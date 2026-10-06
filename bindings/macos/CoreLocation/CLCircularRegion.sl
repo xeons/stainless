@@ -34,10 +34,14 @@ import Standard.ObjC;
 /// Deprecated in macOS 100000.
 public extern objc class CLCircularRegion : CLRegion
 {
-    [Selector("center")] public CLLocationCoordinate2D Center { get; }
-    [Selector("radius")] public CLLocationDistance Radius { get; }
-    [Selector("initWithCenter:radius:identifier:")] public Self InitWithCenterRadiusIdentifier(CLLocationCoordinate2D center, CLLocationDistance radius, NSString identifier);
-    [Selector("containsCoordinate:")] public bool ContainsCoordinate(CLLocationCoordinate2D coordinate);
+    [Selector("center")]
+    public CLLocationCoordinate2D Center { get; }
+    [Selector("radius")]
+    public CLLocationDistance Radius { get; }
+    [Selector("initWithCenter:radius:identifier:")]
+    public Self InitWithCenterRadiusIdentifier(CLLocationCoordinate2D center, CLLocationDistance radius, NSString identifier);
+    [Selector("containsCoordinate:")]
+    public bool ContainsCoordinate(CLLocationCoordinate2D coordinate);
 }
 
 #endif

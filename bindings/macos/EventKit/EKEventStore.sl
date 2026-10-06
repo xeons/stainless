@@ -43,46 +43,84 @@ public objc closure void EKEventStoreFetchRemindersMatchingPredicateCompletionCo
 
 public extern objc class EKEventStore : NSObject
 {
-    [Selector("eventStoreIdentifier")] public NSString EventStoreIdentifier { get; }
-    [Selector("delegateSources")] public NSArray? DelegateSources { get; }
-    [Selector("sources")] public NSArray? Sources { get; }
-    [Selector("defaultCalendarForNewEvents")] public EKCalendar? DefaultCalendarForNewEvents { get; }
-    [Selector("authorizationStatusForEntityType:")] public static EKAuthorizationStatus AuthorizationStatusForEntityType(EKEntityType entityType);
+    [Selector("eventStoreIdentifier")]
+    public NSString EventStoreIdentifier { get; }
+    [Selector("delegateSources")]
+    public NSArray? DelegateSources { get; }
+    [Selector("sources")]
+    public NSArray? Sources { get; }
+    [Selector("defaultCalendarForNewEvents")]
+    public EKCalendar? DefaultCalendarForNewEvents { get; }
+    [Selector("authorizationStatusForEntityType:")]
+    public static EKAuthorizationStatus AuthorizationStatusForEntityType(EKEntityType entityType);
     /// Deprecated in macOS 10.9.
-    [Selector("initWithAccessToEntityTypes:")] public AnyObject InitWithAccessToEntityTypes(EKEntityMask entityTypes);
-    [Selector("init")] public AnyObject Init();
-    [Selector("initWithSources:")] public Self InitWithSources(NSArray sources);
-    [Selector("requestFullAccessToEventsWithCompletion:")] public void RequestFullAccessToEventsWithCompletion(EKEventStoreRequestAccessCompletionHandler completion);
-    [Selector("requestWriteOnlyAccessToEventsWithCompletion:")] public void RequestWriteOnlyAccessToEventsWithCompletion(EKEventStoreRequestAccessCompletionHandler completion);
-    [Selector("requestFullAccessToRemindersWithCompletion:")] public void RequestFullAccessToRemindersWithCompletion(EKEventStoreRequestAccessCompletionHandler completion);
+    [Selector("initWithAccessToEntityTypes:")]
+    public AnyObject InitWithAccessToEntityTypes(EKEntityMask entityTypes);
+    [Selector("init")]
+    public AnyObject Init();
+    [Selector("initWithSources:")]
+    public Self InitWithSources(NSArray sources);
+    [Selector("requestFullAccessToEventsWithCompletion:")]
+    public void RequestFullAccessToEventsWithCompletion(EKEventStoreRequestAccessCompletionHandler completion);
+    [Selector("requestWriteOnlyAccessToEventsWithCompletion:")]
+    public void RequestWriteOnlyAccessToEventsWithCompletion(EKEventStoreRequestAccessCompletionHandler completion);
+    [Selector("requestFullAccessToRemindersWithCompletion:")]
+    public void RequestFullAccessToRemindersWithCompletion(EKEventStoreRequestAccessCompletionHandler completion);
     /// Deprecated in macOS 14.0.
-    [Selector("requestAccessToEntityType:completion:")] public void RequestAccessToEntityTypeCompletion(EKEntityType entityType, EKEventStoreRequestAccessCompletionHandler completion);
-    [Selector("sourceWithIdentifier:")] public EKSource? SourceWithIdentifier(NSString identifier);
-    [Selector("calendarsForEntityType:")] public NSArray CalendarsForEntityType(EKEntityType entityType);
-    [Selector("defaultCalendarForNewReminders")] public EKCalendar? DefaultCalendarForNewReminders();
-    [Selector("calendarWithIdentifier:")] public EKCalendar? CalendarWithIdentifier(NSString identifier);
-    [Selector("saveCalendar:commit:error:")] public bool SaveCalendarCommitError(EKCalendar calendar, bool commit, out NSError? error);
-    [Selector("removeCalendar:commit:error:")] public bool RemoveCalendarCommitError(EKCalendar calendar, bool commit, out NSError? error);
-    [Selector("calendarItemWithIdentifier:")] public EKCalendarItem? CalendarItemWithIdentifier(NSString identifier);
-    [Selector("calendarItemsWithExternalIdentifier:")] public NSArray CalendarItemsWithExternalIdentifier(NSString externalIdentifier);
-    [Selector("saveEvent:span:error:")] public bool SaveEventSpanError(EKEvent event, EKSpan span, out NSError? error);
-    [Selector("removeEvent:span:error:")] public bool RemoveEventSpanError(EKEvent event, EKSpan span, out NSError? error);
-    [Selector("saveEvent:span:commit:error:")] public bool SaveEventSpanCommitError(EKEvent event, EKSpan span, bool commit, out NSError? error);
-    [Selector("removeEvent:span:commit:error:")] public bool RemoveEventSpanCommitError(EKEvent event, EKSpan span, bool commit, out NSError? error);
-    [Selector("eventWithIdentifier:")] public EKEvent? EventWithIdentifier(NSString identifier);
-    [Selector("eventsMatchingPredicate:")] public NSArray EventsMatchingPredicate(NSPredicate predicate);
-    [Selector("enumerateEventsMatchingPredicate:usingBlock:")] public void EnumerateEventsMatchingPredicateUsingBlock(NSPredicate predicate, EKEventSearchCallback block);
-    [Selector("predicateForEventsWithStartDate:endDate:calendars:")] public NSPredicate PredicateForEventsWithStartDateEndDateCalendars(NSDate startDate, NSDate endDate, NSArray? calendars);
-    [Selector("saveReminder:commit:error:")] public bool SaveReminderCommitError(EKReminder reminder, bool commit, out NSError? error);
-    [Selector("removeReminder:commit:error:")] public bool RemoveReminderCommitError(EKReminder reminder, bool commit, out NSError? error);
-    [Selector("fetchRemindersMatchingPredicate:completion:")] public AnyObject FetchRemindersMatchingPredicateCompletion(NSPredicate predicate, EKEventStoreFetchRemindersMatchingPredicateCompletionCompletionBlock completion);
-    [Selector("cancelFetchRequest:")] public void CancelFetchRequest(AnyObject fetchIdentifier);
-    [Selector("predicateForRemindersInCalendars:")] public NSPredicate PredicateForRemindersInCalendars(NSArray? calendars);
-    [Selector("predicateForIncompleteRemindersWithDueDateStarting:ending:calendars:")] public NSPredicate PredicateForIncompleteRemindersWithDueDateStartingEndingCalendars(NSDate? startDate, NSDate? endDate, NSArray? calendars);
-    [Selector("predicateForCompletedRemindersWithCompletionDateStarting:ending:calendars:")] public NSPredicate PredicateForCompletedRemindersWithCompletionDateStartingEndingCalendars(NSDate? startDate, NSDate? endDate, NSArray? calendars);
-    [Selector("commit:")] public bool Commit(out NSError? error);
-    [Selector("reset")] public void Reset();
-    [Selector("refreshSourcesIfNecessary")] public void RefreshSourcesIfNecessary();
+    [Selector("requestAccessToEntityType:completion:")]
+    public void RequestAccessToEntityTypeCompletion(EKEntityType entityType, EKEventStoreRequestAccessCompletionHandler completion);
+    [Selector("sourceWithIdentifier:")]
+    public EKSource? SourceWithIdentifier(NSString identifier);
+    [Selector("calendarsForEntityType:")]
+    public NSArray CalendarsForEntityType(EKEntityType entityType);
+    [Selector("defaultCalendarForNewReminders")]
+    public EKCalendar? DefaultCalendarForNewReminders();
+    [Selector("calendarWithIdentifier:")]
+    public EKCalendar? CalendarWithIdentifier(NSString identifier);
+    [Selector("saveCalendar:commit:error:")]
+    public bool SaveCalendarCommitError(EKCalendar calendar, bool commit, out NSError? error);
+    [Selector("removeCalendar:commit:error:")]
+    public bool RemoveCalendarCommitError(EKCalendar calendar, bool commit, out NSError? error);
+    [Selector("calendarItemWithIdentifier:")]
+    public EKCalendarItem? CalendarItemWithIdentifier(NSString identifier);
+    [Selector("calendarItemsWithExternalIdentifier:")]
+    public NSArray CalendarItemsWithExternalIdentifier(NSString externalIdentifier);
+    [Selector("saveEvent:span:error:")]
+    public bool SaveEventSpanError(EKEvent event, EKSpan span, out NSError? error);
+    [Selector("removeEvent:span:error:")]
+    public bool RemoveEventSpanError(EKEvent event, EKSpan span, out NSError? error);
+    [Selector("saveEvent:span:commit:error:")]
+    public bool SaveEventSpanCommitError(EKEvent event, EKSpan span, bool commit, out NSError? error);
+    [Selector("removeEvent:span:commit:error:")]
+    public bool RemoveEventSpanCommitError(EKEvent event, EKSpan span, bool commit, out NSError? error);
+    [Selector("eventWithIdentifier:")]
+    public EKEvent? EventWithIdentifier(NSString identifier);
+    [Selector("eventsMatchingPredicate:")]
+    public NSArray EventsMatchingPredicate(NSPredicate predicate);
+    [Selector("enumerateEventsMatchingPredicate:usingBlock:")]
+    public void EnumerateEventsMatchingPredicateUsingBlock(NSPredicate predicate, EKEventSearchCallback block);
+    [Selector("predicateForEventsWithStartDate:endDate:calendars:")]
+    public NSPredicate PredicateForEventsWithStartDateEndDateCalendars(NSDate startDate, NSDate endDate, NSArray? calendars);
+    [Selector("saveReminder:commit:error:")]
+    public bool SaveReminderCommitError(EKReminder reminder, bool commit, out NSError? error);
+    [Selector("removeReminder:commit:error:")]
+    public bool RemoveReminderCommitError(EKReminder reminder, bool commit, out NSError? error);
+    [Selector("fetchRemindersMatchingPredicate:completion:")]
+    public AnyObject FetchRemindersMatchingPredicateCompletion(NSPredicate predicate, EKEventStoreFetchRemindersMatchingPredicateCompletionCompletionBlock completion);
+    [Selector("cancelFetchRequest:")]
+    public void CancelFetchRequest(AnyObject fetchIdentifier);
+    [Selector("predicateForRemindersInCalendars:")]
+    public NSPredicate PredicateForRemindersInCalendars(NSArray? calendars);
+    [Selector("predicateForIncompleteRemindersWithDueDateStarting:ending:calendars:")]
+    public NSPredicate PredicateForIncompleteRemindersWithDueDateStartingEndingCalendars(NSDate? startDate, NSDate? endDate, NSArray? calendars);
+    [Selector("predicateForCompletedRemindersWithCompletionDateStarting:ending:calendars:")]
+    public NSPredicate PredicateForCompletedRemindersWithCompletionDateStartingEndingCalendars(NSDate? startDate, NSDate? endDate, NSArray? calendars);
+    [Selector("commit:")]
+    public bool Commit(out NSError? error);
+    [Selector("reset")]
+    public void Reset();
+    [Selector("refreshSourcesIfNecessary")]
+    public void RefreshSourcesIfNecessary();
 }
 
 public objc closure void EKEventStoreRequestAccessCompletionHandler(bool arg0, NSError? arg1);

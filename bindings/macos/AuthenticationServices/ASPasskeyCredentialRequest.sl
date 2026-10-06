@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class ASPasskeyCredentialRequest : NSObject, ASCredentialRequest
 {
-    [Selector("clientDataHash")] public NSData ClientDataHash { get; }
-    [Selector("userVerificationPreference", "setUserVerificationPreference:")] public ASAuthorizationPublicKeyCredentialUserVerificationPreference UserVerificationPreference { get; set; }
-    [Selector("supportedAlgorithms")] public NSArray? SupportedAlgorithms { get; }
-    [Selector("excludedCredentials")] public NSArray? ExcludedCredentials { get; }
-    [Selector("assertionExtensionInput")] public ASPasskeyAssertionCredentialExtensionInput? AssertionExtensionInput { get; }
-    [Selector("registrationExtensionInput")] public ASPasskeyRegistrationCredentialExtensionInput? RegistrationExtensionInput { get; }
-    [Selector("initWithCredentialIdentity:clientDataHash:userVerificationPreference:supportedAlgorithms:")] public Self InitWithCredentialIdentityClientDataHashUserVerificationPreferenceSupportedAlgorithms(ASPasskeyCredentialIdentity credentialIdentity, NSData clientDataHash, ASAuthorizationPublicKeyCredentialUserVerificationPreference userVerificationPreference, NSArray supportedAlgorithms);
-    [Selector("initWithCredentialIdentity:clientDataHash:userVerificationPreference:supportedAlgorithms:assertionExtensionInput:")] public Self InitWithCredentialIdentityClientDataHashUserVerificationPreferenceSupportedAlgorithmsAssertionExtensionInput(ASPasskeyCredentialIdentity credentialIdentity, NSData clientDataHash, ASAuthorizationPublicKeyCredentialUserVerificationPreference userVerificationPreference, NSArray supportedAlgorithms, ASPasskeyAssertionCredentialExtensionInput? assertionExtensionInput);
-    [Selector("initWithCredentialIdentity:clientDataHash:userVerificationPreference:supportedAlgorithms:registrationExtensionInput:")] public Self InitWithCredentialIdentityClientDataHashUserVerificationPreferenceSupportedAlgorithmsRegistrationExtensionInput(ASPasskeyCredentialIdentity credentialIdentity, NSData clientDataHash, ASAuthorizationPublicKeyCredentialUserVerificationPreference userVerificationPreference, NSArray supportedAlgorithms, ASPasskeyRegistrationCredentialExtensionInput? registrationExtensionInput);
-    [Selector("requestWithCredentialIdentity:clientDataHash:userVerificationPreference:supportedAlgorithms:")] public static Self RequestWithCredentialIdentityClientDataHashUserVerificationPreferenceSupportedAlgorithms(ASPasskeyCredentialIdentity credentialIdentity, NSData clientDataHash, ASAuthorizationPublicKeyCredentialUserVerificationPreference userVerificationPreference, NSArray supportedAlgorithms);
+    [Selector("clientDataHash")]
+    public NSData ClientDataHash { get; }
+    [Selector("userVerificationPreference", "setUserVerificationPreference:")]
+    public ASAuthorizationPublicKeyCredentialUserVerificationPreference UserVerificationPreference { get; set; }
+    [Selector("supportedAlgorithms")]
+    public NSArray? SupportedAlgorithms { get; }
+    [Selector("excludedCredentials")]
+    public NSArray? ExcludedCredentials { get; }
+    [Selector("assertionExtensionInput")]
+    public ASPasskeyAssertionCredentialExtensionInput? AssertionExtensionInput { get; }
+    [Selector("registrationExtensionInput")]
+    public ASPasskeyRegistrationCredentialExtensionInput? RegistrationExtensionInput { get; }
+    [Selector("initWithCredentialIdentity:clientDataHash:userVerificationPreference:supportedAlgorithms:")]
+    public Self InitWithCredentialIdentityClientDataHashUserVerificationPreferenceSupportedAlgorithms(ASPasskeyCredentialIdentity credentialIdentity, NSData clientDataHash, ASAuthorizationPublicKeyCredentialUserVerificationPreference userVerificationPreference, NSArray supportedAlgorithms);
+    [Selector("initWithCredentialIdentity:clientDataHash:userVerificationPreference:supportedAlgorithms:assertionExtensionInput:")]
+    public Self InitWithCredentialIdentityClientDataHashUserVerificationPreferenceSupportedAlgorithmsAssertionExtensionInput(ASPasskeyCredentialIdentity credentialIdentity, NSData clientDataHash, ASAuthorizationPublicKeyCredentialUserVerificationPreference userVerificationPreference, NSArray supportedAlgorithms, ASPasskeyAssertionCredentialExtensionInput? assertionExtensionInput);
+    [Selector("initWithCredentialIdentity:clientDataHash:userVerificationPreference:supportedAlgorithms:registrationExtensionInput:")]
+    public Self InitWithCredentialIdentityClientDataHashUserVerificationPreferenceSupportedAlgorithmsRegistrationExtensionInput(ASPasskeyCredentialIdentity credentialIdentity, NSData clientDataHash, ASAuthorizationPublicKeyCredentialUserVerificationPreference userVerificationPreference, NSArray supportedAlgorithms, ASPasskeyRegistrationCredentialExtensionInput? registrationExtensionInput);
+    [Selector("requestWithCredentialIdentity:clientDataHash:userVerificationPreference:supportedAlgorithms:")]
+    public static Self RequestWithCredentialIdentityClientDataHashUserVerificationPreferenceSupportedAlgorithms(ASPasskeyCredentialIdentity credentialIdentity, NSData clientDataHash, ASAuthorizationPublicKeyCredentialUserVerificationPreference userVerificationPreference, NSArray supportedAlgorithms);
 }
 
 #endif

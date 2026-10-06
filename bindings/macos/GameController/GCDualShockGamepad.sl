@@ -31,9 +31,12 @@ import Standard.ObjC;
 
 public extern objc class GCDualShockGamepad : GCExtendedGamepad
 {
-    [Selector("touchpadButton")] public GCControllerButtonInput? TouchpadButton { get; }
-    [Selector("touchpadPrimary")] public GCControllerDirectionPad? TouchpadPrimary { get; }
-    [Selector("touchpadSecondary")] public GCControllerDirectionPad? TouchpadSecondary { get; }
+    [Selector("touchpadButton")]
+    public GCControllerButtonInput? TouchpadButton { get; }
+    [Selector("touchpadPrimary")]
+    public GCControllerDirectionPad? TouchpadPrimary { get; }
+    [Selector("touchpadSecondary")]
+    public GCControllerDirectionPad? TouchpadSecondary { get; }
 }
 
 #endif

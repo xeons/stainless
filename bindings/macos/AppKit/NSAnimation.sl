@@ -54,35 +54,65 @@ public extern "C" NSString NSAnimationProgressMark;
 
 public extern objc class NSAnimation : NSObject, NSCopying, NSCoding
 {
-    [Selector("isAnimating")] public bool Animating { get; }
-    [Selector("currentProgress", "setCurrentProgress:")] public NSAnimationProgress CurrentProgress { get; set; }
-    [Selector("duration", "setDuration:")] public NSTimeInterval Duration { get; set; }
-    [Selector("animationBlockingMode", "setAnimationBlockingMode:")] public NSAnimationBlockingMode AnimationBlockingMode { get; set; }
-    [Selector("frameRate", "setFrameRate:")] public float FrameRate { get; set; }
-    [Selector("animationCurve", "setAnimationCurve:")] public NSAnimationCurve AnimationCurve { get; set; }
-    [Selector("currentValue")] public float CurrentValue { get; }
-    [Selector("delegate", "setDelegate:")] public NSAnimationDelegate? Delegate { get; set; }
-    [Selector("progressMarks", "setProgressMarks:")] public NSArray ProgressMarks { get; set; }
-    [Selector("runLoopModesForAnimating")] public NSArray? RunLoopModesForAnimating { get; }
-    [Selector("initWithDuration:animationCurve:")] public Self InitWithDurationAnimationCurve(NSTimeInterval duration, NSAnimationCurve animationCurve);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("startAnimation")] public void StartAnimation();
-    [Selector("stopAnimation")] public void StopAnimation();
-    [Selector("addProgressMark:")] public void AddProgressMark(NSAnimationProgress progressMark);
-    [Selector("removeProgressMark:")] public void RemoveProgressMark(NSAnimationProgress progressMark);
-    [Selector("startWhenAnimation:reachesProgress:")] public void StartWhenAnimationReachesProgress(NSAnimation animation, NSAnimationProgress startProgress);
-    [Selector("stopWhenAnimation:reachesProgress:")] public void StopWhenAnimationReachesProgress(NSAnimation animation, NSAnimationProgress stopProgress);
-    [Selector("clearStartAnimation")] public void ClearStartAnimation();
-    [Selector("clearStopAnimation")] public void ClearStopAnimation();
+    [Selector("isAnimating")]
+    public bool Animating { get; }
+    [Selector("currentProgress", "setCurrentProgress:")]
+    public NSAnimationProgress CurrentProgress { get; set; }
+    [Selector("duration", "setDuration:")]
+    public NSTimeInterval Duration { get; set; }
+    [Selector("animationBlockingMode", "setAnimationBlockingMode:")]
+    public NSAnimationBlockingMode AnimationBlockingMode { get; set; }
+    [Selector("frameRate", "setFrameRate:")]
+    public float FrameRate { get; set; }
+    [Selector("animationCurve", "setAnimationCurve:")]
+    public NSAnimationCurve AnimationCurve { get; set; }
+    [Selector("currentValue")]
+    public float CurrentValue { get; }
+    [Selector("delegate", "setDelegate:")]
+    public NSAnimationDelegate? Delegate { get; set; }
+    [Selector("progressMarks", "setProgressMarks:")]
+    public NSArray ProgressMarks { get; set; }
+    [Selector("runLoopModesForAnimating")]
+    public NSArray? RunLoopModesForAnimating { get; }
+    [Selector("initWithDuration:animationCurve:")]
+    public Self InitWithDurationAnimationCurve(NSTimeInterval duration, NSAnimationCurve animationCurve);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("startAnimation")]
+    public void StartAnimation();
+    [Selector("stopAnimation")]
+    public void StopAnimation();
+    [Selector("addProgressMark:")]
+    public void AddProgressMark(NSAnimationProgress progressMark);
+    [Selector("removeProgressMark:")]
+    public void RemoveProgressMark(NSAnimationProgress progressMark);
+    [Selector("startWhenAnimation:reachesProgress:")]
+    public void StartWhenAnimationReachesProgress(NSAnimation animation, NSAnimationProgress startProgress);
+    [Selector("stopWhenAnimation:reachesProgress:")]
+    public void StopWhenAnimationReachesProgress(NSAnimation animation, NSAnimationProgress stopProgress);
+    [Selector("clearStartAnimation")]
+    public void ClearStartAnimation();
+    [Selector("clearStopAnimation")]
+    public void ClearStopAnimation();
 }
 
 public objc interface NSAnimationDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("animationShouldStart:")] bool AnimationShouldStart(NSAnimation animation);
-    [Optional] [Selector("animationDidStop:")] void AnimationDidStop(NSAnimation animation);
-    [Optional] [Selector("animationDidEnd:")] void AnimationDidEnd(NSAnimation animation);
-    [Optional] [Selector("animation:valueForProgress:")] float AnimationValueForProgress(NSAnimation animation, NSAnimationProgress progress);
-    [Optional] [Selector("animation:didReachProgressMark:")] void AnimationDidReachProgressMark(NSAnimation animation, NSAnimationProgress progress);
+    [Optional]
+    [Selector("animationShouldStart:")]
+    bool AnimationShouldStart(NSAnimation animation);
+    [Optional]
+    [Selector("animationDidStop:")]
+    void AnimationDidStop(NSAnimation animation);
+    [Optional]
+    [Selector("animationDidEnd:")]
+    void AnimationDidEnd(NSAnimation animation);
+    [Optional]
+    [Selector("animation:valueForProgress:")]
+    float AnimationValueForProgress(NSAnimation animation, NSAnimationProgress progress);
+    [Optional]
+    [Selector("animation:didReachProgressMark:")]
+    void AnimationDidReachProgressMark(NSAnimation animation, NSAnimationProgress progress);
 }
 
 public using NSViewAnimationKey = NSString;
@@ -103,18 +133,24 @@ public extern "C" NSViewAnimationEffectName NSViewAnimationFadeOutEffect;
 
 public extern objc class NSViewAnimation : NSAnimation
 {
-    [Selector("viewAnimations", "setViewAnimations:")] public NSArray ViewAnimations { get; set; }
-    [Selector("initWithViewAnimations:")] public Self InitWithViewAnimations(NSArray viewAnimations);
+    [Selector("viewAnimations", "setViewAnimations:")]
+    public NSArray ViewAnimations { get; set; }
+    [Selector("initWithViewAnimations:")]
+    public Self InitWithViewAnimations(NSArray viewAnimations);
 }
 
 public using NSAnimatablePropertyKey = NSString;
 
 public objc interface NSAnimatablePropertyContainer
 {
-    [Selector("animations", "setAnimations:")] NSDictionary? Animations { get; set; }
-    [Selector("animator")] Self Animator();
-    [Selector("animationForKey:")] AnyObject? AnimationForKey(NSAnimatablePropertyKey key);
-    [Selector("defaultAnimationForKey:")] static abstract AnyObject? DefaultAnimationForKey(NSAnimatablePropertyKey key);
+    [Selector("animations", "setAnimations:")]
+    NSDictionary? Animations { get; set; }
+    [Selector("animator")]
+    Self Animator();
+    [Selector("animationForKey:")]
+    AnyObject? AnimationForKey(NSAnimatablePropertyKey key);
+    [Selector("defaultAnimationForKey:")]
+    static abstract AnyObject? DefaultAnimationForKey(NSAnimatablePropertyKey key);
 }
 
 public extern "C" NSAnimatablePropertyKey? NSAnimationTriggerOrderIn;

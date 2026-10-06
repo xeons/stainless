@@ -45,20 +45,34 @@ public enum VSOriginatingDeviceCategory : long
 
 public extern objc class VSUserAccount : NSObject
 {
-    [Selector("updateURL", "setUpdateURL:")] public NSURL? UpdateURL { get; set; }
-    [Selector("requiresSystemTrust", "setRequiresSystemTrust:")] public bool RequiresSystemTrust { get; set; }
-    [Selector("accountProviderIdentifier", "setAccountProviderIdentifier:")] public NSString? AccountProviderIdentifier { get; set; }
-    [Selector("identifier", "setIdentifier:")] public NSString? Identifier { get; set; }
-    [Selector("accountType", "setAccountType:")] public VSUserAccountType AccountType { get; set; }
-    [Selector("isSignedOut", "setSignedOut:")] public bool SignedOut { get; set; }
-    [Selector("subscriptionBillingCycleEndDate", "setSubscriptionBillingCycleEndDate:")] public NSDate? SubscriptionBillingCycleEndDate { get; set; }
-    [Selector("tierIdentifiers", "setTierIdentifiers:")] public NSArray? TierIdentifiers { get; set; }
-    [Selector("billingIdentifier", "setBillingIdentifier:")] public NSString? BillingIdentifier { get; set; }
-    [Selector("authenticationData", "setAuthenticationData:")] public NSString? AuthenticationData { get; set; }
-    [Selector("isFromCurrentDevice")] public bool FromCurrentDevice { get; }
-    [Selector("deviceCategory")] public VSOriginatingDeviceCategory DeviceCategory { get; }
-    [Selector("appleSubscription", "setAppleSubscription:")] public VSAppleSubscription? AppleSubscription { get; set; }
-    [Selector("initWithAccountType:updateURL:")] public Self InitWithAccountTypeUpdateURL(VSUserAccountType accountType, NSURL? url);
+    [Selector("updateURL", "setUpdateURL:")]
+    public NSURL? UpdateURL { get; set; }
+    [Selector("requiresSystemTrust", "setRequiresSystemTrust:")]
+    public bool RequiresSystemTrust { get; set; }
+    [Selector("accountProviderIdentifier", "setAccountProviderIdentifier:")]
+    public NSString? AccountProviderIdentifier { get; set; }
+    [Selector("identifier", "setIdentifier:")]
+    public NSString? Identifier { get; set; }
+    [Selector("accountType", "setAccountType:")]
+    public VSUserAccountType AccountType { get; set; }
+    [Selector("isSignedOut", "setSignedOut:")]
+    public bool SignedOut { get; set; }
+    [Selector("subscriptionBillingCycleEndDate", "setSubscriptionBillingCycleEndDate:")]
+    public NSDate? SubscriptionBillingCycleEndDate { get; set; }
+    [Selector("tierIdentifiers", "setTierIdentifiers:")]
+    public NSArray? TierIdentifiers { get; set; }
+    [Selector("billingIdentifier", "setBillingIdentifier:")]
+    public NSString? BillingIdentifier { get; set; }
+    [Selector("authenticationData", "setAuthenticationData:")]
+    public NSString? AuthenticationData { get; set; }
+    [Selector("isFromCurrentDevice")]
+    public bool FromCurrentDevice { get; }
+    [Selector("deviceCategory")]
+    public VSOriginatingDeviceCategory DeviceCategory { get; }
+    [Selector("appleSubscription", "setAppleSubscription:")]
+    public VSAppleSubscription? AppleSubscription { get; set; }
+    [Selector("initWithAccountType:updateURL:")]
+    public Self InitWithAccountTypeUpdateURL(VSUserAccountType accountType, NSURL? url);
 }
 
 #endif

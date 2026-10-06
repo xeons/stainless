@@ -275,46 +275,70 @@ public extern "C" CIDynamicRangeOption? kCIDynamicRangeHigh;
 
 public extern objc class CIFilter : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("outputImage")] public CIImage? OutputImage { get; }
-    [Selector("name", "setName:")] public NSString Name { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("inputKeys")] public NSArray InputKeys { get; }
-    [Selector("outputKeys")] public NSArray OutputKeys { get; }
-    [Selector("attributes")] public NSDictionary Attributes { get; }
-    [Selector("setDefaults")] public void SetDefaults();
-    [Selector("apply:arguments:options:")] public CIImage? ApplyArgumentsOptions(CIKernel k, NSArray? args, NSDictionary? dict);
-    [Selector("apply:")] public CIImage? Apply(CIKernel k, ...);
+    [Selector("outputImage")]
+    public CIImage? OutputImage { get; }
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("inputKeys")]
+    public NSArray InputKeys { get; }
+    [Selector("outputKeys")]
+    public NSArray OutputKeys { get; }
+    [Selector("attributes")]
+    public NSDictionary Attributes { get; }
+    [Selector("setDefaults")]
+    public void SetDefaults();
+    [Selector("apply:arguments:options:")]
+    public CIImage? ApplyArgumentsOptions(CIKernel k, NSArray? args, NSDictionary? dict);
+    [Selector("apply:")]
+    public CIImage? Apply(CIKernel k, ...);
 }
 
 [ObjCName("CIFilter")]
 public objc interface CIFilterProtocol
 {
-    [Selector("outputImage")] CIImage? OutputImage { get; }
-    [Optional] [Selector("customAttributes")] static abstract NSDictionary? CustomAttributes();
+    [Selector("outputImage")]
+    CIImage? OutputImage { get; }
+    [Optional]
+    [Selector("customAttributes")]
+    static abstract NSDictionary? CustomAttributes();
 }
 
 /// CIFilterRegistry, a category of CIFilter.
 public extern objc class CIFilter
 {
-    [Selector("filterWithName:")] public static CIFilter? FilterWithName(NSString name);
-    [Selector("filterWithName:keysAndValues:")] public static CIFilter? FilterWithNameKeysAndValues(NSString name, AnyObject? key0, ...);
-    [Selector("filterWithName:withInputParameters:")] public static CIFilter? FilterWithNameWithInputParameters(NSString name, NSDictionary? params);
-    [Selector("filterNamesInCategory:")] public static NSArray FilterNamesInCategory(NSString? category);
-    [Selector("filterNamesInCategories:")] public static NSArray FilterNamesInCategories(NSArray? categories);
-    [Selector("registerFilterName:constructor:classAttributes:")] public static void RegisterFilterNameConstructorClassAttributes(NSString name, CIFilterConstructor anObject, NSDictionary attributes);
-    [Selector("localizedNameForFilterName:")] public static NSString? LocalizedNameForFilterName(NSString filterName);
-    [Selector("localizedNameForCategory:")] public static NSString LocalizedNameForCategory(NSString category);
-    [Selector("localizedDescriptionForFilterName:")] public static NSString? LocalizedDescriptionForFilterName(NSString filterName);
-    [Selector("localizedReferenceDocumentationForFilterName:")] public static NSURL? LocalizedReferenceDocumentationForFilterName(NSString filterName);
+    [Selector("filterWithName:")]
+    public static CIFilter? FilterWithName(NSString name);
+    [Selector("filterWithName:keysAndValues:")]
+    public static CIFilter? FilterWithNameKeysAndValues(NSString name, AnyObject? key0, ...);
+    [Selector("filterWithName:withInputParameters:")]
+    public static CIFilter? FilterWithNameWithInputParameters(NSString name, NSDictionary? params);
+    [Selector("filterNamesInCategory:")]
+    public static NSArray FilterNamesInCategory(NSString? category);
+    [Selector("filterNamesInCategories:")]
+    public static NSArray FilterNamesInCategories(NSArray? categories);
+    [Selector("registerFilterName:constructor:classAttributes:")]
+    public static void RegisterFilterNameConstructorClassAttributes(NSString name, CIFilterConstructor anObject, NSDictionary attributes);
+    [Selector("localizedNameForFilterName:")]
+    public static NSString? LocalizedNameForFilterName(NSString filterName);
+    [Selector("localizedNameForCategory:")]
+    public static NSString LocalizedNameForCategory(NSString category);
+    [Selector("localizedDescriptionForFilterName:")]
+    public static NSString? LocalizedDescriptionForFilterName(NSString filterName);
+    [Selector("localizedReferenceDocumentationForFilterName:")]
+    public static NSURL? LocalizedReferenceDocumentationForFilterName(NSString filterName);
 }
 
 /// CIFilterXMPSerialization, a category of CIFilter.
 public extern objc class CIFilter
 {
     /// Deprecated in macOS 14.0.
-    [Selector("serializedXMPFromFilters:inputImageExtent:")] public static NSData? SerializedXMPFromFiltersInputImageExtent(NSArray filters, CGRect extent);
+    [Selector("serializedXMPFromFilters:inputImageExtent:")]
+    public static NSData? SerializedXMPFromFiltersInputImageExtent(NSArray filters, CGRect extent);
     /// Deprecated in macOS 14.0.
-    [Selector("filterArrayFromSerializedXMP:inputImageExtent:error:")] public static NSArray FilterArrayFromSerializedXMPInputImageExtentError(NSData xmpData, CGRect extent, out NSError? outError);
+    [Selector("filterArrayFromSerializedXMP:inputImageExtent:error:")]
+    public static NSArray FilterArrayFromSerializedXMPInputImageExtentError(NSData xmpData, CGRect extent, out NSError? outError);
 }
 
 #endif

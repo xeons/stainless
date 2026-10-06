@@ -33,33 +33,51 @@ import Standard.ObjC;
 
 public extern objc class DRTrack : NSObject
 {
-    [Selector("initWithProducer:")] public AnyObject? InitWithProducer(AnyObject? producer);
-    [Selector("properties")] public NSDictionary? Properties();
-    [Selector("setProperties:")] public void SetProperties(NSDictionary? properties);
-    [Selector("testProductionSpeedForInterval:")] public float TestProductionSpeedForInterval(NSTimeInterval interval);
-    [Selector("testProductionSpeedForLength:")] public float TestProductionSpeedForLength(uint length);
-    [Selector("estimateLength")] public ulong EstimateLength();
+    [Selector("initWithProducer:")]
+    public AnyObject? InitWithProducer(AnyObject? producer);
+    [Selector("properties")]
+    public NSDictionary? Properties();
+    [Selector("setProperties:")]
+    public void SetProperties(NSDictionary? properties);
+    [Selector("testProductionSpeedForInterval:")]
+    public float TestProductionSpeedForInterval(NSTimeInterval interval);
+    [Selector("testProductionSpeedForLength:")]
+    public float TestProductionSpeedForLength(uint length);
+    [Selector("estimateLength")]
+    public ulong EstimateLength();
 }
 
 /// PropertyConvenience, a category of DRTrack.
 public extern objc class DRTrack
 {
-    [Selector("length")] public DRMSF? Length();
-    [Selector("preGap")] public DRMSF? PreGap();
-    [Selector("setPreGap:")] public void SetPreGap(DRMSF? preGap);
+    [Selector("length")]
+    public DRMSF? Length();
+    [Selector("preGap")]
+    public DRMSF? PreGap();
+    [Selector("setPreGap:")]
+    public void SetPreGap(DRMSF? preGap);
 }
 
 public objc interface DRTrackDataProduction
 {
-    [Selector("estimateLengthOfTrack:")] ulong EstimateLengthOfTrack(DRTrack? track);
-    [Selector("prepareTrack:forBurn:toMedia:")] bool PrepareTrackForBurnToMedia(DRTrack? track, DRBurn? burn, NSDictionary? mediaInfo);
-    [Selector("cleanupTrackAfterBurn:")] void CleanupTrackAfterBurn(DRTrack? track);
-    [Selector("producePreGapForTrack:intoBuffer:length:atAddress:blockSize:ioFlags:")] uint ProducePreGapForTrackIntoBufferLengthAtAddressBlockSizeIoFlags(DRTrack? track, byte* buffer, uint bufferLength, ulong address, uint blockSize, uint* flags);
-    [Selector("produceDataForTrack:intoBuffer:length:atAddress:blockSize:ioFlags:")] uint ProduceDataForTrackIntoBufferLengthAtAddressBlockSizeIoFlags(DRTrack? track, byte* buffer, uint bufferLength, ulong address, uint blockSize, uint* flags);
-    [Selector("prepareTrackForVerification:")] bool PrepareTrackForVerification(DRTrack? track);
-    [Selector("verifyPreGapForTrack:inBuffer:length:atAddress:blockSize:ioFlags:")] bool VerifyPreGapForTrackInBufferLengthAtAddressBlockSizeIoFlags(DRTrack? track, byte* buffer, uint bufferLength, ulong address, uint blockSize, uint* flags);
-    [Selector("verifyDataForTrack:inBuffer:length:atAddress:blockSize:ioFlags:")] bool VerifyDataForTrackInBufferLengthAtAddressBlockSizeIoFlags(DRTrack? track, byte* buffer, uint bufferLength, ulong address, uint blockSize, uint* flags);
-    [Selector("cleanupTrackAfterVerification:")] bool CleanupTrackAfterVerification(DRTrack? track);
+    [Selector("estimateLengthOfTrack:")]
+    ulong EstimateLengthOfTrack(DRTrack? track);
+    [Selector("prepareTrack:forBurn:toMedia:")]
+    bool PrepareTrackForBurnToMedia(DRTrack? track, DRBurn? burn, NSDictionary? mediaInfo);
+    [Selector("cleanupTrackAfterBurn:")]
+    void CleanupTrackAfterBurn(DRTrack? track);
+    [Selector("producePreGapForTrack:intoBuffer:length:atAddress:blockSize:ioFlags:")]
+    uint ProducePreGapForTrackIntoBufferLengthAtAddressBlockSizeIoFlags(DRTrack? track, byte* buffer, uint bufferLength, ulong address, uint blockSize, uint* flags);
+    [Selector("produceDataForTrack:intoBuffer:length:atAddress:blockSize:ioFlags:")]
+    uint ProduceDataForTrackIntoBufferLengthAtAddressBlockSizeIoFlags(DRTrack? track, byte* buffer, uint bufferLength, ulong address, uint blockSize, uint* flags);
+    [Selector("prepareTrackForVerification:")]
+    bool PrepareTrackForVerification(DRTrack? track);
+    [Selector("verifyPreGapForTrack:inBuffer:length:atAddress:blockSize:ioFlags:")]
+    bool VerifyPreGapForTrackInBufferLengthAtAddressBlockSizeIoFlags(DRTrack? track, byte* buffer, uint bufferLength, ulong address, uint blockSize, uint* flags);
+    [Selector("verifyDataForTrack:inBuffer:length:atAddress:blockSize:ioFlags:")]
+    bool VerifyDataForTrackInBufferLengthAtAddressBlockSizeIoFlags(DRTrack? track, byte* buffer, uint bufferLength, ulong address, uint blockSize, uint* flags);
+    [Selector("cleanupTrackAfterVerification:")]
+    bool CleanupTrackAfterVerification(DRTrack? track);
 }
 
 public extern "C" NSString? DRTrackLengthKey;

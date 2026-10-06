@@ -34,12 +34,18 @@ import Standard.ObjC;
 
 public extern objc class PHContentEditingOutput : NSObject
 {
-    [Selector("adjustmentData", "setAdjustmentData:")] public PHAdjustmentData? AdjustmentData { get; set; }
-    [Selector("renderedContentURL")] public NSURL RenderedContentURL { get; }
-    [Selector("defaultRenderedContentType")] public UTType? DefaultRenderedContentType { get; }
-    [Selector("supportedRenderedContentTypes")] public NSArray SupportedRenderedContentTypes { get; }
-    [Selector("initWithContentEditingInput:")] public Self InitWithContentEditingInput(PHContentEditingInput contentEditingInput);
-    [Selector("renderedContentURLForType:error:")] public NSURL? RenderedContentURLForTypeError(UTType type, out NSError? error);
+    [Selector("adjustmentData", "setAdjustmentData:")]
+    public PHAdjustmentData? AdjustmentData { get; set; }
+    [Selector("renderedContentURL")]
+    public NSURL RenderedContentURL { get; }
+    [Selector("defaultRenderedContentType")]
+    public UTType? DefaultRenderedContentType { get; }
+    [Selector("supportedRenderedContentTypes")]
+    public NSArray SupportedRenderedContentTypes { get; }
+    [Selector("initWithContentEditingInput:")]
+    public Self InitWithContentEditingInput(PHContentEditingInput contentEditingInput);
+    [Selector("renderedContentURLForType:error:")]
+    public NSURL? RenderedContentURLForTypeError(UTType type, out NSError? error);
 }
 
 #endif

@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INIntentResolutionResult : NSObject
 {
-    [Selector("needsValue")] public static Self NeedsValue();
-    [Selector("notRequired")] public static Self NotRequired();
-    [Selector("unsupported")] public static Self Unsupported();
+    [Selector("needsValue")]
+    public static Self NeedsValue();
+    [Selector("notRequired")]
+    public static Self NotRequired();
+    [Selector("unsupported")]
+    public static Self Unsupported();
 }
 
 #endif

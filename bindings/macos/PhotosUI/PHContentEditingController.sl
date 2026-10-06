@@ -36,11 +36,16 @@ public objc closure void PHContentEditingControllerFinishContentEditingWithCompl
 
 public objc interface PHContentEditingController : NSObjectProtocol
 {
-    [Selector("shouldShowCancelConfirmation")] bool ShouldShowCancelConfirmation { get; }
-    [Selector("canHandleAdjustmentData:")] bool CanHandleAdjustmentData(PHAdjustmentData adjustmentData);
-    [Selector("startContentEditingWithInput:placeholderImage:")] void StartContentEditingWithInputPlaceholderImage(PHContentEditingInput contentEditingInput, NSImage placeholderImage);
-    [Selector("finishContentEditingWithCompletionHandler:")] void FinishContentEditingWithCompletionHandler(PHContentEditingControllerFinishContentEditingWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("cancelContentEditing")] void CancelContentEditing();
+    [Selector("shouldShowCancelConfirmation")]
+    bool ShouldShowCancelConfirmation { get; }
+    [Selector("canHandleAdjustmentData:")]
+    bool CanHandleAdjustmentData(PHAdjustmentData adjustmentData);
+    [Selector("startContentEditingWithInput:placeholderImage:")]
+    void StartContentEditingWithInputPlaceholderImage(PHContentEditingInput contentEditingInput, NSImage placeholderImage);
+    [Selector("finishContentEditingWithCompletionHandler:")]
+    void FinishContentEditingWithCompletionHandler(PHContentEditingControllerFinishContentEditingWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("cancelContentEditing")]
+    void CancelContentEditing();
 }
 
 #endif

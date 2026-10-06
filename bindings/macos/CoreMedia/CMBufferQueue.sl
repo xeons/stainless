@@ -106,7 +106,8 @@ public extern "C" OSStatus CMBufferQueueEnqueue(CMBufferQueueRef queue, CMBuffer
 /// Deprecated in macOS 15.0.
 public extern "C" CMBufferRef? CMBufferQueueGetHead(CMBufferQueueRef queue);
 
-[ReturnsRetained] public extern "C" CMBufferRef? CMBufferQueueCopyHead(CMBufferQueueRef queue);
+[ReturnsRetained]
+public extern "C" CMBufferRef? CMBufferQueueCopyHead(CMBufferQueueRef queue);
 
 public extern "C" Boolean CMBufferQueueIsEmpty(CMBufferQueueRef queue);
 

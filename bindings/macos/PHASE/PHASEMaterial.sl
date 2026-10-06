@@ -42,7 +42,8 @@ public enum PHASEMaterialPreset : long
 
 public extern objc class PHASEMaterial : NSObject
 {
-    [Selector("initWithEngine:preset:")] public Self InitWithEnginePreset(PHASEEngine engine, PHASEMaterialPreset preset);
+    [Selector("initWithEngine:preset:")]
+    public Self InitWithEnginePreset(PHASEEngine engine, PHASEMaterialPreset preset);
 }
 
 #endif

@@ -43,15 +43,24 @@ public objc closure void CMHeadphoneActivityHandler(CMMotionActivity? arg0, NSEr
 
 public extern objc class CMHeadphoneActivityManager : NSObject
 {
-    [Selector("isActivityAvailable")] public bool ActivityAvailable { get; }
-    [Selector("isActivityActive")] public bool ActivityActive { get; }
-    [Selector("isStatusAvailable")] public bool StatusAvailable { get; }
-    [Selector("isStatusActive")] public bool StatusActive { get; }
-    [Selector("authorizationStatus")] public static CMAuthorizationStatus AuthorizationStatus();
-    [Selector("startActivityUpdatesToQueue:withHandler:")] public void StartActivityUpdatesToQueueWithHandler(NSOperationQueue queue, CMHeadphoneActivityHandler handler);
-    [Selector("stopActivityUpdates")] public void StopActivityUpdates();
-    [Selector("startStatusUpdatesToQueue:withHandler:")] public void StartStatusUpdatesToQueueWithHandler(NSOperationQueue queue, CMHeadphoneActivityStatusHandler handler);
-    [Selector("stopStatusUpdates")] public void StopStatusUpdates();
+    [Selector("isActivityAvailable")]
+    public bool ActivityAvailable { get; }
+    [Selector("isActivityActive")]
+    public bool ActivityActive { get; }
+    [Selector("isStatusAvailable")]
+    public bool StatusAvailable { get; }
+    [Selector("isStatusActive")]
+    public bool StatusActive { get; }
+    [Selector("authorizationStatus")]
+    public static CMAuthorizationStatus AuthorizationStatus();
+    [Selector("startActivityUpdatesToQueue:withHandler:")]
+    public void StartActivityUpdatesToQueueWithHandler(NSOperationQueue queue, CMHeadphoneActivityHandler handler);
+    [Selector("stopActivityUpdates")]
+    public void StopActivityUpdates();
+    [Selector("startStatusUpdatesToQueue:withHandler:")]
+    public void StartStatusUpdatesToQueueWithHandler(NSOperationQueue queue, CMHeadphoneActivityStatusHandler handler);
+    [Selector("stopStatusUpdates")]
+    public void StopStatusUpdates();
 }
 
 #endif

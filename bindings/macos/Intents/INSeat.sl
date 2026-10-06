@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class INSeat : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("seatSection")] public NSString? SeatSection { get; }
-    [Selector("seatRow")] public NSString? SeatRow { get; }
-    [Selector("seatNumber")] public NSString? SeatNumber { get; }
-    [Selector("seatingType")] public NSString? SeatingType { get; }
-    [Selector("initWithSeatSection:seatRow:seatNumber:seatingType:")] public Self InitWithSeatSectionSeatRowSeatNumberSeatingType(NSString? seatSection, NSString? seatRow, NSString? seatNumber, NSString? seatingType);
+    [Selector("seatSection")]
+    public NSString? SeatSection { get; }
+    [Selector("seatRow")]
+    public NSString? SeatRow { get; }
+    [Selector("seatNumber")]
+    public NSString? SeatNumber { get; }
+    [Selector("seatingType")]
+    public NSString? SeatingType { get; }
+    [Selector("initWithSeatSection:seatRow:seatNumber:seatingType:")]
+    public Self InitWithSeatSectionSeatRowSeatNumberSeatingType(NSString? seatSection, NSString? seatRow, NSString? seatNumber, NSString? seatingType);
 }
 
 #endif

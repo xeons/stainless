@@ -35,16 +35,26 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothObjectPushUIController : NSWindowController
 {
-    [Selector("initObjectPushWithBluetoothDevice:withFiles:delegate:")] public IOBluetoothObjectPushUIController? InitObjectPushWithBluetoothDeviceWithFilesDelegate(IOBluetoothDevice? inDevice, NSArray? inFiles, AnyObject? inDelegate);
-    [Selector("runModal")] public void RunModal();
-    [Selector("runPanel")] public void RunPanel();
-    [Selector("beginSheetModalForWindow:modalDelegate:didEndSelector:contextInfo:")] public IOReturn BeginSheetModalForWindowModalDelegateDidEndSelectorContextInfo(NSWindow? sheetWindow, AnyObject? modalDelegate, Selector didEndSelector, void* contextInfo);
-    [Selector("stop")] public void Stop();
-    [Selector("setTitle:")] public void SetTitle(NSString? windowTitle);
-    [Selector("getTitle")] public NSString? GetTitle();
-    [Selector("setIconImage:")] public void SetIconImage(NSImage? image);
-    [Selector("getDevice")] public IOBluetoothDevice? GetDevice();
-    [Selector("isTransferInProgress")] public bool IsTransferInProgress();
+    [Selector("initObjectPushWithBluetoothDevice:withFiles:delegate:")]
+    public IOBluetoothObjectPushUIController? InitObjectPushWithBluetoothDeviceWithFilesDelegate(IOBluetoothDevice? inDevice, NSArray? inFiles, AnyObject? inDelegate);
+    [Selector("runModal")]
+    public void RunModal();
+    [Selector("runPanel")]
+    public void RunPanel();
+    [Selector("beginSheetModalForWindow:modalDelegate:didEndSelector:contextInfo:")]
+    public IOReturn BeginSheetModalForWindowModalDelegateDidEndSelectorContextInfo(NSWindow? sheetWindow, AnyObject? modalDelegate, Selector didEndSelector, void* contextInfo);
+    [Selector("stop")]
+    public void Stop();
+    [Selector("setTitle:")]
+    public void SetTitle(NSString? windowTitle);
+    [Selector("getTitle")]
+    public NSString? GetTitle();
+    [Selector("setIconImage:")]
+    public void SetIconImage(NSImage? image);
+    [Selector("getDevice")]
+    public IOBluetoothDevice? GetDevice();
+    [Selector("isTransferInProgress")]
+    public bool IsTransferInProgress();
 }
 
 #endif

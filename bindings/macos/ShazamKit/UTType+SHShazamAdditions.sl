@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// SHShazamAdditions, a category of UTType.
 public extern objc class UTType
 {
-    [Selector("SHSignatureContentType")] public static UTType? SHSignatureContentType { get; }
-    [Selector("SHCustomCatalogContentType")] public static UTType? SHCustomCatalogContentType { get; }
+    [Selector("SHSignatureContentType")]
+    public static UTType? SHSignatureContentType { get; }
+    [Selector("SHCustomCatalogContentType")]
+    public static UTType? SHCustomCatalogContentType { get; }
 }
 
 #endif

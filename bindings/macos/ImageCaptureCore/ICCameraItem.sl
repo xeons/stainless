@@ -60,31 +60,53 @@ public extern "C" ICDownloadOption ICTruncateAfterSuccessfulDownload;
 
 public extern objc class ICCameraItem : NSObject
 {
-    [Selector("device")] public ICCameraDevice? Device { get; }
-    [Selector("parentFolder")] public ICCameraFolder? ParentFolder { get; }
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("UTI")] public NSString? UTI { get; }
-    [Selector("fileSystemPath")] public NSString? FileSystemPath { get; }
-    [Selector("isLocked")] public bool Locked { get; }
-    [Selector("isRaw")] public bool Raw { get; }
-    [Selector("isInTemporaryStore")] public bool InTemporaryStore { get; }
-    [Selector("creationDate")] public NSDate? CreationDate { get; }
-    [Selector("modificationDate")] public NSDate? ModificationDate { get; }
-    [Selector("thumbnail")] public CGImageRef? Thumbnail { get; }
-    [Selector("metadata")] public NSDictionary? Metadata { get; }
-    [Selector("userData")] public NSMutableDictionary? UserData { get; }
-    [Selector("ptpObjectHandle")] public uint PtpObjectHandle { get; }
-    [Selector("wasAddedAfterContentCatalogCompleted")] public bool AddedAfterContentCatalogCompleted { get; }
+    [Selector("device")]
+    public ICCameraDevice? Device { get; }
+    [Selector("parentFolder")]
+    public ICCameraFolder? ParentFolder { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("UTI")]
+    public NSString? UTI { get; }
+    [Selector("fileSystemPath")]
+    public NSString? FileSystemPath { get; }
+    [Selector("isLocked")]
+    public bool Locked { get; }
+    [Selector("isRaw")]
+    public bool Raw { get; }
+    [Selector("isInTemporaryStore")]
+    public bool InTemporaryStore { get; }
+    [Selector("creationDate")]
+    public NSDate? CreationDate { get; }
+    [Selector("modificationDate")]
+    public NSDate? ModificationDate { get; }
+    [Selector("thumbnail")]
+    public CGImageRef? Thumbnail { get; }
+    [Selector("metadata")]
+    public NSDictionary? Metadata { get; }
+    [Selector("userData")]
+    public NSMutableDictionary? UserData { get; }
+    [Selector("ptpObjectHandle")]
+    public uint PtpObjectHandle { get; }
+    [Selector("wasAddedAfterContentCatalogCompleted")]
+    public bool AddedAfterContentCatalogCompleted { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("thumbnailIfAvailable")] public CGImageRef? ThumbnailIfAvailable { get; }
+    [Selector("thumbnailIfAvailable")]
+    public CGImageRef? ThumbnailIfAvailable { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("largeThumbnailIfAvailable")] public CGImageRef? LargeThumbnailIfAvailable { get; }
+    [Selector("largeThumbnailIfAvailable")]
+    public CGImageRef? LargeThumbnailIfAvailable { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("metadataIfAvailable")] public NSDictionary? MetadataIfAvailable { get; }
-    [Selector("requestThumbnail")] public void RequestThumbnail();
-    [Selector("requestMetadata")] public void RequestMetadata();
-    [Selector("flushThumbnailCache")] public void FlushThumbnailCache();
-    [Selector("flushMetadataCache")] public void FlushMetadataCache();
+    [Selector("metadataIfAvailable")]
+    public NSDictionary? MetadataIfAvailable { get; }
+    [Selector("requestThumbnail")]
+    public void RequestThumbnail();
+    [Selector("requestMetadata")]
+    public void RequestMetadata();
+    [Selector("flushThumbnailCache")]
+    public void FlushThumbnailCache();
+    [Selector("flushMetadataCache")]
+    public void FlushMetadataCache();
 }
 
 #endif

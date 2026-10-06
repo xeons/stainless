@@ -37,7 +37,8 @@ public struct __CFDateFormatter;
 [CFType("CFDateFormatterGetTypeID")]
 public extern objc class CFDateFormatterRef : CFTypeRef { }
 
-[ReturnsRetained] public extern "C" CFStringRef? CFDateFormatterCreateDateFormatFromTemplate(CFAllocatorRef? allocator, CFStringRef? tmplate, CFOptionFlags options, CFLocaleRef? locale);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFDateFormatterCreateDateFormatFromTemplate(CFAllocatorRef? allocator, CFStringRef? tmplate, CFOptionFlags options, CFLocaleRef? locale);
 
 public extern "C" CFTypeID CFDateFormatterGetTypeID();
 
@@ -69,9 +70,11 @@ public enum CFISO8601DateFormatOptions : ulong
     InternetDateTime = 1907,
 }
 
-[ReturnsRetained] public extern "C" CFDateFormatterRef? CFDateFormatterCreateISO8601Formatter(CFAllocatorRef? allocator, CFISO8601DateFormatOptions formatOptions);
+[ReturnsRetained]
+public extern "C" CFDateFormatterRef? CFDateFormatterCreateISO8601Formatter(CFAllocatorRef? allocator, CFISO8601DateFormatOptions formatOptions);
 
-[ReturnsRetained] public extern "C" CFDateFormatterRef? CFDateFormatterCreate(CFAllocatorRef? allocator, CFLocaleRef? locale, CFDateFormatterStyle dateStyle, CFDateFormatterStyle timeStyle);
+[ReturnsRetained]
+public extern "C" CFDateFormatterRef? CFDateFormatterCreate(CFAllocatorRef? allocator, CFLocaleRef? locale, CFDateFormatterStyle dateStyle, CFDateFormatterStyle timeStyle);
 
 public extern "C" CFLocaleRef? CFDateFormatterGetLocale(CFDateFormatterRef? formatter);
 
@@ -83,17 +86,21 @@ public extern "C" CFStringRef? CFDateFormatterGetFormat(CFDateFormatterRef? form
 
 public extern "C" void CFDateFormatterSetFormat(CFDateFormatterRef? formatter, CFStringRef? formatString);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFDateFormatterCreateStringWithDate(CFAllocatorRef? allocator, CFDateFormatterRef? formatter, CFDateRef? date);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFDateFormatterCreateStringWithDate(CFAllocatorRef? allocator, CFDateFormatterRef? formatter, CFDateRef? date);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFDateFormatterCreateStringWithAbsoluteTime(CFAllocatorRef? allocator, CFDateFormatterRef? formatter, CFAbsoluteTime at);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFDateFormatterCreateStringWithAbsoluteTime(CFAllocatorRef? allocator, CFDateFormatterRef? formatter, CFAbsoluteTime at);
 
-[ReturnsRetained] public extern "C" CFDateRef? CFDateFormatterCreateDateFromString(CFAllocatorRef? allocator, CFDateFormatterRef? formatter, CFStringRef? string, CFRange* rangep);
+[ReturnsRetained]
+public extern "C" CFDateRef? CFDateFormatterCreateDateFromString(CFAllocatorRef? allocator, CFDateFormatterRef? formatter, CFStringRef? string, CFRange* rangep);
 
 public extern "C" Boolean CFDateFormatterGetAbsoluteTimeFromString(CFDateFormatterRef? formatter, CFStringRef? string, CFRange* rangep, CFAbsoluteTime* atp);
 
 public extern "C" void CFDateFormatterSetProperty(CFDateFormatterRef? formatter, CFStringRef? key, CFTypeRef? value);
 
-[ReturnsRetained] public extern "C" CFTypeRef? CFDateFormatterCopyProperty(CFDateFormatterRef? formatter, CFDateFormatterKey? key);
+[ReturnsRetained]
+public extern "C" CFTypeRef? CFDateFormatterCopyProperty(CFDateFormatterRef? formatter, CFDateFormatterKey? key);
 
 public extern "C" CFDateFormatterKey? kCFDateFormatterIsLenient;
 

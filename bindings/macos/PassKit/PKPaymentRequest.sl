@@ -80,39 +80,72 @@ public enum PKApplePayLaterAvailability : long
 
 public extern objc class PKPaymentRequest : NSObject
 {
-    [Selector("merchantIdentifier", "setMerchantIdentifier:")] public NSString MerchantIdentifier { get; set; }
-    [Selector("attributionIdentifier", "setAttributionIdentifier:")] public NSString? AttributionIdentifier { get; set; }
-    [Selector("countryCode", "setCountryCode:")] public NSString CountryCode { get; set; }
-    [Selector("supportedNetworks", "setSupportedNetworks:")] public NSArray SupportedNetworks { get; set; }
-    [Selector("merchantCapabilities", "setMerchantCapabilities:")] public PKMerchantCapability MerchantCapabilities { get; set; }
-    [Selector("supportsCouponCode", "setSupportsCouponCode:")] public bool SupportsCouponCode { get; set; }
-    [Selector("couponCode", "setCouponCode:")] public NSString? CouponCode { get; set; }
-    [Selector("merchantCategoryCode", "setMerchantCategoryCode:")] public PKMerchantCategoryCode MerchantCategoryCode { get; set; }
-    [Selector("paymentSummaryItems", "setPaymentSummaryItems:")] public NSArray PaymentSummaryItems { get; set; }
-    [Selector("currencyCode", "setCurrencyCode:")] public NSString CurrencyCode { get; set; }
-    [Selector("requiredBillingContactFields", "setRequiredBillingContactFields:")] public NSSet RequiredBillingContactFields { get; set; }
-    [Selector("requiredBillingAddressFields", "setRequiredBillingAddressFields:")] public PKAddressField RequiredBillingAddressFields { get; set; }
-    [Selector("billingContact", "setBillingContact:")] public PKContact? BillingContact { get; set; }
-    [Selector("requiredShippingContactFields", "setRequiredShippingContactFields:")] public NSSet RequiredShippingContactFields { get; set; }
-    [Selector("requiredShippingAddressFields", "setRequiredShippingAddressFields:")] public PKAddressField RequiredShippingAddressFields { get; set; }
-    [Selector("shippingContact", "setShippingContact:")] public PKContact? ShippingContact { get; set; }
-    [Selector("shippingMethods", "setShippingMethods:")] public NSArray? ShippingMethods { get; set; }
-    [Selector("shippingType", "setShippingType:")] public PKShippingType ShippingType { get; set; }
-    [Selector("shippingContactEditingMode", "setShippingContactEditingMode:")] public PKShippingContactEditingMode ShippingContactEditingMode { get; set; }
-    [Selector("applicationData", "setApplicationData:")] public NSData? ApplicationData { get; set; }
-    [Selector("supportedCountries", "setSupportedCountries:")] public NSSet? SupportedCountries { get; set; }
-    [Selector("multiTokenContexts", "setMultiTokenContexts:")] public NSArray? MultiTokenContexts { get; set; }
-    [Selector("recurringPaymentRequest", "setRecurringPaymentRequest:")] public PKRecurringPaymentRequest? RecurringPaymentRequest { get; set; }
-    [Selector("automaticReloadPaymentRequest", "setAutomaticReloadPaymentRequest:")] public PKAutomaticReloadPaymentRequest? AutomaticReloadPaymentRequest { get; set; }
-    [Selector("deferredPaymentRequest", "setDeferredPaymentRequest:")] public PKDeferredPaymentRequest? DeferredPaymentRequest { get; set; }
-    [Selector("applePayLaterAvailability", "setApplePayLaterAvailability:")] public PKApplePayLaterAvailability ApplePayLaterAvailability { get; set; }
-    [Selector("availableNetworks")] public static NSArray AvailableNetworks();
-    [Selector("paymentContactInvalidErrorWithContactField:localizedDescription:")] public static NSError PaymentContactInvalidErrorWithContactFieldLocalizedDescription(PKContactField field, NSString? localizedDescription);
-    [Selector("paymentShippingAddressInvalidErrorWithKey:localizedDescription:")] public static NSError PaymentShippingAddressInvalidErrorWithKeyLocalizedDescription(NSString postalAddressKey, NSString? localizedDescription);
-    [Selector("paymentBillingAddressInvalidErrorWithKey:localizedDescription:")] public static NSError PaymentBillingAddressInvalidErrorWithKeyLocalizedDescription(NSString postalAddressKey, NSString? localizedDescription);
-    [Selector("paymentShippingAddressUnserviceableErrorWithLocalizedDescription:")] public static NSError PaymentShippingAddressUnserviceableErrorWithLocalizedDescription(NSString? localizedDescription);
-    [Selector("paymentCouponCodeInvalidErrorWithLocalizedDescription:")] public static NSError PaymentCouponCodeInvalidErrorWithLocalizedDescription(NSString? localizedDescription);
-    [Selector("paymentCouponCodeExpiredErrorWithLocalizedDescription:")] public static NSError PaymentCouponCodeExpiredErrorWithLocalizedDescription(NSString? localizedDescription);
+    [Selector("merchantIdentifier", "setMerchantIdentifier:")]
+    public NSString MerchantIdentifier { get; set; }
+    [Selector("attributionIdentifier", "setAttributionIdentifier:")]
+    public NSString? AttributionIdentifier { get; set; }
+    [Selector("countryCode", "setCountryCode:")]
+    public NSString CountryCode { get; set; }
+    [Selector("supportedNetworks", "setSupportedNetworks:")]
+    public NSArray SupportedNetworks { get; set; }
+    [Selector("merchantCapabilities", "setMerchantCapabilities:")]
+    public PKMerchantCapability MerchantCapabilities { get; set; }
+    [Selector("supportsCouponCode", "setSupportsCouponCode:")]
+    public bool SupportsCouponCode { get; set; }
+    [Selector("couponCode", "setCouponCode:")]
+    public NSString? CouponCode { get; set; }
+    [Selector("merchantCategoryCode", "setMerchantCategoryCode:")]
+    public PKMerchantCategoryCode MerchantCategoryCode { get; set; }
+    [Selector("paymentSummaryItems", "setPaymentSummaryItems:")]
+    public NSArray PaymentSummaryItems { get; set; }
+    [Selector("currencyCode", "setCurrencyCode:")]
+    public NSString CurrencyCode { get; set; }
+    [Selector("requiredBillingContactFields", "setRequiredBillingContactFields:")]
+    public NSSet RequiredBillingContactFields { get; set; }
+    [Selector("requiredBillingAddressFields", "setRequiredBillingAddressFields:")]
+    public PKAddressField RequiredBillingAddressFields { get; set; }
+    [Selector("billingContact", "setBillingContact:")]
+    public PKContact? BillingContact { get; set; }
+    [Selector("requiredShippingContactFields", "setRequiredShippingContactFields:")]
+    public NSSet RequiredShippingContactFields { get; set; }
+    [Selector("requiredShippingAddressFields", "setRequiredShippingAddressFields:")]
+    public PKAddressField RequiredShippingAddressFields { get; set; }
+    [Selector("shippingContact", "setShippingContact:")]
+    public PKContact? ShippingContact { get; set; }
+    [Selector("shippingMethods", "setShippingMethods:")]
+    public NSArray? ShippingMethods { get; set; }
+    [Selector("shippingType", "setShippingType:")]
+    public PKShippingType ShippingType { get; set; }
+    [Selector("shippingContactEditingMode", "setShippingContactEditingMode:")]
+    public PKShippingContactEditingMode ShippingContactEditingMode { get; set; }
+    [Selector("applicationData", "setApplicationData:")]
+    public NSData? ApplicationData { get; set; }
+    [Selector("supportedCountries", "setSupportedCountries:")]
+    public NSSet? SupportedCountries { get; set; }
+    [Selector("multiTokenContexts", "setMultiTokenContexts:")]
+    public NSArray? MultiTokenContexts { get; set; }
+    [Selector("recurringPaymentRequest", "setRecurringPaymentRequest:")]
+    public PKRecurringPaymentRequest? RecurringPaymentRequest { get; set; }
+    [Selector("automaticReloadPaymentRequest", "setAutomaticReloadPaymentRequest:")]
+    public PKAutomaticReloadPaymentRequest? AutomaticReloadPaymentRequest { get; set; }
+    [Selector("deferredPaymentRequest", "setDeferredPaymentRequest:")]
+    public PKDeferredPaymentRequest? DeferredPaymentRequest { get; set; }
+    [Selector("applePayLaterAvailability", "setApplePayLaterAvailability:")]
+    public PKApplePayLaterAvailability ApplePayLaterAvailability { get; set; }
+    [Selector("availableNetworks")]
+    public static NSArray AvailableNetworks();
+    [Selector("paymentContactInvalidErrorWithContactField:localizedDescription:")]
+    public static NSError PaymentContactInvalidErrorWithContactFieldLocalizedDescription(PKContactField field, NSString? localizedDescription);
+    [Selector("paymentShippingAddressInvalidErrorWithKey:localizedDescription:")]
+    public static NSError PaymentShippingAddressInvalidErrorWithKeyLocalizedDescription(NSString postalAddressKey, NSString? localizedDescription);
+    [Selector("paymentBillingAddressInvalidErrorWithKey:localizedDescription:")]
+    public static NSError PaymentBillingAddressInvalidErrorWithKeyLocalizedDescription(NSString postalAddressKey, NSString? localizedDescription);
+    [Selector("paymentShippingAddressUnserviceableErrorWithLocalizedDescription:")]
+    public static NSError PaymentShippingAddressUnserviceableErrorWithLocalizedDescription(NSString? localizedDescription);
+    [Selector("paymentCouponCodeInvalidErrorWithLocalizedDescription:")]
+    public static NSError PaymentCouponCodeInvalidErrorWithLocalizedDescription(NSString? localizedDescription);
+    [Selector("paymentCouponCodeExpiredErrorWithLocalizedDescription:")]
+    public static NSError PaymentCouponCodeExpiredErrorWithLocalizedDescription(NSString? localizedDescription);
 }
 
 #endif

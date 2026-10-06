@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationPublicKeyCredentialPRFRegistrationOutput : NSObject
 {
-    [Selector("isSupported")] public bool IsSupported { get; }
-    [Selector("first")] public NSData? First { get; }
-    [Selector("second")] public NSData? Second { get; }
+    [Selector("isSupported")]
+    public bool IsSupported { get; }
+    [Selector("first")]
+    public NSData? First { get; }
+    [Selector("second")]
+    public NSData? Second { get; }
 }
 
 #endif

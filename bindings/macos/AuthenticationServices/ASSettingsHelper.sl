@@ -39,9 +39,12 @@ public objc closure void ASSettingsHelperRequestToTurnOnCredentialProviderExtens
 
 public extern objc class ASSettingsHelper : NSObject
 {
-    [Selector("openCredentialProviderAppSettingsWithCompletionHandler:")] public static void OpenCredentialProviderAppSettingsWithCompletionHandler(ASSettingsHelperOpenCredentialProviderAppSettingsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("openVerificationCodeAppSettingsWithCompletionHandler:")] public static void OpenVerificationCodeAppSettingsWithCompletionHandler(ASSettingsHelperOpenVerificationCodeAppSettingsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("requestToTurnOnCredentialProviderExtensionWithCompletionHandler:")] public static void RequestToTurnOnCredentialProviderExtensionWithCompletionHandler(ASSettingsHelperRequestToTurnOnCredentialProviderExtensionWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("openCredentialProviderAppSettingsWithCompletionHandler:")]
+    public static void OpenCredentialProviderAppSettingsWithCompletionHandler(ASSettingsHelperOpenCredentialProviderAppSettingsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("openVerificationCodeAppSettingsWithCompletionHandler:")]
+    public static void OpenVerificationCodeAppSettingsWithCompletionHandler(ASSettingsHelperOpenVerificationCodeAppSettingsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("requestToTurnOnCredentialProviderExtensionWithCompletionHandler:")]
+    public static void RequestToTurnOnCredentialProviderExtensionWithCompletionHandler(ASSettingsHelperRequestToTurnOnCredentialProviderExtensionWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

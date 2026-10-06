@@ -80,26 +80,46 @@ public using NSFontTextStyleOptionKey = NSString;
 
 public extern objc class NSFontDescriptor : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("postscriptName")] public NSString? PostscriptName { get; }
-    [Selector("pointSize")] public CGFloat PointSize { get; }
-    [Selector("matrix")] public NSAffineTransform? Matrix { get; }
-    [Selector("symbolicTraits")] public NSFontDescriptorSymbolicTraits SymbolicTraits { get; }
-    [Selector("requiresFontAssetRequest")] public bool RequiresFontAssetRequest { get; }
-    [Selector("fontAttributes")] public NSDictionary FontAttributes { get; }
-    [Selector("objectForKey:")] public AnyObject? ObjectForKey(NSFontDescriptorAttributeName @attribute);
-    [Selector("fontDescriptorWithFontAttributes:")] public static NSFontDescriptor FontDescriptorWithFontAttributes(NSDictionary? attributes);
-    [Selector("fontDescriptorWithName:size:")] public static NSFontDescriptor FontDescriptorWithNameSize(NSString fontName, CGFloat size);
-    [Selector("fontDescriptorWithName:matrix:")] public static NSFontDescriptor FontDescriptorWithNameMatrix(NSString fontName, NSAffineTransform matrix);
-    [Selector("initWithFontAttributes:")] public Self InitWithFontAttributes(NSDictionary? attributes);
-    [Selector("matchingFontDescriptorsWithMandatoryKeys:")] public NSArray MatchingFontDescriptorsWithMandatoryKeys(NSSet? mandatoryKeys);
-    [Selector("matchingFontDescriptorWithMandatoryKeys:")] public NSFontDescriptor? MatchingFontDescriptorWithMandatoryKeys(NSSet? mandatoryKeys);
-    [Selector("fontDescriptorByAddingAttributes:")] public NSFontDescriptor FontDescriptorByAddingAttributes(NSDictionary attributes);
-    [Selector("fontDescriptorWithSymbolicTraits:")] public NSFontDescriptor FontDescriptorWithSymbolicTraits(NSFontDescriptorSymbolicTraits symbolicTraits);
-    [Selector("fontDescriptorWithSize:")] public NSFontDescriptor FontDescriptorWithSize(CGFloat newPointSize);
-    [Selector("fontDescriptorWithMatrix:")] public NSFontDescriptor FontDescriptorWithMatrix(NSAffineTransform matrix);
-    [Selector("fontDescriptorWithFace:")] public NSFontDescriptor FontDescriptorWithFace(NSString newFace);
-    [Selector("fontDescriptorWithFamily:")] public NSFontDescriptor FontDescriptorWithFamily(NSString newFamily);
-    [Selector("fontDescriptorWithDesign:")] public Self? FontDescriptorWithDesign(NSFontDescriptorSystemDesign design);
+    [Selector("postscriptName")]
+    public NSString? PostscriptName { get; }
+    [Selector("pointSize")]
+    public CGFloat PointSize { get; }
+    [Selector("matrix")]
+    public NSAffineTransform? Matrix { get; }
+    [Selector("symbolicTraits")]
+    public NSFontDescriptorSymbolicTraits SymbolicTraits { get; }
+    [Selector("requiresFontAssetRequest")]
+    public bool RequiresFontAssetRequest { get; }
+    [Selector("fontAttributes")]
+    public NSDictionary FontAttributes { get; }
+    [Selector("objectForKey:")]
+    public AnyObject? ObjectForKey(NSFontDescriptorAttributeName @attribute);
+    [Selector("fontDescriptorWithFontAttributes:")]
+    public static NSFontDescriptor FontDescriptorWithFontAttributes(NSDictionary? attributes);
+    [Selector("fontDescriptorWithName:size:")]
+    public static NSFontDescriptor FontDescriptorWithNameSize(NSString fontName, CGFloat size);
+    [Selector("fontDescriptorWithName:matrix:")]
+    public static NSFontDescriptor FontDescriptorWithNameMatrix(NSString fontName, NSAffineTransform matrix);
+    [Selector("initWithFontAttributes:")]
+    public Self InitWithFontAttributes(NSDictionary? attributes);
+    [Selector("matchingFontDescriptorsWithMandatoryKeys:")]
+    public NSArray MatchingFontDescriptorsWithMandatoryKeys(NSSet? mandatoryKeys);
+    [Selector("matchingFontDescriptorWithMandatoryKeys:")]
+    public NSFontDescriptor? MatchingFontDescriptorWithMandatoryKeys(NSSet? mandatoryKeys);
+    [Selector("fontDescriptorByAddingAttributes:")]
+    public NSFontDescriptor FontDescriptorByAddingAttributes(NSDictionary attributes);
+    [Selector("fontDescriptorWithSymbolicTraits:")]
+    public NSFontDescriptor FontDescriptorWithSymbolicTraits(NSFontDescriptorSymbolicTraits symbolicTraits);
+    [Selector("fontDescriptorWithSize:")]
+    public NSFontDescriptor FontDescriptorWithSize(CGFloat newPointSize);
+    [Selector("fontDescriptorWithMatrix:")]
+    public NSFontDescriptor FontDescriptorWithMatrix(NSAffineTransform matrix);
+    [Selector("fontDescriptorWithFace:")]
+    public NSFontDescriptor FontDescriptorWithFace(NSString newFace);
+    [Selector("fontDescriptorWithFamily:")]
+    public NSFontDescriptor FontDescriptorWithFamily(NSString newFamily);
+    [Selector("fontDescriptorWithDesign:")]
+    public Self? FontDescriptorWithDesign(NSFontDescriptorSystemDesign design);
 }
 
 public extern "C" NSFontDescriptorAttributeName NSFontFamilyAttribute;
@@ -234,7 +254,8 @@ public extern "C" NSString? NSFontColorAttribute;
 /// NSFontDescriptor_TextStyles, a category of NSFontDescriptor.
 public extern objc class NSFontDescriptor
 {
-    [Selector("preferredFontDescriptorForTextStyle:options:")] public static NSFontDescriptor PreferredFontDescriptorForTextStyleOptions(NSFontTextStyle style, NSDictionary options);
+    [Selector("preferredFontDescriptorForTextStyle:options:")]
+    public static NSFontDescriptor PreferredFontDescriptorForTextStyleOptions(NSFontTextStyle style, NSDictionary options);
 }
 
 #endif

@@ -34,10 +34,14 @@ import Standard.ObjC;
 
 public extern objc class CNContactPicker : NSObject
 {
-    [Selector("displayedKeys", "setDisplayedKeys:")] public NSArray DisplayedKeys { get; set; }
-    [Selector("delegate", "setDelegate:")] public CNContactPickerDelegate? Delegate { get; set; }
-    [Selector("showRelativeToRect:ofView:preferredEdge:")] public void ShowRelativeToRectOfViewPreferredEdge(NSRect positioningRect, NSView positioningView, NSRectEdge preferredEdge);
-    [Selector("close")] public void Close();
+    [Selector("displayedKeys", "setDisplayedKeys:")]
+    public NSArray DisplayedKeys { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public CNContactPickerDelegate? Delegate { get; set; }
+    [Selector("showRelativeToRect:ofView:preferredEdge:")]
+    public void ShowRelativeToRectOfViewPreferredEdge(NSRect positioningRect, NSView positioningView, NSRectEdge preferredEdge);
+    [Selector("close")]
+    public void Close();
 }
 
 #endif

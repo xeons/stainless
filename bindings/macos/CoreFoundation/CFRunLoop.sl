@@ -82,9 +82,11 @@ public extern "C" CFRunLoopRef? CFRunLoopGetCurrent();
 
 public extern "C" CFRunLoopRef? CFRunLoopGetMain();
 
-[ReturnsRetained] public extern "C" CFRunLoopMode? CFRunLoopCopyCurrentMode(CFRunLoopRef? rl);
+[ReturnsRetained]
+public extern "C" CFRunLoopMode? CFRunLoopCopyCurrentMode(CFRunLoopRef? rl);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFRunLoopCopyAllModes(CFRunLoopRef? rl);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFRunLoopCopyAllModes(CFRunLoopRef? rl);
 
 public extern "C" void CFRunLoopAddCommonMode(CFRunLoopRef? rl, CFRunLoopMode? mode);
 
@@ -181,7 +183,8 @@ public struct CFRunLoopSourceContext1
 
 public extern "C" CFTypeID CFRunLoopSourceGetTypeID();
 
-[ReturnsRetained] public extern "C" CFRunLoopSourceRef? CFRunLoopSourceCreate(CFAllocatorRef? allocator, CFIndex order, CFRunLoopSourceContext* context);
+[ReturnsRetained]
+public extern "C" CFRunLoopSourceRef? CFRunLoopSourceCreate(CFAllocatorRef? allocator, CFIndex order, CFRunLoopSourceContext* context);
 
 public extern "C" CFIndex CFRunLoopSourceGetOrder(CFRunLoopSourceRef? source);
 
@@ -212,11 +215,13 @@ public delegate void CFRunLoopObserverCallBack(__CFRunLoopObserver* arg0, CFRunL
 
 public extern "C" CFTypeID CFRunLoopObserverGetTypeID();
 
-[ReturnsRetained] public extern "C" CFRunLoopObserverRef? CFRunLoopObserverCreate(CFAllocatorRef? allocator, CFOptionFlags activities, Boolean repeats, CFIndex order, CFRunLoopObserverCallBack callout, CFRunLoopObserverContext* context);
+[ReturnsRetained]
+public extern "C" CFRunLoopObserverRef? CFRunLoopObserverCreate(CFAllocatorRef? allocator, CFOptionFlags activities, Boolean repeats, CFIndex order, CFRunLoopObserverCallBack callout, CFRunLoopObserverContext* context);
 
 public objc closure void CFRunLoopObserverCreateWithHandlerBlock(CFRunLoopObserverRef? arg0, CFRunLoopActivity arg1);
 
-[ReturnsRetained] public extern "C" CFRunLoopObserverRef? CFRunLoopObserverCreateWithHandler(CFAllocatorRef? allocator, CFOptionFlags activities, Boolean repeats, CFIndex order, CFRunLoopObserverCreateWithHandlerBlock? block);
+[ReturnsRetained]
+public extern "C" CFRunLoopObserverRef? CFRunLoopObserverCreateWithHandler(CFAllocatorRef? allocator, CFOptionFlags activities, Boolean repeats, CFIndex order, CFRunLoopObserverCreateWithHandlerBlock? block);
 
 public extern "C" CFOptionFlags CFRunLoopObserverGetActivities(CFRunLoopObserverRef? observer);
 
@@ -249,11 +254,13 @@ public delegate void CFRunLoopTimerCallBack(__CFRunLoopTimer* arg0, void* arg1);
 
 public extern "C" CFTypeID CFRunLoopTimerGetTypeID();
 
-[ReturnsRetained] public extern "C" CFRunLoopTimerRef? CFRunLoopTimerCreate(CFAllocatorRef? allocator, CFAbsoluteTime fireDate, CFTimeInterval interval, CFOptionFlags flags, CFIndex order, CFRunLoopTimerCallBack callout, CFRunLoopTimerContext* context);
+[ReturnsRetained]
+public extern "C" CFRunLoopTimerRef? CFRunLoopTimerCreate(CFAllocatorRef? allocator, CFAbsoluteTime fireDate, CFTimeInterval interval, CFOptionFlags flags, CFIndex order, CFRunLoopTimerCallBack callout, CFRunLoopTimerContext* context);
 
 public objc closure void CFRunLoopTimerCreateWithHandlerBlock(CFRunLoopTimerRef? arg0);
 
-[ReturnsRetained] public extern "C" CFRunLoopTimerRef? CFRunLoopTimerCreateWithHandler(CFAllocatorRef? allocator, CFAbsoluteTime fireDate, CFTimeInterval interval, CFOptionFlags flags, CFIndex order, CFRunLoopTimerCreateWithHandlerBlock? block);
+[ReturnsRetained]
+public extern "C" CFRunLoopTimerRef? CFRunLoopTimerCreateWithHandler(CFAllocatorRef? allocator, CFAbsoluteTime fireDate, CFTimeInterval interval, CFOptionFlags flags, CFIndex order, CFRunLoopTimerCreateWithHandlerBlock? block);
 
 public extern "C" CFAbsoluteTime CFRunLoopTimerGetNextFireDate(CFRunLoopTimerRef? timer);
 

@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class VSAccountMetadata : NSObject
 {
-    [Selector("accountProviderIdentifier")] public NSString? AccountProviderIdentifier { get; }
-    [Selector("authenticationExpirationDate")] public NSDate? AuthenticationExpirationDate { get; }
-    [Selector("verificationData")] public NSData? VerificationData { get; }
-    [Selector("SAMLAttributeQueryResponse")] public NSString? SAMLAttributeQueryResponse { get; }
-    [Selector("accountProviderResponse")] public VSAccountProviderResponse? AccountProviderResponse { get; }
+    [Selector("accountProviderIdentifier")]
+    public NSString? AccountProviderIdentifier { get; }
+    [Selector("authenticationExpirationDate")]
+    public NSDate? AuthenticationExpirationDate { get; }
+    [Selector("verificationData")]
+    public NSData? VerificationData { get; }
+    [Selector("SAMLAttributeQueryResponse")]
+    public NSString? SAMLAttributeQueryResponse { get; }
+    [Selector("accountProviderResponse")]
+    public VSAccountProviderResponse? AccountProviderResponse { get; }
 }
 
 #endif

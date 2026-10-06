@@ -43,6 +43,7 @@ public enum CGPDFDataFormat : int
 
 public extern "C" CGPDFDictionaryRef CGPDFStreamGetDictionary(CGPDFStreamRef stream);
 
-[ReturnsRetained] public extern "C" CFDataRef? CGPDFStreamCopyData(CGPDFStreamRef stream, CGPDFDataFormat* format);
+[ReturnsRetained]
+public extern "C" CFDataRef? CGPDFStreamCopyData(CGPDFStreamRef stream, CGPDFDataFormat* format);
 
 #endif

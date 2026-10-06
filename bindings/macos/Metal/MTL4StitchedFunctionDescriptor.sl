@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTL4StitchedFunctionDescriptor : MTL4FunctionDescriptor
 {
-    [Selector("functionGraph", "setFunctionGraph:")] public MTLFunctionStitchingGraph? FunctionGraph { get; set; }
-    [Selector("functionDescriptors", "setFunctionDescriptors:")] public NSArray? FunctionDescriptors { get; set; }
+    [Selector("functionGraph", "setFunctionGraph:")]
+    public MTLFunctionStitchingGraph? FunctionGraph { get; set; }
+    [Selector("functionDescriptors", "setFunctionDescriptors:")]
+    public NSArray? FunctionDescriptors { get; set; }
 }
 
 #endif

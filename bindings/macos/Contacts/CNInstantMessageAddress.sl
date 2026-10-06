@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class CNInstantMessageAddress : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("username")] public NSString Username { get; }
-    [Selector("service")] public NSString Service { get; }
-    [Selector("initWithUsername:service:")] public Self InitWithUsernameService(NSString username, NSString service);
-    [Selector("localizedStringForKey:")] public static NSString LocalizedStringForKey(NSString key);
-    [Selector("localizedStringForService:")] public static NSString LocalizedStringForService(NSString service);
+    [Selector("username")]
+    public NSString Username { get; }
+    [Selector("service")]
+    public NSString Service { get; }
+    [Selector("initWithUsername:service:")]
+    public Self InitWithUsernameService(NSString username, NSString service);
+    [Selector("localizedStringForKey:")]
+    public static NSString LocalizedStringForKey(NSString key);
+    [Selector("localizedStringForService:")]
+    public static NSString LocalizedStringForService(NSString service);
 }
 
 public extern "C" NSString? CNInstantMessageAddressUsernameKey;

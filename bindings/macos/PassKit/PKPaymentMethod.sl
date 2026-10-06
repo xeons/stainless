@@ -34,13 +34,19 @@ import Standard.ObjC;
 
 public extern objc class PKPaymentMethod : NSObject
 {
-    [Selector("displayName")] public NSString? DisplayName { get; }
-    [Selector("network")] public PKPaymentNetwork? Network { get; }
-    [Selector("type")] public PKPaymentMethodType Type { get; }
+    [Selector("displayName")]
+    public NSString? DisplayName { get; }
+    [Selector("network")]
+    public PKPaymentNetwork? Network { get; }
+    [Selector("type")]
+    public PKPaymentMethodType Type { get; }
     /// Deprecated in macOS 100000.
-    [Selector("paymentPass")] public PKPaymentPass? PaymentPass { get; }
-    [Selector("secureElementPass")] public PKSecureElementPass? SecureElementPass { get; }
-    [Selector("billingAddress")] public CNContact? BillingAddress { get; }
+    [Selector("paymentPass")]
+    public PKPaymentPass? PaymentPass { get; }
+    [Selector("secureElementPass")]
+    public PKSecureElementPass? SecureElementPass { get; }
+    [Selector("billingAddress")]
+    public CNContact? BillingAddress { get; }
 }
 
 public enum PKPaymentMethodType : ulong

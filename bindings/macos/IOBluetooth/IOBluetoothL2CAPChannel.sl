@@ -68,50 +68,89 @@ public delegate void IOBluetoothL2CAPChannelIncomingEventListener(IOBluetoothL2C
 
 public extern objc class IOBluetoothL2CAPChannel : IOBluetoothObject, NSPortDelegate
 {
-    [Selector("outgoingMTU")] public BluetoothL2CAPMTU OutgoingMTU { get; }
-    [Selector("incomingMTU")] public BluetoothL2CAPMTU IncomingMTU { get; }
-    [Selector("device")] public IOBluetoothDevice? Device { get; }
-    [Selector("objectID")] public IOBluetoothObjectID ObjectID { get; }
-    [Selector("PSM")] public BluetoothL2CAPPSM PSM { get; }
-    [Selector("localChannelID")] public BluetoothL2CAPChannelID LocalChannelID { get; }
-    [Selector("remoteChannelID")] public BluetoothL2CAPChannelID RemoteChannelID { get; }
-    [Selector("registerForChannelOpenNotifications:selector:")] public static IOBluetoothUserNotification? RegisterForChannelOpenNotificationsSelector(AnyObject? object, Selector selector);
-    [Selector("registerForChannelOpenNotifications:selector:withPSM:direction:")] public static IOBluetoothUserNotification? RegisterForChannelOpenNotificationsSelectorWithPSMDirection(AnyObject? object, Selector selector, BluetoothL2CAPPSM psm, IOBluetoothUserNotificationChannelDirection inDirection);
-    [Selector("withObjectID:")] public static Self? WithObjectID(IOBluetoothObjectID objectID);
-    [Selector("closeChannel")] public IOReturn CloseChannel();
+    [Selector("outgoingMTU")]
+    public BluetoothL2CAPMTU OutgoingMTU { get; }
+    [Selector("incomingMTU")]
+    public BluetoothL2CAPMTU IncomingMTU { get; }
+    [Selector("device")]
+    public IOBluetoothDevice? Device { get; }
+    [Selector("objectID")]
+    public IOBluetoothObjectID ObjectID { get; }
+    [Selector("PSM")]
+    public BluetoothL2CAPPSM PSM { get; }
+    [Selector("localChannelID")]
+    public BluetoothL2CAPChannelID LocalChannelID { get; }
+    [Selector("remoteChannelID")]
+    public BluetoothL2CAPChannelID RemoteChannelID { get; }
+    [Selector("registerForChannelOpenNotifications:selector:")]
+    public static IOBluetoothUserNotification? RegisterForChannelOpenNotificationsSelector(AnyObject? object, Selector selector);
+    [Selector("registerForChannelOpenNotifications:selector:withPSM:direction:")]
+    public static IOBluetoothUserNotification? RegisterForChannelOpenNotificationsSelectorWithPSMDirection(AnyObject? object, Selector selector, BluetoothL2CAPPSM psm, IOBluetoothUserNotificationChannelDirection inDirection);
+    [Selector("withObjectID:")]
+    public static Self? WithObjectID(IOBluetoothObjectID objectID);
+    [Selector("closeChannel")]
+    public IOReturn CloseChannel();
     /// Deprecated in macOS 10.7.
-    [Selector("getOutgoingMTU")] public BluetoothL2CAPMTU GetOutgoingMTU();
+    [Selector("getOutgoingMTU")]
+    public BluetoothL2CAPMTU GetOutgoingMTU();
     /// Deprecated in macOS 10.7.
-    [Selector("getIncomingMTU")] public BluetoothL2CAPMTU GetIncomingMTU();
-    [Selector("requestRemoteMTU:")] public IOReturn RequestRemoteMTU(BluetoothL2CAPMTU remoteMTU);
-    [Selector("writeAsyncTrap:length:refcon:")] public IOReturn WriteAsyncTrapLengthRefcon(void* data, UInt16 length, void* refcon);
-    [Selector("writeAsync:length:refcon:")] public IOReturn WriteAsyncLengthRefcon(void* data, UInt16 length, void* refcon);
-    [Selector("writeSync:length:")] public IOReturn WriteSyncLength(void* data, UInt16 length);
-    [Selector("setDelegate:")] public IOReturn SetDelegate(AnyObject? channelDelegate);
-    [Selector("setDelegate:withConfiguration:")] public IOReturn SetDelegateWithConfiguration(AnyObject? channelDelegate, NSDictionary? channelConfiguration);
-    [Selector("delegate")] public AnyObject? Delegate();
+    [Selector("getIncomingMTU")]
+    public BluetoothL2CAPMTU GetIncomingMTU();
+    [Selector("requestRemoteMTU:")]
+    public IOReturn RequestRemoteMTU(BluetoothL2CAPMTU remoteMTU);
+    [Selector("writeAsyncTrap:length:refcon:")]
+    public IOReturn WriteAsyncTrapLengthRefcon(void* data, UInt16 length, void* refcon);
+    [Selector("writeAsync:length:refcon:")]
+    public IOReturn WriteAsyncLengthRefcon(void* data, UInt16 length, void* refcon);
+    [Selector("writeSync:length:")]
+    public IOReturn WriteSyncLength(void* data, UInt16 length);
+    [Selector("setDelegate:")]
+    public IOReturn SetDelegate(AnyObject? channelDelegate);
+    [Selector("setDelegate:withConfiguration:")]
+    public IOReturn SetDelegateWithConfiguration(AnyObject? channelDelegate, NSDictionary? channelConfiguration);
+    [Selector("delegate")]
+    public AnyObject? Delegate();
     /// Deprecated in macOS 10.7.
-    [Selector("getDevice")] public IOBluetoothDevice? GetDevice();
+    [Selector("getDevice")]
+    public IOBluetoothDevice? GetDevice();
     /// Deprecated in macOS 10.7.
-    [Selector("getObjectID")] public IOBluetoothObjectID GetObjectID();
+    [Selector("getObjectID")]
+    public IOBluetoothObjectID GetObjectID();
     /// Deprecated in macOS 10.7.
-    [Selector("getPSM")] public BluetoothL2CAPPSM GetPSM();
+    [Selector("getPSM")]
+    public BluetoothL2CAPPSM GetPSM();
     /// Deprecated in macOS 10.7.
-    [Selector("getLocalChannelID")] public BluetoothL2CAPChannelID GetLocalChannelID();
+    [Selector("getLocalChannelID")]
+    public BluetoothL2CAPChannelID GetLocalChannelID();
     /// Deprecated in macOS 10.7.
-    [Selector("getRemoteChannelID")] public BluetoothL2CAPChannelID GetRemoteChannelID();
-    [Selector("isIncoming")] public bool IsIncoming();
-    [Selector("registerForChannelCloseNotification:selector:")] public IOBluetoothUserNotification? RegisterForChannelCloseNotificationSelector(AnyObject? observer, Selector inSelector);
+    [Selector("getRemoteChannelID")]
+    public BluetoothL2CAPChannelID GetRemoteChannelID();
+    [Selector("isIncoming")]
+    public bool IsIncoming();
+    [Selector("registerForChannelCloseNotification:selector:")]
+    public IOBluetoothUserNotification? RegisterForChannelCloseNotificationSelector(AnyObject? observer, Selector inSelector);
 }
 
 public objc interface IOBluetoothL2CAPChannelDelegate
 {
-    [Optional] [Selector("l2capChannelData:data:length:")] void L2capChannelDataDataLength(IOBluetoothL2CAPChannel? l2capChannel, void* dataPointer, nuint dataLength);
-    [Optional] [Selector("l2capChannelOpenComplete:status:")] void L2capChannelOpenCompleteStatus(IOBluetoothL2CAPChannel? l2capChannel, IOReturn error);
-    [Optional] [Selector("l2capChannelClosed:")] void L2capChannelClosed(IOBluetoothL2CAPChannel? l2capChannel);
-    [Optional] [Selector("l2capChannelReconfigured:")] void L2capChannelReconfigured(IOBluetoothL2CAPChannel? l2capChannel);
-    [Optional] [Selector("l2capChannelWriteComplete:refcon:status:")] void L2capChannelWriteCompleteRefconStatus(IOBluetoothL2CAPChannel? l2capChannel, void* refcon, IOReturn error);
-    [Optional] [Selector("l2capChannelQueueSpaceAvailable:")] void L2capChannelQueueSpaceAvailable(IOBluetoothL2CAPChannel? l2capChannel);
+    [Optional]
+    [Selector("l2capChannelData:data:length:")]
+    void L2capChannelDataDataLength(IOBluetoothL2CAPChannel? l2capChannel, void* dataPointer, nuint dataLength);
+    [Optional]
+    [Selector("l2capChannelOpenComplete:status:")]
+    void L2capChannelOpenCompleteStatus(IOBluetoothL2CAPChannel? l2capChannel, IOReturn error);
+    [Optional]
+    [Selector("l2capChannelClosed:")]
+    void L2capChannelClosed(IOBluetoothL2CAPChannel? l2capChannel);
+    [Optional]
+    [Selector("l2capChannelReconfigured:")]
+    void L2capChannelReconfigured(IOBluetoothL2CAPChannel? l2capChannel);
+    [Optional]
+    [Selector("l2capChannelWriteComplete:refcon:status:")]
+    void L2capChannelWriteCompleteRefconStatus(IOBluetoothL2CAPChannel? l2capChannel, void* refcon, IOReturn error);
+    [Optional]
+    [Selector("l2capChannelQueueSpaceAvailable:")]
+    void L2capChannelQueueSpaceAvailable(IOBluetoothL2CAPChannel? l2capChannel);
 }
 
 public extern "C" NSString? IOBluetoothL2CAPChannelPublishedNotification;
@@ -122,13 +161,17 @@ public extern "C" NSString? IOBluetoothL2CAPChannelTerminatedNotification;
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.5.
-    [Selector("registerIncomingDataListener:refCon:")] public IOReturn RegisterIncomingDataListenerRefCon(IOBluetoothL2CAPChannelIncomingDataListener listener, void* refCon);
+    [Selector("registerIncomingDataListener:refCon:")]
+    public IOReturn RegisterIncomingDataListenerRefCon(IOBluetoothL2CAPChannelIncomingDataListener listener, void* refCon);
     /// Deprecated in macOS 10.5.
-    [Selector("write:length:")] public IOReturn WriteLength(void* data, UInt16 length);
+    [Selector("write:length:")]
+    public IOReturn WriteLength(void* data, UInt16 length);
     /// Deprecated in macOS 10.7.
-    [Selector("withL2CAPChannelRef:")] public static IOBluetoothL2CAPChannel? WithL2CAPChannelRef(IOBluetoothL2CAPChannelRef l2capChannelRef);
+    [Selector("withL2CAPChannelRef:")]
+    public static IOBluetoothL2CAPChannel? WithL2CAPChannelRef(IOBluetoothL2CAPChannelRef l2capChannelRef);
     /// Deprecated in macOS 10.7.
-    [Selector("getL2CAPChannelRef")] public IOBluetoothL2CAPChannelRef GetL2CAPChannelRef();
+    [Selector("getL2CAPChannelRef")]
+    public IOBluetoothL2CAPChannelRef GetL2CAPChannelRef();
 }
 
 #endif

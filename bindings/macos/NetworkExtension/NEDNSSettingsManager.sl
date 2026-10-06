@@ -51,14 +51,22 @@ public objc closure void NEDNSSettingsManagerSaveToPreferencesWithCompletionHand
 
 public extern objc class NEDNSSettingsManager : NSObject
 {
-    [Selector("localizedDescription", "setLocalizedDescription:")] public NSString? LocalizedDescription { get; set; }
-    [Selector("dnsSettings", "setDnsSettings:")] public NEDNSSettings? DnsSettings { get; set; }
-    [Selector("onDemandRules", "setOnDemandRules:")] public NSArray? OnDemandRules { get; set; }
-    [Selector("isEnabled")] public bool Enabled { get; }
-    [Selector("sharedManager")] public static NEDNSSettingsManager SharedManager();
-    [Selector("loadFromPreferencesWithCompletionHandler:")] public void LoadFromPreferencesWithCompletionHandler(NEDNSSettingsManagerLoadFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removeFromPreferencesWithCompletionHandler:")] public void RemoveFromPreferencesWithCompletionHandler(NEDNSSettingsManagerRemoveFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("saveToPreferencesWithCompletionHandler:")] public void SaveToPreferencesWithCompletionHandler(NEDNSSettingsManagerSaveToPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("localizedDescription", "setLocalizedDescription:")]
+    public NSString? LocalizedDescription { get; set; }
+    [Selector("dnsSettings", "setDnsSettings:")]
+    public NEDNSSettings? DnsSettings { get; set; }
+    [Selector("onDemandRules", "setOnDemandRules:")]
+    public NSArray? OnDemandRules { get; set; }
+    [Selector("isEnabled")]
+    public bool Enabled { get; }
+    [Selector("sharedManager")]
+    public static NEDNSSettingsManager SharedManager();
+    [Selector("loadFromPreferencesWithCompletionHandler:")]
+    public void LoadFromPreferencesWithCompletionHandler(NEDNSSettingsManagerLoadFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removeFromPreferencesWithCompletionHandler:")]
+    public void RemoveFromPreferencesWithCompletionHandler(NEDNSSettingsManagerRemoveFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("saveToPreferencesWithCompletionHandler:")]
+    public void SaveToPreferencesWithCompletionHandler(NEDNSSettingsManagerSaveToPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

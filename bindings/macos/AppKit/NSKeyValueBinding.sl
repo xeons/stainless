@@ -38,11 +38,16 @@ public using NSBindingOption = NSString;
 
 public extern objc class NSBindingSelectionMarker : NSObject, NSCopying
 {
-    [Selector("multipleValuesSelectionMarker")] public static NSBindingSelectionMarker? MultipleValuesSelectionMarker { get; }
-    [Selector("noSelectionMarker")] public static NSBindingSelectionMarker? NoSelectionMarker { get; }
-    [Selector("notApplicableSelectionMarker")] public static NSBindingSelectionMarker? NotApplicableSelectionMarker { get; }
-    [Selector("setDefaultPlaceholder:forMarker:onClass:withBinding:")] public static void SetDefaultPlaceholderForMarkerOnClassWithBinding(AnyObject? placeholder, NSBindingSelectionMarker? marker, Class objectClass, NSBindingName binding);
-    [Selector("defaultPlaceholderForMarker:onClass:withBinding:")] public static AnyObject? DefaultPlaceholderForMarkerOnClassWithBinding(NSBindingSelectionMarker? marker, Class objectClass, NSBindingName binding);
+    [Selector("multipleValuesSelectionMarker")]
+    public static NSBindingSelectionMarker? MultipleValuesSelectionMarker { get; }
+    [Selector("noSelectionMarker")]
+    public static NSBindingSelectionMarker? NoSelectionMarker { get; }
+    [Selector("notApplicableSelectionMarker")]
+    public static NSBindingSelectionMarker? NotApplicableSelectionMarker { get; }
+    [Selector("setDefaultPlaceholder:forMarker:onClass:withBinding:")]
+    public static void SetDefaultPlaceholderForMarkerOnClassWithBinding(AnyObject? placeholder, NSBindingSelectionMarker? marker, Class objectClass, NSBindingName binding);
+    [Selector("defaultPlaceholderForMarker:onClass:withBinding:")]
+    public static AnyObject? DefaultPlaceholderForMarkerOnClassWithBinding(NSBindingSelectionMarker? marker, Class objectClass, NSBindingName binding);
 }
 
 /// Deprecated in macOS 11.0.
@@ -67,58 +72,81 @@ public extern "C" NSBindingInfoKey NSOptionsKey;
 /// NSKeyValueBindingCreation, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("exposedBindings")] public NSArray ExposedBindings { get; }
-    [Selector("exposeBinding:")] public static void ExposeBinding(NSBindingName binding);
-    [Selector("valueClassForBinding:")] public Class ValueClassForBinding(NSBindingName binding);
-    [Selector("bind:toObject:withKeyPath:options:")] public void BindToObjectWithKeyPathOptions(NSBindingName binding, AnyObject observable, NSString keyPath, NSDictionary? options);
-    [Selector("unbind:")] public void Unbind(NSBindingName binding);
-    [Selector("infoForBinding:")] public NSDictionary? InfoForBinding(NSBindingName binding);
-    [Selector("optionDescriptionsForBinding:")] public NSArray OptionDescriptionsForBinding(NSBindingName binding);
+    [Selector("exposedBindings")]
+    public NSArray ExposedBindings { get; }
+    [Selector("exposeBinding:")]
+    public static void ExposeBinding(NSBindingName binding);
+    [Selector("valueClassForBinding:")]
+    public Class ValueClassForBinding(NSBindingName binding);
+    [Selector("bind:toObject:withKeyPath:options:")]
+    public void BindToObjectWithKeyPathOptions(NSBindingName binding, AnyObject observable, NSString keyPath, NSDictionary? options);
+    [Selector("unbind:")]
+    public void Unbind(NSBindingName binding);
+    [Selector("infoForBinding:")]
+    public NSDictionary? InfoForBinding(NSBindingName binding);
+    [Selector("optionDescriptionsForBinding:")]
+    public NSArray OptionDescriptionsForBinding(NSBindingName binding);
 }
 
 /// NSPlaceholders, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 11.0.
-    [Selector("setDefaultPlaceholder:forMarker:withBinding:")] public static void SetDefaultPlaceholderForMarkerWithBinding(AnyObject? placeholder, AnyObject? marker, NSBindingName binding);
+    [Selector("setDefaultPlaceholder:forMarker:withBinding:")]
+    public static void SetDefaultPlaceholderForMarkerWithBinding(AnyObject? placeholder, AnyObject? marker, NSBindingName binding);
     /// Deprecated in macOS 11.0.
-    [Selector("defaultPlaceholderForMarker:withBinding:")] public static AnyObject? DefaultPlaceholderForMarkerWithBinding(AnyObject? marker, NSBindingName binding);
+    [Selector("defaultPlaceholderForMarker:withBinding:")]
+    public static AnyObject? DefaultPlaceholderForMarkerWithBinding(AnyObject? marker, NSBindingName binding);
 }
 
 public objc interface NSEditor : NSObjectProtocol
 {
-    [Selector("discardEditing")] void DiscardEditing();
-    [Selector("commitEditing")] bool CommitEditing();
-    [Selector("commitEditingWithDelegate:didCommitSelector:contextInfo:")] void CommitEditingWithDelegateDidCommitSelectorContextInfo(AnyObject? @delegate, Selector didCommitSelector, void* contextInfo);
-    [Selector("commitEditingAndReturnError:")] bool CommitEditingAndReturnError(out NSError? error);
+    [Selector("discardEditing")]
+    void DiscardEditing();
+    [Selector("commitEditing")]
+    bool CommitEditing();
+    [Selector("commitEditingWithDelegate:didCommitSelector:contextInfo:")]
+    void CommitEditingWithDelegateDidCommitSelectorContextInfo(AnyObject? @delegate, Selector didCommitSelector, void* contextInfo);
+    [Selector("commitEditingAndReturnError:")]
+    bool CommitEditingAndReturnError(out NSError? error);
 }
 
 public objc interface NSEditorRegistration : NSObjectProtocol
 {
-    [Optional] [Selector("objectDidBeginEditing:")] void ObjectDidBeginEditing(NSEditor editor);
-    [Optional] [Selector("objectDidEndEditing:")] void ObjectDidEndEditing(NSEditor editor);
+    [Optional]
+    [Selector("objectDidBeginEditing:")]
+    void ObjectDidBeginEditing(NSEditor editor);
+    [Optional]
+    [Selector("objectDidEndEditing:")]
+    void ObjectDidEndEditing(NSEditor editor);
 }
 
 /// NSEditor, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 11.0.
-    [Selector("discardEditing")] public void DiscardEditing();
+    [Selector("discardEditing")]
+    public void DiscardEditing();
     /// Deprecated in macOS 11.0.
-    [Selector("commitEditing")] public bool CommitEditing();
+    [Selector("commitEditing")]
+    public bool CommitEditing();
     /// Deprecated in macOS 11.0.
-    [Selector("commitEditingWithDelegate:didCommitSelector:contextInfo:")] public void CommitEditingWithDelegateDidCommitSelectorContextInfo(AnyObject? @delegate, Selector didCommitSelector, void* contextInfo);
+    [Selector("commitEditingWithDelegate:didCommitSelector:contextInfo:")]
+    public void CommitEditingWithDelegateDidCommitSelectorContextInfo(AnyObject? @delegate, Selector didCommitSelector, void* contextInfo);
     /// Deprecated in macOS 11.0.
-    [Selector("commitEditingAndReturnError:")] public bool CommitEditingAndReturnError(out NSError? error);
+    [Selector("commitEditingAndReturnError:")]
+    public bool CommitEditingAndReturnError(out NSError? error);
 }
 
 /// NSEditorRegistration, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 11.0.
-    [Selector("objectDidBeginEditing:")] public void ObjectDidBeginEditing(NSEditor editor);
+    [Selector("objectDidBeginEditing:")]
+    public void ObjectDidBeginEditing(NSEditor editor);
     /// Deprecated in macOS 11.0.
-    [Selector("objectDidEndEditing:")] public void ObjectDidEndEditing(NSEditor editor);
+    [Selector("objectDidEndEditing:")]
+    public void ObjectDidEndEditing(NSEditor editor);
 }
 
 public extern "C" NSBindingName NSAlignmentBinding;

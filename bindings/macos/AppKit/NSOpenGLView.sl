@@ -33,32 +33,44 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class NSOpenGLView : NSView
 {
-    [Selector("openGLContext", "setOpenGLContext:")] public NSOpenGLContext? OpenGLContext { get; set; }
-    [Selector("pixelFormat", "setPixelFormat:")] public NSOpenGLPixelFormat? PixelFormat { get; set; }
+    [Selector("openGLContext", "setOpenGLContext:")]
+    public NSOpenGLContext? OpenGLContext { get; set; }
+    [Selector("pixelFormat", "setPixelFormat:")]
+    public NSOpenGLPixelFormat? PixelFormat { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("wantsBestResolutionOpenGLSurface", "setWantsBestResolutionOpenGLSurface:")] public bool WantsBestResolutionOpenGLSurface { get; set; }
+    [Selector("wantsBestResolutionOpenGLSurface", "setWantsBestResolutionOpenGLSurface:")]
+    public bool WantsBestResolutionOpenGLSurface { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("wantsExtendedDynamicRangeOpenGLSurface", "setWantsExtendedDynamicRangeOpenGLSurface:")] public bool WantsExtendedDynamicRangeOpenGLSurface { get; set; }
-    [Selector("defaultPixelFormat")] public static NSOpenGLPixelFormat DefaultPixelFormat();
-    [Selector("initWithFrame:pixelFormat:")] public Self? InitWithFramePixelFormat(NSRect frameRect, NSOpenGLPixelFormat? format);
-    [Selector("clearGLContext")] public void ClearGLContext();
-    [Selector("update")] public void Update();
-    [Selector("reshape")] public void Reshape();
-    [Selector("prepareOpenGL")] public void PrepareOpenGL();
+    [Selector("wantsExtendedDynamicRangeOpenGLSurface", "setWantsExtendedDynamicRangeOpenGLSurface:")]
+    public bool WantsExtendedDynamicRangeOpenGLSurface { get; set; }
+    [Selector("defaultPixelFormat")]
+    public static NSOpenGLPixelFormat DefaultPixelFormat();
+    [Selector("initWithFrame:pixelFormat:")]
+    public Self? InitWithFramePixelFormat(NSRect frameRect, NSOpenGLPixelFormat? format);
+    [Selector("clearGLContext")]
+    public void ClearGLContext();
+    [Selector("update")]
+    public void Update();
+    [Selector("reshape")]
+    public void Reshape();
+    [Selector("prepareOpenGL")]
+    public void PrepareOpenGL();
 }
 
 /// NSOpenGLSurfaceResolution, a category of NSView.
 public extern objc class NSView
 {
     /// Deprecated in macOS 10.14.
-    [Selector("wantsBestResolutionOpenGLSurface", "setWantsBestResolutionOpenGLSurface:")] public bool WantsBestResolutionOpenGLSurface { get; set; }
+    [Selector("wantsBestResolutionOpenGLSurface", "setWantsBestResolutionOpenGLSurface:")]
+    public bool WantsBestResolutionOpenGLSurface { get; set; }
 }
 
 /// NSExtendedDynamicRange, a category of NSView.
 public extern objc class NSView
 {
     /// Deprecated in macOS 10.14.
-    [Selector("wantsExtendedDynamicRangeOpenGLSurface", "setWantsExtendedDynamicRangeOpenGLSurface:")] public bool WantsExtendedDynamicRangeOpenGLSurface { get; set; }
+    [Selector("wantsExtendedDynamicRangeOpenGLSurface", "setWantsExtendedDynamicRangeOpenGLSurface:")]
+    public bool WantsExtendedDynamicRangeOpenGLSurface { get; set; }
 }
 
 #endif

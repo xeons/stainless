@@ -49,24 +49,38 @@ public enum CKSyncEngineEventType : long
 
 public extern objc class CKSyncEngineEvent : NSObject
 {
-    [Selector("type")] public CKSyncEngineEventType Type { get; }
-    [Selector("stateUpdateEvent")] public CKSyncEngineStateUpdateEvent StateUpdateEvent { get; }
-    [Selector("accountChangeEvent")] public CKSyncEngineAccountChangeEvent AccountChangeEvent { get; }
-    [Selector("willFetchChangesEvent")] public CKSyncEngineWillFetchChangesEvent WillFetchChangesEvent { get; }
-    [Selector("fetchedDatabaseChangesEvent")] public CKSyncEngineFetchedDatabaseChangesEvent FetchedDatabaseChangesEvent { get; }
-    [Selector("didFetchChangesEvent")] public CKSyncEngineDidFetchChangesEvent DidFetchChangesEvent { get; }
-    [Selector("willFetchRecordZoneChangesEvent")] public CKSyncEngineWillFetchRecordZoneChangesEvent WillFetchRecordZoneChangesEvent { get; }
-    [Selector("fetchedRecordZoneChangesEvent")] public CKSyncEngineFetchedRecordZoneChangesEvent FetchedRecordZoneChangesEvent { get; }
-    [Selector("didFetchRecordZoneChangesEvent")] public CKSyncEngineDidFetchRecordZoneChangesEvent DidFetchRecordZoneChangesEvent { get; }
-    [Selector("willSendChangesEvent")] public CKSyncEngineWillSendChangesEvent WillSendChangesEvent { get; }
-    [Selector("sentDatabaseChangesEvent")] public CKSyncEngineSentDatabaseChangesEvent SentDatabaseChangesEvent { get; }
-    [Selector("sentRecordZoneChangesEvent")] public CKSyncEngineSentRecordZoneChangesEvent SentRecordZoneChangesEvent { get; }
-    [Selector("didSendChangesEvent")] public CKSyncEngineDidSendChangesEvent DidSendChangesEvent { get; }
+    [Selector("type")]
+    public CKSyncEngineEventType Type { get; }
+    [Selector("stateUpdateEvent")]
+    public CKSyncEngineStateUpdateEvent StateUpdateEvent { get; }
+    [Selector("accountChangeEvent")]
+    public CKSyncEngineAccountChangeEvent AccountChangeEvent { get; }
+    [Selector("willFetchChangesEvent")]
+    public CKSyncEngineWillFetchChangesEvent WillFetchChangesEvent { get; }
+    [Selector("fetchedDatabaseChangesEvent")]
+    public CKSyncEngineFetchedDatabaseChangesEvent FetchedDatabaseChangesEvent { get; }
+    [Selector("didFetchChangesEvent")]
+    public CKSyncEngineDidFetchChangesEvent DidFetchChangesEvent { get; }
+    [Selector("willFetchRecordZoneChangesEvent")]
+    public CKSyncEngineWillFetchRecordZoneChangesEvent WillFetchRecordZoneChangesEvent { get; }
+    [Selector("fetchedRecordZoneChangesEvent")]
+    public CKSyncEngineFetchedRecordZoneChangesEvent FetchedRecordZoneChangesEvent { get; }
+    [Selector("didFetchRecordZoneChangesEvent")]
+    public CKSyncEngineDidFetchRecordZoneChangesEvent DidFetchRecordZoneChangesEvent { get; }
+    [Selector("willSendChangesEvent")]
+    public CKSyncEngineWillSendChangesEvent WillSendChangesEvent { get; }
+    [Selector("sentDatabaseChangesEvent")]
+    public CKSyncEngineSentDatabaseChangesEvent SentDatabaseChangesEvent { get; }
+    [Selector("sentRecordZoneChangesEvent")]
+    public CKSyncEngineSentRecordZoneChangesEvent SentRecordZoneChangesEvent { get; }
+    [Selector("didSendChangesEvent")]
+    public CKSyncEngineDidSendChangesEvent DidSendChangesEvent { get; }
 }
 
 public extern objc class CKSyncEngineStateUpdateEvent : CKSyncEngineEvent
 {
-    [Selector("stateSerialization")] public CKSyncEngineStateSerialization StateSerialization { get; }
+    [Selector("stateSerialization")]
+    public CKSyncEngineStateSerialization StateSerialization { get; }
 }
 
 public enum CKSyncEngineAccountChangeType : long
@@ -78,74 +92,98 @@ public enum CKSyncEngineAccountChangeType : long
 
 public extern objc class CKSyncEngineAccountChangeEvent : CKSyncEngineEvent
 {
-    [Selector("changeType")] public CKSyncEngineAccountChangeType ChangeType { get; }
-    [Selector("previousUser")] public CKRecordID? PreviousUser { get; }
-    [Selector("currentUser")] public CKRecordID? CurrentUser { get; }
+    [Selector("changeType")]
+    public CKSyncEngineAccountChangeType ChangeType { get; }
+    [Selector("previousUser")]
+    public CKRecordID? PreviousUser { get; }
+    [Selector("currentUser")]
+    public CKRecordID? CurrentUser { get; }
 }
 
 public extern objc class CKSyncEngineFetchedDatabaseChangesEvent : CKSyncEngineEvent
 {
-    [Selector("modifications")] public NSArray Modifications { get; }
-    [Selector("deletions")] public NSArray Deletions { get; }
+    [Selector("modifications")]
+    public NSArray Modifications { get; }
+    [Selector("deletions")]
+    public NSArray Deletions { get; }
 }
 
 public extern objc class CKSyncEngineFetchedRecordZoneChangesEvent : CKSyncEngineEvent
 {
-    [Selector("modifications")] public NSArray Modifications { get; }
-    [Selector("deletions")] public NSArray Deletions { get; }
+    [Selector("modifications")]
+    public NSArray Modifications { get; }
+    [Selector("deletions")]
+    public NSArray Deletions { get; }
 }
 
 public extern objc class CKSyncEngineSentDatabaseChangesEvent : CKSyncEngineEvent
 {
-    [Selector("savedZones")] public NSArray SavedZones { get; }
-    [Selector("failedZoneSaves")] public NSArray FailedZoneSaves { get; }
-    [Selector("deletedZoneIDs")] public NSArray DeletedZoneIDs { get; }
-    [Selector("failedZoneDeletes")] public NSDictionary FailedZoneDeletes { get; }
+    [Selector("savedZones")]
+    public NSArray SavedZones { get; }
+    [Selector("failedZoneSaves")]
+    public NSArray FailedZoneSaves { get; }
+    [Selector("deletedZoneIDs")]
+    public NSArray DeletedZoneIDs { get; }
+    [Selector("failedZoneDeletes")]
+    public NSDictionary FailedZoneDeletes { get; }
 }
 
 public extern objc class CKSyncEngineSentRecordZoneChangesEvent : CKSyncEngineEvent
 {
-    [Selector("savedRecords")] public NSArray SavedRecords { get; }
-    [Selector("failedRecordSaves")] public NSArray FailedRecordSaves { get; }
-    [Selector("deletedRecordIDs")] public NSArray DeletedRecordIDs { get; }
-    [Selector("failedRecordDeletes")] public NSDictionary FailedRecordDeletes { get; }
+    [Selector("savedRecords")]
+    public NSArray SavedRecords { get; }
+    [Selector("failedRecordSaves")]
+    public NSArray FailedRecordSaves { get; }
+    [Selector("deletedRecordIDs")]
+    public NSArray DeletedRecordIDs { get; }
+    [Selector("failedRecordDeletes")]
+    public NSDictionary FailedRecordDeletes { get; }
 }
 
 public extern objc class CKSyncEngineWillFetchChangesEvent : CKSyncEngineEvent
 {
-    [Selector("context")] public CKSyncEngineFetchChangesContext Context { get; }
+    [Selector("context")]
+    public CKSyncEngineFetchChangesContext Context { get; }
 }
 
 public extern objc class CKSyncEngineWillFetchRecordZoneChangesEvent : CKSyncEngineEvent
 {
-    [Selector("zoneID")] public CKRecordZoneID ZoneID { get; }
+    [Selector("zoneID")]
+    public CKRecordZoneID ZoneID { get; }
 }
 
 public extern objc class CKSyncEngineDidFetchRecordZoneChangesEvent : CKSyncEngineEvent
 {
-    [Selector("zoneID")] public CKRecordZoneID ZoneID { get; }
-    [Selector("error")] public NSError? Error { get; }
+    [Selector("zoneID")]
+    public CKRecordZoneID ZoneID { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
 }
 
 public extern objc class CKSyncEngineDidFetchChangesEvent : CKSyncEngineEvent
 {
-    [Selector("context")] public CKSyncEngineFetchChangesContext Context { get; }
+    [Selector("context")]
+    public CKSyncEngineFetchChangesContext Context { get; }
 }
 
 public extern objc class CKSyncEngineWillSendChangesEvent : CKSyncEngineEvent
 {
-    [Selector("context")] public CKSyncEngineSendChangesContext Context { get; }
+    [Selector("context")]
+    public CKSyncEngineSendChangesContext Context { get; }
 }
 
 public extern objc class CKSyncEngineDidSendChangesEvent : CKSyncEngineEvent
 {
-    [Selector("context")] public CKSyncEngineSendChangesContext Context { get; }
+    [Selector("context")]
+    public CKSyncEngineSendChangesContext Context { get; }
 }
 
 public extern objc class CKSyncEngineFetchedRecordDeletion : NSObject
 {
-    [Selector("recordID")] public CKRecordID RecordID { get; }
-    [Selector("recordType")] public CKRecordType RecordType { get; }
+    [Selector("recordID")]
+    public CKRecordID RecordID { get; }
+    [Selector("recordType")]
+    public CKRecordType RecordType { get; }
 }
 
 public enum CKSyncEngineZoneDeletionReason : long
@@ -157,20 +195,26 @@ public enum CKSyncEngineZoneDeletionReason : long
 
 public extern objc class CKSyncEngineFetchedZoneDeletion : NSObject
 {
-    [Selector("zoneID")] public CKRecordZoneID ZoneID { get; }
-    [Selector("reason")] public CKSyncEngineZoneDeletionReason Reason { get; }
+    [Selector("zoneID")]
+    public CKRecordZoneID ZoneID { get; }
+    [Selector("reason")]
+    public CKSyncEngineZoneDeletionReason Reason { get; }
 }
 
 public extern objc class CKSyncEngineFailedRecordSave : NSObject
 {
-    [Selector("record")] public CKRecord Record { get; }
-    [Selector("error")] public NSError Error { get; }
+    [Selector("record")]
+    public CKRecord Record { get; }
+    [Selector("error")]
+    public NSError Error { get; }
 }
 
 public extern objc class CKSyncEngineFailedZoneSave : NSObject
 {
-    [Selector("recordZone")] public CKRecordZone RecordZone { get; }
-    [Selector("error")] public NSError Error { get; }
+    [Selector("recordZone")]
+    public CKRecordZone RecordZone { get; }
+    [Selector("error")]
+    public NSError Error { get; }
 }
 
 #endif

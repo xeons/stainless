@@ -37,8 +37,10 @@ public extern "C" NSString? QCCompositionPickerPanelDidSelectCompositionNotifica
 /// Deprecated in macOS 10.15.
 public extern objc class QCCompositionPickerPanel : NSPanel
 {
-    [Selector("sharedCompositionPickerPanel")] public static QCCompositionPickerPanel? SharedCompositionPickerPanel();
-    [Selector("compositionPickerView")] public QCCompositionPickerView? CompositionPickerView();
+    [Selector("sharedCompositionPickerPanel")]
+    public static QCCompositionPickerPanel? SharedCompositionPickerPanel();
+    [Selector("compositionPickerView")]
+    public QCCompositionPickerView? CompositionPickerView();
 }
 
 #endif

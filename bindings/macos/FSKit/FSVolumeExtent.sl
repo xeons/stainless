@@ -61,7 +61,8 @@ public enum FSExtentType : long
 /// macOS 15.4 and later.
 public extern objc class FSExtentPacker : NSObject
 {
-    [Selector("packExtentWithResource:type:logicalOffset:physicalOffset:length:")] public bool PackExtentWithResourceTypeLogicalOffsetPhysicalOffsetLength(FSBlockDeviceResource resource, FSExtentType type, off_t logicalOffset, off_t physicalOffset, nuint length);
+    [Selector("packExtentWithResource:type:logicalOffset:physicalOffset:length:")]
+    public bool PackExtentWithResourceTypeLogicalOffsetPhysicalOffsetLength(FSBlockDeviceResource resource, FSExtentType type, off_t logicalOffset, off_t physicalOffset, nuint length);
 }
 
 public objc closure void FSVolumeKernelOffloadedIOOperationsBlockmapFileOffsetLengthFlagsOperationIDPackerReplyHandlerReplyBlock(NSError? arg0);
@@ -77,11 +78,17 @@ public objc closure void FSVolumeKernelOffloadedIOOperationsPreallocateSpaceForF
 /// macOS 15.4 and later.
 public objc interface FSVolumeKernelOffloadedIOOperations : NSObjectProtocol
 {
-    [Selector("blockmapFile:offset:length:flags:operationID:packer:replyHandler:")] void BlockmapFileOffsetLengthFlagsOperationIDPackerReplyHandler(FSItem file, off_t offset, nuint length, FSBlockmapFlags flags, FSOperationID operationID, FSExtentPacker packer, FSVolumeKernelOffloadedIOOperationsBlockmapFileOffsetLengthFlagsOperationIDPackerReplyHandlerReplyBlock reply);
-    [Selector("completeIOForFile:offset:length:status:flags:operationID:replyHandler:")] void CompleteIOForFileOffsetLengthStatusFlagsOperationIDReplyHandler(FSItem file, off_t offset, nuint length, NSError status, FSCompleteIOFlags flags, FSOperationID operationID, FSVolumeKernelOffloadedIOOperationsCompleteIOForFileOffsetLengthStatusFlagsOperationIDReplyHandlerReplyBlock reply);
-    [Selector("createFileNamed:inDirectory:attributes:packer:replyHandler:")] void CreateFileNamedInDirectoryAttributesPackerReplyHandler(FSFileName name, FSItem directory, FSItemSetAttributesRequest attributes, FSExtentPacker packer, FSVolumeKernelOffloadedIOOperationsCreateFileNamedInDirectoryAttributesPackerReplyHandlerReplyBlock reply);
-    [Selector("lookupItemNamed:inDirectory:packer:replyHandler:")] void LookupItemNamedInDirectoryPackerReplyHandler(FSFileName name, FSItem directory, FSExtentPacker packer, FSVolumeKernelOffloadedIOOperationsLookupItemNamedInDirectoryPackerReplyHandlerReplyBlock reply);
-    [Optional] [Selector("preallocateSpaceForFile:atOffset:length:flags:packer:replyHandler:")] void PreallocateSpaceForFileAtOffsetLengthFlagsPackerReplyHandler(FSItem file, off_t offset, nuint length, FSPreallocateFlags flags, FSExtentPacker packer, FSVolumeKernelOffloadedIOOperationsPreallocateSpaceForFileAtOffsetLengthFlagsPackerReplyHandlerReplyBlock reply);
+    [Selector("blockmapFile:offset:length:flags:operationID:packer:replyHandler:")]
+    void BlockmapFileOffsetLengthFlagsOperationIDPackerReplyHandler(FSItem file, off_t offset, nuint length, FSBlockmapFlags flags, FSOperationID operationID, FSExtentPacker packer, FSVolumeKernelOffloadedIOOperationsBlockmapFileOffsetLengthFlagsOperationIDPackerReplyHandlerReplyBlock reply);
+    [Selector("completeIOForFile:offset:length:status:flags:operationID:replyHandler:")]
+    void CompleteIOForFileOffsetLengthStatusFlagsOperationIDReplyHandler(FSItem file, off_t offset, nuint length, NSError status, FSCompleteIOFlags flags, FSOperationID operationID, FSVolumeKernelOffloadedIOOperationsCompleteIOForFileOffsetLengthStatusFlagsOperationIDReplyHandlerReplyBlock reply);
+    [Selector("createFileNamed:inDirectory:attributes:packer:replyHandler:")]
+    void CreateFileNamedInDirectoryAttributesPackerReplyHandler(FSFileName name, FSItem directory, FSItemSetAttributesRequest attributes, FSExtentPacker packer, FSVolumeKernelOffloadedIOOperationsCreateFileNamedInDirectoryAttributesPackerReplyHandlerReplyBlock reply);
+    [Selector("lookupItemNamed:inDirectory:packer:replyHandler:")]
+    void LookupItemNamedInDirectoryPackerReplyHandler(FSFileName name, FSItem directory, FSExtentPacker packer, FSVolumeKernelOffloadedIOOperationsLookupItemNamedInDirectoryPackerReplyHandlerReplyBlock reply);
+    [Optional]
+    [Selector("preallocateSpaceForFile:atOffset:length:flags:packer:replyHandler:")]
+    void PreallocateSpaceForFileAtOffsetLengthFlagsPackerReplyHandler(FSItem file, off_t offset, nuint length, FSPreallocateFlags flags, FSExtentPacker packer, FSVolumeKernelOffloadedIOOperationsPreallocateSpaceForFileAtOffsetLengthFlagsPackerReplyHandlerReplyBlock reply);
 }
 
 #endif

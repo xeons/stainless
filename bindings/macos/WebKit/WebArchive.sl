@@ -37,12 +37,18 @@ public extern "C" NSString? WebArchivePboardType;
 /// Deprecated in macOS 10.14.
 public extern objc class WebArchive : NSObject, NSCoding, NSCopying
 {
-    [Selector("mainResource")] public WebResource? MainResource { get; }
-    [Selector("subresources")] public NSArray? Subresources { get; }
-    [Selector("subframeArchives")] public NSArray? SubframeArchives { get; }
-    [Selector("data")] public NSData? Data { get; }
-    [Selector("initWithMainResource:subresources:subframeArchives:")] public Self? InitWithMainResourceSubresourcesSubframeArchives(WebResource? mainResource, NSArray? subresources, NSArray? subframeArchives);
-    [Selector("initWithData:")] public Self? InitWithData(NSData? data);
+    [Selector("mainResource")]
+    public WebResource? MainResource { get; }
+    [Selector("subresources")]
+    public NSArray? Subresources { get; }
+    [Selector("subframeArchives")]
+    public NSArray? SubframeArchives { get; }
+    [Selector("data")]
+    public NSData? Data { get; }
+    [Selector("initWithMainResource:subresources:subframeArchives:")]
+    public Self? InitWithMainResourceSubresourcesSubframeArchives(WebResource? mainResource, NSArray? subresources, NSArray? subframeArchives);
+    [Selector("initWithData:")]
+    public Self? InitWithData(NSData? data);
 }
 
 #endif

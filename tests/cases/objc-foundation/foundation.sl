@@ -11,46 +11,65 @@ import Standard.ObjC;
 [ObjCName("NSObject")]
 public objc interface NSObjectProtocol
 {
-    [Selector("isEqual:")] bool IsEqual(AnyObject? other);
+    [Selector("isEqual:")]
+    bool IsEqual(AnyObject? other);
 }
 
 public objc interface NSSecureCoding
 {
-    [Selector("supportsSecureCoding")] static abstract bool SupportsSecureCoding { get; }
+    [Selector("supportsSecureCoding")]
+    static abstract bool SupportsSecureCoding { get; }
 }
 
 [ObjCRoot]
 public extern objc class NSObject : NSObjectProtocol
 {
-    [Selector("description")] public static NSString ClassDescription { get; }
-    [Selector("alloc")] public static Self Alloc();
-    [Selector("init")] public Self Init();
+    [Selector("description")]
+    public static NSString ClassDescription { get; }
+    [Selector("alloc")]
+    public static Self Alloc();
+    [Selector("init")]
+    public Self Init();
 }
 
 public extern objc class NSString : NSObject, NSSecureCoding
 {
-    [Selector("stringWithUTF8String:")] public static Self FromUtf8(byte* text);
-    [Selector("UTF8String")] public byte* Utf8 { get; }
-    [Selector("length")] public nuint Length { get; }
-    [Selector("isEqualToString:")] public bool IsEqualToString(NSString other);
-    [Selector("stringByAppendingString:")] public NSString Append(NSString other);
-    [Selector("copy")] public NSString Copy();
-    [Selector("stringWithFormat:")] public static NSString WithFormat(NSString format, ...);
+    [Selector("stringWithUTF8String:")]
+    public static Self FromUtf8(byte* text);
+    [Selector("UTF8String")]
+    public byte* Utf8 { get; }
+    [Selector("length")]
+    public nuint Length { get; }
+    [Selector("isEqualToString:")]
+    public bool IsEqualToString(NSString other);
+    [Selector("stringByAppendingString:")]
+    public NSString Append(NSString other);
+    [Selector("copy")]
+    public NSString Copy();
+    [Selector("stringWithFormat:")]
+    public static NSString WithFormat(NSString format, ...);
 }
 
 public extern objc class NSMutableArray : NSObject
 {
-    [Selector("addObject:")] public void Add(AnyObject item);
-    [Selector("count")] public nuint Count { get; }
-    [Selector("objectAtIndex:")] public AnyObject ObjectAt(nuint index);
+    [Selector("addObject:")]
+    public void Add(AnyObject item);
+    [Selector("count")]
+    public nuint Count { get; }
+    [Selector("objectAtIndex:")]
+    public AnyObject ObjectAt(nuint index);
 }
 
 public extern objc class NSNumber : NSObject
 {
-    [Selector("numberWithBool:")] public static NSNumber FromBool(bool value);
-    [Selector("numberWithLong:")] public static NSNumber FromLong(long value);
-    [Selector("boolValue")] public bool BoolValue { get; }
-    [Selector("longValue")] public long LongValue { get; }
+    [Selector("numberWithBool:")]
+    public static NSNumber FromBool(bool value);
+    [Selector("numberWithLong:")]
+    public static NSNumber FromLong(long value);
+    [Selector("boolValue")]
+    public bool BoolValue { get; }
+    [Selector("longValue")]
+    public long LongValue { get; }
 }
 
 public struct Wide
@@ -63,17 +82,28 @@ public struct Wide
 
 public extern objc class SLTracked : NSObject
 {
-    [Selector("alive")] public static int Alive { get; }
-    [Selector("trackedWithValue:")] public static SLTracked WithValue(long value);
-    [Selector("initWithValue:")] public SLTracked InitWithValue(long value);
-    [Selector("value", "setValue:")] public long Value { get; set; }
-    [Selector("spread")] public Wide Spread { get; }
-    [Selector("isPositive")] public bool IsPositive { get; }
-    [Selector("isGreaterThan:flag:")] public bool IsGreaterThan(long other, bool flag);
-    [Selector("copyDoubled")] public SLTracked CopyDoubled();
-    [Selector("makeTwin:")] public bool MakeTwin(out SLTracked? twin);
-    [Selector("maybe:")] public SLTracked? Maybe(bool give);
-    [Selector("initIfPositive:")] public Self? InitIfPositive(long value);
+    [Selector("alive")]
+    public static int Alive { get; }
+    [Selector("trackedWithValue:")]
+    public static SLTracked WithValue(long value);
+    [Selector("initWithValue:")]
+    public SLTracked InitWithValue(long value);
+    [Selector("value", "setValue:")]
+    public long Value { get; set; }
+    [Selector("spread")]
+    public Wide Spread { get; }
+    [Selector("isPositive")]
+    public bool IsPositive { get; }
+    [Selector("isGreaterThan:flag:")]
+    public bool IsGreaterThan(long other, bool flag);
+    [Selector("copyDoubled")]
+    public SLTracked CopyDoubled();
+    [Selector("makeTwin:")]
+    public bool MakeTwin(out SLTracked? twin);
+    [Selector("maybe:")]
+    public SLTracked? Maybe(bool give);
+    [Selector("initIfPositive:")]
+    public Self? InitIfPositive(long value);
 }
 
 String Text(NSString text) => Standard.Text.FromBytes(text.Utf8, text.Length);

@@ -34,11 +34,16 @@ import Standard.ObjC;
 
 public extern objc class SCNLevelOfDetail : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("geometry")] public SCNGeometry? Geometry { get; }
-    [Selector("screenSpaceRadius")] public CGFloat ScreenSpaceRadius { get; }
-    [Selector("worldSpaceDistance")] public CGFloat WorldSpaceDistance { get; }
-    [Selector("levelOfDetailWithGeometry:screenSpaceRadius:")] public static Self LevelOfDetailWithGeometryScreenSpaceRadius(SCNGeometry? geometry, CGFloat radius);
-    [Selector("levelOfDetailWithGeometry:worldSpaceDistance:")] public static Self LevelOfDetailWithGeometryWorldSpaceDistance(SCNGeometry? geometry, CGFloat distance);
+    [Selector("geometry")]
+    public SCNGeometry? Geometry { get; }
+    [Selector("screenSpaceRadius")]
+    public CGFloat ScreenSpaceRadius { get; }
+    [Selector("worldSpaceDistance")]
+    public CGFloat WorldSpaceDistance { get; }
+    [Selector("levelOfDetailWithGeometry:screenSpaceRadius:")]
+    public static Self LevelOfDetailWithGeometryScreenSpaceRadius(SCNGeometry? geometry, CGFloat radius);
+    [Selector("levelOfDetailWithGeometry:worldSpaceDistance:")]
+    public static Self LevelOfDetailWithGeometryWorldSpaceDistance(SCNGeometry? geometry, CGFloat distance);
 }
 
 #endif

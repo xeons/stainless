@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class SKEffectNode : SKNode, SKWarpable
 {
-    [Selector("filter", "setFilter:")] public CIFilter? Filter { get; set; }
-    [Selector("shouldCenterFilter", "setShouldCenterFilter:")] public bool ShouldCenterFilter { get; set; }
-    [Selector("shouldEnableEffects", "setShouldEnableEffects:")] public bool ShouldEnableEffects { get; set; }
-    [Selector("shouldRasterize", "setShouldRasterize:")] public bool ShouldRasterize { get; set; }
-    [Selector("blendMode", "setBlendMode:")] public SKBlendMode BlendMode { get; set; }
-    [Selector("shader", "setShader:")] public SKShader? Shader { get; set; }
-    [Selector("attributeValues", "setAttributeValues:")] public NSDictionary AttributeValues { get; set; }
-    [Selector("valueForAttributeNamed:")] public SKAttributeValue? ValueForAttributeNamed(NSString key);
-    [Selector("setValue:forAttributeNamed:")] public void SetValueForAttributeNamed(SKAttributeValue value, NSString key);
+    [Selector("filter", "setFilter:")]
+    public CIFilter? Filter { get; set; }
+    [Selector("shouldCenterFilter", "setShouldCenterFilter:")]
+    public bool ShouldCenterFilter { get; set; }
+    [Selector("shouldEnableEffects", "setShouldEnableEffects:")]
+    public bool ShouldEnableEffects { get; set; }
+    [Selector("shouldRasterize", "setShouldRasterize:")]
+    public bool ShouldRasterize { get; set; }
+    [Selector("blendMode", "setBlendMode:")]
+    public SKBlendMode BlendMode { get; set; }
+    [Selector("shader", "setShader:")]
+    public SKShader? Shader { get; set; }
+    [Selector("attributeValues", "setAttributeValues:")]
+    public NSDictionary AttributeValues { get; set; }
+    [Selector("valueForAttributeNamed:")]
+    public SKAttributeValue? ValueForAttributeNamed(NSString key);
+    [Selector("setValue:forAttributeNamed:")]
+    public void SetValueForAttributeNamed(SKAttributeValue value, NSString key);
 }
 
 #endif

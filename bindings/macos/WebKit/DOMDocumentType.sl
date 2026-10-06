@@ -33,12 +33,18 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMDocumentType : DOMNode
 {
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("entities")] public DOMNamedNodeMap? Entities { get; }
-    [Selector("notations")] public DOMNamedNodeMap? Notations { get; }
-    [Selector("publicId")] public NSString? PublicId { get; }
-    [Selector("systemId")] public NSString? SystemId { get; }
-    [Selector("internalSubset")] public NSString? InternalSubset { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("entities")]
+    public DOMNamedNodeMap? Entities { get; }
+    [Selector("notations")]
+    public DOMNamedNodeMap? Notations { get; }
+    [Selector("publicId")]
+    public NSString? PublicId { get; }
+    [Selector("systemId")]
+    public NSString? SystemId { get; }
+    [Selector("internalSubset")]
+    public NSString? InternalSubset { get; }
 }
 
 #endif

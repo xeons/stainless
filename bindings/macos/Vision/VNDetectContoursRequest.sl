@@ -33,13 +33,19 @@ import Standard.ObjC;
 
 public extern objc class VNDetectContoursRequest : VNImageBasedRequest
 {
-    [Selector("contrastAdjustment", "setContrastAdjustment:")] public float ContrastAdjustment { get; set; }
-    [Selector("contrastPivot", "setContrastPivot:")] public NSNumber? ContrastPivot { get; set; }
-    [Selector("detectsDarkOnLight", "setDetectsDarkOnLight:")] public bool DetectsDarkOnLight { get; set; }
+    [Selector("contrastAdjustment", "setContrastAdjustment:")]
+    public float ContrastAdjustment { get; set; }
+    [Selector("contrastPivot", "setContrastPivot:")]
+    public NSNumber? ContrastPivot { get; set; }
+    [Selector("detectsDarkOnLight", "setDetectsDarkOnLight:")]
+    public bool DetectsDarkOnLight { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("detectDarkOnLight", "setDetectDarkOnLight:")] public bool DetectDarkOnLight { get; set; }
-    [Selector("maximumImageDimension", "setMaximumImageDimension:")] public NSUInteger MaximumImageDimension { get; set; }
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("detectDarkOnLight", "setDetectDarkOnLight:")]
+    public bool DetectDarkOnLight { get; set; }
+    [Selector("maximumImageDimension", "setMaximumImageDimension:")]
+    public NSUInteger MaximumImageDimension { get; set; }
+    [Selector("results")]
+    public NSArray? Results { get; }
 }
 
 #endif

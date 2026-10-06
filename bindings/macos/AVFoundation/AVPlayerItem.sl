@@ -62,43 +62,69 @@ public enum AVPlayerItemStatus : long
 
 public extern objc class AVPlayerItem : NSObject, NSCopying
 {
-    [Selector("status")] public AVPlayerItemStatus Status { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("playerItemWithURL:")] public static Self PlayerItemWithURL(NSURL URL);
-    [Selector("playerItemWithAsset:")] public static Self PlayerItemWithAsset(AVAsset asset);
-    [Selector("playerItemWithAsset:automaticallyLoadedAssetKeys:")] public static Self PlayerItemWithAssetAutomaticallyLoadedAssetKeys(AVAsset asset, NSArray? automaticallyLoadedAssetKeys);
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL URL);
-    [Selector("initWithAsset:")] public Self InitWithAsset(AVAsset asset);
-    [Selector("initWithAsset:automaticallyLoadedAssetKeys:")] public Self InitWithAssetAutomaticallyLoadedAssetKeys(AVAsset asset, NSArray? automaticallyLoadedAssetKeys);
-    [Selector("copyWithZone:")] public AnyObject CopyWithZone(_NSZone* zone);
-    [Selector("copy")] public AnyObject Copy();
+    [Selector("status")]
+    public AVPlayerItemStatus Status { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("playerItemWithURL:")]
+    public static Self PlayerItemWithURL(NSURL URL);
+    [Selector("playerItemWithAsset:")]
+    public static Self PlayerItemWithAsset(AVAsset asset);
+    [Selector("playerItemWithAsset:automaticallyLoadedAssetKeys:")]
+    public static Self PlayerItemWithAssetAutomaticallyLoadedAssetKeys(AVAsset asset, NSArray? automaticallyLoadedAssetKeys);
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL URL);
+    [Selector("initWithAsset:")]
+    public Self InitWithAsset(AVAsset asset);
+    [Selector("initWithAsset:automaticallyLoadedAssetKeys:")]
+    public Self InitWithAssetAutomaticallyLoadedAssetKeys(AVAsset asset, NSArray? automaticallyLoadedAssetKeys);
+    [Selector("copyWithZone:")]
+    public AnyObject CopyWithZone(_NSZone* zone);
+    [Selector("copy")]
+    public AnyObject Copy();
 }
 
 /// AVPlayerItemInspection, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    [Selector("asset")] public AVAsset Asset { get; }
-    [Selector("tracks")] public NSArray Tracks { get; }
-    [Selector("duration")] public CMTime Duration { get; }
-    [Selector("presentationSize")] public CGSize PresentationSize { get; }
+    [Selector("asset")]
+    public AVAsset Asset { get; }
+    [Selector("tracks")]
+    public NSArray Tracks { get; }
+    [Selector("duration")]
+    public CMTime Duration { get; }
+    [Selector("presentationSize")]
+    public CGSize PresentationSize { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("timedMetadata")] public NSArray? TimedMetadata { get; }
-    [Selector("automaticallyLoadedAssetKeys")] public NSArray AutomaticallyLoadedAssetKeys { get; }
+    [Selector("timedMetadata")]
+    public NSArray? TimedMetadata { get; }
+    [Selector("automaticallyLoadedAssetKeys")]
+    public NSArray AutomaticallyLoadedAssetKeys { get; }
 }
 
 /// AVPlayerItemRateAndSteppingSupport, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    [Selector("canPlayFastForward")] public bool CanPlayFastForward { get; }
-    [Selector("canPlaySlowForward")] public bool CanPlaySlowForward { get; }
-    [Selector("canPlayReverse")] public bool CanPlayReverse { get; }
-    [Selector("canPlaySlowReverse")] public bool CanPlaySlowReverse { get; }
-    [Selector("canPlayFastReverse")] public bool CanPlayFastReverse { get; }
-    [Selector("canStepForward")] public bool CanStepForward { get; }
-    [Selector("canStepBackward")] public bool CanStepBackward { get; }
-    [Selector("configuredTimeOffsetFromLive", "setConfiguredTimeOffsetFromLive:")] public CMTime ConfiguredTimeOffsetFromLive { get; set; }
-    [Selector("recommendedTimeOffsetFromLive")] public CMTime RecommendedTimeOffsetFromLive { get; }
-    [Selector("automaticallyPreservesTimeOffsetFromLive", "setAutomaticallyPreservesTimeOffsetFromLive:")] public bool AutomaticallyPreservesTimeOffsetFromLive { get; set; }
+    [Selector("canPlayFastForward")]
+    public bool CanPlayFastForward { get; }
+    [Selector("canPlaySlowForward")]
+    public bool CanPlaySlowForward { get; }
+    [Selector("canPlayReverse")]
+    public bool CanPlayReverse { get; }
+    [Selector("canPlaySlowReverse")]
+    public bool CanPlaySlowReverse { get; }
+    [Selector("canPlayFastReverse")]
+    public bool CanPlayFastReverse { get; }
+    [Selector("canStepForward")]
+    public bool CanStepForward { get; }
+    [Selector("canStepBackward")]
+    public bool CanStepBackward { get; }
+    [Selector("configuredTimeOffsetFromLive", "setConfiguredTimeOffsetFromLive:")]
+    public CMTime ConfiguredTimeOffsetFromLive { get; set; }
+    [Selector("recommendedTimeOffsetFromLive")]
+    public CMTime RecommendedTimeOffsetFromLive { get; }
+    [Selector("automaticallyPreservesTimeOffsetFromLive", "setAutomaticallyPreservesTimeOffsetFromLive:")]
+    public bool AutomaticallyPreservesTimeOffsetFromLive { get; set; }
 }
 
 public objc closure void AVPlayerItemSeekToTimeCompletionHandlerCompletionHandlerBlock(bool arg0);
@@ -110,60 +136,93 @@ public objc closure void AVPlayerItemSeekToDateCompletionHandlerCompletionHandle
 /// AVPlayerItemTimeControl, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    [Selector("forwardPlaybackEndTime", "setForwardPlaybackEndTime:")] public CMTime ForwardPlaybackEndTime { get; set; }
-    [Selector("reversePlaybackEndTime", "setReversePlaybackEndTime:")] public CMTime ReversePlaybackEndTime { get; set; }
-    [Selector("seekableTimeRanges")] public NSArray SeekableTimeRanges { get; }
-    [Selector("timebase")] public CMTimebaseRef? Timebase { get; }
-    [Selector("currentTime")] public CMTime CurrentTime();
-    [Selector("seekToTime:completionHandler:")] public void SeekToTimeCompletionHandler(CMTime time, AVPlayerItemSeekToTimeCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("seekToTime:toleranceBefore:toleranceAfter:completionHandler:")] public void SeekToTimeToleranceBeforeToleranceAfterCompletionHandler(CMTime time, CMTime toleranceBefore, CMTime toleranceAfter, AVPlayerItemSeekToTimeToleranceBeforeToleranceAfterCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("cancelPendingSeeks")] public void CancelPendingSeeks();
-    [Selector("currentDate")] public NSDate? CurrentDate();
-    [Selector("seekToDate:completionHandler:")] public bool SeekToDateCompletionHandler(NSDate date, AVPlayerItemSeekToDateCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("stepByCount:")] public void StepByCount(NSInteger stepCount);
+    [Selector("forwardPlaybackEndTime", "setForwardPlaybackEndTime:")]
+    public CMTime ForwardPlaybackEndTime { get; set; }
+    [Selector("reversePlaybackEndTime", "setReversePlaybackEndTime:")]
+    public CMTime ReversePlaybackEndTime { get; set; }
+    [Selector("seekableTimeRanges")]
+    public NSArray SeekableTimeRanges { get; }
+    [Selector("timebase")]
+    public CMTimebaseRef? Timebase { get; }
+    [Selector("currentTime")]
+    public CMTime CurrentTime();
+    [Selector("seekToTime:completionHandler:")]
+    public void SeekToTimeCompletionHandler(CMTime time, AVPlayerItemSeekToTimeCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("seekToTime:toleranceBefore:toleranceAfter:completionHandler:")]
+    public void SeekToTimeToleranceBeforeToleranceAfterCompletionHandler(CMTime time, CMTime toleranceBefore, CMTime toleranceAfter, AVPlayerItemSeekToTimeToleranceBeforeToleranceAfterCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("cancelPendingSeeks")]
+    public void CancelPendingSeeks();
+    [Selector("currentDate")]
+    public NSDate? CurrentDate();
+    [Selector("seekToDate:completionHandler:")]
+    public bool SeekToDateCompletionHandler(NSDate date, AVPlayerItemSeekToDateCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("stepByCount:")]
+    public void StepByCount(NSInteger stepCount);
 }
 
 /// AVPlayerItemVisualPresentation, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    [Selector("videoComposition", "setVideoComposition:")] public AVVideoComposition? VideoComposition { get; set; }
-    [Selector("customVideoCompositor")] public AVVideoCompositing? CustomVideoCompositor { get; }
-    [Selector("seekingWaitsForVideoCompositionRendering", "setSeekingWaitsForVideoCompositionRendering:")] public bool SeekingWaitsForVideoCompositionRendering { get; set; }
-    [Selector("textStyleRules", "setTextStyleRules:")] public NSArray? TextStyleRules { get; set; }
-    [Selector("videoApertureMode", "setVideoApertureMode:")] public AVVideoApertureMode? VideoApertureMode { get; set; }
-    [Selector("appliesPerFrameHDRDisplayMetadata", "setAppliesPerFrameHDRDisplayMetadata:")] public bool AppliesPerFrameHDRDisplayMetadata { get; set; }
+    [Selector("videoComposition", "setVideoComposition:")]
+    public AVVideoComposition? VideoComposition { get; set; }
+    [Selector("customVideoCompositor")]
+    public AVVideoCompositing? CustomVideoCompositor { get; }
+    [Selector("seekingWaitsForVideoCompositionRendering", "setSeekingWaitsForVideoCompositionRendering:")]
+    public bool SeekingWaitsForVideoCompositionRendering { get; set; }
+    [Selector("textStyleRules", "setTextStyleRules:")]
+    public NSArray? TextStyleRules { get; set; }
+    [Selector("videoApertureMode", "setVideoApertureMode:")]
+    public AVVideoApertureMode? VideoApertureMode { get; set; }
+    [Selector("appliesPerFrameHDRDisplayMetadata", "setAppliesPerFrameHDRDisplayMetadata:")]
+    public bool AppliesPerFrameHDRDisplayMetadata { get; set; }
 }
 
 /// AVPlayerItemAudioProcessing, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    [Selector("audioTimePitchAlgorithm", "setAudioTimePitchAlgorithm:")] public AVAudioTimePitchAlgorithm AudioTimePitchAlgorithm { get; set; }
+    [Selector("audioTimePitchAlgorithm", "setAudioTimePitchAlgorithm:")]
+    public AVAudioTimePitchAlgorithm AudioTimePitchAlgorithm { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("isAudioSpatializationAllowed", "setAudioSpatializationAllowed:")] public bool AudioSpatializationAllowed { get; set; }
-    [Selector("allowedAudioSpatializationFormats", "setAllowedAudioSpatializationFormats:")] public AVAudioSpatializationFormats AllowedAudioSpatializationFormats { get; set; }
-    [Selector("audioMix", "setAudioMix:")] public AVAudioMix? AudioMix { get; set; }
+    [Selector("isAudioSpatializationAllowed", "setAudioSpatializationAllowed:")]
+    public bool AudioSpatializationAllowed { get; set; }
+    [Selector("allowedAudioSpatializationFormats", "setAllowedAudioSpatializationFormats:")]
+    public AVAudioSpatializationFormats AllowedAudioSpatializationFormats { get; set; }
+    [Selector("audioMix", "setAudioMix:")]
+    public AVAudioMix? AudioMix { get; set; }
 }
 
 /// AVPlayerItemPlayability, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    [Selector("loadedTimeRanges")] public NSArray LoadedTimeRanges { get; }
-    [Selector("isPlaybackLikelyToKeepUp")] public bool PlaybackLikelyToKeepUp { get; }
-    [Selector("isPlaybackBufferFull")] public bool PlaybackBufferFull { get; }
-    [Selector("isPlaybackBufferEmpty")] public bool PlaybackBufferEmpty { get; }
-    [Selector("canUseNetworkResourcesForLiveStreamingWhilePaused", "setCanUseNetworkResourcesForLiveStreamingWhilePaused:")] public bool CanUseNetworkResourcesForLiveStreamingWhilePaused { get; set; }
-    [Selector("preferredForwardBufferDuration", "setPreferredForwardBufferDuration:")] public NSTimeInterval PreferredForwardBufferDuration { get; set; }
+    [Selector("loadedTimeRanges")]
+    public NSArray LoadedTimeRanges { get; }
+    [Selector("isPlaybackLikelyToKeepUp")]
+    public bool PlaybackLikelyToKeepUp { get; }
+    [Selector("isPlaybackBufferFull")]
+    public bool PlaybackBufferFull { get; }
+    [Selector("isPlaybackBufferEmpty")]
+    public bool PlaybackBufferEmpty { get; }
+    [Selector("canUseNetworkResourcesForLiveStreamingWhilePaused", "setCanUseNetworkResourcesForLiveStreamingWhilePaused:")]
+    public bool CanUseNetworkResourcesForLiveStreamingWhilePaused { get; set; }
+    [Selector("preferredForwardBufferDuration", "setPreferredForwardBufferDuration:")]
+    public NSTimeInterval PreferredForwardBufferDuration { get; set; }
 }
 
 /// AVPlayerItemVariantControl, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    [Selector("preferredPeakBitRate", "setPreferredPeakBitRate:")] public double PreferredPeakBitRate { get; set; }
-    [Selector("preferredPeakBitRateForExpensiveNetworks", "setPreferredPeakBitRateForExpensiveNetworks:")] public double PreferredPeakBitRateForExpensiveNetworks { get; set; }
-    [Selector("preferredMaximumResolution", "setPreferredMaximumResolution:")] public CGSize PreferredMaximumResolution { get; set; }
-    [Selector("preferredMaximumResolutionForExpensiveNetworks", "setPreferredMaximumResolutionForExpensiveNetworks:")] public CGSize PreferredMaximumResolutionForExpensiveNetworks { get; set; }
-    [Selector("startsOnFirstEligibleVariant", "setStartsOnFirstEligibleVariant:")] public bool StartsOnFirstEligibleVariant { get; set; }
-    [Selector("variantPreferences", "setVariantPreferences:")] public AVVariantPreferences VariantPreferences { get; set; }
+    [Selector("preferredPeakBitRate", "setPreferredPeakBitRate:")]
+    public double PreferredPeakBitRate { get; set; }
+    [Selector("preferredPeakBitRateForExpensiveNetworks", "setPreferredPeakBitRateForExpensiveNetworks:")]
+    public double PreferredPeakBitRateForExpensiveNetworks { get; set; }
+    [Selector("preferredMaximumResolution", "setPreferredMaximumResolution:")]
+    public CGSize PreferredMaximumResolution { get; set; }
+    [Selector("preferredMaximumResolutionForExpensiveNetworks", "setPreferredMaximumResolutionForExpensiveNetworks:")]
+    public CGSize PreferredMaximumResolutionForExpensiveNetworks { get; set; }
+    [Selector("startsOnFirstEligibleVariant", "setStartsOnFirstEligibleVariant:")]
+    public bool StartsOnFirstEligibleVariant { get; set; }
+    [Selector("variantPreferences", "setVariantPreferences:")]
+    public AVVariantPreferences VariantPreferences { get; set; }
 }
 
 [Flags]
@@ -176,122 +235,184 @@ public enum AVVariantPreferences : ulong
 /// AVPlayerItemMediaSelection, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    [Selector("currentMediaSelection")] public AVMediaSelection CurrentMediaSelection { get; }
-    [Selector("selectMediaOption:inMediaSelectionGroup:")] public void SelectMediaOptionInMediaSelectionGroup(AVMediaSelectionOption? mediaSelectionOption, AVMediaSelectionGroup mediaSelectionGroup);
-    [Selector("selectMediaOptionAutomaticallyInMediaSelectionGroup:")] public void SelectMediaOptionAutomaticallyInMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("currentMediaSelection")]
+    public AVMediaSelection CurrentMediaSelection { get; }
+    [Selector("selectMediaOption:inMediaSelectionGroup:")]
+    public void SelectMediaOptionInMediaSelectionGroup(AVMediaSelectionOption? mediaSelectionOption, AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("selectMediaOptionAutomaticallyInMediaSelectionGroup:")]
+    public void SelectMediaOptionAutomaticallyInMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
 }
 
 /// AVPlayerItemCustomMediaSelectionScheme, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
     /// macOS 26.0 and later.
-    [Selector("preferredCustomMediaSelectionSchemes", "setPreferredCustomMediaSelectionSchemes:")] public NSArray PreferredCustomMediaSelectionSchemes { get; set; }
+    [Selector("preferredCustomMediaSelectionSchemes", "setPreferredCustomMediaSelectionSchemes:")]
+    public NSArray PreferredCustomMediaSelectionSchemes { get; set; }
     /// macOS 26.0 and later.
-    [Selector("selectMediaPresentationLanguage:forMediaSelectionGroup:")] public void SelectMediaPresentationLanguageForMediaSelectionGroup(NSString language, AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("selectMediaPresentationLanguage:forMediaSelectionGroup:")]
+    public void SelectMediaPresentationLanguageForMediaSelectionGroup(NSString language, AVMediaSelectionGroup mediaSelectionGroup);
     /// macOS 26.0 and later.
-    [Selector("selectedMediaPresentationLanguageForMediaSelectionGroup:")] public NSString? SelectedMediaPresentationLanguageForMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("selectedMediaPresentationLanguageForMediaSelectionGroup:")]
+    public NSString? SelectedMediaPresentationLanguageForMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
     /// macOS 26.0 and later.
-    [Selector("selectMediaPresentationSetting:forMediaSelectionGroup:")] public void SelectMediaPresentationSettingForMediaSelectionGroup(AVMediaPresentationSetting mediaPresentationSetting, AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("selectMediaPresentationSetting:forMediaSelectionGroup:")]
+    public void SelectMediaPresentationSettingForMediaSelectionGroup(AVMediaPresentationSetting mediaPresentationSetting, AVMediaSelectionGroup mediaSelectionGroup);
     /// macOS 26.0 and later.
-    [Selector("selectedMediaPresentationSettingsForMediaSelectionGroup:")] public NSDictionary SelectedMediaPresentationSettingsForMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("selectedMediaPresentationSettingsForMediaSelectionGroup:")]
+    public NSDictionary SelectedMediaPresentationSettingsForMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
     /// macOS 26.0 and later.
-    [Selector("effectiveMediaPresentationSettingsForMediaSelectionGroup:")] public NSDictionary EffectiveMediaPresentationSettingsForMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("effectiveMediaPresentationSettingsForMediaSelectionGroup:")]
+    public NSDictionary EffectiveMediaPresentationSettingsForMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
 }
 
 /// AVPlayerItemLogging, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    [Selector("accessLog")] public AVPlayerItemAccessLog? AccessLog();
-    [Selector("errorLog")] public AVPlayerItemErrorLog? ErrorLog();
+    [Selector("accessLog")]
+    public AVPlayerItemAccessLog? AccessLog();
+    [Selector("errorLog")]
+    public AVPlayerItemErrorLog? ErrorLog();
 }
 
 /// AVPlayerItemOutputs, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    [Selector("outputs")] public NSArray Outputs { get; }
-    [Selector("addOutput:")] public void AddOutput(AVPlayerItemOutput output);
-    [Selector("removeOutput:")] public void RemoveOutput(AVPlayerItemOutput output);
+    [Selector("outputs")]
+    public NSArray Outputs { get; }
+    [Selector("addOutput:")]
+    public void AddOutput(AVPlayerItemOutput output);
+    [Selector("removeOutput:")]
+    public void RemoveOutput(AVPlayerItemOutput output);
 }
 
 /// AVPlayerItemMediaDataCollectors, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    [Selector("mediaDataCollectors")] public NSArray MediaDataCollectors { get; }
-    [Selector("addMediaDataCollector:")] public void AddMediaDataCollector(AVPlayerItemMediaDataCollector collector);
-    [Selector("removeMediaDataCollector:")] public void RemoveMediaDataCollector(AVPlayerItemMediaDataCollector collector);
+    [Selector("mediaDataCollectors")]
+    public NSArray MediaDataCollectors { get; }
+    [Selector("addMediaDataCollector:")]
+    public void AddMediaDataCollector(AVPlayerItemMediaDataCollector collector);
+    [Selector("removeMediaDataCollector:")]
+    public void RemoveMediaDataCollector(AVPlayerItemMediaDataCollector collector);
 }
 
 /// AVPlayerItemDeprecated, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
     /// Deprecated in macOS 10.13.
-    [Selector("seekToTime:")] public void SeekToTime(CMTime time);
+    [Selector("seekToTime:")]
+    public void SeekToTime(CMTime time);
     /// Deprecated in macOS 10.13.
-    [Selector("seekToTime:toleranceBefore:toleranceAfter:")] public void SeekToTimeToleranceBeforeToleranceAfter(CMTime time, CMTime toleranceBefore, CMTime toleranceAfter);
+    [Selector("seekToTime:toleranceBefore:toleranceAfter:")]
+    public void SeekToTimeToleranceBeforeToleranceAfter(CMTime time, CMTime toleranceBefore, CMTime toleranceAfter);
     /// Deprecated in macOS 10.13.
-    [Selector("seekToDate:")] public bool SeekToDate(NSDate date);
+    [Selector("seekToDate:")]
+    public bool SeekToDate(NSDate date);
     /// Deprecated in macOS 10.13.
-    [Selector("selectedMediaOptionInMediaSelectionGroup:")] public AVMediaSelectionOption? SelectedMediaOptionInMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("selectedMediaOptionInMediaSelectionGroup:")]
+    public AVMediaSelectionOption? SelectedMediaOptionInMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
 }
 
 public extern objc class AVPlayerItemAccessLog : NSObject, NSCopying
 {
-    [Selector("extendedLogDataStringEncoding")] public NSStringEncoding ExtendedLogDataStringEncoding { get; }
-    [Selector("events")] public NSArray Events { get; }
-    [Selector("extendedLogData")] public NSData? ExtendedLogData();
+    [Selector("extendedLogDataStringEncoding")]
+    public NSStringEncoding ExtendedLogDataStringEncoding { get; }
+    [Selector("events")]
+    public NSArray Events { get; }
+    [Selector("extendedLogData")]
+    public NSData? ExtendedLogData();
 }
 
 public extern objc class AVPlayerItemErrorLog : NSObject, NSCopying
 {
-    [Selector("extendedLogDataStringEncoding")] public NSStringEncoding ExtendedLogDataStringEncoding { get; }
-    [Selector("events")] public NSArray Events { get; }
-    [Selector("extendedLogData")] public NSData? ExtendedLogData();
+    [Selector("extendedLogDataStringEncoding")]
+    public NSStringEncoding ExtendedLogDataStringEncoding { get; }
+    [Selector("events")]
+    public NSArray Events { get; }
+    [Selector("extendedLogData")]
+    public NSData? ExtendedLogData();
 }
 
 public extern objc class AVPlayerItemAccessLogEvent : NSObject, NSCopying
 {
     /// Deprecated in macOS 10.9.
-    [Selector("numberOfSegmentsDownloaded")] public NSInteger NumberOfSegmentsDownloaded { get; }
-    [Selector("numberOfMediaRequests")] public NSInteger NumberOfMediaRequests { get; }
-    [Selector("playbackStartDate")] public NSDate? PlaybackStartDate { get; }
-    [Selector("URI")] public NSString? URI { get; }
-    [Selector("serverAddress")] public NSString? ServerAddress { get; }
-    [Selector("numberOfServerAddressChanges")] public NSInteger NumberOfServerAddressChanges { get; }
-    [Selector("playbackSessionID")] public NSString? PlaybackSessionID { get; }
-    [Selector("playbackStartOffset")] public NSTimeInterval PlaybackStartOffset { get; }
-    [Selector("segmentsDownloadedDuration")] public NSTimeInterval SegmentsDownloadedDuration { get; }
-    [Selector("durationWatched")] public NSTimeInterval DurationWatched { get; }
-    [Selector("numberOfStalls")] public NSInteger NumberOfStalls { get; }
-    [Selector("numberOfBytesTransferred")] public long NumberOfBytesTransferred { get; }
-    [Selector("transferDuration")] public NSTimeInterval TransferDuration { get; }
-    [Selector("observedBitrate")] public double ObservedBitrate { get; }
-    [Selector("indicatedBitrate")] public double IndicatedBitrate { get; }
-    [Selector("indicatedAverageBitrate")] public double IndicatedAverageBitrate { get; }
-    [Selector("averageVideoBitrate")] public double AverageVideoBitrate { get; }
-    [Selector("averageAudioBitrate")] public double AverageAudioBitrate { get; }
-    [Selector("numberOfDroppedVideoFrames")] public NSInteger NumberOfDroppedVideoFrames { get; }
-    [Selector("startupTime")] public NSTimeInterval StartupTime { get; }
-    [Selector("downloadOverdue")] public NSInteger DownloadOverdue { get; }
+    [Selector("numberOfSegmentsDownloaded")]
+    public NSInteger NumberOfSegmentsDownloaded { get; }
+    [Selector("numberOfMediaRequests")]
+    public NSInteger NumberOfMediaRequests { get; }
+    [Selector("playbackStartDate")]
+    public NSDate? PlaybackStartDate { get; }
+    [Selector("URI")]
+    public NSString? URI { get; }
+    [Selector("serverAddress")]
+    public NSString? ServerAddress { get; }
+    [Selector("numberOfServerAddressChanges")]
+    public NSInteger NumberOfServerAddressChanges { get; }
+    [Selector("playbackSessionID")]
+    public NSString? PlaybackSessionID { get; }
+    [Selector("playbackStartOffset")]
+    public NSTimeInterval PlaybackStartOffset { get; }
+    [Selector("segmentsDownloadedDuration")]
+    public NSTimeInterval SegmentsDownloadedDuration { get; }
+    [Selector("durationWatched")]
+    public NSTimeInterval DurationWatched { get; }
+    [Selector("numberOfStalls")]
+    public NSInteger NumberOfStalls { get; }
+    [Selector("numberOfBytesTransferred")]
+    public long NumberOfBytesTransferred { get; }
+    [Selector("transferDuration")]
+    public NSTimeInterval TransferDuration { get; }
+    [Selector("observedBitrate")]
+    public double ObservedBitrate { get; }
+    [Selector("indicatedBitrate")]
+    public double IndicatedBitrate { get; }
+    [Selector("indicatedAverageBitrate")]
+    public double IndicatedAverageBitrate { get; }
+    [Selector("averageVideoBitrate")]
+    public double AverageVideoBitrate { get; }
+    [Selector("averageAudioBitrate")]
+    public double AverageAudioBitrate { get; }
+    [Selector("numberOfDroppedVideoFrames")]
+    public NSInteger NumberOfDroppedVideoFrames { get; }
+    [Selector("startupTime")]
+    public NSTimeInterval StartupTime { get; }
+    [Selector("downloadOverdue")]
+    public NSInteger DownloadOverdue { get; }
     /// Deprecated in macOS 12.
-    [Selector("observedMaxBitrate")] public double ObservedMaxBitrate { get; }
+    [Selector("observedMaxBitrate")]
+    public double ObservedMaxBitrate { get; }
     /// Deprecated in macOS 12.
-    [Selector("observedMinBitrate")] public double ObservedMinBitrate { get; }
-    [Selector("observedBitrateStandardDeviation")] public double ObservedBitrateStandardDeviation { get; }
-    [Selector("playbackType")] public NSString? PlaybackType { get; }
-    [Selector("mediaRequestsWWAN")] public NSInteger MediaRequestsWWAN { get; }
-    [Selector("switchBitrate")] public double SwitchBitrate { get; }
+    [Selector("observedMinBitrate")]
+    public double ObservedMinBitrate { get; }
+    [Selector("observedBitrateStandardDeviation")]
+    public double ObservedBitrateStandardDeviation { get; }
+    [Selector("playbackType")]
+    public NSString? PlaybackType { get; }
+    [Selector("mediaRequestsWWAN")]
+    public NSInteger MediaRequestsWWAN { get; }
+    [Selector("switchBitrate")]
+    public double SwitchBitrate { get; }
 }
 
 public extern objc class AVPlayerItemErrorLogEvent : NSObject, NSCopying
 {
-    [Selector("date")] public NSDate? Date { get; }
-    [Selector("URI")] public NSString? URI { get; }
-    [Selector("serverAddress")] public NSString? ServerAddress { get; }
-    [Selector("playbackSessionID")] public NSString? PlaybackSessionID { get; }
-    [Selector("errorStatusCode")] public NSInteger ErrorStatusCode { get; }
-    [Selector("errorDomain")] public NSString ErrorDomain { get; }
-    [Selector("errorComment")] public NSString? ErrorComment { get; }
-    [Selector("allHTTPResponseHeaderFields")] public NSDictionary? AllHTTPResponseHeaderFields { get; }
+    [Selector("date")]
+    public NSDate? Date { get; }
+    [Selector("URI")]
+    public NSString? URI { get; }
+    [Selector("serverAddress")]
+    public NSString? ServerAddress { get; }
+    [Selector("playbackSessionID")]
+    public NSString? PlaybackSessionID { get; }
+    [Selector("errorStatusCode")]
+    public NSInteger ErrorStatusCode { get; }
+    [Selector("errorDomain")]
+    public NSString ErrorDomain { get; }
+    [Selector("errorComment")]
+    public NSString? ErrorComment { get; }
+    [Selector("allHTTPResponseHeaderFields")]
+    public NSDictionary? AllHTTPResponseHeaderFields { get; }
 }
 
 /// AVMetricEventStreamPublisher, a category of AVPlayerItem.

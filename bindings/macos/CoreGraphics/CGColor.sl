@@ -35,33 +35,44 @@ public struct CGColor;
 [CFType("CGColorGetTypeID")]
 public extern objc class CGColorRef : CFTypeRef { }
 
-[ReturnsRetained] public extern "C" CGColorRef? CGColorCreate(CGColorSpaceRef? space, CGFloat* components);
+[ReturnsRetained]
+public extern "C" CGColorRef? CGColorCreate(CGColorSpaceRef? space, CGFloat* components);
 
-[ReturnsRetained] public extern "C" CGColorRef CGColorCreateGenericGray(CGFloat gray, CGFloat alpha);
+[ReturnsRetained]
+public extern "C" CGColorRef CGColorCreateGenericGray(CGFloat gray, CGFloat alpha);
 
-[ReturnsRetained] public extern "C" CGColorRef CGColorCreateGenericRGB(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
+[ReturnsRetained]
+public extern "C" CGColorRef CGColorCreateGenericRGB(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
 
-[ReturnsRetained] public extern "C" CGColorRef CGColorCreateGenericCMYK(CGFloat cyan, CGFloat magenta, CGFloat yellow, CGFloat black, CGFloat alpha);
+[ReturnsRetained]
+public extern "C" CGColorRef CGColorCreateGenericCMYK(CGFloat cyan, CGFloat magenta, CGFloat yellow, CGFloat black, CGFloat alpha);
 
-[ReturnsRetained] public extern "C" CGColorRef CGColorCreateGenericGrayGamma2_2(CGFloat gray, CGFloat alpha);
+[ReturnsRetained]
+public extern "C" CGColorRef CGColorCreateGenericGrayGamma2_2(CGFloat gray, CGFloat alpha);
 
-[ReturnsRetained] public extern "C" CGColorRef CGColorCreateSRGB(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
+[ReturnsRetained]
+public extern "C" CGColorRef CGColorCreateSRGB(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CGColorRef? CGColorCreateWithContentHeadroom(float headroom, CGColorSpaceRef? space, CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
+[ReturnsRetained]
+public extern "C" CGColorRef? CGColorCreateWithContentHeadroom(float headroom, CGColorSpaceRef? space, CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
 
 /// macOS 26.0 and later.
 public extern "C" float CGColorGetContentHeadroom(CGColorRef? color);
 
 public extern "C" CGColorRef? CGColorGetConstantColor(CFStringRef? colorName);
 
-[ReturnsRetained] public extern "C" CGColorRef? CGColorCreateWithPattern(CGColorSpaceRef? space, CGPatternRef? pattern, CGFloat* components);
+[ReturnsRetained]
+public extern "C" CGColorRef? CGColorCreateWithPattern(CGColorSpaceRef? space, CGPatternRef? pattern, CGFloat* components);
 
-[ReturnsRetained] public extern "C" CGColorRef? CGColorCreateCopy(CGColorRef? color);
+[ReturnsRetained]
+public extern "C" CGColorRef? CGColorCreateCopy(CGColorRef? color);
 
-[ReturnsRetained] public extern "C" CGColorRef? CGColorCreateCopyWithAlpha(CGColorRef? color, CGFloat alpha);
+[ReturnsRetained]
+public extern "C" CGColorRef? CGColorCreateCopyWithAlpha(CGColorRef? color, CGFloat alpha);
 
-[ReturnsRetained] public extern "C" CGColorRef? CGColorCreateCopyByMatchingToColorSpace(CGColorSpaceRef? arg0, CGColorRenderingIntent intent, CGColorRef? color, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGColorRef? CGColorCreateCopyByMatchingToColorSpace(CGColorSpaceRef? arg0, CGColorRenderingIntent intent, CGColorRef? color, CFDictionaryRef? options);
 
 public extern "C" bool CGColorEqualToColor(CGColorRef? color1, CGColorRef? color2);
 

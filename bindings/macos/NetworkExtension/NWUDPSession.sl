@@ -52,31 +52,44 @@ public objc closure void NWUDPSessionWriteDatagramCompletionHandlerCompletionHan
 public extern objc class NWUDPSession : NSObject
 {
     /// Deprecated in macOS 15.0.
-    [Selector("state")] public NWUDPSessionState State { get; }
+    [Selector("state")]
+    public NWUDPSessionState State { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("endpoint")] public NWEndpoint? Endpoint { get; }
+    [Selector("endpoint")]
+    public NWEndpoint? Endpoint { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("resolvedEndpoint")] public NWEndpoint? ResolvedEndpoint { get; }
+    [Selector("resolvedEndpoint")]
+    public NWEndpoint? ResolvedEndpoint { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("isViable")] public bool Viable { get; }
+    [Selector("isViable")]
+    public bool Viable { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("hasBetterPath")] public bool HasBetterPath { get; }
+    [Selector("hasBetterPath")]
+    public bool HasBetterPath { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("currentPath")] public NWPath? CurrentPath { get; }
+    [Selector("currentPath")]
+    public NWPath? CurrentPath { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("maximumDatagramLength")] public NSUInteger MaximumDatagramLength { get; }
+    [Selector("maximumDatagramLength")]
+    public NSUInteger MaximumDatagramLength { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("initWithUpgradeForSession:")] public Self InitWithUpgradeForSession(NWUDPSession session);
+    [Selector("initWithUpgradeForSession:")]
+    public Self InitWithUpgradeForSession(NWUDPSession session);
     /// Deprecated in macOS 15.0.
-    [Selector("tryNextResolvedEndpoint")] public void TryNextResolvedEndpoint();
+    [Selector("tryNextResolvedEndpoint")]
+    public void TryNextResolvedEndpoint();
     /// Deprecated in macOS 15.0.
-    [Selector("setReadHandler:maxDatagrams:")] public void SetReadHandlerMaxDatagrams(NWUDPSessionSetReadHandlerMaxDatagramsHandlerBlock handler, NSUInteger maxDatagrams);
+    [Selector("setReadHandler:maxDatagrams:")]
+    public void SetReadHandlerMaxDatagrams(NWUDPSessionSetReadHandlerMaxDatagramsHandlerBlock handler, NSUInteger maxDatagrams);
     /// Deprecated in macOS 15.0.
-    [Selector("writeMultipleDatagrams:completionHandler:")] public void WriteMultipleDatagramsCompletionHandler(NSArray datagramArray, NWUDPSessionWriteMultipleDatagramsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("writeMultipleDatagrams:completionHandler:")]
+    public void WriteMultipleDatagramsCompletionHandler(NSArray datagramArray, NWUDPSessionWriteMultipleDatagramsCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("writeDatagram:completionHandler:")] public void WriteDatagramCompletionHandler(NSData datagram, NWUDPSessionWriteDatagramCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("writeDatagram:completionHandler:")]
+    public void WriteDatagramCompletionHandler(NSData datagram, NWUDPSessionWriteDatagramCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("cancel")] public void Cancel();
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

@@ -34,7 +34,9 @@ public objc closure void GKGameActivityListenerPlayerWantsToPlayGameActivityComp
 /// macOS 26.0 and later.
 public objc interface GKGameActivityListener
 {
-    [Optional] [Selector("player:wantsToPlayGameActivity:completionHandler:")] void PlayerWantsToPlayGameActivityCompletionHandler(GKPlayer player, GKGameActivity activity, GKGameActivityListenerPlayerWantsToPlayGameActivityCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("player:wantsToPlayGameActivity:completionHandler:")]
+    void PlayerWantsToPlayGameActivityCompletionHandler(GKPlayer player, GKGameActivity activity, GKGameActivityListenerPlayerWantsToPlayGameActivityCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

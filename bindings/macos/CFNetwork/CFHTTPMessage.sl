@@ -60,25 +60,33 @@ public extern objc class CFHTTPMessageRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFHTTPMessageGetTypeID();
 
-[ReturnsRetained] public extern "C" CFHTTPMessageRef CFHTTPMessageCreateRequest(CFAllocatorRef? alloc, CFStringRef requestMethod, CFURLRef url, CFStringRef httpVersion);
+[ReturnsRetained]
+public extern "C" CFHTTPMessageRef CFHTTPMessageCreateRequest(CFAllocatorRef? alloc, CFStringRef requestMethod, CFURLRef url, CFStringRef httpVersion);
 
-[ReturnsRetained] public extern "C" CFHTTPMessageRef CFHTTPMessageCreateResponse(CFAllocatorRef? alloc, CFIndex statusCode, CFStringRef? statusDescription, CFStringRef httpVersion);
+[ReturnsRetained]
+public extern "C" CFHTTPMessageRef CFHTTPMessageCreateResponse(CFAllocatorRef? alloc, CFIndex statusCode, CFStringRef? statusDescription, CFStringRef httpVersion);
 
-[ReturnsRetained] public extern "C" CFHTTPMessageRef CFHTTPMessageCreateEmpty(CFAllocatorRef? alloc, Boolean isRequest);
+[ReturnsRetained]
+public extern "C" CFHTTPMessageRef CFHTTPMessageCreateEmpty(CFAllocatorRef? alloc, Boolean isRequest);
 
-[ReturnsRetained] public extern "C" CFHTTPMessageRef CFHTTPMessageCreateCopy(CFAllocatorRef? alloc, CFHTTPMessageRef message);
+[ReturnsRetained]
+public extern "C" CFHTTPMessageRef CFHTTPMessageCreateCopy(CFAllocatorRef? alloc, CFHTTPMessageRef message);
 
 public extern "C" Boolean CFHTTPMessageIsRequest(CFHTTPMessageRef message);
 
-[ReturnsRetained] public extern "C" CFStringRef CFHTTPMessageCopyVersion(CFHTTPMessageRef message);
+[ReturnsRetained]
+public extern "C" CFStringRef CFHTTPMessageCopyVersion(CFHTTPMessageRef message);
 
-[ReturnsRetained] public extern "C" CFDataRef? CFHTTPMessageCopyBody(CFHTTPMessageRef message);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFHTTPMessageCopyBody(CFHTTPMessageRef message);
 
 public extern "C" void CFHTTPMessageSetBody(CFHTTPMessageRef message, CFDataRef bodyData);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFHTTPMessageCopyHeaderFieldValue(CFHTTPMessageRef message, CFStringRef headerField);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFHTTPMessageCopyHeaderFieldValue(CFHTTPMessageRef message, CFStringRef headerField);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CFHTTPMessageCopyAllHeaderFields(CFHTTPMessageRef message);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CFHTTPMessageCopyAllHeaderFields(CFHTTPMessageRef message);
 
 public extern "C" void CFHTTPMessageSetHeaderFieldValue(CFHTTPMessageRef message, CFStringRef headerField, CFStringRef? value);
 
@@ -86,16 +94,20 @@ public extern "C" Boolean CFHTTPMessageAppendBytes(CFHTTPMessageRef message, UIn
 
 public extern "C" Boolean CFHTTPMessageIsHeaderComplete(CFHTTPMessageRef message);
 
-[ReturnsRetained] public extern "C" CFDataRef? CFHTTPMessageCopySerializedMessage(CFHTTPMessageRef message);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFHTTPMessageCopySerializedMessage(CFHTTPMessageRef message);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFHTTPMessageCopyRequestURL(CFHTTPMessageRef request);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFHTTPMessageCopyRequestURL(CFHTTPMessageRef request);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFHTTPMessageCopyRequestMethod(CFHTTPMessageRef request);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFHTTPMessageCopyRequestMethod(CFHTTPMessageRef request);
 
 public extern "C" Boolean CFHTTPMessageAddAuthentication(CFHTTPMessageRef request, CFHTTPMessageRef? authenticationFailureResponse, CFStringRef username, CFStringRef password, CFStringRef? authenticationScheme, Boolean forProxy);
 
 public extern "C" CFIndex CFHTTPMessageGetResponseStatusCode(CFHTTPMessageRef response);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFHTTPMessageCopyResponseStatusLine(CFHTTPMessageRef response);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFHTTPMessageCopyResponseStatusLine(CFHTTPMessageRef response);
 
 #endif

@@ -33,10 +33,14 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.12.
 public extern objc class PDFAnnotationLink : PDFAnnotation, NSCopying
 {
-    [Selector("destination")] public PDFDestination? Destination();
-    [Selector("setDestination:")] public void SetDestination(PDFDestination? destination);
-    [Selector("URL")] public NSURL? URL();
-    [Selector("setURL:")] public void SetURL(NSURL? url);
+    [Selector("destination")]
+    public PDFDestination? Destination();
+    [Selector("setDestination:")]
+    public void SetDestination(PDFDestination? destination);
+    [Selector("URL")]
+    public NSURL? URL();
+    [Selector("setURL:")]
+    public void SetURL(NSURL? url);
 }
 
 #endif

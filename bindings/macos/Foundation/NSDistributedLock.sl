@@ -32,12 +32,18 @@ import Standard.ObjC;
 
 public extern objc class NSDistributedLock : NSObject
 {
-    [Selector("lockDate")] public NSDate LockDate { get; }
-    [Selector("lockWithPath:")] public static NSDistributedLock? LockWithPath(NSString path);
-    [Selector("initWithPath:")] public Self? InitWithPath(NSString path);
-    [Selector("tryLock")] public bool TryLock();
-    [Selector("unlock")] public void Unlock();
-    [Selector("breakLock")] public void BreakLock();
+    [Selector("lockDate")]
+    public NSDate LockDate { get; }
+    [Selector("lockWithPath:")]
+    public static NSDistributedLock? LockWithPath(NSString path);
+    [Selector("initWithPath:")]
+    public Self? InitWithPath(NSString path);
+    [Selector("tryLock")]
+    public bool TryLock();
+    [Selector("unlock")]
+    public void Unlock();
+    [Selector("breakLock")]
+    public void BreakLock();
 }
 
 #endif

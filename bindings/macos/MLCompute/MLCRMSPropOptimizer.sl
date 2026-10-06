@@ -33,12 +33,18 @@ import Standard.ObjC;
 /// Deprecated in macOS 100000.
 public extern objc class MLCRMSPropOptimizer : MLCOptimizer, NSCopying
 {
-    [Selector("momentumScale")] public float MomentumScale { get; }
-    [Selector("alpha")] public float Alpha { get; }
-    [Selector("epsilon")] public float Epsilon { get; }
-    [Selector("isCentered")] public bool IsCentered { get; }
-    [Selector("optimizerWithDescriptor:")] public static Self OptimizerWithDescriptor(MLCOptimizerDescriptor optimizerDescriptor);
-    [Selector("optimizerWithDescriptor:momentumScale:alpha:epsilon:isCentered:")] public static Self OptimizerWithDescriptorMomentumScaleAlphaEpsilonIsCentered(MLCOptimizerDescriptor optimizerDescriptor, float momentumScale, float alpha, float epsilon, bool isCentered);
+    [Selector("momentumScale")]
+    public float MomentumScale { get; }
+    [Selector("alpha")]
+    public float Alpha { get; }
+    [Selector("epsilon")]
+    public float Epsilon { get; }
+    [Selector("isCentered")]
+    public bool IsCentered { get; }
+    [Selector("optimizerWithDescriptor:")]
+    public static Self OptimizerWithDescriptor(MLCOptimizerDescriptor optimizerDescriptor);
+    [Selector("optimizerWithDescriptor:momentumScale:alpha:epsilon:isCentered:")]
+    public static Self OptimizerWithDescriptorMomentumScaleAlphaEpsilonIsCentered(MLCOptimizerDescriptor optimizerDescriptor, float momentumScale, float alpha, float epsilon, bool isCentered);
 }
 
 #endif

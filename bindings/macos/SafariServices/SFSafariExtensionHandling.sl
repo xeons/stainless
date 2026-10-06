@@ -39,18 +39,42 @@ public objc closure void SFSafariExtensionHandlingAdditionalRequestHeadersForURL
 
 public objc interface SFSafariExtensionHandling : NSObjectProtocol
 {
-    [Optional] [Selector("messageReceivedWithName:fromPage:userInfo:")] void MessageReceivedWithNameFromPageUserInfo(NSString messageName, SFSafariPage page, NSDictionary? userInfo);
-    [Optional] [Selector("messageReceivedFromContainingAppWithName:userInfo:")] void MessageReceivedFromContainingAppWithNameUserInfo(NSString messageName, NSDictionary? userInfo);
-    [Optional] [Selector("toolbarItemClickedInWindow:")] void ToolbarItemClickedInWindow(SFSafariWindow window);
-    [Optional] [Selector("validateToolbarItemInWindow:validationHandler:")] void ValidateToolbarItemInWindowValidationHandler(SFSafariWindow window, SFSafariExtensionHandlingValidateToolbarItemInWindowValidationHandlerValidationHandlerBlock validationHandler);
-    [Optional] [Selector("contextMenuItemSelectedWithCommand:inPage:userInfo:")] void ContextMenuItemSelectedWithCommandInPageUserInfo(NSString command, SFSafariPage page, NSDictionary? userInfo);
-    [Optional] [Selector("validateContextMenuItemWithCommand:inPage:userInfo:validationHandler:")] void ValidateContextMenuItemWithCommandInPageUserInfoValidationHandler(NSString command, SFSafariPage page, NSDictionary? userInfo, SFSafariExtensionHandlingValidateContextMenuItemWithCommandInPageUserInfoValidationHandlerValidationHandlerBlock validationHandler);
-    [Optional] [Selector("popoverWillShowInWindow:")] void PopoverWillShowInWindow(SFSafariWindow window);
-    [Optional] [Selector("popoverDidCloseInWindow:")] void PopoverDidCloseInWindow(SFSafariWindow window);
-    [Optional] [Selector("popoverViewController")] SFSafariExtensionViewController PopoverViewController();
-    [Optional] [Selector("additionalRequestHeadersForURL:completionHandler:")] void AdditionalRequestHeadersForURLCompletionHandler(NSURL url, SFSafariExtensionHandlingAdditionalRequestHeadersForURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("contentBlockerWithIdentifier:blockedResourcesWithURLs:onPage:")] void ContentBlockerWithIdentifierBlockedResourcesWithURLsOnPage(NSString contentBlockerIdentifier, NSArray urls, SFSafariPage page);
-    [Optional] [Selector("page:willNavigateToURL:")] void PageWillNavigateToURL(SFSafariPage page, NSURL? url);
+    [Optional]
+    [Selector("messageReceivedWithName:fromPage:userInfo:")]
+    void MessageReceivedWithNameFromPageUserInfo(NSString messageName, SFSafariPage page, NSDictionary? userInfo);
+    [Optional]
+    [Selector("messageReceivedFromContainingAppWithName:userInfo:")]
+    void MessageReceivedFromContainingAppWithNameUserInfo(NSString messageName, NSDictionary? userInfo);
+    [Optional]
+    [Selector("toolbarItemClickedInWindow:")]
+    void ToolbarItemClickedInWindow(SFSafariWindow window);
+    [Optional]
+    [Selector("validateToolbarItemInWindow:validationHandler:")]
+    void ValidateToolbarItemInWindowValidationHandler(SFSafariWindow window, SFSafariExtensionHandlingValidateToolbarItemInWindowValidationHandlerValidationHandlerBlock validationHandler);
+    [Optional]
+    [Selector("contextMenuItemSelectedWithCommand:inPage:userInfo:")]
+    void ContextMenuItemSelectedWithCommandInPageUserInfo(NSString command, SFSafariPage page, NSDictionary? userInfo);
+    [Optional]
+    [Selector("validateContextMenuItemWithCommand:inPage:userInfo:validationHandler:")]
+    void ValidateContextMenuItemWithCommandInPageUserInfoValidationHandler(NSString command, SFSafariPage page, NSDictionary? userInfo, SFSafariExtensionHandlingValidateContextMenuItemWithCommandInPageUserInfoValidationHandlerValidationHandlerBlock validationHandler);
+    [Optional]
+    [Selector("popoverWillShowInWindow:")]
+    void PopoverWillShowInWindow(SFSafariWindow window);
+    [Optional]
+    [Selector("popoverDidCloseInWindow:")]
+    void PopoverDidCloseInWindow(SFSafariWindow window);
+    [Optional]
+    [Selector("popoverViewController")]
+    SFSafariExtensionViewController PopoverViewController();
+    [Optional]
+    [Selector("additionalRequestHeadersForURL:completionHandler:")]
+    void AdditionalRequestHeadersForURLCompletionHandler(NSURL url, SFSafariExtensionHandlingAdditionalRequestHeadersForURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("contentBlockerWithIdentifier:blockedResourcesWithURLs:onPage:")]
+    void ContentBlockerWithIdentifierBlockedResourcesWithURLsOnPage(NSString contentBlockerIdentifier, NSArray urls, SFSafariPage page);
+    [Optional]
+    [Selector("page:willNavigateToURL:")]
+    void PageWillNavigateToURL(SFSafariPage page, NSURL? url);
 }
 
 #endif

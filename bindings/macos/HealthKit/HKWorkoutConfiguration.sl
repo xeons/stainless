@@ -40,10 +40,14 @@ public enum HKWorkoutSessionLocationType : long
 
 public extern objc class HKWorkoutConfiguration : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("activityType", "setActivityType:")] public HKWorkoutActivityType ActivityType { get; set; }
-    [Selector("locationType", "setLocationType:")] public HKWorkoutSessionLocationType LocationType { get; set; }
-    [Selector("swimmingLocationType", "setSwimmingLocationType:")] public HKWorkoutSwimmingLocationType SwimmingLocationType { get; set; }
-    [Selector("lapLength", "setLapLength:")] public HKQuantity? LapLength { get; set; }
+    [Selector("activityType", "setActivityType:")]
+    public HKWorkoutActivityType ActivityType { get; set; }
+    [Selector("locationType", "setLocationType:")]
+    public HKWorkoutSessionLocationType LocationType { get; set; }
+    [Selector("swimmingLocationType", "setSwimmingLocationType:")]
+    public HKWorkoutSwimmingLocationType SwimmingLocationType { get; set; }
+    [Selector("lapLength", "setLapLength:")]
+    public HKQuantity? LapLength { get; set; }
 }
 
 #endif

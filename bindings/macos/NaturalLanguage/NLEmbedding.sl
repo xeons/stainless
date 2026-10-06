@@ -48,32 +48,58 @@ public objc closure void NLEmbeddingEnumerateNeighborsForVectorMaximumCountMaxim
 
 public extern objc class NLEmbedding : NSObject
 {
-    [Selector("dimension")] public NSUInteger Dimension { get; }
-    [Selector("vocabularySize")] public NSUInteger VocabularySize { get; }
-    [Selector("language")] public NLLanguage? Language { get; }
-    [Selector("revision")] public NSUInteger Revision { get; }
-    [Selector("wordEmbeddingForLanguage:")] public static NLEmbedding? WordEmbeddingForLanguage(NLLanguage language);
-    [Selector("wordEmbeddingForLanguage:revision:")] public static NLEmbedding? WordEmbeddingForLanguageRevision(NLLanguage language, NSUInteger revision);
-    [Selector("sentenceEmbeddingForLanguage:")] public static NLEmbedding? SentenceEmbeddingForLanguage(NLLanguage language);
-    [Selector("sentenceEmbeddingForLanguage:revision:")] public static NLEmbedding? SentenceEmbeddingForLanguageRevision(NLLanguage language, NSUInteger revision);
-    [Selector("embeddingWithContentsOfURL:error:")] public static Self? EmbeddingWithContentsOfURLError(NSURL url, out NSError? error);
-    [Selector("containsString:")] public bool ContainsString(NSString string);
-    [Selector("distanceBetweenString:andString:distanceType:")] public NLDistance DistanceBetweenStringAndStringDistanceType(NSString firstString, NSString secondString, NLDistanceType distanceType);
-    [Selector("enumerateNeighborsForString:maximumCount:distanceType:usingBlock:")] public void EnumerateNeighborsForStringMaximumCountDistanceTypeUsingBlock(NSString string, NSUInteger maxCount, NLDistanceType distanceType, NLEmbeddingEnumerateNeighborsForStringMaximumCountDistanceTypeUsingBlockBlock block);
-    [Selector("enumerateNeighborsForString:maximumCount:maximumDistance:distanceType:usingBlock:")] public void EnumerateNeighborsForStringMaximumCountMaximumDistanceDistanceTypeUsingBlock(NSString string, NSUInteger maxCount, NLDistance maxDistance, NLDistanceType distanceType, NLEmbeddingEnumerateNeighborsForStringMaximumCountMaximumDistanceDistanceTypeUsingBlockBlock block);
-    [Selector("neighborsForString:maximumCount:distanceType:")] public NSArray? NeighborsForStringMaximumCountDistanceType(NSString string, NSUInteger maxCount, NLDistanceType distanceType);
-    [Selector("neighborsForString:maximumCount:maximumDistance:distanceType:")] public NSArray? NeighborsForStringMaximumCountMaximumDistanceDistanceType(NSString string, NSUInteger maxCount, NLDistance maxDistance, NLDistanceType distanceType);
-    [Selector("vectorForString:")] public NSArray? VectorForString(NSString string);
-    [Selector("getVector:forString:")] public bool GetVectorForString(float* vector, NSString string);
-    [Selector("enumerateNeighborsForVector:maximumCount:distanceType:usingBlock:")] public void EnumerateNeighborsForVectorMaximumCountDistanceTypeUsingBlock(NSArray vector, NSUInteger maxCount, NLDistanceType distanceType, NLEmbeddingEnumerateNeighborsForVectorMaximumCountDistanceTypeUsingBlockBlock block);
-    [Selector("enumerateNeighborsForVector:maximumCount:maximumDistance:distanceType:usingBlock:")] public void EnumerateNeighborsForVectorMaximumCountMaximumDistanceDistanceTypeUsingBlock(NSArray vector, NSUInteger maxCount, NLDistance maxDistance, NLDistanceType distanceType, NLEmbeddingEnumerateNeighborsForVectorMaximumCountMaximumDistanceDistanceTypeUsingBlockBlock block);
-    [Selector("neighborsForVector:maximumCount:distanceType:")] public NSArray NeighborsForVectorMaximumCountDistanceType(NSArray vector, NSUInteger maxCount, NLDistanceType distanceType);
-    [Selector("neighborsForVector:maximumCount:maximumDistance:distanceType:")] public NSArray NeighborsForVectorMaximumCountMaximumDistanceDistanceType(NSArray vector, NSUInteger maxCount, NLDistance maxDistance, NLDistanceType distanceType);
-    [Selector("supportedRevisionsForLanguage:")] public static NSIndexSet SupportedRevisionsForLanguage(NLLanguage language);
-    [Selector("currentRevisionForLanguage:")] public static NSUInteger CurrentRevisionForLanguage(NLLanguage language);
-    [Selector("supportedSentenceEmbeddingRevisionsForLanguage:")] public static NSIndexSet SupportedSentenceEmbeddingRevisionsForLanguage(NLLanguage language);
-    [Selector("currentSentenceEmbeddingRevisionForLanguage:")] public static NSUInteger CurrentSentenceEmbeddingRevisionForLanguage(NLLanguage language);
-    [Selector("writeEmbeddingForDictionary:language:revision:toURL:error:")] public static bool WriteEmbeddingForDictionaryLanguageRevisionToURLError(NSDictionary dictionary, NLLanguage? language, NSUInteger revision, NSURL url, out NSError? error);
+    [Selector("dimension")]
+    public NSUInteger Dimension { get; }
+    [Selector("vocabularySize")]
+    public NSUInteger VocabularySize { get; }
+    [Selector("language")]
+    public NLLanguage? Language { get; }
+    [Selector("revision")]
+    public NSUInteger Revision { get; }
+    [Selector("wordEmbeddingForLanguage:")]
+    public static NLEmbedding? WordEmbeddingForLanguage(NLLanguage language);
+    [Selector("wordEmbeddingForLanguage:revision:")]
+    public static NLEmbedding? WordEmbeddingForLanguageRevision(NLLanguage language, NSUInteger revision);
+    [Selector("sentenceEmbeddingForLanguage:")]
+    public static NLEmbedding? SentenceEmbeddingForLanguage(NLLanguage language);
+    [Selector("sentenceEmbeddingForLanguage:revision:")]
+    public static NLEmbedding? SentenceEmbeddingForLanguageRevision(NLLanguage language, NSUInteger revision);
+    [Selector("embeddingWithContentsOfURL:error:")]
+    public static Self? EmbeddingWithContentsOfURLError(NSURL url, out NSError? error);
+    [Selector("containsString:")]
+    public bool ContainsString(NSString string);
+    [Selector("distanceBetweenString:andString:distanceType:")]
+    public NLDistance DistanceBetweenStringAndStringDistanceType(NSString firstString, NSString secondString, NLDistanceType distanceType);
+    [Selector("enumerateNeighborsForString:maximumCount:distanceType:usingBlock:")]
+    public void EnumerateNeighborsForStringMaximumCountDistanceTypeUsingBlock(NSString string, NSUInteger maxCount, NLDistanceType distanceType, NLEmbeddingEnumerateNeighborsForStringMaximumCountDistanceTypeUsingBlockBlock block);
+    [Selector("enumerateNeighborsForString:maximumCount:maximumDistance:distanceType:usingBlock:")]
+    public void EnumerateNeighborsForStringMaximumCountMaximumDistanceDistanceTypeUsingBlock(NSString string, NSUInteger maxCount, NLDistance maxDistance, NLDistanceType distanceType, NLEmbeddingEnumerateNeighborsForStringMaximumCountMaximumDistanceDistanceTypeUsingBlockBlock block);
+    [Selector("neighborsForString:maximumCount:distanceType:")]
+    public NSArray? NeighborsForStringMaximumCountDistanceType(NSString string, NSUInteger maxCount, NLDistanceType distanceType);
+    [Selector("neighborsForString:maximumCount:maximumDistance:distanceType:")]
+    public NSArray? NeighborsForStringMaximumCountMaximumDistanceDistanceType(NSString string, NSUInteger maxCount, NLDistance maxDistance, NLDistanceType distanceType);
+    [Selector("vectorForString:")]
+    public NSArray? VectorForString(NSString string);
+    [Selector("getVector:forString:")]
+    public bool GetVectorForString(float* vector, NSString string);
+    [Selector("enumerateNeighborsForVector:maximumCount:distanceType:usingBlock:")]
+    public void EnumerateNeighborsForVectorMaximumCountDistanceTypeUsingBlock(NSArray vector, NSUInteger maxCount, NLDistanceType distanceType, NLEmbeddingEnumerateNeighborsForVectorMaximumCountDistanceTypeUsingBlockBlock block);
+    [Selector("enumerateNeighborsForVector:maximumCount:maximumDistance:distanceType:usingBlock:")]
+    public void EnumerateNeighborsForVectorMaximumCountMaximumDistanceDistanceTypeUsingBlock(NSArray vector, NSUInteger maxCount, NLDistance maxDistance, NLDistanceType distanceType, NLEmbeddingEnumerateNeighborsForVectorMaximumCountMaximumDistanceDistanceTypeUsingBlockBlock block);
+    [Selector("neighborsForVector:maximumCount:distanceType:")]
+    public NSArray NeighborsForVectorMaximumCountDistanceType(NSArray vector, NSUInteger maxCount, NLDistanceType distanceType);
+    [Selector("neighborsForVector:maximumCount:maximumDistance:distanceType:")]
+    public NSArray NeighborsForVectorMaximumCountMaximumDistanceDistanceType(NSArray vector, NSUInteger maxCount, NLDistance maxDistance, NLDistanceType distanceType);
+    [Selector("supportedRevisionsForLanguage:")]
+    public static NSIndexSet SupportedRevisionsForLanguage(NLLanguage language);
+    [Selector("currentRevisionForLanguage:")]
+    public static NSUInteger CurrentRevisionForLanguage(NLLanguage language);
+    [Selector("supportedSentenceEmbeddingRevisionsForLanguage:")]
+    public static NSIndexSet SupportedSentenceEmbeddingRevisionsForLanguage(NLLanguage language);
+    [Selector("currentSentenceEmbeddingRevisionForLanguage:")]
+    public static NSUInteger CurrentSentenceEmbeddingRevisionForLanguage(NLLanguage language);
+    [Selector("writeEmbeddingForDictionary:language:revision:toURL:error:")]
+    public static bool WriteEmbeddingForDictionaryLanguageRevisionToURLError(NSDictionary dictionary, NLLanguage? language, NSUInteger revision, NSURL url, out NSError? error);
 }
 
 #endif

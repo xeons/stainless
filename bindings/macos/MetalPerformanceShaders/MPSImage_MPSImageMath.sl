@@ -32,33 +32,44 @@ import Standard.ObjC;
 
 public extern objc class MPSImageArithmetic : MPSBinaryImageKernel
 {
-    [Selector("primaryScale", "setPrimaryScale:")] public float PrimaryScale { get; set; }
-    [Selector("secondaryScale", "setSecondaryScale:")] public float SecondaryScale { get; set; }
-    [Selector("bias", "setBias:")] public float Bias { get; set; }
-    [Selector("primaryStrideInPixels", "setPrimaryStrideInPixels:")] public MTLSize PrimaryStrideInPixels { get; set; }
-    [Selector("secondaryStrideInPixels", "setSecondaryStrideInPixels:")] public MTLSize SecondaryStrideInPixels { get; set; }
-    [Selector("minimumValue", "setMinimumValue:")] public float MinimumValue { get; set; }
-    [Selector("maximumValue", "setMaximumValue:")] public float MaximumValue { get; set; }
+    [Selector("primaryScale", "setPrimaryScale:")]
+    public float PrimaryScale { get; set; }
+    [Selector("secondaryScale", "setSecondaryScale:")]
+    public float SecondaryScale { get; set; }
+    [Selector("bias", "setBias:")]
+    public float Bias { get; set; }
+    [Selector("primaryStrideInPixels", "setPrimaryStrideInPixels:")]
+    public MTLSize PrimaryStrideInPixels { get; set; }
+    [Selector("secondaryStrideInPixels", "setSecondaryStrideInPixels:")]
+    public MTLSize SecondaryStrideInPixels { get; set; }
+    [Selector("minimumValue", "setMinimumValue:")]
+    public float MinimumValue { get; set; }
+    [Selector("maximumValue", "setMaximumValue:")]
+    public float MaximumValue { get; set; }
 }
 
 public extern objc class MPSImageAdd : MPSImageArithmetic
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSImageSubtract : MPSImageArithmetic
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSImageMultiply : MPSImageArithmetic
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSImageDivide : MPSImageArithmetic
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 #endif

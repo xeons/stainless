@@ -51,35 +51,57 @@ public enum VTMotionBlurParametersSubmissionMode : long
 /// macOS 15.4 and later.
 public extern objc class VTMotionBlurConfiguration : NSObject, VTFrameProcessorConfiguration
 {
-    [Selector("frameWidth")] public NSInteger FrameWidth { get; }
-    [Selector("frameHeight")] public NSInteger FrameHeight { get; }
-    [Selector("usePrecomputedFlow")] public bool UsePrecomputedFlow { get; }
-    [Selector("qualityPrioritization")] public VTMotionBlurConfigurationQualityPrioritization QualityPrioritization { get; }
-    [Selector("revision")] public VTMotionBlurConfigurationRevision Revision { get; }
-    [Selector("supportedRevisions")] public static NSIndexSet SupportedRevisions { get; }
-    [Selector("defaultRevision")] public static VTMotionBlurConfigurationRevision DefaultRevision { get; }
-    [Selector("frameSupportedPixelFormats")] public NSArray? FrameSupportedPixelFormats { get; }
-    [Selector("sourcePixelBufferAttributes")] public NSDictionary SourcePixelBufferAttributes { get; }
-    [Selector("destinationPixelBufferAttributes")] public NSDictionary DestinationPixelBufferAttributes { get; }
-    [Selector("isSupported")] public static bool Supported { get; }
+    [Selector("frameWidth")]
+    public NSInteger FrameWidth { get; }
+    [Selector("frameHeight")]
+    public NSInteger FrameHeight { get; }
+    [Selector("usePrecomputedFlow")]
+    public bool UsePrecomputedFlow { get; }
+    [Selector("qualityPrioritization")]
+    public VTMotionBlurConfigurationQualityPrioritization QualityPrioritization { get; }
+    [Selector("revision")]
+    public VTMotionBlurConfigurationRevision Revision { get; }
+    [Selector("supportedRevisions")]
+    public static NSIndexSet SupportedRevisions { get; }
+    [Selector("defaultRevision")]
+    public static VTMotionBlurConfigurationRevision DefaultRevision { get; }
+    [Selector("frameSupportedPixelFormats")]
+    public NSArray? FrameSupportedPixelFormats { get; }
+    [Selector("sourcePixelBufferAttributes")]
+    public NSDictionary SourcePixelBufferAttributes { get; }
+    [Selector("destinationPixelBufferAttributes")]
+    public NSDictionary DestinationPixelBufferAttributes { get; }
+    [Selector("isSupported")]
+    public static bool Supported { get; }
     /// macOS 15.4 and later.
     /// Deprecated in macOS 26.0.
-    [Selector("processorSupported")] public static Boolean ProcessorSupported { get; }
-    [Selector("initWithFrameWidth:frameHeight:usePrecomputedFlow:qualityPrioritization:revision:")] public Self? InitWithFrameWidthFrameHeightUsePrecomputedFlowQualityPrioritizationRevision(NSInteger frameWidth, NSInteger frameHeight, bool usePrecomputedFlow, VTMotionBlurConfigurationQualityPrioritization qualityPrioritization, VTMotionBlurConfigurationRevision revision);
+    [Selector("processorSupported")]
+    public static Boolean ProcessorSupported { get; }
+    [Selector("initWithFrameWidth:frameHeight:usePrecomputedFlow:qualityPrioritization:revision:")]
+    public Self? InitWithFrameWidthFrameHeightUsePrecomputedFlowQualityPrioritizationRevision(NSInteger frameWidth, NSInteger frameHeight, bool usePrecomputedFlow, VTMotionBlurConfigurationQualityPrioritization qualityPrioritization, VTMotionBlurConfigurationRevision revision);
 }
 
 /// macOS 15.4 and later.
 public extern objc class VTMotionBlurParameters : NSObject, VTFrameProcessorParameters
 {
-    [Selector("sourceFrame")] public VTFrameProcessorFrame SourceFrame { get; }
-    [Selector("nextFrame")] public VTFrameProcessorFrame? NextFrame { get; }
-    [Selector("previousFrame")] public VTFrameProcessorFrame? PreviousFrame { get; }
-    [Selector("nextOpticalFlow")] public VTFrameProcessorOpticalFlow? NextOpticalFlow { get; }
-    [Selector("previousOpticalFlow")] public VTFrameProcessorOpticalFlow? PreviousOpticalFlow { get; }
-    [Selector("motionBlurStrength")] public NSInteger MotionBlurStrength { get; }
-    [Selector("submissionMode")] public VTMotionBlurParametersSubmissionMode SubmissionMode { get; }
-    [Selector("destinationFrame")] public VTFrameProcessorFrame DestinationFrame { get; }
-    [Selector("initWithSourceFrame:nextFrame:previousFrame:nextOpticalFlow:previousOpticalFlow:motionBlurStrength:submissionMode:destinationFrame:")] public Self? InitWithSourceFrameNextFramePreviousFrameNextOpticalFlowPreviousOpticalFlowMotionBlurStrengthSubmissionModeDestinationFrame(VTFrameProcessorFrame sourceFrame, VTFrameProcessorFrame? nextFrame, VTFrameProcessorFrame? previousFrame, VTFrameProcessorOpticalFlow? nextOpticalFlow, VTFrameProcessorOpticalFlow? previousOpticalFlow, NSInteger motionBlurStrength, VTMotionBlurParametersSubmissionMode submissionMode, VTFrameProcessorFrame destinationFrame);
+    [Selector("sourceFrame")]
+    public VTFrameProcessorFrame SourceFrame { get; }
+    [Selector("nextFrame")]
+    public VTFrameProcessorFrame? NextFrame { get; }
+    [Selector("previousFrame")]
+    public VTFrameProcessorFrame? PreviousFrame { get; }
+    [Selector("nextOpticalFlow")]
+    public VTFrameProcessorOpticalFlow? NextOpticalFlow { get; }
+    [Selector("previousOpticalFlow")]
+    public VTFrameProcessorOpticalFlow? PreviousOpticalFlow { get; }
+    [Selector("motionBlurStrength")]
+    public NSInteger MotionBlurStrength { get; }
+    [Selector("submissionMode")]
+    public VTMotionBlurParametersSubmissionMode SubmissionMode { get; }
+    [Selector("destinationFrame")]
+    public VTFrameProcessorFrame DestinationFrame { get; }
+    [Selector("initWithSourceFrame:nextFrame:previousFrame:nextOpticalFlow:previousOpticalFlow:motionBlurStrength:submissionMode:destinationFrame:")]
+    public Self? InitWithSourceFrameNextFramePreviousFrameNextOpticalFlowPreviousOpticalFlowMotionBlurStrengthSubmissionModeDestinationFrame(VTFrameProcessorFrame sourceFrame, VTFrameProcessorFrame? nextFrame, VTFrameProcessorFrame? previousFrame, VTFrameProcessorOpticalFlow? nextOpticalFlow, VTFrameProcessorOpticalFlow? previousOpticalFlow, NSInteger motionBlurStrength, VTMotionBlurParametersSubmissionMode submissionMode, VTFrameProcessorFrame destinationFrame);
 }
 
 #endif

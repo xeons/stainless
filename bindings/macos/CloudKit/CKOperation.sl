@@ -37,36 +37,52 @@ public objc closure void CKOperationLongLivedOperationWasPersistedBlock();
 
 public extern objc class CKOperation : NSOperation
 {
-    [Selector("configuration", "setConfiguration:")] public CKOperationConfiguration? Configuration { get; set; }
-    [Selector("group", "setGroup:")] public CKOperationGroup? Group { get; set; }
-    [Selector("operationID")] public CKOperationID OperationID { get; }
-    [Selector("longLivedOperationWasPersistedBlock", "setLongLivedOperationWasPersistedBlock:")] public CKOperationLongLivedOperationWasPersistedBlock? LongLivedOperationWasPersistedBlock { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("configuration", "setConfiguration:")]
+    public CKOperationConfiguration? Configuration { get; set; }
+    [Selector("group", "setGroup:")]
+    public CKOperationGroup? Group { get; set; }
+    [Selector("operationID")]
+    public CKOperationID OperationID { get; }
+    [Selector("longLivedOperationWasPersistedBlock", "setLongLivedOperationWasPersistedBlock:")]
+    public CKOperationLongLivedOperationWasPersistedBlock? LongLivedOperationWasPersistedBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 public extern objc class CKOperationConfiguration : NSObject
 {
-    [Selector("container", "setContainer:")] public CKContainer? Container { get; set; }
-    [Selector("qualityOfService", "setQualityOfService:")] public NSQualityOfService QualityOfService { get; set; }
-    [Selector("allowsCellularAccess", "setAllowsCellularAccess:")] public bool AllowsCellularAccess { get; set; }
-    [Selector("isLongLived", "setLongLived:")] public bool LongLived { get; set; }
-    [Selector("timeoutIntervalForRequest", "setTimeoutIntervalForRequest:")] public NSTimeInterval TimeoutIntervalForRequest { get; set; }
-    [Selector("timeoutIntervalForResource", "setTimeoutIntervalForResource:")] public NSTimeInterval TimeoutIntervalForResource { get; set; }
+    [Selector("container", "setContainer:")]
+    public CKContainer? Container { get; set; }
+    [Selector("qualityOfService", "setQualityOfService:")]
+    public NSQualityOfService QualityOfService { get; set; }
+    [Selector("allowsCellularAccess", "setAllowsCellularAccess:")]
+    public bool AllowsCellularAccess { get; set; }
+    [Selector("isLongLived", "setLongLived:")]
+    public bool LongLived { get; set; }
+    [Selector("timeoutIntervalForRequest", "setTimeoutIntervalForRequest:")]
+    public NSTimeInterval TimeoutIntervalForRequest { get; set; }
+    [Selector("timeoutIntervalForResource", "setTimeoutIntervalForResource:")]
+    public NSTimeInterval TimeoutIntervalForResource { get; set; }
 }
 
 /// CKOperationDeprecated, a category of CKOperation.
 public extern objc class CKOperation
 {
     /// Deprecated in macOS 10.13.
-    [Selector("container", "setContainer:")] public CKContainer? Container { get; set; }
+    [Selector("container", "setContainer:")]
+    public CKContainer? Container { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("allowsCellularAccess", "setAllowsCellularAccess:")] public bool AllowsCellularAccess { get; set; }
+    [Selector("allowsCellularAccess", "setAllowsCellularAccess:")]
+    public bool AllowsCellularAccess { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("isLongLived", "setLongLived:")] public bool LongLived { get; set; }
+    [Selector("isLongLived", "setLongLived:")]
+    public bool LongLived { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("timeoutIntervalForRequest", "setTimeoutIntervalForRequest:")] public NSTimeInterval TimeoutIntervalForRequest { get; set; }
+    [Selector("timeoutIntervalForRequest", "setTimeoutIntervalForRequest:")]
+    public NSTimeInterval TimeoutIntervalForRequest { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("timeoutIntervalForResource", "setTimeoutIntervalForResource:")] public NSTimeInterval TimeoutIntervalForResource { get; set; }
+    [Selector("timeoutIntervalForResource", "setTimeoutIntervalForResource:")]
+    public NSTimeInterval TimeoutIntervalForResource { get; set; }
 }
 
 #endif

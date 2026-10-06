@@ -55,14 +55,22 @@ public enum SWAttributionViewBackgroundStyle : long
 
 public extern objc class SWAttributionView : NSView
 {
-    [Selector("highlight", "setHighlight:")] public SWHighlight? Highlight { get; set; }
-    [Selector("displayContext", "setDisplayContext:")] public SWAttributionViewDisplayContext DisplayContext { get; set; }
-    [Selector("horizontalAlignment", "setHorizontalAlignment:")] public SWAttributionViewHorizontalAlignment HorizontalAlignment { get; set; }
-    [Selector("backgroundStyle", "setBackgroundStyle:")] public SWAttributionViewBackgroundStyle BackgroundStyle { get; set; }
-    [Selector("preferredMaxLayoutWidth", "setPreferredMaxLayoutWidth:")] public CGFloat PreferredMaxLayoutWidth { get; set; }
-    [Selector("highlightMenu")] public NSMenu HighlightMenu { get; }
-    [Selector("menuTitleForHideAction", "setMenuTitleForHideAction:")] public NSString? MenuTitleForHideAction { get; set; }
-    [Selector("supplementalMenu", "setSupplementalMenu:")] public NSMenuItem? SupplementalMenu { get; set; }
+    [Selector("highlight", "setHighlight:")]
+    public SWHighlight? Highlight { get; set; }
+    [Selector("displayContext", "setDisplayContext:")]
+    public SWAttributionViewDisplayContext DisplayContext { get; set; }
+    [Selector("horizontalAlignment", "setHorizontalAlignment:")]
+    public SWAttributionViewHorizontalAlignment HorizontalAlignment { get; set; }
+    [Selector("backgroundStyle", "setBackgroundStyle:")]
+    public SWAttributionViewBackgroundStyle BackgroundStyle { get; set; }
+    [Selector("preferredMaxLayoutWidth", "setPreferredMaxLayoutWidth:")]
+    public CGFloat PreferredMaxLayoutWidth { get; set; }
+    [Selector("highlightMenu")]
+    public NSMenu HighlightMenu { get; }
+    [Selector("menuTitleForHideAction", "setMenuTitleForHideAction:")]
+    public NSString? MenuTitleForHideAction { get; set; }
+    [Selector("supplementalMenu", "setSupplementalMenu:")]
+    public NSMenuItem? SupplementalMenu { get; set; }
 }
 
 #endif

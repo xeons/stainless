@@ -47,33 +47,48 @@ public objc interface MTLFunctionStitchingNode : NSObjectProtocol, NSCopying { }
 
 public extern objc class MTLFunctionStitchingInputNode : NSObject, MTLFunctionStitchingNode
 {
-    [Selector("argumentIndex", "setArgumentIndex:")] public NSUInteger ArgumentIndex { get; set; }
-    [Selector("initWithArgumentIndex:")] public Self InitWithArgumentIndex(NSUInteger argument);
+    [Selector("argumentIndex", "setArgumentIndex:")]
+    public NSUInteger ArgumentIndex { get; set; }
+    [Selector("initWithArgumentIndex:")]
+    public Self InitWithArgumentIndex(NSUInteger argument);
 }
 
 public extern objc class MTLFunctionStitchingFunctionNode : NSObject, MTLFunctionStitchingNode
 {
-    [Selector("name", "setName:")] public NSString Name { get; set; }
-    [Selector("arguments", "setArguments:")] public NSArray Arguments { get; set; }
-    [Selector("controlDependencies", "setControlDependencies:")] public NSArray ControlDependencies { get; set; }
-    [Selector("initWithName:arguments:controlDependencies:")] public Self InitWithNameArgumentsControlDependencies(NSString name, NSArray arguments, NSArray controlDependencies);
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
+    [Selector("arguments", "setArguments:")]
+    public NSArray Arguments { get; set; }
+    [Selector("controlDependencies", "setControlDependencies:")]
+    public NSArray ControlDependencies { get; set; }
+    [Selector("initWithName:arguments:controlDependencies:")]
+    public Self InitWithNameArgumentsControlDependencies(NSString name, NSArray arguments, NSArray controlDependencies);
 }
 
 public extern objc class MTLFunctionStitchingGraph : NSObject, NSCopying
 {
-    [Selector("functionName", "setFunctionName:")] public NSString FunctionName { get; set; }
-    [Selector("nodes", "setNodes:")] public NSArray Nodes { get; set; }
-    [Selector("outputNode", "setOutputNode:")] public MTLFunctionStitchingFunctionNode? OutputNode { get; set; }
-    [Selector("attributes", "setAttributes:")] public NSArray Attributes { get; set; }
-    [Selector("initWithFunctionName:nodes:outputNode:attributes:")] public Self InitWithFunctionNameNodesOutputNodeAttributes(NSString functionName, NSArray nodes, MTLFunctionStitchingFunctionNode? outputNode, NSArray attributes);
+    [Selector("functionName", "setFunctionName:")]
+    public NSString FunctionName { get; set; }
+    [Selector("nodes", "setNodes:")]
+    public NSArray Nodes { get; set; }
+    [Selector("outputNode", "setOutputNode:")]
+    public MTLFunctionStitchingFunctionNode? OutputNode { get; set; }
+    [Selector("attributes", "setAttributes:")]
+    public NSArray Attributes { get; set; }
+    [Selector("initWithFunctionName:nodes:outputNode:attributes:")]
+    public Self InitWithFunctionNameNodesOutputNodeAttributes(NSString functionName, NSArray nodes, MTLFunctionStitchingFunctionNode? outputNode, NSArray attributes);
 }
 
 public extern objc class MTLStitchedLibraryDescriptor : NSObject, NSCopying
 {
-    [Selector("functionGraphs", "setFunctionGraphs:")] public NSArray FunctionGraphs { get; set; }
-    [Selector("functions", "setFunctions:")] public NSArray Functions { get; set; }
-    [Selector("binaryArchives", "setBinaryArchives:")] public NSArray BinaryArchives { get; set; }
-    [Selector("options", "setOptions:")] public MTLStitchedLibraryOptions Options { get; set; }
+    [Selector("functionGraphs", "setFunctionGraphs:")]
+    public NSArray FunctionGraphs { get; set; }
+    [Selector("functions", "setFunctions:")]
+    public NSArray Functions { get; set; }
+    [Selector("binaryArchives", "setBinaryArchives:")]
+    public NSArray BinaryArchives { get; set; }
+    [Selector("options", "setOptions:")]
+    public MTLStitchedLibraryOptions Options { get; set; }
 }
 
 #endif

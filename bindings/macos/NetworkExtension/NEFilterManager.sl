@@ -59,15 +59,24 @@ public objc closure void NEFilterManagerSaveToPreferencesWithCompletionHandlerCo
 
 public extern objc class NEFilterManager : NSObject
 {
-    [Selector("localizedDescription", "setLocalizedDescription:")] public NSString? LocalizedDescription { get; set; }
-    [Selector("providerConfiguration", "setProviderConfiguration:")] public NEFilterProviderConfiguration? ProviderConfiguration { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("grade", "setGrade:")] public NEFilterManagerGrade Grade { get; set; }
-    [Selector("disableEncryptedDNSSettings", "setDisableEncryptedDNSSettings:")] public bool DisableEncryptedDNSSettings { get; set; }
-    [Selector("sharedManager")] public static NEFilterManager SharedManager();
-    [Selector("loadFromPreferencesWithCompletionHandler:")] public void LoadFromPreferencesWithCompletionHandler(NEFilterManagerLoadFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removeFromPreferencesWithCompletionHandler:")] public void RemoveFromPreferencesWithCompletionHandler(NEFilterManagerRemoveFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("saveToPreferencesWithCompletionHandler:")] public void SaveToPreferencesWithCompletionHandler(NEFilterManagerSaveToPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("localizedDescription", "setLocalizedDescription:")]
+    public NSString? LocalizedDescription { get; set; }
+    [Selector("providerConfiguration", "setProviderConfiguration:")]
+    public NEFilterProviderConfiguration? ProviderConfiguration { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("grade", "setGrade:")]
+    public NEFilterManagerGrade Grade { get; set; }
+    [Selector("disableEncryptedDNSSettings", "setDisableEncryptedDNSSettings:")]
+    public bool DisableEncryptedDNSSettings { get; set; }
+    [Selector("sharedManager")]
+    public static NEFilterManager SharedManager();
+    [Selector("loadFromPreferencesWithCompletionHandler:")]
+    public void LoadFromPreferencesWithCompletionHandler(NEFilterManagerLoadFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removeFromPreferencesWithCompletionHandler:")]
+    public void RemoveFromPreferencesWithCompletionHandler(NEFilterManagerRemoveFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("saveToPreferencesWithCompletionHandler:")]
+    public void SaveToPreferencesWithCompletionHandler(NEFilterManagerSaveToPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

@@ -54,8 +54,10 @@ public extern "C" float GCHapticDurationInfinite;
 
 public extern objc class GCDeviceHaptics : NSObject
 {
-    [Selector("supportedLocalities")] public NSSet SupportedLocalities { get; }
-    [Selector("createEngineWithLocality:")] public CHHapticEngine? CreateEngineWithLocality(GCHapticsLocality locality);
+    [Selector("supportedLocalities")]
+    public NSSet SupportedLocalities { get; }
+    [Selector("createEngineWithLocality:")]
+    public CHHapticEngine? CreateEngineWithLocality(GCHapticsLocality locality);
 }
 
 #endif

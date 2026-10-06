@@ -49,6 +49,7 @@ public enum SecAccessControlCreateFlags : ulong
     ApplicationPassword = 2147483648u,
 }
 
-[ReturnsRetained] public extern "C" SecAccessControlRef? SecAccessControlCreateWithFlags(CFAllocatorRef? allocator, CFTypeRef protection, SecAccessControlCreateFlags flags, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecAccessControlRef? SecAccessControlCreateWithFlags(CFAllocatorRef? allocator, CFTypeRef protection, SecAccessControlCreateFlags flags, __CFError** error);
 
 #endif

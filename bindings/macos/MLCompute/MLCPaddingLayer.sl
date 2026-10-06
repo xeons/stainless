@@ -34,16 +34,26 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCPaddingLayer : MLCLayer, NSCopying
 {
-    [Selector("paddingType")] public MLCPaddingType PaddingType { get; }
-    [Selector("paddingLeft")] public NSUInteger PaddingLeft { get; }
-    [Selector("paddingRight")] public NSUInteger PaddingRight { get; }
-    [Selector("paddingTop")] public NSUInteger PaddingTop { get; }
-    [Selector("paddingBottom")] public NSUInteger PaddingBottom { get; }
-    [Selector("constantValue")] public float ConstantValue { get; }
-    [Selector("layerWithReflectionPadding:")] public static Self LayerWithReflectionPadding(NSArray padding);
-    [Selector("layerWithSymmetricPadding:")] public static Self LayerWithSymmetricPadding(NSArray padding);
-    [Selector("layerWithZeroPadding:")] public static Self LayerWithZeroPadding(NSArray padding);
-    [Selector("layerWithConstantPadding:constantValue:")] public static Self LayerWithConstantPaddingConstantValue(NSArray padding, float constantValue);
+    [Selector("paddingType")]
+    public MLCPaddingType PaddingType { get; }
+    [Selector("paddingLeft")]
+    public NSUInteger PaddingLeft { get; }
+    [Selector("paddingRight")]
+    public NSUInteger PaddingRight { get; }
+    [Selector("paddingTop")]
+    public NSUInteger PaddingTop { get; }
+    [Selector("paddingBottom")]
+    public NSUInteger PaddingBottom { get; }
+    [Selector("constantValue")]
+    public float ConstantValue { get; }
+    [Selector("layerWithReflectionPadding:")]
+    public static Self LayerWithReflectionPadding(NSArray padding);
+    [Selector("layerWithSymmetricPadding:")]
+    public static Self LayerWithSymmetricPadding(NSArray padding);
+    [Selector("layerWithZeroPadding:")]
+    public static Self LayerWithZeroPadding(NSArray padding);
+    [Selector("layerWithConstantPadding:constantValue:")]
+    public static Self LayerWithConstantPaddingConstantValue(NSArray padding, float constantValue);
 }
 
 #endif

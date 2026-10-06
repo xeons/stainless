@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class NSNull : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("null")] public static NSNull Null();
+    [Selector("null")]
+    public static NSNull Null();
 }
 
 #endif

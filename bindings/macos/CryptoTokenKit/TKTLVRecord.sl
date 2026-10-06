@@ -35,28 +35,38 @@ public using TKTLVTag = UInt64;
 
 public extern objc class TKTLVRecord : NSObject
 {
-    [Selector("tag")] public TKTLVTag Tag { get; }
-    [Selector("value")] public NSData Value { get; }
-    [Selector("data")] public NSData Data { get; }
-    [Selector("recordFromData:")] public static Self? RecordFromData(NSData data);
-    [Selector("sequenceOfRecordsFromData:")] public static NSArray? SequenceOfRecordsFromData(NSData data);
+    [Selector("tag")]
+    public TKTLVTag Tag { get; }
+    [Selector("value")]
+    public NSData Value { get; }
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("recordFromData:")]
+    public static Self? RecordFromData(NSData data);
+    [Selector("sequenceOfRecordsFromData:")]
+    public static NSArray? SequenceOfRecordsFromData(NSData data);
 }
 
 public extern objc class TKBERTLVRecord : TKTLVRecord
 {
-    [Selector("dataForTag:")] public static NSData DataForTag(TKTLVTag tag);
-    [Selector("initWithTag:value:")] public Self InitWithTagValue(TKTLVTag tag, NSData value);
-    [Selector("initWithTag:records:")] public Self InitWithTagRecords(TKTLVTag tag, NSArray records);
+    [Selector("dataForTag:")]
+    public static NSData DataForTag(TKTLVTag tag);
+    [Selector("initWithTag:value:")]
+    public Self InitWithTagValue(TKTLVTag tag, NSData value);
+    [Selector("initWithTag:records:")]
+    public Self InitWithTagRecords(TKTLVTag tag, NSArray records);
 }
 
 public extern objc class TKSimpleTLVRecord : TKTLVRecord
 {
-    [Selector("initWithTag:value:")] public Self InitWithTagValue(UInt8 tag, NSData value);
+    [Selector("initWithTag:value:")]
+    public Self InitWithTagValue(UInt8 tag, NSData value);
 }
 
 public extern objc class TKCompactTLVRecord : TKTLVRecord
 {
-    [Selector("initWithTag:value:")] public Self InitWithTagValue(UInt8 tag, NSData value);
+    [Selector("initWithTag:value:")]
+    public Self InitWithTagValue(UInt8 tag, NSData value);
 }
 
 #endif

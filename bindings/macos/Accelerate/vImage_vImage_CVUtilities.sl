@@ -36,11 +36,14 @@ public extern "C" vImage_Error vImageBuffer_InitWithCVPixelBuffer(vImage_Buffer*
 
 public extern "C" vImage_Error vImageBuffer_CopyToCVPixelBuffer(vImage_Buffer* buffer, vImage_CGImageFormat* bufferFormat, CVPixelBufferRef? cvPixelBuffer, vImageCVImageFormatRef? cvImageFormat, CGFloat* backgroundColor, vImage_Flags flags);
 
-[ReturnsRetained] public extern "C" vImageCVImageFormatRef? vImageCVImageFormat_CreateWithCVPixelBuffer(CVPixelBufferRef? buffer);
+[ReturnsRetained]
+public extern "C" vImageCVImageFormatRef? vImageCVImageFormat_CreateWithCVPixelBuffer(CVPixelBufferRef? buffer);
 
-[ReturnsRetained] public extern "C" vImageCVImageFormatRef? vImageCVImageFormat_Create(uint imageFormatType, vImage_ARGBToYpCbCrMatrix* matrix, CFStringRef? cvImageBufferChromaLocation, CGColorSpaceRef? baseColorspace, int alphaIsOneHint);
+[ReturnsRetained]
+public extern "C" vImageCVImageFormatRef? vImageCVImageFormat_Create(uint imageFormatType, vImage_ARGBToYpCbCrMatrix* matrix, CFStringRef? cvImageBufferChromaLocation, CGColorSpaceRef? baseColorspace, int alphaIsOneHint);
 
-[ReturnsRetained] public extern "C" vImageCVImageFormatRef? vImageCVImageFormat_Copy(vImageConstCVImageFormatRef? format);
+[ReturnsRetained]
+public extern "C" vImageCVImageFormatRef? vImageCVImageFormat_Copy(vImageConstCVImageFormatRef? format);
 
 public using vImageCVImageFormatError = nint;
 
@@ -120,7 +123,8 @@ public struct vImageRGBPrimaries
     public float white_y;
 }
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? vImageCreateRGBColorSpaceWithPrimariesAndTransferFunction(vImageRGBPrimaries* primaries, vImageTransferFunction* tf, CGColorRenderingIntent intent, vImage_Flags flags, vImage_Error* error);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? vImageCreateRGBColorSpaceWithPrimariesAndTransferFunction(vImageRGBPrimaries* primaries, vImageTransferFunction* tf, CGColorRenderingIntent intent, vImage_Flags flags, vImage_Error* error);
 
 public struct vImageWhitePoint
 {
@@ -128,11 +132,14 @@ public struct vImageWhitePoint
     public float white_y;
 }
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? vImageCreateMonochromeColorSpaceWithWhitePointAndTransferFunction(vImageWhitePoint* whitePoint, vImageTransferFunction* tf, CGColorRenderingIntent intent, vImage_Flags flags, vImage_Error* error);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? vImageCreateMonochromeColorSpaceWithWhitePointAndTransferFunction(vImageWhitePoint* whitePoint, vImageTransferFunction* tf, CGColorRenderingIntent intent, vImage_Flags flags, vImage_Error* error);
 
-[ReturnsRetained] public extern "C" vImageConverterRef? vImageConverter_CreateForCGToCVImageFormat(vImage_CGImageFormat* srcFormat, vImageCVImageFormatRef? destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
+[ReturnsRetained]
+public extern "C" vImageConverterRef? vImageConverter_CreateForCGToCVImageFormat(vImage_CGImageFormat* srcFormat, vImageCVImageFormatRef? destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
 
-[ReturnsRetained] public extern "C" vImageConverterRef? vImageConverter_CreateForCVToCGImageFormat(vImageCVImageFormatRef? srcFormat, vImage_CGImageFormat* destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
+[ReturnsRetained]
+public extern "C" vImageConverterRef? vImageConverter_CreateForCVToCGImageFormat(vImageCVImageFormatRef? srcFormat, vImage_CGImageFormat* destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
 
 public extern "C" vImage_Error vImageBuffer_InitForCopyToCVPixelBuffer(vImage_Buffer* buffers, vImageConverterRef? converter, CVPixelBufferRef? pixelBuffer, vImage_Flags flags);
 

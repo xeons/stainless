@@ -32,10 +32,14 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMRect : DOMObject
 {
-    [Selector("top")] public DOMCSSPrimitiveValue? Top { get; }
-    [Selector("right")] public DOMCSSPrimitiveValue? Right { get; }
-    [Selector("bottom")] public DOMCSSPrimitiveValue? Bottom { get; }
-    [Selector("left")] public DOMCSSPrimitiveValue? Left { get; }
+    [Selector("top")]
+    public DOMCSSPrimitiveValue? Top { get; }
+    [Selector("right")]
+    public DOMCSSPrimitiveValue? Right { get; }
+    [Selector("bottom")]
+    public DOMCSSPrimitiveValue? Bottom { get; }
+    [Selector("left")]
+    public DOMCSSPrimitiveValue? Left { get; }
 }
 
 #endif

@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public objc interface AUCocoaUIBase
 {
-    [Selector("interfaceVersion")] uint InterfaceVersion();
-    [Selector("uiViewForAudioUnit:withSize:")] NSView? UiViewForAudioUnitWithSize(AudioUnit inAudioUnit, NSSize inPreferredSize);
+    [Selector("interfaceVersion")]
+    uint InterfaceVersion();
+    [Selector("uiViewForAudioUnit:withSize:")]
+    NSView? UiViewForAudioUnitWithSize(AudioUnit inAudioUnit, NSSize inPreferredSize);
 }
 
 #endif

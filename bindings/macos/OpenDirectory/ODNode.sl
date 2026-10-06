@@ -33,40 +33,68 @@ import Standard.ObjC;
 
 public extern objc class ODNode : NSObject
 {
-    [Selector("nodeName")] public NSString? NodeName { get; }
-    [Selector("configuration")] public ODConfiguration? Configuration { get; }
-    [Selector("nodeWithSession:type:error:")] public static Self? NodeWithSessionTypeError(ODSession? inSession, ODNodeType inType, out NSError? outError);
-    [Selector("nodeWithSession:name:error:")] public static Self? NodeWithSessionNameError(ODSession? inSession, NSString? inName, out NSError? outError);
-    [Selector("initWithSession:type:error:")] public Self? InitWithSessionTypeError(ODSession? inSession, ODNodeType inType, out NSError? outError);
-    [Selector("initWithSession:name:error:")] public Self? InitWithSessionNameError(ODSession? inSession, NSString? inName, out NSError? outError);
-    [Selector("subnodeNamesAndReturnError:")] public NSArray? SubnodeNamesAndReturnError(out NSError? outError);
-    [Selector("unreachableSubnodeNamesAndReturnError:")] public NSArray? UnreachableSubnodeNamesAndReturnError(out NSError? outError);
-    [Selector("nodeDetailsForKeys:error:")] public NSDictionary? NodeDetailsForKeysError(NSArray? inKeys, out NSError? outError);
-    [Selector("supportedRecordTypesAndReturnError:")] public NSArray? SupportedRecordTypesAndReturnError(out NSError? outError);
-    [Selector("supportedAttributesForRecordType:error:")] public NSArray? SupportedAttributesForRecordTypeError(ODRecordType? inRecordType, out NSError? outError);
-    [Selector("setCredentialsWithRecordType:recordName:password:error:")] public bool SetCredentialsWithRecordTypeRecordNamePasswordError(ODRecordType? inRecordType, NSString? inRecordName, NSString? inPassword, out NSError? outError);
-    [Selector("setCredentialsWithRecordType:authenticationType:authenticationItems:continueItems:context:error:")] public bool SetCredentialsWithRecordTypeAuthenticationTypeAuthenticationItemsContinueItemsContextError(ODRecordType? inRecordType, ODAuthenticationType? inType, NSArray? inItems, out NSArray? outItems, out AnyObject? outContext, out NSError? outError);
+    [Selector("nodeName")]
+    public NSString? NodeName { get; }
+    [Selector("configuration")]
+    public ODConfiguration? Configuration { get; }
+    [Selector("nodeWithSession:type:error:")]
+    public static Self? NodeWithSessionTypeError(ODSession? inSession, ODNodeType inType, out NSError? outError);
+    [Selector("nodeWithSession:name:error:")]
+    public static Self? NodeWithSessionNameError(ODSession? inSession, NSString? inName, out NSError? outError);
+    [Selector("initWithSession:type:error:")]
+    public Self? InitWithSessionTypeError(ODSession? inSession, ODNodeType inType, out NSError? outError);
+    [Selector("initWithSession:name:error:")]
+    public Self? InitWithSessionNameError(ODSession? inSession, NSString? inName, out NSError? outError);
+    [Selector("subnodeNamesAndReturnError:")]
+    public NSArray? SubnodeNamesAndReturnError(out NSError? outError);
+    [Selector("unreachableSubnodeNamesAndReturnError:")]
+    public NSArray? UnreachableSubnodeNamesAndReturnError(out NSError? outError);
+    [Selector("nodeDetailsForKeys:error:")]
+    public NSDictionary? NodeDetailsForKeysError(NSArray? inKeys, out NSError? outError);
+    [Selector("supportedRecordTypesAndReturnError:")]
+    public NSArray? SupportedRecordTypesAndReturnError(out NSError? outError);
+    [Selector("supportedAttributesForRecordType:error:")]
+    public NSArray? SupportedAttributesForRecordTypeError(ODRecordType? inRecordType, out NSError? outError);
+    [Selector("setCredentialsWithRecordType:recordName:password:error:")]
+    public bool SetCredentialsWithRecordTypeRecordNamePasswordError(ODRecordType? inRecordType, NSString? inRecordName, NSString? inPassword, out NSError? outError);
+    [Selector("setCredentialsWithRecordType:authenticationType:authenticationItems:continueItems:context:error:")]
+    public bool SetCredentialsWithRecordTypeAuthenticationTypeAuthenticationItemsContinueItemsContextError(ODRecordType? inRecordType, ODAuthenticationType? inType, NSArray? inItems, out NSArray? outItems, out AnyObject? outContext, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Selector("setCredentialsUsingKerberosCache:error:")] public bool SetCredentialsUsingKerberosCacheError(NSString? inCacheName, out NSError? outError);
-    [Selector("createRecordWithRecordType:name:attributes:error:")] public ODRecord? CreateRecordWithRecordTypeNameAttributesError(ODRecordType? inRecordType, NSString? inRecordName, NSDictionary? inAttributes, out NSError? outError);
-    [Selector("recordWithRecordType:name:attributes:error:")] public ODRecord? RecordWithRecordTypeNameAttributesError(ODRecordType? inRecordType, NSString? inRecordName, AnyObject? inAttributes, out NSError? outError);
-    [Selector("customCall:sendData:error:")] public NSData? CustomCallSendDataError(NSInteger inCustomCode, NSData? inSendData, out NSError? outError);
-    [Selector("customFunction:payload:error:")] public AnyObject? CustomFunctionPayloadError(NSString? function, AnyObject? payload, out NSError? error);
+    [Selector("setCredentialsUsingKerberosCache:error:")]
+    public bool SetCredentialsUsingKerberosCacheError(NSString? inCacheName, out NSError? outError);
+    [Selector("createRecordWithRecordType:name:attributes:error:")]
+    public ODRecord? CreateRecordWithRecordTypeNameAttributesError(ODRecordType? inRecordType, NSString? inRecordName, NSDictionary? inAttributes, out NSError? outError);
+    [Selector("recordWithRecordType:name:attributes:error:")]
+    public ODRecord? RecordWithRecordTypeNameAttributesError(ODRecordType? inRecordType, NSString? inRecordName, AnyObject? inAttributes, out NSError? outError);
+    [Selector("customCall:sendData:error:")]
+    public NSData? CustomCallSendDataError(NSInteger inCustomCode, NSData? inSendData, out NSError? outError);
+    [Selector("customFunction:payload:error:")]
+    public AnyObject? CustomFunctionPayloadError(NSString? function, AnyObject? payload, out NSError? error);
     /// Deprecated in macOS 10.10.
-    [Selector("policiesAndReturnError:")] public NSDictionary? PoliciesAndReturnError(out NSError? error);
+    [Selector("policiesAndReturnError:")]
+    public NSDictionary? PoliciesAndReturnError(out NSError? error);
     /// Deprecated in macOS 10.10.
-    [Selector("supportedPoliciesAndReturnError:")] public NSDictionary? SupportedPoliciesAndReturnError(out NSError? error);
+    [Selector("supportedPoliciesAndReturnError:")]
+    public NSDictionary? SupportedPoliciesAndReturnError(out NSError? error);
     /// Deprecated in macOS 10.10.
-    [Selector("setPolicies:error:")] public bool SetPoliciesError(NSDictionary? policies, out NSError? error);
+    [Selector("setPolicies:error:")]
+    public bool SetPoliciesError(NSDictionary? policies, out NSError? error);
     /// Deprecated in macOS 10.10.
-    [Selector("setPolicy:value:error:")] public bool SetPolicyValueError(ODPolicyType? policy, AnyObject? value, out NSError? error);
+    [Selector("setPolicy:value:error:")]
+    public bool SetPolicyValueError(ODPolicyType? policy, AnyObject? value, out NSError? error);
     /// Deprecated in macOS 10.10.
-    [Selector("removePolicy:error:")] public bool RemovePolicyError(ODPolicyType? policy, out NSError? error);
-    [Selector("addAccountPolicy:toCategory:error:")] public bool AddAccountPolicyToCategoryError(NSDictionary? policy, ODPolicyCategoryType? category, out NSError? error);
-    [Selector("removeAccountPolicy:fromCategory:error:")] public bool RemoveAccountPolicyFromCategoryError(NSDictionary? policy, ODPolicyCategoryType? category, out NSError? error);
-    [Selector("setAccountPolicies:error:")] public bool SetAccountPoliciesError(NSDictionary? policies, out NSError? error);
-    [Selector("accountPoliciesAndReturnError:")] public NSDictionary? AccountPoliciesAndReturnError(out NSError? error);
-    [Selector("passwordContentCheck:forRecordName:error:")] public bool PasswordContentCheckForRecordNameError(NSString? password, NSString? recordName, out NSError? error);
+    [Selector("removePolicy:error:")]
+    public bool RemovePolicyError(ODPolicyType? policy, out NSError? error);
+    [Selector("addAccountPolicy:toCategory:error:")]
+    public bool AddAccountPolicyToCategoryError(NSDictionary? policy, ODPolicyCategoryType? category, out NSError? error);
+    [Selector("removeAccountPolicy:fromCategory:error:")]
+    public bool RemoveAccountPolicyFromCategoryError(NSDictionary? policy, ODPolicyCategoryType? category, out NSError? error);
+    [Selector("setAccountPolicies:error:")]
+    public bool SetAccountPoliciesError(NSDictionary? policies, out NSError? error);
+    [Selector("accountPoliciesAndReturnError:")]
+    public NSDictionary? AccountPoliciesAndReturnError(out NSError? error);
+    [Selector("passwordContentCheck:forRecordName:error:")]
+    public bool PasswordContentCheckForRecordNameError(NSString? password, NSString? recordName, out NSError? error);
 }
 
 #endif

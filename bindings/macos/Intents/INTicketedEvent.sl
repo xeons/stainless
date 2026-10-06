@@ -34,11 +34,16 @@ import Standard.ObjC;
 
 public extern objc class INTicketedEvent : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("category")] public INTicketedEventCategory Category { get; }
-    [Selector("name")] public NSString Name { get; }
-    [Selector("eventDuration")] public INDateComponentsRange EventDuration { get; }
-    [Selector("location")] public CLPlacemark? Location { get; }
-    [Selector("initWithCategory:name:eventDuration:location:")] public Self InitWithCategoryNameEventDurationLocation(INTicketedEventCategory category, NSString name, INDateComponentsRange eventDuration, CLPlacemark? location);
+    [Selector("category")]
+    public INTicketedEventCategory Category { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("eventDuration")]
+    public INDateComponentsRange EventDuration { get; }
+    [Selector("location")]
+    public CLPlacemark? Location { get; }
+    [Selector("initWithCategory:name:eventDuration:location:")]
+    public Self InitWithCategoryNameEventDurationLocation(INTicketedEventCategory category, NSString name, INDateComponentsRange eventDuration, CLPlacemark? location);
 }
 
 #endif

@@ -32,12 +32,18 @@ import Standard.ObjC;
 
 public extern objc class HKCorrelation : HKSample
 {
-    [Selector("correlationType")] public HKCorrelationType CorrelationType { get; }
-    [Selector("objects")] public NSSet Objects { get; }
-    [Selector("correlationWithType:startDate:endDate:objects:")] public static Self CorrelationWithTypeStartDateEndDateObjects(HKCorrelationType correlationType, NSDate startDate, NSDate endDate, NSSet objects);
-    [Selector("correlationWithType:startDate:endDate:objects:metadata:")] public static Self CorrelationWithTypeStartDateEndDateObjectsMetadata(HKCorrelationType correlationType, NSDate startDate, NSDate endDate, NSSet objects, NSDictionary? metadata);
-    [Selector("correlationWithType:startDate:endDate:objects:device:metadata:")] public static Self CorrelationWithTypeStartDateEndDateObjectsDeviceMetadata(HKCorrelationType correlationType, NSDate startDate, NSDate endDate, NSSet objects, HKDevice? device, NSDictionary? metadata);
-    [Selector("objectsForType:")] public NSSet ObjectsForType(HKObjectType objectType);
+    [Selector("correlationType")]
+    public HKCorrelationType CorrelationType { get; }
+    [Selector("objects")]
+    public NSSet Objects { get; }
+    [Selector("correlationWithType:startDate:endDate:objects:")]
+    public static Self CorrelationWithTypeStartDateEndDateObjects(HKCorrelationType correlationType, NSDate startDate, NSDate endDate, NSSet objects);
+    [Selector("correlationWithType:startDate:endDate:objects:metadata:")]
+    public static Self CorrelationWithTypeStartDateEndDateObjectsMetadata(HKCorrelationType correlationType, NSDate startDate, NSDate endDate, NSSet objects, NSDictionary? metadata);
+    [Selector("correlationWithType:startDate:endDate:objects:device:metadata:")]
+    public static Self CorrelationWithTypeStartDateEndDateObjectsDeviceMetadata(HKCorrelationType correlationType, NSDate startDate, NSDate endDate, NSSet objects, HKDevice? device, NSDictionary? metadata);
+    [Selector("objectsForType:")]
+    public NSSet ObjectsForType(HKObjectType objectType);
 }
 
 #endif

@@ -34,7 +34,8 @@ import Standard.ObjC;
 /// SWCollaborationMetadata, a category of NSPasteboardItem.
 public extern objc class NSPasteboardItem
 {
-    [Selector("collaborationMetadata", "setCollaborationMetadata:")] public SWCollaborationMetadata? CollaborationMetadata { get; set; }
+    [Selector("collaborationMetadata", "setCollaborationMetadata:")]
+    public SWCollaborationMetadata? CollaborationMetadata { get; set; }
 }
 
 public extern "C" NSPasteboardType? NSPasteboardTypeCollaborationMetadata;

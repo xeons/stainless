@@ -35,11 +35,14 @@ public delegate void ODQueryCallback(__ODQuery* arg0, __CFArray* arg1, __CFError
 
 public extern "C" CFTypeID ODQueryGetTypeID();
 
-[ReturnsRetained] public extern "C" ODQueryRef? ODQueryCreateWithNode(CFAllocatorRef? allocator, ODNodeRef? node, CFTypeRef? recordTypeOrList, ODAttributeType? @attribute, ODMatchType matchType, CFTypeRef? queryValueOrList, CFTypeRef? returnAttributeOrList, CFIndex maxResults, __CFError** error);
+[ReturnsRetained]
+public extern "C" ODQueryRef? ODQueryCreateWithNode(CFAllocatorRef? allocator, ODNodeRef? node, CFTypeRef? recordTypeOrList, ODAttributeType? @attribute, ODMatchType matchType, CFTypeRef? queryValueOrList, CFTypeRef? returnAttributeOrList, CFIndex maxResults, __CFError** error);
 
-[ReturnsRetained] public extern "C" ODQueryRef? ODQueryCreateWithNodeType(CFAllocatorRef? allocator, ODNodeType nodeType, CFTypeRef? recordTypeOrList, ODAttributeType? @attribute, ODMatchType matchType, CFTypeRef? queryValueOrList, CFTypeRef? returnAttributeOrList, CFIndex maxResults, __CFError** error);
+[ReturnsRetained]
+public extern "C" ODQueryRef? ODQueryCreateWithNodeType(CFAllocatorRef? allocator, ODNodeType nodeType, CFTypeRef? recordTypeOrList, ODAttributeType? @attribute, ODMatchType matchType, CFTypeRef? queryValueOrList, CFTypeRef? returnAttributeOrList, CFIndex maxResults, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ODQueryCopyResults(ODQueryRef? query, bool allowPartialResults, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ODQueryCopyResults(ODQueryRef? query, bool allowPartialResults, __CFError** error);
 
 public extern "C" void ODQuerySynchronize(ODQueryRef? query);
 

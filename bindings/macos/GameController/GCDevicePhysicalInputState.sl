@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public objc interface GCDevicePhysicalInputState : NSObjectProtocol
 {
-    [Selector("device")] GCDevice? Device { get; }
-    [Selector("lastEventTimestamp")] NSTimeInterval LastEventTimestamp { get; }
-    [Selector("lastEventLatency")] NSTimeInterval LastEventLatency { get; }
-    [Selector("elements")] GCPhysicalInputElementCollection? Elements { get; }
-    [Selector("buttons")] GCPhysicalInputElementCollection? Buttons { get; }
-    [Selector("axes")] GCPhysicalInputElementCollection? Axes { get; }
-    [Selector("switches")] GCPhysicalInputElementCollection? Switches { get; }
-    [Selector("dpads")] GCPhysicalInputElementCollection? Dpads { get; }
-    [Selector("objectForKeyedSubscript:")] GCPhysicalInputElement? ObjectForKeyedSubscript(NSString key);
+    [Selector("device")]
+    GCDevice? Device { get; }
+    [Selector("lastEventTimestamp")]
+    NSTimeInterval LastEventTimestamp { get; }
+    [Selector("lastEventLatency")]
+    NSTimeInterval LastEventLatency { get; }
+    [Selector("elements")]
+    GCPhysicalInputElementCollection? Elements { get; }
+    [Selector("buttons")]
+    GCPhysicalInputElementCollection? Buttons { get; }
+    [Selector("axes")]
+    GCPhysicalInputElementCollection? Axes { get; }
+    [Selector("switches")]
+    GCPhysicalInputElementCollection? Switches { get; }
+    [Selector("dpads")]
+    GCPhysicalInputElementCollection? Dpads { get; }
+    [Selector("objectForKeyedSubscript:")]
+    GCPhysicalInputElement? ObjectForKeyedSubscript(NSString key);
 }
 
 #endif

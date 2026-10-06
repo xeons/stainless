@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class SHRange : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("lowerBound")] public double LowerBound { get; }
-    [Selector("upperBound")] public double UpperBound { get; }
-    [Selector("rangeWithLowerBound:upperBound:")] public static Self RangeWithLowerBoundUpperBound(double lowerBound, double upperBound);
-    [Selector("initWithLowerBound:upperBound:")] public Self InitWithLowerBoundUpperBound(double lowerBound, double upperBound);
+    [Selector("lowerBound")]
+    public double LowerBound { get; }
+    [Selector("upperBound")]
+    public double UpperBound { get; }
+    [Selector("rangeWithLowerBound:upperBound:")]
+    public static Self RangeWithLowerBoundUpperBound(double lowerBound, double upperBound);
+    [Selector("initWithLowerBound:upperBound:")]
+    public Self InitWithLowerBoundUpperBound(double lowerBound, double upperBound);
 }
 
 #endif

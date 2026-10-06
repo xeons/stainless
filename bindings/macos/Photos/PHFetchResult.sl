@@ -39,19 +39,32 @@ public objc closure void PHFetchResultEnumerateObjectsAtIndexesOptionsUsingBlock
 
 public extern objc class PHFetchResult : NSObject, NSCopying, NSFastEnumeration
 {
-    [Selector("count")] public NSUInteger Count { get; }
-    [Selector("firstObject")] public AnyObject? FirstObject { get; }
-    [Selector("lastObject")] public AnyObject? LastObject { get; }
-    [Selector("objectAtIndex:")] public AnyObject ObjectAtIndex(NSUInteger index);
-    [Selector("objectAtIndexedSubscript:")] public AnyObject ObjectAtIndexedSubscript(NSUInteger idx);
-    [Selector("containsObject:")] public bool ContainsObject(AnyObject anObject);
-    [Selector("indexOfObject:")] public NSUInteger IndexOfObject(AnyObject anObject);
-    [Selector("indexOfObject:inRange:")] public NSUInteger IndexOfObjectInRange(AnyObject anObject, NSRange range);
-    [Selector("objectsAtIndexes:")] public NSArray ObjectsAtIndexes(NSIndexSet indexes);
-    [Selector("enumerateObjectsUsingBlock:")] public void EnumerateObjectsUsingBlock(PHFetchResultEnumerateObjectsUsingBlockBlock block);
-    [Selector("enumerateObjectsWithOptions:usingBlock:")] public void EnumerateObjectsWithOptionsUsingBlock(NSEnumerationOptions opts, PHFetchResultEnumerateObjectsWithOptionsUsingBlockBlock block);
-    [Selector("enumerateObjectsAtIndexes:options:usingBlock:")] public void EnumerateObjectsAtIndexesOptionsUsingBlock(NSIndexSet s, NSEnumerationOptions opts, PHFetchResultEnumerateObjectsAtIndexesOptionsUsingBlockBlock block);
-    [Selector("countOfAssetsWithMediaType:")] public NSUInteger CountOfAssetsWithMediaType(PHAssetMediaType mediaType);
+    [Selector("count")]
+    public NSUInteger Count { get; }
+    [Selector("firstObject")]
+    public AnyObject? FirstObject { get; }
+    [Selector("lastObject")]
+    public AnyObject? LastObject { get; }
+    [Selector("objectAtIndex:")]
+    public AnyObject ObjectAtIndex(NSUInteger index);
+    [Selector("objectAtIndexedSubscript:")]
+    public AnyObject ObjectAtIndexedSubscript(NSUInteger idx);
+    [Selector("containsObject:")]
+    public bool ContainsObject(AnyObject anObject);
+    [Selector("indexOfObject:")]
+    public NSUInteger IndexOfObject(AnyObject anObject);
+    [Selector("indexOfObject:inRange:")]
+    public NSUInteger IndexOfObjectInRange(AnyObject anObject, NSRange range);
+    [Selector("objectsAtIndexes:")]
+    public NSArray ObjectsAtIndexes(NSIndexSet indexes);
+    [Selector("enumerateObjectsUsingBlock:")]
+    public void EnumerateObjectsUsingBlock(PHFetchResultEnumerateObjectsUsingBlockBlock block);
+    [Selector("enumerateObjectsWithOptions:usingBlock:")]
+    public void EnumerateObjectsWithOptionsUsingBlock(NSEnumerationOptions opts, PHFetchResultEnumerateObjectsWithOptionsUsingBlockBlock block);
+    [Selector("enumerateObjectsAtIndexes:options:usingBlock:")]
+    public void EnumerateObjectsAtIndexesOptionsUsingBlock(NSIndexSet s, NSEnumerationOptions opts, PHFetchResultEnumerateObjectsAtIndexesOptionsUsingBlockBlock block);
+    [Selector("countOfAssetsWithMediaType:")]
+    public NSUInteger CountOfAssetsWithMediaType(PHAssetMediaType mediaType);
 }
 
 #endif

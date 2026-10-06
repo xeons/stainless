@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class MLComputePlanCost : NSObject
 {
-    [Selector("weight")] public double Weight { get; }
+    [Selector("weight")]
+    public double Weight { get; }
 }
 
 #endif

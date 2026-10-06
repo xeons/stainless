@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioSocketConnection : NSObject
 {
-    [Selector("destinationPort")] public uint DestinationPort { get; }
-    [Selector("sourcePort")] public uint SourcePort { get; }
-    [Selector("fileDescriptor")] public int FileDescriptor { get; }
-    [Selector("close")] public void Close();
+    [Selector("destinationPort")]
+    public uint DestinationPort { get; }
+    [Selector("sourcePort")]
+    public uint SourcePort { get; }
+    [Selector("fileDescriptor")]
+    public int FileDescriptor { get; }
+    [Selector("close")]
+    public void Close();
 }
 
 #endif

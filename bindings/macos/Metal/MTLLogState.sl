@@ -45,13 +45,16 @@ public objc closure void MTLLogStateAddLogHandlerBlock(NSString? arg0, NSString?
 
 public objc interface MTLLogState : NSObjectProtocol
 {
-    [Selector("addLogHandler:")] void AddLogHandler(MTLLogStateAddLogHandlerBlock block);
+    [Selector("addLogHandler:")]
+    void AddLogHandler(MTLLogStateAddLogHandlerBlock block);
 }
 
 public extern objc class MTLLogStateDescriptor : NSObject, NSCopying
 {
-    [Selector("level", "setLevel:")] public MTLLogLevel Level { get; set; }
-    [Selector("bufferSize", "setBufferSize:")] public NSInteger BufferSize { get; set; }
+    [Selector("level", "setLevel:")]
+    public MTLLogLevel Level { get; set; }
+    [Selector("bufferSize", "setBufferSize:")]
+    public NSInteger BufferSize { get; set; }
 }
 
 public extern "C" NSErrorDomain MTLLogStateErrorDomain;

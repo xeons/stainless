@@ -66,42 +66,63 @@ public extern "C" NSPrintPanelAccessorySummaryKey? NSPrintPanelAccessorySummaryI
 
 public objc interface NSPrintPanelAccessorizing
 {
-    [Selector("localizedSummaryItems")] NSArray LocalizedSummaryItems();
-    [Optional] [Selector("keyPathsForValuesAffectingPreview")] NSSet KeyPathsForValuesAffectingPreview();
+    [Selector("localizedSummaryItems")]
+    NSArray LocalizedSummaryItems();
+    [Optional]
+    [Selector("keyPathsForValuesAffectingPreview")]
+    NSSet KeyPathsForValuesAffectingPreview();
 }
 
 public objc closure void NSPrintPanelBeginSheetUsingPrintInfoOnWindowCompletionHandlerHandlerBlock(NSPrintPanelResult arg0);
 
 public extern objc class NSPrintPanel : NSObject
 {
-    [Selector("accessoryControllers")] public NSArray? AccessoryControllers { get; }
-    [Selector("options", "setOptions:")] public NSPrintPanelOptions Options { get; set; }
-    [Selector("helpAnchor", "setHelpAnchor:")] public NSHelpAnchorName? HelpAnchor { get; set; }
-    [Selector("jobStyleHint", "setJobStyleHint:")] public NSPrintPanelJobStyleHint? JobStyleHint { get; set; }
-    [Selector("printInfo")] public NSPrintInfo? PrintInfo { get; }
-    [Selector("printPanel")] public static NSPrintPanel PrintPanel();
-    [Selector("addAccessoryController:")] public void AddAccessoryController(NSViewController accessoryController);
-    [Selector("removeAccessoryController:")] public void RemoveAccessoryController(NSViewController accessoryController);
-    [Selector("setDefaultButtonTitle:")] public void SetDefaultButtonTitle(NSString? defaultButtonTitle);
-    [Selector("defaultButtonTitle")] public NSString? DefaultButtonTitle();
-    [Selector("beginSheetUsingPrintInfo:onWindow:completionHandler:")] public void BeginSheetUsingPrintInfoOnWindowCompletionHandler(NSPrintInfo printInfo, NSWindow parentWindow, NSPrintPanelBeginSheetUsingPrintInfoOnWindowCompletionHandlerHandlerBlock? handler);
+    [Selector("accessoryControllers")]
+    public NSArray? AccessoryControllers { get; }
+    [Selector("options", "setOptions:")]
+    public NSPrintPanelOptions Options { get; set; }
+    [Selector("helpAnchor", "setHelpAnchor:")]
+    public NSHelpAnchorName? HelpAnchor { get; set; }
+    [Selector("jobStyleHint", "setJobStyleHint:")]
+    public NSPrintPanelJobStyleHint? JobStyleHint { get; set; }
+    [Selector("printInfo")]
+    public NSPrintInfo? PrintInfo { get; }
+    [Selector("printPanel")]
+    public static NSPrintPanel PrintPanel();
+    [Selector("addAccessoryController:")]
+    public void AddAccessoryController(NSViewController accessoryController);
+    [Selector("removeAccessoryController:")]
+    public void RemoveAccessoryController(NSViewController accessoryController);
+    [Selector("setDefaultButtonTitle:")]
+    public void SetDefaultButtonTitle(NSString? defaultButtonTitle);
+    [Selector("defaultButtonTitle")]
+    public NSString? DefaultButtonTitle();
+    [Selector("beginSheetUsingPrintInfo:onWindow:completionHandler:")]
+    public void BeginSheetUsingPrintInfoOnWindowCompletionHandler(NSPrintInfo printInfo, NSWindow parentWindow, NSPrintPanelBeginSheetUsingPrintInfoOnWindowCompletionHandlerHandlerBlock? handler);
     /// Deprecated in macOS 100000.
-    [Selector("beginSheetWithPrintInfo:modalForWindow:delegate:didEndSelector:contextInfo:")] public void BeginSheetWithPrintInfoModalForWindowDelegateDidEndSelectorContextInfo(NSPrintInfo printInfo, NSWindow docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
-    [Selector("runModalWithPrintInfo:")] public NSInteger RunModalWithPrintInfo(NSPrintInfo printInfo);
-    [Selector("runModal")] public NSInteger RunModal();
+    [Selector("beginSheetWithPrintInfo:modalForWindow:delegate:didEndSelector:contextInfo:")]
+    public void BeginSheetWithPrintInfoModalForWindowDelegateDidEndSelectorContextInfo(NSPrintInfo printInfo, NSWindow docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
+    [Selector("runModalWithPrintInfo:")]
+    public NSInteger RunModalWithPrintInfo(NSPrintInfo printInfo);
+    [Selector("runModal")]
+    public NSInteger RunModal();
 }
 
 /// NSDeprecated, a category of NSPrintPanel.
 public extern objc class NSPrintPanel
 {
     /// Deprecated in macOS 10.5.
-    [Selector("setAccessoryView:")] public void SetAccessoryView(NSView? accessoryView);
+    [Selector("setAccessoryView:")]
+    public void SetAccessoryView(NSView? accessoryView);
     /// Deprecated in macOS 10.5.
-    [Selector("accessoryView")] public NSView? AccessoryView();
+    [Selector("accessoryView")]
+    public NSView? AccessoryView();
     /// Deprecated in macOS 10.5.
-    [Selector("updateFromPrintInfo")] public void UpdateFromPrintInfo();
+    [Selector("updateFromPrintInfo")]
+    public void UpdateFromPrintInfo();
     /// Deprecated in macOS 10.5.
-    [Selector("finalWritePrintInfo")] public void FinalWritePrintInfo();
+    [Selector("finalWritePrintInfo")]
+    public void FinalWritePrintInfo();
 }
 
 #endif

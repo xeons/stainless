@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class CKSyncEngineState : NSObject
 {
-    [Selector("pendingRecordZoneChanges")] public NSArray PendingRecordZoneChanges { get; }
-    [Selector("pendingDatabaseChanges")] public NSArray PendingDatabaseChanges { get; }
-    [Selector("hasPendingUntrackedChanges", "setHasPendingUntrackedChanges:")] public bool HasPendingUntrackedChanges { get; set; }
-    [Selector("zoneIDsWithUnfetchedServerChanges")] public NSArray ZoneIDsWithUnfetchedServerChanges { get; }
-    [Selector("addPendingRecordZoneChanges:")] public void AddPendingRecordZoneChanges(NSArray changes);
-    [Selector("removePendingRecordZoneChanges:")] public void RemovePendingRecordZoneChanges(NSArray changes);
-    [Selector("addPendingDatabaseChanges:")] public void AddPendingDatabaseChanges(NSArray changes);
-    [Selector("removePendingDatabaseChanges:")] public void RemovePendingDatabaseChanges(NSArray changes);
+    [Selector("pendingRecordZoneChanges")]
+    public NSArray PendingRecordZoneChanges { get; }
+    [Selector("pendingDatabaseChanges")]
+    public NSArray PendingDatabaseChanges { get; }
+    [Selector("hasPendingUntrackedChanges", "setHasPendingUntrackedChanges:")]
+    public bool HasPendingUntrackedChanges { get; set; }
+    [Selector("zoneIDsWithUnfetchedServerChanges")]
+    public NSArray ZoneIDsWithUnfetchedServerChanges { get; }
+    [Selector("addPendingRecordZoneChanges:")]
+    public void AddPendingRecordZoneChanges(NSArray changes);
+    [Selector("removePendingRecordZoneChanges:")]
+    public void RemovePendingRecordZoneChanges(NSArray changes);
+    [Selector("addPendingDatabaseChanges:")]
+    public void AddPendingDatabaseChanges(NSArray changes);
+    [Selector("removePendingDatabaseChanges:")]
+    public void RemovePendingDatabaseChanges(NSArray changes);
 }
 
 public extern objc class CKSyncEngineStateSerialization : NSObject, NSSecureCoding { }
@@ -53,9 +61,12 @@ public enum CKSyncEnginePendingRecordZoneChangeType : long
 
 public extern objc class CKSyncEnginePendingRecordZoneChange : NSObject
 {
-    [Selector("recordID")] public CKRecordID RecordID { get; }
-    [Selector("type")] public CKSyncEnginePendingRecordZoneChangeType Type { get; }
-    [Selector("initWithRecordID:type:")] public Self InitWithRecordIDType(CKRecordID recordID, CKSyncEnginePendingRecordZoneChangeType type);
+    [Selector("recordID")]
+    public CKRecordID RecordID { get; }
+    [Selector("type")]
+    public CKSyncEnginePendingRecordZoneChangeType Type { get; }
+    [Selector("initWithRecordID:type:")]
+    public Self InitWithRecordIDType(CKRecordID recordID, CKSyncEnginePendingRecordZoneChangeType type);
 }
 
 public enum CKSyncEnginePendingDatabaseChangeType : long
@@ -66,19 +77,24 @@ public enum CKSyncEnginePendingDatabaseChangeType : long
 
 public extern objc class CKSyncEnginePendingDatabaseChange : NSObject
 {
-    [Selector("zoneID")] public CKRecordZoneID ZoneID { get; }
-    [Selector("type")] public CKSyncEnginePendingDatabaseChangeType Type { get; }
+    [Selector("zoneID")]
+    public CKRecordZoneID ZoneID { get; }
+    [Selector("type")]
+    public CKSyncEnginePendingDatabaseChangeType Type { get; }
 }
 
 public extern objc class CKSyncEnginePendingZoneSave : CKSyncEnginePendingDatabaseChange
 {
-    [Selector("zone")] public CKRecordZone Zone { get; }
-    [Selector("initWithZone:")] public Self InitWithZone(CKRecordZone zone);
+    [Selector("zone")]
+    public CKRecordZone Zone { get; }
+    [Selector("initWithZone:")]
+    public Self InitWithZone(CKRecordZone zone);
 }
 
 public extern objc class CKSyncEnginePendingZoneDelete : CKSyncEnginePendingDatabaseChange
 {
-    [Selector("initWithZoneID:")] public Self InitWithZoneID(CKRecordZoneID zoneID);
+    [Selector("initWithZoneID:")]
+    public Self InitWithZoneID(CKRecordZoneID zoneID);
 }
 
 #endif

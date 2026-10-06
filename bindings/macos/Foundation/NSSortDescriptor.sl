@@ -32,50 +32,69 @@ import Standard.ObjC;
 
 public extern objc class NSSortDescriptor : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("key")] public NSString? Key { get; }
-    [Selector("ascending")] public bool Ascending { get; }
-    [Selector("selector")] public Selector Selector { get; }
-    [Selector("comparator")] public NSComparator Comparator { get; }
-    [Selector("reversedSortDescriptor")] public AnyObject ReversedSortDescriptor { get; }
-    [Selector("sortDescriptorWithKey:ascending:")] public static Self SortDescriptorWithKeyAscending(NSString? key, bool ascending);
-    [Selector("sortDescriptorWithKey:ascending:selector:")] public static Self SortDescriptorWithKeyAscendingSelector(NSString? key, bool ascending, Selector selector);
-    [Selector("initWithKey:ascending:")] public Self InitWithKeyAscending(NSString? key, bool ascending);
-    [Selector("initWithKey:ascending:selector:")] public Self InitWithKeyAscendingSelector(NSString? key, bool ascending, Selector selector);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("allowEvaluation")] public void AllowEvaluation();
-    [Selector("sortDescriptorWithKey:ascending:comparator:")] public static Self SortDescriptorWithKeyAscendingComparator(NSString? key, bool ascending, NSComparator cmptr);
-    [Selector("initWithKey:ascending:comparator:")] public Self InitWithKeyAscendingComparator(NSString? key, bool ascending, NSComparator cmptr);
-    [Selector("compareObject:toObject:")] public NSComparisonResult CompareObjectToObject(AnyObject object1, AnyObject object2);
+    [Selector("key")]
+    public NSString? Key { get; }
+    [Selector("ascending")]
+    public bool Ascending { get; }
+    [Selector("selector")]
+    public Selector Selector { get; }
+    [Selector("comparator")]
+    public NSComparator Comparator { get; }
+    [Selector("reversedSortDescriptor")]
+    public AnyObject ReversedSortDescriptor { get; }
+    [Selector("sortDescriptorWithKey:ascending:")]
+    public static Self SortDescriptorWithKeyAscending(NSString? key, bool ascending);
+    [Selector("sortDescriptorWithKey:ascending:selector:")]
+    public static Self SortDescriptorWithKeyAscendingSelector(NSString? key, bool ascending, Selector selector);
+    [Selector("initWithKey:ascending:")]
+    public Self InitWithKeyAscending(NSString? key, bool ascending);
+    [Selector("initWithKey:ascending:selector:")]
+    public Self InitWithKeyAscendingSelector(NSString? key, bool ascending, Selector selector);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("allowEvaluation")]
+    public void AllowEvaluation();
+    [Selector("sortDescriptorWithKey:ascending:comparator:")]
+    public static Self SortDescriptorWithKeyAscendingComparator(NSString? key, bool ascending, NSComparator cmptr);
+    [Selector("initWithKey:ascending:comparator:")]
+    public Self InitWithKeyAscendingComparator(NSString? key, bool ascending, NSComparator cmptr);
+    [Selector("compareObject:toObject:")]
+    public NSComparisonResult CompareObjectToObject(AnyObject object1, AnyObject object2);
 }
 
 /// NSSortDescriptorSorting, a category of NSSet.
 public extern objc class NSSet
 {
-    [Selector("sortedArrayUsingDescriptors:")] public NSArray SortedArrayUsingDescriptors(NSArray sortDescriptors);
+    [Selector("sortedArrayUsingDescriptors:")]
+    public NSArray SortedArrayUsingDescriptors(NSArray sortDescriptors);
 }
 
 /// NSSortDescriptorSorting, a category of NSArray.
 public extern objc class NSArray
 {
-    [Selector("sortedArrayUsingDescriptors:")] public NSArray SortedArrayUsingDescriptors(NSArray sortDescriptors);
+    [Selector("sortedArrayUsingDescriptors:")]
+    public NSArray SortedArrayUsingDescriptors(NSArray sortDescriptors);
 }
 
 /// NSSortDescriptorSorting, a category of NSMutableArray.
 public extern objc class NSMutableArray
 {
-    [Selector("sortUsingDescriptors:")] public void SortUsingDescriptors(NSArray sortDescriptors);
+    [Selector("sortUsingDescriptors:")]
+    public void SortUsingDescriptors(NSArray sortDescriptors);
 }
 
 /// NSKeyValueSorting, a category of NSOrderedSet.
 public extern objc class NSOrderedSet
 {
-    [Selector("sortedArrayUsingDescriptors:")] public NSArray SortedArrayUsingDescriptors(NSArray sortDescriptors);
+    [Selector("sortedArrayUsingDescriptors:")]
+    public NSArray SortedArrayUsingDescriptors(NSArray sortDescriptors);
 }
 
 /// NSKeyValueSorting, a category of NSMutableOrderedSet.
 public extern objc class NSMutableOrderedSet
 {
-    [Selector("sortUsingDescriptors:")] public void SortUsingDescriptors(NSArray sortDescriptors);
+    [Selector("sortUsingDescriptors:")]
+    public void SortUsingDescriptors(NSArray sortDescriptors);
 }
 
 #endif

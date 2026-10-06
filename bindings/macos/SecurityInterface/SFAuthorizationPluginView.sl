@@ -49,27 +49,43 @@ public enum SFViewType : int
 
 public extern objc class SFAuthorizationPluginView : NSObject
 {
-    [Selector("initWithCallbacks:andEngineRef:")] public AnyObject? InitWithCallbacksAndEngineRef(AuthorizationCallbacks* callbacks, AuthorizationEngineRef engineRef);
-    [Selector("engineRef")] public AuthorizationEngineRef EngineRef();
-    [Selector("callbacks")] public AuthorizationCallbacks* Callbacks();
-    [Selector("buttonPressed:")] public void ButtonPressed(SFButtonType inButtonType);
-    [Selector("lastError")] public NSError? LastError();
-    [Selector("didActivate")] public void DidActivate();
-    [Selector("willActivateWithUser:")] public void WillActivateWithUser(NSDictionary? inUserInformation);
-    [Selector("didDeactivate")] public void DidDeactivate();
-    [Selector("firstKeyView")] public NSView? FirstKeyView();
-    [Selector("firstResponder")] public NSResponder? FirstResponder();
-    [Selector("lastKeyView")] public NSView? LastKeyView();
-    [Selector("setEnabled:")] public void SetEnabled(bool inEnabled);
-    [Selector("viewForType:")] public NSView? ViewForType(SFViewType inType);
+    [Selector("initWithCallbacks:andEngineRef:")]
+    public AnyObject? InitWithCallbacksAndEngineRef(AuthorizationCallbacks* callbacks, AuthorizationEngineRef engineRef);
+    [Selector("engineRef")]
+    public AuthorizationEngineRef EngineRef();
+    [Selector("callbacks")]
+    public AuthorizationCallbacks* Callbacks();
+    [Selector("buttonPressed:")]
+    public void ButtonPressed(SFButtonType inButtonType);
+    [Selector("lastError")]
+    public NSError? LastError();
+    [Selector("didActivate")]
+    public void DidActivate();
+    [Selector("willActivateWithUser:")]
+    public void WillActivateWithUser(NSDictionary? inUserInformation);
+    [Selector("didDeactivate")]
+    public void DidDeactivate();
+    [Selector("firstKeyView")]
+    public NSView? FirstKeyView();
+    [Selector("firstResponder")]
+    public NSResponder? FirstResponder();
+    [Selector("lastKeyView")]
+    public NSView? LastKeyView();
+    [Selector("setEnabled:")]
+    public void SetEnabled(bool inEnabled);
+    [Selector("viewForType:")]
+    public NSView? ViewForType(SFViewType inType);
 }
 
 /// SFHostControl, a category of SFAuthorizationPluginView.
 public extern objc class SFAuthorizationPluginView
 {
-    [Selector("displayView")] public void DisplayView();
-    [Selector("setButton:enabled:")] public void SetButtonEnabled(SFButtonType inButtonType, bool inEnabled);
-    [Selector("updateView")] public void UpdateView();
+    [Selector("displayView")]
+    public void DisplayView();
+    [Selector("setButton:enabled:")]
+    public void SetButtonEnabled(SFButtonType inButtonType, bool inEnabled);
+    [Selector("updateView")]
+    public void UpdateView();
 }
 
 public extern "C" NSString? SFAuthorizationPluginViewUserNameKey;

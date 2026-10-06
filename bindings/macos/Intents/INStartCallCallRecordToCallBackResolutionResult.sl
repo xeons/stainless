@@ -36,8 +36,10 @@ public enum INStartCallCallRecordToCallBackUnsupportedReason : long
 
 public extern objc class INStartCallCallRecordToCallBackResolutionResult : INCallRecordResolutionResult
 {
-    [Selector("unsupportedForReason:")] public static Self UnsupportedForReason(INStartCallCallRecordToCallBackUnsupportedReason reason);
-    [Selector("initWithCallRecordResolutionResult:")] public Self InitWithCallRecordResolutionResult(INCallRecordResolutionResult callRecordResolutionResult);
+    [Selector("unsupportedForReason:")]
+    public static Self UnsupportedForReason(INStartCallCallRecordToCallBackUnsupportedReason reason);
+    [Selector("initWithCallRecordResolutionResult:")]
+    public Self InitWithCallRecordResolutionResult(INCallRecordResolutionResult callRecordResolutionResult);
 }
 
 #endif

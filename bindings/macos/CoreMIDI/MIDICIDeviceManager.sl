@@ -47,8 +47,10 @@ public extern "C" MIDICIDeviceManagerDictionaryKey? MIDICIProfileObjectKey;
 
 public extern objc class MIDICIDeviceManager : NSObject
 {
-    [Selector("sharedInstance")] public static MIDICIDeviceManager? SharedInstance { get; }
-    [Selector("discoveredCIDevices")] public NSArray DiscoveredCIDevices { get; }
+    [Selector("sharedInstance")]
+    public static MIDICIDeviceManager? SharedInstance { get; }
+    [Selector("discoveredCIDevices")]
+    public NSArray DiscoveredCIDevices { get; }
 }
 
 #endif

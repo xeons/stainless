@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class NSExtensionItem : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("attributedTitle", "setAttributedTitle:")] public NSAttributedString? AttributedTitle { get; set; }
-    [Selector("attributedContentText", "setAttributedContentText:")] public NSAttributedString? AttributedContentText { get; set; }
-    [Selector("attachments", "setAttachments:")] public NSArray? Attachments { get; set; }
-    [Selector("userInfo", "setUserInfo:")] public NSDictionary? UserInfo { get; set; }
+    [Selector("attributedTitle", "setAttributedTitle:")]
+    public NSAttributedString? AttributedTitle { get; set; }
+    [Selector("attributedContentText", "setAttributedContentText:")]
+    public NSAttributedString? AttributedContentText { get; set; }
+    [Selector("attachments", "setAttachments:")]
+    public NSArray? Attachments { get; set; }
+    [Selector("userInfo", "setUserInfo:")]
+    public NSDictionary? UserInfo { get; set; }
 }
 
 public extern "C" NSString? NSExtensionItemAttributedTitleKey;

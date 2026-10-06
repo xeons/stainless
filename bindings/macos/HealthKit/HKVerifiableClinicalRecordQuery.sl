@@ -36,10 +36,14 @@ public objc closure void HKVerifiableClinicalRecordQueryInitWithRecordTypesSourc
 
 public extern objc class HKVerifiableClinicalRecordQuery : HKQuery
 {
-    [Selector("recordTypes")] public NSArray RecordTypes { get; }
-    [Selector("sourceTypes")] public NSArray SourceTypes { get; }
-    [Selector("initWithRecordTypes:predicate:resultsHandler:")] public Self InitWithRecordTypesPredicateResultsHandler(NSArray recordTypes, NSPredicate? predicate, HKVerifiableClinicalRecordQueryInitWithRecordTypesPredicateResultsHandlerResultsHandlerBlock resultsHandler);
-    [Selector("initWithRecordTypes:sourceTypes:predicate:resultsHandler:")] public Self InitWithRecordTypesSourceTypesPredicateResultsHandler(NSArray recordTypes, NSArray sourceTypes, NSPredicate? predicate, HKVerifiableClinicalRecordQueryInitWithRecordTypesSourceTypesPredicateResultsHandlerResultsHandlerBlock resultsHandler);
+    [Selector("recordTypes")]
+    public NSArray RecordTypes { get; }
+    [Selector("sourceTypes")]
+    public NSArray SourceTypes { get; }
+    [Selector("initWithRecordTypes:predicate:resultsHandler:")]
+    public Self InitWithRecordTypesPredicateResultsHandler(NSArray recordTypes, NSPredicate? predicate, HKVerifiableClinicalRecordQueryInitWithRecordTypesPredicateResultsHandlerResultsHandlerBlock resultsHandler);
+    [Selector("initWithRecordTypes:sourceTypes:predicate:resultsHandler:")]
+    public Self InitWithRecordTypesSourceTypesPredicateResultsHandler(NSArray recordTypes, NSArray sourceTypes, NSPredicate? predicate, HKVerifiableClinicalRecordQueryInitWithRecordTypesSourceTypesPredicateResultsHandlerResultsHandlerBlock resultsHandler);
 }
 
 #endif

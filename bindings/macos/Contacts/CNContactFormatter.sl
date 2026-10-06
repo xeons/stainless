@@ -45,16 +45,26 @@ public enum CNContactDisplayNameOrder : long
 
 public extern objc class CNContactFormatter : NSFormatter, NSSecureCoding
 {
-    [Selector("descriptorForRequiredKeysForNameOrder")] public static CNKeyDescriptor DescriptorForRequiredKeysForNameOrder { get; }
-    [Selector("descriptorForRequiredKeysForDelimiter")] public static CNKeyDescriptor DescriptorForRequiredKeysForDelimiter { get; }
-    [Selector("style", "setStyle:")] public CNContactFormatterStyle Style { get; set; }
-    [Selector("descriptorForRequiredKeysForStyle:")] public static CNKeyDescriptor DescriptorForRequiredKeysForStyle(CNContactFormatterStyle style);
-    [Selector("stringFromContact:style:")] public static NSString? StringFromContactStyle(CNContact contact, CNContactFormatterStyle style);
-    [Selector("attributedStringFromContact:style:defaultAttributes:")] public static NSAttributedString? AttributedStringFromContactStyleDefaultAttributes(CNContact contact, CNContactFormatterStyle style, NSDictionary? attributes);
-    [Selector("nameOrderForContact:")] public static CNContactDisplayNameOrder NameOrderForContact(CNContact contact);
-    [Selector("delimiterForContact:")] public static NSString DelimiterForContact(CNContact contact);
-    [Selector("stringFromContact:")] public NSString? StringFromContact(CNContact contact);
-    [Selector("attributedStringFromContact:defaultAttributes:")] public NSAttributedString? AttributedStringFromContactDefaultAttributes(CNContact contact, NSDictionary? attributes);
+    [Selector("descriptorForRequiredKeysForNameOrder")]
+    public static CNKeyDescriptor DescriptorForRequiredKeysForNameOrder { get; }
+    [Selector("descriptorForRequiredKeysForDelimiter")]
+    public static CNKeyDescriptor DescriptorForRequiredKeysForDelimiter { get; }
+    [Selector("style", "setStyle:")]
+    public CNContactFormatterStyle Style { get; set; }
+    [Selector("descriptorForRequiredKeysForStyle:")]
+    public static CNKeyDescriptor DescriptorForRequiredKeysForStyle(CNContactFormatterStyle style);
+    [Selector("stringFromContact:style:")]
+    public static NSString? StringFromContactStyle(CNContact contact, CNContactFormatterStyle style);
+    [Selector("attributedStringFromContact:style:defaultAttributes:")]
+    public static NSAttributedString? AttributedStringFromContactStyleDefaultAttributes(CNContact contact, CNContactFormatterStyle style, NSDictionary? attributes);
+    [Selector("nameOrderForContact:")]
+    public static CNContactDisplayNameOrder NameOrderForContact(CNContact contact);
+    [Selector("delimiterForContact:")]
+    public static NSString DelimiterForContact(CNContact contact);
+    [Selector("stringFromContact:")]
+    public NSString? StringFromContact(CNContact contact);
+    [Selector("attributedStringFromContact:defaultAttributes:")]
+    public NSAttributedString? AttributedStringFromContactDefaultAttributes(CNContact contact, NSDictionary? attributes);
 }
 
 public extern "C" NSString CNContactPropertyAttribute;

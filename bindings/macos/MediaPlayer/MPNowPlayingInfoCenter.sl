@@ -49,11 +49,15 @@ public enum MPNowPlayingPlaybackState : ulong
 
 public extern objc class MPNowPlayingInfoCenter : NSObject
 {
-    [Selector("nowPlayingInfo", "setNowPlayingInfo:")] public NSDictionary? NowPlayingInfo { get; set; }
-    [Selector("playbackState", "setPlaybackState:")] public MPNowPlayingPlaybackState PlaybackState { get; set; }
+    [Selector("nowPlayingInfo", "setNowPlayingInfo:")]
+    public NSDictionary? NowPlayingInfo { get; set; }
+    [Selector("playbackState", "setPlaybackState:")]
+    public MPNowPlayingPlaybackState PlaybackState { get; set; }
     /// macOS 26.0 and later.
-    [Selector("supportedAnimatedArtworkKeys")] public static NSArray SupportedAnimatedArtworkKeys { get; }
-    [Selector("defaultCenter")] public static MPNowPlayingInfoCenter DefaultCenter();
+    [Selector("supportedAnimatedArtworkKeys")]
+    public static NSArray SupportedAnimatedArtworkKeys { get; }
+    [Selector("defaultCenter")]
+    public static MPNowPlayingInfoCenter DefaultCenter();
 }
 
 public extern "C" NSString MPNowPlayingInfoPropertyElapsedPlaybackTime;

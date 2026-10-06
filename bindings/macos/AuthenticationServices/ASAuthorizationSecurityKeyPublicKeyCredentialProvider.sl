@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationSecurityKeyPublicKeyCredentialProvider : NSObject, ASAuthorizationProvider
 {
-    [Selector("relyingPartyIdentifier")] public NSString RelyingPartyIdentifier { get; }
-    [Selector("initWithRelyingPartyIdentifier:")] public Self InitWithRelyingPartyIdentifier(NSString relyingPartyIdentifier);
-    [Selector("createCredentialRegistrationRequestWithChallenge:displayName:name:userID:")] public ASAuthorizationSecurityKeyPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithChallengeDisplayNameNameUserID(NSData challenge, NSString displayName, NSString name, NSData userID);
-    [Selector("createCredentialAssertionRequestWithChallenge:")] public ASAuthorizationSecurityKeyPublicKeyCredentialAssertionRequest CreateCredentialAssertionRequestWithChallenge(NSData challenge);
+    [Selector("relyingPartyIdentifier")]
+    public NSString RelyingPartyIdentifier { get; }
+    [Selector("initWithRelyingPartyIdentifier:")]
+    public Self InitWithRelyingPartyIdentifier(NSString relyingPartyIdentifier);
+    [Selector("createCredentialRegistrationRequestWithChallenge:displayName:name:userID:")]
+    public ASAuthorizationSecurityKeyPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithChallengeDisplayNameNameUserID(NSData challenge, NSString displayName, NSString name, NSData userID);
+    [Selector("createCredentialAssertionRequestWithChallenge:")]
+    public ASAuthorizationSecurityKeyPublicKeyCredentialAssertionRequest CreateCredentialAssertionRequestWithChallenge(NSData challenge);
 }
 
 public extern objc class ASAuthorizationSecurityKeyPublicKeyCredentialProvider : ASAuthorizationWebBrowserSecurityKeyPublicKeyCredentialProvider { }

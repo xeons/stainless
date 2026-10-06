@@ -35,10 +35,14 @@ public using CAMediaTimingFunctionName = NSString;
 
 public extern objc class CAMediaTimingFunction : NSObject, NSSecureCoding
 {
-    [Selector("functionWithName:")] public static Self FunctionWithName(CAMediaTimingFunctionName name);
-    [Selector("functionWithControlPoints::::")] public static Self FunctionWithControlPoints(float c1x, float c1y, float c2x, float c2y);
-    [Selector("initWithControlPoints::::")] public Self InitWithControlPoints(float c1x, float c1y, float c2x, float c2y);
-    [Selector("getControlPointAtIndex:values:")] public void GetControlPointAtIndexValues(nuint idx, float* ptr);
+    [Selector("functionWithName:")]
+    public static Self FunctionWithName(CAMediaTimingFunctionName name);
+    [Selector("functionWithControlPoints::::")]
+    public static Self FunctionWithControlPoints(float c1x, float c1y, float c2x, float c2y);
+    [Selector("initWithControlPoints::::")]
+    public Self InitWithControlPoints(float c1x, float c1y, float c2x, float c2y);
+    [Selector("getControlPointAtIndex:values:")]
+    public void GetControlPointAtIndexValues(nuint idx, float* ptr);
 }
 
 public extern "C" CAMediaTimingFunctionName? kCAMediaTimingFunctionLinear;

@@ -33,10 +33,18 @@ import Standard.ObjC;
 /// Deprecated in macOS 26.0.
 public objc interface GKChallengeListener : NSObjectProtocol
 {
-    [Optional] [Selector("player:wantsToPlayChallenge:")] void PlayerWantsToPlayChallenge(GKPlayer player, GKChallenge challenge);
-    [Optional] [Selector("player:didReceiveChallenge:")] void PlayerDidReceiveChallenge(GKPlayer player, GKChallenge challenge);
-    [Optional] [Selector("player:didCompleteChallenge:issuedByFriend:")] void PlayerDidCompleteChallengeIssuedByFriend(GKPlayer player, GKChallenge challenge, GKPlayer friendPlayer);
-    [Optional] [Selector("player:issuedChallengeWasCompleted:byFriend:")] void PlayerIssuedChallengeWasCompletedByFriend(GKPlayer player, GKChallenge challenge, GKPlayer friendPlayer);
+    [Optional]
+    [Selector("player:wantsToPlayChallenge:")]
+    void PlayerWantsToPlayChallenge(GKPlayer player, GKChallenge challenge);
+    [Optional]
+    [Selector("player:didReceiveChallenge:")]
+    void PlayerDidReceiveChallenge(GKPlayer player, GKChallenge challenge);
+    [Optional]
+    [Selector("player:didCompleteChallenge:issuedByFriend:")]
+    void PlayerDidCompleteChallengeIssuedByFriend(GKPlayer player, GKChallenge challenge, GKPlayer friendPlayer);
+    [Optional]
+    [Selector("player:issuedChallengeWasCompleted:byFriend:")]
+    void PlayerIssuedChallengeWasCompletedByFriend(GKPlayer player, GKChallenge challenge, GKPlayer friendPlayer);
 }
 
 #endif

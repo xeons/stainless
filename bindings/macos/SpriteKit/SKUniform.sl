@@ -47,70 +47,116 @@ public enum SKUniformType : long
 
 public extern objc class SKUniform : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("uniformType")] public SKUniformType UniformType { get; }
-    [Selector("textureValue", "setTextureValue:")] public SKTexture? TextureValue { get; set; }
-    [Selector("floatValue", "setFloatValue:")] public float FloatValue { get; set; }
-    [Selector("vectorFloat2Value", "setVectorFloat2Value:")] public vector_float2 VectorFloat2Value { get; set; }
-    [Selector("vectorFloat3Value", "setVectorFloat3Value:")] public vector_float3 VectorFloat3Value { get; set; }
-    [Selector("vectorFloat4Value", "setVectorFloat4Value:")] public vector_float4 VectorFloat4Value { get; set; }
-    [Selector("matrixFloat2x2Value", "setMatrixFloat2x2Value:")] public matrix_float2x2 MatrixFloat2x2Value { get; set; }
-    [Selector("matrixFloat3x3Value", "setMatrixFloat3x3Value:")] public matrix_float3x3 MatrixFloat3x3Value { get; set; }
-    [Selector("matrixFloat4x4Value", "setMatrixFloat4x4Value:")] public matrix_float4x4 MatrixFloat4x4Value { get; set; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("uniformType")]
+    public SKUniformType UniformType { get; }
+    [Selector("textureValue", "setTextureValue:")]
+    public SKTexture? TextureValue { get; set; }
+    [Selector("floatValue", "setFloatValue:")]
+    public float FloatValue { get; set; }
+    [Selector("vectorFloat2Value", "setVectorFloat2Value:")]
+    public vector_float2 VectorFloat2Value { get; set; }
+    [Selector("vectorFloat3Value", "setVectorFloat3Value:")]
+    public vector_float3 VectorFloat3Value { get; set; }
+    [Selector("vectorFloat4Value", "setVectorFloat4Value:")]
+    public vector_float4 VectorFloat4Value { get; set; }
+    [Selector("matrixFloat2x2Value", "setMatrixFloat2x2Value:")]
+    public matrix_float2x2 MatrixFloat2x2Value { get; set; }
+    [Selector("matrixFloat3x3Value", "setMatrixFloat3x3Value:")]
+    public matrix_float3x3 MatrixFloat3x3Value { get; set; }
+    [Selector("matrixFloat4x4Value", "setMatrixFloat4x4Value:")]
+    public matrix_float4x4 MatrixFloat4x4Value { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("floatVector2Value", "setFloatVector2Value:")] public GLKVector2 FloatVector2Value { get; set; }
+    [Selector("floatVector2Value", "setFloatVector2Value:")]
+    public GLKVector2 FloatVector2Value { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("floatVector3Value", "setFloatVector3Value:")] public GLKVector3 FloatVector3Value { get; set; }
+    [Selector("floatVector3Value", "setFloatVector3Value:")]
+    public GLKVector3 FloatVector3Value { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("floatVector4Value", "setFloatVector4Value:")] public GLKVector4 FloatVector4Value { get; set; }
+    [Selector("floatVector4Value", "setFloatVector4Value:")]
+    public GLKVector4 FloatVector4Value { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("floatMatrix2Value", "setFloatMatrix2Value:")] public GLKMatrix2 FloatMatrix2Value { get; set; }
+    [Selector("floatMatrix2Value", "setFloatMatrix2Value:")]
+    public GLKMatrix2 FloatMatrix2Value { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("floatMatrix3Value", "setFloatMatrix3Value:")] public GLKMatrix3 FloatMatrix3Value { get; set; }
+    [Selector("floatMatrix3Value", "setFloatMatrix3Value:")]
+    public GLKMatrix3 FloatMatrix3Value { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("floatMatrix4Value", "setFloatMatrix4Value:")] public GLKMatrix4 FloatMatrix4Value { get; set; }
-    [Selector("uniformWithName:")] public static Self UniformWithName(NSString name);
-    [Selector("uniformWithName:texture:")] public static Self UniformWithNameTexture(NSString name, SKTexture? texture);
-    [Selector("uniformWithName:float:")] public static Self UniformWithNameFloat(NSString name, float value);
-    [Selector("uniformWithName:vectorFloat2:")] public static Self UniformWithNameVectorFloat2(NSString name, vector_float2 value);
-    [Selector("uniformWithName:vectorFloat3:")] public static Self UniformWithNameVectorFloat3(NSString name, vector_float3 value);
-    [Selector("uniformWithName:vectorFloat4:")] public static Self UniformWithNameVectorFloat4(NSString name, vector_float4 value);
-    [Selector("uniformWithName:matrixFloat2x2:")] public static Self UniformWithNameMatrixFloat2x2(NSString name, matrix_float2x2 value);
-    [Selector("uniformWithName:matrixFloat3x3:")] public static Self UniformWithNameMatrixFloat3x3(NSString name, matrix_float3x3 value);
-    [Selector("uniformWithName:matrixFloat4x4:")] public static Self UniformWithNameMatrixFloat4x4(NSString name, matrix_float4x4 value);
-    [Selector("initWithName:")] public Self InitWithName(NSString name);
-    [Selector("initWithName:texture:")] public Self InitWithNameTexture(NSString name, SKTexture? texture);
-    [Selector("initWithName:float:")] public Self InitWithNameFloat(NSString name, float value);
-    [Selector("initWithName:vectorFloat2:")] public Self InitWithNameVectorFloat2(NSString name, vector_float2 value);
-    [Selector("initWithName:vectorFloat3:")] public Self InitWithNameVectorFloat3(NSString name, vector_float3 value);
-    [Selector("initWithName:vectorFloat4:")] public Self InitWithNameVectorFloat4(NSString name, vector_float4 value);
-    [Selector("initWithName:matrixFloat2x2:")] public Self InitWithNameMatrixFloat2x2(NSString name, matrix_float2x2 value);
-    [Selector("initWithName:matrixFloat3x3:")] public Self InitWithNameMatrixFloat3x3(NSString name, matrix_float3x3 value);
-    [Selector("initWithName:matrixFloat4x4:")] public Self InitWithNameMatrixFloat4x4(NSString name, matrix_float4x4 value);
+    [Selector("floatMatrix4Value", "setFloatMatrix4Value:")]
+    public GLKMatrix4 FloatMatrix4Value { get; set; }
+    [Selector("uniformWithName:")]
+    public static Self UniformWithName(NSString name);
+    [Selector("uniformWithName:texture:")]
+    public static Self UniformWithNameTexture(NSString name, SKTexture? texture);
+    [Selector("uniformWithName:float:")]
+    public static Self UniformWithNameFloat(NSString name, float value);
+    [Selector("uniformWithName:vectorFloat2:")]
+    public static Self UniformWithNameVectorFloat2(NSString name, vector_float2 value);
+    [Selector("uniformWithName:vectorFloat3:")]
+    public static Self UniformWithNameVectorFloat3(NSString name, vector_float3 value);
+    [Selector("uniformWithName:vectorFloat4:")]
+    public static Self UniformWithNameVectorFloat4(NSString name, vector_float4 value);
+    [Selector("uniformWithName:matrixFloat2x2:")]
+    public static Self UniformWithNameMatrixFloat2x2(NSString name, matrix_float2x2 value);
+    [Selector("uniformWithName:matrixFloat3x3:")]
+    public static Self UniformWithNameMatrixFloat3x3(NSString name, matrix_float3x3 value);
+    [Selector("uniformWithName:matrixFloat4x4:")]
+    public static Self UniformWithNameMatrixFloat4x4(NSString name, matrix_float4x4 value);
+    [Selector("initWithName:")]
+    public Self InitWithName(NSString name);
+    [Selector("initWithName:texture:")]
+    public Self InitWithNameTexture(NSString name, SKTexture? texture);
+    [Selector("initWithName:float:")]
+    public Self InitWithNameFloat(NSString name, float value);
+    [Selector("initWithName:vectorFloat2:")]
+    public Self InitWithNameVectorFloat2(NSString name, vector_float2 value);
+    [Selector("initWithName:vectorFloat3:")]
+    public Self InitWithNameVectorFloat3(NSString name, vector_float3 value);
+    [Selector("initWithName:vectorFloat4:")]
+    public Self InitWithNameVectorFloat4(NSString name, vector_float4 value);
+    [Selector("initWithName:matrixFloat2x2:")]
+    public Self InitWithNameMatrixFloat2x2(NSString name, matrix_float2x2 value);
+    [Selector("initWithName:matrixFloat3x3:")]
+    public Self InitWithNameMatrixFloat3x3(NSString name, matrix_float3x3 value);
+    [Selector("initWithName:matrixFloat4x4:")]
+    public Self InitWithNameMatrixFloat4x4(NSString name, matrix_float4x4 value);
     /// Deprecated in macOS 10.12.
-    [Selector("uniformWithName:floatVector2:")] public static Self UniformWithNameFloatVector2(NSString name, GLKVector2 value);
+    [Selector("uniformWithName:floatVector2:")]
+    public static Self UniformWithNameFloatVector2(NSString name, GLKVector2 value);
     /// Deprecated in macOS 10.12.
-    [Selector("uniformWithName:floatVector3:")] public static Self UniformWithNameFloatVector3(NSString name, GLKVector3 value);
+    [Selector("uniformWithName:floatVector3:")]
+    public static Self UniformWithNameFloatVector3(NSString name, GLKVector3 value);
     /// Deprecated in macOS 10.12.
-    [Selector("uniformWithName:floatVector4:")] public static Self UniformWithNameFloatVector4(NSString name, GLKVector4 value);
+    [Selector("uniformWithName:floatVector4:")]
+    public static Self UniformWithNameFloatVector4(NSString name, GLKVector4 value);
     /// Deprecated in macOS 10.12.
-    [Selector("uniformWithName:floatMatrix2:")] public static Self UniformWithNameFloatMatrix2(NSString name, GLKMatrix2 value);
+    [Selector("uniformWithName:floatMatrix2:")]
+    public static Self UniformWithNameFloatMatrix2(NSString name, GLKMatrix2 value);
     /// Deprecated in macOS 10.12.
-    [Selector("uniformWithName:floatMatrix3:")] public static Self UniformWithNameFloatMatrix3(NSString name, GLKMatrix3 value);
+    [Selector("uniformWithName:floatMatrix3:")]
+    public static Self UniformWithNameFloatMatrix3(NSString name, GLKMatrix3 value);
     /// Deprecated in macOS 10.12.
-    [Selector("uniformWithName:floatMatrix4:")] public static Self UniformWithNameFloatMatrix4(NSString name, GLKMatrix4 value);
+    [Selector("uniformWithName:floatMatrix4:")]
+    public static Self UniformWithNameFloatMatrix4(NSString name, GLKMatrix4 value);
     /// Deprecated in macOS 10.12.
-    [Selector("initWithName:floatVector2:")] public Self InitWithNameFloatVector2(NSString name, GLKVector2 value);
+    [Selector("initWithName:floatVector2:")]
+    public Self InitWithNameFloatVector2(NSString name, GLKVector2 value);
     /// Deprecated in macOS 10.12.
-    [Selector("initWithName:floatVector3:")] public Self InitWithNameFloatVector3(NSString name, GLKVector3 value);
+    [Selector("initWithName:floatVector3:")]
+    public Self InitWithNameFloatVector3(NSString name, GLKVector3 value);
     /// Deprecated in macOS 10.12.
-    [Selector("initWithName:floatVector4:")] public Self InitWithNameFloatVector4(NSString name, GLKVector4 value);
+    [Selector("initWithName:floatVector4:")]
+    public Self InitWithNameFloatVector4(NSString name, GLKVector4 value);
     /// Deprecated in macOS 10.12.
-    [Selector("initWithName:floatMatrix2:")] public Self InitWithNameFloatMatrix2(NSString name, GLKMatrix2 value);
+    [Selector("initWithName:floatMatrix2:")]
+    public Self InitWithNameFloatMatrix2(NSString name, GLKMatrix2 value);
     /// Deprecated in macOS 10.12.
-    [Selector("initWithName:floatMatrix3:")] public Self InitWithNameFloatMatrix3(NSString name, GLKMatrix3 value);
+    [Selector("initWithName:floatMatrix3:")]
+    public Self InitWithNameFloatMatrix3(NSString name, GLKMatrix3 value);
     /// Deprecated in macOS 10.12.
-    [Selector("initWithName:floatMatrix4:")] public Self InitWithNameFloatMatrix4(NSString name, GLKMatrix4 value);
+    [Selector("initWithName:floatMatrix4:")]
+    public Self InitWithNameFloatMatrix4(NSString name, GLKMatrix4 value);
 }
 
 #endif

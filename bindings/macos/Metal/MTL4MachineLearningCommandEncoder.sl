@@ -32,9 +32,12 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public objc interface MTL4MachineLearningCommandEncoder : MTL4CommandEncoder
 {
-    [Selector("setPipelineState:")] void SetPipelineState(MTL4MachineLearningPipelineState pipelineState);
-    [Selector("setArgumentTable:")] void SetArgumentTable(MTL4ArgumentTable argumentTable);
-    [Selector("dispatchNetworkWithIntermediatesHeap:")] void DispatchNetworkWithIntermediatesHeap(MTLHeap heap);
+    [Selector("setPipelineState:")]
+    void SetPipelineState(MTL4MachineLearningPipelineState pipelineState);
+    [Selector("setArgumentTable:")]
+    void SetArgumentTable(MTL4ArgumentTable argumentTable);
+    [Selector("dispatchNetworkWithIntermediatesHeap:")]
+    void DispatchNetworkWithIntermediatesHeap(MTLHeap heap);
 }
 
 #endif

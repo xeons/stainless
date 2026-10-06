@@ -43,9 +43,12 @@ public enum FPUIExtensionErrorCode : ulong
 
 public extern objc class FPUIActionExtensionContext : NSExtensionContext
 {
-    [Selector("domainIdentifier")] public NSFileProviderDomainIdentifier? DomainIdentifier { get; }
-    [Selector("completeRequest")] public void CompleteRequest();
-    [Selector("cancelRequestWithError:")] public void CancelRequestWithError(NSError error);
+    [Selector("domainIdentifier")]
+    public NSFileProviderDomainIdentifier? DomainIdentifier { get; }
+    [Selector("completeRequest")]
+    public void CompleteRequest();
+    [Selector("cancelRequestWithError:")]
+    public void CancelRequestWithError(NSError error);
 }
 
 #endif

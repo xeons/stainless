@@ -33,11 +33,16 @@ import Standard.ObjC;
 /// MPSGraphControlFlowOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("controlDependencyWithOperations:dependentBlock:name:")] public NSArray ControlDependencyWithOperationsDependentBlockName(NSArray operations, MPSGraphControlFlowDependencyBlock dependentBlock, NSString? name);
-    [Selector("ifWithPredicateTensor:thenBlock:elseBlock:name:")] public NSArray IfWithPredicateTensorThenBlockElseBlockName(MPSGraphTensor predicateTensor, MPSGraphIfThenElseBlock thenBlock, MPSGraphIfThenElseBlock? elseBlock, NSString? name);
-    [Selector("whileWithInitialInputs:before:after:name:")] public NSArray WhileWithInitialInputsBeforeAfterName(NSArray initialInputs, MPSGraphWhileBeforeBlock before, MPSGraphWhileAfterBlock after, NSString? name);
-    [Selector("forLoopWithLowerBound:upperBound:step:initialBodyArguments:body:name:")] public NSArray ForLoopWithLowerBoundUpperBoundStepInitialBodyArgumentsBodyName(MPSGraphTensor lowerBound, MPSGraphTensor upperBound, MPSGraphTensor step, NSArray initialBodyArguments, MPSGraphForLoopBodyBlock body, NSString? name);
-    [Selector("forLoopWithNumberOfIterations:initialBodyArguments:body:name:")] public NSArray ForLoopWithNumberOfIterationsInitialBodyArgumentsBodyName(MPSGraphTensor numberOfIterations, NSArray initialBodyArguments, MPSGraphForLoopBodyBlock body, NSString? name);
+    [Selector("controlDependencyWithOperations:dependentBlock:name:")]
+    public NSArray ControlDependencyWithOperationsDependentBlockName(NSArray operations, MPSGraphControlFlowDependencyBlock dependentBlock, NSString? name);
+    [Selector("ifWithPredicateTensor:thenBlock:elseBlock:name:")]
+    public NSArray IfWithPredicateTensorThenBlockElseBlockName(MPSGraphTensor predicateTensor, MPSGraphIfThenElseBlock thenBlock, MPSGraphIfThenElseBlock? elseBlock, NSString? name);
+    [Selector("whileWithInitialInputs:before:after:name:")]
+    public NSArray WhileWithInitialInputsBeforeAfterName(NSArray initialInputs, MPSGraphWhileBeforeBlock before, MPSGraphWhileAfterBlock after, NSString? name);
+    [Selector("forLoopWithLowerBound:upperBound:step:initialBodyArguments:body:name:")]
+    public NSArray ForLoopWithLowerBoundUpperBoundStepInitialBodyArgumentsBodyName(MPSGraphTensor lowerBound, MPSGraphTensor upperBound, MPSGraphTensor step, NSArray initialBodyArguments, MPSGraphForLoopBodyBlock body, NSString? name);
+    [Selector("forLoopWithNumberOfIterations:initialBodyArguments:body:name:")]
+    public NSArray ForLoopWithNumberOfIterationsInitialBodyArgumentsBodyName(MPSGraphTensor numberOfIterations, NSArray initialBodyArguments, MPSGraphForLoopBodyBlock body, NSString? name);
 }
 
 public objc closure NSArray MPSGraphControlFlowDependencyBlock();

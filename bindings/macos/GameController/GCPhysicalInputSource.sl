@@ -43,10 +43,14 @@ public enum GCPhysicalInputSourceDirection : ulong
 
 public objc interface GCPhysicalInputSource : NSObjectProtocol
 {
-    [Selector("elementAliases")] NSSet ElementAliases { get; }
-    [Selector("elementLocalizedName")] NSString? ElementLocalizedName { get; }
-    [Selector("sfSymbolsName")] NSString? SfSymbolsName { get; }
-    [Selector("direction")] GCPhysicalInputSourceDirection Direction { get; }
+    [Selector("elementAliases")]
+    NSSet ElementAliases { get; }
+    [Selector("elementLocalizedName")]
+    NSString? ElementLocalizedName { get; }
+    [Selector("sfSymbolsName")]
+    NSString? SfSymbolsName { get; }
+    [Selector("direction")]
+    GCPhysicalInputSourceDirection Direction { get; }
 }
 
 #endif

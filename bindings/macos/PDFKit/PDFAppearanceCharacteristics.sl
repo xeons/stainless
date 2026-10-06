@@ -48,14 +48,22 @@ public extern "C" PDFAppearanceCharacteristicsKey? PDFAppearanceCharacteristicsK
 
 public extern objc class PDFAppearanceCharacteristics : NSObject, NSCopying
 {
-    [Selector("controlType", "setControlType:")] public PDFWidgetControlType ControlType { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("borderColor", "setBorderColor:")] public NSColor? BorderColor { get; set; }
-    [Selector("rotation", "setRotation:")] public NSInteger Rotation { get; set; }
-    [Selector("caption", "setCaption:")] public NSString? Caption { get; set; }
-    [Selector("rolloverCaption", "setRolloverCaption:")] public NSString? RolloverCaption { get; set; }
-    [Selector("downCaption", "setDownCaption:")] public NSString? DownCaption { get; set; }
-    [Selector("appearanceCharacteristicsKeyValues")] public NSDictionary AppearanceCharacteristicsKeyValues { get; }
+    [Selector("controlType", "setControlType:")]
+    public PDFWidgetControlType ControlType { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("borderColor", "setBorderColor:")]
+    public NSColor? BorderColor { get; set; }
+    [Selector("rotation", "setRotation:")]
+    public NSInteger Rotation { get; set; }
+    [Selector("caption", "setCaption:")]
+    public NSString? Caption { get; set; }
+    [Selector("rolloverCaption", "setRolloverCaption:")]
+    public NSString? RolloverCaption { get; set; }
+    [Selector("downCaption", "setDownCaption:")]
+    public NSString? DownCaption { get; set; }
+    [Selector("appearanceCharacteristicsKeyValues")]
+    public NSDictionary AppearanceCharacteristicsKeyValues { get; }
 }
 
 #endif

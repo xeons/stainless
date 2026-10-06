@@ -14,15 +14,19 @@ public attribute JsonIgnore { }
 [Reflect]
 public class Person
 {
-    [JsonName("full_name")] public required String Name;
-    [JsonName("age")]       public int    Years;
+    [JsonName("full_name")]
+    public required String Name;
+    [JsonName("age")]
+    public int    Years;
                             public bool Active;
                             public double Rating;
-    [JsonIgnore]            public int    Internal;
+    [JsonIgnore]
+    public int    Internal;
 
     // A property's backing field is ordinary storage, so a reflected type sees
     // it under the property's own name and carries the annotation with it.
-    [JsonName("city")]      public required String City { get; set; }
+    [JsonName("city")]
+    public required String City { get; set; }
 }
 
 [Reflect]

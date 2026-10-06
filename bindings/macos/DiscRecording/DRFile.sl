@@ -33,26 +33,36 @@ import Standard.ObjC;
 
 public extern objc class DRFile : DRFSObject
 {
-    [Selector("fileWithPath:")] public static DRFile? FileWithPath(NSString? path);
-    [Selector("initWithPath:")] public AnyObject? InitWithPath(NSString? path);
+    [Selector("fileWithPath:")]
+    public static DRFile? FileWithPath(NSString? path);
+    [Selector("initWithPath:")]
+    public AnyObject? InitWithPath(NSString? path);
 }
 
 /// VirtualFiles, a category of DRFile.
 public extern objc class DRFile
 {
-    [Selector("virtualFileWithName:data:")] public static DRFile? VirtualFileWithNameData(NSString? name, NSData? data);
-    [Selector("virtualFileWithName:dataProducer:")] public static DRFile? VirtualFileWithNameDataProducer(NSString? name, AnyObject? producer);
-    [Selector("initWithName:data:")] public AnyObject? InitWithNameData(NSString? name, NSData? data);
-    [Selector("initWithName:dataProducer:")] public AnyObject? InitWithNameDataProducer(NSString? name, AnyObject? producer);
+    [Selector("virtualFileWithName:data:")]
+    public static DRFile? VirtualFileWithNameData(NSString? name, NSData? data);
+    [Selector("virtualFileWithName:dataProducer:")]
+    public static DRFile? VirtualFileWithNameDataProducer(NSString? name, AnyObject? producer);
+    [Selector("initWithName:data:")]
+    public AnyObject? InitWithNameData(NSString? name, NSData? data);
+    [Selector("initWithName:dataProducer:")]
+    public AnyObject? InitWithNameDataProducer(NSString? name, AnyObject? producer);
 }
 
 /// VirtualLinks, a category of DRFile.
 public extern objc class DRFile
 {
-    [Selector("hardLinkPointingTo:inFilesystem:")] public static DRFile? HardLinkPointingToInFilesystem(DRFile? original, NSString? filesystem);
-    [Selector("symLinkPointingTo:inFilesystem:")] public static DRFile? SymLinkPointingToInFilesystem(DRFSObject? original, NSString? filesystem);
-    [Selector("finderAliasPointingTo:inFilesystem:")] public static DRFile? FinderAliasPointingToInFilesystem(DRFSObject? original, NSString? filesystem);
-    [Selector("initWithLinkType:pointingTo:inFilesystem:")] public AnyObject? InitWithLinkTypePointingToInFilesystem(NSString? linkType, DRFSObject? original, NSString? filesystem);
+    [Selector("hardLinkPointingTo:inFilesystem:")]
+    public static DRFile? HardLinkPointingToInFilesystem(DRFile? original, NSString? filesystem);
+    [Selector("symLinkPointingTo:inFilesystem:")]
+    public static DRFile? SymLinkPointingToInFilesystem(DRFSObject? original, NSString? filesystem);
+    [Selector("finderAliasPointingTo:inFilesystem:")]
+    public static DRFile? FinderAliasPointingToInFilesystem(DRFSObject? original, NSString? filesystem);
+    [Selector("initWithLinkType:pointingTo:inFilesystem:")]
+    public AnyObject? InitWithLinkTypePointingToInFilesystem(NSString? linkType, DRFSObject? original, NSString? filesystem);
 }
 
 public extern "C" NSString? DRLinkTypeHardLink;
@@ -68,11 +78,16 @@ public const int DRFileForkResource = 1;
 
 public objc interface DRFileDataProduction
 {
-    [Selector("calculateSizeOfFile:fork:estimating:")] ulong CalculateSizeOfFileForkEstimating(DRFile? file, DRFileFork fork, bool estimate);
-    [Selector("prepareFileForBurn:")] bool PrepareFileForBurn(DRFile? file);
-    [Selector("produceFile:fork:intoBuffer:length:atAddress:blockSize:")] uint ProduceFileForkIntoBufferLengthAtAddressBlockSize(DRFile? file, DRFileFork fork, byte* buffer, uint bufferLength, ulong address, uint blockSize);
-    [Selector("prepareFileForVerification:")] bool PrepareFileForVerification(DRFile? file);
-    [Selector("cleanupFileAfterBurn:")] void CleanupFileAfterBurn(DRFile? file);
+    [Selector("calculateSizeOfFile:fork:estimating:")]
+    ulong CalculateSizeOfFileForkEstimating(DRFile? file, DRFileFork fork, bool estimate);
+    [Selector("prepareFileForBurn:")]
+    bool PrepareFileForBurn(DRFile? file);
+    [Selector("produceFile:fork:intoBuffer:length:atAddress:blockSize:")]
+    uint ProduceFileForkIntoBufferLengthAtAddressBlockSize(DRFile? file, DRFileFork fork, byte* buffer, uint bufferLength, ulong address, uint blockSize);
+    [Selector("prepareFileForVerification:")]
+    bool PrepareFileForVerification(DRFile? file);
+    [Selector("cleanupFileAfterBurn:")]
+    void CleanupFileAfterBurn(DRFile? file);
 }
 
 #endif

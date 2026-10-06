@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class NSFetchIndexDescription : NSObject, NSCoding, NSCopying
 {
-    [Selector("name", "setName:")] public NSString Name { get; set; }
-    [Selector("elements", "setElements:")] public NSArray Elements { get; set; }
-    [Selector("entity")] public NSEntityDescription? Entity { get; }
-    [Selector("partialIndexPredicate", "setPartialIndexPredicate:")] public NSPredicate? PartialIndexPredicate { get; set; }
-    [Selector("initWithName:elements:")] public Self InitWithNameElements(NSString name, NSArray? elements);
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
+    [Selector("elements", "setElements:")]
+    public NSArray Elements { get; set; }
+    [Selector("entity")]
+    public NSEntityDescription? Entity { get; }
+    [Selector("partialIndexPredicate", "setPartialIndexPredicate:")]
+    public NSPredicate? PartialIndexPredicate { get; set; }
+    [Selector("initWithName:elements:")]
+    public Self InitWithNameElements(NSString name, NSArray? elements);
 }
 
 #endif

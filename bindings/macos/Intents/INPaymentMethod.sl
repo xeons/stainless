@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class INPaymentMethod : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("type")] public INPaymentMethodType Type { get; }
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("icon")] public INImage? Icon { get; }
-    [Selector("identificationHint")] public NSString? IdentificationHint { get; }
-    [Selector("initWithType:name:identificationHint:icon:")] public Self InitWithTypeNameIdentificationHintIcon(INPaymentMethodType type, NSString? name, NSString? identificationHint, INImage? icon);
-    [Selector("applePayPaymentMethod")] public static Self ApplePayPaymentMethod();
+    [Selector("type")]
+    public INPaymentMethodType Type { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("icon")]
+    public INImage? Icon { get; }
+    [Selector("identificationHint")]
+    public NSString? IdentificationHint { get; }
+    [Selector("initWithType:name:identificationHint:icon:")]
+    public Self InitWithTypeNameIdentificationHintIcon(INPaymentMethodType type, NSString? name, NSString? identificationHint, INImage? icon);
+    [Selector("applePayPaymentMethod")]
+    public static Self ApplePayPaymentMethod();
 }
 
 #endif

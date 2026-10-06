@@ -33,12 +33,18 @@ import Standard.ObjC;
 /// CSEvents, a category of CSSearchableItemAttributeSet.
 public extern objc class CSSearchableItemAttributeSet
 {
-    [Selector("dueDate", "setDueDate:")] public NSDate? DueDate { get; set; }
-    [Selector("completionDate", "setCompletionDate:")] public NSDate? CompletionDate { get; set; }
-    [Selector("startDate", "setStartDate:")] public NSDate? StartDate { get; set; }
-    [Selector("endDate", "setEndDate:")] public NSDate? EndDate { get; set; }
-    [Selector("importantDates", "setImportantDates:")] public NSArray? ImportantDates { get; set; }
-    [Selector("allDay", "setAllDay:")] public NSNumber? AllDay { get; set; }
+    [Selector("dueDate", "setDueDate:")]
+    public NSDate? DueDate { get; set; }
+    [Selector("completionDate", "setCompletionDate:")]
+    public NSDate? CompletionDate { get; set; }
+    [Selector("startDate", "setStartDate:")]
+    public NSDate? StartDate { get; set; }
+    [Selector("endDate", "setEndDate:")]
+    public NSDate? EndDate { get; set; }
+    [Selector("importantDates", "setImportantDates:")]
+    public NSArray? ImportantDates { get; set; }
+    [Selector("allDay", "setAllDay:")]
+    public NSNumber? AllDay { get; set; }
 }
 
 #endif

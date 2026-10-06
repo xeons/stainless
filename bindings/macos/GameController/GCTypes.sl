@@ -43,8 +43,10 @@ public extern "C" NSString NSStringFromGCPoint2(GCPoint2 point);
 /// GCTypes, a category of NSValue.
 public extern objc class NSValue
 {
-    [Selector("GCPoint2Value")] public GCPoint2 GCPoint2Value { get; }
-    [Selector("valueWithGCPoint2:")] public static Self ValueWithGCPoint2(GCPoint2 point);
+    [Selector("GCPoint2Value")]
+    public GCPoint2 GCPoint2Value { get; }
+    [Selector("valueWithGCPoint2:")]
+    public static Self ValueWithGCPoint2(GCPoint2 point);
 }
 
 #endif

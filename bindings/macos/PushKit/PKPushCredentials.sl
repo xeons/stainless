@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class PKPushCredentials : NSObject
 {
-    [Selector("type")] public PKPushType Type { get; }
-    [Selector("token")] public NSData Token { get; }
+    [Selector("type")]
+    public PKPushType Type { get; }
+    [Selector("token")]
+    public NSData Token { get; }
 }
 
 #endif

@@ -32,8 +32,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCGramMatrixLayer : MLCLayer
 {
-    [Selector("scale")] public float Scale { get; }
-    [Selector("layerWithScale:")] public static Self LayerWithScale(float scale);
+    [Selector("scale")]
+    public float Scale { get; }
+    [Selector("layerWithScale:")]
+    public static Self LayerWithScale(float scale);
 }
 
 #endif

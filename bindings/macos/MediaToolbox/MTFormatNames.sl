@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MediaToolbox")
 
-[ReturnsRetained] public extern "C" CFStringRef? MTCopyLocalizedNameForMediaType(CMMediaType mediaType);
+[ReturnsRetained]
+public extern "C" CFStringRef? MTCopyLocalizedNameForMediaType(CMMediaType mediaType);
 
-[ReturnsRetained] public extern "C" CFStringRef? MTCopyLocalizedNameForMediaSubType(CMMediaType mediaType, FourCharCode mediaSubType);
+[ReturnsRetained]
+public extern "C" CFStringRef? MTCopyLocalizedNameForMediaSubType(CMMediaType mediaType, FourCharCode mediaSubType);
 
 #endif

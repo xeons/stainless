@@ -35,12 +35,18 @@ import Standard.ObjC;
 
 public extern objc class SFKeychainSavePanel : NSSavePanel
 {
-    [Selector("sharedKeychainSavePanel")] public static SFKeychainSavePanel? SharedKeychainSavePanel();
-    [Selector("runModalForDirectory:file:")] public NSInteger RunModalForDirectoryFile(NSString? path, NSString? name);
-    [Selector("setPassword:")] public void SetPassword(NSString? password);
-    [Selector("keychain")] public SecKeychainRef? Keychain();
-    [Selector("error")] public NSError? Error();
-    [Selector("beginSheetForDirectory:file:modalForWindow:modalDelegate:didEndSelector:contextInfo:")] public void BeginSheetForDirectoryFileModalForWindowModalDelegateDidEndSelectorContextInfo(NSString? path, NSString? name, NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
+    [Selector("sharedKeychainSavePanel")]
+    public static SFKeychainSavePanel? SharedKeychainSavePanel();
+    [Selector("runModalForDirectory:file:")]
+    public NSInteger RunModalForDirectoryFile(NSString? path, NSString? name);
+    [Selector("setPassword:")]
+    public void SetPassword(NSString? password);
+    [Selector("keychain")]
+    public SecKeychainRef? Keychain();
+    [Selector("error")]
+    public NSError? Error();
+    [Selector("beginSheetForDirectory:file:modalForWindow:modalDelegate:didEndSelector:contextInfo:")]
+    public void BeginSheetForDirectoryFileModalForWindowModalDelegateDidEndSelectorContextInfo(NSString? path, NSString? name, NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
 }
 
 #endif

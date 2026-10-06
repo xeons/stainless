@@ -34,15 +34,33 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public objc interface WebResourceLoadDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("webView:identifierForInitialRequest:fromDataSource:")] AnyObject? WebViewIdentifierForInitialRequestFromDataSource(WebView? sender, NSURLRequest? request, WebDataSource? dataSource);
-    [Optional] [Selector("webView:resource:willSendRequest:redirectResponse:fromDataSource:")] NSURLRequest? WebViewResourceWillSendRequestRedirectResponseFromDataSource(WebView? sender, AnyObject? identifier, NSURLRequest? request, NSURLResponse? redirectResponse, WebDataSource? dataSource);
-    [Optional] [Selector("webView:resource:didReceiveAuthenticationChallenge:fromDataSource:")] void WebViewResourceDidReceiveAuthenticationChallengeFromDataSource(WebView? sender, AnyObject? identifier, NSURLAuthenticationChallenge? challenge, WebDataSource? dataSource);
-    [Optional] [Selector("webView:resource:didCancelAuthenticationChallenge:fromDataSource:")] void WebViewResourceDidCancelAuthenticationChallengeFromDataSource(WebView? sender, AnyObject? identifier, NSURLAuthenticationChallenge? challenge, WebDataSource? dataSource);
-    [Optional] [Selector("webView:resource:didReceiveResponse:fromDataSource:")] void WebViewResourceDidReceiveResponseFromDataSource(WebView? sender, AnyObject? identifier, NSURLResponse? response, WebDataSource? dataSource);
-    [Optional] [Selector("webView:resource:didReceiveContentLength:fromDataSource:")] void WebViewResourceDidReceiveContentLengthFromDataSource(WebView? sender, AnyObject? identifier, NSInteger length, WebDataSource? dataSource);
-    [Optional] [Selector("webView:resource:didFinishLoadingFromDataSource:")] void WebViewResourceDidFinishLoadingFromDataSource(WebView? sender, AnyObject? identifier, WebDataSource? dataSource);
-    [Optional] [Selector("webView:resource:didFailLoadingWithError:fromDataSource:")] void WebViewResourceDidFailLoadingWithErrorFromDataSource(WebView? sender, AnyObject? identifier, NSError? error, WebDataSource? dataSource);
-    [Optional] [Selector("webView:plugInFailedWithError:dataSource:")] void WebViewPlugInFailedWithErrorDataSource(WebView? sender, NSError? error, WebDataSource? dataSource);
+    [Optional]
+    [Selector("webView:identifierForInitialRequest:fromDataSource:")]
+    AnyObject? WebViewIdentifierForInitialRequestFromDataSource(WebView? sender, NSURLRequest? request, WebDataSource? dataSource);
+    [Optional]
+    [Selector("webView:resource:willSendRequest:redirectResponse:fromDataSource:")]
+    NSURLRequest? WebViewResourceWillSendRequestRedirectResponseFromDataSource(WebView? sender, AnyObject? identifier, NSURLRequest? request, NSURLResponse? redirectResponse, WebDataSource? dataSource);
+    [Optional]
+    [Selector("webView:resource:didReceiveAuthenticationChallenge:fromDataSource:")]
+    void WebViewResourceDidReceiveAuthenticationChallengeFromDataSource(WebView? sender, AnyObject? identifier, NSURLAuthenticationChallenge? challenge, WebDataSource? dataSource);
+    [Optional]
+    [Selector("webView:resource:didCancelAuthenticationChallenge:fromDataSource:")]
+    void WebViewResourceDidCancelAuthenticationChallengeFromDataSource(WebView? sender, AnyObject? identifier, NSURLAuthenticationChallenge? challenge, WebDataSource? dataSource);
+    [Optional]
+    [Selector("webView:resource:didReceiveResponse:fromDataSource:")]
+    void WebViewResourceDidReceiveResponseFromDataSource(WebView? sender, AnyObject? identifier, NSURLResponse? response, WebDataSource? dataSource);
+    [Optional]
+    [Selector("webView:resource:didReceiveContentLength:fromDataSource:")]
+    void WebViewResourceDidReceiveContentLengthFromDataSource(WebView? sender, AnyObject? identifier, NSInteger length, WebDataSource? dataSource);
+    [Optional]
+    [Selector("webView:resource:didFinishLoadingFromDataSource:")]
+    void WebViewResourceDidFinishLoadingFromDataSource(WebView? sender, AnyObject? identifier, WebDataSource? dataSource);
+    [Optional]
+    [Selector("webView:resource:didFailLoadingWithError:fromDataSource:")]
+    void WebViewResourceDidFailLoadingWithErrorFromDataSource(WebView? sender, AnyObject? identifier, NSError? error, WebDataSource? dataSource);
+    [Optional]
+    [Selector("webView:plugInFailedWithError:dataSource:")]
+    void WebViewPlugInFailedWithErrorDataSource(WebView? sender, NSError? error, WebDataSource? dataSource);
 }
 
 #endif

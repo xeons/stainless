@@ -32,26 +32,46 @@ import Standard.ObjC;
 
 public extern objc class NSUbiquitousKeyValueStore : NSObject
 {
-    [Selector("defaultStore")] public static NSUbiquitousKeyValueStore DefaultStore { get; }
-    [Selector("dictionaryRepresentation")] public NSDictionary DictionaryRepresentation { get; }
-    [Selector("objectForKey:")] public AnyObject? ObjectForKey(NSString aKey);
-    [Selector("setObject:forKey:")] public void SetObjectForKey(AnyObject? anObject, NSString aKey);
-    [Selector("removeObjectForKey:")] public void RemoveObjectForKey(NSString aKey);
-    [Selector("stringForKey:")] public NSString? StringForKey(NSString aKey);
-    [Selector("arrayForKey:")] public NSArray? ArrayForKey(NSString aKey);
-    [Selector("dictionaryForKey:")] public NSDictionary? DictionaryForKey(NSString aKey);
-    [Selector("dataForKey:")] public NSData? DataForKey(NSString aKey);
-    [Selector("longLongForKey:")] public long LongLongForKey(NSString aKey);
-    [Selector("doubleForKey:")] public double DoubleForKey(NSString aKey);
-    [Selector("boolForKey:")] public bool BoolForKey(NSString aKey);
-    [Selector("setString:forKey:")] public void SetStringForKey(NSString? aString, NSString aKey);
-    [Selector("setData:forKey:")] public void SetDataForKey(NSData? aData, NSString aKey);
-    [Selector("setArray:forKey:")] public void SetArrayForKey(NSArray? anArray, NSString aKey);
-    [Selector("setDictionary:forKey:")] public void SetDictionaryForKey(NSDictionary? aDictionary, NSString aKey);
-    [Selector("setLongLong:forKey:")] public void SetLongLongForKey(long value, NSString aKey);
-    [Selector("setDouble:forKey:")] public void SetDoubleForKey(double value, NSString aKey);
-    [Selector("setBool:forKey:")] public void SetBoolForKey(bool value, NSString aKey);
-    [Selector("synchronize")] public bool Synchronize();
+    [Selector("defaultStore")]
+    public static NSUbiquitousKeyValueStore DefaultStore { get; }
+    [Selector("dictionaryRepresentation")]
+    public NSDictionary DictionaryRepresentation { get; }
+    [Selector("objectForKey:")]
+    public AnyObject? ObjectForKey(NSString aKey);
+    [Selector("setObject:forKey:")]
+    public void SetObjectForKey(AnyObject? anObject, NSString aKey);
+    [Selector("removeObjectForKey:")]
+    public void RemoveObjectForKey(NSString aKey);
+    [Selector("stringForKey:")]
+    public NSString? StringForKey(NSString aKey);
+    [Selector("arrayForKey:")]
+    public NSArray? ArrayForKey(NSString aKey);
+    [Selector("dictionaryForKey:")]
+    public NSDictionary? DictionaryForKey(NSString aKey);
+    [Selector("dataForKey:")]
+    public NSData? DataForKey(NSString aKey);
+    [Selector("longLongForKey:")]
+    public long LongLongForKey(NSString aKey);
+    [Selector("doubleForKey:")]
+    public double DoubleForKey(NSString aKey);
+    [Selector("boolForKey:")]
+    public bool BoolForKey(NSString aKey);
+    [Selector("setString:forKey:")]
+    public void SetStringForKey(NSString? aString, NSString aKey);
+    [Selector("setData:forKey:")]
+    public void SetDataForKey(NSData? aData, NSString aKey);
+    [Selector("setArray:forKey:")]
+    public void SetArrayForKey(NSArray? anArray, NSString aKey);
+    [Selector("setDictionary:forKey:")]
+    public void SetDictionaryForKey(NSDictionary? aDictionary, NSString aKey);
+    [Selector("setLongLong:forKey:")]
+    public void SetLongLongForKey(long value, NSString aKey);
+    [Selector("setDouble:forKey:")]
+    public void SetDoubleForKey(double value, NSString aKey);
+    [Selector("setBool:forKey:")]
+    public void SetBoolForKey(bool value, NSString aKey);
+    [Selector("synchronize")]
+    public bool Synchronize();
 }
 
 public extern "C" NSNotificationName NSUbiquitousKeyValueStoreDidChangeExternallyNotification;

@@ -34,23 +34,35 @@ import Standard.ObjC;
 /// NSValueAVFoundationExtensions, a category of NSValue.
 public extern objc class NSValue
 {
-    [Selector("CMTimeValue")] public CMTime CMTimeValue { get; }
-    [Selector("CMTimeRangeValue")] public CMTimeRange CMTimeRangeValue { get; }
-    [Selector("CMTimeMappingValue")] public CMTimeMapping CMTimeMappingValue { get; }
-    [Selector("valueWithCMTime:")] public static NSValue ValueWithCMTime(CMTime time);
-    [Selector("valueWithCMTimeRange:")] public static NSValue ValueWithCMTimeRange(CMTimeRange timeRange);
-    [Selector("valueWithCMTimeMapping:")] public static NSValue ValueWithCMTimeMapping(CMTimeMapping timeMapping);
+    [Selector("CMTimeValue")]
+    public CMTime CMTimeValue { get; }
+    [Selector("CMTimeRangeValue")]
+    public CMTimeRange CMTimeRangeValue { get; }
+    [Selector("CMTimeMappingValue")]
+    public CMTimeMapping CMTimeMappingValue { get; }
+    [Selector("valueWithCMTime:")]
+    public static NSValue ValueWithCMTime(CMTime time);
+    [Selector("valueWithCMTimeRange:")]
+    public static NSValue ValueWithCMTimeRange(CMTimeRange timeRange);
+    [Selector("valueWithCMTimeMapping:")]
+    public static NSValue ValueWithCMTimeMapping(CMTimeMapping timeMapping);
 }
 
 /// AVTimeCoding, a category of NSCoder.
 public extern objc class NSCoder
 {
-    [Selector("encodeCMTime:forKey:")] public void EncodeCMTimeForKey(CMTime time, NSString key);
-    [Selector("decodeCMTimeForKey:")] public CMTime DecodeCMTimeForKey(NSString key);
-    [Selector("encodeCMTimeRange:forKey:")] public void EncodeCMTimeRangeForKey(CMTimeRange timeRange, NSString key);
-    [Selector("decodeCMTimeRangeForKey:")] public CMTimeRange DecodeCMTimeRangeForKey(NSString key);
-    [Selector("encodeCMTimeMapping:forKey:")] public void EncodeCMTimeMappingForKey(CMTimeMapping timeMapping, NSString key);
-    [Selector("decodeCMTimeMappingForKey:")] public CMTimeMapping DecodeCMTimeMappingForKey(NSString key);
+    [Selector("encodeCMTime:forKey:")]
+    public void EncodeCMTimeForKey(CMTime time, NSString key);
+    [Selector("decodeCMTimeForKey:")]
+    public CMTime DecodeCMTimeForKey(NSString key);
+    [Selector("encodeCMTimeRange:forKey:")]
+    public void EncodeCMTimeRangeForKey(CMTimeRange timeRange, NSString key);
+    [Selector("decodeCMTimeRangeForKey:")]
+    public CMTimeRange DecodeCMTimeRangeForKey(NSString key);
+    [Selector("encodeCMTimeMapping:forKey:")]
+    public void EncodeCMTimeMappingForKey(CMTimeMapping timeMapping, NSString key);
+    [Selector("decodeCMTimeMappingForKey:")]
+    public CMTimeMapping DecodeCMTimeMappingForKey(NSString key);
 }
 
 #endif

@@ -33,14 +33,20 @@ import Standard.ObjC;
 
 public extern objc class SFSpeechLanguageModelConfiguration : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("languageModel")] public NSURL LanguageModel { get; }
-    [Selector("vocabulary")] public NSURL? Vocabulary { get; }
+    [Selector("languageModel")]
+    public NSURL LanguageModel { get; }
+    [Selector("vocabulary")]
+    public NSURL? Vocabulary { get; }
     /// macOS 26.0 and later.
-    [Selector("weight")] public NSNumber? Weight { get; }
-    [Selector("initWithLanguageModel:")] public Self InitWithLanguageModel(NSURL languageModel);
-    [Selector("initWithLanguageModel:vocabulary:")] public Self InitWithLanguageModelVocabulary(NSURL languageModel, NSURL? vocabulary);
+    [Selector("weight")]
+    public NSNumber? Weight { get; }
+    [Selector("initWithLanguageModel:")]
+    public Self InitWithLanguageModel(NSURL languageModel);
+    [Selector("initWithLanguageModel:vocabulary:")]
+    public Self InitWithLanguageModelVocabulary(NSURL languageModel, NSURL? vocabulary);
     /// macOS 26.0 and later.
-    [Selector("initWithLanguageModel:vocabulary:weight:")] public Self InitWithLanguageModelVocabularyWeight(NSURL languageModel, NSURL? vocabulary, NSNumber? weight);
+    [Selector("initWithLanguageModel:vocabulary:weight:")]
+    public Self InitWithLanguageModelVocabularyWeight(NSURL languageModel, NSURL? vocabulary, NSNumber? weight);
 }
 
 public objc closure void SFSpeechLanguageModelPrepareCustomLanguageModelForUrlClientIdentifierConfigurationCompletionCompletionBlock(NSError? arg0);
@@ -54,11 +60,15 @@ public objc closure void SFSpeechLanguageModelPrepareCustomLanguageModelForUrlCo
 public extern objc class SFSpeechLanguageModel : NSObject
 {
     /// Deprecated in macOS 26.0.
-    [Selector("prepareCustomLanguageModelForUrl:clientIdentifier:configuration:completion:")] public static void PrepareCustomLanguageModelForUrlClientIdentifierConfigurationCompletion(NSURL asset, NSString clientIdentifier, SFSpeechLanguageModelConfiguration configuration, SFSpeechLanguageModelPrepareCustomLanguageModelForUrlClientIdentifierConfigurationCompletionCompletionBlock completion);
+    [Selector("prepareCustomLanguageModelForUrl:clientIdentifier:configuration:completion:")]
+    public static void PrepareCustomLanguageModelForUrlClientIdentifierConfigurationCompletion(NSURL asset, NSString clientIdentifier, SFSpeechLanguageModelConfiguration configuration, SFSpeechLanguageModelPrepareCustomLanguageModelForUrlClientIdentifierConfigurationCompletionCompletionBlock completion);
     /// Deprecated in macOS 26.0.
-    [Selector("prepareCustomLanguageModelForUrl:clientIdentifier:configuration:ignoresCache:completion:")] public static void PrepareCustomLanguageModelForUrlClientIdentifierConfigurationIgnoresCacheCompletion(NSURL asset, NSString clientIdentifier, SFSpeechLanguageModelConfiguration configuration, bool ignoresCache, SFSpeechLanguageModelPrepareCustomLanguageModelForUrlClientIdentifierConfigurationIgnoresCacheCompletionCompletionBlock completion);
-    [Selector("prepareCustomLanguageModelForUrl:configuration:completion:")] public static void PrepareCustomLanguageModelForUrlConfigurationCompletion(NSURL asset, SFSpeechLanguageModelConfiguration configuration, SFSpeechLanguageModelPrepareCustomLanguageModelForUrlConfigurationCompletionCompletionBlock completion);
-    [Selector("prepareCustomLanguageModelForUrl:configuration:ignoresCache:completion:")] public static void PrepareCustomLanguageModelForUrlConfigurationIgnoresCacheCompletion(NSURL asset, SFSpeechLanguageModelConfiguration configuration, bool ignoresCache, SFSpeechLanguageModelPrepareCustomLanguageModelForUrlConfigurationIgnoresCacheCompletionCompletionBlock completion);
+    [Selector("prepareCustomLanguageModelForUrl:clientIdentifier:configuration:ignoresCache:completion:")]
+    public static void PrepareCustomLanguageModelForUrlClientIdentifierConfigurationIgnoresCacheCompletion(NSURL asset, NSString clientIdentifier, SFSpeechLanguageModelConfiguration configuration, bool ignoresCache, SFSpeechLanguageModelPrepareCustomLanguageModelForUrlClientIdentifierConfigurationIgnoresCacheCompletionCompletionBlock completion);
+    [Selector("prepareCustomLanguageModelForUrl:configuration:completion:")]
+    public static void PrepareCustomLanguageModelForUrlConfigurationCompletion(NSURL asset, SFSpeechLanguageModelConfiguration configuration, SFSpeechLanguageModelPrepareCustomLanguageModelForUrlConfigurationCompletionCompletionBlock completion);
+    [Selector("prepareCustomLanguageModelForUrl:configuration:ignoresCache:completion:")]
+    public static void PrepareCustomLanguageModelForUrlConfigurationIgnoresCacheCompletion(NSURL asset, SFSpeechLanguageModelConfiguration configuration, bool ignoresCache, SFSpeechLanguageModelPrepareCustomLanguageModelForUrlConfigurationIgnoresCacheCompletionCompletionBlock completion);
 }
 
 #endif

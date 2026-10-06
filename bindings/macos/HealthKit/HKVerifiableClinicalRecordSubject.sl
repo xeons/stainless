@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class HKVerifiableClinicalRecordSubject : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("fullName")] public NSString FullName { get; }
-    [Selector("dateOfBirthComponents")] public NSDateComponents? DateOfBirthComponents { get; }
+    [Selector("fullName")]
+    public NSString FullName { get; }
+    [Selector("dateOfBirthComponents")]
+    public NSDateComponents? DateOfBirthComponents { get; }
 }
 
 #endif

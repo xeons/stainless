@@ -32,25 +32,32 @@ import Standard.ObjC;
 
 public extern objc class PHASEDistanceModelFadeOutParameters : NSObject
 {
-    [Selector("cullDistance")] public double CullDistance { get; }
-    [Selector("initWithCullDistance:")] public Self InitWithCullDistance(double cullDistance);
+    [Selector("cullDistance")]
+    public double CullDistance { get; }
+    [Selector("initWithCullDistance:")]
+    public Self InitWithCullDistance(double cullDistance);
 }
 
 public extern objc class PHASEDistanceModelParameters : NSObject
 {
-    [Selector("fadeOutParameters", "setFadeOutParameters:")] public PHASEDistanceModelFadeOutParameters? FadeOutParameters { get; set; }
+    [Selector("fadeOutParameters", "setFadeOutParameters:")]
+    public PHASEDistanceModelFadeOutParameters? FadeOutParameters { get; set; }
 }
 
 public extern objc class PHASEGeometricSpreadingDistanceModelParameters : PHASEDistanceModelParameters
 {
-    [Selector("rolloffFactor", "setRolloffFactor:")] public double RolloffFactor { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("rolloffFactor", "setRolloffFactor:")]
+    public double RolloffFactor { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 public extern objc class PHASEEnvelopeDistanceModelParameters : PHASEDistanceModelParameters
 {
-    [Selector("envelope")] public PHASEEnvelope Envelope { get; }
-    [Selector("initWithEnvelope:")] public Self InitWithEnvelope(PHASEEnvelope envelope);
+    [Selector("envelope")]
+    public PHASEEnvelope Envelope { get; }
+    [Selector("initWithEnvelope:")]
+    public Self InitWithEnvelope(PHASEEnvelope envelope);
 }
 
 #endif

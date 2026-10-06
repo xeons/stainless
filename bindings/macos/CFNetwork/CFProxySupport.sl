@@ -30,17 +30,22 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CFNetwork")
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CFNetworkCopySystemProxySettings();
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CFNetworkCopySystemProxySettings();
 
-[ReturnsRetained] public extern "C" CFArrayRef CFNetworkCopyProxiesForURL(CFURLRef url, CFDictionaryRef proxySettings);
+[ReturnsRetained]
+public extern "C" CFArrayRef CFNetworkCopyProxiesForURL(CFURLRef url, CFDictionaryRef proxySettings);
 
 public delegate void CFProxyAutoConfigurationResultCallback(void* arg0, __CFArray* arg1, __CFError* arg2);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFNetworkCopyProxiesForAutoConfigurationScript(CFStringRef proxyAutoConfigurationScript, CFURLRef targetURL, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFNetworkCopyProxiesForAutoConfigurationScript(CFStringRef proxyAutoConfigurationScript, CFURLRef targetURL, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFRunLoopSourceRef CFNetworkExecuteProxyAutoConfigurationScript(CFStringRef proxyAutoConfigurationScript, CFURLRef targetURL, CFProxyAutoConfigurationResultCallback cb, CFStreamClientContext* clientContext);
+[ReturnsRetained]
+public extern "C" CFRunLoopSourceRef CFNetworkExecuteProxyAutoConfigurationScript(CFStringRef proxyAutoConfigurationScript, CFURLRef targetURL, CFProxyAutoConfigurationResultCallback cb, CFStreamClientContext* clientContext);
 
-[ReturnsRetained] public extern "C" CFRunLoopSourceRef CFNetworkExecuteProxyAutoConfigurationURL(CFURLRef proxyAutoConfigURL, CFURLRef targetURL, CFProxyAutoConfigurationResultCallback cb, CFStreamClientContext* clientContext);
+[ReturnsRetained]
+public extern "C" CFRunLoopSourceRef CFNetworkExecuteProxyAutoConfigurationURL(CFURLRef proxyAutoConfigURL, CFURLRef targetURL, CFProxyAutoConfigurationResultCallback cb, CFStreamClientContext* clientContext);
 
 public extern "C" CFStringRef? kCFProxyTypeKey;
 

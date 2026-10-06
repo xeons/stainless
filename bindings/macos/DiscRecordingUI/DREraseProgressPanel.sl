@@ -39,19 +39,27 @@ public extern "C" NSString? DREraseProgressPanelDidFinishNotification;
 
 public extern objc class DREraseProgressPanel : NSPanel
 {
-    [Selector("progressPanel")] public static DREraseProgressPanel? ProgressPanel();
-    [Selector("beginProgressSheetForErase:modalForWindow:")] public void BeginProgressSheetForEraseModalForWindow(DRErase? erase, NSWindow? docWindow);
-    [Selector("beginProgressPanelForErase:")] public void BeginProgressPanelForErase(DRErase? erase);
-    [Selector("setDescription:")] public void SetDescription(NSString? description);
-    [Selector("description")] public NSString? Description();
+    [Selector("progressPanel")]
+    public static DREraseProgressPanel? ProgressPanel();
+    [Selector("beginProgressSheetForErase:modalForWindow:")]
+    public void BeginProgressSheetForEraseModalForWindow(DRErase? erase, NSWindow? docWindow);
+    [Selector("beginProgressPanelForErase:")]
+    public void BeginProgressPanelForErase(DRErase? erase);
+    [Selector("setDescription:")]
+    public void SetDescription(NSString? description);
+    [Selector("description")]
+    public NSString? Description();
 }
 
 /// DREraseProgressPanelDelegateMethods, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("eraseProgressPanelWillBegin:")] public void EraseProgressPanelWillBegin(NSNotification? aNotification);
-    [Selector("eraseProgressPanelDidFinish:")] public void EraseProgressPanelDidFinish(NSNotification? aNotification);
-    [Selector("eraseProgressPanel:eraseDidFinish:")] public bool EraseProgressPanelEraseDidFinish(DREraseProgressPanel? theErasePanel, DRErase? erase);
+    [Selector("eraseProgressPanelWillBegin:")]
+    public void EraseProgressPanelWillBegin(NSNotification? aNotification);
+    [Selector("eraseProgressPanelDidFinish:")]
+    public void EraseProgressPanelDidFinish(NSNotification? aNotification);
+    [Selector("eraseProgressPanel:eraseDidFinish:")]
+    public bool EraseProgressPanelEraseDidFinish(DREraseProgressPanel? theErasePanel, DRErase? erase);
 }
 
 #endif

@@ -35,9 +35,12 @@ public objc closure void DCDeviceGenerateTokenWithCompletionHandlerCompletionBlo
 
 public extern objc class DCDevice : NSObject
 {
-    [Selector("currentDevice")] public static DCDevice CurrentDevice { get; }
-    [Selector("isSupported")] public bool Supported { get; }
-    [Selector("generateTokenWithCompletionHandler:")] public void GenerateTokenWithCompletionHandler(DCDeviceGenerateTokenWithCompletionHandlerCompletionBlock completion);
+    [Selector("currentDevice")]
+    public static DCDevice CurrentDevice { get; }
+    [Selector("isSupported")]
+    public bool Supported { get; }
+    [Selector("generateTokenWithCompletionHandler:")]
+    public void GenerateTokenWithCompletionHandler(DCDeviceGenerateTokenWithCompletionHandlerCompletionBlock completion);
 }
 
 #endif

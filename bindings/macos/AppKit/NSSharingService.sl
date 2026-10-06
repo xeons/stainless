@@ -90,23 +90,39 @@ public objc closure void NSSharingServiceInitWithTitleImageAlternateImageHandler
 
 public extern objc class NSSharingService : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public NSSharingServiceDelegate? Delegate { get; set; }
-    [Selector("title")] public NSString Title { get; }
-    [Selector("image")] public NSImage Image { get; }
-    [Selector("alternateImage")] public NSImage? AlternateImage { get; }
-    [Selector("menuItemTitle", "setMenuItemTitle:")] public NSString? MenuItemTitle { get; set; }
-    [Selector("recipients", "setRecipients:")] public NSArray? Recipients { get; set; }
-    [Selector("subject", "setSubject:")] public NSString? Subject { get; set; }
-    [Selector("messageBody")] public NSString? MessageBody { get; }
-    [Selector("permanentLink")] public NSURL? PermanentLink { get; }
-    [Selector("accountName")] public NSString? AccountName { get; }
-    [Selector("attachmentFileURLs")] public NSArray? AttachmentFileURLs { get; }
+    [Selector("delegate", "setDelegate:")]
+    public NSSharingServiceDelegate? Delegate { get; set; }
+    [Selector("title")]
+    public NSString Title { get; }
+    [Selector("image")]
+    public NSImage Image { get; }
+    [Selector("alternateImage")]
+    public NSImage? AlternateImage { get; }
+    [Selector("menuItemTitle", "setMenuItemTitle:")]
+    public NSString? MenuItemTitle { get; set; }
+    [Selector("recipients", "setRecipients:")]
+    public NSArray? Recipients { get; set; }
+    [Selector("subject", "setSubject:")]
+    public NSString? Subject { get; set; }
+    [Selector("messageBody")]
+    public NSString? MessageBody { get; }
+    [Selector("permanentLink")]
+    public NSURL? PermanentLink { get; }
+    [Selector("accountName")]
+    public NSString? AccountName { get; }
+    [Selector("attachmentFileURLs")]
+    public NSArray? AttachmentFileURLs { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("sharingServicesForItems:")] public static NSArray SharingServicesForItems(NSArray items);
-    [Selector("sharingServiceNamed:")] public static NSSharingService? SharingServiceNamed(NSSharingServiceName serviceName);
-    [Selector("initWithTitle:image:alternateImage:handler:")] public Self InitWithTitleImageAlternateImageHandler(NSString title, NSImage image, NSImage? alternateImage, NSSharingServiceInitWithTitleImageAlternateImageHandlerBlock block);
-    [Selector("canPerformWithItems:")] public bool CanPerformWithItems(NSArray? items);
-    [Selector("performWithItems:")] public void PerformWithItems(NSArray items);
+    [Selector("sharingServicesForItems:")]
+    public static NSArray SharingServicesForItems(NSArray items);
+    [Selector("sharingServiceNamed:")]
+    public static NSSharingService? SharingServiceNamed(NSSharingServiceName serviceName);
+    [Selector("initWithTitle:image:alternateImage:handler:")]
+    public Self InitWithTitleImageAlternateImageHandler(NSString title, NSImage image, NSImage? alternateImage, NSSharingServiceInitWithTitleImageAlternateImageHandlerBlock block);
+    [Selector("canPerformWithItems:")]
+    public bool CanPerformWithItems(NSArray? items);
+    [Selector("performWithItems:")]
+    public void PerformWithItems(NSArray items);
 }
 
 public enum NSSharingContentScope : long
@@ -118,13 +134,27 @@ public enum NSSharingContentScope : long
 
 public objc interface NSSharingServiceDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("sharingService:willShareItems:")] void SharingServiceWillShareItems(NSSharingService sharingService, NSArray items);
-    [Optional] [Selector("sharingService:didFailToShareItems:error:")] void SharingServiceDidFailToShareItemsError(NSSharingService sharingService, NSArray items, NSError error);
-    [Optional] [Selector("sharingService:didShareItems:")] void SharingServiceDidShareItems(NSSharingService sharingService, NSArray items);
-    [Optional] [Selector("sharingService:sourceFrameOnScreenForShareItem:")] NSRect SharingServiceSourceFrameOnScreenForShareItem(NSSharingService sharingService, AnyObject item);
-    [Optional] [Selector("sharingService:transitionImageForShareItem:contentRect:")] NSImage? SharingServiceTransitionImageForShareItemContentRect(NSSharingService sharingService, AnyObject item, NSRect* contentRect);
-    [Optional] [Selector("sharingService:sourceWindowForShareItems:sharingContentScope:")] NSWindow? SharingServiceSourceWindowForShareItemsSharingContentScope(NSSharingService sharingService, NSArray items, NSSharingContentScope* sharingContentScope);
-    [Optional] [Selector("anchoringViewForSharingService:showRelativeToRect:preferredEdge:")] NSView? AnchoringViewForSharingServiceShowRelativeToRectPreferredEdge(NSSharingService sharingService, NSRect* positioningRect, NSRectEdge* preferredEdge);
+    [Optional]
+    [Selector("sharingService:willShareItems:")]
+    void SharingServiceWillShareItems(NSSharingService sharingService, NSArray items);
+    [Optional]
+    [Selector("sharingService:didFailToShareItems:error:")]
+    void SharingServiceDidFailToShareItemsError(NSSharingService sharingService, NSArray items, NSError error);
+    [Optional]
+    [Selector("sharingService:didShareItems:")]
+    void SharingServiceDidShareItems(NSSharingService sharingService, NSArray items);
+    [Optional]
+    [Selector("sharingService:sourceFrameOnScreenForShareItem:")]
+    NSRect SharingServiceSourceFrameOnScreenForShareItem(NSSharingService sharingService, AnyObject item);
+    [Optional]
+    [Selector("sharingService:transitionImageForShareItem:contentRect:")]
+    NSImage? SharingServiceTransitionImageForShareItemContentRect(NSSharingService sharingService, AnyObject item, NSRect* contentRect);
+    [Optional]
+    [Selector("sharingService:sourceWindowForShareItems:sharingContentScope:")]
+    NSWindow? SharingServiceSourceWindowForShareItemsSharingContentScope(NSSharingService sharingService, NSArray items, NSSharingContentScope* sharingContentScope);
+    [Optional]
+    [Selector("anchoringViewForSharingService:showRelativeToRect:preferredEdge:")]
+    NSView? AnchoringViewForSharingServiceShowRelativeToRectPreferredEdge(NSSharingService sharingService, NSRect* positioningRect, NSRectEdge* preferredEdge);
 }
 
 [Flags]
@@ -139,10 +169,18 @@ public enum NSCloudKitSharingServiceOptions : ulong
 
 public objc interface NSCloudSharingServiceDelegate : NSSharingServiceDelegate
 {
-    [Optional] [Selector("sharingService:didCompleteForItems:error:")] void SharingServiceDidCompleteForItemsError(NSSharingService sharingService, NSArray items, NSError? error);
-    [Optional] [Selector("optionsForSharingService:shareProvider:")] NSCloudKitSharingServiceOptions OptionsForSharingServiceShareProvider(NSSharingService cloudKitSharingService, NSItemProvider provider);
-    [Optional] [Selector("sharingService:didSaveShare:")] void SharingServiceDidSaveShare(NSSharingService sharingService, CKShare share);
-    [Optional] [Selector("sharingService:didStopSharing:")] void SharingServiceDidStopSharing(NSSharingService sharingService, CKShare share);
+    [Optional]
+    [Selector("sharingService:didCompleteForItems:error:")]
+    void SharingServiceDidCompleteForItemsError(NSSharingService sharingService, NSArray items, NSError? error);
+    [Optional]
+    [Selector("optionsForSharingService:shareProvider:")]
+    NSCloudKitSharingServiceOptions OptionsForSharingServiceShareProvider(NSSharingService cloudKitSharingService, NSItemProvider provider);
+    [Optional]
+    [Selector("sharingService:didSaveShare:")]
+    void SharingServiceDidSaveShare(NSSharingService sharingService, CKShare share);
+    [Optional]
+    [Selector("sharingService:didStopSharing:")]
+    void SharingServiceDidStopSharing(NSSharingService sharingService, CKShare share);
 }
 
 public objc closure void NSItemProviderRegisterCloudKitShareWithPreparationHandlerPreparationHandlerBlockArg0Block(CKShare? arg0, CKContainer? arg1, NSError? arg2);
@@ -152,25 +190,40 @@ public objc closure void NSItemProviderRegisterCloudKitShareWithPreparationHandl
 /// NSCloudKitSharing, a category of NSItemProvider.
 public extern objc class NSItemProvider
 {
-    [Selector("registerCloudKitShareWithPreparationHandler:")] public void RegisterCloudKitShareWithPreparationHandler(NSItemProviderRegisterCloudKitShareWithPreparationHandlerPreparationHandlerBlock preparationHandler);
-    [Selector("registerCloudKitShare:container:")] public void RegisterCloudKitShareContainer(CKShare share, CKContainer container);
+    [Selector("registerCloudKitShareWithPreparationHandler:")]
+    public void RegisterCloudKitShareWithPreparationHandler(NSItemProviderRegisterCloudKitShareWithPreparationHandlerPreparationHandlerBlock preparationHandler);
+    [Selector("registerCloudKitShare:container:")]
+    public void RegisterCloudKitShareContainer(CKShare share, CKContainer container);
 }
 
 public extern objc class NSSharingServicePicker : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public NSSharingServicePickerDelegate? Delegate { get; set; }
-    [Selector("standardShareMenuItem")] public NSMenuItem? StandardShareMenuItem { get; }
-    [Selector("initWithItems:")] public Self InitWithItems(NSArray items);
-    [Selector("showRelativeToRect:ofView:preferredEdge:")] public void ShowRelativeToRectOfViewPreferredEdge(NSRect rect, NSView view, NSRectEdge preferredEdge);
-    [Selector("close")] public void Close();
+    [Selector("delegate", "setDelegate:")]
+    public NSSharingServicePickerDelegate? Delegate { get; set; }
+    [Selector("standardShareMenuItem")]
+    public NSMenuItem? StandardShareMenuItem { get; }
+    [Selector("initWithItems:")]
+    public Self InitWithItems(NSArray items);
+    [Selector("showRelativeToRect:ofView:preferredEdge:")]
+    public void ShowRelativeToRectOfViewPreferredEdge(NSRect rect, NSView view, NSRectEdge preferredEdge);
+    [Selector("close")]
+    public void Close();
 }
 
 public objc interface NSSharingServicePickerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("sharingServicePicker:sharingServicesForItems:proposedSharingServices:")] NSArray SharingServicePickerSharingServicesForItemsProposedSharingServices(NSSharingServicePicker sharingServicePicker, NSArray items, NSArray proposedServices);
-    [Optional] [Selector("sharingServicePicker:delegateForSharingService:")] NSSharingServiceDelegate? SharingServicePickerDelegateForSharingService(NSSharingServicePicker sharingServicePicker, NSSharingService sharingService);
-    [Optional] [Selector("sharingServicePicker:didChooseSharingService:")] void SharingServicePickerDidChooseSharingService(NSSharingServicePicker sharingServicePicker, NSSharingService? service);
-    [Optional] [Selector("sharingServicePickerCollaborationModeRestrictions:")] NSArray? SharingServicePickerCollaborationModeRestrictions(NSSharingServicePicker sharingServicePicker);
+    [Optional]
+    [Selector("sharingServicePicker:sharingServicesForItems:proposedSharingServices:")]
+    NSArray SharingServicePickerSharingServicesForItemsProposedSharingServices(NSSharingServicePicker sharingServicePicker, NSArray items, NSArray proposedServices);
+    [Optional]
+    [Selector("sharingServicePicker:delegateForSharingService:")]
+    NSSharingServiceDelegate? SharingServicePickerDelegateForSharingService(NSSharingServicePicker sharingServicePicker, NSSharingService sharingService);
+    [Optional]
+    [Selector("sharingServicePicker:didChooseSharingService:")]
+    void SharingServicePickerDidChooseSharingService(NSSharingServicePicker sharingServicePicker, NSSharingService? service);
+    [Optional]
+    [Selector("sharingServicePickerCollaborationModeRestrictions:")]
+    NSArray? SharingServicePickerCollaborationModeRestrictions(NSSharingServicePicker sharingServicePicker);
 }
 
 #endif

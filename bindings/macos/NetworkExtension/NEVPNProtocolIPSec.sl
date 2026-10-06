@@ -39,11 +39,16 @@ public enum NEVPNIKEAuthenticationMethod : long
 
 public extern objc class NEVPNProtocolIPSec : NEVPNProtocol
 {
-    [Selector("authenticationMethod", "setAuthenticationMethod:")] public NEVPNIKEAuthenticationMethod AuthenticationMethod { get; set; }
-    [Selector("useExtendedAuthentication", "setUseExtendedAuthentication:")] public bool UseExtendedAuthentication { get; set; }
-    [Selector("sharedSecretReference", "setSharedSecretReference:")] public NSData? SharedSecretReference { get; set; }
-    [Selector("localIdentifier", "setLocalIdentifier:")] public NSString? LocalIdentifier { get; set; }
-    [Selector("remoteIdentifier", "setRemoteIdentifier:")] public NSString? RemoteIdentifier { get; set; }
+    [Selector("authenticationMethod", "setAuthenticationMethod:")]
+    public NEVPNIKEAuthenticationMethod AuthenticationMethod { get; set; }
+    [Selector("useExtendedAuthentication", "setUseExtendedAuthentication:")]
+    public bool UseExtendedAuthentication { get; set; }
+    [Selector("sharedSecretReference", "setSharedSecretReference:")]
+    public NSData? SharedSecretReference { get; set; }
+    [Selector("localIdentifier", "setLocalIdentifier:")]
+    public NSString? LocalIdentifier { get; set; }
+    [Selector("remoteIdentifier", "setRemoteIdentifier:")]
+    public NSString? RemoteIdentifier { get; set; }
 }
 
 #endif

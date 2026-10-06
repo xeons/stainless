@@ -36,17 +36,22 @@ import Standard.ObjC;
 
 public extern objc class MAFlashingLightsProcessorResult : NSObject
 {
-    [Selector("surfaceProcessed")] public bool SurfaceProcessed { get; }
-    [Selector("mitigationLevel")] public float MitigationLevel { get; }
-    [Selector("intensityLevel")] public float IntensityLevel { get; }
+    [Selector("surfaceProcessed")]
+    public bool SurfaceProcessed { get; }
+    [Selector("mitigationLevel")]
+    public float MitigationLevel { get; }
+    [Selector("intensityLevel")]
+    public float IntensityLevel { get; }
 }
 
 public using MAFlashingLightsProcessorOptionKey = NSString;
 
 public extern objc class MAFlashingLightsProcessor : NSObject
 {
-    [Selector("canProcessSurface:")] public bool CanProcessSurface(IOSurfaceRef surface);
-    [Selector("processSurface:outSurface:timestamp:options:")] public MAFlashingLightsProcessorResult ProcessSurfaceOutSurfaceTimestampOptions(IOSurfaceRef inSurface, IOSurfaceRef outSurface, CFAbsoluteTime timestamp, NSDictionary? options);
+    [Selector("canProcessSurface:")]
+    public bool CanProcessSurface(IOSurfaceRef surface);
+    [Selector("processSurface:outSurface:timestamp:options:")]
+    public MAFlashingLightsProcessorResult ProcessSurfaceOutSurfaceTimestampOptions(IOSurfaceRef inSurface, IOSurfaceRef outSurface, CFAbsoluteTime timestamp, NSDictionary? options);
 }
 
 #endif

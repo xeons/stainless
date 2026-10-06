@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class EKObject : NSObject
 {
-    [Selector("hasChanges")] public bool HasChanges { get; }
-    [Selector("isNew")] public bool New { get; }
-    [Selector("reset")] public void Reset();
-    [Selector("rollback")] public void Rollback();
-    [Selector("refresh")] public bool Refresh();
+    [Selector("hasChanges")]
+    public bool HasChanges { get; }
+    [Selector("isNew")]
+    public bool New { get; }
+    [Selector("reset")]
+    public void Reset();
+    [Selector("rollback")]
+    public void Rollback();
+    [Selector("refresh")]
+    public bool Refresh();
 }
 
 #endif

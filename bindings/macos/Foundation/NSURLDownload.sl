@@ -32,34 +32,70 @@ import Standard.ObjC;
 
 public extern objc class NSURLDownload : NSObject
 {
-    [Selector("request")] public NSURLRequest Request { get; }
-    [Selector("resumeData")] public NSData? ResumeData { get; }
-    [Selector("deletesFileUponFailure", "setDeletesFileUponFailure:")] public bool DeletesFileUponFailure { get; set; }
-    [Selector("canResumeDownloadDecodedWithEncodingMIMEType:")] public static bool CanResumeDownloadDecodedWithEncodingMIMEType(NSString MIMEType);
+    [Selector("request")]
+    public NSURLRequest Request { get; }
+    [Selector("resumeData")]
+    public NSData? ResumeData { get; }
+    [Selector("deletesFileUponFailure", "setDeletesFileUponFailure:")]
+    public bool DeletesFileUponFailure { get; set; }
+    [Selector("canResumeDownloadDecodedWithEncodingMIMEType:")]
+    public static bool CanResumeDownloadDecodedWithEncodingMIMEType(NSString MIMEType);
     /// Deprecated in macOS 10.11.
-    [Selector("initWithRequest:delegate:")] public Self InitWithRequestDelegate(NSURLRequest request, NSURLDownloadDelegate? @delegate);
+    [Selector("initWithRequest:delegate:")]
+    public Self InitWithRequestDelegate(NSURLRequest request, NSURLDownloadDelegate? @delegate);
     /// Deprecated in macOS 10.11.
-    [Selector("initWithResumeData:delegate:path:")] public Self InitWithResumeDataDelegatePath(NSData resumeData, NSURLDownloadDelegate? @delegate, NSString path);
-    [Selector("cancel")] public void Cancel();
-    [Selector("setDestination:allowOverwrite:")] public void SetDestinationAllowOverwrite(NSString path, bool allowOverwrite);
+    [Selector("initWithResumeData:delegate:path:")]
+    public Self InitWithResumeDataDelegatePath(NSData resumeData, NSURLDownloadDelegate? @delegate, NSString path);
+    [Selector("cancel")]
+    public void Cancel();
+    [Selector("setDestination:allowOverwrite:")]
+    public void SetDestinationAllowOverwrite(NSString path, bool allowOverwrite);
 }
 
 public objc interface NSURLDownloadDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("downloadDidBegin:")] void DownloadDidBegin(NSURLDownload download);
-    [Optional] [Selector("download:willSendRequest:redirectResponse:")] NSURLRequest? DownloadWillSendRequestRedirectResponse(NSURLDownload download, NSURLRequest request, NSURLResponse? redirectResponse);
-    [Optional] [Selector("download:canAuthenticateAgainstProtectionSpace:")] bool DownloadCanAuthenticateAgainstProtectionSpace(NSURLDownload connection, NSURLProtectionSpace protectionSpace);
-    [Optional] [Selector("download:didReceiveAuthenticationChallenge:")] void DownloadDidReceiveAuthenticationChallenge(NSURLDownload download, NSURLAuthenticationChallenge challenge);
-    [Optional] [Selector("download:didCancelAuthenticationChallenge:")] void DownloadDidCancelAuthenticationChallenge(NSURLDownload download, NSURLAuthenticationChallenge challenge);
-    [Optional] [Selector("downloadShouldUseCredentialStorage:")] bool DownloadShouldUseCredentialStorage(NSURLDownload download);
-    [Optional] [Selector("download:didReceiveResponse:")] void DownloadDidReceiveResponse(NSURLDownload download, NSURLResponse response);
-    [Optional] [Selector("download:willResumeWithResponse:fromByte:")] void DownloadWillResumeWithResponseFromByte(NSURLDownload download, NSURLResponse response, long startingByte);
-    [Optional] [Selector("download:didReceiveDataOfLength:")] void DownloadDidReceiveDataOfLength(NSURLDownload download, NSUInteger length);
-    [Optional] [Selector("download:shouldDecodeSourceDataOfMIMEType:")] bool DownloadShouldDecodeSourceDataOfMIMEType(NSURLDownload download, NSString encodingType);
-    [Optional] [Selector("download:decideDestinationWithSuggestedFilename:")] void DownloadDecideDestinationWithSuggestedFilename(NSURLDownload download, NSString filename);
-    [Optional] [Selector("download:didCreateDestination:")] void DownloadDidCreateDestination(NSURLDownload download, NSString path);
-    [Optional] [Selector("downloadDidFinish:")] void DownloadDidFinish(NSURLDownload download);
-    [Optional] [Selector("download:didFailWithError:")] void DownloadDidFailWithError(NSURLDownload download, NSError error);
+    [Optional]
+    [Selector("downloadDidBegin:")]
+    void DownloadDidBegin(NSURLDownload download);
+    [Optional]
+    [Selector("download:willSendRequest:redirectResponse:")]
+    NSURLRequest? DownloadWillSendRequestRedirectResponse(NSURLDownload download, NSURLRequest request, NSURLResponse? redirectResponse);
+    [Optional]
+    [Selector("download:canAuthenticateAgainstProtectionSpace:")]
+    bool DownloadCanAuthenticateAgainstProtectionSpace(NSURLDownload connection, NSURLProtectionSpace protectionSpace);
+    [Optional]
+    [Selector("download:didReceiveAuthenticationChallenge:")]
+    void DownloadDidReceiveAuthenticationChallenge(NSURLDownload download, NSURLAuthenticationChallenge challenge);
+    [Optional]
+    [Selector("download:didCancelAuthenticationChallenge:")]
+    void DownloadDidCancelAuthenticationChallenge(NSURLDownload download, NSURLAuthenticationChallenge challenge);
+    [Optional]
+    [Selector("downloadShouldUseCredentialStorage:")]
+    bool DownloadShouldUseCredentialStorage(NSURLDownload download);
+    [Optional]
+    [Selector("download:didReceiveResponse:")]
+    void DownloadDidReceiveResponse(NSURLDownload download, NSURLResponse response);
+    [Optional]
+    [Selector("download:willResumeWithResponse:fromByte:")]
+    void DownloadWillResumeWithResponseFromByte(NSURLDownload download, NSURLResponse response, long startingByte);
+    [Optional]
+    [Selector("download:didReceiveDataOfLength:")]
+    void DownloadDidReceiveDataOfLength(NSURLDownload download, NSUInteger length);
+    [Optional]
+    [Selector("download:shouldDecodeSourceDataOfMIMEType:")]
+    bool DownloadShouldDecodeSourceDataOfMIMEType(NSURLDownload download, NSString encodingType);
+    [Optional]
+    [Selector("download:decideDestinationWithSuggestedFilename:")]
+    void DownloadDecideDestinationWithSuggestedFilename(NSURLDownload download, NSString filename);
+    [Optional]
+    [Selector("download:didCreateDestination:")]
+    void DownloadDidCreateDestination(NSURLDownload download, NSString path);
+    [Optional]
+    [Selector("downloadDidFinish:")]
+    void DownloadDidFinish(NSURLDownload download);
+    [Optional]
+    [Selector("download:didFailWithError:")]
+    void DownloadDidFailWithError(NSURLDownload download, NSError error);
 }
 
 #endif

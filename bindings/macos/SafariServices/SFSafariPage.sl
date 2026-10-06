@@ -40,11 +40,16 @@ public objc closure void SFSafariPageGetScreenshotOfVisibleAreaWithCompletionHan
 
 public extern objc class SFSafariPage : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("dispatchMessageToScriptWithName:userInfo:")] public void DispatchMessageToScriptWithNameUserInfo(NSString messageName, NSDictionary? userInfo);
-    [Selector("reload")] public void Reload();
-    [Selector("getPagePropertiesWithCompletionHandler:")] public void GetPagePropertiesWithCompletionHandler(SFSafariPageGetPagePropertiesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getContainingTabWithCompletionHandler:")] public void GetContainingTabWithCompletionHandler(SFSafariPageGetContainingTabWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getScreenshotOfVisibleAreaWithCompletionHandler:")] public void GetScreenshotOfVisibleAreaWithCompletionHandler(SFSafariPageGetScreenshotOfVisibleAreaWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("dispatchMessageToScriptWithName:userInfo:")]
+    public void DispatchMessageToScriptWithNameUserInfo(NSString messageName, NSDictionary? userInfo);
+    [Selector("reload")]
+    public void Reload();
+    [Selector("getPagePropertiesWithCompletionHandler:")]
+    public void GetPagePropertiesWithCompletionHandler(SFSafariPageGetPagePropertiesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getContainingTabWithCompletionHandler:")]
+    public void GetContainingTabWithCompletionHandler(SFSafariPageGetContainingTabWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getScreenshotOfVisibleAreaWithCompletionHandler:")]
+    public void GetScreenshotOfVisibleAreaWithCompletionHandler(SFSafariPageGetScreenshotOfVisibleAreaWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

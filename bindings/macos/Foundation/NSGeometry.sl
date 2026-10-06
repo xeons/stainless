@@ -151,36 +151,56 @@ public extern "C" NSRect NSRectFromString(NSString aString);
 /// NSValueGeometryExtensions, a category of NSValue.
 public extern objc class NSValue
 {
-    [Selector("pointValue")] public NSPoint PointValue { get; }
-    [Selector("sizeValue")] public NSSize SizeValue { get; }
-    [Selector("rectValue")] public NSRect RectValue { get; }
-    [Selector("edgeInsetsValue")] public NSEdgeInsets EdgeInsetsValue { get; }
-    [Selector("valueWithPoint:")] public static NSValue ValueWithPoint(NSPoint point);
-    [Selector("valueWithSize:")] public static NSValue ValueWithSize(NSSize size);
-    [Selector("valueWithRect:")] public static NSValue ValueWithRect(NSRect rect);
-    [Selector("valueWithEdgeInsets:")] public static NSValue ValueWithEdgeInsets(NSEdgeInsets insets);
+    [Selector("pointValue")]
+    public NSPoint PointValue { get; }
+    [Selector("sizeValue")]
+    public NSSize SizeValue { get; }
+    [Selector("rectValue")]
+    public NSRect RectValue { get; }
+    [Selector("edgeInsetsValue")]
+    public NSEdgeInsets EdgeInsetsValue { get; }
+    [Selector("valueWithPoint:")]
+    public static NSValue ValueWithPoint(NSPoint point);
+    [Selector("valueWithSize:")]
+    public static NSValue ValueWithSize(NSSize size);
+    [Selector("valueWithRect:")]
+    public static NSValue ValueWithRect(NSRect rect);
+    [Selector("valueWithEdgeInsets:")]
+    public static NSValue ValueWithEdgeInsets(NSEdgeInsets insets);
 }
 
 /// NSGeometryCoding, a category of NSCoder.
 public extern objc class NSCoder
 {
-    [Selector("encodePoint:")] public void EncodePoint(NSPoint point);
-    [Selector("decodePoint")] public NSPoint DecodePoint();
-    [Selector("encodeSize:")] public void EncodeSize(NSSize size);
-    [Selector("decodeSize")] public NSSize DecodeSize();
-    [Selector("encodeRect:")] public void EncodeRect(NSRect rect);
-    [Selector("decodeRect")] public NSRect DecodeRect();
+    [Selector("encodePoint:")]
+    public void EncodePoint(NSPoint point);
+    [Selector("decodePoint")]
+    public NSPoint DecodePoint();
+    [Selector("encodeSize:")]
+    public void EncodeSize(NSSize size);
+    [Selector("decodeSize")]
+    public NSSize DecodeSize();
+    [Selector("encodeRect:")]
+    public void EncodeRect(NSRect rect);
+    [Selector("decodeRect")]
+    public NSRect DecodeRect();
 }
 
 /// NSGeometryKeyedCoding, a category of NSCoder.
 public extern objc class NSCoder
 {
-    [Selector("encodePoint:forKey:")] public void EncodePointForKey(NSPoint point, NSString key);
-    [Selector("encodeSize:forKey:")] public void EncodeSizeForKey(NSSize size, NSString key);
-    [Selector("encodeRect:forKey:")] public void EncodeRectForKey(NSRect rect, NSString key);
-    [Selector("decodePointForKey:")] public NSPoint DecodePointForKey(NSString key);
-    [Selector("decodeSizeForKey:")] public NSSize DecodeSizeForKey(NSString key);
-    [Selector("decodeRectForKey:")] public NSRect DecodeRectForKey(NSString key);
+    [Selector("encodePoint:forKey:")]
+    public void EncodePointForKey(NSPoint point, NSString key);
+    [Selector("encodeSize:forKey:")]
+    public void EncodeSizeForKey(NSSize size, NSString key);
+    [Selector("encodeRect:forKey:")]
+    public void EncodeRectForKey(NSRect rect, NSString key);
+    [Selector("decodePointForKey:")]
+    public NSPoint DecodePointForKey(NSString key);
+    [Selector("decodeSizeForKey:")]
+    public NSSize DecodeSizeForKey(NSString key);
+    [Selector("decodeRectForKey:")]
+    public NSRect DecodeRectForKey(NSString key);
 }
 
 public const int NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES = 1;

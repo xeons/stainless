@@ -61,7 +61,8 @@ public enum NSControlCharacterAction : long
 
 public objc interface NSTextLayoutOrientationProvider
 {
-    [Selector("layoutOrientation")] NSTextLayoutOrientation LayoutOrientation { get; }
+    [Selector("layoutOrientation")]
+    NSTextLayoutOrientation LayoutOrientation { get; }
 }
 
 public enum NSTypesetterBehavior : long
@@ -80,139 +81,276 @@ public objc closure void NSLayoutManagerEnumerateEnclosingRectsForGlyphRangeWith
 
 public extern objc class NSLayoutManager : NSObject, NSSecureCoding
 {
-    [Selector("textStorage", "setTextStorage:")] public NSTextStorage? TextStorage { get; set; }
-    [Selector("textContainers")] public NSArray TextContainers { get; }
-    [Selector("delegate", "setDelegate:")] public NSLayoutManagerDelegate? Delegate { get; set; }
-    [Selector("showsInvisibleCharacters", "setShowsInvisibleCharacters:")] public bool ShowsInvisibleCharacters { get; set; }
-    [Selector("showsControlCharacters", "setShowsControlCharacters:")] public bool ShowsControlCharacters { get; set; }
-    [Selector("usesDefaultHyphenation", "setUsesDefaultHyphenation:")] public bool UsesDefaultHyphenation { get; set; }
-    [Selector("usesFontLeading", "setUsesFontLeading:")] public bool UsesFontLeading { get; set; }
-    [Selector("allowsNonContiguousLayout", "setAllowsNonContiguousLayout:")] public bool AllowsNonContiguousLayout { get; set; }
-    [Selector("hasNonContiguousLayout")] public bool HasNonContiguousLayout { get; }
-    [Selector("limitsLayoutForSuspiciousContents", "setLimitsLayoutForSuspiciousContents:")] public bool LimitsLayoutForSuspiciousContents { get; set; }
-    [Selector("backgroundLayoutEnabled", "setBackgroundLayoutEnabled:")] public bool BackgroundLayoutEnabled { get; set; }
-    [Selector("defaultAttachmentScaling", "setDefaultAttachmentScaling:")] public NSImageScaling DefaultAttachmentScaling { get; set; }
-    [Selector("typesetter", "setTypesetter:")] public NSTypesetter Typesetter { get; set; }
-    [Selector("typesetterBehavior", "setTypesetterBehavior:")] public NSTypesetterBehavior TypesetterBehavior { get; set; }
-    [Selector("numberOfGlyphs")] public NSUInteger NumberOfGlyphs { get; }
-    [Selector("extraLineFragmentRect")] public NSRect ExtraLineFragmentRect { get; }
-    [Selector("extraLineFragmentUsedRect")] public NSRect ExtraLineFragmentUsedRect { get; }
-    [Selector("extraLineFragmentTextContainer")] public NSTextContainer? ExtraLineFragmentTextContainer { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("replaceTextStorage:")] public void ReplaceTextStorage(NSTextStorage newTextStorage);
-    [Selector("addTextContainer:")] public void AddTextContainer(NSTextContainer container);
-    [Selector("insertTextContainer:atIndex:")] public void InsertTextContainerAtIndex(NSTextContainer container, NSUInteger index);
-    [Selector("removeTextContainerAtIndex:")] public void RemoveTextContainerAtIndex(NSUInteger index);
-    [Selector("textContainerChangedGeometry:")] public void TextContainerChangedGeometry(NSTextContainer container);
-    [Selector("textContainerChangedTextView:")] public void TextContainerChangedTextView(NSTextContainer container);
-    [Selector("invalidateGlyphsForCharacterRange:changeInLength:actualCharacterRange:")] public void InvalidateGlyphsForCharacterRangeChangeInLengthActualCharacterRange(NSRange charRange, NSInteger delta, NSRangePointer actualCharRange);
-    [Selector("invalidateLayoutForCharacterRange:actualCharacterRange:")] public void InvalidateLayoutForCharacterRangeActualCharacterRange(NSRange charRange, NSRangePointer actualCharRange);
-    [Selector("invalidateDisplayForCharacterRange:")] public void InvalidateDisplayForCharacterRange(NSRange charRange);
-    [Selector("invalidateDisplayForGlyphRange:")] public void InvalidateDisplayForGlyphRange(NSRange glyphRange);
-    [Selector("processEditingForTextStorage:edited:range:changeInLength:invalidatedRange:")] public void ProcessEditingForTextStorageEditedRangeChangeInLengthInvalidatedRange(NSTextStorage textStorage, NSTextStorageEditActions editMask, NSRange newCharRange, NSInteger delta, NSRange invalidatedCharRange);
-    [Selector("ensureGlyphsForCharacterRange:")] public void EnsureGlyphsForCharacterRange(NSRange charRange);
-    [Selector("ensureGlyphsForGlyphRange:")] public void EnsureGlyphsForGlyphRange(NSRange glyphRange);
-    [Selector("ensureLayoutForCharacterRange:")] public void EnsureLayoutForCharacterRange(NSRange charRange);
-    [Selector("ensureLayoutForGlyphRange:")] public void EnsureLayoutForGlyphRange(NSRange glyphRange);
-    [Selector("ensureLayoutForTextContainer:")] public void EnsureLayoutForTextContainer(NSTextContainer container);
-    [Selector("ensureLayoutForBoundingRect:inTextContainer:")] public void EnsureLayoutForBoundingRectInTextContainer(NSRect bounds, NSTextContainer container);
-    [Selector("setGlyphs:properties:characterIndexes:font:forGlyphRange:")] public void SetGlyphsPropertiesCharacterIndexesFontForGlyphRange(CGGlyph* glyphs, NSGlyphProperty* props, NSUInteger* charIndexes, NSFont aFont, NSRange glyphRange);
-    [Selector("CGGlyphAtIndex:isValidIndex:")] public CGGlyph CGGlyphAtIndexIsValidIndex(NSUInteger glyphIndex, bool* isValidIndex);
-    [Selector("CGGlyphAtIndex:")] public CGGlyph CGGlyphAtIndex(NSUInteger glyphIndex);
-    [Selector("isValidGlyphIndex:")] public bool IsValidGlyphIndex(NSUInteger glyphIndex);
-    [Selector("propertyForGlyphAtIndex:")] public NSGlyphProperty PropertyForGlyphAtIndex(NSUInteger glyphIndex);
-    [Selector("characterIndexForGlyphAtIndex:")] public NSUInteger CharacterIndexForGlyphAtIndex(NSUInteger glyphIndex);
-    [Selector("glyphIndexForCharacterAtIndex:")] public NSUInteger GlyphIndexForCharacterAtIndex(NSUInteger charIndex);
-    [Selector("getGlyphsInRange:glyphs:properties:characterIndexes:bidiLevels:")] public NSUInteger GetGlyphsInRangeGlyphsPropertiesCharacterIndexesBidiLevels(NSRange glyphRange, CGGlyph* glyphBuffer, NSGlyphProperty* props, NSUInteger* charIndexBuffer, byte* bidiLevelBuffer);
-    [Selector("setTextContainer:forGlyphRange:")] public void SetTextContainerForGlyphRange(NSTextContainer container, NSRange glyphRange);
-    [Selector("setLineFragmentRect:forGlyphRange:usedRect:")] public void SetLineFragmentRectForGlyphRangeUsedRect(NSRect fragmentRect, NSRange glyphRange, NSRect usedRect);
-    [Selector("setExtraLineFragmentRect:usedRect:textContainer:")] public void SetExtraLineFragmentRectUsedRectTextContainer(NSRect fragmentRect, NSRect usedRect, NSTextContainer container);
-    [Selector("setLocation:forStartOfGlyphRange:")] public void SetLocationForStartOfGlyphRange(NSPoint location, NSRange glyphRange);
-    [Selector("setNotShownAttribute:forGlyphAtIndex:")] public void SetNotShownAttributeForGlyphAtIndex(bool flag, NSUInteger glyphIndex);
-    [Selector("setDrawsOutsideLineFragment:forGlyphAtIndex:")] public void SetDrawsOutsideLineFragmentForGlyphAtIndex(bool flag, NSUInteger glyphIndex);
-    [Selector("setAttachmentSize:forGlyphRange:")] public void SetAttachmentSizeForGlyphRange(NSSize attachmentSize, NSRange glyphRange);
-    [Selector("getFirstUnlaidCharacterIndex:glyphIndex:")] public void GetFirstUnlaidCharacterIndexGlyphIndex(NSUInteger* charIndex, NSUInteger* glyphIndex);
-    [Selector("firstUnlaidCharacterIndex")] public NSUInteger FirstUnlaidCharacterIndex();
-    [Selector("firstUnlaidGlyphIndex")] public NSUInteger FirstUnlaidGlyphIndex();
-    [Selector("textContainerForGlyphAtIndex:effectiveRange:")] public NSTextContainer? TextContainerForGlyphAtIndexEffectiveRange(NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange);
-    [Selector("textContainerForGlyphAtIndex:effectiveRange:withoutAdditionalLayout:")] public NSTextContainer? TextContainerForGlyphAtIndexEffectiveRangeWithoutAdditionalLayout(NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange, bool flag);
-    [Selector("usedRectForTextContainer:")] public NSRect UsedRectForTextContainer(NSTextContainer container);
-    [Selector("lineFragmentRectForGlyphAtIndex:effectiveRange:")] public NSRect LineFragmentRectForGlyphAtIndexEffectiveRange(NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange);
-    [Selector("lineFragmentRectForGlyphAtIndex:effectiveRange:withoutAdditionalLayout:")] public NSRect LineFragmentRectForGlyphAtIndexEffectiveRangeWithoutAdditionalLayout(NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange, bool flag);
-    [Selector("lineFragmentUsedRectForGlyphAtIndex:effectiveRange:")] public NSRect LineFragmentUsedRectForGlyphAtIndexEffectiveRange(NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange);
-    [Selector("lineFragmentUsedRectForGlyphAtIndex:effectiveRange:withoutAdditionalLayout:")] public NSRect LineFragmentUsedRectForGlyphAtIndexEffectiveRangeWithoutAdditionalLayout(NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange, bool flag);
-    [Selector("locationForGlyphAtIndex:")] public NSPoint LocationForGlyphAtIndex(NSUInteger glyphIndex);
-    [Selector("notShownAttributeForGlyphAtIndex:")] public bool NotShownAttributeForGlyphAtIndex(NSUInteger glyphIndex);
-    [Selector("drawsOutsideLineFragmentForGlyphAtIndex:")] public bool DrawsOutsideLineFragmentForGlyphAtIndex(NSUInteger glyphIndex);
-    [Selector("attachmentSizeForGlyphAtIndex:")] public NSSize AttachmentSizeForGlyphAtIndex(NSUInteger glyphIndex);
-    [Selector("truncatedGlyphRangeInLineFragmentForGlyphAtIndex:")] public NSRange TruncatedGlyphRangeInLineFragmentForGlyphAtIndex(NSUInteger glyphIndex);
-    [Selector("glyphRangeForCharacterRange:actualCharacterRange:")] public NSRange GlyphRangeForCharacterRangeActualCharacterRange(NSRange charRange, NSRangePointer actualCharRange);
-    [Selector("characterRangeForGlyphRange:actualGlyphRange:")] public NSRange CharacterRangeForGlyphRangeActualGlyphRange(NSRange glyphRange, NSRangePointer actualGlyphRange);
-    [Selector("glyphRangeForTextContainer:")] public NSRange GlyphRangeForTextContainer(NSTextContainer container);
-    [Selector("rangeOfNominallySpacedGlyphsContainingIndex:")] public NSRange RangeOfNominallySpacedGlyphsContainingIndex(NSUInteger glyphIndex);
-    [Selector("boundingRectForGlyphRange:inTextContainer:")] public NSRect BoundingRectForGlyphRangeInTextContainer(NSRange glyphRange, NSTextContainer container);
-    [Selector("glyphRangeForBoundingRect:inTextContainer:")] public NSRange GlyphRangeForBoundingRectInTextContainer(NSRect bounds, NSTextContainer container);
-    [Selector("glyphRangeForBoundingRectWithoutAdditionalLayout:inTextContainer:")] public NSRange GlyphRangeForBoundingRectWithoutAdditionalLayoutInTextContainer(NSRect bounds, NSTextContainer container);
-    [Selector("glyphIndexForPoint:inTextContainer:fractionOfDistanceThroughGlyph:")] public NSUInteger GlyphIndexForPointInTextContainerFractionOfDistanceThroughGlyph(NSPoint point, NSTextContainer container, CGFloat* partialFraction);
-    [Selector("glyphIndexForPoint:inTextContainer:")] public NSUInteger GlyphIndexForPointInTextContainer(NSPoint point, NSTextContainer container);
-    [Selector("fractionOfDistanceThroughGlyphForPoint:inTextContainer:")] public CGFloat FractionOfDistanceThroughGlyphForPointInTextContainer(NSPoint point, NSTextContainer container);
-    [Selector("characterIndexForPoint:inTextContainer:fractionOfDistanceBetweenInsertionPoints:")] public NSUInteger CharacterIndexForPointInTextContainerFractionOfDistanceBetweenInsertionPoints(NSPoint point, NSTextContainer container, CGFloat* partialFraction);
-    [Selector("getLineFragmentInsertionPointsForCharacterAtIndex:alternatePositions:inDisplayOrder:positions:characterIndexes:")] public NSUInteger GetLineFragmentInsertionPointsForCharacterAtIndexAlternatePositionsInDisplayOrderPositionsCharacterIndexes(NSUInteger charIndex, bool aFlag, bool dFlag, CGFloat* positions, NSUInteger* charIndexes);
-    [Selector("enumerateLineFragmentsForGlyphRange:usingBlock:")] public void EnumerateLineFragmentsForGlyphRangeUsingBlock(NSRange glyphRange, NSLayoutManagerEnumerateLineFragmentsForGlyphRangeUsingBlockBlock block);
-    [Selector("enumerateEnclosingRectsForGlyphRange:withinSelectedGlyphRange:inTextContainer:usingBlock:")] public void EnumerateEnclosingRectsForGlyphRangeWithinSelectedGlyphRangeInTextContainerUsingBlock(NSRange glyphRange, NSRange selectedRange, NSTextContainer textContainer, NSLayoutManagerEnumerateEnclosingRectsForGlyphRangeWithinSelectedGlyphRangeInTextContainerUsingBlockBlock block);
-    [Selector("drawBackgroundForGlyphRange:atPoint:")] public void DrawBackgroundForGlyphRangeAtPoint(NSRange glyphsToShow, NSPoint origin);
-    [Selector("drawGlyphsForGlyphRange:atPoint:")] public void DrawGlyphsForGlyphRangeAtPoint(NSRange glyphsToShow, NSPoint origin);
-    [Selector("showCGGlyphs:positions:count:font:textMatrix:attributes:inContext:")] public void ShowCGGlyphsPositionsCountFontTextMatrixAttributesInContext(CGGlyph* glyphs, CGPoint* positions, NSInteger glyphCount, NSFont font, CGAffineTransform textMatrix, NSDictionary attributes, CGContextRef CGContext);
-    [Selector("fillBackgroundRectArray:count:forCharacterRange:color:")] public void FillBackgroundRectArrayCountForCharacterRangeColor(NSRect* rectArray, NSUInteger rectCount, NSRange charRange, NSColor color);
-    [Selector("drawUnderlineForGlyphRange:underlineType:baselineOffset:lineFragmentRect:lineFragmentGlyphRange:containerOrigin:")] public void DrawUnderlineForGlyphRangeUnderlineTypeBaselineOffsetLineFragmentRectLineFragmentGlyphRangeContainerOrigin(NSRange glyphRange, NSUnderlineStyle underlineVal, CGFloat baselineOffset, NSRect lineRect, NSRange lineGlyphRange, NSPoint containerOrigin);
-    [Selector("underlineGlyphRange:underlineType:lineFragmentRect:lineFragmentGlyphRange:containerOrigin:")] public void UnderlineGlyphRangeUnderlineTypeLineFragmentRectLineFragmentGlyphRangeContainerOrigin(NSRange glyphRange, NSUnderlineStyle underlineVal, NSRect lineRect, NSRange lineGlyphRange, NSPoint containerOrigin);
-    [Selector("drawStrikethroughForGlyphRange:strikethroughType:baselineOffset:lineFragmentRect:lineFragmentGlyphRange:containerOrigin:")] public void DrawStrikethroughForGlyphRangeStrikethroughTypeBaselineOffsetLineFragmentRectLineFragmentGlyphRangeContainerOrigin(NSRange glyphRange, NSUnderlineStyle strikethroughVal, CGFloat baselineOffset, NSRect lineRect, NSRange lineGlyphRange, NSPoint containerOrigin);
-    [Selector("strikethroughGlyphRange:strikethroughType:lineFragmentRect:lineFragmentGlyphRange:containerOrigin:")] public void StrikethroughGlyphRangeStrikethroughTypeLineFragmentRectLineFragmentGlyphRangeContainerOrigin(NSRange glyphRange, NSUnderlineStyle strikethroughVal, NSRect lineRect, NSRange lineGlyphRange, NSPoint containerOrigin);
-    [Selector("showAttachmentCell:inRect:characterIndex:")] public void ShowAttachmentCellInRectCharacterIndex(NSCell cell, NSRect rect, NSUInteger attachmentIndex);
-    [Selector("setLayoutRect:forTextBlock:glyphRange:")] public void SetLayoutRectForTextBlockGlyphRange(NSRect rect, NSTextBlock block, NSRange glyphRange);
-    [Selector("setBoundsRect:forTextBlock:glyphRange:")] public void SetBoundsRectForTextBlockGlyphRange(NSRect rect, NSTextBlock block, NSRange glyphRange);
-    [Selector("layoutRectForTextBlock:glyphRange:")] public NSRect LayoutRectForTextBlockGlyphRange(NSTextBlock block, NSRange glyphRange);
-    [Selector("boundsRectForTextBlock:glyphRange:")] public NSRect BoundsRectForTextBlockGlyphRange(NSTextBlock block, NSRange glyphRange);
-    [Selector("layoutRectForTextBlock:atIndex:effectiveRange:")] public NSRect LayoutRectForTextBlockAtIndexEffectiveRange(NSTextBlock block, NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange);
-    [Selector("boundsRectForTextBlock:atIndex:effectiveRange:")] public NSRect BoundsRectForTextBlockAtIndexEffectiveRange(NSTextBlock block, NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange);
-    [Selector("temporaryAttributesAtCharacterIndex:effectiveRange:")] public NSDictionary TemporaryAttributesAtCharacterIndexEffectiveRange(NSUInteger charIndex, NSRangePointer effectiveCharRange);
-    [Selector("setTemporaryAttributes:forCharacterRange:")] public void SetTemporaryAttributesForCharacterRange(NSDictionary attrs, NSRange charRange);
-    [Selector("addTemporaryAttributes:forCharacterRange:")] public void AddTemporaryAttributesForCharacterRange(NSDictionary attrs, NSRange charRange);
-    [Selector("removeTemporaryAttribute:forCharacterRange:")] public void RemoveTemporaryAttributeForCharacterRange(NSAttributedStringKey attrName, NSRange charRange);
-    [Selector("temporaryAttribute:atCharacterIndex:effectiveRange:")] public AnyObject? TemporaryAttributeAtCharacterIndexEffectiveRange(NSAttributedStringKey attrName, NSUInteger location, NSRangePointer range);
-    [Selector("temporaryAttribute:atCharacterIndex:longestEffectiveRange:inRange:")] public AnyObject? TemporaryAttributeAtCharacterIndexLongestEffectiveRangeInRange(NSAttributedStringKey attrName, NSUInteger location, NSRangePointer range, NSRange rangeLimit);
-    [Selector("temporaryAttributesAtCharacterIndex:longestEffectiveRange:inRange:")] public NSDictionary TemporaryAttributesAtCharacterIndexLongestEffectiveRangeInRange(NSUInteger location, NSRangePointer range, NSRange rangeLimit);
-    [Selector("addTemporaryAttribute:value:forCharacterRange:")] public void AddTemporaryAttributeValueForCharacterRange(NSAttributedStringKey attrName, AnyObject value, NSRange charRange);
-    [Selector("defaultLineHeightForFont:")] public CGFloat DefaultLineHeightForFont(NSFont theFont);
-    [Selector("defaultBaselineOffsetForFont:")] public CGFloat DefaultBaselineOffsetForFont(NSFont theFont);
+    [Selector("textStorage", "setTextStorage:")]
+    public NSTextStorage? TextStorage { get; set; }
+    [Selector("textContainers")]
+    public NSArray TextContainers { get; }
+    [Selector("delegate", "setDelegate:")]
+    public NSLayoutManagerDelegate? Delegate { get; set; }
+    [Selector("showsInvisibleCharacters", "setShowsInvisibleCharacters:")]
+    public bool ShowsInvisibleCharacters { get; set; }
+    [Selector("showsControlCharacters", "setShowsControlCharacters:")]
+    public bool ShowsControlCharacters { get; set; }
+    [Selector("usesDefaultHyphenation", "setUsesDefaultHyphenation:")]
+    public bool UsesDefaultHyphenation { get; set; }
+    [Selector("usesFontLeading", "setUsesFontLeading:")]
+    public bool UsesFontLeading { get; set; }
+    [Selector("allowsNonContiguousLayout", "setAllowsNonContiguousLayout:")]
+    public bool AllowsNonContiguousLayout { get; set; }
+    [Selector("hasNonContiguousLayout")]
+    public bool HasNonContiguousLayout { get; }
+    [Selector("limitsLayoutForSuspiciousContents", "setLimitsLayoutForSuspiciousContents:")]
+    public bool LimitsLayoutForSuspiciousContents { get; set; }
+    [Selector("backgroundLayoutEnabled", "setBackgroundLayoutEnabled:")]
+    public bool BackgroundLayoutEnabled { get; set; }
+    [Selector("defaultAttachmentScaling", "setDefaultAttachmentScaling:")]
+    public NSImageScaling DefaultAttachmentScaling { get; set; }
+    [Selector("typesetter", "setTypesetter:")]
+    public NSTypesetter Typesetter { get; set; }
+    [Selector("typesetterBehavior", "setTypesetterBehavior:")]
+    public NSTypesetterBehavior TypesetterBehavior { get; set; }
+    [Selector("numberOfGlyphs")]
+    public NSUInteger NumberOfGlyphs { get; }
+    [Selector("extraLineFragmentRect")]
+    public NSRect ExtraLineFragmentRect { get; }
+    [Selector("extraLineFragmentUsedRect")]
+    public NSRect ExtraLineFragmentUsedRect { get; }
+    [Selector("extraLineFragmentTextContainer")]
+    public NSTextContainer? ExtraLineFragmentTextContainer { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("replaceTextStorage:")]
+    public void ReplaceTextStorage(NSTextStorage newTextStorage);
+    [Selector("addTextContainer:")]
+    public void AddTextContainer(NSTextContainer container);
+    [Selector("insertTextContainer:atIndex:")]
+    public void InsertTextContainerAtIndex(NSTextContainer container, NSUInteger index);
+    [Selector("removeTextContainerAtIndex:")]
+    public void RemoveTextContainerAtIndex(NSUInteger index);
+    [Selector("textContainerChangedGeometry:")]
+    public void TextContainerChangedGeometry(NSTextContainer container);
+    [Selector("textContainerChangedTextView:")]
+    public void TextContainerChangedTextView(NSTextContainer container);
+    [Selector("invalidateGlyphsForCharacterRange:changeInLength:actualCharacterRange:")]
+    public void InvalidateGlyphsForCharacterRangeChangeInLengthActualCharacterRange(NSRange charRange, NSInteger delta, NSRangePointer actualCharRange);
+    [Selector("invalidateLayoutForCharacterRange:actualCharacterRange:")]
+    public void InvalidateLayoutForCharacterRangeActualCharacterRange(NSRange charRange, NSRangePointer actualCharRange);
+    [Selector("invalidateDisplayForCharacterRange:")]
+    public void InvalidateDisplayForCharacterRange(NSRange charRange);
+    [Selector("invalidateDisplayForGlyphRange:")]
+    public void InvalidateDisplayForGlyphRange(NSRange glyphRange);
+    [Selector("processEditingForTextStorage:edited:range:changeInLength:invalidatedRange:")]
+    public void ProcessEditingForTextStorageEditedRangeChangeInLengthInvalidatedRange(NSTextStorage textStorage, NSTextStorageEditActions editMask, NSRange newCharRange, NSInteger delta, NSRange invalidatedCharRange);
+    [Selector("ensureGlyphsForCharacterRange:")]
+    public void EnsureGlyphsForCharacterRange(NSRange charRange);
+    [Selector("ensureGlyphsForGlyphRange:")]
+    public void EnsureGlyphsForGlyphRange(NSRange glyphRange);
+    [Selector("ensureLayoutForCharacterRange:")]
+    public void EnsureLayoutForCharacterRange(NSRange charRange);
+    [Selector("ensureLayoutForGlyphRange:")]
+    public void EnsureLayoutForGlyphRange(NSRange glyphRange);
+    [Selector("ensureLayoutForTextContainer:")]
+    public void EnsureLayoutForTextContainer(NSTextContainer container);
+    [Selector("ensureLayoutForBoundingRect:inTextContainer:")]
+    public void EnsureLayoutForBoundingRectInTextContainer(NSRect bounds, NSTextContainer container);
+    [Selector("setGlyphs:properties:characterIndexes:font:forGlyphRange:")]
+    public void SetGlyphsPropertiesCharacterIndexesFontForGlyphRange(CGGlyph* glyphs, NSGlyphProperty* props, NSUInteger* charIndexes, NSFont aFont, NSRange glyphRange);
+    [Selector("CGGlyphAtIndex:isValidIndex:")]
+    public CGGlyph CGGlyphAtIndexIsValidIndex(NSUInteger glyphIndex, bool* isValidIndex);
+    [Selector("CGGlyphAtIndex:")]
+    public CGGlyph CGGlyphAtIndex(NSUInteger glyphIndex);
+    [Selector("isValidGlyphIndex:")]
+    public bool IsValidGlyphIndex(NSUInteger glyphIndex);
+    [Selector("propertyForGlyphAtIndex:")]
+    public NSGlyphProperty PropertyForGlyphAtIndex(NSUInteger glyphIndex);
+    [Selector("characterIndexForGlyphAtIndex:")]
+    public NSUInteger CharacterIndexForGlyphAtIndex(NSUInteger glyphIndex);
+    [Selector("glyphIndexForCharacterAtIndex:")]
+    public NSUInteger GlyphIndexForCharacterAtIndex(NSUInteger charIndex);
+    [Selector("getGlyphsInRange:glyphs:properties:characterIndexes:bidiLevels:")]
+    public NSUInteger GetGlyphsInRangeGlyphsPropertiesCharacterIndexesBidiLevels(NSRange glyphRange, CGGlyph* glyphBuffer, NSGlyphProperty* props, NSUInteger* charIndexBuffer, byte* bidiLevelBuffer);
+    [Selector("setTextContainer:forGlyphRange:")]
+    public void SetTextContainerForGlyphRange(NSTextContainer container, NSRange glyphRange);
+    [Selector("setLineFragmentRect:forGlyphRange:usedRect:")]
+    public void SetLineFragmentRectForGlyphRangeUsedRect(NSRect fragmentRect, NSRange glyphRange, NSRect usedRect);
+    [Selector("setExtraLineFragmentRect:usedRect:textContainer:")]
+    public void SetExtraLineFragmentRectUsedRectTextContainer(NSRect fragmentRect, NSRect usedRect, NSTextContainer container);
+    [Selector("setLocation:forStartOfGlyphRange:")]
+    public void SetLocationForStartOfGlyphRange(NSPoint location, NSRange glyphRange);
+    [Selector("setNotShownAttribute:forGlyphAtIndex:")]
+    public void SetNotShownAttributeForGlyphAtIndex(bool flag, NSUInteger glyphIndex);
+    [Selector("setDrawsOutsideLineFragment:forGlyphAtIndex:")]
+    public void SetDrawsOutsideLineFragmentForGlyphAtIndex(bool flag, NSUInteger glyphIndex);
+    [Selector("setAttachmentSize:forGlyphRange:")]
+    public void SetAttachmentSizeForGlyphRange(NSSize attachmentSize, NSRange glyphRange);
+    [Selector("getFirstUnlaidCharacterIndex:glyphIndex:")]
+    public void GetFirstUnlaidCharacterIndexGlyphIndex(NSUInteger* charIndex, NSUInteger* glyphIndex);
+    [Selector("firstUnlaidCharacterIndex")]
+    public NSUInteger FirstUnlaidCharacterIndex();
+    [Selector("firstUnlaidGlyphIndex")]
+    public NSUInteger FirstUnlaidGlyphIndex();
+    [Selector("textContainerForGlyphAtIndex:effectiveRange:")]
+    public NSTextContainer? TextContainerForGlyphAtIndexEffectiveRange(NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange);
+    [Selector("textContainerForGlyphAtIndex:effectiveRange:withoutAdditionalLayout:")]
+    public NSTextContainer? TextContainerForGlyphAtIndexEffectiveRangeWithoutAdditionalLayout(NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange, bool flag);
+    [Selector("usedRectForTextContainer:")]
+    public NSRect UsedRectForTextContainer(NSTextContainer container);
+    [Selector("lineFragmentRectForGlyphAtIndex:effectiveRange:")]
+    public NSRect LineFragmentRectForGlyphAtIndexEffectiveRange(NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange);
+    [Selector("lineFragmentRectForGlyphAtIndex:effectiveRange:withoutAdditionalLayout:")]
+    public NSRect LineFragmentRectForGlyphAtIndexEffectiveRangeWithoutAdditionalLayout(NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange, bool flag);
+    [Selector("lineFragmentUsedRectForGlyphAtIndex:effectiveRange:")]
+    public NSRect LineFragmentUsedRectForGlyphAtIndexEffectiveRange(NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange);
+    [Selector("lineFragmentUsedRectForGlyphAtIndex:effectiveRange:withoutAdditionalLayout:")]
+    public NSRect LineFragmentUsedRectForGlyphAtIndexEffectiveRangeWithoutAdditionalLayout(NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange, bool flag);
+    [Selector("locationForGlyphAtIndex:")]
+    public NSPoint LocationForGlyphAtIndex(NSUInteger glyphIndex);
+    [Selector("notShownAttributeForGlyphAtIndex:")]
+    public bool NotShownAttributeForGlyphAtIndex(NSUInteger glyphIndex);
+    [Selector("drawsOutsideLineFragmentForGlyphAtIndex:")]
+    public bool DrawsOutsideLineFragmentForGlyphAtIndex(NSUInteger glyphIndex);
+    [Selector("attachmentSizeForGlyphAtIndex:")]
+    public NSSize AttachmentSizeForGlyphAtIndex(NSUInteger glyphIndex);
+    [Selector("truncatedGlyphRangeInLineFragmentForGlyphAtIndex:")]
+    public NSRange TruncatedGlyphRangeInLineFragmentForGlyphAtIndex(NSUInteger glyphIndex);
+    [Selector("glyphRangeForCharacterRange:actualCharacterRange:")]
+    public NSRange GlyphRangeForCharacterRangeActualCharacterRange(NSRange charRange, NSRangePointer actualCharRange);
+    [Selector("characterRangeForGlyphRange:actualGlyphRange:")]
+    public NSRange CharacterRangeForGlyphRangeActualGlyphRange(NSRange glyphRange, NSRangePointer actualGlyphRange);
+    [Selector("glyphRangeForTextContainer:")]
+    public NSRange GlyphRangeForTextContainer(NSTextContainer container);
+    [Selector("rangeOfNominallySpacedGlyphsContainingIndex:")]
+    public NSRange RangeOfNominallySpacedGlyphsContainingIndex(NSUInteger glyphIndex);
+    [Selector("boundingRectForGlyphRange:inTextContainer:")]
+    public NSRect BoundingRectForGlyphRangeInTextContainer(NSRange glyphRange, NSTextContainer container);
+    [Selector("glyphRangeForBoundingRect:inTextContainer:")]
+    public NSRange GlyphRangeForBoundingRectInTextContainer(NSRect bounds, NSTextContainer container);
+    [Selector("glyphRangeForBoundingRectWithoutAdditionalLayout:inTextContainer:")]
+    public NSRange GlyphRangeForBoundingRectWithoutAdditionalLayoutInTextContainer(NSRect bounds, NSTextContainer container);
+    [Selector("glyphIndexForPoint:inTextContainer:fractionOfDistanceThroughGlyph:")]
+    public NSUInteger GlyphIndexForPointInTextContainerFractionOfDistanceThroughGlyph(NSPoint point, NSTextContainer container, CGFloat* partialFraction);
+    [Selector("glyphIndexForPoint:inTextContainer:")]
+    public NSUInteger GlyphIndexForPointInTextContainer(NSPoint point, NSTextContainer container);
+    [Selector("fractionOfDistanceThroughGlyphForPoint:inTextContainer:")]
+    public CGFloat FractionOfDistanceThroughGlyphForPointInTextContainer(NSPoint point, NSTextContainer container);
+    [Selector("characterIndexForPoint:inTextContainer:fractionOfDistanceBetweenInsertionPoints:")]
+    public NSUInteger CharacterIndexForPointInTextContainerFractionOfDistanceBetweenInsertionPoints(NSPoint point, NSTextContainer container, CGFloat* partialFraction);
+    [Selector("getLineFragmentInsertionPointsForCharacterAtIndex:alternatePositions:inDisplayOrder:positions:characterIndexes:")]
+    public NSUInteger GetLineFragmentInsertionPointsForCharacterAtIndexAlternatePositionsInDisplayOrderPositionsCharacterIndexes(NSUInteger charIndex, bool aFlag, bool dFlag, CGFloat* positions, NSUInteger* charIndexes);
+    [Selector("enumerateLineFragmentsForGlyphRange:usingBlock:")]
+    public void EnumerateLineFragmentsForGlyphRangeUsingBlock(NSRange glyphRange, NSLayoutManagerEnumerateLineFragmentsForGlyphRangeUsingBlockBlock block);
+    [Selector("enumerateEnclosingRectsForGlyphRange:withinSelectedGlyphRange:inTextContainer:usingBlock:")]
+    public void EnumerateEnclosingRectsForGlyphRangeWithinSelectedGlyphRangeInTextContainerUsingBlock(NSRange glyphRange, NSRange selectedRange, NSTextContainer textContainer, NSLayoutManagerEnumerateEnclosingRectsForGlyphRangeWithinSelectedGlyphRangeInTextContainerUsingBlockBlock block);
+    [Selector("drawBackgroundForGlyphRange:atPoint:")]
+    public void DrawBackgroundForGlyphRangeAtPoint(NSRange glyphsToShow, NSPoint origin);
+    [Selector("drawGlyphsForGlyphRange:atPoint:")]
+    public void DrawGlyphsForGlyphRangeAtPoint(NSRange glyphsToShow, NSPoint origin);
+    [Selector("showCGGlyphs:positions:count:font:textMatrix:attributes:inContext:")]
+    public void ShowCGGlyphsPositionsCountFontTextMatrixAttributesInContext(CGGlyph* glyphs, CGPoint* positions, NSInteger glyphCount, NSFont font, CGAffineTransform textMatrix, NSDictionary attributes, CGContextRef CGContext);
+    [Selector("fillBackgroundRectArray:count:forCharacterRange:color:")]
+    public void FillBackgroundRectArrayCountForCharacterRangeColor(NSRect* rectArray, NSUInteger rectCount, NSRange charRange, NSColor color);
+    [Selector("drawUnderlineForGlyphRange:underlineType:baselineOffset:lineFragmentRect:lineFragmentGlyphRange:containerOrigin:")]
+    public void DrawUnderlineForGlyphRangeUnderlineTypeBaselineOffsetLineFragmentRectLineFragmentGlyphRangeContainerOrigin(NSRange glyphRange, NSUnderlineStyle underlineVal, CGFloat baselineOffset, NSRect lineRect, NSRange lineGlyphRange, NSPoint containerOrigin);
+    [Selector("underlineGlyphRange:underlineType:lineFragmentRect:lineFragmentGlyphRange:containerOrigin:")]
+    public void UnderlineGlyphRangeUnderlineTypeLineFragmentRectLineFragmentGlyphRangeContainerOrigin(NSRange glyphRange, NSUnderlineStyle underlineVal, NSRect lineRect, NSRange lineGlyphRange, NSPoint containerOrigin);
+    [Selector("drawStrikethroughForGlyphRange:strikethroughType:baselineOffset:lineFragmentRect:lineFragmentGlyphRange:containerOrigin:")]
+    public void DrawStrikethroughForGlyphRangeStrikethroughTypeBaselineOffsetLineFragmentRectLineFragmentGlyphRangeContainerOrigin(NSRange glyphRange, NSUnderlineStyle strikethroughVal, CGFloat baselineOffset, NSRect lineRect, NSRange lineGlyphRange, NSPoint containerOrigin);
+    [Selector("strikethroughGlyphRange:strikethroughType:lineFragmentRect:lineFragmentGlyphRange:containerOrigin:")]
+    public void StrikethroughGlyphRangeStrikethroughTypeLineFragmentRectLineFragmentGlyphRangeContainerOrigin(NSRange glyphRange, NSUnderlineStyle strikethroughVal, NSRect lineRect, NSRange lineGlyphRange, NSPoint containerOrigin);
+    [Selector("showAttachmentCell:inRect:characterIndex:")]
+    public void ShowAttachmentCellInRectCharacterIndex(NSCell cell, NSRect rect, NSUInteger attachmentIndex);
+    [Selector("setLayoutRect:forTextBlock:glyphRange:")]
+    public void SetLayoutRectForTextBlockGlyphRange(NSRect rect, NSTextBlock block, NSRange glyphRange);
+    [Selector("setBoundsRect:forTextBlock:glyphRange:")]
+    public void SetBoundsRectForTextBlockGlyphRange(NSRect rect, NSTextBlock block, NSRange glyphRange);
+    [Selector("layoutRectForTextBlock:glyphRange:")]
+    public NSRect LayoutRectForTextBlockGlyphRange(NSTextBlock block, NSRange glyphRange);
+    [Selector("boundsRectForTextBlock:glyphRange:")]
+    public NSRect BoundsRectForTextBlockGlyphRange(NSTextBlock block, NSRange glyphRange);
+    [Selector("layoutRectForTextBlock:atIndex:effectiveRange:")]
+    public NSRect LayoutRectForTextBlockAtIndexEffectiveRange(NSTextBlock block, NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange);
+    [Selector("boundsRectForTextBlock:atIndex:effectiveRange:")]
+    public NSRect BoundsRectForTextBlockAtIndexEffectiveRange(NSTextBlock block, NSUInteger glyphIndex, NSRangePointer effectiveGlyphRange);
+    [Selector("temporaryAttributesAtCharacterIndex:effectiveRange:")]
+    public NSDictionary TemporaryAttributesAtCharacterIndexEffectiveRange(NSUInteger charIndex, NSRangePointer effectiveCharRange);
+    [Selector("setTemporaryAttributes:forCharacterRange:")]
+    public void SetTemporaryAttributesForCharacterRange(NSDictionary attrs, NSRange charRange);
+    [Selector("addTemporaryAttributes:forCharacterRange:")]
+    public void AddTemporaryAttributesForCharacterRange(NSDictionary attrs, NSRange charRange);
+    [Selector("removeTemporaryAttribute:forCharacterRange:")]
+    public void RemoveTemporaryAttributeForCharacterRange(NSAttributedStringKey attrName, NSRange charRange);
+    [Selector("temporaryAttribute:atCharacterIndex:effectiveRange:")]
+    public AnyObject? TemporaryAttributeAtCharacterIndexEffectiveRange(NSAttributedStringKey attrName, NSUInteger location, NSRangePointer range);
+    [Selector("temporaryAttribute:atCharacterIndex:longestEffectiveRange:inRange:")]
+    public AnyObject? TemporaryAttributeAtCharacterIndexLongestEffectiveRangeInRange(NSAttributedStringKey attrName, NSUInteger location, NSRangePointer range, NSRange rangeLimit);
+    [Selector("temporaryAttributesAtCharacterIndex:longestEffectiveRange:inRange:")]
+    public NSDictionary TemporaryAttributesAtCharacterIndexLongestEffectiveRangeInRange(NSUInteger location, NSRangePointer range, NSRange rangeLimit);
+    [Selector("addTemporaryAttribute:value:forCharacterRange:")]
+    public void AddTemporaryAttributeValueForCharacterRange(NSAttributedStringKey attrName, AnyObject value, NSRange charRange);
+    [Selector("defaultLineHeightForFont:")]
+    public CGFloat DefaultLineHeightForFont(NSFont theFont);
+    [Selector("defaultBaselineOffsetForFont:")]
+    public CGFloat DefaultBaselineOffsetForFont(NSFont theFont);
 }
 
 /// NSTextViewSupport, a category of NSLayoutManager.
 public extern objc class NSLayoutManager
 {
-    [Selector("firstTextView")] public NSTextView? FirstTextView { get; }
-    [Selector("textViewForBeginningOfSelection")] public NSTextView? TextViewForBeginningOfSelection { get; }
-    [Selector("rulerMarkersForTextView:paragraphStyle:ruler:")] public NSArray RulerMarkersForTextViewParagraphStyleRuler(NSTextView view, NSParagraphStyle style, NSRulerView ruler);
-    [Selector("rulerAccessoryViewForTextView:paragraphStyle:ruler:enabled:")] public NSView? RulerAccessoryViewForTextViewParagraphStyleRulerEnabled(NSTextView view, NSParagraphStyle style, NSRulerView ruler, bool isEnabled);
-    [Selector("layoutManagerOwnsFirstResponderInWindow:")] public bool LayoutManagerOwnsFirstResponderInWindow(NSWindow window);
+    [Selector("firstTextView")]
+    public NSTextView? FirstTextView { get; }
+    [Selector("textViewForBeginningOfSelection")]
+    public NSTextView? TextViewForBeginningOfSelection { get; }
+    [Selector("rulerMarkersForTextView:paragraphStyle:ruler:")]
+    public NSArray RulerMarkersForTextViewParagraphStyleRuler(NSTextView view, NSParagraphStyle style, NSRulerView ruler);
+    [Selector("rulerAccessoryViewForTextView:paragraphStyle:ruler:enabled:")]
+    public NSView? RulerAccessoryViewForTextViewParagraphStyleRulerEnabled(NSTextView view, NSParagraphStyle style, NSRulerView ruler, bool isEnabled);
+    [Selector("layoutManagerOwnsFirstResponderInWindow:")]
+    public bool LayoutManagerOwnsFirstResponderInWindow(NSWindow window);
 }
 
 public objc interface NSLayoutManagerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("layoutManager:shouldGenerateGlyphs:properties:characterIndexes:font:forGlyphRange:")] NSUInteger LayoutManagerShouldGenerateGlyphsPropertiesCharacterIndexesFontForGlyphRange(NSLayoutManager layoutManager, CGGlyph* glyphs, NSGlyphProperty* props, NSUInteger* charIndexes, NSFont aFont, NSRange glyphRange);
-    [Optional] [Selector("layoutManager:lineSpacingAfterGlyphAtIndex:withProposedLineFragmentRect:")] CGFloat LayoutManagerLineSpacingAfterGlyphAtIndexWithProposedLineFragmentRect(NSLayoutManager layoutManager, NSUInteger glyphIndex, NSRect rect);
-    [Optional] [Selector("layoutManager:paragraphSpacingBeforeGlyphAtIndex:withProposedLineFragmentRect:")] CGFloat LayoutManagerParagraphSpacingBeforeGlyphAtIndexWithProposedLineFragmentRect(NSLayoutManager layoutManager, NSUInteger glyphIndex, NSRect rect);
-    [Optional] [Selector("layoutManager:paragraphSpacingAfterGlyphAtIndex:withProposedLineFragmentRect:")] CGFloat LayoutManagerParagraphSpacingAfterGlyphAtIndexWithProposedLineFragmentRect(NSLayoutManager layoutManager, NSUInteger glyphIndex, NSRect rect);
-    [Optional] [Selector("layoutManager:shouldUseAction:forControlCharacterAtIndex:")] NSControlCharacterAction LayoutManagerShouldUseActionForControlCharacterAtIndex(NSLayoutManager layoutManager, NSControlCharacterAction action, NSUInteger charIndex);
-    [Optional] [Selector("layoutManager:shouldBreakLineByWordBeforeCharacterAtIndex:")] bool LayoutManagerShouldBreakLineByWordBeforeCharacterAtIndex(NSLayoutManager layoutManager, NSUInteger charIndex);
-    [Optional] [Selector("layoutManager:shouldBreakLineByHyphenatingBeforeCharacterAtIndex:")] bool LayoutManagerShouldBreakLineByHyphenatingBeforeCharacterAtIndex(NSLayoutManager layoutManager, NSUInteger charIndex);
-    [Optional] [Selector("layoutManager:boundingBoxForControlGlyphAtIndex:forTextContainer:proposedLineFragment:glyphPosition:characterIndex:")] NSRect LayoutManagerBoundingBoxForControlGlyphAtIndexForTextContainerProposedLineFragmentGlyphPositionCharacterIndex(NSLayoutManager layoutManager, NSUInteger glyphIndex, NSTextContainer textContainer, NSRect proposedRect, NSPoint glyphPosition, NSUInteger charIndex);
-    [Optional] [Selector("layoutManager:shouldSetLineFragmentRect:lineFragmentUsedRect:baselineOffset:inTextContainer:forGlyphRange:")] bool LayoutManagerShouldSetLineFragmentRectLineFragmentUsedRectBaselineOffsetInTextContainerForGlyphRange(NSLayoutManager layoutManager, NSRect* lineFragmentRect, NSRect* lineFragmentUsedRect, CGFloat* baselineOffset, NSTextContainer textContainer, NSRange glyphRange);
-    [Optional] [Selector("layoutManagerDidInvalidateLayout:")] void LayoutManagerDidInvalidateLayout(NSLayoutManager sender);
-    [Optional] [Selector("layoutManager:didCompleteLayoutForTextContainer:atEnd:")] void LayoutManagerDidCompleteLayoutForTextContainerAtEnd(NSLayoutManager layoutManager, NSTextContainer? textContainer, bool layoutFinishedFlag);
-    [Optional] [Selector("layoutManager:textContainer:didChangeGeometryFromSize:")] void LayoutManagerTextContainerDidChangeGeometryFromSize(NSLayoutManager layoutManager, NSTextContainer textContainer, NSSize oldSize);
-    [Optional] [Selector("layoutManager:shouldUseTemporaryAttributes:forDrawingToScreen:atCharacterIndex:effectiveRange:")] NSDictionary? LayoutManagerShouldUseTemporaryAttributesForDrawingToScreenAtCharacterIndexEffectiveRange(NSLayoutManager layoutManager, NSDictionary attrs, bool toScreen, NSUInteger charIndex, NSRangePointer effectiveCharRange);
+    [Optional]
+    [Selector("layoutManager:shouldGenerateGlyphs:properties:characterIndexes:font:forGlyphRange:")]
+    NSUInteger LayoutManagerShouldGenerateGlyphsPropertiesCharacterIndexesFontForGlyphRange(NSLayoutManager layoutManager, CGGlyph* glyphs, NSGlyphProperty* props, NSUInteger* charIndexes, NSFont aFont, NSRange glyphRange);
+    [Optional]
+    [Selector("layoutManager:lineSpacingAfterGlyphAtIndex:withProposedLineFragmentRect:")]
+    CGFloat LayoutManagerLineSpacingAfterGlyphAtIndexWithProposedLineFragmentRect(NSLayoutManager layoutManager, NSUInteger glyphIndex, NSRect rect);
+    [Optional]
+    [Selector("layoutManager:paragraphSpacingBeforeGlyphAtIndex:withProposedLineFragmentRect:")]
+    CGFloat LayoutManagerParagraphSpacingBeforeGlyphAtIndexWithProposedLineFragmentRect(NSLayoutManager layoutManager, NSUInteger glyphIndex, NSRect rect);
+    [Optional]
+    [Selector("layoutManager:paragraphSpacingAfterGlyphAtIndex:withProposedLineFragmentRect:")]
+    CGFloat LayoutManagerParagraphSpacingAfterGlyphAtIndexWithProposedLineFragmentRect(NSLayoutManager layoutManager, NSUInteger glyphIndex, NSRect rect);
+    [Optional]
+    [Selector("layoutManager:shouldUseAction:forControlCharacterAtIndex:")]
+    NSControlCharacterAction LayoutManagerShouldUseActionForControlCharacterAtIndex(NSLayoutManager layoutManager, NSControlCharacterAction action, NSUInteger charIndex);
+    [Optional]
+    [Selector("layoutManager:shouldBreakLineByWordBeforeCharacterAtIndex:")]
+    bool LayoutManagerShouldBreakLineByWordBeforeCharacterAtIndex(NSLayoutManager layoutManager, NSUInteger charIndex);
+    [Optional]
+    [Selector("layoutManager:shouldBreakLineByHyphenatingBeforeCharacterAtIndex:")]
+    bool LayoutManagerShouldBreakLineByHyphenatingBeforeCharacterAtIndex(NSLayoutManager layoutManager, NSUInteger charIndex);
+    [Optional]
+    [Selector("layoutManager:boundingBoxForControlGlyphAtIndex:forTextContainer:proposedLineFragment:glyphPosition:characterIndex:")]
+    NSRect LayoutManagerBoundingBoxForControlGlyphAtIndexForTextContainerProposedLineFragmentGlyphPositionCharacterIndex(NSLayoutManager layoutManager, NSUInteger glyphIndex, NSTextContainer textContainer, NSRect proposedRect, NSPoint glyphPosition, NSUInteger charIndex);
+    [Optional]
+    [Selector("layoutManager:shouldSetLineFragmentRect:lineFragmentUsedRect:baselineOffset:inTextContainer:forGlyphRange:")]
+    bool LayoutManagerShouldSetLineFragmentRectLineFragmentUsedRectBaselineOffsetInTextContainerForGlyphRange(NSLayoutManager layoutManager, NSRect* lineFragmentRect, NSRect* lineFragmentUsedRect, CGFloat* baselineOffset, NSTextContainer textContainer, NSRange glyphRange);
+    [Optional]
+    [Selector("layoutManagerDidInvalidateLayout:")]
+    void LayoutManagerDidInvalidateLayout(NSLayoutManager sender);
+    [Optional]
+    [Selector("layoutManager:didCompleteLayoutForTextContainer:atEnd:")]
+    void LayoutManagerDidCompleteLayoutForTextContainerAtEnd(NSLayoutManager layoutManager, NSTextContainer? textContainer, bool layoutFinishedFlag);
+    [Optional]
+    [Selector("layoutManager:textContainer:didChangeGeometryFromSize:")]
+    void LayoutManagerTextContainerDidChangeGeometryFromSize(NSLayoutManager layoutManager, NSTextContainer textContainer, NSSize oldSize);
+    [Optional]
+    [Selector("layoutManager:shouldUseTemporaryAttributes:forDrawingToScreen:atCharacterIndex:effectiveRange:")]
+    NSDictionary? LayoutManagerShouldUseTemporaryAttributesForDrawingToScreenAtCharacterIndexEffectiveRange(NSLayoutManager layoutManager, NSDictionary attrs, bool toScreen, NSUInteger charIndex, NSRangePointer effectiveCharRange);
 }
 
 /// Deprecated in macOS 10.11.
@@ -235,53 +373,77 @@ public enum NSGlyphInscription : ulong
 public extern objc class NSLayoutManager
 {
     /// Deprecated in macOS 10.11.
-    [Selector("usesScreenFonts", "setUsesScreenFonts:")] public bool UsesScreenFonts { get; set; }
+    [Selector("usesScreenFonts", "setUsesScreenFonts:")]
+    public bool UsesScreenFonts { get; set; }
     /// Deprecated in macOS 10.15.
-    [Selector("hyphenationFactor", "setHyphenationFactor:")] public float HyphenationFactor { get; set; }
-    [Selector("glyphAtIndex:isValidIndex:")] public NSGlyph GlyphAtIndexIsValidIndex(NSUInteger glyphIndex, bool* isValidIndex);
-    [Selector("glyphAtIndex:")] public NSGlyph GlyphAtIndex(NSUInteger glyphIndex);
-    [Selector("rectArrayForCharacterRange:withinSelectedCharacterRange:inTextContainer:rectCount:")] public NSRectArray RectArrayForCharacterRangeWithinSelectedCharacterRangeInTextContainerRectCount(NSRange charRange, NSRange selCharRange, NSTextContainer container, NSUInteger* rectCount);
-    [Selector("rectArrayForGlyphRange:withinSelectedGlyphRange:inTextContainer:rectCount:")] public NSRectArray RectArrayForGlyphRangeWithinSelectedGlyphRangeInTextContainerRectCount(NSRange glyphRange, NSRange selGlyphRange, NSTextContainer container, NSUInteger* rectCount);
+    [Selector("hyphenationFactor", "setHyphenationFactor:")]
+    public float HyphenationFactor { get; set; }
+    [Selector("glyphAtIndex:isValidIndex:")]
+    public NSGlyph GlyphAtIndexIsValidIndex(NSUInteger glyphIndex, bool* isValidIndex);
+    [Selector("glyphAtIndex:")]
+    public NSGlyph GlyphAtIndex(NSUInteger glyphIndex);
+    [Selector("rectArrayForCharacterRange:withinSelectedCharacterRange:inTextContainer:rectCount:")]
+    public NSRectArray RectArrayForCharacterRangeWithinSelectedCharacterRangeInTextContainerRectCount(NSRange charRange, NSRange selCharRange, NSTextContainer container, NSUInteger* rectCount);
+    [Selector("rectArrayForGlyphRange:withinSelectedGlyphRange:inTextContainer:rectCount:")]
+    public NSRectArray RectArrayForGlyphRangeWithinSelectedGlyphRangeInTextContainerRectCount(NSRange glyphRange, NSRange selGlyphRange, NSTextContainer container, NSUInteger* rectCount);
     /// Deprecated in macOS 10.11.
-    [Selector("substituteFontForFont:")] public NSFont SubstituteFontForFont(NSFont originalFont);
+    [Selector("substituteFontForFont:")]
+    public NSFont SubstituteFontForFont(NSFont originalFont);
     /// Deprecated in macOS 10.11.
-    [Selector("insertGlyphs:length:forStartingGlyphAtIndex:characterIndex:")] public void InsertGlyphsLengthForStartingGlyphAtIndexCharacterIndex(NSGlyph* glyphs, NSUInteger length, NSUInteger glyphIndex, NSUInteger charIndex);
+    [Selector("insertGlyphs:length:forStartingGlyphAtIndex:characterIndex:")]
+    public void InsertGlyphsLengthForStartingGlyphAtIndexCharacterIndex(NSGlyph* glyphs, NSUInteger length, NSUInteger glyphIndex, NSUInteger charIndex);
     /// Deprecated in macOS 10.11.
-    [Selector("insertGlyph:atGlyphIndex:characterIndex:")] public void InsertGlyphAtGlyphIndexCharacterIndex(NSGlyph glyph, NSUInteger glyphIndex, NSUInteger charIndex);
+    [Selector("insertGlyph:atGlyphIndex:characterIndex:")]
+    public void InsertGlyphAtGlyphIndexCharacterIndex(NSGlyph glyph, NSUInteger glyphIndex, NSUInteger charIndex);
     /// Deprecated in macOS 10.11.
-    [Selector("replaceGlyphAtIndex:withGlyph:")] public void ReplaceGlyphAtIndexWithGlyph(NSUInteger glyphIndex, NSGlyph newGlyph);
+    [Selector("replaceGlyphAtIndex:withGlyph:")]
+    public void ReplaceGlyphAtIndexWithGlyph(NSUInteger glyphIndex, NSGlyph newGlyph);
     /// Deprecated in macOS 10.11.
-    [Selector("deleteGlyphsInRange:")] public void DeleteGlyphsInRange(NSRange glyphRange);
+    [Selector("deleteGlyphsInRange:")]
+    public void DeleteGlyphsInRange(NSRange glyphRange);
     /// Deprecated in macOS 10.11.
-    [Selector("setCharacterIndex:forGlyphAtIndex:")] public void SetCharacterIndexForGlyphAtIndex(NSUInteger charIndex, NSUInteger glyphIndex);
+    [Selector("setCharacterIndex:forGlyphAtIndex:")]
+    public void SetCharacterIndexForGlyphAtIndex(NSUInteger charIndex, NSUInteger glyphIndex);
     /// Deprecated in macOS 10.11.
-    [Selector("setIntAttribute:value:forGlyphAtIndex:")] public void SetIntAttributeValueForGlyphAtIndex(NSInteger attributeTag, NSInteger val, NSUInteger glyphIndex);
+    [Selector("setIntAttribute:value:forGlyphAtIndex:")]
+    public void SetIntAttributeValueForGlyphAtIndex(NSInteger attributeTag, NSInteger val, NSUInteger glyphIndex);
     /// Deprecated in macOS 10.11.
-    [Selector("invalidateGlyphsOnLayoutInvalidationForGlyphRange:")] public void InvalidateGlyphsOnLayoutInvalidationForGlyphRange(NSRange glyphRange);
+    [Selector("invalidateGlyphsOnLayoutInvalidationForGlyphRange:")]
+    public void InvalidateGlyphsOnLayoutInvalidationForGlyphRange(NSRange glyphRange);
     /// Deprecated in macOS 10.11.
-    [Selector("intAttribute:forGlyphAtIndex:")] public NSInteger IntAttributeForGlyphAtIndex(NSInteger attributeTag, NSUInteger glyphIndex);
+    [Selector("intAttribute:forGlyphAtIndex:")]
+    public NSInteger IntAttributeForGlyphAtIndex(NSInteger attributeTag, NSUInteger glyphIndex);
     /// Deprecated in macOS 10.11.
-    [Selector("getGlyphsInRange:glyphs:characterIndexes:glyphInscriptions:elasticBits:")] public NSUInteger GetGlyphsInRangeGlyphsCharacterIndexesGlyphInscriptionsElasticBits(NSRange glyphRange, NSGlyph* glyphBuffer, NSUInteger* charIndexBuffer, NSGlyphInscription* inscribeBuffer, bool* elasticBuffer);
+    [Selector("getGlyphsInRange:glyphs:characterIndexes:glyphInscriptions:elasticBits:")]
+    public NSUInteger GetGlyphsInRangeGlyphsCharacterIndexesGlyphInscriptionsElasticBits(NSRange glyphRange, NSGlyph* glyphBuffer, NSUInteger* charIndexBuffer, NSGlyphInscription* inscribeBuffer, bool* elasticBuffer);
     /// Deprecated in macOS 10.11.
-    [Selector("getGlyphsInRange:glyphs:characterIndexes:glyphInscriptions:elasticBits:bidiLevels:")] public NSUInteger GetGlyphsInRangeGlyphsCharacterIndexesGlyphInscriptionsElasticBitsBidiLevels(NSRange glyphRange, NSGlyph* glyphBuffer, NSUInteger* charIndexBuffer, NSGlyphInscription* inscribeBuffer, bool* elasticBuffer, byte* bidiLevelBuffer);
+    [Selector("getGlyphsInRange:glyphs:characterIndexes:glyphInscriptions:elasticBits:bidiLevels:")]
+    public NSUInteger GetGlyphsInRangeGlyphsCharacterIndexesGlyphInscriptionsElasticBitsBidiLevels(NSRange glyphRange, NSGlyph* glyphBuffer, NSUInteger* charIndexBuffer, NSGlyphInscription* inscribeBuffer, bool* elasticBuffer, byte* bidiLevelBuffer);
     /// Deprecated in macOS 10.11.
-    [Selector("getGlyphs:range:")] public NSUInteger GetGlyphsRange(NSGlyph* glyphArray, NSRange glyphRange);
+    [Selector("getGlyphs:range:")]
+    public NSUInteger GetGlyphsRange(NSGlyph* glyphArray, NSRange glyphRange);
     /// Deprecated in macOS 10.11.
-    [Selector("invalidateLayoutForCharacterRange:isSoft:actualCharacterRange:")] public void InvalidateLayoutForCharacterRangeIsSoftActualCharacterRange(NSRange charRange, bool flag, NSRangePointer actualCharRange);
+    [Selector("invalidateLayoutForCharacterRange:isSoft:actualCharacterRange:")]
+    public void InvalidateLayoutForCharacterRangeIsSoftActualCharacterRange(NSRange charRange, bool flag, NSRangePointer actualCharRange);
     /// Deprecated in macOS 10.11.
-    [Selector("textStorage:edited:range:changeInLength:invalidatedRange:")] public void TextStorageEditedRangeChangeInLengthInvalidatedRange(NSTextStorage str, NSTextStorageEditedOptions editedMask, NSRange newCharRange, NSInteger delta, NSRange invalidatedCharRange);
+    [Selector("textStorage:edited:range:changeInLength:invalidatedRange:")]
+    public void TextStorageEditedRangeChangeInLengthInvalidatedRange(NSTextStorage str, NSTextStorageEditedOptions editedMask, NSRange newCharRange, NSInteger delta, NSRange invalidatedCharRange);
     /// Deprecated in macOS 10.11.
-    [Selector("setLocations:startingGlyphIndexes:count:forGlyphRange:")] public void SetLocationsStartingGlyphIndexesCountForGlyphRange(NSPointArray locations, NSUInteger* glyphIndexes, NSUInteger count, NSRange glyphRange);
+    [Selector("setLocations:startingGlyphIndexes:count:forGlyphRange:")]
+    public void SetLocationsStartingGlyphIndexesCountForGlyphRange(NSPointArray locations, NSUInteger* glyphIndexes, NSUInteger count, NSRange glyphRange);
     /// Deprecated in macOS 10.7.
-    [Selector("showPackedGlyphs:length:glyphRange:atPoint:font:color:printingAdjustment:")] public void ShowPackedGlyphsLengthGlyphRangeAtPointFontColorPrintingAdjustment(byte* glyphs, NSUInteger glyphLen, NSRange glyphRange, NSPoint point, NSFont font, NSColor color, NSSize printingAdjustment);
+    [Selector("showPackedGlyphs:length:glyphRange:atPoint:font:color:printingAdjustment:")]
+    public void ShowPackedGlyphsLengthGlyphRangeAtPointFontColorPrintingAdjustment(byte* glyphs, NSUInteger glyphLen, NSRange glyphRange, NSPoint point, NSFont font, NSColor color, NSSize printingAdjustment);
     /// Deprecated in macOS 10.15.
-    [Selector("showCGGlyphs:positions:count:font:matrix:attributes:inContext:")] public void ShowCGGlyphsPositionsCountFontMatrixAttributesInContext(CGGlyph* glyphs, NSPoint* positions, NSUInteger glyphCount, NSFont font, NSAffineTransform textMatrix, NSDictionary attributes, NSGraphicsContext graphicsContext);
+    [Selector("showCGGlyphs:positions:count:font:matrix:attributes:inContext:")]
+    public void ShowCGGlyphsPositionsCountFontMatrixAttributesInContext(CGGlyph* glyphs, NSPoint* positions, NSUInteger glyphCount, NSFont font, NSAffineTransform textMatrix, NSDictionary attributes, NSGraphicsContext graphicsContext);
 }
 
 /// NSGlyphGeneration, a category of NSLayoutManager.
 public extern objc class NSLayoutManager : NSGlyphStorage
 {
-    [Selector("glyphGenerator", "setGlyphGenerator:")] public NSGlyphGenerator GlyphGenerator { get; set; }
+    [Selector("glyphGenerator", "setGlyphGenerator:")]
+    public NSGlyphGenerator GlyphGenerator { get; set; }
 }
 
 #endif

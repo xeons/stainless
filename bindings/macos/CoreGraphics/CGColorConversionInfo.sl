@@ -44,15 +44,20 @@ public enum CGColorConversionInfoTransformType : uint
     ApplySpace = 2,
 }
 
-[ReturnsRetained] public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreate(CGColorSpaceRef? src, CGColorSpaceRef? dst);
+[ReturnsRetained]
+public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreate(CGColorSpaceRef? src, CGColorSpaceRef? dst);
 
-[ReturnsRetained] public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateWithOptions(CGColorSpaceRef src, CGColorSpaceRef dst, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateWithOptions(CGColorSpaceRef src, CGColorSpaceRef dst, CFDictionaryRef? options);
 
-[ReturnsRetained] public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateFromList(CFDictionaryRef? options, CGColorSpaceRef? arg1, CGColorConversionInfoTransformType arg2, CGColorRenderingIntent arg3, ...);
+[ReturnsRetained]
+public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateFromList(CFDictionaryRef? options, CGColorSpaceRef? arg1, CGColorConversionInfoTransformType arg2, CGColorRenderingIntent arg3, ...);
 
-[ReturnsRetained] public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateFromListWithArguments(CFDictionaryRef? options, CGColorSpaceRef? arg1, CGColorConversionInfoTransformType arg2, CGColorRenderingIntent arg3, VaList arg4);
+[ReturnsRetained]
+public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateFromListWithArguments(CFDictionaryRef? options, CGColorSpaceRef? arg1, CGColorConversionInfoTransformType arg2, CGColorRenderingIntent arg3, VaList arg4);
 
-[ReturnsRetained] public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateForToneMapping(CGColorSpaceRef from, float source_headroom, CGColorSpaceRef to, float target_headroom, CGToneMapping method, CFDictionaryRef? options, __CFError** error);
+[ReturnsRetained]
+public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateForToneMapping(CGColorSpaceRef from, float source_headroom, CGColorSpaceRef to, float target_headroom, CGToneMapping method, CFDictionaryRef? options, __CFError** error);
 
 public struct CGColorBufferFormat
 {

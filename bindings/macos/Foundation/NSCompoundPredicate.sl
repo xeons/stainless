@@ -38,13 +38,20 @@ public enum NSCompoundPredicateType : ulong
 
 public extern objc class NSCompoundPredicate : NSPredicate
 {
-    [Selector("compoundPredicateType")] public NSCompoundPredicateType CompoundPredicateType { get; }
-    [Selector("subpredicates")] public NSArray Subpredicates { get; }
-    [Selector("initWithType:subpredicates:")] public Self InitWithTypeSubpredicates(NSCompoundPredicateType type, NSArray subpredicates);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("andPredicateWithSubpredicates:")] public static NSCompoundPredicate AndPredicateWithSubpredicates(NSArray subpredicates);
-    [Selector("orPredicateWithSubpredicates:")] public static NSCompoundPredicate OrPredicateWithSubpredicates(NSArray subpredicates);
-    [Selector("notPredicateWithSubpredicate:")] public static NSCompoundPredicate NotPredicateWithSubpredicate(NSPredicate predicate);
+    [Selector("compoundPredicateType")]
+    public NSCompoundPredicateType CompoundPredicateType { get; }
+    [Selector("subpredicates")]
+    public NSArray Subpredicates { get; }
+    [Selector("initWithType:subpredicates:")]
+    public Self InitWithTypeSubpredicates(NSCompoundPredicateType type, NSArray subpredicates);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("andPredicateWithSubpredicates:")]
+    public static NSCompoundPredicate AndPredicateWithSubpredicates(NSArray subpredicates);
+    [Selector("orPredicateWithSubpredicates:")]
+    public static NSCompoundPredicate OrPredicateWithSubpredicates(NSArray subpredicates);
+    [Selector("notPredicateWithSubpredicate:")]
+    public static NSCompoundPredicate NotPredicateWithSubpredicate(NSPredicate predicate);
 }
 
 #endif

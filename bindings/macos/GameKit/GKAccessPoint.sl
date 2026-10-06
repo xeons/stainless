@@ -68,35 +68,56 @@ public objc closure void GKAccessPointTriggerAccessPointForArcadeWithHandlerHand
 
 public extern objc class GKAccessPoint : NSObject
 {
-    [Selector("shared")] public static GKAccessPoint Shared { get; }
-    [Selector("isActive", "setActive:")] public bool Active { get; set; }
-    [Selector("isVisible")] public bool Visible { get; }
-    [Selector("isPresentingGameCenter")] public bool IsPresentingGameCenter { get; }
+    [Selector("shared")]
+    public static GKAccessPoint Shared { get; }
+    [Selector("isActive", "setActive:")]
+    public bool Active { get; set; }
+    [Selector("isVisible")]
+    public bool Visible { get; }
+    [Selector("isPresentingGameCenter")]
+    public bool IsPresentingGameCenter { get; }
     /// Deprecated in macOS 26.0.
-    [Selector("showHighlights", "setShowHighlights:")] public bool ShowHighlights { get; set; }
-    [Selector("location", "setLocation:")] public GKAccessPointLocation Location { get; set; }
-    [Selector("frameInScreenCoordinates")] public NSRect FrameInScreenCoordinates { get; }
-    [Selector("parentWindow", "setParentWindow:")] public NSWindow? ParentWindow { get; set; }
-    [Selector("triggerAccessPointWithHandler:")] public void TriggerAccessPointWithHandler(GKAccessPointTriggerAccessPointWithHandlerHandlerBlock handler);
-    [Selector("triggerAccessPointWithState:handler:")] public void TriggerAccessPointWithStateHandler(GKGameCenterViewControllerState state, GKAccessPointTriggerAccessPointWithStateHandlerHandlerBlock handler);
-    [Selector("triggerAccessPointWithAchievementID:handler:")] public void TriggerAccessPointWithAchievementIDHandler(NSString achievementID, GKAccessPointTriggerAccessPointWithAchievementIDHandlerHandlerBlock? handler);
-    [Selector("triggerAccessPointWithLeaderboardSetID:handler:")] public void TriggerAccessPointWithLeaderboardSetIDHandler(NSString leaderboardSetID, GKAccessPointTriggerAccessPointWithLeaderboardSetIDHandlerHandlerBlock? handler);
-    [Selector("triggerAccessPointWithLeaderboardID:playerScope:timeScope:handler:")] public void TriggerAccessPointWithLeaderboardIDPlayerScopeTimeScopeHandler(NSString leaderboardID, GKLeaderboardPlayerScope playerScope, GKLeaderboardTimeScope timeScope, GKAccessPointTriggerAccessPointWithLeaderboardIDPlayerScopeTimeScopeHandlerHandlerBlock? handler);
-    [Selector("triggerAccessPointWithPlayer:handler:")] public void TriggerAccessPointWithPlayerHandler(GKPlayer player, GKAccessPointTriggerAccessPointWithPlayerHandlerHandlerBlock? handler);
+    [Selector("showHighlights", "setShowHighlights:")]
+    public bool ShowHighlights { get; set; }
+    [Selector("location", "setLocation:")]
+    public GKAccessPointLocation Location { get; set; }
+    [Selector("frameInScreenCoordinates")]
+    public NSRect FrameInScreenCoordinates { get; }
+    [Selector("parentWindow", "setParentWindow:")]
+    public NSWindow? ParentWindow { get; set; }
+    [Selector("triggerAccessPointWithHandler:")]
+    public void TriggerAccessPointWithHandler(GKAccessPointTriggerAccessPointWithHandlerHandlerBlock handler);
+    [Selector("triggerAccessPointWithState:handler:")]
+    public void TriggerAccessPointWithStateHandler(GKGameCenterViewControllerState state, GKAccessPointTriggerAccessPointWithStateHandlerHandlerBlock handler);
+    [Selector("triggerAccessPointWithAchievementID:handler:")]
+    public void TriggerAccessPointWithAchievementIDHandler(NSString achievementID, GKAccessPointTriggerAccessPointWithAchievementIDHandlerHandlerBlock? handler);
+    [Selector("triggerAccessPointWithLeaderboardSetID:handler:")]
+    public void TriggerAccessPointWithLeaderboardSetIDHandler(NSString leaderboardSetID, GKAccessPointTriggerAccessPointWithLeaderboardSetIDHandlerHandlerBlock? handler);
+    [Selector("triggerAccessPointWithLeaderboardID:playerScope:timeScope:handler:")]
+    public void TriggerAccessPointWithLeaderboardIDPlayerScopeTimeScopeHandler(NSString leaderboardID, GKLeaderboardPlayerScope playerScope, GKLeaderboardTimeScope timeScope, GKAccessPointTriggerAccessPointWithLeaderboardIDPlayerScopeTimeScopeHandlerHandlerBlock? handler);
+    [Selector("triggerAccessPointWithPlayer:handler:")]
+    public void TriggerAccessPointWithPlayerHandler(GKPlayer player, GKAccessPointTriggerAccessPointWithPlayerHandlerHandlerBlock? handler);
     /// macOS 26.0 and later.
-    [Selector("triggerAccessPointForPlayTogetherWithHandler:")] public void TriggerAccessPointForPlayTogetherWithHandler(GKAccessPointTriggerAccessPointForPlayTogetherWithHandlerHandlerBlock? handler);
+    [Selector("triggerAccessPointForPlayTogetherWithHandler:")]
+    public void TriggerAccessPointForPlayTogetherWithHandler(GKAccessPointTriggerAccessPointForPlayTogetherWithHandlerHandlerBlock? handler);
     /// macOS 26.0 and later.
-    [Selector("triggerAccessPointForChallengesWithHandler:")] public void TriggerAccessPointForChallengesWithHandler(GKAccessPointTriggerAccessPointForChallengesWithHandlerHandlerBlock? handler);
+    [Selector("triggerAccessPointForChallengesWithHandler:")]
+    public void TriggerAccessPointForChallengesWithHandler(GKAccessPointTriggerAccessPointForChallengesWithHandlerHandlerBlock? handler);
     /// macOS 26.0 and later.
-    [Selector("triggerAccessPointWithChallengeDefinitionID:handler:")] public void TriggerAccessPointWithChallengeDefinitionIDHandler(NSString challengeDefinitionID, GKAccessPointTriggerAccessPointWithChallengeDefinitionIDHandlerHandlerBlock? handler);
+    [Selector("triggerAccessPointWithChallengeDefinitionID:handler:")]
+    public void TriggerAccessPointWithChallengeDefinitionIDHandler(NSString challengeDefinitionID, GKAccessPointTriggerAccessPointWithChallengeDefinitionIDHandlerHandlerBlock? handler);
     /// macOS 26.0 and later.
-    [Selector("triggerAccessPointWithGameActivityDefinitionID:handler:")] public void TriggerAccessPointWithGameActivityDefinitionIDHandler(NSString gameActivityDefinitionID, GKAccessPointTriggerAccessPointWithGameActivityDefinitionIDHandlerHandlerBlock? handler);
+    [Selector("triggerAccessPointWithGameActivityDefinitionID:handler:")]
+    public void TriggerAccessPointWithGameActivityDefinitionIDHandler(NSString gameActivityDefinitionID, GKAccessPointTriggerAccessPointWithGameActivityDefinitionIDHandlerHandlerBlock? handler);
     /// macOS 26.0 and later.
-    [Selector("triggerAccessPointWithGameActivity:handler:")] public void TriggerAccessPointWithGameActivityHandler(GKGameActivity gameActivity, GKAccessPointTriggerAccessPointWithGameActivityHandlerHandlerBlock? handler);
+    [Selector("triggerAccessPointWithGameActivity:handler:")]
+    public void TriggerAccessPointWithGameActivityHandler(GKGameActivity gameActivity, GKAccessPointTriggerAccessPointWithGameActivityHandlerHandlerBlock? handler);
     /// macOS 26.0 and later.
-    [Selector("triggerAccessPointForFriendingWithHandler:")] public void TriggerAccessPointForFriendingWithHandler(GKAccessPointTriggerAccessPointForFriendingWithHandlerHandlerBlock? handler);
+    [Selector("triggerAccessPointForFriendingWithHandler:")]
+    public void TriggerAccessPointForFriendingWithHandler(GKAccessPointTriggerAccessPointForFriendingWithHandlerHandlerBlock? handler);
     /// macOS 26.0 and later.
-    [Selector("triggerAccessPointForArcadeWithHandler:")] public void TriggerAccessPointForArcadeWithHandler(GKAccessPointTriggerAccessPointForArcadeWithHandlerHandlerBlock? handler);
+    [Selector("triggerAccessPointForArcadeWithHandler:")]
+    public void TriggerAccessPointForArcadeWithHandler(GKAccessPointTriggerAccessPointForArcadeWithHandlerHandlerBlock? handler);
 }
 
 #endif

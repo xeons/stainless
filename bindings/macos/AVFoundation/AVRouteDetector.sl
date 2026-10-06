@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class AVRouteDetector : NSObject
 {
-    [Selector("isRouteDetectionEnabled", "setRouteDetectionEnabled:")] public bool RouteDetectionEnabled { get; set; }
-    [Selector("multipleRoutesDetected")] public bool MultipleRoutesDetected { get; }
+    [Selector("isRouteDetectionEnabled", "setRouteDetectionEnabled:")]
+    public bool RouteDetectionEnabled { get; set; }
+    [Selector("multipleRoutesDetected")]
+    public bool MultipleRoutesDetected { get; }
 }
 
 public extern "C" NSNotificationName? AVRouteDetectorMultipleRoutesDetectedDidChangeNotification;

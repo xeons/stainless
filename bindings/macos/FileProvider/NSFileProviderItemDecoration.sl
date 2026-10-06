@@ -34,7 +34,8 @@ public using NSFileProviderItemDecorationIdentifier = NSString;
 
 public objc interface NSFileProviderItemDecorating : NSFileProviderItem
 {
-    [Selector("decorations")] NSArray? Decorations { get; }
+    [Selector("decorations")]
+    NSArray? Decorations { get; }
 }
 
 #endif

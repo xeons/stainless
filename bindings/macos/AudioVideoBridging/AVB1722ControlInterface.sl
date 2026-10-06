@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class AVB1722ControlInterface : NSObject
 {
-    [Selector("interfaceName")] public NSString InterfaceName { get; }
-    [Selector("interface")] public AVBInterface? Interface { get; }
-    [Selector("initWithInterfaceName:")] public Self? InitWithInterfaceName(NSString anInterfaceName);
-    [Selector("initWithInterface:")] public Self? InitWithInterface(AVBInterface anInterface);
+    [Selector("interfaceName")]
+    public NSString InterfaceName { get; }
+    [Selector("interface")]
+    public AVBInterface? Interface { get; }
+    [Selector("initWithInterfaceName:")]
+    public Self? InitWithInterfaceName(NSString anInterfaceName);
+    [Selector("initWithInterface:")]
+    public Self? InitWithInterface(AVBInterface anInterface);
 }
 
 #endif

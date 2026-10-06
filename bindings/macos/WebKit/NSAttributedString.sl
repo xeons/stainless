@@ -38,10 +38,14 @@ public objc closure void NSAttributedStringCompletionHandler(NSAttributedString?
 /// NSAttributedStringWebKitAdditions, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("loadFromHTMLWithRequest:options:completionHandler:")] public static void LoadFromHTMLWithRequestOptionsCompletionHandler(NSURLRequest request, NSDictionary options, NSAttributedStringCompletionHandler completionHandler);
-    [Selector("loadFromHTMLWithFileURL:options:completionHandler:")] public static void LoadFromHTMLWithFileURLOptionsCompletionHandler(NSURL fileURL, NSDictionary options, NSAttributedStringCompletionHandler completionHandler);
-    [Selector("loadFromHTMLWithString:options:completionHandler:")] public static void LoadFromHTMLWithStringOptionsCompletionHandler(NSString string, NSDictionary options, NSAttributedStringCompletionHandler completionHandler);
-    [Selector("loadFromHTMLWithData:options:completionHandler:")] public static void LoadFromHTMLWithDataOptionsCompletionHandler(NSData data, NSDictionary options, NSAttributedStringCompletionHandler completionHandler);
+    [Selector("loadFromHTMLWithRequest:options:completionHandler:")]
+    public static void LoadFromHTMLWithRequestOptionsCompletionHandler(NSURLRequest request, NSDictionary options, NSAttributedStringCompletionHandler completionHandler);
+    [Selector("loadFromHTMLWithFileURL:options:completionHandler:")]
+    public static void LoadFromHTMLWithFileURLOptionsCompletionHandler(NSURL fileURL, NSDictionary options, NSAttributedStringCompletionHandler completionHandler);
+    [Selector("loadFromHTMLWithString:options:completionHandler:")]
+    public static void LoadFromHTMLWithStringOptionsCompletionHandler(NSString string, NSDictionary options, NSAttributedStringCompletionHandler completionHandler);
+    [Selector("loadFromHTMLWithData:options:completionHandler:")]
+    public static void LoadFromHTMLWithDataOptionsCompletionHandler(NSData data, NSDictionary options, NSAttributedStringCompletionHandler completionHandler);
 }
 
 #endif

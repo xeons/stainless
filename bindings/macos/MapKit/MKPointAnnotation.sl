@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class MKPointAnnotation : MKShape
 {
-    [Selector("coordinate", "setCoordinate:")] public CLLocationCoordinate2D Coordinate { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoordinate:")] public Self InitWithCoordinate(CLLocationCoordinate2D coordinate);
-    [Selector("initWithCoordinate:title:subtitle:")] public Self InitWithCoordinateTitleSubtitle(CLLocationCoordinate2D coordinate, NSString? title, NSString? subtitle);
+    [Selector("coordinate", "setCoordinate:")]
+    public CLLocationCoordinate2D Coordinate { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoordinate:")]
+    public Self InitWithCoordinate(CLLocationCoordinate2D coordinate);
+    [Selector("initWithCoordinate:title:subtitle:")]
+    public Self InitWithCoordinateTitleSubtitle(CLLocationCoordinate2D coordinate, NSString? title, NSString? subtitle);
 }
 
 #endif

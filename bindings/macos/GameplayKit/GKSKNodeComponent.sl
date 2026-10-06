@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class GKSKNodeComponent : GKComponent, GKAgentDelegate
 {
-    [Selector("node", "setNode:")] public SKNode Node { get; set; }
-    [Selector("componentWithNode:")] public static Self ComponentWithNode(SKNode node);
-    [Selector("initWithNode:")] public Self InitWithNode(SKNode node);
+    [Selector("node", "setNode:")]
+    public SKNode Node { get; set; }
+    [Selector("componentWithNode:")]
+    public static Self ComponentWithNode(SKNode node);
+    [Selector("initWithNode:")]
+    public Self InitWithNode(SKNode node);
 }
 
 #endif

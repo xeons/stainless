@@ -43,32 +43,50 @@ public enum SCContentSharingPickerMode : ulong
 
 public extern objc class SCContentSharingPickerConfiguration : NSObject
 {
-    [Selector("allowedPickerModes", "setAllowedPickerModes:")] public SCContentSharingPickerMode AllowedPickerModes { get; set; }
-    [Selector("excludedWindowIDs", "setExcludedWindowIDs:")] public NSArray ExcludedWindowIDs { get; set; }
-    [Selector("excludedBundleIDs", "setExcludedBundleIDs:")] public NSArray ExcludedBundleIDs { get; set; }
-    [Selector("allowsChangingSelectedContent", "setAllowsChangingSelectedContent:")] public bool AllowsChangingSelectedContent { get; set; }
+    [Selector("allowedPickerModes", "setAllowedPickerModes:")]
+    public SCContentSharingPickerMode AllowedPickerModes { get; set; }
+    [Selector("excludedWindowIDs", "setExcludedWindowIDs:")]
+    public NSArray ExcludedWindowIDs { get; set; }
+    [Selector("excludedBundleIDs", "setExcludedBundleIDs:")]
+    public NSArray ExcludedBundleIDs { get; set; }
+    [Selector("allowsChangingSelectedContent", "setAllowsChangingSelectedContent:")]
+    public bool AllowsChangingSelectedContent { get; set; }
 }
 
 public extern objc class SCContentSharingPicker : NSObject
 {
-    [Selector("sharedPicker")] public static SCContentSharingPicker SharedPicker { get; }
-    [Selector("defaultConfiguration", "setDefaultConfiguration:")] public SCContentSharingPickerConfiguration? DefaultConfiguration { get; set; }
-    [Selector("maximumStreamCount", "setMaximumStreamCount:")] public NSNumber? MaximumStreamCount { get; set; }
-    [Selector("isActive", "setActive:")] public bool Active { get; set; }
-    [Selector("addObserver:")] public void AddObserver(SCContentSharingPickerObserver observer);
-    [Selector("removeObserver:")] public void RemoveObserver(SCContentSharingPickerObserver observer);
-    [Selector("setConfiguration:forStream:")] public void SetConfigurationForStream(SCContentSharingPickerConfiguration? pickerConfig, SCStream stream);
-    [Selector("present")] public void Present();
-    [Selector("presentPickerUsingContentStyle:")] public void PresentPickerUsingContentStyle(SCShareableContentStyle contentStyle);
-    [Selector("presentPickerForStream:")] public void PresentPickerForStream(SCStream stream);
-    [Selector("presentPickerForStream:usingContentStyle:")] public void PresentPickerForStreamUsingContentStyle(SCStream stream, SCShareableContentStyle contentStyle);
+    [Selector("sharedPicker")]
+    public static SCContentSharingPicker SharedPicker { get; }
+    [Selector("defaultConfiguration", "setDefaultConfiguration:")]
+    public SCContentSharingPickerConfiguration? DefaultConfiguration { get; set; }
+    [Selector("maximumStreamCount", "setMaximumStreamCount:")]
+    public NSNumber? MaximumStreamCount { get; set; }
+    [Selector("isActive", "setActive:")]
+    public bool Active { get; set; }
+    [Selector("addObserver:")]
+    public void AddObserver(SCContentSharingPickerObserver observer);
+    [Selector("removeObserver:")]
+    public void RemoveObserver(SCContentSharingPickerObserver observer);
+    [Selector("setConfiguration:forStream:")]
+    public void SetConfigurationForStream(SCContentSharingPickerConfiguration? pickerConfig, SCStream stream);
+    [Selector("present")]
+    public void Present();
+    [Selector("presentPickerUsingContentStyle:")]
+    public void PresentPickerUsingContentStyle(SCShareableContentStyle contentStyle);
+    [Selector("presentPickerForStream:")]
+    public void PresentPickerForStream(SCStream stream);
+    [Selector("presentPickerForStream:usingContentStyle:")]
+    public void PresentPickerForStreamUsingContentStyle(SCStream stream, SCShareableContentStyle contentStyle);
 }
 
 public objc interface SCContentSharingPickerObserver : NSObjectProtocol
 {
-    [Selector("contentSharingPicker:didCancelForStream:")] void ContentSharingPickerDidCancelForStream(SCContentSharingPicker picker, SCStream? stream);
-    [Selector("contentSharingPicker:didUpdateWithFilter:forStream:")] void ContentSharingPickerDidUpdateWithFilterForStream(SCContentSharingPicker picker, SCContentFilter filter, SCStream? stream);
-    [Selector("contentSharingPickerStartDidFailWithError:")] void ContentSharingPickerStartDidFailWithError(NSError error);
+    [Selector("contentSharingPicker:didCancelForStream:")]
+    void ContentSharingPickerDidCancelForStream(SCContentSharingPicker picker, SCStream? stream);
+    [Selector("contentSharingPicker:didUpdateWithFilter:forStream:")]
+    void ContentSharingPickerDidUpdateWithFilterForStream(SCContentSharingPicker picker, SCContentFilter filter, SCStream? stream);
+    [Selector("contentSharingPickerStartDidFailWithError:")]
+    void ContentSharingPickerStartDidFailWithError(NSError error);
 }
 
 #endif

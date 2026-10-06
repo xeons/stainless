@@ -33,22 +33,36 @@ import Standard.ObjC;
 
 public extern objc class NSPropertyDescription : NSObject, NSCoding, NSCopying
 {
-    [Selector("entity")] public NSEntityDescription Entity { get; }
-    [Selector("name", "setName:")] public NSString Name { get; set; }
-    [Selector("isOptional", "setOptional:")] public bool Optional { get; set; }
-    [Selector("isTransient", "setTransient:")] public bool Transient { get; set; }
-    [Selector("validationPredicates")] public NSArray ValidationPredicates { get; }
-    [Selector("validationWarnings")] public NSArray ValidationWarnings { get; }
-    [Selector("userInfo", "setUserInfo:")] public NSDictionary? UserInfo { get; set; }
+    [Selector("entity")]
+    public NSEntityDescription Entity { get; }
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
+    [Selector("isOptional", "setOptional:")]
+    public bool Optional { get; set; }
+    [Selector("isTransient", "setTransient:")]
+    public bool Transient { get; set; }
+    [Selector("validationPredicates")]
+    public NSArray ValidationPredicates { get; }
+    [Selector("validationWarnings")]
+    public NSArray ValidationWarnings { get; }
+    [Selector("userInfo", "setUserInfo:")]
+    public NSDictionary? UserInfo { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("isIndexed", "setIndexed:")] public bool Indexed { get; set; }
-    [Selector("versionHash")] public NSData VersionHash { get; }
-    [Selector("versionHashModifier", "setVersionHashModifier:")] public NSString? VersionHashModifier { get; set; }
-    [Selector("isIndexedBySpotlight", "setIndexedBySpotlight:")] public bool IndexedBySpotlight { get; set; }
+    [Selector("isIndexed", "setIndexed:")]
+    public bool Indexed { get; set; }
+    [Selector("versionHash")]
+    public NSData VersionHash { get; }
+    [Selector("versionHashModifier", "setVersionHashModifier:")]
+    public NSString? VersionHashModifier { get; set; }
+    [Selector("isIndexedBySpotlight", "setIndexedBySpotlight:")]
+    public bool IndexedBySpotlight { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("isStoredInExternalRecord", "setStoredInExternalRecord:")] public bool StoredInExternalRecord { get; set; }
-    [Selector("renamingIdentifier", "setRenamingIdentifier:")] public NSString? RenamingIdentifier { get; set; }
-    [Selector("setValidationPredicates:withValidationWarnings:")] public void SetValidationPredicatesWithValidationWarnings(NSArray? validationPredicates, NSArray? validationWarnings);
+    [Selector("isStoredInExternalRecord", "setStoredInExternalRecord:")]
+    public bool StoredInExternalRecord { get; set; }
+    [Selector("renamingIdentifier", "setRenamingIdentifier:")]
+    public NSString? RenamingIdentifier { get; set; }
+    [Selector("setValidationPredicates:withValidationWarnings:")]
+    public void SetValidationPredicatesWithValidationWarnings(NSArray? validationPredicates, NSArray? validationWarnings);
 }
 
 #endif

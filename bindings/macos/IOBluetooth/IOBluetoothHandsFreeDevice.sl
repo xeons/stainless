@@ -32,45 +32,93 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothHandsFreeDevice : IOBluetoothHandsFree
 {
-    [Selector("initWithDevice:delegate:")] public Self? InitWithDeviceDelegate(IOBluetoothDevice? device, AnyObject? @delegate);
-    [Selector("dialNumber:")] public void DialNumber(NSString? aNumber);
-    [Selector("memoryDial:")] public void MemoryDial(int memoryLocation);
-    [Selector("redial")] public void Redial();
-    [Selector("endCall")] public void EndCall();
-    [Selector("acceptCall")] public void AcceptCall();
-    [Selector("acceptCallOnPhone")] public void AcceptCallOnPhone();
-    [Selector("sendDTMF:")] public void SendDTMF(NSString? character);
-    [Selector("subscriberNumber")] public void SubscriberNumber();
-    [Selector("currentCallList")] public void CurrentCallList();
-    [Selector("releaseHeldCalls")] public void ReleaseHeldCalls();
-    [Selector("releaseActiveCalls")] public void ReleaseActiveCalls();
-    [Selector("releaseCall:")] public void ReleaseCall(int index);
-    [Selector("holdCall")] public void HoldCall();
-    [Selector("placeAllOthersOnHold:")] public void PlaceAllOthersOnHold(int index);
-    [Selector("addHeldCall")] public void AddHeldCall();
-    [Selector("callTransfer")] public void CallTransfer();
-    [Selector("transferAudioToComputer")] public void TransferAudioToComputer();
-    [Selector("transferAudioToPhone")] public void TransferAudioToPhone();
-    [Selector("sendSMS:message:")] public void SendSMSMessage(NSString? aNumber, NSString? aMessage);
-    [Selector("sendATCommand:")] public void SendATCommand(NSString? atCommand);
-    [Selector("sendATCommand:timeout:selector:target:")] public void SendATCommandTimeoutSelectorTarget(NSString? atCommand, float timeout, Selector selector, AnyObject? target);
+    [Selector("initWithDevice:delegate:")]
+    public Self? InitWithDeviceDelegate(IOBluetoothDevice? device, AnyObject? @delegate);
+    [Selector("dialNumber:")]
+    public void DialNumber(NSString? aNumber);
+    [Selector("memoryDial:")]
+    public void MemoryDial(int memoryLocation);
+    [Selector("redial")]
+    public void Redial();
+    [Selector("endCall")]
+    public void EndCall();
+    [Selector("acceptCall")]
+    public void AcceptCall();
+    [Selector("acceptCallOnPhone")]
+    public void AcceptCallOnPhone();
+    [Selector("sendDTMF:")]
+    public void SendDTMF(NSString? character);
+    [Selector("subscriberNumber")]
+    public void SubscriberNumber();
+    [Selector("currentCallList")]
+    public void CurrentCallList();
+    [Selector("releaseHeldCalls")]
+    public void ReleaseHeldCalls();
+    [Selector("releaseActiveCalls")]
+    public void ReleaseActiveCalls();
+    [Selector("releaseCall:")]
+    public void ReleaseCall(int index);
+    [Selector("holdCall")]
+    public void HoldCall();
+    [Selector("placeAllOthersOnHold:")]
+    public void PlaceAllOthersOnHold(int index);
+    [Selector("addHeldCall")]
+    public void AddHeldCall();
+    [Selector("callTransfer")]
+    public void CallTransfer();
+    [Selector("transferAudioToComputer")]
+    public void TransferAudioToComputer();
+    [Selector("transferAudioToPhone")]
+    public void TransferAudioToPhone();
+    [Selector("sendSMS:message:")]
+    public void SendSMSMessage(NSString? aNumber, NSString? aMessage);
+    [Selector("sendATCommand:")]
+    public void SendATCommand(NSString? atCommand);
+    [Selector("sendATCommand:timeout:selector:target:")]
+    public void SendATCommandTimeoutSelectorTarget(NSString? atCommand, float timeout, Selector selector, AnyObject? target);
 }
 
 public objc interface IOBluetoothHandsFreeDeviceDelegate : IOBluetoothHandsFreeDelegate
 {
-    [Optional] [Selector("handsFree:isServiceAvailable:")] void HandsFreeIsServiceAvailable(IOBluetoothHandsFreeDevice? device, NSNumber? isServiceAvailable);
-    [Optional] [Selector("handsFree:isCallActive:")] void HandsFreeIsCallActive(IOBluetoothHandsFreeDevice? device, NSNumber? isCallActive);
-    [Optional] [Selector("handsFree:callSetupMode:")] void HandsFreeCallSetupMode(IOBluetoothHandsFreeDevice? device, NSNumber? callSetupMode);
-    [Optional] [Selector("handsFree:callHoldState:")] void HandsFreeCallHoldState(IOBluetoothHandsFreeDevice? device, NSNumber? callHoldState);
-    [Optional] [Selector("handsFree:signalStrength:")] void HandsFreeSignalStrength(IOBluetoothHandsFreeDevice? device, NSNumber? signalStrength);
-    [Optional] [Selector("handsFree:isRoaming:")] void HandsFreeIsRoaming(IOBluetoothHandsFreeDevice? device, NSNumber? isRoaming);
-    [Optional] [Selector("handsFree:batteryCharge:")] void HandsFreeBatteryCharge(IOBluetoothHandsFreeDevice? device, NSNumber? batteryCharge);
-    [Optional] [Selector("handsFree:incomingCallFrom:")] void HandsFreeIncomingCallFrom(IOBluetoothHandsFreeDevice? device, NSString? number);
-    [Optional] [Selector("handsFree:ringAttempt:")] void HandsFreeRingAttempt(IOBluetoothHandsFreeDevice? device, NSNumber? ringAttempt);
-    [Optional] [Selector("handsFree:currentCall:")] void HandsFreeCurrentCall(IOBluetoothHandsFreeDevice? device, NSDictionary? currentCall);
-    [Optional] [Selector("handsFree:subscriberNumber:")] void HandsFreeSubscriberNumber(IOBluetoothHandsFreeDevice? device, NSString? subscriberNumber);
-    [Optional] [Selector("handsFree:incomingSMS:")] void HandsFreeIncomingSMS(IOBluetoothHandsFreeDevice? device, NSDictionary? sms);
-    [Optional] [Selector("handsFree:unhandledResultCode:")] void HandsFreeUnhandledResultCode(IOBluetoothHandsFreeDevice? device, NSString? resultCode);
+    [Optional]
+    [Selector("handsFree:isServiceAvailable:")]
+    void HandsFreeIsServiceAvailable(IOBluetoothHandsFreeDevice? device, NSNumber? isServiceAvailable);
+    [Optional]
+    [Selector("handsFree:isCallActive:")]
+    void HandsFreeIsCallActive(IOBluetoothHandsFreeDevice? device, NSNumber? isCallActive);
+    [Optional]
+    [Selector("handsFree:callSetupMode:")]
+    void HandsFreeCallSetupMode(IOBluetoothHandsFreeDevice? device, NSNumber? callSetupMode);
+    [Optional]
+    [Selector("handsFree:callHoldState:")]
+    void HandsFreeCallHoldState(IOBluetoothHandsFreeDevice? device, NSNumber? callHoldState);
+    [Optional]
+    [Selector("handsFree:signalStrength:")]
+    void HandsFreeSignalStrength(IOBluetoothHandsFreeDevice? device, NSNumber? signalStrength);
+    [Optional]
+    [Selector("handsFree:isRoaming:")]
+    void HandsFreeIsRoaming(IOBluetoothHandsFreeDevice? device, NSNumber? isRoaming);
+    [Optional]
+    [Selector("handsFree:batteryCharge:")]
+    void HandsFreeBatteryCharge(IOBluetoothHandsFreeDevice? device, NSNumber? batteryCharge);
+    [Optional]
+    [Selector("handsFree:incomingCallFrom:")]
+    void HandsFreeIncomingCallFrom(IOBluetoothHandsFreeDevice? device, NSString? number);
+    [Optional]
+    [Selector("handsFree:ringAttempt:")]
+    void HandsFreeRingAttempt(IOBluetoothHandsFreeDevice? device, NSNumber? ringAttempt);
+    [Optional]
+    [Selector("handsFree:currentCall:")]
+    void HandsFreeCurrentCall(IOBluetoothHandsFreeDevice? device, NSDictionary? currentCall);
+    [Optional]
+    [Selector("handsFree:subscriberNumber:")]
+    void HandsFreeSubscriberNumber(IOBluetoothHandsFreeDevice? device, NSString? subscriberNumber);
+    [Optional]
+    [Selector("handsFree:incomingSMS:")]
+    void HandsFreeIncomingSMS(IOBluetoothHandsFreeDevice? device, NSDictionary? sms);
+    [Optional]
+    [Selector("handsFree:unhandledResultCode:")]
+    void HandsFreeUnhandledResultCode(IOBluetoothHandsFreeDevice? device, NSString? resultCode);
 }
 
 #endif

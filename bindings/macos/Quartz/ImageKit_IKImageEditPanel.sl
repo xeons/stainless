@@ -34,21 +34,37 @@ import Standard.ObjC;
 
 public objc interface IKImageEditPanelDataSource
 {
-    [Selector("image")] CGImageRef? Image { get; }
-    [Optional] [Selector("imageProperties")] NSDictionary? ImageProperties { get; }
-    [Optional] [Selector("hasAdjustMode")] bool HasAdjustMode { get; }
-    [Optional] [Selector("hasEffectsMode")] bool HasEffectsMode { get; }
-    [Optional] [Selector("hasDetailsMode")] bool HasDetailsMode { get; }
-    [Selector("setImage:imageProperties:")] void SetImageImageProperties(CGImageRef? image, NSDictionary? metaData);
-    [Optional] [Selector("thumbnailWithMaximumSize:")] CGImageRef? ThumbnailWithMaximumSize(NSSize size);
+    [Selector("image")]
+    CGImageRef? Image { get; }
+    [Optional]
+    [Selector("imageProperties")]
+    NSDictionary? ImageProperties { get; }
+    [Optional]
+    [Selector("hasAdjustMode")]
+    bool HasAdjustMode { get; }
+    [Optional]
+    [Selector("hasEffectsMode")]
+    bool HasEffectsMode { get; }
+    [Optional]
+    [Selector("hasDetailsMode")]
+    bool HasDetailsMode { get; }
+    [Selector("setImage:imageProperties:")]
+    void SetImageImageProperties(CGImageRef? image, NSDictionary? metaData);
+    [Optional]
+    [Selector("thumbnailWithMaximumSize:")]
+    CGImageRef? ThumbnailWithMaximumSize(NSSize size);
 }
 
 public extern objc class IKImageEditPanel : NSPanel
 {
-    [Selector("dataSource", "setDataSource:")] public IKImageEditPanelDataSource? DataSource { get; set; }
-    [Selector("filterArray")] public NSArray? FilterArray { get; }
-    [Selector("sharedImageEditPanel")] public static IKImageEditPanel? SharedImageEditPanel();
-    [Selector("reloadData")] public void ReloadData();
+    [Selector("dataSource", "setDataSource:")]
+    public IKImageEditPanelDataSource? DataSource { get; set; }
+    [Selector("filterArray")]
+    public NSArray? FilterArray { get; }
+    [Selector("sharedImageEditPanel")]
+    public static IKImageEditPanel? SharedImageEditPanel();
+    [Selector("reloadData")]
+    public void ReloadData();
 }
 
 #endif

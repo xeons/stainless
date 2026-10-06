@@ -36,7 +36,8 @@ import Standard.ObjC;
 /// INIntentsAdditions, a category of CLPlacemark.
 public extern objc class CLPlacemark
 {
-    [Selector("placemarkWithLocation:name:postalAddress:")] public static Self PlacemarkWithLocationNamePostalAddress(CLLocation location, NSString? name, CNPostalAddress? postalAddress);
+    [Selector("placemarkWithLocation:name:postalAddress:")]
+    public static Self PlacemarkWithLocationNamePostalAddress(CLLocation location, NSString? name, CNPostalAddress? postalAddress);
 }
 
 #endif

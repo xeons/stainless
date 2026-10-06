@@ -37,10 +37,14 @@ public objc closure void NEPacketTunnelFlowReadPacketObjectsWithCompletionHandle
 
 public extern objc class NEPacketTunnelFlow : NSObject
 {
-    [Selector("readPacketsWithCompletionHandler:")] public void ReadPacketsWithCompletionHandler(NEPacketTunnelFlowReadPacketsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("writePackets:withProtocols:")] public bool WritePacketsWithProtocols(NSArray packets, NSArray protocols);
-    [Selector("readPacketObjectsWithCompletionHandler:")] public void ReadPacketObjectsWithCompletionHandler(NEPacketTunnelFlowReadPacketObjectsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("writePacketObjects:")] public bool WritePacketObjects(NSArray packets);
+    [Selector("readPacketsWithCompletionHandler:")]
+    public void ReadPacketsWithCompletionHandler(NEPacketTunnelFlowReadPacketsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("writePackets:withProtocols:")]
+    public bool WritePacketsWithProtocols(NSArray packets, NSArray protocols);
+    [Selector("readPacketObjectsWithCompletionHandler:")]
+    public void ReadPacketObjectsWithCompletionHandler(NEPacketTunnelFlowReadPacketObjectsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("writePacketObjects:")]
+    public bool WritePacketObjects(NSArray packets);
 }
 
 #endif

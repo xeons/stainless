@@ -89,13 +89,17 @@ public using CFSocketNativeHandle = int;
 
 public extern "C" CFTypeID CFSocketGetTypeID();
 
-[ReturnsRetained] public extern "C" CFSocketRef? CFSocketCreate(CFAllocatorRef? allocator, SInt32 protocolFamily, SInt32 socketType, SInt32 protocol, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context);
+[ReturnsRetained]
+public extern "C" CFSocketRef? CFSocketCreate(CFAllocatorRef? allocator, SInt32 protocolFamily, SInt32 socketType, SInt32 protocol, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context);
 
-[ReturnsRetained] public extern "C" CFSocketRef? CFSocketCreateWithNative(CFAllocatorRef? allocator, CFSocketNativeHandle sock, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context);
+[ReturnsRetained]
+public extern "C" CFSocketRef? CFSocketCreateWithNative(CFAllocatorRef? allocator, CFSocketNativeHandle sock, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context);
 
-[ReturnsRetained] public extern "C" CFSocketRef? CFSocketCreateWithSocketSignature(CFAllocatorRef? allocator, CFSocketSignature* signature, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context);
+[ReturnsRetained]
+public extern "C" CFSocketRef? CFSocketCreateWithSocketSignature(CFAllocatorRef? allocator, CFSocketSignature* signature, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context);
 
-[ReturnsRetained] public extern "C" CFSocketRef? CFSocketCreateConnectedToSocketSignature(CFAllocatorRef? allocator, CFSocketSignature* signature, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context, CFTimeInterval timeout);
+[ReturnsRetained]
+public extern "C" CFSocketRef? CFSocketCreateConnectedToSocketSignature(CFAllocatorRef? allocator, CFSocketSignature* signature, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context, CFTimeInterval timeout);
 
 public extern "C" CFSocketError CFSocketSetAddress(CFSocketRef? s, CFDataRef? address);
 
@@ -105,15 +109,18 @@ public extern "C" void CFSocketInvalidate(CFSocketRef? s);
 
 public extern "C" Boolean CFSocketIsValid(CFSocketRef? s);
 
-[ReturnsRetained] public extern "C" CFDataRef? CFSocketCopyAddress(CFSocketRef? s);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFSocketCopyAddress(CFSocketRef? s);
 
-[ReturnsRetained] public extern "C" CFDataRef? CFSocketCopyPeerAddress(CFSocketRef? s);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFSocketCopyPeerAddress(CFSocketRef? s);
 
 public extern "C" void CFSocketGetContext(CFSocketRef? s, CFSocketContext* context);
 
 public extern "C" CFSocketNativeHandle CFSocketGetNative(CFSocketRef? s);
 
-[ReturnsRetained] public extern "C" CFRunLoopSourceRef? CFSocketCreateRunLoopSource(CFAllocatorRef? allocator, CFSocketRef? s, CFIndex order);
+[ReturnsRetained]
+public extern "C" CFRunLoopSourceRef? CFSocketCreateRunLoopSource(CFAllocatorRef? allocator, CFSocketRef? s, CFIndex order);
 
 public extern "C" CFOptionFlags CFSocketGetSocketFlags(CFSocketRef? s);
 

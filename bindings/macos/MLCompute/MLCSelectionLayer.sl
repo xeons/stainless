@@ -32,7 +32,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCSelectionLayer : MLCLayer
 {
-    [Selector("layer")] public static Self Layer();
+    [Selector("layer")]
+    public static Self Layer();
 }
 
 #endif

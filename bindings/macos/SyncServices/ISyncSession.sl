@@ -34,67 +34,98 @@ import Standard.ObjC;
 public extern objc class ISyncSession : NSObject
 {
     /// Deprecated in macOS 10.7.
-    [Selector("beginSessionWithClient:entityNames:beforeDate:")] public static ISyncSession? BeginSessionWithClientEntityNamesBeforeDate(ISyncClient? client, NSArray? entityNames, NSDate? date);
+    [Selector("beginSessionWithClient:entityNames:beforeDate:")]
+    public static ISyncSession? BeginSessionWithClientEntityNamesBeforeDate(ISyncClient? client, NSArray? entityNames, NSDate? date);
     /// Deprecated in macOS 10.7.
-    [Selector("beginSessionInBackgroundWithClient:entityNames:target:selector:")] public static void BeginSessionInBackgroundWithClientEntityNamesTargetSelector(ISyncClient? client, NSArray? entityNames, AnyObject? target, Selector selector);
+    [Selector("beginSessionInBackgroundWithClient:entityNames:target:selector:")]
+    public static void BeginSessionInBackgroundWithClientEntityNamesTargetSelector(ISyncClient? client, NSArray? entityNames, AnyObject? target, Selector selector);
     /// Deprecated in macOS 10.7.
-    [Selector("cancelPreviousBeginSessionWithClient:")] public static void CancelPreviousBeginSessionWithClient(ISyncClient? client);
+    [Selector("cancelPreviousBeginSessionWithClient:")]
+    public static void CancelPreviousBeginSessionWithClient(ISyncClient? client);
     /// Deprecated in macOS 10.7.
-    [Selector("beginSessionWithClient:entityNames:beforeDate:lastAnchors:")] public static ISyncSession? BeginSessionWithClientEntityNamesBeforeDateLastAnchors(ISyncClient? client, NSArray? entityNames, NSDate? date, NSDictionary? anchors);
+    [Selector("beginSessionWithClient:entityNames:beforeDate:lastAnchors:")]
+    public static ISyncSession? BeginSessionWithClientEntityNamesBeforeDateLastAnchors(ISyncClient? client, NSArray? entityNames, NSDate? date, NSDictionary? anchors);
     /// Deprecated in macOS 10.7.
-    [Selector("beginSessionInBackgroundWithClient:entityNames:target:selector:lastAnchors:")] public static void BeginSessionInBackgroundWithClientEntityNamesTargetSelectorLastAnchors(ISyncClient? client, NSArray? entityNames, AnyObject? target, Selector selector, NSDictionary? anchors);
+    [Selector("beginSessionInBackgroundWithClient:entityNames:target:selector:lastAnchors:")]
+    public static void BeginSessionInBackgroundWithClientEntityNamesTargetSelectorLastAnchors(ISyncClient? client, NSArray? entityNames, AnyObject? target, Selector selector, NSDictionary? anchors);
     /// Deprecated in macOS 10.7.
-    [Selector("clientDidResetEntityNames:")] public void ClientDidResetEntityNames(NSArray? entityNames);
+    [Selector("clientDidResetEntityNames:")]
+    public void ClientDidResetEntityNames(NSArray? entityNames);
     /// Deprecated in macOS 10.7.
-    [Selector("clientWantsToPushAllRecordsForEntityNames:")] public void ClientWantsToPushAllRecordsForEntityNames(NSArray? entityNames);
+    [Selector("clientWantsToPushAllRecordsForEntityNames:")]
+    public void ClientWantsToPushAllRecordsForEntityNames(NSArray? entityNames);
     /// Deprecated in macOS 10.7.
-    [Selector("shouldPushChangesForEntityName:")] public bool ShouldPushChangesForEntityName(NSString? entityName);
+    [Selector("shouldPushChangesForEntityName:")]
+    public bool ShouldPushChangesForEntityName(NSString? entityName);
     /// Deprecated in macOS 10.7.
-    [Selector("shouldPushAllRecordsForEntityName:")] public bool ShouldPushAllRecordsForEntityName(NSString? entityName);
+    [Selector("shouldPushAllRecordsForEntityName:")]
+    public bool ShouldPushAllRecordsForEntityName(NSString? entityName);
     /// Deprecated in macOS 10.7.
-    [Selector("shouldPullChangesForEntityName:")] public bool ShouldPullChangesForEntityName(NSString? entityName);
+    [Selector("shouldPullChangesForEntityName:")]
+    public bool ShouldPullChangesForEntityName(NSString? entityName);
     /// Deprecated in macOS 10.7.
-    [Selector("shouldReplaceAllRecordsOnClientForEntityName:")] public bool ShouldReplaceAllRecordsOnClientForEntityName(NSString? entityName);
+    [Selector("shouldReplaceAllRecordsOnClientForEntityName:")]
+    public bool ShouldReplaceAllRecordsOnClientForEntityName(NSString? entityName);
     /// Deprecated in macOS 10.7.
-    [Selector("pushChange:")] public void PushChange(ISyncChange? change);
+    [Selector("pushChange:")]
+    public void PushChange(ISyncChange? change);
     /// Deprecated in macOS 10.7.
-    [Selector("pushChangesFromRecord:withIdentifier:")] public void PushChangesFromRecordWithIdentifier(NSDictionary? record, NSString? recordId);
+    [Selector("pushChangesFromRecord:withIdentifier:")]
+    public void PushChangesFromRecordWithIdentifier(NSDictionary? record, NSString? recordId);
     /// Deprecated in macOS 10.7.
-    [Selector("deleteRecordWithIdentifier:")] public void DeleteRecordWithIdentifier(NSString? recordId);
+    [Selector("deleteRecordWithIdentifier:")]
+    public void DeleteRecordWithIdentifier(NSString? recordId);
     /// Deprecated in macOS 10.7.
-    [Selector("clientLostRecordWithIdentifier:shouldReplaceOnNextSync:")] public void ClientLostRecordWithIdentifierShouldReplaceOnNextSync(NSString? recordId, bool flag);
+    [Selector("clientLostRecordWithIdentifier:shouldReplaceOnNextSync:")]
+    public void ClientLostRecordWithIdentifierShouldReplaceOnNextSync(NSString? recordId, bool flag);
     /// Deprecated in macOS 10.7.
-    [Selector("clientFinishedPushingChangesWithNextAnchors:")] public void ClientFinishedPushingChangesWithNextAnchors(NSDictionary? anchors);
+    [Selector("clientFinishedPushingChangesWithNextAnchors:")]
+    public void ClientFinishedPushingChangesWithNextAnchors(NSDictionary? anchors);
     /// Deprecated in macOS 10.7.
-    [Selector("prepareToPullChangesForEntityNames:beforeDate:")] public bool PrepareToPullChangesForEntityNamesBeforeDate(NSArray? entityNames, NSDate? date);
+    [Selector("prepareToPullChangesForEntityNames:beforeDate:")]
+    public bool PrepareToPullChangesForEntityNamesBeforeDate(NSArray? entityNames, NSDate? date);
     /// Deprecated in macOS 10.7.
-    [Selector("prepareToPullChangesInBackgroundForEntityNames:target:selector:")] public void PrepareToPullChangesInBackgroundForEntityNamesTargetSelector(NSArray? entityNames, AnyObject? target, Selector selector);
+    [Selector("prepareToPullChangesInBackgroundForEntityNames:target:selector:")]
+    public void PrepareToPullChangesInBackgroundForEntityNamesTargetSelector(NSArray? entityNames, AnyObject? target, Selector selector);
     /// Deprecated in macOS 10.7.
-    [Selector("changeEnumeratorForEntityNames:")] public NSEnumerator? ChangeEnumeratorForEntityNames(NSArray? entityNames);
+    [Selector("changeEnumeratorForEntityNames:")]
+    public NSEnumerator? ChangeEnumeratorForEntityNames(NSArray? entityNames);
     /// Deprecated in macOS 10.7.
-    [Selector("clientAcceptedChangesForRecordWithIdentifier:formattedRecord:newRecordIdentifier:")] public void ClientAcceptedChangesForRecordWithIdentifierFormattedRecordNewRecordIdentifier(NSString? recordId, NSDictionary? formattedRecord, NSString? recordId2);
+    [Selector("clientAcceptedChangesForRecordWithIdentifier:formattedRecord:newRecordIdentifier:")]
+    public void ClientAcceptedChangesForRecordWithIdentifierFormattedRecordNewRecordIdentifier(NSString? recordId, NSDictionary? formattedRecord, NSString? recordId2);
     /// Deprecated in macOS 10.7.
-    [Selector("clientRefusedChangesForRecordWithIdentifier:")] public void ClientRefusedChangesForRecordWithIdentifier(NSString? recordId);
+    [Selector("clientRefusedChangesForRecordWithIdentifier:")]
+    public void ClientRefusedChangesForRecordWithIdentifier(NSString? recordId);
     /// Deprecated in macOS 10.7.
-    [Selector("clientCommittedAcceptedChanges")] public void ClientCommittedAcceptedChanges();
+    [Selector("clientCommittedAcceptedChanges")]
+    public void ClientCommittedAcceptedChanges();
     /// Deprecated in macOS 10.7.
-    [Selector("clientCommittedAcceptedChangesWithNextAnchors:")] public void ClientCommittedAcceptedChangesWithNextAnchors(NSDictionary? anchors);
+    [Selector("clientCommittedAcceptedChangesWithNextAnchors:")]
+    public void ClientCommittedAcceptedChangesWithNextAnchors(NSDictionary? anchors);
     /// Deprecated in macOS 10.7.
-    [Selector("clientChangedRecordIdentifiers:")] public void ClientChangedRecordIdentifiers(NSDictionary? oldToNew);
+    [Selector("clientChangedRecordIdentifiers:")]
+    public void ClientChangedRecordIdentifiers(NSDictionary? oldToNew);
     /// Deprecated in macOS 10.7.
-    [Selector("isCancelled")] public bool IsCancelled();
+    [Selector("isCancelled")]
+    public bool IsCancelled();
     /// Deprecated in macOS 10.7.
-    [Selector("cancelSyncing")] public void CancelSyncing();
+    [Selector("cancelSyncing")]
+    public void CancelSyncing();
     /// Deprecated in macOS 10.7.
-    [Selector("finishSyncing")] public void FinishSyncing();
+    [Selector("finishSyncing")]
+    public void FinishSyncing();
     /// Deprecated in macOS 10.7.
-    [Selector("clientInfoForRecordWithIdentifier:")] public AnyObject? ClientInfoForRecordWithIdentifier(NSString? recordId);
+    [Selector("clientInfoForRecordWithIdentifier:")]
+    public AnyObject? ClientInfoForRecordWithIdentifier(NSString? recordId);
     /// Deprecated in macOS 10.7.
-    [Selector("setClientInfo:forRecordWithIdentifier:")] public void SetClientInfoForRecordWithIdentifier(NSCoding? clientInfo, NSString? recordId);
+    [Selector("setClientInfo:forRecordWithIdentifier:")]
+    public void SetClientInfoForRecordWithIdentifier(NSCoding? clientInfo, NSString? recordId);
     /// Deprecated in macOS 10.7.
-    [Selector("snapshotOfRecordsInTruth")] public ISyncRecordSnapshot? SnapshotOfRecordsInTruth();
+    [Selector("snapshotOfRecordsInTruth")]
+    public ISyncRecordSnapshot? SnapshotOfRecordsInTruth();
     /// Deprecated in macOS 10.7.
-    [Selector("ping")] public void Ping();
+    [Selector("ping")]
+    public void Ping();
 }
 
 /// Deprecated in macOS 10.7.

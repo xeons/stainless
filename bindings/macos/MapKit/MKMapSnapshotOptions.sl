@@ -34,20 +34,30 @@ import Standard.ObjC;
 
 public extern objc class MKMapSnapshotOptions : NSObject, NSCopying
 {
-    [Selector("preferredConfiguration", "setPreferredConfiguration:")] public MKMapConfiguration PreferredConfiguration { get; set; }
-    [Selector("camera", "setCamera:")] public MKMapCamera Camera { get; set; }
-    [Selector("mapRect", "setMapRect:")] public MKMapRect MapRect { get; set; }
-    [Selector("region", "setRegion:")] public MKCoordinateRegion Region { get; set; }
+    [Selector("preferredConfiguration", "setPreferredConfiguration:")]
+    public MKMapConfiguration PreferredConfiguration { get; set; }
+    [Selector("camera", "setCamera:")]
+    public MKMapCamera Camera { get; set; }
+    [Selector("mapRect", "setMapRect:")]
+    public MKMapRect MapRect { get; set; }
+    [Selector("region", "setRegion:")]
+    public MKCoordinateRegion Region { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("mapType", "setMapType:")] public MKMapType MapType { get; set; }
+    [Selector("mapType", "setMapType:")]
+    public MKMapType MapType { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")] public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
+    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")]
+    public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
     /// Deprecated in macOS 10.15.
-    [Selector("showsPointsOfInterest", "setShowsPointsOfInterest:")] public bool ShowsPointsOfInterest { get; set; }
+    [Selector("showsPointsOfInterest", "setShowsPointsOfInterest:")]
+    public bool ShowsPointsOfInterest { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("showsBuildings", "setShowsBuildings:")] public bool ShowsBuildings { get; set; }
-    [Selector("size", "setSize:")] public NSSize Size { get; set; }
-    [Selector("appearance", "setAppearance:")] public NSAppearance? Appearance { get; set; }
+    [Selector("showsBuildings", "setShowsBuildings:")]
+    public bool ShowsBuildings { get; set; }
+    [Selector("size", "setSize:")]
+    public NSSize Size { get; set; }
+    [Selector("appearance", "setAppearance:")]
+    public NSAppearance? Appearance { get; set; }
 }
 
 #endif

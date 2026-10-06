@@ -33,36 +33,58 @@ import Standard.ObjC;
 
 public extern objc class HKObjectType : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("quantityTypeForIdentifier:")] public static HKQuantityType? QuantityTypeForIdentifier(HKQuantityTypeIdentifier identifier);
-    [Selector("categoryTypeForIdentifier:")] public static HKCategoryType? CategoryTypeForIdentifier(HKCategoryTypeIdentifier identifier);
-    [Selector("characteristicTypeForIdentifier:")] public static HKCharacteristicType? CharacteristicTypeForIdentifier(HKCharacteristicTypeIdentifier identifier);
-    [Selector("correlationTypeForIdentifier:")] public static HKCorrelationType? CorrelationTypeForIdentifier(HKCorrelationTypeIdentifier identifier);
-    [Selector("documentTypeForIdentifier:")] public static HKDocumentType? DocumentTypeForIdentifier(HKDocumentTypeIdentifier identifier);
-    [Selector("scoredAssessmentTypeForIdentifier:")] public static HKScoredAssessmentType? ScoredAssessmentTypeForIdentifier(HKScoredAssessmentTypeIdentifier identifier);
-    [Selector("seriesTypeForIdentifier:")] public static HKSeriesType? SeriesTypeForIdentifier(NSString identifier);
-    [Selector("workoutType")] public static HKWorkoutType WorkoutType();
-    [Selector("activitySummaryType")] public static HKActivitySummaryType ActivitySummaryType();
-    [Selector("audiogramSampleType")] public static HKAudiogramSampleType AudiogramSampleType();
-    [Selector("electrocardiogramType")] public static HKElectrocardiogramType ElectrocardiogramType();
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("quantityTypeForIdentifier:")]
+    public static HKQuantityType? QuantityTypeForIdentifier(HKQuantityTypeIdentifier identifier);
+    [Selector("categoryTypeForIdentifier:")]
+    public static HKCategoryType? CategoryTypeForIdentifier(HKCategoryTypeIdentifier identifier);
+    [Selector("characteristicTypeForIdentifier:")]
+    public static HKCharacteristicType? CharacteristicTypeForIdentifier(HKCharacteristicTypeIdentifier identifier);
+    [Selector("correlationTypeForIdentifier:")]
+    public static HKCorrelationType? CorrelationTypeForIdentifier(HKCorrelationTypeIdentifier identifier);
+    [Selector("documentTypeForIdentifier:")]
+    public static HKDocumentType? DocumentTypeForIdentifier(HKDocumentTypeIdentifier identifier);
+    [Selector("scoredAssessmentTypeForIdentifier:")]
+    public static HKScoredAssessmentType? ScoredAssessmentTypeForIdentifier(HKScoredAssessmentTypeIdentifier identifier);
+    [Selector("seriesTypeForIdentifier:")]
+    public static HKSeriesType? SeriesTypeForIdentifier(NSString identifier);
+    [Selector("workoutType")]
+    public static HKWorkoutType WorkoutType();
+    [Selector("activitySummaryType")]
+    public static HKActivitySummaryType ActivitySummaryType();
+    [Selector("audiogramSampleType")]
+    public static HKAudiogramSampleType AudiogramSampleType();
+    [Selector("electrocardiogramType")]
+    public static HKElectrocardiogramType ElectrocardiogramType();
     /// macOS 26.0 and later.
-    [Selector("medicationDoseEventType")] public static HKMedicationDoseEventType MedicationDoseEventType();
-    [Selector("visionPrescriptionType")] public static HKPrescriptionType VisionPrescriptionType();
-    [Selector("stateOfMindType")] public static HKStateOfMindType StateOfMindType();
+    [Selector("medicationDoseEventType")]
+    public static HKMedicationDoseEventType MedicationDoseEventType();
+    [Selector("visionPrescriptionType")]
+    public static HKPrescriptionType VisionPrescriptionType();
+    [Selector("stateOfMindType")]
+    public static HKStateOfMindType StateOfMindType();
     /// macOS 26.0 and later.
-    [Selector("userAnnotatedMedicationType")] public static HKUserAnnotatedMedicationType UserAnnotatedMedicationType();
-    [Selector("requiresPerObjectAuthorization")] public bool RequiresPerObjectAuthorization();
+    [Selector("userAnnotatedMedicationType")]
+    public static HKUserAnnotatedMedicationType UserAnnotatedMedicationType();
+    [Selector("requiresPerObjectAuthorization")]
+    public bool RequiresPerObjectAuthorization();
 }
 
 public extern objc class HKCharacteristicType : HKObjectType { }
 
 public extern objc class HKSampleType : HKObjectType
 {
-    [Selector("isMaximumDurationRestricted")] public bool IsMaximumDurationRestricted { get; }
-    [Selector("maximumAllowedDuration")] public NSTimeInterval MaximumAllowedDuration { get; }
-    [Selector("isMinimumDurationRestricted")] public bool IsMinimumDurationRestricted { get; }
-    [Selector("minimumAllowedDuration")] public NSTimeInterval MinimumAllowedDuration { get; }
-    [Selector("allowsRecalibrationForEstimates")] public bool AllowsRecalibrationForEstimates { get; }
+    [Selector("isMaximumDurationRestricted")]
+    public bool IsMaximumDurationRestricted { get; }
+    [Selector("maximumAllowedDuration")]
+    public NSTimeInterval MaximumAllowedDuration { get; }
+    [Selector("isMinimumDurationRestricted")]
+    public bool IsMinimumDurationRestricted { get; }
+    [Selector("minimumAllowedDuration")]
+    public NSTimeInterval MinimumAllowedDuration { get; }
+    [Selector("allowsRecalibrationForEstimates")]
+    public bool AllowsRecalibrationForEstimates { get; }
 }
 
 public extern objc class HKCategoryType : HKSampleType { }
@@ -73,16 +95,20 @@ public extern objc class HKDocumentType : HKSampleType { }
 
 public extern objc class HKQuantityType : HKSampleType
 {
-    [Selector("aggregationStyle")] public HKQuantityAggregationStyle AggregationStyle { get; }
-    [Selector("isCompatibleWithUnit:")] public bool IsCompatibleWithUnit(HKUnit unit);
+    [Selector("aggregationStyle")]
+    public HKQuantityAggregationStyle AggregationStyle { get; }
+    [Selector("isCompatibleWithUnit:")]
+    public bool IsCompatibleWithUnit(HKUnit unit);
 }
 
 public extern objc class HKWorkoutType : HKSampleType { }
 
 public extern objc class HKSeriesType : HKSampleType
 {
-    [Selector("workoutRouteType")] public static Self WorkoutRouteType();
-    [Selector("heartbeatSeriesType")] public static Self HeartbeatSeriesType();
+    [Selector("workoutRouteType")]
+    public static Self WorkoutRouteType();
+    [Selector("heartbeatSeriesType")]
+    public static Self HeartbeatSeriesType();
 }
 
 public extern objc class HKActivitySummaryType : HKObjectType { }

@@ -43,15 +43,24 @@ public enum OSLogMessageComponentArgumentCategory : long
 
 public extern objc class OSLogMessageComponent : NSObject, NSSecureCoding
 {
-    [Selector("formatSubstring")] public NSString FormatSubstring { get; }
-    [Selector("placeholder")] public NSString Placeholder { get; }
-    [Selector("argumentCategory")] public OSLogMessageComponentArgumentCategory ArgumentCategory { get; }
-    [Selector("argumentDataValue")] public NSData? ArgumentDataValue { get; }
-    [Selector("argumentDoubleValue")] public double ArgumentDoubleValue { get; }
-    [Selector("argumentInt64Value")] public long ArgumentInt64Value { get; }
-    [Selector("argumentNumberValue")] public NSNumber? ArgumentNumberValue { get; }
-    [Selector("argumentStringValue")] public NSString? ArgumentStringValue { get; }
-    [Selector("argumentUInt64Value")] public ulong ArgumentUInt64Value { get; }
+    [Selector("formatSubstring")]
+    public NSString FormatSubstring { get; }
+    [Selector("placeholder")]
+    public NSString Placeholder { get; }
+    [Selector("argumentCategory")]
+    public OSLogMessageComponentArgumentCategory ArgumentCategory { get; }
+    [Selector("argumentDataValue")]
+    public NSData? ArgumentDataValue { get; }
+    [Selector("argumentDoubleValue")]
+    public double ArgumentDoubleValue { get; }
+    [Selector("argumentInt64Value")]
+    public long ArgumentInt64Value { get; }
+    [Selector("argumentNumberValue")]
+    public NSNumber? ArgumentNumberValue { get; }
+    [Selector("argumentStringValue")]
+    public NSString? ArgumentStringValue { get; }
+    [Selector("argumentUInt64Value")]
+    public ulong ArgumentUInt64Value { get; }
 }
 
 #endif

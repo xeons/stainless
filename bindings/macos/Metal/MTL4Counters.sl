@@ -54,18 +54,25 @@ public enum MTL4TimestampGranularity : long
 /// macOS 26.0 and later.
 public extern objc class MTL4CounterHeapDescriptor : NSObject, NSCopying
 {
-    [Selector("type", "setType:")] public MTL4CounterHeapType Type { get; set; }
-    [Selector("count", "setCount:")] public NSUInteger Count { get; set; }
+    [Selector("type", "setType:")]
+    public MTL4CounterHeapType Type { get; set; }
+    [Selector("count", "setCount:")]
+    public NSUInteger Count { get; set; }
 }
 
 /// macOS 26.0 and later.
 public objc interface MTL4CounterHeap : NSObjectProtocol
 {
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("count")] NSUInteger Count { get; }
-    [Selector("type")] MTL4CounterHeapType Type { get; }
-    [Selector("resolveCounterRange:")] NSData? ResolveCounterRange(NSRange range);
-    [Selector("invalidateCounterRange:")] void InvalidateCounterRange(NSRange range);
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("count")]
+    NSUInteger Count { get; }
+    [Selector("type")]
+    MTL4CounterHeapType Type { get; }
+    [Selector("resolveCounterRange:")]
+    NSData? ResolveCounterRange(NSRange range);
+    [Selector("invalidateCounterRange:")]
+    void InvalidateCounterRange(NSRange range);
 }
 
 #endif

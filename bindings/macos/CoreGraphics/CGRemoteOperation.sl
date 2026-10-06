@@ -90,7 +90,8 @@ public extern "C" CGError CGWarpMouseCursorPosition(CGPoint newCursorPosition);
 
 public extern "C" CGError CGAssociateMouseAndMouseCursorPosition(boolean_t connected);
 
-[ReturnsRetained] public extern "C" CFMachPortRef? CGWindowServerCreateServerPort();
+[ReturnsRetained]
+public extern "C" CFMachPortRef? CGWindowServerCreateServerPort();
 
 /// Deprecated in macOS 10.6.
 public extern "C" CGError CGEnableEventStateCombining(boolean_t combineState);
@@ -129,7 +130,8 @@ public extern "C" CGError CGSetLocalEventsFilterDuringSuppressionState(CGEventFi
 public extern "C" CGError CGSetLocalEventsSuppressionInterval(CFTimeInterval seconds);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFMachPortRef? CGWindowServerCFMachPort();
+[ReturnsRetained]
+public extern "C" CFMachPortRef? CGWindowServerCFMachPort();
 
 public using CGRectCount = uint;
 

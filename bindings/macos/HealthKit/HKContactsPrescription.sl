@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class HKContactsPrescription : HKVisionPrescription, NSSecureCoding, NSCopying
 {
-    [Selector("rightEye")] public HKContactsLensSpecification? RightEye { get; }
-    [Selector("leftEye")] public HKContactsLensSpecification? LeftEye { get; }
-    [Selector("brand")] public NSString Brand { get; }
-    [Selector("prescriptionWithRightEyeSpecification:leftEyeSpecification:brand:dateIssued:expirationDate:device:metadata:")] public static Self PrescriptionWithRightEyeSpecificationLeftEyeSpecificationBrandDateIssuedExpirationDateDeviceMetadata(HKContactsLensSpecification? rightEyeSpecification, HKContactsLensSpecification? leftEyeSpecification, NSString brand, NSDate dateIssued, NSDate? expirationDate, HKDevice? device, NSDictionary? metadata);
+    [Selector("rightEye")]
+    public HKContactsLensSpecification? RightEye { get; }
+    [Selector("leftEye")]
+    public HKContactsLensSpecification? LeftEye { get; }
+    [Selector("brand")]
+    public NSString Brand { get; }
+    [Selector("prescriptionWithRightEyeSpecification:leftEyeSpecification:brand:dateIssued:expirationDate:device:metadata:")]
+    public static Self PrescriptionWithRightEyeSpecificationLeftEyeSpecificationBrandDateIssuedExpirationDateDeviceMetadata(HKContactsLensSpecification? rightEyeSpecification, HKContactsLensSpecification? leftEyeSpecification, NSString brand, NSDate dateIssued, NSDate? expirationDate, HKDevice? device, NSDictionary? metadata);
 }
 
 #endif

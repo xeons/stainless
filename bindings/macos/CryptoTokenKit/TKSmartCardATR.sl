@@ -43,24 +43,36 @@ public enum TKSmartCardProtocol : ulong
 
 public extern objc class TKSmartCardATRInterfaceGroup : NSObject
 {
-    [Selector("TA")] public NSNumber? TA { get; }
-    [Selector("TB")] public NSNumber? TB { get; }
-    [Selector("TC")] public NSNumber? TC { get; }
-    [Selector("protocol")] public NSNumber? Protocol { get; }
+    [Selector("TA")]
+    public NSNumber? TA { get; }
+    [Selector("TB")]
+    public NSNumber? TB { get; }
+    [Selector("TC")]
+    public NSNumber? TC { get; }
+    [Selector("protocol")]
+    public NSNumber? Protocol { get; }
 }
 
 public objc closure int TKSmartCardATRInitWithSourceSourceBlock();
 
 public extern objc class TKSmartCardATR : NSObject
 {
-    [Selector("bytes")] public NSData Bytes { get; }
-    [Selector("protocols")] public NSArray Protocols { get; }
-    [Selector("historicalBytes")] public NSData HistoricalBytes { get; }
-    [Selector("historicalRecords")] public NSArray? HistoricalRecords { get; }
-    [Selector("initWithBytes:")] public Self? InitWithBytes(NSData bytes);
-    [Selector("initWithSource:")] public Self? InitWithSource(TKSmartCardATRInitWithSourceSourceBlock source);
-    [Selector("interfaceGroupAtIndex:")] public TKSmartCardATRInterfaceGroup? InterfaceGroupAtIndex(NSInteger index);
-    [Selector("interfaceGroupForProtocol:")] public TKSmartCardATRInterfaceGroup? InterfaceGroupForProtocol(TKSmartCardProtocol protocol);
+    [Selector("bytes")]
+    public NSData Bytes { get; }
+    [Selector("protocols")]
+    public NSArray Protocols { get; }
+    [Selector("historicalBytes")]
+    public NSData HistoricalBytes { get; }
+    [Selector("historicalRecords")]
+    public NSArray? HistoricalRecords { get; }
+    [Selector("initWithBytes:")]
+    public Self? InitWithBytes(NSData bytes);
+    [Selector("initWithSource:")]
+    public Self? InitWithSource(TKSmartCardATRInitWithSourceSourceBlock source);
+    [Selector("interfaceGroupAtIndex:")]
+    public TKSmartCardATRInterfaceGroup? InterfaceGroupAtIndex(NSInteger index);
+    [Selector("interfaceGroupForProtocol:")]
+    public TKSmartCardATRInterfaceGroup? InterfaceGroupForProtocol(TKSmartCardProtocol protocol);
 }
 
 #endif

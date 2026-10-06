@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class AVAudioUnitVarispeed : AVAudioUnitTimeEffect
 {
-    [Selector("rate", "setRate:")] public float Rate { get; set; }
+    [Selector("rate", "setRate:")]
+    public float Rate { get; set; }
 }
 
 #endif

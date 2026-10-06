@@ -31,9 +31,12 @@ import Standard.ObjC;
 
 public extern objc class GCKeyboardInput : GCPhysicalInputProfile
 {
-    [Selector("keyChangedHandler", "setKeyChangedHandler:")] public GCKeyboardValueChangedHandler? KeyChangedHandler { get; set; }
-    [Selector("isAnyKeyPressed")] public bool AnyKeyPressed { get; }
-    [Selector("buttonForKeyCode:")] public GCControllerButtonInput? ButtonForKeyCode(GCKeyCode code);
+    [Selector("keyChangedHandler", "setKeyChangedHandler:")]
+    public GCKeyboardValueChangedHandler? KeyChangedHandler { get; set; }
+    [Selector("isAnyKeyPressed")]
+    public bool AnyKeyPressed { get; }
+    [Selector("buttonForKeyCode:")]
+    public GCControllerButtonInput? ButtonForKeyCode(GCKeyCode code);
 }
 
 public objc closure void GCKeyboardValueChangedHandler(GCKeyboardInput arg0, GCControllerButtonInput arg1, GCKeyCode arg2, bool arg3);

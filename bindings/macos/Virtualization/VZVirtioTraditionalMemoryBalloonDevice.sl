@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioTraditionalMemoryBalloonDevice : VZMemoryBalloonDevice
 {
-    [Selector("targetVirtualMachineMemorySize", "setTargetVirtualMachineMemorySize:")] public ulong TargetVirtualMachineMemorySize { get; set; }
+    [Selector("targetVirtualMachineMemorySize", "setTargetVirtualMachineMemorySize:")]
+    public ulong TargetVirtualMachineMemorySize { get; set; }
 }
 
 #endif

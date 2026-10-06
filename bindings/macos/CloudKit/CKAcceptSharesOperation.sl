@@ -36,11 +36,16 @@ public objc closure void CKAcceptSharesOperationAcceptSharesCompletionBlock(NSEr
 
 public extern objc class CKAcceptSharesOperation : CKOperation
 {
-    [Selector("shareMetadatas", "setShareMetadatas:")] public NSArray? ShareMetadatas { get; set; }
-    [Selector("perShareCompletionBlock", "setPerShareCompletionBlock:")] public CKAcceptSharesOperationPerShareCompletionBlock? PerShareCompletionBlock { get; set; }
-    [Selector("acceptSharesCompletionBlock", "setAcceptSharesCompletionBlock:")] public CKAcceptSharesOperationAcceptSharesCompletionBlock? AcceptSharesCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithShareMetadatas:")] public Self InitWithShareMetadatas(NSArray shareMetadatas);
+    [Selector("shareMetadatas", "setShareMetadatas:")]
+    public NSArray? ShareMetadatas { get; set; }
+    [Selector("perShareCompletionBlock", "setPerShareCompletionBlock:")]
+    public CKAcceptSharesOperationPerShareCompletionBlock? PerShareCompletionBlock { get; set; }
+    [Selector("acceptSharesCompletionBlock", "setAcceptSharesCompletionBlock:")]
+    public CKAcceptSharesOperationAcceptSharesCompletionBlock? AcceptSharesCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithShareMetadatas:")]
+    public Self InitWithShareMetadatas(NSArray shareMetadatas);
 }
 
 #endif

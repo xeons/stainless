@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class MXAppRunTimeMetric : MXMetric
 {
-    [Selector("cumulativeForegroundTime")] public NSMeasurement CumulativeForegroundTime { get; }
-    [Selector("cumulativeBackgroundTime")] public NSMeasurement CumulativeBackgroundTime { get; }
-    [Selector("cumulativeBackgroundAudioTime")] public NSMeasurement CumulativeBackgroundAudioTime { get; }
-    [Selector("cumulativeBackgroundLocationTime")] public NSMeasurement CumulativeBackgroundLocationTime { get; }
+    [Selector("cumulativeForegroundTime")]
+    public NSMeasurement CumulativeForegroundTime { get; }
+    [Selector("cumulativeBackgroundTime")]
+    public NSMeasurement CumulativeBackgroundTime { get; }
+    [Selector("cumulativeBackgroundAudioTime")]
+    public NSMeasurement CumulativeBackgroundAudioTime { get; }
+    [Selector("cumulativeBackgroundLocationTime")]
+    public NSMeasurement CumulativeBackgroundLocationTime { get; }
 }
 
 #endif

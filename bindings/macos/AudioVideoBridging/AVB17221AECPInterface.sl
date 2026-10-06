@@ -32,23 +32,34 @@ import Standard.ObjC;
 
 public objc interface AVB17221AECPClient
 {
-    [Selector("AECPDidReceiveCommand:onInterface:")] bool AECPDidReceiveCommandOnInterface(AVB17221AECPMessage message, AVB17221AECPInterface anInterface);
-    [Selector("AECPDidReceiveResponse:onInterface:")] bool AECPDidReceiveResponseOnInterface(AVB17221AECPMessage message, AVB17221AECPInterface anInterface);
+    [Selector("AECPDidReceiveCommand:onInterface:")]
+    bool AECPDidReceiveCommandOnInterface(AVB17221AECPMessage message, AVB17221AECPInterface anInterface);
+    [Selector("AECPDidReceiveResponse:onInterface:")]
+    bool AECPDidReceiveResponseOnInterface(AVB17221AECPMessage message, AVB17221AECPInterface anInterface);
 }
 
 public objc closure void AVB17221AECPInterfaceCompletion(NSError? arg0, AVB17221AECPMessage? arg1);
 
 public extern objc class AVB17221AECPInterface : AVB1722ControlInterface
 {
-    [Selector("AECPInterfaceWithInterface:")] public static AVB17221AECPInterface? AECPInterfaceWithInterface(AVBInterface anInterface);
-    [Selector("AECPInterfaceWithInterfaceNamed:")] public static AVB17221AECPInterface? AECPInterfaceWithInterfaceNamed(NSString anInterfaceName);
-    [Selector("setCommandHandler:forEntityID:")] public bool SetCommandHandlerForEntityID(AVB17221AECPClient handler, ulong targetEntityID);
-    [Selector("removeCommandHandlerForEntityID:")] public void RemoveCommandHandlerForEntityID(ulong targetEntityID);
-    [Selector("setResponseHandler:forControllerEntityID:")] public bool SetResponseHandlerForControllerEntityID(AVB17221AECPClient handler, ulong controllerEntityID);
-    [Selector("removeResponseHandlerForControllerEntityID:")] public void RemoveResponseHandlerForControllerEntityID(ulong controllerEntityID);
-    [Selector("sendCommand:toMACAddress:completionHandler:")] public bool SendCommandToMACAddressCompletionHandler(AVB17221AECPMessage message, AVBMACAddress destMAC, AVB17221AECPInterfaceCompletion completionHandler);
-    [Selector("sendResponse:toMACAddress:error:")] public bool SendResponseToMACAddressError(AVB17221AECPMessage message, AVBMACAddress destMAC, out NSError? error);
-    [Selector("sendVendorUniqueCommand:toMACAddress:expectResponseWithinTimeout:completionHandler:")] public bool SendVendorUniqueCommandToMACAddressExpectResponseWithinTimeoutCompletionHandler(AVB17221AECPVendorMessage message, AVBMACAddress destMAC, long timeout, AVB17221AECPInterfaceCompletion completionHandler);
+    [Selector("AECPInterfaceWithInterface:")]
+    public static AVB17221AECPInterface? AECPInterfaceWithInterface(AVBInterface anInterface);
+    [Selector("AECPInterfaceWithInterfaceNamed:")]
+    public static AVB17221AECPInterface? AECPInterfaceWithInterfaceNamed(NSString anInterfaceName);
+    [Selector("setCommandHandler:forEntityID:")]
+    public bool SetCommandHandlerForEntityID(AVB17221AECPClient handler, ulong targetEntityID);
+    [Selector("removeCommandHandlerForEntityID:")]
+    public void RemoveCommandHandlerForEntityID(ulong targetEntityID);
+    [Selector("setResponseHandler:forControllerEntityID:")]
+    public bool SetResponseHandlerForControllerEntityID(AVB17221AECPClient handler, ulong controllerEntityID);
+    [Selector("removeResponseHandlerForControllerEntityID:")]
+    public void RemoveResponseHandlerForControllerEntityID(ulong controllerEntityID);
+    [Selector("sendCommand:toMACAddress:completionHandler:")]
+    public bool SendCommandToMACAddressCompletionHandler(AVB17221AECPMessage message, AVBMACAddress destMAC, AVB17221AECPInterfaceCompletion completionHandler);
+    [Selector("sendResponse:toMACAddress:error:")]
+    public bool SendResponseToMACAddressError(AVB17221AECPMessage message, AVBMACAddress destMAC, out NSError? error);
+    [Selector("sendVendorUniqueCommand:toMACAddress:expectResponseWithinTimeout:completionHandler:")]
+    public bool SendVendorUniqueCommandToMACAddressExpectResponseWithinTimeoutCompletionHandler(AVB17221AECPVendorMessage message, AVBMACAddress destMAC, long timeout, AVB17221AECPInterfaceCompletion completionHandler);
 }
 
 #endif

@@ -39,19 +39,29 @@ public enum AXCustomContentImportance : ulong
 
 public extern objc class AXCustomContent : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("label")] public NSString Label { get; }
-    [Selector("attributedLabel")] public NSAttributedString AttributedLabel { get; }
-    [Selector("value")] public NSString Value { get; }
-    [Selector("attributedValue")] public NSAttributedString AttributedValue { get; }
-    [Selector("importance", "setImportance:")] public AXCustomContentImportance Importance { get; set; }
-    [Selector("customContentWithLabel:value:")] public static Self CustomContentWithLabelValue(NSString label, NSString value);
-    [Selector("customContentWithAttributedLabel:attributedValue:")] public static Self CustomContentWithAttributedLabelAttributedValue(NSAttributedString label, NSAttributedString value);
+    [Selector("label")]
+    public NSString Label { get; }
+    [Selector("attributedLabel")]
+    public NSAttributedString AttributedLabel { get; }
+    [Selector("value")]
+    public NSString Value { get; }
+    [Selector("attributedValue")]
+    public NSAttributedString AttributedValue { get; }
+    [Selector("importance", "setImportance:")]
+    public AXCustomContentImportance Importance { get; set; }
+    [Selector("customContentWithLabel:value:")]
+    public static Self CustomContentWithLabelValue(NSString label, NSString value);
+    [Selector("customContentWithAttributedLabel:attributedValue:")]
+    public static Self CustomContentWithAttributedLabelAttributedValue(NSAttributedString label, NSAttributedString value);
 }
 
 public objc interface AXCustomContentProvider : NSObjectProtocol
 {
-    [Selector("accessibilityCustomContent", "setAccessibilityCustomContent:")] NSArray? AccessibilityCustomContent { get; set; }
-    [Optional] [Selector("accessibilityCustomContentBlock", "setAccessibilityCustomContentBlock:")] AXCustomContentReturnBlock? AccessibilityCustomContentBlock { get; set; }
+    [Selector("accessibilityCustomContent", "setAccessibilityCustomContent:")]
+    NSArray? AccessibilityCustomContent { get; set; }
+    [Optional]
+    [Selector("accessibilityCustomContentBlock", "setAccessibilityCustomContentBlock:")]
+    AXCustomContentReturnBlock? AccessibilityCustomContentBlock { get; set; }
 }
 
 public objc closure NSArray? AXCustomContentReturnBlock();

@@ -34,29 +34,45 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTL4CommandBufferOptions : NSObject, NSCopying
 {
-    [Selector("logState", "setLogState:")] public MTLLogState? LogState { get; set; }
+    [Selector("logState", "setLogState:")]
+    public MTLLogState? LogState { get; set; }
 }
 
 /// macOS 26.0 and later.
 public objc interface MTL4CommandBuffer : NSObjectProtocol
 {
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("beginCommandBufferWithAllocator:")] void BeginCommandBufferWithAllocator(MTL4CommandAllocator allocator);
-    [Selector("beginCommandBufferWithAllocator:options:")] void BeginCommandBufferWithAllocatorOptions(MTL4CommandAllocator allocator, MTL4CommandBufferOptions options);
-    [Selector("endCommandBuffer")] void EndCommandBuffer();
-    [Selector("renderCommandEncoderWithDescriptor:")] MTL4RenderCommandEncoder? RenderCommandEncoderWithDescriptor(MTL4RenderPassDescriptor descriptor);
-    [Selector("renderCommandEncoderWithDescriptor:options:")] MTL4RenderCommandEncoder? RenderCommandEncoderWithDescriptorOptions(MTL4RenderPassDescriptor descriptor, MTL4RenderEncoderOptions options);
-    [Selector("computeCommandEncoder")] MTL4ComputeCommandEncoder? ComputeCommandEncoder();
-    [Selector("machineLearningCommandEncoder")] MTL4MachineLearningCommandEncoder? MachineLearningCommandEncoder();
-    [Selector("useResidencySet:")] void UseResidencySet(MTLResidencySet residencySet);
-    [Selector("useResidencySets:count:")] void UseResidencySetsCount(void** residencySets, NSUInteger count);
-    [Selector("pushDebugGroup:")] void PushDebugGroup(NSString string);
-    [Selector("popDebugGroup")] void PopDebugGroup();
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("beginCommandBufferWithAllocator:")]
+    void BeginCommandBufferWithAllocator(MTL4CommandAllocator allocator);
+    [Selector("beginCommandBufferWithAllocator:options:")]
+    void BeginCommandBufferWithAllocatorOptions(MTL4CommandAllocator allocator, MTL4CommandBufferOptions options);
+    [Selector("endCommandBuffer")]
+    void EndCommandBuffer();
+    [Selector("renderCommandEncoderWithDescriptor:")]
+    MTL4RenderCommandEncoder? RenderCommandEncoderWithDescriptor(MTL4RenderPassDescriptor descriptor);
+    [Selector("renderCommandEncoderWithDescriptor:options:")]
+    MTL4RenderCommandEncoder? RenderCommandEncoderWithDescriptorOptions(MTL4RenderPassDescriptor descriptor, MTL4RenderEncoderOptions options);
+    [Selector("computeCommandEncoder")]
+    MTL4ComputeCommandEncoder? ComputeCommandEncoder();
+    [Selector("machineLearningCommandEncoder")]
+    MTL4MachineLearningCommandEncoder? MachineLearningCommandEncoder();
+    [Selector("useResidencySet:")]
+    void UseResidencySet(MTLResidencySet residencySet);
+    [Selector("useResidencySets:count:")]
+    void UseResidencySetsCount(void** residencySets, NSUInteger count);
+    [Selector("pushDebugGroup:")]
+    void PushDebugGroup(NSString string);
+    [Selector("popDebugGroup")]
+    void PopDebugGroup();
     /// macOS 26.0 and later.
-    [Selector("writeTimestampIntoHeap:atIndex:")] void WriteTimestampIntoHeapAtIndex(MTL4CounterHeap counterHeap, NSUInteger index);
+    [Selector("writeTimestampIntoHeap:atIndex:")]
+    void WriteTimestampIntoHeapAtIndex(MTL4CounterHeap counterHeap, NSUInteger index);
     /// macOS 26.0 and later.
-    [Selector("resolveCounterHeap:withRange:intoBuffer:waitFence:updateFence:")] void ResolveCounterHeapWithRangeIntoBufferWaitFenceUpdateFence(MTL4CounterHeap counterHeap, NSRange range, MTL4BufferRange bufferRange, MTLFence? fenceToWait, MTLFence? fenceToUpdate);
+    [Selector("resolveCounterHeap:withRange:intoBuffer:waitFence:updateFence:")]
+    void ResolveCounterHeapWithRangeIntoBufferWaitFenceUpdateFence(MTL4CounterHeap counterHeap, NSRange range, MTL4BufferRange bufferRange, MTLFence? fenceToWait, MTLFence? fenceToUpdate);
 }
 
 #endif

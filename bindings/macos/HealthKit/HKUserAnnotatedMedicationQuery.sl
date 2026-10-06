@@ -36,7 +36,8 @@ public objc closure void HKUserAnnotatedMedicationQueryInitWithPredicateLimitRes
 /// macOS 26.0 and later.
 public extern objc class HKUserAnnotatedMedicationQuery : HKQuery
 {
-    [Selector("initWithPredicate:limit:resultsHandler:")] public Self InitWithPredicateLimitResultsHandler(NSPredicate? predicate, NSUInteger limit, HKUserAnnotatedMedicationQueryInitWithPredicateLimitResultsHandlerResultsHandlerBlock resultsHandler);
+    [Selector("initWithPredicate:limit:resultsHandler:")]
+    public Self InitWithPredicateLimitResultsHandler(NSPredicate? predicate, NSUInteger limit, HKUserAnnotatedMedicationQueryInitWithPredicateLimitResultsHandlerResultsHandlerBlock resultsHandler);
 }
 
 #endif

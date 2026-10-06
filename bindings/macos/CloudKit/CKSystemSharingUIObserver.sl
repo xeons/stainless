@@ -37,9 +37,12 @@ public objc closure void CKSystemSharingUIObserverSystemSharingUIDidStopSharingB
 
 public extern objc class CKSystemSharingUIObserver : NSObject
 {
-    [Selector("systemSharingUIDidSaveShareBlock", "setSystemSharingUIDidSaveShareBlock:")] public CKSystemSharingUIObserverSystemSharingUIDidSaveShareBlock? SystemSharingUIDidSaveShareBlock { get; set; }
-    [Selector("systemSharingUIDidStopSharingBlock", "setSystemSharingUIDidStopSharingBlock:")] public CKSystemSharingUIObserverSystemSharingUIDidStopSharingBlock? SystemSharingUIDidStopSharingBlock { get; set; }
-    [Selector("initWithContainer:")] public Self InitWithContainer(CKContainer container);
+    [Selector("systemSharingUIDidSaveShareBlock", "setSystemSharingUIDidSaveShareBlock:")]
+    public CKSystemSharingUIObserverSystemSharingUIDidSaveShareBlock? SystemSharingUIDidSaveShareBlock { get; set; }
+    [Selector("systemSharingUIDidStopSharingBlock", "setSystemSharingUIDidStopSharingBlock:")]
+    public CKSystemSharingUIObserverSystemSharingUIDidStopSharingBlock? SystemSharingUIDidStopSharingBlock { get; set; }
+    [Selector("initWithContainer:")]
+    public Self InitWithContainer(CKContainer container);
 }
 
 #endif

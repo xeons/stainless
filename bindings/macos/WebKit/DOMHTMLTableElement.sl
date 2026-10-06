@@ -33,28 +33,50 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLTableElement : DOMHTMLElement
 {
-    [Selector("caption", "setCaption:")] public DOMHTMLTableCaptionElement? Caption { get; set; }
-    [Selector("tHead", "setTHead:")] public DOMHTMLTableSectionElement? THead { get; set; }
-    [Selector("tFoot", "setTFoot:")] public DOMHTMLTableSectionElement? TFoot { get; set; }
-    [Selector("rows")] public DOMHTMLCollection? Rows { get; }
-    [Selector("tBodies")] public DOMHTMLCollection? TBodies { get; }
-    [Selector("align", "setAlign:")] public NSString? Align { get; set; }
-    [Selector("bgColor", "setBgColor:")] public NSString? BgColor { get; set; }
-    [Selector("border", "setBorder:")] public NSString? Border { get; set; }
-    [Selector("cellPadding", "setCellPadding:")] public NSString? CellPadding { get; set; }
-    [Selector("cellSpacing", "setCellSpacing:")] public NSString? CellSpacing { get; set; }
-    [Selector("frameBorders", "setFrameBorders:")] public NSString? FrameBorders { get; set; }
-    [Selector("rules", "setRules:")] public NSString? Rules { get; set; }
-    [Selector("summary", "setSummary:")] public NSString? Summary { get; set; }
-    [Selector("width", "setWidth:")] public NSString? Width { get; set; }
-    [Selector("createTHead")] public DOMHTMLElement? CreateTHead();
-    [Selector("deleteTHead")] public void DeleteTHead();
-    [Selector("createTFoot")] public DOMHTMLElement? CreateTFoot();
-    [Selector("deleteTFoot")] public void DeleteTFoot();
-    [Selector("createCaption")] public DOMHTMLElement? CreateCaption();
-    [Selector("deleteCaption")] public void DeleteCaption();
-    [Selector("insertRow:")] public DOMHTMLElement? InsertRow(int index);
-    [Selector("deleteRow:")] public void DeleteRow(int index);
+    [Selector("caption", "setCaption:")]
+    public DOMHTMLTableCaptionElement? Caption { get; set; }
+    [Selector("tHead", "setTHead:")]
+    public DOMHTMLTableSectionElement? THead { get; set; }
+    [Selector("tFoot", "setTFoot:")]
+    public DOMHTMLTableSectionElement? TFoot { get; set; }
+    [Selector("rows")]
+    public DOMHTMLCollection? Rows { get; }
+    [Selector("tBodies")]
+    public DOMHTMLCollection? TBodies { get; }
+    [Selector("align", "setAlign:")]
+    public NSString? Align { get; set; }
+    [Selector("bgColor", "setBgColor:")]
+    public NSString? BgColor { get; set; }
+    [Selector("border", "setBorder:")]
+    public NSString? Border { get; set; }
+    [Selector("cellPadding", "setCellPadding:")]
+    public NSString? CellPadding { get; set; }
+    [Selector("cellSpacing", "setCellSpacing:")]
+    public NSString? CellSpacing { get; set; }
+    [Selector("frameBorders", "setFrameBorders:")]
+    public NSString? FrameBorders { get; set; }
+    [Selector("rules", "setRules:")]
+    public NSString? Rules { get; set; }
+    [Selector("summary", "setSummary:")]
+    public NSString? Summary { get; set; }
+    [Selector("width", "setWidth:")]
+    public NSString? Width { get; set; }
+    [Selector("createTHead")]
+    public DOMHTMLElement? CreateTHead();
+    [Selector("deleteTHead")]
+    public void DeleteTHead();
+    [Selector("createTFoot")]
+    public DOMHTMLElement? CreateTFoot();
+    [Selector("deleteTFoot")]
+    public void DeleteTFoot();
+    [Selector("createCaption")]
+    public DOMHTMLElement? CreateCaption();
+    [Selector("deleteCaption")]
+    public void DeleteCaption();
+    [Selector("insertRow:")]
+    public DOMHTMLElement? InsertRow(int index);
+    [Selector("deleteRow:")]
+    public void DeleteRow(int index);
 }
 
 #endif

@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class MLArrayBatchProvider : NSObject, MLBatchProvider
 {
-    [Selector("array")] public NSArray Array { get; }
-    [Selector("initWithFeatureProviderArray:")] public Self InitWithFeatureProviderArray(NSArray array);
-    [Selector("initWithDictionary:error:")] public Self? InitWithDictionaryError(NSDictionary dictionary, out NSError? error);
+    [Selector("array")]
+    public NSArray Array { get; }
+    [Selector("initWithFeatureProviderArray:")]
+    public Self InitWithFeatureProviderArray(NSArray array);
+    [Selector("initWithDictionary:error:")]
+    public Self? InitWithDictionaryError(NSDictionary dictionary, out NSError? error);
 }
 
 #endif

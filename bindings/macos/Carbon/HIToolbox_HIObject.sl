@@ -109,7 +109,8 @@ public extern "C" EventTargetRef HIObjectGetEventTarget(HIObjectRef inObject);
 
 public extern "C" void HIObjectPrintDebugInfo(HIObjectRef inObject);
 
-[ReturnsRetained] public extern "C" CFStringRef? HIObjectCopyClassID(HIObjectRef inObject);
+[ReturnsRetained]
+public extern "C" CFStringRef? HIObjectCopyClassID(HIObjectRef inObject);
 
 public extern "C" Boolean HIObjectIsOfClass(HIObjectRef inObject, CFStringRef? inObjectClassID);
 

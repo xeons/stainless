@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class NSOpenPanel : NSSavePanel
 {
-    [Selector("URLs")] public NSArray URLs { get; }
-    [Selector("resolvesAliases", "setResolvesAliases:")] public bool ResolvesAliases { get; set; }
-    [Selector("canChooseDirectories", "setCanChooseDirectories:")] public bool CanChooseDirectories { get; set; }
-    [Selector("allowsMultipleSelection", "setAllowsMultipleSelection:")] public bool AllowsMultipleSelection { get; set; }
-    [Selector("canChooseFiles", "setCanChooseFiles:")] public bool CanChooseFiles { get; set; }
-    [Selector("canResolveUbiquitousConflicts", "setCanResolveUbiquitousConflicts:")] public bool CanResolveUbiquitousConflicts { get; set; }
-    [Selector("canDownloadUbiquitousContents", "setCanDownloadUbiquitousContents:")] public bool CanDownloadUbiquitousContents { get; set; }
-    [Selector("isAccessoryViewDisclosed", "setAccessoryViewDisclosed:")] public bool AccessoryViewDisclosed { get; set; }
-    [Selector("openPanel")] public static NSOpenPanel OpenPanel();
+    [Selector("URLs")]
+    public NSArray URLs { get; }
+    [Selector("resolvesAliases", "setResolvesAliases:")]
+    public bool ResolvesAliases { get; set; }
+    [Selector("canChooseDirectories", "setCanChooseDirectories:")]
+    public bool CanChooseDirectories { get; set; }
+    [Selector("allowsMultipleSelection", "setAllowsMultipleSelection:")]
+    public bool AllowsMultipleSelection { get; set; }
+    [Selector("canChooseFiles", "setCanChooseFiles:")]
+    public bool CanChooseFiles { get; set; }
+    [Selector("canResolveUbiquitousConflicts", "setCanResolveUbiquitousConflicts:")]
+    public bool CanResolveUbiquitousConflicts { get; set; }
+    [Selector("canDownloadUbiquitousContents", "setCanDownloadUbiquitousContents:")]
+    public bool CanDownloadUbiquitousContents { get; set; }
+    [Selector("isAccessoryViewDisclosed", "setAccessoryViewDisclosed:")]
+    public bool AccessoryViewDisclosed { get; set; }
+    [Selector("openPanel")]
+    public static NSOpenPanel OpenPanel();
 }
 
 /// InheritedAndUnavailable, a category of NSOpenPanel.
@@ -51,15 +60,20 @@ public extern objc class NSOpenPanel { }
 public extern objc class NSOpenPanel
 {
     /// Deprecated in macOS 10.6.
-    [Selector("filenames")] public NSArray Filenames();
+    [Selector("filenames")]
+    public NSArray Filenames();
     /// Deprecated in macOS 10.6.
-    [Selector("beginSheetForDirectory:file:types:modalForWindow:modalDelegate:didEndSelector:contextInfo:")] public void BeginSheetForDirectoryFileTypesModalForWindowModalDelegateDidEndSelectorContextInfo(NSString? path, NSString? name, NSArray? fileTypes, NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
+    [Selector("beginSheetForDirectory:file:types:modalForWindow:modalDelegate:didEndSelector:contextInfo:")]
+    public void BeginSheetForDirectoryFileTypesModalForWindowModalDelegateDidEndSelectorContextInfo(NSString? path, NSString? name, NSArray? fileTypes, NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
     /// Deprecated in macOS 10.6.
-    [Selector("beginForDirectory:file:types:modelessDelegate:didEndSelector:contextInfo:")] public void BeginForDirectoryFileTypesModelessDelegateDidEndSelectorContextInfo(NSString? path, NSString? name, NSArray? fileTypes, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
+    [Selector("beginForDirectory:file:types:modelessDelegate:didEndSelector:contextInfo:")]
+    public void BeginForDirectoryFileTypesModelessDelegateDidEndSelectorContextInfo(NSString? path, NSString? name, NSArray? fileTypes, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
     /// Deprecated in macOS 10.6.
-    [Selector("runModalForDirectory:file:types:")] public NSInteger RunModalForDirectoryFileTypes(NSString? path, NSString? name, NSArray? fileTypes);
+    [Selector("runModalForDirectory:file:types:")]
+    public NSInteger RunModalForDirectoryFileTypes(NSString? path, NSString? name, NSArray? fileTypes);
     /// Deprecated in macOS 10.6.
-    [Selector("runModalForTypes:")] public NSInteger RunModalForTypes(NSArray? fileTypes);
+    [Selector("runModalForTypes:")]
+    public NSInteger RunModalForTypes(NSArray? fileTypes);
 }
 
 #endif

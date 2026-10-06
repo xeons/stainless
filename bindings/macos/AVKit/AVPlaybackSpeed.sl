@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class AVPlaybackSpeed : NSObject
 {
-    [Selector("systemDefaultSpeeds")] public static NSArray SystemDefaultSpeeds { get; }
-    [Selector("rate")] public float Rate { get; }
-    [Selector("localizedName")] public NSString LocalizedName { get; }
-    [Selector("localizedNumericName")] public NSString LocalizedNumericName { get; }
-    [Selector("initWithRate:localizedName:")] public Self InitWithRateLocalizedName(float rate, NSString localizedName);
+    [Selector("systemDefaultSpeeds")]
+    public static NSArray SystemDefaultSpeeds { get; }
+    [Selector("rate")]
+    public float Rate { get; }
+    [Selector("localizedName")]
+    public NSString LocalizedName { get; }
+    [Selector("localizedNumericName")]
+    public NSString LocalizedNumericName { get; }
+    [Selector("initWithRate:localizedName:")]
+    public Self InitWithRateLocalizedName(float rate, NSString localizedName);
 }
 
 #endif

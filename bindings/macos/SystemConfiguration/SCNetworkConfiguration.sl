@@ -120,13 +120,15 @@ public extern objc class SCNetworkSetRef : CFTypeRef { }
 
 public extern "C" CFTypeID SCNetworkInterfaceGetTypeID();
 
-[ReturnsRetained] public extern "C" CFArrayRef SCNetworkInterfaceCopyAll();
+[ReturnsRetained]
+public extern "C" CFArrayRef SCNetworkInterfaceCopyAll();
 
 public extern "C" CFArrayRef? SCNetworkInterfaceGetSupportedInterfaceTypes(SCNetworkInterfaceRef @interface);
 
 public extern "C" CFArrayRef? SCNetworkInterfaceGetSupportedProtocolTypes(SCNetworkInterfaceRef @interface);
 
-[ReturnsRetained] public extern "C" SCNetworkInterfaceRef? SCNetworkInterfaceCreateWithInterface(SCNetworkInterfaceRef @interface, CFStringRef interfaceType);
+[ReturnsRetained]
+public extern "C" SCNetworkInterfaceRef? SCNetworkInterfaceCreateWithInterface(SCNetworkInterfaceRef @interface, CFStringRef interfaceType);
 
 public extern "C" CFStringRef? SCNetworkInterfaceGetBSDName(SCNetworkInterfaceRef @interface);
 
@@ -148,9 +150,11 @@ public extern "C" Boolean SCNetworkInterfaceSetExtendedConfiguration(SCNetworkIn
 
 public extern "C" Boolean SCNetworkInterfaceCopyMediaOptions(SCNetworkInterfaceRef @interface, __CFDictionary** current, __CFDictionary** active, __CFArray** available, Boolean filter);
 
-[ReturnsRetained] public extern "C" CFArrayRef? SCNetworkInterfaceCopyMediaSubTypes(CFArrayRef available);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SCNetworkInterfaceCopyMediaSubTypes(CFArrayRef available);
 
-[ReturnsRetained] public extern "C" CFArrayRef? SCNetworkInterfaceCopyMediaSubTypeOptions(CFArrayRef available, CFStringRef subType);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SCNetworkInterfaceCopyMediaSubTypeOptions(CFArrayRef available, CFStringRef subType);
 
 public extern "C" Boolean SCNetworkInterfaceCopyMTU(SCNetworkInterfaceRef @interface, int* mtu_cur, int* mtu_min, int* mtu_max);
 
@@ -160,11 +164,14 @@ public extern "C" Boolean SCNetworkInterfaceSetMTU(SCNetworkInterfaceRef @interf
 
 public extern "C" Boolean SCNetworkInterfaceForceConfigurationRefresh(SCNetworkInterfaceRef @interface);
 
-[ReturnsRetained] public extern "C" CFArrayRef SCBondInterfaceCopyAll(SCPreferencesRef prefs);
+[ReturnsRetained]
+public extern "C" CFArrayRef SCBondInterfaceCopyAll(SCPreferencesRef prefs);
 
-[ReturnsRetained] public extern "C" CFArrayRef SCBondInterfaceCopyAvailableMemberInterfaces(SCPreferencesRef prefs);
+[ReturnsRetained]
+public extern "C" CFArrayRef SCBondInterfaceCopyAvailableMemberInterfaces(SCPreferencesRef prefs);
 
-[ReturnsRetained] public extern "C" SCBondInterfaceRef? SCBondInterfaceCreate(SCPreferencesRef prefs);
+[ReturnsRetained]
+public extern "C" SCBondInterfaceRef? SCBondInterfaceCreate(SCPreferencesRef prefs);
 
 public extern "C" Boolean SCBondInterfaceRemove(SCBondInterfaceRef bond);
 
@@ -178,7 +185,8 @@ public extern "C" Boolean SCBondInterfaceSetLocalizedDisplayName(SCBondInterface
 
 public extern "C" Boolean SCBondInterfaceSetOptions(SCBondInterfaceRef bond, CFDictionaryRef newOptions);
 
-[ReturnsRetained] public extern "C" SCBondStatusRef? SCBondInterfaceCopyStatus(SCBondInterfaceRef bond);
+[ReturnsRetained]
+public extern "C" SCBondStatusRef? SCBondInterfaceCopyStatus(SCBondInterfaceRef bond);
 
 public extern "C" CFTypeID SCBondStatusGetTypeID();
 
@@ -186,11 +194,14 @@ public extern "C" CFArrayRef? SCBondStatusGetMemberInterfaces(SCBondStatusRef bo
 
 public extern "C" CFDictionaryRef? SCBondStatusGetInterfaceStatus(SCBondStatusRef bondStatus, SCNetworkInterfaceRef? @interface);
 
-[ReturnsRetained] public extern "C" CFArrayRef SCVLANInterfaceCopyAll(SCPreferencesRef prefs);
+[ReturnsRetained]
+public extern "C" CFArrayRef SCVLANInterfaceCopyAll(SCPreferencesRef prefs);
 
-[ReturnsRetained] public extern "C" CFArrayRef SCVLANInterfaceCopyAvailablePhysicalInterfaces();
+[ReturnsRetained]
+public extern "C" CFArrayRef SCVLANInterfaceCopyAvailablePhysicalInterfaces();
 
-[ReturnsRetained] public extern "C" SCVLANInterfaceRef? SCVLANInterfaceCreate(SCPreferencesRef prefs, SCNetworkInterfaceRef physical, CFNumberRef tag);
+[ReturnsRetained]
+public extern "C" SCVLANInterfaceRef? SCVLANInterfaceCreate(SCPreferencesRef prefs, SCNetworkInterfaceRef physical, CFNumberRef tag);
 
 public extern "C" Boolean SCVLANInterfaceRemove(SCVLANInterfaceRef vlan);
 
@@ -222,13 +233,17 @@ public extern "C" CFTypeID SCNetworkServiceGetTypeID();
 
 public extern "C" Boolean SCNetworkServiceAddProtocolType(SCNetworkServiceRef service, CFStringRef protocolType);
 
-[ReturnsRetained] public extern "C" CFArrayRef? SCNetworkServiceCopyAll(SCPreferencesRef prefs);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SCNetworkServiceCopyAll(SCPreferencesRef prefs);
 
-[ReturnsRetained] public extern "C" CFArrayRef? SCNetworkServiceCopyProtocols(SCNetworkServiceRef service);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SCNetworkServiceCopyProtocols(SCNetworkServiceRef service);
 
-[ReturnsRetained] public extern "C" SCNetworkServiceRef? SCNetworkServiceCreate(SCPreferencesRef prefs, SCNetworkInterfaceRef @interface);
+[ReturnsRetained]
+public extern "C" SCNetworkServiceRef? SCNetworkServiceCreate(SCPreferencesRef prefs, SCNetworkInterfaceRef @interface);
 
-[ReturnsRetained] public extern "C" SCNetworkServiceRef? SCNetworkServiceCopy(SCPreferencesRef prefs, CFStringRef serviceID);
+[ReturnsRetained]
+public extern "C" SCNetworkServiceRef? SCNetworkServiceCopy(SCPreferencesRef prefs, CFStringRef serviceID);
 
 public extern "C" Boolean SCNetworkServiceEstablishDefaultConfiguration(SCNetworkServiceRef service);
 
@@ -238,7 +253,8 @@ public extern "C" SCNetworkInterfaceRef? SCNetworkServiceGetInterface(SCNetworkS
 
 public extern "C" CFStringRef? SCNetworkServiceGetName(SCNetworkServiceRef service);
 
-[ReturnsRetained] public extern "C" SCNetworkProtocolRef? SCNetworkServiceCopyProtocol(SCNetworkServiceRef service, CFStringRef protocolType);
+[ReturnsRetained]
+public extern "C" SCNetworkProtocolRef? SCNetworkServiceCopyProtocol(SCNetworkServiceRef service, CFStringRef protocolType);
 
 public extern "C" CFStringRef? SCNetworkServiceGetServiceID(SCNetworkServiceRef service);
 
@@ -256,15 +272,20 @@ public extern "C" Boolean SCNetworkSetAddService(SCNetworkSetRef set, SCNetworkS
 
 public extern "C" Boolean SCNetworkSetContainsInterface(SCNetworkSetRef set, SCNetworkInterfaceRef @interface);
 
-[ReturnsRetained] public extern "C" CFArrayRef? SCNetworkSetCopyAll(SCPreferencesRef prefs);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SCNetworkSetCopyAll(SCPreferencesRef prefs);
 
-[ReturnsRetained] public extern "C" SCNetworkSetRef? SCNetworkSetCopyCurrent(SCPreferencesRef prefs);
+[ReturnsRetained]
+public extern "C" SCNetworkSetRef? SCNetworkSetCopyCurrent(SCPreferencesRef prefs);
 
-[ReturnsRetained] public extern "C" CFArrayRef? SCNetworkSetCopyServices(SCNetworkSetRef set);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SCNetworkSetCopyServices(SCNetworkSetRef set);
 
-[ReturnsRetained] public extern "C" SCNetworkSetRef? SCNetworkSetCreate(SCPreferencesRef prefs);
+[ReturnsRetained]
+public extern "C" SCNetworkSetRef? SCNetworkSetCreate(SCPreferencesRef prefs);
 
-[ReturnsRetained] public extern "C" SCNetworkSetRef? SCNetworkSetCopy(SCPreferencesRef prefs, CFStringRef setID);
+[ReturnsRetained]
+public extern "C" SCNetworkSetRef? SCNetworkSetCopy(SCPreferencesRef prefs, CFStringRef setID);
 
 public extern "C" CFStringRef? SCNetworkSetGetName(SCNetworkSetRef set);
 

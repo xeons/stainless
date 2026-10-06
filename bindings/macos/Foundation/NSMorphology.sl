@@ -119,22 +119,34 @@ public enum NSGrammaticalDefiniteness : long
 
 public extern objc class NSMorphology : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("grammaticalGender", "setGrammaticalGender:")] public NSGrammaticalGender GrammaticalGender { get; set; }
-    [Selector("partOfSpeech", "setPartOfSpeech:")] public NSGrammaticalPartOfSpeech PartOfSpeech { get; set; }
-    [Selector("number", "setNumber:")] public NSGrammaticalNumber Number { get; set; }
-    [Selector("grammaticalCase", "setGrammaticalCase:")] public NSGrammaticalCase GrammaticalCase { get; set; }
-    [Selector("determination", "setDetermination:")] public NSGrammaticalDetermination Determination { get; set; }
-    [Selector("grammaticalPerson", "setGrammaticalPerson:")] public NSGrammaticalPerson GrammaticalPerson { get; set; }
-    [Selector("pronounType", "setPronounType:")] public NSGrammaticalPronounType PronounType { get; set; }
-    [Selector("definiteness", "setDefiniteness:")] public NSGrammaticalDefiniteness Definiteness { get; set; }
+    [Selector("grammaticalGender", "setGrammaticalGender:")]
+    public NSGrammaticalGender GrammaticalGender { get; set; }
+    [Selector("partOfSpeech", "setPartOfSpeech:")]
+    public NSGrammaticalPartOfSpeech PartOfSpeech { get; set; }
+    [Selector("number", "setNumber:")]
+    public NSGrammaticalNumber Number { get; set; }
+    [Selector("grammaticalCase", "setGrammaticalCase:")]
+    public NSGrammaticalCase GrammaticalCase { get; set; }
+    [Selector("determination", "setDetermination:")]
+    public NSGrammaticalDetermination Determination { get; set; }
+    [Selector("grammaticalPerson", "setGrammaticalPerson:")]
+    public NSGrammaticalPerson GrammaticalPerson { get; set; }
+    [Selector("pronounType", "setPronounType:")]
+    public NSGrammaticalPronounType PronounType { get; set; }
+    [Selector("definiteness", "setDefiniteness:")]
+    public NSGrammaticalDefiniteness Definiteness { get; set; }
 }
 
 public extern objc class NSMorphologyPronoun : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("pronoun")] public NSString Pronoun { get; }
-    [Selector("morphology")] public NSMorphology Morphology { get; }
-    [Selector("dependentMorphology")] public NSMorphology? DependentMorphology { get; }
-    [Selector("initWithPronoun:morphology:dependentMorphology:")] public Self InitWithPronounMorphologyDependentMorphology(NSString pronoun, NSMorphology morphology, NSMorphology? dependentMorphology);
+    [Selector("pronoun")]
+    public NSString Pronoun { get; }
+    [Selector("morphology")]
+    public NSMorphology Morphology { get; }
+    [Selector("dependentMorphology")]
+    public NSMorphology? DependentMorphology { get; }
+    [Selector("initWithPronoun:morphology:dependentMorphology:")]
+    public Self InitWithPronounMorphologyDependentMorphology(NSString pronoun, NSMorphology morphology, NSMorphology? dependentMorphology);
 }
 
 /// Deprecated in macOS 14.0.
@@ -142,28 +154,39 @@ public extern objc class NSMorphologyPronoun : NSObject, NSCopying, NSSecureCodi
 public extern objc class NSMorphology
 {
     /// Deprecated in macOS 14.0.
-    [Selector("customPronounForLanguage:")] public NSMorphologyCustomPronoun? CustomPronounForLanguage(NSString language);
+    [Selector("customPronounForLanguage:")]
+    public NSMorphologyCustomPronoun? CustomPronounForLanguage(NSString language);
     /// Deprecated in macOS 14.0.
-    [Selector("setCustomPronoun:forLanguage:error:")] public bool SetCustomPronounForLanguageError(NSMorphologyCustomPronoun? features, NSString language, out NSError? error);
+    [Selector("setCustomPronoun:forLanguage:error:")]
+    public bool SetCustomPronounForLanguageError(NSMorphologyCustomPronoun? features, NSString language, out NSError? error);
 }
 
 /// Deprecated in macOS 14.0.
 public extern objc class NSMorphologyCustomPronoun : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("subjectForm", "setSubjectForm:")] public NSString? SubjectForm { get; set; }
-    [Selector("objectForm", "setObjectForm:")] public NSString? ObjectForm { get; set; }
-    [Selector("possessiveForm", "setPossessiveForm:")] public NSString? PossessiveForm { get; set; }
-    [Selector("possessiveAdjectiveForm", "setPossessiveAdjectiveForm:")] public NSString? PossessiveAdjectiveForm { get; set; }
-    [Selector("reflexiveForm", "setReflexiveForm:")] public NSString? ReflexiveForm { get; set; }
-    [Selector("isSupportedForLanguage:")] public static bool IsSupportedForLanguage(NSString language);
-    [Selector("requiredKeysForLanguage:")] public static NSArray RequiredKeysForLanguage(NSString language);
+    [Selector("subjectForm", "setSubjectForm:")]
+    public NSString? SubjectForm { get; set; }
+    [Selector("objectForm", "setObjectForm:")]
+    public NSString? ObjectForm { get; set; }
+    [Selector("possessiveForm", "setPossessiveForm:")]
+    public NSString? PossessiveForm { get; set; }
+    [Selector("possessiveAdjectiveForm", "setPossessiveAdjectiveForm:")]
+    public NSString? PossessiveAdjectiveForm { get; set; }
+    [Selector("reflexiveForm", "setReflexiveForm:")]
+    public NSString? ReflexiveForm { get; set; }
+    [Selector("isSupportedForLanguage:")]
+    public static bool IsSupportedForLanguage(NSString language);
+    [Selector("requiredKeysForLanguage:")]
+    public static NSArray RequiredKeysForLanguage(NSString language);
 }
 
 /// NSMorphologyUserSettings, a category of NSMorphology.
 public extern objc class NSMorphology
 {
-    [Selector("isUnspecified")] public bool Unspecified { get; }
-    [Selector("userMorphology")] public static NSMorphology UserMorphology { get; }
+    [Selector("isUnspecified")]
+    public bool Unspecified { get; }
+    [Selector("userMorphology")]
+    public static NSMorphology UserMorphology { get; }
 }
 
 #endif

@@ -68,16 +68,25 @@ public enum ITLibPlaylistKind : ulong
 
 public extern objc class ITLibPlaylist : ITLibMediaEntity
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("isPrimary")] public bool Primary { get; }
-    [Selector("parentID")] public NSNumber? ParentID { get; }
-    [Selector("isVisible")] public bool Visible { get; }
-    [Selector("isAllItemsPlaylist")] public bool AllItemsPlaylist { get; }
-    [Selector("items")] public NSArray Items { get; }
-    [Selector("distinguishedKind")] public ITLibDistinguishedPlaylistKind DistinguishedKind { get; }
-    [Selector("kind")] public ITLibPlaylistKind Kind { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("isPrimary")]
+    public bool Primary { get; }
+    [Selector("parentID")]
+    public NSNumber? ParentID { get; }
+    [Selector("isVisible")]
+    public bool Visible { get; }
+    [Selector("isAllItemsPlaylist")]
+    public bool AllItemsPlaylist { get; }
+    [Selector("items")]
+    public NSArray Items { get; }
+    [Selector("distinguishedKind")]
+    public ITLibDistinguishedPlaylistKind DistinguishedKind { get; }
+    [Selector("kind")]
+    public ITLibPlaylistKind Kind { get; }
     /// Deprecated in macOS 100000.
-    [Selector("isMaster")] public bool Master { get; }
+    [Selector("isMaster")]
+    public bool Master { get; }
 }
 
 public extern "C" NSString ITLibPlaylistPropertyName;

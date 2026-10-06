@@ -33,31 +33,45 @@ import Standard.ObjC;
 
 public extern objc class NSFormCell : NSActionCell
 {
-    [Selector("titleWidth", "setTitleWidth:")] public CGFloat TitleWidth { get; set; }
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("titleFont", "setTitleFont:")] public NSFont TitleFont { get; set; }
-    [Selector("isOpaque")] public bool Opaque { get; }
-    [Selector("placeholderString", "setPlaceholderString:")] public NSString? PlaceholderString { get; set; }
-    [Selector("placeholderAttributedString", "setPlaceholderAttributedString:")] public NSAttributedString? PlaceholderAttributedString { get; set; }
-    [Selector("titleAlignment", "setTitleAlignment:")] public NSTextAlignment TitleAlignment { get; set; }
-    [Selector("titleBaseWritingDirection", "setTitleBaseWritingDirection:")] public NSWritingDirection TitleBaseWritingDirection { get; set; }
-    [Selector("preferredTextFieldWidth", "setPreferredTextFieldWidth:")] public CGFloat PreferredTextFieldWidth { get; set; }
-    [Selector("initTextCell:")] public Self InitTextCell(NSString? string);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("titleWidth:")] public CGFloat TitleWidthMethod(NSSize size);
+    [Selector("titleWidth", "setTitleWidth:")]
+    public CGFloat TitleWidth { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("titleFont", "setTitleFont:")]
+    public NSFont TitleFont { get; set; }
+    [Selector("isOpaque")]
+    public bool Opaque { get; }
+    [Selector("placeholderString", "setPlaceholderString:")]
+    public NSString? PlaceholderString { get; set; }
+    [Selector("placeholderAttributedString", "setPlaceholderAttributedString:")]
+    public NSAttributedString? PlaceholderAttributedString { get; set; }
+    [Selector("titleAlignment", "setTitleAlignment:")]
+    public NSTextAlignment TitleAlignment { get; set; }
+    [Selector("titleBaseWritingDirection", "setTitleBaseWritingDirection:")]
+    public NSWritingDirection TitleBaseWritingDirection { get; set; }
+    [Selector("preferredTextFieldWidth", "setPreferredTextFieldWidth:")]
+    public CGFloat PreferredTextFieldWidth { get; set; }
+    [Selector("initTextCell:")]
+    public Self InitTextCell(NSString? string);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("titleWidth:")]
+    public CGFloat TitleWidthMethod(NSSize size);
 }
 
 /// NSKeyboardUI, a category of NSFormCell.
 public extern objc class NSFormCell
 {
     /// Deprecated in macOS 10.8.
-    [Selector("setTitleWithMnemonic:")] public void SetTitleWithMnemonic(NSString? stringWithAmpersand);
+    [Selector("setTitleWithMnemonic:")]
+    public void SetTitleWithMnemonic(NSString? stringWithAmpersand);
 }
 
 /// NSFormCellAttributedStringMethods, a category of NSFormCell.
 public extern objc class NSFormCell
 {
-    [Selector("attributedTitle", "setAttributedTitle:")] public NSAttributedString AttributedTitle { get; set; }
+    [Selector("attributedTitle", "setAttributedTitle:")]
+    public NSAttributedString AttributedTitle { get; set; }
 }
 
 #endif

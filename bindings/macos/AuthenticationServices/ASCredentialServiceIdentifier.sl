@@ -41,12 +41,17 @@ public enum ASCredentialServiceIdentifierType : long
 public extern objc class ASCredentialServiceIdentifier : NSObject, NSCopying, NSSecureCoding
 {
     /// macOS 26.2 and later.
-    [Selector("displayName")] public NSString? DisplayName { get; }
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("type")] public ASCredentialServiceIdentifierType Type { get; }
-    [Selector("initWithIdentifier:type:")] public Self InitWithIdentifierType(NSString identifier, ASCredentialServiceIdentifierType type);
+    [Selector("displayName")]
+    public NSString? DisplayName { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("type")]
+    public ASCredentialServiceIdentifierType Type { get; }
+    [Selector("initWithIdentifier:type:")]
+    public Self InitWithIdentifierType(NSString identifier, ASCredentialServiceIdentifierType type);
     /// macOS 26.2 and later.
-    [Selector("initWithIdentifier:type:displayName:")] public Self InitWithIdentifierTypeDisplayName(NSString identifier, ASCredentialServiceIdentifierType type, NSString displayName);
+    [Selector("initWithIdentifier:type:displayName:")]
+    public Self InitWithIdentifierTypeDisplayName(NSString identifier, ASCredentialServiceIdentifierType type, NSString displayName);
 }
 
 #endif

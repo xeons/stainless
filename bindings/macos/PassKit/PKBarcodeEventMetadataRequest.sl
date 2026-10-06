@@ -33,34 +33,50 @@ import Standard.ObjC;
 
 public extern objc class PKBarcodeEventMetadataRequest : NSObject
 {
-    [Selector("deviceAccountIdentifier")] public NSString DeviceAccountIdentifier { get; }
-    [Selector("lastUsedBarcodeIdentifier")] public NSString LastUsedBarcodeIdentifier { get; }
+    [Selector("deviceAccountIdentifier")]
+    public NSString DeviceAccountIdentifier { get; }
+    [Selector("lastUsedBarcodeIdentifier")]
+    public NSString LastUsedBarcodeIdentifier { get; }
 }
 
 public extern objc class PKBarcodeEventMetadataResponse : NSObject
 {
-    [Selector("paymentInformation", "setPaymentInformation:")] public NSData PaymentInformation { get; set; }
-    [Selector("initWithPaymentInformation:")] public Self InitWithPaymentInformation(NSData paymentInformation);
+    [Selector("paymentInformation", "setPaymentInformation:")]
+    public NSData PaymentInformation { get; set; }
+    [Selector("initWithPaymentInformation:")]
+    public Self InitWithPaymentInformation(NSData paymentInformation);
 }
 
 public extern objc class PKBarcodeEventSignatureRequest : NSObject
 {
-    [Selector("deviceAccountIdentifier")] public NSString DeviceAccountIdentifier { get; }
-    [Selector("transactionIdentifier")] public NSString TransactionIdentifier { get; }
-    [Selector("barcodeIdentifier")] public NSString BarcodeIdentifier { get; }
-    [Selector("rawMerchantName")] public NSString RawMerchantName { get; }
-    [Selector("merchantName")] public NSString MerchantName { get; }
-    [Selector("transactionDate")] public NSDate TransactionDate { get; }
-    [Selector("currencyCode")] public NSString CurrencyCode { get; }
-    [Selector("amount")] public NSNumber Amount { get; }
-    [Selector("transactionStatus")] public NSString TransactionStatus { get; }
-    [Selector("partialSignature")] public NSData PartialSignature { get; }
+    [Selector("deviceAccountIdentifier")]
+    public NSString DeviceAccountIdentifier { get; }
+    [Selector("transactionIdentifier")]
+    public NSString TransactionIdentifier { get; }
+    [Selector("barcodeIdentifier")]
+    public NSString BarcodeIdentifier { get; }
+    [Selector("rawMerchantName")]
+    public NSString RawMerchantName { get; }
+    [Selector("merchantName")]
+    public NSString MerchantName { get; }
+    [Selector("transactionDate")]
+    public NSDate TransactionDate { get; }
+    [Selector("currencyCode")]
+    public NSString CurrencyCode { get; }
+    [Selector("amount")]
+    public NSNumber Amount { get; }
+    [Selector("transactionStatus")]
+    public NSString TransactionStatus { get; }
+    [Selector("partialSignature")]
+    public NSData PartialSignature { get; }
 }
 
 public extern objc class PKBarcodeEventSignatureResponse : NSObject
 {
-    [Selector("signedData", "setSignedData:")] public NSData SignedData { get; set; }
-    [Selector("initWithSignedData:")] public Self InitWithSignedData(NSData signedData);
+    [Selector("signedData", "setSignedData:")]
+    public NSData SignedData { get; set; }
+    [Selector("initWithSignedData:")]
+    public Self InitWithSignedData(NSData signedData);
 }
 
 public enum PKBarcodeEventConfigurationDataType : long
@@ -72,9 +88,12 @@ public enum PKBarcodeEventConfigurationDataType : long
 
 public extern objc class PKBarcodeEventConfigurationRequest : NSObject
 {
-    [Selector("deviceAccountIdentifier")] public NSString DeviceAccountIdentifier { get; }
-    [Selector("configurationData")] public NSData ConfigurationData { get; }
-    [Selector("configurationDataType")] public PKBarcodeEventConfigurationDataType ConfigurationDataType { get; }
+    [Selector("deviceAccountIdentifier")]
+    public NSString DeviceAccountIdentifier { get; }
+    [Selector("configurationData")]
+    public NSData ConfigurationData { get; }
+    [Selector("configurationDataType")]
+    public PKBarcodeEventConfigurationDataType ConfigurationDataType { get; }
 }
 
 #endif

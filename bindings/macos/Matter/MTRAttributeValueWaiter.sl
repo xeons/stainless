@@ -35,8 +35,10 @@ import Standard.ObjC;
 public extern objc class MTRAttributeValueWaiter : NSObject
 {
     /// macOS 15.4 and later.
-    [Selector("UUID")] public NSUUID UUID { get; }
-    [Selector("cancel")] public void Cancel();
+    [Selector("UUID")]
+    public NSUUID UUID { get; }
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

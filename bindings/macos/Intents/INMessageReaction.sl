@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class INMessageReaction : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("reactionType")] public INMessageReactionType ReactionType { get; }
-    [Selector("reactionDescription")] public NSString? ReactionDescription { get; }
-    [Selector("emoji")] public NSString? Emoji { get; }
-    [Selector("initWithReactionType:reactionDescription:emoji:")] public Self InitWithReactionTypeReactionDescriptionEmoji(INMessageReactionType reactionType, NSString? reactionDescription, NSString? emoji);
+    [Selector("reactionType")]
+    public INMessageReactionType ReactionType { get; }
+    [Selector("reactionDescription")]
+    public NSString? ReactionDescription { get; }
+    [Selector("emoji")]
+    public NSString? Emoji { get; }
+    [Selector("initWithReactionType:reactionDescription:emoji:")]
+    public Self InitWithReactionTypeReactionDescriptionEmoji(INMessageReactionType reactionType, NSString? reactionDescription, NSString? emoji);
 }
 
 #endif

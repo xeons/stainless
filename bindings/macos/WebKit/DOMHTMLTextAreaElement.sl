@@ -33,23 +33,39 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLTextAreaElement : DOMHTMLElement
 {
-    [Selector("autofocus", "setAutofocus:")] public bool Autofocus { get; set; }
-    [Selector("disabled", "setDisabled:")] public bool Disabled { get; set; }
-    [Selector("form")] public DOMHTMLFormElement? Form { get; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("readOnly", "setReadOnly:")] public bool ReadOnly { get; set; }
-    [Selector("rows", "setRows:")] public int Rows { get; set; }
-    [Selector("cols", "setCols:")] public int Cols { get; set; }
-    [Selector("type")] public NSString? Type { get; }
-    [Selector("defaultValue", "setDefaultValue:")] public NSString? DefaultValue { get; set; }
-    [Selector("value", "setValue:")] public NSString? Value { get; set; }
-    [Selector("willValidate")] public bool WillValidate { get; }
-    [Selector("selectionStart", "setSelectionStart:")] public int SelectionStart { get; set; }
-    [Selector("selectionEnd", "setSelectionEnd:")] public int SelectionEnd { get; set; }
+    [Selector("autofocus", "setAutofocus:")]
+    public bool Autofocus { get; set; }
+    [Selector("disabled", "setDisabled:")]
+    public bool Disabled { get; set; }
+    [Selector("form")]
+    public DOMHTMLFormElement? Form { get; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("readOnly", "setReadOnly:")]
+    public bool ReadOnly { get; set; }
+    [Selector("rows", "setRows:")]
+    public int Rows { get; set; }
+    [Selector("cols", "setCols:")]
+    public int Cols { get; set; }
+    [Selector("type")]
+    public NSString? Type { get; }
+    [Selector("defaultValue", "setDefaultValue:")]
+    public NSString? DefaultValue { get; set; }
+    [Selector("value", "setValue:")]
+    public NSString? Value { get; set; }
+    [Selector("willValidate")]
+    public bool WillValidate { get; }
+    [Selector("selectionStart", "setSelectionStart:")]
+    public int SelectionStart { get; set; }
+    [Selector("selectionEnd", "setSelectionEnd:")]
+    public int SelectionEnd { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("accessKey", "setAccessKey:")] public NSString? AccessKey { get; set; }
-    [Selector("select")] public void Select();
-    [Selector("setSelectionRange:end:")] public void SetSelectionRangeEnd(int start, int end);
+    [Selector("accessKey", "setAccessKey:")]
+    public NSString? AccessKey { get; set; }
+    [Selector("select")]
+    public void Select();
+    [Selector("setSelectionRange:end:")]
+    public void SetSelectionRangeEnd(int start, int end);
 }
 
 #endif

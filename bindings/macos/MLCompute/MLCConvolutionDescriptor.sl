@@ -34,31 +34,56 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCConvolutionDescriptor : NSObject, NSCopying
 {
-    [Selector("convolutionType")] public MLCConvolutionType ConvolutionType { get; }
-    [Selector("kernelWidth")] public NSUInteger KernelWidth { get; }
-    [Selector("kernelHeight")] public NSUInteger KernelHeight { get; }
-    [Selector("inputFeatureChannelCount")] public NSUInteger InputFeatureChannelCount { get; }
-    [Selector("outputFeatureChannelCount")] public NSUInteger OutputFeatureChannelCount { get; }
-    [Selector("strideInX")] public NSUInteger StrideInX { get; }
-    [Selector("strideInY")] public NSUInteger StrideInY { get; }
-    [Selector("dilationRateInX")] public NSUInteger DilationRateInX { get; }
-    [Selector("dilationRateInY")] public NSUInteger DilationRateInY { get; }
-    [Selector("groupCount")] public NSUInteger GroupCount { get; }
-    [Selector("paddingPolicy")] public MLCPaddingPolicy PaddingPolicy { get; }
-    [Selector("paddingSizeInX")] public NSUInteger PaddingSizeInX { get; }
-    [Selector("paddingSizeInY")] public NSUInteger PaddingSizeInY { get; }
-    [Selector("isConvolutionTranspose")] public bool IsConvolutionTranspose { get; }
-    [Selector("usesDepthwiseConvolution")] public bool UsesDepthwiseConvolution { get; }
-    [Selector("descriptorWithType:kernelSizes:inputFeatureChannelCount:outputFeatureChannelCount:groupCount:strides:dilationRates:paddingPolicy:paddingSizes:")] public static Self DescriptorWithTypeKernelSizesInputFeatureChannelCountOutputFeatureChannelCountGroupCountStridesDilationRatesPaddingPolicyPaddingSizes(MLCConvolutionType convolutionType, NSArray kernelSizes, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount, NSUInteger groupCount, NSArray strides, NSArray dilationRates, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
-    [Selector("descriptorWithKernelWidth:kernelHeight:inputFeatureChannelCount:outputFeatureChannelCount:")] public static Self DescriptorWithKernelWidthKernelHeightInputFeatureChannelCountOutputFeatureChannelCount(NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount);
-    [Selector("descriptorWithKernelSizes:inputFeatureChannelCount:outputFeatureChannelCount:strides:paddingPolicy:paddingSizes:")] public static Self DescriptorWithKernelSizesInputFeatureChannelCountOutputFeatureChannelCountStridesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount, NSArray strides, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
-    [Selector("descriptorWithKernelSizes:inputFeatureChannelCount:outputFeatureChannelCount:groupCount:strides:dilationRates:paddingPolicy:paddingSizes:")] public static Self DescriptorWithKernelSizesInputFeatureChannelCountOutputFeatureChannelCountGroupCountStridesDilationRatesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount, NSUInteger groupCount, NSArray strides, NSArray dilationRates, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
-    [Selector("convolutionTransposeDescriptorWithKernelWidth:kernelHeight:inputFeatureChannelCount:outputFeatureChannelCount:")] public static Self ConvolutionTransposeDescriptorWithKernelWidthKernelHeightInputFeatureChannelCountOutputFeatureChannelCount(NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount);
-    [Selector("convolutionTransposeDescriptorWithKernelSizes:inputFeatureChannelCount:outputFeatureChannelCount:strides:paddingPolicy:paddingSizes:")] public static Self ConvolutionTransposeDescriptorWithKernelSizesInputFeatureChannelCountOutputFeatureChannelCountStridesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount, NSArray strides, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
-    [Selector("convolutionTransposeDescriptorWithKernelSizes:inputFeatureChannelCount:outputFeatureChannelCount:groupCount:strides:dilationRates:paddingPolicy:paddingSizes:")] public static Self ConvolutionTransposeDescriptorWithKernelSizesInputFeatureChannelCountOutputFeatureChannelCountGroupCountStridesDilationRatesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount, NSUInteger groupCount, NSArray strides, NSArray dilationRates, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
-    [Selector("depthwiseConvolutionDescriptorWithKernelWidth:kernelHeight:inputFeatureChannelCount:channelMultiplier:")] public static Self DepthwiseConvolutionDescriptorWithKernelWidthKernelHeightInputFeatureChannelCountChannelMultiplier(NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger inputFeatureChannelCount, NSUInteger channelMultiplier);
-    [Selector("depthwiseConvolutionDescriptorWithKernelSizes:inputFeatureChannelCount:channelMultiplier:strides:paddingPolicy:paddingSizes:")] public static Self DepthwiseConvolutionDescriptorWithKernelSizesInputFeatureChannelCountChannelMultiplierStridesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSUInteger inputFeatureChannelCount, NSUInteger channelMultiplier, NSArray strides, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
-    [Selector("depthwiseConvolutionDescriptorWithKernelSizes:inputFeatureChannelCount:channelMultiplier:strides:dilationRates:paddingPolicy:paddingSizes:")] public static Self DepthwiseConvolutionDescriptorWithKernelSizesInputFeatureChannelCountChannelMultiplierStridesDilationRatesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSUInteger inputFeatureChannelCount, NSUInteger channelMultiplier, NSArray strides, NSArray dilationRates, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
+    [Selector("convolutionType")]
+    public MLCConvolutionType ConvolutionType { get; }
+    [Selector("kernelWidth")]
+    public NSUInteger KernelWidth { get; }
+    [Selector("kernelHeight")]
+    public NSUInteger KernelHeight { get; }
+    [Selector("inputFeatureChannelCount")]
+    public NSUInteger InputFeatureChannelCount { get; }
+    [Selector("outputFeatureChannelCount")]
+    public NSUInteger OutputFeatureChannelCount { get; }
+    [Selector("strideInX")]
+    public NSUInteger StrideInX { get; }
+    [Selector("strideInY")]
+    public NSUInteger StrideInY { get; }
+    [Selector("dilationRateInX")]
+    public NSUInteger DilationRateInX { get; }
+    [Selector("dilationRateInY")]
+    public NSUInteger DilationRateInY { get; }
+    [Selector("groupCount")]
+    public NSUInteger GroupCount { get; }
+    [Selector("paddingPolicy")]
+    public MLCPaddingPolicy PaddingPolicy { get; }
+    [Selector("paddingSizeInX")]
+    public NSUInteger PaddingSizeInX { get; }
+    [Selector("paddingSizeInY")]
+    public NSUInteger PaddingSizeInY { get; }
+    [Selector("isConvolutionTranspose")]
+    public bool IsConvolutionTranspose { get; }
+    [Selector("usesDepthwiseConvolution")]
+    public bool UsesDepthwiseConvolution { get; }
+    [Selector("descriptorWithType:kernelSizes:inputFeatureChannelCount:outputFeatureChannelCount:groupCount:strides:dilationRates:paddingPolicy:paddingSizes:")]
+    public static Self DescriptorWithTypeKernelSizesInputFeatureChannelCountOutputFeatureChannelCountGroupCountStridesDilationRatesPaddingPolicyPaddingSizes(MLCConvolutionType convolutionType, NSArray kernelSizes, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount, NSUInteger groupCount, NSArray strides, NSArray dilationRates, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
+    [Selector("descriptorWithKernelWidth:kernelHeight:inputFeatureChannelCount:outputFeatureChannelCount:")]
+    public static Self DescriptorWithKernelWidthKernelHeightInputFeatureChannelCountOutputFeatureChannelCount(NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount);
+    [Selector("descriptorWithKernelSizes:inputFeatureChannelCount:outputFeatureChannelCount:strides:paddingPolicy:paddingSizes:")]
+    public static Self DescriptorWithKernelSizesInputFeatureChannelCountOutputFeatureChannelCountStridesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount, NSArray strides, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
+    [Selector("descriptorWithKernelSizes:inputFeatureChannelCount:outputFeatureChannelCount:groupCount:strides:dilationRates:paddingPolicy:paddingSizes:")]
+    public static Self DescriptorWithKernelSizesInputFeatureChannelCountOutputFeatureChannelCountGroupCountStridesDilationRatesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount, NSUInteger groupCount, NSArray strides, NSArray dilationRates, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
+    [Selector("convolutionTransposeDescriptorWithKernelWidth:kernelHeight:inputFeatureChannelCount:outputFeatureChannelCount:")]
+    public static Self ConvolutionTransposeDescriptorWithKernelWidthKernelHeightInputFeatureChannelCountOutputFeatureChannelCount(NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount);
+    [Selector("convolutionTransposeDescriptorWithKernelSizes:inputFeatureChannelCount:outputFeatureChannelCount:strides:paddingPolicy:paddingSizes:")]
+    public static Self ConvolutionTransposeDescriptorWithKernelSizesInputFeatureChannelCountOutputFeatureChannelCountStridesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount, NSArray strides, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
+    [Selector("convolutionTransposeDescriptorWithKernelSizes:inputFeatureChannelCount:outputFeatureChannelCount:groupCount:strides:dilationRates:paddingPolicy:paddingSizes:")]
+    public static Self ConvolutionTransposeDescriptorWithKernelSizesInputFeatureChannelCountOutputFeatureChannelCountGroupCountStridesDilationRatesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount, NSUInteger groupCount, NSArray strides, NSArray dilationRates, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
+    [Selector("depthwiseConvolutionDescriptorWithKernelWidth:kernelHeight:inputFeatureChannelCount:channelMultiplier:")]
+    public static Self DepthwiseConvolutionDescriptorWithKernelWidthKernelHeightInputFeatureChannelCountChannelMultiplier(NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger inputFeatureChannelCount, NSUInteger channelMultiplier);
+    [Selector("depthwiseConvolutionDescriptorWithKernelSizes:inputFeatureChannelCount:channelMultiplier:strides:paddingPolicy:paddingSizes:")]
+    public static Self DepthwiseConvolutionDescriptorWithKernelSizesInputFeatureChannelCountChannelMultiplierStridesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSUInteger inputFeatureChannelCount, NSUInteger channelMultiplier, NSArray strides, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
+    [Selector("depthwiseConvolutionDescriptorWithKernelSizes:inputFeatureChannelCount:channelMultiplier:strides:dilationRates:paddingPolicy:paddingSizes:")]
+    public static Self DepthwiseConvolutionDescriptorWithKernelSizesInputFeatureChannelCountChannelMultiplierStridesDilationRatesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSUInteger inputFeatureChannelCount, NSUInteger channelMultiplier, NSArray strides, NSArray dilationRates, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
 }
 
 #endif

@@ -57,11 +57,16 @@ public enum HKElectrocardiogramSymptomsStatus : long
 
 public extern objc class HKElectrocardiogram : HKSample
 {
-    [Selector("numberOfVoltageMeasurements")] public NSInteger NumberOfVoltageMeasurements { get; }
-    [Selector("samplingFrequency")] public HKQuantity? SamplingFrequency { get; }
-    [Selector("classification")] public HKElectrocardiogramClassification Classification { get; }
-    [Selector("averageHeartRate")] public HKQuantity? AverageHeartRate { get; }
-    [Selector("symptomsStatus")] public HKElectrocardiogramSymptomsStatus SymptomsStatus { get; }
+    [Selector("numberOfVoltageMeasurements")]
+    public NSInteger NumberOfVoltageMeasurements { get; }
+    [Selector("samplingFrequency")]
+    public HKQuantity? SamplingFrequency { get; }
+    [Selector("classification")]
+    public HKElectrocardiogramClassification Classification { get; }
+    [Selector("averageHeartRate")]
+    public HKQuantity? AverageHeartRate { get; }
+    [Selector("symptomsStatus")]
+    public HKElectrocardiogramSymptomsStatus SymptomsStatus { get; }
 }
 
 public extern "C" NSString HKPredicateKeyPathAverageHeartRate;

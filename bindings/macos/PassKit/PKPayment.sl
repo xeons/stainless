@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class PKPayment : NSObject
 {
-    [Selector("token")] public PKPaymentToken Token { get; }
-    [Selector("billingContact")] public PKContact? BillingContact { get; }
-    [Selector("shippingContact")] public PKContact? ShippingContact { get; }
-    [Selector("shippingMethod")] public PKShippingMethod? ShippingMethod { get; }
+    [Selector("token")]
+    public PKPaymentToken Token { get; }
+    [Selector("billingContact")]
+    public PKContact? BillingContact { get; }
+    [Selector("shippingContact")]
+    public PKContact? ShippingContact { get; }
+    [Selector("shippingMethod")]
+    public PKShippingMethod? ShippingMethod { get; }
 }
 
 #endif

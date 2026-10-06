@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class INHangUpCallIntent : INIntent
 {
-    [Selector("callIdentifier")] public NSString? CallIdentifier { get; }
-    [Selector("initWithCallIdentifier:")] public Self InitWithCallIdentifier(NSString? callIdentifier);
+    [Selector("callIdentifier")]
+    public NSString? CallIdentifier { get; }
+    [Selector("initWithCallIdentifier:")]
+    public Self InitWithCallIdentifier(NSString? callIdentifier);
 }
 
 public objc closure void INHangUpCallIntentHandlingHandleHangUpCallCompletionCompletionBlock(INHangUpCallIntentResponse arg0);
@@ -43,8 +45,11 @@ public objc closure void INHangUpCallIntentHandlingConfirmHangUpCallCompletionCo
 
 public objc interface INHangUpCallIntentHandling : NSObjectProtocol
 {
-    [Selector("handleHangUpCall:completion:")] void HandleHangUpCallCompletion(INHangUpCallIntent intent, INHangUpCallIntentHandlingHandleHangUpCallCompletionCompletionBlock completion);
-    [Optional] [Selector("confirmHangUpCall:completion:")] void ConfirmHangUpCallCompletion(INHangUpCallIntent intent, INHangUpCallIntentHandlingConfirmHangUpCallCompletionCompletionBlock completion);
+    [Selector("handleHangUpCall:completion:")]
+    void HandleHangUpCallCompletion(INHangUpCallIntent intent, INHangUpCallIntentHandlingHandleHangUpCallCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("confirmHangUpCall:completion:")]
+    void ConfirmHangUpCallCompletion(INHangUpCallIntent intent, INHangUpCallIntentHandlingConfirmHangUpCallCompletionCompletionBlock completion);
 }
 
 #endif

@@ -47,25 +47,44 @@ public enum NSPickerTouchBarItemControlRepresentation : long
 
 public extern objc class NSPickerTouchBarItem : NSTouchBarItem
 {
-    [Selector("controlRepresentation", "setControlRepresentation:")] public NSPickerTouchBarItemControlRepresentation ControlRepresentation { get; set; }
-    [Selector("collapsedRepresentationLabel", "setCollapsedRepresentationLabel:")] public NSString CollapsedRepresentationLabel { get; set; }
-    [Selector("collapsedRepresentationImage", "setCollapsedRepresentationImage:")] public NSImage? CollapsedRepresentationImage { get; set; }
-    [Selector("selectedIndex", "setSelectedIndex:")] public NSInteger SelectedIndex { get; set; }
-    [Selector("selectionColor", "setSelectionColor:")] public NSColor? SelectionColor { get; set; }
-    [Selector("selectionMode", "setSelectionMode:")] public NSPickerTouchBarItemSelectionMode SelectionMode { get; set; }
-    [Selector("numberOfOptions", "setNumberOfOptions:")] public NSInteger NumberOfOptions { get; set; }
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
-    [Selector("action", "setAction:")] public Selector Action { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("customizationLabel", "setCustomizationLabel:")] public NSString? CustomizationLabel { get; set; }
-    [Selector("pickerTouchBarItemWithIdentifier:labels:selectionMode:target:action:")] public static Self PickerTouchBarItemWithIdentifierLabelsSelectionModeTargetAction(NSTouchBarItemIdentifier identifier, NSArray labels, NSPickerTouchBarItemSelectionMode selectionMode, AnyObject? target, Selector action);
-    [Selector("pickerTouchBarItemWithIdentifier:images:selectionMode:target:action:")] public static Self PickerTouchBarItemWithIdentifierImagesSelectionModeTargetAction(NSTouchBarItemIdentifier identifier, NSArray images, NSPickerTouchBarItemSelectionMode selectionMode, AnyObject? target, Selector action);
-    [Selector("setImage:atIndex:")] public void SetImageAtIndex(NSImage? image, NSInteger index);
-    [Selector("imageAtIndex:")] public NSImage? ImageAtIndex(NSInteger index);
-    [Selector("setLabel:atIndex:")] public void SetLabelAtIndex(NSString label, NSInteger index);
-    [Selector("labelAtIndex:")] public NSString? LabelAtIndex(NSInteger index);
-    [Selector("setEnabled:atIndex:")] public void SetEnabledAtIndex(bool enabled, NSInteger index);
-    [Selector("isEnabledAtIndex:")] public bool IsEnabledAtIndex(NSInteger index);
+    [Selector("controlRepresentation", "setControlRepresentation:")]
+    public NSPickerTouchBarItemControlRepresentation ControlRepresentation { get; set; }
+    [Selector("collapsedRepresentationLabel", "setCollapsedRepresentationLabel:")]
+    public NSString CollapsedRepresentationLabel { get; set; }
+    [Selector("collapsedRepresentationImage", "setCollapsedRepresentationImage:")]
+    public NSImage? CollapsedRepresentationImage { get; set; }
+    [Selector("selectedIndex", "setSelectedIndex:")]
+    public NSInteger SelectedIndex { get; set; }
+    [Selector("selectionColor", "setSelectionColor:")]
+    public NSColor? SelectionColor { get; set; }
+    [Selector("selectionMode", "setSelectionMode:")]
+    public NSPickerTouchBarItemSelectionMode SelectionMode { get; set; }
+    [Selector("numberOfOptions", "setNumberOfOptions:")]
+    public NSInteger NumberOfOptions { get; set; }
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
+    [Selector("action", "setAction:")]
+    public Selector Action { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("customizationLabel", "setCustomizationLabel:")]
+    public NSString? CustomizationLabel { get; set; }
+    [Selector("pickerTouchBarItemWithIdentifier:labels:selectionMode:target:action:")]
+    public static Self PickerTouchBarItemWithIdentifierLabelsSelectionModeTargetAction(NSTouchBarItemIdentifier identifier, NSArray labels, NSPickerTouchBarItemSelectionMode selectionMode, AnyObject? target, Selector action);
+    [Selector("pickerTouchBarItemWithIdentifier:images:selectionMode:target:action:")]
+    public static Self PickerTouchBarItemWithIdentifierImagesSelectionModeTargetAction(NSTouchBarItemIdentifier identifier, NSArray images, NSPickerTouchBarItemSelectionMode selectionMode, AnyObject? target, Selector action);
+    [Selector("setImage:atIndex:")]
+    public void SetImageAtIndex(NSImage? image, NSInteger index);
+    [Selector("imageAtIndex:")]
+    public NSImage? ImageAtIndex(NSInteger index);
+    [Selector("setLabel:atIndex:")]
+    public void SetLabelAtIndex(NSString label, NSInteger index);
+    [Selector("labelAtIndex:")]
+    public NSString? LabelAtIndex(NSInteger index);
+    [Selector("setEnabled:atIndex:")]
+    public void SetEnabledAtIndex(bool enabled, NSInteger index);
+    [Selector("isEnabledAtIndex:")]
+    public bool IsEnabledAtIndex(NSInteger index);
 }
 
 #endif

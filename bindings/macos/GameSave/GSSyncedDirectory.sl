@@ -45,19 +45,28 @@ public enum GSSyncState : long
 
 public extern objc class GSSyncedDirectoryVersion : NSObject
 {
-    [Selector("isLocal")] public bool IsLocal { get; }
-    [Selector("localizedNameOfSavingComputer")] public NSString LocalizedNameOfSavingComputer { get; }
-    [Selector("modifiedDate")] public NSDate ModifiedDate { get; }
-    [Selector("url")] public NSURL Url { get; }
-    [Selector("description")] public NSString Description { get; }
+    [Selector("isLocal")]
+    public bool IsLocal { get; }
+    [Selector("localizedNameOfSavingComputer")]
+    public NSString LocalizedNameOfSavingComputer { get; }
+    [Selector("modifiedDate")]
+    public NSDate ModifiedDate { get; }
+    [Selector("url")]
+    public NSURL Url { get; }
+    [Selector("description")]
+    public NSString Description { get; }
 }
 
 public extern objc class GSSyncedDirectoryState : NSObject
 {
-    [Selector("state")] public GSSyncState State { get; }
-    [Selector("url")] public NSURL? Url { get; }
-    [Selector("conflictedVersions")] public NSArray? ConflictedVersions { get; }
-    [Selector("error")] public NSError? Error { get; }
+    [Selector("state")]
+    public GSSyncState State { get; }
+    [Selector("url")]
+    public NSURL? Url { get; }
+    [Selector("conflictedVersions")]
+    public NSArray? ConflictedVersions { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
 }
 
 public objc closure void GSSyncedDirectoryTriggerPendingUploadWithCompletionHandlerCompletionBlock(bool arg0);
@@ -68,13 +77,20 @@ public objc closure void GSSyncedDirectoryFinishSyncingCompletionHandlerCompleti
 
 public extern objc class GSSyncedDirectory : NSObject
 {
-    [Selector("directoryState")] public GSSyncedDirectoryState DirectoryState { get; }
-    [Selector("openDirectoryForContainerIdentifier:")] public static GSSyncedDirectory OpenDirectoryForContainerIdentifier(NSString? containerIdentifier);
-    [Selector("close")] public void Close();
-    [Selector("triggerPendingUploadWithCompletionHandler:")] public void TriggerPendingUploadWithCompletionHandler(GSSyncedDirectoryTriggerPendingUploadWithCompletionHandlerCompletionBlock completion);
-    [Selector("resolveConflictsWithVersion:")] public void ResolveConflictsWithVersion(GSSyncedDirectoryVersion version);
-    [Selector("finishSyncingWithCompletionHandler:")] public void FinishSyncingWithCompletionHandler(GSSyncedDirectoryFinishSyncingWithCompletionHandlerCompletionBlock completion);
-    [Selector("finishSyncing:completionHandler:")] public void FinishSyncingCompletionHandler(NSWindow statusDisplay, GSSyncedDirectoryFinishSyncingCompletionHandlerCompletionBlock completion);
+    [Selector("directoryState")]
+    public GSSyncedDirectoryState DirectoryState { get; }
+    [Selector("openDirectoryForContainerIdentifier:")]
+    public static GSSyncedDirectory OpenDirectoryForContainerIdentifier(NSString? containerIdentifier);
+    [Selector("close")]
+    public void Close();
+    [Selector("triggerPendingUploadWithCompletionHandler:")]
+    public void TriggerPendingUploadWithCompletionHandler(GSSyncedDirectoryTriggerPendingUploadWithCompletionHandlerCompletionBlock completion);
+    [Selector("resolveConflictsWithVersion:")]
+    public void ResolveConflictsWithVersion(GSSyncedDirectoryVersion version);
+    [Selector("finishSyncingWithCompletionHandler:")]
+    public void FinishSyncingWithCompletionHandler(GSSyncedDirectoryFinishSyncingWithCompletionHandlerCompletionBlock completion);
+    [Selector("finishSyncing:completionHandler:")]
+    public void FinishSyncingCompletionHandler(NSWindow statusDisplay, GSSyncedDirectoryFinishSyncingCompletionHandlerCompletionBlock completion);
 }
 
 #endif

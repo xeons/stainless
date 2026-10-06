@@ -65,8 +65,10 @@ public extern "C" NSString? WKWebsiteDataTypeScreenTime;
 
 public extern objc class WKWebsiteDataRecord : NSObject
 {
-    [Selector("displayName")] public NSString DisplayName { get; }
-    [Selector("dataTypes")] public NSSet DataTypes { get; }
+    [Selector("displayName")]
+    public NSString DisplayName { get; }
+    [Selector("dataTypes")]
+    public NSSet DataTypes { get; }
 }
 
 #endif

@@ -54,9 +54,12 @@ public extern "C" NSString AVCaptureReactionSystemImageNameForType(AVCaptureReac
 
 public extern objc class AVCaptureReactionEffectState : NSObject
 {
-    [Selector("reactionType")] public AVCaptureReactionType? ReactionType { get; }
-    [Selector("startTime")] public CMTime StartTime { get; }
-    [Selector("endTime")] public CMTime EndTime { get; }
+    [Selector("reactionType")]
+    public AVCaptureReactionType? ReactionType { get; }
+    [Selector("startTime")]
+    public CMTime StartTime { get; }
+    [Selector("endTime")]
+    public CMTime EndTime { get; }
 }
 
 #endif

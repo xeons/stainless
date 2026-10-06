@@ -39,11 +39,16 @@ public objc closure void MAMusicHapticsManagerAddStatusObserverStatusHandlerBloc
 
 public extern objc class MAMusicHapticsManager : NSObject
 {
-    [Selector("sharedManager")] public static MAMusicHapticsManager SharedManager { get; }
-    [Selector("isActive")] public bool IsActive { get; }
-    [Selector("checkHapticTrackAvailabilityForMediaMatchingCode:completionHandler:")] public void CheckHapticTrackAvailabilityForMediaMatchingCodeCompletionHandler(NSString internationalStandardRecordingCode, MAMusicHapticsManagerCheckHapticTrackAvailabilityForMediaMatchingCodeCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("addStatusObserver:")] public NSCopying? AddStatusObserver(MAMusicHapticsManagerAddStatusObserverStatusHandlerBlock statusHandler);
-    [Selector("removeStatusObserver:")] public void RemoveStatusObserver(NSCopying registrationToken);
+    [Selector("sharedManager")]
+    public static MAMusicHapticsManager SharedManager { get; }
+    [Selector("isActive")]
+    public bool IsActive { get; }
+    [Selector("checkHapticTrackAvailabilityForMediaMatchingCode:completionHandler:")]
+    public void CheckHapticTrackAvailabilityForMediaMatchingCodeCompletionHandler(NSString internationalStandardRecordingCode, MAMusicHapticsManagerCheckHapticTrackAvailabilityForMediaMatchingCodeCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("addStatusObserver:")]
+    public NSCopying? AddStatusObserver(MAMusicHapticsManagerAddStatusObserverStatusHandlerBlock statusHandler);
+    [Selector("removeStatusObserver:")]
+    public void RemoveStatusObserver(NSCopying registrationToken);
 }
 
 #endif

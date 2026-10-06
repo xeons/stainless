@@ -61,41 +61,60 @@ public enum NSColorPanelOptions : ulong
 
 public extern objc class NSColorPanel : NSPanel
 {
-    [Selector("sharedColorPanel")] public static NSColorPanel SharedColorPanel { get; }
-    [Selector("sharedColorPanelExists")] public static bool SharedColorPanelExists { get; }
-    [Selector("accessoryView", "setAccessoryView:")] public NSView? AccessoryView { get; set; }
-    [Selector("isContinuous", "setContinuous:")] public bool Continuous { get; set; }
-    [Selector("showsAlpha", "setShowsAlpha:")] public bool ShowsAlpha { get; set; }
-    [Selector("mode", "setMode:")] public NSColorPanelMode Mode { get; set; }
-    [Selector("color", "setColor:")] public NSColor Color { get; set; }
-    [Selector("alpha")] public CGFloat Alpha { get; }
+    [Selector("sharedColorPanel")]
+    public static NSColorPanel SharedColorPanel { get; }
+    [Selector("sharedColorPanelExists")]
+    public static bool SharedColorPanelExists { get; }
+    [Selector("accessoryView", "setAccessoryView:")]
+    public NSView? AccessoryView { get; set; }
+    [Selector("isContinuous", "setContinuous:")]
+    public bool Continuous { get; set; }
+    [Selector("showsAlpha", "setShowsAlpha:")]
+    public bool ShowsAlpha { get; set; }
+    [Selector("mode", "setMode:")]
+    public NSColorPanelMode Mode { get; set; }
+    [Selector("color", "setColor:")]
+    public NSColor Color { get; set; }
+    [Selector("alpha")]
+    public CGFloat Alpha { get; }
     /// macOS 26.0 and later.
-    [Selector("maximumLinearExposure", "setMaximumLinearExposure:")] public CGFloat MaximumLinearExposure { get; set; }
-    [Selector("dragColor:withEvent:fromView:")] public static bool DragColorWithEventFromView(NSColor color, NSEvent event, NSView sourceView);
-    [Selector("setPickerMask:")] public static void SetPickerMask(NSColorPanelOptions mask);
-    [Selector("setPickerMode:")] public static void SetPickerMode(NSColorPanelMode mode);
-    [Selector("setAction:")] public void SetAction(Selector selector);
-    [Selector("setTarget:")] public void SetTarget(AnyObject? target);
-    [Selector("attachColorList:")] public void AttachColorList(NSColorList colorList);
-    [Selector("detachColorList:")] public void DetachColorList(NSColorList colorList);
+    [Selector("maximumLinearExposure", "setMaximumLinearExposure:")]
+    public CGFloat MaximumLinearExposure { get; set; }
+    [Selector("dragColor:withEvent:fromView:")]
+    public static bool DragColorWithEventFromView(NSColor color, NSEvent event, NSView sourceView);
+    [Selector("setPickerMask:")]
+    public static void SetPickerMask(NSColorPanelOptions mask);
+    [Selector("setPickerMode:")]
+    public static void SetPickerMode(NSColorPanelMode mode);
+    [Selector("setAction:")]
+    public void SetAction(Selector selector);
+    [Selector("setTarget:")]
+    public void SetTarget(AnyObject? target);
+    [Selector("attachColorList:")]
+    public void AttachColorList(NSColorList colorList);
+    [Selector("detachColorList:")]
+    public void DetachColorList(NSColorList colorList);
 }
 
 /// NSColorPanel, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("orderFrontColorPanel:")] public void OrderFrontColorPanel(AnyObject? sender);
+    [Selector("orderFrontColorPanel:")]
+    public void OrderFrontColorPanel(AnyObject? sender);
 }
 
 public objc interface NSColorChanging : NSObjectProtocol
 {
-    [Selector("changeColor:")] void ChangeColor(NSColorPanel? sender);
+    [Selector("changeColor:")]
+    void ChangeColor(NSColorPanel? sender);
 }
 
 /// NSColorPanelResponderMethod, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 11.0.
-    [Selector("changeColor:")] public void ChangeColor(AnyObject? sender);
+    [Selector("changeColor:")]
+    public void ChangeColor(AnyObject? sender);
 }
 
 public extern "C" NSNotificationName NSColorPanelColorDidChangeNotification;

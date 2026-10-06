@@ -42,15 +42,24 @@ public objc closure void NSAnimationContextRunAnimationGroupChangesBlock(NSAnima
 
 public extern objc class NSAnimationContext : NSObject
 {
-    [Selector("currentContext")] public static NSAnimationContext CurrentContext { get; }
-    [Selector("duration", "setDuration:")] public NSTimeInterval Duration { get; set; }
-    [Selector("timingFunction", "setTimingFunction:")] public CAMediaTimingFunction? TimingFunction { get; set; }
-    [Selector("completionHandler", "setCompletionHandler:")] public NSAnimationContextCompletionHandlerBlock? CompletionHandler { get; set; }
-    [Selector("allowsImplicitAnimation", "setAllowsImplicitAnimation:")] public bool AllowsImplicitAnimation { get; set; }
-    [Selector("runAnimationGroup:completionHandler:")] public static void RunAnimationGroupCompletionHandler(NSAnimationContextRunAnimationGroupCompletionHandlerChangesBlock changes, NSAnimationContextRunAnimationGroupCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("runAnimationGroup:")] public static void RunAnimationGroup(NSAnimationContextRunAnimationGroupChangesBlock changes);
-    [Selector("beginGrouping")] public static void BeginGrouping();
-    [Selector("endGrouping")] public static void EndGrouping();
+    [Selector("currentContext")]
+    public static NSAnimationContext CurrentContext { get; }
+    [Selector("duration", "setDuration:")]
+    public NSTimeInterval Duration { get; set; }
+    [Selector("timingFunction", "setTimingFunction:")]
+    public CAMediaTimingFunction? TimingFunction { get; set; }
+    [Selector("completionHandler", "setCompletionHandler:")]
+    public NSAnimationContextCompletionHandlerBlock? CompletionHandler { get; set; }
+    [Selector("allowsImplicitAnimation", "setAllowsImplicitAnimation:")]
+    public bool AllowsImplicitAnimation { get; set; }
+    [Selector("runAnimationGroup:completionHandler:")]
+    public static void RunAnimationGroupCompletionHandler(NSAnimationContextRunAnimationGroupCompletionHandlerChangesBlock changes, NSAnimationContextRunAnimationGroupCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("runAnimationGroup:")]
+    public static void RunAnimationGroup(NSAnimationContextRunAnimationGroupChangesBlock changes);
+    [Selector("beginGrouping")]
+    public static void BeginGrouping();
+    [Selector("endGrouping")]
+    public static void EndGrouping();
 }
 
 #endif

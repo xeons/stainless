@@ -36,12 +36,18 @@ public using CLBeaconMinorValue = ushort;
 
 public extern objc class CLBeaconIdentityCondition : CLCondition, NSCopying, NSSecureCoding
 {
-    [Selector("UUID")] public NSUUID UUID { get; }
-    [Selector("major")] public NSNumber? Major { get; }
-    [Selector("minor")] public NSNumber? Minor { get; }
-    [Selector("initWithUUID:")] public Self InitWithUUID(NSUUID uuid);
-    [Selector("initWithUUID:major:")] public Self InitWithUUIDMajor(NSUUID uuid, CLBeaconMajorValue major);
-    [Selector("initWithUUID:major:minor:")] public Self InitWithUUIDMajorMinor(NSUUID uuid, CLBeaconMajorValue major, CLBeaconMinorValue minor);
+    [Selector("UUID")]
+    public NSUUID UUID { get; }
+    [Selector("major")]
+    public NSNumber? Major { get; }
+    [Selector("minor")]
+    public NSNumber? Minor { get; }
+    [Selector("initWithUUID:")]
+    public Self InitWithUUID(NSUUID uuid);
+    [Selector("initWithUUID:major:")]
+    public Self InitWithUUIDMajor(NSUUID uuid, CLBeaconMajorValue major);
+    [Selector("initWithUUID:major:minor:")]
+    public Self InitWithUUIDMajorMinor(NSUUID uuid, CLBeaconMajorValue major, CLBeaconMinorValue minor);
 }
 
 #endif

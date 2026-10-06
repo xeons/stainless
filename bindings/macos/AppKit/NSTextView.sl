@@ -49,291 +49,544 @@ public extern "C" NSString? NSAllRomanInputSourcesLocaleIdentifier;
 
 public extern objc class NSTextView : NSText, NSColorChanging, NSMenuItemValidation, NSUserInterfaceValidations, NSTextInputClient, NSTextLayoutOrientationProvider, NSDraggingSource, NSStandardKeyBindingResponding, NSTextInput, NSAccessibilityNavigableStaticText, NSTextContent
 {
-    [Selector("textContainer", "setTextContainer:")] public NSTextContainer? TextContainer { get; set; }
-    [Selector("textContainerInset", "setTextContainerInset:")] public NSSize TextContainerInset { get; set; }
-    [Selector("textContainerOrigin")] public NSPoint TextContainerOrigin { get; }
-    [Selector("layoutManager")] public NSLayoutManager? LayoutManager { get; }
-    [Selector("textStorage")] public NSTextStorage? TextStorage { get; }
-    [Selector("textLayoutManager")] public NSTextLayoutManager? TextLayoutManager { get; }
-    [Selector("textContentStorage")] public NSTextContentStorage? TextContentStorage { get; }
-    [Selector("shouldDrawInsertionPoint")] public bool ShouldDrawInsertionPoint { get; }
-    [Selector("stronglyReferencesTextStorage")] public static bool StronglyReferencesTextStorage { get; }
-    [Selector("usesAdaptiveColorMappingForDarkAppearance", "setUsesAdaptiveColorMappingForDarkAppearance:")] public bool UsesAdaptiveColorMappingForDarkAppearance { get; set; }
-    [Selector("initWithFrame:textContainer:")] public Self InitWithFrameTextContainer(NSRect frameRect, NSTextContainer? container);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("initWithFrame:")] public Self InitWithFrame(NSRect frameRect);
-    [Selector("initUsingTextLayoutManager:")] public Self InitUsingTextLayoutManager(bool usingTextLayoutManager);
-    [Selector("textViewUsingTextLayoutManager:")] public static Self TextViewUsingTextLayoutManager(bool usingTextLayoutManager);
-    [Selector("replaceTextContainer:")] public void ReplaceTextContainer(NSTextContainer newContainer);
-    [Selector("invalidateTextContainerOrigin")] public void InvalidateTextContainerOrigin();
+    [Selector("textContainer", "setTextContainer:")]
+    public NSTextContainer? TextContainer { get; set; }
+    [Selector("textContainerInset", "setTextContainerInset:")]
+    public NSSize TextContainerInset { get; set; }
+    [Selector("textContainerOrigin")]
+    public NSPoint TextContainerOrigin { get; }
+    [Selector("layoutManager")]
+    public NSLayoutManager? LayoutManager { get; }
+    [Selector("textStorage")]
+    public NSTextStorage? TextStorage { get; }
+    [Selector("textLayoutManager")]
+    public NSTextLayoutManager? TextLayoutManager { get; }
+    [Selector("textContentStorage")]
+    public NSTextContentStorage? TextContentStorage { get; }
+    [Selector("shouldDrawInsertionPoint")]
+    public bool ShouldDrawInsertionPoint { get; }
+    [Selector("stronglyReferencesTextStorage")]
+    public static bool StronglyReferencesTextStorage { get; }
+    [Selector("usesAdaptiveColorMappingForDarkAppearance", "setUsesAdaptiveColorMappingForDarkAppearance:")]
+    public bool UsesAdaptiveColorMappingForDarkAppearance { get; set; }
+    [Selector("initWithFrame:textContainer:")]
+    public Self InitWithFrameTextContainer(NSRect frameRect, NSTextContainer? container);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("initWithFrame:")]
+    public Self InitWithFrame(NSRect frameRect);
+    [Selector("initUsingTextLayoutManager:")]
+    public Self InitUsingTextLayoutManager(bool usingTextLayoutManager);
+    [Selector("textViewUsingTextLayoutManager:")]
+    public static Self TextViewUsingTextLayoutManager(bool usingTextLayoutManager);
+    [Selector("replaceTextContainer:")]
+    public void ReplaceTextContainer(NSTextContainer newContainer);
+    [Selector("invalidateTextContainerOrigin")]
+    public void InvalidateTextContainerOrigin();
     /// Deprecated in macOS 10.11.
-    [Selector("insertText:")] public void InsertText(AnyObject insertString);
-    [Selector("setConstrainedFrameSize:")] public void SetConstrainedFrameSize(NSSize desiredSize);
-    [Selector("setAlignment:range:")] public void SetAlignmentRange(NSTextAlignment alignment, NSRange range);
-    [Selector("setBaseWritingDirection:range:")] public void SetBaseWritingDirectionRange(NSWritingDirection writingDirection, NSRange range);
-    [Selector("turnOffKerning:")] public void TurnOffKerning(AnyObject? sender);
-    [Selector("tightenKerning:")] public void TightenKerning(AnyObject? sender);
-    [Selector("loosenKerning:")] public void LoosenKerning(AnyObject? sender);
-    [Selector("useStandardKerning:")] public void UseStandardKerning(AnyObject? sender);
-    [Selector("turnOffLigatures:")] public void TurnOffLigatures(AnyObject? sender);
-    [Selector("useStandardLigatures:")] public void UseStandardLigatures(AnyObject? sender);
-    [Selector("useAllLigatures:")] public void UseAllLigatures(AnyObject? sender);
-    [Selector("raiseBaseline:")] public void RaiseBaseline(AnyObject? sender);
-    [Selector("lowerBaseline:")] public void LowerBaseline(AnyObject? sender);
+    [Selector("insertText:")]
+    public void InsertText(AnyObject insertString);
+    [Selector("setConstrainedFrameSize:")]
+    public void SetConstrainedFrameSize(NSSize desiredSize);
+    [Selector("setAlignment:range:")]
+    public void SetAlignmentRange(NSTextAlignment alignment, NSRange range);
+    [Selector("setBaseWritingDirection:range:")]
+    public void SetBaseWritingDirectionRange(NSWritingDirection writingDirection, NSRange range);
+    [Selector("turnOffKerning:")]
+    public void TurnOffKerning(AnyObject? sender);
+    [Selector("tightenKerning:")]
+    public void TightenKerning(AnyObject? sender);
+    [Selector("loosenKerning:")]
+    public void LoosenKerning(AnyObject? sender);
+    [Selector("useStandardKerning:")]
+    public void UseStandardKerning(AnyObject? sender);
+    [Selector("turnOffLigatures:")]
+    public void TurnOffLigatures(AnyObject? sender);
+    [Selector("useStandardLigatures:")]
+    public void UseStandardLigatures(AnyObject? sender);
+    [Selector("useAllLigatures:")]
+    public void UseAllLigatures(AnyObject? sender);
+    [Selector("raiseBaseline:")]
+    public void RaiseBaseline(AnyObject? sender);
+    [Selector("lowerBaseline:")]
+    public void LowerBaseline(AnyObject? sender);
     /// Deprecated in macOS 10.11.
-    [Selector("toggleTraditionalCharacterShape:")] public void ToggleTraditionalCharacterShape(AnyObject? sender);
-    [Selector("outline:")] public void Outline(AnyObject? sender);
-    [Selector("performFindPanelAction:")] public void PerformFindPanelAction(AnyObject? sender);
-    [Selector("alignJustified:")] public void AlignJustified(AnyObject? sender);
-    [Selector("changeColor:")] public void ChangeColor(AnyObject? sender);
-    [Selector("changeAttributes:")] public void ChangeAttributes(AnyObject? sender);
-    [Selector("changeDocumentBackgroundColor:")] public void ChangeDocumentBackgroundColor(AnyObject? sender);
-    [Selector("orderFrontSpacingPanel:")] public void OrderFrontSpacingPanel(AnyObject? sender);
-    [Selector("orderFrontLinkPanel:")] public void OrderFrontLinkPanel(AnyObject? sender);
-    [Selector("orderFrontListPanel:")] public void OrderFrontListPanel(AnyObject? sender);
-    [Selector("orderFrontTablePanel:")] public void OrderFrontTablePanel(AnyObject? sender);
-    [Selector("rulerView:didMoveMarker:")] public void RulerViewDidMoveMarker(NSRulerView ruler, NSRulerMarker marker);
-    [Selector("rulerView:didRemoveMarker:")] public void RulerViewDidRemoveMarker(NSRulerView ruler, NSRulerMarker marker);
-    [Selector("rulerView:didAddMarker:")] public void RulerViewDidAddMarker(NSRulerView ruler, NSRulerMarker marker);
-    [Selector("rulerView:shouldMoveMarker:")] public bool RulerViewShouldMoveMarker(NSRulerView ruler, NSRulerMarker marker);
-    [Selector("rulerView:shouldAddMarker:")] public bool RulerViewShouldAddMarker(NSRulerView ruler, NSRulerMarker marker);
-    [Selector("rulerView:willMoveMarker:toLocation:")] public CGFloat RulerViewWillMoveMarkerToLocation(NSRulerView ruler, NSRulerMarker marker, CGFloat location);
-    [Selector("rulerView:shouldRemoveMarker:")] public bool RulerViewShouldRemoveMarker(NSRulerView ruler, NSRulerMarker marker);
-    [Selector("rulerView:willAddMarker:atLocation:")] public CGFloat RulerViewWillAddMarkerAtLocation(NSRulerView ruler, NSRulerMarker marker, CGFloat location);
-    [Selector("rulerView:handleMouseDown:")] public void RulerViewHandleMouseDown(NSRulerView ruler, NSEvent event);
-    [Selector("setNeedsDisplayInRect:avoidAdditionalLayout:")] public void SetNeedsDisplayInRectAvoidAdditionalLayout(NSRect rect, bool flag);
-    [Selector("drawInsertionPointInRect:color:turnedOn:")] public void DrawInsertionPointInRectColorTurnedOn(NSRect rect, NSColor color, bool flag);
-    [Selector("drawViewBackgroundInRect:")] public void DrawViewBackgroundInRect(NSRect rect);
-    [Selector("updateRuler")] public void UpdateRuler();
-    [Selector("updateFontPanel")] public void UpdateFontPanel();
-    [Selector("updateDragTypeRegistration")] public void UpdateDragTypeRegistration();
-    [Selector("selectionRangeForProposedRange:granularity:")] public NSRange SelectionRangeForProposedRangeGranularity(NSRange proposedCharRange, NSSelectionGranularity granularity);
-    [Selector("clickedOnLink:atIndex:")] public void ClickedOnLinkAtIndex(AnyObject link, NSUInteger charIndex);
-    [Selector("startSpeaking:")] public void StartSpeaking(AnyObject? sender);
-    [Selector("stopSpeaking:")] public void StopSpeaking(AnyObject? sender);
-    [Selector("setLayoutOrientation:")] public void SetLayoutOrientation(NSTextLayoutOrientation orientation);
-    [Selector("changeLayoutOrientation:")] public void ChangeLayoutOrientation(AnyObject? sender);
-    [Selector("characterIndexForInsertionAtPoint:")] public NSUInteger CharacterIndexForInsertionAtPoint(NSPoint point);
-    [Selector("performValidatedReplacementInRange:withAttributedString:")] public bool PerformValidatedReplacementInRangeWithAttributedString(NSRange range, NSAttributedString attributedString);
+    [Selector("toggleTraditionalCharacterShape:")]
+    public void ToggleTraditionalCharacterShape(AnyObject? sender);
+    [Selector("outline:")]
+    public void Outline(AnyObject? sender);
+    [Selector("performFindPanelAction:")]
+    public void PerformFindPanelAction(AnyObject? sender);
+    [Selector("alignJustified:")]
+    public void AlignJustified(AnyObject? sender);
+    [Selector("changeColor:")]
+    public void ChangeColor(AnyObject? sender);
+    [Selector("changeAttributes:")]
+    public void ChangeAttributes(AnyObject? sender);
+    [Selector("changeDocumentBackgroundColor:")]
+    public void ChangeDocumentBackgroundColor(AnyObject? sender);
+    [Selector("orderFrontSpacingPanel:")]
+    public void OrderFrontSpacingPanel(AnyObject? sender);
+    [Selector("orderFrontLinkPanel:")]
+    public void OrderFrontLinkPanel(AnyObject? sender);
+    [Selector("orderFrontListPanel:")]
+    public void OrderFrontListPanel(AnyObject? sender);
+    [Selector("orderFrontTablePanel:")]
+    public void OrderFrontTablePanel(AnyObject? sender);
+    [Selector("rulerView:didMoveMarker:")]
+    public void RulerViewDidMoveMarker(NSRulerView ruler, NSRulerMarker marker);
+    [Selector("rulerView:didRemoveMarker:")]
+    public void RulerViewDidRemoveMarker(NSRulerView ruler, NSRulerMarker marker);
+    [Selector("rulerView:didAddMarker:")]
+    public void RulerViewDidAddMarker(NSRulerView ruler, NSRulerMarker marker);
+    [Selector("rulerView:shouldMoveMarker:")]
+    public bool RulerViewShouldMoveMarker(NSRulerView ruler, NSRulerMarker marker);
+    [Selector("rulerView:shouldAddMarker:")]
+    public bool RulerViewShouldAddMarker(NSRulerView ruler, NSRulerMarker marker);
+    [Selector("rulerView:willMoveMarker:toLocation:")]
+    public CGFloat RulerViewWillMoveMarkerToLocation(NSRulerView ruler, NSRulerMarker marker, CGFloat location);
+    [Selector("rulerView:shouldRemoveMarker:")]
+    public bool RulerViewShouldRemoveMarker(NSRulerView ruler, NSRulerMarker marker);
+    [Selector("rulerView:willAddMarker:atLocation:")]
+    public CGFloat RulerViewWillAddMarkerAtLocation(NSRulerView ruler, NSRulerMarker marker, CGFloat location);
+    [Selector("rulerView:handleMouseDown:")]
+    public void RulerViewHandleMouseDown(NSRulerView ruler, NSEvent event);
+    [Selector("setNeedsDisplayInRect:avoidAdditionalLayout:")]
+    public void SetNeedsDisplayInRectAvoidAdditionalLayout(NSRect rect, bool flag);
+    [Selector("drawInsertionPointInRect:color:turnedOn:")]
+    public void DrawInsertionPointInRectColorTurnedOn(NSRect rect, NSColor color, bool flag);
+    [Selector("drawViewBackgroundInRect:")]
+    public void DrawViewBackgroundInRect(NSRect rect);
+    [Selector("updateRuler")]
+    public void UpdateRuler();
+    [Selector("updateFontPanel")]
+    public void UpdateFontPanel();
+    [Selector("updateDragTypeRegistration")]
+    public void UpdateDragTypeRegistration();
+    [Selector("selectionRangeForProposedRange:granularity:")]
+    public NSRange SelectionRangeForProposedRangeGranularity(NSRange proposedCharRange, NSSelectionGranularity granularity);
+    [Selector("clickedOnLink:atIndex:")]
+    public void ClickedOnLinkAtIndex(AnyObject link, NSUInteger charIndex);
+    [Selector("startSpeaking:")]
+    public void StartSpeaking(AnyObject? sender);
+    [Selector("stopSpeaking:")]
+    public void StopSpeaking(AnyObject? sender);
+    [Selector("setLayoutOrientation:")]
+    public void SetLayoutOrientation(NSTextLayoutOrientation orientation);
+    [Selector("changeLayoutOrientation:")]
+    public void ChangeLayoutOrientation(AnyObject? sender);
+    [Selector("characterIndexForInsertionAtPoint:")]
+    public NSUInteger CharacterIndexForInsertionAtPoint(NSPoint point);
+    [Selector("performValidatedReplacementInRange:withAttributedString:")]
+    public bool PerformValidatedReplacementInRangeWithAttributedString(NSRange range, NSAttributedString attributedString);
 }
 
 /// NSCompletion, a category of NSTextView.
 public extern objc class NSTextView
 {
-    [Selector("rangeForUserCompletion")] public NSRange RangeForUserCompletion { get; }
-    [Selector("complete:")] public void Complete(AnyObject? sender);
-    [Selector("completionsForPartialWordRange:indexOfSelectedItem:")] public NSArray? CompletionsForPartialWordRangeIndexOfSelectedItem(NSRange charRange, NSInteger* index);
-    [Selector("insertCompletion:forPartialWordRange:movement:isFinal:")] public void InsertCompletionForPartialWordRangeMovementIsFinal(NSString word, NSRange charRange, NSInteger movement, bool flag);
+    [Selector("rangeForUserCompletion")]
+    public NSRange RangeForUserCompletion { get; }
+    [Selector("complete:")]
+    public void Complete(AnyObject? sender);
+    [Selector("completionsForPartialWordRange:indexOfSelectedItem:")]
+    public NSArray? CompletionsForPartialWordRangeIndexOfSelectedItem(NSRange charRange, NSInteger* index);
+    [Selector("insertCompletion:forPartialWordRange:movement:isFinal:")]
+    public void InsertCompletionForPartialWordRangeMovementIsFinal(NSString word, NSRange charRange, NSInteger movement, bool flag);
 }
 
 /// NSPasteboard, a category of NSTextView.
 public extern objc class NSTextView
 {
-    [Selector("writablePasteboardTypes")] public NSArray WritablePasteboardTypes { get; }
-    [Selector("readablePasteboardTypes")] public NSArray ReadablePasteboardTypes { get; }
-    [Selector("writeSelectionToPasteboard:type:")] public bool WriteSelectionToPasteboardType(NSPasteboard pboard, NSPasteboardType type);
-    [Selector("writeSelectionToPasteboard:types:")] public bool WriteSelectionToPasteboardTypes(NSPasteboard pboard, NSArray types);
-    [Selector("preferredPasteboardTypeFromArray:restrictedToTypesFromArray:")] public NSPasteboardType? PreferredPasteboardTypeFromArrayRestrictedToTypesFromArray(NSArray availableTypes, NSArray? allowedTypes);
-    [Selector("readSelectionFromPasteboard:type:")] public bool ReadSelectionFromPasteboardType(NSPasteboard pboard, NSPasteboardType type);
-    [Selector("readSelectionFromPasteboard:")] public bool ReadSelectionFromPasteboard(NSPasteboard pboard);
-    [Selector("registerForServices")] public static void RegisterForServices();
-    [Selector("validRequestorForSendType:returnType:")] public AnyObject? ValidRequestorForSendTypeReturnType(NSPasteboardType? sendType, NSPasteboardType? returnType);
-    [Selector("pasteAsPlainText:")] public void PasteAsPlainText(AnyObject? sender);
-    [Selector("pasteAsRichText:")] public void PasteAsRichText(AnyObject? sender);
+    [Selector("writablePasteboardTypes")]
+    public NSArray WritablePasteboardTypes { get; }
+    [Selector("readablePasteboardTypes")]
+    public NSArray ReadablePasteboardTypes { get; }
+    [Selector("writeSelectionToPasteboard:type:")]
+    public bool WriteSelectionToPasteboardType(NSPasteboard pboard, NSPasteboardType type);
+    [Selector("writeSelectionToPasteboard:types:")]
+    public bool WriteSelectionToPasteboardTypes(NSPasteboard pboard, NSArray types);
+    [Selector("preferredPasteboardTypeFromArray:restrictedToTypesFromArray:")]
+    public NSPasteboardType? PreferredPasteboardTypeFromArrayRestrictedToTypesFromArray(NSArray availableTypes, NSArray? allowedTypes);
+    [Selector("readSelectionFromPasteboard:type:")]
+    public bool ReadSelectionFromPasteboardType(NSPasteboard pboard, NSPasteboardType type);
+    [Selector("readSelectionFromPasteboard:")]
+    public bool ReadSelectionFromPasteboard(NSPasteboard pboard);
+    [Selector("registerForServices")]
+    public static void RegisterForServices();
+    [Selector("validRequestorForSendType:returnType:")]
+    public AnyObject? ValidRequestorForSendTypeReturnType(NSPasteboardType? sendType, NSPasteboardType? returnType);
+    [Selector("pasteAsPlainText:")]
+    public void PasteAsPlainText(AnyObject? sender);
+    [Selector("pasteAsRichText:")]
+    public void PasteAsRichText(AnyObject? sender);
 }
 
 /// NSDragging, a category of NSTextView.
 public extern objc class NSTextView
 {
-    [Selector("acceptableDragTypes")] public NSArray AcceptableDragTypes { get; }
-    [Selector("dragSelectionWithEvent:offset:slideBack:")] public bool DragSelectionWithEventOffsetSlideBack(NSEvent event, NSSize mouseOffset, bool slideBack);
-    [Selector("dragImageForSelectionWithEvent:origin:")] public NSImage? DragImageForSelectionWithEventOrigin(NSEvent event, NSPointPointer origin);
-    [Selector("dragOperationForDraggingInfo:type:")] public NSDragOperation DragOperationForDraggingInfoType(NSDraggingInfo dragInfo, NSPasteboardType type);
-    [Selector("cleanUpAfterDragOperation")] public void CleanUpAfterDragOperation();
+    [Selector("acceptableDragTypes")]
+    public NSArray AcceptableDragTypes { get; }
+    [Selector("dragSelectionWithEvent:offset:slideBack:")]
+    public bool DragSelectionWithEventOffsetSlideBack(NSEvent event, NSSize mouseOffset, bool slideBack);
+    [Selector("dragImageForSelectionWithEvent:origin:")]
+    public NSImage? DragImageForSelectionWithEventOrigin(NSEvent event, NSPointPointer origin);
+    [Selector("dragOperationForDraggingInfo:type:")]
+    public NSDragOperation DragOperationForDraggingInfoType(NSDraggingInfo dragInfo, NSPasteboardType type);
+    [Selector("cleanUpAfterDragOperation")]
+    public void CleanUpAfterDragOperation();
 }
 
 /// NSSharing, a category of NSTextView.
 public extern objc class NSTextView
 {
-    [Selector("selectedRanges", "setSelectedRanges:")] public NSArray SelectedRanges { get; set; }
-    [Selector("selectionAffinity")] public NSSelectionAffinity SelectionAffinity { get; }
-    [Selector("selectionGranularity", "setSelectionGranularity:")] public NSSelectionGranularity SelectionGranularity { get; set; }
-    [Selector("selectedTextAttributes", "setSelectedTextAttributes:")] public NSDictionary SelectedTextAttributes { get; set; }
-    [Selector("insertionPointColor", "setInsertionPointColor:")] public NSColor? InsertionPointColor { get; set; }
-    [Selector("markedTextAttributes", "setMarkedTextAttributes:")] public NSDictionary? MarkedTextAttributes { get; set; }
-    [Selector("linkTextAttributes", "setLinkTextAttributes:")] public NSDictionary? LinkTextAttributes { get; set; }
-    [Selector("displaysLinkToolTips", "setDisplaysLinkToolTips:")] public bool DisplaysLinkToolTips { get; set; }
-    [Selector("acceptsGlyphInfo", "setAcceptsGlyphInfo:")] public bool AcceptsGlyphInfo { get; set; }
-    [Selector("usesRuler", "setUsesRuler:")] public bool UsesRuler { get; set; }
-    [Selector("usesInspectorBar", "setUsesInspectorBar:")] public bool UsesInspectorBar { get; set; }
-    [Selector("isContinuousSpellCheckingEnabled", "setContinuousSpellCheckingEnabled:")] public bool ContinuousSpellCheckingEnabled { get; set; }
-    [Selector("spellCheckerDocumentTag")] public NSInteger SpellCheckerDocumentTag { get; }
-    [Selector("isGrammarCheckingEnabled", "setGrammarCheckingEnabled:")] public bool GrammarCheckingEnabled { get; set; }
-    [Selector("typingAttributes", "setTypingAttributes:")] public NSDictionary TypingAttributes { get; set; }
-    [Selector("rangesForUserTextChange")] public NSArray? RangesForUserTextChange { get; }
-    [Selector("rangesForUserCharacterAttributeChange")] public NSArray? RangesForUserCharacterAttributeChange { get; }
-    [Selector("rangesForUserParagraphAttributeChange")] public NSArray? RangesForUserParagraphAttributeChange { get; }
-    [Selector("rangeForUserTextChange")] public NSRange RangeForUserTextChange { get; }
-    [Selector("rangeForUserCharacterAttributeChange")] public NSRange RangeForUserCharacterAttributeChange { get; }
-    [Selector("rangeForUserParagraphAttributeChange")] public NSRange RangeForUserParagraphAttributeChange { get; }
-    [Selector("allowsDocumentBackgroundColorChange", "setAllowsDocumentBackgroundColorChange:")] public bool AllowsDocumentBackgroundColorChange { get; set; }
-    [Selector("defaultParagraphStyle", "setDefaultParagraphStyle:")] public NSParagraphStyle? DefaultParagraphStyle { get; set; }
-    [Selector("allowsUndo", "setAllowsUndo:")] public bool AllowsUndo { get; set; }
-    [Selector("isCoalescingUndo")] public bool CoalescingUndo { get; }
-    [Selector("allowsImageEditing", "setAllowsImageEditing:")] public bool AllowsImageEditing { get; set; }
-    [Selector("usesRolloverButtonForSelection", "setUsesRolloverButtonForSelection:")] public bool UsesRolloverButtonForSelection { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSTextViewDelegate? Delegate { get; set; }
-    [Selector("isEditable", "setEditable:")] public bool Editable { get; set; }
-    [Selector("isSelectable", "setSelectable:")] public bool Selectable { get; set; }
-    [Selector("isRichText", "setRichText:")] public bool RichText { get; set; }
-    [Selector("importsGraphics", "setImportsGraphics:")] public bool ImportsGraphics { get; set; }
-    [Selector("drawsBackground", "setDrawsBackground:")] public bool DrawsBackground { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor BackgroundColor { get; set; }
-    [Selector("isFieldEditor", "setFieldEditor:")] public bool FieldEditor { get; set; }
-    [Selector("usesFontPanel", "setUsesFontPanel:")] public bool UsesFontPanel { get; set; }
-    [Selector("isRulerVisible", "setRulerVisible:")] public bool RulerVisible { get; set; }
-    [Selector("allowedInputSourceLocales", "setAllowedInputSourceLocales:")] public NSArray? AllowedInputSourceLocales { get; set; }
-    [Selector("isWritingToolsActive")] public bool WritingToolsActive { get; }
-    [Selector("writingToolsBehavior", "setWritingToolsBehavior:")] public NSWritingToolsBehavior WritingToolsBehavior { get; set; }
-    [Selector("allowedWritingToolsResultOptions", "setAllowedWritingToolsResultOptions:")] public NSWritingToolsResultOptions AllowedWritingToolsResultOptions { get; set; }
-    [Selector("setSelectedRanges:affinity:stillSelecting:")] public void SetSelectedRangesAffinityStillSelecting(NSArray ranges, NSSelectionAffinity affinity, bool stillSelectingFlag);
-    [Selector("setSelectedRange:affinity:stillSelecting:")] public void SetSelectedRangeAffinityStillSelecting(NSRange charRange, NSSelectionAffinity affinity, bool stillSelectingFlag);
-    [Selector("updateInsertionPointStateAndRestartTimer:")] public void UpdateInsertionPointStateAndRestartTimer(bool restartFlag);
-    [Selector("toggleContinuousSpellChecking:")] public void ToggleContinuousSpellChecking(AnyObject? sender);
-    [Selector("toggleGrammarChecking:")] public void ToggleGrammarChecking(AnyObject? sender);
-    [Selector("setSpellingState:range:")] public void SetSpellingStateRange(NSInteger value, NSRange charRange);
-    [Selector("shouldChangeTextInRanges:replacementStrings:")] public bool ShouldChangeTextInRangesReplacementStrings(NSArray affectedRanges, NSArray? replacementStrings);
-    [Selector("shouldChangeTextInRange:replacementString:")] public bool ShouldChangeTextInRangeReplacementString(NSRange affectedCharRange, NSString? replacementString);
-    [Selector("didChangeText")] public void DidChangeText();
-    [Selector("breakUndoCoalescing")] public void BreakUndoCoalescing();
-    [Selector("showFindIndicatorForRange:")] public void ShowFindIndicatorForRange(NSRange charRange);
-    [Selector("setSelectedRange:")] public void SetSelectedRange(NSRange charRange);
+    [Selector("selectedRanges", "setSelectedRanges:")]
+    public NSArray SelectedRanges { get; set; }
+    [Selector("selectionAffinity")]
+    public NSSelectionAffinity SelectionAffinity { get; }
+    [Selector("selectionGranularity", "setSelectionGranularity:")]
+    public NSSelectionGranularity SelectionGranularity { get; set; }
+    [Selector("selectedTextAttributes", "setSelectedTextAttributes:")]
+    public NSDictionary SelectedTextAttributes { get; set; }
+    [Selector("insertionPointColor", "setInsertionPointColor:")]
+    public NSColor? InsertionPointColor { get; set; }
+    [Selector("markedTextAttributes", "setMarkedTextAttributes:")]
+    public NSDictionary? MarkedTextAttributes { get; set; }
+    [Selector("linkTextAttributes", "setLinkTextAttributes:")]
+    public NSDictionary? LinkTextAttributes { get; set; }
+    [Selector("displaysLinkToolTips", "setDisplaysLinkToolTips:")]
+    public bool DisplaysLinkToolTips { get; set; }
+    [Selector("acceptsGlyphInfo", "setAcceptsGlyphInfo:")]
+    public bool AcceptsGlyphInfo { get; set; }
+    [Selector("usesRuler", "setUsesRuler:")]
+    public bool UsesRuler { get; set; }
+    [Selector("usesInspectorBar", "setUsesInspectorBar:")]
+    public bool UsesInspectorBar { get; set; }
+    [Selector("isContinuousSpellCheckingEnabled", "setContinuousSpellCheckingEnabled:")]
+    public bool ContinuousSpellCheckingEnabled { get; set; }
+    [Selector("spellCheckerDocumentTag")]
+    public NSInteger SpellCheckerDocumentTag { get; }
+    [Selector("isGrammarCheckingEnabled", "setGrammarCheckingEnabled:")]
+    public bool GrammarCheckingEnabled { get; set; }
+    [Selector("typingAttributes", "setTypingAttributes:")]
+    public NSDictionary TypingAttributes { get; set; }
+    [Selector("rangesForUserTextChange")]
+    public NSArray? RangesForUserTextChange { get; }
+    [Selector("rangesForUserCharacterAttributeChange")]
+    public NSArray? RangesForUserCharacterAttributeChange { get; }
+    [Selector("rangesForUserParagraphAttributeChange")]
+    public NSArray? RangesForUserParagraphAttributeChange { get; }
+    [Selector("rangeForUserTextChange")]
+    public NSRange RangeForUserTextChange { get; }
+    [Selector("rangeForUserCharacterAttributeChange")]
+    public NSRange RangeForUserCharacterAttributeChange { get; }
+    [Selector("rangeForUserParagraphAttributeChange")]
+    public NSRange RangeForUserParagraphAttributeChange { get; }
+    [Selector("allowsDocumentBackgroundColorChange", "setAllowsDocumentBackgroundColorChange:")]
+    public bool AllowsDocumentBackgroundColorChange { get; set; }
+    [Selector("defaultParagraphStyle", "setDefaultParagraphStyle:")]
+    public NSParagraphStyle? DefaultParagraphStyle { get; set; }
+    [Selector("allowsUndo", "setAllowsUndo:")]
+    public bool AllowsUndo { get; set; }
+    [Selector("isCoalescingUndo")]
+    public bool CoalescingUndo { get; }
+    [Selector("allowsImageEditing", "setAllowsImageEditing:")]
+    public bool AllowsImageEditing { get; set; }
+    [Selector("usesRolloverButtonForSelection", "setUsesRolloverButtonForSelection:")]
+    public bool UsesRolloverButtonForSelection { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSTextViewDelegate? Delegate { get; set; }
+    [Selector("isEditable", "setEditable:")]
+    public bool Editable { get; set; }
+    [Selector("isSelectable", "setSelectable:")]
+    public bool Selectable { get; set; }
+    [Selector("isRichText", "setRichText:")]
+    public bool RichText { get; set; }
+    [Selector("importsGraphics", "setImportsGraphics:")]
+    public bool ImportsGraphics { get; set; }
+    [Selector("drawsBackground", "setDrawsBackground:")]
+    public bool DrawsBackground { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor BackgroundColor { get; set; }
+    [Selector("isFieldEditor", "setFieldEditor:")]
+    public bool FieldEditor { get; set; }
+    [Selector("usesFontPanel", "setUsesFontPanel:")]
+    public bool UsesFontPanel { get; set; }
+    [Selector("isRulerVisible", "setRulerVisible:")]
+    public bool RulerVisible { get; set; }
+    [Selector("allowedInputSourceLocales", "setAllowedInputSourceLocales:")]
+    public NSArray? AllowedInputSourceLocales { get; set; }
+    [Selector("isWritingToolsActive")]
+    public bool WritingToolsActive { get; }
+    [Selector("writingToolsBehavior", "setWritingToolsBehavior:")]
+    public NSWritingToolsBehavior WritingToolsBehavior { get; set; }
+    [Selector("allowedWritingToolsResultOptions", "setAllowedWritingToolsResultOptions:")]
+    public NSWritingToolsResultOptions AllowedWritingToolsResultOptions { get; set; }
+    [Selector("setSelectedRanges:affinity:stillSelecting:")]
+    public void SetSelectedRangesAffinityStillSelecting(NSArray ranges, NSSelectionAffinity affinity, bool stillSelectingFlag);
+    [Selector("setSelectedRange:affinity:stillSelecting:")]
+    public void SetSelectedRangeAffinityStillSelecting(NSRange charRange, NSSelectionAffinity affinity, bool stillSelectingFlag);
+    [Selector("updateInsertionPointStateAndRestartTimer:")]
+    public void UpdateInsertionPointStateAndRestartTimer(bool restartFlag);
+    [Selector("toggleContinuousSpellChecking:")]
+    public void ToggleContinuousSpellChecking(AnyObject? sender);
+    [Selector("toggleGrammarChecking:")]
+    public void ToggleGrammarChecking(AnyObject? sender);
+    [Selector("setSpellingState:range:")]
+    public void SetSpellingStateRange(NSInteger value, NSRange charRange);
+    [Selector("shouldChangeTextInRanges:replacementStrings:")]
+    public bool ShouldChangeTextInRangesReplacementStrings(NSArray affectedRanges, NSArray? replacementStrings);
+    [Selector("shouldChangeTextInRange:replacementString:")]
+    public bool ShouldChangeTextInRangeReplacementString(NSRange affectedCharRange, NSString? replacementString);
+    [Selector("didChangeText")]
+    public void DidChangeText();
+    [Selector("breakUndoCoalescing")]
+    public void BreakUndoCoalescing();
+    [Selector("showFindIndicatorForRange:")]
+    public void ShowFindIndicatorForRange(NSRange charRange);
+    [Selector("setSelectedRange:")]
+    public void SetSelectedRange(NSRange charRange);
 }
 
 /// NSTextChecking, a category of NSTextView.
 public extern objc class NSTextView
 {
-    [Selector("smartInsertDeleteEnabled", "setSmartInsertDeleteEnabled:")] public bool SmartInsertDeleteEnabled { get; set; }
-    [Selector("isAutomaticQuoteSubstitutionEnabled", "setAutomaticQuoteSubstitutionEnabled:")] public bool AutomaticQuoteSubstitutionEnabled { get; set; }
-    [Selector("isAutomaticLinkDetectionEnabled", "setAutomaticLinkDetectionEnabled:")] public bool AutomaticLinkDetectionEnabled { get; set; }
-    [Selector("isAutomaticDataDetectionEnabled", "setAutomaticDataDetectionEnabled:")] public bool AutomaticDataDetectionEnabled { get; set; }
-    [Selector("isAutomaticDashSubstitutionEnabled", "setAutomaticDashSubstitutionEnabled:")] public bool AutomaticDashSubstitutionEnabled { get; set; }
-    [Selector("isAutomaticTextReplacementEnabled", "setAutomaticTextReplacementEnabled:")] public bool AutomaticTextReplacementEnabled { get; set; }
-    [Selector("isAutomaticSpellingCorrectionEnabled", "setAutomaticSpellingCorrectionEnabled:")] public bool AutomaticSpellingCorrectionEnabled { get; set; }
-    [Selector("enabledTextCheckingTypes", "setEnabledTextCheckingTypes:")] public NSTextCheckingTypes EnabledTextCheckingTypes { get; set; }
-    [Selector("usesFindPanel", "setUsesFindPanel:")] public bool UsesFindPanel { get; set; }
-    [Selector("usesFindBar", "setUsesFindBar:")] public bool UsesFindBar { get; set; }
-    [Selector("isIncrementalSearchingEnabled", "setIncrementalSearchingEnabled:")] public bool IncrementalSearchingEnabled { get; set; }
-    [Selector("inlinePredictionType", "setInlinePredictionType:")] public NSTextInputTraitType InlinePredictionType { get; set; }
-    [Selector("mathExpressionCompletionType", "setMathExpressionCompletionType:")] public NSTextInputTraitType MathExpressionCompletionType { get; set; }
-    [Selector("smartDeleteRangeForProposedRange:")] public NSRange SmartDeleteRangeForProposedRange(NSRange proposedCharRange);
-    [Selector("toggleSmartInsertDelete:")] public void ToggleSmartInsertDelete(AnyObject? sender);
-    [Selector("smartInsertForString:replacingRange:beforeString:afterString:")] public void SmartInsertForStringReplacingRangeBeforeStringAfterString(NSString pasteString, NSRange charRangeToReplace, out NSString? beforeString, out NSString? afterString);
-    [Selector("smartInsertBeforeStringForString:replacingRange:")] public NSString? SmartInsertBeforeStringForStringReplacingRange(NSString pasteString, NSRange charRangeToReplace);
-    [Selector("smartInsertAfterStringForString:replacingRange:")] public NSString? SmartInsertAfterStringForStringReplacingRange(NSString pasteString, NSRange charRangeToReplace);
-    [Selector("toggleAutomaticQuoteSubstitution:")] public void ToggleAutomaticQuoteSubstitution(AnyObject? sender);
-    [Selector("toggleAutomaticLinkDetection:")] public void ToggleAutomaticLinkDetection(AnyObject? sender);
-    [Selector("toggleAutomaticDataDetection:")] public void ToggleAutomaticDataDetection(AnyObject? sender);
-    [Selector("toggleAutomaticDashSubstitution:")] public void ToggleAutomaticDashSubstitution(AnyObject? sender);
-    [Selector("toggleAutomaticTextReplacement:")] public void ToggleAutomaticTextReplacement(AnyObject? sender);
-    [Selector("toggleAutomaticSpellingCorrection:")] public void ToggleAutomaticSpellingCorrection(AnyObject? sender);
-    [Selector("checkTextInRange:types:options:")] public void CheckTextInRangeTypesOptions(NSRange range, NSTextCheckingTypes checkingTypes, NSDictionary options);
-    [Selector("handleTextCheckingResults:forRange:types:options:orthography:wordCount:")] public void HandleTextCheckingResultsForRangeTypesOptionsOrthographyWordCount(NSArray results, NSRange range, NSTextCheckingTypes checkingTypes, NSDictionary options, NSOrthography orthography, NSInteger wordCount);
-    [Selector("orderFrontSubstitutionsPanel:")] public void OrderFrontSubstitutionsPanel(AnyObject? sender);
-    [Selector("checkTextInSelection:")] public void CheckTextInSelection(AnyObject? sender);
-    [Selector("checkTextInDocument:")] public void CheckTextInDocument(AnyObject? sender);
+    [Selector("smartInsertDeleteEnabled", "setSmartInsertDeleteEnabled:")]
+    public bool SmartInsertDeleteEnabled { get; set; }
+    [Selector("isAutomaticQuoteSubstitutionEnabled", "setAutomaticQuoteSubstitutionEnabled:")]
+    public bool AutomaticQuoteSubstitutionEnabled { get; set; }
+    [Selector("isAutomaticLinkDetectionEnabled", "setAutomaticLinkDetectionEnabled:")]
+    public bool AutomaticLinkDetectionEnabled { get; set; }
+    [Selector("isAutomaticDataDetectionEnabled", "setAutomaticDataDetectionEnabled:")]
+    public bool AutomaticDataDetectionEnabled { get; set; }
+    [Selector("isAutomaticDashSubstitutionEnabled", "setAutomaticDashSubstitutionEnabled:")]
+    public bool AutomaticDashSubstitutionEnabled { get; set; }
+    [Selector("isAutomaticTextReplacementEnabled", "setAutomaticTextReplacementEnabled:")]
+    public bool AutomaticTextReplacementEnabled { get; set; }
+    [Selector("isAutomaticSpellingCorrectionEnabled", "setAutomaticSpellingCorrectionEnabled:")]
+    public bool AutomaticSpellingCorrectionEnabled { get; set; }
+    [Selector("enabledTextCheckingTypes", "setEnabledTextCheckingTypes:")]
+    public NSTextCheckingTypes EnabledTextCheckingTypes { get; set; }
+    [Selector("usesFindPanel", "setUsesFindPanel:")]
+    public bool UsesFindPanel { get; set; }
+    [Selector("usesFindBar", "setUsesFindBar:")]
+    public bool UsesFindBar { get; set; }
+    [Selector("isIncrementalSearchingEnabled", "setIncrementalSearchingEnabled:")]
+    public bool IncrementalSearchingEnabled { get; set; }
+    [Selector("inlinePredictionType", "setInlinePredictionType:")]
+    public NSTextInputTraitType InlinePredictionType { get; set; }
+    [Selector("mathExpressionCompletionType", "setMathExpressionCompletionType:")]
+    public NSTextInputTraitType MathExpressionCompletionType { get; set; }
+    [Selector("smartDeleteRangeForProposedRange:")]
+    public NSRange SmartDeleteRangeForProposedRange(NSRange proposedCharRange);
+    [Selector("toggleSmartInsertDelete:")]
+    public void ToggleSmartInsertDelete(AnyObject? sender);
+    [Selector("smartInsertForString:replacingRange:beforeString:afterString:")]
+    public void SmartInsertForStringReplacingRangeBeforeStringAfterString(NSString pasteString, NSRange charRangeToReplace, out NSString? beforeString, out NSString? afterString);
+    [Selector("smartInsertBeforeStringForString:replacingRange:")]
+    public NSString? SmartInsertBeforeStringForStringReplacingRange(NSString pasteString, NSRange charRangeToReplace);
+    [Selector("smartInsertAfterStringForString:replacingRange:")]
+    public NSString? SmartInsertAfterStringForStringReplacingRange(NSString pasteString, NSRange charRangeToReplace);
+    [Selector("toggleAutomaticQuoteSubstitution:")]
+    public void ToggleAutomaticQuoteSubstitution(AnyObject? sender);
+    [Selector("toggleAutomaticLinkDetection:")]
+    public void ToggleAutomaticLinkDetection(AnyObject? sender);
+    [Selector("toggleAutomaticDataDetection:")]
+    public void ToggleAutomaticDataDetection(AnyObject? sender);
+    [Selector("toggleAutomaticDashSubstitution:")]
+    public void ToggleAutomaticDashSubstitution(AnyObject? sender);
+    [Selector("toggleAutomaticTextReplacement:")]
+    public void ToggleAutomaticTextReplacement(AnyObject? sender);
+    [Selector("toggleAutomaticSpellingCorrection:")]
+    public void ToggleAutomaticSpellingCorrection(AnyObject? sender);
+    [Selector("checkTextInRange:types:options:")]
+    public void CheckTextInRangeTypesOptions(NSRange range, NSTextCheckingTypes checkingTypes, NSDictionary options);
+    [Selector("handleTextCheckingResults:forRange:types:options:orthography:wordCount:")]
+    public void HandleTextCheckingResultsForRangeTypesOptionsOrthographyWordCount(NSArray results, NSRange range, NSTextCheckingTypes checkingTypes, NSDictionary options, NSOrthography orthography, NSInteger wordCount);
+    [Selector("orderFrontSubstitutionsPanel:")]
+    public void OrderFrontSubstitutionsPanel(AnyObject? sender);
+    [Selector("checkTextInSelection:")]
+    public void CheckTextInSelection(AnyObject? sender);
+    [Selector("checkTextInDocument:")]
+    public void CheckTextInDocument(AnyObject? sender);
 }
 
 /// NSQuickLookPreview, a category of NSTextView.
 public extern objc class NSTextView
 {
-    [Selector("toggleQuickLookPreviewPanel:")] public void ToggleQuickLookPreviewPanel(AnyObject? sender);
-    [Selector("quickLookPreviewableItemsInRanges:")] public NSArray QuickLookPreviewableItemsInRanges(NSArray ranges);
-    [Selector("updateQuickLookPreviewPanel")] public void UpdateQuickLookPreviewPanel();
+    [Selector("toggleQuickLookPreviewPanel:")]
+    public void ToggleQuickLookPreviewPanel(AnyObject? sender);
+    [Selector("quickLookPreviewableItemsInRanges:")]
+    public NSArray QuickLookPreviewableItemsInRanges(NSArray ranges);
+    [Selector("updateQuickLookPreviewPanel")]
+    public void UpdateQuickLookPreviewPanel();
 }
 
 /// NSTextView_SharingService, a category of NSTextView.
 public extern objc class NSTextView
 {
-    [Selector("orderFrontSharingServicePicker:")] public void OrderFrontSharingServicePicker(AnyObject? sender);
+    [Selector("orderFrontSharingServicePicker:")]
+    public void OrderFrontSharingServicePicker(AnyObject? sender);
 }
 
 /// NSTextView_TouchBar, a category of NSTextView.
 public extern objc class NSTextView : NSCandidateListTouchBarItemDelegate, NSTouchBarDelegate
 {
-    [Selector("isAutomaticTextCompletionEnabled", "setAutomaticTextCompletionEnabled:")] public bool AutomaticTextCompletionEnabled { get; set; }
-    [Selector("allowsCharacterPickerTouchBarItem", "setAllowsCharacterPickerTouchBarItem:")] public bool AllowsCharacterPickerTouchBarItem { get; set; }
-    [Selector("candidateListTouchBarItem")] public NSCandidateListTouchBarItem? CandidateListTouchBarItem { get; }
-    [Selector("toggleAutomaticTextCompletion:")] public void ToggleAutomaticTextCompletion(AnyObject? sender);
-    [Selector("updateTouchBarItemIdentifiers")] public void UpdateTouchBarItemIdentifiers();
-    [Selector("updateTextTouchBarItems")] public void UpdateTextTouchBarItems();
-    [Selector("updateCandidates")] public void UpdateCandidates();
+    [Selector("isAutomaticTextCompletionEnabled", "setAutomaticTextCompletionEnabled:")]
+    public bool AutomaticTextCompletionEnabled { get; set; }
+    [Selector("allowsCharacterPickerTouchBarItem", "setAllowsCharacterPickerTouchBarItem:")]
+    public bool AllowsCharacterPickerTouchBarItem { get; set; }
+    [Selector("candidateListTouchBarItem")]
+    public NSCandidateListTouchBarItem? CandidateListTouchBarItem { get; }
+    [Selector("toggleAutomaticTextCompletion:")]
+    public void ToggleAutomaticTextCompletion(AnyObject? sender);
+    [Selector("updateTouchBarItemIdentifiers")]
+    public void UpdateTouchBarItemIdentifiers();
+    [Selector("updateTextTouchBarItems")]
+    public void UpdateTextTouchBarItems();
+    [Selector("updateCandidates")]
+    public void UpdateCandidates();
 }
 
 /// NSTextView_Factory, a category of NSTextView.
 public extern objc class NSTextView
 {
-    [Selector("scrollableTextView")] public static NSScrollView ScrollableTextView();
-    [Selector("fieldEditor")] public static Self ClassFieldEditor();
-    [Selector("scrollableDocumentContentTextView")] public static NSScrollView ScrollableDocumentContentTextView();
-    [Selector("scrollablePlainDocumentContentTextView")] public static NSScrollView ScrollablePlainDocumentContentTextView();
+    [Selector("scrollableTextView")]
+    public static NSScrollView ScrollableTextView();
+    [Selector("fieldEditor")]
+    public static Self ClassFieldEditor();
+    [Selector("scrollableDocumentContentTextView")]
+    public static NSScrollView ScrollableDocumentContentTextView();
+    [Selector("scrollablePlainDocumentContentTextView")]
+    public static NSScrollView ScrollablePlainDocumentContentTextView();
 }
 
 /// NSTextView_TextHighlight, a category of NSTextView.
 public extern objc class NSTextView
 {
-    [Selector("textHighlightAttributes", "setTextHighlightAttributes:")] public NSDictionary? TextHighlightAttributes { get; set; }
-    [Selector("drawTextHighlightBackgroundForTextRange:origin:")] public void DrawTextHighlightBackgroundForTextRangeOrigin(NSTextRange textRange, NSPoint origin);
-    [Selector("highlight:")] public void Highlight(AnyObject? sender);
+    [Selector("textHighlightAttributes", "setTextHighlightAttributes:")]
+    public NSDictionary? TextHighlightAttributes { get; set; }
+    [Selector("drawTextHighlightBackgroundForTextRange:origin:")]
+    public void DrawTextHighlightBackgroundForTextRangeOrigin(NSTextRange textRange, NSPoint origin);
+    [Selector("highlight:")]
+    public void Highlight(AnyObject? sender);
 }
 
 /// NSDeprecated, a category of NSTextView.
 public extern objc class NSTextView
 {
     /// Deprecated in macOS 10.6.
-    [Selector("toggleBaseWritingDirection:")] public void ToggleBaseWritingDirection(AnyObject? sender);
+    [Selector("toggleBaseWritingDirection:")]
+    public void ToggleBaseWritingDirection(AnyObject? sender);
 }
 
 public objc interface NSTextViewDelegate : NSTextDelegate
 {
-    [Optional] [Selector("textView:clickedOnLink:atIndex:")] bool TextViewClickedOnLinkAtIndex(NSTextView textView, AnyObject link, NSUInteger charIndex);
-    [Optional] [Selector("textView:clickedOnCell:inRect:atIndex:")] void TextViewClickedOnCellInRectAtIndex(NSTextView textView, NSTextAttachmentCellProtocol cell, NSRect cellFrame, NSUInteger charIndex);
-    [Optional] [Selector("textView:doubleClickedOnCell:inRect:atIndex:")] void TextViewDoubleClickedOnCellInRectAtIndex(NSTextView textView, NSTextAttachmentCellProtocol cell, NSRect cellFrame, NSUInteger charIndex);
-    [Optional] [Selector("textView:draggedCell:inRect:event:atIndex:")] void TextViewDraggedCellInRectEventAtIndex(NSTextView view, NSTextAttachmentCellProtocol cell, NSRect rect, NSEvent event, NSUInteger charIndex);
-    [Optional] [Selector("textView:writablePasteboardTypesForCell:atIndex:")] NSArray TextViewWritablePasteboardTypesForCellAtIndex(NSTextView view, NSTextAttachmentCellProtocol cell, NSUInteger charIndex);
-    [Optional] [Selector("textView:writeCell:atIndex:toPasteboard:type:")] bool TextViewWriteCellAtIndexToPasteboardType(NSTextView view, NSTextAttachmentCellProtocol cell, NSUInteger charIndex, NSPasteboard pboard, NSPasteboardType type);
-    [Optional] [Selector("textView:willChangeSelectionFromCharacterRange:toCharacterRange:")] NSRange TextViewWillChangeSelectionFromCharacterRangeToCharacterRange(NSTextView textView, NSRange oldSelectedCharRange, NSRange newSelectedCharRange);
-    [Optional] [Selector("textView:willChangeSelectionFromCharacterRanges:toCharacterRanges:")] NSArray TextViewWillChangeSelectionFromCharacterRangesToCharacterRanges(NSTextView textView, NSArray oldSelectedCharRanges, NSArray newSelectedCharRanges);
-    [Optional] [Selector("textView:shouldChangeTextInRanges:replacementStrings:")] bool TextViewShouldChangeTextInRangesReplacementStrings(NSTextView textView, NSArray affectedRanges, NSArray? replacementStrings);
-    [Optional] [Selector("textView:shouldChangeTypingAttributes:toAttributes:")] NSDictionary TextViewShouldChangeTypingAttributesToAttributes(NSTextView textView, NSDictionary oldTypingAttributes, NSDictionary newTypingAttributes);
-    [Optional] [Selector("textViewDidChangeSelection:")] void TextViewDidChangeSelection(NSNotification notification);
-    [Optional] [Selector("textViewDidChangeTypingAttributes:")] void TextViewDidChangeTypingAttributes(NSNotification notification);
-    [Optional] [Selector("textView:willDisplayToolTip:forCharacterAtIndex:")] NSString? TextViewWillDisplayToolTipForCharacterAtIndex(NSTextView textView, NSString tooltip, NSUInteger characterIndex);
-    [Optional] [Selector("textView:completions:forPartialWordRange:indexOfSelectedItem:")] NSArray TextViewCompletionsForPartialWordRangeIndexOfSelectedItem(NSTextView textView, NSArray words, NSRange charRange, NSInteger* index);
-    [Optional] [Selector("textView:shouldChangeTextInRange:replacementString:")] bool TextViewShouldChangeTextInRangeReplacementString(NSTextView textView, NSRange affectedCharRange, NSString? replacementString);
-    [Optional] [Selector("textView:doCommandBySelector:")] bool TextViewDoCommandBySelector(NSTextView textView, Selector commandSelector);
-    [Optional] [Selector("textView:shouldSetSpellingState:range:")] NSInteger TextViewShouldSetSpellingStateRange(NSTextView textView, NSInteger value, NSRange affectedCharRange);
-    [Optional] [Selector("textView:menu:forEvent:atIndex:")] NSMenu? TextViewMenuForEventAtIndex(NSTextView view, NSMenu menu, NSEvent event, NSUInteger charIndex);
-    [Optional] [Selector("textView:willCheckTextInRange:options:types:")] NSDictionary TextViewWillCheckTextInRangeOptionsTypes(NSTextView view, NSRange range, NSDictionary options, NSTextCheckingTypes* checkingTypes);
-    [Optional] [Selector("textView:didCheckTextInRange:types:options:results:orthography:wordCount:")] NSArray TextViewDidCheckTextInRangeTypesOptionsResultsOrthographyWordCount(NSTextView view, NSRange range, NSTextCheckingTypes checkingTypes, NSDictionary options, NSArray results, NSOrthography orthography, NSInteger wordCount);
-    [Optional] [Selector("textView:URLForContentsOfTextAttachment:atIndex:")] NSURL? TextViewURLForContentsOfTextAttachmentAtIndex(NSTextView textView, NSTextAttachment textAttachment, NSUInteger charIndex);
-    [Optional] [Selector("textView:willShowSharingServicePicker:forItems:")] NSSharingServicePicker? TextViewWillShowSharingServicePickerForItems(NSTextView textView, NSSharingServicePicker servicePicker, NSArray items);
-    [Optional] [Selector("undoManagerForTextView:")] NSUndoManager? UndoManagerForTextView(NSTextView view);
-    [Optional] [Selector("textView:shouldUpdateTouchBarItemIdentifiers:")] NSArray TextViewShouldUpdateTouchBarItemIdentifiers(NSTextView textView, NSArray identifiers);
-    [Optional] [Selector("textView:candidatesForSelectedRange:")] NSArray? TextViewCandidatesForSelectedRange(NSTextView textView, NSRange selectedRange);
-    [Optional] [Selector("textView:candidates:forSelectedRange:")] NSArray TextViewCandidatesForSelectedRange(NSTextView textView, NSArray candidates, NSRange selectedRange);
-    [Optional] [Selector("textView:shouldSelectCandidateAtIndex:")] bool TextViewShouldSelectCandidateAtIndex(NSTextView textView, NSUInteger index);
-    [Optional] [Selector("textViewWritingToolsWillBegin:")] void TextViewWritingToolsWillBegin(NSTextView textView);
-    [Optional] [Selector("textViewWritingToolsDidEnd:")] void TextViewWritingToolsDidEnd(NSTextView textView);
-    [Optional] [Selector("textView:writingToolsIgnoredRangesInEnclosingRange:")] NSArray TextViewWritingToolsIgnoredRangesInEnclosingRange(NSTextView textView, NSRange enclosingRange);
+    [Optional]
+    [Selector("textView:clickedOnLink:atIndex:")]
+    bool TextViewClickedOnLinkAtIndex(NSTextView textView, AnyObject link, NSUInteger charIndex);
+    [Optional]
+    [Selector("textView:clickedOnCell:inRect:atIndex:")]
+    void TextViewClickedOnCellInRectAtIndex(NSTextView textView, NSTextAttachmentCellProtocol cell, NSRect cellFrame, NSUInteger charIndex);
+    [Optional]
+    [Selector("textView:doubleClickedOnCell:inRect:atIndex:")]
+    void TextViewDoubleClickedOnCellInRectAtIndex(NSTextView textView, NSTextAttachmentCellProtocol cell, NSRect cellFrame, NSUInteger charIndex);
+    [Optional]
+    [Selector("textView:draggedCell:inRect:event:atIndex:")]
+    void TextViewDraggedCellInRectEventAtIndex(NSTextView view, NSTextAttachmentCellProtocol cell, NSRect rect, NSEvent event, NSUInteger charIndex);
+    [Optional]
+    [Selector("textView:writablePasteboardTypesForCell:atIndex:")]
+    NSArray TextViewWritablePasteboardTypesForCellAtIndex(NSTextView view, NSTextAttachmentCellProtocol cell, NSUInteger charIndex);
+    [Optional]
+    [Selector("textView:writeCell:atIndex:toPasteboard:type:")]
+    bool TextViewWriteCellAtIndexToPasteboardType(NSTextView view, NSTextAttachmentCellProtocol cell, NSUInteger charIndex, NSPasteboard pboard, NSPasteboardType type);
+    [Optional]
+    [Selector("textView:willChangeSelectionFromCharacterRange:toCharacterRange:")]
+    NSRange TextViewWillChangeSelectionFromCharacterRangeToCharacterRange(NSTextView textView, NSRange oldSelectedCharRange, NSRange newSelectedCharRange);
+    [Optional]
+    [Selector("textView:willChangeSelectionFromCharacterRanges:toCharacterRanges:")]
+    NSArray TextViewWillChangeSelectionFromCharacterRangesToCharacterRanges(NSTextView textView, NSArray oldSelectedCharRanges, NSArray newSelectedCharRanges);
+    [Optional]
+    [Selector("textView:shouldChangeTextInRanges:replacementStrings:")]
+    bool TextViewShouldChangeTextInRangesReplacementStrings(NSTextView textView, NSArray affectedRanges, NSArray? replacementStrings);
+    [Optional]
+    [Selector("textView:shouldChangeTypingAttributes:toAttributes:")]
+    NSDictionary TextViewShouldChangeTypingAttributesToAttributes(NSTextView textView, NSDictionary oldTypingAttributes, NSDictionary newTypingAttributes);
+    [Optional]
+    [Selector("textViewDidChangeSelection:")]
+    void TextViewDidChangeSelection(NSNotification notification);
+    [Optional]
+    [Selector("textViewDidChangeTypingAttributes:")]
+    void TextViewDidChangeTypingAttributes(NSNotification notification);
+    [Optional]
+    [Selector("textView:willDisplayToolTip:forCharacterAtIndex:")]
+    NSString? TextViewWillDisplayToolTipForCharacterAtIndex(NSTextView textView, NSString tooltip, NSUInteger characterIndex);
+    [Optional]
+    [Selector("textView:completions:forPartialWordRange:indexOfSelectedItem:")]
+    NSArray TextViewCompletionsForPartialWordRangeIndexOfSelectedItem(NSTextView textView, NSArray words, NSRange charRange, NSInteger* index);
+    [Optional]
+    [Selector("textView:shouldChangeTextInRange:replacementString:")]
+    bool TextViewShouldChangeTextInRangeReplacementString(NSTextView textView, NSRange affectedCharRange, NSString? replacementString);
+    [Optional]
+    [Selector("textView:doCommandBySelector:")]
+    bool TextViewDoCommandBySelector(NSTextView textView, Selector commandSelector);
+    [Optional]
+    [Selector("textView:shouldSetSpellingState:range:")]
+    NSInteger TextViewShouldSetSpellingStateRange(NSTextView textView, NSInteger value, NSRange affectedCharRange);
+    [Optional]
+    [Selector("textView:menu:forEvent:atIndex:")]
+    NSMenu? TextViewMenuForEventAtIndex(NSTextView view, NSMenu menu, NSEvent event, NSUInteger charIndex);
+    [Optional]
+    [Selector("textView:willCheckTextInRange:options:types:")]
+    NSDictionary TextViewWillCheckTextInRangeOptionsTypes(NSTextView view, NSRange range, NSDictionary options, NSTextCheckingTypes* checkingTypes);
+    [Optional]
+    [Selector("textView:didCheckTextInRange:types:options:results:orthography:wordCount:")]
+    NSArray TextViewDidCheckTextInRangeTypesOptionsResultsOrthographyWordCount(NSTextView view, NSRange range, NSTextCheckingTypes checkingTypes, NSDictionary options, NSArray results, NSOrthography orthography, NSInteger wordCount);
+    [Optional]
+    [Selector("textView:URLForContentsOfTextAttachment:atIndex:")]
+    NSURL? TextViewURLForContentsOfTextAttachmentAtIndex(NSTextView textView, NSTextAttachment textAttachment, NSUInteger charIndex);
+    [Optional]
+    [Selector("textView:willShowSharingServicePicker:forItems:")]
+    NSSharingServicePicker? TextViewWillShowSharingServicePickerForItems(NSTextView textView, NSSharingServicePicker servicePicker, NSArray items);
+    [Optional]
+    [Selector("undoManagerForTextView:")]
+    NSUndoManager? UndoManagerForTextView(NSTextView view);
+    [Optional]
+    [Selector("textView:shouldUpdateTouchBarItemIdentifiers:")]
+    NSArray TextViewShouldUpdateTouchBarItemIdentifiers(NSTextView textView, NSArray identifiers);
+    [Optional]
+    [Selector("textView:candidatesForSelectedRange:")]
+    NSArray? TextViewCandidatesForSelectedRange(NSTextView textView, NSRange selectedRange);
+    [Optional]
+    [Selector("textView:candidates:forSelectedRange:")]
+    NSArray TextViewCandidatesForSelectedRange(NSTextView textView, NSArray candidates, NSRange selectedRange);
+    [Optional]
+    [Selector("textView:shouldSelectCandidateAtIndex:")]
+    bool TextViewShouldSelectCandidateAtIndex(NSTextView textView, NSUInteger index);
+    [Optional]
+    [Selector("textViewWritingToolsWillBegin:")]
+    void TextViewWritingToolsWillBegin(NSTextView textView);
+    [Optional]
+    [Selector("textViewWritingToolsDidEnd:")]
+    void TextViewWritingToolsDidEnd(NSTextView textView);
+    [Optional]
+    [Selector("textView:writingToolsIgnoredRangesInEnclosingRange:")]
+    NSArray TextViewWritingToolsIgnoredRangesInEnclosingRange(NSTextView textView, NSRange enclosingRange);
     /// Deprecated in macOS 10.6.
-    [Optional] [Selector("textView:clickedOnLink:")] bool TextViewClickedOnLink(NSTextView textView, AnyObject? link);
+    [Optional]
+    [Selector("textView:clickedOnLink:")]
+    bool TextViewClickedOnLink(NSTextView textView, AnyObject? link);
     /// Deprecated in macOS 10.6.
-    [Optional] [Selector("textView:clickedOnCell:inRect:")] void TextViewClickedOnCellInRect(NSTextView textView, NSTextAttachmentCellProtocol? cell, NSRect cellFrame);
+    [Optional]
+    [Selector("textView:clickedOnCell:inRect:")]
+    void TextViewClickedOnCellInRect(NSTextView textView, NSTextAttachmentCellProtocol? cell, NSRect cellFrame);
     /// Deprecated in macOS 10.6.
-    [Optional] [Selector("textView:doubleClickedOnCell:inRect:")] void TextViewDoubleClickedOnCellInRect(NSTextView textView, NSTextAttachmentCellProtocol? cell, NSRect cellFrame);
+    [Optional]
+    [Selector("textView:doubleClickedOnCell:inRect:")]
+    void TextViewDoubleClickedOnCellInRect(NSTextView textView, NSTextAttachmentCellProtocol? cell, NSRect cellFrame);
     /// Deprecated in macOS 10.6.
-    [Optional] [Selector("textView:draggedCell:inRect:event:")] void TextViewDraggedCellInRectEvent(NSTextView view, NSTextAttachmentCellProtocol? cell, NSRect rect, NSEvent? event);
+    [Optional]
+    [Selector("textView:draggedCell:inRect:event:")]
+    void TextViewDraggedCellInRectEvent(NSTextView view, NSTextAttachmentCellProtocol? cell, NSRect rect, NSEvent? event);
 }
 
 public extern "C" NSTouchBarItemIdentifier? NSTouchBarItemIdentifierCharacterPicker;

@@ -68,13 +68,16 @@ public enum SCNetworkReachabilityFlags : uint
 public delegate void SCNetworkReachabilityCallBack(__SCNetworkReachability* arg0, SCNetworkReachabilityFlags arg1, void* arg2);
 
 /// Deprecated in macOS 14.4.
-[ReturnsRetained] public extern "C" SCNetworkReachabilityRef? SCNetworkReachabilityCreateWithAddress(CFAllocatorRef? allocator, sockaddr* address);
+[ReturnsRetained]
+public extern "C" SCNetworkReachabilityRef? SCNetworkReachabilityCreateWithAddress(CFAllocatorRef? allocator, sockaddr* address);
 
 /// Deprecated in macOS 14.4.
-[ReturnsRetained] public extern "C" SCNetworkReachabilityRef? SCNetworkReachabilityCreateWithAddressPair(CFAllocatorRef? allocator, sockaddr* localAddress, sockaddr* remoteAddress);
+[ReturnsRetained]
+public extern "C" SCNetworkReachabilityRef? SCNetworkReachabilityCreateWithAddressPair(CFAllocatorRef? allocator, sockaddr* localAddress, sockaddr* remoteAddress);
 
 /// Deprecated in macOS 14.4.
-[ReturnsRetained] public extern "C" SCNetworkReachabilityRef? SCNetworkReachabilityCreateWithName(CFAllocatorRef? allocator, byte* nodename);
+[ReturnsRetained]
+public extern "C" SCNetworkReachabilityRef? SCNetworkReachabilityCreateWithName(CFAllocatorRef? allocator, byte* nodename);
 
 /// Deprecated in macOS 14.4.
 public extern "C" CFTypeID SCNetworkReachabilityGetTypeID();

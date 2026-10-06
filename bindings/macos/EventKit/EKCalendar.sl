@@ -34,18 +34,30 @@ import Standard.ObjC;
 
 public extern objc class EKCalendar : EKObject
 {
-    [Selector("source", "setSource:")] public EKSource? Source { get; set; }
-    [Selector("calendarIdentifier")] public NSString? CalendarIdentifier { get; }
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("type")] public EKCalendarType Type { get; }
-    [Selector("allowsContentModifications")] public bool AllowsContentModifications { get; }
-    [Selector("isSubscribed")] public bool Subscribed { get; }
-    [Selector("isImmutable")] public bool Immutable { get; }
-    [Selector("CGColor", "setCGColor:")] public CGColorRef? CGColor { get; set; }
-    [Selector("color", "setColor:")] public NSColor? Color { get; set; }
-    [Selector("supportedEventAvailabilities")] public EKCalendarEventAvailabilityMask SupportedEventAvailabilities { get; }
-    [Selector("allowedEntityTypes")] public EKEntityMask AllowedEntityTypes { get; }
-    [Selector("calendarForEntityType:eventStore:")] public static EKCalendar CalendarForEntityTypeEventStore(EKEntityType entityType, EKEventStore eventStore);
+    [Selector("source", "setSource:")]
+    public EKSource? Source { get; set; }
+    [Selector("calendarIdentifier")]
+    public NSString? CalendarIdentifier { get; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("type")]
+    public EKCalendarType Type { get; }
+    [Selector("allowsContentModifications")]
+    public bool AllowsContentModifications { get; }
+    [Selector("isSubscribed")]
+    public bool Subscribed { get; }
+    [Selector("isImmutable")]
+    public bool Immutable { get; }
+    [Selector("CGColor", "setCGColor:")]
+    public CGColorRef? CGColor { get; set; }
+    [Selector("color", "setColor:")]
+    public NSColor? Color { get; set; }
+    [Selector("supportedEventAvailabilities")]
+    public EKCalendarEventAvailabilityMask SupportedEventAvailabilities { get; }
+    [Selector("allowedEntityTypes")]
+    public EKEntityMask AllowedEntityTypes { get; }
+    [Selector("calendarForEntityType:eventStore:")]
+    public static EKCalendar CalendarForEntityTypeEventStore(EKEntityType entityType, EKEventStore eventStore);
 }
 
 #endif

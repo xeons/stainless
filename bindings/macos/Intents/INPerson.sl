@@ -40,27 +40,43 @@ public enum INPersonSuggestionType : long
 
 public extern objc class INPerson : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("personHandle")] public INPersonHandle? PersonHandle { get; }
-    [Selector("nameComponents")] public NSPersonNameComponents? NameComponents { get; }
-    [Selector("displayName")] public NSString DisplayName { get; }
-    [Selector("image")] public INImage? Image { get; }
-    [Selector("contactIdentifier")] public NSString? ContactIdentifier { get; }
-    [Selector("customIdentifier")] public NSString? CustomIdentifier { get; }
-    [Selector("relationship")] public INPersonRelationship? Relationship { get; }
-    [Selector("isContactSuggestion")] public bool ContactSuggestion { get; }
-    [Selector("initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:")] public Self InitWithPersonHandleNameComponentsDisplayNameImageContactIdentifierCustomIdentifier(INPersonHandle personHandle, NSPersonNameComponents? nameComponents, NSString? displayName, INImage? image, NSString? contactIdentifier, NSString? customIdentifier);
-    [Selector("initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:relationship:")] public Self InitWithPersonHandleNameComponentsDisplayNameImageContactIdentifierCustomIdentifierRelationship(INPersonHandle personHandle, NSPersonNameComponents? nameComponents, NSString? displayName, INImage? image, NSString? contactIdentifier, NSString? customIdentifier, INPersonRelationship? relationship);
-    [Selector("initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:isMe:")] public Self InitWithPersonHandleNameComponentsDisplayNameImageContactIdentifierCustomIdentifierIsMe(INPersonHandle personHandle, NSPersonNameComponents? nameComponents, NSString? displayName, INImage? image, NSString? contactIdentifier, NSString? customIdentifier, bool isMe);
-    [Selector("initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:isMe:suggestionType:")] public Self InitWithPersonHandleNameComponentsDisplayNameImageContactIdentifierCustomIdentifierIsMeSuggestionType(INPersonHandle personHandle, NSPersonNameComponents? nameComponents, NSString? displayName, INImage? image, NSString? contactIdentifier, NSString? customIdentifier, bool isMe, INPersonSuggestionType suggestionType);
-    [Selector("initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:isContactSuggestion:suggestionType:")] public Self InitWithPersonHandleNameComponentsDisplayNameImageContactIdentifierCustomIdentifierIsContactSuggestionSuggestionType(INPersonHandle personHandle, NSPersonNameComponents? nameComponents, NSString? displayName, INImage? image, NSString? contactIdentifier, NSString? customIdentifier, bool isContactSuggestion, INPersonSuggestionType suggestionType);
+    [Selector("personHandle")]
+    public INPersonHandle? PersonHandle { get; }
+    [Selector("nameComponents")]
+    public NSPersonNameComponents? NameComponents { get; }
+    [Selector("displayName")]
+    public NSString DisplayName { get; }
+    [Selector("image")]
+    public INImage? Image { get; }
+    [Selector("contactIdentifier")]
+    public NSString? ContactIdentifier { get; }
+    [Selector("customIdentifier")]
+    public NSString? CustomIdentifier { get; }
+    [Selector("relationship")]
+    public INPersonRelationship? Relationship { get; }
+    [Selector("isContactSuggestion")]
+    public bool ContactSuggestion { get; }
+    [Selector("initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:")]
+    public Self InitWithPersonHandleNameComponentsDisplayNameImageContactIdentifierCustomIdentifier(INPersonHandle personHandle, NSPersonNameComponents? nameComponents, NSString? displayName, INImage? image, NSString? contactIdentifier, NSString? customIdentifier);
+    [Selector("initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:relationship:")]
+    public Self InitWithPersonHandleNameComponentsDisplayNameImageContactIdentifierCustomIdentifierRelationship(INPersonHandle personHandle, NSPersonNameComponents? nameComponents, NSString? displayName, INImage? image, NSString? contactIdentifier, NSString? customIdentifier, INPersonRelationship? relationship);
+    [Selector("initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:isMe:")]
+    public Self InitWithPersonHandleNameComponentsDisplayNameImageContactIdentifierCustomIdentifierIsMe(INPersonHandle personHandle, NSPersonNameComponents? nameComponents, NSString? displayName, INImage? image, NSString? contactIdentifier, NSString? customIdentifier, bool isMe);
+    [Selector("initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:isMe:suggestionType:")]
+    public Self InitWithPersonHandleNameComponentsDisplayNameImageContactIdentifierCustomIdentifierIsMeSuggestionType(INPersonHandle personHandle, NSPersonNameComponents? nameComponents, NSString? displayName, INImage? image, NSString? contactIdentifier, NSString? customIdentifier, bool isMe, INPersonSuggestionType suggestionType);
+    [Selector("initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:isContactSuggestion:suggestionType:")]
+    public Self InitWithPersonHandleNameComponentsDisplayNameImageContactIdentifierCustomIdentifierIsContactSuggestionSuggestionType(INPersonHandle personHandle, NSPersonNameComponents? nameComponents, NSString? displayName, INImage? image, NSString? contactIdentifier, NSString? customIdentifier, bool isContactSuggestion, INPersonSuggestionType suggestionType);
 }
 
 /// INInteraction, a category of INPerson.
 public extern objc class INPerson
 {
-    [Selector("aliases")] public NSArray? Aliases { get; }
-    [Selector("suggestionType")] public INPersonSuggestionType SuggestionType { get; }
-    [Selector("initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:aliases:suggestionType:")] public Self InitWithPersonHandleNameComponentsDisplayNameImageContactIdentifierCustomIdentifierAliasesSuggestionType(INPersonHandle personHandle, NSPersonNameComponents? nameComponents, NSString? displayName, INImage? image, NSString? contactIdentifier, NSString? customIdentifier, NSArray? aliases, INPersonSuggestionType suggestionType);
+    [Selector("aliases")]
+    public NSArray? Aliases { get; }
+    [Selector("suggestionType")]
+    public INPersonSuggestionType SuggestionType { get; }
+    [Selector("initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:aliases:suggestionType:")]
+    public Self InitWithPersonHandleNameComponentsDisplayNameImageContactIdentifierCustomIdentifierAliasesSuggestionType(INPersonHandle personHandle, NSPersonNameComponents? nameComponents, NSString? displayName, INImage? image, NSString? contactIdentifier, NSString? customIdentifier, NSArray? aliases, INPersonSuggestionType suggestionType);
 }
 
 #endif

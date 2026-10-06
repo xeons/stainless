@@ -120,7 +120,8 @@ public extern "C" NSTextContentType NSTextContentTypeBirthdateYear;
 
 public objc interface NSTextContent
 {
-    [Selector("contentType", "setContentType:")] NSTextContentType? ContentType { get; set; }
+    [Selector("contentType", "setContentType:")]
+    NSTextContentType? ContentType { get; set; }
 }
 
 #endif

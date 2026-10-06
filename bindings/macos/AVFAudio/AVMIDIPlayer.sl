@@ -35,15 +35,24 @@ public objc closure void AVMIDIPlayerCompletionHandler();
 
 public extern objc class AVMIDIPlayer : NSObject
 {
-    [Selector("duration")] public NSTimeInterval Duration { get; }
-    [Selector("isPlaying")] public bool Playing { get; }
-    [Selector("rate", "setRate:")] public float Rate { get; set; }
-    [Selector("currentPosition", "setCurrentPosition:")] public NSTimeInterval CurrentPosition { get; set; }
-    [Selector("initWithContentsOfURL:soundBankURL:error:")] public Self? InitWithContentsOfURLSoundBankURLError(NSURL inURL, NSURL? bankURL, out NSError? outError);
-    [Selector("initWithData:soundBankURL:error:")] public Self? InitWithDataSoundBankURLError(NSData data, NSURL? bankURL, out NSError? outError);
-    [Selector("prepareToPlay")] public void PrepareToPlay();
-    [Selector("play:")] public void Play(AVMIDIPlayerCompletionHandler? completionHandler);
-    [Selector("stop")] public void Stop();
+    [Selector("duration")]
+    public NSTimeInterval Duration { get; }
+    [Selector("isPlaying")]
+    public bool Playing { get; }
+    [Selector("rate", "setRate:")]
+    public float Rate { get; set; }
+    [Selector("currentPosition", "setCurrentPosition:")]
+    public NSTimeInterval CurrentPosition { get; set; }
+    [Selector("initWithContentsOfURL:soundBankURL:error:")]
+    public Self? InitWithContentsOfURLSoundBankURLError(NSURL inURL, NSURL? bankURL, out NSError? outError);
+    [Selector("initWithData:soundBankURL:error:")]
+    public Self? InitWithDataSoundBankURLError(NSData data, NSURL? bankURL, out NSError? outError);
+    [Selector("prepareToPlay")]
+    public void PrepareToPlay();
+    [Selector("play:")]
+    public void Play(AVMIDIPlayerCompletionHandler? completionHandler);
+    [Selector("stop")]
+    public void Stop();
 }
 
 #endif

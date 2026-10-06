@@ -49,23 +49,35 @@ public enum MTROTAImageDigestType : ulong
 
 public extern objc class MTROTAHeader : NSObject
 {
-    [Selector("vendorID", "setVendorID:")] public NSNumber VendorID { get; set; }
-    [Selector("productID", "setProductID:")] public NSNumber ProductID { get; set; }
-    [Selector("payloadSize", "setPayloadSize:")] public NSNumber PayloadSize { get; set; }
-    [Selector("softwareVersion", "setSoftwareVersion:")] public NSNumber SoftwareVersion { get; set; }
-    [Selector("softwareVersionString", "setSoftwareVersionString:")] public NSString SoftwareVersionString { get; set; }
-    [Selector("releaseNotesURL", "setReleaseNotesURL:")] public NSString? ReleaseNotesURL { get; set; }
-    [Selector("imageDigest", "setImageDigest:")] public NSData ImageDigest { get; set; }
-    [Selector("imageDigestType", "setImageDigestType:")] public MTROTAImageDigestType ImageDigestType { get; set; }
-    [Selector("minApplicableVersion", "setMinApplicableVersion:")] public NSNumber? MinApplicableVersion { get; set; }
-    [Selector("maxApplicableVersion", "setMaxApplicableVersion:")] public NSNumber? MaxApplicableVersion { get; set; }
-    [Selector("initWithData:")] public Self InitWithData(NSData data);
+    [Selector("vendorID", "setVendorID:")]
+    public NSNumber VendorID { get; set; }
+    [Selector("productID", "setProductID:")]
+    public NSNumber ProductID { get; set; }
+    [Selector("payloadSize", "setPayloadSize:")]
+    public NSNumber PayloadSize { get; set; }
+    [Selector("softwareVersion", "setSoftwareVersion:")]
+    public NSNumber SoftwareVersion { get; set; }
+    [Selector("softwareVersionString", "setSoftwareVersionString:")]
+    public NSString SoftwareVersionString { get; set; }
+    [Selector("releaseNotesURL", "setReleaseNotesURL:")]
+    public NSString? ReleaseNotesURL { get; set; }
+    [Selector("imageDigest", "setImageDigest:")]
+    public NSData ImageDigest { get; set; }
+    [Selector("imageDigestType", "setImageDigestType:")]
+    public MTROTAImageDigestType ImageDigestType { get; set; }
+    [Selector("minApplicableVersion", "setMinApplicableVersion:")]
+    public NSNumber? MinApplicableVersion { get; set; }
+    [Selector("maxApplicableVersion", "setMaxApplicableVersion:")]
+    public NSNumber? MaxApplicableVersion { get; set; }
+    [Selector("initWithData:")]
+    public Self InitWithData(NSData data);
 }
 
 /// Deprecated in macOS 13.3.
 public extern objc class MTROTAHeaderParser : NSObject
 {
-    [Selector("headerFromData:error:")] public static MTROTAHeader? HeaderFromDataError(NSData data, out NSError? error);
+    [Selector("headerFromData:error:")]
+    public static MTROTAHeader? HeaderFromDataError(NSData data, out NSError? error);
 }
 
 #endif

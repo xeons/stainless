@@ -48,13 +48,18 @@ public objc closure void VSUserAccountManagerDeleteAutoSignInTokenWithCompletion
 
 public extern objc class VSUserAccountManager : NSObject
 {
-    [Selector("sharedUserAccountManager")] public static VSUserAccountManager SharedUserAccountManager { get; }
-    [Selector("updateUserAccount:completion:")] public void UpdateUserAccountCompletion(VSUserAccount account, VSUserAccountManagerUpdateUserAccountCompletionCompletionBlock? completion);
-    [Selector("queryUserAccountsWithOptions:completion:")] public void QueryUserAccountsWithOptionsCompletion(VSUserAccountQueryOptions options, VSUserAccountManagerQueryUserAccountsWithOptionsCompletionCompletionBlock completion);
+    [Selector("sharedUserAccountManager")]
+    public static VSUserAccountManager SharedUserAccountManager { get; }
+    [Selector("updateUserAccount:completion:")]
+    public void UpdateUserAccountCompletion(VSUserAccount account, VSUserAccountManagerUpdateUserAccountCompletionCompletionBlock? completion);
+    [Selector("queryUserAccountsWithOptions:completion:")]
+    public void QueryUserAccountsWithOptionsCompletion(VSUserAccountQueryOptions options, VSUserAccountManagerQueryUserAccountsWithOptionsCompletionCompletionBlock completion);
     /// macOS 26.0 and later.
-    [Selector("queryAutoSignInTokenWithCompletionHandler:")] public void QueryAutoSignInTokenWithCompletionHandler(VSUserAccountManagerQueryAutoSignInTokenWithCompletionHandlerCompletionBlock completion);
+    [Selector("queryAutoSignInTokenWithCompletionHandler:")]
+    public void QueryAutoSignInTokenWithCompletionHandler(VSUserAccountManagerQueryAutoSignInTokenWithCompletionHandlerCompletionBlock completion);
     /// macOS 26.0 and later.
-    [Selector("deleteAutoSignInTokenWithCompletionHandler:")] public void DeleteAutoSignInTokenWithCompletionHandler(VSUserAccountManagerDeleteAutoSignInTokenWithCompletionHandlerCompletionBlock completion);
+    [Selector("deleteAutoSignInTokenWithCompletionHandler:")]
+    public void DeleteAutoSignInTokenWithCompletionHandler(VSUserAccountManagerDeleteAutoSignInTokenWithCompletionHandlerCompletionBlock completion);
 }
 
 #endif

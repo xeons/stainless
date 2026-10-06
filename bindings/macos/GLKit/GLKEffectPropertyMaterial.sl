@@ -33,11 +33,16 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class GLKEffectPropertyMaterial : GLKEffectProperty
 {
-    [Selector("ambientColor", "setAmbientColor:")] public GLKVector4 AmbientColor { get; set; }
-    [Selector("diffuseColor", "setDiffuseColor:")] public GLKVector4 DiffuseColor { get; set; }
-    [Selector("specularColor", "setSpecularColor:")] public GLKVector4 SpecularColor { get; set; }
-    [Selector("emissiveColor", "setEmissiveColor:")] public GLKVector4 EmissiveColor { get; set; }
-    [Selector("shininess", "setShininess:")] public GLfloat Shininess { get; set; }
+    [Selector("ambientColor", "setAmbientColor:")]
+    public GLKVector4 AmbientColor { get; set; }
+    [Selector("diffuseColor", "setDiffuseColor:")]
+    public GLKVector4 DiffuseColor { get; set; }
+    [Selector("specularColor", "setSpecularColor:")]
+    public GLKVector4 SpecularColor { get; set; }
+    [Selector("emissiveColor", "setEmissiveColor:")]
+    public GLKVector4 EmissiveColor { get; set; }
+    [Selector("shininess", "setShininess:")]
+    public GLfloat Shininess { get; set; }
 }
 
 #endif

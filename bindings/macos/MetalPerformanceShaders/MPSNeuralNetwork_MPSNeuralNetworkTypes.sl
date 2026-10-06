@@ -100,24 +100,37 @@ public enum MPSNNPaddingMethod : ulong
 
 public objc interface MPSNNPadding : NSObjectProtocol, NSSecureCoding
 {
-    [Selector("paddingMethod")] MPSNNPaddingMethod PaddingMethod();
-    [Optional] [Selector("label")] NSString Label();
-    [Optional] [Selector("destinationImageDescriptorForSourceImages:sourceStates:forKernel:suggestedDescriptor:")] MPSImageDescriptor DestinationImageDescriptorForSourceImagesSourceStatesForKernelSuggestedDescriptor(NSArray sourceImages, NSArray? sourceStates, MPSKernel kernel, MPSImageDescriptor inDescriptor);
-    [Optional] [Selector("inverse")] Self? Inverse();
+    [Selector("paddingMethod")]
+    MPSNNPaddingMethod PaddingMethod();
+    [Optional]
+    [Selector("label")]
+    NSString Label();
+    [Optional]
+    [Selector("destinationImageDescriptorForSourceImages:sourceStates:forKernel:suggestedDescriptor:")]
+    MPSImageDescriptor DestinationImageDescriptorForSourceImagesSourceStatesForKernelSuggestedDescriptor(NSArray sourceImages, NSArray? sourceStates, MPSKernel kernel, MPSImageDescriptor inDescriptor);
+    [Optional]
+    [Selector("inverse")]
+    Self? Inverse();
 }
 
 public extern objc class MPSNNDefaultPadding : NSObject, MPSNNPadding
 {
-    [Selector("paddingWithMethod:")] public static Self PaddingWithMethod(MPSNNPaddingMethod method);
-    [Selector("paddingForTensorflowAveragePooling")] public static Self PaddingForTensorflowAveragePooling();
-    [Selector("paddingForTensorflowAveragePoolingValidOnly")] public static Self PaddingForTensorflowAveragePoolingValidOnly();
-    [Selector("label")] public NSString Label();
+    [Selector("paddingWithMethod:")]
+    public static Self PaddingWithMethod(MPSNNPaddingMethod method);
+    [Selector("paddingForTensorflowAveragePooling")]
+    public static Self PaddingForTensorflowAveragePooling();
+    [Selector("paddingForTensorflowAveragePoolingValidOnly")]
+    public static Self PaddingForTensorflowAveragePoolingValidOnly();
+    [Selector("label")]
+    public NSString Label();
 }
 
 public objc interface MPSImageSizeEncodingState : NSObjectProtocol
 {
-    [Selector("sourceWidth")] NSUInteger SourceWidth { get; }
-    [Selector("sourceHeight")] NSUInteger SourceHeight { get; }
+    [Selector("sourceWidth")]
+    NSUInteger SourceWidth { get; }
+    [Selector("sourceHeight")]
+    NSUInteger SourceHeight { get; }
 }
 
 #endif

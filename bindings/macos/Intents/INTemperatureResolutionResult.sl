@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INTemperatureResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedTemperature:")] public static Self SuccessWithResolvedTemperature(NSMeasurement resolvedTemperature);
-    [Selector("disambiguationWithTemperaturesToDisambiguate:")] public static Self DisambiguationWithTemperaturesToDisambiguate(NSArray temperaturesToDisambiguate);
-    [Selector("confirmationRequiredWithTemperatureToConfirm:")] public static Self ConfirmationRequiredWithTemperatureToConfirm(NSMeasurement? temperatureToConfirm);
+    [Selector("successWithResolvedTemperature:")]
+    public static Self SuccessWithResolvedTemperature(NSMeasurement resolvedTemperature);
+    [Selector("disambiguationWithTemperaturesToDisambiguate:")]
+    public static Self DisambiguationWithTemperaturesToDisambiguate(NSArray temperaturesToDisambiguate);
+    [Selector("confirmationRequiredWithTemperatureToConfirm:")]
+    public static Self ConfirmationRequiredWithTemperatureToConfirm(NSMeasurement? temperatureToConfirm);
 }
 
 #endif

@@ -38,13 +38,20 @@ public objc closure void CKModifyRecordZonesOperationModifyRecordZonesCompletion
 
 public extern objc class CKModifyRecordZonesOperation : CKDatabaseOperation
 {
-    [Selector("recordZonesToSave", "setRecordZonesToSave:")] public NSArray? RecordZonesToSave { get; set; }
-    [Selector("recordZoneIDsToDelete", "setRecordZoneIDsToDelete:")] public NSArray? RecordZoneIDsToDelete { get; set; }
-    [Selector("perRecordZoneSaveBlock", "setPerRecordZoneSaveBlock:")] public CKModifyRecordZonesOperationPerRecordZoneSaveBlock? PerRecordZoneSaveBlock { get; set; }
-    [Selector("perRecordZoneDeleteBlock", "setPerRecordZoneDeleteBlock:")] public CKModifyRecordZonesOperationPerRecordZoneDeleteBlock? PerRecordZoneDeleteBlock { get; set; }
-    [Selector("modifyRecordZonesCompletionBlock", "setModifyRecordZonesCompletionBlock:")] public CKModifyRecordZonesOperationModifyRecordZonesCompletionBlock? ModifyRecordZonesCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithRecordZonesToSave:recordZoneIDsToDelete:")] public Self InitWithRecordZonesToSaveRecordZoneIDsToDelete(NSArray? recordZonesToSave, NSArray? recordZoneIDsToDelete);
+    [Selector("recordZonesToSave", "setRecordZonesToSave:")]
+    public NSArray? RecordZonesToSave { get; set; }
+    [Selector("recordZoneIDsToDelete", "setRecordZoneIDsToDelete:")]
+    public NSArray? RecordZoneIDsToDelete { get; set; }
+    [Selector("perRecordZoneSaveBlock", "setPerRecordZoneSaveBlock:")]
+    public CKModifyRecordZonesOperationPerRecordZoneSaveBlock? PerRecordZoneSaveBlock { get; set; }
+    [Selector("perRecordZoneDeleteBlock", "setPerRecordZoneDeleteBlock:")]
+    public CKModifyRecordZonesOperationPerRecordZoneDeleteBlock? PerRecordZoneDeleteBlock { get; set; }
+    [Selector("modifyRecordZonesCompletionBlock", "setModifyRecordZonesCompletionBlock:")]
+    public CKModifyRecordZonesOperationModifyRecordZonesCompletionBlock? ModifyRecordZonesCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithRecordZonesToSave:recordZoneIDsToDelete:")]
+    public Self InitWithRecordZonesToSaveRecordZoneIDsToDelete(NSArray? recordZonesToSave, NSArray? recordZoneIDsToDelete);
 }
 
 #endif

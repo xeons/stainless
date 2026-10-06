@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class VNStatefulRequest : VNImageBasedRequest
 {
-    [Selector("minimumLatencyFrameCount")] public NSInteger MinimumLatencyFrameCount { get; }
-    [Selector("frameAnalysisSpacing")] public CMTime FrameAnalysisSpacing { get; }
-    [Selector("initWithFrameAnalysisSpacing:completionHandler:")] public Self InitWithFrameAnalysisSpacingCompletionHandler(CMTime frameAnalysisSpacing, VNRequestCompletionHandler? completionHandler);
+    [Selector("minimumLatencyFrameCount")]
+    public NSInteger MinimumLatencyFrameCount { get; }
+    [Selector("frameAnalysisSpacing")]
+    public CMTime FrameAnalysisSpacing { get; }
+    [Selector("initWithFrameAnalysisSpacing:completionHandler:")]
+    public Self InitWithFrameAnalysisSpacingCompletionHandler(CMTime frameAnalysisSpacing, VNRequestCompletionHandler? completionHandler);
 }
 
 #endif

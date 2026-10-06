@@ -32,15 +32,23 @@ import Standard.ObjC;
 
 public extern objc class NSTitlebarAccessoryViewController : NSViewController, NSAnimationDelegate, NSAnimatablePropertyContainer
 {
-    [Selector("layoutAttribute", "setLayoutAttribute:")] public NSLayoutAttribute LayoutAttribute { get; set; }
-    [Selector("fullScreenMinHeight", "setFullScreenMinHeight:")] public CGFloat FullScreenMinHeight { get; set; }
-    [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
-    [Selector("automaticallyAdjustsSize", "setAutomaticallyAdjustsSize:")] public bool AutomaticallyAdjustsSize { get; set; }
+    [Selector("layoutAttribute", "setLayoutAttribute:")]
+    public NSLayoutAttribute LayoutAttribute { get; set; }
+    [Selector("fullScreenMinHeight", "setFullScreenMinHeight:")]
+    public CGFloat FullScreenMinHeight { get; set; }
+    [Selector("isHidden", "setHidden:")]
+    public bool Hidden { get; set; }
+    [Selector("automaticallyAdjustsSize", "setAutomaticallyAdjustsSize:")]
+    public bool AutomaticallyAdjustsSize { get; set; }
     /// macOS 26.1 and later.
-    [Selector("preferredScrollEdgeEffectStyle", "setPreferredScrollEdgeEffectStyle:")] public NSScrollEdgeEffectStyle? PreferredScrollEdgeEffectStyle { get; set; }
-    [Selector("viewWillAppear")] public void ViewWillAppear();
-    [Selector("viewDidAppear")] public void ViewDidAppear();
-    [Selector("viewDidDisappear")] public void ViewDidDisappear();
+    [Selector("preferredScrollEdgeEffectStyle", "setPreferredScrollEdgeEffectStyle:")]
+    public NSScrollEdgeEffectStyle? PreferredScrollEdgeEffectStyle { get; set; }
+    [Selector("viewWillAppear")]
+    public void ViewWillAppear();
+    [Selector("viewDidAppear")]
+    public void ViewDidAppear();
+    [Selector("viewDidDisappear")]
+    public void ViewDidDisappear();
 }
 
 #endif

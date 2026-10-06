@@ -33,36 +33,46 @@ import Standard.ObjC;
 
 public extern objc class MPSCNNUpsampling : MPSCNNKernel
 {
-    [Selector("scaleFactorX")] public double ScaleFactorX { get; }
-    [Selector("scaleFactorY")] public double ScaleFactorY { get; }
-    [Selector("alignCorners")] public bool AlignCorners { get; }
+    [Selector("scaleFactorX")]
+    public double ScaleFactorX { get; }
+    [Selector("scaleFactorY")]
+    public double ScaleFactorY { get; }
+    [Selector("alignCorners")]
+    public bool AlignCorners { get; }
 }
 
 public extern objc class MPSCNNUpsamplingNearest : MPSCNNUpsampling
 {
-    [Selector("initWithDevice:integerScaleFactorX:integerScaleFactorY:")] public Self InitWithDeviceIntegerScaleFactorXIntegerScaleFactorY(MTLDevice device, NSUInteger integerScaleFactorX, NSUInteger integerScaleFactorY);
+    [Selector("initWithDevice:integerScaleFactorX:integerScaleFactorY:")]
+    public Self InitWithDeviceIntegerScaleFactorXIntegerScaleFactorY(MTLDevice device, NSUInteger integerScaleFactorX, NSUInteger integerScaleFactorY);
 }
 
 public extern objc class MPSCNNUpsamplingBilinear : MPSCNNUpsampling
 {
-    [Selector("initWithDevice:integerScaleFactorX:integerScaleFactorY:")] public Self InitWithDeviceIntegerScaleFactorXIntegerScaleFactorY(MTLDevice device, NSUInteger integerScaleFactorX, NSUInteger integerScaleFactorY);
-    [Selector("initWithDevice:integerScaleFactorX:integerScaleFactorY:alignCorners:")] public Self InitWithDeviceIntegerScaleFactorXIntegerScaleFactorYAlignCorners(MTLDevice device, NSUInteger integerScaleFactorX, NSUInteger integerScaleFactorY, bool alignCorners);
+    [Selector("initWithDevice:integerScaleFactorX:integerScaleFactorY:")]
+    public Self InitWithDeviceIntegerScaleFactorXIntegerScaleFactorY(MTLDevice device, NSUInteger integerScaleFactorX, NSUInteger integerScaleFactorY);
+    [Selector("initWithDevice:integerScaleFactorX:integerScaleFactorY:alignCorners:")]
+    public Self InitWithDeviceIntegerScaleFactorXIntegerScaleFactorYAlignCorners(MTLDevice device, NSUInteger integerScaleFactorX, NSUInteger integerScaleFactorY, bool alignCorners);
 }
 
 public extern objc class MPSCNNUpsamplingGradient : MPSCNNGradientKernel
 {
-    [Selector("scaleFactorX")] public double ScaleFactorX { get; }
-    [Selector("scaleFactorY")] public double ScaleFactorY { get; }
+    [Selector("scaleFactorX")]
+    public double ScaleFactorX { get; }
+    [Selector("scaleFactorY")]
+    public double ScaleFactorY { get; }
 }
 
 public extern objc class MPSCNNUpsamplingNearestGradient : MPSCNNUpsamplingGradient
 {
-    [Selector("initWithDevice:integerScaleFactorX:integerScaleFactorY:")] public Self InitWithDeviceIntegerScaleFactorXIntegerScaleFactorY(MTLDevice device, NSUInteger integerScaleFactorX, NSUInteger integerScaleFactorY);
+    [Selector("initWithDevice:integerScaleFactorX:integerScaleFactorY:")]
+    public Self InitWithDeviceIntegerScaleFactorXIntegerScaleFactorY(MTLDevice device, NSUInteger integerScaleFactorX, NSUInteger integerScaleFactorY);
 }
 
 public extern objc class MPSCNNUpsamplingBilinearGradient : MPSCNNUpsamplingGradient
 {
-    [Selector("initWithDevice:integerScaleFactorX:integerScaleFactorY:")] public Self InitWithDeviceIntegerScaleFactorXIntegerScaleFactorY(MTLDevice device, NSUInteger integerScaleFactorX, NSUInteger integerScaleFactorY);
+    [Selector("initWithDevice:integerScaleFactorX:integerScaleFactorY:")]
+    public Self InitWithDeviceIntegerScaleFactorXIntegerScaleFactorY(MTLDevice device, NSUInteger integerScaleFactorX, NSUInteger integerScaleFactorY);
 }
 
 #endif

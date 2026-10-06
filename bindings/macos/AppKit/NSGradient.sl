@@ -41,21 +41,36 @@ public enum NSGradientDrawingOptions : ulong
 
 public extern objc class NSGradient : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("colorSpace")] public NSColorSpace ColorSpace { get; }
-    [Selector("numberOfColorStops")] public NSInteger NumberOfColorStops { get; }
-    [Selector("initWithStartingColor:endingColor:")] public Self? InitWithStartingColorEndingColor(NSColor startingColor, NSColor endingColor);
-    [Selector("initWithColors:")] public Self? InitWithColors(NSArray colorArray);
-    [Selector("initWithColorsAndLocations:")] public Self? InitWithColorsAndLocations(NSColor firstColor, ...);
-    [Selector("initWithColors:atLocations:colorSpace:")] public Self? InitWithColorsAtLocationsColorSpace(NSArray colorArray, CGFloat* locations, NSColorSpace colorSpace);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("drawFromPoint:toPoint:options:")] public void DrawFromPointToPointOptions(NSPoint startingPoint, NSPoint endingPoint, NSGradientDrawingOptions options);
-    [Selector("drawInRect:angle:")] public void DrawInRectAngle(NSRect rect, CGFloat angle);
-    [Selector("drawInBezierPath:angle:")] public void DrawInBezierPathAngle(NSBezierPath path, CGFloat angle);
-    [Selector("drawFromCenter:radius:toCenter:radius:options:")] public void DrawFromCenterRadiusToCenterRadiusOptions(NSPoint startCenter, CGFloat startRadius, NSPoint endCenter, CGFloat endRadius, NSGradientDrawingOptions options);
-    [Selector("drawInRect:relativeCenterPosition:")] public void DrawInRectRelativeCenterPosition(NSRect rect, NSPoint relativeCenterPosition);
-    [Selector("drawInBezierPath:relativeCenterPosition:")] public void DrawInBezierPathRelativeCenterPosition(NSBezierPath path, NSPoint relativeCenterPosition);
-    [Selector("getColor:location:atIndex:")] public void GetColorLocationAtIndex(out NSColor? color, CGFloat* location, NSInteger index);
-    [Selector("interpolatedColorAtLocation:")] public NSColor InterpolatedColorAtLocation(CGFloat location);
+    [Selector("colorSpace")]
+    public NSColorSpace ColorSpace { get; }
+    [Selector("numberOfColorStops")]
+    public NSInteger NumberOfColorStops { get; }
+    [Selector("initWithStartingColor:endingColor:")]
+    public Self? InitWithStartingColorEndingColor(NSColor startingColor, NSColor endingColor);
+    [Selector("initWithColors:")]
+    public Self? InitWithColors(NSArray colorArray);
+    [Selector("initWithColorsAndLocations:")]
+    public Self? InitWithColorsAndLocations(NSColor firstColor, ...);
+    [Selector("initWithColors:atLocations:colorSpace:")]
+    public Self? InitWithColorsAtLocationsColorSpace(NSArray colorArray, CGFloat* locations, NSColorSpace colorSpace);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("drawFromPoint:toPoint:options:")]
+    public void DrawFromPointToPointOptions(NSPoint startingPoint, NSPoint endingPoint, NSGradientDrawingOptions options);
+    [Selector("drawInRect:angle:")]
+    public void DrawInRectAngle(NSRect rect, CGFloat angle);
+    [Selector("drawInBezierPath:angle:")]
+    public void DrawInBezierPathAngle(NSBezierPath path, CGFloat angle);
+    [Selector("drawFromCenter:radius:toCenter:radius:options:")]
+    public void DrawFromCenterRadiusToCenterRadiusOptions(NSPoint startCenter, CGFloat startRadius, NSPoint endCenter, CGFloat endRadius, NSGradientDrawingOptions options);
+    [Selector("drawInRect:relativeCenterPosition:")]
+    public void DrawInRectRelativeCenterPosition(NSRect rect, NSPoint relativeCenterPosition);
+    [Selector("drawInBezierPath:relativeCenterPosition:")]
+    public void DrawInBezierPathRelativeCenterPosition(NSBezierPath path, NSPoint relativeCenterPosition);
+    [Selector("getColor:location:atIndex:")]
+    public void GetColorLocationAtIndex(out NSColor? color, CGFloat* location, NSInteger index);
+    [Selector("interpolatedColorAtLocation:")]
+    public NSColor InterpolatedColorAtLocation(CGFloat location);
 }
 
 #endif

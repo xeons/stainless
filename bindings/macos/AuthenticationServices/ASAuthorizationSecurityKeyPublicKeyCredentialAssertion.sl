@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationSecurityKeyPublicKeyCredentialAssertion : NSObject, ASAuthorizationPublicKeyCredentialAssertion
 {
-    [Selector("appID")] public bool AppID { get; }
+    [Selector("appID")]
+    public bool AppID { get; }
 }
 
 #endif

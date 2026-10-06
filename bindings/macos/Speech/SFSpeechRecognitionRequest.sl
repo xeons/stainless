@@ -35,28 +35,41 @@ import Standard.ObjC;
 
 public extern objc class SFSpeechRecognitionRequest : NSObject
 {
-    [Selector("taskHint", "setTaskHint:")] public SFSpeechRecognitionTaskHint TaskHint { get; set; }
-    [Selector("shouldReportPartialResults", "setShouldReportPartialResults:")] public bool ShouldReportPartialResults { get; set; }
-    [Selector("contextualStrings", "setContextualStrings:")] public NSArray ContextualStrings { get; set; }
+    [Selector("taskHint", "setTaskHint:")]
+    public SFSpeechRecognitionTaskHint TaskHint { get; set; }
+    [Selector("shouldReportPartialResults", "setShouldReportPartialResults:")]
+    public bool ShouldReportPartialResults { get; set; }
+    [Selector("contextualStrings", "setContextualStrings:")]
+    public NSArray ContextualStrings { get; set; }
     /// Deprecated in macOS 12.0.
-    [Selector("interactionIdentifier", "setInteractionIdentifier:")] public NSString? InteractionIdentifier { get; set; }
-    [Selector("requiresOnDeviceRecognition", "setRequiresOnDeviceRecognition:")] public bool RequiresOnDeviceRecognition { get; set; }
-    [Selector("addsPunctuation", "setAddsPunctuation:")] public bool AddsPunctuation { get; set; }
-    [Selector("customizedLanguageModel", "setCustomizedLanguageModel:")] public SFSpeechLanguageModelConfiguration? CustomizedLanguageModel { get; set; }
+    [Selector("interactionIdentifier", "setInteractionIdentifier:")]
+    public NSString? InteractionIdentifier { get; set; }
+    [Selector("requiresOnDeviceRecognition", "setRequiresOnDeviceRecognition:")]
+    public bool RequiresOnDeviceRecognition { get; set; }
+    [Selector("addsPunctuation", "setAddsPunctuation:")]
+    public bool AddsPunctuation { get; set; }
+    [Selector("customizedLanguageModel", "setCustomizedLanguageModel:")]
+    public SFSpeechLanguageModelConfiguration? CustomizedLanguageModel { get; set; }
 }
 
 public extern objc class SFSpeechURLRecognitionRequest : SFSpeechRecognitionRequest
 {
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL URL);
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL URL);
 }
 
 public extern objc class SFSpeechAudioBufferRecognitionRequest : SFSpeechRecognitionRequest
 {
-    [Selector("nativeAudioFormat")] public AVAudioFormat NativeAudioFormat { get; }
-    [Selector("appendAudioPCMBuffer:")] public void AppendAudioPCMBuffer(AVAudioPCMBuffer audioPCMBuffer);
-    [Selector("appendAudioSampleBuffer:")] public void AppendAudioSampleBuffer(CMSampleBufferRef sampleBuffer);
-    [Selector("endAudio")] public void EndAudio();
+    [Selector("nativeAudioFormat")]
+    public AVAudioFormat NativeAudioFormat { get; }
+    [Selector("appendAudioPCMBuffer:")]
+    public void AppendAudioPCMBuffer(AVAudioPCMBuffer audioPCMBuffer);
+    [Selector("appendAudioSampleBuffer:")]
+    public void AppendAudioSampleBuffer(CMSampleBufferRef sampleBuffer);
+    [Selector("endAudio")]
+    public void EndAudio();
 }
 
 #endif

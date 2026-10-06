@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class NSLocalizedNumberFormatRule : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("automatic")] public static NSLocalizedNumberFormatRule Automatic();
+    [Selector("automatic")]
+    public static NSLocalizedNumberFormatRule Automatic();
 }
 
 #endif

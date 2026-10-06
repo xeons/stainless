@@ -37,11 +37,16 @@ public objc closure void CKDiscoverUserIdentitiesOperationDiscoverUserIdentities
 /// Deprecated in macOS 14.0.
 public extern objc class CKDiscoverUserIdentitiesOperation : CKOperation
 {
-    [Selector("userIdentityLookupInfos", "setUserIdentityLookupInfos:")] public NSArray UserIdentityLookupInfos { get; set; }
-    [Selector("userIdentityDiscoveredBlock", "setUserIdentityDiscoveredBlock:")] public CKDiscoverUserIdentitiesOperationUserIdentityDiscoveredBlock? UserIdentityDiscoveredBlock { get; set; }
-    [Selector("discoverUserIdentitiesCompletionBlock", "setDiscoverUserIdentitiesCompletionBlock:")] public CKDiscoverUserIdentitiesOperationDiscoverUserIdentitiesCompletionBlock? DiscoverUserIdentitiesCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithUserIdentityLookupInfos:")] public Self InitWithUserIdentityLookupInfos(NSArray userIdentityLookupInfos);
+    [Selector("userIdentityLookupInfos", "setUserIdentityLookupInfos:")]
+    public NSArray UserIdentityLookupInfos { get; set; }
+    [Selector("userIdentityDiscoveredBlock", "setUserIdentityDiscoveredBlock:")]
+    public CKDiscoverUserIdentitiesOperationUserIdentityDiscoveredBlock? UserIdentityDiscoveredBlock { get; set; }
+    [Selector("discoverUserIdentitiesCompletionBlock", "setDiscoverUserIdentitiesCompletionBlock:")]
+    public CKDiscoverUserIdentitiesOperationDiscoverUserIdentitiesCompletionBlock? DiscoverUserIdentitiesCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithUserIdentityLookupInfos:")]
+    public Self InitWithUserIdentityLookupInfos(NSArray userIdentityLookupInfos);
 }
 
 #endif

@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class GKMinmaxStrategist : NSObject, GKStrategist
 {
-    [Selector("maxLookAheadDepth", "setMaxLookAheadDepth:")] public NSInteger MaxLookAheadDepth { get; set; }
-    [Selector("bestMoveForPlayer:")] public GKGameModelUpdate? BestMoveForPlayer(GKGameModelPlayer player);
-    [Selector("randomMoveForPlayer:fromNumberOfBestMoves:")] public GKGameModelUpdate? RandomMoveForPlayerFromNumberOfBestMoves(GKGameModelPlayer player, NSInteger numMovesToConsider);
+    [Selector("maxLookAheadDepth", "setMaxLookAheadDepth:")]
+    public NSInteger MaxLookAheadDepth { get; set; }
+    [Selector("bestMoveForPlayer:")]
+    public GKGameModelUpdate? BestMoveForPlayer(GKGameModelPlayer player);
+    [Selector("randomMoveForPlayer:fromNumberOfBestMoves:")]
+    public GKGameModelUpdate? RandomMoveForPlayerFromNumberOfBestMoves(GKGameModelPlayer player, NSInteger numMovesToConsider);
 }
 
 #endif

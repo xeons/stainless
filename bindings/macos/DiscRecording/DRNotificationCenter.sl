@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class DRNotificationCenter : NSObject
 {
-    [Selector("currentRunLoopCenter")] public static DRNotificationCenter? CurrentRunLoopCenter();
-    [Selector("addObserver:selector:name:object:")] public void AddObserverSelectorNameObject(AnyObject? observer, Selector aSelector, NSString? notificationName, AnyObject? anObject);
-    [Selector("removeObserver:name:object:")] public void RemoveObserverNameObject(AnyObject? observer, NSString? aName, AnyObject? anObject);
+    [Selector("currentRunLoopCenter")]
+    public static DRNotificationCenter? CurrentRunLoopCenter();
+    [Selector("addObserver:selector:name:object:")]
+    public void AddObserverSelectorNameObject(AnyObject? observer, Selector aSelector, NSString? notificationName, AnyObject? anObject);
+    [Selector("removeObserver:name:object:")]
+    public void RemoveObserverNameObject(AnyObject? observer, NSString? aName, AnyObject? anObject);
 }
 
 #endif

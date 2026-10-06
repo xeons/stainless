@@ -32,7 +32,8 @@ import Standard.ObjC;
 #if ARM64
 public extern objc class VZMacOSVirtualMachineStartOptions : VZVirtualMachineStartOptions
 {
-    [Selector("startUpFromMacOSRecovery", "setStartUpFromMacOSRecovery:")] public bool StartUpFromMacOSRecovery { get; set; }
+    [Selector("startUpFromMacOSRecovery", "setStartUpFromMacOSRecovery:")]
+    public bool StartUpFromMacOSRecovery { get; set; }
 }
 #endif
 

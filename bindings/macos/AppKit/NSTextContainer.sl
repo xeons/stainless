@@ -34,25 +34,40 @@ import Standard.ObjC;
 
 public extern objc class NSTextContainer : NSObject, NSSecureCoding
 {
-    [Selector("textLayoutManager")] public NSTextLayoutManager? TextLayoutManager { get; }
-    [Selector("size", "setSize:")] public CGSize Size { get; set; }
-    [Selector("lineBreakMode", "setLineBreakMode:")] public NSLineBreakMode LineBreakMode { get; set; }
-    [Selector("lineFragmentPadding", "setLineFragmentPadding:")] public CGFloat LineFragmentPadding { get; set; }
-    [Selector("maximumNumberOfLines", "setMaximumNumberOfLines:")] public NSUInteger MaximumNumberOfLines { get; set; }
-    [Selector("isSimpleRectangularTextContainer")] public bool SimpleRectangularTextContainer { get; }
-    [Selector("widthTracksTextView", "setWidthTracksTextView:")] public bool WidthTracksTextView { get; set; }
-    [Selector("heightTracksTextView", "setHeightTracksTextView:")] public bool HeightTracksTextView { get; set; }
-    [Selector("initWithSize:")] public Self InitWithSize(CGSize size);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("lineFragmentRectForProposedRect:atIndex:writingDirection:remainingRect:")] public CGRect LineFragmentRectForProposedRectAtIndexWritingDirectionRemainingRect(CGRect proposedRect, NSUInteger characterIndex, NSWritingDirection baseWritingDirection, CGRect* remainingRect);
+    [Selector("textLayoutManager")]
+    public NSTextLayoutManager? TextLayoutManager { get; }
+    [Selector("size", "setSize:")]
+    public CGSize Size { get; set; }
+    [Selector("lineBreakMode", "setLineBreakMode:")]
+    public NSLineBreakMode LineBreakMode { get; set; }
+    [Selector("lineFragmentPadding", "setLineFragmentPadding:")]
+    public CGFloat LineFragmentPadding { get; set; }
+    [Selector("maximumNumberOfLines", "setMaximumNumberOfLines:")]
+    public NSUInteger MaximumNumberOfLines { get; set; }
+    [Selector("isSimpleRectangularTextContainer")]
+    public bool SimpleRectangularTextContainer { get; }
+    [Selector("widthTracksTextView", "setWidthTracksTextView:")]
+    public bool WidthTracksTextView { get; set; }
+    [Selector("heightTracksTextView", "setHeightTracksTextView:")]
+    public bool HeightTracksTextView { get; set; }
+    [Selector("initWithSize:")]
+    public Self InitWithSize(CGSize size);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("lineFragmentRectForProposedRect:atIndex:writingDirection:remainingRect:")]
+    public CGRect LineFragmentRectForProposedRectAtIndexWritingDirectionRemainingRect(CGRect proposedRect, NSUInteger characterIndex, NSWritingDirection baseWritingDirection, CGRect* remainingRect);
 }
 
 public extern objc class NSTextContainer : NSTextLayoutOrientationProvider
 {
-    [Selector("layoutManager", "setLayoutManager:")] public NSLayoutManager? LayoutManager { get; set; }
-    [Selector("exclusionPaths", "setExclusionPaths:")] public NSArray? ExclusionPaths { get; set; }
-    [Selector("textView", "setTextView:")] public NSTextView? TextView { get; set; }
-    [Selector("replaceLayoutManager:")] public void ReplaceLayoutManager(NSLayoutManager newLayoutManager);
+    [Selector("layoutManager", "setLayoutManager:")]
+    public NSLayoutManager? LayoutManager { get; set; }
+    [Selector("exclusionPaths", "setExclusionPaths:")]
+    public NSArray? ExclusionPaths { get; set; }
+    [Selector("textView", "setTextView:")]
+    public NSTextView? TextView { get; set; }
+    [Selector("replaceLayoutManager:")]
+    public void ReplaceLayoutManager(NSLayoutManager newLayoutManager);
 }
 
 public enum NSLineSweepDirection : ulong
@@ -75,11 +90,15 @@ public enum NSLineMovementDirection : ulong
 /// NSTextContainerDeprecated, a category of NSTextContainer.
 public extern objc class NSTextContainer
 {
-    [Selector("containerSize", "setContainerSize:")] public NSSize ContainerSize { get; set; }
-    [Selector("initWithContainerSize:")] public Self InitWithContainerSize(NSSize aContainerSize);
-    [Selector("lineFragmentRectForProposedRect:sweepDirection:movementDirection:remainingRect:")] public NSRect LineFragmentRectForProposedRectSweepDirectionMovementDirectionRemainingRect(NSRect proposedRect, NSLineSweepDirection sweepDirection, NSLineMovementDirection movementDirection, NSRectPointer remainingRect);
+    [Selector("containerSize", "setContainerSize:")]
+    public NSSize ContainerSize { get; set; }
+    [Selector("initWithContainerSize:")]
+    public Self InitWithContainerSize(NSSize aContainerSize);
+    [Selector("lineFragmentRectForProposedRect:sweepDirection:movementDirection:remainingRect:")]
+    public NSRect LineFragmentRectForProposedRectSweepDirectionMovementDirectionRemainingRect(NSRect proposedRect, NSLineSweepDirection sweepDirection, NSLineMovementDirection movementDirection, NSRectPointer remainingRect);
     /// Deprecated in macOS 10.11.
-    [Selector("containsPoint:")] public bool ContainsPoint(NSPoint point);
+    [Selector("containsPoint:")]
+    public bool ContainsPoint(NSPoint point);
 }
 
 #endif

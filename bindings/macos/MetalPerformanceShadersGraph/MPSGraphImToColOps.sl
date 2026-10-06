@@ -34,27 +34,43 @@ import Standard.ObjC;
 
 public extern objc class MPSGraphImToColOpDescriptor : MPSGraphObject, NSCopying
 {
-    [Selector("kernelWidth", "setKernelWidth:")] public NSUInteger KernelWidth { get; set; }
-    [Selector("kernelHeight", "setKernelHeight:")] public NSUInteger KernelHeight { get; set; }
-    [Selector("strideInX", "setStrideInX:")] public NSUInteger StrideInX { get; set; }
-    [Selector("strideInY", "setStrideInY:")] public NSUInteger StrideInY { get; set; }
-    [Selector("dilationRateInX", "setDilationRateInX:")] public NSUInteger DilationRateInX { get; set; }
-    [Selector("dilationRateInY", "setDilationRateInY:")] public NSUInteger DilationRateInY { get; set; }
-    [Selector("paddingLeft", "setPaddingLeft:")] public NSUInteger PaddingLeft { get; set; }
-    [Selector("paddingRight", "setPaddingRight:")] public NSUInteger PaddingRight { get; set; }
-    [Selector("paddingTop", "setPaddingTop:")] public NSUInteger PaddingTop { get; set; }
-    [Selector("paddingBottom", "setPaddingBottom:")] public NSUInteger PaddingBottom { get; set; }
-    [Selector("dataLayout", "setDataLayout:")] public MPSGraphTensorNamedDataLayout DataLayout { get; set; }
-    [Selector("descriptorWithKernelWidth:kernelHeight:strideInX:strideInY:dilationRateInX:dilationRateInY:paddingLeft:paddingRight:paddingTop:paddingBottom:dataLayout:")] public static Self? DescriptorWithKernelWidthKernelHeightStrideInXStrideInYDilationRateInXDilationRateInYPaddingLeftPaddingRightPaddingTopPaddingBottomDataLayout(NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInX, NSUInteger strideInY, NSUInteger dilationRateInX, NSUInteger dilationRateInY, NSUInteger paddingLeft, NSUInteger paddingRight, NSUInteger paddingTop, NSUInteger paddingBottom, MPSGraphTensorNamedDataLayout dataLayout);
-    [Selector("descriptorWithKernelWidth:kernelHeight:strideInX:strideInY:dilationRateInX:dilationRateInY:dataLayout:")] public static Self? DescriptorWithKernelWidthKernelHeightStrideInXStrideInYDilationRateInXDilationRateInYDataLayout(NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInX, NSUInteger strideInY, NSUInteger dilationRateInX, NSUInteger dilationRateInY, MPSGraphTensorNamedDataLayout dataLayout);
-    [Selector("setExplicitPaddingWithPaddingLeft:paddingRight:paddingTop:paddingBottom:")] public void SetExplicitPaddingWithPaddingLeftPaddingRightPaddingTopPaddingBottom(NSUInteger paddingLeft, NSUInteger paddingRight, NSUInteger paddingTop, NSUInteger paddingBottom);
+    [Selector("kernelWidth", "setKernelWidth:")]
+    public NSUInteger KernelWidth { get; set; }
+    [Selector("kernelHeight", "setKernelHeight:")]
+    public NSUInteger KernelHeight { get; set; }
+    [Selector("strideInX", "setStrideInX:")]
+    public NSUInteger StrideInX { get; set; }
+    [Selector("strideInY", "setStrideInY:")]
+    public NSUInteger StrideInY { get; set; }
+    [Selector("dilationRateInX", "setDilationRateInX:")]
+    public NSUInteger DilationRateInX { get; set; }
+    [Selector("dilationRateInY", "setDilationRateInY:")]
+    public NSUInteger DilationRateInY { get; set; }
+    [Selector("paddingLeft", "setPaddingLeft:")]
+    public NSUInteger PaddingLeft { get; set; }
+    [Selector("paddingRight", "setPaddingRight:")]
+    public NSUInteger PaddingRight { get; set; }
+    [Selector("paddingTop", "setPaddingTop:")]
+    public NSUInteger PaddingTop { get; set; }
+    [Selector("paddingBottom", "setPaddingBottom:")]
+    public NSUInteger PaddingBottom { get; set; }
+    [Selector("dataLayout", "setDataLayout:")]
+    public MPSGraphTensorNamedDataLayout DataLayout { get; set; }
+    [Selector("descriptorWithKernelWidth:kernelHeight:strideInX:strideInY:dilationRateInX:dilationRateInY:paddingLeft:paddingRight:paddingTop:paddingBottom:dataLayout:")]
+    public static Self? DescriptorWithKernelWidthKernelHeightStrideInXStrideInYDilationRateInXDilationRateInYPaddingLeftPaddingRightPaddingTopPaddingBottomDataLayout(NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInX, NSUInteger strideInY, NSUInteger dilationRateInX, NSUInteger dilationRateInY, NSUInteger paddingLeft, NSUInteger paddingRight, NSUInteger paddingTop, NSUInteger paddingBottom, MPSGraphTensorNamedDataLayout dataLayout);
+    [Selector("descriptorWithKernelWidth:kernelHeight:strideInX:strideInY:dilationRateInX:dilationRateInY:dataLayout:")]
+    public static Self? DescriptorWithKernelWidthKernelHeightStrideInXStrideInYDilationRateInXDilationRateInYDataLayout(NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInX, NSUInteger strideInY, NSUInteger dilationRateInX, NSUInteger dilationRateInY, MPSGraphTensorNamedDataLayout dataLayout);
+    [Selector("setExplicitPaddingWithPaddingLeft:paddingRight:paddingTop:paddingBottom:")]
+    public void SetExplicitPaddingWithPaddingLeftPaddingRightPaddingTopPaddingBottom(NSUInteger paddingLeft, NSUInteger paddingRight, NSUInteger paddingTop, NSUInteger paddingBottom);
 }
 
 /// MPSGraphImToColOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("imToColWithSourceTensor:descriptor:name:")] public MPSGraphTensor ImToColWithSourceTensorDescriptorName(MPSGraphTensor source, MPSGraphImToColOpDescriptor descriptor, NSString? name);
-    [Selector("colToImWithSourceTensor:outputShape:descriptor:name:")] public MPSGraphTensor ColToImWithSourceTensorOutputShapeDescriptorName(MPSGraphTensor source, MPSShape outputShape, MPSGraphImToColOpDescriptor descriptor, NSString? name);
+    [Selector("imToColWithSourceTensor:descriptor:name:")]
+    public MPSGraphTensor ImToColWithSourceTensorDescriptorName(MPSGraphTensor source, MPSGraphImToColOpDescriptor descriptor, NSString? name);
+    [Selector("colToImWithSourceTensor:outputShape:descriptor:name:")]
+    public MPSGraphTensor ColToImWithSourceTensorOutputShapeDescriptorName(MPSGraphTensor source, MPSShape outputShape, MPSGraphImToColOpDescriptor descriptor, NSString? name);
 }
 
 #endif

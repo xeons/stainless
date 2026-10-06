@@ -47,40 +47,60 @@ public using MIDICIProfileStateList = NSArray;
 /// Deprecated in macOS 15.0.
 public extern objc class MIDICIDeviceInfo : NSObject, NSSecureCoding
 {
-    [Selector("manufacturerID")] public NSData ManufacturerID { get; }
-    [Selector("family")] public NSData Family { get; }
-    [Selector("modelNumber")] public NSData ModelNumber { get; }
-    [Selector("revisionLevel")] public NSData RevisionLevel { get; }
-    [Selector("midiDestination")] public MIDIEndpointRef MidiDestination { get; }
-    [Selector("initWithDestination:manufacturer:family:model:revision:")] public Self InitWithDestinationManufacturerFamilyModelRevision(MIDIEntityRef midiDestination, NSData manufacturer, NSData family, NSData modelNumber, NSData revisionLevel);
+    [Selector("manufacturerID")]
+    public NSData ManufacturerID { get; }
+    [Selector("family")]
+    public NSData Family { get; }
+    [Selector("modelNumber")]
+    public NSData ModelNumber { get; }
+    [Selector("revisionLevel")]
+    public NSData RevisionLevel { get; }
+    [Selector("midiDestination")]
+    public MIDIEndpointRef MidiDestination { get; }
+    [Selector("initWithDestination:manufacturer:family:model:revision:")]
+    public Self InitWithDestinationManufacturerFamilyModelRevision(MIDIEntityRef midiDestination, NSData manufacturer, NSData family, NSData modelNumber, NSData revisionLevel);
 }
 
 /// Deprecated in macOS 15.0.
 public extern objc class MIDICIDiscoveredNode : NSObject, NSSecureCoding
 {
-    [Selector("destination")] public MIDIEntityRef Destination { get; }
-    [Selector("deviceInfo")] public MIDICIDeviceInfo DeviceInfo { get; }
-    [Selector("supportsProfiles")] public bool SupportsProfiles { get; }
-    [Selector("supportsProperties")] public bool SupportsProperties { get; }
-    [Selector("maximumSysExSize")] public NSNumber MaximumSysExSize { get; }
+    [Selector("destination")]
+    public MIDIEntityRef Destination { get; }
+    [Selector("deviceInfo")]
+    public MIDICIDeviceInfo DeviceInfo { get; }
+    [Selector("supportsProfiles")]
+    public bool SupportsProfiles { get; }
+    [Selector("supportsProperties")]
+    public bool SupportsProperties { get; }
+    [Selector("maximumSysExSize")]
+    public NSNumber MaximumSysExSize { get; }
 }
 
 public extern objc class MIDICIProfile : NSObject, NSSecureCoding
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("profileID")] public NSData ProfileID { get; }
-    [Selector("initWithData:")] public Self InitWithData(NSData data);
-    [Selector("initWithData:name:")] public Self InitWithDataName(NSData data, NSString inName);
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("profileID")]
+    public NSData ProfileID { get; }
+    [Selector("initWithData:")]
+    public Self InitWithData(NSData data);
+    [Selector("initWithData:name:")]
+    public Self InitWithDataName(NSData data, NSString inName);
 }
 
 public extern objc class MIDICIProfileState : NSObject, NSSecureCoding
 {
-    [Selector("midiChannel")] public MIDIChannelNumber MidiChannel { get; }
-    [Selector("enabledProfiles")] public NSArray EnabledProfiles { get; }
-    [Selector("disabledProfiles")] public NSArray DisabledProfiles { get; }
+    [Selector("midiChannel")]
+    public MIDIChannelNumber MidiChannel { get; }
+    [Selector("enabledProfiles")]
+    public NSArray EnabledProfiles { get; }
+    [Selector("disabledProfiles")]
+    public NSArray DisabledProfiles { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("initWithChannel:enabledProfiles:disabledProfiles:")] public Self InitWithChannelEnabledProfilesDisabledProfiles(MIDIChannelNumber midiChannelNum, NSArray enabled, NSArray disabled);
-    [Selector("initWithEnabledProfiles:disabledProfiles:")] public Self InitWithEnabledProfilesDisabledProfiles(NSArray enabled, NSArray disabled);
+    [Selector("initWithChannel:enabledProfiles:disabledProfiles:")]
+    public Self InitWithChannelEnabledProfilesDisabledProfiles(MIDIChannelNumber midiChannelNum, NSArray enabled, NSArray disabled);
+    [Selector("initWithEnabledProfiles:disabledProfiles:")]
+    public Self InitWithEnabledProfilesDisabledProfiles(NSArray enabled, NSArray disabled);
 }
 
 /// Deprecated in macOS 15.0.
@@ -100,48 +120,77 @@ public objc closure void MIDICISessionInitWithDiscoveredNodeDataReadyHandlerDisc
 /// Deprecated in macOS 15.0.
 public extern objc class MIDICISession : NSObject
 {
-    [Selector("midiDestination")] public MIDIEntityRef MidiDestination { get; }
-    [Selector("supportsProfileCapability")] public bool SupportsProfileCapability { get; }
-    [Selector("supportsPropertyCapability")] public bool SupportsPropertyCapability { get; }
-    [Selector("deviceInfo")] public MIDICIDeviceInfo DeviceInfo { get; }
-    [Selector("maxSysExSize")] public NSNumber MaxSysExSize { get; }
-    [Selector("maxPropertyRequests")] public NSNumber MaxPropertyRequests { get; }
-    [Selector("profileChangedCallback", "setProfileChangedCallback:")] public MIDICIProfileChangedBlock? ProfileChangedCallback { get; set; }
-    [Selector("profileSpecificDataHandler", "setProfileSpecificDataHandler:")] public MIDICIProfileSpecificDataBlock? ProfileSpecificDataHandler { get; set; }
-    [Selector("initWithDiscoveredNode:dataReadyHandler:disconnectHandler:")] public Self InitWithDiscoveredNodeDataReadyHandlerDisconnectHandler(MIDICIDiscoveredNode discoveredNode, MIDICISessionInitWithDiscoveredNodeDataReadyHandlerDisconnectHandlerHandlerBlock handler, MIDICISessionDisconnectBlock disconnectHandler);
-    [Selector("profileStateForChannel:")] public MIDICIProfileState ProfileStateForChannel(MIDIChannelNumber channel);
-    [Selector("enableProfile:onChannel:error:")] public bool EnableProfileOnChannelError(MIDICIProfile profile, MIDIChannelNumber channel, out NSError? outError);
-    [Selector("disableProfile:onChannel:error:")] public bool DisableProfileOnChannelError(MIDICIProfile profile, MIDIChannelNumber channel, out NSError? outError);
-    [Selector("sendProfile:onChannel:profileData:")] public bool SendProfileOnChannelProfileData(MIDICIProfile profile, MIDIChannelNumber channel, NSData profileSpecificData);
+    [Selector("midiDestination")]
+    public MIDIEntityRef MidiDestination { get; }
+    [Selector("supportsProfileCapability")]
+    public bool SupportsProfileCapability { get; }
+    [Selector("supportsPropertyCapability")]
+    public bool SupportsPropertyCapability { get; }
+    [Selector("deviceInfo")]
+    public MIDICIDeviceInfo DeviceInfo { get; }
+    [Selector("maxSysExSize")]
+    public NSNumber MaxSysExSize { get; }
+    [Selector("maxPropertyRequests")]
+    public NSNumber MaxPropertyRequests { get; }
+    [Selector("profileChangedCallback", "setProfileChangedCallback:")]
+    public MIDICIProfileChangedBlock? ProfileChangedCallback { get; set; }
+    [Selector("profileSpecificDataHandler", "setProfileSpecificDataHandler:")]
+    public MIDICIProfileSpecificDataBlock? ProfileSpecificDataHandler { get; set; }
+    [Selector("initWithDiscoveredNode:dataReadyHandler:disconnectHandler:")]
+    public Self InitWithDiscoveredNodeDataReadyHandlerDisconnectHandler(MIDICIDiscoveredNode discoveredNode, MIDICISessionInitWithDiscoveredNodeDataReadyHandlerDisconnectHandlerHandlerBlock handler, MIDICISessionDisconnectBlock disconnectHandler);
+    [Selector("profileStateForChannel:")]
+    public MIDICIProfileState ProfileStateForChannel(MIDIChannelNumber channel);
+    [Selector("enableProfile:onChannel:error:")]
+    public bool EnableProfileOnChannelError(MIDICIProfile profile, MIDIChannelNumber channel, out NSError? outError);
+    [Selector("disableProfile:onChannel:error:")]
+    public bool DisableProfileOnChannelError(MIDICIProfile profile, MIDIChannelNumber channel, out NSError? outError);
+    [Selector("sendProfile:onChannel:profileData:")]
+    public bool SendProfileOnChannelProfileData(MIDICIProfile profile, MIDIChannelNumber channel, NSData profileSpecificData);
 }
 
 /// Deprecated in macOS 15.0.
 public extern objc class MIDICIDiscoveryManager : NSObject
 {
-    [Selector("sharedInstance")] public static MIDICIDiscoveryManager SharedInstance();
-    [Selector("discoverWithHandler:")] public void DiscoverWithHandler(MIDICIDiscoveryResponseBlock completedHandler);
+    [Selector("sharedInstance")]
+    public static MIDICIDiscoveryManager SharedInstance();
+    [Selector("discoverWithHandler:")]
+    public void DiscoverWithHandler(MIDICIDiscoveryResponseBlock completedHandler);
 }
 
 /// Deprecated in macOS 15.0.
 public objc interface MIDICIProfileResponderDelegate : NSObjectProtocol
 {
-    [Selector("connectInitiator:withDeviceInfo:")] bool ConnectInitiatorWithDeviceInfo(MIDICIInitiatiorMUID initiatorMUID, MIDICIDeviceInfo deviceInfo);
-    [Selector("initiatorDisconnected:")] void InitiatorDisconnected(MIDICIInitiatiorMUID initiatorMUID);
-    [Optional] [Selector("willSetProfile:onChannel:enabled:")] bool WillSetProfileOnChannelEnabled(MIDICIProfile aProfile, MIDIChannelNumber channel, bool shouldEnable);
-    [Optional] [Selector("handleDataForProfile:onChannel:data:")] void HandleDataForProfileOnChannelData(MIDICIProfile aProfile, MIDIChannelNumber channel, NSData inData);
+    [Selector("connectInitiator:withDeviceInfo:")]
+    bool ConnectInitiatorWithDeviceInfo(MIDICIInitiatiorMUID initiatorMUID, MIDICIDeviceInfo deviceInfo);
+    [Selector("initiatorDisconnected:")]
+    void InitiatorDisconnected(MIDICIInitiatiorMUID initiatorMUID);
+    [Optional]
+    [Selector("willSetProfile:onChannel:enabled:")]
+    bool WillSetProfileOnChannelEnabled(MIDICIProfile aProfile, MIDIChannelNumber channel, bool shouldEnable);
+    [Optional]
+    [Selector("handleDataForProfile:onChannel:data:")]
+    void HandleDataForProfileOnChannelData(MIDICIProfile aProfile, MIDIChannelNumber channel, NSData inData);
 }
 
 /// Deprecated in macOS 15.0.
 public extern objc class MIDICIResponder : NSObject
 {
-    [Selector("initiators")] public NSArray Initiators { get; }
-    [Selector("profileDelegate")] public MIDICIProfileResponderDelegate ProfileDelegate { get; }
-    [Selector("deviceInfo")] public MIDICIDeviceInfo DeviceInfo { get; }
-    [Selector("initWithDeviceInfo:profileDelegate:profileStates:supportProperties:")] public Self InitWithDeviceInfoProfileDelegateProfileStatesSupportProperties(MIDICIDeviceInfo deviceInfo, MIDICIProfileResponderDelegate @delegate, MIDICIProfileStateList profileList, bool propertiesSupported);
-    [Selector("notifyProfile:onChannel:isEnabled:")] public bool NotifyProfileOnChannelIsEnabled(MIDICIProfile aProfile, MIDIChannelNumber channel, bool enabledState);
-    [Selector("sendProfile:onChannel:profileData:")] public bool SendProfileOnChannelProfileData(MIDICIProfile aProfile, MIDIChannelNumber channel, NSData profileSpecificData);
-    [Selector("start")] public bool Start();
-    [Selector("stop")] public void Stop();
+    [Selector("initiators")]
+    public NSArray Initiators { get; }
+    [Selector("profileDelegate")]
+    public MIDICIProfileResponderDelegate ProfileDelegate { get; }
+    [Selector("deviceInfo")]
+    public MIDICIDeviceInfo DeviceInfo { get; }
+    [Selector("initWithDeviceInfo:profileDelegate:profileStates:supportProperties:")]
+    public Self InitWithDeviceInfoProfileDelegateProfileStatesSupportProperties(MIDICIDeviceInfo deviceInfo, MIDICIProfileResponderDelegate @delegate, MIDICIProfileStateList profileList, bool propertiesSupported);
+    [Selector("notifyProfile:onChannel:isEnabled:")]
+    public bool NotifyProfileOnChannelIsEnabled(MIDICIProfile aProfile, MIDIChannelNumber channel, bool enabledState);
+    [Selector("sendProfile:onChannel:profileData:")]
+    public bool SendProfileOnChannelProfileData(MIDICIProfile aProfile, MIDIChannelNumber channel, NSData profileSpecificData);
+    [Selector("start")]
+    public bool Start();
+    [Selector("stop")]
+    public void Stop();
 }
 
 #endif

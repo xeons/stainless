@@ -33,40 +33,68 @@ import Standard.ObjC;
 
 public extern objc class NSPathControl : NSControl
 {
-    [Selector("isEditable", "setEditable:")] public bool Editable { get; set; }
-    [Selector("allowedTypes", "setAllowedTypes:")] public NSArray? AllowedTypes { get; set; }
-    [Selector("placeholderString", "setPlaceholderString:")] public NSString? PlaceholderString { get; set; }
-    [Selector("placeholderAttributedString", "setPlaceholderAttributedString:")] public NSAttributedString? PlaceholderAttributedString { get; set; }
-    [Selector("URL", "setURL:")] public NSURL? URL { get; set; }
-    [Selector("doubleAction", "setDoubleAction:")] public Selector DoubleAction { get; set; }
-    [Selector("pathStyle", "setPathStyle:")] public NSPathStyle PathStyle { get; set; }
-    [Selector("clickedPathItem")] public NSPathControlItem? ClickedPathItem { get; }
-    [Selector("pathItems", "setPathItems:")] public NSArray? PathItems { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSPathControlDelegate? Delegate { get; set; }
-    [Selector("menu", "setMenu:")] public NSMenu? Menu { get; set; }
-    [Selector("setDraggingSourceOperationMask:forLocal:")] public void SetDraggingSourceOperationMaskForLocal(NSDragOperation mask, bool isLocal);
+    [Selector("isEditable", "setEditable:")]
+    public bool Editable { get; set; }
+    [Selector("allowedTypes", "setAllowedTypes:")]
+    public NSArray? AllowedTypes { get; set; }
+    [Selector("placeholderString", "setPlaceholderString:")]
+    public NSString? PlaceholderString { get; set; }
+    [Selector("placeholderAttributedString", "setPlaceholderAttributedString:")]
+    public NSAttributedString? PlaceholderAttributedString { get; set; }
+    [Selector("URL", "setURL:")]
+    public NSURL? URL { get; set; }
+    [Selector("doubleAction", "setDoubleAction:")]
+    public Selector DoubleAction { get; set; }
+    [Selector("pathStyle", "setPathStyle:")]
+    public NSPathStyle PathStyle { get; set; }
+    [Selector("clickedPathItem")]
+    public NSPathControlItem? ClickedPathItem { get; }
+    [Selector("pathItems", "setPathItems:")]
+    public NSArray? PathItems { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSPathControlDelegate? Delegate { get; set; }
+    [Selector("menu", "setMenu:")]
+    public NSMenu? Menu { get; set; }
+    [Selector("setDraggingSourceOperationMask:forLocal:")]
+    public void SetDraggingSourceOperationMaskForLocal(NSDragOperation mask, bool isLocal);
 }
 
 public objc interface NSPathControlDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("pathControl:shouldDragItem:withPasteboard:")] bool PathControlShouldDragItemWithPasteboard(NSPathControl pathControl, NSPathControlItem pathItem, NSPasteboard pasteboard);
-    [Optional] [Selector("pathControl:shouldDragPathComponentCell:withPasteboard:")] bool PathControlShouldDragPathComponentCellWithPasteboard(NSPathControl pathControl, NSPathComponentCell pathComponentCell, NSPasteboard pasteboard);
-    [Optional] [Selector("pathControl:validateDrop:")] NSDragOperation PathControlValidateDrop(NSPathControl pathControl, NSDraggingInfo info);
-    [Optional] [Selector("pathControl:acceptDrop:")] bool PathControlAcceptDrop(NSPathControl pathControl, NSDraggingInfo info);
-    [Optional] [Selector("pathControl:willDisplayOpenPanel:")] void PathControlWillDisplayOpenPanel(NSPathControl pathControl, NSOpenPanel openPanel);
-    [Optional] [Selector("pathControl:willPopUpMenu:")] void PathControlWillPopUpMenu(NSPathControl pathControl, NSMenu menu);
+    [Optional]
+    [Selector("pathControl:shouldDragItem:withPasteboard:")]
+    bool PathControlShouldDragItemWithPasteboard(NSPathControl pathControl, NSPathControlItem pathItem, NSPasteboard pasteboard);
+    [Optional]
+    [Selector("pathControl:shouldDragPathComponentCell:withPasteboard:")]
+    bool PathControlShouldDragPathComponentCellWithPasteboard(NSPathControl pathControl, NSPathComponentCell pathComponentCell, NSPasteboard pasteboard);
+    [Optional]
+    [Selector("pathControl:validateDrop:")]
+    NSDragOperation PathControlValidateDrop(NSPathControl pathControl, NSDraggingInfo info);
+    [Optional]
+    [Selector("pathControl:acceptDrop:")]
+    bool PathControlAcceptDrop(NSPathControl pathControl, NSDraggingInfo info);
+    [Optional]
+    [Selector("pathControl:willDisplayOpenPanel:")]
+    void PathControlWillDisplayOpenPanel(NSPathControl pathControl, NSOpenPanel openPanel);
+    [Optional]
+    [Selector("pathControl:willPopUpMenu:")]
+    void PathControlWillPopUpMenu(NSPathControl pathControl, NSMenu menu);
 }
 
 /// NSDeprecated, a category of NSPathControl.
 public extern objc class NSPathControl
 {
     /// Deprecated in macOS 10.14.
-    [Selector("clickedPathComponentCell")] public NSPathComponentCell? ClickedPathComponentCell();
+    [Selector("clickedPathComponentCell")]
+    public NSPathComponentCell? ClickedPathComponentCell();
     /// Deprecated in macOS 10.14.
-    [Selector("pathComponentCells")] public NSArray PathComponentCells();
+    [Selector("pathComponentCells")]
+    public NSArray PathComponentCells();
     /// Deprecated in macOS 10.14.
-    [Selector("setPathComponentCells:")] public void SetPathComponentCells(NSArray cells);
+    [Selector("setPathComponentCells:")]
+    public void SetPathComponentCells(NSArray cells);
 }
 
 #endif

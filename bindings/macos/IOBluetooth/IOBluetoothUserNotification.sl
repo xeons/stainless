@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothUserNotification : NSObject
 {
-    [Selector("unregister")] public void Unregister();
+    [Selector("unregister")]
+    public void Unregister();
 }
 
 #endif

@@ -33,12 +33,18 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLEmbedElement : DOMHTMLElement
 {
-    [Selector("align", "setAlign:")] public NSString? Align { get; set; }
-    [Selector("height", "setHeight:")] public int Height { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("src", "setSrc:")] public NSString? Src { get; set; }
-    [Selector("type", "setType:")] public NSString? Type { get; set; }
-    [Selector("width", "setWidth:")] public int Width { get; set; }
+    [Selector("align", "setAlign:")]
+    public NSString? Align { get; set; }
+    [Selector("height", "setHeight:")]
+    public int Height { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("src", "setSrc:")]
+    public NSString? Src { get; set; }
+    [Selector("type", "setType:")]
+    public NSString? Type { get; set; }
+    [Selector("width", "setWidth:")]
+    public int Width { get; set; }
 }
 
 #endif

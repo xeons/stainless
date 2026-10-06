@@ -37,21 +37,34 @@ import Standard.ObjC;
 
 public extern objc class PHContentEditingInput : NSObject
 {
-    [Selector("mediaType")] public PHAssetMediaType MediaType { get; }
-    [Selector("mediaSubtypes")] public PHAssetMediaSubtype MediaSubtypes { get; }
-    [Selector("creationDate")] public NSDate? CreationDate { get; }
-    [Selector("location")] public CLLocation? Location { get; }
+    [Selector("mediaType")]
+    public PHAssetMediaType MediaType { get; }
+    [Selector("mediaSubtypes")]
+    public PHAssetMediaSubtype MediaSubtypes { get; }
+    [Selector("creationDate")]
+    public NSDate? CreationDate { get; }
+    [Selector("location")]
+    public CLLocation? Location { get; }
     /// macOS 26.0 and later.
-    [Selector("contentType")] public UTType? ContentType { get; }
+    [Selector("contentType")]
+    public UTType? ContentType { get; }
     /// Deprecated in macOS 100000.
-    [Selector("uniformTypeIdentifier")] public NSString? UniformTypeIdentifier { get; }
-    [Selector("playbackStyle")] public PHAssetPlaybackStyle PlaybackStyle { get; }
-    [Selector("adjustmentData")] public PHAdjustmentData? AdjustmentData { get; }
-    [Selector("displaySizeImage")] public NSImage? DisplaySizeImage { get; }
-    [Selector("fullSizeImageURL")] public NSURL? FullSizeImageURL { get; }
-    [Selector("fullSizeImageOrientation")] public int FullSizeImageOrientation { get; }
-    [Selector("audiovisualAsset")] public AVAsset? AudiovisualAsset { get; }
-    [Selector("livePhoto")] public PHLivePhoto? LivePhoto { get; }
+    [Selector("uniformTypeIdentifier")]
+    public NSString? UniformTypeIdentifier { get; }
+    [Selector("playbackStyle")]
+    public PHAssetPlaybackStyle PlaybackStyle { get; }
+    [Selector("adjustmentData")]
+    public PHAdjustmentData? AdjustmentData { get; }
+    [Selector("displaySizeImage")]
+    public NSImage? DisplaySizeImage { get; }
+    [Selector("fullSizeImageURL")]
+    public NSURL? FullSizeImageURL { get; }
+    [Selector("fullSizeImageOrientation")]
+    public int FullSizeImageOrientation { get; }
+    [Selector("audiovisualAsset")]
+    public AVAsset? AudiovisualAsset { get; }
+    [Selector("livePhoto")]
+    public PHLivePhoto? LivePhoto { get; }
 }
 
 #endif

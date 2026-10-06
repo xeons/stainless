@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class MLModelStructureNeuralNetwork : NSObject
 {
-    [Selector("layers")] public NSArray Layers { get; }
+    [Selector("layers")]
+    public NSArray Layers { get; }
 }
 
 #endif

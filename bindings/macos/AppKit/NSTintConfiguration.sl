@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class NSTintConfiguration : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("defaultTintConfiguration")] public static NSTintConfiguration DefaultTintConfiguration { get; }
-    [Selector("monochromeTintConfiguration")] public static NSTintConfiguration MonochromeTintConfiguration { get; }
-    [Selector("baseTintColor")] public NSColor? BaseTintColor { get; }
-    [Selector("equivalentContentTintColor")] public NSColor? EquivalentContentTintColor { get; }
-    [Selector("adaptsToUserAccentColor")] public bool AdaptsToUserAccentColor { get; }
-    [Selector("tintConfigurationWithPreferredColor:")] public static Self TintConfigurationWithPreferredColor(NSColor color);
-    [Selector("tintConfigurationWithFixedColor:")] public static Self TintConfigurationWithFixedColor(NSColor color);
+    [Selector("defaultTintConfiguration")]
+    public static NSTintConfiguration DefaultTintConfiguration { get; }
+    [Selector("monochromeTintConfiguration")]
+    public static NSTintConfiguration MonochromeTintConfiguration { get; }
+    [Selector("baseTintColor")]
+    public NSColor? BaseTintColor { get; }
+    [Selector("equivalentContentTintColor")]
+    public NSColor? EquivalentContentTintColor { get; }
+    [Selector("adaptsToUserAccentColor")]
+    public bool AdaptsToUserAccentColor { get; }
+    [Selector("tintConfigurationWithPreferredColor:")]
+    public static Self TintConfigurationWithPreferredColor(NSColor color);
+    [Selector("tintConfigurationWithFixedColor:")]
+    public static Self TintConfigurationWithFixedColor(NSColor color);
 }
 
 #endif

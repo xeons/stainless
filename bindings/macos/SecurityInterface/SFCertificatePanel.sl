@@ -35,26 +35,41 @@ import Standard.ObjC;
 
 public extern objc class SFCertificatePanel : NSPanel
 {
-    [Selector("sharedCertificatePanel")] public static SFCertificatePanel? SharedCertificatePanel();
-    [Selector("runModalForTrust:showGroup:")] public NSInteger RunModalForTrustShowGroup(SecTrustRef? trust, bool showGroup);
-    [Selector("runModalForCertificates:showGroup:")] public NSInteger RunModalForCertificatesShowGroup(NSArray? certificates, bool showGroup);
-    [Selector("beginSheetForWindow:modalDelegate:didEndSelector:contextInfo:trust:showGroup:")] public void BeginSheetForWindowModalDelegateDidEndSelectorContextInfoTrustShowGroup(NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo, SecTrustRef? trust, bool showGroup);
-    [Selector("beginSheetForWindow:modalDelegate:didEndSelector:contextInfo:certificates:showGroup:")] public void BeginSheetForWindowModalDelegateDidEndSelectorContextInfoCertificatesShowGroup(NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo, NSArray? certificates, bool showGroup);
-    [Selector("setPolicies:")] public void SetPolicies(AnyObject? policies);
-    [Selector("policies")] public NSArray? Policies();
-    [Selector("setDefaultButtonTitle:")] public void SetDefaultButtonTitle(NSString? title);
-    [Selector("setAlternateButtonTitle:")] public void SetAlternateButtonTitle(NSString? title);
-    [Selector("setShowsHelp:")] public void SetShowsHelp(bool showsHelp);
-    [Selector("showsHelp")] public bool ShowsHelp();
-    [Selector("setHelpAnchor:")] public void SetHelpAnchor(NSString? anchor);
-    [Selector("helpAnchor")] public NSString? HelpAnchor();
-    [Selector("certificateView")] public SFCertificateView? CertificateView();
+    [Selector("sharedCertificatePanel")]
+    public static SFCertificatePanel? SharedCertificatePanel();
+    [Selector("runModalForTrust:showGroup:")]
+    public NSInteger RunModalForTrustShowGroup(SecTrustRef? trust, bool showGroup);
+    [Selector("runModalForCertificates:showGroup:")]
+    public NSInteger RunModalForCertificatesShowGroup(NSArray? certificates, bool showGroup);
+    [Selector("beginSheetForWindow:modalDelegate:didEndSelector:contextInfo:trust:showGroup:")]
+    public void BeginSheetForWindowModalDelegateDidEndSelectorContextInfoTrustShowGroup(NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo, SecTrustRef? trust, bool showGroup);
+    [Selector("beginSheetForWindow:modalDelegate:didEndSelector:contextInfo:certificates:showGroup:")]
+    public void BeginSheetForWindowModalDelegateDidEndSelectorContextInfoCertificatesShowGroup(NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo, NSArray? certificates, bool showGroup);
+    [Selector("setPolicies:")]
+    public void SetPolicies(AnyObject? policies);
+    [Selector("policies")]
+    public NSArray? Policies();
+    [Selector("setDefaultButtonTitle:")]
+    public void SetDefaultButtonTitle(NSString? title);
+    [Selector("setAlternateButtonTitle:")]
+    public void SetAlternateButtonTitle(NSString? title);
+    [Selector("setShowsHelp:")]
+    public void SetShowsHelp(bool showsHelp);
+    [Selector("showsHelp")]
+    public bool ShowsHelp();
+    [Selector("setHelpAnchor:")]
+    public void SetHelpAnchor(NSString? anchor);
+    [Selector("helpAnchor")]
+    public NSString? HelpAnchor();
+    [Selector("certificateView")]
+    public SFCertificateView? CertificateView();
 }
 
 /// SFCertificatePanelDelegate, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("certificatePanelShowHelp:")] public bool CertificatePanelShowHelp(SFCertificatePanel? sender);
+    [Selector("certificatePanelShowHelp:")]
+    public bool CertificatePanelShowHelp(SFCertificatePanel? sender);
 }
 
 #endif

@@ -33,22 +33,34 @@ import Standard.ObjC;
 
 public objc interface NSTextLocation : NSObjectProtocol
 {
-    [Selector("compare:")] NSComparisonResult Compare(NSTextLocation location);
+    [Selector("compare:")]
+    NSComparisonResult Compare(NSTextLocation location);
 }
 
 public extern objc class NSTextRange : NSObject
 {
-    [Selector("isEmpty")] public bool Empty { get; }
-    [Selector("location")] public NSTextLocation Location { get; }
-    [Selector("endLocation")] public NSTextLocation EndLocation { get; }
-    [Selector("initWithLocation:endLocation:")] public Self? InitWithLocationEndLocation(NSTextLocation location, NSTextLocation? endLocation);
-    [Selector("initWithLocation:")] public Self InitWithLocation(NSTextLocation location);
-    [Selector("isEqualToTextRange:")] public bool IsEqualToTextRange(NSTextRange textRange);
-    [Selector("containsLocation:")] public bool ContainsLocation(NSTextLocation location);
-    [Selector("containsRange:")] public bool ContainsRange(NSTextRange textRange);
-    [Selector("intersectsWithTextRange:")] public bool IntersectsWithTextRange(NSTextRange textRange);
-    [Selector("textRangeByIntersectingWithTextRange:")] public Self? TextRangeByIntersectingWithTextRange(NSTextRange textRange);
-    [Selector("textRangeByFormingUnionWithTextRange:")] public Self TextRangeByFormingUnionWithTextRange(NSTextRange textRange);
+    [Selector("isEmpty")]
+    public bool Empty { get; }
+    [Selector("location")]
+    public NSTextLocation Location { get; }
+    [Selector("endLocation")]
+    public NSTextLocation EndLocation { get; }
+    [Selector("initWithLocation:endLocation:")]
+    public Self? InitWithLocationEndLocation(NSTextLocation location, NSTextLocation? endLocation);
+    [Selector("initWithLocation:")]
+    public Self InitWithLocation(NSTextLocation location);
+    [Selector("isEqualToTextRange:")]
+    public bool IsEqualToTextRange(NSTextRange textRange);
+    [Selector("containsLocation:")]
+    public bool ContainsLocation(NSTextLocation location);
+    [Selector("containsRange:")]
+    public bool ContainsRange(NSTextRange textRange);
+    [Selector("intersectsWithTextRange:")]
+    public bool IntersectsWithTextRange(NSTextRange textRange);
+    [Selector("textRangeByIntersectingWithTextRange:")]
+    public Self? TextRangeByIntersectingWithTextRange(NSTextRange textRange);
+    [Selector("textRangeByFormingUnionWithTextRange:")]
+    public Self TextRangeByFormingUnionWithTextRange(NSTextRange textRange);
 }
 
 #endif

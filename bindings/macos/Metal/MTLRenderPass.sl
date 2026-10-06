@@ -72,22 +72,34 @@ public enum MTLVisibilityResultType : long
 
 public extern objc class MTLRenderPassAttachmentDescriptor : NSObject, NSCopying
 {
-    [Selector("texture", "setTexture:")] public MTLTexture? Texture { get; set; }
-    [Selector("level", "setLevel:")] public NSUInteger Level { get; set; }
-    [Selector("slice", "setSlice:")] public NSUInteger Slice { get; set; }
-    [Selector("depthPlane", "setDepthPlane:")] public NSUInteger DepthPlane { get; set; }
-    [Selector("resolveTexture", "setResolveTexture:")] public MTLTexture? ResolveTexture { get; set; }
-    [Selector("resolveLevel", "setResolveLevel:")] public NSUInteger ResolveLevel { get; set; }
-    [Selector("resolveSlice", "setResolveSlice:")] public NSUInteger ResolveSlice { get; set; }
-    [Selector("resolveDepthPlane", "setResolveDepthPlane:")] public NSUInteger ResolveDepthPlane { get; set; }
-    [Selector("loadAction", "setLoadAction:")] public MTLLoadAction LoadAction { get; set; }
-    [Selector("storeAction", "setStoreAction:")] public MTLStoreAction StoreAction { get; set; }
-    [Selector("storeActionOptions", "setStoreActionOptions:")] public MTLStoreActionOptions StoreActionOptions { get; set; }
+    [Selector("texture", "setTexture:")]
+    public MTLTexture? Texture { get; set; }
+    [Selector("level", "setLevel:")]
+    public NSUInteger Level { get; set; }
+    [Selector("slice", "setSlice:")]
+    public NSUInteger Slice { get; set; }
+    [Selector("depthPlane", "setDepthPlane:")]
+    public NSUInteger DepthPlane { get; set; }
+    [Selector("resolveTexture", "setResolveTexture:")]
+    public MTLTexture? ResolveTexture { get; set; }
+    [Selector("resolveLevel", "setResolveLevel:")]
+    public NSUInteger ResolveLevel { get; set; }
+    [Selector("resolveSlice", "setResolveSlice:")]
+    public NSUInteger ResolveSlice { get; set; }
+    [Selector("resolveDepthPlane", "setResolveDepthPlane:")]
+    public NSUInteger ResolveDepthPlane { get; set; }
+    [Selector("loadAction", "setLoadAction:")]
+    public MTLLoadAction LoadAction { get; set; }
+    [Selector("storeAction", "setStoreAction:")]
+    public MTLStoreAction StoreAction { get; set; }
+    [Selector("storeActionOptions", "setStoreActionOptions:")]
+    public MTLStoreActionOptions StoreActionOptions { get; set; }
 }
 
 public extern objc class MTLRenderPassColorAttachmentDescriptor : MTLRenderPassAttachmentDescriptor
 {
-    [Selector("clearColor", "setClearColor:")] public MTLClearColor ClearColor { get; set; }
+    [Selector("clearColor", "setClearColor:")]
+    public MTLClearColor ClearColor { get; set; }
 }
 
 public enum MTLMultisampleDepthResolveFilter : ulong
@@ -99,8 +111,10 @@ public enum MTLMultisampleDepthResolveFilter : ulong
 
 public extern objc class MTLRenderPassDepthAttachmentDescriptor : MTLRenderPassAttachmentDescriptor
 {
-    [Selector("clearDepth", "setClearDepth:")] public double ClearDepth { get; set; }
-    [Selector("depthResolveFilter", "setDepthResolveFilter:")] public MTLMultisampleDepthResolveFilter DepthResolveFilter { get; set; }
+    [Selector("clearDepth", "setClearDepth:")]
+    public double ClearDepth { get; set; }
+    [Selector("depthResolveFilter", "setDepthResolveFilter:")]
+    public MTLMultisampleDepthResolveFilter DepthResolveFilter { get; set; }
 }
 
 public enum MTLMultisampleStencilResolveFilter : ulong
@@ -111,54 +125,84 @@ public enum MTLMultisampleStencilResolveFilter : ulong
 
 public extern objc class MTLRenderPassStencilAttachmentDescriptor : MTLRenderPassAttachmentDescriptor
 {
-    [Selector("clearStencil", "setClearStencil:")] public uint ClearStencil { get; set; }
-    [Selector("stencilResolveFilter", "setStencilResolveFilter:")] public MTLMultisampleStencilResolveFilter StencilResolveFilter { get; set; }
+    [Selector("clearStencil", "setClearStencil:")]
+    public uint ClearStencil { get; set; }
+    [Selector("stencilResolveFilter", "setStencilResolveFilter:")]
+    public MTLMultisampleStencilResolveFilter StencilResolveFilter { get; set; }
 }
 
 public extern objc class MTLRenderPassColorAttachmentDescriptorArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public MTLRenderPassColorAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTLRenderPassColorAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
+    [Selector("objectAtIndexedSubscript:")]
+    public MTLRenderPassColorAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTLRenderPassColorAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
 }
 
 public extern objc class MTLRenderPassSampleBufferAttachmentDescriptor : NSObject, NSCopying
 {
-    [Selector("sampleBuffer", "setSampleBuffer:")] public MTLCounterSampleBuffer? SampleBuffer { get; set; }
-    [Selector("startOfVertexSampleIndex", "setStartOfVertexSampleIndex:")] public NSUInteger StartOfVertexSampleIndex { get; set; }
-    [Selector("endOfVertexSampleIndex", "setEndOfVertexSampleIndex:")] public NSUInteger EndOfVertexSampleIndex { get; set; }
-    [Selector("startOfFragmentSampleIndex", "setStartOfFragmentSampleIndex:")] public NSUInteger StartOfFragmentSampleIndex { get; set; }
-    [Selector("endOfFragmentSampleIndex", "setEndOfFragmentSampleIndex:")] public NSUInteger EndOfFragmentSampleIndex { get; set; }
+    [Selector("sampleBuffer", "setSampleBuffer:")]
+    public MTLCounterSampleBuffer? SampleBuffer { get; set; }
+    [Selector("startOfVertexSampleIndex", "setStartOfVertexSampleIndex:")]
+    public NSUInteger StartOfVertexSampleIndex { get; set; }
+    [Selector("endOfVertexSampleIndex", "setEndOfVertexSampleIndex:")]
+    public NSUInteger EndOfVertexSampleIndex { get; set; }
+    [Selector("startOfFragmentSampleIndex", "setStartOfFragmentSampleIndex:")]
+    public NSUInteger StartOfFragmentSampleIndex { get; set; }
+    [Selector("endOfFragmentSampleIndex", "setEndOfFragmentSampleIndex:")]
+    public NSUInteger EndOfFragmentSampleIndex { get; set; }
 }
 
 public extern objc class MTLRenderPassSampleBufferAttachmentDescriptorArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public MTLRenderPassSampleBufferAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTLRenderPassSampleBufferAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
+    [Selector("objectAtIndexedSubscript:")]
+    public MTLRenderPassSampleBufferAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTLRenderPassSampleBufferAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
 }
 
 public extern objc class MTLRenderPassDescriptor : NSObject, NSCopying
 {
-    [Selector("colorAttachments")] public MTLRenderPassColorAttachmentDescriptorArray ColorAttachments { get; }
-    [Selector("depthAttachment", "setDepthAttachment:")] public MTLRenderPassDepthAttachmentDescriptor? DepthAttachment { get; set; }
-    [Selector("stencilAttachment", "setStencilAttachment:")] public MTLRenderPassStencilAttachmentDescriptor? StencilAttachment { get; set; }
-    [Selector("visibilityResultBuffer", "setVisibilityResultBuffer:")] public MTLBuffer? VisibilityResultBuffer { get; set; }
-    [Selector("renderTargetArrayLength", "setRenderTargetArrayLength:")] public NSUInteger RenderTargetArrayLength { get; set; }
-    [Selector("imageblockSampleLength", "setImageblockSampleLength:")] public NSUInteger ImageblockSampleLength { get; set; }
-    [Selector("threadgroupMemoryLength", "setThreadgroupMemoryLength:")] public NSUInteger ThreadgroupMemoryLength { get; set; }
-    [Selector("tileWidth", "setTileWidth:")] public NSUInteger TileWidth { get; set; }
-    [Selector("tileHeight", "setTileHeight:")] public NSUInteger TileHeight { get; set; }
-    [Selector("defaultRasterSampleCount", "setDefaultRasterSampleCount:")] public NSUInteger DefaultRasterSampleCount { get; set; }
-    [Selector("renderTargetWidth", "setRenderTargetWidth:")] public NSUInteger RenderTargetWidth { get; set; }
-    [Selector("renderTargetHeight", "setRenderTargetHeight:")] public NSUInteger RenderTargetHeight { get; set; }
-    [Selector("rasterizationRateMap", "setRasterizationRateMap:")] public MTLRasterizationRateMap? RasterizationRateMap { get; set; }
-    [Selector("sampleBufferAttachments")] public MTLRenderPassSampleBufferAttachmentDescriptorArray SampleBufferAttachments { get; }
+    [Selector("colorAttachments")]
+    public MTLRenderPassColorAttachmentDescriptorArray ColorAttachments { get; }
+    [Selector("depthAttachment", "setDepthAttachment:")]
+    public MTLRenderPassDepthAttachmentDescriptor? DepthAttachment { get; set; }
+    [Selector("stencilAttachment", "setStencilAttachment:")]
+    public MTLRenderPassStencilAttachmentDescriptor? StencilAttachment { get; set; }
+    [Selector("visibilityResultBuffer", "setVisibilityResultBuffer:")]
+    public MTLBuffer? VisibilityResultBuffer { get; set; }
+    [Selector("renderTargetArrayLength", "setRenderTargetArrayLength:")]
+    public NSUInteger RenderTargetArrayLength { get; set; }
+    [Selector("imageblockSampleLength", "setImageblockSampleLength:")]
+    public NSUInteger ImageblockSampleLength { get; set; }
+    [Selector("threadgroupMemoryLength", "setThreadgroupMemoryLength:")]
+    public NSUInteger ThreadgroupMemoryLength { get; set; }
+    [Selector("tileWidth", "setTileWidth:")]
+    public NSUInteger TileWidth { get; set; }
+    [Selector("tileHeight", "setTileHeight:")]
+    public NSUInteger TileHeight { get; set; }
+    [Selector("defaultRasterSampleCount", "setDefaultRasterSampleCount:")]
+    public NSUInteger DefaultRasterSampleCount { get; set; }
+    [Selector("renderTargetWidth", "setRenderTargetWidth:")]
+    public NSUInteger RenderTargetWidth { get; set; }
+    [Selector("renderTargetHeight", "setRenderTargetHeight:")]
+    public NSUInteger RenderTargetHeight { get; set; }
+    [Selector("rasterizationRateMap", "setRasterizationRateMap:")]
+    public MTLRasterizationRateMap? RasterizationRateMap { get; set; }
+    [Selector("sampleBufferAttachments")]
+    public MTLRenderPassSampleBufferAttachmentDescriptorArray SampleBufferAttachments { get; }
     /// macOS 26.0 and later.
-    [Selector("visibilityResultType", "setVisibilityResultType:")] public MTLVisibilityResultType VisibilityResultType { get; set; }
+    [Selector("visibilityResultType", "setVisibilityResultType:")]
+    public MTLVisibilityResultType VisibilityResultType { get; set; }
     /// macOS 26.0 and later.
-    [Selector("supportColorAttachmentMapping", "setSupportColorAttachmentMapping:")] public bool SupportColorAttachmentMapping { get; set; }
-    [Selector("renderPassDescriptor")] public static MTLRenderPassDescriptor RenderPassDescriptor();
-    [Selector("setSamplePositions:count:")] public void SetSamplePositionsCount(MTLSamplePosition* positions, NSUInteger count);
-    [Selector("getSamplePositions:count:")] public NSUInteger GetSamplePositionsCount(MTLSamplePosition* positions, NSUInteger count);
+    [Selector("supportColorAttachmentMapping", "setSupportColorAttachmentMapping:")]
+    public bool SupportColorAttachmentMapping { get; set; }
+    [Selector("renderPassDescriptor")]
+    public static MTLRenderPassDescriptor RenderPassDescriptor();
+    [Selector("setSamplePositions:count:")]
+    public void SetSamplePositionsCount(MTLSamplePosition* positions, NSUInteger count);
+    [Selector("getSamplePositions:count:")]
+    public NSUInteger GetSamplePositionsCount(MTLSamplePosition* positions, NSUInteger count);
 }
 
 #endif

@@ -37,115 +37,154 @@ public extern objc class AXMathExpression : NSObject { }
 /// macOS 15.2 and later.
 public extern objc class AXMathExpressionNumber : AXMathExpression
 {
-    [Selector("content")] public NSString Content { get; }
-    [Selector("initWithContent:")] public Self InitWithContent(NSString content);
+    [Selector("content")]
+    public NSString Content { get; }
+    [Selector("initWithContent:")]
+    public Self InitWithContent(NSString content);
 }
 
 /// macOS 15.2 and later.
 public extern objc class AXMathExpressionIdentifier : AXMathExpression
 {
-    [Selector("content")] public NSString Content { get; }
-    [Selector("initWithContent:")] public Self InitWithContent(NSString content);
+    [Selector("content")]
+    public NSString Content { get; }
+    [Selector("initWithContent:")]
+    public Self InitWithContent(NSString content);
 }
 
 /// macOS 15.2 and later.
 public extern objc class AXMathExpressionOperator : AXMathExpression
 {
-    [Selector("content")] public NSString Content { get; }
-    [Selector("initWithContent:")] public Self InitWithContent(NSString content);
+    [Selector("content")]
+    public NSString Content { get; }
+    [Selector("initWithContent:")]
+    public Self InitWithContent(NSString content);
 }
 
 /// macOS 15.2 and later.
 public extern objc class AXMathExpressionText : AXMathExpression
 {
-    [Selector("content")] public NSString Content { get; }
-    [Selector("initWithContent:")] public Self InitWithContent(NSString content);
+    [Selector("content")]
+    public NSString Content { get; }
+    [Selector("initWithContent:")]
+    public Self InitWithContent(NSString content);
 }
 
 /// macOS 15.2 and later.
 public extern objc class AXMathExpressionFenced : AXMathExpression
 {
-    [Selector("expressions")] public NSArray Expressions { get; }
-    [Selector("openString")] public NSString OpenString { get; }
-    [Selector("closeString")] public NSString CloseString { get; }
-    [Selector("initWithExpressions:openString:closeString:")] public Self InitWithExpressionsOpenStringCloseString(NSArray expressions, NSString openString, NSString closeString);
+    [Selector("expressions")]
+    public NSArray Expressions { get; }
+    [Selector("openString")]
+    public NSString OpenString { get; }
+    [Selector("closeString")]
+    public NSString CloseString { get; }
+    [Selector("initWithExpressions:openString:closeString:")]
+    public Self InitWithExpressionsOpenStringCloseString(NSArray expressions, NSString openString, NSString closeString);
 }
 
 /// macOS 15.2 and later.
 public extern objc class AXMathExpressionRow : AXMathExpression
 {
-    [Selector("expressions")] public NSArray Expressions { get; }
-    [Selector("initWithExpressions:")] public Self InitWithExpressions(NSArray expressions);
+    [Selector("expressions")]
+    public NSArray Expressions { get; }
+    [Selector("initWithExpressions:")]
+    public Self InitWithExpressions(NSArray expressions);
 }
 
 /// macOS 15.2 and later.
 public extern objc class AXMathExpressionTable : AXMathExpression
 {
-    [Selector("expressions")] public NSArray Expressions { get; }
-    [Selector("initWithExpressions:")] public Self InitWithExpressions(NSArray expressions);
+    [Selector("expressions")]
+    public NSArray Expressions { get; }
+    [Selector("initWithExpressions:")]
+    public Self InitWithExpressions(NSArray expressions);
 }
 
 /// macOS 15.2 and later.
 public extern objc class AXMathExpressionTableRow : AXMathExpression
 {
-    [Selector("expressions")] public NSArray Expressions { get; }
-    [Selector("initWithExpressions:")] public Self InitWithExpressions(NSArray expressions);
+    [Selector("expressions")]
+    public NSArray Expressions { get; }
+    [Selector("initWithExpressions:")]
+    public Self InitWithExpressions(NSArray expressions);
 }
 
 /// macOS 15.2 and later.
 public extern objc class AXMathExpressionTableCell : AXMathExpression
 {
-    [Selector("expressions")] public NSArray Expressions { get; }
-    [Selector("initWithExpressions:")] public Self InitWithExpressions(NSArray expressions);
+    [Selector("expressions")]
+    public NSArray Expressions { get; }
+    [Selector("initWithExpressions:")]
+    public Self InitWithExpressions(NSArray expressions);
 }
 
 /// macOS 15.2 and later.
 public extern objc class AXMathExpressionUnderOver : AXMathExpression
 {
-    [Selector("baseExpression")] public AXMathExpression BaseExpression { get; }
-    [Selector("underExpression")] public AXMathExpression UnderExpression { get; }
-    [Selector("overExpression")] public AXMathExpression OverExpression { get; }
-    [Selector("initWithBaseExpression:underExpression:overExpression:")] public Self InitWithBaseExpressionUnderExpressionOverExpression(AXMathExpression baseExpression, AXMathExpression underExpression, AXMathExpression overExpression);
+    [Selector("baseExpression")]
+    public AXMathExpression BaseExpression { get; }
+    [Selector("underExpression")]
+    public AXMathExpression UnderExpression { get; }
+    [Selector("overExpression")]
+    public AXMathExpression OverExpression { get; }
+    [Selector("initWithBaseExpression:underExpression:overExpression:")]
+    public Self InitWithBaseExpressionUnderExpressionOverExpression(AXMathExpression baseExpression, AXMathExpression underExpression, AXMathExpression overExpression);
 }
 
 /// macOS 15.2 and later.
 public extern objc class AXMathExpressionSubSuperscript : AXMathExpression
 {
-    [Selector("baseExpression")] public AXMathExpression BaseExpression { get; }
-    [Selector("subscriptExpressions")] public NSArray SubscriptExpressions { get; }
-    [Selector("superscriptExpressions")] public NSArray SuperscriptExpressions { get; }
-    [Selector("initWithBaseExpression:subscriptExpressions:superscriptExpressions:")] public Self InitWithBaseExpressionSubscriptExpressionsSuperscriptExpressions(NSArray baseExpression, NSArray subscriptExpressions, NSArray superscriptExpressions);
+    [Selector("baseExpression")]
+    public AXMathExpression BaseExpression { get; }
+    [Selector("subscriptExpressions")]
+    public NSArray SubscriptExpressions { get; }
+    [Selector("superscriptExpressions")]
+    public NSArray SuperscriptExpressions { get; }
+    [Selector("initWithBaseExpression:subscriptExpressions:superscriptExpressions:")]
+    public Self InitWithBaseExpressionSubscriptExpressionsSuperscriptExpressions(NSArray baseExpression, NSArray subscriptExpressions, NSArray superscriptExpressions);
 }
 
 /// macOS 15.2 and later.
 public extern objc class AXMathExpressionFraction : AXMathExpression
 {
-    [Selector("numeratorExpression")] public AXMathExpression NumeratorExpression { get; }
-    [Selector("denimonatorExpression")] public AXMathExpression DenimonatorExpression { get; }
-    [Selector("initWithNumeratorExpression:denimonatorExpression:")] public Self InitWithNumeratorExpressionDenimonatorExpression(AXMathExpression numeratorExpression, AXMathExpression denimonatorExpression);
+    [Selector("numeratorExpression")]
+    public AXMathExpression NumeratorExpression { get; }
+    [Selector("denimonatorExpression")]
+    public AXMathExpression DenimonatorExpression { get; }
+    [Selector("initWithNumeratorExpression:denimonatorExpression:")]
+    public Self InitWithNumeratorExpressionDenimonatorExpression(AXMathExpression numeratorExpression, AXMathExpression denimonatorExpression);
 }
 
 /// macOS 15.2 and later.
 public extern objc class AXMathExpressionMultiscript : AXMathExpression
 {
-    [Selector("baseExpression")] public AXMathExpression BaseExpression { get; }
-    [Selector("prescriptExpressions")] public NSArray PrescriptExpressions { get; }
-    [Selector("postscriptExpressions")] public NSArray PostscriptExpressions { get; }
-    [Selector("initWithBaseExpression:prescriptExpressions:postscriptExpressions:")] public Self InitWithBaseExpressionPrescriptExpressionsPostscriptExpressions(AXMathExpression baseExpression, NSArray prescriptExpressions, NSArray postscriptExpressions);
+    [Selector("baseExpression")]
+    public AXMathExpression BaseExpression { get; }
+    [Selector("prescriptExpressions")]
+    public NSArray PrescriptExpressions { get; }
+    [Selector("postscriptExpressions")]
+    public NSArray PostscriptExpressions { get; }
+    [Selector("initWithBaseExpression:prescriptExpressions:postscriptExpressions:")]
+    public Self InitWithBaseExpressionPrescriptExpressionsPostscriptExpressions(AXMathExpression baseExpression, NSArray prescriptExpressions, NSArray postscriptExpressions);
 }
 
 /// macOS 15.2 and later.
 public extern objc class AXMathExpressionRoot : AXMathExpression
 {
-    [Selector("radicandExpressions")] public NSArray RadicandExpressions { get; }
-    [Selector("rootIndexExpression")] public AXMathExpression RootIndexExpression { get; }
-    [Selector("initWithRadicandExpressions:rootIndexExpression:")] public Self InitWithRadicandExpressionsRootIndexExpression(NSArray radicandExpressions, AXMathExpression rootIndexExpression);
+    [Selector("radicandExpressions")]
+    public NSArray RadicandExpressions { get; }
+    [Selector("rootIndexExpression")]
+    public AXMathExpression RootIndexExpression { get; }
+    [Selector("initWithRadicandExpressions:rootIndexExpression:")]
+    public Self InitWithRadicandExpressionsRootIndexExpression(NSArray radicandExpressions, AXMathExpression rootIndexExpression);
 }
 
 public objc interface AXMathExpressionProvider : NSObjectProtocol
 {
     /// macOS 15.2 and later.
-    [Selector("accessibilityMathExpression")] AXMathExpression? AccessibilityMathExpression();
+    [Selector("accessibilityMathExpression")]
+    AXMathExpression? AccessibilityMathExpression();
 }
 
 #endif

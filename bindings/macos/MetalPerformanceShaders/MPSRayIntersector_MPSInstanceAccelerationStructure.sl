@@ -41,15 +41,24 @@ public enum MPSTransformType : ulong
 /// Deprecated in macOS 14.0.
 public extern objc class MPSInstanceAccelerationStructure : MPSAccelerationStructure
 {
-    [Selector("accelerationStructures", "setAccelerationStructures:")] public NSArray? AccelerationStructures { get; set; }
-    [Selector("instanceBuffer", "setInstanceBuffer:")] public MTLBuffer? InstanceBuffer { get; set; }
-    [Selector("instanceBufferOffset", "setInstanceBufferOffset:")] public NSUInteger InstanceBufferOffset { get; set; }
-    [Selector("transformBuffer", "setTransformBuffer:")] public MTLBuffer? TransformBuffer { get; set; }
-    [Selector("transformBufferOffset", "setTransformBufferOffset:")] public NSUInteger TransformBufferOffset { get; set; }
-    [Selector("transformType", "setTransformType:")] public MPSTransformType TransformType { get; set; }
-    [Selector("maskBuffer", "setMaskBuffer:")] public MTLBuffer? MaskBuffer { get; set; }
-    [Selector("maskBufferOffset", "setMaskBufferOffset:")] public NSUInteger MaskBufferOffset { get; set; }
-    [Selector("instanceCount", "setInstanceCount:")] public NSUInteger InstanceCount { get; set; }
+    [Selector("accelerationStructures", "setAccelerationStructures:")]
+    public NSArray? AccelerationStructures { get; set; }
+    [Selector("instanceBuffer", "setInstanceBuffer:")]
+    public MTLBuffer? InstanceBuffer { get; set; }
+    [Selector("instanceBufferOffset", "setInstanceBufferOffset:")]
+    public NSUInteger InstanceBufferOffset { get; set; }
+    [Selector("transformBuffer", "setTransformBuffer:")]
+    public MTLBuffer? TransformBuffer { get; set; }
+    [Selector("transformBufferOffset", "setTransformBufferOffset:")]
+    public NSUInteger TransformBufferOffset { get; set; }
+    [Selector("transformType", "setTransformType:")]
+    public MPSTransformType TransformType { get; set; }
+    [Selector("maskBuffer", "setMaskBuffer:")]
+    public MTLBuffer? MaskBuffer { get; set; }
+    [Selector("maskBufferOffset", "setMaskBufferOffset:")]
+    public NSUInteger MaskBufferOffset { get; set; }
+    [Selector("instanceCount", "setInstanceCount:")]
+    public NSUInteger InstanceCount { get; set; }
 }
 
 #endif

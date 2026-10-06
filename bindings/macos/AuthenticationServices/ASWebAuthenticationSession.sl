@@ -44,20 +44,29 @@ public objc closure void ASWebAuthenticationSessionCompletionHandler(NSURL? arg0
 
 public extern objc class ASWebAuthenticationSession : NSObject
 {
-    [Selector("presentationContextProvider", "setPresentationContextProvider:")] public ASWebAuthenticationPresentationContextProviding? PresentationContextProvider { get; set; }
-    [Selector("prefersEphemeralWebBrowserSession", "setPrefersEphemeralWebBrowserSession:")] public bool PrefersEphemeralWebBrowserSession { get; set; }
-    [Selector("additionalHeaderFields", "setAdditionalHeaderFields:")] public NSDictionary? AdditionalHeaderFields { get; set; }
-    [Selector("canStart")] public bool CanStart { get; }
+    [Selector("presentationContextProvider", "setPresentationContextProvider:")]
+    public ASWebAuthenticationPresentationContextProviding? PresentationContextProvider { get; set; }
+    [Selector("prefersEphemeralWebBrowserSession", "setPrefersEphemeralWebBrowserSession:")]
+    public bool PrefersEphemeralWebBrowserSession { get; set; }
+    [Selector("additionalHeaderFields", "setAdditionalHeaderFields:")]
+    public NSDictionary? AdditionalHeaderFields { get; set; }
+    [Selector("canStart")]
+    public bool CanStart { get; }
     /// Deprecated in macOS 100000.
-    [Selector("initWithURL:callbackURLScheme:completionHandler:")] public Self InitWithURLCallbackURLSchemeCompletionHandler(NSURL URL, NSString? callbackURLScheme, ASWebAuthenticationSessionCompletionHandler completionHandler);
-    [Selector("initWithURL:callback:completionHandler:")] public Self InitWithURLCallbackCompletionHandler(NSURL URL, ASWebAuthenticationSessionCallback callback, ASWebAuthenticationSessionCompletionHandler completionHandler);
-    [Selector("start")] public bool Start();
-    [Selector("cancel")] public void Cancel();
+    [Selector("initWithURL:callbackURLScheme:completionHandler:")]
+    public Self InitWithURLCallbackURLSchemeCompletionHandler(NSURL URL, NSString? callbackURLScheme, ASWebAuthenticationSessionCompletionHandler completionHandler);
+    [Selector("initWithURL:callback:completionHandler:")]
+    public Self InitWithURLCallbackCompletionHandler(NSURL URL, ASWebAuthenticationSessionCallback callback, ASWebAuthenticationSessionCompletionHandler completionHandler);
+    [Selector("start")]
+    public bool Start();
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 public objc interface ASWebAuthenticationPresentationContextProviding : NSObjectProtocol
 {
-    [Selector("presentationAnchorForWebAuthenticationSession:")] ASPresentationAnchor PresentationAnchorForWebAuthenticationSession(ASWebAuthenticationSession session);
+    [Selector("presentationAnchorForWebAuthenticationSession:")]
+    ASPresentationAnchor PresentationAnchorForWebAuthenticationSession(ASWebAuthenticationSession session);
 }
 
 #endif

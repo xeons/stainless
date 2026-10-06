@@ -42,7 +42,8 @@ public enum PKPaymentPassActivationState : ulong
 public extern objc class PKPaymentPass : PKSecureElementPass
 {
     /// Deprecated in macOS 100000.
-    [Selector("activationState")] public PKPaymentPassActivationState ActivationState { get; }
+    [Selector("activationState")]
+    public PKPaymentPassActivationState ActivationState { get; }
 }
 
 #endif

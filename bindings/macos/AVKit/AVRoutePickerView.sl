@@ -42,17 +42,26 @@ public enum AVRoutePickerViewButtonState : long
 
 public extern objc class AVRoutePickerView : NSView
 {
-    [Selector("delegate", "setDelegate:")] public AVRoutePickerViewDelegate? Delegate { get; set; }
-    [Selector("player", "setPlayer:")] public AVPlayer? Player { get; set; }
-    [Selector("isRoutePickerButtonBordered", "setRoutePickerButtonBordered:")] public bool RoutePickerButtonBordered { get; set; }
-    [Selector("routePickerButtonColorForState:")] public NSColor RoutePickerButtonColorForState(AVRoutePickerViewButtonState state);
-    [Selector("setRoutePickerButtonColor:forState:")] public void SetRoutePickerButtonColorForState(NSColor? color, AVRoutePickerViewButtonState state);
+    [Selector("delegate", "setDelegate:")]
+    public AVRoutePickerViewDelegate? Delegate { get; set; }
+    [Selector("player", "setPlayer:")]
+    public AVPlayer? Player { get; set; }
+    [Selector("isRoutePickerButtonBordered", "setRoutePickerButtonBordered:")]
+    public bool RoutePickerButtonBordered { get; set; }
+    [Selector("routePickerButtonColorForState:")]
+    public NSColor RoutePickerButtonColorForState(AVRoutePickerViewButtonState state);
+    [Selector("setRoutePickerButtonColor:forState:")]
+    public void SetRoutePickerButtonColorForState(NSColor? color, AVRoutePickerViewButtonState state);
 }
 
 public objc interface AVRoutePickerViewDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("routePickerViewWillBeginPresentingRoutes:")] void RoutePickerViewWillBeginPresentingRoutes(AVRoutePickerView routePickerView);
-    [Optional] [Selector("routePickerViewDidEndPresentingRoutes:")] void RoutePickerViewDidEndPresentingRoutes(AVRoutePickerView routePickerView);
+    [Optional]
+    [Selector("routePickerViewWillBeginPresentingRoutes:")]
+    void RoutePickerViewWillBeginPresentingRoutes(AVRoutePickerView routePickerView);
+    [Optional]
+    [Selector("routePickerViewDidEndPresentingRoutes:")]
+    void RoutePickerViewDidEndPresentingRoutes(AVRoutePickerView routePickerView);
 }
 
 #endif

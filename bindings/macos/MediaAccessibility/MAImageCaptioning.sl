@@ -30,10 +30,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MediaAccessibility")
 
-[ReturnsRetained] public extern "C" CFStringRef? MAImageCaptioningCopyCaption(CFURLRef url, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFStringRef? MAImageCaptioningCopyCaption(CFURLRef url, __CFError** error);
 
 public extern "C" bool MAImageCaptioningSetCaption(CFURLRef url, CFStringRef? string, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFStringRef MAImageCaptioningCopyMetadataTagPath();
+[ReturnsRetained]
+public extern "C" CFStringRef MAImageCaptioningCopyMetadataTagPath();
 
 #endif

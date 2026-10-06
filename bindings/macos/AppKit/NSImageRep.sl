@@ -46,48 +46,84 @@ public enum NSImageLayoutDirection : long
 
 public extern objc class NSImageRep : NSObject, NSCopying, NSCoding
 {
-    [Selector("size", "setSize:")] public NSSize Size { get; set; }
-    [Selector("hasAlpha", "setAlpha:")] public bool Alpha { get; set; }
-    [Selector("isOpaque", "setOpaque:")] public bool Opaque { get; set; }
-    [Selector("colorSpaceName", "setColorSpaceName:")] public NSColorSpaceName ColorSpaceName { get; set; }
-    [Selector("bitsPerSample", "setBitsPerSample:")] public NSInteger BitsPerSample { get; set; }
-    [Selector("pixelsWide", "setPixelsWide:")] public NSInteger PixelsWide { get; set; }
-    [Selector("pixelsHigh", "setPixelsHigh:")] public NSInteger PixelsHigh { get; set; }
-    [Selector("layoutDirection", "setLayoutDirection:")] public NSImageLayoutDirection LayoutDirection { get; set; }
-    [Selector("registeredImageRepClasses")] public static NSArray RegisteredImageRepClasses { get; }
-    [Selector("imageUnfilteredTypes")] public static NSArray? ImageUnfilteredTypes { get; }
-    [Selector("imageTypes")] public static NSArray? ImageTypes { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("draw")] public bool Draw();
-    [Selector("drawAtPoint:")] public bool DrawAtPoint(NSPoint point);
-    [Selector("drawInRect:")] public bool DrawInRect(NSRect rect);
-    [Selector("drawInRect:fromRect:operation:fraction:respectFlipped:hints:")] public bool DrawInRectFromRectOperationFractionRespectFlippedHints(NSRect dstSpacePortionRect, NSRect srcSpacePortionRect, NSCompositingOperation op, CGFloat requestedAlpha, bool respectContextIsFlipped, NSDictionary? hints);
-    [Selector("registerImageRepClass:")] public static void RegisterImageRepClass(Class imageRepClass);
-    [Selector("unregisterImageRepClass:")] public static void UnregisterImageRepClass(Class imageRepClass);
+    [Selector("size", "setSize:")]
+    public NSSize Size { get; set; }
+    [Selector("hasAlpha", "setAlpha:")]
+    public bool Alpha { get; set; }
+    [Selector("isOpaque", "setOpaque:")]
+    public bool Opaque { get; set; }
+    [Selector("colorSpaceName", "setColorSpaceName:")]
+    public NSColorSpaceName ColorSpaceName { get; set; }
+    [Selector("bitsPerSample", "setBitsPerSample:")]
+    public NSInteger BitsPerSample { get; set; }
+    [Selector("pixelsWide", "setPixelsWide:")]
+    public NSInteger PixelsWide { get; set; }
+    [Selector("pixelsHigh", "setPixelsHigh:")]
+    public NSInteger PixelsHigh { get; set; }
+    [Selector("layoutDirection", "setLayoutDirection:")]
+    public NSImageLayoutDirection LayoutDirection { get; set; }
+    [Selector("registeredImageRepClasses")]
+    public static NSArray RegisteredImageRepClasses { get; }
+    [Selector("imageUnfilteredTypes")]
+    public static NSArray? ImageUnfilteredTypes { get; }
+    [Selector("imageTypes")]
+    public static NSArray? ImageTypes { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("draw")]
+    public bool Draw();
+    [Selector("drawAtPoint:")]
+    public bool DrawAtPoint(NSPoint point);
+    [Selector("drawInRect:")]
+    public bool DrawInRect(NSRect rect);
+    [Selector("drawInRect:fromRect:operation:fraction:respectFlipped:hints:")]
+    public bool DrawInRectFromRectOperationFractionRespectFlippedHints(NSRect dstSpacePortionRect, NSRect srcSpacePortionRect, NSCompositingOperation op, CGFloat requestedAlpha, bool respectContextIsFlipped, NSDictionary? hints);
+    [Selector("registerImageRepClass:")]
+    public static void RegisterImageRepClass(Class imageRepClass);
+    [Selector("unregisterImageRepClass:")]
+    public static void UnregisterImageRepClass(Class imageRepClass);
     /// Deprecated in macOS 10.10.
-    [Selector("imageRepClassForFileType:")] public static Class ImageRepClassForFileType(NSString type);
+    [Selector("imageRepClassForFileType:")]
+    public static Class ImageRepClassForFileType(NSString type);
     /// Deprecated in macOS 10.10.
-    [Selector("imageRepClassForPasteboardType:")] public static Class ImageRepClassForPasteboardType(NSPasteboardType type);
-    [Selector("imageRepClassForType:")] public static Class ImageRepClassForType(NSString type);
-    [Selector("imageRepClassForData:")] public static Class ImageRepClassForData(NSData data);
-    [Selector("canInitWithData:")] public static bool CanInitWithData(NSData data);
+    [Selector("imageRepClassForPasteboardType:")]
+    public static Class ImageRepClassForPasteboardType(NSPasteboardType type);
+    [Selector("imageRepClassForType:")]
+    public static Class ImageRepClassForType(NSString type);
+    [Selector("imageRepClassForData:")]
+    public static Class ImageRepClassForData(NSData data);
+    [Selector("canInitWithData:")]
+    public static bool CanInitWithData(NSData data);
     /// Deprecated in macOS 10.10.
-    [Selector("imageUnfilteredFileTypes")] public static NSArray ImageUnfilteredFileTypes();
+    [Selector("imageUnfilteredFileTypes")]
+    public static NSArray ImageUnfilteredFileTypes();
     /// Deprecated in macOS 10.10.
-    [Selector("imageUnfilteredPasteboardTypes")] public static NSArray ImageUnfilteredPasteboardTypes();
+    [Selector("imageUnfilteredPasteboardTypes")]
+    public static NSArray ImageUnfilteredPasteboardTypes();
     /// Deprecated in macOS 10.10.
-    [Selector("imageFileTypes")] public static NSArray ImageFileTypes();
+    [Selector("imageFileTypes")]
+    public static NSArray ImageFileTypes();
     /// Deprecated in macOS 10.10.
-    [Selector("imagePasteboardTypes")] public static NSArray ImagePasteboardTypes();
-    [Selector("canInitWithPasteboard:")] public static bool CanInitWithPasteboard(NSPasteboard pasteboard);
-    [Selector("imageRepsWithContentsOfFile:")] public static NSArray? ImageRepsWithContentsOfFile(NSString filename);
-    [Selector("imageRepWithContentsOfFile:")] public static NSImageRep? ImageRepWithContentsOfFile(NSString filename);
-    [Selector("imageRepsWithContentsOfURL:")] public static NSArray? ImageRepsWithContentsOfURL(NSURL url);
-    [Selector("imageRepWithContentsOfURL:")] public static NSImageRep? ImageRepWithContentsOfURL(NSURL url);
-    [Selector("imageRepsWithPasteboard:")] public static NSArray? ImageRepsWithPasteboard(NSPasteboard pasteboard);
-    [Selector("imageRepWithPasteboard:")] public static NSImageRep? ImageRepWithPasteboard(NSPasteboard pasteboard);
-    [Selector("CGImageForProposedRect:context:hints:")] public CGImageRef? CGImageForProposedRectContextHints(NSRect* proposedDestRect, NSGraphicsContext? context, NSDictionary? hints);
+    [Selector("imagePasteboardTypes")]
+    public static NSArray ImagePasteboardTypes();
+    [Selector("canInitWithPasteboard:")]
+    public static bool CanInitWithPasteboard(NSPasteboard pasteboard);
+    [Selector("imageRepsWithContentsOfFile:")]
+    public static NSArray? ImageRepsWithContentsOfFile(NSString filename);
+    [Selector("imageRepWithContentsOfFile:")]
+    public static NSImageRep? ImageRepWithContentsOfFile(NSString filename);
+    [Selector("imageRepsWithContentsOfURL:")]
+    public static NSArray? ImageRepsWithContentsOfURL(NSURL url);
+    [Selector("imageRepWithContentsOfURL:")]
+    public static NSImageRep? ImageRepWithContentsOfURL(NSURL url);
+    [Selector("imageRepsWithPasteboard:")]
+    public static NSArray? ImageRepsWithPasteboard(NSPasteboard pasteboard);
+    [Selector("imageRepWithPasteboard:")]
+    public static NSImageRep? ImageRepWithPasteboard(NSPasteboard pasteboard);
+    [Selector("CGImageForProposedRect:context:hints:")]
+    public CGImageRef? CGImageForProposedRectContextHints(NSRect* proposedDestRect, NSGraphicsContext? context, NSDictionary? hints);
 }
 
 public extern "C" NSNotificationName NSImageRepRegistryDidChangeNotification;

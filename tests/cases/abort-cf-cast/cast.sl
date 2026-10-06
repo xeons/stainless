@@ -15,7 +15,8 @@ public extern objc class CFStringRef : CFTypeRef { }
 [CFType("CFNumberGetTypeID")]
 public extern objc class CFNumberRef : CFTypeRef { }
 
-[ReturnsRetained] extern "C" CFStringRef CFStringCreateWithCString(void* allocator, byte* text, uint encoding);
+[ReturnsRetained]
+extern "C" CFStringRef CFStringCreateWithCString(void* allocator, byte* text, uint encoding);
 
 int Main()
 {

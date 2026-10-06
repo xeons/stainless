@@ -43,23 +43,40 @@ public objc closure void MTLIOCommandBufferHandler(MTLIOCommandBuffer arg0);
 
 public objc interface MTLIOCommandBuffer : NSObjectProtocol
 {
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("status")] MTLIOStatus Status { get; }
-    [Selector("error")] NSError? Error { get; }
-    [Selector("addCompletedHandler:")] void AddCompletedHandler(MTLIOCommandBufferHandler block);
-    [Selector("loadBytes:size:sourceHandle:sourceHandleOffset:")] void LoadBytesSizeSourceHandleSourceHandleOffset(void* pointer, NSUInteger size, MTLIOFileHandle sourceHandle, NSUInteger sourceHandleOffset);
-    [Selector("loadBuffer:offset:size:sourceHandle:sourceHandleOffset:")] void LoadBufferOffsetSizeSourceHandleSourceHandleOffset(MTLBuffer buffer, NSUInteger offset, NSUInteger size, MTLIOFileHandle sourceHandle, NSUInteger sourceHandleOffset);
-    [Selector("loadTexture:slice:level:size:sourceBytesPerRow:sourceBytesPerImage:destinationOrigin:sourceHandle:sourceHandleOffset:")] void LoadTextureSliceLevelSizeSourceBytesPerRowSourceBytesPerImageDestinationOriginSourceHandleSourceHandleOffset(MTLTexture texture, NSUInteger slice, NSUInteger level, MTLSize size, NSUInteger sourceBytesPerRow, NSUInteger sourceBytesPerImage, MTLOrigin destinationOrigin, MTLIOFileHandle sourceHandle, NSUInteger sourceHandleOffset);
-    [Selector("copyStatusToBuffer:offset:")] void CopyStatusToBufferOffset(MTLBuffer buffer, NSUInteger offset);
-    [Selector("commit")] void Commit();
-    [Selector("waitUntilCompleted")] void WaitUntilCompleted();
-    [Selector("tryCancel")] void TryCancel();
-    [Selector("addBarrier")] void AddBarrier();
-    [Selector("pushDebugGroup:")] void PushDebugGroup(NSString string);
-    [Selector("popDebugGroup")] void PopDebugGroup();
-    [Selector("enqueue")] void Enqueue();
-    [Selector("waitForEvent:value:")] void WaitForEventValue(MTLSharedEvent event, ulong value);
-    [Selector("signalEvent:value:")] void SignalEventValue(MTLSharedEvent event, ulong value);
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("status")]
+    MTLIOStatus Status { get; }
+    [Selector("error")]
+    NSError? Error { get; }
+    [Selector("addCompletedHandler:")]
+    void AddCompletedHandler(MTLIOCommandBufferHandler block);
+    [Selector("loadBytes:size:sourceHandle:sourceHandleOffset:")]
+    void LoadBytesSizeSourceHandleSourceHandleOffset(void* pointer, NSUInteger size, MTLIOFileHandle sourceHandle, NSUInteger sourceHandleOffset);
+    [Selector("loadBuffer:offset:size:sourceHandle:sourceHandleOffset:")]
+    void LoadBufferOffsetSizeSourceHandleSourceHandleOffset(MTLBuffer buffer, NSUInteger offset, NSUInteger size, MTLIOFileHandle sourceHandle, NSUInteger sourceHandleOffset);
+    [Selector("loadTexture:slice:level:size:sourceBytesPerRow:sourceBytesPerImage:destinationOrigin:sourceHandle:sourceHandleOffset:")]
+    void LoadTextureSliceLevelSizeSourceBytesPerRowSourceBytesPerImageDestinationOriginSourceHandleSourceHandleOffset(MTLTexture texture, NSUInteger slice, NSUInteger level, MTLSize size, NSUInteger sourceBytesPerRow, NSUInteger sourceBytesPerImage, MTLOrigin destinationOrigin, MTLIOFileHandle sourceHandle, NSUInteger sourceHandleOffset);
+    [Selector("copyStatusToBuffer:offset:")]
+    void CopyStatusToBufferOffset(MTLBuffer buffer, NSUInteger offset);
+    [Selector("commit")]
+    void Commit();
+    [Selector("waitUntilCompleted")]
+    void WaitUntilCompleted();
+    [Selector("tryCancel")]
+    void TryCancel();
+    [Selector("addBarrier")]
+    void AddBarrier();
+    [Selector("pushDebugGroup:")]
+    void PushDebugGroup(NSString string);
+    [Selector("popDebugGroup")]
+    void PopDebugGroup();
+    [Selector("enqueue")]
+    void Enqueue();
+    [Selector("waitForEvent:value:")]
+    void WaitForEventValue(MTLSharedEvent event, ulong value);
+    [Selector("signalEvent:value:")]
+    void SignalEventValue(MTLSharedEvent event, ulong value);
 }
 
 #endif

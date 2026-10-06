@@ -37,17 +37,28 @@ public extern "C" NSString? AVMovieReferenceRestrictionsKey;
 
 public extern objc class AVMovie : AVAsset, NSCopying, NSMutableCopying
 {
-    [Selector("URL")] public NSURL? URL { get; }
-    [Selector("data")] public NSData? Data { get; }
-    [Selector("defaultMediaDataStorage")] public AVMediaDataStorage? DefaultMediaDataStorage { get; }
-    [Selector("tracks")] public NSArray Tracks { get; }
-    [Selector("canContainMovieFragments")] public bool CanContainMovieFragments { get; }
-    [Selector("containsMovieFragments")] public bool ContainsMovieFragments { get; }
-    [Selector("movieTypes")] public static NSArray MovieTypes();
-    [Selector("movieWithURL:options:")] public static Self MovieWithURLOptions(NSURL URL, NSDictionary? options);
-    [Selector("initWithURL:options:")] public Self InitWithURLOptions(NSURL URL, NSDictionary? options);
-    [Selector("movieWithData:options:")] public static Self MovieWithDataOptions(NSData data, NSDictionary? options);
-    [Selector("initWithData:options:")] public Self InitWithDataOptions(NSData data, NSDictionary? options);
+    [Selector("URL")]
+    public NSURL? URL { get; }
+    [Selector("data")]
+    public NSData? Data { get; }
+    [Selector("defaultMediaDataStorage")]
+    public AVMediaDataStorage? DefaultMediaDataStorage { get; }
+    [Selector("tracks")]
+    public NSArray Tracks { get; }
+    [Selector("canContainMovieFragments")]
+    public bool CanContainMovieFragments { get; }
+    [Selector("containsMovieFragments")]
+    public bool ContainsMovieFragments { get; }
+    [Selector("movieTypes")]
+    public static NSArray MovieTypes();
+    [Selector("movieWithURL:options:")]
+    public static Self MovieWithURLOptions(NSURL URL, NSDictionary? options);
+    [Selector("initWithURL:options:")]
+    public Self InitWithURLOptions(NSURL URL, NSDictionary? options);
+    [Selector("movieWithData:options:")]
+    public static Self MovieWithDataOptions(NSData data, NSDictionary? options);
+    [Selector("initWithData:options:")]
+    public Self InitWithDataOptions(NSData data, NSDictionary? options);
 }
 
 public extern "C" NSString? AVMovieShouldSupportAliasDataReferencesKey;
@@ -62,9 +73,12 @@ public enum AVMovieWritingOptions : ulong
 /// AVMovieMovieHeaderSupport, a category of AVMovie.
 public extern objc class AVMovie
 {
-    [Selector("movieHeaderWithFileType:error:")] public NSData? MovieHeaderWithFileTypeError(AVFileType fileType, out NSError? outError);
-    [Selector("writeMovieHeaderToURL:fileType:options:error:")] public bool WriteMovieHeaderToURLFileTypeOptionsError(NSURL URL, AVFileType fileType, AVMovieWritingOptions options, out NSError? outError);
-    [Selector("isCompatibleWithFileType:")] public bool IsCompatibleWithFileType(AVFileType fileType);
+    [Selector("movieHeaderWithFileType:error:")]
+    public NSData? MovieHeaderWithFileTypeError(AVFileType fileType, out NSError? outError);
+    [Selector("writeMovieHeaderToURL:fileType:options:error:")]
+    public bool WriteMovieHeaderToURLFileTypeOptionsError(NSURL URL, AVFileType fileType, AVMovieWritingOptions options, out NSError? outError);
+    [Selector("isCompatibleWithFileType:")]
+    public bool IsCompatibleWithFileType(AVFileType fileType);
 }
 
 public objc closure void AVMovieLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock(AVMovieTrack? arg0, NSError? arg1);
@@ -77,56 +91,85 @@ public objc closure void AVMovieLoadTracksWithMediaCharacteristicCompletionHandl
 public extern objc class AVMovie
 {
     /// Deprecated in macOS 15.0.
-    [Selector("trackWithTrackID:")] public AVMovieTrack? TrackWithTrackID(CMPersistentTrackID trackID);
-    [Selector("loadTrackWithTrackID:completionHandler:")] public void LoadTrackWithTrackIDCompletionHandler(CMPersistentTrackID trackID, AVMovieLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("trackWithTrackID:")]
+    public AVMovieTrack? TrackWithTrackID(CMPersistentTrackID trackID);
+    [Selector("loadTrackWithTrackID:completionHandler:")]
+    public void LoadTrackWithTrackIDCompletionHandler(CMPersistentTrackID trackID, AVMovieLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("tracksWithMediaType:")] public NSArray TracksWithMediaType(AVMediaType mediaType);
-    [Selector("loadTracksWithMediaType:completionHandler:")] public void LoadTracksWithMediaTypeCompletionHandler(AVMediaType mediaType, AVMovieLoadTracksWithMediaTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tracksWithMediaType:")]
+    public NSArray TracksWithMediaType(AVMediaType mediaType);
+    [Selector("loadTracksWithMediaType:completionHandler:")]
+    public void LoadTracksWithMediaTypeCompletionHandler(AVMediaType mediaType, AVMovieLoadTracksWithMediaTypeCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("tracksWithMediaCharacteristic:")] public NSArray TracksWithMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
-    [Selector("loadTracksWithMediaCharacteristic:completionHandler:")] public void LoadTracksWithMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVMovieLoadTracksWithMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tracksWithMediaCharacteristic:")]
+    public NSArray TracksWithMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("loadTracksWithMediaCharacteristic:completionHandler:")]
+    public void LoadTracksWithMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVMovieLoadTracksWithMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public extern objc class AVMutableMovie : AVMovie
 {
-    [Selector("preferredRate", "setPreferredRate:")] public float PreferredRate { get; set; }
-    [Selector("preferredVolume", "setPreferredVolume:")] public float PreferredVolume { get; set; }
-    [Selector("preferredTransform", "setPreferredTransform:")] public CGAffineTransform PreferredTransform { get; set; }
-    [Selector("timescale", "setTimescale:")] public CMTimeScale Timescale { get; set; }
-    [Selector("tracks")] public NSArray Tracks { get; }
-    [Selector("movieWithURL:options:error:")] public static Self? MovieWithURLOptionsError(NSURL URL, NSDictionary? options, out NSError? outError);
-    [Selector("initWithURL:options:error:")] public Self? InitWithURLOptionsError(NSURL URL, NSDictionary? options, out NSError? outError);
-    [Selector("movieWithData:options:error:")] public static Self? MovieWithDataOptionsError(NSData data, NSDictionary? options, out NSError? outError);
-    [Selector("initWithData:options:error:")] public Self? InitWithDataOptionsError(NSData data, NSDictionary? options, out NSError? outError);
-    [Selector("movieWithSettingsFromMovie:options:error:")] public static Self? MovieWithSettingsFromMovieOptionsError(AVMovie? movie, NSDictionary? options, out NSError? outError);
-    [Selector("initWithSettingsFromMovie:options:error:")] public Self? InitWithSettingsFromMovieOptionsError(AVMovie? movie, NSDictionary? options, out NSError? outError);
+    [Selector("preferredRate", "setPreferredRate:")]
+    public float PreferredRate { get; set; }
+    [Selector("preferredVolume", "setPreferredVolume:")]
+    public float PreferredVolume { get; set; }
+    [Selector("preferredTransform", "setPreferredTransform:")]
+    public CGAffineTransform PreferredTransform { get; set; }
+    [Selector("timescale", "setTimescale:")]
+    public CMTimeScale Timescale { get; set; }
+    [Selector("tracks")]
+    public NSArray Tracks { get; }
+    [Selector("movieWithURL:options:error:")]
+    public static Self? MovieWithURLOptionsError(NSURL URL, NSDictionary? options, out NSError? outError);
+    [Selector("initWithURL:options:error:")]
+    public Self? InitWithURLOptionsError(NSURL URL, NSDictionary? options, out NSError? outError);
+    [Selector("movieWithData:options:error:")]
+    public static Self? MovieWithDataOptionsError(NSData data, NSDictionary? options, out NSError? outError);
+    [Selector("initWithData:options:error:")]
+    public Self? InitWithDataOptionsError(NSData data, NSDictionary? options, out NSError? outError);
+    [Selector("movieWithSettingsFromMovie:options:error:")]
+    public static Self? MovieWithSettingsFromMovieOptionsError(AVMovie? movie, NSDictionary? options, out NSError? outError);
+    [Selector("initWithSettingsFromMovie:options:error:")]
+    public Self? InitWithSettingsFromMovieOptionsError(AVMovie? movie, NSDictionary? options, out NSError? outError);
 }
 
 /// AVMutableMovieMovieLevelEditing, a category of AVMutableMovie.
 public extern objc class AVMutableMovie
 {
-    [Selector("isModified", "setModified:")] public bool Modified { get; set; }
-    [Selector("defaultMediaDataStorage", "setDefaultMediaDataStorage:")] public AVMediaDataStorage? DefaultMediaDataStorage { get; set; }
-    [Selector("interleavingPeriod", "setInterleavingPeriod:")] public CMTime InterleavingPeriod { get; set; }
-    [Selector("insertTimeRange:ofAsset:atTime:copySampleData:error:")] public bool InsertTimeRangeOfAssetAtTimeCopySampleDataError(CMTimeRange timeRange, AVAsset asset, CMTime startTime, bool copySampleData, out NSError? outError);
-    [Selector("insertEmptyTimeRange:")] public void InsertEmptyTimeRange(CMTimeRange timeRange);
-    [Selector("removeTimeRange:")] public void RemoveTimeRange(CMTimeRange timeRange);
-    [Selector("scaleTimeRange:toDuration:")] public void ScaleTimeRangeToDuration(CMTimeRange timeRange, CMTime duration);
+    [Selector("isModified", "setModified:")]
+    public bool Modified { get; set; }
+    [Selector("defaultMediaDataStorage", "setDefaultMediaDataStorage:")]
+    public AVMediaDataStorage? DefaultMediaDataStorage { get; set; }
+    [Selector("interleavingPeriod", "setInterleavingPeriod:")]
+    public CMTime InterleavingPeriod { get; set; }
+    [Selector("insertTimeRange:ofAsset:atTime:copySampleData:error:")]
+    public bool InsertTimeRangeOfAssetAtTimeCopySampleDataError(CMTimeRange timeRange, AVAsset asset, CMTime startTime, bool copySampleData, out NSError? outError);
+    [Selector("insertEmptyTimeRange:")]
+    public void InsertEmptyTimeRange(CMTimeRange timeRange);
+    [Selector("removeTimeRange:")]
+    public void RemoveTimeRange(CMTimeRange timeRange);
+    [Selector("scaleTimeRange:toDuration:")]
+    public void ScaleTimeRangeToDuration(CMTimeRange timeRange, CMTime duration);
 }
 
 /// AVMutableMovieTrackLevelEditing, a category of AVMutableMovie.
 public extern objc class AVMutableMovie
 {
-    [Selector("mutableTrackCompatibleWithTrack:")] public AVMutableMovieTrack? MutableTrackCompatibleWithTrack(AVAssetTrack track);
-    [Selector("addMutableTrackWithMediaType:copySettingsFromTrack:options:")] public AVMutableMovieTrack? AddMutableTrackWithMediaTypeCopySettingsFromTrackOptions(AVMediaType mediaType, AVAssetTrack? track, NSDictionary? options);
-    [Selector("addMutableTracksCopyingSettingsFromTracks:options:")] public NSArray AddMutableTracksCopyingSettingsFromTracksOptions(NSArray existingTracks, NSDictionary? options);
-    [Selector("removeTrack:")] public void RemoveTrack(AVMovieTrack track);
+    [Selector("mutableTrackCompatibleWithTrack:")]
+    public AVMutableMovieTrack? MutableTrackCompatibleWithTrack(AVAssetTrack track);
+    [Selector("addMutableTrackWithMediaType:copySettingsFromTrack:options:")]
+    public AVMutableMovieTrack? AddMutableTrackWithMediaTypeCopySettingsFromTrackOptions(AVMediaType mediaType, AVAssetTrack? track, NSDictionary? options);
+    [Selector("addMutableTracksCopyingSettingsFromTracks:options:")]
+    public NSArray AddMutableTracksCopyingSettingsFromTracksOptions(NSArray existingTracks, NSDictionary? options);
+    [Selector("removeTrack:")]
+    public void RemoveTrack(AVMovieTrack track);
 }
 
 /// AVMutableMovieMetadataEditing, a category of AVMutableMovie.
 public extern objc class AVMutableMovie
 {
-    [Selector("metadata", "setMetadata:")] public NSArray Metadata { get; set; }
+    [Selector("metadata", "setMetadata:")]
+    public NSArray Metadata { get; set; }
 }
 
 public objc closure void AVMutableMovieLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock(AVMutableMovieTrack? arg0, NSError? arg1);
@@ -138,18 +181,26 @@ public objc closure void AVMutableMovieLoadTracksWithMediaCharacteristicCompleti
 /// AVMutableMovieTrackInspection, a category of AVMutableMovie.
 public extern objc class AVMutableMovie
 {
-    [Selector("trackWithTrackID:")] public AVMutableMovieTrack? TrackWithTrackID(CMPersistentTrackID trackID);
-    [Selector("loadTrackWithTrackID:completionHandler:")] public void LoadTrackWithTrackIDCompletionHandler(CMPersistentTrackID trackID, AVMutableMovieLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("tracksWithMediaType:")] public NSArray TracksWithMediaType(AVMediaType mediaType);
-    [Selector("loadTracksWithMediaType:completionHandler:")] public void LoadTracksWithMediaTypeCompletionHandler(AVMediaType mediaType, AVMutableMovieLoadTracksWithMediaTypeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("tracksWithMediaCharacteristic:")] public NSArray TracksWithMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
-    [Selector("loadTracksWithMediaCharacteristic:completionHandler:")] public void LoadTracksWithMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVMutableMovieLoadTracksWithMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("trackWithTrackID:")]
+    public AVMutableMovieTrack? TrackWithTrackID(CMPersistentTrackID trackID);
+    [Selector("loadTrackWithTrackID:completionHandler:")]
+    public void LoadTrackWithTrackIDCompletionHandler(CMPersistentTrackID trackID, AVMutableMovieLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tracksWithMediaType:")]
+    public NSArray TracksWithMediaType(AVMediaType mediaType);
+    [Selector("loadTracksWithMediaType:completionHandler:")]
+    public void LoadTracksWithMediaTypeCompletionHandler(AVMediaType mediaType, AVMutableMovieLoadTracksWithMediaTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tracksWithMediaCharacteristic:")]
+    public NSArray TracksWithMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("loadTracksWithMediaCharacteristic:completionHandler:")]
+    public void LoadTracksWithMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVMutableMovieLoadTracksWithMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public extern objc class AVMediaDataStorage : NSObject
 {
-    [Selector("initWithURL:options:")] public Self InitWithURLOptions(NSURL URL, NSDictionary? options);
-    [Selector("URL")] public NSURL? URL();
+    [Selector("initWithURL:options:")]
+    public Self InitWithURLOptions(NSURL URL, NSDictionary? options);
+    [Selector("URL")]
+    public NSURL? URL();
 }
 
 public extern "C" NSString? AVFragmentedMovieContainsMovieFragmentsDidChangeNotification;
@@ -160,7 +211,8 @@ public extern "C" NSString? AVFragmentedMovieWasDefragmentedNotification;
 
 public extern objc class AVFragmentedMovie : AVMovie, AVFragmentMinding
 {
-    [Selector("tracks")] public NSArray Tracks { get; }
+    [Selector("tracks")]
+    public NSArray Tracks { get; }
 }
 
 public objc closure void AVFragmentedMovieLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock(AVFragmentedMovieTrack? arg0, NSError? arg1);
@@ -173,34 +225,51 @@ public objc closure void AVFragmentedMovieLoadTracksWithMediaCharacteristicCompl
 public extern objc class AVFragmentedMovie
 {
     /// Deprecated in macOS 15.0.
-    [Selector("trackWithTrackID:")] public AVFragmentedMovieTrack? TrackWithTrackID(CMPersistentTrackID trackID);
-    [Selector("loadTrackWithTrackID:completionHandler:")] public void LoadTrackWithTrackIDCompletionHandler(CMPersistentTrackID trackID, AVFragmentedMovieLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("trackWithTrackID:")]
+    public AVFragmentedMovieTrack? TrackWithTrackID(CMPersistentTrackID trackID);
+    [Selector("loadTrackWithTrackID:completionHandler:")]
+    public void LoadTrackWithTrackIDCompletionHandler(CMPersistentTrackID trackID, AVFragmentedMovieLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("tracksWithMediaType:")] public NSArray TracksWithMediaType(AVMediaType mediaType);
-    [Selector("loadTracksWithMediaType:completionHandler:")] public void LoadTracksWithMediaTypeCompletionHandler(AVMediaType mediaType, AVFragmentedMovieLoadTracksWithMediaTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tracksWithMediaType:")]
+    public NSArray TracksWithMediaType(AVMediaType mediaType);
+    [Selector("loadTracksWithMediaType:completionHandler:")]
+    public void LoadTracksWithMediaTypeCompletionHandler(AVMediaType mediaType, AVFragmentedMovieLoadTracksWithMediaTypeCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("tracksWithMediaCharacteristic:")] public NSArray TracksWithMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
-    [Selector("loadTracksWithMediaCharacteristic:completionHandler:")] public void LoadTracksWithMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVFragmentedMovieLoadTracksWithMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tracksWithMediaCharacteristic:")]
+    public NSArray TracksWithMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("loadTracksWithMediaCharacteristic:completionHandler:")]
+    public void LoadTracksWithMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVFragmentedMovieLoadTracksWithMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public extern objc class AVFragmentedMovieMinder : AVFragmentedAssetMinder
 {
-    [Selector("mindingInterval", "setMindingInterval:")] public NSTimeInterval MindingInterval { get; set; }
-    [Selector("movies")] public NSArray Movies { get; }
-    [Selector("fragmentedMovieMinderWithMovie:mindingInterval:")] public static Self FragmentedMovieMinderWithMovieMindingInterval(AVFragmentedMovie movie, NSTimeInterval mindingInterval);
-    [Selector("initWithMovie:mindingInterval:")] public Self InitWithMovieMindingInterval(AVFragmentedMovie movie, NSTimeInterval mindingInterval);
-    [Selector("addFragmentedMovie:")] public void AddFragmentedMovie(AVFragmentedMovie movie);
-    [Selector("removeFragmentedMovie:")] public void RemoveFragmentedMovie(AVFragmentedMovie movie);
+    [Selector("mindingInterval", "setMindingInterval:")]
+    public NSTimeInterval MindingInterval { get; set; }
+    [Selector("movies")]
+    public NSArray Movies { get; }
+    [Selector("fragmentedMovieMinderWithMovie:mindingInterval:")]
+    public static Self FragmentedMovieMinderWithMovieMindingInterval(AVFragmentedMovie movie, NSTimeInterval mindingInterval);
+    [Selector("initWithMovie:mindingInterval:")]
+    public Self InitWithMovieMindingInterval(AVFragmentedMovie movie, NSTimeInterval mindingInterval);
+    [Selector("addFragmentedMovie:")]
+    public void AddFragmentedMovie(AVFragmentedMovie movie);
+    [Selector("removeFragmentedMovie:")]
+    public void RemoveFragmentedMovie(AVFragmentedMovie movie);
 }
 
 /// SynchronousAssetInterface, a category of AVMutableMovie.
 public extern objc class AVMutableMovie
 {
-    [Selector("metadataForFormat:")] public NSArray MetadataForFormat(AVMetadataFormat format);
-    [Selector("chapterMetadataGroupsWithTitleLocale:containingItemsWithCommonKeys:")] public NSArray ChapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeys(NSLocale locale, NSArray? commonKeys);
-    [Selector("chapterMetadataGroupsBestMatchingPreferredLanguages:")] public NSArray ChapterMetadataGroupsBestMatchingPreferredLanguages(NSArray preferredLanguages);
-    [Selector("mediaSelectionGroupForMediaCharacteristic:")] public AVMediaSelectionGroup? MediaSelectionGroupForMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
-    [Selector("unusedTrackID")] public CMPersistentTrackID UnusedTrackID();
+    [Selector("metadataForFormat:")]
+    public NSArray MetadataForFormat(AVMetadataFormat format);
+    [Selector("chapterMetadataGroupsWithTitleLocale:containingItemsWithCommonKeys:")]
+    public NSArray ChapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeys(NSLocale locale, NSArray? commonKeys);
+    [Selector("chapterMetadataGroupsBestMatchingPreferredLanguages:")]
+    public NSArray ChapterMetadataGroupsBestMatchingPreferredLanguages(NSArray preferredLanguages);
+    [Selector("mediaSelectionGroupForMediaCharacteristic:")]
+    public AVMediaSelectionGroup? MediaSelectionGroupForMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("unusedTrackID")]
+    public CMPersistentTrackID UnusedTrackID();
 }
 
 #endif

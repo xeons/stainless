@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.12.
 public extern objc class PDFAnnotationPopup : PDFAnnotation, NSCopying, NSCoding
 {
-    [Selector("isOpen")] public bool IsOpen();
-    [Selector("setIsOpen:")] public void SetIsOpen(bool isOpen);
+    [Selector("isOpen")]
+    public bool IsOpen();
+    [Selector("setIsOpen:")]
+    public void SetIsOpen(bool isOpen);
 }
 
 #endif

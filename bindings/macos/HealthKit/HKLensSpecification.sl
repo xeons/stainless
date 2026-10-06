@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class HKLensSpecification : NSObject
 {
-    [Selector("sphere")] public HKQuantity Sphere { get; }
-    [Selector("cylinder")] public HKQuantity? Cylinder { get; }
-    [Selector("axis")] public HKQuantity? Axis { get; }
-    [Selector("addPower")] public HKQuantity? AddPower { get; }
+    [Selector("sphere")]
+    public HKQuantity Sphere { get; }
+    [Selector("cylinder")]
+    public HKQuantity? Cylinder { get; }
+    [Selector("axis")]
+    public HKQuantity? Axis { get; }
+    [Selector("addPower")]
+    public HKQuantity? AddPower { get; }
 }
 
 #endif

@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class ASOneTimeCodeCredential : NSObject, ASAuthorizationCredential
 {
-    [Selector("code")] public NSString Code { get; }
-    [Selector("credentialWithCode:")] public static Self CredentialWithCode(NSString code);
-    [Selector("initWithCode:")] public Self InitWithCode(NSString code);
+    [Selector("code")]
+    public NSString Code { get; }
+    [Selector("credentialWithCode:")]
+    public static Self CredentialWithCode(NSString code);
+    [Selector("initWithCode:")]
+    public Self InitWithCode(NSString code);
 }
 
 #endif

@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class WKWindowFeatures : NSObject
 {
-    [Selector("menuBarVisibility")] public NSNumber? MenuBarVisibility { get; }
-    [Selector("statusBarVisibility")] public NSNumber? StatusBarVisibility { get; }
-    [Selector("toolbarsVisibility")] public NSNumber? ToolbarsVisibility { get; }
-    [Selector("allowsResizing")] public NSNumber? AllowsResizing { get; }
-    [Selector("x")] public NSNumber? X { get; }
-    [Selector("y")] public NSNumber? Y { get; }
-    [Selector("width")] public NSNumber? Width { get; }
-    [Selector("height")] public NSNumber? Height { get; }
+    [Selector("menuBarVisibility")]
+    public NSNumber? MenuBarVisibility { get; }
+    [Selector("statusBarVisibility")]
+    public NSNumber? StatusBarVisibility { get; }
+    [Selector("toolbarsVisibility")]
+    public NSNumber? ToolbarsVisibility { get; }
+    [Selector("allowsResizing")]
+    public NSNumber? AllowsResizing { get; }
+    [Selector("x")]
+    public NSNumber? X { get; }
+    [Selector("y")]
+    public NSNumber? Y { get; }
+    [Selector("width")]
+    public NSNumber? Width { get; }
+    [Selector("height")]
+    public NSNumber? Height { get; }
 }
 
 #endif

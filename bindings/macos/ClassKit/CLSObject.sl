@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class CLSObject : NSObject, NSSecureCoding
 {
-    [Selector("dateCreated")] public NSDate DateCreated { get; }
-    [Selector("dateLastModified")] public NSDate DateLastModified { get; }
+    [Selector("dateCreated")]
+    public NSDate DateCreated { get; }
+    [Selector("dateLastModified")]
+    public NSDate DateLastModified { get; }
 }
 
 #endif

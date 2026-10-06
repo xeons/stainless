@@ -423,11 +423,14 @@ public attribute JsonIgnore { }
 [Reflect]
 public class Person
 {
-    [JsonName("full_name")] public required String Name;
-    [JsonName("age")]       public int    Years;
+    [JsonName("full_name")]
+    public required String Name;
+    [JsonName("age")]
+    public int    Years;
                             public bool   Active;
                             public double Rating;
-    [JsonIgnore]            public int    Internal;
+    [JsonIgnore]
+    public int    Internal;
 }
 ```
 

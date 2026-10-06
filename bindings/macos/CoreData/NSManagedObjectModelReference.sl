@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class NSManagedObjectModelReference : NSObject
 {
-    [Selector("resolvedModel")] public NSManagedObjectModel ResolvedModel { get; }
-    [Selector("versionChecksum")] public NSString VersionChecksum { get; }
-    [Selector("initWithModel:versionChecksum:")] public Self InitWithModelVersionChecksum(NSManagedObjectModel model, NSString versionChecksum);
-    [Selector("initWithFileURL:versionChecksum:")] public Self InitWithFileURLVersionChecksum(NSURL fileURL, NSString versionChecksum);
-    [Selector("initWithEntityVersionHashes:inBundle:versionChecksum:")] public Self InitWithEntityVersionHashesInBundleVersionChecksum(NSDictionary versionHash, NSBundle? bundle, NSString versionChecksum);
-    [Selector("initWithName:inBundle:versionChecksum:")] public Self InitWithNameInBundleVersionChecksum(NSString modelName, NSBundle? bundle, NSString versionChecksum);
+    [Selector("resolvedModel")]
+    public NSManagedObjectModel ResolvedModel { get; }
+    [Selector("versionChecksum")]
+    public NSString VersionChecksum { get; }
+    [Selector("initWithModel:versionChecksum:")]
+    public Self InitWithModelVersionChecksum(NSManagedObjectModel model, NSString versionChecksum);
+    [Selector("initWithFileURL:versionChecksum:")]
+    public Self InitWithFileURLVersionChecksum(NSURL fileURL, NSString versionChecksum);
+    [Selector("initWithEntityVersionHashes:inBundle:versionChecksum:")]
+    public Self InitWithEntityVersionHashesInBundleVersionChecksum(NSDictionary versionHash, NSBundle? bundle, NSString versionChecksum);
+    [Selector("initWithName:inBundle:versionChecksum:")]
+    public Self InitWithNameInBundleVersionChecksum(NSString modelName, NSBundle? bundle, NSString versionChecksum);
 }
 
 #endif

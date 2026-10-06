@@ -43,14 +43,22 @@ public enum NSLengthFormatterUnit : long
 
 public extern objc class NSLengthFormatter : NSFormatter
 {
-    [Selector("numberFormatter", "setNumberFormatter:")] public NSNumberFormatter? NumberFormatter { get; set; }
-    [Selector("unitStyle", "setUnitStyle:")] public NSFormattingUnitStyle UnitStyle { get; set; }
-    [Selector("isForPersonHeightUse", "setForPersonHeightUse:")] public bool ForPersonHeightUse { get; set; }
-    [Selector("stringFromValue:unit:")] public NSString StringFromValueUnit(double value, NSLengthFormatterUnit unit);
-    [Selector("stringFromMeters:")] public NSString StringFromMeters(double numberInMeters);
-    [Selector("unitStringFromValue:unit:")] public NSString UnitStringFromValueUnit(double value, NSLengthFormatterUnit unit);
-    [Selector("unitStringFromMeters:usedUnit:")] public NSString UnitStringFromMetersUsedUnit(double numberInMeters, NSLengthFormatterUnit* unitp);
-    [Selector("getObjectValue:forString:errorDescription:")] public bool GetObjectValueForStringErrorDescription(out AnyObject? obj, NSString string, out NSString? error);
+    [Selector("numberFormatter", "setNumberFormatter:")]
+    public NSNumberFormatter? NumberFormatter { get; set; }
+    [Selector("unitStyle", "setUnitStyle:")]
+    public NSFormattingUnitStyle UnitStyle { get; set; }
+    [Selector("isForPersonHeightUse", "setForPersonHeightUse:")]
+    public bool ForPersonHeightUse { get; set; }
+    [Selector("stringFromValue:unit:")]
+    public NSString StringFromValueUnit(double value, NSLengthFormatterUnit unit);
+    [Selector("stringFromMeters:")]
+    public NSString StringFromMeters(double numberInMeters);
+    [Selector("unitStringFromValue:unit:")]
+    public NSString UnitStringFromValueUnit(double value, NSLengthFormatterUnit unit);
+    [Selector("unitStringFromMeters:usedUnit:")]
+    public NSString UnitStringFromMetersUsedUnit(double numberInMeters, NSLengthFormatterUnit* unitp);
+    [Selector("getObjectValue:forString:errorDescription:")]
+    public bool GetObjectValueForStringErrorDescription(out AnyObject? obj, NSString string, out NSString? error);
 }
 
 #endif

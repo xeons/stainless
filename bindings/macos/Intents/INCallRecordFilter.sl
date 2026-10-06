@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class INCallRecordFilter : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("participants")] public NSArray? Participants { get; }
-    [Selector("callTypes")] public INCallRecordTypeOptions CallTypes { get; }
-    [Selector("callCapability")] public INCallCapability CallCapability { get; }
-    [Selector("initWithParticipants:callTypes:callCapability:")] public Self InitWithParticipantsCallTypesCallCapability(NSArray? participants, INCallRecordTypeOptions callTypes, INCallCapability callCapability);
+    [Selector("participants")]
+    public NSArray? Participants { get; }
+    [Selector("callTypes")]
+    public INCallRecordTypeOptions CallTypes { get; }
+    [Selector("callCapability")]
+    public INCallCapability CallCapability { get; }
+    [Selector("initWithParticipants:callTypes:callCapability:")]
+    public Self InitWithParticipantsCallTypesCallCapability(NSArray? participants, INCallRecordTypeOptions callTypes, INCallCapability callCapability);
 }
 
 #endif

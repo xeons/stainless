@@ -45,7 +45,8 @@ public extern "C" int NetFSMountURLCancel(AsyncRequestID requestID);
 
 public extern "C" CFStringRef? NetFSMountURLProbe(CFStringRef? hostname);
 
-[ReturnsRetained] public extern "C" CFURLRef? NetFSCopyURLForRemountingVolume(CFURLRef? localPathURL);
+[ReturnsRetained]
+public extern "C" CFURLRef? NetFSCopyURLForRemountingVolume(CFURLRef? localPathURL);
 
 public const CFStringRef kNetFSAuthenticationInfoKey = "AuthenticationInfo";
 

@@ -33,20 +33,31 @@ import Standard.ObjC;
 
 public extern objc class MCNearbyServiceBrowser : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public MCNearbyServiceBrowserDelegate? Delegate { get; set; }
-    [Selector("myPeerID")] public MCPeerID MyPeerID { get; }
-    [Selector("serviceType")] public NSString ServiceType { get; }
-    [Selector("initWithPeer:serviceType:")] public Self InitWithPeerServiceType(MCPeerID myPeerID, NSString serviceType);
-    [Selector("startBrowsingForPeers")] public void StartBrowsingForPeers();
-    [Selector("stopBrowsingForPeers")] public void StopBrowsingForPeers();
-    [Selector("invitePeer:toSession:withContext:timeout:")] public void InvitePeerToSessionWithContextTimeout(MCPeerID peerID, MCSession session, NSData? context, NSTimeInterval timeout);
+    [Selector("delegate", "setDelegate:")]
+    public MCNearbyServiceBrowserDelegate? Delegate { get; set; }
+    [Selector("myPeerID")]
+    public MCPeerID MyPeerID { get; }
+    [Selector("serviceType")]
+    public NSString ServiceType { get; }
+    [Selector("initWithPeer:serviceType:")]
+    public Self InitWithPeerServiceType(MCPeerID myPeerID, NSString serviceType);
+    [Selector("startBrowsingForPeers")]
+    public void StartBrowsingForPeers();
+    [Selector("stopBrowsingForPeers")]
+    public void StopBrowsingForPeers();
+    [Selector("invitePeer:toSession:withContext:timeout:")]
+    public void InvitePeerToSessionWithContextTimeout(MCPeerID peerID, MCSession session, NSData? context, NSTimeInterval timeout);
 }
 
 public objc interface MCNearbyServiceBrowserDelegate : NSObjectProtocol
 {
-    [Selector("browser:foundPeer:withDiscoveryInfo:")] void BrowserFoundPeerWithDiscoveryInfo(MCNearbyServiceBrowser browser, MCPeerID peerID, NSDictionary? info);
-    [Selector("browser:lostPeer:")] void BrowserLostPeer(MCNearbyServiceBrowser browser, MCPeerID peerID);
-    [Optional] [Selector("browser:didNotStartBrowsingForPeers:")] void BrowserDidNotStartBrowsingForPeers(MCNearbyServiceBrowser browser, NSError error);
+    [Selector("browser:foundPeer:withDiscoveryInfo:")]
+    void BrowserFoundPeerWithDiscoveryInfo(MCNearbyServiceBrowser browser, MCPeerID peerID, NSDictionary? info);
+    [Selector("browser:lostPeer:")]
+    void BrowserLostPeer(MCNearbyServiceBrowser browser, MCPeerID peerID);
+    [Optional]
+    [Selector("browser:didNotStartBrowsingForPeers:")]
+    void BrowserDidNotStartBrowsingForPeers(MCNearbyServiceBrowser browser, NSError error);
 }
 
 #endif

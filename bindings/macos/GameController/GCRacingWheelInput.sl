@@ -32,17 +32,24 @@ import Standard.ObjC;
 
 public extern objc class GCRacingWheelInputState : NSObject, GCDevicePhysicalInputState
 {
-    [Selector("wheel")] public GCSteeringWheelElement Wheel { get; }
-    [Selector("acceleratorPedal")] public GCButtonElement? AcceleratorPedal { get; }
-    [Selector("brakePedal")] public GCButtonElement? BrakePedal { get; }
-    [Selector("clutchPedal")] public GCButtonElement? ClutchPedal { get; }
-    [Selector("shifter")] public GCGearShifterElement? Shifter { get; }
+    [Selector("wheel")]
+    public GCSteeringWheelElement Wheel { get; }
+    [Selector("acceleratorPedal")]
+    public GCButtonElement? AcceleratorPedal { get; }
+    [Selector("brakePedal")]
+    public GCButtonElement? BrakePedal { get; }
+    [Selector("clutchPedal")]
+    public GCButtonElement? ClutchPedal { get; }
+    [Selector("shifter")]
+    public GCGearShifterElement? Shifter { get; }
 }
 
 public extern objc class GCRacingWheelInput : GCRacingWheelInputState, GCDevicePhysicalInput
 {
-    [Selector("capture")] public GCRacingWheelInputState Capture();
-    [Selector("nextInputState")] public GCRacingWheelInputState? NextInputState();
+    [Selector("capture")]
+    public GCRacingWheelInputState Capture();
+    [Selector("nextInputState")]
+    public GCRacingWheelInputState? NextInputState();
 }
 
 #endif

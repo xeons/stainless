@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class MLDictionaryConstraint : NSObject, NSSecureCoding
 {
-    [Selector("keyType")] public MLFeatureType KeyType { get; }
+    [Selector("keyType")]
+    public MLFeatureType KeyType { get; }
 }
 
 #endif

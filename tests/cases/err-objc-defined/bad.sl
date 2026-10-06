@@ -7,14 +7,18 @@ import Standard.ObjC;
 [ObjCRoot]
 public extern objc class NSObject
 {
-    [Selector("alloc")] public static Self Alloc();
-    [Selector("init")] public Self Init();
-    [Selector("hash")] public nuint Hash { get; }
+    [Selector("alloc")]
+    public static Self Alloc();
+    [Selector("init")]
+    public Self Init();
+    [Selector("hash")]
+    public nuint Hash { get; }
 }
 
 public objc interface Named
 {
-    [Selector("name")] long Name();
+    [Selector("name")]
+    long Name();
 }
 
 // No superclass.
@@ -27,9 +31,12 @@ public objc class Overrides : NSObject
 {
     public virtual long Spare() => 1;
     public override long Missing() => 2;
-    [Selector("hash")] public nuint MyHash => 3;
-    [Selector("twice")] public long First() => 1;
-    [Selector("twice")] public long Second() => 2;
+    [Selector("hash")]
+    public nuint MyHash => 3;
+    [Selector("twice")]
+    public long First() => 1;
+    [Selector("twice")]
+    public long Second() => 2;
 }
 
 // A required protocol member nobody answers.
@@ -45,13 +52,15 @@ public static objc class Static : NSObject
 // A generic method answering a selector.
 public objc class Generic : NSObject
 {
-    [Selector("pick:")] public long Pick<T>(long value) => value;
+    [Selector("pick:")]
+    public long Pick<T>(long value) => value;
 }
 
 // A constructor whose selector is not an init.
 public objc class NotInit : NSObject
 {
-    [Selector("make:")] public NotInit(long value) { }
+    [Selector("make:")]
+    public NotInit(long value) { }
 }
 
 // A field with no zero value and no initializer.

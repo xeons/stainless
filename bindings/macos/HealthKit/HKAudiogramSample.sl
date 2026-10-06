@@ -32,10 +32,13 @@ import Standard.ObjC;
 
 public extern objc class HKAudiogramSample : HKSample
 {
-    [Selector("sensitivityPoints")] public NSArray SensitivityPoints { get; }
-    [Selector("audiogramSampleWithSensitivityPoints:startDate:endDate:metadata:")] public static Self AudiogramSampleWithSensitivityPointsStartDateEndDateMetadata(NSArray sensitivityPoints, NSDate startDate, NSDate endDate, NSDictionary? metadata);
+    [Selector("sensitivityPoints")]
+    public NSArray SensitivityPoints { get; }
+    [Selector("audiogramSampleWithSensitivityPoints:startDate:endDate:metadata:")]
+    public static Self AudiogramSampleWithSensitivityPointsStartDateEndDateMetadata(NSArray sensitivityPoints, NSDate startDate, NSDate endDate, NSDictionary? metadata);
     /// macOS 15.1 and later.
-    [Selector("audiogramSampleWithSensitivityPoints:startDate:endDate:device:metadata:")] public static Self AudiogramSampleWithSensitivityPointsStartDateEndDateDeviceMetadata(NSArray sensitivityPoints, NSDate startDate, NSDate endDate, HKDevice? device, NSDictionary? metadata);
+    [Selector("audiogramSampleWithSensitivityPoints:startDate:endDate:device:metadata:")]
+    public static Self AudiogramSampleWithSensitivityPointsStartDateEndDateDeviceMetadata(NSArray sensitivityPoints, NSDate startDate, NSDate endDate, HKDevice? device, NSDictionary? metadata);
 }
 
 #endif

@@ -51,14 +51,22 @@ public objc closure void NLTokenizerEnumerateTokensInRangeUsingBlockBlock(NSRang
 
 public extern objc class NLTokenizer : NSObject
 {
-    [Selector("unit")] public NLTokenUnit Unit { get; }
-    [Selector("string", "setString:")] public NSString? String { get; set; }
-    [Selector("initWithUnit:")] public Self InitWithUnit(NLTokenUnit unit);
-    [Selector("setLanguage:")] public void SetLanguage(NLLanguage language);
-    [Selector("tokenRangeAtIndex:")] public NSRange TokenRangeAtIndex(NSUInteger characterIndex);
-    [Selector("tokenRangeForRange:")] public NSRange TokenRangeForRange(NSRange range);
-    [Selector("tokensForRange:")] public NSArray TokensForRange(NSRange range);
-    [Selector("enumerateTokensInRange:usingBlock:")] public void EnumerateTokensInRangeUsingBlock(NSRange range, NLTokenizerEnumerateTokensInRangeUsingBlockBlock block);
+    [Selector("unit")]
+    public NLTokenUnit Unit { get; }
+    [Selector("string", "setString:")]
+    public NSString? String { get; set; }
+    [Selector("initWithUnit:")]
+    public Self InitWithUnit(NLTokenUnit unit);
+    [Selector("setLanguage:")]
+    public void SetLanguage(NLLanguage language);
+    [Selector("tokenRangeAtIndex:")]
+    public NSRange TokenRangeAtIndex(NSUInteger characterIndex);
+    [Selector("tokenRangeForRange:")]
+    public NSRange TokenRangeForRange(NSRange range);
+    [Selector("tokensForRange:")]
+    public NSArray TokensForRange(NSRange range);
+    [Selector("enumerateTokensInRange:usingBlock:")]
+    public void EnumerateTokensInRangeUsingBlock(NSRange range, NLTokenizerEnumerateTokensInRangeUsingBlockBlock block);
 }
 
 #endif

@@ -37,21 +37,29 @@ public extern objc class MDItemRef : CFTypeRef { }
 
 public extern "C" CFTypeID MDItemGetTypeID();
 
-[ReturnsRetained] public extern "C" MDItemRef? MDItemCreate(CFAllocatorRef? allocator, CFStringRef? path);
+[ReturnsRetained]
+public extern "C" MDItemRef? MDItemCreate(CFAllocatorRef? allocator, CFStringRef? path);
 
-[ReturnsRetained] public extern "C" MDItemRef? MDItemCreateWithURL(CFAllocatorRef? allocator, CFURLRef? url);
+[ReturnsRetained]
+public extern "C" MDItemRef? MDItemCreateWithURL(CFAllocatorRef? allocator, CFURLRef? url);
 
-[ReturnsRetained] public extern "C" CFArrayRef? MDItemsCreateWithURLs(CFAllocatorRef? allocator, CFArrayRef? urls);
+[ReturnsRetained]
+public extern "C" CFArrayRef? MDItemsCreateWithURLs(CFAllocatorRef? allocator, CFArrayRef? urls);
 
-[ReturnsRetained] public extern "C" CFTypeRef? MDItemCopyAttribute(MDItemRef? item, CFStringRef? name);
+[ReturnsRetained]
+public extern "C" CFTypeRef? MDItemCopyAttribute(MDItemRef? item, CFStringRef? name);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? MDItemCopyAttributes(MDItemRef? item, CFArrayRef? names);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? MDItemCopyAttributes(MDItemRef? item, CFArrayRef? names);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? MDItemCopyAttributeList(MDItemRef? item, ...);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? MDItemCopyAttributeList(MDItemRef? item, ...);
 
-[ReturnsRetained] public extern "C" CFArrayRef? MDItemCopyAttributeNames(MDItemRef? item);
+[ReturnsRetained]
+public extern "C" CFArrayRef? MDItemCopyAttributeNames(MDItemRef? item);
 
-[ReturnsRetained] public extern "C" CFArrayRef? MDItemsCopyAttributes(CFArrayRef? items, CFArrayRef? names);
+[ReturnsRetained]
+public extern "C" CFArrayRef? MDItemsCopyAttributes(CFArrayRef? items, CFArrayRef? names);
 
 public objc closure void MDItemGetCacheFileDescriptorsCompletionHandlerBlock(CFArrayRef? arg0);
 
@@ -414,6 +422,7 @@ public extern "C" CFStringRef? kMDItemApplicationCategories;
 
 public extern "C" CFStringRef? kMDItemIsApplicationManaged;
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? __MDItemCopyAttributesEllipsis1(MDItemRef? item, ...);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? __MDItemCopyAttributesEllipsis1(MDItemRef? item, ...);
 
 #endif

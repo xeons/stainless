@@ -44,25 +44,44 @@ public const long NSCannotCreateScriptCommandError = 10;
 
 public extern objc class NSScriptCommand : NSObject, NSCoding
 {
-    [Selector("commandDescription")] public NSScriptCommandDescription CommandDescription { get; }
-    [Selector("directParameter", "setDirectParameter:")] public AnyObject? DirectParameter { get; set; }
-    [Selector("receiversSpecifier", "setReceiversSpecifier:")] public NSScriptObjectSpecifier? ReceiversSpecifier { get; set; }
-    [Selector("evaluatedReceivers")] public AnyObject? EvaluatedReceivers { get; }
-    [Selector("arguments", "setArguments:")] public NSDictionary? Arguments { get; set; }
-    [Selector("evaluatedArguments")] public NSDictionary? EvaluatedArguments { get; }
-    [Selector("isWellFormed")] public bool WellFormed { get; }
-    [Selector("scriptErrorNumber", "setScriptErrorNumber:")] public NSInteger ScriptErrorNumber { get; set; }
-    [Selector("scriptErrorOffendingObjectDescriptor", "setScriptErrorOffendingObjectDescriptor:")] public NSAppleEventDescriptor? ScriptErrorOffendingObjectDescriptor { get; set; }
-    [Selector("scriptErrorExpectedTypeDescriptor", "setScriptErrorExpectedTypeDescriptor:")] public NSAppleEventDescriptor? ScriptErrorExpectedTypeDescriptor { get; set; }
-    [Selector("scriptErrorString", "setScriptErrorString:")] public NSString? ScriptErrorString { get; set; }
-    [Selector("appleEvent")] public NSAppleEventDescriptor? AppleEvent { get; }
-    [Selector("initWithCommandDescription:")] public Self InitWithCommandDescription(NSScriptCommandDescription commandDef);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder inCoder);
-    [Selector("performDefaultImplementation")] public AnyObject? PerformDefaultImplementation();
-    [Selector("executeCommand")] public AnyObject? ExecuteCommand();
-    [Selector("currentCommand")] public static NSScriptCommand? CurrentCommand();
-    [Selector("suspendExecution")] public void SuspendExecution();
-    [Selector("resumeExecutionWithResult:")] public void ResumeExecutionWithResult(AnyObject? result);
+    [Selector("commandDescription")]
+    public NSScriptCommandDescription CommandDescription { get; }
+    [Selector("directParameter", "setDirectParameter:")]
+    public AnyObject? DirectParameter { get; set; }
+    [Selector("receiversSpecifier", "setReceiversSpecifier:")]
+    public NSScriptObjectSpecifier? ReceiversSpecifier { get; set; }
+    [Selector("evaluatedReceivers")]
+    public AnyObject? EvaluatedReceivers { get; }
+    [Selector("arguments", "setArguments:")]
+    public NSDictionary? Arguments { get; set; }
+    [Selector("evaluatedArguments")]
+    public NSDictionary? EvaluatedArguments { get; }
+    [Selector("isWellFormed")]
+    public bool WellFormed { get; }
+    [Selector("scriptErrorNumber", "setScriptErrorNumber:")]
+    public NSInteger ScriptErrorNumber { get; set; }
+    [Selector("scriptErrorOffendingObjectDescriptor", "setScriptErrorOffendingObjectDescriptor:")]
+    public NSAppleEventDescriptor? ScriptErrorOffendingObjectDescriptor { get; set; }
+    [Selector("scriptErrorExpectedTypeDescriptor", "setScriptErrorExpectedTypeDescriptor:")]
+    public NSAppleEventDescriptor? ScriptErrorExpectedTypeDescriptor { get; set; }
+    [Selector("scriptErrorString", "setScriptErrorString:")]
+    public NSString? ScriptErrorString { get; set; }
+    [Selector("appleEvent")]
+    public NSAppleEventDescriptor? AppleEvent { get; }
+    [Selector("initWithCommandDescription:")]
+    public Self InitWithCommandDescription(NSScriptCommandDescription commandDef);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder inCoder);
+    [Selector("performDefaultImplementation")]
+    public AnyObject? PerformDefaultImplementation();
+    [Selector("executeCommand")]
+    public AnyObject? ExecuteCommand();
+    [Selector("currentCommand")]
+    public static NSScriptCommand? CurrentCommand();
+    [Selector("suspendExecution")]
+    public void SuspendExecution();
+    [Selector("resumeExecutionWithResult:")]
+    public void ResumeExecutionWithResult(AnyObject? result);
 }
 
 #endif

@@ -52,14 +52,22 @@ public enum NSAttributeType : ulong
 
 public extern objc class NSAttributeDescription : NSPropertyDescription
 {
-    [Selector("attributeType", "setAttributeType:")] public NSAttributeType AttributeType { get; set; }
-    [Selector("attributeValueClassName", "setAttributeValueClassName:")] public NSString? AttributeValueClassName { get; set; }
-    [Selector("defaultValue", "setDefaultValue:")] public AnyObject? DefaultValue { get; set; }
-    [Selector("versionHash")] public NSData VersionHash { get; }
-    [Selector("valueTransformerName", "setValueTransformerName:")] public NSString? ValueTransformerName { get; set; }
-    [Selector("allowsExternalBinaryDataStorage", "setAllowsExternalBinaryDataStorage:")] public bool AllowsExternalBinaryDataStorage { get; set; }
-    [Selector("preservesValueInHistoryOnDeletion", "setPreservesValueInHistoryOnDeletion:")] public bool PreservesValueInHistoryOnDeletion { get; set; }
-    [Selector("allowsCloudEncryption", "setAllowsCloudEncryption:")] public bool AllowsCloudEncryption { get; set; }
+    [Selector("attributeType", "setAttributeType:")]
+    public NSAttributeType AttributeType { get; set; }
+    [Selector("attributeValueClassName", "setAttributeValueClassName:")]
+    public NSString? AttributeValueClassName { get; set; }
+    [Selector("defaultValue", "setDefaultValue:")]
+    public AnyObject? DefaultValue { get; set; }
+    [Selector("versionHash")]
+    public NSData VersionHash { get; }
+    [Selector("valueTransformerName", "setValueTransformerName:")]
+    public NSString? ValueTransformerName { get; set; }
+    [Selector("allowsExternalBinaryDataStorage", "setAllowsExternalBinaryDataStorage:")]
+    public bool AllowsExternalBinaryDataStorage { get; set; }
+    [Selector("preservesValueInHistoryOnDeletion", "setPreservesValueInHistoryOnDeletion:")]
+    public bool PreservesValueInHistoryOnDeletion { get; set; }
+    [Selector("allowsCloudEncryption", "setAllowsCloudEncryption:")]
+    public bool AllowsCloudEncryption { get; set; }
 }
 
 #endif

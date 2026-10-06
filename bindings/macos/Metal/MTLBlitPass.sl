@@ -33,21 +33,28 @@ import Standard.ObjC;
 
 public extern objc class MTLBlitPassSampleBufferAttachmentDescriptor : NSObject, NSCopying
 {
-    [Selector("sampleBuffer", "setSampleBuffer:")] public MTLCounterSampleBuffer? SampleBuffer { get; set; }
-    [Selector("startOfEncoderSampleIndex", "setStartOfEncoderSampleIndex:")] public NSUInteger StartOfEncoderSampleIndex { get; set; }
-    [Selector("endOfEncoderSampleIndex", "setEndOfEncoderSampleIndex:")] public NSUInteger EndOfEncoderSampleIndex { get; set; }
+    [Selector("sampleBuffer", "setSampleBuffer:")]
+    public MTLCounterSampleBuffer? SampleBuffer { get; set; }
+    [Selector("startOfEncoderSampleIndex", "setStartOfEncoderSampleIndex:")]
+    public NSUInteger StartOfEncoderSampleIndex { get; set; }
+    [Selector("endOfEncoderSampleIndex", "setEndOfEncoderSampleIndex:")]
+    public NSUInteger EndOfEncoderSampleIndex { get; set; }
 }
 
 public extern objc class MTLBlitPassSampleBufferAttachmentDescriptorArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public MTLBlitPassSampleBufferAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTLBlitPassSampleBufferAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
+    [Selector("objectAtIndexedSubscript:")]
+    public MTLBlitPassSampleBufferAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTLBlitPassSampleBufferAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
 }
 
 public extern objc class MTLBlitPassDescriptor : NSObject, NSCopying
 {
-    [Selector("sampleBufferAttachments")] public MTLBlitPassSampleBufferAttachmentDescriptorArray SampleBufferAttachments { get; }
-    [Selector("blitPassDescriptor")] public static MTLBlitPassDescriptor BlitPassDescriptor();
+    [Selector("sampleBufferAttachments")]
+    public MTLBlitPassSampleBufferAttachmentDescriptorArray SampleBufferAttachments { get; }
+    [Selector("blitPassDescriptor")]
+    public static MTLBlitPassDescriptor BlitPassDescriptor();
 }
 
 #endif

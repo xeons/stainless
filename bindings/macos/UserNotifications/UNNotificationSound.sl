@@ -35,12 +35,18 @@ public using UNNotificationSoundName = NSString;
 
 public extern objc class UNNotificationSound : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("defaultSound")] public static UNNotificationSound DefaultSound { get; }
-    [Selector("defaultCriticalSound")] public static UNNotificationSound? DefaultCriticalSound { get; }
-    [Selector("defaultCriticalSoundWithAudioVolume:")] public static Self DefaultCriticalSoundWithAudioVolume(float volume);
-    [Selector("soundNamed:")] public static Self SoundNamed(UNNotificationSoundName name);
-    [Selector("criticalSoundNamed:")] public static Self CriticalSoundNamed(UNNotificationSoundName name);
-    [Selector("criticalSoundNamed:withAudioVolume:")] public static Self CriticalSoundNamedWithAudioVolume(UNNotificationSoundName name, float volume);
+    [Selector("defaultSound")]
+    public static UNNotificationSound DefaultSound { get; }
+    [Selector("defaultCriticalSound")]
+    public static UNNotificationSound? DefaultCriticalSound { get; }
+    [Selector("defaultCriticalSoundWithAudioVolume:")]
+    public static Self DefaultCriticalSoundWithAudioVolume(float volume);
+    [Selector("soundNamed:")]
+    public static Self SoundNamed(UNNotificationSoundName name);
+    [Selector("criticalSoundNamed:")]
+    public static Self CriticalSoundNamed(UNNotificationSoundName name);
+    [Selector("criticalSoundNamed:withAudioVolume:")]
+    public static Self CriticalSoundNamedWithAudioVolume(UNNotificationSoundName name, float volume);
 }
 
 #endif

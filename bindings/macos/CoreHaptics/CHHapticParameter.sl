@@ -81,32 +81,46 @@ public extern "C" CHHapticDynamicParameterID? CHHapticDynamicParameterIDAudioRel
 
 public extern objc class CHHapticEventParameter : NSObject
 {
-    [Selector("parameterID")] public CHHapticEventParameterID ParameterID { get; }
-    [Selector("value", "setValue:")] public float Value { get; set; }
-    [Selector("initWithParameterID:value:")] public Self InitWithParameterIDValue(CHHapticEventParameterID parameterID, float value);
+    [Selector("parameterID")]
+    public CHHapticEventParameterID ParameterID { get; }
+    [Selector("value", "setValue:")]
+    public float Value { get; set; }
+    [Selector("initWithParameterID:value:")]
+    public Self InitWithParameterIDValue(CHHapticEventParameterID parameterID, float value);
 }
 
 public extern objc class CHHapticDynamicParameter : NSObject
 {
-    [Selector("parameterID")] public CHHapticDynamicParameterID ParameterID { get; }
-    [Selector("value", "setValue:")] public float Value { get; set; }
-    [Selector("relativeTime", "setRelativeTime:")] public NSTimeInterval RelativeTime { get; set; }
-    [Selector("initWithParameterID:value:relativeTime:")] public Self InitWithParameterIDValueRelativeTime(CHHapticDynamicParameterID parameterID, float value, NSTimeInterval time);
+    [Selector("parameterID")]
+    public CHHapticDynamicParameterID ParameterID { get; }
+    [Selector("value", "setValue:")]
+    public float Value { get; set; }
+    [Selector("relativeTime", "setRelativeTime:")]
+    public NSTimeInterval RelativeTime { get; set; }
+    [Selector("initWithParameterID:value:relativeTime:")]
+    public Self InitWithParameterIDValueRelativeTime(CHHapticDynamicParameterID parameterID, float value, NSTimeInterval time);
 }
 
 public extern objc class CHHapticParameterCurveControlPoint : NSObject
 {
-    [Selector("relativeTime", "setRelativeTime:")] public NSTimeInterval RelativeTime { get; set; }
-    [Selector("value", "setValue:")] public float Value { get; set; }
-    [Selector("initWithRelativeTime:value:")] public Self InitWithRelativeTimeValue(NSTimeInterval time, float value);
+    [Selector("relativeTime", "setRelativeTime:")]
+    public NSTimeInterval RelativeTime { get; set; }
+    [Selector("value", "setValue:")]
+    public float Value { get; set; }
+    [Selector("initWithRelativeTime:value:")]
+    public Self InitWithRelativeTimeValue(NSTimeInterval time, float value);
 }
 
 public extern objc class CHHapticParameterCurve : NSObject
 {
-    [Selector("parameterID")] public CHHapticDynamicParameterID ParameterID { get; }
-    [Selector("relativeTime", "setRelativeTime:")] public NSTimeInterval RelativeTime { get; set; }
-    [Selector("controlPoints")] public NSArray ControlPoints { get; }
-    [Selector("initWithParameterID:controlPoints:relativeTime:")] public Self InitWithParameterIDControlPointsRelativeTime(CHHapticDynamicParameterID parameterID, NSArray controlPoints, NSTimeInterval relativeTime);
+    [Selector("parameterID")]
+    public CHHapticDynamicParameterID ParameterID { get; }
+    [Selector("relativeTime", "setRelativeTime:")]
+    public NSTimeInterval RelativeTime { get; set; }
+    [Selector("controlPoints")]
+    public NSArray ControlPoints { get; }
+    [Selector("initWithParameterID:controlPoints:relativeTime:")]
+    public Self InitWithParameterIDControlPointsRelativeTime(CHHapticDynamicParameterID parameterID, NSArray controlPoints, NSTimeInterval relativeTime);
 }
 
 #endif

@@ -42,10 +42,14 @@ public enum CSSuggestionKind : long
 
 public extern objc class CSSuggestion : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("localizedAttributedSuggestion")] public NSAttributedString? LocalizedAttributedSuggestion { get; }
-    [Selector("suggestionKind")] public CSSuggestionKind SuggestionKind { get; }
-    [Selector("compareByRank:")] public NSComparisonResult CompareByRank(CSSuggestion other);
-    [Selector("compare:")] public NSComparisonResult Compare(CSSuggestion other);
+    [Selector("localizedAttributedSuggestion")]
+    public NSAttributedString? LocalizedAttributedSuggestion { get; }
+    [Selector("suggestionKind")]
+    public CSSuggestionKind SuggestionKind { get; }
+    [Selector("compareByRank:")]
+    public NSComparisonResult CompareByRank(CSSuggestion other);
+    [Selector("compare:")]
+    public NSComparisonResult Compare(CSSuggestion other);
 }
 
 #endif

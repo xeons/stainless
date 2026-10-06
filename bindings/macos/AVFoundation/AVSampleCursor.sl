@@ -34,32 +34,48 @@ import Standard.ObjC;
 
 public extern objc class AVSampleCursor : NSObject, NSCopying
 {
-    [Selector("stepInDecodeOrderByCount:")] public long StepInDecodeOrderByCount(long stepCount);
-    [Selector("stepInPresentationOrderByCount:")] public long StepInPresentationOrderByCount(long stepCount);
-    [Selector("stepByDecodeTime:wasPinned:")] public CMTime StepByDecodeTimeWasPinned(CMTime deltaDecodeTime, bool* outWasPinned);
-    [Selector("stepByPresentationTime:wasPinned:")] public CMTime StepByPresentationTimeWasPinned(CMTime deltaPresentationTime, bool* outWasPinned);
+    [Selector("stepInDecodeOrderByCount:")]
+    public long StepInDecodeOrderByCount(long stepCount);
+    [Selector("stepInPresentationOrderByCount:")]
+    public long StepInPresentationOrderByCount(long stepCount);
+    [Selector("stepByDecodeTime:wasPinned:")]
+    public CMTime StepByDecodeTimeWasPinned(CMTime deltaDecodeTime, bool* outWasPinned);
+    [Selector("stepByPresentationTime:wasPinned:")]
+    public CMTime StepByPresentationTimeWasPinned(CMTime deltaPresentationTime, bool* outWasPinned);
 }
 
 /// AVSampleCursorTemporalPosition, a category of AVSampleCursor.
 public extern objc class AVSampleCursor
 {
-    [Selector("presentationTimeStamp")] public CMTime PresentationTimeStamp { get; }
-    [Selector("decodeTimeStamp")] public CMTime DecodeTimeStamp { get; }
-    [Selector("comparePositionInDecodeOrderWithPositionOfCursor:")] public NSComparisonResult ComparePositionInDecodeOrderWithPositionOfCursor(AVSampleCursor cursor);
-    [Selector("samplesWithEarlierDecodeTimeStampsMayHaveLaterPresentationTimeStampsThanCursor:")] public bool SamplesWithEarlierDecodeTimeStampsMayHaveLaterPresentationTimeStampsThanCursor(AVSampleCursor cursor);
-    [Selector("samplesWithLaterDecodeTimeStampsMayHaveEarlierPresentationTimeStampsThanCursor:")] public bool SamplesWithLaterDecodeTimeStampsMayHaveEarlierPresentationTimeStampsThanCursor(AVSampleCursor cursor);
+    [Selector("presentationTimeStamp")]
+    public CMTime PresentationTimeStamp { get; }
+    [Selector("decodeTimeStamp")]
+    public CMTime DecodeTimeStamp { get; }
+    [Selector("comparePositionInDecodeOrderWithPositionOfCursor:")]
+    public NSComparisonResult ComparePositionInDecodeOrderWithPositionOfCursor(AVSampleCursor cursor);
+    [Selector("samplesWithEarlierDecodeTimeStampsMayHaveLaterPresentationTimeStampsThanCursor:")]
+    public bool SamplesWithEarlierDecodeTimeStampsMayHaveLaterPresentationTimeStampsThanCursor(AVSampleCursor cursor);
+    [Selector("samplesWithLaterDecodeTimeStampsMayHaveEarlierPresentationTimeStampsThanCursor:")]
+    public bool SamplesWithLaterDecodeTimeStampsMayHaveEarlierPresentationTimeStampsThanCursor(AVSampleCursor cursor);
 }
 
 /// AVSampleCursorCurrentSampleInfo, a category of AVSampleCursor.
 public extern objc class AVSampleCursor
 {
-    [Selector("currentSampleDuration")] public CMTime CurrentSampleDuration { get; }
-    [Selector("currentSampleSyncInfo")] public AVSampleCursorSyncInfo CurrentSampleSyncInfo { get; }
-    [Selector("currentSampleDependencyInfo")] public AVSampleCursorDependencyInfo CurrentSampleDependencyInfo { get; }
-    [Selector("currentSampleDependencyAttachments")] public NSDictionary? CurrentSampleDependencyAttachments { get; }
-    [Selector("currentSampleAudioDependencyInfo")] public AVSampleCursorAudioDependencyInfo CurrentSampleAudioDependencyInfo { get; }
-    [Selector("samplesRequiredForDecoderRefresh")] public NSInteger SamplesRequiredForDecoderRefresh { get; }
-    [Selector("copyCurrentSampleFormatDescription")] public CMFormatDescriptionRef CopyCurrentSampleFormatDescription();
+    [Selector("currentSampleDuration")]
+    public CMTime CurrentSampleDuration { get; }
+    [Selector("currentSampleSyncInfo")]
+    public AVSampleCursorSyncInfo CurrentSampleSyncInfo { get; }
+    [Selector("currentSampleDependencyInfo")]
+    public AVSampleCursorDependencyInfo CurrentSampleDependencyInfo { get; }
+    [Selector("currentSampleDependencyAttachments")]
+    public NSDictionary? CurrentSampleDependencyAttachments { get; }
+    [Selector("currentSampleAudioDependencyInfo")]
+    public AVSampleCursorAudioDependencyInfo CurrentSampleAudioDependencyInfo { get; }
+    [Selector("samplesRequiredForDecoderRefresh")]
+    public NSInteger SamplesRequiredForDecoderRefresh { get; }
+    [Selector("copyCurrentSampleFormatDescription")]
+    public CMFormatDescriptionRef CopyCurrentSampleFormatDescription();
 }
 
 public struct AVSampleCursorSyncInfo
@@ -88,11 +104,16 @@ public struct AVSampleCursorAudioDependencyInfo
 /// AVSampleCursorSampleStorageInfo, a category of AVSampleCursor.
 public extern objc class AVSampleCursor
 {
-    [Selector("currentChunkStorageURL")] public NSURL? CurrentChunkStorageURL { get; }
-    [Selector("currentChunkStorageRange")] public AVSampleCursorStorageRange CurrentChunkStorageRange { get; }
-    [Selector("currentChunkInfo")] public AVSampleCursorChunkInfo CurrentChunkInfo { get; }
-    [Selector("currentSampleIndexInChunk")] public long CurrentSampleIndexInChunk { get; }
-    [Selector("currentSampleStorageRange")] public AVSampleCursorStorageRange CurrentSampleStorageRange { get; }
+    [Selector("currentChunkStorageURL")]
+    public NSURL? CurrentChunkStorageURL { get; }
+    [Selector("currentChunkStorageRange")]
+    public AVSampleCursorStorageRange CurrentChunkStorageRange { get; }
+    [Selector("currentChunkInfo")]
+    public AVSampleCursorChunkInfo CurrentChunkInfo { get; }
+    [Selector("currentSampleIndexInChunk")]
+    public long CurrentSampleIndexInChunk { get; }
+    [Selector("currentSampleStorageRange")]
+    public AVSampleCursorStorageRange CurrentSampleStorageRange { get; }
 }
 
 public struct AVSampleCursorStorageRange

@@ -7,7 +7,8 @@ import Standard.ObjC;
 [ObjCRoot]
 public extern objc class NSObject
 {
-    [Selector("description")] Missing Description { get; }
+    [Selector("description")]
+    Missing Description { get; }
 }
 
 public objc class Square : NSObject

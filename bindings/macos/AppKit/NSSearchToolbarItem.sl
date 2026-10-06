@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class NSSearchToolbarItem : NSToolbarItem
 {
-    [Selector("searchField", "setSearchField:")] public NSSearchField? SearchField { get; set; }
-    [Selector("resignsFirstResponderWithCancel", "setResignsFirstResponderWithCancel:")] public bool ResignsFirstResponderWithCancel { get; set; }
-    [Selector("preferredWidthForSearchField", "setPreferredWidthForSearchField:")] public CGFloat PreferredWidthForSearchField { get; set; }
-    [Selector("beginSearchInteraction")] public void BeginSearchInteraction();
-    [Selector("endSearchInteraction")] public void EndSearchInteraction();
+    [Selector("searchField", "setSearchField:")]
+    public NSSearchField? SearchField { get; set; }
+    [Selector("resignsFirstResponderWithCancel", "setResignsFirstResponderWithCancel:")]
+    public bool ResignsFirstResponderWithCancel { get; set; }
+    [Selector("preferredWidthForSearchField", "setPreferredWidthForSearchField:")]
+    public CGFloat PreferredWidthForSearchField { get; set; }
+    [Selector("beginSearchInteraction")]
+    public void BeginSearchInteraction();
+    [Selector("endSearchInteraction")]
+    public void EndSearchInteraction();
 }
 
 #endif

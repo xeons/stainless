@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class ASPasskeyRegistrationCredential : NSObject, ASAuthorizationCredential
 {
-    [Selector("relyingParty")] public NSString RelyingParty { get; }
-    [Selector("clientDataHash")] public NSData ClientDataHash { get; }
-    [Selector("credentialID")] public NSData CredentialID { get; }
-    [Selector("attestationObject")] public NSData AttestationObject { get; }
-    [Selector("extensionOutput", "setExtensionOutput:")] public ASPasskeyRegistrationCredentialExtensionOutput? ExtensionOutput { get; set; }
-    [Selector("initWithRelyingParty:clientDataHash:credentialID:attestationObject:")] public Self InitWithRelyingPartyClientDataHashCredentialIDAttestationObject(NSString relyingParty, NSData clientDataHash, NSData credentialID, NSData attestationObject);
-    [Selector("initWithRelyingParty:clientDataHash:credentialID:attestationObject:extensionOutput:")] public Self InitWithRelyingPartyClientDataHashCredentialIDAttestationObjectExtensionOutput(NSString relyingParty, NSData clientDataHash, NSData credentialID, NSData attestationObject, ASPasskeyRegistrationCredentialExtensionOutput? extensionOutput);
-    [Selector("credentialWithRelyingParty:clientDataHash:credentialID:attestationObject:")] public static Self CredentialWithRelyingPartyClientDataHashCredentialIDAttestationObject(NSString relyingParty, NSData clientDataHash, NSData credentialID, NSData attestationObject);
+    [Selector("relyingParty")]
+    public NSString RelyingParty { get; }
+    [Selector("clientDataHash")]
+    public NSData ClientDataHash { get; }
+    [Selector("credentialID")]
+    public NSData CredentialID { get; }
+    [Selector("attestationObject")]
+    public NSData AttestationObject { get; }
+    [Selector("extensionOutput", "setExtensionOutput:")]
+    public ASPasskeyRegistrationCredentialExtensionOutput? ExtensionOutput { get; set; }
+    [Selector("initWithRelyingParty:clientDataHash:credentialID:attestationObject:")]
+    public Self InitWithRelyingPartyClientDataHashCredentialIDAttestationObject(NSString relyingParty, NSData clientDataHash, NSData credentialID, NSData attestationObject);
+    [Selector("initWithRelyingParty:clientDataHash:credentialID:attestationObject:extensionOutput:")]
+    public Self InitWithRelyingPartyClientDataHashCredentialIDAttestationObjectExtensionOutput(NSString relyingParty, NSData clientDataHash, NSData credentialID, NSData attestationObject, ASPasskeyRegistrationCredentialExtensionOutput? extensionOutput);
+    [Selector("credentialWithRelyingParty:clientDataHash:credentialID:attestationObject:")]
+    public static Self CredentialWithRelyingPartyClientDataHashCredentialIDAttestationObject(NSString relyingParty, NSData clientDataHash, NSData credentialID, NSData attestationObject);
 }
 
 #endif

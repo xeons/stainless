@@ -36,92 +36,138 @@ public objc interface AVMetricEventStreamPublisher { }
 
 public objc interface AVMetricEventStreamSubscriber
 {
-    [Selector("publisher:didReceiveEvent:")] void PublisherDidReceiveEvent(AVMetricEventStreamPublisher publisher, AVMetricEvent event);
+    [Selector("publisher:didReceiveEvent:")]
+    void PublisherDidReceiveEvent(AVMetricEventStreamPublisher publisher, AVMetricEvent event);
 }
 
 public extern objc class AVMetricEventStream : NSObject
 {
-    [Selector("eventStream")] public static Self EventStream();
-    [Selector("addPublisher:")] public bool AddPublisher(AVMetricEventStreamPublisher publisher);
-    [Selector("setSubscriber:queue:")] public bool SetSubscriberQueue(AVMetricEventStreamSubscriber subscriber, dispatch_queue_t? queue);
-    [Selector("subscribeToMetricEvent:")] public void SubscribeToMetricEvent(Class metricEventClass);
-    [Selector("subscribeToMetricEvents:")] public void SubscribeToMetricEvents(NSArray metricEventClasses);
-    [Selector("subscribeToAllMetricEvents")] public void SubscribeToAllMetricEvents();
+    [Selector("eventStream")]
+    public static Self EventStream();
+    [Selector("addPublisher:")]
+    public bool AddPublisher(AVMetricEventStreamPublisher publisher);
+    [Selector("setSubscriber:queue:")]
+    public bool SetSubscriberQueue(AVMetricEventStreamSubscriber subscriber, dispatch_queue_t? queue);
+    [Selector("subscribeToMetricEvent:")]
+    public void SubscribeToMetricEvent(Class metricEventClass);
+    [Selector("subscribeToMetricEvents:")]
+    public void SubscribeToMetricEvents(NSArray metricEventClasses);
+    [Selector("subscribeToAllMetricEvents")]
+    public void SubscribeToAllMetricEvents();
 }
 
 public extern objc class AVMetricEvent : NSObject, NSSecureCoding
 {
-    [Selector("date")] public NSDate Date { get; }
-    [Selector("mediaTime")] public CMTime MediaTime { get; }
-    [Selector("sessionID")] public NSString? SessionID { get; }
+    [Selector("date")]
+    public NSDate Date { get; }
+    [Selector("mediaTime")]
+    public CMTime MediaTime { get; }
+    [Selector("sessionID")]
+    public NSString? SessionID { get; }
 }
 
 public extern objc class AVMetricErrorEvent : AVMetricEvent
 {
-    [Selector("didRecover")] public bool DidRecover { get; }
-    [Selector("error")] public NSError Error { get; }
+    [Selector("didRecover")]
+    public bool DidRecover { get; }
+    [Selector("error")]
+    public NSError Error { get; }
 }
 
 public extern objc class AVMetricMediaResourceRequestEvent : AVMetricEvent
 {
-    [Selector("url")] public NSURL? Url { get; }
-    [Selector("serverAddress")] public NSString? ServerAddress { get; }
-    [Selector("requestStartTime")] public NSDate RequestStartTime { get; }
-    [Selector("requestEndTime")] public NSDate RequestEndTime { get; }
-    [Selector("responseStartTime")] public NSDate ResponseStartTime { get; }
-    [Selector("responseEndTime")] public NSDate ResponseEndTime { get; }
-    [Selector("byteRange")] public NSRange ByteRange { get; }
-    [Selector("wasReadFromCache")] public bool ReadFromCache { get; }
-    [Selector("errorEvent")] public AVMetricErrorEvent? ErrorEvent { get; }
-    [Selector("networkTransactionMetrics")] public NSURLSessionTaskMetrics? NetworkTransactionMetrics { get; }
+    [Selector("url")]
+    public NSURL? Url { get; }
+    [Selector("serverAddress")]
+    public NSString? ServerAddress { get; }
+    [Selector("requestStartTime")]
+    public NSDate RequestStartTime { get; }
+    [Selector("requestEndTime")]
+    public NSDate RequestEndTime { get; }
+    [Selector("responseStartTime")]
+    public NSDate ResponseStartTime { get; }
+    [Selector("responseEndTime")]
+    public NSDate ResponseEndTime { get; }
+    [Selector("byteRange")]
+    public NSRange ByteRange { get; }
+    [Selector("wasReadFromCache")]
+    public bool ReadFromCache { get; }
+    [Selector("errorEvent")]
+    public AVMetricErrorEvent? ErrorEvent { get; }
+    [Selector("networkTransactionMetrics")]
+    public NSURLSessionTaskMetrics? NetworkTransactionMetrics { get; }
 }
 
 public extern objc class AVMetricHLSPlaylistRequestEvent : AVMetricEvent
 {
-    [Selector("url")] public NSURL? Url { get; }
-    [Selector("isMultivariantPlaylist")] public bool IsMultivariantPlaylist { get; }
-    [Selector("mediaType")] public AVMediaType MediaType { get; }
-    [Selector("mediaResourceRequestEvent")] public AVMetricMediaResourceRequestEvent? MediaResourceRequestEvent { get; }
+    [Selector("url")]
+    public NSURL? Url { get; }
+    [Selector("isMultivariantPlaylist")]
+    public bool IsMultivariantPlaylist { get; }
+    [Selector("mediaType")]
+    public AVMediaType MediaType { get; }
+    [Selector("mediaResourceRequestEvent")]
+    public AVMetricMediaResourceRequestEvent? MediaResourceRequestEvent { get; }
 }
 
 public extern objc class AVMetricHLSMediaSegmentRequestEvent : AVMetricEvent
 {
-    [Selector("url")] public NSURL? Url { get; }
-    [Selector("isMapSegment")] public bool IsMapSegment { get; }
-    [Selector("mediaType")] public AVMediaType MediaType { get; }
-    [Selector("byteRange")] public NSRange ByteRange { get; }
-    [Selector("indexFileURL")] public NSURL IndexFileURL { get; }
-    [Selector("segmentDuration")] public NSTimeInterval SegmentDuration { get; }
-    [Selector("mediaResourceRequestEvent")] public AVMetricMediaResourceRequestEvent? MediaResourceRequestEvent { get; }
+    [Selector("url")]
+    public NSURL? Url { get; }
+    [Selector("isMapSegment")]
+    public bool IsMapSegment { get; }
+    [Selector("mediaType")]
+    public AVMediaType MediaType { get; }
+    [Selector("byteRange")]
+    public NSRange ByteRange { get; }
+    [Selector("indexFileURL")]
+    public NSURL IndexFileURL { get; }
+    [Selector("segmentDuration")]
+    public NSTimeInterval SegmentDuration { get; }
+    [Selector("mediaResourceRequestEvent")]
+    public AVMetricMediaResourceRequestEvent? MediaResourceRequestEvent { get; }
 }
 
 public extern objc class AVMetricContentKeyRequestEvent : AVMetricEvent
 {
-    [Selector("contentKeySpecifier")] public AVContentKeySpecifier ContentKeySpecifier { get; }
-    [Selector("mediaType")] public AVMediaType MediaType { get; }
-    [Selector("isClientInitiated")] public bool IsClientInitiated { get; }
-    [Selector("mediaResourceRequestEvent")] public AVMetricMediaResourceRequestEvent? MediaResourceRequestEvent { get; }
+    [Selector("contentKeySpecifier")]
+    public AVContentKeySpecifier ContentKeySpecifier { get; }
+    [Selector("mediaType")]
+    public AVMediaType MediaType { get; }
+    [Selector("isClientInitiated")]
+    public bool IsClientInitiated { get; }
+    [Selector("mediaResourceRequestEvent")]
+    public AVMetricMediaResourceRequestEvent? MediaResourceRequestEvent { get; }
 }
 
 public extern objc class AVMetricPlayerItemLikelyToKeepUpEvent : AVMetricEvent
 {
-    [Selector("variant")] public AVAssetVariant? Variant { get; }
-    [Selector("timeTaken")] public NSTimeInterval TimeTaken { get; }
-    [Selector("loadedTimeRanges")] public NSArray? LoadedTimeRanges { get; }
+    [Selector("variant")]
+    public AVAssetVariant? Variant { get; }
+    [Selector("timeTaken")]
+    public NSTimeInterval TimeTaken { get; }
+    [Selector("loadedTimeRanges")]
+    public NSArray? LoadedTimeRanges { get; }
 }
 
 public extern objc class AVMetricPlayerItemInitialLikelyToKeepUpEvent : AVMetricPlayerItemLikelyToKeepUpEvent
 {
-    [Selector("playlistRequestEvents")] public NSArray PlaylistRequestEvents { get; }
-    [Selector("mediaSegmentRequestEvents")] public NSArray MediaSegmentRequestEvents { get; }
-    [Selector("contentKeyRequestEvents")] public NSArray ContentKeyRequestEvents { get; }
+    [Selector("playlistRequestEvents")]
+    public NSArray PlaylistRequestEvents { get; }
+    [Selector("mediaSegmentRequestEvents")]
+    public NSArray MediaSegmentRequestEvents { get; }
+    [Selector("contentKeyRequestEvents")]
+    public NSArray ContentKeyRequestEvents { get; }
 }
 
 public extern objc class AVMetricPlayerItemRateChangeEvent : AVMetricEvent
 {
-    [Selector("rate")] public double Rate { get; }
-    [Selector("previousRate")] public double PreviousRate { get; }
-    [Selector("variant")] public AVAssetVariant? Variant { get; }
+    [Selector("rate")]
+    public double Rate { get; }
+    [Selector("previousRate")]
+    public double PreviousRate { get; }
+    [Selector("variant")]
+    public AVAssetVariant? Variant { get; }
 }
 
 public extern objc class AVMetricPlayerItemStallEvent : AVMetricPlayerItemRateChangeEvent { }
@@ -130,65 +176,97 @@ public extern objc class AVMetricPlayerItemSeekEvent : AVMetricPlayerItemRateCha
 
 public extern objc class AVMetricPlayerItemSeekDidCompleteEvent : AVMetricPlayerItemRateChangeEvent
 {
-    [Selector("didSeekInBuffer")] public bool DidSeekInBuffer { get; }
+    [Selector("didSeekInBuffer")]
+    public bool DidSeekInBuffer { get; }
 }
 
 /// macOS 26.0 and later.
 public extern objc class AVMetricMediaRendition : NSObject, NSSecureCoding
 {
-    [Selector("stableID")] public NSString? StableID { get; }
-    [Selector("URL")] public NSURL? URL { get; }
+    [Selector("stableID")]
+    public NSString? StableID { get; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
 }
 
 public extern objc class AVMetricPlayerItemVariantSwitchEvent : AVMetricEvent
 {
-    [Selector("fromVariant")] public AVAssetVariant? FromVariant { get; }
-    [Selector("toVariant")] public AVAssetVariant ToVariant { get; }
-    [Selector("loadedTimeRanges")] public NSArray? LoadedTimeRanges { get; }
+    [Selector("fromVariant")]
+    public AVAssetVariant? FromVariant { get; }
+    [Selector("toVariant")]
+    public AVAssetVariant ToVariant { get; }
+    [Selector("loadedTimeRanges")]
+    public NSArray? LoadedTimeRanges { get; }
     /// macOS 26.0 and later.
-    [Selector("videoRendition")] public AVMetricMediaRendition VideoRendition { get; }
+    [Selector("videoRendition")]
+    public AVMetricMediaRendition VideoRendition { get; }
     /// macOS 26.0 and later.
-    [Selector("audioRendition")] public AVMetricMediaRendition AudioRendition { get; }
+    [Selector("audioRendition")]
+    public AVMetricMediaRendition AudioRendition { get; }
     /// macOS 26.0 and later.
-    [Selector("subtitleRendition")] public AVMetricMediaRendition SubtitleRendition { get; }
-    [Selector("didSucceed")] public bool DidSucceed { get; }
+    [Selector("subtitleRendition")]
+    public AVMetricMediaRendition SubtitleRendition { get; }
+    [Selector("didSucceed")]
+    public bool DidSucceed { get; }
 }
 
 public extern objc class AVMetricPlayerItemVariantSwitchStartEvent : AVMetricEvent
 {
-    [Selector("fromVariant")] public AVAssetVariant? FromVariant { get; }
-    [Selector("toVariant")] public AVAssetVariant ToVariant { get; }
-    [Selector("loadedTimeRanges")] public NSArray? LoadedTimeRanges { get; }
+    [Selector("fromVariant")]
+    public AVAssetVariant? FromVariant { get; }
+    [Selector("toVariant")]
+    public AVAssetVariant ToVariant { get; }
+    [Selector("loadedTimeRanges")]
+    public NSArray? LoadedTimeRanges { get; }
     /// macOS 26.0 and later.
-    [Selector("videoRendition")] public AVMetricMediaRendition VideoRendition { get; }
+    [Selector("videoRendition")]
+    public AVMetricMediaRendition VideoRendition { get; }
     /// macOS 26.0 and later.
-    [Selector("audioRendition")] public AVMetricMediaRendition AudioRendition { get; }
+    [Selector("audioRendition")]
+    public AVMetricMediaRendition AudioRendition { get; }
     /// macOS 26.0 and later.
-    [Selector("subtitleRendition")] public AVMetricMediaRendition SubtitleRendition { get; }
+    [Selector("subtitleRendition")]
+    public AVMetricMediaRendition SubtitleRendition { get; }
 }
 
 public extern objc class AVMetricPlayerItemPlaybackSummaryEvent : AVMetricEvent
 {
-    [Selector("errorEvent")] public AVMetricErrorEvent? ErrorEvent { get; }
-    [Selector("recoverableErrorCount")] public NSInteger RecoverableErrorCount { get; }
-    [Selector("stallCount")] public NSInteger StallCount { get; }
-    [Selector("variantSwitchCount")] public NSInteger VariantSwitchCount { get; }
-    [Selector("playbackDuration")] public NSInteger PlaybackDuration { get; }
-    [Selector("mediaResourceRequestCount")] public NSInteger MediaResourceRequestCount { get; }
-    [Selector("timeSpentRecoveringFromStall")] public NSTimeInterval TimeSpentRecoveringFromStall { get; }
-    [Selector("timeSpentInInitialStartup")] public NSTimeInterval TimeSpentInInitialStartup { get; }
-    [Selector("timeWeightedAverageBitrate")] public NSInteger TimeWeightedAverageBitrate { get; }
-    [Selector("timeWeightedPeakBitrate")] public NSInteger TimeWeightedPeakBitrate { get; }
+    [Selector("errorEvent")]
+    public AVMetricErrorEvent? ErrorEvent { get; }
+    [Selector("recoverableErrorCount")]
+    public NSInteger RecoverableErrorCount { get; }
+    [Selector("stallCount")]
+    public NSInteger StallCount { get; }
+    [Selector("variantSwitchCount")]
+    public NSInteger VariantSwitchCount { get; }
+    [Selector("playbackDuration")]
+    public NSInteger PlaybackDuration { get; }
+    [Selector("mediaResourceRequestCount")]
+    public NSInteger MediaResourceRequestCount { get; }
+    [Selector("timeSpentRecoveringFromStall")]
+    public NSTimeInterval TimeSpentRecoveringFromStall { get; }
+    [Selector("timeSpentInInitialStartup")]
+    public NSTimeInterval TimeSpentInInitialStartup { get; }
+    [Selector("timeWeightedAverageBitrate")]
+    public NSInteger TimeWeightedAverageBitrate { get; }
+    [Selector("timeWeightedPeakBitrate")]
+    public NSInteger TimeWeightedPeakBitrate { get; }
 }
 
 public extern objc class AVMetricDownloadSummaryEvent : AVMetricEvent
 {
-    [Selector("errorEvent")] public AVMetricErrorEvent? ErrorEvent { get; }
-    [Selector("recoverableErrorCount")] public NSInteger RecoverableErrorCount { get; }
-    [Selector("mediaResourceRequestCount")] public NSInteger MediaResourceRequestCount { get; }
-    [Selector("bytesDownloadedCount")] public NSInteger BytesDownloadedCount { get; }
-    [Selector("downloadDuration")] public NSTimeInterval DownloadDuration { get; }
-    [Selector("variants")] public NSArray Variants { get; }
+    [Selector("errorEvent")]
+    public AVMetricErrorEvent? ErrorEvent { get; }
+    [Selector("recoverableErrorCount")]
+    public NSInteger RecoverableErrorCount { get; }
+    [Selector("mediaResourceRequestCount")]
+    public NSInteger MediaResourceRequestCount { get; }
+    [Selector("bytesDownloadedCount")]
+    public NSInteger BytesDownloadedCount { get; }
+    [Selector("downloadDuration")]
+    public NSTimeInterval DownloadDuration { get; }
+    [Selector("variants")]
+    public NSArray Variants { get; }
 }
 
 #endif

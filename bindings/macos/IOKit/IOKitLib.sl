@@ -71,11 +71,14 @@ public extern "C" kern_return_t IOObjectRetain(io_object_t object);
 
 public extern "C" kern_return_t IOObjectGetClass(io_object_t object, byte* className);
 
-[ReturnsRetained] public extern "C" CFStringRef? IOObjectCopyClass(io_object_t object);
+[ReturnsRetained]
+public extern "C" CFStringRef? IOObjectCopyClass(io_object_t object);
 
-[ReturnsRetained] public extern "C" CFStringRef? IOObjectCopySuperclassForClass(CFStringRef? classname);
+[ReturnsRetained]
+public extern "C" CFStringRef? IOObjectCopySuperclassForClass(CFStringRef? classname);
 
-[ReturnsRetained] public extern "C" CFStringRef? IOObjectCopyBundleIdentifierForClass(CFStringRef? classname);
+[ReturnsRetained]
+public extern "C" CFStringRef? IOObjectCopyBundleIdentifierForClass(CFStringRef? classname);
 
 public extern "C" boolean_t IOObjectConformsTo(io_object_t object, byte* className);
 
@@ -192,15 +195,18 @@ public extern "C" kern_return_t IORegistryEntryGetLocationInPlane(io_registry_en
 
 public extern "C" kern_return_t IORegistryEntryGetPath(io_registry_entry_t entry, byte* plane, byte* path);
 
-[ReturnsRetained] public extern "C" CFStringRef? IORegistryEntryCopyPath(io_registry_entry_t entry, byte* plane);
+[ReturnsRetained]
+public extern "C" CFStringRef? IORegistryEntryCopyPath(io_registry_entry_t entry, byte* plane);
 
 public extern "C" kern_return_t IORegistryEntryGetRegistryEntryID(io_registry_entry_t entry, ulong* entryID);
 
 public extern "C" kern_return_t IORegistryEntryCreateCFProperties(io_registry_entry_t entry, __CFDictionary** properties, CFAllocatorRef? allocator, IOOptionBits options);
 
-[ReturnsRetained] public extern "C" CFTypeRef? IORegistryEntryCreateCFProperty(io_registry_entry_t entry, CFStringRef? key, CFAllocatorRef? allocator, IOOptionBits options);
+[ReturnsRetained]
+public extern "C" CFTypeRef? IORegistryEntryCreateCFProperty(io_registry_entry_t entry, CFStringRef? key, CFAllocatorRef? allocator, IOOptionBits options);
 
-[ReturnsRetained] public extern "C" CFTypeRef? IORegistryEntrySearchCFProperty(io_registry_entry_t entry, byte* plane, CFStringRef? key, CFAllocatorRef? allocator, IOOptionBits options);
+[ReturnsRetained]
+public extern "C" CFTypeRef? IORegistryEntrySearchCFProperty(io_registry_entry_t entry, byte* plane, CFStringRef? key, CFAllocatorRef? allocator, IOOptionBits options);
 
 public extern "C" kern_return_t IORegistryEntryGetProperty(io_registry_entry_t entry, byte* propertyName, byte* buffer, uint* size);
 
@@ -218,15 +224,19 @@ public extern "C" kern_return_t IORegistryEntryGetParentEntry(io_registry_entry_
 
 public extern "C" boolean_t IORegistryEntryInPlane(io_registry_entry_t entry, byte* plane);
 
-[ReturnsRetained] public extern "C" CFMutableDictionaryRef? IOServiceMatching(byte* name);
+[ReturnsRetained]
+public extern "C" CFMutableDictionaryRef? IOServiceMatching(byte* name);
 
-[ReturnsRetained] public extern "C" CFMutableDictionaryRef? IOServiceNameMatching(byte* name);
+[ReturnsRetained]
+public extern "C" CFMutableDictionaryRef? IOServiceNameMatching(byte* name);
 
-[ReturnsRetained] public extern "C" CFMutableDictionaryRef? IOBSDNameMatching(mach_port_t mainPort, uint options, byte* bsdName);
+[ReturnsRetained]
+public extern "C" CFMutableDictionaryRef? IOBSDNameMatching(mach_port_t mainPort, uint options, byte* bsdName);
 
 public extern "C" CFMutableDictionaryRef? IOOpenFirmwarePathMatching(mach_port_t mainPort, uint options, byte* path);
 
-[ReturnsRetained] public extern "C" CFMutableDictionaryRef? IORegistryEntryIDMatching(ulong entryID);
+[ReturnsRetained]
+public extern "C" CFMutableDictionaryRef? IORegistryEntryIDMatching(ulong entryID);
 
 public extern "C" kern_return_t IOServiceOFPathToBSDName(mach_port_t mainPort, byte* openFirmwarePath, byte* bsdName);
 

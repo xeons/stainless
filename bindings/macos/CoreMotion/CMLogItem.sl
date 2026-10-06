@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class CMLogItem : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("timestamp")] public NSTimeInterval Timestamp { get; }
+    [Selector("timestamp")]
+    public NSTimeInterval Timestamp { get; }
 }
 
 #endif

@@ -33,21 +33,32 @@ import Standard.ObjC;
 
 public extern objc class NEIPv4Settings : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("addresses")] public NSArray? Addresses { get; }
-    [Selector("subnetMasks")] public NSArray? SubnetMasks { get; }
-    [Selector("router", "setRouter:")] public NSString? Router { get; set; }
-    [Selector("includedRoutes", "setIncludedRoutes:")] public NSArray? IncludedRoutes { get; set; }
-    [Selector("excludedRoutes", "setExcludedRoutes:")] public NSArray? ExcludedRoutes { get; set; }
-    [Selector("initWithAddresses:subnetMasks:")] public Self InitWithAddressesSubnetMasks(NSArray addresses, NSArray subnetMasks);
+    [Selector("addresses")]
+    public NSArray? Addresses { get; }
+    [Selector("subnetMasks")]
+    public NSArray? SubnetMasks { get; }
+    [Selector("router", "setRouter:")]
+    public NSString? Router { get; set; }
+    [Selector("includedRoutes", "setIncludedRoutes:")]
+    public NSArray? IncludedRoutes { get; set; }
+    [Selector("excludedRoutes", "setExcludedRoutes:")]
+    public NSArray? ExcludedRoutes { get; set; }
+    [Selector("initWithAddresses:subnetMasks:")]
+    public Self InitWithAddressesSubnetMasks(NSArray addresses, NSArray subnetMasks);
 }
 
 public extern objc class NEIPv4Route : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("destinationAddress")] public NSString? DestinationAddress { get; }
-    [Selector("destinationSubnetMask")] public NSString? DestinationSubnetMask { get; }
-    [Selector("gatewayAddress", "setGatewayAddress:")] public NSString? GatewayAddress { get; set; }
-    [Selector("initWithDestinationAddress:subnetMask:")] public Self InitWithDestinationAddressSubnetMask(NSString address, NSString subnetMask);
-    [Selector("defaultRoute")] public static NEIPv4Route DefaultRoute();
+    [Selector("destinationAddress")]
+    public NSString? DestinationAddress { get; }
+    [Selector("destinationSubnetMask")]
+    public NSString? DestinationSubnetMask { get; }
+    [Selector("gatewayAddress", "setGatewayAddress:")]
+    public NSString? GatewayAddress { get; set; }
+    [Selector("initWithDestinationAddress:subnetMask:")]
+    public Self InitWithDestinationAddressSubnetMask(NSString address, NSString subnetMask);
+    [Selector("defaultRoute")]
+    public static NEIPv4Route DefaultRoute();
 }
 
 #endif

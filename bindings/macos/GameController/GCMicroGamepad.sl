@@ -40,17 +40,27 @@ public extern "C" NSString GCInputMicroGamepadButtonMenu;
 
 public extern objc class GCMicroGamepad : GCPhysicalInputProfile
 {
-    [Selector("controller")] public GCController? Controller { get; }
-    [Selector("valueChangedHandler", "setValueChangedHandler:")] public GCMicroGamepadValueChangedHandler? ValueChangedHandler { get; set; }
-    [Selector("dpad")] public GCControllerDirectionPad Dpad { get; }
-    [Selector("buttonA")] public GCControllerButtonInput ButtonA { get; }
-    [Selector("buttonX")] public GCControllerButtonInput ButtonX { get; }
-    [Selector("buttonMenu")] public GCControllerButtonInput ButtonMenu { get; }
-    [Selector("reportsAbsoluteDpadValues", "setReportsAbsoluteDpadValues:")] public bool ReportsAbsoluteDpadValues { get; set; }
-    [Selector("allowsRotation", "setAllowsRotation:")] public bool AllowsRotation { get; set; }
+    [Selector("controller")]
+    public GCController? Controller { get; }
+    [Selector("valueChangedHandler", "setValueChangedHandler:")]
+    public GCMicroGamepadValueChangedHandler? ValueChangedHandler { get; set; }
+    [Selector("dpad")]
+    public GCControllerDirectionPad Dpad { get; }
+    [Selector("buttonA")]
+    public GCControllerButtonInput ButtonA { get; }
+    [Selector("buttonX")]
+    public GCControllerButtonInput ButtonX { get; }
+    [Selector("buttonMenu")]
+    public GCControllerButtonInput ButtonMenu { get; }
+    [Selector("reportsAbsoluteDpadValues", "setReportsAbsoluteDpadValues:")]
+    public bool ReportsAbsoluteDpadValues { get; set; }
+    [Selector("allowsRotation", "setAllowsRotation:")]
+    public bool AllowsRotation { get; set; }
     /// Deprecated in macOS 10.15.
-    [Selector("saveSnapshot")] public GCMicroGamepadSnapshot SaveSnapshot();
-    [Selector("setStateFromMicroGamepad:")] public void SetStateFromMicroGamepad(GCMicroGamepad microGamepad);
+    [Selector("saveSnapshot")]
+    public GCMicroGamepadSnapshot SaveSnapshot();
+    [Selector("setStateFromMicroGamepad:")]
+    public void SetStateFromMicroGamepad(GCMicroGamepad microGamepad);
 }
 
 public objc closure void GCMicroGamepadValueChangedHandler(GCMicroGamepad arg0, GCControllerElement arg1);

@@ -33,17 +33,24 @@ import Standard.ObjC;
 
 public objc interface GCPhysicalInputElement : NSObjectProtocol
 {
-    [Selector("aliases")] NSSet Aliases { get; }
-    [Selector("localizedName")] NSString? LocalizedName { get; }
-    [Selector("sfSymbolsName")] NSString? SfSymbolsName { get; }
+    [Selector("aliases")]
+    NSSet Aliases { get; }
+    [Selector("localizedName")]
+    NSString? LocalizedName { get; }
+    [Selector("sfSymbolsName")]
+    NSString? SfSymbolsName { get; }
 }
 
 public extern objc class GCPhysicalInputElementCollection : NSObject, NSFastEnumeration
 {
-    [Selector("count")] public NSUInteger Count { get; }
-    [Selector("elementForAlias:")] public AnyObject? ElementForAlias(AnyObject alias);
-    [Selector("objectForKeyedSubscript:")] public AnyObject? ObjectForKeyedSubscript(AnyObject key);
-    [Selector("elementEnumerator")] public NSEnumerator ElementEnumerator();
+    [Selector("count")]
+    public NSUInteger Count { get; }
+    [Selector("elementForAlias:")]
+    public AnyObject? ElementForAlias(AnyObject alias);
+    [Selector("objectForKeyedSubscript:")]
+    public AnyObject? ObjectForKeyedSubscript(AnyObject key);
+    [Selector("elementEnumerator")]
+    public NSEnumerator ElementEnumerator();
 }
 
 #endif

@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class ABPersonView : NSView
 {
-    [Selector("editing", "setEditing:")] public bool Editing { get; set; }
-    [Selector("person", "setPerson:")] public ABPerson? Person { get; set; }
-    [Selector("shouldShowLinkedPeople", "setShouldShowLinkedPeople:")] public bool ShouldShowLinkedPeople { get; set; }
+    [Selector("editing", "setEditing:")]
+    public bool Editing { get; set; }
+    [Selector("person", "setPerson:")]
+    public ABPerson? Person { get; set; }
+    [Selector("shouldShowLinkedPeople", "setShouldShowLinkedPeople:")]
+    public bool ShouldShowLinkedPeople { get; set; }
 }
 
 #endif

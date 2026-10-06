@@ -33,11 +33,16 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCUpsampleLayer : MLCLayer
 {
-    [Selector("shape")] public NSArray? Shape { get; }
-    [Selector("sampleMode")] public MLCSampleMode SampleMode { get; }
-    [Selector("alignsCorners")] public bool AlignsCorners { get; }
-    [Selector("layerWithShape:")] public static Self? LayerWithShape(NSArray shape);
-    [Selector("layerWithShape:sampleMode:alignsCorners:")] public static Self? LayerWithShapeSampleModeAlignsCorners(NSArray shape, MLCSampleMode sampleMode, bool alignsCorners);
+    [Selector("shape")]
+    public NSArray? Shape { get; }
+    [Selector("sampleMode")]
+    public MLCSampleMode SampleMode { get; }
+    [Selector("alignsCorners")]
+    public bool AlignsCorners { get; }
+    [Selector("layerWithShape:")]
+    public static Self? LayerWithShape(NSArray shape);
+    [Selector("layerWithShape:sampleMode:alignsCorners:")]
+    public static Self? LayerWithShapeSampleModeAlignsCorners(NSArray shape, MLCSampleMode sampleMode, bool alignsCorners);
 }
 
 #endif

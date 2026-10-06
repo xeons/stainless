@@ -35,17 +35,28 @@ public objc closure void CMHeadphoneDeviceMotionHandler(CMDeviceMotion? arg0, NS
 
 public extern objc class CMHeadphoneMotionManager : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public CMHeadphoneMotionManagerDelegate? Delegate { get; set; }
-    [Selector("isConnectionStatusActive")] public bool ConnectionStatusActive { get; }
-    [Selector("isDeviceMotionAvailable")] public bool DeviceMotionAvailable { get; }
-    [Selector("isDeviceMotionActive")] public bool DeviceMotionActive { get; }
-    [Selector("deviceMotion")] public CMDeviceMotion? DeviceMotion { get; }
-    [Selector("authorizationStatus")] public static CMAuthorizationStatus AuthorizationStatus();
-    [Selector("startDeviceMotionUpdates")] public void StartDeviceMotionUpdates();
-    [Selector("startDeviceMotionUpdatesToQueue:withHandler:")] public void StartDeviceMotionUpdatesToQueueWithHandler(NSOperationQueue queue, CMHeadphoneDeviceMotionHandler handler);
-    [Selector("stopDeviceMotionUpdates")] public void StopDeviceMotionUpdates();
-    [Selector("startConnectionStatusUpdates")] public void StartConnectionStatusUpdates();
-    [Selector("stopConnectionStatusUpdates")] public void StopConnectionStatusUpdates();
+    [Selector("delegate", "setDelegate:")]
+    public CMHeadphoneMotionManagerDelegate? Delegate { get; set; }
+    [Selector("isConnectionStatusActive")]
+    public bool ConnectionStatusActive { get; }
+    [Selector("isDeviceMotionAvailable")]
+    public bool DeviceMotionAvailable { get; }
+    [Selector("isDeviceMotionActive")]
+    public bool DeviceMotionActive { get; }
+    [Selector("deviceMotion")]
+    public CMDeviceMotion? DeviceMotion { get; }
+    [Selector("authorizationStatus")]
+    public static CMAuthorizationStatus AuthorizationStatus();
+    [Selector("startDeviceMotionUpdates")]
+    public void StartDeviceMotionUpdates();
+    [Selector("startDeviceMotionUpdatesToQueue:withHandler:")]
+    public void StartDeviceMotionUpdatesToQueueWithHandler(NSOperationQueue queue, CMHeadphoneDeviceMotionHandler handler);
+    [Selector("stopDeviceMotionUpdates")]
+    public void StopDeviceMotionUpdates();
+    [Selector("startConnectionStatusUpdates")]
+    public void StartConnectionStatusUpdates();
+    [Selector("stopConnectionStatusUpdates")]
+    public void StopConnectionStatusUpdates();
 }
 
 #endif

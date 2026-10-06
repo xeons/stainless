@@ -33,67 +33,123 @@ import Standard.ObjC;
 /// CSMedia, a category of CSSearchableItemAttributeSet.
 public extern objc class CSSearchableItemAttributeSet
 {
-    [Selector("editors", "setEditors:")] public NSArray? Editors { get; set; }
-    [Selector("participants", "setParticipants:")] public NSArray? Participants { get; set; }
-    [Selector("projects", "setProjects:")] public NSArray? Projects { get; set; }
-    [Selector("downloadedDate", "setDownloadedDate:")] public NSDate? DownloadedDate { get; set; }
-    [Selector("contentSources", "setContentSources:")] public NSArray? ContentSources { get; set; }
-    [Selector("comment", "setComment:")] public NSString? Comment { get; set; }
-    [Selector("copyright", "setCopyright:")] public NSString? Copyright { get; set; }
-    [Selector("lastUsedDate", "setLastUsedDate:")] public NSDate? LastUsedDate { get; set; }
-    [Selector("contentCreationDate", "setContentCreationDate:")] public NSDate? ContentCreationDate { get; set; }
-    [Selector("contentModificationDate", "setContentModificationDate:")] public NSDate? ContentModificationDate { get; set; }
-    [Selector("addedDate", "setAddedDate:")] public NSDate? AddedDate { get; set; }
-    [Selector("duration", "setDuration:")] public NSNumber? Duration { get; set; }
-    [Selector("contactKeywords", "setContactKeywords:")] public NSArray? ContactKeywords { get; set; }
-    [Selector("codecs", "setCodecs:")] public NSArray? Codecs { get; set; }
-    [Selector("mediaTypes", "setMediaTypes:")] public NSArray? MediaTypes { get; set; }
-    [Selector("isStreamable", "setStreamable:")] public NSNumber? Streamable { get; set; }
-    [Selector("totalBitRate", "setTotalBitRate:")] public NSNumber? TotalBitRate { get; set; }
-    [Selector("videoBitRate", "setVideoBitRate:")] public NSNumber? VideoBitRate { get; set; }
-    [Selector("audioBitRate", "setAudioBitRate:")] public NSNumber? AudioBitRate { get; set; }
-    [Selector("deliveryType", "setDeliveryType:")] public NSNumber? DeliveryType { get; set; }
-    [Selector("organizations", "setOrganizations:")] public NSArray? Organizations { get; set; }
-    [Selector("role", "setRole:")] public NSString? Role { get; set; }
-    [Selector("languages", "setLanguages:")] public NSArray? Languages { get; set; }
-    [Selector("rights", "setRights:")] public NSString? Rights { get; set; }
-    [Selector("publishers", "setPublishers:")] public NSArray? Publishers { get; set; }
-    [Selector("contributors", "setContributors:")] public NSArray? Contributors { get; set; }
-    [Selector("coverage", "setCoverage:")] public NSArray? Coverage { get; set; }
-    [Selector("rating", "setRating:")] public NSNumber? Rating { get; set; }
-    [Selector("ratingDescription", "setRatingDescription:")] public NSString? RatingDescription { get; set; }
-    [Selector("playCount", "setPlayCount:")] public NSNumber? PlayCount { get; set; }
-    [Selector("information", "setInformation:")] public NSString? Information { get; set; }
-    [Selector("director", "setDirector:")] public NSString? Director { get; set; }
-    [Selector("producer", "setProducer:")] public NSString? Producer { get; set; }
-    [Selector("genre", "setGenre:")] public NSString? Genre { get; set; }
-    [Selector("performers", "setPerformers:")] public NSArray? Performers { get; set; }
-    [Selector("originalFormat", "setOriginalFormat:")] public NSString? OriginalFormat { get; set; }
-    [Selector("originalSource", "setOriginalSource:")] public NSString? OriginalSource { get; set; }
-    [Selector("isLocal", "setLocal:")] public NSNumber? Local { get; set; }
-    [Selector("contentRating", "setContentRating:")] public NSNumber? ContentRating { get; set; }
-    [Selector("URL", "setURL:")] public NSURL? URL { get; set; }
+    [Selector("editors", "setEditors:")]
+    public NSArray? Editors { get; set; }
+    [Selector("participants", "setParticipants:")]
+    public NSArray? Participants { get; set; }
+    [Selector("projects", "setProjects:")]
+    public NSArray? Projects { get; set; }
+    [Selector("downloadedDate", "setDownloadedDate:")]
+    public NSDate? DownloadedDate { get; set; }
+    [Selector("contentSources", "setContentSources:")]
+    public NSArray? ContentSources { get; set; }
+    [Selector("comment", "setComment:")]
+    public NSString? Comment { get; set; }
+    [Selector("copyright", "setCopyright:")]
+    public NSString? Copyright { get; set; }
+    [Selector("lastUsedDate", "setLastUsedDate:")]
+    public NSDate? LastUsedDate { get; set; }
+    [Selector("contentCreationDate", "setContentCreationDate:")]
+    public NSDate? ContentCreationDate { get; set; }
+    [Selector("contentModificationDate", "setContentModificationDate:")]
+    public NSDate? ContentModificationDate { get; set; }
+    [Selector("addedDate", "setAddedDate:")]
+    public NSDate? AddedDate { get; set; }
+    [Selector("duration", "setDuration:")]
+    public NSNumber? Duration { get; set; }
+    [Selector("contactKeywords", "setContactKeywords:")]
+    public NSArray? ContactKeywords { get; set; }
+    [Selector("codecs", "setCodecs:")]
+    public NSArray? Codecs { get; set; }
+    [Selector("mediaTypes", "setMediaTypes:")]
+    public NSArray? MediaTypes { get; set; }
+    [Selector("isStreamable", "setStreamable:")]
+    public NSNumber? Streamable { get; set; }
+    [Selector("totalBitRate", "setTotalBitRate:")]
+    public NSNumber? TotalBitRate { get; set; }
+    [Selector("videoBitRate", "setVideoBitRate:")]
+    public NSNumber? VideoBitRate { get; set; }
+    [Selector("audioBitRate", "setAudioBitRate:")]
+    public NSNumber? AudioBitRate { get; set; }
+    [Selector("deliveryType", "setDeliveryType:")]
+    public NSNumber? DeliveryType { get; set; }
+    [Selector("organizations", "setOrganizations:")]
+    public NSArray? Organizations { get; set; }
+    [Selector("role", "setRole:")]
+    public NSString? Role { get; set; }
+    [Selector("languages", "setLanguages:")]
+    public NSArray? Languages { get; set; }
+    [Selector("rights", "setRights:")]
+    public NSString? Rights { get; set; }
+    [Selector("publishers", "setPublishers:")]
+    public NSArray? Publishers { get; set; }
+    [Selector("contributors", "setContributors:")]
+    public NSArray? Contributors { get; set; }
+    [Selector("coverage", "setCoverage:")]
+    public NSArray? Coverage { get; set; }
+    [Selector("rating", "setRating:")]
+    public NSNumber? Rating { get; set; }
+    [Selector("ratingDescription", "setRatingDescription:")]
+    public NSString? RatingDescription { get; set; }
+    [Selector("playCount", "setPlayCount:")]
+    public NSNumber? PlayCount { get; set; }
+    [Selector("information", "setInformation:")]
+    public NSString? Information { get; set; }
+    [Selector("director", "setDirector:")]
+    public NSString? Director { get; set; }
+    [Selector("producer", "setProducer:")]
+    public NSString? Producer { get; set; }
+    [Selector("genre", "setGenre:")]
+    public NSString? Genre { get; set; }
+    [Selector("performers", "setPerformers:")]
+    public NSArray? Performers { get; set; }
+    [Selector("originalFormat", "setOriginalFormat:")]
+    public NSString? OriginalFormat { get; set; }
+    [Selector("originalSource", "setOriginalSource:")]
+    public NSString? OriginalSource { get; set; }
+    [Selector("isLocal", "setLocal:")]
+    public NSNumber? Local { get; set; }
+    [Selector("contentRating", "setContentRating:")]
+    public NSNumber? ContentRating { get; set; }
+    [Selector("URL", "setURL:")]
+    public NSURL? URL { get; set; }
 }
 
 /// CSMusic, a category of CSSearchableItemAttributeSet.
 public extern objc class CSSearchableItemAttributeSet
 {
-    [Selector("audioSampleRate", "setAudioSampleRate:")] public NSNumber? AudioSampleRate { get; set; }
-    [Selector("audioChannelCount", "setAudioChannelCount:")] public NSNumber? AudioChannelCount { get; set; }
-    [Selector("tempo", "setTempo:")] public NSNumber? Tempo { get; set; }
-    [Selector("keySignature", "setKeySignature:")] public NSString? KeySignature { get; set; }
-    [Selector("timeSignature", "setTimeSignature:")] public NSString? TimeSignature { get; set; }
-    [Selector("audioEncodingApplication", "setAudioEncodingApplication:")] public NSString? AudioEncodingApplication { get; set; }
-    [Selector("composer", "setComposer:")] public NSString? Composer { get; set; }
-    [Selector("lyricist", "setLyricist:")] public NSString? Lyricist { get; set; }
-    [Selector("album", "setAlbum:")] public NSString? Album { get; set; }
-    [Selector("artist", "setArtist:")] public NSString? Artist { get; set; }
-    [Selector("audioTrackNumber", "setAudioTrackNumber:")] public NSNumber? AudioTrackNumber { get; set; }
-    [Selector("recordingDate", "setRecordingDate:")] public NSDate? RecordingDate { get; set; }
-    [Selector("musicalGenre", "setMusicalGenre:")] public NSString? MusicalGenre { get; set; }
-    [Selector("isGeneralMIDISequence", "setGeneralMIDISequence:")] public NSNumber? GeneralMIDISequence { get; set; }
-    [Selector("musicalInstrumentCategory", "setMusicalInstrumentCategory:")] public NSString? MusicalInstrumentCategory { get; set; }
-    [Selector("musicalInstrumentName", "setMusicalInstrumentName:")] public NSString? MusicalInstrumentName { get; set; }
+    [Selector("audioSampleRate", "setAudioSampleRate:")]
+    public NSNumber? AudioSampleRate { get; set; }
+    [Selector("audioChannelCount", "setAudioChannelCount:")]
+    public NSNumber? AudioChannelCount { get; set; }
+    [Selector("tempo", "setTempo:")]
+    public NSNumber? Tempo { get; set; }
+    [Selector("keySignature", "setKeySignature:")]
+    public NSString? KeySignature { get; set; }
+    [Selector("timeSignature", "setTimeSignature:")]
+    public NSString? TimeSignature { get; set; }
+    [Selector("audioEncodingApplication", "setAudioEncodingApplication:")]
+    public NSString? AudioEncodingApplication { get; set; }
+    [Selector("composer", "setComposer:")]
+    public NSString? Composer { get; set; }
+    [Selector("lyricist", "setLyricist:")]
+    public NSString? Lyricist { get; set; }
+    [Selector("album", "setAlbum:")]
+    public NSString? Album { get; set; }
+    [Selector("artist", "setArtist:")]
+    public NSString? Artist { get; set; }
+    [Selector("audioTrackNumber", "setAudioTrackNumber:")]
+    public NSNumber? AudioTrackNumber { get; set; }
+    [Selector("recordingDate", "setRecordingDate:")]
+    public NSDate? RecordingDate { get; set; }
+    [Selector("musicalGenre", "setMusicalGenre:")]
+    public NSString? MusicalGenre { get; set; }
+    [Selector("isGeneralMIDISequence", "setGeneralMIDISequence:")]
+    public NSNumber? GeneralMIDISequence { get; set; }
+    [Selector("musicalInstrumentCategory", "setMusicalInstrumentCategory:")]
+    public NSString? MusicalInstrumentCategory { get; set; }
+    [Selector("musicalInstrumentName", "setMusicalInstrumentName:")]
+    public NSString? MusicalInstrumentName { get; set; }
 }
 
 #endif

@@ -32,14 +32,22 @@ import Standard.ObjC;
 
 public extern objc class CNMutablePostalAddress : CNPostalAddress
 {
-    [Selector("street", "setStreet:")] public NSString Street { get; set; }
-    [Selector("subLocality", "setSubLocality:")] public NSString? SubLocality { get; set; }
-    [Selector("city", "setCity:")] public NSString City { get; set; }
-    [Selector("subAdministrativeArea", "setSubAdministrativeArea:")] public NSString? SubAdministrativeArea { get; set; }
-    [Selector("state", "setState:")] public NSString State { get; set; }
-    [Selector("postalCode", "setPostalCode:")] public NSString PostalCode { get; set; }
-    [Selector("country", "setCountry:")] public NSString Country { get; set; }
-    [Selector("ISOCountryCode", "setISOCountryCode:")] public NSString ISOCountryCode { get; set; }
+    [Selector("street", "setStreet:")]
+    public NSString Street { get; set; }
+    [Selector("subLocality", "setSubLocality:")]
+    public NSString? SubLocality { get; set; }
+    [Selector("city", "setCity:")]
+    public NSString City { get; set; }
+    [Selector("subAdministrativeArea", "setSubAdministrativeArea:")]
+    public NSString? SubAdministrativeArea { get; set; }
+    [Selector("state", "setState:")]
+    public NSString State { get; set; }
+    [Selector("postalCode", "setPostalCode:")]
+    public NSString PostalCode { get; set; }
+    [Selector("country", "setCountry:")]
+    public NSString Country { get; set; }
+    [Selector("ISOCountryCode", "setISOCountryCode:")]
+    public NSString ISOCountryCode { get; set; }
 }
 
 #endif

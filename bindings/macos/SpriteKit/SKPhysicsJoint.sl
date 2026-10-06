@@ -34,46 +34,66 @@ import Standard.ObjC;
 
 public extern objc class SKPhysicsJoint : NSObject, NSSecureCoding
 {
-    [Selector("bodyA", "setBodyA:")] public SKPhysicsBody BodyA { get; set; }
-    [Selector("bodyB", "setBodyB:")] public SKPhysicsBody BodyB { get; set; }
-    [Selector("reactionForce")] public CGVector ReactionForce { get; }
-    [Selector("reactionTorque")] public CGFloat ReactionTorque { get; }
+    [Selector("bodyA", "setBodyA:")]
+    public SKPhysicsBody BodyA { get; set; }
+    [Selector("bodyB", "setBodyB:")]
+    public SKPhysicsBody BodyB { get; set; }
+    [Selector("reactionForce")]
+    public CGVector ReactionForce { get; }
+    [Selector("reactionTorque")]
+    public CGFloat ReactionTorque { get; }
 }
 
 public extern objc class SKPhysicsJointPin : SKPhysicsJoint
 {
-    [Selector("shouldEnableLimits", "setShouldEnableLimits:")] public bool ShouldEnableLimits { get; set; }
-    [Selector("lowerAngleLimit", "setLowerAngleLimit:")] public CGFloat LowerAngleLimit { get; set; }
-    [Selector("upperAngleLimit", "setUpperAngleLimit:")] public CGFloat UpperAngleLimit { get; set; }
-    [Selector("frictionTorque", "setFrictionTorque:")] public CGFloat FrictionTorque { get; set; }
-    [Selector("rotationSpeed", "setRotationSpeed:")] public CGFloat RotationSpeed { get; set; }
-    [Selector("jointWithBodyA:bodyB:anchor:")] public static SKPhysicsJointPin JointWithBodyABodyBAnchor(SKPhysicsBody bodyA, SKPhysicsBody bodyB, CGPoint anchor);
+    [Selector("shouldEnableLimits", "setShouldEnableLimits:")]
+    public bool ShouldEnableLimits { get; set; }
+    [Selector("lowerAngleLimit", "setLowerAngleLimit:")]
+    public CGFloat LowerAngleLimit { get; set; }
+    [Selector("upperAngleLimit", "setUpperAngleLimit:")]
+    public CGFloat UpperAngleLimit { get; set; }
+    [Selector("frictionTorque", "setFrictionTorque:")]
+    public CGFloat FrictionTorque { get; set; }
+    [Selector("rotationSpeed", "setRotationSpeed:")]
+    public CGFloat RotationSpeed { get; set; }
+    [Selector("jointWithBodyA:bodyB:anchor:")]
+    public static SKPhysicsJointPin JointWithBodyABodyBAnchor(SKPhysicsBody bodyA, SKPhysicsBody bodyB, CGPoint anchor);
 }
 
 public extern objc class SKPhysicsJointSpring : SKPhysicsJoint
 {
-    [Selector("damping", "setDamping:")] public CGFloat Damping { get; set; }
-    [Selector("frequency", "setFrequency:")] public CGFloat Frequency { get; set; }
-    [Selector("jointWithBodyA:bodyB:anchorA:anchorB:")] public static SKPhysicsJointSpring JointWithBodyABodyBAnchorAAnchorB(SKPhysicsBody bodyA, SKPhysicsBody bodyB, CGPoint anchorA, CGPoint anchorB);
+    [Selector("damping", "setDamping:")]
+    public CGFloat Damping { get; set; }
+    [Selector("frequency", "setFrequency:")]
+    public CGFloat Frequency { get; set; }
+    [Selector("jointWithBodyA:bodyB:anchorA:anchorB:")]
+    public static SKPhysicsJointSpring JointWithBodyABodyBAnchorAAnchorB(SKPhysicsBody bodyA, SKPhysicsBody bodyB, CGPoint anchorA, CGPoint anchorB);
 }
 
 public extern objc class SKPhysicsJointFixed : SKPhysicsJoint
 {
-    [Selector("jointWithBodyA:bodyB:anchor:")] public static SKPhysicsJointFixed JointWithBodyABodyBAnchor(SKPhysicsBody bodyA, SKPhysicsBody bodyB, CGPoint anchor);
+    [Selector("jointWithBodyA:bodyB:anchor:")]
+    public static SKPhysicsJointFixed JointWithBodyABodyBAnchor(SKPhysicsBody bodyA, SKPhysicsBody bodyB, CGPoint anchor);
 }
 
 public extern objc class SKPhysicsJointSliding : SKPhysicsJoint
 {
-    [Selector("shouldEnableLimits", "setShouldEnableLimits:")] public bool ShouldEnableLimits { get; set; }
-    [Selector("lowerDistanceLimit", "setLowerDistanceLimit:")] public CGFloat LowerDistanceLimit { get; set; }
-    [Selector("upperDistanceLimit", "setUpperDistanceLimit:")] public CGFloat UpperDistanceLimit { get; set; }
-    [Selector("jointWithBodyA:bodyB:anchor:axis:")] public static SKPhysicsJointSliding JointWithBodyABodyBAnchorAxis(SKPhysicsBody bodyA, SKPhysicsBody bodyB, CGPoint anchor, CGVector axis);
+    [Selector("shouldEnableLimits", "setShouldEnableLimits:")]
+    public bool ShouldEnableLimits { get; set; }
+    [Selector("lowerDistanceLimit", "setLowerDistanceLimit:")]
+    public CGFloat LowerDistanceLimit { get; set; }
+    [Selector("upperDistanceLimit", "setUpperDistanceLimit:")]
+    public CGFloat UpperDistanceLimit { get; set; }
+    [Selector("jointWithBodyA:bodyB:anchor:axis:")]
+    public static SKPhysicsJointSliding JointWithBodyABodyBAnchorAxis(SKPhysicsBody bodyA, SKPhysicsBody bodyB, CGPoint anchor, CGVector axis);
 }
 
 public extern objc class SKPhysicsJointLimit : SKPhysicsJoint
 {
-    [Selector("maxLength", "setMaxLength:")] public CGFloat MaxLength { get; set; }
-    [Selector("jointWithBodyA:bodyB:anchorA:anchorB:")] public static SKPhysicsJointLimit JointWithBodyABodyBAnchorAAnchorB(SKPhysicsBody bodyA, SKPhysicsBody bodyB, CGPoint anchorA, CGPoint anchorB);
+    [Selector("maxLength", "setMaxLength:")]
+    public CGFloat MaxLength { get; set; }
+    [Selector("jointWithBodyA:bodyB:anchorA:anchorB:")]
+    public static SKPhysicsJointLimit JointWithBodyABodyBAnchorAAnchorB(SKPhysicsBody bodyA, SKPhysicsBody bodyB, CGPoint anchorA, CGPoint anchorB);
 }
 
 #endif

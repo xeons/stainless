@@ -33,18 +33,30 @@ import Standard.ObjC;
 
 public extern objc class PHASEDucker : NSObject
 {
-    [Selector("sourceGroups")] public NSSet SourceGroups { get; }
-    [Selector("targetGroups")] public NSSet TargetGroups { get; }
-    [Selector("isActive")] public bool Active { get; }
-    [Selector("gain")] public double Gain { get; }
-    [Selector("attackTime")] public double AttackTime { get; }
-    [Selector("releaseTime")] public double ReleaseTime { get; }
-    [Selector("attackCurve")] public PHASECurveType AttackCurve { get; }
-    [Selector("releaseCurve")] public PHASECurveType ReleaseCurve { get; }
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("initWithEngine:sourceGroups:targetGroups:gain:attackTime:releaseTime:attackCurve:releaseCurve:")] public Self InitWithEngineSourceGroupsTargetGroupsGainAttackTimeReleaseTimeAttackCurveReleaseCurve(PHASEEngine engine, NSSet sourceGroups, NSSet targetGroups, double gain, double attackTime, double releaseTime, PHASECurveType attackCurve, PHASECurveType releaseCurve);
-    [Selector("activate")] public void Activate();
-    [Selector("deactivate")] public void Deactivate();
+    [Selector("sourceGroups")]
+    public NSSet SourceGroups { get; }
+    [Selector("targetGroups")]
+    public NSSet TargetGroups { get; }
+    [Selector("isActive")]
+    public bool Active { get; }
+    [Selector("gain")]
+    public double Gain { get; }
+    [Selector("attackTime")]
+    public double AttackTime { get; }
+    [Selector("releaseTime")]
+    public double ReleaseTime { get; }
+    [Selector("attackCurve")]
+    public PHASECurveType AttackCurve { get; }
+    [Selector("releaseCurve")]
+    public PHASECurveType ReleaseCurve { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("initWithEngine:sourceGroups:targetGroups:gain:attackTime:releaseTime:attackCurve:releaseCurve:")]
+    public Self InitWithEngineSourceGroupsTargetGroupsGainAttackTimeReleaseTimeAttackCurveReleaseCurve(PHASEEngine engine, NSSet sourceGroups, NSSet targetGroups, double gain, double attackTime, double releaseTime, PHASECurveType attackCurve, PHASECurveType releaseCurve);
+    [Selector("activate")]
+    public void Activate();
+    [Selector("deactivate")]
+    public void Deactivate();
 }
 
 #endif

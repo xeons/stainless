@@ -32,34 +32,57 @@ import Standard.ObjC;
 
 public extern objc class NSScanner : NSObject, NSCopying
 {
-    [Selector("string")] public NSString String { get; }
-    [Selector("scanLocation", "setScanLocation:")] public NSUInteger ScanLocation { get; set; }
-    [Selector("charactersToBeSkipped", "setCharactersToBeSkipped:")] public NSCharacterSet? CharactersToBeSkipped { get; set; }
-    [Selector("caseSensitive", "setCaseSensitive:")] public bool CaseSensitive { get; set; }
-    [Selector("locale", "setLocale:")] public AnyObject? Locale { get; set; }
-    [Selector("initWithString:")] public Self InitWithString(NSString string);
+    [Selector("string")]
+    public NSString String { get; }
+    [Selector("scanLocation", "setScanLocation:")]
+    public NSUInteger ScanLocation { get; set; }
+    [Selector("charactersToBeSkipped", "setCharactersToBeSkipped:")]
+    public NSCharacterSet? CharactersToBeSkipped { get; set; }
+    [Selector("caseSensitive", "setCaseSensitive:")]
+    public bool CaseSensitive { get; set; }
+    [Selector("locale", "setLocale:")]
+    public AnyObject? Locale { get; set; }
+    [Selector("initWithString:")]
+    public Self InitWithString(NSString string);
 }
 
 /// NSExtendedScanner, a category of NSScanner.
 public extern objc class NSScanner
 {
-    [Selector("isAtEnd")] public bool AtEnd { get; }
-    [Selector("scanInt:")] public bool ScanInt(int* result);
-    [Selector("scanInteger:")] public bool ScanInteger(NSInteger* result);
-    [Selector("scanLongLong:")] public bool ScanLongLong(long* result);
-    [Selector("scanUnsignedLongLong:")] public bool ScanUnsignedLongLong(ulong* result);
-    [Selector("scanFloat:")] public bool ScanFloat(float* result);
-    [Selector("scanDouble:")] public bool ScanDouble(double* result);
-    [Selector("scanHexInt:")] public bool ScanHexInt(uint* result);
-    [Selector("scanHexLongLong:")] public bool ScanHexLongLong(ulong* result);
-    [Selector("scanHexFloat:")] public bool ScanHexFloat(float* result);
-    [Selector("scanHexDouble:")] public bool ScanHexDouble(double* result);
-    [Selector("scanString:intoString:")] public bool ScanStringIntoString(NSString string, out NSString? result);
-    [Selector("scanCharactersFromSet:intoString:")] public bool ScanCharactersFromSetIntoString(NSCharacterSet set, out NSString? result);
-    [Selector("scanUpToString:intoString:")] public bool ScanUpToStringIntoString(NSString string, out NSString? result);
-    [Selector("scanUpToCharactersFromSet:intoString:")] public bool ScanUpToCharactersFromSetIntoString(NSCharacterSet set, out NSString? result);
-    [Selector("scannerWithString:")] public static Self ScannerWithString(NSString string);
-    [Selector("localizedScannerWithString:")] public static AnyObject LocalizedScannerWithString(NSString string);
+    [Selector("isAtEnd")]
+    public bool AtEnd { get; }
+    [Selector("scanInt:")]
+    public bool ScanInt(int* result);
+    [Selector("scanInteger:")]
+    public bool ScanInteger(NSInteger* result);
+    [Selector("scanLongLong:")]
+    public bool ScanLongLong(long* result);
+    [Selector("scanUnsignedLongLong:")]
+    public bool ScanUnsignedLongLong(ulong* result);
+    [Selector("scanFloat:")]
+    public bool ScanFloat(float* result);
+    [Selector("scanDouble:")]
+    public bool ScanDouble(double* result);
+    [Selector("scanHexInt:")]
+    public bool ScanHexInt(uint* result);
+    [Selector("scanHexLongLong:")]
+    public bool ScanHexLongLong(ulong* result);
+    [Selector("scanHexFloat:")]
+    public bool ScanHexFloat(float* result);
+    [Selector("scanHexDouble:")]
+    public bool ScanHexDouble(double* result);
+    [Selector("scanString:intoString:")]
+    public bool ScanStringIntoString(NSString string, out NSString? result);
+    [Selector("scanCharactersFromSet:intoString:")]
+    public bool ScanCharactersFromSetIntoString(NSCharacterSet set, out NSString? result);
+    [Selector("scanUpToString:intoString:")]
+    public bool ScanUpToStringIntoString(NSString string, out NSString? result);
+    [Selector("scanUpToCharactersFromSet:intoString:")]
+    public bool ScanUpToCharactersFromSetIntoString(NSCharacterSet set, out NSString? result);
+    [Selector("scannerWithString:")]
+    public static Self ScannerWithString(NSString string);
+    [Selector("localizedScannerWithString:")]
+    public static AnyObject LocalizedScannerWithString(NSString string);
 }
 
 #endif

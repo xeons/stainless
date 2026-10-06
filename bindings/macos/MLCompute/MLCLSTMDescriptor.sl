@@ -34,20 +34,34 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCLSTMDescriptor : NSObject, NSCopying
 {
-    [Selector("inputSize")] public NSUInteger InputSize { get; }
-    [Selector("hiddenSize")] public NSUInteger HiddenSize { get; }
-    [Selector("layerCount")] public NSUInteger LayerCount { get; }
-    [Selector("usesBiases")] public bool UsesBiases { get; }
-    [Selector("batchFirst")] public bool BatchFirst { get; }
-    [Selector("isBidirectional")] public bool IsBidirectional { get; }
-    [Selector("returnsSequences")] public bool ReturnsSequences { get; }
-    [Selector("dropout")] public float Dropout { get; }
-    [Selector("resultMode")] public MLCLSTMResultMode ResultMode { get; }
-    [Selector("descriptorWithInputSize:hiddenSize:layerCount:")] public static Self DescriptorWithInputSizeHiddenSizeLayerCount(NSUInteger inputSize, NSUInteger hiddenSize, NSUInteger layerCount);
-    [Selector("descriptorWithInputSize:hiddenSize:layerCount:usesBiases:isBidirectional:dropout:")] public static Self DescriptorWithInputSizeHiddenSizeLayerCountUsesBiasesIsBidirectionalDropout(NSUInteger inputSize, NSUInteger hiddenSize, NSUInteger layerCount, bool usesBiases, bool isBidirectional, float dropout);
-    [Selector("descriptorWithInputSize:hiddenSize:layerCount:usesBiases:batchFirst:isBidirectional:dropout:")] public static Self DescriptorWithInputSizeHiddenSizeLayerCountUsesBiasesBatchFirstIsBidirectionalDropout(NSUInteger inputSize, NSUInteger hiddenSize, NSUInteger layerCount, bool usesBiases, bool batchFirst, bool isBidirectional, float dropout);
-    [Selector("descriptorWithInputSize:hiddenSize:layerCount:usesBiases:batchFirst:isBidirectional:returnsSequences:dropout:")] public static Self DescriptorWithInputSizeHiddenSizeLayerCountUsesBiasesBatchFirstIsBidirectionalReturnsSequencesDropout(NSUInteger inputSize, NSUInteger hiddenSize, NSUInteger layerCount, bool usesBiases, bool batchFirst, bool isBidirectional, bool returnsSequences, float dropout);
-    [Selector("descriptorWithInputSize:hiddenSize:layerCount:usesBiases:batchFirst:isBidirectional:returnsSequences:dropout:resultMode:")] public static Self DescriptorWithInputSizeHiddenSizeLayerCountUsesBiasesBatchFirstIsBidirectionalReturnsSequencesDropoutResultMode(NSUInteger inputSize, NSUInteger hiddenSize, NSUInteger layerCount, bool usesBiases, bool batchFirst, bool isBidirectional, bool returnsSequences, float dropout, MLCLSTMResultMode resultMode);
+    [Selector("inputSize")]
+    public NSUInteger InputSize { get; }
+    [Selector("hiddenSize")]
+    public NSUInteger HiddenSize { get; }
+    [Selector("layerCount")]
+    public NSUInteger LayerCount { get; }
+    [Selector("usesBiases")]
+    public bool UsesBiases { get; }
+    [Selector("batchFirst")]
+    public bool BatchFirst { get; }
+    [Selector("isBidirectional")]
+    public bool IsBidirectional { get; }
+    [Selector("returnsSequences")]
+    public bool ReturnsSequences { get; }
+    [Selector("dropout")]
+    public float Dropout { get; }
+    [Selector("resultMode")]
+    public MLCLSTMResultMode ResultMode { get; }
+    [Selector("descriptorWithInputSize:hiddenSize:layerCount:")]
+    public static Self DescriptorWithInputSizeHiddenSizeLayerCount(NSUInteger inputSize, NSUInteger hiddenSize, NSUInteger layerCount);
+    [Selector("descriptorWithInputSize:hiddenSize:layerCount:usesBiases:isBidirectional:dropout:")]
+    public static Self DescriptorWithInputSizeHiddenSizeLayerCountUsesBiasesIsBidirectionalDropout(NSUInteger inputSize, NSUInteger hiddenSize, NSUInteger layerCount, bool usesBiases, bool isBidirectional, float dropout);
+    [Selector("descriptorWithInputSize:hiddenSize:layerCount:usesBiases:batchFirst:isBidirectional:dropout:")]
+    public static Self DescriptorWithInputSizeHiddenSizeLayerCountUsesBiasesBatchFirstIsBidirectionalDropout(NSUInteger inputSize, NSUInteger hiddenSize, NSUInteger layerCount, bool usesBiases, bool batchFirst, bool isBidirectional, float dropout);
+    [Selector("descriptorWithInputSize:hiddenSize:layerCount:usesBiases:batchFirst:isBidirectional:returnsSequences:dropout:")]
+    public static Self DescriptorWithInputSizeHiddenSizeLayerCountUsesBiasesBatchFirstIsBidirectionalReturnsSequencesDropout(NSUInteger inputSize, NSUInteger hiddenSize, NSUInteger layerCount, bool usesBiases, bool batchFirst, bool isBidirectional, bool returnsSequences, float dropout);
+    [Selector("descriptorWithInputSize:hiddenSize:layerCount:usesBiases:batchFirst:isBidirectional:returnsSequences:dropout:resultMode:")]
+    public static Self DescriptorWithInputSizeHiddenSizeLayerCountUsesBiasesBatchFirstIsBidirectionalReturnsSequencesDropoutResultMode(NSUInteger inputSize, NSUInteger hiddenSize, NSUInteger layerCount, bool usesBiases, bool batchFirst, bool isBidirectional, bool returnsSequences, float dropout, MLCLSTMResultMode resultMode);
 }
 
 #endif

@@ -46,29 +46,41 @@ public extern "C" NSString? CalAlarmActionSound;
 public extern objc class CalAlarm : NSObject, NSCopying
 {
     /// Deprecated in macOS 10.8.
-    [Selector("action", "setAction:")] public NSString? Action { get; set; }
+    [Selector("action", "setAction:")]
+    public NSString? Action { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("sound", "setSound:")] public NSString? Sound { get; set; }
+    [Selector("sound", "setSound:")]
+    public NSString? Sound { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("emailAddress", "setEmailAddress:")] public NSString? EmailAddress { get; set; }
+    [Selector("emailAddress", "setEmailAddress:")]
+    public NSString? EmailAddress { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("url", "setUrl:")] public NSURL? Url { get; set; }
+    [Selector("url", "setUrl:")]
+    public NSURL? Url { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("relativeTrigger", "setRelativeTrigger:")] public NSTimeInterval RelativeTrigger { get; set; }
+    [Selector("relativeTrigger", "setRelativeTrigger:")]
+    public NSTimeInterval RelativeTrigger { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("absoluteTrigger", "setAbsoluteTrigger:")] public NSDate? AbsoluteTrigger { get; set; }
+    [Selector("absoluteTrigger", "setAbsoluteTrigger:")]
+    public NSDate? AbsoluteTrigger { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("alarm")] public static AnyObject? Alarm();
+    [Selector("alarm")]
+    public static AnyObject? Alarm();
     /// Deprecated in macOS 10.8.
-    [Selector("setAcknowledged:")] public void SetAcknowledged(NSDate? date);
+    [Selector("setAcknowledged:")]
+    public void SetAcknowledged(NSDate? date);
     /// Deprecated in macOS 10.8.
-    [Selector("acknowledged")] public NSDate? Acknowledged();
+    [Selector("acknowledged")]
+    public NSDate? Acknowledged();
     /// Deprecated in macOS 10.8.
-    [Selector("setRelatedTo:")] public void SetRelatedTo(NSString? relatedTo);
+    [Selector("setRelatedTo:")]
+    public void SetRelatedTo(NSString? relatedTo);
     /// Deprecated in macOS 10.8.
-    [Selector("relatedTo")] public NSString? RelatedTo();
+    [Selector("relatedTo")]
+    public NSString? RelatedTo();
     /// Deprecated in macOS 10.8.
-    [Selector("triggerDateRelativeTo:")] public NSDate? TriggerDateRelativeTo(NSDate? date);
+    [Selector("triggerDateRelativeTo:")]
+    public NSDate? TriggerDateRelativeTo(NSDate? date);
 }
 
 #endif

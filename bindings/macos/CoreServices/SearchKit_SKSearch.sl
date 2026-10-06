@@ -45,7 +45,8 @@ public const int kSKSearchOptionNoRelevanceScores = 1;
 public const int kSKSearchOptionSpaceMeansOR = 2;
 public const int kSKSearchOptionFindSimilar = 4;
 
-[ReturnsRetained] public extern "C" SKSearchRef? SKSearchCreate(SKIndexRef? inIndex, CFStringRef? inQuery, SKSearchOptions inSearchOptions);
+[ReturnsRetained]
+public extern "C" SKSearchRef? SKSearchCreate(SKIndexRef? inIndex, CFStringRef? inQuery, SKSearchOptions inSearchOptions);
 
 public extern "C" void SKSearchCancel(SKSearchRef? inSearch);
 
@@ -84,16 +85,20 @@ public enum SKSearchType : int
 public delegate Boolean SKSearchResultsFilterCallBack(__SKIndex* arg0, void* arg1, void* arg2);
 
 /// Deprecated in macOS 10.4.
-[ReturnsRetained] public extern "C" SKSearchGroupRef? SKSearchGroupCreate(CFArrayRef? inArrayOfInIndexes);
+[ReturnsRetained]
+public extern "C" SKSearchGroupRef? SKSearchGroupCreate(CFArrayRef? inArrayOfInIndexes);
 
 /// Deprecated in macOS 10.4.
-[ReturnsRetained] public extern "C" CFArrayRef? SKSearchGroupCopyIndexes(SKSearchGroupRef? inSearchGroup);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SKSearchGroupCopyIndexes(SKSearchGroupRef? inSearchGroup);
 
 /// Deprecated in macOS 10.4.
-[ReturnsRetained] public extern "C" SKSearchResultsRef? SKSearchResultsCreateWithQuery(SKSearchGroupRef? inSearchGroup, CFStringRef? inQuery, SKSearchType inSearchType, CFIndex inMaxFoundDocuments, void* inContext, SKSearchResultsFilterCallBack inFilterCallBack);
+[ReturnsRetained]
+public extern "C" SKSearchResultsRef? SKSearchResultsCreateWithQuery(SKSearchGroupRef? inSearchGroup, CFStringRef? inQuery, SKSearchType inSearchType, CFIndex inMaxFoundDocuments, void* inContext, SKSearchResultsFilterCallBack inFilterCallBack);
 
 /// Deprecated in macOS 10.4.
-[ReturnsRetained] public extern "C" SKSearchResultsRef? SKSearchResultsCreateWithDocuments(SKSearchGroupRef? inSearchGroup, CFArrayRef? inExampleDocuments, CFIndex inMaxFoundDocuments, void* inContext, SKSearchResultsFilterCallBack inFilterCallBack);
+[ReturnsRetained]
+public extern "C" SKSearchResultsRef? SKSearchResultsCreateWithDocuments(SKSearchGroupRef? inSearchGroup, CFArrayRef? inExampleDocuments, CFIndex inMaxFoundDocuments, void* inContext, SKSearchResultsFilterCallBack inFilterCallBack);
 
 /// Deprecated in macOS 10.4.
 public extern "C" CFIndex SKSearchResultsGetCount(SKSearchResultsRef? inSearchResults);
@@ -102,6 +107,7 @@ public extern "C" CFIndex SKSearchResultsGetCount(SKSearchResultsRef? inSearchRe
 public extern "C" CFIndex SKSearchResultsGetInfoInRange(SKSearchResultsRef? inSearchResults, CFRange inRange, void** outDocumentsArray, __SKIndex** outIndexesArray, float* outScoresArray);
 
 /// Deprecated in macOS 10.4.
-[ReturnsRetained] public extern "C" CFArrayRef? SKSearchResultsCopyMatchingTerms(SKSearchResultsRef? inSearchResults, CFIndex inItem);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SKSearchResultsCopyMatchingTerms(SKSearchResultsRef? inSearchResults, CFIndex inItem);
 
 #endif

@@ -37,6 +37,7 @@ public extern "C" Boolean CNMarkPortalOnline(CFStringRef interfaceName);
 
 public extern "C" Boolean CNMarkPortalOffline(CFStringRef interfaceName);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CNCopySupportedInterfaces();
+[ReturnsRetained]
+public extern "C" CFArrayRef? CNCopySupportedInterfaces();
 
 #endif

@@ -40,9 +40,12 @@ public enum CLSBinaryValueType : long
 
 public extern objc class CLSBinaryItem : CLSActivityItem
 {
-    [Selector("value", "setValue:")] public bool Value { get; set; }
-    [Selector("valueType")] public CLSBinaryValueType ValueType { get; }
-    [Selector("initWithIdentifier:title:type:")] public Self InitWithIdentifierTitleType(NSString identifier, NSString title, CLSBinaryValueType valueType);
+    [Selector("value", "setValue:")]
+    public bool Value { get; set; }
+    [Selector("valueType")]
+    public CLSBinaryValueType ValueType { get; }
+    [Selector("initWithIdentifier:title:type:")]
+    public Self InitWithIdentifierTitleType(NSString identifier, NSString title, CLSBinaryValueType valueType);
 }
 
 #endif

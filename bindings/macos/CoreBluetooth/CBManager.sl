@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class CBManager : NSObject
 {
-    [Selector("state")] public CBManagerState State { get; }
-    [Selector("authorization")] public CBManagerAuthorization Authorization { get; }
-    [Selector("authorization")] public static CBManagerAuthorization ClassAuthorization { get; }
+    [Selector("state")]
+    public CBManagerState State { get; }
+    [Selector("authorization")]
+    public CBManagerAuthorization Authorization { get; }
+    [Selector("authorization")]
+    public static CBManagerAuthorization ClassAuthorization { get; }
 }
 
 public enum CBManagerState : long

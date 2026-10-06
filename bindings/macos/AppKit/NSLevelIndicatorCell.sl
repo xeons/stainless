@@ -41,17 +41,28 @@ public enum NSLevelIndicatorStyle : ulong
 
 public extern objc class NSLevelIndicatorCell : NSActionCell
 {
-    [Selector("levelIndicatorStyle", "setLevelIndicatorStyle:")] public NSLevelIndicatorStyle LevelIndicatorStyle { get; set; }
-    [Selector("minValue", "setMinValue:")] public double MinValue { get; set; }
-    [Selector("maxValue", "setMaxValue:")] public double MaxValue { get; set; }
-    [Selector("warningValue", "setWarningValue:")] public double WarningValue { get; set; }
-    [Selector("criticalValue", "setCriticalValue:")] public double CriticalValue { get; set; }
-    [Selector("tickMarkPosition", "setTickMarkPosition:")] public NSTickMarkPosition TickMarkPosition { get; set; }
-    [Selector("numberOfTickMarks", "setNumberOfTickMarks:")] public NSInteger NumberOfTickMarks { get; set; }
-    [Selector("numberOfMajorTickMarks", "setNumberOfMajorTickMarks:")] public NSInteger NumberOfMajorTickMarks { get; set; }
-    [Selector("initWithLevelIndicatorStyle:")] public Self InitWithLevelIndicatorStyle(NSLevelIndicatorStyle levelIndicatorStyle);
-    [Selector("rectOfTickMarkAtIndex:")] public NSRect RectOfTickMarkAtIndex(NSInteger index);
-    [Selector("tickMarkValueAtIndex:")] public double TickMarkValueAtIndex(NSInteger index);
+    [Selector("levelIndicatorStyle", "setLevelIndicatorStyle:")]
+    public NSLevelIndicatorStyle LevelIndicatorStyle { get; set; }
+    [Selector("minValue", "setMinValue:")]
+    public double MinValue { get; set; }
+    [Selector("maxValue", "setMaxValue:")]
+    public double MaxValue { get; set; }
+    [Selector("warningValue", "setWarningValue:")]
+    public double WarningValue { get; set; }
+    [Selector("criticalValue", "setCriticalValue:")]
+    public double CriticalValue { get; set; }
+    [Selector("tickMarkPosition", "setTickMarkPosition:")]
+    public NSTickMarkPosition TickMarkPosition { get; set; }
+    [Selector("numberOfTickMarks", "setNumberOfTickMarks:")]
+    public NSInteger NumberOfTickMarks { get; set; }
+    [Selector("numberOfMajorTickMarks", "setNumberOfMajorTickMarks:")]
+    public NSInteger NumberOfMajorTickMarks { get; set; }
+    [Selector("initWithLevelIndicatorStyle:")]
+    public Self InitWithLevelIndicatorStyle(NSLevelIndicatorStyle levelIndicatorStyle);
+    [Selector("rectOfTickMarkAtIndex:")]
+    public NSRect RectOfTickMarkAtIndex(NSInteger index);
+    [Selector("tickMarkValueAtIndex:")]
+    public double TickMarkValueAtIndex(NSInteger index);
 }
 
 #endif

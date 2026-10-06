@@ -37,85 +37,142 @@ public objc closure CGRect CIKernelROICallback(int arg0, CGRect arg1);
 
 public extern objc class CIKernel : NSObject
 {
-    [Selector("name")] public NSString? Name { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("kernelsWithString:")] public static NSArray? KernelsWithString(NSString string);
-    [Selector("kernelsWithMetalString:error:")] public static NSArray? KernelsWithMetalStringError(NSString source, out NSError? error);
+    [Selector("kernelsWithString:")]
+    public static NSArray? KernelsWithString(NSString string);
+    [Selector("kernelsWithMetalString:error:")]
+    public static NSArray? KernelsWithMetalStringError(NSString source, out NSError? error);
     /// Deprecated in macOS 10.14.
-    [Selector("kernelWithString:")] public static Self? KernelWithString(NSString string);
-    [Selector("kernelWithFunctionName:fromMetalLibraryData:error:")] public static Self? KernelWithFunctionNameFromMetalLibraryDataError(NSString name, NSData data, out NSError? error);
-    [Selector("kernelWithFunctionName:fromMetalLibraryData:outputPixelFormat:error:")] public static Self? KernelWithFunctionNameFromMetalLibraryDataOutputPixelFormatError(NSString name, NSData data, CIFormat format, out NSError? error);
-    [Selector("kernelNamesFromMetalLibraryData:")] public static NSArray KernelNamesFromMetalLibraryData(NSData data);
-    [Selector("setROISelector:")] public void SetROISelector(Selector method);
-    [Selector("applyWithExtent:roiCallback:arguments:")] public CIImage? ApplyWithExtentRoiCallbackArguments(CGRect extent, CIKernelROICallback callback, NSArray? args);
+    [Selector("kernelWithString:")]
+    public static Self? KernelWithString(NSString string);
+    [Selector("kernelWithFunctionName:fromMetalLibraryData:error:")]
+    public static Self? KernelWithFunctionNameFromMetalLibraryDataError(NSString name, NSData data, out NSError? error);
+    [Selector("kernelWithFunctionName:fromMetalLibraryData:outputPixelFormat:error:")]
+    public static Self? KernelWithFunctionNameFromMetalLibraryDataOutputPixelFormatError(NSString name, NSData data, CIFormat format, out NSError? error);
+    [Selector("kernelNamesFromMetalLibraryData:")]
+    public static NSArray KernelNamesFromMetalLibraryData(NSData data);
+    [Selector("setROISelector:")]
+    public void SetROISelector(Selector method);
+    [Selector("applyWithExtent:roiCallback:arguments:")]
+    public CIImage? ApplyWithExtentRoiCallbackArguments(CGRect extent, CIKernelROICallback callback, NSArray? args);
 }
 
 public extern objc class CIColorKernel : CIKernel
 {
     /// Deprecated in macOS 10.14.
-    [Selector("kernelWithString:")] public static Self? KernelWithString(NSString string);
-    [Selector("applyWithExtent:arguments:")] public CIImage? ApplyWithExtentArguments(CGRect extent, NSArray? args);
+    [Selector("kernelWithString:")]
+    public static Self? KernelWithString(NSString string);
+    [Selector("applyWithExtent:arguments:")]
+    public CIImage? ApplyWithExtentArguments(CGRect extent, NSArray? args);
 }
 
 public extern objc class CIWarpKernel : CIKernel
 {
     /// Deprecated in macOS 10.14.
-    [Selector("kernelWithString:")] public static Self? KernelWithString(NSString string);
-    [Selector("applyWithExtent:roiCallback:inputImage:arguments:")] public CIImage? ApplyWithExtentRoiCallbackInputImageArguments(CGRect extent, CIKernelROICallback callback, CIImage image, NSArray? args);
+    [Selector("kernelWithString:")]
+    public static Self? KernelWithString(NSString string);
+    [Selector("applyWithExtent:roiCallback:inputImage:arguments:")]
+    public CIImage? ApplyWithExtentRoiCallbackInputImageArguments(CGRect extent, CIKernelROICallback callback, CIImage image, NSArray? args);
 }
 
 public extern objc class CIBlendKernel : CIColorKernel
 {
     /// Deprecated in macOS 10.14.
-    [Selector("kernelWithString:")] public static Self? KernelWithString(NSString string);
-    [Selector("applyWithForeground:background:")] public CIImage? ApplyWithForegroundBackground(CIImage foreground, CIImage background);
-    [Selector("applyWithForeground:background:colorSpace:")] public CIImage? ApplyWithForegroundBackgroundColorSpace(CIImage foreground, CIImage background, CGColorSpaceRef colorSpace);
+    [Selector("kernelWithString:")]
+    public static Self? KernelWithString(NSString string);
+    [Selector("applyWithForeground:background:")]
+    public CIImage? ApplyWithForegroundBackground(CIImage foreground, CIImage background);
+    [Selector("applyWithForeground:background:colorSpace:")]
+    public CIImage? ApplyWithForegroundBackgroundColorSpace(CIImage foreground, CIImage background, CGColorSpaceRef colorSpace);
 }
 
 /// BuiltIn, a category of CIBlendKernel.
 public extern objc class CIBlendKernel
 {
-    [Selector("componentAdd")] public static CIBlendKernel ComponentAdd { get; }
-    [Selector("componentMultiply")] public static CIBlendKernel ComponentMultiply { get; }
-    [Selector("componentMin")] public static CIBlendKernel ComponentMin { get; }
-    [Selector("componentMax")] public static CIBlendKernel ComponentMax { get; }
-    [Selector("clear")] public static CIBlendKernel Clear { get; }
-    [Selector("source")] public static CIBlendKernel Source { get; }
-    [Selector("destination")] public static CIBlendKernel Destination { get; }
-    [Selector("sourceOver")] public static CIBlendKernel SourceOver { get; }
-    [Selector("destinationOver")] public static CIBlendKernel DestinationOver { get; }
-    [Selector("sourceIn")] public static CIBlendKernel SourceIn { get; }
-    [Selector("destinationIn")] public static CIBlendKernel DestinationIn { get; }
-    [Selector("sourceOut")] public static CIBlendKernel SourceOut { get; }
-    [Selector("destinationOut")] public static CIBlendKernel DestinationOut { get; }
-    [Selector("sourceAtop")] public static CIBlendKernel SourceAtop { get; }
-    [Selector("destinationAtop")] public static CIBlendKernel DestinationAtop { get; }
-    [Selector("exclusiveOr")] public static CIBlendKernel ExclusiveOr { get; }
-    [Selector("multiply")] public static CIBlendKernel Multiply { get; }
-    [Selector("screen")] public static CIBlendKernel Screen { get; }
-    [Selector("overlay")] public static CIBlendKernel Overlay { get; }
-    [Selector("darken")] public static CIBlendKernel Darken { get; }
-    [Selector("lighten")] public static CIBlendKernel Lighten { get; }
-    [Selector("colorDodge")] public static CIBlendKernel ColorDodge { get; }
-    [Selector("colorBurn")] public static CIBlendKernel ColorBurn { get; }
-    [Selector("hardLight")] public static CIBlendKernel HardLight { get; }
-    [Selector("softLight")] public static CIBlendKernel SoftLight { get; }
-    [Selector("difference")] public static CIBlendKernel Difference { get; }
-    [Selector("exclusion")] public static CIBlendKernel Exclusion { get; }
-    [Selector("hue")] public static CIBlendKernel Hue { get; }
-    [Selector("saturation")] public static CIBlendKernel Saturation { get; }
-    [Selector("color")] public static CIBlendKernel Color { get; }
-    [Selector("luminosity")] public static CIBlendKernel Luminosity { get; }
-    [Selector("subtract")] public static CIBlendKernel Subtract { get; }
-    [Selector("divide")] public static CIBlendKernel Divide { get; }
-    [Selector("linearBurn")] public static CIBlendKernel LinearBurn { get; }
-    [Selector("linearDodge")] public static CIBlendKernel LinearDodge { get; }
-    [Selector("vividLight")] public static CIBlendKernel VividLight { get; }
-    [Selector("linearLight")] public static CIBlendKernel LinearLight { get; }
-    [Selector("pinLight")] public static CIBlendKernel PinLight { get; }
-    [Selector("hardMix")] public static CIBlendKernel HardMix { get; }
-    [Selector("darkerColor")] public static CIBlendKernel DarkerColor { get; }
-    [Selector("lighterColor")] public static CIBlendKernel LighterColor { get; }
+    [Selector("componentAdd")]
+    public static CIBlendKernel ComponentAdd { get; }
+    [Selector("componentMultiply")]
+    public static CIBlendKernel ComponentMultiply { get; }
+    [Selector("componentMin")]
+    public static CIBlendKernel ComponentMin { get; }
+    [Selector("componentMax")]
+    public static CIBlendKernel ComponentMax { get; }
+    [Selector("clear")]
+    public static CIBlendKernel Clear { get; }
+    [Selector("source")]
+    public static CIBlendKernel Source { get; }
+    [Selector("destination")]
+    public static CIBlendKernel Destination { get; }
+    [Selector("sourceOver")]
+    public static CIBlendKernel SourceOver { get; }
+    [Selector("destinationOver")]
+    public static CIBlendKernel DestinationOver { get; }
+    [Selector("sourceIn")]
+    public static CIBlendKernel SourceIn { get; }
+    [Selector("destinationIn")]
+    public static CIBlendKernel DestinationIn { get; }
+    [Selector("sourceOut")]
+    public static CIBlendKernel SourceOut { get; }
+    [Selector("destinationOut")]
+    public static CIBlendKernel DestinationOut { get; }
+    [Selector("sourceAtop")]
+    public static CIBlendKernel SourceAtop { get; }
+    [Selector("destinationAtop")]
+    public static CIBlendKernel DestinationAtop { get; }
+    [Selector("exclusiveOr")]
+    public static CIBlendKernel ExclusiveOr { get; }
+    [Selector("multiply")]
+    public static CIBlendKernel Multiply { get; }
+    [Selector("screen")]
+    public static CIBlendKernel Screen { get; }
+    [Selector("overlay")]
+    public static CIBlendKernel Overlay { get; }
+    [Selector("darken")]
+    public static CIBlendKernel Darken { get; }
+    [Selector("lighten")]
+    public static CIBlendKernel Lighten { get; }
+    [Selector("colorDodge")]
+    public static CIBlendKernel ColorDodge { get; }
+    [Selector("colorBurn")]
+    public static CIBlendKernel ColorBurn { get; }
+    [Selector("hardLight")]
+    public static CIBlendKernel HardLight { get; }
+    [Selector("softLight")]
+    public static CIBlendKernel SoftLight { get; }
+    [Selector("difference")]
+    public static CIBlendKernel Difference { get; }
+    [Selector("exclusion")]
+    public static CIBlendKernel Exclusion { get; }
+    [Selector("hue")]
+    public static CIBlendKernel Hue { get; }
+    [Selector("saturation")]
+    public static CIBlendKernel Saturation { get; }
+    [Selector("color")]
+    public static CIBlendKernel Color { get; }
+    [Selector("luminosity")]
+    public static CIBlendKernel Luminosity { get; }
+    [Selector("subtract")]
+    public static CIBlendKernel Subtract { get; }
+    [Selector("divide")]
+    public static CIBlendKernel Divide { get; }
+    [Selector("linearBurn")]
+    public static CIBlendKernel LinearBurn { get; }
+    [Selector("linearDodge")]
+    public static CIBlendKernel LinearDodge { get; }
+    [Selector("vividLight")]
+    public static CIBlendKernel VividLight { get; }
+    [Selector("linearLight")]
+    public static CIBlendKernel LinearLight { get; }
+    [Selector("pinLight")]
+    public static CIBlendKernel PinLight { get; }
+    [Selector("hardMix")]
+    public static CIBlendKernel HardMix { get; }
+    [Selector("darkerColor")]
+    public static CIBlendKernel DarkerColor { get; }
+    [Selector("lighterColor")]
+    public static CIBlendKernel LighterColor { get; }
 }
 
 #endif

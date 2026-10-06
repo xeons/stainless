@@ -44,13 +44,18 @@ public objc closure void FSUnaryFileSystemOperationsUnloadResourceOptionsReplyHa
 public objc interface FSUnaryFileSystemOperations : NSObjectProtocol
 {
     /// macOS 15.4 and later.
-    [Selector("probeResource:replyHandler:")] void ProbeResourceReplyHandler(FSResource resource, FSUnaryFileSystemOperationsProbeResourceReplyHandlerReplyBlock reply);
+    [Selector("probeResource:replyHandler:")]
+    void ProbeResourceReplyHandler(FSResource resource, FSUnaryFileSystemOperationsProbeResourceReplyHandlerReplyBlock reply);
     /// macOS 15.4 and later.
-    [Selector("loadResource:options:replyHandler:")] void LoadResourceOptionsReplyHandler(FSResource resource, FSTaskOptions options, FSUnaryFileSystemOperationsLoadResourceOptionsReplyHandlerReplyBlock reply);
+    [Selector("loadResource:options:replyHandler:")]
+    void LoadResourceOptionsReplyHandler(FSResource resource, FSTaskOptions options, FSUnaryFileSystemOperationsLoadResourceOptionsReplyHandlerReplyBlock reply);
     /// macOS 15.4 and later.
-    [Selector("unloadResource:options:replyHandler:")] void UnloadResourceOptionsReplyHandler(FSResource resource, FSTaskOptions options, FSUnaryFileSystemOperationsUnloadResourceOptionsReplyHandlerReplyBlock reply);
+    [Selector("unloadResource:options:replyHandler:")]
+    void UnloadResourceOptionsReplyHandler(FSResource resource, FSTaskOptions options, FSUnaryFileSystemOperationsUnloadResourceOptionsReplyHandlerReplyBlock reply);
     /// macOS 15.4 and later.
-    [Optional] [Selector("didFinishLoading")] void DidFinishLoading();
+    [Optional]
+    [Selector("didFinishLoading")]
+    void DidFinishLoading();
 }
 
 #endif

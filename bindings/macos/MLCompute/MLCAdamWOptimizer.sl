@@ -34,13 +34,20 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCAdamWOptimizer : MLCOptimizer, NSCopying
 {
-    [Selector("beta1")] public float Beta1 { get; }
-    [Selector("beta2")] public float Beta2 { get; }
-    [Selector("epsilon")] public float Epsilon { get; }
-    [Selector("usesAMSGrad")] public bool UsesAMSGrad { get; }
-    [Selector("timeStep")] public NSUInteger TimeStep { get; }
-    [Selector("optimizerWithDescriptor:")] public static Self OptimizerWithDescriptor(MLCOptimizerDescriptor optimizerDescriptor);
-    [Selector("optimizerWithDescriptor:beta1:beta2:epsilon:usesAMSGrad:timeStep:")] public static Self OptimizerWithDescriptorBeta1Beta2EpsilonUsesAMSGradTimeStep(MLCOptimizerDescriptor optimizerDescriptor, float beta1, float beta2, float epsilon, bool usesAMSGrad, NSUInteger timeStep);
+    [Selector("beta1")]
+    public float Beta1 { get; }
+    [Selector("beta2")]
+    public float Beta2 { get; }
+    [Selector("epsilon")]
+    public float Epsilon { get; }
+    [Selector("usesAMSGrad")]
+    public bool UsesAMSGrad { get; }
+    [Selector("timeStep")]
+    public NSUInteger TimeStep { get; }
+    [Selector("optimizerWithDescriptor:")]
+    public static Self OptimizerWithDescriptor(MLCOptimizerDescriptor optimizerDescriptor);
+    [Selector("optimizerWithDescriptor:beta1:beta2:epsilon:usesAMSGrad:timeStep:")]
+    public static Self OptimizerWithDescriptorBeta1Beta2EpsilonUsesAMSGradTimeStep(MLCOptimizerDescriptor optimizerDescriptor, float beta1, float beta2, float epsilon, bool usesAMSGrad, NSUInteger timeStep);
 }
 
 #endif

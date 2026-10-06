@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class GKCompositeBehavior : GKBehavior
 {
-    [Selector("behaviorCount")] public NSInteger BehaviorCount { get; }
-    [Selector("behaviorWithBehaviors:")] public static Self BehaviorWithBehaviors(NSArray behaviors);
-    [Selector("behaviorWithBehaviors:andWeights:")] public static Self BehaviorWithBehaviorsAndWeights(NSArray behaviors, NSArray weights);
-    [Selector("setWeight:forBehavior:")] public void SetWeightForBehavior(float weight, GKBehavior behavior);
-    [Selector("weightForBehavior:")] public float WeightForBehavior(GKBehavior behavior);
-    [Selector("removeBehavior:")] public void RemoveBehavior(GKBehavior behavior);
-    [Selector("removeAllBehaviors")] public void RemoveAllBehaviors();
-    [Selector("objectAtIndexedSubscript:")] public GKBehavior ObjectAtIndexedSubscript(NSUInteger idx);
-    [Selector("setObject:forKeyedSubscript:")] public void SetObjectForKeyedSubscript(NSNumber weight, GKBehavior behavior);
-    [Selector("objectForKeyedSubscript:")] public NSNumber ObjectForKeyedSubscript(GKBehavior behavior);
+    [Selector("behaviorCount")]
+    public NSInteger BehaviorCount { get; }
+    [Selector("behaviorWithBehaviors:")]
+    public static Self BehaviorWithBehaviors(NSArray behaviors);
+    [Selector("behaviorWithBehaviors:andWeights:")]
+    public static Self BehaviorWithBehaviorsAndWeights(NSArray behaviors, NSArray weights);
+    [Selector("setWeight:forBehavior:")]
+    public void SetWeightForBehavior(float weight, GKBehavior behavior);
+    [Selector("weightForBehavior:")]
+    public float WeightForBehavior(GKBehavior behavior);
+    [Selector("removeBehavior:")]
+    public void RemoveBehavior(GKBehavior behavior);
+    [Selector("removeAllBehaviors")]
+    public void RemoveAllBehaviors();
+    [Selector("objectAtIndexedSubscript:")]
+    public GKBehavior ObjectAtIndexedSubscript(NSUInteger idx);
+    [Selector("setObject:forKeyedSubscript:")]
+    public void SetObjectForKeyedSubscript(NSNumber weight, GKBehavior behavior);
+    [Selector("objectForKeyedSubscript:")]
+    public NSNumber ObjectForKeyedSubscript(GKBehavior behavior);
 }
 
 #endif

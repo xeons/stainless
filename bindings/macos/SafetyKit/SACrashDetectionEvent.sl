@@ -40,9 +40,12 @@ public enum SACrashDetectionEventResponse : long
 
 public extern objc class SACrashDetectionEvent : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("date")] public NSDate Date { get; }
-    [Selector("response")] public SACrashDetectionEventResponse Response { get; }
-    [Selector("location")] public CLLocation? Location { get; }
+    [Selector("date")]
+    public NSDate Date { get; }
+    [Selector("response")]
+    public SACrashDetectionEventResponse Response { get; }
+    [Selector("location")]
+    public CLLocation? Location { get; }
 }
 
 #endif

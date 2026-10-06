@@ -42,13 +42,19 @@ public objc closure void QLThumbnailGeneratorSaveBestRepresentationForRequestToF
 
 public extern objc class QLThumbnailGenerator : NSObject
 {
-    [Selector("sharedGenerator")] public static QLThumbnailGenerator? SharedGenerator { get; }
-    [Selector("generateBestRepresentationForRequest:completionHandler:")] public void GenerateBestRepresentationForRequestCompletionHandler(QLThumbnailGenerationRequest request, QLThumbnailGeneratorGenerateBestRepresentationForRequestCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("generateRepresentationsForRequest:updateHandler:")] public void GenerateRepresentationsForRequestUpdateHandler(QLThumbnailGenerationRequest request, QLThumbnailGeneratorGenerateRepresentationsForRequestUpdateHandlerUpdateHandlerBlock? updateHandler);
-    [Selector("cancelRequest:")] public void CancelRequest(QLThumbnailGenerationRequest request);
-    [Selector("saveBestRepresentationForRequest:toFileAtURL:asContentType:completionHandler:")] public void SaveBestRepresentationForRequestToFileAtURLAsContentTypeCompletionHandler(QLThumbnailGenerationRequest request, NSURL fileURL, UTType contentType, QLThumbnailGeneratorSaveBestRepresentationForRequestToFileAtURLAsContentTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("sharedGenerator")]
+    public static QLThumbnailGenerator? SharedGenerator { get; }
+    [Selector("generateBestRepresentationForRequest:completionHandler:")]
+    public void GenerateBestRepresentationForRequestCompletionHandler(QLThumbnailGenerationRequest request, QLThumbnailGeneratorGenerateBestRepresentationForRequestCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("generateRepresentationsForRequest:updateHandler:")]
+    public void GenerateRepresentationsForRequestUpdateHandler(QLThumbnailGenerationRequest request, QLThumbnailGeneratorGenerateRepresentationsForRequestUpdateHandlerUpdateHandlerBlock? updateHandler);
+    [Selector("cancelRequest:")]
+    public void CancelRequest(QLThumbnailGenerationRequest request);
+    [Selector("saveBestRepresentationForRequest:toFileAtURL:asContentType:completionHandler:")]
+    public void SaveBestRepresentationForRequestToFileAtURLAsContentTypeCompletionHandler(QLThumbnailGenerationRequest request, NSURL fileURL, UTType contentType, QLThumbnailGeneratorSaveBestRepresentationForRequestToFileAtURLAsContentTypeCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("saveBestRepresentationForRequest:toFileAtURL:withContentType:completionHandler:")] public void SaveBestRepresentationForRequestToFileAtURLWithContentTypeCompletionHandler(QLThumbnailGenerationRequest request, NSURL fileURL, NSString contentType, QLThumbnailGeneratorSaveBestRepresentationForRequestToFileAtURLWithContentTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("saveBestRepresentationForRequest:toFileAtURL:withContentType:completionHandler:")]
+    public void SaveBestRepresentationForRequestToFileAtURLWithContentTypeCompletionHandler(QLThumbnailGenerationRequest request, NSURL fileURL, NSString contentType, QLThumbnailGeneratorSaveBestRepresentationForRequestToFileAtURLWithContentTypeCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

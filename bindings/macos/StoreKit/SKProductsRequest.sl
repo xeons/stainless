@@ -34,21 +34,26 @@ import Standard.ObjC;
 /// Deprecated in macOS 15.0.
 public objc interface SKProductsRequestDelegate : SKRequestDelegate
 {
-    [Selector("productsRequest:didReceiveResponse:")] void ProductsRequestDidReceiveResponse(SKProductsRequest request, SKProductsResponse response);
+    [Selector("productsRequest:didReceiveResponse:")]
+    void ProductsRequestDidReceiveResponse(SKProductsRequest request, SKProductsResponse response);
 }
 
 /// Deprecated in macOS 15.0.
 public extern objc class SKProductsRequest : SKRequest
 {
-    [Selector("delegate", "setDelegate:")] public SKProductsRequestDelegate? Delegate { get; set; }
-    [Selector("initWithProductIdentifiers:")] public Self InitWithProductIdentifiers(NSSet productIdentifiers);
+    [Selector("delegate", "setDelegate:")]
+    public SKProductsRequestDelegate? Delegate { get; set; }
+    [Selector("initWithProductIdentifiers:")]
+    public Self InitWithProductIdentifiers(NSSet productIdentifiers);
 }
 
 /// Deprecated in macOS 15.0.
 public extern objc class SKProductsResponse : NSObject
 {
-    [Selector("products")] public NSArray Products { get; }
-    [Selector("invalidProductIdentifiers")] public NSArray InvalidProductIdentifiers { get; }
+    [Selector("products")]
+    public NSArray Products { get; }
+    [Selector("invalidProductIdentifiers")]
+    public NSArray InvalidProductIdentifiers { get; }
 }
 
 #endif

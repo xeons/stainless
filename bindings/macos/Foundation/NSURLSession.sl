@@ -43,38 +43,67 @@ public objc closure void NSURLSessionGetAllTasksWithCompletionHandlerCompletionH
 
 public extern objc class NSURLSession : NSObject
 {
-    [Selector("sharedSession")] public static NSURLSession SharedSession { get; }
-    [Selector("delegateQueue")] public NSOperationQueue DelegateQueue { get; }
-    [Selector("delegate")] public NSURLSessionDelegate? Delegate { get; }
-    [Selector("configuration")] public NSURLSessionConfiguration Configuration { get; }
-    [Selector("sessionDescription", "setSessionDescription:")] public NSString? SessionDescription { get; set; }
-    [Selector("sessionWithConfiguration:")] public static NSURLSession SessionWithConfiguration(NSURLSessionConfiguration configuration);
-    [Selector("sessionWithConfiguration:delegate:delegateQueue:")] public static NSURLSession SessionWithConfigurationDelegateDelegateQueue(NSURLSessionConfiguration configuration, NSURLSessionDelegate? @delegate, NSOperationQueue? queue);
-    [Selector("finishTasksAndInvalidate")] public void FinishTasksAndInvalidate();
-    [Selector("invalidateAndCancel")] public void InvalidateAndCancel();
-    [Selector("resetWithCompletionHandler:")] public void ResetWithCompletionHandler(NSURLSessionResetWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("flushWithCompletionHandler:")] public void FlushWithCompletionHandler(NSURLSessionFlushWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getTasksWithCompletionHandler:")] public void GetTasksWithCompletionHandler(NSURLSessionGetTasksWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getAllTasksWithCompletionHandler:")] public void GetAllTasksWithCompletionHandler(NSURLSessionGetAllTasksWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("dataTaskWithRequest:")] public NSURLSessionDataTask DataTaskWithRequest(NSURLRequest request);
-    [Selector("dataTaskWithURL:")] public NSURLSessionDataTask DataTaskWithURL(NSURL url);
-    [Selector("uploadTaskWithRequest:fromFile:")] public NSURLSessionUploadTask UploadTaskWithRequestFromFile(NSURLRequest request, NSURL fileURL);
-    [Selector("uploadTaskWithRequest:fromData:")] public NSURLSessionUploadTask UploadTaskWithRequestFromData(NSURLRequest request, NSData bodyData);
-    [Selector("uploadTaskWithResumeData:")] public NSURLSessionUploadTask UploadTaskWithResumeData(NSData resumeData);
-    [Selector("uploadTaskWithStreamedRequest:")] public NSURLSessionUploadTask UploadTaskWithStreamedRequest(NSURLRequest request);
-    [Selector("downloadTaskWithRequest:")] public NSURLSessionDownloadTask DownloadTaskWithRequest(NSURLRequest request);
-    [Selector("downloadTaskWithURL:")] public NSURLSessionDownloadTask DownloadTaskWithURL(NSURL url);
-    [Selector("downloadTaskWithResumeData:")] public NSURLSessionDownloadTask DownloadTaskWithResumeData(NSData resumeData);
-    [Selector("streamTaskWithHostName:port:")] public NSURLSessionStreamTask StreamTaskWithHostNamePort(NSString hostname, NSInteger port);
+    [Selector("sharedSession")]
+    public static NSURLSession SharedSession { get; }
+    [Selector("delegateQueue")]
+    public NSOperationQueue DelegateQueue { get; }
+    [Selector("delegate")]
+    public NSURLSessionDelegate? Delegate { get; }
+    [Selector("configuration")]
+    public NSURLSessionConfiguration Configuration { get; }
+    [Selector("sessionDescription", "setSessionDescription:")]
+    public NSString? SessionDescription { get; set; }
+    [Selector("sessionWithConfiguration:")]
+    public static NSURLSession SessionWithConfiguration(NSURLSessionConfiguration configuration);
+    [Selector("sessionWithConfiguration:delegate:delegateQueue:")]
+    public static NSURLSession SessionWithConfigurationDelegateDelegateQueue(NSURLSessionConfiguration configuration, NSURLSessionDelegate? @delegate, NSOperationQueue? queue);
+    [Selector("finishTasksAndInvalidate")]
+    public void FinishTasksAndInvalidate();
+    [Selector("invalidateAndCancel")]
+    public void InvalidateAndCancel();
+    [Selector("resetWithCompletionHandler:")]
+    public void ResetWithCompletionHandler(NSURLSessionResetWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("flushWithCompletionHandler:")]
+    public void FlushWithCompletionHandler(NSURLSessionFlushWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getTasksWithCompletionHandler:")]
+    public void GetTasksWithCompletionHandler(NSURLSessionGetTasksWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getAllTasksWithCompletionHandler:")]
+    public void GetAllTasksWithCompletionHandler(NSURLSessionGetAllTasksWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("dataTaskWithRequest:")]
+    public NSURLSessionDataTask DataTaskWithRequest(NSURLRequest request);
+    [Selector("dataTaskWithURL:")]
+    public NSURLSessionDataTask DataTaskWithURL(NSURL url);
+    [Selector("uploadTaskWithRequest:fromFile:")]
+    public NSURLSessionUploadTask UploadTaskWithRequestFromFile(NSURLRequest request, NSURL fileURL);
+    [Selector("uploadTaskWithRequest:fromData:")]
+    public NSURLSessionUploadTask UploadTaskWithRequestFromData(NSURLRequest request, NSData bodyData);
+    [Selector("uploadTaskWithResumeData:")]
+    public NSURLSessionUploadTask UploadTaskWithResumeData(NSData resumeData);
+    [Selector("uploadTaskWithStreamedRequest:")]
+    public NSURLSessionUploadTask UploadTaskWithStreamedRequest(NSURLRequest request);
+    [Selector("downloadTaskWithRequest:")]
+    public NSURLSessionDownloadTask DownloadTaskWithRequest(NSURLRequest request);
+    [Selector("downloadTaskWithURL:")]
+    public NSURLSessionDownloadTask DownloadTaskWithURL(NSURL url);
+    [Selector("downloadTaskWithResumeData:")]
+    public NSURLSessionDownloadTask DownloadTaskWithResumeData(NSData resumeData);
+    [Selector("streamTaskWithHostName:port:")]
+    public NSURLSessionStreamTask StreamTaskWithHostNamePort(NSString hostname, NSInteger port);
     /// Deprecated in macOS 100000.
-    [Selector("streamTaskWithNetService:")] public NSURLSessionStreamTask StreamTaskWithNetService(NSNetService service);
-    [Selector("webSocketTaskWithURL:")] public NSURLSessionWebSocketTask WebSocketTaskWithURL(NSURL url);
-    [Selector("webSocketTaskWithURL:protocols:")] public NSURLSessionWebSocketTask WebSocketTaskWithURLProtocols(NSURL url, NSArray protocols);
-    [Selector("webSocketTaskWithRequest:")] public NSURLSessionWebSocketTask WebSocketTaskWithRequest(NSURLRequest request);
+    [Selector("streamTaskWithNetService:")]
+    public NSURLSessionStreamTask StreamTaskWithNetService(NSNetService service);
+    [Selector("webSocketTaskWithURL:")]
+    public NSURLSessionWebSocketTask WebSocketTaskWithURL(NSURL url);
+    [Selector("webSocketTaskWithURL:protocols:")]
+    public NSURLSessionWebSocketTask WebSocketTaskWithURLProtocols(NSURL url, NSArray protocols);
+    [Selector("webSocketTaskWithRequest:")]
+    public NSURLSessionWebSocketTask WebSocketTaskWithRequest(NSURLRequest request);
     /// Deprecated in macOS 10.15.
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 10.15.
-    [Selector("new")] public static Self New();
+    [Selector("new")]
+    public static Self New();
 }
 
 public objc closure void NSURLSessionDataTaskWithRequestCompletionHandlerCompletionHandlerBlock(NSData? arg0, NSURLResponse? arg1, NSError? arg2);
@@ -96,14 +125,22 @@ public objc closure void NSURLSessionDownloadTaskWithResumeDataCompletionHandler
 /// NSURLSessionAsynchronousConvenience, a category of NSURLSession.
 public extern objc class NSURLSession
 {
-    [Selector("dataTaskWithRequest:completionHandler:")] public NSURLSessionDataTask DataTaskWithRequestCompletionHandler(NSURLRequest request, NSURLSessionDataTaskWithRequestCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("dataTaskWithURL:completionHandler:")] public NSURLSessionDataTask DataTaskWithURLCompletionHandler(NSURL url, NSURLSessionDataTaskWithURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("uploadTaskWithRequest:fromFile:completionHandler:")] public NSURLSessionUploadTask UploadTaskWithRequestFromFileCompletionHandler(NSURLRequest request, NSURL fileURL, NSURLSessionUploadTaskWithRequestFromFileCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("uploadTaskWithRequest:fromData:completionHandler:")] public NSURLSessionUploadTask UploadTaskWithRequestFromDataCompletionHandler(NSURLRequest request, NSData? bodyData, NSURLSessionUploadTaskWithRequestFromDataCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("uploadTaskWithResumeData:completionHandler:")] public NSURLSessionUploadTask UploadTaskWithResumeDataCompletionHandler(NSData resumeData, NSURLSessionUploadTaskWithResumeDataCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("downloadTaskWithRequest:completionHandler:")] public NSURLSessionDownloadTask DownloadTaskWithRequestCompletionHandler(NSURLRequest request, NSURLSessionDownloadTaskWithRequestCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("downloadTaskWithURL:completionHandler:")] public NSURLSessionDownloadTask DownloadTaskWithURLCompletionHandler(NSURL url, NSURLSessionDownloadTaskWithURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("downloadTaskWithResumeData:completionHandler:")] public NSURLSessionDownloadTask DownloadTaskWithResumeDataCompletionHandler(NSData resumeData, NSURLSessionDownloadTaskWithResumeDataCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("dataTaskWithRequest:completionHandler:")]
+    public NSURLSessionDataTask DataTaskWithRequestCompletionHandler(NSURLRequest request, NSURLSessionDataTaskWithRequestCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("dataTaskWithURL:completionHandler:")]
+    public NSURLSessionDataTask DataTaskWithURLCompletionHandler(NSURL url, NSURLSessionDataTaskWithURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("uploadTaskWithRequest:fromFile:completionHandler:")]
+    public NSURLSessionUploadTask UploadTaskWithRequestFromFileCompletionHandler(NSURLRequest request, NSURL fileURL, NSURLSessionUploadTaskWithRequestFromFileCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("uploadTaskWithRequest:fromData:completionHandler:")]
+    public NSURLSessionUploadTask UploadTaskWithRequestFromDataCompletionHandler(NSURLRequest request, NSData? bodyData, NSURLSessionUploadTaskWithRequestFromDataCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("uploadTaskWithResumeData:completionHandler:")]
+    public NSURLSessionUploadTask UploadTaskWithResumeDataCompletionHandler(NSData resumeData, NSURLSessionUploadTaskWithResumeDataCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("downloadTaskWithRequest:completionHandler:")]
+    public NSURLSessionDownloadTask DownloadTaskWithRequestCompletionHandler(NSURLRequest request, NSURLSessionDownloadTaskWithRequestCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("downloadTaskWithURL:completionHandler:")]
+    public NSURLSessionDownloadTask DownloadTaskWithURLCompletionHandler(NSURL url, NSURLSessionDownloadTaskWithURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("downloadTaskWithResumeData:completionHandler:")]
+    public NSURLSessionDownloadTask DownloadTaskWithResumeDataCompletionHandler(NSData resumeData, NSURLSessionDownloadTaskWithResumeDataCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public enum NSURLSessionTaskState : long
@@ -116,31 +153,54 @@ public enum NSURLSessionTaskState : long
 
 public extern objc class NSURLSessionTask : NSObject, NSCopying, NSProgressReporting
 {
-    [Selector("taskIdentifier")] public NSUInteger TaskIdentifier { get; }
-    [Selector("originalRequest")] public NSURLRequest? OriginalRequest { get; }
-    [Selector("currentRequest")] public NSURLRequest? CurrentRequest { get; }
-    [Selector("response")] public NSURLResponse? Response { get; }
-    [Selector("delegate", "setDelegate:")] public NSURLSessionTaskDelegate? Delegate { get; set; }
-    [Selector("progress")] public NSProgress Progress { get; }
-    [Selector("earliestBeginDate", "setEarliestBeginDate:")] public NSDate? EarliestBeginDate { get; set; }
-    [Selector("countOfBytesClientExpectsToSend", "setCountOfBytesClientExpectsToSend:")] public long CountOfBytesClientExpectsToSend { get; set; }
-    [Selector("countOfBytesClientExpectsToReceive", "setCountOfBytesClientExpectsToReceive:")] public long CountOfBytesClientExpectsToReceive { get; set; }
-    [Selector("countOfBytesSent")] public long CountOfBytesSent { get; }
-    [Selector("countOfBytesReceived")] public long CountOfBytesReceived { get; }
-    [Selector("countOfBytesExpectedToSend")] public long CountOfBytesExpectedToSend { get; }
-    [Selector("countOfBytesExpectedToReceive")] public long CountOfBytesExpectedToReceive { get; }
-    [Selector("taskDescription", "setTaskDescription:")] public NSString? TaskDescription { get; set; }
-    [Selector("state")] public NSURLSessionTaskState State { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("priority", "setPriority:")] public float Priority { get; set; }
-    [Selector("prefersIncrementalDelivery", "setPrefersIncrementalDelivery:")] public bool PrefersIncrementalDelivery { get; set; }
-    [Selector("cancel")] public void Cancel();
-    [Selector("suspend")] public void Suspend();
-    [Selector("resume")] public void Resume();
+    [Selector("taskIdentifier")]
+    public NSUInteger TaskIdentifier { get; }
+    [Selector("originalRequest")]
+    public NSURLRequest? OriginalRequest { get; }
+    [Selector("currentRequest")]
+    public NSURLRequest? CurrentRequest { get; }
+    [Selector("response")]
+    public NSURLResponse? Response { get; }
+    [Selector("delegate", "setDelegate:")]
+    public NSURLSessionTaskDelegate? Delegate { get; set; }
+    [Selector("progress")]
+    public NSProgress Progress { get; }
+    [Selector("earliestBeginDate", "setEarliestBeginDate:")]
+    public NSDate? EarliestBeginDate { get; set; }
+    [Selector("countOfBytesClientExpectsToSend", "setCountOfBytesClientExpectsToSend:")]
+    public long CountOfBytesClientExpectsToSend { get; set; }
+    [Selector("countOfBytesClientExpectsToReceive", "setCountOfBytesClientExpectsToReceive:")]
+    public long CountOfBytesClientExpectsToReceive { get; set; }
+    [Selector("countOfBytesSent")]
+    public long CountOfBytesSent { get; }
+    [Selector("countOfBytesReceived")]
+    public long CountOfBytesReceived { get; }
+    [Selector("countOfBytesExpectedToSend")]
+    public long CountOfBytesExpectedToSend { get; }
+    [Selector("countOfBytesExpectedToReceive")]
+    public long CountOfBytesExpectedToReceive { get; }
+    [Selector("taskDescription", "setTaskDescription:")]
+    public NSString? TaskDescription { get; set; }
+    [Selector("state")]
+    public NSURLSessionTaskState State { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("priority", "setPriority:")]
+    public float Priority { get; set; }
+    [Selector("prefersIncrementalDelivery", "setPrefersIncrementalDelivery:")]
+    public bool PrefersIncrementalDelivery { get; set; }
+    [Selector("cancel")]
+    public void Cancel();
+    [Selector("suspend")]
+    public void Suspend();
+    [Selector("resume")]
+    public void Resume();
     /// Deprecated in macOS 10.15.
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 10.15.
-    [Selector("new")] public static Self New();
+    [Selector("new")]
+    public static Self New();
 }
 
 public extern "C" float NSURLSessionTaskPriorityDefault;
@@ -152,9 +212,11 @@ public extern "C" float NSURLSessionTaskPriorityHigh;
 public extern objc class NSURLSessionDataTask : NSURLSessionTask
 {
     /// Deprecated in macOS 10.15.
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 10.15.
-    [Selector("new")] public static Self New();
+    [Selector("new")]
+    public static Self New();
 }
 
 public objc closure void NSURLSessionUploadTaskCancelByProducingResumeDataCompletionHandlerBlock(NSData? arg0);
@@ -162,21 +224,27 @@ public objc closure void NSURLSessionUploadTaskCancelByProducingResumeDataComple
 public extern objc class NSURLSessionUploadTask : NSURLSessionDataTask
 {
     /// Deprecated in macOS 10.15.
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 10.15.
-    [Selector("new")] public static Self New();
-    [Selector("cancelByProducingResumeData:")] public void CancelByProducingResumeData(NSURLSessionUploadTaskCancelByProducingResumeDataCompletionHandlerBlock completionHandler);
+    [Selector("new")]
+    public static Self New();
+    [Selector("cancelByProducingResumeData:")]
+    public void CancelByProducingResumeData(NSURLSessionUploadTaskCancelByProducingResumeDataCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void NSURLSessionDownloadTaskCancelByProducingResumeDataCompletionHandlerBlock(NSData? arg0);
 
 public extern objc class NSURLSessionDownloadTask : NSURLSessionTask
 {
-    [Selector("cancelByProducingResumeData:")] public void CancelByProducingResumeData(NSURLSessionDownloadTaskCancelByProducingResumeDataCompletionHandlerBlock completionHandler);
+    [Selector("cancelByProducingResumeData:")]
+    public void CancelByProducingResumeData(NSURLSessionDownloadTaskCancelByProducingResumeDataCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 10.15.
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 10.15.
-    [Selector("new")] public static Self New();
+    [Selector("new")]
+    public static Self New();
 }
 
 public objc closure void NSURLSessionStreamTaskReadDataOfMinLengthMaxLengthTimeoutCompletionHandlerCompletionHandlerBlock(NSData? arg0, bool arg1, NSError? arg2);
@@ -185,18 +253,27 @@ public objc closure void NSURLSessionStreamTaskWriteDataTimeoutCompletionHandler
 
 public extern objc class NSURLSessionStreamTask : NSURLSessionTask
 {
-    [Selector("readDataOfMinLength:maxLength:timeout:completionHandler:")] public void ReadDataOfMinLengthMaxLengthTimeoutCompletionHandler(NSUInteger minBytes, NSUInteger maxBytes, NSTimeInterval timeout, NSURLSessionStreamTaskReadDataOfMinLengthMaxLengthTimeoutCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("writeData:timeout:completionHandler:")] public void WriteDataTimeoutCompletionHandler(NSData data, NSTimeInterval timeout, NSURLSessionStreamTaskWriteDataTimeoutCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("captureStreams")] public void CaptureStreams();
-    [Selector("closeWrite")] public void CloseWrite();
-    [Selector("closeRead")] public void CloseRead();
-    [Selector("startSecureConnection")] public void StartSecureConnection();
+    [Selector("readDataOfMinLength:maxLength:timeout:completionHandler:")]
+    public void ReadDataOfMinLengthMaxLengthTimeoutCompletionHandler(NSUInteger minBytes, NSUInteger maxBytes, NSTimeInterval timeout, NSURLSessionStreamTaskReadDataOfMinLengthMaxLengthTimeoutCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("writeData:timeout:completionHandler:")]
+    public void WriteDataTimeoutCompletionHandler(NSData data, NSTimeInterval timeout, NSURLSessionStreamTaskWriteDataTimeoutCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("captureStreams")]
+    public void CaptureStreams();
+    [Selector("closeWrite")]
+    public void CloseWrite();
+    [Selector("closeRead")]
+    public void CloseRead();
+    [Selector("startSecureConnection")]
+    public void StartSecureConnection();
     /// Deprecated in macOS 10.15.
-    [Selector("stopSecureConnection")] public void StopSecureConnection();
+    [Selector("stopSecureConnection")]
+    public void StopSecureConnection();
     /// Deprecated in macOS 10.15.
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 10.15.
-    [Selector("new")] public static Self New();
+    [Selector("new")]
+    public static Self New();
 }
 
 public enum NSURLSessionWebSocketMessageType : long
@@ -207,11 +284,16 @@ public enum NSURLSessionWebSocketMessageType : long
 
 public extern objc class NSURLSessionWebSocketMessage : NSObject
 {
-    [Selector("type")] public NSURLSessionWebSocketMessageType Type { get; }
-    [Selector("data")] public NSData? Data { get; }
-    [Selector("string")] public NSString? String { get; }
-    [Selector("initWithData:")] public Self InitWithData(NSData data);
-    [Selector("initWithString:")] public Self InitWithString(NSString string);
+    [Selector("type")]
+    public NSURLSessionWebSocketMessageType Type { get; }
+    [Selector("data")]
+    public NSData? Data { get; }
+    [Selector("string")]
+    public NSString? String { get; }
+    [Selector("initWithData:")]
+    public Self InitWithData(NSData data);
+    [Selector("initWithString:")]
+    public Self InitWithString(NSString string);
 }
 
 public enum NSURLSessionWebSocketCloseCode : long
@@ -239,62 +321,105 @@ public objc closure void NSURLSessionWebSocketTaskSendPingWithPongReceiveHandler
 
 public extern objc class NSURLSessionWebSocketTask : NSURLSessionTask
 {
-    [Selector("maximumMessageSize", "setMaximumMessageSize:")] public NSInteger MaximumMessageSize { get; set; }
-    [Selector("closeCode")] public NSURLSessionWebSocketCloseCode CloseCode { get; }
-    [Selector("closeReason")] public NSData? CloseReason { get; }
-    [Selector("sendMessage:completionHandler:")] public void SendMessageCompletionHandler(NSURLSessionWebSocketMessage message, NSURLSessionWebSocketTaskSendMessageCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("receiveMessageWithCompletionHandler:")] public void ReceiveMessageWithCompletionHandler(NSURLSessionWebSocketTaskReceiveMessageWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("sendPingWithPongReceiveHandler:")] public void SendPingWithPongReceiveHandler(NSURLSessionWebSocketTaskSendPingWithPongReceiveHandlerPongReceiveHandlerBlock pongReceiveHandler);
-    [Selector("cancelWithCloseCode:reason:")] public void CancelWithCloseCodeReason(NSURLSessionWebSocketCloseCode closeCode, NSData? reason);
+    [Selector("maximumMessageSize", "setMaximumMessageSize:")]
+    public NSInteger MaximumMessageSize { get; set; }
+    [Selector("closeCode")]
+    public NSURLSessionWebSocketCloseCode CloseCode { get; }
+    [Selector("closeReason")]
+    public NSData? CloseReason { get; }
+    [Selector("sendMessage:completionHandler:")]
+    public void SendMessageCompletionHandler(NSURLSessionWebSocketMessage message, NSURLSessionWebSocketTaskSendMessageCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("receiveMessageWithCompletionHandler:")]
+    public void ReceiveMessageWithCompletionHandler(NSURLSessionWebSocketTaskReceiveMessageWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("sendPingWithPongReceiveHandler:")]
+    public void SendPingWithPongReceiveHandler(NSURLSessionWebSocketTaskSendPingWithPongReceiveHandlerPongReceiveHandlerBlock pongReceiveHandler);
+    [Selector("cancelWithCloseCode:reason:")]
+    public void CancelWithCloseCodeReason(NSURLSessionWebSocketCloseCode closeCode, NSData? reason);
 }
 
 public extern objc class NSURLSessionConfiguration : NSObject, NSCopying
 {
-    [Selector("defaultSessionConfiguration")] public static NSURLSessionConfiguration DefaultSessionConfiguration { get; }
-    [Selector("ephemeralSessionConfiguration")] public static NSURLSessionConfiguration EphemeralSessionConfiguration { get; }
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("requestCachePolicy", "setRequestCachePolicy:")] public NSURLRequestCachePolicy RequestCachePolicy { get; set; }
-    [Selector("timeoutIntervalForRequest", "setTimeoutIntervalForRequest:")] public NSTimeInterval TimeoutIntervalForRequest { get; set; }
-    [Selector("timeoutIntervalForResource", "setTimeoutIntervalForResource:")] public NSTimeInterval TimeoutIntervalForResource { get; set; }
-    [Selector("networkServiceType", "setNetworkServiceType:")] public NSURLRequestNetworkServiceType NetworkServiceType { get; set; }
-    [Selector("allowsCellularAccess", "setAllowsCellularAccess:")] public bool AllowsCellularAccess { get; set; }
-    [Selector("allowsExpensiveNetworkAccess", "setAllowsExpensiveNetworkAccess:")] public bool AllowsExpensiveNetworkAccess { get; set; }
-    [Selector("allowsConstrainedNetworkAccess", "setAllowsConstrainedNetworkAccess:")] public bool AllowsConstrainedNetworkAccess { get; set; }
+    [Selector("defaultSessionConfiguration")]
+    public static NSURLSessionConfiguration DefaultSessionConfiguration { get; }
+    [Selector("ephemeralSessionConfiguration")]
+    public static NSURLSessionConfiguration EphemeralSessionConfiguration { get; }
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("requestCachePolicy", "setRequestCachePolicy:")]
+    public NSURLRequestCachePolicy RequestCachePolicy { get; set; }
+    [Selector("timeoutIntervalForRequest", "setTimeoutIntervalForRequest:")]
+    public NSTimeInterval TimeoutIntervalForRequest { get; set; }
+    [Selector("timeoutIntervalForResource", "setTimeoutIntervalForResource:")]
+    public NSTimeInterval TimeoutIntervalForResource { get; set; }
+    [Selector("networkServiceType", "setNetworkServiceType:")]
+    public NSURLRequestNetworkServiceType NetworkServiceType { get; set; }
+    [Selector("allowsCellularAccess", "setAllowsCellularAccess:")]
+    public bool AllowsCellularAccess { get; set; }
+    [Selector("allowsExpensiveNetworkAccess", "setAllowsExpensiveNetworkAccess:")]
+    public bool AllowsExpensiveNetworkAccess { get; set; }
+    [Selector("allowsConstrainedNetworkAccess", "setAllowsConstrainedNetworkAccess:")]
+    public bool AllowsConstrainedNetworkAccess { get; set; }
     /// macOS 26.1 and later.
-    [Selector("allowsUltraConstrainedNetworkAccess", "setAllowsUltraConstrainedNetworkAccess:")] public bool AllowsUltraConstrainedNetworkAccess { get; set; }
-    [Selector("requiresDNSSECValidation", "setRequiresDNSSECValidation:")] public bool RequiresDNSSECValidation { get; set; }
-    [Selector("waitsForConnectivity", "setWaitsForConnectivity:")] public bool WaitsForConnectivity { get; set; }
-    [Selector("isDiscretionary", "setDiscretionary:")] public bool Discretionary { get; set; }
-    [Selector("sharedContainerIdentifier", "setSharedContainerIdentifier:")] public NSString? SharedContainerIdentifier { get; set; }
-    [Selector("sessionSendsLaunchEvents", "setSessionSendsLaunchEvents:")] public bool SessionSendsLaunchEvents { get; set; }
-    [Selector("connectionProxyDictionary", "setConnectionProxyDictionary:")] public NSDictionary? ConnectionProxyDictionary { get; set; }
+    [Selector("allowsUltraConstrainedNetworkAccess", "setAllowsUltraConstrainedNetworkAccess:")]
+    public bool AllowsUltraConstrainedNetworkAccess { get; set; }
+    [Selector("requiresDNSSECValidation", "setRequiresDNSSECValidation:")]
+    public bool RequiresDNSSECValidation { get; set; }
+    [Selector("waitsForConnectivity", "setWaitsForConnectivity:")]
+    public bool WaitsForConnectivity { get; set; }
+    [Selector("isDiscretionary", "setDiscretionary:")]
+    public bool Discretionary { get; set; }
+    [Selector("sharedContainerIdentifier", "setSharedContainerIdentifier:")]
+    public NSString? SharedContainerIdentifier { get; set; }
+    [Selector("sessionSendsLaunchEvents", "setSessionSendsLaunchEvents:")]
+    public bool SessionSendsLaunchEvents { get; set; }
+    [Selector("connectionProxyDictionary", "setConnectionProxyDictionary:")]
+    public NSDictionary? ConnectionProxyDictionary { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("TLSMinimumSupportedProtocol", "setTLSMinimumSupportedProtocol:")] public SSLProtocol TLSMinimumSupportedProtocol { get; set; }
+    [Selector("TLSMinimumSupportedProtocol", "setTLSMinimumSupportedProtocol:")]
+    public SSLProtocol TLSMinimumSupportedProtocol { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("TLSMaximumSupportedProtocol", "setTLSMaximumSupportedProtocol:")] public SSLProtocol TLSMaximumSupportedProtocol { get; set; }
-    [Selector("TLSMinimumSupportedProtocolVersion", "setTLSMinimumSupportedProtocolVersion:")] public tls_protocol_version_t TLSMinimumSupportedProtocolVersion { get; set; }
-    [Selector("TLSMaximumSupportedProtocolVersion", "setTLSMaximumSupportedProtocolVersion:")] public tls_protocol_version_t TLSMaximumSupportedProtocolVersion { get; set; }
+    [Selector("TLSMaximumSupportedProtocol", "setTLSMaximumSupportedProtocol:")]
+    public SSLProtocol TLSMaximumSupportedProtocol { get; set; }
+    [Selector("TLSMinimumSupportedProtocolVersion", "setTLSMinimumSupportedProtocolVersion:")]
+    public tls_protocol_version_t TLSMinimumSupportedProtocolVersion { get; set; }
+    [Selector("TLSMaximumSupportedProtocolVersion", "setTLSMaximumSupportedProtocolVersion:")]
+    public tls_protocol_version_t TLSMaximumSupportedProtocolVersion { get; set; }
     /// Deprecated in macOS 15.4.
-    [Selector("HTTPShouldUsePipelining", "setHTTPShouldUsePipelining:")] public bool HTTPShouldUsePipelining { get; set; }
-    [Selector("HTTPShouldSetCookies", "setHTTPShouldSetCookies:")] public bool HTTPShouldSetCookies { get; set; }
-    [Selector("HTTPCookieAcceptPolicy", "setHTTPCookieAcceptPolicy:")] public NSHTTPCookieAcceptPolicy HTTPCookieAcceptPolicy { get; set; }
-    [Selector("HTTPAdditionalHeaders", "setHTTPAdditionalHeaders:")] public NSDictionary? HTTPAdditionalHeaders { get; set; }
-    [Selector("HTTPMaximumConnectionsPerHost", "setHTTPMaximumConnectionsPerHost:")] public NSInteger HTTPMaximumConnectionsPerHost { get; set; }
-    [Selector("HTTPCookieStorage", "setHTTPCookieStorage:")] public NSHTTPCookieStorage? HTTPCookieStorage { get; set; }
-    [Selector("URLCredentialStorage", "setURLCredentialStorage:")] public NSURLCredentialStorage? URLCredentialStorage { get; set; }
-    [Selector("URLCache", "setURLCache:")] public NSURLCache? URLCache { get; set; }
+    [Selector("HTTPShouldUsePipelining", "setHTTPShouldUsePipelining:")]
+    public bool HTTPShouldUsePipelining { get; set; }
+    [Selector("HTTPShouldSetCookies", "setHTTPShouldSetCookies:")]
+    public bool HTTPShouldSetCookies { get; set; }
+    [Selector("HTTPCookieAcceptPolicy", "setHTTPCookieAcceptPolicy:")]
+    public NSHTTPCookieAcceptPolicy HTTPCookieAcceptPolicy { get; set; }
+    [Selector("HTTPAdditionalHeaders", "setHTTPAdditionalHeaders:")]
+    public NSDictionary? HTTPAdditionalHeaders { get; set; }
+    [Selector("HTTPMaximumConnectionsPerHost", "setHTTPMaximumConnectionsPerHost:")]
+    public NSInteger HTTPMaximumConnectionsPerHost { get; set; }
+    [Selector("HTTPCookieStorage", "setHTTPCookieStorage:")]
+    public NSHTTPCookieStorage? HTTPCookieStorage { get; set; }
+    [Selector("URLCredentialStorage", "setURLCredentialStorage:")]
+    public NSURLCredentialStorage? URLCredentialStorage { get; set; }
+    [Selector("URLCache", "setURLCache:")]
+    public NSURLCache? URLCache { get; set; }
     /// Deprecated in macOS 15.4.
-    [Selector("shouldUseExtendedBackgroundIdleMode", "setShouldUseExtendedBackgroundIdleMode:")] public bool ShouldUseExtendedBackgroundIdleMode { get; set; }
-    [Selector("protocolClasses", "setProtocolClasses:")] public NSArray? ProtocolClasses { get; set; }
+    [Selector("shouldUseExtendedBackgroundIdleMode", "setShouldUseExtendedBackgroundIdleMode:")]
+    public bool ShouldUseExtendedBackgroundIdleMode { get; set; }
+    [Selector("protocolClasses", "setProtocolClasses:")]
+    public NSArray? ProtocolClasses { get; set; }
     /// macOS 15.4 and later.
-    [Selector("usesClassicLoadingMode", "setUsesClassicLoadingMode:")] public bool UsesClassicLoadingMode { get; set; }
+    [Selector("usesClassicLoadingMode", "setUsesClassicLoadingMode:")]
+    public bool UsesClassicLoadingMode { get; set; }
     /// macOS 26.0 and later.
-    [Selector("enablesEarlyData", "setEnablesEarlyData:")] public bool EnablesEarlyData { get; set; }
-    [Selector("backgroundSessionConfigurationWithIdentifier:")] public static NSURLSessionConfiguration BackgroundSessionConfigurationWithIdentifier(NSString identifier);
+    [Selector("enablesEarlyData", "setEnablesEarlyData:")]
+    public bool EnablesEarlyData { get; set; }
+    [Selector("backgroundSessionConfigurationWithIdentifier:")]
+    public static NSURLSessionConfiguration BackgroundSessionConfigurationWithIdentifier(NSString identifier);
     /// Deprecated in macOS 10.15.
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 10.15.
-    [Selector("new")] public static Self New();
+    [Selector("new")]
+    public static Self New();
 }
 
 public enum NSURLSessionDelayedRequestDisposition : long
@@ -324,9 +449,15 @@ public objc closure void NSURLSessionDelegateURLSessionDidReceiveChallengeComple
 
 public objc interface NSURLSessionDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("URLSession:didBecomeInvalidWithError:")] void URLSessionDidBecomeInvalidWithError(NSURLSession session, NSError? error);
-    [Optional] [Selector("URLSession:didReceiveChallenge:completionHandler:")] void URLSessionDidReceiveChallengeCompletionHandler(NSURLSession session, NSURLAuthenticationChallenge challenge, NSURLSessionDelegateURLSessionDidReceiveChallengeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("URLSessionDidFinishEventsForBackgroundURLSession:")] void URLSessionDidFinishEventsForBackgroundURLSession(NSURLSession session);
+    [Optional]
+    [Selector("URLSession:didBecomeInvalidWithError:")]
+    void URLSessionDidBecomeInvalidWithError(NSURLSession session, NSError? error);
+    [Optional]
+    [Selector("URLSession:didReceiveChallenge:completionHandler:")]
+    void URLSessionDidReceiveChallengeCompletionHandler(NSURLSession session, NSURLAuthenticationChallenge challenge, NSURLSessionDelegateURLSessionDidReceiveChallengeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("URLSessionDidFinishEventsForBackgroundURLSession:")]
+    void URLSessionDidFinishEventsForBackgroundURLSession(NSURLSession session);
 }
 
 public objc closure void NSURLSessionTaskDelegateURLSessionTaskWillBeginDelayedRequestCompletionHandlerCompletionHandlerBlock(NSURLSessionDelayedRequestDisposition arg0, NSURLRequest? arg1);
@@ -341,17 +472,39 @@ public objc closure void NSURLSessionTaskDelegateURLSessionTaskNeedNewBodyStream
 
 public objc interface NSURLSessionTaskDelegate : NSURLSessionDelegate
 {
-    [Optional] [Selector("URLSession:didCreateTask:")] void URLSessionDidCreateTask(NSURLSession session, NSURLSessionTask task);
-    [Optional] [Selector("URLSession:task:willBeginDelayedRequest:completionHandler:")] void URLSessionTaskWillBeginDelayedRequestCompletionHandler(NSURLSession session, NSURLSessionTask task, NSURLRequest request, NSURLSessionTaskDelegateURLSessionTaskWillBeginDelayedRequestCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("URLSession:taskIsWaitingForConnectivity:")] void URLSessionTaskIsWaitingForConnectivity(NSURLSession session, NSURLSessionTask task);
-    [Optional] [Selector("URLSession:task:willPerformHTTPRedirection:newRequest:completionHandler:")] void URLSessionTaskWillPerformHTTPRedirectionNewRequestCompletionHandler(NSURLSession session, NSURLSessionTask task, NSHTTPURLResponse response, NSURLRequest request, NSURLSessionTaskDelegateURLSessionTaskWillPerformHTTPRedirectionNewRequestCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("URLSession:task:didReceiveChallenge:completionHandler:")] void URLSessionTaskDidReceiveChallengeCompletionHandler(NSURLSession session, NSURLSessionTask task, NSURLAuthenticationChallenge challenge, NSURLSessionTaskDelegateURLSessionTaskDidReceiveChallengeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("URLSession:task:needNewBodyStream:")] void URLSessionTaskNeedNewBodyStream(NSURLSession session, NSURLSessionTask task, NSURLSessionTaskDelegateURLSessionTaskNeedNewBodyStreamCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("URLSession:task:needNewBodyStreamFromOffset:completionHandler:")] void URLSessionTaskNeedNewBodyStreamFromOffsetCompletionHandler(NSURLSession session, NSURLSessionTask task, long offset, NSURLSessionTaskDelegateURLSessionTaskNeedNewBodyStreamFromOffsetCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("URLSession:task:didSendBodyData:totalBytesSent:totalBytesExpectedToSend:")] void URLSessionTaskDidSendBodyDataTotalBytesSentTotalBytesExpectedToSend(NSURLSession session, NSURLSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend);
-    [Optional] [Selector("URLSession:task:didReceiveInformationalResponse:")] void URLSessionTaskDidReceiveInformationalResponse(NSURLSession session, NSURLSessionTask task, NSHTTPURLResponse response);
-    [Optional] [Selector("URLSession:task:didFinishCollectingMetrics:")] void URLSessionTaskDidFinishCollectingMetrics(NSURLSession session, NSURLSessionTask task, NSURLSessionTaskMetrics metrics);
-    [Optional] [Selector("URLSession:task:didCompleteWithError:")] void URLSessionTaskDidCompleteWithError(NSURLSession session, NSURLSessionTask task, NSError? error);
+    [Optional]
+    [Selector("URLSession:didCreateTask:")]
+    void URLSessionDidCreateTask(NSURLSession session, NSURLSessionTask task);
+    [Optional]
+    [Selector("URLSession:task:willBeginDelayedRequest:completionHandler:")]
+    void URLSessionTaskWillBeginDelayedRequestCompletionHandler(NSURLSession session, NSURLSessionTask task, NSURLRequest request, NSURLSessionTaskDelegateURLSessionTaskWillBeginDelayedRequestCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("URLSession:taskIsWaitingForConnectivity:")]
+    void URLSessionTaskIsWaitingForConnectivity(NSURLSession session, NSURLSessionTask task);
+    [Optional]
+    [Selector("URLSession:task:willPerformHTTPRedirection:newRequest:completionHandler:")]
+    void URLSessionTaskWillPerformHTTPRedirectionNewRequestCompletionHandler(NSURLSession session, NSURLSessionTask task, NSHTTPURLResponse response, NSURLRequest request, NSURLSessionTaskDelegateURLSessionTaskWillPerformHTTPRedirectionNewRequestCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("URLSession:task:didReceiveChallenge:completionHandler:")]
+    void URLSessionTaskDidReceiveChallengeCompletionHandler(NSURLSession session, NSURLSessionTask task, NSURLAuthenticationChallenge challenge, NSURLSessionTaskDelegateURLSessionTaskDidReceiveChallengeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("URLSession:task:needNewBodyStream:")]
+    void URLSessionTaskNeedNewBodyStream(NSURLSession session, NSURLSessionTask task, NSURLSessionTaskDelegateURLSessionTaskNeedNewBodyStreamCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("URLSession:task:needNewBodyStreamFromOffset:completionHandler:")]
+    void URLSessionTaskNeedNewBodyStreamFromOffsetCompletionHandler(NSURLSession session, NSURLSessionTask task, long offset, NSURLSessionTaskDelegateURLSessionTaskNeedNewBodyStreamFromOffsetCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("URLSession:task:didSendBodyData:totalBytesSent:totalBytesExpectedToSend:")]
+    void URLSessionTaskDidSendBodyDataTotalBytesSentTotalBytesExpectedToSend(NSURLSession session, NSURLSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend);
+    [Optional]
+    [Selector("URLSession:task:didReceiveInformationalResponse:")]
+    void URLSessionTaskDidReceiveInformationalResponse(NSURLSession session, NSURLSessionTask task, NSHTTPURLResponse response);
+    [Optional]
+    [Selector("URLSession:task:didFinishCollectingMetrics:")]
+    void URLSessionTaskDidFinishCollectingMetrics(NSURLSession session, NSURLSessionTask task, NSURLSessionTaskMetrics metrics);
+    [Optional]
+    [Selector("URLSession:task:didCompleteWithError:")]
+    void URLSessionTaskDidCompleteWithError(NSURLSession session, NSURLSessionTask task, NSError? error);
 }
 
 public objc closure void NSURLSessionDataDelegateURLSessionDataTaskDidReceiveResponseCompletionHandlerCompletionHandlerBlock(NSURLSessionResponseDisposition arg0);
@@ -360,32 +513,59 @@ public objc closure void NSURLSessionDataDelegateURLSessionDataTaskWillCacheResp
 
 public objc interface NSURLSessionDataDelegate : NSURLSessionTaskDelegate
 {
-    [Optional] [Selector("URLSession:dataTask:didReceiveResponse:completionHandler:")] void URLSessionDataTaskDidReceiveResponseCompletionHandler(NSURLSession session, NSURLSessionDataTask dataTask, NSURLResponse response, NSURLSessionDataDelegateURLSessionDataTaskDidReceiveResponseCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("URLSession:dataTask:didBecomeDownloadTask:")] void URLSessionDataTaskDidBecomeDownloadTask(NSURLSession session, NSURLSessionDataTask dataTask, NSURLSessionDownloadTask downloadTask);
-    [Optional] [Selector("URLSession:dataTask:didBecomeStreamTask:")] void URLSessionDataTaskDidBecomeStreamTask(NSURLSession session, NSURLSessionDataTask dataTask, NSURLSessionStreamTask streamTask);
-    [Optional] [Selector("URLSession:dataTask:didReceiveData:")] void URLSessionDataTaskDidReceiveData(NSURLSession session, NSURLSessionDataTask dataTask, NSData data);
-    [Optional] [Selector("URLSession:dataTask:willCacheResponse:completionHandler:")] void URLSessionDataTaskWillCacheResponseCompletionHandler(NSURLSession session, NSURLSessionDataTask dataTask, NSCachedURLResponse proposedResponse, NSURLSessionDataDelegateURLSessionDataTaskWillCacheResponseCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("URLSession:dataTask:didReceiveResponse:completionHandler:")]
+    void URLSessionDataTaskDidReceiveResponseCompletionHandler(NSURLSession session, NSURLSessionDataTask dataTask, NSURLResponse response, NSURLSessionDataDelegateURLSessionDataTaskDidReceiveResponseCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("URLSession:dataTask:didBecomeDownloadTask:")]
+    void URLSessionDataTaskDidBecomeDownloadTask(NSURLSession session, NSURLSessionDataTask dataTask, NSURLSessionDownloadTask downloadTask);
+    [Optional]
+    [Selector("URLSession:dataTask:didBecomeStreamTask:")]
+    void URLSessionDataTaskDidBecomeStreamTask(NSURLSession session, NSURLSessionDataTask dataTask, NSURLSessionStreamTask streamTask);
+    [Optional]
+    [Selector("URLSession:dataTask:didReceiveData:")]
+    void URLSessionDataTaskDidReceiveData(NSURLSession session, NSURLSessionDataTask dataTask, NSData data);
+    [Optional]
+    [Selector("URLSession:dataTask:willCacheResponse:completionHandler:")]
+    void URLSessionDataTaskWillCacheResponseCompletionHandler(NSURLSession session, NSURLSessionDataTask dataTask, NSCachedURLResponse proposedResponse, NSURLSessionDataDelegateURLSessionDataTaskWillCacheResponseCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc interface NSURLSessionDownloadDelegate : NSURLSessionTaskDelegate
 {
-    [Selector("URLSession:downloadTask:didFinishDownloadingToURL:")] void URLSessionDownloadTaskDidFinishDownloadingToURL(NSURLSession session, NSURLSessionDownloadTask downloadTask, NSURL location);
-    [Optional] [Selector("URLSession:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:")] void URLSessionDownloadTaskDidWriteDataTotalBytesWrittenTotalBytesExpectedToWrite(NSURLSession session, NSURLSessionDownloadTask downloadTask, long bytesWritten, long totalBytesWritten, long totalBytesExpectedToWrite);
-    [Optional] [Selector("URLSession:downloadTask:didResumeAtOffset:expectedTotalBytes:")] void URLSessionDownloadTaskDidResumeAtOffsetExpectedTotalBytes(NSURLSession session, NSURLSessionDownloadTask downloadTask, long fileOffset, long expectedTotalBytes);
+    [Selector("URLSession:downloadTask:didFinishDownloadingToURL:")]
+    void URLSessionDownloadTaskDidFinishDownloadingToURL(NSURLSession session, NSURLSessionDownloadTask downloadTask, NSURL location);
+    [Optional]
+    [Selector("URLSession:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:")]
+    void URLSessionDownloadTaskDidWriteDataTotalBytesWrittenTotalBytesExpectedToWrite(NSURLSession session, NSURLSessionDownloadTask downloadTask, long bytesWritten, long totalBytesWritten, long totalBytesExpectedToWrite);
+    [Optional]
+    [Selector("URLSession:downloadTask:didResumeAtOffset:expectedTotalBytes:")]
+    void URLSessionDownloadTaskDidResumeAtOffsetExpectedTotalBytes(NSURLSession session, NSURLSessionDownloadTask downloadTask, long fileOffset, long expectedTotalBytes);
 }
 
 public objc interface NSURLSessionStreamDelegate : NSURLSessionTaskDelegate
 {
-    [Optional] [Selector("URLSession:readClosedForStreamTask:")] void URLSessionReadClosedForStreamTask(NSURLSession session, NSURLSessionStreamTask streamTask);
-    [Optional] [Selector("URLSession:writeClosedForStreamTask:")] void URLSessionWriteClosedForStreamTask(NSURLSession session, NSURLSessionStreamTask streamTask);
-    [Optional] [Selector("URLSession:betterRouteDiscoveredForStreamTask:")] void URLSessionBetterRouteDiscoveredForStreamTask(NSURLSession session, NSURLSessionStreamTask streamTask);
-    [Optional] [Selector("URLSession:streamTask:didBecomeInputStream:outputStream:")] void URLSessionStreamTaskDidBecomeInputStreamOutputStream(NSURLSession session, NSURLSessionStreamTask streamTask, NSInputStream inputStream, NSOutputStream outputStream);
+    [Optional]
+    [Selector("URLSession:readClosedForStreamTask:")]
+    void URLSessionReadClosedForStreamTask(NSURLSession session, NSURLSessionStreamTask streamTask);
+    [Optional]
+    [Selector("URLSession:writeClosedForStreamTask:")]
+    void URLSessionWriteClosedForStreamTask(NSURLSession session, NSURLSessionStreamTask streamTask);
+    [Optional]
+    [Selector("URLSession:betterRouteDiscoveredForStreamTask:")]
+    void URLSessionBetterRouteDiscoveredForStreamTask(NSURLSession session, NSURLSessionStreamTask streamTask);
+    [Optional]
+    [Selector("URLSession:streamTask:didBecomeInputStream:outputStream:")]
+    void URLSessionStreamTaskDidBecomeInputStreamOutputStream(NSURLSession session, NSURLSessionStreamTask streamTask, NSInputStream inputStream, NSOutputStream outputStream);
 }
 
 public objc interface NSURLSessionWebSocketDelegate : NSURLSessionTaskDelegate
 {
-    [Optional] [Selector("URLSession:webSocketTask:didOpenWithProtocol:")] void URLSessionWebSocketTaskDidOpenWithProtocol(NSURLSession session, NSURLSessionWebSocketTask webSocketTask, NSString? protocol);
-    [Optional] [Selector("URLSession:webSocketTask:didCloseWithCode:reason:")] void URLSessionWebSocketTaskDidCloseWithCodeReason(NSURLSession session, NSURLSessionWebSocketTask webSocketTask, NSURLSessionWebSocketCloseCode closeCode, NSData? reason);
+    [Optional]
+    [Selector("URLSession:webSocketTask:didOpenWithProtocol:")]
+    void URLSessionWebSocketTaskDidOpenWithProtocol(NSURLSession session, NSURLSessionWebSocketTask webSocketTask, NSString? protocol);
+    [Optional]
+    [Selector("URLSession:webSocketTask:didCloseWithCode:reason:")]
+    void URLSessionWebSocketTaskDidCloseWithCodeReason(NSURLSession session, NSURLSessionWebSocketTask webSocketTask, NSURLSessionWebSocketCloseCode closeCode, NSData? reason);
 }
 
 public extern "C" NSString NSURLSessionDownloadTaskResumeData;
@@ -396,7 +576,8 @@ public extern "C" NSString NSURLSessionUploadTaskResumeData;
 public extern objc class NSURLSessionConfiguration
 {
     /// Deprecated in macOS 10.10.
-    [Selector("backgroundSessionConfiguration:")] public static NSURLSessionConfiguration BackgroundSessionConfiguration(NSString identifier);
+    [Selector("backgroundSessionConfiguration:")]
+    public static NSURLSessionConfiguration BackgroundSessionConfiguration(NSString identifier);
 }
 
 public enum NSURLSessionTaskMetricsResourceFetchType : long
@@ -418,55 +599,96 @@ public enum NSURLSessionTaskMetricsDomainResolutionProtocol : long
 
 public extern objc class NSURLSessionTaskTransactionMetrics : NSObject
 {
-    [Selector("request")] public NSURLRequest Request { get; }
-    [Selector("response")] public NSURLResponse? Response { get; }
-    [Selector("fetchStartDate")] public NSDate? FetchStartDate { get; }
-    [Selector("domainLookupStartDate")] public NSDate? DomainLookupStartDate { get; }
-    [Selector("domainLookupEndDate")] public NSDate? DomainLookupEndDate { get; }
-    [Selector("connectStartDate")] public NSDate? ConnectStartDate { get; }
-    [Selector("secureConnectionStartDate")] public NSDate? SecureConnectionStartDate { get; }
-    [Selector("secureConnectionEndDate")] public NSDate? SecureConnectionEndDate { get; }
-    [Selector("connectEndDate")] public NSDate? ConnectEndDate { get; }
-    [Selector("requestStartDate")] public NSDate? RequestStartDate { get; }
-    [Selector("requestEndDate")] public NSDate? RequestEndDate { get; }
-    [Selector("responseStartDate")] public NSDate? ResponseStartDate { get; }
-    [Selector("responseEndDate")] public NSDate? ResponseEndDate { get; }
-    [Selector("networkProtocolName")] public NSString? NetworkProtocolName { get; }
-    [Selector("isProxyConnection")] public bool ProxyConnection { get; }
-    [Selector("isReusedConnection")] public bool ReusedConnection { get; }
-    [Selector("resourceFetchType")] public NSURLSessionTaskMetricsResourceFetchType ResourceFetchType { get; }
-    [Selector("countOfRequestHeaderBytesSent")] public long CountOfRequestHeaderBytesSent { get; }
-    [Selector("countOfRequestBodyBytesSent")] public long CountOfRequestBodyBytesSent { get; }
-    [Selector("countOfRequestBodyBytesBeforeEncoding")] public long CountOfRequestBodyBytesBeforeEncoding { get; }
-    [Selector("countOfResponseHeaderBytesReceived")] public long CountOfResponseHeaderBytesReceived { get; }
-    [Selector("countOfResponseBodyBytesReceived")] public long CountOfResponseBodyBytesReceived { get; }
-    [Selector("countOfResponseBodyBytesAfterDecoding")] public long CountOfResponseBodyBytesAfterDecoding { get; }
-    [Selector("localAddress")] public NSString? LocalAddress { get; }
-    [Selector("localPort")] public NSNumber? LocalPort { get; }
-    [Selector("remoteAddress")] public NSString? RemoteAddress { get; }
-    [Selector("remotePort")] public NSNumber? RemotePort { get; }
-    [Selector("negotiatedTLSProtocolVersion")] public NSNumber? NegotiatedTLSProtocolVersion { get; }
-    [Selector("negotiatedTLSCipherSuite")] public NSNumber? NegotiatedTLSCipherSuite { get; }
-    [Selector("isCellular")] public bool Cellular { get; }
-    [Selector("isExpensive")] public bool Expensive { get; }
-    [Selector("isConstrained")] public bool Constrained { get; }
-    [Selector("isMultipath")] public bool Multipath { get; }
-    [Selector("domainResolutionProtocol")] public NSURLSessionTaskMetricsDomainResolutionProtocol DomainResolutionProtocol { get; }
+    [Selector("request")]
+    public NSURLRequest Request { get; }
+    [Selector("response")]
+    public NSURLResponse? Response { get; }
+    [Selector("fetchStartDate")]
+    public NSDate? FetchStartDate { get; }
+    [Selector("domainLookupStartDate")]
+    public NSDate? DomainLookupStartDate { get; }
+    [Selector("domainLookupEndDate")]
+    public NSDate? DomainLookupEndDate { get; }
+    [Selector("connectStartDate")]
+    public NSDate? ConnectStartDate { get; }
+    [Selector("secureConnectionStartDate")]
+    public NSDate? SecureConnectionStartDate { get; }
+    [Selector("secureConnectionEndDate")]
+    public NSDate? SecureConnectionEndDate { get; }
+    [Selector("connectEndDate")]
+    public NSDate? ConnectEndDate { get; }
+    [Selector("requestStartDate")]
+    public NSDate? RequestStartDate { get; }
+    [Selector("requestEndDate")]
+    public NSDate? RequestEndDate { get; }
+    [Selector("responseStartDate")]
+    public NSDate? ResponseStartDate { get; }
+    [Selector("responseEndDate")]
+    public NSDate? ResponseEndDate { get; }
+    [Selector("networkProtocolName")]
+    public NSString? NetworkProtocolName { get; }
+    [Selector("isProxyConnection")]
+    public bool ProxyConnection { get; }
+    [Selector("isReusedConnection")]
+    public bool ReusedConnection { get; }
+    [Selector("resourceFetchType")]
+    public NSURLSessionTaskMetricsResourceFetchType ResourceFetchType { get; }
+    [Selector("countOfRequestHeaderBytesSent")]
+    public long CountOfRequestHeaderBytesSent { get; }
+    [Selector("countOfRequestBodyBytesSent")]
+    public long CountOfRequestBodyBytesSent { get; }
+    [Selector("countOfRequestBodyBytesBeforeEncoding")]
+    public long CountOfRequestBodyBytesBeforeEncoding { get; }
+    [Selector("countOfResponseHeaderBytesReceived")]
+    public long CountOfResponseHeaderBytesReceived { get; }
+    [Selector("countOfResponseBodyBytesReceived")]
+    public long CountOfResponseBodyBytesReceived { get; }
+    [Selector("countOfResponseBodyBytesAfterDecoding")]
+    public long CountOfResponseBodyBytesAfterDecoding { get; }
+    [Selector("localAddress")]
+    public NSString? LocalAddress { get; }
+    [Selector("localPort")]
+    public NSNumber? LocalPort { get; }
+    [Selector("remoteAddress")]
+    public NSString? RemoteAddress { get; }
+    [Selector("remotePort")]
+    public NSNumber? RemotePort { get; }
+    [Selector("negotiatedTLSProtocolVersion")]
+    public NSNumber? NegotiatedTLSProtocolVersion { get; }
+    [Selector("negotiatedTLSCipherSuite")]
+    public NSNumber? NegotiatedTLSCipherSuite { get; }
+    [Selector("isCellular")]
+    public bool Cellular { get; }
+    [Selector("isExpensive")]
+    public bool Expensive { get; }
+    [Selector("isConstrained")]
+    public bool Constrained { get; }
+    [Selector("isMultipath")]
+    public bool Multipath { get; }
+    [Selector("domainResolutionProtocol")]
+    public NSURLSessionTaskMetricsDomainResolutionProtocol DomainResolutionProtocol { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 10.15.
-    [Selector("new")] public static Self New();
+    [Selector("new")]
+    public static Self New();
 }
 
 public extern objc class NSURLSessionTaskMetrics : NSObject
 {
-    [Selector("transactionMetrics")] public NSArray TransactionMetrics { get; }
-    [Selector("taskInterval")] public NSDateInterval TaskInterval { get; }
-    [Selector("redirectCount")] public NSUInteger RedirectCount { get; }
+    [Selector("transactionMetrics")]
+    public NSArray TransactionMetrics { get; }
+    [Selector("taskInterval")]
+    public NSDateInterval TaskInterval { get; }
+    [Selector("redirectCount")]
+    public NSUInteger RedirectCount { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 10.15.
-    [Selector("new")] public static Self New();
+    [Selector("new")]
+    public static Self New();
 }
 
 #endif

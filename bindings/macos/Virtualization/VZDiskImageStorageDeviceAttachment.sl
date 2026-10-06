@@ -46,12 +46,18 @@ public enum VZDiskImageSynchronizationMode : long
 
 public extern objc class VZDiskImageStorageDeviceAttachment : VZStorageDeviceAttachment
 {
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("isReadOnly")] public bool ReadOnly { get; }
-    [Selector("cachingMode")] public VZDiskImageCachingMode CachingMode { get; }
-    [Selector("synchronizationMode")] public VZDiskImageSynchronizationMode SynchronizationMode { get; }
-    [Selector("initWithURL:readOnly:error:")] public Self? InitWithURLReadOnlyError(NSURL url, bool readOnly, out NSError? error);
-    [Selector("initWithURL:readOnly:cachingMode:synchronizationMode:error:")] public Self? InitWithURLReadOnlyCachingModeSynchronizationModeError(NSURL url, bool readOnly, VZDiskImageCachingMode cachingMode, VZDiskImageSynchronizationMode synchronizationMode, out NSError? error);
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("isReadOnly")]
+    public bool ReadOnly { get; }
+    [Selector("cachingMode")]
+    public VZDiskImageCachingMode CachingMode { get; }
+    [Selector("synchronizationMode")]
+    public VZDiskImageSynchronizationMode SynchronizationMode { get; }
+    [Selector("initWithURL:readOnly:error:")]
+    public Self? InitWithURLReadOnlyError(NSURL url, bool readOnly, out NSError? error);
+    [Selector("initWithURL:readOnly:cachingMode:synchronizationMode:error:")]
+    public Self? InitWithURLReadOnlyCachingModeSynchronizationModeError(NSURL url, bool readOnly, VZDiskImageCachingMode cachingMode, VZDiskImageSynchronizationMode synchronizationMode, out NSError? error);
 }
 
 #endif

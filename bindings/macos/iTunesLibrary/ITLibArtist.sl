@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class ITLibArtist : NSObject
 {
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("sortName")] public NSString? SortName { get; }
-    [Selector("persistentID")] public NSNumber PersistentID { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("sortName")]
+    public NSString? SortName { get; }
+    [Selector("persistentID")]
+    public NSNumber PersistentID { get; }
 }
 
 #endif

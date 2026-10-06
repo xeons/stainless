@@ -34,35 +34,60 @@ import Standard.ObjC;
 
 public objc interface PDEPlugIn : NSObjectProtocol
 {
-    [Selector("initWithBundle:")] Self? InitWithBundle(NSBundle theBundle);
-    [Selector("PDEPanelsForType:withHostInfo:")] NSArray? PDEPanelsForTypeWithHostInfo(NSString pdeType, PDEPlugInCallbackProtocol host);
+    [Selector("initWithBundle:")]
+    Self? InitWithBundle(NSBundle theBundle);
+    [Selector("PDEPanelsForType:withHostInfo:")]
+    NSArray? PDEPanelsForTypeWithHostInfo(NSString pdeType, PDEPlugInCallbackProtocol host);
 }
 
 public objc interface PDEPanel : NSObjectProtocol
 {
-    [Selector("willShow")] void WillShow();
-    [Selector("shouldHide")] bool ShouldHide();
-    [Selector("saveValuesAndReturnError:")] bool SaveValuesAndReturnError(out NSError? error);
-    [Selector("restoreValuesAndReturnError:")] bool RestoreValuesAndReturnError(out NSError? error);
-    [Optional] [Selector("supportedPPDOptionKeys")] NSArray? SupportedPPDOptionKeys();
-    [Selector("PPDOptionKeyValueDidChange:ppdChoice:")] void PPDOptionKeyValueDidChangePpdChoice(NSString option, NSString choice);
-    [Selector("panelView")] NSView? PanelView();
-    [Selector("panelName")] NSString PanelName();
-    [Selector("panelKind")] NSString PanelKind();
-    [Selector("summaryInfo")] NSDictionary? SummaryInfo();
-    [Optional] [Selector("shouldShowHelp")] bool ShouldShowHelp();
-    [Optional] [Selector("shouldPrint")] bool ShouldPrint();
-    [Optional] [Selector("printWindowWillClose:")] void PrintWindowWillClose(bool userCanceled);
+    [Selector("willShow")]
+    void WillShow();
+    [Selector("shouldHide")]
+    bool ShouldHide();
+    [Selector("saveValuesAndReturnError:")]
+    bool SaveValuesAndReturnError(out NSError? error);
+    [Selector("restoreValuesAndReturnError:")]
+    bool RestoreValuesAndReturnError(out NSError? error);
+    [Optional]
+    [Selector("supportedPPDOptionKeys")]
+    NSArray? SupportedPPDOptionKeys();
+    [Selector("PPDOptionKeyValueDidChange:ppdChoice:")]
+    void PPDOptionKeyValueDidChangePpdChoice(NSString option, NSString choice);
+    [Selector("panelView")]
+    NSView? PanelView();
+    [Selector("panelName")]
+    NSString PanelName();
+    [Selector("panelKind")]
+    NSString PanelKind();
+    [Selector("summaryInfo")]
+    NSDictionary? SummaryInfo();
+    [Optional]
+    [Selector("shouldShowHelp")]
+    bool ShouldShowHelp();
+    [Optional]
+    [Selector("shouldPrint")]
+    bool ShouldPrint();
+    [Optional]
+    [Selector("printWindowWillClose:")]
+    void PrintWindowWillClose(bool userCanceled);
 }
 
 public objc interface PDEPlugInCallbackProtocol
 {
-    [Selector("printSession")] PMPrintSession PrintSession();
-    [Selector("printSettings")] PMPrintSettings PrintSettings();
-    [Selector("pageFormat")] PMPageFormat PageFormat();
-    [Selector("PMPrinter")] PMPrinter PMPrinter();
-    [Selector("ppdFile")] ppd_file_s* PpdFile();
-    [Selector("willChangePPDOptionKeyValue:ppdChoice:")] bool WillChangePPDOptionKeyValuePpdChoice(NSString option, NSString choice);
+    [Selector("printSession")]
+    PMPrintSession PrintSession();
+    [Selector("printSettings")]
+    PMPrintSettings PrintSettings();
+    [Selector("pageFormat")]
+    PMPageFormat PageFormat();
+    [Selector("PMPrinter")]
+    PMPrinter PMPrinter();
+    [Selector("ppdFile")]
+    ppd_file_s* PpdFile();
+    [Selector("willChangePPDOptionKeyValue:ppdChoice:")]
+    bool WillChangePPDOptionKeyValuePpdChoice(NSString option, NSString choice);
 }
 
 #endif

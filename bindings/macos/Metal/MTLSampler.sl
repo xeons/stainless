@@ -71,32 +71,52 @@ public enum MTLSamplerReductionMode : ulong
 
 public extern objc class MTLSamplerDescriptor : NSObject, NSCopying
 {
-    [Selector("minFilter", "setMinFilter:")] public MTLSamplerMinMagFilter MinFilter { get; set; }
-    [Selector("magFilter", "setMagFilter:")] public MTLSamplerMinMagFilter MagFilter { get; set; }
-    [Selector("mipFilter", "setMipFilter:")] public MTLSamplerMipFilter MipFilter { get; set; }
-    [Selector("maxAnisotropy", "setMaxAnisotropy:")] public NSUInteger MaxAnisotropy { get; set; }
-    [Selector("sAddressMode", "setSAddressMode:")] public MTLSamplerAddressMode SAddressMode { get; set; }
-    [Selector("tAddressMode", "setTAddressMode:")] public MTLSamplerAddressMode TAddressMode { get; set; }
-    [Selector("rAddressMode", "setRAddressMode:")] public MTLSamplerAddressMode RAddressMode { get; set; }
-    [Selector("borderColor", "setBorderColor:")] public MTLSamplerBorderColor BorderColor { get; set; }
+    [Selector("minFilter", "setMinFilter:")]
+    public MTLSamplerMinMagFilter MinFilter { get; set; }
+    [Selector("magFilter", "setMagFilter:")]
+    public MTLSamplerMinMagFilter MagFilter { get; set; }
+    [Selector("mipFilter", "setMipFilter:")]
+    public MTLSamplerMipFilter MipFilter { get; set; }
+    [Selector("maxAnisotropy", "setMaxAnisotropy:")]
+    public NSUInteger MaxAnisotropy { get; set; }
+    [Selector("sAddressMode", "setSAddressMode:")]
+    public MTLSamplerAddressMode SAddressMode { get; set; }
+    [Selector("tAddressMode", "setTAddressMode:")]
+    public MTLSamplerAddressMode TAddressMode { get; set; }
+    [Selector("rAddressMode", "setRAddressMode:")]
+    public MTLSamplerAddressMode RAddressMode { get; set; }
+    [Selector("borderColor", "setBorderColor:")]
+    public MTLSamplerBorderColor BorderColor { get; set; }
     /// macOS 26.0 and later.
-    [Selector("reductionMode", "setReductionMode:")] public MTLSamplerReductionMode ReductionMode { get; set; }
-    [Selector("normalizedCoordinates", "setNormalizedCoordinates:")] public bool NormalizedCoordinates { get; set; }
-    [Selector("lodMinClamp", "setLodMinClamp:")] public float LodMinClamp { get; set; }
-    [Selector("lodMaxClamp", "setLodMaxClamp:")] public float LodMaxClamp { get; set; }
-    [Selector("lodAverage", "setLodAverage:")] public bool LodAverage { get; set; }
+    [Selector("reductionMode", "setReductionMode:")]
+    public MTLSamplerReductionMode ReductionMode { get; set; }
+    [Selector("normalizedCoordinates", "setNormalizedCoordinates:")]
+    public bool NormalizedCoordinates { get; set; }
+    [Selector("lodMinClamp", "setLodMinClamp:")]
+    public float LodMinClamp { get; set; }
+    [Selector("lodMaxClamp", "setLodMaxClamp:")]
+    public float LodMaxClamp { get; set; }
+    [Selector("lodAverage", "setLodAverage:")]
+    public bool LodAverage { get; set; }
     /// macOS 26.0 and later.
-    [Selector("lodBias", "setLodBias:")] public float LodBias { get; set; }
-    [Selector("compareFunction", "setCompareFunction:")] public MTLCompareFunction CompareFunction { get; set; }
-    [Selector("supportArgumentBuffers", "setSupportArgumentBuffers:")] public bool SupportArgumentBuffers { get; set; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
+    [Selector("lodBias", "setLodBias:")]
+    public float LodBias { get; set; }
+    [Selector("compareFunction", "setCompareFunction:")]
+    public MTLCompareFunction CompareFunction { get; set; }
+    [Selector("supportArgumentBuffers", "setSupportArgumentBuffers:")]
+    public bool SupportArgumentBuffers { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
 }
 
 public objc interface MTLSamplerState : NSObjectProtocol
 {
-    [Selector("label")] NSString? Label { get; }
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("gpuResourceID")] MTLResourceID GpuResourceID { get; }
+    [Selector("label")]
+    NSString? Label { get; }
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("gpuResourceID")]
+    MTLResourceID GpuResourceID { get; }
 }
 
 #endif

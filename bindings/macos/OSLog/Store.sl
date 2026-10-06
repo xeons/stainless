@@ -39,16 +39,25 @@ public enum OSLogStoreScope : long
 
 public extern objc class OSLogStore : NSObject
 {
-    [Selector("localStoreAndReturnError:")] public static Self? LocalStoreAndReturnError(out NSError? error);
-    [Selector("storeWithScope:error:")] public static Self? StoreWithScopeError(OSLogStoreScope scope, out NSError? error);
-    [Selector("storeWithURL:error:")] public static Self? StoreWithURLError(NSURL url, out NSError? error);
+    [Selector("localStoreAndReturnError:")]
+    public static Self? LocalStoreAndReturnError(out NSError? error);
+    [Selector("storeWithScope:error:")]
+    public static Self? StoreWithScopeError(OSLogStoreScope scope, out NSError? error);
+    [Selector("storeWithURL:error:")]
+    public static Self? StoreWithURLError(NSURL url, out NSError? error);
     /// Deprecated in macOS 12.0.
-    [Selector("init")] public Self Init();
-    [Selector("entriesEnumeratorWithOptions:position:predicate:error:")] public OSLogEnumerator? EntriesEnumeratorWithOptionsPositionPredicateError(OSLogEnumeratorOptions options, OSLogPosition? position, NSPredicate? predicate, out NSError? error);
-    [Selector("entriesEnumeratorAndReturnError:")] public OSLogEnumerator? EntriesEnumeratorAndReturnError(out NSError? error);
-    [Selector("positionWithDate:")] public OSLogPosition PositionWithDate(NSDate date);
-    [Selector("positionWithTimeIntervalSinceEnd:")] public OSLogPosition PositionWithTimeIntervalSinceEnd(NSTimeInterval seconds);
-    [Selector("positionWithTimeIntervalSinceLatestBoot:")] public OSLogPosition PositionWithTimeIntervalSinceLatestBoot(NSTimeInterval seconds);
+    [Selector("init")]
+    public Self Init();
+    [Selector("entriesEnumeratorWithOptions:position:predicate:error:")]
+    public OSLogEnumerator? EntriesEnumeratorWithOptionsPositionPredicateError(OSLogEnumeratorOptions options, OSLogPosition? position, NSPredicate? predicate, out NSError? error);
+    [Selector("entriesEnumeratorAndReturnError:")]
+    public OSLogEnumerator? EntriesEnumeratorAndReturnError(out NSError? error);
+    [Selector("positionWithDate:")]
+    public OSLogPosition PositionWithDate(NSDate date);
+    [Selector("positionWithTimeIntervalSinceEnd:")]
+    public OSLogPosition PositionWithTimeIntervalSinceEnd(NSTimeInterval seconds);
+    [Selector("positionWithTimeIntervalSinceLatestBoot:")]
+    public OSLogPosition PositionWithTimeIntervalSinceLatestBoot(NSTimeInterval seconds);
 }
 
 #endif

@@ -92,62 +92,151 @@ public enum WebDragSourceAction : ulong
 /// Deprecated in macOS 10.14.
 public objc interface WebOpenPanelResultListener : NSObjectProtocol
 {
-    [Selector("chooseFilename:")] void ChooseFilename(NSString? fileName);
-    [Selector("chooseFilenames:")] void ChooseFilenames(NSArray? fileNames);
-    [Selector("cancel")] void Cancel();
+    [Selector("chooseFilename:")]
+    void ChooseFilename(NSString? fileName);
+    [Selector("chooseFilenames:")]
+    void ChooseFilenames(NSArray? fileNames);
+    [Selector("cancel")]
+    void Cancel();
 }
 
 /// Deprecated in macOS 10.14.
 public objc interface WebUIDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("webView:createWebViewWithRequest:")] WebView? WebViewCreateWebViewWithRequest(WebView? sender, NSURLRequest? request);
-    [Optional] [Selector("webViewShow:")] void WebViewShow(WebView? sender);
-    [Optional] [Selector("webView:createWebViewModalDialogWithRequest:")] WebView? WebViewCreateWebViewModalDialogWithRequest(WebView? sender, NSURLRequest? request);
-    [Optional] [Selector("webViewRunModal:")] void WebViewRunModal(WebView? sender);
-    [Optional] [Selector("webViewClose:")] void WebViewClose(WebView? sender);
-    [Optional] [Selector("webViewFocus:")] void WebViewFocus(WebView? sender);
-    [Optional] [Selector("webViewUnfocus:")] void WebViewUnfocus(WebView? sender);
-    [Optional] [Selector("webViewFirstResponder:")] NSResponder? WebViewFirstResponder(WebView? sender);
-    [Optional] [Selector("webView:makeFirstResponder:")] void WebViewMakeFirstResponder(WebView? sender, NSResponder? responder);
-    [Optional] [Selector("webView:setStatusText:")] void WebViewSetStatusText(WebView? sender, NSString? text);
-    [Optional] [Selector("webViewStatusText:")] NSString? WebViewStatusText(WebView? sender);
-    [Optional] [Selector("webViewAreToolbarsVisible:")] bool WebViewAreToolbarsVisible(WebView? sender);
-    [Optional] [Selector("webView:setToolbarsVisible:")] void WebViewSetToolbarsVisible(WebView? sender, bool visible);
-    [Optional] [Selector("webViewIsStatusBarVisible:")] bool WebViewIsStatusBarVisible(WebView? sender);
-    [Optional] [Selector("webView:setStatusBarVisible:")] void WebViewSetStatusBarVisible(WebView? sender, bool visible);
-    [Optional] [Selector("webViewIsResizable:")] bool WebViewIsResizable(WebView? sender);
-    [Optional] [Selector("webView:setResizable:")] void WebViewSetResizable(WebView? sender, bool resizable);
-    [Optional] [Selector("webView:setFrame:")] void WebViewSetFrame(WebView? sender, NSRect frame);
-    [Optional] [Selector("webViewFrame:")] NSRect WebViewFrame(WebView? sender);
-    [Optional] [Selector("webView:runJavaScriptAlertPanelWithMessage:initiatedByFrame:")] void WebViewRunJavaScriptAlertPanelWithMessageInitiatedByFrame(WebView? sender, NSString? message, WebFrame? frame);
-    [Optional] [Selector("webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:")] bool WebViewRunJavaScriptConfirmPanelWithMessageInitiatedByFrame(WebView? sender, NSString? message, WebFrame? frame);
-    [Optional] [Selector("webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:")] NSString? WebViewRunJavaScriptTextInputPanelWithPromptDefaultTextInitiatedByFrame(WebView? sender, NSString? prompt, NSString? defaultText, WebFrame? frame);
-    [Optional] [Selector("webView:runBeforeUnloadConfirmPanelWithMessage:initiatedByFrame:")] bool WebViewRunBeforeUnloadConfirmPanelWithMessageInitiatedByFrame(WebView? sender, NSString? message, WebFrame? frame);
-    [Optional] [Selector("webView:runOpenPanelForFileButtonWithResultListener:")] void WebViewRunOpenPanelForFileButtonWithResultListener(WebView? sender, WebOpenPanelResultListener? resultListener);
-    [Optional] [Selector("webView:runOpenPanelForFileButtonWithResultListener:allowMultipleFiles:")] void WebViewRunOpenPanelForFileButtonWithResultListenerAllowMultipleFiles(WebView? sender, WebOpenPanelResultListener? resultListener, bool allowMultipleFiles);
-    [Optional] [Selector("webView:mouseDidMoveOverElement:modifierFlags:")] void WebViewMouseDidMoveOverElementModifierFlags(WebView? sender, NSDictionary? elementInformation, NSUInteger modifierFlags);
-    [Optional] [Selector("webView:contextMenuItemsForElement:defaultMenuItems:")] NSArray? WebViewContextMenuItemsForElementDefaultMenuItems(WebView? sender, NSDictionary? element, NSArray? defaultMenuItems);
-    [Optional] [Selector("webView:validateUserInterfaceItem:defaultValidation:")] bool WebViewValidateUserInterfaceItemDefaultValidation(WebView? webView, NSValidatedUserInterfaceItem? item, bool defaultValidation);
-    [Optional] [Selector("webView:shouldPerformAction:fromSender:")] bool WebViewShouldPerformActionFromSender(WebView? webView, Selector action, AnyObject? sender);
-    [Optional] [Selector("webView:dragDestinationActionMaskForDraggingInfo:")] NSUInteger WebViewDragDestinationActionMaskForDraggingInfo(WebView? webView, NSDraggingInfo? draggingInfo);
-    [Optional] [Selector("webView:willPerformDragDestinationAction:forDraggingInfo:")] void WebViewWillPerformDragDestinationActionForDraggingInfo(WebView? webView, WebDragDestinationAction action, NSDraggingInfo? draggingInfo);
-    [Optional] [Selector("webView:dragSourceActionMaskForPoint:")] NSUInteger WebViewDragSourceActionMaskForPoint(WebView? webView, NSPoint point);
-    [Optional] [Selector("webView:willPerformDragSourceAction:fromPoint:withPasteboard:")] void WebViewWillPerformDragSourceActionFromPointWithPasteboard(WebView? webView, WebDragSourceAction action, NSPoint point, NSPasteboard? pasteboard);
-    [Optional] [Selector("webView:printFrameView:")] void WebViewPrintFrameView(WebView? sender, WebFrameView? frameView);
-    [Optional] [Selector("webViewHeaderHeight:")] float WebViewHeaderHeight(WebView? sender);
-    [Optional] [Selector("webViewFooterHeight:")] float WebViewFooterHeight(WebView? sender);
-    [Optional] [Selector("webView:drawHeaderInRect:")] void WebViewDrawHeaderInRect(WebView? sender, NSRect rect);
-    [Optional] [Selector("webView:drawFooterInRect:")] void WebViewDrawFooterInRect(WebView? sender, NSRect rect);
+    [Optional]
+    [Selector("webView:createWebViewWithRequest:")]
+    WebView? WebViewCreateWebViewWithRequest(WebView? sender, NSURLRequest? request);
+    [Optional]
+    [Selector("webViewShow:")]
+    void WebViewShow(WebView? sender);
+    [Optional]
+    [Selector("webView:createWebViewModalDialogWithRequest:")]
+    WebView? WebViewCreateWebViewModalDialogWithRequest(WebView? sender, NSURLRequest? request);
+    [Optional]
+    [Selector("webViewRunModal:")]
+    void WebViewRunModal(WebView? sender);
+    [Optional]
+    [Selector("webViewClose:")]
+    void WebViewClose(WebView? sender);
+    [Optional]
+    [Selector("webViewFocus:")]
+    void WebViewFocus(WebView? sender);
+    [Optional]
+    [Selector("webViewUnfocus:")]
+    void WebViewUnfocus(WebView? sender);
+    [Optional]
+    [Selector("webViewFirstResponder:")]
+    NSResponder? WebViewFirstResponder(WebView? sender);
+    [Optional]
+    [Selector("webView:makeFirstResponder:")]
+    void WebViewMakeFirstResponder(WebView? sender, NSResponder? responder);
+    [Optional]
+    [Selector("webView:setStatusText:")]
+    void WebViewSetStatusText(WebView? sender, NSString? text);
+    [Optional]
+    [Selector("webViewStatusText:")]
+    NSString? WebViewStatusText(WebView? sender);
+    [Optional]
+    [Selector("webViewAreToolbarsVisible:")]
+    bool WebViewAreToolbarsVisible(WebView? sender);
+    [Optional]
+    [Selector("webView:setToolbarsVisible:")]
+    void WebViewSetToolbarsVisible(WebView? sender, bool visible);
+    [Optional]
+    [Selector("webViewIsStatusBarVisible:")]
+    bool WebViewIsStatusBarVisible(WebView? sender);
+    [Optional]
+    [Selector("webView:setStatusBarVisible:")]
+    void WebViewSetStatusBarVisible(WebView? sender, bool visible);
+    [Optional]
+    [Selector("webViewIsResizable:")]
+    bool WebViewIsResizable(WebView? sender);
+    [Optional]
+    [Selector("webView:setResizable:")]
+    void WebViewSetResizable(WebView? sender, bool resizable);
+    [Optional]
+    [Selector("webView:setFrame:")]
+    void WebViewSetFrame(WebView? sender, NSRect frame);
+    [Optional]
+    [Selector("webViewFrame:")]
+    NSRect WebViewFrame(WebView? sender);
+    [Optional]
+    [Selector("webView:runJavaScriptAlertPanelWithMessage:initiatedByFrame:")]
+    void WebViewRunJavaScriptAlertPanelWithMessageInitiatedByFrame(WebView? sender, NSString? message, WebFrame? frame);
+    [Optional]
+    [Selector("webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:")]
+    bool WebViewRunJavaScriptConfirmPanelWithMessageInitiatedByFrame(WebView? sender, NSString? message, WebFrame? frame);
+    [Optional]
+    [Selector("webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:")]
+    NSString? WebViewRunJavaScriptTextInputPanelWithPromptDefaultTextInitiatedByFrame(WebView? sender, NSString? prompt, NSString? defaultText, WebFrame? frame);
+    [Optional]
+    [Selector("webView:runBeforeUnloadConfirmPanelWithMessage:initiatedByFrame:")]
+    bool WebViewRunBeforeUnloadConfirmPanelWithMessageInitiatedByFrame(WebView? sender, NSString? message, WebFrame? frame);
+    [Optional]
+    [Selector("webView:runOpenPanelForFileButtonWithResultListener:")]
+    void WebViewRunOpenPanelForFileButtonWithResultListener(WebView? sender, WebOpenPanelResultListener? resultListener);
+    [Optional]
+    [Selector("webView:runOpenPanelForFileButtonWithResultListener:allowMultipleFiles:")]
+    void WebViewRunOpenPanelForFileButtonWithResultListenerAllowMultipleFiles(WebView? sender, WebOpenPanelResultListener? resultListener, bool allowMultipleFiles);
+    [Optional]
+    [Selector("webView:mouseDidMoveOverElement:modifierFlags:")]
+    void WebViewMouseDidMoveOverElementModifierFlags(WebView? sender, NSDictionary? elementInformation, NSUInteger modifierFlags);
+    [Optional]
+    [Selector("webView:contextMenuItemsForElement:defaultMenuItems:")]
+    NSArray? WebViewContextMenuItemsForElementDefaultMenuItems(WebView? sender, NSDictionary? element, NSArray? defaultMenuItems);
+    [Optional]
+    [Selector("webView:validateUserInterfaceItem:defaultValidation:")]
+    bool WebViewValidateUserInterfaceItemDefaultValidation(WebView? webView, NSValidatedUserInterfaceItem? item, bool defaultValidation);
+    [Optional]
+    [Selector("webView:shouldPerformAction:fromSender:")]
+    bool WebViewShouldPerformActionFromSender(WebView? webView, Selector action, AnyObject? sender);
+    [Optional]
+    [Selector("webView:dragDestinationActionMaskForDraggingInfo:")]
+    NSUInteger WebViewDragDestinationActionMaskForDraggingInfo(WebView? webView, NSDraggingInfo? draggingInfo);
+    [Optional]
+    [Selector("webView:willPerformDragDestinationAction:forDraggingInfo:")]
+    void WebViewWillPerformDragDestinationActionForDraggingInfo(WebView? webView, WebDragDestinationAction action, NSDraggingInfo? draggingInfo);
+    [Optional]
+    [Selector("webView:dragSourceActionMaskForPoint:")]
+    NSUInteger WebViewDragSourceActionMaskForPoint(WebView? webView, NSPoint point);
+    [Optional]
+    [Selector("webView:willPerformDragSourceAction:fromPoint:withPasteboard:")]
+    void WebViewWillPerformDragSourceActionFromPointWithPasteboard(WebView? webView, WebDragSourceAction action, NSPoint point, NSPasteboard? pasteboard);
+    [Optional]
+    [Selector("webView:printFrameView:")]
+    void WebViewPrintFrameView(WebView? sender, WebFrameView? frameView);
+    [Optional]
+    [Selector("webViewHeaderHeight:")]
+    float WebViewHeaderHeight(WebView? sender);
+    [Optional]
+    [Selector("webViewFooterHeight:")]
+    float WebViewFooterHeight(WebView? sender);
+    [Optional]
+    [Selector("webView:drawHeaderInRect:")]
+    void WebViewDrawHeaderInRect(WebView? sender, NSRect rect);
+    [Optional]
+    [Selector("webView:drawFooterInRect:")]
+    void WebViewDrawFooterInRect(WebView? sender, NSRect rect);
     /// Deprecated in macOS 10.5.
-    [Optional] [Selector("webView:runJavaScriptAlertPanelWithMessage:")] void WebViewRunJavaScriptAlertPanelWithMessage(WebView? sender, NSString? message);
+    [Optional]
+    [Selector("webView:runJavaScriptAlertPanelWithMessage:")]
+    void WebViewRunJavaScriptAlertPanelWithMessage(WebView? sender, NSString? message);
     /// Deprecated in macOS 10.5.
-    [Optional] [Selector("webView:runJavaScriptConfirmPanelWithMessage:")] bool WebViewRunJavaScriptConfirmPanelWithMessage(WebView? sender, NSString? message);
+    [Optional]
+    [Selector("webView:runJavaScriptConfirmPanelWithMessage:")]
+    bool WebViewRunJavaScriptConfirmPanelWithMessage(WebView? sender, NSString? message);
     /// Deprecated in macOS 10.5.
-    [Optional] [Selector("webView:runJavaScriptTextInputPanelWithPrompt:defaultText:")] NSString? WebViewRunJavaScriptTextInputPanelWithPromptDefaultText(WebView? sender, NSString? prompt, NSString? defaultText);
+    [Optional]
+    [Selector("webView:runJavaScriptTextInputPanelWithPrompt:defaultText:")]
+    NSString? WebViewRunJavaScriptTextInputPanelWithPromptDefaultText(WebView? sender, NSString? prompt, NSString? defaultText);
     /// Deprecated in macOS 10.5.
-    [Optional] [Selector("webView:setContentRect:")] void WebViewSetContentRect(WebView? sender, NSRect frame);
+    [Optional]
+    [Selector("webView:setContentRect:")]
+    void WebViewSetContentRect(WebView? sender, NSRect frame);
     /// Deprecated in macOS 10.5.
-    [Optional] [Selector("webViewContentRect:")] NSRect WebViewContentRect(WebView? sender);
+    [Optional]
+    [Selector("webViewContentRect:")]
+    NSRect WebViewContentRect(WebView? sender);
 }
 
 #endif

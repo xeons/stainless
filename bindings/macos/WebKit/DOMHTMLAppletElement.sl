@@ -33,17 +33,28 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLAppletElement : DOMHTMLElement
 {
-    [Selector("align", "setAlign:")] public NSString? Align { get; set; }
-    [Selector("alt", "setAlt:")] public NSString? Alt { get; set; }
-    [Selector("archive", "setArchive:")] public NSString? Archive { get; set; }
-    [Selector("code", "setCode:")] public NSString? Code { get; set; }
-    [Selector("codeBase", "setCodeBase:")] public NSString? CodeBase { get; set; }
-    [Selector("height", "setHeight:")] public NSString? Height { get; set; }
-    [Selector("hspace", "setHspace:")] public int Hspace { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("object", "setObject:")] public NSString? Object { get; set; }
-    [Selector("vspace", "setVspace:")] public int Vspace { get; set; }
-    [Selector("width", "setWidth:")] public NSString? Width { get; set; }
+    [Selector("align", "setAlign:")]
+    public NSString? Align { get; set; }
+    [Selector("alt", "setAlt:")]
+    public NSString? Alt { get; set; }
+    [Selector("archive", "setArchive:")]
+    public NSString? Archive { get; set; }
+    [Selector("code", "setCode:")]
+    public NSString? Code { get; set; }
+    [Selector("codeBase", "setCodeBase:")]
+    public NSString? CodeBase { get; set; }
+    [Selector("height", "setHeight:")]
+    public NSString? Height { get; set; }
+    [Selector("hspace", "setHspace:")]
+    public int Hspace { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("object", "setObject:")]
+    public NSString? Object { get; set; }
+    [Selector("vspace", "setVspace:")]
+    public int Vspace { get; set; }
+    [Selector("width", "setWidth:")]
+    public NSString? Width { get; set; }
 }
 
 #endif

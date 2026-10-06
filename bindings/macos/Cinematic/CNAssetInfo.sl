@@ -40,37 +40,54 @@ public objc closure void CNAssetInfoLoadFromAssetCompletionHandlerCompletionHand
 
 public extern objc class CNAssetInfo : NSObject
 {
-    [Selector("asset")] public AVAsset Asset { get; }
-    [Selector("allCinematicTracks")] public NSArray AllCinematicTracks { get; }
-    [Selector("cinematicVideoTrack")] public AVAssetTrack CinematicVideoTrack { get; }
-    [Selector("cinematicDisparityTrack")] public AVAssetTrack CinematicDisparityTrack { get; }
-    [Selector("cinematicMetadataTrack")] public AVAssetTrack CinematicMetadataTrack { get; }
-    [Selector("timeRange")] public CMTimeRange TimeRange { get; }
-    [Selector("naturalSize")] public CGSize NaturalSize { get; }
-    [Selector("preferredSize")] public CGSize PreferredSize { get; }
-    [Selector("preferredTransform")] public CGAffineTransform PreferredTransform { get; }
-    [Selector("checkIfCinematic:completionHandler:")] public static void CheckIfCinematicCompletionHandler(AVAsset asset, CNAssetInfoCheckIfCinematicCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadFromAsset:completionHandler:")] public static void LoadFromAssetCompletionHandler(AVAsset asset, CNAssetInfoLoadFromAssetCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("asset")]
+    public AVAsset Asset { get; }
+    [Selector("allCinematicTracks")]
+    public NSArray AllCinematicTracks { get; }
+    [Selector("cinematicVideoTrack")]
+    public AVAssetTrack CinematicVideoTrack { get; }
+    [Selector("cinematicDisparityTrack")]
+    public AVAssetTrack CinematicDisparityTrack { get; }
+    [Selector("cinematicMetadataTrack")]
+    public AVAssetTrack CinematicMetadataTrack { get; }
+    [Selector("timeRange")]
+    public CMTimeRange TimeRange { get; }
+    [Selector("naturalSize")]
+    public CGSize NaturalSize { get; }
+    [Selector("preferredSize")]
+    public CGSize PreferredSize { get; }
+    [Selector("preferredTransform")]
+    public CGAffineTransform PreferredTransform { get; }
+    [Selector("checkIfCinematic:completionHandler:")]
+    public static void CheckIfCinematicCompletionHandler(AVAsset asset, CNAssetInfoCheckIfCinematicCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadFromAsset:completionHandler:")]
+    public static void LoadFromAssetCompletionHandler(AVAsset asset, CNAssetInfoLoadFromAssetCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 /// AbstractTracks, a category of CNAssetInfo.
 public extern objc class CNAssetInfo
 {
-    [Selector("frameTimingTrack")] public AVAssetTrack FrameTimingTrack { get; }
-    [Selector("videoCompositionTracks")] public NSArray VideoCompositionTracks { get; }
-    [Selector("videoCompositionTrackIDs")] public NSArray VideoCompositionTrackIDs { get; }
-    [Selector("sampleDataTrackIDs")] public NSArray SampleDataTrackIDs { get; }
+    [Selector("frameTimingTrack")]
+    public AVAssetTrack FrameTimingTrack { get; }
+    [Selector("videoCompositionTracks")]
+    public NSArray VideoCompositionTracks { get; }
+    [Selector("videoCompositionTrackIDs")]
+    public NSArray VideoCompositionTrackIDs { get; }
+    [Selector("sampleDataTrackIDs")]
+    public NSArray SampleDataTrackIDs { get; }
 }
 
 public extern objc class CNCompositionInfo : CNAssetInfo
 {
-    [Selector("insertTimeRange:ofCinematicAssetInfo:atTime:error:")] public bool InsertTimeRangeOfCinematicAssetInfoAtTimeError(CMTimeRange timeRange, CNAssetInfo assetInfo, CMTime startTime, out NSError? outError);
+    [Selector("insertTimeRange:ofCinematicAssetInfo:atTime:error:")]
+    public bool InsertTimeRangeOfCinematicAssetInfoAtTimeError(CMTimeRange timeRange, CNAssetInfo assetInfo, CMTime startTime, out NSError? outError);
 }
 
 /// CNComposition, a category of AVMutableComposition.
 public extern objc class AVMutableComposition
 {
-    [Selector("addTracksForCinematicAssetInfo:preferredStartingTrackID:")] public CNCompositionInfo AddTracksForCinematicAssetInfoPreferredStartingTrackID(CNAssetInfo assetInfo, CMPersistentTrackID preferredStartingTrackID);
+    [Selector("addTracksForCinematicAssetInfo:preferredStartingTrackID:")]
+    public CNCompositionInfo AddTracksForCinematicAssetInfoPreferredStartingTrackID(CNAssetInfo assetInfo, CMPersistentTrackID preferredStartingTrackID);
 }
 
 #endif

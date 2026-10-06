@@ -42,14 +42,17 @@ public enum MTL4PipelineDataSetSerializerConfiguration : ulong
 /// macOS 26.0 and later.
 public extern objc class MTL4PipelineDataSetSerializerDescriptor : NSObject, NSCopying
 {
-    [Selector("configuration", "setConfiguration:")] public MTL4PipelineDataSetSerializerConfiguration Configuration { get; set; }
+    [Selector("configuration", "setConfiguration:")]
+    public MTL4PipelineDataSetSerializerConfiguration Configuration { get; set; }
 }
 
 /// macOS 26.0 and later.
 public objc interface MTL4PipelineDataSetSerializer : NSObjectProtocol
 {
-    [Selector("serializeAsArchiveAndFlushToURL:error:")] bool SerializeAsArchiveAndFlushToURLError(NSURL url, out NSError? error);
-    [Selector("serializeAsPipelinesScriptWithError:")] NSData? SerializeAsPipelinesScriptWithError(out NSError? error);
+    [Selector("serializeAsArchiveAndFlushToURL:error:")]
+    bool SerializeAsArchiveAndFlushToURLError(NSURL url, out NSError? error);
+    [Selector("serializeAsPipelinesScriptWithError:")]
+    NSData? SerializeAsPipelinesScriptWithError(out NSError? error);
 }
 
 #endif

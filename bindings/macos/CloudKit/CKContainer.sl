@@ -38,19 +38,27 @@ public extern "C" NSString CKOwnerDefaultName;
 
 public extern objc class CKContainer : NSObject
 {
-    [Selector("containerIdentifier")] public NSString? ContainerIdentifier { get; }
-    [Selector("defaultContainer")] public static CKContainer DefaultContainer();
-    [Selector("containerWithIdentifier:")] public static CKContainer ContainerWithIdentifier(NSString containerIdentifier);
-    [Selector("addOperation:")] public void AddOperation(CKOperation operation);
+    [Selector("containerIdentifier")]
+    public NSString? ContainerIdentifier { get; }
+    [Selector("defaultContainer")]
+    public static CKContainer DefaultContainer();
+    [Selector("containerWithIdentifier:")]
+    public static CKContainer ContainerWithIdentifier(NSString containerIdentifier);
+    [Selector("addOperation:")]
+    public void AddOperation(CKOperation operation);
 }
 
 /// Database, a category of CKContainer.
 public extern objc class CKContainer
 {
-    [Selector("privateCloudDatabase")] public CKDatabase PrivateCloudDatabase { get; }
-    [Selector("publicCloudDatabase")] public CKDatabase PublicCloudDatabase { get; }
-    [Selector("sharedCloudDatabase")] public CKDatabase SharedCloudDatabase { get; }
-    [Selector("databaseWithDatabaseScope:")] public CKDatabase DatabaseWithDatabaseScope(CKDatabaseScope databaseScope);
+    [Selector("privateCloudDatabase")]
+    public CKDatabase PrivateCloudDatabase { get; }
+    [Selector("publicCloudDatabase")]
+    public CKDatabase PublicCloudDatabase { get; }
+    [Selector("sharedCloudDatabase")]
+    public CKDatabase SharedCloudDatabase { get; }
+    [Selector("databaseWithDatabaseScope:")]
+    public CKDatabase DatabaseWithDatabaseScope(CKDatabaseScope databaseScope);
 }
 
 public enum CKAccountStatus : long
@@ -69,7 +77,8 @@ public objc closure void CKContainerAccountStatusWithCompletionHandlerCompletion
 /// AccountStatus, a category of CKContainer.
 public extern objc class CKContainer
 {
-    [Selector("accountStatusWithCompletionHandler:")] public void AccountStatusWithCompletionHandler(CKContainerAccountStatusWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("accountStatusWithCompletionHandler:")]
+    public void AccountStatusWithCompletionHandler(CKContainerAccountStatusWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 [Flags]
@@ -94,9 +103,11 @@ public objc closure void CKApplicationPermissionBlock(CKApplicationPermissionSta
 public extern objc class CKContainer
 {
     /// Deprecated in macOS 14.0.
-    [Selector("statusForApplicationPermission:completionHandler:")] public void StatusForApplicationPermissionCompletionHandler(CKApplicationPermissions applicationPermission, CKApplicationPermissionBlock completionHandler);
+    [Selector("statusForApplicationPermission:completionHandler:")]
+    public void StatusForApplicationPermissionCompletionHandler(CKApplicationPermissions applicationPermission, CKApplicationPermissionBlock completionHandler);
     /// Deprecated in macOS 14.0.
-    [Selector("requestApplicationPermission:completionHandler:")] public void RequestApplicationPermissionCompletionHandler(CKApplicationPermissions applicationPermission, CKApplicationPermissionBlock completionHandler);
+    [Selector("requestApplicationPermission:completionHandler:")]
+    public void RequestApplicationPermissionCompletionHandler(CKApplicationPermissions applicationPermission, CKApplicationPermissionBlock completionHandler);
 }
 
 public objc closure void CKContainerFetchUserRecordIDWithCompletionHandlerCompletionHandlerBlock(CKRecordID? arg0, NSError? arg1);
@@ -112,15 +123,20 @@ public objc closure void CKContainerDiscoverUserIdentityWithUserRecordIDCompleti
 /// UserRecords, a category of CKContainer.
 public extern objc class CKContainer
 {
-    [Selector("fetchUserRecordIDWithCompletionHandler:")] public void FetchUserRecordIDWithCompletionHandler(CKContainerFetchUserRecordIDWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchUserRecordIDWithCompletionHandler:")]
+    public void FetchUserRecordIDWithCompletionHandler(CKContainerFetchUserRecordIDWithCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 14.0.
-    [Selector("discoverAllIdentitiesWithCompletionHandler:")] public void DiscoverAllIdentitiesWithCompletionHandler(CKContainerDiscoverAllIdentitiesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("discoverAllIdentitiesWithCompletionHandler:")]
+    public void DiscoverAllIdentitiesWithCompletionHandler(CKContainerDiscoverAllIdentitiesWithCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 14.0.
-    [Selector("discoverUserIdentityWithEmailAddress:completionHandler:")] public void DiscoverUserIdentityWithEmailAddressCompletionHandler(NSString email, CKContainerDiscoverUserIdentityWithEmailAddressCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("discoverUserIdentityWithEmailAddress:completionHandler:")]
+    public void DiscoverUserIdentityWithEmailAddressCompletionHandler(NSString email, CKContainerDiscoverUserIdentityWithEmailAddressCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 14.0.
-    [Selector("discoverUserIdentityWithPhoneNumber:completionHandler:")] public void DiscoverUserIdentityWithPhoneNumberCompletionHandler(NSString phoneNumber, CKContainerDiscoverUserIdentityWithPhoneNumberCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("discoverUserIdentityWithPhoneNumber:completionHandler:")]
+    public void DiscoverUserIdentityWithPhoneNumberCompletionHandler(NSString phoneNumber, CKContainerDiscoverUserIdentityWithPhoneNumberCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 14.0.
-    [Selector("discoverUserIdentityWithUserRecordID:completionHandler:")] public void DiscoverUserIdentityWithUserRecordIDCompletionHandler(CKRecordID userRecordID, CKContainerDiscoverUserIdentityWithUserRecordIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("discoverUserIdentityWithUserRecordID:completionHandler:")]
+    public void DiscoverUserIdentityWithUserRecordIDCompletionHandler(CKRecordID userRecordID, CKContainerDiscoverUserIdentityWithUserRecordIDCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void CKContainerFetchShareParticipantWithEmailAddressCompletionHandlerCompletionHandlerBlock(CKShareParticipant? arg0, NSError? arg1);
@@ -136,11 +152,16 @@ public objc closure void CKContainerAcceptShareMetadataCompletionHandlerCompleti
 /// Sharing, a category of CKContainer.
 public extern objc class CKContainer
 {
-    [Selector("fetchShareParticipantWithEmailAddress:completionHandler:")] public void FetchShareParticipantWithEmailAddressCompletionHandler(NSString emailAddress, CKContainerFetchShareParticipantWithEmailAddressCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("fetchShareParticipantWithPhoneNumber:completionHandler:")] public void FetchShareParticipantWithPhoneNumberCompletionHandler(NSString phoneNumber, CKContainerFetchShareParticipantWithPhoneNumberCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("fetchShareParticipantWithUserRecordID:completionHandler:")] public void FetchShareParticipantWithUserRecordIDCompletionHandler(CKRecordID userRecordID, CKContainerFetchShareParticipantWithUserRecordIDCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("fetchShareMetadataWithURL:completionHandler:")] public void FetchShareMetadataWithURLCompletionHandler(NSURL url, CKContainerFetchShareMetadataWithURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("acceptShareMetadata:completionHandler:")] public void AcceptShareMetadataCompletionHandler(CKShareMetadata metadata, CKContainerAcceptShareMetadataCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchShareParticipantWithEmailAddress:completionHandler:")]
+    public void FetchShareParticipantWithEmailAddressCompletionHandler(NSString emailAddress, CKContainerFetchShareParticipantWithEmailAddressCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchShareParticipantWithPhoneNumber:completionHandler:")]
+    public void FetchShareParticipantWithPhoneNumberCompletionHandler(NSString phoneNumber, CKContainerFetchShareParticipantWithPhoneNumberCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchShareParticipantWithUserRecordID:completionHandler:")]
+    public void FetchShareParticipantWithUserRecordIDCompletionHandler(CKRecordID userRecordID, CKContainerFetchShareParticipantWithUserRecordIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchShareMetadataWithURL:completionHandler:")]
+    public void FetchShareMetadataWithURLCompletionHandler(NSURL url, CKContainerFetchShareMetadataWithURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("acceptShareMetadata:completionHandler:")]
+    public void AcceptShareMetadataCompletionHandler(CKShareMetadata metadata, CKContainerAcceptShareMetadataCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void CKContainerFetchAllLongLivedOperationIDsWithCompletionHandlerCompletionHandlerBlock(NSArray? arg0, NSError? arg1);
@@ -150,8 +171,10 @@ public objc closure void CKContainerFetchLongLivedOperationWithIDCompletionHandl
 /// CKLongLivedOperations, a category of CKContainer.
 public extern objc class CKContainer
 {
-    [Selector("fetchAllLongLivedOperationIDsWithCompletionHandler:")] public void FetchAllLongLivedOperationIDsWithCompletionHandler(CKContainerFetchAllLongLivedOperationIDsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("fetchLongLivedOperationWithID:completionHandler:")] public void FetchLongLivedOperationWithIDCompletionHandler(CKOperationID operationID, CKContainerFetchLongLivedOperationWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchAllLongLivedOperationIDsWithCompletionHandler:")]
+    public void FetchAllLongLivedOperationIDsWithCompletionHandler(CKContainerFetchAllLongLivedOperationIDsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchLongLivedOperationWithID:completionHandler:")]
+    public void FetchLongLivedOperationWithIDCompletionHandler(CKOperationID operationID, CKContainerFetchLongLivedOperationWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

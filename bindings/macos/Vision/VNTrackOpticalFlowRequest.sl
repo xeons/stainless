@@ -41,12 +41,18 @@ public enum VNTrackOpticalFlowRequestComputationAccuracy : ulong
 
 public extern objc class VNTrackOpticalFlowRequest : VNStatefulRequest
 {
-    [Selector("computationAccuracy", "setComputationAccuracy:")] public VNTrackOpticalFlowRequestComputationAccuracy ComputationAccuracy { get; set; }
-    [Selector("outputPixelFormat", "setOutputPixelFormat:")] public OSType OutputPixelFormat { get; set; }
-    [Selector("keepNetworkOutput", "setKeepNetworkOutput:")] public bool KeepNetworkOutput { get; set; }
-    [Selector("results")] public NSArray? Results { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCompletionHandler:")] public Self InitWithCompletionHandler(VNRequestCompletionHandler? completionHandler);
+    [Selector("computationAccuracy", "setComputationAccuracy:")]
+    public VNTrackOpticalFlowRequestComputationAccuracy ComputationAccuracy { get; set; }
+    [Selector("outputPixelFormat", "setOutputPixelFormat:")]
+    public OSType OutputPixelFormat { get; set; }
+    [Selector("keepNetworkOutput", "setKeepNetworkOutput:")]
+    public bool KeepNetworkOutput { get; set; }
+    [Selector("results")]
+    public NSArray? Results { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCompletionHandler:")]
+    public Self InitWithCompletionHandler(VNRequestCompletionHandler? completionHandler);
 }
 
 #endif

@@ -44,14 +44,21 @@ public enum SKPaymentTransactionState : long
 /// Deprecated in macOS 15.0.
 public extern objc class SKPaymentTransaction : NSObject
 {
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("originalTransaction")] public SKPaymentTransaction? OriginalTransaction { get; }
-    [Selector("payment")] public SKPayment Payment { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("originalTransaction")]
+    public SKPaymentTransaction? OriginalTransaction { get; }
+    [Selector("payment")]
+    public SKPayment Payment { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("downloads")] public NSArray? Downloads { get; }
-    [Selector("transactionDate")] public NSDate? TransactionDate { get; }
-    [Selector("transactionIdentifier")] public NSString? TransactionIdentifier { get; }
-    [Selector("transactionState")] public SKPaymentTransactionState TransactionState { get; }
+    [Selector("downloads")]
+    public NSArray? Downloads { get; }
+    [Selector("transactionDate")]
+    public NSDate? TransactionDate { get; }
+    [Selector("transactionIdentifier")]
+    public NSString? TransactionIdentifier { get; }
+    [Selector("transactionState")]
+    public SKPaymentTransactionState TransactionState { get; }
 }
 
 #endif

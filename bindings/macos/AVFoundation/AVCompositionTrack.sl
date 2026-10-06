@@ -35,49 +35,74 @@ import Standard.ObjC;
 
 public extern objc class AVCompositionTrack : AVAssetTrack
 {
-    [Selector("segments")] public NSArray Segments { get; }
-    [Selector("formatDescriptionReplacements")] public NSArray FormatDescriptionReplacements { get; }
-    [Selector("segmentForTrackTime:")] public AVCompositionTrackSegment? SegmentForTrackTime(CMTime trackTime);
+    [Selector("segments")]
+    public NSArray Segments { get; }
+    [Selector("formatDescriptionReplacements")]
+    public NSArray FormatDescriptionReplacements { get; }
+    [Selector("segmentForTrackTime:")]
+    public AVCompositionTrackSegment? SegmentForTrackTime(CMTime trackTime);
 }
 
 public extern objc class AVMutableCompositionTrack : AVCompositionTrack
 {
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("naturalTimeScale", "setNaturalTimeScale:")] public CMTimeScale NaturalTimeScale { get; set; }
-    [Selector("languageCode", "setLanguageCode:")] public NSString? LanguageCode { get; set; }
-    [Selector("extendedLanguageTag", "setExtendedLanguageTag:")] public NSString? ExtendedLanguageTag { get; set; }
-    [Selector("preferredTransform", "setPreferredTransform:")] public CGAffineTransform PreferredTransform { get; set; }
-    [Selector("preferredVolume", "setPreferredVolume:")] public float PreferredVolume { get; set; }
-    [Selector("segments", "setSegments:")] public NSArray? Segments { get; set; }
-    [Selector("insertTimeRange:ofTrack:atTime:error:")] public bool InsertTimeRangeOfTrackAtTimeError(CMTimeRange timeRange, AVAssetTrack track, CMTime startTime, out NSError? outError);
-    [Selector("insertTimeRanges:ofTracks:atTime:error:")] public bool InsertTimeRangesOfTracksAtTimeError(NSArray timeRanges, NSArray tracks, CMTime startTime, out NSError? outError);
-    [Selector("insertEmptyTimeRange:")] public void InsertEmptyTimeRange(CMTimeRange timeRange);
-    [Selector("removeTimeRange:")] public void RemoveTimeRange(CMTimeRange timeRange);
-    [Selector("scaleTimeRange:toDuration:")] public void ScaleTimeRangeToDuration(CMTimeRange timeRange, CMTime duration);
-    [Selector("validateTrackSegments:error:")] public bool ValidateTrackSegmentsError(NSArray trackSegments, out NSError? outError);
-    [Selector("addTrackAssociationToTrack:type:")] public void AddTrackAssociationToTrackType(AVCompositionTrack compositionTrack, AVTrackAssociationType trackAssociationType);
-    [Selector("removeTrackAssociationToTrack:type:")] public void RemoveTrackAssociationToTrackType(AVCompositionTrack compositionTrack, AVTrackAssociationType trackAssociationType);
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("naturalTimeScale", "setNaturalTimeScale:")]
+    public CMTimeScale NaturalTimeScale { get; set; }
+    [Selector("languageCode", "setLanguageCode:")]
+    public NSString? LanguageCode { get; set; }
+    [Selector("extendedLanguageTag", "setExtendedLanguageTag:")]
+    public NSString? ExtendedLanguageTag { get; set; }
+    [Selector("preferredTransform", "setPreferredTransform:")]
+    public CGAffineTransform PreferredTransform { get; set; }
+    [Selector("preferredVolume", "setPreferredVolume:")]
+    public float PreferredVolume { get; set; }
+    [Selector("segments", "setSegments:")]
+    public NSArray? Segments { get; set; }
+    [Selector("insertTimeRange:ofTrack:atTime:error:")]
+    public bool InsertTimeRangeOfTrackAtTimeError(CMTimeRange timeRange, AVAssetTrack track, CMTime startTime, out NSError? outError);
+    [Selector("insertTimeRanges:ofTracks:atTime:error:")]
+    public bool InsertTimeRangesOfTracksAtTimeError(NSArray timeRanges, NSArray tracks, CMTime startTime, out NSError? outError);
+    [Selector("insertEmptyTimeRange:")]
+    public void InsertEmptyTimeRange(CMTimeRange timeRange);
+    [Selector("removeTimeRange:")]
+    public void RemoveTimeRange(CMTimeRange timeRange);
+    [Selector("scaleTimeRange:toDuration:")]
+    public void ScaleTimeRangeToDuration(CMTimeRange timeRange, CMTime duration);
+    [Selector("validateTrackSegments:error:")]
+    public bool ValidateTrackSegmentsError(NSArray trackSegments, out NSError? outError);
+    [Selector("addTrackAssociationToTrack:type:")]
+    public void AddTrackAssociationToTrackType(AVCompositionTrack compositionTrack, AVTrackAssociationType trackAssociationType);
+    [Selector("removeTrackAssociationToTrack:type:")]
+    public void RemoveTrackAssociationToTrackType(AVCompositionTrack compositionTrack, AVTrackAssociationType trackAssociationType);
 }
 
 public extern objc class AVCompositionTrackFormatDescriptionReplacement : NSObject, NSSecureCoding
 {
-    [Selector("originalFormatDescription")] public CMFormatDescriptionRef OriginalFormatDescription { get; }
-    [Selector("replacementFormatDescription")] public CMFormatDescriptionRef ReplacementFormatDescription { get; }
+    [Selector("originalFormatDescription")]
+    public CMFormatDescriptionRef OriginalFormatDescription { get; }
+    [Selector("replacementFormatDescription")]
+    public CMFormatDescriptionRef ReplacementFormatDescription { get; }
 }
 
 /// AVMutableCompositionTrackFormatDescriptionReplacement, a category of AVMutableCompositionTrack.
 public extern objc class AVMutableCompositionTrack
 {
-    [Selector("replaceFormatDescription:withFormatDescription:")] public void ReplaceFormatDescriptionWithFormatDescription(CMFormatDescriptionRef originalFormatDescription, CMFormatDescriptionRef? replacementFormatDescription);
+    [Selector("replaceFormatDescription:withFormatDescription:")]
+    public void ReplaceFormatDescriptionWithFormatDescription(CMFormatDescriptionRef originalFormatDescription, CMFormatDescriptionRef? replacementFormatDescription);
 }
 
 /// SynchronousTrackInterface, a category of AVCompositionTrack.
 public extern objc class AVCompositionTrack
 {
-    [Selector("hasMediaCharacteristic:")] public bool HasMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
-    [Selector("samplePresentationTimeForTrackTime:")] public CMTime SamplePresentationTimeForTrackTime(CMTime trackTime);
-    [Selector("metadataForFormat:")] public NSArray MetadataForFormat(AVMetadataFormat format);
-    [Selector("associatedTracksOfType:")] public NSArray AssociatedTracksOfType(AVTrackAssociationType trackAssociationType);
+    [Selector("hasMediaCharacteristic:")]
+    public bool HasMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("samplePresentationTimeForTrackTime:")]
+    public CMTime SamplePresentationTimeForTrackTime(CMTime trackTime);
+    [Selector("metadataForFormat:")]
+    public NSArray MetadataForFormat(AVMetadataFormat format);
+    [Selector("associatedTracksOfType:")]
+    public NSArray AssociatedTracksOfType(AVTrackAssociationType trackAssociationType);
 }
 
 #endif

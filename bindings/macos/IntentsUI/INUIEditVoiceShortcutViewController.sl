@@ -35,15 +35,20 @@ import Standard.ObjC;
 
 public extern objc class INUIEditVoiceShortcutViewController : NSViewController
 {
-    [Selector("delegate", "setDelegate:")] public INUIEditVoiceShortcutViewControllerDelegate? Delegate { get; set; }
-    [Selector("initWithVoiceShortcut:")] public Self InitWithVoiceShortcut(INVoiceShortcut voiceShortcut);
+    [Selector("delegate", "setDelegate:")]
+    public INUIEditVoiceShortcutViewControllerDelegate? Delegate { get; set; }
+    [Selector("initWithVoiceShortcut:")]
+    public Self InitWithVoiceShortcut(INVoiceShortcut voiceShortcut);
 }
 
 public objc interface INUIEditVoiceShortcutViewControllerDelegate : NSObjectProtocol
 {
-    [Selector("editVoiceShortcutViewController:didUpdateVoiceShortcut:error:")] void EditVoiceShortcutViewControllerDidUpdateVoiceShortcutError(INUIEditVoiceShortcutViewController controller, INVoiceShortcut? voiceShortcut, NSError? error);
-    [Selector("editVoiceShortcutViewController:didDeleteVoiceShortcutWithIdentifier:")] void EditVoiceShortcutViewControllerDidDeleteVoiceShortcutWithIdentifier(INUIEditVoiceShortcutViewController controller, NSUUID deletedVoiceShortcutIdentifier);
-    [Selector("editVoiceShortcutViewControllerDidCancel:")] void EditVoiceShortcutViewControllerDidCancel(INUIEditVoiceShortcutViewController controller);
+    [Selector("editVoiceShortcutViewController:didUpdateVoiceShortcut:error:")]
+    void EditVoiceShortcutViewControllerDidUpdateVoiceShortcutError(INUIEditVoiceShortcutViewController controller, INVoiceShortcut? voiceShortcut, NSError? error);
+    [Selector("editVoiceShortcutViewController:didDeleteVoiceShortcutWithIdentifier:")]
+    void EditVoiceShortcutViewControllerDidDeleteVoiceShortcutWithIdentifier(INUIEditVoiceShortcutViewController controller, NSUUID deletedVoiceShortcutIdentifier);
+    [Selector("editVoiceShortcutViewControllerDidCancel:")]
+    void EditVoiceShortcutViewControllerDidCancel(INUIEditVoiceShortcutViewController controller);
 }
 
 #endif

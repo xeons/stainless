@@ -34,62 +34,88 @@ import Standard.ObjC;
 public objc interface NSTextInput
 {
     /// Deprecated in macOS 10.6.
-    [Selector("insertText:")] void InsertText(AnyObject? string);
+    [Selector("insertText:")]
+    void InsertText(AnyObject? string);
     /// Deprecated in macOS 10.6.
-    [Selector("doCommandBySelector:")] void DoCommandBySelector(Selector selector);
+    [Selector("doCommandBySelector:")]
+    void DoCommandBySelector(Selector selector);
     /// Deprecated in macOS 10.6.
-    [Selector("setMarkedText:selectedRange:")] void SetMarkedTextSelectedRange(AnyObject? string, NSRange selRange);
+    [Selector("setMarkedText:selectedRange:")]
+    void SetMarkedTextSelectedRange(AnyObject? string, NSRange selRange);
     /// Deprecated in macOS 10.6.
-    [Selector("unmarkText")] void UnmarkText();
+    [Selector("unmarkText")]
+    void UnmarkText();
     /// Deprecated in macOS 10.6.
-    [Selector("hasMarkedText")] bool HasMarkedText();
+    [Selector("hasMarkedText")]
+    bool HasMarkedText();
     /// Deprecated in macOS 10.6.
-    [Selector("conversationIdentifier")] NSInteger ConversationIdentifier();
+    [Selector("conversationIdentifier")]
+    NSInteger ConversationIdentifier();
     /// Deprecated in macOS 10.6.
-    [Selector("attributedSubstringFromRange:")] NSAttributedString? AttributedSubstringFromRange(NSRange range);
+    [Selector("attributedSubstringFromRange:")]
+    NSAttributedString? AttributedSubstringFromRange(NSRange range);
     /// Deprecated in macOS 10.6.
-    [Selector("markedRange")] NSRange MarkedRange();
+    [Selector("markedRange")]
+    NSRange MarkedRange();
     /// Deprecated in macOS 10.6.
-    [Selector("selectedRange")] NSRange SelectedRange();
+    [Selector("selectedRange")]
+    NSRange SelectedRange();
     /// Deprecated in macOS 10.6.
-    [Selector("firstRectForCharacterRange:")] NSRect FirstRectForCharacterRange(NSRange range);
+    [Selector("firstRectForCharacterRange:")]
+    NSRect FirstRectForCharacterRange(NSRange range);
     /// Deprecated in macOS 10.6.
-    [Selector("characterIndexForPoint:")] NSUInteger CharacterIndexForPoint(NSPoint point);
+    [Selector("characterIndexForPoint:")]
+    NSUInteger CharacterIndexForPoint(NSPoint point);
     /// Deprecated in macOS 10.6.
-    [Selector("validAttributesForMarkedText")] NSArray? ValidAttributesForMarkedText();
+    [Selector("validAttributesForMarkedText")]
+    NSArray? ValidAttributesForMarkedText();
 }
 
 /// Deprecated in macOS 10.6.
 public extern objc class NSInputManager : NSObject, NSTextInput
 {
     /// Deprecated in macOS 10.6.
-    [Selector("currentInputManager")] public static NSInputManager? CurrentInputManager();
+    [Selector("currentInputManager")]
+    public static NSInputManager? CurrentInputManager();
     /// Deprecated in macOS 10.6.
-    [Selector("cycleToNextInputLanguage:")] public static void CycleToNextInputLanguage(AnyObject? sender);
+    [Selector("cycleToNextInputLanguage:")]
+    public static void CycleToNextInputLanguage(AnyObject? sender);
     /// Deprecated in macOS 10.6.
-    [Selector("cycleToNextInputServerInLanguage:")] public static void CycleToNextInputServerInLanguage(AnyObject? sender);
+    [Selector("cycleToNextInputServerInLanguage:")]
+    public static void CycleToNextInputServerInLanguage(AnyObject? sender);
     /// Deprecated in macOS 10.6.
-    [Selector("initWithName:host:")] public NSInputManager? InitWithNameHost(NSString? inputServerName, NSString? hostName);
+    [Selector("initWithName:host:")]
+    public NSInputManager? InitWithNameHost(NSString? inputServerName, NSString? hostName);
     /// Deprecated in macOS 10.6.
-    [Selector("localizedInputManagerName")] public NSString? LocalizedInputManagerName();
+    [Selector("localizedInputManagerName")]
+    public NSString? LocalizedInputManagerName();
     /// Deprecated in macOS 10.6.
-    [Selector("markedTextAbandoned:")] public void MarkedTextAbandoned(AnyObject? cli);
+    [Selector("markedTextAbandoned:")]
+    public void MarkedTextAbandoned(AnyObject? cli);
     /// Deprecated in macOS 10.6.
-    [Selector("markedTextSelectionChanged:client:")] public void MarkedTextSelectionChangedClient(NSRange newSel, AnyObject? cli);
+    [Selector("markedTextSelectionChanged:client:")]
+    public void MarkedTextSelectionChangedClient(NSRange newSel, AnyObject? cli);
     /// Deprecated in macOS 10.6.
-    [Selector("wantsToInterpretAllKeystrokes")] public bool WantsToInterpretAllKeystrokes();
+    [Selector("wantsToInterpretAllKeystrokes")]
+    public bool WantsToInterpretAllKeystrokes();
     /// Deprecated in macOS 10.6.
-    [Selector("language")] public NSString? Language();
+    [Selector("language")]
+    public NSString? Language();
     /// Deprecated in macOS 10.6.
-    [Selector("image")] public NSImage? Image();
+    [Selector("image")]
+    public NSImage? Image();
     /// Deprecated in macOS 10.6.
-    [Selector("server")] public NSInputServer? Server();
+    [Selector("server")]
+    public NSInputServer? Server();
     /// Deprecated in macOS 10.6.
-    [Selector("wantsToHandleMouseEvents")] public bool WantsToHandleMouseEvents();
+    [Selector("wantsToHandleMouseEvents")]
+    public bool WantsToHandleMouseEvents();
     /// Deprecated in macOS 10.6.
-    [Selector("handleMouseEvent:")] public bool HandleMouseEvent(NSEvent? mouseEvent);
+    [Selector("handleMouseEvent:")]
+    public bool HandleMouseEvent(NSEvent? mouseEvent);
     /// Deprecated in macOS 10.6.
-    [Selector("wantsToDelayTextChangeNotifications")] public bool WantsToDelayTextChangeNotifications();
+    [Selector("wantsToDelayTextChangeNotifications")]
+    public bool WantsToDelayTextChangeNotifications();
 }
 
 #endif

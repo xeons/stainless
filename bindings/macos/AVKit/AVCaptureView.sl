@@ -34,12 +34,18 @@ import Standard.ObjC;
 
 public extern objc class AVCaptureView : NSView
 {
-    [Selector("session")] public AVCaptureSession? Session { get; }
-    [Selector("fileOutput")] public AVCaptureFileOutput? FileOutput { get; }
-    [Selector("delegate", "setDelegate:")] public AVCaptureViewDelegate? Delegate { get; set; }
-    [Selector("controlsStyle", "setControlsStyle:")] public AVCaptureViewControlsStyle ControlsStyle { get; set; }
-    [Selector("videoGravity", "setVideoGravity:")] public AVLayerVideoGravity VideoGravity { get; set; }
-    [Selector("setSession:showVideoPreview:showAudioPreview:")] public void SetSessionShowVideoPreviewShowAudioPreview(AVCaptureSession? session, bool showVideoPreview, bool showAudioPreview);
+    [Selector("session")]
+    public AVCaptureSession? Session { get; }
+    [Selector("fileOutput")]
+    public AVCaptureFileOutput? FileOutput { get; }
+    [Selector("delegate", "setDelegate:")]
+    public AVCaptureViewDelegate? Delegate { get; set; }
+    [Selector("controlsStyle", "setControlsStyle:")]
+    public AVCaptureViewControlsStyle ControlsStyle { get; set; }
+    [Selector("videoGravity", "setVideoGravity:")]
+    public AVLayerVideoGravity VideoGravity { get; set; }
+    [Selector("setSession:showVideoPreview:showAudioPreview:")]
+    public void SetSessionShowVideoPreviewShowAudioPreview(AVCaptureSession? session, bool showVideoPreview, bool showAudioPreview);
 }
 
 public enum AVCaptureViewControlsStyle : long
@@ -52,7 +58,8 @@ public enum AVCaptureViewControlsStyle : long
 
 public objc interface AVCaptureViewDelegate : NSObjectProtocol
 {
-    [Selector("captureView:startRecordingToFileOutput:")] void CaptureViewStartRecordingToFileOutput(AVCaptureView captureView, AVCaptureFileOutput fileOutput);
+    [Selector("captureView:startRecordingToFileOutput:")]
+    void CaptureViewStartRecordingToFileOutput(AVCaptureView captureView, AVCaptureFileOutput fileOutput);
 }
 
 #endif

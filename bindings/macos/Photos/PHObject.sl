@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class PHObject : NSObject, NSCopying
 {
-    [Selector("localIdentifier")] public NSString LocalIdentifier { get; }
+    [Selector("localIdentifier")]
+    public NSString LocalIdentifier { get; }
 }
 
 public extern objc class PHObjectPlaceholder : PHObject { }

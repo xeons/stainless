@@ -37,11 +37,16 @@ public objc closure void CKShareRequestAccessOperationShareRequestAccessCompleti
 /// macOS 26.0 and later.
 public extern objc class CKShareRequestAccessOperation : CKOperation
 {
-    [Selector("shareURLs", "setShareURLs:")] public NSArray? ShareURLs { get; set; }
-    [Selector("perShareAccessRequestCompletionBlock", "setPerShareAccessRequestCompletionBlock:")] public CKShareRequestAccessOperationPerShareAccessRequestCompletionBlock? PerShareAccessRequestCompletionBlock { get; set; }
-    [Selector("shareRequestAccessCompletionBlock", "setShareRequestAccessCompletionBlock:")] public CKShareRequestAccessOperationShareRequestAccessCompletionBlock? ShareRequestAccessCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithShareURLs:")] public Self InitWithShareURLs(NSArray shareURLs);
+    [Selector("shareURLs", "setShareURLs:")]
+    public NSArray? ShareURLs { get; set; }
+    [Selector("perShareAccessRequestCompletionBlock", "setPerShareAccessRequestCompletionBlock:")]
+    public CKShareRequestAccessOperationPerShareAccessRequestCompletionBlock? PerShareAccessRequestCompletionBlock { get; set; }
+    [Selector("shareRequestAccessCompletionBlock", "setShareRequestAccessCompletionBlock:")]
+    public CKShareRequestAccessOperationShareRequestAccessCompletionBlock? ShareRequestAccessCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithShareURLs:")]
+    public Self InitWithShareURLs(NSArray shareURLs);
 }
 
 #endif

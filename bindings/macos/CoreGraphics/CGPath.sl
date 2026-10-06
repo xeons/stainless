@@ -54,27 +54,37 @@ public enum CGLineCap : int
 
 public extern "C" CFTypeID CGPathGetTypeID();
 
-[ReturnsRetained] public extern "C" CGMutablePathRef CGPathCreateMutable();
+[ReturnsRetained]
+public extern "C" CGMutablePathRef CGPathCreateMutable();
 
-[ReturnsRetained] public extern "C" CGPathRef? CGPathCreateCopy(CGPathRef? path);
+[ReturnsRetained]
+public extern "C" CGPathRef? CGPathCreateCopy(CGPathRef? path);
 
-[ReturnsRetained] public extern "C" CGPathRef? CGPathCreateCopyByTransformingPath(CGPathRef? path, CGAffineTransform* transform);
+[ReturnsRetained]
+public extern "C" CGPathRef? CGPathCreateCopyByTransformingPath(CGPathRef? path, CGAffineTransform* transform);
 
-[ReturnsRetained] public extern "C" CGMutablePathRef? CGPathCreateMutableCopy(CGPathRef? path);
+[ReturnsRetained]
+public extern "C" CGMutablePathRef? CGPathCreateMutableCopy(CGPathRef? path);
 
-[ReturnsRetained] public extern "C" CGMutablePathRef? CGPathCreateMutableCopyByTransformingPath(CGPathRef? path, CGAffineTransform* transform);
+[ReturnsRetained]
+public extern "C" CGMutablePathRef? CGPathCreateMutableCopyByTransformingPath(CGPathRef? path, CGAffineTransform* transform);
 
-[ReturnsRetained] public extern "C" CGPathRef CGPathCreateWithRect(CGRect rect, CGAffineTransform* transform);
+[ReturnsRetained]
+public extern "C" CGPathRef CGPathCreateWithRect(CGRect rect, CGAffineTransform* transform);
 
-[ReturnsRetained] public extern "C" CGPathRef CGPathCreateWithEllipseInRect(CGRect rect, CGAffineTransform* transform);
+[ReturnsRetained]
+public extern "C" CGPathRef CGPathCreateWithEllipseInRect(CGRect rect, CGAffineTransform* transform);
 
-[ReturnsRetained] public extern "C" CGPathRef CGPathCreateWithRoundedRect(CGRect rect, CGFloat cornerWidth, CGFloat cornerHeight, CGAffineTransform* transform);
+[ReturnsRetained]
+public extern "C" CGPathRef CGPathCreateWithRoundedRect(CGRect rect, CGFloat cornerWidth, CGFloat cornerHeight, CGAffineTransform* transform);
 
 public extern "C" void CGPathAddRoundedRect(CGMutablePathRef? path, CGAffineTransform* transform, CGRect rect, CGFloat cornerWidth, CGFloat cornerHeight);
 
-[ReturnsRetained] public extern "C" CGPathRef? CGPathCreateCopyByDashingPath(CGPathRef? path, CGAffineTransform* transform, CGFloat phase, CGFloat* lengths, nuint count);
+[ReturnsRetained]
+public extern "C" CGPathRef? CGPathCreateCopyByDashingPath(CGPathRef? path, CGAffineTransform* transform, CGFloat phase, CGFloat* lengths, nuint count);
 
-[ReturnsRetained] public extern "C" CGPathRef? CGPathCreateCopyByStrokingPath(CGPathRef? path, CGAffineTransform* transform, CGFloat lineWidth, CGLineCap lineCap, CGLineJoin lineJoin, CGFloat miterLimit);
+[ReturnsRetained]
+public extern "C" CGPathRef? CGPathCreateCopyByStrokingPath(CGPathRef? path, CGAffineTransform* transform, CGFloat lineWidth, CGLineCap lineCap, CGLineJoin lineJoin, CGFloat miterLimit);
 
 public extern "C" bool CGPathEqualToPath(CGPathRef? path1, CGPathRef? path2);
 
@@ -139,23 +149,32 @@ public objc closure void CGPathApplyBlock(CGPathElement* arg0);
 
 public extern "C" void CGPathApplyWithBlock(CGPathRef path, CGPathApplyBlock block);
 
-[ReturnsRetained] public extern "C" CGPathRef? CGPathCreateCopyByNormalizing(CGPathRef? path, bool evenOddFillRule);
+[ReturnsRetained]
+public extern "C" CGPathRef? CGPathCreateCopyByNormalizing(CGPathRef? path, bool evenOddFillRule);
 
-[ReturnsRetained] public extern "C" CGPathRef? CGPathCreateCopyByUnioningPath(CGPathRef? path, CGPathRef? maskPath, bool evenOddFillRule);
+[ReturnsRetained]
+public extern "C" CGPathRef? CGPathCreateCopyByUnioningPath(CGPathRef? path, CGPathRef? maskPath, bool evenOddFillRule);
 
-[ReturnsRetained] public extern "C" CGPathRef? CGPathCreateCopyByIntersectingPath(CGPathRef? path, CGPathRef? maskPath, bool evenOddFillRule);
+[ReturnsRetained]
+public extern "C" CGPathRef? CGPathCreateCopyByIntersectingPath(CGPathRef? path, CGPathRef? maskPath, bool evenOddFillRule);
 
-[ReturnsRetained] public extern "C" CGPathRef? CGPathCreateCopyBySubtractingPath(CGPathRef? path, CGPathRef? maskPath, bool evenOddFillRule);
+[ReturnsRetained]
+public extern "C" CGPathRef? CGPathCreateCopyBySubtractingPath(CGPathRef? path, CGPathRef? maskPath, bool evenOddFillRule);
 
-[ReturnsRetained] public extern "C" CGPathRef? CGPathCreateCopyBySymmetricDifferenceOfPath(CGPathRef? path, CGPathRef? maskPath, bool evenOddFillRule);
+[ReturnsRetained]
+public extern "C" CGPathRef? CGPathCreateCopyBySymmetricDifferenceOfPath(CGPathRef? path, CGPathRef? maskPath, bool evenOddFillRule);
 
-[ReturnsRetained] public extern "C" CGPathRef? CGPathCreateCopyOfLineBySubtractingPath(CGPathRef? path, CGPathRef? maskPath, bool evenOddFillRule);
+[ReturnsRetained]
+public extern "C" CGPathRef? CGPathCreateCopyOfLineBySubtractingPath(CGPathRef? path, CGPathRef? maskPath, bool evenOddFillRule);
 
-[ReturnsRetained] public extern "C" CGPathRef? CGPathCreateCopyOfLineByIntersectingPath(CGPathRef? path, CGPathRef? maskPath, bool evenOddFillRule);
+[ReturnsRetained]
+public extern "C" CGPathRef? CGPathCreateCopyOfLineByIntersectingPath(CGPathRef? path, CGPathRef? maskPath, bool evenOddFillRule);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CGPathCreateSeparateComponents(CGPathRef? path, bool evenOddFillRule);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CGPathCreateSeparateComponents(CGPathRef? path, bool evenOddFillRule);
 
-[ReturnsRetained] public extern "C" CGPathRef? CGPathCreateCopyByFlattening(CGPathRef? path, CGFloat flatteningThreshold);
+[ReturnsRetained]
+public extern "C" CGPathRef? CGPathCreateCopyByFlattening(CGPathRef? path, CGFloat flatteningThreshold);
 
 public extern "C" bool CGPathIntersectsPath(CGPathRef? path1, CGPathRef? path2, bool evenOddFillRule);
 

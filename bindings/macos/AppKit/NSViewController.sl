@@ -47,39 +47,67 @@ public enum NSViewControllerTransitionOptions : ulong
 
 public extern objc class NSViewController : NSResponder, NSEditor, NSSeguePerforming, NSUserInterfaceItemIdentification
 {
-    [Selector("nibName")] public NSNibName? NibName { get; }
-    [Selector("nibBundle")] public NSBundle? NibBundle { get; }
-    [Selector("representedObject", "setRepresentedObject:")] public AnyObject? RepresentedObject { get; set; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("view", "setView:")] public NSView View { get; set; }
-    [Selector("viewIfLoaded")] public NSView? ViewIfLoaded { get; }
-    [Selector("isViewLoaded")] public bool ViewLoaded { get; }
-    [Selector("preferredContentSize", "setPreferredContentSize:")] public NSSize PreferredContentSize { get; set; }
-    [Selector("initWithNibName:bundle:")] public Self InitWithNibNameBundle(NSNibName? nibNameOrNil, NSBundle? nibBundleOrNil);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("loadView")] public void LoadView();
-    [Selector("loadViewIfNeeded")] public void LoadViewIfNeeded();
-    [Selector("commitEditingWithDelegate:didCommitSelector:contextInfo:")] public void CommitEditingWithDelegateDidCommitSelectorContextInfo(AnyObject? @delegate, Selector didCommitSelector, void* contextInfo);
-    [Selector("commitEditing")] public bool CommitEditing();
-    [Selector("discardEditing")] public void DiscardEditing();
-    [Selector("viewDidLoad")] public void ViewDidLoad();
-    [Selector("viewWillAppear")] public void ViewWillAppear();
-    [Selector("viewDidAppear")] public void ViewDidAppear();
-    [Selector("viewWillDisappear")] public void ViewWillDisappear();
-    [Selector("viewDidDisappear")] public void ViewDidDisappear();
-    [Selector("updateViewConstraints")] public void UpdateViewConstraints();
-    [Selector("viewWillLayout")] public void ViewWillLayout();
-    [Selector("viewDidLayout")] public void ViewDidLayout();
+    [Selector("nibName")]
+    public NSNibName? NibName { get; }
+    [Selector("nibBundle")]
+    public NSBundle? NibBundle { get; }
+    [Selector("representedObject", "setRepresentedObject:")]
+    public AnyObject? RepresentedObject { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("view", "setView:")]
+    public NSView View { get; set; }
+    [Selector("viewIfLoaded")]
+    public NSView? ViewIfLoaded { get; }
+    [Selector("isViewLoaded")]
+    public bool ViewLoaded { get; }
+    [Selector("preferredContentSize", "setPreferredContentSize:")]
+    public NSSize PreferredContentSize { get; set; }
+    [Selector("initWithNibName:bundle:")]
+    public Self InitWithNibNameBundle(NSNibName? nibNameOrNil, NSBundle? nibBundleOrNil);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("loadView")]
+    public void LoadView();
+    [Selector("loadViewIfNeeded")]
+    public void LoadViewIfNeeded();
+    [Selector("commitEditingWithDelegate:didCommitSelector:contextInfo:")]
+    public void CommitEditingWithDelegateDidCommitSelectorContextInfo(AnyObject? @delegate, Selector didCommitSelector, void* contextInfo);
+    [Selector("commitEditing")]
+    public bool CommitEditing();
+    [Selector("discardEditing")]
+    public void DiscardEditing();
+    [Selector("viewDidLoad")]
+    public void ViewDidLoad();
+    [Selector("viewWillAppear")]
+    public void ViewWillAppear();
+    [Selector("viewDidAppear")]
+    public void ViewDidAppear();
+    [Selector("viewWillDisappear")]
+    public void ViewWillDisappear();
+    [Selector("viewDidDisappear")]
+    public void ViewDidDisappear();
+    [Selector("updateViewConstraints")]
+    public void UpdateViewConstraints();
+    [Selector("viewWillLayout")]
+    public void ViewWillLayout();
+    [Selector("viewDidLayout")]
+    public void ViewDidLayout();
 }
 
 /// NSViewControllerPresentation, a category of NSViewController.
 public extern objc class NSViewController
 {
-    [Selector("presentedViewControllers")] public NSArray? PresentedViewControllers { get; }
-    [Selector("presentingViewController")] public NSViewController? PresentingViewController { get; }
-    [Selector("presentViewController:animator:")] public void PresentViewControllerAnimator(NSViewController viewController, NSViewControllerPresentationAnimator animator);
-    [Selector("dismissViewController:")] public void DismissViewController(NSViewController viewController);
-    [Selector("dismissController:")] public void DismissController(AnyObject? sender);
+    [Selector("presentedViewControllers")]
+    public NSArray? PresentedViewControllers { get; }
+    [Selector("presentingViewController")]
+    public NSViewController? PresentingViewController { get; }
+    [Selector("presentViewController:animator:")]
+    public void PresentViewControllerAnimator(NSViewController viewController, NSViewControllerPresentationAnimator animator);
+    [Selector("dismissViewController:")]
+    public void DismissViewController(NSViewController viewController);
+    [Selector("dismissController:")]
+    public void DismissController(AnyObject? sender);
 }
 
 public objc closure void NSViewControllerTransitionFromViewControllerToViewControllerOptionsCompletionHandlerCompletionBlock();
@@ -87,46 +115,67 @@ public objc closure void NSViewControllerTransitionFromViewControllerToViewContr
 /// NSViewControllerPresentationAndTransitionStyles, a category of NSViewController.
 public extern objc class NSViewController
 {
-    [Selector("presentViewControllerAsSheet:")] public void PresentViewControllerAsSheet(NSViewController viewController);
-    [Selector("presentViewControllerAsModalWindow:")] public void PresentViewControllerAsModalWindow(NSViewController viewController);
-    [Selector("presentViewController:asPopoverRelativeToRect:ofView:preferredEdge:behavior:")] public void PresentViewControllerAsPopoverRelativeToRectOfViewPreferredEdgeBehavior(NSViewController viewController, NSRect positioningRect, NSView positioningView, NSRectEdge preferredEdge, NSPopoverBehavior behavior);
-    [Selector("presentViewController:asPopoverRelativeToRect:ofView:preferredEdge:behavior:hasFullSizeContent:")] public void PresentViewControllerAsPopoverRelativeToRectOfViewPreferredEdgeBehaviorHasFullSizeContent(NSViewController viewController, NSRect positioningRect, NSView positioningView, NSRectEdge preferredEdge, NSPopoverBehavior behavior, bool hasFullSizeContent);
-    [Selector("transitionFromViewController:toViewController:options:completionHandler:")] public void TransitionFromViewControllerToViewControllerOptionsCompletionHandler(NSViewController fromViewController, NSViewController toViewController, NSViewControllerTransitionOptions options, NSViewControllerTransitionFromViewControllerToViewControllerOptionsCompletionHandlerCompletionBlock? completion);
+    [Selector("presentViewControllerAsSheet:")]
+    public void PresentViewControllerAsSheet(NSViewController viewController);
+    [Selector("presentViewControllerAsModalWindow:")]
+    public void PresentViewControllerAsModalWindow(NSViewController viewController);
+    [Selector("presentViewController:asPopoverRelativeToRect:ofView:preferredEdge:behavior:")]
+    public void PresentViewControllerAsPopoverRelativeToRectOfViewPreferredEdgeBehavior(NSViewController viewController, NSRect positioningRect, NSView positioningView, NSRectEdge preferredEdge, NSPopoverBehavior behavior);
+    [Selector("presentViewController:asPopoverRelativeToRect:ofView:preferredEdge:behavior:hasFullSizeContent:")]
+    public void PresentViewControllerAsPopoverRelativeToRectOfViewPreferredEdgeBehaviorHasFullSizeContent(NSViewController viewController, NSRect positioningRect, NSView positioningView, NSRectEdge preferredEdge, NSPopoverBehavior behavior, bool hasFullSizeContent);
+    [Selector("transitionFromViewController:toViewController:options:completionHandler:")]
+    public void TransitionFromViewControllerToViewControllerOptionsCompletionHandler(NSViewController fromViewController, NSViewController toViewController, NSViewControllerTransitionOptions options, NSViewControllerTransitionFromViewControllerToViewControllerOptionsCompletionHandlerCompletionBlock? completion);
 }
 
 /// NSViewControllerContainer, a category of NSViewController.
 public extern objc class NSViewController
 {
-    [Selector("parentViewController")] public NSViewController? ParentViewController { get; }
-    [Selector("childViewControllers", "setChildViewControllers:")] public NSArray? ChildViewControllers { get; set; }
-    [Selector("addChildViewController:")] public void AddChildViewController(NSViewController childViewController);
-    [Selector("removeFromParentViewController")] public void RemoveFromParentViewController();
-    [Selector("insertChildViewController:atIndex:")] public void InsertChildViewControllerAtIndex(NSViewController childViewController, NSInteger index);
-    [Selector("removeChildViewControllerAtIndex:")] public void RemoveChildViewControllerAtIndex(NSInteger index);
-    [Selector("preferredContentSizeDidChangeForViewController:")] public void PreferredContentSizeDidChangeForViewController(NSViewController viewController);
-    [Selector("viewWillTransitionToSize:")] public void ViewWillTransitionToSize(NSSize newSize);
+    [Selector("parentViewController")]
+    public NSViewController? ParentViewController { get; }
+    [Selector("childViewControllers", "setChildViewControllers:")]
+    public NSArray? ChildViewControllers { get; set; }
+    [Selector("addChildViewController:")]
+    public void AddChildViewController(NSViewController childViewController);
+    [Selector("removeFromParentViewController")]
+    public void RemoveFromParentViewController();
+    [Selector("insertChildViewController:atIndex:")]
+    public void InsertChildViewControllerAtIndex(NSViewController childViewController, NSInteger index);
+    [Selector("removeChildViewControllerAtIndex:")]
+    public void RemoveChildViewControllerAtIndex(NSInteger index);
+    [Selector("preferredContentSizeDidChangeForViewController:")]
+    public void PreferredContentSizeDidChangeForViewController(NSViewController viewController);
+    [Selector("viewWillTransitionToSize:")]
+    public void ViewWillTransitionToSize(NSSize newSize);
 }
 
 public objc interface NSViewControllerPresentationAnimator : NSObjectProtocol
 {
-    [Selector("animatePresentationOfViewController:fromViewController:")] void AnimatePresentationOfViewControllerFromViewController(NSViewController viewController, NSViewController fromViewController);
-    [Selector("animateDismissalOfViewController:fromViewController:")] void AnimateDismissalOfViewControllerFromViewController(NSViewController viewController, NSViewController fromViewController);
+    [Selector("animatePresentationOfViewController:fromViewController:")]
+    void AnimatePresentationOfViewControllerFromViewController(NSViewController viewController, NSViewController fromViewController);
+    [Selector("animateDismissalOfViewController:fromViewController:")]
+    void AnimateDismissalOfViewControllerFromViewController(NSViewController viewController, NSViewController fromViewController);
 }
 
 /// NSViewControllerStoryboardingMethods, a category of NSViewController.
 public extern objc class NSViewController
 {
-    [Selector("storyboard")] public NSStoryboard? Storyboard { get; }
+    [Selector("storyboard")]
+    public NSStoryboard? Storyboard { get; }
 }
 
 /// NSExtensionAdditions, a category of NSViewController.
 public extern objc class NSViewController : NSExtensionRequestHandling
 {
-    [Selector("extensionContext")] public NSExtensionContext? ExtensionContext { get; }
-    [Selector("sourceItemView", "setSourceItemView:")] public NSView? SourceItemView { get; set; }
-    [Selector("preferredScreenOrigin", "setPreferredScreenOrigin:")] public NSPoint PreferredScreenOrigin { get; set; }
-    [Selector("preferredMinimumSize")] public NSSize PreferredMinimumSize { get; }
-    [Selector("preferredMaximumSize")] public NSSize PreferredMaximumSize { get; }
+    [Selector("extensionContext")]
+    public NSExtensionContext? ExtensionContext { get; }
+    [Selector("sourceItemView", "setSourceItemView:")]
+    public NSView? SourceItemView { get; set; }
+    [Selector("preferredScreenOrigin", "setPreferredScreenOrigin:")]
+    public NSPoint PreferredScreenOrigin { get; set; }
+    [Selector("preferredMinimumSize")]
+    public NSSize PreferredMinimumSize { get; }
+    [Selector("preferredMaximumSize")]
+    public NSSize PreferredMaximumSize { get; }
 }
 
 #endif

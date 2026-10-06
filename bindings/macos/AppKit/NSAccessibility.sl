@@ -34,49 +34,72 @@ import Standard.ObjC;
 /// NSAccessibility, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("accessibilityFocusedUIElement")] public AnyObject? AccessibilityFocusedUIElement { get; }
-    [Selector("accessibilityNotifiesWhenDestroyed")] public bool AccessibilityNotifiesWhenDestroyed { get; }
+    [Selector("accessibilityFocusedUIElement")]
+    public AnyObject? AccessibilityFocusedUIElement { get; }
+    [Selector("accessibilityNotifiesWhenDestroyed")]
+    public bool AccessibilityNotifiesWhenDestroyed { get; }
     /// Deprecated in macOS 10.10.
-    [Selector("accessibilityAttributeNames")] public NSArray AccessibilityAttributeNames();
+    [Selector("accessibilityAttributeNames")]
+    public NSArray AccessibilityAttributeNames();
     /// Deprecated in macOS 10.10.
-    [Selector("accessibilityAttributeValue:")] public AnyObject? AccessibilityAttributeValue(NSAccessibilityAttributeName @attribute);
+    [Selector("accessibilityAttributeValue:")]
+    public AnyObject? AccessibilityAttributeValue(NSAccessibilityAttributeName @attribute);
     /// Deprecated in macOS 10.10.
-    [Selector("accessibilityIsAttributeSettable:")] public bool AccessibilityIsAttributeSettable(NSAccessibilityAttributeName @attribute);
+    [Selector("accessibilityIsAttributeSettable:")]
+    public bool AccessibilityIsAttributeSettable(NSAccessibilityAttributeName @attribute);
     /// Deprecated in macOS 10.10.
-    [Selector("accessibilitySetValue:forAttribute:")] public void AccessibilitySetValueForAttribute(AnyObject? value, NSAccessibilityAttributeName @attribute);
+    [Selector("accessibilitySetValue:forAttribute:")]
+    public void AccessibilitySetValueForAttribute(AnyObject? value, NSAccessibilityAttributeName @attribute);
     /// Deprecated in macOS 10.10.
-    [Selector("accessibilityParameterizedAttributeNames")] public NSArray AccessibilityParameterizedAttributeNames();
+    [Selector("accessibilityParameterizedAttributeNames")]
+    public NSArray AccessibilityParameterizedAttributeNames();
     /// Deprecated in macOS 10.10.
-    [Selector("accessibilityAttributeValue:forParameter:")] public AnyObject? AccessibilityAttributeValueForParameter(NSAccessibilityParameterizedAttributeName @attribute, AnyObject? parameter);
+    [Selector("accessibilityAttributeValue:forParameter:")]
+    public AnyObject? AccessibilityAttributeValueForParameter(NSAccessibilityParameterizedAttributeName @attribute, AnyObject? parameter);
     /// Deprecated in macOS 10.10.
-    [Selector("accessibilityActionNames")] public NSArray AccessibilityActionNames();
+    [Selector("accessibilityActionNames")]
+    public NSArray AccessibilityActionNames();
     /// Deprecated in macOS 10.10.
-    [Selector("accessibilityActionDescription:")] public NSString? AccessibilityActionDescription(NSAccessibilityActionName action);
+    [Selector("accessibilityActionDescription:")]
+    public NSString? AccessibilityActionDescription(NSAccessibilityActionName action);
     /// Deprecated in macOS 10.10.
-    [Selector("accessibilityPerformAction:")] public void AccessibilityPerformAction(NSAccessibilityActionName action);
+    [Selector("accessibilityPerformAction:")]
+    public void AccessibilityPerformAction(NSAccessibilityActionName action);
     /// Deprecated in macOS 10.10.
-    [Selector("accessibilityIsIgnored")] public bool AccessibilityIsIgnored();
-    [Selector("accessibilityHitTest:")] public AnyObject? AccessibilityHitTest(NSPoint point);
-    [Selector("accessibilityIndexOfChild:")] public NSUInteger AccessibilityIndexOfChild(AnyObject child);
-    [Selector("accessibilityArrayAttributeCount:")] public NSUInteger AccessibilityArrayAttributeCount(NSAccessibilityAttributeName @attribute);
-    [Selector("accessibilityArrayAttributeValues:index:maxCount:")] public NSArray AccessibilityArrayAttributeValuesIndexMaxCount(NSAccessibilityAttributeName @attribute, NSUInteger index, NSUInteger maxCount);
+    [Selector("accessibilityIsIgnored")]
+    public bool AccessibilityIsIgnored();
+    [Selector("accessibilityHitTest:")]
+    public AnyObject? AccessibilityHitTest(NSPoint point);
+    [Selector("accessibilityIndexOfChild:")]
+    public NSUInteger AccessibilityIndexOfChild(AnyObject child);
+    [Selector("accessibilityArrayAttributeCount:")]
+    public NSUInteger AccessibilityArrayAttributeCount(NSAccessibilityAttributeName @attribute);
+    [Selector("accessibilityArrayAttributeValues:index:maxCount:")]
+    public NSArray AccessibilityArrayAttributeValuesIndexMaxCount(NSAccessibilityAttributeName @attribute, NSUInteger index, NSUInteger maxCount);
 }
 
 /// NSWorkspaceAccessibilityDisplay, a category of NSWorkspace.
 public extern objc class NSWorkspace
 {
-    [Selector("accessibilityDisplayShouldIncreaseContrast")] public bool AccessibilityDisplayShouldIncreaseContrast { get; }
-    [Selector("accessibilityDisplayShouldDifferentiateWithoutColor")] public bool AccessibilityDisplayShouldDifferentiateWithoutColor { get; }
-    [Selector("accessibilityDisplayShouldReduceTransparency")] public bool AccessibilityDisplayShouldReduceTransparency { get; }
-    [Selector("accessibilityDisplayShouldReduceMotion")] public bool AccessibilityDisplayShouldReduceMotion { get; }
-    [Selector("accessibilityDisplayShouldInvertColors")] public bool AccessibilityDisplayShouldInvertColors { get; }
+    [Selector("accessibilityDisplayShouldIncreaseContrast")]
+    public bool AccessibilityDisplayShouldIncreaseContrast { get; }
+    [Selector("accessibilityDisplayShouldDifferentiateWithoutColor")]
+    public bool AccessibilityDisplayShouldDifferentiateWithoutColor { get; }
+    [Selector("accessibilityDisplayShouldReduceTransparency")]
+    public bool AccessibilityDisplayShouldReduceTransparency { get; }
+    [Selector("accessibilityDisplayShouldReduceMotion")]
+    public bool AccessibilityDisplayShouldReduceMotion { get; }
+    [Selector("accessibilityDisplayShouldInvertColors")]
+    public bool AccessibilityDisplayShouldInvertColors { get; }
 }
 
 /// NSWorkspaceAccessibility, a category of NSWorkspace.
 public extern objc class NSWorkspace
 {
-    [Selector("isVoiceOverEnabled")] public bool VoiceOverEnabled { get; }
-    [Selector("isSwitchControlEnabled")] public bool SwitchControlEnabled { get; }
+    [Selector("isVoiceOverEnabled")]
+    public bool VoiceOverEnabled { get; }
+    [Selector("isSwitchControlEnabled")]
+    public bool SwitchControlEnabled { get; }
 }
 
 public extern "C" NSNotificationName? NSWorkspaceAccessibilityDisplayOptionsDidChangeNotification;
@@ -85,7 +108,8 @@ public extern "C" NSNotificationName? NSWorkspaceAccessibilityDisplayOptionsDidC
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.10.
-    [Selector("accessibilitySetOverrideValue:forAttribute:")] public bool AccessibilitySetOverrideValueForAttribute(AnyObject? value, NSAccessibilityAttributeName @attribute);
+    [Selector("accessibilitySetOverrideValue:forAttribute:")]
+    public bool AccessibilitySetOverrideValueForAttribute(AnyObject? value, NSAccessibilityAttributeName @attribute);
 }
 
 public extern "C" NSRect NSAccessibilityFrameInView(NSView parentView, NSRect frame);

@@ -32,13 +32,20 @@ import Standard.ObjC;
 
 public extern objc class MXCrashDiagnostic : MXDiagnostic
 {
-    [Selector("callStackTree")] public MXCallStackTree CallStackTree { get; }
-    [Selector("terminationReason")] public NSString? TerminationReason { get; }
-    [Selector("virtualMemoryRegionInfo")] public NSString? VirtualMemoryRegionInfo { get; }
-    [Selector("exceptionType")] public NSNumber? ExceptionType { get; }
-    [Selector("exceptionCode")] public NSNumber? ExceptionCode { get; }
-    [Selector("signal")] public NSNumber? Signal { get; }
-    [Selector("exceptionReason")] public MXCrashDiagnosticObjectiveCExceptionReason? ExceptionReason { get; }
+    [Selector("callStackTree")]
+    public MXCallStackTree CallStackTree { get; }
+    [Selector("terminationReason")]
+    public NSString? TerminationReason { get; }
+    [Selector("virtualMemoryRegionInfo")]
+    public NSString? VirtualMemoryRegionInfo { get; }
+    [Selector("exceptionType")]
+    public NSNumber? ExceptionType { get; }
+    [Selector("exceptionCode")]
+    public NSNumber? ExceptionCode { get; }
+    [Selector("signal")]
+    public NSNumber? Signal { get; }
+    [Selector("exceptionReason")]
+    public MXCrashDiagnosticObjectiveCExceptionReason? ExceptionReason { get; }
 }
 
 #endif

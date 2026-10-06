@@ -33,28 +33,50 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCLossLayer : MLCLayer
 {
-    [Selector("descriptor")] public MLCLossDescriptor Descriptor { get; }
-    [Selector("weights")] public MLCTensor? Weights { get; }
-    [Selector("layerWithDescriptor:")] public static Self LayerWithDescriptor(MLCLossDescriptor lossDescriptor);
-    [Selector("layerWithDescriptor:weights:")] public static Self LayerWithDescriptorWeights(MLCLossDescriptor lossDescriptor, MLCTensor weights);
-    [Selector("softmaxCrossEntropyLossWithReductionType:labelSmoothing:classCount:weight:")] public static Self SoftmaxCrossEntropyLossWithReductionTypeLabelSmoothingClassCountWeight(MLCReductionType reductionType, float labelSmoothing, NSUInteger classCount, float weight);
-    [Selector("softmaxCrossEntropyLossWithReductionType:labelSmoothing:classCount:weights:")] public static Self SoftmaxCrossEntropyLossWithReductionTypeLabelSmoothingClassCountWeights(MLCReductionType reductionType, float labelSmoothing, NSUInteger classCount, MLCTensor? weights);
-    [Selector("categoricalCrossEntropyLossWithReductionType:labelSmoothing:classCount:weight:")] public static Self CategoricalCrossEntropyLossWithReductionTypeLabelSmoothingClassCountWeight(MLCReductionType reductionType, float labelSmoothing, NSUInteger classCount, float weight);
-    [Selector("categoricalCrossEntropyLossWithReductionType:labelSmoothing:classCount:weights:")] public static Self CategoricalCrossEntropyLossWithReductionTypeLabelSmoothingClassCountWeights(MLCReductionType reductionType, float labelSmoothing, NSUInteger classCount, MLCTensor? weights);
-    [Selector("sigmoidCrossEntropyLossWithReductionType:labelSmoothing:weight:")] public static Self SigmoidCrossEntropyLossWithReductionTypeLabelSmoothingWeight(MLCReductionType reductionType, float labelSmoothing, float weight);
-    [Selector("sigmoidCrossEntropyLossWithReductionType:labelSmoothing:weights:")] public static Self SigmoidCrossEntropyLossWithReductionTypeLabelSmoothingWeights(MLCReductionType reductionType, float labelSmoothing, MLCTensor? weights);
-    [Selector("logLossWithReductionType:epsilon:weight:")] public static Self LogLossWithReductionTypeEpsilonWeight(MLCReductionType reductionType, float epsilon, float weight);
-    [Selector("logLossWithReductionType:epsilon:weights:")] public static Self LogLossWithReductionTypeEpsilonWeights(MLCReductionType reductionType, float epsilon, MLCTensor? weights);
-    [Selector("huberLossWithReductionType:delta:weight:")] public static Self HuberLossWithReductionTypeDeltaWeight(MLCReductionType reductionType, float delta, float weight);
-    [Selector("huberLossWithReductionType:delta:weights:")] public static Self HuberLossWithReductionTypeDeltaWeights(MLCReductionType reductionType, float delta, MLCTensor? weights);
-    [Selector("meanAbsoluteErrorLossWithReductionType:weight:")] public static Self MeanAbsoluteErrorLossWithReductionTypeWeight(MLCReductionType reductionType, float weight);
-    [Selector("meanAbsoluteErrorLossWithReductionType:weights:")] public static Self MeanAbsoluteErrorLossWithReductionTypeWeights(MLCReductionType reductionType, MLCTensor? weights);
-    [Selector("meanSquaredErrorLossWithReductionType:weight:")] public static Self MeanSquaredErrorLossWithReductionTypeWeight(MLCReductionType reductionType, float weight);
-    [Selector("meanSquaredErrorLossWithReductionType:weights:")] public static Self MeanSquaredErrorLossWithReductionTypeWeights(MLCReductionType reductionType, MLCTensor? weights);
-    [Selector("hingeLossWithReductionType:weight:")] public static Self HingeLossWithReductionTypeWeight(MLCReductionType reductionType, float weight);
-    [Selector("hingeLossWithReductionType:weights:")] public static Self HingeLossWithReductionTypeWeights(MLCReductionType reductionType, MLCTensor? weights);
-    [Selector("cosineDistanceLossWithReductionType:weight:")] public static Self CosineDistanceLossWithReductionTypeWeight(MLCReductionType reductionType, float weight);
-    [Selector("cosineDistanceLossWithReductionType:weights:")] public static Self CosineDistanceLossWithReductionTypeWeights(MLCReductionType reductionType, MLCTensor? weights);
+    [Selector("descriptor")]
+    public MLCLossDescriptor Descriptor { get; }
+    [Selector("weights")]
+    public MLCTensor? Weights { get; }
+    [Selector("layerWithDescriptor:")]
+    public static Self LayerWithDescriptor(MLCLossDescriptor lossDescriptor);
+    [Selector("layerWithDescriptor:weights:")]
+    public static Self LayerWithDescriptorWeights(MLCLossDescriptor lossDescriptor, MLCTensor weights);
+    [Selector("softmaxCrossEntropyLossWithReductionType:labelSmoothing:classCount:weight:")]
+    public static Self SoftmaxCrossEntropyLossWithReductionTypeLabelSmoothingClassCountWeight(MLCReductionType reductionType, float labelSmoothing, NSUInteger classCount, float weight);
+    [Selector("softmaxCrossEntropyLossWithReductionType:labelSmoothing:classCount:weights:")]
+    public static Self SoftmaxCrossEntropyLossWithReductionTypeLabelSmoothingClassCountWeights(MLCReductionType reductionType, float labelSmoothing, NSUInteger classCount, MLCTensor? weights);
+    [Selector("categoricalCrossEntropyLossWithReductionType:labelSmoothing:classCount:weight:")]
+    public static Self CategoricalCrossEntropyLossWithReductionTypeLabelSmoothingClassCountWeight(MLCReductionType reductionType, float labelSmoothing, NSUInteger classCount, float weight);
+    [Selector("categoricalCrossEntropyLossWithReductionType:labelSmoothing:classCount:weights:")]
+    public static Self CategoricalCrossEntropyLossWithReductionTypeLabelSmoothingClassCountWeights(MLCReductionType reductionType, float labelSmoothing, NSUInteger classCount, MLCTensor? weights);
+    [Selector("sigmoidCrossEntropyLossWithReductionType:labelSmoothing:weight:")]
+    public static Self SigmoidCrossEntropyLossWithReductionTypeLabelSmoothingWeight(MLCReductionType reductionType, float labelSmoothing, float weight);
+    [Selector("sigmoidCrossEntropyLossWithReductionType:labelSmoothing:weights:")]
+    public static Self SigmoidCrossEntropyLossWithReductionTypeLabelSmoothingWeights(MLCReductionType reductionType, float labelSmoothing, MLCTensor? weights);
+    [Selector("logLossWithReductionType:epsilon:weight:")]
+    public static Self LogLossWithReductionTypeEpsilonWeight(MLCReductionType reductionType, float epsilon, float weight);
+    [Selector("logLossWithReductionType:epsilon:weights:")]
+    public static Self LogLossWithReductionTypeEpsilonWeights(MLCReductionType reductionType, float epsilon, MLCTensor? weights);
+    [Selector("huberLossWithReductionType:delta:weight:")]
+    public static Self HuberLossWithReductionTypeDeltaWeight(MLCReductionType reductionType, float delta, float weight);
+    [Selector("huberLossWithReductionType:delta:weights:")]
+    public static Self HuberLossWithReductionTypeDeltaWeights(MLCReductionType reductionType, float delta, MLCTensor? weights);
+    [Selector("meanAbsoluteErrorLossWithReductionType:weight:")]
+    public static Self MeanAbsoluteErrorLossWithReductionTypeWeight(MLCReductionType reductionType, float weight);
+    [Selector("meanAbsoluteErrorLossWithReductionType:weights:")]
+    public static Self MeanAbsoluteErrorLossWithReductionTypeWeights(MLCReductionType reductionType, MLCTensor? weights);
+    [Selector("meanSquaredErrorLossWithReductionType:weight:")]
+    public static Self MeanSquaredErrorLossWithReductionTypeWeight(MLCReductionType reductionType, float weight);
+    [Selector("meanSquaredErrorLossWithReductionType:weights:")]
+    public static Self MeanSquaredErrorLossWithReductionTypeWeights(MLCReductionType reductionType, MLCTensor? weights);
+    [Selector("hingeLossWithReductionType:weight:")]
+    public static Self HingeLossWithReductionTypeWeight(MLCReductionType reductionType, float weight);
+    [Selector("hingeLossWithReductionType:weights:")]
+    public static Self HingeLossWithReductionTypeWeights(MLCReductionType reductionType, MLCTensor? weights);
+    [Selector("cosineDistanceLossWithReductionType:weight:")]
+    public static Self CosineDistanceLossWithReductionTypeWeight(MLCReductionType reductionType, float weight);
+    [Selector("cosineDistanceLossWithReductionType:weights:")]
+    public static Self CosineDistanceLossWithReductionTypeWeights(MLCReductionType reductionType, MLCTensor? weights);
 }
 
 #endif

@@ -34,53 +34,70 @@ public objc closure bool NSPredicatePredicateWithBlockBlock(AnyObject? arg0, NSD
 
 public extern objc class NSPredicate : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("predicateFormat")] public NSString PredicateFormat { get; }
-    [Selector("predicateWithFormat:argumentArray:")] public static NSPredicate PredicateWithFormatArgumentArray(NSString predicateFormat, NSArray? arguments);
-    [Selector("predicateWithFormat:")] public static NSPredicate PredicateWithFormat(NSString predicateFormat, ...);
-    [Selector("predicateWithFormat:arguments:")] public static NSPredicate PredicateWithFormatArguments(NSString predicateFormat, VaList argList);
-    [Selector("predicateFromMetadataQueryString:")] public static NSPredicate? PredicateFromMetadataQueryString(NSString queryString);
-    [Selector("predicateWithValue:")] public static NSPredicate PredicateWithValue(bool value);
-    [Selector("predicateWithBlock:")] public static NSPredicate PredicateWithBlock(NSPredicatePredicateWithBlockBlock block);
-    [Selector("predicateWithSubstitutionVariables:")] public Self PredicateWithSubstitutionVariables(NSDictionary variables);
-    [Selector("evaluateWithObject:")] public bool EvaluateWithObject(AnyObject? object);
-    [Selector("evaluateWithObject:substitutionVariables:")] public bool EvaluateWithObjectSubstitutionVariables(AnyObject? object, NSDictionary? bindings);
-    [Selector("allowEvaluation")] public void AllowEvaluation();
+    [Selector("predicateFormat")]
+    public NSString PredicateFormat { get; }
+    [Selector("predicateWithFormat:argumentArray:")]
+    public static NSPredicate PredicateWithFormatArgumentArray(NSString predicateFormat, NSArray? arguments);
+    [Selector("predicateWithFormat:")]
+    public static NSPredicate PredicateWithFormat(NSString predicateFormat, ...);
+    [Selector("predicateWithFormat:arguments:")]
+    public static NSPredicate PredicateWithFormatArguments(NSString predicateFormat, VaList argList);
+    [Selector("predicateFromMetadataQueryString:")]
+    public static NSPredicate? PredicateFromMetadataQueryString(NSString queryString);
+    [Selector("predicateWithValue:")]
+    public static NSPredicate PredicateWithValue(bool value);
+    [Selector("predicateWithBlock:")]
+    public static NSPredicate PredicateWithBlock(NSPredicatePredicateWithBlockBlock block);
+    [Selector("predicateWithSubstitutionVariables:")]
+    public Self PredicateWithSubstitutionVariables(NSDictionary variables);
+    [Selector("evaluateWithObject:")]
+    public bool EvaluateWithObject(AnyObject? object);
+    [Selector("evaluateWithObject:substitutionVariables:")]
+    public bool EvaluateWithObjectSubstitutionVariables(AnyObject? object, NSDictionary? bindings);
+    [Selector("allowEvaluation")]
+    public void AllowEvaluation();
 }
 
 /// NSPredicateSupport, a category of NSArray.
 public extern objc class NSArray
 {
-    [Selector("filteredArrayUsingPredicate:")] public NSArray FilteredArrayUsingPredicate(NSPredicate predicate);
+    [Selector("filteredArrayUsingPredicate:")]
+    public NSArray FilteredArrayUsingPredicate(NSPredicate predicate);
 }
 
 /// NSPredicateSupport, a category of NSMutableArray.
 public extern objc class NSMutableArray
 {
-    [Selector("filterUsingPredicate:")] public void FilterUsingPredicate(NSPredicate predicate);
+    [Selector("filterUsingPredicate:")]
+    public void FilterUsingPredicate(NSPredicate predicate);
 }
 
 /// NSPredicateSupport, a category of NSSet.
 public extern objc class NSSet
 {
-    [Selector("filteredSetUsingPredicate:")] public NSSet FilteredSetUsingPredicate(NSPredicate predicate);
+    [Selector("filteredSetUsingPredicate:")]
+    public NSSet FilteredSetUsingPredicate(NSPredicate predicate);
 }
 
 /// NSPredicateSupport, a category of NSMutableSet.
 public extern objc class NSMutableSet
 {
-    [Selector("filterUsingPredicate:")] public void FilterUsingPredicate(NSPredicate predicate);
+    [Selector("filterUsingPredicate:")]
+    public void FilterUsingPredicate(NSPredicate predicate);
 }
 
 /// NSPredicateSupport, a category of NSOrderedSet.
 public extern objc class NSOrderedSet
 {
-    [Selector("filteredOrderedSetUsingPredicate:")] public NSOrderedSet FilteredOrderedSetUsingPredicate(NSPredicate p);
+    [Selector("filteredOrderedSetUsingPredicate:")]
+    public NSOrderedSet FilteredOrderedSetUsingPredicate(NSPredicate p);
 }
 
 /// NSPredicateSupport, a category of NSMutableOrderedSet.
 public extern objc class NSMutableOrderedSet
 {
-    [Selector("filterUsingPredicate:")] public void FilterUsingPredicate(NSPredicate p);
+    [Selector("filterUsingPredicate:")]
+    public void FilterUsingPredicate(NSPredicate p);
 }
 
 #endif

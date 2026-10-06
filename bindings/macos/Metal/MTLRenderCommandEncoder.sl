@@ -145,144 +145,275 @@ public enum MTLRenderStages : ulong
 
 public objc interface MTLRenderCommandEncoder : MTLCommandEncoder
 {
-    [Selector("tileWidth")] NSUInteger TileWidth { get; }
-    [Selector("tileHeight")] NSUInteger TileHeight { get; }
-    [Selector("setRenderPipelineState:")] void SetRenderPipelineState(MTLRenderPipelineState pipelineState);
-    [Selector("setVertexBytes:length:atIndex:")] void SetVertexBytesLengthAtIndex(void* bytes, NSUInteger length, NSUInteger index);
-    [Selector("setVertexBuffer:offset:atIndex:")] void SetVertexBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
-    [Selector("setVertexBufferOffset:atIndex:")] void SetVertexBufferOffsetAtIndex(NSUInteger offset, NSUInteger index);
-    [Selector("setVertexBuffers:offsets:withRange:")] void SetVertexBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
-    [Selector("setVertexBuffer:offset:attributeStride:atIndex:")] void SetVertexBufferOffsetAttributeStrideAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger stride, NSUInteger index);
-    [Selector("setVertexBuffers:offsets:attributeStrides:withRange:")] void SetVertexBuffersOffsetsAttributeStridesWithRange(void** buffers, NSUInteger* offsets, NSUInteger* strides, NSRange range);
-    [Selector("setVertexBufferOffset:attributeStride:atIndex:")] void SetVertexBufferOffsetAttributeStrideAtIndex(NSUInteger offset, NSUInteger stride, NSUInteger index);
-    [Selector("setVertexBytes:length:attributeStride:atIndex:")] void SetVertexBytesLengthAttributeStrideAtIndex(void* bytes, NSUInteger length, NSUInteger stride, NSUInteger index);
-    [Selector("setVertexTexture:atIndex:")] void SetVertexTextureAtIndex(MTLTexture? texture, NSUInteger index);
-    [Selector("setVertexTextures:withRange:")] void SetVertexTexturesWithRange(void** textures, NSRange range);
-    [Selector("setVertexSamplerState:atIndex:")] void SetVertexSamplerStateAtIndex(MTLSamplerState? sampler, NSUInteger index);
-    [Selector("setVertexSamplerStates:withRange:")] void SetVertexSamplerStatesWithRange(void** samplers, NSRange range);
-    [Selector("setVertexSamplerState:lodMinClamp:lodMaxClamp:atIndex:")] void SetVertexSamplerStateLodMinClampLodMaxClampAtIndex(MTLSamplerState? sampler, float lodMinClamp, float lodMaxClamp, NSUInteger index);
-    [Selector("setVertexSamplerStates:lodMinClamps:lodMaxClamps:withRange:")] void SetVertexSamplerStatesLodMinClampsLodMaxClampsWithRange(void** samplers, float* lodMinClamps, float* lodMaxClamps, NSRange range);
-    [Selector("setVertexVisibleFunctionTable:atBufferIndex:")] void SetVertexVisibleFunctionTableAtBufferIndex(MTLVisibleFunctionTable? functionTable, NSUInteger bufferIndex);
-    [Selector("setVertexVisibleFunctionTables:withBufferRange:")] void SetVertexVisibleFunctionTablesWithBufferRange(void** functionTables, NSRange range);
-    [Selector("setVertexIntersectionFunctionTable:atBufferIndex:")] void SetVertexIntersectionFunctionTableAtBufferIndex(MTLIntersectionFunctionTable? intersectionFunctionTable, NSUInteger bufferIndex);
-    [Selector("setVertexIntersectionFunctionTables:withBufferRange:")] void SetVertexIntersectionFunctionTablesWithBufferRange(void** intersectionFunctionTables, NSRange range);
-    [Selector("setVertexAccelerationStructure:atBufferIndex:")] void SetVertexAccelerationStructureAtBufferIndex(MTLAccelerationStructure? accelerationStructure, NSUInteger bufferIndex);
-    [Selector("setViewport:")] void SetViewport(MTLViewport viewport);
-    [Selector("setViewports:count:")] void SetViewportsCount(MTLViewport* viewports, NSUInteger count);
-    [Selector("setFrontFacingWinding:")] void SetFrontFacingWinding(MTLWinding frontFacingWinding);
-    [Selector("setVertexAmplificationCount:viewMappings:")] void SetVertexAmplificationCountViewMappings(NSUInteger count, MTLVertexAmplificationViewMapping* viewMappings);
-    [Selector("setCullMode:")] void SetCullMode(MTLCullMode cullMode);
-    [Selector("setDepthClipMode:")] void SetDepthClipMode(MTLDepthClipMode depthClipMode);
-    [Selector("setDepthBias:slopeScale:clamp:")] void SetDepthBiasSlopeScaleClamp(float depthBias, float slopeScale, float clamp);
+    [Selector("tileWidth")]
+    NSUInteger TileWidth { get; }
+    [Selector("tileHeight")]
+    NSUInteger TileHeight { get; }
+    [Selector("setRenderPipelineState:")]
+    void SetRenderPipelineState(MTLRenderPipelineState pipelineState);
+    [Selector("setVertexBytes:length:atIndex:")]
+    void SetVertexBytesLengthAtIndex(void* bytes, NSUInteger length, NSUInteger index);
+    [Selector("setVertexBuffer:offset:atIndex:")]
+    void SetVertexBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
+    [Selector("setVertexBufferOffset:atIndex:")]
+    void SetVertexBufferOffsetAtIndex(NSUInteger offset, NSUInteger index);
+    [Selector("setVertexBuffers:offsets:withRange:")]
+    void SetVertexBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
+    [Selector("setVertexBuffer:offset:attributeStride:atIndex:")]
+    void SetVertexBufferOffsetAttributeStrideAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger stride, NSUInteger index);
+    [Selector("setVertexBuffers:offsets:attributeStrides:withRange:")]
+    void SetVertexBuffersOffsetsAttributeStridesWithRange(void** buffers, NSUInteger* offsets, NSUInteger* strides, NSRange range);
+    [Selector("setVertexBufferOffset:attributeStride:atIndex:")]
+    void SetVertexBufferOffsetAttributeStrideAtIndex(NSUInteger offset, NSUInteger stride, NSUInteger index);
+    [Selector("setVertexBytes:length:attributeStride:atIndex:")]
+    void SetVertexBytesLengthAttributeStrideAtIndex(void* bytes, NSUInteger length, NSUInteger stride, NSUInteger index);
+    [Selector("setVertexTexture:atIndex:")]
+    void SetVertexTextureAtIndex(MTLTexture? texture, NSUInteger index);
+    [Selector("setVertexTextures:withRange:")]
+    void SetVertexTexturesWithRange(void** textures, NSRange range);
+    [Selector("setVertexSamplerState:atIndex:")]
+    void SetVertexSamplerStateAtIndex(MTLSamplerState? sampler, NSUInteger index);
+    [Selector("setVertexSamplerStates:withRange:")]
+    void SetVertexSamplerStatesWithRange(void** samplers, NSRange range);
+    [Selector("setVertexSamplerState:lodMinClamp:lodMaxClamp:atIndex:")]
+    void SetVertexSamplerStateLodMinClampLodMaxClampAtIndex(MTLSamplerState? sampler, float lodMinClamp, float lodMaxClamp, NSUInteger index);
+    [Selector("setVertexSamplerStates:lodMinClamps:lodMaxClamps:withRange:")]
+    void SetVertexSamplerStatesLodMinClampsLodMaxClampsWithRange(void** samplers, float* lodMinClamps, float* lodMaxClamps, NSRange range);
+    [Selector("setVertexVisibleFunctionTable:atBufferIndex:")]
+    void SetVertexVisibleFunctionTableAtBufferIndex(MTLVisibleFunctionTable? functionTable, NSUInteger bufferIndex);
+    [Selector("setVertexVisibleFunctionTables:withBufferRange:")]
+    void SetVertexVisibleFunctionTablesWithBufferRange(void** functionTables, NSRange range);
+    [Selector("setVertexIntersectionFunctionTable:atBufferIndex:")]
+    void SetVertexIntersectionFunctionTableAtBufferIndex(MTLIntersectionFunctionTable? intersectionFunctionTable, NSUInteger bufferIndex);
+    [Selector("setVertexIntersectionFunctionTables:withBufferRange:")]
+    void SetVertexIntersectionFunctionTablesWithBufferRange(void** intersectionFunctionTables, NSRange range);
+    [Selector("setVertexAccelerationStructure:atBufferIndex:")]
+    void SetVertexAccelerationStructureAtBufferIndex(MTLAccelerationStructure? accelerationStructure, NSUInteger bufferIndex);
+    [Selector("setViewport:")]
+    void SetViewport(MTLViewport viewport);
+    [Selector("setViewports:count:")]
+    void SetViewportsCount(MTLViewport* viewports, NSUInteger count);
+    [Selector("setFrontFacingWinding:")]
+    void SetFrontFacingWinding(MTLWinding frontFacingWinding);
+    [Selector("setVertexAmplificationCount:viewMappings:")]
+    void SetVertexAmplificationCountViewMappings(NSUInteger count, MTLVertexAmplificationViewMapping* viewMappings);
+    [Selector("setCullMode:")]
+    void SetCullMode(MTLCullMode cullMode);
+    [Selector("setDepthClipMode:")]
+    void SetDepthClipMode(MTLDepthClipMode depthClipMode);
+    [Selector("setDepthBias:slopeScale:clamp:")]
+    void SetDepthBiasSlopeScaleClamp(float depthBias, float slopeScale, float clamp);
     /// macOS 26.0 and later.
-    [Selector("setDepthTestMinBound:maxBound:")] void SetDepthTestMinBoundMaxBound(float minBound, float maxBound);
-    [Selector("setScissorRect:")] void SetScissorRect(MTLScissorRect rect);
-    [Selector("setScissorRects:count:")] void SetScissorRectsCount(MTLScissorRect* scissorRects, NSUInteger count);
-    [Selector("setTriangleFillMode:")] void SetTriangleFillMode(MTLTriangleFillMode fillMode);
-    [Selector("setFragmentBytes:length:atIndex:")] void SetFragmentBytesLengthAtIndex(void* bytes, NSUInteger length, NSUInteger index);
-    [Selector("setFragmentBuffer:offset:atIndex:")] void SetFragmentBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
-    [Selector("setFragmentBufferOffset:atIndex:")] void SetFragmentBufferOffsetAtIndex(NSUInteger offset, NSUInteger index);
-    [Selector("setFragmentBuffers:offsets:withRange:")] void SetFragmentBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
-    [Selector("setFragmentTexture:atIndex:")] void SetFragmentTextureAtIndex(MTLTexture? texture, NSUInteger index);
-    [Selector("setFragmentTextures:withRange:")] void SetFragmentTexturesWithRange(void** textures, NSRange range);
-    [Selector("setFragmentSamplerState:atIndex:")] void SetFragmentSamplerStateAtIndex(MTLSamplerState? sampler, NSUInteger index);
-    [Selector("setFragmentSamplerStates:withRange:")] void SetFragmentSamplerStatesWithRange(void** samplers, NSRange range);
-    [Selector("setFragmentSamplerState:lodMinClamp:lodMaxClamp:atIndex:")] void SetFragmentSamplerStateLodMinClampLodMaxClampAtIndex(MTLSamplerState? sampler, float lodMinClamp, float lodMaxClamp, NSUInteger index);
-    [Selector("setFragmentSamplerStates:lodMinClamps:lodMaxClamps:withRange:")] void SetFragmentSamplerStatesLodMinClampsLodMaxClampsWithRange(void** samplers, float* lodMinClamps, float* lodMaxClamps, NSRange range);
-    [Selector("setFragmentVisibleFunctionTable:atBufferIndex:")] void SetFragmentVisibleFunctionTableAtBufferIndex(MTLVisibleFunctionTable? functionTable, NSUInteger bufferIndex);
-    [Selector("setFragmentVisibleFunctionTables:withBufferRange:")] void SetFragmentVisibleFunctionTablesWithBufferRange(void** functionTables, NSRange range);
-    [Selector("setFragmentIntersectionFunctionTable:atBufferIndex:")] void SetFragmentIntersectionFunctionTableAtBufferIndex(MTLIntersectionFunctionTable? intersectionFunctionTable, NSUInteger bufferIndex);
-    [Selector("setFragmentIntersectionFunctionTables:withBufferRange:")] void SetFragmentIntersectionFunctionTablesWithBufferRange(void** intersectionFunctionTables, NSRange range);
-    [Selector("setFragmentAccelerationStructure:atBufferIndex:")] void SetFragmentAccelerationStructureAtBufferIndex(MTLAccelerationStructure? accelerationStructure, NSUInteger bufferIndex);
-    [Selector("setBlendColorRed:green:blue:alpha:")] void SetBlendColorRedGreenBlueAlpha(float red, float green, float blue, float alpha);
-    [Selector("setDepthStencilState:")] void SetDepthStencilState(MTLDepthStencilState? depthStencilState);
-    [Selector("setStencilReferenceValue:")] void SetStencilReferenceValue(uint referenceValue);
-    [Selector("setStencilFrontReferenceValue:backReferenceValue:")] void SetStencilFrontReferenceValueBackReferenceValue(uint frontReferenceValue, uint backReferenceValue);
-    [Selector("setVisibilityResultMode:offset:")] void SetVisibilityResultModeOffset(MTLVisibilityResultMode mode, NSUInteger offset);
-    [Selector("setColorStoreAction:atIndex:")] void SetColorStoreActionAtIndex(MTLStoreAction storeAction, NSUInteger colorAttachmentIndex);
-    [Selector("setDepthStoreAction:")] void SetDepthStoreAction(MTLStoreAction storeAction);
-    [Selector("setStencilStoreAction:")] void SetStencilStoreAction(MTLStoreAction storeAction);
-    [Selector("setColorStoreActionOptions:atIndex:")] void SetColorStoreActionOptionsAtIndex(MTLStoreActionOptions storeActionOptions, NSUInteger colorAttachmentIndex);
-    [Selector("setDepthStoreActionOptions:")] void SetDepthStoreActionOptions(MTLStoreActionOptions storeActionOptions);
-    [Selector("setStencilStoreActionOptions:")] void SetStencilStoreActionOptions(MTLStoreActionOptions storeActionOptions);
-    [Selector("setObjectBytes:length:atIndex:")] void SetObjectBytesLengthAtIndex(void* bytes, NSUInteger length, NSUInteger index);
-    [Selector("setObjectBuffer:offset:atIndex:")] void SetObjectBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
-    [Selector("setObjectBufferOffset:atIndex:")] void SetObjectBufferOffsetAtIndex(NSUInteger offset, NSUInteger index);
-    [Selector("setObjectBuffers:offsets:withRange:")] void SetObjectBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
-    [Selector("setObjectTexture:atIndex:")] void SetObjectTextureAtIndex(MTLTexture? texture, NSUInteger index);
-    [Selector("setObjectTextures:withRange:")] void SetObjectTexturesWithRange(void** textures, NSRange range);
-    [Selector("setObjectSamplerState:atIndex:")] void SetObjectSamplerStateAtIndex(MTLSamplerState? sampler, NSUInteger index);
-    [Selector("setObjectSamplerStates:withRange:")] void SetObjectSamplerStatesWithRange(void** samplers, NSRange range);
-    [Selector("setObjectSamplerState:lodMinClamp:lodMaxClamp:atIndex:")] void SetObjectSamplerStateLodMinClampLodMaxClampAtIndex(MTLSamplerState? sampler, float lodMinClamp, float lodMaxClamp, NSUInteger index);
-    [Selector("setObjectSamplerStates:lodMinClamps:lodMaxClamps:withRange:")] void SetObjectSamplerStatesLodMinClampsLodMaxClampsWithRange(void** samplers, float* lodMinClamps, float* lodMaxClamps, NSRange range);
-    [Selector("setObjectThreadgroupMemoryLength:atIndex:")] void SetObjectThreadgroupMemoryLengthAtIndex(NSUInteger length, NSUInteger index);
-    [Selector("setMeshBytes:length:atIndex:")] void SetMeshBytesLengthAtIndex(void* bytes, NSUInteger length, NSUInteger index);
-    [Selector("setMeshBuffer:offset:atIndex:")] void SetMeshBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
-    [Selector("setMeshBufferOffset:atIndex:")] void SetMeshBufferOffsetAtIndex(NSUInteger offset, NSUInteger index);
-    [Selector("setMeshBuffers:offsets:withRange:")] void SetMeshBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
-    [Selector("setMeshTexture:atIndex:")] void SetMeshTextureAtIndex(MTLTexture? texture, NSUInteger index);
-    [Selector("setMeshTextures:withRange:")] void SetMeshTexturesWithRange(void** textures, NSRange range);
-    [Selector("setMeshSamplerState:atIndex:")] void SetMeshSamplerStateAtIndex(MTLSamplerState? sampler, NSUInteger index);
-    [Selector("setMeshSamplerStates:withRange:")] void SetMeshSamplerStatesWithRange(void** samplers, NSRange range);
-    [Selector("setMeshSamplerState:lodMinClamp:lodMaxClamp:atIndex:")] void SetMeshSamplerStateLodMinClampLodMaxClampAtIndex(MTLSamplerState? sampler, float lodMinClamp, float lodMaxClamp, NSUInteger index);
-    [Selector("setMeshSamplerStates:lodMinClamps:lodMaxClamps:withRange:")] void SetMeshSamplerStatesLodMinClampsLodMaxClampsWithRange(void** samplers, float* lodMinClamps, float* lodMaxClamps, NSRange range);
-    [Selector("drawMeshThreadgroups:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")] void DrawMeshThreadgroupsThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLSize threadgroupsPerGrid, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
-    [Selector("drawMeshThreads:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")] void DrawMeshThreadsThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLSize threadsPerGrid, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
-    [Selector("drawMeshThreadgroupsWithIndirectBuffer:indirectBufferOffset:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")] void DrawMeshThreadgroupsWithIndirectBufferIndirectBufferOffsetThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLBuffer indirectBuffer, NSUInteger indirectBufferOffset, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
-    [Selector("drawPrimitives:vertexStart:vertexCount:instanceCount:")] void DrawPrimitivesVertexStartVertexCountInstanceCount(MTLPrimitiveType primitiveType, NSUInteger vertexStart, NSUInteger vertexCount, NSUInteger instanceCount);
-    [Selector("drawPrimitives:vertexStart:vertexCount:")] void DrawPrimitivesVertexStartVertexCount(MTLPrimitiveType primitiveType, NSUInteger vertexStart, NSUInteger vertexCount);
-    [Selector("drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferOffset:instanceCount:")] void DrawIndexedPrimitivesIndexCountIndexTypeIndexBufferIndexBufferOffsetInstanceCount(MTLPrimitiveType primitiveType, NSUInteger indexCount, MTLIndexType indexType, MTLBuffer indexBuffer, NSUInteger indexBufferOffset, NSUInteger instanceCount);
-    [Selector("drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferOffset:")] void DrawIndexedPrimitivesIndexCountIndexTypeIndexBufferIndexBufferOffset(MTLPrimitiveType primitiveType, NSUInteger indexCount, MTLIndexType indexType, MTLBuffer indexBuffer, NSUInteger indexBufferOffset);
-    [Selector("drawPrimitives:vertexStart:vertexCount:instanceCount:baseInstance:")] void DrawPrimitivesVertexStartVertexCountInstanceCountBaseInstance(MTLPrimitiveType primitiveType, NSUInteger vertexStart, NSUInteger vertexCount, NSUInteger instanceCount, NSUInteger baseInstance);
-    [Selector("drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferOffset:instanceCount:baseVertex:baseInstance:")] void DrawIndexedPrimitivesIndexCountIndexTypeIndexBufferIndexBufferOffsetInstanceCountBaseVertexBaseInstance(MTLPrimitiveType primitiveType, NSUInteger indexCount, MTLIndexType indexType, MTLBuffer indexBuffer, NSUInteger indexBufferOffset, NSUInteger instanceCount, NSInteger baseVertex, NSUInteger baseInstance);
-    [Selector("drawPrimitives:indirectBuffer:indirectBufferOffset:")] void DrawPrimitivesIndirectBufferIndirectBufferOffset(MTLPrimitiveType primitiveType, MTLBuffer indirectBuffer, NSUInteger indirectBufferOffset);
-    [Selector("drawIndexedPrimitives:indexType:indexBuffer:indexBufferOffset:indirectBuffer:indirectBufferOffset:")] void DrawIndexedPrimitivesIndexTypeIndexBufferIndexBufferOffsetIndirectBufferIndirectBufferOffset(MTLPrimitiveType primitiveType, MTLIndexType indexType, MTLBuffer indexBuffer, NSUInteger indexBufferOffset, MTLBuffer indirectBuffer, NSUInteger indirectBufferOffset);
+    [Selector("setDepthTestMinBound:maxBound:")]
+    void SetDepthTestMinBoundMaxBound(float minBound, float maxBound);
+    [Selector("setScissorRect:")]
+    void SetScissorRect(MTLScissorRect rect);
+    [Selector("setScissorRects:count:")]
+    void SetScissorRectsCount(MTLScissorRect* scissorRects, NSUInteger count);
+    [Selector("setTriangleFillMode:")]
+    void SetTriangleFillMode(MTLTriangleFillMode fillMode);
+    [Selector("setFragmentBytes:length:atIndex:")]
+    void SetFragmentBytesLengthAtIndex(void* bytes, NSUInteger length, NSUInteger index);
+    [Selector("setFragmentBuffer:offset:atIndex:")]
+    void SetFragmentBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
+    [Selector("setFragmentBufferOffset:atIndex:")]
+    void SetFragmentBufferOffsetAtIndex(NSUInteger offset, NSUInteger index);
+    [Selector("setFragmentBuffers:offsets:withRange:")]
+    void SetFragmentBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
+    [Selector("setFragmentTexture:atIndex:")]
+    void SetFragmentTextureAtIndex(MTLTexture? texture, NSUInteger index);
+    [Selector("setFragmentTextures:withRange:")]
+    void SetFragmentTexturesWithRange(void** textures, NSRange range);
+    [Selector("setFragmentSamplerState:atIndex:")]
+    void SetFragmentSamplerStateAtIndex(MTLSamplerState? sampler, NSUInteger index);
+    [Selector("setFragmentSamplerStates:withRange:")]
+    void SetFragmentSamplerStatesWithRange(void** samplers, NSRange range);
+    [Selector("setFragmentSamplerState:lodMinClamp:lodMaxClamp:atIndex:")]
+    void SetFragmentSamplerStateLodMinClampLodMaxClampAtIndex(MTLSamplerState? sampler, float lodMinClamp, float lodMaxClamp, NSUInteger index);
+    [Selector("setFragmentSamplerStates:lodMinClamps:lodMaxClamps:withRange:")]
+    void SetFragmentSamplerStatesLodMinClampsLodMaxClampsWithRange(void** samplers, float* lodMinClamps, float* lodMaxClamps, NSRange range);
+    [Selector("setFragmentVisibleFunctionTable:atBufferIndex:")]
+    void SetFragmentVisibleFunctionTableAtBufferIndex(MTLVisibleFunctionTable? functionTable, NSUInteger bufferIndex);
+    [Selector("setFragmentVisibleFunctionTables:withBufferRange:")]
+    void SetFragmentVisibleFunctionTablesWithBufferRange(void** functionTables, NSRange range);
+    [Selector("setFragmentIntersectionFunctionTable:atBufferIndex:")]
+    void SetFragmentIntersectionFunctionTableAtBufferIndex(MTLIntersectionFunctionTable? intersectionFunctionTable, NSUInteger bufferIndex);
+    [Selector("setFragmentIntersectionFunctionTables:withBufferRange:")]
+    void SetFragmentIntersectionFunctionTablesWithBufferRange(void** intersectionFunctionTables, NSRange range);
+    [Selector("setFragmentAccelerationStructure:atBufferIndex:")]
+    void SetFragmentAccelerationStructureAtBufferIndex(MTLAccelerationStructure? accelerationStructure, NSUInteger bufferIndex);
+    [Selector("setBlendColorRed:green:blue:alpha:")]
+    void SetBlendColorRedGreenBlueAlpha(float red, float green, float blue, float alpha);
+    [Selector("setDepthStencilState:")]
+    void SetDepthStencilState(MTLDepthStencilState? depthStencilState);
+    [Selector("setStencilReferenceValue:")]
+    void SetStencilReferenceValue(uint referenceValue);
+    [Selector("setStencilFrontReferenceValue:backReferenceValue:")]
+    void SetStencilFrontReferenceValueBackReferenceValue(uint frontReferenceValue, uint backReferenceValue);
+    [Selector("setVisibilityResultMode:offset:")]
+    void SetVisibilityResultModeOffset(MTLVisibilityResultMode mode, NSUInteger offset);
+    [Selector("setColorStoreAction:atIndex:")]
+    void SetColorStoreActionAtIndex(MTLStoreAction storeAction, NSUInteger colorAttachmentIndex);
+    [Selector("setDepthStoreAction:")]
+    void SetDepthStoreAction(MTLStoreAction storeAction);
+    [Selector("setStencilStoreAction:")]
+    void SetStencilStoreAction(MTLStoreAction storeAction);
+    [Selector("setColorStoreActionOptions:atIndex:")]
+    void SetColorStoreActionOptionsAtIndex(MTLStoreActionOptions storeActionOptions, NSUInteger colorAttachmentIndex);
+    [Selector("setDepthStoreActionOptions:")]
+    void SetDepthStoreActionOptions(MTLStoreActionOptions storeActionOptions);
+    [Selector("setStencilStoreActionOptions:")]
+    void SetStencilStoreActionOptions(MTLStoreActionOptions storeActionOptions);
+    [Selector("setObjectBytes:length:atIndex:")]
+    void SetObjectBytesLengthAtIndex(void* bytes, NSUInteger length, NSUInteger index);
+    [Selector("setObjectBuffer:offset:atIndex:")]
+    void SetObjectBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
+    [Selector("setObjectBufferOffset:atIndex:")]
+    void SetObjectBufferOffsetAtIndex(NSUInteger offset, NSUInteger index);
+    [Selector("setObjectBuffers:offsets:withRange:")]
+    void SetObjectBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
+    [Selector("setObjectTexture:atIndex:")]
+    void SetObjectTextureAtIndex(MTLTexture? texture, NSUInteger index);
+    [Selector("setObjectTextures:withRange:")]
+    void SetObjectTexturesWithRange(void** textures, NSRange range);
+    [Selector("setObjectSamplerState:atIndex:")]
+    void SetObjectSamplerStateAtIndex(MTLSamplerState? sampler, NSUInteger index);
+    [Selector("setObjectSamplerStates:withRange:")]
+    void SetObjectSamplerStatesWithRange(void** samplers, NSRange range);
+    [Selector("setObjectSamplerState:lodMinClamp:lodMaxClamp:atIndex:")]
+    void SetObjectSamplerStateLodMinClampLodMaxClampAtIndex(MTLSamplerState? sampler, float lodMinClamp, float lodMaxClamp, NSUInteger index);
+    [Selector("setObjectSamplerStates:lodMinClamps:lodMaxClamps:withRange:")]
+    void SetObjectSamplerStatesLodMinClampsLodMaxClampsWithRange(void** samplers, float* lodMinClamps, float* lodMaxClamps, NSRange range);
+    [Selector("setObjectThreadgroupMemoryLength:atIndex:")]
+    void SetObjectThreadgroupMemoryLengthAtIndex(NSUInteger length, NSUInteger index);
+    [Selector("setMeshBytes:length:atIndex:")]
+    void SetMeshBytesLengthAtIndex(void* bytes, NSUInteger length, NSUInteger index);
+    [Selector("setMeshBuffer:offset:atIndex:")]
+    void SetMeshBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
+    [Selector("setMeshBufferOffset:atIndex:")]
+    void SetMeshBufferOffsetAtIndex(NSUInteger offset, NSUInteger index);
+    [Selector("setMeshBuffers:offsets:withRange:")]
+    void SetMeshBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
+    [Selector("setMeshTexture:atIndex:")]
+    void SetMeshTextureAtIndex(MTLTexture? texture, NSUInteger index);
+    [Selector("setMeshTextures:withRange:")]
+    void SetMeshTexturesWithRange(void** textures, NSRange range);
+    [Selector("setMeshSamplerState:atIndex:")]
+    void SetMeshSamplerStateAtIndex(MTLSamplerState? sampler, NSUInteger index);
+    [Selector("setMeshSamplerStates:withRange:")]
+    void SetMeshSamplerStatesWithRange(void** samplers, NSRange range);
+    [Selector("setMeshSamplerState:lodMinClamp:lodMaxClamp:atIndex:")]
+    void SetMeshSamplerStateLodMinClampLodMaxClampAtIndex(MTLSamplerState? sampler, float lodMinClamp, float lodMaxClamp, NSUInteger index);
+    [Selector("setMeshSamplerStates:lodMinClamps:lodMaxClamps:withRange:")]
+    void SetMeshSamplerStatesLodMinClampsLodMaxClampsWithRange(void** samplers, float* lodMinClamps, float* lodMaxClamps, NSRange range);
+    [Selector("drawMeshThreadgroups:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")]
+    void DrawMeshThreadgroupsThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLSize threadgroupsPerGrid, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
+    [Selector("drawMeshThreads:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")]
+    void DrawMeshThreadsThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLSize threadsPerGrid, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
+    [Selector("drawMeshThreadgroupsWithIndirectBuffer:indirectBufferOffset:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")]
+    void DrawMeshThreadgroupsWithIndirectBufferIndirectBufferOffsetThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLBuffer indirectBuffer, NSUInteger indirectBufferOffset, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
+    [Selector("drawPrimitives:vertexStart:vertexCount:instanceCount:")]
+    void DrawPrimitivesVertexStartVertexCountInstanceCount(MTLPrimitiveType primitiveType, NSUInteger vertexStart, NSUInteger vertexCount, NSUInteger instanceCount);
+    [Selector("drawPrimitives:vertexStart:vertexCount:")]
+    void DrawPrimitivesVertexStartVertexCount(MTLPrimitiveType primitiveType, NSUInteger vertexStart, NSUInteger vertexCount);
+    [Selector("drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferOffset:instanceCount:")]
+    void DrawIndexedPrimitivesIndexCountIndexTypeIndexBufferIndexBufferOffsetInstanceCount(MTLPrimitiveType primitiveType, NSUInteger indexCount, MTLIndexType indexType, MTLBuffer indexBuffer, NSUInteger indexBufferOffset, NSUInteger instanceCount);
+    [Selector("drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferOffset:")]
+    void DrawIndexedPrimitivesIndexCountIndexTypeIndexBufferIndexBufferOffset(MTLPrimitiveType primitiveType, NSUInteger indexCount, MTLIndexType indexType, MTLBuffer indexBuffer, NSUInteger indexBufferOffset);
+    [Selector("drawPrimitives:vertexStart:vertexCount:instanceCount:baseInstance:")]
+    void DrawPrimitivesVertexStartVertexCountInstanceCountBaseInstance(MTLPrimitiveType primitiveType, NSUInteger vertexStart, NSUInteger vertexCount, NSUInteger instanceCount, NSUInteger baseInstance);
+    [Selector("drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferOffset:instanceCount:baseVertex:baseInstance:")]
+    void DrawIndexedPrimitivesIndexCountIndexTypeIndexBufferIndexBufferOffsetInstanceCountBaseVertexBaseInstance(MTLPrimitiveType primitiveType, NSUInteger indexCount, MTLIndexType indexType, MTLBuffer indexBuffer, NSUInteger indexBufferOffset, NSUInteger instanceCount, NSInteger baseVertex, NSUInteger baseInstance);
+    [Selector("drawPrimitives:indirectBuffer:indirectBufferOffset:")]
+    void DrawPrimitivesIndirectBufferIndirectBufferOffset(MTLPrimitiveType primitiveType, MTLBuffer indirectBuffer, NSUInteger indirectBufferOffset);
+    [Selector("drawIndexedPrimitives:indexType:indexBuffer:indexBufferOffset:indirectBuffer:indirectBufferOffset:")]
+    void DrawIndexedPrimitivesIndexTypeIndexBufferIndexBufferOffsetIndirectBufferIndirectBufferOffset(MTLPrimitiveType primitiveType, MTLIndexType indexType, MTLBuffer indexBuffer, NSUInteger indexBufferOffset, MTLBuffer indirectBuffer, NSUInteger indirectBufferOffset);
     /// Deprecated in macOS 10.14.
-    [Selector("textureBarrier")] void TextureBarrier();
-    [Selector("updateFence:afterStages:")] void UpdateFenceAfterStages(MTLFence fence, MTLRenderStages stages);
-    [Selector("waitForFence:beforeStages:")] void WaitForFenceBeforeStages(MTLFence fence, MTLRenderStages stages);
-    [Selector("setTessellationFactorBuffer:offset:instanceStride:")] void SetTessellationFactorBufferOffsetInstanceStride(MTLBuffer? buffer, NSUInteger offset, NSUInteger instanceStride);
-    [Selector("setTessellationFactorScale:")] void SetTessellationFactorScale(float scale);
-    [Selector("drawPatches:patchStart:patchCount:patchIndexBuffer:patchIndexBufferOffset:instanceCount:baseInstance:")] void DrawPatchesPatchStartPatchCountPatchIndexBufferPatchIndexBufferOffsetInstanceCountBaseInstance(NSUInteger numberOfPatchControlPoints, NSUInteger patchStart, NSUInteger patchCount, MTLBuffer? patchIndexBuffer, NSUInteger patchIndexBufferOffset, NSUInteger instanceCount, NSUInteger baseInstance);
-    [Selector("drawPatches:patchIndexBuffer:patchIndexBufferOffset:indirectBuffer:indirectBufferOffset:")] void DrawPatchesPatchIndexBufferPatchIndexBufferOffsetIndirectBufferIndirectBufferOffset(NSUInteger numberOfPatchControlPoints, MTLBuffer? patchIndexBuffer, NSUInteger patchIndexBufferOffset, MTLBuffer indirectBuffer, NSUInteger indirectBufferOffset);
-    [Selector("drawIndexedPatches:patchStart:patchCount:patchIndexBuffer:patchIndexBufferOffset:controlPointIndexBuffer:controlPointIndexBufferOffset:instanceCount:baseInstance:")] void DrawIndexedPatchesPatchStartPatchCountPatchIndexBufferPatchIndexBufferOffsetControlPointIndexBufferControlPointIndexBufferOffsetInstanceCountBaseInstance(NSUInteger numberOfPatchControlPoints, NSUInteger patchStart, NSUInteger patchCount, MTLBuffer? patchIndexBuffer, NSUInteger patchIndexBufferOffset, MTLBuffer controlPointIndexBuffer, NSUInteger controlPointIndexBufferOffset, NSUInteger instanceCount, NSUInteger baseInstance);
-    [Selector("drawIndexedPatches:patchIndexBuffer:patchIndexBufferOffset:controlPointIndexBuffer:controlPointIndexBufferOffset:indirectBuffer:indirectBufferOffset:")] void DrawIndexedPatchesPatchIndexBufferPatchIndexBufferOffsetControlPointIndexBufferControlPointIndexBufferOffsetIndirectBufferIndirectBufferOffset(NSUInteger numberOfPatchControlPoints, MTLBuffer? patchIndexBuffer, NSUInteger patchIndexBufferOffset, MTLBuffer controlPointIndexBuffer, NSUInteger controlPointIndexBufferOffset, MTLBuffer indirectBuffer, NSUInteger indirectBufferOffset);
-    [Selector("setTileBytes:length:atIndex:")] void SetTileBytesLengthAtIndex(void* bytes, NSUInteger length, NSUInteger index);
-    [Selector("setTileBuffer:offset:atIndex:")] void SetTileBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
-    [Selector("setTileBufferOffset:atIndex:")] void SetTileBufferOffsetAtIndex(NSUInteger offset, NSUInteger index);
-    [Selector("setTileBuffers:offsets:withRange:")] void SetTileBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
-    [Selector("setTileTexture:atIndex:")] void SetTileTextureAtIndex(MTLTexture? texture, NSUInteger index);
-    [Selector("setTileTextures:withRange:")] void SetTileTexturesWithRange(void** textures, NSRange range);
-    [Selector("setTileSamplerState:atIndex:")] void SetTileSamplerStateAtIndex(MTLSamplerState? sampler, NSUInteger index);
-    [Selector("setTileSamplerStates:withRange:")] void SetTileSamplerStatesWithRange(void** samplers, NSRange range);
-    [Selector("setTileSamplerState:lodMinClamp:lodMaxClamp:atIndex:")] void SetTileSamplerStateLodMinClampLodMaxClampAtIndex(MTLSamplerState? sampler, float lodMinClamp, float lodMaxClamp, NSUInteger index);
-    [Selector("setTileSamplerStates:lodMinClamps:lodMaxClamps:withRange:")] void SetTileSamplerStatesLodMinClampsLodMaxClampsWithRange(void** samplers, float* lodMinClamps, float* lodMaxClamps, NSRange range);
-    [Selector("setTileVisibleFunctionTable:atBufferIndex:")] void SetTileVisibleFunctionTableAtBufferIndex(MTLVisibleFunctionTable? functionTable, NSUInteger bufferIndex);
-    [Selector("setTileVisibleFunctionTables:withBufferRange:")] void SetTileVisibleFunctionTablesWithBufferRange(void** functionTables, NSRange range);
-    [Selector("setTileIntersectionFunctionTable:atBufferIndex:")] void SetTileIntersectionFunctionTableAtBufferIndex(MTLIntersectionFunctionTable? intersectionFunctionTable, NSUInteger bufferIndex);
-    [Selector("setTileIntersectionFunctionTables:withBufferRange:")] void SetTileIntersectionFunctionTablesWithBufferRange(void** intersectionFunctionTables, NSRange range);
-    [Selector("setTileAccelerationStructure:atBufferIndex:")] void SetTileAccelerationStructureAtBufferIndex(MTLAccelerationStructure? accelerationStructure, NSUInteger bufferIndex);
-    [Selector("dispatchThreadsPerTile:")] void DispatchThreadsPerTile(MTLSize threadsPerTile);
-    [Selector("setThreadgroupMemoryLength:offset:atIndex:")] void SetThreadgroupMemoryLengthOffsetAtIndex(NSUInteger length, NSUInteger offset, NSUInteger index);
+    [Selector("textureBarrier")]
+    void TextureBarrier();
+    [Selector("updateFence:afterStages:")]
+    void UpdateFenceAfterStages(MTLFence fence, MTLRenderStages stages);
+    [Selector("waitForFence:beforeStages:")]
+    void WaitForFenceBeforeStages(MTLFence fence, MTLRenderStages stages);
+    [Selector("setTessellationFactorBuffer:offset:instanceStride:")]
+    void SetTessellationFactorBufferOffsetInstanceStride(MTLBuffer? buffer, NSUInteger offset, NSUInteger instanceStride);
+    [Selector("setTessellationFactorScale:")]
+    void SetTessellationFactorScale(float scale);
+    [Selector("drawPatches:patchStart:patchCount:patchIndexBuffer:patchIndexBufferOffset:instanceCount:baseInstance:")]
+    void DrawPatchesPatchStartPatchCountPatchIndexBufferPatchIndexBufferOffsetInstanceCountBaseInstance(NSUInteger numberOfPatchControlPoints, NSUInteger patchStart, NSUInteger patchCount, MTLBuffer? patchIndexBuffer, NSUInteger patchIndexBufferOffset, NSUInteger instanceCount, NSUInteger baseInstance);
+    [Selector("drawPatches:patchIndexBuffer:patchIndexBufferOffset:indirectBuffer:indirectBufferOffset:")]
+    void DrawPatchesPatchIndexBufferPatchIndexBufferOffsetIndirectBufferIndirectBufferOffset(NSUInteger numberOfPatchControlPoints, MTLBuffer? patchIndexBuffer, NSUInteger patchIndexBufferOffset, MTLBuffer indirectBuffer, NSUInteger indirectBufferOffset);
+    [Selector("drawIndexedPatches:patchStart:patchCount:patchIndexBuffer:patchIndexBufferOffset:controlPointIndexBuffer:controlPointIndexBufferOffset:instanceCount:baseInstance:")]
+    void DrawIndexedPatchesPatchStartPatchCountPatchIndexBufferPatchIndexBufferOffsetControlPointIndexBufferControlPointIndexBufferOffsetInstanceCountBaseInstance(NSUInteger numberOfPatchControlPoints, NSUInteger patchStart, NSUInteger patchCount, MTLBuffer? patchIndexBuffer, NSUInteger patchIndexBufferOffset, MTLBuffer controlPointIndexBuffer, NSUInteger controlPointIndexBufferOffset, NSUInteger instanceCount, NSUInteger baseInstance);
+    [Selector("drawIndexedPatches:patchIndexBuffer:patchIndexBufferOffset:controlPointIndexBuffer:controlPointIndexBufferOffset:indirectBuffer:indirectBufferOffset:")]
+    void DrawIndexedPatchesPatchIndexBufferPatchIndexBufferOffsetControlPointIndexBufferControlPointIndexBufferOffsetIndirectBufferIndirectBufferOffset(NSUInteger numberOfPatchControlPoints, MTLBuffer? patchIndexBuffer, NSUInteger patchIndexBufferOffset, MTLBuffer controlPointIndexBuffer, NSUInteger controlPointIndexBufferOffset, MTLBuffer indirectBuffer, NSUInteger indirectBufferOffset);
+    [Selector("setTileBytes:length:atIndex:")]
+    void SetTileBytesLengthAtIndex(void* bytes, NSUInteger length, NSUInteger index);
+    [Selector("setTileBuffer:offset:atIndex:")]
+    void SetTileBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
+    [Selector("setTileBufferOffset:atIndex:")]
+    void SetTileBufferOffsetAtIndex(NSUInteger offset, NSUInteger index);
+    [Selector("setTileBuffers:offsets:withRange:")]
+    void SetTileBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
+    [Selector("setTileTexture:atIndex:")]
+    void SetTileTextureAtIndex(MTLTexture? texture, NSUInteger index);
+    [Selector("setTileTextures:withRange:")]
+    void SetTileTexturesWithRange(void** textures, NSRange range);
+    [Selector("setTileSamplerState:atIndex:")]
+    void SetTileSamplerStateAtIndex(MTLSamplerState? sampler, NSUInteger index);
+    [Selector("setTileSamplerStates:withRange:")]
+    void SetTileSamplerStatesWithRange(void** samplers, NSRange range);
+    [Selector("setTileSamplerState:lodMinClamp:lodMaxClamp:atIndex:")]
+    void SetTileSamplerStateLodMinClampLodMaxClampAtIndex(MTLSamplerState? sampler, float lodMinClamp, float lodMaxClamp, NSUInteger index);
+    [Selector("setTileSamplerStates:lodMinClamps:lodMaxClamps:withRange:")]
+    void SetTileSamplerStatesLodMinClampsLodMaxClampsWithRange(void** samplers, float* lodMinClamps, float* lodMaxClamps, NSRange range);
+    [Selector("setTileVisibleFunctionTable:atBufferIndex:")]
+    void SetTileVisibleFunctionTableAtBufferIndex(MTLVisibleFunctionTable? functionTable, NSUInteger bufferIndex);
+    [Selector("setTileVisibleFunctionTables:withBufferRange:")]
+    void SetTileVisibleFunctionTablesWithBufferRange(void** functionTables, NSRange range);
+    [Selector("setTileIntersectionFunctionTable:atBufferIndex:")]
+    void SetTileIntersectionFunctionTableAtBufferIndex(MTLIntersectionFunctionTable? intersectionFunctionTable, NSUInteger bufferIndex);
+    [Selector("setTileIntersectionFunctionTables:withBufferRange:")]
+    void SetTileIntersectionFunctionTablesWithBufferRange(void** intersectionFunctionTables, NSRange range);
+    [Selector("setTileAccelerationStructure:atBufferIndex:")]
+    void SetTileAccelerationStructureAtBufferIndex(MTLAccelerationStructure? accelerationStructure, NSUInteger bufferIndex);
+    [Selector("dispatchThreadsPerTile:")]
+    void DispatchThreadsPerTile(MTLSize threadsPerTile);
+    [Selector("setThreadgroupMemoryLength:offset:atIndex:")]
+    void SetThreadgroupMemoryLengthOffsetAtIndex(NSUInteger length, NSUInteger offset, NSUInteger index);
     /// Deprecated in macOS 13.0.
-    [Selector("useResource:usage:")] void UseResourceUsage(MTLResource resource, MTLResourceUsage usage);
+    [Selector("useResource:usage:")]
+    void UseResourceUsage(MTLResource resource, MTLResourceUsage usage);
     /// Deprecated in macOS 13.0.
-    [Selector("useResources:count:usage:")] void UseResourcesCountUsage(void** resources, NSUInteger count, MTLResourceUsage usage);
-    [Selector("useResource:usage:stages:")] void UseResourceUsageStages(MTLResource resource, MTLResourceUsage usage, MTLRenderStages stages);
-    [Selector("useResources:count:usage:stages:")] void UseResourcesCountUsageStages(void** resources, NSUInteger count, MTLResourceUsage usage, MTLRenderStages stages);
+    [Selector("useResources:count:usage:")]
+    void UseResourcesCountUsage(void** resources, NSUInteger count, MTLResourceUsage usage);
+    [Selector("useResource:usage:stages:")]
+    void UseResourceUsageStages(MTLResource resource, MTLResourceUsage usage, MTLRenderStages stages);
+    [Selector("useResources:count:usage:stages:")]
+    void UseResourcesCountUsageStages(void** resources, NSUInteger count, MTLResourceUsage usage, MTLRenderStages stages);
     /// Deprecated in macOS 13.0.
-    [Selector("useHeap:")] void UseHeap(MTLHeap heap);
+    [Selector("useHeap:")]
+    void UseHeap(MTLHeap heap);
     /// Deprecated in macOS 13.0.
-    [Selector("useHeaps:count:")] void UseHeapsCount(void** heaps, NSUInteger count);
-    [Selector("useHeap:stages:")] void UseHeapStages(MTLHeap heap, MTLRenderStages stages);
-    [Selector("useHeaps:count:stages:")] void UseHeapsCountStages(void** heaps, NSUInteger count, MTLRenderStages stages);
-    [Selector("executeCommandsInBuffer:withRange:")] void ExecuteCommandsInBufferWithRange(MTLIndirectCommandBuffer indirectCommandBuffer, NSRange executionRange);
-    [Selector("executeCommandsInBuffer:indirectBuffer:indirectBufferOffset:")] void ExecuteCommandsInBufferIndirectBufferIndirectBufferOffset(MTLIndirectCommandBuffer indirectCommandbuffer, MTLBuffer indirectRangeBuffer, NSUInteger indirectBufferOffset);
-    [Selector("memoryBarrierWithScope:afterStages:beforeStages:")] void MemoryBarrierWithScopeAfterStagesBeforeStages(MTLBarrierScope scope, MTLRenderStages after, MTLRenderStages before);
-    [Selector("memoryBarrierWithResources:count:afterStages:beforeStages:")] void MemoryBarrierWithResourcesCountAfterStagesBeforeStages(void** resources, NSUInteger count, MTLRenderStages after, MTLRenderStages before);
-    [Selector("sampleCountersInBuffer:atSampleIndex:withBarrier:")] void SampleCountersInBufferAtSampleIndexWithBarrier(MTLCounterSampleBuffer sampleBuffer, NSUInteger sampleIndex, bool barrier);
+    [Selector("useHeaps:count:")]
+    void UseHeapsCount(void** heaps, NSUInteger count);
+    [Selector("useHeap:stages:")]
+    void UseHeapStages(MTLHeap heap, MTLRenderStages stages);
+    [Selector("useHeaps:count:stages:")]
+    void UseHeapsCountStages(void** heaps, NSUInteger count, MTLRenderStages stages);
+    [Selector("executeCommandsInBuffer:withRange:")]
+    void ExecuteCommandsInBufferWithRange(MTLIndirectCommandBuffer indirectCommandBuffer, NSRange executionRange);
+    [Selector("executeCommandsInBuffer:indirectBuffer:indirectBufferOffset:")]
+    void ExecuteCommandsInBufferIndirectBufferIndirectBufferOffset(MTLIndirectCommandBuffer indirectCommandbuffer, MTLBuffer indirectRangeBuffer, NSUInteger indirectBufferOffset);
+    [Selector("memoryBarrierWithScope:afterStages:beforeStages:")]
+    void MemoryBarrierWithScopeAfterStagesBeforeStages(MTLBarrierScope scope, MTLRenderStages after, MTLRenderStages before);
+    [Selector("memoryBarrierWithResources:count:afterStages:beforeStages:")]
+    void MemoryBarrierWithResourcesCountAfterStagesBeforeStages(void** resources, NSUInteger count, MTLRenderStages after, MTLRenderStages before);
+    [Selector("sampleCountersInBuffer:atSampleIndex:withBarrier:")]
+    void SampleCountersInBufferAtSampleIndexWithBarrier(MTLCounterSampleBuffer sampleBuffer, NSUInteger sampleIndex, bool barrier);
     /// macOS 26.0 and later.
-    [Selector("setColorAttachmentMap:")] void SetColorAttachmentMap(MTLLogicalToPhysicalColorAttachmentMap? mapping);
+    [Selector("setColorAttachmentMap:")]
+    void SetColorAttachmentMap(MTLLogicalToPhysicalColorAttachmentMap? mapping);
 }
 
 #endif

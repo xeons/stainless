@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class VNCalculateImageAestheticsScoresRequest : VNImageBasedRequest
 {
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("results")]
+    public NSArray? Results { get; }
 }
 
 #endif

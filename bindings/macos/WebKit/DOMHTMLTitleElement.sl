@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLTitleElement : DOMHTMLElement
 {
-    [Selector("text", "setText:")] public NSString? Text { get; set; }
+    [Selector("text", "setText:")]
+    public NSString? Text { get; set; }
 }
 
 #endif

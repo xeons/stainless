@@ -32,19 +32,32 @@ import Standard.ObjC;
 
 public extern objc class NSInvocation : NSObject
 {
-    [Selector("methodSignature")] public NSMethodSignature MethodSignature { get; }
-    [Selector("argumentsRetained")] public bool ArgumentsRetained { get; }
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
-    [Selector("selector", "setSelector:")] public Selector Selector { get; set; }
-    [Selector("invocationWithMethodSignature:")] public static NSInvocation InvocationWithMethodSignature(NSMethodSignature sig);
-    [Selector("retainArguments")] public void RetainArguments();
-    [Selector("getReturnValue:")] public void GetReturnValue(void* retLoc);
-    [Selector("setReturnValue:")] public void SetReturnValue(void* retLoc);
-    [Selector("getArgument:atIndex:")] public void GetArgumentAtIndex(void* argumentLocation, NSInteger idx);
-    [Selector("setArgument:atIndex:")] public void SetArgumentAtIndex(void* argumentLocation, NSInteger idx);
-    [Selector("invoke")] public void Invoke();
-    [Selector("invokeWithTarget:")] public void InvokeWithTarget(AnyObject target);
-    [Selector("invokeUsingIMP:")] public void InvokeUsingIMP(IMP imp);
+    [Selector("methodSignature")]
+    public NSMethodSignature MethodSignature { get; }
+    [Selector("argumentsRetained")]
+    public bool ArgumentsRetained { get; }
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
+    [Selector("selector", "setSelector:")]
+    public Selector Selector { get; set; }
+    [Selector("invocationWithMethodSignature:")]
+    public static NSInvocation InvocationWithMethodSignature(NSMethodSignature sig);
+    [Selector("retainArguments")]
+    public void RetainArguments();
+    [Selector("getReturnValue:")]
+    public void GetReturnValue(void* retLoc);
+    [Selector("setReturnValue:")]
+    public void SetReturnValue(void* retLoc);
+    [Selector("getArgument:atIndex:")]
+    public void GetArgumentAtIndex(void* argumentLocation, NSInteger idx);
+    [Selector("setArgument:atIndex:")]
+    public void SetArgumentAtIndex(void* argumentLocation, NSInteger idx);
+    [Selector("invoke")]
+    public void Invoke();
+    [Selector("invokeWithTarget:")]
+    public void InvokeWithTarget(AnyObject target);
+    [Selector("invokeUsingIMP:")]
+    public void InvokeUsingIMP(IMP imp);
 }
 
 #endif

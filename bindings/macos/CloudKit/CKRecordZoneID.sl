@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class CKRecordZoneID : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("zoneName")] public NSString ZoneName { get; }
-    [Selector("ownerName")] public NSString OwnerName { get; }
-    [Selector("initWithZoneName:ownerName:")] public Self InitWithZoneNameOwnerName(NSString zoneName, NSString ownerName);
+    [Selector("zoneName")]
+    public NSString ZoneName { get; }
+    [Selector("ownerName")]
+    public NSString OwnerName { get; }
+    [Selector("initWithZoneName:ownerName:")]
+    public Self InitWithZoneNameOwnerName(NSString zoneName, NSString ownerName);
 }
 
 #endif

@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationPasswordProvider : NSObject, ASAuthorizationProvider
 {
-    [Selector("createRequest")] public ASAuthorizationPasswordRequest CreateRequest();
+    [Selector("createRequest")]
+    public ASAuthorizationPasswordRequest CreateRequest();
 }
 
 #endif

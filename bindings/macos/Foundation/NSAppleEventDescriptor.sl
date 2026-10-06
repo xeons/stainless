@@ -49,61 +49,116 @@ public enum NSAppleEventSendOptions : ulong
 
 public extern objc class NSAppleEventDescriptor : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("aeDesc")] public AEDesc* AeDesc { get; }
-    [Selector("descriptorType")] public DescType DescriptorType { get; }
-    [Selector("data")] public NSData Data { get; }
-    [Selector("booleanValue")] public Boolean BooleanValue { get; }
-    [Selector("enumCodeValue")] public OSType EnumCodeValue { get; }
-    [Selector("int32Value")] public SInt32 Int32Value { get; }
-    [Selector("doubleValue")] public double DoubleValue { get; }
-    [Selector("typeCodeValue")] public OSType TypeCodeValue { get; }
-    [Selector("stringValue")] public NSString? StringValue { get; }
-    [Selector("dateValue")] public NSDate? DateValue { get; }
-    [Selector("fileURLValue")] public NSURL? FileURLValue { get; }
-    [Selector("eventClass")] public AEEventClass EventClass { get; }
-    [Selector("eventID")] public AEEventID EventID { get; }
-    [Selector("returnID")] public AEReturnID ReturnID { get; }
-    [Selector("transactionID")] public AETransactionID TransactionID { get; }
-    [Selector("isRecordDescriptor")] public bool IsRecordDescriptor { get; }
-    [Selector("numberOfItems")] public NSInteger NumberOfItems { get; }
-    [Selector("nullDescriptor")] public static NSAppleEventDescriptor NullDescriptor();
-    [Selector("descriptorWithDescriptorType:bytes:length:")] public static NSAppleEventDescriptor? DescriptorWithDescriptorTypeBytesLength(DescType descriptorType, void* bytes, NSUInteger byteCount);
-    [Selector("descriptorWithDescriptorType:data:")] public static NSAppleEventDescriptor? DescriptorWithDescriptorTypeData(DescType descriptorType, NSData? data);
-    [Selector("descriptorWithBoolean:")] public static NSAppleEventDescriptor DescriptorWithBoolean(Boolean boolean);
-    [Selector("descriptorWithEnumCode:")] public static NSAppleEventDescriptor DescriptorWithEnumCode(OSType enumerator);
-    [Selector("descriptorWithInt32:")] public static NSAppleEventDescriptor DescriptorWithInt32(SInt32 signedInt);
-    [Selector("descriptorWithDouble:")] public static NSAppleEventDescriptor DescriptorWithDouble(double doubleValue);
-    [Selector("descriptorWithTypeCode:")] public static NSAppleEventDescriptor DescriptorWithTypeCode(OSType typeCode);
-    [Selector("descriptorWithString:")] public static NSAppleEventDescriptor DescriptorWithString(NSString string);
-    [Selector("descriptorWithDate:")] public static NSAppleEventDescriptor DescriptorWithDate(NSDate date);
-    [Selector("descriptorWithFileURL:")] public static NSAppleEventDescriptor DescriptorWithFileURL(NSURL fileURL);
-    [Selector("appleEventWithEventClass:eventID:targetDescriptor:returnID:transactionID:")] public static NSAppleEventDescriptor AppleEventWithEventClassEventIDTargetDescriptorReturnIDTransactionID(AEEventClass eventClass, AEEventID eventID, NSAppleEventDescriptor? targetDescriptor, AEReturnID returnID, AETransactionID transactionID);
-    [Selector("listDescriptor")] public static NSAppleEventDescriptor ListDescriptor();
-    [Selector("recordDescriptor")] public static NSAppleEventDescriptor RecordDescriptor();
-    [Selector("currentProcessDescriptor")] public static NSAppleEventDescriptor CurrentProcessDescriptor();
-    [Selector("descriptorWithProcessIdentifier:")] public static NSAppleEventDescriptor DescriptorWithProcessIdentifier(pid_t processIdentifier);
-    [Selector("descriptorWithBundleIdentifier:")] public static NSAppleEventDescriptor DescriptorWithBundleIdentifier(NSString bundleIdentifier);
-    [Selector("descriptorWithApplicationURL:")] public static NSAppleEventDescriptor DescriptorWithApplicationURL(NSURL applicationURL);
-    [Selector("initWithAEDescNoCopy:")] public Self InitWithAEDescNoCopy(AEDesc* aeDesc);
-    [Selector("initWithDescriptorType:bytes:length:")] public Self? InitWithDescriptorTypeBytesLength(DescType descriptorType, void* bytes, NSUInteger byteCount);
-    [Selector("initWithDescriptorType:data:")] public Self? InitWithDescriptorTypeData(DescType descriptorType, NSData? data);
-    [Selector("initWithEventClass:eventID:targetDescriptor:returnID:transactionID:")] public Self InitWithEventClassEventIDTargetDescriptorReturnIDTransactionID(AEEventClass eventClass, AEEventID eventID, NSAppleEventDescriptor? targetDescriptor, AEReturnID returnID, AETransactionID transactionID);
-    [Selector("initListDescriptor")] public Self InitListDescriptor();
-    [Selector("initRecordDescriptor")] public Self InitRecordDescriptor();
-    [Selector("setParamDescriptor:forKeyword:")] public void SetParamDescriptorForKeyword(NSAppleEventDescriptor descriptor, AEKeyword keyword);
-    [Selector("paramDescriptorForKeyword:")] public NSAppleEventDescriptor? ParamDescriptorForKeyword(AEKeyword keyword);
-    [Selector("removeParamDescriptorWithKeyword:")] public void RemoveParamDescriptorWithKeyword(AEKeyword keyword);
-    [Selector("setAttributeDescriptor:forKeyword:")] public void SetAttributeDescriptorForKeyword(NSAppleEventDescriptor descriptor, AEKeyword keyword);
-    [Selector("attributeDescriptorForKeyword:")] public NSAppleEventDescriptor? AttributeDescriptorForKeyword(AEKeyword keyword);
-    [Selector("sendEventWithOptions:timeout:error:")] public NSAppleEventDescriptor? SendEventWithOptionsTimeoutError(NSAppleEventSendOptions sendOptions, NSTimeInterval timeoutInSeconds, out NSError? error);
-    [Selector("insertDescriptor:atIndex:")] public void InsertDescriptorAtIndex(NSAppleEventDescriptor descriptor, NSInteger index);
-    [Selector("descriptorAtIndex:")] public NSAppleEventDescriptor? DescriptorAtIndex(NSInteger index);
-    [Selector("removeDescriptorAtIndex:")] public void RemoveDescriptorAtIndex(NSInteger index);
-    [Selector("setDescriptor:forKeyword:")] public void SetDescriptorForKeyword(NSAppleEventDescriptor descriptor, AEKeyword keyword);
-    [Selector("descriptorForKeyword:")] public NSAppleEventDescriptor? DescriptorForKeyword(AEKeyword keyword);
-    [Selector("removeDescriptorWithKeyword:")] public void RemoveDescriptorWithKeyword(AEKeyword keyword);
-    [Selector("keywordForDescriptorAtIndex:")] public AEKeyword KeywordForDescriptorAtIndex(NSInteger index);
-    [Selector("coerceToDescriptorType:")] public NSAppleEventDescriptor? CoerceToDescriptorType(DescType descriptorType);
+    [Selector("aeDesc")]
+    public AEDesc* AeDesc { get; }
+    [Selector("descriptorType")]
+    public DescType DescriptorType { get; }
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("booleanValue")]
+    public Boolean BooleanValue { get; }
+    [Selector("enumCodeValue")]
+    public OSType EnumCodeValue { get; }
+    [Selector("int32Value")]
+    public SInt32 Int32Value { get; }
+    [Selector("doubleValue")]
+    public double DoubleValue { get; }
+    [Selector("typeCodeValue")]
+    public OSType TypeCodeValue { get; }
+    [Selector("stringValue")]
+    public NSString? StringValue { get; }
+    [Selector("dateValue")]
+    public NSDate? DateValue { get; }
+    [Selector("fileURLValue")]
+    public NSURL? FileURLValue { get; }
+    [Selector("eventClass")]
+    public AEEventClass EventClass { get; }
+    [Selector("eventID")]
+    public AEEventID EventID { get; }
+    [Selector("returnID")]
+    public AEReturnID ReturnID { get; }
+    [Selector("transactionID")]
+    public AETransactionID TransactionID { get; }
+    [Selector("isRecordDescriptor")]
+    public bool IsRecordDescriptor { get; }
+    [Selector("numberOfItems")]
+    public NSInteger NumberOfItems { get; }
+    [Selector("nullDescriptor")]
+    public static NSAppleEventDescriptor NullDescriptor();
+    [Selector("descriptorWithDescriptorType:bytes:length:")]
+    public static NSAppleEventDescriptor? DescriptorWithDescriptorTypeBytesLength(DescType descriptorType, void* bytes, NSUInteger byteCount);
+    [Selector("descriptorWithDescriptorType:data:")]
+    public static NSAppleEventDescriptor? DescriptorWithDescriptorTypeData(DescType descriptorType, NSData? data);
+    [Selector("descriptorWithBoolean:")]
+    public static NSAppleEventDescriptor DescriptorWithBoolean(Boolean boolean);
+    [Selector("descriptorWithEnumCode:")]
+    public static NSAppleEventDescriptor DescriptorWithEnumCode(OSType enumerator);
+    [Selector("descriptorWithInt32:")]
+    public static NSAppleEventDescriptor DescriptorWithInt32(SInt32 signedInt);
+    [Selector("descriptorWithDouble:")]
+    public static NSAppleEventDescriptor DescriptorWithDouble(double doubleValue);
+    [Selector("descriptorWithTypeCode:")]
+    public static NSAppleEventDescriptor DescriptorWithTypeCode(OSType typeCode);
+    [Selector("descriptorWithString:")]
+    public static NSAppleEventDescriptor DescriptorWithString(NSString string);
+    [Selector("descriptorWithDate:")]
+    public static NSAppleEventDescriptor DescriptorWithDate(NSDate date);
+    [Selector("descriptorWithFileURL:")]
+    public static NSAppleEventDescriptor DescriptorWithFileURL(NSURL fileURL);
+    [Selector("appleEventWithEventClass:eventID:targetDescriptor:returnID:transactionID:")]
+    public static NSAppleEventDescriptor AppleEventWithEventClassEventIDTargetDescriptorReturnIDTransactionID(AEEventClass eventClass, AEEventID eventID, NSAppleEventDescriptor? targetDescriptor, AEReturnID returnID, AETransactionID transactionID);
+    [Selector("listDescriptor")]
+    public static NSAppleEventDescriptor ListDescriptor();
+    [Selector("recordDescriptor")]
+    public static NSAppleEventDescriptor RecordDescriptor();
+    [Selector("currentProcessDescriptor")]
+    public static NSAppleEventDescriptor CurrentProcessDescriptor();
+    [Selector("descriptorWithProcessIdentifier:")]
+    public static NSAppleEventDescriptor DescriptorWithProcessIdentifier(pid_t processIdentifier);
+    [Selector("descriptorWithBundleIdentifier:")]
+    public static NSAppleEventDescriptor DescriptorWithBundleIdentifier(NSString bundleIdentifier);
+    [Selector("descriptorWithApplicationURL:")]
+    public static NSAppleEventDescriptor DescriptorWithApplicationURL(NSURL applicationURL);
+    [Selector("initWithAEDescNoCopy:")]
+    public Self InitWithAEDescNoCopy(AEDesc* aeDesc);
+    [Selector("initWithDescriptorType:bytes:length:")]
+    public Self? InitWithDescriptorTypeBytesLength(DescType descriptorType, void* bytes, NSUInteger byteCount);
+    [Selector("initWithDescriptorType:data:")]
+    public Self? InitWithDescriptorTypeData(DescType descriptorType, NSData? data);
+    [Selector("initWithEventClass:eventID:targetDescriptor:returnID:transactionID:")]
+    public Self InitWithEventClassEventIDTargetDescriptorReturnIDTransactionID(AEEventClass eventClass, AEEventID eventID, NSAppleEventDescriptor? targetDescriptor, AEReturnID returnID, AETransactionID transactionID);
+    [Selector("initListDescriptor")]
+    public Self InitListDescriptor();
+    [Selector("initRecordDescriptor")]
+    public Self InitRecordDescriptor();
+    [Selector("setParamDescriptor:forKeyword:")]
+    public void SetParamDescriptorForKeyword(NSAppleEventDescriptor descriptor, AEKeyword keyword);
+    [Selector("paramDescriptorForKeyword:")]
+    public NSAppleEventDescriptor? ParamDescriptorForKeyword(AEKeyword keyword);
+    [Selector("removeParamDescriptorWithKeyword:")]
+    public void RemoveParamDescriptorWithKeyword(AEKeyword keyword);
+    [Selector("setAttributeDescriptor:forKeyword:")]
+    public void SetAttributeDescriptorForKeyword(NSAppleEventDescriptor descriptor, AEKeyword keyword);
+    [Selector("attributeDescriptorForKeyword:")]
+    public NSAppleEventDescriptor? AttributeDescriptorForKeyword(AEKeyword keyword);
+    [Selector("sendEventWithOptions:timeout:error:")]
+    public NSAppleEventDescriptor? SendEventWithOptionsTimeoutError(NSAppleEventSendOptions sendOptions, NSTimeInterval timeoutInSeconds, out NSError? error);
+    [Selector("insertDescriptor:atIndex:")]
+    public void InsertDescriptorAtIndex(NSAppleEventDescriptor descriptor, NSInteger index);
+    [Selector("descriptorAtIndex:")]
+    public NSAppleEventDescriptor? DescriptorAtIndex(NSInteger index);
+    [Selector("removeDescriptorAtIndex:")]
+    public void RemoveDescriptorAtIndex(NSInteger index);
+    [Selector("setDescriptor:forKeyword:")]
+    public void SetDescriptorForKeyword(NSAppleEventDescriptor descriptor, AEKeyword keyword);
+    [Selector("descriptorForKeyword:")]
+    public NSAppleEventDescriptor? DescriptorForKeyword(AEKeyword keyword);
+    [Selector("removeDescriptorWithKeyword:")]
+    public void RemoveDescriptorWithKeyword(AEKeyword keyword);
+    [Selector("keywordForDescriptorAtIndex:")]
+    public AEKeyword KeywordForDescriptorAtIndex(NSInteger index);
+    [Selector("coerceToDescriptorType:")]
+    public NSAppleEventDescriptor? CoerceToDescriptorType(DescType descriptorType);
 }
 
 #endif

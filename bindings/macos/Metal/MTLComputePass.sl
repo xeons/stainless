@@ -33,22 +33,30 @@ import Standard.ObjC;
 
 public extern objc class MTLComputePassSampleBufferAttachmentDescriptor : NSObject, NSCopying
 {
-    [Selector("sampleBuffer", "setSampleBuffer:")] public MTLCounterSampleBuffer? SampleBuffer { get; set; }
-    [Selector("startOfEncoderSampleIndex", "setStartOfEncoderSampleIndex:")] public NSUInteger StartOfEncoderSampleIndex { get; set; }
-    [Selector("endOfEncoderSampleIndex", "setEndOfEncoderSampleIndex:")] public NSUInteger EndOfEncoderSampleIndex { get; set; }
+    [Selector("sampleBuffer", "setSampleBuffer:")]
+    public MTLCounterSampleBuffer? SampleBuffer { get; set; }
+    [Selector("startOfEncoderSampleIndex", "setStartOfEncoderSampleIndex:")]
+    public NSUInteger StartOfEncoderSampleIndex { get; set; }
+    [Selector("endOfEncoderSampleIndex", "setEndOfEncoderSampleIndex:")]
+    public NSUInteger EndOfEncoderSampleIndex { get; set; }
 }
 
 public extern objc class MTLComputePassSampleBufferAttachmentDescriptorArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public MTLComputePassSampleBufferAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTLComputePassSampleBufferAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
+    [Selector("objectAtIndexedSubscript:")]
+    public MTLComputePassSampleBufferAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTLComputePassSampleBufferAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
 }
 
 public extern objc class MTLComputePassDescriptor : NSObject, NSCopying
 {
-    [Selector("dispatchType", "setDispatchType:")] public MTLDispatchType DispatchType { get; set; }
-    [Selector("sampleBufferAttachments")] public MTLComputePassSampleBufferAttachmentDescriptorArray SampleBufferAttachments { get; }
-    [Selector("computePassDescriptor")] public static MTLComputePassDescriptor ComputePassDescriptor();
+    [Selector("dispatchType", "setDispatchType:")]
+    public MTLDispatchType DispatchType { get; set; }
+    [Selector("sampleBufferAttachments")]
+    public MTLComputePassSampleBufferAttachmentDescriptorArray SampleBufferAttachments { get; }
+    [Selector("computePassDescriptor")]
+    public static MTLComputePassDescriptor ComputePassDescriptor();
 }
 
 #endif

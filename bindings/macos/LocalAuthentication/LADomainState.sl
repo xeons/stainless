@@ -33,22 +33,30 @@ import Standard.ObjC;
 
 public extern objc class LADomainStateBiometry : NSObject
 {
-    [Selector("biometryType")] public LABiometryType BiometryType { get; }
-    [Selector("stateHash")] public NSData? StateHash { get; }
+    [Selector("biometryType")]
+    public LABiometryType BiometryType { get; }
+    [Selector("stateHash")]
+    public NSData? StateHash { get; }
 }
 
 public extern objc class LADomainStateCompanion : NSObject
 {
-    [Selector("availableCompanionTypes")] public NSSet? AvailableCompanionTypes { get; }
-    [Selector("stateHash")] public NSData? StateHash { get; }
-    [Selector("stateHashForCompanionType:")] public NSData? StateHashForCompanionType(LACompanionType companionType);
+    [Selector("availableCompanionTypes")]
+    public NSSet? AvailableCompanionTypes { get; }
+    [Selector("stateHash")]
+    public NSData? StateHash { get; }
+    [Selector("stateHashForCompanionType:")]
+    public NSData? StateHashForCompanionType(LACompanionType companionType);
 }
 
 public extern objc class LADomainState : NSObject
 {
-    [Selector("biometry")] public LADomainStateBiometry Biometry { get; }
-    [Selector("companion")] public LADomainStateCompanion Companion { get; }
-    [Selector("stateHash")] public NSData? StateHash { get; }
+    [Selector("biometry")]
+    public LADomainStateBiometry Biometry { get; }
+    [Selector("companion")]
+    public LADomainStateCompanion Companion { get; }
+    [Selector("stateHash")]
+    public NSData? StateHash { get; }
 }
 
 #endif

@@ -43,34 +43,56 @@ public extern "C" SCNViewOption SCNPreferLowPowerDeviceKey;
 
 public objc interface SCNCameraControlConfiguration : NSObjectProtocol
 {
-    [Selector("autoSwitchToFreeCamera", "setAutoSwitchToFreeCamera:")] bool AutoSwitchToFreeCamera { get; set; }
-    [Selector("allowsTranslation", "setAllowsTranslation:")] bool AllowsTranslation { get; set; }
-    [Selector("flyModeVelocity", "setFlyModeVelocity:")] CGFloat FlyModeVelocity { get; set; }
-    [Selector("panSensitivity", "setPanSensitivity:")] CGFloat PanSensitivity { get; set; }
-    [Selector("truckSensitivity", "setTruckSensitivity:")] CGFloat TruckSensitivity { get; set; }
-    [Selector("rotationSensitivity", "setRotationSensitivity:")] CGFloat RotationSensitivity { get; set; }
+    [Selector("autoSwitchToFreeCamera", "setAutoSwitchToFreeCamera:")]
+    bool AutoSwitchToFreeCamera { get; set; }
+    [Selector("allowsTranslation", "setAllowsTranslation:")]
+    bool AllowsTranslation { get; set; }
+    [Selector("flyModeVelocity", "setFlyModeVelocity:")]
+    CGFloat FlyModeVelocity { get; set; }
+    [Selector("panSensitivity", "setPanSensitivity:")]
+    CGFloat PanSensitivity { get; set; }
+    [Selector("truckSensitivity", "setTruckSensitivity:")]
+    CGFloat TruckSensitivity { get; set; }
+    [Selector("rotationSensitivity", "setRotationSensitivity:")]
+    CGFloat RotationSensitivity { get; set; }
 }
 
 public extern objc class SCNView : NSView, SCNSceneRenderer, SCNTechniqueSupport
 {
-    [Selector("scene", "setScene:")] public SCNScene? Scene { get; set; }
-    [Selector("rendersContinuously", "setRendersContinuously:")] public bool RendersContinuously { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor BackgroundColor { get; set; }
-    [Selector("allowsCameraControl", "setAllowsCameraControl:")] public bool AllowsCameraControl { get; set; }
-    [Selector("cameraControlConfiguration")] public SCNCameraControlConfiguration CameraControlConfiguration { get; }
-    [Selector("defaultCameraController")] public SCNCameraController DefaultCameraController { get; }
-    [Selector("preferredFramesPerSecond", "setPreferredFramesPerSecond:")] public NSInteger PreferredFramesPerSecond { get; set; }
-    [Selector("drawableResizesAsynchronously", "setDrawableResizesAsynchronously:")] public bool DrawableResizesAsynchronously { get; set; }
+    [Selector("scene", "setScene:")]
+    public SCNScene? Scene { get; set; }
+    [Selector("rendersContinuously", "setRendersContinuously:")]
+    public bool RendersContinuously { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor BackgroundColor { get; set; }
+    [Selector("allowsCameraControl", "setAllowsCameraControl:")]
+    public bool AllowsCameraControl { get; set; }
+    [Selector("cameraControlConfiguration")]
+    public SCNCameraControlConfiguration CameraControlConfiguration { get; }
+    [Selector("defaultCameraController")]
+    public SCNCameraController DefaultCameraController { get; }
+    [Selector("preferredFramesPerSecond", "setPreferredFramesPerSecond:")]
+    public NSInteger PreferredFramesPerSecond { get; set; }
+    [Selector("drawableResizesAsynchronously", "setDrawableResizesAsynchronously:")]
+    public bool DrawableResizesAsynchronously { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("openGLContext", "setOpenGLContext:")] public NSOpenGLContext? OpenGLContext { get; set; }
-    [Selector("antialiasingMode", "setAntialiasingMode:")] public SCNAntialiasingMode AntialiasingMode { get; set; }
+    [Selector("openGLContext", "setOpenGLContext:")]
+    public NSOpenGLContext? OpenGLContext { get; set; }
+    [Selector("antialiasingMode", "setAntialiasingMode:")]
+    public SCNAntialiasingMode AntialiasingMode { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("pixelFormat", "setPixelFormat:")] public NSOpenGLPixelFormat? PixelFormat { get; set; }
-    [Selector("initWithFrame:options:")] public Self InitWithFrameOptions(NSRect frame, NSDictionary? options);
-    [Selector("snapshot")] public NSImage Snapshot();
-    [Selector("play:")] public void Play(AnyObject? sender);
-    [Selector("pause:")] public void Pause(AnyObject? sender);
-    [Selector("stop:")] public void Stop(AnyObject? sender);
+    [Selector("pixelFormat", "setPixelFormat:")]
+    public NSOpenGLPixelFormat? PixelFormat { get; set; }
+    [Selector("initWithFrame:options:")]
+    public Self InitWithFrameOptions(NSRect frame, NSDictionary? options);
+    [Selector("snapshot")]
+    public NSImage Snapshot();
+    [Selector("play:")]
+    public void Play(AnyObject? sender);
+    [Selector("pause:")]
+    public void Pause(AnyObject? sender);
+    [Selector("stop:")]
+    public void Stop(AnyObject? sender);
 }
 
 #endif

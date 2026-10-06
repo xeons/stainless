@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class NSAtomicStoreCacheNode : NSObject
 {
-    [Selector("objectID")] public NSManagedObjectID ObjectID { get; }
-    [Selector("propertyCache", "setPropertyCache:")] public NSMutableDictionary? PropertyCache { get; set; }
-    [Selector("initWithObjectID:")] public Self InitWithObjectID(NSManagedObjectID moid);
-    [Selector("valueForKey:")] public AnyObject? ValueForKey(NSString key);
-    [Selector("setValue:forKey:")] public void SetValueForKey(AnyObject? value, NSString key);
+    [Selector("objectID")]
+    public NSManagedObjectID ObjectID { get; }
+    [Selector("propertyCache", "setPropertyCache:")]
+    public NSMutableDictionary? PropertyCache { get; set; }
+    [Selector("initWithObjectID:")]
+    public Self InitWithObjectID(NSManagedObjectID moid);
+    [Selector("valueForKey:")]
+    public AnyObject? ValueForKey(NSString key);
+    [Selector("setValue:forKey:")]
+    public void SetValueForKey(AnyObject? value, NSString key);
 }
 
 #endif

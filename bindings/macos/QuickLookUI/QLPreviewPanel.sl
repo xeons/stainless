@@ -34,41 +34,66 @@ import Standard.ObjC;
 
 public extern objc class QLPreviewPanel : NSPanel
 {
-    [Selector("currentController")] public AnyObject? CurrentController { get; }
-    [Selector("dataSource", "setDataSource:")] public QLPreviewPanelDataSource? DataSource { get; set; }
-    [Selector("currentPreviewItemIndex", "setCurrentPreviewItemIndex:")] public NSInteger CurrentPreviewItemIndex { get; set; }
-    [Selector("currentPreviewItem")] public QLPreviewItem? CurrentPreviewItem { get; }
-    [Selector("displayState", "setDisplayState:")] public AnyObject? DisplayState { get; set; }
-    [Selector("delegate", "setDelegate:")] public AnyObject? Delegate { get; set; }
-    [Selector("isInFullScreenMode")] public bool InFullScreenMode { get; }
-    [Selector("sharedPreviewPanel")] public static QLPreviewPanel? SharedPreviewPanel();
-    [Selector("sharedPreviewPanelExists")] public static bool SharedPreviewPanelExists();
-    [Selector("updateController")] public void UpdateController();
-    [Selector("reloadData")] public void ReloadData();
-    [Selector("refreshCurrentPreviewItem")] public void RefreshCurrentPreviewItem();
-    [Selector("enterFullScreenMode:withOptions:")] public bool EnterFullScreenModeWithOptions(NSScreen? screen, NSDictionary? options);
-    [Selector("exitFullScreenModeWithOptions:")] public void ExitFullScreenModeWithOptions(NSDictionary? options);
+    [Selector("currentController")]
+    public AnyObject? CurrentController { get; }
+    [Selector("dataSource", "setDataSource:")]
+    public QLPreviewPanelDataSource? DataSource { get; set; }
+    [Selector("currentPreviewItemIndex", "setCurrentPreviewItemIndex:")]
+    public NSInteger CurrentPreviewItemIndex { get; set; }
+    [Selector("currentPreviewItem")]
+    public QLPreviewItem? CurrentPreviewItem { get; }
+    [Selector("displayState", "setDisplayState:")]
+    public AnyObject? DisplayState { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public AnyObject? Delegate { get; set; }
+    [Selector("isInFullScreenMode")]
+    public bool InFullScreenMode { get; }
+    [Selector("sharedPreviewPanel")]
+    public static QLPreviewPanel? SharedPreviewPanel();
+    [Selector("sharedPreviewPanelExists")]
+    public static bool SharedPreviewPanelExists();
+    [Selector("updateController")]
+    public void UpdateController();
+    [Selector("reloadData")]
+    public void ReloadData();
+    [Selector("refreshCurrentPreviewItem")]
+    public void RefreshCurrentPreviewItem();
+    [Selector("enterFullScreenMode:withOptions:")]
+    public bool EnterFullScreenModeWithOptions(NSScreen? screen, NSDictionary? options);
+    [Selector("exitFullScreenModeWithOptions:")]
+    public void ExitFullScreenModeWithOptions(NSDictionary? options);
 }
 
 /// QLPreviewPanelController, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("acceptsPreviewPanelControl:")] public bool AcceptsPreviewPanelControl(QLPreviewPanel? panel);
-    [Selector("beginPreviewPanelControl:")] public void BeginPreviewPanelControl(QLPreviewPanel? panel);
-    [Selector("endPreviewPanelControl:")] public void EndPreviewPanelControl(QLPreviewPanel? panel);
+    [Selector("acceptsPreviewPanelControl:")]
+    public bool AcceptsPreviewPanelControl(QLPreviewPanel? panel);
+    [Selector("beginPreviewPanelControl:")]
+    public void BeginPreviewPanelControl(QLPreviewPanel? panel);
+    [Selector("endPreviewPanelControl:")]
+    public void EndPreviewPanelControl(QLPreviewPanel? panel);
 }
 
 public objc interface QLPreviewPanelDataSource
 {
-    [Selector("numberOfPreviewItemsInPreviewPanel:")] NSInteger NumberOfPreviewItemsInPreviewPanel(QLPreviewPanel? panel);
-    [Selector("previewPanel:previewItemAtIndex:")] QLPreviewItem? PreviewPanelPreviewItemAtIndex(QLPreviewPanel? panel, NSInteger index);
+    [Selector("numberOfPreviewItemsInPreviewPanel:")]
+    NSInteger NumberOfPreviewItemsInPreviewPanel(QLPreviewPanel? panel);
+    [Selector("previewPanel:previewItemAtIndex:")]
+    QLPreviewItem? PreviewPanelPreviewItemAtIndex(QLPreviewPanel? panel, NSInteger index);
 }
 
 public objc interface QLPreviewPanelDelegate : NSWindowDelegate
 {
-    [Optional] [Selector("previewPanel:handleEvent:")] bool PreviewPanelHandleEvent(QLPreviewPanel? panel, NSEvent? event);
-    [Optional] [Selector("previewPanel:sourceFrameOnScreenForPreviewItem:")] NSRect PreviewPanelSourceFrameOnScreenForPreviewItem(QLPreviewPanel? panel, QLPreviewItem? item);
-    [Optional] [Selector("previewPanel:transitionImageForPreviewItem:contentRect:")] AnyObject? PreviewPanelTransitionImageForPreviewItemContentRect(QLPreviewPanel? panel, QLPreviewItem? item, NSRect* contentRect);
+    [Optional]
+    [Selector("previewPanel:handleEvent:")]
+    bool PreviewPanelHandleEvent(QLPreviewPanel? panel, NSEvent? event);
+    [Optional]
+    [Selector("previewPanel:sourceFrameOnScreenForPreviewItem:")]
+    NSRect PreviewPanelSourceFrameOnScreenForPreviewItem(QLPreviewPanel? panel, QLPreviewItem? item);
+    [Optional]
+    [Selector("previewPanel:transitionImageForPreviewItem:contentRect:")]
+    AnyObject? PreviewPanelTransitionImageForPreviewItemContentRect(QLPreviewPanel? panel, QLPreviewItem? item, NSRect* contentRect);
 }
 
 #endif

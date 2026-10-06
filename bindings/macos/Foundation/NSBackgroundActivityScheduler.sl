@@ -42,15 +42,24 @@ public objc closure void NSBackgroundActivitySchedulerScheduleWithBlockBlock(NSB
 
 public extern objc class NSBackgroundActivityScheduler : NSObject
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("qualityOfService", "setQualityOfService:")] public NSQualityOfService QualityOfService { get; set; }
-    [Selector("repeats", "setRepeats:")] public bool Repeats { get; set; }
-    [Selector("interval", "setInterval:")] public NSTimeInterval Interval { get; set; }
-    [Selector("tolerance", "setTolerance:")] public NSTimeInterval Tolerance { get; set; }
-    [Selector("shouldDefer")] public bool ShouldDefer { get; }
-    [Selector("initWithIdentifier:")] public Self InitWithIdentifier(NSString identifier);
-    [Selector("scheduleWithBlock:")] public void ScheduleWithBlock(NSBackgroundActivitySchedulerScheduleWithBlockBlock block);
-    [Selector("invalidate")] public void Invalidate();
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("qualityOfService", "setQualityOfService:")]
+    public NSQualityOfService QualityOfService { get; set; }
+    [Selector("repeats", "setRepeats:")]
+    public bool Repeats { get; set; }
+    [Selector("interval", "setInterval:")]
+    public NSTimeInterval Interval { get; set; }
+    [Selector("tolerance", "setTolerance:")]
+    public NSTimeInterval Tolerance { get; set; }
+    [Selector("shouldDefer")]
+    public bool ShouldDefer { get; }
+    [Selector("initWithIdentifier:")]
+    public Self InitWithIdentifier(NSString identifier);
+    [Selector("scheduleWithBlock:")]
+    public void ScheduleWithBlock(NSBackgroundActivitySchedulerScheduleWithBlockBlock block);
+    [Selector("invalidate")]
+    public void Invalidate();
 }
 
 #endif

@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class PHAdjustmentData : NSObject
 {
-    [Selector("formatIdentifier")] public NSString FormatIdentifier { get; }
-    [Selector("formatVersion")] public NSString FormatVersion { get; }
-    [Selector("data")] public NSData Data { get; }
-    [Selector("initWithFormatIdentifier:formatVersion:data:")] public Self InitWithFormatIdentifierFormatVersionData(NSString formatIdentifier, NSString formatVersion, NSData data);
+    [Selector("formatIdentifier")]
+    public NSString FormatIdentifier { get; }
+    [Selector("formatVersion")]
+    public NSString FormatVersion { get; }
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("initWithFormatIdentifier:formatVersion:data:")]
+    public Self InitWithFormatIdentifierFormatVersionData(NSString formatIdentifier, NSString formatVersion, NSData data);
 }
 
 #endif

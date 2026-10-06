@@ -34,10 +34,14 @@ import Standard.ObjC;
 /// macOS 15.4 and later.
 public extern objc class MTREndpointInfo : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("endpointID")] public NSNumber EndpointID { get; }
-    [Selector("deviceTypes")] public NSArray DeviceTypes { get; }
-    [Selector("partsList")] public NSArray PartsList { get; }
-    [Selector("children")] public NSArray Children { get; }
+    [Selector("endpointID")]
+    public NSNumber EndpointID { get; }
+    [Selector("deviceTypes")]
+    public NSArray DeviceTypes { get; }
+    [Selector("partsList")]
+    public NSArray PartsList { get; }
+    [Selector("children")]
+    public NSArray Children { get; }
 }
 
 #endif

@@ -41,13 +41,19 @@ public enum MKPinAnnotationColor : ulong
 /// Deprecated in macOS 13.0.
 public extern objc class MKPinAnnotationView : MKAnnotationView
 {
-    [Selector("pinTintColor", "setPinTintColor:")] public NSColor? PinTintColor { get; set; }
-    [Selector("animatesDrop", "setAnimatesDrop:")] public bool AnimatesDrop { get; set; }
+    [Selector("pinTintColor", "setPinTintColor:")]
+    public NSColor? PinTintColor { get; set; }
+    [Selector("animatesDrop", "setAnimatesDrop:")]
+    public bool AnimatesDrop { get; set; }
     /// Deprecated in macOS 10.11.
-    [Selector("pinColor", "setPinColor:")] public MKPinAnnotationColor PinColor { get; set; }
-    [Selector("redPinColor")] public static NSColor RedPinColor();
-    [Selector("greenPinColor")] public static NSColor GreenPinColor();
-    [Selector("purplePinColor")] public static NSColor PurplePinColor();
+    [Selector("pinColor", "setPinColor:")]
+    public MKPinAnnotationColor PinColor { get; set; }
+    [Selector("redPinColor")]
+    public static NSColor RedPinColor();
+    [Selector("greenPinColor")]
+    public static NSColor GreenPinColor();
+    [Selector("purplePinColor")]
+    public static NSColor PurplePinColor();
 }
 
 #endif

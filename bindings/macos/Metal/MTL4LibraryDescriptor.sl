@@ -34,9 +34,12 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTL4LibraryDescriptor : NSObject, NSCopying
 {
-    [Selector("source", "setSource:")] public NSString? Source { get; set; }
-    [Selector("options", "setOptions:")] public MTLCompileOptions? Options { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
+    [Selector("source", "setSource:")]
+    public NSString? Source { get; set; }
+    [Selector("options", "setOptions:")]
+    public MTLCompileOptions? Options { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
 }
 
 #endif

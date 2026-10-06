@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// Network, a category of NSURLSessionConfiguration.
 public extern objc class NSURLSessionConfiguration
 {
-    [Selector("proxyConfigurations", "setProxyConfigurations:")] public NSArray? ProxyConfigurations { get; set; }
+    [Selector("proxyConfigurations", "setProxyConfigurations:")]
+    public NSArray? ProxyConfigurations { get; set; }
 }
 
 #endif

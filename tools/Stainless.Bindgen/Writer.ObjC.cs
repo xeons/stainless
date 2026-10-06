@@ -456,12 +456,13 @@ public sealed partial class Writer
 
         string selector = string.Join(", ", selectors.Select(s => $"\"{s}\""));
         string accessors = property.IsReadOnly ? "{ get; }" : "{ get; set; }";
-        string optional = property.IsOptional ? "[Optional] " : "";
+        string optional = property.IsOptional ? "    [Optional]\n" : "";
         string visibility = isProtocol ? "" : "public ";
         // A protocol's class member is one each adopting class answers.
         string isStatic = !property.IsClass ? "" : isProtocol ? "static abstract " : "static ";
         return Indented(Documentation(property.Availability)) +
-               $"    {optional}[Selector({selector})] {visibility}{isStatic}{type} {Identifier(name)} {accessors}\n";
+               $"{optional}    [Selector({selector})]\n" +
+               $"    {visibility}{isStatic}{type} {Identifier(name)} {accessors}\n";
     }
 
     private string? WriteMethod(string owner, CObjCContainer container, CObjCMethod method, bool isProtocol, Context context)
@@ -509,20 +510,20 @@ public sealed partial class Writer
         bool byFamily = ReturnsRetainedByFamily(method.Selector, method.IsInstance, returnsObject);
         string ownership = (method.ReturnsRetained, returnsObject) switch
         {
-            (true, true) when !byFamily => "[ReturnsRetained] ",
-            (false, true) when byFamily => "[ReturnsNotRetained] ",
+            (true, true) when !byFamily => "    [ReturnsRetained]\n",
+            (false, true) when byFamily => "    [ReturnsNotRetained]\n",
             _ => "",
         };
 
         if (!isProtocol)
             context.Runtime.Add(new RuntimeCheck(owner, method.Selector, method.IsInstance, Later(method.Availability) ?? context.Introduced));
 
-        string optional = method.IsOptional ? "[Optional] " : "";
+        string optional = method.IsOptional ? "    [Optional]\n" : "";
         string visibility = isProtocol ? "" : "public ";
         string isStatic = method.IsInstance ? "" : isProtocol ? "static abstract " : "static ";
         return Indented(Documentation(method.Availability)) +
-               $"    {optional}{ownership}[Selector(\"{method.Selector}\")] {visibility}{isStatic}{result} " +
-               $"{Identifier(claimed)}({string.Join(", ", parameters)});\n";
+               $"{optional}{ownership}    [Selector(\"{method.Selector}\")]\n" +
+               $"    {visibility}{isStatic}{result} {Identifier(claimed)}({string.Join(", ", parameters)});\n";
     }
 
     /// <summary>A type where a value is: an object with its <c>?</c>, anything else as it is.</summary>

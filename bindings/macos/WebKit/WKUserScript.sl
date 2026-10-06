@@ -39,11 +39,16 @@ public enum WKUserScriptInjectionTime : long
 
 public extern objc class WKUserScript : NSObject, NSCopying
 {
-    [Selector("source")] public NSString Source { get; }
-    [Selector("injectionTime")] public WKUserScriptInjectionTime InjectionTime { get; }
-    [Selector("isForMainFrameOnly")] public bool ForMainFrameOnly { get; }
-    [Selector("initWithSource:injectionTime:forMainFrameOnly:")] public Self InitWithSourceInjectionTimeForMainFrameOnly(NSString source, WKUserScriptInjectionTime injectionTime, bool forMainFrameOnly);
-    [Selector("initWithSource:injectionTime:forMainFrameOnly:inContentWorld:")] public Self InitWithSourceInjectionTimeForMainFrameOnlyInContentWorld(NSString source, WKUserScriptInjectionTime injectionTime, bool forMainFrameOnly, WKContentWorld contentWorld);
+    [Selector("source")]
+    public NSString Source { get; }
+    [Selector("injectionTime")]
+    public WKUserScriptInjectionTime InjectionTime { get; }
+    [Selector("isForMainFrameOnly")]
+    public bool ForMainFrameOnly { get; }
+    [Selector("initWithSource:injectionTime:forMainFrameOnly:")]
+    public Self InitWithSourceInjectionTimeForMainFrameOnly(NSString source, WKUserScriptInjectionTime injectionTime, bool forMainFrameOnly);
+    [Selector("initWithSource:injectionTime:forMainFrameOnly:inContentWorld:")]
+    public Self InitWithSourceInjectionTimeForMainFrameOnlyInContentWorld(NSString source, WKUserScriptInjectionTime injectionTime, bool forMainFrameOnly, WKContentWorld contentWorld);
 }
 
 #endif

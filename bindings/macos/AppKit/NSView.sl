@@ -87,245 +87,439 @@ public delegate NSComparisonResult NSViewSortSubviewsUsingFunctionContextCompare
 
 public extern objc class NSView : NSResponder, NSAnimatablePropertyContainer, NSUserInterfaceItemIdentification, NSDraggingDestination, NSAppearanceCustomization, NSAccessibilityElementProtocol, NSAccessibility
 {
-    [Selector("window")] public NSWindow? Window { get; }
-    [Selector("superview")] public NSView? Superview { get; }
-    [Selector("subviews", "setSubviews:")] public NSArray Subviews { get; set; }
-    [Selector("opaqueAncestor")] public NSView? OpaqueAncestor { get; }
-    [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
-    [Selector("isHiddenOrHasHiddenAncestor")] public bool HiddenOrHasHiddenAncestor { get; }
-    [Selector("wantsDefaultClipping")] public bool WantsDefaultClipping { get; }
-    [Selector("postsFrameChangedNotifications", "setPostsFrameChangedNotifications:")] public bool PostsFrameChangedNotifications { get; set; }
-    [Selector("autoresizesSubviews", "setAutoresizesSubviews:")] public bool AutoresizesSubviews { get; set; }
-    [Selector("autoresizingMask", "setAutoresizingMask:")] public NSAutoresizingMaskOptions AutoresizingMask { get; set; }
-    [Selector("frame", "setFrame:")] public NSRect Frame { get; set; }
-    [Selector("frameRotation", "setFrameRotation:")] public CGFloat FrameRotation { get; set; }
-    [Selector("frameCenterRotation", "setFrameCenterRotation:")] public CGFloat FrameCenterRotation { get; set; }
-    [Selector("boundsRotation", "setBoundsRotation:")] public CGFloat BoundsRotation { get; set; }
-    [Selector("bounds", "setBounds:")] public NSRect Bounds { get; set; }
-    [Selector("isFlipped")] public bool Flipped { get; }
-    [Selector("isRotatedFromBase")] public bool RotatedFromBase { get; }
-    [Selector("isRotatedOrScaledFromBase")] public bool RotatedOrScaledFromBase { get; }
-    [Selector("isOpaque")] public bool Opaque { get; }
-    [Selector("canDrawConcurrently", "setCanDrawConcurrently:")] public bool CanDrawConcurrently { get; set; }
+    [Selector("window")]
+    public NSWindow? Window { get; }
+    [Selector("superview")]
+    public NSView? Superview { get; }
+    [Selector("subviews", "setSubviews:")]
+    public NSArray Subviews { get; set; }
+    [Selector("opaqueAncestor")]
+    public NSView? OpaqueAncestor { get; }
+    [Selector("isHidden", "setHidden:")]
+    public bool Hidden { get; set; }
+    [Selector("isHiddenOrHasHiddenAncestor")]
+    public bool HiddenOrHasHiddenAncestor { get; }
+    [Selector("wantsDefaultClipping")]
+    public bool WantsDefaultClipping { get; }
+    [Selector("postsFrameChangedNotifications", "setPostsFrameChangedNotifications:")]
+    public bool PostsFrameChangedNotifications { get; set; }
+    [Selector("autoresizesSubviews", "setAutoresizesSubviews:")]
+    public bool AutoresizesSubviews { get; set; }
+    [Selector("autoresizingMask", "setAutoresizingMask:")]
+    public NSAutoresizingMaskOptions AutoresizingMask { get; set; }
+    [Selector("frame", "setFrame:")]
+    public NSRect Frame { get; set; }
+    [Selector("frameRotation", "setFrameRotation:")]
+    public CGFloat FrameRotation { get; set; }
+    [Selector("frameCenterRotation", "setFrameCenterRotation:")]
+    public CGFloat FrameCenterRotation { get; set; }
+    [Selector("boundsRotation", "setBoundsRotation:")]
+    public CGFloat BoundsRotation { get; set; }
+    [Selector("bounds", "setBounds:")]
+    public NSRect Bounds { get; set; }
+    [Selector("isFlipped")]
+    public bool Flipped { get; }
+    [Selector("isRotatedFromBase")]
+    public bool RotatedFromBase { get; }
+    [Selector("isRotatedOrScaledFromBase")]
+    public bool RotatedOrScaledFromBase { get; }
+    [Selector("isOpaque")]
+    public bool Opaque { get; }
+    [Selector("canDrawConcurrently", "setCanDrawConcurrently:")]
+    public bool CanDrawConcurrently { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("canDraw")] public bool CanDraw { get; }
-    [Selector("needsDisplay", "setNeedsDisplay:")] public bool NeedsDisplay { get; set; }
-    [Selector("focusView")] public static NSView? FocusView { get; }
-    [Selector("visibleRect")] public NSRect VisibleRect { get; }
-    [Selector("tag")] public NSInteger Tag { get; }
-    [Selector("needsPanelToBecomeKey")] public bool NeedsPanelToBecomeKey { get; }
-    [Selector("mouseDownCanMoveWindow")] public bool MouseDownCanMoveWindow { get; }
+    [Selector("canDraw")]
+    public bool CanDraw { get; }
+    [Selector("needsDisplay", "setNeedsDisplay:")]
+    public bool NeedsDisplay { get; set; }
+    [Selector("focusView")]
+    public static NSView? FocusView { get; }
+    [Selector("visibleRect")]
+    public NSRect VisibleRect { get; }
+    [Selector("tag")]
+    public NSInteger Tag { get; }
+    [Selector("needsPanelToBecomeKey")]
+    public bool NeedsPanelToBecomeKey { get; }
+    [Selector("mouseDownCanMoveWindow")]
+    public bool MouseDownCanMoveWindow { get; }
     /// Deprecated in macOS 10.12.2.
-    [Selector("acceptsTouchEvents", "setAcceptsTouchEvents:")] public bool AcceptsTouchEvents { get; set; }
-    [Selector("wantsRestingTouches", "setWantsRestingTouches:")] public bool WantsRestingTouches { get; set; }
-    [Selector("layerContentsRedrawPolicy", "setLayerContentsRedrawPolicy:")] public NSViewLayerContentsRedrawPolicy LayerContentsRedrawPolicy { get; set; }
-    [Selector("layerContentsPlacement", "setLayerContentsPlacement:")] public NSViewLayerContentsPlacement LayerContentsPlacement { get; set; }
-    [Selector("wantsLayer", "setWantsLayer:")] public bool WantsLayer { get; set; }
-    [Selector("layer", "setLayer:")] public CALayer? Layer { get; set; }
-    [Selector("wantsUpdateLayer")] public bool WantsUpdateLayer { get; }
-    [Selector("canDrawSubviewsIntoLayer", "setCanDrawSubviewsIntoLayer:")] public bool CanDrawSubviewsIntoLayer { get; set; }
-    [Selector("needsLayout", "setNeedsLayout:")] public bool NeedsLayout { get; set; }
-    [Selector("alphaValue", "setAlphaValue:")] public CGFloat AlphaValue { get; set; }
-    [Selector("layerUsesCoreImageFilters", "setLayerUsesCoreImageFilters:")] public bool LayerUsesCoreImageFilters { get; set; }
-    [Selector("backgroundFilters", "setBackgroundFilters:")] public NSArray? BackgroundFilters { get; set; }
-    [Selector("compositingFilter", "setCompositingFilter:")] public CIFilter? CompositingFilter { get; set; }
-    [Selector("contentFilters", "setContentFilters:")] public NSArray? ContentFilters { get; set; }
-    [Selector("shadow", "setShadow:")] public NSShadow? Shadow { get; set; }
-    [Selector("clipsToBounds", "setClipsToBounds:")] public bool ClipsToBounds { get; set; }
-    [Selector("postsBoundsChangedNotifications", "setPostsBoundsChangedNotifications:")] public bool PostsBoundsChangedNotifications { get; set; }
-    [Selector("enclosingScrollView")] public NSScrollView? EnclosingScrollView { get; }
-    [Selector("defaultMenu")] public static NSMenu? DefaultMenu { get; }
-    [Selector("toolTip", "setToolTip:")] public NSString? ToolTip { get; set; }
-    [Selector("inLiveResize")] public bool InLiveResize { get; }
-    [Selector("preservesContentDuringLiveResize")] public bool PreservesContentDuringLiveResize { get; }
-    [Selector("rectPreservedDuringLiveResize")] public NSRect RectPreservedDuringLiveResize { get; }
-    [Selector("inputContext")] public NSTextInputContext? InputContext { get; }
-    [Selector("userInterfaceLayoutDirection", "setUserInterfaceLayoutDirection:")] public NSUserInterfaceLayoutDirection UserInterfaceLayoutDirection { get; set; }
-    [Selector("isCompatibleWithResponsiveScrolling")] public static bool CompatibleWithResponsiveScrolling { get; }
-    [Selector("preparedContentRect", "setPreparedContentRect:")] public NSRect PreparedContentRect { get; set; }
-    [Selector("allowsVibrancy")] public bool AllowsVibrancy { get; }
-    [Selector("initWithFrame:")] public Self InitWithFrame(NSRect frameRect);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("isDescendantOf:")] public bool IsDescendantOf(NSView view);
-    [Selector("ancestorSharedWithView:")] public NSView? AncestorSharedWithView(NSView view);
-    [Selector("getRectsBeingDrawn:count:")] public void GetRectsBeingDrawnCount(NSRect** rects, NSInteger* count);
-    [Selector("needsToDrawRect:")] public bool NeedsToDrawRect(NSRect rect);
-    [Selector("viewDidHide")] public void ViewDidHide();
-    [Selector("viewDidUnhide")] public void ViewDidUnhide();
-    [Selector("addSubview:")] public void AddSubview(NSView view);
-    [Selector("addSubview:positioned:relativeTo:")] public void AddSubviewPositionedRelativeTo(NSView view, NSWindowOrderingMode place, NSView? otherView);
-    [Selector("sortSubviewsUsingFunction:context:")] public void SortSubviewsUsingFunctionContext(NSViewSortSubviewsUsingFunctionContextCompareFunction compare, void* context);
-    [Selector("viewWillMoveToWindow:")] public void ViewWillMoveToWindow(NSWindow? newWindow);
-    [Selector("viewDidMoveToWindow")] public void ViewDidMoveToWindow();
-    [Selector("viewWillMoveToSuperview:")] public void ViewWillMoveToSuperview(NSView? newSuperview);
-    [Selector("viewDidMoveToSuperview")] public void ViewDidMoveToSuperview();
-    [Selector("didAddSubview:")] public void DidAddSubview(NSView subview);
-    [Selector("willRemoveSubview:")] public void WillRemoveSubview(NSView subview);
-    [Selector("removeFromSuperview")] public void RemoveFromSuperview();
-    [Selector("replaceSubview:with:")] public void ReplaceSubviewWith(NSView oldView, NSView newView);
-    [Selector("removeFromSuperviewWithoutNeedingDisplay")] public void RemoveFromSuperviewWithoutNeedingDisplay();
-    [Selector("viewDidChangeBackingProperties")] public void ViewDidChangeBackingProperties();
-    [Selector("resizeSubviewsWithOldSize:")] public void ResizeSubviewsWithOldSize(NSSize oldSize);
-    [Selector("resizeWithOldSuperviewSize:")] public void ResizeWithOldSuperviewSize(NSSize oldSize);
-    [Selector("setFrameOrigin:")] public void SetFrameOrigin(NSPoint newOrigin);
-    [Selector("setFrameSize:")] public void SetFrameSize(NSSize newSize);
-    [Selector("setBoundsOrigin:")] public void SetBoundsOrigin(NSPoint newOrigin);
-    [Selector("setBoundsSize:")] public void SetBoundsSize(NSSize newSize);
-    [Selector("translateOriginToPoint:")] public void TranslateOriginToPoint(NSPoint translation);
-    [Selector("scaleUnitSquareToSize:")] public void ScaleUnitSquareToSize(NSSize newUnitSize);
-    [Selector("rotateByAngle:")] public void RotateByAngle(CGFloat angle);
-    [Selector("convertPoint:fromView:")] public NSPoint ConvertPointFromView(NSPoint point, NSView? view);
-    [Selector("convertPoint:toView:")] public NSPoint ConvertPointToView(NSPoint point, NSView? view);
-    [Selector("convertSize:fromView:")] public NSSize ConvertSizeFromView(NSSize size, NSView? view);
-    [Selector("convertSize:toView:")] public NSSize ConvertSizeToView(NSSize size, NSView? view);
-    [Selector("convertRect:fromView:")] public NSRect ConvertRectFromView(NSRect rect, NSView? view);
-    [Selector("convertRect:toView:")] public NSRect ConvertRectToView(NSRect rect, NSView? view);
-    [Selector("backingAlignedRect:options:")] public NSRect BackingAlignedRectOptions(NSRect rect, NSAlignmentOptions options);
-    [Selector("centerScanRect:")] public NSRect CenterScanRect(NSRect rect);
-    [Selector("convertPointToBacking:")] public NSPoint ConvertPointToBacking(NSPoint point);
-    [Selector("convertPointFromBacking:")] public NSPoint ConvertPointFromBacking(NSPoint point);
-    [Selector("convertSizeToBacking:")] public NSSize ConvertSizeToBacking(NSSize size);
-    [Selector("convertSizeFromBacking:")] public NSSize ConvertSizeFromBacking(NSSize size);
-    [Selector("convertRectToBacking:")] public NSRect ConvertRectToBacking(NSRect rect);
-    [Selector("convertRectFromBacking:")] public NSRect ConvertRectFromBacking(NSRect rect);
-    [Selector("convertPointToLayer:")] public NSPoint ConvertPointToLayer(NSPoint point);
-    [Selector("convertPointFromLayer:")] public NSPoint ConvertPointFromLayer(NSPoint point);
-    [Selector("convertSizeToLayer:")] public NSSize ConvertSizeToLayer(NSSize size);
-    [Selector("convertSizeFromLayer:")] public NSSize ConvertSizeFromLayer(NSSize size);
-    [Selector("convertRectToLayer:")] public NSRect ConvertRectToLayer(NSRect rect);
-    [Selector("convertRectFromLayer:")] public NSRect ConvertRectFromLayer(NSRect rect);
-    [Selector("setNeedsDisplayInRect:")] public void SetNeedsDisplayInRect(NSRect invalidRect);
+    [Selector("acceptsTouchEvents", "setAcceptsTouchEvents:")]
+    public bool AcceptsTouchEvents { get; set; }
+    [Selector("wantsRestingTouches", "setWantsRestingTouches:")]
+    public bool WantsRestingTouches { get; set; }
+    [Selector("layerContentsRedrawPolicy", "setLayerContentsRedrawPolicy:")]
+    public NSViewLayerContentsRedrawPolicy LayerContentsRedrawPolicy { get; set; }
+    [Selector("layerContentsPlacement", "setLayerContentsPlacement:")]
+    public NSViewLayerContentsPlacement LayerContentsPlacement { get; set; }
+    [Selector("wantsLayer", "setWantsLayer:")]
+    public bool WantsLayer { get; set; }
+    [Selector("layer", "setLayer:")]
+    public CALayer? Layer { get; set; }
+    [Selector("wantsUpdateLayer")]
+    public bool WantsUpdateLayer { get; }
+    [Selector("canDrawSubviewsIntoLayer", "setCanDrawSubviewsIntoLayer:")]
+    public bool CanDrawSubviewsIntoLayer { get; set; }
+    [Selector("needsLayout", "setNeedsLayout:")]
+    public bool NeedsLayout { get; set; }
+    [Selector("alphaValue", "setAlphaValue:")]
+    public CGFloat AlphaValue { get; set; }
+    [Selector("layerUsesCoreImageFilters", "setLayerUsesCoreImageFilters:")]
+    public bool LayerUsesCoreImageFilters { get; set; }
+    [Selector("backgroundFilters", "setBackgroundFilters:")]
+    public NSArray? BackgroundFilters { get; set; }
+    [Selector("compositingFilter", "setCompositingFilter:")]
+    public CIFilter? CompositingFilter { get; set; }
+    [Selector("contentFilters", "setContentFilters:")]
+    public NSArray? ContentFilters { get; set; }
+    [Selector("shadow", "setShadow:")]
+    public NSShadow? Shadow { get; set; }
+    [Selector("clipsToBounds", "setClipsToBounds:")]
+    public bool ClipsToBounds { get; set; }
+    [Selector("postsBoundsChangedNotifications", "setPostsBoundsChangedNotifications:")]
+    public bool PostsBoundsChangedNotifications { get; set; }
+    [Selector("enclosingScrollView")]
+    public NSScrollView? EnclosingScrollView { get; }
+    [Selector("defaultMenu")]
+    public static NSMenu? DefaultMenu { get; }
+    [Selector("toolTip", "setToolTip:")]
+    public NSString? ToolTip { get; set; }
+    [Selector("inLiveResize")]
+    public bool InLiveResize { get; }
+    [Selector("preservesContentDuringLiveResize")]
+    public bool PreservesContentDuringLiveResize { get; }
+    [Selector("rectPreservedDuringLiveResize")]
+    public NSRect RectPreservedDuringLiveResize { get; }
+    [Selector("inputContext")]
+    public NSTextInputContext? InputContext { get; }
+    [Selector("userInterfaceLayoutDirection", "setUserInterfaceLayoutDirection:")]
+    public NSUserInterfaceLayoutDirection UserInterfaceLayoutDirection { get; set; }
+    [Selector("isCompatibleWithResponsiveScrolling")]
+    public static bool CompatibleWithResponsiveScrolling { get; }
+    [Selector("preparedContentRect", "setPreparedContentRect:")]
+    public NSRect PreparedContentRect { get; set; }
+    [Selector("allowsVibrancy")]
+    public bool AllowsVibrancy { get; }
+    [Selector("initWithFrame:")]
+    public Self InitWithFrame(NSRect frameRect);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("isDescendantOf:")]
+    public bool IsDescendantOf(NSView view);
+    [Selector("ancestorSharedWithView:")]
+    public NSView? AncestorSharedWithView(NSView view);
+    [Selector("getRectsBeingDrawn:count:")]
+    public void GetRectsBeingDrawnCount(NSRect** rects, NSInteger* count);
+    [Selector("needsToDrawRect:")]
+    public bool NeedsToDrawRect(NSRect rect);
+    [Selector("viewDidHide")]
+    public void ViewDidHide();
+    [Selector("viewDidUnhide")]
+    public void ViewDidUnhide();
+    [Selector("addSubview:")]
+    public void AddSubview(NSView view);
+    [Selector("addSubview:positioned:relativeTo:")]
+    public void AddSubviewPositionedRelativeTo(NSView view, NSWindowOrderingMode place, NSView? otherView);
+    [Selector("sortSubviewsUsingFunction:context:")]
+    public void SortSubviewsUsingFunctionContext(NSViewSortSubviewsUsingFunctionContextCompareFunction compare, void* context);
+    [Selector("viewWillMoveToWindow:")]
+    public void ViewWillMoveToWindow(NSWindow? newWindow);
+    [Selector("viewDidMoveToWindow")]
+    public void ViewDidMoveToWindow();
+    [Selector("viewWillMoveToSuperview:")]
+    public void ViewWillMoveToSuperview(NSView? newSuperview);
+    [Selector("viewDidMoveToSuperview")]
+    public void ViewDidMoveToSuperview();
+    [Selector("didAddSubview:")]
+    public void DidAddSubview(NSView subview);
+    [Selector("willRemoveSubview:")]
+    public void WillRemoveSubview(NSView subview);
+    [Selector("removeFromSuperview")]
+    public void RemoveFromSuperview();
+    [Selector("replaceSubview:with:")]
+    public void ReplaceSubviewWith(NSView oldView, NSView newView);
+    [Selector("removeFromSuperviewWithoutNeedingDisplay")]
+    public void RemoveFromSuperviewWithoutNeedingDisplay();
+    [Selector("viewDidChangeBackingProperties")]
+    public void ViewDidChangeBackingProperties();
+    [Selector("resizeSubviewsWithOldSize:")]
+    public void ResizeSubviewsWithOldSize(NSSize oldSize);
+    [Selector("resizeWithOldSuperviewSize:")]
+    public void ResizeWithOldSuperviewSize(NSSize oldSize);
+    [Selector("setFrameOrigin:")]
+    public void SetFrameOrigin(NSPoint newOrigin);
+    [Selector("setFrameSize:")]
+    public void SetFrameSize(NSSize newSize);
+    [Selector("setBoundsOrigin:")]
+    public void SetBoundsOrigin(NSPoint newOrigin);
+    [Selector("setBoundsSize:")]
+    public void SetBoundsSize(NSSize newSize);
+    [Selector("translateOriginToPoint:")]
+    public void TranslateOriginToPoint(NSPoint translation);
+    [Selector("scaleUnitSquareToSize:")]
+    public void ScaleUnitSquareToSize(NSSize newUnitSize);
+    [Selector("rotateByAngle:")]
+    public void RotateByAngle(CGFloat angle);
+    [Selector("convertPoint:fromView:")]
+    public NSPoint ConvertPointFromView(NSPoint point, NSView? view);
+    [Selector("convertPoint:toView:")]
+    public NSPoint ConvertPointToView(NSPoint point, NSView? view);
+    [Selector("convertSize:fromView:")]
+    public NSSize ConvertSizeFromView(NSSize size, NSView? view);
+    [Selector("convertSize:toView:")]
+    public NSSize ConvertSizeToView(NSSize size, NSView? view);
+    [Selector("convertRect:fromView:")]
+    public NSRect ConvertRectFromView(NSRect rect, NSView? view);
+    [Selector("convertRect:toView:")]
+    public NSRect ConvertRectToView(NSRect rect, NSView? view);
+    [Selector("backingAlignedRect:options:")]
+    public NSRect BackingAlignedRectOptions(NSRect rect, NSAlignmentOptions options);
+    [Selector("centerScanRect:")]
+    public NSRect CenterScanRect(NSRect rect);
+    [Selector("convertPointToBacking:")]
+    public NSPoint ConvertPointToBacking(NSPoint point);
+    [Selector("convertPointFromBacking:")]
+    public NSPoint ConvertPointFromBacking(NSPoint point);
+    [Selector("convertSizeToBacking:")]
+    public NSSize ConvertSizeToBacking(NSSize size);
+    [Selector("convertSizeFromBacking:")]
+    public NSSize ConvertSizeFromBacking(NSSize size);
+    [Selector("convertRectToBacking:")]
+    public NSRect ConvertRectToBacking(NSRect rect);
+    [Selector("convertRectFromBacking:")]
+    public NSRect ConvertRectFromBacking(NSRect rect);
+    [Selector("convertPointToLayer:")]
+    public NSPoint ConvertPointToLayer(NSPoint point);
+    [Selector("convertPointFromLayer:")]
+    public NSPoint ConvertPointFromLayer(NSPoint point);
+    [Selector("convertSizeToLayer:")]
+    public NSSize ConvertSizeToLayer(NSSize size);
+    [Selector("convertSizeFromLayer:")]
+    public NSSize ConvertSizeFromLayer(NSSize size);
+    [Selector("convertRectToLayer:")]
+    public NSRect ConvertRectToLayer(NSRect rect);
+    [Selector("convertRectFromLayer:")]
+    public NSRect ConvertRectFromLayer(NSRect rect);
+    [Selector("setNeedsDisplayInRect:")]
+    public void SetNeedsDisplayInRect(NSRect invalidRect);
     /// Deprecated in macOS 10.14.
-    [Selector("lockFocus")] public void LockFocus();
+    [Selector("lockFocus")]
+    public void LockFocus();
     /// Deprecated in macOS 10.14.
-    [Selector("unlockFocus")] public void UnlockFocus();
+    [Selector("unlockFocus")]
+    public void UnlockFocus();
     /// Deprecated in macOS 10.14.
-    [Selector("lockFocusIfCanDraw")] public bool LockFocusIfCanDraw();
+    [Selector("lockFocusIfCanDraw")]
+    public bool LockFocusIfCanDraw();
     /// Deprecated in macOS 10.13.
-    [Selector("lockFocusIfCanDrawInContext:")] public bool LockFocusIfCanDrawInContext(NSGraphicsContext context);
-    [Selector("display")] public void Display();
-    [Selector("displayIfNeeded")] public void DisplayIfNeeded();
-    [Selector("displayIfNeededIgnoringOpacity")] public void DisplayIfNeededIgnoringOpacity();
-    [Selector("displayRect:")] public void DisplayRect(NSRect rect);
-    [Selector("displayIfNeededInRect:")] public void DisplayIfNeededInRect(NSRect rect);
-    [Selector("displayRectIgnoringOpacity:")] public void DisplayRectIgnoringOpacity(NSRect rect);
-    [Selector("displayIfNeededInRectIgnoringOpacity:")] public void DisplayIfNeededInRectIgnoringOpacity(NSRect rect);
-    [Selector("drawRect:")] public void DrawRect(NSRect dirtyRect);
-    [Selector("displayRectIgnoringOpacity:inContext:")] public void DisplayRectIgnoringOpacityInContext(NSRect rect, NSGraphicsContext context);
-    [Selector("bitmapImageRepForCachingDisplayInRect:")] public NSBitmapImageRep? BitmapImageRepForCachingDisplayInRect(NSRect rect);
-    [Selector("cacheDisplayInRect:toBitmapImageRep:")] public void CacheDisplayInRectToBitmapImageRep(NSRect rect, NSBitmapImageRep bitmapImageRep);
-    [Selector("viewWillDraw")] public void ViewWillDraw();
-    [Selector("scrollPoint:")] public void ScrollPoint(NSPoint point);
-    [Selector("scrollRectToVisible:")] public bool ScrollRectToVisible(NSRect rect);
-    [Selector("autoscroll:")] public bool Autoscroll(NSEvent event);
-    [Selector("adjustScroll:")] public NSRect AdjustScroll(NSRect newVisible);
+    [Selector("lockFocusIfCanDrawInContext:")]
+    public bool LockFocusIfCanDrawInContext(NSGraphicsContext context);
+    [Selector("display")]
+    public void Display();
+    [Selector("displayIfNeeded")]
+    public void DisplayIfNeeded();
+    [Selector("displayIfNeededIgnoringOpacity")]
+    public void DisplayIfNeededIgnoringOpacity();
+    [Selector("displayRect:")]
+    public void DisplayRect(NSRect rect);
+    [Selector("displayIfNeededInRect:")]
+    public void DisplayIfNeededInRect(NSRect rect);
+    [Selector("displayRectIgnoringOpacity:")]
+    public void DisplayRectIgnoringOpacity(NSRect rect);
+    [Selector("displayIfNeededInRectIgnoringOpacity:")]
+    public void DisplayIfNeededInRectIgnoringOpacity(NSRect rect);
+    [Selector("drawRect:")]
+    public void DrawRect(NSRect dirtyRect);
+    [Selector("displayRectIgnoringOpacity:inContext:")]
+    public void DisplayRectIgnoringOpacityInContext(NSRect rect, NSGraphicsContext context);
+    [Selector("bitmapImageRepForCachingDisplayInRect:")]
+    public NSBitmapImageRep? BitmapImageRepForCachingDisplayInRect(NSRect rect);
+    [Selector("cacheDisplayInRect:toBitmapImageRep:")]
+    public void CacheDisplayInRectToBitmapImageRep(NSRect rect, NSBitmapImageRep bitmapImageRep);
+    [Selector("viewWillDraw")]
+    public void ViewWillDraw();
+    [Selector("scrollPoint:")]
+    public void ScrollPoint(NSPoint point);
+    [Selector("scrollRectToVisible:")]
+    public bool ScrollRectToVisible(NSRect rect);
+    [Selector("autoscroll:")]
+    public bool Autoscroll(NSEvent event);
+    [Selector("adjustScroll:")]
+    public NSRect AdjustScroll(NSRect newVisible);
     /// Deprecated in macOS 10.14.
-    [Selector("scrollRect:by:")] public void ScrollRectBy(NSRect rect, NSSize delta);
-    [Selector("translateRectsNeedingDisplayInRect:by:")] public void TranslateRectsNeedingDisplayInRectBy(NSRect clipRect, NSSize delta);
-    [Selector("hitTest:")] public NSView? HitTest(NSPoint point);
-    [Selector("mouse:inRect:")] public bool MouseInRect(NSPoint point, NSRect rect);
-    [Selector("viewWithTag:")] public NSView? ViewWithTag(NSInteger tag);
-    [Selector("performKeyEquivalent:")] public bool PerformKeyEquivalent(NSEvent event);
-    [Selector("acceptsFirstMouse:")] public bool AcceptsFirstMouse(NSEvent? event);
-    [Selector("shouldDelayWindowOrderingForEvent:")] public bool ShouldDelayWindowOrderingForEvent(NSEvent event);
-    [Selector("makeBackingLayer")] public CALayer MakeBackingLayer();
-    [Selector("updateLayer")] public void UpdateLayer();
-    [Selector("layoutSubtreeIfNeeded")] public void LayoutSubtreeIfNeeded();
-    [Selector("layout")] public void Layout();
-    [Selector("menuForEvent:")] public NSMenu? MenuForEvent(NSEvent event);
-    [Selector("willOpenMenu:withEvent:")] public void WillOpenMenuWithEvent(NSMenu menu, NSEvent event);
-    [Selector("didCloseMenu:withEvent:")] public void DidCloseMenuWithEvent(NSMenu menu, NSEvent? event);
-    [Selector("addToolTipRect:owner:userData:")] public NSToolTipTag AddToolTipRectOwnerUserData(NSRect rect, AnyObject owner, void* data);
-    [Selector("removeToolTip:")] public void RemoveToolTip(NSToolTipTag tag);
-    [Selector("removeAllToolTips")] public void RemoveAllToolTips();
-    [Selector("viewWillStartLiveResize")] public void ViewWillStartLiveResize();
-    [Selector("viewDidEndLiveResize")] public void ViewDidEndLiveResize();
-    [Selector("getRectsExposedDuringLiveResize:count:")] public void GetRectsExposedDuringLiveResizeCount(NSRect* exposedRects, NSInteger* count);
-    [Selector("rectForSmartMagnificationAtPoint:inRect:")] public NSRect RectForSmartMagnificationAtPointInRect(NSPoint location, NSRect visibleRect);
-    [Selector("prepareForReuse")] public void PrepareForReuse();
-    [Selector("prepareContentInRect:")] public void PrepareContentInRect(NSRect rect);
-    [Selector("viewDidChangeEffectiveAppearance")] public void ViewDidChangeEffectiveAppearance();
+    [Selector("scrollRect:by:")]
+    public void ScrollRectBy(NSRect rect, NSSize delta);
+    [Selector("translateRectsNeedingDisplayInRect:by:")]
+    public void TranslateRectsNeedingDisplayInRectBy(NSRect clipRect, NSSize delta);
+    [Selector("hitTest:")]
+    public NSView? HitTest(NSPoint point);
+    [Selector("mouse:inRect:")]
+    public bool MouseInRect(NSPoint point, NSRect rect);
+    [Selector("viewWithTag:")]
+    public NSView? ViewWithTag(NSInteger tag);
+    [Selector("performKeyEquivalent:")]
+    public bool PerformKeyEquivalent(NSEvent event);
+    [Selector("acceptsFirstMouse:")]
+    public bool AcceptsFirstMouse(NSEvent? event);
+    [Selector("shouldDelayWindowOrderingForEvent:")]
+    public bool ShouldDelayWindowOrderingForEvent(NSEvent event);
+    [Selector("makeBackingLayer")]
+    public CALayer MakeBackingLayer();
+    [Selector("updateLayer")]
+    public void UpdateLayer();
+    [Selector("layoutSubtreeIfNeeded")]
+    public void LayoutSubtreeIfNeeded();
+    [Selector("layout")]
+    public void Layout();
+    [Selector("menuForEvent:")]
+    public NSMenu? MenuForEvent(NSEvent event);
+    [Selector("willOpenMenu:withEvent:")]
+    public void WillOpenMenuWithEvent(NSMenu menu, NSEvent event);
+    [Selector("didCloseMenu:withEvent:")]
+    public void DidCloseMenuWithEvent(NSMenu menu, NSEvent? event);
+    [Selector("addToolTipRect:owner:userData:")]
+    public NSToolTipTag AddToolTipRectOwnerUserData(NSRect rect, AnyObject owner, void* data);
+    [Selector("removeToolTip:")]
+    public void RemoveToolTip(NSToolTipTag tag);
+    [Selector("removeAllToolTips")]
+    public void RemoveAllToolTips();
+    [Selector("viewWillStartLiveResize")]
+    public void ViewWillStartLiveResize();
+    [Selector("viewDidEndLiveResize")]
+    public void ViewDidEndLiveResize();
+    [Selector("getRectsExposedDuringLiveResize:count:")]
+    public void GetRectsExposedDuringLiveResizeCount(NSRect* exposedRects, NSInteger* count);
+    [Selector("rectForSmartMagnificationAtPoint:inRect:")]
+    public NSRect RectForSmartMagnificationAtPointInRect(NSPoint location, NSRect visibleRect);
+    [Selector("prepareForReuse")]
+    public void PrepareForReuse();
+    [Selector("prepareContentInRect:")]
+    public void PrepareContentInRect(NSRect rect);
+    [Selector("viewDidChangeEffectiveAppearance")]
+    public void ViewDidChangeEffectiveAppearance();
 }
 
 public objc interface NSViewLayerContentScaleDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("layer:shouldInheritContentsScale:fromWindow:")] bool LayerShouldInheritContentsScaleFromWindow(CALayer layer, CGFloat newScale, NSWindow window);
+    [Optional]
+    [Selector("layer:shouldInheritContentsScale:fromWindow:")]
+    bool LayerShouldInheritContentsScaleFromWindow(CALayer layer, CGFloat newScale, NSWindow window);
 }
 
 /// NSLayerDelegateContentsScaleUpdating, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 11.0.
-    [Selector("layer:shouldInheritContentsScale:fromWindow:")] public bool LayerShouldInheritContentsScaleFromWindow(CALayer layer, CGFloat newScale, NSWindow window);
+    [Selector("layer:shouldInheritContentsScale:fromWindow:")]
+    public bool LayerShouldInheritContentsScaleFromWindow(CALayer layer, CGFloat newScale, NSWindow window);
 }
 
 public objc interface NSViewToolTipOwner : NSObjectProtocol
 {
-    [Selector("view:stringForToolTip:point:userData:")] NSString ViewStringForToolTipPointUserData(NSView view, NSToolTipTag tag, NSPoint point, void* data);
+    [Selector("view:stringForToolTip:point:userData:")]
+    NSString ViewStringForToolTipPointUserData(NSView view, NSToolTipTag tag, NSPoint point, void* data);
 }
 
 /// NSToolTipOwner, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 11.0.
-    [Selector("view:stringForToolTip:point:userData:")] public NSString ViewStringForToolTipPointUserData(NSView view, NSToolTipTag tag, NSPoint point, void* data);
+    [Selector("view:stringForToolTip:point:userData:")]
+    public NSString ViewStringForToolTipPointUserData(NSView view, NSToolTipTag tag, NSPoint point, void* data);
 }
 
 public objc interface NSViewContentSelectionInfo : NSObjectProtocol
 {
-    [Optional] [Selector("selectionAnchorRect")] NSRect SelectionAnchorRect { get; }
+    [Optional]
+    [Selector("selectionAnchorRect")]
+    NSRect SelectionAnchorRect { get; }
 }
 
 /// NSKeyboardUI, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("nextKeyView", "setNextKeyView:")] public NSView? NextKeyView { get; set; }
-    [Selector("previousKeyView")] public NSView? PreviousKeyView { get; }
-    [Selector("nextValidKeyView")] public NSView? NextValidKeyView { get; }
-    [Selector("previousValidKeyView")] public NSView? PreviousValidKeyView { get; }
-    [Selector("canBecomeKeyView")] public bool CanBecomeKeyView { get; }
-    [Selector("focusRingType", "setFocusRingType:")] public NSFocusRingType FocusRingType { get; set; }
-    [Selector("defaultFocusRingType")] public static NSFocusRingType DefaultFocusRingType { get; }
-    [Selector("focusRingMaskBounds")] public NSRect FocusRingMaskBounds { get; }
-    [Selector("setKeyboardFocusRingNeedsDisplayInRect:")] public void SetKeyboardFocusRingNeedsDisplayInRect(NSRect rect);
-    [Selector("drawFocusRingMask")] public void DrawFocusRingMask();
-    [Selector("noteFocusRingMaskChanged")] public void NoteFocusRingMaskChanged();
+    [Selector("nextKeyView", "setNextKeyView:")]
+    public NSView? NextKeyView { get; set; }
+    [Selector("previousKeyView")]
+    public NSView? PreviousKeyView { get; }
+    [Selector("nextValidKeyView")]
+    public NSView? NextValidKeyView { get; }
+    [Selector("previousValidKeyView")]
+    public NSView? PreviousValidKeyView { get; }
+    [Selector("canBecomeKeyView")]
+    public bool CanBecomeKeyView { get; }
+    [Selector("focusRingType", "setFocusRingType:")]
+    public NSFocusRingType FocusRingType { get; set; }
+    [Selector("defaultFocusRingType")]
+    public static NSFocusRingType DefaultFocusRingType { get; }
+    [Selector("focusRingMaskBounds")]
+    public NSRect FocusRingMaskBounds { get; }
+    [Selector("setKeyboardFocusRingNeedsDisplayInRect:")]
+    public void SetKeyboardFocusRingNeedsDisplayInRect(NSRect rect);
+    [Selector("drawFocusRingMask")]
+    public void DrawFocusRingMask();
+    [Selector("noteFocusRingMaskChanged")]
+    public void NoteFocusRingMaskChanged();
 }
 
 /// NSPrinting, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("heightAdjustLimit")] public CGFloat HeightAdjustLimit { get; }
-    [Selector("widthAdjustLimit")] public CGFloat WidthAdjustLimit { get; }
-    [Selector("pageHeader")] public NSAttributedString PageHeader { get; }
-    [Selector("pageFooter")] public NSAttributedString PageFooter { get; }
-    [Selector("printJobTitle")] public NSString PrintJobTitle { get; }
-    [Selector("writeEPSInsideRect:toPasteboard:")] public void WriteEPSInsideRectToPasteboard(NSRect rect, NSPasteboard pasteboard);
-    [Selector("dataWithEPSInsideRect:")] public NSData DataWithEPSInsideRect(NSRect rect);
-    [Selector("writePDFInsideRect:toPasteboard:")] public void WritePDFInsideRectToPasteboard(NSRect rect, NSPasteboard pasteboard);
-    [Selector("dataWithPDFInsideRect:")] public NSData DataWithPDFInsideRect(NSRect rect);
-    [Selector("print:")] public void Print(AnyObject? sender);
-    [Selector("knowsPageRange:")] public bool KnowsPageRange(NSRangePointer range);
-    [Selector("adjustPageWidthNew:left:right:limit:")] public void AdjustPageWidthNewLeftRightLimit(CGFloat* newRight, CGFloat oldLeft, CGFloat oldRight, CGFloat rightLimit);
-    [Selector("adjustPageHeightNew:top:bottom:limit:")] public void AdjustPageHeightNewTopBottomLimit(CGFloat* newBottom, CGFloat oldTop, CGFloat oldBottom, CGFloat bottomLimit);
-    [Selector("rectForPage:")] public NSRect RectForPage(NSInteger page);
-    [Selector("locationOfPrintRect:")] public NSPoint LocationOfPrintRect(NSRect rect);
-    [Selector("drawPageBorderWithSize:")] public void DrawPageBorderWithSize(NSSize borderSize);
+    [Selector("heightAdjustLimit")]
+    public CGFloat HeightAdjustLimit { get; }
+    [Selector("widthAdjustLimit")]
+    public CGFloat WidthAdjustLimit { get; }
+    [Selector("pageHeader")]
+    public NSAttributedString PageHeader { get; }
+    [Selector("pageFooter")]
+    public NSAttributedString PageFooter { get; }
+    [Selector("printJobTitle")]
+    public NSString PrintJobTitle { get; }
+    [Selector("writeEPSInsideRect:toPasteboard:")]
+    public void WriteEPSInsideRectToPasteboard(NSRect rect, NSPasteboard pasteboard);
+    [Selector("dataWithEPSInsideRect:")]
+    public NSData DataWithEPSInsideRect(NSRect rect);
+    [Selector("writePDFInsideRect:toPasteboard:")]
+    public void WritePDFInsideRectToPasteboard(NSRect rect, NSPasteboard pasteboard);
+    [Selector("dataWithPDFInsideRect:")]
+    public NSData DataWithPDFInsideRect(NSRect rect);
+    [Selector("print:")]
+    public void Print(AnyObject? sender);
+    [Selector("knowsPageRange:")]
+    public bool KnowsPageRange(NSRangePointer range);
+    [Selector("adjustPageWidthNew:left:right:limit:")]
+    public void AdjustPageWidthNewLeftRightLimit(CGFloat* newRight, CGFloat oldLeft, CGFloat oldRight, CGFloat rightLimit);
+    [Selector("adjustPageHeightNew:top:bottom:limit:")]
+    public void AdjustPageHeightNewTopBottomLimit(CGFloat* newBottom, CGFloat oldTop, CGFloat oldBottom, CGFloat bottomLimit);
+    [Selector("rectForPage:")]
+    public NSRect RectForPage(NSInteger page);
+    [Selector("locationOfPrintRect:")]
+    public NSPoint LocationOfPrintRect(NSRect rect);
+    [Selector("drawPageBorderWithSize:")]
+    public void DrawPageBorderWithSize(NSSize borderSize);
     /// Deprecated in macOS 10.14.
-    [Selector("drawSheetBorderWithSize:")] public void DrawSheetBorderWithSize(NSSize borderSize);
-    [Selector("beginDocument")] public void BeginDocument();
-    [Selector("endDocument")] public void EndDocument();
-    [Selector("beginPageInRect:atPlacement:")] public void BeginPageInRectAtPlacement(NSRect rect, NSPoint location);
-    [Selector("endPage")] public void EndPage();
+    [Selector("drawSheetBorderWithSize:")]
+    public void DrawSheetBorderWithSize(NSSize borderSize);
+    [Selector("beginDocument")]
+    public void BeginDocument();
+    [Selector("endDocument")]
+    public void EndDocument();
+    [Selector("beginPageInRect:atPlacement:")]
+    public void BeginPageInRectAtPlacement(NSRect rect, NSPoint location);
+    [Selector("endPage")]
+    public void EndPage();
 }
 
 /// NSDrag, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("registeredDraggedTypes")] public NSArray RegisteredDraggedTypes { get; }
-    [Selector("beginDraggingSessionWithItems:event:source:")] public NSDraggingSession BeginDraggingSessionWithItemsEventSource(NSArray items, NSEvent event, NSDraggingSource source);
-    [Selector("registerForDraggedTypes:")] public void RegisterForDraggedTypes(NSArray newTypes);
-    [Selector("unregisterDraggedTypes")] public void UnregisterDraggedTypes();
+    [Selector("registeredDraggedTypes")]
+    public NSArray RegisteredDraggedTypes { get; }
+    [Selector("beginDraggingSessionWithItems:event:source:")]
+    public NSDraggingSession BeginDraggingSessionWithItemsEventSource(NSArray items, NSEvent event, NSDraggingSource source);
+    [Selector("registerForDraggedTypes:")]
+    public void RegisterForDraggedTypes(NSArray newTypes);
+    [Selector("unregisterDraggedTypes")]
+    public void UnregisterDraggedTypes();
 }
 
 public using NSViewFullScreenModeOptionKey = NSString;
@@ -341,9 +535,12 @@ public extern "C" NSViewFullScreenModeOptionKey? NSFullScreenModeApplicationPres
 /// NSFullScreenMode, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("isInFullScreenMode")] public bool InFullScreenMode { get; }
-    [Selector("enterFullScreenMode:withOptions:")] public bool EnterFullScreenModeWithOptions(NSScreen screen, NSDictionary? options);
-    [Selector("exitFullScreenModeWithOptions:")] public void ExitFullScreenModeWithOptions(NSDictionary? options);
+    [Selector("isInFullScreenMode")]
+    public bool InFullScreenMode { get; }
+    [Selector("enterFullScreenMode:withOptions:")]
+    public bool EnterFullScreenModeWithOptions(NSScreen screen, NSDictionary? options);
+    [Selector("exitFullScreenModeWithOptions:")]
+    public void ExitFullScreenModeWithOptions(NSDictionary? options);
 }
 
 public using NSDefinitionOptionKey = NSString;
@@ -361,110 +558,151 @@ public objc closure NSPoint NSViewShowDefinitionForAttributedStringRangeOptionsB
 /// NSDefinition, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("showDefinitionForAttributedString:atPoint:")] public void ShowDefinitionForAttributedStringAtPoint(NSAttributedString? attrString, NSPoint textBaselineOrigin);
-    [Selector("showDefinitionForAttributedString:range:options:baselineOriginProvider:")] public void ShowDefinitionForAttributedStringRangeOptionsBaselineOriginProvider(NSAttributedString? attrString, NSRange targetRange, NSDictionary? options, NSViewShowDefinitionForAttributedStringRangeOptionsBaselineOriginProviderOriginProviderBlock? originProvider);
+    [Selector("showDefinitionForAttributedString:atPoint:")]
+    public void ShowDefinitionForAttributedStringAtPoint(NSAttributedString? attrString, NSPoint textBaselineOrigin);
+    [Selector("showDefinitionForAttributedString:range:options:baselineOriginProvider:")]
+    public void ShowDefinitionForAttributedStringRangeOptionsBaselineOriginProvider(NSAttributedString? attrString, NSRange targetRange, NSDictionary? options, NSViewShowDefinitionForAttributedStringRangeOptionsBaselineOriginProviderOriginProviderBlock? originProvider);
 }
 
 /// NSFindIndicator, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("isDrawingFindIndicator")] public bool DrawingFindIndicator { get; }
+    [Selector("isDrawingFindIndicator")]
+    public bool DrawingFindIndicator { get; }
 }
 
 /// NSGestureRecognizer, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("gestureRecognizers", "setGestureRecognizers:")] public NSArray? GestureRecognizers { get; set; }
-    [Selector("addGestureRecognizer:")] public void AddGestureRecognizer(NSGestureRecognizer gestureRecognizer);
-    [Selector("removeGestureRecognizer:")] public void RemoveGestureRecognizer(NSGestureRecognizer gestureRecognizer);
+    [Selector("gestureRecognizers", "setGestureRecognizers:")]
+    public NSArray? GestureRecognizers { get; set; }
+    [Selector("addGestureRecognizer:")]
+    public void AddGestureRecognizer(NSGestureRecognizer gestureRecognizer);
+    [Selector("removeGestureRecognizer:")]
+    public void RemoveGestureRecognizer(NSGestureRecognizer gestureRecognizer);
 }
 
 /// NSTouchBar, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("allowedTouchTypes", "setAllowedTouchTypes:")] public NSTouchTypeMask AllowedTouchTypes { get; set; }
+    [Selector("allowedTouchTypes", "setAllowedTouchTypes:")]
+    public NSTouchTypeMask AllowedTouchTypes { get; set; }
 }
 
 /// NSSafeAreas, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("safeAreaInsets")] public NSEdgeInsets SafeAreaInsets { get; }
-    [Selector("additionalSafeAreaInsets", "setAdditionalSafeAreaInsets:")] public NSEdgeInsets AdditionalSafeAreaInsets { get; set; }
-    [Selector("safeAreaLayoutGuide")] public NSLayoutGuide? SafeAreaLayoutGuide { get; }
-    [Selector("safeAreaRect")] public NSRect SafeAreaRect { get; }
-    [Selector("layoutMarginsGuide")] public NSLayoutGuide? LayoutMarginsGuide { get; }
+    [Selector("safeAreaInsets")]
+    public NSEdgeInsets SafeAreaInsets { get; }
+    [Selector("additionalSafeAreaInsets", "setAdditionalSafeAreaInsets:")]
+    public NSEdgeInsets AdditionalSafeAreaInsets { get; set; }
+    [Selector("safeAreaLayoutGuide")]
+    public NSLayoutGuide? SafeAreaLayoutGuide { get; }
+    [Selector("safeAreaRect")]
+    public NSRect SafeAreaRect { get; }
+    [Selector("layoutMarginsGuide")]
+    public NSLayoutGuide? LayoutMarginsGuide { get; }
 }
 
 /// NSCompactControlSizeMetrics, a category of NSView.
 public extern objc class NSView
 {
     /// macOS 26.0 and later.
-    [Selector("prefersCompactControlSizeMetrics", "setPrefersCompactControlSizeMetrics:")] public bool PrefersCompactControlSizeMetrics { get; set; }
+    [Selector("prefersCompactControlSizeMetrics", "setPrefersCompactControlSizeMetrics:")]
+    public bool PrefersCompactControlSizeMetrics { get; set; }
 }
 
 /// NSTrackingArea, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("trackingAreas")] public NSArray? TrackingAreas { get; }
-    [Selector("addTrackingArea:")] public void AddTrackingArea(NSTrackingArea trackingArea);
-    [Selector("removeTrackingArea:")] public void RemoveTrackingArea(NSTrackingArea trackingArea);
-    [Selector("updateTrackingAreas")] public void UpdateTrackingAreas();
-    [Selector("addCursorRect:cursor:")] public void AddCursorRectCursor(NSRect rect, NSCursor object);
-    [Selector("removeCursorRect:cursor:")] public void RemoveCursorRectCursor(NSRect rect, NSCursor object);
-    [Selector("discardCursorRects")] public void DiscardCursorRects();
-    [Selector("resetCursorRects")] public void ResetCursorRects();
-    [Selector("addTrackingRect:owner:userData:assumeInside:")] public NSTrackingRectTag AddTrackingRectOwnerUserDataAssumeInside(NSRect rect, AnyObject owner, void* data, bool flag);
-    [Selector("removeTrackingRect:")] public void RemoveTrackingRect(NSTrackingRectTag tag);
+    [Selector("trackingAreas")]
+    public NSArray? TrackingAreas { get; }
+    [Selector("addTrackingArea:")]
+    public void AddTrackingArea(NSTrackingArea trackingArea);
+    [Selector("removeTrackingArea:")]
+    public void RemoveTrackingArea(NSTrackingArea trackingArea);
+    [Selector("updateTrackingAreas")]
+    public void UpdateTrackingAreas();
+    [Selector("addCursorRect:cursor:")]
+    public void AddCursorRectCursor(NSRect rect, NSCursor object);
+    [Selector("removeCursorRect:cursor:")]
+    public void RemoveCursorRectCursor(NSRect rect, NSCursor object);
+    [Selector("discardCursorRects")]
+    public void DiscardCursorRects();
+    [Selector("resetCursorRects")]
+    public void ResetCursorRects();
+    [Selector("addTrackingRect:owner:userData:assumeInside:")]
+    public NSTrackingRectTag AddTrackingRectOwnerUserDataAssumeInside(NSRect rect, AnyObject owner, void* data, bool flag);
+    [Selector("removeTrackingRect:")]
+    public void RemoveTrackingRect(NSTrackingRectTag tag);
 }
 
 /// NSDisplayLink, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("displayLinkWithTarget:selector:")] public CADisplayLink DisplayLinkWithTargetSelector(AnyObject target, Selector selector);
+    [Selector("displayLinkWithTarget:selector:")]
+    public CADisplayLink DisplayLinkWithTargetSelector(AnyObject target, Selector selector);
 }
 
 /// NSDeprecated, a category of NSView.
 public extern objc class NSView
 {
     /// Deprecated in macOS 10.7.
-    [Selector("dragImage:at:offset:event:pasteboard:source:slideBack:")] public void DragImageAtOffsetEventPasteboardSourceSlideBack(NSImage image, NSPoint viewLocation, NSSize initialOffset, NSEvent event, NSPasteboard pboard, AnyObject sourceObj, bool slideFlag);
+    [Selector("dragImage:at:offset:event:pasteboard:source:slideBack:")]
+    public void DragImageAtOffsetEventPasteboardSourceSlideBack(NSImage image, NSPoint viewLocation, NSSize initialOffset, NSEvent event, NSPasteboard pboard, AnyObject sourceObj, bool slideFlag);
     /// Deprecated in macOS 10.13.
-    [Selector("dragFile:fromRect:slideBack:event:")] public bool DragFileFromRectSlideBackEvent(NSString filename, NSRect rect, bool flag, NSEvent event);
+    [Selector("dragFile:fromRect:slideBack:event:")]
+    public bool DragFileFromRectSlideBackEvent(NSString filename, NSRect rect, bool flag, NSEvent event);
     /// Deprecated in macOS 10.13.
-    [Selector("dragPromisedFilesOfTypes:fromRect:source:slideBack:event:")] public bool DragPromisedFilesOfTypesFromRectSourceSlideBackEvent(NSArray typeArray, NSRect rect, AnyObject sourceObject, bool flag, NSEvent event);
+    [Selector("dragPromisedFilesOfTypes:fromRect:source:slideBack:event:")]
+    public bool DragPromisedFilesOfTypesFromRectSourceSlideBackEvent(NSArray typeArray, NSRect rect, AnyObject sourceObject, bool flag, NSEvent event);
     /// Deprecated in macOS 10.7.
-    [Selector("convertPointToBase:")] public NSPoint ConvertPointToBase(NSPoint point);
+    [Selector("convertPointToBase:")]
+    public NSPoint ConvertPointToBase(NSPoint point);
     /// Deprecated in macOS 10.7.
-    [Selector("convertPointFromBase:")] public NSPoint ConvertPointFromBase(NSPoint point);
+    [Selector("convertPointFromBase:")]
+    public NSPoint ConvertPointFromBase(NSPoint point);
     /// Deprecated in macOS 10.7.
-    [Selector("convertSizeToBase:")] public NSSize ConvertSizeToBase(NSSize size);
+    [Selector("convertSizeToBase:")]
+    public NSSize ConvertSizeToBase(NSSize size);
     /// Deprecated in macOS 10.7.
-    [Selector("convertSizeFromBase:")] public NSSize ConvertSizeFromBase(NSSize size);
+    [Selector("convertSizeFromBase:")]
+    public NSSize ConvertSizeFromBase(NSSize size);
     /// Deprecated in macOS 10.7.
-    [Selector("convertRectToBase:")] public NSRect ConvertRectToBase(NSRect rect);
+    [Selector("convertRectToBase:")]
+    public NSRect ConvertRectToBase(NSRect rect);
     /// Deprecated in macOS 10.7.
-    [Selector("convertRectFromBase:")] public NSRect ConvertRectFromBase(NSRect rect);
+    [Selector("convertRectFromBase:")]
+    public NSRect ConvertRectFromBase(NSRect rect);
     /// Deprecated in macOS 10.8.
-    [Selector("performMnemonic:")] public bool PerformMnemonic(NSString string);
+    [Selector("performMnemonic:")]
+    public bool PerformMnemonic(NSString string);
     /// Deprecated in macOS 10.10.
-    [Selector("shouldDrawColor")] public bool ShouldDrawColor();
+    [Selector("shouldDrawColor")]
+    public bool ShouldDrawColor();
     /// Deprecated in macOS 10.10.
-    [Selector("gState")] public NSInteger GState();
+    [Selector("gState")]
+    public NSInteger GState();
     /// Deprecated in macOS 10.10.
-    [Selector("allocateGState")] public void AllocateGState();
+    [Selector("allocateGState")]
+    public void AllocateGState();
     /// Deprecated in macOS 10.10.
-    [Selector("releaseGState")] public void ReleaseGState();
+    [Selector("releaseGState")]
+    public void ReleaseGState();
     /// Deprecated in macOS 10.10.
-    [Selector("setUpGState")] public void SetUpGState();
+    [Selector("setUpGState")]
+    public void SetUpGState();
     /// Deprecated in macOS 10.10.
-    [Selector("renewGState")] public void RenewGState();
+    [Selector("renewGState")]
+    public void RenewGState();
 }
 
 /// macOS 15.2 and later.
 /// NSWritingToolsCoordinator, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("writingToolsCoordinator", "setWritingToolsCoordinator:")] public NSWritingToolsCoordinator? WritingToolsCoordinator { get; set; }
+    [Selector("writingToolsCoordinator", "setWritingToolsCoordinator:")]
+    public NSWritingToolsCoordinator? WritingToolsCoordinator { get; set; }
 }
 
 public extern "C" NSNotificationName NSViewFrameDidChangeNotification;

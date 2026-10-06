@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class AMWorkflowView : NSView
 {
-    [Selector("isEditable", "setEditable:")] public bool Editable { get; set; }
-    [Selector("workflowController", "setWorkflowController:")] public AMWorkflowController? WorkflowController { get; set; }
+    [Selector("isEditable", "setEditable:")]
+    public bool Editable { get; set; }
+    [Selector("workflowController", "setWorkflowController:")]
+    public AMWorkflowController? WorkflowController { get; set; }
 }
 
 #endif

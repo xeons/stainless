@@ -34,21 +34,36 @@ import Standard.ObjC;
 
 public extern objc class SFCertificateView : NSVisualEffectView
 {
-    [Selector("setCertificate:")] public void SetCertificate(SecCertificateRef? certificate);
-    [Selector("certificate")] public SecCertificateRef? Certificate();
-    [Selector("setPolicies:")] public void SetPolicies(AnyObject? policies);
-    [Selector("policies")] public NSArray? Policies();
-    [Selector("setEditableTrust:")] public void SetEditableTrust(bool editable);
-    [Selector("isEditable")] public bool IsEditable();
-    [Selector("setDisplayTrust:")] public void SetDisplayTrust(bool display);
-    [Selector("isTrustDisplayed")] public bool IsTrustDisplayed();
-    [Selector("saveTrustSettings")] public void SaveTrustSettings();
-    [Selector("setDisplayDetails:")] public void SetDisplayDetails(bool display);
-    [Selector("detailsDisplayed")] public bool DetailsDisplayed();
-    [Selector("setDetailsDisclosed:")] public void SetDetailsDisclosed(bool disclosed);
-    [Selector("detailsDisclosed")] public bool DetailsDisclosed();
-    [Selector("setPoliciesDisclosed:")] public void SetPoliciesDisclosed(bool disclosed);
-    [Selector("policiesDisclosed")] public bool PoliciesDisclosed();
+    [Selector("setCertificate:")]
+    public void SetCertificate(SecCertificateRef? certificate);
+    [Selector("certificate")]
+    public SecCertificateRef? Certificate();
+    [Selector("setPolicies:")]
+    public void SetPolicies(AnyObject? policies);
+    [Selector("policies")]
+    public NSArray? Policies();
+    [Selector("setEditableTrust:")]
+    public void SetEditableTrust(bool editable);
+    [Selector("isEditable")]
+    public bool IsEditable();
+    [Selector("setDisplayTrust:")]
+    public void SetDisplayTrust(bool display);
+    [Selector("isTrustDisplayed")]
+    public bool IsTrustDisplayed();
+    [Selector("saveTrustSettings")]
+    public void SaveTrustSettings();
+    [Selector("setDisplayDetails:")]
+    public void SetDisplayDetails(bool display);
+    [Selector("detailsDisplayed")]
+    public bool DetailsDisplayed();
+    [Selector("setDetailsDisclosed:")]
+    public void SetDetailsDisclosed(bool disclosed);
+    [Selector("detailsDisclosed")]
+    public bool DetailsDisclosed();
+    [Selector("setPoliciesDisclosed:")]
+    public void SetPoliciesDisclosed(bool disclosed);
+    [Selector("policiesDisclosed")]
+    public bool PoliciesDisclosed();
 }
 
 public extern "C" NSString? SFCertificateViewDisclosureStateDidChange;

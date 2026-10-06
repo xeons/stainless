@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class NSScriptCoercionHandler : NSObject
 {
-    [Selector("sharedCoercionHandler")] public static NSScriptCoercionHandler SharedCoercionHandler();
-    [Selector("coerceValue:toClass:")] public AnyObject? CoerceValueToClass(AnyObject value, Class toClass);
-    [Selector("registerCoercer:selector:toConvertFromClass:toClass:")] public void RegisterCoercerSelectorToConvertFromClassToClass(AnyObject coercer, Selector selector, Class fromClass, Class toClass);
+    [Selector("sharedCoercionHandler")]
+    public static NSScriptCoercionHandler SharedCoercionHandler();
+    [Selector("coerceValue:toClass:")]
+    public AnyObject? CoerceValueToClass(AnyObject value, Class toClass);
+    [Selector("registerCoercer:selector:toConvertFromClass:toClass:")]
+    public void RegisterCoercerSelectorToConvertFromClassToClass(AnyObject coercer, Selector selector, Class fromClass, Class toClass);
 }
 
 #endif

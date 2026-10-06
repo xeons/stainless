@@ -33,20 +33,28 @@ import Standard.ObjC;
 
 public extern objc class NSPersistentDocument : NSDocument
 {
-    [Selector("managedObjectContext", "setManagedObjectContext:")] public NSManagedObjectContext? ManagedObjectContext { get; set; }
-    [Selector("managedObjectModel")] public NSManagedObjectModel? ManagedObjectModel { get; }
-    [Selector("configurePersistentStoreCoordinatorForURL:ofType:modelConfiguration:storeOptions:error:")] public bool ConfigurePersistentStoreCoordinatorForURLOfTypeModelConfigurationStoreOptionsError(NSURL url, NSString fileType, NSString? configuration, NSDictionary? storeOptions, out NSError? error);
-    [Selector("persistentStoreTypeForFileType:")] public NSString PersistentStoreTypeForFileType(NSString fileType);
-    [Selector("writeToURL:ofType:forSaveOperation:originalContentsURL:error:")] public bool WriteToURLOfTypeForSaveOperationOriginalContentsURLError(NSURL absoluteURL, NSString typeName, NSSaveOperationType saveOperation, NSURL? absoluteOriginalContentsURL, out NSError? error);
-    [Selector("readFromURL:ofType:error:")] public bool ReadFromURLOfTypeError(NSURL absoluteURL, NSString typeName, out NSError? error);
-    [Selector("revertToContentsOfURL:ofType:error:")] public bool RevertToContentsOfURLOfTypeError(NSURL inAbsoluteURL, NSString inTypeName, out NSError? outError);
+    [Selector("managedObjectContext", "setManagedObjectContext:")]
+    public NSManagedObjectContext? ManagedObjectContext { get; set; }
+    [Selector("managedObjectModel")]
+    public NSManagedObjectModel? ManagedObjectModel { get; }
+    [Selector("configurePersistentStoreCoordinatorForURL:ofType:modelConfiguration:storeOptions:error:")]
+    public bool ConfigurePersistentStoreCoordinatorForURLOfTypeModelConfigurationStoreOptionsError(NSURL url, NSString fileType, NSString? configuration, NSDictionary? storeOptions, out NSError? error);
+    [Selector("persistentStoreTypeForFileType:")]
+    public NSString PersistentStoreTypeForFileType(NSString fileType);
+    [Selector("writeToURL:ofType:forSaveOperation:originalContentsURL:error:")]
+    public bool WriteToURLOfTypeForSaveOperationOriginalContentsURLError(NSURL absoluteURL, NSString typeName, NSSaveOperationType saveOperation, NSURL? absoluteOriginalContentsURL, out NSError? error);
+    [Selector("readFromURL:ofType:error:")]
+    public bool ReadFromURLOfTypeError(NSURL absoluteURL, NSString typeName, out NSError? error);
+    [Selector("revertToContentsOfURL:ofType:error:")]
+    public bool RevertToContentsOfURLOfTypeError(NSURL inAbsoluteURL, NSString inTypeName, out NSError? outError);
 }
 
 /// NSDeprecated, a category of NSPersistentDocument.
 public extern objc class NSPersistentDocument
 {
     /// Deprecated in macOS 10.5.
-    [Selector("configurePersistentStoreCoordinatorForURL:ofType:error:")] public bool ConfigurePersistentStoreCoordinatorForURLOfTypeError(NSURL? url, NSString? fileType, out NSError? error);
+    [Selector("configurePersistentStoreCoordinatorForURL:ofType:error:")]
+    public bool ConfigurePersistentStoreCoordinatorForURLOfTypeError(NSURL? url, NSString? fileType, out NSError? error);
 }
 
 #endif

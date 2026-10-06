@@ -51,66 +51,98 @@ public using TKTokenOperationConstraint = AnyObject;
 
 public extern objc class TKTokenKeyAlgorithm : NSObject
 {
-    [Selector("isAlgorithm:")] public bool IsAlgorithm(SecKeyAlgorithm algorithm);
-    [Selector("supportsAlgorithm:")] public bool SupportsAlgorithm(SecKeyAlgorithm algorithm);
+    [Selector("isAlgorithm:")]
+    public bool IsAlgorithm(SecKeyAlgorithm algorithm);
+    [Selector("supportsAlgorithm:")]
+    public bool SupportsAlgorithm(SecKeyAlgorithm algorithm);
 }
 
 public extern objc class TKTokenKeyExchangeParameters : NSObject
 {
-    [Selector("requestedSize")] public NSInteger RequestedSize { get; }
-    [Selector("sharedInfo")] public NSData? SharedInfo { get; }
+    [Selector("requestedSize")]
+    public NSInteger RequestedSize { get; }
+    [Selector("sharedInfo")]
+    public NSData? SharedInfo { get; }
 }
 
 public extern objc class TKTokenSession : NSObject
 {
-    [Selector("token")] public TKToken Token { get; }
-    [Selector("delegate", "setDelegate:")] public TKTokenSessionDelegate? Delegate { get; set; }
-    [Selector("initWithToken:")] public Self InitWithToken(TKToken token);
+    [Selector("token")]
+    public TKToken Token { get; }
+    [Selector("delegate", "setDelegate:")]
+    public TKTokenSessionDelegate? Delegate { get; set; }
+    [Selector("initWithToken:")]
+    public Self InitWithToken(TKToken token);
 }
 
 public objc interface TKTokenSessionDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("tokenSession:beginAuthForOperation:constraint:error:")] TKTokenAuthOperation? TokenSessionBeginAuthForOperationConstraintError(TKTokenSession session, TKTokenOperation operation, TKTokenOperationConstraint constraint, out NSError? error);
-    [Optional] [Selector("tokenSession:supportsOperation:usingKey:algorithm:")] bool TokenSessionSupportsOperationUsingKeyAlgorithm(TKTokenSession session, TKTokenOperation operation, TKTokenObjectID keyObjectID, TKTokenKeyAlgorithm algorithm);
-    [Optional] [Selector("tokenSession:signData:usingKey:algorithm:error:")] NSData? TokenSessionSignDataUsingKeyAlgorithmError(TKTokenSession session, NSData dataToSign, TKTokenObjectID keyObjectID, TKTokenKeyAlgorithm algorithm, out NSError? error);
-    [Optional] [Selector("tokenSession:decryptData:usingKey:algorithm:error:")] NSData? TokenSessionDecryptDataUsingKeyAlgorithmError(TKTokenSession session, NSData ciphertext, TKTokenObjectID keyObjectID, TKTokenKeyAlgorithm algorithm, out NSError? error);
-    [Optional] [Selector("tokenSession:performKeyExchangeWithPublicKey:usingKey:algorithm:parameters:error:")] NSData? TokenSessionPerformKeyExchangeWithPublicKeyUsingKeyAlgorithmParametersError(TKTokenSession session, NSData otherPartyPublicKeyData, TKTokenObjectID objectID, TKTokenKeyAlgorithm algorithm, TKTokenKeyExchangeParameters parameters, out NSError? error);
+    [Optional]
+    [Selector("tokenSession:beginAuthForOperation:constraint:error:")]
+    TKTokenAuthOperation? TokenSessionBeginAuthForOperationConstraintError(TKTokenSession session, TKTokenOperation operation, TKTokenOperationConstraint constraint, out NSError? error);
+    [Optional]
+    [Selector("tokenSession:supportsOperation:usingKey:algorithm:")]
+    bool TokenSessionSupportsOperationUsingKeyAlgorithm(TKTokenSession session, TKTokenOperation operation, TKTokenObjectID keyObjectID, TKTokenKeyAlgorithm algorithm);
+    [Optional]
+    [Selector("tokenSession:signData:usingKey:algorithm:error:")]
+    NSData? TokenSessionSignDataUsingKeyAlgorithmError(TKTokenSession session, NSData dataToSign, TKTokenObjectID keyObjectID, TKTokenKeyAlgorithm algorithm, out NSError? error);
+    [Optional]
+    [Selector("tokenSession:decryptData:usingKey:algorithm:error:")]
+    NSData? TokenSessionDecryptDataUsingKeyAlgorithmError(TKTokenSession session, NSData ciphertext, TKTokenObjectID keyObjectID, TKTokenKeyAlgorithm algorithm, out NSError? error);
+    [Optional]
+    [Selector("tokenSession:performKeyExchangeWithPublicKey:usingKey:algorithm:parameters:error:")]
+    NSData? TokenSessionPerformKeyExchangeWithPublicKeyUsingKeyAlgorithmParametersError(TKTokenSession session, NSData otherPartyPublicKeyData, TKTokenObjectID objectID, TKTokenKeyAlgorithm algorithm, TKTokenKeyExchangeParameters parameters, out NSError? error);
 }
 
 public extern objc class TKToken : NSObject
 {
-    [Selector("tokenDriver")] public TKTokenDriver TokenDriver { get; }
-    [Selector("delegate", "setDelegate:")] public TKTokenDelegate? Delegate { get; set; }
-    [Selector("configuration")] public TKTokenConfiguration Configuration { get; }
-    [Selector("keychainContents")] public TKTokenKeychainContents? KeychainContents { get; }
-    [Selector("initWithTokenDriver:instanceID:")] public Self InitWithTokenDriverInstanceID(TKTokenDriver tokenDriver, TKTokenInstanceID instanceID);
+    [Selector("tokenDriver")]
+    public TKTokenDriver TokenDriver { get; }
+    [Selector("delegate", "setDelegate:")]
+    public TKTokenDelegate? Delegate { get; set; }
+    [Selector("configuration")]
+    public TKTokenConfiguration Configuration { get; }
+    [Selector("keychainContents")]
+    public TKTokenKeychainContents? KeychainContents { get; }
+    [Selector("initWithTokenDriver:instanceID:")]
+    public Self InitWithTokenDriverInstanceID(TKTokenDriver tokenDriver, TKTokenInstanceID instanceID);
 }
 
 public objc interface TKTokenDelegate : NSObjectProtocol
 {
-    [Selector("token:createSessionWithError:")] TKTokenSession? TokenCreateSessionWithError(TKToken token, out NSError? error);
-    [Optional] [Selector("token:terminateSession:")] void TokenTerminateSession(TKToken token, TKTokenSession session);
+    [Selector("token:createSessionWithError:")]
+    TKTokenSession? TokenCreateSessionWithError(TKToken token, out NSError? error);
+    [Optional]
+    [Selector("token:terminateSession:")]
+    void TokenTerminateSession(TKToken token, TKTokenSession session);
 }
 
 public extern objc class TKTokenDriver : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public TKTokenDriverDelegate? Delegate { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public TKTokenDriverDelegate? Delegate { get; set; }
 }
 
 public objc interface TKTokenDriverDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("tokenDriver:tokenForConfiguration:error:")] TKToken? TokenDriverTokenForConfigurationError(TKTokenDriver driver, TKTokenConfiguration configuration, out NSError? error);
-    [Optional] [Selector("tokenDriver:terminateToken:")] void TokenDriverTerminateToken(TKTokenDriver driver, TKToken token);
+    [Optional]
+    [Selector("tokenDriver:tokenForConfiguration:error:")]
+    TKToken? TokenDriverTokenForConfigurationError(TKTokenDriver driver, TKTokenConfiguration configuration, out NSError? error);
+    [Optional]
+    [Selector("tokenDriver:terminateToken:")]
+    void TokenDriverTerminateToken(TKTokenDriver driver, TKToken token);
 }
 
 public extern objc class TKTokenAuthOperation : NSObject, NSSecureCoding
 {
-    [Selector("finishWithError:")] public bool FinishWithError(out NSError? error);
+    [Selector("finishWithError:")]
+    public bool FinishWithError(out NSError? error);
 }
 
 public extern objc class TKTokenPasswordAuthOperation : TKTokenAuthOperation
 {
-    [Selector("password", "setPassword:")] public NSString? Password { get; set; }
+    [Selector("password", "setPassword:")]
+    public NSString? Password { get; set; }
 }
 
 #endif

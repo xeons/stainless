@@ -33,42 +33,63 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.13.
 public extern objc class NSPortNameServer : NSObject
 {
-    [Selector("systemDefaultPortNameServer")] public static NSPortNameServer SystemDefaultPortNameServer();
-    [Selector("portForName:")] public NSPort? PortForName(NSString name);
-    [Selector("portForName:host:")] public NSPort? PortForNameHost(NSString name, NSString? host);
-    [Selector("registerPort:name:")] public bool RegisterPortName(NSPort port, NSString name);
-    [Selector("removePortForName:")] public bool RemovePortForName(NSString name);
+    [Selector("systemDefaultPortNameServer")]
+    public static NSPortNameServer SystemDefaultPortNameServer();
+    [Selector("portForName:")]
+    public NSPort? PortForName(NSString name);
+    [Selector("portForName:host:")]
+    public NSPort? PortForNameHost(NSString name, NSString? host);
+    [Selector("registerPort:name:")]
+    public bool RegisterPortName(NSPort port, NSString name);
+    [Selector("removePortForName:")]
+    public bool RemovePortForName(NSString name);
 }
 
 /// Deprecated in macOS 10.13.
 public extern objc class NSMachBootstrapServer : NSPortNameServer
 {
-    [Selector("sharedInstance")] public static AnyObject SharedInstance();
-    [Selector("portForName:")] public NSPort? PortForName(NSString name);
-    [Selector("portForName:host:")] public NSPort? PortForNameHost(NSString name, NSString? host);
-    [Selector("registerPort:name:")] public bool RegisterPortName(NSPort port, NSString name);
-    [Selector("servicePortWithName:")] public NSPort? ServicePortWithName(NSString name);
+    [Selector("sharedInstance")]
+    public static AnyObject SharedInstance();
+    [Selector("portForName:")]
+    public NSPort? PortForName(NSString name);
+    [Selector("portForName:host:")]
+    public NSPort? PortForNameHost(NSString name, NSString? host);
+    [Selector("registerPort:name:")]
+    public bool RegisterPortName(NSPort port, NSString name);
+    [Selector("servicePortWithName:")]
+    public NSPort? ServicePortWithName(NSString name);
 }
 
 /// Deprecated in macOS 10.13.
 public extern objc class NSMessagePortNameServer : NSPortNameServer
 {
-    [Selector("sharedInstance")] public static AnyObject SharedInstance();
-    [Selector("portForName:")] public NSPort? PortForName(NSString name);
-    [Selector("portForName:host:")] public NSPort? PortForNameHost(NSString name, NSString? host);
+    [Selector("sharedInstance")]
+    public static AnyObject SharedInstance();
+    [Selector("portForName:")]
+    public NSPort? PortForName(NSString name);
+    [Selector("portForName:host:")]
+    public NSPort? PortForNameHost(NSString name, NSString? host);
 }
 
 /// Deprecated in macOS 10.13.
 public extern objc class NSSocketPortNameServer : NSPortNameServer
 {
-    [Selector("defaultNameServerPortNumber", "setDefaultNameServerPortNumber:")] public ushort DefaultNameServerPortNumber { get; set; }
-    [Selector("sharedInstance")] public static AnyObject SharedInstance();
-    [Selector("portForName:")] public NSPort? PortForName(NSString name);
-    [Selector("portForName:host:")] public NSPort? PortForNameHost(NSString name, NSString? host);
-    [Selector("registerPort:name:")] public bool RegisterPortName(NSPort port, NSString name);
-    [Selector("removePortForName:")] public bool RemovePortForName(NSString name);
-    [Selector("portForName:host:nameServerPortNumber:")] public NSPort? PortForNameHostNameServerPortNumber(NSString name, NSString? host, ushort portNumber);
-    [Selector("registerPort:name:nameServerPortNumber:")] public bool RegisterPortNameNameServerPortNumber(NSPort port, NSString name, ushort portNumber);
+    [Selector("defaultNameServerPortNumber", "setDefaultNameServerPortNumber:")]
+    public ushort DefaultNameServerPortNumber { get; set; }
+    [Selector("sharedInstance")]
+    public static AnyObject SharedInstance();
+    [Selector("portForName:")]
+    public NSPort? PortForName(NSString name);
+    [Selector("portForName:host:")]
+    public NSPort? PortForNameHost(NSString name, NSString? host);
+    [Selector("registerPort:name:")]
+    public bool RegisterPortName(NSPort port, NSString name);
+    [Selector("removePortForName:")]
+    public bool RemovePortForName(NSString name);
+    [Selector("portForName:host:nameServerPortNumber:")]
+    public NSPort? PortForNameHostNameServerPortNumber(NSString name, NSString? host, ushort portNumber);
+    [Selector("registerPort:name:nameServerPortNumber:")]
+    public bool RegisterPortNameNameServerPortNumber(NSPort port, NSString name, ushort portNumber);
 }
 
 #endif

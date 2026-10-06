@@ -34,14 +34,22 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCEmbeddingDescriptor : NSObject, NSCopying
 {
-    [Selector("embeddingCount")] public NSNumber? EmbeddingCount { get; }
-    [Selector("embeddingDimension")] public NSNumber? EmbeddingDimension { get; }
-    [Selector("paddingIndex")] public NSNumber? PaddingIndex { get; }
-    [Selector("maximumNorm")] public NSNumber? MaximumNorm { get; }
-    [Selector("pNorm")] public NSNumber? PNorm { get; }
-    [Selector("scalesGradientByFrequency")] public bool ScalesGradientByFrequency { get; }
-    [Selector("descriptorWithEmbeddingCount:embeddingDimension:")] public static Self? DescriptorWithEmbeddingCountEmbeddingDimension(NSNumber embeddingCount, NSNumber embeddingDimension);
-    [Selector("descriptorWithEmbeddingCount:embeddingDimension:paddingIndex:maximumNorm:pNorm:scalesGradientByFrequency:")] public static Self? DescriptorWithEmbeddingCountEmbeddingDimensionPaddingIndexMaximumNormPNormScalesGradientByFrequency(NSNumber embeddingCount, NSNumber embeddingDimension, NSNumber? paddingIndex, NSNumber? maximumNorm, NSNumber? pNorm, bool scalesGradientByFrequency);
+    [Selector("embeddingCount")]
+    public NSNumber? EmbeddingCount { get; }
+    [Selector("embeddingDimension")]
+    public NSNumber? EmbeddingDimension { get; }
+    [Selector("paddingIndex")]
+    public NSNumber? PaddingIndex { get; }
+    [Selector("maximumNorm")]
+    public NSNumber? MaximumNorm { get; }
+    [Selector("pNorm")]
+    public NSNumber? PNorm { get; }
+    [Selector("scalesGradientByFrequency")]
+    public bool ScalesGradientByFrequency { get; }
+    [Selector("descriptorWithEmbeddingCount:embeddingDimension:")]
+    public static Self? DescriptorWithEmbeddingCountEmbeddingDimension(NSNumber embeddingCount, NSNumber embeddingDimension);
+    [Selector("descriptorWithEmbeddingCount:embeddingDimension:paddingIndex:maximumNorm:pNorm:scalesGradientByFrequency:")]
+    public static Self? DescriptorWithEmbeddingCountEmbeddingDimensionPaddingIndexMaximumNormPNormScalesGradientByFrequency(NSNumber embeddingCount, NSNumber embeddingDimension, NSNumber? paddingIndex, NSNumber? maximumNorm, NSNumber? pNorm, bool scalesGradientByFrequency);
 }
 
 #endif

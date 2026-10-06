@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class MEEmailAddress : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("rawString")] public NSString RawString { get; }
-    [Selector("addressString")] public NSString? AddressString { get; }
-    [Selector("initWithRawString:")] public Self InitWithRawString(NSString rawString);
+    [Selector("rawString")]
+    public NSString RawString { get; }
+    [Selector("addressString")]
+    public NSString? AddressString { get; }
+    [Selector("initWithRawString:")]
+    public Self InitWithRawString(NSString rawString);
 }
 
 #endif

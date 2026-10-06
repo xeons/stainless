@@ -33,27 +33,37 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.13.
 public extern objc class NSPortCoder : NSCoder
 {
-    [Selector("isBycopy")] public bool IsBycopy();
-    [Selector("isByref")] public bool IsByref();
-    [Selector("encodePortObject:")] public void EncodePortObject(NSPort aport);
-    [Selector("decodePortObject")] public NSPort? DecodePortObject();
+    [Selector("isBycopy")]
+    public bool IsBycopy();
+    [Selector("isByref")]
+    public bool IsByref();
+    [Selector("encodePortObject:")]
+    public void EncodePortObject(NSPort aport);
+    [Selector("decodePortObject")]
+    public NSPort? DecodePortObject();
     /// Deprecated in macOS 10.7.
-    [Selector("connection")] public NSConnection? Connection();
+    [Selector("connection")]
+    public NSConnection? Connection();
     /// Deprecated in macOS 10.7.
-    [Selector("portCoderWithReceivePort:sendPort:components:")] public static AnyObject PortCoderWithReceivePortSendPortComponents(NSPort? rcvPort, NSPort? sndPort, NSArray? comps);
+    [Selector("portCoderWithReceivePort:sendPort:components:")]
+    public static AnyObject PortCoderWithReceivePortSendPortComponents(NSPort? rcvPort, NSPort? sndPort, NSArray? comps);
     /// Deprecated in macOS 10.7.
-    [Selector("initWithReceivePort:sendPort:components:")] public AnyObject InitWithReceivePortSendPortComponents(NSPort? rcvPort, NSPort? sndPort, NSArray? comps);
+    [Selector("initWithReceivePort:sendPort:components:")]
+    public AnyObject InitWithReceivePortSendPortComponents(NSPort? rcvPort, NSPort? sndPort, NSArray? comps);
     /// Deprecated in macOS 10.7.
-    [Selector("dispatch")] public void Dispatch();
+    [Selector("dispatch")]
+    public void Dispatch();
 }
 
 /// NSDistributedObjects, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.13.
-    [Selector("classForPortCoder")] public Class ClassForPortCoder { get; }
+    [Selector("classForPortCoder")]
+    public Class ClassForPortCoder { get; }
     /// Deprecated in macOS 10.13.
-    [Selector("replacementObjectForPortCoder:")] public AnyObject? ReplacementObjectForPortCoder(NSPortCoder coder);
+    [Selector("replacementObjectForPortCoder:")]
+    public AnyObject? ReplacementObjectForPortCoder(NSPortCoder coder);
 }
 
 #endif

@@ -33,24 +33,42 @@ import Standard.ObjC;
 
 public extern objc class GKRuleSystem : NSObject
 {
-    [Selector("state")] public NSMutableDictionary State { get; }
-    [Selector("rules")] public NSArray Rules { get; }
-    [Selector("agenda")] public NSArray Agenda { get; }
-    [Selector("executed")] public NSArray Executed { get; }
-    [Selector("facts")] public NSArray Facts { get; }
-    [Selector("init")] public Self Init();
-    [Selector("evaluate")] public void Evaluate();
-    [Selector("addRule:")] public void AddRule(GKRule rule);
-    [Selector("addRulesFromArray:")] public void AddRulesFromArray(NSArray rules);
-    [Selector("removeAllRules")] public void RemoveAllRules();
-    [Selector("gradeForFact:")] public float GradeForFact(NSObjectProtocol fact);
-    [Selector("minimumGradeForFacts:")] public float MinimumGradeForFacts(NSArray facts);
-    [Selector("maximumGradeForFacts:")] public float MaximumGradeForFacts(NSArray facts);
-    [Selector("assertFact:")] public void AssertFact(NSObjectProtocol fact);
-    [Selector("assertFact:grade:")] public void AssertFactGrade(NSObjectProtocol fact, float grade);
-    [Selector("retractFact:")] public void RetractFact(NSObjectProtocol fact);
-    [Selector("retractFact:grade:")] public void RetractFactGrade(NSObjectProtocol fact, float grade);
-    [Selector("reset")] public void Reset();
+    [Selector("state")]
+    public NSMutableDictionary State { get; }
+    [Selector("rules")]
+    public NSArray Rules { get; }
+    [Selector("agenda")]
+    public NSArray Agenda { get; }
+    [Selector("executed")]
+    public NSArray Executed { get; }
+    [Selector("facts")]
+    public NSArray Facts { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("evaluate")]
+    public void Evaluate();
+    [Selector("addRule:")]
+    public void AddRule(GKRule rule);
+    [Selector("addRulesFromArray:")]
+    public void AddRulesFromArray(NSArray rules);
+    [Selector("removeAllRules")]
+    public void RemoveAllRules();
+    [Selector("gradeForFact:")]
+    public float GradeForFact(NSObjectProtocol fact);
+    [Selector("minimumGradeForFacts:")]
+    public float MinimumGradeForFacts(NSArray facts);
+    [Selector("maximumGradeForFacts:")]
+    public float MaximumGradeForFacts(NSArray facts);
+    [Selector("assertFact:")]
+    public void AssertFact(NSObjectProtocol fact);
+    [Selector("assertFact:grade:")]
+    public void AssertFactGrade(NSObjectProtocol fact, float grade);
+    [Selector("retractFact:")]
+    public void RetractFact(NSObjectProtocol fact);
+    [Selector("retractFact:grade:")]
+    public void RetractFactGrade(NSObjectProtocol fact, float grade);
+    [Selector("reset")]
+    public void Reset();
 }
 
 public objc closure bool GKRuleRuleWithBlockPredicateActionPredicateBlock(GKRuleSystem arg0);
@@ -59,19 +77,28 @@ public objc closure void GKRuleRuleWithBlockPredicateActionActionBlock(GKRuleSys
 
 public extern objc class GKRule : NSObject
 {
-    [Selector("salience", "setSalience:")] public NSInteger Salience { get; set; }
-    [Selector("evaluatePredicateWithSystem:")] public bool EvaluatePredicateWithSystem(GKRuleSystem system);
-    [Selector("performActionWithSystem:")] public void PerformActionWithSystem(GKRuleSystem system);
-    [Selector("ruleWithPredicate:assertingFact:grade:")] public static Self RuleWithPredicateAssertingFactGrade(NSPredicate predicate, NSObjectProtocol fact, float grade);
-    [Selector("ruleWithPredicate:retractingFact:grade:")] public static Self RuleWithPredicateRetractingFactGrade(NSPredicate predicate, NSObjectProtocol fact, float grade);
-    [Selector("ruleWithBlockPredicate:action:")] public static Self RuleWithBlockPredicateAction(GKRuleRuleWithBlockPredicateActionPredicateBlock predicate, GKRuleRuleWithBlockPredicateActionActionBlock action);
+    [Selector("salience", "setSalience:")]
+    public NSInteger Salience { get; set; }
+    [Selector("evaluatePredicateWithSystem:")]
+    public bool EvaluatePredicateWithSystem(GKRuleSystem system);
+    [Selector("performActionWithSystem:")]
+    public void PerformActionWithSystem(GKRuleSystem system);
+    [Selector("ruleWithPredicate:assertingFact:grade:")]
+    public static Self RuleWithPredicateAssertingFactGrade(NSPredicate predicate, NSObjectProtocol fact, float grade);
+    [Selector("ruleWithPredicate:retractingFact:grade:")]
+    public static Self RuleWithPredicateRetractingFactGrade(NSPredicate predicate, NSObjectProtocol fact, float grade);
+    [Selector("ruleWithBlockPredicate:action:")]
+    public static Self RuleWithBlockPredicateAction(GKRuleRuleWithBlockPredicateActionPredicateBlock predicate, GKRuleRuleWithBlockPredicateActionActionBlock action);
 }
 
 public extern objc class GKNSPredicateRule : GKRule
 {
-    [Selector("predicate")] public NSPredicate Predicate { get; }
-    [Selector("initWithPredicate:")] public Self InitWithPredicate(NSPredicate predicate);
-    [Selector("evaluatePredicateWithSystem:")] public bool EvaluatePredicateWithSystem(GKRuleSystem system);
+    [Selector("predicate")]
+    public NSPredicate Predicate { get; }
+    [Selector("initWithPredicate:")]
+    public Self InitWithPredicate(NSPredicate predicate);
+    [Selector("evaluatePredicateWithSystem:")]
+    public bool EvaluatePredicateWithSystem(GKRuleSystem system);
 }
 
 #endif

@@ -46,13 +46,20 @@ public extern "C" AVSemanticSegmentationMatteType AVSemanticSegmentationMatteTyp
 
 public extern objc class AVSemanticSegmentationMatte : NSObject
 {
-    [Selector("matteType")] public AVSemanticSegmentationMatteType MatteType { get; }
-    [Selector("pixelFormatType")] public OSType PixelFormatType { get; }
-    [Selector("mattingImage")] public CVPixelBufferRef? MattingImage { get; }
-    [Selector("semanticSegmentationMatteFromImageSourceAuxiliaryDataType:dictionaryRepresentation:error:")] public static Self? SemanticSegmentationMatteFromImageSourceAuxiliaryDataTypeDictionaryRepresentationError(CFStringRef imageSourceAuxiliaryDataType, NSDictionary imageSourceAuxiliaryDataInfoDictionary, out NSError? outError);
-    [Selector("semanticSegmentationMatteByApplyingExifOrientation:")] public Self SemanticSegmentationMatteByApplyingExifOrientation(CGImagePropertyOrientation exifOrientation);
-    [Selector("semanticSegmentationMatteByReplacingSemanticSegmentationMatteWithPixelBuffer:error:")] public Self? SemanticSegmentationMatteByReplacingSemanticSegmentationMatteWithPixelBufferError(CVPixelBufferRef pixelBuffer, out NSError? outError);
-    [Selector("dictionaryRepresentationForAuxiliaryDataType:")] public NSDictionary? DictionaryRepresentationForAuxiliaryDataType(out NSString? outAuxDataType);
+    [Selector("matteType")]
+    public AVSemanticSegmentationMatteType MatteType { get; }
+    [Selector("pixelFormatType")]
+    public OSType PixelFormatType { get; }
+    [Selector("mattingImage")]
+    public CVPixelBufferRef? MattingImage { get; }
+    [Selector("semanticSegmentationMatteFromImageSourceAuxiliaryDataType:dictionaryRepresentation:error:")]
+    public static Self? SemanticSegmentationMatteFromImageSourceAuxiliaryDataTypeDictionaryRepresentationError(CFStringRef imageSourceAuxiliaryDataType, NSDictionary imageSourceAuxiliaryDataInfoDictionary, out NSError? outError);
+    [Selector("semanticSegmentationMatteByApplyingExifOrientation:")]
+    public Self SemanticSegmentationMatteByApplyingExifOrientation(CGImagePropertyOrientation exifOrientation);
+    [Selector("semanticSegmentationMatteByReplacingSemanticSegmentationMatteWithPixelBuffer:error:")]
+    public Self? SemanticSegmentationMatteByReplacingSemanticSegmentationMatteWithPixelBufferError(CVPixelBufferRef pixelBuffer, out NSError? outError);
+    [Selector("dictionaryRepresentationForAuxiliaryDataType:")]
+    public NSDictionary? DictionaryRepresentationForAuxiliaryDataType(out NSString? outAuxDataType);
 }
 
 #endif

@@ -49,31 +49,53 @@ public extern "C" SCNSceneAttribute? SCNSceneUpAxisAttributeKey;
 
 public extern objc class SCNScene : NSObject, NSSecureCoding
 {
-    [Selector("rootNode")] public SCNNode RootNode { get; }
-    [Selector("physicsWorld")] public SCNPhysicsWorld? PhysicsWorld { get; }
-    [Selector("background")] public SCNMaterialProperty? Background { get; }
-    [Selector("lightingEnvironment")] public SCNMaterialProperty LightingEnvironment { get; }
-    [Selector("fogStartDistance", "setFogStartDistance:")] public CGFloat FogStartDistance { get; set; }
-    [Selector("fogEndDistance", "setFogEndDistance:")] public CGFloat FogEndDistance { get; set; }
-    [Selector("fogDensityExponent", "setFogDensityExponent:")] public CGFloat FogDensityExponent { get; set; }
-    [Selector("fogColor", "setFogColor:")] public AnyObject? FogColor { get; set; }
-    [Selector("wantsScreenSpaceReflection", "setWantsScreenSpaceReflection:")] public bool WantsScreenSpaceReflection { get; set; }
-    [Selector("screenSpaceReflectionSampleCount", "setScreenSpaceReflectionSampleCount:")] public NSInteger ScreenSpaceReflectionSampleCount { get; set; }
-    [Selector("screenSpaceReflectionMaximumDistance", "setScreenSpaceReflectionMaximumDistance:")] public CGFloat ScreenSpaceReflectionMaximumDistance { get; set; }
-    [Selector("screenSpaceReflectionStride", "setScreenSpaceReflectionStride:")] public CGFloat ScreenSpaceReflectionStride { get; set; }
-    [Selector("isPaused", "setPaused:")] public bool Paused { get; set; }
-    [Selector("scene")] public static Self Scene();
-    [Selector("attributeForKey:")] public AnyObject? AttributeForKey(NSString key);
-    [Selector("setAttribute:forKey:")] public void SetAttributeForKey(AnyObject? @attribute, NSString key);
-    [Selector("sceneNamed:")] public static Self? SceneNamed(NSString name);
-    [Selector("sceneNamed:inDirectory:options:")] public static Self? SceneNamedInDirectoryOptions(NSString name, NSString? directory, NSDictionary? options);
-    [Selector("sceneWithURL:options:error:")] public static Self? SceneWithURLOptionsError(NSURL url, NSDictionary? options, out NSError? error);
-    [Selector("writeToURL:options:delegate:progressHandler:")] public bool WriteToURLOptionsDelegateProgressHandler(NSURL url, NSDictionary? options, SCNSceneExportDelegate? @delegate, SCNSceneExportProgressHandler? progressHandler);
+    [Selector("rootNode")]
+    public SCNNode RootNode { get; }
+    [Selector("physicsWorld")]
+    public SCNPhysicsWorld? PhysicsWorld { get; }
+    [Selector("background")]
+    public SCNMaterialProperty? Background { get; }
+    [Selector("lightingEnvironment")]
+    public SCNMaterialProperty LightingEnvironment { get; }
+    [Selector("fogStartDistance", "setFogStartDistance:")]
+    public CGFloat FogStartDistance { get; set; }
+    [Selector("fogEndDistance", "setFogEndDistance:")]
+    public CGFloat FogEndDistance { get; set; }
+    [Selector("fogDensityExponent", "setFogDensityExponent:")]
+    public CGFloat FogDensityExponent { get; set; }
+    [Selector("fogColor", "setFogColor:")]
+    public AnyObject? FogColor { get; set; }
+    [Selector("wantsScreenSpaceReflection", "setWantsScreenSpaceReflection:")]
+    public bool WantsScreenSpaceReflection { get; set; }
+    [Selector("screenSpaceReflectionSampleCount", "setScreenSpaceReflectionSampleCount:")]
+    public NSInteger ScreenSpaceReflectionSampleCount { get; set; }
+    [Selector("screenSpaceReflectionMaximumDistance", "setScreenSpaceReflectionMaximumDistance:")]
+    public CGFloat ScreenSpaceReflectionMaximumDistance { get; set; }
+    [Selector("screenSpaceReflectionStride", "setScreenSpaceReflectionStride:")]
+    public CGFloat ScreenSpaceReflectionStride { get; set; }
+    [Selector("isPaused", "setPaused:")]
+    public bool Paused { get; set; }
+    [Selector("scene")]
+    public static Self Scene();
+    [Selector("attributeForKey:")]
+    public AnyObject? AttributeForKey(NSString key);
+    [Selector("setAttribute:forKey:")]
+    public void SetAttributeForKey(AnyObject? @attribute, NSString key);
+    [Selector("sceneNamed:")]
+    public static Self? SceneNamed(NSString name);
+    [Selector("sceneNamed:inDirectory:options:")]
+    public static Self? SceneNamedInDirectoryOptions(NSString name, NSString? directory, NSDictionary? options);
+    [Selector("sceneWithURL:options:error:")]
+    public static Self? SceneWithURLOptionsError(NSURL url, NSDictionary? options, out NSError? error);
+    [Selector("writeToURL:options:delegate:progressHandler:")]
+    public bool WriteToURLOptionsDelegateProgressHandler(NSURL url, NSDictionary? options, SCNSceneExportDelegate? @delegate, SCNSceneExportProgressHandler? progressHandler);
 }
 
 public objc interface SCNSceneExportDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("writeImage:withSceneDocumentURL:originalImageURL:")] NSURL? WriteImageWithSceneDocumentURLOriginalImageURL(NSImage image, NSURL documentURL, NSURL? originalImageURL);
+    [Optional]
+    [Selector("writeImage:withSceneDocumentURL:originalImageURL:")]
+    NSURL? WriteImageWithSceneDocumentURLOriginalImageURL(NSImage image, NSURL documentURL, NSURL? originalImageURL);
 }
 
 #endif

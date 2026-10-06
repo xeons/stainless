@@ -33,42 +33,76 @@ import Standard.ObjC;
 
 public extern objc class AVAudioPlayer : NSObject
 {
-    [Selector("isPlaying")] public bool Playing { get; }
-    [Selector("numberOfChannels")] public NSUInteger NumberOfChannels { get; }
-    [Selector("duration")] public NSTimeInterval Duration { get; }
-    [Selector("currentDevice", "setCurrentDevice:")] public NSString? CurrentDevice { get; set; }
-    [Selector("delegate", "setDelegate:")] public AVAudioPlayerDelegate? Delegate { get; set; }
-    [Selector("url")] public NSURL? Url { get; }
-    [Selector("data")] public NSData? Data { get; }
-    [Selector("pan", "setPan:")] public float Pan { get; set; }
-    [Selector("volume", "setVolume:")] public float Volume { get; set; }
-    [Selector("enableRate", "setEnableRate:")] public bool EnableRate { get; set; }
-    [Selector("rate", "setRate:")] public float Rate { get; set; }
-    [Selector("currentTime", "setCurrentTime:")] public NSTimeInterval CurrentTime { get; set; }
-    [Selector("deviceCurrentTime")] public NSTimeInterval DeviceCurrentTime { get; }
-    [Selector("numberOfLoops", "setNumberOfLoops:")] public NSInteger NumberOfLoops { get; set; }
-    [Selector("settings")] public NSDictionary Settings { get; }
-    [Selector("format")] public AVAudioFormat Format { get; }
-    [Selector("isMeteringEnabled", "setMeteringEnabled:")] public bool MeteringEnabled { get; set; }
-    [Selector("initWithContentsOfURL:error:")] public Self? InitWithContentsOfURLError(NSURL url, out NSError? outError);
-    [Selector("initWithData:error:")] public Self? InitWithDataError(NSData data, out NSError? outError);
-    [Selector("initWithContentsOfURL:fileTypeHint:error:")] public Self? InitWithContentsOfURLFileTypeHintError(NSURL url, NSString? utiString, out NSError? outError);
-    [Selector("initWithData:fileTypeHint:error:")] public Self? InitWithDataFileTypeHintError(NSData data, NSString? utiString, out NSError? outError);
-    [Selector("prepareToPlay")] public bool PrepareToPlay();
-    [Selector("play")] public bool Play();
-    [Selector("playAtTime:")] public bool PlayAtTime(NSTimeInterval time);
-    [Selector("pause")] public void Pause();
-    [Selector("stop")] public void Stop();
-    [Selector("setVolume:fadeDuration:")] public void SetVolumeFadeDuration(float volume, NSTimeInterval duration);
-    [Selector("updateMeters")] public void UpdateMeters();
-    [Selector("peakPowerForChannel:")] public float PeakPowerForChannel(NSUInteger channelNumber);
-    [Selector("averagePowerForChannel:")] public float AveragePowerForChannel(NSUInteger channelNumber);
+    [Selector("isPlaying")]
+    public bool Playing { get; }
+    [Selector("numberOfChannels")]
+    public NSUInteger NumberOfChannels { get; }
+    [Selector("duration")]
+    public NSTimeInterval Duration { get; }
+    [Selector("currentDevice", "setCurrentDevice:")]
+    public NSString? CurrentDevice { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public AVAudioPlayerDelegate? Delegate { get; set; }
+    [Selector("url")]
+    public NSURL? Url { get; }
+    [Selector("data")]
+    public NSData? Data { get; }
+    [Selector("pan", "setPan:")]
+    public float Pan { get; set; }
+    [Selector("volume", "setVolume:")]
+    public float Volume { get; set; }
+    [Selector("enableRate", "setEnableRate:")]
+    public bool EnableRate { get; set; }
+    [Selector("rate", "setRate:")]
+    public float Rate { get; set; }
+    [Selector("currentTime", "setCurrentTime:")]
+    public NSTimeInterval CurrentTime { get; set; }
+    [Selector("deviceCurrentTime")]
+    public NSTimeInterval DeviceCurrentTime { get; }
+    [Selector("numberOfLoops", "setNumberOfLoops:")]
+    public NSInteger NumberOfLoops { get; set; }
+    [Selector("settings")]
+    public NSDictionary Settings { get; }
+    [Selector("format")]
+    public AVAudioFormat Format { get; }
+    [Selector("isMeteringEnabled", "setMeteringEnabled:")]
+    public bool MeteringEnabled { get; set; }
+    [Selector("initWithContentsOfURL:error:")]
+    public Self? InitWithContentsOfURLError(NSURL url, out NSError? outError);
+    [Selector("initWithData:error:")]
+    public Self? InitWithDataError(NSData data, out NSError? outError);
+    [Selector("initWithContentsOfURL:fileTypeHint:error:")]
+    public Self? InitWithContentsOfURLFileTypeHintError(NSURL url, NSString? utiString, out NSError? outError);
+    [Selector("initWithData:fileTypeHint:error:")]
+    public Self? InitWithDataFileTypeHintError(NSData data, NSString? utiString, out NSError? outError);
+    [Selector("prepareToPlay")]
+    public bool PrepareToPlay();
+    [Selector("play")]
+    public bool Play();
+    [Selector("playAtTime:")]
+    public bool PlayAtTime(NSTimeInterval time);
+    [Selector("pause")]
+    public void Pause();
+    [Selector("stop")]
+    public void Stop();
+    [Selector("setVolume:fadeDuration:")]
+    public void SetVolumeFadeDuration(float volume, NSTimeInterval duration);
+    [Selector("updateMeters")]
+    public void UpdateMeters();
+    [Selector("peakPowerForChannel:")]
+    public float PeakPowerForChannel(NSUInteger channelNumber);
+    [Selector("averagePowerForChannel:")]
+    public float AveragePowerForChannel(NSUInteger channelNumber);
 }
 
 public objc interface AVAudioPlayerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("audioPlayerDidFinishPlaying:successfully:")] void AudioPlayerDidFinishPlayingSuccessfully(AVAudioPlayer player, bool flag);
-    [Optional] [Selector("audioPlayerDecodeErrorDidOccur:error:")] void AudioPlayerDecodeErrorDidOccurError(AVAudioPlayer player, NSError? error);
+    [Optional]
+    [Selector("audioPlayerDidFinishPlaying:successfully:")]
+    void AudioPlayerDidFinishPlayingSuccessfully(AVAudioPlayer player, bool flag);
+    [Optional]
+    [Selector("audioPlayerDecodeErrorDidOccur:error:")]
+    void AudioPlayerDecodeErrorDidOccurError(AVAudioPlayer player, NSError? error);
 }
 
 #endif

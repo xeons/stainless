@@ -36,38 +36,61 @@ public extern "C" NSNotificationName NSPortDidBecomeInvalidNotification;
 
 public extern objc class NSPort : NSObject, NSCopying, NSCoding
 {
-    [Selector("isValid")] public bool Valid { get; }
-    [Selector("reservedSpaceLength")] public NSUInteger ReservedSpaceLength { get; }
-    [Selector("port")] public static NSPort Port();
-    [Selector("invalidate")] public void Invalidate();
-    [Selector("setDelegate:")] public void SetDelegate(NSPortDelegate? anObject);
-    [Selector("delegate")] public NSPortDelegate? Delegate();
-    [Selector("scheduleInRunLoop:forMode:")] public void ScheduleInRunLoopForMode(NSRunLoop runLoop, NSRunLoopMode mode);
-    [Selector("removeFromRunLoop:forMode:")] public void RemoveFromRunLoopForMode(NSRunLoop runLoop, NSRunLoopMode mode);
-    [Selector("sendBeforeDate:components:from:reserved:")] public bool SendBeforeDateComponentsFromReserved(NSDate limitDate, NSMutableArray? components, NSPort? receivePort, NSUInteger headerSpaceReserved);
-    [Selector("sendBeforeDate:msgid:components:from:reserved:")] public bool SendBeforeDateMsgidComponentsFromReserved(NSDate limitDate, NSUInteger msgID, NSMutableArray? components, NSPort? receivePort, NSUInteger headerSpaceReserved);
+    [Selector("isValid")]
+    public bool Valid { get; }
+    [Selector("reservedSpaceLength")]
+    public NSUInteger ReservedSpaceLength { get; }
+    [Selector("port")]
+    public static NSPort Port();
+    [Selector("invalidate")]
+    public void Invalidate();
+    [Selector("setDelegate:")]
+    public void SetDelegate(NSPortDelegate? anObject);
+    [Selector("delegate")]
+    public NSPortDelegate? Delegate();
+    [Selector("scheduleInRunLoop:forMode:")]
+    public void ScheduleInRunLoopForMode(NSRunLoop runLoop, NSRunLoopMode mode);
+    [Selector("removeFromRunLoop:forMode:")]
+    public void RemoveFromRunLoopForMode(NSRunLoop runLoop, NSRunLoopMode mode);
+    [Selector("sendBeforeDate:components:from:reserved:")]
+    public bool SendBeforeDateComponentsFromReserved(NSDate limitDate, NSMutableArray? components, NSPort? receivePort, NSUInteger headerSpaceReserved);
+    [Selector("sendBeforeDate:msgid:components:from:reserved:")]
+    public bool SendBeforeDateMsgidComponentsFromReserved(NSDate limitDate, NSUInteger msgID, NSMutableArray? components, NSPort? receivePort, NSUInteger headerSpaceReserved);
     /// Deprecated in macOS 10.13.
-    [Selector("addConnection:toRunLoop:forMode:")] public void AddConnectionToRunLoopForMode(NSConnection conn, NSRunLoop runLoop, NSRunLoopMode mode);
+    [Selector("addConnection:toRunLoop:forMode:")]
+    public void AddConnectionToRunLoopForMode(NSConnection conn, NSRunLoop runLoop, NSRunLoopMode mode);
     /// Deprecated in macOS 10.13.
-    [Selector("removeConnection:fromRunLoop:forMode:")] public void RemoveConnectionFromRunLoopForMode(NSConnection conn, NSRunLoop runLoop, NSRunLoopMode mode);
+    [Selector("removeConnection:fromRunLoop:forMode:")]
+    public void RemoveConnectionFromRunLoopForMode(NSConnection conn, NSRunLoop runLoop, NSRunLoopMode mode);
 }
 
 public objc interface NSPortDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("handlePortMessage:")] void HandlePortMessage(NSPortMessage message);
+    [Optional]
+    [Selector("handlePortMessage:")]
+    void HandlePortMessage(NSPortMessage message);
 }
 
 public extern objc class NSMachPort : NSPort
 {
-    [Selector("machPort")] public uint MachPort { get; }
-    [Selector("portWithMachPort:")] public static NSPort PortWithMachPort(uint machPort);
-    [Selector("initWithMachPort:")] public Self InitWithMachPort(uint machPort);
-    [Selector("setDelegate:")] public void SetDelegate(NSMachPortDelegate? anObject);
-    [Selector("delegate")] public NSMachPortDelegate? Delegate();
-    [Selector("portWithMachPort:options:")] public static NSPort PortWithMachPortOptions(uint machPort, NSMachPortOptions f);
-    [Selector("initWithMachPort:options:")] public Self InitWithMachPortOptions(uint machPort, NSMachPortOptions f);
-    [Selector("scheduleInRunLoop:forMode:")] public void ScheduleInRunLoopForMode(NSRunLoop runLoop, NSRunLoopMode mode);
-    [Selector("removeFromRunLoop:forMode:")] public void RemoveFromRunLoopForMode(NSRunLoop runLoop, NSRunLoopMode mode);
+    [Selector("machPort")]
+    public uint MachPort { get; }
+    [Selector("portWithMachPort:")]
+    public static NSPort PortWithMachPort(uint machPort);
+    [Selector("initWithMachPort:")]
+    public Self InitWithMachPort(uint machPort);
+    [Selector("setDelegate:")]
+    public void SetDelegate(NSMachPortDelegate? anObject);
+    [Selector("delegate")]
+    public NSMachPortDelegate? Delegate();
+    [Selector("portWithMachPort:options:")]
+    public static NSPort PortWithMachPortOptions(uint machPort, NSMachPortOptions f);
+    [Selector("initWithMachPort:options:")]
+    public Self InitWithMachPortOptions(uint machPort, NSMachPortOptions f);
+    [Selector("scheduleInRunLoop:forMode:")]
+    public void ScheduleInRunLoopForMode(NSRunLoop runLoop, NSRunLoopMode mode);
+    [Selector("removeFromRunLoop:forMode:")]
+    public void RemoveFromRunLoopForMode(NSRunLoop runLoop, NSRunLoopMode mode);
 }
 
 [Flags]
@@ -80,24 +103,37 @@ public enum NSMachPortOptions : ulong
 
 public objc interface NSMachPortDelegate : NSPortDelegate
 {
-    [Optional] [Selector("handleMachMessage:")] void HandleMachMessage(void* msg);
+    [Optional]
+    [Selector("handleMachMessage:")]
+    void HandleMachMessage(void* msg);
 }
 
 public extern objc class NSMessagePort : NSPort { }
 
 public extern objc class NSSocketPort : NSPort
 {
-    [Selector("protocolFamily")] public int ProtocolFamily { get; }
-    [Selector("socketType")] public int SocketType { get; }
-    [Selector("protocol")] public int Protocol { get; }
-    [Selector("address")] public NSData Address { get; }
-    [Selector("socket")] public NSSocketNativeHandle Socket { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithTCPPort:")] public Self? InitWithTCPPort(ushort port);
-    [Selector("initWithProtocolFamily:socketType:protocol:address:")] public Self? InitWithProtocolFamilySocketTypeProtocolAddress(int family, int type, int protocol, NSData address);
-    [Selector("initWithProtocolFamily:socketType:protocol:socket:")] public Self? InitWithProtocolFamilySocketTypeProtocolSocket(int family, int type, int protocol, NSSocketNativeHandle sock);
-    [Selector("initRemoteWithTCPPort:host:")] public Self? InitRemoteWithTCPPortHost(ushort port, NSString? hostName);
-    [Selector("initRemoteWithProtocolFamily:socketType:protocol:address:")] public Self InitRemoteWithProtocolFamilySocketTypeProtocolAddress(int family, int type, int protocol, NSData address);
+    [Selector("protocolFamily")]
+    public int ProtocolFamily { get; }
+    [Selector("socketType")]
+    public int SocketType { get; }
+    [Selector("protocol")]
+    public int Protocol { get; }
+    [Selector("address")]
+    public NSData Address { get; }
+    [Selector("socket")]
+    public NSSocketNativeHandle Socket { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithTCPPort:")]
+    public Self? InitWithTCPPort(ushort port);
+    [Selector("initWithProtocolFamily:socketType:protocol:address:")]
+    public Self? InitWithProtocolFamilySocketTypeProtocolAddress(int family, int type, int protocol, NSData address);
+    [Selector("initWithProtocolFamily:socketType:protocol:socket:")]
+    public Self? InitWithProtocolFamilySocketTypeProtocolSocket(int family, int type, int protocol, NSSocketNativeHandle sock);
+    [Selector("initRemoteWithTCPPort:host:")]
+    public Self? InitRemoteWithTCPPortHost(ushort port, NSString? hostName);
+    [Selector("initRemoteWithProtocolFamily:socketType:protocol:address:")]
+    public Self InitRemoteWithProtocolFamilySocketTypeProtocolAddress(int family, int type, int protocol, NSData address);
 }
 
 #endif

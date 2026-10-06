@@ -41,25 +41,46 @@ public enum MKLookAroundBadgePosition : long
 
 public extern objc class MKLookAroundViewController : NSViewController, NSSecureCoding, NSCoding
 {
-    [Selector("delegate", "setDelegate:")] public MKLookAroundViewControllerDelegate? Delegate { get; set; }
-    [Selector("scene", "setScene:")] public MKLookAroundScene? Scene { get; set; }
-    [Selector("isNavigationEnabled", "setNavigationEnabled:")] public bool NavigationEnabled { get; set; }
-    [Selector("showsRoadLabels", "setShowsRoadLabels:")] public bool ShowsRoadLabels { get; set; }
-    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")] public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
-    [Selector("badgePosition", "setBadgePosition:")] public MKLookAroundBadgePosition BadgePosition { get; set; }
-    [Selector("initWithScene:")] public Self InitWithScene(MKLookAroundScene scene);
-    [Selector("initWithNibName:bundle:")] public Self InitWithNibNameBundle(NSString? nibNameOrNil, NSBundle? nibBundleOrNil);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("delegate", "setDelegate:")]
+    public MKLookAroundViewControllerDelegate? Delegate { get; set; }
+    [Selector("scene", "setScene:")]
+    public MKLookAroundScene? Scene { get; set; }
+    [Selector("isNavigationEnabled", "setNavigationEnabled:")]
+    public bool NavigationEnabled { get; set; }
+    [Selector("showsRoadLabels", "setShowsRoadLabels:")]
+    public bool ShowsRoadLabels { get; set; }
+    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")]
+    public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
+    [Selector("badgePosition", "setBadgePosition:")]
+    public MKLookAroundBadgePosition BadgePosition { get; set; }
+    [Selector("initWithScene:")]
+    public Self InitWithScene(MKLookAroundScene scene);
+    [Selector("initWithNibName:bundle:")]
+    public Self InitWithNibNameBundle(NSString? nibNameOrNil, NSBundle? nibBundleOrNil);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 public objc interface MKLookAroundViewControllerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("lookAroundViewControllerWillUpdateScene:")] void LookAroundViewControllerWillUpdateScene(MKLookAroundViewController viewController);
-    [Optional] [Selector("lookAroundViewControllerDidUpdateScene:")] void LookAroundViewControllerDidUpdateScene(MKLookAroundViewController viewController);
-    [Optional] [Selector("lookAroundViewControllerWillPresentFullScreen:")] void LookAroundViewControllerWillPresentFullScreen(MKLookAroundViewController viewController);
-    [Optional] [Selector("lookAroundViewControllerDidPresentFullScreen:")] void LookAroundViewControllerDidPresentFullScreen(MKLookAroundViewController viewController);
-    [Optional] [Selector("lookAroundViewControllerWillDismissFullScreen:")] void LookAroundViewControllerWillDismissFullScreen(MKLookAroundViewController viewController);
-    [Optional] [Selector("lookAroundViewControllerDidDismissFullScreen:")] void LookAroundViewControllerDidDismissFullScreen(MKLookAroundViewController viewController);
+    [Optional]
+    [Selector("lookAroundViewControllerWillUpdateScene:")]
+    void LookAroundViewControllerWillUpdateScene(MKLookAroundViewController viewController);
+    [Optional]
+    [Selector("lookAroundViewControllerDidUpdateScene:")]
+    void LookAroundViewControllerDidUpdateScene(MKLookAroundViewController viewController);
+    [Optional]
+    [Selector("lookAroundViewControllerWillPresentFullScreen:")]
+    void LookAroundViewControllerWillPresentFullScreen(MKLookAroundViewController viewController);
+    [Optional]
+    [Selector("lookAroundViewControllerDidPresentFullScreen:")]
+    void LookAroundViewControllerDidPresentFullScreen(MKLookAroundViewController viewController);
+    [Optional]
+    [Selector("lookAroundViewControllerWillDismissFullScreen:")]
+    void LookAroundViewControllerWillDismissFullScreen(MKLookAroundViewController viewController);
+    [Optional]
+    [Selector("lookAroundViewControllerDidDismissFullScreen:")]
+    void LookAroundViewControllerDidDismissFullScreen(MKLookAroundViewController viewController);
 }
 
 #endif

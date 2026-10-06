@@ -32,22 +32,42 @@ import Standard.ObjC;
 
 public extern objc class NSSpellServer : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public NSSpellServerDelegate? Delegate { get; set; }
-    [Selector("registerLanguage:byVendor:")] public bool RegisterLanguageByVendor(NSString? language, NSString? vendor);
-    [Selector("isWordInUserDictionaries:caseSensitive:")] public bool IsWordInUserDictionariesCaseSensitive(NSString word, bool flag);
-    [Selector("run")] public void Run();
+    [Selector("delegate", "setDelegate:")]
+    public NSSpellServerDelegate? Delegate { get; set; }
+    [Selector("registerLanguage:byVendor:")]
+    public bool RegisterLanguageByVendor(NSString? language, NSString? vendor);
+    [Selector("isWordInUserDictionaries:caseSensitive:")]
+    public bool IsWordInUserDictionariesCaseSensitive(NSString word, bool flag);
+    [Selector("run")]
+    public void Run();
 }
 
 public objc interface NSSpellServerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("spellServer:findMisspelledWordInString:language:wordCount:countOnly:")] NSRange SpellServerFindMisspelledWordInStringLanguageWordCountCountOnly(NSSpellServer sender, NSString stringToCheck, NSString language, NSInteger* wordCount, bool countOnly);
-    [Optional] [Selector("spellServer:suggestGuessesForWord:inLanguage:")] NSArray? SpellServerSuggestGuessesForWordInLanguage(NSSpellServer sender, NSString word, NSString language);
-    [Optional] [Selector("spellServer:didLearnWord:inLanguage:")] void SpellServerDidLearnWordInLanguage(NSSpellServer sender, NSString word, NSString language);
-    [Optional] [Selector("spellServer:didForgetWord:inLanguage:")] void SpellServerDidForgetWordInLanguage(NSSpellServer sender, NSString word, NSString language);
-    [Optional] [Selector("spellServer:suggestCompletionsForPartialWordRange:inString:language:")] NSArray? SpellServerSuggestCompletionsForPartialWordRangeInStringLanguage(NSSpellServer sender, NSRange range, NSString string, NSString language);
-    [Optional] [Selector("spellServer:checkGrammarInString:language:details:")] NSRange SpellServerCheckGrammarInStringLanguageDetails(NSSpellServer sender, NSString stringToCheck, NSString? language, out NSArray? details);
-    [Optional] [Selector("spellServer:checkString:offset:types:options:orthography:wordCount:")] NSArray? SpellServerCheckStringOffsetTypesOptionsOrthographyWordCount(NSSpellServer sender, NSString stringToCheck, NSUInteger offset, NSTextCheckingTypes checkingTypes, NSDictionary? options, NSOrthography? orthography, NSInteger* wordCount);
-    [Optional] [Selector("spellServer:recordResponse:toCorrection:forWord:language:")] void SpellServerRecordResponseToCorrectionForWordLanguage(NSSpellServer sender, NSUInteger response, NSString correction, NSString word, NSString language);
+    [Optional]
+    [Selector("spellServer:findMisspelledWordInString:language:wordCount:countOnly:")]
+    NSRange SpellServerFindMisspelledWordInStringLanguageWordCountCountOnly(NSSpellServer sender, NSString stringToCheck, NSString language, NSInteger* wordCount, bool countOnly);
+    [Optional]
+    [Selector("spellServer:suggestGuessesForWord:inLanguage:")]
+    NSArray? SpellServerSuggestGuessesForWordInLanguage(NSSpellServer sender, NSString word, NSString language);
+    [Optional]
+    [Selector("spellServer:didLearnWord:inLanguage:")]
+    void SpellServerDidLearnWordInLanguage(NSSpellServer sender, NSString word, NSString language);
+    [Optional]
+    [Selector("spellServer:didForgetWord:inLanguage:")]
+    void SpellServerDidForgetWordInLanguage(NSSpellServer sender, NSString word, NSString language);
+    [Optional]
+    [Selector("spellServer:suggestCompletionsForPartialWordRange:inString:language:")]
+    NSArray? SpellServerSuggestCompletionsForPartialWordRangeInStringLanguage(NSSpellServer sender, NSRange range, NSString string, NSString language);
+    [Optional]
+    [Selector("spellServer:checkGrammarInString:language:details:")]
+    NSRange SpellServerCheckGrammarInStringLanguageDetails(NSSpellServer sender, NSString stringToCheck, NSString? language, out NSArray? details);
+    [Optional]
+    [Selector("spellServer:checkString:offset:types:options:orthography:wordCount:")]
+    NSArray? SpellServerCheckStringOffsetTypesOptionsOrthographyWordCount(NSSpellServer sender, NSString stringToCheck, NSUInteger offset, NSTextCheckingTypes checkingTypes, NSDictionary? options, NSOrthography? orthography, NSInteger* wordCount);
+    [Optional]
+    [Selector("spellServer:recordResponse:toCorrection:forWord:language:")]
+    void SpellServerRecordResponseToCorrectionForWordLanguage(NSSpellServer sender, NSUInteger response, NSString correction, NSString word, NSString language);
 }
 
 public extern "C" NSString? NSGrammarRange;

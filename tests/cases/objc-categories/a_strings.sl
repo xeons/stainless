@@ -6,10 +6,12 @@ import Standard.ObjC;
 
 public objc interface Lowering
 {
-    [Selector("lowercaseString")] NSString Lowercase { get; }
+    [Selector("lowercaseString")]
+    NSString Lowercase { get; }
 }
 
 public extern objc class NSString : Lowering
 {
-    [Selector("length")] public nuint Length { get; }
+    [Selector("length")]
+    public nuint Length { get; }
 }

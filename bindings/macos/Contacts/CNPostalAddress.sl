@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class CNPostalAddress : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("street")] public NSString Street { get; }
-    [Selector("subLocality")] public NSString? SubLocality { get; }
-    [Selector("city")] public NSString City { get; }
-    [Selector("subAdministrativeArea")] public NSString? SubAdministrativeArea { get; }
-    [Selector("state")] public NSString State { get; }
-    [Selector("postalCode")] public NSString PostalCode { get; }
-    [Selector("country")] public NSString Country { get; }
-    [Selector("ISOCountryCode")] public NSString ISOCountryCode { get; }
-    [Selector("localizedStringForKey:")] public static NSString LocalizedStringForKey(NSString key);
+    [Selector("street")]
+    public NSString Street { get; }
+    [Selector("subLocality")]
+    public NSString? SubLocality { get; }
+    [Selector("city")]
+    public NSString City { get; }
+    [Selector("subAdministrativeArea")]
+    public NSString? SubAdministrativeArea { get; }
+    [Selector("state")]
+    public NSString State { get; }
+    [Selector("postalCode")]
+    public NSString PostalCode { get; }
+    [Selector("country")]
+    public NSString Country { get; }
+    [Selector("ISOCountryCode")]
+    public NSString ISOCountryCode { get; }
+    [Selector("localizedStringForKey:")]
+    public static NSString LocalizedStringForKey(NSString key);
 }
 
 public extern "C" NSString? CNPostalAddressStreetKey;

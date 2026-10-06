@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class UNNotification : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("date")] public NSDate Date { get; }
-    [Selector("request")] public UNNotificationRequest Request { get; }
+    [Selector("date")]
+    public NSDate Date { get; }
+    [Selector("request")]
+    public UNNotificationRequest Request { get; }
 }
 
 #endif

@@ -37,8 +37,10 @@ public objc closure void CKSharePreparationHandler(CKSharePreparationCompletionH
 /// CKSharingSupport, a category of NSItemProvider.
 public extern objc class NSItemProvider
 {
-    [Selector("registerCKShareWithContainer:allowedSharingOptions:preparationHandler:")] public void RegisterCKShareWithContainerAllowedSharingOptionsPreparationHandler(CKContainer container, CKAllowedSharingOptions allowedOptions, CKSharePreparationHandler preparationHandler);
-    [Selector("registerCKShare:container:allowedSharingOptions:")] public void RegisterCKShareContainerAllowedSharingOptions(CKShare share, CKContainer container, CKAllowedSharingOptions allowedOptions);
+    [Selector("registerCKShareWithContainer:allowedSharingOptions:preparationHandler:")]
+    public void RegisterCKShareWithContainerAllowedSharingOptionsPreparationHandler(CKContainer container, CKAllowedSharingOptions allowedOptions, CKSharePreparationHandler preparationHandler);
+    [Selector("registerCKShare:container:allowedSharingOptions:")]
+    public void RegisterCKShareContainerAllowedSharingOptions(CKShare share, CKContainer container, CKAllowedSharingOptions allowedOptions);
 }
 
 #endif

@@ -148,62 +148,99 @@ public objc closure void NSPasteboardDetectMetadataForTypesCompletionHandlerComp
 
 public extern objc class NSPasteboard : NSObject
 {
-    [Selector("generalPasteboard")] public static NSPasteboard GeneralPasteboard { get; }
-    [Selector("name")] public NSPasteboardName Name { get; }
-    [Selector("changeCount")] public NSInteger ChangeCount { get; }
+    [Selector("generalPasteboard")]
+    public static NSPasteboard GeneralPasteboard { get; }
+    [Selector("name")]
+    public NSPasteboardName Name { get; }
+    [Selector("changeCount")]
+    public NSInteger ChangeCount { get; }
     /// macOS 15.4 and later.
-    [Selector("accessBehavior")] public NSPasteboardAccessBehavior AccessBehavior { get; }
-    [Selector("pasteboardItems")] public NSArray? PasteboardItems { get; }
-    [Selector("types")] public NSArray? Types { get; }
-    [Selector("pasteboardWithName:")] public static NSPasteboard PasteboardWithName(NSPasteboardName name);
-    [Selector("pasteboardWithUniqueName")] public static NSPasteboard PasteboardWithUniqueName();
-    [Selector("releaseGlobally")] public void ReleaseGlobally();
-    [Selector("prepareForNewContentsWithOptions:")] public NSInteger PrepareForNewContentsWithOptions(NSPasteboardContentsOptions options);
-    [Selector("clearContents")] public NSInteger ClearContents();
-    [Selector("writeObjects:")] public bool WriteObjects(NSArray objects);
-    [Selector("readObjectsForClasses:options:")] public NSArray? ReadObjectsForClassesOptions(NSArray classArray, NSDictionary? options);
-    [Selector("indexOfPasteboardItem:")] public NSUInteger IndexOfPasteboardItem(NSPasteboardItem pasteboardItem);
-    [Selector("canReadItemWithDataConformingToTypes:")] public bool CanReadItemWithDataConformingToTypes(NSArray types);
-    [Selector("canReadObjectForClasses:options:")] public bool CanReadObjectForClassesOptions(NSArray classArray, NSDictionary? options);
-    [Selector("declareTypes:owner:")] public NSInteger DeclareTypesOwner(NSArray newTypes, AnyObject? newOwner);
-    [Selector("addTypes:owner:")] public NSInteger AddTypesOwner(NSArray newTypes, AnyObject? newOwner);
-    [Selector("availableTypeFromArray:")] public NSPasteboardType? AvailableTypeFromArray(NSArray types);
-    [Selector("setData:forType:")] public bool SetDataForType(NSData? data, NSPasteboardType dataType);
-    [Selector("setPropertyList:forType:")] public bool SetPropertyListForType(AnyObject plist, NSPasteboardType dataType);
-    [Selector("setString:forType:")] public bool SetStringForType(NSString string, NSPasteboardType dataType);
-    [Selector("dataForType:")] public NSData? DataForType(NSPasteboardType dataType);
-    [Selector("propertyListForType:")] public AnyObject? PropertyListForType(NSPasteboardType dataType);
-    [Selector("stringForType:")] public NSString? StringForType(NSPasteboardType dataType);
+    [Selector("accessBehavior")]
+    public NSPasteboardAccessBehavior AccessBehavior { get; }
+    [Selector("pasteboardItems")]
+    public NSArray? PasteboardItems { get; }
+    [Selector("types")]
+    public NSArray? Types { get; }
+    [Selector("pasteboardWithName:")]
+    public static NSPasteboard PasteboardWithName(NSPasteboardName name);
+    [Selector("pasteboardWithUniqueName")]
+    public static NSPasteboard PasteboardWithUniqueName();
+    [Selector("releaseGlobally")]
+    public void ReleaseGlobally();
+    [Selector("prepareForNewContentsWithOptions:")]
+    public NSInteger PrepareForNewContentsWithOptions(NSPasteboardContentsOptions options);
+    [Selector("clearContents")]
+    public NSInteger ClearContents();
+    [Selector("writeObjects:")]
+    public bool WriteObjects(NSArray objects);
+    [Selector("readObjectsForClasses:options:")]
+    public NSArray? ReadObjectsForClassesOptions(NSArray classArray, NSDictionary? options);
+    [Selector("indexOfPasteboardItem:")]
+    public NSUInteger IndexOfPasteboardItem(NSPasteboardItem pasteboardItem);
+    [Selector("canReadItemWithDataConformingToTypes:")]
+    public bool CanReadItemWithDataConformingToTypes(NSArray types);
+    [Selector("canReadObjectForClasses:options:")]
+    public bool CanReadObjectForClassesOptions(NSArray classArray, NSDictionary? options);
+    [Selector("declareTypes:owner:")]
+    public NSInteger DeclareTypesOwner(NSArray newTypes, AnyObject? newOwner);
+    [Selector("addTypes:owner:")]
+    public NSInteger AddTypesOwner(NSArray newTypes, AnyObject? newOwner);
+    [Selector("availableTypeFromArray:")]
+    public NSPasteboardType? AvailableTypeFromArray(NSArray types);
+    [Selector("setData:forType:")]
+    public bool SetDataForType(NSData? data, NSPasteboardType dataType);
+    [Selector("setPropertyList:forType:")]
+    public bool SetPropertyListForType(AnyObject plist, NSPasteboardType dataType);
+    [Selector("setString:forType:")]
+    public bool SetStringForType(NSString string, NSPasteboardType dataType);
+    [Selector("dataForType:")]
+    public NSData? DataForType(NSPasteboardType dataType);
+    [Selector("propertyListForType:")]
+    public AnyObject? PropertyListForType(NSPasteboardType dataType);
+    [Selector("stringForType:")]
+    public NSString? StringForType(NSPasteboardType dataType);
     /// macOS 15.4 and later.
-    [Selector("detectPatternsForPatterns:completionHandler:")] public void DetectPatternsForPatternsCompletionHandler(NSSet patterns, NSPasteboardDetectPatternsForPatternsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("detectPatternsForPatterns:completionHandler:")]
+    public void DetectPatternsForPatternsCompletionHandler(NSSet patterns, NSPasteboardDetectPatternsForPatternsCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 15.4 and later.
-    [Selector("detectValuesForPatterns:completionHandler:")] public void DetectValuesForPatternsCompletionHandler(NSSet patterns, NSPasteboardDetectValuesForPatternsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("detectValuesForPatterns:completionHandler:")]
+    public void DetectValuesForPatternsCompletionHandler(NSSet patterns, NSPasteboardDetectValuesForPatternsCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 15.4 and later.
-    [Selector("detectMetadataForTypes:completionHandler:")] public void DetectMetadataForTypesCompletionHandler(NSSet types, NSPasteboardDetectMetadataForTypesCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("detectMetadataForTypes:completionHandler:")]
+    public void DetectMetadataForTypesCompletionHandler(NSSet types, NSPasteboardDetectMetadataForTypesCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 /// FilterServices, a category of NSPasteboard.
 public extern objc class NSPasteboard
 {
-    [Selector("typesFilterableTo:")] public static NSArray TypesFilterableTo(NSPasteboardType type);
-    [Selector("pasteboardByFilteringFile:")] public static NSPasteboard PasteboardByFilteringFile(NSString filename);
-    [Selector("pasteboardByFilteringData:ofType:")] public static NSPasteboard PasteboardByFilteringDataOfType(NSData data, NSPasteboardType type);
-    [Selector("pasteboardByFilteringTypesInPasteboard:")] public static NSPasteboard PasteboardByFilteringTypesInPasteboard(NSPasteboard pboard);
+    [Selector("typesFilterableTo:")]
+    public static NSArray TypesFilterableTo(NSPasteboardType type);
+    [Selector("pasteboardByFilteringFile:")]
+    public static NSPasteboard PasteboardByFilteringFile(NSString filename);
+    [Selector("pasteboardByFilteringData:ofType:")]
+    public static NSPasteboard PasteboardByFilteringDataOfType(NSData data, NSPasteboardType type);
+    [Selector("pasteboardByFilteringTypesInPasteboard:")]
+    public static NSPasteboard PasteboardByFilteringTypesInPasteboard(NSPasteboard pboard);
 }
 
 public objc interface NSPasteboardTypeOwner : NSObjectProtocol
 {
-    [Selector("pasteboard:provideDataForType:")] void PasteboardProvideDataForType(NSPasteboard sender, NSPasteboardType type);
-    [Optional] [Selector("pasteboardChangedOwner:")] void PasteboardChangedOwner(NSPasteboard sender);
+    [Selector("pasteboard:provideDataForType:")]
+    void PasteboardProvideDataForType(NSPasteboard sender, NSPasteboardType type);
+    [Optional]
+    [Selector("pasteboardChangedOwner:")]
+    void PasteboardChangedOwner(NSPasteboard sender);
 }
 
 /// NSPasteboardOwner, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 11.0.
-    [Selector("pasteboard:provideDataForType:")] public void PasteboardProvideDataForType(NSPasteboard sender, NSPasteboardType type);
+    [Selector("pasteboard:provideDataForType:")]
+    public void PasteboardProvideDataForType(NSPasteboard sender, NSPasteboardType type);
     /// Deprecated in macOS 11.0.
-    [Selector("pasteboardChangedOwner:")] public void PasteboardChangedOwner(NSPasteboard sender);
+    [Selector("pasteboardChangedOwner:")]
+    public void PasteboardChangedOwner(NSPasteboard sender);
 }
 
 [Flags]
@@ -214,9 +251,13 @@ public enum NSPasteboardWritingOptions : ulong
 
 public objc interface NSPasteboardWriting : NSObjectProtocol
 {
-    [Selector("writableTypesForPasteboard:")] NSArray WritableTypesForPasteboard(NSPasteboard pasteboard);
-    [Optional] [Selector("writingOptionsForType:pasteboard:")] NSPasteboardWritingOptions WritingOptionsForTypePasteboard(NSPasteboardType type, NSPasteboard pasteboard);
-    [Selector("pasteboardPropertyListForType:")] AnyObject? PasteboardPropertyListForType(NSPasteboardType type);
+    [Selector("writableTypesForPasteboard:")]
+    NSArray WritableTypesForPasteboard(NSPasteboard pasteboard);
+    [Optional]
+    [Selector("writingOptionsForType:pasteboard:")]
+    NSPasteboardWritingOptions WritingOptionsForTypePasteboard(NSPasteboardType type, NSPasteboard pasteboard);
+    [Selector("pasteboardPropertyListForType:")]
+    AnyObject? PasteboardPropertyListForType(NSPasteboardType type);
 }
 
 [Flags]
@@ -230,16 +271,23 @@ public enum NSPasteboardReadingOptions : ulong
 
 public objc interface NSPasteboardReading : NSObjectProtocol
 {
-    [Selector("readableTypesForPasteboard:")] static abstract NSArray ReadableTypesForPasteboard(NSPasteboard pasteboard);
-    [Optional] [Selector("readingOptionsForType:pasteboard:")] static abstract NSPasteboardReadingOptions ReadingOptionsForTypePasteboard(NSPasteboardType type, NSPasteboard pasteboard);
-    [Optional] [Selector("initWithPasteboardPropertyList:ofType:")] AnyObject? InitWithPasteboardPropertyListOfType(AnyObject propertyList, NSPasteboardType type);
+    [Selector("readableTypesForPasteboard:")]
+    static abstract NSArray ReadableTypesForPasteboard(NSPasteboard pasteboard);
+    [Optional]
+    [Selector("readingOptionsForType:pasteboard:")]
+    static abstract NSPasteboardReadingOptions ReadingOptionsForTypePasteboard(NSPasteboardType type, NSPasteboard pasteboard);
+    [Optional]
+    [Selector("initWithPasteboardPropertyList:ofType:")]
+    AnyObject? InitWithPasteboardPropertyListOfType(AnyObject propertyList, NSPasteboardType type);
 }
 
 /// NSPasteboardSupport, a category of NSURL.
 public extern objc class NSURL : NSPasteboardWriting, NSPasteboardReading
 {
-    [Selector("URLFromPasteboard:")] public static NSURL? URLFromPasteboard(NSPasteboard pasteBoard);
-    [Selector("writeToPasteboard:")] public void WriteToPasteboard(NSPasteboard pasteBoard);
+    [Selector("URLFromPasteboard:")]
+    public static NSURL? URLFromPasteboard(NSPasteboard pasteBoard);
+    [Selector("writeToPasteboard:")]
+    public void WriteToPasteboard(NSPasteboard pasteBoard);
 }
 
 /// NSPasteboardSupport, a category of NSString.
@@ -248,10 +296,14 @@ public extern objc class NSString : NSPasteboardWriting, NSPasteboardReading { }
 /// NSFileContents, a category of NSPasteboard.
 public extern objc class NSPasteboard
 {
-    [Selector("writeFileContents:")] public bool WriteFileContents(NSString filename);
-    [Selector("readFileContentsType:toFile:")] public NSString? ReadFileContentsTypeToFile(NSPasteboardType? type, NSString filename);
-    [Selector("writeFileWrapper:")] public bool WriteFileWrapper(NSFileWrapper wrapper);
-    [Selector("readFileWrapper")] public NSFileWrapper? ReadFileWrapper();
+    [Selector("writeFileContents:")]
+    public bool WriteFileContents(NSString filename);
+    [Selector("readFileContentsType:toFile:")]
+    public NSString? ReadFileContentsTypeToFile(NSPasteboardType? type, NSString filename);
+    [Selector("writeFileWrapper:")]
+    public bool WriteFileWrapper(NSFileWrapper wrapper);
+    [Selector("readFileWrapper")]
+    public NSFileWrapper? ReadFileWrapper();
 }
 
 public extern "C" NSPasteboardType NSFileContentsPboardType;

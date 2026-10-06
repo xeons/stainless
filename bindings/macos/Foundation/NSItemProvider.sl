@@ -47,17 +47,27 @@ public objc closure void NSItemProviderWritingLoadDataWithTypeIdentifierForItemP
 
 public objc interface NSItemProviderWriting : NSObjectProtocol
 {
-    [Selector("writableTypeIdentifiersForItemProvider")] static abstract NSArray WritableTypeIdentifiersForItemProvider { get; }
-    [Optional] [Selector("writableTypeIdentifiersForItemProvider")] NSArray WritableTypeIdentifiersForItemProviderProperty { get; }
-    [Optional] [Selector("itemProviderVisibilityForRepresentationWithTypeIdentifier:")] static abstract NSItemProviderRepresentationVisibility ItemProviderVisibilityForRepresentationWithTypeIdentifier(NSString typeIdentifier);
-    [Optional] [Selector("itemProviderVisibilityForRepresentationWithTypeIdentifier:")] NSItemProviderRepresentationVisibility ItemProviderVisibilityForRepresentationWithTypeIdentifierMethod(NSString typeIdentifier);
-    [Selector("loadDataWithTypeIdentifier:forItemProviderCompletionHandler:")] NSProgress? LoadDataWithTypeIdentifierForItemProviderCompletionHandler(NSString typeIdentifier, NSItemProviderWritingLoadDataWithTypeIdentifierForItemProviderCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("writableTypeIdentifiersForItemProvider")]
+    static abstract NSArray WritableTypeIdentifiersForItemProvider { get; }
+    [Optional]
+    [Selector("writableTypeIdentifiersForItemProvider")]
+    NSArray WritableTypeIdentifiersForItemProviderProperty { get; }
+    [Optional]
+    [Selector("itemProviderVisibilityForRepresentationWithTypeIdentifier:")]
+    static abstract NSItemProviderRepresentationVisibility ItemProviderVisibilityForRepresentationWithTypeIdentifier(NSString typeIdentifier);
+    [Optional]
+    [Selector("itemProviderVisibilityForRepresentationWithTypeIdentifier:")]
+    NSItemProviderRepresentationVisibility ItemProviderVisibilityForRepresentationWithTypeIdentifierMethod(NSString typeIdentifier);
+    [Selector("loadDataWithTypeIdentifier:forItemProviderCompletionHandler:")]
+    NSProgress? LoadDataWithTypeIdentifierForItemProviderCompletionHandler(NSString typeIdentifier, NSItemProviderWritingLoadDataWithTypeIdentifierForItemProviderCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc interface NSItemProviderReading : NSObjectProtocol
 {
-    [Selector("readableTypeIdentifiersForItemProvider")] static abstract NSArray ReadableTypeIdentifiersForItemProvider { get; }
-    [Selector("objectWithItemProviderData:typeIdentifier:error:")] static abstract Self? ObjectWithItemProviderDataTypeIdentifierError(NSData data, NSString typeIdentifier, out NSError? outError);
+    [Selector("readableTypeIdentifiersForItemProvider")]
+    static abstract NSArray ReadableTypeIdentifiersForItemProvider { get; }
+    [Selector("objectWithItemProviderData:typeIdentifier:error:")]
+    static abstract Self? ObjectWithItemProviderDataTypeIdentifierError(NSData data, NSString typeIdentifier, out NSError? outError);
 }
 
 public objc closure void NSItemProviderCompletionHandler(NSSecureCoding? arg0, NSError? arg1);
@@ -86,26 +96,46 @@ public objc closure void NSItemProviderLoadObjectOfClassCompletionHandlerComplet
 
 public extern objc class NSItemProvider : NSObject, NSCopying
 {
-    [Selector("registeredTypeIdentifiers")] public NSArray RegisteredTypeIdentifiers { get; }
-    [Selector("suggestedName", "setSuggestedName:")] public NSString? SuggestedName { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("registerDataRepresentationForTypeIdentifier:visibility:loadHandler:")] public void RegisterDataRepresentationForTypeIdentifierVisibilityLoadHandler(NSString typeIdentifier, NSItemProviderRepresentationVisibility visibility, NSItemProviderRegisterDataRepresentationForTypeIdentifierVisibilityLoadHandlerLoadHandlerBlock loadHandler);
-    [Selector("registerFileRepresentationForTypeIdentifier:fileOptions:visibility:loadHandler:")] public void RegisterFileRepresentationForTypeIdentifierFileOptionsVisibilityLoadHandler(NSString typeIdentifier, NSItemProviderFileOptions fileOptions, NSItemProviderRepresentationVisibility visibility, NSItemProviderRegisterFileRepresentationForTypeIdentifierFileOptionsVisibilityLoadHandlerLoadHandlerBlock loadHandler);
-    [Selector("registeredTypeIdentifiersWithFileOptions:")] public NSArray RegisteredTypeIdentifiersWithFileOptions(NSItemProviderFileOptions fileOptions);
-    [Selector("hasItemConformingToTypeIdentifier:")] public bool HasItemConformingToTypeIdentifier(NSString typeIdentifier);
-    [Selector("hasRepresentationConformingToTypeIdentifier:fileOptions:")] public bool HasRepresentationConformingToTypeIdentifierFileOptions(NSString typeIdentifier, NSItemProviderFileOptions fileOptions);
-    [Selector("loadDataRepresentationForTypeIdentifier:completionHandler:")] public NSProgress LoadDataRepresentationForTypeIdentifierCompletionHandler(NSString typeIdentifier, NSItemProviderLoadDataRepresentationForTypeIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadFileRepresentationForTypeIdentifier:completionHandler:")] public NSProgress LoadFileRepresentationForTypeIdentifierCompletionHandler(NSString typeIdentifier, NSItemProviderLoadFileRepresentationForTypeIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadInPlaceFileRepresentationForTypeIdentifier:completionHandler:")] public NSProgress LoadInPlaceFileRepresentationForTypeIdentifierCompletionHandler(NSString typeIdentifier, NSItemProviderLoadInPlaceFileRepresentationForTypeIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("initWithObject:")] public Self InitWithObject(NSItemProviderWriting object);
-    [Selector("registerObject:visibility:")] public void RegisterObjectVisibility(NSItemProviderWriting object, NSItemProviderRepresentationVisibility visibility);
-    [Selector("registerObjectOfClass:visibility:loadHandler:")] public void RegisterObjectOfClassVisibilityLoadHandler(Class aClass, NSItemProviderRepresentationVisibility visibility, NSItemProviderRegisterObjectOfClassVisibilityLoadHandlerLoadHandlerBlock loadHandler);
-    [Selector("canLoadObjectOfClass:")] public bool CanLoadObjectOfClass(Class aClass);
-    [Selector("loadObjectOfClass:completionHandler:")] public NSProgress LoadObjectOfClassCompletionHandler(Class aClass, NSItemProviderLoadObjectOfClassCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("initWithItem:typeIdentifier:")] public Self InitWithItemTypeIdentifier(NSSecureCoding? item, NSString? typeIdentifier);
-    [Selector("initWithContentsOfURL:")] public Self? InitWithContentsOfURL(NSURL? fileURL);
-    [Selector("registerItemForTypeIdentifier:loadHandler:")] public void RegisterItemForTypeIdentifierLoadHandler(NSString typeIdentifier, NSItemProviderLoadHandler loadHandler);
-    [Selector("loadItemForTypeIdentifier:options:completionHandler:")] public void LoadItemForTypeIdentifierOptionsCompletionHandler(NSString typeIdentifier, NSDictionary? options, NSItemProviderCompletionHandler? completionHandler);
+    [Selector("registeredTypeIdentifiers")]
+    public NSArray RegisteredTypeIdentifiers { get; }
+    [Selector("suggestedName", "setSuggestedName:")]
+    public NSString? SuggestedName { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("registerDataRepresentationForTypeIdentifier:visibility:loadHandler:")]
+    public void RegisterDataRepresentationForTypeIdentifierVisibilityLoadHandler(NSString typeIdentifier, NSItemProviderRepresentationVisibility visibility, NSItemProviderRegisterDataRepresentationForTypeIdentifierVisibilityLoadHandlerLoadHandlerBlock loadHandler);
+    [Selector("registerFileRepresentationForTypeIdentifier:fileOptions:visibility:loadHandler:")]
+    public void RegisterFileRepresentationForTypeIdentifierFileOptionsVisibilityLoadHandler(NSString typeIdentifier, NSItemProviderFileOptions fileOptions, NSItemProviderRepresentationVisibility visibility, NSItemProviderRegisterFileRepresentationForTypeIdentifierFileOptionsVisibilityLoadHandlerLoadHandlerBlock loadHandler);
+    [Selector("registeredTypeIdentifiersWithFileOptions:")]
+    public NSArray RegisteredTypeIdentifiersWithFileOptions(NSItemProviderFileOptions fileOptions);
+    [Selector("hasItemConformingToTypeIdentifier:")]
+    public bool HasItemConformingToTypeIdentifier(NSString typeIdentifier);
+    [Selector("hasRepresentationConformingToTypeIdentifier:fileOptions:")]
+    public bool HasRepresentationConformingToTypeIdentifierFileOptions(NSString typeIdentifier, NSItemProviderFileOptions fileOptions);
+    [Selector("loadDataRepresentationForTypeIdentifier:completionHandler:")]
+    public NSProgress LoadDataRepresentationForTypeIdentifierCompletionHandler(NSString typeIdentifier, NSItemProviderLoadDataRepresentationForTypeIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadFileRepresentationForTypeIdentifier:completionHandler:")]
+    public NSProgress LoadFileRepresentationForTypeIdentifierCompletionHandler(NSString typeIdentifier, NSItemProviderLoadFileRepresentationForTypeIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadInPlaceFileRepresentationForTypeIdentifier:completionHandler:")]
+    public NSProgress LoadInPlaceFileRepresentationForTypeIdentifierCompletionHandler(NSString typeIdentifier, NSItemProviderLoadInPlaceFileRepresentationForTypeIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("initWithObject:")]
+    public Self InitWithObject(NSItemProviderWriting object);
+    [Selector("registerObject:visibility:")]
+    public void RegisterObjectVisibility(NSItemProviderWriting object, NSItemProviderRepresentationVisibility visibility);
+    [Selector("registerObjectOfClass:visibility:loadHandler:")]
+    public void RegisterObjectOfClassVisibilityLoadHandler(Class aClass, NSItemProviderRepresentationVisibility visibility, NSItemProviderRegisterObjectOfClassVisibilityLoadHandlerLoadHandlerBlock loadHandler);
+    [Selector("canLoadObjectOfClass:")]
+    public bool CanLoadObjectOfClass(Class aClass);
+    [Selector("loadObjectOfClass:completionHandler:")]
+    public NSProgress LoadObjectOfClassCompletionHandler(Class aClass, NSItemProviderLoadObjectOfClassCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("initWithItem:typeIdentifier:")]
+    public Self InitWithItemTypeIdentifier(NSSecureCoding? item, NSString? typeIdentifier);
+    [Selector("initWithContentsOfURL:")]
+    public Self? InitWithContentsOfURL(NSURL? fileURL);
+    [Selector("registerItemForTypeIdentifier:loadHandler:")]
+    public void RegisterItemForTypeIdentifierLoadHandler(NSString typeIdentifier, NSItemProviderLoadHandler loadHandler);
+    [Selector("loadItemForTypeIdentifier:options:completionHandler:")]
+    public void LoadItemForTypeIdentifierOptionsCompletionHandler(NSString typeIdentifier, NSDictionary? options, NSItemProviderCompletionHandler? completionHandler);
 }
 
 public extern "C" NSString NSItemProviderPreferredImageSizeKey;
@@ -113,8 +143,10 @@ public extern "C" NSString NSItemProviderPreferredImageSizeKey;
 /// NSPreviewSupport, a category of NSItemProvider.
 public extern objc class NSItemProvider
 {
-    [Selector("previewImageHandler", "setPreviewImageHandler:")] public NSItemProviderLoadHandler? PreviewImageHandler { get; set; }
-    [Selector("loadPreviewImageWithOptions:completionHandler:")] public void LoadPreviewImageWithOptionsCompletionHandler(NSDictionary? options, NSItemProviderCompletionHandler? completionHandler);
+    [Selector("previewImageHandler", "setPreviewImageHandler:")]
+    public NSItemProviderLoadHandler? PreviewImageHandler { get; set; }
+    [Selector("loadPreviewImageWithOptions:completionHandler:")]
+    public void LoadPreviewImageWithOptionsCompletionHandler(NSDictionary? options, NSItemProviderCompletionHandler? completionHandler);
 }
 
 public extern "C" NSString? NSExtensionJavaScriptPreprocessingResultsKey;

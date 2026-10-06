@@ -40,8 +40,10 @@ public enum SWHighlightPersistenceEventTrigger : long
 
 public extern objc class SWHighlightPersistenceEvent : NSObject, SWHighlightEvent
 {
-    [Selector("persistenceEventTrigger")] public SWHighlightPersistenceEventTrigger PersistenceEventTrigger { get; }
-    [Selector("initWithHighlight:trigger:")] public Self InitWithHighlightTrigger(SWHighlight highlight, SWHighlightPersistenceEventTrigger trigger);
+    [Selector("persistenceEventTrigger")]
+    public SWHighlightPersistenceEventTrigger PersistenceEventTrigger { get; }
+    [Selector("initWithHighlight:trigger:")]
+    public Self InitWithHighlightTrigger(SWHighlight highlight, SWHighlightPersistenceEventTrigger trigger);
 }
 
 #endif

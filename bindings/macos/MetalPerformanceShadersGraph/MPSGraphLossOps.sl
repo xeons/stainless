@@ -42,8 +42,10 @@ public enum MPSGraphLossReductionType : ulong
 /// MPSGraphLossOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("softMaxCrossEntropyWithSourceTensor:labelsTensor:axis:reductionType:name:")] public MPSGraphTensor SoftMaxCrossEntropyWithSourceTensorLabelsTensorAxisReductionTypeName(MPSGraphTensor sourceTensor, MPSGraphTensor labelsTensor, NSInteger axis, MPSGraphLossReductionType reductionType, NSString? name);
-    [Selector("softMaxCrossEntropyGradientWithIncomingGradientTensor:sourceTensor:labelsTensor:axis:reductionType:name:")] public MPSGraphTensor SoftMaxCrossEntropyGradientWithIncomingGradientTensorSourceTensorLabelsTensorAxisReductionTypeName(MPSGraphTensor gradientTensor, MPSGraphTensor sourceTensor, MPSGraphTensor labelsTensor, NSInteger axis, MPSGraphLossReductionType reductionType, NSString? name);
+    [Selector("softMaxCrossEntropyWithSourceTensor:labelsTensor:axis:reductionType:name:")]
+    public MPSGraphTensor SoftMaxCrossEntropyWithSourceTensorLabelsTensorAxisReductionTypeName(MPSGraphTensor sourceTensor, MPSGraphTensor labelsTensor, NSInteger axis, MPSGraphLossReductionType reductionType, NSString? name);
+    [Selector("softMaxCrossEntropyGradientWithIncomingGradientTensor:sourceTensor:labelsTensor:axis:reductionType:name:")]
+    public MPSGraphTensor SoftMaxCrossEntropyGradientWithIncomingGradientTensorSourceTensorLabelsTensorAxisReductionTypeName(MPSGraphTensor gradientTensor, MPSGraphTensor sourceTensor, MPSGraphTensor labelsTensor, NSInteger axis, MPSGraphLossReductionType reductionType, NSString? name);
 }
 
 #endif

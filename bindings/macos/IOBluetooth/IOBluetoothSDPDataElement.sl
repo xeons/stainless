@@ -33,23 +33,40 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothSDPDataElement : NSObject, NSCoding, NSSecureCoding
 {
-    [Selector("withElementValue:")] public static Self? WithElementValue(NSObject? element);
-    [Selector("withType:sizeDescriptor:size:value:")] public static Self? WithTypeSizeDescriptorSizeValue(BluetoothSDPDataElementTypeDescriptor type, BluetoothSDPDataElementSizeDescriptor newSizeDescriptor, uint newSize, NSObject? newValue);
-    [Selector("withSDPDataElementRef:")] public static Self? WithSDPDataElementRef(IOBluetoothSDPDataElementRef sdpDataElementRef);
-    [Selector("initWithElementValue:")] public Self? InitWithElementValue(NSObject? element);
-    [Selector("initWithType:sizeDescriptor:size:value:")] public Self? InitWithTypeSizeDescriptorSizeValue(BluetoothSDPDataElementTypeDescriptor newType, BluetoothSDPDataElementSizeDescriptor newSizeDescriptor, uint newSize, NSObject? newValue);
-    [Selector("getSDPDataElementRef")] public IOBluetoothSDPDataElementRef GetSDPDataElementRef();
-    [Selector("getTypeDescriptor")] public BluetoothSDPDataElementTypeDescriptor GetTypeDescriptor();
-    [Selector("getSizeDescriptor")] public BluetoothSDPDataElementSizeDescriptor GetSizeDescriptor();
-    [Selector("getSize")] public uint GetSize();
-    [Selector("getNumberValue")] public NSNumber? GetNumberValue();
-    [Selector("getDataValue")] public NSData? GetDataValue();
-    [Selector("getStringValue")] public NSString? GetStringValue();
-    [Selector("getArrayValue")] public NSArray? GetArrayValue();
-    [Selector("getUUIDValue")] public IOBluetoothSDPUUID? GetUUIDValue();
-    [Selector("getValue")] public NSObject? GetValue();
-    [Selector("containsDataElement:")] public bool ContainsDataElement(IOBluetoothSDPDataElement? dataElement);
-    [Selector("containsValue:")] public bool ContainsValue(NSObject? cmpValue);
+    [Selector("withElementValue:")]
+    public static Self? WithElementValue(NSObject? element);
+    [Selector("withType:sizeDescriptor:size:value:")]
+    public static Self? WithTypeSizeDescriptorSizeValue(BluetoothSDPDataElementTypeDescriptor type, BluetoothSDPDataElementSizeDescriptor newSizeDescriptor, uint newSize, NSObject? newValue);
+    [Selector("withSDPDataElementRef:")]
+    public static Self? WithSDPDataElementRef(IOBluetoothSDPDataElementRef sdpDataElementRef);
+    [Selector("initWithElementValue:")]
+    public Self? InitWithElementValue(NSObject? element);
+    [Selector("initWithType:sizeDescriptor:size:value:")]
+    public Self? InitWithTypeSizeDescriptorSizeValue(BluetoothSDPDataElementTypeDescriptor newType, BluetoothSDPDataElementSizeDescriptor newSizeDescriptor, uint newSize, NSObject? newValue);
+    [Selector("getSDPDataElementRef")]
+    public IOBluetoothSDPDataElementRef GetSDPDataElementRef();
+    [Selector("getTypeDescriptor")]
+    public BluetoothSDPDataElementTypeDescriptor GetTypeDescriptor();
+    [Selector("getSizeDescriptor")]
+    public BluetoothSDPDataElementSizeDescriptor GetSizeDescriptor();
+    [Selector("getSize")]
+    public uint GetSize();
+    [Selector("getNumberValue")]
+    public NSNumber? GetNumberValue();
+    [Selector("getDataValue")]
+    public NSData? GetDataValue();
+    [Selector("getStringValue")]
+    public NSString? GetStringValue();
+    [Selector("getArrayValue")]
+    public NSArray? GetArrayValue();
+    [Selector("getUUIDValue")]
+    public IOBluetoothSDPUUID? GetUUIDValue();
+    [Selector("getValue")]
+    public NSObject? GetValue();
+    [Selector("containsDataElement:")]
+    public bool ContainsDataElement(IOBluetoothSDPDataElement? dataElement);
+    [Selector("containsValue:")]
+    public bool ContainsValue(NSObject? cmpValue);
 }
 
 #endif

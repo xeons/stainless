@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class PDFActionGoTo : PDFAction, NSCopying
 {
-    [Selector("destination", "setDestination:")] public PDFDestination Destination { get; set; }
-    [Selector("initWithDestination:")] public Self InitWithDestination(PDFDestination destination);
+    [Selector("destination", "setDestination:")]
+    public PDFDestination Destination { get; set; }
+    [Selector("initWithDestination:")]
+    public Self InitWithDestination(PDFDestination destination);
 }
 
 #endif

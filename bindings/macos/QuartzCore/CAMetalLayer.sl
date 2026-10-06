@@ -36,28 +36,45 @@ import Standard.ObjC;
 
 public objc interface CAMetalDrawable : MTLDrawable
 {
-    [Selector("texture")] MTLTexture Texture { get; }
-    [Selector("layer")] CAMetalLayer Layer { get; }
+    [Selector("texture")]
+    MTLTexture Texture { get; }
+    [Selector("layer")]
+    CAMetalLayer Layer { get; }
 }
 
 public extern objc class CAMetalLayer : CALayer
 {
-    [Selector("device", "setDevice:")] public MTLDevice? Device { get; set; }
-    [Selector("preferredDevice")] public MTLDevice? PreferredDevice { get; }
-    [Selector("pixelFormat", "setPixelFormat:")] public MTLPixelFormat PixelFormat { get; set; }
-    [Selector("framebufferOnly", "setFramebufferOnly:")] public bool FramebufferOnly { get; set; }
-    [Selector("drawableSize", "setDrawableSize:")] public CGSize DrawableSize { get; set; }
-    [Selector("maximumDrawableCount", "setMaximumDrawableCount:")] public NSUInteger MaximumDrawableCount { get; set; }
-    [Selector("presentsWithTransaction", "setPresentsWithTransaction:")] public bool PresentsWithTransaction { get; set; }
-    [Selector("colorspace", "setColorspace:")] public CGColorSpaceRef? Colorspace { get; set; }
-    [Selector("wantsExtendedDynamicRangeContent", "setWantsExtendedDynamicRangeContent:")] public bool WantsExtendedDynamicRangeContent { get; set; }
-    [Selector("EDRMetadata", "setEDRMetadata:")] public CAEDRMetadata? EDRMetadata { get; set; }
-    [Selector("displaySyncEnabled", "setDisplaySyncEnabled:")] public bool DisplaySyncEnabled { get; set; }
-    [Selector("allowsNextDrawableTimeout", "setAllowsNextDrawableTimeout:")] public bool AllowsNextDrawableTimeout { get; set; }
-    [Selector("developerHUDProperties", "setDeveloperHUDProperties:")] public NSDictionary? DeveloperHUDProperties { get; set; }
+    [Selector("device", "setDevice:")]
+    public MTLDevice? Device { get; set; }
+    [Selector("preferredDevice")]
+    public MTLDevice? PreferredDevice { get; }
+    [Selector("pixelFormat", "setPixelFormat:")]
+    public MTLPixelFormat PixelFormat { get; set; }
+    [Selector("framebufferOnly", "setFramebufferOnly:")]
+    public bool FramebufferOnly { get; set; }
+    [Selector("drawableSize", "setDrawableSize:")]
+    public CGSize DrawableSize { get; set; }
+    [Selector("maximumDrawableCount", "setMaximumDrawableCount:")]
+    public NSUInteger MaximumDrawableCount { get; set; }
+    [Selector("presentsWithTransaction", "setPresentsWithTransaction:")]
+    public bool PresentsWithTransaction { get; set; }
+    [Selector("colorspace", "setColorspace:")]
+    public CGColorSpaceRef? Colorspace { get; set; }
+    [Selector("wantsExtendedDynamicRangeContent", "setWantsExtendedDynamicRangeContent:")]
+    public bool WantsExtendedDynamicRangeContent { get; set; }
+    [Selector("EDRMetadata", "setEDRMetadata:")]
+    public CAEDRMetadata? EDRMetadata { get; set; }
+    [Selector("displaySyncEnabled", "setDisplaySyncEnabled:")]
+    public bool DisplaySyncEnabled { get; set; }
+    [Selector("allowsNextDrawableTimeout", "setAllowsNextDrawableTimeout:")]
+    public bool AllowsNextDrawableTimeout { get; set; }
+    [Selector("developerHUDProperties", "setDeveloperHUDProperties:")]
+    public NSDictionary? DeveloperHUDProperties { get; set; }
     /// macOS 26.0 and later.
-    [Selector("residencySet")] public MTLResidencySet? ResidencySet { get; }
-    [Selector("nextDrawable")] public CAMetalDrawable? NextDrawable();
+    [Selector("residencySet")]
+    public MTLResidencySet? ResidencySet { get; }
+    [Selector("nextDrawable")]
+    public CAMetalDrawable? NextDrawable();
 }
 
 #endif

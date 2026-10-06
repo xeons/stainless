@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class HKLiveWorkoutDataSource : NSObject
 {
-    [Selector("typesToCollect")] public NSSet TypesToCollect { get; }
-    [Selector("initWithHealthStore:workoutConfiguration:")] public Self InitWithHealthStoreWorkoutConfiguration(HKHealthStore healthStore, HKWorkoutConfiguration? configuration);
-    [Selector("enableCollectionForType:predicate:")] public void EnableCollectionForTypePredicate(HKQuantityType quantityType, NSPredicate? predicate);
-    [Selector("disableCollectionForType:")] public void DisableCollectionForType(HKQuantityType quantityType);
+    [Selector("typesToCollect")]
+    public NSSet TypesToCollect { get; }
+    [Selector("initWithHealthStore:workoutConfiguration:")]
+    public Self InitWithHealthStoreWorkoutConfiguration(HKHealthStore healthStore, HKWorkoutConfiguration? configuration);
+    [Selector("enableCollectionForType:predicate:")]
+    public void EnableCollectionForTypePredicate(HKQuantityType quantityType, NSPredicate? predicate);
+    [Selector("disableCollectionForType:")]
+    public void DisableCollectionForType(HKQuantityType quantityType);
 }
 
 #endif

@@ -34,16 +34,26 @@ import Standard.ObjC;
 /// WebPlugIn, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("objectForWebScript")] public AnyObject? ObjectForWebScript { get; }
-    [Selector("webPlugInInitialize")] public void WebPlugInInitialize();
-    [Selector("webPlugInStart")] public void WebPlugInStart();
-    [Selector("webPlugInStop")] public void WebPlugInStop();
-    [Selector("webPlugInDestroy")] public void WebPlugInDestroy();
-    [Selector("webPlugInSetIsSelected:")] public void WebPlugInSetIsSelected(bool isSelected);
-    [Selector("webPlugInMainResourceDidReceiveResponse:")] public void WebPlugInMainResourceDidReceiveResponse(NSURLResponse? response);
-    [Selector("webPlugInMainResourceDidReceiveData:")] public void WebPlugInMainResourceDidReceiveData(NSData? data);
-    [Selector("webPlugInMainResourceDidFailWithError:")] public void WebPlugInMainResourceDidFailWithError(NSError? error);
-    [Selector("webPlugInMainResourceDidFinishLoading")] public void WebPlugInMainResourceDidFinishLoading();
+    [Selector("objectForWebScript")]
+    public AnyObject? ObjectForWebScript { get; }
+    [Selector("webPlugInInitialize")]
+    public void WebPlugInInitialize();
+    [Selector("webPlugInStart")]
+    public void WebPlugInStart();
+    [Selector("webPlugInStop")]
+    public void WebPlugInStop();
+    [Selector("webPlugInDestroy")]
+    public void WebPlugInDestroy();
+    [Selector("webPlugInSetIsSelected:")]
+    public void WebPlugInSetIsSelected(bool isSelected);
+    [Selector("webPlugInMainResourceDidReceiveResponse:")]
+    public void WebPlugInMainResourceDidReceiveResponse(NSURLResponse? response);
+    [Selector("webPlugInMainResourceDidReceiveData:")]
+    public void WebPlugInMainResourceDidReceiveData(NSData? data);
+    [Selector("webPlugInMainResourceDidFailWithError:")]
+    public void WebPlugInMainResourceDidFailWithError(NSError? error);
+    [Selector("webPlugInMainResourceDidFinishLoading")]
+    public void WebPlugInMainResourceDidFinishLoading();
 }
 
 #endif

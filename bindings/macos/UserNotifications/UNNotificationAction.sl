@@ -41,20 +41,30 @@ public enum UNNotificationActionOptions : ulong
 
 public extern objc class UNNotificationAction : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("title")] public NSString Title { get; }
-    [Selector("options")] public UNNotificationActionOptions Options { get; }
-    [Selector("icon")] public UNNotificationActionIcon? Icon { get; }
-    [Selector("actionWithIdentifier:title:options:")] public static Self ActionWithIdentifierTitleOptions(NSString identifier, NSString title, UNNotificationActionOptions options);
-    [Selector("actionWithIdentifier:title:options:icon:")] public static Self ActionWithIdentifierTitleOptionsIcon(NSString identifier, NSString title, UNNotificationActionOptions options, UNNotificationActionIcon? icon);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("title")]
+    public NSString Title { get; }
+    [Selector("options")]
+    public UNNotificationActionOptions Options { get; }
+    [Selector("icon")]
+    public UNNotificationActionIcon? Icon { get; }
+    [Selector("actionWithIdentifier:title:options:")]
+    public static Self ActionWithIdentifierTitleOptions(NSString identifier, NSString title, UNNotificationActionOptions options);
+    [Selector("actionWithIdentifier:title:options:icon:")]
+    public static Self ActionWithIdentifierTitleOptionsIcon(NSString identifier, NSString title, UNNotificationActionOptions options, UNNotificationActionIcon? icon);
 }
 
 public extern objc class UNTextInputNotificationAction : UNNotificationAction
 {
-    [Selector("textInputButtonTitle")] public NSString TextInputButtonTitle { get; }
-    [Selector("textInputPlaceholder")] public NSString TextInputPlaceholder { get; }
-    [Selector("actionWithIdentifier:title:options:textInputButtonTitle:textInputPlaceholder:")] public static Self ActionWithIdentifierTitleOptionsTextInputButtonTitleTextInputPlaceholder(NSString identifier, NSString title, UNNotificationActionOptions options, NSString textInputButtonTitle, NSString textInputPlaceholder);
-    [Selector("actionWithIdentifier:title:options:icon:textInputButtonTitle:textInputPlaceholder:")] public static Self ActionWithIdentifierTitleOptionsIconTextInputButtonTitleTextInputPlaceholder(NSString identifier, NSString title, UNNotificationActionOptions options, UNNotificationActionIcon? icon, NSString textInputButtonTitle, NSString textInputPlaceholder);
+    [Selector("textInputButtonTitle")]
+    public NSString TextInputButtonTitle { get; }
+    [Selector("textInputPlaceholder")]
+    public NSString TextInputPlaceholder { get; }
+    [Selector("actionWithIdentifier:title:options:textInputButtonTitle:textInputPlaceholder:")]
+    public static Self ActionWithIdentifierTitleOptionsTextInputButtonTitleTextInputPlaceholder(NSString identifier, NSString title, UNNotificationActionOptions options, NSString textInputButtonTitle, NSString textInputPlaceholder);
+    [Selector("actionWithIdentifier:title:options:icon:textInputButtonTitle:textInputPlaceholder:")]
+    public static Self ActionWithIdentifierTitleOptionsIconTextInputButtonTitleTextInputPlaceholder(NSString identifier, NSString title, UNNotificationActionOptions options, UNNotificationActionIcon? icon, NSString textInputButtonTitle, NSString textInputPlaceholder);
 }
 
 #endif

@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public objc interface GKStrategist : NSObjectProtocol
 {
-    [Selector("gameModel", "setGameModel:")] GKGameModel? GameModel { get; set; }
-    [Selector("randomSource", "setRandomSource:")] GKRandom? RandomSource { get; set; }
-    [Selector("bestMoveForActivePlayer")] GKGameModelUpdate? BestMoveForActivePlayer();
+    [Selector("gameModel", "setGameModel:")]
+    GKGameModel? GameModel { get; set; }
+    [Selector("randomSource", "setRandomSource:")]
+    GKRandom? RandomSource { get; set; }
+    [Selector("bestMoveForActivePlayer")]
+    GKGameModelUpdate? BestMoveForActivePlayer();
 }
 
 #endif

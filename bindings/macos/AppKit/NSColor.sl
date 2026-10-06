@@ -54,209 +54,368 @@ public objc closure NSColor NSColorColorWithNameDynamicProviderDynamicProviderBl
 
 public extern objc class NSColor : NSObject, NSCopying, NSSecureCoding, NSPasteboardReading, NSPasteboardWriting
 {
-    [Selector("type")] public NSColorType Type { get; }
+    [Selector("type")]
+    public NSColorType Type { get; }
     /// macOS 26.0 and later.
-    [Selector("standardDynamicRangeColor")] public NSColor? StandardDynamicRangeColor { get; }
-    [Selector("blackColor")] public static NSColor BlackColor { get; }
-    [Selector("darkGrayColor")] public static NSColor DarkGrayColor { get; }
-    [Selector("lightGrayColor")] public static NSColor LightGrayColor { get; }
-    [Selector("whiteColor")] public static NSColor WhiteColor { get; }
-    [Selector("grayColor")] public static NSColor GrayColor { get; }
-    [Selector("redColor")] public static NSColor RedColor { get; }
-    [Selector("greenColor")] public static NSColor GreenColor { get; }
-    [Selector("blueColor")] public static NSColor BlueColor { get; }
-    [Selector("cyanColor")] public static NSColor CyanColor { get; }
-    [Selector("yellowColor")] public static NSColor YellowColor { get; }
-    [Selector("magentaColor")] public static NSColor MagentaColor { get; }
-    [Selector("orangeColor")] public static NSColor OrangeColor { get; }
-    [Selector("purpleColor")] public static NSColor PurpleColor { get; }
-    [Selector("brownColor")] public static NSColor BrownColor { get; }
-    [Selector("clearColor")] public static NSColor ClearColor { get; }
-    [Selector("labelColor")] public static NSColor? LabelColor { get; }
-    [Selector("secondaryLabelColor")] public static NSColor? SecondaryLabelColor { get; }
-    [Selector("tertiaryLabelColor")] public static NSColor? TertiaryLabelColor { get; }
-    [Selector("quaternaryLabelColor")] public static NSColor? QuaternaryLabelColor { get; }
-    [Selector("quinaryLabelColor")] public static NSColor? QuinaryLabelColor { get; }
-    [Selector("linkColor")] public static NSColor? LinkColor { get; }
-    [Selector("placeholderTextColor")] public static NSColor? PlaceholderTextColor { get; }
-    [Selector("windowFrameTextColor")] public static NSColor WindowFrameTextColor { get; }
-    [Selector("selectedMenuItemTextColor")] public static NSColor SelectedMenuItemTextColor { get; }
-    [Selector("alternateSelectedControlTextColor")] public static NSColor AlternateSelectedControlTextColor { get; }
-    [Selector("headerTextColor")] public static NSColor HeaderTextColor { get; }
-    [Selector("separatorColor")] public static NSColor? SeparatorColor { get; }
-    [Selector("gridColor")] public static NSColor GridColor { get; }
-    [Selector("windowBackgroundColor")] public static NSColor WindowBackgroundColor { get; }
-    [Selector("underPageBackgroundColor")] public static NSColor? UnderPageBackgroundColor { get; }
-    [Selector("controlBackgroundColor")] public static NSColor ControlBackgroundColor { get; }
-    [Selector("selectedContentBackgroundColor")] public static NSColor? SelectedContentBackgroundColor { get; }
-    [Selector("unemphasizedSelectedContentBackgroundColor")] public static NSColor? UnemphasizedSelectedContentBackgroundColor { get; }
-    [Selector("alternatingContentBackgroundColors")] public static NSArray? AlternatingContentBackgroundColors { get; }
-    [Selector("findHighlightColor")] public static NSColor? FindHighlightColor { get; }
-    [Selector("textColor")] public static NSColor TextColor { get; }
-    [Selector("textBackgroundColor")] public static NSColor TextBackgroundColor { get; }
-    [Selector("textInsertionPointColor")] public static NSColor? TextInsertionPointColor { get; }
-    [Selector("selectedTextColor")] public static NSColor SelectedTextColor { get; }
-    [Selector("selectedTextBackgroundColor")] public static NSColor SelectedTextBackgroundColor { get; }
-    [Selector("unemphasizedSelectedTextBackgroundColor")] public static NSColor? UnemphasizedSelectedTextBackgroundColor { get; }
-    [Selector("unemphasizedSelectedTextColor")] public static NSColor? UnemphasizedSelectedTextColor { get; }
-    [Selector("controlColor")] public static NSColor ControlColor { get; }
-    [Selector("controlTextColor")] public static NSColor ControlTextColor { get; }
-    [Selector("selectedControlColor")] public static NSColor SelectedControlColor { get; }
-    [Selector("selectedControlTextColor")] public static NSColor SelectedControlTextColor { get; }
-    [Selector("disabledControlTextColor")] public static NSColor DisabledControlTextColor { get; }
-    [Selector("keyboardFocusIndicatorColor")] public static NSColor KeyboardFocusIndicatorColor { get; }
-    [Selector("scrubberTexturedBackgroundColor")] public static NSColor? ScrubberTexturedBackgroundColor { get; }
-    [Selector("systemRedColor")] public static NSColor? SystemRedColor { get; }
-    [Selector("systemGreenColor")] public static NSColor? SystemGreenColor { get; }
-    [Selector("systemBlueColor")] public static NSColor? SystemBlueColor { get; }
-    [Selector("systemOrangeColor")] public static NSColor? SystemOrangeColor { get; }
-    [Selector("systemYellowColor")] public static NSColor? SystemYellowColor { get; }
-    [Selector("systemBrownColor")] public static NSColor? SystemBrownColor { get; }
-    [Selector("systemPinkColor")] public static NSColor? SystemPinkColor { get; }
-    [Selector("systemPurpleColor")] public static NSColor? SystemPurpleColor { get; }
-    [Selector("systemGrayColor")] public static NSColor? SystemGrayColor { get; }
-    [Selector("systemTealColor")] public static NSColor? SystemTealColor { get; }
-    [Selector("systemIndigoColor")] public static NSColor? SystemIndigoColor { get; }
-    [Selector("systemMintColor")] public static NSColor? SystemMintColor { get; }
-    [Selector("systemCyanColor")] public static NSColor? SystemCyanColor { get; }
-    [Selector("systemFillColor")] public static NSColor? SystemFillColor { get; }
-    [Selector("secondarySystemFillColor")] public static NSColor? SecondarySystemFillColor { get; }
-    [Selector("tertiarySystemFillColor")] public static NSColor? TertiarySystemFillColor { get; }
-    [Selector("quaternarySystemFillColor")] public static NSColor? QuaternarySystemFillColor { get; }
-    [Selector("quinarySystemFillColor")] public static NSColor? QuinarySystemFillColor { get; }
-    [Selector("controlAccentColor")] public static NSColor? ControlAccentColor { get; }
-    [Selector("currentControlTint")] public static NSControlTint CurrentControlTint { get; }
-    [Selector("highlightColor")] public static NSColor HighlightColor { get; }
-    [Selector("shadowColor")] public static NSColor ShadowColor { get; }
-    [Selector("catalogNameComponent")] public NSColorListName CatalogNameComponent { get; }
-    [Selector("colorNameComponent")] public NSColorName ColorNameComponent { get; }
-    [Selector("localizedCatalogNameComponent")] public NSString LocalizedCatalogNameComponent { get; }
-    [Selector("localizedColorNameComponent")] public NSString LocalizedColorNameComponent { get; }
-    [Selector("redComponent")] public CGFloat RedComponent { get; }
-    [Selector("greenComponent")] public CGFloat GreenComponent { get; }
-    [Selector("blueComponent")] public CGFloat BlueComponent { get; }
-    [Selector("hueComponent")] public CGFloat HueComponent { get; }
-    [Selector("saturationComponent")] public CGFloat SaturationComponent { get; }
-    [Selector("brightnessComponent")] public CGFloat BrightnessComponent { get; }
-    [Selector("whiteComponent")] public CGFloat WhiteComponent { get; }
-    [Selector("cyanComponent")] public CGFloat CyanComponent { get; }
-    [Selector("magentaComponent")] public CGFloat MagentaComponent { get; }
-    [Selector("yellowComponent")] public CGFloat YellowComponent { get; }
-    [Selector("blackComponent")] public CGFloat BlackComponent { get; }
-    [Selector("colorSpace")] public NSColorSpace ColorSpace { get; }
-    [Selector("numberOfComponents")] public NSInteger NumberOfComponents { get; }
-    [Selector("patternImage")] public NSImage PatternImage { get; }
-    [Selector("alphaComponent")] public CGFloat AlphaComponent { get; }
+    [Selector("standardDynamicRangeColor")]
+    public NSColor? StandardDynamicRangeColor { get; }
+    [Selector("blackColor")]
+    public static NSColor BlackColor { get; }
+    [Selector("darkGrayColor")]
+    public static NSColor DarkGrayColor { get; }
+    [Selector("lightGrayColor")]
+    public static NSColor LightGrayColor { get; }
+    [Selector("whiteColor")]
+    public static NSColor WhiteColor { get; }
+    [Selector("grayColor")]
+    public static NSColor GrayColor { get; }
+    [Selector("redColor")]
+    public static NSColor RedColor { get; }
+    [Selector("greenColor")]
+    public static NSColor GreenColor { get; }
+    [Selector("blueColor")]
+    public static NSColor BlueColor { get; }
+    [Selector("cyanColor")]
+    public static NSColor CyanColor { get; }
+    [Selector("yellowColor")]
+    public static NSColor YellowColor { get; }
+    [Selector("magentaColor")]
+    public static NSColor MagentaColor { get; }
+    [Selector("orangeColor")]
+    public static NSColor OrangeColor { get; }
+    [Selector("purpleColor")]
+    public static NSColor PurpleColor { get; }
+    [Selector("brownColor")]
+    public static NSColor BrownColor { get; }
+    [Selector("clearColor")]
+    public static NSColor ClearColor { get; }
+    [Selector("labelColor")]
+    public static NSColor? LabelColor { get; }
+    [Selector("secondaryLabelColor")]
+    public static NSColor? SecondaryLabelColor { get; }
+    [Selector("tertiaryLabelColor")]
+    public static NSColor? TertiaryLabelColor { get; }
+    [Selector("quaternaryLabelColor")]
+    public static NSColor? QuaternaryLabelColor { get; }
+    [Selector("quinaryLabelColor")]
+    public static NSColor? QuinaryLabelColor { get; }
+    [Selector("linkColor")]
+    public static NSColor? LinkColor { get; }
+    [Selector("placeholderTextColor")]
+    public static NSColor? PlaceholderTextColor { get; }
+    [Selector("windowFrameTextColor")]
+    public static NSColor WindowFrameTextColor { get; }
+    [Selector("selectedMenuItemTextColor")]
+    public static NSColor SelectedMenuItemTextColor { get; }
+    [Selector("alternateSelectedControlTextColor")]
+    public static NSColor AlternateSelectedControlTextColor { get; }
+    [Selector("headerTextColor")]
+    public static NSColor HeaderTextColor { get; }
+    [Selector("separatorColor")]
+    public static NSColor? SeparatorColor { get; }
+    [Selector("gridColor")]
+    public static NSColor GridColor { get; }
+    [Selector("windowBackgroundColor")]
+    public static NSColor WindowBackgroundColor { get; }
+    [Selector("underPageBackgroundColor")]
+    public static NSColor? UnderPageBackgroundColor { get; }
+    [Selector("controlBackgroundColor")]
+    public static NSColor ControlBackgroundColor { get; }
+    [Selector("selectedContentBackgroundColor")]
+    public static NSColor? SelectedContentBackgroundColor { get; }
+    [Selector("unemphasizedSelectedContentBackgroundColor")]
+    public static NSColor? UnemphasizedSelectedContentBackgroundColor { get; }
+    [Selector("alternatingContentBackgroundColors")]
+    public static NSArray? AlternatingContentBackgroundColors { get; }
+    [Selector("findHighlightColor")]
+    public static NSColor? FindHighlightColor { get; }
+    [Selector("textColor")]
+    public static NSColor TextColor { get; }
+    [Selector("textBackgroundColor")]
+    public static NSColor TextBackgroundColor { get; }
+    [Selector("textInsertionPointColor")]
+    public static NSColor? TextInsertionPointColor { get; }
+    [Selector("selectedTextColor")]
+    public static NSColor SelectedTextColor { get; }
+    [Selector("selectedTextBackgroundColor")]
+    public static NSColor SelectedTextBackgroundColor { get; }
+    [Selector("unemphasizedSelectedTextBackgroundColor")]
+    public static NSColor? UnemphasizedSelectedTextBackgroundColor { get; }
+    [Selector("unemphasizedSelectedTextColor")]
+    public static NSColor? UnemphasizedSelectedTextColor { get; }
+    [Selector("controlColor")]
+    public static NSColor ControlColor { get; }
+    [Selector("controlTextColor")]
+    public static NSColor ControlTextColor { get; }
+    [Selector("selectedControlColor")]
+    public static NSColor SelectedControlColor { get; }
+    [Selector("selectedControlTextColor")]
+    public static NSColor SelectedControlTextColor { get; }
+    [Selector("disabledControlTextColor")]
+    public static NSColor DisabledControlTextColor { get; }
+    [Selector("keyboardFocusIndicatorColor")]
+    public static NSColor KeyboardFocusIndicatorColor { get; }
+    [Selector("scrubberTexturedBackgroundColor")]
+    public static NSColor? ScrubberTexturedBackgroundColor { get; }
+    [Selector("systemRedColor")]
+    public static NSColor? SystemRedColor { get; }
+    [Selector("systemGreenColor")]
+    public static NSColor? SystemGreenColor { get; }
+    [Selector("systemBlueColor")]
+    public static NSColor? SystemBlueColor { get; }
+    [Selector("systemOrangeColor")]
+    public static NSColor? SystemOrangeColor { get; }
+    [Selector("systemYellowColor")]
+    public static NSColor? SystemYellowColor { get; }
+    [Selector("systemBrownColor")]
+    public static NSColor? SystemBrownColor { get; }
+    [Selector("systemPinkColor")]
+    public static NSColor? SystemPinkColor { get; }
+    [Selector("systemPurpleColor")]
+    public static NSColor? SystemPurpleColor { get; }
+    [Selector("systemGrayColor")]
+    public static NSColor? SystemGrayColor { get; }
+    [Selector("systemTealColor")]
+    public static NSColor? SystemTealColor { get; }
+    [Selector("systemIndigoColor")]
+    public static NSColor? SystemIndigoColor { get; }
+    [Selector("systemMintColor")]
+    public static NSColor? SystemMintColor { get; }
+    [Selector("systemCyanColor")]
+    public static NSColor? SystemCyanColor { get; }
+    [Selector("systemFillColor")]
+    public static NSColor? SystemFillColor { get; }
+    [Selector("secondarySystemFillColor")]
+    public static NSColor? SecondarySystemFillColor { get; }
+    [Selector("tertiarySystemFillColor")]
+    public static NSColor? TertiarySystemFillColor { get; }
+    [Selector("quaternarySystemFillColor")]
+    public static NSColor? QuaternarySystemFillColor { get; }
+    [Selector("quinarySystemFillColor")]
+    public static NSColor? QuinarySystemFillColor { get; }
+    [Selector("controlAccentColor")]
+    public static NSColor? ControlAccentColor { get; }
+    [Selector("currentControlTint")]
+    public static NSControlTint CurrentControlTint { get; }
+    [Selector("highlightColor")]
+    public static NSColor HighlightColor { get; }
+    [Selector("shadowColor")]
+    public static NSColor ShadowColor { get; }
+    [Selector("catalogNameComponent")]
+    public NSColorListName CatalogNameComponent { get; }
+    [Selector("colorNameComponent")]
+    public NSColorName ColorNameComponent { get; }
+    [Selector("localizedCatalogNameComponent")]
+    public NSString LocalizedCatalogNameComponent { get; }
+    [Selector("localizedColorNameComponent")]
+    public NSString LocalizedColorNameComponent { get; }
+    [Selector("redComponent")]
+    public CGFloat RedComponent { get; }
+    [Selector("greenComponent")]
+    public CGFloat GreenComponent { get; }
+    [Selector("blueComponent")]
+    public CGFloat BlueComponent { get; }
+    [Selector("hueComponent")]
+    public CGFloat HueComponent { get; }
+    [Selector("saturationComponent")]
+    public CGFloat SaturationComponent { get; }
+    [Selector("brightnessComponent")]
+    public CGFloat BrightnessComponent { get; }
+    [Selector("whiteComponent")]
+    public CGFloat WhiteComponent { get; }
+    [Selector("cyanComponent")]
+    public CGFloat CyanComponent { get; }
+    [Selector("magentaComponent")]
+    public CGFloat MagentaComponent { get; }
+    [Selector("yellowComponent")]
+    public CGFloat YellowComponent { get; }
+    [Selector("blackComponent")]
+    public CGFloat BlackComponent { get; }
+    [Selector("colorSpace")]
+    public NSColorSpace ColorSpace { get; }
+    [Selector("numberOfComponents")]
+    public NSInteger NumberOfComponents { get; }
+    [Selector("patternImage")]
+    public NSImage PatternImage { get; }
+    [Selector("alphaComponent")]
+    public CGFloat AlphaComponent { get; }
     /// macOS 26.0 and later.
-    [Selector("linearExposure")] public CGFloat LinearExposure { get; }
-    [Selector("CGColor")] public CGColorRef? CGColor { get; }
+    [Selector("linearExposure")]
+    public CGFloat LinearExposure { get; }
+    [Selector("CGColor")]
+    public CGColorRef? CGColor { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("ignoresAlpha", "setIgnoresAlpha:")] public static bool IgnoresAlpha { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("colorWithColorSpace:components:count:")] public static NSColor ColorWithColorSpaceComponentsCount(NSColorSpace space, CGFloat* components, NSInteger numberOfComponents);
-    [Selector("colorWithSRGBRed:green:blue:alpha:")] public static NSColor ColorWithSRGBRedGreenBlueAlpha(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
-    [Selector("colorWithGenericGamma22White:alpha:")] public static NSColor ColorWithGenericGamma22WhiteAlpha(CGFloat white, CGFloat alpha);
-    [Selector("colorWithDisplayP3Red:green:blue:alpha:")] public static NSColor ColorWithDisplayP3RedGreenBlueAlpha(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
-    [Selector("colorWithWhite:alpha:")] public static NSColor ColorWithWhiteAlpha(CGFloat white, CGFloat alpha);
-    [Selector("colorWithRed:green:blue:alpha:")] public static NSColor ColorWithRedGreenBlueAlpha(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
-    [Selector("colorWithHue:saturation:brightness:alpha:")] public static NSColor ColorWithHueSaturationBrightnessAlpha(CGFloat hue, CGFloat saturation, CGFloat brightness, CGFloat alpha);
-    [Selector("colorWithColorSpace:hue:saturation:brightness:alpha:")] public static NSColor ColorWithColorSpaceHueSaturationBrightnessAlpha(NSColorSpace space, CGFloat hue, CGFloat saturation, CGFloat brightness, CGFloat alpha);
-    [Selector("colorWithCatalogName:colorName:")] public static NSColor? ColorWithCatalogNameColorName(NSColorListName listName, NSColorName colorName);
-    [Selector("colorNamed:bundle:")] public static NSColor? ColorNamedBundle(NSColorName name, NSBundle? bundle);
-    [Selector("colorNamed:")] public static NSColor? ColorNamed(NSColorName name);
-    [Selector("colorWithName:dynamicProvider:")] public static NSColor ColorWithNameDynamicProvider(NSColorName? colorName, NSColorColorWithNameDynamicProviderDynamicProviderBlock dynamicProvider);
-    [Selector("colorWithDeviceWhite:alpha:")] public static NSColor ColorWithDeviceWhiteAlpha(CGFloat white, CGFloat alpha);
-    [Selector("colorWithDeviceRed:green:blue:alpha:")] public static NSColor ColorWithDeviceRedGreenBlueAlpha(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
-    [Selector("colorWithDeviceHue:saturation:brightness:alpha:")] public static NSColor ColorWithDeviceHueSaturationBrightnessAlpha(CGFloat hue, CGFloat saturation, CGFloat brightness, CGFloat alpha);
-    [Selector("colorWithDeviceCyan:magenta:yellow:black:alpha:")] public static NSColor ColorWithDeviceCyanMagentaYellowBlackAlpha(CGFloat cyan, CGFloat magenta, CGFloat yellow, CGFloat black, CGFloat alpha);
-    [Selector("colorWithCalibratedWhite:alpha:")] public static NSColor ColorWithCalibratedWhiteAlpha(CGFloat white, CGFloat alpha);
-    [Selector("colorWithCalibratedRed:green:blue:alpha:")] public static NSColor ColorWithCalibratedRedGreenBlueAlpha(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
-    [Selector("colorWithCalibratedHue:saturation:brightness:alpha:")] public static NSColor ColorWithCalibratedHueSaturationBrightnessAlpha(CGFloat hue, CGFloat saturation, CGFloat brightness, CGFloat alpha);
-    [Selector("colorWithPatternImage:")] public static NSColor ColorWithPatternImage(NSImage image);
-    [Selector("colorUsingType:")] public NSColor? ColorUsingType(NSColorType type);
-    [Selector("colorUsingColorSpace:")] public NSColor? ColorUsingColorSpace(NSColorSpace space);
+    [Selector("ignoresAlpha", "setIgnoresAlpha:")]
+    public static bool IgnoresAlpha { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("colorWithColorSpace:components:count:")]
+    public static NSColor ColorWithColorSpaceComponentsCount(NSColorSpace space, CGFloat* components, NSInteger numberOfComponents);
+    [Selector("colorWithSRGBRed:green:blue:alpha:")]
+    public static NSColor ColorWithSRGBRedGreenBlueAlpha(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
+    [Selector("colorWithGenericGamma22White:alpha:")]
+    public static NSColor ColorWithGenericGamma22WhiteAlpha(CGFloat white, CGFloat alpha);
+    [Selector("colorWithDisplayP3Red:green:blue:alpha:")]
+    public static NSColor ColorWithDisplayP3RedGreenBlueAlpha(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
+    [Selector("colorWithWhite:alpha:")]
+    public static NSColor ColorWithWhiteAlpha(CGFloat white, CGFloat alpha);
+    [Selector("colorWithRed:green:blue:alpha:")]
+    public static NSColor ColorWithRedGreenBlueAlpha(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
+    [Selector("colorWithHue:saturation:brightness:alpha:")]
+    public static NSColor ColorWithHueSaturationBrightnessAlpha(CGFloat hue, CGFloat saturation, CGFloat brightness, CGFloat alpha);
+    [Selector("colorWithColorSpace:hue:saturation:brightness:alpha:")]
+    public static NSColor ColorWithColorSpaceHueSaturationBrightnessAlpha(NSColorSpace space, CGFloat hue, CGFloat saturation, CGFloat brightness, CGFloat alpha);
+    [Selector("colorWithCatalogName:colorName:")]
+    public static NSColor? ColorWithCatalogNameColorName(NSColorListName listName, NSColorName colorName);
+    [Selector("colorNamed:bundle:")]
+    public static NSColor? ColorNamedBundle(NSColorName name, NSBundle? bundle);
+    [Selector("colorNamed:")]
+    public static NSColor? ColorNamed(NSColorName name);
+    [Selector("colorWithName:dynamicProvider:")]
+    public static NSColor ColorWithNameDynamicProvider(NSColorName? colorName, NSColorColorWithNameDynamicProviderDynamicProviderBlock dynamicProvider);
+    [Selector("colorWithDeviceWhite:alpha:")]
+    public static NSColor ColorWithDeviceWhiteAlpha(CGFloat white, CGFloat alpha);
+    [Selector("colorWithDeviceRed:green:blue:alpha:")]
+    public static NSColor ColorWithDeviceRedGreenBlueAlpha(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
+    [Selector("colorWithDeviceHue:saturation:brightness:alpha:")]
+    public static NSColor ColorWithDeviceHueSaturationBrightnessAlpha(CGFloat hue, CGFloat saturation, CGFloat brightness, CGFloat alpha);
+    [Selector("colorWithDeviceCyan:magenta:yellow:black:alpha:")]
+    public static NSColor ColorWithDeviceCyanMagentaYellowBlackAlpha(CGFloat cyan, CGFloat magenta, CGFloat yellow, CGFloat black, CGFloat alpha);
+    [Selector("colorWithCalibratedWhite:alpha:")]
+    public static NSColor ColorWithCalibratedWhiteAlpha(CGFloat white, CGFloat alpha);
+    [Selector("colorWithCalibratedRed:green:blue:alpha:")]
+    public static NSColor ColorWithCalibratedRedGreenBlueAlpha(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
+    [Selector("colorWithCalibratedHue:saturation:brightness:alpha:")]
+    public static NSColor ColorWithCalibratedHueSaturationBrightnessAlpha(CGFloat hue, CGFloat saturation, CGFloat brightness, CGFloat alpha);
+    [Selector("colorWithPatternImage:")]
+    public static NSColor ColorWithPatternImage(NSImage image);
+    [Selector("colorUsingType:")]
+    public NSColor? ColorUsingType(NSColorType type);
+    [Selector("colorUsingColorSpace:")]
+    public NSColor? ColorUsingColorSpace(NSColorSpace space);
     /// macOS 26.0 and later.
-    [Selector("colorWithRed:green:blue:alpha:exposure:")] public static NSColor ColorWithRedGreenBlueAlphaExposure(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha, CGFloat exposure);
+    [Selector("colorWithRed:green:blue:alpha:exposure:")]
+    public static NSColor ColorWithRedGreenBlueAlphaExposure(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha, CGFloat exposure);
     /// macOS 26.0 and later.
-    [Selector("colorWithRed:green:blue:alpha:linearExposure:")] public static NSColor ColorWithRedGreenBlueAlphaLinearExposure(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha, CGFloat linearExposure);
+    [Selector("colorWithRed:green:blue:alpha:linearExposure:")]
+    public static NSColor ColorWithRedGreenBlueAlphaLinearExposure(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha, CGFloat linearExposure);
     /// macOS 26.0 and later.
-    [Selector("colorByApplyingContentHeadroom:")] public NSColor ColorByApplyingContentHeadroom(CGFloat contentHeadroom);
+    [Selector("colorByApplyingContentHeadroom:")]
+    public NSColor ColorByApplyingContentHeadroom(CGFloat contentHeadroom);
     /// Deprecated in macOS 11.0.
-    [Selector("colorForControlTint:")] public static NSColor ColorForControlTint(NSControlTint controlTint);
-    [Selector("highlightWithLevel:")] public NSColor? HighlightWithLevel(CGFloat val);
-    [Selector("shadowWithLevel:")] public NSColor? ShadowWithLevel(CGFloat val);
-    [Selector("colorWithSystemEffect:")] public NSColor ColorWithSystemEffect(NSColorSystemEffect systemEffect);
-    [Selector("set")] public void Set();
-    [Selector("setFill")] public void SetFill();
-    [Selector("setStroke")] public void SetStroke();
-    [Selector("blendedColorWithFraction:ofColor:")] public NSColor? BlendedColorWithFractionOfColor(CGFloat fraction, NSColor color);
-    [Selector("colorWithAlphaComponent:")] public NSColor ColorWithAlphaComponent(CGFloat alpha);
-    [Selector("getRed:green:blue:alpha:")] public void GetRedGreenBlueAlpha(CGFloat* red, CGFloat* green, CGFloat* blue, CGFloat* alpha);
-    [Selector("getHue:saturation:brightness:alpha:")] public void GetHueSaturationBrightnessAlpha(CGFloat* hue, CGFloat* saturation, CGFloat* brightness, CGFloat* alpha);
-    [Selector("getWhite:alpha:")] public void GetWhiteAlpha(CGFloat* white, CGFloat* alpha);
-    [Selector("getCyan:magenta:yellow:black:alpha:")] public void GetCyanMagentaYellowBlackAlpha(CGFloat* cyan, CGFloat* magenta, CGFloat* yellow, CGFloat* black, CGFloat* alpha);
-    [Selector("getComponents:")] public void GetComponents(CGFloat* components);
-    [Selector("colorFromPasteboard:")] public static NSColor? ColorFromPasteboard(NSPasteboard pasteBoard);
-    [Selector("writeToPasteboard:")] public void WriteToPasteboard(NSPasteboard pasteBoard);
-    [Selector("drawSwatchInRect:")] public void DrawSwatchInRect(NSRect rect);
-    [Selector("colorWithCGColor:")] public static NSColor? ColorWithCGColor(CGColorRef cgColor);
+    [Selector("colorForControlTint:")]
+    public static NSColor ColorForControlTint(NSControlTint controlTint);
+    [Selector("highlightWithLevel:")]
+    public NSColor? HighlightWithLevel(CGFloat val);
+    [Selector("shadowWithLevel:")]
+    public NSColor? ShadowWithLevel(CGFloat val);
+    [Selector("colorWithSystemEffect:")]
+    public NSColor ColorWithSystemEffect(NSColorSystemEffect systemEffect);
+    [Selector("set")]
+    public void Set();
+    [Selector("setFill")]
+    public void SetFill();
+    [Selector("setStroke")]
+    public void SetStroke();
+    [Selector("blendedColorWithFraction:ofColor:")]
+    public NSColor? BlendedColorWithFractionOfColor(CGFloat fraction, NSColor color);
+    [Selector("colorWithAlphaComponent:")]
+    public NSColor ColorWithAlphaComponent(CGFloat alpha);
+    [Selector("getRed:green:blue:alpha:")]
+    public void GetRedGreenBlueAlpha(CGFloat* red, CGFloat* green, CGFloat* blue, CGFloat* alpha);
+    [Selector("getHue:saturation:brightness:alpha:")]
+    public void GetHueSaturationBrightnessAlpha(CGFloat* hue, CGFloat* saturation, CGFloat* brightness, CGFloat* alpha);
+    [Selector("getWhite:alpha:")]
+    public void GetWhiteAlpha(CGFloat* white, CGFloat* alpha);
+    [Selector("getCyan:magenta:yellow:black:alpha:")]
+    public void GetCyanMagentaYellowBlackAlpha(CGFloat* cyan, CGFloat* magenta, CGFloat* yellow, CGFloat* black, CGFloat* alpha);
+    [Selector("getComponents:")]
+    public void GetComponents(CGFloat* components);
+    [Selector("colorFromPasteboard:")]
+    public static NSColor? ColorFromPasteboard(NSPasteboard pasteBoard);
+    [Selector("writeToPasteboard:")]
+    public void WriteToPasteboard(NSPasteboard pasteBoard);
+    [Selector("drawSwatchInRect:")]
+    public void DrawSwatchInRect(NSRect rect);
+    [Selector("colorWithCGColor:")]
+    public static NSColor? ColorWithCGColor(CGColorRef cgColor);
 }
 
 /// NSDeprecated, a category of NSColor.
 public extern objc class NSColor
 {
     /// Deprecated in macOS 11.0.
-    [Selector("controlHighlightColor")] public static NSColor? ControlHighlightColor { get; }
+    [Selector("controlHighlightColor")]
+    public static NSColor? ControlHighlightColor { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("controlLightHighlightColor")] public static NSColor? ControlLightHighlightColor { get; }
+    [Selector("controlLightHighlightColor")]
+    public static NSColor? ControlLightHighlightColor { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("controlShadowColor")] public static NSColor? ControlShadowColor { get; }
+    [Selector("controlShadowColor")]
+    public static NSColor? ControlShadowColor { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("controlDarkShadowColor")] public static NSColor? ControlDarkShadowColor { get; }
+    [Selector("controlDarkShadowColor")]
+    public static NSColor? ControlDarkShadowColor { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("scrollBarColor")] public static NSColor? ScrollBarColor { get; }
+    [Selector("scrollBarColor")]
+    public static NSColor? ScrollBarColor { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("knobColor")] public static NSColor? KnobColor { get; }
+    [Selector("knobColor")]
+    public static NSColor? KnobColor { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("selectedKnobColor")] public static NSColor? SelectedKnobColor { get; }
+    [Selector("selectedKnobColor")]
+    public static NSColor? SelectedKnobColor { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("windowFrameColor")] public static NSColor? WindowFrameColor { get; }
+    [Selector("windowFrameColor")]
+    public static NSColor? WindowFrameColor { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("selectedMenuItemColor")] public static NSColor? SelectedMenuItemColor { get; }
+    [Selector("selectedMenuItemColor")]
+    public static NSColor? SelectedMenuItemColor { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("headerColor")] public static NSColor? HeaderColor { get; }
+    [Selector("headerColor")]
+    public static NSColor? HeaderColor { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("secondarySelectedControlColor")] public static NSColor? SecondarySelectedControlColor { get; }
+    [Selector("secondarySelectedControlColor")]
+    public static NSColor? SecondarySelectedControlColor { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("alternateSelectedControlColor")] public static NSColor? AlternateSelectedControlColor { get; }
+    [Selector("alternateSelectedControlColor")]
+    public static NSColor? AlternateSelectedControlColor { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("controlAlternatingRowBackgroundColors")] public static NSArray? ControlAlternatingRowBackgroundColors { get; }
+    [Selector("controlAlternatingRowBackgroundColors")]
+    public static NSArray? ControlAlternatingRowBackgroundColors { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("colorSpaceName")] public NSColorSpaceName? ColorSpaceName { get; }
+    [Selector("colorSpaceName")]
+    public NSColorSpaceName? ColorSpaceName { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("colorUsingColorSpaceName:device:")] public NSColor? ColorUsingColorSpaceNameDevice(NSColorSpaceName? name, NSDictionary? deviceDescription);
+    [Selector("colorUsingColorSpaceName:device:")]
+    public NSColor? ColorUsingColorSpaceNameDevice(NSColorSpaceName? name, NSDictionary? deviceDescription);
     /// Deprecated in macOS 10.14.
-    [Selector("colorUsingColorSpaceName:")] public NSColor? ColorUsingColorSpaceName(NSColorSpaceName name);
+    [Selector("colorUsingColorSpaceName:")]
+    public NSColor? ColorUsingColorSpaceName(NSColorSpaceName name);
 }
 
 /// NSQuartzCoreAdditions, a category of NSColor.
 public extern objc class NSColor
 {
-    [Selector("colorWithCIColor:")] public static NSColor ColorWithCIColor(CIColor color);
+    [Selector("colorWithCIColor:")]
+    public static NSColor ColorWithCIColor(CIColor color);
 }
 
 /// NSAppKitAdditions, a category of CIColor.
 public extern objc class CIColor
 {
-    [Selector("initWithColor:")] public Self? InitWithColor(NSColor color);
+    [Selector("initWithColor:")]
+    public Self? InitWithColor(NSColor color);
 }
 
 /// NSAppKitColorExtensions, a category of NSCoder.
 public extern objc class NSCoder
 {
     /// Deprecated in macOS 10.9.
-    [Selector("decodeNXColor")] public NSColor? DecodeNXColor();
+    [Selector("decodeNXColor")]
+    public NSColor? DecodeNXColor();
 }
 
 public extern "C" NSNotificationName NSSystemColorsDidChangeNotification;

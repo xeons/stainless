@@ -34,13 +34,17 @@ import Standard.ObjC;
 public extern objc class INPerson
 {
     /// Deprecated in macOS 10.12.
-    [Selector("handle")] public NSString? Handle { get; }
+    [Selector("handle")]
+    public NSString? Handle { get; }
     /// Deprecated in macOS 10.12.
-    [Selector("initWithHandle:nameComponents:contactIdentifier:")] public Self InitWithHandleNameComponentsContactIdentifier(NSString handle, NSPersonNameComponents nameComponents, NSString? contactIdentifier);
+    [Selector("initWithHandle:nameComponents:contactIdentifier:")]
+    public Self InitWithHandleNameComponentsContactIdentifier(NSString handle, NSPersonNameComponents nameComponents, NSString? contactIdentifier);
     /// Deprecated in macOS 10.12.
-    [Selector("initWithHandle:displayName:contactIdentifier:")] public Self InitWithHandleDisplayNameContactIdentifier(NSString handle, NSString? displayName, NSString? contactIdentifier);
+    [Selector("initWithHandle:displayName:contactIdentifier:")]
+    public Self InitWithHandleDisplayNameContactIdentifier(NSString handle, NSString? displayName, NSString? contactIdentifier);
     /// Deprecated in macOS 10.12.
-    [Selector("initWithHandle:nameComponents:displayName:image:contactIdentifier:")] public Self InitWithHandleNameComponentsDisplayNameImageContactIdentifier(NSString handle, NSPersonNameComponents? nameComponents, NSString? displayName, INImage? image, NSString? contactIdentifier);
+    [Selector("initWithHandle:nameComponents:displayName:image:contactIdentifier:")]
+    public Self InitWithHandleNameComponentsDisplayNameImageContactIdentifier(NSString handle, NSPersonNameComponents? nameComponents, NSString? displayName, INImage? image, NSString? contactIdentifier);
 }
 
 #endif

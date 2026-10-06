@@ -68,9 +68,11 @@ public extern "C" void CVBufferSetAttachments(CVBufferRef buffer, CFDictionaryRe
 
 public extern "C" void CVBufferPropagateAttachments(CVBufferRef sourceBuffer, CVBufferRef destinationBuffer);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CVBufferCopyAttachments(CVBufferRef buffer, CVAttachmentMode attachmentMode);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CVBufferCopyAttachments(CVBufferRef buffer, CVAttachmentMode attachmentMode);
 
-[ReturnsRetained] public extern "C" CFTypeRef? CVBufferCopyAttachment(CVBufferRef buffer, CFStringRef key, CVAttachmentMode* attachmentMode);
+[ReturnsRetained]
+public extern "C" CFTypeRef? CVBufferCopyAttachment(CVBufferRef buffer, CFStringRef key, CVAttachmentMode* attachmentMode);
 
 public extern "C" Boolean CVBufferHasAttachment(CVBufferRef buffer, CFStringRef key);
 

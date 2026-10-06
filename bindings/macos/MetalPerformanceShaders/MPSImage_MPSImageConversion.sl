@@ -34,9 +34,12 @@ import Standard.ObjC;
 
 public extern objc class MPSImageConversion : MPSUnaryImageKernel
 {
-    [Selector("sourceAlpha")] public MPSAlphaType SourceAlpha { get; }
-    [Selector("destinationAlpha")] public MPSAlphaType DestinationAlpha { get; }
-    [Selector("initWithDevice:srcAlpha:destAlpha:backgroundColor:conversionInfo:")] public Self InitWithDeviceSrcAlphaDestAlphaBackgroundColorConversionInfo(MTLDevice device, MPSAlphaType srcAlpha, MPSAlphaType destAlpha, CGFloat* backgroundColor, CGColorConversionInfoRef? conversionInfo);
+    [Selector("sourceAlpha")]
+    public MPSAlphaType SourceAlpha { get; }
+    [Selector("destinationAlpha")]
+    public MPSAlphaType DestinationAlpha { get; }
+    [Selector("initWithDevice:srcAlpha:destAlpha:backgroundColor:conversionInfo:")]
+    public Self InitWithDeviceSrcAlphaDestAlphaBackgroundColorConversionInfo(MTLDevice device, MPSAlphaType srcAlpha, MPSAlphaType destAlpha, CGFloat* backgroundColor, CGColorConversionInfoRef? conversionInfo);
 }
 
 #endif

@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public objc interface VNRequestRevisionProviding
 {
-    [Selector("requestRevision")] NSUInteger RequestRevision { get; }
+    [Selector("requestRevision")]
+    NSUInteger RequestRevision { get; }
 }
 
 #endif

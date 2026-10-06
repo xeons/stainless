@@ -34,20 +34,34 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.12.
 public extern objc class PDFAnnotationChoiceWidget : PDFAnnotation, NSCopying
 {
-    [Selector("stringValue")] public NSString? StringValue();
-    [Selector("setStringValue:")] public void SetStringValue(NSString? value);
-    [Selector("backgroundColor")] public NSColor? BackgroundColor();
-    [Selector("setBackgroundColor:")] public void SetBackgroundColor(NSColor? color);
-    [Selector("font")] public NSFont? Font();
-    [Selector("setFont:")] public void SetFont(NSFont? font);
-    [Selector("fontColor")] public NSColor? FontColor();
-    [Selector("setFontColor:")] public void SetFontColor(NSColor? color);
-    [Selector("fieldName")] public NSString? FieldName();
-    [Selector("setFieldName:")] public void SetFieldName(NSString? name);
-    [Selector("isListChoice")] public bool IsListChoice();
-    [Selector("setIsListChoice:")] public void SetIsListChoice(bool isList);
-    [Selector("choices")] public NSArray? Choices();
-    [Selector("setChoices:")] public void SetChoices(NSArray? options);
+    [Selector("stringValue")]
+    public NSString? StringValue();
+    [Selector("setStringValue:")]
+    public void SetStringValue(NSString? value);
+    [Selector("backgroundColor")]
+    public NSColor? BackgroundColor();
+    [Selector("setBackgroundColor:")]
+    public void SetBackgroundColor(NSColor? color);
+    [Selector("font")]
+    public NSFont? Font();
+    [Selector("setFont:")]
+    public void SetFont(NSFont? font);
+    [Selector("fontColor")]
+    public NSColor? FontColor();
+    [Selector("setFontColor:")]
+    public void SetFontColor(NSColor? color);
+    [Selector("fieldName")]
+    public NSString? FieldName();
+    [Selector("setFieldName:")]
+    public void SetFieldName(NSString? name);
+    [Selector("isListChoice")]
+    public bool IsListChoice();
+    [Selector("setIsListChoice:")]
+    public void SetIsListChoice(bool isList);
+    [Selector("choices")]
+    public NSArray? Choices();
+    [Selector("setChoices:")]
+    public void SetChoices(NSArray? options);
 }
 
 #endif

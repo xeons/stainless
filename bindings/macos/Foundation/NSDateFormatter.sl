@@ -32,47 +32,88 @@ import Standard.ObjC;
 
 public extern objc class NSDateFormatter : NSFormatter
 {
-    [Selector("formattingContext", "setFormattingContext:")] public NSFormattingContext FormattingContext { get; set; }
-    [Selector("defaultFormatterBehavior", "setDefaultFormatterBehavior:")] public static NSDateFormatterBehavior DefaultFormatterBehavior { get; set; }
-    [Selector("dateFormat", "setDateFormat:")] public NSString? DateFormat { get; set; }
-    [Selector("dateStyle", "setDateStyle:")] public NSDateFormatterStyle DateStyle { get; set; }
-    [Selector("timeStyle", "setTimeStyle:")] public NSDateFormatterStyle TimeStyle { get; set; }
-    [Selector("locale", "setLocale:")] public NSLocale? Locale { get; set; }
-    [Selector("generatesCalendarDates", "setGeneratesCalendarDates:")] public bool GeneratesCalendarDates { get; set; }
-    [Selector("formatterBehavior", "setFormatterBehavior:")] public NSDateFormatterBehavior FormatterBehavior { get; set; }
-    [Selector("timeZone", "setTimeZone:")] public NSTimeZone? TimeZone { get; set; }
-    [Selector("calendar", "setCalendar:")] public NSCalendar? Calendar { get; set; }
-    [Selector("isLenient", "setLenient:")] public bool Lenient { get; set; }
-    [Selector("twoDigitStartDate", "setTwoDigitStartDate:")] public NSDate? TwoDigitStartDate { get; set; }
-    [Selector("defaultDate", "setDefaultDate:")] public NSDate? DefaultDate { get; set; }
-    [Selector("eraSymbols", "setEraSymbols:")] public NSArray? EraSymbols { get; set; }
-    [Selector("monthSymbols", "setMonthSymbols:")] public NSArray? MonthSymbols { get; set; }
-    [Selector("shortMonthSymbols", "setShortMonthSymbols:")] public NSArray? ShortMonthSymbols { get; set; }
-    [Selector("weekdaySymbols", "setWeekdaySymbols:")] public NSArray? WeekdaySymbols { get; set; }
-    [Selector("shortWeekdaySymbols", "setShortWeekdaySymbols:")] public NSArray? ShortWeekdaySymbols { get; set; }
-    [Selector("AMSymbol", "setAMSymbol:")] public NSString? AMSymbol { get; set; }
-    [Selector("PMSymbol", "setPMSymbol:")] public NSString? PMSymbol { get; set; }
-    [Selector("longEraSymbols", "setLongEraSymbols:")] public NSArray? LongEraSymbols { get; set; }
-    [Selector("veryShortMonthSymbols", "setVeryShortMonthSymbols:")] public NSArray? VeryShortMonthSymbols { get; set; }
-    [Selector("standaloneMonthSymbols", "setStandaloneMonthSymbols:")] public NSArray? StandaloneMonthSymbols { get; set; }
-    [Selector("shortStandaloneMonthSymbols", "setShortStandaloneMonthSymbols:")] public NSArray? ShortStandaloneMonthSymbols { get; set; }
-    [Selector("veryShortStandaloneMonthSymbols", "setVeryShortStandaloneMonthSymbols:")] public NSArray? VeryShortStandaloneMonthSymbols { get; set; }
-    [Selector("veryShortWeekdaySymbols", "setVeryShortWeekdaySymbols:")] public NSArray? VeryShortWeekdaySymbols { get; set; }
-    [Selector("standaloneWeekdaySymbols", "setStandaloneWeekdaySymbols:")] public NSArray? StandaloneWeekdaySymbols { get; set; }
-    [Selector("shortStandaloneWeekdaySymbols", "setShortStandaloneWeekdaySymbols:")] public NSArray? ShortStandaloneWeekdaySymbols { get; set; }
-    [Selector("veryShortStandaloneWeekdaySymbols", "setVeryShortStandaloneWeekdaySymbols:")] public NSArray? VeryShortStandaloneWeekdaySymbols { get; set; }
-    [Selector("quarterSymbols", "setQuarterSymbols:")] public NSArray? QuarterSymbols { get; set; }
-    [Selector("shortQuarterSymbols", "setShortQuarterSymbols:")] public NSArray? ShortQuarterSymbols { get; set; }
-    [Selector("standaloneQuarterSymbols", "setStandaloneQuarterSymbols:")] public NSArray? StandaloneQuarterSymbols { get; set; }
-    [Selector("shortStandaloneQuarterSymbols", "setShortStandaloneQuarterSymbols:")] public NSArray? ShortStandaloneQuarterSymbols { get; set; }
-    [Selector("gregorianStartDate", "setGregorianStartDate:")] public NSDate? GregorianStartDate { get; set; }
-    [Selector("doesRelativeDateFormatting", "setDoesRelativeDateFormatting:")] public bool DoesRelativeDateFormatting { get; set; }
-    [Selector("getObjectValue:forString:range:error:")] public bool GetObjectValueForStringRangeError(out AnyObject? obj, NSString string, NSRange* rangep, out NSError? error);
-    [Selector("stringFromDate:")] public NSString StringFromDate(NSDate date);
-    [Selector("dateFromString:")] public NSDate? DateFromString(NSString string);
-    [Selector("localizedStringFromDate:dateStyle:timeStyle:")] public static NSString LocalizedStringFromDateDateStyleTimeStyle(NSDate date, NSDateFormatterStyle dstyle, NSDateFormatterStyle tstyle);
-    [Selector("dateFormatFromTemplate:options:locale:")] public static NSString? DateFormatFromTemplateOptionsLocale(NSString tmplate, NSUInteger opts, NSLocale? locale);
-    [Selector("setLocalizedDateFormatFromTemplate:")] public void SetLocalizedDateFormatFromTemplate(NSString dateFormatTemplate);
+    [Selector("formattingContext", "setFormattingContext:")]
+    public NSFormattingContext FormattingContext { get; set; }
+    [Selector("defaultFormatterBehavior", "setDefaultFormatterBehavior:")]
+    public static NSDateFormatterBehavior DefaultFormatterBehavior { get; set; }
+    [Selector("dateFormat", "setDateFormat:")]
+    public NSString? DateFormat { get; set; }
+    [Selector("dateStyle", "setDateStyle:")]
+    public NSDateFormatterStyle DateStyle { get; set; }
+    [Selector("timeStyle", "setTimeStyle:")]
+    public NSDateFormatterStyle TimeStyle { get; set; }
+    [Selector("locale", "setLocale:")]
+    public NSLocale? Locale { get; set; }
+    [Selector("generatesCalendarDates", "setGeneratesCalendarDates:")]
+    public bool GeneratesCalendarDates { get; set; }
+    [Selector("formatterBehavior", "setFormatterBehavior:")]
+    public NSDateFormatterBehavior FormatterBehavior { get; set; }
+    [Selector("timeZone", "setTimeZone:")]
+    public NSTimeZone? TimeZone { get; set; }
+    [Selector("calendar", "setCalendar:")]
+    public NSCalendar? Calendar { get; set; }
+    [Selector("isLenient", "setLenient:")]
+    public bool Lenient { get; set; }
+    [Selector("twoDigitStartDate", "setTwoDigitStartDate:")]
+    public NSDate? TwoDigitStartDate { get; set; }
+    [Selector("defaultDate", "setDefaultDate:")]
+    public NSDate? DefaultDate { get; set; }
+    [Selector("eraSymbols", "setEraSymbols:")]
+    public NSArray? EraSymbols { get; set; }
+    [Selector("monthSymbols", "setMonthSymbols:")]
+    public NSArray? MonthSymbols { get; set; }
+    [Selector("shortMonthSymbols", "setShortMonthSymbols:")]
+    public NSArray? ShortMonthSymbols { get; set; }
+    [Selector("weekdaySymbols", "setWeekdaySymbols:")]
+    public NSArray? WeekdaySymbols { get; set; }
+    [Selector("shortWeekdaySymbols", "setShortWeekdaySymbols:")]
+    public NSArray? ShortWeekdaySymbols { get; set; }
+    [Selector("AMSymbol", "setAMSymbol:")]
+    public NSString? AMSymbol { get; set; }
+    [Selector("PMSymbol", "setPMSymbol:")]
+    public NSString? PMSymbol { get; set; }
+    [Selector("longEraSymbols", "setLongEraSymbols:")]
+    public NSArray? LongEraSymbols { get; set; }
+    [Selector("veryShortMonthSymbols", "setVeryShortMonthSymbols:")]
+    public NSArray? VeryShortMonthSymbols { get; set; }
+    [Selector("standaloneMonthSymbols", "setStandaloneMonthSymbols:")]
+    public NSArray? StandaloneMonthSymbols { get; set; }
+    [Selector("shortStandaloneMonthSymbols", "setShortStandaloneMonthSymbols:")]
+    public NSArray? ShortStandaloneMonthSymbols { get; set; }
+    [Selector("veryShortStandaloneMonthSymbols", "setVeryShortStandaloneMonthSymbols:")]
+    public NSArray? VeryShortStandaloneMonthSymbols { get; set; }
+    [Selector("veryShortWeekdaySymbols", "setVeryShortWeekdaySymbols:")]
+    public NSArray? VeryShortWeekdaySymbols { get; set; }
+    [Selector("standaloneWeekdaySymbols", "setStandaloneWeekdaySymbols:")]
+    public NSArray? StandaloneWeekdaySymbols { get; set; }
+    [Selector("shortStandaloneWeekdaySymbols", "setShortStandaloneWeekdaySymbols:")]
+    public NSArray? ShortStandaloneWeekdaySymbols { get; set; }
+    [Selector("veryShortStandaloneWeekdaySymbols", "setVeryShortStandaloneWeekdaySymbols:")]
+    public NSArray? VeryShortStandaloneWeekdaySymbols { get; set; }
+    [Selector("quarterSymbols", "setQuarterSymbols:")]
+    public NSArray? QuarterSymbols { get; set; }
+    [Selector("shortQuarterSymbols", "setShortQuarterSymbols:")]
+    public NSArray? ShortQuarterSymbols { get; set; }
+    [Selector("standaloneQuarterSymbols", "setStandaloneQuarterSymbols:")]
+    public NSArray? StandaloneQuarterSymbols { get; set; }
+    [Selector("shortStandaloneQuarterSymbols", "setShortStandaloneQuarterSymbols:")]
+    public NSArray? ShortStandaloneQuarterSymbols { get; set; }
+    [Selector("gregorianStartDate", "setGregorianStartDate:")]
+    public NSDate? GregorianStartDate { get; set; }
+    [Selector("doesRelativeDateFormatting", "setDoesRelativeDateFormatting:")]
+    public bool DoesRelativeDateFormatting { get; set; }
+    [Selector("getObjectValue:forString:range:error:")]
+    public bool GetObjectValueForStringRangeError(out AnyObject? obj, NSString string, NSRange* rangep, out NSError? error);
+    [Selector("stringFromDate:")]
+    public NSString StringFromDate(NSDate date);
+    [Selector("dateFromString:")]
+    public NSDate? DateFromString(NSString string);
+    [Selector("localizedStringFromDate:dateStyle:timeStyle:")]
+    public static NSString LocalizedStringFromDateDateStyleTimeStyle(NSDate date, NSDateFormatterStyle dstyle, NSDateFormatterStyle tstyle);
+    [Selector("dateFormatFromTemplate:options:locale:")]
+    public static NSString? DateFormatFromTemplateOptionsLocale(NSString tmplate, NSUInteger opts, NSLocale? locale);
+    [Selector("setLocalizedDateFormatFromTemplate:")]
+    public void SetLocalizedDateFormatFromTemplate(NSString dateFormatTemplate);
 }
 
 public enum NSDateFormatterStyle : ulong
@@ -95,9 +136,11 @@ public enum NSDateFormatterBehavior : ulong
 public extern objc class NSDateFormatter
 {
     /// Deprecated in macOS 10.9.
-    [Selector("initWithDateFormat:allowNaturalLanguage:")] public AnyObject InitWithDateFormatAllowNaturalLanguage(NSString format, bool flag);
+    [Selector("initWithDateFormat:allowNaturalLanguage:")]
+    public AnyObject InitWithDateFormatAllowNaturalLanguage(NSString format, bool flag);
     /// Deprecated in macOS 10.9.
-    [Selector("allowsNaturalLanguage")] public bool AllowsNaturalLanguage();
+    [Selector("allowsNaturalLanguage")]
+    public bool AllowsNaturalLanguage();
 }
 
 #endif

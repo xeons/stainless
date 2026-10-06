@@ -40,16 +40,26 @@ public objc closure void CKFetchRecordChangesOperationFetchRecordChangesCompleti
 /// Deprecated in macOS 10.12.
 public extern objc class CKFetchRecordChangesOperation : CKDatabaseOperation
 {
-    [Selector("recordZoneID", "setRecordZoneID:")] public CKRecordZoneID? RecordZoneID { get; set; }
-    [Selector("previousServerChangeToken", "setPreviousServerChangeToken:")] public CKServerChangeToken? PreviousServerChangeToken { get; set; }
-    [Selector("resultsLimit", "setResultsLimit:")] public NSUInteger ResultsLimit { get; set; }
-    [Selector("desiredKeys", "setDesiredKeys:")] public NSArray? DesiredKeys { get; set; }
-    [Selector("recordChangedBlock", "setRecordChangedBlock:")] public CKFetchRecordChangesOperationRecordChangedBlock? RecordChangedBlock { get; set; }
-    [Selector("recordWithIDWasDeletedBlock", "setRecordWithIDWasDeletedBlock:")] public CKFetchRecordChangesOperationRecordWithIDWasDeletedBlock? RecordWithIDWasDeletedBlock { get; set; }
-    [Selector("moreComing")] public bool MoreComing { get; }
-    [Selector("fetchRecordChangesCompletionBlock", "setFetchRecordChangesCompletionBlock:")] public CKFetchRecordChangesOperationFetchRecordChangesCompletionBlock? FetchRecordChangesCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithRecordZoneID:previousServerChangeToken:")] public Self InitWithRecordZoneIDPreviousServerChangeToken(CKRecordZoneID recordZoneID, CKServerChangeToken? previousServerChangeToken);
+    [Selector("recordZoneID", "setRecordZoneID:")]
+    public CKRecordZoneID? RecordZoneID { get; set; }
+    [Selector("previousServerChangeToken", "setPreviousServerChangeToken:")]
+    public CKServerChangeToken? PreviousServerChangeToken { get; set; }
+    [Selector("resultsLimit", "setResultsLimit:")]
+    public NSUInteger ResultsLimit { get; set; }
+    [Selector("desiredKeys", "setDesiredKeys:")]
+    public NSArray? DesiredKeys { get; set; }
+    [Selector("recordChangedBlock", "setRecordChangedBlock:")]
+    public CKFetchRecordChangesOperationRecordChangedBlock? RecordChangedBlock { get; set; }
+    [Selector("recordWithIDWasDeletedBlock", "setRecordWithIDWasDeletedBlock:")]
+    public CKFetchRecordChangesOperationRecordWithIDWasDeletedBlock? RecordWithIDWasDeletedBlock { get; set; }
+    [Selector("moreComing")]
+    public bool MoreComing { get; }
+    [Selector("fetchRecordChangesCompletionBlock", "setFetchRecordChangesCompletionBlock:")]
+    public CKFetchRecordChangesOperationFetchRecordChangesCompletionBlock? FetchRecordChangesCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithRecordZoneID:previousServerChangeToken:")]
+    public Self InitWithRecordZoneIDPreviousServerChangeToken(CKRecordZoneID recordZoneID, CKServerChangeToken? previousServerChangeToken);
 }
 
 #endif

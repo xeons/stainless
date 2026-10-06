@@ -67,15 +67,18 @@ public enum CTRubyPosition : byte
     Count = 4,
 }
 
-[ReturnsRetained] public extern "C" CTRubyAnnotationRef CTRubyAnnotationCreate(CTRubyAlignment alignment, CTRubyOverhang overhang, CGFloat sizeFactor, __CFString** text);
+[ReturnsRetained]
+public extern "C" CTRubyAnnotationRef CTRubyAnnotationCreate(CTRubyAlignment alignment, CTRubyOverhang overhang, CGFloat sizeFactor, __CFString** text);
 
 public extern "C" CFStringRef kCTRubyAnnotationSizeFactorAttributeName;
 
 public extern "C" CFStringRef kCTRubyAnnotationScaleToFitAttributeName;
 
-[ReturnsRetained] public extern "C" CTRubyAnnotationRef CTRubyAnnotationCreateWithAttributes(CTRubyAlignment alignment, CTRubyOverhang overhang, CTRubyPosition position, CFStringRef string, CFDictionaryRef attributes);
+[ReturnsRetained]
+public extern "C" CTRubyAnnotationRef CTRubyAnnotationCreateWithAttributes(CTRubyAlignment alignment, CTRubyOverhang overhang, CTRubyPosition position, CFStringRef string, CFDictionaryRef attributes);
 
-[ReturnsRetained] public extern "C" CTRubyAnnotationRef CTRubyAnnotationCreateCopy(CTRubyAnnotationRef rubyAnnotation);
+[ReturnsRetained]
+public extern "C" CTRubyAnnotationRef CTRubyAnnotationCreateCopy(CTRubyAnnotationRef rubyAnnotation);
 
 public extern "C" CTRubyAlignment CTRubyAnnotationGetAlignment(CTRubyAnnotationRef rubyAnnotation);
 

@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class MTRServerEndpoint : NSObject
 {
-    [Selector("endpointID")] public NSNumber EndpointID { get; }
-    [Selector("deviceTypes")] public NSArray DeviceTypes { get; }
-    [Selector("accessGrants")] public NSArray AccessGrants { get; }
-    [Selector("serverClusters")] public NSArray ServerClusters { get; }
-    [Selector("initWithEndpointID:deviceTypes:")] public Self? InitWithEndpointIDDeviceTypes(NSNumber endpointID, NSArray deviceTypes);
-    [Selector("addAccessGrant:")] public void AddAccessGrant(MTRAccessGrant accessGrant);
-    [Selector("removeAccessGrant:")] public void RemoveAccessGrant(MTRAccessGrant accessGrant);
-    [Selector("addServerCluster:")] public bool AddServerCluster(MTRServerCluster serverCluster);
+    [Selector("endpointID")]
+    public NSNumber EndpointID { get; }
+    [Selector("deviceTypes")]
+    public NSArray DeviceTypes { get; }
+    [Selector("accessGrants")]
+    public NSArray AccessGrants { get; }
+    [Selector("serverClusters")]
+    public NSArray ServerClusters { get; }
+    [Selector("initWithEndpointID:deviceTypes:")]
+    public Self? InitWithEndpointIDDeviceTypes(NSNumber endpointID, NSArray deviceTypes);
+    [Selector("addAccessGrant:")]
+    public void AddAccessGrant(MTRAccessGrant accessGrant);
+    [Selector("removeAccessGrant:")]
+    public void RemoveAccessGrant(MTRAccessGrant accessGrant);
+    [Selector("addServerCluster:")]
+    public bool AddServerCluster(MTRServerCluster serverCluster);
 }
 
 #endif

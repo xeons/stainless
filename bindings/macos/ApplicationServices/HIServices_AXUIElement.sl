@@ -83,9 +83,11 @@ public extern "C" AXError AXUIElementPerformAction(AXUIElementRef element, CFStr
 
 public extern "C" AXError AXUIElementCopyElementAtPosition(AXUIElementRef application, float x, float y, __AXUIElement** element);
 
-[ReturnsRetained] public extern "C" AXUIElementRef AXUIElementCreateApplication(pid_t pid);
+[ReturnsRetained]
+public extern "C" AXUIElementRef AXUIElementCreateApplication(pid_t pid);
 
-[ReturnsRetained] public extern "C" AXUIElementRef AXUIElementCreateSystemWide();
+[ReturnsRetained]
+public extern "C" AXUIElementRef AXUIElementCreateSystemWide();
 
 public extern "C" AXError AXUIElementGetPid(AXUIElementRef element, pid_t* pid);
 
@@ -101,7 +103,8 @@ public extern objc class AXTextMarkerRef : CFTypeRef { }
 
 public extern "C" CFTypeID AXTextMarkerGetTypeID();
 
-[ReturnsRetained] public extern "C" AXTextMarkerRef AXTextMarkerCreate(CFAllocatorRef? allocator, UInt8* bytes, CFIndex length);
+[ReturnsRetained]
+public extern "C" AXTextMarkerRef AXTextMarkerCreate(CFAllocatorRef? allocator, UInt8* bytes, CFIndex length);
 
 public extern "C" CFIndex AXTextMarkerGetLength(AXTextMarkerRef marker);
 
@@ -114,13 +117,17 @@ public extern objc class AXTextMarkerRangeRef : CFTypeRef { }
 
 public extern "C" CFTypeID AXTextMarkerRangeGetTypeID();
 
-[ReturnsRetained] public extern "C" AXTextMarkerRangeRef AXTextMarkerRangeCreate(CFAllocatorRef? allocator, AXTextMarkerRef startMarker, AXTextMarkerRef endMarker);
+[ReturnsRetained]
+public extern "C" AXTextMarkerRangeRef AXTextMarkerRangeCreate(CFAllocatorRef? allocator, AXTextMarkerRef startMarker, AXTextMarkerRef endMarker);
 
-[ReturnsRetained] public extern "C" AXTextMarkerRangeRef AXTextMarkerRangeCreateWithBytes(CFAllocatorRef? allocator, UInt8* startMarkerBytes, CFIndex startMarkerLength, UInt8* endMarkerBytes, CFIndex endMarkerLength);
+[ReturnsRetained]
+public extern "C" AXTextMarkerRangeRef AXTextMarkerRangeCreateWithBytes(CFAllocatorRef? allocator, UInt8* startMarkerBytes, CFIndex startMarkerLength, UInt8* endMarkerBytes, CFIndex endMarkerLength);
 
-[ReturnsRetained] public extern "C" AXTextMarkerRef AXTextMarkerRangeCopyStartMarker(AXTextMarkerRangeRef textMarkerRange);
+[ReturnsRetained]
+public extern "C" AXTextMarkerRef AXTextMarkerRangeCopyStartMarker(AXTextMarkerRangeRef textMarkerRange);
 
-[ReturnsRetained] public extern "C" AXTextMarkerRef AXTextMarkerRangeCopyEndMarker(AXTextMarkerRangeRef textMarkerRange);
+[ReturnsRetained]
+public extern "C" AXTextMarkerRef AXTextMarkerRangeCopyEndMarker(AXTextMarkerRangeRef textMarkerRange);
 
 public struct __AXObserver;
 

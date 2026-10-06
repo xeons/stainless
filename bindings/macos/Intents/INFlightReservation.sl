@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class INFlightReservation : INReservation, NSCopying, NSSecureCoding
 {
-    [Selector("reservedSeat")] public INSeat? ReservedSeat { get; }
-    [Selector("flight")] public INFlight Flight { get; }
-    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:URL:reservedSeat:flight:")] public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsURLReservedSeatFlight(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, NSURL? URL, INSeat? reservedSeat, INFlight flight);
-    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:reservedSeat:flight:")] public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsReservedSeatFlight(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, INSeat? reservedSeat, INFlight flight);
+    [Selector("reservedSeat")]
+    public INSeat? ReservedSeat { get; }
+    [Selector("flight")]
+    public INFlight Flight { get; }
+    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:URL:reservedSeat:flight:")]
+    public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsURLReservedSeatFlight(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, NSURL? URL, INSeat? reservedSeat, INFlight flight);
+    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:reservedSeat:flight:")]
+    public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsReservedSeatFlight(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, INSeat? reservedSeat, INFlight flight);
 }
 
 #endif

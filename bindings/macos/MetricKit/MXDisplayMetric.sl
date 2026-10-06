@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class MXDisplayMetric : MXMetric
 {
-    [Selector("averagePixelLuminance")] public MXAverage? AveragePixelLuminance { get; }
+    [Selector("averagePixelLuminance")]
+    public MXAverage? AveragePixelLuminance { get; }
 }
 
 #endif

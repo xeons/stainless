@@ -34,10 +34,14 @@ import Standard.ObjC;
 /// macOS 15.2 and later.
 public extern objc class MTRDeviceType : NSObject
 {
-    [Selector("id")] public NSNumber Id { get; }
-    [Selector("name")] public NSString Name { get; }
-    [Selector("isUtility")] public bool IsUtility { get; }
-    [Selector("deviceTypeForID:")] public static MTRDeviceType? DeviceTypeForID(NSNumber deviceTypeID);
+    [Selector("id")]
+    public NSNumber Id { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("isUtility")]
+    public bool IsUtility { get; }
+    [Selector("deviceTypeForID:")]
+    public static MTRDeviceType? DeviceTypeForID(NSNumber deviceTypeID);
 }
 
 /// macOS 15.4 and later.

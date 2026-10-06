@@ -35,9 +35,11 @@ import Standard.ObjC;
 public extern objc class SKStorefront : NSObject
 {
     /// Deprecated in macOS 15.0.
-    [Selector("countryCode")] public NSString CountryCode { get; }
+    [Selector("countryCode")]
+    public NSString CountryCode { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("identifier")] public NSString Identifier { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
 }
 
 #endif

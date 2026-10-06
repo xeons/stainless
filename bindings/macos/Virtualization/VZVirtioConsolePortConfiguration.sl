@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioConsolePortConfiguration : VZConsolePortConfiguration
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("isConsole", "setIsConsole:")] public bool IsConsole { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("isConsole", "setIsConsole:")]
+    public bool IsConsole { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

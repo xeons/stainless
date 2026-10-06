@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class NSManagedObjectID : NSObject, NSCopying
 {
-    [Selector("entity")] public NSEntityDescription Entity { get; }
-    [Selector("persistentStore")] public NSPersistentStore? PersistentStore { get; }
-    [Selector("isTemporaryID")] public bool TemporaryID { get; }
-    [Selector("URIRepresentation")] public NSURL URIRepresentation();
+    [Selector("entity")]
+    public NSEntityDescription Entity { get; }
+    [Selector("persistentStore")]
+    public NSPersistentStore? PersistentStore { get; }
+    [Selector("isTemporaryID")]
+    public bool TemporaryID { get; }
+    [Selector("URIRepresentation")]
+    public NSURL URIRepresentation();
 }
 
 #endif

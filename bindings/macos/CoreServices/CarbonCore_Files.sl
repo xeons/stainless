@@ -1345,7 +1345,8 @@ public extern "C" OSStatus FSPathMoveObjectToTrashSync(byte* sourcePath, byte** 
 public extern "C" CFTypeID FSFileOperationGetTypeID();
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" FSFileOperationRef? FSFileOperationCreate(CFAllocatorRef? alloc);
+[ReturnsRetained]
+public extern "C" FSFileOperationRef? FSFileOperationCreate(CFAllocatorRef? alloc);
 
 /// Deprecated in macOS 10.8.
 public extern "C" OSStatus FSFileOperationScheduleWithRunLoop(FSFileOperationRef? fileOp, CFRunLoopRef? runLoop, CFStringRef? runLoopMode);
@@ -1381,7 +1382,8 @@ public extern "C" OSStatus FSFileOperationCopyStatus(FSFileOperationRef? fileOp,
 public extern "C" OSStatus FSPathFileOperationCopyStatus(FSFileOperationRef? fileOp, byte** currentItem, FSFileOperationStage* stage, OSStatus* error, __CFDictionary** statusDictionary, void** info);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFStringRef? FSCreateStringFromHFSUniStr(CFAllocatorRef? alloc, HFSUniStr255* uniStr);
+[ReturnsRetained]
+public extern "C" CFStringRef? FSCreateStringFromHFSUniStr(CFAllocatorRef? alloc, HFSUniStr255* uniStr);
 
 /// Deprecated in macOS 10.8.
 public extern "C" OSStatus FSGetHFSUniStrFromString(CFStringRef? theString, HFSUniStr255* uniStr);
@@ -1390,13 +1392,16 @@ public extern "C" OSStatus FSGetHFSUniStrFromString(CFStringRef? theString, HFSU
 public extern "C" CFTypeID FSFileSecurityGetTypeID();
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" FSFileSecurityRef? FSFileSecurityCreate(CFAllocatorRef? alloc);
+[ReturnsRetained]
+public extern "C" FSFileSecurityRef? FSFileSecurityCreate(CFAllocatorRef? alloc);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" FSFileSecurityRef? FSFileSecurityCreateWithFSPermissionInfo(CFAllocatorRef? alloc, FSPermissionInfo* permissions);
+[ReturnsRetained]
+public extern "C" FSFileSecurityRef? FSFileSecurityCreateWithFSPermissionInfo(CFAllocatorRef? alloc, FSPermissionInfo* permissions);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" FSFileSecurityRef? FSFileSecurityRefCreateCopy(CFAllocatorRef? alloc, FSFileSecurityRef? fileSec);
+[ReturnsRetained]
+public extern "C" FSFileSecurityRef? FSFileSecurityRefCreateCopy(CFAllocatorRef? alloc, FSFileSecurityRef? fileSec);
 
 /// Deprecated in macOS 10.8.
 public extern "C" OSStatus FSFileSecurityGetOwnerUUID(FSFileSecurityRef? fileSec, CFUUIDBytes* owner);

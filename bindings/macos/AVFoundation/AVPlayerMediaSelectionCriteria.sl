@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class AVPlayerMediaSelectionCriteria : NSObject
 {
-    [Selector("preferredLanguages")] public NSArray? PreferredLanguages { get; }
-    [Selector("preferredMediaCharacteristics")] public NSArray? PreferredMediaCharacteristics { get; }
-    [Selector("principalMediaCharacteristics")] public NSArray? PrincipalMediaCharacteristics { get; }
-    [Selector("initWithPreferredLanguages:preferredMediaCharacteristics:")] public Self InitWithPreferredLanguagesPreferredMediaCharacteristics(NSArray? preferredLanguages, NSArray? preferredMediaCharacteristics);
-    [Selector("initWithPrincipalMediaCharacteristics:preferredLanguages:preferredMediaCharacteristics:")] public Self InitWithPrincipalMediaCharacteristicsPreferredLanguagesPreferredMediaCharacteristics(NSArray? principalMediaCharacteristics, NSArray? preferredLanguages, NSArray? preferredMediaCharacteristics);
+    [Selector("preferredLanguages")]
+    public NSArray? PreferredLanguages { get; }
+    [Selector("preferredMediaCharacteristics")]
+    public NSArray? PreferredMediaCharacteristics { get; }
+    [Selector("principalMediaCharacteristics")]
+    public NSArray? PrincipalMediaCharacteristics { get; }
+    [Selector("initWithPreferredLanguages:preferredMediaCharacteristics:")]
+    public Self InitWithPreferredLanguagesPreferredMediaCharacteristics(NSArray? preferredLanguages, NSArray? preferredMediaCharacteristics);
+    [Selector("initWithPrincipalMediaCharacteristics:preferredLanguages:preferredMediaCharacteristics:")]
+    public Self InitWithPrincipalMediaCharacteristicsPreferredLanguagesPreferredMediaCharacteristics(NSArray? principalMediaCharacteristics, NSArray? preferredLanguages, NSArray? preferredMediaCharacteristics);
 }
 
 #endif

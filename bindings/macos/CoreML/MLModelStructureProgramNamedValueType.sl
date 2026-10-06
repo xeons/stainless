@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MLModelStructureProgramNamedValueType : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("type")] public MLModelStructureProgramValueType Type { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("type")]
+    public MLModelStructureProgramValueType Type { get; }
 }
 
 #endif

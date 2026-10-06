@@ -33,27 +33,36 @@ import Standard.ObjC;
 
 public extern "C" CFTypeID SecCertificateGetTypeID();
 
-[ReturnsRetained] public extern "C" SecCertificateRef? SecCertificateCreateWithData(CFAllocatorRef? allocator, CFDataRef data);
+[ReturnsRetained]
+public extern "C" SecCertificateRef? SecCertificateCreateWithData(CFAllocatorRef? allocator, CFDataRef data);
 
-[ReturnsRetained] public extern "C" CFDataRef SecCertificateCopyData(SecCertificateRef certificate);
+[ReturnsRetained]
+public extern "C" CFDataRef SecCertificateCopyData(SecCertificateRef certificate);
 
-[ReturnsRetained] public extern "C" CFStringRef? SecCertificateCopySubjectSummary(SecCertificateRef certificate);
+[ReturnsRetained]
+public extern "C" CFStringRef? SecCertificateCopySubjectSummary(SecCertificateRef certificate);
 
 public extern "C" OSStatus SecCertificateCopyCommonName(SecCertificateRef certificate, __CFString** commonName);
 
 public extern "C" OSStatus SecCertificateCopyEmailAddresses(SecCertificateRef certificate, __CFArray** emailAddresses);
 
-[ReturnsRetained] public extern "C" CFDataRef? SecCertificateCopyNormalizedIssuerSequence(SecCertificateRef certificate);
+[ReturnsRetained]
+public extern "C" CFDataRef? SecCertificateCopyNormalizedIssuerSequence(SecCertificateRef certificate);
 
-[ReturnsRetained] public extern "C" CFDataRef? SecCertificateCopyNormalizedSubjectSequence(SecCertificateRef certificate);
+[ReturnsRetained]
+public extern "C" CFDataRef? SecCertificateCopyNormalizedSubjectSequence(SecCertificateRef certificate);
 
-[ReturnsRetained] public extern "C" SecKeyRef? SecCertificateCopyKey(SecCertificateRef certificate);
+[ReturnsRetained]
+public extern "C" SecKeyRef? SecCertificateCopyKey(SecCertificateRef certificate);
 
-[ReturnsRetained] public extern "C" CFDataRef? SecCertificateCopySerialNumberData(SecCertificateRef certificate, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDataRef? SecCertificateCopySerialNumberData(SecCertificateRef certificate, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFDateRef? SecCertificateCopyNotValidBeforeDate(SecCertificateRef certificate);
+[ReturnsRetained]
+public extern "C" CFDateRef? SecCertificateCopyNotValidBeforeDate(SecCertificateRef certificate);
 
-[ReturnsRetained] public extern "C" CFDateRef? SecCertificateCopyNotValidAfterDate(SecCertificateRef certificate);
+[ReturnsRetained]
+public extern "C" CFDateRef? SecCertificateCopyNotValidAfterDate(SecCertificateRef certificate);
 
 public const int kSecSubjectItemAttr = 1937072746;
 public const int kSecIssuerItemAttr = 1769173877;
@@ -89,7 +98,8 @@ public extern "C" OSStatus SecCertificateGetAlgorithmID(SecCertificateRef certif
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecCertificateCopyPreference(CFStringRef name, uint32 keyUsage, __SecCertificate** certificate);
 
-[ReturnsRetained] public extern "C" SecCertificateRef? SecCertificateCopyPreferred(CFStringRef name, CFArrayRef? keyUsage);
+[ReturnsRetained]
+public extern "C" SecCertificateRef? SecCertificateCopyPreferred(CFStringRef name, CFArrayRef? keyUsage);
 
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecCertificateSetPreference(SecCertificateRef certificate, CFStringRef name, uint32 keyUsage, CFDateRef? date);
@@ -140,17 +150,22 @@ public extern "C" CFStringRef? kSecPropertyTypeArray;
 
 public extern "C" CFStringRef? kSecPropertyTypeNumber;
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? SecCertificateCopyValues(SecCertificateRef certificate, CFArrayRef? keys, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? SecCertificateCopyValues(SecCertificateRef certificate, CFArrayRef? keys, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFStringRef? SecCertificateCopyLongDescription(CFAllocatorRef? alloc, SecCertificateRef certificate, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFStringRef? SecCertificateCopyLongDescription(CFAllocatorRef? alloc, SecCertificateRef certificate, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFStringRef? SecCertificateCopyShortDescription(CFAllocatorRef? alloc, SecCertificateRef certificate, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFStringRef? SecCertificateCopyShortDescription(CFAllocatorRef? alloc, SecCertificateRef certificate, __CFError** error);
 
 /// Deprecated in macOS 10.12.4.
-[ReturnsRetained] public extern "C" CFDataRef? SecCertificateCopyNormalizedIssuerContent(SecCertificateRef certificate, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDataRef? SecCertificateCopyNormalizedIssuerContent(SecCertificateRef certificate, __CFError** error);
 
 /// Deprecated in macOS 10.12.4.
-[ReturnsRetained] public extern "C" CFDataRef? SecCertificateCopyNormalizedSubjectContent(SecCertificateRef certificate, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDataRef? SecCertificateCopyNormalizedSubjectContent(SecCertificateRef certificate, __CFError** error);
 
 #if X64
 /// Deprecated in macOS 10.14.
@@ -159,7 +174,8 @@ public extern "C" OSStatus SecCertificateCopyPublicKey(SecCertificateRef certifi
 
 #if X64
 /// Deprecated in macOS 10.13.
-[ReturnsRetained] public extern "C" CFDataRef? SecCertificateCopySerialNumber(SecCertificateRef certificate, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDataRef? SecCertificateCopySerialNumber(SecCertificateRef certificate, __CFError** error);
 #endif
 
 #endif

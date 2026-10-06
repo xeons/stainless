@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class INObjectCollection : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("sections")] public NSArray Sections { get; }
-    [Selector("allItems")] public NSArray AllItems { get; }
-    [Selector("usesIndexedCollation", "setUsesIndexedCollation:")] public bool UsesIndexedCollation { get; set; }
-    [Selector("initWithSections:")] public Self InitWithSections(NSArray sections);
-    [Selector("initWithItems:")] public Self InitWithItems(NSArray items);
+    [Selector("sections")]
+    public NSArray Sections { get; }
+    [Selector("allItems")]
+    public NSArray AllItems { get; }
+    [Selector("usesIndexedCollation", "setUsesIndexedCollation:")]
+    public bool UsesIndexedCollation { get; set; }
+    [Selector("initWithSections:")]
+    public Self InitWithSections(NSArray sections);
+    [Selector("initWithItems:")]
+    public Self InitWithItems(NSArray items);
 }
 
 #endif

@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MKPolyline : MKMultiPoint, MKOverlay
 {
-    [Selector("polylineWithPoints:count:")] public static Self PolylineWithPointsCount(MKMapPoint* points, NSUInteger count);
-    [Selector("polylineWithCoordinates:count:")] public static Self PolylineWithCoordinatesCount(CLLocationCoordinate2D* coords, NSUInteger count);
+    [Selector("polylineWithPoints:count:")]
+    public static Self PolylineWithPointsCount(MKMapPoint* points, NSUInteger count);
+    [Selector("polylineWithCoordinates:count:")]
+    public static Self PolylineWithCoordinatesCount(CLLocationCoordinate2D* coords, NSUInteger count);
 }
 
 #endif

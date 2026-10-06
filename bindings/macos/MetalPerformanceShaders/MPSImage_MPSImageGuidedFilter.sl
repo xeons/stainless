@@ -34,16 +34,26 @@ import Standard.ObjC;
 
 public extern objc class MPSImageGuidedFilter : MPSKernel
 {
-    [Selector("kernelDiameter")] public NSUInteger KernelDiameter { get; }
-    [Selector("epsilon", "setEpsilon:")] public float Epsilon { get; set; }
-    [Selector("reconstructScale", "setReconstructScale:")] public float ReconstructScale { get; set; }
-    [Selector("reconstructOffset", "setReconstructOffset:")] public float ReconstructOffset { get; set; }
-    [Selector("initWithDevice:kernelDiameter:")] public Self InitWithDeviceKernelDiameter(MTLDevice device, NSUInteger kernelDiameter);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeRegressionToCommandBuffer:sourceTexture:guidanceTexture:weightsTexture:destinationCoefficientsTexture:")] public void EncodeRegressionToCommandBufferSourceTextureGuidanceTextureWeightsTextureDestinationCoefficientsTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture guidanceTexture, MTLTexture? weightsTexture, MTLTexture destinationCoefficientsTexture);
-    [Selector("encodeReconstructionToCommandBuffer:guidanceTexture:coefficientsTexture:destinationTexture:")] public void EncodeReconstructionToCommandBufferGuidanceTextureCoefficientsTextureDestinationTexture(MTLCommandBuffer commandBuffer, MTLTexture guidanceTexture, MTLTexture coefficientsTexture, MTLTexture destinationTexture);
-    [Selector("encodeRegressionToCommandBuffer:sourceTexture:guidanceTexture:weightsTexture:destinationCoefficientsTextureA:destinationCoefficientsTextureB:")] public void EncodeRegressionToCommandBufferSourceTextureGuidanceTextureWeightsTextureDestinationCoefficientsTextureADestinationCoefficientsTextureB(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture guidanceTexture, MTLTexture? weightsTexture, MTLTexture destinationCoefficientsTextureA, MTLTexture destinationCoefficientsTextureB);
-    [Selector("encodeReconstructionToCommandBuffer:guidanceTexture:coefficientsTextureA:coefficientsTextureB:destinationTexture:")] public void EncodeReconstructionToCommandBufferGuidanceTextureCoefficientsTextureACoefficientsTextureBDestinationTexture(MTLCommandBuffer commandBuffer, MTLTexture guidanceTexture, MTLTexture coefficientsTextureA, MTLTexture coefficientsTextureB, MTLTexture destinationTexture);
+    [Selector("kernelDiameter")]
+    public NSUInteger KernelDiameter { get; }
+    [Selector("epsilon", "setEpsilon:")]
+    public float Epsilon { get; set; }
+    [Selector("reconstructScale", "setReconstructScale:")]
+    public float ReconstructScale { get; set; }
+    [Selector("reconstructOffset", "setReconstructOffset:")]
+    public float ReconstructOffset { get; set; }
+    [Selector("initWithDevice:kernelDiameter:")]
+    public Self InitWithDeviceKernelDiameter(MTLDevice device, NSUInteger kernelDiameter);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeRegressionToCommandBuffer:sourceTexture:guidanceTexture:weightsTexture:destinationCoefficientsTexture:")]
+    public void EncodeRegressionToCommandBufferSourceTextureGuidanceTextureWeightsTextureDestinationCoefficientsTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture guidanceTexture, MTLTexture? weightsTexture, MTLTexture destinationCoefficientsTexture);
+    [Selector("encodeReconstructionToCommandBuffer:guidanceTexture:coefficientsTexture:destinationTexture:")]
+    public void EncodeReconstructionToCommandBufferGuidanceTextureCoefficientsTextureDestinationTexture(MTLCommandBuffer commandBuffer, MTLTexture guidanceTexture, MTLTexture coefficientsTexture, MTLTexture destinationTexture);
+    [Selector("encodeRegressionToCommandBuffer:sourceTexture:guidanceTexture:weightsTexture:destinationCoefficientsTextureA:destinationCoefficientsTextureB:")]
+    public void EncodeRegressionToCommandBufferSourceTextureGuidanceTextureWeightsTextureDestinationCoefficientsTextureADestinationCoefficientsTextureB(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture guidanceTexture, MTLTexture? weightsTexture, MTLTexture destinationCoefficientsTextureA, MTLTexture destinationCoefficientsTextureB);
+    [Selector("encodeReconstructionToCommandBuffer:guidanceTexture:coefficientsTextureA:coefficientsTextureB:destinationTexture:")]
+    public void EncodeReconstructionToCommandBufferGuidanceTextureCoefficientsTextureACoefficientsTextureBDestinationTexture(MTLCommandBuffer commandBuffer, MTLTexture guidanceTexture, MTLTexture coefficientsTextureA, MTLTexture coefficientsTextureB, MTLTexture destinationTexture);
 }
 
 #endif

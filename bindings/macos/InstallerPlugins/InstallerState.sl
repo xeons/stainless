@@ -41,14 +41,22 @@ public struct InstallerState_Private;
 
 public extern objc class InstallerState : NSObject
 {
-    [Selector("licenseAgreed")] public bool LicenseAgreed { get; }
-    [Selector("licenseAgreedLanguage")] public NSString? LicenseAgreedLanguage { get; }
-    [Selector("targetVolumePath")] public NSString? TargetVolumePath { get; }
-    [Selector("targetPath")] public NSString? TargetPath { get; }
-    [Selector("choiceDictionaries")] public NSArray? ChoiceDictionaries { get; }
-    [Selector("installStarted")] public bool InstallStarted { get; }
-    [Selector("installSucceeded")] public bool InstallSucceeded { get; }
-    [Selector("choiceDictionaryForIdentifier:")] public NSDictionary? ChoiceDictionaryForIdentifier(NSString? choiceIdentifier);
+    [Selector("licenseAgreed")]
+    public bool LicenseAgreed { get; }
+    [Selector("licenseAgreedLanguage")]
+    public NSString? LicenseAgreedLanguage { get; }
+    [Selector("targetVolumePath")]
+    public NSString? TargetVolumePath { get; }
+    [Selector("targetPath")]
+    public NSString? TargetPath { get; }
+    [Selector("choiceDictionaries")]
+    public NSArray? ChoiceDictionaries { get; }
+    [Selector("installStarted")]
+    public bool InstallStarted { get; }
+    [Selector("installSucceeded")]
+    public bool InstallSucceeded { get; }
+    [Selector("choiceDictionaryForIdentifier:")]
+    public NSDictionary? ChoiceDictionaryForIdentifier(NSString? choiceIdentifier);
 }
 
 #endif

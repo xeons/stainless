@@ -51,31 +51,49 @@ public enum NSBoxType : ulong
 
 public extern objc class NSBox : NSView
 {
-    [Selector("boxType", "setBoxType:")] public NSBoxType BoxType { get; set; }
-    [Selector("titlePosition", "setTitlePosition:")] public NSTitlePosition TitlePosition { get; set; }
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("titleFont", "setTitleFont:")] public NSFont TitleFont { get; set; }
-    [Selector("borderRect")] public NSRect BorderRect { get; }
-    [Selector("titleRect")] public NSRect TitleRect { get; }
-    [Selector("titleCell")] public AnyObject TitleCell { get; }
-    [Selector("contentViewMargins", "setContentViewMargins:")] public NSSize ContentViewMargins { get; set; }
-    [Selector("contentView", "setContentView:")] public NSView? ContentView { get; set; }
-    [Selector("isTransparent", "setTransparent:")] public bool Transparent { get; set; }
-    [Selector("borderWidth", "setBorderWidth:")] public CGFloat BorderWidth { get; set; }
-    [Selector("cornerRadius", "setCornerRadius:")] public CGFloat CornerRadius { get; set; }
-    [Selector("borderColor", "setBorderColor:")] public NSColor? BorderColor { get; set; }
-    [Selector("fillColor", "setFillColor:")] public NSColor? FillColor { get; set; }
-    [Selector("sizeToFit")] public void SizeToFit();
-    [Selector("setFrameFromContentFrame:")] public void SetFrameFromContentFrame(NSRect contentFrame);
+    [Selector("boxType", "setBoxType:")]
+    public NSBoxType BoxType { get; set; }
+    [Selector("titlePosition", "setTitlePosition:")]
+    public NSTitlePosition TitlePosition { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("titleFont", "setTitleFont:")]
+    public NSFont TitleFont { get; set; }
+    [Selector("borderRect")]
+    public NSRect BorderRect { get; }
+    [Selector("titleRect")]
+    public NSRect TitleRect { get; }
+    [Selector("titleCell")]
+    public AnyObject TitleCell { get; }
+    [Selector("contentViewMargins", "setContentViewMargins:")]
+    public NSSize ContentViewMargins { get; set; }
+    [Selector("contentView", "setContentView:")]
+    public NSView? ContentView { get; set; }
+    [Selector("isTransparent", "setTransparent:")]
+    public bool Transparent { get; set; }
+    [Selector("borderWidth", "setBorderWidth:")]
+    public CGFloat BorderWidth { get; set; }
+    [Selector("cornerRadius", "setCornerRadius:")]
+    public CGFloat CornerRadius { get; set; }
+    [Selector("borderColor", "setBorderColor:")]
+    public NSColor? BorderColor { get; set; }
+    [Selector("fillColor", "setFillColor:")]
+    public NSColor? FillColor { get; set; }
+    [Selector("sizeToFit")]
+    public void SizeToFit();
+    [Selector("setFrameFromContentFrame:")]
+    public void SetFrameFromContentFrame(NSRect contentFrame);
 }
 
 /// NSDeprecated, a category of NSBox.
 public extern objc class NSBox
 {
     /// Deprecated in macOS 10.15.
-    [Selector("borderType", "setBorderType:")] public NSBorderType BorderType { get; set; }
+    [Selector("borderType", "setBorderType:")]
+    public NSBorderType BorderType { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("setTitleWithMnemonic:")] public void SetTitleWithMnemonic(NSString? stringWithAmpersand);
+    [Selector("setTitleWithMnemonic:")]
+    public void SetTitleWithMnemonic(NSString? stringWithAmpersand);
 }
 
 #endif

@@ -33,13 +33,15 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.10.
 public extern objc class GKChallengesViewController : NSViewController, GKViewController
 {
-    [Selector("challengeDelegate", "setChallengeDelegate:")] public GKChallengesViewControllerDelegate? ChallengeDelegate { get; set; }
+    [Selector("challengeDelegate", "setChallengeDelegate:")]
+    public GKChallengesViewControllerDelegate? ChallengeDelegate { get; set; }
 }
 
 /// Deprecated in macOS 15.4.
 public objc interface GKChallengesViewControllerDelegate
 {
-    [Selector("challengesViewControllerDidFinish:")] void ChallengesViewControllerDidFinish(GKChallengesViewController? viewController);
+    [Selector("challengesViewControllerDidFinish:")]
+    void ChallengesViewControllerDidFinish(GKChallengesViewController? viewController);
 }
 
 #endif

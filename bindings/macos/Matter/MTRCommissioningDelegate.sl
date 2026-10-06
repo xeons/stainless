@@ -38,14 +38,29 @@ public objc closure void MTRCommissioningDelegateCommissioningNeedsThreadCredent
 /// macOS 26.2 and later.
 public objc interface MTRCommissioningDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("commissioning:readCommissioneeInfo:")] void CommissioningReadCommissioneeInfo(MTRCommissioningOperation commissioning, MTRCommissioneeInfo info);
-    [Selector("commissioning:completedDeviceAttestation:error:completion:")] void CommissioningCompletedDeviceAttestationErrorCompletion(MTRCommissioningOperation commissioning, MTRDeviceAttestationDeviceInfo attestationDeviceInfo, NSError? error, dispatch_block_t completion);
-    [Optional] [Selector("commissioning:needsWiFiCredentialsWithScanResults:error:completion:")] void CommissioningNeedsWiFiCredentialsWithScanResultsErrorCompletion(MTRCommissioningOperation commissioning, NSArray? networks, NSError? error, MTRCommissioningDelegateCommissioningNeedsWiFiCredentialsWithScanResultsErrorCompletionCompletionBlock completion);
-    [Optional] [Selector("commissioning:needsThreadCredentialsWithScanResults:error:completion:")] void CommissioningNeedsThreadCredentialsWithScanResultsErrorCompletion(MTRCommissioningOperation commissioning, NSArray? networks, NSError? error, MTRCommissioningDelegateCommissioningNeedsThreadCredentialsWithScanResultsErrorCompletionCompletionBlock completion);
-    [Optional] [Selector("commissioningStartingNetworkScan:")] void CommissioningStartingNetworkScan(MTRCommissioningOperation commissioning);
-    [Optional] [Selector("commissioningProvisionedNetworkCredentials:")] void CommissioningProvisionedNetworkCredentials(MTRCommissioningOperation commissioning);
-    [Optional] [Selector("commissioning:failedWithError:metrics:")] void CommissioningFailedWithErrorMetrics(MTRCommissioningOperation commissioning, NSError error, MTRMetrics metrics);
-    [Optional] [Selector("commissioning:succeededForNodeID:metrics:")] void CommissioningSucceededForNodeIDMetrics(MTRCommissioningOperation commissioning, NSNumber nodeID, MTRMetrics metrics);
+    [Optional]
+    [Selector("commissioning:readCommissioneeInfo:")]
+    void CommissioningReadCommissioneeInfo(MTRCommissioningOperation commissioning, MTRCommissioneeInfo info);
+    [Selector("commissioning:completedDeviceAttestation:error:completion:")]
+    void CommissioningCompletedDeviceAttestationErrorCompletion(MTRCommissioningOperation commissioning, MTRDeviceAttestationDeviceInfo attestationDeviceInfo, NSError? error, dispatch_block_t completion);
+    [Optional]
+    [Selector("commissioning:needsWiFiCredentialsWithScanResults:error:completion:")]
+    void CommissioningNeedsWiFiCredentialsWithScanResultsErrorCompletion(MTRCommissioningOperation commissioning, NSArray? networks, NSError? error, MTRCommissioningDelegateCommissioningNeedsWiFiCredentialsWithScanResultsErrorCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("commissioning:needsThreadCredentialsWithScanResults:error:completion:")]
+    void CommissioningNeedsThreadCredentialsWithScanResultsErrorCompletion(MTRCommissioningOperation commissioning, NSArray? networks, NSError? error, MTRCommissioningDelegateCommissioningNeedsThreadCredentialsWithScanResultsErrorCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("commissioningStartingNetworkScan:")]
+    void CommissioningStartingNetworkScan(MTRCommissioningOperation commissioning);
+    [Optional]
+    [Selector("commissioningProvisionedNetworkCredentials:")]
+    void CommissioningProvisionedNetworkCredentials(MTRCommissioningOperation commissioning);
+    [Optional]
+    [Selector("commissioning:failedWithError:metrics:")]
+    void CommissioningFailedWithErrorMetrics(MTRCommissioningOperation commissioning, NSError error, MTRMetrics metrics);
+    [Optional]
+    [Selector("commissioning:succeededForNodeID:metrics:")]
+    void CommissioningSucceededForNodeIDMetrics(MTRCommissioningOperation commissioning, NSNumber nodeID, MTRMetrics metrics);
 }
 
 #endif

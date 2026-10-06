@@ -41,18 +41,30 @@ public enum CMOdometerOriginDevice : long
 
 public extern objc class CMOdometerData : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("startDate")] public NSDate StartDate { get; }
-    [Selector("endDate")] public NSDate EndDate { get; }
-    [Selector("deltaDistance")] public CLLocationDistance DeltaDistance { get; }
-    [Selector("deltaDistanceAccuracy")] public CLLocationAccuracy DeltaDistanceAccuracy { get; }
-    [Selector("speed")] public CLLocationSpeed Speed { get; }
-    [Selector("speedAccuracy")] public CLLocationSpeedAccuracy SpeedAccuracy { get; }
-    [Selector("gpsDate")] public NSDate GpsDate { get; }
-    [Selector("deltaAltitude")] public CLLocationDistance DeltaAltitude { get; }
-    [Selector("verticalAccuracy")] public CLLocationAccuracy VerticalAccuracy { get; }
-    [Selector("originDevice")] public CMOdometerOriginDevice OriginDevice { get; }
-    [Selector("slope")] public NSNumber? Slope { get; }
-    [Selector("maxAbsSlope")] public NSNumber? MaxAbsSlope { get; }
+    [Selector("startDate")]
+    public NSDate StartDate { get; }
+    [Selector("endDate")]
+    public NSDate EndDate { get; }
+    [Selector("deltaDistance")]
+    public CLLocationDistance DeltaDistance { get; }
+    [Selector("deltaDistanceAccuracy")]
+    public CLLocationAccuracy DeltaDistanceAccuracy { get; }
+    [Selector("speed")]
+    public CLLocationSpeed Speed { get; }
+    [Selector("speedAccuracy")]
+    public CLLocationSpeedAccuracy SpeedAccuracy { get; }
+    [Selector("gpsDate")]
+    public NSDate GpsDate { get; }
+    [Selector("deltaAltitude")]
+    public CLLocationDistance DeltaAltitude { get; }
+    [Selector("verticalAccuracy")]
+    public CLLocationAccuracy VerticalAccuracy { get; }
+    [Selector("originDevice")]
+    public CMOdometerOriginDevice OriginDevice { get; }
+    [Selector("slope")]
+    public NSNumber? Slope { get; }
+    [Selector("maxAbsSlope")]
+    public NSNumber? MaxAbsSlope { get; }
 }
 
 #endif

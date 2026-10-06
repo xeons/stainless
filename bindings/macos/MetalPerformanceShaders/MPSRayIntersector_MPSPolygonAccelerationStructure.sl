@@ -42,17 +42,28 @@ public enum MPSPolygonType : ulong
 /// Deprecated in macOS 14.0.
 public extern objc class MPSPolygonAccelerationStructure : MPSAccelerationStructure
 {
-    [Selector("polygonType", "setPolygonType:")] public MPSPolygonType PolygonType { get; set; }
-    [Selector("vertexStride", "setVertexStride:")] public NSUInteger VertexStride { get; set; }
-    [Selector("indexType", "setIndexType:")] public MPSDataType IndexType { get; set; }
-    [Selector("vertexBuffer", "setVertexBuffer:")] public MTLBuffer? VertexBuffer { get; set; }
-    [Selector("vertexBufferOffset", "setVertexBufferOffset:")] public NSUInteger VertexBufferOffset { get; set; }
-    [Selector("indexBuffer", "setIndexBuffer:")] public MTLBuffer? IndexBuffer { get; set; }
-    [Selector("indexBufferOffset", "setIndexBufferOffset:")] public NSUInteger IndexBufferOffset { get; set; }
-    [Selector("maskBuffer", "setMaskBuffer:")] public MTLBuffer? MaskBuffer { get; set; }
-    [Selector("maskBufferOffset", "setMaskBufferOffset:")] public NSUInteger MaskBufferOffset { get; set; }
-    [Selector("polygonCount", "setPolygonCount:")] public NSUInteger PolygonCount { get; set; }
-    [Selector("polygonBuffers", "setPolygonBuffers:")] public NSArray? PolygonBuffers { get; set; }
+    [Selector("polygonType", "setPolygonType:")]
+    public MPSPolygonType PolygonType { get; set; }
+    [Selector("vertexStride", "setVertexStride:")]
+    public NSUInteger VertexStride { get; set; }
+    [Selector("indexType", "setIndexType:")]
+    public MPSDataType IndexType { get; set; }
+    [Selector("vertexBuffer", "setVertexBuffer:")]
+    public MTLBuffer? VertexBuffer { get; set; }
+    [Selector("vertexBufferOffset", "setVertexBufferOffset:")]
+    public NSUInteger VertexBufferOffset { get; set; }
+    [Selector("indexBuffer", "setIndexBuffer:")]
+    public MTLBuffer? IndexBuffer { get; set; }
+    [Selector("indexBufferOffset", "setIndexBufferOffset:")]
+    public NSUInteger IndexBufferOffset { get; set; }
+    [Selector("maskBuffer", "setMaskBuffer:")]
+    public MTLBuffer? MaskBuffer { get; set; }
+    [Selector("maskBufferOffset", "setMaskBufferOffset:")]
+    public NSUInteger MaskBufferOffset { get; set; }
+    [Selector("polygonCount", "setPolygonCount:")]
+    public NSUInteger PolygonCount { get; set; }
+    [Selector("polygonBuffers", "setPolygonBuffers:")]
+    public NSArray? PolygonBuffers { get; set; }
 }
 
 #endif

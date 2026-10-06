@@ -34,10 +34,14 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class NSItemBadge : NSObject
 {
-    [Selector("text")] public NSString Text { get; }
-    [Selector("badgeWithCount:")] public static NSItemBadge BadgeWithCount(NSInteger count);
-    [Selector("badgeWithText:")] public static NSItemBadge BadgeWithText(NSString text);
-    [Selector("indicatorBadge")] public static NSItemBadge IndicatorBadge();
+    [Selector("text")]
+    public NSString Text { get; }
+    [Selector("badgeWithCount:")]
+    public static NSItemBadge BadgeWithCount(NSInteger count);
+    [Selector("badgeWithText:")]
+    public static NSItemBadge BadgeWithText(NSString text);
+    [Selector("indicatorBadge")]
+    public static NSItemBadge IndicatorBadge();
 }
 
 #endif

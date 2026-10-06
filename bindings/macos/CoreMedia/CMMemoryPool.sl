@@ -42,7 +42,8 @@ public extern "C" CFTypeID CMMemoryPoolGetTypeID();
 
 public extern "C" CFStringRef kCMMemoryPoolOption_AgeOutPeriod;
 
-[ReturnsRetained] public extern "C" CMMemoryPoolRef CMMemoryPoolCreate(CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CMMemoryPoolRef CMMemoryPoolCreate(CFDictionaryRef? options);
 
 public extern "C" CFAllocatorRef CMMemoryPoolGetAllocator(CMMemoryPoolRef pool);
 

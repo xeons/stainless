@@ -110,10 +110,12 @@ public extern "C" CFTypeID CFNetServiceMonitorGetTypeID();
 public extern "C" CFTypeID CFNetServiceBrowserGetTypeID();
 
 /// Deprecated in macOS 100000.
-[ReturnsRetained] public extern "C" CFNetServiceRef CFNetServiceCreate(CFAllocatorRef? alloc, CFStringRef domain, CFStringRef serviceType, CFStringRef name, SInt32 port);
+[ReturnsRetained]
+public extern "C" CFNetServiceRef CFNetServiceCreate(CFAllocatorRef? alloc, CFStringRef domain, CFStringRef serviceType, CFStringRef name, SInt32 port);
 
 /// Deprecated in macOS 100000.
-[ReturnsRetained] public extern "C" CFNetServiceRef CFNetServiceCreateCopy(CFAllocatorRef? alloc, CFNetServiceRef service);
+[ReturnsRetained]
+public extern "C" CFNetServiceRef CFNetServiceCreateCopy(CFAllocatorRef? alloc, CFNetServiceRef service);
 
 /// Deprecated in macOS 100000.
 public extern "C" CFStringRef CFNetServiceGetDomain(CFNetServiceRef theService);
@@ -149,10 +151,12 @@ public extern "C" CFDataRef? CFNetServiceGetTXTData(CFNetServiceRef theService);
 public extern "C" Boolean CFNetServiceSetTXTData(CFNetServiceRef theService, CFDataRef txtRecord);
 
 /// Deprecated in macOS 100000.
-[ReturnsRetained] public extern "C" CFDictionaryRef? CFNetServiceCreateDictionaryWithTXTData(CFAllocatorRef? alloc, CFDataRef txtRecord);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CFNetServiceCreateDictionaryWithTXTData(CFAllocatorRef? alloc, CFDataRef txtRecord);
 
 /// Deprecated in macOS 100000.
-[ReturnsRetained] public extern "C" CFDataRef? CFNetServiceCreateTXTDataWithDictionary(CFAllocatorRef? alloc, CFDictionaryRef keyValuePairs);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFNetServiceCreateTXTDataWithDictionary(CFAllocatorRef? alloc, CFDictionaryRef keyValuePairs);
 
 /// Deprecated in macOS 100000.
 public extern "C" Boolean CFNetServiceSetClient(CFNetServiceRef theService, CFNetServiceClientCallBack clientCB, CFNetServiceClientContext* clientContext);
@@ -164,7 +168,8 @@ public extern "C" void CFNetServiceScheduleWithRunLoop(CFNetServiceRef theServic
 public extern "C" void CFNetServiceUnscheduleFromRunLoop(CFNetServiceRef theService, CFRunLoopRef runLoop, CFStringRef runLoopMode);
 
 /// Deprecated in macOS 100000.
-[ReturnsRetained] public extern "C" CFNetServiceMonitorRef CFNetServiceMonitorCreate(CFAllocatorRef? alloc, CFNetServiceRef theService, CFNetServiceMonitorClientCallBack clientCB, CFNetServiceClientContext* clientContext);
+[ReturnsRetained]
+public extern "C" CFNetServiceMonitorRef CFNetServiceMonitorCreate(CFAllocatorRef? alloc, CFNetServiceRef theService, CFNetServiceMonitorClientCallBack clientCB, CFNetServiceClientContext* clientContext);
 
 /// Deprecated in macOS 100000.
 public extern "C" void CFNetServiceMonitorInvalidate(CFNetServiceMonitorRef monitor);
@@ -182,7 +187,8 @@ public extern "C" void CFNetServiceMonitorScheduleWithRunLoop(CFNetServiceMonito
 public extern "C" void CFNetServiceMonitorUnscheduleFromRunLoop(CFNetServiceMonitorRef monitor, CFRunLoopRef runLoop, CFStringRef runLoopMode);
 
 /// Deprecated in macOS 100000.
-[ReturnsRetained] public extern "C" CFNetServiceBrowserRef CFNetServiceBrowserCreate(CFAllocatorRef? alloc, CFNetServiceBrowserClientCallBack clientCB, CFNetServiceClientContext* clientContext);
+[ReturnsRetained]
+public extern "C" CFNetServiceBrowserRef CFNetServiceBrowserCreate(CFAllocatorRef? alloc, CFNetServiceBrowserClientCallBack clientCB, CFNetServiceClientContext* clientContext);
 
 /// Deprecated in macOS 100000.
 public extern "C" void CFNetServiceBrowserInvalidate(CFNetServiceBrowserRef browser);

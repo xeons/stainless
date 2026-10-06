@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class IOUSBHostStream : IOUSBHostIOSource
 {
-    [Selector("hostPipe")] public IOUSBHostPipe HostPipe { get; }
-    [Selector("streamID")] public NSUInteger StreamID { get; }
-    [Selector("abortWithOption:error:")] public bool AbortWithOptionError(IOUSBHostAbortOption option, out NSError? error);
-    [Selector("abortWithError:")] public bool AbortWithError(out NSError? error);
-    [Selector("sendIORequestWithData:bytesTransferred:error:")] public bool SendIORequestWithDataBytesTransferredError(NSMutableData? data, NSUInteger* bytesTransferred, out NSError? error);
-    [Selector("enqueueIORequestWithData:error:completionHandler:")] public bool EnqueueIORequestWithDataErrorCompletionHandler(NSMutableData? data, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
+    [Selector("hostPipe")]
+    public IOUSBHostPipe HostPipe { get; }
+    [Selector("streamID")]
+    public NSUInteger StreamID { get; }
+    [Selector("abortWithOption:error:")]
+    public bool AbortWithOptionError(IOUSBHostAbortOption option, out NSError? error);
+    [Selector("abortWithError:")]
+    public bool AbortWithError(out NSError? error);
+    [Selector("sendIORequestWithData:bytesTransferred:error:")]
+    public bool SendIORequestWithDataBytesTransferredError(NSMutableData? data, NSUInteger* bytesTransferred, out NSError? error);
+    [Selector("enqueueIORequestWithData:error:completionHandler:")]
+    public bool EnqueueIORequestWithDataErrorCompletionHandler(NSMutableData? data, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
 }
 
 #endif

@@ -31,12 +31,14 @@ import Standard.ObjC;
 
 public extern objc class VNDetectedPoint : VNPoint
 {
-    [Selector("confidence")] public VNConfidence Confidence { get; }
+    [Selector("confidence")]
+    public VNConfidence Confidence { get; }
 }
 
 public extern objc class VNRecognizedPoint : VNDetectedPoint
 {
-    [Selector("identifier")] public VNRecognizedPointKey Identifier { get; }
+    [Selector("identifier")]
+    public VNRecognizedPointKey Identifier { get; }
 }
 
 #endif

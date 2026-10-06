@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class VZMultipleDirectoryShare : VZDirectoryShare
 {
-    [Selector("directories")] public NSDictionary Directories { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithDirectories:")] public Self InitWithDirectories(NSDictionary directories);
-    [Selector("validateName:error:")] public static bool ValidateNameError(NSString name, out NSError? error);
-    [Selector("canonicalizedNameFromName:")] public static NSString? CanonicalizedNameFromName(NSString name);
+    [Selector("directories")]
+    public NSDictionary Directories { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithDirectories:")]
+    public Self InitWithDirectories(NSDictionary directories);
+    [Selector("validateName:error:")]
+    public static bool ValidateNameError(NSString name, out NSError? error);
+    [Selector("canonicalizedNameFromName:")]
+    public static NSString? CanonicalizedNameFromName(NSString name);
 }
 
 #endif

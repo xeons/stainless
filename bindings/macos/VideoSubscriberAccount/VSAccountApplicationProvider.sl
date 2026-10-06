@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class VSAccountApplicationProvider : NSObject
 {
-    [Selector("localizedDisplayName")] public NSString LocalizedDisplayName { get; }
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("initWithLocalizedDisplayName:identifier:")] public Self InitWithLocalizedDisplayNameIdentifier(NSString localizedDisplayName, NSString identifier);
+    [Selector("localizedDisplayName")]
+    public NSString LocalizedDisplayName { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("initWithLocalizedDisplayName:identifier:")]
+    public Self InitWithLocalizedDisplayNameIdentifier(NSString localizedDisplayName, NSString identifier);
 }
 
 #endif

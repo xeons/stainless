@@ -33,23 +33,32 @@ import Standard.ObjC;
 public extern objc class CalEvent : CalCalendarItem
 {
     /// Deprecated in macOS 10.8.
-    [Selector("isAllDay", "setIsAllDay:")] public bool IsAllDay { get; set; }
+    [Selector("isAllDay", "setIsAllDay:")]
+    public bool IsAllDay { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("location", "setLocation:")] public NSString? Location { get; set; }
+    [Selector("location", "setLocation:")]
+    public NSString? Location { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("recurrenceRule", "setRecurrenceRule:")] public CalRecurrenceRule? RecurrenceRule { get; set; }
+    [Selector("recurrenceRule", "setRecurrenceRule:")]
+    public CalRecurrenceRule? RecurrenceRule { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("startDate", "setStartDate:")] public NSDate? StartDate { get; set; }
+    [Selector("startDate", "setStartDate:")]
+    public NSDate? StartDate { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("endDate", "setEndDate:")] public NSDate? EndDate { get; set; }
+    [Selector("endDate", "setEndDate:")]
+    public NSDate? EndDate { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("attendees")] public NSArray? Attendees { get; }
+    [Selector("attendees")]
+    public NSArray? Attendees { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("isDetached")] public bool IsDetached { get; }
+    [Selector("isDetached")]
+    public bool IsDetached { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("occurrence")] public NSDate? Occurrence { get; }
+    [Selector("occurrence")]
+    public NSDate? Occurrence { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("event")] public static AnyObject? Event();
+    [Selector("event")]
+    public static AnyObject? Event();
 }
 
 #endif

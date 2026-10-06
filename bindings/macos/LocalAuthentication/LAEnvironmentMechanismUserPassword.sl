@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class LAEnvironmentMechanismUserPassword : LAEnvironmentMechanism
 {
-    [Selector("isSet")] public bool IsSet { get; }
+    [Selector("isSet")]
+    public bool IsSet { get; }
 }
 
 #endif

@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class MDLUtility : NSObject
 {
-    [Selector("convertToUSDZ:writeToURL:")] public static void ConvertToUSDZWriteToURL(NSURL inputURL, NSURL outputURL);
+    [Selector("convertToUSDZ:writeToURL:")]
+    public static void ConvertToUSDZWriteToURL(NSURL inputURL, NSURL outputURL);
 }
 
 #endif

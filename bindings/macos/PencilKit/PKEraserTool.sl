@@ -39,13 +39,20 @@ public enum PKEraserType : long
 
 public extern objc class PKEraserTool : PKTool
 {
-    [Selector("eraserType")] public PKEraserType EraserType { get; }
-    [Selector("width")] public CGFloat Width { get; }
-    [Selector("initWithEraserType:")] public Self InitWithEraserType(PKEraserType eraserType);
-    [Selector("initWithEraserType:width:")] public Self InitWithEraserTypeWidth(PKEraserType eraserType, CGFloat width);
-    [Selector("defaultWidthForEraserType:")] public static CGFloat DefaultWidthForEraserType(PKEraserType eraserType);
-    [Selector("minimumWidthForEraserType:")] public static CGFloat MinimumWidthForEraserType(PKEraserType eraserType);
-    [Selector("maximumWidthForEraserType:")] public static CGFloat MaximumWidthForEraserType(PKEraserType eraserType);
+    [Selector("eraserType")]
+    public PKEraserType EraserType { get; }
+    [Selector("width")]
+    public CGFloat Width { get; }
+    [Selector("initWithEraserType:")]
+    public Self InitWithEraserType(PKEraserType eraserType);
+    [Selector("initWithEraserType:width:")]
+    public Self InitWithEraserTypeWidth(PKEraserType eraserType, CGFloat width);
+    [Selector("defaultWidthForEraserType:")]
+    public static CGFloat DefaultWidthForEraserType(PKEraserType eraserType);
+    [Selector("minimumWidthForEraserType:")]
+    public static CGFloat MinimumWidthForEraserType(PKEraserType eraserType);
+    [Selector("maximumWidthForEraserType:")]
+    public static CGFloat MaximumWidthForEraserType(PKEraserType eraserType);
 }
 
 #endif

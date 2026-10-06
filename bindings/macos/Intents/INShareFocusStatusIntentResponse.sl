@@ -42,8 +42,10 @@ public enum INShareFocusStatusIntentResponseCode : long
 
 public extern objc class INShareFocusStatusIntentResponse : INIntentResponse
 {
-    [Selector("code")] public INShareFocusStatusIntentResponseCode Code { get; }
-    [Selector("initWithCode:userActivity:")] public Self InitWithCodeUserActivity(INShareFocusStatusIntentResponseCode code, NSUserActivity? userActivity);
+    [Selector("code")]
+    public INShareFocusStatusIntentResponseCode Code { get; }
+    [Selector("initWithCode:userActivity:")]
+    public Self InitWithCodeUserActivity(INShareFocusStatusIntentResponseCode code, NSUserActivity? userActivity);
 }
 
 #endif

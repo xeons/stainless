@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class AMWorkspace : NSObject
 {
-    [Selector("sharedWorkspace")] public static AMWorkspace? SharedWorkspace { get; }
-    [Selector("runWorkflowAtPath:withInput:error:")] public AnyObject? RunWorkflowAtPathWithInputError(NSString? path, AnyObject? input, out NSError? error);
+    [Selector("sharedWorkspace")]
+    public static AMWorkspace? SharedWorkspace { get; }
+    [Selector("runWorkflowAtPath:withInput:error:")]
+    public AnyObject? RunWorkflowAtPathWithInputError(NSString? path, AnyObject? input, out NSError? error);
 }
 
 #endif

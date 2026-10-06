@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class MLModelStructureProgramBlock : NSObject
 {
-    [Selector("inputs")] public NSArray Inputs { get; }
-    [Selector("outputNames")] public NSArray OutputNames { get; }
-    [Selector("operations")] public NSArray Operations { get; }
+    [Selector("inputs")]
+    public NSArray Inputs { get; }
+    [Selector("outputNames")]
+    public NSArray OutputNames { get; }
+    [Selector("operations")]
+    public NSArray Operations { get; }
 }
 
 #endif

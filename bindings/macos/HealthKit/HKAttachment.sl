@@ -34,12 +34,18 @@ import Standard.ObjC;
 
 public extern objc class HKAttachment : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("identifier")] public NSUUID Identifier { get; }
-    [Selector("name")] public NSString Name { get; }
-    [Selector("contentType")] public UTType ContentType { get; }
-    [Selector("size")] public NSInteger Size { get; }
-    [Selector("creationDate")] public NSDate CreationDate { get; }
-    [Selector("metadata")] public NSDictionary? Metadata { get; }
+    [Selector("identifier")]
+    public NSUUID Identifier { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("contentType")]
+    public UTType ContentType { get; }
+    [Selector("size")]
+    public NSInteger Size { get; }
+    [Selector("creationDate")]
+    public NSDate CreationDate { get; }
+    [Selector("metadata")]
+    public NSDictionary? Metadata { get; }
 }
 
 #endif

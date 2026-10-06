@@ -33,104 +33,186 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMDocument : DOMNode
 {
-    [Selector("doctype")] public DOMDocumentType? Doctype { get; }
-    [Selector("implementation")] public DOMImplementation? Implementation { get; }
-    [Selector("documentElement")] public DOMElement? DocumentElement { get; }
-    [Selector("inputEncoding")] public NSString? InputEncoding { get; }
-    [Selector("xmlEncoding")] public NSString? XmlEncoding { get; }
-    [Selector("xmlVersion", "setXmlVersion:")] public NSString? XmlVersion { get; set; }
-    [Selector("xmlStandalone", "setXmlStandalone:")] public bool XmlStandalone { get; set; }
-    [Selector("documentURI", "setDocumentURI:")] public NSString? DocumentURI { get; set; }
-    [Selector("defaultView")] public DOMAbstractView? DefaultView { get; }
-    [Selector("styleSheets")] public DOMStyleSheetList? StyleSheets { get; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("referrer")] public NSString? Referrer { get; }
-    [Selector("domain")] public NSString? Domain { get; }
-    [Selector("URL")] public NSString? URL { get; }
-    [Selector("cookie", "setCookie:")] public NSString? Cookie { get; set; }
-    [Selector("body", "setBody:")] public DOMHTMLElement? Body { get; set; }
-    [Selector("images")] public DOMHTMLCollection? Images { get; }
-    [Selector("applets")] public DOMHTMLCollection? Applets { get; }
-    [Selector("links")] public DOMHTMLCollection? Links { get; }
-    [Selector("forms")] public DOMHTMLCollection? Forms { get; }
-    [Selector("anchors")] public DOMHTMLCollection? Anchors { get; }
-    [Selector("lastModified")] public NSString? LastModified { get; }
-    [Selector("charset", "setCharset:")] public NSString? Charset { get; set; }
-    [Selector("defaultCharset")] public NSString? DefaultCharset { get; }
-    [Selector("readyState")] public NSString? ReadyState { get; }
-    [Selector("characterSet")] public NSString? CharacterSet { get; }
-    [Selector("preferredStylesheetSet")] public NSString? PreferredStylesheetSet { get; }
-    [Selector("selectedStylesheetSet", "setSelectedStylesheetSet:")] public NSString? SelectedStylesheetSet { get; set; }
-    [Selector("activeElement")] public DOMElement? ActiveElement { get; }
-    [Selector("createElement:")] public DOMElement? CreateElement(NSString? tagName);
-    [Selector("createDocumentFragment")] public DOMDocumentFragment? CreateDocumentFragment();
-    [Selector("createTextNode:")] public DOMText? CreateTextNode(NSString? data);
-    [Selector("createComment:")] public DOMComment? CreateComment(NSString? data);
-    [Selector("createCDATASection:")] public DOMCDATASection? CreateCDATASection(NSString? data);
-    [Selector("createProcessingInstruction:data:")] public DOMProcessingInstruction? CreateProcessingInstructionData(NSString? target, NSString? data);
-    [Selector("createAttribute:")] public DOMAttr? CreateAttribute(NSString? name);
-    [Selector("createEntityReference:")] public DOMEntityReference? CreateEntityReference(NSString? name);
-    [Selector("getElementsByTagName:")] public DOMNodeList? GetElementsByTagName(NSString? tagname);
-    [Selector("importNode:deep:")] public DOMNode? ImportNodeDeep(DOMNode? importedNode, bool deep);
-    [Selector("createElementNS:qualifiedName:")] public DOMElement? CreateElementNSQualifiedName(NSString? namespaceURI, NSString? qualifiedName);
-    [Selector("createAttributeNS:qualifiedName:")] public DOMAttr? CreateAttributeNSQualifiedName(NSString? namespaceURI, NSString? qualifiedName);
-    [Selector("getElementsByTagNameNS:localName:")] public DOMNodeList? GetElementsByTagNameNSLocalName(NSString? namespaceURI, NSString? localName);
-    [Selector("adoptNode:")] public DOMNode? AdoptNode(DOMNode? source);
-    [Selector("createEvent:")] public DOMEvent? CreateEvent(NSString? eventType);
-    [Selector("createRange")] public DOMRange? CreateRange();
-    [Selector("createNodeIterator:whatToShow:filter:expandEntityReferences:")] public DOMNodeIterator? CreateNodeIteratorWhatToShowFilterExpandEntityReferences(DOMNode? root, uint whatToShow, DOMNodeFilter? filter, bool expandEntityReferences);
-    [Selector("createTreeWalker:whatToShow:filter:expandEntityReferences:")] public DOMTreeWalker? CreateTreeWalkerWhatToShowFilterExpandEntityReferences(DOMNode? root, uint whatToShow, DOMNodeFilter? filter, bool expandEntityReferences);
-    [Selector("getOverrideStyle:pseudoElement:")] public DOMCSSStyleDeclaration? GetOverrideStylePseudoElement(DOMElement? element, NSString? pseudoElement);
-    [Selector("createExpression:resolver:")] public DOMXPathExpression? CreateExpressionResolver(NSString? expression, DOMXPathNSResolver? resolver);
-    [Selector("createNSResolver:")] public DOMXPathNSResolver? CreateNSResolver(DOMNode? nodeResolver);
-    [Selector("evaluate:contextNode:resolver:type:inResult:")] public DOMXPathResult? EvaluateContextNodeResolverTypeInResult(NSString? expression, DOMNode? contextNode, DOMXPathNSResolver? resolver, ushort type, DOMXPathResult? inResult);
-    [Selector("execCommand:userInterface:value:")] public bool ExecCommandUserInterfaceValue(NSString? command, bool userInterface, NSString? value);
-    [Selector("execCommand:userInterface:")] public bool ExecCommandUserInterface(NSString? command, bool userInterface);
-    [Selector("execCommand:")] public bool ExecCommand(NSString? command);
-    [Selector("queryCommandEnabled:")] public bool QueryCommandEnabled(NSString? command);
-    [Selector("queryCommandIndeterm:")] public bool QueryCommandIndeterm(NSString? command);
-    [Selector("queryCommandState:")] public bool QueryCommandState(NSString? command);
-    [Selector("queryCommandSupported:")] public bool QueryCommandSupported(NSString? command);
-    [Selector("queryCommandValue:")] public NSString? QueryCommandValue(NSString? command);
-    [Selector("getElementsByName:")] public DOMNodeList? GetElementsByName(NSString? elementName);
-    [Selector("elementFromPoint:y:")] public DOMElement? ElementFromPointY(int x, int y);
-    [Selector("createCSSStyleDeclaration")] public DOMCSSStyleDeclaration? CreateCSSStyleDeclaration();
-    [Selector("getComputedStyle:pseudoElement:")] public DOMCSSStyleDeclaration? GetComputedStylePseudoElement(DOMElement? element, NSString? pseudoElement);
-    [Selector("getMatchedCSSRules:pseudoElement:")] public DOMCSSRuleList? GetMatchedCSSRulesPseudoElement(DOMElement? element, NSString? pseudoElement);
-    [Selector("getMatchedCSSRules:pseudoElement:authorOnly:")] public DOMCSSRuleList? GetMatchedCSSRulesPseudoElementAuthorOnly(DOMElement? element, NSString? pseudoElement, bool authorOnly);
-    [Selector("getElementsByClassName:")] public DOMNodeList? GetElementsByClassName(NSString? classNames);
-    [Selector("hasFocus")] public bool HasFocus();
-    [Selector("webkitCancelFullScreen")] public void WebkitCancelFullScreen();
-    [Selector("getElementById:")] public DOMElement? GetElementById(NSString? elementId);
-    [Selector("querySelector:")] public DOMElement? QuerySelector(NSString? selectors);
-    [Selector("querySelectorAll:")] public DOMNodeList? QuerySelectorAll(NSString? selectors);
+    [Selector("doctype")]
+    public DOMDocumentType? Doctype { get; }
+    [Selector("implementation")]
+    public DOMImplementation? Implementation { get; }
+    [Selector("documentElement")]
+    public DOMElement? DocumentElement { get; }
+    [Selector("inputEncoding")]
+    public NSString? InputEncoding { get; }
+    [Selector("xmlEncoding")]
+    public NSString? XmlEncoding { get; }
+    [Selector("xmlVersion", "setXmlVersion:")]
+    public NSString? XmlVersion { get; set; }
+    [Selector("xmlStandalone", "setXmlStandalone:")]
+    public bool XmlStandalone { get; set; }
+    [Selector("documentURI", "setDocumentURI:")]
+    public NSString? DocumentURI { get; set; }
+    [Selector("defaultView")]
+    public DOMAbstractView? DefaultView { get; }
+    [Selector("styleSheets")]
+    public DOMStyleSheetList? StyleSheets { get; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("referrer")]
+    public NSString? Referrer { get; }
+    [Selector("domain")]
+    public NSString? Domain { get; }
+    [Selector("URL")]
+    public NSString? URL { get; }
+    [Selector("cookie", "setCookie:")]
+    public NSString? Cookie { get; set; }
+    [Selector("body", "setBody:")]
+    public DOMHTMLElement? Body { get; set; }
+    [Selector("images")]
+    public DOMHTMLCollection? Images { get; }
+    [Selector("applets")]
+    public DOMHTMLCollection? Applets { get; }
+    [Selector("links")]
+    public DOMHTMLCollection? Links { get; }
+    [Selector("forms")]
+    public DOMHTMLCollection? Forms { get; }
+    [Selector("anchors")]
+    public DOMHTMLCollection? Anchors { get; }
+    [Selector("lastModified")]
+    public NSString? LastModified { get; }
+    [Selector("charset", "setCharset:")]
+    public NSString? Charset { get; set; }
+    [Selector("defaultCharset")]
+    public NSString? DefaultCharset { get; }
+    [Selector("readyState")]
+    public NSString? ReadyState { get; }
+    [Selector("characterSet")]
+    public NSString? CharacterSet { get; }
+    [Selector("preferredStylesheetSet")]
+    public NSString? PreferredStylesheetSet { get; }
+    [Selector("selectedStylesheetSet", "setSelectedStylesheetSet:")]
+    public NSString? SelectedStylesheetSet { get; set; }
+    [Selector("activeElement")]
+    public DOMElement? ActiveElement { get; }
+    [Selector("createElement:")]
+    public DOMElement? CreateElement(NSString? tagName);
+    [Selector("createDocumentFragment")]
+    public DOMDocumentFragment? CreateDocumentFragment();
+    [Selector("createTextNode:")]
+    public DOMText? CreateTextNode(NSString? data);
+    [Selector("createComment:")]
+    public DOMComment? CreateComment(NSString? data);
+    [Selector("createCDATASection:")]
+    public DOMCDATASection? CreateCDATASection(NSString? data);
+    [Selector("createProcessingInstruction:data:")]
+    public DOMProcessingInstruction? CreateProcessingInstructionData(NSString? target, NSString? data);
+    [Selector("createAttribute:")]
+    public DOMAttr? CreateAttribute(NSString? name);
+    [Selector("createEntityReference:")]
+    public DOMEntityReference? CreateEntityReference(NSString? name);
+    [Selector("getElementsByTagName:")]
+    public DOMNodeList? GetElementsByTagName(NSString? tagname);
+    [Selector("importNode:deep:")]
+    public DOMNode? ImportNodeDeep(DOMNode? importedNode, bool deep);
+    [Selector("createElementNS:qualifiedName:")]
+    public DOMElement? CreateElementNSQualifiedName(NSString? namespaceURI, NSString? qualifiedName);
+    [Selector("createAttributeNS:qualifiedName:")]
+    public DOMAttr? CreateAttributeNSQualifiedName(NSString? namespaceURI, NSString? qualifiedName);
+    [Selector("getElementsByTagNameNS:localName:")]
+    public DOMNodeList? GetElementsByTagNameNSLocalName(NSString? namespaceURI, NSString? localName);
+    [Selector("adoptNode:")]
+    public DOMNode? AdoptNode(DOMNode? source);
+    [Selector("createEvent:")]
+    public DOMEvent? CreateEvent(NSString? eventType);
+    [Selector("createRange")]
+    public DOMRange? CreateRange();
+    [Selector("createNodeIterator:whatToShow:filter:expandEntityReferences:")]
+    public DOMNodeIterator? CreateNodeIteratorWhatToShowFilterExpandEntityReferences(DOMNode? root, uint whatToShow, DOMNodeFilter? filter, bool expandEntityReferences);
+    [Selector("createTreeWalker:whatToShow:filter:expandEntityReferences:")]
+    public DOMTreeWalker? CreateTreeWalkerWhatToShowFilterExpandEntityReferences(DOMNode? root, uint whatToShow, DOMNodeFilter? filter, bool expandEntityReferences);
+    [Selector("getOverrideStyle:pseudoElement:")]
+    public DOMCSSStyleDeclaration? GetOverrideStylePseudoElement(DOMElement? element, NSString? pseudoElement);
+    [Selector("createExpression:resolver:")]
+    public DOMXPathExpression? CreateExpressionResolver(NSString? expression, DOMXPathNSResolver? resolver);
+    [Selector("createNSResolver:")]
+    public DOMXPathNSResolver? CreateNSResolver(DOMNode? nodeResolver);
+    [Selector("evaluate:contextNode:resolver:type:inResult:")]
+    public DOMXPathResult? EvaluateContextNodeResolverTypeInResult(NSString? expression, DOMNode? contextNode, DOMXPathNSResolver? resolver, ushort type, DOMXPathResult? inResult);
+    [Selector("execCommand:userInterface:value:")]
+    public bool ExecCommandUserInterfaceValue(NSString? command, bool userInterface, NSString? value);
+    [Selector("execCommand:userInterface:")]
+    public bool ExecCommandUserInterface(NSString? command, bool userInterface);
+    [Selector("execCommand:")]
+    public bool ExecCommand(NSString? command);
+    [Selector("queryCommandEnabled:")]
+    public bool QueryCommandEnabled(NSString? command);
+    [Selector("queryCommandIndeterm:")]
+    public bool QueryCommandIndeterm(NSString? command);
+    [Selector("queryCommandState:")]
+    public bool QueryCommandState(NSString? command);
+    [Selector("queryCommandSupported:")]
+    public bool QueryCommandSupported(NSString? command);
+    [Selector("queryCommandValue:")]
+    public NSString? QueryCommandValue(NSString? command);
+    [Selector("getElementsByName:")]
+    public DOMNodeList? GetElementsByName(NSString? elementName);
+    [Selector("elementFromPoint:y:")]
+    public DOMElement? ElementFromPointY(int x, int y);
+    [Selector("createCSSStyleDeclaration")]
+    public DOMCSSStyleDeclaration? CreateCSSStyleDeclaration();
+    [Selector("getComputedStyle:pseudoElement:")]
+    public DOMCSSStyleDeclaration? GetComputedStylePseudoElement(DOMElement? element, NSString? pseudoElement);
+    [Selector("getMatchedCSSRules:pseudoElement:")]
+    public DOMCSSRuleList? GetMatchedCSSRulesPseudoElement(DOMElement? element, NSString? pseudoElement);
+    [Selector("getMatchedCSSRules:pseudoElement:authorOnly:")]
+    public DOMCSSRuleList? GetMatchedCSSRulesPseudoElementAuthorOnly(DOMElement? element, NSString? pseudoElement, bool authorOnly);
+    [Selector("getElementsByClassName:")]
+    public DOMNodeList? GetElementsByClassName(NSString? classNames);
+    [Selector("hasFocus")]
+    public bool HasFocus();
+    [Selector("webkitCancelFullScreen")]
+    public void WebkitCancelFullScreen();
+    [Selector("getElementById:")]
+    public DOMElement? GetElementById(NSString? elementId);
+    [Selector("querySelector:")]
+    public DOMElement? QuerySelector(NSString? selectors);
+    [Selector("querySelectorAll:")]
+    public DOMNodeList? QuerySelectorAll(NSString? selectors);
 }
 
 /// DOMDocumentDeprecated, a category of DOMDocument.
 public extern objc class DOMDocument
 {
     /// Deprecated in macOS 10.5.
-    [Selector("createProcessingInstruction::")] public DOMProcessingInstruction? CreateProcessingInstruction(NSString? target, NSString? data);
+    [Selector("createProcessingInstruction::")]
+    public DOMProcessingInstruction? CreateProcessingInstruction(NSString? target, NSString? data);
     /// Deprecated in macOS 10.5.
-    [Selector("importNode::")] public DOMNode? ImportNode(DOMNode? importedNode, bool deep);
+    [Selector("importNode::")]
+    public DOMNode? ImportNode(DOMNode? importedNode, bool deep);
     /// Deprecated in macOS 10.5.
-    [Selector("createElementNS::")] public DOMElement? CreateElementNS(NSString? namespaceURI, NSString? qualifiedName);
+    [Selector("createElementNS::")]
+    public DOMElement? CreateElementNS(NSString? namespaceURI, NSString? qualifiedName);
     /// Deprecated in macOS 10.5.
-    [Selector("createAttributeNS::")] public DOMAttr? CreateAttributeNS(NSString? namespaceURI, NSString? qualifiedName);
+    [Selector("createAttributeNS::")]
+    public DOMAttr? CreateAttributeNS(NSString? namespaceURI, NSString? qualifiedName);
     /// Deprecated in macOS 10.5.
-    [Selector("getElementsByTagNameNS::")] public DOMNodeList? GetElementsByTagNameNS(NSString? namespaceURI, NSString? localName);
+    [Selector("getElementsByTagNameNS::")]
+    public DOMNodeList? GetElementsByTagNameNS(NSString? namespaceURI, NSString? localName);
     /// Deprecated in macOS 10.5.
-    [Selector("createNodeIterator::::")] public DOMNodeIterator? CreateNodeIterator(DOMNode? root, uint whatToShow, DOMNodeFilter? filter, bool expandEntityReferences);
+    [Selector("createNodeIterator::::")]
+    public DOMNodeIterator? CreateNodeIterator(DOMNode? root, uint whatToShow, DOMNodeFilter? filter, bool expandEntityReferences);
     /// Deprecated in macOS 10.5.
-    [Selector("createTreeWalker::::")] public DOMTreeWalker? CreateTreeWalker(DOMNode? root, uint whatToShow, DOMNodeFilter? filter, bool expandEntityReferences);
+    [Selector("createTreeWalker::::")]
+    public DOMTreeWalker? CreateTreeWalker(DOMNode? root, uint whatToShow, DOMNodeFilter? filter, bool expandEntityReferences);
     /// Deprecated in macOS 10.5.
-    [Selector("getOverrideStyle::")] public DOMCSSStyleDeclaration? GetOverrideStyle(DOMElement? element, NSString? pseudoElement);
+    [Selector("getOverrideStyle::")]
+    public DOMCSSStyleDeclaration? GetOverrideStyle(DOMElement? element, NSString? pseudoElement);
     /// Deprecated in macOS 10.5.
-    [Selector("createExpression::")] public DOMXPathExpression? CreateExpression(NSString? expression, DOMXPathNSResolver? resolver);
+    [Selector("createExpression::")]
+    public DOMXPathExpression? CreateExpression(NSString? expression, DOMXPathNSResolver? resolver);
     /// Deprecated in macOS 10.5.
-    [Selector("evaluate:::::")] public DOMXPathResult? Evaluate(NSString? expression, DOMNode? contextNode, DOMXPathNSResolver? resolver, ushort type, DOMXPathResult? inResult);
+    [Selector("evaluate:::::")]
+    public DOMXPathResult? Evaluate(NSString? expression, DOMNode? contextNode, DOMXPathNSResolver? resolver, ushort type, DOMXPathResult? inResult);
     /// Deprecated in macOS 10.5.
-    [Selector("getComputedStyle::")] public DOMCSSStyleDeclaration? GetComputedStyle(DOMElement? element, NSString? pseudoElement);
+    [Selector("getComputedStyle::")]
+    public DOMCSSStyleDeclaration? GetComputedStyle(DOMElement? element, NSString? pseudoElement);
 }
 
 #endif

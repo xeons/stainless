@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INGetReservationDetailsIntent : INIntent
 {
-    [Selector("reservationContainerReference")] public INSpeakableString? ReservationContainerReference { get; }
-    [Selector("reservationItemReferences")] public NSArray? ReservationItemReferences { get; }
-    [Selector("initWithReservationContainerReference:reservationItemReferences:")] public Self InitWithReservationContainerReferenceReservationItemReferences(INSpeakableString? reservationContainerReference, NSArray? reservationItemReferences);
+    [Selector("reservationContainerReference")]
+    public INSpeakableString? ReservationContainerReference { get; }
+    [Selector("reservationItemReferences")]
+    public NSArray? ReservationItemReferences { get; }
+    [Selector("initWithReservationContainerReference:reservationItemReferences:")]
+    public Self InitWithReservationContainerReferenceReservationItemReferences(INSpeakableString? reservationContainerReference, NSArray? reservationItemReferences);
 }
 
 #endif

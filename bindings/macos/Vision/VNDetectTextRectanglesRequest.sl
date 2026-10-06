@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class VNDetectTextRectanglesRequest : VNImageBasedRequest
 {
-    [Selector("reportCharacterBoxes", "setReportCharacterBoxes:")] public bool ReportCharacterBoxes { get; set; }
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("reportCharacterBoxes", "setReportCharacterBoxes:")]
+    public bool ReportCharacterBoxes { get; set; }
+    [Selector("results")]
+    public NSArray? Results { get; }
 }
 
 #endif

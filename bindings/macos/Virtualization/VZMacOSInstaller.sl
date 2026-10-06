@@ -36,11 +36,16 @@ public objc closure void VZMacOSInstallerInstallWithCompletionHandlerCompletionH
 
 public extern objc class VZMacOSInstaller : NSObject
 {
-    [Selector("progress")] public NSProgress Progress { get; }
-    [Selector("virtualMachine")] public VZVirtualMachine VirtualMachine { get; }
-    [Selector("restoreImageURL")] public NSURL RestoreImageURL { get; }
-    [Selector("initWithVirtualMachine:restoreImageURL:")] public Self InitWithVirtualMachineRestoreImageURL(VZVirtualMachine virtualMachine, NSURL restoreImageFileURL);
-    [Selector("installWithCompletionHandler:")] public void InstallWithCompletionHandler(VZMacOSInstallerInstallWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("progress")]
+    public NSProgress Progress { get; }
+    [Selector("virtualMachine")]
+    public VZVirtualMachine VirtualMachine { get; }
+    [Selector("restoreImageURL")]
+    public NSURL RestoreImageURL { get; }
+    [Selector("initWithVirtualMachine:restoreImageURL:")]
+    public Self InitWithVirtualMachineRestoreImageURL(VZVirtualMachine virtualMachine, NSURL restoreImageFileURL);
+    [Selector("installWithCompletionHandler:")]
+    public void InstallWithCompletionHandler(VZMacOSInstallerInstallWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 #endif
 

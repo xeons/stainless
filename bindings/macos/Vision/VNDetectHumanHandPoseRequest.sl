@@ -91,23 +91,34 @@ public extern "C" VNHumanHandPoseObservationJointsGroupName VNHumanHandPoseObser
 
 public extern objc class VNHumanHandPoseObservation : VNRecognizedPointsObservation
 {
-    [Selector("availableJointNames")] public NSArray AvailableJointNames { get; }
-    [Selector("availableJointsGroupNames")] public NSArray AvailableJointsGroupNames { get; }
-    [Selector("chirality")] public VNChirality Chirality { get; }
-    [Selector("recognizedPointForJointName:error:")] public VNRecognizedPoint? RecognizedPointForJointNameError(VNHumanHandPoseObservationJointName jointName, out NSError? error);
-    [Selector("recognizedPointsForJointsGroupName:error:")] public NSDictionary? RecognizedPointsForJointsGroupNameError(VNHumanHandPoseObservationJointsGroupName jointsGroupName, out NSError? error);
+    [Selector("availableJointNames")]
+    public NSArray AvailableJointNames { get; }
+    [Selector("availableJointsGroupNames")]
+    public NSArray AvailableJointsGroupNames { get; }
+    [Selector("chirality")]
+    public VNChirality Chirality { get; }
+    [Selector("recognizedPointForJointName:error:")]
+    public VNRecognizedPoint? RecognizedPointForJointNameError(VNHumanHandPoseObservationJointName jointName, out NSError? error);
+    [Selector("recognizedPointsForJointsGroupName:error:")]
+    public NSDictionary? RecognizedPointsForJointsGroupNameError(VNHumanHandPoseObservationJointsGroupName jointsGroupName, out NSError? error);
 }
 
 public extern objc class VNDetectHumanHandPoseRequest : VNImageBasedRequest
 {
-    [Selector("maximumHandCount", "setMaximumHandCount:")] public NSUInteger MaximumHandCount { get; set; }
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("maximumHandCount", "setMaximumHandCount:")]
+    public NSUInteger MaximumHandCount { get; set; }
+    [Selector("results")]
+    public NSArray? Results { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("supportedJointNamesForRevision:error:")] public static NSArray? SupportedJointNamesForRevisionError(NSUInteger revision, out NSError? error);
-    [Selector("supportedJointNamesAndReturnError:")] public NSArray? SupportedJointNamesAndReturnError(out NSError? error);
+    [Selector("supportedJointNamesForRevision:error:")]
+    public static NSArray? SupportedJointNamesForRevisionError(NSUInteger revision, out NSError? error);
+    [Selector("supportedJointNamesAndReturnError:")]
+    public NSArray? SupportedJointNamesAndReturnError(out NSError? error);
     /// Deprecated in macOS 14.0.
-    [Selector("supportedJointsGroupNamesForRevision:error:")] public static NSArray? SupportedJointsGroupNamesForRevisionError(NSUInteger revision, out NSError? error);
-    [Selector("supportedJointsGroupNamesAndReturnError:")] public NSArray? SupportedJointsGroupNamesAndReturnError(out NSError? error);
+    [Selector("supportedJointsGroupNamesForRevision:error:")]
+    public static NSArray? SupportedJointsGroupNamesForRevisionError(NSUInteger revision, out NSError? error);
+    [Selector("supportedJointsGroupNamesAndReturnError:")]
+    public NSArray? SupportedJointsGroupNamesAndReturnError(out NSError? error);
 }
 
 #endif

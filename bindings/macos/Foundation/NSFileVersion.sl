@@ -46,27 +46,48 @@ public objc closure void NSFileVersionGetNonlocalVersionsOfItemAtURLCompletionHa
 
 public extern objc class NSFileVersion : NSObject
 {
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("localizedName")] public NSString? LocalizedName { get; }
-    [Selector("localizedNameOfSavingComputer")] public NSString? LocalizedNameOfSavingComputer { get; }
-    [Selector("originatorNameComponents")] public NSPersonNameComponents? OriginatorNameComponents { get; }
-    [Selector("modificationDate")] public NSDate? ModificationDate { get; }
-    [Selector("persistentIdentifier")] public NSCoding PersistentIdentifier { get; }
-    [Selector("isConflict")] public bool Conflict { get; }
-    [Selector("isResolved", "setResolved:")] public bool Resolved { get; set; }
-    [Selector("isDiscardable", "setDiscardable:")] public bool Discardable { get; set; }
-    [Selector("hasLocalContents")] public bool HasLocalContents { get; }
-    [Selector("hasThumbnail")] public bool HasThumbnail { get; }
-    [Selector("currentVersionOfItemAtURL:")] public static NSFileVersion? CurrentVersionOfItemAtURL(NSURL url);
-    [Selector("otherVersionsOfItemAtURL:")] public static NSArray? OtherVersionsOfItemAtURL(NSURL url);
-    [Selector("unresolvedConflictVersionsOfItemAtURL:")] public static NSArray? UnresolvedConflictVersionsOfItemAtURL(NSURL url);
-    [Selector("getNonlocalVersionsOfItemAtURL:completionHandler:")] public static void GetNonlocalVersionsOfItemAtURLCompletionHandler(NSURL url, NSFileVersionGetNonlocalVersionsOfItemAtURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("versionOfItemAtURL:forPersistentIdentifier:")] public static NSFileVersion? VersionOfItemAtURLForPersistentIdentifier(NSURL url, AnyObject persistentIdentifier);
-    [Selector("addVersionOfItemAtURL:withContentsOfURL:options:error:")] public static NSFileVersion? AddVersionOfItemAtURLWithContentsOfURLOptionsError(NSURL url, NSURL contentsURL, NSFileVersionAddingOptions options, out NSError? outError);
-    [Selector("temporaryDirectoryURLForNewVersionOfItemAtURL:")] public static NSURL TemporaryDirectoryURLForNewVersionOfItemAtURL(NSURL url);
-    [Selector("replaceItemAtURL:options:error:")] public NSURL? ReplaceItemAtURLOptionsError(NSURL url, NSFileVersionReplacingOptions options, out NSError? error);
-    [Selector("removeAndReturnError:")] public bool RemoveAndReturnError(out NSError? outError);
-    [Selector("removeOtherVersionsOfItemAtURL:error:")] public static bool RemoveOtherVersionsOfItemAtURLError(NSURL url, out NSError? outError);
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("localizedName")]
+    public NSString? LocalizedName { get; }
+    [Selector("localizedNameOfSavingComputer")]
+    public NSString? LocalizedNameOfSavingComputer { get; }
+    [Selector("originatorNameComponents")]
+    public NSPersonNameComponents? OriginatorNameComponents { get; }
+    [Selector("modificationDate")]
+    public NSDate? ModificationDate { get; }
+    [Selector("persistentIdentifier")]
+    public NSCoding PersistentIdentifier { get; }
+    [Selector("isConflict")]
+    public bool Conflict { get; }
+    [Selector("isResolved", "setResolved:")]
+    public bool Resolved { get; set; }
+    [Selector("isDiscardable", "setDiscardable:")]
+    public bool Discardable { get; set; }
+    [Selector("hasLocalContents")]
+    public bool HasLocalContents { get; }
+    [Selector("hasThumbnail")]
+    public bool HasThumbnail { get; }
+    [Selector("currentVersionOfItemAtURL:")]
+    public static NSFileVersion? CurrentVersionOfItemAtURL(NSURL url);
+    [Selector("otherVersionsOfItemAtURL:")]
+    public static NSArray? OtherVersionsOfItemAtURL(NSURL url);
+    [Selector("unresolvedConflictVersionsOfItemAtURL:")]
+    public static NSArray? UnresolvedConflictVersionsOfItemAtURL(NSURL url);
+    [Selector("getNonlocalVersionsOfItemAtURL:completionHandler:")]
+    public static void GetNonlocalVersionsOfItemAtURLCompletionHandler(NSURL url, NSFileVersionGetNonlocalVersionsOfItemAtURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("versionOfItemAtURL:forPersistentIdentifier:")]
+    public static NSFileVersion? VersionOfItemAtURLForPersistentIdentifier(NSURL url, AnyObject persistentIdentifier);
+    [Selector("addVersionOfItemAtURL:withContentsOfURL:options:error:")]
+    public static NSFileVersion? AddVersionOfItemAtURLWithContentsOfURLOptionsError(NSURL url, NSURL contentsURL, NSFileVersionAddingOptions options, out NSError? outError);
+    [Selector("temporaryDirectoryURLForNewVersionOfItemAtURL:")]
+    public static NSURL TemporaryDirectoryURLForNewVersionOfItemAtURL(NSURL url);
+    [Selector("replaceItemAtURL:options:error:")]
+    public NSURL? ReplaceItemAtURLOptionsError(NSURL url, NSFileVersionReplacingOptions options, out NSError? error);
+    [Selector("removeAndReturnError:")]
+    public bool RemoveAndReturnError(out NSError? outError);
+    [Selector("removeOtherVersionsOfItemAtURL:error:")]
+    public static bool RemoveOtherVersionsOfItemAtURLError(NSURL url, out NSError? outError);
 }
 
 #endif

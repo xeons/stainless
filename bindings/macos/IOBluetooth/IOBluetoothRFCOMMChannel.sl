@@ -34,42 +34,80 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothRFCOMMChannel : IOBluetoothObject, NSPortDelegate, NSStreamDelegate
 {
-    [Selector("registerForChannelOpenNotifications:selector:")] public static IOBluetoothUserNotification? RegisterForChannelOpenNotificationsSelector(AnyObject? object, Selector selector);
-    [Selector("registerForChannelOpenNotifications:selector:withChannelID:direction:")] public static IOBluetoothUserNotification? RegisterForChannelOpenNotificationsSelectorWithChannelIDDirection(AnyObject? object, Selector selector, BluetoothRFCOMMChannelID channelID, IOBluetoothUserNotificationChannelDirection inDirection);
-    [Selector("withRFCOMMChannelRef:")] public static Self? WithRFCOMMChannelRef(IOBluetoothRFCOMMChannelRef rfcommChannelRef);
-    [Selector("withObjectID:")] public static Self? WithObjectID(IOBluetoothObjectID objectID);
-    [Selector("getRFCOMMChannelRef")] public IOBluetoothRFCOMMChannelRef GetRFCOMMChannelRef();
-    [Selector("closeChannel")] public IOReturn CloseChannel();
-    [Selector("isOpen")] public bool IsOpen();
-    [Selector("getMTU")] public BluetoothRFCOMMMTU GetMTU();
-    [Selector("isTransmissionPaused")] public bool IsTransmissionPaused();
+    [Selector("registerForChannelOpenNotifications:selector:")]
+    public static IOBluetoothUserNotification? RegisterForChannelOpenNotificationsSelector(AnyObject? object, Selector selector);
+    [Selector("registerForChannelOpenNotifications:selector:withChannelID:direction:")]
+    public static IOBluetoothUserNotification? RegisterForChannelOpenNotificationsSelectorWithChannelIDDirection(AnyObject? object, Selector selector, BluetoothRFCOMMChannelID channelID, IOBluetoothUserNotificationChannelDirection inDirection);
+    [Selector("withRFCOMMChannelRef:")]
+    public static Self? WithRFCOMMChannelRef(IOBluetoothRFCOMMChannelRef rfcommChannelRef);
+    [Selector("withObjectID:")]
+    public static Self? WithObjectID(IOBluetoothObjectID objectID);
+    [Selector("getRFCOMMChannelRef")]
+    public IOBluetoothRFCOMMChannelRef GetRFCOMMChannelRef();
+    [Selector("closeChannel")]
+    public IOReturn CloseChannel();
+    [Selector("isOpen")]
+    public bool IsOpen();
+    [Selector("getMTU")]
+    public BluetoothRFCOMMMTU GetMTU();
+    [Selector("isTransmissionPaused")]
+    public bool IsTransmissionPaused();
     /// Deprecated in macOS 10.5.
-    [Selector("write:length:sleep:")] public IOReturn WriteLengthSleep(void* data, UInt16 length, bool sleep);
-    [Selector("writeAsync:length:refcon:")] public IOReturn WriteAsyncLengthRefcon(void* data, UInt16 length, void* refcon);
-    [Selector("writeSync:length:")] public IOReturn WriteSyncLength(void* data, UInt16 length);
+    [Selector("write:length:sleep:")]
+    public IOReturn WriteLengthSleep(void* data, UInt16 length, bool sleep);
+    [Selector("writeAsync:length:refcon:")]
+    public IOReturn WriteAsyncLengthRefcon(void* data, UInt16 length, void* refcon);
+    [Selector("writeSync:length:")]
+    public IOReturn WriteSyncLength(void* data, UInt16 length);
     /// Deprecated in macOS 10.5.
-    [Selector("writeSimple:length:sleep:bytesSent:")] public IOReturn WriteSimpleLengthSleepBytesSent(void* data, UInt16 length, bool sleep, UInt32* numBytesSent);
-    [Selector("setSerialParameters:dataBits:parity:stopBits:")] public IOReturn SetSerialParametersDataBitsParityStopBits(UInt32 speed, UInt8 nBits, BluetoothRFCOMMParityType parity, UInt8 bitStop);
-    [Selector("sendRemoteLineStatus:")] public IOReturn SendRemoteLineStatus(BluetoothRFCOMMLineStatus lineStatus);
-    [Selector("setDelegate:")] public IOReturn SetDelegate(AnyObject? @delegate);
-    [Selector("delegate")] public AnyObject? Delegate();
-    [Selector("getChannelID")] public BluetoothRFCOMMChannelID GetChannelID();
-    [Selector("isIncoming")] public bool IsIncoming();
-    [Selector("getDevice")] public IOBluetoothDevice? GetDevice();
-    [Selector("getObjectID")] public IOBluetoothObjectID GetObjectID();
-    [Selector("registerForChannelCloseNotification:selector:")] public IOBluetoothUserNotification? RegisterForChannelCloseNotificationSelector(AnyObject? observer, Selector inSelector);
+    [Selector("writeSimple:length:sleep:bytesSent:")]
+    public IOReturn WriteSimpleLengthSleepBytesSent(void* data, UInt16 length, bool sleep, UInt32* numBytesSent);
+    [Selector("setSerialParameters:dataBits:parity:stopBits:")]
+    public IOReturn SetSerialParametersDataBitsParityStopBits(UInt32 speed, UInt8 nBits, BluetoothRFCOMMParityType parity, UInt8 bitStop);
+    [Selector("sendRemoteLineStatus:")]
+    public IOReturn SendRemoteLineStatus(BluetoothRFCOMMLineStatus lineStatus);
+    [Selector("setDelegate:")]
+    public IOReturn SetDelegate(AnyObject? @delegate);
+    [Selector("delegate")]
+    public AnyObject? Delegate();
+    [Selector("getChannelID")]
+    public BluetoothRFCOMMChannelID GetChannelID();
+    [Selector("isIncoming")]
+    public bool IsIncoming();
+    [Selector("getDevice")]
+    public IOBluetoothDevice? GetDevice();
+    [Selector("getObjectID")]
+    public IOBluetoothObjectID GetObjectID();
+    [Selector("registerForChannelCloseNotification:selector:")]
+    public IOBluetoothUserNotification? RegisterForChannelCloseNotificationSelector(AnyObject? observer, Selector inSelector);
 }
 
 public objc interface IOBluetoothRFCOMMChannelDelegate
 {
-    [Optional] [Selector("rfcommChannelData:data:length:")] void RfcommChannelDataDataLength(IOBluetoothRFCOMMChannel? rfcommChannel, void* dataPointer, nuint dataLength);
-    [Optional] [Selector("rfcommChannelOpenComplete:status:")] void RfcommChannelOpenCompleteStatus(IOBluetoothRFCOMMChannel? rfcommChannel, IOReturn error);
-    [Optional] [Selector("rfcommChannelClosed:")] void RfcommChannelClosed(IOBluetoothRFCOMMChannel? rfcommChannel);
-    [Optional] [Selector("rfcommChannelControlSignalsChanged:")] void RfcommChannelControlSignalsChanged(IOBluetoothRFCOMMChannel? rfcommChannel);
-    [Optional] [Selector("rfcommChannelFlowControlChanged:")] void RfcommChannelFlowControlChanged(IOBluetoothRFCOMMChannel? rfcommChannel);
-    [Optional] [Selector("rfcommChannelWriteComplete:refcon:status:")] void RfcommChannelWriteCompleteRefconStatus(IOBluetoothRFCOMMChannel? rfcommChannel, void* refcon, IOReturn error);
-    [Optional] [Selector("rfcommChannelWriteComplete:refcon:status:bytesWritten:")] void RfcommChannelWriteCompleteRefconStatusBytesWritten(IOBluetoothRFCOMMChannel? rfcommChannel, void* refcon, IOReturn error, nuint length);
-    [Optional] [Selector("rfcommChannelQueueSpaceAvailable:")] void RfcommChannelQueueSpaceAvailable(IOBluetoothRFCOMMChannel? rfcommChannel);
+    [Optional]
+    [Selector("rfcommChannelData:data:length:")]
+    void RfcommChannelDataDataLength(IOBluetoothRFCOMMChannel? rfcommChannel, void* dataPointer, nuint dataLength);
+    [Optional]
+    [Selector("rfcommChannelOpenComplete:status:")]
+    void RfcommChannelOpenCompleteStatus(IOBluetoothRFCOMMChannel? rfcommChannel, IOReturn error);
+    [Optional]
+    [Selector("rfcommChannelClosed:")]
+    void RfcommChannelClosed(IOBluetoothRFCOMMChannel? rfcommChannel);
+    [Optional]
+    [Selector("rfcommChannelControlSignalsChanged:")]
+    void RfcommChannelControlSignalsChanged(IOBluetoothRFCOMMChannel? rfcommChannel);
+    [Optional]
+    [Selector("rfcommChannelFlowControlChanged:")]
+    void RfcommChannelFlowControlChanged(IOBluetoothRFCOMMChannel? rfcommChannel);
+    [Optional]
+    [Selector("rfcommChannelWriteComplete:refcon:status:")]
+    void RfcommChannelWriteCompleteRefconStatus(IOBluetoothRFCOMMChannel? rfcommChannel, void* refcon, IOReturn error);
+    [Optional]
+    [Selector("rfcommChannelWriteComplete:refcon:status:bytesWritten:")]
+    void RfcommChannelWriteCompleteRefconStatusBytesWritten(IOBluetoothRFCOMMChannel? rfcommChannel, void* refcon, IOReturn error, nuint length);
+    [Optional]
+    [Selector("rfcommChannelQueueSpaceAvailable:")]
+    void RfcommChannelQueueSpaceAvailable(IOBluetoothRFCOMMChannel? rfcommChannel);
 }
 
 #endif

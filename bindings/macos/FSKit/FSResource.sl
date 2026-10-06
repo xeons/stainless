@@ -42,18 +42,26 @@ public enum FSMatchResult : long
 /// macOS 15.4 and later.
 public extern objc class FSResource : NSObject, NSSecureCoding
 {
-    [Selector("isRevoked")] public bool Revoked { get; }
-    [Selector("makeProxy")] public Self MakeProxy();
-    [Selector("revoke")] public void Revoke();
+    [Selector("isRevoked")]
+    public bool Revoked { get; }
+    [Selector("makeProxy")]
+    public Self MakeProxy();
+    [Selector("revoke")]
+    public void Revoke();
 }
 
 public extern objc class FSMetadataRange : NSObject
 {
-    [Selector("startOffset")] public off_t StartOffset { get; }
-    [Selector("segmentLength")] public ulong SegmentLength { get; }
-    [Selector("segmentCount")] public ulong SegmentCount { get; }
-    [Selector("initWithOffset:segmentLength:segmentCount:")] public Self InitWithOffsetSegmentLengthSegmentCount(off_t startOffset, ulong segmentLength, ulong segmentCount);
-    [Selector("rangeWithOffset:segmentLength:segmentCount:")] public static Self RangeWithOffsetSegmentLengthSegmentCount(off_t startOffset, ulong segmentLength, ulong segmentCount);
+    [Selector("startOffset")]
+    public off_t StartOffset { get; }
+    [Selector("segmentLength")]
+    public ulong SegmentLength { get; }
+    [Selector("segmentCount")]
+    public ulong SegmentCount { get; }
+    [Selector("initWithOffset:segmentLength:segmentCount:")]
+    public Self InitWithOffsetSegmentLengthSegmentCount(off_t startOffset, ulong segmentLength, ulong segmentCount);
+    [Selector("rangeWithOffset:segmentLength:segmentCount:")]
+    public static Self RangeWithOffsetSegmentLengthSegmentCount(off_t startOffset, ulong segmentLength, ulong segmentCount);
 }
 
 public objc closure void FSBlockDeviceResourceReadIntoStartingAtLengthCompletionHandlerCompletionHandlerBlock(nuint arg0, NSError? arg1);
@@ -63,70 +71,101 @@ public objc closure void FSBlockDeviceResourceWriteFromStartingAtLengthCompletio
 /// macOS 15.4 and later.
 public extern objc class FSBlockDeviceResource : FSResource
 {
-    [Selector("BSDName")] public NSString BSDName { get; }
-    [Selector("isWritable")] public bool Writable { get; }
-    [Selector("blockSize")] public ulong BlockSize { get; }
-    [Selector("blockCount")] public ulong BlockCount { get; }
-    [Selector("physicalBlockSize")] public ulong PhysicalBlockSize { get; }
+    [Selector("BSDName")]
+    public NSString BSDName { get; }
+    [Selector("isWritable")]
+    public bool Writable { get; }
+    [Selector("blockSize")]
+    public ulong BlockSize { get; }
+    [Selector("blockCount")]
+    public ulong BlockCount { get; }
+    [Selector("physicalBlockSize")]
+    public ulong PhysicalBlockSize { get; }
     /// macOS 15.4 and later.
-    [Selector("readInto:startingAt:length:completionHandler:")] public void ReadIntoStartingAtLengthCompletionHandler(void* buffer, off_t offset, nuint length, FSBlockDeviceResourceReadIntoStartingAtLengthCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("readInto:startingAt:length:completionHandler:")]
+    public void ReadIntoStartingAtLengthCompletionHandler(void* buffer, off_t offset, nuint length, FSBlockDeviceResourceReadIntoStartingAtLengthCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 15.4 and later.
-    [Selector("readInto:startingAt:length:error:")] public nuint ReadIntoStartingAtLengthError(void* buffer, off_t offset, nuint length, out NSError? error);
+    [Selector("readInto:startingAt:length:error:")]
+    public nuint ReadIntoStartingAtLengthError(void* buffer, off_t offset, nuint length, out NSError? error);
     /// macOS 15.4 and later.
-    [Selector("writeFrom:startingAt:length:completionHandler:")] public void WriteFromStartingAtLengthCompletionHandler(void* buffer, off_t offset, nuint length, FSBlockDeviceResourceWriteFromStartingAtLengthCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("writeFrom:startingAt:length:completionHandler:")]
+    public void WriteFromStartingAtLengthCompletionHandler(void* buffer, off_t offset, nuint length, FSBlockDeviceResourceWriteFromStartingAtLengthCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 15.4 and later.
-    [Selector("writeFrom:startingAt:length:error:")] public nuint WriteFromStartingAtLengthError(void* buffer, off_t offset, nuint length, out NSError? error);
+    [Selector("writeFrom:startingAt:length:error:")]
+    public nuint WriteFromStartingAtLengthError(void* buffer, off_t offset, nuint length, out NSError? error);
     /// macOS 15.4 and later.
-    [Selector("metadataReadInto:startingAt:length:error:")] public bool MetadataReadIntoStartingAtLengthError(void* buffer, off_t offset, nuint length, out NSError? error);
+    [Selector("metadataReadInto:startingAt:length:error:")]
+    public bool MetadataReadIntoStartingAtLengthError(void* buffer, off_t offset, nuint length, out NSError? error);
     /// macOS 15.4 and later.
-    [Selector("metadataWriteFrom:startingAt:length:error:")] public bool MetadataWriteFromStartingAtLengthError(void* buffer, off_t offset, nuint length, out NSError? error);
+    [Selector("metadataWriteFrom:startingAt:length:error:")]
+    public bool MetadataWriteFromStartingAtLengthError(void* buffer, off_t offset, nuint length, out NSError? error);
     /// macOS 15.4 and later.
-    [Selector("delayedMetadataWriteFrom:startingAt:length:error:")] public bool DelayedMetadataWriteFromStartingAtLengthError(void* buffer, off_t offset, nuint length, out NSError? error);
+    [Selector("delayedMetadataWriteFrom:startingAt:length:error:")]
+    public bool DelayedMetadataWriteFromStartingAtLengthError(void* buffer, off_t offset, nuint length, out NSError? error);
     /// macOS 15.4 and later.
-    [Selector("metadataFlushWithError:")] public bool MetadataFlushWithError(out NSError? error);
+    [Selector("metadataFlushWithError:")]
+    public bool MetadataFlushWithError(out NSError? error);
     /// macOS 15.4 and later.
-    [Selector("asynchronousMetadataFlushWithError:")] public bool AsynchronousMetadataFlushWithError(out NSError? error);
+    [Selector("asynchronousMetadataFlushWithError:")]
+    public bool AsynchronousMetadataFlushWithError(out NSError? error);
     /// macOS 15.4 and later.
-    [Selector("metadataClear:withDelayedWrites:error:")] public bool MetadataClearWithDelayedWritesError(NSArray rangesToClear, bool withDelayedWrites, out NSError? error);
+    [Selector("metadataClear:withDelayedWrites:error:")]
+    public bool MetadataClearWithDelayedWritesError(NSArray rangesToClear, bool withDelayedWrites, out NSError? error);
     /// macOS 15.4 and later.
-    [Selector("metadataPurge:error:")] public bool MetadataPurgeError(NSArray rangesToPurge, out NSError? error);
+    [Selector("metadataPurge:error:")]
+    public bool MetadataPurgeError(NSArray rangesToPurge, out NSError? error);
 }
 
 /// macOS 26.0 and later.
 public extern objc class FSGenericURLResource : FSResource
 {
-    [Selector("url")] public NSURL Url { get; }
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL url);
+    [Selector("url")]
+    public NSURL Url { get; }
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL url);
 }
 
 /// macOS 26.0 and later.
 public extern objc class FSPathURLResource : FSResource
 {
-    [Selector("url")] public NSURL Url { get; }
-    [Selector("isWritable")] public bool Writable { get; }
-    [Selector("initWithURL:writable:")] public Self InitWithURLWritable(NSURL URL, bool writable);
+    [Selector("url")]
+    public NSURL Url { get; }
+    [Selector("isWritable")]
+    public bool Writable { get; }
+    [Selector("initWithURL:writable:")]
+    public Self InitWithURLWritable(NSURL URL, bool writable);
 }
 
 /// macOS 15.4 and later.
 public objc interface FSManageableResourceMaintenanceOperations : NSObjectProtocol
 {
     /// macOS 15.4 and later.
-    [Selector("startCheckWithTask:options:error:")] NSProgress? StartCheckWithTaskOptionsError(FSTask task, FSTaskOptions options, out NSError? error);
+    [Selector("startCheckWithTask:options:error:")]
+    NSProgress? StartCheckWithTaskOptionsError(FSTask task, FSTaskOptions options, out NSError? error);
     /// macOS 15.4 and later.
-    [Selector("startFormatWithTask:options:error:")] NSProgress? StartFormatWithTaskOptionsError(FSTask task, FSTaskOptions options, out NSError? error);
+    [Selector("startFormatWithTask:options:error:")]
+    NSProgress? StartFormatWithTaskOptionsError(FSTask task, FSTaskOptions options, out NSError? error);
 }
 
 /// macOS 15.4 and later.
 public extern objc class FSProbeResult : NSObject, NSSecureCoding
 {
-    [Selector("result")] public FSMatchResult Result { get; }
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("containerID")] public FSContainerIdentifier? ContainerID { get; }
-    [Selector("notRecognizedProbeResult")] public static FSProbeResult NotRecognizedProbeResult { get; }
-    [Selector("usableButLimitedProbeResult")] public static FSProbeResult UsableButLimitedProbeResult { get; }
-    [Selector("recognizedProbeResultWithName:containerID:")] public static Self RecognizedProbeResultWithNameContainerID(NSString name, FSContainerIdentifier containerID);
-    [Selector("usableButLimitedProbeResultWithName:containerID:")] public static Self UsableButLimitedProbeResultWithNameContainerID(NSString name, FSContainerIdentifier containerID);
-    [Selector("usableProbeResultWithName:containerID:")] public static Self UsableProbeResultWithNameContainerID(NSString name, FSContainerIdentifier containerID);
+    [Selector("result")]
+    public FSMatchResult Result { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("containerID")]
+    public FSContainerIdentifier? ContainerID { get; }
+    [Selector("notRecognizedProbeResult")]
+    public static FSProbeResult NotRecognizedProbeResult { get; }
+    [Selector("usableButLimitedProbeResult")]
+    public static FSProbeResult UsableButLimitedProbeResult { get; }
+    [Selector("recognizedProbeResultWithName:containerID:")]
+    public static Self RecognizedProbeResultWithNameContainerID(NSString name, FSContainerIdentifier containerID);
+    [Selector("usableButLimitedProbeResultWithName:containerID:")]
+    public static Self UsableButLimitedProbeResultWithNameContainerID(NSString name, FSContainerIdentifier containerID);
+    [Selector("usableProbeResultWithName:containerID:")]
+    public static Self UsableProbeResultWithNameContainerID(NSString name, FSContainerIdentifier containerID);
 }
 
 #endif

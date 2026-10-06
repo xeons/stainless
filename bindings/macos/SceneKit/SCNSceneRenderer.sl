@@ -78,53 +78,101 @@ public objc closure void SCNSceneRendererPrepareObjectsWithCompletionHandlerComp
 
 public objc interface SCNSceneRenderer : NSObjectProtocol
 {
-    [Selector("scene", "setScene:")] SCNScene? Scene { get; set; }
-    [Selector("sceneTime", "setSceneTime:")] NSTimeInterval SceneTime { get; set; }
-    [Selector("delegate", "setDelegate:")] SCNSceneRendererDelegate? Delegate { get; set; }
-    [Selector("isPlaying", "setPlaying:")] bool Playing { get; set; }
-    [Selector("loops", "setLoops:")] bool Loops { get; set; }
-    [Selector("pointOfView", "setPointOfView:")] SCNNode? PointOfView { get; set; }
-    [Selector("autoenablesDefaultLighting", "setAutoenablesDefaultLighting:")] bool AutoenablesDefaultLighting { get; set; }
-    [Selector("isJitteringEnabled", "setJitteringEnabled:")] bool JitteringEnabled { get; set; }
-    [Selector("isTemporalAntialiasingEnabled", "setTemporalAntialiasingEnabled:")] bool TemporalAntialiasingEnabled { get; set; }
-    [Selector("showsStatistics", "setShowsStatistics:")] bool ShowsStatistics { get; set; }
-    [Selector("debugOptions", "setDebugOptions:")] SCNDebugOptions DebugOptions { get; set; }
-    [Selector("overlaySKScene", "setOverlaySKScene:")] SKScene? OverlaySKScene { get; set; }
-    [Selector("renderingAPI")] SCNRenderingAPI RenderingAPI { get; }
-    [Selector("workingColorSpace")] CGColorSpaceRef WorkingColorSpace { get; }
-    [Selector("context")] void* Context { get; }
-    [Selector("currentRenderCommandEncoder")] MTLRenderCommandEncoder? CurrentRenderCommandEncoder { get; }
-    [Selector("currentRenderPassDescriptor")] MTLRenderPassDescriptor? CurrentRenderPassDescriptor { get; }
-    [Selector("device")] MTLDevice? Device { get; }
-    [Selector("colorPixelFormat")] MTLPixelFormat ColorPixelFormat { get; }
-    [Selector("depthPixelFormat")] MTLPixelFormat DepthPixelFormat { get; }
-    [Selector("stencilPixelFormat")] MTLPixelFormat StencilPixelFormat { get; }
-    [Selector("commandQueue")] MTLCommandQueue? CommandQueue { get; }
-    [Selector("audioEngine")] AVAudioEngine AudioEngine { get; }
-    [Selector("audioEnvironmentNode")] AVAudioEnvironmentNode? AudioEnvironmentNode { get; }
-    [Selector("audioListener", "setAudioListener:")] SCNNode? AudioListener { get; set; }
-    [Selector("currentViewport")] CGRect CurrentViewport { get; }
+    [Selector("scene", "setScene:")]
+    SCNScene? Scene { get; set; }
+    [Selector("sceneTime", "setSceneTime:")]
+    NSTimeInterval SceneTime { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    SCNSceneRendererDelegate? Delegate { get; set; }
+    [Selector("isPlaying", "setPlaying:")]
+    bool Playing { get; set; }
+    [Selector("loops", "setLoops:")]
+    bool Loops { get; set; }
+    [Selector("pointOfView", "setPointOfView:")]
+    SCNNode? PointOfView { get; set; }
+    [Selector("autoenablesDefaultLighting", "setAutoenablesDefaultLighting:")]
+    bool AutoenablesDefaultLighting { get; set; }
+    [Selector("isJitteringEnabled", "setJitteringEnabled:")]
+    bool JitteringEnabled { get; set; }
+    [Selector("isTemporalAntialiasingEnabled", "setTemporalAntialiasingEnabled:")]
+    bool TemporalAntialiasingEnabled { get; set; }
+    [Selector("showsStatistics", "setShowsStatistics:")]
+    bool ShowsStatistics { get; set; }
+    [Selector("debugOptions", "setDebugOptions:")]
+    SCNDebugOptions DebugOptions { get; set; }
+    [Selector("overlaySKScene", "setOverlaySKScene:")]
+    SKScene? OverlaySKScene { get; set; }
+    [Selector("renderingAPI")]
+    SCNRenderingAPI RenderingAPI { get; }
+    [Selector("workingColorSpace")]
+    CGColorSpaceRef WorkingColorSpace { get; }
+    [Selector("context")]
+    void* Context { get; }
+    [Selector("currentRenderCommandEncoder")]
+    MTLRenderCommandEncoder? CurrentRenderCommandEncoder { get; }
+    [Selector("currentRenderPassDescriptor")]
+    MTLRenderPassDescriptor? CurrentRenderPassDescriptor { get; }
+    [Selector("device")]
+    MTLDevice? Device { get; }
+    [Selector("colorPixelFormat")]
+    MTLPixelFormat ColorPixelFormat { get; }
+    [Selector("depthPixelFormat")]
+    MTLPixelFormat DepthPixelFormat { get; }
+    [Selector("stencilPixelFormat")]
+    MTLPixelFormat StencilPixelFormat { get; }
+    [Selector("commandQueue")]
+    MTLCommandQueue? CommandQueue { get; }
+    [Selector("audioEngine")]
+    AVAudioEngine AudioEngine { get; }
+    [Selector("audioEnvironmentNode")]
+    AVAudioEnvironmentNode? AudioEnvironmentNode { get; }
+    [Selector("audioListener", "setAudioListener:")]
+    SCNNode? AudioListener { get; set; }
+    [Selector("currentViewport")]
+    CGRect CurrentViewport { get; }
     /// Deprecated in macOS 10.10.
-    [Selector("currentTime", "setCurrentTime:")] NSTimeInterval CurrentTime { get; set; }
-    [Selector("usesReverseZ", "setUsesReverseZ:")] bool UsesReverseZ { get; set; }
-    [Selector("presentScene:withTransition:incomingPointOfView:completionHandler:")] void PresentSceneWithTransitionIncomingPointOfViewCompletionHandler(SCNScene scene, SKTransition transition, SCNNode? pointOfView, SCNSceneRendererPresentSceneWithTransitionIncomingPointOfViewCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("hitTest:options:")] NSArray HitTestOptions(CGPoint point, NSDictionary? options);
-    [Selector("isNodeInsideFrustum:withPointOfView:")] bool IsNodeInsideFrustumWithPointOfView(SCNNode node, SCNNode pointOfView);
-    [Selector("nodesInsideFrustumWithPointOfView:")] NSArray NodesInsideFrustumWithPointOfView(SCNNode pointOfView);
-    [Selector("projectPoint:")] SCNVector3 ProjectPoint(SCNVector3 point);
-    [Selector("unprojectPoint:")] SCNVector3 UnprojectPoint(SCNVector3 point);
-    [Selector("prepareObject:shouldAbortBlock:")] bool PrepareObjectShouldAbortBlock(AnyObject object, SCNSceneRendererPrepareObjectShouldAbortBlockBlock? block);
-    [Selector("prepareObjects:withCompletionHandler:")] void PrepareObjectsWithCompletionHandler(NSArray objects, SCNSceneRendererPrepareObjectsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("currentTime", "setCurrentTime:")]
+    NSTimeInterval CurrentTime { get; set; }
+    [Selector("usesReverseZ", "setUsesReverseZ:")]
+    bool UsesReverseZ { get; set; }
+    [Selector("presentScene:withTransition:incomingPointOfView:completionHandler:")]
+    void PresentSceneWithTransitionIncomingPointOfViewCompletionHandler(SCNScene scene, SKTransition transition, SCNNode? pointOfView, SCNSceneRendererPresentSceneWithTransitionIncomingPointOfViewCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("hitTest:options:")]
+    NSArray HitTestOptions(CGPoint point, NSDictionary? options);
+    [Selector("isNodeInsideFrustum:withPointOfView:")]
+    bool IsNodeInsideFrustumWithPointOfView(SCNNode node, SCNNode pointOfView);
+    [Selector("nodesInsideFrustumWithPointOfView:")]
+    NSArray NodesInsideFrustumWithPointOfView(SCNNode pointOfView);
+    [Selector("projectPoint:")]
+    SCNVector3 ProjectPoint(SCNVector3 point);
+    [Selector("unprojectPoint:")]
+    SCNVector3 UnprojectPoint(SCNVector3 point);
+    [Selector("prepareObject:shouldAbortBlock:")]
+    bool PrepareObjectShouldAbortBlock(AnyObject object, SCNSceneRendererPrepareObjectShouldAbortBlockBlock? block);
+    [Selector("prepareObjects:withCompletionHandler:")]
+    void PrepareObjectsWithCompletionHandler(NSArray objects, SCNSceneRendererPrepareObjectsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public objc interface SCNSceneRendererDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("renderer:updateAtTime:")] void RendererUpdateAtTime(SCNSceneRenderer renderer, NSTimeInterval time);
-    [Optional] [Selector("renderer:didApplyAnimationsAtTime:")] void RendererDidApplyAnimationsAtTime(SCNSceneRenderer renderer, NSTimeInterval time);
-    [Optional] [Selector("renderer:didSimulatePhysicsAtTime:")] void RendererDidSimulatePhysicsAtTime(SCNSceneRenderer renderer, NSTimeInterval time);
-    [Optional] [Selector("renderer:didApplyConstraintsAtTime:")] void RendererDidApplyConstraintsAtTime(SCNSceneRenderer renderer, NSTimeInterval time);
-    [Optional] [Selector("renderer:willRenderScene:atTime:")] void RendererWillRenderSceneAtTime(SCNSceneRenderer renderer, SCNScene scene, NSTimeInterval time);
-    [Optional] [Selector("renderer:didRenderScene:atTime:")] void RendererDidRenderSceneAtTime(SCNSceneRenderer renderer, SCNScene scene, NSTimeInterval time);
+    [Optional]
+    [Selector("renderer:updateAtTime:")]
+    void RendererUpdateAtTime(SCNSceneRenderer renderer, NSTimeInterval time);
+    [Optional]
+    [Selector("renderer:didApplyAnimationsAtTime:")]
+    void RendererDidApplyAnimationsAtTime(SCNSceneRenderer renderer, NSTimeInterval time);
+    [Optional]
+    [Selector("renderer:didSimulatePhysicsAtTime:")]
+    void RendererDidSimulatePhysicsAtTime(SCNSceneRenderer renderer, NSTimeInterval time);
+    [Optional]
+    [Selector("renderer:didApplyConstraintsAtTime:")]
+    void RendererDidApplyConstraintsAtTime(SCNSceneRenderer renderer, NSTimeInterval time);
+    [Optional]
+    [Selector("renderer:willRenderScene:atTime:")]
+    void RendererWillRenderSceneAtTime(SCNSceneRenderer renderer, SCNScene scene, NSTimeInterval time);
+    [Optional]
+    [Selector("renderer:didRenderScene:atTime:")]
+    void RendererDidRenderSceneAtTime(SCNSceneRenderer renderer, SCNScene scene, NSTimeInterval time);
 }
 
 #endif

@@ -34,19 +34,32 @@ import Standard.ObjC;
 
 public extern objc class MPSMatrixSum : MPSKernel
 {
-    [Selector("rows")] public NSUInteger Rows { get; }
-    [Selector("columns")] public NSUInteger Columns { get; }
-    [Selector("count")] public NSUInteger Count { get; }
-    [Selector("transpose")] public bool Transpose { get; }
-    [Selector("resultMatrixOrigin", "setResultMatrixOrigin:")] public MTLOrigin ResultMatrixOrigin { get; set; }
-    [Selector("neuronParameterA")] public float NeuronParameterA { get; }
-    [Selector("neuronParameterB")] public float NeuronParameterB { get; }
-    [Selector("neuronParameterC")] public float NeuronParameterC { get; }
-    [Selector("initWithDevice:count:rows:columns:transpose:")] public Self InitWithDeviceCountRowsColumnsTranspose(MTLDevice device, NSUInteger count, NSUInteger rows, NSUInteger columns, bool transpose);
-    [Selector("setNeuronType:parameterA:parameterB:parameterC:")] public void SetNeuronTypeParameterAParameterBParameterC(MPSCNNNeuronType neuronType, float parameterA, float parameterB, float parameterC);
-    [Selector("neuronType")] public MPSCNNNeuronType NeuronType();
-    [Selector("encodeToCommandBuffer:sourceMatrices:resultMatrix:scaleVector:offsetVector:biasVector:startIndex:")] public void EncodeToCommandBufferSourceMatricesResultMatrixScaleVectorOffsetVectorBiasVectorStartIndex(MTLCommandBuffer buffer, NSArray sourceMatrices, MPSMatrix resultMatrix, MPSVector? scaleVector, MPSVector? offsetVector, MPSVector? biasVector, NSUInteger startIndex);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("rows")]
+    public NSUInteger Rows { get; }
+    [Selector("columns")]
+    public NSUInteger Columns { get; }
+    [Selector("count")]
+    public NSUInteger Count { get; }
+    [Selector("transpose")]
+    public bool Transpose { get; }
+    [Selector("resultMatrixOrigin", "setResultMatrixOrigin:")]
+    public MTLOrigin ResultMatrixOrigin { get; set; }
+    [Selector("neuronParameterA")]
+    public float NeuronParameterA { get; }
+    [Selector("neuronParameterB")]
+    public float NeuronParameterB { get; }
+    [Selector("neuronParameterC")]
+    public float NeuronParameterC { get; }
+    [Selector("initWithDevice:count:rows:columns:transpose:")]
+    public Self InitWithDeviceCountRowsColumnsTranspose(MTLDevice device, NSUInteger count, NSUInteger rows, NSUInteger columns, bool transpose);
+    [Selector("setNeuronType:parameterA:parameterB:parameterC:")]
+    public void SetNeuronTypeParameterAParameterBParameterC(MPSCNNNeuronType neuronType, float parameterA, float parameterB, float parameterC);
+    [Selector("neuronType")]
+    public MPSCNNNeuronType NeuronType();
+    [Selector("encodeToCommandBuffer:sourceMatrices:resultMatrix:scaleVector:offsetVector:biasVector:startIndex:")]
+    public void EncodeToCommandBufferSourceMatricesResultMatrixScaleVectorOffsetVectorBiasVectorStartIndex(MTLCommandBuffer buffer, NSArray sourceMatrices, MPSMatrix resultMatrix, MPSVector? scaleVector, MPSVector? offsetVector, MPSVector? biasVector, NSUInteger startIndex);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 #endif

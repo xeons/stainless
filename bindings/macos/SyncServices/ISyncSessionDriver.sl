@@ -51,94 +51,143 @@ public enum ISyncSessionDriverChangeResult : int
 public extern objc class ISyncSessionDriver : NSObject
 {
     /// Deprecated in macOS 10.7.
-    [Selector("sessionDriverWithDataSource:")] public static ISyncSessionDriver? SessionDriverWithDataSource(ISyncSessionDriverDataSource? dataSource);
+    [Selector("sessionDriverWithDataSource:")]
+    public static ISyncSessionDriver? SessionDriverWithDataSource(ISyncSessionDriverDataSource? dataSource);
     /// Deprecated in macOS 10.7.
-    [Selector("sync")] public bool Sync();
+    [Selector("sync")]
+    public bool Sync();
     /// Deprecated in macOS 10.7.
-    [Selector("startAsynchronousSync:")] public bool StartAsynchronousSync(out NSError? outError);
+    [Selector("startAsynchronousSync:")]
+    public bool StartAsynchronousSync(out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Selector("lastError")] public NSError? LastError();
+    [Selector("lastError")]
+    public NSError? LastError();
     /// Deprecated in macOS 10.7.
-    [Selector("dataSource")] public ISyncSessionDriverDataSource? DataSource();
+    [Selector("dataSource")]
+    public ISyncSessionDriverDataSource? DataSource();
     /// Deprecated in macOS 10.7.
-    [Selector("setDelegate:")] public void SetDelegate(AnyObject? @delegate);
+    [Selector("setDelegate:")]
+    public void SetDelegate(AnyObject? @delegate);
     /// Deprecated in macOS 10.7.
-    [Selector("delegate")] public AnyObject? Delegate();
+    [Selector("delegate")]
+    public AnyObject? Delegate();
     /// Deprecated in macOS 10.7.
-    [Selector("setHandlesSyncAlerts:")] public void SetHandlesSyncAlerts(bool yesOrNo);
+    [Selector("setHandlesSyncAlerts:")]
+    public void SetHandlesSyncAlerts(bool yesOrNo);
     /// Deprecated in macOS 10.7.
-    [Selector("handlesSyncAlerts")] public bool HandlesSyncAlerts();
+    [Selector("handlesSyncAlerts")]
+    public bool HandlesSyncAlerts();
     /// Deprecated in macOS 10.7.
-    [Selector("client")] public ISyncClient? Client();
+    [Selector("client")]
+    public ISyncClient? Client();
     /// Deprecated in macOS 10.7.
-    [Selector("session")] public ISyncSession? Session();
+    [Selector("session")]
+    public ISyncSession? Session();
     /// Deprecated in macOS 10.7.
-    [Selector("finishSyncing")] public void FinishSyncing();
+    [Selector("finishSyncing")]
+    public void FinishSyncing();
 }
 
 public objc interface ISyncSessionDriverDataSource
 {
     /// Deprecated in macOS 10.7.
-    [Selector("clientIdentifier")] NSString? ClientIdentifier();
+    [Selector("clientIdentifier")]
+    NSString? ClientIdentifier();
     /// Deprecated in macOS 10.7.
-    [Selector("clientDescriptionURL")] NSURL? ClientDescriptionURL();
+    [Selector("clientDescriptionURL")]
+    NSURL? ClientDescriptionURL();
     /// Deprecated in macOS 10.7.
-    [Selector("schemaBundleURLs")] NSArray? SchemaBundleURLs();
+    [Selector("schemaBundleURLs")]
+    NSArray? SchemaBundleURLs();
     /// Deprecated in macOS 10.7.
-    [Selector("preferredSyncModeForEntityName:")] ISyncSessionDriverMode PreferredSyncModeForEntityName(NSString? entity);
+    [Selector("preferredSyncModeForEntityName:")]
+    ISyncSessionDriverMode PreferredSyncModeForEntityName(NSString? entity);
     /// Deprecated in macOS 10.7.
-    [Selector("recordsForEntityName:moreComing:error:")] NSDictionary? RecordsForEntityNameMoreComingError(NSString? entity, bool* moreComing, out NSError? outError);
+    [Selector("recordsForEntityName:moreComing:error:")]
+    NSDictionary? RecordsForEntityNameMoreComingError(NSString? entity, bool* moreComing, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Selector("applyChange:forEntityName:remappedRecordIdentifier:formattedRecord:error:")] ISyncSessionDriverChangeResult ApplyChangeForEntityNameRemappedRecordIdentifierFormattedRecordError(ISyncChange? change, NSString? entityName, out NSString? outRecordIdentifier, out NSDictionary? outRecord, out NSError? outError);
+    [Selector("applyChange:forEntityName:remappedRecordIdentifier:formattedRecord:error:")]
+    ISyncSessionDriverChangeResult ApplyChangeForEntityNameRemappedRecordIdentifierFormattedRecordError(ISyncChange? change, NSString? entityName, out NSString? outRecordIdentifier, out NSDictionary? outRecord, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Selector("deleteAllRecordsForEntityName:error:")] bool DeleteAllRecordsForEntityNameError(NSString? entityName, out NSError? outError);
+    [Selector("deleteAllRecordsForEntityName:error:")]
+    bool DeleteAllRecordsForEntityNameError(NSString? entityName, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("entityNamesToSync")] NSArray? EntityNamesToSync();
+    [Optional]
+    [Selector("entityNamesToSync")]
+    NSArray? EntityNamesToSync();
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("entityNamesToPull")] NSArray? EntityNamesToPull();
+    [Optional]
+    [Selector("entityNamesToPull")]
+    NSArray? EntityNamesToPull();
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("sessionBeginTimeout")] NSTimeInterval SessionBeginTimeout();
+    [Optional]
+    [Selector("sessionBeginTimeout")]
+    NSTimeInterval SessionBeginTimeout();
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("sessionPullChangesTimeout")] NSTimeInterval SessionPullChangesTimeout();
+    [Optional]
+    [Selector("sessionPullChangesTimeout")]
+    NSTimeInterval SessionPullChangesTimeout();
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("lastAnchorForEntityName:")] NSString? LastAnchorForEntityName(NSString? entityName);
+    [Optional]
+    [Selector("lastAnchorForEntityName:")]
+    NSString? LastAnchorForEntityName(NSString? entityName);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("nextAnchorForEntityName:")] NSString? NextAnchorForEntityName(NSString? entityName);
+    [Optional]
+    [Selector("nextAnchorForEntityName:")]
+    NSString? NextAnchorForEntityName(NSString? entityName);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("changedRecordsForEntityName:moreComing:error:")] NSDictionary? ChangedRecordsForEntityNameMoreComingError(NSString? entity, bool* moreComing, out NSError? outError);
+    [Optional]
+    [Selector("changedRecordsForEntityName:moreComing:error:")]
+    NSDictionary? ChangedRecordsForEntityNameMoreComingError(NSString? entity, bool* moreComing, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("changesForEntityName:moreComing:error:")] NSArray? ChangesForEntityNameMoreComingError(NSString? entity, bool* moreComing, out NSError? outError);
+    [Optional]
+    [Selector("changesForEntityName:moreComing:error:")]
+    NSArray? ChangesForEntityNameMoreComingError(NSString? entity, bool* moreComing, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("identifiersForRecordsToDeleteForEntityName:moreComing:error:")] NSArray? IdentifiersForRecordsToDeleteForEntityNameMoreComingError(NSString? entityName, bool* moreComing, out NSError? outError);
+    [Optional]
+    [Selector("identifiersForRecordsToDeleteForEntityName:moreComing:error:")]
+    NSArray? IdentifiersForRecordsToDeleteForEntityNameMoreComingError(NSString? entityName, bool* moreComing, out NSError? outError);
 }
 
 /// ISyncSessionDriverDelegate, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.7.
-    [Selector("sessionDriver:didRegisterClientAndReturnError:")] public bool SessionDriverDidRegisterClientAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
+    [Selector("sessionDriver:didRegisterClientAndReturnError:")]
+    public bool SessionDriverDidRegisterClientAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Selector("sessionDriver:willNegotiateAndReturnError:")] public bool SessionDriverWillNegotiateAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
+    [Selector("sessionDriver:willNegotiateAndReturnError:")]
+    public bool SessionDriverWillNegotiateAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Selector("sessionDriver:didNegotiateAndReturnError:")] public bool SessionDriverDidNegotiateAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
+    [Selector("sessionDriver:didNegotiateAndReturnError:")]
+    public bool SessionDriverDidNegotiateAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Selector("sessionDriver:willPushAndReturnError:")] public bool SessionDriverWillPushAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
+    [Selector("sessionDriver:willPushAndReturnError:")]
+    public bool SessionDriverWillPushAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Selector("sessionDriver:didPushAndReturnError:")] public bool SessionDriverDidPushAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
+    [Selector("sessionDriver:didPushAndReturnError:")]
+    public bool SessionDriverDidPushAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Selector("sessionDriver:willPullAndReturnError:")] public bool SessionDriverWillPullAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
+    [Selector("sessionDriver:willPullAndReturnError:")]
+    public bool SessionDriverWillPullAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Selector("sessionDriver:didPullAndReturnError:")] public bool SessionDriverDidPullAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
+    [Selector("sessionDriver:didPullAndReturnError:")]
+    public bool SessionDriverDidPullAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Selector("sessionDriver:willFinishSessionAndReturnError:")] public bool SessionDriverWillFinishSessionAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
+    [Selector("sessionDriver:willFinishSessionAndReturnError:")]
+    public bool SessionDriverWillFinishSessionAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Selector("sessionDriverDidFinishSession:")] public void SessionDriverDidFinishSession(ISyncSessionDriver? sender);
+    [Selector("sessionDriverDidFinishSession:")]
+    public void SessionDriverDidFinishSession(ISyncSessionDriver? sender);
     /// Deprecated in macOS 10.7.
-    [Selector("sessionDriverWillCancelSession:")] public void SessionDriverWillCancelSession(ISyncSessionDriver? sender);
+    [Selector("sessionDriverWillCancelSession:")]
+    public void SessionDriverWillCancelSession(ISyncSessionDriver? sender);
     /// Deprecated in macOS 10.7.
-    [Selector("sessionDriverDidCancelSession:")] public void SessionDriverDidCancelSession(ISyncSessionDriver? sender);
+    [Selector("sessionDriverDidCancelSession:")]
+    public void SessionDriverDidCancelSession(ISyncSessionDriver? sender);
     /// Deprecated in macOS 10.7.
-    [Selector("sessionDriver:didReceiveSyncAlertAndReturnError:")] public bool SessionDriverDidReceiveSyncAlertAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
+    [Selector("sessionDriver:didReceiveSyncAlertAndReturnError:")]
+    public bool SessionDriverDidReceiveSyncAlertAndReturnError(ISyncSessionDriver? sender, out NSError? outError);
 }
 
 #endif

@@ -33,30 +33,39 @@ import Standard.ObjC;
 
 public extern objc class ABPerson : ABRecord
 {
-    [Selector("parentGroups")] public NSArray? ParentGroups();
-    [Selector("linkedPeople")] public NSArray? LinkedPeople();
+    [Selector("parentGroups")]
+    public NSArray? ParentGroups();
+    [Selector("linkedPeople")]
+    public NSArray? LinkedPeople();
 }
 
 /// ABPerson_Properties, a category of ABPerson.
 public extern objc class ABPerson
 {
-    [Selector("addPropertiesAndTypes:")] public static NSInteger AddPropertiesAndTypes(NSDictionary? properties);
-    [Selector("removeProperties:")] public static NSInteger RemoveProperties(NSArray? properties);
-    [Selector("properties")] public static NSArray? Properties();
-    [Selector("typeOfProperty:")] public static ABPropertyType TypeOfProperty(NSString? property);
+    [Selector("addPropertiesAndTypes:")]
+    public static NSInteger AddPropertiesAndTypes(NSDictionary? properties);
+    [Selector("removeProperties:")]
+    public static NSInteger RemoveProperties(NSArray? properties);
+    [Selector("properties")]
+    public static NSArray? Properties();
+    [Selector("typeOfProperty:")]
+    public static ABPropertyType TypeOfProperty(NSString? property);
 }
 
 /// ABPerson_Searching, a category of ABPerson.
 public extern objc class ABPerson
 {
-    [Selector("searchElementForProperty:label:key:value:comparison:")] public static ABSearchElement? SearchElementForPropertyLabelKeyValueComparison(NSString? property, NSString? label, NSString? key, AnyObject? value, ABSearchComparison comparison);
+    [Selector("searchElementForProperty:label:key:value:comparison:")]
+    public static ABSearchElement? SearchElementForPropertyLabelKeyValueComparison(NSString? property, NSString? label, NSString? key, AnyObject? value, ABSearchComparison comparison);
 }
 
 /// ABPerson_vCard, a category of ABPerson.
 public extern objc class ABPerson
 {
-    [Selector("initWithVCardRepresentation:")] public AnyObject? InitWithVCardRepresentation(NSData? vCardData);
-    [Selector("vCardRepresentation")] public NSData? VCardRepresentation();
+    [Selector("initWithVCardRepresentation:")]
+    public AnyObject? InitWithVCardRepresentation(NSData? vCardData);
+    [Selector("vCardRepresentation")]
+    public NSData? VCardRepresentation();
 }
 
 #endif

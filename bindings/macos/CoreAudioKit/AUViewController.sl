@@ -40,10 +40,14 @@ public extern objc class AUViewController : NSViewController, NSExtensionRequest
 
 public extern objc class AUAudioUnitViewConfiguration : NSObject, NSSecureCoding
 {
-    [Selector("width")] public CGFloat Width { get; }
-    [Selector("height")] public CGFloat Height { get; }
-    [Selector("hostHasController")] public bool HostHasController { get; }
-    [Selector("initWithWidth:height:hostHasController:")] public Self InitWithWidthHeightHostHasController(CGFloat width, CGFloat height, bool hostHasController);
+    [Selector("width")]
+    public CGFloat Width { get; }
+    [Selector("height")]
+    public CGFloat Height { get; }
+    [Selector("hostHasController")]
+    public bool HostHasController { get; }
+    [Selector("initWithWidth:height:hostHasController:")]
+    public Self InitWithWidthHeightHostHasController(CGFloat width, CGFloat height, bool hostHasController);
 }
 
 public objc closure void AUAudioUnitRequestViewControllerWithCompletionHandlerCompletionHandlerBlock(AUViewControllerBase? arg0);
@@ -51,9 +55,12 @@ public objc closure void AUAudioUnitRequestViewControllerWithCompletionHandlerCo
 /// AUAudioUnit_ViewController, a category of AUAudioUnit.
 public extern objc class AUAudioUnit
 {
-    [Selector("requestViewControllerWithCompletionHandler:")] public void RequestViewControllerWithCompletionHandler(AUAudioUnitRequestViewControllerWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("supportedViewConfigurations:")] public NSIndexSet SupportedViewConfigurations(NSArray availableViewConfigurations);
-    [Selector("selectViewConfiguration:")] public void SelectViewConfiguration(AUAudioUnitViewConfiguration viewConfiguration);
+    [Selector("requestViewControllerWithCompletionHandler:")]
+    public void RequestViewControllerWithCompletionHandler(AUAudioUnitRequestViewControllerWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("supportedViewConfigurations:")]
+    public NSIndexSet SupportedViewConfigurations(NSArray availableViewConfigurations);
+    [Selector("selectViewConfiguration:")]
+    public void SelectViewConfiguration(AUAudioUnitViewConfiguration viewConfiguration);
 }
 
 #endif

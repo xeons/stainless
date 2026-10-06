@@ -42,38 +42,62 @@ public enum NSMergePolicyType : ulong
 
 public extern objc class NSMergeConflict : NSObject
 {
-    [Selector("sourceObject")] public NSManagedObject SourceObject { get; }
-    [Selector("objectSnapshot")] public NSDictionary? ObjectSnapshot { get; }
-    [Selector("cachedSnapshot")] public NSDictionary? CachedSnapshot { get; }
-    [Selector("persistedSnapshot")] public NSDictionary? PersistedSnapshot { get; }
-    [Selector("newVersionNumber")] public NSUInteger NewVersionNumber { get; }
-    [Selector("oldVersionNumber")] public NSUInteger OldVersionNumber { get; }
-    [Selector("initWithSource:newVersion:oldVersion:cachedSnapshot:persistedSnapshot:")] public Self InitWithSourceNewVersionOldVersionCachedSnapshotPersistedSnapshot(NSManagedObject srcObject, NSUInteger newvers, NSUInteger oldvers, NSDictionary? cachesnap, NSDictionary? persnap);
+    [Selector("sourceObject")]
+    public NSManagedObject SourceObject { get; }
+    [Selector("objectSnapshot")]
+    public NSDictionary? ObjectSnapshot { get; }
+    [Selector("cachedSnapshot")]
+    public NSDictionary? CachedSnapshot { get; }
+    [Selector("persistedSnapshot")]
+    public NSDictionary? PersistedSnapshot { get; }
+    [Selector("newVersionNumber")]
+    public NSUInteger NewVersionNumber { get; }
+    [Selector("oldVersionNumber")]
+    public NSUInteger OldVersionNumber { get; }
+    [Selector("initWithSource:newVersion:oldVersion:cachedSnapshot:persistedSnapshot:")]
+    public Self InitWithSourceNewVersionOldVersionCachedSnapshotPersistedSnapshot(NSManagedObject srcObject, NSUInteger newvers, NSUInteger oldvers, NSDictionary? cachesnap, NSDictionary? persnap);
 }
 
 public extern objc class NSConstraintConflict : NSObject
 {
-    [Selector("constraint")] public NSArray Constraint { get; }
-    [Selector("constraintValues")] public NSDictionary ConstraintValues { get; }
-    [Selector("databaseObject")] public NSManagedObject? DatabaseObject { get; }
-    [Selector("databaseSnapshot")] public NSDictionary? DatabaseSnapshot { get; }
-    [Selector("conflictingObjects")] public NSArray ConflictingObjects { get; }
-    [Selector("conflictingSnapshots")] public NSArray ConflictingSnapshots { get; }
-    [Selector("initWithConstraint:databaseObject:databaseSnapshot:conflictingObjects:conflictingSnapshots:")] public Self InitWithConstraintDatabaseObjectDatabaseSnapshotConflictingObjectsConflictingSnapshots(NSArray contraint, NSManagedObject? databaseObject, NSDictionary? databaseSnapshot, NSArray conflictingObjects, NSArray conflictingSnapshots);
+    [Selector("constraint")]
+    public NSArray Constraint { get; }
+    [Selector("constraintValues")]
+    public NSDictionary ConstraintValues { get; }
+    [Selector("databaseObject")]
+    public NSManagedObject? DatabaseObject { get; }
+    [Selector("databaseSnapshot")]
+    public NSDictionary? DatabaseSnapshot { get; }
+    [Selector("conflictingObjects")]
+    public NSArray ConflictingObjects { get; }
+    [Selector("conflictingSnapshots")]
+    public NSArray ConflictingSnapshots { get; }
+    [Selector("initWithConstraint:databaseObject:databaseSnapshot:conflictingObjects:conflictingSnapshots:")]
+    public Self InitWithConstraintDatabaseObjectDatabaseSnapshotConflictingObjectsConflictingSnapshots(NSArray contraint, NSManagedObject? databaseObject, NSDictionary? databaseSnapshot, NSArray conflictingObjects, NSArray conflictingSnapshots);
 }
 
 public extern objc class NSMergePolicy : NSObject
 {
-    [Selector("errorMergePolicy")] public static NSMergePolicy ErrorMergePolicy { get; }
-    [Selector("rollbackMergePolicy")] public static NSMergePolicy RollbackMergePolicy { get; }
-    [Selector("overwriteMergePolicy")] public static NSMergePolicy OverwriteMergePolicy { get; }
-    [Selector("mergeByPropertyObjectTrumpMergePolicy")] public static NSMergePolicy MergeByPropertyObjectTrumpMergePolicy { get; }
-    [Selector("mergeByPropertyStoreTrumpMergePolicy")] public static NSMergePolicy MergeByPropertyStoreTrumpMergePolicy { get; }
-    [Selector("mergeType")] public NSMergePolicyType MergeType { get; }
-    [Selector("initWithMergeType:")] public AnyObject InitWithMergeType(NSMergePolicyType ty);
-    [Selector("resolveConflicts:error:")] public bool ResolveConflictsError(NSArray list, out NSError? error);
-    [Selector("resolveOptimisticLockingVersionConflicts:error:")] public bool ResolveOptimisticLockingVersionConflictsError(NSArray list, out NSError? error);
-    [Selector("resolveConstraintConflicts:error:")] public bool ResolveConstraintConflictsError(NSArray list, out NSError? error);
+    [Selector("errorMergePolicy")]
+    public static NSMergePolicy ErrorMergePolicy { get; }
+    [Selector("rollbackMergePolicy")]
+    public static NSMergePolicy RollbackMergePolicy { get; }
+    [Selector("overwriteMergePolicy")]
+    public static NSMergePolicy OverwriteMergePolicy { get; }
+    [Selector("mergeByPropertyObjectTrumpMergePolicy")]
+    public static NSMergePolicy MergeByPropertyObjectTrumpMergePolicy { get; }
+    [Selector("mergeByPropertyStoreTrumpMergePolicy")]
+    public static NSMergePolicy MergeByPropertyStoreTrumpMergePolicy { get; }
+    [Selector("mergeType")]
+    public NSMergePolicyType MergeType { get; }
+    [Selector("initWithMergeType:")]
+    public AnyObject InitWithMergeType(NSMergePolicyType ty);
+    [Selector("resolveConflicts:error:")]
+    public bool ResolveConflictsError(NSArray list, out NSError? error);
+    [Selector("resolveOptimisticLockingVersionConflicts:error:")]
+    public bool ResolveOptimisticLockingVersionConflictsError(NSArray list, out NSError? error);
+    [Selector("resolveConstraintConflicts:error:")]
+    public bool ResolveConstraintConflictsError(NSArray list, out NSError? error);
 }
 
 #endif

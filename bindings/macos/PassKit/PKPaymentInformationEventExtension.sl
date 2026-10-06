@@ -40,9 +40,12 @@ public objc closure void PKPaymentInformationRequestHandlingHandleConfigurationR
 
 public objc interface PKPaymentInformationRequestHandling
 {
-    [Selector("handleInformationRequest:completion:")] void HandleInformationRequestCompletion(PKBarcodeEventMetadataRequest infoRequest, PKInformationRequestCompletionBlock completion);
-    [Selector("handleSignatureRequest:completion:")] void HandleSignatureRequestCompletion(PKBarcodeEventSignatureRequest signatureRequest, PKSignatureRequestCompletionBlock completion);
-    [Selector("handleConfigurationRequest:completion:")] void HandleConfigurationRequestCompletion(PKBarcodeEventConfigurationRequest configurationRequest, PKPaymentInformationRequestHandlingHandleConfigurationRequestCompletionCompletionBlock completion);
+    [Selector("handleInformationRequest:completion:")]
+    void HandleInformationRequestCompletion(PKBarcodeEventMetadataRequest infoRequest, PKInformationRequestCompletionBlock completion);
+    [Selector("handleSignatureRequest:completion:")]
+    void HandleSignatureRequestCompletion(PKBarcodeEventSignatureRequest signatureRequest, PKSignatureRequestCompletionBlock completion);
+    [Selector("handleConfigurationRequest:completion:")]
+    void HandleConfigurationRequestCompletion(PKBarcodeEventConfigurationRequest configurationRequest, PKPaymentInformationRequestHandlingHandleConfigurationRequestCompletionCompletionBlock completion);
 }
 
 #endif

@@ -43,9 +43,12 @@ public enum INAnswerCallIntentResponseCode : long
 
 public extern objc class INAnswerCallIntentResponse : INIntentResponse
 {
-    [Selector("code")] public INAnswerCallIntentResponseCode Code { get; }
-    [Selector("callRecords", "setCallRecords:")] public NSArray? CallRecords { get; set; }
-    [Selector("initWithCode:userActivity:")] public Self InitWithCodeUserActivity(INAnswerCallIntentResponseCode code, NSUserActivity? userActivity);
+    [Selector("code")]
+    public INAnswerCallIntentResponseCode Code { get; }
+    [Selector("callRecords", "setCallRecords:")]
+    public NSArray? CallRecords { get; set; }
+    [Selector("initWithCode:userActivity:")]
+    public Self InitWithCodeUserActivity(INAnswerCallIntentResponseCode code, NSUserActivity? userActivity);
 }
 
 #endif

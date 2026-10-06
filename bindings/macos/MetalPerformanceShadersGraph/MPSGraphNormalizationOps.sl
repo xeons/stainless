@@ -33,13 +33,20 @@ import Standard.ObjC;
 /// MPSGraphNormalizationOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("meanOfTensor:axes:name:")] public MPSGraphTensor MeanOfTensorAxesName(MPSGraphTensor tensor, NSArray axes, NSString? name);
-    [Selector("varianceOfTensor:meanTensor:axes:name:")] public MPSGraphTensor VarianceOfTensorMeanTensorAxesName(MPSGraphTensor tensor, MPSGraphTensor meanTensor, NSArray axes, NSString? name);
-    [Selector("varianceOfTensor:axes:name:")] public MPSGraphTensor VarianceOfTensorAxesName(MPSGraphTensor tensor, NSArray axes, NSString? name);
-    [Selector("normalizationWithTensor:meanTensor:varianceTensor:gammaTensor:betaTensor:epsilon:name:")] public MPSGraphTensor NormalizationWithTensorMeanTensorVarianceTensorGammaTensorBetaTensorEpsilonName(MPSGraphTensor tensor, MPSGraphTensor mean, MPSGraphTensor variance, MPSGraphTensor? gamma, MPSGraphTensor? beta, float epsilon, NSString? name);
-    [Selector("normalizationGammaGradientWithIncomingGradientTensor:sourceTensor:meanTensor:varianceTensor:reductionAxes:epsilon:name:")] public MPSGraphTensor NormalizationGammaGradientWithIncomingGradientTensorSourceTensorMeanTensorVarianceTensorReductionAxesEpsilonName(MPSGraphTensor incomingGradientTensor, MPSGraphTensor sourceTensor, MPSGraphTensor meanTensor, MPSGraphTensor varianceTensor, NSArray axes, float epsilon, NSString? name);
-    [Selector("normalizationBetaGradientWithIncomingGradientTensor:sourceTensor:reductionAxes:name:")] public MPSGraphTensor NormalizationBetaGradientWithIncomingGradientTensorSourceTensorReductionAxesName(MPSGraphTensor incomingGradientTensor, MPSGraphTensor sourceTensor, NSArray axes, NSString? name);
-    [Selector("normalizationGradientWithIncomingGradientTensor:sourceTensor:meanTensor:varianceTensor:gammaTensor:gammaGradientTensor:betaGradientTensor:reductionAxes:epsilon:name:")] public MPSGraphTensor NormalizationGradientWithIncomingGradientTensorSourceTensorMeanTensorVarianceTensorGammaTensorGammaGradientTensorBetaGradientTensorReductionAxesEpsilonName(MPSGraphTensor incomingGradientTensor, MPSGraphTensor sourceTensor, MPSGraphTensor meanTensor, MPSGraphTensor varianceTensor, MPSGraphTensor? gamma, MPSGraphTensor? gammaGradient, MPSGraphTensor? betaGradient, NSArray axes, float epsilon, NSString? name);
+    [Selector("meanOfTensor:axes:name:")]
+    public MPSGraphTensor MeanOfTensorAxesName(MPSGraphTensor tensor, NSArray axes, NSString? name);
+    [Selector("varianceOfTensor:meanTensor:axes:name:")]
+    public MPSGraphTensor VarianceOfTensorMeanTensorAxesName(MPSGraphTensor tensor, MPSGraphTensor meanTensor, NSArray axes, NSString? name);
+    [Selector("varianceOfTensor:axes:name:")]
+    public MPSGraphTensor VarianceOfTensorAxesName(MPSGraphTensor tensor, NSArray axes, NSString? name);
+    [Selector("normalizationWithTensor:meanTensor:varianceTensor:gammaTensor:betaTensor:epsilon:name:")]
+    public MPSGraphTensor NormalizationWithTensorMeanTensorVarianceTensorGammaTensorBetaTensorEpsilonName(MPSGraphTensor tensor, MPSGraphTensor mean, MPSGraphTensor variance, MPSGraphTensor? gamma, MPSGraphTensor? beta, float epsilon, NSString? name);
+    [Selector("normalizationGammaGradientWithIncomingGradientTensor:sourceTensor:meanTensor:varianceTensor:reductionAxes:epsilon:name:")]
+    public MPSGraphTensor NormalizationGammaGradientWithIncomingGradientTensorSourceTensorMeanTensorVarianceTensorReductionAxesEpsilonName(MPSGraphTensor incomingGradientTensor, MPSGraphTensor sourceTensor, MPSGraphTensor meanTensor, MPSGraphTensor varianceTensor, NSArray axes, float epsilon, NSString? name);
+    [Selector("normalizationBetaGradientWithIncomingGradientTensor:sourceTensor:reductionAxes:name:")]
+    public MPSGraphTensor NormalizationBetaGradientWithIncomingGradientTensorSourceTensorReductionAxesName(MPSGraphTensor incomingGradientTensor, MPSGraphTensor sourceTensor, NSArray axes, NSString? name);
+    [Selector("normalizationGradientWithIncomingGradientTensor:sourceTensor:meanTensor:varianceTensor:gammaTensor:gammaGradientTensor:betaGradientTensor:reductionAxes:epsilon:name:")]
+    public MPSGraphTensor NormalizationGradientWithIncomingGradientTensorSourceTensorMeanTensorVarianceTensorGammaTensorGammaGradientTensorBetaGradientTensorReductionAxesEpsilonName(MPSGraphTensor incomingGradientTensor, MPSGraphTensor sourceTensor, MPSGraphTensor meanTensor, MPSGraphTensor varianceTensor, MPSGraphTensor? gamma, MPSGraphTensor? gammaGradient, MPSGraphTensor? betaGradient, NSArray axes, float epsilon, NSString? name);
 }
 
 #endif

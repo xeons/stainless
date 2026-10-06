@@ -41,11 +41,16 @@ public enum NSMediaLibrary : ulong
 
 public extern objc class NSMediaLibraryBrowserController : NSObject
 {
-    [Selector("sharedMediaLibraryBrowserController")] public static NSMediaLibraryBrowserController SharedMediaLibraryBrowserController { get; }
-    [Selector("isVisible", "setVisible:")] public bool Visible { get; set; }
-    [Selector("frame", "setFrame:")] public NSRect Frame { get; set; }
-    [Selector("mediaLibraries", "setMediaLibraries:")] public NSMediaLibrary MediaLibraries { get; set; }
-    [Selector("togglePanel:")] public void TogglePanel(AnyObject? sender);
+    [Selector("sharedMediaLibraryBrowserController")]
+    public static NSMediaLibraryBrowserController SharedMediaLibraryBrowserController { get; }
+    [Selector("isVisible", "setVisible:")]
+    public bool Visible { get; set; }
+    [Selector("frame", "setFrame:")]
+    public NSRect Frame { get; set; }
+    [Selector("mediaLibraries", "setMediaLibraries:")]
+    public NSMediaLibrary MediaLibraries { get; set; }
+    [Selector("togglePanel:")]
+    public void TogglePanel(AnyObject? sender);
 }
 
 #endif

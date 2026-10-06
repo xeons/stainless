@@ -61,13 +61,17 @@ public extern objc class CFMutableArrayRef : CFArrayRef { }
 
 public extern "C" CFTypeID CFArrayGetTypeID();
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFArrayCreate(CFAllocatorRef? allocator, void** values, CFIndex numValues, CFArrayCallBacks* callBacks);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFArrayCreate(CFAllocatorRef? allocator, void** values, CFIndex numValues, CFArrayCallBacks* callBacks);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFArrayCreateCopy(CFAllocatorRef? allocator, CFArrayRef? theArray);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFArrayCreateCopy(CFAllocatorRef? allocator, CFArrayRef? theArray);
 
-[ReturnsRetained] public extern "C" CFMutableArrayRef? CFArrayCreateMutable(CFAllocatorRef? allocator, CFIndex capacity, CFArrayCallBacks* callBacks);
+[ReturnsRetained]
+public extern "C" CFMutableArrayRef? CFArrayCreateMutable(CFAllocatorRef? allocator, CFIndex capacity, CFArrayCallBacks* callBacks);
 
-[ReturnsRetained] public extern "C" CFMutableArrayRef? CFArrayCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFArrayRef? theArray);
+[ReturnsRetained]
+public extern "C" CFMutableArrayRef? CFArrayCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFArrayRef? theArray);
 
 public extern "C" CFIndex CFArrayGetCount(CFArrayRef? theArray);
 

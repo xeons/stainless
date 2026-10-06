@@ -37,13 +37,20 @@ public extern "C" NSString GCRacingWheelDidDisconnectNotification;
 
 public extern objc class GCRacingWheel : NSObject, GCDevice
 {
-    [Selector("connectedRacingWheels")] public static NSSet ConnectedRacingWheels { get; }
-    [Selector("isAcquired")] public bool Acquired { get; }
-    [Selector("wheelInput")] public GCRacingWheelInput WheelInput { get; }
-    [Selector("isSnapshot")] public bool Snapshot { get; }
-    [Selector("acquireDeviceWithError:")] public bool AcquireDeviceWithError(out NSError? error);
-    [Selector("relinquishDevice")] public void RelinquishDevice();
-    [Selector("capture")] public GCRacingWheel Capture();
+    [Selector("connectedRacingWheels")]
+    public static NSSet ConnectedRacingWheels { get; }
+    [Selector("isAcquired")]
+    public bool Acquired { get; }
+    [Selector("wheelInput")]
+    public GCRacingWheelInput WheelInput { get; }
+    [Selector("isSnapshot")]
+    public bool Snapshot { get; }
+    [Selector("acquireDeviceWithError:")]
+    public bool AcquireDeviceWithError(out NSError? error);
+    [Selector("relinquishDevice")]
+    public void RelinquishDevice();
+    [Selector("capture")]
+    public GCRacingWheel Capture();
 }
 
 #endif

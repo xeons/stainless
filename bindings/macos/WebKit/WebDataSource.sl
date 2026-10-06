@@ -34,22 +34,38 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class WebDataSource : NSObject
 {
-    [Selector("data")] public NSData? Data { get; }
-    [Selector("representation")] public WebDocumentRepresentation? Representation { get; }
-    [Selector("webFrame")] public WebFrame? WebFrame { get; }
-    [Selector("initialRequest")] public NSURLRequest? InitialRequest { get; }
-    [Selector("request")] public NSMutableURLRequest? Request { get; }
-    [Selector("response")] public NSURLResponse? Response { get; }
-    [Selector("textEncodingName")] public NSString? TextEncodingName { get; }
-    [Selector("isLoading")] public bool Loading { get; }
-    [Selector("pageTitle")] public NSString? PageTitle { get; }
-    [Selector("unreachableURL")] public NSURL? UnreachableURL { get; }
-    [Selector("webArchive")] public WebArchive? WebArchive { get; }
-    [Selector("mainResource")] public WebResource? MainResource { get; }
-    [Selector("subresources")] public NSArray? Subresources { get; }
-    [Selector("initWithRequest:")] public Self? InitWithRequest(NSURLRequest? request);
-    [Selector("subresourceForURL:")] public WebResource? SubresourceForURL(NSURL? URL);
-    [Selector("addSubresource:")] public void AddSubresource(WebResource? subresource);
+    [Selector("data")]
+    public NSData? Data { get; }
+    [Selector("representation")]
+    public WebDocumentRepresentation? Representation { get; }
+    [Selector("webFrame")]
+    public WebFrame? WebFrame { get; }
+    [Selector("initialRequest")]
+    public NSURLRequest? InitialRequest { get; }
+    [Selector("request")]
+    public NSMutableURLRequest? Request { get; }
+    [Selector("response")]
+    public NSURLResponse? Response { get; }
+    [Selector("textEncodingName")]
+    public NSString? TextEncodingName { get; }
+    [Selector("isLoading")]
+    public bool Loading { get; }
+    [Selector("pageTitle")]
+    public NSString? PageTitle { get; }
+    [Selector("unreachableURL")]
+    public NSURL? UnreachableURL { get; }
+    [Selector("webArchive")]
+    public WebArchive? WebArchive { get; }
+    [Selector("mainResource")]
+    public WebResource? MainResource { get; }
+    [Selector("subresources")]
+    public NSArray? Subresources { get; }
+    [Selector("initWithRequest:")]
+    public Self? InitWithRequest(NSURLRequest? request);
+    [Selector("subresourceForURL:")]
+    public WebResource? SubresourceForURL(NSURL? URL);
+    [Selector("addSubresource:")]
+    public void AddSubresource(WebResource? subresource);
 }
 
 #endif

@@ -31,10 +31,14 @@ import Standard.ObjC;
 
 public extern objc class MXAppLaunchMetric : MXMetric
 {
-    [Selector("histogrammedTimeToFirstDraw")] public MXHistogram HistogrammedTimeToFirstDraw { get; }
-    [Selector("histogrammedApplicationResumeTime")] public MXHistogram HistogrammedApplicationResumeTime { get; }
-    [Selector("histogrammedOptimizedTimeToFirstDraw")] public MXHistogram HistogrammedOptimizedTimeToFirstDraw { get; }
-    [Selector("histogrammedExtendedLaunch")] public MXHistogram HistogrammedExtendedLaunch { get; }
+    [Selector("histogrammedTimeToFirstDraw")]
+    public MXHistogram HistogrammedTimeToFirstDraw { get; }
+    [Selector("histogrammedApplicationResumeTime")]
+    public MXHistogram HistogrammedApplicationResumeTime { get; }
+    [Selector("histogrammedOptimizedTimeToFirstDraw")]
+    public MXHistogram HistogrammedOptimizedTimeToFirstDraw { get; }
+    [Selector("histogrammedExtendedLaunch")]
+    public MXHistogram HistogrammedExtendedLaunch { get; }
 }
 
 #endif

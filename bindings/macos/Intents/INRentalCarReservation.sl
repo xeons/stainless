@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class INRentalCarReservation : INReservation, NSCopying, NSSecureCoding
 {
-    [Selector("rentalCar")] public INRentalCar RentalCar { get; }
-    [Selector("rentalDuration")] public INDateComponentsRange RentalDuration { get; }
-    [Selector("pickupLocation")] public CLPlacemark? PickupLocation { get; }
-    [Selector("dropOffLocation")] public CLPlacemark? DropOffLocation { get; }
-    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:URL:rentalCar:rentalDuration:pickupLocation:dropOffLocation:")] public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsURLRentalCarRentalDurationPickupLocationDropOffLocation(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, NSURL? URL, INRentalCar rentalCar, INDateComponentsRange rentalDuration, CLPlacemark? pickupLocation, CLPlacemark? dropOffLocation);
-    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:rentalCar:rentalDuration:pickupLocation:dropOffLocation:")] public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsRentalCarRentalDurationPickupLocationDropOffLocation(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, INRentalCar rentalCar, INDateComponentsRange rentalDuration, CLPlacemark? pickupLocation, CLPlacemark? dropOffLocation);
+    [Selector("rentalCar")]
+    public INRentalCar RentalCar { get; }
+    [Selector("rentalDuration")]
+    public INDateComponentsRange RentalDuration { get; }
+    [Selector("pickupLocation")]
+    public CLPlacemark? PickupLocation { get; }
+    [Selector("dropOffLocation")]
+    public CLPlacemark? DropOffLocation { get; }
+    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:URL:rentalCar:rentalDuration:pickupLocation:dropOffLocation:")]
+    public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsURLRentalCarRentalDurationPickupLocationDropOffLocation(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, NSURL? URL, INRentalCar rentalCar, INDateComponentsRange rentalDuration, CLPlacemark? pickupLocation, CLPlacemark? dropOffLocation);
+    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:rentalCar:rentalDuration:pickupLocation:dropOffLocation:")]
+    public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsRentalCarRentalDurationPickupLocationDropOffLocation(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, INRentalCar rentalCar, INDateComponentsRange rentalDuration, CLPlacemark? pickupLocation, CLPlacemark? dropOffLocation);
 }
 
 #endif

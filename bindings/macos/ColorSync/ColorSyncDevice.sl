@@ -92,13 +92,15 @@ public extern "C" bool ColorSyncUnregisterDevice(CFStringRef deviceClass, CFUUID
 
 public extern "C" bool ColorSyncDeviceSetCustomProfiles(CFStringRef deviceClass, CFUUIDRef deviceID, CFDictionaryRef profileInfo);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? ColorSyncDeviceCopyDeviceInfo(CFStringRef deviceClass, CFUUIDRef devID);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? ColorSyncDeviceCopyDeviceInfo(CFStringRef deviceClass, CFUUIDRef devID);
 
 public delegate bool ColorSyncDeviceProfileIterateCallback(__CFDictionary* arg0, void* arg1);
 
 public extern "C" void ColorSyncIterateDeviceProfiles(ColorSyncDeviceProfileIterateCallback callBack, void* userInfo);
 
-[ReturnsRetained] public extern "C" CFUUIDRef CGDisplayCreateUUIDFromDisplayID(uint displayID);
+[ReturnsRetained]
+public extern "C" CFUUIDRef CGDisplayCreateUUIDFromDisplayID(uint displayID);
 
 public extern "C" uint CGDisplayGetDisplayIDFromUUID(CFUUIDRef uuid);
 

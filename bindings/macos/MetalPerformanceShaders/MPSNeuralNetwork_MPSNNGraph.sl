@@ -36,32 +36,56 @@ public objc closure void MPSNNGraphCompletionHandler(MPSImage? arg0, NSError? ar
 
 public extern objc class MPSNNGraph : MPSKernel, NSCopying, NSSecureCoding
 {
-    [Selector("sourceImageHandles")] public NSArray SourceImageHandles { get; }
-    [Selector("sourceStateHandles")] public NSArray? SourceStateHandles { get; }
-    [Selector("intermediateImageHandles")] public NSArray? IntermediateImageHandles { get; }
-    [Selector("resultStateHandles")] public NSArray? ResultStateHandles { get; }
-    [Selector("resultHandle")] public MPSHandle? ResultHandle { get; }
-    [Selector("outputStateIsTemporary", "setOutputStateIsTemporary:")] public bool OutputStateIsTemporary { get; set; }
-    [Selector("destinationImageAllocator", "setDestinationImageAllocator:")] public MPSImageAllocator DestinationImageAllocator { get; set; }
-    [Selector("format", "setFormat:")] public MPSImageFeatureChannelFormat Format { get; set; }
-    [Selector("resultImageIsNeeded")] public bool ResultImageIsNeeded { get; }
-    [Selector("initWithDevice:resultImage:resultImageIsNeeded:")] public Self? InitWithDeviceResultImageResultImageIsNeeded(MTLDevice device, MPSNNImageNode resultImage, bool resultIsNeeded);
-    [Selector("graphWithDevice:resultImage:resultImageIsNeeded:")] public static Self? GraphWithDeviceResultImageResultImageIsNeeded(MTLDevice device, MPSNNImageNode resultImage, bool resultIsNeeded);
-    [Selector("initWithDevice:resultImages:resultsAreNeeded:")] public Self? InitWithDeviceResultImagesResultsAreNeeded(MTLDevice device, NSArray resultImages, bool* areResultsNeeded);
-    [Selector("graphWithDevice:resultImages:resultsAreNeeded:")] public static Self? GraphWithDeviceResultImagesResultsAreNeeded(MTLDevice device, NSArray resultImages, bool* areResultsNeeded);
+    [Selector("sourceImageHandles")]
+    public NSArray SourceImageHandles { get; }
+    [Selector("sourceStateHandles")]
+    public NSArray? SourceStateHandles { get; }
+    [Selector("intermediateImageHandles")]
+    public NSArray? IntermediateImageHandles { get; }
+    [Selector("resultStateHandles")]
+    public NSArray? ResultStateHandles { get; }
+    [Selector("resultHandle")]
+    public MPSHandle? ResultHandle { get; }
+    [Selector("outputStateIsTemporary", "setOutputStateIsTemporary:")]
+    public bool OutputStateIsTemporary { get; set; }
+    [Selector("destinationImageAllocator", "setDestinationImageAllocator:")]
+    public MPSImageAllocator DestinationImageAllocator { get; set; }
+    [Selector("format", "setFormat:")]
+    public MPSImageFeatureChannelFormat Format { get; set; }
+    [Selector("resultImageIsNeeded")]
+    public bool ResultImageIsNeeded { get; }
+    [Selector("initWithDevice:resultImage:resultImageIsNeeded:")]
+    public Self? InitWithDeviceResultImageResultImageIsNeeded(MTLDevice device, MPSNNImageNode resultImage, bool resultIsNeeded);
+    [Selector("graphWithDevice:resultImage:resultImageIsNeeded:")]
+    public static Self? GraphWithDeviceResultImageResultImageIsNeeded(MTLDevice device, MPSNNImageNode resultImage, bool resultIsNeeded);
+    [Selector("initWithDevice:resultImages:resultsAreNeeded:")]
+    public Self? InitWithDeviceResultImagesResultsAreNeeded(MTLDevice device, NSArray resultImages, bool* areResultsNeeded);
+    [Selector("graphWithDevice:resultImages:resultsAreNeeded:")]
+    public static Self? GraphWithDeviceResultImagesResultsAreNeeded(MTLDevice device, NSArray resultImages, bool* areResultsNeeded);
     /// Deprecated in macOS 10.13.4.
-    [Selector("initWithDevice:resultImage:")] public Self? InitWithDeviceResultImage(MTLDevice device, MPSNNImageNode resultImage);
+    [Selector("initWithDevice:resultImage:")]
+    public Self? InitWithDeviceResultImage(MTLDevice device, MPSNNImageNode resultImage);
     /// Deprecated in macOS 10.13.4.
-    [Selector("graphWithDevice:resultImage:")] public static Self? GraphWithDeviceResultImage(MTLDevice device, MPSNNImageNode resultImage);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("reloadFromDataSources")] public void ReloadFromDataSources();
-    [Selector("encodeToCommandBuffer:sourceImages:sourceStates:intermediateImages:destinationStates:")] public MPSImage? EncodeToCommandBufferSourceImagesSourceStatesIntermediateImagesDestinationStates(MTLCommandBuffer commandBuffer, NSArray sourceImages, NSArray? sourceStates, NSMutableArray? intermediateImages, NSMutableArray? destinationStates);
-    [Selector("encodeBatchToCommandBuffer:sourceImages:sourceStates:intermediateImages:destinationStates:")] public MPSImageBatch? EncodeBatchToCommandBufferSourceImagesSourceStatesIntermediateImagesDestinationStates(MTLCommandBuffer commandBuffer, NSArray sourceImages, NSArray? sourceStates, NSMutableArray? intermediateImages, NSMutableArray? destinationStates);
-    [Selector("encodeToCommandBuffer:sourceImages:")] public MPSImage? EncodeToCommandBufferSourceImages(MTLCommandBuffer commandBuffer, NSArray sourceImages);
-    [Selector("encodeBatchToCommandBuffer:sourceImages:sourceStates:")] public MPSImageBatch? EncodeBatchToCommandBufferSourceImagesSourceStates(MTLCommandBuffer commandBuffer, NSArray sourceImages, NSArray? sourceStates);
-    [Selector("executeAsyncWithSourceImages:completionHandler:")] public MPSImage ExecuteAsyncWithSourceImagesCompletionHandler(NSArray sourceImages, MPSNNGraphCompletionHandler handler);
-    [Selector("readCountForSourceImageAtIndex:")] public NSUInteger ReadCountForSourceImageAtIndex(NSUInteger index);
-    [Selector("readCountForSourceStateAtIndex:")] public NSUInteger ReadCountForSourceStateAtIndex(NSUInteger index);
+    [Selector("graphWithDevice:resultImage:")]
+    public static Self? GraphWithDeviceResultImage(MTLDevice device, MPSNNImageNode resultImage);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("reloadFromDataSources")]
+    public void ReloadFromDataSources();
+    [Selector("encodeToCommandBuffer:sourceImages:sourceStates:intermediateImages:destinationStates:")]
+    public MPSImage? EncodeToCommandBufferSourceImagesSourceStatesIntermediateImagesDestinationStates(MTLCommandBuffer commandBuffer, NSArray sourceImages, NSArray? sourceStates, NSMutableArray? intermediateImages, NSMutableArray? destinationStates);
+    [Selector("encodeBatchToCommandBuffer:sourceImages:sourceStates:intermediateImages:destinationStates:")]
+    public MPSImageBatch? EncodeBatchToCommandBufferSourceImagesSourceStatesIntermediateImagesDestinationStates(MTLCommandBuffer commandBuffer, NSArray sourceImages, NSArray? sourceStates, NSMutableArray? intermediateImages, NSMutableArray? destinationStates);
+    [Selector("encodeToCommandBuffer:sourceImages:")]
+    public MPSImage? EncodeToCommandBufferSourceImages(MTLCommandBuffer commandBuffer, NSArray sourceImages);
+    [Selector("encodeBatchToCommandBuffer:sourceImages:sourceStates:")]
+    public MPSImageBatch? EncodeBatchToCommandBufferSourceImagesSourceStates(MTLCommandBuffer commandBuffer, NSArray sourceImages, NSArray? sourceStates);
+    [Selector("executeAsyncWithSourceImages:completionHandler:")]
+    public MPSImage ExecuteAsyncWithSourceImagesCompletionHandler(NSArray sourceImages, MPSNNGraphCompletionHandler handler);
+    [Selector("readCountForSourceImageAtIndex:")]
+    public NSUInteger ReadCountForSourceImageAtIndex(NSUInteger index);
+    [Selector("readCountForSourceStateAtIndex:")]
+    public NSUInteger ReadCountForSourceStateAtIndex(NSUInteger index);
 }
 
 #endif

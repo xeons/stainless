@@ -47,26 +47,38 @@ public enum CAConstraintAttribute : int
 /// CAConstraintLayoutManager, a category of CALayer.
 public extern objc class CALayer
 {
-    [Selector("constraints", "setConstraints:")] public NSArray? Constraints { get; set; }
-    [Selector("addConstraint:")] public void AddConstraint(CAConstraint c);
+    [Selector("constraints", "setConstraints:")]
+    public NSArray? Constraints { get; set; }
+    [Selector("addConstraint:")]
+    public void AddConstraint(CAConstraint c);
 }
 
 public extern objc class CAConstraintLayoutManager : NSObject, CALayoutManager
 {
-    [Selector("layoutManager")] public static Self LayoutManager();
+    [Selector("layoutManager")]
+    public static Self LayoutManager();
 }
 
 public extern objc class CAConstraint : NSObject, NSSecureCoding
 {
-    [Selector("attribute")] public CAConstraintAttribute Attribute { get; }
-    [Selector("sourceName")] public NSString SourceName { get; }
-    [Selector("sourceAttribute")] public CAConstraintAttribute SourceAttribute { get; }
-    [Selector("scale")] public CGFloat Scale { get; }
-    [Selector("offset")] public CGFloat Offset { get; }
-    [Selector("constraintWithAttribute:relativeTo:attribute:scale:offset:")] public static Self ConstraintWithAttributeRelativeToAttributeScaleOffset(CAConstraintAttribute attr, NSString srcId, CAConstraintAttribute srcAttr, CGFloat m, CGFloat c);
-    [Selector("constraintWithAttribute:relativeTo:attribute:offset:")] public static Self ConstraintWithAttributeRelativeToAttributeOffset(CAConstraintAttribute attr, NSString srcId, CAConstraintAttribute srcAttr, CGFloat c);
-    [Selector("constraintWithAttribute:relativeTo:attribute:")] public static Self ConstraintWithAttributeRelativeToAttribute(CAConstraintAttribute attr, NSString srcId, CAConstraintAttribute srcAttr);
-    [Selector("initWithAttribute:relativeTo:attribute:scale:offset:")] public Self InitWithAttributeRelativeToAttributeScaleOffset(CAConstraintAttribute attr, NSString srcId, CAConstraintAttribute srcAttr, CGFloat m, CGFloat c);
+    [Selector("attribute")]
+    public CAConstraintAttribute Attribute { get; }
+    [Selector("sourceName")]
+    public NSString SourceName { get; }
+    [Selector("sourceAttribute")]
+    public CAConstraintAttribute SourceAttribute { get; }
+    [Selector("scale")]
+    public CGFloat Scale { get; }
+    [Selector("offset")]
+    public CGFloat Offset { get; }
+    [Selector("constraintWithAttribute:relativeTo:attribute:scale:offset:")]
+    public static Self ConstraintWithAttributeRelativeToAttributeScaleOffset(CAConstraintAttribute attr, NSString srcId, CAConstraintAttribute srcAttr, CGFloat m, CGFloat c);
+    [Selector("constraintWithAttribute:relativeTo:attribute:offset:")]
+    public static Self ConstraintWithAttributeRelativeToAttributeOffset(CAConstraintAttribute attr, NSString srcId, CAConstraintAttribute srcAttr, CGFloat c);
+    [Selector("constraintWithAttribute:relativeTo:attribute:")]
+    public static Self ConstraintWithAttributeRelativeToAttribute(CAConstraintAttribute attr, NSString srcId, CAConstraintAttribute srcAttr);
+    [Selector("initWithAttribute:relativeTo:attribute:scale:offset:")]
+    public Self InitWithAttributeRelativeToAttributeScaleOffset(CAConstraintAttribute attr, NSString srcId, CAConstraintAttribute srcAttr, CGFloat m, CGFloat c);
 }
 
 #endif

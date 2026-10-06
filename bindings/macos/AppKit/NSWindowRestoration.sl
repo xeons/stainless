@@ -35,7 +35,8 @@ public objc closure void NSWindowRestorationRestoreWindowWithIdentifierStateComp
 
 public objc interface NSWindowRestoration : NSObjectProtocol
 {
-    [Selector("restoreWindowWithIdentifier:state:completionHandler:")] static abstract void RestoreWindowWithIdentifierStateCompletionHandler(NSUserInterfaceItemIdentifier identifier, NSCoder state, NSWindowRestorationRestoreWindowWithIdentifierStateCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("restoreWindowWithIdentifier:state:completionHandler:")]
+    static abstract void RestoreWindowWithIdentifierStateCompletionHandler(NSUserInterfaceItemIdentifier identifier, NSCoder state, NSWindowRestorationRestoreWindowWithIdentifierStateCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 /// NSWindowRestoration, a category of NSDocumentController.
@@ -46,7 +47,8 @@ public objc closure void NSApplicationRestoreWindowWithIdentifierStateCompletion
 /// NSWindowRestoration, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("restoreWindowWithIdentifier:state:completionHandler:")] public bool RestoreWindowWithIdentifierStateCompletionHandler(NSUserInterfaceItemIdentifier identifier, NSCoder state, NSApplicationRestoreWindowWithIdentifierStateCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("restoreWindowWithIdentifier:state:completionHandler:")]
+    public bool RestoreWindowWithIdentifierStateCompletionHandler(NSUserInterfaceItemIdentifier identifier, NSCoder state, NSApplicationRestoreWindowWithIdentifierStateCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public extern "C" NSNotificationName? NSApplicationDidFinishRestoringWindowsNotification;
@@ -54,28 +56,40 @@ public extern "C" NSNotificationName? NSApplicationDidFinishRestoringWindowsNoti
 /// NSUserInterfaceRestoration, a category of NSWindow.
 public extern objc class NSWindow
 {
-    [Selector("isRestorable", "setRestorable:")] public bool Restorable { get; set; }
-    [Selector("restorationClass", "setRestorationClass:")] public Class RestorationClass { get; set; }
-    [Selector("disableSnapshotRestoration")] public void DisableSnapshotRestoration();
-    [Selector("enableSnapshotRestoration")] public void EnableSnapshotRestoration();
+    [Selector("isRestorable", "setRestorable:")]
+    public bool Restorable { get; set; }
+    [Selector("restorationClass", "setRestorationClass:")]
+    public Class RestorationClass { get; set; }
+    [Selector("disableSnapshotRestoration")]
+    public void DisableSnapshotRestoration();
+    [Selector("enableSnapshotRestoration")]
+    public void EnableSnapshotRestoration();
 }
 
 /// NSRestorableState, a category of NSResponder.
 public extern objc class NSResponder
 {
-    [Selector("restorableStateKeyPaths")] public static NSArray? RestorableStateKeyPaths { get; }
-    [Selector("encodeRestorableStateWithCoder:")] public void EncodeRestorableStateWithCoder(NSCoder coder);
-    [Selector("encodeRestorableStateWithCoder:backgroundQueue:")] public void EncodeRestorableStateWithCoderBackgroundQueue(NSCoder coder, NSOperationQueue queue);
-    [Selector("restoreStateWithCoder:")] public void RestoreStateWithCoder(NSCoder coder);
-    [Selector("invalidateRestorableState")] public void InvalidateRestorableState();
-    [Selector("allowedClassesForRestorableStateKeyPath:")] public static NSArray AllowedClassesForRestorableStateKeyPath(NSString keyPath);
+    [Selector("restorableStateKeyPaths")]
+    public static NSArray? RestorableStateKeyPaths { get; }
+    [Selector("encodeRestorableStateWithCoder:")]
+    public void EncodeRestorableStateWithCoder(NSCoder coder);
+    [Selector("encodeRestorableStateWithCoder:backgroundQueue:")]
+    public void EncodeRestorableStateWithCoderBackgroundQueue(NSCoder coder, NSOperationQueue queue);
+    [Selector("restoreStateWithCoder:")]
+    public void RestoreStateWithCoder(NSCoder coder);
+    [Selector("invalidateRestorableState")]
+    public void InvalidateRestorableState();
+    [Selector("allowedClassesForRestorableStateKeyPath:")]
+    public static NSArray AllowedClassesForRestorableStateKeyPath(NSString keyPath);
 }
 
 /// NSRestorableStateExtension, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("extendStateRestoration")] public void ExtendStateRestoration();
-    [Selector("completeStateRestoration")] public void CompleteStateRestoration();
+    [Selector("extendStateRestoration")]
+    public void ExtendStateRestoration();
+    [Selector("completeStateRestoration")]
+    public void CompleteStateRestoration();
 }
 
 public objc closure void NSDocumentRestoreDocumentWindowWithIdentifierStateCompletionHandlerCompletionHandlerBlock(NSWindow? arg0, NSError? arg1);
@@ -83,13 +97,20 @@ public objc closure void NSDocumentRestoreDocumentWindowWithIdentifierStateCompl
 /// NSRestorableState, a category of NSDocument.
 public extern objc class NSDocument
 {
-    [Selector("restorableStateKeyPaths")] public static NSArray? RestorableStateKeyPaths { get; }
-    [Selector("restoreDocumentWindowWithIdentifier:state:completionHandler:")] public void RestoreDocumentWindowWithIdentifierStateCompletionHandler(NSUserInterfaceItemIdentifier identifier, NSCoder state, NSDocumentRestoreDocumentWindowWithIdentifierStateCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("encodeRestorableStateWithCoder:")] public void EncodeRestorableStateWithCoder(NSCoder coder);
-    [Selector("encodeRestorableStateWithCoder:backgroundQueue:")] public void EncodeRestorableStateWithCoderBackgroundQueue(NSCoder coder, NSOperationQueue queue);
-    [Selector("restoreStateWithCoder:")] public void RestoreStateWithCoder(NSCoder coder);
-    [Selector("invalidateRestorableState")] public void InvalidateRestorableState();
-    [Selector("allowedClassesForRestorableStateKeyPath:")] public static NSArray AllowedClassesForRestorableStateKeyPath(NSString keyPath);
+    [Selector("restorableStateKeyPaths")]
+    public static NSArray? RestorableStateKeyPaths { get; }
+    [Selector("restoreDocumentWindowWithIdentifier:state:completionHandler:")]
+    public void RestoreDocumentWindowWithIdentifierStateCompletionHandler(NSUserInterfaceItemIdentifier identifier, NSCoder state, NSDocumentRestoreDocumentWindowWithIdentifierStateCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("encodeRestorableStateWithCoder:")]
+    public void EncodeRestorableStateWithCoder(NSCoder coder);
+    [Selector("encodeRestorableStateWithCoder:backgroundQueue:")]
+    public void EncodeRestorableStateWithCoderBackgroundQueue(NSCoder coder, NSOperationQueue queue);
+    [Selector("restoreStateWithCoder:")]
+    public void RestoreStateWithCoder(NSCoder coder);
+    [Selector("invalidateRestorableState")]
+    public void InvalidateRestorableState();
+    [Selector("allowedClassesForRestorableStateKeyPath:")]
+    public static NSArray AllowedClassesForRestorableStateKeyPath(NSString keyPath);
 }
 
 #endif

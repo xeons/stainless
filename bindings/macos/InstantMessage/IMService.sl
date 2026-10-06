@@ -124,42 +124,58 @@ public extern "C" NSString? IMCapabilityVideoConference;
 public extern objc class IMService : NSObject
 {
     /// Deprecated in macOS 10.9.
-    [Selector("imageNameForStatus:")] public static NSString? ImageNameForStatus(IMPersonStatus status);
+    [Selector("imageNameForStatus:")]
+    public static NSString? ImageNameForStatus(IMPersonStatus status);
     /// Deprecated in macOS 10.9.
-    [Selector("allServices")] public static NSArray? AllServices();
+    [Selector("allServices")]
+    public static NSArray? AllServices();
     /// Deprecated in macOS 10.9.
-    [Selector("serviceWithName:")] public static IMService? ServiceWithName(NSString? name);
+    [Selector("serviceWithName:")]
+    public static IMService? ServiceWithName(NSString? name);
     /// Deprecated in macOS 10.9.
-    [Selector("notificationCenter")] public static NSNotificationCenter? NotificationCenter();
+    [Selector("notificationCenter")]
+    public static NSNotificationCenter? NotificationCenter();
     /// Deprecated in macOS 10.9.
-    [Selector("myStatus")] public static IMPersonStatus MyStatus();
+    [Selector("myStatus")]
+    public static IMPersonStatus MyStatus();
     /// Deprecated in macOS 10.9.
-    [Selector("myIdleTime")] public static NSDate? MyIdleTime();
+    [Selector("myIdleTime")]
+    public static NSDate? MyIdleTime();
     /// Deprecated in macOS 10.9.
-    [Selector("localizedName")] public NSString? LocalizedName();
+    [Selector("localizedName")]
+    public NSString? LocalizedName();
     /// Deprecated in macOS 10.9.
-    [Selector("localizedShortName")] public NSString? LocalizedShortName();
+    [Selector("localizedShortName")]
+    public NSString? LocalizedShortName();
     /// Deprecated in macOS 10.9.
-    [Selector("name")] public NSString? Name();
+    [Selector("name")]
+    public NSString? Name();
     /// Deprecated in macOS 10.9.
-    [Selector("status")] public IMServiceStatus Status();
+    [Selector("status")]
+    public IMServiceStatus Status();
     /// Deprecated in macOS 10.9.
-    [Selector("infoForScreenName:")] public NSDictionary? InfoForScreenName(NSString? screenName);
+    [Selector("infoForScreenName:")]
+    public NSDictionary? InfoForScreenName(NSString? screenName);
     /// Deprecated in macOS 10.9.
-    [Selector("infoForAllScreenNames")] public NSArray? InfoForAllScreenNames();
+    [Selector("infoForAllScreenNames")]
+    public NSArray? InfoForAllScreenNames();
     /// Deprecated in macOS 10.9.
-    [Selector("infoForPreferredScreenNames")] public NSArray? InfoForPreferredScreenNames();
+    [Selector("infoForPreferredScreenNames")]
+    public NSArray? InfoForPreferredScreenNames();
     /// Deprecated in macOS 10.9.
-    [Selector("peopleWithScreenName:")] public NSArray? PeopleWithScreenName(NSString? screenName);
+    [Selector("peopleWithScreenName:")]
+    public NSArray? PeopleWithScreenName(NSString? screenName);
     /// Deprecated in macOS 10.9.
-    [Selector("screenNamesForPerson:")] public NSArray? ScreenNamesForPerson(ABPerson? person);
+    [Selector("screenNamesForPerson:")]
+    public NSArray? ScreenNamesForPerson(ABPerson? person);
 }
 
 /// NSDeprecatedMethods, a category of IMService.
 public extern objc class IMService
 {
     /// Deprecated in macOS 10.5.
-    [Selector("imageURLForStatus:")] public static NSURL? ImageURLForStatus(IMPersonStatus status);
+    [Selector("imageURLForStatus:")]
+    public static NSURL? ImageURLForStatus(IMPersonStatus status);
 }
 
 #endif

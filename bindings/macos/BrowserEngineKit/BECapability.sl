@@ -33,34 +33,43 @@ import Standard.ObjC;
 
 public objc interface BEProcessCapabilityGrant : NSObjectProtocol
 {
-    [Selector("isValid")] bool Valid { get; }
-    [Selector("invalidate")] bool Invalidate();
+    [Selector("isValid")]
+    bool Valid { get; }
+    [Selector("invalidate")]
+    bool Invalidate();
 }
 
 public extern objc class BEProcessCapability : NSObject
 {
-    [Selector("background")] public static Self Background();
-    [Selector("foreground")] public static Self Foreground();
-    [Selector("suspended")] public static Self Suspended();
-    [Selector("requestWithError:")] public BEProcessCapabilityGrant RequestWithError(out NSError? error);
+    [Selector("background")]
+    public static Self Background();
+    [Selector("foreground")]
+    public static Self Foreground();
+    [Selector("suspended")]
+    public static Self Suspended();
+    [Selector("requestWithError:")]
+    public BEProcessCapabilityGrant RequestWithError(out NSError? error);
 }
 
 /// Capability, a category of BEWebContentProcess.
 public extern objc class BEWebContentProcess
 {
-    [Selector("grantCapability:error:")] public BEProcessCapabilityGrant? GrantCapabilityError(BEProcessCapability capability, out NSError? error);
+    [Selector("grantCapability:error:")]
+    public BEProcessCapabilityGrant? GrantCapabilityError(BEProcessCapability capability, out NSError? error);
 }
 
 /// Capability, a category of BERenderingProcess.
 public extern objc class BERenderingProcess
 {
-    [Selector("grantCapability:error:")] public BEProcessCapabilityGrant? GrantCapabilityError(BEProcessCapability capability, out NSError? error);
+    [Selector("grantCapability:error:")]
+    public BEProcessCapabilityGrant? GrantCapabilityError(BEProcessCapability capability, out NSError? error);
 }
 
 /// Capability, a category of BENetworkingProcess.
 public extern objc class BENetworkingProcess
 {
-    [Selector("grantCapability:error:")] public BEProcessCapabilityGrant? GrantCapabilityError(BEProcessCapability capability, out NSError? error);
+    [Selector("grantCapability:error:")]
+    public BEProcessCapabilityGrant? GrantCapabilityError(BEProcessCapability capability, out NSError? error);
 }
 
 #endif

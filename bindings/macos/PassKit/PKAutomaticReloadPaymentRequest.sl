@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class PKAutomaticReloadPaymentRequest : NSObject
 {
-    [Selector("paymentDescription", "setPaymentDescription:")] public NSString PaymentDescription { get; set; }
-    [Selector("automaticReloadBilling", "setAutomaticReloadBilling:")] public PKAutomaticReloadPaymentSummaryItem AutomaticReloadBilling { get; set; }
-    [Selector("billingAgreement", "setBillingAgreement:")] public NSString? BillingAgreement { get; set; }
-    [Selector("managementURL", "setManagementURL:")] public NSURL ManagementURL { get; set; }
-    [Selector("tokenNotificationURL", "setTokenNotificationURL:")] public NSURL? TokenNotificationURL { get; set; }
-    [Selector("initWithPaymentDescription:automaticReloadBilling:managementURL:")] public Self InitWithPaymentDescriptionAutomaticReloadBillingManagementURL(NSString paymentDescription, PKAutomaticReloadPaymentSummaryItem automaticReloadBilling, NSURL managementURL);
+    [Selector("paymentDescription", "setPaymentDescription:")]
+    public NSString PaymentDescription { get; set; }
+    [Selector("automaticReloadBilling", "setAutomaticReloadBilling:")]
+    public PKAutomaticReloadPaymentSummaryItem AutomaticReloadBilling { get; set; }
+    [Selector("billingAgreement", "setBillingAgreement:")]
+    public NSString? BillingAgreement { get; set; }
+    [Selector("managementURL", "setManagementURL:")]
+    public NSURL ManagementURL { get; set; }
+    [Selector("tokenNotificationURL", "setTokenNotificationURL:")]
+    public NSURL? TokenNotificationURL { get; set; }
+    [Selector("initWithPaymentDescription:automaticReloadBilling:managementURL:")]
+    public Self InitWithPaymentDescriptionAutomaticReloadBillingManagementURL(NSString paymentDescription, PKAutomaticReloadPaymentSummaryItem automaticReloadBilling, NSURL managementURL);
 }
 
 #endif

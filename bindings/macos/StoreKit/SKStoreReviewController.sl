@@ -34,7 +34,8 @@ import Standard.ObjC;
 public extern objc class SKStoreReviewController : NSObject
 {
     /// Deprecated in macOS 15.0.
-    [Selector("requestReview")] public static void RequestReview();
+    [Selector("requestReview")]
+    public static void RequestReview();
 }
 
 #endif

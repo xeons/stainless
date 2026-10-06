@@ -33,30 +33,47 @@ import Standard.ObjC;
 
 public extern objc class MPSPredicate : NSObject
 {
-    [Selector("predicateBuffer")] public MTLBuffer PredicateBuffer { get; }
-    [Selector("predicateOffset")] public NSUInteger PredicateOffset { get; }
-    [Selector("predicateWithBuffer:offset:")] public static Self PredicateWithBufferOffset(MTLBuffer buffer, NSUInteger offset);
-    [Selector("initWithBuffer:offset:")] public Self InitWithBufferOffset(MTLBuffer buffer, NSUInteger offset);
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("predicateBuffer")]
+    public MTLBuffer PredicateBuffer { get; }
+    [Selector("predicateOffset")]
+    public NSUInteger PredicateOffset { get; }
+    [Selector("predicateWithBuffer:offset:")]
+    public static Self PredicateWithBufferOffset(MTLBuffer buffer, NSUInteger offset);
+    [Selector("initWithBuffer:offset:")]
+    public Self InitWithBufferOffset(MTLBuffer buffer, NSUInteger offset);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public objc interface MPSHeapProvider : NSObjectProtocol
 {
-    [Selector("newHeapWithDescriptor:")] MTLHeap? NewHeapWithDescriptor(MTLHeapDescriptor descriptor);
-    [Optional] [Selector("retireHeap:cacheDelay:")] void RetireHeapCacheDelay(MTLHeap heap, double seconds);
+    [Selector("newHeapWithDescriptor:")]
+    MTLHeap? NewHeapWithDescriptor(MTLHeapDescriptor descriptor);
+    [Optional]
+    [Selector("retireHeap:cacheDelay:")]
+    void RetireHeapCacheDelay(MTLHeap heap, double seconds);
 }
 
 public extern objc class MPSCommandBuffer : NSObject, MTLCommandBuffer
 {
-    [Selector("commandBuffer")] public MTLCommandBuffer CommandBuffer { get; }
-    [Selector("rootCommandBuffer")] public MTLCommandBuffer RootCommandBuffer { get; }
-    [Selector("predicate", "setPredicate:")] public MPSPredicate? Predicate { get; set; }
-    [Selector("heapProvider", "setHeapProvider:")] public MPSHeapProvider? HeapProvider { get; set; }
-    [Selector("commandBufferWithCommandBuffer:")] public static Self CommandBufferWithCommandBuffer(MTLCommandBuffer commandBuffer);
-    [Selector("commandBufferFromCommandQueue:")] public static Self CommandBufferFromCommandQueue(MTLCommandQueue commandQueue);
-    [Selector("initWithCommandBuffer:")] public Self InitWithCommandBuffer(MTLCommandBuffer commandBuffer);
-    [Selector("commitAndContinue")] public void CommitAndContinue();
-    [Selector("prefetchHeapForWorkloadSize:")] public void PrefetchHeapForWorkloadSize(nuint size);
+    [Selector("commandBuffer")]
+    public MTLCommandBuffer CommandBuffer { get; }
+    [Selector("rootCommandBuffer")]
+    public MTLCommandBuffer RootCommandBuffer { get; }
+    [Selector("predicate", "setPredicate:")]
+    public MPSPredicate? Predicate { get; set; }
+    [Selector("heapProvider", "setHeapProvider:")]
+    public MPSHeapProvider? HeapProvider { get; set; }
+    [Selector("commandBufferWithCommandBuffer:")]
+    public static Self CommandBufferWithCommandBuffer(MTLCommandBuffer commandBuffer);
+    [Selector("commandBufferFromCommandQueue:")]
+    public static Self CommandBufferFromCommandQueue(MTLCommandQueue commandQueue);
+    [Selector("initWithCommandBuffer:")]
+    public Self InitWithCommandBuffer(MTLCommandBuffer commandBuffer);
+    [Selector("commitAndContinue")]
+    public void CommitAndContinue();
+    [Selector("prefetchHeapForWorkloadSize:")]
+    public void PrefetchHeapForWorkloadSize(nuint size);
 }
 
 #endif

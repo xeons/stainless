@@ -33,19 +33,28 @@ import Standard.ObjC;
 
 public extern objc class MXSignpostIntervalData : NSObject, NSSecureCoding
 {
-    [Selector("histogrammedSignpostDuration")] public MXHistogram HistogrammedSignpostDuration { get; }
-    [Selector("cumulativeCPUTime")] public NSMeasurement? CumulativeCPUTime { get; }
-    [Selector("averageMemory")] public MXAverage? AverageMemory { get; }
-    [Selector("cumulativeLogicalWrites")] public NSMeasurement? CumulativeLogicalWrites { get; }
-    [Selector("cumulativeHitchTimeRatio")] public NSMeasurement? CumulativeHitchTimeRatio { get; }
+    [Selector("histogrammedSignpostDuration")]
+    public MXHistogram HistogrammedSignpostDuration { get; }
+    [Selector("cumulativeCPUTime")]
+    public NSMeasurement? CumulativeCPUTime { get; }
+    [Selector("averageMemory")]
+    public MXAverage? AverageMemory { get; }
+    [Selector("cumulativeLogicalWrites")]
+    public NSMeasurement? CumulativeLogicalWrites { get; }
+    [Selector("cumulativeHitchTimeRatio")]
+    public NSMeasurement? CumulativeHitchTimeRatio { get; }
 }
 
 public extern objc class MXSignpostMetric : MXMetric
 {
-    [Selector("signpostName")] public NSString SignpostName { get; }
-    [Selector("signpostCategory")] public NSString SignpostCategory { get; }
-    [Selector("signpostIntervalData")] public MXSignpostIntervalData? SignpostIntervalData { get; }
-    [Selector("totalCount")] public NSUInteger TotalCount { get; }
+    [Selector("signpostName")]
+    public NSString SignpostName { get; }
+    [Selector("signpostCategory")]
+    public NSString SignpostCategory { get; }
+    [Selector("signpostIntervalData")]
+    public MXSignpostIntervalData? SignpostIntervalData { get; }
+    [Selector("totalCount")]
+    public NSUInteger TotalCount { get; }
 }
 
 #endif

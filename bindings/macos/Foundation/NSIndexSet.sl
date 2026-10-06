@@ -56,50 +56,90 @@ public objc closure void NSIndexSetEnumerateRangesInRangeOptionsUsingBlockBlock(
 
 public extern objc class NSIndexSet : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("count")] public NSUInteger Count { get; }
-    [Selector("firstIndex")] public NSUInteger FirstIndex { get; }
-    [Selector("lastIndex")] public NSUInteger LastIndex { get; }
-    [Selector("indexSet")] public static Self IndexSet();
-    [Selector("indexSetWithIndex:")] public static Self IndexSetWithIndex(NSUInteger value);
-    [Selector("indexSetWithIndexesInRange:")] public static Self IndexSetWithIndexesInRange(NSRange range);
-    [Selector("initWithIndexesInRange:")] public Self InitWithIndexesInRange(NSRange range);
-    [Selector("initWithIndexSet:")] public Self InitWithIndexSet(NSIndexSet indexSet);
-    [Selector("initWithIndex:")] public Self InitWithIndex(NSUInteger value);
-    [Selector("isEqualToIndexSet:")] public bool IsEqualToIndexSet(NSIndexSet indexSet);
-    [Selector("indexGreaterThanIndex:")] public NSUInteger IndexGreaterThanIndex(NSUInteger value);
-    [Selector("indexLessThanIndex:")] public NSUInteger IndexLessThanIndex(NSUInteger value);
-    [Selector("indexGreaterThanOrEqualToIndex:")] public NSUInteger IndexGreaterThanOrEqualToIndex(NSUInteger value);
-    [Selector("indexLessThanOrEqualToIndex:")] public NSUInteger IndexLessThanOrEqualToIndex(NSUInteger value);
-    [Selector("getIndexes:maxCount:inIndexRange:")] public NSUInteger GetIndexesMaxCountInIndexRange(NSUInteger* indexBuffer, NSUInteger bufferSize, NSRangePointer range);
-    [Selector("countOfIndexesInRange:")] public NSUInteger CountOfIndexesInRange(NSRange range);
-    [Selector("containsIndex:")] public bool ContainsIndex(NSUInteger value);
-    [Selector("containsIndexesInRange:")] public bool ContainsIndexesInRange(NSRange range);
-    [Selector("containsIndexes:")] public bool ContainsIndexes(NSIndexSet indexSet);
-    [Selector("intersectsIndexesInRange:")] public bool IntersectsIndexesInRange(NSRange range);
-    [Selector("enumerateIndexesUsingBlock:")] public void EnumerateIndexesUsingBlock(NSIndexSetEnumerateIndexesUsingBlockBlock block);
-    [Selector("enumerateIndexesWithOptions:usingBlock:")] public void EnumerateIndexesWithOptionsUsingBlock(NSEnumerationOptions opts, NSIndexSetEnumerateIndexesWithOptionsUsingBlockBlock block);
-    [Selector("enumerateIndexesInRange:options:usingBlock:")] public void EnumerateIndexesInRangeOptionsUsingBlock(NSRange range, NSEnumerationOptions opts, NSIndexSetEnumerateIndexesInRangeOptionsUsingBlockBlock block);
-    [Selector("indexPassingTest:")] public NSUInteger IndexPassingTest(NSIndexSetIndexPassingTestPredicateBlock predicate);
-    [Selector("indexWithOptions:passingTest:")] public NSUInteger IndexWithOptionsPassingTest(NSEnumerationOptions opts, NSIndexSetIndexWithOptionsPassingTestPredicateBlock predicate);
-    [Selector("indexInRange:options:passingTest:")] public NSUInteger IndexInRangeOptionsPassingTest(NSRange range, NSEnumerationOptions opts, NSIndexSetIndexInRangeOptionsPassingTestPredicateBlock predicate);
-    [Selector("indexesPassingTest:")] public NSIndexSet IndexesPassingTest(NSIndexSetIndexesPassingTestPredicateBlock predicate);
-    [Selector("indexesWithOptions:passingTest:")] public NSIndexSet IndexesWithOptionsPassingTest(NSEnumerationOptions opts, NSIndexSetIndexesWithOptionsPassingTestPredicateBlock predicate);
-    [Selector("indexesInRange:options:passingTest:")] public NSIndexSet IndexesInRangeOptionsPassingTest(NSRange range, NSEnumerationOptions opts, NSIndexSetIndexesInRangeOptionsPassingTestPredicateBlock predicate);
-    [Selector("enumerateRangesUsingBlock:")] public void EnumerateRangesUsingBlock(NSIndexSetEnumerateRangesUsingBlockBlock block);
-    [Selector("enumerateRangesWithOptions:usingBlock:")] public void EnumerateRangesWithOptionsUsingBlock(NSEnumerationOptions opts, NSIndexSetEnumerateRangesWithOptionsUsingBlockBlock block);
-    [Selector("enumerateRangesInRange:options:usingBlock:")] public void EnumerateRangesInRangeOptionsUsingBlock(NSRange range, NSEnumerationOptions opts, NSIndexSetEnumerateRangesInRangeOptionsUsingBlockBlock block);
+    [Selector("count")]
+    public NSUInteger Count { get; }
+    [Selector("firstIndex")]
+    public NSUInteger FirstIndex { get; }
+    [Selector("lastIndex")]
+    public NSUInteger LastIndex { get; }
+    [Selector("indexSet")]
+    public static Self IndexSet();
+    [Selector("indexSetWithIndex:")]
+    public static Self IndexSetWithIndex(NSUInteger value);
+    [Selector("indexSetWithIndexesInRange:")]
+    public static Self IndexSetWithIndexesInRange(NSRange range);
+    [Selector("initWithIndexesInRange:")]
+    public Self InitWithIndexesInRange(NSRange range);
+    [Selector("initWithIndexSet:")]
+    public Self InitWithIndexSet(NSIndexSet indexSet);
+    [Selector("initWithIndex:")]
+    public Self InitWithIndex(NSUInteger value);
+    [Selector("isEqualToIndexSet:")]
+    public bool IsEqualToIndexSet(NSIndexSet indexSet);
+    [Selector("indexGreaterThanIndex:")]
+    public NSUInteger IndexGreaterThanIndex(NSUInteger value);
+    [Selector("indexLessThanIndex:")]
+    public NSUInteger IndexLessThanIndex(NSUInteger value);
+    [Selector("indexGreaterThanOrEqualToIndex:")]
+    public NSUInteger IndexGreaterThanOrEqualToIndex(NSUInteger value);
+    [Selector("indexLessThanOrEqualToIndex:")]
+    public NSUInteger IndexLessThanOrEqualToIndex(NSUInteger value);
+    [Selector("getIndexes:maxCount:inIndexRange:")]
+    public NSUInteger GetIndexesMaxCountInIndexRange(NSUInteger* indexBuffer, NSUInteger bufferSize, NSRangePointer range);
+    [Selector("countOfIndexesInRange:")]
+    public NSUInteger CountOfIndexesInRange(NSRange range);
+    [Selector("containsIndex:")]
+    public bool ContainsIndex(NSUInteger value);
+    [Selector("containsIndexesInRange:")]
+    public bool ContainsIndexesInRange(NSRange range);
+    [Selector("containsIndexes:")]
+    public bool ContainsIndexes(NSIndexSet indexSet);
+    [Selector("intersectsIndexesInRange:")]
+    public bool IntersectsIndexesInRange(NSRange range);
+    [Selector("enumerateIndexesUsingBlock:")]
+    public void EnumerateIndexesUsingBlock(NSIndexSetEnumerateIndexesUsingBlockBlock block);
+    [Selector("enumerateIndexesWithOptions:usingBlock:")]
+    public void EnumerateIndexesWithOptionsUsingBlock(NSEnumerationOptions opts, NSIndexSetEnumerateIndexesWithOptionsUsingBlockBlock block);
+    [Selector("enumerateIndexesInRange:options:usingBlock:")]
+    public void EnumerateIndexesInRangeOptionsUsingBlock(NSRange range, NSEnumerationOptions opts, NSIndexSetEnumerateIndexesInRangeOptionsUsingBlockBlock block);
+    [Selector("indexPassingTest:")]
+    public NSUInteger IndexPassingTest(NSIndexSetIndexPassingTestPredicateBlock predicate);
+    [Selector("indexWithOptions:passingTest:")]
+    public NSUInteger IndexWithOptionsPassingTest(NSEnumerationOptions opts, NSIndexSetIndexWithOptionsPassingTestPredicateBlock predicate);
+    [Selector("indexInRange:options:passingTest:")]
+    public NSUInteger IndexInRangeOptionsPassingTest(NSRange range, NSEnumerationOptions opts, NSIndexSetIndexInRangeOptionsPassingTestPredicateBlock predicate);
+    [Selector("indexesPassingTest:")]
+    public NSIndexSet IndexesPassingTest(NSIndexSetIndexesPassingTestPredicateBlock predicate);
+    [Selector("indexesWithOptions:passingTest:")]
+    public NSIndexSet IndexesWithOptionsPassingTest(NSEnumerationOptions opts, NSIndexSetIndexesWithOptionsPassingTestPredicateBlock predicate);
+    [Selector("indexesInRange:options:passingTest:")]
+    public NSIndexSet IndexesInRangeOptionsPassingTest(NSRange range, NSEnumerationOptions opts, NSIndexSetIndexesInRangeOptionsPassingTestPredicateBlock predicate);
+    [Selector("enumerateRangesUsingBlock:")]
+    public void EnumerateRangesUsingBlock(NSIndexSetEnumerateRangesUsingBlockBlock block);
+    [Selector("enumerateRangesWithOptions:usingBlock:")]
+    public void EnumerateRangesWithOptionsUsingBlock(NSEnumerationOptions opts, NSIndexSetEnumerateRangesWithOptionsUsingBlockBlock block);
+    [Selector("enumerateRangesInRange:options:usingBlock:")]
+    public void EnumerateRangesInRangeOptionsUsingBlock(NSRange range, NSEnumerationOptions opts, NSIndexSetEnumerateRangesInRangeOptionsUsingBlockBlock block);
 }
 
 public extern objc class NSMutableIndexSet : NSIndexSet
 {
-    [Selector("addIndexes:")] public void AddIndexes(NSIndexSet indexSet);
-    [Selector("removeIndexes:")] public void RemoveIndexes(NSIndexSet indexSet);
-    [Selector("removeAllIndexes")] public void RemoveAllIndexes();
-    [Selector("addIndex:")] public void AddIndex(NSUInteger value);
-    [Selector("removeIndex:")] public void RemoveIndex(NSUInteger value);
-    [Selector("addIndexesInRange:")] public void AddIndexesInRange(NSRange range);
-    [Selector("removeIndexesInRange:")] public void RemoveIndexesInRange(NSRange range);
-    [Selector("shiftIndexesStartingAtIndex:by:")] public void ShiftIndexesStartingAtIndexBy(NSUInteger index, NSInteger delta);
+    [Selector("addIndexes:")]
+    public void AddIndexes(NSIndexSet indexSet);
+    [Selector("removeIndexes:")]
+    public void RemoveIndexes(NSIndexSet indexSet);
+    [Selector("removeAllIndexes")]
+    public void RemoveAllIndexes();
+    [Selector("addIndex:")]
+    public void AddIndex(NSUInteger value);
+    [Selector("removeIndex:")]
+    public void RemoveIndex(NSUInteger value);
+    [Selector("addIndexesInRange:")]
+    public void AddIndexesInRange(NSRange range);
+    [Selector("removeIndexesInRange:")]
+    public void RemoveIndexesInRange(NSRange range);
+    [Selector("shiftIndexesStartingAtIndex:by:")]
+    public void ShiftIndexesStartingAtIndexBy(NSUInteger index, NSInteger delta);
 }
 
 #endif

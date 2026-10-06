@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class NSTreeNode : NSObject
 {
-    [Selector("representedObject")] public AnyObject? RepresentedObject { get; }
-    [Selector("indexPath")] public NSIndexPath IndexPath { get; }
-    [Selector("isLeaf")] public bool Leaf { get; }
-    [Selector("childNodes")] public NSArray? ChildNodes { get; }
-    [Selector("mutableChildNodes")] public NSMutableArray MutableChildNodes { get; }
-    [Selector("parentNode")] public NSTreeNode? ParentNode { get; }
-    [Selector("treeNodeWithRepresentedObject:")] public static Self TreeNodeWithRepresentedObject(AnyObject? modelObject);
-    [Selector("initWithRepresentedObject:")] public Self InitWithRepresentedObject(AnyObject? modelObject);
-    [Selector("descendantNodeAtIndexPath:")] public NSTreeNode? DescendantNodeAtIndexPath(NSIndexPath indexPath);
-    [Selector("sortWithSortDescriptors:recursively:")] public void SortWithSortDescriptorsRecursively(NSArray sortDescriptors, bool recursively);
+    [Selector("representedObject")]
+    public AnyObject? RepresentedObject { get; }
+    [Selector("indexPath")]
+    public NSIndexPath IndexPath { get; }
+    [Selector("isLeaf")]
+    public bool Leaf { get; }
+    [Selector("childNodes")]
+    public NSArray? ChildNodes { get; }
+    [Selector("mutableChildNodes")]
+    public NSMutableArray MutableChildNodes { get; }
+    [Selector("parentNode")]
+    public NSTreeNode? ParentNode { get; }
+    [Selector("treeNodeWithRepresentedObject:")]
+    public static Self TreeNodeWithRepresentedObject(AnyObject? modelObject);
+    [Selector("initWithRepresentedObject:")]
+    public Self InitWithRepresentedObject(AnyObject? modelObject);
+    [Selector("descendantNodeAtIndexPath:")]
+    public NSTreeNode? DescendantNodeAtIndexPath(NSIndexPath indexPath);
+    [Selector("sortWithSortDescriptors:recursively:")]
+    public void SortWithSortDescriptorsRecursively(NSArray sortDescriptors, bool recursively);
 }
 
 #endif

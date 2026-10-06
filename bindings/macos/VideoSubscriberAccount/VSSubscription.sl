@@ -40,10 +40,14 @@ public enum VSSubscriptionAccessLevel : long
 
 public extern objc class VSSubscription : NSObject
 {
-    [Selector("expirationDate", "setExpirationDate:")] public NSDate? ExpirationDate { get; set; }
-    [Selector("accessLevel", "setAccessLevel:")] public VSSubscriptionAccessLevel AccessLevel { get; set; }
-    [Selector("tierIdentifiers", "setTierIdentifiers:")] public NSArray? TierIdentifiers { get; set; }
-    [Selector("billingIdentifier", "setBillingIdentifier:")] public NSString? BillingIdentifier { get; set; }
+    [Selector("expirationDate", "setExpirationDate:")]
+    public NSDate? ExpirationDate { get; set; }
+    [Selector("accessLevel", "setAccessLevel:")]
+    public VSSubscriptionAccessLevel AccessLevel { get; set; }
+    [Selector("tierIdentifiers", "setTierIdentifiers:")]
+    public NSArray? TierIdentifiers { get; set; }
+    [Selector("billingIdentifier", "setBillingIdentifier:")]
+    public NSString? BillingIdentifier { get; set; }
 }
 
 #endif

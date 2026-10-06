@@ -34,14 +34,22 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCActivationDescriptor : NSObject, NSCopying
 {
-    [Selector("activationType")] public MLCActivationType ActivationType { get; }
-    [Selector("a")] public float A { get; }
-    [Selector("b")] public float B { get; }
-    [Selector("c")] public float C { get; }
-    [Selector("descriptorWithType:")] public static Self? DescriptorWithType(MLCActivationType activationType);
-    [Selector("descriptorWithType:a:")] public static Self? DescriptorWithTypeA(MLCActivationType activationType, float a);
-    [Selector("descriptorWithType:a:b:")] public static Self? DescriptorWithTypeAB(MLCActivationType activationType, float a, float b);
-    [Selector("descriptorWithType:a:b:c:")] public static Self? DescriptorWithTypeABC(MLCActivationType activationType, float a, float b, float c);
+    [Selector("activationType")]
+    public MLCActivationType ActivationType { get; }
+    [Selector("a")]
+    public float A { get; }
+    [Selector("b")]
+    public float B { get; }
+    [Selector("c")]
+    public float C { get; }
+    [Selector("descriptorWithType:")]
+    public static Self? DescriptorWithType(MLCActivationType activationType);
+    [Selector("descriptorWithType:a:")]
+    public static Self? DescriptorWithTypeA(MLCActivationType activationType, float a);
+    [Selector("descriptorWithType:a:b:")]
+    public static Self? DescriptorWithTypeAB(MLCActivationType activationType, float a, float b);
+    [Selector("descriptorWithType:a:b:c:")]
+    public static Self? DescriptorWithTypeABC(MLCActivationType activationType, float a, float b, float c);
 }
 
 #endif

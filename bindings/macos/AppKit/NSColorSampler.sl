@@ -34,7 +34,8 @@ public objc closure void NSColorSamplerShowSamplerWithSelectionHandlerSelectionH
 
 public extern objc class NSColorSampler : NSObject
 {
-    [Selector("showSamplerWithSelectionHandler:")] public void ShowSamplerWithSelectionHandler(NSColorSamplerShowSamplerWithSelectionHandlerSelectionHandlerBlock selectionHandler);
+    [Selector("showSamplerWithSelectionHandler:")]
+    public void ShowSamplerWithSelectionHandler(NSColorSamplerShowSamplerWithSelectionHandlerSelectionHandlerBlock selectionHandler);
 }
 
 #endif

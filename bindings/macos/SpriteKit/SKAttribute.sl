@@ -46,23 +46,36 @@ public enum SKAttributeType : long
 
 public extern objc class SKAttribute : NSObject, NSSecureCoding
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("type")] public SKAttributeType Type { get; }
-    [Selector("attributeWithName:type:")] public static Self AttributeWithNameType(NSString name, SKAttributeType type);
-    [Selector("initWithName:type:")] public Self InitWithNameType(NSString name, SKAttributeType type);
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("type")]
+    public SKAttributeType Type { get; }
+    [Selector("attributeWithName:type:")]
+    public static Self AttributeWithNameType(NSString name, SKAttributeType type);
+    [Selector("initWithName:type:")]
+    public Self InitWithNameType(NSString name, SKAttributeType type);
 }
 
 public extern objc class SKAttributeValue : NSObject, NSSecureCoding
 {
-    [Selector("floatValue", "setFloatValue:")] public float FloatValue { get; set; }
-    [Selector("vectorFloat2Value", "setVectorFloat2Value:")] public vector_float2 VectorFloat2Value { get; set; }
-    [Selector("vectorFloat3Value", "setVectorFloat3Value:")] public vector_float3 VectorFloat3Value { get; set; }
-    [Selector("vectorFloat4Value", "setVectorFloat4Value:")] public vector_float4 VectorFloat4Value { get; set; }
-    [Selector("valueWithFloat:")] public static Self ValueWithFloat(float value);
-    [Selector("valueWithVectorFloat2:")] public static Self ValueWithVectorFloat2(vector_float2 value);
-    [Selector("valueWithVectorFloat3:")] public static Self ValueWithVectorFloat3(vector_float3 value);
-    [Selector("valueWithVectorFloat4:")] public static Self ValueWithVectorFloat4(vector_float4 value);
-    [Selector("init")] public Self Init();
+    [Selector("floatValue", "setFloatValue:")]
+    public float FloatValue { get; set; }
+    [Selector("vectorFloat2Value", "setVectorFloat2Value:")]
+    public vector_float2 VectorFloat2Value { get; set; }
+    [Selector("vectorFloat3Value", "setVectorFloat3Value:")]
+    public vector_float3 VectorFloat3Value { get; set; }
+    [Selector("vectorFloat4Value", "setVectorFloat4Value:")]
+    public vector_float4 VectorFloat4Value { get; set; }
+    [Selector("valueWithFloat:")]
+    public static Self ValueWithFloat(float value);
+    [Selector("valueWithVectorFloat2:")]
+    public static Self ValueWithVectorFloat2(vector_float2 value);
+    [Selector("valueWithVectorFloat3:")]
+    public static Self ValueWithVectorFloat3(vector_float3 value);
+    [Selector("valueWithVectorFloat4:")]
+    public static Self ValueWithVectorFloat4(vector_float4 value);
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

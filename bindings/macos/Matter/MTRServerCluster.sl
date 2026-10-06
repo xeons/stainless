@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class MTRServerCluster : NSObject
 {
-    [Selector("clusterID")] public NSNumber ClusterID { get; }
-    [Selector("clusterRevision")] public NSNumber ClusterRevision { get; }
-    [Selector("accessGrants")] public NSArray AccessGrants { get; }
-    [Selector("attributes")] public NSArray Attributes { get; }
-    [Selector("initWithClusterID:revision:")] public Self? InitWithClusterIDRevision(NSNumber clusterID, NSNumber revision);
-    [Selector("addAccessGrant:")] public void AddAccessGrant(MTRAccessGrant accessGrant);
-    [Selector("removeAccessGrant:")] public void RemoveAccessGrant(MTRAccessGrant accessGrant);
-    [Selector("addAttribute:")] public bool AddAttribute(MTRServerAttribute @attribute);
-    [Selector("newDescriptorCluster")] public static MTRServerCluster NewDescriptorCluster();
+    [Selector("clusterID")]
+    public NSNumber ClusterID { get; }
+    [Selector("clusterRevision")]
+    public NSNumber ClusterRevision { get; }
+    [Selector("accessGrants")]
+    public NSArray AccessGrants { get; }
+    [Selector("attributes")]
+    public NSArray Attributes { get; }
+    [Selector("initWithClusterID:revision:")]
+    public Self? InitWithClusterIDRevision(NSNumber clusterID, NSNumber revision);
+    [Selector("addAccessGrant:")]
+    public void AddAccessGrant(MTRAccessGrant accessGrant);
+    [Selector("removeAccessGrant:")]
+    public void RemoveAccessGrant(MTRAccessGrant accessGrant);
+    [Selector("addAttribute:")]
+    public bool AddAttribute(MTRServerAttribute @attribute);
+    [Selector("newDescriptorCluster")]
+    public static MTRServerCluster NewDescriptorCluster();
 }
 
 #endif

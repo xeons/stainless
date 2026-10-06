@@ -40,31 +40,56 @@ public enum ABPeoplePickerSelectionBehavior : int
 
 public extern objc class ABPeoplePickerView : NSView
 {
-    [Selector("accessoryView", "setAccessoryView:")] public NSView? AccessoryView { get; set; }
-    [Selector("valueSelectionBehavior", "setValueSelectionBehavior:")] public ABPeoplePickerSelectionBehavior ValueSelectionBehavior { get; set; }
-    [Selector("allowsGroupSelection", "setAllowsGroupSelection:")] public bool AllowsGroupSelection { get; set; }
-    [Selector("allowsMultipleSelection", "setAllowsMultipleSelection:")] public bool AllowsMultipleSelection { get; set; }
-    [Selector("displayedProperty", "setDisplayedProperty:")] public NSString? DisplayedProperty { get; set; }
-    [Selector("autosaveName", "setAutosaveName:")] public NSString? AutosaveName { get; set; }
-    [Selector("selectedGroups")] public NSArray? SelectedGroups { get; }
-    [Selector("selectedRecords")] public NSArray? SelectedRecords { get; }
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
-    [Selector("groupDoubleAction", "setGroupDoubleAction:")] public Selector GroupDoubleAction { get; set; }
-    [Selector("nameDoubleAction", "setNameDoubleAction:")] public Selector NameDoubleAction { get; set; }
-    [Selector("addProperty:")] public void AddProperty(NSString? property);
-    [Selector("removeProperty:")] public void RemoveProperty(NSString? property);
-    [Selector("properties")] public NSArray? Properties();
-    [Selector("setColumnTitle:forProperty:")] public void SetColumnTitleForProperty(NSString? title, NSString? property);
-    [Selector("columnTitleForProperty:")] public NSString? ColumnTitleForProperty(NSString? property);
-    [Selector("selectedIdentifiersForPerson:")] public NSArray? SelectedIdentifiersForPerson(ABPerson? person);
-    [Selector("selectGroup:byExtendingSelection:")] public void SelectGroupByExtendingSelection(ABGroup? group, bool extend);
-    [Selector("selectRecord:byExtendingSelection:")] public void SelectRecordByExtendingSelection(ABRecord? record, bool extend);
-    [Selector("selectIdentifier:forPerson:byExtendingSelection:")] public void SelectIdentifierForPersonByExtendingSelection(NSString? identifier, ABPerson? person, bool extend);
-    [Selector("deselectGroup:")] public void DeselectGroup(ABGroup? group);
-    [Selector("deselectRecord:")] public void DeselectRecord(ABRecord? record);
-    [Selector("deselectIdentifier:forPerson:")] public void DeselectIdentifierForPerson(NSString? identifier, ABPerson? person);
-    [Selector("deselectAll:")] public void DeselectAll(AnyObject? sender);
-    [Selector("clearSearchField:")] public void ClearSearchField(AnyObject? sender);
+    [Selector("accessoryView", "setAccessoryView:")]
+    public NSView? AccessoryView { get; set; }
+    [Selector("valueSelectionBehavior", "setValueSelectionBehavior:")]
+    public ABPeoplePickerSelectionBehavior ValueSelectionBehavior { get; set; }
+    [Selector("allowsGroupSelection", "setAllowsGroupSelection:")]
+    public bool AllowsGroupSelection { get; set; }
+    [Selector("allowsMultipleSelection", "setAllowsMultipleSelection:")]
+    public bool AllowsMultipleSelection { get; set; }
+    [Selector("displayedProperty", "setDisplayedProperty:")]
+    public NSString? DisplayedProperty { get; set; }
+    [Selector("autosaveName", "setAutosaveName:")]
+    public NSString? AutosaveName { get; set; }
+    [Selector("selectedGroups")]
+    public NSArray? SelectedGroups { get; }
+    [Selector("selectedRecords")]
+    public NSArray? SelectedRecords { get; }
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
+    [Selector("groupDoubleAction", "setGroupDoubleAction:")]
+    public Selector GroupDoubleAction { get; set; }
+    [Selector("nameDoubleAction", "setNameDoubleAction:")]
+    public Selector NameDoubleAction { get; set; }
+    [Selector("addProperty:")]
+    public void AddProperty(NSString? property);
+    [Selector("removeProperty:")]
+    public void RemoveProperty(NSString? property);
+    [Selector("properties")]
+    public NSArray? Properties();
+    [Selector("setColumnTitle:forProperty:")]
+    public void SetColumnTitleForProperty(NSString? title, NSString? property);
+    [Selector("columnTitleForProperty:")]
+    public NSString? ColumnTitleForProperty(NSString? property);
+    [Selector("selectedIdentifiersForPerson:")]
+    public NSArray? SelectedIdentifiersForPerson(ABPerson? person);
+    [Selector("selectGroup:byExtendingSelection:")]
+    public void SelectGroupByExtendingSelection(ABGroup? group, bool extend);
+    [Selector("selectRecord:byExtendingSelection:")]
+    public void SelectRecordByExtendingSelection(ABRecord? record, bool extend);
+    [Selector("selectIdentifier:forPerson:byExtendingSelection:")]
+    public void SelectIdentifierForPersonByExtendingSelection(NSString? identifier, ABPerson? person, bool extend);
+    [Selector("deselectGroup:")]
+    public void DeselectGroup(ABGroup? group);
+    [Selector("deselectRecord:")]
+    public void DeselectRecord(ABRecord? record);
+    [Selector("deselectIdentifier:forPerson:")]
+    public void DeselectIdentifierForPerson(NSString? identifier, ABPerson? person);
+    [Selector("deselectAll:")]
+    public void DeselectAll(AnyObject? sender);
+    [Selector("clearSearchField:")]
+    public void ClearSearchField(AnyObject? sender);
 }
 
 public extern "C" NSString? ABPeoplePickerGroupSelectionDidChangeNotification;
@@ -78,9 +103,12 @@ public extern "C" NSString? ABPeoplePickerDisplayedPropertyDidChangeNotification
 /// ABPeoplePickerConvenience, a category of ABPeoplePickerView.
 public extern objc class ABPeoplePickerView
 {
-    [Selector("selectedValues")] public NSArray? SelectedValues();
-    [Selector("editInAddressBook:")] public void EditInAddressBook(AnyObject? sender);
-    [Selector("selectInAddressBook:")] public void SelectInAddressBook(AnyObject? sender);
+    [Selector("selectedValues")]
+    public NSArray? SelectedValues();
+    [Selector("editInAddressBook:")]
+    public void EditInAddressBook(AnyObject? sender);
+    [Selector("selectInAddressBook:")]
+    public void SelectInAddressBook(AnyObject? sender);
 }
 
 #endif

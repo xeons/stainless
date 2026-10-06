@@ -44,37 +44,63 @@ public enum NSUserNotificationActivationType : long
 /// Deprecated in macOS 11.0.
 public extern objc class NSUserNotification : NSObject, NSCopying
 {
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("subtitle", "setSubtitle:")] public NSString? Subtitle { get; set; }
-    [Selector("informativeText", "setInformativeText:")] public NSString? InformativeText { get; set; }
-    [Selector("actionButtonTitle", "setActionButtonTitle:")] public NSString ActionButtonTitle { get; set; }
-    [Selector("userInfo", "setUserInfo:")] public NSDictionary? UserInfo { get; set; }
-    [Selector("deliveryDate", "setDeliveryDate:")] public NSDate? DeliveryDate { get; set; }
-    [Selector("deliveryTimeZone", "setDeliveryTimeZone:")] public NSTimeZone? DeliveryTimeZone { get; set; }
-    [Selector("deliveryRepeatInterval", "setDeliveryRepeatInterval:")] public NSDateComponents? DeliveryRepeatInterval { get; set; }
-    [Selector("actualDeliveryDate")] public NSDate? ActualDeliveryDate { get; }
-    [Selector("isPresented")] public bool Presented { get; }
-    [Selector("isRemote")] public bool Remote { get; }
-    [Selector("soundName", "setSoundName:")] public NSString? SoundName { get; set; }
-    [Selector("hasActionButton", "setHasActionButton:")] public bool HasActionButton { get; set; }
-    [Selector("activationType")] public NSUserNotificationActivationType ActivationType { get; }
-    [Selector("otherButtonTitle", "setOtherButtonTitle:")] public NSString OtherButtonTitle { get; set; }
-    [Selector("identifier", "setIdentifier:")] public NSString? Identifier { get; set; }
-    [Selector("contentImage", "setContentImage:")] public NSImage? ContentImage { get; set; }
-    [Selector("hasReplyButton", "setHasReplyButton:")] public bool HasReplyButton { get; set; }
-    [Selector("responsePlaceholder", "setResponsePlaceholder:")] public NSString? ResponsePlaceholder { get; set; }
-    [Selector("response")] public NSAttributedString? Response { get; }
-    [Selector("additionalActions", "setAdditionalActions:")] public NSArray? AdditionalActions { get; set; }
-    [Selector("additionalActivationAction")] public NSUserNotificationAction? AdditionalActivationAction { get; }
-    [Selector("init")] public Self Init();
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("subtitle", "setSubtitle:")]
+    public NSString? Subtitle { get; set; }
+    [Selector("informativeText", "setInformativeText:")]
+    public NSString? InformativeText { get; set; }
+    [Selector("actionButtonTitle", "setActionButtonTitle:")]
+    public NSString ActionButtonTitle { get; set; }
+    [Selector("userInfo", "setUserInfo:")]
+    public NSDictionary? UserInfo { get; set; }
+    [Selector("deliveryDate", "setDeliveryDate:")]
+    public NSDate? DeliveryDate { get; set; }
+    [Selector("deliveryTimeZone", "setDeliveryTimeZone:")]
+    public NSTimeZone? DeliveryTimeZone { get; set; }
+    [Selector("deliveryRepeatInterval", "setDeliveryRepeatInterval:")]
+    public NSDateComponents? DeliveryRepeatInterval { get; set; }
+    [Selector("actualDeliveryDate")]
+    public NSDate? ActualDeliveryDate { get; }
+    [Selector("isPresented")]
+    public bool Presented { get; }
+    [Selector("isRemote")]
+    public bool Remote { get; }
+    [Selector("soundName", "setSoundName:")]
+    public NSString? SoundName { get; set; }
+    [Selector("hasActionButton", "setHasActionButton:")]
+    public bool HasActionButton { get; set; }
+    [Selector("activationType")]
+    public NSUserNotificationActivationType ActivationType { get; }
+    [Selector("otherButtonTitle", "setOtherButtonTitle:")]
+    public NSString OtherButtonTitle { get; set; }
+    [Selector("identifier", "setIdentifier:")]
+    public NSString? Identifier { get; set; }
+    [Selector("contentImage", "setContentImage:")]
+    public NSImage? ContentImage { get; set; }
+    [Selector("hasReplyButton", "setHasReplyButton:")]
+    public bool HasReplyButton { get; set; }
+    [Selector("responsePlaceholder", "setResponsePlaceholder:")]
+    public NSString? ResponsePlaceholder { get; set; }
+    [Selector("response")]
+    public NSAttributedString? Response { get; }
+    [Selector("additionalActions", "setAdditionalActions:")]
+    public NSArray? AdditionalActions { get; set; }
+    [Selector("additionalActivationAction")]
+    public NSUserNotificationAction? AdditionalActivationAction { get; }
+    [Selector("init")]
+    public Self Init();
 }
 
 /// Deprecated in macOS 11.0.
 public extern objc class NSUserNotificationAction : NSObject, NSCopying
 {
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("actionWithIdentifier:title:")] public static Self ActionWithIdentifierTitle(NSString? identifier, NSString? title);
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("actionWithIdentifier:title:")]
+    public static Self ActionWithIdentifierTitle(NSString? identifier, NSString? title);
 }
 
 /// Deprecated in macOS 11.0.
@@ -83,25 +109,40 @@ public extern "C" NSString? NSUserNotificationDefaultSoundName;
 /// Deprecated in macOS 11.0.
 public extern objc class NSUserNotificationCenter : NSObject
 {
-    [Selector("defaultUserNotificationCenter")] public static NSUserNotificationCenter DefaultUserNotificationCenter { get; }
-    [Selector("delegate", "setDelegate:")] public NSUserNotificationCenterDelegate? Delegate { get; set; }
-    [Selector("scheduledNotifications", "setScheduledNotifications:")] public NSArray ScheduledNotifications { get; set; }
-    [Selector("deliveredNotifications")] public NSArray DeliveredNotifications { get; }
-    [Selector("scheduleNotification:")] public void ScheduleNotification(NSUserNotification notification);
-    [Selector("removeScheduledNotification:")] public void RemoveScheduledNotification(NSUserNotification notification);
-    [Selector("deliverNotification:")] public void DeliverNotification(NSUserNotification notification);
-    [Selector("removeDeliveredNotification:")] public void RemoveDeliveredNotification(NSUserNotification notification);
-    [Selector("removeAllDeliveredNotifications")] public void RemoveAllDeliveredNotifications();
+    [Selector("defaultUserNotificationCenter")]
+    public static NSUserNotificationCenter DefaultUserNotificationCenter { get; }
+    [Selector("delegate", "setDelegate:")]
+    public NSUserNotificationCenterDelegate? Delegate { get; set; }
+    [Selector("scheduledNotifications", "setScheduledNotifications:")]
+    public NSArray ScheduledNotifications { get; set; }
+    [Selector("deliveredNotifications")]
+    public NSArray DeliveredNotifications { get; }
+    [Selector("scheduleNotification:")]
+    public void ScheduleNotification(NSUserNotification notification);
+    [Selector("removeScheduledNotification:")]
+    public void RemoveScheduledNotification(NSUserNotification notification);
+    [Selector("deliverNotification:")]
+    public void DeliverNotification(NSUserNotification notification);
+    [Selector("removeDeliveredNotification:")]
+    public void RemoveDeliveredNotification(NSUserNotification notification);
+    [Selector("removeAllDeliveredNotifications")]
+    public void RemoveAllDeliveredNotifications();
 }
 
 public objc interface NSUserNotificationCenterDelegate : NSObjectProtocol
 {
     /// Deprecated in macOS 11.0.
-    [Optional] [Selector("userNotificationCenter:didDeliverNotification:")] void UserNotificationCenterDidDeliverNotification(NSUserNotificationCenter center, NSUserNotification notification);
+    [Optional]
+    [Selector("userNotificationCenter:didDeliverNotification:")]
+    void UserNotificationCenterDidDeliverNotification(NSUserNotificationCenter center, NSUserNotification notification);
     /// Deprecated in macOS 11.0.
-    [Optional] [Selector("userNotificationCenter:didActivateNotification:")] void UserNotificationCenterDidActivateNotification(NSUserNotificationCenter center, NSUserNotification notification);
+    [Optional]
+    [Selector("userNotificationCenter:didActivateNotification:")]
+    void UserNotificationCenterDidActivateNotification(NSUserNotificationCenter center, NSUserNotification notification);
     /// Deprecated in macOS 11.0.
-    [Optional] [Selector("userNotificationCenter:shouldPresentNotification:")] bool UserNotificationCenterShouldPresentNotification(NSUserNotificationCenter center, NSUserNotification notification);
+    [Optional]
+    [Selector("userNotificationCenter:shouldPresentNotification:")]
+    bool UserNotificationCenterShouldPresentNotification(NSUserNotificationCenter center, NSUserNotification notification);
 }
 
 #endif

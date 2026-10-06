@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class PKDeferredPaymentSummaryItem : PKPaymentSummaryItem
 {
-    [Selector("deferredDate", "setDeferredDate:")] public NSDate DeferredDate { get; set; }
+    [Selector("deferredDate", "setDeferredDate:")]
+    public NSDate DeferredDate { get; set; }
 }
 
 #endif

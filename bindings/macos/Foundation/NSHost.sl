@@ -33,21 +33,33 @@ import Standard.ObjC;
 /// Deprecated in macOS 100000.
 public extern objc class NSHost : NSObject
 {
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("names")] public NSArray Names { get; }
-    [Selector("address")] public NSString? Address { get; }
-    [Selector("addresses")] public NSArray Addresses { get; }
-    [Selector("localizedName")] public NSString? LocalizedName { get; }
-    [Selector("currentHost")] public static Self CurrentHost();
-    [Selector("hostWithName:")] public static Self HostWithName(NSString? name);
-    [Selector("hostWithAddress:")] public static Self HostWithAddress(NSString address);
-    [Selector("isEqualToHost:")] public bool IsEqualToHost(NSHost aHost);
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("names")]
+    public NSArray Names { get; }
+    [Selector("address")]
+    public NSString? Address { get; }
+    [Selector("addresses")]
+    public NSArray Addresses { get; }
+    [Selector("localizedName")]
+    public NSString? LocalizedName { get; }
+    [Selector("currentHost")]
+    public static Self CurrentHost();
+    [Selector("hostWithName:")]
+    public static Self HostWithName(NSString? name);
+    [Selector("hostWithAddress:")]
+    public static Self HostWithAddress(NSString address);
+    [Selector("isEqualToHost:")]
+    public bool IsEqualToHost(NSHost aHost);
     /// Deprecated in macOS 10.7.
-    [Selector("setHostCacheEnabled:")] public static void SetHostCacheEnabled(bool flag);
+    [Selector("setHostCacheEnabled:")]
+    public static void SetHostCacheEnabled(bool flag);
     /// Deprecated in macOS 10.7.
-    [Selector("isHostCacheEnabled")] public static bool IsHostCacheEnabled();
+    [Selector("isHostCacheEnabled")]
+    public static bool IsHostCacheEnabled();
     /// Deprecated in macOS 10.7.
-    [Selector("flushHostCache")] public static void FlushHostCache();
+    [Selector("flushHostCache")]
+    public static void FlushHostCache();
 }
 
 #endif

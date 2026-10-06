@@ -34,13 +34,17 @@ import Standard.ObjC;
 public extern objc class NWBonjourServiceEndpoint : NWEndpoint
 {
     /// Deprecated in macOS 15.0.
-    [Selector("name")] public NSString? Name { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("type")] public NSString? Type { get; }
+    [Selector("type")]
+    public NSString? Type { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("domain")] public NSString? Domain { get; }
+    [Selector("domain")]
+    public NSString? Domain { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("endpointWithName:type:domain:")] public static Self EndpointWithNameTypeDomain(NSString name, NSString type, NSString domain);
+    [Selector("endpointWithName:type:domain:")]
+    public static Self EndpointWithNameTypeDomain(NSString name, NSString type, NSString domain);
 }
 
 #endif

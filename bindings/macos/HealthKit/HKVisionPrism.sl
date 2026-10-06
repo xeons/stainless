@@ -48,15 +48,24 @@ public enum HKVisionEye : long
 
 public extern objc class HKVisionPrism : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("amount")] public HKQuantity Amount { get; }
-    [Selector("angle")] public HKQuantity Angle { get; }
-    [Selector("verticalAmount")] public HKQuantity VerticalAmount { get; }
-    [Selector("horizontalAmount")] public HKQuantity HorizontalAmount { get; }
-    [Selector("verticalBase")] public HKPrismBase VerticalBase { get; }
-    [Selector("horizontalBase")] public HKPrismBase HorizontalBase { get; }
-    [Selector("eye")] public HKVisionEye Eye { get; }
-    [Selector("initWithAmount:angle:eye:")] public Self InitWithAmountAngleEye(HKQuantity amount, HKQuantity angle, HKVisionEye eye);
-    [Selector("initWithVerticalAmount:verticalBase:horizontalAmount:horizontalBase:eye:")] public Self InitWithVerticalAmountVerticalBaseHorizontalAmountHorizontalBaseEye(HKQuantity verticalAmount, HKPrismBase verticalBase, HKQuantity horizontalAmount, HKPrismBase horizontalBase, HKVisionEye eye);
+    [Selector("amount")]
+    public HKQuantity Amount { get; }
+    [Selector("angle")]
+    public HKQuantity Angle { get; }
+    [Selector("verticalAmount")]
+    public HKQuantity VerticalAmount { get; }
+    [Selector("horizontalAmount")]
+    public HKQuantity HorizontalAmount { get; }
+    [Selector("verticalBase")]
+    public HKPrismBase VerticalBase { get; }
+    [Selector("horizontalBase")]
+    public HKPrismBase HorizontalBase { get; }
+    [Selector("eye")]
+    public HKVisionEye Eye { get; }
+    [Selector("initWithAmount:angle:eye:")]
+    public Self InitWithAmountAngleEye(HKQuantity amount, HKQuantity angle, HKVisionEye eye);
+    [Selector("initWithVerticalAmount:verticalBase:horizontalAmount:horizontalBase:eye:")]
+    public Self InitWithVerticalAmountVerticalBaseHorizontalAmountHorizontalBaseEye(HKQuantity verticalAmount, HKPrismBase verticalBase, HKQuantity horizontalAmount, HKPrismBase horizontalBase, HKVisionEye eye);
 }
 
 #endif

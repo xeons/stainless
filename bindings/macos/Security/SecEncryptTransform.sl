@@ -82,10 +82,12 @@ public extern "C" CFStringRef? kSecOAEPEncodingParametersAttributeName;
 public extern "C" CFStringRef? kSecOAEPMGF1DigestAlgorithmAttributeName;
 
 /// Deprecated in macOS 13.0.
-[ReturnsRetained] public extern "C" SecTransformRef SecEncryptTransformCreate(SecKeyRef keyRef, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecTransformRef SecEncryptTransformCreate(SecKeyRef keyRef, __CFError** error);
 
 /// Deprecated in macOS 13.0.
-[ReturnsRetained] public extern "C" SecTransformRef SecDecryptTransformCreate(SecKeyRef keyRef, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecTransformRef SecDecryptTransformCreate(SecKeyRef keyRef, __CFError** error);
 
 /// Deprecated in macOS 13.0.
 public extern "C" CFTypeID SecDecryptTransformGetTypeID();

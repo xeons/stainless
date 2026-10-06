@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class UNNotificationActionIcon : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("iconWithTemplateImageName:")] public static Self IconWithTemplateImageName(NSString templateImageName);
-    [Selector("iconWithSystemImageName:")] public static Self IconWithSystemImageName(NSString systemImageName);
+    [Selector("iconWithTemplateImageName:")]
+    public static Self IconWithTemplateImageName(NSString templateImageName);
+    [Selector("iconWithSystemImageName:")]
+    public static Self IconWithSystemImageName(NSString systemImageName);
 }
 
 #endif

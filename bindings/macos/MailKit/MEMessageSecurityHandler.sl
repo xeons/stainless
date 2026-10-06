@@ -42,9 +42,12 @@ public objc closure void MEMessageSecurityHandlerPrimaryActionClickedForMessageC
 
 public objc interface MEMessageSecurityHandler : MEMessageEncoder, MEMessageDecoder
 {
-    [Selector("extensionViewControllerForMessageSigners:")] MEExtensionViewController? ExtensionViewControllerForMessageSigners(NSArray messageSigners);
-    [Selector("extensionViewControllerForMessageContext:")] MEExtensionViewController? ExtensionViewControllerForMessageContext(NSData context);
-    [Selector("primaryActionClickedForMessageContext:completionHandler:")] void PrimaryActionClickedForMessageContextCompletionHandler(NSData context, MEMessageSecurityHandlerPrimaryActionClickedForMessageContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("extensionViewControllerForMessageSigners:")]
+    MEExtensionViewController? ExtensionViewControllerForMessageSigners(NSArray messageSigners);
+    [Selector("extensionViewControllerForMessageContext:")]
+    MEExtensionViewController? ExtensionViewControllerForMessageContext(NSData context);
+    [Selector("primaryActionClickedForMessageContext:completionHandler:")]
+    void PrimaryActionClickedForMessageContextCompletionHandler(NSData context, MEMessageSecurityHandlerPrimaryActionClickedForMessageContextCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

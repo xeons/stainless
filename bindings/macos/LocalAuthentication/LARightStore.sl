@@ -45,13 +45,20 @@ public objc closure void LARightStoreRemoveAllRightsWithCompletionHandlerBlock(N
 
 public extern objc class LARightStore : NSObject
 {
-    [Selector("sharedStore")] public static LARightStore SharedStore { get; }
-    [Selector("rightForIdentifier:completion:")] public void RightForIdentifierCompletion(NSString identifier, LARightStoreRightForIdentifierCompletionHandlerBlock handler);
-    [Selector("saveRight:identifier:completion:")] public void SaveRightIdentifierCompletion(LARight right, NSString identifier, LARightStoreSaveRightIdentifierCompletionHandlerBlock handler);
-    [Selector("saveRight:identifier:secret:completion:")] public void SaveRightIdentifierSecretCompletion(LARight right, NSString identifier, NSData secret, LARightStoreSaveRightIdentifierSecretCompletionHandlerBlock handler);
-    [Selector("removeRight:completion:")] public void RemoveRightCompletion(LAPersistedRight right, LARightStoreRemoveRightCompletionHandlerBlock handler);
-    [Selector("removeRightForIdentifier:completion:")] public void RemoveRightForIdentifierCompletion(NSString identifier, LARightStoreRemoveRightForIdentifierCompletionHandlerBlock handler);
-    [Selector("removeAllRightsWithCompletion:")] public void RemoveAllRightsWithCompletion(LARightStoreRemoveAllRightsWithCompletionHandlerBlock handler);
+    [Selector("sharedStore")]
+    public static LARightStore SharedStore { get; }
+    [Selector("rightForIdentifier:completion:")]
+    public void RightForIdentifierCompletion(NSString identifier, LARightStoreRightForIdentifierCompletionHandlerBlock handler);
+    [Selector("saveRight:identifier:completion:")]
+    public void SaveRightIdentifierCompletion(LARight right, NSString identifier, LARightStoreSaveRightIdentifierCompletionHandlerBlock handler);
+    [Selector("saveRight:identifier:secret:completion:")]
+    public void SaveRightIdentifierSecretCompletion(LARight right, NSString identifier, NSData secret, LARightStoreSaveRightIdentifierSecretCompletionHandlerBlock handler);
+    [Selector("removeRight:completion:")]
+    public void RemoveRightCompletion(LAPersistedRight right, LARightStoreRemoveRightCompletionHandlerBlock handler);
+    [Selector("removeRightForIdentifier:completion:")]
+    public void RemoveRightForIdentifierCompletion(NSString identifier, LARightStoreRemoveRightForIdentifierCompletionHandlerBlock handler);
+    [Selector("removeAllRightsWithCompletion:")]
+    public void RemoveAllRightsWithCompletion(LARightStoreRemoveAllRightsWithCompletionHandlerBlock handler);
 }
 
 #endif

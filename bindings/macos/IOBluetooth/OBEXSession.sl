@@ -36,31 +36,56 @@ public using PrivOBEXSessionDataRef = OpaquePrivOBEXSessionData*;
 
 public extern objc class OBEXSession : NSObject
 {
-    [Selector("OBEXConnect:maxPacketLength:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")] public OBEXError OBEXConnectMaxPacketLengthOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXFlags inFlags, OBEXMaxPacketLength inMaxPacketLength, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
-    [Selector("OBEXDisconnect:optionalHeadersLength:eventSelector:selectorTarget:refCon:")] public OBEXError OBEXDisconnectOptionalHeadersLengthEventSelectorSelectorTargetRefCon(void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
-    [Selector("OBEXPut:headersData:headersDataLength:bodyData:bodyDataLength:eventSelector:selectorTarget:refCon:")] public OBEXError OBEXPutHeadersDataHeadersDataLengthBodyDataBodyDataLengthEventSelectorSelectorTargetRefCon(Boolean isFinalChunk, void* inHeadersData, nuint inHeadersDataLength, void* inBodyData, nuint inBodyDataLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
-    [Selector("OBEXGet:headers:headersLength:eventSelector:selectorTarget:refCon:")] public OBEXError OBEXGetHeadersHeadersLengthEventSelectorSelectorTargetRefCon(Boolean isFinalChunk, void* inHeaders, nuint inHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
-    [Selector("OBEXAbort:optionalHeadersLength:eventSelector:selectorTarget:refCon:")] public OBEXError OBEXAbortOptionalHeadersLengthEventSelectorSelectorTargetRefCon(void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
-    [Selector("OBEXSetPath:constants:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")] public OBEXError OBEXSetPathConstantsOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXFlags inFlags, OBEXConstants inConstants, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
-    [Selector("OBEXConnectResponse:flags:maxPacketLength:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")] public OBEXError OBEXConnectResponseFlagsMaxPacketLengthOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXOpCode inResponseOpCode, OBEXFlags inFlags, OBEXMaxPacketLength inMaxPacketLength, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
-    [Selector("OBEXDisconnectResponse:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")] public OBEXError OBEXDisconnectResponseOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXOpCode inResponseOpCode, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
-    [Selector("OBEXPutResponse:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")] public OBEXError OBEXPutResponseOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXOpCode inResponseOpCode, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
-    [Selector("OBEXGetResponse:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")] public OBEXError OBEXGetResponseOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXOpCode inResponseOpCode, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
-    [Selector("OBEXAbortResponse:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")] public OBEXError OBEXAbortResponseOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXOpCode inResponseOpCode, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
-    [Selector("OBEXSetPathResponse:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")] public OBEXError OBEXSetPathResponseOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXOpCode inResponseOpCode, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
-    [Selector("getAvailableCommandPayloadLength:")] public OBEXMaxPacketLength GetAvailableCommandPayloadLength(OBEXOpCode inOpCode);
-    [Selector("getAvailableCommandResponsePayloadLength:")] public OBEXMaxPacketLength GetAvailableCommandResponsePayloadLength(OBEXOpCode inOpCode);
-    [Selector("getMaxPacketLength")] public OBEXMaxPacketLength GetMaxPacketLength();
-    [Selector("hasOpenOBEXConnection")] public bool HasOpenOBEXConnection();
-    [Selector("setEventCallback:")] public void SetEventCallback(OBEXSessionEventCallback inEventCallback);
-    [Selector("setEventRefCon:")] public void SetEventRefCon(void* inRefCon);
-    [Selector("setEventSelector:target:refCon:")] public void SetEventSelectorTargetRefCon(Selector inEventSelector, AnyObject? inEventSelectorTarget, void* inUserRefCon);
-    [Selector("serverHandleIncomingData:")] public void ServerHandleIncomingData(OBEXTransportEvent* event);
-    [Selector("clientHandleIncomingData:")] public void ClientHandleIncomingData(OBEXTransportEvent* event);
-    [Selector("sendDataToTransport:dataLength:")] public OBEXError SendDataToTransportDataLength(void* inDataToSend, nuint inDataLength);
-    [Selector("openTransportConnection:selectorTarget:refCon:")] public OBEXError OpenTransportConnectionSelectorTargetRefCon(Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
-    [Selector("hasOpenTransportConnection")] public Boolean HasOpenTransportConnection();
-    [Selector("closeTransportConnection")] public OBEXError CloseTransportConnection();
+    [Selector("OBEXConnect:maxPacketLength:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")]
+    public OBEXError OBEXConnectMaxPacketLengthOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXFlags inFlags, OBEXMaxPacketLength inMaxPacketLength, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
+    [Selector("OBEXDisconnect:optionalHeadersLength:eventSelector:selectorTarget:refCon:")]
+    public OBEXError OBEXDisconnectOptionalHeadersLengthEventSelectorSelectorTargetRefCon(void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
+    [Selector("OBEXPut:headersData:headersDataLength:bodyData:bodyDataLength:eventSelector:selectorTarget:refCon:")]
+    public OBEXError OBEXPutHeadersDataHeadersDataLengthBodyDataBodyDataLengthEventSelectorSelectorTargetRefCon(Boolean isFinalChunk, void* inHeadersData, nuint inHeadersDataLength, void* inBodyData, nuint inBodyDataLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
+    [Selector("OBEXGet:headers:headersLength:eventSelector:selectorTarget:refCon:")]
+    public OBEXError OBEXGetHeadersHeadersLengthEventSelectorSelectorTargetRefCon(Boolean isFinalChunk, void* inHeaders, nuint inHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
+    [Selector("OBEXAbort:optionalHeadersLength:eventSelector:selectorTarget:refCon:")]
+    public OBEXError OBEXAbortOptionalHeadersLengthEventSelectorSelectorTargetRefCon(void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
+    [Selector("OBEXSetPath:constants:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")]
+    public OBEXError OBEXSetPathConstantsOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXFlags inFlags, OBEXConstants inConstants, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
+    [Selector("OBEXConnectResponse:flags:maxPacketLength:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")]
+    public OBEXError OBEXConnectResponseFlagsMaxPacketLengthOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXOpCode inResponseOpCode, OBEXFlags inFlags, OBEXMaxPacketLength inMaxPacketLength, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
+    [Selector("OBEXDisconnectResponse:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")]
+    public OBEXError OBEXDisconnectResponseOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXOpCode inResponseOpCode, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
+    [Selector("OBEXPutResponse:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")]
+    public OBEXError OBEXPutResponseOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXOpCode inResponseOpCode, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
+    [Selector("OBEXGetResponse:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")]
+    public OBEXError OBEXGetResponseOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXOpCode inResponseOpCode, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
+    [Selector("OBEXAbortResponse:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")]
+    public OBEXError OBEXAbortResponseOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXOpCode inResponseOpCode, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
+    [Selector("OBEXSetPathResponse:optionalHeaders:optionalHeadersLength:eventSelector:selectorTarget:refCon:")]
+    public OBEXError OBEXSetPathResponseOptionalHeadersOptionalHeadersLengthEventSelectorSelectorTargetRefCon(OBEXOpCode inResponseOpCode, void* inOptionalHeaders, nuint inOptionalHeadersLength, Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
+    [Selector("getAvailableCommandPayloadLength:")]
+    public OBEXMaxPacketLength GetAvailableCommandPayloadLength(OBEXOpCode inOpCode);
+    [Selector("getAvailableCommandResponsePayloadLength:")]
+    public OBEXMaxPacketLength GetAvailableCommandResponsePayloadLength(OBEXOpCode inOpCode);
+    [Selector("getMaxPacketLength")]
+    public OBEXMaxPacketLength GetMaxPacketLength();
+    [Selector("hasOpenOBEXConnection")]
+    public bool HasOpenOBEXConnection();
+    [Selector("setEventCallback:")]
+    public void SetEventCallback(OBEXSessionEventCallback inEventCallback);
+    [Selector("setEventRefCon:")]
+    public void SetEventRefCon(void* inRefCon);
+    [Selector("setEventSelector:target:refCon:")]
+    public void SetEventSelectorTargetRefCon(Selector inEventSelector, AnyObject? inEventSelectorTarget, void* inUserRefCon);
+    [Selector("serverHandleIncomingData:")]
+    public void ServerHandleIncomingData(OBEXTransportEvent* event);
+    [Selector("clientHandleIncomingData:")]
+    public void ClientHandleIncomingData(OBEXTransportEvent* event);
+    [Selector("sendDataToTransport:dataLength:")]
+    public OBEXError SendDataToTransportDataLength(void* inDataToSend, nuint inDataLength);
+    [Selector("openTransportConnection:selectorTarget:refCon:")]
+    public OBEXError OpenTransportConnectionSelectorTargetRefCon(Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
+    [Selector("hasOpenTransportConnection")]
+    public Boolean HasOpenTransportConnection();
+    [Selector("closeTransportConnection")]
+    public OBEXError CloseTransportConnection();
 }
 
 public using OBEXTransportEventType = uint;

@@ -55,14 +55,22 @@ public enum NSXMLDTDNodeKind : ulong
 
 public extern objc class NSXMLDTDNode : NSXMLNode
 {
-    [Selector("DTDKind", "setDTDKind:")] public NSXMLDTDNodeKind DTDKind { get; set; }
-    [Selector("isExternal")] public bool External { get; }
-    [Selector("publicID", "setPublicID:")] public NSString? PublicID { get; set; }
-    [Selector("systemID", "setSystemID:")] public NSString? SystemID { get; set; }
-    [Selector("notationName", "setNotationName:")] public NSString? NotationName { get; set; }
-    [Selector("initWithXMLString:")] public Self? InitWithXMLString(NSString string);
-    [Selector("initWithKind:options:")] public Self InitWithKindOptions(NSXMLNodeKind kind, NSXMLNodeOptions options);
-    [Selector("init")] public Self Init();
+    [Selector("DTDKind", "setDTDKind:")]
+    public NSXMLDTDNodeKind DTDKind { get; set; }
+    [Selector("isExternal")]
+    public bool External { get; }
+    [Selector("publicID", "setPublicID:")]
+    public NSString? PublicID { get; set; }
+    [Selector("systemID", "setSystemID:")]
+    public NSString? SystemID { get; set; }
+    [Selector("notationName", "setNotationName:")]
+    public NSString? NotationName { get; set; }
+    [Selector("initWithXMLString:")]
+    public Self? InitWithXMLString(NSString string);
+    [Selector("initWithKind:options:")]
+    public Self InitWithKindOptions(NSXMLNodeKind kind, NSXMLNodeOptions options);
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

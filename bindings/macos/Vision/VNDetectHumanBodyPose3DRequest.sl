@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class VNDetectHumanBodyPose3DRequest : VNStatefulRequest
 {
-    [Selector("results")] public NSArray? Results { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCompletionHandler:")] public Self InitWithCompletionHandler(VNRequestCompletionHandler? completionHandler);
-    [Selector("supportedJointNamesAndReturnError:")] public NSArray? SupportedJointNamesAndReturnError(out NSError? error);
-    [Selector("supportedJointsGroupNamesAndReturnError:")] public NSArray? SupportedJointsGroupNamesAndReturnError(out NSError? error);
+    [Selector("results")]
+    public NSArray? Results { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCompletionHandler:")]
+    public Self InitWithCompletionHandler(VNRequestCompletionHandler? completionHandler);
+    [Selector("supportedJointNamesAndReturnError:")]
+    public NSArray? SupportedJointNamesAndReturnError(out NSError? error);
+    [Selector("supportedJointsGroupNamesAndReturnError:")]
+    public NSArray? SupportedJointsGroupNamesAndReturnError(out NSError? error);
 }
 
 #endif

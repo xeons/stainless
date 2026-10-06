@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class NLGazetteer : NSObject
 {
-    [Selector("language")] public NLLanguage? Language { get; }
-    [Selector("data")] public NSData Data { get; }
-    [Selector("gazetteerWithContentsOfURL:error:")] public static Self? GazetteerWithContentsOfURLError(NSURL url, out NSError? error);
-    [Selector("initWithContentsOfURL:error:")] public Self? InitWithContentsOfURLError(NSURL url, out NSError? error);
-    [Selector("initWithData:error:")] public Self? InitWithDataError(NSData data, out NSError? error);
-    [Selector("initWithDictionary:language:error:")] public Self? InitWithDictionaryLanguageError(NSDictionary dictionary, NLLanguage? language, out NSError? error);
-    [Selector("labelForString:")] public NSString? LabelForString(NSString string);
-    [Selector("writeGazetteerForDictionary:language:toURL:error:")] public static bool WriteGazetteerForDictionaryLanguageToURLError(NSDictionary dictionary, NLLanguage? language, NSURL url, out NSError? error);
+    [Selector("language")]
+    public NLLanguage? Language { get; }
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("gazetteerWithContentsOfURL:error:")]
+    public static Self? GazetteerWithContentsOfURLError(NSURL url, out NSError? error);
+    [Selector("initWithContentsOfURL:error:")]
+    public Self? InitWithContentsOfURLError(NSURL url, out NSError? error);
+    [Selector("initWithData:error:")]
+    public Self? InitWithDataError(NSData data, out NSError? error);
+    [Selector("initWithDictionary:language:error:")]
+    public Self? InitWithDictionaryLanguageError(NSDictionary dictionary, NLLanguage? language, out NSError? error);
+    [Selector("labelForString:")]
+    public NSString? LabelForString(NSString string);
+    [Selector("writeGazetteerForDictionary:language:toURL:error:")]
+    public static bool WriteGazetteerForDictionaryLanguageToURLError(NSDictionary dictionary, NLLanguage? language, NSURL url, out NSError? error);
 }
 
 #endif

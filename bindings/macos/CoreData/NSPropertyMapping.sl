@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class NSPropertyMapping : NSObject
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("valueExpression", "setValueExpression:")] public NSExpression? ValueExpression { get; set; }
-    [Selector("userInfo", "setUserInfo:")] public NSDictionary? UserInfo { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("valueExpression", "setValueExpression:")]
+    public NSExpression? ValueExpression { get; set; }
+    [Selector("userInfo", "setUserInfo:")]
+    public NSDictionary? UserInfo { get; set; }
 }
 
 #endif

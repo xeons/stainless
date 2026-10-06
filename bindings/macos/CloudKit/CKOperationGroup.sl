@@ -45,14 +45,22 @@ public enum CKOperationGroupTransferSize : long
 
 public extern objc class CKOperationGroup : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("operationGroupID")] public NSString OperationGroupID { get; }
-    [Selector("defaultConfiguration", "setDefaultConfiguration:")] public CKOperationConfiguration? DefaultConfiguration { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("quantity", "setQuantity:")] public NSUInteger Quantity { get; set; }
-    [Selector("expectedSendSize", "setExpectedSendSize:")] public CKOperationGroupTransferSize ExpectedSendSize { get; set; }
-    [Selector("expectedReceiveSize", "setExpectedReceiveSize:")] public CKOperationGroupTransferSize ExpectedReceiveSize { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder aDecoder);
+    [Selector("operationGroupID")]
+    public NSString OperationGroupID { get; }
+    [Selector("defaultConfiguration", "setDefaultConfiguration:")]
+    public CKOperationConfiguration? DefaultConfiguration { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("quantity", "setQuantity:")]
+    public NSUInteger Quantity { get; set; }
+    [Selector("expectedSendSize", "setExpectedSendSize:")]
+    public CKOperationGroupTransferSize ExpectedSendSize { get; set; }
+    [Selector("expectedReceiveSize", "setExpectedReceiveSize:")]
+    public CKOperationGroupTransferSize ExpectedReceiveSize { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder aDecoder);
 }
 
 #endif

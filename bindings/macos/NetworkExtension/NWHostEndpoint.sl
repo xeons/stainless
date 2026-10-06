@@ -34,11 +34,14 @@ import Standard.ObjC;
 public extern objc class NWHostEndpoint : NWEndpoint
 {
     /// Deprecated in macOS 15.0.
-    [Selector("hostname")] public NSString? Hostname { get; }
+    [Selector("hostname")]
+    public NSString? Hostname { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("port")] public NSString? Port { get; }
+    [Selector("port")]
+    public NSString? Port { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("endpointWithHostname:port:")] public static Self EndpointWithHostnamePort(NSString hostname, NSString port);
+    [Selector("endpointWithHostname:port:")]
+    public static Self EndpointWithHostnamePort(NSString hostname, NSString port);
 }
 
 #endif

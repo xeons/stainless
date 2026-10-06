@@ -51,7 +51,8 @@ public extern "C" CFStringRef? kCFHTTPAuthenticationAccountDomain;
 
 public extern "C" CFTypeID CFHTTPAuthenticationGetTypeID();
 
-[ReturnsRetained] public extern "C" CFHTTPAuthenticationRef CFHTTPAuthenticationCreateFromResponse(CFAllocatorRef? alloc, CFHTTPMessageRef response);
+[ReturnsRetained]
+public extern "C" CFHTTPAuthenticationRef CFHTTPAuthenticationCreateFromResponse(CFAllocatorRef? alloc, CFHTTPMessageRef response);
 
 public extern "C" Boolean CFHTTPAuthenticationIsValid(CFHTTPAuthenticationRef auth, CFStreamError* error);
 
@@ -63,11 +64,14 @@ public extern "C" Boolean CFHTTPMessageApplyCredentials(CFHTTPMessageRef request
 
 public extern "C" Boolean CFHTTPMessageApplyCredentialDictionary(CFHTTPMessageRef request, CFHTTPAuthenticationRef auth, CFDictionaryRef dict, CFStreamError* error);
 
-[ReturnsRetained] public extern "C" CFStringRef CFHTTPAuthenticationCopyRealm(CFHTTPAuthenticationRef auth);
+[ReturnsRetained]
+public extern "C" CFStringRef CFHTTPAuthenticationCopyRealm(CFHTTPAuthenticationRef auth);
 
-[ReturnsRetained] public extern "C" CFArrayRef CFHTTPAuthenticationCopyDomains(CFHTTPAuthenticationRef auth);
+[ReturnsRetained]
+public extern "C" CFArrayRef CFHTTPAuthenticationCopyDomains(CFHTTPAuthenticationRef auth);
 
-[ReturnsRetained] public extern "C" CFStringRef CFHTTPAuthenticationCopyMethod(CFHTTPAuthenticationRef auth);
+[ReturnsRetained]
+public extern "C" CFStringRef CFHTTPAuthenticationCopyMethod(CFHTTPAuthenticationRef auth);
 
 public extern "C" Boolean CFHTTPAuthenticationRequiresUserNameAndPassword(CFHTTPAuthenticationRef auth);
 

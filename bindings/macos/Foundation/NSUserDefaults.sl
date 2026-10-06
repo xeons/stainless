@@ -38,46 +38,84 @@ public extern "C" NSString NSRegistrationDomain;
 
 public extern objc class NSUserDefaults : NSObject
 {
-    [Selector("standardUserDefaults")] public static NSUserDefaults StandardUserDefaults { get; }
-    [Selector("volatileDomainNames")] public NSArray VolatileDomainNames { get; }
-    [Selector("resetStandardUserDefaults")] public static void ResetStandardUserDefaults();
-    [Selector("init")] public Self Init();
-    [Selector("initWithSuiteName:")] public Self? InitWithSuiteName(NSString? suitename);
+    [Selector("standardUserDefaults")]
+    public static NSUserDefaults StandardUserDefaults { get; }
+    [Selector("volatileDomainNames")]
+    public NSArray VolatileDomainNames { get; }
+    [Selector("resetStandardUserDefaults")]
+    public static void ResetStandardUserDefaults();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithSuiteName:")]
+    public Self? InitWithSuiteName(NSString? suitename);
     /// Deprecated in macOS 10.9.
-    [Selector("initWithUser:")] public AnyObject? InitWithUser(NSString username);
-    [Selector("objectForKey:")] public AnyObject? ObjectForKey(NSString defaultName);
-    [Selector("setObject:forKey:")] public void SetObjectForKey(AnyObject? value, NSString defaultName);
-    [Selector("removeObjectForKey:")] public void RemoveObjectForKey(NSString defaultName);
-    [Selector("stringForKey:")] public NSString? StringForKey(NSString defaultName);
-    [Selector("arrayForKey:")] public NSArray? ArrayForKey(NSString defaultName);
-    [Selector("dictionaryForKey:")] public NSDictionary? DictionaryForKey(NSString defaultName);
-    [Selector("dataForKey:")] public NSData? DataForKey(NSString defaultName);
-    [Selector("stringArrayForKey:")] public NSArray? StringArrayForKey(NSString defaultName);
-    [Selector("integerForKey:")] public NSInteger IntegerForKey(NSString defaultName);
-    [Selector("floatForKey:")] public float FloatForKey(NSString defaultName);
-    [Selector("doubleForKey:")] public double DoubleForKey(NSString defaultName);
-    [Selector("boolForKey:")] public bool BoolForKey(NSString defaultName);
-    [Selector("URLForKey:")] public NSURL? URLForKey(NSString defaultName);
-    [Selector("setInteger:forKey:")] public void SetIntegerForKey(NSInteger value, NSString defaultName);
-    [Selector("setFloat:forKey:")] public void SetFloatForKey(float value, NSString defaultName);
-    [Selector("setDouble:forKey:")] public void SetDoubleForKey(double value, NSString defaultName);
-    [Selector("setBool:forKey:")] public void SetBoolForKey(bool value, NSString defaultName);
-    [Selector("setURL:forKey:")] public void SetURLForKey(NSURL? url, NSString defaultName);
-    [Selector("registerDefaults:")] public void RegisterDefaults(NSDictionary registrationDictionary);
-    [Selector("addSuiteNamed:")] public void AddSuiteNamed(NSString suiteName);
-    [Selector("removeSuiteNamed:")] public void RemoveSuiteNamed(NSString suiteName);
-    [Selector("dictionaryRepresentation")] public NSDictionary DictionaryRepresentation();
-    [Selector("volatileDomainForName:")] public NSDictionary VolatileDomainForName(NSString domainName);
-    [Selector("setVolatileDomain:forName:")] public void SetVolatileDomainForName(NSDictionary domain, NSString domainName);
-    [Selector("removeVolatileDomainForName:")] public void RemoveVolatileDomainForName(NSString domainName);
+    [Selector("initWithUser:")]
+    public AnyObject? InitWithUser(NSString username);
+    [Selector("objectForKey:")]
+    public AnyObject? ObjectForKey(NSString defaultName);
+    [Selector("setObject:forKey:")]
+    public void SetObjectForKey(AnyObject? value, NSString defaultName);
+    [Selector("removeObjectForKey:")]
+    public void RemoveObjectForKey(NSString defaultName);
+    [Selector("stringForKey:")]
+    public NSString? StringForKey(NSString defaultName);
+    [Selector("arrayForKey:")]
+    public NSArray? ArrayForKey(NSString defaultName);
+    [Selector("dictionaryForKey:")]
+    public NSDictionary? DictionaryForKey(NSString defaultName);
+    [Selector("dataForKey:")]
+    public NSData? DataForKey(NSString defaultName);
+    [Selector("stringArrayForKey:")]
+    public NSArray? StringArrayForKey(NSString defaultName);
+    [Selector("integerForKey:")]
+    public NSInteger IntegerForKey(NSString defaultName);
+    [Selector("floatForKey:")]
+    public float FloatForKey(NSString defaultName);
+    [Selector("doubleForKey:")]
+    public double DoubleForKey(NSString defaultName);
+    [Selector("boolForKey:")]
+    public bool BoolForKey(NSString defaultName);
+    [Selector("URLForKey:")]
+    public NSURL? URLForKey(NSString defaultName);
+    [Selector("setInteger:forKey:")]
+    public void SetIntegerForKey(NSInteger value, NSString defaultName);
+    [Selector("setFloat:forKey:")]
+    public void SetFloatForKey(float value, NSString defaultName);
+    [Selector("setDouble:forKey:")]
+    public void SetDoubleForKey(double value, NSString defaultName);
+    [Selector("setBool:forKey:")]
+    public void SetBoolForKey(bool value, NSString defaultName);
+    [Selector("setURL:forKey:")]
+    public void SetURLForKey(NSURL? url, NSString defaultName);
+    [Selector("registerDefaults:")]
+    public void RegisterDefaults(NSDictionary registrationDictionary);
+    [Selector("addSuiteNamed:")]
+    public void AddSuiteNamed(NSString suiteName);
+    [Selector("removeSuiteNamed:")]
+    public void RemoveSuiteNamed(NSString suiteName);
+    [Selector("dictionaryRepresentation")]
+    public NSDictionary DictionaryRepresentation();
+    [Selector("volatileDomainForName:")]
+    public NSDictionary VolatileDomainForName(NSString domainName);
+    [Selector("setVolatileDomain:forName:")]
+    public void SetVolatileDomainForName(NSDictionary domain, NSString domainName);
+    [Selector("removeVolatileDomainForName:")]
+    public void RemoveVolatileDomainForName(NSString domainName);
     /// Deprecated in macOS 10.9.
-    [Selector("persistentDomainNames")] public NSArray PersistentDomainNames();
-    [Selector("persistentDomainForName:")] public NSDictionary? PersistentDomainForName(NSString domainName);
-    [Selector("setPersistentDomain:forName:")] public void SetPersistentDomainForName(NSDictionary domain, NSString domainName);
-    [Selector("removePersistentDomainForName:")] public void RemovePersistentDomainForName(NSString domainName);
-    [Selector("synchronize")] public bool Synchronize();
-    [Selector("objectIsForcedForKey:")] public bool ObjectIsForcedForKey(NSString key);
-    [Selector("objectIsForcedForKey:inDomain:")] public bool ObjectIsForcedForKeyInDomain(NSString key, NSString domain);
+    [Selector("persistentDomainNames")]
+    public NSArray PersistentDomainNames();
+    [Selector("persistentDomainForName:")]
+    public NSDictionary? PersistentDomainForName(NSString domainName);
+    [Selector("setPersistentDomain:forName:")]
+    public void SetPersistentDomainForName(NSDictionary domain, NSString domainName);
+    [Selector("removePersistentDomainForName:")]
+    public void RemovePersistentDomainForName(NSString domainName);
+    [Selector("synchronize")]
+    public bool Synchronize();
+    [Selector("objectIsForcedForKey:")]
+    public bool ObjectIsForcedForKey(NSString key);
+    [Selector("objectIsForcedForKey:inDomain:")]
+    public bool ObjectIsForcedForKeyInDomain(NSString key, NSString domain);
 }
 
 public extern "C" NSNotificationName NSUserDefaultsDidChangeNotification;

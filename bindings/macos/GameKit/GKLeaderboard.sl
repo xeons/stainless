@@ -65,29 +65,47 @@ public objc closure void GKLeaderboardLoadEntriesForPlayersTimeScopeCompletionHa
 
 public extern objc class GKLeaderboard : NSObject
 {
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("groupIdentifier")] public NSString? GroupIdentifier { get; }
-    [Selector("baseLeaderboardID")] public NSString BaseLeaderboardID { get; }
-    [Selector("type")] public GKLeaderboardType Type { get; }
-    [Selector("startDate")] public NSDate? StartDate { get; }
-    [Selector("nextStartDate")] public NSDate? NextStartDate { get; }
-    [Selector("duration")] public NSTimeInterval Duration { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("groupIdentifier")]
+    public NSString? GroupIdentifier { get; }
+    [Selector("baseLeaderboardID")]
+    public NSString BaseLeaderboardID { get; }
+    [Selector("type")]
+    public GKLeaderboardType Type { get; }
+    [Selector("startDate")]
+    public NSDate? StartDate { get; }
+    [Selector("nextStartDate")]
+    public NSDate? NextStartDate { get; }
+    [Selector("duration")]
+    public NSTimeInterval Duration { get; }
     /// macOS 26.0 and later.
-    [Selector("leaderboardDescription")] public NSString LeaderboardDescription { get; }
+    [Selector("leaderboardDescription")]
+    public NSString LeaderboardDescription { get; }
     /// macOS 26.0 and later.
-    [Selector("releaseState")] public GKReleaseState ReleaseState { get; }
+    [Selector("releaseState")]
+    public GKReleaseState ReleaseState { get; }
     /// macOS 26.0 and later.
-    [Selector("activityIdentifier")] public NSString ActivityIdentifier { get; }
+    [Selector("activityIdentifier")]
+    public NSString ActivityIdentifier { get; }
     /// macOS 26.0 and later.
-    [Selector("activityProperties")] public NSDictionary ActivityProperties { get; }
+    [Selector("activityProperties")]
+    public NSDictionary ActivityProperties { get; }
     /// macOS 26.0 and later.
-    [Selector("isHidden")] public bool IsHidden { get; }
-    [Selector("loadLeaderboardsWithIDs:completionHandler:")] public static void LoadLeaderboardsWithIDsCompletionHandler(NSArray? leaderboardIDs, GKLeaderboardLoadLeaderboardsWithIDsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadPreviousOccurrenceWithCompletionHandler:")] public void LoadPreviousOccurrenceWithCompletionHandler(GKLeaderboardLoadPreviousOccurrenceWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("submitScore:context:player:leaderboardIDs:completionHandler:")] public static void SubmitScoreContextPlayerLeaderboardIDsCompletionHandler(NSInteger score, NSUInteger context, GKPlayer player, NSArray leaderboardIDs, GKLeaderboardSubmitScoreContextPlayerLeaderboardIDsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("submitScore:context:player:completionHandler:")] public void SubmitScoreContextPlayerCompletionHandler(NSInteger score, NSUInteger context, GKPlayer player, GKLeaderboardSubmitScoreContextPlayerCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadEntriesForPlayerScope:timeScope:range:completionHandler:")] public void LoadEntriesForPlayerScopeTimeScopeRangeCompletionHandler(GKLeaderboardPlayerScope playerScope, GKLeaderboardTimeScope timeScope, NSRange range, GKLeaderboardLoadEntriesForPlayerScopeTimeScopeRangeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadEntriesForPlayers:timeScope:completionHandler:")] public void LoadEntriesForPlayersTimeScopeCompletionHandler(NSArray players, GKLeaderboardTimeScope timeScope, GKLeaderboardLoadEntriesForPlayersTimeScopeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("isHidden")]
+    public bool IsHidden { get; }
+    [Selector("loadLeaderboardsWithIDs:completionHandler:")]
+    public static void LoadLeaderboardsWithIDsCompletionHandler(NSArray? leaderboardIDs, GKLeaderboardLoadLeaderboardsWithIDsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadPreviousOccurrenceWithCompletionHandler:")]
+    public void LoadPreviousOccurrenceWithCompletionHandler(GKLeaderboardLoadPreviousOccurrenceWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("submitScore:context:player:leaderboardIDs:completionHandler:")]
+    public static void SubmitScoreContextPlayerLeaderboardIDsCompletionHandler(NSInteger score, NSUInteger context, GKPlayer player, NSArray leaderboardIDs, GKLeaderboardSubmitScoreContextPlayerLeaderboardIDsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("submitScore:context:player:completionHandler:")]
+    public void SubmitScoreContextPlayerCompletionHandler(NSInteger score, NSUInteger context, GKPlayer player, GKLeaderboardSubmitScoreContextPlayerCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadEntriesForPlayerScope:timeScope:range:completionHandler:")]
+    public void LoadEntriesForPlayerScopeTimeScopeRangeCompletionHandler(GKLeaderboardPlayerScope playerScope, GKLeaderboardTimeScope timeScope, NSRange range, GKLeaderboardLoadEntriesForPlayerScopeTimeScopeRangeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadEntriesForPlayers:timeScope:completionHandler:")]
+    public void LoadEntriesForPlayersTimeScopeCompletionHandler(NSArray players, GKLeaderboardTimeScope timeScope, GKLeaderboardLoadEntriesForPlayersTimeScopeCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void GKLeaderboardLoadCategoriesWithCompletionHandlerCompletionHandlerBlock(NSArray? arg0, NSArray? arg1, NSError? arg2);
@@ -102,37 +120,53 @@ public objc closure void GKLeaderboardLoadLeaderboardsWithCompletionHandlerCompl
 public extern objc class GKLeaderboard
 {
     /// Deprecated in macOS 10.10.
-    [Selector("category", "setCategory:")] public NSString? Category { get; set; }
+    [Selector("category", "setCategory:")]
+    public NSString? Category { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("timeScope", "setTimeScope:")] public GKLeaderboardTimeScope TimeScope { get; set; }
+    [Selector("timeScope", "setTimeScope:")]
+    public GKLeaderboardTimeScope TimeScope { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("playerScope", "setPlayerScope:")] public GKLeaderboardPlayerScope PlayerScope { get; set; }
+    [Selector("playerScope", "setPlayerScope:")]
+    public GKLeaderboardPlayerScope PlayerScope { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("identifier", "setIdentifier:")] public NSString? Identifier { get; set; }
+    [Selector("identifier", "setIdentifier:")]
+    public NSString? Identifier { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("range", "setRange:")] public NSRange Range { get; set; }
+    [Selector("range", "setRange:")]
+    public NSRange Range { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("scores")] public NSArray? Scores { get; }
+    [Selector("scores")]
+    public NSArray? Scores { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("maxRange")] public NSUInteger MaxRange { get; }
+    [Selector("maxRange")]
+    public NSUInteger MaxRange { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("localPlayerScore")] public GKScore? LocalPlayerScore { get; }
+    [Selector("localPlayerScore")]
+    public GKScore? LocalPlayerScore { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("isLoading")] public bool Loading { get; }
+    [Selector("isLoading")]
+    public bool Loading { get; }
     /// Deprecated in macOS 10.10.
-    [Selector("initWithPlayerIDs:")] public Self? InitWithPlayerIDs(NSArray? playerIDs);
+    [Selector("initWithPlayerIDs:")]
+    public Self? InitWithPlayerIDs(NSArray? playerIDs);
     /// Deprecated in macOS 10.9.
-    [Selector("loadCategoriesWithCompletionHandler:")] public static void LoadCategoriesWithCompletionHandler(GKLeaderboardLoadCategoriesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadCategoriesWithCompletionHandler:")]
+    public static void LoadCategoriesWithCompletionHandler(GKLeaderboardLoadCategoriesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 10.10.
-    [Selector("setDefaultLeaderboard:withCompletionHandler:")] public static void SetDefaultLeaderboardWithCompletionHandler(NSString? leaderboardIdentifier, GKLeaderboardSetDefaultLeaderboardWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("setDefaultLeaderboard:withCompletionHandler:")]
+    public static void SetDefaultLeaderboardWithCompletionHandler(NSString? leaderboardIdentifier, GKLeaderboardSetDefaultLeaderboardWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 11.0.
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 11.0.
-    [Selector("initWithPlayers:")] public Self InitWithPlayers(NSArray players);
+    [Selector("initWithPlayers:")]
+    public Self InitWithPlayers(NSArray players);
     /// Deprecated in macOS 11.0.
-    [Selector("loadScoresWithCompletionHandler:")] public void LoadScoresWithCompletionHandler(GKLeaderboardLoadScoresWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadScoresWithCompletionHandler:")]
+    public void LoadScoresWithCompletionHandler(GKLeaderboardLoadScoresWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 11.0.
-    [Selector("loadLeaderboardsWithCompletionHandler:")] public static void LoadLeaderboardsWithCompletionHandler(GKLeaderboardLoadLeaderboardsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadLeaderboardsWithCompletionHandler:")]
+    public static void LoadLeaderboardsWithCompletionHandler(GKLeaderboardLoadLeaderboardsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public objc closure void GKLeaderboardLoadImageWithCompletionHandlerCompletionHandlerBlock(NSImage? arg0, NSError? arg1);
@@ -140,7 +174,8 @@ public objc closure void GKLeaderboardLoadImageWithCompletionHandlerCompletionHa
 /// UI, a category of GKLeaderboard.
 public extern objc class GKLeaderboard
 {
-    [Selector("loadImageWithCompletionHandler:")] public void LoadImageWithCompletionHandler(GKLeaderboardLoadImageWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadImageWithCompletionHandler:")]
+    public void LoadImageWithCompletionHandler(GKLeaderboardLoadImageWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 #endif

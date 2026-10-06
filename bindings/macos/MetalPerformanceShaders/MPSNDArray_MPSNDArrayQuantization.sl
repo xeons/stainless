@@ -41,23 +41,32 @@ public enum MPSNDArrayQuantizationScheme : ulong
 
 public extern objc class MPSNDArrayQuantizationDescriptor : NSObject, NSCopying
 {
-    [Selector("quantizationDataType")] public MPSDataType QuantizationDataType { get; }
-    [Selector("quantizationScheme")] public MPSNDArrayQuantizationScheme QuantizationScheme { get; }
+    [Selector("quantizationDataType")]
+    public MPSDataType QuantizationDataType { get; }
+    [Selector("quantizationScheme")]
+    public MPSNDArrayQuantizationScheme QuantizationScheme { get; }
 }
 
 public extern objc class MPSNDArrayAffineQuantizationDescriptor : MPSNDArrayQuantizationDescriptor
 {
-    [Selector("hasZeroPoint", "setHasZeroPoint:")] public bool HasZeroPoint { get; set; }
-    [Selector("hasMinValue", "setHasMinValue:")] public bool HasMinValue { get; set; }
-    [Selector("implicitZeroPoint", "setImplicitZeroPoint:")] public bool ImplicitZeroPoint { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithDataType:hasZeroPoint:hasMinValue:")] public Self InitWithDataTypeHasZeroPointHasMinValue(MPSDataType quantizationDataType, bool hasZeroPoint, bool hasMinValue);
+    [Selector("hasZeroPoint", "setHasZeroPoint:")]
+    public bool HasZeroPoint { get; set; }
+    [Selector("hasMinValue", "setHasMinValue:")]
+    public bool HasMinValue { get; set; }
+    [Selector("implicitZeroPoint", "setImplicitZeroPoint:")]
+    public bool ImplicitZeroPoint { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithDataType:hasZeroPoint:hasMinValue:")]
+    public Self InitWithDataTypeHasZeroPointHasMinValue(MPSDataType quantizationDataType, bool hasZeroPoint, bool hasMinValue);
 }
 
 public extern objc class MPSNDArrayLUTQuantizationDescriptor : MPSNDArrayQuantizationDescriptor
 {
-    [Selector("initWithDataType:")] public Self InitWithDataType(MPSDataType quantizationDataType);
-    [Selector("initWithDataType:vectorAxis:")] public Self InitWithDataTypeVectorAxis(MPSDataType quantizationDataType, NSUInteger vectorAxis);
+    [Selector("initWithDataType:")]
+    public Self InitWithDataType(MPSDataType quantizationDataType);
+    [Selector("initWithDataType:vectorAxis:")]
+    public Self InitWithDataTypeVectorAxis(MPSDataType quantizationDataType, NSUInteger vectorAxis);
 }
 
 #endif

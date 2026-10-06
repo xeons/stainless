@@ -32,13 +32,20 @@ import Standard.ObjC;
 
 public extern objc class NSTermOfAddress : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("languageIdentifier")] public NSString? LanguageIdentifier { get; }
-    [Selector("pronouns")] public NSArray? Pronouns { get; }
-    [Selector("neutral")] public static Self Neutral();
-    [Selector("feminine")] public static Self Feminine();
-    [Selector("masculine")] public static Self Masculine();
-    [Selector("currentUser")] public static Self CurrentUser();
-    [Selector("localizedForLanguageIdentifier:withPronouns:")] public static Self LocalizedForLanguageIdentifierWithPronouns(NSString language, NSArray pronouns);
+    [Selector("languageIdentifier")]
+    public NSString? LanguageIdentifier { get; }
+    [Selector("pronouns")]
+    public NSArray? Pronouns { get; }
+    [Selector("neutral")]
+    public static Self Neutral();
+    [Selector("feminine")]
+    public static Self Feminine();
+    [Selector("masculine")]
+    public static Self Masculine();
+    [Selector("currentUser")]
+    public static Self CurrentUser();
+    [Selector("localizedForLanguageIdentifier:withPronouns:")]
+    public static Self LocalizedForLanguageIdentifierWithPronouns(NSString language, NSArray pronouns);
 }
 
 #endif

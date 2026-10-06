@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// Predicates, a category of CNContainer.
 public extern objc class CNContainer
 {
-    [Selector("predicateForContainersWithIdentifiers:")] public static NSPredicate PredicateForContainersWithIdentifiers(NSArray identifiers);
-    [Selector("predicateForContainerOfContactWithIdentifier:")] public static NSPredicate PredicateForContainerOfContactWithIdentifier(NSString contactIdentifier);
-    [Selector("predicateForContainerOfGroupWithIdentifier:")] public static NSPredicate PredicateForContainerOfGroupWithIdentifier(NSString groupIdentifier);
+    [Selector("predicateForContainersWithIdentifiers:")]
+    public static NSPredicate PredicateForContainersWithIdentifiers(NSArray identifiers);
+    [Selector("predicateForContainerOfContactWithIdentifier:")]
+    public static NSPredicate PredicateForContainerOfContactWithIdentifier(NSString contactIdentifier);
+    [Selector("predicateForContainerOfGroupWithIdentifier:")]
+    public static NSPredicate PredicateForContainerOfGroupWithIdentifier(NSString groupIdentifier);
 }
 
 #endif

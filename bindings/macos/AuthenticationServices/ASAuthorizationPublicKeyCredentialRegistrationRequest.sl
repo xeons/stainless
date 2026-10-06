@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public objc interface ASAuthorizationPublicKeyCredentialRegistrationRequest : NSObjectProtocol, NSSecureCoding, NSCopying
 {
-    [Selector("relyingPartyIdentifier")] NSString RelyingPartyIdentifier { get; }
-    [Selector("userID", "setUserID:")] NSData UserID { get; set; }
-    [Selector("name", "setName:")] NSString Name { get; set; }
-    [Selector("displayName", "setDisplayName:")] NSString? DisplayName { get; set; }
-    [Selector("challenge", "setChallenge:")] NSData Challenge { get; set; }
-    [Selector("userVerificationPreference", "setUserVerificationPreference:")] ASAuthorizationPublicKeyCredentialUserVerificationPreference UserVerificationPreference { get; set; }
-    [Selector("attestationPreference", "setAttestationPreference:")] ASAuthorizationPublicKeyCredentialAttestationKind? AttestationPreference { get; set; }
+    [Selector("relyingPartyIdentifier")]
+    NSString RelyingPartyIdentifier { get; }
+    [Selector("userID", "setUserID:")]
+    NSData UserID { get; set; }
+    [Selector("name", "setName:")]
+    NSString Name { get; set; }
+    [Selector("displayName", "setDisplayName:")]
+    NSString? DisplayName { get; set; }
+    [Selector("challenge", "setChallenge:")]
+    NSData Challenge { get; set; }
+    [Selector("userVerificationPreference", "setUserVerificationPreference:")]
+    ASAuthorizationPublicKeyCredentialUserVerificationPreference UserVerificationPreference { get; set; }
+    [Selector("attestationPreference", "setAttestationPreference:")]
+    ASAuthorizationPublicKeyCredentialAttestationKind? AttestationPreference { get; set; }
 }
 
 #endif

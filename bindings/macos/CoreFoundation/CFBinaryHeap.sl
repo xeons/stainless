@@ -73,9 +73,11 @@ public extern objc class CFBinaryHeapRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFBinaryHeapGetTypeID();
 
-[ReturnsRetained] public extern "C" CFBinaryHeapRef? CFBinaryHeapCreate(CFAllocatorRef? allocator, CFIndex capacity, CFBinaryHeapCallBacks* callBacks, CFBinaryHeapCompareContext* compareContext);
+[ReturnsRetained]
+public extern "C" CFBinaryHeapRef? CFBinaryHeapCreate(CFAllocatorRef? allocator, CFIndex capacity, CFBinaryHeapCallBacks* callBacks, CFBinaryHeapCompareContext* compareContext);
 
-[ReturnsRetained] public extern "C" CFBinaryHeapRef? CFBinaryHeapCreateCopy(CFAllocatorRef? allocator, CFIndex capacity, CFBinaryHeapRef? heap);
+[ReturnsRetained]
+public extern "C" CFBinaryHeapRef? CFBinaryHeapCreateCopy(CFAllocatorRef? allocator, CFIndex capacity, CFBinaryHeapRef? heap);
 
 public extern "C" CFIndex CFBinaryHeapGetCount(CFBinaryHeapRef? heap);
 

@@ -42,14 +42,22 @@ public extern "C" MLFeatureValueImageOption MLFeatureValueImageOptionCropAndScal
 /// MLImageConversion, a category of MLFeatureValue.
 public extern objc class MLFeatureValue
 {
-    [Selector("featureValueWithImageAtURL:pixelsWide:pixelsHigh:pixelFormatType:options:error:")] public static Self? FeatureValueWithImageAtURLPixelsWidePixelsHighPixelFormatTypeOptionsError(NSURL url, NSInteger pixelsWide, NSInteger pixelsHigh, OSType pixelFormatType, NSDictionary? options, out NSError? error);
-    [Selector("featureValueWithImageAtURL:constraint:options:error:")] public static Self? FeatureValueWithImageAtURLConstraintOptionsError(NSURL url, MLImageConstraint constraint, NSDictionary? options, out NSError? error);
-    [Selector("featureValueWithCGImage:pixelsWide:pixelsHigh:pixelFormatType:options:error:")] public static Self? FeatureValueWithCGImagePixelsWidePixelsHighPixelFormatTypeOptionsError(CGImageRef cgImage, NSInteger pixelsWide, NSInteger pixelsHigh, OSType pixelFormatType, NSDictionary? options, out NSError? error);
-    [Selector("featureValueWithCGImage:constraint:options:error:")] public static Self? FeatureValueWithCGImageConstraintOptionsError(CGImageRef cgImage, MLImageConstraint constraint, NSDictionary? options, out NSError? error);
-    [Selector("featureValueWithImageAtURL:orientation:pixelsWide:pixelsHigh:pixelFormatType:options:error:")] public static Self? FeatureValueWithImageAtURLOrientationPixelsWidePixelsHighPixelFormatTypeOptionsError(NSURL url, CGImagePropertyOrientation orientation, NSInteger pixelsWide, NSInteger pixelsHigh, OSType pixelFormatType, NSDictionary? options, out NSError? error);
-    [Selector("featureValueWithImageAtURL:orientation:constraint:options:error:")] public static Self? FeatureValueWithImageAtURLOrientationConstraintOptionsError(NSURL url, CGImagePropertyOrientation orientation, MLImageConstraint constraint, NSDictionary? options, out NSError? error);
-    [Selector("featureValueWithCGImage:orientation:pixelsWide:pixelsHigh:pixelFormatType:options:error:")] public static Self? FeatureValueWithCGImageOrientationPixelsWidePixelsHighPixelFormatTypeOptionsError(CGImageRef cgImage, CGImagePropertyOrientation orientation, NSInteger pixelsWide, NSInteger pixelsHigh, OSType pixelFormatType, NSDictionary? options, out NSError? error);
-    [Selector("featureValueWithCGImage:orientation:constraint:options:error:")] public static Self? FeatureValueWithCGImageOrientationConstraintOptionsError(CGImageRef cgImage, CGImagePropertyOrientation orientation, MLImageConstraint constraint, NSDictionary? options, out NSError? error);
+    [Selector("featureValueWithImageAtURL:pixelsWide:pixelsHigh:pixelFormatType:options:error:")]
+    public static Self? FeatureValueWithImageAtURLPixelsWidePixelsHighPixelFormatTypeOptionsError(NSURL url, NSInteger pixelsWide, NSInteger pixelsHigh, OSType pixelFormatType, NSDictionary? options, out NSError? error);
+    [Selector("featureValueWithImageAtURL:constraint:options:error:")]
+    public static Self? FeatureValueWithImageAtURLConstraintOptionsError(NSURL url, MLImageConstraint constraint, NSDictionary? options, out NSError? error);
+    [Selector("featureValueWithCGImage:pixelsWide:pixelsHigh:pixelFormatType:options:error:")]
+    public static Self? FeatureValueWithCGImagePixelsWidePixelsHighPixelFormatTypeOptionsError(CGImageRef cgImage, NSInteger pixelsWide, NSInteger pixelsHigh, OSType pixelFormatType, NSDictionary? options, out NSError? error);
+    [Selector("featureValueWithCGImage:constraint:options:error:")]
+    public static Self? FeatureValueWithCGImageConstraintOptionsError(CGImageRef cgImage, MLImageConstraint constraint, NSDictionary? options, out NSError? error);
+    [Selector("featureValueWithImageAtURL:orientation:pixelsWide:pixelsHigh:pixelFormatType:options:error:")]
+    public static Self? FeatureValueWithImageAtURLOrientationPixelsWidePixelsHighPixelFormatTypeOptionsError(NSURL url, CGImagePropertyOrientation orientation, NSInteger pixelsWide, NSInteger pixelsHigh, OSType pixelFormatType, NSDictionary? options, out NSError? error);
+    [Selector("featureValueWithImageAtURL:orientation:constraint:options:error:")]
+    public static Self? FeatureValueWithImageAtURLOrientationConstraintOptionsError(NSURL url, CGImagePropertyOrientation orientation, MLImageConstraint constraint, NSDictionary? options, out NSError? error);
+    [Selector("featureValueWithCGImage:orientation:pixelsWide:pixelsHigh:pixelFormatType:options:error:")]
+    public static Self? FeatureValueWithCGImageOrientationPixelsWidePixelsHighPixelFormatTypeOptionsError(CGImageRef cgImage, CGImagePropertyOrientation orientation, NSInteger pixelsWide, NSInteger pixelsHigh, OSType pixelFormatType, NSDictionary? options, out NSError? error);
+    [Selector("featureValueWithCGImage:orientation:constraint:options:error:")]
+    public static Self? FeatureValueWithCGImageOrientationConstraintOptionsError(CGImageRef cgImage, CGImagePropertyOrientation orientation, MLImageConstraint constraint, NSDictionary? options, out NSError? error);
 }
 
 #endif

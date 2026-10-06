@@ -34,89 +34,120 @@ import Standard.ObjC;
 public extern objc class IMAVControl : NSObject
 {
     /// Deprecated in macOS 10.9.
-    [Selector("target")] public AnyObject? Target();
+    [Selector("target")]
+    public AnyObject? Target();
     /// Deprecated in macOS 10.9.
-    [Selector("setTarget:")] public void SetTarget(AnyObject? anObject);
+    [Selector("setTarget:")]
+    public void SetTarget(AnyObject? anObject);
     /// Deprecated in macOS 10.9.
-    [Selector("action")] public Selector Action();
+    [Selector("action")]
+    public Selector Action();
     /// Deprecated in macOS 10.9.
-    [Selector("setAction:")] public void SetAction(Selector aSelector);
+    [Selector("setAction:")]
+    public void SetAction(Selector aSelector);
     /// Deprecated in macOS 10.9.
-    [Selector("tag")] public NSInteger Tag();
+    [Selector("tag")]
+    public NSInteger Tag();
     /// Deprecated in macOS 10.9.
-    [Selector("setTag:")] public void SetTag(NSInteger anInt);
+    [Selector("setTag:")]
+    public void SetTag(NSInteger anInt);
     /// Deprecated in macOS 10.9.
-    [Selector("isEnabled")] public bool IsEnabled();
+    [Selector("isEnabled")]
+    public bool IsEnabled();
     /// Deprecated in macOS 10.9.
-    [Selector("setEnabled:")] public void SetEnabled(bool flag);
+    [Selector("setEnabled:")]
+    public void SetEnabled(bool flag);
     /// Deprecated in macOS 10.9.
-    [Selector("integerValue")] public NSInteger IntegerValue();
+    [Selector("integerValue")]
+    public NSInteger IntegerValue();
     /// Deprecated in macOS 10.9.
-    [Selector("setIntegerValue:")] public void SetIntegerValue(NSInteger anInteger);
+    [Selector("setIntegerValue:")]
+    public void SetIntegerValue(NSInteger anInteger);
     /// Deprecated in macOS 10.9.
-    [Selector("intValue")] public int IntValue();
+    [Selector("intValue")]
+    public int IntValue();
     /// Deprecated in macOS 10.9.
-    [Selector("setIntValue:")] public void SetIntValue(int anInt);
+    [Selector("setIntValue:")]
+    public void SetIntValue(int anInt);
     /// Deprecated in macOS 10.9.
-    [Selector("floatValue")] public float FloatValue();
+    [Selector("floatValue")]
+    public float FloatValue();
     /// Deprecated in macOS 10.9.
-    [Selector("setFloatValue:")] public void SetFloatValue(float aFloat);
+    [Selector("setFloatValue:")]
+    public void SetFloatValue(float aFloat);
     /// Deprecated in macOS 10.9.
-    [Selector("doubleValue")] public double DoubleValue();
+    [Selector("doubleValue")]
+    public double DoubleValue();
     /// Deprecated in macOS 10.9.
-    [Selector("setDoubleValue:")] public void SetDoubleValue(double aDouble);
+    [Selector("setDoubleValue:")]
+    public void SetDoubleValue(double aDouble);
 }
 
 public extern objc class IMAVButton : IMAVControl
 {
     /// Deprecated in macOS 10.9.
-    [Selector("state")] public NSInteger State();
+    [Selector("state")]
+    public NSInteger State();
     /// Deprecated in macOS 10.9.
-    [Selector("setState:")] public void SetState(NSInteger value);
+    [Selector("setState:")]
+    public void SetState(NSInteger value);
 }
 
 /// StandardControls, a category of IMAVButton.
 public extern objc class IMAVButton
 {
     /// Deprecated in macOS 10.9.
-    [Selector("playPauseButton")] public static IMAVButton? PlayPauseButton();
+    [Selector("playPauseButton")]
+    public static IMAVButton? PlayPauseButton();
     /// Deprecated in macOS 10.9.
-    [Selector("forwardButton")] public static IMAVButton? ForwardButton();
+    [Selector("forwardButton")]
+    public static IMAVButton? ForwardButton();
     /// Deprecated in macOS 10.9.
-    [Selector("backwardButton")] public static IMAVButton? BackwardButton();
+    [Selector("backwardButton")]
+    public static IMAVButton? BackwardButton();
     /// Deprecated in macOS 10.9.
-    [Selector("muteButton")] public static IMAVButton? MuteButton();
+    [Selector("muteButton")]
+    public static IMAVButton? MuteButton();
 }
 
 public extern objc class IMAVSlider : IMAVControl
 {
     /// Deprecated in macOS 10.9.
-    [Selector("minValue")] public double MinValue();
+    [Selector("minValue")]
+    public double MinValue();
     /// Deprecated in macOS 10.9.
-    [Selector("setMinValue:")] public void SetMinValue(double aDouble);
+    [Selector("setMinValue:")]
+    public void SetMinValue(double aDouble);
     /// Deprecated in macOS 10.9.
-    [Selector("maxValue")] public double MaxValue();
+    [Selector("maxValue")]
+    public double MaxValue();
     /// Deprecated in macOS 10.9.
-    [Selector("setMaxValue:")] public void SetMaxValue(double aDouble);
+    [Selector("setMaxValue:")]
+    public void SetMaxValue(double aDouble);
 }
 
 /// StandardControls, a category of IMAVSlider.
 public extern objc class IMAVSlider
 {
     /// Deprecated in macOS 10.9.
-    [Selector("timeSlider")] public static IMAVSlider? TimeSlider();
+    [Selector("timeSlider")]
+    public static IMAVSlider? TimeSlider();
 }
 
 public extern objc class IMAVControlBar : NSObject
 {
     /// Deprecated in macOS 10.9.
-    [Selector("controls")] public NSArray? Controls();
+    [Selector("controls")]
+    public NSArray? Controls();
     /// Deprecated in macOS 10.9.
-    [Selector("addControl:")] public void AddControl(IMAVControl? control);
+    [Selector("addControl:")]
+    public void AddControl(IMAVControl? control);
     /// Deprecated in macOS 10.9.
-    [Selector("removeControl:")] public void RemoveControl(IMAVControl? control);
+    [Selector("removeControl:")]
+    public void RemoveControl(IMAVControl? control);
     /// Deprecated in macOS 10.9.
-    [Selector("removeAllControls")] public void RemoveAllControls();
+    [Selector("removeAllControls")]
+    public void RemoveAllControls();
 }
 
 #endif

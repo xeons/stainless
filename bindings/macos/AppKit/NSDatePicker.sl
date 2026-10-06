@@ -32,23 +32,40 @@ import Standard.ObjC;
 
 public extern objc class NSDatePicker : NSControl
 {
-    [Selector("datePickerStyle", "setDatePickerStyle:")] public NSDatePickerStyle DatePickerStyle { get; set; }
-    [Selector("isBezeled", "setBezeled:")] public bool Bezeled { get; set; }
-    [Selector("isBordered", "setBordered:")] public bool Bordered { get; set; }
-    [Selector("drawsBackground", "setDrawsBackground:")] public bool DrawsBackground { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor BackgroundColor { get; set; }
-    [Selector("textColor", "setTextColor:")] public NSColor TextColor { get; set; }
-    [Selector("datePickerMode", "setDatePickerMode:")] public NSDatePickerMode DatePickerMode { get; set; }
-    [Selector("datePickerElements", "setDatePickerElements:")] public NSDatePickerElementFlags DatePickerElements { get; set; }
-    [Selector("calendar", "setCalendar:")] public NSCalendar? Calendar { get; set; }
-    [Selector("locale", "setLocale:")] public NSLocale? Locale { get; set; }
-    [Selector("timeZone", "setTimeZone:")] public NSTimeZone? TimeZone { get; set; }
-    [Selector("dateValue", "setDateValue:")] public NSDate DateValue { get; set; }
-    [Selector("timeInterval", "setTimeInterval:")] public NSTimeInterval TimeInterval { get; set; }
-    [Selector("minDate", "setMinDate:")] public NSDate? MinDate { get; set; }
-    [Selector("maxDate", "setMaxDate:")] public NSDate? MaxDate { get; set; }
-    [Selector("presentsCalendarOverlay", "setPresentsCalendarOverlay:")] public bool PresentsCalendarOverlay { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSDatePickerCellDelegate? Delegate { get; set; }
+    [Selector("datePickerStyle", "setDatePickerStyle:")]
+    public NSDatePickerStyle DatePickerStyle { get; set; }
+    [Selector("isBezeled", "setBezeled:")]
+    public bool Bezeled { get; set; }
+    [Selector("isBordered", "setBordered:")]
+    public bool Bordered { get; set; }
+    [Selector("drawsBackground", "setDrawsBackground:")]
+    public bool DrawsBackground { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor BackgroundColor { get; set; }
+    [Selector("textColor", "setTextColor:")]
+    public NSColor TextColor { get; set; }
+    [Selector("datePickerMode", "setDatePickerMode:")]
+    public NSDatePickerMode DatePickerMode { get; set; }
+    [Selector("datePickerElements", "setDatePickerElements:")]
+    public NSDatePickerElementFlags DatePickerElements { get; set; }
+    [Selector("calendar", "setCalendar:")]
+    public NSCalendar? Calendar { get; set; }
+    [Selector("locale", "setLocale:")]
+    public NSLocale? Locale { get; set; }
+    [Selector("timeZone", "setTimeZone:")]
+    public NSTimeZone? TimeZone { get; set; }
+    [Selector("dateValue", "setDateValue:")]
+    public NSDate DateValue { get; set; }
+    [Selector("timeInterval", "setTimeInterval:")]
+    public NSTimeInterval TimeInterval { get; set; }
+    [Selector("minDate", "setMinDate:")]
+    public NSDate? MinDate { get; set; }
+    [Selector("maxDate", "setMaxDate:")]
+    public NSDate? MaxDate { get; set; }
+    [Selector("presentsCalendarOverlay", "setPresentsCalendarOverlay:")]
+    public bool PresentsCalendarOverlay { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSDatePickerCellDelegate? Delegate { get; set; }
 }
 
 #endif

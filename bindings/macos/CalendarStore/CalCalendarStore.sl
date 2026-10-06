@@ -42,43 +42,62 @@ public enum CalSpan : int
 public extern objc class CalCalendarStore : NSObject
 {
     /// Deprecated in macOS 10.8.
-    [Selector("defaultCalendarStore")] public static CalCalendarStore? DefaultCalendarStore();
+    [Selector("defaultCalendarStore")]
+    public static CalCalendarStore? DefaultCalendarStore();
     /// Deprecated in macOS 10.8.
-    [Selector("calendars")] public NSArray? Calendars();
+    [Selector("calendars")]
+    public NSArray? Calendars();
     /// Deprecated in macOS 10.8.
-    [Selector("calendarWithUID:")] public CalCalendar? CalendarWithUID(NSString? UID);
+    [Selector("calendarWithUID:")]
+    public CalCalendar? CalendarWithUID(NSString? UID);
     /// Deprecated in macOS 10.8.
-    [Selector("saveCalendar:error:")] public bool SaveCalendarError(CalCalendar? calendar, out NSError? error);
+    [Selector("saveCalendar:error:")]
+    public bool SaveCalendarError(CalCalendar? calendar, out NSError? error);
     /// Deprecated in macOS 10.8.
-    [Selector("removeCalendar:error:")] public bool RemoveCalendarError(CalCalendar? calendar, out NSError? error);
+    [Selector("removeCalendar:error:")]
+    public bool RemoveCalendarError(CalCalendar? calendar, out NSError? error);
     /// Deprecated in macOS 10.8.
-    [Selector("eventsWithPredicate:")] public NSArray? EventsWithPredicate(NSPredicate? predicate);
+    [Selector("eventsWithPredicate:")]
+    public NSArray? EventsWithPredicate(NSPredicate? predicate);
     /// Deprecated in macOS 10.8.
-    [Selector("eventWithUID:occurrence:")] public CalEvent? EventWithUIDOccurrence(NSString? uid, NSDate? date);
+    [Selector("eventWithUID:occurrence:")]
+    public CalEvent? EventWithUIDOccurrence(NSString? uid, NSDate? date);
     /// Deprecated in macOS 10.8.
-    [Selector("tasksWithPredicate:")] public NSArray? TasksWithPredicate(NSPredicate? predicate);
+    [Selector("tasksWithPredicate:")]
+    public NSArray? TasksWithPredicate(NSPredicate? predicate);
     /// Deprecated in macOS 10.8.
-    [Selector("taskWithUID:")] public CalTask? TaskWithUID(NSString? uid);
+    [Selector("taskWithUID:")]
+    public CalTask? TaskWithUID(NSString? uid);
     /// Deprecated in macOS 10.8.
-    [Selector("saveEvent:span:error:")] public bool SaveEventSpanError(CalEvent? event, CalSpan span, out NSError? error);
+    [Selector("saveEvent:span:error:")]
+    public bool SaveEventSpanError(CalEvent? event, CalSpan span, out NSError? error);
     /// Deprecated in macOS 10.8.
-    [Selector("removeEvent:span:error:")] public bool RemoveEventSpanError(CalEvent? event, CalSpan span, out NSError? error);
+    [Selector("removeEvent:span:error:")]
+    public bool RemoveEventSpanError(CalEvent? event, CalSpan span, out NSError? error);
     /// Deprecated in macOS 10.8.
-    [Selector("saveTask:error:")] public bool SaveTaskError(CalTask? task, out NSError? error);
+    [Selector("saveTask:error:")]
+    public bool SaveTaskError(CalTask? task, out NSError? error);
     /// Deprecated in macOS 10.8.
-    [Selector("removeTask:error:")] public bool RemoveTaskError(CalTask? task, out NSError? error);
+    [Selector("removeTask:error:")]
+    public bool RemoveTaskError(CalTask? task, out NSError? error);
     /// Deprecated in macOS 10.8.
-    [Selector("eventPredicateWithStartDate:endDate:calendars:")] public static NSPredicate? EventPredicateWithStartDateEndDateCalendars(NSDate? startDate, NSDate? endDate, NSArray? calendars);
+    [Selector("eventPredicateWithStartDate:endDate:calendars:")]
+    public static NSPredicate? EventPredicateWithStartDateEndDateCalendars(NSDate? startDate, NSDate? endDate, NSArray? calendars);
     /// Deprecated in macOS 10.8.
-    [Selector("eventPredicateWithStartDate:endDate:UID:calendars:")] public static NSPredicate? EventPredicateWithStartDateEndDateUIDCalendars(NSDate? startDate, NSDate? endDate, NSString? UID, NSArray? calendars);
+    [Selector("eventPredicateWithStartDate:endDate:UID:calendars:")]
+    public static NSPredicate? EventPredicateWithStartDateEndDateUIDCalendars(NSDate? startDate, NSDate? endDate, NSString? UID, NSArray? calendars);
     /// Deprecated in macOS 10.8.
-    [Selector("taskPredicateWithCalendars:")] public static NSPredicate? TaskPredicateWithCalendars(NSArray? calendars);
+    [Selector("taskPredicateWithCalendars:")]
+    public static NSPredicate? TaskPredicateWithCalendars(NSArray? calendars);
     /// Deprecated in macOS 10.8.
-    [Selector("taskPredicateWithUncompletedTasks:")] public static NSPredicate? TaskPredicateWithUncompletedTasks(NSArray? calendars);
+    [Selector("taskPredicateWithUncompletedTasks:")]
+    public static NSPredicate? TaskPredicateWithUncompletedTasks(NSArray? calendars);
     /// Deprecated in macOS 10.8.
-    [Selector("taskPredicateWithUncompletedTasksDueBefore:calendars:")] public static NSPredicate? TaskPredicateWithUncompletedTasksDueBeforeCalendars(NSDate? dueDate, NSArray? calendars);
+    [Selector("taskPredicateWithUncompletedTasksDueBefore:calendars:")]
+    public static NSPredicate? TaskPredicateWithUncompletedTasksDueBeforeCalendars(NSDate? dueDate, NSArray? calendars);
     /// Deprecated in macOS 10.8.
-    [Selector("taskPredicateWithTasksCompletedSince:calendars:")] public static NSPredicate? TaskPredicateWithTasksCompletedSinceCalendars(NSDate? completedSince, NSArray? calendars);
+    [Selector("taskPredicateWithTasksCompletedSince:calendars:")]
+    public static NSPredicate? TaskPredicateWithTasksCompletedSinceCalendars(NSDate? completedSince, NSArray? calendars);
 }
 
 /// Deprecated in macOS 10.8.

@@ -33,22 +33,37 @@ import Standard.ObjC;
 
 public extern objc class AVAudioFile : NSObject
 {
-    [Selector("isOpen")] public bool IsOpen { get; }
-    [Selector("url")] public NSURL Url { get; }
-    [Selector("fileFormat")] public AVAudioFormat FileFormat { get; }
-    [Selector("processingFormat")] public AVAudioFormat ProcessingFormat { get; }
-    [Selector("length")] public AVAudioFramePosition Length { get; }
-    [Selector("framePosition", "setFramePosition:")] public AVAudioFramePosition FramePosition { get; set; }
+    [Selector("isOpen")]
+    public bool IsOpen { get; }
+    [Selector("url")]
+    public NSURL Url { get; }
+    [Selector("fileFormat")]
+    public AVAudioFormat FileFormat { get; }
+    [Selector("processingFormat")]
+    public AVAudioFormat ProcessingFormat { get; }
+    [Selector("length")]
+    public AVAudioFramePosition Length { get; }
+    [Selector("framePosition", "setFramePosition:")]
+    public AVAudioFramePosition FramePosition { get; set; }
     /// Deprecated in macOS 26.0.
-    [Selector("init")] public Self Init();
-    [Selector("initForReading:error:")] public Self? InitForReadingError(NSURL fileURL, out NSError? outError);
-    [Selector("initForReading:commonFormat:interleaved:error:")] public Self? InitForReadingCommonFormatInterleavedError(NSURL fileURL, AVAudioCommonFormat format, bool interleaved, out NSError? outError);
-    [Selector("initForWriting:settings:error:")] public Self? InitForWritingSettingsError(NSURL fileURL, NSDictionary settings, out NSError? outError);
-    [Selector("initForWriting:settings:commonFormat:interleaved:error:")] public Self? InitForWritingSettingsCommonFormatInterleavedError(NSURL fileURL, NSDictionary settings, AVAudioCommonFormat format, bool interleaved, out NSError? outError);
-    [Selector("close")] public void Close();
-    [Selector("readIntoBuffer:error:")] public bool ReadIntoBufferError(AVAudioPCMBuffer buffer, out NSError? outError);
-    [Selector("readIntoBuffer:frameCount:error:")] public bool ReadIntoBufferFrameCountError(AVAudioPCMBuffer buffer, AVAudioFrameCount frames, out NSError? outError);
-    [Selector("writeFromBuffer:error:")] public bool WriteFromBufferError(AVAudioPCMBuffer buffer, out NSError? outError);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initForReading:error:")]
+    public Self? InitForReadingError(NSURL fileURL, out NSError? outError);
+    [Selector("initForReading:commonFormat:interleaved:error:")]
+    public Self? InitForReadingCommonFormatInterleavedError(NSURL fileURL, AVAudioCommonFormat format, bool interleaved, out NSError? outError);
+    [Selector("initForWriting:settings:error:")]
+    public Self? InitForWritingSettingsError(NSURL fileURL, NSDictionary settings, out NSError? outError);
+    [Selector("initForWriting:settings:commonFormat:interleaved:error:")]
+    public Self? InitForWritingSettingsCommonFormatInterleavedError(NSURL fileURL, NSDictionary settings, AVAudioCommonFormat format, bool interleaved, out NSError? outError);
+    [Selector("close")]
+    public void Close();
+    [Selector("readIntoBuffer:error:")]
+    public bool ReadIntoBufferError(AVAudioPCMBuffer buffer, out NSError? outError);
+    [Selector("readIntoBuffer:frameCount:error:")]
+    public bool ReadIntoBufferFrameCountError(AVAudioPCMBuffer buffer, AVAudioFrameCount frames, out NSError? outError);
+    [Selector("writeFromBuffer:error:")]
+    public bool WriteFromBufferError(AVAudioPCMBuffer buffer, out NSError? outError);
 }
 
 #endif

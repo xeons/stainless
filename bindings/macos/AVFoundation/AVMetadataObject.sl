@@ -38,14 +38,20 @@ public using AVMetadataObjectType = NSString;
 
 public extern objc class AVMetadataObject : NSObject
 {
-    [Selector("time")] public CMTime Time { get; }
-    [Selector("duration")] public CMTime Duration { get; }
-    [Selector("bounds")] public CGRect Bounds { get; }
-    [Selector("type")] public AVMetadataObjectType Type { get; }
+    [Selector("time")]
+    public CMTime Time { get; }
+    [Selector("duration")]
+    public CMTime Duration { get; }
+    [Selector("bounds")]
+    public CGRect Bounds { get; }
+    [Selector("type")]
+    public AVMetadataObjectType Type { get; }
     /// macOS 26.0 and later.
-    [Selector("groupID")] public NSInteger GroupID { get; }
+    [Selector("groupID")]
+    public NSInteger GroupID { get; }
     /// macOS 26.0 and later.
-    [Selector("objectID")] public NSInteger ObjectID { get; }
+    [Selector("objectID")]
+    public NSInteger ObjectID { get; }
 }
 
 /// macOS 26.0 and later.
@@ -53,14 +59,17 @@ public extern objc class AVMetadataObject : NSObject
 public extern objc class AVMetadataObject
 {
     /// macOS 26.0 and later.
-    [Selector("cinematicVideoFocusMode")] public AVCaptureCinematicVideoFocusMode CinematicVideoFocusMode { get; }
+    [Selector("cinematicVideoFocusMode")]
+    public AVCaptureCinematicVideoFocusMode CinematicVideoFocusMode { get; }
     /// macOS 26.0 and later.
-    [Selector("isFixedFocus")] public bool FixedFocus { get; }
+    [Selector("isFixedFocus")]
+    public bool FixedFocus { get; }
 }
 
 public extern objc class AVMetadataBodyObject : AVMetadataObject, NSCopying
 {
-    [Selector("bodyID")] public NSInteger BodyID { get; }
+    [Selector("bodyID")]
+    public NSInteger BodyID { get; }
 }
 
 public extern "C" AVMetadataObjectType? AVMetadataObjectTypeHumanBody;
@@ -95,18 +104,24 @@ public extern "C" AVMetadataObjectType? AVMetadataObjectTypeSalientObject;
 
 public extern objc class AVMetadataSalientObject : AVMetadataObject, NSCopying
 {
-    [Selector("objectID")] public NSInteger ObjectID { get; }
+    [Selector("objectID")]
+    public NSInteger ObjectID { get; }
 }
 
 public extern "C" AVMetadataObjectType AVMetadataObjectTypeFace;
 
 public extern objc class AVMetadataFaceObject : AVMetadataObject, NSCopying
 {
-    [Selector("faceID")] public NSInteger FaceID { get; }
-    [Selector("hasRollAngle")] public bool HasRollAngle { get; }
-    [Selector("rollAngle")] public CGFloat RollAngle { get; }
-    [Selector("hasYawAngle")] public bool HasYawAngle { get; }
-    [Selector("yawAngle")] public CGFloat YawAngle { get; }
+    [Selector("faceID")]
+    public NSInteger FaceID { get; }
+    [Selector("hasRollAngle")]
+    public bool HasRollAngle { get; }
+    [Selector("rollAngle")]
+    public CGFloat RollAngle { get; }
+    [Selector("hasYawAngle")]
+    public bool HasYawAngle { get; }
+    [Selector("yawAngle")]
+    public CGFloat YawAngle { get; }
 }
 
 public extern "C" AVMetadataObjectType AVMetadataObjectTypeUPCECode;
@@ -149,14 +164,17 @@ public extern "C" AVMetadataObjectType? AVMetadataObjectTypeMicroPDF417Code;
 
 public extern objc class AVMetadataMachineReadableCodeObject : AVMetadataObject
 {
-    [Selector("corners")] public NSArray Corners { get; }
-    [Selector("stringValue")] public NSString? StringValue { get; }
+    [Selector("corners")]
+    public NSArray Corners { get; }
+    [Selector("stringValue")]
+    public NSString? StringValue { get; }
 }
 
 /// AVMetadataMachineReadableCodeDescriptor, a category of AVMetadataMachineReadableCodeObject.
 public extern objc class AVMetadataMachineReadableCodeObject
 {
-    [Selector("descriptor")] public CIBarcodeDescriptor? Descriptor { get; }
+    [Selector("descriptor")]
+    public CIBarcodeDescriptor? Descriptor { get; }
 }
 
 #endif

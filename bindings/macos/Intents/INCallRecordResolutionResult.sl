@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INCallRecordResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedCallRecord:")] public static Self SuccessWithResolvedCallRecord(INCallRecord resolvedCallRecord);
-    [Selector("disambiguationWithCallRecordsToDisambiguate:")] public static Self DisambiguationWithCallRecordsToDisambiguate(NSArray callRecordsToDisambiguate);
-    [Selector("confirmationRequiredWithCallRecordToConfirm:")] public static Self ConfirmationRequiredWithCallRecordToConfirm(INCallRecord? callRecordToConfirm);
+    [Selector("successWithResolvedCallRecord:")]
+    public static Self SuccessWithResolvedCallRecord(INCallRecord resolvedCallRecord);
+    [Selector("disambiguationWithCallRecordsToDisambiguate:")]
+    public static Self DisambiguationWithCallRecordsToDisambiguate(NSArray callRecordsToDisambiguate);
+    [Selector("confirmationRequiredWithCallRecordToConfirm:")]
+    public static Self ConfirmationRequiredWithCallRecordToConfirm(INCallRecord? callRecordToConfirm);
 }
 
 #endif

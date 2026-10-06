@@ -33,17 +33,24 @@ import Standard.ObjC;
 
 public extern objc class HKCDADocumentSample : HKDocumentSample
 {
-    [Selector("document")] public HKCDADocument? Document { get; }
-    [Selector("CDADocumentSampleWithData:startDate:endDate:metadata:validationError:")] public static Self? CDADocumentSampleWithDataStartDateEndDateMetadataValidationError(NSData documentData, NSDate startDate, NSDate endDate, NSDictionary? metadata, out NSError? validationError);
+    [Selector("document")]
+    public HKCDADocument? Document { get; }
+    [Selector("CDADocumentSampleWithData:startDate:endDate:metadata:validationError:")]
+    public static Self? CDADocumentSampleWithDataStartDateEndDateMetadataValidationError(NSData documentData, NSDate startDate, NSDate endDate, NSDictionary? metadata, out NSError? validationError);
 }
 
 public extern objc class HKCDADocument : NSObject
 {
-    [Selector("documentData")] public NSData? DocumentData { get; }
-    [Selector("title")] public NSString Title { get; }
-    [Selector("patientName")] public NSString PatientName { get; }
-    [Selector("authorName")] public NSString AuthorName { get; }
-    [Selector("custodianName")] public NSString CustodianName { get; }
+    [Selector("documentData")]
+    public NSData? DocumentData { get; }
+    [Selector("title")]
+    public NSString Title { get; }
+    [Selector("patientName")]
+    public NSString PatientName { get; }
+    [Selector("authorName")]
+    public NSString AuthorName { get; }
+    [Selector("custodianName")]
+    public NSString CustodianName { get; }
 }
 
 public extern "C" NSString HKPredicateKeyPathCDATitle;

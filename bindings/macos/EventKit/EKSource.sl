@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class EKSource : EKObject
 {
-    [Selector("sourceIdentifier")] public NSString SourceIdentifier { get; }
-    [Selector("sourceType")] public EKSourceType SourceType { get; }
-    [Selector("title")] public NSString Title { get; }
-    [Selector("isDelegate")] public bool IsDelegate { get; }
-    [Selector("calendarsForEntityType:")] public NSSet CalendarsForEntityType(EKEntityType entityType);
+    [Selector("sourceIdentifier")]
+    public NSString SourceIdentifier { get; }
+    [Selector("sourceType")]
+    public EKSourceType SourceType { get; }
+    [Selector("title")]
+    public NSString Title { get; }
+    [Selector("isDelegate")]
+    public bool IsDelegate { get; }
+    [Selector("calendarsForEntityType:")]
+    public NSSet CalendarsForEntityType(EKEntityType entityType);
 }
 
 #endif

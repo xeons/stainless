@@ -44,56 +44,83 @@ public using NSPrinterPaperName = NSString;
 
 public extern objc class NSPrinter : NSObject, NSCopying, NSCoding
 {
-    [Selector("printerNames")] public static NSArray PrinterNames { get; }
-    [Selector("printerTypes")] public static NSArray PrinterTypes { get; }
-    [Selector("name")] public NSString Name { get; }
-    [Selector("type")] public NSPrinterTypeName Type { get; }
-    [Selector("languageLevel")] public NSInteger LanguageLevel { get; }
-    [Selector("deviceDescription")] public NSDictionary DeviceDescription { get; }
-    [Selector("printerWithName:")] public static NSPrinter? PrinterWithName(NSString name);
-    [Selector("printerWithType:")] public static NSPrinter? PrinterWithType(NSPrinterTypeName type);
-    [Selector("pageSizeForPaper:")] public NSSize PageSizeForPaper(NSPrinterPaperName paperName);
+    [Selector("printerNames")]
+    public static NSArray PrinterNames { get; }
+    [Selector("printerTypes")]
+    public static NSArray PrinterTypes { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("type")]
+    public NSPrinterTypeName Type { get; }
+    [Selector("languageLevel")]
+    public NSInteger LanguageLevel { get; }
+    [Selector("deviceDescription")]
+    public NSDictionary DeviceDescription { get; }
+    [Selector("printerWithName:")]
+    public static NSPrinter? PrinterWithName(NSString name);
+    [Selector("printerWithType:")]
+    public static NSPrinter? PrinterWithType(NSPrinterTypeName type);
+    [Selector("pageSizeForPaper:")]
+    public NSSize PageSizeForPaper(NSPrinterPaperName paperName);
 }
 
 /// NSDeprecated, a category of NSPrinter.
 public extern objc class NSPrinter
 {
     /// Deprecated in macOS 10.9.
-    [Selector("statusForTable:")] public NSPrinterTableStatus StatusForTable(NSString tableName);
+    [Selector("statusForTable:")]
+    public NSPrinterTableStatus StatusForTable(NSString tableName);
     /// Deprecated in macOS 10.9.
-    [Selector("isKey:inTable:")] public bool IsKeyInTable(NSString? key, NSString table);
+    [Selector("isKey:inTable:")]
+    public bool IsKeyInTable(NSString? key, NSString table);
     /// Deprecated in macOS 10.9.
-    [Selector("booleanForKey:inTable:")] public bool BooleanForKeyInTable(NSString? key, NSString table);
+    [Selector("booleanForKey:inTable:")]
+    public bool BooleanForKeyInTable(NSString? key, NSString table);
     /// Deprecated in macOS 10.9.
-    [Selector("floatForKey:inTable:")] public float FloatForKeyInTable(NSString? key, NSString table);
+    [Selector("floatForKey:inTable:")]
+    public float FloatForKeyInTable(NSString? key, NSString table);
     /// Deprecated in macOS 10.9.
-    [Selector("intForKey:inTable:")] public int IntForKeyInTable(NSString? key, NSString table);
+    [Selector("intForKey:inTable:")]
+    public int IntForKeyInTable(NSString? key, NSString table);
     /// Deprecated in macOS 10.9.
-    [Selector("rectForKey:inTable:")] public NSRect RectForKeyInTable(NSString? key, NSString table);
+    [Selector("rectForKey:inTable:")]
+    public NSRect RectForKeyInTable(NSString? key, NSString table);
     /// Deprecated in macOS 10.9.
-    [Selector("sizeForKey:inTable:")] public NSSize SizeForKeyInTable(NSString? key, NSString table);
+    [Selector("sizeForKey:inTable:")]
+    public NSSize SizeForKeyInTable(NSString? key, NSString table);
     /// Deprecated in macOS 10.9.
-    [Selector("stringForKey:inTable:")] public NSString? StringForKeyInTable(NSString? key, NSString table);
+    [Selector("stringForKey:inTable:")]
+    public NSString? StringForKeyInTable(NSString? key, NSString table);
     /// Deprecated in macOS 10.9.
-    [Selector("stringListForKey:inTable:")] public NSArray? StringListForKeyInTable(NSString? key, NSString table);
+    [Selector("stringListForKey:inTable:")]
+    public NSArray? StringListForKeyInTable(NSString? key, NSString table);
     /// Deprecated in macOS 10.2.
-    [Selector("imageRectForPaper:")] public NSRect ImageRectForPaper(NSString? paperName);
+    [Selector("imageRectForPaper:")]
+    public NSRect ImageRectForPaper(NSString? paperName);
     /// Deprecated in macOS 10.2.
-    [Selector("acceptsBinary")] public bool AcceptsBinary();
+    [Selector("acceptsBinary")]
+    public bool AcceptsBinary();
     /// Deprecated in macOS 10.2.
-    [Selector("isColor")] public bool IsColor();
+    [Selector("isColor")]
+    public bool IsColor();
     /// Deprecated in macOS 10.2.
-    [Selector("isFontAvailable:")] public bool IsFontAvailable(NSString? faceName);
+    [Selector("isFontAvailable:")]
+    public bool IsFontAvailable(NSString? faceName);
     /// Deprecated in macOS 10.2.
-    [Selector("isOutputStackInReverseOrder")] public bool IsOutputStackInReverseOrder();
+    [Selector("isOutputStackInReverseOrder")]
+    public bool IsOutputStackInReverseOrder();
     /// Deprecated in macOS 10.2.
-    [Selector("printerWithName:domain:includeUnavailable:")] public static NSPrinter? PrinterWithNameDomainIncludeUnavailable(NSString name, NSString? domain, bool flag);
+    [Selector("printerWithName:domain:includeUnavailable:")]
+    public static NSPrinter? PrinterWithNameDomainIncludeUnavailable(NSString name, NSString? domain, bool flag);
     /// Deprecated in macOS 10.2.
-    [Selector("domain")] public NSString Domain();
+    [Selector("domain")]
+    public NSString Domain();
     /// Deprecated in macOS 10.2.
-    [Selector("host")] public NSString Host();
+    [Selector("host")]
+    public NSString Host();
     /// Deprecated in macOS 10.2.
-    [Selector("note")] public NSString Note();
+    [Selector("note")]
+    public NSString Note();
 }
 
 #endif

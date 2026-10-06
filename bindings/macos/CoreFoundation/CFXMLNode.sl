@@ -137,10 +137,12 @@ public struct CFXMLEntityReferenceInfo
 public extern "C" CFTypeID CFXMLNodeGetTypeID();
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFXMLNodeRef? CFXMLNodeCreate(CFAllocatorRef? alloc, CFXMLNodeTypeCode xmlType, CFStringRef? dataString, void* additionalInfoPtr, CFIndex version);
+[ReturnsRetained]
+public extern "C" CFXMLNodeRef? CFXMLNodeCreate(CFAllocatorRef? alloc, CFXMLNodeTypeCode xmlType, CFStringRef? dataString, void* additionalInfoPtr, CFIndex version);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFXMLNodeRef? CFXMLNodeCreateCopy(CFAllocatorRef? alloc, CFXMLNodeRef? origNode);
+[ReturnsRetained]
+public extern "C" CFXMLNodeRef? CFXMLNodeCreateCopy(CFAllocatorRef? alloc, CFXMLNodeRef? origNode);
 
 /// Deprecated in macOS 10.8.
 public extern "C" CFXMLNodeTypeCode CFXMLNodeGetTypeCode(CFXMLNodeRef? node);
@@ -155,7 +157,8 @@ public extern "C" void* CFXMLNodeGetInfoPtr(CFXMLNodeRef? node);
 public extern "C" CFIndex CFXMLNodeGetVersion(CFXMLNodeRef? node);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFXMLTreeRef? CFXMLTreeCreateWithNode(CFAllocatorRef? allocator, CFXMLNodeRef? node);
+[ReturnsRetained]
+public extern "C" CFXMLTreeRef? CFXMLTreeCreateWithNode(CFAllocatorRef? allocator, CFXMLNodeRef? node);
 
 /// Deprecated in macOS 10.8.
 public extern "C" CFXMLNodeRef? CFXMLTreeGetNode(CFXMLTreeRef? xmlTree);

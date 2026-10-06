@@ -34,16 +34,26 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCOptimizer : NSObject, NSCopying
 {
-    [Selector("learningRate", "setLearningRate:")] public float LearningRate { get; set; }
-    [Selector("gradientRescale")] public float GradientRescale { get; }
-    [Selector("appliesGradientClipping", "setAppliesGradientClipping:")] public bool AppliesGradientClipping { get; set; }
-    [Selector("gradientClipMax")] public float GradientClipMax { get; }
-    [Selector("gradientClipMin")] public float GradientClipMin { get; }
-    [Selector("regularizationScale")] public float RegularizationScale { get; }
-    [Selector("regularizationType")] public MLCRegularizationType RegularizationType { get; }
-    [Selector("gradientClippingType")] public MLCGradientClippingType GradientClippingType { get; }
-    [Selector("maximumClippingNorm")] public float MaximumClippingNorm { get; }
-    [Selector("customGlobalNorm")] public float CustomGlobalNorm { get; }
+    [Selector("learningRate", "setLearningRate:")]
+    public float LearningRate { get; set; }
+    [Selector("gradientRescale")]
+    public float GradientRescale { get; }
+    [Selector("appliesGradientClipping", "setAppliesGradientClipping:")]
+    public bool AppliesGradientClipping { get; set; }
+    [Selector("gradientClipMax")]
+    public float GradientClipMax { get; }
+    [Selector("gradientClipMin")]
+    public float GradientClipMin { get; }
+    [Selector("regularizationScale")]
+    public float RegularizationScale { get; }
+    [Selector("regularizationType")]
+    public MLCRegularizationType RegularizationType { get; }
+    [Selector("gradientClippingType")]
+    public MLCGradientClippingType GradientClippingType { get; }
+    [Selector("maximumClippingNorm")]
+    public float MaximumClippingNorm { get; }
+    [Selector("customGlobalNorm")]
+    public float CustomGlobalNorm { get; }
 }
 
 #endif

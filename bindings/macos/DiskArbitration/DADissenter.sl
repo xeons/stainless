@@ -52,7 +52,8 @@ public struct __DADissenter;
 [CFType]
 public extern objc class DADissenterRef : CFTypeRef { }
 
-[ReturnsRetained] public extern "C" DADissenterRef DADissenterCreate(CFAllocatorRef? allocator, DAReturn status, CFStringRef? string);
+[ReturnsRetained]
+public extern "C" DADissenterRef DADissenterCreate(CFAllocatorRef? allocator, DAReturn status, CFStringRef? string);
 
 public extern "C" DAReturn DADissenterGetStatus(DADissenterRef dissenter);
 

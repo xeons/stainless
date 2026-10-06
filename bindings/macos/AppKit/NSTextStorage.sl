@@ -40,25 +40,42 @@ public enum NSTextStorageEditActions : ulong
 
 public extern objc class NSTextStorage : NSMutableAttributedString, NSSecureCoding
 {
-    [Selector("layoutManagers")] public NSArray LayoutManagers { get; }
-    [Selector("editedMask")] public NSTextStorageEditActions EditedMask { get; }
-    [Selector("editedRange")] public NSRange EditedRange { get; }
-    [Selector("changeInLength")] public NSInteger ChangeInLength { get; }
-    [Selector("delegate", "setDelegate:")] public NSTextStorageDelegate? Delegate { get; set; }
-    [Selector("fixesAttributesLazily")] public bool FixesAttributesLazily { get; }
-    [Selector("textStorageObserver", "setTextStorageObserver:")] public NSTextStorageObserving? TextStorageObserver { get; set; }
-    [Selector("addLayoutManager:")] public void AddLayoutManager(NSLayoutManager aLayoutManager);
-    [Selector("removeLayoutManager:")] public void RemoveLayoutManager(NSLayoutManager aLayoutManager);
-    [Selector("edited:range:changeInLength:")] public void EditedRangeChangeInLength(NSTextStorageEditActions editedMask, NSRange editedRange, NSInteger delta);
-    [Selector("processEditing")] public void ProcessEditing();
-    [Selector("invalidateAttributesInRange:")] public void InvalidateAttributesInRange(NSRange range);
-    [Selector("ensureAttributesAreFixedInRange:")] public void EnsureAttributesAreFixedInRange(NSRange range);
+    [Selector("layoutManagers")]
+    public NSArray LayoutManagers { get; }
+    [Selector("editedMask")]
+    public NSTextStorageEditActions EditedMask { get; }
+    [Selector("editedRange")]
+    public NSRange EditedRange { get; }
+    [Selector("changeInLength")]
+    public NSInteger ChangeInLength { get; }
+    [Selector("delegate", "setDelegate:")]
+    public NSTextStorageDelegate? Delegate { get; set; }
+    [Selector("fixesAttributesLazily")]
+    public bool FixesAttributesLazily { get; }
+    [Selector("textStorageObserver", "setTextStorageObserver:")]
+    public NSTextStorageObserving? TextStorageObserver { get; set; }
+    [Selector("addLayoutManager:")]
+    public void AddLayoutManager(NSLayoutManager aLayoutManager);
+    [Selector("removeLayoutManager:")]
+    public void RemoveLayoutManager(NSLayoutManager aLayoutManager);
+    [Selector("edited:range:changeInLength:")]
+    public void EditedRangeChangeInLength(NSTextStorageEditActions editedMask, NSRange editedRange, NSInteger delta);
+    [Selector("processEditing")]
+    public void ProcessEditing();
+    [Selector("invalidateAttributesInRange:")]
+    public void InvalidateAttributesInRange(NSRange range);
+    [Selector("ensureAttributesAreFixedInRange:")]
+    public void EnsureAttributesAreFixedInRange(NSRange range);
 }
 
 public objc interface NSTextStorageDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("textStorage:willProcessEditing:range:changeInLength:")] void TextStorageWillProcessEditingRangeChangeInLength(NSTextStorage textStorage, NSTextStorageEditActions editedMask, NSRange editedRange, NSInteger delta);
-    [Optional] [Selector("textStorage:didProcessEditing:range:changeInLength:")] void TextStorageDidProcessEditingRangeChangeInLength(NSTextStorage textStorage, NSTextStorageEditActions editedMask, NSRange editedRange, NSInteger delta);
+    [Optional]
+    [Selector("textStorage:willProcessEditing:range:changeInLength:")]
+    void TextStorageWillProcessEditingRangeChangeInLength(NSTextStorage textStorage, NSTextStorageEditActions editedMask, NSRange editedRange, NSInteger delta);
+    [Optional]
+    [Selector("textStorage:didProcessEditing:range:changeInLength:")]
+    void TextStorageDidProcessEditingRangeChangeInLength(NSTextStorage textStorage, NSTextStorageEditActions editedMask, NSRange editedRange, NSInteger delta);
 }
 
 public extern "C" NSNotificationName NSTextStorageWillProcessEditingNotification;
@@ -69,9 +86,12 @@ public objc closure void NSTextStorageObservingPerformEditingTransactionForTextS
 
 public objc interface NSTextStorageObserving : NSObjectProtocol
 {
-    [Selector("textStorage", "setTextStorage:")] NSTextStorage? TextStorage { get; set; }
-    [Selector("processEditingForTextStorage:edited:range:changeInLength:invalidatedRange:")] void ProcessEditingForTextStorageEditedRangeChangeInLengthInvalidatedRange(NSTextStorage textStorage, NSTextStorageEditActions editMask, NSRange newCharRange, NSInteger delta, NSRange invalidatedCharRange);
-    [Selector("performEditingTransactionForTextStorage:usingBlock:")] void PerformEditingTransactionForTextStorageUsingBlock(NSTextStorage textStorage, NSTextStorageObservingPerformEditingTransactionForTextStorageUsingBlockTransactionBlock transaction);
+    [Selector("textStorage", "setTextStorage:")]
+    NSTextStorage? TextStorage { get; set; }
+    [Selector("processEditingForTextStorage:edited:range:changeInLength:invalidatedRange:")]
+    void ProcessEditingForTextStorageEditedRangeChangeInLengthInvalidatedRange(NSTextStorage textStorage, NSTextStorageEditActions editMask, NSRange newCharRange, NSInteger delta, NSRange invalidatedCharRange);
+    [Selector("performEditingTransactionForTextStorage:usingBlock:")]
+    void PerformEditingTransactionForTextStorageUsingBlock(NSTextStorage textStorage, NSTextStorageObservingPerformEditingTransactionForTextStorageUsingBlockTransactionBlock transaction);
 }
 
 public using NSTextStorageEditedOptions = NSUInteger;
@@ -80,9 +100,11 @@ public using NSTextStorageEditedOptions = NSUInteger;
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.11.
-    [Selector("textStorageWillProcessEditing:")] public void TextStorageWillProcessEditing(NSNotification notification);
+    [Selector("textStorageWillProcessEditing:")]
+    public void TextStorageWillProcessEditing(NSNotification notification);
     /// Deprecated in macOS 10.11.
-    [Selector("textStorageDidProcessEditing:")] public void TextStorageDidProcessEditing(NSNotification notification);
+    [Selector("textStorageDidProcessEditing:")]
+    public void TextStorageDidProcessEditing(NSNotification notification);
 }
 
 #endif

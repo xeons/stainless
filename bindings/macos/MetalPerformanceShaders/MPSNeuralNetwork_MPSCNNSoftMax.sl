@@ -35,16 +35,20 @@ public extern objc class MPSCNNSoftMax : MPSCNNKernel { }
 
 public extern objc class MPSCNNSoftMaxGradient : MPSCNNGradientKernel
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNLogSoftMax : MPSCNNKernel { }
 
 public extern objc class MPSCNNLogSoftMaxGradient : MPSCNNGradientKernel
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 #endif

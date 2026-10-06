@@ -34,9 +34,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 11.0.
 public extern objc class NCWidgetController : NSObject
 {
-    [Selector("widgetController")] public static Self WidgetController();
-    [Selector("defaultWidgetController")] public static NCWidgetController DefaultWidgetController();
-    [Selector("setHasContent:forWidgetWithBundleIdentifier:")] public void SetHasContentForWidgetWithBundleIdentifier(bool flag, NSString bundleID);
+    [Selector("widgetController")]
+    public static Self WidgetController();
+    [Selector("defaultWidgetController")]
+    public static NCWidgetController DefaultWidgetController();
+    [Selector("setHasContent:forWidgetWithBundleIdentifier:")]
+    public void SetHasContentForWidgetWithBundleIdentifier(bool flag, NSString bundleID);
 }
 
 #endif

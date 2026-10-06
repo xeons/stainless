@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class PKIssuerProvisioningExtensionPaymentPassEntry : PKIssuerProvisioningExtensionPassEntry
 {
-    [Selector("addRequestConfiguration")] public PKAddPaymentPassRequestConfiguration AddRequestConfiguration { get; }
-    [Selector("initWithIdentifier:title:art:addRequestConfiguration:")] public Self? InitWithIdentifierTitleArtAddRequestConfiguration(NSString identifier, NSString title, CGImageRef art, PKAddPaymentPassRequestConfiguration configuration);
+    [Selector("addRequestConfiguration")]
+    public PKAddPaymentPassRequestConfiguration AddRequestConfiguration { get; }
+    [Selector("initWithIdentifier:title:art:addRequestConfiguration:")]
+    public Self? InitWithIdentifierTitleArtAddRequestConfiguration(NSString identifier, NSString title, CGImageRef art, PKAddPaymentPassRequestConfiguration configuration);
 }
 
 #endif

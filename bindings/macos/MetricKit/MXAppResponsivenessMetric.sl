@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class MXAppResponsivenessMetric : MXMetric
 {
-    [Selector("histogrammedApplicationHangTime")] public MXHistogram HistogrammedApplicationHangTime { get; }
+    [Selector("histogrammedApplicationHangTime")]
+    public MXHistogram HistogrammedApplicationHangTime { get; }
 }
 
 #endif

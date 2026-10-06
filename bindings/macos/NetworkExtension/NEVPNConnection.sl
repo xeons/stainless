@@ -76,13 +76,20 @@ public objc closure void NEVPNConnectionFetchLastDisconnectErrorWithCompletionHa
 
 public extern objc class NEVPNConnection : NSObject
 {
-    [Selector("status")] public NEVPNStatus Status { get; }
-    [Selector("connectedDate")] public NSDate? ConnectedDate { get; }
-    [Selector("manager")] public NEVPNManager? Manager { get; }
-    [Selector("startVPNTunnelAndReturnError:")] public bool StartVPNTunnelAndReturnError(out NSError? error);
-    [Selector("startVPNTunnelWithOptions:andReturnError:")] public bool StartVPNTunnelWithOptionsAndReturnError(NSDictionary? options, out NSError? error);
-    [Selector("stopVPNTunnel")] public void StopVPNTunnel();
-    [Selector("fetchLastDisconnectErrorWithCompletionHandler:")] public void FetchLastDisconnectErrorWithCompletionHandler(NEVPNConnectionFetchLastDisconnectErrorWithCompletionHandlerHandlerBlock handler);
+    [Selector("status")]
+    public NEVPNStatus Status { get; }
+    [Selector("connectedDate")]
+    public NSDate? ConnectedDate { get; }
+    [Selector("manager")]
+    public NEVPNManager? Manager { get; }
+    [Selector("startVPNTunnelAndReturnError:")]
+    public bool StartVPNTunnelAndReturnError(out NSError? error);
+    [Selector("startVPNTunnelWithOptions:andReturnError:")]
+    public bool StartVPNTunnelWithOptionsAndReturnError(NSDictionary? options, out NSError? error);
+    [Selector("stopVPNTunnel")]
+    public void StopVPNTunnel();
+    [Selector("fetchLastDisconnectErrorWithCompletionHandler:")]
+    public void FetchLastDisconnectErrorWithCompletionHandler(NEVPNConnectionFetchLastDisconnectErrorWithCompletionHandlerHandlerBlock handler);
 }
 
 #endif

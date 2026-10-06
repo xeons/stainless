@@ -79,40 +79,64 @@ public extern objc class FSItem : NSObject { }
 /// macOS 15.4 and later.
 public extern objc class FSItemAttributes : NSObject, NSSecureCoding
 {
-    [Selector("uid", "setUid:")] public uint Uid { get; set; }
-    [Selector("gid", "setGid:")] public uint Gid { get; set; }
-    [Selector("mode", "setMode:")] public uint Mode { get; set; }
-    [Selector("type", "setType:")] public FSItemType Type { get; set; }
-    [Selector("linkCount", "setLinkCount:")] public uint LinkCount { get; set; }
-    [Selector("flags", "setFlags:")] public uint Flags { get; set; }
-    [Selector("size", "setSize:")] public ulong Size { get; set; }
-    [Selector("allocSize", "setAllocSize:")] public ulong AllocSize { get; set; }
-    [Selector("fileID", "setFileID:")] public FSItemID FileID { get; set; }
-    [Selector("parentID", "setParentID:")] public FSItemID ParentID { get; set; }
-    [Selector("supportsLimitedXAttrs", "setSupportsLimitedXAttrs:")] public bool SupportsLimitedXAttrs { get; set; }
-    [Selector("inhibitKernelOffloadedIO", "setInhibitKernelOffloadedIO:")] public bool InhibitKernelOffloadedIO { get; set; }
-    [Selector("modifyTime", "setModifyTime:")] public timespec ModifyTime { get; set; }
-    [Selector("addedTime", "setAddedTime:")] public timespec AddedTime { get; set; }
-    [Selector("changeTime", "setChangeTime:")] public timespec ChangeTime { get; set; }
-    [Selector("accessTime", "setAccessTime:")] public timespec AccessTime { get; set; }
-    [Selector("birthTime", "setBirthTime:")] public timespec BirthTime { get; set; }
-    [Selector("backupTime", "setBackupTime:")] public timespec BackupTime { get; set; }
-    [Selector("invalidateAllProperties")] public void InvalidateAllProperties();
-    [Selector("isValid:")] public bool IsValid(FSItemAttribute @attribute);
+    [Selector("uid", "setUid:")]
+    public uint Uid { get; set; }
+    [Selector("gid", "setGid:")]
+    public uint Gid { get; set; }
+    [Selector("mode", "setMode:")]
+    public uint Mode { get; set; }
+    [Selector("type", "setType:")]
+    public FSItemType Type { get; set; }
+    [Selector("linkCount", "setLinkCount:")]
+    public uint LinkCount { get; set; }
+    [Selector("flags", "setFlags:")]
+    public uint Flags { get; set; }
+    [Selector("size", "setSize:")]
+    public ulong Size { get; set; }
+    [Selector("allocSize", "setAllocSize:")]
+    public ulong AllocSize { get; set; }
+    [Selector("fileID", "setFileID:")]
+    public FSItemID FileID { get; set; }
+    [Selector("parentID", "setParentID:")]
+    public FSItemID ParentID { get; set; }
+    [Selector("supportsLimitedXAttrs", "setSupportsLimitedXAttrs:")]
+    public bool SupportsLimitedXAttrs { get; set; }
+    [Selector("inhibitKernelOffloadedIO", "setInhibitKernelOffloadedIO:")]
+    public bool InhibitKernelOffloadedIO { get; set; }
+    [Selector("modifyTime", "setModifyTime:")]
+    public timespec ModifyTime { get; set; }
+    [Selector("addedTime", "setAddedTime:")]
+    public timespec AddedTime { get; set; }
+    [Selector("changeTime", "setChangeTime:")]
+    public timespec ChangeTime { get; set; }
+    [Selector("accessTime", "setAccessTime:")]
+    public timespec AccessTime { get; set; }
+    [Selector("birthTime", "setBirthTime:")]
+    public timespec BirthTime { get; set; }
+    [Selector("backupTime", "setBackupTime:")]
+    public timespec BackupTime { get; set; }
+    [Selector("invalidateAllProperties")]
+    public void InvalidateAllProperties();
+    [Selector("isValid:")]
+    public bool IsValid(FSItemAttribute @attribute);
 }
 
 /// macOS 15.4 and later.
 public extern objc class FSItemSetAttributesRequest : FSItemAttributes
 {
-    [Selector("consumedAttributes", "setConsumedAttributes:")] public FSItemAttribute ConsumedAttributes { get; set; }
-    [Selector("wasAttributeConsumed:")] public bool WasAttributeConsumed(FSItemAttribute @attribute);
+    [Selector("consumedAttributes", "setConsumedAttributes:")]
+    public FSItemAttribute ConsumedAttributes { get; set; }
+    [Selector("wasAttributeConsumed:")]
+    public bool WasAttributeConsumed(FSItemAttribute @attribute);
 }
 
 /// macOS 15.4 and later.
 public extern objc class FSItemGetAttributesRequest : NSObject, NSSecureCoding
 {
-    [Selector("wantedAttributes", "setWantedAttributes:")] public FSItemAttribute WantedAttributes { get; set; }
-    [Selector("isAttributeWanted:")] public bool IsAttributeWanted(FSItemAttribute @attribute);
+    [Selector("wantedAttributes", "setWantedAttributes:")]
+    public FSItemAttribute WantedAttributes { get; set; }
+    [Selector("isAttributeWanted:")]
+    public bool IsAttributeWanted(FSItemAttribute @attribute);
 }
 
 #endif

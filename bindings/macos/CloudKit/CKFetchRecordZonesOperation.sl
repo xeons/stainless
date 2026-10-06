@@ -36,12 +36,18 @@ public objc closure void CKFetchRecordZonesOperationFetchRecordZonesCompletionBl
 
 public extern objc class CKFetchRecordZonesOperation : CKDatabaseOperation
 {
-    [Selector("recordZoneIDs", "setRecordZoneIDs:")] public NSArray? RecordZoneIDs { get; set; }
-    [Selector("perRecordZoneCompletionBlock", "setPerRecordZoneCompletionBlock:")] public CKFetchRecordZonesOperationPerRecordZoneCompletionBlock? PerRecordZoneCompletionBlock { get; set; }
-    [Selector("fetchRecordZonesCompletionBlock", "setFetchRecordZonesCompletionBlock:")] public CKFetchRecordZonesOperationFetchRecordZonesCompletionBlock? FetchRecordZonesCompletionBlock { get; set; }
-    [Selector("fetchAllRecordZonesOperation")] public static Self FetchAllRecordZonesOperation();
-    [Selector("init")] public Self Init();
-    [Selector("initWithRecordZoneIDs:")] public Self InitWithRecordZoneIDs(NSArray zoneIDs);
+    [Selector("recordZoneIDs", "setRecordZoneIDs:")]
+    public NSArray? RecordZoneIDs { get; set; }
+    [Selector("perRecordZoneCompletionBlock", "setPerRecordZoneCompletionBlock:")]
+    public CKFetchRecordZonesOperationPerRecordZoneCompletionBlock? PerRecordZoneCompletionBlock { get; set; }
+    [Selector("fetchRecordZonesCompletionBlock", "setFetchRecordZonesCompletionBlock:")]
+    public CKFetchRecordZonesOperationFetchRecordZonesCompletionBlock? FetchRecordZonesCompletionBlock { get; set; }
+    [Selector("fetchAllRecordZonesOperation")]
+    public static Self FetchAllRecordZonesOperation();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithRecordZoneIDs:")]
+    public Self InitWithRecordZoneIDs(NSArray zoneIDs);
 }
 
 #endif

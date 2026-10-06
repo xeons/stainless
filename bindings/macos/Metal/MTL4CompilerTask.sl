@@ -41,9 +41,12 @@ public enum MTL4CompilerTaskStatus : long
 /// macOS 26.0 and later.
 public objc interface MTL4CompilerTask : NSObjectProtocol
 {
-    [Selector("compiler")] MTL4Compiler Compiler { get; }
-    [Selector("status")] MTL4CompilerTaskStatus Status { get; }
-    [Selector("waitUntilCompleted")] void WaitUntilCompleted();
+    [Selector("compiler")]
+    MTL4Compiler Compiler { get; }
+    [Selector("status")]
+    MTL4CompilerTaskStatus Status { get; }
+    [Selector("waitUntilCompleted")]
+    void WaitUntilCompleted();
 }
 
 #endif

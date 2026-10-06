@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MLModelStructurePipeline : NSObject
 {
-    [Selector("subModelNames")] public NSArray SubModelNames { get; }
-    [Selector("subModels")] public NSArray SubModels { get; }
+    [Selector("subModelNames")]
+    public NSArray SubModelNames { get; }
+    [Selector("subModels")]
+    public NSArray SubModels { get; }
 }
 
 #endif

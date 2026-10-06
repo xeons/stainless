@@ -33,14 +33,22 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTL4ComputePipelineDescriptor : MTL4PipelineDescriptor
 {
-    [Selector("computeFunctionDescriptor", "setComputeFunctionDescriptor:")] public MTL4FunctionDescriptor? ComputeFunctionDescriptor { get; set; }
-    [Selector("threadGroupSizeIsMultipleOfThreadExecutionWidth", "setThreadGroupSizeIsMultipleOfThreadExecutionWidth:")] public bool ThreadGroupSizeIsMultipleOfThreadExecutionWidth { get; set; }
-    [Selector("maxTotalThreadsPerThreadgroup", "setMaxTotalThreadsPerThreadgroup:")] public NSUInteger MaxTotalThreadsPerThreadgroup { get; set; }
-    [Selector("requiredThreadsPerThreadgroup", "setRequiredThreadsPerThreadgroup:")] public MTLSize RequiredThreadsPerThreadgroup { get; set; }
-    [Selector("supportBinaryLinking", "setSupportBinaryLinking:")] public bool SupportBinaryLinking { get; set; }
-    [Selector("staticLinkingDescriptor", "setStaticLinkingDescriptor:")] public MTL4StaticLinkingDescriptor? StaticLinkingDescriptor { get; set; }
-    [Selector("supportIndirectCommandBuffers", "setSupportIndirectCommandBuffers:")] public MTL4IndirectCommandBufferSupportState SupportIndirectCommandBuffers { get; set; }
-    [Selector("reset")] public void Reset();
+    [Selector("computeFunctionDescriptor", "setComputeFunctionDescriptor:")]
+    public MTL4FunctionDescriptor? ComputeFunctionDescriptor { get; set; }
+    [Selector("threadGroupSizeIsMultipleOfThreadExecutionWidth", "setThreadGroupSizeIsMultipleOfThreadExecutionWidth:")]
+    public bool ThreadGroupSizeIsMultipleOfThreadExecutionWidth { get; set; }
+    [Selector("maxTotalThreadsPerThreadgroup", "setMaxTotalThreadsPerThreadgroup:")]
+    public NSUInteger MaxTotalThreadsPerThreadgroup { get; set; }
+    [Selector("requiredThreadsPerThreadgroup", "setRequiredThreadsPerThreadgroup:")]
+    public MTLSize RequiredThreadsPerThreadgroup { get; set; }
+    [Selector("supportBinaryLinking", "setSupportBinaryLinking:")]
+    public bool SupportBinaryLinking { get; set; }
+    [Selector("staticLinkingDescriptor", "setStaticLinkingDescriptor:")]
+    public MTL4StaticLinkingDescriptor? StaticLinkingDescriptor { get; set; }
+    [Selector("supportIndirectCommandBuffers", "setSupportIndirectCommandBuffers:")]
+    public MTL4IndirectCommandBufferSupportState SupportIndirectCommandBuffers { get; set; }
+    [Selector("reset")]
+    public void Reset();
 }
 
 #endif

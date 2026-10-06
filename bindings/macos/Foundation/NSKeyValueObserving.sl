@@ -70,68 +70,94 @@ public extern "C" NSKeyValueChangeKey NSKeyValueChangeNotificationIsPriorKey;
 /// NSKeyValueObserving, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("observeValueForKeyPath:ofObject:change:context:")] public void ObserveValueForKeyPathOfObjectChangeContext(NSString? keyPath, AnyObject? object, NSDictionary? change, void* context);
+    [Selector("observeValueForKeyPath:ofObject:change:context:")]
+    public void ObserveValueForKeyPathOfObjectChangeContext(NSString? keyPath, AnyObject? object, NSDictionary? change, void* context);
 }
 
 /// NSKeyValueObserverRegistration, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("addObserver:forKeyPath:options:context:")] public void AddObserverForKeyPathOptionsContext(NSObject observer, NSString keyPath, NSKeyValueObservingOptions options, void* context);
-    [Selector("removeObserver:forKeyPath:context:")] public void RemoveObserverForKeyPathContext(NSObject observer, NSString keyPath, void* context);
-    [Selector("removeObserver:forKeyPath:")] public void RemoveObserverForKeyPath(NSObject observer, NSString keyPath);
+    [Selector("addObserver:forKeyPath:options:context:")]
+    public void AddObserverForKeyPathOptionsContext(NSObject observer, NSString keyPath, NSKeyValueObservingOptions options, void* context);
+    [Selector("removeObserver:forKeyPath:context:")]
+    public void RemoveObserverForKeyPathContext(NSObject observer, NSString keyPath, void* context);
+    [Selector("removeObserver:forKeyPath:")]
+    public void RemoveObserverForKeyPath(NSObject observer, NSString keyPath);
 }
 
 /// NSKeyValueObserverRegistration, a category of NSArray.
 public extern objc class NSArray
 {
-    [Selector("addObserver:toObjectsAtIndexes:forKeyPath:options:context:")] public void AddObserverToObjectsAtIndexesForKeyPathOptionsContext(NSObject observer, NSIndexSet indexes, NSString keyPath, NSKeyValueObservingOptions options, void* context);
-    [Selector("removeObserver:fromObjectsAtIndexes:forKeyPath:context:")] public void RemoveObserverFromObjectsAtIndexesForKeyPathContext(NSObject observer, NSIndexSet indexes, NSString keyPath, void* context);
-    [Selector("removeObserver:fromObjectsAtIndexes:forKeyPath:")] public void RemoveObserverFromObjectsAtIndexesForKeyPath(NSObject observer, NSIndexSet indexes, NSString keyPath);
-    [Selector("addObserver:forKeyPath:options:context:")] public void AddObserverForKeyPathOptionsContext(NSObject observer, NSString keyPath, NSKeyValueObservingOptions options, void* context);
-    [Selector("removeObserver:forKeyPath:context:")] public void RemoveObserverForKeyPathContext(NSObject observer, NSString keyPath, void* context);
-    [Selector("removeObserver:forKeyPath:")] public void RemoveObserverForKeyPath(NSObject observer, NSString keyPath);
+    [Selector("addObserver:toObjectsAtIndexes:forKeyPath:options:context:")]
+    public void AddObserverToObjectsAtIndexesForKeyPathOptionsContext(NSObject observer, NSIndexSet indexes, NSString keyPath, NSKeyValueObservingOptions options, void* context);
+    [Selector("removeObserver:fromObjectsAtIndexes:forKeyPath:context:")]
+    public void RemoveObserverFromObjectsAtIndexesForKeyPathContext(NSObject observer, NSIndexSet indexes, NSString keyPath, void* context);
+    [Selector("removeObserver:fromObjectsAtIndexes:forKeyPath:")]
+    public void RemoveObserverFromObjectsAtIndexesForKeyPath(NSObject observer, NSIndexSet indexes, NSString keyPath);
+    [Selector("addObserver:forKeyPath:options:context:")]
+    public void AddObserverForKeyPathOptionsContext(NSObject observer, NSString keyPath, NSKeyValueObservingOptions options, void* context);
+    [Selector("removeObserver:forKeyPath:context:")]
+    public void RemoveObserverForKeyPathContext(NSObject observer, NSString keyPath, void* context);
+    [Selector("removeObserver:forKeyPath:")]
+    public void RemoveObserverForKeyPath(NSObject observer, NSString keyPath);
 }
 
 /// NSKeyValueObserverRegistration, a category of NSOrderedSet.
 public extern objc class NSOrderedSet
 {
-    [Selector("addObserver:forKeyPath:options:context:")] public void AddObserverForKeyPathOptionsContext(NSObject observer, NSString keyPath, NSKeyValueObservingOptions options, void* context);
-    [Selector("removeObserver:forKeyPath:context:")] public void RemoveObserverForKeyPathContext(NSObject observer, NSString keyPath, void* context);
-    [Selector("removeObserver:forKeyPath:")] public void RemoveObserverForKeyPath(NSObject observer, NSString keyPath);
+    [Selector("addObserver:forKeyPath:options:context:")]
+    public void AddObserverForKeyPathOptionsContext(NSObject observer, NSString keyPath, NSKeyValueObservingOptions options, void* context);
+    [Selector("removeObserver:forKeyPath:context:")]
+    public void RemoveObserverForKeyPathContext(NSObject observer, NSString keyPath, void* context);
+    [Selector("removeObserver:forKeyPath:")]
+    public void RemoveObserverForKeyPath(NSObject observer, NSString keyPath);
 }
 
 /// NSKeyValueObserverRegistration, a category of NSSet.
 public extern objc class NSSet
 {
-    [Selector("addObserver:forKeyPath:options:context:")] public void AddObserverForKeyPathOptionsContext(NSObject observer, NSString keyPath, NSKeyValueObservingOptions options, void* context);
-    [Selector("removeObserver:forKeyPath:context:")] public void RemoveObserverForKeyPathContext(NSObject observer, NSString keyPath, void* context);
-    [Selector("removeObserver:forKeyPath:")] public void RemoveObserverForKeyPath(NSObject observer, NSString keyPath);
+    [Selector("addObserver:forKeyPath:options:context:")]
+    public void AddObserverForKeyPathOptionsContext(NSObject observer, NSString keyPath, NSKeyValueObservingOptions options, void* context);
+    [Selector("removeObserver:forKeyPath:context:")]
+    public void RemoveObserverForKeyPathContext(NSObject observer, NSString keyPath, void* context);
+    [Selector("removeObserver:forKeyPath:")]
+    public void RemoveObserverForKeyPath(NSObject observer, NSString keyPath);
 }
 
 /// NSKeyValueObserverNotification, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("willChangeValueForKey:")] public void WillChangeValueForKey(NSString key);
-    [Selector("didChangeValueForKey:")] public void DidChangeValueForKey(NSString key);
-    [Selector("willChange:valuesAtIndexes:forKey:")] public void WillChangeValuesAtIndexesForKey(NSKeyValueChange changeKind, NSIndexSet indexes, NSString key);
-    [Selector("didChange:valuesAtIndexes:forKey:")] public void DidChangeValuesAtIndexesForKey(NSKeyValueChange changeKind, NSIndexSet indexes, NSString key);
-    [Selector("willChangeValueForKey:withSetMutation:usingObjects:")] public void WillChangeValueForKeyWithSetMutationUsingObjects(NSString key, NSKeyValueSetMutationKind mutationKind, NSSet objects);
-    [Selector("didChangeValueForKey:withSetMutation:usingObjects:")] public void DidChangeValueForKeyWithSetMutationUsingObjects(NSString key, NSKeyValueSetMutationKind mutationKind, NSSet objects);
+    [Selector("willChangeValueForKey:")]
+    public void WillChangeValueForKey(NSString key);
+    [Selector("didChangeValueForKey:")]
+    public void DidChangeValueForKey(NSString key);
+    [Selector("willChange:valuesAtIndexes:forKey:")]
+    public void WillChangeValuesAtIndexesForKey(NSKeyValueChange changeKind, NSIndexSet indexes, NSString key);
+    [Selector("didChange:valuesAtIndexes:forKey:")]
+    public void DidChangeValuesAtIndexesForKey(NSKeyValueChange changeKind, NSIndexSet indexes, NSString key);
+    [Selector("willChangeValueForKey:withSetMutation:usingObjects:")]
+    public void WillChangeValueForKeyWithSetMutationUsingObjects(NSString key, NSKeyValueSetMutationKind mutationKind, NSSet objects);
+    [Selector("didChangeValueForKey:withSetMutation:usingObjects:")]
+    public void DidChangeValueForKeyWithSetMutationUsingObjects(NSString key, NSKeyValueSetMutationKind mutationKind, NSSet objects);
 }
 
 /// NSKeyValueObservingCustomization, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("observationInfo", "setObservationInfo:")] public void* ObservationInfo { get; set; }
-    [Selector("keyPathsForValuesAffectingValueForKey:")] public static NSSet KeyPathsForValuesAffectingValueForKey(NSString key);
-    [Selector("automaticallyNotifiesObserversForKey:")] public static bool AutomaticallyNotifiesObserversForKey(NSString key);
+    [Selector("observationInfo", "setObservationInfo:")]
+    public void* ObservationInfo { get; set; }
+    [Selector("keyPathsForValuesAffectingValueForKey:")]
+    public static NSSet KeyPathsForValuesAffectingValueForKey(NSString key);
+    [Selector("automaticallyNotifiesObserversForKey:")]
+    public static bool AutomaticallyNotifiesObserversForKey(NSString key);
 }
 
 /// NSDeprecatedKeyValueObservingCustomization, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.5.
-    [Selector("setKeys:triggerChangeNotificationsForDependentKey:")] public static void SetKeysTriggerChangeNotificationsForDependentKey(NSArray keys, NSString dependentKey);
+    [Selector("setKeys:triggerChangeNotificationsForDependentKey:")]
+    public static void SetKeysTriggerChangeNotificationsForDependentKey(NSArray keys, NSString dependentKey);
 }
 
 #endif

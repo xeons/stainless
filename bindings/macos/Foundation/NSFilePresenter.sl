@@ -48,28 +48,70 @@ public objc closure void NSFilePresenterAccommodatePresentedSubitemDeletionAtURL
 
 public objc interface NSFilePresenter : NSObjectProtocol
 {
-    [Selector("presentedItemURL")] NSURL? PresentedItemURL { get; }
-    [Selector("presentedItemOperationQueue")] NSOperationQueue PresentedItemOperationQueue { get; }
-    [Optional] [Selector("primaryPresentedItemURL")] NSURL? PrimaryPresentedItemURL { get; }
-    [Optional] [Selector("observedPresentedItemUbiquityAttributes")] NSSet ObservedPresentedItemUbiquityAttributes { get; }
-    [Optional] [Selector("relinquishPresentedItemToReader:")] void RelinquishPresentedItemToReader(NSFilePresenterRelinquishPresentedItemToReaderReaderBlock reader);
-    [Optional] [Selector("relinquishPresentedItemToWriter:")] void RelinquishPresentedItemToWriter(NSFilePresenterRelinquishPresentedItemToWriterWriterBlock writer);
-    [Optional] [Selector("savePresentedItemChangesWithCompletionHandler:")] void SavePresentedItemChangesWithCompletionHandler(NSFilePresenterSavePresentedItemChangesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("accommodatePresentedItemDeletionWithCompletionHandler:")] void AccommodatePresentedItemDeletionWithCompletionHandler(NSFilePresenterAccommodatePresentedItemDeletionWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("accommodatePresentedItemEvictionWithCompletionHandler:")] void AccommodatePresentedItemEvictionWithCompletionHandler(NSFilePresenterAccommodatePresentedItemEvictionWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("presentedItemDidMoveToURL:")] void PresentedItemDidMoveToURL(NSURL newURL);
-    [Optional] [Selector("presentedItemDidChange")] void PresentedItemDidChange();
-    [Optional] [Selector("presentedItemDidChangeUbiquityAttributes:")] void PresentedItemDidChangeUbiquityAttributes(NSSet attributes);
-    [Optional] [Selector("presentedItemDidGainVersion:")] void PresentedItemDidGainVersion(NSFileVersion version);
-    [Optional] [Selector("presentedItemDidLoseVersion:")] void PresentedItemDidLoseVersion(NSFileVersion version);
-    [Optional] [Selector("presentedItemDidResolveConflictVersion:")] void PresentedItemDidResolveConflictVersion(NSFileVersion version);
-    [Optional] [Selector("accommodatePresentedSubitemDeletionAtURL:completionHandler:")] void AccommodatePresentedSubitemDeletionAtURLCompletionHandler(NSURL url, NSFilePresenterAccommodatePresentedSubitemDeletionAtURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("presentedSubitemDidAppearAtURL:")] void PresentedSubitemDidAppearAtURL(NSURL url);
-    [Optional] [Selector("presentedSubitemAtURL:didMoveToURL:")] void PresentedSubitemAtURLDidMoveToURL(NSURL oldURL, NSURL newURL);
-    [Optional] [Selector("presentedSubitemDidChangeAtURL:")] void PresentedSubitemDidChangeAtURL(NSURL url);
-    [Optional] [Selector("presentedSubitemAtURL:didGainVersion:")] void PresentedSubitemAtURLDidGainVersion(NSURL url, NSFileVersion version);
-    [Optional] [Selector("presentedSubitemAtURL:didLoseVersion:")] void PresentedSubitemAtURLDidLoseVersion(NSURL url, NSFileVersion version);
-    [Optional] [Selector("presentedSubitemAtURL:didResolveConflictVersion:")] void PresentedSubitemAtURLDidResolveConflictVersion(NSURL url, NSFileVersion version);
+    [Selector("presentedItemURL")]
+    NSURL? PresentedItemURL { get; }
+    [Selector("presentedItemOperationQueue")]
+    NSOperationQueue PresentedItemOperationQueue { get; }
+    [Optional]
+    [Selector("primaryPresentedItemURL")]
+    NSURL? PrimaryPresentedItemURL { get; }
+    [Optional]
+    [Selector("observedPresentedItemUbiquityAttributes")]
+    NSSet ObservedPresentedItemUbiquityAttributes { get; }
+    [Optional]
+    [Selector("relinquishPresentedItemToReader:")]
+    void RelinquishPresentedItemToReader(NSFilePresenterRelinquishPresentedItemToReaderReaderBlock reader);
+    [Optional]
+    [Selector("relinquishPresentedItemToWriter:")]
+    void RelinquishPresentedItemToWriter(NSFilePresenterRelinquishPresentedItemToWriterWriterBlock writer);
+    [Optional]
+    [Selector("savePresentedItemChangesWithCompletionHandler:")]
+    void SavePresentedItemChangesWithCompletionHandler(NSFilePresenterSavePresentedItemChangesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("accommodatePresentedItemDeletionWithCompletionHandler:")]
+    void AccommodatePresentedItemDeletionWithCompletionHandler(NSFilePresenterAccommodatePresentedItemDeletionWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("accommodatePresentedItemEvictionWithCompletionHandler:")]
+    void AccommodatePresentedItemEvictionWithCompletionHandler(NSFilePresenterAccommodatePresentedItemEvictionWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("presentedItemDidMoveToURL:")]
+    void PresentedItemDidMoveToURL(NSURL newURL);
+    [Optional]
+    [Selector("presentedItemDidChange")]
+    void PresentedItemDidChange();
+    [Optional]
+    [Selector("presentedItemDidChangeUbiquityAttributes:")]
+    void PresentedItemDidChangeUbiquityAttributes(NSSet attributes);
+    [Optional]
+    [Selector("presentedItemDidGainVersion:")]
+    void PresentedItemDidGainVersion(NSFileVersion version);
+    [Optional]
+    [Selector("presentedItemDidLoseVersion:")]
+    void PresentedItemDidLoseVersion(NSFileVersion version);
+    [Optional]
+    [Selector("presentedItemDidResolveConflictVersion:")]
+    void PresentedItemDidResolveConflictVersion(NSFileVersion version);
+    [Optional]
+    [Selector("accommodatePresentedSubitemDeletionAtURL:completionHandler:")]
+    void AccommodatePresentedSubitemDeletionAtURLCompletionHandler(NSURL url, NSFilePresenterAccommodatePresentedSubitemDeletionAtURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("presentedSubitemDidAppearAtURL:")]
+    void PresentedSubitemDidAppearAtURL(NSURL url);
+    [Optional]
+    [Selector("presentedSubitemAtURL:didMoveToURL:")]
+    void PresentedSubitemAtURLDidMoveToURL(NSURL oldURL, NSURL newURL);
+    [Optional]
+    [Selector("presentedSubitemDidChangeAtURL:")]
+    void PresentedSubitemDidChangeAtURL(NSURL url);
+    [Optional]
+    [Selector("presentedSubitemAtURL:didGainVersion:")]
+    void PresentedSubitemAtURLDidGainVersion(NSURL url, NSFileVersion version);
+    [Optional]
+    [Selector("presentedSubitemAtURL:didLoseVersion:")]
+    void PresentedSubitemAtURLDidLoseVersion(NSURL url, NSFileVersion version);
+    [Optional]
+    [Selector("presentedSubitemAtURL:didResolveConflictVersion:")]
+    void PresentedSubitemAtURLDidResolveConflictVersion(NSURL url, NSFileVersion version);
 }
 
 #endif

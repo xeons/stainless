@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class NSPathComponentCell : NSTextFieldCell
 {
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("URL", "setURL:")] public NSURL? URL { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("URL", "setURL:")]
+    public NSURL? URL { get; set; }
 }
 
 #endif

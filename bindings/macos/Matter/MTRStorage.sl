@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public objc interface MTRStorage : NSObjectProtocol
 {
-    [Selector("storageDataForKey:")] NSData? StorageDataForKey(NSString key);
-    [Selector("setStorageData:forKey:")] bool SetStorageDataForKey(NSData value, NSString key);
-    [Selector("removeStorageDataForKey:")] bool RemoveStorageDataForKey(NSString key);
+    [Selector("storageDataForKey:")]
+    NSData? StorageDataForKey(NSString key);
+    [Selector("setStorageData:forKey:")]
+    bool SetStorageDataForKey(NSData value, NSString key);
+    [Selector("removeStorageDataForKey:")]
+    bool RemoveStorageDataForKey(NSString key);
 }
 
 /// Deprecated in macOS 13.3.

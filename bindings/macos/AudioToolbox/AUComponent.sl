@@ -274,7 +274,8 @@ public extern "C" NSImage? AudioComponentCopyIcon(AudioComponent comp);
 
 public extern "C" OSStatus AudioUnitExtensionSetComponentList(CFStringRef extensionIdentifier, CFArrayRef? audioComponentInfo);
 
-[ReturnsRetained] public extern "C" CFArrayRef? AudioUnitExtensionCopyComponentList(CFStringRef extensionIdentifier);
+[ReturnsRetained]
+public extern "C" CFArrayRef? AudioUnitExtensionCopyComponentList(CFStringRef extensionIdentifier);
 
 public const int kAudioUnitRange = 0;
 public const int kAudioUnitInitializeSelect = 1;

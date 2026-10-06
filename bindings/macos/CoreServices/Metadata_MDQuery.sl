@@ -45,17 +45,23 @@ public enum MDQueryOptionFlags : int
 
 public extern "C" CFTypeID MDQueryGetTypeID();
 
-[ReturnsRetained] public extern "C" MDQueryRef? MDQueryCreate(CFAllocatorRef? allocator, CFStringRef? queryString, CFArrayRef? valueListAttrs, CFArrayRef? sortingAttrs);
+[ReturnsRetained]
+public extern "C" MDQueryRef? MDQueryCreate(CFAllocatorRef? allocator, CFStringRef? queryString, CFArrayRef? valueListAttrs, CFArrayRef? sortingAttrs);
 
-[ReturnsRetained] public extern "C" MDQueryRef? MDQueryCreateSubset(CFAllocatorRef? allocator, MDQueryRef? query, CFStringRef? queryString, CFArrayRef? valueListAttrs, CFArrayRef? sortingAttrs);
+[ReturnsRetained]
+public extern "C" MDQueryRef? MDQueryCreateSubset(CFAllocatorRef? allocator, MDQueryRef? query, CFStringRef? queryString, CFArrayRef? valueListAttrs, CFArrayRef? sortingAttrs);
 
-[ReturnsRetained] public extern "C" MDQueryRef? MDQueryCreateForItems(CFAllocatorRef? allocator, CFStringRef? queryString, CFArrayRef? valueListAttrs, CFArrayRef? sortingAttrs, CFArrayRef? items);
+[ReturnsRetained]
+public extern "C" MDQueryRef? MDQueryCreateForItems(CFAllocatorRef? allocator, CFStringRef? queryString, CFArrayRef? valueListAttrs, CFArrayRef? sortingAttrs, CFArrayRef? items);
 
-[ReturnsRetained] public extern "C" CFStringRef? MDQueryCopyQueryString(MDQueryRef? query);
+[ReturnsRetained]
+public extern "C" CFStringRef? MDQueryCopyQueryString(MDQueryRef? query);
 
-[ReturnsRetained] public extern "C" CFArrayRef? MDQueryCopyValueListAttributes(MDQueryRef? query);
+[ReturnsRetained]
+public extern "C" CFArrayRef? MDQueryCopyValueListAttributes(MDQueryRef? query);
 
-[ReturnsRetained] public extern "C" CFArrayRef? MDQueryCopySortingAttributes(MDQueryRef? query);
+[ReturnsRetained]
+public extern "C" CFArrayRef? MDQueryCopySortingAttributes(MDQueryRef? query);
 
 public struct MDQueryBatchingParams
 {
@@ -99,7 +105,8 @@ public extern "C" CFIndex MDQueryGetIndexOfResult(MDQueryRef? query, void* resul
 
 public extern "C" void* MDQueryGetAttributeValueOfResultAtIndex(MDQueryRef? query, CFStringRef? name, CFIndex idx);
 
-[ReturnsRetained] public extern "C" CFArrayRef? MDQueryCopyValuesOfAttribute(MDQueryRef? query, CFStringRef? name);
+[ReturnsRetained]
+public extern "C" CFArrayRef? MDQueryCopyValuesOfAttribute(MDQueryRef? query, CFStringRef? name);
 
 public extern "C" CFIndex MDQueryGetCountOfResultsWithAttributeValue(MDQueryRef? query, CFStringRef? name, CFTypeRef? value);
 

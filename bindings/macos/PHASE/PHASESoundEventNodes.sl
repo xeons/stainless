@@ -49,82 +49,126 @@ public enum PHASEPushStreamCompletionCallbackCondition : long
 
 public extern objc class PHASESoundEventNodeDefinition : PHASEDefinition
 {
-    [Selector("children")] public NSArray Children { get; }
+    [Selector("children")]
+    public NSArray Children { get; }
 }
 
 public extern objc class PHASEGeneratorNodeDefinition : PHASESoundEventNodeDefinition
 {
-    [Selector("calibrationMode")] public PHASECalibrationMode CalibrationMode { get; }
-    [Selector("level")] public double Level { get; }
-    [Selector("rate", "setRate:")] public double Rate { get; set; }
-    [Selector("group", "setGroup:")] public PHASEGroup? Group { get; set; }
-    [Selector("gainMetaParameterDefinition", "setGainMetaParameterDefinition:")] public PHASENumberMetaParameterDefinition? GainMetaParameterDefinition { get; set; }
-    [Selector("rateMetaParameterDefinition", "setRateMetaParameterDefinition:")] public PHASENumberMetaParameterDefinition? RateMetaParameterDefinition { get; set; }
-    [Selector("mixerDefinition")] public PHASEMixerDefinition MixerDefinition { get; }
-    [Selector("setCalibrationMode:level:")] public void SetCalibrationModeLevel(PHASECalibrationMode calibrationMode, double level);
+    [Selector("calibrationMode")]
+    public PHASECalibrationMode CalibrationMode { get; }
+    [Selector("level")]
+    public double Level { get; }
+    [Selector("rate", "setRate:")]
+    public double Rate { get; set; }
+    [Selector("group", "setGroup:")]
+    public PHASEGroup? Group { get; set; }
+    [Selector("gainMetaParameterDefinition", "setGainMetaParameterDefinition:")]
+    public PHASENumberMetaParameterDefinition? GainMetaParameterDefinition { get; set; }
+    [Selector("rateMetaParameterDefinition", "setRateMetaParameterDefinition:")]
+    public PHASENumberMetaParameterDefinition? RateMetaParameterDefinition { get; set; }
+    [Selector("mixerDefinition")]
+    public PHASEMixerDefinition MixerDefinition { get; }
+    [Selector("setCalibrationMode:level:")]
+    public void SetCalibrationModeLevel(PHASECalibrationMode calibrationMode, double level);
 }
 
 public extern objc class PHASESamplerNodeDefinition : PHASEGeneratorNodeDefinition
 {
-    [Selector("assetIdentifier")] public NSString AssetIdentifier { get; }
-    [Selector("cullOption", "setCullOption:")] public PHASECullOption CullOption { get; set; }
-    [Selector("playbackMode", "setPlaybackMode:")] public PHASEPlaybackMode PlaybackMode { get; set; }
-    [Selector("initWithSoundAssetIdentifier:mixerDefinition:identifier:")] public Self InitWithSoundAssetIdentifierMixerDefinitionIdentifier(NSString soundAssetIdentifier, PHASEMixerDefinition mixerDefinition, NSString identifier);
-    [Selector("initWithSoundAssetIdentifier:mixerDefinition:")] public Self InitWithSoundAssetIdentifierMixerDefinition(NSString soundAssetIdentifier, PHASEMixerDefinition mixerDefinition);
+    [Selector("assetIdentifier")]
+    public NSString AssetIdentifier { get; }
+    [Selector("cullOption", "setCullOption:")]
+    public PHASECullOption CullOption { get; set; }
+    [Selector("playbackMode", "setPlaybackMode:")]
+    public PHASEPlaybackMode PlaybackMode { get; set; }
+    [Selector("initWithSoundAssetIdentifier:mixerDefinition:identifier:")]
+    public Self InitWithSoundAssetIdentifierMixerDefinitionIdentifier(NSString soundAssetIdentifier, PHASEMixerDefinition mixerDefinition, NSString identifier);
+    [Selector("initWithSoundAssetIdentifier:mixerDefinition:")]
+    public Self InitWithSoundAssetIdentifierMixerDefinition(NSString soundAssetIdentifier, PHASEMixerDefinition mixerDefinition);
 }
 
 public extern objc class PHASEContainerNodeDefinition : PHASESoundEventNodeDefinition
 {
-    [Selector("init")] public Self Init();
-    [Selector("new")] public static Self New();
-    [Selector("initWithIdentifier:")] public Self InitWithIdentifier(NSString identifier);
-    [Selector("addSubtree:")] public void AddSubtree(PHASESoundEventNodeDefinition subtree);
+    [Selector("init")]
+    public Self Init();
+    [Selector("new")]
+    public static Self New();
+    [Selector("initWithIdentifier:")]
+    public Self InitWithIdentifier(NSString identifier);
+    [Selector("addSubtree:")]
+    public void AddSubtree(PHASESoundEventNodeDefinition subtree);
 }
 
 public extern objc class PHASEBlendNodeDefinition : PHASESoundEventNodeDefinition
 {
-    [Selector("blendParameterDefinition")] public PHASENumberMetaParameterDefinition? BlendParameterDefinition { get; }
-    [Selector("spatialMixerDefinitionForDistance")] public PHASESpatialMixerDefinition? SpatialMixerDefinitionForDistance { get; }
-    [Selector("initWithBlendMetaParameterDefinition:identifier:")] public Self InitWithBlendMetaParameterDefinitionIdentifier(PHASENumberMetaParameterDefinition blendMetaParameterDefinition, NSString identifier);
-    [Selector("initWithBlendMetaParameterDefinition:")] public Self InitWithBlendMetaParameterDefinition(PHASENumberMetaParameterDefinition blendMetaParameterDefinition);
-    [Selector("initDistanceBlendWithSpatialMixerDefinition:identifier:")] public Self InitDistanceBlendWithSpatialMixerDefinitionIdentifier(PHASESpatialMixerDefinition spatialMixerDefinition, NSString identifier);
-    [Selector("initDistanceBlendWithSpatialMixerDefinition:")] public Self InitDistanceBlendWithSpatialMixerDefinition(PHASESpatialMixerDefinition spatialMixerDefinition);
-    [Selector("addRangeForInputValuesBelow:fullGainAtValue:fadeCurveType:subtree:")] public void AddRangeForInputValuesBelowFullGainAtValueFadeCurveTypeSubtree(double value, double fullGainAtValue, PHASECurveType fadeCurveType, PHASESoundEventNodeDefinition subtree);
-    [Selector("addRangeForInputValuesBetween:highValue:fullGainAtLowValue:fullGainAtHighValue:lowFadeCurveType:highFadeCurveType:subtree:")] public void AddRangeForInputValuesBetweenHighValueFullGainAtLowValueFullGainAtHighValueLowFadeCurveTypeHighFadeCurveTypeSubtree(double lowValue, double highValue, double fullGainAtLowValue, double fullGainAtHighValue, PHASECurveType lowFadeCurveType, PHASECurveType highFadeCurveType, PHASESoundEventNodeDefinition subtree);
-    [Selector("addRangeForInputValuesAbove:fullGainAtValue:fadeCurveType:subtree:")] public void AddRangeForInputValuesAboveFullGainAtValueFadeCurveTypeSubtree(double value, double fullGainAtValue, PHASECurveType fadeCurveType, PHASESoundEventNodeDefinition subtree);
-    [Selector("addRangeWithEnvelope:subtree:")] public void AddRangeWithEnvelopeSubtree(PHASEEnvelope envelope, PHASESoundEventNodeDefinition subtree);
+    [Selector("blendParameterDefinition")]
+    public PHASENumberMetaParameterDefinition? BlendParameterDefinition { get; }
+    [Selector("spatialMixerDefinitionForDistance")]
+    public PHASESpatialMixerDefinition? SpatialMixerDefinitionForDistance { get; }
+    [Selector("initWithBlendMetaParameterDefinition:identifier:")]
+    public Self InitWithBlendMetaParameterDefinitionIdentifier(PHASENumberMetaParameterDefinition blendMetaParameterDefinition, NSString identifier);
+    [Selector("initWithBlendMetaParameterDefinition:")]
+    public Self InitWithBlendMetaParameterDefinition(PHASENumberMetaParameterDefinition blendMetaParameterDefinition);
+    [Selector("initDistanceBlendWithSpatialMixerDefinition:identifier:")]
+    public Self InitDistanceBlendWithSpatialMixerDefinitionIdentifier(PHASESpatialMixerDefinition spatialMixerDefinition, NSString identifier);
+    [Selector("initDistanceBlendWithSpatialMixerDefinition:")]
+    public Self InitDistanceBlendWithSpatialMixerDefinition(PHASESpatialMixerDefinition spatialMixerDefinition);
+    [Selector("addRangeForInputValuesBelow:fullGainAtValue:fadeCurveType:subtree:")]
+    public void AddRangeForInputValuesBelowFullGainAtValueFadeCurveTypeSubtree(double value, double fullGainAtValue, PHASECurveType fadeCurveType, PHASESoundEventNodeDefinition subtree);
+    [Selector("addRangeForInputValuesBetween:highValue:fullGainAtLowValue:fullGainAtHighValue:lowFadeCurveType:highFadeCurveType:subtree:")]
+    public void AddRangeForInputValuesBetweenHighValueFullGainAtLowValueFullGainAtHighValueLowFadeCurveTypeHighFadeCurveTypeSubtree(double lowValue, double highValue, double fullGainAtLowValue, double fullGainAtHighValue, PHASECurveType lowFadeCurveType, PHASECurveType highFadeCurveType, PHASESoundEventNodeDefinition subtree);
+    [Selector("addRangeForInputValuesAbove:fullGainAtValue:fadeCurveType:subtree:")]
+    public void AddRangeForInputValuesAboveFullGainAtValueFadeCurveTypeSubtree(double value, double fullGainAtValue, PHASECurveType fadeCurveType, PHASESoundEventNodeDefinition subtree);
+    [Selector("addRangeWithEnvelope:subtree:")]
+    public void AddRangeWithEnvelopeSubtree(PHASEEnvelope envelope, PHASESoundEventNodeDefinition subtree);
 }
 
 public extern objc class PHASESwitchNodeDefinition : PHASESoundEventNodeDefinition
 {
-    [Selector("switchMetaParameterDefinition")] public PHASEStringMetaParameterDefinition SwitchMetaParameterDefinition { get; }
-    [Selector("initWithSwitchMetaParameterDefinition:identifier:")] public Self InitWithSwitchMetaParameterDefinitionIdentifier(PHASEStringMetaParameterDefinition switchMetaParameterDefinition, NSString identifier);
-    [Selector("initWithSwitchMetaParameterDefinition:")] public Self InitWithSwitchMetaParameterDefinition(PHASEStringMetaParameterDefinition switchMetaParameterDefinition);
-    [Selector("addSubtree:switchValue:")] public void AddSubtreeSwitchValue(PHASESoundEventNodeDefinition subtree, NSString switchValue);
+    [Selector("switchMetaParameterDefinition")]
+    public PHASEStringMetaParameterDefinition SwitchMetaParameterDefinition { get; }
+    [Selector("initWithSwitchMetaParameterDefinition:identifier:")]
+    public Self InitWithSwitchMetaParameterDefinitionIdentifier(PHASEStringMetaParameterDefinition switchMetaParameterDefinition, NSString identifier);
+    [Selector("initWithSwitchMetaParameterDefinition:")]
+    public Self InitWithSwitchMetaParameterDefinition(PHASEStringMetaParameterDefinition switchMetaParameterDefinition);
+    [Selector("addSubtree:switchValue:")]
+    public void AddSubtreeSwitchValue(PHASESoundEventNodeDefinition subtree, NSString switchValue);
 }
 
 public extern objc class PHASERandomNodeDefinition : PHASESoundEventNodeDefinition
 {
-    [Selector("uniqueSelectionQueueLength", "setUniqueSelectionQueueLength:")] public NSInteger UniqueSelectionQueueLength { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithIdentifier:")] public Self InitWithIdentifier(NSString identifier);
-    [Selector("addSubtree:weight:")] public void AddSubtreeWeight(PHASESoundEventNodeDefinition subtree, NSNumber weight);
+    [Selector("uniqueSelectionQueueLength", "setUniqueSelectionQueueLength:")]
+    public NSInteger UniqueSelectionQueueLength { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithIdentifier:")]
+    public Self InitWithIdentifier(NSString identifier);
+    [Selector("addSubtree:weight:")]
+    public void AddSubtreeWeight(PHASESoundEventNodeDefinition subtree, NSNumber weight);
 }
 
 public extern objc class PHASEStreamNode : NSObject
 {
-    [Selector("gainMetaParameter")] public PHASENumberMetaParameter? GainMetaParameter { get; }
-    [Selector("rateMetaParameter")] public PHASENumberMetaParameter? RateMetaParameter { get; }
-    [Selector("mixer")] public PHASEMixer Mixer { get; }
-    [Selector("format")] public AVAudioFormat Format { get; }
+    [Selector("gainMetaParameter")]
+    public PHASENumberMetaParameter? GainMetaParameter { get; }
+    [Selector("rateMetaParameter")]
+    public PHASENumberMetaParameter? RateMetaParameter { get; }
+    [Selector("mixer")]
+    public PHASEMixer Mixer { get; }
+    [Selector("format")]
+    public AVAudioFormat Format { get; }
 }
 
 public extern objc class PHASEPushStreamNodeDefinition : PHASEGeneratorNodeDefinition
 {
-    [Selector("format")] public AVAudioFormat Format { get; }
-    [Selector("normalize", "setNormalize:")] public bool Normalize { get; set; }
-    [Selector("initWithMixerDefinition:format:identifier:")] public Self InitWithMixerDefinitionFormatIdentifier(PHASEMixerDefinition mixerDefinition, AVAudioFormat format, NSString identifier);
-    [Selector("initWithMixerDefinition:format:")] public Self InitWithMixerDefinitionFormat(PHASEMixerDefinition mixerDefinition, AVAudioFormat format);
+    [Selector("format")]
+    public AVAudioFormat Format { get; }
+    [Selector("normalize", "setNormalize:")]
+    public bool Normalize { get; set; }
+    [Selector("initWithMixerDefinition:format:identifier:")]
+    public Self InitWithMixerDefinitionFormatIdentifier(PHASEMixerDefinition mixerDefinition, AVAudioFormat format, NSString identifier);
+    [Selector("initWithMixerDefinition:format:")]
+    public Self InitWithMixerDefinitionFormat(PHASEMixerDefinition mixerDefinition, AVAudioFormat format);
 }
 
 public objc closure void PHASEPushStreamNodeScheduleBufferCompletionCallbackTypeCompletionHandlerCompletionHandlerBlock(PHASEPushStreamCompletionCallbackCondition arg0);
@@ -133,29 +177,42 @@ public objc closure void PHASEPushStreamNodeScheduleBufferAtTimeOptionsCompletio
 
 public extern objc class PHASEPushStreamNode : PHASEStreamNode
 {
-    [Selector("gainMetaParameter")] public PHASENumberMetaParameter? GainMetaParameter { get; }
-    [Selector("rateMetaParameter")] public PHASENumberMetaParameter? RateMetaParameter { get; }
-    [Selector("mixer")] public PHASEMixer Mixer { get; }
-    [Selector("format")] public AVAudioFormat Format { get; }
-    [Selector("scheduleBuffer:")] public void ScheduleBuffer(AVAudioPCMBuffer buffer);
-    [Selector("scheduleBuffer:completionCallbackType:completionHandler:")] public void ScheduleBufferCompletionCallbackTypeCompletionHandler(AVAudioPCMBuffer buffer, PHASEPushStreamCompletionCallbackCondition completionCallbackType, PHASEPushStreamNodeScheduleBufferCompletionCallbackTypeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("scheduleBuffer:atTime:options:")] public void ScheduleBufferAtTimeOptions(AVAudioPCMBuffer buffer, AVAudioTime? when, PHASEPushStreamBufferOptions options);
-    [Selector("scheduleBuffer:atTime:options:completionCallbackType:completionHandler:")] public void ScheduleBufferAtTimeOptionsCompletionCallbackTypeCompletionHandler(AVAudioPCMBuffer buffer, AVAudioTime? when, PHASEPushStreamBufferOptions options, PHASEPushStreamCompletionCallbackCondition completionCallbackType, PHASEPushStreamNodeScheduleBufferAtTimeOptionsCompletionCallbackTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("gainMetaParameter")]
+    public PHASENumberMetaParameter? GainMetaParameter { get; }
+    [Selector("rateMetaParameter")]
+    public PHASENumberMetaParameter? RateMetaParameter { get; }
+    [Selector("mixer")]
+    public PHASEMixer Mixer { get; }
+    [Selector("format")]
+    public AVAudioFormat Format { get; }
+    [Selector("scheduleBuffer:")]
+    public void ScheduleBuffer(AVAudioPCMBuffer buffer);
+    [Selector("scheduleBuffer:completionCallbackType:completionHandler:")]
+    public void ScheduleBufferCompletionCallbackTypeCompletionHandler(AVAudioPCMBuffer buffer, PHASEPushStreamCompletionCallbackCondition completionCallbackType, PHASEPushStreamNodeScheduleBufferCompletionCallbackTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("scheduleBuffer:atTime:options:")]
+    public void ScheduleBufferAtTimeOptions(AVAudioPCMBuffer buffer, AVAudioTime? when, PHASEPushStreamBufferOptions options);
+    [Selector("scheduleBuffer:atTime:options:completionCallbackType:completionHandler:")]
+    public void ScheduleBufferAtTimeOptionsCompletionCallbackTypeCompletionHandler(AVAudioPCMBuffer buffer, AVAudioTime? when, PHASEPushStreamBufferOptions options, PHASEPushStreamCompletionCallbackCondition completionCallbackType, PHASEPushStreamNodeScheduleBufferAtTimeOptionsCompletionCallbackTypeCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure OSStatus PHASEPullStreamRenderBlock(bool* arg0, AudioTimeStamp* arg1, AVAudioFrameCount arg2, AudioBufferList* arg3);
 
 public extern objc class PHASEPullStreamNodeDefinition : PHASEGeneratorNodeDefinition
 {
-    [Selector("format")] public AVAudioFormat Format { get; }
-    [Selector("normalize", "setNormalize:")] public bool Normalize { get; set; }
-    [Selector("initWithMixerDefinition:format:identifier:")] public Self InitWithMixerDefinitionFormatIdentifier(PHASEMixerDefinition mixerDefinition, AVAudioFormat format, NSString identifier);
-    [Selector("initWithMixerDefinition:format:")] public Self InitWithMixerDefinitionFormat(PHASEMixerDefinition mixerDefinition, AVAudioFormat format);
+    [Selector("format")]
+    public AVAudioFormat Format { get; }
+    [Selector("normalize", "setNormalize:")]
+    public bool Normalize { get; set; }
+    [Selector("initWithMixerDefinition:format:identifier:")]
+    public Self InitWithMixerDefinitionFormatIdentifier(PHASEMixerDefinition mixerDefinition, AVAudioFormat format, NSString identifier);
+    [Selector("initWithMixerDefinition:format:")]
+    public Self InitWithMixerDefinitionFormat(PHASEMixerDefinition mixerDefinition, AVAudioFormat format);
 }
 
 public extern objc class PHASEPullStreamNode : PHASEStreamNode
 {
-    [Selector("renderBlock", "setRenderBlock:")] public PHASEPullStreamRenderBlock? RenderBlock { get; set; }
+    [Selector("renderBlock", "setRenderBlock:")]
+    public PHASEPullStreamRenderBlock? RenderBlock { get; set; }
 }
 
 #endif

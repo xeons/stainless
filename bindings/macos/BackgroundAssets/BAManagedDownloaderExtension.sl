@@ -32,7 +32,9 @@ import Standard.ObjC;
 /// macOS 26 and later.
 public objc interface BAManagedDownloaderExtension : BADownloaderExtension
 {
-    [Optional] [Selector("shouldDownloadAssetPack:")] bool ShouldDownloadAssetPack(BAAssetPack assetPack);
+    [Optional]
+    [Selector("shouldDownloadAssetPack:")]
+    bool ShouldDownloadAssetPack(BAAssetPack assetPack);
 }
 
 #endif

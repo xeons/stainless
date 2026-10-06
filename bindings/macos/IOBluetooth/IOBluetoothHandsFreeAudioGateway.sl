@@ -32,18 +32,28 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothHandsFreeAudioGateway : IOBluetoothHandsFree
 {
-    [Selector("initWithDevice:delegate:")] public Self? InitWithDeviceDelegate(IOBluetoothDevice? device, AnyObject? inDelegate);
-    [Selector("createIndicator:min:max:currentValue:")] public void CreateIndicatorMinMaxCurrentValue(NSString? indicatorName, int minValue, int maxValue, int currentValue);
-    [Selector("processATCommand:")] public void ProcessATCommand(NSString? atCommand);
-    [Selector("sendOKResponse")] public void SendOKResponse();
-    [Selector("sendResponse:")] public void SendResponse(NSString? response);
-    [Selector("sendResponse:withOK:")] public void SendResponseWithOK(NSString? response, bool withOK);
+    [Selector("initWithDevice:delegate:")]
+    public Self? InitWithDeviceDelegate(IOBluetoothDevice? device, AnyObject? inDelegate);
+    [Selector("createIndicator:min:max:currentValue:")]
+    public void CreateIndicatorMinMaxCurrentValue(NSString? indicatorName, int minValue, int maxValue, int currentValue);
+    [Selector("processATCommand:")]
+    public void ProcessATCommand(NSString? atCommand);
+    [Selector("sendOKResponse")]
+    public void SendOKResponse();
+    [Selector("sendResponse:")]
+    public void SendResponse(NSString? response);
+    [Selector("sendResponse:withOK:")]
+    public void SendResponseWithOK(NSString? response, bool withOK);
 }
 
 public objc interface IOBluetoothHandsFreeAudioGatewayDelegate
 {
-    [Optional] [Selector("handsFree:hangup:")] void HandsFreeHangup(IOBluetoothHandsFreeAudioGateway? device, NSNumber? hangup);
-    [Optional] [Selector("handsFree:redial:")] void HandsFreeRedial(IOBluetoothHandsFreeAudioGateway? device, NSNumber? redial);
+    [Optional]
+    [Selector("handsFree:hangup:")]
+    void HandsFreeHangup(IOBluetoothHandsFreeAudioGateway? device, NSNumber? hangup);
+    [Optional]
+    [Selector("handsFree:redial:")]
+    void HandsFreeRedial(IOBluetoothHandsFreeAudioGateway? device, NSNumber? redial);
 }
 
 #endif

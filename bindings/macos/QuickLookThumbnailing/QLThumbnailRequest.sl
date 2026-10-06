@@ -34,10 +34,14 @@ import Standard.ObjC;
 
 public extern objc class QLFileThumbnailRequest : NSObject
 {
-    [Selector("maximumSize")] public CGSize MaximumSize { get; }
-    [Selector("minimumSize")] public CGSize MinimumSize { get; }
-    [Selector("scale")] public CGFloat Scale { get; }
-    [Selector("fileURL")] public NSURL FileURL { get; }
+    [Selector("maximumSize")]
+    public CGSize MaximumSize { get; }
+    [Selector("minimumSize")]
+    public CGSize MinimumSize { get; }
+    [Selector("scale")]
+    public CGFloat Scale { get; }
+    [Selector("fileURL")]
+    public NSURL FileURL { get; }
 }
 
 #endif

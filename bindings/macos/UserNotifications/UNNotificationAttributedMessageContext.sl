@@ -34,7 +34,8 @@ import Standard.ObjC;
 
 public extern objc class UNNotificationAttributedMessageContext : NSObject, UNNotificationContentProviding
 {
-    [Selector("contextWithSendMessageIntent:attributedContent:")] public static Self ContextWithSendMessageIntentAttributedContent(INSendMessageIntent sendMessageIntent, NSAttributedString attributedContent);
+    [Selector("contextWithSendMessageIntent:attributedContent:")]
+    public static Self ContextWithSendMessageIntentAttributedContent(INSendMessageIntent sendMessageIntent, NSAttributedString attributedContent);
 }
 
 #endif

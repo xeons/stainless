@@ -32,34 +32,44 @@ import Standard.ObjC;
 
 public extern objc class NSUserScriptTask : NSObject
 {
-    [Selector("scriptURL")] public NSURL ScriptURL { get; }
-    [Selector("initWithURL:error:")] public Self? InitWithURLError(NSURL url, out NSError? error);
-    [Selector("executeWithCompletionHandler:")] public void ExecuteWithCompletionHandler(NSUserScriptTaskCompletionHandler? handler);
+    [Selector("scriptURL")]
+    public NSURL ScriptURL { get; }
+    [Selector("initWithURL:error:")]
+    public Self? InitWithURLError(NSURL url, out NSError? error);
+    [Selector("executeWithCompletionHandler:")]
+    public void ExecuteWithCompletionHandler(NSUserScriptTaskCompletionHandler? handler);
 }
 
 public objc closure void NSUserScriptTaskCompletionHandler(NSError? arg0);
 
 public extern objc class NSUserUnixTask : NSUserScriptTask
 {
-    [Selector("standardInput", "setStandardInput:")] public NSFileHandle? StandardInput { get; set; }
-    [Selector("standardOutput", "setStandardOutput:")] public NSFileHandle? StandardOutput { get; set; }
-    [Selector("standardError", "setStandardError:")] public NSFileHandle? StandardError { get; set; }
-    [Selector("executeWithArguments:completionHandler:")] public void ExecuteWithArgumentsCompletionHandler(NSArray? arguments, NSUserUnixTaskCompletionHandler? handler);
+    [Selector("standardInput", "setStandardInput:")]
+    public NSFileHandle? StandardInput { get; set; }
+    [Selector("standardOutput", "setStandardOutput:")]
+    public NSFileHandle? StandardOutput { get; set; }
+    [Selector("standardError", "setStandardError:")]
+    public NSFileHandle? StandardError { get; set; }
+    [Selector("executeWithArguments:completionHandler:")]
+    public void ExecuteWithArgumentsCompletionHandler(NSArray? arguments, NSUserUnixTaskCompletionHandler? handler);
 }
 
 public objc closure void NSUserUnixTaskCompletionHandler(NSError? arg0);
 
 public extern objc class NSUserAppleScriptTask : NSUserScriptTask
 {
-    [Selector("executeWithAppleEvent:completionHandler:")] public void ExecuteWithAppleEventCompletionHandler(NSAppleEventDescriptor? event, NSUserAppleScriptTaskCompletionHandler? handler);
+    [Selector("executeWithAppleEvent:completionHandler:")]
+    public void ExecuteWithAppleEventCompletionHandler(NSAppleEventDescriptor? event, NSUserAppleScriptTaskCompletionHandler? handler);
 }
 
 public objc closure void NSUserAppleScriptTaskCompletionHandler(NSAppleEventDescriptor? arg0, NSError? arg1);
 
 public extern objc class NSUserAutomatorTask : NSUserScriptTask
 {
-    [Selector("variables", "setVariables:")] public NSDictionary? Variables { get; set; }
-    [Selector("executeWithInput:completionHandler:")] public void ExecuteWithInputCompletionHandler(NSSecureCoding? input, NSUserAutomatorTaskCompletionHandler? handler);
+    [Selector("variables", "setVariables:")]
+    public NSDictionary? Variables { get; set; }
+    [Selector("executeWithInput:completionHandler:")]
+    public void ExecuteWithInputCompletionHandler(NSSecureCoding? input, NSUserAutomatorTaskCompletionHandler? handler);
 }
 
 public objc closure void NSUserAutomatorTaskCompletionHandler(AnyObject? arg0, NSError? arg1);

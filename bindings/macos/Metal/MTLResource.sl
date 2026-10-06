@@ -100,19 +100,32 @@ public enum MTLTextureSparseTier : long
 
 public objc interface MTLResource : MTLAllocation
 {
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("cpuCacheMode")] MTLCPUCacheMode CpuCacheMode { get; }
-    [Selector("storageMode")] MTLStorageMode StorageMode { get; }
-    [Selector("hazardTrackingMode")] MTLHazardTrackingMode HazardTrackingMode { get; }
-    [Selector("resourceOptions")] MTLResourceOptions ResourceOptions { get; }
-    [Selector("heap")] MTLHeap? Heap { get; }
-    [Selector("heapOffset")] NSUInteger HeapOffset { get; }
-    [Selector("allocatedSize")] NSUInteger AllocatedSize { get; }
-    [Selector("setPurgeableState:")] MTLPurgeableState SetPurgeableState(MTLPurgeableState state);
-    [Selector("makeAliasable")] void MakeAliasable();
-    [Selector("isAliasable")] bool IsAliasable();
-    [Selector("setOwnerWithIdentity:")] kern_return_t SetOwnerWithIdentity(task_id_token_t task_id_token);
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("cpuCacheMode")]
+    MTLCPUCacheMode CpuCacheMode { get; }
+    [Selector("storageMode")]
+    MTLStorageMode StorageMode { get; }
+    [Selector("hazardTrackingMode")]
+    MTLHazardTrackingMode HazardTrackingMode { get; }
+    [Selector("resourceOptions")]
+    MTLResourceOptions ResourceOptions { get; }
+    [Selector("heap")]
+    MTLHeap? Heap { get; }
+    [Selector("heapOffset")]
+    NSUInteger HeapOffset { get; }
+    [Selector("allocatedSize")]
+    NSUInteger AllocatedSize { get; }
+    [Selector("setPurgeableState:")]
+    MTLPurgeableState SetPurgeableState(MTLPurgeableState state);
+    [Selector("makeAliasable")]
+    void MakeAliasable();
+    [Selector("isAliasable")]
+    bool IsAliasable();
+    [Selector("setOwnerWithIdentity:")]
+    kern_return_t SetOwnerWithIdentity(task_id_token_t task_id_token);
 }
 
 public const int MTLResourceCPUCacheModeShift = 0;

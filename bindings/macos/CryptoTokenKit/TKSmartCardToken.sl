@@ -33,32 +33,42 @@ import Standard.ObjC;
 
 public extern objc class TKTokenSmartCardPINAuthOperation : TKTokenAuthOperation
 {
-    [Selector("PINFormat", "setPINFormat:")] public TKSmartCardPINFormat PINFormat { get; set; }
-    [Selector("APDUTemplate", "setAPDUTemplate:")] public NSData? APDUTemplate { get; set; }
-    [Selector("PINByteOffset", "setPINByteOffset:")] public NSInteger PINByteOffset { get; set; }
-    [Selector("smartCard", "setSmartCard:")] public TKSmartCard? SmartCard { get; set; }
-    [Selector("PIN", "setPIN:")] public NSString? PIN { get; set; }
+    [Selector("PINFormat", "setPINFormat:")]
+    public TKSmartCardPINFormat PINFormat { get; set; }
+    [Selector("APDUTemplate", "setAPDUTemplate:")]
+    public NSData? APDUTemplate { get; set; }
+    [Selector("PINByteOffset", "setPINByteOffset:")]
+    public NSInteger PINByteOffset { get; set; }
+    [Selector("smartCard", "setSmartCard:")]
+    public TKSmartCard? SmartCard { get; set; }
+    [Selector("PIN", "setPIN:")]
+    public NSString? PIN { get; set; }
 }
 
 public extern objc class TKSmartCardTokenSession : TKTokenSession
 {
     /// Deprecated in macOS 26.0.
-    [Selector("smartCard")] public TKSmartCard SmartCard { get; }
+    [Selector("smartCard")]
+    public TKSmartCard SmartCard { get; }
     /// macOS 26.0 and later.
-    [Selector("getSmartCardWithError:")] public TKSmartCard? GetSmartCardWithError(out NSError? error);
+    [Selector("getSmartCardWithError:")]
+    public TKSmartCard? GetSmartCardWithError(out NSError? error);
 }
 
 public extern objc class TKSmartCardToken : TKToken
 {
-    [Selector("AID")] public NSData? AID { get; }
-    [Selector("initWithSmartCard:AID:instanceID:tokenDriver:")] public Self InitWithSmartCardAIDInstanceIDTokenDriver(TKSmartCard smartCard, NSData? AID, NSString instanceID, TKSmartCardTokenDriver tokenDriver);
+    [Selector("AID")]
+    public NSData? AID { get; }
+    [Selector("initWithSmartCard:AID:instanceID:tokenDriver:")]
+    public Self InitWithSmartCardAIDInstanceIDTokenDriver(TKSmartCard smartCard, NSData? AID, NSString instanceID, TKSmartCardTokenDriver tokenDriver);
 }
 
 public extern objc class TKSmartCardTokenDriver : TKTokenDriver { }
 
 public objc interface TKSmartCardTokenDriverDelegate : TKTokenDriverDelegate
 {
-    [Selector("tokenDriver:createTokenForSmartCard:AID:error:")] TKSmartCardToken? TokenDriverCreateTokenForSmartCardAIDError(TKSmartCardTokenDriver driver, TKSmartCard smartCard, NSData? AID, out NSError? error);
+    [Selector("tokenDriver:createTokenForSmartCard:AID:error:")]
+    TKSmartCardToken? TokenDriverCreateTokenForSmartCardAIDError(TKSmartCardTokenDriver driver, TKSmartCard smartCard, NSData? AID, out NSError? error);
 }
 
 #endif

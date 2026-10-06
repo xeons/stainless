@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class MXDiskWriteExceptionDiagnostic : MXDiagnostic
 {
-    [Selector("callStackTree")] public MXCallStackTree CallStackTree { get; }
-    [Selector("totalWritesCaused")] public NSMeasurement TotalWritesCaused { get; }
+    [Selector("callStackTree")]
+    public MXCallStackTree CallStackTree { get; }
+    [Selector("totalWritesCaused")]
+    public NSMeasurement TotalWritesCaused { get; }
 }
 
 #endif

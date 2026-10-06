@@ -33,14 +33,18 @@ import Standard.ObjC;
 
 public extern objc class AVMediaSelection : NSObject, NSCopying, NSMutableCopying
 {
-    [Selector("asset")] public AVAsset? Asset { get; }
-    [Selector("selectedMediaOptionInMediaSelectionGroup:")] public AVMediaSelectionOption? SelectedMediaOptionInMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
-    [Selector("mediaSelectionCriteriaCanBeAppliedAutomaticallyToMediaSelectionGroup:")] public bool MediaSelectionCriteriaCanBeAppliedAutomaticallyToMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("asset")]
+    public AVAsset? Asset { get; }
+    [Selector("selectedMediaOptionInMediaSelectionGroup:")]
+    public AVMediaSelectionOption? SelectedMediaOptionInMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("mediaSelectionCriteriaCanBeAppliedAutomaticallyToMediaSelectionGroup:")]
+    public bool MediaSelectionCriteriaCanBeAppliedAutomaticallyToMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
 }
 
 public extern objc class AVMutableMediaSelection : AVMediaSelection
 {
-    [Selector("selectMediaOption:inMediaSelectionGroup:")] public void SelectMediaOptionInMediaSelectionGroup(AVMediaSelectionOption? mediaSelectionOption, AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("selectMediaOption:inMediaSelectionGroup:")]
+    public void SelectMediaOptionInMediaSelectionGroup(AVMediaSelectionOption? mediaSelectionOption, AVMediaSelectionGroup mediaSelectionGroup);
 }
 
 #endif

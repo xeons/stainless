@@ -34,15 +34,19 @@ public objc interface GKViewController { }
 
 public extern objc class GKDialogController : NSResponder
 {
-    [Selector("parentWindow", "setParentWindow:")] public NSWindow? ParentWindow { get; set; }
-    [Selector("presentViewController:")] public bool PresentViewController(NSViewController viewController);
-    [Selector("dismiss:")] public void Dismiss(AnyObject sender);
+    [Selector("parentWindow", "setParentWindow:")]
+    public NSWindow? ParentWindow { get; set; }
+    [Selector("presentViewController:")]
+    public bool PresentViewController(NSViewController viewController);
+    [Selector("dismiss:")]
+    public void Dismiss(AnyObject sender);
 }
 
 /// SharedDialogController, a category of GKDialogController.
 public extern objc class GKDialogController
 {
-    [Selector("sharedDialogController")] public static GKDialogController SharedDialogController();
+    [Selector("sharedDialogController")]
+    public static GKDialogController SharedDialogController();
 }
 
 #endif

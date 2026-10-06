@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class LPLinkView : NSView
 {
-    [Selector("metadata", "setMetadata:")] public LPLinkMetadata Metadata { get; set; }
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL URL);
-    [Selector("initWithMetadata:")] public Self InitWithMetadata(LPLinkMetadata metadata);
+    [Selector("metadata", "setMetadata:")]
+    public LPLinkMetadata Metadata { get; set; }
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL URL);
+    [Selector("initWithMetadata:")]
+    public Self InitWithMetadata(LPLinkMetadata metadata);
 }
 
 #endif

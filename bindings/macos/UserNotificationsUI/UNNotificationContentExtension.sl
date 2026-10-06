@@ -52,23 +52,41 @@ public objc closure void UNNotificationContentExtensionDidReceiveNotificationRes
 
 public objc interface UNNotificationContentExtension : NSObjectProtocol
 {
-    [Optional] [Selector("mediaPlayPauseButtonType")] UNNotificationContentExtensionMediaPlayPauseButtonType MediaPlayPauseButtonType { get; }
-    [Optional] [Selector("mediaPlayPauseButtonFrame")] CGRect MediaPlayPauseButtonFrame { get; }
-    [Optional] [Selector("mediaPlayPauseButtonTintColor")] NSColor MediaPlayPauseButtonTintColor { get; }
-    [Selector("didReceiveNotification:")] void DidReceiveNotification(UNNotification notification);
-    [Optional] [Selector("didReceiveNotificationResponse:completionHandler:")] void DidReceiveNotificationResponseCompletionHandler(UNNotificationResponse response, UNNotificationContentExtensionDidReceiveNotificationResponseCompletionHandlerCompletionBlock completion);
-    [Optional] [Selector("mediaPlay")] void MediaPlay();
-    [Optional] [Selector("mediaPause")] void MediaPause();
+    [Optional]
+    [Selector("mediaPlayPauseButtonType")]
+    UNNotificationContentExtensionMediaPlayPauseButtonType MediaPlayPauseButtonType { get; }
+    [Optional]
+    [Selector("mediaPlayPauseButtonFrame")]
+    CGRect MediaPlayPauseButtonFrame { get; }
+    [Optional]
+    [Selector("mediaPlayPauseButtonTintColor")]
+    NSColor MediaPlayPauseButtonTintColor { get; }
+    [Selector("didReceiveNotification:")]
+    void DidReceiveNotification(UNNotification notification);
+    [Optional]
+    [Selector("didReceiveNotificationResponse:completionHandler:")]
+    void DidReceiveNotificationResponseCompletionHandler(UNNotificationResponse response, UNNotificationContentExtensionDidReceiveNotificationResponseCompletionHandlerCompletionBlock completion);
+    [Optional]
+    [Selector("mediaPlay")]
+    void MediaPlay();
+    [Optional]
+    [Selector("mediaPause")]
+    void MediaPause();
 }
 
 /// UNNotificationContentExtension, a category of NSExtensionContext.
 public extern objc class NSExtensionContext
 {
-    [Selector("notificationActions", "setNotificationActions:")] public NSArray NotificationActions { get; set; }
-    [Selector("performNotificationDefaultAction")] public void PerformNotificationDefaultAction();
-    [Selector("dismissNotificationContentExtension")] public void DismissNotificationContentExtension();
-    [Selector("mediaPlayingStarted")] public void MediaPlayingStarted();
-    [Selector("mediaPlayingPaused")] public void MediaPlayingPaused();
+    [Selector("notificationActions", "setNotificationActions:")]
+    public NSArray NotificationActions { get; set; }
+    [Selector("performNotificationDefaultAction")]
+    public void PerformNotificationDefaultAction();
+    [Selector("dismissNotificationContentExtension")]
+    public void DismissNotificationContentExtension();
+    [Selector("mediaPlayingStarted")]
+    public void MediaPlayingStarted();
+    [Selector("mediaPlayingPaused")]
+    public void MediaPlayingPaused();
 }
 
 #endif

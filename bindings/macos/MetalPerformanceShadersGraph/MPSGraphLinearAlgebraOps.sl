@@ -34,8 +34,10 @@ import Standard.ObjC;
 /// MPSGraphLinearAlgebraOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("bandPartWithTensor:numLower:numUpper:name:")] public MPSGraphTensor BandPartWithTensorNumLowerNumUpperName(MPSGraphTensor inputTensor, NSInteger numLower, NSInteger numUpper, NSString? name);
-    [Selector("bandPartWithTensor:numLowerTensor:numUpperTensor:name:")] public MPSGraphTensor BandPartWithTensorNumLowerTensorNumUpperTensorName(MPSGraphTensor inputTensor, MPSGraphTensor numLowerTensor, MPSGraphTensor numUpperTensor, NSString? name);
+    [Selector("bandPartWithTensor:numLower:numUpper:name:")]
+    public MPSGraphTensor BandPartWithTensorNumLowerNumUpperName(MPSGraphTensor inputTensor, NSInteger numLower, NSInteger numUpper, NSString? name);
+    [Selector("bandPartWithTensor:numLowerTensor:numUpperTensor:name:")]
+    public MPSGraphTensor BandPartWithTensorNumLowerTensorNumUpperTensorName(MPSGraphTensor inputTensor, MPSGraphTensor numLowerTensor, MPSGraphTensor numUpperTensor, NSString? name);
 }
 
 #endif

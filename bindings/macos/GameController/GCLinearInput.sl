@@ -35,15 +35,23 @@ public objc closure void GCLinearInputValueDidChangeHandlerBlock(GCPhysicalInput
 
 public objc interface GCLinearInput : NSObjectProtocol
 {
-    [Selector("valueDidChangeHandler", "setValueDidChangeHandler:")] GCLinearInputValueDidChangeHandlerBlock? ValueDidChangeHandler { get; set; }
-    [Selector("value")] float Value { get; }
-    [Selector("isAnalog")] bool Analog { get; }
-    [Selector("canWrap")] bool CanWrap { get; }
-    [Selector("lastValueTimestamp")] NSTimeInterval LastValueTimestamp { get; }
-    [Selector("lastValueLatency")] NSTimeInterval LastValueLatency { get; }
+    [Selector("valueDidChangeHandler", "setValueDidChangeHandler:")]
+    GCLinearInputValueDidChangeHandlerBlock? ValueDidChangeHandler { get; set; }
+    [Selector("value")]
+    float Value { get; }
+    [Selector("isAnalog")]
+    bool Analog { get; }
+    [Selector("canWrap")]
+    bool CanWrap { get; }
+    [Selector("lastValueTimestamp")]
+    NSTimeInterval LastValueTimestamp { get; }
+    [Selector("lastValueLatency")]
+    NSTimeInterval LastValueLatency { get; }
     /// macOS 26.2 and later.
-    [Selector("physicalExtents")] GCPhysicalInputExtents? PhysicalExtents { get; }
-    [Selector("sources")] NSSet Sources { get; }
+    [Selector("physicalExtents")]
+    GCPhysicalInputExtents? PhysicalExtents { get; }
+    [Selector("sources")]
+    NSSet Sources { get; }
 }
 
 #endif

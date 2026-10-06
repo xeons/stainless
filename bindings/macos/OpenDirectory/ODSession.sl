@@ -42,17 +42,28 @@ public extern "C" NSString? ODSessionProxyPassword;
 
 public extern objc class ODSession : NSObject
 {
-    [Selector("configurationTemplateNames")] public NSArray? ConfigurationTemplateNames { get; }
-    [Selector("mappingTemplateNames")] public NSArray? MappingTemplateNames { get; }
-    [Selector("defaultSession")] public static ODSession? DefaultSession();
-    [Selector("sessionWithOptions:error:")] public static Self? SessionWithOptionsError(NSDictionary? inOptions, out NSError? outError);
-    [Selector("initWithOptions:error:")] public Self? InitWithOptionsError(NSDictionary? inOptions, out NSError? outError);
-    [Selector("nodeNamesAndReturnError:")] public NSArray? NodeNamesAndReturnError(out NSError? outError);
-    [Selector("configurationAuthorizationAllowingUserInteraction:error:")] public SFAuthorization? ConfigurationAuthorizationAllowingUserInteractionError(bool allowInteraction, out NSError? error);
-    [Selector("configurationForNodename:")] public ODConfiguration? ConfigurationForNodename(NSString? nodename);
-    [Selector("addConfiguration:authorization:error:")] public bool AddConfigurationAuthorizationError(ODConfiguration? configuration, SFAuthorization? authorization, out NSError? error);
-    [Selector("deleteConfiguration:authorization:error:")] public bool DeleteConfigurationAuthorizationError(ODConfiguration? configuration, SFAuthorization? authorization, out NSError? error);
-    [Selector("deleteConfigurationWithNodename:authorization:error:")] public bool DeleteConfigurationWithNodenameAuthorizationError(NSString? nodename, SFAuthorization? authorization, out NSError? error);
+    [Selector("configurationTemplateNames")]
+    public NSArray? ConfigurationTemplateNames { get; }
+    [Selector("mappingTemplateNames")]
+    public NSArray? MappingTemplateNames { get; }
+    [Selector("defaultSession")]
+    public static ODSession? DefaultSession();
+    [Selector("sessionWithOptions:error:")]
+    public static Self? SessionWithOptionsError(NSDictionary? inOptions, out NSError? outError);
+    [Selector("initWithOptions:error:")]
+    public Self? InitWithOptionsError(NSDictionary? inOptions, out NSError? outError);
+    [Selector("nodeNamesAndReturnError:")]
+    public NSArray? NodeNamesAndReturnError(out NSError? outError);
+    [Selector("configurationAuthorizationAllowingUserInteraction:error:")]
+    public SFAuthorization? ConfigurationAuthorizationAllowingUserInteractionError(bool allowInteraction, out NSError? error);
+    [Selector("configurationForNodename:")]
+    public ODConfiguration? ConfigurationForNodename(NSString? nodename);
+    [Selector("addConfiguration:authorization:error:")]
+    public bool AddConfigurationAuthorizationError(ODConfiguration? configuration, SFAuthorization? authorization, out NSError? error);
+    [Selector("deleteConfiguration:authorization:error:")]
+    public bool DeleteConfigurationAuthorizationError(ODConfiguration? configuration, SFAuthorization? authorization, out NSError? error);
+    [Selector("deleteConfigurationWithNodename:authorization:error:")]
+    public bool DeleteConfigurationWithNodenameAuthorizationError(NSString? nodename, SFAuthorization? authorization, out NSError? error);
 }
 
 #endif

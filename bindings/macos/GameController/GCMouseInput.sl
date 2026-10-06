@@ -32,12 +32,18 @@ import Standard.ObjC;
 
 public extern objc class GCMouseInput : GCPhysicalInputProfile
 {
-    [Selector("mouseMovedHandler", "setMouseMovedHandler:")] public GCMouseMoved? MouseMovedHandler { get; set; }
-    [Selector("scroll")] public GCDeviceCursor Scroll { get; }
-    [Selector("leftButton")] public GCControllerButtonInput LeftButton { get; }
-    [Selector("rightButton")] public GCControllerButtonInput? RightButton { get; }
-    [Selector("middleButton")] public GCControllerButtonInput? MiddleButton { get; }
-    [Selector("auxiliaryButtons")] public NSArray? AuxiliaryButtons { get; }
+    [Selector("mouseMovedHandler", "setMouseMovedHandler:")]
+    public GCMouseMoved? MouseMovedHandler { get; set; }
+    [Selector("scroll")]
+    public GCDeviceCursor Scroll { get; }
+    [Selector("leftButton")]
+    public GCControllerButtonInput LeftButton { get; }
+    [Selector("rightButton")]
+    public GCControllerButtonInput? RightButton { get; }
+    [Selector("middleButton")]
+    public GCControllerButtonInput? MiddleButton { get; }
+    [Selector("auxiliaryButtons")]
+    public NSArray? AuxiliaryButtons { get; }
 }
 
 public objc closure void GCMouseMoved(GCMouseInput arg0, float arg1, float arg2);

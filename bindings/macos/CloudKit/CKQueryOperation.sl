@@ -43,18 +43,29 @@ public objc closure void CKQueryOperationQueryCompletionBlock(CKQueryCursor? arg
 
 public extern objc class CKQueryOperation : CKDatabaseOperation
 {
-    [Selector("query", "setQuery:")] public CKQuery? Query { get; set; }
-    [Selector("cursor", "setCursor:")] public CKQueryCursor? Cursor { get; set; }
-    [Selector("zoneID", "setZoneID:")] public CKRecordZoneID? ZoneID { get; set; }
-    [Selector("resultsLimit", "setResultsLimit:")] public NSUInteger ResultsLimit { get; set; }
-    [Selector("desiredKeys", "setDesiredKeys:")] public NSArray? DesiredKeys { get; set; }
+    [Selector("query", "setQuery:")]
+    public CKQuery? Query { get; set; }
+    [Selector("cursor", "setCursor:")]
+    public CKQueryCursor? Cursor { get; set; }
+    [Selector("zoneID", "setZoneID:")]
+    public CKRecordZoneID? ZoneID { get; set; }
+    [Selector("resultsLimit", "setResultsLimit:")]
+    public NSUInteger ResultsLimit { get; set; }
+    [Selector("desiredKeys", "setDesiredKeys:")]
+    public NSArray? DesiredKeys { get; set; }
     /// Deprecated in macOS 12.0.
-    [Selector("recordFetchedBlock", "setRecordFetchedBlock:")] public CKQueryOperationRecordFetchedBlock? RecordFetchedBlock { get; set; }
-    [Selector("recordMatchedBlock", "setRecordMatchedBlock:")] public CKQueryOperationRecordMatchedBlock? RecordMatchedBlock { get; set; }
-    [Selector("queryCompletionBlock", "setQueryCompletionBlock:")] public CKQueryOperationQueryCompletionBlock? QueryCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithQuery:")] public Self InitWithQuery(CKQuery query);
-    [Selector("initWithCursor:")] public Self InitWithCursor(CKQueryCursor cursor);
+    [Selector("recordFetchedBlock", "setRecordFetchedBlock:")]
+    public CKQueryOperationRecordFetchedBlock? RecordFetchedBlock { get; set; }
+    [Selector("recordMatchedBlock", "setRecordMatchedBlock:")]
+    public CKQueryOperationRecordMatchedBlock? RecordMatchedBlock { get; set; }
+    [Selector("queryCompletionBlock", "setQueryCompletionBlock:")]
+    public CKQueryOperationQueryCompletionBlock? QueryCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithQuery:")]
+    public Self InitWithQuery(CKQuery query);
+    [Selector("initWithCursor:")]
+    public Self InitWithCursor(CKQueryCursor cursor);
 }
 
 #endif

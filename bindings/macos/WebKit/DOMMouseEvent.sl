@@ -33,30 +33,48 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMMouseEvent : DOMUIEvent
 {
-    [Selector("screenX")] public int ScreenX { get; }
-    [Selector("screenY")] public int ScreenY { get; }
-    [Selector("clientX")] public int ClientX { get; }
-    [Selector("clientY")] public int ClientY { get; }
-    [Selector("ctrlKey")] public bool CtrlKey { get; }
-    [Selector("shiftKey")] public bool ShiftKey { get; }
-    [Selector("altKey")] public bool AltKey { get; }
-    [Selector("metaKey")] public bool MetaKey { get; }
-    [Selector("button")] public short Button { get; }
-    [Selector("relatedTarget")] public DOMEventTarget? RelatedTarget { get; }
-    [Selector("offsetX")] public int OffsetX { get; }
-    [Selector("offsetY")] public int OffsetY { get; }
-    [Selector("x")] public int X { get; }
-    [Selector("y")] public int Y { get; }
-    [Selector("fromElement")] public DOMNode? FromElement { get; }
-    [Selector("toElement")] public DOMNode? ToElement { get; }
-    [Selector("initMouseEvent:canBubble:cancelable:view:detail:screenX:screenY:clientX:clientY:ctrlKey:altKey:shiftKey:metaKey:button:relatedTarget:")] public void InitMouseEventCanBubbleCancelableViewDetailScreenXScreenYClientXClientYCtrlKeyAltKeyShiftKeyMetaKeyButtonRelatedTarget(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, int detail, int screenX, int screenY, int clientX, int clientY, bool ctrlKey, bool altKey, bool shiftKey, bool metaKey, ushort button, DOMEventTarget? relatedTarget);
+    [Selector("screenX")]
+    public int ScreenX { get; }
+    [Selector("screenY")]
+    public int ScreenY { get; }
+    [Selector("clientX")]
+    public int ClientX { get; }
+    [Selector("clientY")]
+    public int ClientY { get; }
+    [Selector("ctrlKey")]
+    public bool CtrlKey { get; }
+    [Selector("shiftKey")]
+    public bool ShiftKey { get; }
+    [Selector("altKey")]
+    public bool AltKey { get; }
+    [Selector("metaKey")]
+    public bool MetaKey { get; }
+    [Selector("button")]
+    public short Button { get; }
+    [Selector("relatedTarget")]
+    public DOMEventTarget? RelatedTarget { get; }
+    [Selector("offsetX")]
+    public int OffsetX { get; }
+    [Selector("offsetY")]
+    public int OffsetY { get; }
+    [Selector("x")]
+    public int X { get; }
+    [Selector("y")]
+    public int Y { get; }
+    [Selector("fromElement")]
+    public DOMNode? FromElement { get; }
+    [Selector("toElement")]
+    public DOMNode? ToElement { get; }
+    [Selector("initMouseEvent:canBubble:cancelable:view:detail:screenX:screenY:clientX:clientY:ctrlKey:altKey:shiftKey:metaKey:button:relatedTarget:")]
+    public void InitMouseEventCanBubbleCancelableViewDetailScreenXScreenYClientXClientYCtrlKeyAltKeyShiftKeyMetaKeyButtonRelatedTarget(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, int detail, int screenX, int screenY, int clientX, int clientY, bool ctrlKey, bool altKey, bool shiftKey, bool metaKey, ushort button, DOMEventTarget? relatedTarget);
 }
 
 /// DOMMouseEventDeprecated, a category of DOMMouseEvent.
 public extern objc class DOMMouseEvent
 {
     /// Deprecated in macOS 10.5.
-    [Selector("initMouseEvent:::::::::::::::")] public void InitMouseEvent(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, int detail, int screenX, int screenY, int clientX, int clientY, bool ctrlKey, bool altKey, bool shiftKey, bool metaKey, ushort button, DOMEventTarget? relatedTarget);
+    [Selector("initMouseEvent:::::::::::::::")]
+    public void InitMouseEvent(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, int detail, int screenX, int screenY, int clientX, int clientY, bool ctrlKey, bool altKey, bool shiftKey, bool metaKey, ushort button, DOMEventTarget? relatedTarget);
 }
 
 #endif

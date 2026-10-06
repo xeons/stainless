@@ -33,46 +33,71 @@ import Standard.ObjC;
 
 public extern objc class UTType : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("preferredFilenameExtension")] public NSString? PreferredFilenameExtension { get; }
-    [Selector("preferredMIMEType")] public NSString? PreferredMIMEType { get; }
-    [Selector("localizedDescription")] public NSString? LocalizedDescription { get; }
-    [Selector("version")] public NSNumber? Version { get; }
-    [Selector("referenceURL")] public NSURL? ReferenceURL { get; }
-    [Selector("isDynamic")] public bool Dynamic { get; }
-    [Selector("isDeclared")] public bool Declared { get; }
-    [Selector("isPublicType")] public bool PublicType { get; }
-    [Selector("typeWithIdentifier:")] public static Self? TypeWithIdentifier(NSString identifier);
-    [Selector("typeWithFilenameExtension:")] public static Self? TypeWithFilenameExtension(NSString filenameExtension);
-    [Selector("typeWithFilenameExtension:conformingToType:")] public static Self? TypeWithFilenameExtensionConformingToType(NSString filenameExtension, UTType supertype);
-    [Selector("typeWithMIMEType:")] public static Self? TypeWithMIMEType(NSString mimeType);
-    [Selector("typeWithMIMEType:conformingToType:")] public static Self? TypeWithMIMETypeConformingToType(NSString mimeType, UTType supertype);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("preferredFilenameExtension")]
+    public NSString? PreferredFilenameExtension { get; }
+    [Selector("preferredMIMEType")]
+    public NSString? PreferredMIMEType { get; }
+    [Selector("localizedDescription")]
+    public NSString? LocalizedDescription { get; }
+    [Selector("version")]
+    public NSNumber? Version { get; }
+    [Selector("referenceURL")]
+    public NSURL? ReferenceURL { get; }
+    [Selector("isDynamic")]
+    public bool Dynamic { get; }
+    [Selector("isDeclared")]
+    public bool Declared { get; }
+    [Selector("isPublicType")]
+    public bool PublicType { get; }
+    [Selector("typeWithIdentifier:")]
+    public static Self? TypeWithIdentifier(NSString identifier);
+    [Selector("typeWithFilenameExtension:")]
+    public static Self? TypeWithFilenameExtension(NSString filenameExtension);
+    [Selector("typeWithFilenameExtension:conformingToType:")]
+    public static Self? TypeWithFilenameExtensionConformingToType(NSString filenameExtension, UTType supertype);
+    [Selector("typeWithMIMEType:")]
+    public static Self? TypeWithMIMEType(NSString mimeType);
+    [Selector("typeWithMIMEType:conformingToType:")]
+    public static Self? TypeWithMIMETypeConformingToType(NSString mimeType, UTType supertype);
 }
 
 /// Conformance, a category of UTType.
 public extern objc class UTType
 {
-    [Selector("supertypes")] public NSSet Supertypes { get; }
-    [Selector("conformsToType:")] public bool ConformsToType(UTType type);
-    [Selector("isSupertypeOfType:")] public bool IsSupertypeOfType(UTType type);
-    [Selector("isSubtypeOfType:")] public bool IsSubtypeOfType(UTType type);
+    [Selector("supertypes")]
+    public NSSet Supertypes { get; }
+    [Selector("conformsToType:")]
+    public bool ConformsToType(UTType type);
+    [Selector("isSupertypeOfType:")]
+    public bool IsSupertypeOfType(UTType type);
+    [Selector("isSubtypeOfType:")]
+    public bool IsSubtypeOfType(UTType type);
 }
 
 /// UTTagSpecification, a category of UTType.
 public extern objc class UTType
 {
-    [Selector("tags")] public NSDictionary Tags { get; }
-    [Selector("typeWithTag:tagClass:conformingToType:")] public static Self? TypeWithTagTagClassConformingToType(NSString tag, NSString tagClass, UTType? supertype);
-    [Selector("typesWithTag:tagClass:conformingToType:")] public static NSArray TypesWithTagTagClassConformingToType(NSString tag, NSString tagClass, UTType? supertype);
+    [Selector("tags")]
+    public NSDictionary Tags { get; }
+    [Selector("typeWithTag:tagClass:conformingToType:")]
+    public static Self? TypeWithTagTagClassConformingToType(NSString tag, NSString tagClass, UTType? supertype);
+    [Selector("typesWithTag:tagClass:conformingToType:")]
+    public static NSArray TypesWithTagTagClassConformingToType(NSString tag, NSString tagClass, UTType? supertype);
 }
 
 /// LocalConstants, a category of UTType.
 public extern objc class UTType
 {
-    [Selector("exportedTypeWithIdentifier:")] public static UTType ExportedTypeWithIdentifier(NSString identifier);
-    [Selector("exportedTypeWithIdentifier:conformingToType:")] public static UTType ExportedTypeWithIdentifierConformingToType(NSString identifier, UTType parentType);
-    [Selector("importedTypeWithIdentifier:")] public static UTType ImportedTypeWithIdentifier(NSString identifier);
-    [Selector("importedTypeWithIdentifier:conformingToType:")] public static UTType ImportedTypeWithIdentifierConformingToType(NSString identifier, UTType parentType);
+    [Selector("exportedTypeWithIdentifier:")]
+    public static UTType ExportedTypeWithIdentifier(NSString identifier);
+    [Selector("exportedTypeWithIdentifier:conformingToType:")]
+    public static UTType ExportedTypeWithIdentifierConformingToType(NSString identifier, UTType parentType);
+    [Selector("importedTypeWithIdentifier:")]
+    public static UTType ImportedTypeWithIdentifier(NSString identifier);
+    [Selector("importedTypeWithIdentifier:conformingToType:")]
+    public static UTType ImportedTypeWithIdentifierConformingToType(NSString identifier, UTType parentType);
 }
 
 #endif

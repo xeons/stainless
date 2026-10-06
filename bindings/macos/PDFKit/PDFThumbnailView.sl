@@ -36,14 +36,22 @@ public extern "C" NSString? PDFThumbnailViewDocumentEditedNotification;
 
 public extern objc class PDFThumbnailView : NSView, NSCoding
 {
-    [Selector("PDFView", "setPDFView:")] public PDFView? PDFView { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("selectedPages")] public NSArray? SelectedPages { get; }
-    [Selector("thumbnailSize", "setThumbnailSize:")] public NSSize ThumbnailSize { get; set; }
-    [Selector("maximumNumberOfColumns", "setMaximumNumberOfColumns:")] public NSUInteger MaximumNumberOfColumns { get; set; }
-    [Selector("labelFont", "setLabelFont:")] public NSFont? LabelFont { get; set; }
-    [Selector("allowsDragging", "setAllowsDragging:")] public bool AllowsDragging { get; set; }
-    [Selector("allowsMultipleSelection", "setAllowsMultipleSelection:")] public bool AllowsMultipleSelection { get; set; }
+    [Selector("PDFView", "setPDFView:")]
+    public PDFView? PDFView { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("selectedPages")]
+    public NSArray? SelectedPages { get; }
+    [Selector("thumbnailSize", "setThumbnailSize:")]
+    public NSSize ThumbnailSize { get; set; }
+    [Selector("maximumNumberOfColumns", "setMaximumNumberOfColumns:")]
+    public NSUInteger MaximumNumberOfColumns { get; set; }
+    [Selector("labelFont", "setLabelFont:")]
+    public NSFont? LabelFont { get; set; }
+    [Selector("allowsDragging", "setAllowsDragging:")]
+    public bool AllowsDragging { get; set; }
+    [Selector("allowsMultipleSelection", "setAllowsMultipleSelection:")]
+    public bool AllowsMultipleSelection { get; set; }
 }
 
 #endif

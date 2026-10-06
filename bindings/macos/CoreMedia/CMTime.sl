@@ -106,7 +106,8 @@ public extern "C" CMTime CMTimeMaximum(CMTime time1, CMTime time2);
 
 public extern "C" CMTime CMTimeAbsoluteValue(CMTime time);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CMTimeCopyAsDictionary(CMTime time, CFAllocatorRef? allocator);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CMTimeCopyAsDictionary(CMTime time, CFAllocatorRef? allocator);
 
 public extern "C" CMTime CMTimeMakeFromDictionary(CFDictionaryRef? dictionaryRepresentation);
 
@@ -118,7 +119,8 @@ public extern "C" CFStringRef kCMTimeEpochKey;
 
 public extern "C" CFStringRef kCMTimeFlagsKey;
 
-[ReturnsRetained] public extern "C" CFStringRef? CMTimeCopyDescription(CFAllocatorRef? allocator, CMTime time);
+[ReturnsRetained]
+public extern "C" CFStringRef? CMTimeCopyDescription(CFAllocatorRef? allocator, CMTime time);
 
 public extern "C" void CMTimeShow(CMTime time);
 

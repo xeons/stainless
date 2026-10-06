@@ -52,63 +52,97 @@ public extern "C" NSString AVAssetDownloadTaskPrefersHDRKey;
 
 public extern objc class AVAssetDownloadTask : NSURLSessionTask
 {
-    [Selector("URLAsset")] public AVURLAsset URLAsset { get; }
+    [Selector("URLAsset")]
+    public AVURLAsset URLAsset { get; }
     /// Deprecated in macOS 100000.
-    [Selector("options")] public NSDictionary? Options { get; }
+    [Selector("options")]
+    public NSDictionary? Options { get; }
     /// Deprecated in macOS 100000.
-    [Selector("loadedTimeRanges")] public NSArray LoadedTimeRanges { get; }
+    [Selector("loadedTimeRanges")]
+    public NSArray LoadedTimeRanges { get; }
 }
 
 public extern objc class AVAssetDownloadConfiguration : NSObject
 {
-    [Selector("artworkData", "setArtworkData:")] public NSData? ArtworkData { get; set; }
-    [Selector("primaryContentConfiguration")] public AVAssetDownloadContentConfiguration PrimaryContentConfiguration { get; }
-    [Selector("auxiliaryContentConfigurations", "setAuxiliaryContentConfigurations:")] public NSArray AuxiliaryContentConfigurations { get; set; }
-    [Selector("optimizesAuxiliaryContentConfigurations", "setOptimizesAuxiliaryContentConfigurations:")] public bool OptimizesAuxiliaryContentConfigurations { get; set; }
-    [Selector("downloadConfigurationWithAsset:title:")] public static Self DownloadConfigurationWithAssetTitle(AVURLAsset asset, NSString title);
+    [Selector("artworkData", "setArtworkData:")]
+    public NSData? ArtworkData { get; set; }
+    [Selector("primaryContentConfiguration")]
+    public AVAssetDownloadContentConfiguration PrimaryContentConfiguration { get; }
+    [Selector("auxiliaryContentConfigurations", "setAuxiliaryContentConfigurations:")]
+    public NSArray AuxiliaryContentConfigurations { get; set; }
+    [Selector("optimizesAuxiliaryContentConfigurations", "setOptimizesAuxiliaryContentConfigurations:")]
+    public bool OptimizesAuxiliaryContentConfigurations { get; set; }
+    [Selector("downloadConfigurationWithAsset:title:")]
+    public static Self DownloadConfigurationWithAssetTitle(AVURLAsset asset, NSString title);
     /// macOS 15.4 and later.
-    [Selector("setInterstitialMediaSelectionCriteria:forMediaCharacteristic:")] public void SetInterstitialMediaSelectionCriteriaForMediaCharacteristic(NSArray criteria, AVMediaCharacteristic mediaCharacteristic);
+    [Selector("setInterstitialMediaSelectionCriteria:forMediaCharacteristic:")]
+    public void SetInterstitialMediaSelectionCriteriaForMediaCharacteristic(NSArray criteria, AVMediaCharacteristic mediaCharacteristic);
 }
 
 public extern objc class AVAssetDownloadContentConfiguration : NSObject, NSCopying
 {
-    [Selector("variantQualifiers", "setVariantQualifiers:")] public NSArray VariantQualifiers { get; set; }
-    [Selector("mediaSelections", "setMediaSelections:")] public NSArray MediaSelections { get; set; }
+    [Selector("variantQualifiers", "setVariantQualifiers:")]
+    public NSArray VariantQualifiers { get; set; }
+    [Selector("mediaSelections", "setMediaSelections:")]
+    public NSArray MediaSelections { get; set; }
 }
 
 /// Deprecated in macOS 100000.
 public extern objc class AVAggregateAssetDownloadTask : NSURLSessionTask
 {
-    [Selector("URLAsset")] public AVURLAsset URLAsset { get; }
+    [Selector("URLAsset")]
+    public AVURLAsset URLAsset { get; }
 }
 
 public objc interface AVAssetDownloadDelegate : NSURLSessionTaskDelegate
 {
     /// Deprecated in macOS 100000.
-    [Optional] [Selector("URLSession:assetDownloadTask:didFinishDownloadingToURL:")] void URLSessionAssetDownloadTaskDidFinishDownloadingToURL(NSURLSession session, AVAssetDownloadTask assetDownloadTask, NSURL location);
+    [Optional]
+    [Selector("URLSession:assetDownloadTask:didFinishDownloadingToURL:")]
+    void URLSessionAssetDownloadTaskDidFinishDownloadingToURL(NSURLSession session, AVAssetDownloadTask assetDownloadTask, NSURL location);
     /// Deprecated in macOS 100000.
-    [Optional] [Selector("URLSession:assetDownloadTask:didLoadTimeRange:totalTimeRangesLoaded:timeRangeExpectedToLoad:")] void URLSessionAssetDownloadTaskDidLoadTimeRangeTotalTimeRangesLoadedTimeRangeExpectedToLoad(NSURLSession session, AVAssetDownloadTask assetDownloadTask, CMTimeRange timeRange, NSArray loadedTimeRanges, CMTimeRange timeRangeExpectedToLoad);
-    [Optional] [Selector("URLSession:assetDownloadTask:didResolveMediaSelection:")] void URLSessionAssetDownloadTaskDidResolveMediaSelection(NSURLSession session, AVAssetDownloadTask assetDownloadTask, AVMediaSelection resolvedMediaSelection);
-    [Optional] [Selector("URLSession:assetDownloadTask:willDownloadToURL:")] void URLSessionAssetDownloadTaskWillDownloadToURL(NSURLSession session, AVAssetDownloadTask assetDownloadTask, NSURL location);
+    [Optional]
+    [Selector("URLSession:assetDownloadTask:didLoadTimeRange:totalTimeRangesLoaded:timeRangeExpectedToLoad:")]
+    void URLSessionAssetDownloadTaskDidLoadTimeRangeTotalTimeRangesLoadedTimeRangeExpectedToLoad(NSURLSession session, AVAssetDownloadTask assetDownloadTask, CMTimeRange timeRange, NSArray loadedTimeRanges, CMTimeRange timeRangeExpectedToLoad);
+    [Optional]
+    [Selector("URLSession:assetDownloadTask:didResolveMediaSelection:")]
+    void URLSessionAssetDownloadTaskDidResolveMediaSelection(NSURLSession session, AVAssetDownloadTask assetDownloadTask, AVMediaSelection resolvedMediaSelection);
+    [Optional]
+    [Selector("URLSession:assetDownloadTask:willDownloadToURL:")]
+    void URLSessionAssetDownloadTaskWillDownloadToURL(NSURLSession session, AVAssetDownloadTask assetDownloadTask, NSURL location);
     /// Deprecated in macOS 100000.
-    [Optional] [Selector("URLSession:aggregateAssetDownloadTask:willDownloadToURL:")] void URLSessionAggregateAssetDownloadTaskWillDownloadToURL(NSURLSession session, AVAggregateAssetDownloadTask aggregateAssetDownloadTask, NSURL location);
+    [Optional]
+    [Selector("URLSession:aggregateAssetDownloadTask:willDownloadToURL:")]
+    void URLSessionAggregateAssetDownloadTaskWillDownloadToURL(NSURLSession session, AVAggregateAssetDownloadTask aggregateAssetDownloadTask, NSURL location);
     /// Deprecated in macOS 100000.
-    [Optional] [Selector("URLSession:aggregateAssetDownloadTask:didCompleteForMediaSelection:")] void URLSessionAggregateAssetDownloadTaskDidCompleteForMediaSelection(NSURLSession session, AVAggregateAssetDownloadTask aggregateAssetDownloadTask, AVMediaSelection mediaSelection);
+    [Optional]
+    [Selector("URLSession:aggregateAssetDownloadTask:didCompleteForMediaSelection:")]
+    void URLSessionAggregateAssetDownloadTaskDidCompleteForMediaSelection(NSURLSession session, AVAggregateAssetDownloadTask aggregateAssetDownloadTask, AVMediaSelection mediaSelection);
     /// Deprecated in macOS 100000.
-    [Optional] [Selector("URLSession:aggregateAssetDownloadTask:didLoadTimeRange:totalTimeRangesLoaded:timeRangeExpectedToLoad:forMediaSelection:")] void URLSessionAggregateAssetDownloadTaskDidLoadTimeRangeTotalTimeRangesLoadedTimeRangeExpectedToLoadForMediaSelection(NSURLSession session, AVAggregateAssetDownloadTask aggregateAssetDownloadTask, CMTimeRange timeRange, NSArray loadedTimeRanges, CMTimeRange timeRangeExpectedToLoad, AVMediaSelection mediaSelection);
-    [Optional] [Selector("URLSession:assetDownloadTask:willDownloadVariants:")] void URLSessionAssetDownloadTaskWillDownloadVariants(NSURLSession session, AVAssetDownloadTask assetDownloadTask, NSArray variants);
+    [Optional]
+    [Selector("URLSession:aggregateAssetDownloadTask:didLoadTimeRange:totalTimeRangesLoaded:timeRangeExpectedToLoad:forMediaSelection:")]
+    void URLSessionAggregateAssetDownloadTaskDidLoadTimeRangeTotalTimeRangesLoadedTimeRangeExpectedToLoadForMediaSelection(NSURLSession session, AVAggregateAssetDownloadTask aggregateAssetDownloadTask, CMTimeRange timeRange, NSArray loadedTimeRanges, CMTimeRange timeRangeExpectedToLoad, AVMediaSelection mediaSelection);
+    [Optional]
+    [Selector("URLSession:assetDownloadTask:willDownloadVariants:")]
+    void URLSessionAssetDownloadTaskWillDownloadVariants(NSURLSession session, AVAssetDownloadTask assetDownloadTask, NSArray variants);
     /// macOS 26.0 and later.
-    [Optional] [Selector("URLSession:assetDownloadTask:didReceiveMetricEvent:")] void URLSessionAssetDownloadTaskDidReceiveMetricEvent(NSURLSession session, AVAssetDownloadTask assetDownloadTask, AVMetricEvent metricEvent);
+    [Optional]
+    [Selector("URLSession:assetDownloadTask:didReceiveMetricEvent:")]
+    void URLSessionAssetDownloadTaskDidReceiveMetricEvent(NSURLSession session, AVAssetDownloadTask assetDownloadTask, AVMetricEvent metricEvent);
 }
 
 public extern objc class AVAssetDownloadURLSession : NSURLSession
 {
-    [Selector("sessionWithConfiguration:assetDownloadDelegate:delegateQueue:")] public static AVAssetDownloadURLSession SessionWithConfigurationAssetDownloadDelegateDelegateQueue(NSURLSessionConfiguration configuration, AVAssetDownloadDelegate? @delegate, NSOperationQueue? delegateQueue);
+    [Selector("sessionWithConfiguration:assetDownloadDelegate:delegateQueue:")]
+    public static AVAssetDownloadURLSession SessionWithConfigurationAssetDownloadDelegateDelegateQueue(NSURLSessionConfiguration configuration, AVAssetDownloadDelegate? @delegate, NSOperationQueue? delegateQueue);
     /// Deprecated in macOS 100000.
-    [Selector("assetDownloadTaskWithURLAsset:assetTitle:assetArtworkData:options:")] public AVAssetDownloadTask? AssetDownloadTaskWithURLAssetAssetTitleAssetArtworkDataOptions(AVURLAsset URLAsset, NSString title, NSData? artworkData, NSDictionary? options);
+    [Selector("assetDownloadTaskWithURLAsset:assetTitle:assetArtworkData:options:")]
+    public AVAssetDownloadTask? AssetDownloadTaskWithURLAssetAssetTitleAssetArtworkDataOptions(AVURLAsset URLAsset, NSString title, NSData? artworkData, NSDictionary? options);
     /// Deprecated in macOS 100000.
-    [Selector("aggregateAssetDownloadTaskWithURLAsset:mediaSelections:assetTitle:assetArtworkData:options:")] public AVAggregateAssetDownloadTask? AggregateAssetDownloadTaskWithURLAssetMediaSelectionsAssetTitleAssetArtworkDataOptions(AVURLAsset URLAsset, NSArray mediaSelections, NSString title, NSData? artworkData, NSDictionary? options);
-    [Selector("assetDownloadTaskWithConfiguration:")] public AVAssetDownloadTask AssetDownloadTaskWithConfiguration(AVAssetDownloadConfiguration downloadConfiguration);
+    [Selector("aggregateAssetDownloadTaskWithURLAsset:mediaSelections:assetTitle:assetArtworkData:options:")]
+    public AVAggregateAssetDownloadTask? AggregateAssetDownloadTaskWithURLAssetMediaSelectionsAssetTitleAssetArtworkDataOptions(AVURLAsset URLAsset, NSArray mediaSelections, NSString title, NSData? artworkData, NSDictionary? options);
+    [Selector("assetDownloadTaskWithConfiguration:")]
+    public AVAssetDownloadTask AssetDownloadTaskWithConfiguration(AVAssetDownloadConfiguration downloadConfiguration);
 }
 
 #endif

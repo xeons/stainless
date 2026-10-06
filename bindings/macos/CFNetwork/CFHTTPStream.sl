@@ -74,9 +74,11 @@ public extern "C" CFStringRef? kCFStreamPropertyHTTPAttemptPersistentConnection;
 public extern "C" CFStringRef? kCFStreamPropertyHTTPRequestBytesWrittenCount;
 
 /// Deprecated in macOS 10.11.
-[ReturnsRetained] public extern "C" CFReadStreamRef CFReadStreamCreateForHTTPRequest(CFAllocatorRef? alloc, CFHTTPMessageRef request);
+[ReturnsRetained]
+public extern "C" CFReadStreamRef CFReadStreamCreateForHTTPRequest(CFAllocatorRef? alloc, CFHTTPMessageRef request);
 
 /// Deprecated in macOS 10.11.
-[ReturnsRetained] public extern "C" CFReadStreamRef CFReadStreamCreateForStreamedHTTPRequest(CFAllocatorRef? alloc, CFHTTPMessageRef requestHeaders, CFReadStreamRef requestBody);
+[ReturnsRetained]
+public extern "C" CFReadStreamRef CFReadStreamCreateForStreamedHTTPRequest(CFAllocatorRef? alloc, CFHTTPMessageRef requestHeaders, CFReadStreamRef requestBody);
 
 #endif

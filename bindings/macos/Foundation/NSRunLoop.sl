@@ -37,15 +37,24 @@ public extern "C" NSRunLoopMode NSRunLoopCommonModes;
 
 public extern objc class NSRunLoop : NSObject
 {
-    [Selector("currentRunLoop")] public static NSRunLoop? CurrentRunLoop { get; }
-    [Selector("mainRunLoop")] public static NSRunLoop MainRunLoop { get; }
-    [Selector("currentMode")] public NSRunLoopMode? CurrentMode { get; }
-    [Selector("getCFRunLoop")] public CFRunLoopRef GetCFRunLoop();
-    [Selector("addTimer:forMode:")] public void AddTimerForMode(NSTimer timer, NSRunLoopMode mode);
-    [Selector("addPort:forMode:")] public void AddPortForMode(NSPort aPort, NSRunLoopMode mode);
-    [Selector("removePort:forMode:")] public void RemovePortForMode(NSPort aPort, NSRunLoopMode mode);
-    [Selector("limitDateForMode:")] public NSDate? LimitDateForMode(NSRunLoopMode mode);
-    [Selector("acceptInputForMode:beforeDate:")] public void AcceptInputForModeBeforeDate(NSRunLoopMode mode, NSDate limitDate);
+    [Selector("currentRunLoop")]
+    public static NSRunLoop? CurrentRunLoop { get; }
+    [Selector("mainRunLoop")]
+    public static NSRunLoop MainRunLoop { get; }
+    [Selector("currentMode")]
+    public NSRunLoopMode? CurrentMode { get; }
+    [Selector("getCFRunLoop")]
+    public CFRunLoopRef GetCFRunLoop();
+    [Selector("addTimer:forMode:")]
+    public void AddTimerForMode(NSTimer timer, NSRunLoopMode mode);
+    [Selector("addPort:forMode:")]
+    public void AddPortForMode(NSPort aPort, NSRunLoopMode mode);
+    [Selector("removePort:forMode:")]
+    public void RemovePortForMode(NSPort aPort, NSRunLoopMode mode);
+    [Selector("limitDateForMode:")]
+    public NSDate? LimitDateForMode(NSRunLoopMode mode);
+    [Selector("acceptInputForMode:beforeDate:")]
+    public void AcceptInputForModeBeforeDate(NSRunLoopMode mode, NSDate limitDate);
 }
 
 public objc closure void NSRunLoopPerformInModesBlockBlock();
@@ -55,30 +64,43 @@ public objc closure void NSRunLoopPerformBlockBlock();
 /// NSRunLoopConveniences, a category of NSRunLoop.
 public extern objc class NSRunLoop
 {
-    [Selector("run")] public void Run();
-    [Selector("runUntilDate:")] public void RunUntilDate(NSDate limitDate);
-    [Selector("runMode:beforeDate:")] public bool RunModeBeforeDate(NSRunLoopMode mode, NSDate limitDate);
+    [Selector("run")]
+    public void Run();
+    [Selector("runUntilDate:")]
+    public void RunUntilDate(NSDate limitDate);
+    [Selector("runMode:beforeDate:")]
+    public bool RunModeBeforeDate(NSRunLoopMode mode, NSDate limitDate);
     /// Deprecated in macOS 10.5.
-    [Selector("configureAsServer")] public void ConfigureAsServer();
-    [Selector("performInModes:block:")] public void PerformInModesBlock(NSArray modes, NSRunLoopPerformInModesBlockBlock block);
-    [Selector("performBlock:")] public void PerformBlock(NSRunLoopPerformBlockBlock block);
+    [Selector("configureAsServer")]
+    public void ConfigureAsServer();
+    [Selector("performInModes:block:")]
+    public void PerformInModesBlock(NSArray modes, NSRunLoopPerformInModesBlockBlock block);
+    [Selector("performBlock:")]
+    public void PerformBlock(NSRunLoopPerformBlockBlock block);
 }
 
 /// NSDelayedPerforming, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("performSelector:withObject:afterDelay:inModes:")] public void PerformSelectorWithObjectAfterDelayInModes(Selector aSelector, AnyObject? anArgument, NSTimeInterval delay, NSArray modes);
-    [Selector("performSelector:withObject:afterDelay:")] public void PerformSelectorWithObjectAfterDelay(Selector aSelector, AnyObject? anArgument, NSTimeInterval delay);
-    [Selector("cancelPreviousPerformRequestsWithTarget:selector:object:")] public static void CancelPreviousPerformRequestsWithTargetSelectorObject(AnyObject aTarget, Selector aSelector, AnyObject? anArgument);
-    [Selector("cancelPreviousPerformRequestsWithTarget:")] public static void CancelPreviousPerformRequestsWithTarget(AnyObject aTarget);
+    [Selector("performSelector:withObject:afterDelay:inModes:")]
+    public void PerformSelectorWithObjectAfterDelayInModes(Selector aSelector, AnyObject? anArgument, NSTimeInterval delay, NSArray modes);
+    [Selector("performSelector:withObject:afterDelay:")]
+    public void PerformSelectorWithObjectAfterDelay(Selector aSelector, AnyObject? anArgument, NSTimeInterval delay);
+    [Selector("cancelPreviousPerformRequestsWithTarget:selector:object:")]
+    public static void CancelPreviousPerformRequestsWithTargetSelectorObject(AnyObject aTarget, Selector aSelector, AnyObject? anArgument);
+    [Selector("cancelPreviousPerformRequestsWithTarget:")]
+    public static void CancelPreviousPerformRequestsWithTarget(AnyObject aTarget);
 }
 
 /// NSOrderedPerform, a category of NSRunLoop.
 public extern objc class NSRunLoop
 {
-    [Selector("performSelector:target:argument:order:modes:")] public void PerformSelectorTargetArgumentOrderModes(Selector aSelector, AnyObject target, AnyObject? arg, NSUInteger order, NSArray modes);
-    [Selector("cancelPerformSelector:target:argument:")] public void CancelPerformSelectorTargetArgument(Selector aSelector, AnyObject target, AnyObject? arg);
-    [Selector("cancelPerformSelectorsWithTarget:")] public void CancelPerformSelectorsWithTarget(AnyObject target);
+    [Selector("performSelector:target:argument:order:modes:")]
+    public void PerformSelectorTargetArgumentOrderModes(Selector aSelector, AnyObject target, AnyObject? arg, NSUInteger order, NSArray modes);
+    [Selector("cancelPerformSelector:target:argument:")]
+    public void CancelPerformSelectorTargetArgument(Selector aSelector, AnyObject target, AnyObject? arg);
+    [Selector("cancelPerformSelectorsWithTarget:")]
+    public void CancelPerformSelectorsWithTarget(AnyObject target);
 }
 
 #endif

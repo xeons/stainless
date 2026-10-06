@@ -96,125 +96,236 @@ public enum CACornerMask : ulong
 
 public extern objc class CALayer : NSObject, NSSecureCoding, CAMediaTiming
 {
-    [Selector("bounds", "setBounds:")] public CGRect Bounds { get; set; }
-    [Selector("position", "setPosition:")] public CGPoint Position { get; set; }
-    [Selector("zPosition", "setZPosition:")] public CGFloat ZPosition { get; set; }
-    [Selector("anchorPoint", "setAnchorPoint:")] public CGPoint AnchorPoint { get; set; }
-    [Selector("anchorPointZ", "setAnchorPointZ:")] public CGFloat AnchorPointZ { get; set; }
-    [Selector("transform", "setTransform:")] public CATransform3D Transform { get; set; }
-    [Selector("frame", "setFrame:")] public CGRect Frame { get; set; }
-    [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
-    [Selector("isDoubleSided", "setDoubleSided:")] public bool DoubleSided { get; set; }
-    [Selector("isGeometryFlipped", "setGeometryFlipped:")] public bool GeometryFlipped { get; set; }
-    [Selector("superlayer")] public CALayer? Superlayer { get; }
-    [Selector("sublayers", "setSublayers:")] public NSArray? Sublayers { get; set; }
-    [Selector("sublayerTransform", "setSublayerTransform:")] public CATransform3D SublayerTransform { get; set; }
-    [Selector("mask", "setMask:")] public CALayer? Mask { get; set; }
-    [Selector("masksToBounds", "setMasksToBounds:")] public bool MasksToBounds { get; set; }
-    [Selector("contents", "setContents:")] public AnyObject? Contents { get; set; }
-    [Selector("contentsRect", "setContentsRect:")] public CGRect ContentsRect { get; set; }
-    [Selector("contentsGravity", "setContentsGravity:")] public CALayerContentsGravity ContentsGravity { get; set; }
-    [Selector("contentsScale", "setContentsScale:")] public CGFloat ContentsScale { get; set; }
-    [Selector("contentsCenter", "setContentsCenter:")] public CGRect ContentsCenter { get; set; }
-    [Selector("contentsFormat", "setContentsFormat:")] public CALayerContentsFormat? ContentsFormat { get; set; }
+    [Selector("bounds", "setBounds:")]
+    public CGRect Bounds { get; set; }
+    [Selector("position", "setPosition:")]
+    public CGPoint Position { get; set; }
+    [Selector("zPosition", "setZPosition:")]
+    public CGFloat ZPosition { get; set; }
+    [Selector("anchorPoint", "setAnchorPoint:")]
+    public CGPoint AnchorPoint { get; set; }
+    [Selector("anchorPointZ", "setAnchorPointZ:")]
+    public CGFloat AnchorPointZ { get; set; }
+    [Selector("transform", "setTransform:")]
+    public CATransform3D Transform { get; set; }
+    [Selector("frame", "setFrame:")]
+    public CGRect Frame { get; set; }
+    [Selector("isHidden", "setHidden:")]
+    public bool Hidden { get; set; }
+    [Selector("isDoubleSided", "setDoubleSided:")]
+    public bool DoubleSided { get; set; }
+    [Selector("isGeometryFlipped", "setGeometryFlipped:")]
+    public bool GeometryFlipped { get; set; }
+    [Selector("superlayer")]
+    public CALayer? Superlayer { get; }
+    [Selector("sublayers", "setSublayers:")]
+    public NSArray? Sublayers { get; set; }
+    [Selector("sublayerTransform", "setSublayerTransform:")]
+    public CATransform3D SublayerTransform { get; set; }
+    [Selector("mask", "setMask:")]
+    public CALayer? Mask { get; set; }
+    [Selector("masksToBounds", "setMasksToBounds:")]
+    public bool MasksToBounds { get; set; }
+    [Selector("contents", "setContents:")]
+    public AnyObject? Contents { get; set; }
+    [Selector("contentsRect", "setContentsRect:")]
+    public CGRect ContentsRect { get; set; }
+    [Selector("contentsGravity", "setContentsGravity:")]
+    public CALayerContentsGravity ContentsGravity { get; set; }
+    [Selector("contentsScale", "setContentsScale:")]
+    public CGFloat ContentsScale { get; set; }
+    [Selector("contentsCenter", "setContentsCenter:")]
+    public CGRect ContentsCenter { get; set; }
+    [Selector("contentsFormat", "setContentsFormat:")]
+    public CALayerContentsFormat? ContentsFormat { get; set; }
     /// Deprecated in macOS 26.0.
-    [Selector("wantsExtendedDynamicRangeContent", "setWantsExtendedDynamicRangeContent:")] public bool WantsExtendedDynamicRangeContent { get; set; }
-    [Selector("toneMapMode", "setToneMapMode:")] public CAToneMapMode? ToneMapMode { get; set; }
+    [Selector("wantsExtendedDynamicRangeContent", "setWantsExtendedDynamicRangeContent:")]
+    public bool WantsExtendedDynamicRangeContent { get; set; }
+    [Selector("toneMapMode", "setToneMapMode:")]
+    public CAToneMapMode? ToneMapMode { get; set; }
     /// macOS 26.0 and later.
-    [Selector("preferredDynamicRange", "setPreferredDynamicRange:")] public CADynamicRange? PreferredDynamicRange { get; set; }
+    [Selector("preferredDynamicRange", "setPreferredDynamicRange:")]
+    public CADynamicRange? PreferredDynamicRange { get; set; }
     /// macOS 26.0 and later.
-    [Selector("contentsHeadroom", "setContentsHeadroom:")] public CGFloat ContentsHeadroom { get; set; }
-    [Selector("minificationFilter", "setMinificationFilter:")] public CALayerContentsFilter MinificationFilter { get; set; }
-    [Selector("magnificationFilter", "setMagnificationFilter:")] public CALayerContentsFilter MagnificationFilter { get; set; }
-    [Selector("minificationFilterBias", "setMinificationFilterBias:")] public float MinificationFilterBias { get; set; }
-    [Selector("isOpaque", "setOpaque:")] public bool Opaque { get; set; }
-    [Selector("needsDisplayOnBoundsChange", "setNeedsDisplayOnBoundsChange:")] public bool NeedsDisplayOnBoundsChange { get; set; }
-    [Selector("drawsAsynchronously", "setDrawsAsynchronously:")] public bool DrawsAsynchronously { get; set; }
-    [Selector("edgeAntialiasingMask", "setEdgeAntialiasingMask:")] public CAEdgeAntialiasingMask EdgeAntialiasingMask { get; set; }
-    [Selector("allowsEdgeAntialiasing", "setAllowsEdgeAntialiasing:")] public bool AllowsEdgeAntialiasing { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public CGColorRef? BackgroundColor { get; set; }
-    [Selector("cornerRadius", "setCornerRadius:")] public CGFloat CornerRadius { get; set; }
-    [Selector("maskedCorners", "setMaskedCorners:")] public CACornerMask MaskedCorners { get; set; }
-    [Selector("cornerCurve", "setCornerCurve:")] public CALayerCornerCurve? CornerCurve { get; set; }
-    [Selector("borderWidth", "setBorderWidth:")] public CGFloat BorderWidth { get; set; }
-    [Selector("borderColor", "setBorderColor:")] public CGColorRef? BorderColor { get; set; }
-    [Selector("opacity", "setOpacity:")] public float Opacity { get; set; }
-    [Selector("allowsGroupOpacity", "setAllowsGroupOpacity:")] public bool AllowsGroupOpacity { get; set; }
-    [Selector("compositingFilter", "setCompositingFilter:")] public AnyObject? CompositingFilter { get; set; }
-    [Selector("filters", "setFilters:")] public NSArray? Filters { get; set; }
-    [Selector("backgroundFilters", "setBackgroundFilters:")] public NSArray? BackgroundFilters { get; set; }
-    [Selector("shouldRasterize", "setShouldRasterize:")] public bool ShouldRasterize { get; set; }
-    [Selector("rasterizationScale", "setRasterizationScale:")] public CGFloat RasterizationScale { get; set; }
-    [Selector("shadowColor", "setShadowColor:")] public CGColorRef? ShadowColor { get; set; }
-    [Selector("shadowOpacity", "setShadowOpacity:")] public float ShadowOpacity { get; set; }
-    [Selector("shadowOffset", "setShadowOffset:")] public CGSize ShadowOffset { get; set; }
-    [Selector("shadowRadius", "setShadowRadius:")] public CGFloat ShadowRadius { get; set; }
-    [Selector("shadowPath", "setShadowPath:")] public CGPathRef? ShadowPath { get; set; }
-    [Selector("autoresizingMask", "setAutoresizingMask:")] public CAAutoresizingMask AutoresizingMask { get; set; }
-    [Selector("layoutManager", "setLayoutManager:")] public CALayoutManager? LayoutManager { get; set; }
-    [Selector("actions", "setActions:")] public NSDictionary? Actions { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("delegate", "setDelegate:")] public CALayerDelegate? Delegate { get; set; }
-    [Selector("style", "setStyle:")] public NSDictionary? Style { get; set; }
-    [Selector("layer")] public static Self Layer();
-    [Selector("init")] public Self Init();
-    [Selector("initWithLayer:")] public Self InitWithLayer(AnyObject layer);
-    [Selector("presentationLayer")] public Self? PresentationLayer();
-    [Selector("modelLayer")] public Self ModelLayer();
-    [Selector("defaultValueForKey:")] public static AnyObject? DefaultValueForKey(NSString key);
-    [Selector("needsDisplayForKey:")] public static bool NeedsDisplayForKey(NSString key);
-    [Selector("shouldArchiveValueForKey:")] public bool ShouldArchiveValueForKey(NSString key);
-    [Selector("affineTransform")] public CGAffineTransform AffineTransform();
-    [Selector("setAffineTransform:")] public void SetAffineTransform(CGAffineTransform m);
-    [Selector("contentsAreFlipped")] public bool ContentsAreFlipped();
-    [Selector("removeFromSuperlayer")] public void RemoveFromSuperlayer();
-    [Selector("addSublayer:")] public void AddSublayer(CALayer layer);
-    [Selector("insertSublayer:atIndex:")] public void InsertSublayerAtIndex(CALayer layer, uint idx);
-    [Selector("insertSublayer:below:")] public void InsertSublayerBelow(CALayer layer, CALayer? sibling);
-    [Selector("insertSublayer:above:")] public void InsertSublayerAbove(CALayer layer, CALayer? sibling);
-    [Selector("replaceSublayer:with:")] public void ReplaceSublayerWith(CALayer oldLayer, CALayer newLayer);
-    [Selector("convertPoint:fromLayer:")] public CGPoint ConvertPointFromLayer(CGPoint p, CALayer? l);
-    [Selector("convertPoint:toLayer:")] public CGPoint ConvertPointToLayer(CGPoint p, CALayer? l);
-    [Selector("convertRect:fromLayer:")] public CGRect ConvertRectFromLayer(CGRect r, CALayer? l);
-    [Selector("convertRect:toLayer:")] public CGRect ConvertRectToLayer(CGRect r, CALayer? l);
-    [Selector("convertTime:fromLayer:")] public CFTimeInterval ConvertTimeFromLayer(CFTimeInterval t, CALayer? l);
-    [Selector("convertTime:toLayer:")] public CFTimeInterval ConvertTimeToLayer(CFTimeInterval t, CALayer? l);
-    [Selector("hitTest:")] public CALayer? HitTest(CGPoint p);
-    [Selector("containsPoint:")] public bool ContainsPoint(CGPoint p);
-    [Selector("display")] public void Display();
-    [Selector("setNeedsDisplay")] public void SetNeedsDisplay();
-    [Selector("setNeedsDisplayInRect:")] public void SetNeedsDisplayInRect(CGRect r);
-    [Selector("needsDisplay")] public bool NeedsDisplay();
-    [Selector("displayIfNeeded")] public void DisplayIfNeeded();
-    [Selector("drawInContext:")] public void DrawInContext(CGContextRef ctx);
-    [Selector("renderInContext:")] public void RenderInContext(CGContextRef ctx);
-    [Selector("cornerCurveExpansionFactor:")] public static CGFloat CornerCurveExpansionFactor(CALayerCornerCurve curve);
-    [Selector("preferredFrameSize")] public CGSize PreferredFrameSize();
-    [Selector("setNeedsLayout")] public void SetNeedsLayout();
-    [Selector("needsLayout")] public bool NeedsLayout();
-    [Selector("layoutIfNeeded")] public void LayoutIfNeeded();
-    [Selector("layoutSublayers")] public void LayoutSublayers();
-    [Selector("resizeSublayersWithOldSize:")] public void ResizeSublayersWithOldSize(CGSize size);
-    [Selector("resizeWithOldSuperlayerSize:")] public void ResizeWithOldSuperlayerSize(CGSize size);
-    [Selector("defaultActionForKey:")] public static CAAction? DefaultActionForKey(NSString event);
-    [Selector("actionForKey:")] public CAAction? ActionForKey(NSString event);
-    [Selector("addAnimation:forKey:")] public void AddAnimationForKey(CAAnimation anim, NSString? key);
-    [Selector("removeAllAnimations")] public void RemoveAllAnimations();
-    [Selector("removeAnimationForKey:")] public void RemoveAnimationForKey(NSString key);
-    [Selector("animationKeys")] public NSArray? AnimationKeys();
-    [Selector("animationForKey:")] public CAAnimation? AnimationForKey(NSString key);
+    [Selector("contentsHeadroom", "setContentsHeadroom:")]
+    public CGFloat ContentsHeadroom { get; set; }
+    [Selector("minificationFilter", "setMinificationFilter:")]
+    public CALayerContentsFilter MinificationFilter { get; set; }
+    [Selector("magnificationFilter", "setMagnificationFilter:")]
+    public CALayerContentsFilter MagnificationFilter { get; set; }
+    [Selector("minificationFilterBias", "setMinificationFilterBias:")]
+    public float MinificationFilterBias { get; set; }
+    [Selector("isOpaque", "setOpaque:")]
+    public bool Opaque { get; set; }
+    [Selector("needsDisplayOnBoundsChange", "setNeedsDisplayOnBoundsChange:")]
+    public bool NeedsDisplayOnBoundsChange { get; set; }
+    [Selector("drawsAsynchronously", "setDrawsAsynchronously:")]
+    public bool DrawsAsynchronously { get; set; }
+    [Selector("edgeAntialiasingMask", "setEdgeAntialiasingMask:")]
+    public CAEdgeAntialiasingMask EdgeAntialiasingMask { get; set; }
+    [Selector("allowsEdgeAntialiasing", "setAllowsEdgeAntialiasing:")]
+    public bool AllowsEdgeAntialiasing { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public CGColorRef? BackgroundColor { get; set; }
+    [Selector("cornerRadius", "setCornerRadius:")]
+    public CGFloat CornerRadius { get; set; }
+    [Selector("maskedCorners", "setMaskedCorners:")]
+    public CACornerMask MaskedCorners { get; set; }
+    [Selector("cornerCurve", "setCornerCurve:")]
+    public CALayerCornerCurve? CornerCurve { get; set; }
+    [Selector("borderWidth", "setBorderWidth:")]
+    public CGFloat BorderWidth { get; set; }
+    [Selector("borderColor", "setBorderColor:")]
+    public CGColorRef? BorderColor { get; set; }
+    [Selector("opacity", "setOpacity:")]
+    public float Opacity { get; set; }
+    [Selector("allowsGroupOpacity", "setAllowsGroupOpacity:")]
+    public bool AllowsGroupOpacity { get; set; }
+    [Selector("compositingFilter", "setCompositingFilter:")]
+    public AnyObject? CompositingFilter { get; set; }
+    [Selector("filters", "setFilters:")]
+    public NSArray? Filters { get; set; }
+    [Selector("backgroundFilters", "setBackgroundFilters:")]
+    public NSArray? BackgroundFilters { get; set; }
+    [Selector("shouldRasterize", "setShouldRasterize:")]
+    public bool ShouldRasterize { get; set; }
+    [Selector("rasterizationScale", "setRasterizationScale:")]
+    public CGFloat RasterizationScale { get; set; }
+    [Selector("shadowColor", "setShadowColor:")]
+    public CGColorRef? ShadowColor { get; set; }
+    [Selector("shadowOpacity", "setShadowOpacity:")]
+    public float ShadowOpacity { get; set; }
+    [Selector("shadowOffset", "setShadowOffset:")]
+    public CGSize ShadowOffset { get; set; }
+    [Selector("shadowRadius", "setShadowRadius:")]
+    public CGFloat ShadowRadius { get; set; }
+    [Selector("shadowPath", "setShadowPath:")]
+    public CGPathRef? ShadowPath { get; set; }
+    [Selector("autoresizingMask", "setAutoresizingMask:")]
+    public CAAutoresizingMask AutoresizingMask { get; set; }
+    [Selector("layoutManager", "setLayoutManager:")]
+    public CALayoutManager? LayoutManager { get; set; }
+    [Selector("actions", "setActions:")]
+    public NSDictionary? Actions { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public CALayerDelegate? Delegate { get; set; }
+    [Selector("style", "setStyle:")]
+    public NSDictionary? Style { get; set; }
+    [Selector("layer")]
+    public static Self Layer();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithLayer:")]
+    public Self InitWithLayer(AnyObject layer);
+    [Selector("presentationLayer")]
+    public Self? PresentationLayer();
+    [Selector("modelLayer")]
+    public Self ModelLayer();
+    [Selector("defaultValueForKey:")]
+    public static AnyObject? DefaultValueForKey(NSString key);
+    [Selector("needsDisplayForKey:")]
+    public static bool NeedsDisplayForKey(NSString key);
+    [Selector("shouldArchiveValueForKey:")]
+    public bool ShouldArchiveValueForKey(NSString key);
+    [Selector("affineTransform")]
+    public CGAffineTransform AffineTransform();
+    [Selector("setAffineTransform:")]
+    public void SetAffineTransform(CGAffineTransform m);
+    [Selector("contentsAreFlipped")]
+    public bool ContentsAreFlipped();
+    [Selector("removeFromSuperlayer")]
+    public void RemoveFromSuperlayer();
+    [Selector("addSublayer:")]
+    public void AddSublayer(CALayer layer);
+    [Selector("insertSublayer:atIndex:")]
+    public void InsertSublayerAtIndex(CALayer layer, uint idx);
+    [Selector("insertSublayer:below:")]
+    public void InsertSublayerBelow(CALayer layer, CALayer? sibling);
+    [Selector("insertSublayer:above:")]
+    public void InsertSublayerAbove(CALayer layer, CALayer? sibling);
+    [Selector("replaceSublayer:with:")]
+    public void ReplaceSublayerWith(CALayer oldLayer, CALayer newLayer);
+    [Selector("convertPoint:fromLayer:")]
+    public CGPoint ConvertPointFromLayer(CGPoint p, CALayer? l);
+    [Selector("convertPoint:toLayer:")]
+    public CGPoint ConvertPointToLayer(CGPoint p, CALayer? l);
+    [Selector("convertRect:fromLayer:")]
+    public CGRect ConvertRectFromLayer(CGRect r, CALayer? l);
+    [Selector("convertRect:toLayer:")]
+    public CGRect ConvertRectToLayer(CGRect r, CALayer? l);
+    [Selector("convertTime:fromLayer:")]
+    public CFTimeInterval ConvertTimeFromLayer(CFTimeInterval t, CALayer? l);
+    [Selector("convertTime:toLayer:")]
+    public CFTimeInterval ConvertTimeToLayer(CFTimeInterval t, CALayer? l);
+    [Selector("hitTest:")]
+    public CALayer? HitTest(CGPoint p);
+    [Selector("containsPoint:")]
+    public bool ContainsPoint(CGPoint p);
+    [Selector("display")]
+    public void Display();
+    [Selector("setNeedsDisplay")]
+    public void SetNeedsDisplay();
+    [Selector("setNeedsDisplayInRect:")]
+    public void SetNeedsDisplayInRect(CGRect r);
+    [Selector("needsDisplay")]
+    public bool NeedsDisplay();
+    [Selector("displayIfNeeded")]
+    public void DisplayIfNeeded();
+    [Selector("drawInContext:")]
+    public void DrawInContext(CGContextRef ctx);
+    [Selector("renderInContext:")]
+    public void RenderInContext(CGContextRef ctx);
+    [Selector("cornerCurveExpansionFactor:")]
+    public static CGFloat CornerCurveExpansionFactor(CALayerCornerCurve curve);
+    [Selector("preferredFrameSize")]
+    public CGSize PreferredFrameSize();
+    [Selector("setNeedsLayout")]
+    public void SetNeedsLayout();
+    [Selector("needsLayout")]
+    public bool NeedsLayout();
+    [Selector("layoutIfNeeded")]
+    public void LayoutIfNeeded();
+    [Selector("layoutSublayers")]
+    public void LayoutSublayers();
+    [Selector("resizeSublayersWithOldSize:")]
+    public void ResizeSublayersWithOldSize(CGSize size);
+    [Selector("resizeWithOldSuperlayerSize:")]
+    public void ResizeWithOldSuperlayerSize(CGSize size);
+    [Selector("defaultActionForKey:")]
+    public static CAAction? DefaultActionForKey(NSString event);
+    [Selector("actionForKey:")]
+    public CAAction? ActionForKey(NSString event);
+    [Selector("addAnimation:forKey:")]
+    public void AddAnimationForKey(CAAnimation anim, NSString? key);
+    [Selector("removeAllAnimations")]
+    public void RemoveAllAnimations();
+    [Selector("removeAnimationForKey:")]
+    public void RemoveAnimationForKey(NSString key);
+    [Selector("animationKeys")]
+    public NSArray? AnimationKeys();
+    [Selector("animationForKey:")]
+    public CAAnimation? AnimationForKey(NSString key);
 }
 
 public objc interface CALayoutManager : NSObjectProtocol
 {
-    [Optional] [Selector("preferredSizeOfLayer:")] CGSize PreferredSizeOfLayer(CALayer layer);
-    [Optional] [Selector("invalidateLayoutOfLayer:")] void InvalidateLayoutOfLayer(CALayer layer);
-    [Optional] [Selector("layoutSublayersOfLayer:")] void LayoutSublayersOfLayer(CALayer layer);
+    [Optional]
+    [Selector("preferredSizeOfLayer:")]
+    CGSize PreferredSizeOfLayer(CALayer layer);
+    [Optional]
+    [Selector("invalidateLayoutOfLayer:")]
+    void InvalidateLayoutOfLayer(CALayer layer);
+    [Optional]
+    [Selector("layoutSublayersOfLayer:")]
+    void LayoutSublayersOfLayer(CALayer layer);
 }
 
 public objc interface CAAction
 {
-    [Selector("runActionForKey:object:arguments:")] void RunActionForKeyObjectArguments(NSString event, AnyObject anObject, NSDictionary? dict);
+    [Selector("runActionForKey:object:arguments:")]
+    void RunActionForKeyObjectArguments(NSString event, AnyObject anObject, NSDictionary? dict);
 }
 
 /// CAActionAdditions, a category of NSNull.
@@ -222,11 +333,21 @@ public extern objc class NSNull : CAAction { }
 
 public objc interface CALayerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("displayLayer:")] void DisplayLayer(CALayer layer);
-    [Optional] [Selector("drawLayer:inContext:")] void DrawLayerInContext(CALayer layer, CGContextRef ctx);
-    [Optional] [Selector("layerWillDraw:")] void LayerWillDraw(CALayer layer);
-    [Optional] [Selector("layoutSublayersOfLayer:")] void LayoutSublayersOfLayer(CALayer layer);
-    [Optional] [Selector("actionForLayer:forKey:")] CAAction? ActionForLayerForKey(CALayer layer, NSString event);
+    [Optional]
+    [Selector("displayLayer:")]
+    void DisplayLayer(CALayer layer);
+    [Optional]
+    [Selector("drawLayer:inContext:")]
+    void DrawLayerInContext(CALayer layer, CGContextRef ctx);
+    [Optional]
+    [Selector("layerWillDraw:")]
+    void LayerWillDraw(CALayer layer);
+    [Optional]
+    [Selector("layoutSublayersOfLayer:")]
+    void LayoutSublayersOfLayer(CALayer layer);
+    [Optional]
+    [Selector("actionForLayer:forKey:")]
+    CAAction? ActionForLayerForKey(CALayer layer, NSString event);
 }
 
 public extern "C" CALayerContentsGravity? kCAGravityCenter;

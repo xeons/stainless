@@ -45,25 +45,34 @@ public extern objc class CFURLRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFURLGetTypeID();
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateWithBytes(CFAllocatorRef? allocator, UInt8* URLBytes, CFIndex length, CFStringEncoding encoding, CFURLRef? baseURL);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateWithBytes(CFAllocatorRef? allocator, UInt8* URLBytes, CFIndex length, CFStringEncoding encoding, CFURLRef? baseURL);
 
-[ReturnsRetained] public extern "C" CFDataRef? CFURLCreateData(CFAllocatorRef? allocator, CFURLRef? url, CFStringEncoding encoding, Boolean escapeWhitespace);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFURLCreateData(CFAllocatorRef? allocator, CFURLRef? url, CFStringEncoding encoding, Boolean escapeWhitespace);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateWithString(CFAllocatorRef? allocator, CFStringRef? URLString, CFURLRef? baseURL);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateWithString(CFAllocatorRef? allocator, CFStringRef? URLString, CFURLRef? baseURL);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateAbsoluteURLWithBytes(CFAllocatorRef? alloc, UInt8* relativeURLBytes, CFIndex length, CFStringEncoding encoding, CFURLRef? baseURL, Boolean useCompatibilityMode);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateAbsoluteURLWithBytes(CFAllocatorRef? alloc, UInt8* relativeURLBytes, CFIndex length, CFStringEncoding encoding, CFURLRef? baseURL, Boolean useCompatibilityMode);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateWithFileSystemPath(CFAllocatorRef? allocator, CFStringRef? filePath, CFURLPathStyle pathStyle, Boolean isDirectory);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateWithFileSystemPath(CFAllocatorRef? allocator, CFStringRef? filePath, CFURLPathStyle pathStyle, Boolean isDirectory);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateFromFileSystemRepresentation(CFAllocatorRef? allocator, UInt8* buffer, CFIndex bufLen, Boolean isDirectory);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateFromFileSystemRepresentation(CFAllocatorRef? allocator, UInt8* buffer, CFIndex bufLen, Boolean isDirectory);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateWithFileSystemPathRelativeToBase(CFAllocatorRef? allocator, CFStringRef? filePath, CFURLPathStyle pathStyle, Boolean isDirectory, CFURLRef? baseURL);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateWithFileSystemPathRelativeToBase(CFAllocatorRef? allocator, CFStringRef? filePath, CFURLPathStyle pathStyle, Boolean isDirectory, CFURLRef? baseURL);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateFromFileSystemRepresentationRelativeToBase(CFAllocatorRef? allocator, UInt8* buffer, CFIndex bufLen, Boolean isDirectory, CFURLRef? baseURL);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateFromFileSystemRepresentationRelativeToBase(CFAllocatorRef? allocator, UInt8* buffer, CFIndex bufLen, Boolean isDirectory, CFURLRef? baseURL);
 
 public extern "C" Boolean CFURLGetFileSystemRepresentation(CFURLRef? url, Boolean resolveAgainstBase, UInt8* buffer, CFIndex maxBufLen);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCopyAbsoluteURL(CFURLRef? relativeURL);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCopyAbsoluteURL(CFURLRef? relativeURL);
 
 public extern "C" CFStringRef? CFURLGetString(CFURLRef? anURL);
 
@@ -71,46 +80,64 @@ public extern "C" CFURLRef? CFURLGetBaseURL(CFURLRef? anURL);
 
 public extern "C" Boolean CFURLCanBeDecomposed(CFURLRef? anURL);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyScheme(CFURLRef? anURL);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCopyScheme(CFURLRef? anURL);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyNetLocation(CFURLRef? anURL);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCopyNetLocation(CFURLRef? anURL);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyPath(CFURLRef? anURL);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCopyPath(CFURLRef? anURL);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyStrictPath(CFURLRef? anURL, Boolean* isAbsolute);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCopyStrictPath(CFURLRef? anURL, Boolean* isAbsolute);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyFileSystemPath(CFURLRef? anURL, CFURLPathStyle pathStyle);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCopyFileSystemPath(CFURLRef? anURL, CFURLPathStyle pathStyle);
 
 public extern "C" Boolean CFURLHasDirectoryPath(CFURLRef? anURL);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyResourceSpecifier(CFURLRef? anURL);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCopyResourceSpecifier(CFURLRef? anURL);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyHostName(CFURLRef? anURL);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCopyHostName(CFURLRef? anURL);
 
 public extern "C" SInt32 CFURLGetPortNumber(CFURLRef? anURL);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyUserName(CFURLRef? anURL);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCopyUserName(CFURLRef? anURL);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyPassword(CFURLRef? anURL);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCopyPassword(CFURLRef? anURL);
 
 /// Deprecated in macOS 10.15.
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyParameterString(CFURLRef? anURL, CFStringRef? charactersToLeaveEscaped);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCopyParameterString(CFURLRef? anURL, CFStringRef? charactersToLeaveEscaped);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyQueryString(CFURLRef? anURL, CFStringRef? charactersToLeaveEscaped);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCopyQueryString(CFURLRef? anURL, CFStringRef? charactersToLeaveEscaped);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyFragment(CFURLRef? anURL, CFStringRef? charactersToLeaveEscaped);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCopyFragment(CFURLRef? anURL, CFStringRef? charactersToLeaveEscaped);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyLastPathComponent(CFURLRef? url);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCopyLastPathComponent(CFURLRef? url);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyPathExtension(CFURLRef? url);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCopyPathExtension(CFURLRef? url);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateCopyAppendingPathComponent(CFAllocatorRef? allocator, CFURLRef? url, CFStringRef? pathComponent, Boolean isDirectory);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateCopyAppendingPathComponent(CFAllocatorRef? allocator, CFURLRef? url, CFStringRef? pathComponent, Boolean isDirectory);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateCopyDeletingLastPathComponent(CFAllocatorRef? allocator, CFURLRef? url);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateCopyDeletingLastPathComponent(CFAllocatorRef? allocator, CFURLRef? url);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateCopyAppendingPathExtension(CFAllocatorRef? allocator, CFURLRef? url, CFStringRef? extension);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateCopyAppendingPathExtension(CFAllocatorRef? allocator, CFURLRef? url, CFStringRef? extension);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateCopyDeletingPathExtension(CFAllocatorRef? allocator, CFURLRef? url);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateCopyDeletingPathExtension(CFAllocatorRef? allocator, CFURLRef? url);
 
 public extern "C" CFIndex CFURLGetBytes(CFURLRef? url, UInt8* buffer, CFIndex bufferLength);
 
@@ -132,29 +159,36 @@ public enum CFURLComponentType : long
 
 public extern "C" CFRange CFURLGetByteRangeForComponent(CFURLRef? url, CFURLComponentType component, CFRange* rangeIncludingSeparators);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCreateStringByReplacingPercentEscapes(CFAllocatorRef? allocator, CFStringRef? originalString, CFStringRef? charactersToLeaveEscaped);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCreateStringByReplacingPercentEscapes(CFAllocatorRef? allocator, CFStringRef? originalString, CFStringRef? charactersToLeaveEscaped);
 
 /// Deprecated in macOS 10.11.
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCreateStringByReplacingPercentEscapesUsingEncoding(CFAllocatorRef? allocator, CFStringRef? origString, CFStringRef? charsToLeaveEscaped, CFStringEncoding encoding);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCreateStringByReplacingPercentEscapesUsingEncoding(CFAllocatorRef? allocator, CFStringRef? origString, CFStringRef? charsToLeaveEscaped, CFStringEncoding encoding);
 
 /// Deprecated in macOS 10.11.
-[ReturnsRetained] public extern "C" CFStringRef? CFURLCreateStringByAddingPercentEscapes(CFAllocatorRef? allocator, CFStringRef? originalString, CFStringRef? charactersToLeaveUnescaped, CFStringRef? legalURLCharactersToBeEscaped, CFStringEncoding encoding);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFURLCreateStringByAddingPercentEscapes(CFAllocatorRef? allocator, CFStringRef? originalString, CFStringRef? charactersToLeaveUnescaped, CFStringRef? legalURLCharactersToBeEscaped, CFStringEncoding encoding);
 
 public extern "C" Boolean CFURLIsFileReferenceURL(CFURLRef? url);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateFileReferenceURL(CFAllocatorRef? allocator, CFURLRef? url, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateFileReferenceURL(CFAllocatorRef? allocator, CFURLRef? url, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateFilePathURL(CFAllocatorRef? allocator, CFURLRef? url, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateFilePathURL(CFAllocatorRef? allocator, CFURLRef? url, __CFError** error);
 
 /// Deprecated in macOS 10.9.
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateFromFSRef(CFAllocatorRef? allocator, FSRef* fsRef);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateFromFSRef(CFAllocatorRef? allocator, FSRef* fsRef);
 
 /// Deprecated in macOS 10.9.
 public extern "C" Boolean CFURLGetFSRef(CFURLRef? url, FSRef* fsRef);
 
 public extern "C" Boolean CFURLCopyResourcePropertyForKey(CFURLRef? url, CFStringRef? key, void* propertyValueTypeRefPtr, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CFURLCopyResourcePropertiesForKeys(CFURLRef? url, CFArrayRef? keys, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CFURLCopyResourcePropertiesForKeys(CFURLRef? url, CFArrayRef? keys, __CFError** error);
 
 public extern "C" Boolean CFURLSetResourcePropertyForKey(CFURLRef? url, CFStringRef? key, CFTypeRef? propertyValue, __CFError** error);
 
@@ -455,20 +489,26 @@ public enum CFURLBookmarkResolutionOptions : ulong
 
 public using CFURLBookmarkFileCreationOptions = CFOptionFlags;
 
-[ReturnsRetained] public extern "C" CFDataRef? CFURLCreateBookmarkData(CFAllocatorRef? allocator, CFURLRef? url, CFURLBookmarkCreationOptions options, CFArrayRef? resourcePropertiesToInclude, CFURLRef? relativeToURL, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFURLCreateBookmarkData(CFAllocatorRef? allocator, CFURLRef? url, CFURLBookmarkCreationOptions options, CFArrayRef? resourcePropertiesToInclude, CFURLRef? relativeToURL, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateByResolvingBookmarkData(CFAllocatorRef? allocator, CFDataRef? bookmark, CFURLBookmarkResolutionOptions options, CFURLRef? relativeToURL, CFArrayRef? resourcePropertiesToInclude, Boolean* isStale, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFURLCreateByResolvingBookmarkData(CFAllocatorRef? allocator, CFDataRef? bookmark, CFURLBookmarkResolutionOptions options, CFURLRef? relativeToURL, CFArrayRef? resourcePropertiesToInclude, Boolean* isStale, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CFURLCreateResourcePropertiesForKeysFromBookmarkData(CFAllocatorRef? allocator, CFArrayRef? resourcePropertiesToReturn, CFDataRef? bookmark);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CFURLCreateResourcePropertiesForKeysFromBookmarkData(CFAllocatorRef? allocator, CFArrayRef? resourcePropertiesToReturn, CFDataRef? bookmark);
 
-[ReturnsRetained] public extern "C" CFTypeRef? CFURLCreateResourcePropertyForKeyFromBookmarkData(CFAllocatorRef? allocator, CFStringRef? resourcePropertyKey, CFDataRef? bookmark);
+[ReturnsRetained]
+public extern "C" CFTypeRef? CFURLCreateResourcePropertyForKeyFromBookmarkData(CFAllocatorRef? allocator, CFStringRef? resourcePropertyKey, CFDataRef? bookmark);
 
-[ReturnsRetained] public extern "C" CFDataRef? CFURLCreateBookmarkDataFromFile(CFAllocatorRef? allocator, CFURLRef? fileURL, __CFError** errorRef);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFURLCreateBookmarkDataFromFile(CFAllocatorRef? allocator, CFURLRef? fileURL, __CFError** errorRef);
 
 public extern "C" Boolean CFURLWriteBookmarkDataToFile(CFDataRef? bookmarkRef, CFURLRef? fileURL, CFURLBookmarkFileCreationOptions options, __CFError** errorRef);
 
 /// Deprecated in macOS 11.0.
-[ReturnsRetained] public extern "C" CFDataRef? CFURLCreateBookmarkDataFromAliasRecord(CFAllocatorRef? allocatorRef, CFDataRef? aliasRecordDataRef);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFURLCreateBookmarkDataFromAliasRecord(CFAllocatorRef? allocatorRef, CFDataRef? aliasRecordDataRef);
 
 public extern "C" Boolean CFURLStartAccessingSecurityScopedResource(CFURLRef? url);
 

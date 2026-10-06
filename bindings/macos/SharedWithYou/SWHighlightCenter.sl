@@ -34,7 +34,8 @@ import Standard.ObjC;
 
 public objc interface SWHighlightCenterDelegate : NSObjectProtocol
 {
-    [Selector("highlightCenterHighlightsDidChange:")] void HighlightCenterHighlightsDidChange(SWHighlightCenter highlightCenter);
+    [Selector("highlightCenterHighlightsDidChange:")]
+    void HighlightCenterHighlightsDidChange(SWHighlightCenter highlightCenter);
 }
 
 public objc closure void SWHighlightCenterGetHighlightForURLCompletionHandlerCompletionHandlerBlock(SWHighlight? arg0, NSError? arg1);
@@ -45,16 +46,26 @@ public objc closure void SWHighlightCenterGetSignedIdentityProofForCollaboration
 
 public extern objc class SWHighlightCenter : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public SWHighlightCenterDelegate? Delegate { get; set; }
-    [Selector("highlights")] public NSArray Highlights { get; }
-    [Selector("highlightCollectionTitle")] public static NSString HighlightCollectionTitle { get; }
-    [Selector("isSystemCollaborationSupportAvailable")] public static bool SystemCollaborationSupportAvailable { get; }
-    [Selector("getHighlightForURL:completionHandler:")] public void GetHighlightForURLCompletionHandler(NSURL URL, SWHighlightCenterGetHighlightForURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("collaborationHighlightForIdentifier:error:")] public SWCollaborationHighlight? CollaborationHighlightForIdentifierError(SWCollaborationIdentifier collaborationIdentifier, out NSError? error);
-    [Selector("getCollaborationHighlightForURL:completionHandler:")] public void GetCollaborationHighlightForURLCompletionHandler(NSURL URL, SWHighlightCenterGetCollaborationHighlightForURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("postNoticeForHighlightEvent:")] public void PostNoticeForHighlightEvent(SWHighlightEvent event);
-    [Selector("clearNoticesForHighlight:")] public void ClearNoticesForHighlight(SWCollaborationHighlight highlight);
-    [Selector("getSignedIdentityProofForCollaborationHighlight:usingData:completionHandler:")] public void GetSignedIdentityProofForCollaborationHighlightUsingDataCompletionHandler(SWCollaborationHighlight collaborationHighlight, NSData data, SWHighlightCenterGetSignedIdentityProofForCollaborationHighlightUsingDataCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("delegate", "setDelegate:")]
+    public SWHighlightCenterDelegate? Delegate { get; set; }
+    [Selector("highlights")]
+    public NSArray Highlights { get; }
+    [Selector("highlightCollectionTitle")]
+    public static NSString HighlightCollectionTitle { get; }
+    [Selector("isSystemCollaborationSupportAvailable")]
+    public static bool SystemCollaborationSupportAvailable { get; }
+    [Selector("getHighlightForURL:completionHandler:")]
+    public void GetHighlightForURLCompletionHandler(NSURL URL, SWHighlightCenterGetHighlightForURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("collaborationHighlightForIdentifier:error:")]
+    public SWCollaborationHighlight? CollaborationHighlightForIdentifierError(SWCollaborationIdentifier collaborationIdentifier, out NSError? error);
+    [Selector("getCollaborationHighlightForURL:completionHandler:")]
+    public void GetCollaborationHighlightForURLCompletionHandler(NSURL URL, SWHighlightCenterGetCollaborationHighlightForURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("postNoticeForHighlightEvent:")]
+    public void PostNoticeForHighlightEvent(SWHighlightEvent event);
+    [Selector("clearNoticesForHighlight:")]
+    public void ClearNoticesForHighlight(SWCollaborationHighlight highlight);
+    [Selector("getSignedIdentityProofForCollaborationHighlight:usingData:completionHandler:")]
+    public void GetSignedIdentityProofForCollaborationHighlightUsingDataCompletionHandler(SWCollaborationHighlight collaborationHighlight, NSData data, SWHighlightCenterGetSignedIdentityProofForCollaborationHighlightUsingDataCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

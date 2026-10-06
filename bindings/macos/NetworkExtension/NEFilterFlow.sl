@@ -34,25 +34,38 @@ import Standard.ObjC;
 
 public extern objc class NEFilterFlow : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("URL")] public NSURL? URL { get; }
-    [Selector("direction")] public NETrafficDirection Direction { get; }
-    [Selector("sourceAppAuditToken")] public NSData? SourceAppAuditToken { get; }
-    [Selector("sourceProcessAuditToken")] public NSData? SourceProcessAuditToken { get; }
-    [Selector("identifier")] public NSUUID Identifier { get; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
+    [Selector("direction")]
+    public NETrafficDirection Direction { get; }
+    [Selector("sourceAppAuditToken")]
+    public NSData? SourceAppAuditToken { get; }
+    [Selector("sourceProcessAuditToken")]
+    public NSData? SourceProcessAuditToken { get; }
+    [Selector("identifier")]
+    public NSUUID Identifier { get; }
 }
 
 public extern objc class NEFilterSocketFlow : NEFilterFlow, NSSecureCoding, NSCopying
 {
-    [Selector("remoteFlowEndpoint")] public nw_endpoint_t? RemoteFlowEndpoint { get; }
+    [Selector("remoteFlowEndpoint")]
+    public nw_endpoint_t? RemoteFlowEndpoint { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("remoteEndpoint")] public NWEndpoint? RemoteEndpoint { get; }
-    [Selector("remoteHostname")] public NSString? RemoteHostname { get; }
-    [Selector("localFlowEndpoint")] public nw_endpoint_t? LocalFlowEndpoint { get; }
+    [Selector("remoteEndpoint")]
+    public NWEndpoint? RemoteEndpoint { get; }
+    [Selector("remoteHostname")]
+    public NSString? RemoteHostname { get; }
+    [Selector("localFlowEndpoint")]
+    public nw_endpoint_t? LocalFlowEndpoint { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("localEndpoint")] public NWEndpoint? LocalEndpoint { get; }
-    [Selector("socketFamily")] public int SocketFamily { get; }
-    [Selector("socketType")] public int SocketType { get; }
-    [Selector("socketProtocol")] public int SocketProtocol { get; }
+    [Selector("localEndpoint")]
+    public NWEndpoint? LocalEndpoint { get; }
+    [Selector("socketFamily")]
+    public int SocketFamily { get; }
+    [Selector("socketType")]
+    public int SocketType { get; }
+    [Selector("socketProtocol")]
+    public int SocketProtocol { get; }
 }
 
 public const ulong NEFilterFlowBytesMax = 18446744073709551615u;

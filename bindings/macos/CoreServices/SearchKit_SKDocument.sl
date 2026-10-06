@@ -34,11 +34,14 @@ public using SKDocumentRef = CFTypeRef;
 
 public extern "C" CFTypeID SKDocumentGetTypeID();
 
-[ReturnsRetained] public extern "C" SKDocumentRef? SKDocumentCreateWithURL(CFURLRef? inURL);
+[ReturnsRetained]
+public extern "C" SKDocumentRef? SKDocumentCreateWithURL(CFURLRef? inURL);
 
-[ReturnsRetained] public extern "C" CFURLRef? SKDocumentCopyURL(SKDocumentRef? inDocument);
+[ReturnsRetained]
+public extern "C" CFURLRef? SKDocumentCopyURL(SKDocumentRef? inDocument);
 
-[ReturnsRetained] public extern "C" SKDocumentRef? SKDocumentCreate(CFStringRef? inScheme, SKDocumentRef? inParent, CFStringRef? inName);
+[ReturnsRetained]
+public extern "C" SKDocumentRef? SKDocumentCreate(CFStringRef? inScheme, SKDocumentRef? inParent, CFStringRef? inName);
 
 public extern "C" CFStringRef? SKDocumentGetSchemeName(SKDocumentRef? inDocument);
 

@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class MXHangDiagnostic : MXDiagnostic
 {
-    [Selector("callStackTree")] public MXCallStackTree CallStackTree { get; }
-    [Selector("hangDuration")] public NSMeasurement HangDuration { get; }
+    [Selector("callStackTree")]
+    public MXCallStackTree CallStackTree { get; }
+    [Selector("hangDuration")]
+    public NSMeasurement HangDuration { get; }
 }
 
 #endif

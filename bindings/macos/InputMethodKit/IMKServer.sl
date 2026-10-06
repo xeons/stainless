@@ -39,11 +39,16 @@ public extern "C" NSString? IMKDelegateClass;
 
 public extern objc class IMKServer : NSObject
 {
-    [Selector("initWithName:bundleIdentifier:")] public AnyObject? InitWithNameBundleIdentifier(NSString? name, NSString? bundleIdentifier);
-    [Selector("initWithName:controllerClass:delegateClass:")] public AnyObject? InitWithNameControllerClassDelegateClass(NSString? name, Class controllerClassID, Class delegateClassID);
-    [Selector("bundle")] public NSBundle? Bundle();
-    [Selector("paletteWillTerminate")] public bool PaletteWillTerminate();
-    [Selector("lastKeyEventWasDeadKey")] public bool LastKeyEventWasDeadKey();
+    [Selector("initWithName:bundleIdentifier:")]
+    public AnyObject? InitWithNameBundleIdentifier(NSString? name, NSString? bundleIdentifier);
+    [Selector("initWithName:controllerClass:delegateClass:")]
+    public AnyObject? InitWithNameControllerClassDelegateClass(NSString? name, Class controllerClassID, Class delegateClassID);
+    [Selector("bundle")]
+    public NSBundle? Bundle();
+    [Selector("paletteWillTerminate")]
+    public bool PaletteWillTerminate();
+    [Selector("lastKeyEventWasDeadKey")]
+    public bool LastKeyEventWasDeadKey();
 }
 
 #endif

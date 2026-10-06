@@ -47,10 +47,14 @@ public objc closure void NSTextInsertionIndicatorEffectsViewInserterBlock(NSView
 
 public extern objc class NSTextInsertionIndicator : NSView
 {
-    [Selector("displayMode", "setDisplayMode:")] public NSTextInsertionIndicatorDisplayMode DisplayMode { get; set; }
-    [Selector("color", "setColor:")] public NSColor? Color { get; set; }
-    [Selector("automaticModeOptions", "setAutomaticModeOptions:")] public NSTextInsertionIndicatorAutomaticModeOptions AutomaticModeOptions { get; set; }
-    [Selector("effectsViewInserter", "setEffectsViewInserter:")] public NSTextInsertionIndicatorEffectsViewInserterBlock? EffectsViewInserter { get; set; }
+    [Selector("displayMode", "setDisplayMode:")]
+    public NSTextInsertionIndicatorDisplayMode DisplayMode { get; set; }
+    [Selector("color", "setColor:")]
+    public NSColor? Color { get; set; }
+    [Selector("automaticModeOptions", "setAutomaticModeOptions:")]
+    public NSTextInsertionIndicatorAutomaticModeOptions AutomaticModeOptions { get; set; }
+    [Selector("effectsViewInserter", "setEffectsViewInserter:")]
+    public NSTextInsertionIndicatorEffectsViewInserterBlock? EffectsViewInserter { get; set; }
 }
 
 #endif

@@ -35,14 +35,18 @@ import Standard.ObjC;
 
 public extern objc class INUIAddVoiceShortcutViewController : NSViewController
 {
-    [Selector("delegate", "setDelegate:")] public INUIAddVoiceShortcutViewControllerDelegate? Delegate { get; set; }
-    [Selector("initWithShortcut:")] public Self InitWithShortcut(INShortcut shortcut);
+    [Selector("delegate", "setDelegate:")]
+    public INUIAddVoiceShortcutViewControllerDelegate? Delegate { get; set; }
+    [Selector("initWithShortcut:")]
+    public Self InitWithShortcut(INShortcut shortcut);
 }
 
 public objc interface INUIAddVoiceShortcutViewControllerDelegate : NSObjectProtocol
 {
-    [Selector("addVoiceShortcutViewController:didFinishWithVoiceShortcut:error:")] void AddVoiceShortcutViewControllerDidFinishWithVoiceShortcutError(INUIAddVoiceShortcutViewController controller, INVoiceShortcut? voiceShortcut, NSError? error);
-    [Selector("addVoiceShortcutViewControllerDidCancel:")] void AddVoiceShortcutViewControllerDidCancel(INUIAddVoiceShortcutViewController controller);
+    [Selector("addVoiceShortcutViewController:didFinishWithVoiceShortcut:error:")]
+    void AddVoiceShortcutViewControllerDidFinishWithVoiceShortcutError(INUIAddVoiceShortcutViewController controller, INVoiceShortcut? voiceShortcut, NSError? error);
+    [Selector("addVoiceShortcutViewControllerDidCancel:")]
+    void AddVoiceShortcutViewControllerDidCancel(INUIAddVoiceShortcutViewController controller);
 }
 
 #endif

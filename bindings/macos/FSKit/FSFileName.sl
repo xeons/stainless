@@ -35,27 +35,38 @@ import Standard.ObjC;
 public extern objc class FSFileName : NSObject, NSSecureCoding, NSCopying
 {
     /// macOS 15.4 and later.
-    [Selector("data")] public NSData Data { get; }
+    [Selector("data")]
+    public NSData Data { get; }
     /// macOS 15.4 and later.
-    [Selector("string")] public NSString? String { get; }
+    [Selector("string")]
+    public NSString? String { get; }
     /// macOS 15.4 and later.
-    [Selector("debugDescription")] public NSString DebugDescription { get; }
+    [Selector("debugDescription")]
+    public NSString DebugDescription { get; }
     /// macOS 15.4 and later.
-    [Selector("initWithCString:")] public Self InitWithCString(byte* name);
+    [Selector("initWithCString:")]
+    public Self InitWithCString(byte* name);
     /// macOS 15.4 and later.
-    [Selector("initWithBytes:length:")] public Self InitWithBytesLength(byte* bytes, NSUInteger length);
+    [Selector("initWithBytes:length:")]
+    public Self InitWithBytesLength(byte* bytes, NSUInteger length);
     /// macOS 15.4 and later.
-    [Selector("initWithData:")] public Self InitWithData(NSData name);
+    [Selector("initWithData:")]
+    public Self InitWithData(NSData name);
     /// macOS 15.4 and later.
-    [Selector("initWithString:")] public Self InitWithString(NSString name);
+    [Selector("initWithString:")]
+    public Self InitWithString(NSString name);
     /// macOS 15.4 and later.
-    [Selector("nameWithCString:")] public static Self NameWithCString(byte* name);
+    [Selector("nameWithCString:")]
+    public static Self NameWithCString(byte* name);
     /// macOS 15.4 and later.
-    [Selector("nameWithBytes:length:")] public static Self NameWithBytesLength(byte* bytes, NSUInteger length);
+    [Selector("nameWithBytes:length:")]
+    public static Self NameWithBytesLength(byte* bytes, NSUInteger length);
     /// macOS 15.4 and later.
-    [Selector("nameWithData:")] public static Self NameWithData(NSData name);
+    [Selector("nameWithData:")]
+    public static Self NameWithData(NSData name);
     /// macOS 15.4 and later.
-    [Selector("nameWithString:")] public static Self NameWithString(NSString name);
+    [Selector("nameWithString:")]
+    public static Self NameWithString(NSString name);
 }
 
 #endif

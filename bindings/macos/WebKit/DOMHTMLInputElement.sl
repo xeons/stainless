@@ -33,36 +33,65 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLInputElement : DOMHTMLElement
 {
-    [Selector("accept", "setAccept:")] public NSString? Accept { get; set; }
-    [Selector("alt", "setAlt:")] public NSString? Alt { get; set; }
-    [Selector("autofocus", "setAutofocus:")] public bool Autofocus { get; set; }
-    [Selector("defaultChecked", "setDefaultChecked:")] public bool DefaultChecked { get; set; }
-    [Selector("checked", "setChecked:")] public bool Checked { get; set; }
-    [Selector("disabled", "setDisabled:")] public bool Disabled { get; set; }
-    [Selector("form")] public DOMHTMLFormElement? Form { get; }
-    [Selector("files", "setFiles:")] public DOMFileList? Files { get; set; }
-    [Selector("indeterminate", "setIndeterminate:")] public bool Indeterminate { get; set; }
-    [Selector("maxLength", "setMaxLength:")] public int MaxLength { get; set; }
-    [Selector("multiple", "setMultiple:")] public bool Multiple { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("readOnly", "setReadOnly:")] public bool ReadOnly { get; set; }
-    [Selector("size", "setSize:")] public NSString? Size { get; set; }
-    [Selector("src", "setSrc:")] public NSString? Src { get; set; }
-    [Selector("type", "setType:")] public NSString? Type { get; set; }
-    [Selector("defaultValue", "setDefaultValue:")] public NSString? DefaultValue { get; set; }
-    [Selector("value", "setValue:")] public NSString? Value { get; set; }
-    [Selector("willValidate")] public bool WillValidate { get; }
-    [Selector("selectionStart", "setSelectionStart:")] public int SelectionStart { get; set; }
-    [Selector("selectionEnd", "setSelectionEnd:")] public int SelectionEnd { get; set; }
-    [Selector("align", "setAlign:")] public NSString? Align { get; set; }
-    [Selector("useMap", "setUseMap:")] public NSString? UseMap { get; set; }
+    [Selector("accept", "setAccept:")]
+    public NSString? Accept { get; set; }
+    [Selector("alt", "setAlt:")]
+    public NSString? Alt { get; set; }
+    [Selector("autofocus", "setAutofocus:")]
+    public bool Autofocus { get; set; }
+    [Selector("defaultChecked", "setDefaultChecked:")]
+    public bool DefaultChecked { get; set; }
+    [Selector("checked", "setChecked:")]
+    public bool Checked { get; set; }
+    [Selector("disabled", "setDisabled:")]
+    public bool Disabled { get; set; }
+    [Selector("form")]
+    public DOMHTMLFormElement? Form { get; }
+    [Selector("files", "setFiles:")]
+    public DOMFileList? Files { get; set; }
+    [Selector("indeterminate", "setIndeterminate:")]
+    public bool Indeterminate { get; set; }
+    [Selector("maxLength", "setMaxLength:")]
+    public int MaxLength { get; set; }
+    [Selector("multiple", "setMultiple:")]
+    public bool Multiple { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("readOnly", "setReadOnly:")]
+    public bool ReadOnly { get; set; }
+    [Selector("size", "setSize:")]
+    public NSString? Size { get; set; }
+    [Selector("src", "setSrc:")]
+    public NSString? Src { get; set; }
+    [Selector("type", "setType:")]
+    public NSString? Type { get; set; }
+    [Selector("defaultValue", "setDefaultValue:")]
+    public NSString? DefaultValue { get; set; }
+    [Selector("value", "setValue:")]
+    public NSString? Value { get; set; }
+    [Selector("willValidate")]
+    public bool WillValidate { get; }
+    [Selector("selectionStart", "setSelectionStart:")]
+    public int SelectionStart { get; set; }
+    [Selector("selectionEnd", "setSelectionEnd:")]
+    public int SelectionEnd { get; set; }
+    [Selector("align", "setAlign:")]
+    public NSString? Align { get; set; }
+    [Selector("useMap", "setUseMap:")]
+    public NSString? UseMap { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("accessKey", "setAccessKey:")] public NSString? AccessKey { get; set; }
-    [Selector("altDisplayString")] public NSString? AltDisplayString { get; }
-    [Selector("absoluteImageURL")] public NSURL? AbsoluteImageURL { get; }
-    [Selector("select")] public void Select();
-    [Selector("setSelectionRange:end:")] public void SetSelectionRangeEnd(int start, int end);
-    [Selector("click")] public void Click();
+    [Selector("accessKey", "setAccessKey:")]
+    public NSString? AccessKey { get; set; }
+    [Selector("altDisplayString")]
+    public NSString? AltDisplayString { get; }
+    [Selector("absoluteImageURL")]
+    public NSURL? AbsoluteImageURL { get; }
+    [Selector("select")]
+    public void Select();
+    [Selector("setSelectionRange:end:")]
+    public void SetSelectionRangeEnd(int start, int end);
+    [Selector("click")]
+    public void Click();
 }
 
 #endif

@@ -52,11 +52,16 @@ public enum NSJSONWritingOptions : ulong
 
 public extern objc class NSJSONSerialization : NSObject
 {
-    [Selector("isValidJSONObject:")] public static bool IsValidJSONObject(AnyObject obj);
-    [Selector("dataWithJSONObject:options:error:")] public static NSData? DataWithJSONObjectOptionsError(AnyObject obj, NSJSONWritingOptions opt, out NSError? error);
-    [Selector("JSONObjectWithData:options:error:")] public static AnyObject? JSONObjectWithDataOptionsError(NSData data, NSJSONReadingOptions opt, out NSError? error);
-    [Selector("writeJSONObject:toStream:options:error:")] public static NSInteger WriteJSONObjectToStreamOptionsError(AnyObject obj, NSOutputStream stream, NSJSONWritingOptions opt, out NSError? error);
-    [Selector("JSONObjectWithStream:options:error:")] public static AnyObject? JSONObjectWithStreamOptionsError(NSInputStream stream, NSJSONReadingOptions opt, out NSError? error);
+    [Selector("isValidJSONObject:")]
+    public static bool IsValidJSONObject(AnyObject obj);
+    [Selector("dataWithJSONObject:options:error:")]
+    public static NSData? DataWithJSONObjectOptionsError(AnyObject obj, NSJSONWritingOptions opt, out NSError? error);
+    [Selector("JSONObjectWithData:options:error:")]
+    public static AnyObject? JSONObjectWithDataOptionsError(NSData data, NSJSONReadingOptions opt, out NSError? error);
+    [Selector("writeJSONObject:toStream:options:error:")]
+    public static NSInteger WriteJSONObjectToStreamOptionsError(AnyObject obj, NSOutputStream stream, NSJSONWritingOptions opt, out NSError? error);
+    [Selector("JSONObjectWithStream:options:error:")]
+    public static AnyObject? JSONObjectWithStreamOptionsError(NSInputStream stream, NSJSONReadingOptions opt, out NSError? error);
 }
 
 #endif

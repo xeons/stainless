@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class AVCompositionTrackSegment : AVAssetTrackSegment
 {
-    [Selector("isEmpty")] public bool Empty { get; }
-    [Selector("sourceURL")] public NSURL? SourceURL { get; }
-    [Selector("sourceTrackID")] public CMPersistentTrackID SourceTrackID { get; }
-    [Selector("compositionTrackSegmentWithURL:trackID:sourceTimeRange:targetTimeRange:")] public static Self CompositionTrackSegmentWithURLTrackIDSourceTimeRangeTargetTimeRange(NSURL URL, CMPersistentTrackID trackID, CMTimeRange sourceTimeRange, CMTimeRange targetTimeRange);
-    [Selector("compositionTrackSegmentWithTimeRange:")] public static Self CompositionTrackSegmentWithTimeRange(CMTimeRange timeRange);
-    [Selector("initWithURL:trackID:sourceTimeRange:targetTimeRange:")] public Self InitWithURLTrackIDSourceTimeRangeTargetTimeRange(NSURL URL, CMPersistentTrackID trackID, CMTimeRange sourceTimeRange, CMTimeRange targetTimeRange);
-    [Selector("initWithTimeRange:")] public Self InitWithTimeRange(CMTimeRange timeRange);
+    [Selector("isEmpty")]
+    public bool Empty { get; }
+    [Selector("sourceURL")]
+    public NSURL? SourceURL { get; }
+    [Selector("sourceTrackID")]
+    public CMPersistentTrackID SourceTrackID { get; }
+    [Selector("compositionTrackSegmentWithURL:trackID:sourceTimeRange:targetTimeRange:")]
+    public static Self CompositionTrackSegmentWithURLTrackIDSourceTimeRangeTargetTimeRange(NSURL URL, CMPersistentTrackID trackID, CMTimeRange sourceTimeRange, CMTimeRange targetTimeRange);
+    [Selector("compositionTrackSegmentWithTimeRange:")]
+    public static Self CompositionTrackSegmentWithTimeRange(CMTimeRange timeRange);
+    [Selector("initWithURL:trackID:sourceTimeRange:targetTimeRange:")]
+    public Self InitWithURLTrackIDSourceTimeRangeTargetTimeRange(NSURL URL, CMPersistentTrackID trackID, CMTimeRange sourceTimeRange, CMTimeRange targetTimeRange);
+    [Selector("initWithTimeRange:")]
+    public Self InitWithTimeRange(CMTimeRange timeRange);
 }
 
 #endif

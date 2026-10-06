@@ -35,18 +35,25 @@ import Standard.ObjC;
 
 public extern objc class NSAdaptiveImageGlyph : NSObject, NSCopying, NSSecureCoding, CTAdaptiveImageProviding
 {
-    [Selector("imageContent")] public NSData ImageContent { get; }
-    [Selector("contentIdentifier")] public NSString ContentIdentifier { get; }
-    [Selector("contentDescription")] public NSString ContentDescription { get; }
-    [Selector("contentType")] public static UTType ContentType { get; }
-    [Selector("initWithImageContent:")] public Self InitWithImageContent(NSData imageContent);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
+    [Selector("imageContent")]
+    public NSData ImageContent { get; }
+    [Selector("contentIdentifier")]
+    public NSString ContentIdentifier { get; }
+    [Selector("contentDescription")]
+    public NSString ContentDescription { get; }
+    [Selector("contentType")]
+    public static UTType ContentType { get; }
+    [Selector("initWithImageContent:")]
+    public Self InitWithImageContent(NSData imageContent);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
 }
 
 /// NSAttributedStringAdaptiveImageGlyphConveniences, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("attributedStringWithAdaptiveImageGlyph:attributes:")] public static Self AttributedStringWithAdaptiveImageGlyphAttributes(NSAdaptiveImageGlyph adaptiveImageGlyph, NSDictionary attributes);
+    [Selector("attributedStringWithAdaptiveImageGlyph:attributes:")]
+    public static Self AttributedStringWithAdaptiveImageGlyphAttributes(NSAdaptiveImageGlyph adaptiveImageGlyph, NSDictionary attributes);
 }
 
 #endif

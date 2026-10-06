@@ -37,10 +37,14 @@ public objc closure void NEFilterProviderStopFilterWithReasonCompletionHandlerCo
 
 public extern objc class NEFilterProvider : NEProvider
 {
-    [Selector("filterConfiguration")] public NEFilterProviderConfiguration FilterConfiguration { get; }
-    [Selector("startFilterWithCompletionHandler:")] public void StartFilterWithCompletionHandler(NEFilterProviderStartFilterWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("stopFilterWithReason:completionHandler:")] public void StopFilterWithReasonCompletionHandler(NEProviderStopReason reason, NEFilterProviderStopFilterWithReasonCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("handleReport:")] public void HandleReport(NEFilterReport report);
+    [Selector("filterConfiguration")]
+    public NEFilterProviderConfiguration FilterConfiguration { get; }
+    [Selector("startFilterWithCompletionHandler:")]
+    public void StartFilterWithCompletionHandler(NEFilterProviderStartFilterWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("stopFilterWithReason:completionHandler:")]
+    public void StopFilterWithReasonCompletionHandler(NEProviderStopReason reason, NEFilterProviderStopFilterWithReasonCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("handleReport:")]
+    public void HandleReport(NEFilterReport report);
 }
 
 public enum NEFilterReportFrequency : long
@@ -53,16 +57,22 @@ public enum NEFilterReportFrequency : long
 
 public extern objc class NEFilterVerdict : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("shouldReport", "setShouldReport:")] public bool ShouldReport { get; set; }
+    [Selector("shouldReport", "setShouldReport:")]
+    public bool ShouldReport { get; set; }
 }
 
 public extern objc class NEFilterNewFlowVerdict : NEFilterVerdict, NSSecureCoding, NSCopying
 {
-    [Selector("statisticsReportFrequency", "setStatisticsReportFrequency:")] public NEFilterReportFrequency StatisticsReportFrequency { get; set; }
-    [Selector("allowVerdict")] public static NEFilterNewFlowVerdict AllowVerdict();
-    [Selector("dropVerdict")] public static NEFilterNewFlowVerdict DropVerdict();
-    [Selector("filterDataVerdictWithFilterInbound:peekInboundBytes:filterOutbound:peekOutboundBytes:")] public static NEFilterNewFlowVerdict FilterDataVerdictWithFilterInboundPeekInboundBytesFilterOutboundPeekOutboundBytes(bool filterInbound, NSUInteger peekInboundBytes, bool filterOutbound, NSUInteger peekOutboundBytes);
-    [Selector("pauseVerdict")] public static NEFilterNewFlowVerdict PauseVerdict();
+    [Selector("statisticsReportFrequency", "setStatisticsReportFrequency:")]
+    public NEFilterReportFrequency StatisticsReportFrequency { get; set; }
+    [Selector("allowVerdict")]
+    public static NEFilterNewFlowVerdict AllowVerdict();
+    [Selector("dropVerdict")]
+    public static NEFilterNewFlowVerdict DropVerdict();
+    [Selector("filterDataVerdictWithFilterInbound:peekInboundBytes:filterOutbound:peekOutboundBytes:")]
+    public static NEFilterNewFlowVerdict FilterDataVerdictWithFilterInboundPeekInboundBytesFilterOutboundPeekOutboundBytes(bool filterInbound, NSUInteger peekInboundBytes, bool filterOutbound, NSUInteger peekOutboundBytes);
+    [Selector("pauseVerdict")]
+    public static NEFilterNewFlowVerdict PauseVerdict();
 }
 
 public enum NEFilterAction : long
@@ -84,11 +94,16 @@ public enum NEFilterReportEvent : long
 
 public extern objc class NEFilterReport : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("flow")] public NEFilterFlow? Flow { get; }
-    [Selector("action")] public NEFilterAction Action { get; }
-    [Selector("event")] public NEFilterReportEvent Event { get; }
-    [Selector("bytesInboundCount")] public NSUInteger BytesInboundCount { get; }
-    [Selector("bytesOutboundCount")] public NSUInteger BytesOutboundCount { get; }
+    [Selector("flow")]
+    public NEFilterFlow? Flow { get; }
+    [Selector("action")]
+    public NEFilterAction Action { get; }
+    [Selector("event")]
+    public NEFilterReportEvent Event { get; }
+    [Selector("bytesInboundCount")]
+    public NSUInteger BytesInboundCount { get; }
+    [Selector("bytesOutboundCount")]
+    public NSUInteger BytesOutboundCount { get; }
 }
 
 public const NSString NEFilterProviderRemediationURLFlowURLHostname = "NE_FLOW_HOSTNAME";

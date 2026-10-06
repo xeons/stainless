@@ -36,10 +36,14 @@ import Standard.ObjC;
 /// Deprecated in macOS 26.0.
 public extern objc class MKPlacemark : CLPlacemark, MKAnnotation
 {
-    [Selector("countryCode")] public NSString? CountryCode { get; }
-    [Selector("initWithCoordinate:")] public Self InitWithCoordinate(CLLocationCoordinate2D coordinate);
-    [Selector("initWithCoordinate:addressDictionary:")] public Self InitWithCoordinateAddressDictionary(CLLocationCoordinate2D coordinate, NSDictionary? addressDictionary);
-    [Selector("initWithCoordinate:postalAddress:")] public Self InitWithCoordinatePostalAddress(CLLocationCoordinate2D coordinate, CNPostalAddress postalAddress);
+    [Selector("countryCode")]
+    public NSString? CountryCode { get; }
+    [Selector("initWithCoordinate:")]
+    public Self InitWithCoordinate(CLLocationCoordinate2D coordinate);
+    [Selector("initWithCoordinate:addressDictionary:")]
+    public Self InitWithCoordinateAddressDictionary(CLLocationCoordinate2D coordinate, NSDictionary? addressDictionary);
+    [Selector("initWithCoordinate:postalAddress:")]
+    public Self InitWithCoordinatePostalAddress(CLLocationCoordinate2D coordinate, CNPostalAddress postalAddress);
 }
 
 #endif

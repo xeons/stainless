@@ -42,9 +42,12 @@ public enum VZMacAuxiliaryStorageInitializationOptions : ulong
 #if ARM64
 public extern objc class VZMacAuxiliaryStorage : NSObject
 {
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL URL);
-    [Selector("initCreatingStorageAtURL:hardwareModel:options:error:")] public Self? InitCreatingStorageAtURLHardwareModelOptionsError(NSURL URL, VZMacHardwareModel hardwareModel, VZMacAuxiliaryStorageInitializationOptions options, out NSError? error);
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL URL);
+    [Selector("initCreatingStorageAtURL:hardwareModel:options:error:")]
+    public Self? InitCreatingStorageAtURLHardwareModelOptionsError(NSURL URL, VZMacHardwareModel hardwareModel, VZMacAuxiliaryStorageInitializationOptions options, out NSError? error);
 }
 #endif
 
@@ -53,7 +56,8 @@ public extern objc class VZMacAuxiliaryStorage : NSObject
 public extern objc class VZMacAuxiliaryStorage
 {
     /// Deprecated in macOS 100000.
-    [Selector("initWithContentsOfURL:")] public Self InitWithContentsOfURL(NSURL URL);
+    [Selector("initWithContentsOfURL:")]
+    public Self InitWithContentsOfURL(NSURL URL);
 }
 #endif
 

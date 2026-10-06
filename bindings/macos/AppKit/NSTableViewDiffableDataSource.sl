@@ -34,17 +34,28 @@ public objc closure void NSTableViewDiffableDataSourceApplySnapshotAnimatingDiff
 
 public extern objc class NSTableViewDiffableDataSource : NSObject, NSTableViewDataSource
 {
-    [Selector("rowViewProvider", "setRowViewProvider:")] public NSTableViewDiffableDataSourceRowProvider? RowViewProvider { get; set; }
-    [Selector("sectionHeaderViewProvider", "setSectionHeaderViewProvider:")] public NSTableViewDiffableDataSourceSectionHeaderViewProvider? SectionHeaderViewProvider { get; set; }
-    [Selector("defaultRowAnimation", "setDefaultRowAnimation:")] public NSTableViewAnimationOptions DefaultRowAnimation { get; set; }
-    [Selector("initWithTableView:cellProvider:")] public Self InitWithTableViewCellProvider(NSTableView tableView, NSTableViewDiffableDataSourceCellProvider cellProvider);
-    [Selector("snapshot")] public NSDiffableDataSourceSnapshot Snapshot();
-    [Selector("applySnapshot:animatingDifferences:")] public void ApplySnapshotAnimatingDifferences(NSDiffableDataSourceSnapshot snapshot, bool animatingDifferences);
-    [Selector("applySnapshot:animatingDifferences:completion:")] public void ApplySnapshotAnimatingDifferencesCompletion(NSDiffableDataSourceSnapshot snapshot, bool animatingDifferences, NSTableViewDiffableDataSourceApplySnapshotAnimatingDifferencesCompletionCompletionBlock? completion);
-    [Selector("itemIdentifierForRow:")] public AnyObject? ItemIdentifierForRow(NSInteger row);
-    [Selector("rowForItemIdentifier:")] public NSInteger RowForItemIdentifier(AnyObject identifier);
-    [Selector("sectionIdentifierForRow:")] public AnyObject? SectionIdentifierForRow(NSInteger row);
-    [Selector("rowForSectionIdentifier:")] public NSInteger RowForSectionIdentifier(AnyObject identifier);
+    [Selector("rowViewProvider", "setRowViewProvider:")]
+    public NSTableViewDiffableDataSourceRowProvider? RowViewProvider { get; set; }
+    [Selector("sectionHeaderViewProvider", "setSectionHeaderViewProvider:")]
+    public NSTableViewDiffableDataSourceSectionHeaderViewProvider? SectionHeaderViewProvider { get; set; }
+    [Selector("defaultRowAnimation", "setDefaultRowAnimation:")]
+    public NSTableViewAnimationOptions DefaultRowAnimation { get; set; }
+    [Selector("initWithTableView:cellProvider:")]
+    public Self InitWithTableViewCellProvider(NSTableView tableView, NSTableViewDiffableDataSourceCellProvider cellProvider);
+    [Selector("snapshot")]
+    public NSDiffableDataSourceSnapshot Snapshot();
+    [Selector("applySnapshot:animatingDifferences:")]
+    public void ApplySnapshotAnimatingDifferences(NSDiffableDataSourceSnapshot snapshot, bool animatingDifferences);
+    [Selector("applySnapshot:animatingDifferences:completion:")]
+    public void ApplySnapshotAnimatingDifferencesCompletion(NSDiffableDataSourceSnapshot snapshot, bool animatingDifferences, NSTableViewDiffableDataSourceApplySnapshotAnimatingDifferencesCompletionCompletionBlock? completion);
+    [Selector("itemIdentifierForRow:")]
+    public AnyObject? ItemIdentifierForRow(NSInteger row);
+    [Selector("rowForItemIdentifier:")]
+    public NSInteger RowForItemIdentifier(AnyObject identifier);
+    [Selector("sectionIdentifierForRow:")]
+    public AnyObject? SectionIdentifierForRow(NSInteger row);
+    [Selector("rowForSectionIdentifier:")]
+    public NSInteger RowForSectionIdentifier(AnyObject identifier);
 }
 
 public objc closure NSView NSTableViewDiffableDataSourceCellProvider(NSTableView arg0, NSTableColumn arg1, NSInteger arg2, AnyObject arg3);

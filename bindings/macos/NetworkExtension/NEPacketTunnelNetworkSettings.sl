@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class NEPacketTunnelNetworkSettings : NETunnelNetworkSettings
 {
-    [Selector("IPv4Settings", "setIPv4Settings:")] public NEIPv4Settings? IPv4Settings { get; set; }
-    [Selector("IPv6Settings", "setIPv6Settings:")] public NEIPv6Settings? IPv6Settings { get; set; }
-    [Selector("tunnelOverheadBytes", "setTunnelOverheadBytes:")] public NSNumber? TunnelOverheadBytes { get; set; }
-    [Selector("MTU", "setMTU:")] public NSNumber? MTU { get; set; }
+    [Selector("IPv4Settings", "setIPv4Settings:")]
+    public NEIPv4Settings? IPv4Settings { get; set; }
+    [Selector("IPv6Settings", "setIPv6Settings:")]
+    public NEIPv6Settings? IPv6Settings { get; set; }
+    [Selector("tunnelOverheadBytes", "setTunnelOverheadBytes:")]
+    public NSNumber? TunnelOverheadBytes { get; set; }
+    [Selector("MTU", "setMTU:")]
+    public NSNumber? MTU { get; set; }
 }
 
 #endif

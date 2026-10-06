@@ -33,35 +33,64 @@ import Standard.ObjC;
 /// CSPlaces, a category of CSSearchableItemAttributeSet.
 public extern objc class CSSearchableItemAttributeSet
 {
-    [Selector("headline", "setHeadline:")] public NSString? Headline { get; set; }
-    [Selector("instructions", "setInstructions:")] public NSString? Instructions { get; set; }
-    [Selector("thoroughfare", "setThoroughfare:")] public NSString? Thoroughfare { get; set; }
-    [Selector("subThoroughfare", "setSubThoroughfare:")] public NSString? SubThoroughfare { get; set; }
-    [Selector("postalCode", "setPostalCode:")] public NSString? PostalCode { get; set; }
-    [Selector("city", "setCity:")] public NSString? City { get; set; }
-    [Selector("stateOrProvince", "setStateOrProvince:")] public NSString? StateOrProvince { get; set; }
-    [Selector("country", "setCountry:")] public NSString? Country { get; set; }
-    [Selector("fullyFormattedAddress", "setFullyFormattedAddress:")] public NSString? FullyFormattedAddress { get; set; }
-    [Selector("altitude", "setAltitude:")] public NSNumber? Altitude { get; set; }
-    [Selector("latitude", "setLatitude:")] public NSNumber? Latitude { get; set; }
-    [Selector("longitude", "setLongitude:")] public NSNumber? Longitude { get; set; }
-    [Selector("speed", "setSpeed:")] public NSNumber? Speed { get; set; }
-    [Selector("timestamp", "setTimestamp:")] public NSDate? Timestamp { get; set; }
-    [Selector("imageDirection", "setImageDirection:")] public NSNumber? ImageDirection { get; set; }
-    [Selector("namedLocation", "setNamedLocation:")] public NSString? NamedLocation { get; set; }
-    [Selector("GPSTrack", "setGPSTrack:")] public NSNumber? GPSTrack { get; set; }
-    [Selector("GPSStatus", "setGPSStatus:")] public NSString? GPSStatus { get; set; }
-    [Selector("GPSMeasureMode", "setGPSMeasureMode:")] public NSString? GPSMeasureMode { get; set; }
-    [Selector("GPSDOP", "setGPSDOP:")] public NSNumber? GPSDOP { get; set; }
-    [Selector("GPSMapDatum", "setGPSMapDatum:")] public NSString? GPSMapDatum { get; set; }
-    [Selector("GPSDestLatitude", "setGPSDestLatitude:")] public NSNumber? GPSDestLatitude { get; set; }
-    [Selector("GPSDestLongitude", "setGPSDestLongitude:")] public NSNumber? GPSDestLongitude { get; set; }
-    [Selector("GPSDestBearing", "setGPSDestBearing:")] public NSNumber? GPSDestBearing { get; set; }
-    [Selector("GPSDestDistance", "setGPSDestDistance:")] public NSNumber? GPSDestDistance { get; set; }
-    [Selector("GPSProcessingMethod", "setGPSProcessingMethod:")] public NSString? GPSProcessingMethod { get; set; }
-    [Selector("GPSAreaInformation", "setGPSAreaInformation:")] public NSString? GPSAreaInformation { get; set; }
-    [Selector("GPSDateStamp", "setGPSDateStamp:")] public NSDate? GPSDateStamp { get; set; }
-    [Selector("GPSDifferental", "setGPSDifferental:")] public NSNumber? GPSDifferental { get; set; }
+    [Selector("headline", "setHeadline:")]
+    public NSString? Headline { get; set; }
+    [Selector("instructions", "setInstructions:")]
+    public NSString? Instructions { get; set; }
+    [Selector("thoroughfare", "setThoroughfare:")]
+    public NSString? Thoroughfare { get; set; }
+    [Selector("subThoroughfare", "setSubThoroughfare:")]
+    public NSString? SubThoroughfare { get; set; }
+    [Selector("postalCode", "setPostalCode:")]
+    public NSString? PostalCode { get; set; }
+    [Selector("city", "setCity:")]
+    public NSString? City { get; set; }
+    [Selector("stateOrProvince", "setStateOrProvince:")]
+    public NSString? StateOrProvince { get; set; }
+    [Selector("country", "setCountry:")]
+    public NSString? Country { get; set; }
+    [Selector("fullyFormattedAddress", "setFullyFormattedAddress:")]
+    public NSString? FullyFormattedAddress { get; set; }
+    [Selector("altitude", "setAltitude:")]
+    public NSNumber? Altitude { get; set; }
+    [Selector("latitude", "setLatitude:")]
+    public NSNumber? Latitude { get; set; }
+    [Selector("longitude", "setLongitude:")]
+    public NSNumber? Longitude { get; set; }
+    [Selector("speed", "setSpeed:")]
+    public NSNumber? Speed { get; set; }
+    [Selector("timestamp", "setTimestamp:")]
+    public NSDate? Timestamp { get; set; }
+    [Selector("imageDirection", "setImageDirection:")]
+    public NSNumber? ImageDirection { get; set; }
+    [Selector("namedLocation", "setNamedLocation:")]
+    public NSString? NamedLocation { get; set; }
+    [Selector("GPSTrack", "setGPSTrack:")]
+    public NSNumber? GPSTrack { get; set; }
+    [Selector("GPSStatus", "setGPSStatus:")]
+    public NSString? GPSStatus { get; set; }
+    [Selector("GPSMeasureMode", "setGPSMeasureMode:")]
+    public NSString? GPSMeasureMode { get; set; }
+    [Selector("GPSDOP", "setGPSDOP:")]
+    public NSNumber? GPSDOP { get; set; }
+    [Selector("GPSMapDatum", "setGPSMapDatum:")]
+    public NSString? GPSMapDatum { get; set; }
+    [Selector("GPSDestLatitude", "setGPSDestLatitude:")]
+    public NSNumber? GPSDestLatitude { get; set; }
+    [Selector("GPSDestLongitude", "setGPSDestLongitude:")]
+    public NSNumber? GPSDestLongitude { get; set; }
+    [Selector("GPSDestBearing", "setGPSDestBearing:")]
+    public NSNumber? GPSDestBearing { get; set; }
+    [Selector("GPSDestDistance", "setGPSDestDistance:")]
+    public NSNumber? GPSDestDistance { get; set; }
+    [Selector("GPSProcessingMethod", "setGPSProcessingMethod:")]
+    public NSString? GPSProcessingMethod { get; set; }
+    [Selector("GPSAreaInformation", "setGPSAreaInformation:")]
+    public NSString? GPSAreaInformation { get; set; }
+    [Selector("GPSDateStamp", "setGPSDateStamp:")]
+    public NSDate? GPSDateStamp { get; set; }
+    [Selector("GPSDifferental", "setGPSDifferental:")]
+    public NSNumber? GPSDifferental { get; set; }
 }
 
 #endif

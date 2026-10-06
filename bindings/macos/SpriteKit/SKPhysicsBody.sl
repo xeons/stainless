@@ -35,47 +35,88 @@ import Standard.ObjC;
 
 public extern objc class SKPhysicsBody : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("isDynamic", "setDynamic:")] public bool Dynamic { get; set; }
-    [Selector("usesPreciseCollisionDetection", "setUsesPreciseCollisionDetection:")] public bool UsesPreciseCollisionDetection { get; set; }
-    [Selector("allowsRotation", "setAllowsRotation:")] public bool AllowsRotation { get; set; }
-    [Selector("pinned", "setPinned:")] public bool Pinned { get; set; }
-    [Selector("isResting", "setResting:")] public bool Resting { get; set; }
-    [Selector("friction", "setFriction:")] public CGFloat Friction { get; set; }
-    [Selector("charge", "setCharge:")] public CGFloat Charge { get; set; }
-    [Selector("restitution", "setRestitution:")] public CGFloat Restitution { get; set; }
-    [Selector("linearDamping", "setLinearDamping:")] public CGFloat LinearDamping { get; set; }
-    [Selector("angularDamping", "setAngularDamping:")] public CGFloat AngularDamping { get; set; }
-    [Selector("density", "setDensity:")] public CGFloat Density { get; set; }
-    [Selector("mass", "setMass:")] public CGFloat Mass { get; set; }
-    [Selector("area")] public CGFloat Area { get; }
-    [Selector("affectedByGravity", "setAffectedByGravity:")] public bool AffectedByGravity { get; set; }
-    [Selector("fieldBitMask", "setFieldBitMask:")] public uint FieldBitMask { get; set; }
-    [Selector("categoryBitMask", "setCategoryBitMask:")] public uint CategoryBitMask { get; set; }
-    [Selector("collisionBitMask", "setCollisionBitMask:")] public uint CollisionBitMask { get; set; }
-    [Selector("contactTestBitMask", "setContactTestBitMask:")] public uint ContactTestBitMask { get; set; }
-    [Selector("joints")] public NSArray Joints { get; }
-    [Selector("node")] public SKNode? Node { get; }
-    [Selector("velocity", "setVelocity:")] public CGVector Velocity { get; set; }
-    [Selector("angularVelocity", "setAngularVelocity:")] public CGFloat AngularVelocity { get; set; }
-    [Selector("bodyWithCircleOfRadius:")] public static SKPhysicsBody BodyWithCircleOfRadius(CGFloat r);
-    [Selector("bodyWithCircleOfRadius:center:")] public static SKPhysicsBody BodyWithCircleOfRadiusCenter(CGFloat r, CGPoint center);
-    [Selector("bodyWithRectangleOfSize:")] public static SKPhysicsBody BodyWithRectangleOfSize(CGSize s);
-    [Selector("bodyWithRectangleOfSize:center:")] public static SKPhysicsBody BodyWithRectangleOfSizeCenter(CGSize s, CGPoint center);
-    [Selector("bodyWithPolygonFromPath:")] public static SKPhysicsBody BodyWithPolygonFromPath(CGPathRef path);
-    [Selector("bodyWithEdgeFromPoint:toPoint:")] public static SKPhysicsBody BodyWithEdgeFromPointToPoint(CGPoint p1, CGPoint p2);
-    [Selector("bodyWithEdgeChainFromPath:")] public static SKPhysicsBody BodyWithEdgeChainFromPath(CGPathRef path);
-    [Selector("bodyWithEdgeLoopFromPath:")] public static SKPhysicsBody BodyWithEdgeLoopFromPath(CGPathRef path);
-    [Selector("bodyWithEdgeLoopFromRect:")] public static SKPhysicsBody BodyWithEdgeLoopFromRect(CGRect rect);
-    [Selector("bodyWithTexture:size:")] public static SKPhysicsBody BodyWithTextureSize(SKTexture texture, CGSize size);
-    [Selector("bodyWithTexture:alphaThreshold:size:")] public static SKPhysicsBody BodyWithTextureAlphaThresholdSize(SKTexture texture, float alphaThreshold, CGSize size);
-    [Selector("bodyWithBodies:")] public static SKPhysicsBody BodyWithBodies(NSArray bodies);
-    [Selector("applyForce:")] public void ApplyForce(CGVector force);
-    [Selector("applyForce:atPoint:")] public void ApplyForceAtPoint(CGVector force, CGPoint point);
-    [Selector("applyTorque:")] public void ApplyTorque(CGFloat torque);
-    [Selector("applyImpulse:")] public void ApplyImpulse(CGVector impulse);
-    [Selector("applyImpulse:atPoint:")] public void ApplyImpulseAtPoint(CGVector impulse, CGPoint point);
-    [Selector("applyAngularImpulse:")] public void ApplyAngularImpulse(CGFloat impulse);
-    [Selector("allContactedBodies")] public NSArray AllContactedBodies();
+    [Selector("isDynamic", "setDynamic:")]
+    public bool Dynamic { get; set; }
+    [Selector("usesPreciseCollisionDetection", "setUsesPreciseCollisionDetection:")]
+    public bool UsesPreciseCollisionDetection { get; set; }
+    [Selector("allowsRotation", "setAllowsRotation:")]
+    public bool AllowsRotation { get; set; }
+    [Selector("pinned", "setPinned:")]
+    public bool Pinned { get; set; }
+    [Selector("isResting", "setResting:")]
+    public bool Resting { get; set; }
+    [Selector("friction", "setFriction:")]
+    public CGFloat Friction { get; set; }
+    [Selector("charge", "setCharge:")]
+    public CGFloat Charge { get; set; }
+    [Selector("restitution", "setRestitution:")]
+    public CGFloat Restitution { get; set; }
+    [Selector("linearDamping", "setLinearDamping:")]
+    public CGFloat LinearDamping { get; set; }
+    [Selector("angularDamping", "setAngularDamping:")]
+    public CGFloat AngularDamping { get; set; }
+    [Selector("density", "setDensity:")]
+    public CGFloat Density { get; set; }
+    [Selector("mass", "setMass:")]
+    public CGFloat Mass { get; set; }
+    [Selector("area")]
+    public CGFloat Area { get; }
+    [Selector("affectedByGravity", "setAffectedByGravity:")]
+    public bool AffectedByGravity { get; set; }
+    [Selector("fieldBitMask", "setFieldBitMask:")]
+    public uint FieldBitMask { get; set; }
+    [Selector("categoryBitMask", "setCategoryBitMask:")]
+    public uint CategoryBitMask { get; set; }
+    [Selector("collisionBitMask", "setCollisionBitMask:")]
+    public uint CollisionBitMask { get; set; }
+    [Selector("contactTestBitMask", "setContactTestBitMask:")]
+    public uint ContactTestBitMask { get; set; }
+    [Selector("joints")]
+    public NSArray Joints { get; }
+    [Selector("node")]
+    public SKNode? Node { get; }
+    [Selector("velocity", "setVelocity:")]
+    public CGVector Velocity { get; set; }
+    [Selector("angularVelocity", "setAngularVelocity:")]
+    public CGFloat AngularVelocity { get; set; }
+    [Selector("bodyWithCircleOfRadius:")]
+    public static SKPhysicsBody BodyWithCircleOfRadius(CGFloat r);
+    [Selector("bodyWithCircleOfRadius:center:")]
+    public static SKPhysicsBody BodyWithCircleOfRadiusCenter(CGFloat r, CGPoint center);
+    [Selector("bodyWithRectangleOfSize:")]
+    public static SKPhysicsBody BodyWithRectangleOfSize(CGSize s);
+    [Selector("bodyWithRectangleOfSize:center:")]
+    public static SKPhysicsBody BodyWithRectangleOfSizeCenter(CGSize s, CGPoint center);
+    [Selector("bodyWithPolygonFromPath:")]
+    public static SKPhysicsBody BodyWithPolygonFromPath(CGPathRef path);
+    [Selector("bodyWithEdgeFromPoint:toPoint:")]
+    public static SKPhysicsBody BodyWithEdgeFromPointToPoint(CGPoint p1, CGPoint p2);
+    [Selector("bodyWithEdgeChainFromPath:")]
+    public static SKPhysicsBody BodyWithEdgeChainFromPath(CGPathRef path);
+    [Selector("bodyWithEdgeLoopFromPath:")]
+    public static SKPhysicsBody BodyWithEdgeLoopFromPath(CGPathRef path);
+    [Selector("bodyWithEdgeLoopFromRect:")]
+    public static SKPhysicsBody BodyWithEdgeLoopFromRect(CGRect rect);
+    [Selector("bodyWithTexture:size:")]
+    public static SKPhysicsBody BodyWithTextureSize(SKTexture texture, CGSize size);
+    [Selector("bodyWithTexture:alphaThreshold:size:")]
+    public static SKPhysicsBody BodyWithTextureAlphaThresholdSize(SKTexture texture, float alphaThreshold, CGSize size);
+    [Selector("bodyWithBodies:")]
+    public static SKPhysicsBody BodyWithBodies(NSArray bodies);
+    [Selector("applyForce:")]
+    public void ApplyForce(CGVector force);
+    [Selector("applyForce:atPoint:")]
+    public void ApplyForceAtPoint(CGVector force, CGPoint point);
+    [Selector("applyTorque:")]
+    public void ApplyTorque(CGFloat torque);
+    [Selector("applyImpulse:")]
+    public void ApplyImpulse(CGVector impulse);
+    [Selector("applyImpulse:atPoint:")]
+    public void ApplyImpulseAtPoint(CGVector impulse, CGPoint point);
+    [Selector("applyAngularImpulse:")]
+    public void ApplyAngularImpulse(CGFloat impulse);
+    [Selector("allContactedBodies")]
+    public NSArray AllContactedBodies();
 }
 
 #endif

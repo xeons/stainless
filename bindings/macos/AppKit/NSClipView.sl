@@ -32,34 +32,51 @@ import Standard.ObjC;
 
 public extern objc class NSClipView : NSView
 {
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor BackgroundColor { get; set; }
-    [Selector("drawsBackground", "setDrawsBackground:")] public bool DrawsBackground { get; set; }
-    [Selector("documentView", "setDocumentView:")] public NSView? DocumentView { get; set; }
-    [Selector("documentRect")] public NSRect DocumentRect { get; }
-    [Selector("documentCursor", "setDocumentCursor:")] public NSCursor? DocumentCursor { get; set; }
-    [Selector("documentVisibleRect")] public NSRect DocumentVisibleRect { get; }
-    [Selector("contentInsets", "setContentInsets:")] public NSEdgeInsets ContentInsets { get; set; }
-    [Selector("automaticallyAdjustsContentInsets", "setAutomaticallyAdjustsContentInsets:")] public bool AutomaticallyAdjustsContentInsets { get; set; }
-    [Selector("viewFrameChanged:")] public void ViewFrameChanged(NSNotification notification);
-    [Selector("viewBoundsChanged:")] public void ViewBoundsChanged(NSNotification notification);
-    [Selector("autoscroll:")] public bool Autoscroll(NSEvent event);
-    [Selector("scrollToPoint:")] public void ScrollToPoint(NSPoint newOrigin);
-    [Selector("constrainBoundsRect:")] public NSRect ConstrainBoundsRect(NSRect proposedBounds);
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor BackgroundColor { get; set; }
+    [Selector("drawsBackground", "setDrawsBackground:")]
+    public bool DrawsBackground { get; set; }
+    [Selector("documentView", "setDocumentView:")]
+    public NSView? DocumentView { get; set; }
+    [Selector("documentRect")]
+    public NSRect DocumentRect { get; }
+    [Selector("documentCursor", "setDocumentCursor:")]
+    public NSCursor? DocumentCursor { get; set; }
+    [Selector("documentVisibleRect")]
+    public NSRect DocumentVisibleRect { get; }
+    [Selector("contentInsets", "setContentInsets:")]
+    public NSEdgeInsets ContentInsets { get; set; }
+    [Selector("automaticallyAdjustsContentInsets", "setAutomaticallyAdjustsContentInsets:")]
+    public bool AutomaticallyAdjustsContentInsets { get; set; }
+    [Selector("viewFrameChanged:")]
+    public void ViewFrameChanged(NSNotification notification);
+    [Selector("viewBoundsChanged:")]
+    public void ViewBoundsChanged(NSNotification notification);
+    [Selector("autoscroll:")]
+    public bool Autoscroll(NSEvent event);
+    [Selector("scrollToPoint:")]
+    public void ScrollToPoint(NSPoint newOrigin);
+    [Selector("constrainBoundsRect:")]
+    public NSRect ConstrainBoundsRect(NSRect proposedBounds);
 }
 
 /// NSClipViewSuperview, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("reflectScrolledClipView:")] public void ReflectScrolledClipView(NSClipView clipView);
-    [Selector("scrollClipView:toPoint:")] public void ScrollClipViewToPoint(NSClipView clipView, NSPoint point);
+    [Selector("reflectScrolledClipView:")]
+    public void ReflectScrolledClipView(NSClipView clipView);
+    [Selector("scrollClipView:toPoint:")]
+    public void ScrollClipViewToPoint(NSClipView clipView, NSPoint point);
 }
 
 public extern objc class NSClipView
 {
     /// Deprecated in macOS 11.0.
-    [Selector("copiesOnScroll", "setCopiesOnScroll:")] public bool CopiesOnScroll { get; set; }
+    [Selector("copiesOnScroll", "setCopiesOnScroll:")]
+    public bool CopiesOnScroll { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("constrainScrollPoint:")] public NSPoint ConstrainScrollPoint(NSPoint newOrigin);
+    [Selector("constrainScrollPoint:")]
+    public NSPoint ConstrainScrollPoint(NSPoint newOrigin);
 }
 
 #endif

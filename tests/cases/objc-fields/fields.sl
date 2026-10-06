@@ -13,21 +13,27 @@ import Standard.ObjC;
 [ObjCRoot]
 public extern objc class NSObject
 {
-    [Selector("alloc")] public static Self Alloc();
-    [Selector("init")] public Self Init();
+    [Selector("alloc")]
+    public static Self Alloc();
+    [Selector("init")]
+    public Self Init();
 }
 
 public extern objc class NSString : NSObject
 {
-    [Selector("stringWithUTF8String:")] public static Self FromUtf8(byte* text);
-    [Selector("length")] public nuint Length { get; }
+    [Selector("stringWithUTF8String:")]
+    public static Self FromUtf8(byte* text);
+    [Selector("length")]
+    public nuint Length { get; }
 }
 
 // Written in probe.m, with ivars of its own.
 public extern objc class SLBase : NSObject
 {
-    [Selector("initWithBase:")] public Self InitWithBase(long value);
-    [Selector("baseValue")] public long BaseValue { get; }
+    [Selector("initWithBase:")]
+    public Self InitWithBase(long value);
+    [Selector("baseValue")]
+    public long BaseValue { get; }
 }
 
 public struct Tag
@@ -69,10 +75,14 @@ public objc class Counter : SLBase
         Made++;
     }
 
-    [Selector("count")] public long Count => _count;
-    [Selector("seen")] public long Seen => (long)_seen.Count;
-    [Selector("labelLength")] public long LabelLength => (long)_label.ByteLength() + _tag.Weight;
-    [Selector("noteLength")] public long NoteLength => _note is NSString note ? (long)note.Length : -1;
+    [Selector("count")]
+    public long Count => _count;
+    [Selector("seen")]
+    public long Seen => (long)_seen.Count;
+    [Selector("labelLength")]
+    public long LabelLength => (long)_label.ByteLength() + _tag.Weight;
+    [Selector("noteLength")]
+    public long NoteLength => _note is NSString note ? (long)note.Length : -1;
 
     [Selector("bump")]
     public void Bump()
@@ -100,7 +110,8 @@ public objc class Wider : Counter
         _extra = extra * 2;
     }
 
-    [Selector("extra")] public long Extra => _extra + (long)_name.ByteLength();
+    [Selector("extra")]
+    public long Extra => _extra + (long)_name.ByteLength();
 }
 
 extern "C"

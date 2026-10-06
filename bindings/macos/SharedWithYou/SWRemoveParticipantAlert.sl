@@ -34,7 +34,8 @@ import Standard.ObjC;
 
 public extern objc class SWRemoveParticipantAlert : NSObject
 {
-    [Selector("showAlertWithParticipant:highlight:inWindow:")] public static void ShowAlertWithParticipantHighlightInWindow(SWPerson participant, SWCollaborationHighlight highlight, NSWindow? window);
+    [Selector("showAlertWithParticipant:highlight:inWindow:")]
+    public static void ShowAlertWithParticipantHighlightInWindow(SWPerson participant, SWCollaborationHighlight highlight, NSWindow? window);
 }
 
 #endif

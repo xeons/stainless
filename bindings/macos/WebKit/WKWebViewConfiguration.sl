@@ -50,27 +50,46 @@ public enum WKAudiovisualMediaTypes : ulong
 public extern objc class WKWebViewConfiguration : NSObject, NSSecureCoding, NSCopying
 {
     /// Deprecated in macOS 12.0.
-    [Selector("processPool", "setProcessPool:")] public WKProcessPool ProcessPool { get; set; }
-    [Selector("preferences", "setPreferences:")] public WKPreferences Preferences { get; set; }
-    [Selector("userContentController", "setUserContentController:")] public WKUserContentController UserContentController { get; set; }
+    [Selector("processPool", "setProcessPool:")]
+    public WKProcessPool ProcessPool { get; set; }
+    [Selector("preferences", "setPreferences:")]
+    public WKPreferences Preferences { get; set; }
+    [Selector("userContentController", "setUserContentController:")]
+    public WKUserContentController UserContentController { get; set; }
     /// macOS 15.4 and later.
-    [Selector("webExtensionController", "setWebExtensionController:")] public WKWebExtensionController? WebExtensionController { get; set; }
-    [Selector("websiteDataStore", "setWebsiteDataStore:")] public WKWebsiteDataStore WebsiteDataStore { get; set; }
-    [Selector("suppressesIncrementalRendering", "setSuppressesIncrementalRendering:")] public bool SuppressesIncrementalRendering { get; set; }
-    [Selector("applicationNameForUserAgent", "setApplicationNameForUserAgent:")] public NSString? ApplicationNameForUserAgent { get; set; }
-    [Selector("allowsAirPlayForMediaPlayback", "setAllowsAirPlayForMediaPlayback:")] public bool AllowsAirPlayForMediaPlayback { get; set; }
+    [Selector("webExtensionController", "setWebExtensionController:")]
+    public WKWebExtensionController? WebExtensionController { get; set; }
+    [Selector("websiteDataStore", "setWebsiteDataStore:")]
+    public WKWebsiteDataStore WebsiteDataStore { get; set; }
+    [Selector("suppressesIncrementalRendering", "setSuppressesIncrementalRendering:")]
+    public bool SuppressesIncrementalRendering { get; set; }
+    [Selector("applicationNameForUserAgent", "setApplicationNameForUserAgent:")]
+    public NSString? ApplicationNameForUserAgent { get; set; }
+    [Selector("allowsAirPlayForMediaPlayback", "setAllowsAirPlayForMediaPlayback:")]
+    public bool AllowsAirPlayForMediaPlayback { get; set; }
     /// macOS 26.0 and later.
-    [Selector("showsSystemScreenTimeBlockingView", "setShowsSystemScreenTimeBlockingView:")] public bool ShowsSystemScreenTimeBlockingView { get; set; }
-    [Selector("upgradeKnownHostsToHTTPS", "setUpgradeKnownHostsToHTTPS:")] public bool UpgradeKnownHostsToHTTPS { get; set; }
-    [Selector("mediaTypesRequiringUserActionForPlayback", "setMediaTypesRequiringUserActionForPlayback:")] public WKAudiovisualMediaTypes MediaTypesRequiringUserActionForPlayback { get; set; }
-    [Selector("defaultWebpagePreferences", "setDefaultWebpagePreferences:")] public WKWebpagePreferences? DefaultWebpagePreferences { get; set; }
-    [Selector("limitsNavigationsToAppBoundDomains", "setLimitsNavigationsToAppBoundDomains:")] public bool LimitsNavigationsToAppBoundDomains { get; set; }
-    [Selector("allowsInlinePredictions", "setAllowsInlinePredictions:")] public bool AllowsInlinePredictions { get; set; }
-    [Selector("userInterfaceDirectionPolicy", "setUserInterfaceDirectionPolicy:")] public WKUserInterfaceDirectionPolicy UserInterfaceDirectionPolicy { get; set; }
-    [Selector("supportsAdaptiveImageGlyph", "setSupportsAdaptiveImageGlyph:")] public bool SupportsAdaptiveImageGlyph { get; set; }
-    [Selector("writingToolsBehavior", "setWritingToolsBehavior:")] public NSWritingToolsBehavior WritingToolsBehavior { get; set; }
-    [Selector("setURLSchemeHandler:forURLScheme:")] public void SetURLSchemeHandlerForURLScheme(WKURLSchemeHandler? urlSchemeHandler, NSString urlScheme);
-    [Selector("urlSchemeHandlerForURLScheme:")] public WKURLSchemeHandler? UrlSchemeHandlerForURLScheme(NSString urlScheme);
+    [Selector("showsSystemScreenTimeBlockingView", "setShowsSystemScreenTimeBlockingView:")]
+    public bool ShowsSystemScreenTimeBlockingView { get; set; }
+    [Selector("upgradeKnownHostsToHTTPS", "setUpgradeKnownHostsToHTTPS:")]
+    public bool UpgradeKnownHostsToHTTPS { get; set; }
+    [Selector("mediaTypesRequiringUserActionForPlayback", "setMediaTypesRequiringUserActionForPlayback:")]
+    public WKAudiovisualMediaTypes MediaTypesRequiringUserActionForPlayback { get; set; }
+    [Selector("defaultWebpagePreferences", "setDefaultWebpagePreferences:")]
+    public WKWebpagePreferences? DefaultWebpagePreferences { get; set; }
+    [Selector("limitsNavigationsToAppBoundDomains", "setLimitsNavigationsToAppBoundDomains:")]
+    public bool LimitsNavigationsToAppBoundDomains { get; set; }
+    [Selector("allowsInlinePredictions", "setAllowsInlinePredictions:")]
+    public bool AllowsInlinePredictions { get; set; }
+    [Selector("userInterfaceDirectionPolicy", "setUserInterfaceDirectionPolicy:")]
+    public WKUserInterfaceDirectionPolicy UserInterfaceDirectionPolicy { get; set; }
+    [Selector("supportsAdaptiveImageGlyph", "setSupportsAdaptiveImageGlyph:")]
+    public bool SupportsAdaptiveImageGlyph { get; set; }
+    [Selector("writingToolsBehavior", "setWritingToolsBehavior:")]
+    public NSWritingToolsBehavior WritingToolsBehavior { get; set; }
+    [Selector("setURLSchemeHandler:forURLScheme:")]
+    public void SetURLSchemeHandlerForURLScheme(WKURLSchemeHandler? urlSchemeHandler, NSString urlScheme);
+    [Selector("urlSchemeHandlerForURLScheme:")]
+    public WKURLSchemeHandler? UrlSchemeHandlerForURLScheme(NSString urlScheme);
 }
 
 #endif

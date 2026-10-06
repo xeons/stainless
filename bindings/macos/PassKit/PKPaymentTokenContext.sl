@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class PKPaymentTokenContext : NSObject
 {
-    [Selector("merchantIdentifier", "setMerchantIdentifier:")] public NSString MerchantIdentifier { get; set; }
-    [Selector("externalIdentifier", "setExternalIdentifier:")] public NSString ExternalIdentifier { get; set; }
-    [Selector("merchantName", "setMerchantName:")] public NSString MerchantName { get; set; }
-    [Selector("merchantDomain", "setMerchantDomain:")] public NSString? MerchantDomain { get; set; }
-    [Selector("amount", "setAmount:")] public NSDecimalNumber Amount { get; set; }
-    [Selector("initWithMerchantIdentifier:externalIdentifier:merchantName:merchantDomain:amount:")] public Self InitWithMerchantIdentifierExternalIdentifierMerchantNameMerchantDomainAmount(NSString merchantIdentifier, NSString externalIdentifier, NSString merchantName, NSString? merchantDomain, NSDecimalNumber amount);
+    [Selector("merchantIdentifier", "setMerchantIdentifier:")]
+    public NSString MerchantIdentifier { get; set; }
+    [Selector("externalIdentifier", "setExternalIdentifier:")]
+    public NSString ExternalIdentifier { get; set; }
+    [Selector("merchantName", "setMerchantName:")]
+    public NSString MerchantName { get; set; }
+    [Selector("merchantDomain", "setMerchantDomain:")]
+    public NSString? MerchantDomain { get; set; }
+    [Selector("amount", "setAmount:")]
+    public NSDecimalNumber Amount { get; set; }
+    [Selector("initWithMerchantIdentifier:externalIdentifier:merchantName:merchantDomain:amount:")]
+    public Self InitWithMerchantIdentifierExternalIdentifierMerchantNameMerchantDomainAmount(NSString merchantIdentifier, NSString externalIdentifier, NSString merchantName, NSString? merchantDomain, NSDecimalNumber amount);
 }
 
 #endif

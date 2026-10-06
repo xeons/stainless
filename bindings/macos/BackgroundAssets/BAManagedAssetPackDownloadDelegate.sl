@@ -34,11 +34,21 @@ import Standard.ObjC;
 /// macOS 26 and later.
 public objc interface BAManagedAssetPackDownloadDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("downloadOfAssetPackBegan:")] void DownloadOfAssetPackBegan(BAAssetPack assetPack);
-    [Optional] [Selector("downloadOfAssetPackPaused:")] void DownloadOfAssetPackPaused(BAAssetPack assetPack);
-    [Optional] [Selector("downloadOfAssetPack:hasProgress:")] void DownloadOfAssetPackHasProgress(BAAssetPack assetPack, NSProgress progress);
-    [Optional] [Selector("downloadOfAssetPackFinished:")] void DownloadOfAssetPackFinished(BAAssetPack assetPack);
-    [Optional] [Selector("downloadOfAssetPack:failedWithError:")] void DownloadOfAssetPackFailedWithError(BAAssetPack assetPack, NSError error);
+    [Optional]
+    [Selector("downloadOfAssetPackBegan:")]
+    void DownloadOfAssetPackBegan(BAAssetPack assetPack);
+    [Optional]
+    [Selector("downloadOfAssetPackPaused:")]
+    void DownloadOfAssetPackPaused(BAAssetPack assetPack);
+    [Optional]
+    [Selector("downloadOfAssetPack:hasProgress:")]
+    void DownloadOfAssetPackHasProgress(BAAssetPack assetPack, NSProgress progress);
+    [Optional]
+    [Selector("downloadOfAssetPackFinished:")]
+    void DownloadOfAssetPackFinished(BAAssetPack assetPack);
+    [Optional]
+    [Selector("downloadOfAssetPack:failedWithError:")]
+    void DownloadOfAssetPackFailedWithError(BAAssetPack assetPack, NSError error);
 }
 
 #endif

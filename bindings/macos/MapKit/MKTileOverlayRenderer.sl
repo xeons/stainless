@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class MKTileOverlayRenderer : MKOverlayRenderer
 {
-    [Selector("initWithTileOverlay:")] public Self InitWithTileOverlay(MKTileOverlay overlay);
-    [Selector("reloadData")] public void ReloadData();
+    [Selector("initWithTileOverlay:")]
+    public Self InitWithTileOverlay(MKTileOverlay overlay);
+    [Selector("reloadData")]
+    public void ReloadData();
 }
 
 #endif

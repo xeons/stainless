@@ -148,12 +148,15 @@ public sealed record ProjectFile
     // --------------------------------------------------------------- derived
 
     /// <summary>The directory the file was read from. Not serialized.</summary>
-    [JsonIgnore] public string Directory { get; init; } = ".";
+    [JsonIgnore]
+    public string Directory { get; init; } = ".";
 
     /// <summary>The file itself, for a diagnostic that can name it.</summary>
-    [JsonIgnore] public string Path => System.IO.Path.Combine(Directory, FileName);
+    [JsonIgnore]
+    public string Path => System.IO.Path.Combine(Directory, FileName);
 
-    [JsonIgnore] public bool IsLibrary => Kind == ProjectKind.Library;
+    [JsonIgnore]
+    public bool IsLibrary => Kind == ProjectKind.Library;
 
     /// <summary>Resolves a path written in the file against the file's own directory.</summary>
     public string Resolve(string path) =>

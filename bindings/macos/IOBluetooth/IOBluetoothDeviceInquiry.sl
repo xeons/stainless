@@ -34,26 +34,47 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothDeviceInquiry : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public AnyObject? Delegate { get; set; }
-    [Selector("inquiryLength", "setInquiryLength:")] public byte InquiryLength { get; set; }
-    [Selector("searchType", "setSearchType:")] public IOBluetoothDeviceSearchTypes SearchType { get; set; }
-    [Selector("updateNewDeviceNames", "setUpdateNewDeviceNames:")] public bool UpdateNewDeviceNames { get; set; }
-    [Selector("inquiryWithDelegate:")] public static Self? InquiryWithDelegate(AnyObject? @delegate);
-    [Selector("initWithDelegate:")] public Self? InitWithDelegate(AnyObject? @delegate);
-    [Selector("start")] public IOReturn Start();
-    [Selector("stop")] public IOReturn Stop();
-    [Selector("foundDevices")] public NSArray? FoundDevices();
-    [Selector("clearFoundDevices")] public void ClearFoundDevices();
-    [Selector("setSearchCriteria:majorDeviceClass:minorDeviceClass:")] public void SetSearchCriteriaMajorDeviceClassMinorDeviceClass(BluetoothServiceClassMajor inServiceClassMajor, BluetoothDeviceClassMajor inMajorDeviceClass, BluetoothDeviceClassMinor inMinorDeviceClass);
+    [Selector("delegate", "setDelegate:")]
+    public AnyObject? Delegate { get; set; }
+    [Selector("inquiryLength", "setInquiryLength:")]
+    public byte InquiryLength { get; set; }
+    [Selector("searchType", "setSearchType:")]
+    public IOBluetoothDeviceSearchTypes SearchType { get; set; }
+    [Selector("updateNewDeviceNames", "setUpdateNewDeviceNames:")]
+    public bool UpdateNewDeviceNames { get; set; }
+    [Selector("inquiryWithDelegate:")]
+    public static Self? InquiryWithDelegate(AnyObject? @delegate);
+    [Selector("initWithDelegate:")]
+    public Self? InitWithDelegate(AnyObject? @delegate);
+    [Selector("start")]
+    public IOReturn Start();
+    [Selector("stop")]
+    public IOReturn Stop();
+    [Selector("foundDevices")]
+    public NSArray? FoundDevices();
+    [Selector("clearFoundDevices")]
+    public void ClearFoundDevices();
+    [Selector("setSearchCriteria:majorDeviceClass:minorDeviceClass:")]
+    public void SetSearchCriteriaMajorDeviceClassMinorDeviceClass(BluetoothServiceClassMajor inServiceClassMajor, BluetoothDeviceClassMajor inMajorDeviceClass, BluetoothDeviceClassMinor inMinorDeviceClass);
 }
 
 public objc interface IOBluetoothDeviceInquiryDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("deviceInquiryStarted:")] void DeviceInquiryStarted(IOBluetoothDeviceInquiry? sender);
-    [Optional] [Selector("deviceInquiryDeviceFound:device:")] void DeviceInquiryDeviceFoundDevice(IOBluetoothDeviceInquiry? sender, IOBluetoothDevice? device);
-    [Optional] [Selector("deviceInquiryUpdatingDeviceNamesStarted:devicesRemaining:")] void DeviceInquiryUpdatingDeviceNamesStartedDevicesRemaining(IOBluetoothDeviceInquiry? sender, uint devicesRemaining);
-    [Optional] [Selector("deviceInquiryDeviceNameUpdated:device:devicesRemaining:")] void DeviceInquiryDeviceNameUpdatedDeviceDevicesRemaining(IOBluetoothDeviceInquiry? sender, IOBluetoothDevice? device, uint devicesRemaining);
-    [Optional] [Selector("deviceInquiryComplete:error:aborted:")] void DeviceInquiryCompleteErrorAborted(IOBluetoothDeviceInquiry? sender, IOReturn error, bool aborted);
+    [Optional]
+    [Selector("deviceInquiryStarted:")]
+    void DeviceInquiryStarted(IOBluetoothDeviceInquiry? sender);
+    [Optional]
+    [Selector("deviceInquiryDeviceFound:device:")]
+    void DeviceInquiryDeviceFoundDevice(IOBluetoothDeviceInquiry? sender, IOBluetoothDevice? device);
+    [Optional]
+    [Selector("deviceInquiryUpdatingDeviceNamesStarted:devicesRemaining:")]
+    void DeviceInquiryUpdatingDeviceNamesStartedDevicesRemaining(IOBluetoothDeviceInquiry? sender, uint devicesRemaining);
+    [Optional]
+    [Selector("deviceInquiryDeviceNameUpdated:device:devicesRemaining:")]
+    void DeviceInquiryDeviceNameUpdatedDeviceDevicesRemaining(IOBluetoothDeviceInquiry? sender, IOBluetoothDevice? device, uint devicesRemaining);
+    [Optional]
+    [Selector("deviceInquiryComplete:error:aborted:")]
+    void DeviceInquiryCompleteErrorAborted(IOBluetoothDeviceInquiry? sender, IOReturn error, bool aborted);
 }
 
 #endif

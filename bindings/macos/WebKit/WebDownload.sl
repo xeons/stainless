@@ -37,7 +37,9 @@ public extern objc class WebDownload : NSURLDownload { }
 /// Deprecated in macOS 10.14.
 public objc interface WebDownloadDelegate : NSURLDownloadDelegate
 {
-    [Optional] [Selector("downloadWindowForAuthenticationSheet:")] NSWindow? DownloadWindowForAuthenticationSheet(WebDownload? download);
+    [Optional]
+    [Selector("downloadWindowForAuthenticationSheet:")]
+    NSWindow? DownloadWindowForAuthenticationSheet(WebDownload? download);
 }
 
 #endif

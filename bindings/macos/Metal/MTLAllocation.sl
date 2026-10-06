@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public objc interface MTLAllocation : NSObjectProtocol
 {
-    [Selector("allocatedSize")] NSUInteger AllocatedSize { get; }
+    [Selector("allocatedSize")]
+    NSUInteger AllocatedSize { get; }
 }
 
 #endif

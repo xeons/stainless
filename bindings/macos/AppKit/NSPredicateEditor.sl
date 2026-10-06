@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class NSPredicateEditor : NSRuleEditor
 {
-    [Selector("rowTemplates", "setRowTemplates:")] public NSArray RowTemplates { get; set; }
+    [Selector("rowTemplates", "setRowTemplates:")]
+    public NSArray RowTemplates { get; set; }
 }
 
 #endif

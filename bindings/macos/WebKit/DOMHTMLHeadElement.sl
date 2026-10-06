@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLHeadElement : DOMHTMLElement
 {
-    [Selector("profile", "setProfile:")] public NSString? Profile { get; set; }
+    [Selector("profile", "setProfile:")]
+    public NSString? Profile { get; set; }
 }
 
 #endif

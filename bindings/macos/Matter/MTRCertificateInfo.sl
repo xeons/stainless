@@ -33,22 +33,33 @@ import Standard.ObjC;
 
 public extern objc class MTRCertificateInfo : NSObject, NSCopying
 {
-    [Selector("issuer")] public MTRDistinguishedNameInfo Issuer { get; }
-    [Selector("subject")] public MTRDistinguishedNameInfo Subject { get; }
-    [Selector("notBefore")] public NSDate NotBefore { get; }
-    [Selector("notAfter")] public NSDate NotAfter { get; }
+    [Selector("issuer")]
+    public MTRDistinguishedNameInfo Issuer { get; }
+    [Selector("subject")]
+    public MTRDistinguishedNameInfo Subject { get; }
+    [Selector("notBefore")]
+    public NSDate NotBefore { get; }
+    [Selector("notAfter")]
+    public NSDate NotAfter { get; }
     /// macOS 15.2 and later.
-    [Selector("publicKeyData")] public NSData? PublicKeyData { get; }
-    [Selector("initWithTLVBytes:")] public Self? InitWithTLVBytes(MTRCertificateTLVBytes bytes);
+    [Selector("publicKeyData")]
+    public NSData? PublicKeyData { get; }
+    [Selector("initWithTLVBytes:")]
+    public Self? InitWithTLVBytes(MTRCertificateTLVBytes bytes);
 }
 
 public extern objc class MTRDistinguishedNameInfo : NSObject, NSCopying
 {
-    [Selector("nodeID")] public NSNumber? NodeID { get; }
-    [Selector("fabricID")] public NSNumber? FabricID { get; }
-    [Selector("rootCACertificateID")] public NSNumber? RootCACertificateID { get; }
-    [Selector("intermediateCACertificateID")] public NSNumber? IntermediateCACertificateID { get; }
-    [Selector("caseAuthenticatedTags")] public NSSet CaseAuthenticatedTags { get; }
+    [Selector("nodeID")]
+    public NSNumber? NodeID { get; }
+    [Selector("fabricID")]
+    public NSNumber? FabricID { get; }
+    [Selector("rootCACertificateID")]
+    public NSNumber? RootCACertificateID { get; }
+    [Selector("intermediateCACertificateID")]
+    public NSNumber? IntermediateCACertificateID { get; }
+    [Selector("caseAuthenticatedTags")]
+    public NSSet CaseAuthenticatedTags { get; }
 }
 
 #endif

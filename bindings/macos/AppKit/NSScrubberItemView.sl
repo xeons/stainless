@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class NSScrubberArrangedView : NSView
 {
-    [Selector("isSelected", "setSelected:")] public bool Selected { get; set; }
-    [Selector("isHighlighted", "setHighlighted:")] public bool Highlighted { get; set; }
-    [Selector("applyLayoutAttributes:")] public void ApplyLayoutAttributes(NSScrubberLayoutAttributes layoutAttributes);
+    [Selector("isSelected", "setSelected:")]
+    public bool Selected { get; set; }
+    [Selector("isHighlighted", "setHighlighted:")]
+    public bool Highlighted { get; set; }
+    [Selector("applyLayoutAttributes:")]
+    public void ApplyLayoutAttributes(NSScrubberLayoutAttributes layoutAttributes);
 }
 
 public extern objc class NSScrubberSelectionView : NSScrubberArrangedView { }
@@ -43,15 +46,20 @@ public extern objc class NSScrubberItemView : NSScrubberArrangedView { }
 
 public extern objc class NSScrubberTextItemView : NSScrubberItemView
 {
-    [Selector("textField")] public NSTextField TextField { get; }
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
+    [Selector("textField")]
+    public NSTextField TextField { get; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
 }
 
 public extern objc class NSScrubberImageItemView : NSScrubberItemView
 {
-    [Selector("imageView")] public NSImageView ImageView { get; }
-    [Selector("image", "setImage:")] public NSImage Image { get; set; }
-    [Selector("imageAlignment", "setImageAlignment:")] public NSImageAlignment ImageAlignment { get; set; }
+    [Selector("imageView")]
+    public NSImageView ImageView { get; }
+    [Selector("image", "setImage:")]
+    public NSImage Image { get; set; }
+    [Selector("imageAlignment", "setImageAlignment:")]
+    public NSImageAlignment ImageAlignment { get; set; }
 }
 
 #endif

@@ -53,7 +53,8 @@ public extern objc class CFTreeRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFTreeGetTypeID();
 
-[ReturnsRetained] public extern "C" CFTreeRef? CFTreeCreate(CFAllocatorRef? allocator, CFTreeContext* context);
+[ReturnsRetained]
+public extern "C" CFTreeRef? CFTreeCreate(CFAllocatorRef? allocator, CFTreeContext* context);
 
 public extern "C" CFTreeRef? CFTreeGetParent(CFTreeRef? tree);
 

@@ -39,7 +39,8 @@ public delegate void CFUserNotificationCallBack(__CFUserNotification* arg0, CFOp
 
 public extern "C" CFTypeID CFUserNotificationGetTypeID();
 
-[ReturnsRetained] public extern "C" CFUserNotificationRef? CFUserNotificationCreate(CFAllocatorRef? allocator, CFTimeInterval timeout, CFOptionFlags flags, SInt32* error, CFDictionaryRef? dictionary);
+[ReturnsRetained]
+public extern "C" CFUserNotificationRef? CFUserNotificationCreate(CFAllocatorRef? allocator, CFTimeInterval timeout, CFOptionFlags flags, SInt32* error, CFDictionaryRef? dictionary);
 
 public extern "C" SInt32 CFUserNotificationReceiveResponse(CFUserNotificationRef? userNotification, CFTimeInterval timeout, CFOptionFlags* responseFlags);
 
@@ -51,7 +52,8 @@ public extern "C" SInt32 CFUserNotificationUpdate(CFUserNotificationRef? userNot
 
 public extern "C" SInt32 CFUserNotificationCancel(CFUserNotificationRef? userNotification);
 
-[ReturnsRetained] public extern "C" CFRunLoopSourceRef? CFUserNotificationCreateRunLoopSource(CFAllocatorRef? allocator, CFUserNotificationRef? userNotification, CFUserNotificationCallBack callout, CFIndex order);
+[ReturnsRetained]
+public extern "C" CFRunLoopSourceRef? CFUserNotificationCreateRunLoopSource(CFAllocatorRef? allocator, CFUserNotificationRef? userNotification, CFUserNotificationCallBack callout, CFIndex order);
 
 public extern "C" SInt32 CFUserNotificationDisplayNotice(CFTimeInterval timeout, CFOptionFlags flags, CFURLRef? iconURL, CFURLRef? soundURL, CFURLRef? localizationURL, CFStringRef? alertHeader, CFStringRef? alertMessage, CFStringRef? defaultButtonTitle);
 

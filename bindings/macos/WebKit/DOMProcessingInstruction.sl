@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMProcessingInstruction : DOMCharacterData
 {
-    [Selector("target")] public NSString? Target { get; }
-    [Selector("sheet")] public DOMStyleSheet? Sheet { get; }
+    [Selector("target")]
+    public NSString? Target { get; }
+    [Selector("sheet")]
+    public DOMStyleSheet? Sheet { get; }
 }
 
 #endif

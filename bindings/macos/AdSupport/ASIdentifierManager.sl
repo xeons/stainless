@@ -33,10 +33,13 @@ import Standard.ObjC;
 
 public extern objc class ASIdentifierManager : NSObject
 {
-    [Selector("advertisingIdentifier")] public NSUUID AdvertisingIdentifier { get; }
+    [Selector("advertisingIdentifier")]
+    public NSUUID AdvertisingIdentifier { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("isAdvertisingTrackingEnabled")] public bool AdvertisingTrackingEnabled { get; }
-    [Selector("sharedManager")] public static ASIdentifierManager SharedManager();
+    [Selector("isAdvertisingTrackingEnabled")]
+    public bool AdvertisingTrackingEnabled { get; }
+    [Selector("sharedManager")]
+    public static ASIdentifierManager SharedManager();
 }
 
 #endif

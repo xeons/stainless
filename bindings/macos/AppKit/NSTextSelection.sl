@@ -49,19 +49,32 @@ public enum NSTextSelectionAffinity : long
 
 public extern objc class NSTextSelection : NSObject, NSSecureCoding
 {
-    [Selector("textRanges")] public NSArray TextRanges { get; }
-    [Selector("granularity")] public NSTextSelectionGranularity Granularity { get; }
-    [Selector("affinity")] public NSTextSelectionAffinity Affinity { get; }
-    [Selector("isTransient")] public bool Transient { get; }
-    [Selector("anchorPositionOffset", "setAnchorPositionOffset:")] public CGFloat AnchorPositionOffset { get; set; }
-    [Selector("isLogical", "setLogical:")] public bool Logical { get; set; }
-    [Selector("secondarySelectionLocation", "setSecondarySelectionLocation:")] public NSTextLocation? SecondarySelectionLocation { get; set; }
-    [Selector("typingAttributes", "setTypingAttributes:")] public NSDictionary TypingAttributes { get; set; }
-    [Selector("initWithRanges:affinity:granularity:")] public Self InitWithRangesAffinityGranularity(NSArray textRanges, NSTextSelectionAffinity affinity, NSTextSelectionGranularity granularity);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("initWithRange:affinity:granularity:")] public Self InitWithRangeAffinityGranularity(NSTextRange range, NSTextSelectionAffinity affinity, NSTextSelectionGranularity granularity);
-    [Selector("initWithLocation:affinity:")] public Self InitWithLocationAffinity(NSTextLocation location, NSTextSelectionAffinity affinity);
-    [Selector("textSelectionWithTextRanges:")] public NSTextSelection TextSelectionWithTextRanges(NSArray textRanges);
+    [Selector("textRanges")]
+    public NSArray TextRanges { get; }
+    [Selector("granularity")]
+    public NSTextSelectionGranularity Granularity { get; }
+    [Selector("affinity")]
+    public NSTextSelectionAffinity Affinity { get; }
+    [Selector("isTransient")]
+    public bool Transient { get; }
+    [Selector("anchorPositionOffset", "setAnchorPositionOffset:")]
+    public CGFloat AnchorPositionOffset { get; set; }
+    [Selector("isLogical", "setLogical:")]
+    public bool Logical { get; set; }
+    [Selector("secondarySelectionLocation", "setSecondarySelectionLocation:")]
+    public NSTextLocation? SecondarySelectionLocation { get; set; }
+    [Selector("typingAttributes", "setTypingAttributes:")]
+    public NSDictionary TypingAttributes { get; set; }
+    [Selector("initWithRanges:affinity:granularity:")]
+    public Self InitWithRangesAffinityGranularity(NSArray textRanges, NSTextSelectionAffinity affinity, NSTextSelectionGranularity granularity);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("initWithRange:affinity:granularity:")]
+    public Self InitWithRangeAffinityGranularity(NSTextRange range, NSTextSelectionAffinity affinity, NSTextSelectionGranularity granularity);
+    [Selector("initWithLocation:affinity:")]
+    public Self InitWithLocationAffinity(NSTextLocation location, NSTextSelectionAffinity affinity);
+    [Selector("textSelectionWithTextRanges:")]
+    public NSTextSelection TextSelectionWithTextRanges(NSArray textRanges);
 }
 
 #endif

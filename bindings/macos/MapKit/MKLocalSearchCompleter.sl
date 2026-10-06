@@ -49,37 +49,57 @@ public enum MKLocalSearchCompleterResultType : ulong
 
 public extern objc class MKLocalSearchCompleter : NSObject
 {
-    [Selector("queryFragment", "setQueryFragment:")] public NSString QueryFragment { get; set; }
-    [Selector("region", "setRegion:")] public MKCoordinateRegion Region { get; set; }
-    [Selector("regionPriority", "setRegionPriority:")] public MKLocalSearchRegionPriority RegionPriority { get; set; }
+    [Selector("queryFragment", "setQueryFragment:")]
+    public NSString QueryFragment { get; set; }
+    [Selector("region", "setRegion:")]
+    public MKCoordinateRegion Region { get; set; }
+    [Selector("regionPriority", "setRegionPriority:")]
+    public MKLocalSearchRegionPriority RegionPriority { get; set; }
     /// Deprecated in macOS 10.15.
-    [Selector("filterType", "setFilterType:")] public MKSearchCompletionFilterType FilterType { get; set; }
-    [Selector("resultTypes", "setResultTypes:")] public MKLocalSearchCompleterResultType ResultTypes { get; set; }
-    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")] public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
-    [Selector("addressFilter", "setAddressFilter:")] public MKAddressFilter? AddressFilter { get; set; }
-    [Selector("delegate", "setDelegate:")] public MKLocalSearchCompleterDelegate? Delegate { get; set; }
-    [Selector("results")] public NSArray Results { get; }
-    [Selector("isSearching")] public bool Searching { get; }
-    [Selector("cancel")] public void Cancel();
+    [Selector("filterType", "setFilterType:")]
+    public MKSearchCompletionFilterType FilterType { get; set; }
+    [Selector("resultTypes", "setResultTypes:")]
+    public MKLocalSearchCompleterResultType ResultTypes { get; set; }
+    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")]
+    public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
+    [Selector("addressFilter", "setAddressFilter:")]
+    public MKAddressFilter? AddressFilter { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public MKLocalSearchCompleterDelegate? Delegate { get; set; }
+    [Selector("results")]
+    public NSArray Results { get; }
+    [Selector("isSearching")]
+    public bool Searching { get; }
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 public objc interface MKLocalSearchCompleterDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("completerDidUpdateResults:")] void CompleterDidUpdateResults(MKLocalSearchCompleter completer);
-    [Optional] [Selector("completer:didFailWithError:")] void CompleterDidFailWithError(MKLocalSearchCompleter completer, NSError error);
+    [Optional]
+    [Selector("completerDidUpdateResults:")]
+    void CompleterDidUpdateResults(MKLocalSearchCompleter completer);
+    [Optional]
+    [Selector("completer:didFailWithError:")]
+    void CompleterDidFailWithError(MKLocalSearchCompleter completer, NSError error);
 }
 
 public extern objc class MKLocalSearchCompletion : NSObject
 {
-    [Selector("title")] public NSString Title { get; }
-    [Selector("titleHighlightRanges")] public NSArray TitleHighlightRanges { get; }
-    [Selector("subtitle")] public NSString Subtitle { get; }
-    [Selector("subtitleHighlightRanges")] public NSArray SubtitleHighlightRanges { get; }
+    [Selector("title")]
+    public NSString Title { get; }
+    [Selector("titleHighlightRanges")]
+    public NSArray TitleHighlightRanges { get; }
+    [Selector("subtitle")]
+    public NSString Subtitle { get; }
+    [Selector("subtitleHighlightRanges")]
+    public NSArray SubtitleHighlightRanges { get; }
 }
 
 public extern objc class MKLocalSearchRequest
 {
-    [Selector("initWithCompletion:")] public Self InitWithCompletion(MKLocalSearchCompletion completion);
+    [Selector("initWithCompletion:")]
+    public Self InitWithCompletion(MKLocalSearchCompletion completion);
 }
 
 #endif

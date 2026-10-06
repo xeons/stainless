@@ -31,11 +31,16 @@ import Standard.ObjC;
 
 public extern objc class NSStepper : NSControl, NSAccessibilityStepper
 {
-    [Selector("minValue", "setMinValue:")] public double MinValue { get; set; }
-    [Selector("maxValue", "setMaxValue:")] public double MaxValue { get; set; }
-    [Selector("increment", "setIncrement:")] public double Increment { get; set; }
-    [Selector("valueWraps", "setValueWraps:")] public bool ValueWraps { get; set; }
-    [Selector("autorepeat", "setAutorepeat:")] public bool Autorepeat { get; set; }
+    [Selector("minValue", "setMinValue:")]
+    public double MinValue { get; set; }
+    [Selector("maxValue", "setMaxValue:")]
+    public double MaxValue { get; set; }
+    [Selector("increment", "setIncrement:")]
+    public double Increment { get; set; }
+    [Selector("valueWraps", "setValueWraps:")]
+    public bool ValueWraps { get; set; }
+    [Selector("autorepeat", "setAutorepeat:")]
+    public bool Autorepeat { get; set; }
 }
 
 #endif

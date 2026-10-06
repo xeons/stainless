@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public objc interface VZUSBDevice : NSObjectProtocol
 {
-    [Selector("usbController")] VZUSBController? UsbController { get; }
-    [Selector("uuid")] NSUUID Uuid { get; }
+    [Selector("usbController")]
+    VZUSBController? UsbController { get; }
+    [Selector("uuid")]
+    NSUUID Uuid { get; }
 }
 
 #endif

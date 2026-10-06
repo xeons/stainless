@@ -32,67 +32,127 @@ import Standard.ObjC;
 
 public extern objc class NSBundle : NSObject
 {
-    [Selector("mainBundle")] public static NSBundle MainBundle { get; }
-    [Selector("allBundles")] public static NSArray AllBundles { get; }
-    [Selector("allFrameworks")] public static NSArray AllFrameworks { get; }
-    [Selector("isLoaded")] public bool Loaded { get; }
-    [Selector("bundleURL")] public NSURL BundleURL { get; }
-    [Selector("resourceURL")] public NSURL? ResourceURL { get; }
-    [Selector("executableURL")] public NSURL? ExecutableURL { get; }
-    [Selector("privateFrameworksURL")] public NSURL? PrivateFrameworksURL { get; }
-    [Selector("sharedFrameworksURL")] public NSURL? SharedFrameworksURL { get; }
-    [Selector("sharedSupportURL")] public NSURL? SharedSupportURL { get; }
-    [Selector("builtInPlugInsURL")] public NSURL? BuiltInPlugInsURL { get; }
-    [Selector("appStoreReceiptURL")] public NSURL? AppStoreReceiptURL { get; }
-    [Selector("bundlePath")] public NSString BundlePath { get; }
-    [Selector("resourcePath")] public NSString? ResourcePath { get; }
-    [Selector("executablePath")] public NSString? ExecutablePath { get; }
-    [Selector("privateFrameworksPath")] public NSString? PrivateFrameworksPath { get; }
-    [Selector("sharedFrameworksPath")] public NSString? SharedFrameworksPath { get; }
-    [Selector("sharedSupportPath")] public NSString? SharedSupportPath { get; }
-    [Selector("builtInPlugInsPath")] public NSString? BuiltInPlugInsPath { get; }
-    [Selector("bundleIdentifier")] public NSString? BundleIdentifier { get; }
-    [Selector("infoDictionary")] public NSDictionary? InfoDictionary { get; }
-    [Selector("localizedInfoDictionary")] public NSDictionary? LocalizedInfoDictionary { get; }
-    [Selector("principalClass")] public Class PrincipalClass { get; }
-    [Selector("preferredLocalizations")] public NSArray PreferredLocalizations { get; }
-    [Selector("localizations")] public NSArray Localizations { get; }
-    [Selector("developmentLocalization")] public NSString? DevelopmentLocalization { get; }
-    [Selector("executableArchitectures")] public NSArray? ExecutableArchitectures { get; }
-    [Selector("bundleWithPath:")] public static Self? BundleWithPath(NSString path);
-    [Selector("initWithPath:")] public Self? InitWithPath(NSString path);
-    [Selector("bundleWithURL:")] public static Self? BundleWithURL(NSURL url);
-    [Selector("initWithURL:")] public Self? InitWithURL(NSURL url);
-    [Selector("bundleForClass:")] public static NSBundle BundleForClass(Class aClass);
-    [Selector("bundleWithIdentifier:")] public static NSBundle? BundleWithIdentifier(NSString identifier);
-    [Selector("load")] public bool Load();
-    [Selector("unload")] public bool Unload();
-    [Selector("preflightAndReturnError:")] public bool PreflightAndReturnError(out NSError? error);
-    [Selector("loadAndReturnError:")] public bool LoadAndReturnError(out NSError? error);
-    [Selector("URLForAuxiliaryExecutable:")] public NSURL? URLForAuxiliaryExecutable(NSString executableName);
-    [Selector("pathForAuxiliaryExecutable:")] public NSString? PathForAuxiliaryExecutable(NSString executableName);
-    [Selector("URLForResource:withExtension:subdirectory:inBundleWithURL:")] public static NSURL? URLForResourceWithExtensionSubdirectoryInBundleWithURL(NSString? name, NSString? ext, NSString? subpath, NSURL bundleURL);
-    [Selector("URLsForResourcesWithExtension:subdirectory:inBundleWithURL:")] public static NSArray? URLsForResourcesWithExtensionSubdirectoryInBundleWithURL(NSString? ext, NSString? subpath, NSURL bundleURL);
-    [Selector("URLForResource:withExtension:")] public NSURL? URLForResourceWithExtension(NSString? name, NSString? ext);
-    [Selector("URLForResource:withExtension:subdirectory:")] public NSURL? URLForResourceWithExtensionSubdirectory(NSString? name, NSString? ext, NSString? subpath);
-    [Selector("URLForResource:withExtension:subdirectory:localization:")] public NSURL? URLForResourceWithExtensionSubdirectoryLocalization(NSString? name, NSString? ext, NSString? subpath, NSString? localizationName);
-    [Selector("URLsForResourcesWithExtension:subdirectory:")] public NSArray? URLsForResourcesWithExtensionSubdirectory(NSString? ext, NSString? subpath);
-    [Selector("URLsForResourcesWithExtension:subdirectory:localization:")] public NSArray? URLsForResourcesWithExtensionSubdirectoryLocalization(NSString? ext, NSString? subpath, NSString? localizationName);
-    [Selector("pathForResource:ofType:inDirectory:")] public static NSString? PathForResourceOfTypeInDirectory(NSString? name, NSString? ext, NSString bundlePath);
-    [Selector("pathsForResourcesOfType:inDirectory:")] public static NSArray PathsForResourcesOfTypeInDirectory(NSString? ext, NSString bundlePath);
-    [Selector("pathForResource:ofType:")] public NSString? PathForResourceOfType(NSString? name, NSString? ext);
-    [Selector("pathForResource:ofType:inDirectory:")] public NSString? PathForResourceOfTypeInDirectoryMethod(NSString? name, NSString? ext, NSString? subpath);
-    [Selector("pathForResource:ofType:inDirectory:forLocalization:")] public NSString? PathForResourceOfTypeInDirectoryForLocalization(NSString? name, NSString? ext, NSString? subpath, NSString? localizationName);
-    [Selector("pathsForResourcesOfType:inDirectory:")] public NSArray PathsForResourcesOfTypeInDirectoryMethod(NSString? ext, NSString? subpath);
-    [Selector("pathsForResourcesOfType:inDirectory:forLocalization:")] public NSArray PathsForResourcesOfTypeInDirectoryForLocalization(NSString? ext, NSString? subpath, NSString? localizationName);
-    [Selector("localizedStringForKey:value:table:")] public NSString LocalizedStringForKeyValueTable(NSString key, NSString? value, NSString? tableName);
-    [Selector("localizedAttributedStringForKey:value:table:")] public NSAttributedString LocalizedAttributedStringForKeyValueTable(NSString key, NSString? value, NSString? tableName);
+    [Selector("mainBundle")]
+    public static NSBundle MainBundle { get; }
+    [Selector("allBundles")]
+    public static NSArray AllBundles { get; }
+    [Selector("allFrameworks")]
+    public static NSArray AllFrameworks { get; }
+    [Selector("isLoaded")]
+    public bool Loaded { get; }
+    [Selector("bundleURL")]
+    public NSURL BundleURL { get; }
+    [Selector("resourceURL")]
+    public NSURL? ResourceURL { get; }
+    [Selector("executableURL")]
+    public NSURL? ExecutableURL { get; }
+    [Selector("privateFrameworksURL")]
+    public NSURL? PrivateFrameworksURL { get; }
+    [Selector("sharedFrameworksURL")]
+    public NSURL? SharedFrameworksURL { get; }
+    [Selector("sharedSupportURL")]
+    public NSURL? SharedSupportURL { get; }
+    [Selector("builtInPlugInsURL")]
+    public NSURL? BuiltInPlugInsURL { get; }
+    [Selector("appStoreReceiptURL")]
+    public NSURL? AppStoreReceiptURL { get; }
+    [Selector("bundlePath")]
+    public NSString BundlePath { get; }
+    [Selector("resourcePath")]
+    public NSString? ResourcePath { get; }
+    [Selector("executablePath")]
+    public NSString? ExecutablePath { get; }
+    [Selector("privateFrameworksPath")]
+    public NSString? PrivateFrameworksPath { get; }
+    [Selector("sharedFrameworksPath")]
+    public NSString? SharedFrameworksPath { get; }
+    [Selector("sharedSupportPath")]
+    public NSString? SharedSupportPath { get; }
+    [Selector("builtInPlugInsPath")]
+    public NSString? BuiltInPlugInsPath { get; }
+    [Selector("bundleIdentifier")]
+    public NSString? BundleIdentifier { get; }
+    [Selector("infoDictionary")]
+    public NSDictionary? InfoDictionary { get; }
+    [Selector("localizedInfoDictionary")]
+    public NSDictionary? LocalizedInfoDictionary { get; }
+    [Selector("principalClass")]
+    public Class PrincipalClass { get; }
+    [Selector("preferredLocalizations")]
+    public NSArray PreferredLocalizations { get; }
+    [Selector("localizations")]
+    public NSArray Localizations { get; }
+    [Selector("developmentLocalization")]
+    public NSString? DevelopmentLocalization { get; }
+    [Selector("executableArchitectures")]
+    public NSArray? ExecutableArchitectures { get; }
+    [Selector("bundleWithPath:")]
+    public static Self? BundleWithPath(NSString path);
+    [Selector("initWithPath:")]
+    public Self? InitWithPath(NSString path);
+    [Selector("bundleWithURL:")]
+    public static Self? BundleWithURL(NSURL url);
+    [Selector("initWithURL:")]
+    public Self? InitWithURL(NSURL url);
+    [Selector("bundleForClass:")]
+    public static NSBundle BundleForClass(Class aClass);
+    [Selector("bundleWithIdentifier:")]
+    public static NSBundle? BundleWithIdentifier(NSString identifier);
+    [Selector("load")]
+    public bool Load();
+    [Selector("unload")]
+    public bool Unload();
+    [Selector("preflightAndReturnError:")]
+    public bool PreflightAndReturnError(out NSError? error);
+    [Selector("loadAndReturnError:")]
+    public bool LoadAndReturnError(out NSError? error);
+    [Selector("URLForAuxiliaryExecutable:")]
+    public NSURL? URLForAuxiliaryExecutable(NSString executableName);
+    [Selector("pathForAuxiliaryExecutable:")]
+    public NSString? PathForAuxiliaryExecutable(NSString executableName);
+    [Selector("URLForResource:withExtension:subdirectory:inBundleWithURL:")]
+    public static NSURL? URLForResourceWithExtensionSubdirectoryInBundleWithURL(NSString? name, NSString? ext, NSString? subpath, NSURL bundleURL);
+    [Selector("URLsForResourcesWithExtension:subdirectory:inBundleWithURL:")]
+    public static NSArray? URLsForResourcesWithExtensionSubdirectoryInBundleWithURL(NSString? ext, NSString? subpath, NSURL bundleURL);
+    [Selector("URLForResource:withExtension:")]
+    public NSURL? URLForResourceWithExtension(NSString? name, NSString? ext);
+    [Selector("URLForResource:withExtension:subdirectory:")]
+    public NSURL? URLForResourceWithExtensionSubdirectory(NSString? name, NSString? ext, NSString? subpath);
+    [Selector("URLForResource:withExtension:subdirectory:localization:")]
+    public NSURL? URLForResourceWithExtensionSubdirectoryLocalization(NSString? name, NSString? ext, NSString? subpath, NSString? localizationName);
+    [Selector("URLsForResourcesWithExtension:subdirectory:")]
+    public NSArray? URLsForResourcesWithExtensionSubdirectory(NSString? ext, NSString? subpath);
+    [Selector("URLsForResourcesWithExtension:subdirectory:localization:")]
+    public NSArray? URLsForResourcesWithExtensionSubdirectoryLocalization(NSString? ext, NSString? subpath, NSString? localizationName);
+    [Selector("pathForResource:ofType:inDirectory:")]
+    public static NSString? PathForResourceOfTypeInDirectory(NSString? name, NSString? ext, NSString bundlePath);
+    [Selector("pathsForResourcesOfType:inDirectory:")]
+    public static NSArray PathsForResourcesOfTypeInDirectory(NSString? ext, NSString bundlePath);
+    [Selector("pathForResource:ofType:")]
+    public NSString? PathForResourceOfType(NSString? name, NSString? ext);
+    [Selector("pathForResource:ofType:inDirectory:")]
+    public NSString? PathForResourceOfTypeInDirectoryMethod(NSString? name, NSString? ext, NSString? subpath);
+    [Selector("pathForResource:ofType:inDirectory:forLocalization:")]
+    public NSString? PathForResourceOfTypeInDirectoryForLocalization(NSString? name, NSString? ext, NSString? subpath, NSString? localizationName);
+    [Selector("pathsForResourcesOfType:inDirectory:")]
+    public NSArray PathsForResourcesOfTypeInDirectoryMethod(NSString? ext, NSString? subpath);
+    [Selector("pathsForResourcesOfType:inDirectory:forLocalization:")]
+    public NSArray PathsForResourcesOfTypeInDirectoryForLocalization(NSString? ext, NSString? subpath, NSString? localizationName);
+    [Selector("localizedStringForKey:value:table:")]
+    public NSString LocalizedStringForKeyValueTable(NSString key, NSString? value, NSString? tableName);
+    [Selector("localizedAttributedStringForKey:value:table:")]
+    public NSAttributedString LocalizedAttributedStringForKeyValueTable(NSString key, NSString? value, NSString? tableName);
     /// macOS 15.4 and later.
-    [Selector("localizedStringForKey:value:table:localizations:")] public NSString LocalizedStringForKeyValueTableLocalizations(NSString key, NSString? value, NSString? tableName, NSArray localizations);
-    [Selector("objectForInfoDictionaryKey:")] public AnyObject? ObjectForInfoDictionaryKey(NSString key);
-    [Selector("classNamed:")] public Class ClassNamed(NSString className);
-    [Selector("preferredLocalizationsFromArray:")] public static NSArray PreferredLocalizationsFromArray(NSArray localizationsArray);
-    [Selector("preferredLocalizationsFromArray:forPreferences:")] public static NSArray PreferredLocalizationsFromArrayForPreferences(NSArray localizationsArray, NSArray? preferencesArray);
+    [Selector("localizedStringForKey:value:table:localizations:")]
+    public NSString LocalizedStringForKeyValueTableLocalizations(NSString key, NSString? value, NSString? tableName, NSArray localizations);
+    [Selector("objectForInfoDictionaryKey:")]
+    public AnyObject? ObjectForInfoDictionaryKey(NSString key);
+    [Selector("classNamed:")]
+    public Class ClassNamed(NSString className);
+    [Selector("preferredLocalizationsFromArray:")]
+    public static NSArray PreferredLocalizationsFromArray(NSArray localizationsArray);
+    [Selector("preferredLocalizationsFromArray:forPreferences:")]
+    public static NSArray PreferredLocalizationsFromArrayForPreferences(NSArray localizationsArray, NSArray? preferencesArray);
 }
 
 public const int NSBundleExecutableArchitectureI386 = 7;
@@ -104,7 +164,8 @@ public const int NSBundleExecutableArchitectureARM64 = 16777228;
 /// NSBundleExtensionMethods, a category of NSString.
 public extern objc class NSString
 {
-    [Selector("variantFittingPresentationWidth:")] public NSString VariantFittingPresentationWidth(NSInteger width);
+    [Selector("variantFittingPresentationWidth:")]
+    public NSString VariantFittingPresentationWidth(NSInteger width);
 }
 
 public extern "C" NSNotificationName NSBundleDidLoadNotification;

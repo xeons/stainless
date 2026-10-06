@@ -75,16 +75,25 @@ public extern "C" NSTextListMarkerFormat NSTextListMarkerDecimal;
 
 public extern objc class NSTextList : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("markerFormat")] public NSTextListMarkerFormat MarkerFormat { get; }
-    [Selector("listOptions")] public NSTextListOptions ListOptions { get; }
-    [Selector("startingItemNumber", "setStartingItemNumber:")] public NSInteger StartingItemNumber { get; set; }
-    [Selector("isOrdered")] public bool Ordered { get; }
+    [Selector("markerFormat")]
+    public NSTextListMarkerFormat MarkerFormat { get; }
+    [Selector("listOptions")]
+    public NSTextListOptions ListOptions { get; }
+    [Selector("startingItemNumber", "setStartingItemNumber:")]
+    public NSInteger StartingItemNumber { get; set; }
+    [Selector("isOrdered")]
+    public bool Ordered { get; }
     /// macOS 26.0 and later.
-    [Selector("includesTextListMarkers")] public static bool IncludesTextListMarkers { get; }
-    [Selector("initWithMarkerFormat:options:startingItemNumber:")] public Self InitWithMarkerFormatOptionsStartingItemNumber(NSTextListMarkerFormat markerFormat, NSTextListOptions options, NSInteger startingItemNumber);
-    [Selector("initWithMarkerFormat:options:")] public Self InitWithMarkerFormatOptions(NSTextListMarkerFormat markerFormat, NSUInteger options);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("markerForItemNumber:")] public NSString MarkerForItemNumber(NSInteger itemNumber);
+    [Selector("includesTextListMarkers")]
+    public static bool IncludesTextListMarkers { get; }
+    [Selector("initWithMarkerFormat:options:startingItemNumber:")]
+    public Self InitWithMarkerFormatOptionsStartingItemNumber(NSTextListMarkerFormat markerFormat, NSTextListOptions options, NSInteger startingItemNumber);
+    [Selector("initWithMarkerFormat:options:")]
+    public Self InitWithMarkerFormatOptions(NSTextListMarkerFormat markerFormat, NSUInteger options);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("markerForItemNumber:")]
+    public NSString MarkerForItemNumber(NSInteger itemNumber);
 }
 
 #endif

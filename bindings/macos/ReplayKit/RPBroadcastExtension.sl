@@ -38,14 +38,18 @@ public objc closure void NSExtensionContextLoadBroadcastingApplicationInfoWithCo
 /// RPBroadcastExtension, a category of NSExtensionContext.
 public extern objc class NSExtensionContext
 {
-    [Selector("loadBroadcastingApplicationInfoWithCompletion:")] public void LoadBroadcastingApplicationInfoWithCompletion(NSExtensionContextLoadBroadcastingApplicationInfoWithCompletionHandlerBlock handler);
-    [Selector("completeRequestWithBroadcastURL:setupInfo:")] public void CompleteRequestWithBroadcastURLSetupInfo(NSURL broadcastURL, NSDictionary? setupInfo);
+    [Selector("loadBroadcastingApplicationInfoWithCompletion:")]
+    public void LoadBroadcastingApplicationInfoWithCompletion(NSExtensionContextLoadBroadcastingApplicationInfoWithCompletionHandlerBlock handler);
+    [Selector("completeRequestWithBroadcastURL:setupInfo:")]
+    public void CompleteRequestWithBroadcastURLSetupInfo(NSURL broadcastURL, NSDictionary? setupInfo);
 }
 
 public extern objc class RPBroadcastHandler : NSObject, NSExtensionRequestHandling
 {
-    [Selector("updateServiceInfo:")] public void UpdateServiceInfo(NSDictionary serviceInfo);
-    [Selector("updateBroadcastURL:")] public void UpdateBroadcastURL(NSURL broadcastURL);
+    [Selector("updateServiceInfo:")]
+    public void UpdateServiceInfo(NSDictionary serviceInfo);
+    [Selector("updateBroadcastURL:")]
+    public void UpdateBroadcastURL(NSURL broadcastURL);
 }
 
 public enum RPSampleBufferType : long
@@ -61,13 +65,20 @@ public extern "C" NSString RPApplicationInfoBundleIdentifierKey;
 
 public extern objc class RPBroadcastSampleHandler : RPBroadcastHandler
 {
-    [Selector("broadcastStartedWithSetupInfo:")] public void BroadcastStartedWithSetupInfo(NSDictionary? setupInfo);
-    [Selector("broadcastPaused")] public void BroadcastPaused();
-    [Selector("broadcastResumed")] public void BroadcastResumed();
-    [Selector("broadcastFinished")] public void BroadcastFinished();
-    [Selector("broadcastAnnotatedWithApplicationInfo:")] public void BroadcastAnnotatedWithApplicationInfo(NSDictionary applicationInfo);
-    [Selector("processSampleBuffer:withType:")] public void ProcessSampleBufferWithType(CMSampleBufferRef sampleBuffer, RPSampleBufferType sampleBufferType);
-    [Selector("finishBroadcastWithError:")] public void FinishBroadcastWithError(NSError error);
+    [Selector("broadcastStartedWithSetupInfo:")]
+    public void BroadcastStartedWithSetupInfo(NSDictionary? setupInfo);
+    [Selector("broadcastPaused")]
+    public void BroadcastPaused();
+    [Selector("broadcastResumed")]
+    public void BroadcastResumed();
+    [Selector("broadcastFinished")]
+    public void BroadcastFinished();
+    [Selector("broadcastAnnotatedWithApplicationInfo:")]
+    public void BroadcastAnnotatedWithApplicationInfo(NSDictionary applicationInfo);
+    [Selector("processSampleBuffer:withType:")]
+    public void ProcessSampleBufferWithType(CMSampleBufferRef sampleBuffer, RPSampleBufferType sampleBufferType);
+    [Selector("finishBroadcastWithError:")]
+    public void FinishBroadcastWithError(NSError error);
 }
 
 #endif

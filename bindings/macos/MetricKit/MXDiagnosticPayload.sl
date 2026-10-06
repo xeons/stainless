@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class MXDiagnosticPayload : NSObject, NSSecureCoding
 {
-    [Selector("cpuExceptionDiagnostics")] public NSArray? CpuExceptionDiagnostics { get; }
-    [Selector("diskWriteExceptionDiagnostics")] public NSArray? DiskWriteExceptionDiagnostics { get; }
-    [Selector("hangDiagnostics")] public NSArray? HangDiagnostics { get; }
-    [Selector("crashDiagnostics")] public NSArray? CrashDiagnostics { get; }
-    [Selector("timeStampBegin")] public NSDate TimeStampBegin { get; }
-    [Selector("timeStampEnd")] public NSDate TimeStampEnd { get; }
-    [Selector("JSONRepresentation")] public NSData JSONRepresentation();
-    [Selector("dictionaryRepresentation")] public NSDictionary DictionaryRepresentation();
+    [Selector("cpuExceptionDiagnostics")]
+    public NSArray? CpuExceptionDiagnostics { get; }
+    [Selector("diskWriteExceptionDiagnostics")]
+    public NSArray? DiskWriteExceptionDiagnostics { get; }
+    [Selector("hangDiagnostics")]
+    public NSArray? HangDiagnostics { get; }
+    [Selector("crashDiagnostics")]
+    public NSArray? CrashDiagnostics { get; }
+    [Selector("timeStampBegin")]
+    public NSDate TimeStampBegin { get; }
+    [Selector("timeStampEnd")]
+    public NSDate TimeStampEnd { get; }
+    [Selector("JSONRepresentation")]
+    public NSData JSONRepresentation();
+    [Selector("dictionaryRepresentation")]
+    public NSDictionary DictionaryRepresentation();
 }
 
 #endif

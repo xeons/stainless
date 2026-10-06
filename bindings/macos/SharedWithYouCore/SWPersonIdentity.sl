@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class SWPersonIdentity : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("rootHash")] public NSData RootHash { get; }
-    [Selector("initWithRootHash:")] public Self InitWithRootHash(NSData rootHash);
+    [Selector("rootHash")]
+    public NSData RootHash { get; }
+    [Selector("initWithRootHash:")]
+    public Self InitWithRootHash(NSData rootHash);
 }
 
 #endif

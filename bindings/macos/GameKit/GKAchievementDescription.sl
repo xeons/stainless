@@ -36,22 +36,35 @@ public objc closure void GKAchievementDescriptionLoadAchievementDescriptionsWith
 
 public extern objc class GKAchievementDescription : NSObject, NSCoding, NSSecureCoding
 {
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("groupIdentifier")] public NSString? GroupIdentifier { get; }
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("achievedDescription")] public NSString? AchievedDescription { get; }
-    [Selector("unachievedDescription")] public NSString? UnachievedDescription { get; }
-    [Selector("maximumPoints")] public NSInteger MaximumPoints { get; }
-    [Selector("isHidden")] public bool Hidden { get; }
-    [Selector("isReplayable")] public bool Replayable { get; }
-    [Selector("rarityPercent")] public NSNumber? RarityPercent { get; }
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("groupIdentifier")]
+    public NSString? GroupIdentifier { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("achievedDescription")]
+    public NSString? AchievedDescription { get; }
+    [Selector("unachievedDescription")]
+    public NSString? UnachievedDescription { get; }
+    [Selector("maximumPoints")]
+    public NSInteger MaximumPoints { get; }
+    [Selector("isHidden")]
+    public bool Hidden { get; }
+    [Selector("isReplayable")]
+    public bool Replayable { get; }
+    [Selector("rarityPercent")]
+    public NSNumber? RarityPercent { get; }
     /// macOS 15.4 and later.
-    [Selector("releaseState")] public GKReleaseState ReleaseState { get; }
+    [Selector("releaseState")]
+    public GKReleaseState ReleaseState { get; }
     /// macOS 26.0 and later.
-    [Selector("activityIdentifier")] public NSString ActivityIdentifier { get; }
+    [Selector("activityIdentifier")]
+    public NSString ActivityIdentifier { get; }
     /// macOS 26.0 and later.
-    [Selector("activityProperties")] public NSDictionary ActivityProperties { get; }
-    [Selector("loadAchievementDescriptionsWithCompletionHandler:")] public static void LoadAchievementDescriptionsWithCompletionHandler(GKAchievementDescriptionLoadAchievementDescriptionsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("activityProperties")]
+    public NSDictionary ActivityProperties { get; }
+    [Selector("loadAchievementDescriptionsWithCompletionHandler:")]
+    public static void LoadAchievementDescriptionsWithCompletionHandler(GKAchievementDescriptionLoadAchievementDescriptionsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public objc closure void GKAchievementDescriptionLoadImageWithCompletionHandlerCompletionHandlerBlock(NSImage? arg0, NSError? arg1);
@@ -60,10 +73,14 @@ public objc closure void GKAchievementDescriptionLoadImageWithCompletionHandlerC
 public extern objc class GKAchievementDescription
 {
     /// Deprecated in macOS 14.2.
-    [Selector("image")] public NSImage? Image { get; }
-    [Selector("loadImageWithCompletionHandler:")] public void LoadImageWithCompletionHandler(GKAchievementDescriptionLoadImageWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("incompleteAchievementImage")] public static NSImage IncompleteAchievementImage();
-    [Selector("placeholderCompletedAchievementImage")] public static NSImage PlaceholderCompletedAchievementImage();
+    [Selector("image")]
+    public NSImage? Image { get; }
+    [Selector("loadImageWithCompletionHandler:")]
+    public void LoadImageWithCompletionHandler(GKAchievementDescriptionLoadImageWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("incompleteAchievementImage")]
+    public static NSImage IncompleteAchievementImage();
+    [Selector("placeholderCompletedAchievementImage")]
+    public static NSImage PlaceholderCompletedAchievementImage();
 }
 
 #endif

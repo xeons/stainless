@@ -60,59 +60,112 @@ public enum NSTextAlignment : long
 
 public extern objc class NSText : NSView, NSChangeSpelling, NSIgnoreMisspelledWords
 {
-    [Selector("string", "setString:")] public NSString String { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSTextDelegate? Delegate { get; set; }
-    [Selector("isEditable", "setEditable:")] public bool Editable { get; set; }
-    [Selector("isSelectable", "setSelectable:")] public bool Selectable { get; set; }
-    [Selector("isRichText", "setRichText:")] public bool RichText { get; set; }
-    [Selector("importsGraphics", "setImportsGraphics:")] public bool ImportsGraphics { get; set; }
-    [Selector("isFieldEditor", "setFieldEditor:")] public bool FieldEditor { get; set; }
-    [Selector("usesFontPanel", "setUsesFontPanel:")] public bool UsesFontPanel { get; set; }
-    [Selector("drawsBackground", "setDrawsBackground:")] public bool DrawsBackground { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("isRulerVisible")] public bool RulerVisible { get; }
-    [Selector("selectedRange", "setSelectedRange:")] public NSRange SelectedRange { get; set; }
-    [Selector("font", "setFont:")] public NSFont? Font { get; set; }
-    [Selector("textColor", "setTextColor:")] public NSColor? TextColor { get; set; }
-    [Selector("alignment", "setAlignment:")] public NSTextAlignment Alignment { get; set; }
-    [Selector("baseWritingDirection", "setBaseWritingDirection:")] public NSWritingDirection BaseWritingDirection { get; set; }
-    [Selector("maxSize", "setMaxSize:")] public NSSize MaxSize { get; set; }
-    [Selector("minSize", "setMinSize:")] public NSSize MinSize { get; set; }
-    [Selector("isHorizontallyResizable", "setHorizontallyResizable:")] public bool HorizontallyResizable { get; set; }
-    [Selector("isVerticallyResizable", "setVerticallyResizable:")] public bool VerticallyResizable { get; set; }
-    [Selector("initWithFrame:")] public Self InitWithFrame(NSRect frameRect);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("replaceCharactersInRange:withString:")] public void ReplaceCharactersInRangeWithString(NSRange range, NSString string);
-    [Selector("replaceCharactersInRange:withRTF:")] public void ReplaceCharactersInRangeWithRTF(NSRange range, NSData rtfData);
-    [Selector("replaceCharactersInRange:withRTFD:")] public void ReplaceCharactersInRangeWithRTFD(NSRange range, NSData rtfdData);
-    [Selector("RTFFromRange:")] public NSData? RTFFromRange(NSRange range);
-    [Selector("RTFDFromRange:")] public NSData? RTFDFromRange(NSRange range);
-    [Selector("writeRTFDToFile:atomically:")] public bool WriteRTFDToFileAtomically(NSString path, bool flag);
-    [Selector("readRTFDFromFile:")] public bool ReadRTFDFromFile(NSString path);
-    [Selector("scrollRangeToVisible:")] public void ScrollRangeToVisible(NSRange range);
-    [Selector("setTextColor:range:")] public void SetTextColorRange(NSColor? color, NSRange range);
-    [Selector("setFont:range:")] public void SetFontRange(NSFont font, NSRange range);
-    [Selector("sizeToFit")] public void SizeToFit();
-    [Selector("copy:")] public void Copy(AnyObject? sender);
-    [Selector("copyFont:")] public void CopyFont(AnyObject? sender);
-    [Selector("copyRuler:")] public void CopyRuler(AnyObject? sender);
-    [Selector("cut:")] public void Cut(AnyObject? sender);
-    [Selector("delete:")] public void Delete(AnyObject? sender);
-    [Selector("paste:")] public void Paste(AnyObject? sender);
-    [Selector("pasteFont:")] public void PasteFont(AnyObject? sender);
-    [Selector("pasteRuler:")] public void PasteRuler(AnyObject? sender);
-    [Selector("selectAll:")] public void SelectAll(AnyObject? sender);
-    [Selector("changeFont:")] public void ChangeFont(AnyObject? sender);
-    [Selector("alignLeft:")] public void AlignLeft(AnyObject? sender);
-    [Selector("alignRight:")] public void AlignRight(AnyObject? sender);
-    [Selector("alignCenter:")] public void AlignCenter(AnyObject? sender);
-    [Selector("subscript:")] public void Subscript(AnyObject? sender);
-    [Selector("superscript:")] public void Superscript(AnyObject? sender);
-    [Selector("underline:")] public void Underline(AnyObject? sender);
-    [Selector("unscript:")] public void Unscript(AnyObject? sender);
-    [Selector("showGuessPanel:")] public void ShowGuessPanel(AnyObject? sender);
-    [Selector("checkSpelling:")] public void CheckSpelling(AnyObject? sender);
-    [Selector("toggleRuler:")] public void ToggleRuler(AnyObject? sender);
+    [Selector("string", "setString:")]
+    public NSString String { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSTextDelegate? Delegate { get; set; }
+    [Selector("isEditable", "setEditable:")]
+    public bool Editable { get; set; }
+    [Selector("isSelectable", "setSelectable:")]
+    public bool Selectable { get; set; }
+    [Selector("isRichText", "setRichText:")]
+    public bool RichText { get; set; }
+    [Selector("importsGraphics", "setImportsGraphics:")]
+    public bool ImportsGraphics { get; set; }
+    [Selector("isFieldEditor", "setFieldEditor:")]
+    public bool FieldEditor { get; set; }
+    [Selector("usesFontPanel", "setUsesFontPanel:")]
+    public bool UsesFontPanel { get; set; }
+    [Selector("drawsBackground", "setDrawsBackground:")]
+    public bool DrawsBackground { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("isRulerVisible")]
+    public bool RulerVisible { get; }
+    [Selector("selectedRange", "setSelectedRange:")]
+    public NSRange SelectedRange { get; set; }
+    [Selector("font", "setFont:")]
+    public NSFont? Font { get; set; }
+    [Selector("textColor", "setTextColor:")]
+    public NSColor? TextColor { get; set; }
+    [Selector("alignment", "setAlignment:")]
+    public NSTextAlignment Alignment { get; set; }
+    [Selector("baseWritingDirection", "setBaseWritingDirection:")]
+    public NSWritingDirection BaseWritingDirection { get; set; }
+    [Selector("maxSize", "setMaxSize:")]
+    public NSSize MaxSize { get; set; }
+    [Selector("minSize", "setMinSize:")]
+    public NSSize MinSize { get; set; }
+    [Selector("isHorizontallyResizable", "setHorizontallyResizable:")]
+    public bool HorizontallyResizable { get; set; }
+    [Selector("isVerticallyResizable", "setVerticallyResizable:")]
+    public bool VerticallyResizable { get; set; }
+    [Selector("initWithFrame:")]
+    public Self InitWithFrame(NSRect frameRect);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("replaceCharactersInRange:withString:")]
+    public void ReplaceCharactersInRangeWithString(NSRange range, NSString string);
+    [Selector("replaceCharactersInRange:withRTF:")]
+    public void ReplaceCharactersInRangeWithRTF(NSRange range, NSData rtfData);
+    [Selector("replaceCharactersInRange:withRTFD:")]
+    public void ReplaceCharactersInRangeWithRTFD(NSRange range, NSData rtfdData);
+    [Selector("RTFFromRange:")]
+    public NSData? RTFFromRange(NSRange range);
+    [Selector("RTFDFromRange:")]
+    public NSData? RTFDFromRange(NSRange range);
+    [Selector("writeRTFDToFile:atomically:")]
+    public bool WriteRTFDToFileAtomically(NSString path, bool flag);
+    [Selector("readRTFDFromFile:")]
+    public bool ReadRTFDFromFile(NSString path);
+    [Selector("scrollRangeToVisible:")]
+    public void ScrollRangeToVisible(NSRange range);
+    [Selector("setTextColor:range:")]
+    public void SetTextColorRange(NSColor? color, NSRange range);
+    [Selector("setFont:range:")]
+    public void SetFontRange(NSFont font, NSRange range);
+    [Selector("sizeToFit")]
+    public void SizeToFit();
+    [Selector("copy:")]
+    public void Copy(AnyObject? sender);
+    [Selector("copyFont:")]
+    public void CopyFont(AnyObject? sender);
+    [Selector("copyRuler:")]
+    public void CopyRuler(AnyObject? sender);
+    [Selector("cut:")]
+    public void Cut(AnyObject? sender);
+    [Selector("delete:")]
+    public void Delete(AnyObject? sender);
+    [Selector("paste:")]
+    public void Paste(AnyObject? sender);
+    [Selector("pasteFont:")]
+    public void PasteFont(AnyObject? sender);
+    [Selector("pasteRuler:")]
+    public void PasteRuler(AnyObject? sender);
+    [Selector("selectAll:")]
+    public void SelectAll(AnyObject? sender);
+    [Selector("changeFont:")]
+    public void ChangeFont(AnyObject? sender);
+    [Selector("alignLeft:")]
+    public void AlignLeft(AnyObject? sender);
+    [Selector("alignRight:")]
+    public void AlignRight(AnyObject? sender);
+    [Selector("alignCenter:")]
+    public void AlignCenter(AnyObject? sender);
+    [Selector("subscript:")]
+    public void Subscript(AnyObject? sender);
+    [Selector("superscript:")]
+    public void Superscript(AnyObject? sender);
+    [Selector("underline:")]
+    public void Underline(AnyObject? sender);
+    [Selector("unscript:")]
+    public void Unscript(AnyObject? sender);
+    [Selector("showGuessPanel:")]
+    public void ShowGuessPanel(AnyObject? sender);
+    [Selector("checkSpelling:")]
+    public void CheckSpelling(AnyObject? sender);
+    [Selector("toggleRuler:")]
+    public void ToggleRuler(AnyObject? sender);
 }
 
 public const int NSEnterCharacter = 3;
@@ -160,11 +213,21 @@ public const int NSOtherTextMovement = 0;
 
 public objc interface NSTextDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("textShouldBeginEditing:")] bool TextShouldBeginEditing(NSText textObject);
-    [Optional] [Selector("textShouldEndEditing:")] bool TextShouldEndEditing(NSText textObject);
-    [Optional] [Selector("textDidBeginEditing:")] void TextDidBeginEditing(NSNotification notification);
-    [Optional] [Selector("textDidEndEditing:")] void TextDidEndEditing(NSNotification notification);
-    [Optional] [Selector("textDidChange:")] void TextDidChange(NSNotification notification);
+    [Optional]
+    [Selector("textShouldBeginEditing:")]
+    bool TextShouldBeginEditing(NSText textObject);
+    [Optional]
+    [Selector("textShouldEndEditing:")]
+    bool TextShouldEndEditing(NSText textObject);
+    [Optional]
+    [Selector("textDidBeginEditing:")]
+    void TextDidBeginEditing(NSNotification notification);
+    [Optional]
+    [Selector("textDidEndEditing:")]
+    void TextDidEndEditing(NSNotification notification);
+    [Optional]
+    [Selector("textDidChange:")]
+    void TextDidChange(NSNotification notification);
 }
 
 public const int NSTextWritingDirectionEmbedding = 0;

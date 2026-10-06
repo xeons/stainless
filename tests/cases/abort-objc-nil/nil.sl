@@ -14,7 +14,8 @@ public extern objc class NSObject
 
 public extern objc class SLNothing : NSObject
 {
-    [Selector("nothing")] public static SLNothing Nothing();
+    [Selector("nothing")]
+    public static SLNothing Nothing();
 }
 
 int Main()

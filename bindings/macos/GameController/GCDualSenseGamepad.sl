@@ -31,11 +31,16 @@ import Standard.ObjC;
 
 public extern objc class GCDualSenseGamepad : GCExtendedGamepad
 {
-    [Selector("touchpadButton")] public GCControllerButtonInput TouchpadButton { get; }
-    [Selector("touchpadPrimary")] public GCControllerDirectionPad TouchpadPrimary { get; }
-    [Selector("touchpadSecondary")] public GCControllerDirectionPad TouchpadSecondary { get; }
-    [Selector("leftTrigger")] public GCDualSenseAdaptiveTrigger LeftTrigger { get; }
-    [Selector("rightTrigger")] public GCDualSenseAdaptiveTrigger RightTrigger { get; }
+    [Selector("touchpadButton")]
+    public GCControllerButtonInput TouchpadButton { get; }
+    [Selector("touchpadPrimary")]
+    public GCControllerDirectionPad TouchpadPrimary { get; }
+    [Selector("touchpadSecondary")]
+    public GCControllerDirectionPad TouchpadSecondary { get; }
+    [Selector("leftTrigger")]
+    public GCDualSenseAdaptiveTrigger LeftTrigger { get; }
+    [Selector("rightTrigger")]
+    public GCDualSenseAdaptiveTrigger RightTrigger { get; }
 }
 
 #endif

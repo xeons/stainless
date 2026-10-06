@@ -38,17 +38,28 @@ public enum NSTextFieldBezelStyle : ulong
 
 public extern objc class NSTextFieldCell : NSActionCell
 {
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("drawsBackground", "setDrawsBackground:")] public bool DrawsBackground { get; set; }
-    [Selector("textColor", "setTextColor:")] public NSColor? TextColor { get; set; }
-    [Selector("bezelStyle", "setBezelStyle:")] public NSTextFieldBezelStyle BezelStyle { get; set; }
-    [Selector("placeholderString", "setPlaceholderString:")] public NSString? PlaceholderString { get; set; }
-    [Selector("placeholderAttributedString", "setPlaceholderAttributedString:")] public NSAttributedString? PlaceholderAttributedString { get; set; }
-    [Selector("allowedInputSourceLocales", "setAllowedInputSourceLocales:")] public NSArray? AllowedInputSourceLocales { get; set; }
-    [Selector("initTextCell:")] public Self InitTextCell(NSString string);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("setUpFieldEditorAttributes:")] public NSText SetUpFieldEditorAttributes(NSText textObj);
-    [Selector("setWantsNotificationForMarkedText:")] public void SetWantsNotificationForMarkedText(bool flag);
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("drawsBackground", "setDrawsBackground:")]
+    public bool DrawsBackground { get; set; }
+    [Selector("textColor", "setTextColor:")]
+    public NSColor? TextColor { get; set; }
+    [Selector("bezelStyle", "setBezelStyle:")]
+    public NSTextFieldBezelStyle BezelStyle { get; set; }
+    [Selector("placeholderString", "setPlaceholderString:")]
+    public NSString? PlaceholderString { get; set; }
+    [Selector("placeholderAttributedString", "setPlaceholderAttributedString:")]
+    public NSAttributedString? PlaceholderAttributedString { get; set; }
+    [Selector("allowedInputSourceLocales", "setAllowedInputSourceLocales:")]
+    public NSArray? AllowedInputSourceLocales { get; set; }
+    [Selector("initTextCell:")]
+    public Self InitTextCell(NSString string);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("setUpFieldEditorAttributes:")]
+    public NSText SetUpFieldEditorAttributes(NSText textObj);
+    [Selector("setWantsNotificationForMarkedText:")]
+    public void SetWantsNotificationForMarkedText(bool flag);
 }
 
 #endif

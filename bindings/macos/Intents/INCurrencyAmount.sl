@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class INCurrencyAmount : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("amount")] public NSDecimalNumber? Amount { get; }
-    [Selector("currencyCode")] public NSString? CurrencyCode { get; }
-    [Selector("initWithAmount:currencyCode:")] public Self InitWithAmountCurrencyCode(NSDecimalNumber amount, NSString currencyCode);
+    [Selector("amount")]
+    public NSDecimalNumber? Amount { get; }
+    [Selector("currencyCode")]
+    public NSString? CurrencyCode { get; }
+    [Selector("initWithAmount:currencyCode:")]
+    public Self InitWithAmountCurrencyCode(NSDecimalNumber amount, NSString currencyCode);
 }
 
 #endif

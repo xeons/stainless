@@ -33,12 +33,24 @@ import Standard.ObjC;
 
 public objc interface AEAssessmentSessionDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("assessmentSessionDidBegin:")] void AssessmentSessionDidBegin(AEAssessmentSession session);
-    [Optional] [Selector("assessmentSession:failedToBeginWithError:")] void AssessmentSessionFailedToBeginWithError(AEAssessmentSession session, NSError error);
-    [Optional] [Selector("assessmentSession:wasInterruptedWithError:")] void AssessmentSessionWasInterruptedWithError(AEAssessmentSession session, NSError error);
-    [Optional] [Selector("assessmentSessionDidEnd:")] void AssessmentSessionDidEnd(AEAssessmentSession session);
-    [Optional] [Selector("assessmentSessionDidUpdate:")] void AssessmentSessionDidUpdate(AEAssessmentSession session);
-    [Optional] [Selector("assessmentSession:failedToUpdateToConfiguration:error:")] void AssessmentSessionFailedToUpdateToConfigurationError(AEAssessmentSession session, AEAssessmentConfiguration configuration, NSError error);
+    [Optional]
+    [Selector("assessmentSessionDidBegin:")]
+    void AssessmentSessionDidBegin(AEAssessmentSession session);
+    [Optional]
+    [Selector("assessmentSession:failedToBeginWithError:")]
+    void AssessmentSessionFailedToBeginWithError(AEAssessmentSession session, NSError error);
+    [Optional]
+    [Selector("assessmentSession:wasInterruptedWithError:")]
+    void AssessmentSessionWasInterruptedWithError(AEAssessmentSession session, NSError error);
+    [Optional]
+    [Selector("assessmentSessionDidEnd:")]
+    void AssessmentSessionDidEnd(AEAssessmentSession session);
+    [Optional]
+    [Selector("assessmentSessionDidUpdate:")]
+    void AssessmentSessionDidUpdate(AEAssessmentSession session);
+    [Optional]
+    [Selector("assessmentSession:failedToUpdateToConfiguration:error:")]
+    void AssessmentSessionFailedToUpdateToConfigurationError(AEAssessmentSession session, AEAssessmentConfiguration configuration, NSError error);
 }
 
 #endif

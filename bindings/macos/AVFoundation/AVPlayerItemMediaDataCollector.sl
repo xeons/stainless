@@ -35,15 +35,20 @@ public extern objc class AVPlayerItemMediaDataCollector : NSObject { }
 
 public extern objc class AVPlayerItemMetadataCollector : AVPlayerItemMediaDataCollector
 {
-    [Selector("delegate")] public AVPlayerItemMetadataCollectorPushDelegate? Delegate { get; }
-    [Selector("delegateQueue")] public dispatch_queue_t? DelegateQueue { get; }
-    [Selector("initWithIdentifiers:classifyingLabels:")] public Self InitWithIdentifiersClassifyingLabels(NSArray? identifiers, NSArray? classifyingLabels);
-    [Selector("setDelegate:queue:")] public void SetDelegateQueue(AVPlayerItemMetadataCollectorPushDelegate? @delegate, dispatch_queue_t? delegateQueue);
+    [Selector("delegate")]
+    public AVPlayerItemMetadataCollectorPushDelegate? Delegate { get; }
+    [Selector("delegateQueue")]
+    public dispatch_queue_t? DelegateQueue { get; }
+    [Selector("initWithIdentifiers:classifyingLabels:")]
+    public Self InitWithIdentifiersClassifyingLabels(NSArray? identifiers, NSArray? classifyingLabels);
+    [Selector("setDelegate:queue:")]
+    public void SetDelegateQueue(AVPlayerItemMetadataCollectorPushDelegate? @delegate, dispatch_queue_t? delegateQueue);
 }
 
 public objc interface AVPlayerItemMetadataCollectorPushDelegate : NSObjectProtocol
 {
-    [Selector("metadataCollector:didCollectDateRangeMetadataGroups:indexesOfNewGroups:indexesOfModifiedGroups:")] void MetadataCollectorDidCollectDateRangeMetadataGroupsIndexesOfNewGroupsIndexesOfModifiedGroups(AVPlayerItemMetadataCollector metadataCollector, NSArray metadataGroups, NSIndexSet indexesOfNewGroups, NSIndexSet indexesOfModifiedGroups);
+    [Selector("metadataCollector:didCollectDateRangeMetadataGroups:indexesOfNewGroups:indexesOfModifiedGroups:")]
+    void MetadataCollectorDidCollectDateRangeMetadataGroupsIndexesOfNewGroupsIndexesOfModifiedGroups(AVPlayerItemMetadataCollector metadataCollector, NSArray metadataGroups, NSIndexSet indexesOfNewGroups, NSIndexSet indexesOfModifiedGroups);
 }
 
 #endif

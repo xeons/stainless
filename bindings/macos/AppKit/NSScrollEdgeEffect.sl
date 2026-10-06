@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// macOS 26.1 and later.
 public extern objc class NSScrollEdgeEffectStyle : NSObject
 {
-    [Selector("automaticStyle")] public static NSScrollEdgeEffectStyle AutomaticStyle { get; }
-    [Selector("softStyle")] public static NSScrollEdgeEffectStyle SoftStyle { get; }
-    [Selector("hardStyle")] public static NSScrollEdgeEffectStyle HardStyle { get; }
+    [Selector("automaticStyle")]
+    public static NSScrollEdgeEffectStyle AutomaticStyle { get; }
+    [Selector("softStyle")]
+    public static NSScrollEdgeEffectStyle SoftStyle { get; }
+    [Selector("hardStyle")]
+    public static NSScrollEdgeEffectStyle HardStyle { get; }
 }
 
 #endif

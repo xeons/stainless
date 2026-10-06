@@ -31,10 +31,14 @@ import Standard.ObjC;
 
 public extern objc class VZGenericPlatformConfiguration : VZPlatformConfiguration
 {
-    [Selector("machineIdentifier", "setMachineIdentifier:")] public VZGenericMachineIdentifier? MachineIdentifier { get; set; }
-    [Selector("isNestedVirtualizationSupported")] public static bool NestedVirtualizationSupported { get; }
-    [Selector("isNestedVirtualizationEnabled", "setNestedVirtualizationEnabled:")] public bool NestedVirtualizationEnabled { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("machineIdentifier", "setMachineIdentifier:")]
+    public VZGenericMachineIdentifier? MachineIdentifier { get; set; }
+    [Selector("isNestedVirtualizationSupported")]
+    public static bool NestedVirtualizationSupported { get; }
+    [Selector("isNestedVirtualizationEnabled", "setNestedVirtualizationEnabled:")]
+    public bool NestedVirtualizationEnabled { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class PKRecurringPaymentRequest : NSObject
 {
-    [Selector("paymentDescription", "setPaymentDescription:")] public NSString PaymentDescription { get; set; }
-    [Selector("regularBilling", "setRegularBilling:")] public PKRecurringPaymentSummaryItem RegularBilling { get; set; }
-    [Selector("trialBilling", "setTrialBilling:")] public PKRecurringPaymentSummaryItem? TrialBilling { get; set; }
-    [Selector("billingAgreement", "setBillingAgreement:")] public NSString? BillingAgreement { get; set; }
-    [Selector("managementURL", "setManagementURL:")] public NSURL ManagementURL { get; set; }
-    [Selector("tokenNotificationURL", "setTokenNotificationURL:")] public NSURL? TokenNotificationURL { get; set; }
-    [Selector("initWithPaymentDescription:regularBilling:managementURL:")] public Self InitWithPaymentDescriptionRegularBillingManagementURL(NSString paymentDescription, PKRecurringPaymentSummaryItem regularBilling, NSURL managementURL);
+    [Selector("paymentDescription", "setPaymentDescription:")]
+    public NSString PaymentDescription { get; set; }
+    [Selector("regularBilling", "setRegularBilling:")]
+    public PKRecurringPaymentSummaryItem RegularBilling { get; set; }
+    [Selector("trialBilling", "setTrialBilling:")]
+    public PKRecurringPaymentSummaryItem? TrialBilling { get; set; }
+    [Selector("billingAgreement", "setBillingAgreement:")]
+    public NSString? BillingAgreement { get; set; }
+    [Selector("managementURL", "setManagementURL:")]
+    public NSURL ManagementURL { get; set; }
+    [Selector("tokenNotificationURL", "setTokenNotificationURL:")]
+    public NSURL? TokenNotificationURL { get; set; }
+    [Selector("initWithPaymentDescription:regularBilling:managementURL:")]
+    public Self InitWithPaymentDescriptionRegularBillingManagementURL(NSString paymentDescription, PKRecurringPaymentSummaryItem regularBilling, NSURL managementURL);
 }
 
 #endif

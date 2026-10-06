@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class INReservation : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("itemReference")] public INSpeakableString ItemReference { get; }
-    [Selector("reservationNumber")] public NSString? ReservationNumber { get; }
-    [Selector("bookingTime")] public NSDate? BookingTime { get; }
-    [Selector("reservationStatus")] public INReservationStatus ReservationStatus { get; }
-    [Selector("reservationHolderName")] public NSString? ReservationHolderName { get; }
-    [Selector("actions")] public NSArray? Actions { get; }
-    [Selector("URL")] public NSURL? URL { get; }
+    [Selector("itemReference")]
+    public INSpeakableString ItemReference { get; }
+    [Selector("reservationNumber")]
+    public NSString? ReservationNumber { get; }
+    [Selector("bookingTime")]
+    public NSDate? BookingTime { get; }
+    [Selector("reservationStatus")]
+    public INReservationStatus ReservationStatus { get; }
+    [Selector("reservationHolderName")]
+    public NSString? ReservationHolderName { get; }
+    [Selector("actions")]
+    public NSArray? Actions { get; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
 }
 
 #endif

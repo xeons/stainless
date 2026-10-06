@@ -39,8 +39,10 @@ public const int DOM_CSS_CUSTOM = 3;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMCSSValue : DOMObject
 {
-    [Selector("cssText", "setCssText:")] public NSString? CssText { get; set; }
-    [Selector("cssValueType")] public ushort CssValueType { get; }
+    [Selector("cssText", "setCssText:")]
+    public NSString? CssText { get; set; }
+    [Selector("cssValueType")]
+    public ushort CssValueType { get; }
 }
 
 #endif

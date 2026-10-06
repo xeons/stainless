@@ -58,29 +58,47 @@ public using NSTextCheckingKey = NSString;
 
 public extern objc class NSTextCheckingResult : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("resultType")] public NSTextCheckingType ResultType { get; }
-    [Selector("range")] public NSRange Range { get; }
+    [Selector("resultType")]
+    public NSTextCheckingType ResultType { get; }
+    [Selector("range")]
+    public NSRange Range { get; }
 }
 
 /// NSTextCheckingResultOptional, a category of NSTextCheckingResult.
 public extern objc class NSTextCheckingResult
 {
-    [Selector("orthography")] public NSOrthography? Orthography { get; }
-    [Selector("grammarDetails")] public NSArray? GrammarDetails { get; }
-    [Selector("date")] public NSDate? Date { get; }
-    [Selector("timeZone")] public NSTimeZone? TimeZone { get; }
-    [Selector("duration")] public NSTimeInterval Duration { get; }
-    [Selector("components")] public NSDictionary? Components { get; }
-    [Selector("URL")] public NSURL? URL { get; }
-    [Selector("replacementString")] public NSString? ReplacementString { get; }
-    [Selector("alternativeStrings")] public NSArray? AlternativeStrings { get; }
-    [Selector("regularExpression")] public NSRegularExpression? RegularExpression { get; }
-    [Selector("phoneNumber")] public NSString? PhoneNumber { get; }
-    [Selector("numberOfRanges")] public NSUInteger NumberOfRanges { get; }
-    [Selector("addressComponents")] public NSDictionary? AddressComponents { get; }
-    [Selector("rangeAtIndex:")] public NSRange RangeAtIndex(NSUInteger idx);
-    [Selector("rangeWithName:")] public NSRange RangeWithName(NSString name);
-    [Selector("resultByAdjustingRangesWithOffset:")] public NSTextCheckingResult ResultByAdjustingRangesWithOffset(NSInteger offset);
+    [Selector("orthography")]
+    public NSOrthography? Orthography { get; }
+    [Selector("grammarDetails")]
+    public NSArray? GrammarDetails { get; }
+    [Selector("date")]
+    public NSDate? Date { get; }
+    [Selector("timeZone")]
+    public NSTimeZone? TimeZone { get; }
+    [Selector("duration")]
+    public NSTimeInterval Duration { get; }
+    [Selector("components")]
+    public NSDictionary? Components { get; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
+    [Selector("replacementString")]
+    public NSString? ReplacementString { get; }
+    [Selector("alternativeStrings")]
+    public NSArray? AlternativeStrings { get; }
+    [Selector("regularExpression")]
+    public NSRegularExpression? RegularExpression { get; }
+    [Selector("phoneNumber")]
+    public NSString? PhoneNumber { get; }
+    [Selector("numberOfRanges")]
+    public NSUInteger NumberOfRanges { get; }
+    [Selector("addressComponents")]
+    public NSDictionary? AddressComponents { get; }
+    [Selector("rangeAtIndex:")]
+    public NSRange RangeAtIndex(NSUInteger idx);
+    [Selector("rangeWithName:")]
+    public NSRange RangeWithName(NSString name);
+    [Selector("resultByAdjustingRangesWithOffset:")]
+    public NSTextCheckingResult ResultByAdjustingRangesWithOffset(NSInteger offset);
 }
 
 public extern "C" NSTextCheckingKey NSTextCheckingNameKey;
@@ -108,21 +126,36 @@ public extern "C" NSTextCheckingKey NSTextCheckingFlightKey;
 /// NSTextCheckingResultCreation, a category of NSTextCheckingResult.
 public extern objc class NSTextCheckingResult
 {
-    [Selector("orthographyCheckingResultWithRange:orthography:")] public static NSTextCheckingResult OrthographyCheckingResultWithRangeOrthography(NSRange range, NSOrthography orthography);
-    [Selector("spellCheckingResultWithRange:")] public static NSTextCheckingResult SpellCheckingResultWithRange(NSRange range);
-    [Selector("grammarCheckingResultWithRange:details:")] public static NSTextCheckingResult GrammarCheckingResultWithRangeDetails(NSRange range, NSArray details);
-    [Selector("dateCheckingResultWithRange:date:")] public static NSTextCheckingResult DateCheckingResultWithRangeDate(NSRange range, NSDate date);
-    [Selector("dateCheckingResultWithRange:date:timeZone:duration:")] public static NSTextCheckingResult DateCheckingResultWithRangeDateTimeZoneDuration(NSRange range, NSDate date, NSTimeZone timeZone, NSTimeInterval duration);
-    [Selector("addressCheckingResultWithRange:components:")] public static NSTextCheckingResult AddressCheckingResultWithRangeComponents(NSRange range, NSDictionary components);
-    [Selector("linkCheckingResultWithRange:URL:")] public static NSTextCheckingResult LinkCheckingResultWithRangeURL(NSRange range, NSURL url);
-    [Selector("quoteCheckingResultWithRange:replacementString:")] public static NSTextCheckingResult QuoteCheckingResultWithRangeReplacementString(NSRange range, NSString replacementString);
-    [Selector("dashCheckingResultWithRange:replacementString:")] public static NSTextCheckingResult DashCheckingResultWithRangeReplacementString(NSRange range, NSString replacementString);
-    [Selector("replacementCheckingResultWithRange:replacementString:")] public static NSTextCheckingResult ReplacementCheckingResultWithRangeReplacementString(NSRange range, NSString replacementString);
-    [Selector("correctionCheckingResultWithRange:replacementString:")] public static NSTextCheckingResult CorrectionCheckingResultWithRangeReplacementString(NSRange range, NSString replacementString);
-    [Selector("correctionCheckingResultWithRange:replacementString:alternativeStrings:")] public static NSTextCheckingResult CorrectionCheckingResultWithRangeReplacementStringAlternativeStrings(NSRange range, NSString replacementString, NSArray alternativeStrings);
-    [Selector("regularExpressionCheckingResultWithRanges:count:regularExpression:")] public static NSTextCheckingResult RegularExpressionCheckingResultWithRangesCountRegularExpression(NSRangePointer ranges, NSUInteger count, NSRegularExpression regularExpression);
-    [Selector("phoneNumberCheckingResultWithRange:phoneNumber:")] public static NSTextCheckingResult PhoneNumberCheckingResultWithRangePhoneNumber(NSRange range, NSString phoneNumber);
-    [Selector("transitInformationCheckingResultWithRange:components:")] public static NSTextCheckingResult TransitInformationCheckingResultWithRangeComponents(NSRange range, NSDictionary components);
+    [Selector("orthographyCheckingResultWithRange:orthography:")]
+    public static NSTextCheckingResult OrthographyCheckingResultWithRangeOrthography(NSRange range, NSOrthography orthography);
+    [Selector("spellCheckingResultWithRange:")]
+    public static NSTextCheckingResult SpellCheckingResultWithRange(NSRange range);
+    [Selector("grammarCheckingResultWithRange:details:")]
+    public static NSTextCheckingResult GrammarCheckingResultWithRangeDetails(NSRange range, NSArray details);
+    [Selector("dateCheckingResultWithRange:date:")]
+    public static NSTextCheckingResult DateCheckingResultWithRangeDate(NSRange range, NSDate date);
+    [Selector("dateCheckingResultWithRange:date:timeZone:duration:")]
+    public static NSTextCheckingResult DateCheckingResultWithRangeDateTimeZoneDuration(NSRange range, NSDate date, NSTimeZone timeZone, NSTimeInterval duration);
+    [Selector("addressCheckingResultWithRange:components:")]
+    public static NSTextCheckingResult AddressCheckingResultWithRangeComponents(NSRange range, NSDictionary components);
+    [Selector("linkCheckingResultWithRange:URL:")]
+    public static NSTextCheckingResult LinkCheckingResultWithRangeURL(NSRange range, NSURL url);
+    [Selector("quoteCheckingResultWithRange:replacementString:")]
+    public static NSTextCheckingResult QuoteCheckingResultWithRangeReplacementString(NSRange range, NSString replacementString);
+    [Selector("dashCheckingResultWithRange:replacementString:")]
+    public static NSTextCheckingResult DashCheckingResultWithRangeReplacementString(NSRange range, NSString replacementString);
+    [Selector("replacementCheckingResultWithRange:replacementString:")]
+    public static NSTextCheckingResult ReplacementCheckingResultWithRangeReplacementString(NSRange range, NSString replacementString);
+    [Selector("correctionCheckingResultWithRange:replacementString:")]
+    public static NSTextCheckingResult CorrectionCheckingResultWithRangeReplacementString(NSRange range, NSString replacementString);
+    [Selector("correctionCheckingResultWithRange:replacementString:alternativeStrings:")]
+    public static NSTextCheckingResult CorrectionCheckingResultWithRangeReplacementStringAlternativeStrings(NSRange range, NSString replacementString, NSArray alternativeStrings);
+    [Selector("regularExpressionCheckingResultWithRanges:count:regularExpression:")]
+    public static NSTextCheckingResult RegularExpressionCheckingResultWithRangesCountRegularExpression(NSRangePointer ranges, NSUInteger count, NSRegularExpression regularExpression);
+    [Selector("phoneNumberCheckingResultWithRange:phoneNumber:")]
+    public static NSTextCheckingResult PhoneNumberCheckingResultWithRangePhoneNumber(NSRange range, NSString phoneNumber);
+    [Selector("transitInformationCheckingResultWithRange:components:")]
+    public static NSTextCheckingResult TransitInformationCheckingResultWithRangeComponents(NSRange range, NSDictionary components);
 }
 
 #endif

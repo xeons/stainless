@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class INTrainReservation : INReservation, NSCopying, NSSecureCoding
 {
-    [Selector("reservedSeat")] public INSeat? ReservedSeat { get; }
-    [Selector("trainTrip")] public INTrainTrip TrainTrip { get; }
-    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:URL:reservedSeat:trainTrip:")] public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsURLReservedSeatTrainTrip(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, NSURL? URL, INSeat? reservedSeat, INTrainTrip trainTrip);
-    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:reservedSeat:trainTrip:")] public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsReservedSeatTrainTrip(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, INSeat? reservedSeat, INTrainTrip trainTrip);
+    [Selector("reservedSeat")]
+    public INSeat? ReservedSeat { get; }
+    [Selector("trainTrip")]
+    public INTrainTrip TrainTrip { get; }
+    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:URL:reservedSeat:trainTrip:")]
+    public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsURLReservedSeatTrainTrip(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, NSURL? URL, INSeat? reservedSeat, INTrainTrip trainTrip);
+    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:reservedSeat:trainTrip:")]
+    public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsReservedSeatTrainTrip(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, INSeat? reservedSeat, INTrainTrip trainTrip);
 }
 
 #endif

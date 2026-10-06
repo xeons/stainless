@@ -34,17 +34,28 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCLossDescriptor : NSObject, NSCopying
 {
-    [Selector("lossType")] public MLCLossType LossType { get; }
-    [Selector("reductionType")] public MLCReductionType ReductionType { get; }
-    [Selector("weight")] public float Weight { get; }
-    [Selector("labelSmoothing")] public float LabelSmoothing { get; }
-    [Selector("classCount")] public NSUInteger ClassCount { get; }
-    [Selector("epsilon")] public float Epsilon { get; }
-    [Selector("delta")] public float Delta { get; }
-    [Selector("descriptorWithType:reductionType:")] public static Self DescriptorWithTypeReductionType(MLCLossType lossType, MLCReductionType reductionType);
-    [Selector("descriptorWithType:reductionType:weight:")] public static Self DescriptorWithTypeReductionTypeWeight(MLCLossType lossType, MLCReductionType reductionType, float weight);
-    [Selector("descriptorWithType:reductionType:weight:labelSmoothing:classCount:")] public static Self DescriptorWithTypeReductionTypeWeightLabelSmoothingClassCount(MLCLossType lossType, MLCReductionType reductionType, float weight, float labelSmoothing, NSUInteger classCount);
-    [Selector("descriptorWithType:reductionType:weight:labelSmoothing:classCount:epsilon:delta:")] public static Self DescriptorWithTypeReductionTypeWeightLabelSmoothingClassCountEpsilonDelta(MLCLossType lossType, MLCReductionType reductionType, float weight, float labelSmoothing, NSUInteger classCount, float epsilon, float delta);
+    [Selector("lossType")]
+    public MLCLossType LossType { get; }
+    [Selector("reductionType")]
+    public MLCReductionType ReductionType { get; }
+    [Selector("weight")]
+    public float Weight { get; }
+    [Selector("labelSmoothing")]
+    public float LabelSmoothing { get; }
+    [Selector("classCount")]
+    public NSUInteger ClassCount { get; }
+    [Selector("epsilon")]
+    public float Epsilon { get; }
+    [Selector("delta")]
+    public float Delta { get; }
+    [Selector("descriptorWithType:reductionType:")]
+    public static Self DescriptorWithTypeReductionType(MLCLossType lossType, MLCReductionType reductionType);
+    [Selector("descriptorWithType:reductionType:weight:")]
+    public static Self DescriptorWithTypeReductionTypeWeight(MLCLossType lossType, MLCReductionType reductionType, float weight);
+    [Selector("descriptorWithType:reductionType:weight:labelSmoothing:classCount:")]
+    public static Self DescriptorWithTypeReductionTypeWeightLabelSmoothingClassCount(MLCLossType lossType, MLCReductionType reductionType, float weight, float labelSmoothing, NSUInteger classCount);
+    [Selector("descriptorWithType:reductionType:weight:labelSmoothing:classCount:epsilon:delta:")]
+    public static Self DescriptorWithTypeReductionTypeWeightLabelSmoothingClassCountEpsilonDelta(MLCLossType lossType, MLCReductionType reductionType, float weight, float labelSmoothing, NSUInteger classCount, float epsilon, float delta);
 }
 
 #endif

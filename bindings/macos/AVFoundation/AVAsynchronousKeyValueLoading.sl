@@ -43,8 +43,10 @@ public objc closure void AVAsynchronousKeyValueLoadingLoadValuesAsynchronouslyFo
 
 public objc interface AVAsynchronousKeyValueLoading
 {
-    [Selector("statusOfValueForKey:error:")] AVKeyValueStatus StatusOfValueForKeyError(NSString key, out NSError? outError);
-    [Selector("loadValuesAsynchronouslyForKeys:completionHandler:")] void LoadValuesAsynchronouslyForKeysCompletionHandler(NSArray keys, AVAsynchronousKeyValueLoadingLoadValuesAsynchronouslyForKeysCompletionHandlerHandlerBlock? handler);
+    [Selector("statusOfValueForKey:error:")]
+    AVKeyValueStatus StatusOfValueForKeyError(NSString key, out NSError? outError);
+    [Selector("loadValuesAsynchronouslyForKeys:completionHandler:")]
+    void LoadValuesAsynchronouslyForKeysCompletionHandler(NSArray keys, AVAsynchronousKeyValueLoadingLoadValuesAsynchronouslyForKeysCompletionHandlerHandlerBlock? handler);
 }
 
 #endif

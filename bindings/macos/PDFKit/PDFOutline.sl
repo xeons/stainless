@@ -33,18 +33,30 @@ import Standard.ObjC;
 
 public extern objc class PDFOutline : NSObject
 {
-    [Selector("document")] public PDFDocument? Document { get; }
-    [Selector("parent")] public PDFOutline? Parent { get; }
-    [Selector("numberOfChildren")] public NSUInteger NumberOfChildren { get; }
-    [Selector("index")] public NSUInteger Index { get; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("isOpen", "setIsOpen:")] public bool IsOpen { get; set; }
-    [Selector("destination", "setDestination:")] public PDFDestination? Destination { get; set; }
-    [Selector("action", "setAction:")] public PDFAction? Action { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("childAtIndex:")] public PDFOutline? ChildAtIndex(NSUInteger index);
-    [Selector("insertChild:atIndex:")] public void InsertChildAtIndex(PDFOutline child, NSUInteger index);
-    [Selector("removeFromParent")] public void RemoveFromParent();
+    [Selector("document")]
+    public PDFDocument? Document { get; }
+    [Selector("parent")]
+    public PDFOutline? Parent { get; }
+    [Selector("numberOfChildren")]
+    public NSUInteger NumberOfChildren { get; }
+    [Selector("index")]
+    public NSUInteger Index { get; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("isOpen", "setIsOpen:")]
+    public bool IsOpen { get; set; }
+    [Selector("destination", "setDestination:")]
+    public PDFDestination? Destination { get; set; }
+    [Selector("action", "setAction:")]
+    public PDFAction? Action { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("childAtIndex:")]
+    public PDFOutline? ChildAtIndex(NSUInteger index);
+    [Selector("insertChild:atIndex:")]
+    public void InsertChildAtIndex(PDFOutline child, NSUInteger index);
+    [Selector("removeFromParent")]
+    public void RemoveFromParent();
 }
 
 #endif

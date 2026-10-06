@@ -48,23 +48,39 @@ public enum PHLivePhotoViewContentMode : long
 
 public extern objc class PHLivePhotoView : NSView
 {
-    [Selector("delegate", "setDelegate:")] public PHLivePhotoViewDelegate? Delegate { get; set; }
-    [Selector("livePhoto", "setLivePhoto:")] public PHLivePhoto? LivePhoto { get; set; }
-    [Selector("contentMode", "setContentMode:")] public PHLivePhotoViewContentMode ContentMode { get; set; }
-    [Selector("contentsRect", "setContentsRect:")] public CGRect ContentsRect { get; set; }
-    [Selector("audioVolume", "setAudioVolume:")] public float AudioVolume { get; set; }
-    [Selector("isMuted", "setMuted:")] public bool Muted { get; set; }
-    [Selector("livePhotoBadgeView")] public NSView? LivePhotoBadgeView { get; }
-    [Selector("startPlaybackWithStyle:")] public void StartPlaybackWithStyle(PHLivePhotoViewPlaybackStyle playbackStyle);
-    [Selector("stopPlayback")] public void StopPlayback();
-    [Selector("stopPlaybackAnimated:")] public void StopPlaybackAnimated(bool animated);
+    [Selector("delegate", "setDelegate:")]
+    public PHLivePhotoViewDelegate? Delegate { get; set; }
+    [Selector("livePhoto", "setLivePhoto:")]
+    public PHLivePhoto? LivePhoto { get; set; }
+    [Selector("contentMode", "setContentMode:")]
+    public PHLivePhotoViewContentMode ContentMode { get; set; }
+    [Selector("contentsRect", "setContentsRect:")]
+    public CGRect ContentsRect { get; set; }
+    [Selector("audioVolume", "setAudioVolume:")]
+    public float AudioVolume { get; set; }
+    [Selector("isMuted", "setMuted:")]
+    public bool Muted { get; set; }
+    [Selector("livePhotoBadgeView")]
+    public NSView? LivePhotoBadgeView { get; }
+    [Selector("startPlaybackWithStyle:")]
+    public void StartPlaybackWithStyle(PHLivePhotoViewPlaybackStyle playbackStyle);
+    [Selector("stopPlayback")]
+    public void StopPlayback();
+    [Selector("stopPlaybackAnimated:")]
+    public void StopPlaybackAnimated(bool animated);
 }
 
 public objc interface PHLivePhotoViewDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("livePhotoView:canBeginPlaybackWithStyle:")] bool LivePhotoViewCanBeginPlaybackWithStyle(PHLivePhotoView livePhotoView, PHLivePhotoViewPlaybackStyle playbackStyle);
-    [Optional] [Selector("livePhotoView:willBeginPlaybackWithStyle:")] void LivePhotoViewWillBeginPlaybackWithStyle(PHLivePhotoView livePhotoView, PHLivePhotoViewPlaybackStyle playbackStyle);
-    [Optional] [Selector("livePhotoView:didEndPlaybackWithStyle:")] void LivePhotoViewDidEndPlaybackWithStyle(PHLivePhotoView livePhotoView, PHLivePhotoViewPlaybackStyle playbackStyle);
+    [Optional]
+    [Selector("livePhotoView:canBeginPlaybackWithStyle:")]
+    bool LivePhotoViewCanBeginPlaybackWithStyle(PHLivePhotoView livePhotoView, PHLivePhotoViewPlaybackStyle playbackStyle);
+    [Optional]
+    [Selector("livePhotoView:willBeginPlaybackWithStyle:")]
+    void LivePhotoViewWillBeginPlaybackWithStyle(PHLivePhotoView livePhotoView, PHLivePhotoViewPlaybackStyle playbackStyle);
+    [Optional]
+    [Selector("livePhotoView:didEndPlaybackWithStyle:")]
+    void LivePhotoViewDidEndPlaybackWithStyle(PHLivePhotoView livePhotoView, PHLivePhotoViewPlaybackStyle playbackStyle);
 }
 
 #endif

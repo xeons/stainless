@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MLImageSize : NSObject, NSSecureCoding
 {
-    [Selector("pixelsWide")] public NSInteger PixelsWide { get; }
-    [Selector("pixelsHigh")] public NSInteger PixelsHigh { get; }
+    [Selector("pixelsWide")]
+    public NSInteger PixelsWide { get; }
+    [Selector("pixelsHigh")]
+    public NSInteger PixelsHigh { get; }
 }
 
 #endif

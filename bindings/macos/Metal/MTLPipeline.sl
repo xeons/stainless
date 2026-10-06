@@ -47,13 +47,16 @@ public enum MTLShaderValidation : long
 
 public extern objc class MTLPipelineBufferDescriptor : NSObject, NSCopying
 {
-    [Selector("mutability", "setMutability:")] public MTLMutability Mutability { get; set; }
+    [Selector("mutability", "setMutability:")]
+    public MTLMutability Mutability { get; set; }
 }
 
 public extern objc class MTLPipelineBufferDescriptorArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public MTLPipelineBufferDescriptor ObjectAtIndexedSubscript(NSUInteger bufferIndex);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTLPipelineBufferDescriptor? buffer, NSUInteger bufferIndex);
+    [Selector("objectAtIndexedSubscript:")]
+    public MTLPipelineBufferDescriptor ObjectAtIndexedSubscript(NSUInteger bufferIndex);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTLPipelineBufferDescriptor? buffer, NSUInteger bufferIndex);
 }
 
 #endif

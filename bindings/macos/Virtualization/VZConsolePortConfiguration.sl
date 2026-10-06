@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class VZConsolePortConfiguration : NSObject, NSCopying
 {
-    [Selector("attachment", "setAttachment:")] public VZSerialPortAttachment? Attachment { get; set; }
+    [Selector("attachment", "setAttachment:")]
+    public VZSerialPortAttachment? Attachment { get; set; }
 }
 
 #endif

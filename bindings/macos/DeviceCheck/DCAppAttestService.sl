@@ -39,11 +39,16 @@ public objc closure void DCAppAttestServiceGenerateAssertionClientDataHashComple
 
 public extern objc class DCAppAttestService : NSObject
 {
-    [Selector("sharedService")] public static DCAppAttestService SharedService { get; }
-    [Selector("isSupported")] public bool Supported { get; }
-    [Selector("generateKeyWithCompletionHandler:")] public void GenerateKeyWithCompletionHandler(DCAppAttestServiceGenerateKeyWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("attestKey:clientDataHash:completionHandler:")] public void AttestKeyClientDataHashCompletionHandler(NSString keyId, NSData clientDataHash, DCAppAttestServiceAttestKeyClientDataHashCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("generateAssertion:clientDataHash:completionHandler:")] public void GenerateAssertionClientDataHashCompletionHandler(NSString keyId, NSData clientDataHash, DCAppAttestServiceGenerateAssertionClientDataHashCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("sharedService")]
+    public static DCAppAttestService SharedService { get; }
+    [Selector("isSupported")]
+    public bool Supported { get; }
+    [Selector("generateKeyWithCompletionHandler:")]
+    public void GenerateKeyWithCompletionHandler(DCAppAttestServiceGenerateKeyWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("attestKey:clientDataHash:completionHandler:")]
+    public void AttestKeyClientDataHashCompletionHandler(NSString keyId, NSData clientDataHash, DCAppAttestServiceAttestKeyClientDataHashCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("generateAssertion:clientDataHash:completionHandler:")]
+    public void GenerateAssertionClientDataHashCompletionHandler(NSString keyId, NSData clientDataHash, DCAppAttestServiceGenerateAssertionClientDataHashCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

@@ -35,38 +35,52 @@ import Standard.ObjC;
 public extern objc class CSSearchableItemAttributeSet : NSObject, NSCopying, NSSecureCoding
 {
     /// Deprecated in macOS 100000.
-    [Selector("initWithItemContentType:")] public Self InitWithItemContentType(NSString itemContentType);
-    [Selector("initWithContentType:")] public Self InitWithContentType(UTType contentType);
+    [Selector("initWithItemContentType:")]
+    public Self InitWithItemContentType(NSString itemContentType);
+    [Selector("initWithContentType:")]
+    public Self InitWithContentType(UTType contentType);
 }
 
 public extern objc class CSLocalizedString : NSString
 {
-    [Selector("initWithLocalizedStrings:")] public Self InitWithLocalizedStrings(NSDictionary localizedStrings);
-    [Selector("localizedString")] public NSString LocalizedString();
+    [Selector("initWithLocalizedStrings:")]
+    public Self InitWithLocalizedStrings(NSDictionary localizedStrings);
+    [Selector("localizedString")]
+    public NSString LocalizedString();
 }
 
 public extern objc class CSCustomAttributeKey : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("keyName")] public NSString KeyName { get; }
-    [Selector("isSearchable")] public bool Searchable { get; }
-    [Selector("isSearchableByDefault")] public bool SearchableByDefault { get; }
-    [Selector("isUnique")] public bool Unique { get; }
-    [Selector("isMultiValued")] public bool MultiValued { get; }
-    [Selector("initWithKeyName:")] public Self? InitWithKeyName(NSString keyName);
-    [Selector("initWithKeyName:searchable:searchableByDefault:unique:multiValued:")] public Self? InitWithKeyNameSearchableSearchableByDefaultUniqueMultiValued(NSString keyName, bool searchable, bool searchableByDefault, bool unique, bool multiValued);
+    [Selector("keyName")]
+    public NSString KeyName { get; }
+    [Selector("isSearchable")]
+    public bool Searchable { get; }
+    [Selector("isSearchableByDefault")]
+    public bool SearchableByDefault { get; }
+    [Selector("isUnique")]
+    public bool Unique { get; }
+    [Selector("isMultiValued")]
+    public bool MultiValued { get; }
+    [Selector("initWithKeyName:")]
+    public Self? InitWithKeyName(NSString keyName);
+    [Selector("initWithKeyName:searchable:searchableByDefault:unique:multiValued:")]
+    public Self? InitWithKeyNameSearchableSearchableByDefaultUniqueMultiValued(NSString keyName, bool searchable, bool searchableByDefault, bool unique, bool multiValued);
 }
 
 /// CSCustomAttributes, a category of CSSearchableItemAttributeSet.
 public extern objc class CSSearchableItemAttributeSet
 {
-    [Selector("setValue:forCustomKey:")] public void SetValueForCustomKey(NSSecureCoding? value, CSCustomAttributeKey key);
-    [Selector("valueForCustomKey:")] public NSSecureCoding? ValueForCustomKey(CSCustomAttributeKey key);
+    [Selector("setValue:forCustomKey:")]
+    public void SetValueForCustomKey(NSSecureCoding? value, CSCustomAttributeKey key);
+    [Selector("valueForCustomKey:")]
+    public NSSecureCoding? ValueForCustomKey(CSCustomAttributeKey key);
 }
 
 /// CSSearchableItemAttributeSet, a category of NSUserActivity.
 public extern objc class NSUserActivity
 {
-    [Selector("contentAttributeSet", "setContentAttributeSet:")] public CSSearchableItemAttributeSet? ContentAttributeSet { get; set; }
+    [Selector("contentAttributeSet", "setContentAttributeSet:")]
+    public CSSearchableItemAttributeSet? ContentAttributeSet { get; set; }
 }
 
 #endif

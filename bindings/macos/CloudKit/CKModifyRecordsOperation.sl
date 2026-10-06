@@ -49,19 +49,31 @@ public objc closure void CKModifyRecordsOperationModifyRecordsCompletionBlock(NS
 
 public extern objc class CKModifyRecordsOperation : CKDatabaseOperation
 {
-    [Selector("recordsToSave", "setRecordsToSave:")] public NSArray? RecordsToSave { get; set; }
-    [Selector("recordIDsToDelete", "setRecordIDsToDelete:")] public NSArray? RecordIDsToDelete { get; set; }
-    [Selector("savePolicy", "setSavePolicy:")] public CKRecordSavePolicy SavePolicy { get; set; }
-    [Selector("clientChangeTokenData", "setClientChangeTokenData:")] public NSData? ClientChangeTokenData { get; set; }
-    [Selector("atomic", "setAtomic:")] public bool Atomic { get; set; }
-    [Selector("perRecordProgressBlock", "setPerRecordProgressBlock:")] public CKModifyRecordsOperationPerRecordProgressBlock? PerRecordProgressBlock { get; set; }
+    [Selector("recordsToSave", "setRecordsToSave:")]
+    public NSArray? RecordsToSave { get; set; }
+    [Selector("recordIDsToDelete", "setRecordIDsToDelete:")]
+    public NSArray? RecordIDsToDelete { get; set; }
+    [Selector("savePolicy", "setSavePolicy:")]
+    public CKRecordSavePolicy SavePolicy { get; set; }
+    [Selector("clientChangeTokenData", "setClientChangeTokenData:")]
+    public NSData? ClientChangeTokenData { get; set; }
+    [Selector("atomic", "setAtomic:")]
+    public bool Atomic { get; set; }
+    [Selector("perRecordProgressBlock", "setPerRecordProgressBlock:")]
+    public CKModifyRecordsOperationPerRecordProgressBlock? PerRecordProgressBlock { get; set; }
     /// Deprecated in macOS 12.0.
-    [Selector("perRecordCompletionBlock", "setPerRecordCompletionBlock:")] public CKModifyRecordsOperationPerRecordCompletionBlock? PerRecordCompletionBlock { get; set; }
-    [Selector("perRecordSaveBlock", "setPerRecordSaveBlock:")] public CKModifyRecordsOperationPerRecordSaveBlock? PerRecordSaveBlock { get; set; }
-    [Selector("perRecordDeleteBlock", "setPerRecordDeleteBlock:")] public CKModifyRecordsOperationPerRecordDeleteBlock? PerRecordDeleteBlock { get; set; }
-    [Selector("modifyRecordsCompletionBlock", "setModifyRecordsCompletionBlock:")] public CKModifyRecordsOperationModifyRecordsCompletionBlock? ModifyRecordsCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithRecordsToSave:recordIDsToDelete:")] public Self InitWithRecordsToSaveRecordIDsToDelete(NSArray? records, NSArray? recordIDs);
+    [Selector("perRecordCompletionBlock", "setPerRecordCompletionBlock:")]
+    public CKModifyRecordsOperationPerRecordCompletionBlock? PerRecordCompletionBlock { get; set; }
+    [Selector("perRecordSaveBlock", "setPerRecordSaveBlock:")]
+    public CKModifyRecordsOperationPerRecordSaveBlock? PerRecordSaveBlock { get; set; }
+    [Selector("perRecordDeleteBlock", "setPerRecordDeleteBlock:")]
+    public CKModifyRecordsOperationPerRecordDeleteBlock? PerRecordDeleteBlock { get; set; }
+    [Selector("modifyRecordsCompletionBlock", "setModifyRecordsCompletionBlock:")]
+    public CKModifyRecordsOperationModifyRecordsCompletionBlock? ModifyRecordsCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithRecordsToSave:recordIDsToDelete:")]
+    public Self InitWithRecordsToSaveRecordIDsToDelete(NSArray? records, NSArray? recordIDs);
 }
 
 #endif

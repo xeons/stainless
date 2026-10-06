@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class NSActionCell : NSCell
 {
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
-    [Selector("action", "setAction:")] public Selector Action { get; set; }
-    [Selector("tag", "setTag:")] public NSInteger Tag { get; set; }
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
+    [Selector("action", "setAction:")]
+    public Selector Action { get; set; }
+    [Selector("tag", "setTag:")]
+    public NSInteger Tag { get; set; }
 }
 
 #endif

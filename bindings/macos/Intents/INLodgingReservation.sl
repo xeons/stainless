@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class INLodgingReservation : INReservation, NSCopying, NSSecureCoding
 {
-    [Selector("lodgingBusinessLocation")] public CLPlacemark LodgingBusinessLocation { get; }
-    [Selector("reservationDuration")] public INDateComponentsRange ReservationDuration { get; }
-    [Selector("numberOfAdults")] public NSNumber? NumberOfAdults { get; }
-    [Selector("numberOfChildren")] public NSNumber? NumberOfChildren { get; }
-    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:URL:lodgingBusinessLocation:reservationDuration:numberOfAdults:numberOfChildren:")] public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsURLLodgingBusinessLocationReservationDurationNumberOfAdultsNumberOfChildren(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, NSURL? URL, CLPlacemark lodgingBusinessLocation, INDateComponentsRange reservationDuration, NSNumber? numberOfAdults, NSNumber? numberOfChildren);
-    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:lodgingBusinessLocation:reservationDuration:numberOfAdults:numberOfChildren:")] public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsLodgingBusinessLocationReservationDurationNumberOfAdultsNumberOfChildren(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, CLPlacemark lodgingBusinessLocation, INDateComponentsRange reservationDuration, NSNumber? numberOfAdults, NSNumber? numberOfChildren);
+    [Selector("lodgingBusinessLocation")]
+    public CLPlacemark LodgingBusinessLocation { get; }
+    [Selector("reservationDuration")]
+    public INDateComponentsRange ReservationDuration { get; }
+    [Selector("numberOfAdults")]
+    public NSNumber? NumberOfAdults { get; }
+    [Selector("numberOfChildren")]
+    public NSNumber? NumberOfChildren { get; }
+    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:URL:lodgingBusinessLocation:reservationDuration:numberOfAdults:numberOfChildren:")]
+    public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsURLLodgingBusinessLocationReservationDurationNumberOfAdultsNumberOfChildren(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, NSURL? URL, CLPlacemark lodgingBusinessLocation, INDateComponentsRange reservationDuration, NSNumber? numberOfAdults, NSNumber? numberOfChildren);
+    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:lodgingBusinessLocation:reservationDuration:numberOfAdults:numberOfChildren:")]
+    public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsLodgingBusinessLocationReservationDurationNumberOfAdultsNumberOfChildren(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, CLPlacemark lodgingBusinessLocation, INDateComponentsRange reservationDuration, NSNumber? numberOfAdults, NSNumber? numberOfChildren);
 }
 
 #endif

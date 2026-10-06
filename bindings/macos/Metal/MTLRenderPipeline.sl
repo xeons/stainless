@@ -115,196 +115,330 @@ public enum MTLTessellationControlPointIndexType : ulong
 
 public extern objc class MTLRenderPipelineColorAttachmentDescriptor : NSObject, NSCopying
 {
-    [Selector("pixelFormat", "setPixelFormat:")] public MTLPixelFormat PixelFormat { get; set; }
-    [Selector("isBlendingEnabled", "setBlendingEnabled:")] public bool BlendingEnabled { get; set; }
-    [Selector("sourceRGBBlendFactor", "setSourceRGBBlendFactor:")] public MTLBlendFactor SourceRGBBlendFactor { get; set; }
-    [Selector("destinationRGBBlendFactor", "setDestinationRGBBlendFactor:")] public MTLBlendFactor DestinationRGBBlendFactor { get; set; }
-    [Selector("rgbBlendOperation", "setRgbBlendOperation:")] public MTLBlendOperation RgbBlendOperation { get; set; }
-    [Selector("sourceAlphaBlendFactor", "setSourceAlphaBlendFactor:")] public MTLBlendFactor SourceAlphaBlendFactor { get; set; }
-    [Selector("destinationAlphaBlendFactor", "setDestinationAlphaBlendFactor:")] public MTLBlendFactor DestinationAlphaBlendFactor { get; set; }
-    [Selector("alphaBlendOperation", "setAlphaBlendOperation:")] public MTLBlendOperation AlphaBlendOperation { get; set; }
-    [Selector("writeMask", "setWriteMask:")] public MTLColorWriteMask WriteMask { get; set; }
+    [Selector("pixelFormat", "setPixelFormat:")]
+    public MTLPixelFormat PixelFormat { get; set; }
+    [Selector("isBlendingEnabled", "setBlendingEnabled:")]
+    public bool BlendingEnabled { get; set; }
+    [Selector("sourceRGBBlendFactor", "setSourceRGBBlendFactor:")]
+    public MTLBlendFactor SourceRGBBlendFactor { get; set; }
+    [Selector("destinationRGBBlendFactor", "setDestinationRGBBlendFactor:")]
+    public MTLBlendFactor DestinationRGBBlendFactor { get; set; }
+    [Selector("rgbBlendOperation", "setRgbBlendOperation:")]
+    public MTLBlendOperation RgbBlendOperation { get; set; }
+    [Selector("sourceAlphaBlendFactor", "setSourceAlphaBlendFactor:")]
+    public MTLBlendFactor SourceAlphaBlendFactor { get; set; }
+    [Selector("destinationAlphaBlendFactor", "setDestinationAlphaBlendFactor:")]
+    public MTLBlendFactor DestinationAlphaBlendFactor { get; set; }
+    [Selector("alphaBlendOperation", "setAlphaBlendOperation:")]
+    public MTLBlendOperation AlphaBlendOperation { get; set; }
+    [Selector("writeMask", "setWriteMask:")]
+    public MTLColorWriteMask WriteMask { get; set; }
 }
 
 /// macOS 26.0 and later.
 public extern objc class MTLLogicalToPhysicalColorAttachmentMap : NSObject, NSCopying
 {
-    [Selector("setPhysicalIndex:forLogicalIndex:")] public void SetPhysicalIndexForLogicalIndex(NSUInteger physicalIndex, NSUInteger logicalIndex);
-    [Selector("getPhysicalIndexForLogicalIndex:")] public NSUInteger GetPhysicalIndexForLogicalIndex(NSUInteger logicalIndex);
-    [Selector("reset")] public void Reset();
+    [Selector("setPhysicalIndex:forLogicalIndex:")]
+    public void SetPhysicalIndexForLogicalIndex(NSUInteger physicalIndex, NSUInteger logicalIndex);
+    [Selector("getPhysicalIndexForLogicalIndex:")]
+    public NSUInteger GetPhysicalIndexForLogicalIndex(NSUInteger logicalIndex);
+    [Selector("reset")]
+    public void Reset();
 }
 
 public extern objc class MTLRenderPipelineReflection : NSObject
 {
-    [Selector("vertexBindings")] public NSArray VertexBindings { get; }
-    [Selector("fragmentBindings")] public NSArray FragmentBindings { get; }
-    [Selector("tileBindings")] public NSArray TileBindings { get; }
-    [Selector("objectBindings")] public NSArray ObjectBindings { get; }
-    [Selector("meshBindings")] public NSArray MeshBindings { get; }
+    [Selector("vertexBindings")]
+    public NSArray VertexBindings { get; }
+    [Selector("fragmentBindings")]
+    public NSArray FragmentBindings { get; }
+    [Selector("tileBindings")]
+    public NSArray TileBindings { get; }
+    [Selector("objectBindings")]
+    public NSArray ObjectBindings { get; }
+    [Selector("meshBindings")]
+    public NSArray MeshBindings { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("vertexArguments")] public NSArray? VertexArguments { get; }
+    [Selector("vertexArguments")]
+    public NSArray? VertexArguments { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("fragmentArguments")] public NSArray? FragmentArguments { get; }
+    [Selector("fragmentArguments")]
+    public NSArray? FragmentArguments { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("tileArguments")] public NSArray? TileArguments { get; }
+    [Selector("tileArguments")]
+    public NSArray? TileArguments { get; }
 }
 
 public extern objc class MTLRenderPipelineDescriptor : NSObject, NSCopying
 {
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("vertexFunction", "setVertexFunction:")] public MTLFunction? VertexFunction { get; set; }
-    [Selector("fragmentFunction", "setFragmentFunction:")] public MTLFunction? FragmentFunction { get; set; }
-    [Selector("vertexDescriptor", "setVertexDescriptor:")] public MTLVertexDescriptor? VertexDescriptor { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("vertexFunction", "setVertexFunction:")]
+    public MTLFunction? VertexFunction { get; set; }
+    [Selector("fragmentFunction", "setFragmentFunction:")]
+    public MTLFunction? FragmentFunction { get; set; }
+    [Selector("vertexDescriptor", "setVertexDescriptor:")]
+    public MTLVertexDescriptor? VertexDescriptor { get; set; }
     /// Deprecated in macOS 13.0.
-    [Selector("sampleCount", "setSampleCount:")] public NSUInteger SampleCount { get; set; }
-    [Selector("rasterSampleCount", "setRasterSampleCount:")] public NSUInteger RasterSampleCount { get; set; }
-    [Selector("isAlphaToCoverageEnabled", "setAlphaToCoverageEnabled:")] public bool AlphaToCoverageEnabled { get; set; }
-    [Selector("isAlphaToOneEnabled", "setAlphaToOneEnabled:")] public bool AlphaToOneEnabled { get; set; }
-    [Selector("isRasterizationEnabled", "setRasterizationEnabled:")] public bool RasterizationEnabled { get; set; }
-    [Selector("maxVertexAmplificationCount", "setMaxVertexAmplificationCount:")] public NSUInteger MaxVertexAmplificationCount { get; set; }
-    [Selector("colorAttachments")] public MTLRenderPipelineColorAttachmentDescriptorArray ColorAttachments { get; }
-    [Selector("depthAttachmentPixelFormat", "setDepthAttachmentPixelFormat:")] public MTLPixelFormat DepthAttachmentPixelFormat { get; set; }
-    [Selector("stencilAttachmentPixelFormat", "setStencilAttachmentPixelFormat:")] public MTLPixelFormat StencilAttachmentPixelFormat { get; set; }
-    [Selector("inputPrimitiveTopology", "setInputPrimitiveTopology:")] public MTLPrimitiveTopologyClass InputPrimitiveTopology { get; set; }
-    [Selector("tessellationPartitionMode", "setTessellationPartitionMode:")] public MTLTessellationPartitionMode TessellationPartitionMode { get; set; }
-    [Selector("maxTessellationFactor", "setMaxTessellationFactor:")] public NSUInteger MaxTessellationFactor { get; set; }
-    [Selector("isTessellationFactorScaleEnabled", "setTessellationFactorScaleEnabled:")] public bool TessellationFactorScaleEnabled { get; set; }
-    [Selector("tessellationFactorFormat", "setTessellationFactorFormat:")] public MTLTessellationFactorFormat TessellationFactorFormat { get; set; }
-    [Selector("tessellationControlPointIndexType", "setTessellationControlPointIndexType:")] public MTLTessellationControlPointIndexType TessellationControlPointIndexType { get; set; }
-    [Selector("tessellationFactorStepFunction", "setTessellationFactorStepFunction:")] public MTLTessellationFactorStepFunction TessellationFactorStepFunction { get; set; }
-    [Selector("tessellationOutputWindingOrder", "setTessellationOutputWindingOrder:")] public MTLWinding TessellationOutputWindingOrder { get; set; }
-    [Selector("vertexBuffers")] public MTLPipelineBufferDescriptorArray VertexBuffers { get; }
-    [Selector("fragmentBuffers")] public MTLPipelineBufferDescriptorArray FragmentBuffers { get; }
-    [Selector("supportIndirectCommandBuffers", "setSupportIndirectCommandBuffers:")] public bool SupportIndirectCommandBuffers { get; set; }
-    [Selector("binaryArchives", "setBinaryArchives:")] public NSArray? BinaryArchives { get; set; }
-    [Selector("vertexPreloadedLibraries", "setVertexPreloadedLibraries:")] public NSArray VertexPreloadedLibraries { get; set; }
-    [Selector("fragmentPreloadedLibraries", "setFragmentPreloadedLibraries:")] public NSArray FragmentPreloadedLibraries { get; set; }
-    [Selector("vertexLinkedFunctions", "setVertexLinkedFunctions:")] public MTLLinkedFunctions? VertexLinkedFunctions { get; set; }
-    [Selector("fragmentLinkedFunctions", "setFragmentLinkedFunctions:")] public MTLLinkedFunctions? FragmentLinkedFunctions { get; set; }
-    [Selector("supportAddingVertexBinaryFunctions", "setSupportAddingVertexBinaryFunctions:")] public bool SupportAddingVertexBinaryFunctions { get; set; }
-    [Selector("supportAddingFragmentBinaryFunctions", "setSupportAddingFragmentBinaryFunctions:")] public bool SupportAddingFragmentBinaryFunctions { get; set; }
-    [Selector("maxVertexCallStackDepth", "setMaxVertexCallStackDepth:")] public NSUInteger MaxVertexCallStackDepth { get; set; }
-    [Selector("maxFragmentCallStackDepth", "setMaxFragmentCallStackDepth:")] public NSUInteger MaxFragmentCallStackDepth { get; set; }
-    [Selector("shaderValidation", "setShaderValidation:")] public MTLShaderValidation ShaderValidation { get; set; }
-    [Selector("reset")] public void Reset();
+    [Selector("sampleCount", "setSampleCount:")]
+    public NSUInteger SampleCount { get; set; }
+    [Selector("rasterSampleCount", "setRasterSampleCount:")]
+    public NSUInteger RasterSampleCount { get; set; }
+    [Selector("isAlphaToCoverageEnabled", "setAlphaToCoverageEnabled:")]
+    public bool AlphaToCoverageEnabled { get; set; }
+    [Selector("isAlphaToOneEnabled", "setAlphaToOneEnabled:")]
+    public bool AlphaToOneEnabled { get; set; }
+    [Selector("isRasterizationEnabled", "setRasterizationEnabled:")]
+    public bool RasterizationEnabled { get; set; }
+    [Selector("maxVertexAmplificationCount", "setMaxVertexAmplificationCount:")]
+    public NSUInteger MaxVertexAmplificationCount { get; set; }
+    [Selector("colorAttachments")]
+    public MTLRenderPipelineColorAttachmentDescriptorArray ColorAttachments { get; }
+    [Selector("depthAttachmentPixelFormat", "setDepthAttachmentPixelFormat:")]
+    public MTLPixelFormat DepthAttachmentPixelFormat { get; set; }
+    [Selector("stencilAttachmentPixelFormat", "setStencilAttachmentPixelFormat:")]
+    public MTLPixelFormat StencilAttachmentPixelFormat { get; set; }
+    [Selector("inputPrimitiveTopology", "setInputPrimitiveTopology:")]
+    public MTLPrimitiveTopologyClass InputPrimitiveTopology { get; set; }
+    [Selector("tessellationPartitionMode", "setTessellationPartitionMode:")]
+    public MTLTessellationPartitionMode TessellationPartitionMode { get; set; }
+    [Selector("maxTessellationFactor", "setMaxTessellationFactor:")]
+    public NSUInteger MaxTessellationFactor { get; set; }
+    [Selector("isTessellationFactorScaleEnabled", "setTessellationFactorScaleEnabled:")]
+    public bool TessellationFactorScaleEnabled { get; set; }
+    [Selector("tessellationFactorFormat", "setTessellationFactorFormat:")]
+    public MTLTessellationFactorFormat TessellationFactorFormat { get; set; }
+    [Selector("tessellationControlPointIndexType", "setTessellationControlPointIndexType:")]
+    public MTLTessellationControlPointIndexType TessellationControlPointIndexType { get; set; }
+    [Selector("tessellationFactorStepFunction", "setTessellationFactorStepFunction:")]
+    public MTLTessellationFactorStepFunction TessellationFactorStepFunction { get; set; }
+    [Selector("tessellationOutputWindingOrder", "setTessellationOutputWindingOrder:")]
+    public MTLWinding TessellationOutputWindingOrder { get; set; }
+    [Selector("vertexBuffers")]
+    public MTLPipelineBufferDescriptorArray VertexBuffers { get; }
+    [Selector("fragmentBuffers")]
+    public MTLPipelineBufferDescriptorArray FragmentBuffers { get; }
+    [Selector("supportIndirectCommandBuffers", "setSupportIndirectCommandBuffers:")]
+    public bool SupportIndirectCommandBuffers { get; set; }
+    [Selector("binaryArchives", "setBinaryArchives:")]
+    public NSArray? BinaryArchives { get; set; }
+    [Selector("vertexPreloadedLibraries", "setVertexPreloadedLibraries:")]
+    public NSArray VertexPreloadedLibraries { get; set; }
+    [Selector("fragmentPreloadedLibraries", "setFragmentPreloadedLibraries:")]
+    public NSArray FragmentPreloadedLibraries { get; set; }
+    [Selector("vertexLinkedFunctions", "setVertexLinkedFunctions:")]
+    public MTLLinkedFunctions? VertexLinkedFunctions { get; set; }
+    [Selector("fragmentLinkedFunctions", "setFragmentLinkedFunctions:")]
+    public MTLLinkedFunctions? FragmentLinkedFunctions { get; set; }
+    [Selector("supportAddingVertexBinaryFunctions", "setSupportAddingVertexBinaryFunctions:")]
+    public bool SupportAddingVertexBinaryFunctions { get; set; }
+    [Selector("supportAddingFragmentBinaryFunctions", "setSupportAddingFragmentBinaryFunctions:")]
+    public bool SupportAddingFragmentBinaryFunctions { get; set; }
+    [Selector("maxVertexCallStackDepth", "setMaxVertexCallStackDepth:")]
+    public NSUInteger MaxVertexCallStackDepth { get; set; }
+    [Selector("maxFragmentCallStackDepth", "setMaxFragmentCallStackDepth:")]
+    public NSUInteger MaxFragmentCallStackDepth { get; set; }
+    [Selector("shaderValidation", "setShaderValidation:")]
+    public MTLShaderValidation ShaderValidation { get; set; }
+    [Selector("reset")]
+    public void Reset();
 }
 
 public extern objc class MTLRenderPipelineFunctionsDescriptor : NSObject, NSCopying
 {
-    [Selector("vertexAdditionalBinaryFunctions", "setVertexAdditionalBinaryFunctions:")] public NSArray? VertexAdditionalBinaryFunctions { get; set; }
-    [Selector("fragmentAdditionalBinaryFunctions", "setFragmentAdditionalBinaryFunctions:")] public NSArray? FragmentAdditionalBinaryFunctions { get; set; }
-    [Selector("tileAdditionalBinaryFunctions", "setTileAdditionalBinaryFunctions:")] public NSArray? TileAdditionalBinaryFunctions { get; set; }
+    [Selector("vertexAdditionalBinaryFunctions", "setVertexAdditionalBinaryFunctions:")]
+    public NSArray? VertexAdditionalBinaryFunctions { get; set; }
+    [Selector("fragmentAdditionalBinaryFunctions", "setFragmentAdditionalBinaryFunctions:")]
+    public NSArray? FragmentAdditionalBinaryFunctions { get; set; }
+    [Selector("tileAdditionalBinaryFunctions", "setTileAdditionalBinaryFunctions:")]
+    public NSArray? TileAdditionalBinaryFunctions { get; set; }
 }
 
 public objc interface MTLRenderPipelineState : MTLAllocation, NSObjectProtocol
 {
-    [Selector("label")] NSString? Label { get; }
-    [Selector("device")] MTLDevice Device { get; }
+    [Selector("label")]
+    NSString? Label { get; }
+    [Selector("device")]
+    MTLDevice Device { get; }
     /// macOS 26.0 and later.
-    [Selector("reflection")] MTLRenderPipelineReflection? Reflection { get; }
-    [Selector("maxTotalThreadsPerThreadgroup")] NSUInteger MaxTotalThreadsPerThreadgroup { get; }
-    [Selector("threadgroupSizeMatchesTileSize")] bool ThreadgroupSizeMatchesTileSize { get; }
-    [Selector("imageblockSampleLength")] NSUInteger ImageblockSampleLength { get; }
-    [Selector("supportIndirectCommandBuffers")] bool SupportIndirectCommandBuffers { get; }
-    [Selector("maxTotalThreadsPerObjectThreadgroup")] NSUInteger MaxTotalThreadsPerObjectThreadgroup { get; }
-    [Selector("maxTotalThreadsPerMeshThreadgroup")] NSUInteger MaxTotalThreadsPerMeshThreadgroup { get; }
-    [Selector("objectThreadExecutionWidth")] NSUInteger ObjectThreadExecutionWidth { get; }
-    [Selector("meshThreadExecutionWidth")] NSUInteger MeshThreadExecutionWidth { get; }
-    [Selector("maxTotalThreadgroupsPerMeshGrid")] NSUInteger MaxTotalThreadgroupsPerMeshGrid { get; }
-    [Selector("gpuResourceID")] MTLResourceID GpuResourceID { get; }
-    [Selector("shaderValidation")] MTLShaderValidation ShaderValidation { get; }
+    [Selector("reflection")]
+    MTLRenderPipelineReflection? Reflection { get; }
+    [Selector("maxTotalThreadsPerThreadgroup")]
+    NSUInteger MaxTotalThreadsPerThreadgroup { get; }
+    [Selector("threadgroupSizeMatchesTileSize")]
+    bool ThreadgroupSizeMatchesTileSize { get; }
+    [Selector("imageblockSampleLength")]
+    NSUInteger ImageblockSampleLength { get; }
+    [Selector("supportIndirectCommandBuffers")]
+    bool SupportIndirectCommandBuffers { get; }
+    [Selector("maxTotalThreadsPerObjectThreadgroup")]
+    NSUInteger MaxTotalThreadsPerObjectThreadgroup { get; }
+    [Selector("maxTotalThreadsPerMeshThreadgroup")]
+    NSUInteger MaxTotalThreadsPerMeshThreadgroup { get; }
+    [Selector("objectThreadExecutionWidth")]
+    NSUInteger ObjectThreadExecutionWidth { get; }
+    [Selector("meshThreadExecutionWidth")]
+    NSUInteger MeshThreadExecutionWidth { get; }
+    [Selector("maxTotalThreadgroupsPerMeshGrid")]
+    NSUInteger MaxTotalThreadgroupsPerMeshGrid { get; }
+    [Selector("gpuResourceID")]
+    MTLResourceID GpuResourceID { get; }
+    [Selector("shaderValidation")]
+    MTLShaderValidation ShaderValidation { get; }
     /// macOS 26.0 and later.
-    [Selector("requiredThreadsPerTileThreadgroup")] MTLSize RequiredThreadsPerTileThreadgroup { get; }
+    [Selector("requiredThreadsPerTileThreadgroup")]
+    MTLSize RequiredThreadsPerTileThreadgroup { get; }
     /// macOS 26.0 and later.
-    [Selector("requiredThreadsPerObjectThreadgroup")] MTLSize RequiredThreadsPerObjectThreadgroup { get; }
+    [Selector("requiredThreadsPerObjectThreadgroup")]
+    MTLSize RequiredThreadsPerObjectThreadgroup { get; }
     /// macOS 26.0 and later.
-    [Selector("requiredThreadsPerMeshThreadgroup")] MTLSize RequiredThreadsPerMeshThreadgroup { get; }
+    [Selector("requiredThreadsPerMeshThreadgroup")]
+    MTLSize RequiredThreadsPerMeshThreadgroup { get; }
     /// macOS 26.0 and later.
-    [Selector("functionHandleWithName:stage:")] MTLFunctionHandle? FunctionHandleWithNameStage(NSString name, MTLRenderStages stage);
+    [Selector("functionHandleWithName:stage:")]
+    MTLFunctionHandle? FunctionHandleWithNameStage(NSString name, MTLRenderStages stage);
     /// macOS 26.0 and later.
-    [Selector("functionHandleWithBinaryFunction:stage:")] MTLFunctionHandle? FunctionHandleWithBinaryFunctionStage(MTL4BinaryFunctionProtocol function, MTLRenderStages stage);
+    [Selector("functionHandleWithBinaryFunction:stage:")]
+    MTLFunctionHandle? FunctionHandleWithBinaryFunctionStage(MTL4BinaryFunctionProtocol function, MTLRenderStages stage);
     /// macOS 26.0 and later.
-    [Selector("newRenderPipelineStateWithBinaryFunctions:error:")] MTLRenderPipelineState? NewRenderPipelineStateWithBinaryFunctionsError(MTL4RenderPipelineBinaryFunctionsDescriptor binaryFunctionsDescriptor, out NSError? error);
+    [Selector("newRenderPipelineStateWithBinaryFunctions:error:")]
+    MTLRenderPipelineState? NewRenderPipelineStateWithBinaryFunctionsError(MTL4RenderPipelineBinaryFunctionsDescriptor binaryFunctionsDescriptor, out NSError? error);
     /// macOS 26.0 and later.
-    [Selector("newRenderPipelineDescriptorForSpecialization")] MTL4PipelineDescriptor NewRenderPipelineDescriptorForSpecialization();
-    [Selector("imageblockMemoryLengthForDimensions:")] NSUInteger ImageblockMemoryLengthForDimensions(MTLSize imageblockDimensions);
-    [Selector("functionHandleWithFunction:stage:")] MTLFunctionHandle? FunctionHandleWithFunctionStage(MTLFunction function, MTLRenderStages stage);
-    [Selector("newVisibleFunctionTableWithDescriptor:stage:")] MTLVisibleFunctionTable? NewVisibleFunctionTableWithDescriptorStage(MTLVisibleFunctionTableDescriptor descriptor, MTLRenderStages stage);
-    [Selector("newIntersectionFunctionTableWithDescriptor:stage:")] MTLIntersectionFunctionTable? NewIntersectionFunctionTableWithDescriptorStage(MTLIntersectionFunctionTableDescriptor descriptor, MTLRenderStages stage);
-    [Selector("newRenderPipelineStateWithAdditionalBinaryFunctions:error:")] MTLRenderPipelineState? NewRenderPipelineStateWithAdditionalBinaryFunctionsError(MTLRenderPipelineFunctionsDescriptor additionalBinaryFunctions, out NSError? error);
+    [Selector("newRenderPipelineDescriptorForSpecialization")]
+    MTL4PipelineDescriptor NewRenderPipelineDescriptorForSpecialization();
+    [Selector("imageblockMemoryLengthForDimensions:")]
+    NSUInteger ImageblockMemoryLengthForDimensions(MTLSize imageblockDimensions);
+    [Selector("functionHandleWithFunction:stage:")]
+    MTLFunctionHandle? FunctionHandleWithFunctionStage(MTLFunction function, MTLRenderStages stage);
+    [Selector("newVisibleFunctionTableWithDescriptor:stage:")]
+    MTLVisibleFunctionTable? NewVisibleFunctionTableWithDescriptorStage(MTLVisibleFunctionTableDescriptor descriptor, MTLRenderStages stage);
+    [Selector("newIntersectionFunctionTableWithDescriptor:stage:")]
+    MTLIntersectionFunctionTable? NewIntersectionFunctionTableWithDescriptorStage(MTLIntersectionFunctionTableDescriptor descriptor, MTLRenderStages stage);
+    [Selector("newRenderPipelineStateWithAdditionalBinaryFunctions:error:")]
+    MTLRenderPipelineState? NewRenderPipelineStateWithAdditionalBinaryFunctionsError(MTLRenderPipelineFunctionsDescriptor additionalBinaryFunctions, out NSError? error);
 }
 
 public extern objc class MTLRenderPipelineColorAttachmentDescriptorArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public MTLRenderPipelineColorAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTLRenderPipelineColorAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
+    [Selector("objectAtIndexedSubscript:")]
+    public MTLRenderPipelineColorAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTLRenderPipelineColorAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
 }
 
 public extern objc class MTLTileRenderPipelineColorAttachmentDescriptor : NSObject, NSCopying
 {
-    [Selector("pixelFormat", "setPixelFormat:")] public MTLPixelFormat PixelFormat { get; set; }
+    [Selector("pixelFormat", "setPixelFormat:")]
+    public MTLPixelFormat PixelFormat { get; set; }
 }
 
 public extern objc class MTLTileRenderPipelineColorAttachmentDescriptorArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public MTLTileRenderPipelineColorAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTLTileRenderPipelineColorAttachmentDescriptor attachment, NSUInteger attachmentIndex);
+    [Selector("objectAtIndexedSubscript:")]
+    public MTLTileRenderPipelineColorAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTLTileRenderPipelineColorAttachmentDescriptor attachment, NSUInteger attachmentIndex);
 }
 
 public extern objc class MTLTileRenderPipelineDescriptor : NSObject, NSCopying
 {
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("tileFunction", "setTileFunction:")] public MTLFunction TileFunction { get; set; }
-    [Selector("rasterSampleCount", "setRasterSampleCount:")] public NSUInteger RasterSampleCount { get; set; }
-    [Selector("colorAttachments")] public MTLTileRenderPipelineColorAttachmentDescriptorArray ColorAttachments { get; }
-    [Selector("threadgroupSizeMatchesTileSize", "setThreadgroupSizeMatchesTileSize:")] public bool ThreadgroupSizeMatchesTileSize { get; set; }
-    [Selector("tileBuffers")] public MTLPipelineBufferDescriptorArray TileBuffers { get; }
-    [Selector("maxTotalThreadsPerThreadgroup", "setMaxTotalThreadsPerThreadgroup:")] public NSUInteger MaxTotalThreadsPerThreadgroup { get; set; }
-    [Selector("binaryArchives", "setBinaryArchives:")] public NSArray? BinaryArchives { get; set; }
-    [Selector("preloadedLibraries", "setPreloadedLibraries:")] public NSArray PreloadedLibraries { get; set; }
-    [Selector("linkedFunctions", "setLinkedFunctions:")] public MTLLinkedFunctions? LinkedFunctions { get; set; }
-    [Selector("supportAddingBinaryFunctions", "setSupportAddingBinaryFunctions:")] public bool SupportAddingBinaryFunctions { get; set; }
-    [Selector("maxCallStackDepth", "setMaxCallStackDepth:")] public NSUInteger MaxCallStackDepth { get; set; }
-    [Selector("shaderValidation", "setShaderValidation:")] public MTLShaderValidation ShaderValidation { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("tileFunction", "setTileFunction:")]
+    public MTLFunction TileFunction { get; set; }
+    [Selector("rasterSampleCount", "setRasterSampleCount:")]
+    public NSUInteger RasterSampleCount { get; set; }
+    [Selector("colorAttachments")]
+    public MTLTileRenderPipelineColorAttachmentDescriptorArray ColorAttachments { get; }
+    [Selector("threadgroupSizeMatchesTileSize", "setThreadgroupSizeMatchesTileSize:")]
+    public bool ThreadgroupSizeMatchesTileSize { get; set; }
+    [Selector("tileBuffers")]
+    public MTLPipelineBufferDescriptorArray TileBuffers { get; }
+    [Selector("maxTotalThreadsPerThreadgroup", "setMaxTotalThreadsPerThreadgroup:")]
+    public NSUInteger MaxTotalThreadsPerThreadgroup { get; set; }
+    [Selector("binaryArchives", "setBinaryArchives:")]
+    public NSArray? BinaryArchives { get; set; }
+    [Selector("preloadedLibraries", "setPreloadedLibraries:")]
+    public NSArray PreloadedLibraries { get; set; }
+    [Selector("linkedFunctions", "setLinkedFunctions:")]
+    public MTLLinkedFunctions? LinkedFunctions { get; set; }
+    [Selector("supportAddingBinaryFunctions", "setSupportAddingBinaryFunctions:")]
+    public bool SupportAddingBinaryFunctions { get; set; }
+    [Selector("maxCallStackDepth", "setMaxCallStackDepth:")]
+    public NSUInteger MaxCallStackDepth { get; set; }
+    [Selector("shaderValidation", "setShaderValidation:")]
+    public MTLShaderValidation ShaderValidation { get; set; }
     /// macOS 26.0 and later.
-    [Selector("requiredThreadsPerThreadgroup", "setRequiredThreadsPerThreadgroup:")] public MTLSize RequiredThreadsPerThreadgroup { get; set; }
-    [Selector("reset")] public void Reset();
+    [Selector("requiredThreadsPerThreadgroup", "setRequiredThreadsPerThreadgroup:")]
+    public MTLSize RequiredThreadsPerThreadgroup { get; set; }
+    [Selector("reset")]
+    public void Reset();
 }
 
 public extern objc class MTLMeshRenderPipelineDescriptor : NSObject, NSCopying
 {
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("objectFunction", "setObjectFunction:")] public MTLFunction? ObjectFunction { get; set; }
-    [Selector("meshFunction", "setMeshFunction:")] public MTLFunction? MeshFunction { get; set; }
-    [Selector("fragmentFunction", "setFragmentFunction:")] public MTLFunction? FragmentFunction { get; set; }
-    [Selector("maxTotalThreadsPerObjectThreadgroup", "setMaxTotalThreadsPerObjectThreadgroup:")] public NSUInteger MaxTotalThreadsPerObjectThreadgroup { get; set; }
-    [Selector("maxTotalThreadsPerMeshThreadgroup", "setMaxTotalThreadsPerMeshThreadgroup:")] public NSUInteger MaxTotalThreadsPerMeshThreadgroup { get; set; }
-    [Selector("objectThreadgroupSizeIsMultipleOfThreadExecutionWidth", "setObjectThreadgroupSizeIsMultipleOfThreadExecutionWidth:")] public bool ObjectThreadgroupSizeIsMultipleOfThreadExecutionWidth { get; set; }
-    [Selector("meshThreadgroupSizeIsMultipleOfThreadExecutionWidth", "setMeshThreadgroupSizeIsMultipleOfThreadExecutionWidth:")] public bool MeshThreadgroupSizeIsMultipleOfThreadExecutionWidth { get; set; }
-    [Selector("payloadMemoryLength", "setPayloadMemoryLength:")] public NSUInteger PayloadMemoryLength { get; set; }
-    [Selector("maxTotalThreadgroupsPerMeshGrid", "setMaxTotalThreadgroupsPerMeshGrid:")] public NSUInteger MaxTotalThreadgroupsPerMeshGrid { get; set; }
-    [Selector("objectBuffers")] public MTLPipelineBufferDescriptorArray ObjectBuffers { get; }
-    [Selector("meshBuffers")] public MTLPipelineBufferDescriptorArray MeshBuffers { get; }
-    [Selector("fragmentBuffers")] public MTLPipelineBufferDescriptorArray FragmentBuffers { get; }
-    [Selector("rasterSampleCount", "setRasterSampleCount:")] public NSUInteger RasterSampleCount { get; set; }
-    [Selector("isAlphaToCoverageEnabled", "setAlphaToCoverageEnabled:")] public bool AlphaToCoverageEnabled { get; set; }
-    [Selector("isAlphaToOneEnabled", "setAlphaToOneEnabled:")] public bool AlphaToOneEnabled { get; set; }
-    [Selector("isRasterizationEnabled", "setRasterizationEnabled:")] public bool RasterizationEnabled { get; set; }
-    [Selector("maxVertexAmplificationCount", "setMaxVertexAmplificationCount:")] public NSUInteger MaxVertexAmplificationCount { get; set; }
-    [Selector("colorAttachments")] public MTLRenderPipelineColorAttachmentDescriptorArray ColorAttachments { get; }
-    [Selector("depthAttachmentPixelFormat", "setDepthAttachmentPixelFormat:")] public MTLPixelFormat DepthAttachmentPixelFormat { get; set; }
-    [Selector("stencilAttachmentPixelFormat", "setStencilAttachmentPixelFormat:")] public MTLPixelFormat StencilAttachmentPixelFormat { get; set; }
-    [Selector("supportIndirectCommandBuffers", "setSupportIndirectCommandBuffers:")] public bool SupportIndirectCommandBuffers { get; set; }
-    [Selector("binaryArchives", "setBinaryArchives:")] public NSArray? BinaryArchives { get; set; }
-    [Selector("objectLinkedFunctions", "setObjectLinkedFunctions:")] public MTLLinkedFunctions? ObjectLinkedFunctions { get; set; }
-    [Selector("meshLinkedFunctions", "setMeshLinkedFunctions:")] public MTLLinkedFunctions? MeshLinkedFunctions { get; set; }
-    [Selector("fragmentLinkedFunctions", "setFragmentLinkedFunctions:")] public MTLLinkedFunctions? FragmentLinkedFunctions { get; set; }
-    [Selector("shaderValidation", "setShaderValidation:")] public MTLShaderValidation ShaderValidation { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("objectFunction", "setObjectFunction:")]
+    public MTLFunction? ObjectFunction { get; set; }
+    [Selector("meshFunction", "setMeshFunction:")]
+    public MTLFunction? MeshFunction { get; set; }
+    [Selector("fragmentFunction", "setFragmentFunction:")]
+    public MTLFunction? FragmentFunction { get; set; }
+    [Selector("maxTotalThreadsPerObjectThreadgroup", "setMaxTotalThreadsPerObjectThreadgroup:")]
+    public NSUInteger MaxTotalThreadsPerObjectThreadgroup { get; set; }
+    [Selector("maxTotalThreadsPerMeshThreadgroup", "setMaxTotalThreadsPerMeshThreadgroup:")]
+    public NSUInteger MaxTotalThreadsPerMeshThreadgroup { get; set; }
+    [Selector("objectThreadgroupSizeIsMultipleOfThreadExecutionWidth", "setObjectThreadgroupSizeIsMultipleOfThreadExecutionWidth:")]
+    public bool ObjectThreadgroupSizeIsMultipleOfThreadExecutionWidth { get; set; }
+    [Selector("meshThreadgroupSizeIsMultipleOfThreadExecutionWidth", "setMeshThreadgroupSizeIsMultipleOfThreadExecutionWidth:")]
+    public bool MeshThreadgroupSizeIsMultipleOfThreadExecutionWidth { get; set; }
+    [Selector("payloadMemoryLength", "setPayloadMemoryLength:")]
+    public NSUInteger PayloadMemoryLength { get; set; }
+    [Selector("maxTotalThreadgroupsPerMeshGrid", "setMaxTotalThreadgroupsPerMeshGrid:")]
+    public NSUInteger MaxTotalThreadgroupsPerMeshGrid { get; set; }
+    [Selector("objectBuffers")]
+    public MTLPipelineBufferDescriptorArray ObjectBuffers { get; }
+    [Selector("meshBuffers")]
+    public MTLPipelineBufferDescriptorArray MeshBuffers { get; }
+    [Selector("fragmentBuffers")]
+    public MTLPipelineBufferDescriptorArray FragmentBuffers { get; }
+    [Selector("rasterSampleCount", "setRasterSampleCount:")]
+    public NSUInteger RasterSampleCount { get; set; }
+    [Selector("isAlphaToCoverageEnabled", "setAlphaToCoverageEnabled:")]
+    public bool AlphaToCoverageEnabled { get; set; }
+    [Selector("isAlphaToOneEnabled", "setAlphaToOneEnabled:")]
+    public bool AlphaToOneEnabled { get; set; }
+    [Selector("isRasterizationEnabled", "setRasterizationEnabled:")]
+    public bool RasterizationEnabled { get; set; }
+    [Selector("maxVertexAmplificationCount", "setMaxVertexAmplificationCount:")]
+    public NSUInteger MaxVertexAmplificationCount { get; set; }
+    [Selector("colorAttachments")]
+    public MTLRenderPipelineColorAttachmentDescriptorArray ColorAttachments { get; }
+    [Selector("depthAttachmentPixelFormat", "setDepthAttachmentPixelFormat:")]
+    public MTLPixelFormat DepthAttachmentPixelFormat { get; set; }
+    [Selector("stencilAttachmentPixelFormat", "setStencilAttachmentPixelFormat:")]
+    public MTLPixelFormat StencilAttachmentPixelFormat { get; set; }
+    [Selector("supportIndirectCommandBuffers", "setSupportIndirectCommandBuffers:")]
+    public bool SupportIndirectCommandBuffers { get; set; }
+    [Selector("binaryArchives", "setBinaryArchives:")]
+    public NSArray? BinaryArchives { get; set; }
+    [Selector("objectLinkedFunctions", "setObjectLinkedFunctions:")]
+    public MTLLinkedFunctions? ObjectLinkedFunctions { get; set; }
+    [Selector("meshLinkedFunctions", "setMeshLinkedFunctions:")]
+    public MTLLinkedFunctions? MeshLinkedFunctions { get; set; }
+    [Selector("fragmentLinkedFunctions", "setFragmentLinkedFunctions:")]
+    public MTLLinkedFunctions? FragmentLinkedFunctions { get; set; }
+    [Selector("shaderValidation", "setShaderValidation:")]
+    public MTLShaderValidation ShaderValidation { get; set; }
     /// macOS 26.0 and later.
-    [Selector("requiredThreadsPerObjectThreadgroup", "setRequiredThreadsPerObjectThreadgroup:")] public MTLSize RequiredThreadsPerObjectThreadgroup { get; set; }
+    [Selector("requiredThreadsPerObjectThreadgroup", "setRequiredThreadsPerObjectThreadgroup:")]
+    public MTLSize RequiredThreadsPerObjectThreadgroup { get; set; }
     /// macOS 26.0 and later.
-    [Selector("requiredThreadsPerMeshThreadgroup", "setRequiredThreadsPerMeshThreadgroup:")] public MTLSize RequiredThreadsPerMeshThreadgroup { get; set; }
-    [Selector("reset")] public void Reset();
+    [Selector("requiredThreadsPerMeshThreadgroup", "setRequiredThreadsPerMeshThreadgroup:")]
+    public MTLSize RequiredThreadsPerMeshThreadgroup { get; set; }
+    [Selector("reset")]
+    public void Reset();
 }
 
 #endif

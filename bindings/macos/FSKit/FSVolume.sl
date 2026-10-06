@@ -63,7 +63,8 @@ public extern objc class FSVolumeIdentifier : FSEntityIdentifier { }
 public extern objc class FSDirectoryEntryPacker : NSObject
 {
     /// macOS 15.4 and later.
-    [Selector("packEntryWithName:itemType:itemID:nextCookie:attributes:")] public bool PackEntryWithNameItemTypeItemIDNextCookieAttributes(FSFileName name, FSItemType itemType, FSItemID itemID, FSDirectoryCookie nextCookie, FSItemAttributes? attributes);
+    [Selector("packEntryWithName:itemType:itemID:nextCookie:attributes:")]
+    public bool PackEntryWithNameItemTypeItemIDNextCookieAttributes(FSFileName name, FSItemType itemType, FSItemID itemID, FSDirectoryCookie nextCookie, FSItemAttributes? attributes);
 }
 
 public enum FSVolumeCaseFormat : long
@@ -76,67 +77,117 @@ public enum FSVolumeCaseFormat : long
 /// macOS 15.4 and later.
 public extern objc class FSVolumeSupportedCapabilities : NSObject, NSSecureCoding
 {
-    [Selector("supportsPersistentObjectIDs", "setSupportsPersistentObjectIDs:")] public bool SupportsPersistentObjectIDs { get; set; }
-    [Selector("supportsSymbolicLinks", "setSupportsSymbolicLinks:")] public bool SupportsSymbolicLinks { get; set; }
-    [Selector("supportsHardLinks", "setSupportsHardLinks:")] public bool SupportsHardLinks { get; set; }
-    [Selector("supportsJournal", "setSupportsJournal:")] public bool SupportsJournal { get; set; }
-    [Selector("supportsActiveJournal", "setSupportsActiveJournal:")] public bool SupportsActiveJournal { get; set; }
-    [Selector("doesNotSupportRootTimes", "setDoesNotSupportRootTimes:")] public bool DoesNotSupportRootTimes { get; set; }
-    [Selector("supportsSparseFiles", "setSupportsSparseFiles:")] public bool SupportsSparseFiles { get; set; }
-    [Selector("supportsZeroRuns", "setSupportsZeroRuns:")] public bool SupportsZeroRuns { get; set; }
-    [Selector("supportsFastStatFS", "setSupportsFastStatFS:")] public bool SupportsFastStatFS { get; set; }
-    [Selector("supports2TBFiles", "setSupports2TBFiles:")] public bool Supports2TBFiles { get; set; }
-    [Selector("supportsOpenDenyModes", "setSupportsOpenDenyModes:")] public bool SupportsOpenDenyModes { get; set; }
-    [Selector("supportsHiddenFiles", "setSupportsHiddenFiles:")] public bool SupportsHiddenFiles { get; set; }
-    [Selector("doesNotSupportVolumeSizes", "setDoesNotSupportVolumeSizes:")] public bool DoesNotSupportVolumeSizes { get; set; }
-    [Selector("supports64BitObjectIDs", "setSupports64BitObjectIDs:")] public bool Supports64BitObjectIDs { get; set; }
-    [Selector("supportsDocumentID", "setSupportsDocumentID:")] public bool SupportsDocumentID { get; set; }
-    [Selector("doesNotSupportImmutableFiles", "setDoesNotSupportImmutableFiles:")] public bool DoesNotSupportImmutableFiles { get; set; }
-    [Selector("doesNotSupportSettingFilePermissions", "setDoesNotSupportSettingFilePermissions:")] public bool DoesNotSupportSettingFilePermissions { get; set; }
-    [Selector("supportsSharedSpace", "setSupportsSharedSpace:")] public bool SupportsSharedSpace { get; set; }
-    [Selector("supportsVolumeGroups", "setSupportsVolumeGroups:")] public bool SupportsVolumeGroups { get; set; }
-    [Selector("caseFormat", "setCaseFormat:")] public FSVolumeCaseFormat CaseFormat { get; set; }
+    [Selector("supportsPersistentObjectIDs", "setSupportsPersistentObjectIDs:")]
+    public bool SupportsPersistentObjectIDs { get; set; }
+    [Selector("supportsSymbolicLinks", "setSupportsSymbolicLinks:")]
+    public bool SupportsSymbolicLinks { get; set; }
+    [Selector("supportsHardLinks", "setSupportsHardLinks:")]
+    public bool SupportsHardLinks { get; set; }
+    [Selector("supportsJournal", "setSupportsJournal:")]
+    public bool SupportsJournal { get; set; }
+    [Selector("supportsActiveJournal", "setSupportsActiveJournal:")]
+    public bool SupportsActiveJournal { get; set; }
+    [Selector("doesNotSupportRootTimes", "setDoesNotSupportRootTimes:")]
+    public bool DoesNotSupportRootTimes { get; set; }
+    [Selector("supportsSparseFiles", "setSupportsSparseFiles:")]
+    public bool SupportsSparseFiles { get; set; }
+    [Selector("supportsZeroRuns", "setSupportsZeroRuns:")]
+    public bool SupportsZeroRuns { get; set; }
+    [Selector("supportsFastStatFS", "setSupportsFastStatFS:")]
+    public bool SupportsFastStatFS { get; set; }
+    [Selector("supports2TBFiles", "setSupports2TBFiles:")]
+    public bool Supports2TBFiles { get; set; }
+    [Selector("supportsOpenDenyModes", "setSupportsOpenDenyModes:")]
+    public bool SupportsOpenDenyModes { get; set; }
+    [Selector("supportsHiddenFiles", "setSupportsHiddenFiles:")]
+    public bool SupportsHiddenFiles { get; set; }
+    [Selector("doesNotSupportVolumeSizes", "setDoesNotSupportVolumeSizes:")]
+    public bool DoesNotSupportVolumeSizes { get; set; }
+    [Selector("supports64BitObjectIDs", "setSupports64BitObjectIDs:")]
+    public bool Supports64BitObjectIDs { get; set; }
+    [Selector("supportsDocumentID", "setSupportsDocumentID:")]
+    public bool SupportsDocumentID { get; set; }
+    [Selector("doesNotSupportImmutableFiles", "setDoesNotSupportImmutableFiles:")]
+    public bool DoesNotSupportImmutableFiles { get; set; }
+    [Selector("doesNotSupportSettingFilePermissions", "setDoesNotSupportSettingFilePermissions:")]
+    public bool DoesNotSupportSettingFilePermissions { get; set; }
+    [Selector("supportsSharedSpace", "setSupportsSharedSpace:")]
+    public bool SupportsSharedSpace { get; set; }
+    [Selector("supportsVolumeGroups", "setSupportsVolumeGroups:")]
+    public bool SupportsVolumeGroups { get; set; }
+    [Selector("caseFormat", "setCaseFormat:")]
+    public FSVolumeCaseFormat CaseFormat { get; set; }
 }
 
 /// macOS 15.4 and later.
 public extern objc class FSVolume : NSObject
 {
-    [Selector("volumeID")] public FSVolumeIdentifier VolumeID { get; }
-    [Selector("name", "setName:")] public FSFileName Name { get; set; }
-    [Selector("initWithVolumeID:volumeName:")] public Self InitWithVolumeIDVolumeName(FSVolumeIdentifier volumeID, FSFileName volumeName);
+    [Selector("volumeID")]
+    public FSVolumeIdentifier VolumeID { get; }
+    [Selector("name", "setName:")]
+    public FSFileName Name { get; set; }
+    [Selector("initWithVolumeID:volumeName:")]
+    public Self InitWithVolumeIDVolumeName(FSVolumeIdentifier volumeID, FSFileName volumeName);
 }
 
 /// macOS 15.4 and later.
 public objc interface FSVolumePathConfOperations : NSObjectProtocol
 {
-    [Selector("maximumLinkCount")] NSInteger MaximumLinkCount { get; }
-    [Selector("maximumNameLength")] NSInteger MaximumNameLength { get; }
-    [Selector("restrictsOwnershipChanges")] bool RestrictsOwnershipChanges { get; }
-    [Selector("truncatesLongNames")] bool TruncatesLongNames { get; }
-    [Optional] [Selector("maximumXattrSize")] NSInteger MaximumXattrSize { get; }
-    [Optional] [Selector("maximumXattrSizeInBits")] NSInteger MaximumXattrSizeInBits { get; }
-    [Optional] [Selector("maximumFileSize")] ulong MaximumFileSize { get; }
-    [Optional] [Selector("maximumFileSizeInBits")] NSInteger MaximumFileSizeInBits { get; }
+    [Selector("maximumLinkCount")]
+    NSInteger MaximumLinkCount { get; }
+    [Selector("maximumNameLength")]
+    NSInteger MaximumNameLength { get; }
+    [Selector("restrictsOwnershipChanges")]
+    bool RestrictsOwnershipChanges { get; }
+    [Selector("truncatesLongNames")]
+    bool TruncatesLongNames { get; }
+    [Optional]
+    [Selector("maximumXattrSize")]
+    NSInteger MaximumXattrSize { get; }
+    [Optional]
+    [Selector("maximumXattrSizeInBits")]
+    NSInteger MaximumXattrSizeInBits { get; }
+    [Optional]
+    [Selector("maximumFileSize")]
+    ulong MaximumFileSize { get; }
+    [Optional]
+    [Selector("maximumFileSizeInBits")]
+    NSInteger MaximumFileSizeInBits { get; }
 }
 
 /// macOS 15.4 and later.
 public extern objc class FSStatFSResult : NSObject, NSSecureCoding
 {
-    [Selector("blockSize", "setBlockSize:")] public NSInteger BlockSize { get; set; }
-    [Selector("ioSize", "setIoSize:")] public NSInteger IoSize { get; set; }
-    [Selector("totalBlocks", "setTotalBlocks:")] public ulong TotalBlocks { get; set; }
-    [Selector("availableBlocks", "setAvailableBlocks:")] public ulong AvailableBlocks { get; set; }
-    [Selector("freeBlocks", "setFreeBlocks:")] public ulong FreeBlocks { get; set; }
-    [Selector("usedBlocks", "setUsedBlocks:")] public ulong UsedBlocks { get; set; }
-    [Selector("totalBytes", "setTotalBytes:")] public ulong TotalBytes { get; set; }
-    [Selector("availableBytes", "setAvailableBytes:")] public ulong AvailableBytes { get; set; }
-    [Selector("freeBytes", "setFreeBytes:")] public ulong FreeBytes { get; set; }
-    [Selector("usedBytes", "setUsedBytes:")] public ulong UsedBytes { get; set; }
-    [Selector("totalFiles", "setTotalFiles:")] public ulong TotalFiles { get; set; }
-    [Selector("freeFiles", "setFreeFiles:")] public ulong FreeFiles { get; set; }
-    [Selector("fileSystemSubType", "setFileSystemSubType:")] public NSInteger FileSystemSubType { get; set; }
-    [Selector("fileSystemTypeName")] public NSString FileSystemTypeName { get; }
-    [Selector("initWithFileSystemTypeName:")] public Self InitWithFileSystemTypeName(NSString fileSystemTypeName);
+    [Selector("blockSize", "setBlockSize:")]
+    public NSInteger BlockSize { get; set; }
+    [Selector("ioSize", "setIoSize:")]
+    public NSInteger IoSize { get; set; }
+    [Selector("totalBlocks", "setTotalBlocks:")]
+    public ulong TotalBlocks { get; set; }
+    [Selector("availableBlocks", "setAvailableBlocks:")]
+    public ulong AvailableBlocks { get; set; }
+    [Selector("freeBlocks", "setFreeBlocks:")]
+    public ulong FreeBlocks { get; set; }
+    [Selector("usedBlocks", "setUsedBlocks:")]
+    public ulong UsedBlocks { get; set; }
+    [Selector("totalBytes", "setTotalBytes:")]
+    public ulong TotalBytes { get; set; }
+    [Selector("availableBytes", "setAvailableBytes:")]
+    public ulong AvailableBytes { get; set; }
+    [Selector("freeBytes", "setFreeBytes:")]
+    public ulong FreeBytes { get; set; }
+    [Selector("usedBytes", "setUsedBytes:")]
+    public ulong UsedBytes { get; set; }
+    [Selector("totalFiles", "setTotalFiles:")]
+    public ulong TotalFiles { get; set; }
+    [Selector("freeFiles", "setFreeFiles:")]
+    public ulong FreeFiles { get; set; }
+    [Selector("fileSystemSubType", "setFileSystemSubType:")]
+    public NSInteger FileSystemSubType { get; set; }
+    [Selector("fileSystemTypeName")]
+    public NSString FileSystemTypeName { get; }
+    [Selector("initWithFileSystemTypeName:")]
+    public Self InitWithFileSystemTypeName(NSString fileSystemTypeName);
 }
 
 public objc closure void FSVolumeOperationsMountWithOptionsReplyHandlerReplyBlock(NSError? arg0);
@@ -174,26 +225,46 @@ public objc closure void FSVolumeOperationsDeactivateWithOptionsReplyHandlerRepl
 /// macOS 15.4 and later.
 public objc interface FSVolumeOperations : NSObjectProtocol, FSVolumePathConfOperations
 {
-    [Selector("supportedVolumeCapabilities")] FSVolumeSupportedCapabilities SupportedVolumeCapabilities { get; }
-    [Selector("volumeStatistics")] FSStatFSResult VolumeStatistics { get; }
+    [Selector("supportedVolumeCapabilities")]
+    FSVolumeSupportedCapabilities SupportedVolumeCapabilities { get; }
+    [Selector("volumeStatistics")]
+    FSStatFSResult VolumeStatistics { get; }
     /// macOS 26.0 and later.
-    [Optional] [Selector("enableOpenUnlinkEmulation", "setEnableOpenUnlinkEmulation:")] bool EnableOpenUnlinkEmulation { get; set; }
-    [Selector("mountWithOptions:replyHandler:")] void MountWithOptionsReplyHandler(FSTaskOptions options, FSVolumeOperationsMountWithOptionsReplyHandlerReplyBlock reply);
-    [Selector("unmountWithReplyHandler:")] void UnmountWithReplyHandler(FSVolumeOperationsUnmountWithReplyHandlerReplyBlock reply);
-    [Selector("synchronizeWithFlags:replyHandler:")] void SynchronizeWithFlagsReplyHandler(FSSyncFlags flags, FSVolumeOperationsSynchronizeWithFlagsReplyHandlerReplyBlock reply);
-    [Selector("getAttributes:ofItem:replyHandler:")] void GetAttributesOfItemReplyHandler(FSItemGetAttributesRequest desiredAttributes, FSItem item, FSVolumeOperationsGetAttributesOfItemReplyHandlerReplyBlock reply);
-    [Selector("setAttributes:onItem:replyHandler:")] void SetAttributesOnItemReplyHandler(FSItemSetAttributesRequest newAttributes, FSItem item, FSVolumeOperationsSetAttributesOnItemReplyHandlerReplyBlock reply);
-    [Selector("lookupItemNamed:inDirectory:replyHandler:")] void LookupItemNamedInDirectoryReplyHandler(FSFileName name, FSItem directory, FSVolumeOperationsLookupItemNamedInDirectoryReplyHandlerReplyBlock reply);
-    [Selector("reclaimItem:replyHandler:")] void ReclaimItemReplyHandler(FSItem item, FSVolumeOperationsReclaimItemReplyHandlerReplyBlock reply);
-    [Selector("readSymbolicLink:replyHandler:")] void ReadSymbolicLinkReplyHandler(FSItem item, FSVolumeOperationsReadSymbolicLinkReplyHandlerReplyBlock reply);
-    [Selector("createItemNamed:type:inDirectory:attributes:replyHandler:")] void CreateItemNamedTypeInDirectoryAttributesReplyHandler(FSFileName name, FSItemType type, FSItem directory, FSItemSetAttributesRequest newAttributes, FSVolumeOperationsCreateItemNamedTypeInDirectoryAttributesReplyHandlerReplyBlock reply);
-    [Selector("createSymbolicLinkNamed:inDirectory:attributes:linkContents:replyHandler:")] void CreateSymbolicLinkNamedInDirectoryAttributesLinkContentsReplyHandler(FSFileName name, FSItem directory, FSItemSetAttributesRequest newAttributes, FSFileName contents, FSVolumeOperationsCreateSymbolicLinkNamedInDirectoryAttributesLinkContentsReplyHandlerReplyBlock reply);
-    [Selector("createLinkToItem:named:inDirectory:replyHandler:")] void CreateLinkToItemNamedInDirectoryReplyHandler(FSItem item, FSFileName name, FSItem directory, FSVolumeOperationsCreateLinkToItemNamedInDirectoryReplyHandlerReplyBlock reply);
-    [Selector("removeItem:named:fromDirectory:replyHandler:")] void RemoveItemNamedFromDirectoryReplyHandler(FSItem item, FSFileName name, FSItem directory, FSVolumeOperationsRemoveItemNamedFromDirectoryReplyHandlerReplyBlock reply);
-    [Selector("renameItem:inDirectory:named:toNewName:inDirectory:overItem:replyHandler:")] void RenameItemInDirectoryNamedToNewNameInDirectoryOverItemReplyHandler(FSItem item, FSItem sourceDirectory, FSFileName sourceName, FSFileName destinationName, FSItem destinationDirectory, FSItem? overItem, FSVolumeOperationsRenameItemInDirectoryNamedToNewNameInDirectoryOverItemReplyHandlerReplyBlock reply);
-    [Selector("enumerateDirectory:startingAtCookie:verifier:providingAttributes:usingPacker:replyHandler:")] void EnumerateDirectoryStartingAtCookieVerifierProvidingAttributesUsingPackerReplyHandler(FSItem directory, FSDirectoryCookie cookie, FSDirectoryVerifier verifier, FSItemGetAttributesRequest? attributes, FSDirectoryEntryPacker packer, FSVolumeOperationsEnumerateDirectoryStartingAtCookieVerifierProvidingAttributesUsingPackerReplyHandlerReplyBlock reply);
-    [Selector("activateWithOptions:replyHandler:")] void ActivateWithOptionsReplyHandler(FSTaskOptions options, FSVolumeOperationsActivateWithOptionsReplyHandlerReplyBlock reply);
-    [Selector("deactivateWithOptions:replyHandler:")] void DeactivateWithOptionsReplyHandler(FSDeactivateOptions options, FSVolumeOperationsDeactivateWithOptionsReplyHandlerReplyBlock reply);
+    [Optional]
+    [Selector("enableOpenUnlinkEmulation", "setEnableOpenUnlinkEmulation:")]
+    bool EnableOpenUnlinkEmulation { get; set; }
+    [Selector("mountWithOptions:replyHandler:")]
+    void MountWithOptionsReplyHandler(FSTaskOptions options, FSVolumeOperationsMountWithOptionsReplyHandlerReplyBlock reply);
+    [Selector("unmountWithReplyHandler:")]
+    void UnmountWithReplyHandler(FSVolumeOperationsUnmountWithReplyHandlerReplyBlock reply);
+    [Selector("synchronizeWithFlags:replyHandler:")]
+    void SynchronizeWithFlagsReplyHandler(FSSyncFlags flags, FSVolumeOperationsSynchronizeWithFlagsReplyHandlerReplyBlock reply);
+    [Selector("getAttributes:ofItem:replyHandler:")]
+    void GetAttributesOfItemReplyHandler(FSItemGetAttributesRequest desiredAttributes, FSItem item, FSVolumeOperationsGetAttributesOfItemReplyHandlerReplyBlock reply);
+    [Selector("setAttributes:onItem:replyHandler:")]
+    void SetAttributesOnItemReplyHandler(FSItemSetAttributesRequest newAttributes, FSItem item, FSVolumeOperationsSetAttributesOnItemReplyHandlerReplyBlock reply);
+    [Selector("lookupItemNamed:inDirectory:replyHandler:")]
+    void LookupItemNamedInDirectoryReplyHandler(FSFileName name, FSItem directory, FSVolumeOperationsLookupItemNamedInDirectoryReplyHandlerReplyBlock reply);
+    [Selector("reclaimItem:replyHandler:")]
+    void ReclaimItemReplyHandler(FSItem item, FSVolumeOperationsReclaimItemReplyHandlerReplyBlock reply);
+    [Selector("readSymbolicLink:replyHandler:")]
+    void ReadSymbolicLinkReplyHandler(FSItem item, FSVolumeOperationsReadSymbolicLinkReplyHandlerReplyBlock reply);
+    [Selector("createItemNamed:type:inDirectory:attributes:replyHandler:")]
+    void CreateItemNamedTypeInDirectoryAttributesReplyHandler(FSFileName name, FSItemType type, FSItem directory, FSItemSetAttributesRequest newAttributes, FSVolumeOperationsCreateItemNamedTypeInDirectoryAttributesReplyHandlerReplyBlock reply);
+    [Selector("createSymbolicLinkNamed:inDirectory:attributes:linkContents:replyHandler:")]
+    void CreateSymbolicLinkNamedInDirectoryAttributesLinkContentsReplyHandler(FSFileName name, FSItem directory, FSItemSetAttributesRequest newAttributes, FSFileName contents, FSVolumeOperationsCreateSymbolicLinkNamedInDirectoryAttributesLinkContentsReplyHandlerReplyBlock reply);
+    [Selector("createLinkToItem:named:inDirectory:replyHandler:")]
+    void CreateLinkToItemNamedInDirectoryReplyHandler(FSItem item, FSFileName name, FSItem directory, FSVolumeOperationsCreateLinkToItemNamedInDirectoryReplyHandlerReplyBlock reply);
+    [Selector("removeItem:named:fromDirectory:replyHandler:")]
+    void RemoveItemNamedFromDirectoryReplyHandler(FSItem item, FSFileName name, FSItem directory, FSVolumeOperationsRemoveItemNamedFromDirectoryReplyHandlerReplyBlock reply);
+    [Selector("renameItem:inDirectory:named:toNewName:inDirectory:overItem:replyHandler:")]
+    void RenameItemInDirectoryNamedToNewNameInDirectoryOverItemReplyHandler(FSItem item, FSItem sourceDirectory, FSFileName sourceName, FSFileName destinationName, FSItem destinationDirectory, FSItem? overItem, FSVolumeOperationsRenameItemInDirectoryNamedToNewNameInDirectoryOverItemReplyHandlerReplyBlock reply);
+    [Selector("enumerateDirectory:startingAtCookie:verifier:providingAttributes:usingPacker:replyHandler:")]
+    void EnumerateDirectoryStartingAtCookieVerifierProvidingAttributesUsingPackerReplyHandler(FSItem directory, FSDirectoryCookie cookie, FSDirectoryVerifier verifier, FSItemGetAttributesRequest? attributes, FSDirectoryEntryPacker packer, FSVolumeOperationsEnumerateDirectoryStartingAtCookieVerifierProvidingAttributesUsingPackerReplyHandlerReplyBlock reply);
+    [Selector("activateWithOptions:replyHandler:")]
+    void ActivateWithOptionsReplyHandler(FSTaskOptions options, FSVolumeOperationsActivateWithOptionsReplyHandlerReplyBlock reply);
+    [Selector("deactivateWithOptions:replyHandler:")]
+    void DeactivateWithOptionsReplyHandler(FSDeactivateOptions options, FSVolumeOperationsDeactivateWithOptionsReplyHandlerReplyBlock reply);
 }
 
 public enum FSSetXattrPolicy : ulong
@@ -213,11 +284,18 @@ public objc closure void FSVolumeXattrOperationsListXattrsOfItemReplyHandlerRepl
 /// macOS 15.4 and later.
 public objc interface FSVolumeXattrOperations : NSObjectProtocol
 {
-    [Optional] [Selector("xattrOperationsInhibited", "setXattrOperationsInhibited:")] bool XattrOperationsInhibited { get; set; }
-    [Optional] [Selector("supportedXattrNamesForItem:")] NSArray SupportedXattrNamesForItem(FSItem item);
-    [Selector("getXattrNamed:ofItem:replyHandler:")] void GetXattrNamedOfItemReplyHandler(FSFileName name, FSItem item, FSVolumeXattrOperationsGetXattrNamedOfItemReplyHandlerReplyBlock reply);
-    [Selector("setXattrNamed:toData:onItem:policy:replyHandler:")] void SetXattrNamedToDataOnItemPolicyReplyHandler(FSFileName name, NSData? value, FSItem item, FSSetXattrPolicy policy, FSVolumeXattrOperationsSetXattrNamedToDataOnItemPolicyReplyHandlerReplyBlock reply);
-    [Selector("listXattrsOfItem:replyHandler:")] void ListXattrsOfItemReplyHandler(FSItem item, FSVolumeXattrOperationsListXattrsOfItemReplyHandlerReplyBlock reply);
+    [Optional]
+    [Selector("xattrOperationsInhibited", "setXattrOperationsInhibited:")]
+    bool XattrOperationsInhibited { get; set; }
+    [Optional]
+    [Selector("supportedXattrNamesForItem:")]
+    NSArray SupportedXattrNamesForItem(FSItem item);
+    [Selector("getXattrNamed:ofItem:replyHandler:")]
+    void GetXattrNamedOfItemReplyHandler(FSFileName name, FSItem item, FSVolumeXattrOperationsGetXattrNamedOfItemReplyHandlerReplyBlock reply);
+    [Selector("setXattrNamed:toData:onItem:policy:replyHandler:")]
+    void SetXattrNamedToDataOnItemPolicyReplyHandler(FSFileName name, NSData? value, FSItem item, FSSetXattrPolicy policy, FSVolumeXattrOperationsSetXattrNamedToDataOnItemPolicyReplyHandlerReplyBlock reply);
+    [Selector("listXattrsOfItem:replyHandler:")]
+    void ListXattrsOfItemReplyHandler(FSItem item, FSVolumeXattrOperationsListXattrsOfItemReplyHandlerReplyBlock reply);
 }
 
 [Flags]
@@ -234,9 +312,13 @@ public objc closure void FSVolumeOpenCloseOperationsCloseItemKeepingModesReplyHa
 /// macOS 15.4 and later.
 public objc interface FSVolumeOpenCloseOperations : NSObjectProtocol
 {
-    [Optional] [Selector("isOpenCloseInhibited", "setOpenCloseInhibited:")] bool OpenCloseInhibited { get; set; }
-    [Selector("openItem:withModes:replyHandler:")] void OpenItemWithModesReplyHandler(FSItem item, FSVolumeOpenModes modes, FSVolumeOpenCloseOperationsOpenItemWithModesReplyHandlerReplyBlock reply);
-    [Selector("closeItem:keepingModes:replyHandler:")] void CloseItemKeepingModesReplyHandler(FSItem item, FSVolumeOpenModes modes, FSVolumeOpenCloseOperationsCloseItemKeepingModesReplyHandlerReplyBlock reply);
+    [Optional]
+    [Selector("isOpenCloseInhibited", "setOpenCloseInhibited:")]
+    bool OpenCloseInhibited { get; set; }
+    [Selector("openItem:withModes:replyHandler:")]
+    void OpenItemWithModesReplyHandler(FSItem item, FSVolumeOpenModes modes, FSVolumeOpenCloseOperationsOpenItemWithModesReplyHandlerReplyBlock reply);
+    [Selector("closeItem:keepingModes:replyHandler:")]
+    void CloseItemKeepingModesReplyHandler(FSItem item, FSVolumeOpenModes modes, FSVolumeOpenCloseOperationsCloseItemKeepingModesReplyHandlerReplyBlock reply);
 }
 
 public objc closure void FSVolumeReadWriteOperationsReadFromFileOffsetLengthIntoBufferReplyHandlerReplyBlock(nuint arg0, NSError? arg1);
@@ -246,8 +328,10 @@ public objc closure void FSVolumeReadWriteOperationsWriteContentsToFileAtOffsetR
 /// macOS 15.4 and later.
 public objc interface FSVolumeReadWriteOperations : NSObjectProtocol
 {
-    [Selector("readFromFile:offset:length:intoBuffer:replyHandler:")] void ReadFromFileOffsetLengthIntoBufferReplyHandler(FSItem item, off_t offset, nuint length, FSMutableFileDataBuffer buffer, FSVolumeReadWriteOperationsReadFromFileOffsetLengthIntoBufferReplyHandlerReplyBlock reply);
-    [Selector("writeContents:toFile:atOffset:replyHandler:")] void WriteContentsToFileAtOffsetReplyHandler(NSData contents, FSItem item, off_t offset, FSVolumeReadWriteOperationsWriteContentsToFileAtOffsetReplyHandlerReplyBlock reply);
+    [Selector("readFromFile:offset:length:intoBuffer:replyHandler:")]
+    void ReadFromFileOffsetLengthIntoBufferReplyHandler(FSItem item, off_t offset, nuint length, FSMutableFileDataBuffer buffer, FSVolumeReadWriteOperationsReadFromFileOffsetLengthIntoBufferReplyHandlerReplyBlock reply);
+    [Selector("writeContents:toFile:atOffset:replyHandler:")]
+    void WriteContentsToFileAtOffsetReplyHandler(NSData contents, FSItem item, off_t offset, FSVolumeReadWriteOperationsWriteContentsToFileAtOffsetReplyHandlerReplyBlock reply);
 }
 
 [Flags]
@@ -277,8 +361,11 @@ public objc closure void FSVolumeAccessCheckOperationsCheckAccessToItemRequested
 /// macOS 15.4 and later.
 public objc interface FSVolumeAccessCheckOperations : NSObjectProtocol
 {
-    [Optional] [Selector("isAccessCheckInhibited", "setAccessCheckInhibited:")] bool AccessCheckInhibited { get; set; }
-    [Selector("checkAccessToItem:requestedAccess:replyHandler:")] void CheckAccessToItemRequestedAccessReplyHandler(FSItem theItem, FSAccessMask access, FSVolumeAccessCheckOperationsCheckAccessToItemRequestedAccessReplyHandlerReplyBlock reply);
+    [Optional]
+    [Selector("isAccessCheckInhibited", "setAccessCheckInhibited:")]
+    bool AccessCheckInhibited { get; set; }
+    [Selector("checkAccessToItem:requestedAccess:replyHandler:")]
+    void CheckAccessToItemRequestedAccessReplyHandler(FSItem theItem, FSAccessMask access, FSVolumeAccessCheckOperationsCheckAccessToItemRequestedAccessReplyHandlerReplyBlock reply);
 }
 
 public objc closure void FSVolumeRenameOperationsSetVolumeNameReplyHandlerReplyBlock(FSFileName? arg0, NSError? arg1);
@@ -286,8 +373,11 @@ public objc closure void FSVolumeRenameOperationsSetVolumeNameReplyHandlerReplyB
 /// macOS 15.4 and later.
 public objc interface FSVolumeRenameOperations : NSObjectProtocol
 {
-    [Optional] [Selector("isVolumeRenameInhibited", "setVolumeRenameInhibited:")] bool VolumeRenameInhibited { get; set; }
-    [Selector("setVolumeName:replyHandler:")] void SetVolumeNameReplyHandler(FSFileName name, FSVolumeRenameOperationsSetVolumeNameReplyHandlerReplyBlock reply);
+    [Optional]
+    [Selector("isVolumeRenameInhibited", "setVolumeRenameInhibited:")]
+    bool VolumeRenameInhibited { get; set; }
+    [Selector("setVolumeName:replyHandler:")]
+    void SetVolumeNameReplyHandler(FSFileName name, FSVolumeRenameOperationsSetVolumeNameReplyHandlerReplyBlock reply);
 }
 
 [Flags]
@@ -304,8 +394,11 @@ public objc closure void FSVolumePreallocateOperationsPreallocateSpaceForItemAtO
 /// macOS 15.4 and later.
 public objc interface FSVolumePreallocateOperations : NSObjectProtocol
 {
-    [Optional] [Selector("isPreallocateInhibited", "setPreallocateInhibited:")] bool PreallocateInhibited { get; set; }
-    [Selector("preallocateSpaceForItem:atOffset:length:flags:replyHandler:")] void PreallocateSpaceForItemAtOffsetLengthFlagsReplyHandler(FSItem item, off_t offset, nuint length, FSPreallocateFlags flags, FSVolumePreallocateOperationsPreallocateSpaceForItemAtOffsetLengthFlagsReplyHandlerReplyBlock reply);
+    [Optional]
+    [Selector("isPreallocateInhibited", "setPreallocateInhibited:")]
+    bool PreallocateInhibited { get; set; }
+    [Selector("preallocateSpaceForItem:atOffset:length:flags:replyHandler:")]
+    void PreallocateSpaceForItemAtOffsetLengthFlagsReplyHandler(FSItem item, off_t offset, nuint length, FSPreallocateFlags flags, FSVolumePreallocateOperationsPreallocateSpaceForItemAtOffsetLengthFlagsReplyHandlerReplyBlock reply);
 }
 
 [Flags]
@@ -322,8 +415,10 @@ public objc closure void FSVolumeItemDeactivationDeactivateItemReplyHandlerReply
 /// macOS 15.4 and later.
 public objc interface FSVolumeItemDeactivation : NSObjectProtocol
 {
-    [Selector("itemDeactivationPolicy")] FSItemDeactivationOptions ItemDeactivationPolicy { get; }
-    [Selector("deactivateItem:replyHandler:")] void DeactivateItemReplyHandler(FSItem item, FSVolumeItemDeactivationDeactivateItemReplyHandlerReplyBlock reply);
+    [Selector("itemDeactivationPolicy")]
+    FSItemDeactivationOptions ItemDeactivationPolicy { get; }
+    [Selector("deactivateItem:replyHandler:")]
+    void DeactivateItemReplyHandler(FSItem item, FSVolumeItemDeactivationDeactivateItemReplyHandlerReplyBlock reply);
 }
 
 #endif

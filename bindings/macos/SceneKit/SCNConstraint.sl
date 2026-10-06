@@ -34,19 +34,28 @@ import Standard.ObjC;
 
 public extern objc class SCNConstraint : NSObject, NSCopying, NSSecureCoding, SCNAnimatable
 {
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("influenceFactor", "setInfluenceFactor:")] public CGFloat InfluenceFactor { get; set; }
-    [Selector("isIncremental", "setIncremental:")] public bool Incremental { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("influenceFactor", "setInfluenceFactor:")]
+    public CGFloat InfluenceFactor { get; set; }
+    [Selector("isIncremental", "setIncremental:")]
+    public bool Incremental { get; set; }
 }
 
 public extern objc class SCNLookAtConstraint : SCNConstraint
 {
-    [Selector("target", "setTarget:")] public SCNNode? Target { get; set; }
-    [Selector("targetOffset", "setTargetOffset:")] public SCNVector3 TargetOffset { get; set; }
-    [Selector("localFront", "setLocalFront:")] public SCNVector3 LocalFront { get; set; }
-    [Selector("worldUp", "setWorldUp:")] public SCNVector3 WorldUp { get; set; }
-    [Selector("gimbalLockEnabled", "setGimbalLockEnabled:")] public bool GimbalLockEnabled { get; set; }
-    [Selector("lookAtConstraintWithTarget:")] public static Self LookAtConstraintWithTarget(SCNNode? target);
+    [Selector("target", "setTarget:")]
+    public SCNNode? Target { get; set; }
+    [Selector("targetOffset", "setTargetOffset:")]
+    public SCNVector3 TargetOffset { get; set; }
+    [Selector("localFront", "setLocalFront:")]
+    public SCNVector3 LocalFront { get; set; }
+    [Selector("worldUp", "setWorldUp:")]
+    public SCNVector3 WorldUp { get; set; }
+    [Selector("gimbalLockEnabled", "setGimbalLockEnabled:")]
+    public bool GimbalLockEnabled { get; set; }
+    [Selector("lookAtConstraintWithTarget:")]
+    public static Self LookAtConstraintWithTarget(SCNNode? target);
 }
 
 [Flags]
@@ -60,8 +69,10 @@ public enum SCNBillboardAxis : ulong
 
 public extern objc class SCNBillboardConstraint : SCNConstraint
 {
-    [Selector("freeAxes", "setFreeAxes:")] public SCNBillboardAxis FreeAxes { get; set; }
-    [Selector("billboardConstraint")] public static Self BillboardConstraint();
+    [Selector("freeAxes", "setFreeAxes:")]
+    public SCNBillboardAxis FreeAxes { get; set; }
+    [Selector("billboardConstraint")]
+    public static Self BillboardConstraint();
 }
 
 public objc closure SCNMatrix4 SCNTransformConstraintTransformConstraintInWorldSpaceWithBlockBlock(SCNNode arg0, SCNMatrix4 arg1);
@@ -72,71 +83,110 @@ public objc closure SCNQuaternion SCNTransformConstraintOrientationConstraintInW
 
 public extern objc class SCNTransformConstraint : SCNConstraint
 {
-    [Selector("transformConstraintInWorldSpace:withBlock:")] public static Self TransformConstraintInWorldSpaceWithBlock(bool world, SCNTransformConstraintTransformConstraintInWorldSpaceWithBlockBlock block);
-    [Selector("positionConstraintInWorldSpace:withBlock:")] public static Self PositionConstraintInWorldSpaceWithBlock(bool world, SCNTransformConstraintPositionConstraintInWorldSpaceWithBlockBlock block);
-    [Selector("orientationConstraintInWorldSpace:withBlock:")] public static Self OrientationConstraintInWorldSpaceWithBlock(bool world, SCNTransformConstraintOrientationConstraintInWorldSpaceWithBlockBlock block);
+    [Selector("transformConstraintInWorldSpace:withBlock:")]
+    public static Self TransformConstraintInWorldSpaceWithBlock(bool world, SCNTransformConstraintTransformConstraintInWorldSpaceWithBlockBlock block);
+    [Selector("positionConstraintInWorldSpace:withBlock:")]
+    public static Self PositionConstraintInWorldSpaceWithBlock(bool world, SCNTransformConstraintPositionConstraintInWorldSpaceWithBlockBlock block);
+    [Selector("orientationConstraintInWorldSpace:withBlock:")]
+    public static Self OrientationConstraintInWorldSpaceWithBlock(bool world, SCNTransformConstraintOrientationConstraintInWorldSpaceWithBlockBlock block);
 }
 
 public extern objc class SCNIKConstraint : SCNConstraint
 {
-    [Selector("chainRootNode")] public SCNNode ChainRootNode { get; }
-    [Selector("targetPosition", "setTargetPosition:")] public SCNVector3 TargetPosition { get; set; }
-    [Selector("initWithChainRootNode:")] public Self InitWithChainRootNode(SCNNode chainRootNode);
-    [Selector("inverseKinematicsConstraintWithChainRootNode:")] public static Self InverseKinematicsConstraintWithChainRootNode(SCNNode chainRootNode);
-    [Selector("setMaxAllowedRotationAngle:forJoint:")] public void SetMaxAllowedRotationAngleForJoint(CGFloat angle, SCNNode node);
-    [Selector("maxAllowedRotationAngleForJoint:")] public CGFloat MaxAllowedRotationAngleForJoint(SCNNode node);
+    [Selector("chainRootNode")]
+    public SCNNode ChainRootNode { get; }
+    [Selector("targetPosition", "setTargetPosition:")]
+    public SCNVector3 TargetPosition { get; set; }
+    [Selector("initWithChainRootNode:")]
+    public Self InitWithChainRootNode(SCNNode chainRootNode);
+    [Selector("inverseKinematicsConstraintWithChainRootNode:")]
+    public static Self InverseKinematicsConstraintWithChainRootNode(SCNNode chainRootNode);
+    [Selector("setMaxAllowedRotationAngle:forJoint:")]
+    public void SetMaxAllowedRotationAngleForJoint(CGFloat angle, SCNNode node);
+    [Selector("maxAllowedRotationAngleForJoint:")]
+    public CGFloat MaxAllowedRotationAngleForJoint(SCNNode node);
 }
 
 public extern objc class SCNDistanceConstraint : SCNConstraint
 {
-    [Selector("target", "setTarget:")] public SCNNode? Target { get; set; }
-    [Selector("minimumDistance", "setMinimumDistance:")] public CGFloat MinimumDistance { get; set; }
-    [Selector("maximumDistance", "setMaximumDistance:")] public CGFloat MaximumDistance { get; set; }
-    [Selector("distanceConstraintWithTarget:")] public static Self DistanceConstraintWithTarget(SCNNode? target);
+    [Selector("target", "setTarget:")]
+    public SCNNode? Target { get; set; }
+    [Selector("minimumDistance", "setMinimumDistance:")]
+    public CGFloat MinimumDistance { get; set; }
+    [Selector("maximumDistance", "setMaximumDistance:")]
+    public CGFloat MaximumDistance { get; set; }
+    [Selector("distanceConstraintWithTarget:")]
+    public static Self DistanceConstraintWithTarget(SCNNode? target);
 }
 
 public extern objc class SCNReplicatorConstraint : SCNConstraint
 {
-    [Selector("target", "setTarget:")] public SCNNode? Target { get; set; }
-    [Selector("replicatesOrientation", "setReplicatesOrientation:")] public bool ReplicatesOrientation { get; set; }
-    [Selector("replicatesPosition", "setReplicatesPosition:")] public bool ReplicatesPosition { get; set; }
-    [Selector("replicatesScale", "setReplicatesScale:")] public bool ReplicatesScale { get; set; }
-    [Selector("orientationOffset", "setOrientationOffset:")] public SCNQuaternion OrientationOffset { get; set; }
-    [Selector("positionOffset", "setPositionOffset:")] public SCNVector3 PositionOffset { get; set; }
-    [Selector("scaleOffset", "setScaleOffset:")] public SCNVector3 ScaleOffset { get; set; }
-    [Selector("replicatorConstraintWithTarget:")] public static Self ReplicatorConstraintWithTarget(SCNNode? target);
+    [Selector("target", "setTarget:")]
+    public SCNNode? Target { get; set; }
+    [Selector("replicatesOrientation", "setReplicatesOrientation:")]
+    public bool ReplicatesOrientation { get; set; }
+    [Selector("replicatesPosition", "setReplicatesPosition:")]
+    public bool ReplicatesPosition { get; set; }
+    [Selector("replicatesScale", "setReplicatesScale:")]
+    public bool ReplicatesScale { get; set; }
+    [Selector("orientationOffset", "setOrientationOffset:")]
+    public SCNQuaternion OrientationOffset { get; set; }
+    [Selector("positionOffset", "setPositionOffset:")]
+    public SCNVector3 PositionOffset { get; set; }
+    [Selector("scaleOffset", "setScaleOffset:")]
+    public SCNVector3 ScaleOffset { get; set; }
+    [Selector("replicatorConstraintWithTarget:")]
+    public static Self ReplicatorConstraintWithTarget(SCNNode? target);
 }
 
 public extern objc class SCNAccelerationConstraint : SCNConstraint
 {
-    [Selector("maximumLinearAcceleration", "setMaximumLinearAcceleration:")] public CGFloat MaximumLinearAcceleration { get; set; }
-    [Selector("maximumLinearVelocity", "setMaximumLinearVelocity:")] public CGFloat MaximumLinearVelocity { get; set; }
-    [Selector("decelerationDistance", "setDecelerationDistance:")] public CGFloat DecelerationDistance { get; set; }
-    [Selector("damping", "setDamping:")] public CGFloat Damping { get; set; }
-    [Selector("accelerationConstraint")] public static Self AccelerationConstraint();
+    [Selector("maximumLinearAcceleration", "setMaximumLinearAcceleration:")]
+    public CGFloat MaximumLinearAcceleration { get; set; }
+    [Selector("maximumLinearVelocity", "setMaximumLinearVelocity:")]
+    public CGFloat MaximumLinearVelocity { get; set; }
+    [Selector("decelerationDistance", "setDecelerationDistance:")]
+    public CGFloat DecelerationDistance { get; set; }
+    [Selector("damping", "setDamping:")]
+    public CGFloat Damping { get; set; }
+    [Selector("accelerationConstraint")]
+    public static Self AccelerationConstraint();
 }
 
 public extern objc class SCNSliderConstraint : SCNConstraint
 {
-    [Selector("collisionCategoryBitMask", "setCollisionCategoryBitMask:")] public NSUInteger CollisionCategoryBitMask { get; set; }
-    [Selector("radius", "setRadius:")] public CGFloat Radius { get; set; }
-    [Selector("offset", "setOffset:")] public SCNVector3 Offset { get; set; }
-    [Selector("sliderConstraint")] public static Self SliderConstraint();
+    [Selector("collisionCategoryBitMask", "setCollisionCategoryBitMask:")]
+    public NSUInteger CollisionCategoryBitMask { get; set; }
+    [Selector("radius", "setRadius:")]
+    public CGFloat Radius { get; set; }
+    [Selector("offset", "setOffset:")]
+    public SCNVector3 Offset { get; set; }
+    [Selector("sliderConstraint")]
+    public static Self SliderConstraint();
 }
 
 public objc interface SCNAvoidOccluderConstraintDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("avoidOccluderConstraint:shouldAvoidOccluder:forNode:")] bool AvoidOccluderConstraintShouldAvoidOccluderForNode(SCNAvoidOccluderConstraint constraint, SCNNode occluder, SCNNode node);
-    [Optional] [Selector("avoidOccluderConstraint:didAvoidOccluder:forNode:")] void AvoidOccluderConstraintDidAvoidOccluderForNode(SCNAvoidOccluderConstraint constraint, SCNNode occluder, SCNNode node);
+    [Optional]
+    [Selector("avoidOccluderConstraint:shouldAvoidOccluder:forNode:")]
+    bool AvoidOccluderConstraintShouldAvoidOccluderForNode(SCNAvoidOccluderConstraint constraint, SCNNode occluder, SCNNode node);
+    [Optional]
+    [Selector("avoidOccluderConstraint:didAvoidOccluder:forNode:")]
+    void AvoidOccluderConstraintDidAvoidOccluderForNode(SCNAvoidOccluderConstraint constraint, SCNNode occluder, SCNNode node);
 }
 
 public extern objc class SCNAvoidOccluderConstraint : SCNConstraint
 {
-    [Selector("delegate", "setDelegate:")] public SCNAvoidOccluderConstraintDelegate Delegate { get; set; }
-    [Selector("target", "setTarget:")] public SCNNode? Target { get; set; }
-    [Selector("occluderCategoryBitMask", "setOccluderCategoryBitMask:")] public NSUInteger OccluderCategoryBitMask { get; set; }
-    [Selector("bias", "setBias:")] public CGFloat Bias { get; set; }
-    [Selector("avoidOccluderConstraintWithTarget:")] public static Self AvoidOccluderConstraintWithTarget(SCNNode? target);
+    [Selector("delegate", "setDelegate:")]
+    public SCNAvoidOccluderConstraintDelegate Delegate { get; set; }
+    [Selector("target", "setTarget:")]
+    public SCNNode? Target { get; set; }
+    [Selector("occluderCategoryBitMask", "setOccluderCategoryBitMask:")]
+    public NSUInteger OccluderCategoryBitMask { get; set; }
+    [Selector("bias", "setBias:")]
+    public CGFloat Bias { get; set; }
+    [Selector("avoidOccluderConstraintWithTarget:")]
+    public static Self AvoidOccluderConstraintWithTarget(SCNNode? target);
 }
 
 #endif

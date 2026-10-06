@@ -49,12 +49,18 @@ public enum NSFormattingUnitStyle : long
 
 public extern objc class NSFormatter : NSObject, NSCopying, NSCoding
 {
-    [Selector("stringForObjectValue:")] public NSString? StringForObjectValue(AnyObject? obj);
-    [Selector("attributedStringForObjectValue:withDefaultAttributes:")] public NSAttributedString? AttributedStringForObjectValueWithDefaultAttributes(AnyObject obj, NSDictionary? attrs);
-    [Selector("editingStringForObjectValue:")] public NSString? EditingStringForObjectValue(AnyObject obj);
-    [Selector("getObjectValue:forString:errorDescription:")] public bool GetObjectValueForStringErrorDescription(out AnyObject? obj, NSString string, out NSString? error);
-    [Selector("isPartialStringValid:newEditingString:errorDescription:")] public bool IsPartialStringValidNewEditingStringErrorDescription(NSString partialString, out NSString? newString, out NSString? error);
-    [Selector("isPartialStringValid:proposedSelectedRange:originalString:originalSelectedRange:errorDescription:")] public bool IsPartialStringValidProposedSelectedRangeOriginalStringOriginalSelectedRangeErrorDescription(out NSString? partialStringPtr, NSRangePointer proposedSelRangePtr, NSString origString, NSRange origSelRange, out NSString? error);
+    [Selector("stringForObjectValue:")]
+    public NSString? StringForObjectValue(AnyObject? obj);
+    [Selector("attributedStringForObjectValue:withDefaultAttributes:")]
+    public NSAttributedString? AttributedStringForObjectValueWithDefaultAttributes(AnyObject obj, NSDictionary? attrs);
+    [Selector("editingStringForObjectValue:")]
+    public NSString? EditingStringForObjectValue(AnyObject obj);
+    [Selector("getObjectValue:forString:errorDescription:")]
+    public bool GetObjectValueForStringErrorDescription(out AnyObject? obj, NSString string, out NSString? error);
+    [Selector("isPartialStringValid:newEditingString:errorDescription:")]
+    public bool IsPartialStringValidNewEditingStringErrorDescription(NSString partialString, out NSString? newString, out NSString? error);
+    [Selector("isPartialStringValid:proposedSelectedRange:originalString:originalSelectedRange:errorDescription:")]
+    public bool IsPartialStringValidProposedSelectedRangeOriginalStringOriginalSelectedRangeErrorDescription(out NSString? partialStringPtr, NSRangePointer proposedSelRangePtr, NSString origString, NSRange origSelRange, out NSString? error);
 }
 
 #endif

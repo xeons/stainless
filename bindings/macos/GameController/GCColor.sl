@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class GCColor : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("red")] public float Red { get; }
-    [Selector("green")] public float Green { get; }
-    [Selector("blue")] public float Blue { get; }
-    [Selector("initWithRed:green:blue:")] public Self InitWithRedGreenBlue(float red, float green, float blue);
+    [Selector("red")]
+    public float Red { get; }
+    [Selector("green")]
+    public float Green { get; }
+    [Selector("blue")]
+    public float Blue { get; }
+    [Selector("initWithRed:green:blue:")]
+    public Self InitWithRedGreenBlue(float red, float green, float blue);
 }
 
 #endif

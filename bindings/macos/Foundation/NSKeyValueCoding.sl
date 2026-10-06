@@ -59,82 +59,118 @@ public extern "C" NSKeyValueOperator NSUnionOfSetsKeyValueOperator;
 /// NSKeyValueCoding, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("accessInstanceVariablesDirectly")] public static bool AccessInstanceVariablesDirectly { get; }
-    [Selector("valueForKey:")] public AnyObject? ValueForKey(NSString key);
-    [Selector("setValue:forKey:")] public void SetValueForKey(AnyObject? value, NSString key);
-    [Selector("validateValue:forKey:error:")] public bool ValidateValueForKeyError(out AnyObject? ioValue, NSString inKey, out NSError? outError);
-    [Selector("mutableArrayValueForKey:")] public NSMutableArray MutableArrayValueForKey(NSString key);
-    [Selector("mutableOrderedSetValueForKey:")] public NSMutableOrderedSet MutableOrderedSetValueForKey(NSString key);
-    [Selector("mutableSetValueForKey:")] public NSMutableSet MutableSetValueForKey(NSString key);
-    [Selector("valueForKeyPath:")] public AnyObject? ValueForKeyPath(NSString keyPath);
-    [Selector("setValue:forKeyPath:")] public void SetValueForKeyPath(AnyObject? value, NSString keyPath);
-    [Selector("validateValue:forKeyPath:error:")] public bool ValidateValueForKeyPathError(out AnyObject? ioValue, NSString inKeyPath, out NSError? outError);
-    [Selector("mutableArrayValueForKeyPath:")] public NSMutableArray MutableArrayValueForKeyPath(NSString keyPath);
-    [Selector("mutableOrderedSetValueForKeyPath:")] public NSMutableOrderedSet MutableOrderedSetValueForKeyPath(NSString keyPath);
-    [Selector("mutableSetValueForKeyPath:")] public NSMutableSet MutableSetValueForKeyPath(NSString keyPath);
-    [Selector("valueForUndefinedKey:")] public AnyObject? ValueForUndefinedKey(NSString key);
-    [Selector("setValue:forUndefinedKey:")] public void SetValueForUndefinedKey(AnyObject? value, NSString key);
-    [Selector("setNilValueForKey:")] public void SetNilValueForKey(NSString key);
-    [Selector("dictionaryWithValuesForKeys:")] public NSDictionary DictionaryWithValuesForKeys(NSArray keys);
-    [Selector("setValuesForKeysWithDictionary:")] public void SetValuesForKeysWithDictionary(NSDictionary keyedValues);
+    [Selector("accessInstanceVariablesDirectly")]
+    public static bool AccessInstanceVariablesDirectly { get; }
+    [Selector("valueForKey:")]
+    public AnyObject? ValueForKey(NSString key);
+    [Selector("setValue:forKey:")]
+    public void SetValueForKey(AnyObject? value, NSString key);
+    [Selector("validateValue:forKey:error:")]
+    public bool ValidateValueForKeyError(out AnyObject? ioValue, NSString inKey, out NSError? outError);
+    [Selector("mutableArrayValueForKey:")]
+    public NSMutableArray MutableArrayValueForKey(NSString key);
+    [Selector("mutableOrderedSetValueForKey:")]
+    public NSMutableOrderedSet MutableOrderedSetValueForKey(NSString key);
+    [Selector("mutableSetValueForKey:")]
+    public NSMutableSet MutableSetValueForKey(NSString key);
+    [Selector("valueForKeyPath:")]
+    public AnyObject? ValueForKeyPath(NSString keyPath);
+    [Selector("setValue:forKeyPath:")]
+    public void SetValueForKeyPath(AnyObject? value, NSString keyPath);
+    [Selector("validateValue:forKeyPath:error:")]
+    public bool ValidateValueForKeyPathError(out AnyObject? ioValue, NSString inKeyPath, out NSError? outError);
+    [Selector("mutableArrayValueForKeyPath:")]
+    public NSMutableArray MutableArrayValueForKeyPath(NSString keyPath);
+    [Selector("mutableOrderedSetValueForKeyPath:")]
+    public NSMutableOrderedSet MutableOrderedSetValueForKeyPath(NSString keyPath);
+    [Selector("mutableSetValueForKeyPath:")]
+    public NSMutableSet MutableSetValueForKeyPath(NSString keyPath);
+    [Selector("valueForUndefinedKey:")]
+    public AnyObject? ValueForUndefinedKey(NSString key);
+    [Selector("setValue:forUndefinedKey:")]
+    public void SetValueForUndefinedKey(AnyObject? value, NSString key);
+    [Selector("setNilValueForKey:")]
+    public void SetNilValueForKey(NSString key);
+    [Selector("dictionaryWithValuesForKeys:")]
+    public NSDictionary DictionaryWithValuesForKeys(NSArray keys);
+    [Selector("setValuesForKeysWithDictionary:")]
+    public void SetValuesForKeysWithDictionary(NSDictionary keyedValues);
 }
 
 /// NSKeyValueCoding, a category of NSArray.
 public extern objc class NSArray
 {
-    [Selector("valueForKey:")] public AnyObject ValueForKey(NSString key);
-    [Selector("setValue:forKey:")] public void SetValueForKey(AnyObject? value, NSString key);
+    [Selector("valueForKey:")]
+    public AnyObject ValueForKey(NSString key);
+    [Selector("setValue:forKey:")]
+    public void SetValueForKey(AnyObject? value, NSString key);
 }
 
 /// NSKeyValueCoding, a category of NSDictionary.
 public extern objc class NSDictionary
 {
-    [Selector("valueForKey:")] public AnyObject? ValueForKey(NSString key);
+    [Selector("valueForKey:")]
+    public AnyObject? ValueForKey(NSString key);
 }
 
 /// NSKeyValueCoding, a category of NSMutableDictionary.
 public extern objc class NSMutableDictionary
 {
-    [Selector("setValue:forKey:")] public void SetValueForKey(AnyObject? value, NSString key);
+    [Selector("setValue:forKey:")]
+    public void SetValueForKey(AnyObject? value, NSString key);
 }
 
 /// NSKeyValueCoding, a category of NSOrderedSet.
 public extern objc class NSOrderedSet
 {
-    [Selector("valueForKey:")] public AnyObject ValueForKey(NSString key);
-    [Selector("setValue:forKey:")] public void SetValueForKey(AnyObject? value, NSString key);
+    [Selector("valueForKey:")]
+    public AnyObject ValueForKey(NSString key);
+    [Selector("setValue:forKey:")]
+    public void SetValueForKey(AnyObject? value, NSString key);
 }
 
 /// NSKeyValueCoding, a category of NSSet.
 public extern objc class NSSet
 {
-    [Selector("valueForKey:")] public AnyObject ValueForKey(NSString key);
-    [Selector("setValue:forKey:")] public void SetValueForKey(AnyObject? value, NSString key);
+    [Selector("valueForKey:")]
+    public AnyObject ValueForKey(NSString key);
+    [Selector("setValue:forKey:")]
+    public void SetValueForKey(AnyObject? value, NSString key);
 }
 
 /// NSDeprecatedKeyValueCoding, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.4.
-    [Selector("useStoredAccessor")] public static bool UseStoredAccessor();
+    [Selector("useStoredAccessor")]
+    public static bool UseStoredAccessor();
     /// Deprecated in macOS 10.4.
-    [Selector("storedValueForKey:")] public AnyObject? StoredValueForKey(NSString key);
+    [Selector("storedValueForKey:")]
+    public AnyObject? StoredValueForKey(NSString key);
     /// Deprecated in macOS 10.4.
-    [Selector("takeStoredValue:forKey:")] public void TakeStoredValueForKey(AnyObject? value, NSString key);
+    [Selector("takeStoredValue:forKey:")]
+    public void TakeStoredValueForKey(AnyObject? value, NSString key);
     /// Deprecated in macOS 10.3.
-    [Selector("takeValue:forKey:")] public void TakeValueForKey(AnyObject? value, NSString key);
+    [Selector("takeValue:forKey:")]
+    public void TakeValueForKey(AnyObject? value, NSString key);
     /// Deprecated in macOS 10.3.
-    [Selector("takeValue:forKeyPath:")] public void TakeValueForKeyPath(AnyObject? value, NSString keyPath);
+    [Selector("takeValue:forKeyPath:")]
+    public void TakeValueForKeyPath(AnyObject? value, NSString keyPath);
     /// Deprecated in macOS 10.3.
-    [Selector("handleQueryWithUnboundKey:")] public AnyObject? HandleQueryWithUnboundKey(NSString key);
+    [Selector("handleQueryWithUnboundKey:")]
+    public AnyObject? HandleQueryWithUnboundKey(NSString key);
     /// Deprecated in macOS 10.3.
-    [Selector("handleTakeValue:forUnboundKey:")] public void HandleTakeValueForUnboundKey(AnyObject? value, NSString key);
+    [Selector("handleTakeValue:forUnboundKey:")]
+    public void HandleTakeValueForUnboundKey(AnyObject? value, NSString key);
     /// Deprecated in macOS 10.3.
-    [Selector("unableToSetNilForKey:")] public void UnableToSetNilForKey(NSString key);
+    [Selector("unableToSetNilForKey:")]
+    public void UnableToSetNilForKey(NSString key);
     /// Deprecated in macOS 10.3.
-    [Selector("valuesForKeys:")] public NSDictionary ValuesForKeys(NSArray keys);
+    [Selector("valuesForKeys:")]
+    public NSDictionary ValuesForKeys(NSArray keys);
     /// Deprecated in macOS 10.3.
-    [Selector("takeValuesFromDictionary:")] public void TakeValuesFromDictionary(NSDictionary properties);
+    [Selector("takeValuesFromDictionary:")]
+    public void TakeValuesFromDictionary(NSDictionary properties);
 }
 
 #endif

@@ -39,11 +39,16 @@ public objc closure void HKHeartbeatSeriesBuilderFinishSeriesWithCompletionCompl
 
 public extern objc class HKHeartbeatSeriesBuilder : HKSeriesBuilder
 {
-    [Selector("maximumCount")] public static NSUInteger MaximumCount { get; }
-    [Selector("initWithHealthStore:device:startDate:")] public Self InitWithHealthStoreDeviceStartDate(HKHealthStore healthStore, HKDevice? device, NSDate startDate);
-    [Selector("addHeartbeatWithTimeIntervalSinceSeriesStartDate:precededByGap:completion:")] public void AddHeartbeatWithTimeIntervalSinceSeriesStartDatePrecededByGapCompletion(NSTimeInterval timeIntervalSinceStart, bool precededByGap, HKHeartbeatSeriesBuilderAddHeartbeatWithTimeIntervalSinceSeriesStartDatePrecededByGapCompletionCompletionBlock completion);
-    [Selector("addMetadata:completion:")] public void AddMetadataCompletion(NSDictionary metadata, HKHeartbeatSeriesBuilderAddMetadataCompletionCompletionBlock completion);
-    [Selector("finishSeriesWithCompletion:")] public void FinishSeriesWithCompletion(HKHeartbeatSeriesBuilderFinishSeriesWithCompletionCompletionBlock completion);
+    [Selector("maximumCount")]
+    public static NSUInteger MaximumCount { get; }
+    [Selector("initWithHealthStore:device:startDate:")]
+    public Self InitWithHealthStoreDeviceStartDate(HKHealthStore healthStore, HKDevice? device, NSDate startDate);
+    [Selector("addHeartbeatWithTimeIntervalSinceSeriesStartDate:precededByGap:completion:")]
+    public void AddHeartbeatWithTimeIntervalSinceSeriesStartDatePrecededByGapCompletion(NSTimeInterval timeIntervalSinceStart, bool precededByGap, HKHeartbeatSeriesBuilderAddHeartbeatWithTimeIntervalSinceSeriesStartDatePrecededByGapCompletionCompletionBlock completion);
+    [Selector("addMetadata:completion:")]
+    public void AddMetadataCompletion(NSDictionary metadata, HKHeartbeatSeriesBuilderAddMetadataCompletionCompletionBlock completion);
+    [Selector("finishSeriesWithCompletion:")]
+    public void FinishSeriesWithCompletion(HKHeartbeatSeriesBuilderFinishSeriesWithCompletionCompletionBlock completion);
 }
 
 #endif

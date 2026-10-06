@@ -47,23 +47,40 @@ public enum NSPopoverBehavior : long
 
 public extern objc class NSPopover : NSResponder, NSAppearanceCustomization, NSAccessibilityElementProtocol, NSAccessibility
 {
-    [Selector("delegate", "setDelegate:")] public NSPopoverDelegate? Delegate { get; set; }
-    [Selector("appearance", "setAppearance:")] public NSAppearance? Appearance { get; set; }
-    [Selector("effectiveAppearance")] public NSAppearance? EffectiveAppearance { get; }
-    [Selector("behavior", "setBehavior:")] public NSPopoverBehavior Behavior { get; set; }
-    [Selector("animates", "setAnimates:")] public bool Animates { get; set; }
-    [Selector("contentViewController", "setContentViewController:")] public NSViewController? ContentViewController { get; set; }
-    [Selector("contentSize", "setContentSize:")] public NSSize ContentSize { get; set; }
-    [Selector("isShown")] public bool Shown { get; }
-    [Selector("isDetached")] public bool Detached { get; }
-    [Selector("positioningRect", "setPositioningRect:")] public NSRect PositioningRect { get; set; }
-    [Selector("hasFullSizeContent", "setHasFullSizeContent:")] public bool HasFullSizeContent { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("showRelativeToRect:ofView:preferredEdge:")] public void ShowRelativeToRectOfViewPreferredEdge(NSRect positioningRect, NSView positioningView, NSRectEdge preferredEdge);
-    [Selector("showRelativeToToolbarItem:")] public void ShowRelativeToToolbarItem(NSToolbarItem toolbarItem);
-    [Selector("performClose:")] public void PerformClose(AnyObject? sender);
-    [Selector("close")] public void Close();
+    [Selector("delegate", "setDelegate:")]
+    public NSPopoverDelegate? Delegate { get; set; }
+    [Selector("appearance", "setAppearance:")]
+    public NSAppearance? Appearance { get; set; }
+    [Selector("effectiveAppearance")]
+    public NSAppearance? EffectiveAppearance { get; }
+    [Selector("behavior", "setBehavior:")]
+    public NSPopoverBehavior Behavior { get; set; }
+    [Selector("animates", "setAnimates:")]
+    public bool Animates { get; set; }
+    [Selector("contentViewController", "setContentViewController:")]
+    public NSViewController? ContentViewController { get; set; }
+    [Selector("contentSize", "setContentSize:")]
+    public NSSize ContentSize { get; set; }
+    [Selector("isShown")]
+    public bool Shown { get; }
+    [Selector("isDetached")]
+    public bool Detached { get; }
+    [Selector("positioningRect", "setPositioningRect:")]
+    public NSRect PositioningRect { get; set; }
+    [Selector("hasFullSizeContent", "setHasFullSizeContent:")]
+    public bool HasFullSizeContent { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("showRelativeToRect:ofView:preferredEdge:")]
+    public void ShowRelativeToRectOfViewPreferredEdge(NSRect positioningRect, NSView positioningView, NSRectEdge preferredEdge);
+    [Selector("showRelativeToToolbarItem:")]
+    public void ShowRelativeToToolbarItem(NSToolbarItem toolbarItem);
+    [Selector("performClose:")]
+    public void PerformClose(AnyObject? sender);
+    [Selector("close")]
+    public void Close();
 }
 
 public extern "C" NSString? NSPopoverCloseReasonKey;
@@ -84,14 +101,30 @@ public extern "C" NSNotificationName? NSPopoverDidCloseNotification;
 
 public objc interface NSPopoverDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("popoverShouldClose:")] bool PopoverShouldClose(NSPopover popover);
-    [Optional] [Selector("popoverShouldDetach:")] bool PopoverShouldDetach(NSPopover popover);
-    [Optional] [Selector("popoverDidDetach:")] void PopoverDidDetach(NSPopover popover);
-    [Optional] [Selector("detachableWindowForPopover:")] NSWindow? DetachableWindowForPopover(NSPopover popover);
-    [Optional] [Selector("popoverWillShow:")] void PopoverWillShow(NSNotification notification);
-    [Optional] [Selector("popoverDidShow:")] void PopoverDidShow(NSNotification notification);
-    [Optional] [Selector("popoverWillClose:")] void PopoverWillClose(NSNotification notification);
-    [Optional] [Selector("popoverDidClose:")] void PopoverDidClose(NSNotification notification);
+    [Optional]
+    [Selector("popoverShouldClose:")]
+    bool PopoverShouldClose(NSPopover popover);
+    [Optional]
+    [Selector("popoverShouldDetach:")]
+    bool PopoverShouldDetach(NSPopover popover);
+    [Optional]
+    [Selector("popoverDidDetach:")]
+    void PopoverDidDetach(NSPopover popover);
+    [Optional]
+    [Selector("detachableWindowForPopover:")]
+    NSWindow? DetachableWindowForPopover(NSPopover popover);
+    [Optional]
+    [Selector("popoverWillShow:")]
+    void PopoverWillShow(NSNotification notification);
+    [Optional]
+    [Selector("popoverDidShow:")]
+    void PopoverDidShow(NSNotification notification);
+    [Optional]
+    [Selector("popoverWillClose:")]
+    void PopoverWillClose(NSNotification notification);
+    [Optional]
+    [Selector("popoverDidClose:")]
+    void PopoverDidClose(NSNotification notification);
 }
 
 #endif

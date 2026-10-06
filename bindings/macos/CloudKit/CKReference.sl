@@ -39,10 +39,14 @@ public enum CKReferenceAction : ulong
 
 public extern objc class CKReference : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("referenceAction")] public CKReferenceAction ReferenceAction { get; }
-    [Selector("recordID")] public CKRecordID RecordID { get; }
-    [Selector("initWithRecordID:action:")] public Self InitWithRecordIDAction(CKRecordID recordID, CKReferenceAction action);
-    [Selector("initWithRecord:action:")] public Self InitWithRecordAction(CKRecord record, CKReferenceAction action);
+    [Selector("referenceAction")]
+    public CKReferenceAction ReferenceAction { get; }
+    [Selector("recordID")]
+    public CKRecordID RecordID { get; }
+    [Selector("initWithRecordID:action:")]
+    public Self InitWithRecordIDAction(CKRecordID recordID, CKReferenceAction action);
+    [Selector("initWithRecord:action:")]
+    public Self InitWithRecordAction(CKRecord record, CKReferenceAction action);
 }
 
 #endif

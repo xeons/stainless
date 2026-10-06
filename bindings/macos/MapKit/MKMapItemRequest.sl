@@ -35,12 +35,18 @@ public objc closure void MKMapItemRequestGetMapItemWithCompletionHandlerCompleti
 
 public extern objc class MKMapItemRequest : NSObject
 {
-    [Selector("mapItemIdentifier")] public MKMapItemIdentifier? MapItemIdentifier { get; }
-    [Selector("isCancelled")] public bool Cancelled { get; }
-    [Selector("isLoading")] public bool Loading { get; }
-    [Selector("initWithMapItemIdentifier:")] public Self InitWithMapItemIdentifier(MKMapItemIdentifier identifier);
-    [Selector("getMapItemWithCompletionHandler:")] public void GetMapItemWithCompletionHandler(MKMapItemRequestGetMapItemWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("cancel")] public void Cancel();
+    [Selector("mapItemIdentifier")]
+    public MKMapItemIdentifier? MapItemIdentifier { get; }
+    [Selector("isCancelled")]
+    public bool Cancelled { get; }
+    [Selector("isLoading")]
+    public bool Loading { get; }
+    [Selector("initWithMapItemIdentifier:")]
+    public Self InitWithMapItemIdentifier(MKMapItemIdentifier identifier);
+    [Selector("getMapItemWithCompletionHandler:")]
+    public void GetMapItemWithCompletionHandler(MKMapItemRequestGetMapItemWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

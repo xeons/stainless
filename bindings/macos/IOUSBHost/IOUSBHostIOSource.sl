@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class IOUSBHostIOSource : NSObject
 {
-    [Selector("hostInterface")] public IOUSBHostInterface HostInterface { get; }
-    [Selector("deviceAddress")] public NSUInteger DeviceAddress { get; }
-    [Selector("endpointAddress")] public NSUInteger EndpointAddress { get; }
+    [Selector("hostInterface")]
+    public IOUSBHostInterface HostInterface { get; }
+    [Selector("deviceAddress")]
+    public NSUInteger DeviceAddress { get; }
+    [Selector("endpointAddress")]
+    public NSUInteger EndpointAddress { get; }
 }
 
 public struct IOUSBHostIOSourceDescriptors

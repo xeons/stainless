@@ -75,67 +75,96 @@ public enum NSURLHandleStatus : ulong
 public objc interface NSURLHandleClient
 {
     /// Deprecated in macOS 10.4.
-    [Selector("URLHandle:resourceDataDidBecomeAvailable:")] void URLHandleResourceDataDidBecomeAvailable(NSURLHandle? sender, NSData? newBytes);
+    [Selector("URLHandle:resourceDataDidBecomeAvailable:")]
+    void URLHandleResourceDataDidBecomeAvailable(NSURLHandle? sender, NSData? newBytes);
     /// Deprecated in macOS 10.4.
-    [Selector("URLHandleResourceDidBeginLoading:")] void URLHandleResourceDidBeginLoading(NSURLHandle? sender);
+    [Selector("URLHandleResourceDidBeginLoading:")]
+    void URLHandleResourceDidBeginLoading(NSURLHandle? sender);
     /// Deprecated in macOS 10.4.
-    [Selector("URLHandleResourceDidFinishLoading:")] void URLHandleResourceDidFinishLoading(NSURLHandle? sender);
+    [Selector("URLHandleResourceDidFinishLoading:")]
+    void URLHandleResourceDidFinishLoading(NSURLHandle? sender);
     /// Deprecated in macOS 10.4.
-    [Selector("URLHandleResourceDidCancelLoading:")] void URLHandleResourceDidCancelLoading(NSURLHandle? sender);
+    [Selector("URLHandleResourceDidCancelLoading:")]
+    void URLHandleResourceDidCancelLoading(NSURLHandle? sender);
     /// Deprecated in macOS 10.4.
-    [Selector("URLHandle:resourceDidFailLoadingWithReason:")] void URLHandleResourceDidFailLoadingWithReason(NSURLHandle? sender, NSString? reason);
+    [Selector("URLHandle:resourceDidFailLoadingWithReason:")]
+    void URLHandleResourceDidFailLoadingWithReason(NSURLHandle? sender, NSString? reason);
 }
 
 public extern objc class NSURLHandle : NSObject
 {
     /// Deprecated in macOS 10.4.
-    [Selector("registerURLHandleClass:")] public static void RegisterURLHandleClass(Class anURLHandleSubclass);
+    [Selector("registerURLHandleClass:")]
+    public static void RegisterURLHandleClass(Class anURLHandleSubclass);
     /// Deprecated in macOS 10.4.
-    [Selector("URLHandleClassForURL:")] public static Class URLHandleClassForURL(NSURL? anURL);
+    [Selector("URLHandleClassForURL:")]
+    public static Class URLHandleClassForURL(NSURL? anURL);
     /// Deprecated in macOS 10.4.
-    [Selector("status")] public NSURLHandleStatus Status();
+    [Selector("status")]
+    public NSURLHandleStatus Status();
     /// Deprecated in macOS 10.4.
-    [Selector("failureReason")] public NSString? FailureReason();
+    [Selector("failureReason")]
+    public NSString? FailureReason();
     /// Deprecated in macOS 10.4.
-    [Selector("addClient:")] public void AddClient(NSURLHandleClient? client);
+    [Selector("addClient:")]
+    public void AddClient(NSURLHandleClient? client);
     /// Deprecated in macOS 10.4.
-    [Selector("removeClient:")] public void RemoveClient(NSURLHandleClient? client);
+    [Selector("removeClient:")]
+    public void RemoveClient(NSURLHandleClient? client);
     /// Deprecated in macOS 10.4.
-    [Selector("loadInBackground")] public void LoadInBackground();
+    [Selector("loadInBackground")]
+    public void LoadInBackground();
     /// Deprecated in macOS 10.4.
-    [Selector("cancelLoadInBackground")] public void CancelLoadInBackground();
+    [Selector("cancelLoadInBackground")]
+    public void CancelLoadInBackground();
     /// Deprecated in macOS 10.4.
-    [Selector("resourceData")] public NSData? ResourceData();
+    [Selector("resourceData")]
+    public NSData? ResourceData();
     /// Deprecated in macOS 10.4.
-    [Selector("availableResourceData")] public NSData? AvailableResourceData();
+    [Selector("availableResourceData")]
+    public NSData? AvailableResourceData();
     /// Deprecated in macOS 10.4.
-    [Selector("expectedResourceDataSize")] public long ExpectedResourceDataSize();
+    [Selector("expectedResourceDataSize")]
+    public long ExpectedResourceDataSize();
     /// Deprecated in macOS 10.4.
-    [Selector("flushCachedData")] public void FlushCachedData();
+    [Selector("flushCachedData")]
+    public void FlushCachedData();
     /// Deprecated in macOS 10.4.
-    [Selector("backgroundLoadDidFailWithReason:")] public void BackgroundLoadDidFailWithReason(NSString? reason);
+    [Selector("backgroundLoadDidFailWithReason:")]
+    public void BackgroundLoadDidFailWithReason(NSString? reason);
     /// Deprecated in macOS 10.4.
-    [Selector("didLoadBytes:loadComplete:")] public void DidLoadBytesLoadComplete(NSData? newBytes, bool yorn);
+    [Selector("didLoadBytes:loadComplete:")]
+    public void DidLoadBytesLoadComplete(NSData? newBytes, bool yorn);
     /// Deprecated in macOS 10.4.
-    [Selector("canInitWithURL:")] public static bool CanInitWithURL(NSURL? anURL);
+    [Selector("canInitWithURL:")]
+    public static bool CanInitWithURL(NSURL? anURL);
     /// Deprecated in macOS 10.4.
-    [Selector("cachedHandleForURL:")] public static NSURLHandle? CachedHandleForURL(NSURL? anURL);
+    [Selector("cachedHandleForURL:")]
+    public static NSURLHandle? CachedHandleForURL(NSURL? anURL);
     /// Deprecated in macOS 10.4.
-    [Selector("initWithURL:cached:")] public AnyObject? InitWithURLCached(NSURL? anURL, bool willCache);
+    [Selector("initWithURL:cached:")]
+    public AnyObject? InitWithURLCached(NSURL? anURL, bool willCache);
     /// Deprecated in macOS 10.4.
-    [Selector("propertyForKey:")] public AnyObject? PropertyForKey(NSString? propertyKey);
+    [Selector("propertyForKey:")]
+    public AnyObject? PropertyForKey(NSString? propertyKey);
     /// Deprecated in macOS 10.4.
-    [Selector("propertyForKeyIfAvailable:")] public AnyObject? PropertyForKeyIfAvailable(NSString? propertyKey);
+    [Selector("propertyForKeyIfAvailable:")]
+    public AnyObject? PropertyForKeyIfAvailable(NSString? propertyKey);
     /// Deprecated in macOS 10.4.
-    [Selector("writeProperty:forKey:")] public bool WritePropertyForKey(AnyObject? propertyValue, NSString? propertyKey);
+    [Selector("writeProperty:forKey:")]
+    public bool WritePropertyForKey(AnyObject? propertyValue, NSString? propertyKey);
     /// Deprecated in macOS 10.4.
-    [Selector("writeData:")] public bool WriteData(NSData? data);
+    [Selector("writeData:")]
+    public bool WriteData(NSData? data);
     /// Deprecated in macOS 10.4.
-    [Selector("loadInForeground")] public NSData? LoadInForeground();
+    [Selector("loadInForeground")]
+    public NSData? LoadInForeground();
     /// Deprecated in macOS 10.4.
-    [Selector("beginLoadInBackground")] public void BeginLoadInBackground();
+    [Selector("beginLoadInBackground")]
+    public void BeginLoadInBackground();
     /// Deprecated in macOS 10.4.
-    [Selector("endLoadInBackground")] public void EndLoadInBackground();
+    [Selector("endLoadInBackground")]
+    public void EndLoadInBackground();
 }
 
 #endif

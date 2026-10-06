@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class PHASEOccluder : PHASEObject
 {
-    [Selector("shapes")] public NSArray Shapes { get; }
-    [Selector("initWithEngine:shapes:")] public Self InitWithEngineShapes(PHASEEngine engine, NSArray shapes);
+    [Selector("shapes")]
+    public NSArray Shapes { get; }
+    [Selector("initWithEngine:shapes:")]
+    public Self InitWithEngineShapes(PHASEEngine engine, NSArray shapes);
 }
 
 #endif

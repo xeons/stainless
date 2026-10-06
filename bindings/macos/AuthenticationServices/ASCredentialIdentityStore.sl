@@ -69,19 +69,29 @@ public objc closure void ASCredentialIdentityStoreReplaceCredentialIdentityEntri
 
 public extern objc class ASCredentialIdentityStore : NSObject
 {
-    [Selector("sharedStore")] public static ASCredentialIdentityStore SharedStore { get; }
-    [Selector("getCredentialIdentityStoreStateWithCompletion:")] public void GetCredentialIdentityStoreStateWithCompletion(ASCredentialIdentityStoreGetCredentialIdentityStoreStateWithCompletionCompletionBlock completion);
-    [Selector("getCredentialIdentitiesForService:credentialIdentityTypes:completionHandler:")] public void GetCredentialIdentitiesForServiceCredentialIdentityTypesCompletionHandler(ASCredentialServiceIdentifier? serviceIdentifier, ASCredentialIdentityTypes credentialIdentityTypes, ASCredentialIdentityStoreGetCredentialIdentitiesForServiceCredentialIdentityTypesCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("sharedStore")]
+    public static ASCredentialIdentityStore SharedStore { get; }
+    [Selector("getCredentialIdentityStoreStateWithCompletion:")]
+    public void GetCredentialIdentityStoreStateWithCompletion(ASCredentialIdentityStoreGetCredentialIdentityStoreStateWithCompletionCompletionBlock completion);
+    [Selector("getCredentialIdentitiesForService:credentialIdentityTypes:completionHandler:")]
+    public void GetCredentialIdentitiesForServiceCredentialIdentityTypesCompletionHandler(ASCredentialServiceIdentifier? serviceIdentifier, ASCredentialIdentityTypes credentialIdentityTypes, ASCredentialIdentityStoreGetCredentialIdentitiesForServiceCredentialIdentityTypesCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 14.0.
-    [Selector("saveCredentialIdentities:completion:")] public void SaveCredentialIdentitiesCompletion(NSArray credentialIdentities, ASCredentialIdentityStoreSaveCredentialIdentitiesCompletionCompletionBlock? completion);
-    [Selector("saveCredentialIdentityEntries:completion:")] public void SaveCredentialIdentityEntriesCompletion(NSArray credentialIdentities, ASCredentialIdentityStoreSaveCredentialIdentityEntriesCompletionCompletionBlock? completion);
+    [Selector("saveCredentialIdentities:completion:")]
+    public void SaveCredentialIdentitiesCompletion(NSArray credentialIdentities, ASCredentialIdentityStoreSaveCredentialIdentitiesCompletionCompletionBlock? completion);
+    [Selector("saveCredentialIdentityEntries:completion:")]
+    public void SaveCredentialIdentityEntriesCompletion(NSArray credentialIdentities, ASCredentialIdentityStoreSaveCredentialIdentityEntriesCompletionCompletionBlock? completion);
     /// Deprecated in macOS 14.0.
-    [Selector("removeCredentialIdentities:completion:")] public void RemoveCredentialIdentitiesCompletion(NSArray credentialIdentities, ASCredentialIdentityStoreRemoveCredentialIdentitiesCompletionCompletionBlock? completion);
-    [Selector("removeCredentialIdentityEntries:completion:")] public void RemoveCredentialIdentityEntriesCompletion(NSArray credentialIdentities, ASCredentialIdentityStoreRemoveCredentialIdentityEntriesCompletionCompletionBlock? completion);
-    [Selector("removeAllCredentialIdentitiesWithCompletion:")] public void RemoveAllCredentialIdentitiesWithCompletion(ASCredentialIdentityStoreRemoveAllCredentialIdentitiesWithCompletionCompletionBlock? completion);
+    [Selector("removeCredentialIdentities:completion:")]
+    public void RemoveCredentialIdentitiesCompletion(NSArray credentialIdentities, ASCredentialIdentityStoreRemoveCredentialIdentitiesCompletionCompletionBlock? completion);
+    [Selector("removeCredentialIdentityEntries:completion:")]
+    public void RemoveCredentialIdentityEntriesCompletion(NSArray credentialIdentities, ASCredentialIdentityStoreRemoveCredentialIdentityEntriesCompletionCompletionBlock? completion);
+    [Selector("removeAllCredentialIdentitiesWithCompletion:")]
+    public void RemoveAllCredentialIdentitiesWithCompletion(ASCredentialIdentityStoreRemoveAllCredentialIdentitiesWithCompletionCompletionBlock? completion);
     /// Deprecated in macOS 14.0.
-    [Selector("replaceCredentialIdentitiesWithIdentities:completion:")] public void ReplaceCredentialIdentitiesWithIdentitiesCompletion(NSArray newCredentialIdentities, ASCredentialIdentityStoreReplaceCredentialIdentitiesWithIdentitiesCompletionCompletionBlock? completion);
-    [Selector("replaceCredentialIdentityEntries:completion:")] public void ReplaceCredentialIdentityEntriesCompletion(NSArray newCredentialIdentities, ASCredentialIdentityStoreReplaceCredentialIdentityEntriesCompletionCompletionBlock? completion);
+    [Selector("replaceCredentialIdentitiesWithIdentities:completion:")]
+    public void ReplaceCredentialIdentitiesWithIdentitiesCompletion(NSArray newCredentialIdentities, ASCredentialIdentityStoreReplaceCredentialIdentitiesWithIdentitiesCompletionCompletionBlock? completion);
+    [Selector("replaceCredentialIdentityEntries:completion:")]
+    public void ReplaceCredentialIdentityEntriesCompletion(NSArray newCredentialIdentities, ASCredentialIdentityStoreReplaceCredentialIdentityEntriesCompletionCompletionBlock? completion);
 }
 
 #endif

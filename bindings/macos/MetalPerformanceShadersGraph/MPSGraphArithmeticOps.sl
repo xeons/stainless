@@ -33,84 +33,161 @@ import Standard.ObjC;
 /// MPSGraphArithmeticOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("identityWithTensor:name:")] public MPSGraphTensor IdentityWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("exponentWithTensor:name:")] public MPSGraphTensor ExponentWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("exponentBase2WithTensor:name:")] public MPSGraphTensor ExponentBase2WithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("exponentBase10WithTensor:name:")] public MPSGraphTensor ExponentBase10WithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("logarithmWithTensor:name:")] public MPSGraphTensor LogarithmWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("logarithmBase2WithTensor:name:")] public MPSGraphTensor LogarithmBase2WithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("logarithmBase10WithTensor:name:")] public MPSGraphTensor LogarithmBase10WithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("squareWithTensor:name:")] public MPSGraphTensor SquareWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("squareRootWithTensor:name:")] public MPSGraphTensor SquareRootWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("reciprocalSquareRootWithTensor:name:")] public MPSGraphTensor ReciprocalSquareRootWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("identityWithTensor:name:")]
+    public MPSGraphTensor IdentityWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("exponentWithTensor:name:")]
+    public MPSGraphTensor ExponentWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("exponentBase2WithTensor:name:")]
+    public MPSGraphTensor ExponentBase2WithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("exponentBase10WithTensor:name:")]
+    public MPSGraphTensor ExponentBase10WithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("logarithmWithTensor:name:")]
+    public MPSGraphTensor LogarithmWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("logarithmBase2WithTensor:name:")]
+    public MPSGraphTensor LogarithmBase2WithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("logarithmBase10WithTensor:name:")]
+    public MPSGraphTensor LogarithmBase10WithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("squareWithTensor:name:")]
+    public MPSGraphTensor SquareWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("squareRootWithTensor:name:")]
+    public MPSGraphTensor SquareRootWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("reciprocalSquareRootWithTensor:name:")]
+    public MPSGraphTensor ReciprocalSquareRootWithTensorName(MPSGraphTensor tensor, NSString? name);
     /// Deprecated in macOS 15.0.
-    [Selector("reverseSquareRootWithTensor:name:")] public MPSGraphTensor ReverseSquareRootWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("reciprocalWithTensor:name:")] public MPSGraphTensor ReciprocalWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("absoluteWithTensor:name:")] public MPSGraphTensor AbsoluteWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("absoluteSquareWithTensor:name:")] public MPSGraphTensor AbsoluteSquareWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("negativeWithTensor:name:")] public MPSGraphTensor NegativeWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("signWithTensor:name:")] public MPSGraphTensor SignWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("signbitWithTensor:name:")] public MPSGraphTensor SignbitWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("ceilWithTensor:name:")] public MPSGraphTensor CeilWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("floorWithTensor:name:")] public MPSGraphTensor FloorWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("roundWithTensor:name:")] public MPSGraphTensor RoundWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("rintWithTensor:name:")] public MPSGraphTensor RintWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("sinWithTensor:name:")] public MPSGraphTensor SinWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("cosWithTensor:name:")] public MPSGraphTensor CosWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("tanWithTensor:name:")] public MPSGraphTensor TanWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("sinhWithTensor:name:")] public MPSGraphTensor SinhWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("coshWithTensor:name:")] public MPSGraphTensor CoshWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("tanhWithTensor:name:")] public MPSGraphTensor TanhWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("asinWithTensor:name:")] public MPSGraphTensor AsinWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("acosWithTensor:name:")] public MPSGraphTensor AcosWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("atanWithTensor:name:")] public MPSGraphTensor AtanWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("asinhWithTensor:name:")] public MPSGraphTensor AsinhWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("acoshWithTensor:name:")] public MPSGraphTensor AcoshWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("atanhWithTensor:name:")] public MPSGraphTensor AtanhWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("notWithTensor:name:")] public MPSGraphTensor NotWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("isInfiniteWithTensor:name:")] public MPSGraphTensor IsInfiniteWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("isFiniteWithTensor:name:")] public MPSGraphTensor IsFiniteWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("isNaNWithTensor:name:")] public MPSGraphTensor IsNaNWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("erfWithTensor:name:")] public MPSGraphTensor ErfWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("truncateWithTensor:name:")] public MPSGraphTensor TruncateWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("bitwiseNOTWithTensor:name:")] public MPSGraphTensor BitwiseNOTWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("bitwisePopulationCountWithTensor:name:")] public MPSGraphTensor BitwisePopulationCountWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("conjugateWithTensor:name:")] public MPSGraphTensor ConjugateWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("additionWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor AdditionWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("subtractionWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor SubtractionWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("multiplicationWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor MultiplicationWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("divisionWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor DivisionWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("moduloWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor ModuloWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("powerWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor PowerWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("minimumWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor MinimumWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("maximumWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor MaximumWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("minimumWithNaNPropagationWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor MinimumWithNaNPropagationWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("maximumWithNaNPropagationWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor MaximumWithNaNPropagationWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("equalWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor EqualWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("notEqualWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor NotEqualWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("lessThanWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor LessThanWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("lessThanOrEqualToWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor LessThanOrEqualToWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("greaterThanWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor GreaterThanWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("greaterThanOrEqualToWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor GreaterThanOrEqualToWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("logicalANDWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor LogicalANDWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("logicalORWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor LogicalORWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("logicalNANDWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor LogicalNANDWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("logicalNORWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor LogicalNORWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("logicalXORWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor LogicalXORWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("logicalXNORWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor LogicalXNORWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("atan2WithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor Atan2WithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("bitwiseANDWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor BitwiseANDWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("bitwiseORWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor BitwiseORWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("bitwiseXORWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor BitwiseXORWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("bitwiseLeftShiftWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor BitwiseLeftShiftWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("bitwiseRightShiftWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor BitwiseRightShiftWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("selectWithPredicateTensor:truePredicateTensor:falsePredicateTensor:name:")] public MPSGraphTensor SelectWithPredicateTensorTruePredicateTensorFalsePredicateTensorName(MPSGraphTensor predicateTensor, MPSGraphTensor truePredicateTensor, MPSGraphTensor falseSelectTensor, NSString? name);
-    [Selector("clampWithTensor:minValueTensor:maxValueTensor:name:")] public MPSGraphTensor ClampWithTensorMinValueTensorMaxValueTensorName(MPSGraphTensor tensor, MPSGraphTensor minValueTensor, MPSGraphTensor maxValueTensor, NSString? name);
-    [Selector("divisionNoNaNWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor DivisionNoNaNWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("floorModuloWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor FloorModuloWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("realPartOfTensor:name:")] public MPSGraphTensor RealPartOfTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("imaginaryPartOfTensor:name:")] public MPSGraphTensor ImaginaryPartOfTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("complexTensorWithRealTensor:imaginaryTensor:name:")] public MPSGraphTensor ComplexTensorWithRealTensorImaginaryTensorName(MPSGraphTensor realTensor, MPSGraphTensor imaginaryTensor, NSString? name);
+    [Selector("reverseSquareRootWithTensor:name:")]
+    public MPSGraphTensor ReverseSquareRootWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("reciprocalWithTensor:name:")]
+    public MPSGraphTensor ReciprocalWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("absoluteWithTensor:name:")]
+    public MPSGraphTensor AbsoluteWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("absoluteSquareWithTensor:name:")]
+    public MPSGraphTensor AbsoluteSquareWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("negativeWithTensor:name:")]
+    public MPSGraphTensor NegativeWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("signWithTensor:name:")]
+    public MPSGraphTensor SignWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("signbitWithTensor:name:")]
+    public MPSGraphTensor SignbitWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("ceilWithTensor:name:")]
+    public MPSGraphTensor CeilWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("floorWithTensor:name:")]
+    public MPSGraphTensor FloorWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("roundWithTensor:name:")]
+    public MPSGraphTensor RoundWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("rintWithTensor:name:")]
+    public MPSGraphTensor RintWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("sinWithTensor:name:")]
+    public MPSGraphTensor SinWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("cosWithTensor:name:")]
+    public MPSGraphTensor CosWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("tanWithTensor:name:")]
+    public MPSGraphTensor TanWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("sinhWithTensor:name:")]
+    public MPSGraphTensor SinhWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("coshWithTensor:name:")]
+    public MPSGraphTensor CoshWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("tanhWithTensor:name:")]
+    public MPSGraphTensor TanhWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("asinWithTensor:name:")]
+    public MPSGraphTensor AsinWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("acosWithTensor:name:")]
+    public MPSGraphTensor AcosWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("atanWithTensor:name:")]
+    public MPSGraphTensor AtanWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("asinhWithTensor:name:")]
+    public MPSGraphTensor AsinhWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("acoshWithTensor:name:")]
+    public MPSGraphTensor AcoshWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("atanhWithTensor:name:")]
+    public MPSGraphTensor AtanhWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("notWithTensor:name:")]
+    public MPSGraphTensor NotWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("isInfiniteWithTensor:name:")]
+    public MPSGraphTensor IsInfiniteWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("isFiniteWithTensor:name:")]
+    public MPSGraphTensor IsFiniteWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("isNaNWithTensor:name:")]
+    public MPSGraphTensor IsNaNWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("erfWithTensor:name:")]
+    public MPSGraphTensor ErfWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("truncateWithTensor:name:")]
+    public MPSGraphTensor TruncateWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("bitwiseNOTWithTensor:name:")]
+    public MPSGraphTensor BitwiseNOTWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("bitwisePopulationCountWithTensor:name:")]
+    public MPSGraphTensor BitwisePopulationCountWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("conjugateWithTensor:name:")]
+    public MPSGraphTensor ConjugateWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("additionWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor AdditionWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("subtractionWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor SubtractionWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("multiplicationWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor MultiplicationWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("divisionWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor DivisionWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("moduloWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor ModuloWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("powerWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor PowerWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("minimumWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor MinimumWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("maximumWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor MaximumWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("minimumWithNaNPropagationWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor MinimumWithNaNPropagationWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("maximumWithNaNPropagationWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor MaximumWithNaNPropagationWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("equalWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor EqualWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("notEqualWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor NotEqualWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("lessThanWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor LessThanWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("lessThanOrEqualToWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor LessThanOrEqualToWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("greaterThanWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor GreaterThanWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("greaterThanOrEqualToWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor GreaterThanOrEqualToWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("logicalANDWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor LogicalANDWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("logicalORWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor LogicalORWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("logicalNANDWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor LogicalNANDWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("logicalNORWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor LogicalNORWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("logicalXORWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor LogicalXORWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("logicalXNORWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor LogicalXNORWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("atan2WithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor Atan2WithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("bitwiseANDWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor BitwiseANDWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("bitwiseORWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor BitwiseORWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("bitwiseXORWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor BitwiseXORWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("bitwiseLeftShiftWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor BitwiseLeftShiftWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("bitwiseRightShiftWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor BitwiseRightShiftWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("selectWithPredicateTensor:truePredicateTensor:falsePredicateTensor:name:")]
+    public MPSGraphTensor SelectWithPredicateTensorTruePredicateTensorFalsePredicateTensorName(MPSGraphTensor predicateTensor, MPSGraphTensor truePredicateTensor, MPSGraphTensor falseSelectTensor, NSString? name);
+    [Selector("clampWithTensor:minValueTensor:maxValueTensor:name:")]
+    public MPSGraphTensor ClampWithTensorMinValueTensorMaxValueTensorName(MPSGraphTensor tensor, MPSGraphTensor minValueTensor, MPSGraphTensor maxValueTensor, NSString? name);
+    [Selector("divisionNoNaNWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor DivisionNoNaNWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("floorModuloWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor FloorModuloWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("realPartOfTensor:name:")]
+    public MPSGraphTensor RealPartOfTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("imaginaryPartOfTensor:name:")]
+    public MPSGraphTensor ImaginaryPartOfTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("complexTensorWithRealTensor:imaginaryTensor:name:")]
+    public MPSGraphTensor ComplexTensorWithRealTensorImaginaryTensorName(MPSGraphTensor realTensor, MPSGraphTensor imaginaryTensor, NSString? name);
 }
 
 #endif

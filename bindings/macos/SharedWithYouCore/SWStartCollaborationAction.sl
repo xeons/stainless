@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class SWStartCollaborationAction : SWAction, NSSecureCoding, NSCopying
 {
-    [Selector("collaborationMetadata")] public SWCollaborationMetadata CollaborationMetadata { get; }
-    [Selector("fulfillUsingURL:collaborationIdentifier:")] public void FulfillUsingURLCollaborationIdentifier(NSURL url, SWCollaborationIdentifier collaborationIdentifier);
+    [Selector("collaborationMetadata")]
+    public SWCollaborationMetadata CollaborationMetadata { get; }
+    [Selector("fulfillUsingURL:collaborationIdentifier:")]
+    public void FulfillUsingURLCollaborationIdentifier(NSURL url, SWCollaborationIdentifier collaborationIdentifier);
 }
 
 #endif

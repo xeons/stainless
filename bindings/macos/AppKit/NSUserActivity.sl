@@ -33,21 +33,26 @@ import Standard.ObjC;
 
 public objc interface NSUserActivityRestoring : NSObjectProtocol
 {
-    [Selector("restoreUserActivityState:")] void RestoreUserActivityState(NSUserActivity userActivity);
+    [Selector("restoreUserActivityState:")]
+    void RestoreUserActivityState(NSUserActivity userActivity);
 }
 
 /// NSUserActivity, a category of NSResponder.
 public extern objc class NSResponder : NSUserActivityRestoring
 {
-    [Selector("userActivity", "setUserActivity:")] public NSUserActivity? UserActivity { get; set; }
-    [Selector("updateUserActivityState:")] public void UpdateUserActivityState(NSUserActivity userActivity);
+    [Selector("userActivity", "setUserActivity:")]
+    public NSUserActivity? UserActivity { get; set; }
+    [Selector("updateUserActivityState:")]
+    public void UpdateUserActivityState(NSUserActivity userActivity);
 }
 
 /// NSUserActivity, a category of NSDocument.
 public extern objc class NSDocument : NSUserActivityRestoring
 {
-    [Selector("userActivity", "setUserActivity:")] public NSUserActivity? UserActivity { get; set; }
-    [Selector("updateUserActivityState:")] public void UpdateUserActivityState(NSUserActivity activity);
+    [Selector("userActivity", "setUserActivity:")]
+    public NSUserActivity? UserActivity { get; set; }
+    [Selector("updateUserActivityState:")]
+    public void UpdateUserActivityState(NSUserActivity activity);
 }
 
 public extern "C" NSString? NSUserActivityDocumentURLKey;

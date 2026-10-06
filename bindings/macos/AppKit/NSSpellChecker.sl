@@ -63,57 +63,108 @@ public objc closure void NSSpellCheckerShowCorrectionIndicatorOfTypePrimaryStrin
 
 public extern objc class NSSpellChecker : NSObject
 {
-    [Selector("sharedSpellChecker")] public static NSSpellChecker SharedSpellChecker { get; }
-    [Selector("sharedSpellCheckerExists")] public static bool SharedSpellCheckerExists { get; }
-    [Selector("userReplacementsDictionary")] public NSDictionary? UserReplacementsDictionary { get; }
-    [Selector("spellingPanel")] public NSPanel SpellingPanel { get; }
-    [Selector("accessoryView", "setAccessoryView:")] public NSView? AccessoryView { get; set; }
-    [Selector("substitutionsPanel")] public NSPanel? SubstitutionsPanel { get; }
-    [Selector("substitutionsPanelAccessoryViewController", "setSubstitutionsPanelAccessoryViewController:")] public NSViewController? SubstitutionsPanelAccessoryViewController { get; set; }
-    [Selector("availableLanguages")] public NSArray? AvailableLanguages { get; }
-    [Selector("userPreferredLanguages")] public NSArray? UserPreferredLanguages { get; }
-    [Selector("automaticallyIdentifiesLanguages", "setAutomaticallyIdentifiesLanguages:")] public bool AutomaticallyIdentifiesLanguages { get; set; }
-    [Selector("isAutomaticTextReplacementEnabled")] public static bool AutomaticTextReplacementEnabled { get; }
-    [Selector("isAutomaticSpellingCorrectionEnabled")] public static bool AutomaticSpellingCorrectionEnabled { get; }
-    [Selector("isAutomaticQuoteSubstitutionEnabled")] public static bool AutomaticQuoteSubstitutionEnabled { get; }
-    [Selector("isAutomaticDashSubstitutionEnabled")] public static bool AutomaticDashSubstitutionEnabled { get; }
-    [Selector("isAutomaticCapitalizationEnabled")] public static bool AutomaticCapitalizationEnabled { get; }
-    [Selector("isAutomaticPeriodSubstitutionEnabled")] public static bool AutomaticPeriodSubstitutionEnabled { get; }
-    [Selector("isAutomaticTextCompletionEnabled")] public static bool AutomaticTextCompletionEnabled { get; }
-    [Selector("isAutomaticInlinePredictionEnabled")] public static bool AutomaticInlinePredictionEnabled { get; }
-    [Selector("uniqueSpellDocumentTag")] public static NSInteger UniqueSpellDocumentTag();
-    [Selector("checkSpellingOfString:startingAt:language:wrap:inSpellDocumentWithTag:wordCount:")] public NSRange CheckSpellingOfStringStartingAtLanguageWrapInSpellDocumentWithTagWordCount(NSString stringToCheck, NSInteger startingOffset, NSString? language, bool wrapFlag, NSInteger tag, NSInteger* wordCount);
-    [Selector("checkSpellingOfString:startingAt:")] public NSRange CheckSpellingOfStringStartingAt(NSString stringToCheck, NSInteger startingOffset);
-    [Selector("countWordsInString:language:")] public NSInteger CountWordsInStringLanguage(NSString stringToCount, NSString? language);
-    [Selector("checkGrammarOfString:startingAt:language:wrap:inSpellDocumentWithTag:details:")] public NSRange CheckGrammarOfStringStartingAtLanguageWrapInSpellDocumentWithTagDetails(NSString stringToCheck, NSInteger startingOffset, NSString? language, bool wrapFlag, NSInteger tag, out NSArray? details);
-    [Selector("checkString:range:types:options:inSpellDocumentWithTag:orthography:wordCount:")] public NSArray CheckStringRangeTypesOptionsInSpellDocumentWithTagOrthographyWordCount(NSString stringToCheck, NSRange range, NSTextCheckingTypes checkingTypes, NSDictionary? options, NSInteger tag, out NSOrthography? orthography, NSInteger* wordCount);
-    [Selector("requestCheckingOfString:range:types:options:inSpellDocumentWithTag:completionHandler:")] public NSInteger RequestCheckingOfStringRangeTypesOptionsInSpellDocumentWithTagCompletionHandler(NSString stringToCheck, NSRange range, NSTextCheckingTypes checkingTypes, NSDictionary? options, NSInteger tag, NSSpellCheckerRequestCheckingOfStringRangeTypesOptionsInSpellDocumentWithTagCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("requestCandidatesForSelectedRange:inString:types:options:inSpellDocumentWithTag:completionHandler:")] public NSInteger RequestCandidatesForSelectedRangeInStringTypesOptionsInSpellDocumentWithTagCompletionHandler(NSRange selectedRange, NSString stringToCheck, NSTextCheckingTypes checkingTypes, NSDictionary? options, NSInteger tag, NSSpellCheckerRequestCandidatesForSelectedRangeInStringTypesOptionsInSpellDocumentWithTagCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("menuForResult:string:options:atLocation:inView:")] public NSMenu? MenuForResultStringOptionsAtLocationInView(NSTextCheckingResult result, NSString checkedString, NSDictionary? options, NSPoint location, NSView view);
-    [Selector("userQuotesArrayForLanguage:")] public NSArray UserQuotesArrayForLanguage(NSString language);
-    [Selector("updateSpellingPanelWithMisspelledWord:")] public void UpdateSpellingPanelWithMisspelledWord(NSString word);
-    [Selector("updateSpellingPanelWithGrammarString:detail:")] public void UpdateSpellingPanelWithGrammarStringDetail(NSString string, NSDictionary detail);
-    [Selector("updatePanels")] public void UpdatePanels();
-    [Selector("ignoreWord:inSpellDocumentWithTag:")] public void IgnoreWordInSpellDocumentWithTag(NSString wordToIgnore, NSInteger tag);
-    [Selector("ignoredWordsInSpellDocumentWithTag:")] public NSArray? IgnoredWordsInSpellDocumentWithTag(NSInteger tag);
-    [Selector("setIgnoredWords:inSpellDocumentWithTag:")] public void SetIgnoredWordsInSpellDocumentWithTag(NSArray words, NSInteger tag);
-    [Selector("guessesForWordRange:inString:language:inSpellDocumentWithTag:")] public NSArray? GuessesForWordRangeInStringLanguageInSpellDocumentWithTag(NSRange range, NSString string, NSString? language, NSInteger tag);
-    [Selector("correctionForWordRange:inString:language:inSpellDocumentWithTag:")] public NSString? CorrectionForWordRangeInStringLanguageInSpellDocumentWithTag(NSRange range, NSString string, NSString language, NSInteger tag);
-    [Selector("completionsForPartialWordRange:inString:language:inSpellDocumentWithTag:")] public NSArray? CompletionsForPartialWordRangeInStringLanguageInSpellDocumentWithTag(NSRange range, NSString string, NSString? language, NSInteger tag);
-    [Selector("languageForWordRange:inString:orthography:")] public NSString? LanguageForWordRangeInStringOrthography(NSRange range, NSString string, NSOrthography? orthography);
-    [Selector("closeSpellDocumentWithTag:")] public void CloseSpellDocumentWithTag(NSInteger tag);
-    [Selector("recordResponse:toCorrection:forWord:language:inSpellDocumentWithTag:")] public void RecordResponseToCorrectionForWordLanguageInSpellDocumentWithTag(NSCorrectionResponse response, NSString correction, NSString word, NSString? language, NSInteger tag);
-    [Selector("showCorrectionIndicatorOfType:primaryString:alternativeStrings:forStringInRect:view:completionHandler:")] public void ShowCorrectionIndicatorOfTypePrimaryStringAlternativeStringsForStringInRectViewCompletionHandler(NSCorrectionIndicatorType type, NSString primaryString, NSArray alternativeStrings, NSRect rectOfTypedString, NSView view, NSSpellCheckerShowCorrectionIndicatorOfTypePrimaryStringAlternativeStringsForStringInRectViewCompletionHandlerCompletionBlock? completionBlock);
-    [Selector("dismissCorrectionIndicatorForView:")] public void DismissCorrectionIndicatorForView(NSView view);
-    [Selector("showInlinePredictionForCandidates:client:")] public void ShowInlinePredictionForCandidatesClient(NSArray candidates, NSTextInputClient client);
-    [Selector("preventsAutocorrectionBeforeString:language:")] public bool PreventsAutocorrectionBeforeStringLanguage(NSString string, NSString? language);
-    [Selector("deletesAutospaceBetweenString:andString:language:")] public bool DeletesAutospaceBetweenStringAndStringLanguage(NSString precedingString, NSString followingString, NSString? language);
-    [Selector("setWordFieldStringValue:")] public void SetWordFieldStringValue(NSString string);
-    [Selector("learnWord:")] public void LearnWord(NSString word);
-    [Selector("hasLearnedWord:")] public bool HasLearnedWord(NSString word);
-    [Selector("unlearnWord:")] public void UnlearnWord(NSString word);
-    [Selector("language")] public NSString Language();
-    [Selector("setLanguage:")] public bool SetLanguage(NSString language);
+    [Selector("sharedSpellChecker")]
+    public static NSSpellChecker SharedSpellChecker { get; }
+    [Selector("sharedSpellCheckerExists")]
+    public static bool SharedSpellCheckerExists { get; }
+    [Selector("userReplacementsDictionary")]
+    public NSDictionary? UserReplacementsDictionary { get; }
+    [Selector("spellingPanel")]
+    public NSPanel SpellingPanel { get; }
+    [Selector("accessoryView", "setAccessoryView:")]
+    public NSView? AccessoryView { get; set; }
+    [Selector("substitutionsPanel")]
+    public NSPanel? SubstitutionsPanel { get; }
+    [Selector("substitutionsPanelAccessoryViewController", "setSubstitutionsPanelAccessoryViewController:")]
+    public NSViewController? SubstitutionsPanelAccessoryViewController { get; set; }
+    [Selector("availableLanguages")]
+    public NSArray? AvailableLanguages { get; }
+    [Selector("userPreferredLanguages")]
+    public NSArray? UserPreferredLanguages { get; }
+    [Selector("automaticallyIdentifiesLanguages", "setAutomaticallyIdentifiesLanguages:")]
+    public bool AutomaticallyIdentifiesLanguages { get; set; }
+    [Selector("isAutomaticTextReplacementEnabled")]
+    public static bool AutomaticTextReplacementEnabled { get; }
+    [Selector("isAutomaticSpellingCorrectionEnabled")]
+    public static bool AutomaticSpellingCorrectionEnabled { get; }
+    [Selector("isAutomaticQuoteSubstitutionEnabled")]
+    public static bool AutomaticQuoteSubstitutionEnabled { get; }
+    [Selector("isAutomaticDashSubstitutionEnabled")]
+    public static bool AutomaticDashSubstitutionEnabled { get; }
+    [Selector("isAutomaticCapitalizationEnabled")]
+    public static bool AutomaticCapitalizationEnabled { get; }
+    [Selector("isAutomaticPeriodSubstitutionEnabled")]
+    public static bool AutomaticPeriodSubstitutionEnabled { get; }
+    [Selector("isAutomaticTextCompletionEnabled")]
+    public static bool AutomaticTextCompletionEnabled { get; }
+    [Selector("isAutomaticInlinePredictionEnabled")]
+    public static bool AutomaticInlinePredictionEnabled { get; }
+    [Selector("uniqueSpellDocumentTag")]
+    public static NSInteger UniqueSpellDocumentTag();
+    [Selector("checkSpellingOfString:startingAt:language:wrap:inSpellDocumentWithTag:wordCount:")]
+    public NSRange CheckSpellingOfStringStartingAtLanguageWrapInSpellDocumentWithTagWordCount(NSString stringToCheck, NSInteger startingOffset, NSString? language, bool wrapFlag, NSInteger tag, NSInteger* wordCount);
+    [Selector("checkSpellingOfString:startingAt:")]
+    public NSRange CheckSpellingOfStringStartingAt(NSString stringToCheck, NSInteger startingOffset);
+    [Selector("countWordsInString:language:")]
+    public NSInteger CountWordsInStringLanguage(NSString stringToCount, NSString? language);
+    [Selector("checkGrammarOfString:startingAt:language:wrap:inSpellDocumentWithTag:details:")]
+    public NSRange CheckGrammarOfStringStartingAtLanguageWrapInSpellDocumentWithTagDetails(NSString stringToCheck, NSInteger startingOffset, NSString? language, bool wrapFlag, NSInteger tag, out NSArray? details);
+    [Selector("checkString:range:types:options:inSpellDocumentWithTag:orthography:wordCount:")]
+    public NSArray CheckStringRangeTypesOptionsInSpellDocumentWithTagOrthographyWordCount(NSString stringToCheck, NSRange range, NSTextCheckingTypes checkingTypes, NSDictionary? options, NSInteger tag, out NSOrthography? orthography, NSInteger* wordCount);
+    [Selector("requestCheckingOfString:range:types:options:inSpellDocumentWithTag:completionHandler:")]
+    public NSInteger RequestCheckingOfStringRangeTypesOptionsInSpellDocumentWithTagCompletionHandler(NSString stringToCheck, NSRange range, NSTextCheckingTypes checkingTypes, NSDictionary? options, NSInteger tag, NSSpellCheckerRequestCheckingOfStringRangeTypesOptionsInSpellDocumentWithTagCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("requestCandidatesForSelectedRange:inString:types:options:inSpellDocumentWithTag:completionHandler:")]
+    public NSInteger RequestCandidatesForSelectedRangeInStringTypesOptionsInSpellDocumentWithTagCompletionHandler(NSRange selectedRange, NSString stringToCheck, NSTextCheckingTypes checkingTypes, NSDictionary? options, NSInteger tag, NSSpellCheckerRequestCandidatesForSelectedRangeInStringTypesOptionsInSpellDocumentWithTagCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("menuForResult:string:options:atLocation:inView:")]
+    public NSMenu? MenuForResultStringOptionsAtLocationInView(NSTextCheckingResult result, NSString checkedString, NSDictionary? options, NSPoint location, NSView view);
+    [Selector("userQuotesArrayForLanguage:")]
+    public NSArray UserQuotesArrayForLanguage(NSString language);
+    [Selector("updateSpellingPanelWithMisspelledWord:")]
+    public void UpdateSpellingPanelWithMisspelledWord(NSString word);
+    [Selector("updateSpellingPanelWithGrammarString:detail:")]
+    public void UpdateSpellingPanelWithGrammarStringDetail(NSString string, NSDictionary detail);
+    [Selector("updatePanels")]
+    public void UpdatePanels();
+    [Selector("ignoreWord:inSpellDocumentWithTag:")]
+    public void IgnoreWordInSpellDocumentWithTag(NSString wordToIgnore, NSInteger tag);
+    [Selector("ignoredWordsInSpellDocumentWithTag:")]
+    public NSArray? IgnoredWordsInSpellDocumentWithTag(NSInteger tag);
+    [Selector("setIgnoredWords:inSpellDocumentWithTag:")]
+    public void SetIgnoredWordsInSpellDocumentWithTag(NSArray words, NSInteger tag);
+    [Selector("guessesForWordRange:inString:language:inSpellDocumentWithTag:")]
+    public NSArray? GuessesForWordRangeInStringLanguageInSpellDocumentWithTag(NSRange range, NSString string, NSString? language, NSInteger tag);
+    [Selector("correctionForWordRange:inString:language:inSpellDocumentWithTag:")]
+    public NSString? CorrectionForWordRangeInStringLanguageInSpellDocumentWithTag(NSRange range, NSString string, NSString language, NSInteger tag);
+    [Selector("completionsForPartialWordRange:inString:language:inSpellDocumentWithTag:")]
+    public NSArray? CompletionsForPartialWordRangeInStringLanguageInSpellDocumentWithTag(NSRange range, NSString string, NSString? language, NSInteger tag);
+    [Selector("languageForWordRange:inString:orthography:")]
+    public NSString? LanguageForWordRangeInStringOrthography(NSRange range, NSString string, NSOrthography? orthography);
+    [Selector("closeSpellDocumentWithTag:")]
+    public void CloseSpellDocumentWithTag(NSInteger tag);
+    [Selector("recordResponse:toCorrection:forWord:language:inSpellDocumentWithTag:")]
+    public void RecordResponseToCorrectionForWordLanguageInSpellDocumentWithTag(NSCorrectionResponse response, NSString correction, NSString word, NSString? language, NSInteger tag);
+    [Selector("showCorrectionIndicatorOfType:primaryString:alternativeStrings:forStringInRect:view:completionHandler:")]
+    public void ShowCorrectionIndicatorOfTypePrimaryStringAlternativeStringsForStringInRectViewCompletionHandler(NSCorrectionIndicatorType type, NSString primaryString, NSArray alternativeStrings, NSRect rectOfTypedString, NSView view, NSSpellCheckerShowCorrectionIndicatorOfTypePrimaryStringAlternativeStringsForStringInRectViewCompletionHandlerCompletionBlock? completionBlock);
+    [Selector("dismissCorrectionIndicatorForView:")]
+    public void DismissCorrectionIndicatorForView(NSView view);
+    [Selector("showInlinePredictionForCandidates:client:")]
+    public void ShowInlinePredictionForCandidatesClient(NSArray candidates, NSTextInputClient client);
+    [Selector("preventsAutocorrectionBeforeString:language:")]
+    public bool PreventsAutocorrectionBeforeStringLanguage(NSString string, NSString? language);
+    [Selector("deletesAutospaceBetweenString:andString:language:")]
+    public bool DeletesAutospaceBetweenStringAndStringLanguage(NSString precedingString, NSString followingString, NSString? language);
+    [Selector("setWordFieldStringValue:")]
+    public void SetWordFieldStringValue(NSString string);
+    [Selector("learnWord:")]
+    public void LearnWord(NSString word);
+    [Selector("hasLearnedWord:")]
+    public bool HasLearnedWord(NSString word);
+    [Selector("unlearnWord:")]
+    public void UnlearnWord(NSString word);
+    [Selector("language")]
+    public NSString Language();
+    [Selector("setLanguage:")]
+    public bool SetLanguage(NSString language);
 }
 
 public enum NSCorrectionResponse : long
@@ -153,9 +204,11 @@ public extern "C" NSNotificationName? NSSpellCheckerDidChangeAutomaticInlinePred
 public extern objc class NSSpellChecker
 {
     /// Deprecated in macOS 10.6.
-    [Selector("guessesForWord:")] public NSArray? GuessesForWord(NSString? word);
+    [Selector("guessesForWord:")]
+    public NSArray? GuessesForWord(NSString? word);
     /// Deprecated in macOS 10.5.
-    [Selector("forgetWord:")] public void ForgetWord(NSString? word);
+    [Selector("forgetWord:")]
+    public void ForgetWord(NSString? word);
 }
 
 #endif

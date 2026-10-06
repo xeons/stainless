@@ -33,23 +33,40 @@ import Standard.ObjC;
 
 public extern objc class GKObstacleGraph : GKGraph
 {
-    [Selector("obstacles")] public NSArray Obstacles { get; }
-    [Selector("bufferRadius")] public float BufferRadius { get; }
-    [Selector("graphWithObstacles:bufferRadius:")] public static Self GraphWithObstaclesBufferRadius(NSArray obstacles, float bufferRadius);
-    [Selector("initWithObstacles:bufferRadius:")] public Self InitWithObstaclesBufferRadius(NSArray obstacles, float bufferRadius);
-    [Selector("graphWithObstacles:bufferRadius:nodeClass:")] public static Self GraphWithObstaclesBufferRadiusNodeClass(NSArray obstacles, float bufferRadius, Class nodeClass);
-    [Selector("initWithObstacles:bufferRadius:nodeClass:")] public Self InitWithObstaclesBufferRadiusNodeClass(NSArray obstacles, float bufferRadius, Class nodeClass);
-    [Selector("connectNodeUsingObstacles:")] public void ConnectNodeUsingObstacles(AnyObject node);
-    [Selector("connectNodeUsingObstacles:ignoringObstacles:")] public void ConnectNodeUsingObstaclesIgnoringObstacles(AnyObject node, NSArray obstaclesToIgnore);
-    [Selector("connectNodeUsingObstacles:ignoringBufferRadiusOfObstacles:")] public void ConnectNodeUsingObstaclesIgnoringBufferRadiusOfObstacles(AnyObject node, NSArray obstaclesBufferRadiusToIgnore);
-    [Selector("addObstacles:")] public void AddObstacles(NSArray obstacles);
-    [Selector("removeObstacles:")] public void RemoveObstacles(NSArray obstacles);
-    [Selector("removeAllObstacles")] public void RemoveAllObstacles();
-    [Selector("nodesForObstacle:")] public NSArray NodesForObstacle(GKPolygonObstacle obstacle);
-    [Selector("lockConnectionFromNode:toNode:")] public void LockConnectionFromNodeToNode(AnyObject startNode, AnyObject endNode);
-    [Selector("unlockConnectionFromNode:toNode:")] public void UnlockConnectionFromNodeToNode(AnyObject startNode, AnyObject endNode);
-    [Selector("isConnectionLockedFromNode:toNode:")] public bool IsConnectionLockedFromNodeToNode(AnyObject startNode, AnyObject endNode);
-    [Selector("classForGenericArgumentAtIndex:")] public Class ClassForGenericArgumentAtIndex(NSUInteger index);
+    [Selector("obstacles")]
+    public NSArray Obstacles { get; }
+    [Selector("bufferRadius")]
+    public float BufferRadius { get; }
+    [Selector("graphWithObstacles:bufferRadius:")]
+    public static Self GraphWithObstaclesBufferRadius(NSArray obstacles, float bufferRadius);
+    [Selector("initWithObstacles:bufferRadius:")]
+    public Self InitWithObstaclesBufferRadius(NSArray obstacles, float bufferRadius);
+    [Selector("graphWithObstacles:bufferRadius:nodeClass:")]
+    public static Self GraphWithObstaclesBufferRadiusNodeClass(NSArray obstacles, float bufferRadius, Class nodeClass);
+    [Selector("initWithObstacles:bufferRadius:nodeClass:")]
+    public Self InitWithObstaclesBufferRadiusNodeClass(NSArray obstacles, float bufferRadius, Class nodeClass);
+    [Selector("connectNodeUsingObstacles:")]
+    public void ConnectNodeUsingObstacles(AnyObject node);
+    [Selector("connectNodeUsingObstacles:ignoringObstacles:")]
+    public void ConnectNodeUsingObstaclesIgnoringObstacles(AnyObject node, NSArray obstaclesToIgnore);
+    [Selector("connectNodeUsingObstacles:ignoringBufferRadiusOfObstacles:")]
+    public void ConnectNodeUsingObstaclesIgnoringBufferRadiusOfObstacles(AnyObject node, NSArray obstaclesBufferRadiusToIgnore);
+    [Selector("addObstacles:")]
+    public void AddObstacles(NSArray obstacles);
+    [Selector("removeObstacles:")]
+    public void RemoveObstacles(NSArray obstacles);
+    [Selector("removeAllObstacles")]
+    public void RemoveAllObstacles();
+    [Selector("nodesForObstacle:")]
+    public NSArray NodesForObstacle(GKPolygonObstacle obstacle);
+    [Selector("lockConnectionFromNode:toNode:")]
+    public void LockConnectionFromNodeToNode(AnyObject startNode, AnyObject endNode);
+    [Selector("unlockConnectionFromNode:toNode:")]
+    public void UnlockConnectionFromNodeToNode(AnyObject startNode, AnyObject endNode);
+    [Selector("isConnectionLockedFromNode:toNode:")]
+    public bool IsConnectionLockedFromNodeToNode(AnyObject startNode, AnyObject endNode);
+    [Selector("classForGenericArgumentAtIndex:")]
+    public Class ClassForGenericArgumentAtIndex(NSUInteger index);
 }
 
 #endif

@@ -35,98 +35,180 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTLFXTemporalDenoisedScalerDescriptor : NSObject, NSCopying
 {
-    [Selector("colorTextureFormat", "setColorTextureFormat:")] public MTLPixelFormat ColorTextureFormat { get; set; }
-    [Selector("depthTextureFormat", "setDepthTextureFormat:")] public MTLPixelFormat DepthTextureFormat { get; set; }
-    [Selector("motionTextureFormat", "setMotionTextureFormat:")] public MTLPixelFormat MotionTextureFormat { get; set; }
-    [Selector("diffuseAlbedoTextureFormat", "setDiffuseAlbedoTextureFormat:")] public MTLPixelFormat DiffuseAlbedoTextureFormat { get; set; }
-    [Selector("specularAlbedoTextureFormat", "setSpecularAlbedoTextureFormat:")] public MTLPixelFormat SpecularAlbedoTextureFormat { get; set; }
-    [Selector("normalTextureFormat", "setNormalTextureFormat:")] public MTLPixelFormat NormalTextureFormat { get; set; }
-    [Selector("roughnessTextureFormat", "setRoughnessTextureFormat:")] public MTLPixelFormat RoughnessTextureFormat { get; set; }
-    [Selector("specularHitDistanceTextureFormat", "setSpecularHitDistanceTextureFormat:")] public MTLPixelFormat SpecularHitDistanceTextureFormat { get; set; }
-    [Selector("denoiseStrengthMaskTextureFormat", "setDenoiseStrengthMaskTextureFormat:")] public MTLPixelFormat DenoiseStrengthMaskTextureFormat { get; set; }
-    [Selector("transparencyOverlayTextureFormat", "setTransparencyOverlayTextureFormat:")] public MTLPixelFormat TransparencyOverlayTextureFormat { get; set; }
-    [Selector("outputTextureFormat", "setOutputTextureFormat:")] public MTLPixelFormat OutputTextureFormat { get; set; }
-    [Selector("inputWidth", "setInputWidth:")] public NSUInteger InputWidth { get; set; }
-    [Selector("inputHeight", "setInputHeight:")] public NSUInteger InputHeight { get; set; }
-    [Selector("outputWidth", "setOutputWidth:")] public NSUInteger OutputWidth { get; set; }
-    [Selector("outputHeight", "setOutputHeight:")] public NSUInteger OutputHeight { get; set; }
-    [Selector("requiresSynchronousInitialization", "setRequiresSynchronousInitialization:")] public bool RequiresSynchronousInitialization { get; set; }
-    [Selector("isAutoExposureEnabled", "setAutoExposureEnabled:")] public bool AutoExposureEnabled { get; set; }
-    [Selector("isReactiveMaskTextureEnabled", "setReactiveMaskTextureEnabled:")] public bool ReactiveMaskTextureEnabled { get; set; }
-    [Selector("reactiveMaskTextureFormat", "setReactiveMaskTextureFormat:")] public MTLPixelFormat ReactiveMaskTextureFormat { get; set; }
-    [Selector("isSpecularHitDistanceTextureEnabled", "setSpecularHitDistanceTextureEnabled:")] public bool SpecularHitDistanceTextureEnabled { get; set; }
-    [Selector("isDenoiseStrengthMaskTextureEnabled", "setDenoiseStrengthMaskTextureEnabled:")] public bool DenoiseStrengthMaskTextureEnabled { get; set; }
-    [Selector("isTransparencyOverlayTextureEnabled", "setTransparencyOverlayTextureEnabled:")] public bool TransparencyOverlayTextureEnabled { get; set; }
-    [Selector("newTemporalDenoisedScalerWithDevice:")] public MTLFXTemporalDenoisedScaler? NewTemporalDenoisedScalerWithDevice(MTLDevice device);
-    [Selector("newTemporalDenoisedScalerWithDevice:compiler:")] public MTL4FXTemporalDenoisedScaler? NewTemporalDenoisedScalerWithDeviceCompiler(MTLDevice device, MTL4Compiler compiler);
-    [Selector("supportedInputContentMinScaleForDevice:")] public static float SupportedInputContentMinScaleForDevice(MTLDevice device);
-    [Selector("supportedInputContentMaxScaleForDevice:")] public static float SupportedInputContentMaxScaleForDevice(MTLDevice device);
-    [Selector("supportsMetal4FX:")] public static bool SupportsMetal4FX(MTLDevice device);
-    [Selector("supportsDevice:")] public static bool SupportsDevice(MTLDevice device);
+    [Selector("colorTextureFormat", "setColorTextureFormat:")]
+    public MTLPixelFormat ColorTextureFormat { get; set; }
+    [Selector("depthTextureFormat", "setDepthTextureFormat:")]
+    public MTLPixelFormat DepthTextureFormat { get; set; }
+    [Selector("motionTextureFormat", "setMotionTextureFormat:")]
+    public MTLPixelFormat MotionTextureFormat { get; set; }
+    [Selector("diffuseAlbedoTextureFormat", "setDiffuseAlbedoTextureFormat:")]
+    public MTLPixelFormat DiffuseAlbedoTextureFormat { get; set; }
+    [Selector("specularAlbedoTextureFormat", "setSpecularAlbedoTextureFormat:")]
+    public MTLPixelFormat SpecularAlbedoTextureFormat { get; set; }
+    [Selector("normalTextureFormat", "setNormalTextureFormat:")]
+    public MTLPixelFormat NormalTextureFormat { get; set; }
+    [Selector("roughnessTextureFormat", "setRoughnessTextureFormat:")]
+    public MTLPixelFormat RoughnessTextureFormat { get; set; }
+    [Selector("specularHitDistanceTextureFormat", "setSpecularHitDistanceTextureFormat:")]
+    public MTLPixelFormat SpecularHitDistanceTextureFormat { get; set; }
+    [Selector("denoiseStrengthMaskTextureFormat", "setDenoiseStrengthMaskTextureFormat:")]
+    public MTLPixelFormat DenoiseStrengthMaskTextureFormat { get; set; }
+    [Selector("transparencyOverlayTextureFormat", "setTransparencyOverlayTextureFormat:")]
+    public MTLPixelFormat TransparencyOverlayTextureFormat { get; set; }
+    [Selector("outputTextureFormat", "setOutputTextureFormat:")]
+    public MTLPixelFormat OutputTextureFormat { get; set; }
+    [Selector("inputWidth", "setInputWidth:")]
+    public NSUInteger InputWidth { get; set; }
+    [Selector("inputHeight", "setInputHeight:")]
+    public NSUInteger InputHeight { get; set; }
+    [Selector("outputWidth", "setOutputWidth:")]
+    public NSUInteger OutputWidth { get; set; }
+    [Selector("outputHeight", "setOutputHeight:")]
+    public NSUInteger OutputHeight { get; set; }
+    [Selector("requiresSynchronousInitialization", "setRequiresSynchronousInitialization:")]
+    public bool RequiresSynchronousInitialization { get; set; }
+    [Selector("isAutoExposureEnabled", "setAutoExposureEnabled:")]
+    public bool AutoExposureEnabled { get; set; }
+    [Selector("isReactiveMaskTextureEnabled", "setReactiveMaskTextureEnabled:")]
+    public bool ReactiveMaskTextureEnabled { get; set; }
+    [Selector("reactiveMaskTextureFormat", "setReactiveMaskTextureFormat:")]
+    public MTLPixelFormat ReactiveMaskTextureFormat { get; set; }
+    [Selector("isSpecularHitDistanceTextureEnabled", "setSpecularHitDistanceTextureEnabled:")]
+    public bool SpecularHitDistanceTextureEnabled { get; set; }
+    [Selector("isDenoiseStrengthMaskTextureEnabled", "setDenoiseStrengthMaskTextureEnabled:")]
+    public bool DenoiseStrengthMaskTextureEnabled { get; set; }
+    [Selector("isTransparencyOverlayTextureEnabled", "setTransparencyOverlayTextureEnabled:")]
+    public bool TransparencyOverlayTextureEnabled { get; set; }
+    [Selector("newTemporalDenoisedScalerWithDevice:")]
+    public MTLFXTemporalDenoisedScaler? NewTemporalDenoisedScalerWithDevice(MTLDevice device);
+    [Selector("newTemporalDenoisedScalerWithDevice:compiler:")]
+    public MTL4FXTemporalDenoisedScaler? NewTemporalDenoisedScalerWithDeviceCompiler(MTLDevice device, MTL4Compiler compiler);
+    [Selector("supportedInputContentMinScaleForDevice:")]
+    public static float SupportedInputContentMinScaleForDevice(MTLDevice device);
+    [Selector("supportedInputContentMaxScaleForDevice:")]
+    public static float SupportedInputContentMaxScaleForDevice(MTLDevice device);
+    [Selector("supportsMetal4FX:")]
+    public static bool SupportsMetal4FX(MTLDevice device);
+    [Selector("supportsDevice:")]
+    public static bool SupportsDevice(MTLDevice device);
 }
 
 /// macOS 26.0 and later.
 public objc interface MTLFXTemporalDenoisedScalerBase : MTLFXFrameInterpolatableScaler
 {
-    [Selector("colorTextureUsage")] MTLTextureUsage ColorTextureUsage { get; }
-    [Selector("depthTextureUsage")] MTLTextureUsage DepthTextureUsage { get; }
-    [Selector("motionTextureUsage")] MTLTextureUsage MotionTextureUsage { get; }
-    [Selector("reactiveTextureUsage")] MTLTextureUsage ReactiveTextureUsage { get; }
-    [Selector("diffuseAlbedoTextureUsage")] MTLTextureUsage DiffuseAlbedoTextureUsage { get; }
-    [Selector("specularAlbedoTextureUsage")] MTLTextureUsage SpecularAlbedoTextureUsage { get; }
-    [Selector("normalTextureUsage")] MTLTextureUsage NormalTextureUsage { get; }
-    [Selector("roughnessTextureUsage")] MTLTextureUsage RoughnessTextureUsage { get; }
-    [Selector("specularHitDistanceTextureUsage")] MTLTextureUsage SpecularHitDistanceTextureUsage { get; }
-    [Selector("denoiseStrengthMaskTextureUsage")] MTLTextureUsage DenoiseStrengthMaskTextureUsage { get; }
-    [Selector("transparencyOverlayTextureUsage")] MTLTextureUsage TransparencyOverlayTextureUsage { get; }
-    [Selector("outputTextureUsage")] MTLTextureUsage OutputTextureUsage { get; }
-    [Selector("colorTexture", "setColorTexture:")] MTLTexture? ColorTexture { get; set; }
-    [Selector("depthTexture", "setDepthTexture:")] MTLTexture? DepthTexture { get; set; }
-    [Selector("motionTexture", "setMotionTexture:")] MTLTexture? MotionTexture { get; set; }
-    [Selector("diffuseAlbedoTexture", "setDiffuseAlbedoTexture:")] MTLTexture? DiffuseAlbedoTexture { get; set; }
-    [Selector("specularAlbedoTexture", "setSpecularAlbedoTexture:")] MTLTexture? SpecularAlbedoTexture { get; set; }
-    [Selector("normalTexture", "setNormalTexture:")] MTLTexture? NormalTexture { get; set; }
-    [Selector("roughnessTexture", "setRoughnessTexture:")] MTLTexture? RoughnessTexture { get; set; }
-    [Selector("specularHitDistanceTexture", "setSpecularHitDistanceTexture:")] MTLTexture? SpecularHitDistanceTexture { get; set; }
-    [Selector("denoiseStrengthMaskTexture", "setDenoiseStrengthMaskTexture:")] MTLTexture? DenoiseStrengthMaskTexture { get; set; }
-    [Selector("transparencyOverlayTexture", "setTransparencyOverlayTexture:")] MTLTexture? TransparencyOverlayTexture { get; set; }
-    [Selector("outputTexture", "setOutputTexture:")] MTLTexture? OutputTexture { get; set; }
-    [Selector("exposureTexture", "setExposureTexture:")] MTLTexture? ExposureTexture { get; set; }
-    [Selector("preExposure", "setPreExposure:")] float PreExposure { get; set; }
-    [Selector("reactiveMaskTexture", "setReactiveMaskTexture:")] MTLTexture? ReactiveMaskTexture { get; set; }
-    [Selector("jitterOffsetX", "setJitterOffsetX:")] float JitterOffsetX { get; set; }
-    [Selector("jitterOffsetY", "setJitterOffsetY:")] float JitterOffsetY { get; set; }
-    [Selector("motionVectorScaleX", "setMotionVectorScaleX:")] float MotionVectorScaleX { get; set; }
-    [Selector("motionVectorScaleY", "setMotionVectorScaleY:")] float MotionVectorScaleY { get; set; }
-    [Selector("shouldResetHistory", "setShouldResetHistory:")] bool ShouldResetHistory { get; set; }
-    [Selector("isDepthReversed", "setDepthReversed:")] bool DepthReversed { get; set; }
-    [Selector("colorTextureFormat")] MTLPixelFormat ColorTextureFormat { get; }
-    [Selector("depthTextureFormat")] MTLPixelFormat DepthTextureFormat { get; }
-    [Selector("motionTextureFormat")] MTLPixelFormat MotionTextureFormat { get; }
-    [Selector("diffuseAlbedoTextureFormat")] MTLPixelFormat DiffuseAlbedoTextureFormat { get; }
-    [Selector("specularAlbedoTextureFormat")] MTLPixelFormat SpecularAlbedoTextureFormat { get; }
-    [Selector("normalTextureFormat")] MTLPixelFormat NormalTextureFormat { get; }
-    [Selector("roughnessTextureFormat")] MTLPixelFormat RoughnessTextureFormat { get; }
-    [Selector("specularHitDistanceTextureFormat")] MTLPixelFormat SpecularHitDistanceTextureFormat { get; }
-    [Selector("denoiseStrengthMaskTextureFormat")] MTLPixelFormat DenoiseStrengthMaskTextureFormat { get; }
-    [Selector("transparencyOverlayTextureFormat")] MTLPixelFormat TransparencyOverlayTextureFormat { get; }
-    [Selector("reactiveMaskTextureFormat")] MTLPixelFormat ReactiveMaskTextureFormat { get; }
-    [Selector("outputTextureFormat")] MTLPixelFormat OutputTextureFormat { get; }
-    [Selector("inputWidth")] NSUInteger InputWidth { get; }
-    [Selector("inputHeight")] NSUInteger InputHeight { get; }
-    [Selector("outputWidth")] NSUInteger OutputWidth { get; }
-    [Selector("outputHeight")] NSUInteger OutputHeight { get; }
-    [Selector("inputContentMinScale")] float InputContentMinScale { get; }
-    [Selector("inputContentMaxScale")] float InputContentMaxScale { get; }
-    [Selector("worldToViewMatrix", "setWorldToViewMatrix:")] simd_float4x4 WorldToViewMatrix { get; set; }
-    [Selector("viewToClipMatrix", "setViewToClipMatrix:")] simd_float4x4 ViewToClipMatrix { get; set; }
-    [Selector("fence", "setFence:")] MTLFence? Fence { get; set; }
+    [Selector("colorTextureUsage")]
+    MTLTextureUsage ColorTextureUsage { get; }
+    [Selector("depthTextureUsage")]
+    MTLTextureUsage DepthTextureUsage { get; }
+    [Selector("motionTextureUsage")]
+    MTLTextureUsage MotionTextureUsage { get; }
+    [Selector("reactiveTextureUsage")]
+    MTLTextureUsage ReactiveTextureUsage { get; }
+    [Selector("diffuseAlbedoTextureUsage")]
+    MTLTextureUsage DiffuseAlbedoTextureUsage { get; }
+    [Selector("specularAlbedoTextureUsage")]
+    MTLTextureUsage SpecularAlbedoTextureUsage { get; }
+    [Selector("normalTextureUsage")]
+    MTLTextureUsage NormalTextureUsage { get; }
+    [Selector("roughnessTextureUsage")]
+    MTLTextureUsage RoughnessTextureUsage { get; }
+    [Selector("specularHitDistanceTextureUsage")]
+    MTLTextureUsage SpecularHitDistanceTextureUsage { get; }
+    [Selector("denoiseStrengthMaskTextureUsage")]
+    MTLTextureUsage DenoiseStrengthMaskTextureUsage { get; }
+    [Selector("transparencyOverlayTextureUsage")]
+    MTLTextureUsage TransparencyOverlayTextureUsage { get; }
+    [Selector("outputTextureUsage")]
+    MTLTextureUsage OutputTextureUsage { get; }
+    [Selector("colorTexture", "setColorTexture:")]
+    MTLTexture? ColorTexture { get; set; }
+    [Selector("depthTexture", "setDepthTexture:")]
+    MTLTexture? DepthTexture { get; set; }
+    [Selector("motionTexture", "setMotionTexture:")]
+    MTLTexture? MotionTexture { get; set; }
+    [Selector("diffuseAlbedoTexture", "setDiffuseAlbedoTexture:")]
+    MTLTexture? DiffuseAlbedoTexture { get; set; }
+    [Selector("specularAlbedoTexture", "setSpecularAlbedoTexture:")]
+    MTLTexture? SpecularAlbedoTexture { get; set; }
+    [Selector("normalTexture", "setNormalTexture:")]
+    MTLTexture? NormalTexture { get; set; }
+    [Selector("roughnessTexture", "setRoughnessTexture:")]
+    MTLTexture? RoughnessTexture { get; set; }
+    [Selector("specularHitDistanceTexture", "setSpecularHitDistanceTexture:")]
+    MTLTexture? SpecularHitDistanceTexture { get; set; }
+    [Selector("denoiseStrengthMaskTexture", "setDenoiseStrengthMaskTexture:")]
+    MTLTexture? DenoiseStrengthMaskTexture { get; set; }
+    [Selector("transparencyOverlayTexture", "setTransparencyOverlayTexture:")]
+    MTLTexture? TransparencyOverlayTexture { get; set; }
+    [Selector("outputTexture", "setOutputTexture:")]
+    MTLTexture? OutputTexture { get; set; }
+    [Selector("exposureTexture", "setExposureTexture:")]
+    MTLTexture? ExposureTexture { get; set; }
+    [Selector("preExposure", "setPreExposure:")]
+    float PreExposure { get; set; }
+    [Selector("reactiveMaskTexture", "setReactiveMaskTexture:")]
+    MTLTexture? ReactiveMaskTexture { get; set; }
+    [Selector("jitterOffsetX", "setJitterOffsetX:")]
+    float JitterOffsetX { get; set; }
+    [Selector("jitterOffsetY", "setJitterOffsetY:")]
+    float JitterOffsetY { get; set; }
+    [Selector("motionVectorScaleX", "setMotionVectorScaleX:")]
+    float MotionVectorScaleX { get; set; }
+    [Selector("motionVectorScaleY", "setMotionVectorScaleY:")]
+    float MotionVectorScaleY { get; set; }
+    [Selector("shouldResetHistory", "setShouldResetHistory:")]
+    bool ShouldResetHistory { get; set; }
+    [Selector("isDepthReversed", "setDepthReversed:")]
+    bool DepthReversed { get; set; }
+    [Selector("colorTextureFormat")]
+    MTLPixelFormat ColorTextureFormat { get; }
+    [Selector("depthTextureFormat")]
+    MTLPixelFormat DepthTextureFormat { get; }
+    [Selector("motionTextureFormat")]
+    MTLPixelFormat MotionTextureFormat { get; }
+    [Selector("diffuseAlbedoTextureFormat")]
+    MTLPixelFormat DiffuseAlbedoTextureFormat { get; }
+    [Selector("specularAlbedoTextureFormat")]
+    MTLPixelFormat SpecularAlbedoTextureFormat { get; }
+    [Selector("normalTextureFormat")]
+    MTLPixelFormat NormalTextureFormat { get; }
+    [Selector("roughnessTextureFormat")]
+    MTLPixelFormat RoughnessTextureFormat { get; }
+    [Selector("specularHitDistanceTextureFormat")]
+    MTLPixelFormat SpecularHitDistanceTextureFormat { get; }
+    [Selector("denoiseStrengthMaskTextureFormat")]
+    MTLPixelFormat DenoiseStrengthMaskTextureFormat { get; }
+    [Selector("transparencyOverlayTextureFormat")]
+    MTLPixelFormat TransparencyOverlayTextureFormat { get; }
+    [Selector("reactiveMaskTextureFormat")]
+    MTLPixelFormat ReactiveMaskTextureFormat { get; }
+    [Selector("outputTextureFormat")]
+    MTLPixelFormat OutputTextureFormat { get; }
+    [Selector("inputWidth")]
+    NSUInteger InputWidth { get; }
+    [Selector("inputHeight")]
+    NSUInteger InputHeight { get; }
+    [Selector("outputWidth")]
+    NSUInteger OutputWidth { get; }
+    [Selector("outputHeight")]
+    NSUInteger OutputHeight { get; }
+    [Selector("inputContentMinScale")]
+    float InputContentMinScale { get; }
+    [Selector("inputContentMaxScale")]
+    float InputContentMaxScale { get; }
+    [Selector("worldToViewMatrix", "setWorldToViewMatrix:")]
+    simd_float4x4 WorldToViewMatrix { get; set; }
+    [Selector("viewToClipMatrix", "setViewToClipMatrix:")]
+    simd_float4x4 ViewToClipMatrix { get; set; }
+    [Selector("fence", "setFence:")]
+    MTLFence? Fence { get; set; }
 }
 
 /// macOS 26.0 and later.
 public objc interface MTLFXTemporalDenoisedScaler : MTLFXTemporalDenoisedScalerBase
 {
-    [Selector("encodeToCommandBuffer:")] void EncodeToCommandBuffer(MTLCommandBuffer commandBuffer);
+    [Selector("encodeToCommandBuffer:")]
+    void EncodeToCommandBuffer(MTLCommandBuffer commandBuffer);
 }
 
 #endif

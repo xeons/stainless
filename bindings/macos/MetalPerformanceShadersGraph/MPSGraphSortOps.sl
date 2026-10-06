@@ -34,14 +34,22 @@ import Standard.ObjC;
 /// MPSGraphSortOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("sortWithTensor:axis:descending:name:")] public MPSGraphTensor SortWithTensorAxisDescendingName(MPSGraphTensor tensor, NSInteger axis, bool descending, NSString? name);
-    [Selector("sortWithTensor:axisTensor:descending:name:")] public MPSGraphTensor SortWithTensorAxisTensorDescendingName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, bool descending, NSString? name);
-    [Selector("sortWithTensor:axis:name:")] public MPSGraphTensor SortWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("sortWithTensor:axisTensor:name:")] public MPSGraphTensor SortWithTensorAxisTensorName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, NSString? name);
-    [Selector("argSortWithTensor:axis:descending:name:")] public MPSGraphTensor ArgSortWithTensorAxisDescendingName(MPSGraphTensor tensor, NSInteger axis, bool descending, NSString? name);
-    [Selector("argSortWithTensor:axisTensor:descending:name:")] public MPSGraphTensor ArgSortWithTensorAxisTensorDescendingName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, bool descending, NSString? name);
-    [Selector("argSortWithTensor:axis:name:")] public MPSGraphTensor ArgSortWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("argSortWithTensor:axisTensor:name:")] public MPSGraphTensor ArgSortWithTensorAxisTensorName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, NSString? name);
+    [Selector("sortWithTensor:axis:descending:name:")]
+    public MPSGraphTensor SortWithTensorAxisDescendingName(MPSGraphTensor tensor, NSInteger axis, bool descending, NSString? name);
+    [Selector("sortWithTensor:axisTensor:descending:name:")]
+    public MPSGraphTensor SortWithTensorAxisTensorDescendingName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, bool descending, NSString? name);
+    [Selector("sortWithTensor:axis:name:")]
+    public MPSGraphTensor SortWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("sortWithTensor:axisTensor:name:")]
+    public MPSGraphTensor SortWithTensorAxisTensorName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, NSString? name);
+    [Selector("argSortWithTensor:axis:descending:name:")]
+    public MPSGraphTensor ArgSortWithTensorAxisDescendingName(MPSGraphTensor tensor, NSInteger axis, bool descending, NSString? name);
+    [Selector("argSortWithTensor:axisTensor:descending:name:")]
+    public MPSGraphTensor ArgSortWithTensorAxisTensorDescendingName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, bool descending, NSString? name);
+    [Selector("argSortWithTensor:axis:name:")]
+    public MPSGraphTensor ArgSortWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("argSortWithTensor:axisTensor:name:")]
+    public MPSGraphTensor ArgSortWithTensorAxisTensorName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, NSString? name);
 }
 
 #endif

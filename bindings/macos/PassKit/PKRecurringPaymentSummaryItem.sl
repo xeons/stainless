@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class PKRecurringPaymentSummaryItem : PKPaymentSummaryItem
 {
-    [Selector("startDate", "setStartDate:")] public NSDate? StartDate { get; set; }
-    [Selector("intervalUnit", "setIntervalUnit:")] public NSCalendarUnit IntervalUnit { get; set; }
-    [Selector("intervalCount", "setIntervalCount:")] public NSInteger IntervalCount { get; set; }
-    [Selector("endDate", "setEndDate:")] public NSDate? EndDate { get; set; }
+    [Selector("startDate", "setStartDate:")]
+    public NSDate? StartDate { get; set; }
+    [Selector("intervalUnit", "setIntervalUnit:")]
+    public NSCalendarUnit IntervalUnit { get; set; }
+    [Selector("intervalCount", "setIntervalCount:")]
+    public NSInteger IntervalCount { get; set; }
+    [Selector("endDate", "setEndDate:")]
+    public NSDate? EndDate { get; set; }
 }
 
 #endif

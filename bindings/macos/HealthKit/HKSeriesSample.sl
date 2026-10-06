@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class HKSeriesSample : HKSample
 {
-    [Selector("count")] public NSUInteger Count { get; }
+    [Selector("count")]
+    public NSUInteger Count { get; }
 }
 
 #endif

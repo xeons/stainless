@@ -33,16 +33,26 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLTableRowElement : DOMHTMLElement
 {
-    [Selector("rowIndex")] public int RowIndex { get; }
-    [Selector("sectionRowIndex")] public int SectionRowIndex { get; }
-    [Selector("cells")] public DOMHTMLCollection? Cells { get; }
-    [Selector("align", "setAlign:")] public NSString? Align { get; set; }
-    [Selector("bgColor", "setBgColor:")] public NSString? BgColor { get; set; }
-    [Selector("ch", "setCh:")] public NSString? Ch { get; set; }
-    [Selector("chOff", "setChOff:")] public NSString? ChOff { get; set; }
-    [Selector("vAlign", "setVAlign:")] public NSString? VAlign { get; set; }
-    [Selector("insertCell:")] public DOMHTMLElement? InsertCell(int index);
-    [Selector("deleteCell:")] public void DeleteCell(int index);
+    [Selector("rowIndex")]
+    public int RowIndex { get; }
+    [Selector("sectionRowIndex")]
+    public int SectionRowIndex { get; }
+    [Selector("cells")]
+    public DOMHTMLCollection? Cells { get; }
+    [Selector("align", "setAlign:")]
+    public NSString? Align { get; set; }
+    [Selector("bgColor", "setBgColor:")]
+    public NSString? BgColor { get; set; }
+    [Selector("ch", "setCh:")]
+    public NSString? Ch { get; set; }
+    [Selector("chOff", "setChOff:")]
+    public NSString? ChOff { get; set; }
+    [Selector("vAlign", "setVAlign:")]
+    public NSString? VAlign { get; set; }
+    [Selector("insertCell:")]
+    public DOMHTMLElement? InsertCell(int index);
+    [Selector("deleteCell:")]
+    public void DeleteCell(int index);
 }
 
 #endif

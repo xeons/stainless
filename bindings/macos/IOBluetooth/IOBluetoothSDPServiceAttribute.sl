@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothSDPServiceAttribute : NSObject, NSCoding, NSSecureCoding
 {
-    [Selector("withID:attributeElementValue:")] public static Self? WithIDAttributeElementValue(BluetoothSDPServiceAttributeID newAttributeID, NSObject? attributeElementValue);
-    [Selector("withID:attributeElement:")] public static Self? WithIDAttributeElement(BluetoothSDPServiceAttributeID newAttributeID, IOBluetoothSDPDataElement? attributeElement);
-    [Selector("initWithID:attributeElementValue:")] public Self? InitWithIDAttributeElementValue(BluetoothSDPServiceAttributeID newAttributeID, NSObject? attributeElementValue);
-    [Selector("initWithID:attributeElement:")] public Self? InitWithIDAttributeElement(BluetoothSDPServiceAttributeID newAttributeID, IOBluetoothSDPDataElement? attributeElement);
-    [Selector("getAttributeID")] public BluetoothSDPServiceAttributeID GetAttributeID();
-    [Selector("getDataElement")] public IOBluetoothSDPDataElement? GetDataElement();
-    [Selector("getIDDataElement")] public IOBluetoothSDPDataElement? GetIDDataElement();
+    [Selector("withID:attributeElementValue:")]
+    public static Self? WithIDAttributeElementValue(BluetoothSDPServiceAttributeID newAttributeID, NSObject? attributeElementValue);
+    [Selector("withID:attributeElement:")]
+    public static Self? WithIDAttributeElement(BluetoothSDPServiceAttributeID newAttributeID, IOBluetoothSDPDataElement? attributeElement);
+    [Selector("initWithID:attributeElementValue:")]
+    public Self? InitWithIDAttributeElementValue(BluetoothSDPServiceAttributeID newAttributeID, NSObject? attributeElementValue);
+    [Selector("initWithID:attributeElement:")]
+    public Self? InitWithIDAttributeElement(BluetoothSDPServiceAttributeID newAttributeID, IOBluetoothSDPDataElement? attributeElement);
+    [Selector("getAttributeID")]
+    public BluetoothSDPServiceAttributeID GetAttributeID();
+    [Selector("getDataElement")]
+    public IOBluetoothSDPDataElement? GetDataElement();
+    [Selector("getIDDataElement")]
+    public IOBluetoothSDPDataElement? GetIDDataElement();
 }
 
 #endif

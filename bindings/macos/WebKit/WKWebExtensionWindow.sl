@@ -59,17 +59,39 @@ public objc closure void WKWebExtensionWindowCloseForWebExtensionContextCompleti
 /// macOS 15.4 and later.
 public objc interface WKWebExtensionWindow : NSObjectProtocol
 {
-    [Optional] [Selector("tabsForWebExtensionContext:")] NSArray TabsForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("activeTabForWebExtensionContext:")] WKWebExtensionTab? ActiveTabForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("windowTypeForWebExtensionContext:")] WKWebExtensionWindowType WindowTypeForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("windowStateForWebExtensionContext:")] WKWebExtensionWindowState WindowStateForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("setWindowState:forWebExtensionContext:completionHandler:")] void SetWindowStateForWebExtensionContextCompletionHandler(WKWebExtensionWindowState state, WKWebExtensionContext context, WKWebExtensionWindowSetWindowStateForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("isPrivateForWebExtensionContext:")] bool IsPrivateForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("screenFrameForWebExtensionContext:")] CGRect ScreenFrameForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("frameForWebExtensionContext:")] CGRect FrameForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("setFrame:forWebExtensionContext:completionHandler:")] void SetFrameForWebExtensionContextCompletionHandler(CGRect frame, WKWebExtensionContext context, WKWebExtensionWindowSetFrameForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("focusForWebExtensionContext:completionHandler:")] void FocusForWebExtensionContextCompletionHandler(WKWebExtensionContext context, WKWebExtensionWindowFocusForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("closeForWebExtensionContext:completionHandler:")] void CloseForWebExtensionContextCompletionHandler(WKWebExtensionContext context, WKWebExtensionWindowCloseForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("tabsForWebExtensionContext:")]
+    NSArray TabsForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("activeTabForWebExtensionContext:")]
+    WKWebExtensionTab? ActiveTabForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("windowTypeForWebExtensionContext:")]
+    WKWebExtensionWindowType WindowTypeForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("windowStateForWebExtensionContext:")]
+    WKWebExtensionWindowState WindowStateForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("setWindowState:forWebExtensionContext:completionHandler:")]
+    void SetWindowStateForWebExtensionContextCompletionHandler(WKWebExtensionWindowState state, WKWebExtensionContext context, WKWebExtensionWindowSetWindowStateForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("isPrivateForWebExtensionContext:")]
+    bool IsPrivateForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("screenFrameForWebExtensionContext:")]
+    CGRect ScreenFrameForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("frameForWebExtensionContext:")]
+    CGRect FrameForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("setFrame:forWebExtensionContext:completionHandler:")]
+    void SetFrameForWebExtensionContextCompletionHandler(CGRect frame, WKWebExtensionContext context, WKWebExtensionWindowSetFrameForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("focusForWebExtensionContext:completionHandler:")]
+    void FocusForWebExtensionContextCompletionHandler(WKWebExtensionContext context, WKWebExtensionWindowFocusForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("closeForWebExtensionContext:completionHandler:")]
+    void CloseForWebExtensionContextCompletionHandler(WKWebExtensionContext context, WKWebExtensionWindowCloseForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

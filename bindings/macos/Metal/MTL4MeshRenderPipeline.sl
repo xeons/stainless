@@ -33,32 +33,58 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTL4MeshRenderPipelineDescriptor : MTL4PipelineDescriptor
 {
-    [Selector("objectFunctionDescriptor", "setObjectFunctionDescriptor:")] public MTL4FunctionDescriptor? ObjectFunctionDescriptor { get; set; }
-    [Selector("meshFunctionDescriptor", "setMeshFunctionDescriptor:")] public MTL4FunctionDescriptor? MeshFunctionDescriptor { get; set; }
-    [Selector("fragmentFunctionDescriptor", "setFragmentFunctionDescriptor:")] public MTL4FunctionDescriptor? FragmentFunctionDescriptor { get; set; }
-    [Selector("maxTotalThreadsPerObjectThreadgroup", "setMaxTotalThreadsPerObjectThreadgroup:")] public NSUInteger MaxTotalThreadsPerObjectThreadgroup { get; set; }
-    [Selector("maxTotalThreadsPerMeshThreadgroup", "setMaxTotalThreadsPerMeshThreadgroup:")] public NSUInteger MaxTotalThreadsPerMeshThreadgroup { get; set; }
-    [Selector("requiredThreadsPerObjectThreadgroup", "setRequiredThreadsPerObjectThreadgroup:")] public MTLSize RequiredThreadsPerObjectThreadgroup { get; set; }
-    [Selector("requiredThreadsPerMeshThreadgroup", "setRequiredThreadsPerMeshThreadgroup:")] public MTLSize RequiredThreadsPerMeshThreadgroup { get; set; }
-    [Selector("objectThreadgroupSizeIsMultipleOfThreadExecutionWidth", "setObjectThreadgroupSizeIsMultipleOfThreadExecutionWidth:")] public bool ObjectThreadgroupSizeIsMultipleOfThreadExecutionWidth { get; set; }
-    [Selector("meshThreadgroupSizeIsMultipleOfThreadExecutionWidth", "setMeshThreadgroupSizeIsMultipleOfThreadExecutionWidth:")] public bool MeshThreadgroupSizeIsMultipleOfThreadExecutionWidth { get; set; }
-    [Selector("payloadMemoryLength", "setPayloadMemoryLength:")] public NSUInteger PayloadMemoryLength { get; set; }
-    [Selector("maxTotalThreadgroupsPerMeshGrid", "setMaxTotalThreadgroupsPerMeshGrid:")] public NSUInteger MaxTotalThreadgroupsPerMeshGrid { get; set; }
-    [Selector("rasterSampleCount", "setRasterSampleCount:")] public NSUInteger RasterSampleCount { get; set; }
-    [Selector("alphaToCoverageState", "setAlphaToCoverageState:")] public MTL4AlphaToCoverageState AlphaToCoverageState { get; set; }
-    [Selector("alphaToOneState", "setAlphaToOneState:")] public MTL4AlphaToOneState AlphaToOneState { get; set; }
-    [Selector("isRasterizationEnabled", "setRasterizationEnabled:")] public bool RasterizationEnabled { get; set; }
-    [Selector("maxVertexAmplificationCount", "setMaxVertexAmplificationCount:")] public NSUInteger MaxVertexAmplificationCount { get; set; }
-    [Selector("colorAttachments")] public MTL4RenderPipelineColorAttachmentDescriptorArray ColorAttachments { get; }
-    [Selector("objectStaticLinkingDescriptor", "setObjectStaticLinkingDescriptor:")] public MTL4StaticLinkingDescriptor? ObjectStaticLinkingDescriptor { get; set; }
-    [Selector("meshStaticLinkingDescriptor", "setMeshStaticLinkingDescriptor:")] public MTL4StaticLinkingDescriptor? MeshStaticLinkingDescriptor { get; set; }
-    [Selector("fragmentStaticLinkingDescriptor", "setFragmentStaticLinkingDescriptor:")] public MTL4StaticLinkingDescriptor? FragmentStaticLinkingDescriptor { get; set; }
-    [Selector("supportObjectBinaryLinking", "setSupportObjectBinaryLinking:")] public bool SupportObjectBinaryLinking { get; set; }
-    [Selector("supportMeshBinaryLinking", "setSupportMeshBinaryLinking:")] public bool SupportMeshBinaryLinking { get; set; }
-    [Selector("supportFragmentBinaryLinking", "setSupportFragmentBinaryLinking:")] public bool SupportFragmentBinaryLinking { get; set; }
-    [Selector("colorAttachmentMappingState", "setColorAttachmentMappingState:")] public MTL4LogicalToPhysicalColorAttachmentMappingState ColorAttachmentMappingState { get; set; }
-    [Selector("supportIndirectCommandBuffers", "setSupportIndirectCommandBuffers:")] public MTL4IndirectCommandBufferSupportState SupportIndirectCommandBuffers { get; set; }
-    [Selector("reset")] public void Reset();
+    [Selector("objectFunctionDescriptor", "setObjectFunctionDescriptor:")]
+    public MTL4FunctionDescriptor? ObjectFunctionDescriptor { get; set; }
+    [Selector("meshFunctionDescriptor", "setMeshFunctionDescriptor:")]
+    public MTL4FunctionDescriptor? MeshFunctionDescriptor { get; set; }
+    [Selector("fragmentFunctionDescriptor", "setFragmentFunctionDescriptor:")]
+    public MTL4FunctionDescriptor? FragmentFunctionDescriptor { get; set; }
+    [Selector("maxTotalThreadsPerObjectThreadgroup", "setMaxTotalThreadsPerObjectThreadgroup:")]
+    public NSUInteger MaxTotalThreadsPerObjectThreadgroup { get; set; }
+    [Selector("maxTotalThreadsPerMeshThreadgroup", "setMaxTotalThreadsPerMeshThreadgroup:")]
+    public NSUInteger MaxTotalThreadsPerMeshThreadgroup { get; set; }
+    [Selector("requiredThreadsPerObjectThreadgroup", "setRequiredThreadsPerObjectThreadgroup:")]
+    public MTLSize RequiredThreadsPerObjectThreadgroup { get; set; }
+    [Selector("requiredThreadsPerMeshThreadgroup", "setRequiredThreadsPerMeshThreadgroup:")]
+    public MTLSize RequiredThreadsPerMeshThreadgroup { get; set; }
+    [Selector("objectThreadgroupSizeIsMultipleOfThreadExecutionWidth", "setObjectThreadgroupSizeIsMultipleOfThreadExecutionWidth:")]
+    public bool ObjectThreadgroupSizeIsMultipleOfThreadExecutionWidth { get; set; }
+    [Selector("meshThreadgroupSizeIsMultipleOfThreadExecutionWidth", "setMeshThreadgroupSizeIsMultipleOfThreadExecutionWidth:")]
+    public bool MeshThreadgroupSizeIsMultipleOfThreadExecutionWidth { get; set; }
+    [Selector("payloadMemoryLength", "setPayloadMemoryLength:")]
+    public NSUInteger PayloadMemoryLength { get; set; }
+    [Selector("maxTotalThreadgroupsPerMeshGrid", "setMaxTotalThreadgroupsPerMeshGrid:")]
+    public NSUInteger MaxTotalThreadgroupsPerMeshGrid { get; set; }
+    [Selector("rasterSampleCount", "setRasterSampleCount:")]
+    public NSUInteger RasterSampleCount { get; set; }
+    [Selector("alphaToCoverageState", "setAlphaToCoverageState:")]
+    public MTL4AlphaToCoverageState AlphaToCoverageState { get; set; }
+    [Selector("alphaToOneState", "setAlphaToOneState:")]
+    public MTL4AlphaToOneState AlphaToOneState { get; set; }
+    [Selector("isRasterizationEnabled", "setRasterizationEnabled:")]
+    public bool RasterizationEnabled { get; set; }
+    [Selector("maxVertexAmplificationCount", "setMaxVertexAmplificationCount:")]
+    public NSUInteger MaxVertexAmplificationCount { get; set; }
+    [Selector("colorAttachments")]
+    public MTL4RenderPipelineColorAttachmentDescriptorArray ColorAttachments { get; }
+    [Selector("objectStaticLinkingDescriptor", "setObjectStaticLinkingDescriptor:")]
+    public MTL4StaticLinkingDescriptor? ObjectStaticLinkingDescriptor { get; set; }
+    [Selector("meshStaticLinkingDescriptor", "setMeshStaticLinkingDescriptor:")]
+    public MTL4StaticLinkingDescriptor? MeshStaticLinkingDescriptor { get; set; }
+    [Selector("fragmentStaticLinkingDescriptor", "setFragmentStaticLinkingDescriptor:")]
+    public MTL4StaticLinkingDescriptor? FragmentStaticLinkingDescriptor { get; set; }
+    [Selector("supportObjectBinaryLinking", "setSupportObjectBinaryLinking:")]
+    public bool SupportObjectBinaryLinking { get; set; }
+    [Selector("supportMeshBinaryLinking", "setSupportMeshBinaryLinking:")]
+    public bool SupportMeshBinaryLinking { get; set; }
+    [Selector("supportFragmentBinaryLinking", "setSupportFragmentBinaryLinking:")]
+    public bool SupportFragmentBinaryLinking { get; set; }
+    [Selector("colorAttachmentMappingState", "setColorAttachmentMappingState:")]
+    public MTL4LogicalToPhysicalColorAttachmentMappingState ColorAttachmentMappingState { get; set; }
+    [Selector("supportIndirectCommandBuffers", "setSupportIndirectCommandBuffers:")]
+    public MTL4IndirectCommandBufferSupportState SupportIndirectCommandBuffers { get; set; }
+    [Selector("reset")]
+    public void Reset();
 }
 
 #endif

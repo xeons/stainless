@@ -33,12 +33,17 @@ import Standard.ObjC;
 
 public extern objc class CKUserIdentity : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("userRecordID")] public CKRecordID? UserRecordID { get; }
-    [Selector("lookupInfo")] public CKUserIdentityLookupInfo? LookupInfo { get; }
-    [Selector("nameComponents")] public NSPersonNameComponents? NameComponents { get; }
-    [Selector("hasiCloudAccount")] public bool HasiCloudAccount { get; }
+    [Selector("userRecordID")]
+    public CKRecordID? UserRecordID { get; }
+    [Selector("lookupInfo")]
+    public CKUserIdentityLookupInfo? LookupInfo { get; }
+    [Selector("nameComponents")]
+    public NSPersonNameComponents? NameComponents { get; }
+    [Selector("hasiCloudAccount")]
+    public bool HasiCloudAccount { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("contactIdentifiers")] public NSArray ContactIdentifiers { get; }
+    [Selector("contactIdentifiers")]
+    public NSArray ContactIdentifiers { get; }
 }
 
 #endif

@@ -35,10 +35,14 @@ public objc closure void NSFilePromiseReceiverReceivePromisedFilesAtDestinationO
 
 public extern objc class NSFilePromiseReceiver : NSObject, NSPasteboardReading
 {
-    [Selector("readableDraggedTypes")] public static NSArray ReadableDraggedTypes { get; }
-    [Selector("fileTypes")] public NSArray FileTypes { get; }
-    [Selector("fileNames")] public NSArray FileNames { get; }
-    [Selector("receivePromisedFilesAtDestination:options:operationQueue:reader:")] public void ReceivePromisedFilesAtDestinationOptionsOperationQueueReader(NSURL destinationDir, NSDictionary options, NSOperationQueue operationQueue, NSFilePromiseReceiverReceivePromisedFilesAtDestinationOptionsOperationQueueReaderReaderBlock reader);
+    [Selector("readableDraggedTypes")]
+    public static NSArray ReadableDraggedTypes { get; }
+    [Selector("fileTypes")]
+    public NSArray FileTypes { get; }
+    [Selector("fileNames")]
+    public NSArray FileNames { get; }
+    [Selector("receivePromisedFilesAtDestination:options:operationQueue:reader:")]
+    public void ReceivePromisedFilesAtDestinationOptionsOperationQueueReader(NSURL destinationDir, NSDictionary options, NSOperationQueue operationQueue, NSFilePromiseReceiverReceivePromisedFilesAtDestinationOptionsOperationQueueReaderReaderBlock reader);
 }
 
 #endif

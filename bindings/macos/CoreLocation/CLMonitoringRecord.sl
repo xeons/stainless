@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class CLMonitoringRecord : NSObject, NSSecureCoding
 {
-    [Selector("condition")] public CLCondition Condition { get; }
-    [Selector("lastEvent")] public CLMonitoringEvent LastEvent { get; }
+    [Selector("condition")]
+    public CLCondition Condition { get; }
+    [Selector("lastEvent")]
+    public CLMonitoringEvent LastEvent { get; }
 }
 
 #endif

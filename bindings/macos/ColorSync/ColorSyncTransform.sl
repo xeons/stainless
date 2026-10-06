@@ -37,9 +37,11 @@ public extern objc class ColorSyncTransformRef : CFTypeRef { }
 
 public extern "C" CFTypeID ColorSyncTransformGetTypeID();
 
-[ReturnsRetained] public extern "C" ColorSyncTransformRef? ColorSyncTransformCreate(CFArrayRef? profileSequence, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" ColorSyncTransformRef? ColorSyncTransformCreate(CFArrayRef? profileSequence, CFDictionaryRef? options);
 
-[ReturnsRetained] public extern "C" CFTypeRef? ColorSyncTransformCopyProperty(ColorSyncTransformRef transform, CFTypeRef key, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CFTypeRef? ColorSyncTransformCopyProperty(ColorSyncTransformRef transform, CFTypeRef key, CFDictionaryRef? options);
 
 public extern "C" void ColorSyncTransformSetProperty(ColorSyncTransformRef transform, CFTypeRef key, CFTypeRef? property);
 
@@ -180,6 +182,7 @@ public extern "C" CFStringRef kColorSyncConversionBPC;
 
 public extern "C" CFStringRef kColorSyncFixedPointRange;
 
-[ReturnsRetained] public extern "C" CFTypeRef ColorSyncCreateCodeFragment(CFArrayRef profileSequence, CFDictionaryRef options);
+[ReturnsRetained]
+public extern "C" CFTypeRef ColorSyncCreateCodeFragment(CFArrayRef profileSequence, CFDictionaryRef options);
 
 #endif

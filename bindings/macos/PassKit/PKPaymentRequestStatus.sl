@@ -33,59 +33,86 @@ import Standard.ObjC;
 
 public extern objc class PKPaymentAuthorizationResult : NSObject
 {
-    [Selector("status", "setStatus:")] public PKPaymentAuthorizationStatus Status { get; set; }
-    [Selector("errors", "setErrors:")] public NSArray? Errors { get; set; }
-    [Selector("orderDetails", "setOrderDetails:")] public PKPaymentOrderDetails? OrderDetails { get; set; }
-    [Selector("initWithStatus:errors:")] public Self InitWithStatusErrors(PKPaymentAuthorizationStatus status, NSArray? errors);
+    [Selector("status", "setStatus:")]
+    public PKPaymentAuthorizationStatus Status { get; set; }
+    [Selector("errors", "setErrors:")]
+    public NSArray? Errors { get; set; }
+    [Selector("orderDetails", "setOrderDetails:")]
+    public PKPaymentOrderDetails? OrderDetails { get; set; }
+    [Selector("initWithStatus:errors:")]
+    public Self InitWithStatusErrors(PKPaymentAuthorizationStatus status, NSArray? errors);
 }
 
 public extern objc class PKPaymentRequestUpdate : NSObject
 {
-    [Selector("status", "setStatus:")] public PKPaymentAuthorizationStatus Status { get; set; }
-    [Selector("paymentSummaryItems", "setPaymentSummaryItems:")] public NSArray PaymentSummaryItems { get; set; }
-    [Selector("shippingMethods", "setShippingMethods:")] public NSArray ShippingMethods { get; set; }
-    [Selector("multiTokenContexts", "setMultiTokenContexts:")] public NSArray? MultiTokenContexts { get; set; }
-    [Selector("recurringPaymentRequest", "setRecurringPaymentRequest:")] public PKRecurringPaymentRequest? RecurringPaymentRequest { get; set; }
-    [Selector("automaticReloadPaymentRequest", "setAutomaticReloadPaymentRequest:")] public PKAutomaticReloadPaymentRequest? AutomaticReloadPaymentRequest { get; set; }
-    [Selector("deferredPaymentRequest", "setDeferredPaymentRequest:")] public PKDeferredPaymentRequest? DeferredPaymentRequest { get; set; }
-    [Selector("initWithPaymentSummaryItems:")] public Self InitWithPaymentSummaryItems(NSArray paymentSummaryItems);
+    [Selector("status", "setStatus:")]
+    public PKPaymentAuthorizationStatus Status { get; set; }
+    [Selector("paymentSummaryItems", "setPaymentSummaryItems:")]
+    public NSArray PaymentSummaryItems { get; set; }
+    [Selector("shippingMethods", "setShippingMethods:")]
+    public NSArray ShippingMethods { get; set; }
+    [Selector("multiTokenContexts", "setMultiTokenContexts:")]
+    public NSArray? MultiTokenContexts { get; set; }
+    [Selector("recurringPaymentRequest", "setRecurringPaymentRequest:")]
+    public PKRecurringPaymentRequest? RecurringPaymentRequest { get; set; }
+    [Selector("automaticReloadPaymentRequest", "setAutomaticReloadPaymentRequest:")]
+    public PKAutomaticReloadPaymentRequest? AutomaticReloadPaymentRequest { get; set; }
+    [Selector("deferredPaymentRequest", "setDeferredPaymentRequest:")]
+    public PKDeferredPaymentRequest? DeferredPaymentRequest { get; set; }
+    [Selector("initWithPaymentSummaryItems:")]
+    public Self InitWithPaymentSummaryItems(NSArray paymentSummaryItems);
 }
 
 public extern objc class PKPaymentRequestShippingContactUpdate : PKPaymentRequestUpdate
 {
-    [Selector("shippingMethods", "setShippingMethods:")] public NSArray ShippingMethods { get; set; }
-    [Selector("errors", "setErrors:")] public NSArray? Errors { get; set; }
-    [Selector("initWithErrors:paymentSummaryItems:shippingMethods:")] public Self InitWithErrorsPaymentSummaryItemsShippingMethods(NSArray? errors, NSArray paymentSummaryItems, NSArray shippingMethods);
+    [Selector("shippingMethods", "setShippingMethods:")]
+    public NSArray ShippingMethods { get; set; }
+    [Selector("errors", "setErrors:")]
+    public NSArray? Errors { get; set; }
+    [Selector("initWithErrors:paymentSummaryItems:shippingMethods:")]
+    public Self InitWithErrorsPaymentSummaryItemsShippingMethods(NSArray? errors, NSArray paymentSummaryItems, NSArray shippingMethods);
 }
 
 public extern objc class PKPaymentRequestShippingMethodUpdate : PKPaymentRequestUpdate { }
 
 public extern objc class PKPaymentRequestPaymentMethodUpdate : PKPaymentRequestUpdate
 {
-    [Selector("errors", "setErrors:")] public NSArray? Errors { get; set; }
-    [Selector("initWithErrors:paymentSummaryItems:")] public Self InitWithErrorsPaymentSummaryItems(NSArray? errors, NSArray paymentSummaryItems);
+    [Selector("errors", "setErrors:")]
+    public NSArray? Errors { get; set; }
+    [Selector("initWithErrors:paymentSummaryItems:")]
+    public Self InitWithErrorsPaymentSummaryItems(NSArray? errors, NSArray paymentSummaryItems);
 }
 
 public extern objc class PKPaymentRequestMerchantSessionUpdate : NSObject
 {
-    [Selector("status", "setStatus:")] public PKPaymentAuthorizationStatus Status { get; set; }
-    [Selector("session", "setSession:")] public PKPaymentMerchantSession? Session { get; set; }
-    [Selector("initWithStatus:merchantSession:")] public Self InitWithStatusMerchantSession(PKPaymentAuthorizationStatus status, PKPaymentMerchantSession? session);
+    [Selector("status", "setStatus:")]
+    public PKPaymentAuthorizationStatus Status { get; set; }
+    [Selector("session", "setSession:")]
+    public PKPaymentMerchantSession? Session { get; set; }
+    [Selector("initWithStatus:merchantSession:")]
+    public Self InitWithStatusMerchantSession(PKPaymentAuthorizationStatus status, PKPaymentMerchantSession? session);
 }
 
 public extern objc class PKPaymentRequestCouponCodeUpdate : PKPaymentRequestUpdate
 {
-    [Selector("errors", "setErrors:")] public NSArray? Errors { get; set; }
-    [Selector("initWithErrors:paymentSummaryItems:shippingMethods:")] public Self InitWithErrorsPaymentSummaryItemsShippingMethods(NSArray? errors, NSArray paymentSummaryItems, NSArray shippingMethods);
+    [Selector("errors", "setErrors:")]
+    public NSArray? Errors { get; set; }
+    [Selector("initWithErrors:paymentSummaryItems:shippingMethods:")]
+    public Self InitWithErrorsPaymentSummaryItemsShippingMethods(NSArray? errors, NSArray paymentSummaryItems, NSArray shippingMethods);
 }
 
 public extern objc class PKPaymentOrderDetails : NSObject
 {
-    [Selector("orderTypeIdentifier", "setOrderTypeIdentifier:")] public NSString OrderTypeIdentifier { get; set; }
-    [Selector("orderIdentifier", "setOrderIdentifier:")] public NSString OrderIdentifier { get; set; }
-    [Selector("webServiceURL", "setWebServiceURL:")] public NSURL WebServiceURL { get; set; }
-    [Selector("authenticationToken", "setAuthenticationToken:")] public NSString AuthenticationToken { get; set; }
-    [Selector("initWithOrderTypeIdentifier:orderIdentifier:webServiceURL:authenticationToken:")] public Self InitWithOrderTypeIdentifierOrderIdentifierWebServiceURLAuthenticationToken(NSString orderTypeIdentifier, NSString orderIdentifier, NSURL webServiceURL, NSString authenticationToken);
+    [Selector("orderTypeIdentifier", "setOrderTypeIdentifier:")]
+    public NSString OrderTypeIdentifier { get; set; }
+    [Selector("orderIdentifier", "setOrderIdentifier:")]
+    public NSString OrderIdentifier { get; set; }
+    [Selector("webServiceURL", "setWebServiceURL:")]
+    public NSURL WebServiceURL { get; set; }
+    [Selector("authenticationToken", "setAuthenticationToken:")]
+    public NSString AuthenticationToken { get; set; }
+    [Selector("initWithOrderTypeIdentifier:orderIdentifier:webServiceURL:authenticationToken:")]
+    public Self InitWithOrderTypeIdentifierOrderIdentifierWebServiceURLAuthenticationToken(NSString orderTypeIdentifier, NSString orderIdentifier, NSURL webServiceURL, NSString authenticationToken);
 }
 
 #endif

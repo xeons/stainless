@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class VZDiskBlockDeviceStorageDeviceAttachment : VZStorageDeviceAttachment
 {
-    [Selector("fileHandle")] public NSFileHandle FileHandle { get; }
-    [Selector("isReadOnly")] public bool ReadOnly { get; }
-    [Selector("synchronizationMode")] public VZDiskSynchronizationMode SynchronizationMode { get; }
-    [Selector("initWithFileHandle:readOnly:synchronizationMode:error:")] public Self? InitWithFileHandleReadOnlySynchronizationModeError(NSFileHandle fileHandle, bool readOnly, VZDiskSynchronizationMode synchronizationMode, out NSError? error);
+    [Selector("fileHandle")]
+    public NSFileHandle FileHandle { get; }
+    [Selector("isReadOnly")]
+    public bool ReadOnly { get; }
+    [Selector("synchronizationMode")]
+    public VZDiskSynchronizationMode SynchronizationMode { get; }
+    [Selector("initWithFileHandle:readOnly:synchronizationMode:error:")]
+    public Self? InitWithFileHandleReadOnlySynchronizationModeError(NSFileHandle fileHandle, bool readOnly, VZDiskSynchronizationMode synchronizationMode, out NSError? error);
 }
 
 #endif

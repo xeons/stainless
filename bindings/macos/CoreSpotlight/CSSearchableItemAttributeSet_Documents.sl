@@ -33,21 +33,36 @@ import Standard.ObjC;
 /// CSDocuments, a category of CSSearchableItemAttributeSet.
 public extern objc class CSSearchableItemAttributeSet
 {
-    [Selector("subject", "setSubject:")] public NSString? Subject { get; set; }
-    [Selector("theme", "setTheme:")] public NSString? Theme { get; set; }
-    [Selector("contentDescription", "setContentDescription:")] public NSString? ContentDescription { get; set; }
-    [Selector("identifier", "setIdentifier:")] public NSString? Identifier { get; set; }
-    [Selector("audiences", "setAudiences:")] public NSArray? Audiences { get; set; }
-    [Selector("fileSize", "setFileSize:")] public NSNumber? FileSize { get; set; }
-    [Selector("pageCount", "setPageCount:")] public NSNumber? PageCount { get; set; }
-    [Selector("pageWidth", "setPageWidth:")] public NSNumber? PageWidth { get; set; }
-    [Selector("pageHeight", "setPageHeight:")] public NSNumber? PageHeight { get; set; }
-    [Selector("securityMethod", "setSecurityMethod:")] public NSString? SecurityMethod { get; set; }
-    [Selector("creator", "setCreator:")] public NSString? Creator { get; set; }
-    [Selector("encodingApplications", "setEncodingApplications:")] public NSArray? EncodingApplications { get; set; }
-    [Selector("kind", "setKind:")] public NSString? Kind { get; set; }
-    [Selector("fontNames", "setFontNames:")] public NSArray? FontNames { get; set; }
-    [Selector("moveFrom:")] public void MoveFrom(CSSearchableItemAttributeSet sourceAttributeSet);
+    [Selector("subject", "setSubject:")]
+    public NSString? Subject { get; set; }
+    [Selector("theme", "setTheme:")]
+    public NSString? Theme { get; set; }
+    [Selector("contentDescription", "setContentDescription:")]
+    public NSString? ContentDescription { get; set; }
+    [Selector("identifier", "setIdentifier:")]
+    public NSString? Identifier { get; set; }
+    [Selector("audiences", "setAudiences:")]
+    public NSArray? Audiences { get; set; }
+    [Selector("fileSize", "setFileSize:")]
+    public NSNumber? FileSize { get; set; }
+    [Selector("pageCount", "setPageCount:")]
+    public NSNumber? PageCount { get; set; }
+    [Selector("pageWidth", "setPageWidth:")]
+    public NSNumber? PageWidth { get; set; }
+    [Selector("pageHeight", "setPageHeight:")]
+    public NSNumber? PageHeight { get; set; }
+    [Selector("securityMethod", "setSecurityMethod:")]
+    public NSString? SecurityMethod { get; set; }
+    [Selector("creator", "setCreator:")]
+    public NSString? Creator { get; set; }
+    [Selector("encodingApplications", "setEncodingApplications:")]
+    public NSArray? EncodingApplications { get; set; }
+    [Selector("kind", "setKind:")]
+    public NSString? Kind { get; set; }
+    [Selector("fontNames", "setFontNames:")]
+    public NSArray? FontNames { get; set; }
+    [Selector("moveFrom:")]
+    public void MoveFrom(CSSearchableItemAttributeSet sourceAttributeSet);
 }
 
 #endif

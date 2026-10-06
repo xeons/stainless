@@ -33,17 +33,22 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMCSSMediaRule : DOMCSSRule
 {
-    [Selector("media")] public DOMMediaList? Media { get; }
-    [Selector("cssRules")] public DOMCSSRuleList? CssRules { get; }
-    [Selector("insertRule:index:")] public uint InsertRuleIndex(NSString? rule, uint index);
-    [Selector("deleteRule:")] public void DeleteRule(uint index);
+    [Selector("media")]
+    public DOMMediaList? Media { get; }
+    [Selector("cssRules")]
+    public DOMCSSRuleList? CssRules { get; }
+    [Selector("insertRule:index:")]
+    public uint InsertRuleIndex(NSString? rule, uint index);
+    [Selector("deleteRule:")]
+    public void DeleteRule(uint index);
 }
 
 /// DOMCSSMediaRuleDeprecated, a category of DOMCSSMediaRule.
 public extern objc class DOMCSSMediaRule
 {
     /// Deprecated in macOS 10.5.
-    [Selector("insertRule::")] public uint InsertRule(NSString? rule, uint index);
+    [Selector("insertRule::")]
+    public uint InsertRule(NSString? rule, uint index);
 }
 
 #endif

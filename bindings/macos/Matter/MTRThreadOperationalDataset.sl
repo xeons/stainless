@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class MTRThreadOperationalDataset : NSObject
 {
-    [Selector("networkName")] public NSString NetworkName { get; }
-    [Selector("extendedPANID")] public NSData ExtendedPANID { get; }
-    [Selector("masterKey")] public NSData MasterKey { get; }
-    [Selector("PSKc")] public NSData PSKc { get; }
-    [Selector("channelNumber")] public NSNumber ChannelNumber { get; }
-    [Selector("panID")] public NSData PanID { get; }
-    [Selector("initWithNetworkName:extendedPANID:masterKey:PSKc:channelNumber:panID:")] public Self? InitWithNetworkNameExtendedPANIDMasterKeyPSKcChannelNumberPanID(NSString networkName, NSData extendedPANID, NSData masterKey, NSData PSKc, NSNumber channelNumber, NSData panID);
-    [Selector("initWithData:")] public Self? InitWithData(NSData data);
-    [Selector("data")] public NSData Data();
+    [Selector("networkName")]
+    public NSString NetworkName { get; }
+    [Selector("extendedPANID")]
+    public NSData ExtendedPANID { get; }
+    [Selector("masterKey")]
+    public NSData MasterKey { get; }
+    [Selector("PSKc")]
+    public NSData PSKc { get; }
+    [Selector("channelNumber")]
+    public NSNumber ChannelNumber { get; }
+    [Selector("panID")]
+    public NSData PanID { get; }
+    [Selector("initWithNetworkName:extendedPANID:masterKey:PSKc:channelNumber:panID:")]
+    public Self? InitWithNetworkNameExtendedPANIDMasterKeyPSKcChannelNumberPanID(NSString networkName, NSData extendedPANID, NSData masterKey, NSData PSKc, NSNumber channelNumber, NSData panID);
+    [Selector("initWithData:")]
+    public Self? InitWithData(NSData data);
+    [Selector("data")]
+    public NSData Data();
 }
 
 public extern "C" nuint MTRSizeThreadNetworkName;
@@ -61,9 +70,11 @@ public extern "C" nuint MTRSizeThreadPANID;
 public extern objc class MTRThreadOperationalDataset
 {
     /// Deprecated in macOS 13.3.
-    [Selector("channel", "setChannel:")] public ushort Channel { get; set; }
+    [Selector("channel", "setChannel:")]
+    public ushort Channel { get; set; }
     /// Deprecated in macOS 13.3.
-    [Selector("initWithNetworkName:extendedPANID:masterKey:PSKc:channel:panID:")] public Self? InitWithNetworkNameExtendedPANIDMasterKeyPSKcChannelPanID(NSString networkName, NSData extendedPANID, NSData masterKey, NSData PSKc, ushort channel, NSData panID);
+    [Selector("initWithNetworkName:extendedPANID:masterKey:PSKc:channel:panID:")]
+    public Self? InitWithNetworkNameExtendedPANIDMasterKeyPSKcChannelPanID(NSString networkName, NSData extendedPANID, NSData masterKey, NSData PSKc, ushort channel, NSData panID);
 }
 
 #endif

@@ -38,21 +38,36 @@ public objc closure void NSTimerInitWithFireDateIntervalRepeatsBlockBlock(NSTime
 
 public extern objc class NSTimer : NSObject
 {
-    [Selector("fireDate", "setFireDate:")] public NSDate FireDate { get; set; }
-    [Selector("timeInterval")] public NSTimeInterval TimeInterval { get; }
-    [Selector("tolerance", "setTolerance:")] public NSTimeInterval Tolerance { get; set; }
-    [Selector("isValid")] public bool Valid { get; }
-    [Selector("userInfo")] public AnyObject? UserInfo { get; }
-    [Selector("timerWithTimeInterval:invocation:repeats:")] public static NSTimer TimerWithTimeIntervalInvocationRepeats(NSTimeInterval ti, NSInvocation invocation, bool yesOrNo);
-    [Selector("scheduledTimerWithTimeInterval:invocation:repeats:")] public static NSTimer ScheduledTimerWithTimeIntervalInvocationRepeats(NSTimeInterval ti, NSInvocation invocation, bool yesOrNo);
-    [Selector("timerWithTimeInterval:target:selector:userInfo:repeats:")] public static NSTimer TimerWithTimeIntervalTargetSelectorUserInfoRepeats(NSTimeInterval ti, AnyObject aTarget, Selector aSelector, AnyObject? userInfo, bool yesOrNo);
-    [Selector("scheduledTimerWithTimeInterval:target:selector:userInfo:repeats:")] public static NSTimer ScheduledTimerWithTimeIntervalTargetSelectorUserInfoRepeats(NSTimeInterval ti, AnyObject aTarget, Selector aSelector, AnyObject? userInfo, bool yesOrNo);
-    [Selector("timerWithTimeInterval:repeats:block:")] public static NSTimer TimerWithTimeIntervalRepeatsBlock(NSTimeInterval interval, bool repeats, NSTimerTimerWithTimeIntervalRepeatsBlockBlock block);
-    [Selector("scheduledTimerWithTimeInterval:repeats:block:")] public static NSTimer ScheduledTimerWithTimeIntervalRepeatsBlock(NSTimeInterval interval, bool repeats, NSTimerScheduledTimerWithTimeIntervalRepeatsBlockBlock block);
-    [Selector("initWithFireDate:interval:repeats:block:")] public Self InitWithFireDateIntervalRepeatsBlock(NSDate date, NSTimeInterval interval, bool repeats, NSTimerInitWithFireDateIntervalRepeatsBlockBlock block);
-    [Selector("initWithFireDate:interval:target:selector:userInfo:repeats:")] public Self InitWithFireDateIntervalTargetSelectorUserInfoRepeats(NSDate date, NSTimeInterval ti, AnyObject t, Selector s, AnyObject? ui, bool rep);
-    [Selector("fire")] public void Fire();
-    [Selector("invalidate")] public void Invalidate();
+    [Selector("fireDate", "setFireDate:")]
+    public NSDate FireDate { get; set; }
+    [Selector("timeInterval")]
+    public NSTimeInterval TimeInterval { get; }
+    [Selector("tolerance", "setTolerance:")]
+    public NSTimeInterval Tolerance { get; set; }
+    [Selector("isValid")]
+    public bool Valid { get; }
+    [Selector("userInfo")]
+    public AnyObject? UserInfo { get; }
+    [Selector("timerWithTimeInterval:invocation:repeats:")]
+    public static NSTimer TimerWithTimeIntervalInvocationRepeats(NSTimeInterval ti, NSInvocation invocation, bool yesOrNo);
+    [Selector("scheduledTimerWithTimeInterval:invocation:repeats:")]
+    public static NSTimer ScheduledTimerWithTimeIntervalInvocationRepeats(NSTimeInterval ti, NSInvocation invocation, bool yesOrNo);
+    [Selector("timerWithTimeInterval:target:selector:userInfo:repeats:")]
+    public static NSTimer TimerWithTimeIntervalTargetSelectorUserInfoRepeats(NSTimeInterval ti, AnyObject aTarget, Selector aSelector, AnyObject? userInfo, bool yesOrNo);
+    [Selector("scheduledTimerWithTimeInterval:target:selector:userInfo:repeats:")]
+    public static NSTimer ScheduledTimerWithTimeIntervalTargetSelectorUserInfoRepeats(NSTimeInterval ti, AnyObject aTarget, Selector aSelector, AnyObject? userInfo, bool yesOrNo);
+    [Selector("timerWithTimeInterval:repeats:block:")]
+    public static NSTimer TimerWithTimeIntervalRepeatsBlock(NSTimeInterval interval, bool repeats, NSTimerTimerWithTimeIntervalRepeatsBlockBlock block);
+    [Selector("scheduledTimerWithTimeInterval:repeats:block:")]
+    public static NSTimer ScheduledTimerWithTimeIntervalRepeatsBlock(NSTimeInterval interval, bool repeats, NSTimerScheduledTimerWithTimeIntervalRepeatsBlockBlock block);
+    [Selector("initWithFireDate:interval:repeats:block:")]
+    public Self InitWithFireDateIntervalRepeatsBlock(NSDate date, NSTimeInterval interval, bool repeats, NSTimerInitWithFireDateIntervalRepeatsBlockBlock block);
+    [Selector("initWithFireDate:interval:target:selector:userInfo:repeats:")]
+    public Self InitWithFireDateIntervalTargetSelectorUserInfoRepeats(NSDate date, NSTimeInterval ti, AnyObject t, Selector s, AnyObject? ui, bool rep);
+    [Selector("fire")]
+    public void Fire();
+    [Selector("invalidate")]
+    public void Invalidate();
 }
 
 #endif

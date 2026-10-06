@@ -33,10 +33,14 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCSliceLayer : MLCLayer
 {
-    [Selector("start")] public NSArray? Start { get; }
-    [Selector("end")] public NSArray? End { get; }
-    [Selector("stride")] public NSArray? Stride { get; }
-    [Selector("sliceLayerWithStart:end:stride:")] public static Self? SliceLayerWithStartEndStride(NSArray start, NSArray end, NSArray? stride);
+    [Selector("start")]
+    public NSArray? Start { get; }
+    [Selector("end")]
+    public NSArray? End { get; }
+    [Selector("stride")]
+    public NSArray? Stride { get; }
+    [Selector("sliceLayerWithStart:end:stride:")]
+    public static Self? SliceLayerWithStartEndStride(NSArray start, NSArray end, NSArray? stride);
 }
 
 #endif

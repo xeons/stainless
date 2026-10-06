@@ -46,12 +46,18 @@ public enum WKWebExtensionDataRecordError : long
 /// macOS 15.4 and later.
 public extern objc class WKWebExtensionDataRecord : NSObject
 {
-    [Selector("displayName")] public NSString DisplayName { get; }
-    [Selector("uniqueIdentifier")] public NSString UniqueIdentifier { get; }
-    [Selector("containedDataTypes")] public NSSet ContainedDataTypes { get; }
-    [Selector("errors")] public NSArray Errors { get; }
-    [Selector("totalSizeInBytes")] public NSUInteger TotalSizeInBytes { get; }
-    [Selector("sizeInBytesOfTypes:")] public NSUInteger SizeInBytesOfTypes(NSSet dataTypes);
+    [Selector("displayName")]
+    public NSString DisplayName { get; }
+    [Selector("uniqueIdentifier")]
+    public NSString UniqueIdentifier { get; }
+    [Selector("containedDataTypes")]
+    public NSSet ContainedDataTypes { get; }
+    [Selector("errors")]
+    public NSArray Errors { get; }
+    [Selector("totalSizeInBytes")]
+    public NSUInteger TotalSizeInBytes { get; }
+    [Selector("sizeInBytesOfTypes:")]
+    public NSUInteger SizeInBytesOfTypes(NSSet dataTypes);
 }
 
 #endif

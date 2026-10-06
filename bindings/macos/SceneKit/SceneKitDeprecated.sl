@@ -56,40 +56,50 @@ public extern "C" NSString? SCNLightShadowFarClippingKey;
 public extern objc class SCNLight : SCNTechniqueSupport
 {
     /// Deprecated in macOS 10.10.
-    [Selector("attributeForKey:")] public AnyObject? AttributeForKey(NSString key);
+    [Selector("attributeForKey:")]
+    public AnyObject? AttributeForKey(NSString key);
     /// Deprecated in macOS 10.10.
-    [Selector("setAttribute:forKey:")] public void SetAttributeForKey(AnyObject? @attribute, NSString key);
+    [Selector("setAttribute:forKey:")]
+    public void SetAttributeForKey(AnyObject? @attribute, NSString key);
 }
 
 /// SCNDeprecated, a category of SCNCamera.
 public extern objc class SCNCamera
 {
     /// Deprecated in macOS 10.13.
-    [Selector("focalBlurRadius", "setFocalBlurRadius:")] public CGFloat FocalBlurRadius { get; set; }
+    [Selector("focalBlurRadius", "setFocalBlurRadius:")]
+    public CGFloat FocalBlurRadius { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("xFov", "setXFov:")] public double XFov { get; set; }
+    [Selector("xFov", "setXFov:")]
+    public double XFov { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("yFov", "setYFov:")] public double YFov { get; set; }
+    [Selector("yFov", "setYFov:")]
+    public double YFov { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("aperture", "setAperture:")] public CGFloat Aperture { get; set; }
+    [Selector("aperture", "setAperture:")]
+    public CGFloat Aperture { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("focalSize", "setFocalSize:")] public CGFloat FocalSize { get; set; }
+    [Selector("focalSize", "setFocalSize:")]
+    public CGFloat FocalSize { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("focalDistance", "setFocalDistance:")] public CGFloat FocalDistance { get; set; }
+    [Selector("focalDistance", "setFocalDistance:")]
+    public CGFloat FocalDistance { get; set; }
 }
 
 /// SCNDeprecated, a category of SCNRenderer.
 public extern objc class SCNRenderer
 {
     /// Deprecated in macOS 10.11.
-    [Selector("render")] public void Render();
+    [Selector("render")]
+    public void Render();
 }
 
 /// SCNDeprecated, a category of SCNMaterialProperty.
 public extern objc class SCNMaterialProperty
 {
     /// Deprecated in macOS 10.12.
-    [Selector("borderColor", "setBorderColor:")] public AnyObject? BorderColor { get; set; }
+    [Selector("borderColor", "setBorderColor:")]
+    public AnyObject? BorderColor { get; set; }
 }
 
 #endif

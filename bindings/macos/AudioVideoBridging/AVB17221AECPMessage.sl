@@ -33,50 +33,74 @@ import Standard.ObjC;
 
 public extern objc class AVB17221AECPMessage : NSObject, NSCopying
 {
-    [Selector("messageType", "setMessageType:")] public AVB17221AECPMessageType MessageType { get; set; }
-    [Selector("status", "setStatus:")] public AVB17221AECPStatusCode Status { get; set; }
-    [Selector("targetEntityID", "setTargetEntityID:")] public ulong TargetEntityID { get; set; }
-    [Selector("controllerEntityID", "setControllerEntityID:")] public ulong ControllerEntityID { get; set; }
-    [Selector("sequenceID", "setSequenceID:")] public ushort SequenceID { get; set; }
-    [Selector("sourceMAC", "setSourceMAC:")] public AVBMACAddress SourceMAC { get; set; }
-    [Selector("errorForStatusCode:")] public static NSError? ErrorForStatusCode(AVB17221AECPStatusCode statusCode);
-    [Selector("errorForStatusCode")] public NSError? ErrorForStatusCodeMethod();
+    [Selector("messageType", "setMessageType:")]
+    public AVB17221AECPMessageType MessageType { get; set; }
+    [Selector("status", "setStatus:")]
+    public AVB17221AECPStatusCode Status { get; set; }
+    [Selector("targetEntityID", "setTargetEntityID:")]
+    public ulong TargetEntityID { get; set; }
+    [Selector("controllerEntityID", "setControllerEntityID:")]
+    public ulong ControllerEntityID { get; set; }
+    [Selector("sequenceID", "setSequenceID:")]
+    public ushort SequenceID { get; set; }
+    [Selector("sourceMAC", "setSourceMAC:")]
+    public AVBMACAddress SourceMAC { get; set; }
+    [Selector("errorForStatusCode:")]
+    public static NSError? ErrorForStatusCode(AVB17221AECPStatusCode statusCode);
+    [Selector("errorForStatusCode")]
+    public NSError? ErrorForStatusCodeMethod();
 }
 
 public extern objc class AVB17221AECPAEMMessage : AVB17221AECPMessage
 {
-    [Selector("commandType", "setCommandType:")] public AVB17221AEMCommandType CommandType { get; set; }
-    [Selector("isUnsolicited", "setUnsolicited:")] public bool Unsolicited { get; set; }
-    [Selector("isControllerRequest", "setControllerRequest:")] public bool ControllerRequest { get; set; }
-    [Selector("commandSpecificData", "setCommandSpecificData:")] public NSData? CommandSpecificData { get; set; }
-    [Selector("commandMessage")] public static AVB17221AECPAEMMessage CommandMessage();
-    [Selector("responseMessage")] public static AVB17221AECPAEMMessage ResponseMessage();
-    [Selector("responseMessageFromCommandMessage:")] public static AVB17221AECPAEMMessage ResponseMessageFromCommandMessage(AVB17221AECPAEMMessage commandMessage);
+    [Selector("commandType", "setCommandType:")]
+    public AVB17221AEMCommandType CommandType { get; set; }
+    [Selector("isUnsolicited", "setUnsolicited:")]
+    public bool Unsolicited { get; set; }
+    [Selector("isControllerRequest", "setControllerRequest:")]
+    public bool ControllerRequest { get; set; }
+    [Selector("commandSpecificData", "setCommandSpecificData:")]
+    public NSData? CommandSpecificData { get; set; }
+    [Selector("commandMessage")]
+    public static AVB17221AECPAEMMessage CommandMessage();
+    [Selector("responseMessage")]
+    public static AVB17221AECPAEMMessage ResponseMessage();
+    [Selector("responseMessageFromCommandMessage:")]
+    public static AVB17221AECPAEMMessage ResponseMessageFromCommandMessage(AVB17221AECPAEMMessage commandMessage);
 }
 
 public extern objc class AVB17221AECPAddressAccessMessage : AVB17221AECPMessage
 {
-    [Selector("tlvs", "setTlvs:")] public NSArray? Tlvs { get; set; }
-    [Selector("commandMessage")] public static AVB17221AECPAddressAccessMessage CommandMessage();
-    [Selector("responseMessage")] public static AVB17221AECPAddressAccessMessage ResponseMessage();
+    [Selector("tlvs", "setTlvs:")]
+    public NSArray? Tlvs { get; set; }
+    [Selector("commandMessage")]
+    public static AVB17221AECPAddressAccessMessage CommandMessage();
+    [Selector("responseMessage")]
+    public static AVB17221AECPAddressAccessMessage ResponseMessage();
 }
 
 public extern objc class AVB17221AECPAddressAccessTLV : NSObject
 {
-    [Selector("mode", "setMode:")] public AVB17221AECPAddressAccessTLVMode Mode { get; set; }
-    [Selector("address", "setAddress:")] public ulong Address { get; set; }
-    [Selector("memoryData", "setMemoryData:")] public NSData? MemoryData { get; set; }
+    [Selector("mode", "setMode:")]
+    public AVB17221AECPAddressAccessTLVMode Mode { get; set; }
+    [Selector("address", "setAddress:")]
+    public ulong Address { get; set; }
+    [Selector("memoryData", "setMemoryData:")]
+    public NSData? MemoryData { get; set; }
 }
 
 public extern objc class AVB17221AECPAVCMessage : AVB17221AECPMessage
 {
-    [Selector("commandResponse", "setCommandResponse:")] public NSData? CommandResponse { get; set; }
+    [Selector("commandResponse", "setCommandResponse:")]
+    public NSData? CommandResponse { get; set; }
 }
 
 public extern objc class AVB17221AECPVendorMessage : AVB17221AECPMessage
 {
-    [Selector("protocolID", "setProtocolID:")] public ulong ProtocolID { get; set; }
-    [Selector("protocolSpecificData", "setProtocolSpecificData:")] public NSData? ProtocolSpecificData { get; set; }
+    [Selector("protocolID", "setProtocolID:")]
+    public ulong ProtocolID { get; set; }
+    [Selector("protocolSpecificData", "setProtocolSpecificData:")]
+    public NSData? ProtocolSpecificData { get; set; }
 }
 
 #endif

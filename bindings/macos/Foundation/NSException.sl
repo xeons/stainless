@@ -62,21 +62,31 @@ public extern "C" NSExceptionName NSInconsistentArchiveException;
 
 public extern objc class NSException : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("name")] public NSExceptionName Name { get; }
-    [Selector("reason")] public NSString? Reason { get; }
-    [Selector("userInfo")] public NSDictionary? UserInfo { get; }
-    [Selector("callStackReturnAddresses")] public NSArray CallStackReturnAddresses { get; }
-    [Selector("callStackSymbols")] public NSArray CallStackSymbols { get; }
-    [Selector("exceptionWithName:reason:userInfo:")] public static NSException ExceptionWithNameReasonUserInfo(NSExceptionName name, NSString? reason, NSDictionary? userInfo);
-    [Selector("initWithName:reason:userInfo:")] public Self InitWithNameReasonUserInfo(NSExceptionName aName, NSString? aReason, NSDictionary? aUserInfo);
-    [Selector("raise")] public void Raise();
+    [Selector("name")]
+    public NSExceptionName Name { get; }
+    [Selector("reason")]
+    public NSString? Reason { get; }
+    [Selector("userInfo")]
+    public NSDictionary? UserInfo { get; }
+    [Selector("callStackReturnAddresses")]
+    public NSArray CallStackReturnAddresses { get; }
+    [Selector("callStackSymbols")]
+    public NSArray CallStackSymbols { get; }
+    [Selector("exceptionWithName:reason:userInfo:")]
+    public static NSException ExceptionWithNameReasonUserInfo(NSExceptionName name, NSString? reason, NSDictionary? userInfo);
+    [Selector("initWithName:reason:userInfo:")]
+    public Self InitWithNameReasonUserInfo(NSExceptionName aName, NSString? aReason, NSDictionary? aUserInfo);
+    [Selector("raise")]
+    public void Raise();
 }
 
 /// NSExceptionRaisingConveniences, a category of NSException.
 public extern objc class NSException
 {
-    [Selector("raise:format:")] public static void RaiseFormat(NSExceptionName name, NSString format, ...);
-    [Selector("raise:format:arguments:")] public static void RaiseFormatArguments(NSExceptionName name, NSString format, VaList argList);
+    [Selector("raise:format:")]
+    public static void RaiseFormat(NSExceptionName name, NSString format, ...);
+    [Selector("raise:format:arguments:")]
+    public static void RaiseFormatArguments(NSExceptionName name, NSString format, VaList argList);
 }
 
 public delegate void NSUncaughtExceptionHandler(void* arg0);
@@ -89,9 +99,12 @@ public extern "C" NSString NSAssertionHandlerKey;
 
 public extern objc class NSAssertionHandler : NSObject
 {
-    [Selector("currentHandler")] public static NSAssertionHandler CurrentHandler { get; }
-    [Selector("handleFailureInMethod:object:file:lineNumber:description:")] public void HandleFailureInMethodObjectFileLineNumberDescription(Selector selector, AnyObject object, NSString fileName, NSInteger line, NSString? format, ...);
-    [Selector("handleFailureInFunction:file:lineNumber:description:")] public void HandleFailureInFunctionFileLineNumberDescription(NSString functionName, NSString fileName, NSInteger line, NSString? format, ...);
+    [Selector("currentHandler")]
+    public static NSAssertionHandler CurrentHandler { get; }
+    [Selector("handleFailureInMethod:object:file:lineNumber:description:")]
+    public void HandleFailureInMethodObjectFileLineNumberDescription(Selector selector, AnyObject object, NSString fileName, NSInteger line, NSString? format, ...);
+    [Selector("handleFailureInFunction:file:lineNumber:description:")]
+    public void HandleFailureInFunctionFileLineNumberDescription(NSString functionName, NSString fileName, NSInteger line, NSString? format, ...);
 }
 
 #endif

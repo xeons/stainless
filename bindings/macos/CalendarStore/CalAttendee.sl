@@ -42,11 +42,14 @@ public extern "C" NSString? CalAttendeeStatusTentative;
 public extern objc class CalAttendee : NSObject, NSCopying
 {
     /// Deprecated in macOS 10.8.
-    [Selector("address")] public NSURL? Address { get; }
+    [Selector("address")]
+    public NSURL? Address { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("commonName")] public NSString? CommonName { get; }
+    [Selector("commonName")]
+    public NSString? CommonName { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("status")] public NSString? Status { get; }
+    [Selector("status")]
+    public NSString? Status { get; }
 }
 
 #endif

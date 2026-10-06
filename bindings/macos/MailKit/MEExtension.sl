@@ -32,10 +32,18 @@ import Standard.ObjC;
 
 public objc interface MEExtension : NSObjectProtocol
 {
-    [Optional] [Selector("handlerForComposeSession:")] MEComposeSessionHandler HandlerForComposeSession(MEComposeSession session);
-    [Optional] [Selector("handlerForMessageActions")] MEMessageActionHandler HandlerForMessageActions();
-    [Optional] [Selector("handlerForContentBlocker")] MEContentBlocker HandlerForContentBlocker();
-    [Optional] [Selector("handlerForMessageSecurity")] MEMessageSecurityHandler HandlerForMessageSecurity();
+    [Optional]
+    [Selector("handlerForComposeSession:")]
+    MEComposeSessionHandler HandlerForComposeSession(MEComposeSession session);
+    [Optional]
+    [Selector("handlerForMessageActions")]
+    MEMessageActionHandler HandlerForMessageActions();
+    [Optional]
+    [Selector("handlerForContentBlocker")]
+    MEContentBlocker HandlerForContentBlocker();
+    [Optional]
+    [Selector("handlerForMessageSecurity")]
+    MEMessageSecurityHandler HandlerForMessageSecurity();
 }
 
 #endif

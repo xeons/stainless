@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class HKQueryDescriptor : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("sampleType")] public HKSampleType SampleType { get; }
-    [Selector("predicate")] public NSPredicate? Predicate { get; }
-    [Selector("initWithSampleType:predicate:")] public Self InitWithSampleTypePredicate(HKSampleType sampleType, NSPredicate? predicate);
+    [Selector("sampleType")]
+    public HKSampleType SampleType { get; }
+    [Selector("predicate")]
+    public NSPredicate? Predicate { get; }
+    [Selector("initWithSampleType:predicate:")]
+    public Self InitWithSampleTypePredicate(HKSampleType sampleType, NSPredicate? predicate);
 }
 
 #endif

@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class BETextAlternatives : NSObject
 {
-    [Selector("primaryString")] public NSString PrimaryString { get; }
-    [Selector("alternativeStrings")] public NSArray AlternativeStrings { get; }
+    [Selector("primaryString")]
+    public NSString PrimaryString { get; }
+    [Selector("alternativeStrings")]
+    public NSArray AlternativeStrings { get; }
 }
 
 #endif

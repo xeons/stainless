@@ -35,35 +35,64 @@ import Standard.ObjC;
 
 public extern objc class CIColor : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("numberOfComponents")] public nuint NumberOfComponents { get; }
-    [Selector("components")] public CGFloat* Components { get; }
-    [Selector("alpha")] public CGFloat Alpha { get; }
-    [Selector("colorSpace")] public CGColorSpaceRef? ColorSpace { get; }
-    [Selector("red")] public CGFloat Red { get; }
-    [Selector("green")] public CGFloat Green { get; }
-    [Selector("blue")] public CGFloat Blue { get; }
-    [Selector("stringRepresentation")] public NSString StringRepresentation { get; }
-    [Selector("blackColor")] public static CIColor? BlackColor { get; }
-    [Selector("whiteColor")] public static CIColor? WhiteColor { get; }
-    [Selector("grayColor")] public static CIColor? GrayColor { get; }
-    [Selector("redColor")] public static CIColor? RedColor { get; }
-    [Selector("greenColor")] public static CIColor? GreenColor { get; }
-    [Selector("blueColor")] public static CIColor? BlueColor { get; }
-    [Selector("cyanColor")] public static CIColor? CyanColor { get; }
-    [Selector("magentaColor")] public static CIColor? MagentaColor { get; }
-    [Selector("yellowColor")] public static CIColor? YellowColor { get; }
-    [Selector("clearColor")] public static CIColor? ClearColor { get; }
-    [Selector("colorWithCGColor:")] public static Self ColorWithCGColor(CGColorRef color);
-    [Selector("colorWithRed:green:blue:alpha:")] public static Self ColorWithRedGreenBlueAlpha(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
-    [Selector("colorWithRed:green:blue:")] public static Self ColorWithRedGreenBlue(CGFloat red, CGFloat green, CGFloat blue);
-    [Selector("colorWithRed:green:blue:alpha:colorSpace:")] public static Self? ColorWithRedGreenBlueAlphaColorSpace(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha, CGColorSpaceRef colorSpace);
-    [Selector("colorWithRed:green:blue:colorSpace:")] public static Self? ColorWithRedGreenBlueColorSpace(CGFloat red, CGFloat green, CGFloat blue, CGColorSpaceRef colorSpace);
-    [Selector("colorWithString:")] public static Self ColorWithString(NSString representation);
-    [Selector("initWithCGColor:")] public Self InitWithCGColor(CGColorRef color);
-    [Selector("initWithRed:green:blue:alpha:")] public Self InitWithRedGreenBlueAlpha(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
-    [Selector("initWithRed:green:blue:")] public Self InitWithRedGreenBlue(CGFloat red, CGFloat green, CGFloat blue);
-    [Selector("initWithRed:green:blue:alpha:colorSpace:")] public Self? InitWithRedGreenBlueAlphaColorSpace(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha, CGColorSpaceRef colorSpace);
-    [Selector("initWithRed:green:blue:colorSpace:")] public Self? InitWithRedGreenBlueColorSpace(CGFloat red, CGFloat green, CGFloat blue, CGColorSpaceRef colorSpace);
+    [Selector("numberOfComponents")]
+    public nuint NumberOfComponents { get; }
+    [Selector("components")]
+    public CGFloat* Components { get; }
+    [Selector("alpha")]
+    public CGFloat Alpha { get; }
+    [Selector("colorSpace")]
+    public CGColorSpaceRef? ColorSpace { get; }
+    [Selector("red")]
+    public CGFloat Red { get; }
+    [Selector("green")]
+    public CGFloat Green { get; }
+    [Selector("blue")]
+    public CGFloat Blue { get; }
+    [Selector("stringRepresentation")]
+    public NSString StringRepresentation { get; }
+    [Selector("blackColor")]
+    public static CIColor? BlackColor { get; }
+    [Selector("whiteColor")]
+    public static CIColor? WhiteColor { get; }
+    [Selector("grayColor")]
+    public static CIColor? GrayColor { get; }
+    [Selector("redColor")]
+    public static CIColor? RedColor { get; }
+    [Selector("greenColor")]
+    public static CIColor? GreenColor { get; }
+    [Selector("blueColor")]
+    public static CIColor? BlueColor { get; }
+    [Selector("cyanColor")]
+    public static CIColor? CyanColor { get; }
+    [Selector("magentaColor")]
+    public static CIColor? MagentaColor { get; }
+    [Selector("yellowColor")]
+    public static CIColor? YellowColor { get; }
+    [Selector("clearColor")]
+    public static CIColor? ClearColor { get; }
+    [Selector("colorWithCGColor:")]
+    public static Self ColorWithCGColor(CGColorRef color);
+    [Selector("colorWithRed:green:blue:alpha:")]
+    public static Self ColorWithRedGreenBlueAlpha(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
+    [Selector("colorWithRed:green:blue:")]
+    public static Self ColorWithRedGreenBlue(CGFloat red, CGFloat green, CGFloat blue);
+    [Selector("colorWithRed:green:blue:alpha:colorSpace:")]
+    public static Self? ColorWithRedGreenBlueAlphaColorSpace(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha, CGColorSpaceRef colorSpace);
+    [Selector("colorWithRed:green:blue:colorSpace:")]
+    public static Self? ColorWithRedGreenBlueColorSpace(CGFloat red, CGFloat green, CGFloat blue, CGColorSpaceRef colorSpace);
+    [Selector("colorWithString:")]
+    public static Self ColorWithString(NSString representation);
+    [Selector("initWithCGColor:")]
+    public Self InitWithCGColor(CGColorRef color);
+    [Selector("initWithRed:green:blue:alpha:")]
+    public Self InitWithRedGreenBlueAlpha(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
+    [Selector("initWithRed:green:blue:")]
+    public Self InitWithRedGreenBlue(CGFloat red, CGFloat green, CGFloat blue);
+    [Selector("initWithRed:green:blue:alpha:colorSpace:")]
+    public Self? InitWithRedGreenBlueAlphaColorSpace(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha, CGColorSpaceRef colorSpace);
+    [Selector("initWithRed:green:blue:colorSpace:")]
+    public Self? InitWithRedGreenBlueColorSpace(CGFloat red, CGFloat green, CGFloat blue, CGColorSpaceRef colorSpace);
 }
 
 #endif

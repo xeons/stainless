@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class CARemoteLayerClient : NSObject
 {
-    [Selector("clientId")] public uint ClientId { get; }
-    [Selector("layer", "setLayer:")] public CALayer? Layer { get; set; }
-    [Selector("initWithServerPort:")] public Self InitWithServerPort(mach_port_t port);
-    [Selector("invalidate")] public void Invalidate();
+    [Selector("clientId")]
+    public uint ClientId { get; }
+    [Selector("layer", "setLayer:")]
+    public CALayer? Layer { get; set; }
+    [Selector("initWithServerPort:")]
+    public Self InitWithServerPort(mach_port_t port);
+    [Selector("invalidate")]
+    public void Invalidate();
 }
 
 #endif

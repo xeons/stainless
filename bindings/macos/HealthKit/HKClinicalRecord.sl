@@ -36,9 +36,12 @@ public extern "C" NSString? HKPredicateKeyPathClinicalRecordFHIRResourceType;
 
 public extern objc class HKClinicalRecord : HKSample, NSSecureCoding, NSCopying
 {
-    [Selector("clinicalType")] public HKClinicalType ClinicalType { get; }
-    [Selector("displayName")] public NSString DisplayName { get; }
-    [Selector("FHIRResource")] public HKFHIRResource? FHIRResource { get; }
+    [Selector("clinicalType")]
+    public HKClinicalType ClinicalType { get; }
+    [Selector("displayName")]
+    public NSString DisplayName { get; }
+    [Selector("FHIRResource")]
+    public HKFHIRResource? FHIRResource { get; }
 }
 
 #endif

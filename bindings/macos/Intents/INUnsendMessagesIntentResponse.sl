@@ -48,8 +48,10 @@ public enum INUnsendMessagesIntentResponseCode : long
 
 public extern objc class INUnsendMessagesIntentResponse : INIntentResponse
 {
-    [Selector("code")] public INUnsendMessagesIntentResponseCode Code { get; }
-    [Selector("initWithCode:userActivity:")] public Self InitWithCodeUserActivity(INUnsendMessagesIntentResponseCode code, NSUserActivity? userActivity);
+    [Selector("code")]
+    public INUnsendMessagesIntentResponseCode Code { get; }
+    [Selector("initWithCode:userActivity:")]
+    public Self InitWithCodeUserActivity(INUnsendMessagesIntentResponseCode code, NSUserActivity? userActivity);
 }
 
 #endif

@@ -34,12 +34,18 @@ import Standard.ObjC;
 /// Deprecated in macOS 15.0.
 public extern objc class SKPaymentDiscount : NSObject
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("keyIdentifier")] public NSString KeyIdentifier { get; }
-    [Selector("nonce")] public NSUUID Nonce { get; }
-    [Selector("signature")] public NSString Signature { get; }
-    [Selector("timestamp")] public NSNumber Timestamp { get; }
-    [Selector("initWithIdentifier:keyIdentifier:nonce:signature:timestamp:")] public Self InitWithIdentifierKeyIdentifierNonceSignatureTimestamp(NSString identifier, NSString keyIdentifier, NSUUID nonce, NSString signature, NSNumber timestamp);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("keyIdentifier")]
+    public NSString KeyIdentifier { get; }
+    [Selector("nonce")]
+    public NSUUID Nonce { get; }
+    [Selector("signature")]
+    public NSString Signature { get; }
+    [Selector("timestamp")]
+    public NSNumber Timestamp { get; }
+    [Selector("initWithIdentifier:keyIdentifier:nonce:signature:timestamp:")]
+    public Self InitWithIdentifierKeyIdentifierNonceSignatureTimestamp(NSString identifier, NSString keyIdentifier, NSUUID nonce, NSString signature, NSNumber timestamp);
 }
 
 #endif

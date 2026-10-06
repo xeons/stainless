@@ -22,8 +22,10 @@ import Standard.Threading;
 import Standard.Time;
 import HttpTestServer;
 
-[Embed("ed25519.crt.pem")] static readonly byte[] ServerCertificate;
-[Embed("ed25519.key.pem")] static readonly byte[] ServerKey;
+[Embed("ed25519.crt.pem")]
+static readonly byte[] ServerCertificate;
+[Embed("ed25519.key.pem")]
+static readonly byte[] ServerKey;
 
 String ConvertToText(byte[] bytes) => Text.FromBytes(&bytes[0u], bytes.Length);
 

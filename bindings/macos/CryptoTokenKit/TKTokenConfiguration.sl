@@ -33,20 +33,30 @@ import Standard.ObjC;
 
 public extern objc class TKTokenDriverConfiguration : NSObject
 {
-    [Selector("driverConfigurations")] public static NSDictionary DriverConfigurations { get; }
-    [Selector("classID")] public TKTokenDriverClassID ClassID { get; }
-    [Selector("tokenConfigurations")] public NSDictionary TokenConfigurations { get; }
-    [Selector("addTokenConfigurationForTokenInstanceID:")] public TKTokenConfiguration AddTokenConfigurationForTokenInstanceID(TKTokenInstanceID instanceID);
-    [Selector("removeTokenConfigurationForTokenInstanceID:")] public void RemoveTokenConfigurationForTokenInstanceID(TKTokenInstanceID instanceID);
+    [Selector("driverConfigurations")]
+    public static NSDictionary DriverConfigurations { get; }
+    [Selector("classID")]
+    public TKTokenDriverClassID ClassID { get; }
+    [Selector("tokenConfigurations")]
+    public NSDictionary TokenConfigurations { get; }
+    [Selector("addTokenConfigurationForTokenInstanceID:")]
+    public TKTokenConfiguration AddTokenConfigurationForTokenInstanceID(TKTokenInstanceID instanceID);
+    [Selector("removeTokenConfigurationForTokenInstanceID:")]
+    public void RemoveTokenConfigurationForTokenInstanceID(TKTokenInstanceID instanceID);
 }
 
 public extern objc class TKTokenConfiguration : NSObject
 {
-    [Selector("instanceID")] public TKTokenInstanceID InstanceID { get; }
-    [Selector("configurationData", "setConfigurationData:")] public NSData? ConfigurationData { get; set; }
-    [Selector("keychainItems", "setKeychainItems:")] public NSArray KeychainItems { get; set; }
-    [Selector("keyForObjectID:error:")] public TKTokenKeychainKey? KeyForObjectIDError(TKTokenObjectID objectID, out NSError? error);
-    [Selector("certificateForObjectID:error:")] public TKTokenKeychainCertificate? CertificateForObjectIDError(TKTokenObjectID objectID, out NSError? error);
+    [Selector("instanceID")]
+    public TKTokenInstanceID InstanceID { get; }
+    [Selector("configurationData", "setConfigurationData:")]
+    public NSData? ConfigurationData { get; set; }
+    [Selector("keychainItems", "setKeychainItems:")]
+    public NSArray KeychainItems { get; set; }
+    [Selector("keyForObjectID:error:")]
+    public TKTokenKeychainKey? KeyForObjectIDError(TKTokenObjectID objectID, out NSError? error);
+    [Selector("certificateForObjectID:error:")]
+    public TKTokenKeychainCertificate? CertificateForObjectIDError(TKTokenObjectID objectID, out NSError? error);
 }
 
 #endif

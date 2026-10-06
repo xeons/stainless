@@ -34,7 +34,8 @@ import Standard.ObjC;
 /// IntentsUI, a category of INImage.
 public extern objc class INImage
 {
-    [Selector("imageWithNSImage:")] public static Self ImageWithNSImage(NSImage image);
+    [Selector("imageWithNSImage:")]
+    public static Self ImageWithNSImage(NSImage image);
 }
 
 #endif

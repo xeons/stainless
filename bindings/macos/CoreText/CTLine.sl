@@ -56,11 +56,14 @@ public enum CTLineTruncationType : uint
 
 public extern "C" CFTypeID CTLineGetTypeID();
 
-[ReturnsRetained] public extern "C" CTLineRef CTLineCreateWithAttributedString(CFAttributedStringRef attrString);
+[ReturnsRetained]
+public extern "C" CTLineRef CTLineCreateWithAttributedString(CFAttributedStringRef attrString);
 
-[ReturnsRetained] public extern "C" CTLineRef? CTLineCreateTruncatedLine(CTLineRef line, double width, CTLineTruncationType truncationType, CTLineRef? truncationToken);
+[ReturnsRetained]
+public extern "C" CTLineRef? CTLineCreateTruncatedLine(CTLineRef line, double width, CTLineTruncationType truncationType, CTLineRef? truncationToken);
 
-[ReturnsRetained] public extern "C" CTLineRef? CTLineCreateJustifiedLine(CTLineRef line, CGFloat justificationFactor, double justificationWidth);
+[ReturnsRetained]
+public extern "C" CTLineRef? CTLineCreateJustifiedLine(CTLineRef line, CGFloat justificationFactor, double justificationWidth);
 
 public extern "C" CFIndex CTLineGetGlyphCount(CTLineRef line);
 

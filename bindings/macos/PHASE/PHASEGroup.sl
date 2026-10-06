@@ -33,20 +33,34 @@ import Standard.ObjC;
 
 public extern objc class PHASEGroup : NSObject
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("gain", "setGain:")] public double Gain { get; set; }
-    [Selector("rate", "setRate:")] public double Rate { get; set; }
-    [Selector("isMuted")] public bool Muted { get; }
-    [Selector("isSoloed")] public bool Soloed { get; }
-    [Selector("initWithIdentifier:")] public Self InitWithIdentifier(NSString identifier);
-    [Selector("registerWithEngine:")] public void RegisterWithEngine(PHASEEngine engine);
-    [Selector("unregisterFromEngine")] public void UnregisterFromEngine();
-    [Selector("fadeGain:duration:curveType:")] public void FadeGainDurationCurveType(double gain, double duration, PHASECurveType curveType);
-    [Selector("fadeRate:duration:curveType:")] public void FadeRateDurationCurveType(double rate, double duration, PHASECurveType curveType);
-    [Selector("mute")] public void Mute();
-    [Selector("unmute")] public void Unmute();
-    [Selector("solo")] public void Solo();
-    [Selector("unsolo")] public void Unsolo();
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("gain", "setGain:")]
+    public double Gain { get; set; }
+    [Selector("rate", "setRate:")]
+    public double Rate { get; set; }
+    [Selector("isMuted")]
+    public bool Muted { get; }
+    [Selector("isSoloed")]
+    public bool Soloed { get; }
+    [Selector("initWithIdentifier:")]
+    public Self InitWithIdentifier(NSString identifier);
+    [Selector("registerWithEngine:")]
+    public void RegisterWithEngine(PHASEEngine engine);
+    [Selector("unregisterFromEngine")]
+    public void UnregisterFromEngine();
+    [Selector("fadeGain:duration:curveType:")]
+    public void FadeGainDurationCurveType(double gain, double duration, PHASECurveType curveType);
+    [Selector("fadeRate:duration:curveType:")]
+    public void FadeRateDurationCurveType(double rate, double duration, PHASECurveType curveType);
+    [Selector("mute")]
+    public void Mute();
+    [Selector("unmute")]
+    public void Unmute();
+    [Selector("solo")]
+    public void Solo();
+    [Selector("unsolo")]
+    public void Unsolo();
 }
 
 #endif

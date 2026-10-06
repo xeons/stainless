@@ -33,23 +33,33 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMNamedNodeMap : DOMObject
 {
-    [Selector("length")] public uint Length { get; }
-    [Selector("getNamedItem:")] public DOMNode? GetNamedItem(NSString? name);
-    [Selector("setNamedItem:")] public DOMNode? SetNamedItem(DOMNode? node);
-    [Selector("removeNamedItem:")] public DOMNode? RemoveNamedItem(NSString? name);
-    [Selector("item:")] public DOMNode? Item(uint index);
-    [Selector("getNamedItemNS:localName:")] public DOMNode? GetNamedItemNSLocalName(NSString? namespaceURI, NSString? localName);
-    [Selector("setNamedItemNS:")] public DOMNode? SetNamedItemNS(DOMNode? node);
-    [Selector("removeNamedItemNS:localName:")] public DOMNode? RemoveNamedItemNSLocalName(NSString? namespaceURI, NSString? localName);
+    [Selector("length")]
+    public uint Length { get; }
+    [Selector("getNamedItem:")]
+    public DOMNode? GetNamedItem(NSString? name);
+    [Selector("setNamedItem:")]
+    public DOMNode? SetNamedItem(DOMNode? node);
+    [Selector("removeNamedItem:")]
+    public DOMNode? RemoveNamedItem(NSString? name);
+    [Selector("item:")]
+    public DOMNode? Item(uint index);
+    [Selector("getNamedItemNS:localName:")]
+    public DOMNode? GetNamedItemNSLocalName(NSString? namespaceURI, NSString? localName);
+    [Selector("setNamedItemNS:")]
+    public DOMNode? SetNamedItemNS(DOMNode? node);
+    [Selector("removeNamedItemNS:localName:")]
+    public DOMNode? RemoveNamedItemNSLocalName(NSString? namespaceURI, NSString? localName);
 }
 
 /// DOMNamedNodeMapDeprecated, a category of DOMNamedNodeMap.
 public extern objc class DOMNamedNodeMap
 {
     /// Deprecated in macOS 10.5.
-    [Selector("getNamedItemNS::")] public DOMNode? GetNamedItemNS(NSString? namespaceURI, NSString? localName);
+    [Selector("getNamedItemNS::")]
+    public DOMNode? GetNamedItemNS(NSString? namespaceURI, NSString? localName);
     /// Deprecated in macOS 10.5.
-    [Selector("removeNamedItemNS::")] public DOMNode? RemoveNamedItemNS(NSString? namespaceURI, NSString? localName);
+    [Selector("removeNamedItemNS::")]
+    public DOMNode? RemoveNamedItemNS(NSString? namespaceURI, NSString? localName);
 }
 
 #endif

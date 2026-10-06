@@ -136,53 +136,85 @@ public enum NSSpeechBoundary : ulong
 public extern objc class NSSpeechSynthesizer : NSObject
 {
     /// Deprecated in macOS 14.0.
-    [Selector("isSpeaking")] public bool Speaking { get; }
+    [Selector("isSpeaking")]
+    public bool Speaking { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("delegate", "setDelegate:")] public NSSpeechSynthesizerDelegate? Delegate { get; set; }
-    [Selector("rate", "setRate:")] public float Rate { get; set; }
-    [Selector("volume", "setVolume:")] public float Volume { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSSpeechSynthesizerDelegate? Delegate { get; set; }
+    [Selector("rate", "setRate:")]
+    public float Rate { get; set; }
+    [Selector("volume", "setVolume:")]
+    public float Volume { get; set; }
     /// Deprecated in macOS 14.0.
-    [Selector("usesFeedbackWindow", "setUsesFeedbackWindow:")] public bool UsesFeedbackWindow { get; set; }
+    [Selector("usesFeedbackWindow", "setUsesFeedbackWindow:")]
+    public bool UsesFeedbackWindow { get; set; }
     /// Deprecated in macOS 14.0.
-    [Selector("isAnyApplicationSpeaking")] public static bool AnyApplicationSpeaking { get; }
+    [Selector("isAnyApplicationSpeaking")]
+    public static bool AnyApplicationSpeaking { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("defaultVoice")] public static NSSpeechSynthesizerVoiceName DefaultVoice { get; }
+    [Selector("defaultVoice")]
+    public static NSSpeechSynthesizerVoiceName DefaultVoice { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("availableVoices")] public static NSArray AvailableVoices { get; }
+    [Selector("availableVoices")]
+    public static NSArray AvailableVoices { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("initWithVoice:")] public Self? InitWithVoice(NSSpeechSynthesizerVoiceName? voice);
+    [Selector("initWithVoice:")]
+    public Self? InitWithVoice(NSSpeechSynthesizerVoiceName? voice);
     /// Deprecated in macOS 14.0.
-    [Selector("startSpeakingString:")] public bool StartSpeakingString(NSString string);
+    [Selector("startSpeakingString:")]
+    public bool StartSpeakingString(NSString string);
     /// Deprecated in macOS 14.0.
-    [Selector("startSpeakingString:toURL:")] public bool StartSpeakingStringToURL(NSString string, NSURL url);
+    [Selector("startSpeakingString:toURL:")]
+    public bool StartSpeakingStringToURL(NSString string, NSURL url);
     /// Deprecated in macOS 14.0.
-    [Selector("stopSpeaking")] public void StopSpeaking();
-    [Selector("stopSpeakingAtBoundary:")] public void StopSpeakingAtBoundary(NSSpeechBoundary boundary);
-    [Selector("pauseSpeakingAtBoundary:")] public void PauseSpeakingAtBoundary(NSSpeechBoundary boundary);
-    [Selector("continueSpeaking")] public void ContinueSpeaking();
+    [Selector("stopSpeaking")]
+    public void StopSpeaking();
+    [Selector("stopSpeakingAtBoundary:")]
+    public void StopSpeakingAtBoundary(NSSpeechBoundary boundary);
+    [Selector("pauseSpeakingAtBoundary:")]
+    public void PauseSpeakingAtBoundary(NSSpeechBoundary boundary);
+    [Selector("continueSpeaking")]
+    public void ContinueSpeaking();
     /// Deprecated in macOS 14.0.
-    [Selector("voice")] public NSSpeechSynthesizerVoiceName? Voice();
+    [Selector("voice")]
+    public NSSpeechSynthesizerVoiceName? Voice();
     /// Deprecated in macOS 14.0.
-    [Selector("setVoice:")] public bool SetVoice(NSSpeechSynthesizerVoiceName? voice);
-    [Selector("addSpeechDictionary:")] public void AddSpeechDictionary(NSDictionary speechDictionary);
-    [Selector("phonemesFromText:")] public NSString PhonemesFromText(NSString text);
-    [Selector("objectForProperty:error:")] public AnyObject? ObjectForPropertyError(NSSpeechPropertyKey property, out NSError? outError);
-    [Selector("setObject:forProperty:error:")] public bool SetObjectForPropertyError(AnyObject? object, NSSpeechPropertyKey property, out NSError? outError);
+    [Selector("setVoice:")]
+    public bool SetVoice(NSSpeechSynthesizerVoiceName? voice);
+    [Selector("addSpeechDictionary:")]
+    public void AddSpeechDictionary(NSDictionary speechDictionary);
+    [Selector("phonemesFromText:")]
+    public NSString PhonemesFromText(NSString text);
+    [Selector("objectForProperty:error:")]
+    public AnyObject? ObjectForPropertyError(NSSpeechPropertyKey property, out NSError? outError);
+    [Selector("setObject:forProperty:error:")]
+    public bool SetObjectForPropertyError(AnyObject? object, NSSpeechPropertyKey property, out NSError? outError);
     /// Deprecated in macOS 14.0.
-    [Selector("attributesForVoice:")] public static NSDictionary AttributesForVoice(NSSpeechSynthesizerVoiceName voice);
+    [Selector("attributesForVoice:")]
+    public static NSDictionary AttributesForVoice(NSSpeechSynthesizerVoiceName voice);
 }
 
 /// Deprecated in macOS 14.0.
 public objc interface NSSpeechSynthesizerDelegate : NSObjectProtocol
 {
     /// Deprecated in macOS 14.0.
-    [Optional] [Selector("speechSynthesizer:didFinishSpeaking:")] void SpeechSynthesizerDidFinishSpeaking(NSSpeechSynthesizer sender, bool finishedSpeaking);
+    [Optional]
+    [Selector("speechSynthesizer:didFinishSpeaking:")]
+    void SpeechSynthesizerDidFinishSpeaking(NSSpeechSynthesizer sender, bool finishedSpeaking);
     /// Deprecated in macOS 14.0.
-    [Optional] [Selector("speechSynthesizer:willSpeakWord:ofString:")] void SpeechSynthesizerWillSpeakWordOfString(NSSpeechSynthesizer sender, NSRange characterRange, NSString string);
+    [Optional]
+    [Selector("speechSynthesizer:willSpeakWord:ofString:")]
+    void SpeechSynthesizerWillSpeakWordOfString(NSSpeechSynthesizer sender, NSRange characterRange, NSString string);
     /// Deprecated in macOS 14.0.
-    [Optional] [Selector("speechSynthesizer:willSpeakPhoneme:")] void SpeechSynthesizerWillSpeakPhoneme(NSSpeechSynthesizer sender, short phonemeOpcode);
-    [Optional] [Selector("speechSynthesizer:didEncounterErrorAtIndex:ofString:message:")] void SpeechSynthesizerDidEncounterErrorAtIndexOfStringMessage(NSSpeechSynthesizer sender, NSUInteger characterIndex, NSString string, NSString message);
-    [Optional] [Selector("speechSynthesizer:didEncounterSyncMessage:")] void SpeechSynthesizerDidEncounterSyncMessage(NSSpeechSynthesizer sender, NSString message);
+    [Optional]
+    [Selector("speechSynthesizer:willSpeakPhoneme:")]
+    void SpeechSynthesizerWillSpeakPhoneme(NSSpeechSynthesizer sender, short phonemeOpcode);
+    [Optional]
+    [Selector("speechSynthesizer:didEncounterErrorAtIndex:ofString:message:")]
+    void SpeechSynthesizerDidEncounterErrorAtIndexOfStringMessage(NSSpeechSynthesizer sender, NSUInteger characterIndex, NSString string, NSString message);
+    [Optional]
+    [Selector("speechSynthesizer:didEncounterSyncMessage:")]
+    void SpeechSynthesizerDidEncounterSyncMessage(NSSpeechSynthesizer sender, NSString message);
 }
 
 /// Deprecated in macOS 14.0.

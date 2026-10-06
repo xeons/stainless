@@ -42,33 +42,61 @@ public enum MTLBlitOption : ulong
 
 public objc interface MTLBlitCommandEncoder : MTLCommandEncoder
 {
-    [Selector("synchronizeResource:")] void SynchronizeResource(MTLResource resource);
-    [Selector("synchronizeTexture:slice:level:")] void SynchronizeTextureSliceLevel(MTLTexture texture, NSUInteger slice, NSUInteger level);
-    [Selector("copyFromTexture:sourceSlice:sourceLevel:sourceOrigin:sourceSize:toTexture:destinationSlice:destinationLevel:destinationOrigin:")] void CopyFromTextureSourceSliceSourceLevelSourceOriginSourceSizeToTextureDestinationSliceDestinationLevelDestinationOrigin(MTLTexture sourceTexture, NSUInteger sourceSlice, NSUInteger sourceLevel, MTLOrigin sourceOrigin, MTLSize sourceSize, MTLTexture destinationTexture, NSUInteger destinationSlice, NSUInteger destinationLevel, MTLOrigin destinationOrigin);
-    [Selector("copyFromBuffer:sourceOffset:sourceBytesPerRow:sourceBytesPerImage:sourceSize:toTexture:destinationSlice:destinationLevel:destinationOrigin:")] void CopyFromBufferSourceOffsetSourceBytesPerRowSourceBytesPerImageSourceSizeToTextureDestinationSliceDestinationLevelDestinationOrigin(MTLBuffer sourceBuffer, NSUInteger sourceOffset, NSUInteger sourceBytesPerRow, NSUInteger sourceBytesPerImage, MTLSize sourceSize, MTLTexture destinationTexture, NSUInteger destinationSlice, NSUInteger destinationLevel, MTLOrigin destinationOrigin);
-    [Selector("copyFromBuffer:sourceOffset:sourceBytesPerRow:sourceBytesPerImage:sourceSize:toTexture:destinationSlice:destinationLevel:destinationOrigin:options:")] void CopyFromBufferSourceOffsetSourceBytesPerRowSourceBytesPerImageSourceSizeToTextureDestinationSliceDestinationLevelDestinationOriginOptions(MTLBuffer sourceBuffer, NSUInteger sourceOffset, NSUInteger sourceBytesPerRow, NSUInteger sourceBytesPerImage, MTLSize sourceSize, MTLTexture destinationTexture, NSUInteger destinationSlice, NSUInteger destinationLevel, MTLOrigin destinationOrigin, MTLBlitOption options);
-    [Selector("copyFromTexture:sourceSlice:sourceLevel:sourceOrigin:sourceSize:toBuffer:destinationOffset:destinationBytesPerRow:destinationBytesPerImage:")] void CopyFromTextureSourceSliceSourceLevelSourceOriginSourceSizeToBufferDestinationOffsetDestinationBytesPerRowDestinationBytesPerImage(MTLTexture sourceTexture, NSUInteger sourceSlice, NSUInteger sourceLevel, MTLOrigin sourceOrigin, MTLSize sourceSize, MTLBuffer destinationBuffer, NSUInteger destinationOffset, NSUInteger destinationBytesPerRow, NSUInteger destinationBytesPerImage);
-    [Selector("copyFromTexture:sourceSlice:sourceLevel:sourceOrigin:sourceSize:toBuffer:destinationOffset:destinationBytesPerRow:destinationBytesPerImage:options:")] void CopyFromTextureSourceSliceSourceLevelSourceOriginSourceSizeToBufferDestinationOffsetDestinationBytesPerRowDestinationBytesPerImageOptions(MTLTexture sourceTexture, NSUInteger sourceSlice, NSUInteger sourceLevel, MTLOrigin sourceOrigin, MTLSize sourceSize, MTLBuffer destinationBuffer, NSUInteger destinationOffset, NSUInteger destinationBytesPerRow, NSUInteger destinationBytesPerImage, MTLBlitOption options);
-    [Selector("generateMipmapsForTexture:")] void GenerateMipmapsForTexture(MTLTexture texture);
-    [Selector("fillBuffer:range:value:")] void FillBufferRangeValue(MTLBuffer buffer, NSRange range, byte value);
-    [Selector("copyFromTexture:sourceSlice:sourceLevel:toTexture:destinationSlice:destinationLevel:sliceCount:levelCount:")] void CopyFromTextureSourceSliceSourceLevelToTextureDestinationSliceDestinationLevelSliceCountLevelCount(MTLTexture sourceTexture, NSUInteger sourceSlice, NSUInteger sourceLevel, MTLTexture destinationTexture, NSUInteger destinationSlice, NSUInteger destinationLevel, NSUInteger sliceCount, NSUInteger levelCount);
-    [Selector("copyFromTexture:toTexture:")] void CopyFromTextureToTexture(MTLTexture sourceTexture, MTLTexture destinationTexture);
-    [Selector("copyFromBuffer:sourceOffset:toBuffer:destinationOffset:size:")] void CopyFromBufferSourceOffsetToBufferDestinationOffsetSize(MTLBuffer sourceBuffer, NSUInteger sourceOffset, MTLBuffer destinationBuffer, NSUInteger destinationOffset, NSUInteger size);
-    [Selector("updateFence:")] void UpdateFence(MTLFence fence);
-    [Selector("waitForFence:")] void WaitForFence(MTLFence fence);
-    [Optional] [Selector("getTextureAccessCounters:region:mipLevel:slice:resetCounters:countersBuffer:countersBufferOffset:")] void GetTextureAccessCountersRegionMipLevelSliceResetCountersCountersBufferCountersBufferOffset(MTLTexture texture, MTLRegion region, NSUInteger mipLevel, NSUInteger slice, bool resetCounters, MTLBuffer countersBuffer, NSUInteger countersBufferOffset);
-    [Optional] [Selector("resetTextureAccessCounters:region:mipLevel:slice:")] void ResetTextureAccessCountersRegionMipLevelSlice(MTLTexture texture, MTLRegion region, NSUInteger mipLevel, NSUInteger slice);
-    [Selector("optimizeContentsForGPUAccess:")] void OptimizeContentsForGPUAccess(MTLTexture texture);
-    [Selector("optimizeContentsForGPUAccess:slice:level:")] void OptimizeContentsForGPUAccessSliceLevel(MTLTexture texture, NSUInteger slice, NSUInteger level);
-    [Selector("optimizeContentsForCPUAccess:")] void OptimizeContentsForCPUAccess(MTLTexture texture);
-    [Selector("optimizeContentsForCPUAccess:slice:level:")] void OptimizeContentsForCPUAccessSliceLevel(MTLTexture texture, NSUInteger slice, NSUInteger level);
-    [Selector("resetCommandsInBuffer:withRange:")] void ResetCommandsInBufferWithRange(MTLIndirectCommandBuffer buffer, NSRange range);
-    [Selector("copyIndirectCommandBuffer:sourceRange:destination:destinationIndex:")] void CopyIndirectCommandBufferSourceRangeDestinationDestinationIndex(MTLIndirectCommandBuffer source, NSRange sourceRange, MTLIndirectCommandBuffer destination, NSUInteger destinationIndex);
-    [Selector("optimizeIndirectCommandBuffer:withRange:")] void OptimizeIndirectCommandBufferWithRange(MTLIndirectCommandBuffer indirectCommandBuffer, NSRange range);
-    [Selector("sampleCountersInBuffer:atSampleIndex:withBarrier:")] void SampleCountersInBufferAtSampleIndexWithBarrier(MTLCounterSampleBuffer sampleBuffer, NSUInteger sampleIndex, bool barrier);
-    [Selector("resolveCounters:inRange:destinationBuffer:destinationOffset:")] void ResolveCountersInRangeDestinationBufferDestinationOffset(MTLCounterSampleBuffer sampleBuffer, NSRange range, MTLBuffer destinationBuffer, NSUInteger destinationOffset);
+    [Selector("synchronizeResource:")]
+    void SynchronizeResource(MTLResource resource);
+    [Selector("synchronizeTexture:slice:level:")]
+    void SynchronizeTextureSliceLevel(MTLTexture texture, NSUInteger slice, NSUInteger level);
+    [Selector("copyFromTexture:sourceSlice:sourceLevel:sourceOrigin:sourceSize:toTexture:destinationSlice:destinationLevel:destinationOrigin:")]
+    void CopyFromTextureSourceSliceSourceLevelSourceOriginSourceSizeToTextureDestinationSliceDestinationLevelDestinationOrigin(MTLTexture sourceTexture, NSUInteger sourceSlice, NSUInteger sourceLevel, MTLOrigin sourceOrigin, MTLSize sourceSize, MTLTexture destinationTexture, NSUInteger destinationSlice, NSUInteger destinationLevel, MTLOrigin destinationOrigin);
+    [Selector("copyFromBuffer:sourceOffset:sourceBytesPerRow:sourceBytesPerImage:sourceSize:toTexture:destinationSlice:destinationLevel:destinationOrigin:")]
+    void CopyFromBufferSourceOffsetSourceBytesPerRowSourceBytesPerImageSourceSizeToTextureDestinationSliceDestinationLevelDestinationOrigin(MTLBuffer sourceBuffer, NSUInteger sourceOffset, NSUInteger sourceBytesPerRow, NSUInteger sourceBytesPerImage, MTLSize sourceSize, MTLTexture destinationTexture, NSUInteger destinationSlice, NSUInteger destinationLevel, MTLOrigin destinationOrigin);
+    [Selector("copyFromBuffer:sourceOffset:sourceBytesPerRow:sourceBytesPerImage:sourceSize:toTexture:destinationSlice:destinationLevel:destinationOrigin:options:")]
+    void CopyFromBufferSourceOffsetSourceBytesPerRowSourceBytesPerImageSourceSizeToTextureDestinationSliceDestinationLevelDestinationOriginOptions(MTLBuffer sourceBuffer, NSUInteger sourceOffset, NSUInteger sourceBytesPerRow, NSUInteger sourceBytesPerImage, MTLSize sourceSize, MTLTexture destinationTexture, NSUInteger destinationSlice, NSUInteger destinationLevel, MTLOrigin destinationOrigin, MTLBlitOption options);
+    [Selector("copyFromTexture:sourceSlice:sourceLevel:sourceOrigin:sourceSize:toBuffer:destinationOffset:destinationBytesPerRow:destinationBytesPerImage:")]
+    void CopyFromTextureSourceSliceSourceLevelSourceOriginSourceSizeToBufferDestinationOffsetDestinationBytesPerRowDestinationBytesPerImage(MTLTexture sourceTexture, NSUInteger sourceSlice, NSUInteger sourceLevel, MTLOrigin sourceOrigin, MTLSize sourceSize, MTLBuffer destinationBuffer, NSUInteger destinationOffset, NSUInteger destinationBytesPerRow, NSUInteger destinationBytesPerImage);
+    [Selector("copyFromTexture:sourceSlice:sourceLevel:sourceOrigin:sourceSize:toBuffer:destinationOffset:destinationBytesPerRow:destinationBytesPerImage:options:")]
+    void CopyFromTextureSourceSliceSourceLevelSourceOriginSourceSizeToBufferDestinationOffsetDestinationBytesPerRowDestinationBytesPerImageOptions(MTLTexture sourceTexture, NSUInteger sourceSlice, NSUInteger sourceLevel, MTLOrigin sourceOrigin, MTLSize sourceSize, MTLBuffer destinationBuffer, NSUInteger destinationOffset, NSUInteger destinationBytesPerRow, NSUInteger destinationBytesPerImage, MTLBlitOption options);
+    [Selector("generateMipmapsForTexture:")]
+    void GenerateMipmapsForTexture(MTLTexture texture);
+    [Selector("fillBuffer:range:value:")]
+    void FillBufferRangeValue(MTLBuffer buffer, NSRange range, byte value);
+    [Selector("copyFromTexture:sourceSlice:sourceLevel:toTexture:destinationSlice:destinationLevel:sliceCount:levelCount:")]
+    void CopyFromTextureSourceSliceSourceLevelToTextureDestinationSliceDestinationLevelSliceCountLevelCount(MTLTexture sourceTexture, NSUInteger sourceSlice, NSUInteger sourceLevel, MTLTexture destinationTexture, NSUInteger destinationSlice, NSUInteger destinationLevel, NSUInteger sliceCount, NSUInteger levelCount);
+    [Selector("copyFromTexture:toTexture:")]
+    void CopyFromTextureToTexture(MTLTexture sourceTexture, MTLTexture destinationTexture);
+    [Selector("copyFromBuffer:sourceOffset:toBuffer:destinationOffset:size:")]
+    void CopyFromBufferSourceOffsetToBufferDestinationOffsetSize(MTLBuffer sourceBuffer, NSUInteger sourceOffset, MTLBuffer destinationBuffer, NSUInteger destinationOffset, NSUInteger size);
+    [Selector("updateFence:")]
+    void UpdateFence(MTLFence fence);
+    [Selector("waitForFence:")]
+    void WaitForFence(MTLFence fence);
+    [Optional]
+    [Selector("getTextureAccessCounters:region:mipLevel:slice:resetCounters:countersBuffer:countersBufferOffset:")]
+    void GetTextureAccessCountersRegionMipLevelSliceResetCountersCountersBufferCountersBufferOffset(MTLTexture texture, MTLRegion region, NSUInteger mipLevel, NSUInteger slice, bool resetCounters, MTLBuffer countersBuffer, NSUInteger countersBufferOffset);
+    [Optional]
+    [Selector("resetTextureAccessCounters:region:mipLevel:slice:")]
+    void ResetTextureAccessCountersRegionMipLevelSlice(MTLTexture texture, MTLRegion region, NSUInteger mipLevel, NSUInteger slice);
+    [Selector("optimizeContentsForGPUAccess:")]
+    void OptimizeContentsForGPUAccess(MTLTexture texture);
+    [Selector("optimizeContentsForGPUAccess:slice:level:")]
+    void OptimizeContentsForGPUAccessSliceLevel(MTLTexture texture, NSUInteger slice, NSUInteger level);
+    [Selector("optimizeContentsForCPUAccess:")]
+    void OptimizeContentsForCPUAccess(MTLTexture texture);
+    [Selector("optimizeContentsForCPUAccess:slice:level:")]
+    void OptimizeContentsForCPUAccessSliceLevel(MTLTexture texture, NSUInteger slice, NSUInteger level);
+    [Selector("resetCommandsInBuffer:withRange:")]
+    void ResetCommandsInBufferWithRange(MTLIndirectCommandBuffer buffer, NSRange range);
+    [Selector("copyIndirectCommandBuffer:sourceRange:destination:destinationIndex:")]
+    void CopyIndirectCommandBufferSourceRangeDestinationDestinationIndex(MTLIndirectCommandBuffer source, NSRange sourceRange, MTLIndirectCommandBuffer destination, NSUInteger destinationIndex);
+    [Selector("optimizeIndirectCommandBuffer:withRange:")]
+    void OptimizeIndirectCommandBufferWithRange(MTLIndirectCommandBuffer indirectCommandBuffer, NSRange range);
+    [Selector("sampleCountersInBuffer:atSampleIndex:withBarrier:")]
+    void SampleCountersInBufferAtSampleIndexWithBarrier(MTLCounterSampleBuffer sampleBuffer, NSUInteger sampleIndex, bool barrier);
+    [Selector("resolveCounters:inRange:destinationBuffer:destinationOffset:")]
+    void ResolveCountersInRangeDestinationBufferDestinationOffset(MTLCounterSampleBuffer sampleBuffer, NSRange range, MTLBuffer destinationBuffer, NSUInteger destinationOffset);
     /// macOS 26.0 and later.
-    [Selector("copyFromTensor:sourceOrigin:sourceDimensions:toTensor:destinationOrigin:destinationDimensions:")] void CopyFromTensorSourceOriginSourceDimensionsToTensorDestinationOriginDestinationDimensions(MTLTensor sourceTensor, MTLTensorExtents sourceOrigin, MTLTensorExtents sourceDimensions, MTLTensor destinationTensor, MTLTensorExtents destinationOrigin, MTLTensorExtents destinationDimensions);
+    [Selector("copyFromTensor:sourceOrigin:sourceDimensions:toTensor:destinationOrigin:destinationDimensions:")]
+    void CopyFromTensorSourceOriginSourceDimensionsToTensorDestinationOriginDestinationDimensions(MTLTensor sourceTensor, MTLTensorExtents sourceOrigin, MTLTensorExtents sourceDimensions, MTLTensor destinationTensor, MTLTensorExtents destinationOrigin, MTLTensorExtents destinationDimensions);
 }
 
 #endif

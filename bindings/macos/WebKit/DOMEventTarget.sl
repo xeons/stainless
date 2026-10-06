@@ -34,13 +34,18 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public objc interface DOMEventTarget : NSObjectProtocol, NSCopying
 {
-    [Selector("addEventListener:listener:useCapture:")] void AddEventListenerListenerUseCapture(NSString? type, DOMEventListener? listener, bool useCapture);
-    [Selector("removeEventListener:listener:useCapture:")] void RemoveEventListenerListenerUseCapture(NSString? type, DOMEventListener? listener, bool useCapture);
-    [Selector("dispatchEvent:")] bool DispatchEvent(DOMEvent? event);
+    [Selector("addEventListener:listener:useCapture:")]
+    void AddEventListenerListenerUseCapture(NSString? type, DOMEventListener? listener, bool useCapture);
+    [Selector("removeEventListener:listener:useCapture:")]
+    void RemoveEventListenerListenerUseCapture(NSString? type, DOMEventListener? listener, bool useCapture);
+    [Selector("dispatchEvent:")]
+    bool DispatchEvent(DOMEvent? event);
     /// Deprecated in macOS 10.5.
-    [Selector("addEventListener:::")] void AddEventListener(NSString? type, DOMEventListener? listener, bool useCapture);
+    [Selector("addEventListener:::")]
+    void AddEventListener(NSString? type, DOMEventListener? listener, bool useCapture);
     /// Deprecated in macOS 10.5.
-    [Selector("removeEventListener:::")] void RemoveEventListener(NSString? type, DOMEventListener? listener, bool useCapture);
+    [Selector("removeEventListener:::")]
+    void RemoveEventListener(NSString? type, DOMEventListener? listener, bool useCapture);
 }
 
 #endif

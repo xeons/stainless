@@ -34,68 +34,98 @@ public extern objc class GKNoiseSource : NSObject { }
 
 public extern objc class GKCoherentNoiseSource : GKNoiseSource
 {
-    [Selector("frequency", "setFrequency:")] public double Frequency { get; set; }
-    [Selector("octaveCount", "setOctaveCount:")] public NSInteger OctaveCount { get; set; }
-    [Selector("lacunarity", "setLacunarity:")] public double Lacunarity { get; set; }
-    [Selector("seed", "setSeed:")] public int Seed { get; set; }
+    [Selector("frequency", "setFrequency:")]
+    public double Frequency { get; set; }
+    [Selector("octaveCount", "setOctaveCount:")]
+    public NSInteger OctaveCount { get; set; }
+    [Selector("lacunarity", "setLacunarity:")]
+    public double Lacunarity { get; set; }
+    [Selector("seed", "setSeed:")]
+    public int Seed { get; set; }
 }
 
 public extern objc class GKPerlinNoiseSource : GKCoherentNoiseSource
 {
-    [Selector("persistence", "setPersistence:")] public double Persistence { get; set; }
-    [Selector("perlinNoiseSourceWithFrequency:octaveCount:persistence:lacunarity:seed:")] public static Self PerlinNoiseSourceWithFrequencyOctaveCountPersistenceLacunaritySeed(double frequency, NSInteger octaveCount, double persistence, double lacunarity, int seed);
-    [Selector("initWithFrequency:octaveCount:persistence:lacunarity:seed:")] public Self InitWithFrequencyOctaveCountPersistenceLacunaritySeed(double frequency, NSInteger octaveCount, double persistence, double lacunarity, int seed);
+    [Selector("persistence", "setPersistence:")]
+    public double Persistence { get; set; }
+    [Selector("perlinNoiseSourceWithFrequency:octaveCount:persistence:lacunarity:seed:")]
+    public static Self PerlinNoiseSourceWithFrequencyOctaveCountPersistenceLacunaritySeed(double frequency, NSInteger octaveCount, double persistence, double lacunarity, int seed);
+    [Selector("initWithFrequency:octaveCount:persistence:lacunarity:seed:")]
+    public Self InitWithFrequencyOctaveCountPersistenceLacunaritySeed(double frequency, NSInteger octaveCount, double persistence, double lacunarity, int seed);
 }
 
 public extern objc class GKBillowNoiseSource : GKCoherentNoiseSource
 {
-    [Selector("persistence", "setPersistence:")] public double Persistence { get; set; }
-    [Selector("billowNoiseSourceWithFrequency:octaveCount:persistence:lacunarity:seed:")] public static Self BillowNoiseSourceWithFrequencyOctaveCountPersistenceLacunaritySeed(double frequency, NSInteger octaveCount, double persistence, double lacunarity, int seed);
-    [Selector("initWithFrequency:octaveCount:persistence:lacunarity:seed:")] public Self InitWithFrequencyOctaveCountPersistenceLacunaritySeed(double frequency, NSInteger octaveCount, double persistence, double lacunarity, int seed);
+    [Selector("persistence", "setPersistence:")]
+    public double Persistence { get; set; }
+    [Selector("billowNoiseSourceWithFrequency:octaveCount:persistence:lacunarity:seed:")]
+    public static Self BillowNoiseSourceWithFrequencyOctaveCountPersistenceLacunaritySeed(double frequency, NSInteger octaveCount, double persistence, double lacunarity, int seed);
+    [Selector("initWithFrequency:octaveCount:persistence:lacunarity:seed:")]
+    public Self InitWithFrequencyOctaveCountPersistenceLacunaritySeed(double frequency, NSInteger octaveCount, double persistence, double lacunarity, int seed);
 }
 
 public extern objc class GKRidgedNoiseSource : GKCoherentNoiseSource
 {
-    [Selector("ridgedNoiseSourceWithFrequency:octaveCount:lacunarity:seed:")] public static Self RidgedNoiseSourceWithFrequencyOctaveCountLacunaritySeed(double frequency, NSInteger octaveCount, double lacunarity, int seed);
-    [Selector("initWithFrequency:octaveCount:lacunarity:seed:")] public Self InitWithFrequencyOctaveCountLacunaritySeed(double frequency, NSInteger octaveCount, double lacunarity, int seed);
+    [Selector("ridgedNoiseSourceWithFrequency:octaveCount:lacunarity:seed:")]
+    public static Self RidgedNoiseSourceWithFrequencyOctaveCountLacunaritySeed(double frequency, NSInteger octaveCount, double lacunarity, int seed);
+    [Selector("initWithFrequency:octaveCount:lacunarity:seed:")]
+    public Self InitWithFrequencyOctaveCountLacunaritySeed(double frequency, NSInteger octaveCount, double lacunarity, int seed);
 }
 
 public extern objc class GKVoronoiNoiseSource : GKNoiseSource
 {
-    [Selector("frequency", "setFrequency:")] public double Frequency { get; set; }
-    [Selector("displacement", "setDisplacement:")] public double Displacement { get; set; }
-    [Selector("isDistanceEnabled", "setDistanceEnabled:")] public bool DistanceEnabled { get; set; }
-    [Selector("seed", "setSeed:")] public int Seed { get; set; }
-    [Selector("voronoiNoiseWithFrequency:displacement:distanceEnabled:seed:")] public static Self VoronoiNoiseWithFrequencyDisplacementDistanceEnabledSeed(double frequency, double displacement, bool distanceEnabled, int seed);
-    [Selector("initWithFrequency:displacement:distanceEnabled:seed:")] public Self InitWithFrequencyDisplacementDistanceEnabledSeed(double frequency, double displacement, bool distanceEnabled, int seed);
+    [Selector("frequency", "setFrequency:")]
+    public double Frequency { get; set; }
+    [Selector("displacement", "setDisplacement:")]
+    public double Displacement { get; set; }
+    [Selector("isDistanceEnabled", "setDistanceEnabled:")]
+    public bool DistanceEnabled { get; set; }
+    [Selector("seed", "setSeed:")]
+    public int Seed { get; set; }
+    [Selector("voronoiNoiseWithFrequency:displacement:distanceEnabled:seed:")]
+    public static Self VoronoiNoiseWithFrequencyDisplacementDistanceEnabledSeed(double frequency, double displacement, bool distanceEnabled, int seed);
+    [Selector("initWithFrequency:displacement:distanceEnabled:seed:")]
+    public Self InitWithFrequencyDisplacementDistanceEnabledSeed(double frequency, double displacement, bool distanceEnabled, int seed);
 }
 
 public extern objc class GKConstantNoiseSource : GKNoiseSource
 {
-    [Selector("value", "setValue:")] public double Value { get; set; }
-    [Selector("constantNoiseWithValue:")] public static Self ConstantNoiseWithValue(double value);
-    [Selector("initWithValue:")] public Self InitWithValue(double value);
+    [Selector("value", "setValue:")]
+    public double Value { get; set; }
+    [Selector("constantNoiseWithValue:")]
+    public static Self ConstantNoiseWithValue(double value);
+    [Selector("initWithValue:")]
+    public Self InitWithValue(double value);
 }
 
 public extern objc class GKCylindersNoiseSource : GKNoiseSource
 {
-    [Selector("frequency", "setFrequency:")] public double Frequency { get; set; }
-    [Selector("cylindersNoiseWithFrequency:")] public static Self CylindersNoiseWithFrequency(double frequency);
-    [Selector("initWithFrequency:")] public Self InitWithFrequency(double frequency);
+    [Selector("frequency", "setFrequency:")]
+    public double Frequency { get; set; }
+    [Selector("cylindersNoiseWithFrequency:")]
+    public static Self CylindersNoiseWithFrequency(double frequency);
+    [Selector("initWithFrequency:")]
+    public Self InitWithFrequency(double frequency);
 }
 
 public extern objc class GKSpheresNoiseSource : GKNoiseSource
 {
-    [Selector("frequency", "setFrequency:")] public double Frequency { get; set; }
-    [Selector("spheresNoiseWithFrequency:")] public static Self SpheresNoiseWithFrequency(double frequency);
-    [Selector("initWithFrequency:")] public Self InitWithFrequency(double frequency);
+    [Selector("frequency", "setFrequency:")]
+    public double Frequency { get; set; }
+    [Selector("spheresNoiseWithFrequency:")]
+    public static Self SpheresNoiseWithFrequency(double frequency);
+    [Selector("initWithFrequency:")]
+    public Self InitWithFrequency(double frequency);
 }
 
 public extern objc class GKCheckerboardNoiseSource : GKNoiseSource
 {
-    [Selector("squareSize", "setSquareSize:")] public double SquareSize { get; set; }
-    [Selector("checkerboardNoiseWithSquareSize:")] public static Self CheckerboardNoiseWithSquareSize(double squareSize);
-    [Selector("initWithSquareSize:")] public Self InitWithSquareSize(double squareSize);
+    [Selector("squareSize", "setSquareSize:")]
+    public double SquareSize { get; set; }
+    [Selector("checkerboardNoiseWithSquareSize:")]
+    public static Self CheckerboardNoiseWithSquareSize(double squareSize);
+    [Selector("initWithSquareSize:")]
+    public Self InitWithSquareSize(double squareSize);
 }
 
 #endif

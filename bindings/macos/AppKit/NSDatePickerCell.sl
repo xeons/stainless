@@ -57,27 +57,45 @@ public enum NSDatePickerElementFlags : ulong
 
 public extern objc class NSDatePickerCell : NSActionCell
 {
-    [Selector("datePickerStyle", "setDatePickerStyle:")] public NSDatePickerStyle DatePickerStyle { get; set; }
-    [Selector("drawsBackground", "setDrawsBackground:")] public bool DrawsBackground { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor BackgroundColor { get; set; }
-    [Selector("textColor", "setTextColor:")] public NSColor TextColor { get; set; }
-    [Selector("datePickerMode", "setDatePickerMode:")] public NSDatePickerMode DatePickerMode { get; set; }
-    [Selector("datePickerElements", "setDatePickerElements:")] public NSDatePickerElementFlags DatePickerElements { get; set; }
-    [Selector("calendar", "setCalendar:")] public NSCalendar? Calendar { get; set; }
-    [Selector("locale", "setLocale:")] public NSLocale? Locale { get; set; }
-    [Selector("timeZone", "setTimeZone:")] public NSTimeZone? TimeZone { get; set; }
-    [Selector("dateValue", "setDateValue:")] public NSDate DateValue { get; set; }
-    [Selector("timeInterval", "setTimeInterval:")] public NSTimeInterval TimeInterval { get; set; }
-    [Selector("minDate", "setMinDate:")] public NSDate? MinDate { get; set; }
-    [Selector("maxDate", "setMaxDate:")] public NSDate? MaxDate { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSDatePickerCellDelegate? Delegate { get; set; }
-    [Selector("initTextCell:")] public Self InitTextCell(NSString string);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
+    [Selector("datePickerStyle", "setDatePickerStyle:")]
+    public NSDatePickerStyle DatePickerStyle { get; set; }
+    [Selector("drawsBackground", "setDrawsBackground:")]
+    public bool DrawsBackground { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor BackgroundColor { get; set; }
+    [Selector("textColor", "setTextColor:")]
+    public NSColor TextColor { get; set; }
+    [Selector("datePickerMode", "setDatePickerMode:")]
+    public NSDatePickerMode DatePickerMode { get; set; }
+    [Selector("datePickerElements", "setDatePickerElements:")]
+    public NSDatePickerElementFlags DatePickerElements { get; set; }
+    [Selector("calendar", "setCalendar:")]
+    public NSCalendar? Calendar { get; set; }
+    [Selector("locale", "setLocale:")]
+    public NSLocale? Locale { get; set; }
+    [Selector("timeZone", "setTimeZone:")]
+    public NSTimeZone? TimeZone { get; set; }
+    [Selector("dateValue", "setDateValue:")]
+    public NSDate DateValue { get; set; }
+    [Selector("timeInterval", "setTimeInterval:")]
+    public NSTimeInterval TimeInterval { get; set; }
+    [Selector("minDate", "setMinDate:")]
+    public NSDate? MinDate { get; set; }
+    [Selector("maxDate", "setMaxDate:")]
+    public NSDate? MaxDate { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSDatePickerCellDelegate? Delegate { get; set; }
+    [Selector("initTextCell:")]
+    public Self InitTextCell(NSString string);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
 }
 
 public objc interface NSDatePickerCellDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("datePickerCell:validateProposedDateValue:timeInterval:")] void DatePickerCellValidateProposedDateValueTimeInterval(NSDatePickerCell datePickerCell, out NSDate? proposedDateValue, NSTimeInterval* proposedTimeInterval);
+    [Optional]
+    [Selector("datePickerCell:validateProposedDateValue:timeInterval:")]
+    void DatePickerCellValidateProposedDateValueTimeInterval(NSDatePickerCell datePickerCell, out NSDate? proposedDateValue, NSTimeInterval* proposedTimeInterval);
 }
 
 #endif

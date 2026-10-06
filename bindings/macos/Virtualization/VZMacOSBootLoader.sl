@@ -32,7 +32,8 @@ import Standard.ObjC;
 #if ARM64
 public extern objc class VZMacOSBootLoader : VZBootLoader
 {
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
 }
 #endif
 

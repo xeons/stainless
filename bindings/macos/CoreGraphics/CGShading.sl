@@ -37,15 +37,19 @@ public extern objc class CGShadingRef : CFTypeRef { }
 
 public extern "C" CFTypeID CGShadingGetTypeID();
 
-[ReturnsRetained] public extern "C" CGShadingRef? CGShadingCreateAxial(CGColorSpaceRef? space, CGPoint start, CGPoint end, CGFunctionRef? function, bool extendStart, bool extendEnd);
+[ReturnsRetained]
+public extern "C" CGShadingRef? CGShadingCreateAxial(CGColorSpaceRef? space, CGPoint start, CGPoint end, CGFunctionRef? function, bool extendStart, bool extendEnd);
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CGShadingRef? CGShadingCreateAxialWithContentHeadroom(float headroom, CGColorSpaceRef? space, CGPoint start, CGPoint end, CGFunctionRef? function, bool extendStart, bool extendEnd);
+[ReturnsRetained]
+public extern "C" CGShadingRef? CGShadingCreateAxialWithContentHeadroom(float headroom, CGColorSpaceRef? space, CGPoint start, CGPoint end, CGFunctionRef? function, bool extendStart, bool extendEnd);
 
-[ReturnsRetained] public extern "C" CGShadingRef? CGShadingCreateRadial(CGColorSpaceRef? space, CGPoint start, CGFloat startRadius, CGPoint end, CGFloat endRadius, CGFunctionRef? function, bool extendStart, bool extendEnd);
+[ReturnsRetained]
+public extern "C" CGShadingRef? CGShadingCreateRadial(CGColorSpaceRef? space, CGPoint start, CGFloat startRadius, CGPoint end, CGFloat endRadius, CGFunctionRef? function, bool extendStart, bool extendEnd);
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CGShadingRef? CGShadingCreateRadialWithContentHeadroom(float headroom, CGColorSpaceRef? space, CGPoint start, CGFloat startRadius, CGPoint end, CGFloat endRadius, CGFunctionRef? function, bool extendStart, bool extendEnd);
+[ReturnsRetained]
+public extern "C" CGShadingRef? CGShadingCreateRadialWithContentHeadroom(float headroom, CGColorSpaceRef? space, CGPoint start, CGFloat startRadius, CGPoint end, CGFloat endRadius, CGFunctionRef? function, bool extendStart, bool extendEnd);
 
 /// macOS 26.0 and later.
 public extern "C" float CGShadingGetContentHeadroom(CGShadingRef? shading);

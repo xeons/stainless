@@ -37,11 +37,16 @@ public objc closure void MKETAHandler(MKETAResponse? arg0, NSError? arg1);
 
 public extern objc class MKDirections : NSObject
 {
-    [Selector("isCalculating")] public bool Calculating { get; }
-    [Selector("initWithRequest:")] public Self InitWithRequest(MKDirectionsRequest request);
-    [Selector("calculateDirectionsWithCompletionHandler:")] public void CalculateDirectionsWithCompletionHandler(MKDirectionsHandler completionHandler);
-    [Selector("calculateETAWithCompletionHandler:")] public void CalculateETAWithCompletionHandler(MKETAHandler completionHandler);
-    [Selector("cancel")] public void Cancel();
+    [Selector("isCalculating")]
+    public bool Calculating { get; }
+    [Selector("initWithRequest:")]
+    public Self InitWithRequest(MKDirectionsRequest request);
+    [Selector("calculateDirectionsWithCompletionHandler:")]
+    public void CalculateDirectionsWithCompletionHandler(MKDirectionsHandler completionHandler);
+    [Selector("calculateETAWithCompletionHandler:")]
+    public void CalculateETAWithCompletionHandler(MKETAHandler completionHandler);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

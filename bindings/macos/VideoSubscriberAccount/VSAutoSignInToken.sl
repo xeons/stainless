@@ -34,8 +34,10 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class VSAutoSignInToken : NSObject, NSSecureCoding
 {
-    [Selector("authorization")] public VSAutoSignInAuthorization Authorization { get; }
-    [Selector("value")] public NSString? Value { get; }
+    [Selector("authorization")]
+    public VSAutoSignInAuthorization Authorization { get; }
+    [Selector("value")]
+    public NSString? Value { get; }
 }
 
 #endif

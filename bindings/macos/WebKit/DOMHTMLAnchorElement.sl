@@ -33,27 +33,47 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLAnchorElement : DOMHTMLElement
 {
-    [Selector("charset", "setCharset:")] public NSString? Charset { get; set; }
-    [Selector("coords", "setCoords:")] public NSString? Coords { get; set; }
-    [Selector("hreflang", "setHreflang:")] public NSString? Hreflang { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("rel", "setRel:")] public NSString? Rel { get; set; }
-    [Selector("rev", "setRev:")] public NSString? Rev { get; set; }
-    [Selector("shape", "setShape:")] public NSString? Shape { get; set; }
-    [Selector("target", "setTarget:")] public NSString? Target { get; set; }
-    [Selector("type", "setType:")] public NSString? Type { get; set; }
+    [Selector("charset", "setCharset:")]
+    public NSString? Charset { get; set; }
+    [Selector("coords", "setCoords:")]
+    public NSString? Coords { get; set; }
+    [Selector("hreflang", "setHreflang:")]
+    public NSString? Hreflang { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("rel", "setRel:")]
+    public NSString? Rel { get; set; }
+    [Selector("rev", "setRev:")]
+    public NSString? Rev { get; set; }
+    [Selector("shape", "setShape:")]
+    public NSString? Shape { get; set; }
+    [Selector("target", "setTarget:")]
+    public NSString? Target { get; set; }
+    [Selector("type", "setType:")]
+    public NSString? Type { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("accessKey", "setAccessKey:")] public NSString? AccessKey { get; set; }
-    [Selector("text")] public NSString? Text { get; }
-    [Selector("absoluteLinkURL")] public NSURL? AbsoluteLinkURL { get; }
-    [Selector("href", "setHref:")] public NSString? Href { get; set; }
-    [Selector("protocol")] public NSString? Protocol { get; }
-    [Selector("host")] public NSString? Host { get; }
-    [Selector("hostname")] public NSString? Hostname { get; }
-    [Selector("port")] public NSString? Port { get; }
-    [Selector("pathname")] public NSString? Pathname { get; }
-    [Selector("search")] public NSString? Search { get; }
-    [Selector("hashName")] public NSString? HashName { get; }
+    [Selector("accessKey", "setAccessKey:")]
+    public NSString? AccessKey { get; set; }
+    [Selector("text")]
+    public NSString? Text { get; }
+    [Selector("absoluteLinkURL")]
+    public NSURL? AbsoluteLinkURL { get; }
+    [Selector("href", "setHref:")]
+    public NSString? Href { get; set; }
+    [Selector("protocol")]
+    public NSString? Protocol { get; }
+    [Selector("host")]
+    public NSString? Host { get; }
+    [Selector("hostname")]
+    public NSString? Hostname { get; }
+    [Selector("port")]
+    public NSString? Port { get; }
+    [Selector("pathname")]
+    public NSString? Pathname { get; }
+    [Selector("search")]
+    public NSString? Search { get; }
+    [Selector("hashName")]
+    public NSString? HashName { get; }
 }
 
 #endif

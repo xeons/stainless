@@ -38,52 +38,82 @@ import Standard.ObjC;
 
 public extern objc class CIImageProcessorKernel : NSObject
 {
-    [Selector("outputFormat")] public static CIFormat OutputFormat { get; }
-    [Selector("outputIsOpaque")] public static bool OutputIsOpaque { get; }
-    [Selector("synchronizeInputs")] public static bool SynchronizeInputs { get; }
-    [Selector("processWithInputs:arguments:output:error:")] public static bool ProcessWithInputsArgumentsOutputError(NSArray? inputs, NSDictionary? arguments, CIImageProcessorOutput output, out NSError? error);
-    [Selector("roiForInput:arguments:outputRect:")] public static CGRect RoiForInputArgumentsOutputRect(int inputIndex, NSDictionary? arguments, CGRect outputRect);
-    [Selector("roiTileArrayForInput:arguments:outputRect:")] public static NSArray RoiTileArrayForInputArgumentsOutputRect(int inputIndex, NSDictionary? arguments, CGRect outputRect);
-    [Selector("formatForInputAtIndex:")] public static CIFormat FormatForInputAtIndex(int inputIndex);
-    [Selector("applyWithExtent:inputs:arguments:error:")] public static CIImage? ApplyWithExtentInputsArgumentsError(CGRect extent, NSArray? inputs, NSDictionary? arguments, out NSError? error);
+    [Selector("outputFormat")]
+    public static CIFormat OutputFormat { get; }
+    [Selector("outputIsOpaque")]
+    public static bool OutputIsOpaque { get; }
+    [Selector("synchronizeInputs")]
+    public static bool SynchronizeInputs { get; }
+    [Selector("processWithInputs:arguments:output:error:")]
+    public static bool ProcessWithInputsArgumentsOutputError(NSArray? inputs, NSDictionary? arguments, CIImageProcessorOutput output, out NSError? error);
+    [Selector("roiForInput:arguments:outputRect:")]
+    public static CGRect RoiForInputArgumentsOutputRect(int inputIndex, NSDictionary? arguments, CGRect outputRect);
+    [Selector("roiTileArrayForInput:arguments:outputRect:")]
+    public static NSArray RoiTileArrayForInputArgumentsOutputRect(int inputIndex, NSDictionary? arguments, CGRect outputRect);
+    [Selector("formatForInputAtIndex:")]
+    public static CIFormat FormatForInputAtIndex(int inputIndex);
+    [Selector("applyWithExtent:inputs:arguments:error:")]
+    public static CIImage? ApplyWithExtentInputsArgumentsError(CGRect extent, NSArray? inputs, NSDictionary? arguments, out NSError? error);
 }
 
 /// MultipleOutputSupport, a category of CIImageProcessorKernel.
 public extern objc class CIImageProcessorKernel
 {
     /// macOS 26.0 and later.
-    [Selector("processWithInputs:arguments:outputs:error:")] public static bool ProcessWithInputsArgumentsOutputsError(NSArray? inputs, NSDictionary? arguments, NSArray outputs, out NSError? error);
+    [Selector("processWithInputs:arguments:outputs:error:")]
+    public static bool ProcessWithInputsArgumentsOutputsError(NSArray? inputs, NSDictionary? arguments, NSArray outputs, out NSError? error);
     /// macOS 26.0 and later.
-    [Selector("outputFormatAtIndex:arguments:")] public static CIFormat OutputFormatAtIndexArguments(int outputIndex, NSDictionary? arguments);
+    [Selector("outputFormatAtIndex:arguments:")]
+    public static CIFormat OutputFormatAtIndexArguments(int outputIndex, NSDictionary? arguments);
     /// macOS 26.0 and later.
-    [Selector("applyWithExtents:inputs:arguments:error:")] public static NSArray? ApplyWithExtentsInputsArgumentsError(NSArray extents, NSArray? inputs, NSDictionary? arguments, out NSError? error);
+    [Selector("applyWithExtents:inputs:arguments:error:")]
+    public static NSArray? ApplyWithExtentsInputsArgumentsError(NSArray extents, NSArray? inputs, NSDictionary? arguments, out NSError? error);
 }
 
 public objc interface CIImageProcessorInput
 {
-    [Selector("region")] CGRect Region { get; }
-    [Selector("bytesPerRow")] nuint BytesPerRow { get; }
-    [Selector("format")] CIFormat Format { get; }
-    [Selector("baseAddress")] void* BaseAddress { get; }
-    [Selector("surface")] IOSurfaceRef Surface { get; }
-    [Selector("pixelBuffer")] CVPixelBufferRef? PixelBuffer { get; }
-    [Selector("metalTexture")] MTLTexture? MetalTexture { get; }
-    [Selector("digest")] ulong Digest { get; }
-    [Selector("roiTileIndex")] NSUInteger RoiTileIndex { get; }
-    [Selector("roiTileCount")] NSUInteger RoiTileCount { get; }
+    [Selector("region")]
+    CGRect Region { get; }
+    [Selector("bytesPerRow")]
+    nuint BytesPerRow { get; }
+    [Selector("format")]
+    CIFormat Format { get; }
+    [Selector("baseAddress")]
+    void* BaseAddress { get; }
+    [Selector("surface")]
+    IOSurfaceRef Surface { get; }
+    [Selector("pixelBuffer")]
+    CVPixelBufferRef? PixelBuffer { get; }
+    [Selector("metalTexture")]
+    MTLTexture? MetalTexture { get; }
+    [Selector("digest")]
+    ulong Digest { get; }
+    [Selector("roiTileIndex")]
+    NSUInteger RoiTileIndex { get; }
+    [Selector("roiTileCount")]
+    NSUInteger RoiTileCount { get; }
 }
 
 public objc interface CIImageProcessorOutput
 {
-    [Selector("region")] CGRect Region { get; }
-    [Selector("bytesPerRow")] nuint BytesPerRow { get; }
-    [Selector("format")] CIFormat Format { get; }
-    [Selector("baseAddress")] void* BaseAddress { get; }
-    [Selector("surface")] IOSurfaceRef Surface { get; }
-    [Selector("pixelBuffer")] CVPixelBufferRef? PixelBuffer { get; }
-    [Selector("metalTexture")] MTLTexture? MetalTexture { get; }
-    [Selector("metalCommandBuffer")] MTLCommandBuffer? MetalCommandBuffer { get; }
-    [Selector("digest")] ulong Digest { get; }
+    [Selector("region")]
+    CGRect Region { get; }
+    [Selector("bytesPerRow")]
+    nuint BytesPerRow { get; }
+    [Selector("format")]
+    CIFormat Format { get; }
+    [Selector("baseAddress")]
+    void* BaseAddress { get; }
+    [Selector("surface")]
+    IOSurfaceRef Surface { get; }
+    [Selector("pixelBuffer")]
+    CVPixelBufferRef? PixelBuffer { get; }
+    [Selector("metalTexture")]
+    MTLTexture? MetalTexture { get; }
+    [Selector("metalCommandBuffer")]
+    MTLCommandBuffer? MetalCommandBuffer { get; }
+    [Selector("digest")]
+    ulong Digest { get; }
 }
 
 #endif

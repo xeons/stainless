@@ -52,41 +52,65 @@ public struct MTLIndirectCommandBufferExecutionRange
 
 public extern objc class MTLIndirectCommandBufferDescriptor : NSObject, NSCopying
 {
-    [Selector("commandTypes", "setCommandTypes:")] public MTLIndirectCommandType CommandTypes { get; set; }
-    [Selector("inheritPipelineState", "setInheritPipelineState:")] public bool InheritPipelineState { get; set; }
-    [Selector("inheritBuffers", "setInheritBuffers:")] public bool InheritBuffers { get; set; }
+    [Selector("commandTypes", "setCommandTypes:")]
+    public MTLIndirectCommandType CommandTypes { get; set; }
+    [Selector("inheritPipelineState", "setInheritPipelineState:")]
+    public bool InheritPipelineState { get; set; }
+    [Selector("inheritBuffers", "setInheritBuffers:")]
+    public bool InheritBuffers { get; set; }
     /// macOS 26.0 and later.
-    [Selector("inheritDepthStencilState", "setInheritDepthStencilState:")] public bool InheritDepthStencilState { get; set; }
+    [Selector("inheritDepthStencilState", "setInheritDepthStencilState:")]
+    public bool InheritDepthStencilState { get; set; }
     /// macOS 26.0 and later.
-    [Selector("inheritDepthBias", "setInheritDepthBias:")] public bool InheritDepthBias { get; set; }
+    [Selector("inheritDepthBias", "setInheritDepthBias:")]
+    public bool InheritDepthBias { get; set; }
     /// macOS 26.0 and later.
-    [Selector("inheritDepthClipMode", "setInheritDepthClipMode:")] public bool InheritDepthClipMode { get; set; }
+    [Selector("inheritDepthClipMode", "setInheritDepthClipMode:")]
+    public bool InheritDepthClipMode { get; set; }
     /// macOS 26.0 and later.
-    [Selector("inheritCullMode", "setInheritCullMode:")] public bool InheritCullMode { get; set; }
+    [Selector("inheritCullMode", "setInheritCullMode:")]
+    public bool InheritCullMode { get; set; }
     /// macOS 26.0 and later.
-    [Selector("inheritFrontFacingWinding", "setInheritFrontFacingWinding:")] public bool InheritFrontFacingWinding { get; set; }
+    [Selector("inheritFrontFacingWinding", "setInheritFrontFacingWinding:")]
+    public bool InheritFrontFacingWinding { get; set; }
     /// macOS 26.0 and later.
-    [Selector("inheritTriangleFillMode", "setInheritTriangleFillMode:")] public bool InheritTriangleFillMode { get; set; }
-    [Selector("maxVertexBufferBindCount", "setMaxVertexBufferBindCount:")] public NSUInteger MaxVertexBufferBindCount { get; set; }
-    [Selector("maxFragmentBufferBindCount", "setMaxFragmentBufferBindCount:")] public NSUInteger MaxFragmentBufferBindCount { get; set; }
-    [Selector("maxKernelBufferBindCount", "setMaxKernelBufferBindCount:")] public NSUInteger MaxKernelBufferBindCount { get; set; }
-    [Selector("maxKernelThreadgroupMemoryBindCount", "setMaxKernelThreadgroupMemoryBindCount:")] public NSUInteger MaxKernelThreadgroupMemoryBindCount { get; set; }
-    [Selector("maxObjectBufferBindCount", "setMaxObjectBufferBindCount:")] public NSUInteger MaxObjectBufferBindCount { get; set; }
-    [Selector("maxMeshBufferBindCount", "setMaxMeshBufferBindCount:")] public NSUInteger MaxMeshBufferBindCount { get; set; }
-    [Selector("maxObjectThreadgroupMemoryBindCount", "setMaxObjectThreadgroupMemoryBindCount:")] public NSUInteger MaxObjectThreadgroupMemoryBindCount { get; set; }
-    [Selector("supportRayTracing", "setSupportRayTracing:")] public bool SupportRayTracing { get; set; }
-    [Selector("supportDynamicAttributeStride", "setSupportDynamicAttributeStride:")] public bool SupportDynamicAttributeStride { get; set; }
+    [Selector("inheritTriangleFillMode", "setInheritTriangleFillMode:")]
+    public bool InheritTriangleFillMode { get; set; }
+    [Selector("maxVertexBufferBindCount", "setMaxVertexBufferBindCount:")]
+    public NSUInteger MaxVertexBufferBindCount { get; set; }
+    [Selector("maxFragmentBufferBindCount", "setMaxFragmentBufferBindCount:")]
+    public NSUInteger MaxFragmentBufferBindCount { get; set; }
+    [Selector("maxKernelBufferBindCount", "setMaxKernelBufferBindCount:")]
+    public NSUInteger MaxKernelBufferBindCount { get; set; }
+    [Selector("maxKernelThreadgroupMemoryBindCount", "setMaxKernelThreadgroupMemoryBindCount:")]
+    public NSUInteger MaxKernelThreadgroupMemoryBindCount { get; set; }
+    [Selector("maxObjectBufferBindCount", "setMaxObjectBufferBindCount:")]
+    public NSUInteger MaxObjectBufferBindCount { get; set; }
+    [Selector("maxMeshBufferBindCount", "setMaxMeshBufferBindCount:")]
+    public NSUInteger MaxMeshBufferBindCount { get; set; }
+    [Selector("maxObjectThreadgroupMemoryBindCount", "setMaxObjectThreadgroupMemoryBindCount:")]
+    public NSUInteger MaxObjectThreadgroupMemoryBindCount { get; set; }
+    [Selector("supportRayTracing", "setSupportRayTracing:")]
+    public bool SupportRayTracing { get; set; }
+    [Selector("supportDynamicAttributeStride", "setSupportDynamicAttributeStride:")]
+    public bool SupportDynamicAttributeStride { get; set; }
     /// macOS 26.0 and later.
-    [Selector("supportColorAttachmentMapping", "setSupportColorAttachmentMapping:")] public bool SupportColorAttachmentMapping { get; set; }
+    [Selector("supportColorAttachmentMapping", "setSupportColorAttachmentMapping:")]
+    public bool SupportColorAttachmentMapping { get; set; }
 }
 
 public objc interface MTLIndirectCommandBuffer : MTLResource
 {
-    [Selector("size")] NSUInteger Size { get; }
-    [Selector("gpuResourceID")] MTLResourceID GpuResourceID { get; }
-    [Selector("resetWithRange:")] void ResetWithRange(NSRange range);
-    [Selector("indirectRenderCommandAtIndex:")] MTLIndirectRenderCommand IndirectRenderCommandAtIndex(NSUInteger commandIndex);
-    [Selector("indirectComputeCommandAtIndex:")] MTLIndirectComputeCommand IndirectComputeCommandAtIndex(NSUInteger commandIndex);
+    [Selector("size")]
+    NSUInteger Size { get; }
+    [Selector("gpuResourceID")]
+    MTLResourceID GpuResourceID { get; }
+    [Selector("resetWithRange:")]
+    void ResetWithRange(NSRange range);
+    [Selector("indirectRenderCommandAtIndex:")]
+    MTLIndirectRenderCommand IndirectRenderCommandAtIndex(NSUInteger commandIndex);
+    [Selector("indirectComputeCommandAtIndex:")]
+    MTLIndirectComputeCommand IndirectComputeCommandAtIndex(NSUInteger commandIndex);
 }
 
 #endif

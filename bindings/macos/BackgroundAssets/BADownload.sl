@@ -50,12 +50,18 @@ public extern "C" BADownloaderPriority BADownloaderPriorityMax;
 
 public extern objc class BADownload : NSObject, NSCoding, NSSecureCoding, NSCopying
 {
-    [Selector("state")] public BADownloadState State { get; }
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("uniqueIdentifier")] public NSString? UniqueIdentifier { get; }
-    [Selector("priority")] public BADownloaderPriority Priority { get; }
-    [Selector("isEssential")] public bool IsEssential { get; }
-    [Selector("copyAsNonEssential")] public Self CopyAsNonEssential();
+    [Selector("state")]
+    public BADownloadState State { get; }
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("uniqueIdentifier")]
+    public NSString? UniqueIdentifier { get; }
+    [Selector("priority")]
+    public BADownloaderPriority Priority { get; }
+    [Selector("isEssential")]
+    public bool IsEssential { get; }
+    [Selector("copyAsNonEssential")]
+    public Self CopyAsNonEssential();
 }
 
 #endif

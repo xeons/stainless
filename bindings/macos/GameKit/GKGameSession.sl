@@ -68,26 +68,46 @@ public objc closure void GKGameSessionClearBadgeForPlayersCompletionHandlerCompl
 /// Deprecated in macOS 10.14.
 public extern objc class GKGameSession : NSObject
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("title")] public NSString Title { get; }
-    [Selector("owner")] public GKCloudPlayer Owner { get; }
-    [Selector("players")] public NSArray Players { get; }
-    [Selector("lastModifiedDate")] public NSDate LastModifiedDate { get; }
-    [Selector("lastModifiedPlayer")] public GKCloudPlayer LastModifiedPlayer { get; }
-    [Selector("maxNumberOfConnectedPlayers")] public NSInteger MaxNumberOfConnectedPlayers { get; }
-    [Selector("badgedPlayers")] public NSArray BadgedPlayers { get; }
-    [Selector("createSessionInContainer:withTitle:maxConnectedPlayers:completionHandler:")] public static void CreateSessionInContainerWithTitleMaxConnectedPlayersCompletionHandler(NSString? containerName, NSString title, NSInteger maxPlayers, GKGameSessionCreateSessionInContainerWithTitleMaxConnectedPlayersCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadSessionsInContainer:completionHandler:")] public static void LoadSessionsInContainerCompletionHandler(NSString? containerName, GKGameSessionLoadSessionsInContainerCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadSessionWithIdentifier:completionHandler:")] public static void LoadSessionWithIdentifierCompletionHandler(NSString identifier, GKGameSessionLoadSessionWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removeSessionWithIdentifier:completionHandler:")] public static void RemoveSessionWithIdentifierCompletionHandler(NSString identifier, GKGameSessionRemoveSessionWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getShareURLWithCompletionHandler:")] public void GetShareURLWithCompletionHandler(GKGameSessionGetShareURLWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadDataWithCompletionHandler:")] public void LoadDataWithCompletionHandler(GKGameSessionLoadDataWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("saveData:completionHandler:")] public void SaveDataCompletionHandler(NSData data, GKGameSessionSaveDataCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("setConnectionState:completionHandler:")] public void SetConnectionStateCompletionHandler(GKConnectionState state, GKGameSessionSetConnectionStateCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("playersWithConnectionState:")] public NSArray PlayersWithConnectionState(GKConnectionState state);
-    [Selector("sendData:withTransportType:completionHandler:")] public void SendDataWithTransportTypeCompletionHandler(NSData data, GKTransportType transport, GKGameSessionSendDataWithTransportTypeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("sendMessageWithLocalizedFormatKey:arguments:data:toPlayers:badgePlayers:completionHandler:")] public void SendMessageWithLocalizedFormatKeyArgumentsDataToPlayersBadgePlayersCompletionHandler(NSString key, NSArray arguments, NSData? data, NSArray players, bool badgePlayers, GKGameSessionSendMessageWithLocalizedFormatKeyArgumentsDataToPlayersBadgePlayersCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("clearBadgeForPlayers:completionHandler:")] public void ClearBadgeForPlayersCompletionHandler(NSArray players, GKGameSessionClearBadgeForPlayersCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("title")]
+    public NSString Title { get; }
+    [Selector("owner")]
+    public GKCloudPlayer Owner { get; }
+    [Selector("players")]
+    public NSArray Players { get; }
+    [Selector("lastModifiedDate")]
+    public NSDate LastModifiedDate { get; }
+    [Selector("lastModifiedPlayer")]
+    public GKCloudPlayer LastModifiedPlayer { get; }
+    [Selector("maxNumberOfConnectedPlayers")]
+    public NSInteger MaxNumberOfConnectedPlayers { get; }
+    [Selector("badgedPlayers")]
+    public NSArray BadgedPlayers { get; }
+    [Selector("createSessionInContainer:withTitle:maxConnectedPlayers:completionHandler:")]
+    public static void CreateSessionInContainerWithTitleMaxConnectedPlayersCompletionHandler(NSString? containerName, NSString title, NSInteger maxPlayers, GKGameSessionCreateSessionInContainerWithTitleMaxConnectedPlayersCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadSessionsInContainer:completionHandler:")]
+    public static void LoadSessionsInContainerCompletionHandler(NSString? containerName, GKGameSessionLoadSessionsInContainerCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadSessionWithIdentifier:completionHandler:")]
+    public static void LoadSessionWithIdentifierCompletionHandler(NSString identifier, GKGameSessionLoadSessionWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removeSessionWithIdentifier:completionHandler:")]
+    public static void RemoveSessionWithIdentifierCompletionHandler(NSString identifier, GKGameSessionRemoveSessionWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getShareURLWithCompletionHandler:")]
+    public void GetShareURLWithCompletionHandler(GKGameSessionGetShareURLWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadDataWithCompletionHandler:")]
+    public void LoadDataWithCompletionHandler(GKGameSessionLoadDataWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("saveData:completionHandler:")]
+    public void SaveDataCompletionHandler(NSData data, GKGameSessionSaveDataCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("setConnectionState:completionHandler:")]
+    public void SetConnectionStateCompletionHandler(GKConnectionState state, GKGameSessionSetConnectionStateCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("playersWithConnectionState:")]
+    public NSArray PlayersWithConnectionState(GKConnectionState state);
+    [Selector("sendData:withTransportType:completionHandler:")]
+    public void SendDataWithTransportTypeCompletionHandler(NSData data, GKTransportType transport, GKGameSessionSendDataWithTransportTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("sendMessageWithLocalizedFormatKey:arguments:data:toPlayers:badgePlayers:completionHandler:")]
+    public void SendMessageWithLocalizedFormatKeyArgumentsDataToPlayersBadgePlayersCompletionHandler(NSString key, NSArray arguments, NSData? data, NSArray players, bool badgePlayers, GKGameSessionSendMessageWithLocalizedFormatKeyArgumentsDataToPlayersBadgePlayersCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("clearBadgeForPlayers:completionHandler:")]
+    public void ClearBadgeForPlayersCompletionHandler(NSArray players, GKGameSessionClearBadgeForPlayersCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

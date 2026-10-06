@@ -32,30 +32,47 @@ import Standard.ObjC;
 
 public extern objc class NSPointerArray : NSObject, NSFastEnumeration, NSCopying, NSSecureCoding
 {
-    [Selector("pointerFunctions")] public NSPointerFunctions PointerFunctions { get; }
-    [Selector("count", "setCount:")] public NSUInteger Count { get; set; }
-    [Selector("initWithOptions:")] public Self InitWithOptions(NSPointerFunctionsOptions options);
-    [Selector("initWithPointerFunctions:")] public Self InitWithPointerFunctions(NSPointerFunctions functions);
-    [Selector("pointerArrayWithOptions:")] public static NSPointerArray PointerArrayWithOptions(NSPointerFunctionsOptions options);
-    [Selector("pointerArrayWithPointerFunctions:")] public static NSPointerArray PointerArrayWithPointerFunctions(NSPointerFunctions functions);
-    [Selector("pointerAtIndex:")] public void* PointerAtIndex(NSUInteger index);
-    [Selector("addPointer:")] public void AddPointer(void* pointer);
-    [Selector("removePointerAtIndex:")] public void RemovePointerAtIndex(NSUInteger index);
-    [Selector("insertPointer:atIndex:")] public void InsertPointerAtIndex(void* item, NSUInteger index);
-    [Selector("replacePointerAtIndex:withPointer:")] public void ReplacePointerAtIndexWithPointer(NSUInteger index, void* item);
-    [Selector("compact")] public void Compact();
+    [Selector("pointerFunctions")]
+    public NSPointerFunctions PointerFunctions { get; }
+    [Selector("count", "setCount:")]
+    public NSUInteger Count { get; set; }
+    [Selector("initWithOptions:")]
+    public Self InitWithOptions(NSPointerFunctionsOptions options);
+    [Selector("initWithPointerFunctions:")]
+    public Self InitWithPointerFunctions(NSPointerFunctions functions);
+    [Selector("pointerArrayWithOptions:")]
+    public static NSPointerArray PointerArrayWithOptions(NSPointerFunctionsOptions options);
+    [Selector("pointerArrayWithPointerFunctions:")]
+    public static NSPointerArray PointerArrayWithPointerFunctions(NSPointerFunctions functions);
+    [Selector("pointerAtIndex:")]
+    public void* PointerAtIndex(NSUInteger index);
+    [Selector("addPointer:")]
+    public void AddPointer(void* pointer);
+    [Selector("removePointerAtIndex:")]
+    public void RemovePointerAtIndex(NSUInteger index);
+    [Selector("insertPointer:atIndex:")]
+    public void InsertPointerAtIndex(void* item, NSUInteger index);
+    [Selector("replacePointerAtIndex:withPointer:")]
+    public void ReplacePointerAtIndexWithPointer(NSUInteger index, void* item);
+    [Selector("compact")]
+    public void Compact();
 }
 
 /// NSPointerArrayConveniences, a category of NSPointerArray.
 public extern objc class NSPointerArray
 {
-    [Selector("allObjects")] public NSArray AllObjects { get; }
+    [Selector("allObjects")]
+    public NSArray AllObjects { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("pointerArrayWithStrongObjects")] public static AnyObject PointerArrayWithStrongObjects();
+    [Selector("pointerArrayWithStrongObjects")]
+    public static AnyObject PointerArrayWithStrongObjects();
     /// Deprecated in macOS 10.8.
-    [Selector("pointerArrayWithWeakObjects")] public static AnyObject PointerArrayWithWeakObjects();
-    [Selector("strongObjectsPointerArray")] public static NSPointerArray StrongObjectsPointerArray();
-    [Selector("weakObjectsPointerArray")] public static NSPointerArray WeakObjectsPointerArray();
+    [Selector("pointerArrayWithWeakObjects")]
+    public static AnyObject PointerArrayWithWeakObjects();
+    [Selector("strongObjectsPointerArray")]
+    public static NSPointerArray StrongObjectsPointerArray();
+    [Selector("weakObjectsPointerArray")]
+    public static NSPointerArray WeakObjectsPointerArray();
 }
 
 #endif

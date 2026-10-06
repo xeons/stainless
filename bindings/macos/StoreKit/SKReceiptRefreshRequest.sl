@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 15.0.
 public extern objc class SKReceiptRefreshRequest : SKRequest
 {
-    [Selector("receiptProperties")] public NSDictionary? ReceiptProperties { get; }
-    [Selector("initWithReceiptProperties:")] public Self InitWithReceiptProperties(NSDictionary? properties);
+    [Selector("receiptProperties")]
+    public NSDictionary? ReceiptProperties { get; }
+    [Selector("initWithReceiptProperties:")]
+    public Self InitWithReceiptProperties(NSDictionary? properties);
 }
 
 public extern "C" void SKTerminateForInvalidReceipt();

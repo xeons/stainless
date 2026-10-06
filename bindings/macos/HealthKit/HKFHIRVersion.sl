@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class HKFHIRVersion : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("majorVersion")] public NSInteger MajorVersion { get; }
-    [Selector("minorVersion")] public NSInteger MinorVersion { get; }
-    [Selector("patchVersion")] public NSInteger PatchVersion { get; }
-    [Selector("FHIRRelease")] public HKFHIRRelease FHIRRelease { get; }
-    [Selector("stringRepresentation")] public NSString StringRepresentation { get; }
-    [Selector("versionFromVersionString:error:")] public static Self? VersionFromVersionStringError(NSString versionString, out NSError? errorOut);
-    [Selector("primaryDSTU2Version")] public static Self PrimaryDSTU2Version();
-    [Selector("primaryR4Version")] public static Self PrimaryR4Version();
+    [Selector("majorVersion")]
+    public NSInteger MajorVersion { get; }
+    [Selector("minorVersion")]
+    public NSInteger MinorVersion { get; }
+    [Selector("patchVersion")]
+    public NSInteger PatchVersion { get; }
+    [Selector("FHIRRelease")]
+    public HKFHIRRelease FHIRRelease { get; }
+    [Selector("stringRepresentation")]
+    public NSString StringRepresentation { get; }
+    [Selector("versionFromVersionString:error:")]
+    public static Self? VersionFromVersionStringError(NSString versionString, out NSError? errorOut);
+    [Selector("primaryDSTU2Version")]
+    public static Self PrimaryDSTU2Version();
+    [Selector("primaryR4Version")]
+    public static Self PrimaryR4Version();
 }
 
 #endif

@@ -32,9 +32,11 @@ import Standard.ObjC;
 
 public extern objc class MXAnimationMetric : MXMetric
 {
-    [Selector("scrollHitchTimeRatio")] public NSMeasurement ScrollHitchTimeRatio { get; }
+    [Selector("scrollHitchTimeRatio")]
+    public NSMeasurement ScrollHitchTimeRatio { get; }
     /// macOS 26.0 and later.
-    [Selector("hitchTimeRatio")] public NSMeasurement HitchTimeRatio { get; }
+    [Selector("hitchTimeRatio")]
+    public NSMeasurement HitchTimeRatio { get; }
 }
 
 #endif

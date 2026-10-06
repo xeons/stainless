@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class MKClusterAnnotation : NSObject, MKAnnotation
 {
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("subtitle", "setSubtitle:")] public NSString? Subtitle { get; set; }
-    [Selector("memberAnnotations")] public NSArray MemberAnnotations { get; }
-    [Selector("initWithMemberAnnotations:")] public Self InitWithMemberAnnotations(NSArray memberAnnotations);
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("subtitle", "setSubtitle:")]
+    public NSString? Subtitle { get; set; }
+    [Selector("memberAnnotations")]
+    public NSArray MemberAnnotations { get; }
+    [Selector("initWithMemberAnnotations:")]
+    public Self InitWithMemberAnnotations(NSArray memberAnnotations);
 }
 
 #endif

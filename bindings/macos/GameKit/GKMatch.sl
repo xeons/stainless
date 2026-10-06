@@ -50,33 +50,60 @@ public objc closure void GKMatchRematchWithCompletionHandlerCompletionHandlerBlo
 
 public extern objc class GKMatch : NSObject
 {
-    [Selector("players")] public NSArray? Players { get; }
-    [Selector("delegate", "setDelegate:")] public GKMatchDelegate? Delegate { get; set; }
-    [Selector("expectedPlayerCount")] public NSUInteger ExpectedPlayerCount { get; }
-    [Selector("properties")] public GKMatchProperties? Properties { get; }
-    [Selector("playerProperties")] public NSDictionary? PlayerProperties { get; }
-    [Selector("sendData:toPlayers:dataMode:error:")] public bool SendDataToPlayersDataModeError(NSData data, NSArray players, GKMatchSendDataMode mode, out NSError? error);
-    [Selector("sendDataToAllPlayers:withDataMode:error:")] public bool SendDataToAllPlayersWithDataModeError(NSData data, GKMatchSendDataMode mode, out NSError? error);
-    [Selector("disconnect")] public void Disconnect();
-    [Selector("chooseBestHostingPlayerWithCompletionHandler:")] public void ChooseBestHostingPlayerWithCompletionHandler(GKMatchChooseBestHostingPlayerWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("rematchWithCompletionHandler:")] public void RematchWithCompletionHandler(GKMatchRematchWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("players")]
+    public NSArray? Players { get; }
+    [Selector("delegate", "setDelegate:")]
+    public GKMatchDelegate? Delegate { get; set; }
+    [Selector("expectedPlayerCount")]
+    public NSUInteger ExpectedPlayerCount { get; }
+    [Selector("properties")]
+    public GKMatchProperties? Properties { get; }
+    [Selector("playerProperties")]
+    public NSDictionary? PlayerProperties { get; }
+    [Selector("sendData:toPlayers:dataMode:error:")]
+    public bool SendDataToPlayersDataModeError(NSData data, NSArray players, GKMatchSendDataMode mode, out NSError? error);
+    [Selector("sendDataToAllPlayers:withDataMode:error:")]
+    public bool SendDataToAllPlayersWithDataModeError(NSData data, GKMatchSendDataMode mode, out NSError? error);
+    [Selector("disconnect")]
+    public void Disconnect();
+    [Selector("chooseBestHostingPlayerWithCompletionHandler:")]
+    public void ChooseBestHostingPlayerWithCompletionHandler(GKMatchChooseBestHostingPlayerWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("rematchWithCompletionHandler:")]
+    public void RematchWithCompletionHandler(GKMatchRematchWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("voiceChatWithName:")] public GKVoiceChat? VoiceChatWithName(NSString name);
+    [Selector("voiceChatWithName:")]
+    public GKVoiceChat? VoiceChatWithName(NSString name);
 }
 
 public objc interface GKMatchDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("match:didReceiveData:fromRemotePlayer:")] void MatchDidReceiveDataFromRemotePlayer(GKMatch match, NSData data, GKPlayer player);
-    [Optional] [Selector("match:didReceiveData:forRecipient:fromRemotePlayer:")] void MatchDidReceiveDataForRecipientFromRemotePlayer(GKMatch match, NSData data, GKPlayer recipient, GKPlayer player);
-    [Optional] [Selector("match:player:didChangeConnectionState:")] void MatchPlayerDidChangeConnectionState(GKMatch match, GKPlayer player, GKPlayerConnectionState state);
-    [Optional] [Selector("match:didFailWithError:")] void MatchDidFailWithError(GKMatch match, NSError? error);
-    [Optional] [Selector("match:shouldReinviteDisconnectedPlayer:")] bool MatchShouldReinviteDisconnectedPlayer(GKMatch match, GKPlayer player);
+    [Optional]
+    [Selector("match:didReceiveData:fromRemotePlayer:")]
+    void MatchDidReceiveDataFromRemotePlayer(GKMatch match, NSData data, GKPlayer player);
+    [Optional]
+    [Selector("match:didReceiveData:forRecipient:fromRemotePlayer:")]
+    void MatchDidReceiveDataForRecipientFromRemotePlayer(GKMatch match, NSData data, GKPlayer recipient, GKPlayer player);
+    [Optional]
+    [Selector("match:player:didChangeConnectionState:")]
+    void MatchPlayerDidChangeConnectionState(GKMatch match, GKPlayer player, GKPlayerConnectionState state);
+    [Optional]
+    [Selector("match:didFailWithError:")]
+    void MatchDidFailWithError(GKMatch match, NSError? error);
+    [Optional]
+    [Selector("match:shouldReinviteDisconnectedPlayer:")]
+    bool MatchShouldReinviteDisconnectedPlayer(GKMatch match, GKPlayer player);
     /// Deprecated in macOS 10.10.
-    [Optional] [Selector("match:didReceiveData:fromPlayer:")] void MatchDidReceiveDataFromPlayer(GKMatch match, NSData data, NSString playerID);
+    [Optional]
+    [Selector("match:didReceiveData:fromPlayer:")]
+    void MatchDidReceiveDataFromPlayer(GKMatch match, NSData data, NSString playerID);
     /// Deprecated in macOS 10.8.
-    [Optional] [Selector("match:player:didChangeState:")] void MatchPlayerDidChangeState(GKMatch match, NSString playerID, GKPlayerConnectionState state);
+    [Optional]
+    [Selector("match:player:didChangeState:")]
+    void MatchPlayerDidChangeState(GKMatch match, NSString playerID, GKPlayerConnectionState state);
     /// Deprecated in macOS 10.10.
-    [Optional] [Selector("match:shouldReinvitePlayer:")] bool MatchShouldReinvitePlayer(GKMatch match, NSString playerID);
+    [Optional]
+    [Selector("match:shouldReinvitePlayer:")]
+    bool MatchShouldReinvitePlayer(GKMatch match, NSString playerID);
 }
 
 public objc closure void GKMatchChooseBestHostPlayerWithCompletionHandlerCompletionHandlerBlock(NSString? arg0);
@@ -85,11 +112,14 @@ public objc closure void GKMatchChooseBestHostPlayerWithCompletionHandlerComplet
 public extern objc class GKMatch
 {
     /// Deprecated in macOS 10.10.
-    [Selector("playerIDs")] public NSArray? PlayerIDs { get; }
+    [Selector("playerIDs")]
+    public NSArray? PlayerIDs { get; }
     /// Deprecated in macOS 10.10.
-    [Selector("chooseBestHostPlayerWithCompletionHandler:")] public void ChooseBestHostPlayerWithCompletionHandler(GKMatchChooseBestHostPlayerWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("chooseBestHostPlayerWithCompletionHandler:")]
+    public void ChooseBestHostPlayerWithCompletionHandler(GKMatchChooseBestHostPlayerWithCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 10.10.
-    [Selector("sendData:toPlayers:withDataMode:error:")] public bool SendDataToPlayersWithDataModeError(NSData data, NSArray playerIDs, GKMatchSendDataMode mode, out NSError? error);
+    [Selector("sendData:toPlayers:withDataMode:error:")]
+    public bool SendDataToPlayersWithDataModeError(NSData data, NSArray playerIDs, GKMatchSendDataMode mode, out NSError? error);
 }
 
 #endif

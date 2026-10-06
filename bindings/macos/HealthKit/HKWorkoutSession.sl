@@ -49,34 +49,63 @@ public enum HKWorkoutSessionType : long
 
 public extern objc class HKWorkoutSession : NSObject, NSSecureCoding
 {
-    [Selector("activityType")] public HKWorkoutActivityType ActivityType { get; }
-    [Selector("locationType")] public HKWorkoutSessionLocationType LocationType { get; }
-    [Selector("workoutConfiguration")] public HKWorkoutConfiguration WorkoutConfiguration { get; }
-    [Selector("delegate", "setDelegate:")] public HKWorkoutSessionDelegate? Delegate { get; set; }
-    [Selector("state")] public HKWorkoutSessionState State { get; }
-    [Selector("type")] public HKWorkoutSessionType Type { get; }
-    [Selector("startDate")] public NSDate? StartDate { get; }
-    [Selector("endDate")] public NSDate? EndDate { get; }
-    [Selector("currentActivity")] public HKWorkoutActivity CurrentActivity { get; }
-    [Selector("prepare")] public void Prepare();
-    [Selector("startActivityWithDate:")] public void StartActivityWithDate(NSDate? date);
-    [Selector("stopActivityWithDate:")] public void StopActivityWithDate(NSDate? date);
-    [Selector("end")] public void End();
-    [Selector("pause")] public void Pause();
-    [Selector("resume")] public void Resume();
-    [Selector("beginNewActivityWithConfiguration:date:metadata:")] public void BeginNewActivityWithConfigurationDateMetadata(HKWorkoutConfiguration workoutConfiguration, NSDate date, NSDictionary? metadata);
-    [Selector("endCurrentActivityOnDate:")] public void EndCurrentActivityOnDate(NSDate date);
+    [Selector("activityType")]
+    public HKWorkoutActivityType ActivityType { get; }
+    [Selector("locationType")]
+    public HKWorkoutSessionLocationType LocationType { get; }
+    [Selector("workoutConfiguration")]
+    public HKWorkoutConfiguration WorkoutConfiguration { get; }
+    [Selector("delegate", "setDelegate:")]
+    public HKWorkoutSessionDelegate? Delegate { get; set; }
+    [Selector("state")]
+    public HKWorkoutSessionState State { get; }
+    [Selector("type")]
+    public HKWorkoutSessionType Type { get; }
+    [Selector("startDate")]
+    public NSDate? StartDate { get; }
+    [Selector("endDate")]
+    public NSDate? EndDate { get; }
+    [Selector("currentActivity")]
+    public HKWorkoutActivity CurrentActivity { get; }
+    [Selector("prepare")]
+    public void Prepare();
+    [Selector("startActivityWithDate:")]
+    public void StartActivityWithDate(NSDate? date);
+    [Selector("stopActivityWithDate:")]
+    public void StopActivityWithDate(NSDate? date);
+    [Selector("end")]
+    public void End();
+    [Selector("pause")]
+    public void Pause();
+    [Selector("resume")]
+    public void Resume();
+    [Selector("beginNewActivityWithConfiguration:date:metadata:")]
+    public void BeginNewActivityWithConfigurationDateMetadata(HKWorkoutConfiguration workoutConfiguration, NSDate date, NSDictionary? metadata);
+    [Selector("endCurrentActivityOnDate:")]
+    public void EndCurrentActivityOnDate(NSDate date);
 }
 
 public objc interface HKWorkoutSessionDelegate : NSObjectProtocol
 {
-    [Selector("workoutSession:didChangeToState:fromState:date:")] void WorkoutSessionDidChangeToStateFromStateDate(HKWorkoutSession workoutSession, HKWorkoutSessionState toState, HKWorkoutSessionState fromState, NSDate date);
-    [Selector("workoutSession:didFailWithError:")] void WorkoutSessionDidFailWithError(HKWorkoutSession workoutSession, NSError error);
-    [Optional] [Selector("workoutSession:didGenerateEvent:")] void WorkoutSessionDidGenerateEvent(HKWorkoutSession workoutSession, HKWorkoutEvent event);
-    [Optional] [Selector("workoutSession:didBeginActivityWithConfiguration:date:")] void WorkoutSessionDidBeginActivityWithConfigurationDate(HKWorkoutSession workoutSession, HKWorkoutConfiguration workoutConfiguration, NSDate date);
-    [Optional] [Selector("workoutSession:didEndActivityWithConfiguration:date:")] void WorkoutSessionDidEndActivityWithConfigurationDate(HKWorkoutSession workoutSession, HKWorkoutConfiguration workoutConfiguration, NSDate date);
-    [Optional] [Selector("workoutSession:didReceiveDataFromRemoteWorkoutSession:")] void WorkoutSessionDidReceiveDataFromRemoteWorkoutSession(HKWorkoutSession workoutSession, NSArray data);
-    [Optional] [Selector("workoutSession:didDisconnectFromRemoteDeviceWithError:")] void WorkoutSessionDidDisconnectFromRemoteDeviceWithError(HKWorkoutSession workoutSession, NSError? error);
+    [Selector("workoutSession:didChangeToState:fromState:date:")]
+    void WorkoutSessionDidChangeToStateFromStateDate(HKWorkoutSession workoutSession, HKWorkoutSessionState toState, HKWorkoutSessionState fromState, NSDate date);
+    [Selector("workoutSession:didFailWithError:")]
+    void WorkoutSessionDidFailWithError(HKWorkoutSession workoutSession, NSError error);
+    [Optional]
+    [Selector("workoutSession:didGenerateEvent:")]
+    void WorkoutSessionDidGenerateEvent(HKWorkoutSession workoutSession, HKWorkoutEvent event);
+    [Optional]
+    [Selector("workoutSession:didBeginActivityWithConfiguration:date:")]
+    void WorkoutSessionDidBeginActivityWithConfigurationDate(HKWorkoutSession workoutSession, HKWorkoutConfiguration workoutConfiguration, NSDate date);
+    [Optional]
+    [Selector("workoutSession:didEndActivityWithConfiguration:date:")]
+    void WorkoutSessionDidEndActivityWithConfigurationDate(HKWorkoutSession workoutSession, HKWorkoutConfiguration workoutConfiguration, NSDate date);
+    [Optional]
+    [Selector("workoutSession:didReceiveDataFromRemoteWorkoutSession:")]
+    void WorkoutSessionDidReceiveDataFromRemoteWorkoutSession(HKWorkoutSession workoutSession, NSArray data);
+    [Optional]
+    [Selector("workoutSession:didDisconnectFromRemoteDeviceWithError:")]
+    void WorkoutSessionDidDisconnectFromRemoteDeviceWithError(HKWorkoutSession workoutSession, NSError? error);
 }
 
 #endif

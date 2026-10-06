@@ -34,38 +34,65 @@ import Standard.ObjC;
 
 public extern objc class NSSegmentedCell : NSActionCell
 {
-    [Selector("segmentCount", "setSegmentCount:")] public NSInteger SegmentCount { get; set; }
-    [Selector("selectedSegment", "setSelectedSegment:")] public NSInteger SelectedSegment { get; set; }
-    [Selector("trackingMode", "setTrackingMode:")] public NSSegmentSwitchTracking TrackingMode { get; set; }
-    [Selector("segmentStyle", "setSegmentStyle:")] public NSSegmentStyle SegmentStyle { get; set; }
-    [Selector("selectSegmentWithTag:")] public bool SelectSegmentWithTag(NSInteger tag);
-    [Selector("makeNextSegmentKey")] public void MakeNextSegmentKey();
-    [Selector("makePreviousSegmentKey")] public void MakePreviousSegmentKey();
-    [Selector("setWidth:forSegment:")] public void SetWidthForSegment(CGFloat width, NSInteger segment);
-    [Selector("widthForSegment:")] public CGFloat WidthForSegment(NSInteger segment);
-    [Selector("setImage:forSegment:")] public void SetImageForSegment(NSImage? image, NSInteger segment);
-    [Selector("imageForSegment:")] public NSImage? ImageForSegment(NSInteger segment);
-    [Selector("setImageScaling:forSegment:")] public void SetImageScalingForSegment(NSImageScaling scaling, NSInteger segment);
-    [Selector("imageScalingForSegment:")] public NSImageScaling ImageScalingForSegment(NSInteger segment);
-    [Selector("setLabel:forSegment:")] public void SetLabelForSegment(NSString label, NSInteger segment);
-    [Selector("labelForSegment:")] public NSString? LabelForSegment(NSInteger segment);
-    [Selector("setSelected:forSegment:")] public void SetSelectedForSegment(bool selected, NSInteger segment);
-    [Selector("isSelectedForSegment:")] public bool IsSelectedForSegment(NSInteger segment);
-    [Selector("setEnabled:forSegment:")] public void SetEnabledForSegment(bool enabled, NSInteger segment);
-    [Selector("isEnabledForSegment:")] public bool IsEnabledForSegment(NSInteger segment);
-    [Selector("setMenu:forSegment:")] public void SetMenuForSegment(NSMenu? menu, NSInteger segment);
-    [Selector("menuForSegment:")] public NSMenu? MenuForSegment(NSInteger segment);
-    [Selector("setToolTip:forSegment:")] public void SetToolTipForSegment(NSString? toolTip, NSInteger segment);
-    [Selector("toolTipForSegment:")] public NSString? ToolTipForSegment(NSInteger segment);
-    [Selector("setTag:forSegment:")] public void SetTagForSegment(NSInteger tag, NSInteger segment);
-    [Selector("tagForSegment:")] public NSInteger TagForSegment(NSInteger segment);
-    [Selector("drawSegment:inFrame:withView:")] public void DrawSegmentInFrameWithView(NSInteger segment, NSRect frame, NSView controlView);
+    [Selector("segmentCount", "setSegmentCount:")]
+    public NSInteger SegmentCount { get; set; }
+    [Selector("selectedSegment", "setSelectedSegment:")]
+    public NSInteger SelectedSegment { get; set; }
+    [Selector("trackingMode", "setTrackingMode:")]
+    public NSSegmentSwitchTracking TrackingMode { get; set; }
+    [Selector("segmentStyle", "setSegmentStyle:")]
+    public NSSegmentStyle SegmentStyle { get; set; }
+    [Selector("selectSegmentWithTag:")]
+    public bool SelectSegmentWithTag(NSInteger tag);
+    [Selector("makeNextSegmentKey")]
+    public void MakeNextSegmentKey();
+    [Selector("makePreviousSegmentKey")]
+    public void MakePreviousSegmentKey();
+    [Selector("setWidth:forSegment:")]
+    public void SetWidthForSegment(CGFloat width, NSInteger segment);
+    [Selector("widthForSegment:")]
+    public CGFloat WidthForSegment(NSInteger segment);
+    [Selector("setImage:forSegment:")]
+    public void SetImageForSegment(NSImage? image, NSInteger segment);
+    [Selector("imageForSegment:")]
+    public NSImage? ImageForSegment(NSInteger segment);
+    [Selector("setImageScaling:forSegment:")]
+    public void SetImageScalingForSegment(NSImageScaling scaling, NSInteger segment);
+    [Selector("imageScalingForSegment:")]
+    public NSImageScaling ImageScalingForSegment(NSInteger segment);
+    [Selector("setLabel:forSegment:")]
+    public void SetLabelForSegment(NSString label, NSInteger segment);
+    [Selector("labelForSegment:")]
+    public NSString? LabelForSegment(NSInteger segment);
+    [Selector("setSelected:forSegment:")]
+    public void SetSelectedForSegment(bool selected, NSInteger segment);
+    [Selector("isSelectedForSegment:")]
+    public bool IsSelectedForSegment(NSInteger segment);
+    [Selector("setEnabled:forSegment:")]
+    public void SetEnabledForSegment(bool enabled, NSInteger segment);
+    [Selector("isEnabledForSegment:")]
+    public bool IsEnabledForSegment(NSInteger segment);
+    [Selector("setMenu:forSegment:")]
+    public void SetMenuForSegment(NSMenu? menu, NSInteger segment);
+    [Selector("menuForSegment:")]
+    public NSMenu? MenuForSegment(NSInteger segment);
+    [Selector("setToolTip:forSegment:")]
+    public void SetToolTipForSegment(NSString? toolTip, NSInteger segment);
+    [Selector("toolTipForSegment:")]
+    public NSString? ToolTipForSegment(NSInteger segment);
+    [Selector("setTag:forSegment:")]
+    public void SetTagForSegment(NSInteger tag, NSInteger segment);
+    [Selector("tagForSegment:")]
+    public NSInteger TagForSegment(NSInteger segment);
+    [Selector("drawSegment:inFrame:withView:")]
+    public void DrawSegmentInFrameWithView(NSInteger segment, NSRect frame, NSView controlView);
 }
 
 /// NSSegmentBackgroundStyle, a category of NSSegmentedCell.
 public extern objc class NSSegmentedCell
 {
-    [Selector("interiorBackgroundStyleForSegment:")] public NSBackgroundStyle InteriorBackgroundStyleForSegment(NSInteger segment);
+    [Selector("interiorBackgroundStyleForSegment:")]
+    public NSBackgroundStyle InteriorBackgroundStyleForSegment(NSInteger segment);
 }
 
 #endif

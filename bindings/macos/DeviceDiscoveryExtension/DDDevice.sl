@@ -96,28 +96,50 @@ public extern "C" NSString DDDeviceMediaPlaybackStateToString(DDDeviceMediaPlayb
 
 public extern objc class DDDevice : NSObject
 {
-    [Selector("deviceSupports", "setDeviceSupports:")] public DDDeviceSupports DeviceSupports { get; set; }
-    [Selector("bluetoothIdentifier", "setBluetoothIdentifier:")] public NSUUID? BluetoothIdentifier { get; set; }
-    [Selector("category", "setCategory:")] public DDDeviceCategory Category { get; set; }
-    [Selector("displayImageName", "setDisplayImageName:")] public NSString? DisplayImageName { get; set; }
-    [Selector("displayName", "setDisplayName:")] public NSString DisplayName { get; set; }
-    [Selector("identifier", "setIdentifier:")] public NSString Identifier { get; set; }
-    [Selector("mediaPlaybackState", "setMediaPlaybackState:")] public DDDeviceMediaPlaybackState MediaPlaybackState { get; set; }
-    [Selector("mediaContentTitle", "setMediaContentTitle:")] public NSString? MediaContentTitle { get; set; }
-    [Selector("mediaContentSubtitle", "setMediaContentSubtitle:")] public NSString? MediaContentSubtitle { get; set; }
-    [Selector("networkEndpoint", "setNetworkEndpoint:")] public nw_endpoint_t? NetworkEndpoint { get; set; }
-    [Selector("protocol", "setProtocol:")] public DDDeviceProtocol Protocol { get; set; }
-    [Selector("protocolType", "setProtocolType:")] public UTType ProtocolType { get; set; }
-    [Selector("state", "setState:")] public DDDeviceState State { get; set; }
-    [Selector("SSID", "setSSID:")] public NSString? SSID { get; set; }
-    [Selector("supportsGrouping", "setSupportsGrouping:")] public bool SupportsGrouping { get; set; }
-    [Selector("txtRecordData", "setTxtRecordData:")] public NSData? TxtRecordData { get; set; }
-    [Selector("url", "setUrl:")] public NSURL Url { get; set; }
-    [Selector("wifiAwareServiceName", "setWifiAwareServiceName:")] public NSString? WifiAwareServiceName { get; set; }
-    [Selector("wifiAwareServiceRole", "setWifiAwareServiceRole:")] public DDDeviceWiFiAwareServiceRole WifiAwareServiceRole { get; set; }
-    [Selector("wifiAwareModelName", "setWifiAwareModelName:")] public NSString? WifiAwareModelName { get; set; }
-    [Selector("wifiAwareVendorName", "setWifiAwareVendorName:")] public NSString? WifiAwareVendorName { get; set; }
-    [Selector("initWithDisplayName:category:protocolType:identifier:")] public Self InitWithDisplayNameCategoryProtocolTypeIdentifier(NSString displayName, DDDeviceCategory category, UTType protocolType, NSString identifier);
+    [Selector("deviceSupports", "setDeviceSupports:")]
+    public DDDeviceSupports DeviceSupports { get; set; }
+    [Selector("bluetoothIdentifier", "setBluetoothIdentifier:")]
+    public NSUUID? BluetoothIdentifier { get; set; }
+    [Selector("category", "setCategory:")]
+    public DDDeviceCategory Category { get; set; }
+    [Selector("displayImageName", "setDisplayImageName:")]
+    public NSString? DisplayImageName { get; set; }
+    [Selector("displayName", "setDisplayName:")]
+    public NSString DisplayName { get; set; }
+    [Selector("identifier", "setIdentifier:")]
+    public NSString Identifier { get; set; }
+    [Selector("mediaPlaybackState", "setMediaPlaybackState:")]
+    public DDDeviceMediaPlaybackState MediaPlaybackState { get; set; }
+    [Selector("mediaContentTitle", "setMediaContentTitle:")]
+    public NSString? MediaContentTitle { get; set; }
+    [Selector("mediaContentSubtitle", "setMediaContentSubtitle:")]
+    public NSString? MediaContentSubtitle { get; set; }
+    [Selector("networkEndpoint", "setNetworkEndpoint:")]
+    public nw_endpoint_t? NetworkEndpoint { get; set; }
+    [Selector("protocol", "setProtocol:")]
+    public DDDeviceProtocol Protocol { get; set; }
+    [Selector("protocolType", "setProtocolType:")]
+    public UTType ProtocolType { get; set; }
+    [Selector("state", "setState:")]
+    public DDDeviceState State { get; set; }
+    [Selector("SSID", "setSSID:")]
+    public NSString? SSID { get; set; }
+    [Selector("supportsGrouping", "setSupportsGrouping:")]
+    public bool SupportsGrouping { get; set; }
+    [Selector("txtRecordData", "setTxtRecordData:")]
+    public NSData? TxtRecordData { get; set; }
+    [Selector("url", "setUrl:")]
+    public NSURL Url { get; set; }
+    [Selector("wifiAwareServiceName", "setWifiAwareServiceName:")]
+    public NSString? WifiAwareServiceName { get; set; }
+    [Selector("wifiAwareServiceRole", "setWifiAwareServiceRole:")]
+    public DDDeviceWiFiAwareServiceRole WifiAwareServiceRole { get; set; }
+    [Selector("wifiAwareModelName", "setWifiAwareModelName:")]
+    public NSString? WifiAwareModelName { get; set; }
+    [Selector("wifiAwareVendorName", "setWifiAwareVendorName:")]
+    public NSString? WifiAwareVendorName { get; set; }
+    [Selector("initWithDisplayName:category:protocolType:identifier:")]
+    public Self InitWithDisplayNameCategoryProtocolTypeIdentifier(NSString displayName, DDDeviceCategory category, UTType protocolType, NSString identifier);
 }
 
 #endif

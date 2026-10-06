@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INCurrencyAmountResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedCurrencyAmount:")] public static Self SuccessWithResolvedCurrencyAmount(INCurrencyAmount resolvedCurrencyAmount);
-    [Selector("disambiguationWithCurrencyAmountsToDisambiguate:")] public static Self DisambiguationWithCurrencyAmountsToDisambiguate(NSArray currencyAmountsToDisambiguate);
-    [Selector("confirmationRequiredWithCurrencyAmountToConfirm:")] public static Self ConfirmationRequiredWithCurrencyAmountToConfirm(INCurrencyAmount? currencyAmountToConfirm);
+    [Selector("successWithResolvedCurrencyAmount:")]
+    public static Self SuccessWithResolvedCurrencyAmount(INCurrencyAmount resolvedCurrencyAmount);
+    [Selector("disambiguationWithCurrencyAmountsToDisambiguate:")]
+    public static Self DisambiguationWithCurrencyAmountsToDisambiguate(NSArray currencyAmountsToDisambiguate);
+    [Selector("confirmationRequiredWithCurrencyAmountToConfirm:")]
+    public static Self ConfirmationRequiredWithCurrencyAmountToConfirm(INCurrencyAmount? currencyAmountToConfirm);
 }
 
 #endif

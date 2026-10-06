@@ -34,8 +34,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.12.
 public extern objc class PDFAnnotationCircle : PDFAnnotation, NSCopying
 {
-    [Selector("interiorColor")] public NSColor? InteriorColor();
-    [Selector("setInteriorColor:")] public void SetInteriorColor(NSColor? color);
+    [Selector("interiorColor")]
+    public NSColor? InteriorColor();
+    [Selector("setInteriorColor:")]
+    public void SetInteriorColor(NSColor? color);
 }
 
 #endif

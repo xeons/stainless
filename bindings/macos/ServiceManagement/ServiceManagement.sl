@@ -37,10 +37,12 @@ public extern "C" CFStringRef? kSMDomainSystemLaunchd;
 public extern "C" CFStringRef? kSMDomainUserLaunchd;
 
 /// Deprecated in macOS 10.10.
-[ReturnsRetained] public extern "C" CFDictionaryRef? SMJobCopyDictionary(CFStringRef? domain, CFStringRef? jobLabel);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? SMJobCopyDictionary(CFStringRef? domain, CFStringRef? jobLabel);
 
 /// Deprecated in macOS 10.10.
-[ReturnsRetained] public extern "C" CFArrayRef? SMCopyAllJobDictionaries(CFStringRef? domain);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SMCopyAllJobDictionaries(CFStringRef? domain);
 
 /// Deprecated in macOS 10.10.
 public extern "C" Boolean SMJobSubmit(CFStringRef? domain, CFDictionaryRef? job, AuthorizationRef auth, __CFError** outError);

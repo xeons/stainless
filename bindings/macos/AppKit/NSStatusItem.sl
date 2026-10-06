@@ -43,46 +43,67 @@ public enum NSStatusItemBehavior : ulong
 
 public extern objc class NSStatusItem : NSObject
 {
-    [Selector("statusBar")] public NSStatusBar? StatusBar { get; }
-    [Selector("length", "setLength:")] public CGFloat Length { get; set; }
-    [Selector("menu", "setMenu:")] public NSMenu? Menu { get; set; }
-    [Selector("button")] public NSStatusBarButton? Button { get; }
-    [Selector("behavior", "setBehavior:")] public NSStatusItemBehavior Behavior { get; set; }
-    [Selector("isVisible", "setVisible:")] public bool Visible { get; set; }
-    [Selector("autosaveName", "setAutosaveName:")] public NSStatusItemAutosaveName? AutosaveName { get; set; }
+    [Selector("statusBar")]
+    public NSStatusBar? StatusBar { get; }
+    [Selector("length", "setLength:")]
+    public CGFloat Length { get; set; }
+    [Selector("menu", "setMenu:")]
+    public NSMenu? Menu { get; set; }
+    [Selector("button")]
+    public NSStatusBarButton? Button { get; }
+    [Selector("behavior", "setBehavior:")]
+    public NSStatusItemBehavior Behavior { get; set; }
+    [Selector("isVisible", "setVisible:")]
+    public bool Visible { get; set; }
+    [Selector("autosaveName", "setAutosaveName:")]
+    public NSStatusItemAutosaveName? AutosaveName { get; set; }
 }
 
 /// NSStatusItemDeprecated, a category of NSStatusItem.
 public extern objc class NSStatusItem
 {
     /// Deprecated in macOS 10.14.
-    [Selector("action", "setAction:")] public Selector Action { get; set; }
+    [Selector("action", "setAction:")]
+    public Selector Action { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("doubleAction", "setDoubleAction:")] public Selector DoubleAction { get; set; }
+    [Selector("doubleAction", "setDoubleAction:")]
+    public Selector DoubleAction { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("attributedTitle", "setAttributedTitle:")] public NSAttributedString? AttributedTitle { get; set; }
+    [Selector("attributedTitle", "setAttributedTitle:")]
+    public NSAttributedString? AttributedTitle { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("alternateImage", "setAlternateImage:")] public NSImage? AlternateImage { get; set; }
+    [Selector("alternateImage", "setAlternateImage:")]
+    public NSImage? AlternateImage { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("highlightMode", "setHighlightMode:")] public bool HighlightMode { get; set; }
+    [Selector("highlightMode", "setHighlightMode:")]
+    public bool HighlightMode { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("toolTip", "setToolTip:")] public NSString? ToolTip { get; set; }
+    [Selector("toolTip", "setToolTip:")]
+    public NSString? ToolTip { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("view", "setView:")] public NSView? View { get; set; }
+    [Selector("view", "setView:")]
+    public NSView? View { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("sendActionOn:")] public NSInteger SendActionOn(NSEventMask mask);
+    [Selector("sendActionOn:")]
+    public NSInteger SendActionOn(NSEventMask mask);
     /// Deprecated in macOS 10.14.
-    [Selector("drawStatusBarBackgroundInRect:withHighlight:")] public void DrawStatusBarBackgroundInRectWithHighlight(NSRect rect, bool highlight);
+    [Selector("drawStatusBarBackgroundInRect:withHighlight:")]
+    public void DrawStatusBarBackgroundInRectWithHighlight(NSRect rect, bool highlight);
     /// Deprecated in macOS 10.14.
-    [Selector("popUpStatusItemMenu:")] public void PopUpStatusItemMenu(NSMenu menu);
+    [Selector("popUpStatusItemMenu:")]
+    public void PopUpStatusItemMenu(NSMenu menu);
 }
 
 #endif

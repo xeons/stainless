@@ -32,9 +32,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class GLKReflectionMapEffect : GLKBaseEffect, GLKNamedEffect
 {
-    [Selector("textureCubeMap")] public GLKEffectPropertyTexture TextureCubeMap { get; }
-    [Selector("matrix", "setMatrix:")] public GLKMatrix3 Matrix { get; set; }
-    [Selector("prepareToDraw")] public void PrepareToDraw();
+    [Selector("textureCubeMap")]
+    public GLKEffectPropertyTexture TextureCubeMap { get; }
+    [Selector("matrix", "setMatrix:")]
+    public GLKMatrix3 Matrix { get; set; }
+    [Selector("prepareToDraw")]
+    public void PrepareToDraw();
 }
 
 #endif

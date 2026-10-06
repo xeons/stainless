@@ -34,43 +34,67 @@ import Standard.ObjC;
 
 public extern objc class MPSCNNConvolutionDescriptor : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("kernelWidth", "setKernelWidth:")] public NSUInteger KernelWidth { get; set; }
-    [Selector("kernelHeight", "setKernelHeight:")] public NSUInteger KernelHeight { get; set; }
-    [Selector("inputFeatureChannels", "setInputFeatureChannels:")] public NSUInteger InputFeatureChannels { get; set; }
-    [Selector("outputFeatureChannels", "setOutputFeatureChannels:")] public NSUInteger OutputFeatureChannels { get; set; }
-    [Selector("strideInPixelsX", "setStrideInPixelsX:")] public NSUInteger StrideInPixelsX { get; set; }
-    [Selector("strideInPixelsY", "setStrideInPixelsY:")] public NSUInteger StrideInPixelsY { get; set; }
-    [Selector("groups", "setGroups:")] public NSUInteger Groups { get; set; }
-    [Selector("dilationRateX", "setDilationRateX:")] public NSUInteger DilationRateX { get; set; }
-    [Selector("dilationRateY", "setDilationRateY:")] public NSUInteger DilationRateY { get; set; }
-    [Selector("fusedNeuronDescriptor", "setFusedNeuronDescriptor:")] public MPSNNNeuronDescriptor FusedNeuronDescriptor { get; set; }
-    [Selector("neuron", "setNeuron:")] public MPSCNNNeuron? Neuron { get; set; }
-    [Selector("supportsSecureCoding")] public static bool SupportsSecureCoding { get; }
-    [Selector("encodeWithCoder:")] public void EncodeWithCoder(NSCoder aCoder);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
-    [Selector("cnnConvolutionDescriptorWithKernelWidth:kernelHeight:inputFeatureChannels:outputFeatureChannels:neuronFilter:")] public static Self CnnConvolutionDescriptorWithKernelWidthKernelHeightInputFeatureChannelsOutputFeatureChannelsNeuronFilter(NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger inputFeatureChannels, NSUInteger outputFeatureChannels, MPSCNNNeuron? neuronFilter);
-    [Selector("cnnConvolutionDescriptorWithKernelWidth:kernelHeight:inputFeatureChannels:outputFeatureChannels:")] public static Self CnnConvolutionDescriptorWithKernelWidthKernelHeightInputFeatureChannelsOutputFeatureChannels(NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger inputFeatureChannels, NSUInteger outputFeatureChannels);
-    [Selector("setBatchNormalizationParametersForInferenceWithMean:variance:gamma:beta:epsilon:")] public void SetBatchNormalizationParametersForInferenceWithMeanVarianceGammaBetaEpsilon(float* mean, float* variance, float* gamma, float* beta, float epsilon);
+    [Selector("kernelWidth", "setKernelWidth:")]
+    public NSUInteger KernelWidth { get; set; }
+    [Selector("kernelHeight", "setKernelHeight:")]
+    public NSUInteger KernelHeight { get; set; }
+    [Selector("inputFeatureChannels", "setInputFeatureChannels:")]
+    public NSUInteger InputFeatureChannels { get; set; }
+    [Selector("outputFeatureChannels", "setOutputFeatureChannels:")]
+    public NSUInteger OutputFeatureChannels { get; set; }
+    [Selector("strideInPixelsX", "setStrideInPixelsX:")]
+    public NSUInteger StrideInPixelsX { get; set; }
+    [Selector("strideInPixelsY", "setStrideInPixelsY:")]
+    public NSUInteger StrideInPixelsY { get; set; }
+    [Selector("groups", "setGroups:")]
+    public NSUInteger Groups { get; set; }
+    [Selector("dilationRateX", "setDilationRateX:")]
+    public NSUInteger DilationRateX { get; set; }
+    [Selector("dilationRateY", "setDilationRateY:")]
+    public NSUInteger DilationRateY { get; set; }
+    [Selector("fusedNeuronDescriptor", "setFusedNeuronDescriptor:")]
+    public MPSNNNeuronDescriptor FusedNeuronDescriptor { get; set; }
+    [Selector("neuron", "setNeuron:")]
+    public MPSCNNNeuron? Neuron { get; set; }
+    [Selector("supportsSecureCoding")]
+    public static bool SupportsSecureCoding { get; }
+    [Selector("encodeWithCoder:")]
+    public void EncodeWithCoder(NSCoder aCoder);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder aDecoder);
+    [Selector("cnnConvolutionDescriptorWithKernelWidth:kernelHeight:inputFeatureChannels:outputFeatureChannels:neuronFilter:")]
+    public static Self CnnConvolutionDescriptorWithKernelWidthKernelHeightInputFeatureChannelsOutputFeatureChannelsNeuronFilter(NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger inputFeatureChannels, NSUInteger outputFeatureChannels, MPSCNNNeuron? neuronFilter);
+    [Selector("cnnConvolutionDescriptorWithKernelWidth:kernelHeight:inputFeatureChannels:outputFeatureChannels:")]
+    public static Self CnnConvolutionDescriptorWithKernelWidthKernelHeightInputFeatureChannelsOutputFeatureChannels(NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger inputFeatureChannels, NSUInteger outputFeatureChannels);
+    [Selector("setBatchNormalizationParametersForInferenceWithMean:variance:gamma:beta:epsilon:")]
+    public void SetBatchNormalizationParametersForInferenceWithMeanVarianceGammaBetaEpsilon(float* mean, float* variance, float* gamma, float* beta, float epsilon);
     /// Deprecated in macOS 10.13.4.
-    [Selector("setNeuronType:parameterA:parameterB:")] public void SetNeuronTypeParameterAParameterB(MPSCNNNeuronType neuronType, float parameterA, float parameterB);
+    [Selector("setNeuronType:parameterA:parameterB:")]
+    public void SetNeuronTypeParameterAParameterB(MPSCNNNeuronType neuronType, float parameterA, float parameterB);
     /// Deprecated in macOS 10.13.4.
-    [Selector("neuronType")] public MPSCNNNeuronType NeuronType();
+    [Selector("neuronType")]
+    public MPSCNNNeuronType NeuronType();
     /// Deprecated in macOS 10.13.4.
-    [Selector("neuronParameterA")] public float NeuronParameterA();
+    [Selector("neuronParameterA")]
+    public float NeuronParameterA();
     /// Deprecated in macOS 10.13.4.
-    [Selector("neuronParameterB")] public float NeuronParameterB();
+    [Selector("neuronParameterB")]
+    public float NeuronParameterB();
     /// Deprecated in macOS 10.13.4.
-    [Selector("setNeuronToPReLUWithParametersA:")] public void SetNeuronToPReLUWithParametersA(NSData A);
+    [Selector("setNeuronToPReLUWithParametersA:")]
+    public void SetNeuronToPReLUWithParametersA(NSData A);
 }
 
 public extern objc class MPSCNNSubPixelConvolutionDescriptor : MPSCNNConvolutionDescriptor
 {
-    [Selector("subPixelScaleFactor", "setSubPixelScaleFactor:")] public NSUInteger SubPixelScaleFactor { get; set; }
+    [Selector("subPixelScaleFactor", "setSubPixelScaleFactor:")]
+    public NSUInteger SubPixelScaleFactor { get; set; }
 }
 
 public extern objc class MPSCNNDepthWiseConvolutionDescriptor : MPSCNNConvolutionDescriptor
 {
-    [Selector("channelMultiplier")] public NSUInteger ChannelMultiplier { get; }
+    [Selector("channelMultiplier")]
+    public NSUInteger ChannelMultiplier { get; }
 }
 
 public enum MPSCNNConvolutionWeightsLayout : uint
@@ -87,83 +111,143 @@ public enum MPSCNNWeightsQuantizationType : uint
 
 public extern objc class MPSCNNConvolutionGradientState : MPSNNGradientState, MPSImageSizeEncodingState
 {
-    [Selector("gradientForWeights")] public MTLBuffer GradientForWeights { get; }
-    [Selector("gradientForBiases")] public MTLBuffer GradientForBiases { get; }
-    [Selector("convolution")] public MPSCNNConvolution Convolution { get; }
-    [Selector("gradientForWeightsLayout")] public MPSCNNConvolutionWeightsLayout GradientForWeightsLayout { get; }
+    [Selector("gradientForWeights")]
+    public MTLBuffer GradientForWeights { get; }
+    [Selector("gradientForBiases")]
+    public MTLBuffer GradientForBiases { get; }
+    [Selector("convolution")]
+    public MPSCNNConvolution Convolution { get; }
+    [Selector("gradientForWeightsLayout")]
+    public MPSCNNConvolutionWeightsLayout GradientForWeightsLayout { get; }
 }
 
 public using MPSCNNConvolutionGradientStateBatch = NSArray;
 
 public extern objc class MPSCNNConvolutionTransposeGradientState : MPSCNNConvolutionGradientState
 {
-    [Selector("convolutionTranspose")] public MPSCNNConvolutionTranspose ConvolutionTranspose { get; }
+    [Selector("convolutionTranspose")]
+    public MPSCNNConvolutionTranspose ConvolutionTranspose { get; }
 }
 
 public using MPSCNNConvolutionTransposeGradientStateBatch = NSArray;
 
 public extern objc class MPSCNNConvolutionWeightsAndBiasesState : MPSState
 {
-    [Selector("weights")] public MTLBuffer Weights { get; }
-    [Selector("biases")] public MTLBuffer? Biases { get; }
-    [Selector("weightsOffset")] public NSUInteger WeightsOffset { get; }
-    [Selector("biasesOffset")] public NSUInteger BiasesOffset { get; }
-    [Selector("initWithWeights:biases:")] public Self InitWithWeightsBiases(MTLBuffer weights, MTLBuffer? biases);
-    [Selector("initWithDevice:cnnConvolutionDescriptor:")] public Self InitWithDeviceCnnConvolutionDescriptor(MTLDevice device, MPSCNNConvolutionDescriptor descriptor);
-    [Selector("temporaryCNNConvolutionWeightsAndBiasesStateWithCommandBuffer:cnnConvolutionDescriptor:")] public static Self TemporaryCNNConvolutionWeightsAndBiasesStateWithCommandBufferCnnConvolutionDescriptor(MTLCommandBuffer commandBuffer, MPSCNNConvolutionDescriptor descriptor);
-    [Selector("initWithWeights:weightsOffset:biases:biasesOffset:cnnConvolutionDescriptor:")] public Self InitWithWeightsWeightsOffsetBiasesBiasesOffsetCnnConvolutionDescriptor(MTLBuffer weights, NSUInteger weightsOffset, MTLBuffer? biases, NSUInteger biasesOffset, MPSCNNConvolutionDescriptor descriptor);
+    [Selector("weights")]
+    public MTLBuffer Weights { get; }
+    [Selector("biases")]
+    public MTLBuffer? Biases { get; }
+    [Selector("weightsOffset")]
+    public NSUInteger WeightsOffset { get; }
+    [Selector("biasesOffset")]
+    public NSUInteger BiasesOffset { get; }
+    [Selector("initWithWeights:biases:")]
+    public Self InitWithWeightsBiases(MTLBuffer weights, MTLBuffer? biases);
+    [Selector("initWithDevice:cnnConvolutionDescriptor:")]
+    public Self InitWithDeviceCnnConvolutionDescriptor(MTLDevice device, MPSCNNConvolutionDescriptor descriptor);
+    [Selector("temporaryCNNConvolutionWeightsAndBiasesStateWithCommandBuffer:cnnConvolutionDescriptor:")]
+    public static Self TemporaryCNNConvolutionWeightsAndBiasesStateWithCommandBufferCnnConvolutionDescriptor(MTLCommandBuffer commandBuffer, MPSCNNConvolutionDescriptor descriptor);
+    [Selector("initWithWeights:weightsOffset:biases:biasesOffset:cnnConvolutionDescriptor:")]
+    public Self InitWithWeightsWeightsOffsetBiasesBiasesOffsetCnnConvolutionDescriptor(MTLBuffer weights, NSUInteger weightsOffset, MTLBuffer? biases, NSUInteger biasesOffset, MPSCNNConvolutionDescriptor descriptor);
 }
 
 public objc interface MPSCNNConvolutionDataSource : NSCopying, NSObjectProtocol
 {
-    [Selector("dataType")] MPSDataType DataType();
-    [Selector("descriptor")] MPSCNNConvolutionDescriptor Descriptor();
-    [Selector("weights")] void* Weights();
-    [Selector("biasTerms")] float* BiasTerms();
-    [Selector("load")] bool Load();
-    [Selector("purge")] void Purge();
-    [Selector("label")] NSString? Label();
-    [Optional] [Selector("rangesForUInt8Kernel")] vector_float2* RangesForUInt8Kernel();
-    [Optional] [Selector("lookupTableForUInt8Kernel")] float* LookupTableForUInt8Kernel();
-    [Optional] [Selector("weightsQuantizationType")] MPSCNNWeightsQuantizationType WeightsQuantizationType();
-    [Optional] [Selector("updateWithCommandBuffer:gradientState:sourceState:")] MPSCNNConvolutionWeightsAndBiasesState? UpdateWithCommandBufferGradientStateSourceState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionGradientState gradientState, MPSCNNConvolutionWeightsAndBiasesState sourceState);
-    [Optional] [Selector("updateWithGradientState:sourceState:")] bool UpdateWithGradientStateSourceState(MPSCNNConvolutionGradientState gradientState, MPSCNNConvolutionWeightsAndBiasesState sourceState);
-    [Optional] [Selector("copyWithZone:device:")] Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
-    [Optional] [Selector("weightsLayout")] MPSCNNConvolutionWeightsLayout WeightsLayout();
-    [Optional] [Selector("kernelWeightsDataType")] MPSDataType KernelWeightsDataType();
+    [Selector("dataType")]
+    MPSDataType DataType();
+    [Selector("descriptor")]
+    MPSCNNConvolutionDescriptor Descriptor();
+    [Selector("weights")]
+    void* Weights();
+    [Selector("biasTerms")]
+    float* BiasTerms();
+    [Selector("load")]
+    bool Load();
+    [Selector("purge")]
+    void Purge();
+    [Selector("label")]
+    NSString? Label();
+    [Optional]
+    [Selector("rangesForUInt8Kernel")]
+    vector_float2* RangesForUInt8Kernel();
+    [Optional]
+    [Selector("lookupTableForUInt8Kernel")]
+    float* LookupTableForUInt8Kernel();
+    [Optional]
+    [Selector("weightsQuantizationType")]
+    MPSCNNWeightsQuantizationType WeightsQuantizationType();
+    [Optional]
+    [Selector("updateWithCommandBuffer:gradientState:sourceState:")]
+    MPSCNNConvolutionWeightsAndBiasesState? UpdateWithCommandBufferGradientStateSourceState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionGradientState gradientState, MPSCNNConvolutionWeightsAndBiasesState sourceState);
+    [Optional]
+    [Selector("updateWithGradientState:sourceState:")]
+    bool UpdateWithGradientStateSourceState(MPSCNNConvolutionGradientState gradientState, MPSCNNConvolutionWeightsAndBiasesState sourceState);
+    [Optional]
+    [Selector("copyWithZone:device:")]
+    Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Optional]
+    [Selector("weightsLayout")]
+    MPSCNNConvolutionWeightsLayout WeightsLayout();
+    [Optional]
+    [Selector("kernelWeightsDataType")]
+    MPSDataType KernelWeightsDataType();
 }
 
 public extern objc class MPSCNNConvolution : MPSCNNKernel
 {
-    [Selector("inputFeatureChannels")] public NSUInteger InputFeatureChannels { get; }
-    [Selector("outputFeatureChannels")] public NSUInteger OutputFeatureChannels { get; }
-    [Selector("groups")] public NSUInteger Groups { get; }
-    [Selector("dataSource")] public MPSCNNConvolutionDataSource DataSource { get; }
-    [Selector("subPixelScaleFactor")] public NSUInteger SubPixelScaleFactor { get; }
-    [Selector("neuron")] public MPSCNNNeuron? Neuron { get; }
+    [Selector("inputFeatureChannels")]
+    public NSUInteger InputFeatureChannels { get; }
+    [Selector("outputFeatureChannels")]
+    public NSUInteger OutputFeatureChannels { get; }
+    [Selector("groups")]
+    public NSUInteger Groups { get; }
+    [Selector("dataSource")]
+    public MPSCNNConvolutionDataSource DataSource { get; }
+    [Selector("subPixelScaleFactor")]
+    public NSUInteger SubPixelScaleFactor { get; }
+    [Selector("neuron")]
+    public MPSCNNNeuron? Neuron { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("neuronType")] public MPSCNNNeuronType NeuronType { get; }
+    [Selector("neuronType")]
+    public MPSCNNNeuronType NeuronType { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("neuronParameterA")] public float NeuronParameterA { get; }
+    [Selector("neuronParameterA")]
+    public float NeuronParameterA { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("neuronParameterB")] public float NeuronParameterB { get; }
+    [Selector("neuronParameterB")]
+    public float NeuronParameterB { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("neuronParameterC")] public float NeuronParameterC { get; }
-    [Selector("fusedNeuronDescriptor")] public MPSNNNeuronDescriptor? FusedNeuronDescriptor { get; }
-    [Selector("channelMultiplier")] public NSUInteger ChannelMultiplier { get; }
-    [Selector("accumulatorPrecisionOption", "setAccumulatorPrecisionOption:")] public MPSNNConvolutionAccumulatorPrecisionOption AccumulatorPrecisionOption { get; set; }
-    [Selector("initWithDevice:weights:")] public Self InitWithDeviceWeights(MTLDevice device, MPSCNNConvolutionDataSource weights);
-    [Selector("initWithDevice:convolutionDescriptor:kernelWeights:biasTerms:flags:")] public Self InitWithDeviceConvolutionDescriptorKernelWeightsBiasTermsFlags(MTLDevice device, MPSCNNConvolutionDescriptor convolutionDescriptor, float* kernelWeights, float* biasTerms, MPSCNNConvolutionFlags flags);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("resultStateForSourceImage:sourceStates:destinationImage:")] public MPSCNNConvolutionGradientState? ResultStateForSourceImageSourceStatesDestinationImage(MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
-    [Selector("resultStateBatchForSourceImage:sourceStates:destinationImage:")] public MPSCNNConvolutionGradientStateBatch? ResultStateBatchForSourceImageSourceStatesDestinationImage(MPSImageBatch sourceImage, NSArray? sourceStates, MPSImageBatch destinationImage);
-    [Selector("temporaryResultStateForCommandBuffer:sourceImage:sourceStates:destinationImage:")] public MPSCNNConvolutionGradientState? TemporaryResultStateForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
-    [Selector("temporaryResultStateBatchForCommandBuffer:sourceImage:sourceStates:destinationImage:")] public MPSCNNConvolutionGradientStateBatch? TemporaryResultStateBatchForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImage, NSArray? sourceStates, MPSImageBatch destinationImage);
-    [Selector("reloadWeightsAndBiasesFromDataSource")] public void ReloadWeightsAndBiasesFromDataSource();
+    [Selector("neuronParameterC")]
+    public float NeuronParameterC { get; }
+    [Selector("fusedNeuronDescriptor")]
+    public MPSNNNeuronDescriptor? FusedNeuronDescriptor { get; }
+    [Selector("channelMultiplier")]
+    public NSUInteger ChannelMultiplier { get; }
+    [Selector("accumulatorPrecisionOption", "setAccumulatorPrecisionOption:")]
+    public MPSNNConvolutionAccumulatorPrecisionOption AccumulatorPrecisionOption { get; set; }
+    [Selector("initWithDevice:weights:")]
+    public Self InitWithDeviceWeights(MTLDevice device, MPSCNNConvolutionDataSource weights);
+    [Selector("initWithDevice:convolutionDescriptor:kernelWeights:biasTerms:flags:")]
+    public Self InitWithDeviceConvolutionDescriptorKernelWeightsBiasTermsFlags(MTLDevice device, MPSCNNConvolutionDescriptor convolutionDescriptor, float* kernelWeights, float* biasTerms, MPSCNNConvolutionFlags flags);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("resultStateForSourceImage:sourceStates:destinationImage:")]
+    public MPSCNNConvolutionGradientState? ResultStateForSourceImageSourceStatesDestinationImage(MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
+    [Selector("resultStateBatchForSourceImage:sourceStates:destinationImage:")]
+    public MPSCNNConvolutionGradientStateBatch? ResultStateBatchForSourceImageSourceStatesDestinationImage(MPSImageBatch sourceImage, NSArray? sourceStates, MPSImageBatch destinationImage);
+    [Selector("temporaryResultStateForCommandBuffer:sourceImage:sourceStates:destinationImage:")]
+    public MPSCNNConvolutionGradientState? TemporaryResultStateForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
+    [Selector("temporaryResultStateBatchForCommandBuffer:sourceImage:sourceStates:destinationImage:")]
+    public MPSCNNConvolutionGradientStateBatch? TemporaryResultStateBatchForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImage, NSArray? sourceStates, MPSImageBatch destinationImage);
+    [Selector("reloadWeightsAndBiasesFromDataSource")]
+    public void ReloadWeightsAndBiasesFromDataSource();
     /// Deprecated in macOS 10.14.
-    [Selector("reloadWeightsAndBiasesWithDataSource:")] public void ReloadWeightsAndBiasesWithDataSource(MPSCNNConvolutionDataSource dataSource);
-    [Selector("reloadWeightsAndBiasesWithCommandBuffer:state:")] public void ReloadWeightsAndBiasesWithCommandBufferState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionWeightsAndBiasesState state);
-    [Selector("exportWeightsAndBiasesWithCommandBuffer:resultStateCanBeTemporary:")] public MPSCNNConvolutionWeightsAndBiasesState ExportWeightsAndBiasesWithCommandBufferResultStateCanBeTemporary(MTLCommandBuffer commandBuffer, bool resultStateCanBeTemporary);
+    [Selector("reloadWeightsAndBiasesWithDataSource:")]
+    public void ReloadWeightsAndBiasesWithDataSource(MPSCNNConvolutionDataSource dataSource);
+    [Selector("reloadWeightsAndBiasesWithCommandBuffer:state:")]
+    public void ReloadWeightsAndBiasesWithCommandBufferState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionWeightsAndBiasesState state);
+    [Selector("exportWeightsAndBiasesWithCommandBuffer:resultStateCanBeTemporary:")]
+    public MPSCNNConvolutionWeightsAndBiasesState ExportWeightsAndBiasesWithCommandBufferResultStateCanBeTemporary(MTLCommandBuffer commandBuffer, bool resultStateCanBeTemporary);
 }
 
 [Flags]
@@ -176,101 +260,163 @@ public enum MPSCNNConvolutionGradientOption : ulong
 
 public extern objc class MPSCNNConvolutionGradient : MPSCNNGradientKernel
 {
-    [Selector("sourceGradientFeatureChannels")] public NSUInteger SourceGradientFeatureChannels { get; }
-    [Selector("sourceImageFeatureChannels")] public NSUInteger SourceImageFeatureChannels { get; }
-    [Selector("groups")] public NSUInteger Groups { get; }
-    [Selector("channelMultiplier")] public NSUInteger ChannelMultiplier { get; }
-    [Selector("dataSource")] public MPSCNNConvolutionDataSource DataSource { get; }
-    [Selector("gradientOption", "setGradientOption:")] public MPSCNNConvolutionGradientOption GradientOption { get; set; }
+    [Selector("sourceGradientFeatureChannels")]
+    public NSUInteger SourceGradientFeatureChannels { get; }
+    [Selector("sourceImageFeatureChannels")]
+    public NSUInteger SourceImageFeatureChannels { get; }
+    [Selector("groups")]
+    public NSUInteger Groups { get; }
+    [Selector("channelMultiplier")]
+    public NSUInteger ChannelMultiplier { get; }
+    [Selector("dataSource")]
+    public MPSCNNConvolutionDataSource DataSource { get; }
+    [Selector("gradientOption", "setGradientOption:")]
+    public MPSCNNConvolutionGradientOption GradientOption { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("serializeWeightsAndBiases", "setSerializeWeightsAndBiases:")] public bool SerializeWeightsAndBiases { get; set; }
-    [Selector("initWithDevice:weights:")] public Self InitWithDeviceWeights(MTLDevice device, MPSCNNConvolutionDataSource weights);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("reloadWeightsAndBiasesFromDataSource")] public void ReloadWeightsAndBiasesFromDataSource();
-    [Selector("reloadWeightsAndBiasesWithCommandBuffer:state:")] public void ReloadWeightsAndBiasesWithCommandBufferState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionWeightsAndBiasesState state);
+    [Selector("serializeWeightsAndBiases", "setSerializeWeightsAndBiases:")]
+    public bool SerializeWeightsAndBiases { get; set; }
+    [Selector("initWithDevice:weights:")]
+    public Self InitWithDeviceWeights(MTLDevice device, MPSCNNConvolutionDataSource weights);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("reloadWeightsAndBiasesFromDataSource")]
+    public void ReloadWeightsAndBiasesFromDataSource();
+    [Selector("reloadWeightsAndBiasesWithCommandBuffer:state:")]
+    public void ReloadWeightsAndBiasesWithCommandBufferState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionWeightsAndBiasesState state);
 }
 
 public extern objc class MPSCNNFullyConnected : MPSCNNConvolution
 {
-    [Selector("initWithDevice:weights:")] public Self InitWithDeviceWeights(MTLDevice device, MPSCNNConvolutionDataSource weights);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:weights:")]
+    public Self InitWithDeviceWeights(MTLDevice device, MPSCNNConvolutionDataSource weights);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNFullyConnectedGradient : MPSCNNConvolutionGradient
 {
-    [Selector("initWithDevice:weights:")] public Self InitWithDeviceWeights(MTLDevice device, MPSCNNConvolutionDataSource weights);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:weights:")]
+    public Self InitWithDeviceWeights(MTLDevice device, MPSCNNConvolutionDataSource weights);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNConvolutionTranspose : MPSCNNKernel
 {
-    [Selector("inputFeatureChannels")] public NSUInteger InputFeatureChannels { get; }
-    [Selector("outputFeatureChannels")] public NSUInteger OutputFeatureChannels { get; }
-    [Selector("kernelOffsetX", "setKernelOffsetX:")] public NSInteger KernelOffsetX { get; set; }
-    [Selector("kernelOffsetY", "setKernelOffsetY:")] public NSInteger KernelOffsetY { get; set; }
-    [Selector("groups")] public NSUInteger Groups { get; }
-    [Selector("accumulatorPrecisionOption", "setAccumulatorPrecisionOption:")] public MPSNNConvolutionAccumulatorPrecisionOption AccumulatorPrecisionOption { get; set; }
-    [Selector("dataSource")] public MPSCNNConvolutionDataSource DataSource { get; }
-    [Selector("initWithDevice:weights:")] public Self InitWithDeviceWeights(MTLDevice device, MPSCNNConvolutionDataSource weights);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:sourceImage:convolutionGradientState:")] public MPSImage EncodeToCommandBufferSourceImageConvolutionGradientState(MTLCommandBuffer commandBuffer, MPSImage sourceImage, MPSCNNConvolutionGradientState? convolutionGradientState);
-    [Selector("encodeBatchToCommandBuffer:sourceImages:convolutionGradientStates:")] public MPSImageBatch EncodeBatchToCommandBufferSourceImagesConvolutionGradientStates(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImage, MPSCNNConvolutionGradientStateBatch? convolutionGradientState);
-    [Selector("encodeToCommandBuffer:sourceImage:convolutionGradientState:destinationImage:")] public void EncodeToCommandBufferSourceImageConvolutionGradientStateDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, MPSCNNConvolutionGradientState? convolutionGradientState, MPSImage destinationImage);
-    [Selector("encodeBatchToCommandBuffer:sourceImages:convolutionGradientStates:destinationImages:")] public void EncodeBatchToCommandBufferSourceImagesConvolutionGradientStatesDestinationImages(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImage, MPSCNNConvolutionGradientStateBatch? convolutionGradientState, MPSImageBatch destinationImage);
-    [Selector("resultStateForSourceImage:sourceStates:destinationImage:")] public MPSCNNConvolutionTransposeGradientState? ResultStateForSourceImageSourceStatesDestinationImage(MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
-    [Selector("resultStateBatchForSourceImage:sourceStates:destinationImage:")] public MPSCNNConvolutionTransposeGradientStateBatch? ResultStateBatchForSourceImageSourceStatesDestinationImage(MPSImageBatch sourceImage, NSArray? sourceStates, MPSImageBatch destinationImage);
-    [Selector("temporaryResultStateForCommandBuffer:sourceImage:sourceStates:destinationImage:")] public MPSCNNConvolutionTransposeGradientState? TemporaryResultStateForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
-    [Selector("temporaryResultStateBatchForCommandBuffer:sourceImage:sourceStates:destinationImage:")] public MPSCNNConvolutionTransposeGradientStateBatch? TemporaryResultStateBatchForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImage, NSArray? sourceStates, MPSImageBatch destinationImage);
-    [Selector("reloadWeightsAndBiasesFromDataSource")] public void ReloadWeightsAndBiasesFromDataSource();
-    [Selector("reloadWeightsAndBiasesWithCommandBuffer:state:")] public void ReloadWeightsAndBiasesWithCommandBufferState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionWeightsAndBiasesState state);
-    [Selector("exportWeightsAndBiasesWithCommandBuffer:resultStateCanBeTemporary:")] public MPSCNNConvolutionWeightsAndBiasesState ExportWeightsAndBiasesWithCommandBufferResultStateCanBeTemporary(MTLCommandBuffer commandBuffer, bool resultStateCanBeTemporary);
-    [Selector("encodeToCommandBuffer:sourceImage:convolutionGradientState:destinationState:destinationStateIsTemporary:")] public MPSImage EncodeToCommandBufferSourceImageConvolutionGradientStateDestinationStateDestinationStateIsTemporary(MTLCommandBuffer commandBuffer, MPSImage sourceImage, MPSCNNConvolutionGradientState? convolutionGradientState, out MPSCNNConvolutionTransposeGradientState? outState, bool isTemporary);
-    [Selector("encodeBatchToCommandBuffer:sourceImages:convolutionGradientStates:destinationStates:destinationStateIsTemporary:")] public MPSImageBatch EncodeBatchToCommandBufferSourceImagesConvolutionGradientStatesDestinationStatesDestinationStateIsTemporary(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImages, MPSCNNConvolutionGradientStateBatch? convolutionGradientStates, out MPSCNNConvolutionTransposeGradientStateBatch? outStates, bool isTemporary);
+    [Selector("inputFeatureChannels")]
+    public NSUInteger InputFeatureChannels { get; }
+    [Selector("outputFeatureChannels")]
+    public NSUInteger OutputFeatureChannels { get; }
+    [Selector("kernelOffsetX", "setKernelOffsetX:")]
+    public NSInteger KernelOffsetX { get; set; }
+    [Selector("kernelOffsetY", "setKernelOffsetY:")]
+    public NSInteger KernelOffsetY { get; set; }
+    [Selector("groups")]
+    public NSUInteger Groups { get; }
+    [Selector("accumulatorPrecisionOption", "setAccumulatorPrecisionOption:")]
+    public MPSNNConvolutionAccumulatorPrecisionOption AccumulatorPrecisionOption { get; set; }
+    [Selector("dataSource")]
+    public MPSCNNConvolutionDataSource DataSource { get; }
+    [Selector("initWithDevice:weights:")]
+    public Self InitWithDeviceWeights(MTLDevice device, MPSCNNConvolutionDataSource weights);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:sourceImage:convolutionGradientState:")]
+    public MPSImage EncodeToCommandBufferSourceImageConvolutionGradientState(MTLCommandBuffer commandBuffer, MPSImage sourceImage, MPSCNNConvolutionGradientState? convolutionGradientState);
+    [Selector("encodeBatchToCommandBuffer:sourceImages:convolutionGradientStates:")]
+    public MPSImageBatch EncodeBatchToCommandBufferSourceImagesConvolutionGradientStates(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImage, MPSCNNConvolutionGradientStateBatch? convolutionGradientState);
+    [Selector("encodeToCommandBuffer:sourceImage:convolutionGradientState:destinationImage:")]
+    public void EncodeToCommandBufferSourceImageConvolutionGradientStateDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, MPSCNNConvolutionGradientState? convolutionGradientState, MPSImage destinationImage);
+    [Selector("encodeBatchToCommandBuffer:sourceImages:convolutionGradientStates:destinationImages:")]
+    public void EncodeBatchToCommandBufferSourceImagesConvolutionGradientStatesDestinationImages(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImage, MPSCNNConvolutionGradientStateBatch? convolutionGradientState, MPSImageBatch destinationImage);
+    [Selector("resultStateForSourceImage:sourceStates:destinationImage:")]
+    public MPSCNNConvolutionTransposeGradientState? ResultStateForSourceImageSourceStatesDestinationImage(MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
+    [Selector("resultStateBatchForSourceImage:sourceStates:destinationImage:")]
+    public MPSCNNConvolutionTransposeGradientStateBatch? ResultStateBatchForSourceImageSourceStatesDestinationImage(MPSImageBatch sourceImage, NSArray? sourceStates, MPSImageBatch destinationImage);
+    [Selector("temporaryResultStateForCommandBuffer:sourceImage:sourceStates:destinationImage:")]
+    public MPSCNNConvolutionTransposeGradientState? TemporaryResultStateForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
+    [Selector("temporaryResultStateBatchForCommandBuffer:sourceImage:sourceStates:destinationImage:")]
+    public MPSCNNConvolutionTransposeGradientStateBatch? TemporaryResultStateBatchForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImage, NSArray? sourceStates, MPSImageBatch destinationImage);
+    [Selector("reloadWeightsAndBiasesFromDataSource")]
+    public void ReloadWeightsAndBiasesFromDataSource();
+    [Selector("reloadWeightsAndBiasesWithCommandBuffer:state:")]
+    public void ReloadWeightsAndBiasesWithCommandBufferState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionWeightsAndBiasesState state);
+    [Selector("exportWeightsAndBiasesWithCommandBuffer:resultStateCanBeTemporary:")]
+    public MPSCNNConvolutionWeightsAndBiasesState ExportWeightsAndBiasesWithCommandBufferResultStateCanBeTemporary(MTLCommandBuffer commandBuffer, bool resultStateCanBeTemporary);
+    [Selector("encodeToCommandBuffer:sourceImage:convolutionGradientState:destinationState:destinationStateIsTemporary:")]
+    public MPSImage EncodeToCommandBufferSourceImageConvolutionGradientStateDestinationStateDestinationStateIsTemporary(MTLCommandBuffer commandBuffer, MPSImage sourceImage, MPSCNNConvolutionGradientState? convolutionGradientState, out MPSCNNConvolutionTransposeGradientState? outState, bool isTemporary);
+    [Selector("encodeBatchToCommandBuffer:sourceImages:convolutionGradientStates:destinationStates:destinationStateIsTemporary:")]
+    public MPSImageBatch EncodeBatchToCommandBufferSourceImagesConvolutionGradientStatesDestinationStatesDestinationStateIsTemporary(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImages, MPSCNNConvolutionGradientStateBatch? convolutionGradientStates, out MPSCNNConvolutionTransposeGradientStateBatch? outStates, bool isTemporary);
 }
 
 public extern objc class MPSCNNConvolutionTransposeGradient : MPSCNNGradientKernel
 {
-    [Selector("sourceGradientFeatureChannels")] public NSUInteger SourceGradientFeatureChannels { get; }
-    [Selector("sourceImageFeatureChannels")] public NSUInteger SourceImageFeatureChannels { get; }
-    [Selector("groups")] public NSUInteger Groups { get; }
-    [Selector("dataSource")] public MPSCNNConvolutionDataSource DataSource { get; }
-    [Selector("gradientOption", "setGradientOption:")] public MPSCNNConvolutionGradientOption GradientOption { get; set; }
-    [Selector("initWithDevice:weights:")] public Self InitWithDeviceWeights(MTLDevice device, MPSCNNConvolutionDataSource weights);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("reloadWeightsAndBiasesFromDataSource")] public void ReloadWeightsAndBiasesFromDataSource();
-    [Selector("reloadWeightsAndBiasesWithCommandBuffer:state:")] public void ReloadWeightsAndBiasesWithCommandBufferState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionWeightsAndBiasesState state);
+    [Selector("sourceGradientFeatureChannels")]
+    public NSUInteger SourceGradientFeatureChannels { get; }
+    [Selector("sourceImageFeatureChannels")]
+    public NSUInteger SourceImageFeatureChannels { get; }
+    [Selector("groups")]
+    public NSUInteger Groups { get; }
+    [Selector("dataSource")]
+    public MPSCNNConvolutionDataSource DataSource { get; }
+    [Selector("gradientOption", "setGradientOption:")]
+    public MPSCNNConvolutionGradientOption GradientOption { get; set; }
+    [Selector("initWithDevice:weights:")]
+    public Self InitWithDeviceWeights(MTLDevice device, MPSCNNConvolutionDataSource weights);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("reloadWeightsAndBiasesFromDataSource")]
+    public void ReloadWeightsAndBiasesFromDataSource();
+    [Selector("reloadWeightsAndBiasesWithCommandBuffer:state:")]
+    public void ReloadWeightsAndBiasesWithCommandBufferState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionWeightsAndBiasesState state);
 }
 
 public extern objc class MPSCNNBinaryConvolution : MPSCNNKernel
 {
-    [Selector("inputFeatureChannels")] public NSUInteger InputFeatureChannels { get; }
-    [Selector("outputFeatureChannels")] public NSUInteger OutputFeatureChannels { get; }
-    [Selector("initWithDevice:convolutionData:scaleValue:type:flags:")] public Self InitWithDeviceConvolutionDataScaleValueTypeFlags(MTLDevice device, MPSCNNConvolutionDataSource convolutionData, float scaleValue, MPSCNNBinaryConvolutionType type, MPSCNNBinaryConvolutionFlags flags);
-    [Selector("initWithDevice:convolutionData:outputBiasTerms:outputScaleTerms:inputBiasTerms:inputScaleTerms:type:flags:")] public Self InitWithDeviceConvolutionDataOutputBiasTermsOutputScaleTermsInputBiasTermsInputScaleTermsTypeFlags(MTLDevice device, MPSCNNConvolutionDataSource convolutionData, float* outputBiasTerms, float* outputScaleTerms, float* inputBiasTerms, float* inputScaleTerms, MPSCNNBinaryConvolutionType type, MPSCNNBinaryConvolutionFlags flags);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("inputFeatureChannels")]
+    public NSUInteger InputFeatureChannels { get; }
+    [Selector("outputFeatureChannels")]
+    public NSUInteger OutputFeatureChannels { get; }
+    [Selector("initWithDevice:convolutionData:scaleValue:type:flags:")]
+    public Self InitWithDeviceConvolutionDataScaleValueTypeFlags(MTLDevice device, MPSCNNConvolutionDataSource convolutionData, float scaleValue, MPSCNNBinaryConvolutionType type, MPSCNNBinaryConvolutionFlags flags);
+    [Selector("initWithDevice:convolutionData:outputBiasTerms:outputScaleTerms:inputBiasTerms:inputScaleTerms:type:flags:")]
+    public Self InitWithDeviceConvolutionDataOutputBiasTermsOutputScaleTermsInputBiasTermsInputScaleTermsTypeFlags(MTLDevice device, MPSCNNConvolutionDataSource convolutionData, float* outputBiasTerms, float* outputScaleTerms, float* inputBiasTerms, float* inputScaleTerms, MPSCNNBinaryConvolutionType type, MPSCNNBinaryConvolutionFlags flags);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNBinaryFullyConnected : MPSCNNBinaryConvolution
 {
-    [Selector("initWithDevice:convolutionData:scaleValue:type:flags:")] public Self InitWithDeviceConvolutionDataScaleValueTypeFlags(MTLDevice device, MPSCNNConvolutionDataSource convolutionData, float scaleValue, MPSCNNBinaryConvolutionType type, MPSCNNBinaryConvolutionFlags flags);
-    [Selector("initWithDevice:convolutionData:outputBiasTerms:outputScaleTerms:inputBiasTerms:inputScaleTerms:type:flags:")] public Self InitWithDeviceConvolutionDataOutputBiasTermsOutputScaleTermsInputBiasTermsInputScaleTermsTypeFlags(MTLDevice device, MPSCNNConvolutionDataSource convolutionData, float* outputBiasTerms, float* outputScaleTerms, float* inputBiasTerms, float* inputScaleTerms, MPSCNNBinaryConvolutionType type, MPSCNNBinaryConvolutionFlags flags);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:convolutionData:scaleValue:type:flags:")]
+    public Self InitWithDeviceConvolutionDataScaleValueTypeFlags(MTLDevice device, MPSCNNConvolutionDataSource convolutionData, float scaleValue, MPSCNNBinaryConvolutionType type, MPSCNNBinaryConvolutionFlags flags);
+    [Selector("initWithDevice:convolutionData:outputBiasTerms:outputScaleTerms:inputBiasTerms:inputScaleTerms:type:flags:")]
+    public Self InitWithDeviceConvolutionDataOutputBiasTermsOutputScaleTermsInputBiasTermsInputScaleTermsTypeFlags(MTLDevice device, MPSCNNConvolutionDataSource convolutionData, float* outputBiasTerms, float* outputScaleTerms, float* inputBiasTerms, float* inputScaleTerms, MPSCNNBinaryConvolutionType type, MPSCNNBinaryConvolutionFlags flags);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNGramMatrixCalculation : MPSCNNKernel
 {
-    [Selector("alpha", "setAlpha:")] public float Alpha { get; set; }
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("initWithDevice:alpha:")] public Self InitWithDeviceAlpha(MTLDevice device, float alpha);
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("alpha", "setAlpha:")]
+    public float Alpha { get; set; }
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:alpha:")]
+    public Self InitWithDeviceAlpha(MTLDevice device, float alpha);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSNNGramMatrixCalculationGradient : MPSCNNGradientKernel
 {
-    [Selector("alpha", "setAlpha:")] public float Alpha { get; set; }
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("initWithDevice:alpha:")] public Self InitWithDeviceAlpha(MTLDevice device, float alpha);
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("alpha", "setAlpha:")]
+    public float Alpha { get; set; }
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:alpha:")]
+    public Self InitWithDeviceAlpha(MTLDevice device, float alpha);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 #endif

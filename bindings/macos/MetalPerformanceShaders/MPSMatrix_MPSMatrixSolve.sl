@@ -33,20 +33,26 @@ import Standard.ObjC;
 
 public extern objc class MPSMatrixSolveTriangular : MPSMatrixBinaryKernel
 {
-    [Selector("initWithDevice:right:upper:transpose:unit:order:numberOfRightHandSides:alpha:")] public Self InitWithDeviceRightUpperTransposeUnitOrderNumberOfRightHandSidesAlpha(MTLDevice device, bool right, bool upper, bool transpose, bool unit, NSUInteger order, NSUInteger numberOfRightHandSides, double alpha);
-    [Selector("encodeToCommandBuffer:sourceMatrix:rightHandSideMatrix:solutionMatrix:")] public void EncodeToCommandBufferSourceMatrixRightHandSideMatrixSolutionMatrix(MTLCommandBuffer commandBuffer, MPSMatrix sourceMatrix, MPSMatrix rightHandSideMatrix, MPSMatrix solutionMatrix);
+    [Selector("initWithDevice:right:upper:transpose:unit:order:numberOfRightHandSides:alpha:")]
+    public Self InitWithDeviceRightUpperTransposeUnitOrderNumberOfRightHandSidesAlpha(MTLDevice device, bool right, bool upper, bool transpose, bool unit, NSUInteger order, NSUInteger numberOfRightHandSides, double alpha);
+    [Selector("encodeToCommandBuffer:sourceMatrix:rightHandSideMatrix:solutionMatrix:")]
+    public void EncodeToCommandBufferSourceMatrixRightHandSideMatrixSolutionMatrix(MTLCommandBuffer commandBuffer, MPSMatrix sourceMatrix, MPSMatrix rightHandSideMatrix, MPSMatrix solutionMatrix);
 }
 
 public extern objc class MPSMatrixSolveLU : MPSMatrixBinaryKernel
 {
-    [Selector("initWithDevice:transpose:order:numberOfRightHandSides:")] public Self InitWithDeviceTransposeOrderNumberOfRightHandSides(MTLDevice device, bool transpose, NSUInteger order, NSUInteger numberOfRightHandSides);
-    [Selector("encodeToCommandBuffer:sourceMatrix:rightHandSideMatrix:pivotIndices:solutionMatrix:")] public void EncodeToCommandBufferSourceMatrixRightHandSideMatrixPivotIndicesSolutionMatrix(MTLCommandBuffer commandBuffer, MPSMatrix sourceMatrix, MPSMatrix rightHandSideMatrix, MPSMatrix pivotIndices, MPSMatrix solutionMatrix);
+    [Selector("initWithDevice:transpose:order:numberOfRightHandSides:")]
+    public Self InitWithDeviceTransposeOrderNumberOfRightHandSides(MTLDevice device, bool transpose, NSUInteger order, NSUInteger numberOfRightHandSides);
+    [Selector("encodeToCommandBuffer:sourceMatrix:rightHandSideMatrix:pivotIndices:solutionMatrix:")]
+    public void EncodeToCommandBufferSourceMatrixRightHandSideMatrixPivotIndicesSolutionMatrix(MTLCommandBuffer commandBuffer, MPSMatrix sourceMatrix, MPSMatrix rightHandSideMatrix, MPSMatrix pivotIndices, MPSMatrix solutionMatrix);
 }
 
 public extern objc class MPSMatrixSolveCholesky : MPSMatrixBinaryKernel
 {
-    [Selector("initWithDevice:upper:order:numberOfRightHandSides:")] public Self InitWithDeviceUpperOrderNumberOfRightHandSides(MTLDevice device, bool upper, NSUInteger order, NSUInteger numberOfRightHandSides);
-    [Selector("encodeToCommandBuffer:sourceMatrix:rightHandSideMatrix:solutionMatrix:")] public void EncodeToCommandBufferSourceMatrixRightHandSideMatrixSolutionMatrix(MTLCommandBuffer commandBuffer, MPSMatrix sourceMatrix, MPSMatrix rightHandSideMatrix, MPSMatrix solutionMatrix);
+    [Selector("initWithDevice:upper:order:numberOfRightHandSides:")]
+    public Self InitWithDeviceUpperOrderNumberOfRightHandSides(MTLDevice device, bool upper, NSUInteger order, NSUInteger numberOfRightHandSides);
+    [Selector("encodeToCommandBuffer:sourceMatrix:rightHandSideMatrix:solutionMatrix:")]
+    public void EncodeToCommandBufferSourceMatrixRightHandSideMatrixSolutionMatrix(MTLCommandBuffer commandBuffer, MPSMatrix sourceMatrix, MPSMatrix rightHandSideMatrix, MPSMatrix solutionMatrix);
 }
 
 #endif

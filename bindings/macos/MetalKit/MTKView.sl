@@ -38,43 +38,75 @@ import Standard.ObjC;
 
 public extern objc class MTKView : NSView, NSCoding, CALayerDelegate
 {
-    [Selector("delegate", "setDelegate:")] public MTKViewDelegate? Delegate { get; set; }
-    [Selector("device", "setDevice:")] public MTLDevice? Device { get; set; }
-    [Selector("currentDrawable")] public CAMetalDrawable? CurrentDrawable { get; }
-    [Selector("framebufferOnly", "setFramebufferOnly:")] public bool FramebufferOnly { get; set; }
-    [Selector("depthStencilAttachmentTextureUsage", "setDepthStencilAttachmentTextureUsage:")] public MTLTextureUsage DepthStencilAttachmentTextureUsage { get; set; }
-    [Selector("multisampleColorAttachmentTextureUsage", "setMultisampleColorAttachmentTextureUsage:")] public MTLTextureUsage MultisampleColorAttachmentTextureUsage { get; set; }
-    [Selector("presentsWithTransaction", "setPresentsWithTransaction:")] public bool PresentsWithTransaction { get; set; }
-    [Selector("colorPixelFormat", "setColorPixelFormat:")] public MTLPixelFormat ColorPixelFormat { get; set; }
-    [Selector("depthStencilPixelFormat", "setDepthStencilPixelFormat:")] public MTLPixelFormat DepthStencilPixelFormat { get; set; }
-    [Selector("depthStencilStorageMode", "setDepthStencilStorageMode:")] public MTLStorageMode DepthStencilStorageMode { get; set; }
-    [Selector("sampleCount", "setSampleCount:")] public NSUInteger SampleCount { get; set; }
-    [Selector("clearColor", "setClearColor:")] public MTLClearColor ClearColor { get; set; }
-    [Selector("clearDepth", "setClearDepth:")] public double ClearDepth { get; set; }
-    [Selector("clearStencil", "setClearStencil:")] public uint ClearStencil { get; set; }
-    [Selector("depthStencilTexture")] public MTLTexture? DepthStencilTexture { get; }
-    [Selector("multisampleColorTexture")] public MTLTexture? MultisampleColorTexture { get; }
-    [Selector("currentRenderPassDescriptor")] public MTLRenderPassDescriptor? CurrentRenderPassDescriptor { get; }
+    [Selector("delegate", "setDelegate:")]
+    public MTKViewDelegate? Delegate { get; set; }
+    [Selector("device", "setDevice:")]
+    public MTLDevice? Device { get; set; }
+    [Selector("currentDrawable")]
+    public CAMetalDrawable? CurrentDrawable { get; }
+    [Selector("framebufferOnly", "setFramebufferOnly:")]
+    public bool FramebufferOnly { get; set; }
+    [Selector("depthStencilAttachmentTextureUsage", "setDepthStencilAttachmentTextureUsage:")]
+    public MTLTextureUsage DepthStencilAttachmentTextureUsage { get; set; }
+    [Selector("multisampleColorAttachmentTextureUsage", "setMultisampleColorAttachmentTextureUsage:")]
+    public MTLTextureUsage MultisampleColorAttachmentTextureUsage { get; set; }
+    [Selector("presentsWithTransaction", "setPresentsWithTransaction:")]
+    public bool PresentsWithTransaction { get; set; }
+    [Selector("colorPixelFormat", "setColorPixelFormat:")]
+    public MTLPixelFormat ColorPixelFormat { get; set; }
+    [Selector("depthStencilPixelFormat", "setDepthStencilPixelFormat:")]
+    public MTLPixelFormat DepthStencilPixelFormat { get; set; }
+    [Selector("depthStencilStorageMode", "setDepthStencilStorageMode:")]
+    public MTLStorageMode DepthStencilStorageMode { get; set; }
+    [Selector("sampleCount", "setSampleCount:")]
+    public NSUInteger SampleCount { get; set; }
+    [Selector("clearColor", "setClearColor:")]
+    public MTLClearColor ClearColor { get; set; }
+    [Selector("clearDepth", "setClearDepth:")]
+    public double ClearDepth { get; set; }
+    [Selector("clearStencil", "setClearStencil:")]
+    public uint ClearStencil { get; set; }
+    [Selector("depthStencilTexture")]
+    public MTLTexture? DepthStencilTexture { get; }
+    [Selector("multisampleColorTexture")]
+    public MTLTexture? MultisampleColorTexture { get; }
+    [Selector("currentRenderPassDescriptor")]
+    public MTLRenderPassDescriptor? CurrentRenderPassDescriptor { get; }
     /// macOS 26.0 and later.
-    [Selector("currentMTL4RenderPassDescriptor")] public MTL4RenderPassDescriptor? CurrentMTL4RenderPassDescriptor { get; }
-    [Selector("preferredFramesPerSecond", "setPreferredFramesPerSecond:")] public NSInteger PreferredFramesPerSecond { get; set; }
-    [Selector("enableSetNeedsDisplay", "setEnableSetNeedsDisplay:")] public bool EnableSetNeedsDisplay { get; set; }
-    [Selector("autoResizeDrawable", "setAutoResizeDrawable:")] public bool AutoResizeDrawable { get; set; }
-    [Selector("drawableSize", "setDrawableSize:")] public CGSize DrawableSize { get; set; }
-    [Selector("preferredDrawableSize")] public CGSize PreferredDrawableSize { get; }
-    [Selector("preferredDevice")] public MTLDevice? PreferredDevice { get; }
-    [Selector("isPaused", "setPaused:")] public bool Paused { get; set; }
-    [Selector("colorspace", "setColorspace:")] public CGColorSpaceRef? Colorspace { get; set; }
-    [Selector("initWithFrame:device:")] public Self InitWithFrameDevice(CGRect frameRect, MTLDevice? device);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("releaseDrawables")] public void ReleaseDrawables();
-    [Selector("draw")] public void Draw();
+    [Selector("currentMTL4RenderPassDescriptor")]
+    public MTL4RenderPassDescriptor? CurrentMTL4RenderPassDescriptor { get; }
+    [Selector("preferredFramesPerSecond", "setPreferredFramesPerSecond:")]
+    public NSInteger PreferredFramesPerSecond { get; set; }
+    [Selector("enableSetNeedsDisplay", "setEnableSetNeedsDisplay:")]
+    public bool EnableSetNeedsDisplay { get; set; }
+    [Selector("autoResizeDrawable", "setAutoResizeDrawable:")]
+    public bool AutoResizeDrawable { get; set; }
+    [Selector("drawableSize", "setDrawableSize:")]
+    public CGSize DrawableSize { get; set; }
+    [Selector("preferredDrawableSize")]
+    public CGSize PreferredDrawableSize { get; }
+    [Selector("preferredDevice")]
+    public MTLDevice? PreferredDevice { get; }
+    [Selector("isPaused", "setPaused:")]
+    public bool Paused { get; set; }
+    [Selector("colorspace", "setColorspace:")]
+    public CGColorSpaceRef? Colorspace { get; set; }
+    [Selector("initWithFrame:device:")]
+    public Self InitWithFrameDevice(CGRect frameRect, MTLDevice? device);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("releaseDrawables")]
+    public void ReleaseDrawables();
+    [Selector("draw")]
+    public void Draw();
 }
 
 public objc interface MTKViewDelegate : NSObjectProtocol
 {
-    [Selector("mtkView:drawableSizeWillChange:")] void MtkViewDrawableSizeWillChange(MTKView view, CGSize size);
-    [Selector("drawInMTKView:")] void DrawInMTKView(MTKView view);
+    [Selector("mtkView:drawableSizeWillChange:")]
+    void MtkViewDrawableSizeWillChange(MTKView view, CGSize size);
+    [Selector("drawInMTKView:")]
+    void DrawInMTKView(MTKView view);
 }
 
 #endif

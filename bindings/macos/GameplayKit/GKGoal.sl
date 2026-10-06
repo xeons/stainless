@@ -33,18 +33,30 @@ import Standard.ObjC;
 
 public extern objc class GKGoal : NSObject, NSCopying
 {
-    [Selector("goalToSeekAgent:")] public static Self GoalToSeekAgent(GKAgent agent);
-    [Selector("goalToFleeAgent:")] public static Self GoalToFleeAgent(GKAgent agent);
-    [Selector("goalToAvoidObstacles:maxPredictionTime:")] public static Self GoalToAvoidObstaclesMaxPredictionTime(NSArray obstacles, NSTimeInterval maxPredictionTime);
-    [Selector("goalToAvoidAgents:maxPredictionTime:")] public static Self GoalToAvoidAgentsMaxPredictionTime(NSArray agents, NSTimeInterval maxPredictionTime);
-    [Selector("goalToSeparateFromAgents:maxDistance:maxAngle:")] public static Self GoalToSeparateFromAgentsMaxDistanceMaxAngle(NSArray agents, float maxDistance, float maxAngle);
-    [Selector("goalToAlignWithAgents:maxDistance:maxAngle:")] public static Self GoalToAlignWithAgentsMaxDistanceMaxAngle(NSArray agents, float maxDistance, float maxAngle);
-    [Selector("goalToCohereWithAgents:maxDistance:maxAngle:")] public static Self GoalToCohereWithAgentsMaxDistanceMaxAngle(NSArray agents, float maxDistance, float maxAngle);
-    [Selector("goalToReachTargetSpeed:")] public static Self GoalToReachTargetSpeed(float targetSpeed);
-    [Selector("goalToWander:")] public static Self GoalToWander(float speed);
-    [Selector("goalToInterceptAgent:maxPredictionTime:")] public static Self GoalToInterceptAgentMaxPredictionTime(GKAgent target, NSTimeInterval maxPredictionTime);
-    [Selector("goalToFollowPath:maxPredictionTime:forward:")] public static Self GoalToFollowPathMaxPredictionTimeForward(GKPath path, NSTimeInterval maxPredictionTime, bool forward);
-    [Selector("goalToStayOnPath:maxPredictionTime:")] public static Self GoalToStayOnPathMaxPredictionTime(GKPath path, NSTimeInterval maxPredictionTime);
+    [Selector("goalToSeekAgent:")]
+    public static Self GoalToSeekAgent(GKAgent agent);
+    [Selector("goalToFleeAgent:")]
+    public static Self GoalToFleeAgent(GKAgent agent);
+    [Selector("goalToAvoidObstacles:maxPredictionTime:")]
+    public static Self GoalToAvoidObstaclesMaxPredictionTime(NSArray obstacles, NSTimeInterval maxPredictionTime);
+    [Selector("goalToAvoidAgents:maxPredictionTime:")]
+    public static Self GoalToAvoidAgentsMaxPredictionTime(NSArray agents, NSTimeInterval maxPredictionTime);
+    [Selector("goalToSeparateFromAgents:maxDistance:maxAngle:")]
+    public static Self GoalToSeparateFromAgentsMaxDistanceMaxAngle(NSArray agents, float maxDistance, float maxAngle);
+    [Selector("goalToAlignWithAgents:maxDistance:maxAngle:")]
+    public static Self GoalToAlignWithAgentsMaxDistanceMaxAngle(NSArray agents, float maxDistance, float maxAngle);
+    [Selector("goalToCohereWithAgents:maxDistance:maxAngle:")]
+    public static Self GoalToCohereWithAgentsMaxDistanceMaxAngle(NSArray agents, float maxDistance, float maxAngle);
+    [Selector("goalToReachTargetSpeed:")]
+    public static Self GoalToReachTargetSpeed(float targetSpeed);
+    [Selector("goalToWander:")]
+    public static Self GoalToWander(float speed);
+    [Selector("goalToInterceptAgent:maxPredictionTime:")]
+    public static Self GoalToInterceptAgentMaxPredictionTime(GKAgent target, NSTimeInterval maxPredictionTime);
+    [Selector("goalToFollowPath:maxPredictionTime:forward:")]
+    public static Self GoalToFollowPathMaxPredictionTimeForward(GKPath path, NSTimeInterval maxPredictionTime, bool forward);
+    [Selector("goalToStayOnPath:maxPredictionTime:")]
+    public static Self GoalToStayOnPathMaxPredictionTime(GKPath path, NSTimeInterval maxPredictionTime);
 }
 
 #endif

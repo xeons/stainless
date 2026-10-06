@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class NSIncrementalStoreNode : NSObject
 {
-    [Selector("objectID")] public NSManagedObjectID ObjectID { get; }
-    [Selector("version")] public ulong Version { get; }
-    [Selector("initWithObjectID:withValues:version:")] public Self InitWithObjectIDWithValuesVersion(NSManagedObjectID objectID, NSDictionary values, ulong version);
-    [Selector("updateWithValues:version:")] public void UpdateWithValuesVersion(NSDictionary values, ulong version);
-    [Selector("valueForPropertyDescription:")] public AnyObject? ValueForPropertyDescription(NSPropertyDescription prop);
+    [Selector("objectID")]
+    public NSManagedObjectID ObjectID { get; }
+    [Selector("version")]
+    public ulong Version { get; }
+    [Selector("initWithObjectID:withValues:version:")]
+    public Self InitWithObjectIDWithValuesVersion(NSManagedObjectID objectID, NSDictionary values, ulong version);
+    [Selector("updateWithValues:version:")]
+    public void UpdateWithValuesVersion(NSDictionary values, ulong version);
+    [Selector("valueForPropertyDescription:")]
+    public AnyObject? ValueForPropertyDescription(NSPropertyDescription prop);
 }
 
 #endif

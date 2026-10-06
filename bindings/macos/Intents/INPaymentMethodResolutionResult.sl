@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INPaymentMethodResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedPaymentMethod:")] public static Self SuccessWithResolvedPaymentMethod(INPaymentMethod resolvedPaymentMethod);
-    [Selector("disambiguationWithPaymentMethodsToDisambiguate:")] public static Self DisambiguationWithPaymentMethodsToDisambiguate(NSArray paymentMethodsToDisambiguate);
-    [Selector("confirmationRequiredWithPaymentMethodToConfirm:")] public static Self ConfirmationRequiredWithPaymentMethodToConfirm(INPaymentMethod? paymentMethodToConfirm);
+    [Selector("successWithResolvedPaymentMethod:")]
+    public static Self SuccessWithResolvedPaymentMethod(INPaymentMethod resolvedPaymentMethod);
+    [Selector("disambiguationWithPaymentMethodsToDisambiguate:")]
+    public static Self DisambiguationWithPaymentMethodsToDisambiguate(NSArray paymentMethodsToDisambiguate);
+    [Selector("confirmationRequiredWithPaymentMethodToConfirm:")]
+    public static Self ConfirmationRequiredWithPaymentMethodToConfirm(INPaymentMethod? paymentMethodToConfirm);
 }
 
 #endif

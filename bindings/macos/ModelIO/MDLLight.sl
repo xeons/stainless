@@ -50,55 +50,83 @@ public enum MDLLightType : ulong
 
 public extern objc class MDLLight : MDLObject
 {
-    [Selector("lightType", "setLightType:")] public MDLLightType LightType { get; set; }
-    [Selector("colorSpace", "setColorSpace:")] public NSString ColorSpace { get; set; }
-    [Selector("irradianceAtPoint:")] public CGColorRef IrradianceAtPoint(vector_float3 point);
-    [Selector("irradianceAtPoint:colorSpace:")] public CGColorRef IrradianceAtPointColorSpace(vector_float3 point, CGColorSpaceRef colorSpace);
+    [Selector("lightType", "setLightType:")]
+    public MDLLightType LightType { get; set; }
+    [Selector("colorSpace", "setColorSpace:")]
+    public NSString ColorSpace { get; set; }
+    [Selector("irradianceAtPoint:")]
+    public CGColorRef IrradianceAtPoint(vector_float3 point);
+    [Selector("irradianceAtPoint:colorSpace:")]
+    public CGColorRef IrradianceAtPointColorSpace(vector_float3 point, CGColorSpaceRef colorSpace);
 }
 
 public extern objc class MDLPhysicallyPlausibleLight : MDLLight
 {
-    [Selector("color", "setColor:")] public CGColorRef? Color { get; set; }
-    [Selector("lumens", "setLumens:")] public float Lumens { get; set; }
-    [Selector("innerConeAngle", "setInnerConeAngle:")] public float InnerConeAngle { get; set; }
-    [Selector("outerConeAngle", "setOuterConeAngle:")] public float OuterConeAngle { get; set; }
-    [Selector("attenuationStartDistance", "setAttenuationStartDistance:")] public float AttenuationStartDistance { get; set; }
-    [Selector("attenuationEndDistance", "setAttenuationEndDistance:")] public float AttenuationEndDistance { get; set; }
-    [Selector("setColorByTemperature:")] public void SetColorByTemperature(float temperature);
+    [Selector("color", "setColor:")]
+    public CGColorRef? Color { get; set; }
+    [Selector("lumens", "setLumens:")]
+    public float Lumens { get; set; }
+    [Selector("innerConeAngle", "setInnerConeAngle:")]
+    public float InnerConeAngle { get; set; }
+    [Selector("outerConeAngle", "setOuterConeAngle:")]
+    public float OuterConeAngle { get; set; }
+    [Selector("attenuationStartDistance", "setAttenuationStartDistance:")]
+    public float AttenuationStartDistance { get; set; }
+    [Selector("attenuationEndDistance", "setAttenuationEndDistance:")]
+    public float AttenuationEndDistance { get; set; }
+    [Selector("setColorByTemperature:")]
+    public void SetColorByTemperature(float temperature);
 }
 
 public extern objc class MDLAreaLight : MDLPhysicallyPlausibleLight
 {
-    [Selector("areaRadius", "setAreaRadius:")] public float AreaRadius { get; set; }
-    [Selector("superEllipticPower", "setSuperEllipticPower:")] public vector_float2 SuperEllipticPower { get; set; }
-    [Selector("aspect", "setAspect:")] public float Aspect { get; set; }
+    [Selector("areaRadius", "setAreaRadius:")]
+    public float AreaRadius { get; set; }
+    [Selector("superEllipticPower", "setSuperEllipticPower:")]
+    public vector_float2 SuperEllipticPower { get; set; }
+    [Selector("aspect", "setAspect:")]
+    public float Aspect { get; set; }
 }
 
 public extern objc class MDLPhotometricLight : MDLPhysicallyPlausibleLight
 {
-    [Selector("lightCubeMap")] public MDLTexture? LightCubeMap { get; }
-    [Selector("sphericalHarmonicsLevel")] public NSUInteger SphericalHarmonicsLevel { get; }
-    [Selector("sphericalHarmonicsCoefficients")] public NSData? SphericalHarmonicsCoefficients { get; }
-    [Selector("initWithIESProfile:")] public Self? InitWithIESProfile(NSURL URL);
-    [Selector("generateSphericalHarmonicsFromLight:")] public void GenerateSphericalHarmonicsFromLight(NSUInteger sphericalHarmonicsLevel);
-    [Selector("generateCubemapFromLight:")] public void GenerateCubemapFromLight(NSUInteger textureSize);
-    [Selector("generateTexture:")] public MDLTexture GenerateTexture(NSUInteger textureSize);
+    [Selector("lightCubeMap")]
+    public MDLTexture? LightCubeMap { get; }
+    [Selector("sphericalHarmonicsLevel")]
+    public NSUInteger SphericalHarmonicsLevel { get; }
+    [Selector("sphericalHarmonicsCoefficients")]
+    public NSData? SphericalHarmonicsCoefficients { get; }
+    [Selector("initWithIESProfile:")]
+    public Self? InitWithIESProfile(NSURL URL);
+    [Selector("generateSphericalHarmonicsFromLight:")]
+    public void GenerateSphericalHarmonicsFromLight(NSUInteger sphericalHarmonicsLevel);
+    [Selector("generateCubemapFromLight:")]
+    public void GenerateCubemapFromLight(NSUInteger textureSize);
+    [Selector("generateTexture:")]
+    public MDLTexture GenerateTexture(NSUInteger textureSize);
 }
 
 public extern objc class MDLLightProbe : MDLLight
 {
-    [Selector("reflectiveTexture")] public MDLTexture? ReflectiveTexture { get; }
-    [Selector("irradianceTexture")] public MDLTexture? IrradianceTexture { get; }
-    [Selector("sphericalHarmonicsLevel")] public NSUInteger SphericalHarmonicsLevel { get; }
-    [Selector("sphericalHarmonicsCoefficients")] public NSData? SphericalHarmonicsCoefficients { get; }
-    [Selector("initWithReflectiveTexture:irradianceTexture:")] public Self InitWithReflectiveTextureIrradianceTexture(MDLTexture? reflectiveTexture, MDLTexture? irradianceTexture);
-    [Selector("generateSphericalHarmonicsFromIrradiance:")] public void GenerateSphericalHarmonicsFromIrradiance(NSUInteger sphericalHarmonicsLevel);
+    [Selector("reflectiveTexture")]
+    public MDLTexture? ReflectiveTexture { get; }
+    [Selector("irradianceTexture")]
+    public MDLTexture? IrradianceTexture { get; }
+    [Selector("sphericalHarmonicsLevel")]
+    public NSUInteger SphericalHarmonicsLevel { get; }
+    [Selector("sphericalHarmonicsCoefficients")]
+    public NSData? SphericalHarmonicsCoefficients { get; }
+    [Selector("initWithReflectiveTexture:irradianceTexture:")]
+    public Self InitWithReflectiveTextureIrradianceTexture(MDLTexture? reflectiveTexture, MDLTexture? irradianceTexture);
+    [Selector("generateSphericalHarmonicsFromIrradiance:")]
+    public void GenerateSphericalHarmonicsFromIrradiance(NSUInteger sphericalHarmonicsLevel);
 }
 
 /// MDLLightBaking, a category of MDLLightProbe.
 public extern objc class MDLLightProbe
 {
-    [Selector("lightProbeWithTextureSize:forLocation:lightsToConsider:objectsToConsider:reflectiveCubemap:irradianceCubemap:")] public static MDLLightProbe? LightProbeWithTextureSizeForLocationLightsToConsiderObjectsToConsiderReflectiveCubemapIrradianceCubemap(NSInteger textureSize, MDLTransform transform, NSArray lightsToConsider, NSArray objectsToConsider, MDLTexture? reflectiveCubemap, MDLTexture? irradianceCubemap);
+    [Selector("lightProbeWithTextureSize:forLocation:lightsToConsider:objectsToConsider:reflectiveCubemap:irradianceCubemap:")]
+    public static MDLLightProbe? LightProbeWithTextureSizeForLocationLightsToConsiderObjectsToConsiderReflectiveCubemapIrradianceCubemap(NSInteger textureSize, MDLTransform transform, NSArray lightsToConsider, NSArray objectsToConsider, MDLTexture? reflectiveCubemap, MDLTexture? irradianceCubemap);
 }
 
 #endif

@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class NSLightweightMigrationStage : NSMigrationStage
 {
-    [Selector("versionChecksums")] public NSArray VersionChecksums { get; }
-    [Selector("initWithVersionChecksums:")] public Self InitWithVersionChecksums(NSArray versionChecksums);
+    [Selector("versionChecksums")]
+    public NSArray VersionChecksums { get; }
+    [Selector("initWithVersionChecksums:")]
+    public Self InitWithVersionChecksums(NSArray versionChecksums);
 }
 
 #endif

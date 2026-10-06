@@ -34,32 +34,58 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCTrainingGraph : MLCGraph
 {
-    [Selector("optimizer")] public MLCOptimizer? Optimizer { get; }
-    [Selector("deviceMemorySize")] public NSUInteger DeviceMemorySize { get; }
-    [Selector("graphWithGraphObjects:lossLayer:optimizer:")] public static Self GraphWithGraphObjectsLossLayerOptimizer(NSArray graphObjects, MLCLayer? lossLayer, MLCOptimizer? optimizer);
-    [Selector("addInputs:lossLabels:")] public bool AddInputsLossLabels(NSDictionary inputs, NSDictionary? lossLabels);
-    [Selector("addInputs:lossLabels:lossLabelWeights:")] public bool AddInputsLossLabelsLossLabelWeights(NSDictionary inputs, NSDictionary? lossLabels, NSDictionary? lossLabelWeights);
-    [Selector("addOutputs:")] public bool AddOutputs(NSDictionary outputs);
-    [Selector("stopGradientForTensors:")] public bool StopGradientForTensors(NSArray tensors);
-    [Selector("compileWithOptions:device:")] public bool CompileWithOptionsDevice(MLCGraphCompilationOptions options, MLCDevice device);
-    [Selector("compileWithOptions:device:inputTensors:inputTensorsData:")] public bool CompileWithOptionsDeviceInputTensorsInputTensorsData(MLCGraphCompilationOptions options, MLCDevice device, NSDictionary? inputTensors, NSDictionary? inputTensorsData);
-    [Selector("compileOptimizer:")] public bool CompileOptimizer(MLCOptimizer optimizer);
-    [Selector("linkWithGraphs:")] public bool LinkWithGraphs(NSArray graphs);
-    [Selector("gradientTensorForInput:")] public MLCTensor? GradientTensorForInput(MLCTensor input);
-    [Selector("sourceGradientTensorsForLayer:")] public NSArray SourceGradientTensorsForLayer(MLCLayer layer);
-    [Selector("resultGradientTensorsForLayer:")] public NSArray ResultGradientTensorsForLayer(MLCLayer layer);
-    [Selector("gradientDataForParameter:layer:")] public NSData? GradientDataForParameterLayer(MLCTensor parameter, MLCLayer layer);
-    [Selector("allocateUserGradientForTensor:")] public MLCTensor? AllocateUserGradientForTensor(MLCTensor tensor);
-    [Selector("executeWithInputsData:lossLabelsData:lossLabelWeightsData:batchSize:options:completionHandler:")] public bool ExecuteWithInputsDataLossLabelsDataLossLabelWeightsDataBatchSizeOptionsCompletionHandler(NSDictionary inputsData, NSDictionary? lossLabelsData, NSDictionary? lossLabelWeightsData, NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
-    [Selector("executeWithInputsData:lossLabelsData:lossLabelWeightsData:outputsData:batchSize:options:completionHandler:")] public bool ExecuteWithInputsDataLossLabelsDataLossLabelWeightsDataOutputsDataBatchSizeOptionsCompletionHandler(NSDictionary inputsData, NSDictionary? lossLabelsData, NSDictionary? lossLabelWeightsData, NSDictionary? outputsData, NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
-    [Selector("executeForwardWithBatchSize:options:completionHandler:")] public bool ExecuteForwardWithBatchSizeOptionsCompletionHandler(NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
-    [Selector("executeForwardWithBatchSize:options:outputsData:completionHandler:")] public bool ExecuteForwardWithBatchSizeOptionsOutputsDataCompletionHandler(NSUInteger batchSize, MLCExecutionOptions options, NSDictionary? outputsData, MLCGraphCompletionHandler? completionHandler);
-    [Selector("executeGradientWithBatchSize:options:completionHandler:")] public bool ExecuteGradientWithBatchSizeOptionsCompletionHandler(NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
-    [Selector("executeGradientWithBatchSize:options:outputsData:completionHandler:")] public bool ExecuteGradientWithBatchSizeOptionsOutputsDataCompletionHandler(NSUInteger batchSize, MLCExecutionOptions options, NSDictionary? outputsData, MLCGraphCompletionHandler? completionHandler);
-    [Selector("executeOptimizerUpdateWithOptions:completionHandler:")] public bool ExecuteOptimizerUpdateWithOptionsCompletionHandler(MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
-    [Selector("synchronizeUpdates")] public void SynchronizeUpdates();
-    [Selector("setTrainingTensorParameters:")] public bool SetTrainingTensorParameters(NSArray parameters);
-    [Selector("bindOptimizerData:deviceData:withTensor:")] public bool BindOptimizerDataDeviceDataWithTensor(NSArray data, NSArray? deviceData, MLCTensor tensor);
+    [Selector("optimizer")]
+    public MLCOptimizer? Optimizer { get; }
+    [Selector("deviceMemorySize")]
+    public NSUInteger DeviceMemorySize { get; }
+    [Selector("graphWithGraphObjects:lossLayer:optimizer:")]
+    public static Self GraphWithGraphObjectsLossLayerOptimizer(NSArray graphObjects, MLCLayer? lossLayer, MLCOptimizer? optimizer);
+    [Selector("addInputs:lossLabels:")]
+    public bool AddInputsLossLabels(NSDictionary inputs, NSDictionary? lossLabels);
+    [Selector("addInputs:lossLabels:lossLabelWeights:")]
+    public bool AddInputsLossLabelsLossLabelWeights(NSDictionary inputs, NSDictionary? lossLabels, NSDictionary? lossLabelWeights);
+    [Selector("addOutputs:")]
+    public bool AddOutputs(NSDictionary outputs);
+    [Selector("stopGradientForTensors:")]
+    public bool StopGradientForTensors(NSArray tensors);
+    [Selector("compileWithOptions:device:")]
+    public bool CompileWithOptionsDevice(MLCGraphCompilationOptions options, MLCDevice device);
+    [Selector("compileWithOptions:device:inputTensors:inputTensorsData:")]
+    public bool CompileWithOptionsDeviceInputTensorsInputTensorsData(MLCGraphCompilationOptions options, MLCDevice device, NSDictionary? inputTensors, NSDictionary? inputTensorsData);
+    [Selector("compileOptimizer:")]
+    public bool CompileOptimizer(MLCOptimizer optimizer);
+    [Selector("linkWithGraphs:")]
+    public bool LinkWithGraphs(NSArray graphs);
+    [Selector("gradientTensorForInput:")]
+    public MLCTensor? GradientTensorForInput(MLCTensor input);
+    [Selector("sourceGradientTensorsForLayer:")]
+    public NSArray SourceGradientTensorsForLayer(MLCLayer layer);
+    [Selector("resultGradientTensorsForLayer:")]
+    public NSArray ResultGradientTensorsForLayer(MLCLayer layer);
+    [Selector("gradientDataForParameter:layer:")]
+    public NSData? GradientDataForParameterLayer(MLCTensor parameter, MLCLayer layer);
+    [Selector("allocateUserGradientForTensor:")]
+    public MLCTensor? AllocateUserGradientForTensor(MLCTensor tensor);
+    [Selector("executeWithInputsData:lossLabelsData:lossLabelWeightsData:batchSize:options:completionHandler:")]
+    public bool ExecuteWithInputsDataLossLabelsDataLossLabelWeightsDataBatchSizeOptionsCompletionHandler(NSDictionary inputsData, NSDictionary? lossLabelsData, NSDictionary? lossLabelWeightsData, NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
+    [Selector("executeWithInputsData:lossLabelsData:lossLabelWeightsData:outputsData:batchSize:options:completionHandler:")]
+    public bool ExecuteWithInputsDataLossLabelsDataLossLabelWeightsDataOutputsDataBatchSizeOptionsCompletionHandler(NSDictionary inputsData, NSDictionary? lossLabelsData, NSDictionary? lossLabelWeightsData, NSDictionary? outputsData, NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
+    [Selector("executeForwardWithBatchSize:options:completionHandler:")]
+    public bool ExecuteForwardWithBatchSizeOptionsCompletionHandler(NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
+    [Selector("executeForwardWithBatchSize:options:outputsData:completionHandler:")]
+    public bool ExecuteForwardWithBatchSizeOptionsOutputsDataCompletionHandler(NSUInteger batchSize, MLCExecutionOptions options, NSDictionary? outputsData, MLCGraphCompletionHandler? completionHandler);
+    [Selector("executeGradientWithBatchSize:options:completionHandler:")]
+    public bool ExecuteGradientWithBatchSizeOptionsCompletionHandler(NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
+    [Selector("executeGradientWithBatchSize:options:outputsData:completionHandler:")]
+    public bool ExecuteGradientWithBatchSizeOptionsOutputsDataCompletionHandler(NSUInteger batchSize, MLCExecutionOptions options, NSDictionary? outputsData, MLCGraphCompletionHandler? completionHandler);
+    [Selector("executeOptimizerUpdateWithOptions:completionHandler:")]
+    public bool ExecuteOptimizerUpdateWithOptionsCompletionHandler(MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
+    [Selector("synchronizeUpdates")]
+    public void SynchronizeUpdates();
+    [Selector("setTrainingTensorParameters:")]
+    public bool SetTrainingTensorParameters(NSArray parameters);
+    [Selector("bindOptimizerData:deviceData:withTensor:")]
+    public bool BindOptimizerDataDeviceDataWithTensor(NSArray data, NSArray? deviceData, MLCTensor tensor);
 }
 
 #endif

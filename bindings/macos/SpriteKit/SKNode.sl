@@ -51,68 +51,122 @@ public objc closure void SKNodeRunActionCompletionBlock();
 
 public extern objc class SKNode : NSResponder, NSCopying, NSSecureCoding
 {
-    [Selector("frame")] public CGRect Frame { get; }
-    [Selector("position", "setPosition:")] public CGPoint Position { get; set; }
-    [Selector("zPosition", "setZPosition:")] public CGFloat ZPosition { get; set; }
-    [Selector("zRotation", "setZRotation:")] public CGFloat ZRotation { get; set; }
-    [Selector("xScale", "setXScale:")] public CGFloat XScale { get; set; }
-    [Selector("yScale", "setYScale:")] public CGFloat YScale { get; set; }
-    [Selector("speed", "setSpeed:")] public CGFloat Speed { get; set; }
-    [Selector("alpha", "setAlpha:")] public CGFloat Alpha { get; set; }
-    [Selector("isPaused", "setPaused:")] public bool Paused { get; set; }
-    [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
-    [Selector("isUserInteractionEnabled", "setUserInteractionEnabled:")] public bool UserInteractionEnabled { get; set; }
-    [Selector("parent")] public SKNode? Parent { get; }
-    [Selector("children")] public NSArray Children { get; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("scene")] public SKScene? Scene { get; }
-    [Selector("physicsBody", "setPhysicsBody:")] public SKPhysicsBody? PhysicsBody { get; set; }
-    [Selector("userData", "setUserData:")] public NSMutableDictionary? UserData { get; set; }
-    [Selector("reachConstraints", "setReachConstraints:")] public SKReachConstraints? ReachConstraints { get; set; }
-    [Selector("constraints", "setConstraints:")] public NSArray? Constraints { get; set; }
+    [Selector("frame")]
+    public CGRect Frame { get; }
+    [Selector("position", "setPosition:")]
+    public CGPoint Position { get; set; }
+    [Selector("zPosition", "setZPosition:")]
+    public CGFloat ZPosition { get; set; }
+    [Selector("zRotation", "setZRotation:")]
+    public CGFloat ZRotation { get; set; }
+    [Selector("xScale", "setXScale:")]
+    public CGFloat XScale { get; set; }
+    [Selector("yScale", "setYScale:")]
+    public CGFloat YScale { get; set; }
+    [Selector("speed", "setSpeed:")]
+    public CGFloat Speed { get; set; }
+    [Selector("alpha", "setAlpha:")]
+    public CGFloat Alpha { get; set; }
+    [Selector("isPaused", "setPaused:")]
+    public bool Paused { get; set; }
+    [Selector("isHidden", "setHidden:")]
+    public bool Hidden { get; set; }
+    [Selector("isUserInteractionEnabled", "setUserInteractionEnabled:")]
+    public bool UserInteractionEnabled { get; set; }
+    [Selector("parent")]
+    public SKNode? Parent { get; }
+    [Selector("children")]
+    public NSArray Children { get; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("scene")]
+    public SKScene? Scene { get; }
+    [Selector("physicsBody", "setPhysicsBody:")]
+    public SKPhysicsBody? PhysicsBody { get; set; }
+    [Selector("userData", "setUserData:")]
+    public NSMutableDictionary? UserData { get; set; }
+    [Selector("reachConstraints", "setReachConstraints:")]
+    public SKReachConstraints? ReachConstraints { get; set; }
+    [Selector("constraints", "setConstraints:")]
+    public NSArray? Constraints { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("attributeValues", "setAttributeValues:")] public NSDictionary? AttributeValues { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
-    [Selector("node")] public static Self Node();
-    [Selector("nodeWithFileNamed:")] public static Self? NodeWithFileNamed(NSString filename);
-    [Selector("nodeWithFileNamed:securelyWithClasses:andError:")] public static Self? NodeWithFileNamedSecurelyWithClassesAndError(NSString filename, NSSet classes, out NSError? error);
-    [Selector("calculateAccumulatedFrame")] public CGRect CalculateAccumulatedFrame();
+    [Selector("attributeValues", "setAttributeValues:")]
+    public NSDictionary? AttributeValues { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder aDecoder);
+    [Selector("node")]
+    public static Self Node();
+    [Selector("nodeWithFileNamed:")]
+    public static Self? NodeWithFileNamed(NSString filename);
+    [Selector("nodeWithFileNamed:securelyWithClasses:andError:")]
+    public static Self? NodeWithFileNamedSecurelyWithClassesAndError(NSString filename, NSSet classes, out NSError? error);
+    [Selector("calculateAccumulatedFrame")]
+    public CGRect CalculateAccumulatedFrame();
     /// Deprecated in macOS 10.12.
-    [Selector("valueForAttributeNamed:")] public SKAttributeValue? ValueForAttributeNamed(NSString key);
+    [Selector("valueForAttributeNamed:")]
+    public SKAttributeValue? ValueForAttributeNamed(NSString key);
     /// Deprecated in macOS 10.12.
-    [Selector("setValue:forAttributeNamed:")] public void SetValueForAttributeNamed(SKAttributeValue value, NSString key);
-    [Selector("setScale:")] public void SetScale(CGFloat scale);
-    [Selector("addChild:")] public void AddChild(SKNode node);
-    [Selector("insertChild:atIndex:")] public void InsertChildAtIndex(SKNode node, NSInteger index);
-    [Selector("removeChildrenInArray:")] public void RemoveChildrenInArray(NSArray nodes);
-    [Selector("removeAllChildren")] public void RemoveAllChildren();
-    [Selector("removeFromParent")] public void RemoveFromParent();
-    [Selector("moveToParent:")] public void MoveToParent(SKNode parent);
-    [Selector("childNodeWithName:")] public SKNode? ChildNodeWithName(NSString name);
-    [Selector("enumerateChildNodesWithName:usingBlock:")] public void EnumerateChildNodesWithNameUsingBlock(NSString name, SKNodeEnumerateChildNodesWithNameUsingBlockBlock block);
-    [Selector("objectForKeyedSubscript:")] public NSArray ObjectForKeyedSubscript(NSString name);
-    [Selector("inParentHierarchy:")] public bool InParentHierarchy(SKNode parent);
-    [Selector("runAction:")] public void RunAction(SKAction action);
-    [Selector("runAction:completion:")] public void RunActionCompletion(SKAction action, SKNodeRunActionCompletionBlock block);
-    [Selector("runAction:withKey:")] public void RunActionWithKey(SKAction action, NSString key);
-    [Selector("hasActions")] public bool HasActions();
-    [Selector("actionForKey:")] public SKAction? ActionForKey(NSString key);
-    [Selector("removeActionForKey:")] public void RemoveActionForKey(NSString key);
-    [Selector("removeAllActions")] public void RemoveAllActions();
-    [Selector("containsPoint:")] public bool ContainsPoint(CGPoint p);
-    [Selector("nodeAtPoint:")] public SKNode NodeAtPoint(CGPoint p);
-    [Selector("nodesAtPoint:")] public NSArray NodesAtPoint(CGPoint p);
-    [Selector("convertPoint:fromNode:")] public CGPoint ConvertPointFromNode(CGPoint point, SKNode node);
-    [Selector("convertPoint:toNode:")] public CGPoint ConvertPointToNode(CGPoint point, SKNode node);
-    [Selector("intersectsNode:")] public bool IntersectsNode(SKNode node);
-    [Selector("isEqualToNode:")] public bool IsEqualToNode(SKNode node);
+    [Selector("setValue:forAttributeNamed:")]
+    public void SetValueForAttributeNamed(SKAttributeValue value, NSString key);
+    [Selector("setScale:")]
+    public void SetScale(CGFloat scale);
+    [Selector("addChild:")]
+    public void AddChild(SKNode node);
+    [Selector("insertChild:atIndex:")]
+    public void InsertChildAtIndex(SKNode node, NSInteger index);
+    [Selector("removeChildrenInArray:")]
+    public void RemoveChildrenInArray(NSArray nodes);
+    [Selector("removeAllChildren")]
+    public void RemoveAllChildren();
+    [Selector("removeFromParent")]
+    public void RemoveFromParent();
+    [Selector("moveToParent:")]
+    public void MoveToParent(SKNode parent);
+    [Selector("childNodeWithName:")]
+    public SKNode? ChildNodeWithName(NSString name);
+    [Selector("enumerateChildNodesWithName:usingBlock:")]
+    public void EnumerateChildNodesWithNameUsingBlock(NSString name, SKNodeEnumerateChildNodesWithNameUsingBlockBlock block);
+    [Selector("objectForKeyedSubscript:")]
+    public NSArray ObjectForKeyedSubscript(NSString name);
+    [Selector("inParentHierarchy:")]
+    public bool InParentHierarchy(SKNode parent);
+    [Selector("runAction:")]
+    public void RunAction(SKAction action);
+    [Selector("runAction:completion:")]
+    public void RunActionCompletion(SKAction action, SKNodeRunActionCompletionBlock block);
+    [Selector("runAction:withKey:")]
+    public void RunActionWithKey(SKAction action, NSString key);
+    [Selector("hasActions")]
+    public bool HasActions();
+    [Selector("actionForKey:")]
+    public SKAction? ActionForKey(NSString key);
+    [Selector("removeActionForKey:")]
+    public void RemoveActionForKey(NSString key);
+    [Selector("removeAllActions")]
+    public void RemoveAllActions();
+    [Selector("containsPoint:")]
+    public bool ContainsPoint(CGPoint p);
+    [Selector("nodeAtPoint:")]
+    public SKNode NodeAtPoint(CGPoint p);
+    [Selector("nodesAtPoint:")]
+    public NSArray NodesAtPoint(CGPoint p);
+    [Selector("convertPoint:fromNode:")]
+    public CGPoint ConvertPointFromNode(CGPoint point, SKNode node);
+    [Selector("convertPoint:toNode:")]
+    public CGPoint ConvertPointToNode(CGPoint point, SKNode node);
+    [Selector("intersectsNode:")]
+    public bool IntersectsNode(SKNode node);
+    [Selector("isEqualToNode:")]
+    public bool IsEqualToNode(SKNode node);
 }
 
 /// SKNodeEvent, a category of NSEvent.
 public extern objc class NSEvent
 {
-    [Selector("locationInNode:")] public CGPoint LocationInNode(SKNode node);
+    [Selector("locationInNode:")]
+    public CGPoint LocationInNode(SKNode node);
 }
 
 #endif

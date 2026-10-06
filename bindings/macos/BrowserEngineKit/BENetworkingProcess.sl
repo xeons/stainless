@@ -41,10 +41,14 @@ public objc closure void BENetworkingProcessNetworkProcessWithBundleIDInterrupti
 
 public extern objc class BENetworkingProcess : NSObject
 {
-    [Selector("networkProcessWithInterruptionHandler:completion:")] public static void NetworkProcessWithInterruptionHandlerCompletion(BENetworkingProcessNetworkProcessWithInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BENetworkingProcessNetworkProcessWithInterruptionHandlerCompletionCompletionBlock completion);
-    [Selector("networkProcessWithBundleID:interruptionHandler:completion:")] public static void NetworkProcessWithBundleIDInterruptionHandlerCompletion(NSString bundleID, BENetworkingProcessNetworkProcessWithBundleIDInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BENetworkingProcessNetworkProcessWithBundleIDInterruptionHandlerCompletionCompletionBlock completion);
-    [Selector("invalidate")] public void Invalidate();
-    [Selector("makeLibXPCConnectionError:")] public xpc_connection_t? MakeLibXPCConnectionError(out NSError? error);
+    [Selector("networkProcessWithInterruptionHandler:completion:")]
+    public static void NetworkProcessWithInterruptionHandlerCompletion(BENetworkingProcessNetworkProcessWithInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BENetworkingProcessNetworkProcessWithInterruptionHandlerCompletionCompletionBlock completion);
+    [Selector("networkProcessWithBundleID:interruptionHandler:completion:")]
+    public static void NetworkProcessWithBundleIDInterruptionHandlerCompletion(NSString bundleID, BENetworkingProcessNetworkProcessWithBundleIDInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BENetworkingProcessNetworkProcessWithBundleIDInterruptionHandlerCompletionCompletionBlock completion);
+    [Selector("invalidate")]
+    public void Invalidate();
+    [Selector("makeLibXPCConnectionError:")]
+    public xpc_connection_t? MakeLibXPCConnectionError(out NSError? error);
 }
 
 /// BEExtensionProcessConformance, a category of BENetworkingProcess.

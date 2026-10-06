@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class UNNotificationRequest : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("content")] public UNNotificationContent Content { get; }
-    [Selector("trigger")] public UNNotificationTrigger? Trigger { get; }
-    [Selector("requestWithIdentifier:content:trigger:")] public static Self RequestWithIdentifierContentTrigger(NSString identifier, UNNotificationContent content, UNNotificationTrigger? trigger);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("content")]
+    public UNNotificationContent Content { get; }
+    [Selector("trigger")]
+    public UNNotificationTrigger? Trigger { get; }
+    [Selector("requestWithIdentifier:content:trigger:")]
+    public static Self RequestWithIdentifierContentTrigger(NSString identifier, UNNotificationContent content, UNNotificationTrigger? trigger);
 }
 
 #endif

@@ -35,13 +35,20 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class NSOpenGLLayer : CAOpenGLLayer
 {
-    [Selector("view", "setView:")] public NSView? View { get; set; }
-    [Selector("openGLPixelFormat", "setOpenGLPixelFormat:")] public NSOpenGLPixelFormat? OpenGLPixelFormat { get; set; }
-    [Selector("openGLContext", "setOpenGLContext:")] public NSOpenGLContext? OpenGLContext { get; set; }
-    [Selector("openGLPixelFormatForDisplayMask:")] public NSOpenGLPixelFormat OpenGLPixelFormatForDisplayMask(uint mask);
-    [Selector("openGLContextForPixelFormat:")] public NSOpenGLContext OpenGLContextForPixelFormat(NSOpenGLPixelFormat pixelFormat);
-    [Selector("canDrawInOpenGLContext:pixelFormat:forLayerTime:displayTime:")] public bool CanDrawInOpenGLContextPixelFormatForLayerTimeDisplayTime(NSOpenGLContext context, NSOpenGLPixelFormat pixelFormat, CFTimeInterval t, CVTimeStamp* ts);
-    [Selector("drawInOpenGLContext:pixelFormat:forLayerTime:displayTime:")] public void DrawInOpenGLContextPixelFormatForLayerTimeDisplayTime(NSOpenGLContext context, NSOpenGLPixelFormat pixelFormat, CFTimeInterval t, CVTimeStamp* ts);
+    [Selector("view", "setView:")]
+    public NSView? View { get; set; }
+    [Selector("openGLPixelFormat", "setOpenGLPixelFormat:")]
+    public NSOpenGLPixelFormat? OpenGLPixelFormat { get; set; }
+    [Selector("openGLContext", "setOpenGLContext:")]
+    public NSOpenGLContext? OpenGLContext { get; set; }
+    [Selector("openGLPixelFormatForDisplayMask:")]
+    public NSOpenGLPixelFormat OpenGLPixelFormatForDisplayMask(uint mask);
+    [Selector("openGLContextForPixelFormat:")]
+    public NSOpenGLContext OpenGLContextForPixelFormat(NSOpenGLPixelFormat pixelFormat);
+    [Selector("canDrawInOpenGLContext:pixelFormat:forLayerTime:displayTime:")]
+    public bool CanDrawInOpenGLContextPixelFormatForLayerTimeDisplayTime(NSOpenGLContext context, NSOpenGLPixelFormat pixelFormat, CFTimeInterval t, CVTimeStamp* ts);
+    [Selector("drawInOpenGLContext:pixelFormat:forLayerTime:displayTime:")]
+    public void DrawInOpenGLContextPixelFormatForLayerTimeDisplayTime(NSOpenGLContext context, NSOpenGLPixelFormat pixelFormat, CFTimeInterval t, CVTimeStamp* ts);
 }
 
 #endif

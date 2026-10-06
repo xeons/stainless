@@ -44,46 +44,60 @@ public objc closure MPRemoteCommandHandlerStatus MPRemoteCommandAddTargetWithHan
 
 public extern objc class MPRemoteCommand : NSObject
 {
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("addTarget:action:")] public void AddTargetAction(AnyObject target, Selector action);
-    [Selector("removeTarget:action:")] public void RemoveTargetAction(AnyObject target, Selector action);
-    [Selector("removeTarget:")] public void RemoveTarget(AnyObject? target);
-    [Selector("addTargetWithHandler:")] public AnyObject AddTargetWithHandler(MPRemoteCommandAddTargetWithHandlerHandlerBlock handler);
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("addTarget:action:")]
+    public void AddTargetAction(AnyObject target, Selector action);
+    [Selector("removeTarget:action:")]
+    public void RemoveTargetAction(AnyObject target, Selector action);
+    [Selector("removeTarget:")]
+    public void RemoveTarget(AnyObject? target);
+    [Selector("addTargetWithHandler:")]
+    public AnyObject AddTargetWithHandler(MPRemoteCommandAddTargetWithHandlerHandlerBlock handler);
 }
 
 public extern objc class MPSkipIntervalCommand : MPRemoteCommand
 {
-    [Selector("preferredIntervals", "setPreferredIntervals:")] public NSArray PreferredIntervals { get; set; }
+    [Selector("preferredIntervals", "setPreferredIntervals:")]
+    public NSArray PreferredIntervals { get; set; }
 }
 
 public extern objc class MPFeedbackCommand : MPRemoteCommand
 {
-    [Selector("isActive", "setActive:")] public bool Active { get; set; }
-    [Selector("localizedTitle", "setLocalizedTitle:")] public NSString LocalizedTitle { get; set; }
-    [Selector("localizedShortTitle", "setLocalizedShortTitle:")] public NSString LocalizedShortTitle { get; set; }
+    [Selector("isActive", "setActive:")]
+    public bool Active { get; set; }
+    [Selector("localizedTitle", "setLocalizedTitle:")]
+    public NSString LocalizedTitle { get; set; }
+    [Selector("localizedShortTitle", "setLocalizedShortTitle:")]
+    public NSString LocalizedShortTitle { get; set; }
 }
 
 public extern objc class MPRatingCommand : MPRemoteCommand
 {
-    [Selector("minimumRating", "setMinimumRating:")] public float MinimumRating { get; set; }
-    [Selector("maximumRating", "setMaximumRating:")] public float MaximumRating { get; set; }
+    [Selector("minimumRating", "setMinimumRating:")]
+    public float MinimumRating { get; set; }
+    [Selector("maximumRating", "setMaximumRating:")]
+    public float MaximumRating { get; set; }
 }
 
 public extern objc class MPChangePlaybackRateCommand : MPRemoteCommand
 {
-    [Selector("supportedPlaybackRates", "setSupportedPlaybackRates:")] public NSArray SupportedPlaybackRates { get; set; }
+    [Selector("supportedPlaybackRates", "setSupportedPlaybackRates:")]
+    public NSArray SupportedPlaybackRates { get; set; }
 }
 
 public extern objc class MPChangePlaybackPositionCommand : MPRemoteCommand { }
 
 public extern objc class MPChangeShuffleModeCommand : MPRemoteCommand
 {
-    [Selector("currentShuffleType", "setCurrentShuffleType:")] public MPShuffleType CurrentShuffleType { get; set; }
+    [Selector("currentShuffleType", "setCurrentShuffleType:")]
+    public MPShuffleType CurrentShuffleType { get; set; }
 }
 
 public extern objc class MPChangeRepeatModeCommand : MPRemoteCommand
 {
-    [Selector("currentRepeatType", "setCurrentRepeatType:")] public MPRepeatType CurrentRepeatType { get; set; }
+    [Selector("currentRepeatType", "setCurrentRepeatType:")]
+    public MPRepeatType CurrentRepeatType { get; set; }
 }
 
 #endif

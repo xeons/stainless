@@ -33,15 +33,24 @@ import Standard.ObjC;
 [ObjCRoot]
 public extern objc class NSProxy : NSObjectProtocol
 {
-    [Selector("description")] public NSString Description { get; }
-    [Selector("debugDescription")] public NSString DebugDescription { get; }
-    [Selector("alloc")] public static AnyObject Alloc();
-    [Selector("class")] public static Class Class();
-    [Selector("forwardInvocation:")] public void ForwardInvocation(NSInvocation invocation);
-    [Selector("methodSignatureForSelector:")] public NSMethodSignature? MethodSignatureForSelector(Selector sel);
-    [Selector("dealloc")] public void Dealloc();
-    [Selector("finalize")] public void Finalize();
-    [Selector("respondsToSelector:")] public static bool RespondsToSelector(Selector aSelector);
+    [Selector("description")]
+    public NSString Description { get; }
+    [Selector("debugDescription")]
+    public NSString DebugDescription { get; }
+    [Selector("alloc")]
+    public static AnyObject Alloc();
+    [Selector("class")]
+    public static Class Class();
+    [Selector("forwardInvocation:")]
+    public void ForwardInvocation(NSInvocation invocation);
+    [Selector("methodSignatureForSelector:")]
+    public NSMethodSignature? MethodSignatureForSelector(Selector sel);
+    [Selector("dealloc")]
+    public void Dealloc();
+    [Selector("finalize")]
+    public void Finalize();
+    [Selector("respondsToSelector:")]
+    public static bool RespondsToSelector(Selector aSelector);
 }
 
 #endif

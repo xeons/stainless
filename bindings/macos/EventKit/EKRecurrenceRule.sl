@@ -33,19 +33,32 @@ import Standard.ObjC;
 
 public extern objc class EKRecurrenceRule : EKObject, NSCopying
 {
-    [Selector("calendarIdentifier")] public NSString CalendarIdentifier { get; }
-    [Selector("recurrenceEnd", "setRecurrenceEnd:")] public EKRecurrenceEnd? RecurrenceEnd { get; set; }
-    [Selector("frequency")] public EKRecurrenceFrequency Frequency { get; }
-    [Selector("interval")] public NSInteger Interval { get; }
-    [Selector("firstDayOfTheWeek")] public NSInteger FirstDayOfTheWeek { get; }
-    [Selector("daysOfTheWeek")] public NSArray? DaysOfTheWeek { get; }
-    [Selector("daysOfTheMonth")] public NSArray? DaysOfTheMonth { get; }
-    [Selector("daysOfTheYear")] public NSArray? DaysOfTheYear { get; }
-    [Selector("weeksOfTheYear")] public NSArray? WeeksOfTheYear { get; }
-    [Selector("monthsOfTheYear")] public NSArray? MonthsOfTheYear { get; }
-    [Selector("setPositions")] public NSArray? SetPositions { get; }
-    [Selector("initRecurrenceWithFrequency:interval:end:")] public Self InitRecurrenceWithFrequencyIntervalEnd(EKRecurrenceFrequency type, NSInteger interval, EKRecurrenceEnd? end);
-    [Selector("initRecurrenceWithFrequency:interval:daysOfTheWeek:daysOfTheMonth:monthsOfTheYear:weeksOfTheYear:daysOfTheYear:setPositions:end:")] public Self InitRecurrenceWithFrequencyIntervalDaysOfTheWeekDaysOfTheMonthMonthsOfTheYearWeeksOfTheYearDaysOfTheYearSetPositionsEnd(EKRecurrenceFrequency type, NSInteger interval, NSArray? days, NSArray? monthDays, NSArray? months, NSArray? weeksOfTheYear, NSArray? daysOfTheYear, NSArray? setPositions, EKRecurrenceEnd? end);
+    [Selector("calendarIdentifier")]
+    public NSString CalendarIdentifier { get; }
+    [Selector("recurrenceEnd", "setRecurrenceEnd:")]
+    public EKRecurrenceEnd? RecurrenceEnd { get; set; }
+    [Selector("frequency")]
+    public EKRecurrenceFrequency Frequency { get; }
+    [Selector("interval")]
+    public NSInteger Interval { get; }
+    [Selector("firstDayOfTheWeek")]
+    public NSInteger FirstDayOfTheWeek { get; }
+    [Selector("daysOfTheWeek")]
+    public NSArray? DaysOfTheWeek { get; }
+    [Selector("daysOfTheMonth")]
+    public NSArray? DaysOfTheMonth { get; }
+    [Selector("daysOfTheYear")]
+    public NSArray? DaysOfTheYear { get; }
+    [Selector("weeksOfTheYear")]
+    public NSArray? WeeksOfTheYear { get; }
+    [Selector("monthsOfTheYear")]
+    public NSArray? MonthsOfTheYear { get; }
+    [Selector("setPositions")]
+    public NSArray? SetPositions { get; }
+    [Selector("initRecurrenceWithFrequency:interval:end:")]
+    public Self InitRecurrenceWithFrequencyIntervalEnd(EKRecurrenceFrequency type, NSInteger interval, EKRecurrenceEnd? end);
+    [Selector("initRecurrenceWithFrequency:interval:daysOfTheWeek:daysOfTheMonth:monthsOfTheYear:weeksOfTheYear:daysOfTheYear:setPositions:end:")]
+    public Self InitRecurrenceWithFrequencyIntervalDaysOfTheWeekDaysOfTheMonthMonthsOfTheYearWeeksOfTheYearDaysOfTheYearSetPositionsEnd(EKRecurrenceFrequency type, NSInteger interval, NSArray? days, NSArray? monthDays, NSArray? months, NSArray? weeksOfTheYear, NSArray? daysOfTheYear, NSArray? setPositions, EKRecurrenceEnd? end);
 }
 
 #endif

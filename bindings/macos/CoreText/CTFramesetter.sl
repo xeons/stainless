@@ -38,11 +38,14 @@ public extern objc class CTFramesetterRef : CFTypeRef { }
 
 public extern "C" CFTypeID CTFramesetterGetTypeID();
 
-[ReturnsRetained] public extern "C" CTFramesetterRef CTFramesetterCreateWithTypesetter(CTTypesetterRef typesetter);
+[ReturnsRetained]
+public extern "C" CTFramesetterRef CTFramesetterCreateWithTypesetter(CTTypesetterRef typesetter);
 
-[ReturnsRetained] public extern "C" CTFramesetterRef CTFramesetterCreateWithAttributedString(CFAttributedStringRef attrString);
+[ReturnsRetained]
+public extern "C" CTFramesetterRef CTFramesetterCreateWithAttributedString(CFAttributedStringRef attrString);
 
-[ReturnsRetained] public extern "C" CTFrameRef CTFramesetterCreateFrame(CTFramesetterRef framesetter, CFRange stringRange, CGPathRef path, CFDictionaryRef? frameAttributes);
+[ReturnsRetained]
+public extern "C" CTFrameRef CTFramesetterCreateFrame(CTFramesetterRef framesetter, CFRange stringRange, CGPathRef path, CFDictionaryRef? frameAttributes);
 
 public extern "C" CTTypesetterRef CTFramesetterGetTypesetter(CTFramesetterRef framesetter);
 

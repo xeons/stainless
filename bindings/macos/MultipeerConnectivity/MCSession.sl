@@ -59,29 +59,47 @@ public objc closure void MCSessionSendResourceAtURLWithNameToPeerWithCompletionH
 
 public extern objc class MCSession : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public MCSessionDelegate? Delegate { get; set; }
-    [Selector("myPeerID")] public MCPeerID MyPeerID { get; }
-    [Selector("securityIdentity")] public NSArray? SecurityIdentity { get; }
-    [Selector("encryptionPreference")] public MCEncryptionPreference EncryptionPreference { get; }
-    [Selector("connectedPeers")] public NSArray ConnectedPeers { get; }
-    [Selector("initWithPeer:")] public Self InitWithPeer(MCPeerID myPeerID);
-    [Selector("initWithPeer:securityIdentity:encryptionPreference:")] public Self InitWithPeerSecurityIdentityEncryptionPreference(MCPeerID myPeerID, NSArray? identity, MCEncryptionPreference encryptionPreference);
-    [Selector("sendData:toPeers:withMode:error:")] public bool SendDataToPeersWithModeError(NSData data, NSArray peerIDs, MCSessionSendDataMode mode, out NSError? error);
-    [Selector("disconnect")] public void Disconnect();
-    [Selector("sendResourceAtURL:withName:toPeer:withCompletionHandler:")] public NSProgress? SendResourceAtURLWithNameToPeerWithCompletionHandler(NSURL resourceURL, NSString resourceName, MCPeerID peerID, MCSessionSendResourceAtURLWithNameToPeerWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("startStreamWithName:toPeer:error:")] public NSOutputStream? StartStreamWithNameToPeerError(NSString streamName, MCPeerID peerID, out NSError? error);
+    [Selector("delegate", "setDelegate:")]
+    public MCSessionDelegate? Delegate { get; set; }
+    [Selector("myPeerID")]
+    public MCPeerID MyPeerID { get; }
+    [Selector("securityIdentity")]
+    public NSArray? SecurityIdentity { get; }
+    [Selector("encryptionPreference")]
+    public MCEncryptionPreference EncryptionPreference { get; }
+    [Selector("connectedPeers")]
+    public NSArray ConnectedPeers { get; }
+    [Selector("initWithPeer:")]
+    public Self InitWithPeer(MCPeerID myPeerID);
+    [Selector("initWithPeer:securityIdentity:encryptionPreference:")]
+    public Self InitWithPeerSecurityIdentityEncryptionPreference(MCPeerID myPeerID, NSArray? identity, MCEncryptionPreference encryptionPreference);
+    [Selector("sendData:toPeers:withMode:error:")]
+    public bool SendDataToPeersWithModeError(NSData data, NSArray peerIDs, MCSessionSendDataMode mode, out NSError? error);
+    [Selector("disconnect")]
+    public void Disconnect();
+    [Selector("sendResourceAtURL:withName:toPeer:withCompletionHandler:")]
+    public NSProgress? SendResourceAtURLWithNameToPeerWithCompletionHandler(NSURL resourceURL, NSString resourceName, MCPeerID peerID, MCSessionSendResourceAtURLWithNameToPeerWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("startStreamWithName:toPeer:error:")]
+    public NSOutputStream? StartStreamWithNameToPeerError(NSString streamName, MCPeerID peerID, out NSError? error);
 }
 
 public objc closure void MCSessionDelegateSessionDidReceiveCertificateFromPeerCertificateHandlerCertificateHandlerBlock(bool arg0);
 
 public objc interface MCSessionDelegate : NSObjectProtocol
 {
-    [Selector("session:peer:didChangeState:")] void SessionPeerDidChangeState(MCSession session, MCPeerID peerID, MCSessionState state);
-    [Selector("session:didReceiveData:fromPeer:")] void SessionDidReceiveDataFromPeer(MCSession session, NSData data, MCPeerID peerID);
-    [Selector("session:didReceiveStream:withName:fromPeer:")] void SessionDidReceiveStreamWithNameFromPeer(MCSession session, NSInputStream stream, NSString streamName, MCPeerID peerID);
-    [Selector("session:didStartReceivingResourceWithName:fromPeer:withProgress:")] void SessionDidStartReceivingResourceWithNameFromPeerWithProgress(MCSession session, NSString resourceName, MCPeerID peerID, NSProgress progress);
-    [Selector("session:didFinishReceivingResourceWithName:fromPeer:atURL:withError:")] void SessionDidFinishReceivingResourceWithNameFromPeerAtURLWithError(MCSession session, NSString resourceName, MCPeerID peerID, NSURL? localURL, NSError? error);
-    [Optional] [Selector("session:didReceiveCertificate:fromPeer:certificateHandler:")] void SessionDidReceiveCertificateFromPeerCertificateHandler(MCSession session, NSArray? certificate, MCPeerID peerID, MCSessionDelegateSessionDidReceiveCertificateFromPeerCertificateHandlerCertificateHandlerBlock certificateHandler);
+    [Selector("session:peer:didChangeState:")]
+    void SessionPeerDidChangeState(MCSession session, MCPeerID peerID, MCSessionState state);
+    [Selector("session:didReceiveData:fromPeer:")]
+    void SessionDidReceiveDataFromPeer(MCSession session, NSData data, MCPeerID peerID);
+    [Selector("session:didReceiveStream:withName:fromPeer:")]
+    void SessionDidReceiveStreamWithNameFromPeer(MCSession session, NSInputStream stream, NSString streamName, MCPeerID peerID);
+    [Selector("session:didStartReceivingResourceWithName:fromPeer:withProgress:")]
+    void SessionDidStartReceivingResourceWithNameFromPeerWithProgress(MCSession session, NSString resourceName, MCPeerID peerID, NSProgress progress);
+    [Selector("session:didFinishReceivingResourceWithName:fromPeer:atURL:withError:")]
+    void SessionDidFinishReceivingResourceWithNameFromPeerAtURLWithError(MCSession session, NSString resourceName, MCPeerID peerID, NSURL? localURL, NSError? error);
+    [Optional]
+    [Selector("session:didReceiveCertificate:fromPeer:certificateHandler:")]
+    void SessionDidReceiveCertificateFromPeerCertificateHandler(MCSession session, NSArray? certificate, MCPeerID peerID, MCSessionDelegateSessionDidReceiveCertificateFromPeerCertificateHandlerCertificateHandlerBlock certificateHandler);
 }
 
 public objc closure void MCSessionNearbyConnectionDataForPeerWithCompletionHandlerCompletionHandlerBlock(NSData? arg0, NSError? arg1);
@@ -89,9 +107,12 @@ public objc closure void MCSessionNearbyConnectionDataForPeerWithCompletionHandl
 /// MCSessionCustomDiscovery, a category of MCSession.
 public extern objc class MCSession
 {
-    [Selector("nearbyConnectionDataForPeer:withCompletionHandler:")] public void NearbyConnectionDataForPeerWithCompletionHandler(MCPeerID peerID, MCSessionNearbyConnectionDataForPeerWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("connectPeer:withNearbyConnectionData:")] public void ConnectPeerWithNearbyConnectionData(MCPeerID peerID, NSData data);
-    [Selector("cancelConnectPeer:")] public void CancelConnectPeer(MCPeerID peerID);
+    [Selector("nearbyConnectionDataForPeer:withCompletionHandler:")]
+    public void NearbyConnectionDataForPeerWithCompletionHandler(MCPeerID peerID, MCSessionNearbyConnectionDataForPeerWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("connectPeer:withNearbyConnectionData:")]
+    public void ConnectPeerWithNearbyConnectionData(MCPeerID peerID, NSData data);
+    [Selector("cancelConnectPeer:")]
+    public void CancelConnectPeer(MCPeerID peerID);
 }
 
 #endif

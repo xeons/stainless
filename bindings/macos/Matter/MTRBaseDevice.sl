@@ -99,72 +99,108 @@ public enum MTRTransportType : byte
 
 public extern objc class MTRAttributeRequestPath : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("endpoint")] public NSNumber? Endpoint { get; }
-    [Selector("cluster")] public NSNumber? Cluster { get; }
-    [Selector("attribute")] public NSNumber? Attribute { get; }
-    [Selector("requestPathWithEndpointID:clusterID:attributeID:")] public static MTRAttributeRequestPath RequestPathWithEndpointIDClusterIDAttributeID(NSNumber? endpointID, NSNumber? clusterID, NSNumber? attributeID);
+    [Selector("endpoint")]
+    public NSNumber? Endpoint { get; }
+    [Selector("cluster")]
+    public NSNumber? Cluster { get; }
+    [Selector("attribute")]
+    public NSNumber? Attribute { get; }
+    [Selector("requestPathWithEndpointID:clusterID:attributeID:")]
+    public static MTRAttributeRequestPath RequestPathWithEndpointIDClusterIDAttributeID(NSNumber? endpointID, NSNumber? clusterID, NSNumber? attributeID);
 }
 
 public extern objc class MTREventRequestPath : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("endpoint")] public NSNumber? Endpoint { get; }
-    [Selector("cluster")] public NSNumber? Cluster { get; }
-    [Selector("event")] public NSNumber? Event { get; }
-    [Selector("requestPathWithEndpointID:clusterID:eventID:")] public static MTREventRequestPath RequestPathWithEndpointIDClusterIDEventID(NSNumber? endpointID, NSNumber? clusterID, NSNumber? eventID);
+    [Selector("endpoint")]
+    public NSNumber? Endpoint { get; }
+    [Selector("cluster")]
+    public NSNumber? Cluster { get; }
+    [Selector("event")]
+    public NSNumber? Event { get; }
+    [Selector("requestPathWithEndpointID:clusterID:eventID:")]
+    public static MTREventRequestPath RequestPathWithEndpointIDClusterIDEventID(NSNumber? endpointID, NSNumber? clusterID, NSNumber? eventID);
 }
 
 public objc closure void MTRBaseDeviceDownloadLogOfTypeTimeoutQueueCompletionCompletionBlock(NSURL? arg0, NSError? arg1);
 
 public extern objc class MTRBaseDevice : NSObject
 {
-    [Selector("sessionTransportType")] public MTRTransportType SessionTransportType { get; }
-    [Selector("deviceWithNodeID:controller:")] public static MTRBaseDevice DeviceWithNodeIDController(NSNumber nodeID, MTRDeviceController controller);
-    [Selector("subscribeWithQueue:params:clusterStateCacheContainer:attributeReportHandler:eventReportHandler:errorHandler:subscriptionEstablished:resubscriptionScheduled:")] public void SubscribeWithQueueParamsClusterStateCacheContainerAttributeReportHandlerEventReportHandlerErrorHandlerSubscriptionEstablishedResubscriptionScheduled(dispatch_queue_t queue, MTRSubscribeParams params, MTRClusterStateCacheContainer? clusterStateCacheContainer, MTRDeviceReportHandler? attributeReportHandler, MTRDeviceReportHandler? eventReportHandler, MTRDeviceErrorHandler errorHandler, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRDeviceResubscriptionScheduledHandler? resubscriptionScheduled);
-    [Selector("readAttributesWithEndpointID:clusterID:attributeID:params:queue:completion:")] public void ReadAttributesWithEndpointIDClusterIDAttributeIDParamsQueueCompletion(NSNumber? endpointID, NSNumber? clusterID, NSNumber? attributeID, MTRReadParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
-    [Selector("readAttributePaths:eventPaths:params:queue:completion:")] public void ReadAttributePathsEventPathsParamsQueueCompletion(NSArray? attributePaths, NSArray? eventPaths, MTRReadParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
-    [Selector("writeAttributeWithEndpointID:clusterID:attributeID:value:timedWriteTimeout:queue:completion:")] public void WriteAttributeWithEndpointIDClusterIDAttributeIDValueTimedWriteTimeoutQueueCompletion(NSNumber endpointID, NSNumber clusterID, NSNumber attributeID, AnyObject value, NSNumber? timeoutMs, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
-    [Selector("invokeCommandWithEndpointID:clusterID:commandID:commandFields:timedInvokeTimeout:queue:completion:")] public void InvokeCommandWithEndpointIDClusterIDCommandIDCommandFieldsTimedInvokeTimeoutQueueCompletion(NSNumber endpointID, NSNumber clusterID, NSNumber commandID, AnyObject commandFields, NSNumber? timeoutMs, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
-    [Selector("subscribeToAttributesWithEndpointID:clusterID:attributeID:params:queue:reportHandler:subscriptionEstablished:")] public void SubscribeToAttributesWithEndpointIDClusterIDAttributeIDParamsQueueReportHandlerSubscriptionEstablished(NSNumber? endpointID, NSNumber? clusterID, NSNumber? attributeID, MTRSubscribeParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler reportHandler, MTRSubscriptionEstablishedHandler? subscriptionEstablished);
-    [Selector("subscribeToAttributePaths:eventPaths:params:queue:reportHandler:subscriptionEstablished:resubscriptionScheduled:")] public void SubscribeToAttributePathsEventPathsParamsQueueReportHandlerSubscriptionEstablishedResubscriptionScheduled(NSArray? attributePaths, NSArray? eventPaths, MTRSubscribeParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler reportHandler, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRDeviceResubscriptionScheduledHandler? resubscriptionScheduled);
-    [Selector("deregisterReportHandlersWithQueue:completion:")] public void DeregisterReportHandlersWithQueueCompletion(dispatch_queue_t queue, dispatch_block_t completion);
-    [Selector("openCommissioningWindowWithSetupPasscode:discriminator:duration:queue:completion:")] public void OpenCommissioningWindowWithSetupPasscodeDiscriminatorDurationQueueCompletion(NSNumber setupPasscode, NSNumber discriminator, NSNumber duration, dispatch_queue_t queue, MTRDeviceOpenCommissioningWindowHandler completion);
-    [Selector("openCommissioningWindowWithDiscriminator:duration:queue:completion:")] public void OpenCommissioningWindowWithDiscriminatorDurationQueueCompletion(NSNumber discriminator, NSNumber duration, dispatch_queue_t queue, MTRDeviceOpenCommissioningWindowHandler completion);
-    [Selector("readEventsWithEndpointID:clusterID:eventID:params:queue:completion:")] public void ReadEventsWithEndpointIDClusterIDEventIDParamsQueueCompletion(NSNumber? endpointID, NSNumber? clusterID, NSNumber? eventID, MTRReadParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
-    [Selector("subscribeToEventsWithEndpointID:clusterID:eventID:params:queue:reportHandler:subscriptionEstablished:")] public void SubscribeToEventsWithEndpointIDClusterIDEventIDParamsQueueReportHandlerSubscriptionEstablished(NSNumber? endpointID, NSNumber? clusterID, NSNumber? eventID, MTRSubscribeParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler reportHandler, MTRSubscriptionEstablishedHandler? subscriptionEstablished);
-    [Selector("downloadLogOfType:timeout:queue:completion:")] public void DownloadLogOfTypeTimeoutQueueCompletion(MTRDiagnosticLogType type, NSTimeInterval timeout, dispatch_queue_t queue, MTRBaseDeviceDownloadLogOfTypeTimeoutQueueCompletionCompletionBlock completion);
+    [Selector("sessionTransportType")]
+    public MTRTransportType SessionTransportType { get; }
+    [Selector("deviceWithNodeID:controller:")]
+    public static MTRBaseDevice DeviceWithNodeIDController(NSNumber nodeID, MTRDeviceController controller);
+    [Selector("subscribeWithQueue:params:clusterStateCacheContainer:attributeReportHandler:eventReportHandler:errorHandler:subscriptionEstablished:resubscriptionScheduled:")]
+    public void SubscribeWithQueueParamsClusterStateCacheContainerAttributeReportHandlerEventReportHandlerErrorHandlerSubscriptionEstablishedResubscriptionScheduled(dispatch_queue_t queue, MTRSubscribeParams params, MTRClusterStateCacheContainer? clusterStateCacheContainer, MTRDeviceReportHandler? attributeReportHandler, MTRDeviceReportHandler? eventReportHandler, MTRDeviceErrorHandler errorHandler, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRDeviceResubscriptionScheduledHandler? resubscriptionScheduled);
+    [Selector("readAttributesWithEndpointID:clusterID:attributeID:params:queue:completion:")]
+    public void ReadAttributesWithEndpointIDClusterIDAttributeIDParamsQueueCompletion(NSNumber? endpointID, NSNumber? clusterID, NSNumber? attributeID, MTRReadParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
+    [Selector("readAttributePaths:eventPaths:params:queue:completion:")]
+    public void ReadAttributePathsEventPathsParamsQueueCompletion(NSArray? attributePaths, NSArray? eventPaths, MTRReadParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
+    [Selector("writeAttributeWithEndpointID:clusterID:attributeID:value:timedWriteTimeout:queue:completion:")]
+    public void WriteAttributeWithEndpointIDClusterIDAttributeIDValueTimedWriteTimeoutQueueCompletion(NSNumber endpointID, NSNumber clusterID, NSNumber attributeID, AnyObject value, NSNumber? timeoutMs, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
+    [Selector("invokeCommandWithEndpointID:clusterID:commandID:commandFields:timedInvokeTimeout:queue:completion:")]
+    public void InvokeCommandWithEndpointIDClusterIDCommandIDCommandFieldsTimedInvokeTimeoutQueueCompletion(NSNumber endpointID, NSNumber clusterID, NSNumber commandID, AnyObject commandFields, NSNumber? timeoutMs, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
+    [Selector("subscribeToAttributesWithEndpointID:clusterID:attributeID:params:queue:reportHandler:subscriptionEstablished:")]
+    public void SubscribeToAttributesWithEndpointIDClusterIDAttributeIDParamsQueueReportHandlerSubscriptionEstablished(NSNumber? endpointID, NSNumber? clusterID, NSNumber? attributeID, MTRSubscribeParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler reportHandler, MTRSubscriptionEstablishedHandler? subscriptionEstablished);
+    [Selector("subscribeToAttributePaths:eventPaths:params:queue:reportHandler:subscriptionEstablished:resubscriptionScheduled:")]
+    public void SubscribeToAttributePathsEventPathsParamsQueueReportHandlerSubscriptionEstablishedResubscriptionScheduled(NSArray? attributePaths, NSArray? eventPaths, MTRSubscribeParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler reportHandler, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRDeviceResubscriptionScheduledHandler? resubscriptionScheduled);
+    [Selector("deregisterReportHandlersWithQueue:completion:")]
+    public void DeregisterReportHandlersWithQueueCompletion(dispatch_queue_t queue, dispatch_block_t completion);
+    [Selector("openCommissioningWindowWithSetupPasscode:discriminator:duration:queue:completion:")]
+    public void OpenCommissioningWindowWithSetupPasscodeDiscriminatorDurationQueueCompletion(NSNumber setupPasscode, NSNumber discriminator, NSNumber duration, dispatch_queue_t queue, MTRDeviceOpenCommissioningWindowHandler completion);
+    [Selector("openCommissioningWindowWithDiscriminator:duration:queue:completion:")]
+    public void OpenCommissioningWindowWithDiscriminatorDurationQueueCompletion(NSNumber discriminator, NSNumber duration, dispatch_queue_t queue, MTRDeviceOpenCommissioningWindowHandler completion);
+    [Selector("readEventsWithEndpointID:clusterID:eventID:params:queue:completion:")]
+    public void ReadEventsWithEndpointIDClusterIDEventIDParamsQueueCompletion(NSNumber? endpointID, NSNumber? clusterID, NSNumber? eventID, MTRReadParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
+    [Selector("subscribeToEventsWithEndpointID:clusterID:eventID:params:queue:reportHandler:subscriptionEstablished:")]
+    public void SubscribeToEventsWithEndpointIDClusterIDEventIDParamsQueueReportHandlerSubscriptionEstablished(NSNumber? endpointID, NSNumber? clusterID, NSNumber? eventID, MTRSubscribeParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler reportHandler, MTRSubscriptionEstablishedHandler? subscriptionEstablished);
+    [Selector("downloadLogOfType:timeout:queue:completion:")]
+    public void DownloadLogOfTypeTimeoutQueueCompletion(MTRDiagnosticLogType type, NSTimeInterval timeout, dispatch_queue_t queue, MTRBaseDeviceDownloadLogOfTypeTimeoutQueueCompletionCompletionBlock completion);
 }
 
 public extern objc class MTRClusterPath : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("endpoint")] public NSNumber Endpoint { get; }
-    [Selector("cluster")] public NSNumber Cluster { get; }
-    [Selector("clusterPathWithEndpointID:clusterID:")] public static MTRClusterPath ClusterPathWithEndpointIDClusterID(NSNumber endpointID, NSNumber clusterID);
+    [Selector("endpoint")]
+    public NSNumber Endpoint { get; }
+    [Selector("cluster")]
+    public NSNumber Cluster { get; }
+    [Selector("clusterPathWithEndpointID:clusterID:")]
+    public static MTRClusterPath ClusterPathWithEndpointIDClusterID(NSNumber endpointID, NSNumber clusterID);
 }
 
 public extern objc class MTRAttributePath : MTRClusterPath, NSSecureCoding
 {
-    [Selector("attribute")] public NSNumber Attribute { get; }
-    [Selector("attributePathWithEndpointID:clusterID:attributeID:")] public static MTRAttributePath AttributePathWithEndpointIDClusterIDAttributeID(NSNumber endpointID, NSNumber clusterID, NSNumber attributeID);
+    [Selector("attribute")]
+    public NSNumber Attribute { get; }
+    [Selector("attributePathWithEndpointID:clusterID:attributeID:")]
+    public static MTRAttributePath AttributePathWithEndpointIDClusterIDAttributeID(NSNumber endpointID, NSNumber clusterID, NSNumber attributeID);
 }
 
 public extern objc class MTREventPath : MTRClusterPath
 {
-    [Selector("event")] public NSNumber Event { get; }
-    [Selector("eventPathWithEndpointID:clusterID:eventID:")] public static MTREventPath EventPathWithEndpointIDClusterIDEventID(NSNumber endpointID, NSNumber clusterID, NSNumber eventID);
+    [Selector("event")]
+    public NSNumber Event { get; }
+    [Selector("eventPathWithEndpointID:clusterID:eventID:")]
+    public static MTREventPath EventPathWithEndpointIDClusterIDEventID(NSNumber endpointID, NSNumber clusterID, NSNumber eventID);
 }
 
 public extern objc class MTRCommandPath : MTRClusterPath
 {
-    [Selector("command")] public NSNumber Command { get; }
-    [Selector("commandPathWithEndpointID:clusterID:commandID:")] public static MTRCommandPath CommandPathWithEndpointIDClusterIDCommandID(NSNumber endpointID, NSNumber clusterID, NSNumber commandID);
+    [Selector("command")]
+    public NSNumber Command { get; }
+    [Selector("commandPathWithEndpointID:clusterID:commandID:")]
+    public static MTRCommandPath CommandPathWithEndpointIDClusterIDCommandID(NSNumber endpointID, NSNumber clusterID, NSNumber commandID);
 }
 
 public extern objc class MTRAttributeReport : NSObject
 {
-    [Selector("path")] public MTRAttributePath Path { get; }
-    [Selector("value")] public AnyObject? Value { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
+    [Selector("path")]
+    public MTRAttributePath Path { get; }
+    [Selector("value")]
+    public AnyObject? Value { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("initWithResponseValue:error:")]
+    public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
 public enum MTREventTimeType : ulong
@@ -182,60 +218,79 @@ public enum MTREventPriority : ulong
 
 public extern objc class MTREventReport : NSObject
 {
-    [Selector("path")] public MTREventPath Path { get; }
-    [Selector("eventNumber")] public NSNumber EventNumber { get; }
-    [Selector("priority")] public NSNumber Priority { get; }
-    [Selector("eventTimeType")] public MTREventTimeType EventTimeType { get; }
-    [Selector("systemUpTime")] public NSTimeInterval SystemUpTime { get; }
-    [Selector("timestampDate")] public NSDate? TimestampDate { get; }
-    [Selector("value")] public AnyObject? Value { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
+    [Selector("path")]
+    public MTREventPath Path { get; }
+    [Selector("eventNumber")]
+    public NSNumber EventNumber { get; }
+    [Selector("priority")]
+    public NSNumber Priority { get; }
+    [Selector("eventTimeType")]
+    public MTREventTimeType EventTimeType { get; }
+    [Selector("systemUpTime")]
+    public NSTimeInterval SystemUpTime { get; }
+    [Selector("timestampDate")]
+    public NSDate? TimestampDate { get; }
+    [Selector("value")]
+    public AnyObject? Value { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("initWithResponseValue:error:")]
+    public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
 /// Deprecated, a category of MTRBaseDevice.
 public extern objc class MTRBaseDevice
 {
     /// Deprecated in macOS 13.3.
-    [Selector("subscribeWithQueue:minInterval:maxInterval:params:cacheContainer:attributeReportHandler:eventReportHandler:errorHandler:subscriptionEstablished:resubscriptionScheduled:")] public void SubscribeWithQueueMinIntervalMaxIntervalParamsCacheContainerAttributeReportHandlerEventReportHandlerErrorHandlerSubscriptionEstablishedResubscriptionScheduled(dispatch_queue_t queue, ushort minInterval, ushort maxInterval, MTRSubscribeParams? params, MTRAttributeCacheContainer? attributeCacheContainer, MTRDeviceReportHandler? attributeReportHandler, MTRDeviceReportHandler? eventReportHandler, MTRDeviceErrorHandler errorHandler, dispatch_block_t? subscriptionEstablishedHandler, MTRDeviceResubscriptionScheduledHandler? resubscriptionScheduledHandler);
+    [Selector("subscribeWithQueue:minInterval:maxInterval:params:cacheContainer:attributeReportHandler:eventReportHandler:errorHandler:subscriptionEstablished:resubscriptionScheduled:")]
+    public void SubscribeWithQueueMinIntervalMaxIntervalParamsCacheContainerAttributeReportHandlerEventReportHandlerErrorHandlerSubscriptionEstablishedResubscriptionScheduled(dispatch_queue_t queue, ushort minInterval, ushort maxInterval, MTRSubscribeParams? params, MTRAttributeCacheContainer? attributeCacheContainer, MTRDeviceReportHandler? attributeReportHandler, MTRDeviceReportHandler? eventReportHandler, MTRDeviceErrorHandler errorHandler, dispatch_block_t? subscriptionEstablishedHandler, MTRDeviceResubscriptionScheduledHandler? resubscriptionScheduledHandler);
     /// Deprecated in macOS 13.3.
-    [Selector("readAttributeWithEndpointId:clusterId:attributeId:params:clientQueue:completion:")] public void ReadAttributeWithEndpointIdClusterIdAttributeIdParamsClientQueueCompletion(NSNumber? endpointId, NSNumber? clusterId, NSNumber? attributeId, MTRReadParams? params, dispatch_queue_t clientQueue, MTRDeviceResponseHandler completion);
+    [Selector("readAttributeWithEndpointId:clusterId:attributeId:params:clientQueue:completion:")]
+    public void ReadAttributeWithEndpointIdClusterIdAttributeIdParamsClientQueueCompletion(NSNumber? endpointId, NSNumber? clusterId, NSNumber? attributeId, MTRReadParams? params, dispatch_queue_t clientQueue, MTRDeviceResponseHandler completion);
     /// Deprecated in macOS 13.3.
-    [Selector("writeAttributeWithEndpointId:clusterId:attributeId:value:timedWriteTimeout:clientQueue:completion:")] public void WriteAttributeWithEndpointIdClusterIdAttributeIdValueTimedWriteTimeoutClientQueueCompletion(NSNumber endpointId, NSNumber clusterId, NSNumber attributeId, AnyObject value, NSNumber? timeoutMs, dispatch_queue_t clientQueue, MTRDeviceResponseHandler completion);
+    [Selector("writeAttributeWithEndpointId:clusterId:attributeId:value:timedWriteTimeout:clientQueue:completion:")]
+    public void WriteAttributeWithEndpointIdClusterIdAttributeIdValueTimedWriteTimeoutClientQueueCompletion(NSNumber endpointId, NSNumber clusterId, NSNumber attributeId, AnyObject value, NSNumber? timeoutMs, dispatch_queue_t clientQueue, MTRDeviceResponseHandler completion);
     /// Deprecated in macOS 13.3.
-    [Selector("invokeCommandWithEndpointId:clusterId:commandId:commandFields:timedInvokeTimeout:clientQueue:completion:")] public void InvokeCommandWithEndpointIdClusterIdCommandIdCommandFieldsTimedInvokeTimeoutClientQueueCompletion(NSNumber endpointId, NSNumber clusterId, NSNumber commandId, AnyObject commandFields, NSNumber? timeoutMs, dispatch_queue_t clientQueue, MTRDeviceResponseHandler completion);
+    [Selector("invokeCommandWithEndpointId:clusterId:commandId:commandFields:timedInvokeTimeout:clientQueue:completion:")]
+    public void InvokeCommandWithEndpointIdClusterIdCommandIdCommandFieldsTimedInvokeTimeoutClientQueueCompletion(NSNumber endpointId, NSNumber clusterId, NSNumber commandId, AnyObject commandFields, NSNumber? timeoutMs, dispatch_queue_t clientQueue, MTRDeviceResponseHandler completion);
     /// Deprecated in macOS 13.3.
-    [Selector("subscribeAttributeWithEndpointId:clusterId:attributeId:minInterval:maxInterval:params:clientQueue:reportHandler:subscriptionEstablished:")] public void SubscribeAttributeWithEndpointIdClusterIdAttributeIdMinIntervalMaxIntervalParamsClientQueueReportHandlerSubscriptionEstablished(NSNumber? endpointId, NSNumber? clusterId, NSNumber? attributeId, NSNumber minInterval, NSNumber maxInterval, MTRSubscribeParams? params, dispatch_queue_t clientQueue, MTRDeviceResponseHandler reportHandler, dispatch_block_t? subscriptionEstablishedHandler);
+    [Selector("subscribeAttributeWithEndpointId:clusterId:attributeId:minInterval:maxInterval:params:clientQueue:reportHandler:subscriptionEstablished:")]
+    public void SubscribeAttributeWithEndpointIdClusterIdAttributeIdMinIntervalMaxIntervalParamsClientQueueReportHandlerSubscriptionEstablished(NSNumber? endpointId, NSNumber? clusterId, NSNumber? attributeId, NSNumber minInterval, NSNumber maxInterval, MTRSubscribeParams? params, dispatch_queue_t clientQueue, MTRDeviceResponseHandler reportHandler, dispatch_block_t? subscriptionEstablishedHandler);
     /// Deprecated in macOS 13.3.
-    [Selector("deregisterReportHandlersWithClientQueue:completion:")] public void DeregisterReportHandlersWithClientQueueCompletion(dispatch_queue_t queue, dispatch_block_t completion);
+    [Selector("deregisterReportHandlersWithClientQueue:completion:")]
+    public void DeregisterReportHandlersWithClientQueueCompletion(dispatch_queue_t queue, dispatch_block_t completion);
 }
 
 /// Deprecated, a category of MTRAttributePath.
 public extern objc class MTRAttributePath
 {
     /// Deprecated in macOS 13.3.
-    [Selector("attributePathWithEndpointId:clusterId:attributeId:")] public static Self AttributePathWithEndpointIdClusterIdAttributeId(NSNumber endpointId, NSNumber clusterId, NSNumber attributeId);
+    [Selector("attributePathWithEndpointId:clusterId:attributeId:")]
+    public static Self AttributePathWithEndpointIdClusterIdAttributeId(NSNumber endpointId, NSNumber clusterId, NSNumber attributeId);
 }
 
 /// Deprecated, a category of MTREventPath.
 public extern objc class MTREventPath
 {
     /// Deprecated in macOS 13.3.
-    [Selector("eventPathWithEndpointId:clusterId:eventId:")] public static Self EventPathWithEndpointIdClusterIdEventId(NSNumber endpointId, NSNumber clusterId, NSNumber eventId);
+    [Selector("eventPathWithEndpointId:clusterId:eventId:")]
+    public static Self EventPathWithEndpointIdClusterIdEventId(NSNumber endpointId, NSNumber clusterId, NSNumber eventId);
 }
 
 /// Deprecated, a category of MTRCommandPath.
 public extern objc class MTRCommandPath
 {
     /// Deprecated in macOS 13.3.
-    [Selector("commandPathWithEndpointId:clusterId:commandId:")] public static Self CommandPathWithEndpointIdClusterIdCommandId(NSNumber endpointId, NSNumber clusterId, NSNumber commandId);
+    [Selector("commandPathWithEndpointId:clusterId:commandId:")]
+    public static Self CommandPathWithEndpointIdClusterIdCommandId(NSNumber endpointId, NSNumber clusterId, NSNumber commandId);
 }
 
 /// Deprecated, a category of MTREventReport.
 public extern objc class MTREventReport
 {
     /// Deprecated in macOS 13.4.
-    [Selector("timestamp")] public NSNumber Timestamp { get; }
+    [Selector("timestamp")]
+    public NSNumber Timestamp { get; }
 }
 
 #endif

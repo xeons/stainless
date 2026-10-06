@@ -36,7 +36,8 @@ public objc closure void LARightAuthorizeWithLocalizedReasonInPresentationContex
 /// UI, a category of LARight.
 public extern objc class LARight
 {
-    [Selector("authorizeWithLocalizedReason:inPresentationContext:completion:")] public void AuthorizeWithLocalizedReasonInPresentationContextCompletion(NSString localizedReason, LAPresentationContext presentationContext, LARightAuthorizeWithLocalizedReasonInPresentationContextCompletionHandlerBlock handler);
+    [Selector("authorizeWithLocalizedReason:inPresentationContext:completion:")]
+    public void AuthorizeWithLocalizedReasonInPresentationContextCompletion(NSString localizedReason, LAPresentationContext presentationContext, LARightAuthorizeWithLocalizedReasonInPresentationContextCompletionHandlerBlock handler);
 }
 
 #endif

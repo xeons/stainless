@@ -37,10 +37,14 @@ public objc closure void ITLibMediaEntityEnumerateValuesExceptForPropertiesUsing
 
 public extern objc class ITLibMediaEntity : NSObject
 {
-    [Selector("persistentID")] public NSNumber PersistentID { get; }
-    [Selector("valueForProperty:")] public AnyObject? ValueForProperty(NSString property);
-    [Selector("enumerateValuesForProperties:usingBlock:")] public void EnumerateValuesForPropertiesUsingBlock(NSSet? properties, ITLibMediaEntityEnumerateValuesForPropertiesUsingBlockBlock block);
-    [Selector("enumerateValuesExceptForProperties:usingBlock:")] public void EnumerateValuesExceptForPropertiesUsingBlock(NSSet? properties, ITLibMediaEntityEnumerateValuesExceptForPropertiesUsingBlockBlock block);
+    [Selector("persistentID")]
+    public NSNumber PersistentID { get; }
+    [Selector("valueForProperty:")]
+    public AnyObject? ValueForProperty(NSString property);
+    [Selector("enumerateValuesForProperties:usingBlock:")]
+    public void EnumerateValuesForPropertiesUsingBlock(NSSet? properties, ITLibMediaEntityEnumerateValuesForPropertiesUsingBlockBlock block);
+    [Selector("enumerateValuesExceptForProperties:usingBlock:")]
+    public void EnumerateValuesExceptForPropertiesUsingBlock(NSSet? properties, ITLibMediaEntityEnumerateValuesExceptForPropertiesUsingBlockBlock block);
 }
 
 public extern "C" NSString ITLibMediaEntityPropertyPersistentID;

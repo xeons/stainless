@@ -39,15 +39,24 @@ public objc closure void GKLocalPlayerFetchItemsForIdentityVerificationSignature
 
 public extern objc class GKLocalPlayer : GKPlayer
 {
-    [Selector("local")] public static GKLocalPlayer? Local { get; }
-    [Selector("localPlayer")] public static GKLocalPlayer LocalPlayer { get; }
-    [Selector("isAuthenticated")] public bool Authenticated { get; }
-    [Selector("isUnderage")] public bool Underage { get; }
-    [Selector("isMultiplayerGamingRestricted")] public bool MultiplayerGamingRestricted { get; }
-    [Selector("isPersonalizedCommunicationRestricted")] public bool PersonalizedCommunicationRestricted { get; }
-    [Selector("loadRecentPlayersWithCompletionHandler:")] public void LoadRecentPlayersWithCompletionHandler(GKLocalPlayerLoadRecentPlayersWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("loadChallengableFriendsWithCompletionHandler:")] public void LoadChallengableFriendsWithCompletionHandler(GKLocalPlayerLoadChallengableFriendsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("fetchItemsForIdentityVerificationSignature:")] public void FetchItemsForIdentityVerificationSignature(GKLocalPlayerFetchItemsForIdentityVerificationSignatureCompletionHandlerBlock? completionHandler);
+    [Selector("local")]
+    public static GKLocalPlayer? Local { get; }
+    [Selector("localPlayer")]
+    public static GKLocalPlayer LocalPlayer { get; }
+    [Selector("isAuthenticated")]
+    public bool Authenticated { get; }
+    [Selector("isUnderage")]
+    public bool Underage { get; }
+    [Selector("isMultiplayerGamingRestricted")]
+    public bool MultiplayerGamingRestricted { get; }
+    [Selector("isPersonalizedCommunicationRestricted")]
+    public bool PersonalizedCommunicationRestricted { get; }
+    [Selector("loadRecentPlayersWithCompletionHandler:")]
+    public void LoadRecentPlayersWithCompletionHandler(GKLocalPlayerLoadRecentPlayersWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadChallengableFriendsWithCompletionHandler:")]
+    public void LoadChallengableFriendsWithCompletionHandler(GKLocalPlayerLoadChallengableFriendsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("fetchItemsForIdentityVerificationSignature:")]
+    public void FetchItemsForIdentityVerificationSignature(GKLocalPlayerFetchItemsForIdentityVerificationSignatureCompletionHandlerBlock? completionHandler);
 }
 
 public objc interface GKLocalPlayerListener : GKChallengeListener, GKGameActivityListener, GKInviteEventListener, GKTurnBasedEventListener, GKSavedGameListener { }
@@ -55,9 +64,12 @@ public objc interface GKLocalPlayerListener : GKChallengeListener, GKGameActivit
 /// GKLocalPlayerEvents, a category of GKLocalPlayer.
 public extern objc class GKLocalPlayer
 {
-    [Selector("registerListener:")] public void RegisterListener(GKLocalPlayerListener listener);
-    [Selector("unregisterListener:")] public void UnregisterListener(GKLocalPlayerListener listener);
-    [Selector("unregisterAllListeners")] public void UnregisterAllListeners();
+    [Selector("registerListener:")]
+    public void RegisterListener(GKLocalPlayerListener listener);
+    [Selector("unregisterListener:")]
+    public void UnregisterListener(GKLocalPlayerListener listener);
+    [Selector("unregisterAllListeners")]
+    public void UnregisterAllListeners();
 }
 
 public extern "C" NSNotificationName GKPlayerAuthenticationDidChangeNotificationName;
@@ -80,19 +92,26 @@ public objc closure void GKLocalPlayerSetDefaultLeaderboardIdentifierCompletionH
 public extern objc class GKLocalPlayer
 {
     /// Deprecated in macOS 10.10.
-    [Selector("setDefaultLeaderboardCategoryID:completionHandler:")] public void SetDefaultLeaderboardCategoryIDCompletionHandler(NSString? categoryID, GKLocalPlayerSetDefaultLeaderboardCategoryIDCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("setDefaultLeaderboardCategoryID:completionHandler:")]
+    public void SetDefaultLeaderboardCategoryIDCompletionHandler(NSString? categoryID, GKLocalPlayerSetDefaultLeaderboardCategoryIDCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 10.10.
-    [Selector("loadDefaultLeaderboardCategoryIDWithCompletionHandler:")] public void LoadDefaultLeaderboardCategoryIDWithCompletionHandler(GKLocalPlayerLoadDefaultLeaderboardCategoryIDWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadDefaultLeaderboardCategoryIDWithCompletionHandler:")]
+    public void LoadDefaultLeaderboardCategoryIDWithCompletionHandler(GKLocalPlayerLoadDefaultLeaderboardCategoryIDWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 10.8.
-    [Selector("authenticateWithCompletionHandler:")] public void AuthenticateWithCompletionHandler(GKLocalPlayerAuthenticateWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("authenticateWithCompletionHandler:")]
+    public void AuthenticateWithCompletionHandler(GKLocalPlayerAuthenticateWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 10.11.
-    [Selector("loadFriendPlayersWithCompletionHandler:")] public void LoadFriendPlayersWithCompletionHandler(GKLocalPlayerLoadFriendPlayersWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadFriendPlayersWithCompletionHandler:")]
+    public void LoadFriendPlayersWithCompletionHandler(GKLocalPlayerLoadFriendPlayersWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 10.15.5.
-    [Selector("generateIdentityVerificationSignatureWithCompletionHandler:")] public void GenerateIdentityVerificationSignatureWithCompletionHandler(GKLocalPlayerGenerateIdentityVerificationSignatureWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("generateIdentityVerificationSignatureWithCompletionHandler:")]
+    public void GenerateIdentityVerificationSignatureWithCompletionHandler(GKLocalPlayerGenerateIdentityVerificationSignatureWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 26.2.
-    [Selector("loadDefaultLeaderboardIdentifierWithCompletionHandler:")] public void LoadDefaultLeaderboardIdentifierWithCompletionHandler(GKLocalPlayerLoadDefaultLeaderboardIdentifierWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadDefaultLeaderboardIdentifierWithCompletionHandler:")]
+    public void LoadDefaultLeaderboardIdentifierWithCompletionHandler(GKLocalPlayerLoadDefaultLeaderboardIdentifierWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 26.2.
-    [Selector("setDefaultLeaderboardIdentifier:completionHandler:")] public void SetDefaultLeaderboardIdentifierCompletionHandler(NSString leaderboardIdentifier, GKLocalPlayerSetDefaultLeaderboardIdentifierCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("setDefaultLeaderboardIdentifier:completionHandler:")]
+    public void SetDefaultLeaderboardIdentifierCompletionHandler(NSString leaderboardIdentifier, GKLocalPlayerSetDefaultLeaderboardIdentifierCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public objc closure void GKLocalPlayerLoadFriendsWithCompletionHandlerCompletionHandlerBlock(NSArray? arg0, NSError? arg1);
@@ -101,9 +120,11 @@ public objc closure void GKLocalPlayerLoadFriendsWithCompletionHandlerCompletion
 public extern objc class GKLocalPlayer
 {
     /// Deprecated in macOS 10.10.
-    [Selector("friends")] public NSArray? Friends { get; }
+    [Selector("friends")]
+    public NSArray? Friends { get; }
     /// Deprecated in macOS 10.10.
-    [Selector("loadFriendsWithCompletionHandler:")] public void LoadFriendsWithCompletionHandler(GKLocalPlayerLoadFriendsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadFriendsWithCompletionHandler:")]
+    public void LoadFriendsWithCompletionHandler(GKLocalPlayerLoadFriendsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public enum GKFriendsAuthorizationStatus : long
@@ -123,9 +144,12 @@ public objc closure void GKLocalPlayerLoadFriendsWithIdentifiersCompletionHandle
 /// FriendsList, a category of GKLocalPlayer.
 public extern objc class GKLocalPlayer
 {
-    [Selector("loadFriendsAuthorizationStatus:")] public void LoadFriendsAuthorizationStatus(GKLocalPlayerLoadFriendsAuthorizationStatusCompletionHandlerBlock completionHandler);
-    [Selector("loadFriends:")] public void LoadFriends(GKLocalPlayerLoadFriendsCompletionHandlerBlock completionHandler);
-    [Selector("loadFriendsWithIdentifiers:completionHandler:")] public void LoadFriendsWithIdentifiersCompletionHandler(NSArray identifiers, GKLocalPlayerLoadFriendsWithIdentifiersCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadFriendsAuthorizationStatus:")]
+    public void LoadFriendsAuthorizationStatus(GKLocalPlayerLoadFriendsAuthorizationStatusCompletionHandlerBlock completionHandler);
+    [Selector("loadFriends:")]
+    public void LoadFriends(GKLocalPlayerLoadFriendsCompletionHandlerBlock completionHandler);
+    [Selector("loadFriendsWithIdentifiers:completionHandler:")]
+    public void LoadFriendsWithIdentifiersCompletionHandler(NSArray identifiers, GKLocalPlayerLoadFriendsWithIdentifiersCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void GKLocalPlayerAuthenticateHandlerBlock(NSViewController? arg0, NSError? arg1);
@@ -133,9 +157,12 @@ public objc closure void GKLocalPlayerAuthenticateHandlerBlock(NSViewController?
 /// UI, a category of GKLocalPlayer.
 public extern objc class GKLocalPlayer
 {
-    [Selector("authenticateHandler", "setAuthenticateHandler:")] public GKLocalPlayerAuthenticateHandlerBlock? AuthenticateHandler { get; set; }
-    [Selector("isPresentingFriendRequestViewController")] public bool IsPresentingFriendRequestViewController { get; }
-    [Selector("presentFriendRequestCreatorFromWindow:error:")] public bool PresentFriendRequestCreatorFromWindowError(NSWindow? window, out NSError? error);
+    [Selector("authenticateHandler", "setAuthenticateHandler:")]
+    public GKLocalPlayerAuthenticateHandlerBlock? AuthenticateHandler { get; set; }
+    [Selector("isPresentingFriendRequestViewController")]
+    public bool IsPresentingFriendRequestViewController { get; }
+    [Selector("presentFriendRequestCreatorFromWindow:error:")]
+    public bool PresentFriendRequestCreatorFromWindowError(NSWindow? window, out NSError? error);
 }
 
 #endif

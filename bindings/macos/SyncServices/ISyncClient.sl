@@ -49,59 +49,86 @@ public enum __ISyncStatus : int
 public extern objc class ISyncClient : NSObject
 {
     /// Deprecated in macOS 10.7.
-    [Selector("clientIdentifier")] public NSString? ClientIdentifier();
+    [Selector("clientIdentifier")]
+    public NSString? ClientIdentifier();
     /// Deprecated in macOS 10.7.
-    [Selector("clientType")] public NSString? ClientType();
+    [Selector("clientType")]
+    public NSString? ClientType();
     /// Deprecated in macOS 10.7.
-    [Selector("displayName")] public NSString? DisplayName();
+    [Selector("displayName")]
+    public NSString? DisplayName();
     /// Deprecated in macOS 10.7.
-    [Selector("setDisplayName:")] public void SetDisplayName(NSString? displayName);
+    [Selector("setDisplayName:")]
+    public void SetDisplayName(NSString? displayName);
     /// Deprecated in macOS 10.7.
-    [Selector("imagePath")] public NSString? ImagePath();
+    [Selector("imagePath")]
+    public NSString? ImagePath();
     /// Deprecated in macOS 10.7.
-    [Selector("setImagePath:")] public void SetImagePath(NSString? path);
+    [Selector("setImagePath:")]
+    public void SetImagePath(NSString? path);
     /// Deprecated in macOS 10.7.
-    [Selector("supportedEntityNames")] public NSArray? SupportedEntityNames();
+    [Selector("supportedEntityNames")]
+    public NSArray? SupportedEntityNames();
     /// Deprecated in macOS 10.7.
-    [Selector("canPushChangesForEntityName:")] public bool CanPushChangesForEntityName(NSString? entityName);
+    [Selector("canPushChangesForEntityName:")]
+    public bool CanPushChangesForEntityName(NSString? entityName);
     /// Deprecated in macOS 10.7.
-    [Selector("canPullChangesForEntityName:")] public bool CanPullChangesForEntityName(NSString? entityName);
+    [Selector("canPullChangesForEntityName:")]
+    public bool CanPullChangesForEntityName(NSString? entityName);
     /// Deprecated in macOS 10.7.
-    [Selector("lastSyncDateForEntityName:")] public NSDate? LastSyncDateForEntityName(NSString? entityName);
+    [Selector("lastSyncDateForEntityName:")]
+    public NSDate? LastSyncDateForEntityName(NSString? entityName);
     /// Deprecated in macOS 10.7.
-    [Selector("lastSyncStatusForEntityName:")] public ISyncStatus LastSyncStatusForEntityName(NSString? entityName);
+    [Selector("lastSyncStatusForEntityName:")]
+    public ISyncStatus LastSyncStatusForEntityName(NSString? entityName);
     /// Deprecated in macOS 10.7.
-    [Selector("enabledEntityNames")] public NSArray? EnabledEntityNames();
+    [Selector("enabledEntityNames")]
+    public NSArray? EnabledEntityNames();
     /// Deprecated in macOS 10.7.
-    [Selector("isEnabledForEntityName:")] public bool IsEnabledForEntityName(NSString? entityName);
+    [Selector("isEnabledForEntityName:")]
+    public bool IsEnabledForEntityName(NSString? entityName);
     /// Deprecated in macOS 10.7.
-    [Selector("setEnabled:forEntityNames:")] public void SetEnabledForEntityNames(bool flag, NSArray? entityNames);
+    [Selector("setEnabled:forEntityNames:")]
+    public void SetEnabledForEntityNames(bool flag, NSArray? entityNames);
     /// Deprecated in macOS 10.7.
-    [Selector("formatsRelationships")] public bool FormatsRelationships();
+    [Selector("formatsRelationships")]
+    public bool FormatsRelationships();
     /// Deprecated in macOS 10.7.
-    [Selector("setFormatsRelationships:")] public void SetFormatsRelationships(bool flag);
+    [Selector("setFormatsRelationships:")]
+    public void SetFormatsRelationships(bool flag);
     /// Deprecated in macOS 10.7.
-    [Selector("shouldReplaceClientRecordsForEntityName:")] public bool ShouldReplaceClientRecordsForEntityName(NSString? entityName);
+    [Selector("shouldReplaceClientRecordsForEntityName:")]
+    public bool ShouldReplaceClientRecordsForEntityName(NSString? entityName);
     /// Deprecated in macOS 10.7.
-    [Selector("setShouldReplaceClientRecords:forEntityNames:")] public void SetShouldReplaceClientRecordsForEntityNames(bool flag, NSArray? entityNames);
+    [Selector("setShouldReplaceClientRecords:forEntityNames:")]
+    public void SetShouldReplaceClientRecordsForEntityNames(bool flag, NSArray? entityNames);
     /// Deprecated in macOS 10.7.
-    [Selector("objectForKey:")] public AnyObject? ObjectForKey(NSString? key);
+    [Selector("objectForKey:")]
+    public AnyObject? ObjectForKey(NSString? key);
     /// Deprecated in macOS 10.7.
-    [Selector("setObject:forKey:")] public void SetObjectForKey(NSCoding? value, NSString? key);
+    [Selector("setObject:forKey:")]
+    public void SetObjectForKey(NSCoding? value, NSString? key);
     /// Deprecated in macOS 10.7.
-    [Selector("filters")] public NSArray? Filters();
+    [Selector("filters")]
+    public NSArray? Filters();
     /// Deprecated in macOS 10.7.
-    [Selector("setFilters:")] public void SetFilters(NSArray? filters);
+    [Selector("setFilters:")]
+    public void SetFilters(NSArray? filters);
     /// Deprecated in macOS 10.7.
-    [Selector("shouldSynchronizeWithClientsOfType:")] public bool ShouldSynchronizeWithClientsOfType(NSString? clientType);
+    [Selector("shouldSynchronizeWithClientsOfType:")]
+    public bool ShouldSynchronizeWithClientsOfType(NSString? clientType);
     /// Deprecated in macOS 10.7.
-    [Selector("setShouldSynchronize:withClientsOfType:")] public void SetShouldSynchronizeWithClientsOfType(bool flag, NSString? clientType);
+    [Selector("setShouldSynchronize:withClientsOfType:")]
+    public void SetShouldSynchronizeWithClientsOfType(bool flag, NSString? clientType);
     /// Deprecated in macOS 10.7.
-    [Selector("syncAlertToolPath")] public NSString? SyncAlertToolPath();
+    [Selector("syncAlertToolPath")]
+    public NSString? SyncAlertToolPath();
     /// Deprecated in macOS 10.7.
-    [Selector("setSyncAlertToolPath:")] public void SetSyncAlertToolPath(NSString? path);
+    [Selector("setSyncAlertToolPath:")]
+    public void SetSyncAlertToolPath(NSString? path);
     /// Deprecated in macOS 10.7.
-    [Selector("setSyncAlertHandler:selector:")] public void SetSyncAlertHandlerSelector(AnyObject? handler, Selector selector);
+    [Selector("setSyncAlertHandler:selector:")]
+    public void SetSyncAlertHandlerSelector(AnyObject? handler, Selector selector);
 }
 
 /// Deprecated in macOS 10.7.

@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class ITLibMediaItemVideoInfo : NSObject
 {
-    [Selector("series")] public NSString? Series { get; }
-    [Selector("sortSeries")] public NSString? SortSeries { get; }
-    [Selector("season")] public NSUInteger Season { get; }
-    [Selector("episode")] public NSString? Episode { get; }
-    [Selector("episodeOrder")] public NSInteger EpisodeOrder { get; }
-    [Selector("isHD")] public bool Hd { get; }
-    [Selector("videoWidth")] public NSUInteger VideoWidth { get; }
-    [Selector("videoHeight")] public NSUInteger VideoHeight { get; }
+    [Selector("series")]
+    public NSString? Series { get; }
+    [Selector("sortSeries")]
+    public NSString? SortSeries { get; }
+    [Selector("season")]
+    public NSUInteger Season { get; }
+    [Selector("episode")]
+    public NSString? Episode { get; }
+    [Selector("episodeOrder")]
+    public NSInteger EpisodeOrder { get; }
+    [Selector("isHD")]
+    public bool Hd { get; }
+    [Selector("videoWidth")]
+    public NSUInteger VideoWidth { get; }
+    [Selector("videoHeight")]
+    public NSUInteger VideoHeight { get; }
 }
 
 #endif

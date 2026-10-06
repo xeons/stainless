@@ -201,88 +201,169 @@ public objc closure NSEvent? NSEventAddLocalMonitorForEventsMatchingMaskHandlerB
 
 public extern objc class NSEvent : NSObject, NSCopying, NSCoding
 {
-    [Selector("type")] public NSEventType Type { get; }
-    [Selector("modifierFlags")] public NSEventModifierFlags ModifierFlags { get; }
-    [Selector("timestamp")] public NSTimeInterval Timestamp { get; }
-    [Selector("window")] public NSWindow? Window { get; }
-    [Selector("windowNumber")] public NSInteger WindowNumber { get; }
+    [Selector("type")]
+    public NSEventType Type { get; }
+    [Selector("modifierFlags")]
+    public NSEventModifierFlags ModifierFlags { get; }
+    [Selector("timestamp")]
+    public NSTimeInterval Timestamp { get; }
+    [Selector("window")]
+    public NSWindow? Window { get; }
+    [Selector("windowNumber")]
+    public NSInteger WindowNumber { get; }
     /// Deprecated in macOS 10.12.
-    [Selector("context")] public NSGraphicsContext? Context { get; }
-    [Selector("clickCount")] public NSInteger ClickCount { get; }
-    [Selector("buttonNumber")] public NSInteger ButtonNumber { get; }
-    [Selector("eventNumber")] public NSInteger EventNumber { get; }
-    [Selector("pressure")] public float Pressure { get; }
-    [Selector("locationInWindow")] public NSPoint LocationInWindow { get; }
-    [Selector("deltaX")] public CGFloat DeltaX { get; }
-    [Selector("deltaY")] public CGFloat DeltaY { get; }
-    [Selector("deltaZ")] public CGFloat DeltaZ { get; }
-    [Selector("hasPreciseScrollingDeltas")] public bool HasPreciseScrollingDeltas { get; }
-    [Selector("scrollingDeltaX")] public CGFloat ScrollingDeltaX { get; }
-    [Selector("scrollingDeltaY")] public CGFloat ScrollingDeltaY { get; }
-    [Selector("momentumPhase")] public NSEventPhase MomentumPhase { get; }
-    [Selector("isDirectionInvertedFromDevice")] public bool DirectionInvertedFromDevice { get; }
-    [Selector("characters")] public NSString? Characters { get; }
-    [Selector("charactersIgnoringModifiers")] public NSString? CharactersIgnoringModifiers { get; }
-    [Selector("isARepeat")] public bool ARepeat { get; }
-    [Selector("keyCode")] public ushort KeyCode { get; }
-    [Selector("trackingNumber")] public NSInteger TrackingNumber { get; }
-    [Selector("userData")] public void* UserData { get; }
-    [Selector("trackingArea")] public NSTrackingArea? TrackingArea { get; }
-    [Selector("subtype")] public NSEventSubtype Subtype { get; }
-    [Selector("data1")] public NSInteger Data1 { get; }
-    [Selector("data2")] public NSInteger Data2 { get; }
-    [Selector("eventRef")] public void* EventRef { get; }
-    [Selector("CGEvent")] public CGEventRef? CGEvent { get; }
-    [Selector("isMouseCoalescingEnabled", "setMouseCoalescingEnabled:")] public static bool MouseCoalescingEnabled { get; set; }
-    [Selector("magnification")] public CGFloat Magnification { get; }
-    [Selector("deviceID")] public NSUInteger DeviceID { get; }
-    [Selector("rotation")] public float Rotation { get; }
-    [Selector("absoluteX")] public NSInteger AbsoluteX { get; }
-    [Selector("absoluteY")] public NSInteger AbsoluteY { get; }
-    [Selector("absoluteZ")] public NSInteger AbsoluteZ { get; }
-    [Selector("buttonMask")] public NSEventButtonMask ButtonMask { get; }
-    [Selector("tilt")] public NSPoint Tilt { get; }
-    [Selector("tangentialPressure")] public float TangentialPressure { get; }
-    [Selector("vendorDefined")] public AnyObject VendorDefined { get; }
-    [Selector("vendorID")] public NSUInteger VendorID { get; }
-    [Selector("tabletID")] public NSUInteger TabletID { get; }
-    [Selector("pointingDeviceID")] public NSUInteger PointingDeviceID { get; }
-    [Selector("systemTabletID")] public NSUInteger SystemTabletID { get; }
-    [Selector("vendorPointingDeviceType")] public NSUInteger VendorPointingDeviceType { get; }
-    [Selector("pointingDeviceSerialNumber")] public NSUInteger PointingDeviceSerialNumber { get; }
-    [Selector("uniqueID")] public ulong UniqueID { get; }
-    [Selector("capabilityMask")] public NSUInteger CapabilityMask { get; }
-    [Selector("pointingDeviceType")] public NSPointingDeviceType PointingDeviceType { get; }
-    [Selector("isEnteringProximity")] public bool EnteringProximity { get; }
-    [Selector("phase")] public NSEventPhase Phase { get; }
-    [Selector("stage")] public NSInteger Stage { get; }
-    [Selector("stageTransition")] public CGFloat StageTransition { get; }
-    [Selector("associatedEventsMask")] public NSEventMask AssociatedEventsMask { get; }
-    [Selector("pressureBehavior")] public NSPressureBehavior PressureBehavior { get; }
-    [Selector("isSwipeTrackingFromScrollEventsEnabled")] public static bool SwipeTrackingFromScrollEventsEnabled { get; }
-    [Selector("mouseLocation")] public static NSPoint MouseLocation { get; }
-    [Selector("modifierFlags")] public static NSEventModifierFlags ClassModifierFlags { get; }
-    [Selector("pressedMouseButtons")] public static NSUInteger PressedMouseButtons { get; }
-    [Selector("doubleClickInterval")] public static NSTimeInterval DoubleClickInterval { get; }
-    [Selector("keyRepeatDelay")] public static NSTimeInterval KeyRepeatDelay { get; }
-    [Selector("keyRepeatInterval")] public static NSTimeInterval KeyRepeatInterval { get; }
-    [Selector("charactersByApplyingModifiers:")] public NSString? CharactersByApplyingModifiers(NSEventModifierFlags modifiers);
-    [Selector("eventWithEventRef:")] public static NSEvent? EventWithEventRef(void* eventRef);
-    [Selector("eventWithCGEvent:")] public static NSEvent? EventWithCGEvent(CGEventRef cgEvent);
-    [Selector("touchesMatchingPhase:inView:")] public NSSet TouchesMatchingPhaseInView(NSTouchPhase phase, NSView? view);
-    [Selector("allTouches")] public NSSet AllTouches();
-    [Selector("touchesForView:")] public NSSet TouchesForView(NSView view);
-    [Selector("coalescedTouchesForTouch:")] public NSArray CoalescedTouchesForTouch(NSTouch touch);
-    [Selector("trackSwipeEventWithOptions:dampenAmountThresholdMin:max:usingHandler:")] public void TrackSwipeEventWithOptionsDampenAmountThresholdMinMaxUsingHandler(NSEventSwipeTrackingOptions options, CGFloat minDampenThreshold, CGFloat maxDampenThreshold, NSEventTrackSwipeEventWithOptionsDampenAmountThresholdMinMaxUsingHandlerTrackingHandlerBlock trackingHandler);
-    [Selector("startPeriodicEventsAfterDelay:withPeriod:")] public static void StartPeriodicEventsAfterDelayWithPeriod(NSTimeInterval delay, NSTimeInterval period);
-    [Selector("stopPeriodicEvents")] public static void StopPeriodicEvents();
-    [Selector("mouseEventWithType:location:modifierFlags:timestamp:windowNumber:context:eventNumber:clickCount:pressure:")] public static NSEvent? MouseEventWithTypeLocationModifierFlagsTimestampWindowNumberContextEventNumberClickCountPressure(NSEventType type, NSPoint location, NSEventModifierFlags flags, NSTimeInterval time, NSInteger wNum, NSGraphicsContext? unusedPassNil, NSInteger eNum, NSInteger cNum, float pressure);
-    [Selector("keyEventWithType:location:modifierFlags:timestamp:windowNumber:context:characters:charactersIgnoringModifiers:isARepeat:keyCode:")] public static NSEvent? KeyEventWithTypeLocationModifierFlagsTimestampWindowNumberContextCharactersCharactersIgnoringModifiersIsARepeatKeyCode(NSEventType type, NSPoint location, NSEventModifierFlags flags, NSTimeInterval time, NSInteger wNum, NSGraphicsContext? unusedPassNil, NSString keys, NSString ukeys, bool flag, ushort code);
-    [Selector("enterExitEventWithType:location:modifierFlags:timestamp:windowNumber:context:eventNumber:trackingNumber:userData:")] public static NSEvent? EnterExitEventWithTypeLocationModifierFlagsTimestampWindowNumberContextEventNumberTrackingNumberUserData(NSEventType type, NSPoint location, NSEventModifierFlags flags, NSTimeInterval time, NSInteger wNum, NSGraphicsContext? unusedPassNil, NSInteger eNum, NSInteger tNum, void* data);
-    [Selector("otherEventWithType:location:modifierFlags:timestamp:windowNumber:context:subtype:data1:data2:")] public static NSEvent? OtherEventWithTypeLocationModifierFlagsTimestampWindowNumberContextSubtypeData1Data2(NSEventType type, NSPoint location, NSEventModifierFlags flags, NSTimeInterval time, NSInteger wNum, NSGraphicsContext? unusedPassNil, short subtype, NSInteger d1, NSInteger d2);
-    [Selector("addGlobalMonitorForEventsMatchingMask:handler:")] public static AnyObject? AddGlobalMonitorForEventsMatchingMaskHandler(NSEventMask mask, NSEventAddGlobalMonitorForEventsMatchingMaskHandlerBlock block);
-    [Selector("addLocalMonitorForEventsMatchingMask:handler:")] public static AnyObject? AddLocalMonitorForEventsMatchingMaskHandler(NSEventMask mask, NSEventAddLocalMonitorForEventsMatchingMaskHandlerBlock block);
-    [Selector("removeMonitor:")] public static void RemoveMonitor(AnyObject eventMonitor);
+    [Selector("context")]
+    public NSGraphicsContext? Context { get; }
+    [Selector("clickCount")]
+    public NSInteger ClickCount { get; }
+    [Selector("buttonNumber")]
+    public NSInteger ButtonNumber { get; }
+    [Selector("eventNumber")]
+    public NSInteger EventNumber { get; }
+    [Selector("pressure")]
+    public float Pressure { get; }
+    [Selector("locationInWindow")]
+    public NSPoint LocationInWindow { get; }
+    [Selector("deltaX")]
+    public CGFloat DeltaX { get; }
+    [Selector("deltaY")]
+    public CGFloat DeltaY { get; }
+    [Selector("deltaZ")]
+    public CGFloat DeltaZ { get; }
+    [Selector("hasPreciseScrollingDeltas")]
+    public bool HasPreciseScrollingDeltas { get; }
+    [Selector("scrollingDeltaX")]
+    public CGFloat ScrollingDeltaX { get; }
+    [Selector("scrollingDeltaY")]
+    public CGFloat ScrollingDeltaY { get; }
+    [Selector("momentumPhase")]
+    public NSEventPhase MomentumPhase { get; }
+    [Selector("isDirectionInvertedFromDevice")]
+    public bool DirectionInvertedFromDevice { get; }
+    [Selector("characters")]
+    public NSString? Characters { get; }
+    [Selector("charactersIgnoringModifiers")]
+    public NSString? CharactersIgnoringModifiers { get; }
+    [Selector("isARepeat")]
+    public bool ARepeat { get; }
+    [Selector("keyCode")]
+    public ushort KeyCode { get; }
+    [Selector("trackingNumber")]
+    public NSInteger TrackingNumber { get; }
+    [Selector("userData")]
+    public void* UserData { get; }
+    [Selector("trackingArea")]
+    public NSTrackingArea? TrackingArea { get; }
+    [Selector("subtype")]
+    public NSEventSubtype Subtype { get; }
+    [Selector("data1")]
+    public NSInteger Data1 { get; }
+    [Selector("data2")]
+    public NSInteger Data2 { get; }
+    [Selector("eventRef")]
+    public void* EventRef { get; }
+    [Selector("CGEvent")]
+    public CGEventRef? CGEvent { get; }
+    [Selector("isMouseCoalescingEnabled", "setMouseCoalescingEnabled:")]
+    public static bool MouseCoalescingEnabled { get; set; }
+    [Selector("magnification")]
+    public CGFloat Magnification { get; }
+    [Selector("deviceID")]
+    public NSUInteger DeviceID { get; }
+    [Selector("rotation")]
+    public float Rotation { get; }
+    [Selector("absoluteX")]
+    public NSInteger AbsoluteX { get; }
+    [Selector("absoluteY")]
+    public NSInteger AbsoluteY { get; }
+    [Selector("absoluteZ")]
+    public NSInteger AbsoluteZ { get; }
+    [Selector("buttonMask")]
+    public NSEventButtonMask ButtonMask { get; }
+    [Selector("tilt")]
+    public NSPoint Tilt { get; }
+    [Selector("tangentialPressure")]
+    public float TangentialPressure { get; }
+    [Selector("vendorDefined")]
+    public AnyObject VendorDefined { get; }
+    [Selector("vendorID")]
+    public NSUInteger VendorID { get; }
+    [Selector("tabletID")]
+    public NSUInteger TabletID { get; }
+    [Selector("pointingDeviceID")]
+    public NSUInteger PointingDeviceID { get; }
+    [Selector("systemTabletID")]
+    public NSUInteger SystemTabletID { get; }
+    [Selector("vendorPointingDeviceType")]
+    public NSUInteger VendorPointingDeviceType { get; }
+    [Selector("pointingDeviceSerialNumber")]
+    public NSUInteger PointingDeviceSerialNumber { get; }
+    [Selector("uniqueID")]
+    public ulong UniqueID { get; }
+    [Selector("capabilityMask")]
+    public NSUInteger CapabilityMask { get; }
+    [Selector("pointingDeviceType")]
+    public NSPointingDeviceType PointingDeviceType { get; }
+    [Selector("isEnteringProximity")]
+    public bool EnteringProximity { get; }
+    [Selector("phase")]
+    public NSEventPhase Phase { get; }
+    [Selector("stage")]
+    public NSInteger Stage { get; }
+    [Selector("stageTransition")]
+    public CGFloat StageTransition { get; }
+    [Selector("associatedEventsMask")]
+    public NSEventMask AssociatedEventsMask { get; }
+    [Selector("pressureBehavior")]
+    public NSPressureBehavior PressureBehavior { get; }
+    [Selector("isSwipeTrackingFromScrollEventsEnabled")]
+    public static bool SwipeTrackingFromScrollEventsEnabled { get; }
+    [Selector("mouseLocation")]
+    public static NSPoint MouseLocation { get; }
+    [Selector("modifierFlags")]
+    public static NSEventModifierFlags ClassModifierFlags { get; }
+    [Selector("pressedMouseButtons")]
+    public static NSUInteger PressedMouseButtons { get; }
+    [Selector("doubleClickInterval")]
+    public static NSTimeInterval DoubleClickInterval { get; }
+    [Selector("keyRepeatDelay")]
+    public static NSTimeInterval KeyRepeatDelay { get; }
+    [Selector("keyRepeatInterval")]
+    public static NSTimeInterval KeyRepeatInterval { get; }
+    [Selector("charactersByApplyingModifiers:")]
+    public NSString? CharactersByApplyingModifiers(NSEventModifierFlags modifiers);
+    [Selector("eventWithEventRef:")]
+    public static NSEvent? EventWithEventRef(void* eventRef);
+    [Selector("eventWithCGEvent:")]
+    public static NSEvent? EventWithCGEvent(CGEventRef cgEvent);
+    [Selector("touchesMatchingPhase:inView:")]
+    public NSSet TouchesMatchingPhaseInView(NSTouchPhase phase, NSView? view);
+    [Selector("allTouches")]
+    public NSSet AllTouches();
+    [Selector("touchesForView:")]
+    public NSSet TouchesForView(NSView view);
+    [Selector("coalescedTouchesForTouch:")]
+    public NSArray CoalescedTouchesForTouch(NSTouch touch);
+    [Selector("trackSwipeEventWithOptions:dampenAmountThresholdMin:max:usingHandler:")]
+    public void TrackSwipeEventWithOptionsDampenAmountThresholdMinMaxUsingHandler(NSEventSwipeTrackingOptions options, CGFloat minDampenThreshold, CGFloat maxDampenThreshold, NSEventTrackSwipeEventWithOptionsDampenAmountThresholdMinMaxUsingHandlerTrackingHandlerBlock trackingHandler);
+    [Selector("startPeriodicEventsAfterDelay:withPeriod:")]
+    public static void StartPeriodicEventsAfterDelayWithPeriod(NSTimeInterval delay, NSTimeInterval period);
+    [Selector("stopPeriodicEvents")]
+    public static void StopPeriodicEvents();
+    [Selector("mouseEventWithType:location:modifierFlags:timestamp:windowNumber:context:eventNumber:clickCount:pressure:")]
+    public static NSEvent? MouseEventWithTypeLocationModifierFlagsTimestampWindowNumberContextEventNumberClickCountPressure(NSEventType type, NSPoint location, NSEventModifierFlags flags, NSTimeInterval time, NSInteger wNum, NSGraphicsContext? unusedPassNil, NSInteger eNum, NSInteger cNum, float pressure);
+    [Selector("keyEventWithType:location:modifierFlags:timestamp:windowNumber:context:characters:charactersIgnoringModifiers:isARepeat:keyCode:")]
+    public static NSEvent? KeyEventWithTypeLocationModifierFlagsTimestampWindowNumberContextCharactersCharactersIgnoringModifiersIsARepeatKeyCode(NSEventType type, NSPoint location, NSEventModifierFlags flags, NSTimeInterval time, NSInteger wNum, NSGraphicsContext? unusedPassNil, NSString keys, NSString ukeys, bool flag, ushort code);
+    [Selector("enterExitEventWithType:location:modifierFlags:timestamp:windowNumber:context:eventNumber:trackingNumber:userData:")]
+    public static NSEvent? EnterExitEventWithTypeLocationModifierFlagsTimestampWindowNumberContextEventNumberTrackingNumberUserData(NSEventType type, NSPoint location, NSEventModifierFlags flags, NSTimeInterval time, NSInteger wNum, NSGraphicsContext? unusedPassNil, NSInteger eNum, NSInteger tNum, void* data);
+    [Selector("otherEventWithType:location:modifierFlags:timestamp:windowNumber:context:subtype:data1:data2:")]
+    public static NSEvent? OtherEventWithTypeLocationModifierFlagsTimestampWindowNumberContextSubtypeData1Data2(NSEventType type, NSPoint location, NSEventModifierFlags flags, NSTimeInterval time, NSInteger wNum, NSGraphicsContext? unusedPassNil, short subtype, NSInteger d1, NSInteger d2);
+    [Selector("addGlobalMonitorForEventsMatchingMask:handler:")]
+    public static AnyObject? AddGlobalMonitorForEventsMatchingMaskHandler(NSEventMask mask, NSEventAddGlobalMonitorForEventsMatchingMaskHandlerBlock block);
+    [Selector("addLocalMonitorForEventsMatchingMask:handler:")]
+    public static AnyObject? AddLocalMonitorForEventsMatchingMaskHandler(NSEventMask mask, NSEventAddLocalMonitorForEventsMatchingMaskHandlerBlock block);
+    [Selector("removeMonitor:")]
+    public static void RemoveMonitor(AnyObject eventMonitor);
 }
 
 public const int NSUpArrowFunctionKey = 63232;

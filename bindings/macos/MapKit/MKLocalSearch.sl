@@ -35,11 +35,16 @@ public objc closure void MKLocalSearchCompletionHandler(MKLocalSearchResponse? a
 
 public extern objc class MKLocalSearch : NSObject
 {
-    [Selector("isSearching")] public bool Searching { get; }
-    [Selector("initWithRequest:")] public Self InitWithRequest(MKLocalSearchRequest request);
-    [Selector("initWithPointsOfInterestRequest:")] public Self InitWithPointsOfInterestRequest(MKLocalPointsOfInterestRequest request);
-    [Selector("startWithCompletionHandler:")] public void StartWithCompletionHandler(MKLocalSearchCompletionHandler completionHandler);
-    [Selector("cancel")] public void Cancel();
+    [Selector("isSearching")]
+    public bool Searching { get; }
+    [Selector("initWithRequest:")]
+    public Self InitWithRequest(MKLocalSearchRequest request);
+    [Selector("initWithPointsOfInterestRequest:")]
+    public Self InitWithPointsOfInterestRequest(MKLocalPointsOfInterestRequest request);
+    [Selector("startWithCompletionHandler:")]
+    public void StartWithCompletionHandler(MKLocalSearchCompletionHandler completionHandler);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

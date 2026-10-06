@@ -46,14 +46,22 @@ public enum NSPersonNameComponentsFormatterOptions : ulong
 
 public extern objc class NSPersonNameComponentsFormatter : NSFormatter
 {
-    [Selector("style", "setStyle:")] public NSPersonNameComponentsFormatterStyle Style { get; set; }
-    [Selector("isPhonetic", "setPhonetic:")] public bool Phonetic { get; set; }
-    [Selector("locale", "setLocale:")] public NSLocale? Locale { get; set; }
-    [Selector("localizedStringFromPersonNameComponents:style:options:")] public static NSString LocalizedStringFromPersonNameComponentsStyleOptions(NSPersonNameComponents components, NSPersonNameComponentsFormatterStyle nameFormatStyle, NSPersonNameComponentsFormatterOptions nameOptions);
-    [Selector("stringFromPersonNameComponents:")] public NSString StringFromPersonNameComponents(NSPersonNameComponents components);
-    [Selector("annotatedStringFromPersonNameComponents:")] public NSAttributedString AnnotatedStringFromPersonNameComponents(NSPersonNameComponents components);
-    [Selector("personNameComponentsFromString:")] public NSPersonNameComponents? PersonNameComponentsFromString(NSString string);
-    [Selector("getObjectValue:forString:errorDescription:")] public bool GetObjectValueForStringErrorDescription(out AnyObject? obj, NSString string, out NSString? error);
+    [Selector("style", "setStyle:")]
+    public NSPersonNameComponentsFormatterStyle Style { get; set; }
+    [Selector("isPhonetic", "setPhonetic:")]
+    public bool Phonetic { get; set; }
+    [Selector("locale", "setLocale:")]
+    public NSLocale? Locale { get; set; }
+    [Selector("localizedStringFromPersonNameComponents:style:options:")]
+    public static NSString LocalizedStringFromPersonNameComponentsStyleOptions(NSPersonNameComponents components, NSPersonNameComponentsFormatterStyle nameFormatStyle, NSPersonNameComponentsFormatterOptions nameOptions);
+    [Selector("stringFromPersonNameComponents:")]
+    public NSString StringFromPersonNameComponents(NSPersonNameComponents components);
+    [Selector("annotatedStringFromPersonNameComponents:")]
+    public NSAttributedString AnnotatedStringFromPersonNameComponents(NSPersonNameComponents components);
+    [Selector("personNameComponentsFromString:")]
+    public NSPersonNameComponents? PersonNameComponentsFromString(NSString string);
+    [Selector("getObjectValue:forString:errorDescription:")]
+    public bool GetObjectValueForStringErrorDescription(out AnyObject? obj, NSString string, out NSString? error);
 }
 
 public extern "C" NSString NSPersonNameComponentKey;

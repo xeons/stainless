@@ -42,8 +42,10 @@ public objc closure void ATTrackingManagerRequestTrackingAuthorizationWithComple
 
 public extern objc class ATTrackingManager : NSObject
 {
-    [Selector("trackingAuthorizationStatus")] public static ATTrackingManagerAuthorizationStatus TrackingAuthorizationStatus { get; }
-    [Selector("requestTrackingAuthorizationWithCompletionHandler:")] public static void RequestTrackingAuthorizationWithCompletionHandler(ATTrackingManagerRequestTrackingAuthorizationWithCompletionHandlerCompletionBlock completion);
+    [Selector("trackingAuthorizationStatus")]
+    public static ATTrackingManagerAuthorizationStatus TrackingAuthorizationStatus { get; }
+    [Selector("requestTrackingAuthorizationWithCompletionHandler:")]
+    public static void RequestTrackingAuthorizationWithCompletionHandler(ATTrackingManagerRequestTrackingAuthorizationWithCompletionHandlerCompletionBlock completion);
 }
 
 #endif

@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern "C" CFTypeID CGEventSourceGetTypeID();
 
-[ReturnsRetained] public extern "C" CGEventSourceRef? CGEventSourceCreate(CGEventSourceStateID stateID);
+[ReturnsRetained]
+public extern "C" CGEventSourceRef? CGEventSourceCreate(CGEventSourceStateID stateID);
 
 public extern "C" CGEventSourceKeyboardType CGEventSourceGetKeyboardType(CGEventSourceRef? source);
 

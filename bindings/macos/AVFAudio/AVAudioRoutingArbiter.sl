@@ -42,9 +42,12 @@ public objc closure void AVAudioRoutingArbiterBeginArbitrationWithCategoryComple
 
 public extern objc class AVAudioRoutingArbiter : NSObject
 {
-    [Selector("sharedRoutingArbiter")] public static AVAudioRoutingArbiter SharedRoutingArbiter { get; }
-    [Selector("beginArbitrationWithCategory:completionHandler:")] public void BeginArbitrationWithCategoryCompletionHandler(AVAudioRoutingArbitrationCategory category, AVAudioRoutingArbiterBeginArbitrationWithCategoryCompletionHandlerHandlerBlock handler);
-    [Selector("leaveArbitration")] public void LeaveArbitration();
+    [Selector("sharedRoutingArbiter")]
+    public static AVAudioRoutingArbiter SharedRoutingArbiter { get; }
+    [Selector("beginArbitrationWithCategory:completionHandler:")]
+    public void BeginArbitrationWithCategoryCompletionHandler(AVAudioRoutingArbitrationCategory category, AVAudioRoutingArbiterBeginArbitrationWithCategoryCompletionHandlerHandlerBlock handler);
+    [Selector("leaveArbitration")]
+    public void LeaveArbitration();
 }
 
 #endif

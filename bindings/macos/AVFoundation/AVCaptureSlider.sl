@@ -35,16 +35,26 @@ public objc closure void AVCaptureSliderSetActionQueueActionActionBlock(float ar
 
 public extern objc class AVCaptureSlider : AVCaptureControl
 {
-    [Selector("value", "setValue:")] public float Value { get; set; }
-    [Selector("localizedValueFormat", "setLocalizedValueFormat:")] public NSString? LocalizedValueFormat { get; set; }
-    [Selector("prominentValues", "setProminentValues:")] public NSArray? ProminentValues { get; set; }
-    [Selector("localizedTitle")] public NSString LocalizedTitle { get; }
-    [Selector("symbolName")] public NSString SymbolName { get; }
-    [Selector("accessibilityIdentifier", "setAccessibilityIdentifier:")] public NSString? AccessibilityIdentifier { get; set; }
-    [Selector("initWithLocalizedTitle:symbolName:minValue:maxValue:")] public Self InitWithLocalizedTitleSymbolNameMinValueMaxValue(NSString localizedTitle, NSString symbolName, float minValue, float maxValue);
-    [Selector("initWithLocalizedTitle:symbolName:minValue:maxValue:step:")] public Self InitWithLocalizedTitleSymbolNameMinValueMaxValueStep(NSString localizedTitle, NSString symbolName, float minValue, float maxValue, float step);
-    [Selector("initWithLocalizedTitle:symbolName:values:")] public Self InitWithLocalizedTitleSymbolNameValues(NSString localizedTitle, NSString symbolName, NSArray values);
-    [Selector("setActionQueue:action:")] public void SetActionQueueAction(dispatch_queue_t actionQueue, AVCaptureSliderSetActionQueueActionActionBlock action);
+    [Selector("value", "setValue:")]
+    public float Value { get; set; }
+    [Selector("localizedValueFormat", "setLocalizedValueFormat:")]
+    public NSString? LocalizedValueFormat { get; set; }
+    [Selector("prominentValues", "setProminentValues:")]
+    public NSArray? ProminentValues { get; set; }
+    [Selector("localizedTitle")]
+    public NSString LocalizedTitle { get; }
+    [Selector("symbolName")]
+    public NSString SymbolName { get; }
+    [Selector("accessibilityIdentifier", "setAccessibilityIdentifier:")]
+    public NSString? AccessibilityIdentifier { get; set; }
+    [Selector("initWithLocalizedTitle:symbolName:minValue:maxValue:")]
+    public Self InitWithLocalizedTitleSymbolNameMinValueMaxValue(NSString localizedTitle, NSString symbolName, float minValue, float maxValue);
+    [Selector("initWithLocalizedTitle:symbolName:minValue:maxValue:step:")]
+    public Self InitWithLocalizedTitleSymbolNameMinValueMaxValueStep(NSString localizedTitle, NSString symbolName, float minValue, float maxValue, float step);
+    [Selector("initWithLocalizedTitle:symbolName:values:")]
+    public Self InitWithLocalizedTitleSymbolNameValues(NSString localizedTitle, NSString symbolName, NSArray values);
+    [Selector("setActionQueue:action:")]
+    public void SetActionQueueAction(dispatch_queue_t actionQueue, AVCaptureSliderSetActionQueueActionActionBlock action);
 }
 
 #endif

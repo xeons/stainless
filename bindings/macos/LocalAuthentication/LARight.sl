@@ -47,13 +47,20 @@ public objc closure void LARightDeauthorizeWithCompletionHandlerBlock();
 
 public extern objc class LARight : NSObject
 {
-    [Selector("state")] public LARightState State { get; }
-    [Selector("tag", "setTag:")] public NSInteger Tag { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithRequirement:")] public Self InitWithRequirement(LAAuthenticationRequirement requirement);
-    [Selector("authorizeWithLocalizedReason:completion:")] public void AuthorizeWithLocalizedReasonCompletion(NSString localizedReason, LARightAuthorizeWithLocalizedReasonCompletionHandlerBlock handler);
-    [Selector("checkCanAuthorizeWithCompletion:")] public void CheckCanAuthorizeWithCompletion(LARightCheckCanAuthorizeWithCompletionHandlerBlock handler);
-    [Selector("deauthorizeWithCompletion:")] public void DeauthorizeWithCompletion(LARightDeauthorizeWithCompletionHandlerBlock handler);
+    [Selector("state")]
+    public LARightState State { get; }
+    [Selector("tag", "setTag:")]
+    public NSInteger Tag { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithRequirement:")]
+    public Self InitWithRequirement(LAAuthenticationRequirement requirement);
+    [Selector("authorizeWithLocalizedReason:completion:")]
+    public void AuthorizeWithLocalizedReasonCompletion(NSString localizedReason, LARightAuthorizeWithLocalizedReasonCompletionHandlerBlock handler);
+    [Selector("checkCanAuthorizeWithCompletion:")]
+    public void CheckCanAuthorizeWithCompletion(LARightCheckCanAuthorizeWithCompletionHandlerBlock handler);
+    [Selector("deauthorizeWithCompletion:")]
+    public void DeauthorizeWithCompletion(LARightDeauthorizeWithCompletionHandlerBlock handler);
 }
 
 #endif

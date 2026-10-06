@@ -32,8 +32,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCArithmeticLayer : MLCLayer
 {
-    [Selector("operation")] public MLCArithmeticOperation Operation { get; }
-    [Selector("layerWithOperation:")] public static Self LayerWithOperation(MLCArithmeticOperation operation);
+    [Selector("operation")]
+    public MLCArithmeticOperation Operation { get; }
+    [Selector("layerWithOperation:")]
+    public static Self LayerWithOperation(MLCArithmeticOperation operation);
 }
 
 #endif

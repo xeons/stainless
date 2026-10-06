@@ -36,41 +36,71 @@ import Standard.ObjC;
 public extern objc class NSPersistentStoreCoordinator
 {
     /// Deprecated in macOS 10.7.
-    [Selector("syncWithClient:inBackground:handler:error:")] public bool SyncWithClientInBackgroundHandlerError(ISyncClient? client, bool flag, NSPersistentStoreCoordinatorSyncing? syncHandler, out NSError? rError);
+    [Selector("syncWithClient:inBackground:handler:error:")]
+    public bool SyncWithClientInBackgroundHandlerError(ISyncClient? client, bool flag, NSPersistentStoreCoordinatorSyncing? syncHandler, out NSError? rError);
     /// Deprecated in macOS 10.7.
-    [Selector("setStoresFastSyncDetailsAtURL:forPersistentStore:")] public void SetStoresFastSyncDetailsAtURLForPersistentStore(NSURL? url, NSPersistentStore? store);
+    [Selector("setStoresFastSyncDetailsAtURL:forPersistentStore:")]
+    public void SetStoresFastSyncDetailsAtURLForPersistentStore(NSURL? url, NSPersistentStore? store);
 }
 
 public objc interface NSPersistentStoreCoordinatorSyncing : NSObjectProtocol
 {
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("managedObjectContextsToMonitorWhenSyncingPersistentStoreCoordinator:")] NSArray? ManagedObjectContextsToMonitorWhenSyncingPersistentStoreCoordinator(NSPersistentStoreCoordinator? coordinator);
+    [Optional]
+    [Selector("managedObjectContextsToMonitorWhenSyncingPersistentStoreCoordinator:")]
+    NSArray? ManagedObjectContextsToMonitorWhenSyncingPersistentStoreCoordinator(NSPersistentStoreCoordinator? coordinator);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("managedObjectContextsToReloadAfterSyncingPersistentStoreCoordinator:")] NSArray? ManagedObjectContextsToReloadAfterSyncingPersistentStoreCoordinator(NSPersistentStoreCoordinator? coordinator);
+    [Optional]
+    [Selector("managedObjectContextsToReloadAfterSyncingPersistentStoreCoordinator:")]
+    NSArray? ManagedObjectContextsToReloadAfterSyncingPersistentStoreCoordinator(NSPersistentStoreCoordinator? coordinator);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("persistentStoreCoordinatorShouldStartSyncing:")] bool PersistentStoreCoordinatorShouldStartSyncing(NSPersistentStoreCoordinator? coordinator);
+    [Optional]
+    [Selector("persistentStoreCoordinatorShouldStartSyncing:")]
+    bool PersistentStoreCoordinatorShouldStartSyncing(NSPersistentStoreCoordinator? coordinator);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("persistentStoreCoordinator:willPushChangesInSyncSession:")] void PersistentStoreCoordinatorWillPushChangesInSyncSession(NSPersistentStoreCoordinator? coordinator, ISyncSession? session);
+    [Optional]
+    [Selector("persistentStoreCoordinator:willPushChangesInSyncSession:")]
+    void PersistentStoreCoordinatorWillPushChangesInSyncSession(NSPersistentStoreCoordinator? coordinator, ISyncSession? session);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("persistentStoreCoordinator:didPushChangesInSyncSession:")] void PersistentStoreCoordinatorDidPushChangesInSyncSession(NSPersistentStoreCoordinator? coordinator, ISyncSession? session);
+    [Optional]
+    [Selector("persistentStoreCoordinator:didPushChangesInSyncSession:")]
+    void PersistentStoreCoordinatorDidPushChangesInSyncSession(NSPersistentStoreCoordinator? coordinator, ISyncSession? session);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("persistentStoreCoordinator:willPullChangesInSyncSession:")] void PersistentStoreCoordinatorWillPullChangesInSyncSession(NSPersistentStoreCoordinator? coordinator, ISyncSession? session);
+    [Optional]
+    [Selector("persistentStoreCoordinator:willPullChangesInSyncSession:")]
+    void PersistentStoreCoordinatorWillPullChangesInSyncSession(NSPersistentStoreCoordinator? coordinator, ISyncSession? session);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("persistentStoreCoordinator:didPullChangesInSyncSession:")] void PersistentStoreCoordinatorDidPullChangesInSyncSession(NSPersistentStoreCoordinator? coordinator, ISyncSession? session);
+    [Optional]
+    [Selector("persistentStoreCoordinator:didPullChangesInSyncSession:")]
+    void PersistentStoreCoordinatorDidPullChangesInSyncSession(NSPersistentStoreCoordinator? coordinator, ISyncSession? session);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("persistentStoreCoordinator:didFinishSyncSession:")] void PersistentStoreCoordinatorDidFinishSyncSession(NSPersistentStoreCoordinator? coordinator, ISyncSession? session);
+    [Optional]
+    [Selector("persistentStoreCoordinator:didFinishSyncSession:")]
+    void PersistentStoreCoordinatorDidFinishSyncSession(NSPersistentStoreCoordinator? coordinator, ISyncSession? session);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("persistentStoreCoordinator:didCancelSyncSession:error:")] void PersistentStoreCoordinatorDidCancelSyncSessionError(NSPersistentStoreCoordinator? coordinator, ISyncSession? session, NSError? error);
+    [Optional]
+    [Selector("persistentStoreCoordinator:didCancelSyncSession:error:")]
+    void PersistentStoreCoordinatorDidCancelSyncSessionError(NSPersistentStoreCoordinator? coordinator, ISyncSession? session, NSError? error);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("persistentStoreCoordinator:willPushRecord:forManagedObject:inSyncSession:")] NSDictionary? PersistentStoreCoordinatorWillPushRecordForManagedObjectInSyncSession(NSPersistentStoreCoordinator? coordinator, NSDictionary? record, NSManagedObject? managedObject, ISyncSession? session);
+    [Optional]
+    [Selector("persistentStoreCoordinator:willPushRecord:forManagedObject:inSyncSession:")]
+    NSDictionary? PersistentStoreCoordinatorWillPushRecordForManagedObjectInSyncSession(NSPersistentStoreCoordinator? coordinator, NSDictionary? record, NSManagedObject? managedObject, ISyncSession? session);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("persistentStoreCoordinator:willDeleteRecordWithIdentifier:inSyncSession:")] bool PersistentStoreCoordinatorWillDeleteRecordWithIdentifierInSyncSession(NSPersistentStoreCoordinator? coordinator, NSString? identifier, ISyncSession? session);
+    [Optional]
+    [Selector("persistentStoreCoordinator:willDeleteRecordWithIdentifier:inSyncSession:")]
+    bool PersistentStoreCoordinatorWillDeleteRecordWithIdentifierInSyncSession(NSPersistentStoreCoordinator? coordinator, NSString? identifier, ISyncSession? session);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("persistentStoreCoordinator:willApplyChange:toManagedObject:inSyncSession:")] ISyncChange? PersistentStoreCoordinatorWillApplyChangeToManagedObjectInSyncSession(NSPersistentStoreCoordinator? coordinator, ISyncChange? change, NSManagedObject? managedObject, ISyncSession? session);
+    [Optional]
+    [Selector("persistentStoreCoordinator:willApplyChange:toManagedObject:inSyncSession:")]
+    ISyncChange? PersistentStoreCoordinatorWillApplyChangeToManagedObjectInSyncSession(NSPersistentStoreCoordinator? coordinator, ISyncChange? change, NSManagedObject? managedObject, ISyncSession? session);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("persistentStoreCoordinator:didApplyChange:toManagedObject:inSyncSession:")] void PersistentStoreCoordinatorDidApplyChangeToManagedObjectInSyncSession(NSPersistentStoreCoordinator? coordinator, ISyncChange? change, NSManagedObject? managedObject, ISyncSession? session);
+    [Optional]
+    [Selector("persistentStoreCoordinator:didApplyChange:toManagedObject:inSyncSession:")]
+    void PersistentStoreCoordinatorDidApplyChangeToManagedObjectInSyncSession(NSPersistentStoreCoordinator? coordinator, ISyncChange? change, NSManagedObject? managedObject, ISyncSession? session);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("persistentStoreCoordinator:didCommitChanges:inSyncSession:")] void PersistentStoreCoordinatorDidCommitChangesInSyncSession(NSPersistentStoreCoordinator? coordinator, NSDictionary? changes, ISyncSession? session);
+    [Optional]
+    [Selector("persistentStoreCoordinator:didCommitChanges:inSyncSession:")]
+    void PersistentStoreCoordinatorDidCommitChangesInSyncSession(NSPersistentStoreCoordinator? coordinator, NSDictionary? changes, ISyncSession? session);
 }
 
 #endif

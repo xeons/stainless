@@ -51,12 +51,18 @@ public extern "C" SCNPhysicsShapeType? SCNPhysicsShapeTypeConcavePolyhedron;
 
 public extern objc class SCNPhysicsShape : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("options")] public NSDictionary? Options { get; }
-    [Selector("sourceObject")] public AnyObject SourceObject { get; }
-    [Selector("transforms")] public NSArray? Transforms { get; }
-    [Selector("shapeWithGeometry:options:")] public static Self ShapeWithGeometryOptions(SCNGeometry geometry, NSDictionary? options);
-    [Selector("shapeWithNode:options:")] public static Self ShapeWithNodeOptions(SCNNode node, NSDictionary? options);
-    [Selector("shapeWithShapes:transforms:")] public static Self ShapeWithShapesTransforms(NSArray shapes, NSArray? transforms);
+    [Selector("options")]
+    public NSDictionary? Options { get; }
+    [Selector("sourceObject")]
+    public AnyObject SourceObject { get; }
+    [Selector("transforms")]
+    public NSArray? Transforms { get; }
+    [Selector("shapeWithGeometry:options:")]
+    public static Self ShapeWithGeometryOptions(SCNGeometry geometry, NSDictionary? options);
+    [Selector("shapeWithNode:options:")]
+    public static Self ShapeWithNodeOptions(SCNNode node, NSDictionary? options);
+    [Selector("shapeWithShapes:transforms:")]
+    public static Self ShapeWithShapesTransforms(NSArray shapes, NSArray? transforms);
 }
 
 #endif

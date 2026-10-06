@@ -41,13 +41,16 @@ public extern objc class QLThumbnailRequestRef : CFTypeRef { }
 public extern "C" CFTypeID QLThumbnailRequestGetTypeID();
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFURLRef? QLThumbnailRequestCopyURL(QLThumbnailRequestRef? thumbnail);
+[ReturnsRetained]
+public extern "C" CFURLRef? QLThumbnailRequestCopyURL(QLThumbnailRequestRef? thumbnail);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFDictionaryRef? QLThumbnailRequestCopyOptions(QLThumbnailRequestRef? thumbnail);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? QLThumbnailRequestCopyOptions(QLThumbnailRequestRef? thumbnail);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFStringRef? QLThumbnailRequestCopyContentUTI(QLThumbnailRequestRef? thumbnail);
+[ReturnsRetained]
+public extern "C" CFStringRef? QLThumbnailRequestCopyContentUTI(QLThumbnailRequestRef? thumbnail);
 
 /// Deprecated in macOS 12.0.
 public extern "C" CGSize QLThumbnailRequestGetMaximumSize(QLThumbnailRequestRef? thumbnail);
@@ -68,7 +71,8 @@ public extern "C" void QLThumbnailRequestSetImage(QLThumbnailRequestRef? thumbna
 public extern "C" void QLThumbnailRequestSetImageWithData(QLThumbnailRequestRef? thumbnail, CFDataRef? data, CFDictionaryRef? properties);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CGContextRef? QLThumbnailRequestCreateContext(QLThumbnailRequestRef? thumbnail, CGSize size, Boolean isBitmap, CFDictionaryRef? properties);
+[ReturnsRetained]
+public extern "C" CGContextRef? QLThumbnailRequestCreateContext(QLThumbnailRequestRef? thumbnail, CGSize size, Boolean isBitmap, CFDictionaryRef? properties);
 
 /// Deprecated in macOS 12.0.
 public extern "C" void QLThumbnailRequestFlushContext(QLThumbnailRequestRef? thumbnail, CGContextRef? context);
@@ -134,13 +138,16 @@ public extern "C" CFStringRef? kQLPreviewOptionCursorKey;
 public extern "C" CFStringRef? kQLPreviewPropertyCursorKey;
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFURLRef? QLPreviewRequestCopyURL(QLPreviewRequestRef? preview);
+[ReturnsRetained]
+public extern "C" CFURLRef? QLPreviewRequestCopyURL(QLPreviewRequestRef? preview);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFDictionaryRef? QLPreviewRequestCopyOptions(QLPreviewRequestRef? preview);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? QLPreviewRequestCopyOptions(QLPreviewRequestRef? preview);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFStringRef? QLPreviewRequestCopyContentUTI(QLPreviewRequestRef? preview);
+[ReturnsRetained]
+public extern "C" CFStringRef? QLPreviewRequestCopyContentUTI(QLPreviewRequestRef? preview);
 
 /// Deprecated in macOS 12.0.
 public extern "C" CFBundleRef? QLPreviewRequestGetGeneratorBundle(QLPreviewRequestRef? preview);
@@ -161,10 +168,12 @@ public extern "C" void QLPreviewRequestSetDataRepresentation(QLPreviewRequestRef
 public extern "C" void QLPreviewRequestSetURLRepresentation(QLPreviewRequestRef? preview, CFURLRef? url, CFStringRef? contentTypeUTI, CFDictionaryRef? properties);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CGContextRef? QLPreviewRequestCreateContext(QLPreviewRequestRef? preview, CGSize size, Boolean isBitmap, CFDictionaryRef? properties);
+[ReturnsRetained]
+public extern "C" CGContextRef? QLPreviewRequestCreateContext(QLPreviewRequestRef? preview, CGSize size, Boolean isBitmap, CFDictionaryRef? properties);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CGContextRef? QLPreviewRequestCreatePDFContext(QLPreviewRequestRef? preview, CGRect* mediaBox, CFDictionaryRef? auxiliaryInfo, CFDictionaryRef? properties);
+[ReturnsRetained]
+public extern "C" CGContextRef? QLPreviewRequestCreatePDFContext(QLPreviewRequestRef? preview, CGRect* mediaBox, CFDictionaryRef? auxiliaryInfo, CFDictionaryRef? properties);
 
 /// Deprecated in macOS 12.0.
 public extern "C" void QLPreviewRequestFlushContext(QLPreviewRequestRef? preview, CGContextRef? context);

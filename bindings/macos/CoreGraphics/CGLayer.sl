@@ -35,7 +35,8 @@ public struct CGLayer;
 [CFType("CGLayerGetTypeID")]
 public extern objc class CGLayerRef : CFTypeRef { }
 
-[ReturnsRetained] public extern "C" CGLayerRef? CGLayerCreateWithContext(CGContextRef? context, CGSize size, CFDictionaryRef? auxiliaryInfo);
+[ReturnsRetained]
+public extern "C" CGLayerRef? CGLayerCreateWithContext(CGContextRef? context, CGSize size, CFDictionaryRef? auxiliaryInfo);
 
 public extern "C" CGSize CGLayerGetSize(CGLayerRef? layer);
 

@@ -34,8 +34,10 @@ import Standard.ObjC;
 /// macOS 15.4 and later.
 public extern objc class FSTaskOptions : NSObject
 {
-    [Selector("taskOptions")] public NSArray TaskOptions { get; }
-    [Selector("urlForOption:")] public NSURL? UrlForOption(NSString option);
+    [Selector("taskOptions")]
+    public NSArray TaskOptions { get; }
+    [Selector("urlForOption:")]
+    public NSURL? UrlForOption(NSString option);
 }
 
 #endif

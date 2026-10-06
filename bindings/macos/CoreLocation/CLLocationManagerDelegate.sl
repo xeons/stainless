@@ -34,29 +34,69 @@ import Standard.ObjC;
 
 public objc interface CLLocationManagerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("locationManager:didUpdateToLocation:fromLocation:")] void LocationManagerDidUpdateToLocationFromLocation(CLLocationManager manager, CLLocation newLocation, CLLocation oldLocation);
-    [Optional] [Selector("locationManager:didUpdateLocations:")] void LocationManagerDidUpdateLocations(CLLocationManager manager, NSArray locations);
-    [Optional] [Selector("locationManager:didUpdateHeading:")] void LocationManagerDidUpdateHeading(CLLocationManager manager, CLHeading newHeading);
-    [Optional] [Selector("locationManagerShouldDisplayHeadingCalibration:")] bool LocationManagerShouldDisplayHeadingCalibration(CLLocationManager manager);
-    [Optional] [Selector("locationManager:didDetermineState:forRegion:")] void LocationManagerDidDetermineStateForRegion(CLLocationManager manager, CLRegionState state, CLRegion region);
+    [Optional]
+    [Selector("locationManager:didUpdateToLocation:fromLocation:")]
+    void LocationManagerDidUpdateToLocationFromLocation(CLLocationManager manager, CLLocation newLocation, CLLocation oldLocation);
+    [Optional]
+    [Selector("locationManager:didUpdateLocations:")]
+    void LocationManagerDidUpdateLocations(CLLocationManager manager, NSArray locations);
+    [Optional]
+    [Selector("locationManager:didUpdateHeading:")]
+    void LocationManagerDidUpdateHeading(CLLocationManager manager, CLHeading newHeading);
+    [Optional]
+    [Selector("locationManagerShouldDisplayHeadingCalibration:")]
+    bool LocationManagerShouldDisplayHeadingCalibration(CLLocationManager manager);
+    [Optional]
+    [Selector("locationManager:didDetermineState:forRegion:")]
+    void LocationManagerDidDetermineStateForRegion(CLLocationManager manager, CLRegionState state, CLRegion region);
     /// Deprecated in macOS 10.15.
-    [Optional] [Selector("locationManager:didRangeBeacons:inRegion:")] void LocationManagerDidRangeBeaconsInRegion(CLLocationManager manager, NSArray beacons, CLBeaconRegion region);
+    [Optional]
+    [Selector("locationManager:didRangeBeacons:inRegion:")]
+    void LocationManagerDidRangeBeaconsInRegion(CLLocationManager manager, NSArray beacons, CLBeaconRegion region);
     /// Deprecated in macOS 10.15.
-    [Optional] [Selector("locationManager:rangingBeaconsDidFailForRegion:withError:")] void LocationManagerRangingBeaconsDidFailForRegionWithError(CLLocationManager manager, CLBeaconRegion region, NSError error);
-    [Optional] [Selector("locationManager:didRangeBeacons:satisfyingConstraint:")] void LocationManagerDidRangeBeaconsSatisfyingConstraint(CLLocationManager manager, NSArray beacons, CLBeaconIdentityConstraint beaconConstraint);
-    [Optional] [Selector("locationManager:didFailRangingBeaconsForConstraint:error:")] void LocationManagerDidFailRangingBeaconsForConstraintError(CLLocationManager manager, CLBeaconIdentityConstraint beaconConstraint, NSError error);
-    [Optional] [Selector("locationManager:didEnterRegion:")] void LocationManagerDidEnterRegion(CLLocationManager manager, CLRegion region);
-    [Optional] [Selector("locationManager:didExitRegion:")] void LocationManagerDidExitRegion(CLLocationManager manager, CLRegion region);
-    [Optional] [Selector("locationManager:didFailWithError:")] void LocationManagerDidFailWithError(CLLocationManager manager, NSError error);
-    [Optional] [Selector("locationManager:monitoringDidFailForRegion:withError:")] void LocationManagerMonitoringDidFailForRegionWithError(CLLocationManager manager, CLRegion? region, NSError error);
+    [Optional]
+    [Selector("locationManager:rangingBeaconsDidFailForRegion:withError:")]
+    void LocationManagerRangingBeaconsDidFailForRegionWithError(CLLocationManager manager, CLBeaconRegion region, NSError error);
+    [Optional]
+    [Selector("locationManager:didRangeBeacons:satisfyingConstraint:")]
+    void LocationManagerDidRangeBeaconsSatisfyingConstraint(CLLocationManager manager, NSArray beacons, CLBeaconIdentityConstraint beaconConstraint);
+    [Optional]
+    [Selector("locationManager:didFailRangingBeaconsForConstraint:error:")]
+    void LocationManagerDidFailRangingBeaconsForConstraintError(CLLocationManager manager, CLBeaconIdentityConstraint beaconConstraint, NSError error);
+    [Optional]
+    [Selector("locationManager:didEnterRegion:")]
+    void LocationManagerDidEnterRegion(CLLocationManager manager, CLRegion region);
+    [Optional]
+    [Selector("locationManager:didExitRegion:")]
+    void LocationManagerDidExitRegion(CLLocationManager manager, CLRegion region);
+    [Optional]
+    [Selector("locationManager:didFailWithError:")]
+    void LocationManagerDidFailWithError(CLLocationManager manager, NSError error);
+    [Optional]
+    [Selector("locationManager:monitoringDidFailForRegion:withError:")]
+    void LocationManagerMonitoringDidFailForRegionWithError(CLLocationManager manager, CLRegion? region, NSError error);
     /// Deprecated in macOS 11.0.
-    [Optional] [Selector("locationManager:didChangeAuthorizationStatus:")] void LocationManagerDidChangeAuthorizationStatus(CLLocationManager manager, CLAuthorizationStatus status);
-    [Optional] [Selector("locationManagerDidChangeAuthorization:")] void LocationManagerDidChangeAuthorization(CLLocationManager manager);
-    [Optional] [Selector("locationManager:didStartMonitoringForRegion:")] void LocationManagerDidStartMonitoringForRegion(CLLocationManager manager, CLRegion region);
-    [Optional] [Selector("locationManagerDidPauseLocationUpdates:")] void LocationManagerDidPauseLocationUpdates(CLLocationManager manager);
-    [Optional] [Selector("locationManagerDidResumeLocationUpdates:")] void LocationManagerDidResumeLocationUpdates(CLLocationManager manager);
-    [Optional] [Selector("locationManager:didFinishDeferredUpdatesWithError:")] void LocationManagerDidFinishDeferredUpdatesWithError(CLLocationManager manager, NSError? error);
-    [Optional] [Selector("locationManager:didVisit:")] void LocationManagerDidVisit(CLLocationManager manager, CLVisit visit);
+    [Optional]
+    [Selector("locationManager:didChangeAuthorizationStatus:")]
+    void LocationManagerDidChangeAuthorizationStatus(CLLocationManager manager, CLAuthorizationStatus status);
+    [Optional]
+    [Selector("locationManagerDidChangeAuthorization:")]
+    void LocationManagerDidChangeAuthorization(CLLocationManager manager);
+    [Optional]
+    [Selector("locationManager:didStartMonitoringForRegion:")]
+    void LocationManagerDidStartMonitoringForRegion(CLLocationManager manager, CLRegion region);
+    [Optional]
+    [Selector("locationManagerDidPauseLocationUpdates:")]
+    void LocationManagerDidPauseLocationUpdates(CLLocationManager manager);
+    [Optional]
+    [Selector("locationManagerDidResumeLocationUpdates:")]
+    void LocationManagerDidResumeLocationUpdates(CLLocationManager manager);
+    [Optional]
+    [Selector("locationManager:didFinishDeferredUpdatesWithError:")]
+    void LocationManagerDidFinishDeferredUpdatesWithError(CLLocationManager manager, NSError? error);
+    [Optional]
+    [Selector("locationManager:didVisit:")]
+    void LocationManagerDidVisit(CLLocationManager manager, CLVisit visit);
 }
 
 #endif

@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class MTRAccessGrant : NSObject, NSCopying
 {
-    [Selector("subjectID")] public NSNumber? SubjectID { get; }
-    [Selector("grantedPrivilege")] public MTRAccessControlEntryPrivilege GrantedPrivilege { get; }
-    [Selector("authenticationMode")] public MTRAccessControlEntryAuthMode AuthenticationMode { get; }
-    [Selector("accessGrantForNodeID:privilege:")] public static MTRAccessGrant? AccessGrantForNodeIDPrivilege(NSNumber nodeID, MTRAccessControlEntryPrivilege privilege);
-    [Selector("accessGrantForCASEAuthenticatedTag:privilege:")] public static MTRAccessGrant? AccessGrantForCASEAuthenticatedTagPrivilege(NSNumber caseAuthenticatedTag, MTRAccessControlEntryPrivilege privilege);
-    [Selector("accessGrantForGroupID:privilege:")] public static MTRAccessGrant? AccessGrantForGroupIDPrivilege(NSNumber groupID, MTRAccessControlEntryPrivilege privilege);
-    [Selector("accessGrantForAllNodesWithPrivilege:")] public static MTRAccessGrant AccessGrantForAllNodesWithPrivilege(MTRAccessControlEntryPrivilege privilege);
+    [Selector("subjectID")]
+    public NSNumber? SubjectID { get; }
+    [Selector("grantedPrivilege")]
+    public MTRAccessControlEntryPrivilege GrantedPrivilege { get; }
+    [Selector("authenticationMode")]
+    public MTRAccessControlEntryAuthMode AuthenticationMode { get; }
+    [Selector("accessGrantForNodeID:privilege:")]
+    public static MTRAccessGrant? AccessGrantForNodeIDPrivilege(NSNumber nodeID, MTRAccessControlEntryPrivilege privilege);
+    [Selector("accessGrantForCASEAuthenticatedTag:privilege:")]
+    public static MTRAccessGrant? AccessGrantForCASEAuthenticatedTagPrivilege(NSNumber caseAuthenticatedTag, MTRAccessControlEntryPrivilege privilege);
+    [Selector("accessGrantForGroupID:privilege:")]
+    public static MTRAccessGrant? AccessGrantForGroupIDPrivilege(NSNumber groupID, MTRAccessControlEntryPrivilege privilege);
+    [Selector("accessGrantForAllNodesWithPrivilege:")]
+    public static MTRAccessGrant AccessGrantForAllNodesWithPrivilege(MTRAccessControlEntryPrivilege privilege);
 }
 
 #endif

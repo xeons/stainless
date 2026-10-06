@@ -32,40 +32,65 @@ import Standard.ObjC;
 
 public objc interface NSURLProtocolClient : NSObjectProtocol
 {
-    [Selector("URLProtocol:wasRedirectedToRequest:redirectResponse:")] void URLProtocolWasRedirectedToRequestRedirectResponse(NSURLProtocol protocol, NSURLRequest request, NSURLResponse redirectResponse);
-    [Selector("URLProtocol:cachedResponseIsValid:")] void URLProtocolCachedResponseIsValid(NSURLProtocol protocol, NSCachedURLResponse cachedResponse);
-    [Selector("URLProtocol:didReceiveResponse:cacheStoragePolicy:")] void URLProtocolDidReceiveResponseCacheStoragePolicy(NSURLProtocol protocol, NSURLResponse response, NSURLCacheStoragePolicy policy);
-    [Selector("URLProtocol:didLoadData:")] void URLProtocolDidLoadData(NSURLProtocol protocol, NSData data);
-    [Selector("URLProtocolDidFinishLoading:")] void URLProtocolDidFinishLoading(NSURLProtocol protocol);
-    [Selector("URLProtocol:didFailWithError:")] void URLProtocolDidFailWithError(NSURLProtocol protocol, NSError error);
-    [Selector("URLProtocol:didReceiveAuthenticationChallenge:")] void URLProtocolDidReceiveAuthenticationChallenge(NSURLProtocol protocol, NSURLAuthenticationChallenge challenge);
-    [Selector("URLProtocol:didCancelAuthenticationChallenge:")] void URLProtocolDidCancelAuthenticationChallenge(NSURLProtocol protocol, NSURLAuthenticationChallenge challenge);
+    [Selector("URLProtocol:wasRedirectedToRequest:redirectResponse:")]
+    void URLProtocolWasRedirectedToRequestRedirectResponse(NSURLProtocol protocol, NSURLRequest request, NSURLResponse redirectResponse);
+    [Selector("URLProtocol:cachedResponseIsValid:")]
+    void URLProtocolCachedResponseIsValid(NSURLProtocol protocol, NSCachedURLResponse cachedResponse);
+    [Selector("URLProtocol:didReceiveResponse:cacheStoragePolicy:")]
+    void URLProtocolDidReceiveResponseCacheStoragePolicy(NSURLProtocol protocol, NSURLResponse response, NSURLCacheStoragePolicy policy);
+    [Selector("URLProtocol:didLoadData:")]
+    void URLProtocolDidLoadData(NSURLProtocol protocol, NSData data);
+    [Selector("URLProtocolDidFinishLoading:")]
+    void URLProtocolDidFinishLoading(NSURLProtocol protocol);
+    [Selector("URLProtocol:didFailWithError:")]
+    void URLProtocolDidFailWithError(NSURLProtocol protocol, NSError error);
+    [Selector("URLProtocol:didReceiveAuthenticationChallenge:")]
+    void URLProtocolDidReceiveAuthenticationChallenge(NSURLProtocol protocol, NSURLAuthenticationChallenge challenge);
+    [Selector("URLProtocol:didCancelAuthenticationChallenge:")]
+    void URLProtocolDidCancelAuthenticationChallenge(NSURLProtocol protocol, NSURLAuthenticationChallenge challenge);
 }
 
 public extern objc class NSURLProtocol : NSObject
 {
-    [Selector("client")] public NSURLProtocolClient? Client { get; }
-    [Selector("request")] public NSURLRequest Request { get; }
-    [Selector("cachedResponse")] public NSCachedURLResponse? CachedResponse { get; }
-    [Selector("initWithRequest:cachedResponse:client:")] public Self InitWithRequestCachedResponseClient(NSURLRequest request, NSCachedURLResponse? cachedResponse, NSURLProtocolClient? client);
-    [Selector("canInitWithRequest:")] public static bool CanInitWithRequest(NSURLRequest request);
-    [Selector("canonicalRequestForRequest:")] public static NSURLRequest CanonicalRequestForRequest(NSURLRequest request);
-    [Selector("requestIsCacheEquivalent:toRequest:")] public static bool RequestIsCacheEquivalentToRequest(NSURLRequest a, NSURLRequest b);
-    [Selector("startLoading")] public void StartLoading();
-    [Selector("stopLoading")] public void StopLoading();
-    [Selector("propertyForKey:inRequest:")] public static AnyObject? PropertyForKeyInRequest(NSString key, NSURLRequest request);
-    [Selector("setProperty:forKey:inRequest:")] public static void SetPropertyForKeyInRequest(AnyObject value, NSString key, NSMutableURLRequest request);
-    [Selector("removePropertyForKey:inRequest:")] public static void RemovePropertyForKeyInRequest(NSString key, NSMutableURLRequest request);
-    [Selector("registerClass:")] public static bool RegisterClass(Class protocolClass);
-    [Selector("unregisterClass:")] public static void UnregisterClass(Class protocolClass);
+    [Selector("client")]
+    public NSURLProtocolClient? Client { get; }
+    [Selector("request")]
+    public NSURLRequest Request { get; }
+    [Selector("cachedResponse")]
+    public NSCachedURLResponse? CachedResponse { get; }
+    [Selector("initWithRequest:cachedResponse:client:")]
+    public Self InitWithRequestCachedResponseClient(NSURLRequest request, NSCachedURLResponse? cachedResponse, NSURLProtocolClient? client);
+    [Selector("canInitWithRequest:")]
+    public static bool CanInitWithRequest(NSURLRequest request);
+    [Selector("canonicalRequestForRequest:")]
+    public static NSURLRequest CanonicalRequestForRequest(NSURLRequest request);
+    [Selector("requestIsCacheEquivalent:toRequest:")]
+    public static bool RequestIsCacheEquivalentToRequest(NSURLRequest a, NSURLRequest b);
+    [Selector("startLoading")]
+    public void StartLoading();
+    [Selector("stopLoading")]
+    public void StopLoading();
+    [Selector("propertyForKey:inRequest:")]
+    public static AnyObject? PropertyForKeyInRequest(NSString key, NSURLRequest request);
+    [Selector("setProperty:forKey:inRequest:")]
+    public static void SetPropertyForKeyInRequest(AnyObject value, NSString key, NSMutableURLRequest request);
+    [Selector("removePropertyForKey:inRequest:")]
+    public static void RemovePropertyForKeyInRequest(NSString key, NSMutableURLRequest request);
+    [Selector("registerClass:")]
+    public static bool RegisterClass(Class protocolClass);
+    [Selector("unregisterClass:")]
+    public static void UnregisterClass(Class protocolClass);
 }
 
 /// NSURLSessionTaskAdditions, a category of NSURLProtocol.
 public extern objc class NSURLProtocol
 {
-    [Selector("task")] public NSURLSessionTask? Task { get; }
-    [Selector("canInitWithTask:")] public static bool CanInitWithTask(NSURLSessionTask task);
-    [Selector("initWithTask:cachedResponse:client:")] public Self InitWithTaskCachedResponseClient(NSURLSessionTask task, NSCachedURLResponse? cachedResponse, NSURLProtocolClient? client);
+    [Selector("task")]
+    public NSURLSessionTask? Task { get; }
+    [Selector("canInitWithTask:")]
+    public static bool CanInitWithTask(NSURLSessionTask task);
+    [Selector("initWithTask:cachedResponse:client:")]
+    public Self InitWithTaskCachedResponseClient(NSURLSessionTask task, NSCachedURLResponse? cachedResponse, NSURLProtocolClient? client);
 }
 
 #endif

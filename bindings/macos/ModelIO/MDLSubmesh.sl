@@ -33,33 +33,56 @@ import Standard.ObjC;
 
 public extern objc class MDLSubmeshTopology : NSObject
 {
-    [Selector("faceTopology", "setFaceTopology:")] public MDLMeshBuffer? FaceTopology { get; set; }
-    [Selector("faceCount", "setFaceCount:")] public NSUInteger FaceCount { get; set; }
-    [Selector("vertexCreaseIndices", "setVertexCreaseIndices:")] public MDLMeshBuffer? VertexCreaseIndices { get; set; }
-    [Selector("vertexCreases", "setVertexCreases:")] public MDLMeshBuffer? VertexCreases { get; set; }
-    [Selector("vertexCreaseCount", "setVertexCreaseCount:")] public NSUInteger VertexCreaseCount { get; set; }
-    [Selector("edgeCreaseIndices", "setEdgeCreaseIndices:")] public MDLMeshBuffer? EdgeCreaseIndices { get; set; }
-    [Selector("edgeCreases", "setEdgeCreases:")] public MDLMeshBuffer? EdgeCreases { get; set; }
-    [Selector("edgeCreaseCount", "setEdgeCreaseCount:")] public NSUInteger EdgeCreaseCount { get; set; }
-    [Selector("holes", "setHoles:")] public MDLMeshBuffer? Holes { get; set; }
-    [Selector("holeCount", "setHoleCount:")] public NSUInteger HoleCount { get; set; }
-    [Selector("initWithSubmesh:")] public Self InitWithSubmesh(MDLSubmesh submesh);
+    [Selector("faceTopology", "setFaceTopology:")]
+    public MDLMeshBuffer? FaceTopology { get; set; }
+    [Selector("faceCount", "setFaceCount:")]
+    public NSUInteger FaceCount { get; set; }
+    [Selector("vertexCreaseIndices", "setVertexCreaseIndices:")]
+    public MDLMeshBuffer? VertexCreaseIndices { get; set; }
+    [Selector("vertexCreases", "setVertexCreases:")]
+    public MDLMeshBuffer? VertexCreases { get; set; }
+    [Selector("vertexCreaseCount", "setVertexCreaseCount:")]
+    public NSUInteger VertexCreaseCount { get; set; }
+    [Selector("edgeCreaseIndices", "setEdgeCreaseIndices:")]
+    public MDLMeshBuffer? EdgeCreaseIndices { get; set; }
+    [Selector("edgeCreases", "setEdgeCreases:")]
+    public MDLMeshBuffer? EdgeCreases { get; set; }
+    [Selector("edgeCreaseCount", "setEdgeCreaseCount:")]
+    public NSUInteger EdgeCreaseCount { get; set; }
+    [Selector("holes", "setHoles:")]
+    public MDLMeshBuffer? Holes { get; set; }
+    [Selector("holeCount", "setHoleCount:")]
+    public NSUInteger HoleCount { get; set; }
+    [Selector("initWithSubmesh:")]
+    public Self InitWithSubmesh(MDLSubmesh submesh);
 }
 
 public extern objc class MDLSubmesh : NSObject, MDLNamed
 {
-    [Selector("indexBuffer")] public MDLMeshBuffer IndexBuffer { get; }
-    [Selector("indexCount")] public NSUInteger IndexCount { get; }
-    [Selector("indexType")] public MDLIndexBitDepth IndexType { get; }
-    [Selector("geometryType")] public MDLGeometryType GeometryType { get; }
-    [Selector("material", "setMaterial:")] public MDLMaterial? Material { get; set; }
-    [Selector("topology", "setTopology:")] public MDLSubmeshTopology? Topology { get; set; }
-    [Selector("name", "setName:")] public NSString Name { get; set; }
-    [Selector("initWithName:indexBuffer:indexCount:indexType:geometryType:material:")] public Self InitWithNameIndexBufferIndexCountIndexTypeGeometryTypeMaterial(NSString name, MDLMeshBuffer indexBuffer, NSUInteger indexCount, MDLIndexBitDepth indexType, MDLGeometryType geometryType, MDLMaterial? material);
-    [Selector("initWithIndexBuffer:indexCount:indexType:geometryType:material:")] public Self InitWithIndexBufferIndexCountIndexTypeGeometryTypeMaterial(MDLMeshBuffer indexBuffer, NSUInteger indexCount, MDLIndexBitDepth indexType, MDLGeometryType geometryType, MDLMaterial? material);
-    [Selector("initWithName:indexBuffer:indexCount:indexType:geometryType:material:topology:")] public Self InitWithNameIndexBufferIndexCountIndexTypeGeometryTypeMaterialTopology(NSString name, MDLMeshBuffer indexBuffer, NSUInteger indexCount, MDLIndexBitDepth indexType, MDLGeometryType geometryType, MDLMaterial? material, MDLSubmeshTopology? topology);
-    [Selector("initWithMDLSubmesh:indexType:geometryType:")] public Self? InitWithMDLSubmeshIndexTypeGeometryType(MDLSubmesh submesh, MDLIndexBitDepth indexType, MDLGeometryType geometryType);
-    [Selector("indexBufferAsIndexType:")] public MDLMeshBuffer IndexBufferAsIndexType(MDLIndexBitDepth indexType);
+    [Selector("indexBuffer")]
+    public MDLMeshBuffer IndexBuffer { get; }
+    [Selector("indexCount")]
+    public NSUInteger IndexCount { get; }
+    [Selector("indexType")]
+    public MDLIndexBitDepth IndexType { get; }
+    [Selector("geometryType")]
+    public MDLGeometryType GeometryType { get; }
+    [Selector("material", "setMaterial:")]
+    public MDLMaterial? Material { get; set; }
+    [Selector("topology", "setTopology:")]
+    public MDLSubmeshTopology? Topology { get; set; }
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
+    [Selector("initWithName:indexBuffer:indexCount:indexType:geometryType:material:")]
+    public Self InitWithNameIndexBufferIndexCountIndexTypeGeometryTypeMaterial(NSString name, MDLMeshBuffer indexBuffer, NSUInteger indexCount, MDLIndexBitDepth indexType, MDLGeometryType geometryType, MDLMaterial? material);
+    [Selector("initWithIndexBuffer:indexCount:indexType:geometryType:material:")]
+    public Self InitWithIndexBufferIndexCountIndexTypeGeometryTypeMaterial(MDLMeshBuffer indexBuffer, NSUInteger indexCount, MDLIndexBitDepth indexType, MDLGeometryType geometryType, MDLMaterial? material);
+    [Selector("initWithName:indexBuffer:indexCount:indexType:geometryType:material:topology:")]
+    public Self InitWithNameIndexBufferIndexCountIndexTypeGeometryTypeMaterialTopology(NSString name, MDLMeshBuffer indexBuffer, NSUInteger indexCount, MDLIndexBitDepth indexType, MDLGeometryType geometryType, MDLMaterial? material, MDLSubmeshTopology? topology);
+    [Selector("initWithMDLSubmesh:indexType:geometryType:")]
+    public Self? InitWithMDLSubmeshIndexTypeGeometryType(MDLSubmesh submesh, MDLIndexBitDepth indexType, MDLGeometryType geometryType);
+    [Selector("indexBufferAsIndexType:")]
+    public MDLMeshBuffer IndexBufferAsIndexType(MDLIndexBitDepth indexType);
 }
 
 #endif

@@ -42,32 +42,56 @@ public enum AMLogLevel : ulong
 
 public extern objc class AMAction : NSObject
 {
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("ignoresInput")] public bool IgnoresInput { get; }
-    [Selector("selectedInputType", "setSelectedInputType:")] public NSString? SelectedInputType { get; set; }
-    [Selector("selectedOutputType", "setSelectedOutputType:")] public NSString? SelectedOutputType { get; set; }
-    [Selector("progressValue", "setProgressValue:")] public CGFloat ProgressValue { get; set; }
-    [Selector("output", "setOutput:")] public AnyObject? Output { get; set; }
-    [Selector("isStopped")] public bool Stopped { get; }
-    [Selector("initWithDefinition:fromArchive:")] public Self? InitWithDefinitionFromArchive(NSDictionary? dict, bool archived);
-    [Selector("initWithContentsOfURL:error:")] public Self? InitWithContentsOfURLError(NSURL fileURL, out NSError? outError);
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("ignoresInput")]
+    public bool IgnoresInput { get; }
+    [Selector("selectedInputType", "setSelectedInputType:")]
+    public NSString? SelectedInputType { get; set; }
+    [Selector("selectedOutputType", "setSelectedOutputType:")]
+    public NSString? SelectedOutputType { get; set; }
+    [Selector("progressValue", "setProgressValue:")]
+    public CGFloat ProgressValue { get; set; }
+    [Selector("output", "setOutput:")]
+    public AnyObject? Output { get; set; }
+    [Selector("isStopped")]
+    public bool Stopped { get; }
+    [Selector("initWithDefinition:fromArchive:")]
+    public Self? InitWithDefinitionFromArchive(NSDictionary? dict, bool archived);
+    [Selector("initWithContentsOfURL:error:")]
+    public Self? InitWithContentsOfURLError(NSURL fileURL, out NSError? outError);
     /// Deprecated in macOS 10.4.
-    [Selector("runWithInput:fromAction:error:")] public AnyObject? RunWithInputFromActionError(AnyObject? input, AMAction? anAction, out NSDictionary? errorInfo);
-    [Selector("runWithInput:error:")] public AnyObject? RunWithInputError(AnyObject? input, out NSError? error);
-    [Selector("runAsynchronouslyWithInput:")] public void RunAsynchronouslyWithInput(AnyObject? input);
-    [Selector("willFinishRunning")] public void WillFinishRunning();
+    [Selector("runWithInput:fromAction:error:")]
+    public AnyObject? RunWithInputFromActionError(AnyObject? input, AMAction? anAction, out NSDictionary? errorInfo);
+    [Selector("runWithInput:error:")]
+    public AnyObject? RunWithInputError(AnyObject? input, out NSError? error);
+    [Selector("runAsynchronouslyWithInput:")]
+    public void RunAsynchronouslyWithInput(AnyObject? input);
+    [Selector("willFinishRunning")]
+    public void WillFinishRunning();
     /// Deprecated in macOS 10.5.
-    [Selector("didFinishRunningWithError:")] public void DidFinishRunningWithError(NSDictionary? errorInfo);
-    [Selector("finishRunningWithError:")] public void FinishRunningWithError(NSError? error);
-    [Selector("stop")] public void Stop();
-    [Selector("reset")] public void Reset();
-    [Selector("writeToDictionary:")] public void WriteToDictionary(NSMutableDictionary dictionary);
-    [Selector("opened")] public void Opened();
-    [Selector("activated")] public void Activated();
-    [Selector("closed")] public void Closed();
-    [Selector("updateParameters")] public void UpdateParameters();
-    [Selector("parametersUpdated")] public void ParametersUpdated();
-    [Selector("logMessageWithLevel:format:")] public void LogMessageWithLevelFormat(AMLogLevel level, NSString format, ...);
+    [Selector("didFinishRunningWithError:")]
+    public void DidFinishRunningWithError(NSDictionary? errorInfo);
+    [Selector("finishRunningWithError:")]
+    public void FinishRunningWithError(NSError? error);
+    [Selector("stop")]
+    public void Stop();
+    [Selector("reset")]
+    public void Reset();
+    [Selector("writeToDictionary:")]
+    public void WriteToDictionary(NSMutableDictionary dictionary);
+    [Selector("opened")]
+    public void Opened();
+    [Selector("activated")]
+    public void Activated();
+    [Selector("closed")]
+    public void Closed();
+    [Selector("updateParameters")]
+    public void UpdateParameters();
+    [Selector("parametersUpdated")]
+    public void ParametersUpdated();
+    [Selector("logMessageWithLevel:format:")]
+    public void LogMessageWithLevelFormat(AMLogLevel level, NSString format, ...);
 }
 
 #endif

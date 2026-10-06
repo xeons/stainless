@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class INAirline : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("iataCode")] public NSString? IataCode { get; }
-    [Selector("icaoCode")] public NSString? IcaoCode { get; }
-    [Selector("initWithName:iataCode:icaoCode:")] public Self InitWithNameIataCodeIcaoCode(NSString? name, NSString? iataCode, NSString? icaoCode);
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("iataCode")]
+    public NSString? IataCode { get; }
+    [Selector("icaoCode")]
+    public NSString? IcaoCode { get; }
+    [Selector("initWithName:iataCode:icaoCode:")]
+    public Self InitWithNameIataCodeIcaoCode(NSString? name, NSString? iataCode, NSString? icaoCode);
 }
 
 #endif

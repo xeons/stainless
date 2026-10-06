@@ -48,11 +48,15 @@ public enum WKWebpagePreferencesUpgradeToHTTPSPolicy : long
 
 public extern objc class WKWebpagePreferences : NSObject
 {
-    [Selector("preferredContentMode", "setPreferredContentMode:")] public WKContentMode PreferredContentMode { get; set; }
-    [Selector("allowsContentJavaScript", "setAllowsContentJavaScript:")] public bool AllowsContentJavaScript { get; set; }
-    [Selector("isLockdownModeEnabled", "setLockdownModeEnabled:")] public bool LockdownModeEnabled { get; set; }
+    [Selector("preferredContentMode", "setPreferredContentMode:")]
+    public WKContentMode PreferredContentMode { get; set; }
+    [Selector("allowsContentJavaScript", "setAllowsContentJavaScript:")]
+    public bool AllowsContentJavaScript { get; set; }
+    [Selector("isLockdownModeEnabled", "setLockdownModeEnabled:")]
+    public bool LockdownModeEnabled { get; set; }
     /// macOS 15.2 and later.
-    [Selector("preferredHTTPSNavigationPolicy", "setPreferredHTTPSNavigationPolicy:")] public WKWebpagePreferencesUpgradeToHTTPSPolicy PreferredHTTPSNavigationPolicy { get; set; }
+    [Selector("preferredHTTPSNavigationPolicy", "setPreferredHTTPSNavigationPolicy:")]
+    public WKWebpagePreferencesUpgradeToHTTPSPolicy PreferredHTTPSNavigationPolicy { get; set; }
 }
 
 #endif

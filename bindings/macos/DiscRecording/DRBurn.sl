@@ -33,27 +33,43 @@ import Standard.ObjC;
 
 public extern objc class DRBurn : NSObject
 {
-    [Selector("burnForDevice:")] public static DRBurn? BurnForDevice(DRDevice? device);
-    [Selector("initWithDevice:")] public AnyObject? InitWithDevice(DRDevice? device);
-    [Selector("writeLayout:")] public void WriteLayout(AnyObject? layout);
-    [Selector("status")] public NSDictionary? Status();
-    [Selector("abort")] public void Abort();
-    [Selector("properties")] public NSDictionary? Properties();
-    [Selector("setProperties:")] public void SetProperties(NSDictionary? properties);
-    [Selector("device")] public DRDevice? Device();
+    [Selector("burnForDevice:")]
+    public static DRBurn? BurnForDevice(DRDevice? device);
+    [Selector("initWithDevice:")]
+    public AnyObject? InitWithDevice(DRDevice? device);
+    [Selector("writeLayout:")]
+    public void WriteLayout(AnyObject? layout);
+    [Selector("status")]
+    public NSDictionary? Status();
+    [Selector("abort")]
+    public void Abort();
+    [Selector("properties")]
+    public NSDictionary? Properties();
+    [Selector("setProperties:")]
+    public void SetProperties(NSDictionary? properties);
+    [Selector("device")]
+    public DRDevice? Device();
 }
 
 /// PropertyConvenienceMethods, a category of DRBurn.
 public extern objc class DRBurn
 {
-    [Selector("requestedBurnSpeed")] public float RequestedBurnSpeed();
-    [Selector("setRequestedBurnSpeed:")] public void SetRequestedBurnSpeed(float speed);
-    [Selector("appendable")] public bool Appendable();
-    [Selector("setAppendable:")] public void SetAppendable(bool appendable);
-    [Selector("verifyDisc")] public bool VerifyDisc();
-    [Selector("setVerifyDisc:")] public void SetVerifyDisc(bool verify);
-    [Selector("completionAction")] public NSString? CompletionAction();
-    [Selector("setCompletionAction:")] public void SetCompletionAction(NSString? action);
+    [Selector("requestedBurnSpeed")]
+    public float RequestedBurnSpeed();
+    [Selector("setRequestedBurnSpeed:")]
+    public void SetRequestedBurnSpeed(float speed);
+    [Selector("appendable")]
+    public bool Appendable();
+    [Selector("setAppendable:")]
+    public void SetAppendable(bool appendable);
+    [Selector("verifyDisc")]
+    public bool VerifyDisc();
+    [Selector("setVerifyDisc:")]
+    public void SetVerifyDisc(bool verify);
+    [Selector("completionAction")]
+    public NSString? CompletionAction();
+    [Selector("setCompletionAction:")]
+    public void SetCompletionAction(NSString? action);
 }
 
 public extern "C" NSString? DRBurnRequestedSpeedKey;

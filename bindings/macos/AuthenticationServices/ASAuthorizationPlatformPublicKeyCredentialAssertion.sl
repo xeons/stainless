@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationPlatformPublicKeyCredentialAssertion : NSObject, ASAuthorizationPublicKeyCredentialAssertion
 {
-    [Selector("attachment")] public ASAuthorizationPublicKeyCredentialAttachment Attachment { get; }
-    [Selector("largeBlob")] public ASAuthorizationPublicKeyCredentialLargeBlobAssertionOutput? LargeBlob { get; }
-    [Selector("prf")] public ASAuthorizationPublicKeyCredentialPRFAssertionOutput? Prf { get; }
+    [Selector("attachment")]
+    public ASAuthorizationPublicKeyCredentialAttachment Attachment { get; }
+    [Selector("largeBlob")]
+    public ASAuthorizationPublicKeyCredentialLargeBlobAssertionOutput? LargeBlob { get; }
+    [Selector("prf")]
+    public ASAuthorizationPublicKeyCredentialPRFAssertionOutput? Prf { get; }
 }
 
 #endif

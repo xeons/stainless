@@ -50,19 +50,32 @@ public objc closure void CNContactStoreEnumerateContactsWithFetchRequestErrorUsi
 
 public extern objc class CNContactStore : NSObject
 {
-    [Selector("currentHistoryToken")] public NSData? CurrentHistoryToken { get; }
-    [Selector("authorizationStatusForEntityType:")] public static CNAuthorizationStatus AuthorizationStatusForEntityType(CNEntityType entityType);
-    [Selector("requestAccessForEntityType:completionHandler:")] public void RequestAccessForEntityTypeCompletionHandler(CNEntityType entityType, CNContactStoreRequestAccessForEntityTypeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("unifiedContactsMatchingPredicate:keysToFetch:error:")] public NSArray? UnifiedContactsMatchingPredicateKeysToFetchError(NSPredicate predicate, NSArray keys, out NSError? error);
-    [Selector("unifiedContactWithIdentifier:keysToFetch:error:")] public CNContact? UnifiedContactWithIdentifierKeysToFetchError(NSString identifier, NSArray keys, out NSError? error);
-    [Selector("unifiedMeContactWithKeysToFetch:error:")] public CNContact? UnifiedMeContactWithKeysToFetchError(NSArray keys, out NSError? error);
-    [Selector("enumeratorForContactFetchRequest:error:")] public CNFetchResult? EnumeratorForContactFetchRequestError(CNContactFetchRequest request, out NSError? error);
-    [Selector("enumeratorForChangeHistoryFetchRequest:error:")] public CNFetchResult? EnumeratorForChangeHistoryFetchRequestError(CNChangeHistoryFetchRequest request, out NSError? error);
-    [Selector("enumerateContactsWithFetchRequest:error:usingBlock:")] public bool EnumerateContactsWithFetchRequestErrorUsingBlock(CNContactFetchRequest fetchRequest, out NSError? error, CNContactStoreEnumerateContactsWithFetchRequestErrorUsingBlockBlock block);
-    [Selector("groupsMatchingPredicate:error:")] public NSArray? GroupsMatchingPredicateError(NSPredicate? predicate, out NSError? error);
-    [Selector("containersMatchingPredicate:error:")] public NSArray? ContainersMatchingPredicateError(NSPredicate? predicate, out NSError? error);
-    [Selector("executeSaveRequest:error:")] public bool ExecuteSaveRequestError(CNSaveRequest saveRequest, out NSError? error);
-    [Selector("defaultContainerIdentifier")] public NSString? DefaultContainerIdentifier();
+    [Selector("currentHistoryToken")]
+    public NSData? CurrentHistoryToken { get; }
+    [Selector("authorizationStatusForEntityType:")]
+    public static CNAuthorizationStatus AuthorizationStatusForEntityType(CNEntityType entityType);
+    [Selector("requestAccessForEntityType:completionHandler:")]
+    public void RequestAccessForEntityTypeCompletionHandler(CNEntityType entityType, CNContactStoreRequestAccessForEntityTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("unifiedContactsMatchingPredicate:keysToFetch:error:")]
+    public NSArray? UnifiedContactsMatchingPredicateKeysToFetchError(NSPredicate predicate, NSArray keys, out NSError? error);
+    [Selector("unifiedContactWithIdentifier:keysToFetch:error:")]
+    public CNContact? UnifiedContactWithIdentifierKeysToFetchError(NSString identifier, NSArray keys, out NSError? error);
+    [Selector("unifiedMeContactWithKeysToFetch:error:")]
+    public CNContact? UnifiedMeContactWithKeysToFetchError(NSArray keys, out NSError? error);
+    [Selector("enumeratorForContactFetchRequest:error:")]
+    public CNFetchResult? EnumeratorForContactFetchRequestError(CNContactFetchRequest request, out NSError? error);
+    [Selector("enumeratorForChangeHistoryFetchRequest:error:")]
+    public CNFetchResult? EnumeratorForChangeHistoryFetchRequestError(CNChangeHistoryFetchRequest request, out NSError? error);
+    [Selector("enumerateContactsWithFetchRequest:error:usingBlock:")]
+    public bool EnumerateContactsWithFetchRequestErrorUsingBlock(CNContactFetchRequest fetchRequest, out NSError? error, CNContactStoreEnumerateContactsWithFetchRequestErrorUsingBlockBlock block);
+    [Selector("groupsMatchingPredicate:error:")]
+    public NSArray? GroupsMatchingPredicateError(NSPredicate? predicate, out NSError? error);
+    [Selector("containersMatchingPredicate:error:")]
+    public NSArray? ContainersMatchingPredicateError(NSPredicate? predicate, out NSError? error);
+    [Selector("executeSaveRequest:error:")]
+    public bool ExecuteSaveRequestError(CNSaveRequest saveRequest, out NSError? error);
+    [Selector("defaultContainerIdentifier")]
+    public NSString? DefaultContainerIdentifier();
 }
 
 public extern "C" NSString? CNContactStoreDidChangeNotification;

@@ -40,13 +40,20 @@ public enum VNGeneratePersonSegmentationRequestQualityLevel : ulong
 
 public extern objc class VNGeneratePersonSegmentationRequest : VNStatefulRequest
 {
-    [Selector("qualityLevel", "setQualityLevel:")] public VNGeneratePersonSegmentationRequestQualityLevel QualityLevel { get; set; }
-    [Selector("outputPixelFormat", "setOutputPixelFormat:")] public OSType OutputPixelFormat { get; set; }
-    [Selector("results")] public NSArray? Results { get; }
-    [Selector("new")] public static Self New();
-    [Selector("init")] public Self Init();
-    [Selector("initWithCompletionHandler:")] public Self InitWithCompletionHandler(VNRequestCompletionHandler? completionHandler);
-    [Selector("supportedOutputPixelFormatsAndReturnError:")] public NSArray? SupportedOutputPixelFormatsAndReturnError(out NSError? error);
+    [Selector("qualityLevel", "setQualityLevel:")]
+    public VNGeneratePersonSegmentationRequestQualityLevel QualityLevel { get; set; }
+    [Selector("outputPixelFormat", "setOutputPixelFormat:")]
+    public OSType OutputPixelFormat { get; set; }
+    [Selector("results")]
+    public NSArray? Results { get; }
+    [Selector("new")]
+    public static Self New();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCompletionHandler:")]
+    public Self InitWithCompletionHandler(VNRequestCompletionHandler? completionHandler);
+    [Selector("supportedOutputPixelFormatsAndReturnError:")]
+    public NSArray? SupportedOutputPixelFormatsAndReturnError(out NSError? error);
 }
 
 #endif

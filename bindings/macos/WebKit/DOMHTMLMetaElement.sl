@@ -33,10 +33,14 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLMetaElement : DOMHTMLElement
 {
-    [Selector("content", "setContent:")] public NSString? Content { get; set; }
-    [Selector("httpEquiv", "setHttpEquiv:")] public NSString? HttpEquiv { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("scheme", "setScheme:")] public NSString? Scheme { get; set; }
+    [Selector("content", "setContent:")]
+    public NSString? Content { get; set; }
+    [Selector("httpEquiv", "setHttpEquiv:")]
+    public NSString? HttpEquiv { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("scheme", "setScheme:")]
+    public NSString? Scheme { get; set; }
 }
 
 #endif

@@ -51,25 +51,39 @@ public enum IKImageBrowserDropOperation : int
 /// IKImageBrowserDataSource, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("numberOfItemsInImageBrowser:")] public NSUInteger NumberOfItemsInImageBrowser(IKImageBrowserView? aBrowser);
-    [Selector("imageBrowser:itemAtIndex:")] public AnyObject? ImageBrowserItemAtIndex(IKImageBrowserView? aBrowser, NSUInteger index);
-    [Selector("imageBrowser:removeItemsAtIndexes:")] public void ImageBrowserRemoveItemsAtIndexes(IKImageBrowserView? aBrowser, NSIndexSet? indexes);
-    [Selector("imageBrowser:moveItemsAtIndexes:toIndex:")] public bool ImageBrowserMoveItemsAtIndexesToIndex(IKImageBrowserView? aBrowser, NSIndexSet? indexes, NSUInteger destinationIndex);
-    [Selector("imageBrowser:writeItemsAtIndexes:toPasteboard:")] public NSUInteger ImageBrowserWriteItemsAtIndexesToPasteboard(IKImageBrowserView? aBrowser, NSIndexSet? itemIndexes, NSPasteboard? pasteboard);
-    [Selector("numberOfGroupsInImageBrowser:")] public NSUInteger NumberOfGroupsInImageBrowser(IKImageBrowserView? aBrowser);
-    [Selector("imageBrowser:groupAtIndex:")] public NSDictionary? ImageBrowserGroupAtIndex(IKImageBrowserView? aBrowser, NSUInteger index);
+    [Selector("numberOfItemsInImageBrowser:")]
+    public NSUInteger NumberOfItemsInImageBrowser(IKImageBrowserView? aBrowser);
+    [Selector("imageBrowser:itemAtIndex:")]
+    public AnyObject? ImageBrowserItemAtIndex(IKImageBrowserView? aBrowser, NSUInteger index);
+    [Selector("imageBrowser:removeItemsAtIndexes:")]
+    public void ImageBrowserRemoveItemsAtIndexes(IKImageBrowserView? aBrowser, NSIndexSet? indexes);
+    [Selector("imageBrowser:moveItemsAtIndexes:toIndex:")]
+    public bool ImageBrowserMoveItemsAtIndexesToIndex(IKImageBrowserView? aBrowser, NSIndexSet? indexes, NSUInteger destinationIndex);
+    [Selector("imageBrowser:writeItemsAtIndexes:toPasteboard:")]
+    public NSUInteger ImageBrowserWriteItemsAtIndexesToPasteboard(IKImageBrowserView? aBrowser, NSIndexSet? itemIndexes, NSPasteboard? pasteboard);
+    [Selector("numberOfGroupsInImageBrowser:")]
+    public NSUInteger NumberOfGroupsInImageBrowser(IKImageBrowserView? aBrowser);
+    [Selector("imageBrowser:groupAtIndex:")]
+    public NSDictionary? ImageBrowserGroupAtIndex(IKImageBrowserView? aBrowser, NSUInteger index);
 }
 
 /// IKImageBrowserItem, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("isSelectable")] public bool Selectable { get; }
-    [Selector("imageUID")] public NSString? ImageUID();
-    [Selector("imageRepresentationType")] public NSString? ImageRepresentationType();
-    [Selector("imageRepresentation")] public AnyObject? ImageRepresentation();
-    [Selector("imageVersion")] public NSUInteger ImageVersion();
-    [Selector("imageTitle")] public NSString? ImageTitle();
-    [Selector("imageSubtitle")] public NSString? ImageSubtitle();
+    [Selector("isSelectable")]
+    public bool Selectable { get; }
+    [Selector("imageUID")]
+    public NSString? ImageUID();
+    [Selector("imageRepresentationType")]
+    public NSString? ImageRepresentationType();
+    [Selector("imageRepresentation")]
+    public AnyObject? ImageRepresentation();
+    [Selector("imageVersion")]
+    public NSUInteger ImageVersion();
+    [Selector("imageTitle")]
+    public NSString? ImageTitle();
+    [Selector("imageSubtitle")]
+    public NSString? ImageSubtitle();
 }
 
 /// Deprecated in macOS 10.14.
@@ -78,89 +92,147 @@ public extern objc class IKImageBrowserView : NSView, NSDraggingSource { }
 /// IKMainMethods, a category of IKImageBrowserView.
 public extern objc class IKImageBrowserView
 {
-    [Selector("dataSource", "setDataSource:")] public AnyObject? DataSource { get; set; }
-    [Selector("delegate", "setDelegate:")] public AnyObject? Delegate { get; set; }
-    [Selector("initWithFrame:")] public AnyObject? InitWithFrame(NSRect frame);
-    [Selector("reloadData")] public void ReloadData();
+    [Selector("dataSource", "setDataSource:")]
+    public AnyObject? DataSource { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public AnyObject? Delegate { get; set; }
+    [Selector("initWithFrame:")]
+    public AnyObject? InitWithFrame(NSRect frame);
+    [Selector("reloadData")]
+    public void ReloadData();
 }
 
 /// IKAppearance, a category of IKImageBrowserView.
 public extern objc class IKImageBrowserView
 {
-    [Selector("setCellsStyleMask:")] public void SetCellsStyleMask(NSUInteger mask);
-    [Selector("cellsStyleMask")] public NSUInteger CellsStyleMask();
-    [Selector("setConstrainsToOriginalSize:")] public void SetConstrainsToOriginalSize(bool flag);
-    [Selector("constrainsToOriginalSize")] public bool ConstrainsToOriginalSize();
-    [Selector("setBackgroundLayer:")] public void SetBackgroundLayer(CALayer? aLayer);
-    [Selector("backgroundLayer")] public CALayer? BackgroundLayer();
-    [Selector("setForegroundLayer:")] public void SetForegroundLayer(CALayer? aLayer);
-    [Selector("foregroundLayer")] public CALayer? ForegroundLayer();
-    [Selector("newCellForRepresentedItem:")] public IKImageBrowserCell? NewCellForRepresentedItem(AnyObject? anItem);
-    [Selector("cellForItemAtIndex:")] public IKImageBrowserCell? CellForItemAtIndex(NSUInteger index);
+    [Selector("setCellsStyleMask:")]
+    public void SetCellsStyleMask(NSUInteger mask);
+    [Selector("cellsStyleMask")]
+    public NSUInteger CellsStyleMask();
+    [Selector("setConstrainsToOriginalSize:")]
+    public void SetConstrainsToOriginalSize(bool flag);
+    [Selector("constrainsToOriginalSize")]
+    public bool ConstrainsToOriginalSize();
+    [Selector("setBackgroundLayer:")]
+    public void SetBackgroundLayer(CALayer? aLayer);
+    [Selector("backgroundLayer")]
+    public CALayer? BackgroundLayer();
+    [Selector("setForegroundLayer:")]
+    public void SetForegroundLayer(CALayer? aLayer);
+    [Selector("foregroundLayer")]
+    public CALayer? ForegroundLayer();
+    [Selector("newCellForRepresentedItem:")]
+    public IKImageBrowserCell? NewCellForRepresentedItem(AnyObject? anItem);
+    [Selector("cellForItemAtIndex:")]
+    public IKImageBrowserCell? CellForItemAtIndex(NSUInteger index);
 }
 
 /// IKBrowsing, a category of IKImageBrowserView.
 public extern objc class IKImageBrowserView
 {
-    [Selector("setZoomValue:")] public void SetZoomValue(float aValue);
-    [Selector("zoomValue")] public float ZoomValue();
-    [Selector("setContentResizingMask:")] public void SetContentResizingMask(NSUInteger mask);
-    [Selector("contentResizingMask")] public NSUInteger ContentResizingMask();
-    [Selector("scrollIndexToVisible:")] public void ScrollIndexToVisible(NSInteger index);
-    [Selector("setCellSize:")] public void SetCellSize(NSSize size);
-    [Selector("cellSize")] public NSSize CellSize();
-    [Selector("intercellSpacing")] public NSSize IntercellSpacing();
-    [Selector("setIntercellSpacing:")] public void SetIntercellSpacing(NSSize aSize);
-    [Selector("indexOfItemAtPoint:")] public NSInteger IndexOfItemAtPoint(NSPoint point);
-    [Selector("itemFrameAtIndex:")] public NSRect ItemFrameAtIndex(NSInteger index);
-    [Selector("visibleItemIndexes")] public NSIndexSet? VisibleItemIndexes();
-    [Selector("rowIndexesInRect:")] public NSIndexSet? RowIndexesInRect(NSRect rect);
-    [Selector("columnIndexesInRect:")] public NSIndexSet? ColumnIndexesInRect(NSRect rect);
-    [Selector("rectOfColumn:")] public NSRect RectOfColumn(NSUInteger columnIndex);
-    [Selector("rectOfRow:")] public NSRect RectOfRow(NSUInteger rowIndex);
-    [Selector("numberOfRows")] public NSUInteger NumberOfRows();
-    [Selector("numberOfColumns")] public NSUInteger NumberOfColumns();
-    [Selector("setCanControlQuickLookPanel:")] public void SetCanControlQuickLookPanel(bool flag);
-    [Selector("canControlQuickLookPanel")] public bool CanControlQuickLookPanel();
+    [Selector("setZoomValue:")]
+    public void SetZoomValue(float aValue);
+    [Selector("zoomValue")]
+    public float ZoomValue();
+    [Selector("setContentResizingMask:")]
+    public void SetContentResizingMask(NSUInteger mask);
+    [Selector("contentResizingMask")]
+    public NSUInteger ContentResizingMask();
+    [Selector("scrollIndexToVisible:")]
+    public void ScrollIndexToVisible(NSInteger index);
+    [Selector("setCellSize:")]
+    public void SetCellSize(NSSize size);
+    [Selector("cellSize")]
+    public NSSize CellSize();
+    [Selector("intercellSpacing")]
+    public NSSize IntercellSpacing();
+    [Selector("setIntercellSpacing:")]
+    public void SetIntercellSpacing(NSSize aSize);
+    [Selector("indexOfItemAtPoint:")]
+    public NSInteger IndexOfItemAtPoint(NSPoint point);
+    [Selector("itemFrameAtIndex:")]
+    public NSRect ItemFrameAtIndex(NSInteger index);
+    [Selector("visibleItemIndexes")]
+    public NSIndexSet? VisibleItemIndexes();
+    [Selector("rowIndexesInRect:")]
+    public NSIndexSet? RowIndexesInRect(NSRect rect);
+    [Selector("columnIndexesInRect:")]
+    public NSIndexSet? ColumnIndexesInRect(NSRect rect);
+    [Selector("rectOfColumn:")]
+    public NSRect RectOfColumn(NSUInteger columnIndex);
+    [Selector("rectOfRow:")]
+    public NSRect RectOfRow(NSUInteger rowIndex);
+    [Selector("numberOfRows")]
+    public NSUInteger NumberOfRows();
+    [Selector("numberOfColumns")]
+    public NSUInteger NumberOfColumns();
+    [Selector("setCanControlQuickLookPanel:")]
+    public void SetCanControlQuickLookPanel(bool flag);
+    [Selector("canControlQuickLookPanel")]
+    public bool CanControlQuickLookPanel();
 }
 
 /// IKSelectionReorderingAndGrouping, a category of IKImageBrowserView.
 public extern objc class IKImageBrowserView
 {
-    [Selector("selectionIndexes")] public NSIndexSet? SelectionIndexes();
-    [Selector("setSelectionIndexes:byExtendingSelection:")] public void SetSelectionIndexesByExtendingSelection(NSIndexSet? indexes, bool extendSelection);
-    [Selector("setAllowsMultipleSelection:")] public void SetAllowsMultipleSelection(bool flag);
-    [Selector("allowsMultipleSelection")] public bool AllowsMultipleSelection();
-    [Selector("setAllowsEmptySelection:")] public void SetAllowsEmptySelection(bool flag);
-    [Selector("allowsEmptySelection")] public bool AllowsEmptySelection();
-    [Selector("setAllowsReordering:")] public void SetAllowsReordering(bool flag);
-    [Selector("allowsReordering")] public bool AllowsReordering();
-    [Selector("setAnimates:")] public void SetAnimates(bool flag);
-    [Selector("animates")] public bool Animates();
-    [Selector("expandGroupAtIndex:")] public void ExpandGroupAtIndex(NSUInteger index);
-    [Selector("collapseGroupAtIndex:")] public void CollapseGroupAtIndex(NSUInteger index);
-    [Selector("isGroupExpandedAtIndex:")] public bool IsGroupExpandedAtIndex(NSUInteger index);
+    [Selector("selectionIndexes")]
+    public NSIndexSet? SelectionIndexes();
+    [Selector("setSelectionIndexes:byExtendingSelection:")]
+    public void SetSelectionIndexesByExtendingSelection(NSIndexSet? indexes, bool extendSelection);
+    [Selector("setAllowsMultipleSelection:")]
+    public void SetAllowsMultipleSelection(bool flag);
+    [Selector("allowsMultipleSelection")]
+    public bool AllowsMultipleSelection();
+    [Selector("setAllowsEmptySelection:")]
+    public void SetAllowsEmptySelection(bool flag);
+    [Selector("allowsEmptySelection")]
+    public bool AllowsEmptySelection();
+    [Selector("setAllowsReordering:")]
+    public void SetAllowsReordering(bool flag);
+    [Selector("allowsReordering")]
+    public bool AllowsReordering();
+    [Selector("setAnimates:")]
+    public void SetAnimates(bool flag);
+    [Selector("animates")]
+    public bool Animates();
+    [Selector("expandGroupAtIndex:")]
+    public void ExpandGroupAtIndex(NSUInteger index);
+    [Selector("collapseGroupAtIndex:")]
+    public void CollapseGroupAtIndex(NSUInteger index);
+    [Selector("isGroupExpandedAtIndex:")]
+    public bool IsGroupExpandedAtIndex(NSUInteger index);
 }
 
 /// IKDragNDrop, a category of IKImageBrowserView.
 public extern objc class IKImageBrowserView
 {
-    [Selector("setDraggingDestinationDelegate:")] public void SetDraggingDestinationDelegate(AnyObject? @delegate);
-    [Selector("draggingDestinationDelegate")] public AnyObject? DraggingDestinationDelegate();
-    [Selector("indexAtLocationOfDroppedItem")] public NSUInteger IndexAtLocationOfDroppedItem();
-    [Selector("dropOperation")] public IKImageBrowserDropOperation DropOperation();
-    [Selector("setAllowsDroppingOnItems:")] public void SetAllowsDroppingOnItems(bool flag);
-    [Selector("allowsDroppingOnItems")] public bool AllowsDroppingOnItems();
-    [Selector("setDropIndex:dropOperation:")] public void SetDropIndexDropOperation(NSInteger index, IKImageBrowserDropOperation operation);
+    [Selector("setDraggingDestinationDelegate:")]
+    public void SetDraggingDestinationDelegate(AnyObject? @delegate);
+    [Selector("draggingDestinationDelegate")]
+    public AnyObject? DraggingDestinationDelegate();
+    [Selector("indexAtLocationOfDroppedItem")]
+    public NSUInteger IndexAtLocationOfDroppedItem();
+    [Selector("dropOperation")]
+    public IKImageBrowserDropOperation DropOperation();
+    [Selector("setAllowsDroppingOnItems:")]
+    public void SetAllowsDroppingOnItems(bool flag);
+    [Selector("allowsDroppingOnItems")]
+    public bool AllowsDroppingOnItems();
+    [Selector("setDropIndex:dropOperation:")]
+    public void SetDropIndexDropOperation(NSInteger index, IKImageBrowserDropOperation operation);
 }
 
 /// IKImageBrowserDelegate, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("imageBrowserSelectionDidChange:")] public void ImageBrowserSelectionDidChange(IKImageBrowserView? aBrowser);
-    [Selector("imageBrowser:cellWasDoubleClickedAtIndex:")] public void ImageBrowserCellWasDoubleClickedAtIndex(IKImageBrowserView? aBrowser, NSUInteger index);
-    [Selector("imageBrowser:cellWasRightClickedAtIndex:withEvent:")] public void ImageBrowserCellWasRightClickedAtIndexWithEvent(IKImageBrowserView? aBrowser, NSUInteger index, NSEvent? event);
-    [Selector("imageBrowser:backgroundWasRightClickedWithEvent:")] public void ImageBrowserBackgroundWasRightClickedWithEvent(IKImageBrowserView? aBrowser, NSEvent? event);
+    [Selector("imageBrowserSelectionDidChange:")]
+    public void ImageBrowserSelectionDidChange(IKImageBrowserView? aBrowser);
+    [Selector("imageBrowser:cellWasDoubleClickedAtIndex:")]
+    public void ImageBrowserCellWasDoubleClickedAtIndex(IKImageBrowserView? aBrowser, NSUInteger index);
+    [Selector("imageBrowser:cellWasRightClickedAtIndex:withEvent:")]
+    public void ImageBrowserCellWasRightClickedAtIndexWithEvent(IKImageBrowserView? aBrowser, NSUInteger index, NSEvent? event);
+    [Selector("imageBrowser:backgroundWasRightClickedWithEvent:")]
+    public void ImageBrowserBackgroundWasRightClickedWithEvent(IKImageBrowserView? aBrowser, NSEvent? event);
 }
 
 public extern "C" NSString? IKImageBrowserPathRepresentationType;

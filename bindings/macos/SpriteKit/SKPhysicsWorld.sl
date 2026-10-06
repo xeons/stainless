@@ -34,8 +34,12 @@ import Standard.ObjC;
 
 public objc interface SKPhysicsContactDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("didBeginContact:")] void DidBeginContact(SKPhysicsContact contact);
-    [Optional] [Selector("didEndContact:")] void DidEndContact(SKPhysicsContact contact);
+    [Optional]
+    [Selector("didBeginContact:")]
+    void DidBeginContact(SKPhysicsContact contact);
+    [Optional]
+    [Selector("didEndContact:")]
+    void DidEndContact(SKPhysicsContact contact);
 }
 
 public objc closure void SKPhysicsWorldEnumerateBodiesAtPointUsingBlockBlock(SKPhysicsBody arg0, bool* arg1);
@@ -46,19 +50,32 @@ public objc closure void SKPhysicsWorldEnumerateBodiesAlongRayStartEndUsingBlock
 
 public extern objc class SKPhysicsWorld : NSObject, NSSecureCoding
 {
-    [Selector("gravity", "setGravity:")] public CGVector Gravity { get; set; }
-    [Selector("speed", "setSpeed:")] public CGFloat Speed { get; set; }
-    [Selector("contactDelegate", "setContactDelegate:")] public SKPhysicsContactDelegate? ContactDelegate { get; set; }
-    [Selector("addJoint:")] public void AddJoint(SKPhysicsJoint joint);
-    [Selector("removeJoint:")] public void RemoveJoint(SKPhysicsJoint joint);
-    [Selector("removeAllJoints")] public void RemoveAllJoints();
-    [Selector("sampleFieldsAt:")] public vector_float3 SampleFieldsAt(vector_float3 position);
-    [Selector("bodyAtPoint:")] public SKPhysicsBody? BodyAtPoint(CGPoint point);
-    [Selector("bodyInRect:")] public SKPhysicsBody? BodyInRect(CGRect rect);
-    [Selector("bodyAlongRayStart:end:")] public SKPhysicsBody? BodyAlongRayStartEnd(CGPoint start, CGPoint end);
-    [Selector("enumerateBodiesAtPoint:usingBlock:")] public void EnumerateBodiesAtPointUsingBlock(CGPoint point, SKPhysicsWorldEnumerateBodiesAtPointUsingBlockBlock block);
-    [Selector("enumerateBodiesInRect:usingBlock:")] public void EnumerateBodiesInRectUsingBlock(CGRect rect, SKPhysicsWorldEnumerateBodiesInRectUsingBlockBlock block);
-    [Selector("enumerateBodiesAlongRayStart:end:usingBlock:")] public void EnumerateBodiesAlongRayStartEndUsingBlock(CGPoint start, CGPoint end, SKPhysicsWorldEnumerateBodiesAlongRayStartEndUsingBlockBlock block);
+    [Selector("gravity", "setGravity:")]
+    public CGVector Gravity { get; set; }
+    [Selector("speed", "setSpeed:")]
+    public CGFloat Speed { get; set; }
+    [Selector("contactDelegate", "setContactDelegate:")]
+    public SKPhysicsContactDelegate? ContactDelegate { get; set; }
+    [Selector("addJoint:")]
+    public void AddJoint(SKPhysicsJoint joint);
+    [Selector("removeJoint:")]
+    public void RemoveJoint(SKPhysicsJoint joint);
+    [Selector("removeAllJoints")]
+    public void RemoveAllJoints();
+    [Selector("sampleFieldsAt:")]
+    public vector_float3 SampleFieldsAt(vector_float3 position);
+    [Selector("bodyAtPoint:")]
+    public SKPhysicsBody? BodyAtPoint(CGPoint point);
+    [Selector("bodyInRect:")]
+    public SKPhysicsBody? BodyInRect(CGRect rect);
+    [Selector("bodyAlongRayStart:end:")]
+    public SKPhysicsBody? BodyAlongRayStartEnd(CGPoint start, CGPoint end);
+    [Selector("enumerateBodiesAtPoint:usingBlock:")]
+    public void EnumerateBodiesAtPointUsingBlock(CGPoint point, SKPhysicsWorldEnumerateBodiesAtPointUsingBlockBlock block);
+    [Selector("enumerateBodiesInRect:usingBlock:")]
+    public void EnumerateBodiesInRectUsingBlock(CGRect rect, SKPhysicsWorldEnumerateBodiesInRectUsingBlockBlock block);
+    [Selector("enumerateBodiesAlongRayStart:end:usingBlock:")]
+    public void EnumerateBodiesAlongRayStartEndUsingBlock(CGPoint start, CGPoint end, SKPhysicsWorldEnumerateBodiesAlongRayStartEndUsingBlockBlock block);
 }
 
 #endif

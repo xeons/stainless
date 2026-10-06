@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class MEOutgoingMessageEncodingStatus : NSObject, NSSecureCoding
 {
-    [Selector("canSign")] public bool CanSign { get; }
-    [Selector("canEncrypt")] public bool CanEncrypt { get; }
-    [Selector("securityError")] public NSError? SecurityError { get; }
-    [Selector("addressesFailingEncryption")] public NSArray AddressesFailingEncryption { get; }
-    [Selector("initWithCanSign:canEncrypt:securityError:addressesFailingEncryption:")] public Self InitWithCanSignCanEncryptSecurityErrorAddressesFailingEncryption(bool canSign, bool canEncrypt, NSError? securityError, NSArray addressesFailingEncryption);
+    [Selector("canSign")]
+    public bool CanSign { get; }
+    [Selector("canEncrypt")]
+    public bool CanEncrypt { get; }
+    [Selector("securityError")]
+    public NSError? SecurityError { get; }
+    [Selector("addressesFailingEncryption")]
+    public NSArray AddressesFailingEncryption { get; }
+    [Selector("initWithCanSign:canEncrypt:securityError:addressesFailingEncryption:")]
+    public Self InitWithCanSignCanEncryptSecurityErrorAddressesFailingEncryption(bool canSign, bool canEncrypt, NSError? securityError, NSArray addressesFailingEncryption);
 }
 
 #endif

@@ -33,10 +33,13 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLLabelElement : DOMHTMLElement
 {
-    [Selector("form")] public DOMHTMLFormElement? Form { get; }
-    [Selector("htmlFor", "setHtmlFor:")] public NSString? HtmlFor { get; set; }
+    [Selector("form")]
+    public DOMHTMLFormElement? Form { get; }
+    [Selector("htmlFor", "setHtmlFor:")]
+    public NSString? HtmlFor { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("accessKey", "setAccessKey:")] public NSString? AccessKey { get; set; }
+    [Selector("accessKey", "setAccessKey:")]
+    public NSString? AccessKey { get; set; }
 }
 
 #endif

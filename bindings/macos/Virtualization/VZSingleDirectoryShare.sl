@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class VZSingleDirectoryShare : VZDirectoryShare
 {
-    [Selector("directory")] public VZSharedDirectory Directory { get; }
-    [Selector("initWithDirectory:")] public Self InitWithDirectory(VZSharedDirectory directory);
+    [Selector("directory")]
+    public VZSharedDirectory Directory { get; }
+    [Selector("initWithDirectory:")]
+    public Self InitWithDirectory(VZSharedDirectory directory);
 }
 
 #endif

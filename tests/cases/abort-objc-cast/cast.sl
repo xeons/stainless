@@ -10,7 +10,8 @@ import Standard.ObjC;
 [ObjCRoot]
 public extern objc class NSObject
 {
-    [Selector("new")] public static Self New();
+    [Selector("new")]
+    public static Self New();
 }
 
 public extern objc class SLOne : NSObject

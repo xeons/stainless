@@ -33,29 +33,47 @@ import Standard.ObjC;
 
 public extern objc class MTRDeviceAttestationInfo : NSObject
 {
-    [Selector("challenge")] public NSData Challenge { get; }
-    [Selector("nonce")] public NSData Nonce { get; }
-    [Selector("elementsTLV")] public MTRTLVBytes ElementsTLV { get; }
-    [Selector("elementsSignature")] public NSData ElementsSignature { get; }
-    [Selector("deviceAttestationCertificate")] public MTRCertificateDERBytes DeviceAttestationCertificate { get; }
-    [Selector("productAttestationIntermediateCertificate")] public MTRCertificateDERBytes ProductAttestationIntermediateCertificate { get; }
-    [Selector("certificationDeclaration")] public NSData CertificationDeclaration { get; }
-    [Selector("firmwareInfo")] public NSData? FirmwareInfo { get; }
-    [Selector("initWithDeviceAttestationChallenge:nonce:elementsTLV:elementsSignature:deviceAttestationCertificate:productAttestationIntermediateCertificate:certificationDeclaration:firmwareInfo:")] public Self InitWithDeviceAttestationChallengeNonceElementsTLVElementsSignatureDeviceAttestationCertificateProductAttestationIntermediateCertificateCertificationDeclarationFirmwareInfo(NSData challenge, NSData nonce, MTRTLVBytes elementsTLV, NSData elementsSignature, MTRCertificateDERBytes deviceAttestationCertificate, MTRCertificateDERBytes processAttestationIntermediateCertificate, NSData certificationDeclaration, NSData firmwareInfo);
+    [Selector("challenge")]
+    public NSData Challenge { get; }
+    [Selector("nonce")]
+    public NSData Nonce { get; }
+    [Selector("elementsTLV")]
+    public MTRTLVBytes ElementsTLV { get; }
+    [Selector("elementsSignature")]
+    public NSData ElementsSignature { get; }
+    [Selector("deviceAttestationCertificate")]
+    public MTRCertificateDERBytes DeviceAttestationCertificate { get; }
+    [Selector("productAttestationIntermediateCertificate")]
+    public MTRCertificateDERBytes ProductAttestationIntermediateCertificate { get; }
+    [Selector("certificationDeclaration")]
+    public NSData CertificationDeclaration { get; }
+    [Selector("firmwareInfo")]
+    public NSData? FirmwareInfo { get; }
+    [Selector("initWithDeviceAttestationChallenge:nonce:elementsTLV:elementsSignature:deviceAttestationCertificate:productAttestationIntermediateCertificate:certificationDeclaration:firmwareInfo:")]
+    public Self InitWithDeviceAttestationChallengeNonceElementsTLVElementsSignatureDeviceAttestationCertificateProductAttestationIntermediateCertificateCertificationDeclarationFirmwareInfo(NSData challenge, NSData nonce, MTRTLVBytes elementsTLV, NSData elementsSignature, MTRCertificateDERBytes deviceAttestationCertificate, MTRCertificateDERBytes processAttestationIntermediateCertificate, NSData certificationDeclaration, NSData firmwareInfo);
 }
 
 /// Deprecated in macOS 13.3.
 public extern objc class AttestationInfo : NSObject
 {
-    [Selector("challenge", "setChallenge:")] public NSData Challenge { get; set; }
-    [Selector("nonce", "setNonce:")] public NSData Nonce { get; set; }
-    [Selector("elements", "setElements:")] public NSData Elements { get; set; }
-    [Selector("elementsSignature", "setElementsSignature:")] public NSData ElementsSignature { get; set; }
-    [Selector("dac", "setDac:")] public NSData Dac { get; set; }
-    [Selector("pai", "setPai:")] public NSData Pai { get; set; }
-    [Selector("certificationDeclaration", "setCertificationDeclaration:")] public NSData CertificationDeclaration { get; set; }
-    [Selector("firmwareInfo", "setFirmwareInfo:")] public NSData FirmwareInfo { get; set; }
-    [Selector("initWithChallenge:nonce:elements:elementsSignature:dac:pai:certificationDeclaration:firmwareInfo:")] public Self InitWithChallengeNonceElementsElementsSignatureDacPaiCertificationDeclarationFirmwareInfo(NSData challenge, NSData nonce, NSData elements, NSData elementsSignature, NSData dac, NSData pai, NSData certificationDeclaration, NSData firmwareInfo);
+    [Selector("challenge", "setChallenge:")]
+    public NSData Challenge { get; set; }
+    [Selector("nonce", "setNonce:")]
+    public NSData Nonce { get; set; }
+    [Selector("elements", "setElements:")]
+    public NSData Elements { get; set; }
+    [Selector("elementsSignature", "setElementsSignature:")]
+    public NSData ElementsSignature { get; set; }
+    [Selector("dac", "setDac:")]
+    public NSData Dac { get; set; }
+    [Selector("pai", "setPai:")]
+    public NSData Pai { get; set; }
+    [Selector("certificationDeclaration", "setCertificationDeclaration:")]
+    public NSData CertificationDeclaration { get; set; }
+    [Selector("firmwareInfo", "setFirmwareInfo:")]
+    public NSData FirmwareInfo { get; set; }
+    [Selector("initWithChallenge:nonce:elements:elementsSignature:dac:pai:certificationDeclaration:firmwareInfo:")]
+    public Self InitWithChallengeNonceElementsElementsSignatureDacPaiCertificationDeclarationFirmwareInfo(NSData challenge, NSData nonce, NSData elements, NSData elementsSignature, NSData dac, NSData pai, NSData certificationDeclaration, NSData firmwareInfo);
 }
 
 #endif

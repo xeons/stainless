@@ -33,29 +33,51 @@ import Standard.ObjC;
 
 public extern objc class MXMetricPayload : NSObject, NSSecureCoding
 {
-    [Selector("latestApplicationVersion")] public NSString LatestApplicationVersion { get; }
-    [Selector("includesMultipleApplicationVersions")] public bool IncludesMultipleApplicationVersions { get; }
-    [Selector("timeStampBegin")] public NSDate TimeStampBegin { get; }
-    [Selector("timeStampEnd")] public NSDate TimeStampEnd { get; }
-    [Selector("cpuMetrics")] public MXCPUMetric? CpuMetrics { get; }
-    [Selector("gpuMetrics")] public MXGPUMetric? GpuMetrics { get; }
-    [Selector("cellularConditionMetrics")] public MXCellularConditionMetric? CellularConditionMetrics { get; }
-    [Selector("applicationTimeMetrics")] public MXAppRunTimeMetric? ApplicationTimeMetrics { get; }
-    [Selector("locationActivityMetrics")] public MXLocationActivityMetric? LocationActivityMetrics { get; }
-    [Selector("networkTransferMetrics")] public MXNetworkTransferMetric? NetworkTransferMetrics { get; }
-    [Selector("applicationLaunchMetrics")] public MXAppLaunchMetric? ApplicationLaunchMetrics { get; }
-    [Selector("applicationResponsivenessMetrics")] public MXAppResponsivenessMetric? ApplicationResponsivenessMetrics { get; }
-    [Selector("diskIOMetrics")] public MXDiskIOMetric? DiskIOMetrics { get; }
-    [Selector("memoryMetrics")] public MXMemoryMetric? MemoryMetrics { get; }
-    [Selector("displayMetrics")] public MXDisplayMetric? DisplayMetrics { get; }
-    [Selector("animationMetrics")] public MXAnimationMetric? AnimationMetrics { get; }
-    [Selector("applicationExitMetrics")] public MXAppExitMetric? ApplicationExitMetrics { get; }
+    [Selector("latestApplicationVersion")]
+    public NSString LatestApplicationVersion { get; }
+    [Selector("includesMultipleApplicationVersions")]
+    public bool IncludesMultipleApplicationVersions { get; }
+    [Selector("timeStampBegin")]
+    public NSDate TimeStampBegin { get; }
+    [Selector("timeStampEnd")]
+    public NSDate TimeStampEnd { get; }
+    [Selector("cpuMetrics")]
+    public MXCPUMetric? CpuMetrics { get; }
+    [Selector("gpuMetrics")]
+    public MXGPUMetric? GpuMetrics { get; }
+    [Selector("cellularConditionMetrics")]
+    public MXCellularConditionMetric? CellularConditionMetrics { get; }
+    [Selector("applicationTimeMetrics")]
+    public MXAppRunTimeMetric? ApplicationTimeMetrics { get; }
+    [Selector("locationActivityMetrics")]
+    public MXLocationActivityMetric? LocationActivityMetrics { get; }
+    [Selector("networkTransferMetrics")]
+    public MXNetworkTransferMetric? NetworkTransferMetrics { get; }
+    [Selector("applicationLaunchMetrics")]
+    public MXAppLaunchMetric? ApplicationLaunchMetrics { get; }
+    [Selector("applicationResponsivenessMetrics")]
+    public MXAppResponsivenessMetric? ApplicationResponsivenessMetrics { get; }
+    [Selector("diskIOMetrics")]
+    public MXDiskIOMetric? DiskIOMetrics { get; }
+    [Selector("memoryMetrics")]
+    public MXMemoryMetric? MemoryMetrics { get; }
+    [Selector("displayMetrics")]
+    public MXDisplayMetric? DisplayMetrics { get; }
+    [Selector("animationMetrics")]
+    public MXAnimationMetric? AnimationMetrics { get; }
+    [Selector("applicationExitMetrics")]
+    public MXAppExitMetric? ApplicationExitMetrics { get; }
     /// macOS 26.0 and later.
-    [Selector("diskSpaceUsageMetrics")] public MXDiskSpaceUsageMetric? DiskSpaceUsageMetrics { get; }
-    [Selector("signpostMetrics")] public NSArray? SignpostMetrics { get; }
-    [Selector("metaData")] public MXMetaData? MetaData { get; }
-    [Selector("JSONRepresentation")] public NSData JSONRepresentation();
-    [Selector("dictionaryRepresentation")] public NSDictionary DictionaryRepresentation();
+    [Selector("diskSpaceUsageMetrics")]
+    public MXDiskSpaceUsageMetric? DiskSpaceUsageMetrics { get; }
+    [Selector("signpostMetrics")]
+    public NSArray? SignpostMetrics { get; }
+    [Selector("metaData")]
+    public MXMetaData? MetaData { get; }
+    [Selector("JSONRepresentation")]
+    public NSData JSONRepresentation();
+    [Selector("dictionaryRepresentation")]
+    public NSDictionary DictionaryRepresentation();
 }
 
 #endif

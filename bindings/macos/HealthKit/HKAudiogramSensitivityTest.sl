@@ -47,12 +47,18 @@ public enum HKAudiogramSensitivityTestSide : long
 /// macOS 15.1 and later.
 public extern objc class HKAudiogramSensitivityTest : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("sensitivity")] public HKQuantity Sensitivity { get; }
-    [Selector("type")] public HKAudiogramConductionType Type { get; }
-    [Selector("masked")] public bool Masked { get; }
-    [Selector("side")] public HKAudiogramSensitivityTestSide Side { get; }
-    [Selector("clampingRange")] public HKAudiogramSensitivityPointClampingRange? ClampingRange { get; }
-    [Selector("initWithSensitivity:type:masked:side:clampingRange:error:")] public Self? InitWithSensitivityTypeMaskedSideClampingRangeError(HKQuantity sensitivity, HKAudiogramConductionType type, bool masked, HKAudiogramSensitivityTestSide side, HKAudiogramSensitivityPointClampingRange? clampingRange, out NSError? errorOut);
+    [Selector("sensitivity")]
+    public HKQuantity Sensitivity { get; }
+    [Selector("type")]
+    public HKAudiogramConductionType Type { get; }
+    [Selector("masked")]
+    public bool Masked { get; }
+    [Selector("side")]
+    public HKAudiogramSensitivityTestSide Side { get; }
+    [Selector("clampingRange")]
+    public HKAudiogramSensitivityPointClampingRange? ClampingRange { get; }
+    [Selector("initWithSensitivity:type:masked:side:clampingRange:error:")]
+    public Self? InitWithSensitivityTypeMaskedSideClampingRangeError(HKQuantity sensitivity, HKAudiogramConductionType type, bool masked, HKAudiogramSensitivityTestSide side, HKAudiogramSensitivityPointClampingRange? clampingRange, out NSError? errorOut);
 }
 
 #endif

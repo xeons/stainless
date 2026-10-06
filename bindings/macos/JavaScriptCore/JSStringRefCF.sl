@@ -32,6 +32,7 @@ import Standard.ObjC;
 
 public extern "C" JSStringRef JSStringCreateWithCFString(CFStringRef? string);
 
-[ReturnsRetained] public extern "C" CFStringRef? JSStringCopyCFString(CFAllocatorRef? alloc, JSStringRef string);
+[ReturnsRetained]
+public extern "C" CFStringRef? JSStringCopyCFString(CFAllocatorRef? alloc, JSStringRef string);
 
 #endif

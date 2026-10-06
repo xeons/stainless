@@ -32,42 +32,68 @@ import Standard.ObjC;
 
 public extern objc class NSWindowController : NSResponder, NSSeguePerforming
 {
-    [Selector("windowNibName")] public NSNibName? WindowNibName { get; }
-    [Selector("windowNibPath")] public NSString? WindowNibPath { get; }
-    [Selector("owner")] public AnyObject? Owner { get; }
-    [Selector("windowFrameAutosaveName", "setWindowFrameAutosaveName:")] public NSWindowFrameAutosaveName WindowFrameAutosaveName { get; set; }
-    [Selector("shouldCascadeWindows", "setShouldCascadeWindows:")] public bool ShouldCascadeWindows { get; set; }
-    [Selector("previewRepresentableActivityItems", "setPreviewRepresentableActivityItems:")] public NSArray? PreviewRepresentableActivityItems { get; set; }
-    [Selector("document", "setDocument:")] public AnyObject? Document { get; set; }
-    [Selector("shouldCloseDocument", "setShouldCloseDocument:")] public bool ShouldCloseDocument { get; set; }
-    [Selector("contentViewController", "setContentViewController:")] public NSViewController? ContentViewController { get; set; }
-    [Selector("window", "setWindow:")] public NSWindow? Window { get; set; }
-    [Selector("isWindowLoaded")] public bool WindowLoaded { get; }
-    [Selector("initWithWindow:")] public Self InitWithWindow(NSWindow? window);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("initWithWindowNibName:")] public Self InitWithWindowNibName(NSNibName windowNibName);
-    [Selector("initWithWindowNibName:owner:")] public Self InitWithWindowNibNameOwner(NSNibName windowNibName, AnyObject owner);
-    [Selector("initWithWindowNibPath:owner:")] public Self InitWithWindowNibPathOwner(NSString windowNibPath, AnyObject owner);
-    [Selector("setDocumentEdited:")] public void SetDocumentEdited(bool dirtyFlag);
-    [Selector("synchronizeWindowTitleWithDocumentName")] public void SynchronizeWindowTitleWithDocumentName();
-    [Selector("windowTitleForDocumentDisplayName:")] public NSString WindowTitleForDocumentDisplayName(NSString displayName);
-    [Selector("windowWillLoad")] public void WindowWillLoad();
-    [Selector("windowDidLoad")] public void WindowDidLoad();
-    [Selector("loadWindow")] public void LoadWindow();
-    [Selector("close")] public void Close();
-    [Selector("showWindow:")] public void ShowWindow(AnyObject? sender);
+    [Selector("windowNibName")]
+    public NSNibName? WindowNibName { get; }
+    [Selector("windowNibPath")]
+    public NSString? WindowNibPath { get; }
+    [Selector("owner")]
+    public AnyObject? Owner { get; }
+    [Selector("windowFrameAutosaveName", "setWindowFrameAutosaveName:")]
+    public NSWindowFrameAutosaveName WindowFrameAutosaveName { get; set; }
+    [Selector("shouldCascadeWindows", "setShouldCascadeWindows:")]
+    public bool ShouldCascadeWindows { get; set; }
+    [Selector("previewRepresentableActivityItems", "setPreviewRepresentableActivityItems:")]
+    public NSArray? PreviewRepresentableActivityItems { get; set; }
+    [Selector("document", "setDocument:")]
+    public AnyObject? Document { get; set; }
+    [Selector("shouldCloseDocument", "setShouldCloseDocument:")]
+    public bool ShouldCloseDocument { get; set; }
+    [Selector("contentViewController", "setContentViewController:")]
+    public NSViewController? ContentViewController { get; set; }
+    [Selector("window", "setWindow:")]
+    public NSWindow? Window { get; set; }
+    [Selector("isWindowLoaded")]
+    public bool WindowLoaded { get; }
+    [Selector("initWithWindow:")]
+    public Self InitWithWindow(NSWindow? window);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("initWithWindowNibName:")]
+    public Self InitWithWindowNibName(NSNibName windowNibName);
+    [Selector("initWithWindowNibName:owner:")]
+    public Self InitWithWindowNibNameOwner(NSNibName windowNibName, AnyObject owner);
+    [Selector("initWithWindowNibPath:owner:")]
+    public Self InitWithWindowNibPathOwner(NSString windowNibPath, AnyObject owner);
+    [Selector("setDocumentEdited:")]
+    public void SetDocumentEdited(bool dirtyFlag);
+    [Selector("synchronizeWindowTitleWithDocumentName")]
+    public void SynchronizeWindowTitleWithDocumentName();
+    [Selector("windowTitleForDocumentDisplayName:")]
+    public NSString WindowTitleForDocumentDisplayName(NSString displayName);
+    [Selector("windowWillLoad")]
+    public void WindowWillLoad();
+    [Selector("windowDidLoad")]
+    public void WindowDidLoad();
+    [Selector("loadWindow")]
+    public void LoadWindow();
+    [Selector("close")]
+    public void Close();
+    [Selector("showWindow:")]
+    public void ShowWindow(AnyObject? sender);
 }
 
 /// NSWindowControllerStoryboardingMethods, a category of NSWindowController.
 public extern objc class NSWindowController
 {
-    [Selector("storyboard")] public NSStoryboard? Storyboard { get; }
+    [Selector("storyboard")]
+    public NSStoryboard? Storyboard { get; }
 }
 
 /// NSWindowControllerDismissing, a category of NSWindowController.
 public extern objc class NSWindowController
 {
-    [Selector("dismissController:")] public void DismissController(AnyObject? sender);
+    [Selector("dismissController:")]
+    public void DismissController(AnyObject? sender);
 }
 
 #endif

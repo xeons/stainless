@@ -32,9 +32,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMProgressEvent : DOMEvent
 {
-    [Selector("lengthComputable")] public bool LengthComputable { get; }
-    [Selector("loaded")] public ulong Loaded { get; }
-    [Selector("total")] public ulong Total { get; }
+    [Selector("lengthComputable")]
+    public bool LengthComputable { get; }
+    [Selector("loaded")]
+    public ulong Loaded { get; }
+    [Selector("total")]
+    public ulong Total { get; }
 }
 
 #endif

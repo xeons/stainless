@@ -34,24 +34,42 @@ import Standard.ObjC;
 
 public extern objc class NSTableRowView : NSView, NSAccessibilityRow
 {
-    [Selector("selectionHighlightStyle", "setSelectionHighlightStyle:")] public NSTableViewSelectionHighlightStyle SelectionHighlightStyle { get; set; }
-    [Selector("isEmphasized", "setEmphasized:")] public bool Emphasized { get; set; }
-    [Selector("isGroupRowStyle", "setGroupRowStyle:")] public bool GroupRowStyle { get; set; }
-    [Selector("isSelected", "setSelected:")] public bool Selected { get; set; }
-    [Selector("isPreviousRowSelected", "setPreviousRowSelected:")] public bool PreviousRowSelected { get; set; }
-    [Selector("isNextRowSelected", "setNextRowSelected:")] public bool NextRowSelected { get; set; }
-    [Selector("isFloating", "setFloating:")] public bool Floating { get; set; }
-    [Selector("isTargetForDropOperation", "setTargetForDropOperation:")] public bool TargetForDropOperation { get; set; }
-    [Selector("draggingDestinationFeedbackStyle", "setDraggingDestinationFeedbackStyle:")] public NSTableViewDraggingDestinationFeedbackStyle DraggingDestinationFeedbackStyle { get; set; }
-    [Selector("indentationForDropOperation", "setIndentationForDropOperation:")] public CGFloat IndentationForDropOperation { get; set; }
-    [Selector("interiorBackgroundStyle")] public NSBackgroundStyle InteriorBackgroundStyle { get; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor BackgroundColor { get; set; }
-    [Selector("numberOfColumns")] public NSInteger NumberOfColumns { get; }
-    [Selector("drawBackgroundInRect:")] public void DrawBackgroundInRect(NSRect dirtyRect);
-    [Selector("drawSelectionInRect:")] public void DrawSelectionInRect(NSRect dirtyRect);
-    [Selector("drawSeparatorInRect:")] public void DrawSeparatorInRect(NSRect dirtyRect);
-    [Selector("drawDraggingDestinationFeedbackInRect:")] public void DrawDraggingDestinationFeedbackInRect(NSRect dirtyRect);
-    [Selector("viewAtColumn:")] public AnyObject? ViewAtColumn(NSInteger column);
+    [Selector("selectionHighlightStyle", "setSelectionHighlightStyle:")]
+    public NSTableViewSelectionHighlightStyle SelectionHighlightStyle { get; set; }
+    [Selector("isEmphasized", "setEmphasized:")]
+    public bool Emphasized { get; set; }
+    [Selector("isGroupRowStyle", "setGroupRowStyle:")]
+    public bool GroupRowStyle { get; set; }
+    [Selector("isSelected", "setSelected:")]
+    public bool Selected { get; set; }
+    [Selector("isPreviousRowSelected", "setPreviousRowSelected:")]
+    public bool PreviousRowSelected { get; set; }
+    [Selector("isNextRowSelected", "setNextRowSelected:")]
+    public bool NextRowSelected { get; set; }
+    [Selector("isFloating", "setFloating:")]
+    public bool Floating { get; set; }
+    [Selector("isTargetForDropOperation", "setTargetForDropOperation:")]
+    public bool TargetForDropOperation { get; set; }
+    [Selector("draggingDestinationFeedbackStyle", "setDraggingDestinationFeedbackStyle:")]
+    public NSTableViewDraggingDestinationFeedbackStyle DraggingDestinationFeedbackStyle { get; set; }
+    [Selector("indentationForDropOperation", "setIndentationForDropOperation:")]
+    public CGFloat IndentationForDropOperation { get; set; }
+    [Selector("interiorBackgroundStyle")]
+    public NSBackgroundStyle InteriorBackgroundStyle { get; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor BackgroundColor { get; set; }
+    [Selector("numberOfColumns")]
+    public NSInteger NumberOfColumns { get; }
+    [Selector("drawBackgroundInRect:")]
+    public void DrawBackgroundInRect(NSRect dirtyRect);
+    [Selector("drawSelectionInRect:")]
+    public void DrawSelectionInRect(NSRect dirtyRect);
+    [Selector("drawSeparatorInRect:")]
+    public void DrawSeparatorInRect(NSRect dirtyRect);
+    [Selector("drawDraggingDestinationFeedbackInRect:")]
+    public void DrawDraggingDestinationFeedbackInRect(NSRect dirtyRect);
+    [Selector("viewAtColumn:")]
+    public AnyObject? ViewAtColumn(NSInteger column);
 }
 
 #endif

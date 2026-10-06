@@ -34,38 +34,58 @@ import Standard.ObjC;
 
 public extern objc class TKTokenKeychainItem : NSObject
 {
-    [Selector("objectID")] public TKTokenObjectID ObjectID { get; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("constraints", "setConstraints:")] public NSDictionary? Constraints { get; set; }
-    [Selector("initWithObjectID:")] public Self InitWithObjectID(TKTokenObjectID objectID);
+    [Selector("objectID")]
+    public TKTokenObjectID ObjectID { get; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("constraints", "setConstraints:")]
+    public NSDictionary? Constraints { get; set; }
+    [Selector("initWithObjectID:")]
+    public Self InitWithObjectID(TKTokenObjectID objectID);
 }
 
 public extern objc class TKTokenKeychainCertificate : TKTokenKeychainItem
 {
-    [Selector("data")] public NSData Data { get; }
-    [Selector("initWithCertificate:objectID:")] public Self? InitWithCertificateObjectID(SecCertificateRef certificateRef, TKTokenObjectID objectID);
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("initWithCertificate:objectID:")]
+    public Self? InitWithCertificateObjectID(SecCertificateRef certificateRef, TKTokenObjectID objectID);
 }
 
 public extern objc class TKTokenKeychainKey : TKTokenKeychainItem
 {
-    [Selector("keyType", "setKeyType:")] public NSString KeyType { get; set; }
-    [Selector("applicationTag", "setApplicationTag:")] public NSData? ApplicationTag { get; set; }
-    [Selector("keySizeInBits", "setKeySizeInBits:")] public NSInteger KeySizeInBits { get; set; }
-    [Selector("publicKeyData", "setPublicKeyData:")] public NSData? PublicKeyData { get; set; }
-    [Selector("publicKeyHash", "setPublicKeyHash:")] public NSData? PublicKeyHash { get; set; }
-    [Selector("canDecrypt", "setCanDecrypt:")] public bool CanDecrypt { get; set; }
-    [Selector("canSign", "setCanSign:")] public bool CanSign { get; set; }
-    [Selector("canPerformKeyExchange", "setCanPerformKeyExchange:")] public bool CanPerformKeyExchange { get; set; }
-    [Selector("isSuitableForLogin", "setSuitableForLogin:")] public bool SuitableForLogin { get; set; }
-    [Selector("initWithCertificate:objectID:")] public Self? InitWithCertificateObjectID(SecCertificateRef? certificateRef, TKTokenObjectID objectID);
+    [Selector("keyType", "setKeyType:")]
+    public NSString KeyType { get; set; }
+    [Selector("applicationTag", "setApplicationTag:")]
+    public NSData? ApplicationTag { get; set; }
+    [Selector("keySizeInBits", "setKeySizeInBits:")]
+    public NSInteger KeySizeInBits { get; set; }
+    [Selector("publicKeyData", "setPublicKeyData:")]
+    public NSData? PublicKeyData { get; set; }
+    [Selector("publicKeyHash", "setPublicKeyHash:")]
+    public NSData? PublicKeyHash { get; set; }
+    [Selector("canDecrypt", "setCanDecrypt:")]
+    public bool CanDecrypt { get; set; }
+    [Selector("canSign", "setCanSign:")]
+    public bool CanSign { get; set; }
+    [Selector("canPerformKeyExchange", "setCanPerformKeyExchange:")]
+    public bool CanPerformKeyExchange { get; set; }
+    [Selector("isSuitableForLogin", "setSuitableForLogin:")]
+    public bool SuitableForLogin { get; set; }
+    [Selector("initWithCertificate:objectID:")]
+    public Self? InitWithCertificateObjectID(SecCertificateRef? certificateRef, TKTokenObjectID objectID);
 }
 
 public extern objc class TKTokenKeychainContents : NSObject
 {
-    [Selector("items")] public NSArray Items { get; }
-    [Selector("fillWithItems:")] public void FillWithItems(NSArray items);
-    [Selector("keyForObjectID:error:")] public TKTokenKeychainKey? KeyForObjectIDError(TKTokenObjectID objectID, out NSError? error);
-    [Selector("certificateForObjectID:error:")] public TKTokenKeychainCertificate? CertificateForObjectIDError(TKTokenObjectID objectID, out NSError? error);
+    [Selector("items")]
+    public NSArray Items { get; }
+    [Selector("fillWithItems:")]
+    public void FillWithItems(NSArray items);
+    [Selector("keyForObjectID:error:")]
+    public TKTokenKeychainKey? KeyForObjectIDError(TKTokenObjectID objectID, out NSError? error);
+    [Selector("certificateForObjectID:error:")]
+    public TKTokenKeychainCertificate? CertificateForObjectIDError(TKTokenObjectID objectID, out NSError? error);
 }
 
 #endif

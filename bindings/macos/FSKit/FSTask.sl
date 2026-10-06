@@ -37,11 +37,14 @@ public objc closure NSError? FSTaskCancellationHandlerBlock();
 public extern objc class FSTask : NSObject
 {
     /// macOS 26.0 and later.
-    [Selector("cancellationHandler", "setCancellationHandler:")] public FSTaskCancellationHandlerBlock? CancellationHandler { get; set; }
+    [Selector("cancellationHandler", "setCancellationHandler:")]
+    public FSTaskCancellationHandlerBlock? CancellationHandler { get; set; }
     /// macOS 15.4 and later.
-    [Selector("logMessage:")] public void LogMessage(NSString str);
+    [Selector("logMessage:")]
+    public void LogMessage(NSString str);
     /// macOS 15.4 and later.
-    [Selector("didCompleteWithError:")] public void DidCompleteWithError(NSError? error);
+    [Selector("didCompleteWithError:")]
+    public void DidCompleteWithError(NSError? error);
 }
 
 #endif

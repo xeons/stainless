@@ -34,10 +34,14 @@ import Standard.ObjC;
 /// macOS 15.4 and later.
 public extern objc class MTRCommandWithRequiredResponse : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("path", "setPath:")] public MTRCommandPath Path { get; set; }
-    [Selector("commandFields", "setCommandFields:")] public NSDictionary? CommandFields { get; set; }
-    [Selector("requiredResponse", "setRequiredResponse:")] public NSDictionary? RequiredResponse { get; set; }
-    [Selector("initWithPath:commandFields:requiredResponse:")] public Self InitWithPathCommandFieldsRequiredResponse(MTRCommandPath path, NSDictionary? commandFields, NSDictionary? requiredResponse);
+    [Selector("path", "setPath:")]
+    public MTRCommandPath Path { get; set; }
+    [Selector("commandFields", "setCommandFields:")]
+    public NSDictionary? CommandFields { get; set; }
+    [Selector("requiredResponse", "setRequiredResponse:")]
+    public NSDictionary? RequiredResponse { get; set; }
+    [Selector("initWithPath:commandFields:requiredResponse:")]
+    public Self InitWithPathCommandFieldsRequiredResponse(MTRCommandPath path, NSDictionary? commandFields, NSDictionary? requiredResponse);
 }
 
 #endif

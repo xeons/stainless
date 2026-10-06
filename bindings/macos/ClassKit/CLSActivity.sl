@@ -32,28 +32,40 @@ import Standard.ObjC;
 
 public extern objc class CLSActivity : CLSObject
 {
-    [Selector("progress", "setProgress:")] public double Progress { get; set; }
-    [Selector("duration")] public NSTimeInterval Duration { get; }
-    [Selector("primaryActivityItem", "setPrimaryActivityItem:")] public CLSActivityItem? PrimaryActivityItem { get; set; }
-    [Selector("additionalActivityItems")] public NSArray AdditionalActivityItems { get; }
-    [Selector("addProgressRangeFromStart:toEnd:")] public void AddProgressRangeFromStartToEnd(double start, double end);
-    [Selector("addAdditionalActivityItem:")] public void AddAdditionalActivityItem(CLSActivityItem activityItem);
+    [Selector("progress", "setProgress:")]
+    public double Progress { get; set; }
+    [Selector("duration")]
+    public NSTimeInterval Duration { get; }
+    [Selector("primaryActivityItem", "setPrimaryActivityItem:")]
+    public CLSActivityItem? PrimaryActivityItem { get; set; }
+    [Selector("additionalActivityItems")]
+    public NSArray AdditionalActivityItems { get; }
+    [Selector("addProgressRangeFromStart:toEnd:")]
+    public void AddProgressRangeFromStartToEnd(double start, double end);
+    [Selector("addAdditionalActivityItem:")]
+    public void AddAdditionalActivityItem(CLSActivityItem activityItem);
 }
 
 /// Activation, a category of CLSActivity.
 public extern objc class CLSActivity
 {
-    [Selector("isStarted")] public bool Started { get; }
-    [Selector("start")] public void Start();
-    [Selector("stop")] public void Stop();
-    [Selector("removeAllActivityItems")] public void RemoveAllActivityItems();
+    [Selector("isStarted")]
+    public bool Started { get; }
+    [Selector("start")]
+    public void Start();
+    [Selector("stop")]
+    public void Stop();
+    [Selector("removeAllActivityItems")]
+    public void RemoveAllActivityItems();
 }
 
 /// Activity, a category of CLSContext.
 public extern objc class CLSContext
 {
-    [Selector("currentActivity")] public CLSActivity? CurrentActivity { get; }
-    [Selector("createNewActivity")] public CLSActivity CreateNewActivity();
+    [Selector("currentActivity")]
+    public CLSActivity? CurrentActivity { get; }
+    [Selector("createNewActivity")]
+    public CLSActivity CreateNewActivity();
 }
 
 #endif

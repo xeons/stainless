@@ -37,19 +37,32 @@ public objc closure void NSPersistentContainerPerformBackgroundTaskBlock(NSManag
 
 public extern objc class NSPersistentContainer : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("viewContext")] public NSManagedObjectContext ViewContext { get; }
-    [Selector("managedObjectModel")] public NSManagedObjectModel ManagedObjectModel { get; }
-    [Selector("persistentStoreCoordinator")] public NSPersistentStoreCoordinator PersistentStoreCoordinator { get; }
-    [Selector("persistentStoreDescriptions", "setPersistentStoreDescriptions:")] public NSArray PersistentStoreDescriptions { get; set; }
-    [Selector("persistentContainerWithName:")] public static Self PersistentContainerWithName(NSString name);
-    [Selector("persistentContainerWithName:managedObjectModel:")] public static Self PersistentContainerWithNameManagedObjectModel(NSString name, NSManagedObjectModel model);
-    [Selector("defaultDirectoryURL")] public static NSURL DefaultDirectoryURL();
-    [Selector("initWithName:")] public Self InitWithName(NSString name);
-    [Selector("initWithName:managedObjectModel:")] public Self InitWithNameManagedObjectModel(NSString name, NSManagedObjectModel model);
-    [Selector("loadPersistentStoresWithCompletionHandler:")] public void LoadPersistentStoresWithCompletionHandler(NSPersistentContainerLoadPersistentStoresWithCompletionHandlerBlock block);
-    [Selector("newBackgroundContext")] public NSManagedObjectContext NewBackgroundContext();
-    [Selector("performBackgroundTask:")] public void PerformBackgroundTask(NSPersistentContainerPerformBackgroundTaskBlock block);
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("viewContext")]
+    public NSManagedObjectContext ViewContext { get; }
+    [Selector("managedObjectModel")]
+    public NSManagedObjectModel ManagedObjectModel { get; }
+    [Selector("persistentStoreCoordinator")]
+    public NSPersistentStoreCoordinator PersistentStoreCoordinator { get; }
+    [Selector("persistentStoreDescriptions", "setPersistentStoreDescriptions:")]
+    public NSArray PersistentStoreDescriptions { get; set; }
+    [Selector("persistentContainerWithName:")]
+    public static Self PersistentContainerWithName(NSString name);
+    [Selector("persistentContainerWithName:managedObjectModel:")]
+    public static Self PersistentContainerWithNameManagedObjectModel(NSString name, NSManagedObjectModel model);
+    [Selector("defaultDirectoryURL")]
+    public static NSURL DefaultDirectoryURL();
+    [Selector("initWithName:")]
+    public Self InitWithName(NSString name);
+    [Selector("initWithName:managedObjectModel:")]
+    public Self InitWithNameManagedObjectModel(NSString name, NSManagedObjectModel model);
+    [Selector("loadPersistentStoresWithCompletionHandler:")]
+    public void LoadPersistentStoresWithCompletionHandler(NSPersistentContainerLoadPersistentStoresWithCompletionHandlerBlock block);
+    [Selector("newBackgroundContext")]
+    public NSManagedObjectContext NewBackgroundContext();
+    [Selector("performBackgroundTask:")]
+    public void PerformBackgroundTask(NSPersistentContainerPerformBackgroundTaskBlock block);
 }
 
 #endif

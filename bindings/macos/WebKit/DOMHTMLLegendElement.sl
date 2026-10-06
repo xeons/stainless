@@ -33,10 +33,13 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLLegendElement : DOMHTMLElement
 {
-    [Selector("form")] public DOMHTMLFormElement? Form { get; }
-    [Selector("align", "setAlign:")] public NSString? Align { get; set; }
+    [Selector("form")]
+    public DOMHTMLFormElement? Form { get; }
+    [Selector("align", "setAlign:")]
+    public NSString? Align { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("accessKey", "setAccessKey:")] public NSString? AccessKey { get; set; }
+    [Selector("accessKey", "setAccessKey:")]
+    public NSString? AccessKey { get; set; }
 }
 
 #endif

@@ -32,18 +32,30 @@ import Standard.ObjC;
 
 public extern objc class GKNoiseMap : NSObject
 {
-    [Selector("size")] public vector_double2 Size { get; }
-    [Selector("origin")] public vector_double2 Origin { get; }
-    [Selector("sampleCount")] public vector_int2 SampleCount { get; }
-    [Selector("isSeamless")] public bool Seamless { get; }
-    [Selector("init")] public Self Init();
-    [Selector("noiseMapWithNoise:")] public static Self NoiseMapWithNoise(GKNoise noise);
-    [Selector("noiseMapWithNoise:size:origin:sampleCount:seamless:")] public static Self NoiseMapWithNoiseSizeOriginSampleCountSeamless(GKNoise noise, vector_double2 size, vector_double2 origin, vector_int2 sampleCount, bool seamless);
-    [Selector("initWithNoise:")] public Self InitWithNoise(GKNoise noise);
-    [Selector("initWithNoise:size:origin:sampleCount:seamless:")] public Self InitWithNoiseSizeOriginSampleCountSeamless(GKNoise noise, vector_double2 size, vector_double2 origin, vector_int2 sampleCount, bool seamless);
-    [Selector("valueAtPosition:")] public float ValueAtPosition(vector_int2 position);
-    [Selector("interpolatedValueAtPosition:")] public float InterpolatedValueAtPosition(vector_float2 position);
-    [Selector("setValue:atPosition:")] public void SetValueAtPosition(float value, vector_int2 position);
+    [Selector("size")]
+    public vector_double2 Size { get; }
+    [Selector("origin")]
+    public vector_double2 Origin { get; }
+    [Selector("sampleCount")]
+    public vector_int2 SampleCount { get; }
+    [Selector("isSeamless")]
+    public bool Seamless { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("noiseMapWithNoise:")]
+    public static Self NoiseMapWithNoise(GKNoise noise);
+    [Selector("noiseMapWithNoise:size:origin:sampleCount:seamless:")]
+    public static Self NoiseMapWithNoiseSizeOriginSampleCountSeamless(GKNoise noise, vector_double2 size, vector_double2 origin, vector_int2 sampleCount, bool seamless);
+    [Selector("initWithNoise:")]
+    public Self InitWithNoise(GKNoise noise);
+    [Selector("initWithNoise:size:origin:sampleCount:seamless:")]
+    public Self InitWithNoiseSizeOriginSampleCountSeamless(GKNoise noise, vector_double2 size, vector_double2 origin, vector_int2 sampleCount, bool seamless);
+    [Selector("valueAtPosition:")]
+    public float ValueAtPosition(vector_int2 position);
+    [Selector("interpolatedValueAtPosition:")]
+    public float InterpolatedValueAtPosition(vector_float2 position);
+    [Selector("setValue:atPosition:")]
+    public void SetValueAtPosition(float value, vector_int2 position);
 }
 
 #endif

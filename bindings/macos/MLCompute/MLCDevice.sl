@@ -34,15 +34,24 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCDevice : NSObject, NSCopying
 {
-    [Selector("type")] public MLCDeviceType Type { get; }
-    [Selector("actualDeviceType")] public MLCDeviceType ActualDeviceType { get; }
-    [Selector("gpuDevices")] public NSArray GpuDevices { get; }
-    [Selector("cpuDevice")] public static Self CpuDevice();
-    [Selector("gpuDevice")] public static Self? GpuDevice();
-    [Selector("aneDevice")] public static Self? AneDevice();
-    [Selector("deviceWithType:")] public static Self? DeviceWithType(MLCDeviceType type);
-    [Selector("deviceWithType:selectsMultipleComputeDevices:")] public static Self? DeviceWithTypeSelectsMultipleComputeDevices(MLCDeviceType type, bool selectsMultipleComputeDevices);
-    [Selector("deviceWithGPUDevices:")] public static Self? DeviceWithGPUDevices(NSArray gpus);
+    [Selector("type")]
+    public MLCDeviceType Type { get; }
+    [Selector("actualDeviceType")]
+    public MLCDeviceType ActualDeviceType { get; }
+    [Selector("gpuDevices")]
+    public NSArray GpuDevices { get; }
+    [Selector("cpuDevice")]
+    public static Self CpuDevice();
+    [Selector("gpuDevice")]
+    public static Self? GpuDevice();
+    [Selector("aneDevice")]
+    public static Self? AneDevice();
+    [Selector("deviceWithType:")]
+    public static Self? DeviceWithType(MLCDeviceType type);
+    [Selector("deviceWithType:selectsMultipleComputeDevices:")]
+    public static Self? DeviceWithTypeSelectsMultipleComputeDevices(MLCDeviceType type, bool selectsMultipleComputeDevices);
+    [Selector("deviceWithGPUDevices:")]
+    public static Self? DeviceWithGPUDevices(NSArray gpus);
 }
 
 #endif

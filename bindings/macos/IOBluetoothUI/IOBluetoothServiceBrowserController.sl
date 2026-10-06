@@ -35,35 +35,59 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothServiceBrowserController : NSWindowController
 {
-    [Selector("serviceBrowserController:")] public static IOBluetoothServiceBrowserController? ServiceBrowserController(IOBluetoothServiceBrowserControllerOptions inOptions);
+    [Selector("serviceBrowserController:")]
+    public static IOBluetoothServiceBrowserController? ServiceBrowserController(IOBluetoothServiceBrowserControllerOptions inOptions);
     /// Deprecated in macOS 10.5.
-    [Selector("browseDevices:options:")] public static IOReturn BrowseDevicesOptions(out IOBluetoothSDPServiceRecord? outRecord, IOBluetoothServiceBrowserControllerOptions inOptions);
+    [Selector("browseDevices:options:")]
+    public static IOReturn BrowseDevicesOptions(out IOBluetoothSDPServiceRecord? outRecord, IOBluetoothServiceBrowserControllerOptions inOptions);
     /// Deprecated in macOS 10.5.
-    [Selector("browseDevicesAsSheetForWindow:options:window:")] public static IOReturn BrowseDevicesAsSheetForWindowOptionsWindow(out IOBluetoothSDPServiceRecord? outRecord, IOBluetoothServiceBrowserControllerOptions inOptions, NSWindow? inWindow);
-    [Selector("withServiceBrowserControllerRef:")] public static IOBluetoothServiceBrowserController? WithServiceBrowserControllerRef(IOBluetoothServiceBrowserControllerRef serviceBrowserControllerRef);
-    [Selector("getServiceBrowserControllerRef")] public IOBluetoothServiceBrowserControllerRef GetServiceBrowserControllerRef();
+    [Selector("browseDevicesAsSheetForWindow:options:window:")]
+    public static IOReturn BrowseDevicesAsSheetForWindowOptionsWindow(out IOBluetoothSDPServiceRecord? outRecord, IOBluetoothServiceBrowserControllerOptions inOptions, NSWindow? inWindow);
+    [Selector("withServiceBrowserControllerRef:")]
+    public static IOBluetoothServiceBrowserController? WithServiceBrowserControllerRef(IOBluetoothServiceBrowserControllerRef serviceBrowserControllerRef);
+    [Selector("getServiceBrowserControllerRef")]
+    public IOBluetoothServiceBrowserControllerRef GetServiceBrowserControllerRef();
     /// Deprecated in macOS 10.5.
-    [Selector("discover:")] public IOReturn Discover(out IOBluetoothSDPServiceRecord? outRecord);
+    [Selector("discover:")]
+    public IOReturn Discover(out IOBluetoothSDPServiceRecord? outRecord);
     /// Deprecated in macOS 10.5.
-    [Selector("discoverAsSheetForWindow:withRecord:")] public IOReturn DiscoverAsSheetForWindowWithRecord(NSWindow? sheetWindow, out IOBluetoothSDPServiceRecord? outRecord);
+    [Selector("discoverAsSheetForWindow:withRecord:")]
+    public IOReturn DiscoverAsSheetForWindowWithRecord(NSWindow? sheetWindow, out IOBluetoothSDPServiceRecord? outRecord);
     /// Deprecated in macOS 10.5.
-    [Selector("discoverWithDeviceAttributes:serviceList:serviceRecord:")] public IOReturn DiscoverWithDeviceAttributesServiceListServiceRecord(IOBluetoothDeviceSearchAttributes* deviceAttributes, NSArray? serviceArray, out IOBluetoothSDPServiceRecord? outRecord);
-    [Selector("setOptions:")] public void SetOptions(IOBluetoothServiceBrowserControllerOptions inOptions);
-    [Selector("runModal")] public int RunModal();
-    [Selector("beginSheetModalForWindow:modalDelegate:didEndSelector:contextInfo:")] public IOReturn BeginSheetModalForWindowModalDelegateDidEndSelectorContextInfo(NSWindow? sheetWindow, AnyObject? modalDelegate, Selector didEndSelector, void* contextInfo);
-    [Selector("getResults")] public NSArray? GetResults();
-    [Selector("getOptions")] public IOBluetoothServiceBrowserControllerOptions GetOptions();
-    [Selector("setSearchAttributes:")] public void SetSearchAttributes(IOBluetoothDeviceSearchAttributes* searchAttributes);
-    [Selector("getSearchAttributes")] public IOBluetoothDeviceSearchAttributes* GetSearchAttributes();
-    [Selector("addAllowedUUID:")] public void AddAllowedUUID(IOBluetoothSDPUUID? allowedUUID);
-    [Selector("addAllowedUUIDArray:")] public void AddAllowedUUIDArray(NSArray? allowedUUIDArray);
-    [Selector("clearAllowedUUIDs")] public void ClearAllowedUUIDs();
-    [Selector("setTitle:")] public void SetTitle(NSString? windowTitle);
-    [Selector("getTitle")] public NSString? GetTitle();
-    [Selector("setDescriptionText:")] public void SetDescriptionText(NSString? descriptionText);
-    [Selector("getDescriptionText")] public NSString? GetDescriptionText();
-    [Selector("setPrompt:")] public void SetPrompt(NSString? prompt);
-    [Selector("getPrompt")] public NSString? GetPrompt();
+    [Selector("discoverWithDeviceAttributes:serviceList:serviceRecord:")]
+    public IOReturn DiscoverWithDeviceAttributesServiceListServiceRecord(IOBluetoothDeviceSearchAttributes* deviceAttributes, NSArray? serviceArray, out IOBluetoothSDPServiceRecord? outRecord);
+    [Selector("setOptions:")]
+    public void SetOptions(IOBluetoothServiceBrowserControllerOptions inOptions);
+    [Selector("runModal")]
+    public int RunModal();
+    [Selector("beginSheetModalForWindow:modalDelegate:didEndSelector:contextInfo:")]
+    public IOReturn BeginSheetModalForWindowModalDelegateDidEndSelectorContextInfo(NSWindow? sheetWindow, AnyObject? modalDelegate, Selector didEndSelector, void* contextInfo);
+    [Selector("getResults")]
+    public NSArray? GetResults();
+    [Selector("getOptions")]
+    public IOBluetoothServiceBrowserControllerOptions GetOptions();
+    [Selector("setSearchAttributes:")]
+    public void SetSearchAttributes(IOBluetoothDeviceSearchAttributes* searchAttributes);
+    [Selector("getSearchAttributes")]
+    public IOBluetoothDeviceSearchAttributes* GetSearchAttributes();
+    [Selector("addAllowedUUID:")]
+    public void AddAllowedUUID(IOBluetoothSDPUUID? allowedUUID);
+    [Selector("addAllowedUUIDArray:")]
+    public void AddAllowedUUIDArray(NSArray? allowedUUIDArray);
+    [Selector("clearAllowedUUIDs")]
+    public void ClearAllowedUUIDs();
+    [Selector("setTitle:")]
+    public void SetTitle(NSString? windowTitle);
+    [Selector("getTitle")]
+    public NSString? GetTitle();
+    [Selector("setDescriptionText:")]
+    public void SetDescriptionText(NSString? descriptionText);
+    [Selector("getDescriptionText")]
+    public NSString? GetDescriptionText();
+    [Selector("setPrompt:")]
+    public void SetPrompt(NSString? prompt);
+    [Selector("getPrompt")]
+    public NSString? GetPrompt();
 }
 
 #endif

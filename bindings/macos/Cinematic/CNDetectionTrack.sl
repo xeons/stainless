@@ -34,28 +34,42 @@ import Standard.ObjC;
 
 public extern objc class CNDetectionTrack : NSObject, NSCopying
 {
-    [Selector("detectionType")] public CNDetectionType DetectionType { get; }
-    [Selector("detectionID")] public CNDetectionID DetectionID { get; }
-    [Selector("detectionGroupID")] public CNDetectionGroupID DetectionGroupID { get; }
-    [Selector("isUserCreated")] public bool UserCreated { get; }
-    [Selector("isDiscrete")] public bool Discrete { get; }
-    [Selector("detectionAtOrBeforeTime:")] public CNDetection? DetectionAtOrBeforeTime(CMTime time);
-    [Selector("detectionNearestTime:")] public CNDetection? DetectionNearestTime(CMTime time);
-    [Selector("detectionsInTimeRange:")] public NSArray DetectionsInTimeRange(CMTimeRange timeRange);
+    [Selector("detectionType")]
+    public CNDetectionType DetectionType { get; }
+    [Selector("detectionID")]
+    public CNDetectionID DetectionID { get; }
+    [Selector("detectionGroupID")]
+    public CNDetectionGroupID DetectionGroupID { get; }
+    [Selector("isUserCreated")]
+    public bool UserCreated { get; }
+    [Selector("isDiscrete")]
+    public bool Discrete { get; }
+    [Selector("detectionAtOrBeforeTime:")]
+    public CNDetection? DetectionAtOrBeforeTime(CMTime time);
+    [Selector("detectionNearestTime:")]
+    public CNDetection? DetectionNearestTime(CMTime time);
+    [Selector("detectionsInTimeRange:")]
+    public NSArray DetectionsInTimeRange(CMTimeRange timeRange);
 }
 
 public extern objc class CNFixedDetectionTrack : CNDetectionTrack
 {
-    [Selector("focusDisparity")] public float FocusDisparity { get; }
-    [Selector("originalDetection")] public CNDetection? OriginalDetection { get; }
-    [Selector("initWithFocusDisparity:")] public Self InitWithFocusDisparity(float focusDisparity);
-    [Selector("initWithOriginalDetection:")] public Self InitWithOriginalDetection(CNDetection originalDetection);
+    [Selector("focusDisparity")]
+    public float FocusDisparity { get; }
+    [Selector("originalDetection")]
+    public CNDetection? OriginalDetection { get; }
+    [Selector("initWithFocusDisparity:")]
+    public Self InitWithFocusDisparity(float focusDisparity);
+    [Selector("initWithOriginalDetection:")]
+    public Self InitWithOriginalDetection(CNDetection originalDetection);
 }
 
 public extern objc class CNCustomDetectionTrack : CNDetectionTrack
 {
-    [Selector("allDetections")] public NSArray AllDetections { get; }
-    [Selector("initWithDetections:smooth:")] public Self InitWithDetectionsSmooth(NSArray detections, bool applySmoothing);
+    [Selector("allDetections")]
+    public NSArray AllDetections { get; }
+    [Selector("initWithDetections:smooth:")]
+    public Self InitWithDetectionsSmooth(NSArray detections, bool applySmoothing);
 }
 
 #endif

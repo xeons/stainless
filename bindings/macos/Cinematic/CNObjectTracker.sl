@@ -37,19 +37,28 @@ import Standard.ObjC;
 
 public extern objc class CNBoundsPrediction : NSObject, NSCopying, NSMutableCopying
 {
-    [Selector("normalizedBounds", "setNormalizedBounds:")] public CGRect NormalizedBounds { get; set; }
-    [Selector("confidence", "setConfidence:")] public float Confidence { get; set; }
+    [Selector("normalizedBounds", "setNormalizedBounds:")]
+    public CGRect NormalizedBounds { get; set; }
+    [Selector("confidence", "setConfidence:")]
+    public float Confidence { get; set; }
 }
 
 public extern objc class CNObjectTracker : NSObject
 {
-    [Selector("isSupported")] public static bool IsSupported { get; }
-    [Selector("initWithCommandQueue:")] public Self InitWithCommandQueue(MTLCommandQueue commandQueue);
-    [Selector("findObjectAtPoint:sourceImage:")] public CNBoundsPrediction? FindObjectAtPointSourceImage(CGPoint point, CVPixelBufferRef sourceImage);
-    [Selector("startTrackingAt:within:sourceImage:sourceDisparity:")] public bool StartTrackingAtWithinSourceImageSourceDisparity(CMTime time, CGRect normalizedBounds, CVPixelBufferRef sourceImage, CVPixelBufferRef sourceDisparity);
-    [Selector("continueTrackingAt:sourceImage:sourceDisparity:")] public CNBoundsPrediction? ContinueTrackingAtSourceImageSourceDisparity(CMTime time, CVPixelBufferRef sourceImage, CVPixelBufferRef sourceDisparity);
-    [Selector("finishDetectionTrack")] public CNDetectionTrack FinishDetectionTrack();
-    [Selector("resetDetectionTrack")] public void ResetDetectionTrack();
+    [Selector("isSupported")]
+    public static bool IsSupported { get; }
+    [Selector("initWithCommandQueue:")]
+    public Self InitWithCommandQueue(MTLCommandQueue commandQueue);
+    [Selector("findObjectAtPoint:sourceImage:")]
+    public CNBoundsPrediction? FindObjectAtPointSourceImage(CGPoint point, CVPixelBufferRef sourceImage);
+    [Selector("startTrackingAt:within:sourceImage:sourceDisparity:")]
+    public bool StartTrackingAtWithinSourceImageSourceDisparity(CMTime time, CGRect normalizedBounds, CVPixelBufferRef sourceImage, CVPixelBufferRef sourceDisparity);
+    [Selector("continueTrackingAt:sourceImage:sourceDisparity:")]
+    public CNBoundsPrediction? ContinueTrackingAtSourceImageSourceDisparity(CMTime time, CVPixelBufferRef sourceImage, CVPixelBufferRef sourceDisparity);
+    [Selector("finishDetectionTrack")]
+    public CNDetectionTrack FinishDetectionTrack();
+    [Selector("resetDetectionTrack")]
+    public void ResetDetectionTrack();
 }
 
 #endif

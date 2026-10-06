@@ -34,11 +34,14 @@ import Standard.ObjC;
 public extern objc class INCallRecord
 {
     /// Deprecated in macOS 12.0.
-    [Selector("caller")] public INPerson? Caller { get; }
+    [Selector("caller")]
+    public INPerson? Caller { get; }
     /// Deprecated in macOS 11.3.
-    [Selector("initWithIdentifier:dateCreated:caller:callRecordType:callCapability:callDuration:unseen:")] public Self InitWithIdentifierDateCreatedCallerCallRecordTypeCallCapabilityCallDurationUnseen(NSString identifier, NSDate? dateCreated, INPerson? caller, INCallRecordType callRecordType, INCallCapability callCapability, NSNumber? callDuration, NSNumber? unseen);
+    [Selector("initWithIdentifier:dateCreated:caller:callRecordType:callCapability:callDuration:unseen:")]
+    public Self InitWithIdentifierDateCreatedCallerCallRecordTypeCallCapabilityCallDurationUnseen(NSString identifier, NSDate? dateCreated, INPerson? caller, INCallRecordType callRecordType, INCallCapability callCapability, NSNumber? callDuration, NSNumber? unseen);
     /// Deprecated in macOS 11.3.
-    [Selector("initWithIdentifier:dateCreated:caller:callRecordType:callCapability:callDuration:unseen:numberOfCalls:")] public Self InitWithIdentifierDateCreatedCallerCallRecordTypeCallCapabilityCallDurationUnseenNumberOfCalls(NSString identifier, NSDate? dateCreated, INPerson? caller, INCallRecordType callRecordType, INCallCapability callCapability, NSNumber? callDuration, NSNumber? unseen, NSNumber? numberOfCalls);
+    [Selector("initWithIdentifier:dateCreated:caller:callRecordType:callCapability:callDuration:unseen:numberOfCalls:")]
+    public Self InitWithIdentifierDateCreatedCallerCallRecordTypeCallCapabilityCallDurationUnseenNumberOfCalls(NSString identifier, NSDate? dateCreated, INPerson? caller, INCallRecordType callRecordType, INCallCapability callCapability, NSNumber? callDuration, NSNumber? unseen, NSNumber? numberOfCalls);
 }
 
 #endif

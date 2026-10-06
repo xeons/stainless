@@ -37,10 +37,14 @@ public objc closure void INVoiceShortcutCenterGetVoiceShortcutWithIdentifierComp
 
 public extern objc class INVoiceShortcutCenter : NSObject
 {
-    [Selector("sharedCenter")] public static INVoiceShortcutCenter SharedCenter { get; }
-    [Selector("getAllVoiceShortcutsWithCompletion:")] public void GetAllVoiceShortcutsWithCompletion(INVoiceShortcutCenterGetAllVoiceShortcutsWithCompletionCompletionHandlerBlock completionHandler);
-    [Selector("getVoiceShortcutWithIdentifier:completion:")] public void GetVoiceShortcutWithIdentifierCompletion(NSUUID identifier, INVoiceShortcutCenterGetVoiceShortcutWithIdentifierCompletionCompletionHandlerBlock completionHandler);
-    [Selector("setShortcutSuggestions:")] public void SetShortcutSuggestions(NSArray suggestions);
+    [Selector("sharedCenter")]
+    public static INVoiceShortcutCenter SharedCenter { get; }
+    [Selector("getAllVoiceShortcutsWithCompletion:")]
+    public void GetAllVoiceShortcutsWithCompletion(INVoiceShortcutCenterGetAllVoiceShortcutsWithCompletionCompletionHandlerBlock completionHandler);
+    [Selector("getVoiceShortcutWithIdentifier:completion:")]
+    public void GetVoiceShortcutWithIdentifierCompletion(NSUUID identifier, INVoiceShortcutCenterGetVoiceShortcutWithIdentifierCompletionCompletionHandlerBlock completionHandler);
+    [Selector("setShortcutSuggestions:")]
+    public void SetShortcutSuggestions(NSArray suggestions);
 }
 
 #endif

@@ -42,12 +42,18 @@ public enum MKAddressRepresentationsContextStyle : long
 /// macOS 26.0 and later.
 public extern objc class MKAddressRepresentations : NSObject
 {
-    [Selector("cityName")] public NSString? CityName { get; }
-    [Selector("cityWithContext")] public NSString? CityWithContext { get; }
-    [Selector("regionName")] public NSString? RegionName { get; }
-    [Selector("regionCode")] public NSString? RegionCode { get; }
-    [Selector("fullAddressIncludingRegion:singleLine:")] public NSString? FullAddressIncludingRegionSingleLine(bool includingRegion, bool singleLine);
-    [Selector("cityWithContextUsingStyle:")] public NSString? CityWithContextUsingStyle(MKAddressRepresentationsContextStyle style);
+    [Selector("cityName")]
+    public NSString? CityName { get; }
+    [Selector("cityWithContext")]
+    public NSString? CityWithContext { get; }
+    [Selector("regionName")]
+    public NSString? RegionName { get; }
+    [Selector("regionCode")]
+    public NSString? RegionCode { get; }
+    [Selector("fullAddressIncludingRegion:singleLine:")]
+    public NSString? FullAddressIncludingRegionSingleLine(bool includingRegion, bool singleLine);
+    [Selector("cityWithContextUsingStyle:")]
+    public NSString? CityWithContextUsingStyle(MKAddressRepresentationsContextStyle style);
 }
 
 #endif

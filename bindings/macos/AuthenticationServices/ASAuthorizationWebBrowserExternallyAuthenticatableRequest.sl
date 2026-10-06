@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public objc interface ASAuthorizationWebBrowserExternallyAuthenticatableRequest : NSObjectProtocol
 {
-    [Selector("authenticatedContext", "setAuthenticatedContext:")] LAContext? AuthenticatedContext { get; set; }
+    [Selector("authenticatedContext", "setAuthenticatedContext:")]
+    LAContext? AuthenticatedContext { get; set; }
 }
 
 #endif

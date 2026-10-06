@@ -44,32 +44,53 @@ public enum SFAuthorizationViewState : int
 
 public extern objc class SFAuthorizationView : NSView
 {
-    [Selector("setString:")] public void SetString(AuthorizationString authorizationString);
-    [Selector("setAuthorizationRights:")] public void SetAuthorizationRights(AuthorizationRights* authorizationRights);
-    [Selector("authorizationRights")] public AuthorizationRights* AuthorizationRights();
-    [Selector("authorization")] public SFAuthorization? Authorization();
-    [Selector("updateStatus:")] public bool UpdateStatus(AnyObject? inSender);
-    [Selector("setAutoupdate:")] public void SetAutoupdate(bool autoupdate);
-    [Selector("setAutoupdate:interval:")] public void SetAutoupdateInterval(bool autoupdate, NSTimeInterval interval);
-    [Selector("authorizationState")] public SFAuthorizationViewState AuthorizationState();
-    [Selector("setEnabled:")] public void SetEnabled(bool enabled);
-    [Selector("isEnabled")] public bool IsEnabled();
-    [Selector("setFlags:")] public void SetFlags(AuthorizationFlags flags);
-    [Selector("setDelegate:")] public void SetDelegate(AnyObject? @delegate);
-    [Selector("delegate")] public AnyObject? Delegate();
-    [Selector("authorize:")] public bool Authorize(AnyObject? inSender);
-    [Selector("deauthorize:")] public bool Deauthorize(AnyObject? inSender);
+    [Selector("setString:")]
+    public void SetString(AuthorizationString authorizationString);
+    [Selector("setAuthorizationRights:")]
+    public void SetAuthorizationRights(AuthorizationRights* authorizationRights);
+    [Selector("authorizationRights")]
+    public AuthorizationRights* AuthorizationRights();
+    [Selector("authorization")]
+    public SFAuthorization? Authorization();
+    [Selector("updateStatus:")]
+    public bool UpdateStatus(AnyObject? inSender);
+    [Selector("setAutoupdate:")]
+    public void SetAutoupdate(bool autoupdate);
+    [Selector("setAutoupdate:interval:")]
+    public void SetAutoupdateInterval(bool autoupdate, NSTimeInterval interval);
+    [Selector("authorizationState")]
+    public SFAuthorizationViewState AuthorizationState();
+    [Selector("setEnabled:")]
+    public void SetEnabled(bool enabled);
+    [Selector("isEnabled")]
+    public bool IsEnabled();
+    [Selector("setFlags:")]
+    public void SetFlags(AuthorizationFlags flags);
+    [Selector("setDelegate:")]
+    public void SetDelegate(AnyObject? @delegate);
+    [Selector("delegate")]
+    public AnyObject? Delegate();
+    [Selector("authorize:")]
+    public bool Authorize(AnyObject? inSender);
+    [Selector("deauthorize:")]
+    public bool Deauthorize(AnyObject? inSender);
 }
 
 /// SFAuthorizationViewDelegate, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("authorizationViewDidAuthorize:")] public void AuthorizationViewDidAuthorize(SFAuthorizationView? view);
-    [Selector("authorizationViewDidDeauthorize:")] public void AuthorizationViewDidDeauthorize(SFAuthorizationView? view);
-    [Selector("authorizationViewShouldDeauthorize:")] public bool AuthorizationViewShouldDeauthorize(SFAuthorizationView? view);
-    [Selector("authorizationViewCreatedAuthorization:")] public void AuthorizationViewCreatedAuthorization(SFAuthorizationView? view);
-    [Selector("authorizationViewReleasedAuthorization:")] public void AuthorizationViewReleasedAuthorization(SFAuthorizationView? view);
-    [Selector("authorizationViewDidHide:")] public void AuthorizationViewDidHide(SFAuthorizationView? view);
+    [Selector("authorizationViewDidAuthorize:")]
+    public void AuthorizationViewDidAuthorize(SFAuthorizationView? view);
+    [Selector("authorizationViewDidDeauthorize:")]
+    public void AuthorizationViewDidDeauthorize(SFAuthorizationView? view);
+    [Selector("authorizationViewShouldDeauthorize:")]
+    public bool AuthorizationViewShouldDeauthorize(SFAuthorizationView? view);
+    [Selector("authorizationViewCreatedAuthorization:")]
+    public void AuthorizationViewCreatedAuthorization(SFAuthorizationView? view);
+    [Selector("authorizationViewReleasedAuthorization:")]
+    public void AuthorizationViewReleasedAuthorization(SFAuthorizationView? view);
+    [Selector("authorizationViewDidHide:")]
+    public void AuthorizationViewDidHide(SFAuthorizationView? view);
 }
 
 #endif

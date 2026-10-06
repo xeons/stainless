@@ -42,10 +42,14 @@ public extern "C" ASAuthorizationOpenIDOperation ASAuthorizationOperationLogout;
 
 public extern objc class ASAuthorizationOpenIDRequest : ASAuthorizationRequest
 {
-    [Selector("requestedScopes", "setRequestedScopes:")] public NSArray? RequestedScopes { get; set; }
-    [Selector("state", "setState:")] public NSString? State { get; set; }
-    [Selector("nonce", "setNonce:")] public NSString? Nonce { get; set; }
-    [Selector("requestedOperation", "setRequestedOperation:")] public ASAuthorizationOpenIDOperation RequestedOperation { get; set; }
+    [Selector("requestedScopes", "setRequestedScopes:")]
+    public NSArray? RequestedScopes { get; set; }
+    [Selector("state", "setState:")]
+    public NSString? State { get; set; }
+    [Selector("nonce", "setNonce:")]
+    public NSString? Nonce { get; set; }
+    [Selector("requestedOperation", "setRequestedOperation:")]
+    public ASAuthorizationOpenIDOperation RequestedOperation { get; set; }
 }
 
 #endif

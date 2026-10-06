@@ -34,43 +34,75 @@ import Standard.ObjC;
 
 public extern objc class OBEXFileTransferServices : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public AnyObject? Delegate { get; set; }
-    [Selector("withOBEXSession:")] public static Self? WithOBEXSession(IOBluetoothOBEXSession? inOBEXSession);
-    [Selector("initWithOBEXSession:")] public Self? InitWithOBEXSession(IOBluetoothOBEXSession? inOBEXSession);
-    [Selector("currentPath")] public NSString? CurrentPath();
-    [Selector("isBusy")] public bool IsBusy();
-    [Selector("isConnected")] public bool IsConnected();
-    [Selector("connectToFTPService")] public OBEXError ConnectToFTPService();
-    [Selector("connectToObjectPushService")] public OBEXError ConnectToObjectPushService();
-    [Selector("disconnect")] public OBEXError Disconnect();
-    [Selector("changeCurrentFolderToRoot")] public OBEXError ChangeCurrentFolderToRoot();
-    [Selector("changeCurrentFolderBackward")] public OBEXError ChangeCurrentFolderBackward();
-    [Selector("changeCurrentFolderForwardToPath:")] public OBEXError ChangeCurrentFolderForwardToPath(NSString? inDirName);
-    [Selector("createFolder:")] public OBEXError CreateFolder(NSString? inDirName);
-    [Selector("removeItem:")] public OBEXError RemoveItem(NSString? inItemName);
-    [Selector("retrieveFolderListing")] public OBEXError RetrieveFolderListing();
-    [Selector("sendFile:")] public OBEXError SendFile(NSString? inLocalPathAndName);
-    [Selector("copyRemoteFile:toLocalPath:")] public OBEXError CopyRemoteFileToLocalPath(NSString? inRemoteFileName, NSString? inLocalPathAndName);
-    [Selector("sendData:type:name:")] public OBEXError SendDataTypeName(NSData? inData, NSString? inType, NSString? inName);
-    [Selector("getDefaultVCard:")] public OBEXError GetDefaultVCard(NSString? inLocalPathAndName);
-    [Selector("abort")] public OBEXError Abort();
+    [Selector("delegate", "setDelegate:")]
+    public AnyObject? Delegate { get; set; }
+    [Selector("withOBEXSession:")]
+    public static Self? WithOBEXSession(IOBluetoothOBEXSession? inOBEXSession);
+    [Selector("initWithOBEXSession:")]
+    public Self? InitWithOBEXSession(IOBluetoothOBEXSession? inOBEXSession);
+    [Selector("currentPath")]
+    public NSString? CurrentPath();
+    [Selector("isBusy")]
+    public bool IsBusy();
+    [Selector("isConnected")]
+    public bool IsConnected();
+    [Selector("connectToFTPService")]
+    public OBEXError ConnectToFTPService();
+    [Selector("connectToObjectPushService")]
+    public OBEXError ConnectToObjectPushService();
+    [Selector("disconnect")]
+    public OBEXError Disconnect();
+    [Selector("changeCurrentFolderToRoot")]
+    public OBEXError ChangeCurrentFolderToRoot();
+    [Selector("changeCurrentFolderBackward")]
+    public OBEXError ChangeCurrentFolderBackward();
+    [Selector("changeCurrentFolderForwardToPath:")]
+    public OBEXError ChangeCurrentFolderForwardToPath(NSString? inDirName);
+    [Selector("createFolder:")]
+    public OBEXError CreateFolder(NSString? inDirName);
+    [Selector("removeItem:")]
+    public OBEXError RemoveItem(NSString? inItemName);
+    [Selector("retrieveFolderListing")]
+    public OBEXError RetrieveFolderListing();
+    [Selector("sendFile:")]
+    public OBEXError SendFile(NSString? inLocalPathAndName);
+    [Selector("copyRemoteFile:toLocalPath:")]
+    public OBEXError CopyRemoteFileToLocalPath(NSString? inRemoteFileName, NSString? inLocalPathAndName);
+    [Selector("sendData:type:name:")]
+    public OBEXError SendDataTypeName(NSData? inData, NSString? inType, NSString? inName);
+    [Selector("getDefaultVCard:")]
+    public OBEXError GetDefaultVCard(NSString? inLocalPathAndName);
+    [Selector("abort")]
+    public OBEXError Abort();
 }
 
 /// OBEXFileTransferServicesDelegate, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("fileTransferServicesConnectionComplete:error:")] public void FileTransferServicesConnectionCompleteError(OBEXFileTransferServices? inServices, OBEXError inError);
-    [Selector("fileTransferServicesDisconnectionComplete:error:")] public void FileTransferServicesDisconnectionCompleteError(OBEXFileTransferServices? inServices, OBEXError inError);
-    [Selector("fileTransferServicesAbortComplete:error:")] public void FileTransferServicesAbortCompleteError(OBEXFileTransferServices? inServices, OBEXError inError);
-    [Selector("fileTransferServicesRemoveItemComplete:error:removedItem:")] public void FileTransferServicesRemoveItemCompleteErrorRemovedItem(OBEXFileTransferServices? inServices, OBEXError inError, NSString? inItemName);
-    [Selector("fileTransferServicesCreateFolderComplete:error:folder:")] public void FileTransferServicesCreateFolderCompleteErrorFolder(OBEXFileTransferServices? inServices, OBEXError inError, NSString? inFolderName);
-    [Selector("fileTransferServicesPathChangeComplete:error:finalPath:")] public void FileTransferServicesPathChangeCompleteErrorFinalPath(OBEXFileTransferServices? inServices, OBEXError inError, NSString? inPath);
-    [Selector("fileTransferServicesRetrieveFolderListingComplete:error:listing:")] public void FileTransferServicesRetrieveFolderListingCompleteErrorListing(OBEXFileTransferServices? inServices, OBEXError inError, NSArray? inListing);
-    [Selector("fileTransferServicesFilePreparationComplete:error:")] public void FileTransferServicesFilePreparationCompleteError(OBEXFileTransferServices? inServices, OBEXError inError);
-    [Selector("fileTransferServicesSendFileProgress:transferProgress:")] public void FileTransferServicesSendFileProgressTransferProgress(OBEXFileTransferServices? inServices, NSDictionary? inProgressDescription);
-    [Selector("fileTransferServicesSendFileComplete:error:")] public void FileTransferServicesSendFileCompleteError(OBEXFileTransferServices? inServices, OBEXError inError);
-    [Selector("fileTransferServicesCopyRemoteFileProgress:transferProgress:")] public void FileTransferServicesCopyRemoteFileProgressTransferProgress(OBEXFileTransferServices? inServices, NSDictionary? inProgressDescription);
-    [Selector("fileTransferServicesCopyRemoteFileComplete:error:")] public void FileTransferServicesCopyRemoteFileCompleteError(OBEXFileTransferServices? inServices, OBEXError inError);
+    [Selector("fileTransferServicesConnectionComplete:error:")]
+    public void FileTransferServicesConnectionCompleteError(OBEXFileTransferServices? inServices, OBEXError inError);
+    [Selector("fileTransferServicesDisconnectionComplete:error:")]
+    public void FileTransferServicesDisconnectionCompleteError(OBEXFileTransferServices? inServices, OBEXError inError);
+    [Selector("fileTransferServicesAbortComplete:error:")]
+    public void FileTransferServicesAbortCompleteError(OBEXFileTransferServices? inServices, OBEXError inError);
+    [Selector("fileTransferServicesRemoveItemComplete:error:removedItem:")]
+    public void FileTransferServicesRemoveItemCompleteErrorRemovedItem(OBEXFileTransferServices? inServices, OBEXError inError, NSString? inItemName);
+    [Selector("fileTransferServicesCreateFolderComplete:error:folder:")]
+    public void FileTransferServicesCreateFolderCompleteErrorFolder(OBEXFileTransferServices? inServices, OBEXError inError, NSString? inFolderName);
+    [Selector("fileTransferServicesPathChangeComplete:error:finalPath:")]
+    public void FileTransferServicesPathChangeCompleteErrorFinalPath(OBEXFileTransferServices? inServices, OBEXError inError, NSString? inPath);
+    [Selector("fileTransferServicesRetrieveFolderListingComplete:error:listing:")]
+    public void FileTransferServicesRetrieveFolderListingCompleteErrorListing(OBEXFileTransferServices? inServices, OBEXError inError, NSArray? inListing);
+    [Selector("fileTransferServicesFilePreparationComplete:error:")]
+    public void FileTransferServicesFilePreparationCompleteError(OBEXFileTransferServices? inServices, OBEXError inError);
+    [Selector("fileTransferServicesSendFileProgress:transferProgress:")]
+    public void FileTransferServicesSendFileProgressTransferProgress(OBEXFileTransferServices? inServices, NSDictionary? inProgressDescription);
+    [Selector("fileTransferServicesSendFileComplete:error:")]
+    public void FileTransferServicesSendFileCompleteError(OBEXFileTransferServices? inServices, OBEXError inError);
+    [Selector("fileTransferServicesCopyRemoteFileProgress:transferProgress:")]
+    public void FileTransferServicesCopyRemoteFileProgressTransferProgress(OBEXFileTransferServices? inServices, NSDictionary? inProgressDescription);
+    [Selector("fileTransferServicesCopyRemoteFileComplete:error:")]
+    public void FileTransferServicesCopyRemoteFileCompleteError(OBEXFileTransferServices? inServices, OBEXError inError);
 }
 
 public extern "C" CFStringRef? kFTSProgressBytesTransferredKey;

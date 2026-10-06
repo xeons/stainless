@@ -32,27 +32,48 @@ import Standard.ObjC;
 
 public extern objc class MPRemoteCommandCenter : NSObject
 {
-    [Selector("pauseCommand")] public MPRemoteCommand PauseCommand { get; }
-    [Selector("playCommand")] public MPRemoteCommand PlayCommand { get; }
-    [Selector("stopCommand")] public MPRemoteCommand StopCommand { get; }
-    [Selector("togglePlayPauseCommand")] public MPRemoteCommand TogglePlayPauseCommand { get; }
-    [Selector("enableLanguageOptionCommand")] public MPRemoteCommand EnableLanguageOptionCommand { get; }
-    [Selector("disableLanguageOptionCommand")] public MPRemoteCommand DisableLanguageOptionCommand { get; }
-    [Selector("changePlaybackRateCommand")] public MPChangePlaybackRateCommand ChangePlaybackRateCommand { get; }
-    [Selector("changeRepeatModeCommand")] public MPChangeRepeatModeCommand ChangeRepeatModeCommand { get; }
-    [Selector("changeShuffleModeCommand")] public MPChangeShuffleModeCommand ChangeShuffleModeCommand { get; }
-    [Selector("nextTrackCommand")] public MPRemoteCommand NextTrackCommand { get; }
-    [Selector("previousTrackCommand")] public MPRemoteCommand PreviousTrackCommand { get; }
-    [Selector("skipForwardCommand")] public MPSkipIntervalCommand SkipForwardCommand { get; }
-    [Selector("skipBackwardCommand")] public MPSkipIntervalCommand SkipBackwardCommand { get; }
-    [Selector("seekForwardCommand")] public MPRemoteCommand SeekForwardCommand { get; }
-    [Selector("seekBackwardCommand")] public MPRemoteCommand SeekBackwardCommand { get; }
-    [Selector("changePlaybackPositionCommand")] public MPChangePlaybackPositionCommand ChangePlaybackPositionCommand { get; }
-    [Selector("ratingCommand")] public MPRatingCommand RatingCommand { get; }
-    [Selector("likeCommand")] public MPFeedbackCommand LikeCommand { get; }
-    [Selector("dislikeCommand")] public MPFeedbackCommand DislikeCommand { get; }
-    [Selector("bookmarkCommand")] public MPFeedbackCommand BookmarkCommand { get; }
-    [Selector("sharedCommandCenter")] public static MPRemoteCommandCenter SharedCommandCenter();
+    [Selector("pauseCommand")]
+    public MPRemoteCommand PauseCommand { get; }
+    [Selector("playCommand")]
+    public MPRemoteCommand PlayCommand { get; }
+    [Selector("stopCommand")]
+    public MPRemoteCommand StopCommand { get; }
+    [Selector("togglePlayPauseCommand")]
+    public MPRemoteCommand TogglePlayPauseCommand { get; }
+    [Selector("enableLanguageOptionCommand")]
+    public MPRemoteCommand EnableLanguageOptionCommand { get; }
+    [Selector("disableLanguageOptionCommand")]
+    public MPRemoteCommand DisableLanguageOptionCommand { get; }
+    [Selector("changePlaybackRateCommand")]
+    public MPChangePlaybackRateCommand ChangePlaybackRateCommand { get; }
+    [Selector("changeRepeatModeCommand")]
+    public MPChangeRepeatModeCommand ChangeRepeatModeCommand { get; }
+    [Selector("changeShuffleModeCommand")]
+    public MPChangeShuffleModeCommand ChangeShuffleModeCommand { get; }
+    [Selector("nextTrackCommand")]
+    public MPRemoteCommand NextTrackCommand { get; }
+    [Selector("previousTrackCommand")]
+    public MPRemoteCommand PreviousTrackCommand { get; }
+    [Selector("skipForwardCommand")]
+    public MPSkipIntervalCommand SkipForwardCommand { get; }
+    [Selector("skipBackwardCommand")]
+    public MPSkipIntervalCommand SkipBackwardCommand { get; }
+    [Selector("seekForwardCommand")]
+    public MPRemoteCommand SeekForwardCommand { get; }
+    [Selector("seekBackwardCommand")]
+    public MPRemoteCommand SeekBackwardCommand { get; }
+    [Selector("changePlaybackPositionCommand")]
+    public MPChangePlaybackPositionCommand ChangePlaybackPositionCommand { get; }
+    [Selector("ratingCommand")]
+    public MPRatingCommand RatingCommand { get; }
+    [Selector("likeCommand")]
+    public MPFeedbackCommand LikeCommand { get; }
+    [Selector("dislikeCommand")]
+    public MPFeedbackCommand DislikeCommand { get; }
+    [Selector("bookmarkCommand")]
+    public MPFeedbackCommand BookmarkCommand { get; }
+    [Selector("sharedCommandCenter")]
+    public static MPRemoteCommandCenter SharedCommandCenter();
 }
 
 #endif

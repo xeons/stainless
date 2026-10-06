@@ -34,76 +34,126 @@ import Standard.ObjC;
 
 public extern objc class MPSMatrixDescriptor : NSObject
 {
-    [Selector("rows", "setRows:")] public NSUInteger Rows { get; set; }
-    [Selector("columns", "setColumns:")] public NSUInteger Columns { get; set; }
-    [Selector("matrices")] public NSUInteger Matrices { get; }
-    [Selector("dataType", "setDataType:")] public MPSDataType DataType { get; set; }
-    [Selector("rowBytes", "setRowBytes:")] public NSUInteger RowBytes { get; set; }
-    [Selector("matrixBytes")] public NSUInteger MatrixBytes { get; }
-    [Selector("matrixDescriptorWithDimensions:columns:rowBytes:dataType:")] public static Self MatrixDescriptorWithDimensionsColumnsRowBytesDataType(NSUInteger rows, NSUInteger columns, NSUInteger rowBytes, MPSDataType dataType);
-    [Selector("matrixDescriptorWithRows:columns:rowBytes:dataType:")] public static Self MatrixDescriptorWithRowsColumnsRowBytesDataType(NSUInteger rows, NSUInteger columns, NSUInteger rowBytes, MPSDataType dataType);
-    [Selector("matrixDescriptorWithRows:columns:matrices:rowBytes:matrixBytes:dataType:")] public static Self MatrixDescriptorWithRowsColumnsMatricesRowBytesMatrixBytesDataType(NSUInteger rows, NSUInteger columns, NSUInteger matrices, NSUInteger rowBytes, NSUInteger matrixBytes, MPSDataType dataType);
-    [Selector("rowBytesFromColumns:dataType:")] public static nuint RowBytesFromColumnsDataType(NSUInteger columns, MPSDataType dataType);
-    [Selector("rowBytesForColumns:dataType:")] public static nuint RowBytesForColumnsDataType(NSUInteger columns, MPSDataType dataType);
+    [Selector("rows", "setRows:")]
+    public NSUInteger Rows { get; set; }
+    [Selector("columns", "setColumns:")]
+    public NSUInteger Columns { get; set; }
+    [Selector("matrices")]
+    public NSUInteger Matrices { get; }
+    [Selector("dataType", "setDataType:")]
+    public MPSDataType DataType { get; set; }
+    [Selector("rowBytes", "setRowBytes:")]
+    public NSUInteger RowBytes { get; set; }
+    [Selector("matrixBytes")]
+    public NSUInteger MatrixBytes { get; }
+    [Selector("matrixDescriptorWithDimensions:columns:rowBytes:dataType:")]
+    public static Self MatrixDescriptorWithDimensionsColumnsRowBytesDataType(NSUInteger rows, NSUInteger columns, NSUInteger rowBytes, MPSDataType dataType);
+    [Selector("matrixDescriptorWithRows:columns:rowBytes:dataType:")]
+    public static Self MatrixDescriptorWithRowsColumnsRowBytesDataType(NSUInteger rows, NSUInteger columns, NSUInteger rowBytes, MPSDataType dataType);
+    [Selector("matrixDescriptorWithRows:columns:matrices:rowBytes:matrixBytes:dataType:")]
+    public static Self MatrixDescriptorWithRowsColumnsMatricesRowBytesMatrixBytesDataType(NSUInteger rows, NSUInteger columns, NSUInteger matrices, NSUInteger rowBytes, NSUInteger matrixBytes, MPSDataType dataType);
+    [Selector("rowBytesFromColumns:dataType:")]
+    public static nuint RowBytesFromColumnsDataType(NSUInteger columns, MPSDataType dataType);
+    [Selector("rowBytesForColumns:dataType:")]
+    public static nuint RowBytesForColumnsDataType(NSUInteger columns, MPSDataType dataType);
 }
 
 public extern objc class MPSVectorDescriptor : NSObject
 {
-    [Selector("length", "setLength:")] public NSUInteger Length { get; set; }
-    [Selector("vectors")] public NSUInteger Vectors { get; }
-    [Selector("dataType", "setDataType:")] public MPSDataType DataType { get; set; }
-    [Selector("vectorBytes")] public NSUInteger VectorBytes { get; }
-    [Selector("vectorDescriptorWithLength:dataType:")] public static Self VectorDescriptorWithLengthDataType(NSUInteger length, MPSDataType dataType);
-    [Selector("vectorDescriptorWithLength:vectors:vectorBytes:dataType:")] public static Self VectorDescriptorWithLengthVectorsVectorBytesDataType(NSUInteger length, NSUInteger vectors, NSUInteger vectorBytes, MPSDataType dataType);
-    [Selector("vectorBytesForLength:dataType:")] public static nuint VectorBytesForLengthDataType(NSUInteger length, MPSDataType dataType);
+    [Selector("length", "setLength:")]
+    public NSUInteger Length { get; set; }
+    [Selector("vectors")]
+    public NSUInteger Vectors { get; }
+    [Selector("dataType", "setDataType:")]
+    public MPSDataType DataType { get; set; }
+    [Selector("vectorBytes")]
+    public NSUInteger VectorBytes { get; }
+    [Selector("vectorDescriptorWithLength:dataType:")]
+    public static Self VectorDescriptorWithLengthDataType(NSUInteger length, MPSDataType dataType);
+    [Selector("vectorDescriptorWithLength:vectors:vectorBytes:dataType:")]
+    public static Self VectorDescriptorWithLengthVectorsVectorBytesDataType(NSUInteger length, NSUInteger vectors, NSUInteger vectorBytes, MPSDataType dataType);
+    [Selector("vectorBytesForLength:dataType:")]
+    public static nuint VectorBytesForLengthDataType(NSUInteger length, MPSDataType dataType);
 }
 
 public extern objc class MPSMatrix : NSObject
 {
-    [Selector("device")] public MTLDevice Device { get; }
-    [Selector("rows")] public NSUInteger Rows { get; }
-    [Selector("columns")] public NSUInteger Columns { get; }
-    [Selector("matrices")] public NSUInteger Matrices { get; }
-    [Selector("dataType")] public MPSDataType DataType { get; }
-    [Selector("rowBytes")] public NSUInteger RowBytes { get; }
-    [Selector("matrixBytes")] public NSUInteger MatrixBytes { get; }
-    [Selector("offset")] public NSUInteger Offset { get; }
-    [Selector("data")] public MTLBuffer Data { get; }
-    [Selector("initWithBuffer:descriptor:")] public Self InitWithBufferDescriptor(MTLBuffer buffer, MPSMatrixDescriptor descriptor);
-    [Selector("initWithBuffer:offset:descriptor:")] public Self InitWithBufferOffsetDescriptor(MTLBuffer buffer, NSUInteger offset, MPSMatrixDescriptor descriptor);
-    [Selector("initWithDevice:descriptor:")] public Self InitWithDeviceDescriptor(MTLDevice device, MPSMatrixDescriptor descriptor);
-    [Selector("synchronizeOnCommandBuffer:")] public void SynchronizeOnCommandBuffer(MTLCommandBuffer commandBuffer);
-    [Selector("resourceSize")] public NSUInteger ResourceSize();
+    [Selector("device")]
+    public MTLDevice Device { get; }
+    [Selector("rows")]
+    public NSUInteger Rows { get; }
+    [Selector("columns")]
+    public NSUInteger Columns { get; }
+    [Selector("matrices")]
+    public NSUInteger Matrices { get; }
+    [Selector("dataType")]
+    public MPSDataType DataType { get; }
+    [Selector("rowBytes")]
+    public NSUInteger RowBytes { get; }
+    [Selector("matrixBytes")]
+    public NSUInteger MatrixBytes { get; }
+    [Selector("offset")]
+    public NSUInteger Offset { get; }
+    [Selector("data")]
+    public MTLBuffer Data { get; }
+    [Selector("initWithBuffer:descriptor:")]
+    public Self InitWithBufferDescriptor(MTLBuffer buffer, MPSMatrixDescriptor descriptor);
+    [Selector("initWithBuffer:offset:descriptor:")]
+    public Self InitWithBufferOffsetDescriptor(MTLBuffer buffer, NSUInteger offset, MPSMatrixDescriptor descriptor);
+    [Selector("initWithDevice:descriptor:")]
+    public Self InitWithDeviceDescriptor(MTLDevice device, MPSMatrixDescriptor descriptor);
+    [Selector("synchronizeOnCommandBuffer:")]
+    public void SynchronizeOnCommandBuffer(MTLCommandBuffer commandBuffer);
+    [Selector("resourceSize")]
+    public NSUInteger ResourceSize();
 }
 
 public extern objc class MPSVector : NSObject
 {
-    [Selector("device")] public MTLDevice Device { get; }
-    [Selector("length")] public NSUInteger Length { get; }
-    [Selector("vectors")] public NSUInteger Vectors { get; }
-    [Selector("dataType")] public MPSDataType DataType { get; }
-    [Selector("vectorBytes")] public NSUInteger VectorBytes { get; }
-    [Selector("offset")] public NSUInteger Offset { get; }
-    [Selector("data")] public MTLBuffer Data { get; }
-    [Selector("initWithBuffer:descriptor:")] public Self InitWithBufferDescriptor(MTLBuffer buffer, MPSVectorDescriptor descriptor);
-    [Selector("initWithBuffer:offset:descriptor:")] public Self InitWithBufferOffsetDescriptor(MTLBuffer buffer, NSUInteger offset, MPSVectorDescriptor descriptor);
-    [Selector("initWithDevice:descriptor:")] public Self InitWithDeviceDescriptor(MTLDevice device, MPSVectorDescriptor descriptor);
-    [Selector("synchronizeOnCommandBuffer:")] public void SynchronizeOnCommandBuffer(MTLCommandBuffer commandBuffer);
-    [Selector("resourceSize")] public NSUInteger ResourceSize();
+    [Selector("device")]
+    public MTLDevice Device { get; }
+    [Selector("length")]
+    public NSUInteger Length { get; }
+    [Selector("vectors")]
+    public NSUInteger Vectors { get; }
+    [Selector("dataType")]
+    public MPSDataType DataType { get; }
+    [Selector("vectorBytes")]
+    public NSUInteger VectorBytes { get; }
+    [Selector("offset")]
+    public NSUInteger Offset { get; }
+    [Selector("data")]
+    public MTLBuffer Data { get; }
+    [Selector("initWithBuffer:descriptor:")]
+    public Self InitWithBufferDescriptor(MTLBuffer buffer, MPSVectorDescriptor descriptor);
+    [Selector("initWithBuffer:offset:descriptor:")]
+    public Self InitWithBufferOffsetDescriptor(MTLBuffer buffer, NSUInteger offset, MPSVectorDescriptor descriptor);
+    [Selector("initWithDevice:descriptor:")]
+    public Self InitWithDeviceDescriptor(MTLDevice device, MPSVectorDescriptor descriptor);
+    [Selector("synchronizeOnCommandBuffer:")]
+    public void SynchronizeOnCommandBuffer(MTLCommandBuffer commandBuffer);
+    [Selector("resourceSize")]
+    public NSUInteger ResourceSize();
 }
 
 public extern objc class MPSTemporaryMatrix : MPSMatrix
 {
-    [Selector("readCount", "setReadCount:")] public NSUInteger ReadCount { get; set; }
-    [Selector("temporaryMatrixWithCommandBuffer:matrixDescriptor:")] public static Self TemporaryMatrixWithCommandBufferMatrixDescriptor(MTLCommandBuffer commandBuffer, MPSMatrixDescriptor matrixDescriptor);
-    [Selector("prefetchStorageWithCommandBuffer:matrixDescriptorList:")] public static void PrefetchStorageWithCommandBufferMatrixDescriptorList(MTLCommandBuffer commandBuffer, NSArray descriptorList);
+    [Selector("readCount", "setReadCount:")]
+    public NSUInteger ReadCount { get; set; }
+    [Selector("temporaryMatrixWithCommandBuffer:matrixDescriptor:")]
+    public static Self TemporaryMatrixWithCommandBufferMatrixDescriptor(MTLCommandBuffer commandBuffer, MPSMatrixDescriptor matrixDescriptor);
+    [Selector("prefetchStorageWithCommandBuffer:matrixDescriptorList:")]
+    public static void PrefetchStorageWithCommandBufferMatrixDescriptorList(MTLCommandBuffer commandBuffer, NSArray descriptorList);
 }
 
 public extern objc class MPSTemporaryVector : MPSVector
 {
-    [Selector("readCount", "setReadCount:")] public NSUInteger ReadCount { get; set; }
-    [Selector("temporaryVectorWithCommandBuffer:descriptor:")] public static Self TemporaryVectorWithCommandBufferDescriptor(MTLCommandBuffer commandBuffer, MPSVectorDescriptor descriptor);
-    [Selector("prefetchStorageWithCommandBuffer:descriptorList:")] public static void PrefetchStorageWithCommandBufferDescriptorList(MTLCommandBuffer commandBuffer, NSArray descriptorList);
+    [Selector("readCount", "setReadCount:")]
+    public NSUInteger ReadCount { get; set; }
+    [Selector("temporaryVectorWithCommandBuffer:descriptor:")]
+    public static Self TemporaryVectorWithCommandBufferDescriptor(MTLCommandBuffer commandBuffer, MPSVectorDescriptor descriptor);
+    [Selector("prefetchStorageWithCommandBuffer:descriptorList:")]
+    public static void PrefetchStorageWithCommandBufferDescriptorList(MTLCommandBuffer commandBuffer, NSArray descriptorList);
 }
 
 #endif

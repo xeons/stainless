@@ -55,33 +55,53 @@ public objc closure void GCControllerControllerPausedHandlerBlock(GCController a
 
 public extern objc class GCController : NSObject, GCDevice
 {
-    [Selector("current")] public static GCController? Current { get; }
+    [Selector("current")]
+    public static GCController? Current { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("controllerPausedHandler", "setControllerPausedHandler:")] public GCControllerControllerPausedHandlerBlock? ControllerPausedHandler { get; set; }
-    [Selector("shouldMonitorBackgroundEvents", "setShouldMonitorBackgroundEvents:")] public static bool ShouldMonitorBackgroundEvents { get; set; }
-    [Selector("isAttachedToDevice")] public bool AttachedToDevice { get; }
-    [Selector("playerIndex", "setPlayerIndex:")] public GCControllerPlayerIndex PlayerIndex { get; set; }
-    [Selector("input")] public GCControllerLiveInput Input { get; }
-    [Selector("battery")] public GCDeviceBattery? Battery { get; }
-    [Selector("physicalInputProfile")] public GCPhysicalInputProfile PhysicalInputProfile { get; }
+    [Selector("controllerPausedHandler", "setControllerPausedHandler:")]
+    public GCControllerControllerPausedHandlerBlock? ControllerPausedHandler { get; set; }
+    [Selector("shouldMonitorBackgroundEvents", "setShouldMonitorBackgroundEvents:")]
+    public static bool ShouldMonitorBackgroundEvents { get; set; }
+    [Selector("isAttachedToDevice")]
+    public bool AttachedToDevice { get; }
+    [Selector("playerIndex", "setPlayerIndex:")]
+    public GCControllerPlayerIndex PlayerIndex { get; set; }
+    [Selector("input")]
+    public GCControllerLiveInput Input { get; }
+    [Selector("battery")]
+    public GCDeviceBattery? Battery { get; }
+    [Selector("physicalInputProfile")]
+    public GCPhysicalInputProfile PhysicalInputProfile { get; }
     /// Deprecated in macOS 10.12.
-    [Selector("gamepad")] public GCGamepad? Gamepad { get; }
-    [Selector("microGamepad")] public GCMicroGamepad? MicroGamepad { get; }
-    [Selector("extendedGamepad")] public GCExtendedGamepad? ExtendedGamepad { get; }
-    [Selector("motion")] public GCMotion? Motion { get; }
-    [Selector("light")] public GCDeviceLight? Light { get; }
-    [Selector("haptics")] public GCDeviceHaptics? Haptics { get; }
-    [Selector("controllers")] public static NSArray Controllers();
-    [Selector("supportsHIDDevice:")] public static bool SupportsHIDDevice(IOHIDDeviceRef device);
+    [Selector("gamepad")]
+    public GCGamepad? Gamepad { get; }
+    [Selector("microGamepad")]
+    public GCMicroGamepad? MicroGamepad { get; }
+    [Selector("extendedGamepad")]
+    public GCExtendedGamepad? ExtendedGamepad { get; }
+    [Selector("motion")]
+    public GCMotion? Motion { get; }
+    [Selector("light")]
+    public GCDeviceLight? Light { get; }
+    [Selector("haptics")]
+    public GCDeviceHaptics? Haptics { get; }
+    [Selector("controllers")]
+    public static NSArray Controllers();
+    [Selector("supportsHIDDevice:")]
+    public static bool SupportsHIDDevice(IOHIDDeviceRef device);
 }
 
 /// Snapshot, a category of GCController.
 public extern objc class GCController
 {
-    [Selector("isSnapshot")] public bool Snapshot { get; }
-    [Selector("capture")] public GCController Capture();
-    [Selector("controllerWithMicroGamepad")] public static GCController ControllerWithMicroGamepad();
-    [Selector("controllerWithExtendedGamepad")] public static GCController ControllerWithExtendedGamepad();
+    [Selector("isSnapshot")]
+    public bool Snapshot { get; }
+    [Selector("capture")]
+    public GCController Capture();
+    [Selector("controllerWithMicroGamepad")]
+    public static GCController ControllerWithMicroGamepad();
+    [Selector("controllerWithExtendedGamepad")]
+    public static GCController ControllerWithExtendedGamepad();
 }
 
 public objc closure void GCControllerStartWirelessControllerDiscoveryWithCompletionHandlerCompletionHandlerBlock();
@@ -89,8 +109,10 @@ public objc closure void GCControllerStartWirelessControllerDiscoveryWithComplet
 /// Discovery, a category of GCController.
 public extern objc class GCController
 {
-    [Selector("startWirelessControllerDiscoveryWithCompletionHandler:")] public static void StartWirelessControllerDiscoveryWithCompletionHandler(GCControllerStartWirelessControllerDiscoveryWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("stopWirelessControllerDiscovery")] public static void StopWirelessControllerDiscovery();
+    [Selector("startWirelessControllerDiscoveryWithCompletionHandler:")]
+    public static void StartWirelessControllerDiscoveryWithCompletionHandler(GCControllerStartWirelessControllerDiscoveryWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("stopWirelessControllerDiscovery")]
+    public static void StopWirelessControllerDiscovery();
 }
 
 #endif

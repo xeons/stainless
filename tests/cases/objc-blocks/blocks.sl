@@ -13,23 +13,30 @@ import Standard.ObjC;
 [ObjCRoot]
 public extern objc class NSObject
 {
-    [Selector("alloc")] public static Self Alloc();
-    [Selector("init")] public Self Init();
+    [Selector("alloc")]
+    public static Self Alloc();
+    [Selector("init")]
+    public Self Init();
 }
 
 public extern objc class NSString : NSObject
 {
-    [Selector("stringWithUTF8String:")] public static Self FromUtf8(byte* text);
-    [Selector("length")] public nuint Length { get; }
-    [Selector("UTF8String")] public byte* Utf8 { get; }
+    [Selector("stringWithUTF8String:")]
+    public static Self FromUtf8(byte* text);
+    [Selector("length")]
+    public nuint Length { get; }
+    [Selector("UTF8String")]
+    public byte* Utf8 { get; }
 }
 
 public objc closure void EachObject(AnyObject item, nuint index, bool* stop);
 
 public extern objc class NSMutableArray : NSObject
 {
-    [Selector("addObject:")] public void Add(AnyObject item);
-    [Selector("enumerateObjectsUsingBlock:")] public void EnumerateObjects(EachObject each);
+    [Selector("addObject:")]
+    public void Add(AnyObject item);
+    [Selector("enumerateObjectsUsingBlock:")]
+    public void EnumerateObjects(EachObject each);
 }
 
 public struct Wide
@@ -48,14 +55,22 @@ public objc closure Wide Spread(double value);
 // Written in probe.m.
 public extern objc class SLBlocks : NSObject
 {
-    [Selector("keep:")] public static void Keep(Transform transform);
-    [Selector("fire:")] public static long Fire(long value);
-    [Selector("drop")] public static void Drop();
-    [Selector("adderFor:")] public static Transform AdderFor(long amount);
-    [Selector("ask:about:")] public static bool Ask(Test test, NSString text);
-    [Selector("name:with:")] public static NSString CallName(Name name, long value);
-    [Selector("spread:with:")] public static double CallSpread(Spread spread, double value);
-    [Selector("handTo:")] public static long HandTo(AnyObject keeper);
+    [Selector("keep:")]
+    public static void Keep(Transform transform);
+    [Selector("fire:")]
+    public static long Fire(long value);
+    [Selector("drop")]
+    public static void Drop();
+    [Selector("adderFor:")]
+    public static Transform AdderFor(long amount);
+    [Selector("ask:about:")]
+    public static bool Ask(Test test, NSString text);
+    [Selector("name:with:")]
+    public static NSString CallName(Name name, long value);
+    [Selector("spread:with:")]
+    public static double CallSpread(Spread spread, double value);
+    [Selector("handTo:")]
+    public static long HandTo(AnyObject keeper);
 }
 
 public class Tally

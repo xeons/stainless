@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public objc interface WKScriptMessageHandler : NSObjectProtocol
 {
-    [Selector("userContentController:didReceiveScriptMessage:")] void UserContentControllerDidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message);
+    [Selector("userContentController:didReceiveScriptMessage:")]
+    void UserContentControllerDidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message);
 }
 
 #endif

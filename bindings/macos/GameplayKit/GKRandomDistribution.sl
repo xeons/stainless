@@ -32,26 +32,42 @@ import Standard.ObjC;
 
 public extern objc class GKRandomDistribution : NSObject, GKRandom
 {
-    [Selector("lowestValue")] public NSInteger LowestValue { get; }
-    [Selector("highestValue")] public NSInteger HighestValue { get; }
-    [Selector("numberOfPossibleOutcomes")] public NSUInteger NumberOfPossibleOutcomes { get; }
-    [Selector("initWithRandomSource:lowestValue:highestValue:")] public Self InitWithRandomSourceLowestValueHighestValue(GKRandom source, NSInteger lowestInclusive, NSInteger highestInclusive);
-    [Selector("nextInt")] public NSInteger NextInt();
-    [Selector("nextIntWithUpperBound:")] public NSUInteger NextIntWithUpperBound(NSUInteger upperBound);
-    [Selector("nextUniform")] public float NextUniform();
-    [Selector("nextBool")] public bool NextBool();
-    [Selector("distributionWithLowestValue:highestValue:")] public static Self DistributionWithLowestValueHighestValue(NSInteger lowestInclusive, NSInteger highestInclusive);
-    [Selector("distributionForDieWithSideCount:")] public static Self DistributionForDieWithSideCount(NSInteger sideCount);
-    [Selector("d6")] public static Self D6();
-    [Selector("d20")] public static Self D20();
+    [Selector("lowestValue")]
+    public NSInteger LowestValue { get; }
+    [Selector("highestValue")]
+    public NSInteger HighestValue { get; }
+    [Selector("numberOfPossibleOutcomes")]
+    public NSUInteger NumberOfPossibleOutcomes { get; }
+    [Selector("initWithRandomSource:lowestValue:highestValue:")]
+    public Self InitWithRandomSourceLowestValueHighestValue(GKRandom source, NSInteger lowestInclusive, NSInteger highestInclusive);
+    [Selector("nextInt")]
+    public NSInteger NextInt();
+    [Selector("nextIntWithUpperBound:")]
+    public NSUInteger NextIntWithUpperBound(NSUInteger upperBound);
+    [Selector("nextUniform")]
+    public float NextUniform();
+    [Selector("nextBool")]
+    public bool NextBool();
+    [Selector("distributionWithLowestValue:highestValue:")]
+    public static Self DistributionWithLowestValueHighestValue(NSInteger lowestInclusive, NSInteger highestInclusive);
+    [Selector("distributionForDieWithSideCount:")]
+    public static Self DistributionForDieWithSideCount(NSInteger sideCount);
+    [Selector("d6")]
+    public static Self D6();
+    [Selector("d20")]
+    public static Self D20();
 }
 
 public extern objc class GKGaussianDistribution : GKRandomDistribution
 {
-    [Selector("mean")] public float Mean { get; }
-    [Selector("deviation")] public float Deviation { get; }
-    [Selector("initWithRandomSource:lowestValue:highestValue:")] public Self InitWithRandomSourceLowestValueHighestValue(GKRandom source, NSInteger lowestInclusive, NSInteger highestInclusive);
-    [Selector("initWithRandomSource:mean:deviation:")] public Self InitWithRandomSourceMeanDeviation(GKRandom source, float mean, float deviation);
+    [Selector("mean")]
+    public float Mean { get; }
+    [Selector("deviation")]
+    public float Deviation { get; }
+    [Selector("initWithRandomSource:lowestValue:highestValue:")]
+    public Self InitWithRandomSourceLowestValueHighestValue(GKRandom source, NSInteger lowestInclusive, NSInteger highestInclusive);
+    [Selector("initWithRandomSource:mean:deviation:")]
+    public Self InitWithRandomSourceMeanDeviation(GKRandom source, float mean, float deviation);
 }
 
 public extern objc class GKShuffledDistribution : GKRandomDistribution { }

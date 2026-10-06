@@ -34,69 +34,130 @@ public using NSURLResourceKey = NSString;
 
 public extern objc class NSURL : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("dataRepresentation")] public NSData DataRepresentation { get; }
-    [Selector("absoluteString")] public NSString? AbsoluteString { get; }
-    [Selector("relativeString")] public NSString RelativeString { get; }
-    [Selector("baseURL")] public NSURL? BaseURL { get; }
-    [Selector("absoluteURL")] public NSURL? AbsoluteURL { get; }
-    [Selector("scheme")] public NSString? Scheme { get; }
-    [Selector("resourceSpecifier")] public NSString? ResourceSpecifier { get; }
-    [Selector("host")] public NSString? Host { get; }
-    [Selector("port")] public NSNumber? Port { get; }
-    [Selector("user")] public NSString? User { get; }
-    [Selector("password")] public NSString? Password { get; }
-    [Selector("path")] public NSString? Path { get; }
-    [Selector("fragment")] public NSString? Fragment { get; }
+    [Selector("dataRepresentation")]
+    public NSData DataRepresentation { get; }
+    [Selector("absoluteString")]
+    public NSString? AbsoluteString { get; }
+    [Selector("relativeString")]
+    public NSString RelativeString { get; }
+    [Selector("baseURL")]
+    public NSURL? BaseURL { get; }
+    [Selector("absoluteURL")]
+    public NSURL? AbsoluteURL { get; }
+    [Selector("scheme")]
+    public NSString? Scheme { get; }
+    [Selector("resourceSpecifier")]
+    public NSString? ResourceSpecifier { get; }
+    [Selector("host")]
+    public NSString? Host { get; }
+    [Selector("port")]
+    public NSNumber? Port { get; }
+    [Selector("user")]
+    public NSString? User { get; }
+    [Selector("password")]
+    public NSString? Password { get; }
+    [Selector("path")]
+    public NSString? Path { get; }
+    [Selector("fragment")]
+    public NSString? Fragment { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("parameterString")] public NSString? ParameterString { get; }
-    [Selector("query")] public NSString? Query { get; }
-    [Selector("relativePath")] public NSString? RelativePath { get; }
-    [Selector("hasDirectoryPath")] public bool HasDirectoryPath { get; }
-    [Selector("fileSystemRepresentation")] public byte* FileSystemRepresentation { get; }
-    [Selector("isFileURL")] public bool FileURL { get; }
-    [Selector("standardizedURL")] public NSURL? StandardizedURL { get; }
-    [Selector("filePathURL")] public NSURL? FilePathURL { get; }
+    [Selector("parameterString")]
+    public NSString? ParameterString { get; }
+    [Selector("query")]
+    public NSString? Query { get; }
+    [Selector("relativePath")]
+    public NSString? RelativePath { get; }
+    [Selector("hasDirectoryPath")]
+    public bool HasDirectoryPath { get; }
+    [Selector("fileSystemRepresentation")]
+    public byte* FileSystemRepresentation { get; }
+    [Selector("isFileURL")]
+    public bool FileURL { get; }
+    [Selector("standardizedURL")]
+    public NSURL? StandardizedURL { get; }
+    [Selector("filePathURL")]
+    public NSURL? FilePathURL { get; }
     /// Deprecated in macOS 10.11.
-    [Selector("initWithScheme:host:path:")] public Self? InitWithSchemeHostPath(NSString scheme, NSString? host, NSString path);
-    [Selector("initFileURLWithPath:isDirectory:relativeToURL:")] public Self InitFileURLWithPathIsDirectoryRelativeToURL(NSString path, bool isDir, NSURL? baseURL);
-    [Selector("initFileURLWithPath:relativeToURL:")] public Self InitFileURLWithPathRelativeToURL(NSString path, NSURL? baseURL);
-    [Selector("initFileURLWithPath:isDirectory:")] public Self InitFileURLWithPathIsDirectory(NSString path, bool isDir);
-    [Selector("initFileURLWithPath:")] public Self InitFileURLWithPath(NSString path);
-    [Selector("fileURLWithPath:isDirectory:relativeToURL:")] public static NSURL FileURLWithPathIsDirectoryRelativeToURL(NSString path, bool isDir, NSURL? baseURL);
-    [Selector("fileURLWithPath:relativeToURL:")] public static NSURL FileURLWithPathRelativeToURL(NSString path, NSURL? baseURL);
-    [Selector("fileURLWithPath:isDirectory:")] public static NSURL FileURLWithPathIsDirectory(NSString path, bool isDir);
-    [Selector("fileURLWithPath:")] public static NSURL FileURLWithPath(NSString path);
-    [Selector("initFileURLWithFileSystemRepresentation:isDirectory:relativeToURL:")] public Self InitFileURLWithFileSystemRepresentationIsDirectoryRelativeToURL(byte* path, bool isDir, NSURL? baseURL);
-    [Selector("fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:")] public static NSURL FileURLWithFileSystemRepresentationIsDirectoryRelativeToURL(byte* path, bool isDir, NSURL? baseURL);
-    [Selector("initWithString:")] public Self? InitWithString(NSString URLString);
-    [Selector("initWithString:relativeToURL:")] public Self? InitWithStringRelativeToURL(NSString URLString, NSURL? baseURL);
-    [Selector("URLWithString:")] public static Self? URLWithString(NSString URLString);
-    [Selector("URLWithString:relativeToURL:")] public static Self? URLWithStringRelativeToURL(NSString URLString, NSURL? baseURL);
-    [Selector("initWithString:encodingInvalidCharacters:")] public Self? InitWithStringEncodingInvalidCharacters(NSString URLString, bool encodingInvalidCharacters);
-    [Selector("URLWithString:encodingInvalidCharacters:")] public static Self? URLWithStringEncodingInvalidCharacters(NSString URLString, bool encodingInvalidCharacters);
-    [Selector("initWithDataRepresentation:relativeToURL:")] public Self InitWithDataRepresentationRelativeToURL(NSData data, NSURL? baseURL);
-    [Selector("URLWithDataRepresentation:relativeToURL:")] public static NSURL URLWithDataRepresentationRelativeToURL(NSData data, NSURL? baseURL);
-    [Selector("initAbsoluteURLWithDataRepresentation:relativeToURL:")] public Self InitAbsoluteURLWithDataRepresentationRelativeToURL(NSData data, NSURL? baseURL);
-    [Selector("absoluteURLWithDataRepresentation:relativeToURL:")] public static NSURL AbsoluteURLWithDataRepresentationRelativeToURL(NSData data, NSURL? baseURL);
-    [Selector("getFileSystemRepresentation:maxLength:")] public bool GetFileSystemRepresentationMaxLength(byte* buffer, NSUInteger maxBufferLength);
-    [Selector("isFileReferenceURL")] public bool IsFileReferenceURL();
-    [Selector("fileReferenceURL")] public NSURL? FileReferenceURL();
-    [Selector("getResourceValue:forKey:error:")] public bool GetResourceValueForKeyError(out AnyObject? value, NSURLResourceKey key, out NSError? error);
-    [Selector("resourceValuesForKeys:error:")] public NSDictionary? ResourceValuesForKeysError(NSArray keys, out NSError? error);
-    [Selector("setResourceValue:forKey:error:")] public bool SetResourceValueForKeyError(AnyObject? value, NSURLResourceKey key, out NSError? error);
-    [Selector("setResourceValues:error:")] public bool SetResourceValuesError(NSDictionary keyedValues, out NSError? error);
-    [Selector("removeCachedResourceValueForKey:")] public void RemoveCachedResourceValueForKey(NSURLResourceKey key);
-    [Selector("removeAllCachedResourceValues")] public void RemoveAllCachedResourceValues();
-    [Selector("setTemporaryResourceValue:forKey:")] public void SetTemporaryResourceValueForKey(AnyObject? value, NSURLResourceKey key);
-    [Selector("bookmarkDataWithOptions:includingResourceValuesForKeys:relativeToURL:error:")] public NSData? BookmarkDataWithOptionsIncludingResourceValuesForKeysRelativeToURLError(NSURLBookmarkCreationOptions options, NSArray? keys, NSURL? relativeURL, out NSError? error);
-    [Selector("initByResolvingBookmarkData:options:relativeToURL:bookmarkDataIsStale:error:")] public Self? InitByResolvingBookmarkDataOptionsRelativeToURLBookmarkDataIsStaleError(NSData bookmarkData, NSURLBookmarkResolutionOptions options, NSURL? relativeURL, bool* isStale, out NSError? error);
-    [Selector("URLByResolvingBookmarkData:options:relativeToURL:bookmarkDataIsStale:error:")] public static Self? URLByResolvingBookmarkDataOptionsRelativeToURLBookmarkDataIsStaleError(NSData bookmarkData, NSURLBookmarkResolutionOptions options, NSURL? relativeURL, bool* isStale, out NSError? error);
-    [Selector("resourceValuesForKeys:fromBookmarkData:")] public static NSDictionary? ResourceValuesForKeysFromBookmarkData(NSArray keys, NSData bookmarkData);
-    [Selector("writeBookmarkData:toURL:options:error:")] public static bool WriteBookmarkDataToURLOptionsError(NSData bookmarkData, NSURL bookmarkFileURL, NSURLBookmarkFileCreationOptions options, out NSError? error);
-    [Selector("bookmarkDataWithContentsOfURL:error:")] public static NSData? BookmarkDataWithContentsOfURLError(NSURL bookmarkFileURL, out NSError? error);
-    [Selector("URLByResolvingAliasFileAtURL:options:error:")] public static Self? URLByResolvingAliasFileAtURLOptionsError(NSURL url, NSURLBookmarkResolutionOptions options, out NSError? error);
-    [Selector("startAccessingSecurityScopedResource")] public bool StartAccessingSecurityScopedResource();
-    [Selector("stopAccessingSecurityScopedResource")] public void StopAccessingSecurityScopedResource();
+    [Selector("initWithScheme:host:path:")]
+    public Self? InitWithSchemeHostPath(NSString scheme, NSString? host, NSString path);
+    [Selector("initFileURLWithPath:isDirectory:relativeToURL:")]
+    public Self InitFileURLWithPathIsDirectoryRelativeToURL(NSString path, bool isDir, NSURL? baseURL);
+    [Selector("initFileURLWithPath:relativeToURL:")]
+    public Self InitFileURLWithPathRelativeToURL(NSString path, NSURL? baseURL);
+    [Selector("initFileURLWithPath:isDirectory:")]
+    public Self InitFileURLWithPathIsDirectory(NSString path, bool isDir);
+    [Selector("initFileURLWithPath:")]
+    public Self InitFileURLWithPath(NSString path);
+    [Selector("fileURLWithPath:isDirectory:relativeToURL:")]
+    public static NSURL FileURLWithPathIsDirectoryRelativeToURL(NSString path, bool isDir, NSURL? baseURL);
+    [Selector("fileURLWithPath:relativeToURL:")]
+    public static NSURL FileURLWithPathRelativeToURL(NSString path, NSURL? baseURL);
+    [Selector("fileURLWithPath:isDirectory:")]
+    public static NSURL FileURLWithPathIsDirectory(NSString path, bool isDir);
+    [Selector("fileURLWithPath:")]
+    public static NSURL FileURLWithPath(NSString path);
+    [Selector("initFileURLWithFileSystemRepresentation:isDirectory:relativeToURL:")]
+    public Self InitFileURLWithFileSystemRepresentationIsDirectoryRelativeToURL(byte* path, bool isDir, NSURL? baseURL);
+    [Selector("fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:")]
+    public static NSURL FileURLWithFileSystemRepresentationIsDirectoryRelativeToURL(byte* path, bool isDir, NSURL? baseURL);
+    [Selector("initWithString:")]
+    public Self? InitWithString(NSString URLString);
+    [Selector("initWithString:relativeToURL:")]
+    public Self? InitWithStringRelativeToURL(NSString URLString, NSURL? baseURL);
+    [Selector("URLWithString:")]
+    public static Self? URLWithString(NSString URLString);
+    [Selector("URLWithString:relativeToURL:")]
+    public static Self? URLWithStringRelativeToURL(NSString URLString, NSURL? baseURL);
+    [Selector("initWithString:encodingInvalidCharacters:")]
+    public Self? InitWithStringEncodingInvalidCharacters(NSString URLString, bool encodingInvalidCharacters);
+    [Selector("URLWithString:encodingInvalidCharacters:")]
+    public static Self? URLWithStringEncodingInvalidCharacters(NSString URLString, bool encodingInvalidCharacters);
+    [Selector("initWithDataRepresentation:relativeToURL:")]
+    public Self InitWithDataRepresentationRelativeToURL(NSData data, NSURL? baseURL);
+    [Selector("URLWithDataRepresentation:relativeToURL:")]
+    public static NSURL URLWithDataRepresentationRelativeToURL(NSData data, NSURL? baseURL);
+    [Selector("initAbsoluteURLWithDataRepresentation:relativeToURL:")]
+    public Self InitAbsoluteURLWithDataRepresentationRelativeToURL(NSData data, NSURL? baseURL);
+    [Selector("absoluteURLWithDataRepresentation:relativeToURL:")]
+    public static NSURL AbsoluteURLWithDataRepresentationRelativeToURL(NSData data, NSURL? baseURL);
+    [Selector("getFileSystemRepresentation:maxLength:")]
+    public bool GetFileSystemRepresentationMaxLength(byte* buffer, NSUInteger maxBufferLength);
+    [Selector("isFileReferenceURL")]
+    public bool IsFileReferenceURL();
+    [Selector("fileReferenceURL")]
+    public NSURL? FileReferenceURL();
+    [Selector("getResourceValue:forKey:error:")]
+    public bool GetResourceValueForKeyError(out AnyObject? value, NSURLResourceKey key, out NSError? error);
+    [Selector("resourceValuesForKeys:error:")]
+    public NSDictionary? ResourceValuesForKeysError(NSArray keys, out NSError? error);
+    [Selector("setResourceValue:forKey:error:")]
+    public bool SetResourceValueForKeyError(AnyObject? value, NSURLResourceKey key, out NSError? error);
+    [Selector("setResourceValues:error:")]
+    public bool SetResourceValuesError(NSDictionary keyedValues, out NSError? error);
+    [Selector("removeCachedResourceValueForKey:")]
+    public void RemoveCachedResourceValueForKey(NSURLResourceKey key);
+    [Selector("removeAllCachedResourceValues")]
+    public void RemoveAllCachedResourceValues();
+    [Selector("setTemporaryResourceValue:forKey:")]
+    public void SetTemporaryResourceValueForKey(AnyObject? value, NSURLResourceKey key);
+    [Selector("bookmarkDataWithOptions:includingResourceValuesForKeys:relativeToURL:error:")]
+    public NSData? BookmarkDataWithOptionsIncludingResourceValuesForKeysRelativeToURLError(NSURLBookmarkCreationOptions options, NSArray? keys, NSURL? relativeURL, out NSError? error);
+    [Selector("initByResolvingBookmarkData:options:relativeToURL:bookmarkDataIsStale:error:")]
+    public Self? InitByResolvingBookmarkDataOptionsRelativeToURLBookmarkDataIsStaleError(NSData bookmarkData, NSURLBookmarkResolutionOptions options, NSURL? relativeURL, bool* isStale, out NSError? error);
+    [Selector("URLByResolvingBookmarkData:options:relativeToURL:bookmarkDataIsStale:error:")]
+    public static Self? URLByResolvingBookmarkDataOptionsRelativeToURLBookmarkDataIsStaleError(NSData bookmarkData, NSURLBookmarkResolutionOptions options, NSURL? relativeURL, bool* isStale, out NSError? error);
+    [Selector("resourceValuesForKeys:fromBookmarkData:")]
+    public static NSDictionary? ResourceValuesForKeysFromBookmarkData(NSArray keys, NSData bookmarkData);
+    [Selector("writeBookmarkData:toURL:options:error:")]
+    public static bool WriteBookmarkDataToURLOptionsError(NSData bookmarkData, NSURL bookmarkFileURL, NSURLBookmarkFileCreationOptions options, out NSError? error);
+    [Selector("bookmarkDataWithContentsOfURL:error:")]
+    public static NSData? BookmarkDataWithContentsOfURLError(NSURL bookmarkFileURL, out NSError? error);
+    [Selector("URLByResolvingAliasFileAtURL:options:error:")]
+    public static Self? URLByResolvingAliasFileAtURLOptionsError(NSURL url, NSURLBookmarkResolutionOptions options, out NSError? error);
+    [Selector("startAccessingSecurityScopedResource")]
+    public bool StartAccessingSecurityScopedResource();
+    [Selector("stopAccessingSecurityScopedResource")]
+    public void StopAccessingSecurityScopedResource();
 }
 
 public extern "C" NSString NSURLFileScheme;
@@ -441,9 +502,12 @@ public using NSURLBookmarkFileCreationOptions = NSUInteger;
 /// NSPromisedItems, a category of NSURL.
 public extern objc class NSURL
 {
-    [Selector("getPromisedItemResourceValue:forKey:error:")] public bool GetPromisedItemResourceValueForKeyError(out AnyObject? value, NSURLResourceKey key, out NSError? error);
-    [Selector("promisedItemResourceValuesForKeys:error:")] public NSDictionary? PromisedItemResourceValuesForKeysError(NSArray keys, out NSError? error);
-    [Selector("checkPromisedItemIsReachableAndReturnError:")] public bool CheckPromisedItemIsReachableAndReturnError(out NSError? error);
+    [Selector("getPromisedItemResourceValue:forKey:error:")]
+    public bool GetPromisedItemResourceValueForKeyError(out AnyObject? value, NSURLResourceKey key, out NSError? error);
+    [Selector("promisedItemResourceValuesForKeys:error:")]
+    public NSDictionary? PromisedItemResourceValuesForKeysError(NSArray keys, out NSError? error);
+    [Selector("checkPromisedItemIsReachableAndReturnError:")]
+    public bool CheckPromisedItemIsReachableAndReturnError(out NSError? error);
 }
 
 /// NSItemProvider, a category of NSURL.
@@ -451,124 +515,196 @@ public extern objc class NSURL : NSItemProviderReading, NSItemProviderWriting { 
 
 public extern objc class NSURLQueryItem : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("value")] public NSString? Value { get; }
-    [Selector("initWithName:value:")] public Self InitWithNameValue(NSString name, NSString? value);
-    [Selector("queryItemWithName:value:")] public static Self QueryItemWithNameValue(NSString name, NSString? value);
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("value")]
+    public NSString? Value { get; }
+    [Selector("initWithName:value:")]
+    public Self InitWithNameValue(NSString name, NSString? value);
+    [Selector("queryItemWithName:value:")]
+    public static Self QueryItemWithNameValue(NSString name, NSString? value);
 }
 
 public extern objc class NSURLComponents : NSObject, NSCopying
 {
-    [Selector("URL")] public NSURL? URL { get; }
-    [Selector("string")] public NSString? String { get; }
-    [Selector("scheme", "setScheme:")] public NSString? Scheme { get; set; }
-    [Selector("user", "setUser:")] public NSString? User { get; set; }
-    [Selector("password", "setPassword:")] public NSString? Password { get; set; }
-    [Selector("host", "setHost:")] public NSString? Host { get; set; }
-    [Selector("port", "setPort:")] public NSNumber? Port { get; set; }
-    [Selector("path", "setPath:")] public NSString? Path { get; set; }
-    [Selector("query", "setQuery:")] public NSString? Query { get; set; }
-    [Selector("fragment", "setFragment:")] public NSString? Fragment { get; set; }
-    [Selector("percentEncodedUser", "setPercentEncodedUser:")] public NSString? PercentEncodedUser { get; set; }
-    [Selector("percentEncodedPassword", "setPercentEncodedPassword:")] public NSString? PercentEncodedPassword { get; set; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
+    [Selector("string")]
+    public NSString? String { get; }
+    [Selector("scheme", "setScheme:")]
+    public NSString? Scheme { get; set; }
+    [Selector("user", "setUser:")]
+    public NSString? User { get; set; }
+    [Selector("password", "setPassword:")]
+    public NSString? Password { get; set; }
+    [Selector("host", "setHost:")]
+    public NSString? Host { get; set; }
+    [Selector("port", "setPort:")]
+    public NSNumber? Port { get; set; }
+    [Selector("path", "setPath:")]
+    public NSString? Path { get; set; }
+    [Selector("query", "setQuery:")]
+    public NSString? Query { get; set; }
+    [Selector("fragment", "setFragment:")]
+    public NSString? Fragment { get; set; }
+    [Selector("percentEncodedUser", "setPercentEncodedUser:")]
+    public NSString? PercentEncodedUser { get; set; }
+    [Selector("percentEncodedPassword", "setPercentEncodedPassword:")]
+    public NSString? PercentEncodedPassword { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("percentEncodedHost", "setPercentEncodedHost:")] public NSString? PercentEncodedHost { get; set; }
-    [Selector("percentEncodedPath", "setPercentEncodedPath:")] public NSString? PercentEncodedPath { get; set; }
-    [Selector("percentEncodedQuery", "setPercentEncodedQuery:")] public NSString? PercentEncodedQuery { get; set; }
-    [Selector("percentEncodedFragment", "setPercentEncodedFragment:")] public NSString? PercentEncodedFragment { get; set; }
-    [Selector("encodedHost", "setEncodedHost:")] public NSString? EncodedHost { get; set; }
-    [Selector("rangeOfScheme")] public NSRange RangeOfScheme { get; }
-    [Selector("rangeOfUser")] public NSRange RangeOfUser { get; }
-    [Selector("rangeOfPassword")] public NSRange RangeOfPassword { get; }
-    [Selector("rangeOfHost")] public NSRange RangeOfHost { get; }
-    [Selector("rangeOfPort")] public NSRange RangeOfPort { get; }
-    [Selector("rangeOfPath")] public NSRange RangeOfPath { get; }
-    [Selector("rangeOfQuery")] public NSRange RangeOfQuery { get; }
-    [Selector("rangeOfFragment")] public NSRange RangeOfFragment { get; }
-    [Selector("queryItems", "setQueryItems:")] public NSArray? QueryItems { get; set; }
-    [Selector("percentEncodedQueryItems", "setPercentEncodedQueryItems:")] public NSArray? PercentEncodedQueryItems { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithURL:resolvingAgainstBaseURL:")] public Self? InitWithURLResolvingAgainstBaseURL(NSURL url, bool resolve);
-    [Selector("componentsWithURL:resolvingAgainstBaseURL:")] public static Self? ComponentsWithURLResolvingAgainstBaseURL(NSURL url, bool resolve);
-    [Selector("initWithString:")] public Self? InitWithString(NSString URLString);
-    [Selector("componentsWithString:")] public static Self? ComponentsWithString(NSString URLString);
-    [Selector("initWithString:encodingInvalidCharacters:")] public Self? InitWithStringEncodingInvalidCharacters(NSString URLString, bool encodingInvalidCharacters);
-    [Selector("componentsWithString:encodingInvalidCharacters:")] public static Self? ComponentsWithStringEncodingInvalidCharacters(NSString URLString, bool encodingInvalidCharacters);
-    [Selector("URLRelativeToURL:")] public NSURL? URLRelativeToURL(NSURL? baseURL);
+    [Selector("percentEncodedHost", "setPercentEncodedHost:")]
+    public NSString? PercentEncodedHost { get; set; }
+    [Selector("percentEncodedPath", "setPercentEncodedPath:")]
+    public NSString? PercentEncodedPath { get; set; }
+    [Selector("percentEncodedQuery", "setPercentEncodedQuery:")]
+    public NSString? PercentEncodedQuery { get; set; }
+    [Selector("percentEncodedFragment", "setPercentEncodedFragment:")]
+    public NSString? PercentEncodedFragment { get; set; }
+    [Selector("encodedHost", "setEncodedHost:")]
+    public NSString? EncodedHost { get; set; }
+    [Selector("rangeOfScheme")]
+    public NSRange RangeOfScheme { get; }
+    [Selector("rangeOfUser")]
+    public NSRange RangeOfUser { get; }
+    [Selector("rangeOfPassword")]
+    public NSRange RangeOfPassword { get; }
+    [Selector("rangeOfHost")]
+    public NSRange RangeOfHost { get; }
+    [Selector("rangeOfPort")]
+    public NSRange RangeOfPort { get; }
+    [Selector("rangeOfPath")]
+    public NSRange RangeOfPath { get; }
+    [Selector("rangeOfQuery")]
+    public NSRange RangeOfQuery { get; }
+    [Selector("rangeOfFragment")]
+    public NSRange RangeOfFragment { get; }
+    [Selector("queryItems", "setQueryItems:")]
+    public NSArray? QueryItems { get; set; }
+    [Selector("percentEncodedQueryItems", "setPercentEncodedQueryItems:")]
+    public NSArray? PercentEncodedQueryItems { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithURL:resolvingAgainstBaseURL:")]
+    public Self? InitWithURLResolvingAgainstBaseURL(NSURL url, bool resolve);
+    [Selector("componentsWithURL:resolvingAgainstBaseURL:")]
+    public static Self? ComponentsWithURLResolvingAgainstBaseURL(NSURL url, bool resolve);
+    [Selector("initWithString:")]
+    public Self? InitWithString(NSString URLString);
+    [Selector("componentsWithString:")]
+    public static Self? ComponentsWithString(NSString URLString);
+    [Selector("initWithString:encodingInvalidCharacters:")]
+    public Self? InitWithStringEncodingInvalidCharacters(NSString URLString, bool encodingInvalidCharacters);
+    [Selector("componentsWithString:encodingInvalidCharacters:")]
+    public static Self? ComponentsWithStringEncodingInvalidCharacters(NSString URLString, bool encodingInvalidCharacters);
+    [Selector("URLRelativeToURL:")]
+    public NSURL? URLRelativeToURL(NSURL? baseURL);
 }
 
 /// NSURLUtilities, a category of NSCharacterSet.
 public extern objc class NSCharacterSet
 {
-    [Selector("URLUserAllowedCharacterSet")] public static NSCharacterSet URLUserAllowedCharacterSet { get; }
-    [Selector("URLPasswordAllowedCharacterSet")] public static NSCharacterSet URLPasswordAllowedCharacterSet { get; }
-    [Selector("URLHostAllowedCharacterSet")] public static NSCharacterSet URLHostAllowedCharacterSet { get; }
-    [Selector("URLPathAllowedCharacterSet")] public static NSCharacterSet URLPathAllowedCharacterSet { get; }
-    [Selector("URLQueryAllowedCharacterSet")] public static NSCharacterSet URLQueryAllowedCharacterSet { get; }
-    [Selector("URLFragmentAllowedCharacterSet")] public static NSCharacterSet URLFragmentAllowedCharacterSet { get; }
+    [Selector("URLUserAllowedCharacterSet")]
+    public static NSCharacterSet URLUserAllowedCharacterSet { get; }
+    [Selector("URLPasswordAllowedCharacterSet")]
+    public static NSCharacterSet URLPasswordAllowedCharacterSet { get; }
+    [Selector("URLHostAllowedCharacterSet")]
+    public static NSCharacterSet URLHostAllowedCharacterSet { get; }
+    [Selector("URLPathAllowedCharacterSet")]
+    public static NSCharacterSet URLPathAllowedCharacterSet { get; }
+    [Selector("URLQueryAllowedCharacterSet")]
+    public static NSCharacterSet URLQueryAllowedCharacterSet { get; }
+    [Selector("URLFragmentAllowedCharacterSet")]
+    public static NSCharacterSet URLFragmentAllowedCharacterSet { get; }
 }
 
 /// NSURLUtilities, a category of NSString.
 public extern objc class NSString
 {
-    [Selector("stringByRemovingPercentEncoding")] public NSString? StringByRemovingPercentEncoding { get; }
-    [Selector("stringByAddingPercentEncodingWithAllowedCharacters:")] public NSString? StringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet allowedCharacters);
+    [Selector("stringByRemovingPercentEncoding")]
+    public NSString? StringByRemovingPercentEncoding { get; }
+    [Selector("stringByAddingPercentEncodingWithAllowedCharacters:")]
+    public NSString? StringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet allowedCharacters);
     /// Deprecated in macOS 10.11.
-    [Selector("stringByAddingPercentEscapesUsingEncoding:")] public NSString? StringByAddingPercentEscapesUsingEncoding(NSStringEncoding enc);
+    [Selector("stringByAddingPercentEscapesUsingEncoding:")]
+    public NSString? StringByAddingPercentEscapesUsingEncoding(NSStringEncoding enc);
     /// Deprecated in macOS 10.11.
-    [Selector("stringByReplacingPercentEscapesUsingEncoding:")] public NSString? StringByReplacingPercentEscapesUsingEncoding(NSStringEncoding enc);
+    [Selector("stringByReplacingPercentEscapesUsingEncoding:")]
+    public NSString? StringByReplacingPercentEscapesUsingEncoding(NSStringEncoding enc);
 }
 
 /// NSURLPathUtilities, a category of NSURL.
 public extern objc class NSURL
 {
-    [Selector("pathComponents")] public NSArray? PathComponents { get; }
-    [Selector("lastPathComponent")] public NSString? LastPathComponent { get; }
-    [Selector("pathExtension")] public NSString? PathExtension { get; }
-    [Selector("URLByDeletingLastPathComponent")] public NSURL? URLByDeletingLastPathComponent { get; }
-    [Selector("URLByDeletingPathExtension")] public NSURL? URLByDeletingPathExtension { get; }
-    [Selector("URLByStandardizingPath")] public NSURL? URLByStandardizingPath { get; }
-    [Selector("URLByResolvingSymlinksInPath")] public NSURL? URLByResolvingSymlinksInPath { get; }
-    [Selector("fileURLWithPathComponents:")] public static NSURL? FileURLWithPathComponents(NSArray components);
-    [Selector("URLByAppendingPathComponent:")] public NSURL? URLByAppendingPathComponent(NSString pathComponent);
-    [Selector("URLByAppendingPathComponent:isDirectory:")] public NSURL? URLByAppendingPathComponentIsDirectory(NSString pathComponent, bool isDirectory);
-    [Selector("URLByAppendingPathExtension:")] public NSURL? URLByAppendingPathExtension(NSString pathExtension);
-    [Selector("checkResourceIsReachableAndReturnError:")] public bool CheckResourceIsReachableAndReturnError(out NSError? error);
+    [Selector("pathComponents")]
+    public NSArray? PathComponents { get; }
+    [Selector("lastPathComponent")]
+    public NSString? LastPathComponent { get; }
+    [Selector("pathExtension")]
+    public NSString? PathExtension { get; }
+    [Selector("URLByDeletingLastPathComponent")]
+    public NSURL? URLByDeletingLastPathComponent { get; }
+    [Selector("URLByDeletingPathExtension")]
+    public NSURL? URLByDeletingPathExtension { get; }
+    [Selector("URLByStandardizingPath")]
+    public NSURL? URLByStandardizingPath { get; }
+    [Selector("URLByResolvingSymlinksInPath")]
+    public NSURL? URLByResolvingSymlinksInPath { get; }
+    [Selector("fileURLWithPathComponents:")]
+    public static NSURL? FileURLWithPathComponents(NSArray components);
+    [Selector("URLByAppendingPathComponent:")]
+    public NSURL? URLByAppendingPathComponent(NSString pathComponent);
+    [Selector("URLByAppendingPathComponent:isDirectory:")]
+    public NSURL? URLByAppendingPathComponentIsDirectory(NSString pathComponent, bool isDirectory);
+    [Selector("URLByAppendingPathExtension:")]
+    public NSURL? URLByAppendingPathExtension(NSString pathExtension);
+    [Selector("checkResourceIsReachableAndReturnError:")]
+    public bool CheckResourceIsReachableAndReturnError(out NSError? error);
 }
 
 public extern objc class NSFileSecurity : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 /// NSURLClient, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.4.
-    [Selector("URL:resourceDataDidBecomeAvailable:")] public void URLResourceDataDidBecomeAvailable(NSURL sender, NSData newBytes);
+    [Selector("URL:resourceDataDidBecomeAvailable:")]
+    public void URLResourceDataDidBecomeAvailable(NSURL sender, NSData newBytes);
     /// Deprecated in macOS 10.4.
-    [Selector("URLResourceDidFinishLoading:")] public void URLResourceDidFinishLoading(NSURL sender);
+    [Selector("URLResourceDidFinishLoading:")]
+    public void URLResourceDidFinishLoading(NSURL sender);
     /// Deprecated in macOS 10.4.
-    [Selector("URLResourceDidCancelLoading:")] public void URLResourceDidCancelLoading(NSURL sender);
+    [Selector("URLResourceDidCancelLoading:")]
+    public void URLResourceDidCancelLoading(NSURL sender);
     /// Deprecated in macOS 10.4.
-    [Selector("URL:resourceDidFailLoadingWithReason:")] public void URLResourceDidFailLoadingWithReason(NSURL sender, NSString reason);
+    [Selector("URL:resourceDidFailLoadingWithReason:")]
+    public void URLResourceDidFailLoadingWithReason(NSURL sender, NSString reason);
 }
 
 /// NSURLLoading, a category of NSURL.
 public extern objc class NSURL
 {
     /// Deprecated in macOS 10.4.
-    [Selector("resourceDataUsingCache:")] public NSData? ResourceDataUsingCache(bool shouldUseCache);
+    [Selector("resourceDataUsingCache:")]
+    public NSData? ResourceDataUsingCache(bool shouldUseCache);
     /// Deprecated in macOS 10.4.
-    [Selector("loadResourceDataNotifyingClient:usingCache:")] public void LoadResourceDataNotifyingClientUsingCache(AnyObject client, bool shouldUseCache);
+    [Selector("loadResourceDataNotifyingClient:usingCache:")]
+    public void LoadResourceDataNotifyingClientUsingCache(AnyObject client, bool shouldUseCache);
     /// Deprecated in macOS 10.4.
-    [Selector("propertyForKey:")] public AnyObject? PropertyForKey(NSString propertyKey);
+    [Selector("propertyForKey:")]
+    public AnyObject? PropertyForKey(NSString propertyKey);
     /// Deprecated in macOS 10.4.
-    [Selector("setResourceData:")] public bool SetResourceData(NSData data);
+    [Selector("setResourceData:")]
+    public bool SetResourceData(NSData data);
     /// Deprecated in macOS 10.4.
-    [Selector("setProperty:forKey:")] public bool SetPropertyForKey(AnyObject property, NSString propertyKey);
+    [Selector("setProperty:forKey:")]
+    public bool SetPropertyForKey(AnyObject property, NSString propertyKey);
     /// Deprecated in macOS 10.4.
-    [Selector("URLHandleUsingCache:")] public NSURLHandle? URLHandleUsingCache(bool shouldUseCache);
+    [Selector("URLHandleUsingCache:")]
+    public NSURLHandle? URLHandleUsingCache(bool shouldUseCache);
 }
 
 #endif

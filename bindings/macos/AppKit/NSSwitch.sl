@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class NSSwitch : NSControl, NSAccessibilitySwitch
 {
-    [Selector("state", "setState:")] public NSControlStateValue State { get; set; }
+    [Selector("state", "setState:")]
+    public NSControlStateValue State { get; set; }
 }
 
 #endif

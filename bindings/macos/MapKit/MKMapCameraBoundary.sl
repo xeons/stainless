@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class MKMapCameraBoundary : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("mapRect")] public MKMapRect MapRect { get; }
-    [Selector("region")] public MKCoordinateRegion Region { get; }
-    [Selector("initWithMapRect:")] public Self? InitWithMapRect(MKMapRect mapRect);
-    [Selector("initWithCoordinateRegion:")] public Self? InitWithCoordinateRegion(MKCoordinateRegion region);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("mapRect")]
+    public MKMapRect MapRect { get; }
+    [Selector("region")]
+    public MKCoordinateRegion Region { get; }
+    [Selector("initWithMapRect:")]
+    public Self? InitWithMapRect(MKMapRect mapRect);
+    [Selector("initWithCoordinateRegion:")]
+    public Self? InitWithCoordinateRegion(MKCoordinateRegion region);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 #endif

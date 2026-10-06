@@ -33,18 +33,30 @@ import Standard.ObjC;
 
 public extern objc class MTRFabricInfo : NSObject
 {
-    [Selector("rootPublicKey")] public NSData RootPublicKey { get; }
-    [Selector("vendorID")] public NSNumber VendorID { get; }
-    [Selector("fabricID")] public NSNumber FabricID { get; }
-    [Selector("nodeID")] public NSNumber NodeID { get; }
-    [Selector("label")] public NSString Label { get; }
-    [Selector("rootCertificate")] public MTRCertificateDERBytes? RootCertificate { get; }
-    [Selector("rootCertificateTLV")] public MTRCertificateTLVBytes? RootCertificateTLV { get; }
-    [Selector("intermediateCertificate")] public MTRCertificateDERBytes? IntermediateCertificate { get; }
-    [Selector("intermediateCertificateTLV")] public MTRCertificateTLVBytes? IntermediateCertificateTLV { get; }
-    [Selector("operationalCertificate")] public MTRCertificateDERBytes? OperationalCertificate { get; }
-    [Selector("operationalCertificateTLV")] public MTRCertificateTLVBytes? OperationalCertificateTLV { get; }
-    [Selector("fabricIndex")] public NSNumber FabricIndex { get; }
+    [Selector("rootPublicKey")]
+    public NSData RootPublicKey { get; }
+    [Selector("vendorID")]
+    public NSNumber VendorID { get; }
+    [Selector("fabricID")]
+    public NSNumber FabricID { get; }
+    [Selector("nodeID")]
+    public NSNumber NodeID { get; }
+    [Selector("label")]
+    public NSString Label { get; }
+    [Selector("rootCertificate")]
+    public MTRCertificateDERBytes? RootCertificate { get; }
+    [Selector("rootCertificateTLV")]
+    public MTRCertificateTLVBytes? RootCertificateTLV { get; }
+    [Selector("intermediateCertificate")]
+    public MTRCertificateDERBytes? IntermediateCertificate { get; }
+    [Selector("intermediateCertificateTLV")]
+    public MTRCertificateTLVBytes? IntermediateCertificateTLV { get; }
+    [Selector("operationalCertificate")]
+    public MTRCertificateDERBytes? OperationalCertificate { get; }
+    [Selector("operationalCertificateTLV")]
+    public MTRCertificateTLVBytes? OperationalCertificateTLV { get; }
+    [Selector("fabricIndex")]
+    public NSNumber FabricIndex { get; }
 }
 
 #endif

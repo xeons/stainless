@@ -34,8 +34,11 @@ import Standard.ObjC;
 
 public objc interface IKDeviceBrowserViewDelegate
 {
-    [Selector("deviceBrowserView:selectionDidChange:")] void DeviceBrowserViewSelectionDidChange(IKDeviceBrowserView? deviceBrowserView, ICDevice? device);
-    [Optional] [Selector("deviceBrowserView:didEncounterError:")] void DeviceBrowserViewDidEncounterError(IKDeviceBrowserView? deviceBrowserView, NSError? error);
+    [Selector("deviceBrowserView:selectionDidChange:")]
+    void DeviceBrowserViewSelectionDidChange(IKDeviceBrowserView? deviceBrowserView, ICDevice? device);
+    [Optional]
+    [Selector("deviceBrowserView:didEncounterError:")]
+    void DeviceBrowserViewDidEncounterError(IKDeviceBrowserView? deviceBrowserView, NSError? error);
 }
 
 public enum IKDeviceBrowserViewDisplayMode : long
@@ -47,13 +50,20 @@ public enum IKDeviceBrowserViewDisplayMode : long
 
 public extern objc class IKDeviceBrowserView : NSView
 {
-    [Selector("delegate", "setDelegate:")] public IKDeviceBrowserViewDelegate? Delegate { get; set; }
-    [Selector("displaysLocalCameras", "setDisplaysLocalCameras:")] public bool DisplaysLocalCameras { get; set; }
-    [Selector("displaysNetworkCameras", "setDisplaysNetworkCameras:")] public bool DisplaysNetworkCameras { get; set; }
-    [Selector("displaysLocalScanners", "setDisplaysLocalScanners:")] public bool DisplaysLocalScanners { get; set; }
-    [Selector("displaysNetworkScanners", "setDisplaysNetworkScanners:")] public bool DisplaysNetworkScanners { get; set; }
-    [Selector("mode", "setMode:")] public IKDeviceBrowserViewDisplayMode Mode { get; set; }
-    [Selector("selectedDevice")] public ICDevice? SelectedDevice { get; }
+    [Selector("delegate", "setDelegate:")]
+    public IKDeviceBrowserViewDelegate? Delegate { get; set; }
+    [Selector("displaysLocalCameras", "setDisplaysLocalCameras:")]
+    public bool DisplaysLocalCameras { get; set; }
+    [Selector("displaysNetworkCameras", "setDisplaysNetworkCameras:")]
+    public bool DisplaysNetworkCameras { get; set; }
+    [Selector("displaysLocalScanners", "setDisplaysLocalScanners:")]
+    public bool DisplaysLocalScanners { get; set; }
+    [Selector("displaysNetworkScanners", "setDisplaysNetworkScanners:")]
+    public bool DisplaysNetworkScanners { get; set; }
+    [Selector("mode", "setMode:")]
+    public IKDeviceBrowserViewDisplayMode Mode { get; set; }
+    [Selector("selectedDevice")]
+    public ICDevice? SelectedDevice { get; }
 }
 
 #endif

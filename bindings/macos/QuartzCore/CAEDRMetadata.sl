@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class CAEDRMetadata : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("HLGMetadata")] public static CAEDRMetadata HLGMetadata { get; }
-    [Selector("isAvailable")] public static bool Available { get; }
-    [Selector("HDR10MetadataWithDisplayInfo:contentInfo:opticalOutputScale:")] public static CAEDRMetadata HDR10MetadataWithDisplayInfoContentInfoOpticalOutputScale(NSData? displayData, NSData? contentData, float scale);
-    [Selector("HDR10MetadataWithMinLuminance:maxLuminance:opticalOutputScale:")] public static CAEDRMetadata HDR10MetadataWithMinLuminanceMaxLuminanceOpticalOutputScale(float minNits, float maxNits, float scale);
-    [Selector("HLGMetadataWithAmbientViewingEnvironment:")] public static CAEDRMetadata HLGMetadataWithAmbientViewingEnvironment(NSData data);
+    [Selector("HLGMetadata")]
+    public static CAEDRMetadata HLGMetadata { get; }
+    [Selector("isAvailable")]
+    public static bool Available { get; }
+    [Selector("HDR10MetadataWithDisplayInfo:contentInfo:opticalOutputScale:")]
+    public static CAEDRMetadata HDR10MetadataWithDisplayInfoContentInfoOpticalOutputScale(NSData? displayData, NSData? contentData, float scale);
+    [Selector("HDR10MetadataWithMinLuminance:maxLuminance:opticalOutputScale:")]
+    public static CAEDRMetadata HDR10MetadataWithMinLuminanceMaxLuminanceOpticalOutputScale(float minNits, float maxNits, float scale);
+    [Selector("HLGMetadataWithAmbientViewingEnvironment:")]
+    public static CAEDRMetadata HLGMetadataWithAmbientViewingEnvironment(NSData data);
 }
 
 #endif

@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class INTimeIntervalResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedTimeInterval:")] public static Self SuccessWithResolvedTimeInterval(NSTimeInterval resolvedTimeInterval);
-    [Selector("confirmationRequiredWithTimeIntervalToConfirm:")] public static Self ConfirmationRequiredWithTimeIntervalToConfirm(NSTimeInterval timeIntervalToConfirm);
+    [Selector("successWithResolvedTimeInterval:")]
+    public static Self SuccessWithResolvedTimeInterval(NSTimeInterval resolvedTimeInterval);
+    [Selector("confirmationRequiredWithTimeIntervalToConfirm:")]
+    public static Self ConfirmationRequiredWithTimeIntervalToConfirm(NSTimeInterval timeIntervalToConfirm);
 }
 
 #endif

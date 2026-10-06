@@ -123,45 +123,73 @@ public extern "C" PDFAnnotationKey? PDFAnnotationKeyWidgetValue;
 
 public extern objc class PDFAnnotation : NSObject, NSCopying, NSCoding
 {
-    [Selector("page", "setPage:")] public PDFPage? Page { get; set; }
-    [Selector("type", "setType:")] public NSString? Type { get; set; }
-    [Selector("bounds", "setBounds:")] public NSRect Bounds { get; set; }
-    [Selector("shouldDisplay", "setShouldDisplay:")] public bool ShouldDisplay { get; set; }
-    [Selector("shouldPrint", "setShouldPrint:")] public bool ShouldPrint { get; set; }
-    [Selector("modificationDate", "setModificationDate:")] public NSDate? ModificationDate { get; set; }
-    [Selector("userName", "setUserName:")] public NSString? UserName { get; set; }
-    [Selector("popup", "setPopup:")] public PDFAnnotation? Popup { get; set; }
-    [Selector("border", "setBorder:")] public PDFBorder? Border { get; set; }
-    [Selector("color", "setColor:")] public NSColor? Color { get; set; }
-    [Selector("contents", "setContents:")] public NSString? Contents { get; set; }
-    [Selector("action", "setAction:")] public PDFAction? Action { get; set; }
-    [Selector("hasAppearanceStream")] public bool HasAppearanceStream { get; }
-    [Selector("isHighlighted", "setHighlighted:")] public bool Highlighted { get; set; }
-    [Selector("annotationKeyValues")] public NSDictionary? AnnotationKeyValues { get; }
-    [Selector("initWithBounds:forType:withProperties:")] public Self InitWithBoundsForTypeWithProperties(NSRect bounds, PDFAnnotationSubtype annotationType, NSDictionary? properties);
-    [Selector("drawWithBox:inContext:")] public void DrawWithBoxInContext(PDFDisplayBox box, CGContextRef context);
-    [Selector("setValue:forAnnotationKey:")] public bool SetValueForAnnotationKey(AnyObject value, PDFAnnotationKey key);
-    [Selector("setBoolean:forAnnotationKey:")] public bool SetBooleanForAnnotationKey(bool value, PDFAnnotationKey key);
-    [Selector("setRect:forAnnotationKey:")] public bool SetRectForAnnotationKey(NSRect value, PDFAnnotationKey key);
-    [Selector("valueForAnnotationKey:")] public AnyObject? ValueForAnnotationKey(PDFAnnotationKey key);
-    [Selector("removeValueForAnnotationKey:")] public void RemoveValueForAnnotationKey(PDFAnnotationKey key);
+    [Selector("page", "setPage:")]
+    public PDFPage? Page { get; set; }
+    [Selector("type", "setType:")]
+    public NSString? Type { get; set; }
+    [Selector("bounds", "setBounds:")]
+    public NSRect Bounds { get; set; }
+    [Selector("shouldDisplay", "setShouldDisplay:")]
+    public bool ShouldDisplay { get; set; }
+    [Selector("shouldPrint", "setShouldPrint:")]
+    public bool ShouldPrint { get; set; }
+    [Selector("modificationDate", "setModificationDate:")]
+    public NSDate? ModificationDate { get; set; }
+    [Selector("userName", "setUserName:")]
+    public NSString? UserName { get; set; }
+    [Selector("popup", "setPopup:")]
+    public PDFAnnotation? Popup { get; set; }
+    [Selector("border", "setBorder:")]
+    public PDFBorder? Border { get; set; }
+    [Selector("color", "setColor:")]
+    public NSColor? Color { get; set; }
+    [Selector("contents", "setContents:")]
+    public NSString? Contents { get; set; }
+    [Selector("action", "setAction:")]
+    public PDFAction? Action { get; set; }
+    [Selector("hasAppearanceStream")]
+    public bool HasAppearanceStream { get; }
+    [Selector("isHighlighted", "setHighlighted:")]
+    public bool Highlighted { get; set; }
+    [Selector("annotationKeyValues")]
+    public NSDictionary? AnnotationKeyValues { get; }
+    [Selector("initWithBounds:forType:withProperties:")]
+    public Self InitWithBoundsForTypeWithProperties(NSRect bounds, PDFAnnotationSubtype annotationType, NSDictionary? properties);
+    [Selector("drawWithBox:inContext:")]
+    public void DrawWithBoxInContext(PDFDisplayBox box, CGContextRef context);
+    [Selector("setValue:forAnnotationKey:")]
+    public bool SetValueForAnnotationKey(AnyObject value, PDFAnnotationKey key);
+    [Selector("setBoolean:forAnnotationKey:")]
+    public bool SetBooleanForAnnotationKey(bool value, PDFAnnotationKey key);
+    [Selector("setRect:forAnnotationKey:")]
+    public bool SetRectForAnnotationKey(NSRect value, PDFAnnotationKey key);
+    [Selector("valueForAnnotationKey:")]
+    public AnyObject? ValueForAnnotationKey(PDFAnnotationKey key);
+    [Selector("removeValueForAnnotationKey:")]
+    public void RemoveValueForAnnotationKey(PDFAnnotationKey key);
 }
 
 /// PDFAnnotationDeprecated, a category of PDFAnnotation.
 public extern objc class PDFAnnotation
 {
     /// Deprecated in macOS 10.12.
-    [Selector("toolTip")] public NSString? ToolTip { get; }
+    [Selector("toolTip")]
+    public NSString? ToolTip { get; }
     /// Deprecated in macOS 10.13.
-    [Selector("mouseUpAction", "setMouseUpAction:")] public PDFAction? MouseUpAction { get; set; }
+    [Selector("mouseUpAction", "setMouseUpAction:")]
+    public PDFAction? MouseUpAction { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("initWithDictionary:forPage:")] public Self InitWithDictionaryForPage(NSDictionary dictionary, PDFPage? page);
+    [Selector("initWithDictionary:forPage:")]
+    public Self InitWithDictionaryForPage(NSDictionary dictionary, PDFPage? page);
     /// Deprecated in macOS 10.12.
-    [Selector("initWithBounds:")] public Self InitWithBounds(NSRect bounds);
+    [Selector("initWithBounds:")]
+    public Self InitWithBounds(NSRect bounds);
     /// Deprecated in macOS 10.12.
-    [Selector("removeAllAppearanceStreams")] public void RemoveAllAppearanceStreams();
+    [Selector("removeAllAppearanceStreams")]
+    public void RemoveAllAppearanceStreams();
     /// Deprecated in macOS 10.12.
-    [Selector("drawWithBox:")] public void DrawWithBox(PDFDisplayBox box);
+    [Selector("drawWithBox:")]
+    public void DrawWithBox(PDFDisplayBox box);
 }
 
 /// Deprecated in macOS 10.13.

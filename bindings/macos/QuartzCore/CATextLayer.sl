@@ -38,14 +38,22 @@ public using CATextLayerAlignmentMode = NSString;
 
 public extern objc class CATextLayer : CALayer
 {
-    [Selector("string", "setString:")] public AnyObject? String { get; set; }
-    [Selector("font", "setFont:")] public CFTypeRef? Font { get; set; }
-    [Selector("fontSize", "setFontSize:")] public CGFloat FontSize { get; set; }
-    [Selector("foregroundColor", "setForegroundColor:")] public CGColorRef? ForegroundColor { get; set; }
-    [Selector("isWrapped", "setWrapped:")] public bool Wrapped { get; set; }
-    [Selector("truncationMode", "setTruncationMode:")] public CATextLayerTruncationMode TruncationMode { get; set; }
-    [Selector("alignmentMode", "setAlignmentMode:")] public CATextLayerAlignmentMode AlignmentMode { get; set; }
-    [Selector("allowsFontSubpixelQuantization", "setAllowsFontSubpixelQuantization:")] public bool AllowsFontSubpixelQuantization { get; set; }
+    [Selector("string", "setString:")]
+    public AnyObject? String { get; set; }
+    [Selector("font", "setFont:")]
+    public CFTypeRef? Font { get; set; }
+    [Selector("fontSize", "setFontSize:")]
+    public CGFloat FontSize { get; set; }
+    [Selector("foregroundColor", "setForegroundColor:")]
+    public CGColorRef? ForegroundColor { get; set; }
+    [Selector("isWrapped", "setWrapped:")]
+    public bool Wrapped { get; set; }
+    [Selector("truncationMode", "setTruncationMode:")]
+    public CATextLayerTruncationMode TruncationMode { get; set; }
+    [Selector("alignmentMode", "setAlignmentMode:")]
+    public CATextLayerAlignmentMode AlignmentMode { get; set; }
+    [Selector("allowsFontSubpixelQuantization", "setAllowsFontSubpixelQuantization:")]
+    public bool AllowsFontSubpixelQuantization { get; set; }
 }
 
 public extern "C" CATextLayerTruncationMode? kCATruncationNone;

@@ -32,15 +32,24 @@ import Standard.ObjC;
 
 public extern objc class PKSuicaPassProperties : PKTransitPassProperties
 {
-    [Selector("transitBalance")] public NSDecimalNumber TransitBalance { get; }
-    [Selector("transitBalanceCurrencyCode")] public NSString TransitBalanceCurrencyCode { get; }
-    [Selector("isInStation")] public bool InStation { get; }
-    [Selector("isInShinkansenStation")] public bool InShinkansenStation { get; }
-    [Selector("isBalanceAllowedForCommute")] public bool BalanceAllowedForCommute { get; }
-    [Selector("isLowBalanceGateNotificationEnabled")] public bool LowBalanceGateNotificationEnabled { get; }
-    [Selector("isGreenCarTicketUsed")] public bool GreenCarTicketUsed { get; }
-    [Selector("isBlacklisted")] public bool Blacklisted { get; }
-    [Selector("passPropertiesForPass:")] public static Self? PassPropertiesForPass(PKPass pass);
+    [Selector("transitBalance")]
+    public NSDecimalNumber TransitBalance { get; }
+    [Selector("transitBalanceCurrencyCode")]
+    public NSString TransitBalanceCurrencyCode { get; }
+    [Selector("isInStation")]
+    public bool InStation { get; }
+    [Selector("isInShinkansenStation")]
+    public bool InShinkansenStation { get; }
+    [Selector("isBalanceAllowedForCommute")]
+    public bool BalanceAllowedForCommute { get; }
+    [Selector("isLowBalanceGateNotificationEnabled")]
+    public bool LowBalanceGateNotificationEnabled { get; }
+    [Selector("isGreenCarTicketUsed")]
+    public bool GreenCarTicketUsed { get; }
+    [Selector("isBlacklisted")]
+    public bool Blacklisted { get; }
+    [Selector("passPropertiesForPass:")]
+    public static Self? PassPropertiesForPass(PKPass pass);
 }
 
 #endif

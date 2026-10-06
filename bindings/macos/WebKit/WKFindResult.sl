@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class WKFindResult : NSObject, NSCopying
 {
-    [Selector("matchFound")] public bool MatchFound { get; }
+    [Selector("matchFound")]
+    public bool MatchFound { get; }
 }
 
 #endif

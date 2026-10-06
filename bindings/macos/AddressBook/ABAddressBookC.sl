@@ -56,7 +56,8 @@ public using ABMutableMultiValueRef = __ABMultiValue*;
 
 public extern "C" ABAddressBookRef ABGetSharedAddressBook();
 
-[ReturnsRetained] public extern "C" CFArrayRef? ABCopyArrayOfMatchingRecords(ABAddressBookRef addressBook, ABSearchElementRef search);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ABCopyArrayOfMatchingRecords(ABAddressBookRef addressBook, ABSearchElementRef search);
 
 public extern "C" bool ABSave(ABAddressBookRef addressBook);
 
@@ -66,13 +67,15 @@ public extern "C" ABPersonRef ABGetMe(ABAddressBookRef addressBook);
 
 public extern "C" void ABSetMe(ABAddressBookRef addressBook, ABPersonRef moi);
 
-[ReturnsRetained] public extern "C" CFStringRef? ABCopyRecordTypeFromUniqueId(ABAddressBookRef addressBook, CFStringRef? uniqueId);
+[ReturnsRetained]
+public extern "C" CFStringRef? ABCopyRecordTypeFromUniqueId(ABAddressBookRef addressBook, CFStringRef? uniqueId);
 
 public extern "C" CFIndex ABAddPropertiesAndTypes(ABAddressBookRef addressBook, CFStringRef? recordType, CFDictionaryRef? propertiesAndTypes);
 
 public extern "C" CFIndex ABRemoveProperties(ABAddressBookRef addressBook, CFStringRef? recordType, CFArrayRef? properties);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ABCopyArrayOfPropertiesForRecordType(ABAddressBookRef addressBook, CFStringRef? recordType);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ABCopyArrayOfPropertiesForRecordType(ABAddressBookRef addressBook, CFStringRef? recordType);
 
 public extern "C" ABPropertyType ABTypeOfProperty(ABAddressBookRef addressBook, CFStringRef? recordType, CFStringRef? property);
 
@@ -82,15 +85,19 @@ public extern "C" bool ABAddRecord(ABAddressBookRef addressBook, ABRecordRef rec
 
 public extern "C" bool ABRemoveRecord(ABAddressBookRef addressBook, ABRecordRef record);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ABCopyArrayOfAllPeople(ABAddressBookRef addressBook);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ABCopyArrayOfAllPeople(ABAddressBookRef addressBook);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ABCopyArrayOfAllGroups(ABAddressBookRef addressBook);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ABCopyArrayOfAllGroups(ABAddressBookRef addressBook);
 
 public extern "C" ABRecordRef ABRecordCreateCopy(ABRecordRef record);
 
-[ReturnsRetained] public extern "C" CFStringRef? ABRecordCopyRecordType(ABRecordRef record);
+[ReturnsRetained]
+public extern "C" CFStringRef? ABRecordCopyRecordType(ABRecordRef record);
 
-[ReturnsRetained] public extern "C" CFTypeRef? ABRecordCopyValue(ABRecordRef record, CFStringRef? property);
+[ReturnsRetained]
+public extern "C" CFTypeRef? ABRecordCopyValue(ABRecordRef record, CFStringRef? property);
 
 public extern "C" bool ABRecordSetValue(ABRecordRef record, CFStringRef? property, CFTypeRef? value);
 
@@ -98,37 +105,44 @@ public extern "C" bool ABRecordRemoveValue(ABRecordRef record, CFStringRef? prop
 
 public extern "C" bool ABRecordIsReadOnly(ABRecordRef record);
 
-[ReturnsRetained] public extern "C" CFStringRef? ABRecordCopyUniqueId(ABRecordRef record);
+[ReturnsRetained]
+public extern "C" CFStringRef? ABRecordCopyUniqueId(ABRecordRef record);
 
 public extern "C" ABPersonRef ABPersonCreate();
 
 public extern "C" ABPersonRef ABPersonCreateWithVCardRepresentation(CFDataRef? vCard);
 
-[ReturnsRetained] public extern "C" CFDataRef? ABPersonCopyVCardRepresentation(ABPersonRef person);
+[ReturnsRetained]
+public extern "C" CFDataRef? ABPersonCopyVCardRepresentation(ABPersonRef person);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ABPersonCopyParentGroups(ABPersonRef person);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ABPersonCopyParentGroups(ABPersonRef person);
 
 public extern "C" ABSearchElementRef ABPersonCreateSearchElement(CFStringRef? property, CFStringRef? label, CFStringRef? key, CFTypeRef? value, ABSearchComparison comparison);
 
 public extern "C" ABGroupRef ABGroupCreate();
 
-[ReturnsRetained] public extern "C" CFArrayRef? ABGroupCopyArrayOfAllMembers(ABGroupRef group);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ABGroupCopyArrayOfAllMembers(ABGroupRef group);
 
 public extern "C" bool ABGroupAddMember(ABGroupRef group, ABPersonRef personToAdd);
 
 public extern "C" bool ABGroupRemoveMember(ABGroupRef group, ABPersonRef personToRemove);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ABGroupCopyArrayOfAllSubgroups(ABGroupRef group);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ABGroupCopyArrayOfAllSubgroups(ABGroupRef group);
 
 public extern "C" bool ABGroupAddGroup(ABGroupRef group, ABGroupRef groupToAdd);
 
 public extern "C" bool ABGroupRemoveGroup(ABGroupRef group, ABGroupRef groupToRemove);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ABGroupCopyParentGroups(ABGroupRef group);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ABGroupCopyParentGroups(ABGroupRef group);
 
 public extern "C" bool ABGroupSetDistributionIdentifier(ABGroupRef group, ABPersonRef person, CFStringRef? property, CFStringRef? identifier);
 
-[ReturnsRetained] public extern "C" CFStringRef? ABGroupCopyDistributionIdentifier(ABGroupRef group, ABPersonRef person, CFStringRef? property);
+[ReturnsRetained]
+public extern "C" CFStringRef? ABGroupCopyDistributionIdentifier(ABGroupRef group, ABPersonRef person, CFStringRef? property);
 
 public extern "C" ABSearchElementRef ABGroupCreateSearchElement(CFStringRef? property, CFStringRef? label, CFStringRef? key, CFTypeRef? value, ABSearchComparison comparison);
 
@@ -140,15 +154,19 @@ public extern "C" ABMultiValueRef ABMultiValueCreate();
 
 public extern "C" CFIndex ABMultiValueCount(ABMultiValueRef multiValue);
 
-[ReturnsRetained] public extern "C" CFTypeRef? ABMultiValueCopyValueAtIndex(ABMultiValueRef multiValue, CFIndex index);
+[ReturnsRetained]
+public extern "C" CFTypeRef? ABMultiValueCopyValueAtIndex(ABMultiValueRef multiValue, CFIndex index);
 
-[ReturnsRetained] public extern "C" CFStringRef? ABMultiValueCopyLabelAtIndex(ABMultiValueRef multiValue, CFIndex index);
+[ReturnsRetained]
+public extern "C" CFStringRef? ABMultiValueCopyLabelAtIndex(ABMultiValueRef multiValue, CFIndex index);
 
-[ReturnsRetained] public extern "C" CFStringRef? ABMultiValueCopyPrimaryIdentifier(ABMultiValueRef multiValue);
+[ReturnsRetained]
+public extern "C" CFStringRef? ABMultiValueCopyPrimaryIdentifier(ABMultiValueRef multiValue);
 
 public extern "C" CFIndex ABMultiValueIndexForIdentifier(ABMultiValueRef multiValue, CFStringRef? identifier);
 
-[ReturnsRetained] public extern "C" CFStringRef? ABMultiValueCopyIdentifierAtIndex(ABMultiValueRef multiValue, CFIndex index);
+[ReturnsRetained]
+public extern "C" CFStringRef? ABMultiValueCopyIdentifierAtIndex(ABMultiValueRef multiValue, CFIndex index);
 
 public extern "C" ABPropertyType ABMultiValuePropertyType(ABMultiValueRef multiValue);
 
@@ -170,15 +188,19 @@ public extern "C" bool ABMultiValueSetPrimaryIdentifier(ABMutableMultiValueRef m
 
 public extern "C" ABMutableMultiValueRef ABMultiValueCreateMutableCopy(ABMultiValueRef multiValue);
 
-[ReturnsRetained] public extern "C" CFStringRef? ABCopyLocalizedPropertyOrLabel(CFStringRef? labelOrProperty);
+[ReturnsRetained]
+public extern "C" CFStringRef? ABCopyLocalizedPropertyOrLabel(CFStringRef? labelOrProperty);
 
-[ReturnsRetained] public extern "C" CFStringRef? ABCreateFormattedAddressFromDictionary(ABAddressBookRef addressBook, CFDictionaryRef? address);
+[ReturnsRetained]
+public extern "C" CFStringRef? ABCreateFormattedAddressFromDictionary(ABAddressBookRef addressBook, CFDictionaryRef? address);
 
-[ReturnsRetained] public extern "C" CFStringRef? ABCopyDefaultCountryCode(ABAddressBookRef addressBook);
+[ReturnsRetained]
+public extern "C" CFStringRef? ABCopyDefaultCountryCode(ABAddressBookRef addressBook);
 
 public extern "C" bool ABPersonSetImageData(ABPersonRef person, CFDataRef? imageData);
 
-[ReturnsRetained] public extern "C" CFDataRef? ABPersonCopyImageData(ABPersonRef person);
+[ReturnsRetained]
+public extern "C" CFDataRef? ABPersonCopyImageData(ABPersonRef person);
 
 public delegate void ABImageClientCallback(__CFData* arg0, CFIndex arg1, void* arg2);
 

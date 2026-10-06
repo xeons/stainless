@@ -35,11 +35,16 @@ import Standard.ObjC;
 
 public extern objc class IOUSBHostDevice : IOUSBHostObject
 {
-    [Selector("configurationDescriptor")] public IOUSBConfigurationDescriptor* ConfigurationDescriptor { get; }
-    [Selector("createMatchingDictionaryWithVendorID:productID:bcdDevice:deviceClass:deviceSubclass:deviceProtocol:speed:productIDArray:")] public static CFMutableDictionaryRef CreateMatchingDictionaryWithVendorIDProductIDBcdDeviceDeviceClassDeviceSubclassDeviceProtocolSpeedProductIDArray(NSNumber? vendorID, NSNumber? productID, NSNumber? bcdDevice, NSNumber? deviceClass, NSNumber? deviceSubclass, NSNumber? deviceProtocol, NSNumber? speed, NSArray? productIDArray);
-    [Selector("configureWithValue:matchInterfaces:error:")] public bool ConfigureWithValueMatchInterfacesError(NSUInteger value, bool matchInterfaces, out NSError? error);
-    [Selector("configureWithValue:error:")] public bool ConfigureWithValueError(NSUInteger value, out NSError? error);
-    [Selector("resetWithError:")] public bool ResetWithError(out NSError? error);
+    [Selector("configurationDescriptor")]
+    public IOUSBConfigurationDescriptor* ConfigurationDescriptor { get; }
+    [Selector("createMatchingDictionaryWithVendorID:productID:bcdDevice:deviceClass:deviceSubclass:deviceProtocol:speed:productIDArray:")]
+    public static CFMutableDictionaryRef CreateMatchingDictionaryWithVendorIDProductIDBcdDeviceDeviceClassDeviceSubclassDeviceProtocolSpeedProductIDArray(NSNumber? vendorID, NSNumber? productID, NSNumber? bcdDevice, NSNumber? deviceClass, NSNumber? deviceSubclass, NSNumber? deviceProtocol, NSNumber? speed, NSArray? productIDArray);
+    [Selector("configureWithValue:matchInterfaces:error:")]
+    public bool ConfigureWithValueMatchInterfacesError(NSUInteger value, bool matchInterfaces, out NSError? error);
+    [Selector("configureWithValue:error:")]
+    public bool ConfigureWithValueError(NSUInteger value, out NSError? error);
+    [Selector("resetWithError:")]
+    public bool ResetWithError(out NSError? error);
 }
 
 #endif

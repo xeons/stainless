@@ -40,12 +40,18 @@ public enum GLKFogMode : int
 /// Deprecated in macOS 10.14.
 public extern objc class GLKEffectPropertyFog : GLKEffectProperty
 {
-    [Selector("enabled", "setEnabled:")] public GLboolean Enabled { get; set; }
-    [Selector("mode", "setMode:")] public GLint Mode { get; set; }
-    [Selector("color", "setColor:")] public GLKVector4 Color { get; set; }
-    [Selector("density", "setDensity:")] public GLfloat Density { get; set; }
-    [Selector("start", "setStart:")] public GLfloat Start { get; set; }
-    [Selector("end", "setEnd:")] public GLfloat End { get; set; }
+    [Selector("enabled", "setEnabled:")]
+    public GLboolean Enabled { get; set; }
+    [Selector("mode", "setMode:")]
+    public GLint Mode { get; set; }
+    [Selector("color", "setColor:")]
+    public GLKVector4 Color { get; set; }
+    [Selector("density", "setDensity:")]
+    public GLfloat Density { get; set; }
+    [Selector("start", "setStart:")]
+    public GLfloat Start { get; set; }
+    [Selector("end", "setEnd:")]
+    public GLfloat End { get; set; }
 }
 
 #endif

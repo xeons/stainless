@@ -47,38 +47,69 @@ public extern "C" NSString? WebPreferencesChangedNotification;
 /// Deprecated in macOS 10.14.
 public extern objc class WebPreferences : NSObject, NSCoding
 {
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("standardFontFamily", "setStandardFontFamily:")] public NSString? StandardFontFamily { get; set; }
-    [Selector("fixedFontFamily", "setFixedFontFamily:")] public NSString? FixedFontFamily { get; set; }
-    [Selector("serifFontFamily", "setSerifFontFamily:")] public NSString? SerifFontFamily { get; set; }
-    [Selector("sansSerifFontFamily", "setSansSerifFontFamily:")] public NSString? SansSerifFontFamily { get; set; }
-    [Selector("cursiveFontFamily", "setCursiveFontFamily:")] public NSString? CursiveFontFamily { get; set; }
-    [Selector("fantasyFontFamily", "setFantasyFontFamily:")] public NSString? FantasyFontFamily { get; set; }
-    [Selector("defaultFontSize", "setDefaultFontSize:")] public int DefaultFontSize { get; set; }
-    [Selector("defaultFixedFontSize", "setDefaultFixedFontSize:")] public int DefaultFixedFontSize { get; set; }
-    [Selector("minimumFontSize", "setMinimumFontSize:")] public int MinimumFontSize { get; set; }
-    [Selector("minimumLogicalFontSize", "setMinimumLogicalFontSize:")] public int MinimumLogicalFontSize { get; set; }
-    [Selector("defaultTextEncodingName", "setDefaultTextEncodingName:")] public NSString? DefaultTextEncodingName { get; set; }
-    [Selector("userStyleSheetEnabled", "setUserStyleSheetEnabled:")] public bool UserStyleSheetEnabled { get; set; }
-    [Selector("userStyleSheetLocation", "setUserStyleSheetLocation:")] public NSURL? UserStyleSheetLocation { get; set; }
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("standardFontFamily", "setStandardFontFamily:")]
+    public NSString? StandardFontFamily { get; set; }
+    [Selector("fixedFontFamily", "setFixedFontFamily:")]
+    public NSString? FixedFontFamily { get; set; }
+    [Selector("serifFontFamily", "setSerifFontFamily:")]
+    public NSString? SerifFontFamily { get; set; }
+    [Selector("sansSerifFontFamily", "setSansSerifFontFamily:")]
+    public NSString? SansSerifFontFamily { get; set; }
+    [Selector("cursiveFontFamily", "setCursiveFontFamily:")]
+    public NSString? CursiveFontFamily { get; set; }
+    [Selector("fantasyFontFamily", "setFantasyFontFamily:")]
+    public NSString? FantasyFontFamily { get; set; }
+    [Selector("defaultFontSize", "setDefaultFontSize:")]
+    public int DefaultFontSize { get; set; }
+    [Selector("defaultFixedFontSize", "setDefaultFixedFontSize:")]
+    public int DefaultFixedFontSize { get; set; }
+    [Selector("minimumFontSize", "setMinimumFontSize:")]
+    public int MinimumFontSize { get; set; }
+    [Selector("minimumLogicalFontSize", "setMinimumLogicalFontSize:")]
+    public int MinimumLogicalFontSize { get; set; }
+    [Selector("defaultTextEncodingName", "setDefaultTextEncodingName:")]
+    public NSString? DefaultTextEncodingName { get; set; }
+    [Selector("userStyleSheetEnabled", "setUserStyleSheetEnabled:")]
+    public bool UserStyleSheetEnabled { get; set; }
+    [Selector("userStyleSheetLocation", "setUserStyleSheetLocation:")]
+    public NSURL? UserStyleSheetLocation { get; set; }
     /// Deprecated in macOS 10.15.
-    [Selector("isJavaEnabled", "setJavaEnabled:")] public bool JavaEnabled { get; set; }
-    [Selector("isJavaScriptEnabled", "setJavaScriptEnabled:")] public bool JavaScriptEnabled { get; set; }
-    [Selector("javaScriptCanOpenWindowsAutomatically", "setJavaScriptCanOpenWindowsAutomatically:")] public bool JavaScriptCanOpenWindowsAutomatically { get; set; }
-    [Selector("arePlugInsEnabled", "setPlugInsEnabled:")] public bool PlugInsEnabled { get; set; }
-    [Selector("allowsAnimatedImages", "setAllowsAnimatedImages:")] public bool AllowsAnimatedImages { get; set; }
-    [Selector("allowsAnimatedImageLooping", "setAllowsAnimatedImageLooping:")] public bool AllowsAnimatedImageLooping { get; set; }
-    [Selector("loadsImagesAutomatically", "setLoadsImagesAutomatically:")] public bool LoadsImagesAutomatically { get; set; }
-    [Selector("autosaves", "setAutosaves:")] public bool Autosaves { get; set; }
-    [Selector("shouldPrintBackgrounds", "setShouldPrintBackgrounds:")] public bool ShouldPrintBackgrounds { get; set; }
-    [Selector("privateBrowsingEnabled", "setPrivateBrowsingEnabled:")] public bool PrivateBrowsingEnabled { get; set; }
-    [Selector("tabsToLinks", "setTabsToLinks:")] public bool TabsToLinks { get; set; }
-    [Selector("usesPageCache", "setUsesPageCache:")] public bool UsesPageCache { get; set; }
-    [Selector("cacheModel", "setCacheModel:")] public WebCacheModel CacheModel { get; set; }
-    [Selector("suppressesIncrementalRendering", "setSuppressesIncrementalRendering:")] public bool SuppressesIncrementalRendering { get; set; }
-    [Selector("allowsAirPlayForMediaPlayback", "setAllowsAirPlayForMediaPlayback:")] public bool AllowsAirPlayForMediaPlayback { get; set; }
-    [Selector("standardPreferences")] public static WebPreferences? StandardPreferences();
-    [Selector("initWithIdentifier:")] public Self? InitWithIdentifier(NSString? anIdentifier);
+    [Selector("isJavaEnabled", "setJavaEnabled:")]
+    public bool JavaEnabled { get; set; }
+    [Selector("isJavaScriptEnabled", "setJavaScriptEnabled:")]
+    public bool JavaScriptEnabled { get; set; }
+    [Selector("javaScriptCanOpenWindowsAutomatically", "setJavaScriptCanOpenWindowsAutomatically:")]
+    public bool JavaScriptCanOpenWindowsAutomatically { get; set; }
+    [Selector("arePlugInsEnabled", "setPlugInsEnabled:")]
+    public bool PlugInsEnabled { get; set; }
+    [Selector("allowsAnimatedImages", "setAllowsAnimatedImages:")]
+    public bool AllowsAnimatedImages { get; set; }
+    [Selector("allowsAnimatedImageLooping", "setAllowsAnimatedImageLooping:")]
+    public bool AllowsAnimatedImageLooping { get; set; }
+    [Selector("loadsImagesAutomatically", "setLoadsImagesAutomatically:")]
+    public bool LoadsImagesAutomatically { get; set; }
+    [Selector("autosaves", "setAutosaves:")]
+    public bool Autosaves { get; set; }
+    [Selector("shouldPrintBackgrounds", "setShouldPrintBackgrounds:")]
+    public bool ShouldPrintBackgrounds { get; set; }
+    [Selector("privateBrowsingEnabled", "setPrivateBrowsingEnabled:")]
+    public bool PrivateBrowsingEnabled { get; set; }
+    [Selector("tabsToLinks", "setTabsToLinks:")]
+    public bool TabsToLinks { get; set; }
+    [Selector("usesPageCache", "setUsesPageCache:")]
+    public bool UsesPageCache { get; set; }
+    [Selector("cacheModel", "setCacheModel:")]
+    public WebCacheModel CacheModel { get; set; }
+    [Selector("suppressesIncrementalRendering", "setSuppressesIncrementalRendering:")]
+    public bool SuppressesIncrementalRendering { get; set; }
+    [Selector("allowsAirPlayForMediaPlayback", "setAllowsAirPlayForMediaPlayback:")]
+    public bool AllowsAirPlayForMediaPlayback { get; set; }
+    [Selector("standardPreferences")]
+    public static WebPreferences? StandardPreferences();
+    [Selector("initWithIdentifier:")]
+    public Self? InitWithIdentifier(NSString? anIdentifier);
 }
 
 #endif

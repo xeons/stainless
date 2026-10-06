@@ -34,10 +34,14 @@ import Standard.ObjC;
 
 public extern objc class PKInk : NSObject, NSCopying
 {
-    [Selector("inkType")] public PKInkType InkType { get; }
-    [Selector("color")] public NSColor Color { get; }
-    [Selector("requiredContentVersion")] public PKContentVersion RequiredContentVersion { get; }
-    [Selector("initWithInkType:color:")] public Self InitWithInkTypeColor(PKInkType type, NSColor color);
+    [Selector("inkType")]
+    public PKInkType InkType { get; }
+    [Selector("color")]
+    public NSColor Color { get; }
+    [Selector("requiredContentVersion")]
+    public PKContentVersion RequiredContentVersion { get; }
+    [Selector("initWithInkType:color:")]
+    public Self InitWithInkTypeColor(PKInkType type, NSColor color);
 }
 
 #endif

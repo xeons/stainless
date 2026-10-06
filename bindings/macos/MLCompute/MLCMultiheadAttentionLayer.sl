@@ -33,13 +33,20 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCMultiheadAttentionLayer : MLCLayer
 {
-    [Selector("descriptor")] public MLCMultiheadAttentionDescriptor Descriptor { get; }
-    [Selector("weights")] public NSArray Weights { get; }
-    [Selector("biases")] public NSArray? Biases { get; }
-    [Selector("attentionBiases")] public NSArray? AttentionBiases { get; }
-    [Selector("weightsParameters")] public NSArray WeightsParameters { get; }
-    [Selector("biasesParameters")] public NSArray? BiasesParameters { get; }
-    [Selector("layerWithDescriptor:weights:biases:attentionBiases:")] public static Self? LayerWithDescriptorWeightsBiasesAttentionBiases(MLCMultiheadAttentionDescriptor descriptor, NSArray weights, NSArray? biases, NSArray? attentionBiases);
+    [Selector("descriptor")]
+    public MLCMultiheadAttentionDescriptor Descriptor { get; }
+    [Selector("weights")]
+    public NSArray Weights { get; }
+    [Selector("biases")]
+    public NSArray? Biases { get; }
+    [Selector("attentionBiases")]
+    public NSArray? AttentionBiases { get; }
+    [Selector("weightsParameters")]
+    public NSArray WeightsParameters { get; }
+    [Selector("biasesParameters")]
+    public NSArray? BiasesParameters { get; }
+    [Selector("layerWithDescriptor:weights:biases:attentionBiases:")]
+    public static Self? LayerWithDescriptorWeightsBiasesAttentionBiases(MLCMultiheadAttentionDescriptor descriptor, NSArray weights, NSArray? biases, NSArray? attentionBiases);
 }
 
 #endif

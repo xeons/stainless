@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class PKToolPickerEraserItem : PKToolPickerItem
 {
-    [Selector("eraserTool")] public PKEraserTool? EraserTool { get; }
-    [Selector("initWithEraserType:")] public Self InitWithEraserType(PKEraserType eraserType);
-    [Selector("initWithEraserType:width:")] public Self InitWithEraserTypeWidth(PKEraserType eraserType, CGFloat width);
+    [Selector("eraserTool")]
+    public PKEraserTool? EraserTool { get; }
+    [Selector("initWithEraserType:")]
+    public Self InitWithEraserType(PKEraserType eraserType);
+    [Selector("initWithEraserType:width:")]
+    public Self InitWithEraserTypeWidth(PKEraserType eraserType, CGFloat width);
 }
 
 #endif

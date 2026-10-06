@@ -34,31 +34,47 @@ import Standard.ObjC;
 
 public extern objc class MTRCertificates : NSObject
 {
-    [Selector("createRootCertificate:issuerID:fabricID:validityPeriod:error:")] public static MTRCertificateDERBytes? CreateRootCertificateIssuerIDFabricIDValidityPeriodError(MTRKeypair keypair, NSNumber? issuerID, NSNumber? fabricID, NSDateInterval validityPeriod, out NSError? error);
-    [Selector("createRootCertificate:issuerID:fabricID:error:")] public static MTRCertificateDERBytes? CreateRootCertificateIssuerIDFabricIDError(MTRKeypair keypair, NSNumber? issuerID, NSNumber? fabricID, out NSError? error);
-    [Selector("createIntermediateCertificate:rootCertificate:intermediatePublicKey:issuerID:fabricID:validityPeriod:error:")] public static MTRCertificateDERBytes? CreateIntermediateCertificateRootCertificateIntermediatePublicKeyIssuerIDFabricIDValidityPeriodError(MTRKeypair rootKeypair, MTRCertificateDERBytes rootCertificate, SecKeyRef intermediatePublicKey, NSNumber? issuerID, NSNumber? fabricID, NSDateInterval validityPeriod, out NSError? error);
-    [Selector("createIntermediateCertificate:rootCertificate:intermediatePublicKey:issuerID:fabricID:error:")] public static MTRCertificateDERBytes? CreateIntermediateCertificateRootCertificateIntermediatePublicKeyIssuerIDFabricIDError(MTRKeypair rootKeypair, MTRCertificateDERBytes rootCertificate, SecKeyRef intermediatePublicKey, NSNumber? issuerID, NSNumber? fabricID, out NSError? error);
-    [Selector("createOperationalCertificate:signingCertificate:operationalPublicKey:fabricID:nodeID:caseAuthenticatedTags:validityPeriod:error:")] public static MTRCertificateDERBytes? CreateOperationalCertificateSigningCertificateOperationalPublicKeyFabricIDNodeIDCaseAuthenticatedTagsValidityPeriodError(MTRKeypair signingKeypair, MTRCertificateDERBytes signingCertificate, SecKeyRef operationalPublicKey, NSNumber fabricID, NSNumber nodeID, NSSet? caseAuthenticatedTags, NSDateInterval validityPeriod, out NSError? error);
-    [Selector("createOperationalCertificate:signingCertificate:operationalPublicKey:fabricID:nodeID:caseAuthenticatedTags:error:")] public static MTRCertificateDERBytes? CreateOperationalCertificateSigningCertificateOperationalPublicKeyFabricIDNodeIDCaseAuthenticatedTagsError(MTRKeypair signingKeypair, MTRCertificateDERBytes signingCertificate, SecKeyRef operationalPublicKey, NSNumber fabricID, NSNumber nodeID, NSSet? caseAuthenticatedTags, out NSError? error);
-    [Selector("keypair:matchesCertificate:")] public static bool KeypairMatchesCertificate(MTRKeypair keypair, NSData certificate);
-    [Selector("isCertificate:equalTo:")] public static bool IsCertificateEqualTo(MTRCertificateDERBytes certificate1, MTRCertificateDERBytes certificate2);
-    [Selector("createCertificateSigningRequest:error:")] public static MTRCSRDERBytes? CreateCertificateSigningRequestError(MTRKeypair keypair, out NSError? error);
-    [Selector("convertX509Certificate:")] public static MTRCertificateTLVBytes? ConvertX509Certificate(MTRCertificateDERBytes x509Certificate);
-    [Selector("convertMatterCertificate:")] public static MTRCertificateDERBytes? ConvertMatterCertificate(MTRCertificateTLVBytes matterCertificate);
-    [Selector("publicKeyFromCSR:error:")] public static NSData? PublicKeyFromCSRError(MTRCSRDERBytes csr, out NSError? error);
+    [Selector("createRootCertificate:issuerID:fabricID:validityPeriod:error:")]
+    public static MTRCertificateDERBytes? CreateRootCertificateIssuerIDFabricIDValidityPeriodError(MTRKeypair keypair, NSNumber? issuerID, NSNumber? fabricID, NSDateInterval validityPeriod, out NSError? error);
+    [Selector("createRootCertificate:issuerID:fabricID:error:")]
+    public static MTRCertificateDERBytes? CreateRootCertificateIssuerIDFabricIDError(MTRKeypair keypair, NSNumber? issuerID, NSNumber? fabricID, out NSError? error);
+    [Selector("createIntermediateCertificate:rootCertificate:intermediatePublicKey:issuerID:fabricID:validityPeriod:error:")]
+    public static MTRCertificateDERBytes? CreateIntermediateCertificateRootCertificateIntermediatePublicKeyIssuerIDFabricIDValidityPeriodError(MTRKeypair rootKeypair, MTRCertificateDERBytes rootCertificate, SecKeyRef intermediatePublicKey, NSNumber? issuerID, NSNumber? fabricID, NSDateInterval validityPeriod, out NSError? error);
+    [Selector("createIntermediateCertificate:rootCertificate:intermediatePublicKey:issuerID:fabricID:error:")]
+    public static MTRCertificateDERBytes? CreateIntermediateCertificateRootCertificateIntermediatePublicKeyIssuerIDFabricIDError(MTRKeypair rootKeypair, MTRCertificateDERBytes rootCertificate, SecKeyRef intermediatePublicKey, NSNumber? issuerID, NSNumber? fabricID, out NSError? error);
+    [Selector("createOperationalCertificate:signingCertificate:operationalPublicKey:fabricID:nodeID:caseAuthenticatedTags:validityPeriod:error:")]
+    public static MTRCertificateDERBytes? CreateOperationalCertificateSigningCertificateOperationalPublicKeyFabricIDNodeIDCaseAuthenticatedTagsValidityPeriodError(MTRKeypair signingKeypair, MTRCertificateDERBytes signingCertificate, SecKeyRef operationalPublicKey, NSNumber fabricID, NSNumber nodeID, NSSet? caseAuthenticatedTags, NSDateInterval validityPeriod, out NSError? error);
+    [Selector("createOperationalCertificate:signingCertificate:operationalPublicKey:fabricID:nodeID:caseAuthenticatedTags:error:")]
+    public static MTRCertificateDERBytes? CreateOperationalCertificateSigningCertificateOperationalPublicKeyFabricIDNodeIDCaseAuthenticatedTagsError(MTRKeypair signingKeypair, MTRCertificateDERBytes signingCertificate, SecKeyRef operationalPublicKey, NSNumber fabricID, NSNumber nodeID, NSSet? caseAuthenticatedTags, out NSError? error);
+    [Selector("keypair:matchesCertificate:")]
+    public static bool KeypairMatchesCertificate(MTRKeypair keypair, NSData certificate);
+    [Selector("isCertificate:equalTo:")]
+    public static bool IsCertificateEqualTo(MTRCertificateDERBytes certificate1, MTRCertificateDERBytes certificate2);
+    [Selector("createCertificateSigningRequest:error:")]
+    public static MTRCSRDERBytes? CreateCertificateSigningRequestError(MTRKeypair keypair, out NSError? error);
+    [Selector("convertX509Certificate:")]
+    public static MTRCertificateTLVBytes? ConvertX509Certificate(MTRCertificateDERBytes x509Certificate);
+    [Selector("convertMatterCertificate:")]
+    public static MTRCertificateDERBytes? ConvertMatterCertificate(MTRCertificateTLVBytes matterCertificate);
+    [Selector("publicKeyFromCSR:error:")]
+    public static NSData? PublicKeyFromCSRError(MTRCSRDERBytes csr, out NSError? error);
 }
 
 /// Deprecated, a category of MTRCertificates.
 public extern objc class MTRCertificates
 {
     /// Deprecated in macOS 13.3.
-    [Selector("generateRootCertificate:issuerId:fabricId:error:")] public static NSData? GenerateRootCertificateIssuerIdFabricIdError(MTRKeypair keypair, NSNumber? issuerId, NSNumber? fabricId, out NSError? error);
+    [Selector("generateRootCertificate:issuerId:fabricId:error:")]
+    public static NSData? GenerateRootCertificateIssuerIdFabricIdError(MTRKeypair keypair, NSNumber? issuerId, NSNumber? fabricId, out NSError? error);
     /// Deprecated in macOS 13.3.
-    [Selector("generateIntermediateCertificate:rootCertificate:intermediatePublicKey:issuerId:fabricId:error:")] public static NSData? GenerateIntermediateCertificateRootCertificateIntermediatePublicKeyIssuerIdFabricIdError(MTRKeypair rootKeypair, NSData rootCertificate, SecKeyRef intermediatePublicKey, NSNumber? issuerId, NSNumber? fabricId, out NSError? error);
+    [Selector("generateIntermediateCertificate:rootCertificate:intermediatePublicKey:issuerId:fabricId:error:")]
+    public static NSData? GenerateIntermediateCertificateRootCertificateIntermediatePublicKeyIssuerIdFabricIdError(MTRKeypair rootKeypair, NSData rootCertificate, SecKeyRef intermediatePublicKey, NSNumber? issuerId, NSNumber? fabricId, out NSError? error);
     /// Deprecated in macOS 13.3.
-    [Selector("generateOperationalCertificate:signingCertificate:operationalPublicKey:fabricId:nodeId:caseAuthenticatedTags:error:")] public static NSData? GenerateOperationalCertificateSigningCertificateOperationalPublicKeyFabricIdNodeIdCaseAuthenticatedTagsError(MTRKeypair signingKeypair, NSData signingCertificate, SecKeyRef operationalPublicKey, NSNumber fabricId, NSNumber nodeId, NSArray? caseAuthenticatedTags, out NSError? error);
+    [Selector("generateOperationalCertificate:signingCertificate:operationalPublicKey:fabricId:nodeId:caseAuthenticatedTags:error:")]
+    public static NSData? GenerateOperationalCertificateSigningCertificateOperationalPublicKeyFabricIdNodeIdCaseAuthenticatedTagsError(MTRKeypair signingKeypair, NSData signingCertificate, SecKeyRef operationalPublicKey, NSNumber fabricId, NSNumber nodeId, NSArray? caseAuthenticatedTags, out NSError? error);
     /// Deprecated in macOS 13.3.
-    [Selector("generateCertificateSigningRequest:error:")] public static NSData? GenerateCertificateSigningRequestError(MTRKeypair keypair, out NSError? error);
+    [Selector("generateCertificateSigningRequest:error:")]
+    public static NSData? GenerateCertificateSigningRequestError(MTRKeypair keypair, out NSError? error);
 }
 
 #endif

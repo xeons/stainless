@@ -48,15 +48,24 @@ public enum AVPlayerLooperItemOrdering : long
 
 public extern objc class AVPlayerLooper : NSObject
 {
-    [Selector("status")] public AVPlayerLooperStatus Status { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("loopCount")] public NSInteger LoopCount { get; }
-    [Selector("loopingPlayerItems")] public NSArray LoopingPlayerItems { get; }
-    [Selector("playerLooperWithPlayer:templateItem:timeRange:")] public static Self PlayerLooperWithPlayerTemplateItemTimeRange(AVQueuePlayer player, AVPlayerItem itemToLoop, CMTimeRange loopRange);
-    [Selector("playerLooperWithPlayer:templateItem:")] public static Self PlayerLooperWithPlayerTemplateItem(AVQueuePlayer player, AVPlayerItem itemToLoop);
-    [Selector("initWithPlayer:templateItem:timeRange:")] public Self InitWithPlayerTemplateItemTimeRange(AVQueuePlayer player, AVPlayerItem itemToLoop, CMTimeRange loopRange);
-    [Selector("initWithPlayer:templateItem:timeRange:existingItemsOrdering:")] public Self InitWithPlayerTemplateItemTimeRangeExistingItemsOrdering(AVQueuePlayer player, AVPlayerItem itemToLoop, CMTimeRange loopRange, AVPlayerLooperItemOrdering itemOrdering);
-    [Selector("disableLooping")] public void DisableLooping();
+    [Selector("status")]
+    public AVPlayerLooperStatus Status { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("loopCount")]
+    public NSInteger LoopCount { get; }
+    [Selector("loopingPlayerItems")]
+    public NSArray LoopingPlayerItems { get; }
+    [Selector("playerLooperWithPlayer:templateItem:timeRange:")]
+    public static Self PlayerLooperWithPlayerTemplateItemTimeRange(AVQueuePlayer player, AVPlayerItem itemToLoop, CMTimeRange loopRange);
+    [Selector("playerLooperWithPlayer:templateItem:")]
+    public static Self PlayerLooperWithPlayerTemplateItem(AVQueuePlayer player, AVPlayerItem itemToLoop);
+    [Selector("initWithPlayer:templateItem:timeRange:")]
+    public Self InitWithPlayerTemplateItemTimeRange(AVQueuePlayer player, AVPlayerItem itemToLoop, CMTimeRange loopRange);
+    [Selector("initWithPlayer:templateItem:timeRange:existingItemsOrdering:")]
+    public Self InitWithPlayerTemplateItemTimeRangeExistingItemsOrdering(AVQueuePlayer player, AVPlayerItem itemToLoop, CMTimeRange loopRange, AVPlayerLooperItemOrdering itemOrdering);
+    [Selector("disableLooping")]
+    public void DisableLooping();
 }
 
 #endif

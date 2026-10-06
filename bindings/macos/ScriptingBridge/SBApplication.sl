@@ -34,24 +34,38 @@ import Standard.ObjC;
 
 public extern objc class SBApplication : SBObject, NSCoding
 {
-    [Selector("isRunning")] public bool Running { get; }
-    [Selector("delegate", "setDelegate:")] public SBApplicationDelegate? Delegate { get; set; }
-    [Selector("launchFlags", "setLaunchFlags:")] public LSLaunchFlags LaunchFlags { get; set; }
-    [Selector("sendMode", "setSendMode:")] public AESendMode SendMode { get; set; }
-    [Selector("timeout", "setTimeout:")] public long Timeout { get; set; }
-    [Selector("initWithBundleIdentifier:")] public SBApplication? InitWithBundleIdentifier(NSString ident);
-    [Selector("initWithURL:")] public SBApplication? InitWithURL(NSURL url);
-    [Selector("initWithProcessIdentifier:")] public SBApplication? InitWithProcessIdentifier(pid_t pid);
-    [Selector("applicationWithBundleIdentifier:")] public static SBApplication? ApplicationWithBundleIdentifier(NSString ident);
-    [Selector("applicationWithURL:")] public static SBApplication? ApplicationWithURL(NSURL url);
-    [Selector("applicationWithProcessIdentifier:")] public static SBApplication? ApplicationWithProcessIdentifier(pid_t pid);
-    [Selector("classForScriptingClass:")] public Class ClassForScriptingClass(NSString className);
-    [Selector("activate")] public void Activate();
+    [Selector("isRunning")]
+    public bool Running { get; }
+    [Selector("delegate", "setDelegate:")]
+    public SBApplicationDelegate? Delegate { get; set; }
+    [Selector("launchFlags", "setLaunchFlags:")]
+    public LSLaunchFlags LaunchFlags { get; set; }
+    [Selector("sendMode", "setSendMode:")]
+    public AESendMode SendMode { get; set; }
+    [Selector("timeout", "setTimeout:")]
+    public long Timeout { get; set; }
+    [Selector("initWithBundleIdentifier:")]
+    public SBApplication? InitWithBundleIdentifier(NSString ident);
+    [Selector("initWithURL:")]
+    public SBApplication? InitWithURL(NSURL url);
+    [Selector("initWithProcessIdentifier:")]
+    public SBApplication? InitWithProcessIdentifier(pid_t pid);
+    [Selector("applicationWithBundleIdentifier:")]
+    public static SBApplication? ApplicationWithBundleIdentifier(NSString ident);
+    [Selector("applicationWithURL:")]
+    public static SBApplication? ApplicationWithURL(NSURL url);
+    [Selector("applicationWithProcessIdentifier:")]
+    public static SBApplication? ApplicationWithProcessIdentifier(pid_t pid);
+    [Selector("classForScriptingClass:")]
+    public Class ClassForScriptingClass(NSString className);
+    [Selector("activate")]
+    public void Activate();
 }
 
 public objc interface SBApplicationDelegate
 {
-    [Selector("eventDidFail:withError:")] AnyObject? EventDidFailWithError(AppleEvent* event, NSError error);
+    [Selector("eventDidFail:withError:")]
+    AnyObject? EventDidFailWithError(AppleEvent* event, NSError error);
 }
 
 #endif

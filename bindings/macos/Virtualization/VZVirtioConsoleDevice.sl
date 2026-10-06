@@ -32,14 +32,20 @@ import Standard.ObjC;
 
 public objc interface VZVirtioConsoleDeviceDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("consoleDevice:didOpenPort:")] void ConsoleDeviceDidOpenPort(VZVirtioConsoleDevice consoleDevice, VZVirtioConsolePort consolePort);
-    [Optional] [Selector("consoleDevice:didClosePort:")] void ConsoleDeviceDidClosePort(VZVirtioConsoleDevice consoleDevice, VZVirtioConsolePort consolePort);
+    [Optional]
+    [Selector("consoleDevice:didOpenPort:")]
+    void ConsoleDeviceDidOpenPort(VZVirtioConsoleDevice consoleDevice, VZVirtioConsolePort consolePort);
+    [Optional]
+    [Selector("consoleDevice:didClosePort:")]
+    void ConsoleDeviceDidClosePort(VZVirtioConsoleDevice consoleDevice, VZVirtioConsolePort consolePort);
 }
 
 public extern objc class VZVirtioConsoleDevice : VZConsoleDevice
 {
-    [Selector("delegate", "setDelegate:")] public VZVirtioConsoleDeviceDelegate? Delegate { get; set; }
-    [Selector("ports")] public VZVirtioConsolePortArray Ports { get; }
+    [Selector("delegate", "setDelegate:")]
+    public VZVirtioConsoleDeviceDelegate? Delegate { get; set; }
+    [Selector("ports")]
+    public VZVirtioConsolePortArray Ports { get; }
 }
 
 #endif

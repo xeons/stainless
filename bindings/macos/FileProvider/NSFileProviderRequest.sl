@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class NSFileProviderRequest : NSObject
 {
-    [Selector("isSystemRequest")] public bool IsSystemRequest { get; }
-    [Selector("isFileViewerRequest")] public bool IsFileViewerRequest { get; }
-    [Selector("requestingExecutable")] public NSURL? RequestingExecutable { get; }
-    [Selector("domainVersion")] public NSFileProviderDomainVersion? DomainVersion { get; }
+    [Selector("isSystemRequest")]
+    public bool IsSystemRequest { get; }
+    [Selector("isFileViewerRequest")]
+    public bool IsFileViewerRequest { get; }
+    [Selector("requestingExecutable")]
+    public NSURL? RequestingExecutable { get; }
+    [Selector("domainVersion")]
+    public NSFileProviderDomainVersion? DomainVersion { get; }
 }
 
 #endif

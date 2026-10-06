@@ -35,27 +35,48 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothDeviceSelectorController : NSWindowController
 {
-    [Selector("deviceSelector")] public static IOBluetoothDeviceSelectorController? DeviceSelector();
-    [Selector("runModal")] public int RunModal();
-    [Selector("beginSheetModalForWindow:modalDelegate:didEndSelector:contextInfo:")] public IOReturn BeginSheetModalForWindowModalDelegateDidEndSelectorContextInfo(NSWindow? sheetWindow, AnyObject? modalDelegate, Selector didEndSelector, void* contextInfo);
-    [Selector("getResults")] public NSArray? GetResults();
-    [Selector("setOptions:")] public void SetOptions(IOBluetoothServiceBrowserControllerOptions options);
-    [Selector("getOptions")] public IOBluetoothServiceBrowserControllerOptions GetOptions();
-    [Selector("setSearchAttributes:")] public void SetSearchAttributes(IOBluetoothDeviceSearchAttributes* searchAttributes);
-    [Selector("getSearchAttributes")] public IOBluetoothDeviceSearchAttributes* GetSearchAttributes();
-    [Selector("addAllowedUUID:")] public void AddAllowedUUID(IOBluetoothSDPUUID? allowedUUID);
-    [Selector("addAllowedUUIDArray:")] public void AddAllowedUUIDArray(NSArray? allowedUUIDArray);
-    [Selector("clearAllowedUUIDs")] public void ClearAllowedUUIDs();
-    [Selector("setTitle:")] public void SetTitle(NSString? windowTitle);
-    [Selector("getTitle")] public NSString? GetTitle();
-    [Selector("setHeader:")] public void SetHeader(NSString? headerText);
-    [Selector("getHeader")] public NSString? GetHeader();
-    [Selector("setDescriptionText:")] public void SetDescriptionText(NSString? descriptionText);
-    [Selector("getDescriptionText")] public NSString? GetDescriptionText();
-    [Selector("setPrompt:")] public void SetPrompt(NSString? prompt);
-    [Selector("getPrompt")] public NSString? GetPrompt();
-    [Selector("setCancel:")] public void SetCancel(NSString? prompt);
-    [Selector("getCancel")] public NSString? GetCancel();
+    [Selector("deviceSelector")]
+    public static IOBluetoothDeviceSelectorController? DeviceSelector();
+    [Selector("runModal")]
+    public int RunModal();
+    [Selector("beginSheetModalForWindow:modalDelegate:didEndSelector:contextInfo:")]
+    public IOReturn BeginSheetModalForWindowModalDelegateDidEndSelectorContextInfo(NSWindow? sheetWindow, AnyObject? modalDelegate, Selector didEndSelector, void* contextInfo);
+    [Selector("getResults")]
+    public NSArray? GetResults();
+    [Selector("setOptions:")]
+    public void SetOptions(IOBluetoothServiceBrowserControllerOptions options);
+    [Selector("getOptions")]
+    public IOBluetoothServiceBrowserControllerOptions GetOptions();
+    [Selector("setSearchAttributes:")]
+    public void SetSearchAttributes(IOBluetoothDeviceSearchAttributes* searchAttributes);
+    [Selector("getSearchAttributes")]
+    public IOBluetoothDeviceSearchAttributes* GetSearchAttributes();
+    [Selector("addAllowedUUID:")]
+    public void AddAllowedUUID(IOBluetoothSDPUUID? allowedUUID);
+    [Selector("addAllowedUUIDArray:")]
+    public void AddAllowedUUIDArray(NSArray? allowedUUIDArray);
+    [Selector("clearAllowedUUIDs")]
+    public void ClearAllowedUUIDs();
+    [Selector("setTitle:")]
+    public void SetTitle(NSString? windowTitle);
+    [Selector("getTitle")]
+    public NSString? GetTitle();
+    [Selector("setHeader:")]
+    public void SetHeader(NSString? headerText);
+    [Selector("getHeader")]
+    public NSString? GetHeader();
+    [Selector("setDescriptionText:")]
+    public void SetDescriptionText(NSString? descriptionText);
+    [Selector("getDescriptionText")]
+    public NSString? GetDescriptionText();
+    [Selector("setPrompt:")]
+    public void SetPrompt(NSString? prompt);
+    [Selector("getPrompt")]
+    public NSString? GetPrompt();
+    [Selector("setCancel:")]
+    public void SetCancel(NSString? prompt);
+    [Selector("getCancel")]
+    public NSString? GetCancel();
 }
 
 #endif

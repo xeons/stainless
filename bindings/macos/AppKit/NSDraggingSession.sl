@@ -35,13 +35,20 @@ public objc closure void NSDraggingSessionEnumerateDraggingItemsWithOptionsForVi
 
 public extern objc class NSDraggingSession : NSObject
 {
-    [Selector("draggingFormation", "setDraggingFormation:")] public NSDraggingFormation DraggingFormation { get; set; }
-    [Selector("animatesToStartingPositionsOnCancelOrFail", "setAnimatesToStartingPositionsOnCancelOrFail:")] public bool AnimatesToStartingPositionsOnCancelOrFail { get; set; }
-    [Selector("draggingLeaderIndex", "setDraggingLeaderIndex:")] public NSInteger DraggingLeaderIndex { get; set; }
-    [Selector("draggingPasteboard")] public NSPasteboard DraggingPasteboard { get; }
-    [Selector("draggingSequenceNumber")] public NSInteger DraggingSequenceNumber { get; }
-    [Selector("draggingLocation")] public NSPoint DraggingLocation { get; }
-    [Selector("enumerateDraggingItemsWithOptions:forView:classes:searchOptions:usingBlock:")] public void EnumerateDraggingItemsWithOptionsForViewClassesSearchOptionsUsingBlock(NSDraggingItemEnumerationOptions enumOpts, NSView? view, NSArray classArray, NSDictionary searchOptions, NSDraggingSessionEnumerateDraggingItemsWithOptionsForViewClassesSearchOptionsUsingBlockBlock block);
+    [Selector("draggingFormation", "setDraggingFormation:")]
+    public NSDraggingFormation DraggingFormation { get; set; }
+    [Selector("animatesToStartingPositionsOnCancelOrFail", "setAnimatesToStartingPositionsOnCancelOrFail:")]
+    public bool AnimatesToStartingPositionsOnCancelOrFail { get; set; }
+    [Selector("draggingLeaderIndex", "setDraggingLeaderIndex:")]
+    public NSInteger DraggingLeaderIndex { get; set; }
+    [Selector("draggingPasteboard")]
+    public NSPasteboard DraggingPasteboard { get; }
+    [Selector("draggingSequenceNumber")]
+    public NSInteger DraggingSequenceNumber { get; }
+    [Selector("draggingLocation")]
+    public NSPoint DraggingLocation { get; }
+    [Selector("enumerateDraggingItemsWithOptions:forView:classes:searchOptions:usingBlock:")]
+    public void EnumerateDraggingItemsWithOptionsForViewClassesSearchOptionsUsingBlock(NSDraggingItemEnumerationOptions enumOpts, NSView? view, NSArray classArray, NSDictionary searchOptions, NSDraggingSessionEnumerateDraggingItemsWithOptionsForViewClassesSearchOptionsUsingBlockBlock block);
 }
 
 #endif

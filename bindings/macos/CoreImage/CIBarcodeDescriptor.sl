@@ -43,32 +43,50 @@ public enum CIQRCodeErrorCorrectionLevel : long
 
 public extern objc class CIQRCodeDescriptor : CIBarcodeDescriptor
 {
-    [Selector("errorCorrectedPayload")] public NSData ErrorCorrectedPayload { get; }
-    [Selector("symbolVersion")] public NSInteger SymbolVersion { get; }
-    [Selector("maskPattern")] public byte MaskPattern { get; }
-    [Selector("errorCorrectionLevel")] public CIQRCodeErrorCorrectionLevel ErrorCorrectionLevel { get; }
-    [Selector("initWithPayload:symbolVersion:maskPattern:errorCorrectionLevel:")] public Self? InitWithPayloadSymbolVersionMaskPatternErrorCorrectionLevel(NSData errorCorrectedPayload, NSInteger symbolVersion, byte maskPattern, CIQRCodeErrorCorrectionLevel errorCorrectionLevel);
-    [Selector("descriptorWithPayload:symbolVersion:maskPattern:errorCorrectionLevel:")] public static Self? DescriptorWithPayloadSymbolVersionMaskPatternErrorCorrectionLevel(NSData errorCorrectedPayload, NSInteger symbolVersion, byte maskPattern, CIQRCodeErrorCorrectionLevel errorCorrectionLevel);
+    [Selector("errorCorrectedPayload")]
+    public NSData ErrorCorrectedPayload { get; }
+    [Selector("symbolVersion")]
+    public NSInteger SymbolVersion { get; }
+    [Selector("maskPattern")]
+    public byte MaskPattern { get; }
+    [Selector("errorCorrectionLevel")]
+    public CIQRCodeErrorCorrectionLevel ErrorCorrectionLevel { get; }
+    [Selector("initWithPayload:symbolVersion:maskPattern:errorCorrectionLevel:")]
+    public Self? InitWithPayloadSymbolVersionMaskPatternErrorCorrectionLevel(NSData errorCorrectedPayload, NSInteger symbolVersion, byte maskPattern, CIQRCodeErrorCorrectionLevel errorCorrectionLevel);
+    [Selector("descriptorWithPayload:symbolVersion:maskPattern:errorCorrectionLevel:")]
+    public static Self? DescriptorWithPayloadSymbolVersionMaskPatternErrorCorrectionLevel(NSData errorCorrectedPayload, NSInteger symbolVersion, byte maskPattern, CIQRCodeErrorCorrectionLevel errorCorrectionLevel);
 }
 
 public extern objc class CIAztecCodeDescriptor : CIBarcodeDescriptor
 {
-    [Selector("errorCorrectedPayload")] public NSData ErrorCorrectedPayload { get; }
-    [Selector("isCompact")] public bool IsCompact { get; }
-    [Selector("layerCount")] public NSInteger LayerCount { get; }
-    [Selector("dataCodewordCount")] public NSInteger DataCodewordCount { get; }
-    [Selector("initWithPayload:isCompact:layerCount:dataCodewordCount:")] public Self? InitWithPayloadIsCompactLayerCountDataCodewordCount(NSData errorCorrectedPayload, bool isCompact, NSInteger layerCount, NSInteger dataCodewordCount);
-    [Selector("descriptorWithPayload:isCompact:layerCount:dataCodewordCount:")] public static Self? DescriptorWithPayloadIsCompactLayerCountDataCodewordCount(NSData errorCorrectedPayload, bool isCompact, NSInteger layerCount, NSInteger dataCodewordCount);
+    [Selector("errorCorrectedPayload")]
+    public NSData ErrorCorrectedPayload { get; }
+    [Selector("isCompact")]
+    public bool IsCompact { get; }
+    [Selector("layerCount")]
+    public NSInteger LayerCount { get; }
+    [Selector("dataCodewordCount")]
+    public NSInteger DataCodewordCount { get; }
+    [Selector("initWithPayload:isCompact:layerCount:dataCodewordCount:")]
+    public Self? InitWithPayloadIsCompactLayerCountDataCodewordCount(NSData errorCorrectedPayload, bool isCompact, NSInteger layerCount, NSInteger dataCodewordCount);
+    [Selector("descriptorWithPayload:isCompact:layerCount:dataCodewordCount:")]
+    public static Self? DescriptorWithPayloadIsCompactLayerCountDataCodewordCount(NSData errorCorrectedPayload, bool isCompact, NSInteger layerCount, NSInteger dataCodewordCount);
 }
 
 public extern objc class CIPDF417CodeDescriptor : CIBarcodeDescriptor
 {
-    [Selector("errorCorrectedPayload")] public NSData ErrorCorrectedPayload { get; }
-    [Selector("isCompact")] public bool IsCompact { get; }
-    [Selector("rowCount")] public NSInteger RowCount { get; }
-    [Selector("columnCount")] public NSInteger ColumnCount { get; }
-    [Selector("initWithPayload:isCompact:rowCount:columnCount:")] public Self? InitWithPayloadIsCompactRowCountColumnCount(NSData errorCorrectedPayload, bool isCompact, NSInteger rowCount, NSInteger columnCount);
-    [Selector("descriptorWithPayload:isCompact:rowCount:columnCount:")] public static Self? DescriptorWithPayloadIsCompactRowCountColumnCount(NSData errorCorrectedPayload, bool isCompact, NSInteger rowCount, NSInteger columnCount);
+    [Selector("errorCorrectedPayload")]
+    public NSData ErrorCorrectedPayload { get; }
+    [Selector("isCompact")]
+    public bool IsCompact { get; }
+    [Selector("rowCount")]
+    public NSInteger RowCount { get; }
+    [Selector("columnCount")]
+    public NSInteger ColumnCount { get; }
+    [Selector("initWithPayload:isCompact:rowCount:columnCount:")]
+    public Self? InitWithPayloadIsCompactRowCountColumnCount(NSData errorCorrectedPayload, bool isCompact, NSInteger rowCount, NSInteger columnCount);
+    [Selector("descriptorWithPayload:isCompact:rowCount:columnCount:")]
+    public static Self? DescriptorWithPayloadIsCompactRowCountColumnCount(NSData errorCorrectedPayload, bool isCompact, NSInteger rowCount, NSInteger columnCount);
 }
 
 public enum CIDataMatrixCodeECCVersion : long
@@ -83,18 +101,25 @@ public enum CIDataMatrixCodeECCVersion : long
 
 public extern objc class CIDataMatrixCodeDescriptor : CIBarcodeDescriptor
 {
-    [Selector("errorCorrectedPayload")] public NSData ErrorCorrectedPayload { get; }
-    [Selector("rowCount")] public NSInteger RowCount { get; }
-    [Selector("columnCount")] public NSInteger ColumnCount { get; }
-    [Selector("eccVersion")] public CIDataMatrixCodeECCVersion EccVersion { get; }
-    [Selector("initWithPayload:rowCount:columnCount:eccVersion:")] public Self? InitWithPayloadRowCountColumnCountEccVersion(NSData errorCorrectedPayload, NSInteger rowCount, NSInteger columnCount, CIDataMatrixCodeECCVersion eccVersion);
-    [Selector("descriptorWithPayload:rowCount:columnCount:eccVersion:")] public static Self? DescriptorWithPayloadRowCountColumnCountEccVersion(NSData errorCorrectedPayload, NSInteger rowCount, NSInteger columnCount, CIDataMatrixCodeECCVersion eccVersion);
+    [Selector("errorCorrectedPayload")]
+    public NSData ErrorCorrectedPayload { get; }
+    [Selector("rowCount")]
+    public NSInteger RowCount { get; }
+    [Selector("columnCount")]
+    public NSInteger ColumnCount { get; }
+    [Selector("eccVersion")]
+    public CIDataMatrixCodeECCVersion EccVersion { get; }
+    [Selector("initWithPayload:rowCount:columnCount:eccVersion:")]
+    public Self? InitWithPayloadRowCountColumnCountEccVersion(NSData errorCorrectedPayload, NSInteger rowCount, NSInteger columnCount, CIDataMatrixCodeECCVersion eccVersion);
+    [Selector("descriptorWithPayload:rowCount:columnCount:eccVersion:")]
+    public static Self? DescriptorWithPayloadRowCountColumnCountEccVersion(NSData errorCorrectedPayload, NSInteger rowCount, NSInteger columnCount, CIDataMatrixCodeECCVersion eccVersion);
 }
 
 /// CIBarcodeDescriptor, a category of NSUserActivity.
 public extern objc class NSUserActivity
 {
-    [Selector("detectedBarcodeDescriptor")] public CIBarcodeDescriptor? DetectedBarcodeDescriptor { get; }
+    [Selector("detectedBarcodeDescriptor")]
+    public CIBarcodeDescriptor? DetectedBarcodeDescriptor { get; }
 }
 
 #endif

@@ -35,7 +35,8 @@ public objc closure void WKScriptMessageHandlerWithReplyUserContentControllerDid
 
 public objc interface WKScriptMessageHandlerWithReply : NSObjectProtocol
 {
-    [Selector("userContentController:didReceiveScriptMessage:replyHandler:")] void UserContentControllerDidReceiveScriptMessageReplyHandler(WKUserContentController userContentController, WKScriptMessage message, WKScriptMessageHandlerWithReplyUserContentControllerDidReceiveScriptMessageReplyHandlerReplyHandlerBlock replyHandler);
+    [Selector("userContentController:didReceiveScriptMessage:replyHandler:")]
+    void UserContentControllerDidReceiveScriptMessageReplyHandler(WKUserContentController userContentController, WKScriptMessage message, WKScriptMessageHandlerWithReplyUserContentControllerDidReceiveScriptMessageReplyHandlerReplyHandlerBlock replyHandler);
 }
 
 #endif

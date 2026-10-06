@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class ASPasskeyCredentialIdentity : NSObject, NSCopying, NSSecureCoding, ASCredentialIdentity
 {
-    [Selector("relyingPartyIdentifier")] public NSString RelyingPartyIdentifier { get; }
-    [Selector("userName")] public NSString UserName { get; }
-    [Selector("credentialID")] public NSData CredentialID { get; }
-    [Selector("userHandle")] public NSData UserHandle { get; }
-    [Selector("recordIdentifier")] public NSString? RecordIdentifier { get; }
-    [Selector("rank", "setRank:")] public NSInteger Rank { get; set; }
-    [Selector("initWithRelyingPartyIdentifier:userName:credentialID:userHandle:recordIdentifier:")] public Self InitWithRelyingPartyIdentifierUserNameCredentialIDUserHandleRecordIdentifier(NSString relyingPartyIdentifier, NSString userName, NSData credentialID, NSData userHandle, NSString? recordIdentifier);
-    [Selector("identityWithRelyingPartyIdentifier:userName:credentialID:userHandle:recordIdentifier:")] public static Self IdentityWithRelyingPartyIdentifierUserNameCredentialIDUserHandleRecordIdentifier(NSString relyingPartyIdentifier, NSString userName, NSData credentialID, NSData userHandle, NSString? recordIdentifier);
+    [Selector("relyingPartyIdentifier")]
+    public NSString RelyingPartyIdentifier { get; }
+    [Selector("userName")]
+    public NSString UserName { get; }
+    [Selector("credentialID")]
+    public NSData CredentialID { get; }
+    [Selector("userHandle")]
+    public NSData UserHandle { get; }
+    [Selector("recordIdentifier")]
+    public NSString? RecordIdentifier { get; }
+    [Selector("rank", "setRank:")]
+    public NSInteger Rank { get; set; }
+    [Selector("initWithRelyingPartyIdentifier:userName:credentialID:userHandle:recordIdentifier:")]
+    public Self InitWithRelyingPartyIdentifierUserNameCredentialIDUserHandleRecordIdentifier(NSString relyingPartyIdentifier, NSString userName, NSData credentialID, NSData userHandle, NSString? recordIdentifier);
+    [Selector("identityWithRelyingPartyIdentifier:userName:credentialID:userHandle:recordIdentifier:")]
+    public static Self IdentityWithRelyingPartyIdentifierUserNameCredentialIDUserHandleRecordIdentifier(NSString relyingPartyIdentifier, NSString userName, NSData credentialID, NSData userHandle, NSString? recordIdentifier);
 }
 
 #endif

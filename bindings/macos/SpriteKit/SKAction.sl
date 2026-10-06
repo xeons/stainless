@@ -46,11 +46,16 @@ public objc closure float SKActionTimingFunction(float arg0);
 
 public extern objc class SKAction : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("duration", "setDuration:")] public NSTimeInterval Duration { get; set; }
-    [Selector("timingMode", "setTimingMode:")] public SKActionTimingMode TimingMode { get; set; }
-    [Selector("timingFunction", "setTimingFunction:")] public SKActionTimingFunction TimingFunction { get; set; }
-    [Selector("speed", "setSpeed:")] public CGFloat Speed { get; set; }
-    [Selector("reversedAction")] public SKAction ReversedAction();
+    [Selector("duration", "setDuration:")]
+    public NSTimeInterval Duration { get; set; }
+    [Selector("timingMode", "setTimingMode:")]
+    public SKActionTimingMode TimingMode { get; set; }
+    [Selector("timingFunction", "setTimingFunction:")]
+    public SKActionTimingFunction TimingFunction { get; set; }
+    [Selector("speed", "setSpeed:")]
+    public CGFloat Speed { get; set; }
+    [Selector("reversedAction")]
+    public SKAction ReversedAction();
 }
 
 public objc closure void SKActionCustomActionWithDurationActionBlockBlock(SKNode arg0, CGFloat arg1);
@@ -58,104 +63,187 @@ public objc closure void SKActionCustomActionWithDurationActionBlockBlock(SKNode
 /// SKActions, a category of SKAction.
 public extern objc class SKAction
 {
-    [Selector("moveBy:duration:")] public static SKAction MoveByDuration(CGVector delta, NSTimeInterval duration);
-    [Selector("moveByX:y:duration:")] public static SKAction MoveByXYDuration(CGFloat deltaX, CGFloat deltaY, NSTimeInterval duration);
-    [Selector("moveTo:duration:")] public static SKAction MoveToDuration(CGPoint location, NSTimeInterval duration);
-    [Selector("moveToX:duration:")] public static SKAction MoveToXDuration(CGFloat x, NSTimeInterval duration);
-    [Selector("moveToY:duration:")] public static SKAction MoveToYDuration(CGFloat y, NSTimeInterval duration);
-    [Selector("rotateByAngle:duration:")] public static SKAction RotateByAngleDuration(CGFloat radians, NSTimeInterval duration);
-    [Selector("rotateToAngle:duration:")] public static SKAction RotateToAngleDuration(CGFloat radians, NSTimeInterval duration);
-    [Selector("rotateToAngle:duration:shortestUnitArc:")] public static SKAction RotateToAngleDurationShortestUnitArc(CGFloat radians, NSTimeInterval duration, bool shortestUnitArc);
-    [Selector("resizeByWidth:height:duration:")] public static SKAction ResizeByWidthHeightDuration(CGFloat width, CGFloat height, NSTimeInterval duration);
-    [Selector("resizeToWidth:height:duration:")] public static SKAction ResizeToWidthHeightDuration(CGFloat width, CGFloat height, NSTimeInterval duration);
-    [Selector("resizeToWidth:duration:")] public static SKAction ResizeToWidthDuration(CGFloat width, NSTimeInterval duration);
-    [Selector("resizeToHeight:duration:")] public static SKAction ResizeToHeightDuration(CGFloat height, NSTimeInterval duration);
-    [Selector("scaleBy:duration:")] public static SKAction ScaleByDuration(CGFloat scale, NSTimeInterval duration);
-    [Selector("scaleXBy:y:duration:")] public static SKAction ScaleXByYDuration(CGFloat xScale, CGFloat yScale, NSTimeInterval duration);
-    [Selector("scaleTo:duration:")] public static SKAction ScaleToDuration(CGFloat scale, NSTimeInterval duration);
-    [Selector("scaleXTo:y:duration:")] public static SKAction ScaleXToYDuration(CGFloat xScale, CGFloat yScale, NSTimeInterval duration);
-    [Selector("scaleXTo:duration:")] public static SKAction ScaleXToDuration(CGFloat scale, NSTimeInterval duration);
-    [Selector("scaleYTo:duration:")] public static SKAction ScaleYToDuration(CGFloat scale, NSTimeInterval duration);
-    [Selector("scaleToSize:duration:")] public static SKAction ScaleToSizeDuration(CGSize size, NSTimeInterval duration);
-    [Selector("sequence:")] public static SKAction Sequence(NSArray actions);
-    [Selector("group:")] public static SKAction Group(NSArray actions);
-    [Selector("repeatAction:count:")] public static SKAction RepeatActionCount(SKAction action, NSUInteger count);
-    [Selector("repeatActionForever:")] public static SKAction RepeatActionForever(SKAction action);
-    [Selector("fadeInWithDuration:")] public static SKAction FadeInWithDuration(NSTimeInterval duration);
-    [Selector("fadeOutWithDuration:")] public static SKAction FadeOutWithDuration(NSTimeInterval duration);
-    [Selector("fadeAlphaBy:duration:")] public static SKAction FadeAlphaByDuration(CGFloat factor, NSTimeInterval duration);
-    [Selector("fadeAlphaTo:duration:")] public static SKAction FadeAlphaToDuration(CGFloat alpha, NSTimeInterval duration);
-    [Selector("hide")] public static SKAction Hide();
-    [Selector("unhide")] public static SKAction Unhide();
-    [Selector("setTexture:")] public static SKAction SetTexture(SKTexture texture);
-    [Selector("setNormalTexture:")] public static SKAction SetNormalTexture(SKTexture texture);
-    [Selector("setTexture:resize:")] public static SKAction SetTextureResize(SKTexture texture, bool resize);
-    [Selector("setNormalTexture:resize:")] public static SKAction SetNormalTextureResize(SKTexture texture, bool resize);
-    [Selector("animateWithTextures:timePerFrame:")] public static SKAction AnimateWithTexturesTimePerFrame(NSArray textures, NSTimeInterval sec);
-    [Selector("animateWithNormalTextures:timePerFrame:")] public static SKAction AnimateWithNormalTexturesTimePerFrame(NSArray textures, NSTimeInterval sec);
-    [Selector("animateWithTextures:timePerFrame:resize:restore:")] public static SKAction AnimateWithTexturesTimePerFrameResizeRestore(NSArray textures, NSTimeInterval sec, bool resize, bool restore);
-    [Selector("animateWithNormalTextures:timePerFrame:resize:restore:")] public static SKAction AnimateWithNormalTexturesTimePerFrameResizeRestore(NSArray textures, NSTimeInterval sec, bool resize, bool restore);
-    [Selector("playSoundFileNamed:waitForCompletion:")] public static SKAction PlaySoundFileNamedWaitForCompletion(NSString soundFile, bool wait);
-    [Selector("colorizeWithColor:colorBlendFactor:duration:")] public static SKAction ColorizeWithColorColorBlendFactorDuration(NSColor color, CGFloat colorBlendFactor, NSTimeInterval duration);
-    [Selector("colorizeWithColorBlendFactor:duration:")] public static SKAction ColorizeWithColorBlendFactorDuration(CGFloat colorBlendFactor, NSTimeInterval sec);
-    [Selector("falloffTo:duration:")] public static SKAction FalloffToDuration(float falloff, NSTimeInterval duration);
-    [Selector("falloffBy:duration:")] public static SKAction FalloffByDuration(float falloff, NSTimeInterval duration);
-    [Selector("followPath:duration:")] public static SKAction FollowPathDuration(CGPathRef path, NSTimeInterval duration);
-    [Selector("followPath:asOffset:orientToPath:duration:")] public static SKAction FollowPathAsOffsetOrientToPathDuration(CGPathRef path, bool offset, bool orient, NSTimeInterval duration);
-    [Selector("followPath:speed:")] public static SKAction FollowPathSpeed(CGPathRef path, CGFloat speed);
-    [Selector("followPath:asOffset:orientToPath:speed:")] public static SKAction FollowPathAsOffsetOrientToPathSpeed(CGPathRef path, bool offset, bool orient, CGFloat speed);
-    [Selector("speedBy:duration:")] public static SKAction SpeedByDuration(CGFloat speed, NSTimeInterval duration);
-    [Selector("speedTo:duration:")] public static SKAction SpeedToDuration(CGFloat speed, NSTimeInterval duration);
-    [Selector("reachTo:rootNode:duration:")] public static SKAction ReachToRootNodeDuration(CGPoint position, SKNode root, NSTimeInterval duration);
-    [Selector("reachTo:rootNode:velocity:")] public static SKAction ReachToRootNodeVelocity(CGPoint position, SKNode root, CGFloat velocity);
-    [Selector("reachToNode:rootNode:duration:")] public static SKAction ReachToNodeRootNodeDuration(SKNode node, SKNode root, NSTimeInterval sec);
-    [Selector("reachToNode:rootNode:velocity:")] public static SKAction ReachToNodeRootNodeVelocity(SKNode node, SKNode root, CGFloat velocity);
-    [Selector("strengthTo:duration:")] public static SKAction StrengthToDuration(float strength, NSTimeInterval duration);
-    [Selector("strengthBy:duration:")] public static SKAction StrengthByDuration(float strength, NSTimeInterval duration);
-    [Selector("waitForDuration:")] public static SKAction WaitForDuration(NSTimeInterval duration);
-    [Selector("waitForDuration:withRange:")] public static SKAction WaitForDurationWithRange(NSTimeInterval duration, NSTimeInterval durationRange);
-    [Selector("removeFromParent")] public static SKAction RemoveFromParent();
-    [Selector("performSelector:onTarget:")] public static SKAction PerformSelectorOnTarget(Selector selector, AnyObject target);
-    [Selector("runBlock:")] public static SKAction RunBlock(dispatch_block_t block);
-    [Selector("runBlock:queue:")] public static SKAction RunBlockQueue(dispatch_block_t block, dispatch_queue_t queue);
-    [Selector("runAction:onChildWithName:")] public static SKAction RunActionOnChildWithName(SKAction action, NSString name);
-    [Selector("customActionWithDuration:actionBlock:")] public static SKAction CustomActionWithDurationActionBlock(NSTimeInterval duration, SKActionCustomActionWithDurationActionBlockBlock block);
-    [Selector("actionNamed:")] public static SKAction? ActionNamed(NSString name);
-    [Selector("actionNamed:duration:")] public static SKAction? ActionNamedDuration(NSString name, NSTimeInterval duration);
-    [Selector("actionNamed:fromURL:")] public static SKAction? ActionNamedFromURL(NSString name, NSURL url);
-    [Selector("actionNamed:fromURL:duration:")] public static SKAction? ActionNamedFromURLDuration(NSString name, NSURL url, NSTimeInterval duration);
+    [Selector("moveBy:duration:")]
+    public static SKAction MoveByDuration(CGVector delta, NSTimeInterval duration);
+    [Selector("moveByX:y:duration:")]
+    public static SKAction MoveByXYDuration(CGFloat deltaX, CGFloat deltaY, NSTimeInterval duration);
+    [Selector("moveTo:duration:")]
+    public static SKAction MoveToDuration(CGPoint location, NSTimeInterval duration);
+    [Selector("moveToX:duration:")]
+    public static SKAction MoveToXDuration(CGFloat x, NSTimeInterval duration);
+    [Selector("moveToY:duration:")]
+    public static SKAction MoveToYDuration(CGFloat y, NSTimeInterval duration);
+    [Selector("rotateByAngle:duration:")]
+    public static SKAction RotateByAngleDuration(CGFloat radians, NSTimeInterval duration);
+    [Selector("rotateToAngle:duration:")]
+    public static SKAction RotateToAngleDuration(CGFloat radians, NSTimeInterval duration);
+    [Selector("rotateToAngle:duration:shortestUnitArc:")]
+    public static SKAction RotateToAngleDurationShortestUnitArc(CGFloat radians, NSTimeInterval duration, bool shortestUnitArc);
+    [Selector("resizeByWidth:height:duration:")]
+    public static SKAction ResizeByWidthHeightDuration(CGFloat width, CGFloat height, NSTimeInterval duration);
+    [Selector("resizeToWidth:height:duration:")]
+    public static SKAction ResizeToWidthHeightDuration(CGFloat width, CGFloat height, NSTimeInterval duration);
+    [Selector("resizeToWidth:duration:")]
+    public static SKAction ResizeToWidthDuration(CGFloat width, NSTimeInterval duration);
+    [Selector("resizeToHeight:duration:")]
+    public static SKAction ResizeToHeightDuration(CGFloat height, NSTimeInterval duration);
+    [Selector("scaleBy:duration:")]
+    public static SKAction ScaleByDuration(CGFloat scale, NSTimeInterval duration);
+    [Selector("scaleXBy:y:duration:")]
+    public static SKAction ScaleXByYDuration(CGFloat xScale, CGFloat yScale, NSTimeInterval duration);
+    [Selector("scaleTo:duration:")]
+    public static SKAction ScaleToDuration(CGFloat scale, NSTimeInterval duration);
+    [Selector("scaleXTo:y:duration:")]
+    public static SKAction ScaleXToYDuration(CGFloat xScale, CGFloat yScale, NSTimeInterval duration);
+    [Selector("scaleXTo:duration:")]
+    public static SKAction ScaleXToDuration(CGFloat scale, NSTimeInterval duration);
+    [Selector("scaleYTo:duration:")]
+    public static SKAction ScaleYToDuration(CGFloat scale, NSTimeInterval duration);
+    [Selector("scaleToSize:duration:")]
+    public static SKAction ScaleToSizeDuration(CGSize size, NSTimeInterval duration);
+    [Selector("sequence:")]
+    public static SKAction Sequence(NSArray actions);
+    [Selector("group:")]
+    public static SKAction Group(NSArray actions);
+    [Selector("repeatAction:count:")]
+    public static SKAction RepeatActionCount(SKAction action, NSUInteger count);
+    [Selector("repeatActionForever:")]
+    public static SKAction RepeatActionForever(SKAction action);
+    [Selector("fadeInWithDuration:")]
+    public static SKAction FadeInWithDuration(NSTimeInterval duration);
+    [Selector("fadeOutWithDuration:")]
+    public static SKAction FadeOutWithDuration(NSTimeInterval duration);
+    [Selector("fadeAlphaBy:duration:")]
+    public static SKAction FadeAlphaByDuration(CGFloat factor, NSTimeInterval duration);
+    [Selector("fadeAlphaTo:duration:")]
+    public static SKAction FadeAlphaToDuration(CGFloat alpha, NSTimeInterval duration);
+    [Selector("hide")]
+    public static SKAction Hide();
+    [Selector("unhide")]
+    public static SKAction Unhide();
+    [Selector("setTexture:")]
+    public static SKAction SetTexture(SKTexture texture);
+    [Selector("setNormalTexture:")]
+    public static SKAction SetNormalTexture(SKTexture texture);
+    [Selector("setTexture:resize:")]
+    public static SKAction SetTextureResize(SKTexture texture, bool resize);
+    [Selector("setNormalTexture:resize:")]
+    public static SKAction SetNormalTextureResize(SKTexture texture, bool resize);
+    [Selector("animateWithTextures:timePerFrame:")]
+    public static SKAction AnimateWithTexturesTimePerFrame(NSArray textures, NSTimeInterval sec);
+    [Selector("animateWithNormalTextures:timePerFrame:")]
+    public static SKAction AnimateWithNormalTexturesTimePerFrame(NSArray textures, NSTimeInterval sec);
+    [Selector("animateWithTextures:timePerFrame:resize:restore:")]
+    public static SKAction AnimateWithTexturesTimePerFrameResizeRestore(NSArray textures, NSTimeInterval sec, bool resize, bool restore);
+    [Selector("animateWithNormalTextures:timePerFrame:resize:restore:")]
+    public static SKAction AnimateWithNormalTexturesTimePerFrameResizeRestore(NSArray textures, NSTimeInterval sec, bool resize, bool restore);
+    [Selector("playSoundFileNamed:waitForCompletion:")]
+    public static SKAction PlaySoundFileNamedWaitForCompletion(NSString soundFile, bool wait);
+    [Selector("colorizeWithColor:colorBlendFactor:duration:")]
+    public static SKAction ColorizeWithColorColorBlendFactorDuration(NSColor color, CGFloat colorBlendFactor, NSTimeInterval duration);
+    [Selector("colorizeWithColorBlendFactor:duration:")]
+    public static SKAction ColorizeWithColorBlendFactorDuration(CGFloat colorBlendFactor, NSTimeInterval sec);
+    [Selector("falloffTo:duration:")]
+    public static SKAction FalloffToDuration(float falloff, NSTimeInterval duration);
+    [Selector("falloffBy:duration:")]
+    public static SKAction FalloffByDuration(float falloff, NSTimeInterval duration);
+    [Selector("followPath:duration:")]
+    public static SKAction FollowPathDuration(CGPathRef path, NSTimeInterval duration);
+    [Selector("followPath:asOffset:orientToPath:duration:")]
+    public static SKAction FollowPathAsOffsetOrientToPathDuration(CGPathRef path, bool offset, bool orient, NSTimeInterval duration);
+    [Selector("followPath:speed:")]
+    public static SKAction FollowPathSpeed(CGPathRef path, CGFloat speed);
+    [Selector("followPath:asOffset:orientToPath:speed:")]
+    public static SKAction FollowPathAsOffsetOrientToPathSpeed(CGPathRef path, bool offset, bool orient, CGFloat speed);
+    [Selector("speedBy:duration:")]
+    public static SKAction SpeedByDuration(CGFloat speed, NSTimeInterval duration);
+    [Selector("speedTo:duration:")]
+    public static SKAction SpeedToDuration(CGFloat speed, NSTimeInterval duration);
+    [Selector("reachTo:rootNode:duration:")]
+    public static SKAction ReachToRootNodeDuration(CGPoint position, SKNode root, NSTimeInterval duration);
+    [Selector("reachTo:rootNode:velocity:")]
+    public static SKAction ReachToRootNodeVelocity(CGPoint position, SKNode root, CGFloat velocity);
+    [Selector("reachToNode:rootNode:duration:")]
+    public static SKAction ReachToNodeRootNodeDuration(SKNode node, SKNode root, NSTimeInterval sec);
+    [Selector("reachToNode:rootNode:velocity:")]
+    public static SKAction ReachToNodeRootNodeVelocity(SKNode node, SKNode root, CGFloat velocity);
+    [Selector("strengthTo:duration:")]
+    public static SKAction StrengthToDuration(float strength, NSTimeInterval duration);
+    [Selector("strengthBy:duration:")]
+    public static SKAction StrengthByDuration(float strength, NSTimeInterval duration);
+    [Selector("waitForDuration:")]
+    public static SKAction WaitForDuration(NSTimeInterval duration);
+    [Selector("waitForDuration:withRange:")]
+    public static SKAction WaitForDurationWithRange(NSTimeInterval duration, NSTimeInterval durationRange);
+    [Selector("removeFromParent")]
+    public static SKAction RemoveFromParent();
+    [Selector("performSelector:onTarget:")]
+    public static SKAction PerformSelectorOnTarget(Selector selector, AnyObject target);
+    [Selector("runBlock:")]
+    public static SKAction RunBlock(dispatch_block_t block);
+    [Selector("runBlock:queue:")]
+    public static SKAction RunBlockQueue(dispatch_block_t block, dispatch_queue_t queue);
+    [Selector("runAction:onChildWithName:")]
+    public static SKAction RunActionOnChildWithName(SKAction action, NSString name);
+    [Selector("customActionWithDuration:actionBlock:")]
+    public static SKAction CustomActionWithDurationActionBlock(NSTimeInterval duration, SKActionCustomActionWithDurationActionBlockBlock block);
+    [Selector("actionNamed:")]
+    public static SKAction? ActionNamed(NSString name);
+    [Selector("actionNamed:duration:")]
+    public static SKAction? ActionNamedDuration(NSString name, NSTimeInterval duration);
+    [Selector("actionNamed:fromURL:")]
+    public static SKAction? ActionNamedFromURL(NSString name, NSURL url);
+    [Selector("actionNamed:fromURL:duration:")]
+    public static SKAction? ActionNamedFromURLDuration(NSString name, NSURL url, NSTimeInterval duration);
 }
 
 /// NodeWithPhysicsBody, a category of SKAction.
 public extern objc class SKAction
 {
-    [Selector("changeChargeTo:duration:")] public static SKAction ChangeChargeToDuration(float v, NSTimeInterval duration);
-    [Selector("changeChargeBy:duration:")] public static SKAction ChangeChargeByDuration(float v, NSTimeInterval duration);
-    [Selector("changeMassTo:duration:")] public static SKAction ChangeMassToDuration(float v, NSTimeInterval duration);
-    [Selector("changeMassBy:duration:")] public static SKAction ChangeMassByDuration(float v, NSTimeInterval duration);
-    [Selector("applyForce:duration:")] public static SKAction ApplyForceDuration(CGVector force, NSTimeInterval duration);
-    [Selector("applyForce:atPoint:duration:")] public static SKAction ApplyForceAtPointDuration(CGVector force, CGPoint point, NSTimeInterval duration);
-    [Selector("applyTorque:duration:")] public static SKAction ApplyTorqueDuration(CGFloat torque, NSTimeInterval duration);
-    [Selector("applyImpulse:duration:")] public static SKAction ApplyImpulseDuration(CGVector impulse, NSTimeInterval duration);
-    [Selector("applyImpulse:atPoint:duration:")] public static SKAction ApplyImpulseAtPointDuration(CGVector impulse, CGPoint point, NSTimeInterval duration);
-    [Selector("applyAngularImpulse:duration:")] public static SKAction ApplyAngularImpulseDuration(CGFloat impulse, NSTimeInterval duration);
+    [Selector("changeChargeTo:duration:")]
+    public static SKAction ChangeChargeToDuration(float v, NSTimeInterval duration);
+    [Selector("changeChargeBy:duration:")]
+    public static SKAction ChangeChargeByDuration(float v, NSTimeInterval duration);
+    [Selector("changeMassTo:duration:")]
+    public static SKAction ChangeMassToDuration(float v, NSTimeInterval duration);
+    [Selector("changeMassBy:duration:")]
+    public static SKAction ChangeMassByDuration(float v, NSTimeInterval duration);
+    [Selector("applyForce:duration:")]
+    public static SKAction ApplyForceDuration(CGVector force, NSTimeInterval duration);
+    [Selector("applyForce:atPoint:duration:")]
+    public static SKAction ApplyForceAtPointDuration(CGVector force, CGPoint point, NSTimeInterval duration);
+    [Selector("applyTorque:duration:")]
+    public static SKAction ApplyTorqueDuration(CGFloat torque, NSTimeInterval duration);
+    [Selector("applyImpulse:duration:")]
+    public static SKAction ApplyImpulseDuration(CGVector impulse, NSTimeInterval duration);
+    [Selector("applyImpulse:atPoint:duration:")]
+    public static SKAction ApplyImpulseAtPointDuration(CGVector impulse, CGPoint point, NSTimeInterval duration);
+    [Selector("applyAngularImpulse:duration:")]
+    public static SKAction ApplyAngularImpulseDuration(CGFloat impulse, NSTimeInterval duration);
 }
 
 /// PlaybackControl, a category of SKAction.
 public extern objc class SKAction
 {
-    [Selector("play")] public static SKAction Play();
-    [Selector("pause")] public static SKAction Pause();
-    [Selector("stop")] public static SKAction Stop();
-    [Selector("changePlaybackRateTo:duration:")] public static SKAction ChangePlaybackRateToDuration(float v, NSTimeInterval duration);
-    [Selector("changePlaybackRateBy:duration:")] public static SKAction ChangePlaybackRateByDuration(float v, NSTimeInterval duration);
+    [Selector("play")]
+    public static SKAction Play();
+    [Selector("pause")]
+    public static SKAction Pause();
+    [Selector("stop")]
+    public static SKAction Stop();
+    [Selector("changePlaybackRateTo:duration:")]
+    public static SKAction ChangePlaybackRateToDuration(float v, NSTimeInterval duration);
+    [Selector("changePlaybackRateBy:duration:")]
+    public static SKAction ChangePlaybackRateByDuration(float v, NSTimeInterval duration);
 }
 
 /// MixerControl, a category of SKAction.
 public extern objc class SKAction
 {
-    [Selector("changeVolumeTo:duration:")] public static SKAction ChangeVolumeToDuration(float v, NSTimeInterval duration);
-    [Selector("changeVolumeBy:duration:")] public static SKAction ChangeVolumeByDuration(float v, NSTimeInterval duration);
+    [Selector("changeVolumeTo:duration:")]
+    public static SKAction ChangeVolumeToDuration(float v, NSTimeInterval duration);
+    [Selector("changeVolumeBy:duration:")]
+    public static SKAction ChangeVolumeByDuration(float v, NSTimeInterval duration);
 }
 
 #endif

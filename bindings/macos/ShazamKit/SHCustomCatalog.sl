@@ -32,14 +32,21 @@ import Standard.ObjC;
 
 public extern objc class SHCustomCatalog : SHCatalog
 {
-    [Selector("dataRepresentation")] public NSData DataRepresentation { get; }
-    [Selector("addReferenceSignature:representingMediaItems:error:")] public bool AddReferenceSignatureRepresentingMediaItemsError(SHSignature signature, NSArray mediaItems, out NSError? error);
-    [Selector("addCustomCatalogFromURL:error:")] public bool AddCustomCatalogFromURLError(NSURL customCatalogURL, out NSError? error);
+    [Selector("dataRepresentation")]
+    public NSData DataRepresentation { get; }
+    [Selector("addReferenceSignature:representingMediaItems:error:")]
+    public bool AddReferenceSignatureRepresentingMediaItemsError(SHSignature signature, NSArray mediaItems, out NSError? error);
+    [Selector("addCustomCatalogFromURL:error:")]
+    public bool AddCustomCatalogFromURLError(NSURL customCatalogURL, out NSError? error);
     /// Deprecated in macOS 15.0.
-    [Selector("writeToURL:error:")] public bool WriteToURLError(NSURL destinationURL, out NSError? error);
-    [Selector("new")] public static Self New();
-    [Selector("init")] public Self Init();
-    [Selector("initWithDataRepresentation:error:")] public Self? InitWithDataRepresentationError(NSData dataRepresentation, out NSError? error);
+    [Selector("writeToURL:error:")]
+    public bool WriteToURLError(NSURL destinationURL, out NSError? error);
+    [Selector("new")]
+    public static Self New();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithDataRepresentation:error:")]
+    public Self? InitWithDataRepresentationError(NSData dataRepresentation, out NSError? error);
 }
 
 #endif

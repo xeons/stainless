@@ -35,7 +35,8 @@ public objc closure OSStatus AVAudioSinkNodeReceiverBlock(AudioTimeStamp* arg0, 
 
 public extern objc class AVAudioSinkNode : AVAudioNode
 {
-    [Selector("initWithReceiverBlock:")] public Self InitWithReceiverBlock(AVAudioSinkNodeReceiverBlock block);
+    [Selector("initWithReceiverBlock:")]
+    public Self InitWithReceiverBlock(AVAudioSinkNodeReceiverBlock block);
 }
 
 #endif

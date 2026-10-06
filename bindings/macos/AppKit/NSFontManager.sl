@@ -69,80 +69,129 @@ public enum NSFontAction : ulong
 
 public extern objc class NSFontManager : NSObject, NSMenuItemValidation
 {
-    [Selector("sharedFontManager")] public static NSFontManager SharedFontManager { get; }
-    [Selector("isMultiple")] public bool Multiple { get; }
-    [Selector("selectedFont")] public NSFont? SelectedFont { get; }
-    [Selector("availableFonts")] public NSArray AvailableFonts { get; }
-    [Selector("availableFontFamilies")] public NSArray AvailableFontFamilies { get; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("action", "setAction:")] public Selector Action { get; set; }
+    [Selector("sharedFontManager")]
+    public static NSFontManager SharedFontManager { get; }
+    [Selector("isMultiple")]
+    public bool Multiple { get; }
+    [Selector("selectedFont")]
+    public NSFont? SelectedFont { get; }
+    [Selector("availableFonts")]
+    public NSArray AvailableFonts { get; }
+    [Selector("availableFontFamilies")]
+    public NSArray AvailableFontFamilies { get; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("action", "setAction:")]
+    public Selector Action { get; set; }
     /// Deprecated in macOS 10.11.
-    [Selector("delegate", "setDelegate:")] public AnyObject? Delegate { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public AnyObject? Delegate { get; set; }
     /// Deprecated in macOS 10.11.
-    [Selector("collectionNames")] public NSArray? CollectionNames { get; }
-    [Selector("currentFontAction")] public NSFontAction CurrentFontAction { get; }
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
-    [Selector("setFontPanelFactory:")] public static void SetFontPanelFactory(Class factoryId);
-    [Selector("setFontManagerFactory:")] public static void SetFontManagerFactory(Class factoryId);
-    [Selector("setSelectedFont:isMultiple:")] public void SetSelectedFontIsMultiple(NSFont fontObj, bool flag);
-    [Selector("setFontMenu:")] public void SetFontMenu(NSMenu newMenu);
-    [Selector("fontMenu:")] public NSMenu? FontMenu(bool create);
-    [Selector("fontPanel:")] public NSFontPanel? FontPanel(bool create);
-    [Selector("fontWithFamily:traits:weight:size:")] public NSFont? FontWithFamilyTraitsWeightSize(NSString family, NSFontTraitMask traits, NSInteger weight, CGFloat size);
-    [Selector("traitsOfFont:")] public NSFontTraitMask TraitsOfFont(NSFont fontObj);
-    [Selector("weightOfFont:")] public NSInteger WeightOfFont(NSFont fontObj);
-    [Selector("availableMembersOfFontFamily:")] public NSArray? AvailableMembersOfFontFamily(NSString fam);
-    [Selector("convertFont:")] public NSFont ConvertFont(NSFont fontObj);
-    [Selector("convertFont:toSize:")] public NSFont ConvertFontToSize(NSFont fontObj, CGFloat size);
-    [Selector("convertFont:toFace:")] public NSFont? ConvertFontToFace(NSFont fontObj, NSString typeface);
-    [Selector("convertFont:toFamily:")] public NSFont ConvertFontToFamily(NSFont fontObj, NSString family);
-    [Selector("convertFont:toHaveTrait:")] public NSFont ConvertFontToHaveTrait(NSFont fontObj, NSFontTraitMask trait);
-    [Selector("convertFont:toNotHaveTrait:")] public NSFont ConvertFontToNotHaveTrait(NSFont fontObj, NSFontTraitMask trait);
-    [Selector("convertWeight:ofFont:")] public NSFont ConvertWeightOfFont(bool upFlag, NSFont fontObj);
-    [Selector("sendAction")] public bool SendAction();
-    [Selector("localizedNameForFamily:face:")] public NSString LocalizedNameForFamilyFace(NSString family, NSString? faceKey);
-    [Selector("setSelectedAttributes:isMultiple:")] public void SetSelectedAttributesIsMultiple(NSDictionary attributes, bool flag);
-    [Selector("convertAttributes:")] public NSDictionary ConvertAttributes(NSDictionary attributes);
+    [Selector("collectionNames")]
+    public NSArray? CollectionNames { get; }
+    [Selector("currentFontAction")]
+    public NSFontAction CurrentFontAction { get; }
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
+    [Selector("setFontPanelFactory:")]
+    public static void SetFontPanelFactory(Class factoryId);
+    [Selector("setFontManagerFactory:")]
+    public static void SetFontManagerFactory(Class factoryId);
+    [Selector("setSelectedFont:isMultiple:")]
+    public void SetSelectedFontIsMultiple(NSFont fontObj, bool flag);
+    [Selector("setFontMenu:")]
+    public void SetFontMenu(NSMenu newMenu);
+    [Selector("fontMenu:")]
+    public NSMenu? FontMenu(bool create);
+    [Selector("fontPanel:")]
+    public NSFontPanel? FontPanel(bool create);
+    [Selector("fontWithFamily:traits:weight:size:")]
+    public NSFont? FontWithFamilyTraitsWeightSize(NSString family, NSFontTraitMask traits, NSInteger weight, CGFloat size);
+    [Selector("traitsOfFont:")]
+    public NSFontTraitMask TraitsOfFont(NSFont fontObj);
+    [Selector("weightOfFont:")]
+    public NSInteger WeightOfFont(NSFont fontObj);
+    [Selector("availableMembersOfFontFamily:")]
+    public NSArray? AvailableMembersOfFontFamily(NSString fam);
+    [Selector("convertFont:")]
+    public NSFont ConvertFont(NSFont fontObj);
+    [Selector("convertFont:toSize:")]
+    public NSFont ConvertFontToSize(NSFont fontObj, CGFloat size);
+    [Selector("convertFont:toFace:")]
+    public NSFont? ConvertFontToFace(NSFont fontObj, NSString typeface);
+    [Selector("convertFont:toFamily:")]
+    public NSFont ConvertFontToFamily(NSFont fontObj, NSString family);
+    [Selector("convertFont:toHaveTrait:")]
+    public NSFont ConvertFontToHaveTrait(NSFont fontObj, NSFontTraitMask trait);
+    [Selector("convertFont:toNotHaveTrait:")]
+    public NSFont ConvertFontToNotHaveTrait(NSFont fontObj, NSFontTraitMask trait);
+    [Selector("convertWeight:ofFont:")]
+    public NSFont ConvertWeightOfFont(bool upFlag, NSFont fontObj);
+    [Selector("sendAction")]
+    public bool SendAction();
+    [Selector("localizedNameForFamily:face:")]
+    public NSString LocalizedNameForFamilyFace(NSString family, NSString? faceKey);
+    [Selector("setSelectedAttributes:isMultiple:")]
+    public void SetSelectedAttributesIsMultiple(NSDictionary attributes, bool flag);
+    [Selector("convertAttributes:")]
+    public NSDictionary ConvertAttributes(NSDictionary attributes);
     /// Deprecated in macOS 10.11.
-    [Selector("availableFontNamesMatchingFontDescriptor:")] public NSArray? AvailableFontNamesMatchingFontDescriptor(NSFontDescriptor descriptor);
+    [Selector("availableFontNamesMatchingFontDescriptor:")]
+    public NSArray? AvailableFontNamesMatchingFontDescriptor(NSFontDescriptor descriptor);
     /// Deprecated in macOS 10.11.
-    [Selector("fontDescriptorsInCollection:")] public NSArray? FontDescriptorsInCollection(NSString collectionNames);
+    [Selector("fontDescriptorsInCollection:")]
+    public NSArray? FontDescriptorsInCollection(NSString collectionNames);
     /// Deprecated in macOS 10.11.
-    [Selector("addCollection:options:")] public bool AddCollectionOptions(NSString collectionName, NSFontCollectionOptions collectionOptions);
+    [Selector("addCollection:options:")]
+    public bool AddCollectionOptions(NSString collectionName, NSFontCollectionOptions collectionOptions);
     /// Deprecated in macOS 10.11.
-    [Selector("removeCollection:")] public bool RemoveCollection(NSString collectionName);
+    [Selector("removeCollection:")]
+    public bool RemoveCollection(NSString collectionName);
     /// Deprecated in macOS 10.11.
-    [Selector("addFontDescriptors:toCollection:")] public void AddFontDescriptorsToCollection(NSArray descriptors, NSString collectionName);
+    [Selector("addFontDescriptors:toCollection:")]
+    public void AddFontDescriptorsToCollection(NSArray descriptors, NSString collectionName);
     /// Deprecated in macOS 10.11.
-    [Selector("removeFontDescriptor:fromCollection:")] public void RemoveFontDescriptorFromCollection(NSFontDescriptor descriptor, NSString collection);
-    [Selector("convertFontTraits:")] public NSFontTraitMask ConvertFontTraits(NSFontTraitMask traits);
+    [Selector("removeFontDescriptor:fromCollection:")]
+    public void RemoveFontDescriptorFromCollection(NSFontDescriptor descriptor, NSString collection);
+    [Selector("convertFontTraits:")]
+    public NSFontTraitMask ConvertFontTraits(NSFontTraitMask traits);
 }
 
 /// NSFontManagerMenuActionMethods, a category of NSFontManager.
 public extern objc class NSFontManager
 {
-    [Selector("fontNamed:hasTraits:")] public bool FontNamedHasTraits(NSString fName, NSFontTraitMask someTraits);
-    [Selector("availableFontNamesWithTraits:")] public NSArray? AvailableFontNamesWithTraits(NSFontTraitMask someTraits);
-    [Selector("addFontTrait:")] public void AddFontTrait(AnyObject? sender);
-    [Selector("removeFontTrait:")] public void RemoveFontTrait(AnyObject? sender);
-    [Selector("modifyFontViaPanel:")] public void ModifyFontViaPanel(AnyObject? sender);
-    [Selector("modifyFont:")] public void ModifyFont(AnyObject? sender);
-    [Selector("orderFrontFontPanel:")] public void OrderFrontFontPanel(AnyObject? sender);
-    [Selector("orderFrontStylesPanel:")] public void OrderFrontStylesPanel(AnyObject? sender);
+    [Selector("fontNamed:hasTraits:")]
+    public bool FontNamedHasTraits(NSString fName, NSFontTraitMask someTraits);
+    [Selector("availableFontNamesWithTraits:")]
+    public NSArray? AvailableFontNamesWithTraits(NSFontTraitMask someTraits);
+    [Selector("addFontTrait:")]
+    public void AddFontTrait(AnyObject? sender);
+    [Selector("removeFontTrait:")]
+    public void RemoveFontTrait(AnyObject? sender);
+    [Selector("modifyFontViaPanel:")]
+    public void ModifyFontViaPanel(AnyObject? sender);
+    [Selector("modifyFont:")]
+    public void ModifyFont(AnyObject? sender);
+    [Selector("orderFrontFontPanel:")]
+    public void OrderFrontFontPanel(AnyObject? sender);
+    [Selector("orderFrontStylesPanel:")]
+    public void OrderFrontStylesPanel(AnyObject? sender);
 }
 
 /// NSFontManagerDelegate, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.11.
-    [Selector("fontManager:willIncludeFont:")] public bool FontManagerWillIncludeFont(AnyObject sender, NSString fontName);
+    [Selector("fontManager:willIncludeFont:")]
+    public bool FontManagerWillIncludeFont(AnyObject sender, NSString fontName);
 }
 
 /// NSFontManagerResponderMethod, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 11.0.
-    [Selector("changeFont:")] public void ChangeFont(AnyObject? sender);
+    [Selector("changeFont:")]
+    public void ChangeFont(AnyObject? sender);
 }
 
 #endif

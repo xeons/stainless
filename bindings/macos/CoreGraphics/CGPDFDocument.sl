@@ -56,9 +56,11 @@ public extern "C" CFStringRef kCGPDFOutlineDestination;
 
 public extern "C" CFStringRef kCGPDFOutlineDestinationRect;
 
-[ReturnsRetained] public extern "C" CGPDFDocumentRef? CGPDFDocumentCreateWithProvider(CGDataProviderRef? provider);
+[ReturnsRetained]
+public extern "C" CGPDFDocumentRef? CGPDFDocumentCreateWithProvider(CGDataProviderRef? provider);
 
-[ReturnsRetained] public extern "C" CGPDFDocumentRef? CGPDFDocumentCreateWithURL(CFURLRef? url);
+[ReturnsRetained]
+public extern "C" CGPDFDocumentRef? CGPDFDocumentCreateWithURL(CFURLRef? url);
 
 public extern "C" void CGPDFDocumentGetVersion(CGPDFDocumentRef? document, int* majorVersion, int* minorVersion);
 

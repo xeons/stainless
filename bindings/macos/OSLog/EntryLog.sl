@@ -41,7 +41,8 @@ public enum OSLogEntryLogLevel : long
 
 public extern objc class OSLogEntryLog : OSLogEntry, OSLogEntryFromProcess, OSLogEntryWithPayload
 {
-    [Selector("level")] public OSLogEntryLogLevel Level { get; }
+    [Selector("level")]
+    public OSLogEntryLogLevel Level { get; }
 }
 
 #endif

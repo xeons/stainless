@@ -52,33 +52,53 @@ public enum VTFrameRateConversionParametersSubmissionMode : long
 /// macOS 15.4 and later.
 public extern objc class VTFrameRateConversionConfiguration : NSObject, VTFrameProcessorConfiguration
 {
-    [Selector("frameWidth")] public NSInteger FrameWidth { get; }
-    [Selector("frameHeight")] public NSInteger FrameHeight { get; }
-    [Selector("usePrecomputedFlow")] public bool UsePrecomputedFlow { get; }
-    [Selector("qualityPrioritization")] public VTFrameRateConversionConfigurationQualityPrioritization QualityPrioritization { get; }
-    [Selector("revision")] public VTFrameRateConversionConfigurationRevision Revision { get; }
-    [Selector("supportedRevisions")] public static NSIndexSet SupportedRevisions { get; }
-    [Selector("defaultRevision")] public static VTFrameRateConversionConfigurationRevision DefaultRevision { get; }
-    [Selector("frameSupportedPixelFormats")] public NSArray? FrameSupportedPixelFormats { get; }
-    [Selector("sourcePixelBufferAttributes")] public NSDictionary SourcePixelBufferAttributes { get; }
-    [Selector("destinationPixelBufferAttributes")] public NSDictionary DestinationPixelBufferAttributes { get; }
-    [Selector("isSupported")] public static bool Supported { get; }
+    [Selector("frameWidth")]
+    public NSInteger FrameWidth { get; }
+    [Selector("frameHeight")]
+    public NSInteger FrameHeight { get; }
+    [Selector("usePrecomputedFlow")]
+    public bool UsePrecomputedFlow { get; }
+    [Selector("qualityPrioritization")]
+    public VTFrameRateConversionConfigurationQualityPrioritization QualityPrioritization { get; }
+    [Selector("revision")]
+    public VTFrameRateConversionConfigurationRevision Revision { get; }
+    [Selector("supportedRevisions")]
+    public static NSIndexSet SupportedRevisions { get; }
+    [Selector("defaultRevision")]
+    public static VTFrameRateConversionConfigurationRevision DefaultRevision { get; }
+    [Selector("frameSupportedPixelFormats")]
+    public NSArray? FrameSupportedPixelFormats { get; }
+    [Selector("sourcePixelBufferAttributes")]
+    public NSDictionary SourcePixelBufferAttributes { get; }
+    [Selector("destinationPixelBufferAttributes")]
+    public NSDictionary DestinationPixelBufferAttributes { get; }
+    [Selector("isSupported")]
+    public static bool Supported { get; }
     /// macOS 15.4 and later.
     /// Deprecated in macOS 26.0.
-    [Selector("processorSupported")] public static Boolean ProcessorSupported { get; }
-    [Selector("initWithFrameWidth:frameHeight:usePrecomputedFlow:qualityPrioritization:revision:")] public Self? InitWithFrameWidthFrameHeightUsePrecomputedFlowQualityPrioritizationRevision(NSInteger frameWidth, NSInteger frameHeight, bool usePrecomputedFlow, VTFrameRateConversionConfigurationQualityPrioritization qualityPrioritization, VTFrameRateConversionConfigurationRevision revision);
+    [Selector("processorSupported")]
+    public static Boolean ProcessorSupported { get; }
+    [Selector("initWithFrameWidth:frameHeight:usePrecomputedFlow:qualityPrioritization:revision:")]
+    public Self? InitWithFrameWidthFrameHeightUsePrecomputedFlowQualityPrioritizationRevision(NSInteger frameWidth, NSInteger frameHeight, bool usePrecomputedFlow, VTFrameRateConversionConfigurationQualityPrioritization qualityPrioritization, VTFrameRateConversionConfigurationRevision revision);
 }
 
 /// macOS 15.4 and later.
 public extern objc class VTFrameRateConversionParameters : NSObject, VTFrameProcessorParameters
 {
-    [Selector("sourceFrame")] public VTFrameProcessorFrame SourceFrame { get; }
-    [Selector("nextFrame")] public VTFrameProcessorFrame? NextFrame { get; }
-    [Selector("opticalFlow")] public VTFrameProcessorOpticalFlow? OpticalFlow { get; }
-    [Selector("interpolationPhase")] public NSArray? InterpolationPhase { get; }
-    [Selector("submissionMode")] public VTFrameRateConversionParametersSubmissionMode SubmissionMode { get; }
-    [Selector("destinationFrames")] public NSArray DestinationFrames { get; }
-    [Selector("initWithSourceFrame:nextFrame:opticalFlow:interpolationPhase:submissionMode:destinationFrames:")] public Self? InitWithSourceFrameNextFrameOpticalFlowInterpolationPhaseSubmissionModeDestinationFrames(VTFrameProcessorFrame sourceFrame, VTFrameProcessorFrame nextFrame, VTFrameProcessorOpticalFlow? opticalFlow, NSArray interpolationPhase, VTFrameRateConversionParametersSubmissionMode submissionMode, NSArray destinationFrame);
+    [Selector("sourceFrame")]
+    public VTFrameProcessorFrame SourceFrame { get; }
+    [Selector("nextFrame")]
+    public VTFrameProcessorFrame? NextFrame { get; }
+    [Selector("opticalFlow")]
+    public VTFrameProcessorOpticalFlow? OpticalFlow { get; }
+    [Selector("interpolationPhase")]
+    public NSArray? InterpolationPhase { get; }
+    [Selector("submissionMode")]
+    public VTFrameRateConversionParametersSubmissionMode SubmissionMode { get; }
+    [Selector("destinationFrames")]
+    public NSArray DestinationFrames { get; }
+    [Selector("initWithSourceFrame:nextFrame:opticalFlow:interpolationPhase:submissionMode:destinationFrames:")]
+    public Self? InitWithSourceFrameNextFrameOpticalFlowInterpolationPhaseSubmissionModeDestinationFrames(VTFrameProcessorFrame sourceFrame, VTFrameProcessorFrame nextFrame, VTFrameProcessorOpticalFlow? opticalFlow, NSArray interpolationPhase, VTFrameRateConversionParametersSubmissionMode submissionMode, NSArray destinationFrame);
 }
 
 #endif

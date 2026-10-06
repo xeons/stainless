@@ -32,44 +32,66 @@ import Standard.ObjC;
 
 public objc interface NSLocking
 {
-    [Selector("lock")] void Lock();
-    [Selector("unlock")] void Unlock();
+    [Selector("lock")]
+    void Lock();
+    [Selector("unlock")]
+    void Unlock();
 }
 
 public extern objc class NSLock : NSObject, NSLocking
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("tryLock")] public bool TryLock();
-    [Selector("lockBeforeDate:")] public bool LockBeforeDate(NSDate limit);
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("tryLock")]
+    public bool TryLock();
+    [Selector("lockBeforeDate:")]
+    public bool LockBeforeDate(NSDate limit);
 }
 
 public extern objc class NSConditionLock : NSObject, NSLocking
 {
-    [Selector("condition")] public NSInteger Condition { get; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("initWithCondition:")] public Self InitWithCondition(NSInteger condition);
-    [Selector("lockWhenCondition:")] public void LockWhenCondition(NSInteger condition);
-    [Selector("tryLock")] public bool TryLock();
-    [Selector("tryLockWhenCondition:")] public bool TryLockWhenCondition(NSInteger condition);
-    [Selector("unlockWithCondition:")] public void UnlockWithCondition(NSInteger condition);
-    [Selector("lockBeforeDate:")] public bool LockBeforeDate(NSDate limit);
-    [Selector("lockWhenCondition:beforeDate:")] public bool LockWhenConditionBeforeDate(NSInteger condition, NSDate limit);
+    [Selector("condition")]
+    public NSInteger Condition { get; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("initWithCondition:")]
+    public Self InitWithCondition(NSInteger condition);
+    [Selector("lockWhenCondition:")]
+    public void LockWhenCondition(NSInteger condition);
+    [Selector("tryLock")]
+    public bool TryLock();
+    [Selector("tryLockWhenCondition:")]
+    public bool TryLockWhenCondition(NSInteger condition);
+    [Selector("unlockWithCondition:")]
+    public void UnlockWithCondition(NSInteger condition);
+    [Selector("lockBeforeDate:")]
+    public bool LockBeforeDate(NSDate limit);
+    [Selector("lockWhenCondition:beforeDate:")]
+    public bool LockWhenConditionBeforeDate(NSInteger condition, NSDate limit);
 }
 
 public extern objc class NSRecursiveLock : NSObject, NSLocking
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("tryLock")] public bool TryLock();
-    [Selector("lockBeforeDate:")] public bool LockBeforeDate(NSDate limit);
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("tryLock")]
+    public bool TryLock();
+    [Selector("lockBeforeDate:")]
+    public bool LockBeforeDate(NSDate limit);
 }
 
 public extern objc class NSCondition : NSObject, NSLocking
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("wait")] public void Wait();
-    [Selector("waitUntilDate:")] public bool WaitUntilDate(NSDate limit);
-    [Selector("signal")] public void Signal();
-    [Selector("broadcast")] public void Broadcast();
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("wait")]
+    public void Wait();
+    [Selector("waitUntilDate:")]
+    public bool WaitUntilDate(NSDate limit);
+    [Selector("signal")]
+    public void Signal();
+    [Selector("broadcast")]
+    public void Broadcast();
 }
 
 #endif

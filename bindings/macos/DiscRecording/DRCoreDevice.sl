@@ -38,11 +38,14 @@ public extern objc class DRDeviceRef : CFTypeRef { }
 
 public extern "C" CFTypeID DRDeviceGetTypeID();
 
-[ReturnsRetained] public extern "C" CFArrayRef? DRCopyDeviceArray();
+[ReturnsRetained]
+public extern "C" CFArrayRef? DRCopyDeviceArray();
 
-[ReturnsRetained] public extern "C" DRDeviceRef? DRDeviceCopyDeviceForBSDName(CFStringRef? name);
+[ReturnsRetained]
+public extern "C" DRDeviceRef? DRDeviceCopyDeviceForBSDName(CFStringRef? name);
 
-[ReturnsRetained] public extern "C" DRDeviceRef? DRDeviceCopyDeviceForIORegistryEntryPath(CFStringRef? path);
+[ReturnsRetained]
+public extern "C" DRDeviceRef? DRDeviceCopyDeviceForIORegistryEntryPath(CFStringRef? path);
 
 public extern "C" Boolean DRDeviceIsValid(DRDeviceRef? device);
 
@@ -60,9 +63,11 @@ public extern "C" OSStatus DRDeviceAcquireExclusiveAccess(DRDeviceRef? device);
 
 public extern "C" void DRDeviceReleaseExclusiveAccess(DRDeviceRef? device);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? DRDeviceCopyInfo(DRDeviceRef? device);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? DRDeviceCopyInfo(DRDeviceRef? device);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? DRDeviceCopyStatus(DRDeviceRef? device);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? DRDeviceCopyStatus(DRDeviceRef? device);
 
 public extern "C" CFStringRef? kDRDeviceAppearedNotification;
 

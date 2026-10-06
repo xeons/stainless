@@ -29,7 +29,8 @@ import Standard.ObjC;
 
 public extern objc class OS_object : NSObject
 {
-    [Selector("init")] public Self? Init();
+    [Selector("init")]
+    public Self? Init();
 }
 
 #endif

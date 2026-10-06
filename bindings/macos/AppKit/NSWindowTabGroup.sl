@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class NSWindowTabGroup : NSObject
 {
-    [Selector("identifier")] public NSWindowTabbingIdentifier Identifier { get; }
-    [Selector("windows")] public NSArray Windows { get; }
-    [Selector("isOverviewVisible", "setOverviewVisible:")] public bool OverviewVisible { get; set; }
-    [Selector("isTabBarVisible")] public bool TabBarVisible { get; }
-    [Selector("selectedWindow", "setSelectedWindow:")] public NSWindow? SelectedWindow { get; set; }
-    [Selector("addWindow:")] public void AddWindow(NSWindow window);
-    [Selector("insertWindow:atIndex:")] public void InsertWindowAtIndex(NSWindow window, NSInteger index);
-    [Selector("removeWindow:")] public void RemoveWindow(NSWindow window);
+    [Selector("identifier")]
+    public NSWindowTabbingIdentifier Identifier { get; }
+    [Selector("windows")]
+    public NSArray Windows { get; }
+    [Selector("isOverviewVisible", "setOverviewVisible:")]
+    public bool OverviewVisible { get; set; }
+    [Selector("isTabBarVisible")]
+    public bool TabBarVisible { get; }
+    [Selector("selectedWindow", "setSelectedWindow:")]
+    public NSWindow? SelectedWindow { get; set; }
+    [Selector("addWindow:")]
+    public void AddWindow(NSWindow window);
+    [Selector("insertWindow:atIndex:")]
+    public void InsertWindowAtIndex(NSWindow window, NSInteger index);
+    [Selector("removeWindow:")]
+    public void RemoveWindow(NSWindow window);
 }
 
 #endif

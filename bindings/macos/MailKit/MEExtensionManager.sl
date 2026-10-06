@@ -37,8 +37,10 @@ public objc closure void MEExtensionManagerReloadVisibleMessagesWithCompletionHa
 
 public extern objc class MEExtensionManager : NSObject
 {
-    [Selector("reloadContentBlockerWithIdentifier:completionHandler:")] public static void ReloadContentBlockerWithIdentifierCompletionHandler(NSString identifier, MEExtensionManagerReloadContentBlockerWithIdentifierCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("reloadVisibleMessagesWithCompletionHandler:")] public static void ReloadVisibleMessagesWithCompletionHandler(MEExtensionManagerReloadVisibleMessagesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("reloadContentBlockerWithIdentifier:completionHandler:")]
+    public static void ReloadContentBlockerWithIdentifierCompletionHandler(NSString identifier, MEExtensionManagerReloadContentBlockerWithIdentifierCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("reloadVisibleMessagesWithCompletionHandler:")]
+    public static void ReloadVisibleMessagesWithCompletionHandler(MEExtensionManagerReloadVisibleMessagesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 #endif

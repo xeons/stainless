@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class MPSNNGridSample : MPSCNNBinaryKernel
 {
-    [Selector("useGridValueAsInputCoordinate", "setUseGridValueAsInputCoordinate:")] public bool UseGridValueAsInputCoordinate { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("useGridValueAsInputCoordinate", "setUseGridValueAsInputCoordinate:")]
+    public bool UseGridValueAsInputCoordinate { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 #endif

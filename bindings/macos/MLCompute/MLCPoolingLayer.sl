@@ -32,8 +32,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCPoolingLayer : MLCLayer
 {
-    [Selector("descriptor")] public MLCPoolingDescriptor Descriptor { get; }
-    [Selector("layerWithDescriptor:")] public static Self LayerWithDescriptor(MLCPoolingDescriptor descriptor);
+    [Selector("descriptor")]
+    public MLCPoolingDescriptor Descriptor { get; }
+    [Selector("layerWithDescriptor:")]
+    public static Self LayerWithDescriptor(MLCPoolingDescriptor descriptor);
 }
 
 #endif

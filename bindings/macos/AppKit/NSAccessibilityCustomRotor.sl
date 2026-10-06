@@ -65,34 +65,50 @@ public enum NSAccessibilityCustomRotorType : long
 
 public extern objc class NSAccessibilityCustomRotor : NSObject
 {
-    [Selector("type", "setType:")] public NSAccessibilityCustomRotorType Type { get; set; }
-    [Selector("label", "setLabel:")] public NSString Label { get; set; }
-    [Selector("itemSearchDelegate", "setItemSearchDelegate:")] public NSAccessibilityCustomRotorItemSearchDelegate? ItemSearchDelegate { get; set; }
-    [Selector("itemLoadingDelegate", "setItemLoadingDelegate:")] public NSAccessibilityElementLoading? ItemLoadingDelegate { get; set; }
-    [Selector("initWithLabel:itemSearchDelegate:")] public Self InitWithLabelItemSearchDelegate(NSString label, NSAccessibilityCustomRotorItemSearchDelegate itemSearchDelegate);
-    [Selector("initWithRotorType:itemSearchDelegate:")] public Self InitWithRotorTypeItemSearchDelegate(NSAccessibilityCustomRotorType rotorType, NSAccessibilityCustomRotorItemSearchDelegate itemSearchDelegate);
+    [Selector("type", "setType:")]
+    public NSAccessibilityCustomRotorType Type { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString Label { get; set; }
+    [Selector("itemSearchDelegate", "setItemSearchDelegate:")]
+    public NSAccessibilityCustomRotorItemSearchDelegate? ItemSearchDelegate { get; set; }
+    [Selector("itemLoadingDelegate", "setItemLoadingDelegate:")]
+    public NSAccessibilityElementLoading? ItemLoadingDelegate { get; set; }
+    [Selector("initWithLabel:itemSearchDelegate:")]
+    public Self InitWithLabelItemSearchDelegate(NSString label, NSAccessibilityCustomRotorItemSearchDelegate itemSearchDelegate);
+    [Selector("initWithRotorType:itemSearchDelegate:")]
+    public Self InitWithRotorTypeItemSearchDelegate(NSAccessibilityCustomRotorType rotorType, NSAccessibilityCustomRotorItemSearchDelegate itemSearchDelegate);
 }
 
 public extern objc class NSAccessibilityCustomRotorSearchParameters : NSObject
 {
-    [Selector("currentItem", "setCurrentItem:")] public NSAccessibilityCustomRotorItemResult? CurrentItem { get; set; }
-    [Selector("searchDirection", "setSearchDirection:")] public NSAccessibilityCustomRotorSearchDirection SearchDirection { get; set; }
-    [Selector("filterString", "setFilterString:")] public NSString FilterString { get; set; }
+    [Selector("currentItem", "setCurrentItem:")]
+    public NSAccessibilityCustomRotorItemResult? CurrentItem { get; set; }
+    [Selector("searchDirection", "setSearchDirection:")]
+    public NSAccessibilityCustomRotorSearchDirection SearchDirection { get; set; }
+    [Selector("filterString", "setFilterString:")]
+    public NSString FilterString { get; set; }
 }
 
 public extern objc class NSAccessibilityCustomRotorItemResult : NSObject
 {
-    [Selector("targetElement")] public NSAccessibilityElementProtocol? TargetElement { get; }
-    [Selector("itemLoadingToken")] public NSAccessibilityLoadingToken? ItemLoadingToken { get; }
-    [Selector("targetRange", "setTargetRange:")] public NSRange TargetRange { get; set; }
-    [Selector("customLabel", "setCustomLabel:")] public NSString? CustomLabel { get; set; }
-    [Selector("initWithTargetElement:")] public Self InitWithTargetElement(NSAccessibilityElementProtocol targetElement);
-    [Selector("initWithItemLoadingToken:customLabel:")] public Self InitWithItemLoadingTokenCustomLabel(NSAccessibilityLoadingToken itemLoadingToken, NSString customLabel);
+    [Selector("targetElement")]
+    public NSAccessibilityElementProtocol? TargetElement { get; }
+    [Selector("itemLoadingToken")]
+    public NSAccessibilityLoadingToken? ItemLoadingToken { get; }
+    [Selector("targetRange", "setTargetRange:")]
+    public NSRange TargetRange { get; set; }
+    [Selector("customLabel", "setCustomLabel:")]
+    public NSString? CustomLabel { get; set; }
+    [Selector("initWithTargetElement:")]
+    public Self InitWithTargetElement(NSAccessibilityElementProtocol targetElement);
+    [Selector("initWithItemLoadingToken:customLabel:")]
+    public Self InitWithItemLoadingTokenCustomLabel(NSAccessibilityLoadingToken itemLoadingToken, NSString customLabel);
 }
 
 public objc interface NSAccessibilityCustomRotorItemSearchDelegate : NSObjectProtocol
 {
-    [Selector("rotor:resultForSearchParameters:")] NSAccessibilityCustomRotorItemResult? RotorResultForSearchParameters(NSAccessibilityCustomRotor rotor, NSAccessibilityCustomRotorSearchParameters searchParameters);
+    [Selector("rotor:resultForSearchParameters:")]
+    NSAccessibilityCustomRotorItemResult? RotorResultForSearchParameters(NSAccessibilityCustomRotor rotor, NSAccessibilityCustomRotorSearchParameters searchParameters);
 }
 
 #endif

@@ -64,11 +64,13 @@ public extern "C" nuint CGDisplayPixelsWide(CGDirectDisplayID display);
 
 public extern "C" nuint CGDisplayPixelsHigh(CGDirectDisplayID display);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CGDisplayCopyAllDisplayModes(CGDirectDisplayID display, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CGDisplayCopyAllDisplayModes(CGDirectDisplayID display, CFDictionaryRef? options);
 
 public extern "C" CFStringRef? kCGDisplayShowDuplicateLowResolutionModes;
 
-[ReturnsRetained] public extern "C" CGDisplayModeRef? CGDisplayCopyDisplayMode(CGDirectDisplayID display);
+[ReturnsRetained]
+public extern "C" CGDisplayModeRef? CGDisplayCopyDisplayMode(CGDirectDisplayID display);
 
 public extern "C" CGError CGDisplaySetDisplayMode(CGDirectDisplayID display, CGDisplayModeRef? mode, CFDictionaryRef? options);
 
@@ -77,7 +79,8 @@ public extern "C" nuint CGDisplayModeGetWidth(CGDisplayModeRef? mode);
 public extern "C" nuint CGDisplayModeGetHeight(CGDisplayModeRef? mode);
 
 /// Deprecated in macOS 10.11.
-[ReturnsRetained] public extern "C" CFStringRef? CGDisplayModeCopyPixelEncoding(CGDisplayModeRef? mode);
+[ReturnsRetained]
+public extern "C" CFStringRef? CGDisplayModeCopyPixelEncoding(CGDisplayModeRef? mode);
 
 public extern "C" double CGDisplayModeGetRefreshRate(CGDisplayModeRef? mode);
 

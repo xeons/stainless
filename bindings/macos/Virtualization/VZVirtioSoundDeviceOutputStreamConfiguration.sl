@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioSoundDeviceOutputStreamConfiguration : VZVirtioSoundDeviceStreamConfiguration
 {
-    [Selector("sink", "setSink:")] public VZAudioOutputStreamSink? Sink { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("sink", "setSink:")]
+    public VZAudioOutputStreamSink? Sink { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

@@ -41,9 +41,12 @@ public extern "C" NSString GCMouseDidStopBeingCurrentNotification;
 
 public extern objc class GCMouse : NSObject, GCDevice
 {
-    [Selector("mouseInput")] public GCMouseInput? MouseInput { get; }
-    [Selector("current")] public static GCMouse? Current { get; }
-    [Selector("mice")] public static NSArray Mice();
+    [Selector("mouseInput")]
+    public GCMouseInput? MouseInput { get; }
+    [Selector("current")]
+    public static GCMouse? Current { get; }
+    [Selector("mice")]
+    public static NSArray Mice();
 }
 
 #endif

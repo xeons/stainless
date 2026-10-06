@@ -33,16 +33,22 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationPublicKeyCredentialPRFAssertionInputValues : NSObject
 {
-    [Selector("saltInput1")] public NSData SaltInput1 { get; }
-    [Selector("saltInput2")] public NSData? SaltInput2 { get; }
-    [Selector("initWithSaltInput1:saltInput2:")] public Self InitWithSaltInput1SaltInput2(NSData saltInput1, NSData? saltInput2);
+    [Selector("saltInput1")]
+    public NSData SaltInput1 { get; }
+    [Selector("saltInput2")]
+    public NSData? SaltInput2 { get; }
+    [Selector("initWithSaltInput1:saltInput2:")]
+    public Self InitWithSaltInput1SaltInput2(NSData saltInput1, NSData? saltInput2);
 }
 
 public extern objc class ASAuthorizationPublicKeyCredentialPRFAssertionInput : NSObject
 {
-    [Selector("inputValues")] public ASAuthorizationPublicKeyCredentialPRFAssertionInputValues? InputValues { get; }
-    [Selector("perCredentialInputValues")] public NSDictionary? PerCredentialInputValues { get; }
-    [Selector("initWithInputValues:perCredentialInputValues:")] public Self InitWithInputValuesPerCredentialInputValues(ASAuthorizationPublicKeyCredentialPRFAssertionInputValues? inputValues, NSDictionary? perCredentialInputValues);
+    [Selector("inputValues")]
+    public ASAuthorizationPublicKeyCredentialPRFAssertionInputValues? InputValues { get; }
+    [Selector("perCredentialInputValues")]
+    public NSDictionary? PerCredentialInputValues { get; }
+    [Selector("initWithInputValues:perCredentialInputValues:")]
+    public Self InitWithInputValuesPerCredentialInputValues(ASAuthorizationPublicKeyCredentialPRFAssertionInputValues? inputValues, NSDictionary? perCredentialInputValues);
 }
 
 #endif

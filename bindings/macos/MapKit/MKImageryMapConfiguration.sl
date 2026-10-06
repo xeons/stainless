@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class MKImageryMapConfiguration : MKMapConfiguration
 {
-    [Selector("init")] public Self Init();
-    [Selector("initWithElevationStyle:")] public Self InitWithElevationStyle(MKMapElevationStyle elevationStyle);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithElevationStyle:")]
+    public Self InitWithElevationStyle(MKMapElevationStyle elevationStyle);
 }
 
 #endif

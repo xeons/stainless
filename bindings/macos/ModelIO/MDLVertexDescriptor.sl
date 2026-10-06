@@ -131,32 +131,50 @@ public enum MDLVertexFormat : ulong
 
 public extern objc class MDLVertexBufferLayout : NSObject, NSCopying
 {
-    [Selector("stride", "setStride:")] public NSUInteger Stride { get; set; }
-    [Selector("initWithStride:")] public Self InitWithStride(NSUInteger stride);
+    [Selector("stride", "setStride:")]
+    public NSUInteger Stride { get; set; }
+    [Selector("initWithStride:")]
+    public Self InitWithStride(NSUInteger stride);
 }
 
 public extern objc class MDLVertexAttribute : NSObject, NSCopying
 {
-    [Selector("name", "setName:")] public NSString Name { get; set; }
-    [Selector("format", "setFormat:")] public MDLVertexFormat Format { get; set; }
-    [Selector("offset", "setOffset:")] public NSUInteger Offset { get; set; }
-    [Selector("bufferIndex", "setBufferIndex:")] public NSUInteger BufferIndex { get; set; }
-    [Selector("time", "setTime:")] public NSTimeInterval Time { get; set; }
-    [Selector("initializationValue", "setInitializationValue:")] public vector_float4 InitializationValue { get; set; }
-    [Selector("initWithName:format:offset:bufferIndex:")] public Self InitWithNameFormatOffsetBufferIndex(NSString name, MDLVertexFormat format, NSUInteger offset, NSUInteger bufferIndex);
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
+    [Selector("format", "setFormat:")]
+    public MDLVertexFormat Format { get; set; }
+    [Selector("offset", "setOffset:")]
+    public NSUInteger Offset { get; set; }
+    [Selector("bufferIndex", "setBufferIndex:")]
+    public NSUInteger BufferIndex { get; set; }
+    [Selector("time", "setTime:")]
+    public NSTimeInterval Time { get; set; }
+    [Selector("initializationValue", "setInitializationValue:")]
+    public vector_float4 InitializationValue { get; set; }
+    [Selector("initWithName:format:offset:bufferIndex:")]
+    public Self InitWithNameFormatOffsetBufferIndex(NSString name, MDLVertexFormat format, NSUInteger offset, NSUInteger bufferIndex);
 }
 
 public extern objc class MDLVertexDescriptor : NSObject, NSCopying
 {
-    [Selector("attributes", "setAttributes:")] public NSMutableArray Attributes { get; set; }
-    [Selector("layouts", "setLayouts:")] public NSMutableArray Layouts { get; set; }
-    [Selector("initWithVertexDescriptor:")] public Self InitWithVertexDescriptor(MDLVertexDescriptor vertexDescriptor);
-    [Selector("attributeNamed:")] public MDLVertexAttribute? AttributeNamed(NSString name);
-    [Selector("addOrReplaceAttribute:")] public void AddOrReplaceAttribute(MDLVertexAttribute @attribute);
-    [Selector("removeAttributeNamed:")] public void RemoveAttributeNamed(NSString name);
-    [Selector("reset")] public void Reset();
-    [Selector("setPackedStrides")] public void SetPackedStrides();
-    [Selector("setPackedOffsets")] public void SetPackedOffsets();
+    [Selector("attributes", "setAttributes:")]
+    public NSMutableArray Attributes { get; set; }
+    [Selector("layouts", "setLayouts:")]
+    public NSMutableArray Layouts { get; set; }
+    [Selector("initWithVertexDescriptor:")]
+    public Self InitWithVertexDescriptor(MDLVertexDescriptor vertexDescriptor);
+    [Selector("attributeNamed:")]
+    public MDLVertexAttribute? AttributeNamed(NSString name);
+    [Selector("addOrReplaceAttribute:")]
+    public void AddOrReplaceAttribute(MDLVertexAttribute @attribute);
+    [Selector("removeAttributeNamed:")]
+    public void RemoveAttributeNamed(NSString name);
+    [Selector("reset")]
+    public void Reset();
+    [Selector("setPackedStrides")]
+    public void SetPackedStrides();
+    [Selector("setPackedOffsets")]
+    public void SetPackedOffsets();
 }
 
 #endif

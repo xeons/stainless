@@ -119,18 +119,23 @@ public extern objc class DADiskRef : CFTypeRef { }
 
 public extern "C" CFTypeID DADiskGetTypeID();
 
-[ReturnsRetained] public extern "C" DADiskRef? DADiskCreateFromBSDName(CFAllocatorRef? allocator, DASessionRef session, byte* name);
+[ReturnsRetained]
+public extern "C" DADiskRef? DADiskCreateFromBSDName(CFAllocatorRef? allocator, DASessionRef session, byte* name);
 
-[ReturnsRetained] public extern "C" DADiskRef? DADiskCreateFromIOMedia(CFAllocatorRef? allocator, DASessionRef session, io_service_t media);
+[ReturnsRetained]
+public extern "C" DADiskRef? DADiskCreateFromIOMedia(CFAllocatorRef? allocator, DASessionRef session, io_service_t media);
 
-[ReturnsRetained] public extern "C" DADiskRef? DADiskCreateFromVolumePath(CFAllocatorRef? allocator, DASessionRef session, CFURLRef path);
+[ReturnsRetained]
+public extern "C" DADiskRef? DADiskCreateFromVolumePath(CFAllocatorRef? allocator, DASessionRef session, CFURLRef path);
 
 public extern "C" byte* DADiskGetBSDName(DADiskRef disk);
 
 public extern "C" io_service_t DADiskCopyIOMedia(DADiskRef disk);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? DADiskCopyDescription(DADiskRef disk);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? DADiskCopyDescription(DADiskRef disk);
 
-[ReturnsRetained] public extern "C" DADiskRef? DADiskCopyWholeDisk(DADiskRef disk);
+[ReturnsRetained]
+public extern "C" DADiskRef? DADiskCopyWholeDisk(DADiskRef disk);
 
 #endif

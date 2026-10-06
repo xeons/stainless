@@ -34,24 +34,42 @@ import Standard.ObjC;
 
 public extern objc class MLFeatureValue : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("type")] public MLFeatureType Type { get; }
-    [Selector("isUndefined")] public bool Undefined { get; }
-    [Selector("int64Value")] public long Int64Value { get; }
-    [Selector("doubleValue")] public double DoubleValue { get; }
-    [Selector("stringValue")] public NSString StringValue { get; }
-    [Selector("multiArrayValue")] public MLMultiArray? MultiArrayValue { get; }
-    [Selector("dictionaryValue")] public NSDictionary DictionaryValue { get; }
-    [Selector("imageBufferValue")] public CVPixelBufferRef? ImageBufferValue { get; }
-    [Selector("sequenceValue")] public MLSequence? SequenceValue { get; }
-    [Selector("featureValueWithInt64:")] public static Self FeatureValueWithInt64(long value);
-    [Selector("featureValueWithDouble:")] public static Self FeatureValueWithDouble(double value);
-    [Selector("featureValueWithString:")] public static Self FeatureValueWithString(NSString value);
-    [Selector("featureValueWithMultiArray:")] public static Self FeatureValueWithMultiArray(MLMultiArray value);
-    [Selector("featureValueWithPixelBuffer:")] public static Self FeatureValueWithPixelBuffer(CVPixelBufferRef value);
-    [Selector("featureValueWithSequence:")] public static Self FeatureValueWithSequence(MLSequence sequence);
-    [Selector("undefinedFeatureValueWithType:")] public static Self UndefinedFeatureValueWithType(MLFeatureType type);
-    [Selector("featureValueWithDictionary:error:")] public static Self? FeatureValueWithDictionaryError(NSDictionary value, out NSError? error);
-    [Selector("isEqualToFeatureValue:")] public bool IsEqualToFeatureValue(MLFeatureValue value);
+    [Selector("type")]
+    public MLFeatureType Type { get; }
+    [Selector("isUndefined")]
+    public bool Undefined { get; }
+    [Selector("int64Value")]
+    public long Int64Value { get; }
+    [Selector("doubleValue")]
+    public double DoubleValue { get; }
+    [Selector("stringValue")]
+    public NSString StringValue { get; }
+    [Selector("multiArrayValue")]
+    public MLMultiArray? MultiArrayValue { get; }
+    [Selector("dictionaryValue")]
+    public NSDictionary DictionaryValue { get; }
+    [Selector("imageBufferValue")]
+    public CVPixelBufferRef? ImageBufferValue { get; }
+    [Selector("sequenceValue")]
+    public MLSequence? SequenceValue { get; }
+    [Selector("featureValueWithInt64:")]
+    public static Self FeatureValueWithInt64(long value);
+    [Selector("featureValueWithDouble:")]
+    public static Self FeatureValueWithDouble(double value);
+    [Selector("featureValueWithString:")]
+    public static Self FeatureValueWithString(NSString value);
+    [Selector("featureValueWithMultiArray:")]
+    public static Self FeatureValueWithMultiArray(MLMultiArray value);
+    [Selector("featureValueWithPixelBuffer:")]
+    public static Self FeatureValueWithPixelBuffer(CVPixelBufferRef value);
+    [Selector("featureValueWithSequence:")]
+    public static Self FeatureValueWithSequence(MLSequence sequence);
+    [Selector("undefinedFeatureValueWithType:")]
+    public static Self UndefinedFeatureValueWithType(MLFeatureType type);
+    [Selector("featureValueWithDictionary:error:")]
+    public static Self? FeatureValueWithDictionaryError(NSDictionary value, out NSError? error);
+    [Selector("isEqualToFeatureValue:")]
+    public bool IsEqualToFeatureValue(MLFeatureValue value);
 }
 
 #endif

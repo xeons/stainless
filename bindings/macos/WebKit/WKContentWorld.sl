@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class WKContentWorld : NSObject
 {
-    [Selector("pageWorld")] public static WKContentWorld PageWorld { get; }
-    [Selector("defaultClientWorld")] public static WKContentWorld DefaultClientWorld { get; }
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("worldWithName:")] public static WKContentWorld WorldWithName(NSString name);
+    [Selector("pageWorld")]
+    public static WKContentWorld PageWorld { get; }
+    [Selector("defaultClientWorld")]
+    public static WKContentWorld DefaultClientWorld { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("worldWithName:")]
+    public static WKContentWorld WorldWithName(NSString name);
 }
 
 #endif

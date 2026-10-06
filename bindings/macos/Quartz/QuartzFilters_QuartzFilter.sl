@@ -34,14 +34,22 @@ import Standard.ObjC;
 
 public extern objc class QuartzFilter : NSObject
 {
-    [Selector("quartzFilterWithURL:")] public static QuartzFilter? QuartzFilterWithURL(NSURL? aURL);
-    [Selector("quartzFilterWithProperties:")] public static QuartzFilter? QuartzFilterWithProperties(NSDictionary? properties);
-    [Selector("quartzFilterWithOutputIntents:")] public static QuartzFilter? QuartzFilterWithOutputIntents(NSArray? outputIntents);
-    [Selector("properties")] public NSDictionary? Properties();
-    [Selector("url")] public NSURL? Url();
-    [Selector("localizedName")] public NSString? LocalizedName();
-    [Selector("applyToContext:")] public bool ApplyToContext(CGContextRef? aContext);
-    [Selector("removeFromContext:")] public void RemoveFromContext(CGContextRef? aContext);
+    [Selector("quartzFilterWithURL:")]
+    public static QuartzFilter? QuartzFilterWithURL(NSURL? aURL);
+    [Selector("quartzFilterWithProperties:")]
+    public static QuartzFilter? QuartzFilterWithProperties(NSDictionary? properties);
+    [Selector("quartzFilterWithOutputIntents:")]
+    public static QuartzFilter? QuartzFilterWithOutputIntents(NSArray? outputIntents);
+    [Selector("properties")]
+    public NSDictionary? Properties();
+    [Selector("url")]
+    public NSURL? Url();
+    [Selector("localizedName")]
+    public NSString? LocalizedName();
+    [Selector("applyToContext:")]
+    public bool ApplyToContext(CGContextRef? aContext);
+    [Selector("removeFromContext:")]
+    public void RemoveFromContext(CGContextRef? aContext);
 }
 
 #endif

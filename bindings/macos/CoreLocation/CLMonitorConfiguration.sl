@@ -37,10 +37,14 @@ public objc closure void CLMonitorConfigurationConfigWithMonitorNameQueueEventHa
 
 public extern objc class CLMonitorConfiguration : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("queue")] public dispatch_queue_t Queue { get; }
-    [Selector("eventHandler")] public CLMonitorConfigurationEventHandlerBlock EventHandler { get; }
-    [Selector("configWithMonitorName:queue:eventHandler:")] public static CLMonitorConfiguration ConfigWithMonitorNameQueueEventHandler(NSString name, dispatch_queue_t queue, CLMonitorConfigurationConfigWithMonitorNameQueueEventHandlerEventHandlerBlock eventHandler);
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("queue")]
+    public dispatch_queue_t Queue { get; }
+    [Selector("eventHandler")]
+    public CLMonitorConfigurationEventHandlerBlock EventHandler { get; }
+    [Selector("configWithMonitorName:queue:eventHandler:")]
+    public static CLMonitorConfiguration ConfigWithMonitorNameQueueEventHandler(NSString name, dispatch_queue_t queue, CLMonitorConfigurationConfigWithMonitorNameQueueEventHandlerEventHandlerBlock eventHandler);
 }
 
 #endif

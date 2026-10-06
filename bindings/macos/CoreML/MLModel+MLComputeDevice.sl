@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// MLComputeDevice, a category of MLModel.
 public extern objc class MLModel
 {
-    [Selector("availableComputeDevices")] public static NSArray? AvailableComputeDevices { get; }
+    [Selector("availableComputeDevices")]
+    public static NSArray? AvailableComputeDevices { get; }
 }
 
 #endif

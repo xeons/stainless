@@ -47,17 +47,26 @@ public objc closure void GKVoiceChatPlayerVoiceChatStateDidChangeHandlerBlock(GK
 public extern objc class GKVoiceChat : NSObject
 {
     /// Deprecated in macOS 15.0.
-    [Selector("playerVoiceChatStateDidChangeHandler", "setPlayerVoiceChatStateDidChangeHandler:")] public GKVoiceChatPlayerVoiceChatStateDidChangeHandlerBlock? PlayerVoiceChatStateDidChangeHandler { get; set; }
-    [Selector("name")] public NSString Name { get; }
-    [Selector("isActive", "setActive:")] public bool Active { get; set; }
-    [Selector("volume", "setVolume:")] public float Volume { get; set; }
+    [Selector("playerVoiceChatStateDidChangeHandler", "setPlayerVoiceChatStateDidChangeHandler:")]
+    public GKVoiceChatPlayerVoiceChatStateDidChangeHandlerBlock? PlayerVoiceChatStateDidChangeHandler { get; set; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("isActive", "setActive:")]
+    public bool Active { get; set; }
+    [Selector("volume", "setVolume:")]
+    public float Volume { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("players")] public NSArray? Players { get; }
-    [Selector("start")] public void Start();
-    [Selector("stop")] public void Stop();
+    [Selector("players")]
+    public NSArray? Players { get; }
+    [Selector("start")]
+    public void Start();
+    [Selector("stop")]
+    public void Stop();
     /// Deprecated in macOS 15.0.
-    [Selector("setPlayer:muted:")] public void SetPlayerMuted(GKPlayer player, bool isMuted);
-    [Selector("isVoIPAllowed")] public static bool IsVoIPAllowed();
+    [Selector("setPlayer:muted:")]
+    public void SetPlayerMuted(GKPlayer player, bool isMuted);
+    [Selector("isVoIPAllowed")]
+    public static bool IsVoIPAllowed();
 }
 
 public objc closure void GKVoiceChatPlayerStateUpdateHandlerBlock(NSString arg0, GKVoiceChatPlayerState arg1);
@@ -66,16 +75,19 @@ public objc closure void GKVoiceChatPlayerStateUpdateHandlerBlock(NSString arg0,
 public extern objc class GKVoiceChat
 {
     /// Deprecated in macOS 10.10.
-    [Selector("playerStateUpdateHandler", "setPlayerStateUpdateHandler:")] public GKVoiceChatPlayerStateUpdateHandlerBlock PlayerStateUpdateHandler { get; set; }
+    [Selector("playerStateUpdateHandler", "setPlayerStateUpdateHandler:")]
+    public GKVoiceChatPlayerStateUpdateHandlerBlock PlayerStateUpdateHandler { get; set; }
 }
 
 /// Obsoleted, a category of GKVoiceChat.
 public extern objc class GKVoiceChat
 {
     /// Deprecated in macOS 10.10.
-    [Selector("playerIDs")] public NSArray? PlayerIDs { get; }
+    [Selector("playerIDs")]
+    public NSArray? PlayerIDs { get; }
     /// Deprecated in macOS 10.10.
-    [Selector("setMute:forPlayer:")] public void SetMuteForPlayer(bool isMuted, NSString playerID);
+    [Selector("setMute:forPlayer:")]
+    public void SetMuteForPlayer(bool isMuted, NSString playerID);
 }
 
 #endif

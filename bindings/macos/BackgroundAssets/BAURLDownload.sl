@@ -33,12 +33,16 @@ import Standard.ObjC;
 
 public extern objc class BAURLDownload : BADownload, NSCopying
 {
-    [Selector("initWithIdentifier:request:fileSize:applicationGroupIdentifier:")] public Self InitWithIdentifierRequestFileSizeApplicationGroupIdentifier(NSString identifier, NSURLRequest request, NSUInteger fileSize, NSString applicationGroupIdentifier);
-    [Selector("initWithIdentifier:request:essential:fileSize:applicationGroupIdentifier:priority:")] public Self InitWithIdentifierRequestEssentialFileSizeApplicationGroupIdentifierPriority(NSString identifier, NSURLRequest request, bool essential, NSUInteger fileSize, NSString applicationGroupIdentifier, BADownloaderPriority priority);
+    [Selector("initWithIdentifier:request:fileSize:applicationGroupIdentifier:")]
+    public Self InitWithIdentifierRequestFileSizeApplicationGroupIdentifier(NSString identifier, NSURLRequest request, NSUInteger fileSize, NSString applicationGroupIdentifier);
+    [Selector("initWithIdentifier:request:essential:fileSize:applicationGroupIdentifier:priority:")]
+    public Self InitWithIdentifierRequestEssentialFileSizeApplicationGroupIdentifierPriority(NSString identifier, NSURLRequest request, bool essential, NSUInteger fileSize, NSString applicationGroupIdentifier, BADownloaderPriority priority);
     /// Deprecated in macOS 13.3.
-    [Selector("initWithIdentifier:request:applicationGroupIdentifier:")] public Self InitWithIdentifierRequestApplicationGroupIdentifier(NSString identifier, NSURLRequest request, NSString applicationGroupIdentifier);
+    [Selector("initWithIdentifier:request:applicationGroupIdentifier:")]
+    public Self InitWithIdentifierRequestApplicationGroupIdentifier(NSString identifier, NSURLRequest request, NSString applicationGroupIdentifier);
     /// Deprecated in macOS 13.3.
-    [Selector("initWithIdentifier:request:applicationGroupIdentifier:priority:")] public Self InitWithIdentifierRequestApplicationGroupIdentifierPriority(NSString identifier, NSURLRequest request, NSString applicationGroupIdentifier, BADownloaderPriority priority);
+    [Selector("initWithIdentifier:request:applicationGroupIdentifier:priority:")]
+    public Self InitWithIdentifierRequestApplicationGroupIdentifierPriority(NSString identifier, NSURLRequest request, NSString applicationGroupIdentifier, BADownloaderPriority priority);
 }
 
 #endif

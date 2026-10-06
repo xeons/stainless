@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class NSSliderAccessory : NSObject, NSCoding
 {
-    [Selector("behavior", "setBehavior:")] public NSSliderAccessoryBehavior Behavior { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("accessoryWithImage:")] public static NSSliderAccessory AccessoryWithImage(NSImage image);
+    [Selector("behavior", "setBehavior:")]
+    public NSSliderAccessoryBehavior Behavior { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("accessoryWithImage:")]
+    public static NSSliderAccessory AccessoryWithImage(NSImage image);
 }
 
 public extern objc class NSSliderAccessory : NSAccessibility, NSAccessibilityElementProtocol { }
@@ -44,12 +47,18 @@ public objc closure void NSSliderAccessoryBehaviorBehaviorWithHandlerHandlerBloc
 
 public extern objc class NSSliderAccessoryBehavior : NSObject, NSCoding, NSCopying
 {
-    [Selector("automaticBehavior")] public static NSSliderAccessoryBehavior AutomaticBehavior { get; }
-    [Selector("valueStepBehavior")] public static NSSliderAccessoryBehavior ValueStepBehavior { get; }
-    [Selector("valueResetBehavior")] public static NSSliderAccessoryBehavior ValueResetBehavior { get; }
-    [Selector("behaviorWithTarget:action:")] public static NSSliderAccessoryBehavior BehaviorWithTargetAction(AnyObject? target, Selector action);
-    [Selector("behaviorWithHandler:")] public static NSSliderAccessoryBehavior BehaviorWithHandler(NSSliderAccessoryBehaviorBehaviorWithHandlerHandlerBlock handler);
-    [Selector("handleAction:")] public void HandleAction(NSSliderAccessory sender);
+    [Selector("automaticBehavior")]
+    public static NSSliderAccessoryBehavior AutomaticBehavior { get; }
+    [Selector("valueStepBehavior")]
+    public static NSSliderAccessoryBehavior ValueStepBehavior { get; }
+    [Selector("valueResetBehavior")]
+    public static NSSliderAccessoryBehavior ValueResetBehavior { get; }
+    [Selector("behaviorWithTarget:action:")]
+    public static NSSliderAccessoryBehavior BehaviorWithTargetAction(AnyObject? target, Selector action);
+    [Selector("behaviorWithHandler:")]
+    public static NSSliderAccessoryBehavior BehaviorWithHandler(NSSliderAccessoryBehaviorBehaviorWithHandlerHandlerBlock handler);
+    [Selector("handleAction:")]
+    public void HandleAction(NSSliderAccessory sender);
 }
 
 #endif

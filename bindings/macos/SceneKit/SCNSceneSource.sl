@@ -114,18 +114,30 @@ public objc closure bool SCNSceneSourceEntriesPassingTestPredicateBlock(AnyObjec
 
 public extern objc class SCNSceneSource : NSObject
 {
-    [Selector("url")] public NSURL? Url { get; }
-    [Selector("data")] public NSData? Data { get; }
-    [Selector("sceneSourceWithURL:options:")] public static Self? SceneSourceWithURLOptions(NSURL url, NSDictionary? options);
-    [Selector("sceneSourceWithData:options:")] public static Self? SceneSourceWithDataOptions(NSData data, NSDictionary? options);
-    [Selector("initWithURL:options:")] public Self? InitWithURLOptions(NSURL url, NSDictionary? options);
-    [Selector("initWithData:options:")] public Self? InitWithDataOptions(NSData data, NSDictionary? options);
-    [Selector("sceneWithOptions:statusHandler:")] public SCNScene? SceneWithOptionsStatusHandler(NSDictionary? options, SCNSceneSourceStatusHandler? statusHandler);
-    [Selector("sceneWithOptions:error:")] public SCNScene? SceneWithOptionsError(NSDictionary? options, out NSError? error);
-    [Selector("propertyForKey:")] public AnyObject? PropertyForKey(NSString key);
-    [Selector("entryWithIdentifier:withClass:")] public AnyObject? EntryWithIdentifierWithClass(NSString uid, Class entryClass);
-    [Selector("identifiersOfEntriesWithClass:")] public NSArray IdentifiersOfEntriesWithClass(Class entryClass);
-    [Selector("entriesPassingTest:")] public NSArray EntriesPassingTest(SCNSceneSourceEntriesPassingTestPredicateBlock predicate);
+    [Selector("url")]
+    public NSURL? Url { get; }
+    [Selector("data")]
+    public NSData? Data { get; }
+    [Selector("sceneSourceWithURL:options:")]
+    public static Self? SceneSourceWithURLOptions(NSURL url, NSDictionary? options);
+    [Selector("sceneSourceWithData:options:")]
+    public static Self? SceneSourceWithDataOptions(NSData data, NSDictionary? options);
+    [Selector("initWithURL:options:")]
+    public Self? InitWithURLOptions(NSURL url, NSDictionary? options);
+    [Selector("initWithData:options:")]
+    public Self? InitWithDataOptions(NSData data, NSDictionary? options);
+    [Selector("sceneWithOptions:statusHandler:")]
+    public SCNScene? SceneWithOptionsStatusHandler(NSDictionary? options, SCNSceneSourceStatusHandler? statusHandler);
+    [Selector("sceneWithOptions:error:")]
+    public SCNScene? SceneWithOptionsError(NSDictionary? options, out NSError? error);
+    [Selector("propertyForKey:")]
+    public AnyObject? PropertyForKey(NSString key);
+    [Selector("entryWithIdentifier:withClass:")]
+    public AnyObject? EntryWithIdentifierWithClass(NSString uid, Class entryClass);
+    [Selector("identifiersOfEntriesWithClass:")]
+    public NSArray IdentifiersOfEntriesWithClass(Class entryClass);
+    [Selector("entriesPassingTest:")]
+    public NSArray EntriesPassingTest(SCNSceneSourceEntriesPassingTestPredicateBlock predicate);
 }
 
 #endif

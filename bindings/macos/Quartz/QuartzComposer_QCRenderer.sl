@@ -43,31 +43,51 @@ public extern "C" NSString? QCRendererMouseLocationKey;
 /// Deprecated in macOS 10.15.
 public objc interface QCCompositionRenderer
 {
-    [Selector("attributes")] NSDictionary? Attributes();
-    [Selector("inputKeys")] NSArray? InputKeys();
-    [Selector("outputKeys")] NSArray? OutputKeys();
-    [Selector("setValue:forInputKey:")] bool SetValueForInputKey(AnyObject? value, NSString? key);
-    [Selector("valueForInputKey:")] AnyObject? ValueForInputKey(NSString? key);
-    [Selector("valueForOutputKey:")] AnyObject? ValueForOutputKey(NSString? key);
-    [Selector("valueForOutputKey:ofType:")] AnyObject? ValueForOutputKeyOfType(NSString? key, NSString? type);
-    [Selector("propertyListFromInputValues")] AnyObject? PropertyListFromInputValues();
-    [Selector("setInputValuesWithPropertyList:")] void SetInputValuesWithPropertyList(AnyObject? plist);
-    [Selector("userInfo")] NSMutableDictionary? UserInfo();
+    [Selector("attributes")]
+    NSDictionary? Attributes();
+    [Selector("inputKeys")]
+    NSArray? InputKeys();
+    [Selector("outputKeys")]
+    NSArray? OutputKeys();
+    [Selector("setValue:forInputKey:")]
+    bool SetValueForInputKey(AnyObject? value, NSString? key);
+    [Selector("valueForInputKey:")]
+    AnyObject? ValueForInputKey(NSString? key);
+    [Selector("valueForOutputKey:")]
+    AnyObject? ValueForOutputKey(NSString? key);
+    [Selector("valueForOutputKey:ofType:")]
+    AnyObject? ValueForOutputKeyOfType(NSString? key, NSString? type);
+    [Selector("propertyListFromInputValues")]
+    AnyObject? PropertyListFromInputValues();
+    [Selector("setInputValuesWithPropertyList:")]
+    void SetInputValuesWithPropertyList(AnyObject? plist);
+    [Selector("userInfo")]
+    NSMutableDictionary? UserInfo();
 }
 
 /// Deprecated in macOS 10.15.
 public extern objc class QCRenderer : NSObject, QCCompositionRenderer
 {
-    [Selector("initWithComposition:colorSpace:")] public AnyObject? InitWithCompositionColorSpace(QCComposition? composition, CGColorSpaceRef? colorSpace);
+    [Selector("initWithComposition:colorSpace:")]
+    public AnyObject? InitWithCompositionColorSpace(QCComposition? composition, CGColorSpaceRef? colorSpace);
     /// Deprecated in macOS 10.14.
-    [Selector("initWithCGLContext:pixelFormat:colorSpace:composition:")] public AnyObject? InitWithCGLContextPixelFormatColorSpaceComposition(CGLContextObj context, CGLPixelFormatObj format, CGColorSpaceRef? colorSpace, QCComposition? composition);
-    [Selector("initOffScreenWithSize:colorSpace:composition:")] public AnyObject? InitOffScreenWithSizeColorSpaceComposition(NSSize size, CGColorSpaceRef? colorSpace, QCComposition? composition);
-    [Selector("initWithOpenGLContext:pixelFormat:file:")] public AnyObject? InitWithOpenGLContextPixelFormatFile(NSOpenGLContext? context, NSOpenGLPixelFormat? format, NSString? path);
-    [Selector("renderAtTime:arguments:")] public bool RenderAtTimeArguments(NSTimeInterval time, NSDictionary? arguments);
-    [Selector("renderingTimeForTime:arguments:")] public NSTimeInterval RenderingTimeForTimeArguments(NSTimeInterval time, NSDictionary? arguments);
-    [Selector("composition")] public QCComposition? Composition();
-    [Selector("snapshotImage")] public NSImage? SnapshotImage();
-    [ReturnsRetained] [Selector("createSnapshotImageOfType:")] public AnyObject? CreateSnapshotImageOfType(NSString? type);
+    [Selector("initWithCGLContext:pixelFormat:colorSpace:composition:")]
+    public AnyObject? InitWithCGLContextPixelFormatColorSpaceComposition(CGLContextObj context, CGLPixelFormatObj format, CGColorSpaceRef? colorSpace, QCComposition? composition);
+    [Selector("initOffScreenWithSize:colorSpace:composition:")]
+    public AnyObject? InitOffScreenWithSizeColorSpaceComposition(NSSize size, CGColorSpaceRef? colorSpace, QCComposition? composition);
+    [Selector("initWithOpenGLContext:pixelFormat:file:")]
+    public AnyObject? InitWithOpenGLContextPixelFormatFile(NSOpenGLContext? context, NSOpenGLPixelFormat? format, NSString? path);
+    [Selector("renderAtTime:arguments:")]
+    public bool RenderAtTimeArguments(NSTimeInterval time, NSDictionary? arguments);
+    [Selector("renderingTimeForTime:arguments:")]
+    public NSTimeInterval RenderingTimeForTimeArguments(NSTimeInterval time, NSDictionary? arguments);
+    [Selector("composition")]
+    public QCComposition? Composition();
+    [Selector("snapshotImage")]
+    public NSImage? SnapshotImage();
+    [ReturnsRetained]
+    [Selector("createSnapshotImageOfType:")]
+    public AnyObject? CreateSnapshotImageOfType(NSString? type);
 }
 
 #endif

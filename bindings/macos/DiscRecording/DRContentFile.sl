@@ -79,14 +79,19 @@ public struct DRFileProductionInfo
 public delegate OSStatus DRFileProc(void* arg0, __DRFile* arg1, DRFileMessage arg2, void* arg3);
 
 /// Deprecated in macOS 10.14.
-[ReturnsRetained] public extern "C" DRFileRef? DRFileCreateReal(FSRef* fsRef);
+[ReturnsRetained]
+public extern "C" DRFileRef? DRFileCreateReal(FSRef* fsRef);
 
-[ReturnsRetained] public extern "C" DRFileRef? DRFileCreateRealWithURL(CFURLRef? urlRef);
+[ReturnsRetained]
+public extern "C" DRFileRef? DRFileCreateRealWithURL(CFURLRef? urlRef);
 
-[ReturnsRetained] public extern "C" DRFileRef? DRFileCreateVirtualWithData(CFStringRef? baseName, void* fileData, UInt32 fileDataLength);
+[ReturnsRetained]
+public extern "C" DRFileRef? DRFileCreateVirtualWithData(CFStringRef? baseName, void* fileData, UInt32 fileDataLength);
 
-[ReturnsRetained] public extern "C" DRFileRef? DRFileCreateVirtualWithCallback(CFStringRef? baseName, DRFileProc fileProc, void* fileProcRefCon);
+[ReturnsRetained]
+public extern "C" DRFileRef? DRFileCreateVirtualWithCallback(CFStringRef? baseName, DRFileProc fileProc, void* fileProcRefCon);
 
-[ReturnsRetained] public extern "C" DRFileRef? DRFileCreateVirtualLink(DRFSObjectRef? original, DRLinkType linkType, CFStringRef? fsKey);
+[ReturnsRetained]
+public extern "C" DRFileRef? DRFileCreateVirtualLink(DRFSObjectRef? original, DRLinkType linkType, CFStringRef? fsKey);
 
 #endif

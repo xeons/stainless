@@ -33,15 +33,20 @@ import Standard.ObjC;
 
 public extern objc class SWPersonIdentityProof : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("inclusionHashes")] public NSArray InclusionHashes { get; }
-    [Selector("publicKey")] public NSData PublicKey { get; }
-    [Selector("publicKeyIndex")] public NSUInteger PublicKeyIndex { get; }
+    [Selector("inclusionHashes")]
+    public NSArray InclusionHashes { get; }
+    [Selector("publicKey")]
+    public NSData PublicKey { get; }
+    [Selector("publicKeyIndex")]
+    public NSUInteger PublicKeyIndex { get; }
 }
 
 public extern objc class SWSignedPersonIdentityProof : SWPersonIdentityProof
 {
-    [Selector("signatureData")] public NSData SignatureData { get; }
-    [Selector("initWithPersonIdentityProof:signatureData:")] public Self InitWithPersonIdentityProofSignatureData(SWPersonIdentityProof personIdentityProof, NSData data);
+    [Selector("signatureData")]
+    public NSData SignatureData { get; }
+    [Selector("initWithPersonIdentityProof:signatureData:")]
+    public Self InitWithPersonIdentityProofSignatureData(SWPersonIdentityProof personIdentityProof, NSData data);
 }
 
 #endif

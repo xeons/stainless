@@ -39,18 +39,30 @@ public enum GLKLightingType : int
 /// Deprecated in macOS 10.14.
 public extern objc class GLKEffectPropertyLight : GLKEffectProperty
 {
-    [Selector("enabled", "setEnabled:")] public GLboolean Enabled { get; set; }
-    [Selector("position", "setPosition:")] public GLKVector4 Position { get; set; }
-    [Selector("ambientColor", "setAmbientColor:")] public GLKVector4 AmbientColor { get; set; }
-    [Selector("diffuseColor", "setDiffuseColor:")] public GLKVector4 DiffuseColor { get; set; }
-    [Selector("specularColor", "setSpecularColor:")] public GLKVector4 SpecularColor { get; set; }
-    [Selector("spotDirection", "setSpotDirection:")] public GLKVector3 SpotDirection { get; set; }
-    [Selector("spotExponent", "setSpotExponent:")] public GLfloat SpotExponent { get; set; }
-    [Selector("spotCutoff", "setSpotCutoff:")] public GLfloat SpotCutoff { get; set; }
-    [Selector("constantAttenuation", "setConstantAttenuation:")] public GLfloat ConstantAttenuation { get; set; }
-    [Selector("linearAttenuation", "setLinearAttenuation:")] public GLfloat LinearAttenuation { get; set; }
-    [Selector("quadraticAttenuation", "setQuadraticAttenuation:")] public GLfloat QuadraticAttenuation { get; set; }
-    [Selector("transform", "setTransform:")] public GLKEffectPropertyTransform Transform { get; set; }
+    [Selector("enabled", "setEnabled:")]
+    public GLboolean Enabled { get; set; }
+    [Selector("position", "setPosition:")]
+    public GLKVector4 Position { get; set; }
+    [Selector("ambientColor", "setAmbientColor:")]
+    public GLKVector4 AmbientColor { get; set; }
+    [Selector("diffuseColor", "setDiffuseColor:")]
+    public GLKVector4 DiffuseColor { get; set; }
+    [Selector("specularColor", "setSpecularColor:")]
+    public GLKVector4 SpecularColor { get; set; }
+    [Selector("spotDirection", "setSpotDirection:")]
+    public GLKVector3 SpotDirection { get; set; }
+    [Selector("spotExponent", "setSpotExponent:")]
+    public GLfloat SpotExponent { get; set; }
+    [Selector("spotCutoff", "setSpotCutoff:")]
+    public GLfloat SpotCutoff { get; set; }
+    [Selector("constantAttenuation", "setConstantAttenuation:")]
+    public GLfloat ConstantAttenuation { get; set; }
+    [Selector("linearAttenuation", "setLinearAttenuation:")]
+    public GLfloat LinearAttenuation { get; set; }
+    [Selector("quadraticAttenuation", "setQuadraticAttenuation:")]
+    public GLfloat QuadraticAttenuation { get; set; }
+    [Selector("transform", "setTransform:")]
+    public GLKEffectPropertyTransform Transform { get; set; }
 }
 
 #endif

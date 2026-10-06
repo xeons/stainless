@@ -44,74 +44,131 @@ public enum NSGestureRecognizerState : long
 
 public extern objc class NSGestureRecognizer : NSObject, NSCoding
 {
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
-    [Selector("action", "setAction:")] public Selector Action { get; set; }
-    [Selector("state")] public NSGestureRecognizerState State { get; }
-    [Selector("delegate", "setDelegate:")] public NSGestureRecognizerDelegate? Delegate { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("view")] public NSView? View { get; }
-    [Selector("pressureConfiguration", "setPressureConfiguration:")] public NSPressureConfiguration? PressureConfiguration { get; set; }
-    [Selector("delaysPrimaryMouseButtonEvents", "setDelaysPrimaryMouseButtonEvents:")] public bool DelaysPrimaryMouseButtonEvents { get; set; }
-    [Selector("delaysSecondaryMouseButtonEvents", "setDelaysSecondaryMouseButtonEvents:")] public bool DelaysSecondaryMouseButtonEvents { get; set; }
-    [Selector("delaysOtherMouseButtonEvents", "setDelaysOtherMouseButtonEvents:")] public bool DelaysOtherMouseButtonEvents { get; set; }
-    [Selector("delaysKeyEvents", "setDelaysKeyEvents:")] public bool DelaysKeyEvents { get; set; }
-    [Selector("delaysMagnificationEvents", "setDelaysMagnificationEvents:")] public bool DelaysMagnificationEvents { get; set; }
-    [Selector("delaysRotationEvents", "setDelaysRotationEvents:")] public bool DelaysRotationEvents { get; set; }
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
+    [Selector("action", "setAction:")]
+    public Selector Action { get; set; }
+    [Selector("state")]
+    public NSGestureRecognizerState State { get; }
+    [Selector("delegate", "setDelegate:")]
+    public NSGestureRecognizerDelegate? Delegate { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("view")]
+    public NSView? View { get; }
+    [Selector("pressureConfiguration", "setPressureConfiguration:")]
+    public NSPressureConfiguration? PressureConfiguration { get; set; }
+    [Selector("delaysPrimaryMouseButtonEvents", "setDelaysPrimaryMouseButtonEvents:")]
+    public bool DelaysPrimaryMouseButtonEvents { get; set; }
+    [Selector("delaysSecondaryMouseButtonEvents", "setDelaysSecondaryMouseButtonEvents:")]
+    public bool DelaysSecondaryMouseButtonEvents { get; set; }
+    [Selector("delaysOtherMouseButtonEvents", "setDelaysOtherMouseButtonEvents:")]
+    public bool DelaysOtherMouseButtonEvents { get; set; }
+    [Selector("delaysKeyEvents", "setDelaysKeyEvents:")]
+    public bool DelaysKeyEvents { get; set; }
+    [Selector("delaysMagnificationEvents", "setDelaysMagnificationEvents:")]
+    public bool DelaysMagnificationEvents { get; set; }
+    [Selector("delaysRotationEvents", "setDelaysRotationEvents:")]
+    public bool DelaysRotationEvents { get; set; }
     /// macOS 26.0 and later.
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
     /// macOS 26.0 and later.
-    [Selector("modifierFlags")] public NSEventModifierFlags ModifierFlags { get; }
-    [Selector("initWithTarget:action:")] public Self InitWithTargetAction(AnyObject? target, Selector action);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("locationInView:")] public NSPoint LocationInView(NSView? view);
+    [Selector("modifierFlags")]
+    public NSEventModifierFlags ModifierFlags { get; }
+    [Selector("initWithTarget:action:")]
+    public Self InitWithTargetAction(AnyObject? target, Selector action);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("locationInView:")]
+    public NSPoint LocationInView(NSView? view);
 }
 
 /// NSTouchBar, a category of NSGestureRecognizer.
 public extern objc class NSGestureRecognizer
 {
-    [Selector("allowedTouchTypes", "setAllowedTouchTypes:")] public NSTouchTypeMask AllowedTouchTypes { get; set; }
+    [Selector("allowedTouchTypes", "setAllowedTouchTypes:")]
+    public NSTouchTypeMask AllowedTouchTypes { get; set; }
 }
 
 public objc interface NSGestureRecognizerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("gestureRecognizer:shouldAttemptToRecognizeWithEvent:")] bool GestureRecognizerShouldAttemptToRecognizeWithEvent(NSGestureRecognizer gestureRecognizer, NSEvent event);
-    [Optional] [Selector("gestureRecognizerShouldBegin:")] bool GestureRecognizerShouldBegin(NSGestureRecognizer gestureRecognizer);
-    [Optional] [Selector("gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:")] bool GestureRecognizerShouldRecognizeSimultaneouslyWithGestureRecognizer(NSGestureRecognizer gestureRecognizer, NSGestureRecognizer otherGestureRecognizer);
-    [Optional] [Selector("gestureRecognizer:shouldRequireFailureOfGestureRecognizer:")] bool GestureRecognizerShouldRequireFailureOfGestureRecognizer(NSGestureRecognizer gestureRecognizer, NSGestureRecognizer otherGestureRecognizer);
-    [Optional] [Selector("gestureRecognizer:shouldBeRequiredToFailByGestureRecognizer:")] bool GestureRecognizerShouldBeRequiredToFailByGestureRecognizer(NSGestureRecognizer gestureRecognizer, NSGestureRecognizer otherGestureRecognizer);
-    [Optional] [Selector("gestureRecognizer:shouldReceiveTouch:")] bool GestureRecognizerShouldReceiveTouch(NSGestureRecognizer gestureRecognizer, NSTouch touch);
+    [Optional]
+    [Selector("gestureRecognizer:shouldAttemptToRecognizeWithEvent:")]
+    bool GestureRecognizerShouldAttemptToRecognizeWithEvent(NSGestureRecognizer gestureRecognizer, NSEvent event);
+    [Optional]
+    [Selector("gestureRecognizerShouldBegin:")]
+    bool GestureRecognizerShouldBegin(NSGestureRecognizer gestureRecognizer);
+    [Optional]
+    [Selector("gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:")]
+    bool GestureRecognizerShouldRecognizeSimultaneouslyWithGestureRecognizer(NSGestureRecognizer gestureRecognizer, NSGestureRecognizer otherGestureRecognizer);
+    [Optional]
+    [Selector("gestureRecognizer:shouldRequireFailureOfGestureRecognizer:")]
+    bool GestureRecognizerShouldRequireFailureOfGestureRecognizer(NSGestureRecognizer gestureRecognizer, NSGestureRecognizer otherGestureRecognizer);
+    [Optional]
+    [Selector("gestureRecognizer:shouldBeRequiredToFailByGestureRecognizer:")]
+    bool GestureRecognizerShouldBeRequiredToFailByGestureRecognizer(NSGestureRecognizer gestureRecognizer, NSGestureRecognizer otherGestureRecognizer);
+    [Optional]
+    [Selector("gestureRecognizer:shouldReceiveTouch:")]
+    bool GestureRecognizerShouldReceiveTouch(NSGestureRecognizer gestureRecognizer, NSTouch touch);
 }
 
 /// NSSubclassUse, a category of NSGestureRecognizer.
 public extern objc class NSGestureRecognizer
 {
-    [Selector("reset")] public void Reset();
-    [Selector("canPreventGestureRecognizer:")] public bool CanPreventGestureRecognizer(NSGestureRecognizer preventedGestureRecognizer);
-    [Selector("canBePreventedByGestureRecognizer:")] public bool CanBePreventedByGestureRecognizer(NSGestureRecognizer preventingGestureRecognizer);
-    [Selector("shouldRequireFailureOfGestureRecognizer:")] public bool ShouldRequireFailureOfGestureRecognizer(NSGestureRecognizer otherGestureRecognizer);
-    [Selector("shouldBeRequiredToFailByGestureRecognizer:")] public bool ShouldBeRequiredToFailByGestureRecognizer(NSGestureRecognizer otherGestureRecognizer);
-    [Selector("mouseDown:")] public void MouseDown(NSEvent event);
-    [Selector("rightMouseDown:")] public void RightMouseDown(NSEvent event);
-    [Selector("otherMouseDown:")] public void OtherMouseDown(NSEvent event);
-    [Selector("mouseUp:")] public void MouseUp(NSEvent event);
-    [Selector("rightMouseUp:")] public void RightMouseUp(NSEvent event);
-    [Selector("otherMouseUp:")] public void OtherMouseUp(NSEvent event);
-    [Selector("mouseDragged:")] public void MouseDragged(NSEvent event);
-    [Selector("rightMouseDragged:")] public void RightMouseDragged(NSEvent event);
-    [Selector("otherMouseDragged:")] public void OtherMouseDragged(NSEvent event);
+    [Selector("reset")]
+    public void Reset();
+    [Selector("canPreventGestureRecognizer:")]
+    public bool CanPreventGestureRecognizer(NSGestureRecognizer preventedGestureRecognizer);
+    [Selector("canBePreventedByGestureRecognizer:")]
+    public bool CanBePreventedByGestureRecognizer(NSGestureRecognizer preventingGestureRecognizer);
+    [Selector("shouldRequireFailureOfGestureRecognizer:")]
+    public bool ShouldRequireFailureOfGestureRecognizer(NSGestureRecognizer otherGestureRecognizer);
+    [Selector("shouldBeRequiredToFailByGestureRecognizer:")]
+    public bool ShouldBeRequiredToFailByGestureRecognizer(NSGestureRecognizer otherGestureRecognizer);
+    [Selector("mouseDown:")]
+    public void MouseDown(NSEvent event);
+    [Selector("rightMouseDown:")]
+    public void RightMouseDown(NSEvent event);
+    [Selector("otherMouseDown:")]
+    public void OtherMouseDown(NSEvent event);
+    [Selector("mouseUp:")]
+    public void MouseUp(NSEvent event);
+    [Selector("rightMouseUp:")]
+    public void RightMouseUp(NSEvent event);
+    [Selector("otherMouseUp:")]
+    public void OtherMouseUp(NSEvent event);
+    [Selector("mouseDragged:")]
+    public void MouseDragged(NSEvent event);
+    [Selector("rightMouseDragged:")]
+    public void RightMouseDragged(NSEvent event);
+    [Selector("otherMouseDragged:")]
+    public void OtherMouseDragged(NSEvent event);
     /// macOS 26.0 and later.
-    [Selector("mouseCancelled:")] public void MouseCancelled(NSEvent event);
-    [Selector("keyDown:")] public void KeyDown(NSEvent event);
-    [Selector("keyUp:")] public void KeyUp(NSEvent event);
-    [Selector("flagsChanged:")] public void FlagsChanged(NSEvent event);
-    [Selector("tabletPoint:")] public void TabletPoint(NSEvent event);
-    [Selector("magnifyWithEvent:")] public void MagnifyWithEvent(NSEvent event);
-    [Selector("rotateWithEvent:")] public void RotateWithEvent(NSEvent event);
-    [Selector("pressureChangeWithEvent:")] public void PressureChangeWithEvent(NSEvent event);
-    [Selector("touchesBeganWithEvent:")] public void TouchesBeganWithEvent(NSEvent event);
-    [Selector("touchesMovedWithEvent:")] public void TouchesMovedWithEvent(NSEvent event);
-    [Selector("touchesEndedWithEvent:")] public void TouchesEndedWithEvent(NSEvent event);
-    [Selector("touchesCancelledWithEvent:")] public void TouchesCancelledWithEvent(NSEvent event);
+    [Selector("mouseCancelled:")]
+    public void MouseCancelled(NSEvent event);
+    [Selector("keyDown:")]
+    public void KeyDown(NSEvent event);
+    [Selector("keyUp:")]
+    public void KeyUp(NSEvent event);
+    [Selector("flagsChanged:")]
+    public void FlagsChanged(NSEvent event);
+    [Selector("tabletPoint:")]
+    public void TabletPoint(NSEvent event);
+    [Selector("magnifyWithEvent:")]
+    public void MagnifyWithEvent(NSEvent event);
+    [Selector("rotateWithEvent:")]
+    public void RotateWithEvent(NSEvent event);
+    [Selector("pressureChangeWithEvent:")]
+    public void PressureChangeWithEvent(NSEvent event);
+    [Selector("touchesBeganWithEvent:")]
+    public void TouchesBeganWithEvent(NSEvent event);
+    [Selector("touchesMovedWithEvent:")]
+    public void TouchesMovedWithEvent(NSEvent event);
+    [Selector("touchesEndedWithEvent:")]
+    public void TouchesEndedWithEvent(NSEvent event);
+    [Selector("touchesCancelledWithEvent:")]
+    public void TouchesCancelledWithEvent(NSEvent event);
 }
 
 #endif

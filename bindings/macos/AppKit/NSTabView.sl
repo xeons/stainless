@@ -60,44 +60,81 @@ public enum NSTabViewBorderType : ulong
 
 public extern objc class NSTabView : NSView
 {
-    [Selector("selectedTabViewItem")] public NSTabViewItem? SelectedTabViewItem { get; }
-    [Selector("font", "setFont:")] public NSFont Font { get; set; }
-    [Selector("tabViewType", "setTabViewType:")] public NSTabViewType TabViewType { get; set; }
-    [Selector("tabPosition", "setTabPosition:")] public NSTabPosition TabPosition { get; set; }
-    [Selector("tabViewBorderType", "setTabViewBorderType:")] public NSTabViewBorderType TabViewBorderType { get; set; }
-    [Selector("tabViewItems", "setTabViewItems:")] public NSArray TabViewItems { get; set; }
-    [Selector("allowsTruncatedLabels", "setAllowsTruncatedLabels:")] public bool AllowsTruncatedLabels { get; set; }
-    [Selector("minimumSize")] public NSSize MinimumSize { get; }
-    [Selector("drawsBackground", "setDrawsBackground:")] public bool DrawsBackground { get; set; }
-    [Selector("controlSize", "setControlSize:")] public NSControlSize ControlSize { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSTabViewDelegate? Delegate { get; set; }
-    [Selector("contentRect")] public NSRect ContentRect { get; }
-    [Selector("numberOfTabViewItems")] public NSInteger NumberOfTabViewItems { get; }
+    [Selector("selectedTabViewItem")]
+    public NSTabViewItem? SelectedTabViewItem { get; }
+    [Selector("font", "setFont:")]
+    public NSFont Font { get; set; }
+    [Selector("tabViewType", "setTabViewType:")]
+    public NSTabViewType TabViewType { get; set; }
+    [Selector("tabPosition", "setTabPosition:")]
+    public NSTabPosition TabPosition { get; set; }
+    [Selector("tabViewBorderType", "setTabViewBorderType:")]
+    public NSTabViewBorderType TabViewBorderType { get; set; }
+    [Selector("tabViewItems", "setTabViewItems:")]
+    public NSArray TabViewItems { get; set; }
+    [Selector("allowsTruncatedLabels", "setAllowsTruncatedLabels:")]
+    public bool AllowsTruncatedLabels { get; set; }
+    [Selector("minimumSize")]
+    public NSSize MinimumSize { get; }
+    [Selector("drawsBackground", "setDrawsBackground:")]
+    public bool DrawsBackground { get; set; }
+    [Selector("controlSize", "setControlSize:")]
+    public NSControlSize ControlSize { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSTabViewDelegate? Delegate { get; set; }
+    [Selector("contentRect")]
+    public NSRect ContentRect { get; }
+    [Selector("numberOfTabViewItems")]
+    public NSInteger NumberOfTabViewItems { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("controlTint", "setControlTint:")] public NSControlTint ControlTint { get; set; }
-    [Selector("selectTabViewItem:")] public void SelectTabViewItem(NSTabViewItem? tabViewItem);
-    [Selector("selectTabViewItemAtIndex:")] public void SelectTabViewItemAtIndex(NSInteger index);
-    [Selector("selectTabViewItemWithIdentifier:")] public void SelectTabViewItemWithIdentifier(AnyObject identifier);
-    [Selector("takeSelectedTabViewItemFromSender:")] public void TakeSelectedTabViewItemFromSender(AnyObject? sender);
-    [Selector("selectFirstTabViewItem:")] public void SelectFirstTabViewItem(AnyObject? sender);
-    [Selector("selectLastTabViewItem:")] public void SelectLastTabViewItem(AnyObject? sender);
-    [Selector("selectNextTabViewItem:")] public void SelectNextTabViewItem(AnyObject? sender);
-    [Selector("selectPreviousTabViewItem:")] public void SelectPreviousTabViewItem(AnyObject? sender);
-    [Selector("addTabViewItem:")] public void AddTabViewItem(NSTabViewItem tabViewItem);
-    [Selector("insertTabViewItem:atIndex:")] public void InsertTabViewItemAtIndex(NSTabViewItem tabViewItem, NSInteger index);
-    [Selector("removeTabViewItem:")] public void RemoveTabViewItem(NSTabViewItem tabViewItem);
-    [Selector("tabViewItemAtPoint:")] public NSTabViewItem? TabViewItemAtPoint(NSPoint point);
-    [Selector("indexOfTabViewItem:")] public NSInteger IndexOfTabViewItem(NSTabViewItem tabViewItem);
-    [Selector("tabViewItemAtIndex:")] public NSTabViewItem TabViewItemAtIndex(NSInteger index);
-    [Selector("indexOfTabViewItemWithIdentifier:")] public NSInteger IndexOfTabViewItemWithIdentifier(AnyObject identifier);
+    [Selector("controlTint", "setControlTint:")]
+    public NSControlTint ControlTint { get; set; }
+    [Selector("selectTabViewItem:")]
+    public void SelectTabViewItem(NSTabViewItem? tabViewItem);
+    [Selector("selectTabViewItemAtIndex:")]
+    public void SelectTabViewItemAtIndex(NSInteger index);
+    [Selector("selectTabViewItemWithIdentifier:")]
+    public void SelectTabViewItemWithIdentifier(AnyObject identifier);
+    [Selector("takeSelectedTabViewItemFromSender:")]
+    public void TakeSelectedTabViewItemFromSender(AnyObject? sender);
+    [Selector("selectFirstTabViewItem:")]
+    public void SelectFirstTabViewItem(AnyObject? sender);
+    [Selector("selectLastTabViewItem:")]
+    public void SelectLastTabViewItem(AnyObject? sender);
+    [Selector("selectNextTabViewItem:")]
+    public void SelectNextTabViewItem(AnyObject? sender);
+    [Selector("selectPreviousTabViewItem:")]
+    public void SelectPreviousTabViewItem(AnyObject? sender);
+    [Selector("addTabViewItem:")]
+    public void AddTabViewItem(NSTabViewItem tabViewItem);
+    [Selector("insertTabViewItem:atIndex:")]
+    public void InsertTabViewItemAtIndex(NSTabViewItem tabViewItem, NSInteger index);
+    [Selector("removeTabViewItem:")]
+    public void RemoveTabViewItem(NSTabViewItem tabViewItem);
+    [Selector("tabViewItemAtPoint:")]
+    public NSTabViewItem? TabViewItemAtPoint(NSPoint point);
+    [Selector("indexOfTabViewItem:")]
+    public NSInteger IndexOfTabViewItem(NSTabViewItem tabViewItem);
+    [Selector("tabViewItemAtIndex:")]
+    public NSTabViewItem TabViewItemAtIndex(NSInteger index);
+    [Selector("indexOfTabViewItemWithIdentifier:")]
+    public NSInteger IndexOfTabViewItemWithIdentifier(AnyObject identifier);
 }
 
 public objc interface NSTabViewDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("tabView:shouldSelectTabViewItem:")] bool TabViewShouldSelectTabViewItem(NSTabView tabView, NSTabViewItem? tabViewItem);
-    [Optional] [Selector("tabView:willSelectTabViewItem:")] void TabViewWillSelectTabViewItem(NSTabView tabView, NSTabViewItem? tabViewItem);
-    [Optional] [Selector("tabView:didSelectTabViewItem:")] void TabViewDidSelectTabViewItem(NSTabView tabView, NSTabViewItem? tabViewItem);
-    [Optional] [Selector("tabViewDidChangeNumberOfTabViewItems:")] void TabViewDidChangeNumberOfTabViewItems(NSTabView tabView);
+    [Optional]
+    [Selector("tabView:shouldSelectTabViewItem:")]
+    bool TabViewShouldSelectTabViewItem(NSTabView tabView, NSTabViewItem? tabViewItem);
+    [Optional]
+    [Selector("tabView:willSelectTabViewItem:")]
+    void TabViewWillSelectTabViewItem(NSTabView tabView, NSTabViewItem? tabViewItem);
+    [Optional]
+    [Selector("tabView:didSelectTabViewItem:")]
+    void TabViewDidSelectTabViewItem(NSTabView tabView, NSTabViewItem? tabViewItem);
+    [Optional]
+    [Selector("tabViewDidChangeNumberOfTabViewItems:")]
+    void TabViewDidChangeNumberOfTabViewItems(NSTabView tabView);
 }
 
 #endif

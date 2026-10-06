@@ -34,72 +34,126 @@ import Standard.ObjC;
 
 public extern objc class MTLFXTemporalScalerDescriptor : NSObject, NSCopying
 {
-    [Selector("colorTextureFormat", "setColorTextureFormat:")] public MTLPixelFormat ColorTextureFormat { get; set; }
-    [Selector("depthTextureFormat", "setDepthTextureFormat:")] public MTLPixelFormat DepthTextureFormat { get; set; }
-    [Selector("motionTextureFormat", "setMotionTextureFormat:")] public MTLPixelFormat MotionTextureFormat { get; set; }
-    [Selector("outputTextureFormat", "setOutputTextureFormat:")] public MTLPixelFormat OutputTextureFormat { get; set; }
-    [Selector("inputWidth", "setInputWidth:")] public NSUInteger InputWidth { get; set; }
-    [Selector("inputHeight", "setInputHeight:")] public NSUInteger InputHeight { get; set; }
-    [Selector("outputWidth", "setOutputWidth:")] public NSUInteger OutputWidth { get; set; }
-    [Selector("outputHeight", "setOutputHeight:")] public NSUInteger OutputHeight { get; set; }
-    [Selector("isAutoExposureEnabled", "setAutoExposureEnabled:")] public bool AutoExposureEnabled { get; set; }
-    [Selector("requiresSynchronousInitialization", "setRequiresSynchronousInitialization:")] public bool RequiresSynchronousInitialization { get; set; }
-    [Selector("isInputContentPropertiesEnabled", "setInputContentPropertiesEnabled:")] public bool InputContentPropertiesEnabled { get; set; }
-    [Selector("inputContentMinScale", "setInputContentMinScale:")] public float InputContentMinScale { get; set; }
-    [Selector("inputContentMaxScale", "setInputContentMaxScale:")] public float InputContentMaxScale { get; set; }
-    [Selector("isReactiveMaskTextureEnabled", "setReactiveMaskTextureEnabled:")] public bool ReactiveMaskTextureEnabled { get; set; }
-    [Selector("reactiveMaskTextureFormat", "setReactiveMaskTextureFormat:")] public MTLPixelFormat ReactiveMaskTextureFormat { get; set; }
-    [Selector("newTemporalScalerWithDevice:")] public MTLFXTemporalScaler? NewTemporalScalerWithDevice(MTLDevice device);
+    [Selector("colorTextureFormat", "setColorTextureFormat:")]
+    public MTLPixelFormat ColorTextureFormat { get; set; }
+    [Selector("depthTextureFormat", "setDepthTextureFormat:")]
+    public MTLPixelFormat DepthTextureFormat { get; set; }
+    [Selector("motionTextureFormat", "setMotionTextureFormat:")]
+    public MTLPixelFormat MotionTextureFormat { get; set; }
+    [Selector("outputTextureFormat", "setOutputTextureFormat:")]
+    public MTLPixelFormat OutputTextureFormat { get; set; }
+    [Selector("inputWidth", "setInputWidth:")]
+    public NSUInteger InputWidth { get; set; }
+    [Selector("inputHeight", "setInputHeight:")]
+    public NSUInteger InputHeight { get; set; }
+    [Selector("outputWidth", "setOutputWidth:")]
+    public NSUInteger OutputWidth { get; set; }
+    [Selector("outputHeight", "setOutputHeight:")]
+    public NSUInteger OutputHeight { get; set; }
+    [Selector("isAutoExposureEnabled", "setAutoExposureEnabled:")]
+    public bool AutoExposureEnabled { get; set; }
+    [Selector("requiresSynchronousInitialization", "setRequiresSynchronousInitialization:")]
+    public bool RequiresSynchronousInitialization { get; set; }
+    [Selector("isInputContentPropertiesEnabled", "setInputContentPropertiesEnabled:")]
+    public bool InputContentPropertiesEnabled { get; set; }
+    [Selector("inputContentMinScale", "setInputContentMinScale:")]
+    public float InputContentMinScale { get; set; }
+    [Selector("inputContentMaxScale", "setInputContentMaxScale:")]
+    public float InputContentMaxScale { get; set; }
+    [Selector("isReactiveMaskTextureEnabled", "setReactiveMaskTextureEnabled:")]
+    public bool ReactiveMaskTextureEnabled { get; set; }
+    [Selector("reactiveMaskTextureFormat", "setReactiveMaskTextureFormat:")]
+    public MTLPixelFormat ReactiveMaskTextureFormat { get; set; }
+    [Selector("newTemporalScalerWithDevice:")]
+    public MTLFXTemporalScaler? NewTemporalScalerWithDevice(MTLDevice device);
     /// macOS 26.0 and later.
-    [Selector("newTemporalScalerWithDevice:compiler:")] public MTL4FXTemporalScaler? NewTemporalScalerWithDeviceCompiler(MTLDevice device, MTL4Compiler compiler);
-    [Selector("supportedInputContentMinScaleForDevice:")] public static float SupportedInputContentMinScaleForDevice(MTLDevice device);
-    [Selector("supportedInputContentMaxScaleForDevice:")] public static float SupportedInputContentMaxScaleForDevice(MTLDevice device);
-    [Selector("supportsDevice:")] public static bool SupportsDevice(MTLDevice device);
+    [Selector("newTemporalScalerWithDevice:compiler:")]
+    public MTL4FXTemporalScaler? NewTemporalScalerWithDeviceCompiler(MTLDevice device, MTL4Compiler compiler);
+    [Selector("supportedInputContentMinScaleForDevice:")]
+    public static float SupportedInputContentMinScaleForDevice(MTLDevice device);
+    [Selector("supportedInputContentMaxScaleForDevice:")]
+    public static float SupportedInputContentMaxScaleForDevice(MTLDevice device);
+    [Selector("supportsDevice:")]
+    public static bool SupportsDevice(MTLDevice device);
     /// macOS 26.0 and later.
-    [Selector("supportsMetal4FX:")] public static bool SupportsMetal4FX(MTLDevice device);
+    [Selector("supportsMetal4FX:")]
+    public static bool SupportsMetal4FX(MTLDevice device);
 }
 
 public objc interface MTLFXFrameInterpolatableScaler : NSObjectProtocol { }
 
 public objc interface MTLFXTemporalScalerBase : MTLFXFrameInterpolatableScaler
 {
-    [Selector("colorTextureUsage")] MTLTextureUsage ColorTextureUsage { get; }
-    [Selector("depthTextureUsage")] MTLTextureUsage DepthTextureUsage { get; }
-    [Selector("motionTextureUsage")] MTLTextureUsage MotionTextureUsage { get; }
-    [Selector("reactiveTextureUsage")] MTLTextureUsage ReactiveTextureUsage { get; }
-    [Selector("outputTextureUsage")] MTLTextureUsage OutputTextureUsage { get; }
-    [Selector("inputContentWidth", "setInputContentWidth:")] NSUInteger InputContentWidth { get; set; }
-    [Selector("inputContentHeight", "setInputContentHeight:")] NSUInteger InputContentHeight { get; set; }
-    [Selector("colorTexture", "setColorTexture:")] MTLTexture? ColorTexture { get; set; }
-    [Selector("depthTexture", "setDepthTexture:")] MTLTexture? DepthTexture { get; set; }
-    [Selector("motionTexture", "setMotionTexture:")] MTLTexture? MotionTexture { get; set; }
-    [Selector("outputTexture", "setOutputTexture:")] MTLTexture? OutputTexture { get; set; }
-    [Selector("exposureTexture", "setExposureTexture:")] MTLTexture? ExposureTexture { get; set; }
-    [Selector("reactiveMaskTexture", "setReactiveMaskTexture:")] MTLTexture? ReactiveMaskTexture { get; set; }
-    [Selector("preExposure", "setPreExposure:")] float PreExposure { get; set; }
-    [Selector("jitterOffsetX", "setJitterOffsetX:")] float JitterOffsetX { get; set; }
-    [Selector("jitterOffsetY", "setJitterOffsetY:")] float JitterOffsetY { get; set; }
-    [Selector("motionVectorScaleX", "setMotionVectorScaleX:")] float MotionVectorScaleX { get; set; }
-    [Selector("motionVectorScaleY", "setMotionVectorScaleY:")] float MotionVectorScaleY { get; set; }
-    [Selector("reset", "setReset:")] bool Reset { get; set; }
-    [Selector("isDepthReversed", "setDepthReversed:")] bool DepthReversed { get; set; }
-    [Selector("colorTextureFormat")] MTLPixelFormat ColorTextureFormat { get; }
-    [Selector("depthTextureFormat")] MTLPixelFormat DepthTextureFormat { get; }
-    [Selector("motionTextureFormat")] MTLPixelFormat MotionTextureFormat { get; }
-    [Selector("reactiveMaskTextureFormat")] MTLPixelFormat ReactiveMaskTextureFormat { get; }
-    [Selector("outputTextureFormat")] MTLPixelFormat OutputTextureFormat { get; }
-    [Selector("inputWidth")] NSUInteger InputWidth { get; }
-    [Selector("inputHeight")] NSUInteger InputHeight { get; }
-    [Selector("outputWidth")] NSUInteger OutputWidth { get; }
-    [Selector("outputHeight")] NSUInteger OutputHeight { get; }
-    [Selector("inputContentMinScale")] float InputContentMinScale { get; }
-    [Selector("inputContentMaxScale")] float InputContentMaxScale { get; }
-    [Selector("fence", "setFence:")] MTLFence? Fence { get; set; }
+    [Selector("colorTextureUsage")]
+    MTLTextureUsage ColorTextureUsage { get; }
+    [Selector("depthTextureUsage")]
+    MTLTextureUsage DepthTextureUsage { get; }
+    [Selector("motionTextureUsage")]
+    MTLTextureUsage MotionTextureUsage { get; }
+    [Selector("reactiveTextureUsage")]
+    MTLTextureUsage ReactiveTextureUsage { get; }
+    [Selector("outputTextureUsage")]
+    MTLTextureUsage OutputTextureUsage { get; }
+    [Selector("inputContentWidth", "setInputContentWidth:")]
+    NSUInteger InputContentWidth { get; set; }
+    [Selector("inputContentHeight", "setInputContentHeight:")]
+    NSUInteger InputContentHeight { get; set; }
+    [Selector("colorTexture", "setColorTexture:")]
+    MTLTexture? ColorTexture { get; set; }
+    [Selector("depthTexture", "setDepthTexture:")]
+    MTLTexture? DepthTexture { get; set; }
+    [Selector("motionTexture", "setMotionTexture:")]
+    MTLTexture? MotionTexture { get; set; }
+    [Selector("outputTexture", "setOutputTexture:")]
+    MTLTexture? OutputTexture { get; set; }
+    [Selector("exposureTexture", "setExposureTexture:")]
+    MTLTexture? ExposureTexture { get; set; }
+    [Selector("reactiveMaskTexture", "setReactiveMaskTexture:")]
+    MTLTexture? ReactiveMaskTexture { get; set; }
+    [Selector("preExposure", "setPreExposure:")]
+    float PreExposure { get; set; }
+    [Selector("jitterOffsetX", "setJitterOffsetX:")]
+    float JitterOffsetX { get; set; }
+    [Selector("jitterOffsetY", "setJitterOffsetY:")]
+    float JitterOffsetY { get; set; }
+    [Selector("motionVectorScaleX", "setMotionVectorScaleX:")]
+    float MotionVectorScaleX { get; set; }
+    [Selector("motionVectorScaleY", "setMotionVectorScaleY:")]
+    float MotionVectorScaleY { get; set; }
+    [Selector("reset", "setReset:")]
+    bool Reset { get; set; }
+    [Selector("isDepthReversed", "setDepthReversed:")]
+    bool DepthReversed { get; set; }
+    [Selector("colorTextureFormat")]
+    MTLPixelFormat ColorTextureFormat { get; }
+    [Selector("depthTextureFormat")]
+    MTLPixelFormat DepthTextureFormat { get; }
+    [Selector("motionTextureFormat")]
+    MTLPixelFormat MotionTextureFormat { get; }
+    [Selector("reactiveMaskTextureFormat")]
+    MTLPixelFormat ReactiveMaskTextureFormat { get; }
+    [Selector("outputTextureFormat")]
+    MTLPixelFormat OutputTextureFormat { get; }
+    [Selector("inputWidth")]
+    NSUInteger InputWidth { get; }
+    [Selector("inputHeight")]
+    NSUInteger InputHeight { get; }
+    [Selector("outputWidth")]
+    NSUInteger OutputWidth { get; }
+    [Selector("outputHeight")]
+    NSUInteger OutputHeight { get; }
+    [Selector("inputContentMinScale")]
+    float InputContentMinScale { get; }
+    [Selector("inputContentMaxScale")]
+    float InputContentMaxScale { get; }
+    [Selector("fence", "setFence:")]
+    MTLFence? Fence { get; set; }
 }
 
 public objc interface MTLFXTemporalScaler : MTLFXTemporalScalerBase
 {
-    [Selector("encodeToCommandBuffer:")] void EncodeToCommandBuffer(MTLCommandBuffer commandBuffer);
+    [Selector("encodeToCommandBuffer:")]
+    void EncodeToCommandBuffer(MTLCommandBuffer commandBuffer);
 }
 
 #endif

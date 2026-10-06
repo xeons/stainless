@@ -63,13 +63,16 @@ public delegate void CFHostClientCallBack(__CFHost* arg0, CFHostInfoType arg1, C
 public extern "C" CFTypeID CFHostGetTypeID();
 
 /// Deprecated in macOS 100000.
-[ReturnsRetained] public extern "C" CFHostRef CFHostCreateWithName(CFAllocatorRef? allocator, CFStringRef hostname);
+[ReturnsRetained]
+public extern "C" CFHostRef CFHostCreateWithName(CFAllocatorRef? allocator, CFStringRef hostname);
 
 /// Deprecated in macOS 100000.
-[ReturnsRetained] public extern "C" CFHostRef CFHostCreateWithAddress(CFAllocatorRef? allocator, CFDataRef addr);
+[ReturnsRetained]
+public extern "C" CFHostRef CFHostCreateWithAddress(CFAllocatorRef? allocator, CFDataRef addr);
 
 /// Deprecated in macOS 100000.
-[ReturnsRetained] public extern "C" CFHostRef CFHostCreateCopy(CFAllocatorRef? alloc, CFHostRef host);
+[ReturnsRetained]
+public extern "C" CFHostRef CFHostCreateCopy(CFAllocatorRef? alloc, CFHostRef host);
 
 /// Deprecated in macOS 100000.
 public extern "C" Boolean CFHostStartInfoResolution(CFHostRef theHost, CFHostInfoType info, CFStreamError* error);

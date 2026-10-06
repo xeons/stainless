@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class GCDeviceLight : NSObject
 {
-    [Selector("color", "setColor:")] public GCColor Color { get; set; }
+    [Selector("color", "setColor:")]
+    public GCColor Color { get; set; }
 }
 
 #endif

@@ -32,27 +32,38 @@ import Standard.ObjC;
 
 public extern objc class NSOrthography : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("dominantScript")] public NSString DominantScript { get; }
-    [Selector("languageMap")] public NSDictionary LanguageMap { get; }
-    [Selector("initWithDominantScript:languageMap:")] public Self InitWithDominantScriptLanguageMap(NSString script, NSDictionary map);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("dominantScript")]
+    public NSString DominantScript { get; }
+    [Selector("languageMap")]
+    public NSDictionary LanguageMap { get; }
+    [Selector("initWithDominantScript:languageMap:")]
+    public Self InitWithDominantScriptLanguageMap(NSString script, NSDictionary map);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 /// NSOrthographyExtended, a category of NSOrthography.
 public extern objc class NSOrthography
 {
-    [Selector("dominantLanguage")] public NSString DominantLanguage { get; }
-    [Selector("allScripts")] public NSArray AllScripts { get; }
-    [Selector("allLanguages")] public NSArray AllLanguages { get; }
-    [Selector("languagesForScript:")] public NSArray? LanguagesForScript(NSString script);
-    [Selector("dominantLanguageForScript:")] public NSString? DominantLanguageForScript(NSString script);
-    [Selector("defaultOrthographyForLanguage:")] public static Self DefaultOrthographyForLanguage(NSString language);
+    [Selector("dominantLanguage")]
+    public NSString DominantLanguage { get; }
+    [Selector("allScripts")]
+    public NSArray AllScripts { get; }
+    [Selector("allLanguages")]
+    public NSArray AllLanguages { get; }
+    [Selector("languagesForScript:")]
+    public NSArray? LanguagesForScript(NSString script);
+    [Selector("dominantLanguageForScript:")]
+    public NSString? DominantLanguageForScript(NSString script);
+    [Selector("defaultOrthographyForLanguage:")]
+    public static Self DefaultOrthographyForLanguage(NSString language);
 }
 
 /// NSOrthographyCreation, a category of NSOrthography.
 public extern objc class NSOrthography
 {
-    [Selector("orthographyWithDominantScript:languageMap:")] public static Self OrthographyWithDominantScriptLanguageMap(NSString script, NSDictionary map);
+    [Selector("orthographyWithDominantScript:languageMap:")]
+    public static Self OrthographyWithDominantScriptLanguageMap(NSString script, NSDictionary map);
 }
 
 #endif

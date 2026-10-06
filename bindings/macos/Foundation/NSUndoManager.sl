@@ -36,42 +36,78 @@ public objc closure void NSUndoManagerRegisterUndoWithTargetHandlerUndoHandlerBl
 
 public extern objc class NSUndoManager : NSObject
 {
-    [Selector("groupingLevel")] public NSInteger GroupingLevel { get; }
-    [Selector("isUndoRegistrationEnabled")] public bool UndoRegistrationEnabled { get; }
-    [Selector("groupsByEvent", "setGroupsByEvent:")] public bool GroupsByEvent { get; set; }
-    [Selector("levelsOfUndo", "setLevelsOfUndo:")] public NSUInteger LevelsOfUndo { get; set; }
-    [Selector("runLoopModes", "setRunLoopModes:")] public NSArray RunLoopModes { get; set; }
-    [Selector("canUndo")] public bool CanUndo { get; }
-    [Selector("canRedo")] public bool CanRedo { get; }
-    [Selector("undoCount")] public NSUInteger UndoCount { get; }
-    [Selector("redoCount")] public NSUInteger RedoCount { get; }
-    [Selector("isUndoing")] public bool Undoing { get; }
-    [Selector("isRedoing")] public bool Redoing { get; }
-    [Selector("undoActionIsDiscardable")] public bool UndoActionIsDiscardable { get; }
-    [Selector("redoActionIsDiscardable")] public bool RedoActionIsDiscardable { get; }
-    [Selector("undoActionName")] public NSString UndoActionName { get; }
-    [Selector("redoActionName")] public NSString RedoActionName { get; }
-    [Selector("undoMenuItemTitle")] public NSString UndoMenuItemTitle { get; }
-    [Selector("redoMenuItemTitle")] public NSString RedoMenuItemTitle { get; }
-    [Selector("beginUndoGrouping")] public void BeginUndoGrouping();
-    [Selector("endUndoGrouping")] public void EndUndoGrouping();
-    [Selector("disableUndoRegistration")] public void DisableUndoRegistration();
-    [Selector("enableUndoRegistration")] public void EnableUndoRegistration();
-    [Selector("undo")] public void Undo();
-    [Selector("redo")] public void Redo();
-    [Selector("undoNestedGroup")] public void UndoNestedGroup();
-    [Selector("removeAllActions")] public void RemoveAllActions();
-    [Selector("removeAllActionsWithTarget:")] public void RemoveAllActionsWithTarget(AnyObject target);
-    [Selector("registerUndoWithTarget:selector:object:")] public void RegisterUndoWithTargetSelectorObject(AnyObject target, Selector selector, AnyObject? object);
-    [Selector("prepareWithInvocationTarget:")] public AnyObject PrepareWithInvocationTarget(AnyObject target);
-    [Selector("registerUndoWithTarget:handler:")] public void RegisterUndoWithTargetHandler(AnyObject target, NSUndoManagerRegisterUndoWithTargetHandlerUndoHandlerBlock undoHandler);
-    [Selector("setActionIsDiscardable:")] public void SetActionIsDiscardable(bool discardable);
-    [Selector("setActionName:")] public void SetActionName(NSString actionName);
-    [Selector("undoActionUserInfoValueForKey:")] public AnyObject? UndoActionUserInfoValueForKey(NSUndoManagerUserInfoKey key);
-    [Selector("redoActionUserInfoValueForKey:")] public AnyObject? RedoActionUserInfoValueForKey(NSUndoManagerUserInfoKey key);
-    [Selector("setActionUserInfoValue:forKey:")] public void SetActionUserInfoValueForKey(AnyObject? info, NSUndoManagerUserInfoKey key);
-    [Selector("undoMenuTitleForUndoActionName:")] public NSString UndoMenuTitleForUndoActionName(NSString actionName);
-    [Selector("redoMenuTitleForUndoActionName:")] public NSString RedoMenuTitleForUndoActionName(NSString actionName);
+    [Selector("groupingLevel")]
+    public NSInteger GroupingLevel { get; }
+    [Selector("isUndoRegistrationEnabled")]
+    public bool UndoRegistrationEnabled { get; }
+    [Selector("groupsByEvent", "setGroupsByEvent:")]
+    public bool GroupsByEvent { get; set; }
+    [Selector("levelsOfUndo", "setLevelsOfUndo:")]
+    public NSUInteger LevelsOfUndo { get; set; }
+    [Selector("runLoopModes", "setRunLoopModes:")]
+    public NSArray RunLoopModes { get; set; }
+    [Selector("canUndo")]
+    public bool CanUndo { get; }
+    [Selector("canRedo")]
+    public bool CanRedo { get; }
+    [Selector("undoCount")]
+    public NSUInteger UndoCount { get; }
+    [Selector("redoCount")]
+    public NSUInteger RedoCount { get; }
+    [Selector("isUndoing")]
+    public bool Undoing { get; }
+    [Selector("isRedoing")]
+    public bool Redoing { get; }
+    [Selector("undoActionIsDiscardable")]
+    public bool UndoActionIsDiscardable { get; }
+    [Selector("redoActionIsDiscardable")]
+    public bool RedoActionIsDiscardable { get; }
+    [Selector("undoActionName")]
+    public NSString UndoActionName { get; }
+    [Selector("redoActionName")]
+    public NSString RedoActionName { get; }
+    [Selector("undoMenuItemTitle")]
+    public NSString UndoMenuItemTitle { get; }
+    [Selector("redoMenuItemTitle")]
+    public NSString RedoMenuItemTitle { get; }
+    [Selector("beginUndoGrouping")]
+    public void BeginUndoGrouping();
+    [Selector("endUndoGrouping")]
+    public void EndUndoGrouping();
+    [Selector("disableUndoRegistration")]
+    public void DisableUndoRegistration();
+    [Selector("enableUndoRegistration")]
+    public void EnableUndoRegistration();
+    [Selector("undo")]
+    public void Undo();
+    [Selector("redo")]
+    public void Redo();
+    [Selector("undoNestedGroup")]
+    public void UndoNestedGroup();
+    [Selector("removeAllActions")]
+    public void RemoveAllActions();
+    [Selector("removeAllActionsWithTarget:")]
+    public void RemoveAllActionsWithTarget(AnyObject target);
+    [Selector("registerUndoWithTarget:selector:object:")]
+    public void RegisterUndoWithTargetSelectorObject(AnyObject target, Selector selector, AnyObject? object);
+    [Selector("prepareWithInvocationTarget:")]
+    public AnyObject PrepareWithInvocationTarget(AnyObject target);
+    [Selector("registerUndoWithTarget:handler:")]
+    public void RegisterUndoWithTargetHandler(AnyObject target, NSUndoManagerRegisterUndoWithTargetHandlerUndoHandlerBlock undoHandler);
+    [Selector("setActionIsDiscardable:")]
+    public void SetActionIsDiscardable(bool discardable);
+    [Selector("setActionName:")]
+    public void SetActionName(NSString actionName);
+    [Selector("undoActionUserInfoValueForKey:")]
+    public AnyObject? UndoActionUserInfoValueForKey(NSUndoManagerUserInfoKey key);
+    [Selector("redoActionUserInfoValueForKey:")]
+    public AnyObject? RedoActionUserInfoValueForKey(NSUndoManagerUserInfoKey key);
+    [Selector("setActionUserInfoValue:forKey:")]
+    public void SetActionUserInfoValueForKey(AnyObject? info, NSUndoManagerUserInfoKey key);
+    [Selector("undoMenuTitleForUndoActionName:")]
+    public NSString UndoMenuTitleForUndoActionName(NSString actionName);
+    [Selector("redoMenuTitleForUndoActionName:")]
+    public NSString RedoMenuTitleForUndoActionName(NSString actionName);
 }
 
 public extern "C" NSString NSUndoManagerGroupIsDiscardableKey;

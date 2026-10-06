@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class INIntent : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("intentDescription")] public NSString? IntentDescription { get; }
-    [Selector("suggestedInvocationPhrase", "setSuggestedInvocationPhrase:")] public NSString? SuggestedInvocationPhrase { get; set; }
-    [Selector("donationMetadata", "setDonationMetadata:")] public INIntentDonationMetadata? DonationMetadata { get; set; }
-    [Selector("setImage:forParameterNamed:")] public void SetImageForParameterNamed(INImage? image, NSString parameterName);
-    [Selector("imageForParameterNamed:")] public INImage? ImageForParameterNamed(NSString parameterName);
-    [Selector("keyImage")] public INImage? KeyImage();
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("intentDescription")]
+    public NSString? IntentDescription { get; }
+    [Selector("suggestedInvocationPhrase", "setSuggestedInvocationPhrase:")]
+    public NSString? SuggestedInvocationPhrase { get; set; }
+    [Selector("donationMetadata", "setDonationMetadata:")]
+    public INIntentDonationMetadata? DonationMetadata { get; set; }
+    [Selector("setImage:forParameterNamed:")]
+    public void SetImageForParameterNamed(INImage? image, NSString parameterName);
+    [Selector("imageForParameterNamed:")]
+    public INImage? ImageForParameterNamed(NSString parameterName);
+    [Selector("keyImage")]
+    public INImage? KeyImage();
 }
 
 #endif

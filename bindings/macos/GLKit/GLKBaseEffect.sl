@@ -35,23 +35,40 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class GLKBaseEffect : NSObject, GLKNamedEffect
 {
-    [Selector("colorMaterialEnabled", "setColorMaterialEnabled:")] public GLboolean ColorMaterialEnabled { get; set; }
-    [Selector("lightModelTwoSided", "setLightModelTwoSided:")] public GLboolean LightModelTwoSided { get; set; }
-    [Selector("useConstantColor", "setUseConstantColor:")] public GLboolean UseConstantColor { get; set; }
-    [Selector("transform")] public GLKEffectPropertyTransform Transform { get; }
-    [Selector("light0")] public GLKEffectPropertyLight Light0 { get; }
-    [Selector("light1")] public GLKEffectPropertyLight Light1 { get; }
-    [Selector("light2")] public GLKEffectPropertyLight Light2 { get; }
-    [Selector("lightingType", "setLightingType:")] public GLKLightingType LightingType { get; set; }
-    [Selector("lightModelAmbientColor", "setLightModelAmbientColor:")] public GLKVector4 LightModelAmbientColor { get; set; }
-    [Selector("material")] public GLKEffectPropertyMaterial Material { get; }
-    [Selector("texture2d0")] public GLKEffectPropertyTexture Texture2d0 { get; }
-    [Selector("texture2d1")] public GLKEffectPropertyTexture Texture2d1 { get; }
-    [Selector("textureOrder", "setTextureOrder:")] public NSArray? TextureOrder { get; set; }
-    [Selector("constantColor", "setConstantColor:")] public GLKVector4 ConstantColor { get; set; }
-    [Selector("fog")] public GLKEffectPropertyFog Fog { get; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("prepareToDraw")] public void PrepareToDraw();
+    [Selector("colorMaterialEnabled", "setColorMaterialEnabled:")]
+    public GLboolean ColorMaterialEnabled { get; set; }
+    [Selector("lightModelTwoSided", "setLightModelTwoSided:")]
+    public GLboolean LightModelTwoSided { get; set; }
+    [Selector("useConstantColor", "setUseConstantColor:")]
+    public GLboolean UseConstantColor { get; set; }
+    [Selector("transform")]
+    public GLKEffectPropertyTransform Transform { get; }
+    [Selector("light0")]
+    public GLKEffectPropertyLight Light0 { get; }
+    [Selector("light1")]
+    public GLKEffectPropertyLight Light1 { get; }
+    [Selector("light2")]
+    public GLKEffectPropertyLight Light2 { get; }
+    [Selector("lightingType", "setLightingType:")]
+    public GLKLightingType LightingType { get; set; }
+    [Selector("lightModelAmbientColor", "setLightModelAmbientColor:")]
+    public GLKVector4 LightModelAmbientColor { get; set; }
+    [Selector("material")]
+    public GLKEffectPropertyMaterial Material { get; }
+    [Selector("texture2d0")]
+    public GLKEffectPropertyTexture Texture2d0 { get; }
+    [Selector("texture2d1")]
+    public GLKEffectPropertyTexture Texture2d1 { get; }
+    [Selector("textureOrder", "setTextureOrder:")]
+    public NSArray? TextureOrder { get; set; }
+    [Selector("constantColor", "setConstantColor:")]
+    public GLKVector4 ConstantColor { get; set; }
+    [Selector("fog")]
+    public GLKEffectPropertyFog Fog { get; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("prepareToDraw")]
+    public void PrepareToDraw();
 }
 
 #endif

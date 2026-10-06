@@ -33,12 +33,18 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLBodyElement : DOMHTMLElement
 {
-    [Selector("aLink", "setALink:")] public NSString? ALink { get; set; }
-    [Selector("background", "setBackground:")] public NSString? Background { get; set; }
-    [Selector("bgColor", "setBgColor:")] public NSString? BgColor { get; set; }
-    [Selector("link", "setLink:")] public NSString? Link { get; set; }
-    [Selector("text", "setText:")] public NSString? Text { get; set; }
-    [Selector("vLink", "setVLink:")] public NSString? VLink { get; set; }
+    [Selector("aLink", "setALink:")]
+    public NSString? ALink { get; set; }
+    [Selector("background", "setBackground:")]
+    public NSString? Background { get; set; }
+    [Selector("bgColor", "setBgColor:")]
+    public NSString? BgColor { get; set; }
+    [Selector("link", "setLink:")]
+    public NSString? Link { get; set; }
+    [Selector("text", "setText:")]
+    public NSString? Text { get; set; }
+    [Selector("vLink", "setVLink:")]
+    public NSString? VLink { get; set; }
 }
 
 #endif

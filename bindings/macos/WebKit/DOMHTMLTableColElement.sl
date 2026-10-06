@@ -33,12 +33,18 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLTableColElement : DOMHTMLElement
 {
-    [Selector("align", "setAlign:")] public NSString? Align { get; set; }
-    [Selector("ch", "setCh:")] public NSString? Ch { get; set; }
-    [Selector("chOff", "setChOff:")] public NSString? ChOff { get; set; }
-    [Selector("span", "setSpan:")] public int Span { get; set; }
-    [Selector("vAlign", "setVAlign:")] public NSString? VAlign { get; set; }
-    [Selector("width", "setWidth:")] public NSString? Width { get; set; }
+    [Selector("align", "setAlign:")]
+    public NSString? Align { get; set; }
+    [Selector("ch", "setCh:")]
+    public NSString? Ch { get; set; }
+    [Selector("chOff", "setChOff:")]
+    public NSString? ChOff { get; set; }
+    [Selector("span", "setSpan:")]
+    public int Span { get; set; }
+    [Selector("vAlign", "setVAlign:")]
+    public NSString? VAlign { get; set; }
+    [Selector("width", "setWidth:")]
+    public NSString? Width { get; set; }
 }
 
 #endif

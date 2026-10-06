@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class INCallCapabilityResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedCallCapability:")] public static Self SuccessWithResolvedCallCapability(INCallCapability resolvedCallCapability);
-    [Selector("confirmationRequiredWithCallCapabilityToConfirm:")] public static Self ConfirmationRequiredWithCallCapabilityToConfirm(INCallCapability callCapabilityToConfirm);
+    [Selector("successWithResolvedCallCapability:")]
+    public static Self SuccessWithResolvedCallCapability(INCallCapability resolvedCallCapability);
+    [Selector("confirmationRequiredWithCallCapabilityToConfirm:")]
+    public static Self ConfirmationRequiredWithCallCapabilityToConfirm(INCallCapability callCapabilityToConfirm);
 }
 
 #endif

@@ -34,6 +34,7 @@ public extern "C" CFStringRef kMAAudibleMediaSettingsChangedNotification;
 
 public extern "C" CFStringRef? MAMediaCharacteristicDescribesVideoForAccessibility;
 
-[ReturnsRetained] public extern "C" CFArrayRef MAAudibleMediaCopyPreferredCharacteristics();
+[ReturnsRetained]
+public extern "C" CFArrayRef MAAudibleMediaCopyPreferredCharacteristics();
 
 #endif

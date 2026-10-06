@@ -33,26 +33,34 @@ import Standard.ObjC;
 
 public objc interface MDLAssetResolver : NSObjectProtocol
 {
-    [Selector("canResolveAssetNamed:")] bool CanResolveAssetNamed(NSString name);
-    [Selector("resolveAssetNamed:")] NSURL ResolveAssetNamed(NSString name);
+    [Selector("canResolveAssetNamed:")]
+    bool CanResolveAssetNamed(NSString name);
+    [Selector("resolveAssetNamed:")]
+    NSURL ResolveAssetNamed(NSString name);
 }
 
 public extern objc class MDLRelativeAssetResolver : NSObject, MDLAssetResolver
 {
-    [Selector("asset", "setAsset:")] public MDLAsset? Asset { get; set; }
-    [Selector("initWithAsset:")] public Self InitWithAsset(MDLAsset asset);
+    [Selector("asset", "setAsset:")]
+    public MDLAsset? Asset { get; set; }
+    [Selector("initWithAsset:")]
+    public Self InitWithAsset(MDLAsset asset);
 }
 
 public extern objc class MDLPathAssetResolver : NSObject, MDLAssetResolver
 {
-    [Selector("path", "setPath:")] public NSString Path { get; set; }
-    [Selector("initWithPath:")] public Self InitWithPath(NSString path);
+    [Selector("path", "setPath:")]
+    public NSString Path { get; set; }
+    [Selector("initWithPath:")]
+    public Self InitWithPath(NSString path);
 }
 
 public extern objc class MDLBundleAssetResolver : NSObject, MDLAssetResolver
 {
-    [Selector("path", "setPath:")] public NSString Path { get; set; }
-    [Selector("initWithBundle:")] public Self InitWithBundle(NSString path);
+    [Selector("path", "setPath:")]
+    public NSString Path { get; set; }
+    [Selector("initWithBundle:")]
+    public Self InitWithBundle(NSString path);
 }
 
 #endif

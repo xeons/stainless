@@ -37,15 +37,24 @@ public using SWLocalCollaborationIdentifier = NSString;
 
 public extern objc class SWCollaborationMetadata : NSObject, NSSecureCoding, NSCopying, NSMutableCopying
 {
-    [Selector("collaborationIdentifier")] public SWCollaborationIdentifier CollaborationIdentifier { get; }
-    [Selector("localIdentifier")] public SWLocalCollaborationIdentifier LocalIdentifier { get; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("defaultShareOptions", "setDefaultShareOptions:")] public SWCollaborationShareOptions? DefaultShareOptions { get; set; }
-    [Selector("userSelectedShareOptions", "setUserSelectedShareOptions:")] public SWCollaborationShareOptions? UserSelectedShareOptions { get; set; }
-    [Selector("initiatorHandle", "setInitiatorHandle:")] public NSString? InitiatorHandle { get; set; }
-    [Selector("initiatorNameComponents", "setInitiatorNameComponents:")] public NSPersonNameComponents? InitiatorNameComponents { get; set; }
-    [Selector("initWithLocalIdentifier:")] public Self InitWithLocalIdentifier(SWLocalCollaborationIdentifier localIdentifier);
-    [Selector("initWithCollaborationIdentifier:")] public Self InitWithCollaborationIdentifier(SWCollaborationIdentifier collaborationIdentifier);
+    [Selector("collaborationIdentifier")]
+    public SWCollaborationIdentifier CollaborationIdentifier { get; }
+    [Selector("localIdentifier")]
+    public SWLocalCollaborationIdentifier LocalIdentifier { get; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("defaultShareOptions", "setDefaultShareOptions:")]
+    public SWCollaborationShareOptions? DefaultShareOptions { get; set; }
+    [Selector("userSelectedShareOptions", "setUserSelectedShareOptions:")]
+    public SWCollaborationShareOptions? UserSelectedShareOptions { get; set; }
+    [Selector("initiatorHandle", "setInitiatorHandle:")]
+    public NSString? InitiatorHandle { get; set; }
+    [Selector("initiatorNameComponents", "setInitiatorNameComponents:")]
+    public NSPersonNameComponents? InitiatorNameComponents { get; set; }
+    [Selector("initWithLocalIdentifier:")]
+    public Self InitWithLocalIdentifier(SWLocalCollaborationIdentifier localIdentifier);
+    [Selector("initWithCollaborationIdentifier:")]
+    public Self InitWithCollaborationIdentifier(SWCollaborationIdentifier collaborationIdentifier);
 }
 
 #endif

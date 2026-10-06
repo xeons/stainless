@@ -41,9 +41,12 @@ public enum CLSProgressReportingCapabilityKind : long
 
 public extern objc class CLSProgressReportingCapability : CLSObject
 {
-    [Selector("kind")] public CLSProgressReportingCapabilityKind Kind { get; }
-    [Selector("details")] public NSString? Details { get; }
-    [Selector("initWithKind:details:")] public Self InitWithKindDetails(CLSProgressReportingCapabilityKind kind, NSString? details);
+    [Selector("kind")]
+    public CLSProgressReportingCapabilityKind Kind { get; }
+    [Selector("details")]
+    public NSString? Details { get; }
+    [Selector("initWithKind:details:")]
+    public Self InitWithKindDetails(CLSProgressReportingCapabilityKind kind, NSString? details);
 }
 
 #endif

@@ -37,9 +37,12 @@ public enum MPSGraphDeviceType : uint
 
 public extern objc class MPSGraphDevice : MPSGraphObject
 {
-    [Selector("type")] public MPSGraphDeviceType Type { get; }
-    [Selector("metalDevice")] public MTLDevice? MetalDevice { get; }
-    [Selector("deviceWithMTLDevice:")] public static Self DeviceWithMTLDevice(MTLDevice metalDevice);
+    [Selector("type")]
+    public MPSGraphDeviceType Type { get; }
+    [Selector("metalDevice")]
+    public MTLDevice? MetalDevice { get; }
+    [Selector("deviceWithMTLDevice:")]
+    public static Self DeviceWithMTLDevice(MTLDevice metalDevice);
 }
 
 #endif

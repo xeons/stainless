@@ -66,31 +66,53 @@ public enum GKTurnBasedMatchOutcome : long
 
 public extern objc class GKTurnBasedParticipant : NSObject
 {
-    [Selector("player")] public GKPlayer? Player { get; }
-    [Selector("lastTurnDate")] public NSDate? LastTurnDate { get; }
-    [Selector("status")] public GKTurnBasedParticipantStatus Status { get; }
-    [Selector("matchOutcome", "setMatchOutcome:")] public GKTurnBasedMatchOutcome MatchOutcome { get; set; }
-    [Selector("timeoutDate")] public NSDate? TimeoutDate { get; }
+    [Selector("player")]
+    public GKPlayer? Player { get; }
+    [Selector("lastTurnDate")]
+    public NSDate? LastTurnDate { get; }
+    [Selector("status")]
+    public GKTurnBasedParticipantStatus Status { get; }
+    [Selector("matchOutcome", "setMatchOutcome:")]
+    public GKTurnBasedMatchOutcome MatchOutcome { get; set; }
+    [Selector("timeoutDate")]
+    public NSDate? TimeoutDate { get; }
 }
 
 /// Obsoleted, a category of GKTurnBasedParticipant.
 public extern objc class GKTurnBasedParticipant
 {
     /// Deprecated in macOS 10.10.
-    [Selector("playerID")] public NSString? PlayerID { get; }
+    [Selector("playerID")]
+    public NSString? PlayerID { get; }
 }
 
 public objc interface GKTurnBasedEventListener
 {
-    [Optional] [Selector("player:didRequestMatchWithOtherPlayers:")] void PlayerDidRequestMatchWithOtherPlayers(GKPlayer player, NSArray playersToInvite);
-    [Optional] [Selector("player:receivedTurnEventForMatch:didBecomeActive:")] void PlayerReceivedTurnEventForMatchDidBecomeActive(GKPlayer player, GKTurnBasedMatch match, bool didBecomeActive);
-    [Optional] [Selector("player:matchEnded:")] void PlayerMatchEnded(GKPlayer player, GKTurnBasedMatch match);
-    [Optional] [Selector("player:receivedExchangeRequest:forMatch:")] void PlayerReceivedExchangeRequestForMatch(GKPlayer player, GKTurnBasedExchange exchange, GKTurnBasedMatch match);
-    [Optional] [Selector("player:receivedExchangeCancellation:forMatch:")] void PlayerReceivedExchangeCancellationForMatch(GKPlayer player, GKTurnBasedExchange exchange, GKTurnBasedMatch match);
-    [Optional] [Selector("player:receivedExchangeReplies:forCompletedExchange:forMatch:")] void PlayerReceivedExchangeRepliesForCompletedExchangeForMatch(GKPlayer player, NSArray replies, GKTurnBasedExchange exchange, GKTurnBasedMatch match);
-    [Optional] [Selector("player:wantsToQuitMatch:")] void PlayerWantsToQuitMatch(GKPlayer player, GKTurnBasedMatch match);
+    [Optional]
+    [Selector("player:didRequestMatchWithOtherPlayers:")]
+    void PlayerDidRequestMatchWithOtherPlayers(GKPlayer player, NSArray playersToInvite);
+    [Optional]
+    [Selector("player:receivedTurnEventForMatch:didBecomeActive:")]
+    void PlayerReceivedTurnEventForMatchDidBecomeActive(GKPlayer player, GKTurnBasedMatch match, bool didBecomeActive);
+    [Optional]
+    [Selector("player:matchEnded:")]
+    void PlayerMatchEnded(GKPlayer player, GKTurnBasedMatch match);
+    [Optional]
+    [Selector("player:receivedExchangeRequest:forMatch:")]
+    void PlayerReceivedExchangeRequestForMatch(GKPlayer player, GKTurnBasedExchange exchange, GKTurnBasedMatch match);
+    [Optional]
+    [Selector("player:receivedExchangeCancellation:forMatch:")]
+    void PlayerReceivedExchangeCancellationForMatch(GKPlayer player, GKTurnBasedExchange exchange, GKTurnBasedMatch match);
+    [Optional]
+    [Selector("player:receivedExchangeReplies:forCompletedExchange:forMatch:")]
+    void PlayerReceivedExchangeRepliesForCompletedExchangeForMatch(GKPlayer player, NSArray replies, GKTurnBasedExchange exchange, GKTurnBasedMatch match);
+    [Optional]
+    [Selector("player:wantsToQuitMatch:")]
+    void PlayerWantsToQuitMatch(GKPlayer player, GKTurnBasedMatch match);
     /// Deprecated in macOS 10.10.
-    [Optional] [Selector("player:didRequestMatchWithPlayers:")] void PlayerDidRequestMatchWithPlayers(GKPlayer player, NSArray playerIDsToInvite);
+    [Optional]
+    [Selector("player:didRequestMatchWithPlayers:")]
+    void PlayerDidRequestMatchWithPlayers(GKPlayer player, NSArray playerIDsToInvite);
 }
 
 public extern "C" NSTimeInterval GKTurnTimeoutDefault;
@@ -139,43 +161,77 @@ public objc closure void GKTurnBasedMatchParticipantQuitInTurnWithOutcomeNextPar
 
 public extern objc class GKTurnBasedMatch : NSObject
 {
-    [Selector("matchID")] public NSString? MatchID { get; }
-    [Selector("creationDate")] public NSDate? CreationDate { get; }
-    [Selector("participants")] public NSArray? Participants { get; }
-    [Selector("status")] public GKTurnBasedMatchStatus Status { get; }
-    [Selector("currentParticipant")] public GKTurnBasedParticipant? CurrentParticipant { get; }
-    [Selector("matchData")] public NSData? MatchData { get; }
-    [Selector("message", "setMessage:")] public NSString? Message { get; set; }
-    [Selector("matchDataMaximumSize")] public NSUInteger MatchDataMaximumSize { get; }
-    [Selector("exchanges")] public NSArray? Exchanges { get; }
-    [Selector("activeExchanges")] public NSArray? ActiveExchanges { get; }
-    [Selector("completedExchanges")] public NSArray? CompletedExchanges { get; }
-    [Selector("exchangeDataMaximumSize")] public NSUInteger ExchangeDataMaximumSize { get; }
-    [Selector("exchangeMaxInitiatedExchangesPerPlayer")] public NSUInteger ExchangeMaxInitiatedExchangesPerPlayer { get; }
-    [Selector("setLocalizableMessageWithKey:arguments:")] public void SetLocalizableMessageWithKeyArguments(NSString key, NSArray? arguments);
-    [Selector("findMatchForRequest:withCompletionHandler:")] public static void FindMatchForRequestWithCompletionHandler(GKMatchRequest request, GKTurnBasedMatchFindMatchForRequestWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadMatchesWithCompletionHandler:")] public static void LoadMatchesWithCompletionHandler(GKTurnBasedMatchLoadMatchesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("loadMatchWithID:withCompletionHandler:")] public static void LoadMatchWithIDWithCompletionHandler(NSString matchID, GKTurnBasedMatchLoadMatchWithIDWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("rematchWithCompletionHandler:")] public void RematchWithCompletionHandler(GKTurnBasedMatchRematchWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("acceptInviteWithCompletionHandler:")] public void AcceptInviteWithCompletionHandler(GKTurnBasedMatchAcceptInviteWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("declineInviteWithCompletionHandler:")] public void DeclineInviteWithCompletionHandler(GKTurnBasedMatchDeclineInviteWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("removeWithCompletionHandler:")] public void RemoveWithCompletionHandler(GKTurnBasedMatchRemoveWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("loadMatchDataWithCompletionHandler:")] public void LoadMatchDataWithCompletionHandler(GKTurnBasedMatchLoadMatchDataWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("endTurnWithNextParticipants:turnTimeout:matchData:completionHandler:")] public void EndTurnWithNextParticipantsTurnTimeoutMatchDataCompletionHandler(NSArray nextParticipants, NSTimeInterval timeout, NSData matchData, GKTurnBasedMatchEndTurnWithNextParticipantsTurnTimeoutMatchDataCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("participantQuitInTurnWithOutcome:nextParticipants:turnTimeout:matchData:completionHandler:")] public void ParticipantQuitInTurnWithOutcomeNextParticipantsTurnTimeoutMatchDataCompletionHandler(GKTurnBasedMatchOutcome matchOutcome, NSArray nextParticipants, NSTimeInterval timeout, NSData matchData, GKTurnBasedMatchParticipantQuitInTurnWithOutcomeNextParticipantsTurnTimeoutMatchDataCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("participantQuitOutOfTurnWithOutcome:withCompletionHandler:")] public void ParticipantQuitOutOfTurnWithOutcomeWithCompletionHandler(GKTurnBasedMatchOutcome matchOutcome, GKTurnBasedMatchParticipantQuitOutOfTurnWithOutcomeWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("endMatchInTurnWithMatchData:completionHandler:")] public void EndMatchInTurnWithMatchDataCompletionHandler(NSData matchData, GKTurnBasedMatchEndMatchInTurnWithMatchDataCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("matchID")]
+    public NSString? MatchID { get; }
+    [Selector("creationDate")]
+    public NSDate? CreationDate { get; }
+    [Selector("participants")]
+    public NSArray? Participants { get; }
+    [Selector("status")]
+    public GKTurnBasedMatchStatus Status { get; }
+    [Selector("currentParticipant")]
+    public GKTurnBasedParticipant? CurrentParticipant { get; }
+    [Selector("matchData")]
+    public NSData? MatchData { get; }
+    [Selector("message", "setMessage:")]
+    public NSString? Message { get; set; }
+    [Selector("matchDataMaximumSize")]
+    public NSUInteger MatchDataMaximumSize { get; }
+    [Selector("exchanges")]
+    public NSArray? Exchanges { get; }
+    [Selector("activeExchanges")]
+    public NSArray? ActiveExchanges { get; }
+    [Selector("completedExchanges")]
+    public NSArray? CompletedExchanges { get; }
+    [Selector("exchangeDataMaximumSize")]
+    public NSUInteger ExchangeDataMaximumSize { get; }
+    [Selector("exchangeMaxInitiatedExchangesPerPlayer")]
+    public NSUInteger ExchangeMaxInitiatedExchangesPerPlayer { get; }
+    [Selector("setLocalizableMessageWithKey:arguments:")]
+    public void SetLocalizableMessageWithKeyArguments(NSString key, NSArray? arguments);
+    [Selector("findMatchForRequest:withCompletionHandler:")]
+    public static void FindMatchForRequestWithCompletionHandler(GKMatchRequest request, GKTurnBasedMatchFindMatchForRequestWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadMatchesWithCompletionHandler:")]
+    public static void LoadMatchesWithCompletionHandler(GKTurnBasedMatchLoadMatchesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadMatchWithID:withCompletionHandler:")]
+    public static void LoadMatchWithIDWithCompletionHandler(NSString matchID, GKTurnBasedMatchLoadMatchWithIDWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("rematchWithCompletionHandler:")]
+    public void RematchWithCompletionHandler(GKTurnBasedMatchRematchWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("acceptInviteWithCompletionHandler:")]
+    public void AcceptInviteWithCompletionHandler(GKTurnBasedMatchAcceptInviteWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("declineInviteWithCompletionHandler:")]
+    public void DeclineInviteWithCompletionHandler(GKTurnBasedMatchDeclineInviteWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("removeWithCompletionHandler:")]
+    public void RemoveWithCompletionHandler(GKTurnBasedMatchRemoveWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadMatchDataWithCompletionHandler:")]
+    public void LoadMatchDataWithCompletionHandler(GKTurnBasedMatchLoadMatchDataWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("endTurnWithNextParticipants:turnTimeout:matchData:completionHandler:")]
+    public void EndTurnWithNextParticipantsTurnTimeoutMatchDataCompletionHandler(NSArray nextParticipants, NSTimeInterval timeout, NSData matchData, GKTurnBasedMatchEndTurnWithNextParticipantsTurnTimeoutMatchDataCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("participantQuitInTurnWithOutcome:nextParticipants:turnTimeout:matchData:completionHandler:")]
+    public void ParticipantQuitInTurnWithOutcomeNextParticipantsTurnTimeoutMatchDataCompletionHandler(GKTurnBasedMatchOutcome matchOutcome, NSArray nextParticipants, NSTimeInterval timeout, NSData matchData, GKTurnBasedMatchParticipantQuitInTurnWithOutcomeNextParticipantsTurnTimeoutMatchDataCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("participantQuitOutOfTurnWithOutcome:withCompletionHandler:")]
+    public void ParticipantQuitOutOfTurnWithOutcomeWithCompletionHandler(GKTurnBasedMatchOutcome matchOutcome, GKTurnBasedMatchParticipantQuitOutOfTurnWithOutcomeWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("endMatchInTurnWithMatchData:completionHandler:")]
+    public void EndMatchInTurnWithMatchDataCompletionHandler(NSData matchData, GKTurnBasedMatchEndMatchInTurnWithMatchDataCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 11.0.
-    [Selector("endMatchInTurnWithMatchData:scores:achievements:completionHandler:")] public void EndMatchInTurnWithMatchDataScoresAchievementsCompletionHandler(NSData matchData, NSArray? scores, NSArray? achievements, GKTurnBasedMatchEndMatchInTurnWithMatchDataScoresAchievementsCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("endMatchInTurnWithMatchData:leaderboardScores:achievements:completionHandler:")] public void EndMatchInTurnWithMatchDataLeaderboardScoresAchievementsCompletionHandler(NSData matchData, NSArray scores, NSArray achievements, GKTurnBasedMatchEndMatchInTurnWithMatchDataLeaderboardScoresAchievementsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("saveCurrentTurnWithMatchData:completionHandler:")] public void SaveCurrentTurnWithMatchDataCompletionHandler(NSData matchData, GKTurnBasedMatchSaveCurrentTurnWithMatchDataCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("saveMergedMatchData:withResolvedExchanges:completionHandler:")] public void SaveMergedMatchDataWithResolvedExchangesCompletionHandler(NSData matchData, NSArray exchanges, GKTurnBasedMatchSaveMergedMatchDataWithResolvedExchangesCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("sendExchangeToParticipants:data:localizableMessageKey:arguments:timeout:completionHandler:")] public void SendExchangeToParticipantsDataLocalizableMessageKeyArgumentsTimeoutCompletionHandler(NSArray participants, NSData data, NSString key, NSArray arguments, NSTimeInterval timeout, GKTurnBasedMatchSendExchangeToParticipantsDataLocalizableMessageKeyArgumentsTimeoutCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("sendReminderToParticipants:localizableMessageKey:arguments:completionHandler:")] public void SendReminderToParticipantsLocalizableMessageKeyArgumentsCompletionHandler(NSArray participants, NSString key, NSArray arguments, GKTurnBasedMatchSendReminderToParticipantsLocalizableMessageKeyArgumentsCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("endMatchInTurnWithMatchData:scores:achievements:completionHandler:")]
+    public void EndMatchInTurnWithMatchDataScoresAchievementsCompletionHandler(NSData matchData, NSArray? scores, NSArray? achievements, GKTurnBasedMatchEndMatchInTurnWithMatchDataScoresAchievementsCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("endMatchInTurnWithMatchData:leaderboardScores:achievements:completionHandler:")]
+    public void EndMatchInTurnWithMatchDataLeaderboardScoresAchievementsCompletionHandler(NSData matchData, NSArray scores, NSArray achievements, GKTurnBasedMatchEndMatchInTurnWithMatchDataLeaderboardScoresAchievementsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("saveCurrentTurnWithMatchData:completionHandler:")]
+    public void SaveCurrentTurnWithMatchDataCompletionHandler(NSData matchData, GKTurnBasedMatchSaveCurrentTurnWithMatchDataCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("saveMergedMatchData:withResolvedExchanges:completionHandler:")]
+    public void SaveMergedMatchDataWithResolvedExchangesCompletionHandler(NSData matchData, NSArray exchanges, GKTurnBasedMatchSaveMergedMatchDataWithResolvedExchangesCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("sendExchangeToParticipants:data:localizableMessageKey:arguments:timeout:completionHandler:")]
+    public void SendExchangeToParticipantsDataLocalizableMessageKeyArgumentsTimeoutCompletionHandler(NSArray participants, NSData data, NSString key, NSArray arguments, NSTimeInterval timeout, GKTurnBasedMatchSendExchangeToParticipantsDataLocalizableMessageKeyArgumentsTimeoutCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("sendReminderToParticipants:localizableMessageKey:arguments:completionHandler:")]
+    public void SendReminderToParticipantsLocalizableMessageKeyArgumentsCompletionHandler(NSArray participants, NSString key, NSArray arguments, GKTurnBasedMatchSendReminderToParticipantsLocalizableMessageKeyArgumentsCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 10.9.
-    [Selector("endTurnWithNextParticipant:matchData:completionHandler:")] public void EndTurnWithNextParticipantMatchDataCompletionHandler(GKTurnBasedParticipant nextParticipant, NSData matchData, GKTurnBasedMatchEndTurnWithNextParticipantMatchDataCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("endTurnWithNextParticipant:matchData:completionHandler:")]
+    public void EndTurnWithNextParticipantMatchDataCompletionHandler(GKTurnBasedParticipant nextParticipant, NSData matchData, GKTurnBasedMatchEndTurnWithNextParticipantMatchDataCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 10.9.
-    [Selector("participantQuitInTurnWithOutcome:nextParticipant:matchData:completionHandler:")] public void ParticipantQuitInTurnWithOutcomeNextParticipantMatchDataCompletionHandler(GKTurnBasedMatchOutcome matchOutcome, GKTurnBasedParticipant nextParticipant, NSData matchData, GKTurnBasedMatchParticipantQuitInTurnWithOutcomeNextParticipantMatchDataCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("participantQuitInTurnWithOutcome:nextParticipant:matchData:completionHandler:")]
+    public void ParticipantQuitInTurnWithOutcomeNextParticipantMatchDataCompletionHandler(GKTurnBasedMatchOutcome matchOutcome, GKTurnBasedParticipant nextParticipant, NSData matchData, GKTurnBasedMatchParticipantQuitInTurnWithOutcomeNextParticipantMatchDataCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public enum GKTurnBasedExchangeStatus : sbyte
@@ -197,48 +253,72 @@ public objc closure void GKTurnBasedExchangeReplyWithLocalizableMessageKeyArgume
 
 public extern objc class GKTurnBasedExchange : NSObject
 {
-    [Selector("exchangeID")] public NSString? ExchangeID { get; }
-    [Selector("sender")] public GKTurnBasedParticipant? Sender { get; }
-    [Selector("recipients")] public NSArray? Recipients { get; }
-    [Selector("status")] public GKTurnBasedExchangeStatus Status { get; }
-    [Selector("message")] public NSString? Message { get; }
-    [Selector("data")] public NSData? Data { get; }
-    [Selector("sendDate")] public NSDate? SendDate { get; }
-    [Selector("timeoutDate")] public NSDate? TimeoutDate { get; }
-    [Selector("completionDate")] public NSDate? CompletionDate { get; }
-    [Selector("replies")] public NSArray? Replies { get; }
-    [Selector("cancelWithLocalizableMessageKey:arguments:completionHandler:")] public void CancelWithLocalizableMessageKeyArgumentsCompletionHandler(NSString key, NSArray arguments, GKTurnBasedExchangeCancelWithLocalizableMessageKeyArgumentsCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("replyWithLocalizableMessageKey:arguments:data:completionHandler:")] public void ReplyWithLocalizableMessageKeyArgumentsDataCompletionHandler(NSString key, NSArray arguments, NSData data, GKTurnBasedExchangeReplyWithLocalizableMessageKeyArgumentsDataCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("exchangeID")]
+    public NSString? ExchangeID { get; }
+    [Selector("sender")]
+    public GKTurnBasedParticipant? Sender { get; }
+    [Selector("recipients")]
+    public NSArray? Recipients { get; }
+    [Selector("status")]
+    public GKTurnBasedExchangeStatus Status { get; }
+    [Selector("message")]
+    public NSString? Message { get; }
+    [Selector("data")]
+    public NSData? Data { get; }
+    [Selector("sendDate")]
+    public NSDate? SendDate { get; }
+    [Selector("timeoutDate")]
+    public NSDate? TimeoutDate { get; }
+    [Selector("completionDate")]
+    public NSDate? CompletionDate { get; }
+    [Selector("replies")]
+    public NSArray? Replies { get; }
+    [Selector("cancelWithLocalizableMessageKey:arguments:completionHandler:")]
+    public void CancelWithLocalizableMessageKeyArgumentsCompletionHandler(NSString key, NSArray arguments, GKTurnBasedExchangeCancelWithLocalizableMessageKeyArgumentsCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("replyWithLocalizableMessageKey:arguments:data:completionHandler:")]
+    public void ReplyWithLocalizableMessageKeyArgumentsDataCompletionHandler(NSString key, NSArray arguments, NSData data, GKTurnBasedExchangeReplyWithLocalizableMessageKeyArgumentsDataCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public extern objc class GKTurnBasedExchangeReply : NSObject
 {
-    [Selector("recipient")] public GKTurnBasedParticipant? Recipient { get; }
-    [Selector("message")] public NSString? Message { get; }
-    [Selector("data")] public NSData? Data { get; }
-    [Selector("replyDate")] public NSDate? ReplyDate { get; }
+    [Selector("recipient")]
+    public GKTurnBasedParticipant? Recipient { get; }
+    [Selector("message")]
+    public NSString? Message { get; }
+    [Selector("data")]
+    public NSData? Data { get; }
+    [Selector("replyDate")]
+    public NSDate? ReplyDate { get; }
 }
 
 /// Deprecated in macOS 10.10.
 public objc interface GKTurnBasedEventHandlerDelegate
 {
     /// Deprecated in macOS 10.10.
-    [Selector("handleInviteFromGameCenter:")] void HandleInviteFromGameCenter(NSArray playersToInvite);
+    [Selector("handleInviteFromGameCenter:")]
+    void HandleInviteFromGameCenter(NSArray playersToInvite);
     /// Deprecated in macOS 10.10.
-    [Selector("handleTurnEventForMatch:didBecomeActive:")] void HandleTurnEventForMatchDidBecomeActive(GKTurnBasedMatch match, bool didBecomeActive);
+    [Selector("handleTurnEventForMatch:didBecomeActive:")]
+    void HandleTurnEventForMatchDidBecomeActive(GKTurnBasedMatch match, bool didBecomeActive);
     /// Deprecated in macOS 10.9.
-    [Optional] [Selector("handleTurnEventForMatch:")] void HandleTurnEventForMatch(GKTurnBasedMatch match);
+    [Optional]
+    [Selector("handleTurnEventForMatch:")]
+    void HandleTurnEventForMatch(GKTurnBasedMatch match);
     /// Deprecated in macOS 10.10.
-    [Optional] [Selector("handleMatchEnded:")] void HandleMatchEnded(GKTurnBasedMatch match);
+    [Optional]
+    [Selector("handleMatchEnded:")]
+    void HandleMatchEnded(GKTurnBasedMatch match);
 }
 
 /// Deprecated in macOS 10.10.
 public extern objc class GKTurnBasedEventHandler : NSObject
 {
     /// Deprecated in macOS 10.10.
-    [Selector("delegate", "setDelegate:")] public NSObject? Delegate { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSObject? Delegate { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("sharedTurnBasedEventHandler")] public static GKTurnBasedEventHandler SharedTurnBasedEventHandler();
+    [Selector("sharedTurnBasedEventHandler")]
+    public static GKTurnBasedEventHandler SharedTurnBasedEventHandler();
 }
 
 #endif

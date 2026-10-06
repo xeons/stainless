@@ -56,23 +56,40 @@ public enum WKWebExtensionMatchPatternOptions : ulong
 /// macOS 15.4 and later.
 public extern objc class WKWebExtensionMatchPattern : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("string")] public NSString String { get; }
-    [Selector("scheme")] public NSString? Scheme { get; }
-    [Selector("host")] public NSString? Host { get; }
-    [Selector("path")] public NSString? Path { get; }
-    [Selector("matchesAllURLs")] public bool MatchesAllURLs { get; }
-    [Selector("matchesAllHosts")] public bool MatchesAllHosts { get; }
-    [Selector("registerCustomURLScheme:")] public static void RegisterCustomURLScheme(NSString urlScheme);
-    [Selector("allURLsMatchPattern")] public static Self AllURLsMatchPattern();
-    [Selector("allHostsAndSchemesMatchPattern")] public static Self AllHostsAndSchemesMatchPattern();
-    [Selector("matchPatternWithString:")] public static Self? MatchPatternWithString(NSString string);
-    [Selector("matchPatternWithScheme:host:path:")] public static Self? MatchPatternWithSchemeHostPath(NSString scheme, NSString host, NSString path);
-    [Selector("initWithString:error:")] public Self? InitWithStringError(NSString string, out NSError? error);
-    [Selector("initWithScheme:host:path:error:")] public Self? InitWithSchemeHostPathError(NSString scheme, NSString host, NSString path, out NSError? error);
-    [Selector("matchesURL:")] public bool MatchesURL(NSURL? url);
-    [Selector("matchesURL:options:")] public bool MatchesURLOptions(NSURL? url, WKWebExtensionMatchPatternOptions options);
-    [Selector("matchesPattern:")] public bool MatchesPattern(WKWebExtensionMatchPattern? pattern);
-    [Selector("matchesPattern:options:")] public bool MatchesPatternOptions(WKWebExtensionMatchPattern? pattern, WKWebExtensionMatchPatternOptions options);
+    [Selector("string")]
+    public NSString String { get; }
+    [Selector("scheme")]
+    public NSString? Scheme { get; }
+    [Selector("host")]
+    public NSString? Host { get; }
+    [Selector("path")]
+    public NSString? Path { get; }
+    [Selector("matchesAllURLs")]
+    public bool MatchesAllURLs { get; }
+    [Selector("matchesAllHosts")]
+    public bool MatchesAllHosts { get; }
+    [Selector("registerCustomURLScheme:")]
+    public static void RegisterCustomURLScheme(NSString urlScheme);
+    [Selector("allURLsMatchPattern")]
+    public static Self AllURLsMatchPattern();
+    [Selector("allHostsAndSchemesMatchPattern")]
+    public static Self AllHostsAndSchemesMatchPattern();
+    [Selector("matchPatternWithString:")]
+    public static Self? MatchPatternWithString(NSString string);
+    [Selector("matchPatternWithScheme:host:path:")]
+    public static Self? MatchPatternWithSchemeHostPath(NSString scheme, NSString host, NSString path);
+    [Selector("initWithString:error:")]
+    public Self? InitWithStringError(NSString string, out NSError? error);
+    [Selector("initWithScheme:host:path:error:")]
+    public Self? InitWithSchemeHostPathError(NSString scheme, NSString host, NSString path, out NSError? error);
+    [Selector("matchesURL:")]
+    public bool MatchesURL(NSURL? url);
+    [Selector("matchesURL:options:")]
+    public bool MatchesURLOptions(NSURL? url, WKWebExtensionMatchPatternOptions options);
+    [Selector("matchesPattern:")]
+    public bool MatchesPattern(WKWebExtensionMatchPattern? pattern);
+    [Selector("matchesPattern:options:")]
+    public bool MatchesPatternOptions(WKWebExtensionMatchPattern? pattern, WKWebExtensionMatchPatternOptions options);
 }
 
 #endif

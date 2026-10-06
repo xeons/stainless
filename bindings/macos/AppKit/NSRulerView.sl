@@ -49,46 +49,81 @@ public extern "C" NSRulerViewUnitName? NSRulerViewUnitPicas;
 
 public extern objc class NSRulerView : NSView
 {
-    [Selector("scrollView", "setScrollView:")] public NSScrollView? ScrollView { get; set; }
-    [Selector("orientation", "setOrientation:")] public NSRulerOrientation Orientation { get; set; }
-    [Selector("baselineLocation")] public CGFloat BaselineLocation { get; }
-    [Selector("requiredThickness")] public CGFloat RequiredThickness { get; }
-    [Selector("ruleThickness", "setRuleThickness:")] public CGFloat RuleThickness { get; set; }
-    [Selector("reservedThicknessForMarkers", "setReservedThicknessForMarkers:")] public CGFloat ReservedThicknessForMarkers { get; set; }
-    [Selector("reservedThicknessForAccessoryView", "setReservedThicknessForAccessoryView:")] public CGFloat ReservedThicknessForAccessoryView { get; set; }
-    [Selector("measurementUnits", "setMeasurementUnits:")] public NSRulerViewUnitName MeasurementUnits { get; set; }
-    [Selector("originOffset", "setOriginOffset:")] public CGFloat OriginOffset { get; set; }
-    [Selector("clientView", "setClientView:")] public NSView? ClientView { get; set; }
-    [Selector("markers", "setMarkers:")] public NSArray? Markers { get; set; }
-    [Selector("accessoryView", "setAccessoryView:")] public NSView? AccessoryView { get; set; }
-    [Selector("isFlipped")] public bool Flipped { get; }
-    [Selector("registerUnitWithName:abbreviation:unitToPointsConversionFactor:stepUpCycle:stepDownCycle:")] public static void RegisterUnitWithNameAbbreviationUnitToPointsConversionFactorStepUpCycleStepDownCycle(NSRulerViewUnitName unitName, NSString abbreviation, CGFloat conversionFactor, NSArray stepUpCycle, NSArray stepDownCycle);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("initWithScrollView:orientation:")] public Self InitWithScrollViewOrientation(NSScrollView? scrollView, NSRulerOrientation orientation);
-    [Selector("addMarker:")] public void AddMarker(NSRulerMarker marker);
-    [Selector("removeMarker:")] public void RemoveMarker(NSRulerMarker marker);
-    [Selector("trackMarker:withMouseEvent:")] public bool TrackMarkerWithMouseEvent(NSRulerMarker marker, NSEvent event);
-    [Selector("moveRulerlineFromLocation:toLocation:")] public void MoveRulerlineFromLocationToLocation(CGFloat oldLocation, CGFloat newLocation);
-    [Selector("invalidateHashMarks")] public void InvalidateHashMarks();
-    [Selector("drawHashMarksAndLabelsInRect:")] public void DrawHashMarksAndLabelsInRect(NSRect rect);
-    [Selector("drawMarkersInRect:")] public void DrawMarkersInRect(NSRect rect);
+    [Selector("scrollView", "setScrollView:")]
+    public NSScrollView? ScrollView { get; set; }
+    [Selector("orientation", "setOrientation:")]
+    public NSRulerOrientation Orientation { get; set; }
+    [Selector("baselineLocation")]
+    public CGFloat BaselineLocation { get; }
+    [Selector("requiredThickness")]
+    public CGFloat RequiredThickness { get; }
+    [Selector("ruleThickness", "setRuleThickness:")]
+    public CGFloat RuleThickness { get; set; }
+    [Selector("reservedThicknessForMarkers", "setReservedThicknessForMarkers:")]
+    public CGFloat ReservedThicknessForMarkers { get; set; }
+    [Selector("reservedThicknessForAccessoryView", "setReservedThicknessForAccessoryView:")]
+    public CGFloat ReservedThicknessForAccessoryView { get; set; }
+    [Selector("measurementUnits", "setMeasurementUnits:")]
+    public NSRulerViewUnitName MeasurementUnits { get; set; }
+    [Selector("originOffset", "setOriginOffset:")]
+    public CGFloat OriginOffset { get; set; }
+    [Selector("clientView", "setClientView:")]
+    public NSView? ClientView { get; set; }
+    [Selector("markers", "setMarkers:")]
+    public NSArray? Markers { get; set; }
+    [Selector("accessoryView", "setAccessoryView:")]
+    public NSView? AccessoryView { get; set; }
+    [Selector("isFlipped")]
+    public bool Flipped { get; }
+    [Selector("registerUnitWithName:abbreviation:unitToPointsConversionFactor:stepUpCycle:stepDownCycle:")]
+    public static void RegisterUnitWithNameAbbreviationUnitToPointsConversionFactorStepUpCycleStepDownCycle(NSRulerViewUnitName unitName, NSString abbreviation, CGFloat conversionFactor, NSArray stepUpCycle, NSArray stepDownCycle);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("initWithScrollView:orientation:")]
+    public Self InitWithScrollViewOrientation(NSScrollView? scrollView, NSRulerOrientation orientation);
+    [Selector("addMarker:")]
+    public void AddMarker(NSRulerMarker marker);
+    [Selector("removeMarker:")]
+    public void RemoveMarker(NSRulerMarker marker);
+    [Selector("trackMarker:withMouseEvent:")]
+    public bool TrackMarkerWithMouseEvent(NSRulerMarker marker, NSEvent event);
+    [Selector("moveRulerlineFromLocation:toLocation:")]
+    public void MoveRulerlineFromLocationToLocation(CGFloat oldLocation, CGFloat newLocation);
+    [Selector("invalidateHashMarks")]
+    public void InvalidateHashMarks();
+    [Selector("drawHashMarksAndLabelsInRect:")]
+    public void DrawHashMarksAndLabelsInRect(NSRect rect);
+    [Selector("drawMarkersInRect:")]
+    public void DrawMarkersInRect(NSRect rect);
 }
 
 /// NSRulerMarkerClientViewDelegation, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("rulerView:shouldMoveMarker:")] public bool RulerViewShouldMoveMarker(NSRulerView ruler, NSRulerMarker marker);
-    [Selector("rulerView:willMoveMarker:toLocation:")] public CGFloat RulerViewWillMoveMarkerToLocation(NSRulerView ruler, NSRulerMarker marker, CGFloat location);
-    [Selector("rulerView:didMoveMarker:")] public void RulerViewDidMoveMarker(NSRulerView ruler, NSRulerMarker marker);
-    [Selector("rulerView:shouldRemoveMarker:")] public bool RulerViewShouldRemoveMarker(NSRulerView ruler, NSRulerMarker marker);
-    [Selector("rulerView:didRemoveMarker:")] public void RulerViewDidRemoveMarker(NSRulerView ruler, NSRulerMarker marker);
-    [Selector("rulerView:shouldAddMarker:")] public bool RulerViewShouldAddMarker(NSRulerView ruler, NSRulerMarker marker);
-    [Selector("rulerView:willAddMarker:atLocation:")] public CGFloat RulerViewWillAddMarkerAtLocation(NSRulerView ruler, NSRulerMarker marker, CGFloat location);
-    [Selector("rulerView:didAddMarker:")] public void RulerViewDidAddMarker(NSRulerView ruler, NSRulerMarker marker);
-    [Selector("rulerView:handleMouseDown:")] public void RulerViewHandleMouseDown(NSRulerView ruler, NSEvent event);
-    [Selector("rulerView:willSetClientView:")] public void RulerViewWillSetClientView(NSRulerView ruler, NSView newClient);
-    [Selector("rulerView:locationForPoint:")] public CGFloat RulerViewLocationForPoint(NSRulerView ruler, NSPoint point);
-    [Selector("rulerView:pointForLocation:")] public NSPoint RulerViewPointForLocation(NSRulerView ruler, CGFloat point);
+    [Selector("rulerView:shouldMoveMarker:")]
+    public bool RulerViewShouldMoveMarker(NSRulerView ruler, NSRulerMarker marker);
+    [Selector("rulerView:willMoveMarker:toLocation:")]
+    public CGFloat RulerViewWillMoveMarkerToLocation(NSRulerView ruler, NSRulerMarker marker, CGFloat location);
+    [Selector("rulerView:didMoveMarker:")]
+    public void RulerViewDidMoveMarker(NSRulerView ruler, NSRulerMarker marker);
+    [Selector("rulerView:shouldRemoveMarker:")]
+    public bool RulerViewShouldRemoveMarker(NSRulerView ruler, NSRulerMarker marker);
+    [Selector("rulerView:didRemoveMarker:")]
+    public void RulerViewDidRemoveMarker(NSRulerView ruler, NSRulerMarker marker);
+    [Selector("rulerView:shouldAddMarker:")]
+    public bool RulerViewShouldAddMarker(NSRulerView ruler, NSRulerMarker marker);
+    [Selector("rulerView:willAddMarker:atLocation:")]
+    public CGFloat RulerViewWillAddMarkerAtLocation(NSRulerView ruler, NSRulerMarker marker, CGFloat location);
+    [Selector("rulerView:didAddMarker:")]
+    public void RulerViewDidAddMarker(NSRulerView ruler, NSRulerMarker marker);
+    [Selector("rulerView:handleMouseDown:")]
+    public void RulerViewHandleMouseDown(NSRulerView ruler, NSEvent event);
+    [Selector("rulerView:willSetClientView:")]
+    public void RulerViewWillSetClientView(NSRulerView ruler, NSView newClient);
+    [Selector("rulerView:locationForPoint:")]
+    public CGFloat RulerViewLocationForPoint(NSRulerView ruler, NSPoint point);
+    [Selector("rulerView:pointForLocation:")]
+    public NSPoint RulerViewPointForLocation(NSRulerView ruler, CGFloat point);
 }
 
 #endif

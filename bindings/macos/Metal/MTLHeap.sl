@@ -40,39 +40,67 @@ public enum MTLHeapType : long
 
 public extern objc class MTLHeapDescriptor : NSObject, NSCopying
 {
-    [Selector("size", "setSize:")] public NSUInteger Size { get; set; }
-    [Selector("storageMode", "setStorageMode:")] public MTLStorageMode StorageMode { get; set; }
-    [Selector("cpuCacheMode", "setCpuCacheMode:")] public MTLCPUCacheMode CpuCacheMode { get; set; }
-    [Selector("sparsePageSize", "setSparsePageSize:")] public MTLSparsePageSize SparsePageSize { get; set; }
-    [Selector("hazardTrackingMode", "setHazardTrackingMode:")] public MTLHazardTrackingMode HazardTrackingMode { get; set; }
-    [Selector("resourceOptions", "setResourceOptions:")] public MTLResourceOptions ResourceOptions { get; set; }
-    [Selector("type", "setType:")] public MTLHeapType Type { get; set; }
+    [Selector("size", "setSize:")]
+    public NSUInteger Size { get; set; }
+    [Selector("storageMode", "setStorageMode:")]
+    public MTLStorageMode StorageMode { get; set; }
+    [Selector("cpuCacheMode", "setCpuCacheMode:")]
+    public MTLCPUCacheMode CpuCacheMode { get; set; }
+    [Selector("sparsePageSize", "setSparsePageSize:")]
+    public MTLSparsePageSize SparsePageSize { get; set; }
+    [Selector("hazardTrackingMode", "setHazardTrackingMode:")]
+    public MTLHazardTrackingMode HazardTrackingMode { get; set; }
+    [Selector("resourceOptions", "setResourceOptions:")]
+    public MTLResourceOptions ResourceOptions { get; set; }
+    [Selector("type", "setType:")]
+    public MTLHeapType Type { get; set; }
     /// macOS 26.0 and later.
-    [Selector("maxCompatiblePlacementSparsePageSize", "setMaxCompatiblePlacementSparsePageSize:")] public MTLSparsePageSize MaxCompatiblePlacementSparsePageSize { get; set; }
+    [Selector("maxCompatiblePlacementSparsePageSize", "setMaxCompatiblePlacementSparsePageSize:")]
+    public MTLSparsePageSize MaxCompatiblePlacementSparsePageSize { get; set; }
 }
 
 public objc interface MTLHeap : MTLAllocation
 {
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("storageMode")] MTLStorageMode StorageMode { get; }
-    [Selector("cpuCacheMode")] MTLCPUCacheMode CpuCacheMode { get; }
-    [Selector("hazardTrackingMode")] MTLHazardTrackingMode HazardTrackingMode { get; }
-    [Selector("resourceOptions")] MTLResourceOptions ResourceOptions { get; }
-    [Selector("size")] NSUInteger Size { get; }
-    [Selector("usedSize")] NSUInteger UsedSize { get; }
-    [Selector("currentAllocatedSize")] NSUInteger CurrentAllocatedSize { get; }
-    [Selector("type")] MTLHeapType Type { get; }
-    [Selector("maxAvailableSizeWithAlignment:")] NSUInteger MaxAvailableSizeWithAlignment(NSUInteger alignment);
-    [Selector("newBufferWithLength:options:")] MTLBuffer? NewBufferWithLengthOptions(NSUInteger length, MTLResourceOptions options);
-    [Selector("newTextureWithDescriptor:")] MTLTexture? NewTextureWithDescriptor(MTLTextureDescriptor descriptor);
-    [Selector("setPurgeableState:")] MTLPurgeableState SetPurgeableState(MTLPurgeableState state);
-    [Selector("newBufferWithLength:options:offset:")] MTLBuffer? NewBufferWithLengthOptionsOffset(NSUInteger length, MTLResourceOptions options, NSUInteger offset);
-    [Selector("newTextureWithDescriptor:offset:")] MTLTexture? NewTextureWithDescriptorOffset(MTLTextureDescriptor descriptor, NSUInteger offset);
-    [Selector("newAccelerationStructureWithSize:")] MTLAccelerationStructure? NewAccelerationStructureWithSize(NSUInteger size);
-    [Selector("newAccelerationStructureWithDescriptor:")] MTLAccelerationStructure? NewAccelerationStructureWithDescriptor(MTLAccelerationStructureDescriptor descriptor);
-    [Selector("newAccelerationStructureWithSize:offset:")] MTLAccelerationStructure? NewAccelerationStructureWithSizeOffset(NSUInteger size, NSUInteger offset);
-    [Selector("newAccelerationStructureWithDescriptor:offset:")] MTLAccelerationStructure? NewAccelerationStructureWithDescriptorOffset(MTLAccelerationStructureDescriptor descriptor, NSUInteger offset);
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("storageMode")]
+    MTLStorageMode StorageMode { get; }
+    [Selector("cpuCacheMode")]
+    MTLCPUCacheMode CpuCacheMode { get; }
+    [Selector("hazardTrackingMode")]
+    MTLHazardTrackingMode HazardTrackingMode { get; }
+    [Selector("resourceOptions")]
+    MTLResourceOptions ResourceOptions { get; }
+    [Selector("size")]
+    NSUInteger Size { get; }
+    [Selector("usedSize")]
+    NSUInteger UsedSize { get; }
+    [Selector("currentAllocatedSize")]
+    NSUInteger CurrentAllocatedSize { get; }
+    [Selector("type")]
+    MTLHeapType Type { get; }
+    [Selector("maxAvailableSizeWithAlignment:")]
+    NSUInteger MaxAvailableSizeWithAlignment(NSUInteger alignment);
+    [Selector("newBufferWithLength:options:")]
+    MTLBuffer? NewBufferWithLengthOptions(NSUInteger length, MTLResourceOptions options);
+    [Selector("newTextureWithDescriptor:")]
+    MTLTexture? NewTextureWithDescriptor(MTLTextureDescriptor descriptor);
+    [Selector("setPurgeableState:")]
+    MTLPurgeableState SetPurgeableState(MTLPurgeableState state);
+    [Selector("newBufferWithLength:options:offset:")]
+    MTLBuffer? NewBufferWithLengthOptionsOffset(NSUInteger length, MTLResourceOptions options, NSUInteger offset);
+    [Selector("newTextureWithDescriptor:offset:")]
+    MTLTexture? NewTextureWithDescriptorOffset(MTLTextureDescriptor descriptor, NSUInteger offset);
+    [Selector("newAccelerationStructureWithSize:")]
+    MTLAccelerationStructure? NewAccelerationStructureWithSize(NSUInteger size);
+    [Selector("newAccelerationStructureWithDescriptor:")]
+    MTLAccelerationStructure? NewAccelerationStructureWithDescriptor(MTLAccelerationStructureDescriptor descriptor);
+    [Selector("newAccelerationStructureWithSize:offset:")]
+    MTLAccelerationStructure? NewAccelerationStructureWithSizeOffset(NSUInteger size, NSUInteger offset);
+    [Selector("newAccelerationStructureWithDescriptor:offset:")]
+    MTLAccelerationStructure? NewAccelerationStructureWithDescriptorOffset(MTLAccelerationStructureDescriptor descriptor, NSUInteger offset);
 }
 
 #endif

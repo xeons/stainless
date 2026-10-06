@@ -34,31 +34,52 @@ import Standard.ObjC;
 
 public extern objc class SKRange : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("lowerLimit", "setLowerLimit:")] public CGFloat LowerLimit { get; set; }
-    [Selector("upperLimit", "setUpperLimit:")] public CGFloat UpperLimit { get; set; }
-    [Selector("initWithLowerLimit:upperLimit:")] public Self InitWithLowerLimitUpperLimit(CGFloat lower, CGFloat upper);
-    [Selector("rangeWithLowerLimit:upperLimit:")] public static Self RangeWithLowerLimitUpperLimit(CGFloat lower, CGFloat upper);
-    [Selector("rangeWithLowerLimit:")] public static Self RangeWithLowerLimit(CGFloat lower);
-    [Selector("rangeWithUpperLimit:")] public static Self RangeWithUpperLimit(CGFloat upper);
-    [Selector("rangeWithConstantValue:")] public static Self RangeWithConstantValue(CGFloat value);
-    [Selector("rangeWithValue:variance:")] public static Self RangeWithValueVariance(CGFloat value, CGFloat variance);
-    [Selector("rangeWithNoLimits")] public static Self RangeWithNoLimits();
+    [Selector("lowerLimit", "setLowerLimit:")]
+    public CGFloat LowerLimit { get; set; }
+    [Selector("upperLimit", "setUpperLimit:")]
+    public CGFloat UpperLimit { get; set; }
+    [Selector("initWithLowerLimit:upperLimit:")]
+    public Self InitWithLowerLimitUpperLimit(CGFloat lower, CGFloat upper);
+    [Selector("rangeWithLowerLimit:upperLimit:")]
+    public static Self RangeWithLowerLimitUpperLimit(CGFloat lower, CGFloat upper);
+    [Selector("rangeWithLowerLimit:")]
+    public static Self RangeWithLowerLimit(CGFloat lower);
+    [Selector("rangeWithUpperLimit:")]
+    public static Self RangeWithUpperLimit(CGFloat upper);
+    [Selector("rangeWithConstantValue:")]
+    public static Self RangeWithConstantValue(CGFloat value);
+    [Selector("rangeWithValue:variance:")]
+    public static Self RangeWithValueVariance(CGFloat value, CGFloat variance);
+    [Selector("rangeWithNoLimits")]
+    public static Self RangeWithNoLimits();
 }
 
 public extern objc class SKConstraint : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("enabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("referenceNode", "setReferenceNode:")] public SKNode? ReferenceNode { get; set; }
-    [Selector("positionX:")] public static Self PositionX(SKRange range);
-    [Selector("positionY:")] public static Self PositionY(SKRange range);
-    [Selector("positionX:Y:")] public static Self PositionXY(SKRange xRange, SKRange yRange);
-    [Selector("distance:toNode:")] public static Self DistanceToNode(SKRange range, SKNode node);
-    [Selector("distance:toPoint:")] public static Self DistanceToPoint(SKRange range, CGPoint point);
-    [Selector("distance:toPoint:inNode:")] public static Self DistanceToPointInNode(SKRange range, CGPoint point, SKNode node);
-    [Selector("zRotation:")] public static Self ZRotation(SKRange zRange);
-    [Selector("orientToNode:offset:")] public static Self OrientToNodeOffset(SKNode node, SKRange radians);
-    [Selector("orientToPoint:offset:")] public static Self OrientToPointOffset(CGPoint point, SKRange radians);
-    [Selector("orientToPoint:inNode:offset:")] public static Self OrientToPointInNodeOffset(CGPoint point, SKNode node, SKRange radians);
+    [Selector("enabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("referenceNode", "setReferenceNode:")]
+    public SKNode? ReferenceNode { get; set; }
+    [Selector("positionX:")]
+    public static Self PositionX(SKRange range);
+    [Selector("positionY:")]
+    public static Self PositionY(SKRange range);
+    [Selector("positionX:Y:")]
+    public static Self PositionXY(SKRange xRange, SKRange yRange);
+    [Selector("distance:toNode:")]
+    public static Self DistanceToNode(SKRange range, SKNode node);
+    [Selector("distance:toPoint:")]
+    public static Self DistanceToPoint(SKRange range, CGPoint point);
+    [Selector("distance:toPoint:inNode:")]
+    public static Self DistanceToPointInNode(SKRange range, CGPoint point, SKNode node);
+    [Selector("zRotation:")]
+    public static Self ZRotation(SKRange zRange);
+    [Selector("orientToNode:offset:")]
+    public static Self OrientToNodeOffset(SKNode node, SKRange radians);
+    [Selector("orientToPoint:offset:")]
+    public static Self OrientToPointOffset(CGPoint point, SKRange radians);
+    [Selector("orientToPoint:inNode:offset:")]
+    public static Self OrientToPointInNodeOffset(CGPoint point, SKNode node, SKRange radians);
 }
 
 #endif

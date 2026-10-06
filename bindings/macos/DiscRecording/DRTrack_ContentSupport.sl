@@ -33,14 +33,17 @@ import Standard.ObjC;
 /// AudioContentCreation, a category of DRTrack.
 public extern objc class DRTrack
 {
-    [Selector("trackForAudioOfLength:producer:")] public static DRTrack? TrackForAudioOfLengthProducer(DRMSF? length, AnyObject? producer);
-    [Selector("trackForAudioFile:")] public static DRTrack? TrackForAudioFile(NSString? path);
+    [Selector("trackForAudioOfLength:producer:")]
+    public static DRTrack? TrackForAudioOfLengthProducer(DRMSF? length, AnyObject? producer);
+    [Selector("trackForAudioFile:")]
+    public static DRTrack? TrackForAudioFile(NSString? path);
 }
 
 /// DataContentCreation, a category of DRTrack.
 public extern objc class DRTrack
 {
-    [Selector("trackForRootFolder:")] public static DRTrack? TrackForRootFolder(DRFolder? rootFolder);
+    [Selector("trackForRootFolder:")]
+    public static DRTrack? TrackForRootFolder(DRFolder? rootFolder);
 }
 
 #endif

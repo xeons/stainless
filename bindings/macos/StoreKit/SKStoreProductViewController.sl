@@ -36,13 +36,17 @@ public objc closure void SKStoreProductViewControllerLoadProductWithParametersCo
 
 public extern objc class SKStoreProductViewController : NSViewController
 {
-    [Selector("delegate", "setDelegate:")] public SKStoreProductViewControllerDelegate? Delegate { get; set; }
-    [Selector("loadProductWithParameters:completionBlock:")] public void LoadProductWithParametersCompletionBlock(NSDictionary parameters, SKStoreProductViewControllerLoadProductWithParametersCompletionBlockBlock? block);
+    [Selector("delegate", "setDelegate:")]
+    public SKStoreProductViewControllerDelegate? Delegate { get; set; }
+    [Selector("loadProductWithParameters:completionBlock:")]
+    public void LoadProductWithParametersCompletionBlock(NSDictionary parameters, SKStoreProductViewControllerLoadProductWithParametersCompletionBlockBlock? block);
 }
 
 public objc interface SKStoreProductViewControllerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("productViewControllerDidFinish:")] void ProductViewControllerDidFinish(SKStoreProductViewController viewController);
+    [Optional]
+    [Selector("productViewControllerDidFinish:")]
+    void ProductViewControllerDidFinish(SKStoreProductViewController viewController);
 }
 
 public extern "C" NSString? SKStoreProductParameterITunesItemIdentifier;

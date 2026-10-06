@@ -42,28 +42,45 @@ public enum BluetoothKeyboardReturnType : int
 
 public extern objc class IOBluetoothPasskeyDisplay : NSView
 {
-    [Selector("usePasskeyNotificaitons", "setUsePasskeyNotificaitons:")] public bool UsePasskeyNotificaitons { get; set; }
-    [Selector("isIncomingRequest", "setIsIncomingRequest:")] public bool IsIncomingRequest { get; set; }
-    [Selector("passkey", "setPasskey:")] public NSString? Passkey { get; set; }
-    [Selector("returnImage", "setReturnImage:")] public NSImage? ReturnImage { get; set; }
-    [Selector("returnHighlightImage", "setReturnHighlightImage:")] public NSImage? ReturnHighlightImage { get; set; }
-    [Selector("centeredView", "setCenteredView:")] public NSView? CenteredView { get; set; }
-    [Selector("backgroundImageConstraint", "setBackgroundImageConstraint:")] public NSLayoutConstraint? BackgroundImageConstraint { get; set; }
-    [Selector("sharedDisplayView")] public static IOBluetoothPasskeyDisplay? SharedDisplayView();
-    [Selector("setPasskey:forDevice:usingSSP:")] public void SetPasskeyForDeviceUsingSSP(NSString? inString, IOBluetoothDevice? device, bool isSSP);
-    [Selector("advancePasskeyIndicator")] public void AdvancePasskeyIndicator();
-    [Selector("retreatPasskeyIndicator")] public void RetreatPasskeyIndicator();
-    [Selector("resetPasskeyIndicator")] public void ResetPasskeyIndicator();
+    [Selector("usePasskeyNotificaitons", "setUsePasskeyNotificaitons:")]
+    public bool UsePasskeyNotificaitons { get; set; }
+    [Selector("isIncomingRequest", "setIsIncomingRequest:")]
+    public bool IsIncomingRequest { get; set; }
+    [Selector("passkey", "setPasskey:")]
+    public NSString? Passkey { get; set; }
+    [Selector("returnImage", "setReturnImage:")]
+    public NSImage? ReturnImage { get; set; }
+    [Selector("returnHighlightImage", "setReturnHighlightImage:")]
+    public NSImage? ReturnHighlightImage { get; set; }
+    [Selector("centeredView", "setCenteredView:")]
+    public NSView? CenteredView { get; set; }
+    [Selector("backgroundImageConstraint", "setBackgroundImageConstraint:")]
+    public NSLayoutConstraint? BackgroundImageConstraint { get; set; }
+    [Selector("sharedDisplayView")]
+    public static IOBluetoothPasskeyDisplay? SharedDisplayView();
+    [Selector("setPasskey:forDevice:usingSSP:")]
+    public void SetPasskeyForDeviceUsingSSP(NSString? inString, IOBluetoothDevice? device, bool isSSP);
+    [Selector("advancePasskeyIndicator")]
+    public void AdvancePasskeyIndicator();
+    [Selector("retreatPasskeyIndicator")]
+    public void RetreatPasskeyIndicator();
+    [Selector("resetPasskeyIndicator")]
+    public void ResetPasskeyIndicator();
     /// Deprecated in macOS 10.8.
-    [Selector("setupUIForDevice:")] public void SetupUIForDevice(IOBluetoothDevice? device);
+    [Selector("setupUIForDevice:")]
+    public void SetupUIForDevice(IOBluetoothDevice? device);
     /// Deprecated in macOS 10.8.
-    [Selector("setupUIForSSPDevice:")] public void SetupUIForSSPDevice(IOBluetoothDevice? device);
+    [Selector("setupUIForSSPDevice:")]
+    public void SetupUIForSSPDevice(IOBluetoothDevice? device);
     /// Deprecated in macOS 10.8.
-    [Selector("setPasskeyString:")] public void SetPasskeyString(NSString? inString);
+    [Selector("setPasskeyString:")]
+    public void SetPasskeyString(NSString? inString);
     /// Deprecated in macOS 10.8.
-    [Selector("setPasskeyIndicatorEnabled:")] public void SetPasskeyIndicatorEnabled(bool inEnabled);
+    [Selector("setPasskeyIndicatorEnabled:")]
+    public void SetPasskeyIndicatorEnabled(bool inEnabled);
     /// Deprecated in macOS 10.8.
-    [Selector("resetAll")] public void ResetAll();
+    [Selector("resetAll")]
+    public void ResetAll();
 }
 
 public extern objc class IOBluetoothAccessibilityIgnoredTextFieldCell : NSTextFieldCell { }

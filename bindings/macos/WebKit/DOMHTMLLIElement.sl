@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLLIElement : DOMHTMLElement
 {
-    [Selector("type", "setType:")] public NSString? Type { get; set; }
-    [Selector("value", "setValue:")] public int Value { get; set; }
+    [Selector("type", "setType:")]
+    public NSString? Type { get; set; }
+    [Selector("value", "setValue:")]
+    public int Value { get; set; }
 }
 
 #endif

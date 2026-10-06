@@ -47,24 +47,42 @@ public enum HKStatisticsOptions : ulong
 
 public extern objc class HKStatistics : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("quantityType")] public HKQuantityType QuantityType { get; }
-    [Selector("startDate")] public NSDate StartDate { get; }
-    [Selector("endDate")] public NSDate EndDate { get; }
-    [Selector("sources")] public NSArray? Sources { get; }
-    [Selector("averageQuantityForSource:")] public HKQuantity? AverageQuantityForSource(HKSource source);
-    [Selector("averageQuantity")] public HKQuantity? AverageQuantity();
-    [Selector("minimumQuantityForSource:")] public HKQuantity? MinimumQuantityForSource(HKSource source);
-    [Selector("minimumQuantity")] public HKQuantity? MinimumQuantity();
-    [Selector("maximumQuantityForSource:")] public HKQuantity? MaximumQuantityForSource(HKSource source);
-    [Selector("maximumQuantity")] public HKQuantity? MaximumQuantity();
-    [Selector("mostRecentQuantityForSource:")] public HKQuantity? MostRecentQuantityForSource(HKSource source);
-    [Selector("mostRecentQuantity")] public HKQuantity? MostRecentQuantity();
-    [Selector("mostRecentQuantityDateIntervalForSource:")] public NSDateInterval? MostRecentQuantityDateIntervalForSource(HKSource source);
-    [Selector("mostRecentQuantityDateInterval")] public NSDateInterval? MostRecentQuantityDateInterval();
-    [Selector("sumQuantityForSource:")] public HKQuantity? SumQuantityForSource(HKSource source);
-    [Selector("sumQuantity")] public HKQuantity? SumQuantity();
-    [Selector("duration")] public HKQuantity? Duration();
-    [Selector("durationForSource:")] public HKQuantity? DurationForSource(HKSource source);
+    [Selector("quantityType")]
+    public HKQuantityType QuantityType { get; }
+    [Selector("startDate")]
+    public NSDate StartDate { get; }
+    [Selector("endDate")]
+    public NSDate EndDate { get; }
+    [Selector("sources")]
+    public NSArray? Sources { get; }
+    [Selector("averageQuantityForSource:")]
+    public HKQuantity? AverageQuantityForSource(HKSource source);
+    [Selector("averageQuantity")]
+    public HKQuantity? AverageQuantity();
+    [Selector("minimumQuantityForSource:")]
+    public HKQuantity? MinimumQuantityForSource(HKSource source);
+    [Selector("minimumQuantity")]
+    public HKQuantity? MinimumQuantity();
+    [Selector("maximumQuantityForSource:")]
+    public HKQuantity? MaximumQuantityForSource(HKSource source);
+    [Selector("maximumQuantity")]
+    public HKQuantity? MaximumQuantity();
+    [Selector("mostRecentQuantityForSource:")]
+    public HKQuantity? MostRecentQuantityForSource(HKSource source);
+    [Selector("mostRecentQuantity")]
+    public HKQuantity? MostRecentQuantity();
+    [Selector("mostRecentQuantityDateIntervalForSource:")]
+    public NSDateInterval? MostRecentQuantityDateIntervalForSource(HKSource source);
+    [Selector("mostRecentQuantityDateInterval")]
+    public NSDateInterval? MostRecentQuantityDateInterval();
+    [Selector("sumQuantityForSource:")]
+    public HKQuantity? SumQuantityForSource(HKSource source);
+    [Selector("sumQuantity")]
+    public HKQuantity? SumQuantity();
+    [Selector("duration")]
+    public HKQuantity? Duration();
+    [Selector("durationForSource:")]
+    public HKQuantity? DurationForSource(HKSource source);
 }
 
 #endif

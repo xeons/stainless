@@ -33,89 +33,107 @@ import Standard.ObjC;
 /// SCNModelIO, a category of SCNScene.
 public extern objc class SCNScene
 {
-    [Selector("sceneWithMDLAsset:")] public static Self SceneWithMDLAsset(MDLAsset mdlAsset);
+    [Selector("sceneWithMDLAsset:")]
+    public static Self SceneWithMDLAsset(MDLAsset mdlAsset);
 }
 
 /// SCNModelIO, a category of MDLAsset.
 public extern objc class MDLAsset
 {
-    [Selector("assetWithSCNScene:")] public static Self AssetWithSCNScene(SCNScene scnScene);
-    [Selector("assetWithSCNScene:bufferAllocator:")] public static Self AssetWithSCNSceneBufferAllocator(SCNScene scnScene, MDLMeshBufferAllocator? bufferAllocator);
+    [Selector("assetWithSCNScene:")]
+    public static Self AssetWithSCNScene(SCNScene scnScene);
+    [Selector("assetWithSCNScene:bufferAllocator:")]
+    public static Self AssetWithSCNSceneBufferAllocator(SCNScene scnScene, MDLMeshBufferAllocator? bufferAllocator);
 }
 
 /// SCNModelIO, a category of SCNNode.
 public extern objc class SCNNode
 {
-    [Selector("nodeWithMDLObject:")] public static Self NodeWithMDLObject(MDLObject mdlObject);
+    [Selector("nodeWithMDLObject:")]
+    public static Self NodeWithMDLObject(MDLObject mdlObject);
 }
 
 /// SCNModelIO, a category of MDLObject.
 public extern objc class MDLObject
 {
-    [Selector("objectWithSCNNode:")] public static Self ObjectWithSCNNode(SCNNode scnNode);
-    [Selector("objectWithSCNNode:bufferAllocator:")] public static Self ObjectWithSCNNodeBufferAllocator(SCNNode scnNode, MDLMeshBufferAllocator? bufferAllocator);
+    [Selector("objectWithSCNNode:")]
+    public static Self ObjectWithSCNNode(SCNNode scnNode);
+    [Selector("objectWithSCNNode:bufferAllocator:")]
+    public static Self ObjectWithSCNNodeBufferAllocator(SCNNode scnNode, MDLMeshBufferAllocator? bufferAllocator);
 }
 
 /// SCNModelIO, a category of SCNGeometry.
 public extern objc class SCNGeometry
 {
-    [Selector("geometryWithMDLMesh:")] public static Self GeometryWithMDLMesh(MDLMesh mdlMesh);
+    [Selector("geometryWithMDLMesh:")]
+    public static Self GeometryWithMDLMesh(MDLMesh mdlMesh);
 }
 
 /// SCNModelIO, a category of MDLMesh.
 public extern objc class MDLMesh
 {
-    [Selector("meshWithSCNGeometry:")] public static Self MeshWithSCNGeometry(SCNGeometry scnGeometry);
-    [Selector("meshWithSCNGeometry:bufferAllocator:")] public static Self MeshWithSCNGeometryBufferAllocator(SCNGeometry scnGeometry, MDLMeshBufferAllocator? bufferAllocator);
+    [Selector("meshWithSCNGeometry:")]
+    public static Self MeshWithSCNGeometry(SCNGeometry scnGeometry);
+    [Selector("meshWithSCNGeometry:bufferAllocator:")]
+    public static Self MeshWithSCNGeometryBufferAllocator(SCNGeometry scnGeometry, MDLMeshBufferAllocator? bufferAllocator);
 }
 
 /// SCNModelIO, a category of SCNGeometryElement.
 public extern objc class SCNGeometryElement
 {
-    [Selector("geometryElementWithMDLSubmesh:")] public static Self GeometryElementWithMDLSubmesh(MDLSubmesh mdlSubMesh);
+    [Selector("geometryElementWithMDLSubmesh:")]
+    public static Self GeometryElementWithMDLSubmesh(MDLSubmesh mdlSubMesh);
 }
 
 /// SCNModelIO, a category of MDLSubmesh.
 public extern objc class MDLSubmesh
 {
-    [Selector("submeshWithSCNGeometryElement:")] public static Self SubmeshWithSCNGeometryElement(SCNGeometryElement scnGeometryElement);
-    [Selector("submeshWithSCNGeometryElement:bufferAllocator:")] public static Self SubmeshWithSCNGeometryElementBufferAllocator(SCNGeometryElement scnGeometryElement, MDLMeshBufferAllocator? bufferAllocator);
+    [Selector("submeshWithSCNGeometryElement:")]
+    public static Self SubmeshWithSCNGeometryElement(SCNGeometryElement scnGeometryElement);
+    [Selector("submeshWithSCNGeometryElement:bufferAllocator:")]
+    public static Self SubmeshWithSCNGeometryElementBufferAllocator(SCNGeometryElement scnGeometryElement, MDLMeshBufferAllocator? bufferAllocator);
 }
 
 /// SCNModelIO, a category of SCNMaterial.
 public extern objc class SCNMaterial
 {
-    [Selector("materialWithMDLMaterial:")] public static Self MaterialWithMDLMaterial(MDLMaterial mdlMaterial);
+    [Selector("materialWithMDLMaterial:")]
+    public static Self MaterialWithMDLMaterial(MDLMaterial mdlMaterial);
 }
 
 /// SCNModelIO, a category of MDLMaterial.
 public extern objc class MDLMaterial
 {
-    [Selector("materialWithSCNMaterial:")] public static Self MaterialWithSCNMaterial(SCNMaterial scnMaterial);
+    [Selector("materialWithSCNMaterial:")]
+    public static Self MaterialWithSCNMaterial(SCNMaterial scnMaterial);
 }
 
 /// SCNModelIO, a category of SCNLight.
 public extern objc class SCNLight
 {
-    [Selector("lightWithMDLLight:")] public static Self LightWithMDLLight(MDLLight mdlLight);
+    [Selector("lightWithMDLLight:")]
+    public static Self LightWithMDLLight(MDLLight mdlLight);
 }
 
 /// SCNModelIO, a category of MDLLight.
 public extern objc class MDLLight
 {
-    [Selector("lightWithSCNLight:")] public static Self LightWithSCNLight(SCNLight scnLight);
+    [Selector("lightWithSCNLight:")]
+    public static Self LightWithSCNLight(SCNLight scnLight);
 }
 
 /// SCNModelIO, a category of SCNCamera.
 public extern objc class SCNCamera
 {
-    [Selector("cameraWithMDLCamera:")] public static Self CameraWithMDLCamera(MDLCamera mdlCamera);
+    [Selector("cameraWithMDLCamera:")]
+    public static Self CameraWithMDLCamera(MDLCamera mdlCamera);
 }
 
 /// SCNModelIO, a category of MDLCamera.
 public extern objc class MDLCamera
 {
-    [Selector("cameraWithSCNCamera:")] public static Self CameraWithSCNCamera(SCNCamera scnCamera);
+    [Selector("cameraWithSCNCamera:")]
+    public static Self CameraWithSCNCamera(SCNCamera scnCamera);
 }
 
 #endif

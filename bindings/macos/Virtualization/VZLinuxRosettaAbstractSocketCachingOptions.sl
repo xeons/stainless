@@ -34,9 +34,12 @@ import Standard.ObjC;
 #if ARM64
 public extern objc class VZLinuxRosettaAbstractSocketCachingOptions : VZLinuxRosettaCachingOptions
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("maximumNameLength")] public static NSUInteger MaximumNameLength { get; }
-    [Selector("initWithName:error:")] public Self? InitWithNameError(NSString name, out NSError? error);
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("maximumNameLength")]
+    public static NSUInteger MaximumNameLength { get; }
+    [Selector("initWithName:error:")]
+    public Self? InitWithNameError(NSString name, out NSError? error);
 }
 #endif
 

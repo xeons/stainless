@@ -48,10 +48,14 @@ public enum HKGAD7AssessmentAnswer : long
 
 public extern objc class HKGAD7Assessment : HKScoredAssessment
 {
-    [Selector("answers")] public NSArray? Answers { get; }
-    [Selector("risk")] public HKGAD7AssessmentRisk Risk { get; }
-    [Selector("assessmentWithDate:answers:")] public static Self AssessmentWithDateAnswers(NSDate date, NSArray answers);
-    [Selector("assessmentWithDate:answers:metadata:")] public static Self AssessmentWithDateAnswersMetadata(NSDate date, NSArray answers, NSDictionary? metadata);
+    [Selector("answers")]
+    public NSArray? Answers { get; }
+    [Selector("risk")]
+    public HKGAD7AssessmentRisk Risk { get; }
+    [Selector("assessmentWithDate:answers:")]
+    public static Self AssessmentWithDateAnswers(NSDate date, NSArray answers);
+    [Selector("assessmentWithDate:answers:metadata:")]
+    public static Self AssessmentWithDateAnswersMetadata(NSDate date, NSArray answers, NSDictionary? metadata);
 }
 
 #endif

@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioConsolePortConfigurationArray : NSObject, NSCopying
 {
-    [Selector("maximumPortCount", "setMaximumPortCount:")] public uint MaximumPortCount { get; set; }
-    [Selector("objectAtIndexedSubscript:")] public VZVirtioConsolePortConfiguration? ObjectAtIndexedSubscript(NSUInteger portIndex);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(VZVirtioConsolePortConfiguration? configuration, NSUInteger portIndex);
+    [Selector("maximumPortCount", "setMaximumPortCount:")]
+    public uint MaximumPortCount { get; set; }
+    [Selector("objectAtIndexedSubscript:")]
+    public VZVirtioConsolePortConfiguration? ObjectAtIndexedSubscript(NSUInteger portIndex);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(VZVirtioConsolePortConfiguration? configuration, NSUInteger portIndex);
 }
 
 #endif

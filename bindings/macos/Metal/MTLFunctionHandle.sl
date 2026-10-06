@@ -33,11 +33,15 @@ import Standard.ObjC;
 
 public objc interface MTLFunctionHandle : NSObjectProtocol
 {
-    [Selector("functionType")] MTLFunctionType FunctionType { get; }
-    [Selector("name")] NSString Name { get; }
-    [Selector("device")] MTLDevice Device { get; }
+    [Selector("functionType")]
+    MTLFunctionType FunctionType { get; }
+    [Selector("name")]
+    NSString Name { get; }
+    [Selector("device")]
+    MTLDevice Device { get; }
     /// macOS 26.0 and later.
-    [Selector("gpuResourceID")] MTLResourceID GpuResourceID { get; }
+    [Selector("gpuResourceID")]
+    MTLResourceID GpuResourceID { get; }
 }
 
 #endif

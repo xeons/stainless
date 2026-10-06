@@ -54,34 +54,46 @@ public enum MTLIOError : long
 
 public objc interface MTLIOCommandQueue : NSObjectProtocol
 {
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("enqueueBarrier")] void EnqueueBarrier();
-    [Selector("commandBuffer")] MTLIOCommandBuffer CommandBuffer();
-    [Selector("commandBufferWithUnretainedReferences")] MTLIOCommandBuffer CommandBufferWithUnretainedReferences();
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("enqueueBarrier")]
+    void EnqueueBarrier();
+    [Selector("commandBuffer")]
+    MTLIOCommandBuffer CommandBuffer();
+    [Selector("commandBufferWithUnretainedReferences")]
+    MTLIOCommandBuffer CommandBufferWithUnretainedReferences();
 }
 
 public objc interface MTLIOScratchBuffer : NSObjectProtocol
 {
-    [Selector("buffer")] MTLBuffer Buffer { get; }
+    [Selector("buffer")]
+    MTLBuffer Buffer { get; }
 }
 
 public objc interface MTLIOScratchBufferAllocator : NSObjectProtocol
 {
-    [Selector("newScratchBufferWithMinimumSize:")] MTLIOScratchBuffer? NewScratchBufferWithMinimumSize(NSUInteger minimumSize);
+    [Selector("newScratchBufferWithMinimumSize:")]
+    MTLIOScratchBuffer? NewScratchBufferWithMinimumSize(NSUInteger minimumSize);
 }
 
 public extern objc class MTLIOCommandQueueDescriptor : NSObject, NSCopying
 {
-    [Selector("maxCommandBufferCount", "setMaxCommandBufferCount:")] public NSUInteger MaxCommandBufferCount { get; set; }
-    [Selector("priority", "setPriority:")] public MTLIOPriority Priority { get; set; }
-    [Selector("type", "setType:")] public MTLIOCommandQueueType Type { get; set; }
-    [Selector("maxCommandsInFlight", "setMaxCommandsInFlight:")] public NSUInteger MaxCommandsInFlight { get; set; }
-    [Selector("scratchBufferAllocator", "setScratchBufferAllocator:")] public MTLIOScratchBufferAllocator? ScratchBufferAllocator { get; set; }
+    [Selector("maxCommandBufferCount", "setMaxCommandBufferCount:")]
+    public NSUInteger MaxCommandBufferCount { get; set; }
+    [Selector("priority", "setPriority:")]
+    public MTLIOPriority Priority { get; set; }
+    [Selector("type", "setType:")]
+    public MTLIOCommandQueueType Type { get; set; }
+    [Selector("maxCommandsInFlight", "setMaxCommandsInFlight:")]
+    public NSUInteger MaxCommandsInFlight { get; set; }
+    [Selector("scratchBufferAllocator", "setScratchBufferAllocator:")]
+    public MTLIOScratchBufferAllocator? ScratchBufferAllocator { get; set; }
 }
 
 public objc interface MTLIOFileHandle : NSObjectProtocol
 {
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
 }
 
 #endif

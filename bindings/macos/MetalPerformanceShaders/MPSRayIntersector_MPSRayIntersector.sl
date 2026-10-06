@@ -103,34 +103,56 @@ public enum MPSRayMaskOperator : ulong
 /// Deprecated in macOS 14.0.
 public extern objc class MPSRayIntersector : MPSKernel, NSSecureCoding, NSCopying
 {
-    [Selector("cullMode", "setCullMode:")] public MTLCullMode CullMode { get; set; }
-    [Selector("frontFacingWinding", "setFrontFacingWinding:")] public MTLWinding FrontFacingWinding { get; set; }
-    [Selector("triangleIntersectionTestType", "setTriangleIntersectionTestType:")] public MPSTriangleIntersectionTestType TriangleIntersectionTestType { get; set; }
-    [Selector("boundingBoxIntersectionTestType", "setBoundingBoxIntersectionTestType:")] public MPSBoundingBoxIntersectionTestType BoundingBoxIntersectionTestType { get; set; }
-    [Selector("rayMaskOptions", "setRayMaskOptions:")] public MPSRayMaskOptions RayMaskOptions { get; set; }
+    [Selector("cullMode", "setCullMode:")]
+    public MTLCullMode CullMode { get; set; }
+    [Selector("frontFacingWinding", "setFrontFacingWinding:")]
+    public MTLWinding FrontFacingWinding { get; set; }
+    [Selector("triangleIntersectionTestType", "setTriangleIntersectionTestType:")]
+    public MPSTriangleIntersectionTestType TriangleIntersectionTestType { get; set; }
+    [Selector("boundingBoxIntersectionTestType", "setBoundingBoxIntersectionTestType:")]
+    public MPSBoundingBoxIntersectionTestType BoundingBoxIntersectionTestType { get; set; }
+    [Selector("rayMaskOptions", "setRayMaskOptions:")]
+    public MPSRayMaskOptions RayMaskOptions { get; set; }
     /// Deprecated in macOS 14.0.
-    [Selector("rayMaskOperator", "setRayMaskOperator:")] public MPSRayMaskOperator RayMaskOperator { get; set; }
-    [Selector("rayStride", "setRayStride:")] public NSUInteger RayStride { get; set; }
-    [Selector("intersectionStride", "setIntersectionStride:")] public NSUInteger IntersectionStride { get; set; }
-    [Selector("rayDataType", "setRayDataType:")] public MPSRayDataType RayDataType { get; set; }
-    [Selector("intersectionDataType", "setIntersectionDataType:")] public MPSIntersectionDataType IntersectionDataType { get; set; }
+    [Selector("rayMaskOperator", "setRayMaskOperator:")]
+    public MPSRayMaskOperator RayMaskOperator { get; set; }
+    [Selector("rayStride", "setRayStride:")]
+    public NSUInteger RayStride { get; set; }
+    [Selector("intersectionStride", "setIntersectionStride:")]
+    public NSUInteger IntersectionStride { get; set; }
+    [Selector("rayDataType", "setRayDataType:")]
+    public MPSRayDataType RayDataType { get; set; }
+    [Selector("intersectionDataType", "setIntersectionDataType:")]
+    public MPSIntersectionDataType IntersectionDataType { get; set; }
     /// Deprecated in macOS 14.0.
-    [Selector("rayIndexDataType", "setRayIndexDataType:")] public MPSDataType RayIndexDataType { get; set; }
+    [Selector("rayIndexDataType", "setRayIndexDataType:")]
+    public MPSDataType RayIndexDataType { get; set; }
     /// Deprecated in macOS 14.0.
-    [Selector("rayMask", "setRayMask:")] public uint RayMask { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
-    [Selector("recommendedMinimumRayBatchSizeForRayCount:")] public NSUInteger RecommendedMinimumRayBatchSizeForRayCount(NSUInteger rayCount);
-    [Selector("encodeWithCoder:")] public void EncodeWithCoder(NSCoder coder);
-    [Selector("encodeIntersectionToCommandBuffer:intersectionType:rayBuffer:rayBufferOffset:intersectionBuffer:intersectionBufferOffset:rayCount:accelerationStructure:")] public void EncodeIntersectionToCommandBufferIntersectionTypeRayBufferRayBufferOffsetIntersectionBufferIntersectionBufferOffsetRayCountAccelerationStructure(MTLCommandBuffer commandBuffer, MPSIntersectionType intersectionType, MTLBuffer rayBuffer, NSUInteger rayBufferOffset, MTLBuffer intersectionBuffer, NSUInteger intersectionBufferOffset, NSUInteger rayCount, MPSAccelerationStructure accelerationStructure);
-    [Selector("encodeIntersectionToCommandBuffer:intersectionType:rayBuffer:rayBufferOffset:intersectionBuffer:intersectionBufferOffset:rayCountBuffer:rayCountBufferOffset:accelerationStructure:")] public void EncodeIntersectionToCommandBufferIntersectionTypeRayBufferRayBufferOffsetIntersectionBufferIntersectionBufferOffsetRayCountBufferRayCountBufferOffsetAccelerationStructure(MTLCommandBuffer commandBuffer, MPSIntersectionType intersectionType, MTLBuffer rayBuffer, NSUInteger rayBufferOffset, MTLBuffer intersectionBuffer, NSUInteger intersectionBufferOffset, MTLBuffer rayCountBuffer, NSUInteger rayCountBufferOffset, MPSAccelerationStructure accelerationStructure);
+    [Selector("rayMask", "setRayMask:")]
+    public uint RayMask { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("recommendedMinimumRayBatchSizeForRayCount:")]
+    public NSUInteger RecommendedMinimumRayBatchSizeForRayCount(NSUInteger rayCount);
+    [Selector("encodeWithCoder:")]
+    public void EncodeWithCoder(NSCoder coder);
+    [Selector("encodeIntersectionToCommandBuffer:intersectionType:rayBuffer:rayBufferOffset:intersectionBuffer:intersectionBufferOffset:rayCount:accelerationStructure:")]
+    public void EncodeIntersectionToCommandBufferIntersectionTypeRayBufferRayBufferOffsetIntersectionBufferIntersectionBufferOffsetRayCountAccelerationStructure(MTLCommandBuffer commandBuffer, MPSIntersectionType intersectionType, MTLBuffer rayBuffer, NSUInteger rayBufferOffset, MTLBuffer intersectionBuffer, NSUInteger intersectionBufferOffset, NSUInteger rayCount, MPSAccelerationStructure accelerationStructure);
+    [Selector("encodeIntersectionToCommandBuffer:intersectionType:rayBuffer:rayBufferOffset:intersectionBuffer:intersectionBufferOffset:rayCountBuffer:rayCountBufferOffset:accelerationStructure:")]
+    public void EncodeIntersectionToCommandBufferIntersectionTypeRayBufferRayBufferOffsetIntersectionBufferIntersectionBufferOffsetRayCountBufferRayCountBufferOffsetAccelerationStructure(MTLCommandBuffer commandBuffer, MPSIntersectionType intersectionType, MTLBuffer rayBuffer, NSUInteger rayBufferOffset, MTLBuffer intersectionBuffer, NSUInteger intersectionBufferOffset, MTLBuffer rayCountBuffer, NSUInteger rayCountBufferOffset, MPSAccelerationStructure accelerationStructure);
     /// Deprecated in macOS 14.0.
-    [Selector("encodeIntersectionToCommandBuffer:intersectionType:rayBuffer:rayBufferOffset:rayIndexBuffer:rayIndexBufferOffset:intersectionBuffer:intersectionBufferOffset:rayIndexCount:accelerationStructure:")] public void EncodeIntersectionToCommandBufferIntersectionTypeRayBufferRayBufferOffsetRayIndexBufferRayIndexBufferOffsetIntersectionBufferIntersectionBufferOffsetRayIndexCountAccelerationStructure(MTLCommandBuffer commandBuffer, MPSIntersectionType intersectionType, MTLBuffer rayBuffer, NSUInteger rayBufferOffset, MTLBuffer rayIndexBuffer, NSUInteger rayIndexBufferOffset, MTLBuffer intersectionBuffer, NSUInteger intersectionBufferOffset, NSUInteger rayIndexCount, MPSAccelerationStructure accelerationStructure);
+    [Selector("encodeIntersectionToCommandBuffer:intersectionType:rayBuffer:rayBufferOffset:rayIndexBuffer:rayIndexBufferOffset:intersectionBuffer:intersectionBufferOffset:rayIndexCount:accelerationStructure:")]
+    public void EncodeIntersectionToCommandBufferIntersectionTypeRayBufferRayBufferOffsetRayIndexBufferRayIndexBufferOffsetIntersectionBufferIntersectionBufferOffsetRayIndexCountAccelerationStructure(MTLCommandBuffer commandBuffer, MPSIntersectionType intersectionType, MTLBuffer rayBuffer, NSUInteger rayBufferOffset, MTLBuffer rayIndexBuffer, NSUInteger rayIndexBufferOffset, MTLBuffer intersectionBuffer, NSUInteger intersectionBufferOffset, NSUInteger rayIndexCount, MPSAccelerationStructure accelerationStructure);
     /// Deprecated in macOS 14.0.
-    [Selector("encodeIntersectionToCommandBuffer:intersectionType:rayBuffer:rayBufferOffset:rayIndexBuffer:rayIndexBufferOffset:intersectionBuffer:intersectionBufferOffset:rayIndexCountBuffer:rayIndexCountBufferOffset:accelerationStructure:")] public void EncodeIntersectionToCommandBufferIntersectionTypeRayBufferRayBufferOffsetRayIndexBufferRayIndexBufferOffsetIntersectionBufferIntersectionBufferOffsetRayIndexCountBufferRayIndexCountBufferOffsetAccelerationStructure(MTLCommandBuffer commandBuffer, MPSIntersectionType intersectionType, MTLBuffer rayBuffer, NSUInteger rayBufferOffset, MTLBuffer rayIndexBuffer, NSUInteger rayIndexBufferOffset, MTLBuffer intersectionBuffer, NSUInteger intersectionBufferOffset, MTLBuffer rayIndexCountBuffer, NSUInteger rayIndexCountBufferOffset, MPSAccelerationStructure accelerationStructure);
+    [Selector("encodeIntersectionToCommandBuffer:intersectionType:rayBuffer:rayBufferOffset:rayIndexBuffer:rayIndexBufferOffset:intersectionBuffer:intersectionBufferOffset:rayIndexCountBuffer:rayIndexCountBufferOffset:accelerationStructure:")]
+    public void EncodeIntersectionToCommandBufferIntersectionTypeRayBufferRayBufferOffsetRayIndexBufferRayIndexBufferOffsetIntersectionBufferIntersectionBufferOffsetRayIndexCountBufferRayIndexCountBufferOffsetAccelerationStructure(MTLCommandBuffer commandBuffer, MPSIntersectionType intersectionType, MTLBuffer rayBuffer, NSUInteger rayBufferOffset, MTLBuffer rayIndexBuffer, NSUInteger rayIndexBufferOffset, MTLBuffer intersectionBuffer, NSUInteger intersectionBufferOffset, MTLBuffer rayIndexCountBuffer, NSUInteger rayIndexCountBufferOffset, MPSAccelerationStructure accelerationStructure);
     /// Deprecated in macOS 14.0.
-    [Selector("encodeIntersectionToCommandBuffer:intersectionType:rayTexture:intersectionTexture:accelerationStructure:")] public void EncodeIntersectionToCommandBufferIntersectionTypeRayTextureIntersectionTextureAccelerationStructure(MTLCommandBuffer commandBuffer, MPSIntersectionType intersectionType, MTLTexture rayTexture, MTLTexture intersectionTexture, MPSAccelerationStructure accelerationStructure);
+    [Selector("encodeIntersectionToCommandBuffer:intersectionType:rayTexture:intersectionTexture:accelerationStructure:")]
+    public void EncodeIntersectionToCommandBufferIntersectionTypeRayTextureIntersectionTextureAccelerationStructure(MTLCommandBuffer commandBuffer, MPSIntersectionType intersectionType, MTLTexture rayTexture, MTLTexture intersectionTexture, MPSAccelerationStructure accelerationStructure);
 }
 
 #endif

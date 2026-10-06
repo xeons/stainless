@@ -35,9 +35,14 @@ public objc interface SNResult : NSObjectProtocol { }
 
 public objc interface SNResultsObserving : NSObjectProtocol
 {
-    [Selector("request:didProduceResult:")] void RequestDidProduceResult(SNRequest request, SNResult result);
-    [Optional] [Selector("request:didFailWithError:")] void RequestDidFailWithError(SNRequest request, NSError error);
-    [Optional] [Selector("requestDidComplete:")] void RequestDidComplete(SNRequest request);
+    [Selector("request:didProduceResult:")]
+    void RequestDidProduceResult(SNRequest request, SNResult result);
+    [Optional]
+    [Selector("request:didFailWithError:")]
+    void RequestDidFailWithError(SNRequest request, NSError error);
+    [Optional]
+    [Selector("requestDidComplete:")]
+    void RequestDidComplete(SNRequest request);
 }
 
 #endif

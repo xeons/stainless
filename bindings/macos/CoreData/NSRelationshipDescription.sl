@@ -41,14 +41,22 @@ public enum NSDeleteRule : ulong
 
 public extern objc class NSRelationshipDescription : NSPropertyDescription
 {
-    [Selector("destinationEntity", "setDestinationEntity:")] public NSEntityDescription? DestinationEntity { get; set; }
-    [Selector("inverseRelationship", "setInverseRelationship:")] public NSRelationshipDescription? InverseRelationship { get; set; }
-    [Selector("maxCount", "setMaxCount:")] public NSUInteger MaxCount { get; set; }
-    [Selector("minCount", "setMinCount:")] public NSUInteger MinCount { get; set; }
-    [Selector("deleteRule", "setDeleteRule:")] public NSDeleteRule DeleteRule { get; set; }
-    [Selector("isToMany")] public bool ToMany { get; }
-    [Selector("versionHash")] public NSData VersionHash { get; }
-    [Selector("isOrdered", "setOrdered:")] public bool Ordered { get; set; }
+    [Selector("destinationEntity", "setDestinationEntity:")]
+    public NSEntityDescription? DestinationEntity { get; set; }
+    [Selector("inverseRelationship", "setInverseRelationship:")]
+    public NSRelationshipDescription? InverseRelationship { get; set; }
+    [Selector("maxCount", "setMaxCount:")]
+    public NSUInteger MaxCount { get; set; }
+    [Selector("minCount", "setMinCount:")]
+    public NSUInteger MinCount { get; set; }
+    [Selector("deleteRule", "setDeleteRule:")]
+    public NSDeleteRule DeleteRule { get; set; }
+    [Selector("isToMany")]
+    public bool ToMany { get; }
+    [Selector("versionHash")]
+    public NSData VersionHash { get; }
+    [Selector("isOrdered", "setOrdered:")]
+    public bool Ordered { get; set; }
 }
 
 #endif

@@ -33,20 +33,28 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMCSSStyleSheet : DOMStyleSheet
 {
-    [Selector("ownerRule")] public DOMCSSRule? OwnerRule { get; }
-    [Selector("cssRules")] public DOMCSSRuleList? CssRules { get; }
-    [Selector("rules")] public DOMCSSRuleList? Rules { get; }
-    [Selector("insertRule:index:")] public uint InsertRuleIndex(NSString? rule, uint index);
-    [Selector("deleteRule:")] public void DeleteRule(uint index);
-    [Selector("addRule:style:index:")] public int AddRuleStyleIndex(NSString? selector, NSString? style, uint index);
-    [Selector("removeRule:")] public void RemoveRule(uint index);
+    [Selector("ownerRule")]
+    public DOMCSSRule? OwnerRule { get; }
+    [Selector("cssRules")]
+    public DOMCSSRuleList? CssRules { get; }
+    [Selector("rules")]
+    public DOMCSSRuleList? Rules { get; }
+    [Selector("insertRule:index:")]
+    public uint InsertRuleIndex(NSString? rule, uint index);
+    [Selector("deleteRule:")]
+    public void DeleteRule(uint index);
+    [Selector("addRule:style:index:")]
+    public int AddRuleStyleIndex(NSString? selector, NSString? style, uint index);
+    [Selector("removeRule:")]
+    public void RemoveRule(uint index);
 }
 
 /// DOMCSSStyleSheetDeprecated, a category of DOMCSSStyleSheet.
 public extern objc class DOMCSSStyleSheet
 {
     /// Deprecated in macOS 10.5.
-    [Selector("insertRule::")] public uint InsertRule(NSString? rule, uint index);
+    [Selector("insertRule::")]
+    public uint InsertRule(NSString? rule, uint index);
 }
 
 #endif

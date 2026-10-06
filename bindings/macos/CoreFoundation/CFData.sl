@@ -40,15 +40,20 @@ public extern objc class CFMutableDataRef : CFDataRef { }
 
 public extern "C" CFTypeID CFDataGetTypeID();
 
-[ReturnsRetained] public extern "C" CFDataRef? CFDataCreate(CFAllocatorRef? allocator, UInt8* bytes, CFIndex length);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFDataCreate(CFAllocatorRef? allocator, UInt8* bytes, CFIndex length);
 
-[ReturnsRetained] public extern "C" CFDataRef? CFDataCreateWithBytesNoCopy(CFAllocatorRef? allocator, UInt8* bytes, CFIndex length, CFAllocatorRef? bytesDeallocator);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFDataCreateWithBytesNoCopy(CFAllocatorRef? allocator, UInt8* bytes, CFIndex length, CFAllocatorRef? bytesDeallocator);
 
-[ReturnsRetained] public extern "C" CFDataRef? CFDataCreateCopy(CFAllocatorRef? allocator, CFDataRef? theData);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFDataCreateCopy(CFAllocatorRef? allocator, CFDataRef? theData);
 
-[ReturnsRetained] public extern "C" CFMutableDataRef? CFDataCreateMutable(CFAllocatorRef? allocator, CFIndex capacity);
+[ReturnsRetained]
+public extern "C" CFMutableDataRef? CFDataCreateMutable(CFAllocatorRef? allocator, CFIndex capacity);
 
-[ReturnsRetained] public extern "C" CFMutableDataRef? CFDataCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFDataRef? theData);
+[ReturnsRetained]
+public extern "C" CFMutableDataRef? CFDataCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFDataRef? theData);
 
 public extern "C" CFIndex CFDataGetLength(CFDataRef? theData);
 

@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class CNSocialProfile : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("urlString")] public NSString UrlString { get; }
-    [Selector("username")] public NSString Username { get; }
-    [Selector("userIdentifier")] public NSString UserIdentifier { get; }
-    [Selector("service")] public NSString Service { get; }
-    [Selector("initWithUrlString:username:userIdentifier:service:")] public Self InitWithUrlStringUsernameUserIdentifierService(NSString? urlString, NSString? username, NSString? userIdentifier, NSString? service);
-    [Selector("localizedStringForKey:")] public static NSString LocalizedStringForKey(NSString key);
-    [Selector("localizedStringForService:")] public static NSString LocalizedStringForService(NSString service);
+    [Selector("urlString")]
+    public NSString UrlString { get; }
+    [Selector("username")]
+    public NSString Username { get; }
+    [Selector("userIdentifier")]
+    public NSString UserIdentifier { get; }
+    [Selector("service")]
+    public NSString Service { get; }
+    [Selector("initWithUrlString:username:userIdentifier:service:")]
+    public Self InitWithUrlStringUsernameUserIdentifierService(NSString? urlString, NSString? username, NSString? userIdentifier, NSString? service);
+    [Selector("localizedStringForKey:")]
+    public static NSString LocalizedStringForKey(NSString key);
+    [Selector("localizedStringForService:")]
+    public static NSString LocalizedStringForService(NSString service);
 }
 
 public extern "C" NSString? CNSocialProfileURLStringKey;

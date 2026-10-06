@@ -33,11 +33,16 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMRGBColor : DOMObject
 {
-    [Selector("red")] public DOMCSSPrimitiveValue? Red { get; }
-    [Selector("green")] public DOMCSSPrimitiveValue? Green { get; }
-    [Selector("blue")] public DOMCSSPrimitiveValue? Blue { get; }
-    [Selector("alpha")] public DOMCSSPrimitiveValue? Alpha { get; }
-    [Selector("color")] public NSColor? Color { get; }
+    [Selector("red")]
+    public DOMCSSPrimitiveValue? Red { get; }
+    [Selector("green")]
+    public DOMCSSPrimitiveValue? Green { get; }
+    [Selector("blue")]
+    public DOMCSSPrimitiveValue? Blue { get; }
+    [Selector("alpha")]
+    public DOMCSSPrimitiveValue? Alpha { get; }
+    [Selector("color")]
+    public NSColor? Color { get; }
 }
 
 #endif

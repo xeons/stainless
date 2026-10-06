@@ -33,18 +33,30 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLIFrameElement : DOMHTMLElement
 {
-    [Selector("align", "setAlign:")] public NSString? Align { get; set; }
-    [Selector("frameBorder", "setFrameBorder:")] public NSString? FrameBorder { get; set; }
-    [Selector("height", "setHeight:")] public NSString? Height { get; set; }
-    [Selector("longDesc", "setLongDesc:")] public NSString? LongDesc { get; set; }
-    [Selector("marginHeight", "setMarginHeight:")] public NSString? MarginHeight { get; set; }
-    [Selector("marginWidth", "setMarginWidth:")] public NSString? MarginWidth { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("scrolling", "setScrolling:")] public NSString? Scrolling { get; set; }
-    [Selector("src", "setSrc:")] public NSString? Src { get; set; }
-    [Selector("width", "setWidth:")] public NSString? Width { get; set; }
-    [Selector("contentDocument")] public DOMDocument? ContentDocument { get; }
-    [Selector("contentWindow")] public DOMAbstractView? ContentWindow { get; }
+    [Selector("align", "setAlign:")]
+    public NSString? Align { get; set; }
+    [Selector("frameBorder", "setFrameBorder:")]
+    public NSString? FrameBorder { get; set; }
+    [Selector("height", "setHeight:")]
+    public NSString? Height { get; set; }
+    [Selector("longDesc", "setLongDesc:")]
+    public NSString? LongDesc { get; set; }
+    [Selector("marginHeight", "setMarginHeight:")]
+    public NSString? MarginHeight { get; set; }
+    [Selector("marginWidth", "setMarginWidth:")]
+    public NSString? MarginWidth { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("scrolling", "setScrolling:")]
+    public NSString? Scrolling { get; set; }
+    [Selector("src", "setSrc:")]
+    public NSString? Src { get; set; }
+    [Selector("width", "setWidth:")]
+    public NSString? Width { get; set; }
+    [Selector("contentDocument")]
+    public DOMDocument? ContentDocument { get; }
+    [Selector("contentWindow")]
+    public DOMAbstractView? ContentWindow { get; }
 }
 
 #endif

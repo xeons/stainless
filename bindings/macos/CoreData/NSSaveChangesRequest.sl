@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class NSSaveChangesRequest : NSPersistentStoreRequest
 {
-    [Selector("insertedObjects")] public NSSet? InsertedObjects { get; }
-    [Selector("updatedObjects")] public NSSet? UpdatedObjects { get; }
-    [Selector("deletedObjects")] public NSSet? DeletedObjects { get; }
-    [Selector("lockedObjects")] public NSSet? LockedObjects { get; }
-    [Selector("initWithInsertedObjects:updatedObjects:deletedObjects:lockedObjects:")] public Self InitWithInsertedObjectsUpdatedObjectsDeletedObjectsLockedObjects(NSSet? insertedObjects, NSSet? updatedObjects, NSSet? deletedObjects, NSSet? lockedObjects);
+    [Selector("insertedObjects")]
+    public NSSet? InsertedObjects { get; }
+    [Selector("updatedObjects")]
+    public NSSet? UpdatedObjects { get; }
+    [Selector("deletedObjects")]
+    public NSSet? DeletedObjects { get; }
+    [Selector("lockedObjects")]
+    public NSSet? LockedObjects { get; }
+    [Selector("initWithInsertedObjects:updatedObjects:deletedObjects:lockedObjects:")]
+    public Self InitWithInsertedObjectsUpdatedObjectsDeletedObjectsLockedObjects(NSSet? insertedObjects, NSSet? updatedObjects, NSSet? deletedObjects, NSSet? lockedObjects);
 }
 
 #endif

@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class CNContactProperty : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("contact")] public CNContact Contact { get; }
-    [Selector("key")] public NSString Key { get; }
-    [Selector("value")] public AnyObject? Value { get; }
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("label")] public NSString? Label { get; }
+    [Selector("contact")]
+    public CNContact Contact { get; }
+    [Selector("key")]
+    public NSString Key { get; }
+    [Selector("value")]
+    public AnyObject? Value { get; }
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("label")]
+    public NSString? Label { get; }
 }
 
 #endif

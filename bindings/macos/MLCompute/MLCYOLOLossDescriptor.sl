@@ -34,17 +34,28 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCYOLOLossDescriptor : NSObject, NSCopying
 {
-    [Selector("anchorBoxCount")] public NSUInteger AnchorBoxCount { get; }
-    [Selector("anchorBoxes")] public NSData AnchorBoxes { get; }
-    [Selector("shouldRescore", "setShouldRescore:")] public bool ShouldRescore { get; set; }
-    [Selector("scaleSpatialPositionLoss", "setScaleSpatialPositionLoss:")] public float ScaleSpatialPositionLoss { get; set; }
-    [Selector("scaleSpatialSizeLoss", "setScaleSpatialSizeLoss:")] public float ScaleSpatialSizeLoss { get; set; }
-    [Selector("scaleNoObjectConfidenceLoss", "setScaleNoObjectConfidenceLoss:")] public float ScaleNoObjectConfidenceLoss { get; set; }
-    [Selector("scaleObjectConfidenceLoss", "setScaleObjectConfidenceLoss:")] public float ScaleObjectConfidenceLoss { get; set; }
-    [Selector("scaleClassLoss", "setScaleClassLoss:")] public float ScaleClassLoss { get; set; }
-    [Selector("minimumIOUForObjectPresence", "setMinimumIOUForObjectPresence:")] public float MinimumIOUForObjectPresence { get; set; }
-    [Selector("maximumIOUForObjectAbsence", "setMaximumIOUForObjectAbsence:")] public float MaximumIOUForObjectAbsence { get; set; }
-    [Selector("descriptorWithAnchorBoxes:anchorBoxCount:")] public static Self DescriptorWithAnchorBoxesAnchorBoxCount(NSData anchorBoxes, NSUInteger anchorBoxCount);
+    [Selector("anchorBoxCount")]
+    public NSUInteger AnchorBoxCount { get; }
+    [Selector("anchorBoxes")]
+    public NSData AnchorBoxes { get; }
+    [Selector("shouldRescore", "setShouldRescore:")]
+    public bool ShouldRescore { get; set; }
+    [Selector("scaleSpatialPositionLoss", "setScaleSpatialPositionLoss:")]
+    public float ScaleSpatialPositionLoss { get; set; }
+    [Selector("scaleSpatialSizeLoss", "setScaleSpatialSizeLoss:")]
+    public float ScaleSpatialSizeLoss { get; set; }
+    [Selector("scaleNoObjectConfidenceLoss", "setScaleNoObjectConfidenceLoss:")]
+    public float ScaleNoObjectConfidenceLoss { get; set; }
+    [Selector("scaleObjectConfidenceLoss", "setScaleObjectConfidenceLoss:")]
+    public float ScaleObjectConfidenceLoss { get; set; }
+    [Selector("scaleClassLoss", "setScaleClassLoss:")]
+    public float ScaleClassLoss { get; set; }
+    [Selector("minimumIOUForObjectPresence", "setMinimumIOUForObjectPresence:")]
+    public float MinimumIOUForObjectPresence { get; set; }
+    [Selector("maximumIOUForObjectAbsence", "setMaximumIOUForObjectAbsence:")]
+    public float MaximumIOUForObjectAbsence { get; set; }
+    [Selector("descriptorWithAnchorBoxes:anchorBoxCount:")]
+    public static Self DescriptorWithAnchorBoxesAnchorBoxCount(NSData anchorBoxes, NSUInteger anchorBoxCount);
 }
 
 #endif

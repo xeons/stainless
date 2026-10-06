@@ -58,49 +58,90 @@ public objc closure AVAudioEngineManualRenderingStatus AVAudioEngineManualRender
 
 public extern objc class AVAudioEngine : NSObject
 {
-    [Selector("musicSequence", "setMusicSequence:")] public MusicSequence MusicSequence { get; set; }
-    [Selector("outputNode")] public AVAudioOutputNode OutputNode { get; }
-    [Selector("inputNode")] public AVAudioInputNode InputNode { get; }
-    [Selector("mainMixerNode")] public AVAudioMixerNode MainMixerNode { get; }
-    [Selector("isRunning")] public bool Running { get; }
-    [Selector("isAutoShutdownEnabled", "setAutoShutdownEnabled:")] public bool AutoShutdownEnabled { get; set; }
-    [Selector("attachedNodes")] public NSSet AttachedNodes { get; }
-    [Selector("manualRenderingBlock")] public AVAudioEngineManualRenderingBlock ManualRenderingBlock { get; }
-    [Selector("isInManualRenderingMode")] public bool IsInManualRenderingMode { get; }
-    [Selector("manualRenderingMode")] public AVAudioEngineManualRenderingMode ManualRenderingMode { get; }
-    [Selector("manualRenderingFormat")] public AVAudioFormat ManualRenderingFormat { get; }
-    [Selector("manualRenderingMaximumFrameCount")] public AVAudioFrameCount ManualRenderingMaximumFrameCount { get; }
-    [Selector("manualRenderingSampleTime")] public AVAudioFramePosition ManualRenderingSampleTime { get; }
-    [Selector("init")] public Self Init();
-    [Selector("attachNode:")] public void AttachNode(AVAudioNode node);
-    [Selector("detachNode:")] public void DetachNode(AVAudioNode node);
-    [Selector("connect:to:fromBus:toBus:format:")] public void ConnectToFromBusToBusFormat(AVAudioNode node1, AVAudioNode node2, AVAudioNodeBus bus1, AVAudioNodeBus bus2, AVAudioFormat? format);
-    [Selector("connect:to:format:")] public void ConnectToFormat(AVAudioNode node1, AVAudioNode node2, AVAudioFormat? format);
-    [Selector("connect:toConnectionPoints:fromBus:format:")] public void ConnectToConnectionPointsFromBusFormat(AVAudioNode sourceNode, NSArray destNodes, AVAudioNodeBus sourceBus, AVAudioFormat? format);
-    [Selector("disconnectNodeInput:bus:")] public void DisconnectNodeInputBus(AVAudioNode node, AVAudioNodeBus bus);
-    [Selector("disconnectNodeInput:")] public void DisconnectNodeInput(AVAudioNode node);
-    [Selector("disconnectNodeOutput:bus:")] public void DisconnectNodeOutputBus(AVAudioNode node, AVAudioNodeBus bus);
-    [Selector("disconnectNodeOutput:")] public void DisconnectNodeOutput(AVAudioNode node);
-    [Selector("prepare")] public void Prepare();
-    [Selector("startAndReturnError:")] public bool StartAndReturnError(out NSError? outError);
-    [Selector("pause")] public void Pause();
-    [Selector("reset")] public void Reset();
-    [Selector("stop")] public void Stop();
-    [Selector("inputConnectionPointForNode:inputBus:")] public AVAudioConnectionPoint? InputConnectionPointForNodeInputBus(AVAudioNode node, AVAudioNodeBus bus);
-    [Selector("outputConnectionPointsForNode:outputBus:")] public NSArray OutputConnectionPointsForNodeOutputBus(AVAudioNode node, AVAudioNodeBus bus);
-    [Selector("enableManualRenderingMode:format:maximumFrameCount:error:")] public bool EnableManualRenderingModeFormatMaximumFrameCountError(AVAudioEngineManualRenderingMode mode, AVAudioFormat pcmFormat, AVAudioFrameCount maximumFrameCount, out NSError? outError);
-    [Selector("disableManualRenderingMode")] public void DisableManualRenderingMode();
-    [Selector("renderOffline:toBuffer:error:")] public AVAudioEngineManualRenderingStatus RenderOfflineToBufferError(AVAudioFrameCount numberOfFrames, AVAudioPCMBuffer buffer, out NSError? outError);
+    [Selector("musicSequence", "setMusicSequence:")]
+    public MusicSequence MusicSequence { get; set; }
+    [Selector("outputNode")]
+    public AVAudioOutputNode OutputNode { get; }
+    [Selector("inputNode")]
+    public AVAudioInputNode InputNode { get; }
+    [Selector("mainMixerNode")]
+    public AVAudioMixerNode MainMixerNode { get; }
+    [Selector("isRunning")]
+    public bool Running { get; }
+    [Selector("isAutoShutdownEnabled", "setAutoShutdownEnabled:")]
+    public bool AutoShutdownEnabled { get; set; }
+    [Selector("attachedNodes")]
+    public NSSet AttachedNodes { get; }
+    [Selector("manualRenderingBlock")]
+    public AVAudioEngineManualRenderingBlock ManualRenderingBlock { get; }
+    [Selector("isInManualRenderingMode")]
+    public bool IsInManualRenderingMode { get; }
+    [Selector("manualRenderingMode")]
+    public AVAudioEngineManualRenderingMode ManualRenderingMode { get; }
+    [Selector("manualRenderingFormat")]
+    public AVAudioFormat ManualRenderingFormat { get; }
+    [Selector("manualRenderingMaximumFrameCount")]
+    public AVAudioFrameCount ManualRenderingMaximumFrameCount { get; }
+    [Selector("manualRenderingSampleTime")]
+    public AVAudioFramePosition ManualRenderingSampleTime { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("attachNode:")]
+    public void AttachNode(AVAudioNode node);
+    [Selector("detachNode:")]
+    public void DetachNode(AVAudioNode node);
+    [Selector("connect:to:fromBus:toBus:format:")]
+    public void ConnectToFromBusToBusFormat(AVAudioNode node1, AVAudioNode node2, AVAudioNodeBus bus1, AVAudioNodeBus bus2, AVAudioFormat? format);
+    [Selector("connect:to:format:")]
+    public void ConnectToFormat(AVAudioNode node1, AVAudioNode node2, AVAudioFormat? format);
+    [Selector("connect:toConnectionPoints:fromBus:format:")]
+    public void ConnectToConnectionPointsFromBusFormat(AVAudioNode sourceNode, NSArray destNodes, AVAudioNodeBus sourceBus, AVAudioFormat? format);
+    [Selector("disconnectNodeInput:bus:")]
+    public void DisconnectNodeInputBus(AVAudioNode node, AVAudioNodeBus bus);
+    [Selector("disconnectNodeInput:")]
+    public void DisconnectNodeInput(AVAudioNode node);
+    [Selector("disconnectNodeOutput:bus:")]
+    public void DisconnectNodeOutputBus(AVAudioNode node, AVAudioNodeBus bus);
+    [Selector("disconnectNodeOutput:")]
+    public void DisconnectNodeOutput(AVAudioNode node);
+    [Selector("prepare")]
+    public void Prepare();
+    [Selector("startAndReturnError:")]
+    public bool StartAndReturnError(out NSError? outError);
+    [Selector("pause")]
+    public void Pause();
+    [Selector("reset")]
+    public void Reset();
+    [Selector("stop")]
+    public void Stop();
+    [Selector("inputConnectionPointForNode:inputBus:")]
+    public AVAudioConnectionPoint? InputConnectionPointForNodeInputBus(AVAudioNode node, AVAudioNodeBus bus);
+    [Selector("outputConnectionPointsForNode:outputBus:")]
+    public NSArray OutputConnectionPointsForNodeOutputBus(AVAudioNode node, AVAudioNodeBus bus);
+    [Selector("enableManualRenderingMode:format:maximumFrameCount:error:")]
+    public bool EnableManualRenderingModeFormatMaximumFrameCountError(AVAudioEngineManualRenderingMode mode, AVAudioFormat pcmFormat, AVAudioFrameCount maximumFrameCount, out NSError? outError);
+    [Selector("disableManualRenderingMode")]
+    public void DisableManualRenderingMode();
+    [Selector("renderOffline:toBuffer:error:")]
+    public AVAudioEngineManualRenderingStatus RenderOfflineToBufferError(AVAudioFrameCount numberOfFrames, AVAudioPCMBuffer buffer, out NSError? outError);
     /// Deprecated in macOS 13.0.
-    [Selector("connectMIDI:to:format:block:")] public void ConnectMIDIToFormatBlock(AVAudioNode sourceNode, AVAudioNode destinationNode, AVAudioFormat? format, AUMIDIOutputEventBlock? tapBlock);
-    [Selector("connectMIDI:to:format:eventListBlock:")] public void ConnectMIDIToFormatEventListBlock(AVAudioNode sourceNode, AVAudioNode destinationNode, AVAudioFormat? format, AUMIDIEventListBlock? tapBlock);
+    [Selector("connectMIDI:to:format:block:")]
+    public void ConnectMIDIToFormatBlock(AVAudioNode sourceNode, AVAudioNode destinationNode, AVAudioFormat? format, AUMIDIOutputEventBlock? tapBlock);
+    [Selector("connectMIDI:to:format:eventListBlock:")]
+    public void ConnectMIDIToFormatEventListBlock(AVAudioNode sourceNode, AVAudioNode destinationNode, AVAudioFormat? format, AUMIDIEventListBlock? tapBlock);
     /// Deprecated in macOS 13.0.
-    [Selector("connectMIDI:toNodes:format:block:")] public void ConnectMIDIToNodesFormatBlock(AVAudioNode sourceNode, NSArray destinationNodes, AVAudioFormat? format, AUMIDIOutputEventBlock? tapBlock);
-    [Selector("connectMIDI:toNodes:format:eventListBlock:")] public void ConnectMIDIToNodesFormatEventListBlock(AVAudioNode sourceNode, NSArray destinationNodes, AVAudioFormat? format, AUMIDIEventListBlock? tapBlock);
-    [Selector("disconnectMIDI:from:")] public void DisconnectMIDIFrom(AVAudioNode sourceNode, AVAudioNode destinationNode);
-    [Selector("disconnectMIDI:fromNodes:")] public void DisconnectMIDIFromNodes(AVAudioNode sourceNode, NSArray destinationNodes);
-    [Selector("disconnectMIDIInput:")] public void DisconnectMIDIInput(AVAudioNode node);
-    [Selector("disconnectMIDIOutput:")] public void DisconnectMIDIOutput(AVAudioNode node);
+    [Selector("connectMIDI:toNodes:format:block:")]
+    public void ConnectMIDIToNodesFormatBlock(AVAudioNode sourceNode, NSArray destinationNodes, AVAudioFormat? format, AUMIDIOutputEventBlock? tapBlock);
+    [Selector("connectMIDI:toNodes:format:eventListBlock:")]
+    public void ConnectMIDIToNodesFormatEventListBlock(AVAudioNode sourceNode, NSArray destinationNodes, AVAudioFormat? format, AUMIDIEventListBlock? tapBlock);
+    [Selector("disconnectMIDI:from:")]
+    public void DisconnectMIDIFrom(AVAudioNode sourceNode, AVAudioNode destinationNode);
+    [Selector("disconnectMIDI:fromNodes:")]
+    public void DisconnectMIDIFromNodes(AVAudioNode sourceNode, NSArray destinationNodes);
+    [Selector("disconnectMIDIInput:")]
+    public void DisconnectMIDIInput(AVAudioNode node);
+    [Selector("disconnectMIDIOutput:")]
+    public void DisconnectMIDIOutput(AVAudioNode node);
 }
 
 public extern "C" NSString AVAudioEngineConfigurationChangeNotification;

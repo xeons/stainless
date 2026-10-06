@@ -34,9 +34,12 @@ import Standard.ObjC;
 
 public extern objc class PKIssuerProvisioningExtensionPassEntry : NSObject
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("title")] public NSString Title { get; }
-    [Selector("art")] public CGImageRef? Art { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("title")]
+    public NSString Title { get; }
+    [Selector("art")]
+    public CGImageRef? Art { get; }
 }
 
 #endif

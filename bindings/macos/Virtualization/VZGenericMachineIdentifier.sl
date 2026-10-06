@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class VZGenericMachineIdentifier : NSObject, NSCopying
 {
-    [Selector("dataRepresentation")] public NSData DataRepresentation { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithDataRepresentation:")] public Self? InitWithDataRepresentation(NSData dataRepresentation);
+    [Selector("dataRepresentation")]
+    public NSData DataRepresentation { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithDataRepresentation:")]
+    public Self? InitWithDataRepresentation(NSData dataRepresentation);
 }
 
 #endif

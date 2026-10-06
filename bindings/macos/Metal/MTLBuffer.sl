@@ -33,19 +33,30 @@ import Standard.ObjC;
 
 public objc interface MTLBuffer : MTLResource
 {
-    [Selector("length")] NSUInteger Length { get; }
-    [Selector("remoteStorageBuffer")] MTLBuffer? RemoteStorageBuffer { get; }
-    [Selector("gpuAddress")] MTLGPUAddress GpuAddress { get; }
+    [Selector("length")]
+    NSUInteger Length { get; }
+    [Selector("remoteStorageBuffer")]
+    MTLBuffer? RemoteStorageBuffer { get; }
+    [Selector("gpuAddress")]
+    MTLGPUAddress GpuAddress { get; }
     /// macOS 26.0 and later.
-    [Selector("sparseBufferTier")] MTLBufferSparseTier SparseBufferTier { get; }
-    [Selector("contents")] void* Contents();
-    [Selector("didModifyRange:")] void DidModifyRange(NSRange range);
-    [Selector("newTextureWithDescriptor:offset:bytesPerRow:")] MTLTexture? NewTextureWithDescriptorOffsetBytesPerRow(MTLTextureDescriptor descriptor, NSUInteger offset, NSUInteger bytesPerRow);
+    [Selector("sparseBufferTier")]
+    MTLBufferSparseTier SparseBufferTier { get; }
+    [Selector("contents")]
+    void* Contents();
+    [Selector("didModifyRange:")]
+    void DidModifyRange(NSRange range);
+    [Selector("newTextureWithDescriptor:offset:bytesPerRow:")]
+    MTLTexture? NewTextureWithDescriptorOffsetBytesPerRow(MTLTextureDescriptor descriptor, NSUInteger offset, NSUInteger bytesPerRow);
     /// macOS 26.0 and later.
-    [Selector("newTensorWithDescriptor:offset:error:")] MTLTensor? NewTensorWithDescriptorOffsetError(MTLTensorDescriptor descriptor, NSUInteger offset, out NSError? error);
-    [Selector("addDebugMarker:range:")] void AddDebugMarkerRange(NSString marker, NSRange range);
-    [Selector("removeAllDebugMarkers")] void RemoveAllDebugMarkers();
-    [Selector("newRemoteBufferViewForDevice:")] MTLBuffer? NewRemoteBufferViewForDevice(MTLDevice device);
+    [Selector("newTensorWithDescriptor:offset:error:")]
+    MTLTensor? NewTensorWithDescriptorOffsetError(MTLTensorDescriptor descriptor, NSUInteger offset, out NSError? error);
+    [Selector("addDebugMarker:range:")]
+    void AddDebugMarkerRange(NSString marker, NSRange range);
+    [Selector("removeAllDebugMarkers")]
+    void RemoveAllDebugMarkers();
+    [Selector("newRemoteBufferViewForDevice:")]
+    MTLBuffer? NewRemoteBufferViewForDevice(MTLDevice device);
 }
 
 #endif

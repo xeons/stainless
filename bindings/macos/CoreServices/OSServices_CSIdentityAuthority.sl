@@ -43,6 +43,7 @@ public extern "C" CSIdentityAuthorityRef? CSGetLocalIdentityAuthority();
 
 public extern "C" CSIdentityAuthorityRef? CSGetManagedIdentityAuthority();
 
-[ReturnsRetained] public extern "C" CFStringRef? CSIdentityAuthorityCopyLocalizedName(CSIdentityAuthorityRef? authority);
+[ReturnsRetained]
+public extern "C" CFStringRef? CSIdentityAuthorityCopyLocalizedName(CSIdentityAuthorityRef? authority);
 
 #endif

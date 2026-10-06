@@ -36,20 +36,34 @@ public objc closure void AVAudioNodeTapBlock(AVAudioPCMBuffer arg0, AVAudioTime 
 
 public extern objc class AVAudioNode : NSObject
 {
-    [Selector("engine")] public AVAudioEngine? Engine { get; }
-    [Selector("numberOfInputs")] public NSUInteger NumberOfInputs { get; }
-    [Selector("numberOfOutputs")] public NSUInteger NumberOfOutputs { get; }
-    [Selector("lastRenderTime")] public AVAudioTime? LastRenderTime { get; }
-    [Selector("AUAudioUnit")] public AUAudioUnit AUAudioUnit { get; }
-    [Selector("latency")] public NSTimeInterval Latency { get; }
-    [Selector("outputPresentationLatency")] public NSTimeInterval OutputPresentationLatency { get; }
-    [Selector("reset")] public void Reset();
-    [Selector("inputFormatForBus:")] public AVAudioFormat InputFormatForBus(AVAudioNodeBus bus);
-    [Selector("outputFormatForBus:")] public AVAudioFormat OutputFormatForBus(AVAudioNodeBus bus);
-    [Selector("nameForInputBus:")] public NSString? NameForInputBus(AVAudioNodeBus bus);
-    [Selector("nameForOutputBus:")] public NSString? NameForOutputBus(AVAudioNodeBus bus);
-    [Selector("installTapOnBus:bufferSize:format:block:")] public void InstallTapOnBusBufferSizeFormatBlock(AVAudioNodeBus bus, AVAudioFrameCount bufferSize, AVAudioFormat? format, AVAudioNodeTapBlock tapBlock);
-    [Selector("removeTapOnBus:")] public void RemoveTapOnBus(AVAudioNodeBus bus);
+    [Selector("engine")]
+    public AVAudioEngine? Engine { get; }
+    [Selector("numberOfInputs")]
+    public NSUInteger NumberOfInputs { get; }
+    [Selector("numberOfOutputs")]
+    public NSUInteger NumberOfOutputs { get; }
+    [Selector("lastRenderTime")]
+    public AVAudioTime? LastRenderTime { get; }
+    [Selector("AUAudioUnit")]
+    public AUAudioUnit AUAudioUnit { get; }
+    [Selector("latency")]
+    public NSTimeInterval Latency { get; }
+    [Selector("outputPresentationLatency")]
+    public NSTimeInterval OutputPresentationLatency { get; }
+    [Selector("reset")]
+    public void Reset();
+    [Selector("inputFormatForBus:")]
+    public AVAudioFormat InputFormatForBus(AVAudioNodeBus bus);
+    [Selector("outputFormatForBus:")]
+    public AVAudioFormat OutputFormatForBus(AVAudioNodeBus bus);
+    [Selector("nameForInputBus:")]
+    public NSString? NameForInputBus(AVAudioNodeBus bus);
+    [Selector("nameForOutputBus:")]
+    public NSString? NameForOutputBus(AVAudioNodeBus bus);
+    [Selector("installTapOnBus:bufferSize:format:block:")]
+    public void InstallTapOnBusBufferSizeFormatBlock(AVAudioNodeBus bus, AVAudioFrameCount bufferSize, AVAudioFormat? format, AVAudioNodeTapBlock tapBlock);
+    [Selector("removeTapOnBus:")]
+    public void RemoveTapOnBus(AVAudioNodeBus bus);
 }
 
 public const int AVAUDIONODE_HAVE_AUAUDIOUNIT = 1;

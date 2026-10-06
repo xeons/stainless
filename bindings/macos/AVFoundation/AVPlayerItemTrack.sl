@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class AVPlayerItemTrack : NSObject
 {
-    [Selector("assetTrack")] public AVAssetTrack? AssetTrack { get; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("currentVideoFrameRate")] public float CurrentVideoFrameRate { get; }
-    [Selector("videoFieldMode", "setVideoFieldMode:")] public NSString? VideoFieldMode { get; set; }
+    [Selector("assetTrack")]
+    public AVAssetTrack? AssetTrack { get; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("currentVideoFrameRate")]
+    public float CurrentVideoFrameRate { get; }
+    [Selector("videoFieldMode", "setVideoFieldMode:")]
+    public NSString? VideoFieldMode { get; set; }
 }
 
 public extern "C" NSString? AVPlayerItemTrackVideoFieldModeDeinterlaceFields;

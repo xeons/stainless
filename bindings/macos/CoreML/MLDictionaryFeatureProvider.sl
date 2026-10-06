@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class MLDictionaryFeatureProvider : NSObject, MLFeatureProvider, NSFastEnumeration, NSSecureCoding
 {
-    [Selector("dictionary")] public NSDictionary Dictionary { get; }
-    [Selector("initWithDictionary:error:")] public Self? InitWithDictionaryError(NSDictionary dictionary, out NSError? error);
-    [Selector("objectForKeyedSubscript:")] public MLFeatureValue? ObjectForKeyedSubscript(NSString featureName);
+    [Selector("dictionary")]
+    public NSDictionary Dictionary { get; }
+    [Selector("initWithDictionary:error:")]
+    public Self? InitWithDictionaryError(NSDictionary dictionary, out NSError? error);
+    [Selector("objectForKeyedSubscript:")]
+    public MLFeatureValue? ObjectForKeyedSubscript(NSString featureName);
 }
 
 #endif

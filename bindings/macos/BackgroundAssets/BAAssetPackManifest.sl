@@ -34,11 +34,16 @@ import Standard.ObjC;
 /// macOS 26 and later.
 public extern objc class BAAssetPackManifest : NSObject
 {
-    [Selector("assetPacks")] public NSSet AssetPacks { get; }
-    [Selector("initWithContentsOfURL:applicationGroupIdentifier:error:")] public Self? InitWithContentsOfURLApplicationGroupIdentifierError(NSURL URL, NSString applicationGroupIdentifier, out NSError? error);
-    [Selector("initFromData:applicationGroupIdentifier:error:")] public Self? InitFromDataApplicationGroupIdentifierError(NSData data, NSString applicationGroupIdentifier, out NSError? error);
-    [Selector("allDownloads")] public NSSet AllDownloads();
-    [Selector("allDownloadsForContentRequest:")] public NSSet AllDownloadsForContentRequest(BAContentRequest contentRequest);
+    [Selector("assetPacks")]
+    public NSSet AssetPacks { get; }
+    [Selector("initWithContentsOfURL:applicationGroupIdentifier:error:")]
+    public Self? InitWithContentsOfURLApplicationGroupIdentifierError(NSURL URL, NSString applicationGroupIdentifier, out NSError? error);
+    [Selector("initFromData:applicationGroupIdentifier:error:")]
+    public Self? InitFromDataApplicationGroupIdentifierError(NSData data, NSString applicationGroupIdentifier, out NSError? error);
+    [Selector("allDownloads")]
+    public NSSet AllDownloads();
+    [Selector("allDownloadsForContentRequest:")]
+    public NSSet AllDownloadsForContentRequest(BAContentRequest contentRequest);
 }
 
 #endif

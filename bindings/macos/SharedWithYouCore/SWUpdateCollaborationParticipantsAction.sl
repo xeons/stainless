@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class SWUpdateCollaborationParticipantsAction : SWAction, NSSecureCoding, NSCopying
 {
-    [Selector("collaborationMetadata")] public SWCollaborationMetadata CollaborationMetadata { get; }
-    [Selector("addedIdentities")] public NSArray AddedIdentities { get; }
-    [Selector("removedIdentities")] public NSArray RemovedIdentities { get; }
+    [Selector("collaborationMetadata")]
+    public SWCollaborationMetadata CollaborationMetadata { get; }
+    [Selector("addedIdentities")]
+    public NSArray AddedIdentities { get; }
+    [Selector("removedIdentities")]
+    public NSArray RemovedIdentities { get; }
 }
 
 #endif

@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class VZNetworkDevice : NSObject
 {
-    [Selector("attachment", "setAttachment:")] public VZNetworkDeviceAttachment? Attachment { get; set; }
+    [Selector("attachment", "setAttachment:")]
+    public VZNetworkDeviceAttachment? Attachment { get; set; }
 }
 
 #endif

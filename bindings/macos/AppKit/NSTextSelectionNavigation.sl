@@ -75,17 +75,28 @@ public enum NSTextSelectionNavigationLayoutOrientation : long
 
 public extern objc class NSTextSelectionNavigation : NSObject
 {
-    [Selector("textSelectionDataSource")] public NSTextSelectionDataSource? TextSelectionDataSource { get; }
-    [Selector("allowsNonContiguousRanges", "setAllowsNonContiguousRanges:")] public bool AllowsNonContiguousRanges { get; set; }
-    [Selector("rotatesCoordinateSystemForLayoutOrientation", "setRotatesCoordinateSystemForLayoutOrientation:")] public bool RotatesCoordinateSystemForLayoutOrientation { get; set; }
-    [Selector("initWithDataSource:")] public Self InitWithDataSource(NSTextSelectionDataSource dataSource);
-    [Selector("flushLayoutCache")] public void FlushLayoutCache();
-    [Selector("destinationSelectionForTextSelection:direction:destination:extending:confined:")] public NSTextSelection? DestinationSelectionForTextSelectionDirectionDestinationExtendingConfined(NSTextSelection textSelection, NSTextSelectionNavigationDirection direction, NSTextSelectionNavigationDestination destination, bool extending, bool confined);
-    [Selector("textSelectionsInteractingAtPoint:inContainerAtLocation:anchors:modifiers:selecting:bounds:")] public NSArray TextSelectionsInteractingAtPointInContainerAtLocationAnchorsModifiersSelectingBounds(CGPoint point, NSTextLocation containerLocation, NSArray anchors, NSTextSelectionNavigationModifier modifiers, bool selecting, CGRect bounds);
-    [Selector("textSelectionForSelectionGranularity:enclosingTextSelection:")] public NSTextSelection TextSelectionForSelectionGranularityEnclosingTextSelection(NSTextSelectionGranularity selectionGranularity, NSTextSelection textSelection);
-    [Selector("textSelectionForSelectionGranularity:enclosingPoint:inContainerAtLocation:")] public NSTextSelection? TextSelectionForSelectionGranularityEnclosingPointInContainerAtLocation(NSTextSelectionGranularity selectionGranularity, CGPoint point, NSTextLocation location);
-    [Selector("resolvedInsertionLocationForTextSelection:writingDirection:")] public NSTextLocation? ResolvedInsertionLocationForTextSelectionWritingDirection(NSTextSelection textSelection, NSTextSelectionNavigationWritingDirection writingDirection);
-    [Selector("deletionRangesForTextSelection:direction:destination:allowsDecomposition:")] public NSArray DeletionRangesForTextSelectionDirectionDestinationAllowsDecomposition(NSTextSelection textSelection, NSTextSelectionNavigationDirection direction, NSTextSelectionNavigationDestination destination, bool allowsDecomposition);
+    [Selector("textSelectionDataSource")]
+    public NSTextSelectionDataSource? TextSelectionDataSource { get; }
+    [Selector("allowsNonContiguousRanges", "setAllowsNonContiguousRanges:")]
+    public bool AllowsNonContiguousRanges { get; set; }
+    [Selector("rotatesCoordinateSystemForLayoutOrientation", "setRotatesCoordinateSystemForLayoutOrientation:")]
+    public bool RotatesCoordinateSystemForLayoutOrientation { get; set; }
+    [Selector("initWithDataSource:")]
+    public Self InitWithDataSource(NSTextSelectionDataSource dataSource);
+    [Selector("flushLayoutCache")]
+    public void FlushLayoutCache();
+    [Selector("destinationSelectionForTextSelection:direction:destination:extending:confined:")]
+    public NSTextSelection? DestinationSelectionForTextSelectionDirectionDestinationExtendingConfined(NSTextSelection textSelection, NSTextSelectionNavigationDirection direction, NSTextSelectionNavigationDestination destination, bool extending, bool confined);
+    [Selector("textSelectionsInteractingAtPoint:inContainerAtLocation:anchors:modifiers:selecting:bounds:")]
+    public NSArray TextSelectionsInteractingAtPointInContainerAtLocationAnchorsModifiersSelectingBounds(CGPoint point, NSTextLocation containerLocation, NSArray anchors, NSTextSelectionNavigationModifier modifiers, bool selecting, CGRect bounds);
+    [Selector("textSelectionForSelectionGranularity:enclosingTextSelection:")]
+    public NSTextSelection TextSelectionForSelectionGranularityEnclosingTextSelection(NSTextSelectionGranularity selectionGranularity, NSTextSelection textSelection);
+    [Selector("textSelectionForSelectionGranularity:enclosingPoint:inContainerAtLocation:")]
+    public NSTextSelection? TextSelectionForSelectionGranularityEnclosingPointInContainerAtLocation(NSTextSelectionGranularity selectionGranularity, CGPoint point, NSTextLocation location);
+    [Selector("resolvedInsertionLocationForTextSelection:writingDirection:")]
+    public NSTextLocation? ResolvedInsertionLocationForTextSelectionWritingDirection(NSTextSelection textSelection, NSTextSelectionNavigationWritingDirection writingDirection);
+    [Selector("deletionRangesForTextSelection:direction:destination:allowsDecomposition:")]
+    public NSArray DeletionRangesForTextSelectionDirectionDestinationAllowsDecomposition(NSTextSelection textSelection, NSTextSelectionNavigationDirection direction, NSTextSelectionNavigationDestination destination, bool allowsDecomposition);
 }
 
 public objc closure void NSTextSelectionDataSourceEnumerateSubstringsFromLocationOptionsUsingBlockBlock(NSString? arg0, NSTextRange arg1, NSTextRange? arg2, bool* arg3);
@@ -96,16 +107,28 @@ public objc closure void NSTextSelectionDataSourceEnumerateContainerBoundariesFr
 
 public objc interface NSTextSelectionDataSource : NSObjectProtocol
 {
-    [Selector("documentRange")] NSTextRange DocumentRange { get; }
-    [Selector("enumerateSubstringsFromLocation:options:usingBlock:")] void EnumerateSubstringsFromLocationOptionsUsingBlock(NSTextLocation location, NSStringEnumerationOptions options, NSTextSelectionDataSourceEnumerateSubstringsFromLocationOptionsUsingBlockBlock block);
-    [Selector("textRangeForSelectionGranularity:enclosingLocation:")] NSTextRange? TextRangeForSelectionGranularityEnclosingLocation(NSTextSelectionGranularity selectionGranularity, NSTextLocation location);
-    [Selector("locationFromLocation:withOffset:")] NSTextLocation? LocationFromLocationWithOffset(NSTextLocation location, NSInteger offset);
-    [Selector("offsetFromLocation:toLocation:")] NSInteger OffsetFromLocationToLocation(NSTextLocation from, NSTextLocation to);
-    [Selector("baseWritingDirectionAtLocation:")] NSTextSelectionNavigationWritingDirection BaseWritingDirectionAtLocation(NSTextLocation location);
-    [Selector("enumerateCaretOffsetsInLineFragmentAtLocation:usingBlock:")] void EnumerateCaretOffsetsInLineFragmentAtLocationUsingBlock(NSTextLocation location, NSTextSelectionDataSourceEnumerateCaretOffsetsInLineFragmentAtLocationUsingBlockBlock block);
-    [Selector("lineFragmentRangeForPoint:inContainerAtLocation:")] NSTextRange? LineFragmentRangeForPointInContainerAtLocation(CGPoint point, NSTextLocation location);
-    [Optional] [Selector("enumerateContainerBoundariesFromLocation:reverse:usingBlock:")] void EnumerateContainerBoundariesFromLocationReverseUsingBlock(NSTextLocation location, bool reverse, NSTextSelectionDataSourceEnumerateContainerBoundariesFromLocationReverseUsingBlockBlock block);
-    [Optional] [Selector("textLayoutOrientationAtLocation:")] NSTextSelectionNavigationLayoutOrientation TextLayoutOrientationAtLocation(NSTextLocation location);
+    [Selector("documentRange")]
+    NSTextRange DocumentRange { get; }
+    [Selector("enumerateSubstringsFromLocation:options:usingBlock:")]
+    void EnumerateSubstringsFromLocationOptionsUsingBlock(NSTextLocation location, NSStringEnumerationOptions options, NSTextSelectionDataSourceEnumerateSubstringsFromLocationOptionsUsingBlockBlock block);
+    [Selector("textRangeForSelectionGranularity:enclosingLocation:")]
+    NSTextRange? TextRangeForSelectionGranularityEnclosingLocation(NSTextSelectionGranularity selectionGranularity, NSTextLocation location);
+    [Selector("locationFromLocation:withOffset:")]
+    NSTextLocation? LocationFromLocationWithOffset(NSTextLocation location, NSInteger offset);
+    [Selector("offsetFromLocation:toLocation:")]
+    NSInteger OffsetFromLocationToLocation(NSTextLocation from, NSTextLocation to);
+    [Selector("baseWritingDirectionAtLocation:")]
+    NSTextSelectionNavigationWritingDirection BaseWritingDirectionAtLocation(NSTextLocation location);
+    [Selector("enumerateCaretOffsetsInLineFragmentAtLocation:usingBlock:")]
+    void EnumerateCaretOffsetsInLineFragmentAtLocationUsingBlock(NSTextLocation location, NSTextSelectionDataSourceEnumerateCaretOffsetsInLineFragmentAtLocationUsingBlockBlock block);
+    [Selector("lineFragmentRangeForPoint:inContainerAtLocation:")]
+    NSTextRange? LineFragmentRangeForPointInContainerAtLocation(CGPoint point, NSTextLocation location);
+    [Optional]
+    [Selector("enumerateContainerBoundariesFromLocation:reverse:usingBlock:")]
+    void EnumerateContainerBoundariesFromLocationReverseUsingBlock(NSTextLocation location, bool reverse, NSTextSelectionDataSourceEnumerateContainerBoundariesFromLocationReverseUsingBlockBlock block);
+    [Optional]
+    [Selector("textLayoutOrientationAtLocation:")]
+    NSTextSelectionNavigationLayoutOrientation TextLayoutOrientationAtLocation(NSTextLocation location);
 }
 
 #endif

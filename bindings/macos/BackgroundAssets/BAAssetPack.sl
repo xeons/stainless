@@ -34,12 +34,18 @@ import Standard.ObjC;
 /// macOS 26 and later.
 public extern objc class BAAssetPack : NSObject
 {
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("downloadSize")] public NSInteger DownloadSize { get; }
-    [Selector("version")] public NSInteger Version { get; }
-    [Selector("userInfo")] public NSData? UserInfo { get; }
-    [Selector("download")] public BADownload Download();
-    [Selector("downloadForContentRequest:")] public BADownload DownloadForContentRequest(BAContentRequest contentRequest);
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("downloadSize")]
+    public NSInteger DownloadSize { get; }
+    [Selector("version")]
+    public NSInteger Version { get; }
+    [Selector("userInfo")]
+    public NSData? UserInfo { get; }
+    [Selector("download")]
+    public BADownload Download();
+    [Selector("downloadForContentRequest:")]
+    public BADownload DownloadForContentRequest(BAContentRequest contentRequest);
 }
 
 #endif

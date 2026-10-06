@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioConsoleDeviceConfiguration : VZConsoleDeviceConfiguration
 {
-    [Selector("ports")] public VZVirtioConsolePortConfigurationArray Ports { get; }
-    [Selector("init")] public Self Init();
+    [Selector("ports")]
+    public VZVirtioConsolePortConfigurationArray Ports { get; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

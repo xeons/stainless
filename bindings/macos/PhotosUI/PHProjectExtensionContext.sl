@@ -35,10 +35,14 @@ public objc closure void PHProjectExtensionContextUpdatedProjectInfoFromProjectI
 
 public extern objc class PHProjectExtensionContext : NSExtensionContext
 {
-    [Selector("photoLibrary")] public PHPhotoLibrary PhotoLibrary { get; }
-    [Selector("project")] public PHProject Project { get; }
-    [Selector("showEditorForAsset:")] public void ShowEditorForAsset(PHAsset asset);
-    [Selector("updatedProjectInfoFromProjectInfo:completion:")] public NSProgress UpdatedProjectInfoFromProjectInfoCompletion(PHProjectInfo? existingProjectInfo, PHProjectExtensionContextUpdatedProjectInfoFromProjectInfoCompletionCompletionBlock completion);
+    [Selector("photoLibrary")]
+    public PHPhotoLibrary PhotoLibrary { get; }
+    [Selector("project")]
+    public PHProject Project { get; }
+    [Selector("showEditorForAsset:")]
+    public void ShowEditorForAsset(PHAsset asset);
+    [Selector("updatedProjectInfoFromProjectInfo:completion:")]
+    public NSProgress UpdatedProjectInfoFromProjectInfoCompletion(PHProjectInfo? existingProjectInfo, PHProjectExtensionContextUpdatedProjectInfoFromProjectInfoCompletionCompletionBlock completion);
 }
 
 #endif

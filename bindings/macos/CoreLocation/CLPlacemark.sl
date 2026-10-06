@@ -36,32 +36,51 @@ import Standard.ObjC;
 /// Deprecated in macOS 100000.
 public extern objc class CLPlacemark : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("location")] public CLLocation? Location { get; }
-    [Selector("region")] public CLRegion? Region { get; }
-    [Selector("timeZone")] public NSTimeZone? TimeZone { get; }
+    [Selector("location")]
+    public CLLocation? Location { get; }
+    [Selector("region")]
+    public CLRegion? Region { get; }
+    [Selector("timeZone")]
+    public NSTimeZone? TimeZone { get; }
     /// Deprecated in macOS 10.13.
-    [Selector("addressDictionary")] public NSDictionary? AddressDictionary { get; }
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("thoroughfare")] public NSString? Thoroughfare { get; }
-    [Selector("subThoroughfare")] public NSString? SubThoroughfare { get; }
-    [Selector("locality")] public NSString? Locality { get; }
-    [Selector("subLocality")] public NSString? SubLocality { get; }
-    [Selector("administrativeArea")] public NSString? AdministrativeArea { get; }
-    [Selector("subAdministrativeArea")] public NSString? SubAdministrativeArea { get; }
-    [Selector("postalCode")] public NSString? PostalCode { get; }
-    [Selector("ISOcountryCode")] public NSString? ISOcountryCode { get; }
-    [Selector("country")] public NSString? Country { get; }
-    [Selector("inlandWater")] public NSString? InlandWater { get; }
-    [Selector("ocean")] public NSString? Ocean { get; }
-    [Selector("areasOfInterest")] public NSArray? AreasOfInterest { get; }
-    [Selector("initWithPlacemark:")] public Self InitWithPlacemark(CLPlacemark placemark);
+    [Selector("addressDictionary")]
+    public NSDictionary? AddressDictionary { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("thoroughfare")]
+    public NSString? Thoroughfare { get; }
+    [Selector("subThoroughfare")]
+    public NSString? SubThoroughfare { get; }
+    [Selector("locality")]
+    public NSString? Locality { get; }
+    [Selector("subLocality")]
+    public NSString? SubLocality { get; }
+    [Selector("administrativeArea")]
+    public NSString? AdministrativeArea { get; }
+    [Selector("subAdministrativeArea")]
+    public NSString? SubAdministrativeArea { get; }
+    [Selector("postalCode")]
+    public NSString? PostalCode { get; }
+    [Selector("ISOcountryCode")]
+    public NSString? ISOcountryCode { get; }
+    [Selector("country")]
+    public NSString? Country { get; }
+    [Selector("inlandWater")]
+    public NSString? InlandWater { get; }
+    [Selector("ocean")]
+    public NSString? Ocean { get; }
+    [Selector("areasOfInterest")]
+    public NSArray? AreasOfInterest { get; }
+    [Selector("initWithPlacemark:")]
+    public Self InitWithPlacemark(CLPlacemark placemark);
 }
 
 /// ContactsAdditions, a category of CLPlacemark.
 public extern objc class CLPlacemark
 {
     /// Deprecated in macOS 100000.
-    [Selector("postalAddress")] public CNPostalAddress? PostalAddress { get; }
+    [Selector("postalAddress")]
+    public CNPostalAddress? PostalAddress { get; }
 }
 
 #endif

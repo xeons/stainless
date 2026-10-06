@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.0.
 public extern objc class MPSTriangleAccelerationStructure : MPSPolygonAccelerationStructure
 {
-    [Selector("triangleCount", "setTriangleCount:")] public NSUInteger TriangleCount { get; set; }
+    [Selector("triangleCount", "setTriangleCount:")]
+    public NSUInteger TriangleCount { get; set; }
 }
 
 #endif

@@ -37,10 +37,14 @@ public const int DOM_BOTH = 2;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMOverflowEvent : DOMEvent
 {
-    [Selector("orient")] public ushort Orient { get; }
-    [Selector("horizontalOverflow")] public bool HorizontalOverflow { get; }
-    [Selector("verticalOverflow")] public bool VerticalOverflow { get; }
-    [Selector("initOverflowEvent:horizontalOverflow:verticalOverflow:")] public void InitOverflowEventHorizontalOverflowVerticalOverflow(ushort orient, bool horizontalOverflow, bool verticalOverflow);
+    [Selector("orient")]
+    public ushort Orient { get; }
+    [Selector("horizontalOverflow")]
+    public bool HorizontalOverflow { get; }
+    [Selector("verticalOverflow")]
+    public bool VerticalOverflow { get; }
+    [Selector("initOverflowEvent:horizontalOverflow:verticalOverflow:")]
+    public void InitOverflowEventHorizontalOverflowVerticalOverflow(ushort orient, bool horizontalOverflow, bool verticalOverflow);
 }
 
 #endif

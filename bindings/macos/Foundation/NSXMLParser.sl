@@ -40,51 +40,107 @@ public enum NSXMLParserExternalEntityResolvingPolicy : ulong
 
 public extern objc class NSXMLParser : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public NSXMLParserDelegate? Delegate { get; set; }
-    [Selector("shouldProcessNamespaces", "setShouldProcessNamespaces:")] public bool ShouldProcessNamespaces { get; set; }
-    [Selector("shouldReportNamespacePrefixes", "setShouldReportNamespacePrefixes:")] public bool ShouldReportNamespacePrefixes { get; set; }
-    [Selector("externalEntityResolvingPolicy", "setExternalEntityResolvingPolicy:")] public NSXMLParserExternalEntityResolvingPolicy ExternalEntityResolvingPolicy { get; set; }
-    [Selector("allowedExternalEntityURLs", "setAllowedExternalEntityURLs:")] public NSSet? AllowedExternalEntityURLs { get; set; }
-    [Selector("parserError")] public NSError? ParserError { get; }
-    [Selector("shouldResolveExternalEntities", "setShouldResolveExternalEntities:")] public bool ShouldResolveExternalEntities { get; set; }
-    [Selector("initWithContentsOfURL:")] public Self? InitWithContentsOfURL(NSURL url);
-    [Selector("initWithData:")] public Self InitWithData(NSData data);
-    [Selector("initWithStream:")] public Self InitWithStream(NSInputStream stream);
-    [Selector("parse")] public bool Parse();
-    [Selector("abortParsing")] public void AbortParsing();
+    [Selector("delegate", "setDelegate:")]
+    public NSXMLParserDelegate? Delegate { get; set; }
+    [Selector("shouldProcessNamespaces", "setShouldProcessNamespaces:")]
+    public bool ShouldProcessNamespaces { get; set; }
+    [Selector("shouldReportNamespacePrefixes", "setShouldReportNamespacePrefixes:")]
+    public bool ShouldReportNamespacePrefixes { get; set; }
+    [Selector("externalEntityResolvingPolicy", "setExternalEntityResolvingPolicy:")]
+    public NSXMLParserExternalEntityResolvingPolicy ExternalEntityResolvingPolicy { get; set; }
+    [Selector("allowedExternalEntityURLs", "setAllowedExternalEntityURLs:")]
+    public NSSet? AllowedExternalEntityURLs { get; set; }
+    [Selector("parserError")]
+    public NSError? ParserError { get; }
+    [Selector("shouldResolveExternalEntities", "setShouldResolveExternalEntities:")]
+    public bool ShouldResolveExternalEntities { get; set; }
+    [Selector("initWithContentsOfURL:")]
+    public Self? InitWithContentsOfURL(NSURL url);
+    [Selector("initWithData:")]
+    public Self InitWithData(NSData data);
+    [Selector("initWithStream:")]
+    public Self InitWithStream(NSInputStream stream);
+    [Selector("parse")]
+    public bool Parse();
+    [Selector("abortParsing")]
+    public void AbortParsing();
 }
 
 /// NSXMLParserLocatorAdditions, a category of NSXMLParser.
 public extern objc class NSXMLParser
 {
-    [Selector("publicID")] public NSString? PublicID { get; }
-    [Selector("systemID")] public NSString? SystemID { get; }
-    [Selector("lineNumber")] public NSInteger LineNumber { get; }
-    [Selector("columnNumber")] public NSInteger ColumnNumber { get; }
+    [Selector("publicID")]
+    public NSString? PublicID { get; }
+    [Selector("systemID")]
+    public NSString? SystemID { get; }
+    [Selector("lineNumber")]
+    public NSInteger LineNumber { get; }
+    [Selector("columnNumber")]
+    public NSInteger ColumnNumber { get; }
 }
 
 public objc interface NSXMLParserDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("parserDidStartDocument:")] void ParserDidStartDocument(NSXMLParser parser);
-    [Optional] [Selector("parserDidEndDocument:")] void ParserDidEndDocument(NSXMLParser parser);
-    [Optional] [Selector("parser:foundNotationDeclarationWithName:publicID:systemID:")] void ParserFoundNotationDeclarationWithNamePublicIDSystemID(NSXMLParser parser, NSString name, NSString? publicID, NSString? systemID);
-    [Optional] [Selector("parser:foundUnparsedEntityDeclarationWithName:publicID:systemID:notationName:")] void ParserFoundUnparsedEntityDeclarationWithNamePublicIDSystemIDNotationName(NSXMLParser parser, NSString name, NSString? publicID, NSString? systemID, NSString? notationName);
-    [Optional] [Selector("parser:foundAttributeDeclarationWithName:forElement:type:defaultValue:")] void ParserFoundAttributeDeclarationWithNameForElementTypeDefaultValue(NSXMLParser parser, NSString attributeName, NSString elementName, NSString? type, NSString? defaultValue);
-    [Optional] [Selector("parser:foundElementDeclarationWithName:model:")] void ParserFoundElementDeclarationWithNameModel(NSXMLParser parser, NSString elementName, NSString model);
-    [Optional] [Selector("parser:foundInternalEntityDeclarationWithName:value:")] void ParserFoundInternalEntityDeclarationWithNameValue(NSXMLParser parser, NSString name, NSString? value);
-    [Optional] [Selector("parser:foundExternalEntityDeclarationWithName:publicID:systemID:")] void ParserFoundExternalEntityDeclarationWithNamePublicIDSystemID(NSXMLParser parser, NSString name, NSString? publicID, NSString? systemID);
-    [Optional] [Selector("parser:didStartElement:namespaceURI:qualifiedName:attributes:")] void ParserDidStartElementNamespaceURIQualifiedNameAttributes(NSXMLParser parser, NSString elementName, NSString? namespaceURI, NSString? qName, NSDictionary attributeDict);
-    [Optional] [Selector("parser:didEndElement:namespaceURI:qualifiedName:")] void ParserDidEndElementNamespaceURIQualifiedName(NSXMLParser parser, NSString elementName, NSString? namespaceURI, NSString? qName);
-    [Optional] [Selector("parser:didStartMappingPrefix:toURI:")] void ParserDidStartMappingPrefixToURI(NSXMLParser parser, NSString prefix, NSString namespaceURI);
-    [Optional] [Selector("parser:didEndMappingPrefix:")] void ParserDidEndMappingPrefix(NSXMLParser parser, NSString prefix);
-    [Optional] [Selector("parser:foundCharacters:")] void ParserFoundCharacters(NSXMLParser parser, NSString string);
-    [Optional] [Selector("parser:foundIgnorableWhitespace:")] void ParserFoundIgnorableWhitespace(NSXMLParser parser, NSString whitespaceString);
-    [Optional] [Selector("parser:foundProcessingInstructionWithTarget:data:")] void ParserFoundProcessingInstructionWithTargetData(NSXMLParser parser, NSString target, NSString? data);
-    [Optional] [Selector("parser:foundComment:")] void ParserFoundComment(NSXMLParser parser, NSString comment);
-    [Optional] [Selector("parser:foundCDATA:")] void ParserFoundCDATA(NSXMLParser parser, NSData CDATABlock);
-    [Optional] [Selector("parser:resolveExternalEntityName:systemID:")] NSData? ParserResolveExternalEntityNameSystemID(NSXMLParser parser, NSString name, NSString? systemID);
-    [Optional] [Selector("parser:parseErrorOccurred:")] void ParserParseErrorOccurred(NSXMLParser parser, NSError parseError);
-    [Optional] [Selector("parser:validationErrorOccurred:")] void ParserValidationErrorOccurred(NSXMLParser parser, NSError validationError);
+    [Optional]
+    [Selector("parserDidStartDocument:")]
+    void ParserDidStartDocument(NSXMLParser parser);
+    [Optional]
+    [Selector("parserDidEndDocument:")]
+    void ParserDidEndDocument(NSXMLParser parser);
+    [Optional]
+    [Selector("parser:foundNotationDeclarationWithName:publicID:systemID:")]
+    void ParserFoundNotationDeclarationWithNamePublicIDSystemID(NSXMLParser parser, NSString name, NSString? publicID, NSString? systemID);
+    [Optional]
+    [Selector("parser:foundUnparsedEntityDeclarationWithName:publicID:systemID:notationName:")]
+    void ParserFoundUnparsedEntityDeclarationWithNamePublicIDSystemIDNotationName(NSXMLParser parser, NSString name, NSString? publicID, NSString? systemID, NSString? notationName);
+    [Optional]
+    [Selector("parser:foundAttributeDeclarationWithName:forElement:type:defaultValue:")]
+    void ParserFoundAttributeDeclarationWithNameForElementTypeDefaultValue(NSXMLParser parser, NSString attributeName, NSString elementName, NSString? type, NSString? defaultValue);
+    [Optional]
+    [Selector("parser:foundElementDeclarationWithName:model:")]
+    void ParserFoundElementDeclarationWithNameModel(NSXMLParser parser, NSString elementName, NSString model);
+    [Optional]
+    [Selector("parser:foundInternalEntityDeclarationWithName:value:")]
+    void ParserFoundInternalEntityDeclarationWithNameValue(NSXMLParser parser, NSString name, NSString? value);
+    [Optional]
+    [Selector("parser:foundExternalEntityDeclarationWithName:publicID:systemID:")]
+    void ParserFoundExternalEntityDeclarationWithNamePublicIDSystemID(NSXMLParser parser, NSString name, NSString? publicID, NSString? systemID);
+    [Optional]
+    [Selector("parser:didStartElement:namespaceURI:qualifiedName:attributes:")]
+    void ParserDidStartElementNamespaceURIQualifiedNameAttributes(NSXMLParser parser, NSString elementName, NSString? namespaceURI, NSString? qName, NSDictionary attributeDict);
+    [Optional]
+    [Selector("parser:didEndElement:namespaceURI:qualifiedName:")]
+    void ParserDidEndElementNamespaceURIQualifiedName(NSXMLParser parser, NSString elementName, NSString? namespaceURI, NSString? qName);
+    [Optional]
+    [Selector("parser:didStartMappingPrefix:toURI:")]
+    void ParserDidStartMappingPrefixToURI(NSXMLParser parser, NSString prefix, NSString namespaceURI);
+    [Optional]
+    [Selector("parser:didEndMappingPrefix:")]
+    void ParserDidEndMappingPrefix(NSXMLParser parser, NSString prefix);
+    [Optional]
+    [Selector("parser:foundCharacters:")]
+    void ParserFoundCharacters(NSXMLParser parser, NSString string);
+    [Optional]
+    [Selector("parser:foundIgnorableWhitespace:")]
+    void ParserFoundIgnorableWhitespace(NSXMLParser parser, NSString whitespaceString);
+    [Optional]
+    [Selector("parser:foundProcessingInstructionWithTarget:data:")]
+    void ParserFoundProcessingInstructionWithTargetData(NSXMLParser parser, NSString target, NSString? data);
+    [Optional]
+    [Selector("parser:foundComment:")]
+    void ParserFoundComment(NSXMLParser parser, NSString comment);
+    [Optional]
+    [Selector("parser:foundCDATA:")]
+    void ParserFoundCDATA(NSXMLParser parser, NSData CDATABlock);
+    [Optional]
+    [Selector("parser:resolveExternalEntityName:systemID:")]
+    NSData? ParserResolveExternalEntityNameSystemID(NSXMLParser parser, NSString name, NSString? systemID);
+    [Optional]
+    [Selector("parser:parseErrorOccurred:")]
+    void ParserParseErrorOccurred(NSXMLParser parser, NSError parseError);
+    [Optional]
+    [Selector("parser:validationErrorOccurred:")]
+    void ParserValidationErrorOccurred(NSXMLParser parser, NSError validationError);
 }
 
 public extern "C" NSErrorDomain NSXMLParserErrorDomain;

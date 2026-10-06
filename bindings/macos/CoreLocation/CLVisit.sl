@@ -34,10 +34,14 @@ import Standard.ObjC;
 
 public extern objc class CLVisit : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("arrivalDate")] public NSDate ArrivalDate { get; }
-    [Selector("departureDate")] public NSDate DepartureDate { get; }
-    [Selector("coordinate")] public CLLocationCoordinate2D Coordinate { get; }
-    [Selector("horizontalAccuracy")] public CLLocationAccuracy HorizontalAccuracy { get; }
+    [Selector("arrivalDate")]
+    public NSDate ArrivalDate { get; }
+    [Selector("departureDate")]
+    public NSDate DepartureDate { get; }
+    [Selector("coordinate")]
+    public CLLocationCoordinate2D Coordinate { get; }
+    [Selector("horizontalAccuracy")]
+    public CLLocationAccuracy HorizontalAccuracy { get; }
 }
 
 #endif

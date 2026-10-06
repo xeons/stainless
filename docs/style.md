@@ -440,6 +440,28 @@ The exception is a chain whose tests are not all the same question: ranges,
 different operands, or conditions with side conditions attached. A `switch` that
 has to be contorted into is worse than the chain it replaced.
 
+### 3.3b One attribute to a line
+
+**Each attribute goes on a line of its own, above what it marks** -- never two
+on one line, and never on the line of the declaration.
+
+```csharp
+[Optional]
+[Selector("title", "setTitle:")]
+public NSString? Title { get; set; }
+
+[JsonName("path")]
+public String Path;
+
+[Optional] [Selector("title")] public NSString? Title { get; }   // no
+[JsonName("path")] public String Path;                             // no
+```
+
+It is a layout rule and not a language one: the compiler takes either. Code
+that writes source -- the bindings generator, the form designer -- writes it
+this way too. A C# parameter's attribute keeps to the rule by taking a line of
+its own inside the parameter list.
+
 ### 3.4 Stepping by one
 
 **`i++`, never `i += 1` and never `i = i + 1`.**

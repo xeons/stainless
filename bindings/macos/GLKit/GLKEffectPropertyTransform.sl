@@ -32,9 +32,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class GLKEffectPropertyTransform : GLKEffectProperty
 {
-    [Selector("modelviewMatrix", "setModelviewMatrix:")] public GLKMatrix4 ModelviewMatrix { get; set; }
-    [Selector("projectionMatrix", "setProjectionMatrix:")] public GLKMatrix4 ProjectionMatrix { get; set; }
-    [Selector("normalMatrix")] public GLKMatrix3 NormalMatrix { get; }
+    [Selector("modelviewMatrix", "setModelviewMatrix:")]
+    public GLKMatrix4 ModelviewMatrix { get; set; }
+    [Selector("projectionMatrix", "setProjectionMatrix:")]
+    public GLKMatrix4 ProjectionMatrix { get; set; }
+    [Selector("normalMatrix")]
+    public GLKMatrix3 NormalMatrix { get; }
 }
 
 #endif

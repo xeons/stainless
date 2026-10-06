@@ -32,6 +32,7 @@ import Standard.ObjC;
 
 public const int kIOCFSerializeToBinary = 1;
 
-[ReturnsRetained] public extern "C" CFDataRef? IOCFSerialize(CFTypeRef? object, CFOptionFlags options);
+[ReturnsRetained]
+public extern "C" CFDataRef? IOCFSerialize(CFTypeRef? object, CFOptionFlags options);
 
 #endif

@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class NSStatusBarButton : NSButton
 {
-    [Selector("appearsDisabled", "setAppearsDisabled:")] public bool AppearsDisabled { get; set; }
+    [Selector("appearsDisabled", "setAppearsDisabled:")]
+    public bool AppearsDisabled { get; set; }
 }
 
 #endif

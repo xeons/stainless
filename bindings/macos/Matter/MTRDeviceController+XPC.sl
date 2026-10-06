@@ -40,44 +40,67 @@ public objc closure void MTRValuesHandler(AnyObject? arg0, NSError? arg1);
 /// XPC, a category of MTRDeviceController.
 public extern objc class MTRDeviceController
 {
-    [Selector("sharedControllerWithID:xpcConnectBlock:")] public static MTRDeviceController SharedControllerWithIDXpcConnectBlock(NSCopying? controllerID, MTRXPCConnectBlock xpcConnectBlock);
-    [Selector("encodeXPCResponseValues:")] public static NSArray? EncodeXPCResponseValues(NSArray? values);
-    [Selector("decodeXPCResponseValues:")] public static NSArray? DecodeXPCResponseValues(NSArray? values);
-    [Selector("encodeXPCReadParams:")] public static NSDictionary? EncodeXPCReadParams(MTRReadParams params);
-    [Selector("decodeXPCReadParams:")] public static MTRReadParams? DecodeXPCReadParams(NSDictionary? params);
-    [Selector("encodeXPCSubscribeParams:")] public static NSDictionary? EncodeXPCSubscribeParams(MTRSubscribeParams? params);
-    [Selector("decodeXPCSubscribeParams:")] public static MTRSubscribeParams? DecodeXPCSubscribeParams(NSDictionary? params);
-    [Selector("xpcInterfaceForServerProtocol")] public static NSXPCInterface XpcInterfaceForServerProtocol();
-    [Selector("xpcInterfaceForClientProtocol")] public static NSXPCInterface XpcInterfaceForClientProtocol();
+    [Selector("sharedControllerWithID:xpcConnectBlock:")]
+    public static MTRDeviceController SharedControllerWithIDXpcConnectBlock(NSCopying? controllerID, MTRXPCConnectBlock xpcConnectBlock);
+    [Selector("encodeXPCResponseValues:")]
+    public static NSArray? EncodeXPCResponseValues(NSArray? values);
+    [Selector("decodeXPCResponseValues:")]
+    public static NSArray? DecodeXPCResponseValues(NSArray? values);
+    [Selector("encodeXPCReadParams:")]
+    public static NSDictionary? EncodeXPCReadParams(MTRReadParams params);
+    [Selector("decodeXPCReadParams:")]
+    public static MTRReadParams? DecodeXPCReadParams(NSDictionary? params);
+    [Selector("encodeXPCSubscribeParams:")]
+    public static NSDictionary? EncodeXPCSubscribeParams(MTRSubscribeParams? params);
+    [Selector("decodeXPCSubscribeParams:")]
+    public static MTRSubscribeParams? DecodeXPCSubscribeParams(NSDictionary? params);
+    [Selector("xpcInterfaceForServerProtocol")]
+    public static NSXPCInterface XpcInterfaceForServerProtocol();
+    [Selector("xpcInterfaceForClientProtocol")]
+    public static NSXPCInterface XpcInterfaceForClientProtocol();
 }
 
 public objc closure void MTRDeviceControllerServerProtocolDownloadLogWithControllerNodeIdTypeTimeoutCompletionCompletionBlock(NSString? arg0, NSError? arg1);
 
 public objc interface MTRDeviceControllerServerProtocol : NSObjectProtocol
 {
-    [Selector("getAnyDeviceControllerWithCompletion:")] void GetAnyDeviceControllerWithCompletion(MTRDeviceControllerGetterHandler completion);
-    [Selector("readAttributeWithController:nodeId:endpointId:clusterId:attributeId:params:completion:")] void ReadAttributeWithControllerNodeIdEndpointIdClusterIdAttributeIdParamsCompletion(AnyObject? controller, ulong nodeId, NSNumber? endpointId, NSNumber? clusterId, NSNumber? attributeId, NSDictionary? params, MTRValuesHandler completion);
-    [Selector("writeAttributeWithController:nodeId:endpointId:clusterId:attributeId:value:timedWriteTimeout:completion:")] void WriteAttributeWithControllerNodeIdEndpointIdClusterIdAttributeIdValueTimedWriteTimeoutCompletion(AnyObject? controller, ulong nodeId, NSNumber endpointId, NSNumber clusterId, NSNumber attributeId, AnyObject value, NSNumber? timeoutMs, MTRValuesHandler completion);
-    [Selector("invokeCommandWithController:nodeId:endpointId:clusterId:commandId:fields:timedInvokeTimeout:completion:")] void InvokeCommandWithControllerNodeIdEndpointIdClusterIdCommandIdFieldsTimedInvokeTimeoutCompletion(AnyObject? controller, ulong nodeId, NSNumber endpointId, NSNumber clusterId, NSNumber commandId, AnyObject fields, NSNumber? timeoutMs, MTRValuesHandler completion);
-    [Selector("subscribeAttributeWithController:nodeId:endpointId:clusterId:attributeId:minInterval:maxInterval:params:establishedHandler:")] void SubscribeAttributeWithControllerNodeIdEndpointIdClusterIdAttributeIdMinIntervalMaxIntervalParamsEstablishedHandler(AnyObject? controller, ulong nodeId, NSNumber? endpointId, NSNumber? clusterId, NSNumber? attributeId, NSNumber minInterval, NSNumber maxInterval, NSDictionary? params, dispatch_block_t establishedHandler);
-    [Selector("stopReportsWithController:nodeId:completion:")] void StopReportsWithControllerNodeIdCompletion(AnyObject? controller, ulong nodeId, dispatch_block_t completion);
-    [Selector("subscribeWithController:nodeId:minInterval:maxInterval:params:shouldCache:completion:")] void SubscribeWithControllerNodeIdMinIntervalMaxIntervalParamsShouldCacheCompletion(AnyObject? controller, ulong nodeId, NSNumber minInterval, NSNumber maxInterval, NSDictionary? params, bool shouldCache, MTRStatusCompletion completion);
-    [Selector("readAttributeCacheWithController:nodeId:endpointId:clusterId:attributeId:completion:")] void ReadAttributeCacheWithControllerNodeIdEndpointIdClusterIdAttributeIdCompletion(AnyObject? controller, ulong nodeId, NSNumber? endpointId, NSNumber? clusterId, NSNumber? attributeId, MTRValuesHandler completion);
+    [Selector("getAnyDeviceControllerWithCompletion:")]
+    void GetAnyDeviceControllerWithCompletion(MTRDeviceControllerGetterHandler completion);
+    [Selector("readAttributeWithController:nodeId:endpointId:clusterId:attributeId:params:completion:")]
+    void ReadAttributeWithControllerNodeIdEndpointIdClusterIdAttributeIdParamsCompletion(AnyObject? controller, ulong nodeId, NSNumber? endpointId, NSNumber? clusterId, NSNumber? attributeId, NSDictionary? params, MTRValuesHandler completion);
+    [Selector("writeAttributeWithController:nodeId:endpointId:clusterId:attributeId:value:timedWriteTimeout:completion:")]
+    void WriteAttributeWithControllerNodeIdEndpointIdClusterIdAttributeIdValueTimedWriteTimeoutCompletion(AnyObject? controller, ulong nodeId, NSNumber endpointId, NSNumber clusterId, NSNumber attributeId, AnyObject value, NSNumber? timeoutMs, MTRValuesHandler completion);
+    [Selector("invokeCommandWithController:nodeId:endpointId:clusterId:commandId:fields:timedInvokeTimeout:completion:")]
+    void InvokeCommandWithControllerNodeIdEndpointIdClusterIdCommandIdFieldsTimedInvokeTimeoutCompletion(AnyObject? controller, ulong nodeId, NSNumber endpointId, NSNumber clusterId, NSNumber commandId, AnyObject fields, NSNumber? timeoutMs, MTRValuesHandler completion);
+    [Selector("subscribeAttributeWithController:nodeId:endpointId:clusterId:attributeId:minInterval:maxInterval:params:establishedHandler:")]
+    void SubscribeAttributeWithControllerNodeIdEndpointIdClusterIdAttributeIdMinIntervalMaxIntervalParamsEstablishedHandler(AnyObject? controller, ulong nodeId, NSNumber? endpointId, NSNumber? clusterId, NSNumber? attributeId, NSNumber minInterval, NSNumber maxInterval, NSDictionary? params, dispatch_block_t establishedHandler);
+    [Selector("stopReportsWithController:nodeId:completion:")]
+    void StopReportsWithControllerNodeIdCompletion(AnyObject? controller, ulong nodeId, dispatch_block_t completion);
+    [Selector("subscribeWithController:nodeId:minInterval:maxInterval:params:shouldCache:completion:")]
+    void SubscribeWithControllerNodeIdMinIntervalMaxIntervalParamsShouldCacheCompletion(AnyObject? controller, ulong nodeId, NSNumber minInterval, NSNumber maxInterval, NSDictionary? params, bool shouldCache, MTRStatusCompletion completion);
+    [Selector("readAttributeCacheWithController:nodeId:endpointId:clusterId:attributeId:completion:")]
+    void ReadAttributeCacheWithControllerNodeIdEndpointIdClusterIdAttributeIdCompletion(AnyObject? controller, ulong nodeId, NSNumber? endpointId, NSNumber? clusterId, NSNumber? attributeId, MTRValuesHandler completion);
     /// Deprecated in macOS 13.3.
-    [Optional] [Selector("getDeviceControllerWithFabricId:completion:")] void GetDeviceControllerWithFabricIdCompletion(ulong fabricId, MTRDeviceControllerGetterHandler completion);
-    [Optional] [Selector("downloadLogWithController:nodeId:type:timeout:completion:")] void DownloadLogWithControllerNodeIdTypeTimeoutCompletion(AnyObject? controller, NSNumber nodeId, MTRDiagnosticLogType type, NSTimeInterval timeout, MTRDeviceControllerServerProtocolDownloadLogWithControllerNodeIdTypeTimeoutCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("getDeviceControllerWithFabricId:completion:")]
+    void GetDeviceControllerWithFabricIdCompletion(ulong fabricId, MTRDeviceControllerGetterHandler completion);
+    [Optional]
+    [Selector("downloadLogWithController:nodeId:type:timeout:completion:")]
+    void DownloadLogWithControllerNodeIdTypeTimeoutCompletion(AnyObject? controller, NSNumber nodeId, MTRDiagnosticLogType type, NSTimeInterval timeout, MTRDeviceControllerServerProtocolDownloadLogWithControllerNodeIdTypeTimeoutCompletionCompletionBlock completion);
 }
 
 public objc interface MTRDeviceControllerClientProtocol : NSObjectProtocol
 {
-    [Selector("handleReportWithController:nodeId:values:error:")] void HandleReportWithControllerNodeIdValuesError(AnyObject? controller, ulong nodeId, AnyObject? values, NSError? error);
+    [Selector("handleReportWithController:nodeId:values:error:")]
+    void HandleReportWithControllerNodeIdValuesError(AnyObject? controller, ulong nodeId, AnyObject? values, NSError? error);
 }
 
 /// Deprecated_XPC, a category of MTRDeviceController.
 public extern objc class MTRDeviceController
 {
     /// Deprecated in macOS 13.3.
-    [Selector("sharedControllerWithId:xpcConnectBlock:")] public static MTRDeviceController SharedControllerWithIdXpcConnectBlock(NSCopying? controllerID, MTRXPCConnectBlock xpcConnectBlock);
+    [Selector("sharedControllerWithId:xpcConnectBlock:")]
+    public static MTRDeviceController SharedControllerWithIdXpcConnectBlock(NSCopying? controllerID, MTRXPCConnectBlock xpcConnectBlock);
 }
 
 #endif

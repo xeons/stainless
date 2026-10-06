@@ -35,21 +35,35 @@ import Standard.ObjC;
 
 public extern objc class MPSGraphTensorData : MPSGraphObject
 {
-    [Selector("shape")] public MPSShape Shape { get; }
-    [Selector("dataType")] public MPSDataType DataType { get; }
-    [Selector("device")] public MPSGraphDevice Device { get; }
-    [Selector("initWithDevice:data:shape:dataType:")] public Self InitWithDeviceDataShapeDataType(MPSGraphDevice device, NSData data, MPSShape shape, MPSDataType dataType);
-    [Selector("initWithMTLBuffer:shape:dataType:")] public Self InitWithMTLBufferShapeDataType(MTLBuffer buffer, MPSShape shape, MPSDataType dataType);
-    [Selector("initWithMTLBuffer:shape:dataType:rowBytes:")] public Self InitWithMTLBufferShapeDataTypeRowBytes(MTLBuffer buffer, MPSShape shape, MPSDataType dataType, NSUInteger rowBytes);
-    [Selector("initWithMPSMatrix:")] public Self InitWithMPSMatrix(MPSMatrix matrix);
-    [Selector("initWithMPSMatrix:rank:")] public Self InitWithMPSMatrixRank(MPSMatrix matrix, NSUInteger rank);
-    [Selector("initWithMPSVector:")] public Self InitWithMPSVector(MPSVector vector);
-    [Selector("initWithMPSVector:rank:")] public Self InitWithMPSVectorRank(MPSVector vector, NSUInteger rank);
-    [Selector("initWithMPSNDArray:")] public Self InitWithMPSNDArray(MPSNDArray ndarray);
-    [Selector("initWithMPSImageBatch:")] public Self InitWithMPSImageBatch(MPSImageBatch imageBatch);
+    [Selector("shape")]
+    public MPSShape Shape { get; }
+    [Selector("dataType")]
+    public MPSDataType DataType { get; }
+    [Selector("device")]
+    public MPSGraphDevice Device { get; }
+    [Selector("initWithDevice:data:shape:dataType:")]
+    public Self InitWithDeviceDataShapeDataType(MPSGraphDevice device, NSData data, MPSShape shape, MPSDataType dataType);
+    [Selector("initWithMTLBuffer:shape:dataType:")]
+    public Self InitWithMTLBufferShapeDataType(MTLBuffer buffer, MPSShape shape, MPSDataType dataType);
+    [Selector("initWithMTLBuffer:shape:dataType:rowBytes:")]
+    public Self InitWithMTLBufferShapeDataTypeRowBytes(MTLBuffer buffer, MPSShape shape, MPSDataType dataType, NSUInteger rowBytes);
+    [Selector("initWithMPSMatrix:")]
+    public Self InitWithMPSMatrix(MPSMatrix matrix);
+    [Selector("initWithMPSMatrix:rank:")]
+    public Self InitWithMPSMatrixRank(MPSMatrix matrix, NSUInteger rank);
+    [Selector("initWithMPSVector:")]
+    public Self InitWithMPSVector(MPSVector vector);
+    [Selector("initWithMPSVector:rank:")]
+    public Self InitWithMPSVectorRank(MPSVector vector, NSUInteger rank);
+    [Selector("initWithMPSNDArray:")]
+    public Self InitWithMPSNDArray(MPSNDArray ndarray);
+    [Selector("initWithMPSImageBatch:")]
+    public Self InitWithMPSImageBatch(MPSImageBatch imageBatch);
     /// macOS 26.0 and later.
-    [Selector("initWithMTLTensor:")] public Self InitWithMTLTensor(MTLTensor tensor);
-    [Selector("mpsndarray")] public MPSNDArray Mpsndarray();
+    [Selector("initWithMTLTensor:")]
+    public Self InitWithMTLTensor(MTLTensor tensor);
+    [Selector("mpsndarray")]
+    public MPSNDArray Mpsndarray();
 }
 
 #endif

@@ -33,20 +33,30 @@ import Standard.ObjC;
 
 public extern objc class NEIPv6Settings : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("addresses")] public NSArray? Addresses { get; }
-    [Selector("networkPrefixLengths")] public NSArray? NetworkPrefixLengths { get; }
-    [Selector("includedRoutes", "setIncludedRoutes:")] public NSArray? IncludedRoutes { get; set; }
-    [Selector("excludedRoutes", "setExcludedRoutes:")] public NSArray? ExcludedRoutes { get; set; }
-    [Selector("initWithAddresses:networkPrefixLengths:")] public Self InitWithAddressesNetworkPrefixLengths(NSArray addresses, NSArray networkPrefixLengths);
+    [Selector("addresses")]
+    public NSArray? Addresses { get; }
+    [Selector("networkPrefixLengths")]
+    public NSArray? NetworkPrefixLengths { get; }
+    [Selector("includedRoutes", "setIncludedRoutes:")]
+    public NSArray? IncludedRoutes { get; set; }
+    [Selector("excludedRoutes", "setExcludedRoutes:")]
+    public NSArray? ExcludedRoutes { get; set; }
+    [Selector("initWithAddresses:networkPrefixLengths:")]
+    public Self InitWithAddressesNetworkPrefixLengths(NSArray addresses, NSArray networkPrefixLengths);
 }
 
 public extern objc class NEIPv6Route : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("destinationAddress")] public NSString? DestinationAddress { get; }
-    [Selector("destinationNetworkPrefixLength")] public NSNumber? DestinationNetworkPrefixLength { get; }
-    [Selector("gatewayAddress", "setGatewayAddress:")] public NSString? GatewayAddress { get; set; }
-    [Selector("initWithDestinationAddress:networkPrefixLength:")] public Self InitWithDestinationAddressNetworkPrefixLength(NSString address, NSNumber networkPrefixLength);
-    [Selector("defaultRoute")] public static NEIPv6Route DefaultRoute();
+    [Selector("destinationAddress")]
+    public NSString? DestinationAddress { get; }
+    [Selector("destinationNetworkPrefixLength")]
+    public NSNumber? DestinationNetworkPrefixLength { get; }
+    [Selector("gatewayAddress", "setGatewayAddress:")]
+    public NSString? GatewayAddress { get; set; }
+    [Selector("initWithDestinationAddress:networkPrefixLength:")]
+    public Self InitWithDestinationAddressNetworkPrefixLength(NSString address, NSNumber networkPrefixLength);
+    [Selector("defaultRoute")]
+    public static NEIPv6Route DefaultRoute();
 }
 
 #endif

@@ -34,17 +34,28 @@ public objc closure void NETunnelProviderManagerLoadAllFromPreferencesWithComple
 
 public extern objc class NETunnelProviderManager : NEVPNManager
 {
-    [Selector("routingMethod")] public NETunnelProviderRoutingMethod RoutingMethod { get; }
-    [Selector("safariDomains", "setSafariDomains:")] public NSArray? SafariDomains { get; set; }
-    [Selector("mailDomains", "setMailDomains:")] public NSArray? MailDomains { get; set; }
-    [Selector("calendarDomains", "setCalendarDomains:")] public NSArray? CalendarDomains { get; set; }
-    [Selector("contactsDomains", "setContactsDomains:")] public NSArray? ContactsDomains { get; set; }
-    [Selector("appRules", "setAppRules:")] public NSArray? AppRules { get; set; }
-    [Selector("excludedDomains", "setExcludedDomains:")] public NSArray? ExcludedDomains { get; set; }
-    [Selector("associatedDomains", "setAssociatedDomains:")] public NSArray? AssociatedDomains { get; set; }
-    [Selector("loadAllFromPreferencesWithCompletionHandler:")] public static void LoadAllFromPreferencesWithCompletionHandler(NETunnelProviderManagerLoadAllFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("forPerAppVPN")] public static Self ForPerAppVPN();
-    [Selector("copyAppRules")] public NSArray? CopyAppRules();
+    [Selector("routingMethod")]
+    public NETunnelProviderRoutingMethod RoutingMethod { get; }
+    [Selector("safariDomains", "setSafariDomains:")]
+    public NSArray? SafariDomains { get; set; }
+    [Selector("mailDomains", "setMailDomains:")]
+    public NSArray? MailDomains { get; set; }
+    [Selector("calendarDomains", "setCalendarDomains:")]
+    public NSArray? CalendarDomains { get; set; }
+    [Selector("contactsDomains", "setContactsDomains:")]
+    public NSArray? ContactsDomains { get; set; }
+    [Selector("appRules", "setAppRules:")]
+    public NSArray? AppRules { get; set; }
+    [Selector("excludedDomains", "setExcludedDomains:")]
+    public NSArray? ExcludedDomains { get; set; }
+    [Selector("associatedDomains", "setAssociatedDomains:")]
+    public NSArray? AssociatedDomains { get; set; }
+    [Selector("loadAllFromPreferencesWithCompletionHandler:")]
+    public static void LoadAllFromPreferencesWithCompletionHandler(NETunnelProviderManagerLoadAllFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("forPerAppVPN")]
+    public static Self ForPerAppVPN();
+    [Selector("copyAppRules")]
+    public NSArray? CopyAppRules();
 }
 
 #endif

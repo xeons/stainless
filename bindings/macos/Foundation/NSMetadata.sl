@@ -36,37 +36,66 @@ public objc closure void NSMetadataQueryEnumerateResultsWithOptionsUsingBlockBlo
 
 public extern objc class NSMetadataQuery : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public NSMetadataQueryDelegate? Delegate { get; set; }
-    [Selector("predicate", "setPredicate:")] public NSPredicate? Predicate { get; set; }
-    [Selector("sortDescriptors", "setSortDescriptors:")] public NSArray SortDescriptors { get; set; }
-    [Selector("valueListAttributes", "setValueListAttributes:")] public NSArray ValueListAttributes { get; set; }
-    [Selector("groupingAttributes", "setGroupingAttributes:")] public NSArray? GroupingAttributes { get; set; }
-    [Selector("notificationBatchingInterval", "setNotificationBatchingInterval:")] public NSTimeInterval NotificationBatchingInterval { get; set; }
-    [Selector("searchScopes", "setSearchScopes:")] public NSArray SearchScopes { get; set; }
-    [Selector("searchItems", "setSearchItems:")] public NSArray? SearchItems { get; set; }
-    [Selector("operationQueue", "setOperationQueue:")] public NSOperationQueue? OperationQueue { get; set; }
-    [Selector("isStarted")] public bool Started { get; }
-    [Selector("isGathering")] public bool Gathering { get; }
-    [Selector("isStopped")] public bool Stopped { get; }
-    [Selector("resultCount")] public NSUInteger ResultCount { get; }
-    [Selector("results")] public NSArray Results { get; }
-    [Selector("valueLists")] public NSDictionary ValueLists { get; }
-    [Selector("groupedResults")] public NSArray GroupedResults { get; }
-    [Selector("startQuery")] public bool StartQuery();
-    [Selector("stopQuery")] public void StopQuery();
-    [Selector("disableUpdates")] public void DisableUpdates();
-    [Selector("enableUpdates")] public void EnableUpdates();
-    [Selector("resultAtIndex:")] public AnyObject ResultAtIndex(NSUInteger idx);
-    [Selector("enumerateResultsUsingBlock:")] public void EnumerateResultsUsingBlock(NSMetadataQueryEnumerateResultsUsingBlockBlock block);
-    [Selector("enumerateResultsWithOptions:usingBlock:")] public void EnumerateResultsWithOptionsUsingBlock(NSEnumerationOptions opts, NSMetadataQueryEnumerateResultsWithOptionsUsingBlockBlock block);
-    [Selector("indexOfResult:")] public NSUInteger IndexOfResult(AnyObject result);
-    [Selector("valueOfAttribute:forResultAtIndex:")] public AnyObject? ValueOfAttributeForResultAtIndex(NSString attrName, NSUInteger idx);
+    [Selector("delegate", "setDelegate:")]
+    public NSMetadataQueryDelegate? Delegate { get; set; }
+    [Selector("predicate", "setPredicate:")]
+    public NSPredicate? Predicate { get; set; }
+    [Selector("sortDescriptors", "setSortDescriptors:")]
+    public NSArray SortDescriptors { get; set; }
+    [Selector("valueListAttributes", "setValueListAttributes:")]
+    public NSArray ValueListAttributes { get; set; }
+    [Selector("groupingAttributes", "setGroupingAttributes:")]
+    public NSArray? GroupingAttributes { get; set; }
+    [Selector("notificationBatchingInterval", "setNotificationBatchingInterval:")]
+    public NSTimeInterval NotificationBatchingInterval { get; set; }
+    [Selector("searchScopes", "setSearchScopes:")]
+    public NSArray SearchScopes { get; set; }
+    [Selector("searchItems", "setSearchItems:")]
+    public NSArray? SearchItems { get; set; }
+    [Selector("operationQueue", "setOperationQueue:")]
+    public NSOperationQueue? OperationQueue { get; set; }
+    [Selector("isStarted")]
+    public bool Started { get; }
+    [Selector("isGathering")]
+    public bool Gathering { get; }
+    [Selector("isStopped")]
+    public bool Stopped { get; }
+    [Selector("resultCount")]
+    public NSUInteger ResultCount { get; }
+    [Selector("results")]
+    public NSArray Results { get; }
+    [Selector("valueLists")]
+    public NSDictionary ValueLists { get; }
+    [Selector("groupedResults")]
+    public NSArray GroupedResults { get; }
+    [Selector("startQuery")]
+    public bool StartQuery();
+    [Selector("stopQuery")]
+    public void StopQuery();
+    [Selector("disableUpdates")]
+    public void DisableUpdates();
+    [Selector("enableUpdates")]
+    public void EnableUpdates();
+    [Selector("resultAtIndex:")]
+    public AnyObject ResultAtIndex(NSUInteger idx);
+    [Selector("enumerateResultsUsingBlock:")]
+    public void EnumerateResultsUsingBlock(NSMetadataQueryEnumerateResultsUsingBlockBlock block);
+    [Selector("enumerateResultsWithOptions:usingBlock:")]
+    public void EnumerateResultsWithOptionsUsingBlock(NSEnumerationOptions opts, NSMetadataQueryEnumerateResultsWithOptionsUsingBlockBlock block);
+    [Selector("indexOfResult:")]
+    public NSUInteger IndexOfResult(AnyObject result);
+    [Selector("valueOfAttribute:forResultAtIndex:")]
+    public AnyObject? ValueOfAttributeForResultAtIndex(NSString attrName, NSUInteger idx);
 }
 
 public objc interface NSMetadataQueryDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("metadataQuery:replacementObjectForResultObject:")] AnyObject MetadataQueryReplacementObjectForResultObject(NSMetadataQuery query, NSMetadataItem result);
-    [Optional] [Selector("metadataQuery:replacementValueForAttribute:value:")] AnyObject MetadataQueryReplacementValueForAttributeValue(NSMetadataQuery query, NSString attrName, AnyObject attrValue);
+    [Optional]
+    [Selector("metadataQuery:replacementObjectForResultObject:")]
+    AnyObject MetadataQueryReplacementObjectForResultObject(NSMetadataQuery query, NSMetadataItem result);
+    [Optional]
+    [Selector("metadataQuery:replacementValueForAttribute:value:")]
+    AnyObject MetadataQueryReplacementValueForAttributeValue(NSMetadataQuery query, NSString attrName, AnyObject attrValue);
 }
 
 public extern "C" NSNotificationName NSMetadataQueryDidStartGatheringNotification;
@@ -103,27 +132,40 @@ public extern "C" NSString NSMetadataQueryAccessibleUbiquitousExternalDocumentsS
 
 public extern objc class NSMetadataItem : NSObject
 {
-    [Selector("attributes")] public NSArray Attributes { get; }
-    [Selector("initWithURL:")] public Self? InitWithURL(NSURL url);
-    [Selector("valueForAttribute:")] public AnyObject? ValueForAttribute(NSString key);
-    [Selector("valuesForAttributes:")] public NSDictionary? ValuesForAttributes(NSArray keys);
+    [Selector("attributes")]
+    public NSArray Attributes { get; }
+    [Selector("initWithURL:")]
+    public Self? InitWithURL(NSURL url);
+    [Selector("valueForAttribute:")]
+    public AnyObject? ValueForAttribute(NSString key);
+    [Selector("valuesForAttributes:")]
+    public NSDictionary? ValuesForAttributes(NSArray keys);
 }
 
 public extern objc class NSMetadataQueryAttributeValueTuple : NSObject
 {
-    [Selector("attribute")] public NSString Attribute { get; }
-    [Selector("value")] public AnyObject? Value { get; }
-    [Selector("count")] public NSUInteger Count { get; }
+    [Selector("attribute")]
+    public NSString Attribute { get; }
+    [Selector("value")]
+    public AnyObject? Value { get; }
+    [Selector("count")]
+    public NSUInteger Count { get; }
 }
 
 public extern objc class NSMetadataQueryResultGroup : NSObject
 {
-    [Selector("attribute")] public NSString Attribute { get; }
-    [Selector("value")] public AnyObject Value { get; }
-    [Selector("subgroups")] public NSArray? Subgroups { get; }
-    [Selector("resultCount")] public NSUInteger ResultCount { get; }
-    [Selector("results")] public NSArray Results { get; }
-    [Selector("resultAtIndex:")] public AnyObject ResultAtIndex(NSUInteger idx);
+    [Selector("attribute")]
+    public NSString Attribute { get; }
+    [Selector("value")]
+    public AnyObject Value { get; }
+    [Selector("subgroups")]
+    public NSArray? Subgroups { get; }
+    [Selector("resultCount")]
+    public NSUInteger ResultCount { get; }
+    [Selector("results")]
+    public NSArray Results { get; }
+    [Selector("resultAtIndex:")]
+    public AnyObject ResultAtIndex(NSUInteger idx);
 }
 
 #endif

@@ -44,12 +44,18 @@ public objc closure void HKAttachmentStoreStreamDataForAttachmentDataHandlerData
 
 public extern objc class HKAttachmentStore : NSObject
 {
-    [Selector("initWithHealthStore:")] public Self InitWithHealthStore(HKHealthStore healthStore);
-    [Selector("addAttachmentToObject:name:contentType:URL:metadata:completion:")] public void AddAttachmentToObjectNameContentTypeURLMetadataCompletion(HKObject object, NSString name, UTType contentType, NSURL URL, NSDictionary? metadata, HKAttachmentStoreAddAttachmentToObjectNameContentTypeURLMetadataCompletionCompletionBlock completion);
-    [Selector("removeAttachment:fromObject:completion:")] public void RemoveAttachmentFromObjectCompletion(HKAttachment attachment, HKObject object, HKAttachmentStoreRemoveAttachmentFromObjectCompletionCompletionBlock completion);
-    [Selector("getAttachmentsForObject:completion:")] public void GetAttachmentsForObjectCompletion(HKObject object, HKAttachmentStoreGetAttachmentsForObjectCompletionCompletionBlock completion);
-    [Selector("getDataForAttachment:completion:")] public NSProgress GetDataForAttachmentCompletion(HKAttachment attachment, HKAttachmentStoreGetDataForAttachmentCompletionCompletionBlock completion);
-    [Selector("streamDataForAttachment:dataHandler:")] public NSProgress StreamDataForAttachmentDataHandler(HKAttachment attachment, HKAttachmentStoreStreamDataForAttachmentDataHandlerDataHandlerBlock dataHandler);
+    [Selector("initWithHealthStore:")]
+    public Self InitWithHealthStore(HKHealthStore healthStore);
+    [Selector("addAttachmentToObject:name:contentType:URL:metadata:completion:")]
+    public void AddAttachmentToObjectNameContentTypeURLMetadataCompletion(HKObject object, NSString name, UTType contentType, NSURL URL, NSDictionary? metadata, HKAttachmentStoreAddAttachmentToObjectNameContentTypeURLMetadataCompletionCompletionBlock completion);
+    [Selector("removeAttachment:fromObject:completion:")]
+    public void RemoveAttachmentFromObjectCompletion(HKAttachment attachment, HKObject object, HKAttachmentStoreRemoveAttachmentFromObjectCompletionCompletionBlock completion);
+    [Selector("getAttachmentsForObject:completion:")]
+    public void GetAttachmentsForObjectCompletion(HKObject object, HKAttachmentStoreGetAttachmentsForObjectCompletionCompletionBlock completion);
+    [Selector("getDataForAttachment:completion:")]
+    public NSProgress GetDataForAttachmentCompletion(HKAttachment attachment, HKAttachmentStoreGetDataForAttachmentCompletionCompletionBlock completion);
+    [Selector("streamDataForAttachment:dataHandler:")]
+    public NSProgress StreamDataForAttachmentDataHandler(HKAttachment attachment, HKAttachmentStoreStreamDataForAttachmentDataHandlerDataHandlerBlock dataHandler);
 }
 
 #endif

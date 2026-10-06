@@ -51,15 +51,22 @@ public using NSPropertyListWriteOptions = NSUInteger;
 
 public extern objc class NSPropertyListSerialization : NSObject
 {
-    [Selector("propertyList:isValidForFormat:")] public static bool PropertyListIsValidForFormat(AnyObject plist, NSPropertyListFormat format);
-    [Selector("dataWithPropertyList:format:options:error:")] public static NSData? DataWithPropertyListFormatOptionsError(AnyObject plist, NSPropertyListFormat format, NSPropertyListWriteOptions opt, out NSError? error);
-    [Selector("writePropertyList:toStream:format:options:error:")] public static NSInteger WritePropertyListToStreamFormatOptionsError(AnyObject plist, NSOutputStream stream, NSPropertyListFormat format, NSPropertyListWriteOptions opt, out NSError? error);
-    [Selector("propertyListWithData:options:format:error:")] public static AnyObject? PropertyListWithDataOptionsFormatError(NSData data, NSPropertyListReadOptions opt, NSPropertyListFormat* format, out NSError? error);
-    [Selector("propertyListWithStream:options:format:error:")] public static AnyObject? PropertyListWithStreamOptionsFormatError(NSInputStream stream, NSPropertyListReadOptions opt, NSPropertyListFormat* format, out NSError? error);
+    [Selector("propertyList:isValidForFormat:")]
+    public static bool PropertyListIsValidForFormat(AnyObject plist, NSPropertyListFormat format);
+    [Selector("dataWithPropertyList:format:options:error:")]
+    public static NSData? DataWithPropertyListFormatOptionsError(AnyObject plist, NSPropertyListFormat format, NSPropertyListWriteOptions opt, out NSError? error);
+    [Selector("writePropertyList:toStream:format:options:error:")]
+    public static NSInteger WritePropertyListToStreamFormatOptionsError(AnyObject plist, NSOutputStream stream, NSPropertyListFormat format, NSPropertyListWriteOptions opt, out NSError? error);
+    [Selector("propertyListWithData:options:format:error:")]
+    public static AnyObject? PropertyListWithDataOptionsFormatError(NSData data, NSPropertyListReadOptions opt, NSPropertyListFormat* format, out NSError? error);
+    [Selector("propertyListWithStream:options:format:error:")]
+    public static AnyObject? PropertyListWithStreamOptionsFormatError(NSInputStream stream, NSPropertyListReadOptions opt, NSPropertyListFormat* format, out NSError? error);
     /// Deprecated in macOS 10.10.
-    [Selector("dataFromPropertyList:format:errorDescription:")] public static NSData? DataFromPropertyListFormatErrorDescription(AnyObject plist, NSPropertyListFormat format, void** errorString);
+    [Selector("dataFromPropertyList:format:errorDescription:")]
+    public static NSData? DataFromPropertyListFormatErrorDescription(AnyObject plist, NSPropertyListFormat format, void** errorString);
     /// Deprecated in macOS 10.10.
-    [Selector("propertyListFromData:mutabilityOption:format:errorDescription:")] public static AnyObject? PropertyListFromDataMutabilityOptionFormatErrorDescription(NSData data, NSPropertyListMutabilityOptions opt, NSPropertyListFormat* format, void** errorString);
+    [Selector("propertyListFromData:mutabilityOption:format:errorDescription:")]
+    public static AnyObject? PropertyListFromDataMutabilityOptionFormatErrorDescription(NSData data, NSPropertyListMutabilityOptions opt, NSPropertyListFormat* format, void** errorString);
 }
 
 #endif

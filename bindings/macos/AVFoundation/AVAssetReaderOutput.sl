@@ -34,81 +34,119 @@ import Standard.ObjC;
 
 public extern objc class AVAssetReaderOutput : NSObject
 {
-    [Selector("mediaType")] public AVMediaType MediaType { get; }
-    [Selector("alwaysCopiesSampleData", "setAlwaysCopiesSampleData:")] public bool AlwaysCopiesSampleData { get; set; }
-    [Selector("copyNextSampleBuffer")] public CMSampleBufferRef? CopyNextSampleBuffer();
+    [Selector("mediaType")]
+    public AVMediaType MediaType { get; }
+    [Selector("alwaysCopiesSampleData", "setAlwaysCopiesSampleData:")]
+    public bool AlwaysCopiesSampleData { get; set; }
+    [Selector("copyNextSampleBuffer")]
+    public CMSampleBufferRef? CopyNextSampleBuffer();
 }
 
 /// AVAssetReaderOutputRandomAccess, a category of AVAssetReaderOutput.
 public extern objc class AVAssetReaderOutput
 {
-    [Selector("supportsRandomAccess", "setSupportsRandomAccess:")] public bool SupportsRandomAccess { get; set; }
-    [Selector("resetForReadingTimeRanges:")] public void ResetForReadingTimeRanges(NSArray timeRanges);
-    [Selector("markConfigurationAsFinal")] public void MarkConfigurationAsFinal();
+    [Selector("supportsRandomAccess", "setSupportsRandomAccess:")]
+    public bool SupportsRandomAccess { get; set; }
+    [Selector("resetForReadingTimeRanges:")]
+    public void ResetForReadingTimeRanges(NSArray timeRanges);
+    [Selector("markConfigurationAsFinal")]
+    public void MarkConfigurationAsFinal();
 }
 
 public extern objc class AVAssetReaderTrackOutput : AVAssetReaderOutput
 {
-    [Selector("track")] public AVAssetTrack Track { get; }
-    [Selector("outputSettings")] public NSDictionary? OutputSettings { get; }
-    [Selector("audioTimePitchAlgorithm", "setAudioTimePitchAlgorithm:")] public AVAudioTimePitchAlgorithm? AudioTimePitchAlgorithm { get; set; }
-    [Selector("assetReaderTrackOutputWithTrack:outputSettings:")] public static Self AssetReaderTrackOutputWithTrackOutputSettings(AVAssetTrack track, NSDictionary? outputSettings);
-    [Selector("initWithTrack:outputSettings:")] public Self InitWithTrackOutputSettings(AVAssetTrack track, NSDictionary? outputSettings);
+    [Selector("track")]
+    public AVAssetTrack Track { get; }
+    [Selector("outputSettings")]
+    public NSDictionary? OutputSettings { get; }
+    [Selector("audioTimePitchAlgorithm", "setAudioTimePitchAlgorithm:")]
+    public AVAudioTimePitchAlgorithm? AudioTimePitchAlgorithm { get; set; }
+    [Selector("assetReaderTrackOutputWithTrack:outputSettings:")]
+    public static Self AssetReaderTrackOutputWithTrackOutputSettings(AVAssetTrack track, NSDictionary? outputSettings);
+    [Selector("initWithTrack:outputSettings:")]
+    public Self InitWithTrackOutputSettings(AVAssetTrack track, NSDictionary? outputSettings);
 }
 
 public extern objc class AVAssetReaderAudioMixOutput : AVAssetReaderOutput
 {
-    [Selector("audioTracks")] public NSArray AudioTracks { get; }
-    [Selector("audioSettings")] public NSDictionary? AudioSettings { get; }
-    [Selector("audioMix", "setAudioMix:")] public AVAudioMix? AudioMix { get; set; }
-    [Selector("audioTimePitchAlgorithm", "setAudioTimePitchAlgorithm:")] public AVAudioTimePitchAlgorithm? AudioTimePitchAlgorithm { get; set; }
-    [Selector("assetReaderAudioMixOutputWithAudioTracks:audioSettings:")] public static Self AssetReaderAudioMixOutputWithAudioTracksAudioSettings(NSArray audioTracks, NSDictionary? audioSettings);
-    [Selector("initWithAudioTracks:audioSettings:")] public Self InitWithAudioTracksAudioSettings(NSArray audioTracks, NSDictionary? audioSettings);
+    [Selector("audioTracks")]
+    public NSArray AudioTracks { get; }
+    [Selector("audioSettings")]
+    public NSDictionary? AudioSettings { get; }
+    [Selector("audioMix", "setAudioMix:")]
+    public AVAudioMix? AudioMix { get; set; }
+    [Selector("audioTimePitchAlgorithm", "setAudioTimePitchAlgorithm:")]
+    public AVAudioTimePitchAlgorithm? AudioTimePitchAlgorithm { get; set; }
+    [Selector("assetReaderAudioMixOutputWithAudioTracks:audioSettings:")]
+    public static Self AssetReaderAudioMixOutputWithAudioTracksAudioSettings(NSArray audioTracks, NSDictionary? audioSettings);
+    [Selector("initWithAudioTracks:audioSettings:")]
+    public Self InitWithAudioTracksAudioSettings(NSArray audioTracks, NSDictionary? audioSettings);
 }
 
 public extern objc class AVAssetReaderVideoCompositionOutput : AVAssetReaderOutput
 {
-    [Selector("videoTracks")] public NSArray VideoTracks { get; }
-    [Selector("videoSettings")] public NSDictionary? VideoSettings { get; }
-    [Selector("videoComposition", "setVideoComposition:")] public AVVideoComposition? VideoComposition { get; set; }
-    [Selector("customVideoCompositor")] public AVVideoCompositing? CustomVideoCompositor { get; }
-    [Selector("assetReaderVideoCompositionOutputWithVideoTracks:videoSettings:")] public static Self AssetReaderVideoCompositionOutputWithVideoTracksVideoSettings(NSArray videoTracks, NSDictionary? videoSettings);
-    [Selector("initWithVideoTracks:videoSettings:")] public Self InitWithVideoTracksVideoSettings(NSArray videoTracks, NSDictionary? videoSettings);
+    [Selector("videoTracks")]
+    public NSArray VideoTracks { get; }
+    [Selector("videoSettings")]
+    public NSDictionary? VideoSettings { get; }
+    [Selector("videoComposition", "setVideoComposition:")]
+    public AVVideoComposition? VideoComposition { get; set; }
+    [Selector("customVideoCompositor")]
+    public AVVideoCompositing? CustomVideoCompositor { get; }
+    [Selector("assetReaderVideoCompositionOutputWithVideoTracks:videoSettings:")]
+    public static Self AssetReaderVideoCompositionOutputWithVideoTracksVideoSettings(NSArray videoTracks, NSDictionary? videoSettings);
+    [Selector("initWithVideoTracks:videoSettings:")]
+    public Self InitWithVideoTracksVideoSettings(NSArray videoTracks, NSDictionary? videoSettings);
 }
 
 public extern objc class AVAssetReaderOutputMetadataAdaptor : NSObject
 {
-    [Selector("assetReaderTrackOutput")] public AVAssetReaderTrackOutput AssetReaderTrackOutput { get; }
-    [Selector("assetReaderOutputMetadataAdaptorWithAssetReaderTrackOutput:")] public static Self AssetReaderOutputMetadataAdaptorWithAssetReaderTrackOutput(AVAssetReaderTrackOutput trackOutput);
-    [Selector("initWithAssetReaderTrackOutput:")] public Self InitWithAssetReaderTrackOutput(AVAssetReaderTrackOutput trackOutput);
-    [Selector("nextTimedMetadataGroup")] public AVTimedMetadataGroup? NextTimedMetadataGroup();
+    [Selector("assetReaderTrackOutput")]
+    public AVAssetReaderTrackOutput AssetReaderTrackOutput { get; }
+    [Selector("assetReaderOutputMetadataAdaptorWithAssetReaderTrackOutput:")]
+    public static Self AssetReaderOutputMetadataAdaptorWithAssetReaderTrackOutput(AVAssetReaderTrackOutput trackOutput);
+    [Selector("initWithAssetReaderTrackOutput:")]
+    public Self InitWithAssetReaderTrackOutput(AVAssetReaderTrackOutput trackOutput);
+    [Selector("nextTimedMetadataGroup")]
+    public AVTimedMetadataGroup? NextTimedMetadataGroup();
 }
 
 public extern objc class AVAssetReaderOutputCaptionAdaptor : NSObject
 {
-    [Selector("assetReaderTrackOutput")] public AVAssetReaderTrackOutput AssetReaderTrackOutput { get; }
-    [Selector("assetReaderOutputCaptionAdaptorWithAssetReaderTrackOutput:")] public static Self AssetReaderOutputCaptionAdaptorWithAssetReaderTrackOutput(AVAssetReaderTrackOutput trackOutput);
-    [Selector("initWithAssetReaderTrackOutput:")] public Self InitWithAssetReaderTrackOutput(AVAssetReaderTrackOutput trackOutput);
-    [Selector("nextCaptionGroup")] public AVCaptionGroup? NextCaptionGroup();
-    [Selector("captionsNotPresentInPreviousGroupsInCaptionGroup:")] public NSArray CaptionsNotPresentInPreviousGroupsInCaptionGroup(AVCaptionGroup captionGroup);
+    [Selector("assetReaderTrackOutput")]
+    public AVAssetReaderTrackOutput AssetReaderTrackOutput { get; }
+    [Selector("assetReaderOutputCaptionAdaptorWithAssetReaderTrackOutput:")]
+    public static Self AssetReaderOutputCaptionAdaptorWithAssetReaderTrackOutput(AVAssetReaderTrackOutput trackOutput);
+    [Selector("initWithAssetReaderTrackOutput:")]
+    public Self InitWithAssetReaderTrackOutput(AVAssetReaderTrackOutput trackOutput);
+    [Selector("nextCaptionGroup")]
+    public AVCaptionGroup? NextCaptionGroup();
+    [Selector("captionsNotPresentInPreviousGroupsInCaptionGroup:")]
+    public NSArray CaptionsNotPresentInPreviousGroupsInCaptionGroup(AVCaptionGroup captionGroup);
 }
 
 /// AVAssetReaderCaptionValidation, a category of AVAssetReaderOutputCaptionAdaptor.
 public extern objc class AVAssetReaderOutputCaptionAdaptor
 {
-    [Selector("validationDelegate", "setValidationDelegate:")] public AVAssetReaderCaptionValidationHandling? ValidationDelegate { get; set; }
+    [Selector("validationDelegate", "setValidationDelegate:")]
+    public AVAssetReaderCaptionValidationHandling? ValidationDelegate { get; set; }
 }
 
 public objc interface AVAssetReaderCaptionValidationHandling : NSObjectProtocol
 {
-    [Optional] [Selector("captionAdaptor:didVendCaption:skippingUnsupportedSourceSyntaxElements:")] void CaptionAdaptorDidVendCaptionSkippingUnsupportedSourceSyntaxElements(AVAssetReaderOutputCaptionAdaptor adaptor, AVCaption caption, NSArray syntaxElements);
+    [Optional]
+    [Selector("captionAdaptor:didVendCaption:skippingUnsupportedSourceSyntaxElements:")]
+    void CaptionAdaptorDidVendCaptionSkippingUnsupportedSourceSyntaxElements(AVAssetReaderOutputCaptionAdaptor adaptor, AVCaption caption, NSArray syntaxElements);
 }
 
 public extern objc class AVAssetReaderSampleReferenceOutput : AVAssetReaderOutput
 {
-    [Selector("track")] public AVAssetTrack Track { get; }
-    [Selector("assetReaderSampleReferenceOutputWithTrack:")] public static Self AssetReaderSampleReferenceOutputWithTrack(AVAssetTrack track);
-    [Selector("initWithTrack:")] public Self InitWithTrack(AVAssetTrack track);
+    [Selector("track")]
+    public AVAssetTrack Track { get; }
+    [Selector("assetReaderSampleReferenceOutputWithTrack:")]
+    public static Self AssetReaderSampleReferenceOutputWithTrack(AVAssetTrack track);
+    [Selector("initWithTrack:")]
+    public Self InitWithTrack(AVAssetTrack track);
 }
 
 #endif

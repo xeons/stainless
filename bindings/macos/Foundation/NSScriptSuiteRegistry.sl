@@ -32,21 +32,36 @@ import Standard.ObjC;
 
 public extern objc class NSScriptSuiteRegistry : NSObject
 {
-    [Selector("suiteNames")] public NSArray SuiteNames { get; }
-    [Selector("sharedScriptSuiteRegistry")] public static NSScriptSuiteRegistry SharedScriptSuiteRegistry();
-    [Selector("setSharedScriptSuiteRegistry:")] public static void SetSharedScriptSuiteRegistry(NSScriptSuiteRegistry registry);
-    [Selector("loadSuitesFromBundle:")] public void LoadSuitesFromBundle(NSBundle bundle);
-    [Selector("loadSuiteWithDictionary:fromBundle:")] public void LoadSuiteWithDictionaryFromBundle(NSDictionary suiteDeclaration, NSBundle bundle);
-    [Selector("registerClassDescription:")] public void RegisterClassDescription(NSScriptClassDescription classDescription);
-    [Selector("registerCommandDescription:")] public void RegisterCommandDescription(NSScriptCommandDescription commandDescription);
-    [Selector("appleEventCodeForSuite:")] public FourCharCode AppleEventCodeForSuite(NSString suiteName);
-    [Selector("bundleForSuite:")] public NSBundle? BundleForSuite(NSString suiteName);
-    [Selector("classDescriptionsInSuite:")] public NSDictionary? ClassDescriptionsInSuite(NSString suiteName);
-    [Selector("commandDescriptionsInSuite:")] public NSDictionary? CommandDescriptionsInSuite(NSString suiteName);
-    [Selector("suiteForAppleEventCode:")] public NSString? SuiteForAppleEventCode(FourCharCode appleEventCode);
-    [Selector("classDescriptionWithAppleEventCode:")] public NSScriptClassDescription? ClassDescriptionWithAppleEventCode(FourCharCode appleEventCode);
-    [Selector("commandDescriptionWithAppleEventClass:andAppleEventCode:")] public NSScriptCommandDescription? CommandDescriptionWithAppleEventClassAndAppleEventCode(FourCharCode appleEventClassCode, FourCharCode appleEventIDCode);
-    [Selector("aeteResource:")] public NSData? AeteResource(NSString languageName);
+    [Selector("suiteNames")]
+    public NSArray SuiteNames { get; }
+    [Selector("sharedScriptSuiteRegistry")]
+    public static NSScriptSuiteRegistry SharedScriptSuiteRegistry();
+    [Selector("setSharedScriptSuiteRegistry:")]
+    public static void SetSharedScriptSuiteRegistry(NSScriptSuiteRegistry registry);
+    [Selector("loadSuitesFromBundle:")]
+    public void LoadSuitesFromBundle(NSBundle bundle);
+    [Selector("loadSuiteWithDictionary:fromBundle:")]
+    public void LoadSuiteWithDictionaryFromBundle(NSDictionary suiteDeclaration, NSBundle bundle);
+    [Selector("registerClassDescription:")]
+    public void RegisterClassDescription(NSScriptClassDescription classDescription);
+    [Selector("registerCommandDescription:")]
+    public void RegisterCommandDescription(NSScriptCommandDescription commandDescription);
+    [Selector("appleEventCodeForSuite:")]
+    public FourCharCode AppleEventCodeForSuite(NSString suiteName);
+    [Selector("bundleForSuite:")]
+    public NSBundle? BundleForSuite(NSString suiteName);
+    [Selector("classDescriptionsInSuite:")]
+    public NSDictionary? ClassDescriptionsInSuite(NSString suiteName);
+    [Selector("commandDescriptionsInSuite:")]
+    public NSDictionary? CommandDescriptionsInSuite(NSString suiteName);
+    [Selector("suiteForAppleEventCode:")]
+    public NSString? SuiteForAppleEventCode(FourCharCode appleEventCode);
+    [Selector("classDescriptionWithAppleEventCode:")]
+    public NSScriptClassDescription? ClassDescriptionWithAppleEventCode(FourCharCode appleEventCode);
+    [Selector("commandDescriptionWithAppleEventClass:andAppleEventCode:")]
+    public NSScriptCommandDescription? CommandDescriptionWithAppleEventClassAndAppleEventCode(FourCharCode appleEventClassCode, FourCharCode appleEventIDCode);
+    [Selector("aeteResource:")]
+    public NSData? AeteResource(NSString languageName);
 }
 
 #endif

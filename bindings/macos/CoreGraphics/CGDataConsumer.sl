@@ -47,10 +47,13 @@ public struct CGDataConsumerCallbacks
 
 public extern "C" CFTypeID CGDataConsumerGetTypeID();
 
-[ReturnsRetained] public extern "C" CGDataConsumerRef? CGDataConsumerCreate(void* info, CGDataConsumerCallbacks* cbks);
+[ReturnsRetained]
+public extern "C" CGDataConsumerRef? CGDataConsumerCreate(void* info, CGDataConsumerCallbacks* cbks);
 
-[ReturnsRetained] public extern "C" CGDataConsumerRef? CGDataConsumerCreateWithURL(CFURLRef? url);
+[ReturnsRetained]
+public extern "C" CGDataConsumerRef? CGDataConsumerCreateWithURL(CFURLRef? url);
 
-[ReturnsRetained] public extern "C" CGDataConsumerRef? CGDataConsumerCreateWithCFData(CFMutableDataRef? data);
+[ReturnsRetained]
+public extern "C" CGDataConsumerRef? CGDataConsumerCreateWithCFData(CFMutableDataRef? data);
 
 #endif

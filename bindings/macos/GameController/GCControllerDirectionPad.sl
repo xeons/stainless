@@ -31,14 +31,22 @@ import Standard.ObjC;
 
 public extern objc class GCControllerDirectionPad : GCControllerElement
 {
-    [Selector("valueChangedHandler", "setValueChangedHandler:")] public GCControllerDirectionPadValueChangedHandler? ValueChangedHandler { get; set; }
-    [Selector("xAxis")] public GCControllerAxisInput XAxis { get; }
-    [Selector("yAxis")] public GCControllerAxisInput YAxis { get; }
-    [Selector("up")] public GCControllerButtonInput Up { get; }
-    [Selector("down")] public GCControllerButtonInput Down { get; }
-    [Selector("left")] public GCControllerButtonInput Left { get; }
-    [Selector("right")] public GCControllerButtonInput Right { get; }
-    [Selector("setValueForXAxis:yAxis:")] public void SetValueForXAxisYAxis(float xAxis, float yAxis);
+    [Selector("valueChangedHandler", "setValueChangedHandler:")]
+    public GCControllerDirectionPadValueChangedHandler? ValueChangedHandler { get; set; }
+    [Selector("xAxis")]
+    public GCControllerAxisInput XAxis { get; }
+    [Selector("yAxis")]
+    public GCControllerAxisInput YAxis { get; }
+    [Selector("up")]
+    public GCControllerButtonInput Up { get; }
+    [Selector("down")]
+    public GCControllerButtonInput Down { get; }
+    [Selector("left")]
+    public GCControllerButtonInput Left { get; }
+    [Selector("right")]
+    public GCControllerButtonInput Right { get; }
+    [Selector("setValueForXAxis:yAxis:")]
+    public void SetValueForXAxisYAxis(float xAxis, float yAxis);
 }
 
 public objc closure void GCControllerDirectionPadValueChangedHandler(GCControllerDirectionPad arg0, float arg1, float arg2);

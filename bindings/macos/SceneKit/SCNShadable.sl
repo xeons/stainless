@@ -43,7 +43,8 @@ public enum SCNBufferFrequency : long
 
 public objc interface SCNBufferStream : NSObjectProtocol
 {
-    [Selector("writeBytes:length:")] void WriteBytesLength(void* bytes, NSUInteger length);
+    [Selector("writeBytes:length:")]
+    void WriteBytesLength(void* bytes, NSUInteger length);
 }
 
 public objc closure void SCNBufferBindingBlock(SCNBufferStream arg0, SCNNode arg1, SCNShadable arg2, SCNRenderer arg3);
@@ -52,42 +53,74 @@ public objc closure void SCNBindingBlock(uint arg0, uint arg1, SCNNode? arg2, SC
 
 public objc interface SCNShadable : NSObjectProtocol
 {
-    [Optional] [Selector("program", "setProgram:")] SCNProgram? Program { get; set; }
-    [Optional] [Selector("shaderModifiers", "setShaderModifiers:")] NSDictionary? ShaderModifiers { get; set; }
-    [Optional] [Selector("minimumLanguageVersion", "setMinimumLanguageVersion:")] NSNumber? MinimumLanguageVersion { get; set; }
-    [Optional] [Selector("handleBindingOfSymbol:usingBlock:")] void HandleBindingOfSymbolUsingBlock(NSString symbol, SCNBindingBlock? block);
-    [Optional] [Selector("handleUnbindingOfSymbol:usingBlock:")] void HandleUnbindingOfSymbolUsingBlock(NSString symbol, SCNBindingBlock? block);
+    [Optional]
+    [Selector("program", "setProgram:")]
+    SCNProgram? Program { get; set; }
+    [Optional]
+    [Selector("shaderModifiers", "setShaderModifiers:")]
+    NSDictionary? ShaderModifiers { get; set; }
+    [Optional]
+    [Selector("minimumLanguageVersion", "setMinimumLanguageVersion:")]
+    NSNumber? MinimumLanguageVersion { get; set; }
+    [Optional]
+    [Selector("handleBindingOfSymbol:usingBlock:")]
+    void HandleBindingOfSymbolUsingBlock(NSString symbol, SCNBindingBlock? block);
+    [Optional]
+    [Selector("handleUnbindingOfSymbol:usingBlock:")]
+    void HandleUnbindingOfSymbolUsingBlock(NSString symbol, SCNBindingBlock? block);
 }
 
 public extern "C" NSString? SCNProgramMappingChannelKey;
 
 public extern objc class SCNProgram : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("vertexShader", "setVertexShader:")] public NSString? VertexShader { get; set; }
-    [Selector("fragmentShader", "setFragmentShader:")] public NSString? FragmentShader { get; set; }
-    [Selector("tessellationControlShader", "setTessellationControlShader:")] public NSString? TessellationControlShader { get; set; }
-    [Selector("tessellationEvaluationShader", "setTessellationEvaluationShader:")] public NSString? TessellationEvaluationShader { get; set; }
-    [Selector("geometryShader", "setGeometryShader:")] public NSString? GeometryShader { get; set; }
-    [Selector("vertexFunctionName", "setVertexFunctionName:")] public NSString? VertexFunctionName { get; set; }
-    [Selector("fragmentFunctionName", "setFragmentFunctionName:")] public NSString? FragmentFunctionName { get; set; }
-    [Selector("isOpaque", "setOpaque:")] public bool Opaque { get; set; }
-    [Selector("delegate", "setDelegate:")] public SCNProgramDelegate? Delegate { get; set; }
-    [Selector("library", "setLibrary:")] public MTLLibrary? Library { get; set; }
-    [Selector("program")] public static Self Program();
-    [Selector("handleBindingOfBufferNamed:frequency:usingBlock:")] public void HandleBindingOfBufferNamedFrequencyUsingBlock(NSString name, SCNBufferFrequency frequency, SCNBufferBindingBlock block);
-    [Selector("setSemantic:forSymbol:options:")] public void SetSemanticForSymbolOptions(NSString? semantic, NSString symbol, NSDictionary? options);
-    [Selector("semanticForSymbol:")] public NSString? SemanticForSymbol(NSString symbol);
+    [Selector("vertexShader", "setVertexShader:")]
+    public NSString? VertexShader { get; set; }
+    [Selector("fragmentShader", "setFragmentShader:")]
+    public NSString? FragmentShader { get; set; }
+    [Selector("tessellationControlShader", "setTessellationControlShader:")]
+    public NSString? TessellationControlShader { get; set; }
+    [Selector("tessellationEvaluationShader", "setTessellationEvaluationShader:")]
+    public NSString? TessellationEvaluationShader { get; set; }
+    [Selector("geometryShader", "setGeometryShader:")]
+    public NSString? GeometryShader { get; set; }
+    [Selector("vertexFunctionName", "setVertexFunctionName:")]
+    public NSString? VertexFunctionName { get; set; }
+    [Selector("fragmentFunctionName", "setFragmentFunctionName:")]
+    public NSString? FragmentFunctionName { get; set; }
+    [Selector("isOpaque", "setOpaque:")]
+    public bool Opaque { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public SCNProgramDelegate? Delegate { get; set; }
+    [Selector("library", "setLibrary:")]
+    public MTLLibrary? Library { get; set; }
+    [Selector("program")]
+    public static Self Program();
+    [Selector("handleBindingOfBufferNamed:frequency:usingBlock:")]
+    public void HandleBindingOfBufferNamedFrequencyUsingBlock(NSString name, SCNBufferFrequency frequency, SCNBufferBindingBlock block);
+    [Selector("setSemantic:forSymbol:options:")]
+    public void SetSemanticForSymbolOptions(NSString? semantic, NSString symbol, NSDictionary? options);
+    [Selector("semanticForSymbol:")]
+    public NSString? SemanticForSymbol(NSString symbol);
 }
 
 public objc interface SCNProgramDelegate : NSObjectProtocol
 {
     /// Deprecated in macOS 10.10.
-    [Optional] [Selector("program:bindValueForSymbol:atLocation:programID:renderer:")] bool ProgramBindValueForSymbolAtLocationProgramIDRenderer(SCNProgram program, NSString symbol, uint location, uint programID, SCNRenderer renderer);
+    [Optional]
+    [Selector("program:bindValueForSymbol:atLocation:programID:renderer:")]
+    bool ProgramBindValueForSymbolAtLocationProgramIDRenderer(SCNProgram program, NSString symbol, uint location, uint programID, SCNRenderer renderer);
     /// Deprecated in macOS 10.10.
-    [Optional] [Selector("program:unbindValueForSymbol:atLocation:programID:renderer:")] void ProgramUnbindValueForSymbolAtLocationProgramIDRenderer(SCNProgram program, NSString symbol, uint location, uint programID, SCNRenderer renderer);
-    [Optional] [Selector("program:handleError:")] void ProgramHandleError(SCNProgram program, NSError error);
+    [Optional]
+    [Selector("program:unbindValueForSymbol:atLocation:programID:renderer:")]
+    void ProgramUnbindValueForSymbolAtLocationProgramIDRenderer(SCNProgram program, NSString symbol, uint location, uint programID, SCNRenderer renderer);
+    [Optional]
+    [Selector("program:handleError:")]
+    void ProgramHandleError(SCNProgram program, NSError error);
     /// Deprecated in macOS 10.10.
-    [Optional] [Selector("programIsOpaque:")] bool ProgramIsOpaque(SCNProgram program);
+    [Optional]
+    [Selector("programIsOpaque:")]
+    bool ProgramIsOpaque(SCNProgram program);
 }
 
 public extern "C" SCNShaderModifierEntryPoint? SCNShaderModifierEntryPointGeometry;

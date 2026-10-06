@@ -40,7 +40,8 @@ public extern "C" bool ODRecordSetNodeCredentialsExtended(ODRecordRef? record, O
 public extern "C" bool ODRecordSetNodeCredentialsUsingKerberosCache(ODRecordRef? record, CFStringRef? cacheName, __CFError** error);
 
 /// Deprecated in macOS 10.9.
-[ReturnsRetained] public extern "C" CFDictionaryRef? ODRecordCopyPasswordPolicy(CFAllocatorRef? allocator, ODRecordRef? record, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? ODRecordCopyPasswordPolicy(CFAllocatorRef? allocator, ODRecordRef? record, __CFError** error);
 
 public extern "C" bool ODRecordVerifyPassword(ODRecordRef? record, CFStringRef? password, __CFError** error);
 
@@ -52,7 +53,8 @@ public extern "C" CFStringRef? ODRecordGetRecordType(ODRecordRef? record);
 
 public extern "C" CFStringRef? ODRecordGetRecordName(ODRecordRef? record);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ODRecordCopyValues(ODRecordRef? record, ODAttributeType? @attribute, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ODRecordCopyValues(ODRecordRef? record, ODAttributeType? @attribute, __CFError** error);
 
 public extern "C" bool ODRecordSetValue(ODRecordRef? record, ODAttributeType? @attribute, CFTypeRef? valueOrValues, __CFError** error);
 
@@ -60,7 +62,8 @@ public extern "C" bool ODRecordAddValue(ODRecordRef? record, ODAttributeType? @a
 
 public extern "C" bool ODRecordRemoveValue(ODRecordRef? record, ODAttributeType? @attribute, CFTypeRef? value, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? ODRecordCopyDetails(ODRecordRef? record, CFArrayRef? attributes, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? ODRecordCopyDetails(ODRecordRef? record, CFArrayRef? attributes, __CFError** error);
 
 public extern "C" bool ODRecordSynchronize(ODRecordRef? record, __CFError** error);
 
@@ -73,13 +76,16 @@ public extern "C" bool ODRecordRemoveMember(ODRecordRef? group, ODRecordRef? mem
 public extern "C" bool ODRecordContainsMember(ODRecordRef? group, ODRecordRef? member, __CFError** error);
 
 /// Deprecated in macOS 10.10.
-[ReturnsRetained] public extern "C" CFDictionaryRef? ODRecordCopyPolicies(ODRecordRef? record, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? ODRecordCopyPolicies(ODRecordRef? record, __CFError** error);
 
 /// Deprecated in macOS 10.10.
-[ReturnsRetained] public extern "C" CFDictionaryRef? ODRecordCopyEffectivePolicies(ODRecordRef? record, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? ODRecordCopyEffectivePolicies(ODRecordRef? record, __CFError** error);
 
 /// Deprecated in macOS 10.10.
-[ReturnsRetained] public extern "C" CFDictionaryRef? ODRecordCopySupportedPolicies(ODRecordRef? record, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? ODRecordCopySupportedPolicies(ODRecordRef? record, __CFError** error);
 
 /// Deprecated in macOS 10.10.
 public extern "C" bool ODRecordSetPolicies(ODRecordRef? record, CFDictionaryRef? policies, __CFError** error);
@@ -96,7 +102,8 @@ public extern "C" bool ODRecordRemoveAccountPolicy(ODRecordRef? record, CFDictio
 
 public extern "C" bool ODRecordSetAccountPolicies(ODRecordRef? record, CFDictionaryRef? policies, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? ODRecordCopyAccountPolicies(ODRecordRef? record, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? ODRecordCopyAccountPolicies(ODRecordRef? record, __CFError** error);
 
 public extern "C" bool ODRecordAuthenticationAllowed(ODRecordRef? record, __CFError** error);
 

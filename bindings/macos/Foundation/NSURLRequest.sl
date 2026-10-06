@@ -62,74 +62,122 @@ public enum NSURLRequestAttribution : ulong
 
 public extern objc class NSURLRequest : NSObject, NSSecureCoding, NSCopying, NSMutableCopying
 {
-    [Selector("supportsSecureCoding")] public static bool SupportsSecureCoding { get; }
-    [Selector("URL")] public NSURL? URL { get; }
-    [Selector("cachePolicy")] public NSURLRequestCachePolicy CachePolicy { get; }
-    [Selector("timeoutInterval")] public NSTimeInterval TimeoutInterval { get; }
-    [Selector("mainDocumentURL")] public NSURL? MainDocumentURL { get; }
-    [Selector("networkServiceType")] public NSURLRequestNetworkServiceType NetworkServiceType { get; }
-    [Selector("allowsCellularAccess")] public bool AllowsCellularAccess { get; }
-    [Selector("allowsExpensiveNetworkAccess")] public bool AllowsExpensiveNetworkAccess { get; }
-    [Selector("allowsConstrainedNetworkAccess")] public bool AllowsConstrainedNetworkAccess { get; }
+    [Selector("supportsSecureCoding")]
+    public static bool SupportsSecureCoding { get; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
+    [Selector("cachePolicy")]
+    public NSURLRequestCachePolicy CachePolicy { get; }
+    [Selector("timeoutInterval")]
+    public NSTimeInterval TimeoutInterval { get; }
+    [Selector("mainDocumentURL")]
+    public NSURL? MainDocumentURL { get; }
+    [Selector("networkServiceType")]
+    public NSURLRequestNetworkServiceType NetworkServiceType { get; }
+    [Selector("allowsCellularAccess")]
+    public bool AllowsCellularAccess { get; }
+    [Selector("allowsExpensiveNetworkAccess")]
+    public bool AllowsExpensiveNetworkAccess { get; }
+    [Selector("allowsConstrainedNetworkAccess")]
+    public bool AllowsConstrainedNetworkAccess { get; }
     /// macOS 26.1 and later.
-    [Selector("allowsUltraConstrainedNetworkAccess")] public bool AllowsUltraConstrainedNetworkAccess { get; }
-    [Selector("assumesHTTP3Capable")] public bool AssumesHTTP3Capable { get; }
-    [Selector("attribution")] public NSURLRequestAttribution Attribution { get; }
-    [Selector("requiresDNSSECValidation")] public bool RequiresDNSSECValidation { get; }
-    [Selector("allowsPersistentDNS")] public bool AllowsPersistentDNS { get; }
+    [Selector("allowsUltraConstrainedNetworkAccess")]
+    public bool AllowsUltraConstrainedNetworkAccess { get; }
+    [Selector("assumesHTTP3Capable")]
+    public bool AssumesHTTP3Capable { get; }
+    [Selector("attribution")]
+    public NSURLRequestAttribution Attribution { get; }
+    [Selector("requiresDNSSECValidation")]
+    public bool RequiresDNSSECValidation { get; }
+    [Selector("allowsPersistentDNS")]
+    public bool AllowsPersistentDNS { get; }
     /// macOS 15.2 and later.
-    [Selector("cookiePartitionIdentifier")] public NSString? CookiePartitionIdentifier { get; }
-    [Selector("requestWithURL:")] public static Self RequestWithURL(NSURL URL);
-    [Selector("requestWithURL:cachePolicy:timeoutInterval:")] public static Self RequestWithURLCachePolicyTimeoutInterval(NSURL URL, NSURLRequestCachePolicy cachePolicy, NSTimeInterval timeoutInterval);
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL URL);
-    [Selector("initWithURL:cachePolicy:timeoutInterval:")] public Self InitWithURLCachePolicyTimeoutInterval(NSURL URL, NSURLRequestCachePolicy cachePolicy, NSTimeInterval timeoutInterval);
+    [Selector("cookiePartitionIdentifier")]
+    public NSString? CookiePartitionIdentifier { get; }
+    [Selector("requestWithURL:")]
+    public static Self RequestWithURL(NSURL URL);
+    [Selector("requestWithURL:cachePolicy:timeoutInterval:")]
+    public static Self RequestWithURLCachePolicyTimeoutInterval(NSURL URL, NSURLRequestCachePolicy cachePolicy, NSTimeInterval timeoutInterval);
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL URL);
+    [Selector("initWithURL:cachePolicy:timeoutInterval:")]
+    public Self InitWithURLCachePolicyTimeoutInterval(NSURL URL, NSURLRequestCachePolicy cachePolicy, NSTimeInterval timeoutInterval);
 }
 
 public extern objc class NSMutableURLRequest : NSURLRequest
 {
-    [Selector("URL", "setURL:")] public NSURL? URL { get; set; }
-    [Selector("cachePolicy", "setCachePolicy:")] public NSURLRequestCachePolicy CachePolicy { get; set; }
-    [Selector("timeoutInterval", "setTimeoutInterval:")] public NSTimeInterval TimeoutInterval { get; set; }
-    [Selector("mainDocumentURL", "setMainDocumentURL:")] public NSURL? MainDocumentURL { get; set; }
-    [Selector("networkServiceType", "setNetworkServiceType:")] public NSURLRequestNetworkServiceType NetworkServiceType { get; set; }
-    [Selector("allowsCellularAccess", "setAllowsCellularAccess:")] public bool AllowsCellularAccess { get; set; }
-    [Selector("allowsExpensiveNetworkAccess", "setAllowsExpensiveNetworkAccess:")] public bool AllowsExpensiveNetworkAccess { get; set; }
-    [Selector("allowsConstrainedNetworkAccess", "setAllowsConstrainedNetworkAccess:")] public bool AllowsConstrainedNetworkAccess { get; set; }
+    [Selector("URL", "setURL:")]
+    public NSURL? URL { get; set; }
+    [Selector("cachePolicy", "setCachePolicy:")]
+    public NSURLRequestCachePolicy CachePolicy { get; set; }
+    [Selector("timeoutInterval", "setTimeoutInterval:")]
+    public NSTimeInterval TimeoutInterval { get; set; }
+    [Selector("mainDocumentURL", "setMainDocumentURL:")]
+    public NSURL? MainDocumentURL { get; set; }
+    [Selector("networkServiceType", "setNetworkServiceType:")]
+    public NSURLRequestNetworkServiceType NetworkServiceType { get; set; }
+    [Selector("allowsCellularAccess", "setAllowsCellularAccess:")]
+    public bool AllowsCellularAccess { get; set; }
+    [Selector("allowsExpensiveNetworkAccess", "setAllowsExpensiveNetworkAccess:")]
+    public bool AllowsExpensiveNetworkAccess { get; set; }
+    [Selector("allowsConstrainedNetworkAccess", "setAllowsConstrainedNetworkAccess:")]
+    public bool AllowsConstrainedNetworkAccess { get; set; }
     /// macOS 26.1 and later.
-    [Selector("allowsUltraConstrainedNetworkAccess", "setAllowsUltraConstrainedNetworkAccess:")] public bool AllowsUltraConstrainedNetworkAccess { get; set; }
-    [Selector("assumesHTTP3Capable", "setAssumesHTTP3Capable:")] public bool AssumesHTTP3Capable { get; set; }
-    [Selector("attribution", "setAttribution:")] public NSURLRequestAttribution Attribution { get; set; }
-    [Selector("requiresDNSSECValidation", "setRequiresDNSSECValidation:")] public bool RequiresDNSSECValidation { get; set; }
-    [Selector("allowsPersistentDNS", "setAllowsPersistentDNS:")] public bool AllowsPersistentDNS { get; set; }
+    [Selector("allowsUltraConstrainedNetworkAccess", "setAllowsUltraConstrainedNetworkAccess:")]
+    public bool AllowsUltraConstrainedNetworkAccess { get; set; }
+    [Selector("assumesHTTP3Capable", "setAssumesHTTP3Capable:")]
+    public bool AssumesHTTP3Capable { get; set; }
+    [Selector("attribution", "setAttribution:")]
+    public NSURLRequestAttribution Attribution { get; set; }
+    [Selector("requiresDNSSECValidation", "setRequiresDNSSECValidation:")]
+    public bool RequiresDNSSECValidation { get; set; }
+    [Selector("allowsPersistentDNS", "setAllowsPersistentDNS:")]
+    public bool AllowsPersistentDNS { get; set; }
     /// macOS 15.2 and later.
-    [Selector("cookiePartitionIdentifier", "setCookiePartitionIdentifier:")] public NSString? CookiePartitionIdentifier { get; set; }
+    [Selector("cookiePartitionIdentifier", "setCookiePartitionIdentifier:")]
+    public NSString? CookiePartitionIdentifier { get; set; }
 }
 
 /// NSHTTPURLRequest, a category of NSURLRequest.
 public extern objc class NSURLRequest
 {
-    [Selector("HTTPMethod")] public NSString? HTTPMethod { get; }
-    [Selector("allHTTPHeaderFields")] public NSDictionary? AllHTTPHeaderFields { get; }
-    [Selector("HTTPBody")] public NSData? HTTPBody { get; }
-    [Selector("HTTPBodyStream")] public NSInputStream? HTTPBodyStream { get; }
-    [Selector("HTTPShouldHandleCookies")] public bool HTTPShouldHandleCookies { get; }
+    [Selector("HTTPMethod")]
+    public NSString? HTTPMethod { get; }
+    [Selector("allHTTPHeaderFields")]
+    public NSDictionary? AllHTTPHeaderFields { get; }
+    [Selector("HTTPBody")]
+    public NSData? HTTPBody { get; }
+    [Selector("HTTPBodyStream")]
+    public NSInputStream? HTTPBodyStream { get; }
+    [Selector("HTTPShouldHandleCookies")]
+    public bool HTTPShouldHandleCookies { get; }
     /// Deprecated in macOS 15.4.
-    [Selector("HTTPShouldUsePipelining")] public bool HTTPShouldUsePipelining { get; }
-    [Selector("valueForHTTPHeaderField:")] public NSString? ValueForHTTPHeaderField(NSString field);
+    [Selector("HTTPShouldUsePipelining")]
+    public bool HTTPShouldUsePipelining { get; }
+    [Selector("valueForHTTPHeaderField:")]
+    public NSString? ValueForHTTPHeaderField(NSString field);
 }
 
 /// NSMutableHTTPURLRequest, a category of NSMutableURLRequest.
 public extern objc class NSMutableURLRequest
 {
-    [Selector("HTTPMethod", "setHTTPMethod:")] public NSString HTTPMethod { get; set; }
-    [Selector("allHTTPHeaderFields", "setAllHTTPHeaderFields:")] public NSDictionary? AllHTTPHeaderFields { get; set; }
-    [Selector("HTTPBody", "setHTTPBody:")] public NSData? HTTPBody { get; set; }
-    [Selector("HTTPBodyStream", "setHTTPBodyStream:")] public NSInputStream? HTTPBodyStream { get; set; }
-    [Selector("HTTPShouldHandleCookies", "setHTTPShouldHandleCookies:")] public bool HTTPShouldHandleCookies { get; set; }
+    [Selector("HTTPMethod", "setHTTPMethod:")]
+    public NSString HTTPMethod { get; set; }
+    [Selector("allHTTPHeaderFields", "setAllHTTPHeaderFields:")]
+    public NSDictionary? AllHTTPHeaderFields { get; set; }
+    [Selector("HTTPBody", "setHTTPBody:")]
+    public NSData? HTTPBody { get; set; }
+    [Selector("HTTPBodyStream", "setHTTPBodyStream:")]
+    public NSInputStream? HTTPBodyStream { get; set; }
+    [Selector("HTTPShouldHandleCookies", "setHTTPShouldHandleCookies:")]
+    public bool HTTPShouldHandleCookies { get; set; }
     /// Deprecated in macOS 15.4.
-    [Selector("HTTPShouldUsePipelining", "setHTTPShouldUsePipelining:")] public bool HTTPShouldUsePipelining { get; set; }
-    [Selector("setValue:forHTTPHeaderField:")] public void SetValueForHTTPHeaderField(NSString? value, NSString field);
-    [Selector("addValue:forHTTPHeaderField:")] public void AddValueForHTTPHeaderField(NSString value, NSString field);
+    [Selector("HTTPShouldUsePipelining", "setHTTPShouldUsePipelining:")]
+    public bool HTTPShouldUsePipelining { get; set; }
+    [Selector("setValue:forHTTPHeaderField:")]
+    public void SetValueForHTTPHeaderField(NSString? value, NSString field);
+    [Selector("addValue:forHTTPHeaderField:")]
+    public void AddValueForHTTPHeaderField(NSString value, NSString field);
 }
 
 #endif

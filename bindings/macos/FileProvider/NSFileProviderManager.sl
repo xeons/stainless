@@ -60,19 +60,32 @@ public objc closure void NSFileProviderManagerSignalErrorResolvedCompletionHandl
 
 public extern objc class NSFileProviderManager : NSObject
 {
-    [Selector("managerForDomain:")] public static Self? ManagerForDomain(NSFileProviderDomain domain);
-    [Selector("signalEnumeratorForContainerItemIdentifier:completionHandler:")] public void SignalEnumeratorForContainerItemIdentifierCompletionHandler(NSFileProviderItemIdentifier containerItemIdentifier, NSFileProviderManagerSignalEnumeratorForContainerItemIdentifierCompletionHandlerCompletionBlock completion);
-    [Selector("getUserVisibleURLForItemIdentifier:completionHandler:")] public void GetUserVisibleURLForItemIdentifierCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderManagerGetUserVisibleURLForItemIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getIdentifierForUserVisibleFileAtURL:completionHandler:")] public static void GetIdentifierForUserVisibleFileAtURLCompletionHandler(NSURL url, NSFileProviderManagerGetIdentifierForUserVisibleFileAtURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("registerURLSessionTask:forItemWithIdentifier:completionHandler:")] public void RegisterURLSessionTaskForItemWithIdentifierCompletionHandler(NSURLSessionTask task, NSFileProviderItemIdentifier identifier, NSFileProviderManagerRegisterURLSessionTaskForItemWithIdentifierCompletionHandlerCompletionBlock completion);
-    [Selector("temporaryDirectoryURLWithError:")] public NSURL? TemporaryDirectoryURLWithError(out NSError? error);
-    [Selector("addDomain:completionHandler:")] public static void AddDomainCompletionHandler(NSFileProviderDomain domain, NSFileProviderManagerAddDomainCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removeDomain:completionHandler:")] public static void RemoveDomainCompletionHandler(NSFileProviderDomain domain, NSFileProviderManagerRemoveDomainCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removeDomain:mode:completionHandler:")] public static void RemoveDomainModeCompletionHandler(NSFileProviderDomain domain, NSFileProviderDomainRemovalMode mode, NSFileProviderManagerRemoveDomainModeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getDomainsWithCompletionHandler:")] public static void GetDomainsWithCompletionHandler(NSFileProviderManagerGetDomainsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removeAllDomainsWithCompletionHandler:")] public static void RemoveAllDomainsWithCompletionHandler(NSFileProviderManagerRemoveAllDomainsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("signalErrorResolved:completionHandler:")] public void SignalErrorResolvedCompletionHandler(NSError error, NSFileProviderManagerSignalErrorResolvedCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("globalProgressForKind:")] public NSProgress GlobalProgressForKind(NSProgressFileOperationKind kind);
+    [Selector("managerForDomain:")]
+    public static Self? ManagerForDomain(NSFileProviderDomain domain);
+    [Selector("signalEnumeratorForContainerItemIdentifier:completionHandler:")]
+    public void SignalEnumeratorForContainerItemIdentifierCompletionHandler(NSFileProviderItemIdentifier containerItemIdentifier, NSFileProviderManagerSignalEnumeratorForContainerItemIdentifierCompletionHandlerCompletionBlock completion);
+    [Selector("getUserVisibleURLForItemIdentifier:completionHandler:")]
+    public void GetUserVisibleURLForItemIdentifierCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderManagerGetUserVisibleURLForItemIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getIdentifierForUserVisibleFileAtURL:completionHandler:")]
+    public static void GetIdentifierForUserVisibleFileAtURLCompletionHandler(NSURL url, NSFileProviderManagerGetIdentifierForUserVisibleFileAtURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("registerURLSessionTask:forItemWithIdentifier:completionHandler:")]
+    public void RegisterURLSessionTaskForItemWithIdentifierCompletionHandler(NSURLSessionTask task, NSFileProviderItemIdentifier identifier, NSFileProviderManagerRegisterURLSessionTaskForItemWithIdentifierCompletionHandlerCompletionBlock completion);
+    [Selector("temporaryDirectoryURLWithError:")]
+    public NSURL? TemporaryDirectoryURLWithError(out NSError? error);
+    [Selector("addDomain:completionHandler:")]
+    public static void AddDomainCompletionHandler(NSFileProviderDomain domain, NSFileProviderManagerAddDomainCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removeDomain:completionHandler:")]
+    public static void RemoveDomainCompletionHandler(NSFileProviderDomain domain, NSFileProviderManagerRemoveDomainCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removeDomain:mode:completionHandler:")]
+    public static void RemoveDomainModeCompletionHandler(NSFileProviderDomain domain, NSFileProviderDomainRemovalMode mode, NSFileProviderManagerRemoveDomainModeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getDomainsWithCompletionHandler:")]
+    public static void GetDomainsWithCompletionHandler(NSFileProviderManagerGetDomainsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removeAllDomainsWithCompletionHandler:")]
+    public static void RemoveAllDomainsWithCompletionHandler(NSFileProviderManagerRemoveAllDomainsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("signalErrorResolved:completionHandler:")]
+    public void SignalErrorResolvedCompletionHandler(NSError error, NSFileProviderManagerSignalErrorResolvedCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("globalProgressForKind:")]
+    public NSProgress GlobalProgressForKind(NSProgressFileOperationKind kind);
 }
 
 public extern "C" NSNotificationName NSFileProviderMaterializedSetDidChange;
@@ -80,22 +93,27 @@ public extern "C" NSNotificationName NSFileProviderMaterializedSetDidChange;
 /// MaterializedSet, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    [Selector("enumeratorForMaterializedItems")] public NSFileProviderEnumerator EnumeratorForMaterializedItems();
+    [Selector("enumeratorForMaterializedItems")]
+    public NSFileProviderEnumerator EnumeratorForMaterializedItems();
 }
 
 public extern "C" NSNotificationName NSFileProviderPendingSetDidChange;
 
 public objc interface NSFileProviderPendingSetEnumerator : NSFileProviderEnumerator
 {
-    [Selector("domainVersion")] NSFileProviderDomainVersion? DomainVersion { get; }
-    [Selector("refreshInterval")] NSTimeInterval RefreshInterval { get; }
-    [Selector("isMaximumSizeReached")] bool MaximumSizeReached { get; }
+    [Selector("domainVersion")]
+    NSFileProviderDomainVersion? DomainVersion { get; }
+    [Selector("refreshInterval")]
+    NSTimeInterval RefreshInterval { get; }
+    [Selector("isMaximumSizeReached")]
+    bool MaximumSizeReached { get; }
 }
 
 /// PendingSet, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    [Selector("enumeratorForPendingItems")] public NSFileProviderPendingSetEnumerator EnumeratorForPendingItems();
+    [Selector("enumeratorForPendingItems")]
+    public NSFileProviderPendingSetEnumerator EnumeratorForPendingItems();
 }
 
 public objc closure void NSFileProviderManagerImportDomainFromDirectoryAtURLCompletionHandlerCompletionHandlerBlock(NSError? arg0);
@@ -107,9 +125,12 @@ public objc closure void NSFileProviderManagerRequestModificationOfFieldsForItem
 /// Import, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    [Selector("importDomain:fromDirectoryAtURL:completionHandler:")] public static void ImportDomainFromDirectoryAtURLCompletionHandler(NSFileProviderDomain domain, NSURL url, NSFileProviderManagerImportDomainFromDirectoryAtURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("reimportItemsBelowItemWithIdentifier:completionHandler:")] public void ReimportItemsBelowItemWithIdentifierCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderManagerReimportItemsBelowItemWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("requestModificationOfFields:forItemWithIdentifier:options:completionHandler:")] public void RequestModificationOfFieldsForItemWithIdentifierOptionsCompletionHandler(NSFileProviderItemFields fields, NSFileProviderItemIdentifier itemIdentifier, NSFileProviderModifyItemOptions options, NSFileProviderManagerRequestModificationOfFieldsForItemWithIdentifierOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("importDomain:fromDirectoryAtURL:completionHandler:")]
+    public static void ImportDomainFromDirectoryAtURLCompletionHandler(NSFileProviderDomain domain, NSURL url, NSFileProviderManagerImportDomainFromDirectoryAtURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("reimportItemsBelowItemWithIdentifier:completionHandler:")]
+    public void ReimportItemsBelowItemWithIdentifierCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderManagerReimportItemsBelowItemWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("requestModificationOfFields:forItemWithIdentifier:options:completionHandler:")]
+    public void RequestModificationOfFieldsForItemWithIdentifierOptionsCompletionHandler(NSFileProviderItemFields fields, NSFileProviderItemIdentifier itemIdentifier, NSFileProviderModifyItemOptions options, NSFileProviderManagerRequestModificationOfFieldsForItemWithIdentifierOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void NSFileProviderManagerEvictItemWithIdentifierCompletionHandlerCompletionHandlerBlock(NSError? arg0);
@@ -117,7 +138,8 @@ public objc closure void NSFileProviderManagerEvictItemWithIdentifierCompletionH
 /// Eviction, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    [Selector("evictItemWithIdentifier:completionHandler:")] public void EvictItemWithIdentifierCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderManagerEvictItemWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("evictItemWithIdentifier:completionHandler:")]
+    public void EvictItemWithIdentifierCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderManagerEvictItemWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void NSFileProviderManagerWaitForChangesOnItemsBelowItemWithIdentifierCompletionHandlerCompletionHandlerBlock(NSError? arg0);
@@ -125,7 +147,8 @@ public objc closure void NSFileProviderManagerWaitForChangesOnItemsBelowItemWith
 /// Barrier, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    [Selector("waitForChangesOnItemsBelowItemWithIdentifier:completionHandler:")] public void WaitForChangesOnItemsBelowItemWithIdentifierCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderManagerWaitForChangesOnItemsBelowItemWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("waitForChangesOnItemsBelowItemWithIdentifier:completionHandler:")]
+    public void WaitForChangesOnItemsBelowItemWithIdentifierCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderManagerWaitForChangesOnItemsBelowItemWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void NSFileProviderManagerWaitForStabilizationWithCompletionHandlerCompletionHandlerBlock(NSError? arg0);
@@ -133,7 +156,8 @@ public objc closure void NSFileProviderManagerWaitForStabilizationWithCompletion
 /// Stabilization, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    [Selector("waitForStabilizationWithCompletionHandler:")] public void WaitForStabilizationWithCompletionHandler(NSFileProviderManagerWaitForStabilizationWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("waitForStabilizationWithCompletionHandler:")]
+    public void WaitForStabilizationWithCompletionHandler(NSFileProviderManagerWaitForStabilizationWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 [Flags]
@@ -149,8 +173,10 @@ public objc closure void NSFileProviderManagerReconnectWithCompletionHandlerComp
 /// Disconnection, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    [Selector("disconnectWithReason:options:completionHandler:")] public void DisconnectWithReasonOptionsCompletionHandler(NSString localizedReason, NSFileProviderManagerDisconnectionOptions options, NSFileProviderManagerDisconnectWithReasonOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("reconnectWithCompletionHandler:")] public void ReconnectWithCompletionHandler(NSFileProviderManagerReconnectWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("disconnectWithReason:options:completionHandler:")]
+    public void DisconnectWithReasonOptionsCompletionHandler(NSString localizedReason, NSFileProviderManagerDisconnectionOptions options, NSFileProviderManagerDisconnectWithReasonOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("reconnectWithCompletionHandler:")]
+    public void ReconnectWithCompletionHandler(NSFileProviderManagerReconnectWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void NSFileProviderManagerRequestDownloadForItemWithIdentifierRequestedRangeCompletionHandlerCompletionHandlerBlock(NSError? arg0);
@@ -158,13 +184,15 @@ public objc closure void NSFileProviderManagerRequestDownloadForItemWithIdentifi
 /// Materialize, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    [Selector("requestDownloadForItemWithIdentifier:requestedRange:completionHandler:")] public void RequestDownloadForItemWithIdentifierRequestedRangeCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSRange rangeToMaterialize, NSFileProviderManagerRequestDownloadForItemWithIdentifierRequestedRangeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("requestDownloadForItemWithIdentifier:requestedRange:completionHandler:")]
+    public void RequestDownloadForItemWithIdentifierRequestedRangeCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSRange rangeToMaterialize, NSFileProviderManagerRequestDownloadForItemWithIdentifierRequestedRangeCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 /// StateDirectory, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    [Selector("stateDirectoryURLWithError:")] public NSURL? StateDirectoryURLWithError(out NSError? error);
+    [Selector("stateDirectoryURLWithError:")]
+    public NSURL? StateDirectoryURLWithError(out NSError? error);
 }
 
 [Flags]
@@ -182,7 +210,8 @@ public enum NSFileProviderVolumeUnsupportedReason : ulong
 /// ExternalDomain, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    [Selector("checkDomainsCanBeStored:onVolumeAtURL:unsupportedReason:error:")] public static bool CheckDomainsCanBeStoredOnVolumeAtURLUnsupportedReasonError(bool* eligible, NSURL url, NSFileProviderVolumeUnsupportedReason* unsupportedReason, out NSError? error);
+    [Selector("checkDomainsCanBeStored:onVolumeAtURL:unsupportedReason:error:")]
+    public static bool CheckDomainsCanBeStoredOnVolumeAtURLUnsupportedReasonError(bool* eligible, NSURL url, NSFileProviderVolumeUnsupportedReason* unsupportedReason, out NSError? error);
 }
 
 public objc closure void NSFileProviderManagerRequestDiagnosticCollectionForItemWithIdentifierErrorReasonCompletionHandlerCompletionHandlerBlock(NSError? arg0);
@@ -191,7 +220,8 @@ public objc closure void NSFileProviderManagerRequestDiagnosticCollectionForItem
 public extern objc class NSFileProviderManager
 {
     /// macOS 15.4 and later.
-    [Selector("requestDiagnosticCollectionForItemWithIdentifier:errorReason:completionHandler:")] public void RequestDiagnosticCollectionForItemWithIdentifierErrorReasonCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSError errorReason, NSFileProviderManagerRequestDiagnosticCollectionForItemWithIdentifierErrorReasonCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("requestDiagnosticCollectionForItemWithIdentifier:errorReason:completionHandler:")]
+    public void RequestDiagnosticCollectionForItemWithIdentifierErrorReasonCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSError errorReason, NSFileProviderManagerRequestDiagnosticCollectionForItemWithIdentifierErrorReasonCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

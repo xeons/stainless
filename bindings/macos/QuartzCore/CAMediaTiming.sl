@@ -35,14 +35,22 @@ public using CAMediaTimingFillMode = NSString;
 
 public objc interface CAMediaTiming
 {
-    [Selector("beginTime", "setBeginTime:")] CFTimeInterval BeginTime { get; set; }
-    [Selector("duration", "setDuration:")] CFTimeInterval Duration { get; set; }
-    [Selector("speed", "setSpeed:")] float Speed { get; set; }
-    [Selector("timeOffset", "setTimeOffset:")] CFTimeInterval TimeOffset { get; set; }
-    [Selector("repeatCount", "setRepeatCount:")] float RepeatCount { get; set; }
-    [Selector("repeatDuration", "setRepeatDuration:")] CFTimeInterval RepeatDuration { get; set; }
-    [Selector("autoreverses", "setAutoreverses:")] bool Autoreverses { get; set; }
-    [Selector("fillMode", "setFillMode:")] CAMediaTimingFillMode FillMode { get; set; }
+    [Selector("beginTime", "setBeginTime:")]
+    CFTimeInterval BeginTime { get; set; }
+    [Selector("duration", "setDuration:")]
+    CFTimeInterval Duration { get; set; }
+    [Selector("speed", "setSpeed:")]
+    float Speed { get; set; }
+    [Selector("timeOffset", "setTimeOffset:")]
+    CFTimeInterval TimeOffset { get; set; }
+    [Selector("repeatCount", "setRepeatCount:")]
+    float RepeatCount { get; set; }
+    [Selector("repeatDuration", "setRepeatDuration:")]
+    CFTimeInterval RepeatDuration { get; set; }
+    [Selector("autoreverses", "setAutoreverses:")]
+    bool Autoreverses { get; set; }
+    [Selector("fillMode", "setFillMode:")]
+    CAMediaTimingFillMode FillMode { get; set; }
 }
 
 public extern "C" CAMediaTimingFillMode? kCAFillModeForwards;

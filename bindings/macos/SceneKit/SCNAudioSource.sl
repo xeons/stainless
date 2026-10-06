@@ -34,16 +34,26 @@ import Standard.ObjC;
 
 public extern objc class SCNAudioSource : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("isPositional", "setPositional:")] public bool Positional { get; set; }
-    [Selector("volume", "setVolume:")] public float Volume { get; set; }
-    [Selector("rate", "setRate:")] public float Rate { get; set; }
-    [Selector("reverbBlend", "setReverbBlend:")] public float ReverbBlend { get; set; }
-    [Selector("loops", "setLoops:")] public bool Loops { get; set; }
-    [Selector("shouldStream", "setShouldStream:")] public bool ShouldStream { get; set; }
-    [Selector("initWithFileNamed:")] public Self? InitWithFileNamed(NSString name);
-    [Selector("initWithURL:")] public Self? InitWithURL(NSURL url);
-    [Selector("audioSourceNamed:")] public static Self? AudioSourceNamed(NSString fileName);
-    [Selector("load")] public void Load();
+    [Selector("isPositional", "setPositional:")]
+    public bool Positional { get; set; }
+    [Selector("volume", "setVolume:")]
+    public float Volume { get; set; }
+    [Selector("rate", "setRate:")]
+    public float Rate { get; set; }
+    [Selector("reverbBlend", "setReverbBlend:")]
+    public float ReverbBlend { get; set; }
+    [Selector("loops", "setLoops:")]
+    public bool Loops { get; set; }
+    [Selector("shouldStream", "setShouldStream:")]
+    public bool ShouldStream { get; set; }
+    [Selector("initWithFileNamed:")]
+    public Self? InitWithFileNamed(NSString name);
+    [Selector("initWithURL:")]
+    public Self? InitWithURL(NSURL url);
+    [Selector("audioSourceNamed:")]
+    public static Self? AudioSourceNamed(NSString fileName);
+    [Selector("load")]
+    public void Load();
 }
 
 public objc closure void SCNAudioPlayerWillStartPlaybackBlock();
@@ -52,23 +62,35 @@ public objc closure void SCNAudioPlayerDidFinishPlaybackBlock();
 
 public extern objc class SCNAudioPlayer : NSObject
 {
-    [Selector("willStartPlayback", "setWillStartPlayback:")] public SCNAudioPlayerWillStartPlaybackBlock? WillStartPlayback { get; set; }
-    [Selector("didFinishPlayback", "setDidFinishPlayback:")] public SCNAudioPlayerDidFinishPlaybackBlock? DidFinishPlayback { get; set; }
-    [Selector("audioNode")] public AVAudioNode? AudioNode { get; }
-    [Selector("audioSource")] public SCNAudioSource? AudioSource { get; }
-    [Selector("initWithSource:")] public Self InitWithSource(SCNAudioSource source);
-    [Selector("initWithAVAudioNode:")] public Self InitWithAVAudioNode(AVAudioNode audioNode);
-    [Selector("audioPlayerWithSource:")] public static Self AudioPlayerWithSource(SCNAudioSource source);
-    [Selector("audioPlayerWithAVAudioNode:")] public static Self AudioPlayerWithAVAudioNode(AVAudioNode audioNode);
+    [Selector("willStartPlayback", "setWillStartPlayback:")]
+    public SCNAudioPlayerWillStartPlaybackBlock? WillStartPlayback { get; set; }
+    [Selector("didFinishPlayback", "setDidFinishPlayback:")]
+    public SCNAudioPlayerDidFinishPlaybackBlock? DidFinishPlayback { get; set; }
+    [Selector("audioNode")]
+    public AVAudioNode? AudioNode { get; }
+    [Selector("audioSource")]
+    public SCNAudioSource? AudioSource { get; }
+    [Selector("initWithSource:")]
+    public Self InitWithSource(SCNAudioSource source);
+    [Selector("initWithAVAudioNode:")]
+    public Self InitWithAVAudioNode(AVAudioNode audioNode);
+    [Selector("audioPlayerWithSource:")]
+    public static Self AudioPlayerWithSource(SCNAudioSource source);
+    [Selector("audioPlayerWithAVAudioNode:")]
+    public static Self AudioPlayerWithAVAudioNode(AVAudioNode audioNode);
 }
 
 /// SCNAudioSupport, a category of SCNNode.
 public extern objc class SCNNode
 {
-    [Selector("audioPlayers")] public NSArray AudioPlayers { get; }
-    [Selector("addAudioPlayer:")] public void AddAudioPlayer(SCNAudioPlayer player);
-    [Selector("removeAllAudioPlayers")] public void RemoveAllAudioPlayers();
-    [Selector("removeAudioPlayer:")] public void RemoveAudioPlayer(SCNAudioPlayer player);
+    [Selector("audioPlayers")]
+    public NSArray AudioPlayers { get; }
+    [Selector("addAudioPlayer:")]
+    public void AddAudioPlayer(SCNAudioPlayer player);
+    [Selector("removeAllAudioPlayers")]
+    public void RemoveAllAudioPlayers();
+    [Selector("removeAudioPlayer:")]
+    public void RemoveAudioPlayer(SCNAudioPlayer player);
 }
 
 #endif

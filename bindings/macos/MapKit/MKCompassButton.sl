@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class MKCompassButton : NSView
 {
-    [Selector("mapView", "setMapView:")] public MKMapView? MapView { get; set; }
-    [Selector("compassVisibility", "setCompassVisibility:")] public MKFeatureVisibility CompassVisibility { get; set; }
-    [Selector("compassButtonWithMapView:")] public static Self CompassButtonWithMapView(MKMapView? mapView);
+    [Selector("mapView", "setMapView:")]
+    public MKMapView? MapView { get; set; }
+    [Selector("compassVisibility", "setCompassVisibility:")]
+    public MKFeatureVisibility CompassVisibility { get; set; }
+    [Selector("compassButtonWithMapView:")]
+    public static Self CompassButtonWithMapView(MKMapView? mapView);
 }
 
 #endif

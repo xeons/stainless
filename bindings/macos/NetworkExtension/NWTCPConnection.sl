@@ -53,35 +53,50 @@ public objc closure void NWTCPConnectionWriteCompletionHandlerCompletionBlock(NS
 public extern objc class NWTCPConnection : NSObject
 {
     /// Deprecated in macOS 15.0.
-    [Selector("state")] public NWTCPConnectionState State { get; }
+    [Selector("state")]
+    public NWTCPConnectionState State { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("isViable")] public bool Viable { get; }
+    [Selector("isViable")]
+    public bool Viable { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("hasBetterPath")] public bool HasBetterPath { get; }
+    [Selector("hasBetterPath")]
+    public bool HasBetterPath { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("endpoint")] public NWEndpoint? Endpoint { get; }
+    [Selector("endpoint")]
+    public NWEndpoint? Endpoint { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("connectedPath")] public NWPath? ConnectedPath { get; }
+    [Selector("connectedPath")]
+    public NWPath? ConnectedPath { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("localAddress")] public NWEndpoint? LocalAddress { get; }
+    [Selector("localAddress")]
+    public NWEndpoint? LocalAddress { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("remoteAddress")] public NWEndpoint? RemoteAddress { get; }
+    [Selector("remoteAddress")]
+    public NWEndpoint? RemoteAddress { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("txtRecord")] public NSData? TxtRecord { get; }
+    [Selector("txtRecord")]
+    public NSData? TxtRecord { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("error")] public NSError? Error { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("initWithUpgradeForConnection:")] public Self InitWithUpgradeForConnection(NWTCPConnection connection);
+    [Selector("initWithUpgradeForConnection:")]
+    public Self InitWithUpgradeForConnection(NWTCPConnection connection);
     /// Deprecated in macOS 15.0.
-    [Selector("cancel")] public void Cancel();
+    [Selector("cancel")]
+    public void Cancel();
     /// Deprecated in macOS 15.0.
-    [Selector("readLength:completionHandler:")] public void ReadLengthCompletionHandler(NSUInteger length, NWTCPConnectionReadLengthCompletionHandlerCompletionBlock completion);
+    [Selector("readLength:completionHandler:")]
+    public void ReadLengthCompletionHandler(NSUInteger length, NWTCPConnectionReadLengthCompletionHandlerCompletionBlock completion);
     /// Deprecated in macOS 15.0.
-    [Selector("readMinimumLength:maximumLength:completionHandler:")] public void ReadMinimumLengthMaximumLengthCompletionHandler(NSUInteger minimum, NSUInteger maximum, NWTCPConnectionReadMinimumLengthMaximumLengthCompletionHandlerCompletionBlock completion);
+    [Selector("readMinimumLength:maximumLength:completionHandler:")]
+    public void ReadMinimumLengthMaximumLengthCompletionHandler(NSUInteger minimum, NSUInteger maximum, NWTCPConnectionReadMinimumLengthMaximumLengthCompletionHandlerCompletionBlock completion);
     /// Deprecated in macOS 15.0.
-    [Selector("write:completionHandler:")] public void WriteCompletionHandler(NSData data, NWTCPConnectionWriteCompletionHandlerCompletionBlock completion);
+    [Selector("write:completionHandler:")]
+    public void WriteCompletionHandler(NSData data, NWTCPConnectionWriteCompletionHandlerCompletionBlock completion);
     /// Deprecated in macOS 15.0.
-    [Selector("writeClose")] public void WriteClose();
+    [Selector("writeClose")]
+    public void WriteClose();
 }
 
 public objc closure void NWTCPConnectionAuthenticationDelegateProvideIdentityForConnectionCompletionHandlerCompletionBlock(SecIdentityRef arg0, NSArray arg1);
@@ -92,13 +107,21 @@ public objc closure void NWTCPConnectionAuthenticationDelegateEvaluateTrustForCo
 public objc interface NWTCPConnectionAuthenticationDelegate : NSObjectProtocol
 {
     /// Deprecated in macOS 15.0.
-    [Optional] [Selector("shouldProvideIdentityForConnection:")] bool ShouldProvideIdentityForConnection(NWTCPConnection connection);
+    [Optional]
+    [Selector("shouldProvideIdentityForConnection:")]
+    bool ShouldProvideIdentityForConnection(NWTCPConnection connection);
     /// Deprecated in macOS 15.0.
-    [Optional] [Selector("provideIdentityForConnection:completionHandler:")] void ProvideIdentityForConnectionCompletionHandler(NWTCPConnection connection, NWTCPConnectionAuthenticationDelegateProvideIdentityForConnectionCompletionHandlerCompletionBlock completion);
+    [Optional]
+    [Selector("provideIdentityForConnection:completionHandler:")]
+    void ProvideIdentityForConnectionCompletionHandler(NWTCPConnection connection, NWTCPConnectionAuthenticationDelegateProvideIdentityForConnectionCompletionHandlerCompletionBlock completion);
     /// Deprecated in macOS 15.0.
-    [Optional] [Selector("shouldEvaluateTrustForConnection:")] bool ShouldEvaluateTrustForConnection(NWTCPConnection connection);
+    [Optional]
+    [Selector("shouldEvaluateTrustForConnection:")]
+    bool ShouldEvaluateTrustForConnection(NWTCPConnection connection);
     /// Deprecated in macOS 15.0.
-    [Optional] [Selector("evaluateTrustForConnection:peerCertificateChain:completionHandler:")] void EvaluateTrustForConnectionPeerCertificateChainCompletionHandler(NWTCPConnection connection, NSArray peerCertificateChain, NWTCPConnectionAuthenticationDelegateEvaluateTrustForConnectionPeerCertificateChainCompletionHandlerCompletionBlock completion);
+    [Optional]
+    [Selector("evaluateTrustForConnection:peerCertificateChain:completionHandler:")]
+    void EvaluateTrustForConnectionPeerCertificateChainCompletionHandler(NWTCPConnection connection, NSArray peerCertificateChain, NWTCPConnectionAuthenticationDelegateEvaluateTrustForConnectionPeerCertificateChainCompletionHandlerCompletionBlock completion);
 }
 
 #endif

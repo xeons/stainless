@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class MXCrashDiagnosticObjectiveCExceptionReason : NSObject, NSSecureCoding
 {
-    [Selector("composedMessage")] public NSString ComposedMessage { get; }
-    [Selector("formatString")] public NSString FormatString { get; }
-    [Selector("arguments")] public NSArray Arguments { get; }
-    [Selector("exceptionType")] public NSString ExceptionType { get; }
-    [Selector("className")] public NSString ClassName { get; }
-    [Selector("exceptionName")] public NSString ExceptionName { get; }
-    [Selector("JSONRepresentation")] public NSData JSONRepresentation();
-    [Selector("dictionaryRepresentation")] public NSDictionary DictionaryRepresentation();
+    [Selector("composedMessage")]
+    public NSString ComposedMessage { get; }
+    [Selector("formatString")]
+    public NSString FormatString { get; }
+    [Selector("arguments")]
+    public NSArray Arguments { get; }
+    [Selector("exceptionType")]
+    public NSString ExceptionType { get; }
+    [Selector("className")]
+    public NSString ClassName { get; }
+    [Selector("exceptionName")]
+    public NSString ExceptionName { get; }
+    [Selector("JSONRepresentation")]
+    public NSData JSONRepresentation();
+    [Selector("dictionaryRepresentation")]
+    public NSDictionary DictionaryRepresentation();
 }
 
 #endif

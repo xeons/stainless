@@ -33,15 +33,20 @@ import Standard.ObjC;
 
 public objc interface MKMapItemDetailViewControllerDelegate : NSObjectProtocol
 {
-    [Selector("mapItemDetailViewControllerDidFinish:")] void MapItemDetailViewControllerDidFinish(MKMapItemDetailViewController detailViewController);
+    [Selector("mapItemDetailViewControllerDidFinish:")]
+    void MapItemDetailViewControllerDidFinish(MKMapItemDetailViewController detailViewController);
 }
 
 public extern objc class MKMapItemDetailViewController : NSViewController
 {
-    [Selector("mapItem", "setMapItem:")] public MKMapItem? MapItem { get; set; }
-    [Selector("delegate", "setDelegate:")] public MKMapItemDetailViewControllerDelegate? Delegate { get; set; }
-    [Selector("initWithMapItem:displaysMap:")] public Self InitWithMapItemDisplaysMap(MKMapItem? mapItem, bool displaysMap);
-    [Selector("initWithMapItem:")] public Self InitWithMapItem(MKMapItem? mapItem);
+    [Selector("mapItem", "setMapItem:")]
+    public MKMapItem? MapItem { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public MKMapItemDetailViewControllerDelegate? Delegate { get; set; }
+    [Selector("initWithMapItem:displaysMap:")]
+    public Self InitWithMapItemDisplaysMap(MKMapItem? mapItem, bool displaysMap);
+    [Selector("initWithMapItem:")]
+    public Self InitWithMapItem(MKMapItem? mapItem);
 }
 
 #endif

@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class CKDatabaseOperation : CKOperation
 {
-    [Selector("database", "setDatabase:")] public CKDatabase? Database { get; set; }
+    [Selector("database", "setDatabase:")]
+    public CKDatabase? Database { get; set; }
 }
 
 #endif

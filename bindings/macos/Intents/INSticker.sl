@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class INSticker : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("type")] public INStickerType Type { get; }
-    [Selector("emoji")] public NSString? Emoji { get; }
-    [Selector("initWithType:emoji:")] public Self InitWithTypeEmoji(INStickerType type, NSString? emoji);
+    [Selector("type")]
+    public INStickerType Type { get; }
+    [Selector("emoji")]
+    public NSString? Emoji { get; }
+    [Selector("initWithType:emoji:")]
+    public Self InitWithTypeEmoji(INStickerType type, NSString? emoji);
 }
 
 #endif

@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class CMAmbientPressureData : CMLogItem
 {
-    [Selector("pressure")] public NSMeasurement Pressure { get; }
-    [Selector("temperature")] public NSMeasurement Temperature { get; }
+    [Selector("pressure")]
+    public NSMeasurement Pressure { get; }
+    [Selector("temperature")]
+    public NSMeasurement Temperature { get; }
 }
 
 #endif

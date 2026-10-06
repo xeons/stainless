@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class INShareFocusStatusIntent : INIntent
 {
-    [Selector("focusStatus")] public INFocusStatus? FocusStatus { get; }
-    [Selector("initWithFocusStatus:")] public Self InitWithFocusStatus(INFocusStatus? focusStatus);
+    [Selector("focusStatus")]
+    public INFocusStatus? FocusStatus { get; }
+    [Selector("initWithFocusStatus:")]
+    public Self InitWithFocusStatus(INFocusStatus? focusStatus);
 }
 
 public objc closure void INShareFocusStatusIntentHandlingHandleShareFocusStatusCompletionCompletionBlock(INShareFocusStatusIntentResponse arg0);
@@ -42,8 +44,11 @@ public objc closure void INShareFocusStatusIntentHandlingConfirmShareFocusStatus
 
 public objc interface INShareFocusStatusIntentHandling : NSObjectProtocol
 {
-    [Selector("handleShareFocusStatus:completion:")] void HandleShareFocusStatusCompletion(INShareFocusStatusIntent intent, INShareFocusStatusIntentHandlingHandleShareFocusStatusCompletionCompletionBlock completion);
-    [Optional] [Selector("confirmShareFocusStatus:completion:")] void ConfirmShareFocusStatusCompletion(INShareFocusStatusIntent intent, INShareFocusStatusIntentHandlingConfirmShareFocusStatusCompletionCompletionBlock completion);
+    [Selector("handleShareFocusStatus:completion:")]
+    void HandleShareFocusStatusCompletion(INShareFocusStatusIntent intent, INShareFocusStatusIntentHandlingHandleShareFocusStatusCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("confirmShareFocusStatus:completion:")]
+    void ConfirmShareFocusStatusCompletion(INShareFocusStatusIntent intent, INShareFocusStatusIntentHandlingConfirmShareFocusStatusCompletionCompletionBlock completion);
 }
 
 #endif

@@ -32,12 +32,18 @@ import Standard.ObjC;
 
 public extern objc class SBElementArray : NSMutableArray
 {
-    [Selector("objectWithName:")] public AnyObject ObjectWithName(NSString name);
-    [Selector("objectWithID:")] public AnyObject ObjectWithID(AnyObject identifier);
-    [Selector("objectAtLocation:")] public AnyObject ObjectAtLocation(AnyObject location);
-    [Selector("arrayByApplyingSelector:")] public NSArray ArrayByApplyingSelector(Selector selector);
-    [Selector("arrayByApplyingSelector:withObject:")] public NSArray ArrayByApplyingSelectorWithObject(Selector aSelector, AnyObject argument);
-    [Selector("get")] public NSArray? Get();
+    [Selector("objectWithName:")]
+    public AnyObject ObjectWithName(NSString name);
+    [Selector("objectWithID:")]
+    public AnyObject ObjectWithID(AnyObject identifier);
+    [Selector("objectAtLocation:")]
+    public AnyObject ObjectAtLocation(AnyObject location);
+    [Selector("arrayByApplyingSelector:")]
+    public NSArray ArrayByApplyingSelector(Selector selector);
+    [Selector("arrayByApplyingSelector:withObject:")]
+    public NSArray ArrayByApplyingSelectorWithObject(Selector aSelector, AnyObject argument);
+    [Selector("get")]
+    public NSArray? Get();
 }
 
 #endif

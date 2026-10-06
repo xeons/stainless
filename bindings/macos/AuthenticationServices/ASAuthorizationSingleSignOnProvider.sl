@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationSingleSignOnProvider : NSObject, ASAuthorizationProvider
 {
-    [Selector("url")] public NSURL Url { get; }
-    [Selector("canPerformAuthorization")] public bool CanPerformAuthorization { get; }
-    [Selector("authorizationProviderWithIdentityProviderURL:")] public static Self AuthorizationProviderWithIdentityProviderURL(NSURL url);
-    [Selector("createRequest")] public ASAuthorizationSingleSignOnRequest CreateRequest();
+    [Selector("url")]
+    public NSURL Url { get; }
+    [Selector("canPerformAuthorization")]
+    public bool CanPerformAuthorization { get; }
+    [Selector("authorizationProviderWithIdentityProviderURL:")]
+    public static Self AuthorizationProviderWithIdentityProviderURL(NSURL url);
+    [Selector("createRequest")]
+    public ASAuthorizationSingleSignOnRequest CreateRequest();
 }
 
 #endif

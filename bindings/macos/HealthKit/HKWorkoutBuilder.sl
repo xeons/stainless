@@ -51,28 +51,50 @@ public objc closure void HKWorkoutBuilderFinishWorkoutWithCompletionCompletionBl
 
 public extern objc class HKWorkoutBuilder : NSObject
 {
-    [Selector("device")] public HKDevice? Device { get; }
-    [Selector("startDate")] public NSDate? StartDate { get; }
-    [Selector("endDate")] public NSDate? EndDate { get; }
-    [Selector("workoutConfiguration")] public HKWorkoutConfiguration WorkoutConfiguration { get; }
-    [Selector("metadata")] public NSDictionary Metadata { get; }
-    [Selector("workoutEvents")] public NSArray WorkoutEvents { get; }
-    [Selector("workoutActivities")] public NSArray WorkoutActivities { get; }
-    [Selector("allStatistics")] public NSDictionary AllStatistics { get; }
-    [Selector("initWithHealthStore:configuration:device:")] public Self InitWithHealthStoreConfigurationDevice(HKHealthStore healthStore, HKWorkoutConfiguration configuration, HKDevice? device);
-    [Selector("beginCollectionWithStartDate:completion:")] public void BeginCollectionWithStartDateCompletion(NSDate startDate, HKWorkoutBuilderBeginCollectionWithStartDateCompletionCompletionBlock completion);
-    [Selector("addSamples:completion:")] public void AddSamplesCompletion(NSArray samples, HKWorkoutBuilderAddSamplesCompletionCompletionBlock completion);
-    [Selector("addWorkoutEvents:completion:")] public void AddWorkoutEventsCompletion(NSArray workoutEvents, HKWorkoutBuilderAddWorkoutEventsCompletionCompletionBlock completion);
-    [Selector("addMetadata:completion:")] public void AddMetadataCompletion(NSDictionary metadata, HKWorkoutBuilderAddMetadataCompletionCompletionBlock completion);
-    [Selector("addWorkoutActivity:completion:")] public void AddWorkoutActivityCompletion(HKWorkoutActivity workoutActivity, HKWorkoutBuilderAddWorkoutActivityCompletionCompletionBlock completion);
-    [Selector("updateActivityWithUUID:endDate:completion:")] public void UpdateActivityWithUUIDEndDateCompletion(NSUUID UUID, NSDate endDate, HKWorkoutBuilderUpdateActivityWithUUIDEndDateCompletionCompletionBlock completion);
-    [Selector("updateActivityWithUUID:addMedatata:completion:")] public void UpdateActivityWithUUIDAddMedatataCompletion(NSUUID UUID, NSDictionary metadata, HKWorkoutBuilderUpdateActivityWithUUIDAddMedatataCompletionCompletionBlock completion);
-    [Selector("endCollectionWithEndDate:completion:")] public void EndCollectionWithEndDateCompletion(NSDate endDate, HKWorkoutBuilderEndCollectionWithEndDateCompletionCompletionBlock completion);
-    [Selector("finishWorkoutWithCompletion:")] public void FinishWorkoutWithCompletion(HKWorkoutBuilderFinishWorkoutWithCompletionCompletionBlock completion);
-    [Selector("discardWorkout")] public void DiscardWorkout();
-    [Selector("elapsedTimeAtDate:")] public NSTimeInterval ElapsedTimeAtDate(NSDate date);
-    [Selector("statisticsForType:")] public HKStatistics? StatisticsForType(HKQuantityType quantityType);
-    [Selector("seriesBuilderForType:")] public HKSeriesBuilder? SeriesBuilderForType(HKSeriesType seriesType);
+    [Selector("device")]
+    public HKDevice? Device { get; }
+    [Selector("startDate")]
+    public NSDate? StartDate { get; }
+    [Selector("endDate")]
+    public NSDate? EndDate { get; }
+    [Selector("workoutConfiguration")]
+    public HKWorkoutConfiguration WorkoutConfiguration { get; }
+    [Selector("metadata")]
+    public NSDictionary Metadata { get; }
+    [Selector("workoutEvents")]
+    public NSArray WorkoutEvents { get; }
+    [Selector("workoutActivities")]
+    public NSArray WorkoutActivities { get; }
+    [Selector("allStatistics")]
+    public NSDictionary AllStatistics { get; }
+    [Selector("initWithHealthStore:configuration:device:")]
+    public Self InitWithHealthStoreConfigurationDevice(HKHealthStore healthStore, HKWorkoutConfiguration configuration, HKDevice? device);
+    [Selector("beginCollectionWithStartDate:completion:")]
+    public void BeginCollectionWithStartDateCompletion(NSDate startDate, HKWorkoutBuilderBeginCollectionWithStartDateCompletionCompletionBlock completion);
+    [Selector("addSamples:completion:")]
+    public void AddSamplesCompletion(NSArray samples, HKWorkoutBuilderAddSamplesCompletionCompletionBlock completion);
+    [Selector("addWorkoutEvents:completion:")]
+    public void AddWorkoutEventsCompletion(NSArray workoutEvents, HKWorkoutBuilderAddWorkoutEventsCompletionCompletionBlock completion);
+    [Selector("addMetadata:completion:")]
+    public void AddMetadataCompletion(NSDictionary metadata, HKWorkoutBuilderAddMetadataCompletionCompletionBlock completion);
+    [Selector("addWorkoutActivity:completion:")]
+    public void AddWorkoutActivityCompletion(HKWorkoutActivity workoutActivity, HKWorkoutBuilderAddWorkoutActivityCompletionCompletionBlock completion);
+    [Selector("updateActivityWithUUID:endDate:completion:")]
+    public void UpdateActivityWithUUIDEndDateCompletion(NSUUID UUID, NSDate endDate, HKWorkoutBuilderUpdateActivityWithUUIDEndDateCompletionCompletionBlock completion);
+    [Selector("updateActivityWithUUID:addMedatata:completion:")]
+    public void UpdateActivityWithUUIDAddMedatataCompletion(NSUUID UUID, NSDictionary metadata, HKWorkoutBuilderUpdateActivityWithUUIDAddMedatataCompletionCompletionBlock completion);
+    [Selector("endCollectionWithEndDate:completion:")]
+    public void EndCollectionWithEndDateCompletion(NSDate endDate, HKWorkoutBuilderEndCollectionWithEndDateCompletionCompletionBlock completion);
+    [Selector("finishWorkoutWithCompletion:")]
+    public void FinishWorkoutWithCompletion(HKWorkoutBuilderFinishWorkoutWithCompletionCompletionBlock completion);
+    [Selector("discardWorkout")]
+    public void DiscardWorkout();
+    [Selector("elapsedTimeAtDate:")]
+    public NSTimeInterval ElapsedTimeAtDate(NSDate date);
+    [Selector("statisticsForType:")]
+    public HKStatistics? StatisticsForType(HKQuantityType quantityType);
+    [Selector("seriesBuilderForType:")]
+    public HKSeriesBuilder? SeriesBuilderForType(HKSeriesType seriesType);
 }
 
 #endif

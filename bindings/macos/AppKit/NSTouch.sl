@@ -58,20 +58,29 @@ public enum NSTouchTypeMask : ulong
 
 public extern objc class NSTouch : NSObject, NSCopying
 {
-    [Selector("identity")] public NSObjectProtocol Identity { get; }
-    [Selector("phase")] public NSTouchPhase Phase { get; }
-    [Selector("normalizedPosition")] public NSPoint NormalizedPosition { get; }
-    [Selector("isResting")] public bool Resting { get; }
-    [Selector("device")] public AnyObject? Device { get; }
-    [Selector("deviceSize")] public NSSize DeviceSize { get; }
+    [Selector("identity")]
+    public NSObjectProtocol Identity { get; }
+    [Selector("phase")]
+    public NSTouchPhase Phase { get; }
+    [Selector("normalizedPosition")]
+    public NSPoint NormalizedPosition { get; }
+    [Selector("isResting")]
+    public bool Resting { get; }
+    [Selector("device")]
+    public AnyObject? Device { get; }
+    [Selector("deviceSize")]
+    public NSSize DeviceSize { get; }
 }
 
 /// NSTouchBar, a category of NSTouch.
 public extern objc class NSTouch
 {
-    [Selector("type")] public NSTouchType Type { get; }
-    [Selector("locationInView:")] public NSPoint LocationInView(NSView? view);
-    [Selector("previousLocationInView:")] public NSPoint PreviousLocationInView(NSView? view);
+    [Selector("type")]
+    public NSTouchType Type { get; }
+    [Selector("locationInView:")]
+    public NSPoint LocationInView(NSView? view);
+    [Selector("previousLocationInView:")]
+    public NSPoint PreviousLocationInView(NSView? view);
 }
 
 #endif

@@ -43,17 +43,28 @@ public extern "C" NSNotificationName NSAppleEventManagerWillProcessFirstEventNot
 
 public extern objc class NSAppleEventManager : NSObject
 {
-    [Selector("currentAppleEvent")] public NSAppleEventDescriptor? CurrentAppleEvent { get; }
-    [Selector("currentReplyAppleEvent")] public NSAppleEventDescriptor? CurrentReplyAppleEvent { get; }
-    [Selector("sharedAppleEventManager")] public static NSAppleEventManager SharedAppleEventManager();
-    [Selector("setEventHandler:andSelector:forEventClass:andEventID:")] public void SetEventHandlerAndSelectorForEventClassAndEventID(AnyObject handler, Selector handleEventSelector, AEEventClass eventClass, AEEventID eventID);
-    [Selector("removeEventHandlerForEventClass:andEventID:")] public void RemoveEventHandlerForEventClassAndEventID(AEEventClass eventClass, AEEventID eventID);
-    [Selector("dispatchRawAppleEvent:withRawReply:handlerRefCon:")] public OSErr DispatchRawAppleEventWithRawReplyHandlerRefCon(AppleEvent* theAppleEvent, AppleEvent* theReply, SRefCon handlerRefCon);
-    [Selector("suspendCurrentAppleEvent")] public NSAppleEventManagerSuspensionID SuspendCurrentAppleEvent();
-    [Selector("appleEventForSuspensionID:")] public NSAppleEventDescriptor AppleEventForSuspensionID(NSAppleEventManagerSuspensionID suspensionID);
-    [Selector("replyAppleEventForSuspensionID:")] public NSAppleEventDescriptor ReplyAppleEventForSuspensionID(NSAppleEventManagerSuspensionID suspensionID);
-    [Selector("setCurrentAppleEventAndReplyEventWithSuspensionID:")] public void SetCurrentAppleEventAndReplyEventWithSuspensionID(NSAppleEventManagerSuspensionID suspensionID);
-    [Selector("resumeWithSuspensionID:")] public void ResumeWithSuspensionID(NSAppleEventManagerSuspensionID suspensionID);
+    [Selector("currentAppleEvent")]
+    public NSAppleEventDescriptor? CurrentAppleEvent { get; }
+    [Selector("currentReplyAppleEvent")]
+    public NSAppleEventDescriptor? CurrentReplyAppleEvent { get; }
+    [Selector("sharedAppleEventManager")]
+    public static NSAppleEventManager SharedAppleEventManager();
+    [Selector("setEventHandler:andSelector:forEventClass:andEventID:")]
+    public void SetEventHandlerAndSelectorForEventClassAndEventID(AnyObject handler, Selector handleEventSelector, AEEventClass eventClass, AEEventID eventID);
+    [Selector("removeEventHandlerForEventClass:andEventID:")]
+    public void RemoveEventHandlerForEventClassAndEventID(AEEventClass eventClass, AEEventID eventID);
+    [Selector("dispatchRawAppleEvent:withRawReply:handlerRefCon:")]
+    public OSErr DispatchRawAppleEventWithRawReplyHandlerRefCon(AppleEvent* theAppleEvent, AppleEvent* theReply, SRefCon handlerRefCon);
+    [Selector("suspendCurrentAppleEvent")]
+    public NSAppleEventManagerSuspensionID SuspendCurrentAppleEvent();
+    [Selector("appleEventForSuspensionID:")]
+    public NSAppleEventDescriptor AppleEventForSuspensionID(NSAppleEventManagerSuspensionID suspensionID);
+    [Selector("replyAppleEventForSuspensionID:")]
+    public NSAppleEventDescriptor ReplyAppleEventForSuspensionID(NSAppleEventManagerSuspensionID suspensionID);
+    [Selector("setCurrentAppleEventAndReplyEventWithSuspensionID:")]
+    public void SetCurrentAppleEventAndReplyEventWithSuspensionID(NSAppleEventManagerSuspensionID suspensionID);
+    [Selector("resumeWithSuspensionID:")]
+    public void ResumeWithSuspensionID(NSAppleEventManagerSuspensionID suspensionID);
 }
 
 #endif

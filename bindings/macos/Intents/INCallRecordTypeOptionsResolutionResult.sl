@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class INCallRecordTypeOptionsResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedCallRecordTypeOptions:")] public static Self SuccessWithResolvedCallRecordTypeOptions(INCallRecordTypeOptions resolvedCallRecordTypeOptions);
-    [Selector("confirmationRequiredWithCallRecordTypeOptionsToConfirm:")] public static Self ConfirmationRequiredWithCallRecordTypeOptionsToConfirm(INCallRecordTypeOptions callRecordTypeOptionsToConfirm);
+    [Selector("successWithResolvedCallRecordTypeOptions:")]
+    public static Self SuccessWithResolvedCallRecordTypeOptions(INCallRecordTypeOptions resolvedCallRecordTypeOptions);
+    [Selector("confirmationRequiredWithCallRecordTypeOptionsToConfirm:")]
+    public static Self ConfirmationRequiredWithCallRecordTypeOptionsToConfirm(INCallRecordTypeOptions callRecordTypeOptionsToConfirm);
 }
 
 #endif

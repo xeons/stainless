@@ -37,9 +37,11 @@ public extern objc class CFFileSecurityRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFFileSecurityGetTypeID();
 
-[ReturnsRetained] public extern "C" CFFileSecurityRef? CFFileSecurityCreate(CFAllocatorRef? allocator);
+[ReturnsRetained]
+public extern "C" CFFileSecurityRef? CFFileSecurityCreate(CFAllocatorRef? allocator);
 
-[ReturnsRetained] public extern "C" CFFileSecurityRef? CFFileSecurityCreateCopy(CFAllocatorRef? allocator, CFFileSecurityRef? fileSec);
+[ReturnsRetained]
+public extern "C" CFFileSecurityRef? CFFileSecurityCreateCopy(CFAllocatorRef? allocator, CFFileSecurityRef? fileSec);
 
 public extern "C" Boolean CFFileSecurityCopyOwnerUUID(CFFileSecurityRef? fileSec, __CFUUID** ownerUUID);
 

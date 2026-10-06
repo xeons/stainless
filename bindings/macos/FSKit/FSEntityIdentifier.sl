@@ -34,12 +34,18 @@ import Standard.ObjC;
 /// macOS 15.4 and later.
 public extern objc class FSEntityIdentifier : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("uuid", "setUuid:")] public NSUUID Uuid { get; set; }
-    [Selector("qualifier", "setQualifier:")] public NSData? Qualifier { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithUUID:")] public Self InitWithUUID(NSUUID uuid);
-    [Selector("initWithUUID:qualifier:")] public Self InitWithUUIDQualifier(NSUUID uuid, ulong qualifier);
-    [Selector("initWithUUID:data:")] public Self InitWithUUIDData(NSUUID uuid, NSData qualifierData);
+    [Selector("uuid", "setUuid:")]
+    public NSUUID Uuid { get; set; }
+    [Selector("qualifier", "setQualifier:")]
+    public NSData? Qualifier { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithUUID:")]
+    public Self InitWithUUID(NSUUID uuid);
+    [Selector("initWithUUID:qualifier:")]
+    public Self InitWithUUIDQualifier(NSUUID uuid, ulong qualifier);
+    [Selector("initWithUUID:data:")]
+    public Self InitWithUUIDData(NSUUID uuid, NSData qualifierData);
 }
 
 #endif

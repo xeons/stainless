@@ -12,17 +12,20 @@ public extern objc class NSObject { }
 
 public extern objc class NSString : NSObject
 {
-    [Selector("length")] public nuint Length { get; }
+    [Selector("length")]
+    public nuint Length { get; }
 }
 
 public extern objc class SLCounted : NSObject
 {
-    [Selector("value")] public long Value { get; }
+    [Selector("value")]
+    public long Value { get; }
 }
 
 extern "C" int SLAlive();
 extern "C" SLCounted SLMakeAutoreleased(long value);
-[ReturnsRetained] extern "C" SLCounted SLMakeRetained(long value);
+[ReturnsRetained]
+extern "C" SLCounted SLMakeRetained(long value);
 extern "C" SLCounted? SLMaybe(bool give);
 extern "C" SLCounted SLShared;
 extern "C" NSString NSDefaultRunLoopMode;

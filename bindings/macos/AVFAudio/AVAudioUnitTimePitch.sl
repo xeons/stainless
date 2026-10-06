@@ -31,9 +31,12 @@ import Standard.ObjC;
 
 public extern objc class AVAudioUnitTimePitch : AVAudioUnitTimeEffect
 {
-    [Selector("rate", "setRate:")] public float Rate { get; set; }
-    [Selector("pitch", "setPitch:")] public float Pitch { get; set; }
-    [Selector("overlap", "setOverlap:")] public float Overlap { get; set; }
+    [Selector("rate", "setRate:")]
+    public float Rate { get; set; }
+    [Selector("pitch", "setPitch:")]
+    public float Pitch { get; set; }
+    [Selector("overlap", "setOverlap:")]
+    public float Overlap { get; set; }
 }
 
 #endif

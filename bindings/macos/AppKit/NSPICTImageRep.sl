@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class NSPICTImageRep : NSImageRep
 {
-    [Selector("PICTRepresentation")] public NSData PICTRepresentation { get; }
-    [Selector("boundingBox")] public NSRect BoundingBox { get; }
-    [Selector("imageRepWithData:")] public static Self? ImageRepWithData(NSData pictData);
-    [Selector("initWithData:")] public Self? InitWithData(NSData pictData);
+    [Selector("PICTRepresentation")]
+    public NSData PICTRepresentation { get; }
+    [Selector("boundingBox")]
+    public NSRect BoundingBox { get; }
+    [Selector("imageRepWithData:")]
+    public static Self? ImageRepWithData(NSData pictData);
+    [Selector("initWithData:")]
+    public Self? InitWithData(NSData pictData);
 }
 
 #endif

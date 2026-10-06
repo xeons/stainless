@@ -34,19 +34,24 @@ import Standard.ObjC;
 public objc interface ISyncFiltering : NSCoding
 {
     /// Deprecated in macOS 10.7.
-    [Selector("isEqual:")] bool IsEqual(AnyObject? anotherFilter);
+    [Selector("isEqual:")]
+    bool IsEqual(AnyObject? anotherFilter);
     /// Deprecated in macOS 10.7.
-    [Selector("supportedEntityNames")] NSArray? SupportedEntityNames();
+    [Selector("supportedEntityNames")]
+    NSArray? SupportedEntityNames();
     /// Deprecated in macOS 10.7.
-    [Selector("shouldApplyRecord:withRecordIdentifier:")] bool ShouldApplyRecordWithRecordIdentifier(NSDictionary? record, NSString? recordId);
+    [Selector("shouldApplyRecord:withRecordIdentifier:")]
+    bool ShouldApplyRecordWithRecordIdentifier(NSDictionary? record, NSString? recordId);
 }
 
 public extern objc class ISyncFilter : NSObject
 {
     /// Deprecated in macOS 10.7.
-    [Selector("filterMatchingAllFilters:")] public static ISyncFiltering? FilterMatchingAllFilters(NSArray? filters);
+    [Selector("filterMatchingAllFilters:")]
+    public static ISyncFiltering? FilterMatchingAllFilters(NSArray? filters);
     /// Deprecated in macOS 10.7.
-    [Selector("filterMatchingAtLeastOneFilter:")] public static ISyncFiltering? FilterMatchingAtLeastOneFilter(NSArray? filters);
+    [Selector("filterMatchingAtLeastOneFilter:")]
+    public static ISyncFiltering? FilterMatchingAtLeastOneFilter(NSArray? filters);
 }
 
 #endif

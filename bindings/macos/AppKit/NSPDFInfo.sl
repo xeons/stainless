@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class NSPDFInfo : NSObject, NSCopying, NSCoding
 {
-    [Selector("URL", "setURL:")] public NSURL? URL { get; set; }
-    [Selector("isFileExtensionHidden", "setFileExtensionHidden:")] public bool FileExtensionHidden { get; set; }
-    [Selector("tagNames", "setTagNames:")] public NSArray TagNames { get; set; }
-    [Selector("orientation", "setOrientation:")] public NSPaperOrientation Orientation { get; set; }
-    [Selector("paperSize", "setPaperSize:")] public NSSize PaperSize { get; set; }
-    [Selector("attributes")] public NSMutableDictionary Attributes { get; }
+    [Selector("URL", "setURL:")]
+    public NSURL? URL { get; set; }
+    [Selector("isFileExtensionHidden", "setFileExtensionHidden:")]
+    public bool FileExtensionHidden { get; set; }
+    [Selector("tagNames", "setTagNames:")]
+    public NSArray TagNames { get; set; }
+    [Selector("orientation", "setOrientation:")]
+    public NSPaperOrientation Orientation { get; set; }
+    [Selector("paperSize", "setPaperSize:")]
+    public NSSize PaperSize { get; set; }
+    [Selector("attributes")]
+    public NSMutableDictionary Attributes { get; }
 }
 
 #endif

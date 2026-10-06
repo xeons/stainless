@@ -51,8 +51,10 @@ public extern "C" NSRange NSRangeFromString(NSString aString);
 /// NSValueRangeExtensions, a category of NSValue.
 public extern objc class NSValue
 {
-    [Selector("rangeValue")] public NSRange RangeValue { get; }
-    [Selector("valueWithRange:")] public static NSValue ValueWithRange(NSRange range);
+    [Selector("rangeValue")]
+    public NSRange RangeValue { get; }
+    [Selector("valueWithRange:")]
+    public static NSValue ValueWithRange(NSRange range);
 }
 
 #endif

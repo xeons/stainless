@@ -47,7 +47,8 @@ public extern objc class CFDateRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFDateGetTypeID();
 
-[ReturnsRetained] public extern "C" CFDateRef? CFDateCreate(CFAllocatorRef? allocator, CFAbsoluteTime at);
+[ReturnsRetained]
+public extern "C" CFDateRef? CFDateCreate(CFAllocatorRef? allocator, CFAbsoluteTime at);
 
 public extern "C" CFAbsoluteTime CFDateGetAbsoluteTime(CFDateRef? theDate);
 

@@ -52,13 +52,19 @@ public extern "C" NSString? CBUUIDL2CAPPSMCharacteristicString;
 
 public extern objc class CBUUID : NSObject, NSCopying
 {
-    [Selector("data")] public NSData Data { get; }
-    [Selector("UUIDString")] public NSString? UUIDString { get; }
-    [Selector("UUIDWithString:")] public static CBUUID UUIDWithString(NSString theString);
-    [Selector("UUIDWithData:")] public static CBUUID UUIDWithData(NSData theData);
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("UUIDString")]
+    public NSString? UUIDString { get; }
+    [Selector("UUIDWithString:")]
+    public static CBUUID UUIDWithString(NSString theString);
+    [Selector("UUIDWithData:")]
+    public static CBUUID UUIDWithData(NSData theData);
     /// Deprecated in macOS 10.13.
-    [Selector("UUIDWithCFUUID:")] public static CBUUID UUIDWithCFUUID(CFUUIDRef theUUID);
-    [Selector("UUIDWithNSUUID:")] public static CBUUID UUIDWithNSUUID(NSUUID theUUID);
+    [Selector("UUIDWithCFUUID:")]
+    public static CBUUID UUIDWithCFUUID(CFUUIDRef theUUID);
+    [Selector("UUIDWithNSUUID:")]
+    public static CBUUID UUIDWithNSUUID(NSUUID theUUID);
 }
 
 #endif

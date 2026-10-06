@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class NSMigrationStage : NSObject
 {
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
 }
 
 #endif

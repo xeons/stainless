@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class SHSignature : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("duration")] public NSTimeInterval Duration { get; }
-    [Selector("dataRepresentation")] public NSData DataRepresentation { get; }
-    [Selector("signatureWithDataRepresentation:error:")] public static SHSignature? SignatureWithDataRepresentationError(NSData dataRepresentation, out NSError? error);
-    [Selector("initWithDataRepresentation:error:")] public Self? InitWithDataRepresentationError(NSData dataRepresentation, out NSError? error);
+    [Selector("duration")]
+    public NSTimeInterval Duration { get; }
+    [Selector("dataRepresentation")]
+    public NSData DataRepresentation { get; }
+    [Selector("signatureWithDataRepresentation:error:")]
+    public static SHSignature? SignatureWithDataRepresentationError(NSData dataRepresentation, out NSError? error);
+    [Selector("initWithDataRepresentation:error:")]
+    public Self? InitWithDataRepresentationError(NSData dataRepresentation, out NSError? error);
 }
 
 #endif

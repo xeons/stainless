@@ -31,14 +31,19 @@ import Standard.ObjC;
 
 #pragma comment(framework, "SystemConfiguration")
 
-[ReturnsRetained] public extern "C" CFStringRef? SCDynamicStoreCopyComputerName(SCDynamicStoreRef? store, CFStringEncoding* nameEncoding);
+[ReturnsRetained]
+public extern "C" CFStringRef? SCDynamicStoreCopyComputerName(SCDynamicStoreRef? store, CFStringEncoding* nameEncoding);
 
-[ReturnsRetained] public extern "C" CFStringRef? SCDynamicStoreCopyConsoleUser(SCDynamicStoreRef? store, uid_t* uid, gid_t* gid);
+[ReturnsRetained]
+public extern "C" CFStringRef? SCDynamicStoreCopyConsoleUser(SCDynamicStoreRef? store, uid_t* uid, gid_t* gid);
 
-[ReturnsRetained] public extern "C" CFStringRef? SCDynamicStoreCopyLocalHostName(SCDynamicStoreRef? store);
+[ReturnsRetained]
+public extern "C" CFStringRef? SCDynamicStoreCopyLocalHostName(SCDynamicStoreRef? store);
 
-[ReturnsRetained] public extern "C" CFStringRef? SCDynamicStoreCopyLocation(SCDynamicStoreRef? store);
+[ReturnsRetained]
+public extern "C" CFStringRef? SCDynamicStoreCopyLocation(SCDynamicStoreRef? store);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? SCDynamicStoreCopyProxies(SCDynamicStoreRef? store);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? SCDynamicStoreCopyProxies(SCDynamicStoreRef? store);
 
 #endif

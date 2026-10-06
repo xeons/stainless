@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class SKCropNode : SKNode
 {
-    [Selector("maskNode", "setMaskNode:")] public SKNode? MaskNode { get; set; }
+    [Selector("maskNode", "setMaskNode:")]
+    public SKNode? MaskNode { get; set; }
 }
 
 #endif

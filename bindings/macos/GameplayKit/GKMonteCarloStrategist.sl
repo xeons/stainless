@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class GKMonteCarloStrategist : NSObject, GKStrategist
 {
-    [Selector("budget", "setBudget:")] public NSUInteger Budget { get; set; }
-    [Selector("explorationParameter", "setExplorationParameter:")] public NSUInteger ExplorationParameter { get; set; }
+    [Selector("budget", "setBudget:")]
+    public NSUInteger Budget { get; set; }
+    [Selector("explorationParameter", "setExplorationParameter:")]
+    public NSUInteger ExplorationParameter { get; set; }
 }
 
 #endif

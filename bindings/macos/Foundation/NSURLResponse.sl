@@ -32,21 +32,32 @@ import Standard.ObjC;
 
 public extern objc class NSURLResponse : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("URL")] public NSURL? URL { get; }
-    [Selector("MIMEType")] public NSString? MIMEType { get; }
-    [Selector("expectedContentLength")] public long ExpectedContentLength { get; }
-    [Selector("textEncodingName")] public NSString? TextEncodingName { get; }
-    [Selector("suggestedFilename")] public NSString? SuggestedFilename { get; }
-    [Selector("initWithURL:MIMEType:expectedContentLength:textEncodingName:")] public Self InitWithURLMIMETypeExpectedContentLengthTextEncodingName(NSURL URL, NSString? MIMEType, NSInteger length, NSString? name);
+    [Selector("URL")]
+    public NSURL? URL { get; }
+    [Selector("MIMEType")]
+    public NSString? MIMEType { get; }
+    [Selector("expectedContentLength")]
+    public long ExpectedContentLength { get; }
+    [Selector("textEncodingName")]
+    public NSString? TextEncodingName { get; }
+    [Selector("suggestedFilename")]
+    public NSString? SuggestedFilename { get; }
+    [Selector("initWithURL:MIMEType:expectedContentLength:textEncodingName:")]
+    public Self InitWithURLMIMETypeExpectedContentLengthTextEncodingName(NSURL URL, NSString? MIMEType, NSInteger length, NSString? name);
 }
 
 public extern objc class NSHTTPURLResponse : NSURLResponse
 {
-    [Selector("statusCode")] public NSInteger StatusCode { get; }
-    [Selector("allHeaderFields")] public NSDictionary AllHeaderFields { get; }
-    [Selector("initWithURL:statusCode:HTTPVersion:headerFields:")] public Self? InitWithURLStatusCodeHTTPVersionHeaderFields(NSURL url, NSInteger statusCode, NSString? HTTPVersion, NSDictionary? headerFields);
-    [Selector("valueForHTTPHeaderField:")] public NSString? ValueForHTTPHeaderField(NSString field);
-    [Selector("localizedStringForStatusCode:")] public static NSString LocalizedStringForStatusCode(NSInteger statusCode);
+    [Selector("statusCode")]
+    public NSInteger StatusCode { get; }
+    [Selector("allHeaderFields")]
+    public NSDictionary AllHeaderFields { get; }
+    [Selector("initWithURL:statusCode:HTTPVersion:headerFields:")]
+    public Self? InitWithURLStatusCodeHTTPVersionHeaderFields(NSURL url, NSInteger statusCode, NSString? HTTPVersion, NSDictionary? headerFields);
+    [Selector("valueForHTTPHeaderField:")]
+    public NSString? ValueForHTTPHeaderField(NSString field);
+    [Selector("localizedStringForStatusCode:")]
+    public static NSString LocalizedStringForStatusCode(NSInteger statusCode);
 }
 
 public const long NSURLResponseUnknownLength = -1;

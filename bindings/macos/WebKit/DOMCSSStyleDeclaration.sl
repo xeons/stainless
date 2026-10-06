@@ -33,25 +33,37 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMCSSStyleDeclaration : DOMObject
 {
-    [Selector("cssText", "setCssText:")] public NSString? CssText { get; set; }
-    [Selector("length")] public uint Length { get; }
-    [Selector("parentRule")] public DOMCSSRule? ParentRule { get; }
-    [Selector("getPropertyValue:")] public NSString? GetPropertyValue(NSString? propertyName);
-    [Selector("getPropertyCSSValue:")] public DOMCSSValue? GetPropertyCSSValue(NSString? propertyName);
-    [Selector("removeProperty:")] public NSString? RemoveProperty(NSString? propertyName);
-    [Selector("getPropertyPriority:")] public NSString? GetPropertyPriority(NSString? propertyName);
-    [Selector("setProperty:value:priority:")] public void SetPropertyValuePriority(NSString? propertyName, NSString? value, NSString? priority);
-    [Selector("item:")] public NSString? Item(uint index);
+    [Selector("cssText", "setCssText:")]
+    public NSString? CssText { get; set; }
+    [Selector("length")]
+    public uint Length { get; }
+    [Selector("parentRule")]
+    public DOMCSSRule? ParentRule { get; }
+    [Selector("getPropertyValue:")]
+    public NSString? GetPropertyValue(NSString? propertyName);
+    [Selector("getPropertyCSSValue:")]
+    public DOMCSSValue? GetPropertyCSSValue(NSString? propertyName);
+    [Selector("removeProperty:")]
+    public NSString? RemoveProperty(NSString? propertyName);
+    [Selector("getPropertyPriority:")]
+    public NSString? GetPropertyPriority(NSString? propertyName);
+    [Selector("setProperty:value:priority:")]
+    public void SetPropertyValuePriority(NSString? propertyName, NSString? value, NSString? priority);
+    [Selector("item:")]
+    public NSString? Item(uint index);
     /// Deprecated in macOS 10.5.
-    [Selector("getPropertyShorthand:")] public NSString? GetPropertyShorthand(NSString? propertyName);
-    [Selector("isPropertyImplicit:")] public bool IsPropertyImplicit(NSString? propertyName);
+    [Selector("getPropertyShorthand:")]
+    public NSString? GetPropertyShorthand(NSString? propertyName);
+    [Selector("isPropertyImplicit:")]
+    public bool IsPropertyImplicit(NSString? propertyName);
 }
 
 /// DOMCSSStyleDeclarationDeprecated, a category of DOMCSSStyleDeclaration.
 public extern objc class DOMCSSStyleDeclaration
 {
     /// Deprecated in macOS 10.5.
-    [Selector("setProperty:::")] public void SetProperty(NSString? propertyName, NSString? value, NSString? priority);
+    [Selector("setProperty:::")]
+    public void SetProperty(NSString? propertyName, NSString? value, NSString? priority);
 }
 
 #endif

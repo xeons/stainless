@@ -32,15 +32,21 @@ import Standard.ObjC;
 
 public extern objc class LAEnvironment : NSObject
 {
-    [Selector("currentUser")] public static LAEnvironment CurrentUser { get; }
-    [Selector("state")] public LAEnvironmentState State { get; }
-    [Selector("addObserver:")] public void AddObserver(LAEnvironmentObserver observer);
-    [Selector("removeObserver:")] public void RemoveObserver(LAEnvironmentObserver observer);
+    [Selector("currentUser")]
+    public static LAEnvironment CurrentUser { get; }
+    [Selector("state")]
+    public LAEnvironmentState State { get; }
+    [Selector("addObserver:")]
+    public void AddObserver(LAEnvironmentObserver observer);
+    [Selector("removeObserver:")]
+    public void RemoveObserver(LAEnvironmentObserver observer);
 }
 
 public objc interface LAEnvironmentObserver : NSObjectProtocol
 {
-    [Optional] [Selector("environment:stateDidChangeFromOldState:")] void EnvironmentStateDidChangeFromOldState(LAEnvironment environment, LAEnvironmentState oldState);
+    [Optional]
+    [Selector("environment:stateDidChangeFromOldState:")]
+    void EnvironmentStateDidChangeFromOldState(LAEnvironment environment, LAEnvironmentState oldState);
 }
 
 #endif

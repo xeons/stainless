@@ -40,15 +40,24 @@ public objc closure void SCNActionableRunActionForKeyCompletionHandlerBlock();
 
 public objc interface SCNActionable : NSObjectProtocol
 {
-    [Selector("hasActions")] bool HasActions { get; }
-    [Selector("actionKeys")] NSArray? ActionKeys { get; }
-    [Selector("runAction:")] void RunAction(SCNAction action);
-    [Selector("runAction:completionHandler:")] void RunActionCompletionHandler(SCNAction action, SCNActionableRunActionCompletionHandlerBlock? block);
-    [Selector("runAction:forKey:")] void RunActionForKey(SCNAction action, NSString? key);
-    [Selector("runAction:forKey:completionHandler:")] void RunActionForKeyCompletionHandler(SCNAction action, NSString? key, SCNActionableRunActionForKeyCompletionHandlerBlock? block);
-    [Selector("actionForKey:")] SCNAction? ActionForKey(NSString key);
-    [Selector("removeActionForKey:")] void RemoveActionForKey(NSString key);
-    [Selector("removeAllActions")] void RemoveAllActions();
+    [Selector("hasActions")]
+    bool HasActions { get; }
+    [Selector("actionKeys")]
+    NSArray? ActionKeys { get; }
+    [Selector("runAction:")]
+    void RunAction(SCNAction action);
+    [Selector("runAction:completionHandler:")]
+    void RunActionCompletionHandler(SCNAction action, SCNActionableRunActionCompletionHandlerBlock? block);
+    [Selector("runAction:forKey:")]
+    void RunActionForKey(SCNAction action, NSString? key);
+    [Selector("runAction:forKey:completionHandler:")]
+    void RunActionForKeyCompletionHandler(SCNAction action, NSString? key, SCNActionableRunActionForKeyCompletionHandlerBlock? block);
+    [Selector("actionForKey:")]
+    SCNAction? ActionForKey(NSString key);
+    [Selector("removeActionForKey:")]
+    void RemoveActionForKey(NSString key);
+    [Selector("removeAllActions")]
+    void RemoveAllActions();
 }
 
 public objc closure void SCNActionRunBlockBlock(SCNNode arg0);
@@ -59,39 +68,72 @@ public objc closure void SCNActionCustomActionWithDurationActionBlockBlock(SCNNo
 
 public extern objc class SCNAction : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("duration", "setDuration:")] public NSTimeInterval Duration { get; set; }
-    [Selector("timingMode", "setTimingMode:")] public SCNActionTimingMode TimingMode { get; set; }
-    [Selector("timingFunction", "setTimingFunction:")] public SCNActionTimingFunction? TimingFunction { get; set; }
-    [Selector("speed", "setSpeed:")] public CGFloat Speed { get; set; }
-    [Selector("reversedAction")] public SCNAction ReversedAction();
-    [Selector("moveByX:y:z:duration:")] public static SCNAction MoveByXYZDuration(CGFloat deltaX, CGFloat deltaY, CGFloat deltaZ, NSTimeInterval duration);
-    [Selector("moveBy:duration:")] public static SCNAction MoveByDuration(SCNVector3 delta, NSTimeInterval duration);
-    [Selector("moveTo:duration:")] public static SCNAction MoveToDuration(SCNVector3 location, NSTimeInterval duration);
-    [Selector("rotateByX:y:z:duration:")] public static SCNAction RotateByXYZDuration(CGFloat xAngle, CGFloat yAngle, CGFloat zAngle, NSTimeInterval duration);
-    [Selector("rotateToX:y:z:duration:")] public static SCNAction RotateToXYZDuration(CGFloat xAngle, CGFloat yAngle, CGFloat zAngle, NSTimeInterval duration);
-    [Selector("rotateToX:y:z:duration:shortestUnitArc:")] public static SCNAction RotateToXYZDurationShortestUnitArc(CGFloat xAngle, CGFloat yAngle, CGFloat zAngle, NSTimeInterval duration, bool shortestUnitArc);
-    [Selector("rotateByAngle:aroundAxis:duration:")] public static SCNAction RotateByAngleAroundAxisDuration(CGFloat angle, SCNVector3 axis, NSTimeInterval duration);
-    [Selector("rotateToAxisAngle:duration:")] public static SCNAction RotateToAxisAngleDuration(SCNVector4 axisAngle, NSTimeInterval duration);
-    [Selector("scaleBy:duration:")] public static SCNAction ScaleByDuration(CGFloat scale, NSTimeInterval sec);
-    [Selector("scaleTo:duration:")] public static SCNAction ScaleToDuration(CGFloat scale, NSTimeInterval sec);
-    [Selector("sequence:")] public static SCNAction Sequence(NSArray actions);
-    [Selector("group:")] public static SCNAction Group(NSArray actions);
-    [Selector("repeatAction:count:")] public static SCNAction RepeatActionCount(SCNAction action, NSUInteger count);
-    [Selector("repeatActionForever:")] public static SCNAction RepeatActionForever(SCNAction action);
-    [Selector("fadeInWithDuration:")] public static SCNAction FadeInWithDuration(NSTimeInterval sec);
-    [Selector("fadeOutWithDuration:")] public static SCNAction FadeOutWithDuration(NSTimeInterval sec);
-    [Selector("fadeOpacityBy:duration:")] public static SCNAction FadeOpacityByDuration(CGFloat factor, NSTimeInterval sec);
-    [Selector("fadeOpacityTo:duration:")] public static SCNAction FadeOpacityToDuration(CGFloat opacity, NSTimeInterval sec);
-    [Selector("hide")] public static SCNAction Hide();
-    [Selector("unhide")] public static SCNAction Unhide();
-    [Selector("waitForDuration:")] public static SCNAction WaitForDuration(NSTimeInterval sec);
-    [Selector("waitForDuration:withRange:")] public static SCNAction WaitForDurationWithRange(NSTimeInterval sec, NSTimeInterval durationRange);
-    [Selector("removeFromParentNode")] public static SCNAction RemoveFromParentNode();
-    [Selector("runBlock:")] public static SCNAction RunBlock(SCNActionRunBlockBlock block);
-    [Selector("runBlock:queue:")] public static SCNAction RunBlockQueue(SCNActionRunBlockQueueBlock block, dispatch_queue_t queue);
-    [Selector("javaScriptActionWithScript:duration:")] public static SCNAction JavaScriptActionWithScriptDuration(NSString script, NSTimeInterval seconds);
-    [Selector("customActionWithDuration:actionBlock:")] public static SCNAction CustomActionWithDurationActionBlock(NSTimeInterval seconds, SCNActionCustomActionWithDurationActionBlockBlock block);
-    [Selector("playAudioSource:waitForCompletion:")] public static SCNAction PlayAudioSourceWaitForCompletion(SCNAudioSource source, bool wait);
+    [Selector("duration", "setDuration:")]
+    public NSTimeInterval Duration { get; set; }
+    [Selector("timingMode", "setTimingMode:")]
+    public SCNActionTimingMode TimingMode { get; set; }
+    [Selector("timingFunction", "setTimingFunction:")]
+    public SCNActionTimingFunction? TimingFunction { get; set; }
+    [Selector("speed", "setSpeed:")]
+    public CGFloat Speed { get; set; }
+    [Selector("reversedAction")]
+    public SCNAction ReversedAction();
+    [Selector("moveByX:y:z:duration:")]
+    public static SCNAction MoveByXYZDuration(CGFloat deltaX, CGFloat deltaY, CGFloat deltaZ, NSTimeInterval duration);
+    [Selector("moveBy:duration:")]
+    public static SCNAction MoveByDuration(SCNVector3 delta, NSTimeInterval duration);
+    [Selector("moveTo:duration:")]
+    public static SCNAction MoveToDuration(SCNVector3 location, NSTimeInterval duration);
+    [Selector("rotateByX:y:z:duration:")]
+    public static SCNAction RotateByXYZDuration(CGFloat xAngle, CGFloat yAngle, CGFloat zAngle, NSTimeInterval duration);
+    [Selector("rotateToX:y:z:duration:")]
+    public static SCNAction RotateToXYZDuration(CGFloat xAngle, CGFloat yAngle, CGFloat zAngle, NSTimeInterval duration);
+    [Selector("rotateToX:y:z:duration:shortestUnitArc:")]
+    public static SCNAction RotateToXYZDurationShortestUnitArc(CGFloat xAngle, CGFloat yAngle, CGFloat zAngle, NSTimeInterval duration, bool shortestUnitArc);
+    [Selector("rotateByAngle:aroundAxis:duration:")]
+    public static SCNAction RotateByAngleAroundAxisDuration(CGFloat angle, SCNVector3 axis, NSTimeInterval duration);
+    [Selector("rotateToAxisAngle:duration:")]
+    public static SCNAction RotateToAxisAngleDuration(SCNVector4 axisAngle, NSTimeInterval duration);
+    [Selector("scaleBy:duration:")]
+    public static SCNAction ScaleByDuration(CGFloat scale, NSTimeInterval sec);
+    [Selector("scaleTo:duration:")]
+    public static SCNAction ScaleToDuration(CGFloat scale, NSTimeInterval sec);
+    [Selector("sequence:")]
+    public static SCNAction Sequence(NSArray actions);
+    [Selector("group:")]
+    public static SCNAction Group(NSArray actions);
+    [Selector("repeatAction:count:")]
+    public static SCNAction RepeatActionCount(SCNAction action, NSUInteger count);
+    [Selector("repeatActionForever:")]
+    public static SCNAction RepeatActionForever(SCNAction action);
+    [Selector("fadeInWithDuration:")]
+    public static SCNAction FadeInWithDuration(NSTimeInterval sec);
+    [Selector("fadeOutWithDuration:")]
+    public static SCNAction FadeOutWithDuration(NSTimeInterval sec);
+    [Selector("fadeOpacityBy:duration:")]
+    public static SCNAction FadeOpacityByDuration(CGFloat factor, NSTimeInterval sec);
+    [Selector("fadeOpacityTo:duration:")]
+    public static SCNAction FadeOpacityToDuration(CGFloat opacity, NSTimeInterval sec);
+    [Selector("hide")]
+    public static SCNAction Hide();
+    [Selector("unhide")]
+    public static SCNAction Unhide();
+    [Selector("waitForDuration:")]
+    public static SCNAction WaitForDuration(NSTimeInterval sec);
+    [Selector("waitForDuration:withRange:")]
+    public static SCNAction WaitForDurationWithRange(NSTimeInterval sec, NSTimeInterval durationRange);
+    [Selector("removeFromParentNode")]
+    public static SCNAction RemoveFromParentNode();
+    [Selector("runBlock:")]
+    public static SCNAction RunBlock(SCNActionRunBlockBlock block);
+    [Selector("runBlock:queue:")]
+    public static SCNAction RunBlockQueue(SCNActionRunBlockQueueBlock block, dispatch_queue_t queue);
+    [Selector("javaScriptActionWithScript:duration:")]
+    public static SCNAction JavaScriptActionWithScriptDuration(NSString script, NSTimeInterval seconds);
+    [Selector("customActionWithDuration:actionBlock:")]
+    public static SCNAction CustomActionWithDurationActionBlock(NSTimeInterval seconds, SCNActionCustomActionWithDurationActionBlockBlock block);
+    [Selector("playAudioSource:waitForCompletion:")]
+    public static SCNAction PlayAudioSourceWaitForCompletion(SCNAudioSource source, bool wait);
 }
 
 #endif

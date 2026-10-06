@@ -34,12 +34,18 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public objc interface MTL4Archive : NSObjectProtocol
 {
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("newComputePipelineStateWithDescriptor:error:")] MTLComputePipelineState? NewComputePipelineStateWithDescriptorError(MTL4ComputePipelineDescriptor descriptor, out NSError? error);
-    [Selector("newComputePipelineStateWithDescriptor:dynamicLinkingDescriptor:error:")] MTLComputePipelineState? NewComputePipelineStateWithDescriptorDynamicLinkingDescriptorError(MTL4ComputePipelineDescriptor descriptor, MTL4PipelineStageDynamicLinkingDescriptor dynamicLinkingDescriptor, out NSError? error);
-    [Selector("newRenderPipelineStateWithDescriptor:error:")] MTLRenderPipelineState? NewRenderPipelineStateWithDescriptorError(MTL4PipelineDescriptor descriptor, out NSError? error);
-    [Selector("newRenderPipelineStateWithDescriptor:dynamicLinkingDescriptor:error:")] MTLRenderPipelineState? NewRenderPipelineStateWithDescriptorDynamicLinkingDescriptorError(MTL4PipelineDescriptor descriptor, MTL4RenderPipelineDynamicLinkingDescriptor dynamicLinkingDescriptor, out NSError? error);
-    [Selector("newBinaryFunctionWithDescriptor:error:")] MTL4BinaryFunctionProtocol? NewBinaryFunctionWithDescriptorError(MTL4BinaryFunctionDescriptor descriptor, out NSError? error);
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("newComputePipelineStateWithDescriptor:error:")]
+    MTLComputePipelineState? NewComputePipelineStateWithDescriptorError(MTL4ComputePipelineDescriptor descriptor, out NSError? error);
+    [Selector("newComputePipelineStateWithDescriptor:dynamicLinkingDescriptor:error:")]
+    MTLComputePipelineState? NewComputePipelineStateWithDescriptorDynamicLinkingDescriptorError(MTL4ComputePipelineDescriptor descriptor, MTL4PipelineStageDynamicLinkingDescriptor dynamicLinkingDescriptor, out NSError? error);
+    [Selector("newRenderPipelineStateWithDescriptor:error:")]
+    MTLRenderPipelineState? NewRenderPipelineStateWithDescriptorError(MTL4PipelineDescriptor descriptor, out NSError? error);
+    [Selector("newRenderPipelineStateWithDescriptor:dynamicLinkingDescriptor:error:")]
+    MTLRenderPipelineState? NewRenderPipelineStateWithDescriptorDynamicLinkingDescriptorError(MTL4PipelineDescriptor descriptor, MTL4RenderPipelineDynamicLinkingDescriptor dynamicLinkingDescriptor, out NSError? error);
+    [Selector("newBinaryFunctionWithDescriptor:error:")]
+    MTL4BinaryFunctionProtocol? NewBinaryFunctionWithDescriptorError(MTL4BinaryFunctionDescriptor descriptor, out NSError? error);
 }
 
 #endif

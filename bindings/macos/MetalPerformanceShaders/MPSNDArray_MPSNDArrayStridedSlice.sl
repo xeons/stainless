@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class MPSNDArrayStridedSlice : MPSNDArrayUnaryKernel
 {
-    [Selector("strides", "setStrides:")] public MPSNDArrayOffsets Strides { get; set; }
+    [Selector("strides", "setStrides:")]
+    public MPSNDArrayOffsets Strides { get; set; }
 }
 
 public extern objc class MPSNDArrayStridedSliceGradient : MPSNDArrayUnaryGradientKernel { }

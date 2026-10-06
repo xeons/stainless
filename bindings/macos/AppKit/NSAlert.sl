@@ -42,37 +42,58 @@ public objc closure void NSAlertBeginSheetModalForWindowCompletionHandlerHandler
 
 public extern objc class NSAlert : NSObject
 {
-    [Selector("messageText", "setMessageText:")] public NSString MessageText { get; set; }
-    [Selector("informativeText", "setInformativeText:")] public NSString InformativeText { get; set; }
-    [Selector("icon", "setIcon:")] public NSImage? Icon { get; set; }
-    [Selector("buttons")] public NSArray Buttons { get; }
-    [Selector("alertStyle", "setAlertStyle:")] public NSAlertStyle AlertStyle { get; set; }
-    [Selector("showsHelp", "setShowsHelp:")] public bool ShowsHelp { get; set; }
-    [Selector("helpAnchor", "setHelpAnchor:")] public NSHelpAnchorName? HelpAnchor { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSAlertDelegate? Delegate { get; set; }
-    [Selector("accessoryView", "setAccessoryView:")] public NSView? AccessoryView { get; set; }
-    [Selector("showsSuppressionButton", "setShowsSuppressionButton:")] public bool ShowsSuppressionButton { get; set; }
-    [Selector("suppressionButton")] public NSButton? SuppressionButton { get; }
-    [Selector("window")] public NSWindow Window { get; }
-    [Selector("alertWithError:")] public static NSAlert AlertWithError(NSError error);
-    [Selector("addButtonWithTitle:")] public NSButton AddButtonWithTitle(NSString title);
-    [Selector("layout")] public void Layout();
-    [Selector("runModal")] public NSModalResponse RunModal();
-    [Selector("beginSheetModalForWindow:completionHandler:")] public void BeginSheetModalForWindowCompletionHandler(NSWindow sheetWindow, NSAlertBeginSheetModalForWindowCompletionHandlerHandlerBlock? handler);
+    [Selector("messageText", "setMessageText:")]
+    public NSString MessageText { get; set; }
+    [Selector("informativeText", "setInformativeText:")]
+    public NSString InformativeText { get; set; }
+    [Selector("icon", "setIcon:")]
+    public NSImage? Icon { get; set; }
+    [Selector("buttons")]
+    public NSArray Buttons { get; }
+    [Selector("alertStyle", "setAlertStyle:")]
+    public NSAlertStyle AlertStyle { get; set; }
+    [Selector("showsHelp", "setShowsHelp:")]
+    public bool ShowsHelp { get; set; }
+    [Selector("helpAnchor", "setHelpAnchor:")]
+    public NSHelpAnchorName? HelpAnchor { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSAlertDelegate? Delegate { get; set; }
+    [Selector("accessoryView", "setAccessoryView:")]
+    public NSView? AccessoryView { get; set; }
+    [Selector("showsSuppressionButton", "setShowsSuppressionButton:")]
+    public bool ShowsSuppressionButton { get; set; }
+    [Selector("suppressionButton")]
+    public NSButton? SuppressionButton { get; }
+    [Selector("window")]
+    public NSWindow Window { get; }
+    [Selector("alertWithError:")]
+    public static NSAlert AlertWithError(NSError error);
+    [Selector("addButtonWithTitle:")]
+    public NSButton AddButtonWithTitle(NSString title);
+    [Selector("layout")]
+    public void Layout();
+    [Selector("runModal")]
+    public NSModalResponse RunModal();
+    [Selector("beginSheetModalForWindow:completionHandler:")]
+    public void BeginSheetModalForWindowCompletionHandler(NSWindow sheetWindow, NSAlertBeginSheetModalForWindowCompletionHandlerHandlerBlock? handler);
 }
 
 public objc interface NSAlertDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("alertShowHelp:")] bool AlertShowHelp(NSAlert alert);
+    [Optional]
+    [Selector("alertShowHelp:")]
+    bool AlertShowHelp(NSAlert alert);
 }
 
 /// NSAlertDeprecated, a category of NSAlert.
 public extern objc class NSAlert
 {
     /// Deprecated in macOS 10.10.
-    [Selector("alertWithMessageText:defaultButton:alternateButton:otherButton:informativeTextWithFormat:")] public static NSAlert AlertWithMessageTextDefaultButtonAlternateButtonOtherButtonInformativeTextWithFormat(NSString? message, NSString? defaultButton, NSString? alternateButton, NSString? otherButton, NSString format, ...);
+    [Selector("alertWithMessageText:defaultButton:alternateButton:otherButton:informativeTextWithFormat:")]
+    public static NSAlert AlertWithMessageTextDefaultButtonAlternateButtonOtherButtonInformativeTextWithFormat(NSString? message, NSString? defaultButton, NSString? alternateButton, NSString? otherButton, NSString format, ...);
     /// Deprecated in macOS 10.10.
-    [Selector("beginSheetModalForWindow:modalDelegate:didEndSelector:contextInfo:")] public void BeginSheetModalForWindowModalDelegateDidEndSelectorContextInfo(NSWindow window, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
+    [Selector("beginSheetModalForWindow:modalDelegate:didEndSelector:contextInfo:")]
+    public void BeginSheetModalForWindowModalDelegateDidEndSelectorContextInfo(NSWindow window, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
 }
 
 #endif

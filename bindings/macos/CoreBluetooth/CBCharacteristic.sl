@@ -47,13 +47,19 @@ public enum CBCharacteristicProperties : ulong
 
 public extern objc class CBCharacteristic : CBAttribute
 {
-    [Selector("service")] public CBService? Service { get; }
-    [Selector("properties")] public CBCharacteristicProperties Properties { get; }
-    [Selector("value")] public NSData? Value { get; }
-    [Selector("descriptors")] public NSArray? Descriptors { get; }
+    [Selector("service")]
+    public CBService? Service { get; }
+    [Selector("properties")]
+    public CBCharacteristicProperties Properties { get; }
+    [Selector("value")]
+    public NSData? Value { get; }
+    [Selector("descriptors")]
+    public NSArray? Descriptors { get; }
     /// Deprecated in macOS 10.13.
-    [Selector("isBroadcasted")] public bool IsBroadcasted { get; }
-    [Selector("isNotifying")] public bool IsNotifying { get; }
+    [Selector("isBroadcasted")]
+    public bool IsBroadcasted { get; }
+    [Selector("isNotifying")]
+    public bool IsNotifying { get; }
 }
 
 [Flags]
@@ -67,12 +73,18 @@ public enum CBAttributePermissions : ulong
 
 public extern objc class CBMutableCharacteristic : CBCharacteristic
 {
-    [Selector("permissions", "setPermissions:")] public CBAttributePermissions Permissions { get; set; }
-    [Selector("subscribedCentrals")] public NSArray? SubscribedCentrals { get; }
-    [Selector("properties", "setProperties:")] public CBCharacteristicProperties Properties { get; set; }
-    [Selector("value", "setValue:")] public NSData? Value { get; set; }
-    [Selector("descriptors", "setDescriptors:")] public NSArray? Descriptors { get; set; }
-    [Selector("initWithType:properties:value:permissions:")] public Self InitWithTypePropertiesValuePermissions(CBUUID UUID, CBCharacteristicProperties properties, NSData? value, CBAttributePermissions permissions);
+    [Selector("permissions", "setPermissions:")]
+    public CBAttributePermissions Permissions { get; set; }
+    [Selector("subscribedCentrals")]
+    public NSArray? SubscribedCentrals { get; }
+    [Selector("properties", "setProperties:")]
+    public CBCharacteristicProperties Properties { get; set; }
+    [Selector("value", "setValue:")]
+    public NSData? Value { get; set; }
+    [Selector("descriptors", "setDescriptors:")]
+    public NSArray? Descriptors { get; set; }
+    [Selector("initWithType:properties:value:permissions:")]
+    public Self InitWithTypePropertiesValuePermissions(CBUUID UUID, CBCharacteristicProperties properties, NSData? value, CBAttributePermissions permissions);
 }
 
 #endif

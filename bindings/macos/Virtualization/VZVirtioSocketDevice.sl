@@ -34,9 +34,12 @@ public objc closure void VZVirtioSocketDeviceConnectToPortCompletionHandlerCompl
 
 public extern objc class VZVirtioSocketDevice : VZSocketDevice
 {
-    [Selector("setSocketListener:forPort:")] public void SetSocketListenerForPort(VZVirtioSocketListener listener, uint port);
-    [Selector("removeSocketListenerForPort:")] public void RemoveSocketListenerForPort(uint port);
-    [Selector("connectToPort:completionHandler:")] public void ConnectToPortCompletionHandler(uint port, VZVirtioSocketDeviceConnectToPortCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("setSocketListener:forPort:")]
+    public void SetSocketListenerForPort(VZVirtioSocketListener listener, uint port);
+    [Selector("removeSocketListenerForPort:")]
+    public void RemoveSocketListenerForPort(uint port);
+    [Selector("connectToPort:completionHandler:")]
+    public void ConnectToPortCompletionHandler(uint port, VZVirtioSocketDeviceConnectToPortCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

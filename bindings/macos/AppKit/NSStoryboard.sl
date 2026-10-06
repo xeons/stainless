@@ -39,12 +39,18 @@ public objc closure AnyObject? NSStoryboardControllerCreator(NSCoder arg0);
 
 public extern objc class NSStoryboard : NSObject
 {
-    [Selector("mainStoryboard")] public static NSStoryboard? MainStoryboard { get; }
-    [Selector("storyboardWithName:bundle:")] public static Self StoryboardWithNameBundle(NSStoryboardName name, NSBundle? storyboardBundleOrNil);
-    [Selector("instantiateInitialController")] public AnyObject? InstantiateInitialController();
-    [Selector("instantiateInitialControllerWithCreator:")] public AnyObject? InstantiateInitialControllerWithCreator(NSStoryboardControllerCreator? block);
-    [Selector("instantiateControllerWithIdentifier:")] public AnyObject InstantiateControllerWithIdentifier(NSStoryboardSceneIdentifier identifier);
-    [Selector("instantiateControllerWithIdentifier:creator:")] public AnyObject InstantiateControllerWithIdentifierCreator(NSStoryboardSceneIdentifier identifier, NSStoryboardControllerCreator? block);
+    [Selector("mainStoryboard")]
+    public static NSStoryboard? MainStoryboard { get; }
+    [Selector("storyboardWithName:bundle:")]
+    public static Self StoryboardWithNameBundle(NSStoryboardName name, NSBundle? storyboardBundleOrNil);
+    [Selector("instantiateInitialController")]
+    public AnyObject? InstantiateInitialController();
+    [Selector("instantiateInitialControllerWithCreator:")]
+    public AnyObject? InstantiateInitialControllerWithCreator(NSStoryboardControllerCreator? block);
+    [Selector("instantiateControllerWithIdentifier:")]
+    public AnyObject InstantiateControllerWithIdentifier(NSStoryboardSceneIdentifier identifier);
+    [Selector("instantiateControllerWithIdentifier:creator:")]
+    public AnyObject InstantiateControllerWithIdentifierCreator(NSStoryboardSceneIdentifier identifier, NSStoryboardControllerCreator? block);
 }
 
 #endif

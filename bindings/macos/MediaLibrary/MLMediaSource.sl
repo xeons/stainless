@@ -35,21 +35,29 @@ import Standard.ObjC;
 public extern objc class MLMediaSource : NSObject
 {
     /// Deprecated in macOS 10.15.
-    [Selector("mediaLibrary")] public MLMediaLibrary? MediaLibrary { get; }
+    [Selector("mediaLibrary")]
+    public MLMediaLibrary? MediaLibrary { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("mediaSourceIdentifier")] public NSString MediaSourceIdentifier { get; }
+    [Selector("mediaSourceIdentifier")]
+    public NSString MediaSourceIdentifier { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("attributes")] public NSDictionary Attributes { get; }
+    [Selector("attributes")]
+    public NSDictionary Attributes { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("rootMediaGroup")] public MLMediaGroup? RootMediaGroup { get; }
+    [Selector("rootMediaGroup")]
+    public MLMediaGroup? RootMediaGroup { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("mediaGroupForIdentifier:")] public MLMediaGroup? MediaGroupForIdentifier(NSString mediaGroupIdentifier);
+    [Selector("mediaGroupForIdentifier:")]
+    public MLMediaGroup? MediaGroupForIdentifier(NSString mediaGroupIdentifier);
     /// Deprecated in macOS 10.15.
-    [Selector("mediaGroupsForIdentifiers:")] public NSDictionary MediaGroupsForIdentifiers(NSArray mediaGroupIdentifiers);
+    [Selector("mediaGroupsForIdentifiers:")]
+    public NSDictionary MediaGroupsForIdentifiers(NSArray mediaGroupIdentifiers);
     /// Deprecated in macOS 10.15.
-    [Selector("mediaObjectForIdentifier:")] public MLMediaObject? MediaObjectForIdentifier(NSString mediaObjectIdentifier);
+    [Selector("mediaObjectForIdentifier:")]
+    public MLMediaObject? MediaObjectForIdentifier(NSString mediaObjectIdentifier);
     /// Deprecated in macOS 10.15.
-    [Selector("mediaObjectsForIdentifiers:")] public NSDictionary MediaObjectsForIdentifiers(NSArray mediaObjectIdentifiers);
+    [Selector("mediaObjectsForIdentifiers:")]
+    public NSDictionary MediaObjectsForIdentifiers(NSArray mediaObjectIdentifiers);
 }
 
 #endif

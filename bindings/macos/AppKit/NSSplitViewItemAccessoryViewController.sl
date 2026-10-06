@@ -32,14 +32,21 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class NSSplitViewItemAccessoryViewController : NSViewController, NSAnimatablePropertyContainer
 {
-    [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
-    [Selector("automaticallyAppliesContentInsets", "setAutomaticallyAppliesContentInsets:")] public bool AutomaticallyAppliesContentInsets { get; set; }
+    [Selector("isHidden", "setHidden:")]
+    public bool Hidden { get; set; }
+    [Selector("automaticallyAppliesContentInsets", "setAutomaticallyAppliesContentInsets:")]
+    public bool AutomaticallyAppliesContentInsets { get; set; }
     /// macOS 26.1 and later.
-    [Selector("preferredScrollEdgeEffectStyle", "setPreferredScrollEdgeEffectStyle:")] public NSScrollEdgeEffectStyle? PreferredScrollEdgeEffectStyle { get; set; }
-    [Selector("viewWillAppear")] public void ViewWillAppear();
-    [Selector("viewDidAppear")] public void ViewDidAppear();
-    [Selector("viewWillDisappear")] public void ViewWillDisappear();
-    [Selector("viewDidDisappear")] public void ViewDidDisappear();
+    [Selector("preferredScrollEdgeEffectStyle", "setPreferredScrollEdgeEffectStyle:")]
+    public NSScrollEdgeEffectStyle? PreferredScrollEdgeEffectStyle { get; set; }
+    [Selector("viewWillAppear")]
+    public void ViewWillAppear();
+    [Selector("viewDidAppear")]
+    public void ViewDidAppear();
+    [Selector("viewWillDisappear")]
+    public void ViewWillDisappear();
+    [Selector("viewDidDisappear")]
+    public void ViewDidDisappear();
 }
 
 #endif

@@ -61,26 +61,45 @@ public struct GCQuaternion
 
 public extern objc class GCMotion : NSObject
 {
-    [Selector("controller")] public GCController? Controller { get; }
-    [Selector("valueChangedHandler", "setValueChangedHandler:")] public GCMotionValueChangedHandler? ValueChangedHandler { get; set; }
-    [Selector("sensorsRequireManualActivation")] public bool SensorsRequireManualActivation { get; }
-    [Selector("sensorsActive", "setSensorsActive:")] public bool SensorsActive { get; set; }
-    [Selector("hasGravityAndUserAcceleration")] public bool HasGravityAndUserAcceleration { get; }
-    [Selector("gravity")] public GCAcceleration Gravity { get; }
-    [Selector("userAcceleration")] public GCAcceleration UserAcceleration { get; }
-    [Selector("acceleration")] public GCAcceleration Acceleration { get; }
+    [Selector("controller")]
+    public GCController? Controller { get; }
+    [Selector("valueChangedHandler", "setValueChangedHandler:")]
+    public GCMotionValueChangedHandler? ValueChangedHandler { get; set; }
+    [Selector("sensorsRequireManualActivation")]
+    public bool SensorsRequireManualActivation { get; }
+    [Selector("sensorsActive", "setSensorsActive:")]
+    public bool SensorsActive { get; set; }
+    [Selector("hasGravityAndUserAcceleration")]
+    public bool HasGravityAndUserAcceleration { get; }
+    [Selector("gravity")]
+    public GCAcceleration Gravity { get; }
+    [Selector("userAcceleration")]
+    public GCAcceleration UserAcceleration { get; }
+    [Selector("acceleration")]
+    public GCAcceleration Acceleration { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("hasAttitudeAndRotationRate")] public bool HasAttitudeAndRotationRate { get; }
-    [Selector("hasAttitude")] public bool HasAttitude { get; }
-    [Selector("hasRotationRate")] public bool HasRotationRate { get; }
-    [Selector("attitude")] public GCQuaternion Attitude { get; }
-    [Selector("rotationRate")] public GCRotationRate RotationRate { get; }
-    [Selector("setGravity:")] public void SetGravity(GCAcceleration gravity);
-    [Selector("setUserAcceleration:")] public void SetUserAcceleration(GCAcceleration userAcceleration);
-    [Selector("setAcceleration:")] public void SetAcceleration(GCAcceleration acceleration);
-    [Selector("setAttitude:")] public void SetAttitude(GCQuaternion attitude);
-    [Selector("setRotationRate:")] public void SetRotationRate(GCRotationRate rotationRate);
-    [Selector("setStateFromMotion:")] public void SetStateFromMotion(GCMotion motion);
+    [Selector("hasAttitudeAndRotationRate")]
+    public bool HasAttitudeAndRotationRate { get; }
+    [Selector("hasAttitude")]
+    public bool HasAttitude { get; }
+    [Selector("hasRotationRate")]
+    public bool HasRotationRate { get; }
+    [Selector("attitude")]
+    public GCQuaternion Attitude { get; }
+    [Selector("rotationRate")]
+    public GCRotationRate RotationRate { get; }
+    [Selector("setGravity:")]
+    public void SetGravity(GCAcceleration gravity);
+    [Selector("setUserAcceleration:")]
+    public void SetUserAcceleration(GCAcceleration userAcceleration);
+    [Selector("setAcceleration:")]
+    public void SetAcceleration(GCAcceleration acceleration);
+    [Selector("setAttitude:")]
+    public void SetAttitude(GCQuaternion attitude);
+    [Selector("setRotationRate:")]
+    public void SetRotationRate(GCRotationRate rotationRate);
+    [Selector("setStateFromMotion:")]
+    public void SetStateFromMotion(GCMotion motion);
 }
 
 public objc closure void GCMotionValueChangedHandler(GCMotion arg0);

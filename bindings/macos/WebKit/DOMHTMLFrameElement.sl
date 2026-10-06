@@ -33,19 +33,32 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLFrameElement : DOMHTMLElement
 {
-    [Selector("frameBorder", "setFrameBorder:")] public NSString? FrameBorder { get; set; }
-    [Selector("longDesc", "setLongDesc:")] public NSString? LongDesc { get; set; }
-    [Selector("marginHeight", "setMarginHeight:")] public NSString? MarginHeight { get; set; }
-    [Selector("marginWidth", "setMarginWidth:")] public NSString? MarginWidth { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("noResize", "setNoResize:")] public bool NoResize { get; set; }
-    [Selector("scrolling", "setScrolling:")] public NSString? Scrolling { get; set; }
-    [Selector("src", "setSrc:")] public NSString? Src { get; set; }
-    [Selector("contentDocument")] public DOMDocument? ContentDocument { get; }
-    [Selector("contentWindow")] public DOMAbstractView? ContentWindow { get; }
-    [Selector("location", "setLocation:")] public NSString? Location { get; set; }
-    [Selector("width")] public int Width { get; }
-    [Selector("height")] public int Height { get; }
+    [Selector("frameBorder", "setFrameBorder:")]
+    public NSString? FrameBorder { get; set; }
+    [Selector("longDesc", "setLongDesc:")]
+    public NSString? LongDesc { get; set; }
+    [Selector("marginHeight", "setMarginHeight:")]
+    public NSString? MarginHeight { get; set; }
+    [Selector("marginWidth", "setMarginWidth:")]
+    public NSString? MarginWidth { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("noResize", "setNoResize:")]
+    public bool NoResize { get; set; }
+    [Selector("scrolling", "setScrolling:")]
+    public NSString? Scrolling { get; set; }
+    [Selector("src", "setSrc:")]
+    public NSString? Src { get; set; }
+    [Selector("contentDocument")]
+    public DOMDocument? ContentDocument { get; }
+    [Selector("contentWindow")]
+    public DOMAbstractView? ContentWindow { get; }
+    [Selector("location", "setLocation:")]
+    public NSString? Location { get; set; }
+    [Selector("width")]
+    public int Width { get; }
+    [Selector("height")]
+    public int Height { get; }
 }
 
 #endif

@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class PDFActionURL : PDFAction, NSCopying
 {
-    [Selector("URL", "setURL:")] public NSURL? URL { get; set; }
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL url);
+    [Selector("URL", "setURL:")]
+    public NSURL? URL { get; set; }
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL url);
 }
 
 #endif

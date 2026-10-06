@@ -34,11 +34,16 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCMatMulDescriptor : NSObject, NSCopying
 {
-    [Selector("alpha")] public float Alpha { get; }
-    [Selector("transposesX")] public bool TransposesX { get; }
-    [Selector("transposesY")] public bool TransposesY { get; }
-    [Selector("descriptorWithAlpha:transposesX:transposesY:")] public static Self? DescriptorWithAlphaTransposesXTransposesY(float alpha, bool transposesX, bool transposesY);
-    [Selector("descriptor")] public static Self Descriptor();
+    [Selector("alpha")]
+    public float Alpha { get; }
+    [Selector("transposesX")]
+    public bool TransposesX { get; }
+    [Selector("transposesY")]
+    public bool TransposesY { get; }
+    [Selector("descriptorWithAlpha:transposesX:transposesY:")]
+    public static Self? DescriptorWithAlphaTransposesXTransposesY(float alpha, bool transposesX, bool transposesY);
+    [Selector("descriptor")]
+    public static Self Descriptor();
 }
 
 #endif

@@ -41,14 +41,19 @@ public using CalPriority = NSUInteger;
 public extern objc class CalTask : CalCalendarItem
 {
     /// Deprecated in macOS 10.8.
-    [Selector("dueDate", "setDueDate:")] public NSDate? DueDate { get; set; }
+    [Selector("dueDate", "setDueDate:")]
+    public NSDate? DueDate { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("priority", "setPriority:")] public CalPriority Priority { get; set; }
+    [Selector("priority", "setPriority:")]
+    public CalPriority Priority { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("isCompleted", "setIsCompleted:")] public bool IsCompleted { get; set; }
+    [Selector("isCompleted", "setIsCompleted:")]
+    public bool IsCompleted { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("completedDate", "setCompletedDate:")] public NSDate? CompletedDate { get; set; }
-    [Selector("task")] public static AnyObject? Task();
+    [Selector("completedDate", "setCompletedDate:")]
+    public NSDate? CompletedDate { get; set; }
+    [Selector("task")]
+    public static AnyObject? Task();
 }
 
 #endif

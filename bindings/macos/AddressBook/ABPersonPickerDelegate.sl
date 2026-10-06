@@ -33,8 +33,11 @@ import Standard.ObjC;
 
 public objc interface ABPersonPickerDelegate : NSObjectProtocol
 {
-    [Selector("personPicker:didChoosePerson:property:identifier:")] void PersonPickerDidChoosePersonPropertyIdentifier(ABPersonPicker? picker, ABPerson? person, NSString? property, NSString? identifier);
-    [Optional] [Selector("personPickerDidClose:")] void PersonPickerDidClose(ABPersonPicker? picker);
+    [Selector("personPicker:didChoosePerson:property:identifier:")]
+    void PersonPickerDidChoosePersonPropertyIdentifier(ABPersonPicker? picker, ABPerson? person, NSString? property, NSString? identifier);
+    [Optional]
+    [Selector("personPickerDidClose:")]
+    void PersonPickerDidClose(ABPersonPicker? picker);
 }
 
 #endif

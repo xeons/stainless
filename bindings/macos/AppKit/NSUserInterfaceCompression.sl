@@ -33,27 +33,44 @@ import Standard.ObjC;
 
 public extern objc class NSUserInterfaceCompressionOptions : NSObject, NSCopying, NSCoding
 {
-    [Selector("isEmpty")] public bool Empty { get; }
-    [Selector("hideImagesOption")] public static NSUserInterfaceCompressionOptions HideImagesOption { get; }
-    [Selector("hideTextOption")] public static NSUserInterfaceCompressionOptions HideTextOption { get; }
-    [Selector("reduceMetricsOption")] public static NSUserInterfaceCompressionOptions ReduceMetricsOption { get; }
-    [Selector("breakEqualWidthsOption")] public static NSUserInterfaceCompressionOptions BreakEqualWidthsOption { get; }
-    [Selector("standardOptions")] public static NSUserInterfaceCompressionOptions StandardOptions { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("initWithIdentifier:")] public Self InitWithIdentifier(NSString identifier);
-    [Selector("initWithCompressionOptions:")] public Self InitWithCompressionOptions(NSSet options);
-    [Selector("containsOptions:")] public bool ContainsOptions(NSUserInterfaceCompressionOptions options);
-    [Selector("intersectsOptions:")] public bool IntersectsOptions(NSUserInterfaceCompressionOptions options);
-    [Selector("optionsByAddingOptions:")] public NSUserInterfaceCompressionOptions OptionsByAddingOptions(NSUserInterfaceCompressionOptions options);
-    [Selector("optionsByRemovingOptions:")] public NSUserInterfaceCompressionOptions OptionsByRemovingOptions(NSUserInterfaceCompressionOptions options);
+    [Selector("isEmpty")]
+    public bool Empty { get; }
+    [Selector("hideImagesOption")]
+    public static NSUserInterfaceCompressionOptions HideImagesOption { get; }
+    [Selector("hideTextOption")]
+    public static NSUserInterfaceCompressionOptions HideTextOption { get; }
+    [Selector("reduceMetricsOption")]
+    public static NSUserInterfaceCompressionOptions ReduceMetricsOption { get; }
+    [Selector("breakEqualWidthsOption")]
+    public static NSUserInterfaceCompressionOptions BreakEqualWidthsOption { get; }
+    [Selector("standardOptions")]
+    public static NSUserInterfaceCompressionOptions StandardOptions { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("initWithIdentifier:")]
+    public Self InitWithIdentifier(NSString identifier);
+    [Selector("initWithCompressionOptions:")]
+    public Self InitWithCompressionOptions(NSSet options);
+    [Selector("containsOptions:")]
+    public bool ContainsOptions(NSUserInterfaceCompressionOptions options);
+    [Selector("intersectsOptions:")]
+    public bool IntersectsOptions(NSUserInterfaceCompressionOptions options);
+    [Selector("optionsByAddingOptions:")]
+    public NSUserInterfaceCompressionOptions OptionsByAddingOptions(NSUserInterfaceCompressionOptions options);
+    [Selector("optionsByRemovingOptions:")]
+    public NSUserInterfaceCompressionOptions OptionsByRemovingOptions(NSUserInterfaceCompressionOptions options);
 }
 
 public objc interface NSUserInterfaceCompression
 {
-    [Selector("activeCompressionOptions")] NSUserInterfaceCompressionOptions ActiveCompressionOptions { get; }
-    [Selector("compressWithPrioritizedCompressionOptions:")] void CompressWithPrioritizedCompressionOptions(NSArray prioritizedOptions);
-    [Selector("minimumSizeWithPrioritizedCompressionOptions:")] NSSize MinimumSizeWithPrioritizedCompressionOptions(NSArray prioritizedOptions);
+    [Selector("activeCompressionOptions")]
+    NSUserInterfaceCompressionOptions ActiveCompressionOptions { get; }
+    [Selector("compressWithPrioritizedCompressionOptions:")]
+    void CompressWithPrioritizedCompressionOptions(NSArray prioritizedOptions);
+    [Selector("minimumSizeWithPrioritizedCompressionOptions:")]
+    NSSize MinimumSizeWithPrioritizedCompressionOptions(NSArray prioritizedOptions);
 }
 
 #endif

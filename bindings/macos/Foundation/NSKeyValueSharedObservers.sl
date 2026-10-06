@@ -34,15 +34,19 @@ public extern objc class NSKeyValueSharedObserversSnapshot : NSObject { }
 
 public extern objc class NSKeyValueSharedObservers : NSObject
 {
-    [Selector("initWithObservableClass:")] public AnyObject InitWithObservableClass(Class observableClass);
-    [Selector("addSharedObserver:forKey:options:context:")] public void AddSharedObserverForKeyOptionsContext(NSObject observer, NSString key, NSKeyValueObservingOptions options, void* context);
-    [Selector("snapshot")] public NSKeyValueSharedObserversSnapshot Snapshot();
+    [Selector("initWithObservableClass:")]
+    public AnyObject InitWithObservableClass(Class observableClass);
+    [Selector("addSharedObserver:forKey:options:context:")]
+    public void AddSharedObserverForKeyOptionsContext(NSObject observer, NSString key, NSKeyValueObservingOptions options, void* context);
+    [Selector("snapshot")]
+    public NSKeyValueSharedObserversSnapshot Snapshot();
 }
 
 /// NSKeyValueSharedObserverRegistration, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("setSharedObservers:")] public void SetSharedObservers(NSKeyValueSharedObserversSnapshot? sharedObservers);
+    [Selector("setSharedObservers:")]
+    public void SetSharedObservers(NSKeyValueSharedObserversSnapshot? sharedObservers);
 }
 
 #endif

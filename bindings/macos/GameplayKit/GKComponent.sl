@@ -33,24 +33,38 @@ import Standard.ObjC;
 
 public extern objc class GKComponent : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("entity")] public GKEntity? Entity { get; }
-    [Selector("updateWithDeltaTime:")] public void UpdateWithDeltaTime(NSTimeInterval seconds);
-    [Selector("didAddToEntity")] public void DidAddToEntity();
-    [Selector("willRemoveFromEntity")] public void WillRemoveFromEntity();
+    [Selector("entity")]
+    public GKEntity? Entity { get; }
+    [Selector("updateWithDeltaTime:")]
+    public void UpdateWithDeltaTime(NSTimeInterval seconds);
+    [Selector("didAddToEntity")]
+    public void DidAddToEntity();
+    [Selector("willRemoveFromEntity")]
+    public void WillRemoveFromEntity();
 }
 
 public extern objc class GKComponentSystem : NSObject, NSFastEnumeration
 {
-    [Selector("componentClass")] public Class ComponentClass { get; }
-    [Selector("components")] public NSArray Components { get; }
-    [Selector("objectAtIndexedSubscript:")] public AnyObject ObjectAtIndexedSubscript(NSUInteger idx);
-    [Selector("initWithComponentClass:")] public Self InitWithComponentClass(Class cls);
-    [Selector("addComponent:")] public void AddComponent(AnyObject component);
-    [Selector("addComponentWithEntity:")] public void AddComponentWithEntity(GKEntity entity);
-    [Selector("removeComponentWithEntity:")] public void RemoveComponentWithEntity(GKEntity entity);
-    [Selector("removeComponent:")] public void RemoveComponent(AnyObject component);
-    [Selector("updateWithDeltaTime:")] public void UpdateWithDeltaTime(NSTimeInterval seconds);
-    [Selector("classForGenericArgumentAtIndex:")] public Class ClassForGenericArgumentAtIndex(NSUInteger index);
+    [Selector("componentClass")]
+    public Class ComponentClass { get; }
+    [Selector("components")]
+    public NSArray Components { get; }
+    [Selector("objectAtIndexedSubscript:")]
+    public AnyObject ObjectAtIndexedSubscript(NSUInteger idx);
+    [Selector("initWithComponentClass:")]
+    public Self InitWithComponentClass(Class cls);
+    [Selector("addComponent:")]
+    public void AddComponent(AnyObject component);
+    [Selector("addComponentWithEntity:")]
+    public void AddComponentWithEntity(GKEntity entity);
+    [Selector("removeComponentWithEntity:")]
+    public void RemoveComponentWithEntity(GKEntity entity);
+    [Selector("removeComponent:")]
+    public void RemoveComponent(AnyObject component);
+    [Selector("updateWithDeltaTime:")]
+    public void UpdateWithDeltaTime(NSTimeInterval seconds);
+    [Selector("classForGenericArgumentAtIndex:")]
+    public Class ClassForGenericArgumentAtIndex(NSUInteger index);
 }
 
 #endif

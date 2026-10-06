@@ -34,15 +34,24 @@ public objc closure void NSStepperTouchBarItemStepperTouchBarItemWithIdentifierD
 
 public extern objc class NSStepperTouchBarItem : NSTouchBarItem
 {
-    [Selector("maxValue", "setMaxValue:")] public double MaxValue { get; set; }
-    [Selector("minValue", "setMinValue:")] public double MinValue { get; set; }
-    [Selector("increment", "setIncrement:")] public double Increment { get; set; }
-    [Selector("value", "setValue:")] public double Value { get; set; }
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
-    [Selector("action", "setAction:")] public Selector Action { get; set; }
-    [Selector("customizationLabel", "setCustomizationLabel:")] public NSString? CustomizationLabel { get; set; }
-    [Selector("stepperTouchBarItemWithIdentifier:formatter:")] public static Self StepperTouchBarItemWithIdentifierFormatter(NSTouchBarItemIdentifier identifier, NSFormatter formatter);
-    [Selector("stepperTouchBarItemWithIdentifier:drawingHandler:")] public static Self StepperTouchBarItemWithIdentifierDrawingHandler(NSTouchBarItemIdentifier identifier, NSStepperTouchBarItemStepperTouchBarItemWithIdentifierDrawingHandlerDrawingHandlerBlock drawingHandler);
+    [Selector("maxValue", "setMaxValue:")]
+    public double MaxValue { get; set; }
+    [Selector("minValue", "setMinValue:")]
+    public double MinValue { get; set; }
+    [Selector("increment", "setIncrement:")]
+    public double Increment { get; set; }
+    [Selector("value", "setValue:")]
+    public double Value { get; set; }
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
+    [Selector("action", "setAction:")]
+    public Selector Action { get; set; }
+    [Selector("customizationLabel", "setCustomizationLabel:")]
+    public NSString? CustomizationLabel { get; set; }
+    [Selector("stepperTouchBarItemWithIdentifier:formatter:")]
+    public static Self StepperTouchBarItemWithIdentifierFormatter(NSTouchBarItemIdentifier identifier, NSFormatter formatter);
+    [Selector("stepperTouchBarItemWithIdentifier:drawingHandler:")]
+    public static Self StepperTouchBarItemWithIdentifierDrawingHandler(NSTouchBarItemIdentifier identifier, NSStepperTouchBarItemStepperTouchBarItemWithIdentifierDrawingHandlerDrawingHandlerBlock drawingHandler);
 }
 
 #endif

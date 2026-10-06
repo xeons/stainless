@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class NEEthernetTunnelNetworkSettings : NEPacketTunnelNetworkSettings
 {
-    [Selector("ethernetAddress")] public NSString? EthernetAddress { get; }
-    [Selector("initWithTunnelRemoteAddress:ethernetAddress:mtu:")] public Self InitWithTunnelRemoteAddressEthernetAddressMtu(NSString address, NSString ethernetAddress, NSInteger mtu);
+    [Selector("ethernetAddress")]
+    public NSString? EthernetAddress { get; }
+    [Selector("initWithTunnelRemoteAddress:ethernetAddress:mtu:")]
+    public Self InitWithTunnelRemoteAddressEthernetAddressMtu(NSString address, NSString ethernetAddress, NSInteger mtu);
 }
 
 #endif

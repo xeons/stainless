@@ -34,11 +34,16 @@ import Standard.ObjC;
 public extern objc class PKStoredValuePassProperties : NSObject
 {
     /// Deprecated in macOS 12.0.
-    [Selector("isBlacklisted")] public bool Blacklisted { get; }
-    [Selector("isBlocked")] public bool Blocked { get; }
-    [Selector("expirationDate")] public NSDate? ExpirationDate { get; }
-    [Selector("balances")] public NSArray Balances { get; }
-    [Selector("passPropertiesForPass:")] public static Self? PassPropertiesForPass(PKPass pass);
+    [Selector("isBlacklisted")]
+    public bool Blacklisted { get; }
+    [Selector("isBlocked")]
+    public bool Blocked { get; }
+    [Selector("expirationDate")]
+    public NSDate? ExpirationDate { get; }
+    [Selector("balances")]
+    public NSArray Balances { get; }
+    [Selector("passPropertiesForPass:")]
+    public static Self? PassPropertiesForPass(PKPass pass);
 }
 
 #endif

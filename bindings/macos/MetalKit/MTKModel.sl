@@ -41,39 +41,60 @@ public extern "C" MTKModelError? MTKModelErrorKey;
 
 public extern objc class MTKMeshBufferAllocator : NSObject, MDLMeshBufferAllocator
 {
-    [Selector("device")] public MTLDevice Device { get; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("device")]
+    public MTLDevice Device { get; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MTKMeshBuffer : NSObject, MDLMeshBuffer, MDLNamed
 {
-    [Selector("length")] public NSUInteger Length { get; }
-    [Selector("allocator")] public MTKMeshBufferAllocator Allocator { get; }
-    [Selector("zone")] public MDLMeshBufferZone? Zone { get; }
-    [Selector("buffer")] public MTLBuffer Buffer { get; }
-    [Selector("offset")] public NSUInteger Offset { get; }
-    [Selector("type")] public MDLMeshBufferType Type { get; }
+    [Selector("length")]
+    public NSUInteger Length { get; }
+    [Selector("allocator")]
+    public MTKMeshBufferAllocator Allocator { get; }
+    [Selector("zone")]
+    public MDLMeshBufferZone? Zone { get; }
+    [Selector("buffer")]
+    public MTLBuffer Buffer { get; }
+    [Selector("offset")]
+    public NSUInteger Offset { get; }
+    [Selector("type")]
+    public MDLMeshBufferType Type { get; }
 }
 
 public extern objc class MTKSubmesh : NSObject
 {
-    [Selector("primitiveType")] public MTLPrimitiveType PrimitiveType { get; }
-    [Selector("indexType")] public MTLIndexType IndexType { get; }
-    [Selector("indexBuffer")] public MTKMeshBuffer IndexBuffer { get; }
-    [Selector("indexCount")] public NSUInteger IndexCount { get; }
-    [Selector("mesh")] public MTKMesh? Mesh { get; }
-    [Selector("name", "setName:")] public NSString Name { get; set; }
+    [Selector("primitiveType")]
+    public MTLPrimitiveType PrimitiveType { get; }
+    [Selector("indexType")]
+    public MTLIndexType IndexType { get; }
+    [Selector("indexBuffer")]
+    public MTKMeshBuffer IndexBuffer { get; }
+    [Selector("indexCount")]
+    public NSUInteger IndexCount { get; }
+    [Selector("mesh")]
+    public MTKMesh? Mesh { get; }
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
 }
 
 public extern objc class MTKMesh : NSObject
 {
-    [Selector("vertexBuffers")] public NSArray VertexBuffers { get; }
-    [Selector("vertexDescriptor")] public MDLVertexDescriptor VertexDescriptor { get; }
-    [Selector("submeshes")] public NSArray Submeshes { get; }
-    [Selector("vertexCount")] public NSUInteger VertexCount { get; }
-    [Selector("name", "setName:")] public NSString Name { get; set; }
-    [Selector("initWithMesh:device:error:")] public Self? InitWithMeshDeviceError(MDLMesh mesh, MTLDevice device, out NSError? error);
-    [Selector("newMeshesFromAsset:device:sourceMeshes:error:")] public static NSArray? NewMeshesFromAssetDeviceSourceMeshesError(MDLAsset asset, MTLDevice device, out NSArray? sourceMeshes, out NSError? error);
+    [Selector("vertexBuffers")]
+    public NSArray VertexBuffers { get; }
+    [Selector("vertexDescriptor")]
+    public MDLVertexDescriptor VertexDescriptor { get; }
+    [Selector("submeshes")]
+    public NSArray Submeshes { get; }
+    [Selector("vertexCount")]
+    public NSUInteger VertexCount { get; }
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
+    [Selector("initWithMesh:device:error:")]
+    public Self? InitWithMeshDeviceError(MDLMesh mesh, MTLDevice device, out NSError? error);
+    [Selector("newMeshesFromAsset:device:sourceMeshes:error:")]
+    public static NSArray? NewMeshesFromAssetDeviceSourceMeshesError(MDLAsset asset, MTLDevice device, out NSArray? sourceMeshes, out NSError? error);
 }
 
 public extern "C" MDLVertexDescriptor MTKModelIOVertexDescriptorFromMetal(MTLVertexDescriptor metalDescriptor);

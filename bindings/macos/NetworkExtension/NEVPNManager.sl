@@ -54,19 +54,31 @@ public objc closure void NEVPNManagerSaveToPreferencesWithCompletionHandlerCompl
 
 public extern objc class NEVPNManager : NSObject
 {
-    [Selector("onDemandRules", "setOnDemandRules:")] public NSArray? OnDemandRules { get; set; }
-    [Selector("isOnDemandEnabled", "setOnDemandEnabled:")] public bool OnDemandEnabled { get; set; }
-    [Selector("localizedDescription", "setLocalizedDescription:")] public NSString? LocalizedDescription { get; set; }
+    [Selector("onDemandRules", "setOnDemandRules:")]
+    public NSArray? OnDemandRules { get; set; }
+    [Selector("isOnDemandEnabled", "setOnDemandEnabled:")]
+    public bool OnDemandEnabled { get; set; }
+    [Selector("localizedDescription", "setLocalizedDescription:")]
+    public NSString? LocalizedDescription { get; set; }
     /// Deprecated in macOS 10.11.
-    [Selector("protocol", "setProtocol:")] public NEVPNProtocol? Protocol { get; set; }
-    [Selector("protocolConfiguration", "setProtocolConfiguration:")] public NEVPNProtocol? ProtocolConfiguration { get; set; }
-    [Selector("connection")] public NEVPNConnection? Connection { get; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("sharedManager")] public static NEVPNManager SharedManager();
-    [Selector("loadFromPreferencesWithCompletionHandler:")] public void LoadFromPreferencesWithCompletionHandler(NEVPNManagerLoadFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removeFromPreferencesWithCompletionHandler:")] public void RemoveFromPreferencesWithCompletionHandler(NEVPNManagerRemoveFromPreferencesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("saveToPreferencesWithCompletionHandler:")] public void SaveToPreferencesWithCompletionHandler(NEVPNManagerSaveToPreferencesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("setAuthorization:")] public void SetAuthorization(AuthorizationRef authorization);
+    [Selector("protocol", "setProtocol:")]
+    public NEVPNProtocol? Protocol { get; set; }
+    [Selector("protocolConfiguration", "setProtocolConfiguration:")]
+    public NEVPNProtocol? ProtocolConfiguration { get; set; }
+    [Selector("connection")]
+    public NEVPNConnection? Connection { get; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("sharedManager")]
+    public static NEVPNManager SharedManager();
+    [Selector("loadFromPreferencesWithCompletionHandler:")]
+    public void LoadFromPreferencesWithCompletionHandler(NEVPNManagerLoadFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removeFromPreferencesWithCompletionHandler:")]
+    public void RemoveFromPreferencesWithCompletionHandler(NEVPNManagerRemoveFromPreferencesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("saveToPreferencesWithCompletionHandler:")]
+    public void SaveToPreferencesWithCompletionHandler(NEVPNManagerSaveToPreferencesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("setAuthorization:")]
+    public void SetAuthorization(AuthorizationRef authorization);
 }
 
 #endif

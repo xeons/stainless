@@ -52,13 +52,16 @@ public enum MEFormatReaderParseAdditionalFragmentsStatus : ulong
 
 public extern objc class MEFormatReaderInstantiationOptions : NSObject, NSCopying
 {
-    [Selector("allowIncrementalFragmentParsing")] public bool AllowIncrementalFragmentParsing { get; }
+    [Selector("allowIncrementalFragmentParsing")]
+    public bool AllowIncrementalFragmentParsing { get; }
 }
 
 public objc interface MEFormatReaderExtension : NSObjectProtocol
 {
-    [Selector("init")] Self Init();
-    [Selector("formatReaderWithByteSource:options:error:")] MEFormatReader? FormatReaderWithByteSourceOptionsError(MEByteSource primaryByteSource, MEFormatReaderInstantiationOptions? options, out NSError? error);
+    [Selector("init")]
+    Self Init();
+    [Selector("formatReaderWithByteSource:options:error:")]
+    MEFormatReader? FormatReaderWithByteSourceOptionsError(MEByteSource primaryByteSource, MEFormatReaderInstantiationOptions? options, out NSError? error);
 }
 
 public objc closure void MEFormatReaderLoadFileInfoWithCompletionHandlerCompletionHandlerBlock(MEFileInfo? arg0, NSError? arg1);
@@ -71,18 +74,26 @@ public objc closure void MEFormatReaderParseAdditionalFragmentsWithCompletionHan
 
 public objc interface MEFormatReader : NSObjectProtocol
 {
-    [Selector("loadFileInfoWithCompletionHandler:")] void LoadFileInfoWithCompletionHandler(MEFormatReaderLoadFileInfoWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadMetadataWithCompletionHandler:")] void LoadMetadataWithCompletionHandler(MEFormatReaderLoadMetadataWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadTrackReadersWithCompletionHandler:")] void LoadTrackReadersWithCompletionHandler(MEFormatReaderLoadTrackReadersWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("parseAdditionalFragmentsWithCompletionHandler:")] void ParseAdditionalFragmentsWithCompletionHandler(MEFormatReaderParseAdditionalFragmentsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadFileInfoWithCompletionHandler:")]
+    void LoadFileInfoWithCompletionHandler(MEFormatReaderLoadFileInfoWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadMetadataWithCompletionHandler:")]
+    void LoadMetadataWithCompletionHandler(MEFormatReaderLoadMetadataWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadTrackReadersWithCompletionHandler:")]
+    void LoadTrackReadersWithCompletionHandler(MEFormatReaderLoadTrackReadersWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("parseAdditionalFragmentsWithCompletionHandler:")]
+    void ParseAdditionalFragmentsWithCompletionHandler(MEFormatReaderParseAdditionalFragmentsWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public extern objc class MEFileInfo : NSObject, NSCopying
 {
-    [Selector("duration", "setDuration:")] public CMTime Duration { get; set; }
-    [Selector("fragmentsStatus", "setFragmentsStatus:")] public MEFileInfoFragmentsStatus FragmentsStatus { get; set; }
+    [Selector("duration", "setDuration:")]
+    public CMTime Duration { get; set; }
+    [Selector("fragmentsStatus", "setFragmentsStatus:")]
+    public MEFileInfoFragmentsStatus FragmentsStatus { get; set; }
     /// macOS 26.0 and later.
-    [Selector("sidecarFileName", "setSidecarFileName:")] public NSString? SidecarFileName { get; set; }
+    [Selector("sidecarFileName", "setSidecarFileName:")]
+    public NSString? SidecarFileName { get; set; }
 }
 
 public objc closure void METrackReaderLoadTrackInfoWithCompletionHandlerCompletionHandlerBlock(METrackInfo? arg0, NSError? arg1);
@@ -103,45 +114,69 @@ public objc closure void METrackReaderLoadMetadataWithCompletionHandlerCompletio
 
 public objc interface METrackReader : NSObjectProtocol
 {
-    [Selector("loadTrackInfoWithCompletionHandler:")] void LoadTrackInfoWithCompletionHandler(METrackReaderLoadTrackInfoWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("generateSampleCursorAtPresentationTimeStamp:completionHandler:")] void GenerateSampleCursorAtPresentationTimeStampCompletionHandler(CMTime presentationTimeStamp, METrackReaderGenerateSampleCursorAtPresentationTimeStampCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("generateSampleCursorAtFirstSampleInDecodeOrderWithCompletionHandler:")] void GenerateSampleCursorAtFirstSampleInDecodeOrderWithCompletionHandler(METrackReaderGenerateSampleCursorAtFirstSampleInDecodeOrderWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("generateSampleCursorAtLastSampleInDecodeOrderWithCompletionHandler:")] void GenerateSampleCursorAtLastSampleInDecodeOrderWithCompletionHandler(METrackReaderGenerateSampleCursorAtLastSampleInDecodeOrderWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("loadUneditedDurationWithCompletionHandler:")] void LoadUneditedDurationWithCompletionHandler(METrackReaderLoadUneditedDurationWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("loadTotalSampleDataLengthWithCompletionHandler:")] void LoadTotalSampleDataLengthWithCompletionHandler(METrackReaderLoadTotalSampleDataLengthWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("loadEstimatedDataRateWithCompletionHandler:")] void LoadEstimatedDataRateWithCompletionHandler(METrackReaderLoadEstimatedDataRateWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("loadMetadataWithCompletionHandler:")] void LoadMetadataWithCompletionHandler(METrackReaderLoadMetadataWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadTrackInfoWithCompletionHandler:")]
+    void LoadTrackInfoWithCompletionHandler(METrackReaderLoadTrackInfoWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("generateSampleCursorAtPresentationTimeStamp:completionHandler:")]
+    void GenerateSampleCursorAtPresentationTimeStampCompletionHandler(CMTime presentationTimeStamp, METrackReaderGenerateSampleCursorAtPresentationTimeStampCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("generateSampleCursorAtFirstSampleInDecodeOrderWithCompletionHandler:")]
+    void GenerateSampleCursorAtFirstSampleInDecodeOrderWithCompletionHandler(METrackReaderGenerateSampleCursorAtFirstSampleInDecodeOrderWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("generateSampleCursorAtLastSampleInDecodeOrderWithCompletionHandler:")]
+    void GenerateSampleCursorAtLastSampleInDecodeOrderWithCompletionHandler(METrackReaderGenerateSampleCursorAtLastSampleInDecodeOrderWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("loadUneditedDurationWithCompletionHandler:")]
+    void LoadUneditedDurationWithCompletionHandler(METrackReaderLoadUneditedDurationWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("loadTotalSampleDataLengthWithCompletionHandler:")]
+    void LoadTotalSampleDataLengthWithCompletionHandler(METrackReaderLoadTotalSampleDataLengthWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("loadEstimatedDataRateWithCompletionHandler:")]
+    void LoadEstimatedDataRateWithCompletionHandler(METrackReaderLoadEstimatedDataRateWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("loadMetadataWithCompletionHandler:")]
+    void LoadMetadataWithCompletionHandler(METrackReaderLoadMetadataWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public extern objc class METrackInfo : NSObject, NSCopying
 {
-    [Selector("mediaType")] public CMMediaType MediaType { get; }
-    [Selector("trackID")] public CMPersistentTrackID TrackID { get; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("formatDescriptions")] public NSArray? FormatDescriptions { get; }
-    [Selector("initWithMediaType:trackID:formatDescriptions:")] public Self InitWithMediaTypeTrackIDFormatDescriptions(CMMediaType mediaType, CMPersistentTrackID trackID, NSArray formatDescriptions);
+    [Selector("mediaType")]
+    public CMMediaType MediaType { get; }
+    [Selector("trackID")]
+    public CMPersistentTrackID TrackID { get; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("formatDescriptions")]
+    public NSArray? FormatDescriptions { get; }
+    [Selector("initWithMediaType:trackID:formatDescriptions:")]
+    public Self InitWithMediaTypeTrackIDFormatDescriptions(CMMediaType mediaType, CMPersistentTrackID trackID, NSArray formatDescriptions);
 }
 
 /// OptionalProperties, a category of METrackInfo.
 public extern objc class METrackInfo
 {
-    [Selector("naturalTimescale", "setNaturalTimescale:")] public CMTimeScale NaturalTimescale { get; set; }
-    [Selector("trackEdits", "setTrackEdits:")] public NSArray? TrackEdits { get; set; }
+    [Selector("naturalTimescale", "setNaturalTimescale:")]
+    public CMTimeScale NaturalTimescale { get; set; }
+    [Selector("trackEdits", "setTrackEdits:")]
+    public NSArray? TrackEdits { get; set; }
 }
 
 /// LanguageTagOptionalProperties, a category of METrackInfo.
 public extern objc class METrackInfo
 {
-    [Selector("extendedLanguageTag", "setExtendedLanguageTag:")] public NSString? ExtendedLanguageTag { get; set; }
+    [Selector("extendedLanguageTag", "setExtendedLanguageTag:")]
+    public NSString? ExtendedLanguageTag { get; set; }
 }
 
 /// VideoSpecificOptionalProperties, a category of METrackInfo.
 public extern objc class METrackInfo
 {
-    [Selector("naturalSize", "setNaturalSize:")] public CGSize NaturalSize { get; set; }
-    [Selector("preferredTransform", "setPreferredTransform:")] public CGAffineTransform PreferredTransform { get; set; }
-    [Selector("nominalFrameRate", "setNominalFrameRate:")] public Float32 NominalFrameRate { get; set; }
-    [Selector("requiresFrameReordering", "setRequiresFrameReordering:")] public bool RequiresFrameReordering { get; set; }
+    [Selector("naturalSize", "setNaturalSize:")]
+    public CGSize NaturalSize { get; set; }
+    [Selector("preferredTransform", "setPreferredTransform:")]
+    public CGAffineTransform PreferredTransform { get; set; }
+    [Selector("nominalFrameRate", "setNominalFrameRate:")]
+    public Float32 NominalFrameRate { get; set; }
+    [Selector("requiresFrameReordering", "setRequiresFrameReordering:")]
+    public bool RequiresFrameReordering { get; set; }
 }
 
 public objc closure void MESampleCursorStepInDecodeOrderByCountCompletionHandlerCompletionHandlerBlock(long arg0, NSError? arg1);
@@ -158,69 +193,123 @@ public objc closure void MESampleCursorLoadPostDecodeProcessingMetadataWithCompl
 
 public objc interface MESampleCursor : NSObjectProtocol, NSCopying
 {
-    [Selector("presentationTimeStamp")] CMTime PresentationTimeStamp { get; }
-    [Selector("decodeTimeStamp")] CMTime DecodeTimeStamp { get; }
-    [Selector("currentSampleDuration")] CMTime CurrentSampleDuration { get; }
-    [Selector("currentSampleFormatDescription")] CMFormatDescriptionRef? CurrentSampleFormatDescription { get; }
-    [Optional] [Selector("syncInfo")] AVSampleCursorSyncInfo SyncInfo { get; }
-    [Optional] [Selector("dependencyInfo")] AVSampleCursorDependencyInfo DependencyInfo { get; }
-    [Optional] [Selector("hevcDependencyInfo")] MEHEVCDependencyInfo HevcDependencyInfo { get; }
-    [Optional] [Selector("decodeTimeOfLastSampleReachableByForwardSteppingThatIsAlreadyLoadedByByteSource")] CMTime DecodeTimeOfLastSampleReachableByForwardSteppingThatIsAlreadyLoadedByByteSource { get; }
-    [Selector("stepInDecodeOrderByCount:completionHandler:")] void StepInDecodeOrderByCountCompletionHandler(long stepCount, MESampleCursorStepInDecodeOrderByCountCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("stepInPresentationOrderByCount:completionHandler:")] void StepInPresentationOrderByCountCompletionHandler(long stepCount, MESampleCursorStepInPresentationOrderByCountCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("stepByDecodeTime:completionHandler:")] void StepByDecodeTimeCompletionHandler(CMTime deltaDecodeTime, MESampleCursorStepByDecodeTimeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("stepByPresentationTime:completionHandler:")] void StepByPresentationTimeCompletionHandler(CMTime deltaPresentationTime, MESampleCursorStepByPresentationTimeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("samplesWithEarlierDTSsMayHaveLaterPTSsThanCursor:")] bool SamplesWithEarlierDTSsMayHaveLaterPTSsThanCursor(MESampleCursor cursor);
-    [Optional] [Selector("samplesWithLaterDTSsMayHaveEarlierPTSsThanCursor:")] bool SamplesWithLaterDTSsMayHaveEarlierPTSsThanCursor(MESampleCursor cursor);
-    [Optional] [Selector("chunkDetailsReturningError:")] MESampleCursorChunk? ChunkDetailsReturningError(out NSError? error);
-    [Optional] [Selector("sampleLocationReturningError:")] MESampleLocation? SampleLocationReturningError(out NSError? error);
-    [Optional] [Selector("estimatedSampleLocationReturningError:")] MEEstimatedSampleLocation? EstimatedSampleLocationReturningError(out NSError? error);
-    [Optional] [Selector("refineSampleLocation:refinementData:refinementDataLength:refinedLocation:error:")] bool RefineSampleLocationRefinementDataRefinementDataLengthRefinedLocationError(AVSampleCursorStorageRange estimatedSampleLocation, byte* refinementData, nuint refinementDataLength, AVSampleCursorStorageRange* refinedLocationOut, out NSError? error);
-    [Optional] [Selector("loadSampleBufferContainingSamplesToEndCursor:completionHandler:")] void LoadSampleBufferContainingSamplesToEndCursorCompletionHandler(MESampleCursor? endSampleCursor, MESampleCursorLoadSampleBufferContainingSamplesToEndCursorCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("loadPostDecodeProcessingMetadataWithCompletionHandler:")] void LoadPostDecodeProcessingMetadataWithCompletionHandler(MESampleCursorLoadPostDecodeProcessingMetadataWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("presentationTimeStamp")]
+    CMTime PresentationTimeStamp { get; }
+    [Selector("decodeTimeStamp")]
+    CMTime DecodeTimeStamp { get; }
+    [Selector("currentSampleDuration")]
+    CMTime CurrentSampleDuration { get; }
+    [Selector("currentSampleFormatDescription")]
+    CMFormatDescriptionRef? CurrentSampleFormatDescription { get; }
+    [Optional]
+    [Selector("syncInfo")]
+    AVSampleCursorSyncInfo SyncInfo { get; }
+    [Optional]
+    [Selector("dependencyInfo")]
+    AVSampleCursorDependencyInfo DependencyInfo { get; }
+    [Optional]
+    [Selector("hevcDependencyInfo")]
+    MEHEVCDependencyInfo HevcDependencyInfo { get; }
+    [Optional]
+    [Selector("decodeTimeOfLastSampleReachableByForwardSteppingThatIsAlreadyLoadedByByteSource")]
+    CMTime DecodeTimeOfLastSampleReachableByForwardSteppingThatIsAlreadyLoadedByByteSource { get; }
+    [Selector("stepInDecodeOrderByCount:completionHandler:")]
+    void StepInDecodeOrderByCountCompletionHandler(long stepCount, MESampleCursorStepInDecodeOrderByCountCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("stepInPresentationOrderByCount:completionHandler:")]
+    void StepInPresentationOrderByCountCompletionHandler(long stepCount, MESampleCursorStepInPresentationOrderByCountCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("stepByDecodeTime:completionHandler:")]
+    void StepByDecodeTimeCompletionHandler(CMTime deltaDecodeTime, MESampleCursorStepByDecodeTimeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("stepByPresentationTime:completionHandler:")]
+    void StepByPresentationTimeCompletionHandler(CMTime deltaPresentationTime, MESampleCursorStepByPresentationTimeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("samplesWithEarlierDTSsMayHaveLaterPTSsThanCursor:")]
+    bool SamplesWithEarlierDTSsMayHaveLaterPTSsThanCursor(MESampleCursor cursor);
+    [Optional]
+    [Selector("samplesWithLaterDTSsMayHaveEarlierPTSsThanCursor:")]
+    bool SamplesWithLaterDTSsMayHaveEarlierPTSsThanCursor(MESampleCursor cursor);
+    [Optional]
+    [Selector("chunkDetailsReturningError:")]
+    MESampleCursorChunk? ChunkDetailsReturningError(out NSError? error);
+    [Optional]
+    [Selector("sampleLocationReturningError:")]
+    MESampleLocation? SampleLocationReturningError(out NSError? error);
+    [Optional]
+    [Selector("estimatedSampleLocationReturningError:")]
+    MEEstimatedSampleLocation? EstimatedSampleLocationReturningError(out NSError? error);
+    [Optional]
+    [Selector("refineSampleLocation:refinementData:refinementDataLength:refinedLocation:error:")]
+    bool RefineSampleLocationRefinementDataRefinementDataLengthRefinedLocationError(AVSampleCursorStorageRange estimatedSampleLocation, byte* refinementData, nuint refinementDataLength, AVSampleCursorStorageRange* refinedLocationOut, out NSError? error);
+    [Optional]
+    [Selector("loadSampleBufferContainingSamplesToEndCursor:completionHandler:")]
+    void LoadSampleBufferContainingSamplesToEndCursorCompletionHandler(MESampleCursor? endSampleCursor, MESampleCursorLoadSampleBufferContainingSamplesToEndCursorCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("loadPostDecodeProcessingMetadataWithCompletionHandler:")]
+    void LoadPostDecodeProcessingMetadataWithCompletionHandler(MESampleCursorLoadPostDecodeProcessingMetadataWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public extern objc class MESampleCursorChunk : NSObject, NSCopying
 {
-    [Selector("byteSource")] public MEByteSource ByteSource { get; }
-    [Selector("chunkStorageRange")] public AVSampleCursorStorageRange ChunkStorageRange { get; }
-    [Selector("chunkInfo")] public AVSampleCursorChunkInfo ChunkInfo { get; }
-    [Selector("sampleIndexWithinChunk")] public CFIndex SampleIndexWithinChunk { get; }
-    [Selector("initWithByteSource:chunkStorageRange:chunkInfo:sampleIndexWithinChunk:")] public Self InitWithByteSourceChunkStorageRangeChunkInfoSampleIndexWithinChunk(MEByteSource byteSource, AVSampleCursorStorageRange chunkStorageRange, AVSampleCursorChunkInfo chunkInfo, CFIndex sampleIndexWithinChunk);
+    [Selector("byteSource")]
+    public MEByteSource ByteSource { get; }
+    [Selector("chunkStorageRange")]
+    public AVSampleCursorStorageRange ChunkStorageRange { get; }
+    [Selector("chunkInfo")]
+    public AVSampleCursorChunkInfo ChunkInfo { get; }
+    [Selector("sampleIndexWithinChunk")]
+    public CFIndex SampleIndexWithinChunk { get; }
+    [Selector("initWithByteSource:chunkStorageRange:chunkInfo:sampleIndexWithinChunk:")]
+    public Self InitWithByteSourceChunkStorageRangeChunkInfoSampleIndexWithinChunk(MEByteSource byteSource, AVSampleCursorStorageRange chunkStorageRange, AVSampleCursorChunkInfo chunkInfo, CFIndex sampleIndexWithinChunk);
 }
 
 public extern objc class MESampleLocation : NSObject, NSCopying
 {
-    [Selector("sampleLocation")] public AVSampleCursorStorageRange SampleLocation { get; }
-    [Selector("byteSource")] public MEByteSource ByteSource { get; }
-    [Selector("initWithByteSource:sampleLocation:")] public Self InitWithByteSourceSampleLocation(MEByteSource byteSource, AVSampleCursorStorageRange sampleLocation);
+    [Selector("sampleLocation")]
+    public AVSampleCursorStorageRange SampleLocation { get; }
+    [Selector("byteSource")]
+    public MEByteSource ByteSource { get; }
+    [Selector("initWithByteSource:sampleLocation:")]
+    public Self InitWithByteSourceSampleLocation(MEByteSource byteSource, AVSampleCursorStorageRange sampleLocation);
 }
 
 public extern objc class MEEstimatedSampleLocation : NSObject, NSCopying
 {
-    [Selector("estimatedSampleLocation")] public AVSampleCursorStorageRange EstimatedSampleLocation { get; }
-    [Selector("refinementDataLocation")] public AVSampleCursorStorageRange RefinementDataLocation { get; }
-    [Selector("byteSource")] public MEByteSource ByteSource { get; }
-    [Selector("initWithByteSource:estimatedSampleLocation:refinementDataLocation:")] public Self InitWithByteSourceEstimatedSampleLocationRefinementDataLocation(MEByteSource byteSource, AVSampleCursorStorageRange estimatedSampleLocation, AVSampleCursorStorageRange refinementDataLocation);
+    [Selector("estimatedSampleLocation")]
+    public AVSampleCursorStorageRange EstimatedSampleLocation { get; }
+    [Selector("refinementDataLocation")]
+    public AVSampleCursorStorageRange RefinementDataLocation { get; }
+    [Selector("byteSource")]
+    public MEByteSource ByteSource { get; }
+    [Selector("initWithByteSource:estimatedSampleLocation:refinementDataLocation:")]
+    public Self InitWithByteSourceEstimatedSampleLocationRefinementDataLocation(MEByteSource byteSource, AVSampleCursorStorageRange estimatedSampleLocation, AVSampleCursorStorageRange refinementDataLocation);
 }
 
 public extern objc class MEHEVCDependencyInfo : NSObject, NSCopying
 {
-    [Selector("hasTemporalSubLayerAccess", "setTemporalSubLayerAccess:")] public bool TemporalSubLayerAccess { get; set; }
-    [Selector("hasStepwiseTemporalSubLayerAccess", "setStepwiseTemporalSubLayerAccess:")] public bool StepwiseTemporalSubLayerAccess { get; set; }
-    [Selector("syncSampleNALUnitType", "setSyncSampleNALUnitType:")] public short SyncSampleNALUnitType { get; set; }
+    [Selector("hasTemporalSubLayerAccess", "setTemporalSubLayerAccess:")]
+    public bool TemporalSubLayerAccess { get; set; }
+    [Selector("hasStepwiseTemporalSubLayerAccess", "setStepwiseTemporalSubLayerAccess:")]
+    public bool StepwiseTemporalSubLayerAccess { get; set; }
+    [Selector("syncSampleNALUnitType", "setSyncSampleNALUnitType:")]
+    public short SyncSampleNALUnitType { get; set; }
 }
 
 /// HEVCTemporalLevelInfo, a category of MEHEVCDependencyInfo.
 public extern objc class MEHEVCDependencyInfo
 {
-    [Selector("temporalLevel", "setTemporalLevel:")] public short TemporalLevel { get; set; }
-    [Selector("profileSpace", "setProfileSpace:")] public short ProfileSpace { get; set; }
-    [Selector("tierFlag", "setTierFlag:")] public short TierFlag { get; set; }
-    [Selector("profileIndex", "setProfileIndex:")] public short ProfileIndex { get; set; }
-    [Selector("profileCompatibilityFlags", "setProfileCompatibilityFlags:")] public NSData? ProfileCompatibilityFlags { get; set; }
-    [Selector("constraintIndicatorFlags", "setConstraintIndicatorFlags:")] public NSData? ConstraintIndicatorFlags { get; set; }
-    [Selector("levelIndex", "setLevelIndex:")] public short LevelIndex { get; set; }
+    [Selector("temporalLevel", "setTemporalLevel:")]
+    public short TemporalLevel { get; set; }
+    [Selector("profileSpace", "setProfileSpace:")]
+    public short ProfileSpace { get; set; }
+    [Selector("tierFlag", "setTierFlag:")]
+    public short TierFlag { get; set; }
+    [Selector("profileIndex", "setProfileIndex:")]
+    public short ProfileIndex { get; set; }
+    [Selector("profileCompatibilityFlags", "setProfileCompatibilityFlags:")]
+    public NSData? ProfileCompatibilityFlags { get; set; }
+    [Selector("constraintIndicatorFlags", "setConstraintIndicatorFlags:")]
+    public NSData? ConstraintIndicatorFlags { get; set; }
+    [Selector("levelIndex", "setLevelIndex:")]
+    public short LevelIndex { get; set; }
 }
 
 public objc closure void MEByteSourceReadDataOfLengthFromOffsetToDestinationCompletionHandlerCompletionHandlerBlock(nuint arg0, NSError? arg1);
@@ -229,15 +318,24 @@ public objc closure void MEByteSourceReadDataOfLengthFromOffsetCompletionHandler
 
 public extern objc class MEByteSource : NSObject
 {
-    [Selector("fileName")] public NSString FileName { get; }
-    [Selector("contentType")] public UTType? ContentType { get; }
-    [Selector("fileLength")] public long FileLength { get; }
-    [Selector("relatedFileNamesInSameDirectory")] public NSArray RelatedFileNamesInSameDirectory { get; }
-    [Selector("readDataOfLength:fromOffset:toDestination:completionHandler:")] public void ReadDataOfLengthFromOffsetToDestinationCompletionHandler(nuint length, long offset, void* dest, MEByteSourceReadDataOfLengthFromOffsetToDestinationCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("readDataOfLength:fromOffset:completionHandler:")] public void ReadDataOfLengthFromOffsetCompletionHandler(nuint length, long offset, MEByteSourceReadDataOfLengthFromOffsetCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("readDataOfLength:fromOffset:toDestination:bytesRead:error:")] public bool ReadDataOfLengthFromOffsetToDestinationBytesReadError(nuint length, long offset, void* dest, nuint* bytesReadOut, out NSError? error);
-    [Selector("availableLengthAtOffset:")] public long AvailableLengthAtOffset(long offset);
-    [Selector("byteSourceForRelatedFileName:error:")] public MEByteSource? ByteSourceForRelatedFileNameError(NSString fileName, out NSError? errorOut);
+    [Selector("fileName")]
+    public NSString FileName { get; }
+    [Selector("contentType")]
+    public UTType? ContentType { get; }
+    [Selector("fileLength")]
+    public long FileLength { get; }
+    [Selector("relatedFileNamesInSameDirectory")]
+    public NSArray RelatedFileNamesInSameDirectory { get; }
+    [Selector("readDataOfLength:fromOffset:toDestination:completionHandler:")]
+    public void ReadDataOfLengthFromOffsetToDestinationCompletionHandler(nuint length, long offset, void* dest, MEByteSourceReadDataOfLengthFromOffsetToDestinationCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("readDataOfLength:fromOffset:completionHandler:")]
+    public void ReadDataOfLengthFromOffsetCompletionHandler(nuint length, long offset, MEByteSourceReadDataOfLengthFromOffsetCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("readDataOfLength:fromOffset:toDestination:bytesRead:error:")]
+    public bool ReadDataOfLengthFromOffsetToDestinationBytesReadError(nuint length, long offset, void* dest, nuint* bytesReadOut, out NSError? error);
+    [Selector("availableLengthAtOffset:")]
+    public long AvailableLengthAtOffset(long offset);
+    [Selector("byteSourceForRelatedFileName:error:")]
+    public MEByteSource? ByteSourceForRelatedFileNameError(NSString fileName, out NSError? errorOut);
 }
 
 #endif

@@ -35,9 +35,15 @@ import Standard.ObjC;
 
 public objc interface IKCameraDeviceViewDelegate
 {
-    [Optional] [Selector("cameraDeviceViewSelectionDidChange:")] void CameraDeviceViewSelectionDidChange(IKCameraDeviceView? cameraDeviceView);
-    [Optional] [Selector("cameraDeviceView:didDownloadFile:location:fileData:error:")] void CameraDeviceViewDidDownloadFileLocationFileDataError(IKCameraDeviceView? cameraDeviceView, ICCameraFile? file, NSURL? url, NSData? data, NSError? error);
-    [Optional] [Selector("cameraDeviceView:didEncounterError:")] void CameraDeviceViewDidEncounterError(IKCameraDeviceView? cameraDeviceView, NSError? error);
+    [Optional]
+    [Selector("cameraDeviceViewSelectionDidChange:")]
+    void CameraDeviceViewSelectionDidChange(IKCameraDeviceView? cameraDeviceView);
+    [Optional]
+    [Selector("cameraDeviceView:didDownloadFile:location:fileData:error:")]
+    void CameraDeviceViewDidDownloadFileLocationFileDataError(IKCameraDeviceView? cameraDeviceView, ICCameraFile? file, NSURL? url, NSData? data, NSError? error);
+    [Optional]
+    [Selector("cameraDeviceView:didEncounterError:")]
+    void CameraDeviceViewDidEncounterError(IKCameraDeviceView? cameraDeviceView, NSError? error);
 }
 
 public enum IKCameraDeviceViewDisplayMode : long
@@ -55,36 +61,66 @@ public enum IKCameraDeviceViewTransferMode : long
 
 public extern objc class IKCameraDeviceView : NSView
 {
-    [Selector("delegate", "setDelegate:")] public IKCameraDeviceViewDelegate? Delegate { get; set; }
-    [Selector("cameraDevice", "setCameraDevice:")] public ICCameraDevice? CameraDevice { get; set; }
-    [Selector("mode", "setMode:")] public IKCameraDeviceViewDisplayMode Mode { get; set; }
-    [Selector("hasDisplayModeTable", "setHasDisplayModeTable:")] public bool HasDisplayModeTable { get; set; }
-    [Selector("hasDisplayModeIcon", "setHasDisplayModeIcon:")] public bool HasDisplayModeIcon { get; set; }
-    [Selector("downloadAllControlLabel", "setDownloadAllControlLabel:")] public NSString? DownloadAllControlLabel { get; set; }
-    [Selector("downloadSelectedControlLabel", "setDownloadSelectedControlLabel:")] public NSString? DownloadSelectedControlLabel { get; set; }
-    [Selector("iconSize", "setIconSize:")] public NSUInteger IconSize { get; set; }
-    [Selector("transferMode", "setTransferMode:")] public IKCameraDeviceViewTransferMode TransferMode { get; set; }
-    [Selector("displaysDownloadsDirectoryControl", "setDisplaysDownloadsDirectoryControl:")] public bool DisplaysDownloadsDirectoryControl { get; set; }
-    [Selector("downloadsDirectory", "setDownloadsDirectory:")] public NSURL? DownloadsDirectory { get; set; }
-    [Selector("displaysPostProcessApplicationControl", "setDisplaysPostProcessApplicationControl:")] public bool DisplaysPostProcessApplicationControl { get; set; }
-    [Selector("postProcessApplication", "setPostProcessApplication:")] public NSURL? PostProcessApplication { get; set; }
-    [Selector("canRotateSelectedItemsLeft")] public bool CanRotateSelectedItemsLeft { get; }
-    [Selector("canRotateSelectedItemsRight")] public bool CanRotateSelectedItemsRight { get; }
-    [Selector("canDeleteSelectedItems")] public bool CanDeleteSelectedItems { get; }
-    [Selector("canDownloadSelectedItems")] public bool CanDownloadSelectedItems { get; }
-    [Selector("selectedIndexes")] public NSIndexSet? SelectedIndexes();
-    [Selector("selectIndexes:byExtendingSelection:")] public void SelectIndexesByExtendingSelection(NSIndexSet? indexes, bool extend);
-    [Selector("rotateLeft:")] public void RotateLeft(AnyObject? sender);
-    [Selector("rotateRight:")] public void RotateRight(AnyObject? sender);
-    [Selector("deleteSelectedItems:")] public void DeleteSelectedItems(AnyObject? sender);
-    [Selector("downloadSelectedItems:")] public void DownloadSelectedItems(AnyObject? sender);
-    [Selector("downloadAllItems:")] public void DownloadAllItems(AnyObject? sender);
-    [Selector("setCustomIconSizeSlider:")] public void SetCustomIconSizeSlider(NSSlider? slider);
-    [Selector("setCustomModeControl:")] public void SetCustomModeControl(NSSegmentedControl? control);
-    [Selector("setCustomActionControl:")] public void SetCustomActionControl(NSSegmentedControl? control);
-    [Selector("setCustomRotateControl:")] public void SetCustomRotateControl(NSSegmentedControl? control);
-    [Selector("setCustomDeleteControl:")] public void SetCustomDeleteControl(NSSegmentedControl? control);
-    [Selector("setShowStatusInfoAsWindowSubtitle:")] public void SetShowStatusInfoAsWindowSubtitle(bool value);
+    [Selector("delegate", "setDelegate:")]
+    public IKCameraDeviceViewDelegate? Delegate { get; set; }
+    [Selector("cameraDevice", "setCameraDevice:")]
+    public ICCameraDevice? CameraDevice { get; set; }
+    [Selector("mode", "setMode:")]
+    public IKCameraDeviceViewDisplayMode Mode { get; set; }
+    [Selector("hasDisplayModeTable", "setHasDisplayModeTable:")]
+    public bool HasDisplayModeTable { get; set; }
+    [Selector("hasDisplayModeIcon", "setHasDisplayModeIcon:")]
+    public bool HasDisplayModeIcon { get; set; }
+    [Selector("downloadAllControlLabel", "setDownloadAllControlLabel:")]
+    public NSString? DownloadAllControlLabel { get; set; }
+    [Selector("downloadSelectedControlLabel", "setDownloadSelectedControlLabel:")]
+    public NSString? DownloadSelectedControlLabel { get; set; }
+    [Selector("iconSize", "setIconSize:")]
+    public NSUInteger IconSize { get; set; }
+    [Selector("transferMode", "setTransferMode:")]
+    public IKCameraDeviceViewTransferMode TransferMode { get; set; }
+    [Selector("displaysDownloadsDirectoryControl", "setDisplaysDownloadsDirectoryControl:")]
+    public bool DisplaysDownloadsDirectoryControl { get; set; }
+    [Selector("downloadsDirectory", "setDownloadsDirectory:")]
+    public NSURL? DownloadsDirectory { get; set; }
+    [Selector("displaysPostProcessApplicationControl", "setDisplaysPostProcessApplicationControl:")]
+    public bool DisplaysPostProcessApplicationControl { get; set; }
+    [Selector("postProcessApplication", "setPostProcessApplication:")]
+    public NSURL? PostProcessApplication { get; set; }
+    [Selector("canRotateSelectedItemsLeft")]
+    public bool CanRotateSelectedItemsLeft { get; }
+    [Selector("canRotateSelectedItemsRight")]
+    public bool CanRotateSelectedItemsRight { get; }
+    [Selector("canDeleteSelectedItems")]
+    public bool CanDeleteSelectedItems { get; }
+    [Selector("canDownloadSelectedItems")]
+    public bool CanDownloadSelectedItems { get; }
+    [Selector("selectedIndexes")]
+    public NSIndexSet? SelectedIndexes();
+    [Selector("selectIndexes:byExtendingSelection:")]
+    public void SelectIndexesByExtendingSelection(NSIndexSet? indexes, bool extend);
+    [Selector("rotateLeft:")]
+    public void RotateLeft(AnyObject? sender);
+    [Selector("rotateRight:")]
+    public void RotateRight(AnyObject? sender);
+    [Selector("deleteSelectedItems:")]
+    public void DeleteSelectedItems(AnyObject? sender);
+    [Selector("downloadSelectedItems:")]
+    public void DownloadSelectedItems(AnyObject? sender);
+    [Selector("downloadAllItems:")]
+    public void DownloadAllItems(AnyObject? sender);
+    [Selector("setCustomIconSizeSlider:")]
+    public void SetCustomIconSizeSlider(NSSlider? slider);
+    [Selector("setCustomModeControl:")]
+    public void SetCustomModeControl(NSSegmentedControl? control);
+    [Selector("setCustomActionControl:")]
+    public void SetCustomActionControl(NSSegmentedControl? control);
+    [Selector("setCustomRotateControl:")]
+    public void SetCustomRotateControl(NSSegmentedControl? control);
+    [Selector("setCustomDeleteControl:")]
+    public void SetCustomDeleteControl(NSSegmentedControl? control);
+    [Selector("setShowStatusInfoAsWindowSubtitle:")]
+    public void SetShowStatusInfoAsWindowSubtitle(bool value);
 }
 
 #endif

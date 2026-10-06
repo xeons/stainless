@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class NETransparentProxyNetworkSettings : NETunnelNetworkSettings
 {
-    [Selector("includedNetworkRules", "setIncludedNetworkRules:")] public NSArray? IncludedNetworkRules { get; set; }
-    [Selector("excludedNetworkRules", "setExcludedNetworkRules:")] public NSArray? ExcludedNetworkRules { get; set; }
+    [Selector("includedNetworkRules", "setIncludedNetworkRules:")]
+    public NSArray? IncludedNetworkRules { get; set; }
+    [Selector("excludedNetworkRules", "setExcludedNetworkRules:")]
+    public NSArray? ExcludedNetworkRules { get; set; }
 }
 
 #endif

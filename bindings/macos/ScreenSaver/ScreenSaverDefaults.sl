@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class ScreenSaverDefaults : NSUserDefaults
 {
-    [Selector("defaultsForModuleWithName:")] public static Self? DefaultsForModuleWithName(NSString inModuleName);
+    [Selector("defaultsForModuleWithName:")]
+    public static Self? DefaultsForModuleWithName(NSString inModuleName);
 }
 
 #endif

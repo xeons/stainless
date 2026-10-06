@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class MPSCNNNormalizationGammaAndBetaState : MPSState
 {
-    [Selector("gamma")] public MTLBuffer Gamma { get; }
-    [Selector("beta")] public MTLBuffer Beta { get; }
-    [Selector("initWithGamma:beta:")] public Self InitWithGammaBeta(MTLBuffer gamma, MTLBuffer beta);
-    [Selector("temporaryStateWithCommandBuffer:numberOfFeatureChannels:")] public static Self TemporaryStateWithCommandBufferNumberOfFeatureChannels(MTLCommandBuffer commandBuffer, NSUInteger numberOfFeatureChannels);
+    [Selector("gamma")]
+    public MTLBuffer Gamma { get; }
+    [Selector("beta")]
+    public MTLBuffer Beta { get; }
+    [Selector("initWithGamma:beta:")]
+    public Self InitWithGammaBeta(MTLBuffer gamma, MTLBuffer beta);
+    [Selector("temporaryStateWithCommandBuffer:numberOfFeatureChannels:")]
+    public static Self TemporaryStateWithCommandBufferNumberOfFeatureChannels(MTLCommandBuffer commandBuffer, NSUInteger numberOfFeatureChannels);
 }
 
 #endif

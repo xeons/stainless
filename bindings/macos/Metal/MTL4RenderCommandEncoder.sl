@@ -43,47 +43,88 @@ public enum MTL4RenderEncoderOptions : ulong
 /// macOS 26.0 and later.
 public objc interface MTL4RenderCommandEncoder : MTL4CommandEncoder
 {
-    [Selector("tileWidth")] NSUInteger TileWidth { get; }
-    [Selector("tileHeight")] NSUInteger TileHeight { get; }
-    [Selector("setColorAttachmentMap:")] void SetColorAttachmentMap(MTLLogicalToPhysicalColorAttachmentMap? mapping);
-    [Selector("setRenderPipelineState:")] void SetRenderPipelineState(MTLRenderPipelineState pipelineState);
-    [Selector("setViewport:")] void SetViewport(MTLViewport viewport);
-    [Selector("setViewports:count:")] void SetViewportsCount(MTLViewport* viewports, NSUInteger count);
-    [Selector("setVertexAmplificationCount:viewMappings:")] void SetVertexAmplificationCountViewMappings(NSUInteger count, MTLVertexAmplificationViewMapping* viewMappings);
-    [Selector("setCullMode:")] void SetCullMode(MTLCullMode cullMode);
-    [Selector("setDepthClipMode:")] void SetDepthClipMode(MTLDepthClipMode depthClipMode);
-    [Selector("setDepthBias:slopeScale:clamp:")] void SetDepthBiasSlopeScaleClamp(float depthBias, float slopeScale, float clamp);
-    [Selector("setDepthTestMinBound:maxBound:")] void SetDepthTestMinBoundMaxBound(float minBound, float maxBound);
-    [Selector("setScissorRect:")] void SetScissorRect(MTLScissorRect rect);
-    [Selector("setScissorRects:count:")] void SetScissorRectsCount(MTLScissorRect* scissorRects, NSUInteger count);
-    [Selector("setTriangleFillMode:")] void SetTriangleFillMode(MTLTriangleFillMode fillMode);
-    [Selector("setBlendColorRed:green:blue:alpha:")] void SetBlendColorRedGreenBlueAlpha(float red, float green, float blue, float alpha);
-    [Selector("setDepthStencilState:")] void SetDepthStencilState(MTLDepthStencilState? depthStencilState);
-    [Selector("setStencilReferenceValue:")] void SetStencilReferenceValue(uint referenceValue);
-    [Selector("setStencilFrontReferenceValue:backReferenceValue:")] void SetStencilFrontReferenceValueBackReferenceValue(uint frontReferenceValue, uint backReferenceValue);
-    [Selector("setVisibilityResultMode:offset:")] void SetVisibilityResultModeOffset(MTLVisibilityResultMode mode, NSUInteger offset);
-    [Selector("setColorStoreAction:atIndex:")] void SetColorStoreActionAtIndex(MTLStoreAction storeAction, NSUInteger colorAttachmentIndex);
-    [Selector("setDepthStoreAction:")] void SetDepthStoreAction(MTLStoreAction storeAction);
-    [Selector("setStencilStoreAction:")] void SetStencilStoreAction(MTLStoreAction storeAction);
-    [Selector("drawPrimitives:vertexStart:vertexCount:")] void DrawPrimitivesVertexStartVertexCount(MTLPrimitiveType primitiveType, NSUInteger vertexStart, NSUInteger vertexCount);
-    [Selector("drawPrimitives:vertexStart:vertexCount:instanceCount:")] void DrawPrimitivesVertexStartVertexCountInstanceCount(MTLPrimitiveType primitiveType, NSUInteger vertexStart, NSUInteger vertexCount, NSUInteger instanceCount);
-    [Selector("drawPrimitives:vertexStart:vertexCount:instanceCount:baseInstance:")] void DrawPrimitivesVertexStartVertexCountInstanceCountBaseInstance(MTLPrimitiveType primitiveType, NSUInteger vertexStart, NSUInteger vertexCount, NSUInteger instanceCount, NSUInteger baseInstance);
-    [Selector("drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferLength:")] void DrawIndexedPrimitivesIndexCountIndexTypeIndexBufferIndexBufferLength(MTLPrimitiveType primitiveType, NSUInteger indexCount, MTLIndexType indexType, MTLGPUAddress indexBuffer, NSUInteger indexBufferLength);
-    [Selector("drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferLength:instanceCount:")] void DrawIndexedPrimitivesIndexCountIndexTypeIndexBufferIndexBufferLengthInstanceCount(MTLPrimitiveType primitiveType, NSUInteger indexCount, MTLIndexType indexType, MTLGPUAddress indexBuffer, NSUInteger indexBufferLength, NSUInteger instanceCount);
-    [Selector("drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferLength:instanceCount:baseVertex:baseInstance:")] void DrawIndexedPrimitivesIndexCountIndexTypeIndexBufferIndexBufferLengthInstanceCountBaseVertexBaseInstance(MTLPrimitiveType primitiveType, NSUInteger indexCount, MTLIndexType indexType, MTLGPUAddress indexBuffer, NSUInteger indexBufferLength, NSUInteger instanceCount, NSInteger baseVertex, NSUInteger baseInstance);
-    [Selector("drawPrimitives:indirectBuffer:")] void DrawPrimitivesIndirectBuffer(MTLPrimitiveType primitiveType, MTLGPUAddress indirectBuffer);
-    [Selector("drawIndexedPrimitives:indexType:indexBuffer:indexBufferLength:indirectBuffer:")] void DrawIndexedPrimitivesIndexTypeIndexBufferIndexBufferLengthIndirectBuffer(MTLPrimitiveType primitiveType, MTLIndexType indexType, MTLGPUAddress indexBuffer, NSUInteger indexBufferLength, MTLGPUAddress indirectBuffer);
-    [Selector("executeCommandsInBuffer:withRange:")] void ExecuteCommandsInBufferWithRange(MTLIndirectCommandBuffer indirectCommandBuffer, NSRange executionRange);
-    [Selector("executeCommandsInBuffer:indirectBuffer:")] void ExecuteCommandsInBufferIndirectBuffer(MTLIndirectCommandBuffer indirectCommandBuffer, MTLGPUAddress indirectRangeBuffer);
-    [Selector("setObjectThreadgroupMemoryLength:atIndex:")] void SetObjectThreadgroupMemoryLengthAtIndex(NSUInteger length, NSUInteger index);
-    [Selector("drawMeshThreadgroups:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")] void DrawMeshThreadgroupsThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLSize threadgroupsPerGrid, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
-    [Selector("drawMeshThreads:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")] void DrawMeshThreadsThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLSize threadsPerGrid, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
-    [Selector("drawMeshThreadgroupsWithIndirectBuffer:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")] void DrawMeshThreadgroupsWithIndirectBufferThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLGPUAddress indirectBuffer, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
-    [Selector("dispatchThreadsPerTile:")] void DispatchThreadsPerTile(MTLSize threadsPerTile);
-    [Selector("setThreadgroupMemoryLength:offset:atIndex:")] void SetThreadgroupMemoryLengthOffsetAtIndex(NSUInteger length, NSUInteger offset, NSUInteger index);
-    [Selector("setArgumentTable:atStages:")] void SetArgumentTableAtStages(MTL4ArgumentTable argumentTable, MTLRenderStages stages);
-    [Selector("setFrontFacingWinding:")] void SetFrontFacingWinding(MTLWinding frontFacingWinding);
-    [Selector("writeTimestampWithGranularity:afterStage:intoHeap:atIndex:")] void WriteTimestampWithGranularityAfterStageIntoHeapAtIndex(MTL4TimestampGranularity granularity, MTLRenderStages stage, MTL4CounterHeap counterHeap, NSUInteger index);
+    [Selector("tileWidth")]
+    NSUInteger TileWidth { get; }
+    [Selector("tileHeight")]
+    NSUInteger TileHeight { get; }
+    [Selector("setColorAttachmentMap:")]
+    void SetColorAttachmentMap(MTLLogicalToPhysicalColorAttachmentMap? mapping);
+    [Selector("setRenderPipelineState:")]
+    void SetRenderPipelineState(MTLRenderPipelineState pipelineState);
+    [Selector("setViewport:")]
+    void SetViewport(MTLViewport viewport);
+    [Selector("setViewports:count:")]
+    void SetViewportsCount(MTLViewport* viewports, NSUInteger count);
+    [Selector("setVertexAmplificationCount:viewMappings:")]
+    void SetVertexAmplificationCountViewMappings(NSUInteger count, MTLVertexAmplificationViewMapping* viewMappings);
+    [Selector("setCullMode:")]
+    void SetCullMode(MTLCullMode cullMode);
+    [Selector("setDepthClipMode:")]
+    void SetDepthClipMode(MTLDepthClipMode depthClipMode);
+    [Selector("setDepthBias:slopeScale:clamp:")]
+    void SetDepthBiasSlopeScaleClamp(float depthBias, float slopeScale, float clamp);
+    [Selector("setDepthTestMinBound:maxBound:")]
+    void SetDepthTestMinBoundMaxBound(float minBound, float maxBound);
+    [Selector("setScissorRect:")]
+    void SetScissorRect(MTLScissorRect rect);
+    [Selector("setScissorRects:count:")]
+    void SetScissorRectsCount(MTLScissorRect* scissorRects, NSUInteger count);
+    [Selector("setTriangleFillMode:")]
+    void SetTriangleFillMode(MTLTriangleFillMode fillMode);
+    [Selector("setBlendColorRed:green:blue:alpha:")]
+    void SetBlendColorRedGreenBlueAlpha(float red, float green, float blue, float alpha);
+    [Selector("setDepthStencilState:")]
+    void SetDepthStencilState(MTLDepthStencilState? depthStencilState);
+    [Selector("setStencilReferenceValue:")]
+    void SetStencilReferenceValue(uint referenceValue);
+    [Selector("setStencilFrontReferenceValue:backReferenceValue:")]
+    void SetStencilFrontReferenceValueBackReferenceValue(uint frontReferenceValue, uint backReferenceValue);
+    [Selector("setVisibilityResultMode:offset:")]
+    void SetVisibilityResultModeOffset(MTLVisibilityResultMode mode, NSUInteger offset);
+    [Selector("setColorStoreAction:atIndex:")]
+    void SetColorStoreActionAtIndex(MTLStoreAction storeAction, NSUInteger colorAttachmentIndex);
+    [Selector("setDepthStoreAction:")]
+    void SetDepthStoreAction(MTLStoreAction storeAction);
+    [Selector("setStencilStoreAction:")]
+    void SetStencilStoreAction(MTLStoreAction storeAction);
+    [Selector("drawPrimitives:vertexStart:vertexCount:")]
+    void DrawPrimitivesVertexStartVertexCount(MTLPrimitiveType primitiveType, NSUInteger vertexStart, NSUInteger vertexCount);
+    [Selector("drawPrimitives:vertexStart:vertexCount:instanceCount:")]
+    void DrawPrimitivesVertexStartVertexCountInstanceCount(MTLPrimitiveType primitiveType, NSUInteger vertexStart, NSUInteger vertexCount, NSUInteger instanceCount);
+    [Selector("drawPrimitives:vertexStart:vertexCount:instanceCount:baseInstance:")]
+    void DrawPrimitivesVertexStartVertexCountInstanceCountBaseInstance(MTLPrimitiveType primitiveType, NSUInteger vertexStart, NSUInteger vertexCount, NSUInteger instanceCount, NSUInteger baseInstance);
+    [Selector("drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferLength:")]
+    void DrawIndexedPrimitivesIndexCountIndexTypeIndexBufferIndexBufferLength(MTLPrimitiveType primitiveType, NSUInteger indexCount, MTLIndexType indexType, MTLGPUAddress indexBuffer, NSUInteger indexBufferLength);
+    [Selector("drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferLength:instanceCount:")]
+    void DrawIndexedPrimitivesIndexCountIndexTypeIndexBufferIndexBufferLengthInstanceCount(MTLPrimitiveType primitiveType, NSUInteger indexCount, MTLIndexType indexType, MTLGPUAddress indexBuffer, NSUInteger indexBufferLength, NSUInteger instanceCount);
+    [Selector("drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferLength:instanceCount:baseVertex:baseInstance:")]
+    void DrawIndexedPrimitivesIndexCountIndexTypeIndexBufferIndexBufferLengthInstanceCountBaseVertexBaseInstance(MTLPrimitiveType primitiveType, NSUInteger indexCount, MTLIndexType indexType, MTLGPUAddress indexBuffer, NSUInteger indexBufferLength, NSUInteger instanceCount, NSInteger baseVertex, NSUInteger baseInstance);
+    [Selector("drawPrimitives:indirectBuffer:")]
+    void DrawPrimitivesIndirectBuffer(MTLPrimitiveType primitiveType, MTLGPUAddress indirectBuffer);
+    [Selector("drawIndexedPrimitives:indexType:indexBuffer:indexBufferLength:indirectBuffer:")]
+    void DrawIndexedPrimitivesIndexTypeIndexBufferIndexBufferLengthIndirectBuffer(MTLPrimitiveType primitiveType, MTLIndexType indexType, MTLGPUAddress indexBuffer, NSUInteger indexBufferLength, MTLGPUAddress indirectBuffer);
+    [Selector("executeCommandsInBuffer:withRange:")]
+    void ExecuteCommandsInBufferWithRange(MTLIndirectCommandBuffer indirectCommandBuffer, NSRange executionRange);
+    [Selector("executeCommandsInBuffer:indirectBuffer:")]
+    void ExecuteCommandsInBufferIndirectBuffer(MTLIndirectCommandBuffer indirectCommandBuffer, MTLGPUAddress indirectRangeBuffer);
+    [Selector("setObjectThreadgroupMemoryLength:atIndex:")]
+    void SetObjectThreadgroupMemoryLengthAtIndex(NSUInteger length, NSUInteger index);
+    [Selector("drawMeshThreadgroups:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")]
+    void DrawMeshThreadgroupsThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLSize threadgroupsPerGrid, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
+    [Selector("drawMeshThreads:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")]
+    void DrawMeshThreadsThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLSize threadsPerGrid, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
+    [Selector("drawMeshThreadgroupsWithIndirectBuffer:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")]
+    void DrawMeshThreadgroupsWithIndirectBufferThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLGPUAddress indirectBuffer, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
+    [Selector("dispatchThreadsPerTile:")]
+    void DispatchThreadsPerTile(MTLSize threadsPerTile);
+    [Selector("setThreadgroupMemoryLength:offset:atIndex:")]
+    void SetThreadgroupMemoryLengthOffsetAtIndex(NSUInteger length, NSUInteger offset, NSUInteger index);
+    [Selector("setArgumentTable:atStages:")]
+    void SetArgumentTableAtStages(MTL4ArgumentTable argumentTable, MTLRenderStages stages);
+    [Selector("setFrontFacingWinding:")]
+    void SetFrontFacingWinding(MTLWinding frontFacingWinding);
+    [Selector("writeTimestampWithGranularity:afterStage:intoHeap:atIndex:")]
+    void WriteTimestampWithGranularityAfterStageIntoHeapAtIndex(MTL4TimestampGranularity granularity, MTLRenderStages stage, MTL4CounterHeap counterHeap, NSUInteger index);
 }
 
 #endif

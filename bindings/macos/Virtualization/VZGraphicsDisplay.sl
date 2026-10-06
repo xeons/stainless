@@ -34,17 +34,26 @@ import Standard.ObjC;
 
 public extern objc class VZGraphicsDisplay : NSObject
 {
-    [Selector("sizeInPixels")] public CGSize SizeInPixels { get; }
-    [Selector("reconfigureWithSizeInPixels:error:")] public bool ReconfigureWithSizeInPixelsError(CGSize sizeInPixels, out NSError? error);
-    [Selector("reconfigureWithConfiguration:error:")] public bool ReconfigureWithConfigurationError(VZGraphicsDisplayConfiguration configuration, out NSError? error);
-    [Selector("addObserver:")] public void AddObserver(VZGraphicsDisplayObserver observer);
-    [Selector("removeObserver:")] public void RemoveObserver(VZGraphicsDisplayObserver observer);
+    [Selector("sizeInPixels")]
+    public CGSize SizeInPixels { get; }
+    [Selector("reconfigureWithSizeInPixels:error:")]
+    public bool ReconfigureWithSizeInPixelsError(CGSize sizeInPixels, out NSError? error);
+    [Selector("reconfigureWithConfiguration:error:")]
+    public bool ReconfigureWithConfigurationError(VZGraphicsDisplayConfiguration configuration, out NSError? error);
+    [Selector("addObserver:")]
+    public void AddObserver(VZGraphicsDisplayObserver observer);
+    [Selector("removeObserver:")]
+    public void RemoveObserver(VZGraphicsDisplayObserver observer);
 }
 
 public objc interface VZGraphicsDisplayObserver : NSObjectProtocol
 {
-    [Optional] [Selector("displayDidBeginReconfiguration:")] void DisplayDidBeginReconfiguration(VZGraphicsDisplay display);
-    [Optional] [Selector("displayDidEndReconfiguration:")] void DisplayDidEndReconfiguration(VZGraphicsDisplay display);
+    [Optional]
+    [Selector("displayDidBeginReconfiguration:")]
+    void DisplayDidBeginReconfiguration(VZGraphicsDisplay display);
+    [Optional]
+    [Selector("displayDidEndReconfiguration:")]
+    void DisplayDidEndReconfiguration(VZGraphicsDisplay display);
 }
 
 #endif

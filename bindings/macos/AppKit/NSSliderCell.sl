@@ -48,19 +48,32 @@ public enum NSSliderType : ulong
 
 public extern objc class NSSliderCell : NSActionCell
 {
-    [Selector("prefersTrackingUntilMouseUp")] public static bool PrefersTrackingUntilMouseUp { get; }
-    [Selector("minValue", "setMinValue:")] public double MinValue { get; set; }
-    [Selector("maxValue", "setMaxValue:")] public double MaxValue { get; set; }
-    [Selector("altIncrementValue", "setAltIncrementValue:")] public double AltIncrementValue { get; set; }
-    [Selector("sliderType", "setSliderType:")] public NSSliderType SliderType { get; set; }
-    [Selector("isVertical", "setVertical:")] public bool Vertical { get; set; }
-    [Selector("trackRect")] public NSRect TrackRect { get; }
-    [Selector("knobThickness")] public CGFloat KnobThickness { get; }
-    [Selector("knobRectFlipped:")] public NSRect KnobRectFlipped(bool flipped);
-    [Selector("barRectFlipped:")] public NSRect BarRectFlipped(bool flipped);
-    [Selector("drawKnob:")] public void DrawKnob(NSRect knobRect);
-    [Selector("drawKnob")] public void DrawKnob();
-    [Selector("drawBarInside:flipped:")] public void DrawBarInsideFlipped(NSRect rect, bool flipped);
+    [Selector("prefersTrackingUntilMouseUp")]
+    public static bool PrefersTrackingUntilMouseUp { get; }
+    [Selector("minValue", "setMinValue:")]
+    public double MinValue { get; set; }
+    [Selector("maxValue", "setMaxValue:")]
+    public double MaxValue { get; set; }
+    [Selector("altIncrementValue", "setAltIncrementValue:")]
+    public double AltIncrementValue { get; set; }
+    [Selector("sliderType", "setSliderType:")]
+    public NSSliderType SliderType { get; set; }
+    [Selector("isVertical", "setVertical:")]
+    public bool Vertical { get; set; }
+    [Selector("trackRect")]
+    public NSRect TrackRect { get; }
+    [Selector("knobThickness")]
+    public CGFloat KnobThickness { get; }
+    [Selector("knobRectFlipped:")]
+    public NSRect KnobRectFlipped(bool flipped);
+    [Selector("barRectFlipped:")]
+    public NSRect BarRectFlipped(bool flipped);
+    [Selector("drawKnob:")]
+    public void DrawKnob(NSRect knobRect);
+    [Selector("drawKnob")]
+    public void DrawKnob();
+    [Selector("drawBarInside:flipped:")]
+    public void DrawBarInsideFlipped(NSRect rect, bool flipped);
 }
 
 /// NSSliderCellVerticalGetter, a category of NSSliderCell.
@@ -69,41 +82,60 @@ public extern objc class NSSliderCell { }
 /// NSTickMarkSupport, a category of NSSliderCell.
 public extern objc class NSSliderCell
 {
-    [Selector("numberOfTickMarks", "setNumberOfTickMarks:")] public NSInteger NumberOfTickMarks { get; set; }
-    [Selector("tickMarkPosition", "setTickMarkPosition:")] public NSTickMarkPosition TickMarkPosition { get; set; }
-    [Selector("allowsTickMarkValuesOnly", "setAllowsTickMarkValuesOnly:")] public bool AllowsTickMarkValuesOnly { get; set; }
-    [Selector("tickMarkValueAtIndex:")] public double TickMarkValueAtIndex(NSInteger index);
-    [Selector("rectOfTickMarkAtIndex:")] public NSRect RectOfTickMarkAtIndex(NSInteger index);
-    [Selector("indexOfTickMarkAtPoint:")] public NSInteger IndexOfTickMarkAtPoint(NSPoint point);
-    [Selector("closestTickMarkValueToValue:")] public double ClosestTickMarkValueToValue(double value);
-    [Selector("drawTickMarks")] public void DrawTickMarks();
+    [Selector("numberOfTickMarks", "setNumberOfTickMarks:")]
+    public NSInteger NumberOfTickMarks { get; set; }
+    [Selector("tickMarkPosition", "setTickMarkPosition:")]
+    public NSTickMarkPosition TickMarkPosition { get; set; }
+    [Selector("allowsTickMarkValuesOnly", "setAllowsTickMarkValuesOnly:")]
+    public bool AllowsTickMarkValuesOnly { get; set; }
+    [Selector("tickMarkValueAtIndex:")]
+    public double TickMarkValueAtIndex(NSInteger index);
+    [Selector("rectOfTickMarkAtIndex:")]
+    public NSRect RectOfTickMarkAtIndex(NSInteger index);
+    [Selector("indexOfTickMarkAtPoint:")]
+    public NSInteger IndexOfTickMarkAtPoint(NSPoint point);
+    [Selector("closestTickMarkValueToValue:")]
+    public double ClosestTickMarkValueToValue(double value);
+    [Selector("drawTickMarks")]
+    public void DrawTickMarks();
 }
 
 /// NSDeprecated, a category of NSSliderCell.
 public extern objc class NSSliderCell
 {
     /// Deprecated in macOS 10.9.
-    [Selector("setTitleCell:")] public void SetTitleCell(NSCell? cell);
+    [Selector("setTitleCell:")]
+    public void SetTitleCell(NSCell? cell);
     /// Deprecated in macOS 10.9.
-    [Selector("titleCell")] public AnyObject? TitleCell();
+    [Selector("titleCell")]
+    public AnyObject? TitleCell();
     /// Deprecated in macOS 10.9.
-    [Selector("setTitleColor:")] public void SetTitleColor(NSColor? newColor);
+    [Selector("setTitleColor:")]
+    public void SetTitleColor(NSColor? newColor);
     /// Deprecated in macOS 10.9.
-    [Selector("titleColor")] public NSColor? TitleColor();
+    [Selector("titleColor")]
+    public NSColor? TitleColor();
     /// Deprecated in macOS 10.9.
-    [Selector("setTitleFont:")] public void SetTitleFont(NSFont? fontObj);
+    [Selector("setTitleFont:")]
+    public void SetTitleFont(NSFont? fontObj);
     /// Deprecated in macOS 10.9.
-    [Selector("titleFont")] public NSFont? TitleFont();
+    [Selector("titleFont")]
+    public NSFont? TitleFont();
     /// Deprecated in macOS 10.9.
-    [Selector("title")] public NSString? Title();
+    [Selector("title")]
+    public NSString? Title();
     /// Deprecated in macOS 10.9.
-    [Selector("setTitle:")] public void SetTitle(NSString? string);
+    [Selector("setTitle:")]
+    public void SetTitle(NSString? string);
     /// Deprecated in macOS 10.9.
-    [Selector("setKnobThickness:")] public void SetKnobThickness(CGFloat thickness);
+    [Selector("setKnobThickness:")]
+    public void SetKnobThickness(CGFloat thickness);
     /// Deprecated in macOS 10.9.
-    [Selector("setImage:")] public void SetImage(NSImage? backgroundImage);
+    [Selector("setImage:")]
+    public void SetImage(NSImage? backgroundImage);
     /// Deprecated in macOS 10.9.
-    [Selector("image")] public NSImage? Image();
+    [Selector("image")]
+    public NSImage? Image();
 }
 
 #endif

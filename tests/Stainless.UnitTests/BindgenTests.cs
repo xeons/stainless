@@ -200,7 +200,7 @@ public class BindgenTests
 
     [Fact]
     public void APackedFieldIsPackedAndItsStructIsNot() =>
-        Assert.Equal("public struct Event\n{\n    public int type;\n    [Packed] public long time;\n    public int flags;\n}\n",
+        Assert.Equal("public struct Event\n{\n    public int type;\n    [Packed]\n    public long time;\n    public int flags;\n}\n",
             Written("Event"));
 
     [Fact]
@@ -312,16 +312,16 @@ public class BindgenTests
     [Fact]
     public void ACreateOrCopyFunctionHandsOverWhatItReturns()
     {
-        Assert.StartsWith("[ReturnsRetained] public extern \"C\" CFStringRef? CFStringCreateCopy(", WrittenObjC("function CFStringCreateCopy"));
+        Assert.StartsWith("[ReturnsRetained]\npublic extern \"C\" CFStringRef? CFStringCreateCopy(", WrittenObjC("function CFStringCreateCopy"));
         Assert.Equal("public extern \"C\" CFStringRef? CFStringGetName(CFStringRef? text);\n", WrittenObjC("function CFStringGetName"));
     }
 
     [Fact]
     public void AnAttributeOverridesTheCreateRule()
     {
-        Assert.StartsWith("[ReturnsRetained] ", WrittenObjC("function MakeName"));
+        Assert.StartsWith("[ReturnsRetained]\n", WrittenObjC("function MakeName"));
         Assert.StartsWith("public extern", WrittenObjC("function CopiedNot"));
-        Assert.StartsWith("[ReturnsRetained] public extern \"C\" NSString NSMadeString()", WrittenObjC("function NSMadeString"));
+        Assert.StartsWith("[ReturnsRetained]\npublic extern \"C\" NSString NSMadeString()", WrittenObjC("function NSMadeString"));
     }
 
     [Theory]
@@ -358,10 +358,10 @@ public class BindgenTests
     public void AnOptionalProtocolMemberIsOptionalAndARequiredOneIsNot()
     {
         string copying = WrittenObjC("protocol Copying");
-        Assert.Contains("    [Optional] [Selector(\"optionalThing\")] void OptionalThing();\n", copying);
-        Assert.Contains("    [Optional] [Selector(\"optionalFlag\")] bool OptionalFlag { get; }\n", copying);
-        Assert.Contains("    [Selector(\"requiredThing\")] void RequiredThing();\n", copying);
-        Assert.Contains("    [Selector(\"copyWithZone:\")] AnyObject CopyWithZone(void* zone);\n", copying);
+        Assert.Contains("    [Optional]\n    [Selector(\"optionalThing\")]\n    void OptionalThing();\n", copying);
+        Assert.Contains("    [Optional]\n    [Selector(\"optionalFlag\")]\n    bool OptionalFlag { get; }\n", copying);
+        Assert.Contains("    [Selector(\"requiredThing\")]\n    void RequiredThing();\n", copying);
+        Assert.Contains("    [Selector(\"copyWithZone:\")]\n    AnyObject CopyWithZone(void* zone);\n", copying);
     }
 
     [Fact]
@@ -373,17 +373,17 @@ public class BindgenTests
         Assert.Equal("public extern objc class NSError : NSObject { }\n", WrittenObjC("class NSError"));
 
     [Theory]
-    [InlineData("    [Selector(\"length\")] public ulong Length { get; }\n")]
-    [InlineData("    [Selector(\"empty\")] public static NSString Empty { get; }\n")]
-    [InlineData("    [Selector(\"title\", \"setTitle:\")] public NSString? Title { get; set; }\n")]
-    [InlineData("    [Selector(\"isOpen\", \"setOpen:\")] public bool Open { get; set; }\n")]
-    [InlineData("    [Selector(\"initWithCoder:\")] public Self? InitWithCoder(AnyObject coder);\n")]
-    [InlineData("    [Selector(\"writeToFile:error:\")] public bool WriteToFileError(NSString path, out NSError? error);\n")]
-    [InlineData("    [Selector(\"enumerateLines:\")] public void EnumerateLines(NSStringEnumerateLinesBlock block);\n")]
-    [InlineData("    [Selector(\"cfString\")] public CFStringRef CfString();\n")]
-    [InlineData("    [Selector(\"copier\")] public Copying Copier();\n")]
-    [InlineData("    [ReturnsRetained] [Selector(\"madeThing\")] public NSString MadeThing();\n")]
-    [InlineData("    [Selector(\"loose\")] public NSString? Loose();\n")]
+    [InlineData("    [Selector(\"length\")]\n    public ulong Length { get; }\n")]
+    [InlineData("    [Selector(\"empty\")]\n    public static NSString Empty { get; }\n")]
+    [InlineData("    [Selector(\"title\", \"setTitle:\")]\n    public NSString? Title { get; set; }\n")]
+    [InlineData("    [Selector(\"isOpen\", \"setOpen:\")]\n    public bool Open { get; set; }\n")]
+    [InlineData("    [Selector(\"initWithCoder:\")]\n    public Self? InitWithCoder(AnyObject coder);\n")]
+    [InlineData("    [Selector(\"writeToFile:error:\")]\n    public bool WriteToFileError(NSString path, out NSError? error);\n")]
+    [InlineData("    [Selector(\"enumerateLines:\")]\n    public void EnumerateLines(NSStringEnumerateLinesBlock block);\n")]
+    [InlineData("    [Selector(\"cfString\")]\n    public CFStringRef CfString();\n")]
+    [InlineData("    [Selector(\"copier\")]\n    public Copying Copier();\n")]
+    [InlineData("    [ReturnsRetained]\n    [Selector(\"madeThing\")]\n    public NSString MadeThing();\n")]
+    [InlineData("    [Selector(\"loose\")]\n    public NSString? Loose();\n")]
     public void AClassMemberIsAMessageNamedByItsSelector(string member) =>
         Assert.Contains(member, WrittenObjC("class NSString"));
 
@@ -428,25 +428,25 @@ public class BindgenTests
 
     [Fact]
     public void AVariadicMessageIsVariadic() =>
-        Assert.Contains("    [Selector(\"stringWithFormat:\")] public NSString StringWithFormat(NSString format, ...);\n",
+        Assert.Contains("    [Selector(\"stringWithFormat:\")]\n    public NSString StringWithFormat(NSString format, ...);\n",
             WrittenObjC("class NSString"));
 
     [Fact]
     public void AProtocolsClassMemberIsARequirementEachClassAnswers() =>
-        Assert.Contains("    [Selector(\"supportsCopying\")] static abstract bool SupportsCopying();\n",
+        Assert.Contains("    [Selector(\"supportsCopying\")]\n    static abstract bool SupportsCopying();\n",
             WrittenObjC("protocol Copying"));
 
     [Fact]
     public void AGenericClassIsErased() =>
         Assert.Equal(
             "public extern objc class NSArray : NSObject\n{\n" +
-            "    [Selector(\"objectAtIndex:\")] public AnyObject ObjectAtIndex(ulong index);\n" +
-            "    [Selector(\"arrayByAddingObject:\")] public NSArray ArrayByAddingObject(AnyObject object);\n}\n",
+            "    [Selector(\"objectAtIndex:\")]\n    public AnyObject ObjectAtIndex(ulong index);\n" +
+            "    [Selector(\"arrayByAddingObject:\")]\n    public NSArray ArrayByAddingObject(AnyObject object);\n}\n",
             WrittenObjC("class NSArray"));
 
     [Fact]
     public void ACategoryIsTheClassDeclaredAgainWithItsProtocols() =>
-        Assert.Contains("public extern objc class NSString : NSObjectProtocol\n{\n    [Selector(\"draw\")] public void Draw();\n",
+        Assert.Contains("public extern objc class NSString : NSObjectProtocol\n{\n    [Selector(\"draw\")]\n    public void Draw();\n",
             WrittenObjC("category NSString(Drawing) objc.h"));
 
     [Fact]

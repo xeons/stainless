@@ -32,93 +32,155 @@ import Standard.ObjC;
 
 public extern objc class NSValue : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("objCType")] public byte* ObjCType { get; }
-    [Selector("getValue:size:")] public void GetValueSize(void* value, NSUInteger size);
-    [Selector("initWithBytes:objCType:")] public Self InitWithBytesObjCType(void* value, byte* type);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("objCType")]
+    public byte* ObjCType { get; }
+    [Selector("getValue:size:")]
+    public void GetValueSize(void* value, NSUInteger size);
+    [Selector("initWithBytes:objCType:")]
+    public Self InitWithBytesObjCType(void* value, byte* type);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 /// NSValueCreation, a category of NSValue.
 public extern objc class NSValue
 {
-    [Selector("valueWithBytes:objCType:")] public static NSValue ValueWithBytesObjCType(void* value, byte* type);
-    [Selector("value:withObjCType:")] public static NSValue ValueWithObjCType(void* value, byte* type);
+    [Selector("valueWithBytes:objCType:")]
+    public static NSValue ValueWithBytesObjCType(void* value, byte* type);
+    [Selector("value:withObjCType:")]
+    public static NSValue ValueWithObjCType(void* value, byte* type);
 }
 
 /// NSValueExtensionMethods, a category of NSValue.
 public extern objc class NSValue
 {
-    [Selector("nonretainedObjectValue")] public AnyObject? NonretainedObjectValue { get; }
-    [Selector("pointerValue")] public void* PointerValue { get; }
-    [Selector("valueWithNonretainedObject:")] public static NSValue ValueWithNonretainedObject(AnyObject? anObject);
-    [Selector("valueWithPointer:")] public static NSValue ValueWithPointer(void* pointer);
-    [Selector("isEqualToValue:")] public bool IsEqualToValue(NSValue value);
+    [Selector("nonretainedObjectValue")]
+    public AnyObject? NonretainedObjectValue { get; }
+    [Selector("pointerValue")]
+    public void* PointerValue { get; }
+    [Selector("valueWithNonretainedObject:")]
+    public static NSValue ValueWithNonretainedObject(AnyObject? anObject);
+    [Selector("valueWithPointer:")]
+    public static NSValue ValueWithPointer(void* pointer);
+    [Selector("isEqualToValue:")]
+    public bool IsEqualToValue(NSValue value);
 }
 
 public extern objc class NSNumber : NSValue
 {
-    [Selector("charValue")] public byte CharValue { get; }
-    [Selector("unsignedCharValue")] public byte UnsignedCharValue { get; }
-    [Selector("shortValue")] public short ShortValue { get; }
-    [Selector("unsignedShortValue")] public ushort UnsignedShortValue { get; }
-    [Selector("intValue")] public int IntValue { get; }
-    [Selector("unsignedIntValue")] public uint UnsignedIntValue { get; }
-    [Selector("longValue")] public long LongValue { get; }
-    [Selector("unsignedLongValue")] public ulong UnsignedLongValue { get; }
-    [Selector("longLongValue")] public long LongLongValue { get; }
-    [Selector("unsignedLongLongValue")] public ulong UnsignedLongLongValue { get; }
-    [Selector("floatValue")] public float FloatValue { get; }
-    [Selector("doubleValue")] public double DoubleValue { get; }
-    [Selector("boolValue")] public bool BoolValue { get; }
-    [Selector("integerValue")] public NSInteger IntegerValue { get; }
-    [Selector("unsignedIntegerValue")] public NSUInteger UnsignedIntegerValue { get; }
-    [Selector("stringValue")] public NSString StringValue { get; }
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("initWithChar:")] public NSNumber InitWithChar(byte value);
-    [Selector("initWithUnsignedChar:")] public NSNumber InitWithUnsignedChar(byte value);
-    [Selector("initWithShort:")] public NSNumber InitWithShort(short value);
-    [Selector("initWithUnsignedShort:")] public NSNumber InitWithUnsignedShort(ushort value);
-    [Selector("initWithInt:")] public NSNumber InitWithInt(int value);
-    [Selector("initWithUnsignedInt:")] public NSNumber InitWithUnsignedInt(uint value);
-    [Selector("initWithLong:")] public NSNumber InitWithLong(long value);
-    [Selector("initWithUnsignedLong:")] public NSNumber InitWithUnsignedLong(ulong value);
-    [Selector("initWithLongLong:")] public NSNumber InitWithLongLong(long value);
-    [Selector("initWithUnsignedLongLong:")] public NSNumber InitWithUnsignedLongLong(ulong value);
-    [Selector("initWithFloat:")] public NSNumber InitWithFloat(float value);
-    [Selector("initWithDouble:")] public NSNumber InitWithDouble(double value);
-    [Selector("initWithBool:")] public NSNumber InitWithBool(bool value);
-    [Selector("initWithInteger:")] public NSNumber InitWithInteger(NSInteger value);
-    [Selector("initWithUnsignedInteger:")] public NSNumber InitWithUnsignedInteger(NSUInteger value);
-    [Selector("compare:")] public NSComparisonResult Compare(NSNumber otherNumber);
-    [Selector("isEqualToNumber:")] public bool IsEqualToNumber(NSNumber number);
-    [Selector("descriptionWithLocale:")] public NSString DescriptionWithLocale(AnyObject? locale);
+    [Selector("charValue")]
+    public byte CharValue { get; }
+    [Selector("unsignedCharValue")]
+    public byte UnsignedCharValue { get; }
+    [Selector("shortValue")]
+    public short ShortValue { get; }
+    [Selector("unsignedShortValue")]
+    public ushort UnsignedShortValue { get; }
+    [Selector("intValue")]
+    public int IntValue { get; }
+    [Selector("unsignedIntValue")]
+    public uint UnsignedIntValue { get; }
+    [Selector("longValue")]
+    public long LongValue { get; }
+    [Selector("unsignedLongValue")]
+    public ulong UnsignedLongValue { get; }
+    [Selector("longLongValue")]
+    public long LongLongValue { get; }
+    [Selector("unsignedLongLongValue")]
+    public ulong UnsignedLongLongValue { get; }
+    [Selector("floatValue")]
+    public float FloatValue { get; }
+    [Selector("doubleValue")]
+    public double DoubleValue { get; }
+    [Selector("boolValue")]
+    public bool BoolValue { get; }
+    [Selector("integerValue")]
+    public NSInteger IntegerValue { get; }
+    [Selector("unsignedIntegerValue")]
+    public NSUInteger UnsignedIntegerValue { get; }
+    [Selector("stringValue")]
+    public NSString StringValue { get; }
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("initWithChar:")]
+    public NSNumber InitWithChar(byte value);
+    [Selector("initWithUnsignedChar:")]
+    public NSNumber InitWithUnsignedChar(byte value);
+    [Selector("initWithShort:")]
+    public NSNumber InitWithShort(short value);
+    [Selector("initWithUnsignedShort:")]
+    public NSNumber InitWithUnsignedShort(ushort value);
+    [Selector("initWithInt:")]
+    public NSNumber InitWithInt(int value);
+    [Selector("initWithUnsignedInt:")]
+    public NSNumber InitWithUnsignedInt(uint value);
+    [Selector("initWithLong:")]
+    public NSNumber InitWithLong(long value);
+    [Selector("initWithUnsignedLong:")]
+    public NSNumber InitWithUnsignedLong(ulong value);
+    [Selector("initWithLongLong:")]
+    public NSNumber InitWithLongLong(long value);
+    [Selector("initWithUnsignedLongLong:")]
+    public NSNumber InitWithUnsignedLongLong(ulong value);
+    [Selector("initWithFloat:")]
+    public NSNumber InitWithFloat(float value);
+    [Selector("initWithDouble:")]
+    public NSNumber InitWithDouble(double value);
+    [Selector("initWithBool:")]
+    public NSNumber InitWithBool(bool value);
+    [Selector("initWithInteger:")]
+    public NSNumber InitWithInteger(NSInteger value);
+    [Selector("initWithUnsignedInteger:")]
+    public NSNumber InitWithUnsignedInteger(NSUInteger value);
+    [Selector("compare:")]
+    public NSComparisonResult Compare(NSNumber otherNumber);
+    [Selector("isEqualToNumber:")]
+    public bool IsEqualToNumber(NSNumber number);
+    [Selector("descriptionWithLocale:")]
+    public NSString DescriptionWithLocale(AnyObject? locale);
 }
 
 /// NSNumberCreation, a category of NSNumber.
 public extern objc class NSNumber
 {
-    [Selector("numberWithChar:")] public static NSNumber NumberWithChar(byte value);
-    [Selector("numberWithUnsignedChar:")] public static NSNumber NumberWithUnsignedChar(byte value);
-    [Selector("numberWithShort:")] public static NSNumber NumberWithShort(short value);
-    [Selector("numberWithUnsignedShort:")] public static NSNumber NumberWithUnsignedShort(ushort value);
-    [Selector("numberWithInt:")] public static NSNumber NumberWithInt(int value);
-    [Selector("numberWithUnsignedInt:")] public static NSNumber NumberWithUnsignedInt(uint value);
-    [Selector("numberWithLong:")] public static NSNumber NumberWithLong(long value);
-    [Selector("numberWithUnsignedLong:")] public static NSNumber NumberWithUnsignedLong(ulong value);
-    [Selector("numberWithLongLong:")] public static NSNumber NumberWithLongLong(long value);
-    [Selector("numberWithUnsignedLongLong:")] public static NSNumber NumberWithUnsignedLongLong(ulong value);
-    [Selector("numberWithFloat:")] public static NSNumber NumberWithFloat(float value);
-    [Selector("numberWithDouble:")] public static NSNumber NumberWithDouble(double value);
-    [Selector("numberWithBool:")] public static NSNumber NumberWithBool(bool value);
-    [Selector("numberWithInteger:")] public static NSNumber NumberWithInteger(NSInteger value);
-    [Selector("numberWithUnsignedInteger:")] public static NSNumber NumberWithUnsignedInteger(NSUInteger value);
+    [Selector("numberWithChar:")]
+    public static NSNumber NumberWithChar(byte value);
+    [Selector("numberWithUnsignedChar:")]
+    public static NSNumber NumberWithUnsignedChar(byte value);
+    [Selector("numberWithShort:")]
+    public static NSNumber NumberWithShort(short value);
+    [Selector("numberWithUnsignedShort:")]
+    public static NSNumber NumberWithUnsignedShort(ushort value);
+    [Selector("numberWithInt:")]
+    public static NSNumber NumberWithInt(int value);
+    [Selector("numberWithUnsignedInt:")]
+    public static NSNumber NumberWithUnsignedInt(uint value);
+    [Selector("numberWithLong:")]
+    public static NSNumber NumberWithLong(long value);
+    [Selector("numberWithUnsignedLong:")]
+    public static NSNumber NumberWithUnsignedLong(ulong value);
+    [Selector("numberWithLongLong:")]
+    public static NSNumber NumberWithLongLong(long value);
+    [Selector("numberWithUnsignedLongLong:")]
+    public static NSNumber NumberWithUnsignedLongLong(ulong value);
+    [Selector("numberWithFloat:")]
+    public static NSNumber NumberWithFloat(float value);
+    [Selector("numberWithDouble:")]
+    public static NSNumber NumberWithDouble(double value);
+    [Selector("numberWithBool:")]
+    public static NSNumber NumberWithBool(bool value);
+    [Selector("numberWithInteger:")]
+    public static NSNumber NumberWithInteger(NSInteger value);
+    [Selector("numberWithUnsignedInteger:")]
+    public static NSNumber NumberWithUnsignedInteger(NSUInteger value);
 }
 
 /// NSDeprecated, a category of NSValue.
 public extern objc class NSValue
 {
     /// Deprecated in macOS 100000.
-    [Selector("getValue:")] public void GetValue(void* value);
+    [Selector("getValue:")]
+    public void GetValue(void* value);
 }
 
 #endif

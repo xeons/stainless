@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class HKCategorySample : HKSample
 {
-    [Selector("categoryType")] public HKCategoryType CategoryType { get; }
-    [Selector("value")] public NSInteger Value { get; }
-    [Selector("categorySampleWithType:value:startDate:endDate:metadata:")] public static Self CategorySampleWithTypeValueStartDateEndDateMetadata(HKCategoryType type, NSInteger value, NSDate startDate, NSDate endDate, NSDictionary? metadata);
-    [Selector("categorySampleWithType:value:startDate:endDate:")] public static Self CategorySampleWithTypeValueStartDateEndDate(HKCategoryType type, NSInteger value, NSDate startDate, NSDate endDate);
-    [Selector("categorySampleWithType:value:startDate:endDate:device:metadata:")] public static Self CategorySampleWithTypeValueStartDateEndDateDeviceMetadata(HKCategoryType type, NSInteger value, NSDate startDate, NSDate endDate, HKDevice? device, NSDictionary? metadata);
+    [Selector("categoryType")]
+    public HKCategoryType CategoryType { get; }
+    [Selector("value")]
+    public NSInteger Value { get; }
+    [Selector("categorySampleWithType:value:startDate:endDate:metadata:")]
+    public static Self CategorySampleWithTypeValueStartDateEndDateMetadata(HKCategoryType type, NSInteger value, NSDate startDate, NSDate endDate, NSDictionary? metadata);
+    [Selector("categorySampleWithType:value:startDate:endDate:")]
+    public static Self CategorySampleWithTypeValueStartDateEndDate(HKCategoryType type, NSInteger value, NSDate startDate, NSDate endDate);
+    [Selector("categorySampleWithType:value:startDate:endDate:device:metadata:")]
+    public static Self CategorySampleWithTypeValueStartDateEndDateDeviceMetadata(HKCategoryType type, NSInteger value, NSDate startDate, NSDate endDate, HKDevice? device, NSDictionary? metadata);
 }
 
 public extern "C" NSString HKPredicateKeyPathCategoryValue;

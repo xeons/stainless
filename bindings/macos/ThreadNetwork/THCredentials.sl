@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class THCredentials : NSObject, NSSecureCoding
 {
-    [Selector("networkName")] public NSString? NetworkName { get; }
-    [Selector("extendedPANID")] public NSData? ExtendedPANID { get; }
-    [Selector("borderAgentID")] public NSData? BorderAgentID { get; }
-    [Selector("activeOperationalDataSet")] public NSData? ActiveOperationalDataSet { get; }
-    [Selector("networkKey")] public NSData? NetworkKey { get; }
-    [Selector("PSKC")] public NSData? PSKC { get; }
-    [Selector("channel", "setChannel:")] public byte Channel { get; set; }
-    [Selector("panID")] public NSData? PanID { get; }
-    [Selector("creationDate")] public NSDate? CreationDate { get; }
-    [Selector("lastModificationDate")] public NSDate? LastModificationDate { get; }
+    [Selector("networkName")]
+    public NSString? NetworkName { get; }
+    [Selector("extendedPANID")]
+    public NSData? ExtendedPANID { get; }
+    [Selector("borderAgentID")]
+    public NSData? BorderAgentID { get; }
+    [Selector("activeOperationalDataSet")]
+    public NSData? ActiveOperationalDataSet { get; }
+    [Selector("networkKey")]
+    public NSData? NetworkKey { get; }
+    [Selector("PSKC")]
+    public NSData? PSKC { get; }
+    [Selector("channel", "setChannel:")]
+    public byte Channel { get; set; }
+    [Selector("panID")]
+    public NSData? PanID { get; }
+    [Selector("creationDate")]
+    public NSDate? CreationDate { get; }
+    [Selector("lastModificationDate")]
+    public NSDate? LastModificationDate { get; }
 }
 
 #endif

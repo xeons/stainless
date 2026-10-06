@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTL4LibraryFunctionDescriptor : MTL4FunctionDescriptor
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("library", "setLibrary:")] public MTLLibrary? Library { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("library", "setLibrary:")]
+    public MTLLibrary? Library { get; set; }
 }
 
 #endif

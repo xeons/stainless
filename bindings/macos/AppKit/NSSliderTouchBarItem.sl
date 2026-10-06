@@ -39,18 +39,30 @@ public extern "C" NSSliderAccessoryWidth NSSliderAccessoryWidthWide;
 
 public extern objc class NSSliderTouchBarItem : NSTouchBarItem
 {
-    [Selector("view")] public NSView? View { get; }
-    [Selector("slider", "setSlider:")] public NSSlider? Slider { get; set; }
-    [Selector("doubleValue", "setDoubleValue:")] public double DoubleValue { get; set; }
-    [Selector("minimumSliderWidth", "setMinimumSliderWidth:")] public CGFloat MinimumSliderWidth { get; set; }
-    [Selector("maximumSliderWidth", "setMaximumSliderWidth:")] public CGFloat MaximumSliderWidth { get; set; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("minimumValueAccessory", "setMinimumValueAccessory:")] public NSSliderAccessory? MinimumValueAccessory { get; set; }
-    [Selector("maximumValueAccessory", "setMaximumValueAccessory:")] public NSSliderAccessory? MaximumValueAccessory { get; set; }
-    [Selector("valueAccessoryWidth", "setValueAccessoryWidth:")] public NSSliderAccessoryWidth ValueAccessoryWidth { get; set; }
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
-    [Selector("action", "setAction:")] public Selector Action { get; set; }
-    [Selector("customizationLabel", "setCustomizationLabel:")] public NSString? CustomizationLabel { get; set; }
+    [Selector("view")]
+    public NSView? View { get; }
+    [Selector("slider", "setSlider:")]
+    public NSSlider? Slider { get; set; }
+    [Selector("doubleValue", "setDoubleValue:")]
+    public double DoubleValue { get; set; }
+    [Selector("minimumSliderWidth", "setMinimumSliderWidth:")]
+    public CGFloat MinimumSliderWidth { get; set; }
+    [Selector("maximumSliderWidth", "setMaximumSliderWidth:")]
+    public CGFloat MaximumSliderWidth { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("minimumValueAccessory", "setMinimumValueAccessory:")]
+    public NSSliderAccessory? MinimumValueAccessory { get; set; }
+    [Selector("maximumValueAccessory", "setMaximumValueAccessory:")]
+    public NSSliderAccessory? MaximumValueAccessory { get; set; }
+    [Selector("valueAccessoryWidth", "setValueAccessoryWidth:")]
+    public NSSliderAccessoryWidth ValueAccessoryWidth { get; set; }
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
+    [Selector("action", "setAction:")]
+    public Selector Action { get; set; }
+    [Selector("customizationLabel", "setCustomizationLabel:")]
+    public NSString? CustomizationLabel { get; set; }
 }
 
 #endif

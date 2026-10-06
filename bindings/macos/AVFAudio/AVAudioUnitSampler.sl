@@ -32,14 +32,21 @@ import Standard.ObjC;
 
 public extern objc class AVAudioUnitSampler : AVAudioUnitMIDIInstrument
 {
-    [Selector("stereoPan", "setStereoPan:")] public float StereoPan { get; set; }
-    [Selector("overallGain", "setOverallGain:")] public float OverallGain { get; set; }
+    [Selector("stereoPan", "setStereoPan:")]
+    public float StereoPan { get; set; }
+    [Selector("overallGain", "setOverallGain:")]
+    public float OverallGain { get; set; }
     /// Deprecated in macOS 12.0.
-    [Selector("masterGain", "setMasterGain:")] public float MasterGain { get; set; }
-    [Selector("globalTuning", "setGlobalTuning:")] public float GlobalTuning { get; set; }
-    [Selector("loadSoundBankInstrumentAtURL:program:bankMSB:bankLSB:error:")] public bool LoadSoundBankInstrumentAtURLProgramBankMSBBankLSBError(NSURL bankURL, byte program, byte bankMSB, byte bankLSB, out NSError? outError);
-    [Selector("loadInstrumentAtURL:error:")] public bool LoadInstrumentAtURLError(NSURL instrumentURL, out NSError? outError);
-    [Selector("loadAudioFilesAtURLs:error:")] public bool LoadAudioFilesAtURLsError(NSArray audioFiles, out NSError? outError);
+    [Selector("masterGain", "setMasterGain:")]
+    public float MasterGain { get; set; }
+    [Selector("globalTuning", "setGlobalTuning:")]
+    public float GlobalTuning { get; set; }
+    [Selector("loadSoundBankInstrumentAtURL:program:bankMSB:bankLSB:error:")]
+    public bool LoadSoundBankInstrumentAtURLProgramBankMSBBankLSBError(NSURL bankURL, byte program, byte bankMSB, byte bankLSB, out NSError? outError);
+    [Selector("loadInstrumentAtURL:error:")]
+    public bool LoadInstrumentAtURLError(NSURL instrumentURL, out NSError? outError);
+    [Selector("loadAudioFilesAtURLs:error:")]
+    public bool LoadAudioFilesAtURLsError(NSArray audioFiles, out NSError? outError);
 }
 
 #endif

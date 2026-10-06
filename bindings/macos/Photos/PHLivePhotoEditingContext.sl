@@ -45,16 +45,26 @@ public objc closure void PHLivePhotoEditingContextSaveLivePhotoToOutputOptionsCo
 
 public extern objc class PHLivePhotoEditingContext : NSObject
 {
-    [Selector("fullSizeImage")] public CIImage FullSizeImage { get; }
-    [Selector("duration")] public CMTime Duration { get; }
-    [Selector("photoTime")] public CMTime PhotoTime { get; }
-    [Selector("frameProcessor", "setFrameProcessor:")] public PHLivePhotoFrameProcessingBlock? FrameProcessor { get; set; }
-    [Selector("audioVolume", "setAudioVolume:")] public float AudioVolume { get; set; }
-    [Selector("orientation")] public CGImagePropertyOrientation Orientation { get; }
-    [Selector("initWithLivePhotoEditingInput:")] public Self? InitWithLivePhotoEditingInput(PHContentEditingInput livePhotoInput);
-    [Selector("prepareLivePhotoForPlaybackWithTargetSize:options:completionHandler:")] public void PrepareLivePhotoForPlaybackWithTargetSizeOptionsCompletionHandler(CGSize targetSize, NSDictionary? options, PHLivePhotoEditingContextPrepareLivePhotoForPlaybackWithTargetSizeOptionsCompletionHandlerHandlerBlock handler);
-    [Selector("saveLivePhotoToOutput:options:completionHandler:")] public void SaveLivePhotoToOutputOptionsCompletionHandler(PHContentEditingOutput output, NSDictionary? options, PHLivePhotoEditingContextSaveLivePhotoToOutputOptionsCompletionHandlerHandlerBlock handler);
-    [Selector("cancel")] public void Cancel();
+    [Selector("fullSizeImage")]
+    public CIImage FullSizeImage { get; }
+    [Selector("duration")]
+    public CMTime Duration { get; }
+    [Selector("photoTime")]
+    public CMTime PhotoTime { get; }
+    [Selector("frameProcessor", "setFrameProcessor:")]
+    public PHLivePhotoFrameProcessingBlock? FrameProcessor { get; set; }
+    [Selector("audioVolume", "setAudioVolume:")]
+    public float AudioVolume { get; set; }
+    [Selector("orientation")]
+    public CGImagePropertyOrientation Orientation { get; }
+    [Selector("initWithLivePhotoEditingInput:")]
+    public Self? InitWithLivePhotoEditingInput(PHContentEditingInput livePhotoInput);
+    [Selector("prepareLivePhotoForPlaybackWithTargetSize:options:completionHandler:")]
+    public void PrepareLivePhotoForPlaybackWithTargetSizeOptionsCompletionHandler(CGSize targetSize, NSDictionary? options, PHLivePhotoEditingContextPrepareLivePhotoForPlaybackWithTargetSizeOptionsCompletionHandlerHandlerBlock handler);
+    [Selector("saveLivePhotoToOutput:options:completionHandler:")]
+    public void SaveLivePhotoToOutputOptionsCompletionHandler(PHContentEditingOutput output, NSDictionary? options, PHLivePhotoEditingContextSaveLivePhotoToOutputOptionsCompletionHandlerHandlerBlock handler);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 public enum PHLivePhotoFrameType : long
@@ -65,10 +75,14 @@ public enum PHLivePhotoFrameType : long
 
 public objc interface PHLivePhotoFrame
 {
-    [Selector("image")] CIImage Image { get; }
-    [Selector("time")] CMTime Time { get; }
-    [Selector("type")] PHLivePhotoFrameType Type { get; }
-    [Selector("renderScale")] CGFloat RenderScale { get; }
+    [Selector("image")]
+    CIImage Image { get; }
+    [Selector("time")]
+    CMTime Time { get; }
+    [Selector("type")]
+    PHLivePhotoFrameType Type { get; }
+    [Selector("renderScale")]
+    CGFloat RenderScale { get; }
 }
 
 public extern "C" PHLivePhotoEditingOption PHLivePhotoShouldRenderAtPlaybackTime;

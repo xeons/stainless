@@ -35,12 +35,18 @@ import Standard.ObjC;
 
 public extern objc class SNClassifySoundRequest : NSObject, SNRequest
 {
-    [Selector("overlapFactor", "setOverlapFactor:")] public double OverlapFactor { get; set; }
-    [Selector("windowDuration", "setWindowDuration:")] public CMTime WindowDuration { get; set; }
-    [Selector("windowDurationConstraint")] public SNTimeDurationConstraint? WindowDurationConstraint { get; }
-    [Selector("knownClassifications")] public NSArray KnownClassifications { get; }
-    [Selector("initWithMLModel:error:")] public Self? InitWithMLModelError(MLModel mlModel, out NSError? error);
-    [Selector("initWithClassifierIdentifier:error:")] public Self? InitWithClassifierIdentifierError(SNClassifierIdentifier classifierIdentifier, out NSError? error);
+    [Selector("overlapFactor", "setOverlapFactor:")]
+    public double OverlapFactor { get; set; }
+    [Selector("windowDuration", "setWindowDuration:")]
+    public CMTime WindowDuration { get; set; }
+    [Selector("windowDurationConstraint")]
+    public SNTimeDurationConstraint? WindowDurationConstraint { get; }
+    [Selector("knownClassifications")]
+    public NSArray KnownClassifications { get; }
+    [Selector("initWithMLModel:error:")]
+    public Self? InitWithMLModelError(MLModel mlModel, out NSError? error);
+    [Selector("initWithClassifierIdentifier:error:")]
+    public Self? InitWithClassifierIdentifierError(SNClassifierIdentifier classifierIdentifier, out NSError? error);
 }
 
 #endif

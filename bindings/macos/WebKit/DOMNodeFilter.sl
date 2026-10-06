@@ -51,7 +51,8 @@ public const uint DOM_SHOW_NOTATION = 2048;
 /// Deprecated in macOS 10.14.
 public objc interface DOMNodeFilter : NSObjectProtocol
 {
-    [Selector("acceptNode:")] short AcceptNode(DOMNode? n);
+    [Selector("acceptNode:")]
+    short AcceptNode(DOMNode? n);
 }
 
 #endif

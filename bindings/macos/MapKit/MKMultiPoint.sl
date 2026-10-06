@@ -35,11 +35,16 @@ import Standard.ObjC;
 
 public extern objc class MKMultiPoint : MKShape
 {
-    [Selector("pointCount")] public NSUInteger PointCount { get; }
-    [Selector("points")] public MKMapPoint* Points();
-    [Selector("getCoordinates:range:")] public void GetCoordinatesRange(CLLocationCoordinate2D* coords, NSRange range);
-    [Selector("locationAtPointIndex:")] public CGFloat LocationAtPointIndex(NSUInteger index);
-    [Selector("locationsAtPointIndexes:")] public NSArray LocationsAtPointIndexes(NSIndexSet indexes);
+    [Selector("pointCount")]
+    public NSUInteger PointCount { get; }
+    [Selector("points")]
+    public MKMapPoint* Points();
+    [Selector("getCoordinates:range:")]
+    public void GetCoordinatesRange(CLLocationCoordinate2D* coords, NSRange range);
+    [Selector("locationAtPointIndex:")]
+    public CGFloat LocationAtPointIndex(NSUInteger index);
+    [Selector("locationsAtPointIndexes:")]
+    public NSArray LocationsAtPointIndexes(NSIndexSet indexes);
 }
 
 #endif

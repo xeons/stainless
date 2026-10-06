@@ -35,12 +35,18 @@ import Standard.ObjC;
 public extern objc class SFSafariToolbarItem : NSObject, NSCopying, NSSecureCoding
 {
     /// Deprecated in macOS 10.13.
-    [Selector("setEnabled:withBadgeText:")] public void SetEnabledWithBadgeText(bool enabled, NSString? badgeText);
-    [Selector("setEnabled:")] public void SetEnabled(bool enabled);
-    [Selector("setBadgeText:")] public void SetBadgeText(NSString? badgeText);
-    [Selector("setImage:")] public void SetImage(NSImage? image);
-    [Selector("setLabel:")] public void SetLabel(NSString? label);
-    [Selector("showPopover")] public void ShowPopover();
+    [Selector("setEnabled:withBadgeText:")]
+    public void SetEnabledWithBadgeText(bool enabled, NSString? badgeText);
+    [Selector("setEnabled:")]
+    public void SetEnabled(bool enabled);
+    [Selector("setBadgeText:")]
+    public void SetBadgeText(NSString? badgeText);
+    [Selector("setImage:")]
+    public void SetImage(NSImage? image);
+    [Selector("setLabel:")]
+    public void SetLabel(NSString? label);
+    [Selector("showPopover")]
+    public void ShowPopover();
 }
 
 #endif

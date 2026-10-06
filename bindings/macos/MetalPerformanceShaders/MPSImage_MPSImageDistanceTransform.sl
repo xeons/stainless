@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class MPSImageEuclideanDistanceTransform : MPSUnaryImageKernel
 {
-    [Selector("searchLimitRadius", "setSearchLimitRadius:")] public float SearchLimitRadius { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("searchLimitRadius", "setSearchLimitRadius:")]
+    public float SearchLimitRadius { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 #endif

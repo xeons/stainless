@@ -45,14 +45,22 @@ public objc closure void NSItemProviderLoadFileRepresentationForContentTypeOpenI
 /// UTType, a category of NSItemProvider.
 public extern objc class NSItemProvider
 {
-    [Selector("registeredContentTypes")] public NSArray RegisteredContentTypes { get; }
-    [Selector("registeredContentTypesForOpenInPlace")] public NSArray RegisteredContentTypesForOpenInPlace { get; }
-    [Selector("initWithContentsOfURL:contentType:openInPlace:coordinated:visibility:")] public Self InitWithContentsOfURLContentTypeOpenInPlaceCoordinatedVisibility(NSURL fileURL, UTType? contentType, bool openInPlace, bool coordinated, NSItemProviderRepresentationVisibility visibility);
-    [Selector("registerDataRepresentationForContentType:visibility:loadHandler:")] public void RegisterDataRepresentationForContentTypeVisibilityLoadHandler(UTType contentType, NSItemProviderRepresentationVisibility visibility, NSItemProviderRegisterDataRepresentationForContentTypeVisibilityLoadHandlerLoadHandlerBlock loadHandler);
-    [Selector("registerFileRepresentationForContentType:visibility:openInPlace:loadHandler:")] public void RegisterFileRepresentationForContentTypeVisibilityOpenInPlaceLoadHandler(UTType contentType, NSItemProviderRepresentationVisibility visibility, bool openInPlace, NSItemProviderRegisterFileRepresentationForContentTypeVisibilityOpenInPlaceLoadHandlerLoadHandlerBlock loadHandler);
-    [Selector("registeredContentTypesConformingToContentType:")] public NSArray RegisteredContentTypesConformingToContentType(UTType contentType);
-    [Selector("loadDataRepresentationForContentType:completionHandler:")] public NSProgress LoadDataRepresentationForContentTypeCompletionHandler(UTType contentType, NSItemProviderLoadDataRepresentationForContentTypeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadFileRepresentationForContentType:openInPlace:completionHandler:")] public NSProgress LoadFileRepresentationForContentTypeOpenInPlaceCompletionHandler(UTType contentType, bool openInPlace, NSItemProviderLoadFileRepresentationForContentTypeOpenInPlaceCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("registeredContentTypes")]
+    public NSArray RegisteredContentTypes { get; }
+    [Selector("registeredContentTypesForOpenInPlace")]
+    public NSArray RegisteredContentTypesForOpenInPlace { get; }
+    [Selector("initWithContentsOfURL:contentType:openInPlace:coordinated:visibility:")]
+    public Self InitWithContentsOfURLContentTypeOpenInPlaceCoordinatedVisibility(NSURL fileURL, UTType? contentType, bool openInPlace, bool coordinated, NSItemProviderRepresentationVisibility visibility);
+    [Selector("registerDataRepresentationForContentType:visibility:loadHandler:")]
+    public void RegisterDataRepresentationForContentTypeVisibilityLoadHandler(UTType contentType, NSItemProviderRepresentationVisibility visibility, NSItemProviderRegisterDataRepresentationForContentTypeVisibilityLoadHandlerLoadHandlerBlock loadHandler);
+    [Selector("registerFileRepresentationForContentType:visibility:openInPlace:loadHandler:")]
+    public void RegisterFileRepresentationForContentTypeVisibilityOpenInPlaceLoadHandler(UTType contentType, NSItemProviderRepresentationVisibility visibility, bool openInPlace, NSItemProviderRegisterFileRepresentationForContentTypeVisibilityOpenInPlaceLoadHandlerLoadHandlerBlock loadHandler);
+    [Selector("registeredContentTypesConformingToContentType:")]
+    public NSArray RegisteredContentTypesConformingToContentType(UTType contentType);
+    [Selector("loadDataRepresentationForContentType:completionHandler:")]
+    public NSProgress LoadDataRepresentationForContentTypeCompletionHandler(UTType contentType, NSItemProviderLoadDataRepresentationForContentTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadFileRepresentationForContentType:openInPlace:completionHandler:")]
+    public NSProgress LoadFileRepresentationForContentTypeOpenInPlaceCompletionHandler(UTType contentType, bool openInPlace, NSItemProviderLoadFileRepresentationForContentTypeOpenInPlaceCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

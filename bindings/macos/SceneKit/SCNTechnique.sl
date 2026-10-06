@@ -34,18 +34,26 @@ import Standard.ObjC;
 
 public extern objc class SCNTechnique : NSObject, SCNAnimatable, NSCopying, NSSecureCoding
 {
-    [Selector("dictionaryRepresentation")] public NSDictionary DictionaryRepresentation { get; }
-    [Selector("library", "setLibrary:")] public MTLLibrary? Library { get; set; }
-    [Selector("techniqueWithDictionary:")] public static SCNTechnique? TechniqueWithDictionary(NSDictionary dictionary);
-    [Selector("techniqueBySequencingTechniques:")] public static SCNTechnique? TechniqueBySequencingTechniques(NSArray techniques);
-    [Selector("handleBindingOfSymbol:usingBlock:")] public void HandleBindingOfSymbolUsingBlock(NSString symbol, SCNBindingBlock? block);
-    [Selector("objectForKeyedSubscript:")] public AnyObject? ObjectForKeyedSubscript(AnyObject key);
-    [Selector("setObject:forKeyedSubscript:")] public void SetObjectForKeyedSubscript(AnyObject? obj, NSCopying key);
+    [Selector("dictionaryRepresentation")]
+    public NSDictionary DictionaryRepresentation { get; }
+    [Selector("library", "setLibrary:")]
+    public MTLLibrary? Library { get; set; }
+    [Selector("techniqueWithDictionary:")]
+    public static SCNTechnique? TechniqueWithDictionary(NSDictionary dictionary);
+    [Selector("techniqueBySequencingTechniques:")]
+    public static SCNTechnique? TechniqueBySequencingTechniques(NSArray techniques);
+    [Selector("handleBindingOfSymbol:usingBlock:")]
+    public void HandleBindingOfSymbolUsingBlock(NSString symbol, SCNBindingBlock? block);
+    [Selector("objectForKeyedSubscript:")]
+    public AnyObject? ObjectForKeyedSubscript(AnyObject key);
+    [Selector("setObject:forKeyedSubscript:")]
+    public void SetObjectForKeyedSubscript(AnyObject? obj, NSCopying key);
 }
 
 public objc interface SCNTechniqueSupport : NSObjectProtocol
 {
-    [Selector("technique", "setTechnique:")] SCNTechnique? Technique { get; set; }
+    [Selector("technique", "setTechnique:")]
+    SCNTechnique? Technique { get; set; }
 }
 
 #endif

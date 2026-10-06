@@ -34,9 +34,12 @@ import Standard.ObjC;
 
 public extern objc class SFKeychainSettingsPanel : NSPanel
 {
-    [Selector("sharedKeychainSettingsPanel")] public static SFKeychainSettingsPanel? SharedKeychainSettingsPanel();
-    [Selector("runModalForSettings:keychain:")] public NSInteger RunModalForSettingsKeychain(SecKeychainSettings* settings, SecKeychainRef? keychain);
-    [Selector("beginSheetForWindow:modalDelegate:didEndSelector:contextInfo:settings:keychain:")] public void BeginSheetForWindowModalDelegateDidEndSelectorContextInfoSettingsKeychain(NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo, SecKeychainSettings* settings, SecKeychainRef? keychain);
+    [Selector("sharedKeychainSettingsPanel")]
+    public static SFKeychainSettingsPanel? SharedKeychainSettingsPanel();
+    [Selector("runModalForSettings:keychain:")]
+    public NSInteger RunModalForSettingsKeychain(SecKeychainSettings* settings, SecKeychainRef? keychain);
+    [Selector("beginSheetForWindow:modalDelegate:didEndSelector:contextInfo:settings:keychain:")]
+    public void BeginSheetForWindowModalDelegateDidEndSelectorContextInfoSettingsKeychain(NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo, SecKeychainSettings* settings, SecKeychainRef? keychain);
 }
 
 #endif

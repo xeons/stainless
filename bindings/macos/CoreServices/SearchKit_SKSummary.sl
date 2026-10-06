@@ -37,19 +37,24 @@ public extern objc class SKSummaryRef : CFTypeRef { }
 
 public extern "C" CFTypeID SKSummaryGetTypeID();
 
-[ReturnsRetained] public extern "C" SKSummaryRef? SKSummaryCreateWithString(CFStringRef? inString);
+[ReturnsRetained]
+public extern "C" SKSummaryRef? SKSummaryCreateWithString(CFStringRef? inString);
 
 public extern "C" CFIndex SKSummaryGetSentenceCount(SKSummaryRef? summary);
 
 public extern "C" CFIndex SKSummaryGetParagraphCount(SKSummaryRef? summary);
 
-[ReturnsRetained] public extern "C" CFStringRef? SKSummaryCopySentenceAtIndex(SKSummaryRef? summary, CFIndex i);
+[ReturnsRetained]
+public extern "C" CFStringRef? SKSummaryCopySentenceAtIndex(SKSummaryRef? summary, CFIndex i);
 
-[ReturnsRetained] public extern "C" CFStringRef? SKSummaryCopyParagraphAtIndex(SKSummaryRef? summary, CFIndex i);
+[ReturnsRetained]
+public extern "C" CFStringRef? SKSummaryCopyParagraphAtIndex(SKSummaryRef? summary, CFIndex i);
 
-[ReturnsRetained] public extern "C" CFStringRef? SKSummaryCopySentenceSummaryString(SKSummaryRef? summary, CFIndex numSentences);
+[ReturnsRetained]
+public extern "C" CFStringRef? SKSummaryCopySentenceSummaryString(SKSummaryRef? summary, CFIndex numSentences);
 
-[ReturnsRetained] public extern "C" CFStringRef? SKSummaryCopyParagraphSummaryString(SKSummaryRef? summary, CFIndex numParagraphs);
+[ReturnsRetained]
+public extern "C" CFStringRef? SKSummaryCopyParagraphSummaryString(SKSummaryRef? summary, CFIndex numParagraphs);
 
 public extern "C" CFIndex SKSummaryGetSentenceSummaryInfo(SKSummaryRef? summary, CFIndex numSentencesInSummary, CFIndex* outRankOrderOfSentences, CFIndex* outSentenceIndexOfSentences, CFIndex* outParagraphIndexOfSentences);
 

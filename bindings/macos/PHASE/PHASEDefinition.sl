@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class PHASEDefinition : NSObject
 {
-    [Selector("identifier")] public NSString Identifier { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
 }
 
 #endif

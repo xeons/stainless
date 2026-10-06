@@ -34,8 +34,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.0.
 public extern objc class MPSAccelerationStructureGroup : NSObject
 {
-    [Selector("device")] public MTLDevice Device { get; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("device")]
+    public MTLDevice Device { get; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 #endif

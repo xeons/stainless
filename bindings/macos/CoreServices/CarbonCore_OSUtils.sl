@@ -110,10 +110,12 @@ public extern "C" void ReadLocation(MachineLocation* loc);
 public extern "C" UInt32 TickCount();
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFStringRef? CSCopyUserName(Boolean useShortName);
+[ReturnsRetained]
+public extern "C" CFStringRef? CSCopyUserName(Boolean useShortName);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFStringRef? CSCopyMachineName();
+[ReturnsRetained]
+public extern "C" CFStringRef? CSCopyMachineName();
 
 /// Deprecated in macOS 10.4.
 public const int useFree = 0;

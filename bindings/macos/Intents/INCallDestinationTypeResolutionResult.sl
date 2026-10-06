@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class INCallDestinationTypeResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedCallDestinationType:")] public static Self SuccessWithResolvedCallDestinationType(INCallDestinationType resolvedCallDestinationType);
-    [Selector("confirmationRequiredWithCallDestinationTypeToConfirm:")] public static Self ConfirmationRequiredWithCallDestinationTypeToConfirm(INCallDestinationType callDestinationTypeToConfirm);
+    [Selector("successWithResolvedCallDestinationType:")]
+    public static Self SuccessWithResolvedCallDestinationType(INCallDestinationType resolvedCallDestinationType);
+    [Selector("confirmationRequiredWithCallDestinationTypeToConfirm:")]
+    public static Self ConfirmationRequiredWithCallDestinationTypeToConfirm(INCallDestinationType callDestinationTypeToConfirm);
 }
 
 #endif

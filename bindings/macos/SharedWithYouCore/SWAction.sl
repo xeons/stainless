@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class SWAction : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("uuid")] public NSUUID Uuid { get; }
-    [Selector("isComplete")] public bool Complete { get; }
-    [Selector("fulfill")] public void Fulfill();
-    [Selector("fail")] public void Fail();
+    [Selector("uuid")]
+    public NSUUID Uuid { get; }
+    [Selector("isComplete")]
+    public bool Complete { get; }
+    [Selector("fulfill")]
+    public void Fulfill();
+    [Selector("fail")]
+    public void Fail();
 }
 
 #endif

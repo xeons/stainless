@@ -35,19 +35,27 @@ public objc closure void MTRAsyncCallbackReadyHandler(AnyObject arg0, NSUInteger
 /// Deprecated in macOS 14.2.
 public extern objc class MTRAsyncCallbackWorkQueue : NSObject
 {
-    [Selector("initWithContext:queue:")] public Self InitWithContextQueue(AnyObject? context, dispatch_queue_t queue);
-    [Selector("invalidate")] public void Invalidate();
-    [Selector("enqueueWorkItem:")] public void EnqueueWorkItem(MTRAsyncCallbackQueueWorkItem item);
+    [Selector("initWithContext:queue:")]
+    public Self InitWithContextQueue(AnyObject? context, dispatch_queue_t queue);
+    [Selector("invalidate")]
+    public void Invalidate();
+    [Selector("enqueueWorkItem:")]
+    public void EnqueueWorkItem(MTRAsyncCallbackQueueWorkItem item);
 }
 
 /// Deprecated in macOS 14.2.
 public extern objc class MTRAsyncCallbackQueueWorkItem : NSObject
 {
-    [Selector("readyHandler", "setReadyHandler:")] public MTRAsyncCallbackReadyHandler ReadyHandler { get; set; }
-    [Selector("cancelHandler", "setCancelHandler:")] public dispatch_block_t CancelHandler { get; set; }
-    [Selector("initWithQueue:")] public Self InitWithQueue(dispatch_queue_t queue);
-    [Selector("endWork")] public void EndWork();
-    [Selector("retryWork")] public void RetryWork();
+    [Selector("readyHandler", "setReadyHandler:")]
+    public MTRAsyncCallbackReadyHandler ReadyHandler { get; set; }
+    [Selector("cancelHandler", "setCancelHandler:")]
+    public dispatch_block_t CancelHandler { get; set; }
+    [Selector("initWithQueue:")]
+    public Self InitWithQueue(dispatch_queue_t queue);
+    [Selector("endWork")]
+    public void EndWork();
+    [Selector("retryWork")]
+    public void RetryWork();
 }
 
 #endif

@@ -33,80 +33,115 @@ import Standard.ObjC;
 
 public extern objc class CNChangeHistoryEvent : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("acceptEventVisitor:")] public void AcceptEventVisitor(CNChangeHistoryEventVisitor visitor);
+    [Selector("acceptEventVisitor:")]
+    public void AcceptEventVisitor(CNChangeHistoryEventVisitor visitor);
 }
 
 public extern objc class CNChangeHistoryDropEverythingEvent : CNChangeHistoryEvent { }
 
 public extern objc class CNChangeHistoryAddContactEvent : CNChangeHistoryEvent
 {
-    [Selector("contact")] public CNContact Contact { get; }
-    [Selector("containerIdentifier")] public NSString? ContainerIdentifier { get; }
+    [Selector("contact")]
+    public CNContact Contact { get; }
+    [Selector("containerIdentifier")]
+    public NSString? ContainerIdentifier { get; }
 }
 
 public extern objc class CNChangeHistoryUpdateContactEvent : CNChangeHistoryEvent
 {
-    [Selector("contact")] public CNContact Contact { get; }
+    [Selector("contact")]
+    public CNContact Contact { get; }
 }
 
 public extern objc class CNChangeHistoryDeleteContactEvent : CNChangeHistoryEvent
 {
-    [Selector("contactIdentifier")] public NSString ContactIdentifier { get; }
+    [Selector("contactIdentifier")]
+    public NSString ContactIdentifier { get; }
 }
 
 public extern objc class CNChangeHistoryAddGroupEvent : CNChangeHistoryEvent
 {
-    [Selector("group")] public CNGroup Group { get; }
-    [Selector("containerIdentifier")] public NSString ContainerIdentifier { get; }
+    [Selector("group")]
+    public CNGroup Group { get; }
+    [Selector("containerIdentifier")]
+    public NSString ContainerIdentifier { get; }
 }
 
 public extern objc class CNChangeHistoryUpdateGroupEvent : CNChangeHistoryEvent
 {
-    [Selector("group")] public CNGroup Group { get; }
+    [Selector("group")]
+    public CNGroup Group { get; }
 }
 
 public extern objc class CNChangeHistoryDeleteGroupEvent : CNChangeHistoryEvent
 {
-    [Selector("groupIdentifier")] public NSString GroupIdentifier { get; }
+    [Selector("groupIdentifier")]
+    public NSString GroupIdentifier { get; }
 }
 
 public extern objc class CNChangeHistoryAddMemberToGroupEvent : CNChangeHistoryEvent
 {
-    [Selector("member")] public CNContact Member { get; }
-    [Selector("group")] public CNGroup Group { get; }
+    [Selector("member")]
+    public CNContact Member { get; }
+    [Selector("group")]
+    public CNGroup Group { get; }
 }
 
 public extern objc class CNChangeHistoryRemoveMemberFromGroupEvent : CNChangeHistoryEvent
 {
-    [Selector("member")] public CNContact Member { get; }
-    [Selector("group")] public CNGroup Group { get; }
+    [Selector("member")]
+    public CNContact Member { get; }
+    [Selector("group")]
+    public CNGroup Group { get; }
 }
 
 public extern objc class CNChangeHistoryAddSubgroupToGroupEvent : CNChangeHistoryEvent
 {
-    [Selector("subgroup")] public CNGroup Subgroup { get; }
-    [Selector("group")] public CNGroup Group { get; }
+    [Selector("subgroup")]
+    public CNGroup Subgroup { get; }
+    [Selector("group")]
+    public CNGroup Group { get; }
 }
 
 public extern objc class CNChangeHistoryRemoveSubgroupFromGroupEvent : CNChangeHistoryEvent
 {
-    [Selector("subgroup")] public CNGroup Subgroup { get; }
-    [Selector("group")] public CNGroup Group { get; }
+    [Selector("subgroup")]
+    public CNGroup Subgroup { get; }
+    [Selector("group")]
+    public CNGroup Group { get; }
 }
 
 public objc interface CNChangeHistoryEventVisitor : NSObjectProtocol
 {
-    [Selector("visitDropEverythingEvent:")] void VisitDropEverythingEvent(CNChangeHistoryDropEverythingEvent event);
-    [Selector("visitAddContactEvent:")] void VisitAddContactEvent(CNChangeHistoryAddContactEvent event);
-    [Selector("visitUpdateContactEvent:")] void VisitUpdateContactEvent(CNChangeHistoryUpdateContactEvent event);
-    [Selector("visitDeleteContactEvent:")] void VisitDeleteContactEvent(CNChangeHistoryDeleteContactEvent event);
-    [Optional] [Selector("visitAddGroupEvent:")] void VisitAddGroupEvent(CNChangeHistoryAddGroupEvent event);
-    [Optional] [Selector("visitUpdateGroupEvent:")] void VisitUpdateGroupEvent(CNChangeHistoryUpdateGroupEvent event);
-    [Optional] [Selector("visitDeleteGroupEvent:")] void VisitDeleteGroupEvent(CNChangeHistoryDeleteGroupEvent event);
-    [Optional] [Selector("visitAddMemberToGroupEvent:")] void VisitAddMemberToGroupEvent(CNChangeHistoryAddMemberToGroupEvent event);
-    [Optional] [Selector("visitRemoveMemberFromGroupEvent:")] void VisitRemoveMemberFromGroupEvent(CNChangeHistoryRemoveMemberFromGroupEvent event);
-    [Optional] [Selector("visitAddSubgroupToGroupEvent:")] void VisitAddSubgroupToGroupEvent(CNChangeHistoryAddSubgroupToGroupEvent event);
-    [Optional] [Selector("visitRemoveSubgroupFromGroupEvent:")] void VisitRemoveSubgroupFromGroupEvent(CNChangeHistoryRemoveSubgroupFromGroupEvent event);
+    [Selector("visitDropEverythingEvent:")]
+    void VisitDropEverythingEvent(CNChangeHistoryDropEverythingEvent event);
+    [Selector("visitAddContactEvent:")]
+    void VisitAddContactEvent(CNChangeHistoryAddContactEvent event);
+    [Selector("visitUpdateContactEvent:")]
+    void VisitUpdateContactEvent(CNChangeHistoryUpdateContactEvent event);
+    [Selector("visitDeleteContactEvent:")]
+    void VisitDeleteContactEvent(CNChangeHistoryDeleteContactEvent event);
+    [Optional]
+    [Selector("visitAddGroupEvent:")]
+    void VisitAddGroupEvent(CNChangeHistoryAddGroupEvent event);
+    [Optional]
+    [Selector("visitUpdateGroupEvent:")]
+    void VisitUpdateGroupEvent(CNChangeHistoryUpdateGroupEvent event);
+    [Optional]
+    [Selector("visitDeleteGroupEvent:")]
+    void VisitDeleteGroupEvent(CNChangeHistoryDeleteGroupEvent event);
+    [Optional]
+    [Selector("visitAddMemberToGroupEvent:")]
+    void VisitAddMemberToGroupEvent(CNChangeHistoryAddMemberToGroupEvent event);
+    [Optional]
+    [Selector("visitRemoveMemberFromGroupEvent:")]
+    void VisitRemoveMemberFromGroupEvent(CNChangeHistoryRemoveMemberFromGroupEvent event);
+    [Optional]
+    [Selector("visitAddSubgroupToGroupEvent:")]
+    void VisitAddSubgroupToGroupEvent(CNChangeHistoryAddSubgroupToGroupEvent event);
+    [Optional]
+    [Selector("visitRemoveSubgroupFromGroupEvent:")]
+    void VisitRemoveSubgroupFromGroupEvent(CNChangeHistoryRemoveSubgroupFromGroupEvent event);
 }
 
 #endif

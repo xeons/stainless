@@ -79,38 +79,61 @@ public extern "C" CLLocationCoordinate2D CLLocationCoordinate2DMake(CLLocationDe
 
 public extern objc class CLFloor : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("level")] public NSInteger Level { get; }
+    [Selector("level")]
+    public NSInteger Level { get; }
 }
 
 public extern objc class CLLocationSourceInformation : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("isSimulatedBySoftware")] public bool IsSimulatedBySoftware { get; }
-    [Selector("isProducedByAccessory")] public bool IsProducedByAccessory { get; }
-    [Selector("initWithSoftwareSimulationState:andExternalAccessoryState:")] public Self InitWithSoftwareSimulationStateAndExternalAccessoryState(bool isSoftware, bool isAccessory);
+    [Selector("isSimulatedBySoftware")]
+    public bool IsSimulatedBySoftware { get; }
+    [Selector("isProducedByAccessory")]
+    public bool IsProducedByAccessory { get; }
+    [Selector("initWithSoftwareSimulationState:andExternalAccessoryState:")]
+    public Self InitWithSoftwareSimulationStateAndExternalAccessoryState(bool isSoftware, bool isAccessory);
 }
 
 public extern objc class CLLocation : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("coordinate")] public CLLocationCoordinate2D Coordinate { get; }
-    [Selector("altitude")] public CLLocationDistance Altitude { get; }
-    [Selector("ellipsoidalAltitude")] public CLLocationDistance EllipsoidalAltitude { get; }
-    [Selector("horizontalAccuracy")] public CLLocationAccuracy HorizontalAccuracy { get; }
-    [Selector("verticalAccuracy")] public CLLocationAccuracy VerticalAccuracy { get; }
-    [Selector("course")] public CLLocationDirection Course { get; }
-    [Selector("courseAccuracy")] public CLLocationDirectionAccuracy CourseAccuracy { get; }
-    [Selector("speed")] public CLLocationSpeed Speed { get; }
-    [Selector("speedAccuracy")] public CLLocationSpeedAccuracy SpeedAccuracy { get; }
-    [Selector("timestamp")] public NSDate Timestamp { get; }
-    [Selector("floor")] public CLFloor? Floor { get; }
-    [Selector("sourceInformation")] public CLLocationSourceInformation? SourceInformation { get; }
-    [Selector("initWithLatitude:longitude:")] public Self InitWithLatitudeLongitude(CLLocationDegrees latitude, CLLocationDegrees longitude);
-    [Selector("initWithCoordinate:altitude:horizontalAccuracy:verticalAccuracy:timestamp:")] public Self InitWithCoordinateAltitudeHorizontalAccuracyVerticalAccuracyTimestamp(CLLocationCoordinate2D coordinate, CLLocationDistance altitude, CLLocationAccuracy hAccuracy, CLLocationAccuracy vAccuracy, NSDate timestamp);
-    [Selector("initWithCoordinate:altitude:horizontalAccuracy:verticalAccuracy:course:speed:timestamp:")] public Self InitWithCoordinateAltitudeHorizontalAccuracyVerticalAccuracyCourseSpeedTimestamp(CLLocationCoordinate2D coordinate, CLLocationDistance altitude, CLLocationAccuracy hAccuracy, CLLocationAccuracy vAccuracy, CLLocationDirection course, CLLocationSpeed speed, NSDate timestamp);
-    [Selector("initWithCoordinate:altitude:horizontalAccuracy:verticalAccuracy:course:courseAccuracy:speed:speedAccuracy:timestamp:")] public Self InitWithCoordinateAltitudeHorizontalAccuracyVerticalAccuracyCourseCourseAccuracySpeedSpeedAccuracyTimestamp(CLLocationCoordinate2D coordinate, CLLocationDistance altitude, CLLocationAccuracy hAccuracy, CLLocationAccuracy vAccuracy, CLLocationDirection course, CLLocationDirectionAccuracy courseAccuracy, CLLocationSpeed speed, CLLocationSpeedAccuracy speedAccuracy, NSDate timestamp);
-    [Selector("initWithCoordinate:altitude:horizontalAccuracy:verticalAccuracy:course:courseAccuracy:speed:speedAccuracy:timestamp:sourceInfo:")] public Self InitWithCoordinateAltitudeHorizontalAccuracyVerticalAccuracyCourseCourseAccuracySpeedSpeedAccuracyTimestampSourceInfo(CLLocationCoordinate2D coordinate, CLLocationDistance altitude, CLLocationAccuracy hAccuracy, CLLocationAccuracy vAccuracy, CLLocationDirection course, CLLocationDirectionAccuracy courseAccuracy, CLLocationSpeed speed, CLLocationSpeedAccuracy speedAccuracy, NSDate timestamp, CLLocationSourceInformation sourceInfo);
+    [Selector("coordinate")]
+    public CLLocationCoordinate2D Coordinate { get; }
+    [Selector("altitude")]
+    public CLLocationDistance Altitude { get; }
+    [Selector("ellipsoidalAltitude")]
+    public CLLocationDistance EllipsoidalAltitude { get; }
+    [Selector("horizontalAccuracy")]
+    public CLLocationAccuracy HorizontalAccuracy { get; }
+    [Selector("verticalAccuracy")]
+    public CLLocationAccuracy VerticalAccuracy { get; }
+    [Selector("course")]
+    public CLLocationDirection Course { get; }
+    [Selector("courseAccuracy")]
+    public CLLocationDirectionAccuracy CourseAccuracy { get; }
+    [Selector("speed")]
+    public CLLocationSpeed Speed { get; }
+    [Selector("speedAccuracy")]
+    public CLLocationSpeedAccuracy SpeedAccuracy { get; }
+    [Selector("timestamp")]
+    public NSDate Timestamp { get; }
+    [Selector("floor")]
+    public CLFloor? Floor { get; }
+    [Selector("sourceInformation")]
+    public CLLocationSourceInformation? SourceInformation { get; }
+    [Selector("initWithLatitude:longitude:")]
+    public Self InitWithLatitudeLongitude(CLLocationDegrees latitude, CLLocationDegrees longitude);
+    [Selector("initWithCoordinate:altitude:horizontalAccuracy:verticalAccuracy:timestamp:")]
+    public Self InitWithCoordinateAltitudeHorizontalAccuracyVerticalAccuracyTimestamp(CLLocationCoordinate2D coordinate, CLLocationDistance altitude, CLLocationAccuracy hAccuracy, CLLocationAccuracy vAccuracy, NSDate timestamp);
+    [Selector("initWithCoordinate:altitude:horizontalAccuracy:verticalAccuracy:course:speed:timestamp:")]
+    public Self InitWithCoordinateAltitudeHorizontalAccuracyVerticalAccuracyCourseSpeedTimestamp(CLLocationCoordinate2D coordinate, CLLocationDistance altitude, CLLocationAccuracy hAccuracy, CLLocationAccuracy vAccuracy, CLLocationDirection course, CLLocationSpeed speed, NSDate timestamp);
+    [Selector("initWithCoordinate:altitude:horizontalAccuracy:verticalAccuracy:course:courseAccuracy:speed:speedAccuracy:timestamp:")]
+    public Self InitWithCoordinateAltitudeHorizontalAccuracyVerticalAccuracyCourseCourseAccuracySpeedSpeedAccuracyTimestamp(CLLocationCoordinate2D coordinate, CLLocationDistance altitude, CLLocationAccuracy hAccuracy, CLLocationAccuracy vAccuracy, CLLocationDirection course, CLLocationDirectionAccuracy courseAccuracy, CLLocationSpeed speed, CLLocationSpeedAccuracy speedAccuracy, NSDate timestamp);
+    [Selector("initWithCoordinate:altitude:horizontalAccuracy:verticalAccuracy:course:courseAccuracy:speed:speedAccuracy:timestamp:sourceInfo:")]
+    public Self InitWithCoordinateAltitudeHorizontalAccuracyVerticalAccuracyCourseCourseAccuracySpeedSpeedAccuracyTimestampSourceInfo(CLLocationCoordinate2D coordinate, CLLocationDistance altitude, CLLocationAccuracy hAccuracy, CLLocationAccuracy vAccuracy, CLLocationDirection course, CLLocationDirectionAccuracy courseAccuracy, CLLocationSpeed speed, CLLocationSpeedAccuracy speedAccuracy, NSDate timestamp, CLLocationSourceInformation sourceInfo);
     /// Deprecated in macOS 10.15.
-    [Selector("getDistanceFrom:")] public CLLocationDistance GetDistanceFrom(CLLocation location);
-    [Selector("distanceFromLocation:")] public CLLocationDistance DistanceFromLocation(CLLocation location);
+    [Selector("getDistanceFrom:")]
+    public CLLocationDistance GetDistanceFrom(CLLocation location);
+    [Selector("distanceFromLocation:")]
+    public CLLocationDistance DistanceFromLocation(CLLocation location);
 }
 
 #endif

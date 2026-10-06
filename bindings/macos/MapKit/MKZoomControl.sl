@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class MKZoomControl : NSView
 {
-    [Selector("mapView", "setMapView:")] public MKMapView? MapView { get; set; }
-    [Selector("zoomControlWithMapView:")] public static Self ZoomControlWithMapView(MKMapView? mapView);
+    [Selector("mapView", "setMapView:")]
+    public MKMapView? MapView { get; set; }
+    [Selector("zoomControlWithMapView:")]
+    public static Self ZoomControlWithMapView(MKMapView? mapView);
 }
 
 #endif

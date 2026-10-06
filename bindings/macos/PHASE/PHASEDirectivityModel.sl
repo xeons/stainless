@@ -33,34 +33,48 @@ import Standard.ObjC;
 
 public extern objc class PHASECardioidDirectivityModelSubbandParameters : NSObject
 {
-    [Selector("frequency", "setFrequency:")] public double Frequency { get; set; }
-    [Selector("pattern", "setPattern:")] public double Pattern { get; set; }
-    [Selector("sharpness", "setSharpness:")] public double Sharpness { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("frequency", "setFrequency:")]
+    public double Frequency { get; set; }
+    [Selector("pattern", "setPattern:")]
+    public double Pattern { get; set; }
+    [Selector("sharpness", "setSharpness:")]
+    public double Sharpness { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 public extern objc class PHASEConeDirectivityModelSubbandParameters : NSObject
 {
-    [Selector("frequency", "setFrequency:")] public double Frequency { get; set; }
-    [Selector("innerAngle")] public double InnerAngle { get; }
-    [Selector("outerAngle")] public double OuterAngle { get; }
-    [Selector("outerGain", "setOuterGain:")] public double OuterGain { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("setInnerAngle:outerAngle:")] public void SetInnerAngleOuterAngle(double innerAngle, double outerAngle);
+    [Selector("frequency", "setFrequency:")]
+    public double Frequency { get; set; }
+    [Selector("innerAngle")]
+    public double InnerAngle { get; }
+    [Selector("outerAngle")]
+    public double OuterAngle { get; }
+    [Selector("outerGain", "setOuterGain:")]
+    public double OuterGain { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("setInnerAngle:outerAngle:")]
+    public void SetInnerAngleOuterAngle(double innerAngle, double outerAngle);
 }
 
 public extern objc class PHASEDirectivityModelParameters : NSObject { }
 
 public extern objc class PHASECardioidDirectivityModelParameters : PHASEDirectivityModelParameters
 {
-    [Selector("subbandParameters")] public NSArray SubbandParameters { get; }
-    [Selector("initWithSubbandParameters:")] public Self InitWithSubbandParameters(NSArray subbandParameters);
+    [Selector("subbandParameters")]
+    public NSArray SubbandParameters { get; }
+    [Selector("initWithSubbandParameters:")]
+    public Self InitWithSubbandParameters(NSArray subbandParameters);
 }
 
 public extern objc class PHASEConeDirectivityModelParameters : PHASEDirectivityModelParameters
 {
-    [Selector("subbandParameters")] public NSArray SubbandParameters { get; }
-    [Selector("initWithSubbandParameters:")] public Self InitWithSubbandParameters(NSArray subbandParameters);
+    [Selector("subbandParameters")]
+    public NSArray SubbandParameters { get; }
+    [Selector("initWithSubbandParameters:")]
+    public Self InitWithSubbandParameters(NSArray subbandParameters);
 }
 
 #endif

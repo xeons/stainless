@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class LAEnvironmentMechanismBiometry : LAEnvironmentMechanism
 {
-    [Selector("biometryType")] public LABiometryType BiometryType { get; }
-    [Selector("isEnrolled")] public bool IsEnrolled { get; }
-    [Selector("isLockedOut")] public bool IsLockedOut { get; }
-    [Selector("stateHash")] public NSData StateHash { get; }
-    [Selector("builtInSensorInaccessible")] public bool BuiltInSensorInaccessible { get; }
+    [Selector("biometryType")]
+    public LABiometryType BiometryType { get; }
+    [Selector("isEnrolled")]
+    public bool IsEnrolled { get; }
+    [Selector("isLockedOut")]
+    public bool IsLockedOut { get; }
+    [Selector("stateHash")]
+    public NSData StateHash { get; }
+    [Selector("builtInSensorInaccessible")]
+    public bool BuiltInSensorInaccessible { get; }
 }
 
 #endif

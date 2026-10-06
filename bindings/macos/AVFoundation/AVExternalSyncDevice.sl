@@ -45,27 +45,40 @@ public enum AVExternalSyncDeviceStatus : long
 /// macOS 26.0 and later.
 public extern objc class AVExternalSyncDevice : NSObject
 {
-    [Selector("status")] public AVExternalSyncDeviceStatus Status { get; }
-    [Selector("clock")] public CMClockRef? Clock { get; }
-    [Selector("signalCompensationDelay", "setSignalCompensationDelay:")] public CMTime SignalCompensationDelay { get; set; }
-    [Selector("uuid")] public NSUUID Uuid { get; }
-    [Selector("vendorID")] public UInt32 VendorID { get; }
-    [Selector("productID")] public UInt32 ProductID { get; }
+    [Selector("status")]
+    public AVExternalSyncDeviceStatus Status { get; }
+    [Selector("clock")]
+    public CMClockRef? Clock { get; }
+    [Selector("signalCompensationDelay", "setSignalCompensationDelay:")]
+    public CMTime SignalCompensationDelay { get; set; }
+    [Selector("uuid")]
+    public NSUUID Uuid { get; }
+    [Selector("vendorID")]
+    public UInt32 VendorID { get; }
+    [Selector("productID")]
+    public UInt32 ProductID { get; }
 }
 
 /// macOS 26.0 and later.
 public extern objc class AVExternalSyncDeviceDiscoverySession : NSObject
 {
-    [Selector("sharedSession")] public static AVExternalSyncDeviceDiscoverySession? SharedSession { get; }
-    [Selector("isSupported")] public static bool Supported { get; }
-    [Selector("devices")] public NSArray Devices { get; }
+    [Selector("sharedSession")]
+    public static AVExternalSyncDeviceDiscoverySession? SharedSession { get; }
+    [Selector("isSupported")]
+    public static bool Supported { get; }
+    [Selector("devices")]
+    public NSArray Devices { get; }
 }
 
 /// macOS 26.0 and later.
 public objc interface AVExternalSyncDeviceDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("externalSyncDeviceStatusDidChange:")] void ExternalSyncDeviceStatusDidChange(AVExternalSyncDevice device);
-    [Optional] [Selector("externalSyncDevice:failedWithError:")] void ExternalSyncDeviceFailedWithError(AVExternalSyncDevice device, NSError? error);
+    [Optional]
+    [Selector("externalSyncDeviceStatusDidChange:")]
+    void ExternalSyncDeviceStatusDidChange(AVExternalSyncDevice device);
+    [Optional]
+    [Selector("externalSyncDevice:failedWithError:")]
+    void ExternalSyncDeviceFailedWithError(AVExternalSyncDevice device, NSError? error);
 }
 
 #endif

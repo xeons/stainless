@@ -35,11 +35,16 @@ public objc closure void MKMapSnapshotCompletionHandler(MKMapSnapshot? arg0, NSE
 
 public extern objc class MKMapSnapshotter : NSObject
 {
-    [Selector("isLoading")] public bool Loading { get; }
-    [Selector("initWithOptions:")] public Self InitWithOptions(MKMapSnapshotOptions options);
-    [Selector("startWithCompletionHandler:")] public void StartWithCompletionHandler(MKMapSnapshotCompletionHandler completionHandler);
-    [Selector("startWithQueue:completionHandler:")] public void StartWithQueueCompletionHandler(dispatch_queue_t queue, MKMapSnapshotCompletionHandler completionHandler);
-    [Selector("cancel")] public void Cancel();
+    [Selector("isLoading")]
+    public bool Loading { get; }
+    [Selector("initWithOptions:")]
+    public Self InitWithOptions(MKMapSnapshotOptions options);
+    [Selector("startWithCompletionHandler:")]
+    public void StartWithCompletionHandler(MKMapSnapshotCompletionHandler completionHandler);
+    [Selector("startWithQueue:completionHandler:")]
+    public void StartWithQueueCompletionHandler(dispatch_queue_t queue, MKMapSnapshotCompletionHandler completionHandler);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

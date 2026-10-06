@@ -34,12 +34,18 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.12.
 public extern objc class PDFAnnotationFreeText : PDFAnnotation, NSCopying, NSCoding
 {
-    [Selector("font")] public NSFont? Font();
-    [Selector("setFont:")] public void SetFont(NSFont? font);
-    [Selector("fontColor")] public NSColor? FontColor();
-    [Selector("setFontColor:")] public void SetFontColor(NSColor? color);
-    [Selector("alignment")] public NSTextAlignment Alignment();
-    [Selector("setAlignment:")] public void SetAlignment(NSTextAlignment alignment);
+    [Selector("font")]
+    public NSFont? Font();
+    [Selector("setFont:")]
+    public void SetFont(NSFont? font);
+    [Selector("fontColor")]
+    public NSColor? FontColor();
+    [Selector("setFontColor:")]
+    public void SetFontColor(NSColor? color);
+    [Selector("alignment")]
+    public NSTextAlignment Alignment();
+    [Selector("setAlignment:")]
+    public void SetAlignment(NSTextAlignment alignment);
 }
 
 #endif

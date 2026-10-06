@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class VZMACAddress : NSObject, NSCopying
 {
-    [Selector("ethernetAddress")] public ether_addr_t EthernetAddress { get; }
-    [Selector("string")] public NSString String { get; }
-    [Selector("isBroadcastAddress")] public bool IsBroadcastAddress { get; }
-    [Selector("isMulticastAddress")] public bool IsMulticastAddress { get; }
-    [Selector("isUnicastAddress")] public bool IsUnicastAddress { get; }
-    [Selector("isLocallyAdministeredAddress")] public bool IsLocallyAdministeredAddress { get; }
-    [Selector("isUniversallyAdministeredAddress")] public bool IsUniversallyAdministeredAddress { get; }
-    [Selector("initWithEthernetAddress:")] public Self InitWithEthernetAddress(ether_addr_t ethernetAddress);
-    [Selector("initWithString:")] public Self? InitWithString(NSString string);
-    [Selector("randomLocallyAdministeredAddress")] public static Self RandomLocallyAdministeredAddress();
+    [Selector("ethernetAddress")]
+    public ether_addr_t EthernetAddress { get; }
+    [Selector("string")]
+    public NSString String { get; }
+    [Selector("isBroadcastAddress")]
+    public bool IsBroadcastAddress { get; }
+    [Selector("isMulticastAddress")]
+    public bool IsMulticastAddress { get; }
+    [Selector("isUnicastAddress")]
+    public bool IsUnicastAddress { get; }
+    [Selector("isLocallyAdministeredAddress")]
+    public bool IsLocallyAdministeredAddress { get; }
+    [Selector("isUniversallyAdministeredAddress")]
+    public bool IsUniversallyAdministeredAddress { get; }
+    [Selector("initWithEthernetAddress:")]
+    public Self InitWithEthernetAddress(ether_addr_t ethernetAddress);
+    [Selector("initWithString:")]
+    public Self? InitWithString(NSString string);
+    [Selector("randomLocallyAdministeredAddress")]
+    public static Self RandomLocallyAdministeredAddress();
 }
 
 #endif

@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class NSPanel : NSWindow
 {
-    [Selector("isFloatingPanel", "setFloatingPanel:")] public bool FloatingPanel { get; set; }
-    [Selector("becomesKeyOnlyIfNeeded", "setBecomesKeyOnlyIfNeeded:")] public bool BecomesKeyOnlyIfNeeded { get; set; }
-    [Selector("worksWhenModal", "setWorksWhenModal:")] public bool WorksWhenModal { get; set; }
+    [Selector("isFloatingPanel", "setFloatingPanel:")]
+    public bool FloatingPanel { get; set; }
+    [Selector("becomesKeyOnlyIfNeeded", "setBecomesKeyOnlyIfNeeded:")]
+    public bool BecomesKeyOnlyIfNeeded { get; set; }
+    [Selector("worksWhenModal", "setWorksWhenModal:")]
+    public bool WorksWhenModal { get; set; }
 }
 
 /// Deprecated in macOS 10.0.

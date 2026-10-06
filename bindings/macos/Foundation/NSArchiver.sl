@@ -33,38 +33,59 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.13.
 public extern objc class NSArchiver : NSCoder
 {
-    [Selector("archiverData")] public NSMutableData ArchiverData { get; }
-    [Selector("initForWritingWithMutableData:")] public Self InitForWritingWithMutableData(NSMutableData mdata);
-    [Selector("encodeRootObject:")] public void EncodeRootObject(AnyObject rootObject);
-    [Selector("encodeConditionalObject:")] public void EncodeConditionalObject(AnyObject? object);
-    [Selector("archivedDataWithRootObject:")] public static NSData ArchivedDataWithRootObject(AnyObject rootObject);
-    [Selector("archiveRootObject:toFile:")] public static bool ArchiveRootObjectToFile(AnyObject rootObject, NSString path);
-    [Selector("encodeClassName:intoClassName:")] public void EncodeClassNameIntoClassName(NSString trueName, NSString inArchiveName);
-    [Selector("classNameEncodedForTrueClassName:")] public NSString? ClassNameEncodedForTrueClassName(NSString trueName);
-    [Selector("replaceObject:withObject:")] public void ReplaceObjectWithObject(AnyObject object, AnyObject newObject);
+    [Selector("archiverData")]
+    public NSMutableData ArchiverData { get; }
+    [Selector("initForWritingWithMutableData:")]
+    public Self InitForWritingWithMutableData(NSMutableData mdata);
+    [Selector("encodeRootObject:")]
+    public void EncodeRootObject(AnyObject rootObject);
+    [Selector("encodeConditionalObject:")]
+    public void EncodeConditionalObject(AnyObject? object);
+    [Selector("archivedDataWithRootObject:")]
+    public static NSData ArchivedDataWithRootObject(AnyObject rootObject);
+    [Selector("archiveRootObject:toFile:")]
+    public static bool ArchiveRootObjectToFile(AnyObject rootObject, NSString path);
+    [Selector("encodeClassName:intoClassName:")]
+    public void EncodeClassNameIntoClassName(NSString trueName, NSString inArchiveName);
+    [Selector("classNameEncodedForTrueClassName:")]
+    public NSString? ClassNameEncodedForTrueClassName(NSString trueName);
+    [Selector("replaceObject:withObject:")]
+    public void ReplaceObjectWithObject(AnyObject object, AnyObject newObject);
 }
 
 /// Deprecated in macOS 10.13.
 public extern objc class NSUnarchiver : NSCoder
 {
-    [Selector("isAtEnd")] public bool AtEnd { get; }
-    [Selector("systemVersion")] public uint SystemVersion { get; }
-    [Selector("initForReadingWithData:")] public Self? InitForReadingWithData(NSData data);
-    [Selector("unarchiveObjectWithData:")] public static AnyObject? UnarchiveObjectWithData(NSData data);
-    [Selector("unarchiveObjectWithFile:")] public static AnyObject? UnarchiveObjectWithFile(NSString path);
-    [Selector("decodeClassName:asClassName:")] public static void DecodeClassNameAsClassName(NSString inArchiveName, NSString trueName);
-    [Selector("decodeClassName:asClassName:")] public void DecodeClassNameAsClassNameMethod(NSString inArchiveName, NSString trueName);
-    [Selector("classNameDecodedForArchiveClassName:")] public static NSString ClassNameDecodedForArchiveClassName(NSString inArchiveName);
-    [Selector("classNameDecodedForArchiveClassName:")] public NSString ClassNameDecodedForArchiveClassNameMethod(NSString inArchiveName);
-    [Selector("replaceObject:withObject:")] public void ReplaceObjectWithObject(AnyObject object, AnyObject newObject);
+    [Selector("isAtEnd")]
+    public bool AtEnd { get; }
+    [Selector("systemVersion")]
+    public uint SystemVersion { get; }
+    [Selector("initForReadingWithData:")]
+    public Self? InitForReadingWithData(NSData data);
+    [Selector("unarchiveObjectWithData:")]
+    public static AnyObject? UnarchiveObjectWithData(NSData data);
+    [Selector("unarchiveObjectWithFile:")]
+    public static AnyObject? UnarchiveObjectWithFile(NSString path);
+    [Selector("decodeClassName:asClassName:")]
+    public static void DecodeClassNameAsClassName(NSString inArchiveName, NSString trueName);
+    [Selector("decodeClassName:asClassName:")]
+    public void DecodeClassNameAsClassNameMethod(NSString inArchiveName, NSString trueName);
+    [Selector("classNameDecodedForArchiveClassName:")]
+    public static NSString ClassNameDecodedForArchiveClassName(NSString inArchiveName);
+    [Selector("classNameDecodedForArchiveClassName:")]
+    public NSString ClassNameDecodedForArchiveClassNameMethod(NSString inArchiveName);
+    [Selector("replaceObject:withObject:")]
+    public void ReplaceObjectWithObject(AnyObject object, AnyObject newObject);
 }
 
 /// NSArchiverCallback, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("classForArchiver")] public Class ClassForArchiver { get; }
+    [Selector("classForArchiver")]
+    public Class ClassForArchiver { get; }
     /// Deprecated in macOS 10.13.
-    [Selector("replacementObjectForArchiver:")] public AnyObject? ReplacementObjectForArchiver(NSArchiver archiver);
+    [Selector("replacementObjectForArchiver:")]
+    public AnyObject? ReplacementObjectForArchiver(NSArchiver archiver);
 }
 
 #endif

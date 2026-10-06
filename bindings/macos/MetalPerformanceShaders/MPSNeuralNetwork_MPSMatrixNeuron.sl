@@ -34,36 +34,62 @@ import Standard.ObjC;
 
 public extern objc class MPSMatrixNeuron : MPSMatrixUnaryKernel
 {
-    [Selector("sourceNumberOfFeatureVectors", "setSourceNumberOfFeatureVectors:")] public NSUInteger SourceNumberOfFeatureVectors { get; set; }
-    [Selector("sourceInputFeatureChannels", "setSourceInputFeatureChannels:")] public NSUInteger SourceInputFeatureChannels { get; set; }
-    [Selector("alpha", "setAlpha:")] public double Alpha { get; set; }
-    [Selector("setNeuronType:parameterA:parameterB:parameterC:")] public void SetNeuronTypeParameterAParameterBParameterC(MPSCNNNeuronType neuronType, float parameterA, float parameterB, float parameterC);
-    [Selector("neuronType")] public MPSCNNNeuronType NeuronType();
-    [Selector("neuronParameterA")] public float NeuronParameterA();
-    [Selector("neuronParameterB")] public float NeuronParameterB();
-    [Selector("neuronParameterC")] public float NeuronParameterC();
-    [Selector("setNeuronToPReLUWithParametersA:")] public void SetNeuronToPReLUWithParametersA(NSData A);
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("encodeToCommandBuffer:inputMatrix:biasVector:resultMatrix:")] public void EncodeToCommandBufferInputMatrixBiasVectorResultMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputMatrix, MPSVector? biasVector, MPSMatrix resultMatrix);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("sourceNumberOfFeatureVectors", "setSourceNumberOfFeatureVectors:")]
+    public NSUInteger SourceNumberOfFeatureVectors { get; set; }
+    [Selector("sourceInputFeatureChannels", "setSourceInputFeatureChannels:")]
+    public NSUInteger SourceInputFeatureChannels { get; set; }
+    [Selector("alpha", "setAlpha:")]
+    public double Alpha { get; set; }
+    [Selector("setNeuronType:parameterA:parameterB:parameterC:")]
+    public void SetNeuronTypeParameterAParameterBParameterC(MPSCNNNeuronType neuronType, float parameterA, float parameterB, float parameterC);
+    [Selector("neuronType")]
+    public MPSCNNNeuronType NeuronType();
+    [Selector("neuronParameterA")]
+    public float NeuronParameterA();
+    [Selector("neuronParameterB")]
+    public float NeuronParameterB();
+    [Selector("neuronParameterC")]
+    public float NeuronParameterC();
+    [Selector("setNeuronToPReLUWithParametersA:")]
+    public void SetNeuronToPReLUWithParametersA(NSData A);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("encodeToCommandBuffer:inputMatrix:biasVector:resultMatrix:")]
+    public void EncodeToCommandBufferInputMatrixBiasVectorResultMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputMatrix, MPSVector? biasVector, MPSMatrix resultMatrix);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
 }
 
 public extern objc class MPSMatrixNeuronGradient : MPSMatrixBinaryKernel
 {
-    [Selector("sourceNumberOfFeatureVectors", "setSourceNumberOfFeatureVectors:")] public NSUInteger SourceNumberOfFeatureVectors { get; set; }
-    [Selector("sourceInputFeatureChannels", "setSourceInputFeatureChannels:")] public NSUInteger SourceInputFeatureChannels { get; set; }
-    [Selector("alpha", "setAlpha:")] public double Alpha { get; set; }
-    [Selector("setNeuronType:parameterA:parameterB:parameterC:")] public void SetNeuronTypeParameterAParameterBParameterC(MPSCNNNeuronType neuronType, float parameterA, float parameterB, float parameterC);
-    [Selector("neuronType")] public MPSCNNNeuronType NeuronType();
-    [Selector("neuronParameterA")] public float NeuronParameterA();
-    [Selector("neuronParameterB")] public float NeuronParameterB();
-    [Selector("neuronParameterC")] public float NeuronParameterC();
-    [Selector("setNeuronToPReLUWithParametersA:")] public void SetNeuronToPReLUWithParametersA(NSData A);
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("encodeToCommandBuffer:gradientMatrix:inputMatrix:biasVector:resultGradientForDataMatrix:resultGradientForBiasVector:")] public void EncodeToCommandBufferGradientMatrixInputMatrixBiasVectorResultGradientForDataMatrixResultGradientForBiasVector(MTLCommandBuffer commandBuffer, MPSMatrix gradientMatrix, MPSMatrix inputMatrix, MPSVector? biasVector, MPSMatrix resultGradientForDataMatrix, MPSVector? resultGradientForBiasVector);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("sourceNumberOfFeatureVectors", "setSourceNumberOfFeatureVectors:")]
+    public NSUInteger SourceNumberOfFeatureVectors { get; set; }
+    [Selector("sourceInputFeatureChannels", "setSourceInputFeatureChannels:")]
+    public NSUInteger SourceInputFeatureChannels { get; set; }
+    [Selector("alpha", "setAlpha:")]
+    public double Alpha { get; set; }
+    [Selector("setNeuronType:parameterA:parameterB:parameterC:")]
+    public void SetNeuronTypeParameterAParameterBParameterC(MPSCNNNeuronType neuronType, float parameterA, float parameterB, float parameterC);
+    [Selector("neuronType")]
+    public MPSCNNNeuronType NeuronType();
+    [Selector("neuronParameterA")]
+    public float NeuronParameterA();
+    [Selector("neuronParameterB")]
+    public float NeuronParameterB();
+    [Selector("neuronParameterC")]
+    public float NeuronParameterC();
+    [Selector("setNeuronToPReLUWithParametersA:")]
+    public void SetNeuronToPReLUWithParametersA(NSData A);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("encodeToCommandBuffer:gradientMatrix:inputMatrix:biasVector:resultGradientForDataMatrix:resultGradientForBiasVector:")]
+    public void EncodeToCommandBufferGradientMatrixInputMatrixBiasVectorResultGradientForDataMatrixResultGradientForBiasVector(MTLCommandBuffer commandBuffer, MPSMatrix gradientMatrix, MPSMatrix inputMatrix, MPSVector? biasVector, MPSMatrix resultGradientForDataMatrix, MPSVector? resultGradientForBiasVector);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
 }
 
 #endif

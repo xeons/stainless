@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class VZLinuxBootLoader : VZBootLoader
 {
-    [Selector("kernelURL", "setKernelURL:")] public NSURL KernelURL { get; set; }
-    [Selector("commandLine", "setCommandLine:")] public NSString CommandLine { get; set; }
-    [Selector("initialRamdiskURL", "setInitialRamdiskURL:")] public NSURL? InitialRamdiskURL { get; set; }
-    [Selector("initWithKernelURL:")] public Self InitWithKernelURL(NSURL kernelURL);
+    [Selector("kernelURL", "setKernelURL:")]
+    public NSURL KernelURL { get; set; }
+    [Selector("commandLine", "setCommandLine:")]
+    public NSString CommandLine { get; set; }
+    [Selector("initialRamdiskURL", "setInitialRamdiskURL:")]
+    public NSURL? InitialRamdiskURL { get; set; }
+    [Selector("initWithKernelURL:")]
+    public Self InitWithKernelURL(NSURL kernelURL);
 }
 
 #endif

@@ -33,20 +33,29 @@ import Standard.ObjC;
 
 public extern objc class NSFilePromiseProvider : NSObject, NSPasteboardWriting
 {
-    [Selector("fileType", "setFileType:")] public NSString FileType { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSFilePromiseProviderDelegate? Delegate { get; set; }
-    [Selector("userInfo", "setUserInfo:")] public AnyObject? UserInfo { get; set; }
-    [Selector("initWithFileType:delegate:")] public Self InitWithFileTypeDelegate(NSString fileType, NSFilePromiseProviderDelegate @delegate);
-    [Selector("init")] public Self Init();
+    [Selector("fileType", "setFileType:")]
+    public NSString FileType { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSFilePromiseProviderDelegate? Delegate { get; set; }
+    [Selector("userInfo", "setUserInfo:")]
+    public AnyObject? UserInfo { get; set; }
+    [Selector("initWithFileType:delegate:")]
+    public Self InitWithFileTypeDelegate(NSString fileType, NSFilePromiseProviderDelegate @delegate);
+    [Selector("init")]
+    public Self Init();
 }
 
 public objc closure void NSFilePromiseProviderDelegateFilePromiseProviderWritePromiseToURLCompletionHandlerCompletionHandlerBlock(NSError? arg0);
 
 public objc interface NSFilePromiseProviderDelegate : NSObjectProtocol
 {
-    [Selector("filePromiseProvider:fileNameForType:")] NSString FilePromiseProviderFileNameForType(NSFilePromiseProvider filePromiseProvider, NSString fileType);
-    [Selector("filePromiseProvider:writePromiseToURL:completionHandler:")] void FilePromiseProviderWritePromiseToURLCompletionHandler(NSFilePromiseProvider filePromiseProvider, NSURL url, NSFilePromiseProviderDelegateFilePromiseProviderWritePromiseToURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("operationQueueForFilePromiseProvider:")] NSOperationQueue OperationQueueForFilePromiseProvider(NSFilePromiseProvider filePromiseProvider);
+    [Selector("filePromiseProvider:fileNameForType:")]
+    NSString FilePromiseProviderFileNameForType(NSFilePromiseProvider filePromiseProvider, NSString fileType);
+    [Selector("filePromiseProvider:writePromiseToURL:completionHandler:")]
+    void FilePromiseProviderWritePromiseToURLCompletionHandler(NSFilePromiseProvider filePromiseProvider, NSURL url, NSFilePromiseProviderDelegateFilePromiseProviderWritePromiseToURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("operationQueueForFilePromiseProvider:")]
+    NSOperationQueue OperationQueueForFilePromiseProvider(NSFilePromiseProvider filePromiseProvider);
 }
 
 #endif

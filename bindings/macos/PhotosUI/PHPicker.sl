@@ -67,66 +67,106 @@ public enum PHPickerCapabilities : ulong
 
 public extern objc class PHPickerFilter : NSObject, NSCopying
 {
-    [Selector("imagesFilter")] public static PHPickerFilter? ImagesFilter { get; }
-    [Selector("videosFilter")] public static PHPickerFilter VideosFilter { get; }
-    [Selector("livePhotosFilter")] public static PHPickerFilter LivePhotosFilter { get; }
-    [Selector("depthEffectPhotosFilter")] public static PHPickerFilter? DepthEffectPhotosFilter { get; }
-    [Selector("burstsFilter")] public static PHPickerFilter? BurstsFilter { get; }
-    [Selector("panoramasFilter")] public static PHPickerFilter? PanoramasFilter { get; }
-    [Selector("screenshotsFilter")] public static PHPickerFilter? ScreenshotsFilter { get; }
-    [Selector("screenRecordingsFilter")] public static PHPickerFilter? ScreenRecordingsFilter { get; }
-    [Selector("cinematicVideosFilter")] public static PHPickerFilter? CinematicVideosFilter { get; }
-    [Selector("slomoVideosFilter")] public static PHPickerFilter? SlomoVideosFilter { get; }
-    [Selector("timelapseVideosFilter")] public static PHPickerFilter? TimelapseVideosFilter { get; }
-    [Selector("spatialMediaFilter")] public static PHPickerFilter SpatialMediaFilter { get; }
-    [Selector("playbackStyleFilter:")] public static PHPickerFilter PlaybackStyleFilter(PHAssetPlaybackStyle playbackStyle);
-    [Selector("anyFilterMatchingSubfilters:")] public static PHPickerFilter AnyFilterMatchingSubfilters(NSArray subfilters);
-    [Selector("allFilterMatchingSubfilters:")] public static PHPickerFilter AllFilterMatchingSubfilters(NSArray subfilters);
-    [Selector("notFilterOfSubfilter:")] public static PHPickerFilter NotFilterOfSubfilter(PHPickerFilter subfilter);
+    [Selector("imagesFilter")]
+    public static PHPickerFilter? ImagesFilter { get; }
+    [Selector("videosFilter")]
+    public static PHPickerFilter VideosFilter { get; }
+    [Selector("livePhotosFilter")]
+    public static PHPickerFilter LivePhotosFilter { get; }
+    [Selector("depthEffectPhotosFilter")]
+    public static PHPickerFilter? DepthEffectPhotosFilter { get; }
+    [Selector("burstsFilter")]
+    public static PHPickerFilter? BurstsFilter { get; }
+    [Selector("panoramasFilter")]
+    public static PHPickerFilter? PanoramasFilter { get; }
+    [Selector("screenshotsFilter")]
+    public static PHPickerFilter? ScreenshotsFilter { get; }
+    [Selector("screenRecordingsFilter")]
+    public static PHPickerFilter? ScreenRecordingsFilter { get; }
+    [Selector("cinematicVideosFilter")]
+    public static PHPickerFilter? CinematicVideosFilter { get; }
+    [Selector("slomoVideosFilter")]
+    public static PHPickerFilter? SlomoVideosFilter { get; }
+    [Selector("timelapseVideosFilter")]
+    public static PHPickerFilter? TimelapseVideosFilter { get; }
+    [Selector("spatialMediaFilter")]
+    public static PHPickerFilter SpatialMediaFilter { get; }
+    [Selector("playbackStyleFilter:")]
+    public static PHPickerFilter PlaybackStyleFilter(PHAssetPlaybackStyle playbackStyle);
+    [Selector("anyFilterMatchingSubfilters:")]
+    public static PHPickerFilter AnyFilterMatchingSubfilters(NSArray subfilters);
+    [Selector("allFilterMatchingSubfilters:")]
+    public static PHPickerFilter AllFilterMatchingSubfilters(NSArray subfilters);
+    [Selector("notFilterOfSubfilter:")]
+    public static PHPickerFilter NotFilterOfSubfilter(PHPickerFilter subfilter);
 }
 
 public extern objc class PHPickerUpdateConfiguration : NSObject, NSCopying
 {
-    [Selector("selectionLimit", "setSelectionLimit:")] public NSInteger SelectionLimit { get; set; }
-    [Selector("edgesWithoutContentMargins", "setEdgesWithoutContentMargins:")] public NSDirectionalRectEdge EdgesWithoutContentMargins { get; set; }
+    [Selector("selectionLimit", "setSelectionLimit:")]
+    public NSInteger SelectionLimit { get; set; }
+    [Selector("edgesWithoutContentMargins", "setEdgesWithoutContentMargins:")]
+    public NSDirectionalRectEdge EdgesWithoutContentMargins { get; set; }
 }
 
 public extern objc class PHPickerConfiguration : NSObject, NSCopying
 {
-    [Selector("preferredAssetRepresentationMode", "setPreferredAssetRepresentationMode:")] public PHPickerConfigurationAssetRepresentationMode PreferredAssetRepresentationMode { get; set; }
-    [Selector("selection", "setSelection:")] public PHPickerConfigurationSelection Selection { get; set; }
-    [Selector("selectionLimit", "setSelectionLimit:")] public NSInteger SelectionLimit { get; set; }
-    [Selector("filter", "setFilter:")] public PHPickerFilter? Filter { get; set; }
-    [Selector("preselectedAssetIdentifiers", "setPreselectedAssetIdentifiers:")] public NSArray? PreselectedAssetIdentifiers { get; set; }
-    [Selector("mode", "setMode:")] public PHPickerMode Mode { get; set; }
-    [Selector("edgesWithoutContentMargins", "setEdgesWithoutContentMargins:")] public NSDirectionalRectEdge EdgesWithoutContentMargins { get; set; }
-    [Selector("disabledCapabilities", "setDisabledCapabilities:")] public PHPickerCapabilities DisabledCapabilities { get; set; }
-    [Selector("initWithPhotoLibrary:")] public Self InitWithPhotoLibrary(PHPhotoLibrary photoLibrary);
-    [Selector("init")] public Self Init();
+    [Selector("preferredAssetRepresentationMode", "setPreferredAssetRepresentationMode:")]
+    public PHPickerConfigurationAssetRepresentationMode PreferredAssetRepresentationMode { get; set; }
+    [Selector("selection", "setSelection:")]
+    public PHPickerConfigurationSelection Selection { get; set; }
+    [Selector("selectionLimit", "setSelectionLimit:")]
+    public NSInteger SelectionLimit { get; set; }
+    [Selector("filter", "setFilter:")]
+    public PHPickerFilter? Filter { get; set; }
+    [Selector("preselectedAssetIdentifiers", "setPreselectedAssetIdentifiers:")]
+    public NSArray? PreselectedAssetIdentifiers { get; set; }
+    [Selector("mode", "setMode:")]
+    public PHPickerMode Mode { get; set; }
+    [Selector("edgesWithoutContentMargins", "setEdgesWithoutContentMargins:")]
+    public NSDirectionalRectEdge EdgesWithoutContentMargins { get; set; }
+    [Selector("disabledCapabilities", "setDisabledCapabilities:")]
+    public PHPickerCapabilities DisabledCapabilities { get; set; }
+    [Selector("initWithPhotoLibrary:")]
+    public Self InitWithPhotoLibrary(PHPhotoLibrary photoLibrary);
+    [Selector("init")]
+    public Self Init();
 }
 
 public extern objc class PHPickerResult : NSObject
 {
-    [Selector("itemProvider")] public NSItemProvider? ItemProvider { get; }
-    [Selector("assetIdentifier")] public NSString? AssetIdentifier { get; }
+    [Selector("itemProvider")]
+    public NSItemProvider? ItemProvider { get; }
+    [Selector("assetIdentifier")]
+    public NSString? AssetIdentifier { get; }
 }
 
 public objc interface PHPickerViewControllerDelegate : NSObjectProtocol
 {
-    [Selector("picker:didFinishPicking:")] void PickerDidFinishPicking(PHPickerViewController picker, NSArray results);
+    [Selector("picker:didFinishPicking:")]
+    void PickerDidFinishPicking(PHPickerViewController picker, NSArray results);
 }
 
 public extern objc class PHPickerViewController : NSViewController
 {
-    [Selector("configuration")] public PHPickerConfiguration? Configuration { get; }
-    [Selector("delegate", "setDelegate:")] public PHPickerViewControllerDelegate? Delegate { get; set; }
-    [Selector("initWithConfiguration:")] public Self InitWithConfiguration(PHPickerConfiguration configuration);
-    [Selector("updatePickerUsingConfiguration:")] public void UpdatePickerUsingConfiguration(PHPickerUpdateConfiguration configuration);
-    [Selector("deselectAssetsWithIdentifiers:")] public void DeselectAssetsWithIdentifiers(NSArray identifiers);
-    [Selector("moveAssetWithIdentifier:afterAssetWithIdentifier:")] public void MoveAssetWithIdentifierAfterAssetWithIdentifier(NSString identifier, NSString? afterIdentifier);
-    [Selector("scrollToInitialPosition")] public void ScrollToInitialPosition();
-    [Selector("zoomIn")] public void ZoomIn();
-    [Selector("zoomOut")] public void ZoomOut();
+    [Selector("configuration")]
+    public PHPickerConfiguration? Configuration { get; }
+    [Selector("delegate", "setDelegate:")]
+    public PHPickerViewControllerDelegate? Delegate { get; set; }
+    [Selector("initWithConfiguration:")]
+    public Self InitWithConfiguration(PHPickerConfiguration configuration);
+    [Selector("updatePickerUsingConfiguration:")]
+    public void UpdatePickerUsingConfiguration(PHPickerUpdateConfiguration configuration);
+    [Selector("deselectAssetsWithIdentifiers:")]
+    public void DeselectAssetsWithIdentifiers(NSArray identifiers);
+    [Selector("moveAssetWithIdentifier:afterAssetWithIdentifier:")]
+    public void MoveAssetWithIdentifierAfterAssetWithIdentifier(NSString identifier, NSString? afterIdentifier);
+    [Selector("scrollToInitialPosition")]
+    public void ScrollToInitialPosition();
+    [Selector("zoomIn")]
+    public void ZoomIn();
+    [Selector("zoomOut")]
+    public void ZoomOut();
 }
 
 #endif

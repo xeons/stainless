@@ -45,32 +45,55 @@ public extern "C" NSString? CSMailboxArchive;
 /// CSMessaging, a category of CSSearchableItemAttributeSet.
 public extern objc class CSSearchableItemAttributeSet
 {
-    [Selector("accountIdentifier", "setAccountIdentifier:")] public NSString? AccountIdentifier { get; set; }
-    [Selector("accountHandles", "setAccountHandles:")] public NSArray? AccountHandles { get; set; }
-    [Selector("HTMLContentData", "setHTMLContentData:")] public NSData? HTMLContentData { get; set; }
-    [Selector("textContent", "setTextContent:")] public NSString? TextContent { get; set; }
-    [Selector("authors", "setAuthors:")] public NSArray? Authors { get; set; }
-    [Selector("primaryRecipients", "setPrimaryRecipients:")] public NSArray? PrimaryRecipients { get; set; }
-    [Selector("additionalRecipients", "setAdditionalRecipients:")] public NSArray? AdditionalRecipients { get; set; }
-    [Selector("hiddenAdditionalRecipients", "setHiddenAdditionalRecipients:")] public NSArray? HiddenAdditionalRecipients { get; set; }
-    [Selector("emailHeaders", "setEmailHeaders:")] public NSDictionary? EmailHeaders { get; set; }
-    [Selector("mailboxIdentifiers", "setMailboxIdentifiers:")] public NSArray? MailboxIdentifiers { get; set; }
-    [Selector("authorNames", "setAuthorNames:")] public NSArray? AuthorNames { get; set; }
-    [Selector("recipientNames", "setRecipientNames:")] public NSArray? RecipientNames { get; set; }
-    [Selector("authorEmailAddresses", "setAuthorEmailAddresses:")] public NSArray? AuthorEmailAddresses { get; set; }
-    [Selector("recipientEmailAddresses", "setRecipientEmailAddresses:")] public NSArray? RecipientEmailAddresses { get; set; }
-    [Selector("authorAddresses", "setAuthorAddresses:")] public NSArray? AuthorAddresses { get; set; }
-    [Selector("recipientAddresses", "setRecipientAddresses:")] public NSArray? RecipientAddresses { get; set; }
-    [Selector("phoneNumbers", "setPhoneNumbers:")] public NSArray? PhoneNumbers { get; set; }
-    [Selector("emailAddresses", "setEmailAddresses:")] public NSArray? EmailAddresses { get; set; }
-    [Selector("instantMessageAddresses", "setInstantMessageAddresses:")] public NSArray? InstantMessageAddresses { get; set; }
-    [Selector("isLikelyJunk", "setLikelyJunk:")] public NSNumber LikelyJunk { get; set; }
+    [Selector("accountIdentifier", "setAccountIdentifier:")]
+    public NSString? AccountIdentifier { get; set; }
+    [Selector("accountHandles", "setAccountHandles:")]
+    public NSArray? AccountHandles { get; set; }
+    [Selector("HTMLContentData", "setHTMLContentData:")]
+    public NSData? HTMLContentData { get; set; }
+    [Selector("textContent", "setTextContent:")]
+    public NSString? TextContent { get; set; }
+    [Selector("authors", "setAuthors:")]
+    public NSArray? Authors { get; set; }
+    [Selector("primaryRecipients", "setPrimaryRecipients:")]
+    public NSArray? PrimaryRecipients { get; set; }
+    [Selector("additionalRecipients", "setAdditionalRecipients:")]
+    public NSArray? AdditionalRecipients { get; set; }
+    [Selector("hiddenAdditionalRecipients", "setHiddenAdditionalRecipients:")]
+    public NSArray? HiddenAdditionalRecipients { get; set; }
+    [Selector("emailHeaders", "setEmailHeaders:")]
+    public NSDictionary? EmailHeaders { get; set; }
+    [Selector("mailboxIdentifiers", "setMailboxIdentifiers:")]
+    public NSArray? MailboxIdentifiers { get; set; }
+    [Selector("authorNames", "setAuthorNames:")]
+    public NSArray? AuthorNames { get; set; }
+    [Selector("recipientNames", "setRecipientNames:")]
+    public NSArray? RecipientNames { get; set; }
+    [Selector("authorEmailAddresses", "setAuthorEmailAddresses:")]
+    public NSArray? AuthorEmailAddresses { get; set; }
+    [Selector("recipientEmailAddresses", "setRecipientEmailAddresses:")]
+    public NSArray? RecipientEmailAddresses { get; set; }
+    [Selector("authorAddresses", "setAuthorAddresses:")]
+    public NSArray? AuthorAddresses { get; set; }
+    [Selector("recipientAddresses", "setRecipientAddresses:")]
+    public NSArray? RecipientAddresses { get; set; }
+    [Selector("phoneNumbers", "setPhoneNumbers:")]
+    public NSArray? PhoneNumbers { get; set; }
+    [Selector("emailAddresses", "setEmailAddresses:")]
+    public NSArray? EmailAddresses { get; set; }
+    [Selector("instantMessageAddresses", "setInstantMessageAddresses:")]
+    public NSArray? InstantMessageAddresses { get; set; }
+    [Selector("isLikelyJunk", "setLikelyJunk:")]
+    public NSNumber LikelyJunk { get; set; }
     /// macOS 15.4 and later.
-    [Selector("isPriority")] public NSNumber? IsPriority { get; }
+    [Selector("isPriority")]
+    public NSNumber? IsPriority { get; }
     /// macOS 15.4 and later.
-    [Selector("textContentSummary")] public NSString? TextContentSummary { get; }
+    [Selector("textContentSummary")]
+    public NSString? TextContentSummary { get; }
     /// macOS 15.4 and later.
-    [Selector("transcribedTextContent", "setTranscribedTextContent:")] public NSString? TranscribedTextContent { get; set; }
+    [Selector("transcribedTextContent", "setTranscribedTextContent:")]
+    public NSString? TranscribedTextContent { get; set; }
 }
 
 #endif

@@ -33,26 +33,47 @@ import Standard.ObjC;
 
 public objc interface IKSlideshowDataSource
 {
-    [Selector("numberOfSlideshowItems")] NSUInteger NumberOfSlideshowItems();
-    [Selector("slideshowItemAtIndex:")] AnyObject? SlideshowItemAtIndex(NSUInteger index);
-    [Optional] [Selector("nameOfSlideshowItemAtIndex:")] NSString? NameOfSlideshowItemAtIndex(NSUInteger index);
-    [Optional] [Selector("canExportSlideshowItemAtIndex:toApplication:")] bool CanExportSlideshowItemAtIndexToApplication(NSUInteger index, NSString? applicationBundleIdentifier);
-    [Optional] [Selector("slideshowWillStart")] void SlideshowWillStart();
-    [Optional] [Selector("slideshowDidStop")] void SlideshowDidStop();
-    [Optional] [Selector("slideshowDidChangeCurrentIndex:")] void SlideshowDidChangeCurrentIndex(NSUInteger newIndex);
+    [Selector("numberOfSlideshowItems")]
+    NSUInteger NumberOfSlideshowItems();
+    [Selector("slideshowItemAtIndex:")]
+    AnyObject? SlideshowItemAtIndex(NSUInteger index);
+    [Optional]
+    [Selector("nameOfSlideshowItemAtIndex:")]
+    NSString? NameOfSlideshowItemAtIndex(NSUInteger index);
+    [Optional]
+    [Selector("canExportSlideshowItemAtIndex:toApplication:")]
+    bool CanExportSlideshowItemAtIndexToApplication(NSUInteger index, NSString? applicationBundleIdentifier);
+    [Optional]
+    [Selector("slideshowWillStart")]
+    void SlideshowWillStart();
+    [Optional]
+    [Selector("slideshowDidStop")]
+    void SlideshowDidStop();
+    [Optional]
+    [Selector("slideshowDidChangeCurrentIndex:")]
+    void SlideshowDidChangeCurrentIndex(NSUInteger newIndex);
 }
 
 public extern objc class IKSlideshow : NSObject
 {
-    [Selector("autoPlayDelay", "setAutoPlayDelay:")] public NSTimeInterval AutoPlayDelay { get; set; }
-    [Selector("sharedSlideshow")] public static IKSlideshow? SharedSlideshow();
-    [Selector("runSlideshowWithDataSource:inMode:options:")] public void RunSlideshowWithDataSourceInModeOptions(IKSlideshowDataSource? dataSource, NSString? slideshowMode, NSDictionary? slideshowOptions);
-    [Selector("stopSlideshow:")] public void StopSlideshow(AnyObject? sender);
-    [Selector("reloadData")] public void ReloadData();
-    [Selector("reloadSlideshowItemAtIndex:")] public void ReloadSlideshowItemAtIndex(NSUInteger index);
-    [Selector("indexOfCurrentSlideshowItem")] public NSUInteger IndexOfCurrentSlideshowItem();
-    [Selector("canExportToApplication:")] public static bool CanExportToApplication(NSString? applicationBundleIdentifier);
-    [Selector("exportSlideshowItem:toApplication:")] public static void ExportSlideshowItemToApplication(AnyObject? item, NSString? applicationBundleIdentifier);
+    [Selector("autoPlayDelay", "setAutoPlayDelay:")]
+    public NSTimeInterval AutoPlayDelay { get; set; }
+    [Selector("sharedSlideshow")]
+    public static IKSlideshow? SharedSlideshow();
+    [Selector("runSlideshowWithDataSource:inMode:options:")]
+    public void RunSlideshowWithDataSourceInModeOptions(IKSlideshowDataSource? dataSource, NSString? slideshowMode, NSDictionary? slideshowOptions);
+    [Selector("stopSlideshow:")]
+    public void StopSlideshow(AnyObject? sender);
+    [Selector("reloadData")]
+    public void ReloadData();
+    [Selector("reloadSlideshowItemAtIndex:")]
+    public void ReloadSlideshowItemAtIndex(NSUInteger index);
+    [Selector("indexOfCurrentSlideshowItem")]
+    public NSUInteger IndexOfCurrentSlideshowItem();
+    [Selector("canExportToApplication:")]
+    public static bool CanExportToApplication(NSString? applicationBundleIdentifier);
+    [Selector("exportSlideshowItem:toApplication:")]
+    public static void ExportSlideshowItemToApplication(AnyObject? item, NSString? applicationBundleIdentifier);
 }
 
 public extern "C" NSString? IKSlideshowModeImages;

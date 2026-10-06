@@ -41,33 +41,45 @@ public enum NSURLCredentialPersistence : ulong
 
 public extern objc class NSURLCredential : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("persistence")] public NSURLCredentialPersistence Persistence { get; }
+    [Selector("persistence")]
+    public NSURLCredentialPersistence Persistence { get; }
 }
 
 /// NSInternetPassword, a category of NSURLCredential.
 public extern objc class NSURLCredential
 {
-    [Selector("user")] public NSString? User { get; }
-    [Selector("password")] public NSString? Password { get; }
-    [Selector("hasPassword")] public bool HasPassword { get; }
-    [Selector("initWithUser:password:persistence:")] public Self InitWithUserPasswordPersistence(NSString user, NSString password, NSURLCredentialPersistence persistence);
-    [Selector("credentialWithUser:password:persistence:")] public static NSURLCredential CredentialWithUserPasswordPersistence(NSString user, NSString password, NSURLCredentialPersistence persistence);
+    [Selector("user")]
+    public NSString? User { get; }
+    [Selector("password")]
+    public NSString? Password { get; }
+    [Selector("hasPassword")]
+    public bool HasPassword { get; }
+    [Selector("initWithUser:password:persistence:")]
+    public Self InitWithUserPasswordPersistence(NSString user, NSString password, NSURLCredentialPersistence persistence);
+    [Selector("credentialWithUser:password:persistence:")]
+    public static NSURLCredential CredentialWithUserPasswordPersistence(NSString user, NSString password, NSURLCredentialPersistence persistence);
 }
 
 /// NSClientCertificate, a category of NSURLCredential.
 public extern objc class NSURLCredential
 {
-    [Selector("identity")] public SecIdentityRef? Identity { get; }
-    [Selector("certificates")] public NSArray Certificates { get; }
-    [Selector("initWithIdentity:certificates:persistence:")] public Self InitWithIdentityCertificatesPersistence(SecIdentityRef identity, NSArray? certArray, NSURLCredentialPersistence persistence);
-    [Selector("credentialWithIdentity:certificates:persistence:")] public static NSURLCredential CredentialWithIdentityCertificatesPersistence(SecIdentityRef identity, NSArray? certArray, NSURLCredentialPersistence persistence);
+    [Selector("identity")]
+    public SecIdentityRef? Identity { get; }
+    [Selector("certificates")]
+    public NSArray Certificates { get; }
+    [Selector("initWithIdentity:certificates:persistence:")]
+    public Self InitWithIdentityCertificatesPersistence(SecIdentityRef identity, NSArray? certArray, NSURLCredentialPersistence persistence);
+    [Selector("credentialWithIdentity:certificates:persistence:")]
+    public static NSURLCredential CredentialWithIdentityCertificatesPersistence(SecIdentityRef identity, NSArray? certArray, NSURLCredentialPersistence persistence);
 }
 
 /// NSServerTrust, a category of NSURLCredential.
 public extern objc class NSURLCredential
 {
-    [Selector("initWithTrust:")] public Self InitWithTrust(SecTrustRef trust);
-    [Selector("credentialForTrust:")] public static NSURLCredential CredentialForTrust(SecTrustRef trust);
+    [Selector("initWithTrust:")]
+    public Self InitWithTrust(SecTrustRef trust);
+    [Selector("credentialForTrust:")]
+    public static NSURLCredential CredentialForTrust(SecTrustRef trust);
 }
 
 #endif

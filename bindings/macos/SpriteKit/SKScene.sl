@@ -44,38 +44,71 @@ public enum SKSceneScaleMode : long
 
 public objc interface SKSceneDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("update:forScene:")] void UpdateForScene(NSTimeInterval currentTime, SKScene scene);
-    [Optional] [Selector("didEvaluateActionsForScene:")] void DidEvaluateActionsForScene(SKScene scene);
-    [Optional] [Selector("didSimulatePhysicsForScene:")] void DidSimulatePhysicsForScene(SKScene scene);
-    [Optional] [Selector("didApplyConstraintsForScene:")] void DidApplyConstraintsForScene(SKScene scene);
-    [Optional] [Selector("didFinishUpdateForScene:")] void DidFinishUpdateForScene(SKScene scene);
+    [Optional]
+    [Selector("update:forScene:")]
+    void UpdateForScene(NSTimeInterval currentTime, SKScene scene);
+    [Optional]
+    [Selector("didEvaluateActionsForScene:")]
+    void DidEvaluateActionsForScene(SKScene scene);
+    [Optional]
+    [Selector("didSimulatePhysicsForScene:")]
+    void DidSimulatePhysicsForScene(SKScene scene);
+    [Optional]
+    [Selector("didApplyConstraintsForScene:")]
+    void DidApplyConstraintsForScene(SKScene scene);
+    [Optional]
+    [Selector("didFinishUpdateForScene:")]
+    void DidFinishUpdateForScene(SKScene scene);
 }
 
 public extern objc class SKScene : SKEffectNode
 {
-    [Selector("size", "setSize:")] public CGSize Size { get; set; }
-    [Selector("scaleMode", "setScaleMode:")] public SKSceneScaleMode ScaleMode { get; set; }
-    [Selector("camera", "setCamera:")] public SKCameraNode? Camera { get; set; }
-    [Selector("listener", "setListener:")] public SKNode? Listener { get; set; }
-    [Selector("audioEngine")] public AVAudioEngine AudioEngine { get; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor BackgroundColor { get; set; }
-    [Selector("delegate", "setDelegate:")] public SKSceneDelegate? Delegate { get; set; }
-    [Selector("anchorPoint", "setAnchorPoint:")] public CGPoint AnchorPoint { get; set; }
-    [Selector("physicsWorld")] public SKPhysicsWorld PhysicsWorld { get; }
-    [Selector("view")] public SKView? View { get; }
-    [Selector("initWithSize:")] public Self InitWithSize(CGSize size);
-    [Selector("sceneWithSize:")] public static Self SceneWithSize(CGSize size);
-    [Selector("sceneDidLoad")] public void SceneDidLoad();
-    [Selector("convertPointFromView:")] public CGPoint ConvertPointFromView(CGPoint point);
-    [Selector("convertPointToView:")] public CGPoint ConvertPointToView(CGPoint point);
-    [Selector("update:")] public void Update(NSTimeInterval currentTime);
-    [Selector("didEvaluateActions")] public void DidEvaluateActions();
-    [Selector("didSimulatePhysics")] public void DidSimulatePhysics();
-    [Selector("didApplyConstraints")] public void DidApplyConstraints();
-    [Selector("didFinishUpdate")] public void DidFinishUpdate();
-    [Selector("didMoveToView:")] public void DidMoveToView(SKView view);
-    [Selector("willMoveFromView:")] public void WillMoveFromView(SKView view);
-    [Selector("didChangeSize:")] public void DidChangeSize(CGSize oldSize);
+    [Selector("size", "setSize:")]
+    public CGSize Size { get; set; }
+    [Selector("scaleMode", "setScaleMode:")]
+    public SKSceneScaleMode ScaleMode { get; set; }
+    [Selector("camera", "setCamera:")]
+    public SKCameraNode? Camera { get; set; }
+    [Selector("listener", "setListener:")]
+    public SKNode? Listener { get; set; }
+    [Selector("audioEngine")]
+    public AVAudioEngine AudioEngine { get; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor BackgroundColor { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public SKSceneDelegate? Delegate { get; set; }
+    [Selector("anchorPoint", "setAnchorPoint:")]
+    public CGPoint AnchorPoint { get; set; }
+    [Selector("physicsWorld")]
+    public SKPhysicsWorld PhysicsWorld { get; }
+    [Selector("view")]
+    public SKView? View { get; }
+    [Selector("initWithSize:")]
+    public Self InitWithSize(CGSize size);
+    [Selector("sceneWithSize:")]
+    public static Self SceneWithSize(CGSize size);
+    [Selector("sceneDidLoad")]
+    public void SceneDidLoad();
+    [Selector("convertPointFromView:")]
+    public CGPoint ConvertPointFromView(CGPoint point);
+    [Selector("convertPointToView:")]
+    public CGPoint ConvertPointToView(CGPoint point);
+    [Selector("update:")]
+    public void Update(NSTimeInterval currentTime);
+    [Selector("didEvaluateActions")]
+    public void DidEvaluateActions();
+    [Selector("didSimulatePhysics")]
+    public void DidSimulatePhysics();
+    [Selector("didApplyConstraints")]
+    public void DidApplyConstraints();
+    [Selector("didFinishUpdate")]
+    public void DidFinishUpdate();
+    [Selector("didMoveToView:")]
+    public void DidMoveToView(SKView view);
+    [Selector("willMoveFromView:")]
+    public void WillMoveFromView(SKView view);
+    [Selector("didChangeSize:")]
+    public void DidChangeSize(CGSize oldSize);
 }
 
 #endif

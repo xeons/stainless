@@ -34,10 +34,14 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class HKClinicalCoding : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("system")] public NSString System { get; }
-    [Selector("version")] public NSString? Version { get; }
-    [Selector("code")] public NSString Code { get; }
-    [Selector("initWithSystem:version:code:")] public Self InitWithSystemVersionCode(NSString system, NSString? version, NSString code);
+    [Selector("system")]
+    public NSString System { get; }
+    [Selector("version")]
+    public NSString? Version { get; }
+    [Selector("code")]
+    public NSString Code { get; }
+    [Selector("initWithSystem:version:code:")]
+    public Self InitWithSystemVersionCode(NSString system, NSString? version, NSString code);
 }
 
 #endif

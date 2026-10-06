@@ -53,7 +53,8 @@ public enum CFNumberFormatterStyle : long
     CurrencyAccountingStyle = 10,
 }
 
-[ReturnsRetained] public extern "C" CFNumberFormatterRef? CFNumberFormatterCreate(CFAllocatorRef? allocator, CFLocaleRef? locale, CFNumberFormatterStyle style);
+[ReturnsRetained]
+public extern "C" CFNumberFormatterRef? CFNumberFormatterCreate(CFAllocatorRef? allocator, CFLocaleRef? locale, CFNumberFormatterStyle style);
 
 public extern "C" CFLocaleRef? CFNumberFormatterGetLocale(CFNumberFormatterRef? formatter);
 
@@ -63,9 +64,11 @@ public extern "C" CFStringRef? CFNumberFormatterGetFormat(CFNumberFormatterRef? 
 
 public extern "C" void CFNumberFormatterSetFormat(CFNumberFormatterRef? formatter, CFStringRef? formatString);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFNumberFormatterCreateStringWithNumber(CFAllocatorRef? allocator, CFNumberFormatterRef? formatter, CFNumberRef? number);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFNumberFormatterCreateStringWithNumber(CFAllocatorRef? allocator, CFNumberFormatterRef? formatter, CFNumberRef? number);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFNumberFormatterCreateStringWithValue(CFAllocatorRef? allocator, CFNumberFormatterRef? formatter, CFNumberType numberType, void* valuePtr);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFNumberFormatterCreateStringWithValue(CFAllocatorRef? allocator, CFNumberFormatterRef? formatter, CFNumberType numberType, void* valuePtr);
 
 [Flags]
 public enum CFNumberFormatterOptionFlags : ulong
@@ -73,13 +76,15 @@ public enum CFNumberFormatterOptionFlags : ulong
     kCFNumberFormatterParseIntegersOnly = 1,
 }
 
-[ReturnsRetained] public extern "C" CFNumberRef? CFNumberFormatterCreateNumberFromString(CFAllocatorRef? allocator, CFNumberFormatterRef? formatter, CFStringRef? string, CFRange* rangep, CFOptionFlags options);
+[ReturnsRetained]
+public extern "C" CFNumberRef? CFNumberFormatterCreateNumberFromString(CFAllocatorRef? allocator, CFNumberFormatterRef? formatter, CFStringRef? string, CFRange* rangep, CFOptionFlags options);
 
 public extern "C" Boolean CFNumberFormatterGetValueFromString(CFNumberFormatterRef? formatter, CFStringRef? string, CFRange* rangep, CFNumberType numberType, void* valuePtr);
 
 public extern "C" void CFNumberFormatterSetProperty(CFNumberFormatterRef? formatter, CFNumberFormatterKey? key, CFTypeRef? value);
 
-[ReturnsRetained] public extern "C" CFTypeRef? CFNumberFormatterCopyProperty(CFNumberFormatterRef? formatter, CFNumberFormatterKey? key);
+[ReturnsRetained]
+public extern "C" CFTypeRef? CFNumberFormatterCopyProperty(CFNumberFormatterRef? formatter, CFNumberFormatterKey? key);
 
 public extern "C" CFNumberFormatterKey? kCFNumberFormatterCurrencyCode;
 

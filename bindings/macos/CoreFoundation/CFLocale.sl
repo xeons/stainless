@@ -43,27 +43,38 @@ public extern "C" CFTypeID CFLocaleGetTypeID();
 
 public extern "C" CFLocaleRef? CFLocaleGetSystem();
 
-[ReturnsRetained] public extern "C" CFLocaleRef? CFLocaleCopyCurrent();
+[ReturnsRetained]
+public extern "C" CFLocaleRef? CFLocaleCopyCurrent();
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFLocaleCopyAvailableLocaleIdentifiers();
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFLocaleCopyAvailableLocaleIdentifiers();
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFLocaleCopyISOLanguageCodes();
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFLocaleCopyISOLanguageCodes();
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFLocaleCopyISOCountryCodes();
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFLocaleCopyISOCountryCodes();
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFLocaleCopyISOCurrencyCodes();
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFLocaleCopyISOCurrencyCodes();
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFLocaleCopyCommonISOCurrencyCodes();
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFLocaleCopyCommonISOCurrencyCodes();
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFLocaleCopyPreferredLanguages();
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFLocaleCopyPreferredLanguages();
 
-[ReturnsRetained] public extern "C" CFLocaleIdentifier? CFLocaleCreateCanonicalLanguageIdentifierFromString(CFAllocatorRef? allocator, CFStringRef? localeIdentifier);
+[ReturnsRetained]
+public extern "C" CFLocaleIdentifier? CFLocaleCreateCanonicalLanguageIdentifierFromString(CFAllocatorRef? allocator, CFStringRef? localeIdentifier);
 
-[ReturnsRetained] public extern "C" CFLocaleIdentifier? CFLocaleCreateCanonicalLocaleIdentifierFromString(CFAllocatorRef? allocator, CFStringRef? localeIdentifier);
+[ReturnsRetained]
+public extern "C" CFLocaleIdentifier? CFLocaleCreateCanonicalLocaleIdentifierFromString(CFAllocatorRef? allocator, CFStringRef? localeIdentifier);
 
-[ReturnsRetained] public extern "C" CFLocaleIdentifier? CFLocaleCreateCanonicalLocaleIdentifierFromScriptManagerCodes(CFAllocatorRef? allocator, LangCode lcode, RegionCode rcode);
+[ReturnsRetained]
+public extern "C" CFLocaleIdentifier? CFLocaleCreateCanonicalLocaleIdentifierFromScriptManagerCodes(CFAllocatorRef? allocator, LangCode lcode, RegionCode rcode);
 
-[ReturnsRetained] public extern "C" CFLocaleIdentifier? CFLocaleCreateLocaleIdentifierFromWindowsLocaleCode(CFAllocatorRef? allocator, uint lcid);
+[ReturnsRetained]
+public extern "C" CFLocaleIdentifier? CFLocaleCreateLocaleIdentifierFromWindowsLocaleCode(CFAllocatorRef? allocator, uint lcid);
 
 public extern "C" uint CFLocaleGetWindowsLocaleCodeFromLocaleIdentifier(CFLocaleIdentifier? localeIdentifier);
 
@@ -80,19 +91,24 @@ public extern "C" CFLocaleLanguageDirection CFLocaleGetLanguageCharacterDirectio
 
 public extern "C" CFLocaleLanguageDirection CFLocaleGetLanguageLineDirection(CFStringRef? isoLangCode);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CFLocaleCreateComponentsFromLocaleIdentifier(CFAllocatorRef? allocator, CFLocaleIdentifier? localeID);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CFLocaleCreateComponentsFromLocaleIdentifier(CFAllocatorRef? allocator, CFLocaleIdentifier? localeID);
 
-[ReturnsRetained] public extern "C" CFLocaleIdentifier? CFLocaleCreateLocaleIdentifierFromComponents(CFAllocatorRef? allocator, CFDictionaryRef? dictionary);
+[ReturnsRetained]
+public extern "C" CFLocaleIdentifier? CFLocaleCreateLocaleIdentifierFromComponents(CFAllocatorRef? allocator, CFDictionaryRef? dictionary);
 
-[ReturnsRetained] public extern "C" CFLocaleRef? CFLocaleCreate(CFAllocatorRef? allocator, CFLocaleIdentifier? localeIdentifier);
+[ReturnsRetained]
+public extern "C" CFLocaleRef? CFLocaleCreate(CFAllocatorRef? allocator, CFLocaleIdentifier? localeIdentifier);
 
-[ReturnsRetained] public extern "C" CFLocaleRef? CFLocaleCreateCopy(CFAllocatorRef? allocator, CFLocaleRef? locale);
+[ReturnsRetained]
+public extern "C" CFLocaleRef? CFLocaleCreateCopy(CFAllocatorRef? allocator, CFLocaleRef? locale);
 
 public extern "C" CFLocaleIdentifier? CFLocaleGetIdentifier(CFLocaleRef? locale);
 
 public extern "C" CFTypeRef? CFLocaleGetValue(CFLocaleRef? locale, CFLocaleKey? key);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFLocaleCopyDisplayNameForPropertyValue(CFLocaleRef? displayLocale, CFLocaleKey? key, CFStringRef? value);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFLocaleCopyDisplayNameForPropertyValue(CFLocaleRef? displayLocale, CFLocaleKey? key, CFStringRef? value);
 
 public extern "C" CFNotificationName? kCFLocaleCurrentLocaleDidChangeNotification;
 

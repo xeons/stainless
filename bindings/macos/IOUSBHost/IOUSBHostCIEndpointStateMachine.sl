@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class IOUSBHostCIEndpointStateMachine : NSObject
 {
-    [Selector("endpointState")] public IOUSBHostCIEndpointState EndpointState { get; }
-    [Selector("deviceAddress")] public NSUInteger DeviceAddress { get; }
-    [Selector("endpointAddress")] public NSUInteger EndpointAddress { get; }
-    [Selector("currentTransferMessage")] public IOUSBHostCIMessage* CurrentTransferMessage { get; }
-    [Selector("controllerInterface")] public IOUSBHostControllerInterface ControllerInterface { get; }
-    [Selector("initWithInterface:command:error:")] public Self? InitWithInterfaceCommandError(IOUSBHostControllerInterface @interface, IOUSBHostCIMessage* command, out NSError? error);
-    [Selector("inspectCommand:error:")] public bool InspectCommandError(IOUSBHostCIMessage* command, out NSError? error);
-    [Selector("respondToCommand:status:error:")] public bool RespondToCommandStatusError(IOUSBHostCIMessage* command, IOUSBHostCIMessageStatus status, out NSError? error);
-    [Selector("processDoorbell:error:")] public bool ProcessDoorbellError(IOUSBHostCIDoorbell doorbell, out NSError? error);
-    [Selector("enqueueTransferCompletionForMessage:status:transferLength:error:")] public bool EnqueueTransferCompletionForMessageStatusTransferLengthError(IOUSBHostCIMessage* message, IOUSBHostCIMessageStatus status, NSUInteger transferLength, out NSError? error);
+    [Selector("endpointState")]
+    public IOUSBHostCIEndpointState EndpointState { get; }
+    [Selector("deviceAddress")]
+    public NSUInteger DeviceAddress { get; }
+    [Selector("endpointAddress")]
+    public NSUInteger EndpointAddress { get; }
+    [Selector("currentTransferMessage")]
+    public IOUSBHostCIMessage* CurrentTransferMessage { get; }
+    [Selector("controllerInterface")]
+    public IOUSBHostControllerInterface ControllerInterface { get; }
+    [Selector("initWithInterface:command:error:")]
+    public Self? InitWithInterfaceCommandError(IOUSBHostControllerInterface @interface, IOUSBHostCIMessage* command, out NSError? error);
+    [Selector("inspectCommand:error:")]
+    public bool InspectCommandError(IOUSBHostCIMessage* command, out NSError? error);
+    [Selector("respondToCommand:status:error:")]
+    public bool RespondToCommandStatusError(IOUSBHostCIMessage* command, IOUSBHostCIMessageStatus status, out NSError? error);
+    [Selector("processDoorbell:error:")]
+    public bool ProcessDoorbellError(IOUSBHostCIDoorbell doorbell, out NSError? error);
+    [Selector("enqueueTransferCompletionForMessage:status:transferLength:error:")]
+    public bool EnqueueTransferCompletionForMessageStatusTransferLengthError(IOUSBHostCIMessage* message, IOUSBHostCIMessageStatus status, NSUInteger transferLength, out NSError? error);
 }
 
 #endif

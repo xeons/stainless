@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class NSArray : NSObject, NSCopying, NSMutableCopying, NSSecureCoding, NSFastEnumeration
 {
-    [Selector("count")] public NSUInteger Count { get; }
-    [Selector("objectAtIndex:")] public AnyObject ObjectAtIndex(NSUInteger index);
-    [Selector("init")] public Self Init();
-    [Selector("initWithObjects:count:")] public Self InitWithObjectsCount(void** objects, NSUInteger cnt);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("count")]
+    public NSUInteger Count { get; }
+    [Selector("objectAtIndex:")]
+    public AnyObject ObjectAtIndex(NSUInteger index);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithObjects:count:")]
+    public Self InitWithObjectsCount(void** objects, NSUInteger cnt);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 public delegate NSInteger NSArraySortedArrayUsingFunctionContextComparatorFunction(void* arg0, void* arg1, void* arg2);
@@ -64,46 +69,86 @@ public objc closure bool NSArrayIndexesOfObjectsAtIndexesOptionsPassingTestPredi
 /// NSExtendedArray, a category of NSArray.
 public extern objc class NSArray
 {
-    [Selector("description")] public NSString Description { get; }
-    [Selector("firstObject")] public AnyObject? FirstObject { get; }
-    [Selector("lastObject")] public AnyObject? LastObject { get; }
-    [Selector("sortedArrayHint")] public NSData SortedArrayHint { get; }
-    [Selector("arrayByAddingObject:")] public NSArray ArrayByAddingObject(AnyObject anObject);
-    [Selector("arrayByAddingObjectsFromArray:")] public NSArray ArrayByAddingObjectsFromArray(NSArray otherArray);
-    [Selector("componentsJoinedByString:")] public NSString ComponentsJoinedByString(NSString separator);
-    [Selector("containsObject:")] public bool ContainsObject(AnyObject anObject);
-    [Selector("descriptionWithLocale:")] public NSString DescriptionWithLocale(AnyObject? locale);
-    [Selector("descriptionWithLocale:indent:")] public NSString DescriptionWithLocaleIndent(AnyObject? locale, NSUInteger level);
-    [Selector("firstObjectCommonWithArray:")] public AnyObject? FirstObjectCommonWithArray(NSArray otherArray);
-    [Selector("getObjects:range:")] public void GetObjectsRange(void** objects, NSRange range);
-    [Selector("indexOfObject:")] public NSUInteger IndexOfObject(AnyObject anObject);
-    [Selector("indexOfObject:inRange:")] public NSUInteger IndexOfObjectInRange(AnyObject anObject, NSRange range);
-    [Selector("indexOfObjectIdenticalTo:")] public NSUInteger IndexOfObjectIdenticalTo(AnyObject anObject);
-    [Selector("indexOfObjectIdenticalTo:inRange:")] public NSUInteger IndexOfObjectIdenticalToInRange(AnyObject anObject, NSRange range);
-    [Selector("isEqualToArray:")] public bool IsEqualToArray(NSArray otherArray);
-    [Selector("objectEnumerator")] public NSEnumerator ObjectEnumerator();
-    [Selector("reverseObjectEnumerator")] public NSEnumerator ReverseObjectEnumerator();
-    [Selector("sortedArrayUsingFunction:context:")] public NSArray SortedArrayUsingFunctionContext(NSArraySortedArrayUsingFunctionContextComparatorFunction comparator, void* context);
-    [Selector("sortedArrayUsingFunction:context:hint:")] public NSArray SortedArrayUsingFunctionContextHint(NSArraySortedArrayUsingFunctionContextHintComparatorFunction comparator, void* context, NSData? hint);
-    [Selector("sortedArrayUsingSelector:")] public NSArray SortedArrayUsingSelector(Selector comparator);
-    [Selector("subarrayWithRange:")] public NSArray SubarrayWithRange(NSRange range);
-    [Selector("writeToURL:error:")] public bool WriteToURLError(NSURL url, out NSError? error);
-    [Selector("makeObjectsPerformSelector:")] public void MakeObjectsPerformSelector(Selector aSelector);
-    [Selector("makeObjectsPerformSelector:withObject:")] public void MakeObjectsPerformSelectorWithObject(Selector aSelector, AnyObject? argument);
-    [Selector("objectsAtIndexes:")] public NSArray ObjectsAtIndexes(NSIndexSet indexes);
-    [Selector("objectAtIndexedSubscript:")] public AnyObject ObjectAtIndexedSubscript(NSUInteger idx);
-    [Selector("enumerateObjectsUsingBlock:")] public void EnumerateObjectsUsingBlock(NSArrayEnumerateObjectsUsingBlockBlock block);
-    [Selector("enumerateObjectsWithOptions:usingBlock:")] public void EnumerateObjectsWithOptionsUsingBlock(NSEnumerationOptions opts, NSArrayEnumerateObjectsWithOptionsUsingBlockBlock block);
-    [Selector("enumerateObjectsAtIndexes:options:usingBlock:")] public void EnumerateObjectsAtIndexesOptionsUsingBlock(NSIndexSet s, NSEnumerationOptions opts, NSArrayEnumerateObjectsAtIndexesOptionsUsingBlockBlock block);
-    [Selector("indexOfObjectPassingTest:")] public NSUInteger IndexOfObjectPassingTest(NSArrayIndexOfObjectPassingTestPredicateBlock predicate);
-    [Selector("indexOfObjectWithOptions:passingTest:")] public NSUInteger IndexOfObjectWithOptionsPassingTest(NSEnumerationOptions opts, NSArrayIndexOfObjectWithOptionsPassingTestPredicateBlock predicate);
-    [Selector("indexOfObjectAtIndexes:options:passingTest:")] public NSUInteger IndexOfObjectAtIndexesOptionsPassingTest(NSIndexSet s, NSEnumerationOptions opts, NSArrayIndexOfObjectAtIndexesOptionsPassingTestPredicateBlock predicate);
-    [Selector("indexesOfObjectsPassingTest:")] public NSIndexSet IndexesOfObjectsPassingTest(NSArrayIndexesOfObjectsPassingTestPredicateBlock predicate);
-    [Selector("indexesOfObjectsWithOptions:passingTest:")] public NSIndexSet IndexesOfObjectsWithOptionsPassingTest(NSEnumerationOptions opts, NSArrayIndexesOfObjectsWithOptionsPassingTestPredicateBlock predicate);
-    [Selector("indexesOfObjectsAtIndexes:options:passingTest:")] public NSIndexSet IndexesOfObjectsAtIndexesOptionsPassingTest(NSIndexSet s, NSEnumerationOptions opts, NSArrayIndexesOfObjectsAtIndexesOptionsPassingTestPredicateBlock predicate);
-    [Selector("sortedArrayUsingComparator:")] public NSArray SortedArrayUsingComparator(NSComparator cmptr);
-    [Selector("sortedArrayWithOptions:usingComparator:")] public NSArray SortedArrayWithOptionsUsingComparator(NSSortOptions opts, NSComparator cmptr);
-    [Selector("indexOfObject:inSortedRange:options:usingComparator:")] public NSUInteger IndexOfObjectInSortedRangeOptionsUsingComparator(AnyObject obj, NSRange r, NSBinarySearchingOptions opts, NSComparator cmp);
+    [Selector("description")]
+    public NSString Description { get; }
+    [Selector("firstObject")]
+    public AnyObject? FirstObject { get; }
+    [Selector("lastObject")]
+    public AnyObject? LastObject { get; }
+    [Selector("sortedArrayHint")]
+    public NSData SortedArrayHint { get; }
+    [Selector("arrayByAddingObject:")]
+    public NSArray ArrayByAddingObject(AnyObject anObject);
+    [Selector("arrayByAddingObjectsFromArray:")]
+    public NSArray ArrayByAddingObjectsFromArray(NSArray otherArray);
+    [Selector("componentsJoinedByString:")]
+    public NSString ComponentsJoinedByString(NSString separator);
+    [Selector("containsObject:")]
+    public bool ContainsObject(AnyObject anObject);
+    [Selector("descriptionWithLocale:")]
+    public NSString DescriptionWithLocale(AnyObject? locale);
+    [Selector("descriptionWithLocale:indent:")]
+    public NSString DescriptionWithLocaleIndent(AnyObject? locale, NSUInteger level);
+    [Selector("firstObjectCommonWithArray:")]
+    public AnyObject? FirstObjectCommonWithArray(NSArray otherArray);
+    [Selector("getObjects:range:")]
+    public void GetObjectsRange(void** objects, NSRange range);
+    [Selector("indexOfObject:")]
+    public NSUInteger IndexOfObject(AnyObject anObject);
+    [Selector("indexOfObject:inRange:")]
+    public NSUInteger IndexOfObjectInRange(AnyObject anObject, NSRange range);
+    [Selector("indexOfObjectIdenticalTo:")]
+    public NSUInteger IndexOfObjectIdenticalTo(AnyObject anObject);
+    [Selector("indexOfObjectIdenticalTo:inRange:")]
+    public NSUInteger IndexOfObjectIdenticalToInRange(AnyObject anObject, NSRange range);
+    [Selector("isEqualToArray:")]
+    public bool IsEqualToArray(NSArray otherArray);
+    [Selector("objectEnumerator")]
+    public NSEnumerator ObjectEnumerator();
+    [Selector("reverseObjectEnumerator")]
+    public NSEnumerator ReverseObjectEnumerator();
+    [Selector("sortedArrayUsingFunction:context:")]
+    public NSArray SortedArrayUsingFunctionContext(NSArraySortedArrayUsingFunctionContextComparatorFunction comparator, void* context);
+    [Selector("sortedArrayUsingFunction:context:hint:")]
+    public NSArray SortedArrayUsingFunctionContextHint(NSArraySortedArrayUsingFunctionContextHintComparatorFunction comparator, void* context, NSData? hint);
+    [Selector("sortedArrayUsingSelector:")]
+    public NSArray SortedArrayUsingSelector(Selector comparator);
+    [Selector("subarrayWithRange:")]
+    public NSArray SubarrayWithRange(NSRange range);
+    [Selector("writeToURL:error:")]
+    public bool WriteToURLError(NSURL url, out NSError? error);
+    [Selector("makeObjectsPerformSelector:")]
+    public void MakeObjectsPerformSelector(Selector aSelector);
+    [Selector("makeObjectsPerformSelector:withObject:")]
+    public void MakeObjectsPerformSelectorWithObject(Selector aSelector, AnyObject? argument);
+    [Selector("objectsAtIndexes:")]
+    public NSArray ObjectsAtIndexes(NSIndexSet indexes);
+    [Selector("objectAtIndexedSubscript:")]
+    public AnyObject ObjectAtIndexedSubscript(NSUInteger idx);
+    [Selector("enumerateObjectsUsingBlock:")]
+    public void EnumerateObjectsUsingBlock(NSArrayEnumerateObjectsUsingBlockBlock block);
+    [Selector("enumerateObjectsWithOptions:usingBlock:")]
+    public void EnumerateObjectsWithOptionsUsingBlock(NSEnumerationOptions opts, NSArrayEnumerateObjectsWithOptionsUsingBlockBlock block);
+    [Selector("enumerateObjectsAtIndexes:options:usingBlock:")]
+    public void EnumerateObjectsAtIndexesOptionsUsingBlock(NSIndexSet s, NSEnumerationOptions opts, NSArrayEnumerateObjectsAtIndexesOptionsUsingBlockBlock block);
+    [Selector("indexOfObjectPassingTest:")]
+    public NSUInteger IndexOfObjectPassingTest(NSArrayIndexOfObjectPassingTestPredicateBlock predicate);
+    [Selector("indexOfObjectWithOptions:passingTest:")]
+    public NSUInteger IndexOfObjectWithOptionsPassingTest(NSEnumerationOptions opts, NSArrayIndexOfObjectWithOptionsPassingTestPredicateBlock predicate);
+    [Selector("indexOfObjectAtIndexes:options:passingTest:")]
+    public NSUInteger IndexOfObjectAtIndexesOptionsPassingTest(NSIndexSet s, NSEnumerationOptions opts, NSArrayIndexOfObjectAtIndexesOptionsPassingTestPredicateBlock predicate);
+    [Selector("indexesOfObjectsPassingTest:")]
+    public NSIndexSet IndexesOfObjectsPassingTest(NSArrayIndexesOfObjectsPassingTestPredicateBlock predicate);
+    [Selector("indexesOfObjectsWithOptions:passingTest:")]
+    public NSIndexSet IndexesOfObjectsWithOptionsPassingTest(NSEnumerationOptions opts, NSArrayIndexesOfObjectsWithOptionsPassingTestPredicateBlock predicate);
+    [Selector("indexesOfObjectsAtIndexes:options:passingTest:")]
+    public NSIndexSet IndexesOfObjectsAtIndexesOptionsPassingTest(NSIndexSet s, NSEnumerationOptions opts, NSArrayIndexesOfObjectsAtIndexesOptionsPassingTestPredicateBlock predicate);
+    [Selector("sortedArrayUsingComparator:")]
+    public NSArray SortedArrayUsingComparator(NSComparator cmptr);
+    [Selector("sortedArrayWithOptions:usingComparator:")]
+    public NSArray SortedArrayWithOptionsUsingComparator(NSSortOptions opts, NSComparator cmptr);
+    [Selector("indexOfObject:inSortedRange:options:usingComparator:")]
+    public NSUInteger IndexOfObjectInSortedRangeOptionsUsingComparator(AnyObject obj, NSRange r, NSBinarySearchingOptions opts, NSComparator cmp);
 }
 
 [Flags]
@@ -117,16 +162,26 @@ public enum NSBinarySearchingOptions : ulong
 /// NSArrayCreation, a category of NSArray.
 public extern objc class NSArray
 {
-    [Selector("array")] public static Self Array();
-    [Selector("arrayWithObject:")] public static Self ArrayWithObject(AnyObject anObject);
-    [Selector("arrayWithObjects:count:")] public static Self ArrayWithObjectsCount(void** objects, NSUInteger cnt);
-    [Selector("arrayWithObjects:")] public static Self ArrayWithObjects(AnyObject firstObj, ...);
-    [Selector("arrayWithArray:")] public static Self ArrayWithArray(NSArray array);
-    [Selector("initWithObjects:")] public Self InitWithObjects(AnyObject firstObj, ...);
-    [Selector("initWithArray:")] public Self InitWithArray(NSArray array);
-    [Selector("initWithArray:copyItems:")] public Self InitWithArrayCopyItems(NSArray array, bool flag);
-    [Selector("initWithContentsOfURL:error:")] public NSArray? InitWithContentsOfURLError(NSURL url, out NSError? error);
-    [Selector("arrayWithContentsOfURL:error:")] public static NSArray? ArrayWithContentsOfURLError(NSURL url, out NSError? error);
+    [Selector("array")]
+    public static Self Array();
+    [Selector("arrayWithObject:")]
+    public static Self ArrayWithObject(AnyObject anObject);
+    [Selector("arrayWithObjects:count:")]
+    public static Self ArrayWithObjectsCount(void** objects, NSUInteger cnt);
+    [Selector("arrayWithObjects:")]
+    public static Self ArrayWithObjects(AnyObject firstObj, ...);
+    [Selector("arrayWithArray:")]
+    public static Self ArrayWithArray(NSArray array);
+    [Selector("initWithObjects:")]
+    public Self InitWithObjects(AnyObject firstObj, ...);
+    [Selector("initWithArray:")]
+    public Self InitWithArray(NSArray array);
+    [Selector("initWithArray:copyItems:")]
+    public Self InitWithArrayCopyItems(NSArray array, bool flag);
+    [Selector("initWithContentsOfURL:error:")]
+    public NSArray? InitWithContentsOfURLError(NSURL url, out NSError? error);
+    [Selector("arrayWithContentsOfURL:error:")]
+    public static NSArray? ArrayWithContentsOfURLError(NSURL url, out NSError? error);
 }
 
 public objc closure bool NSArrayDifferenceFromArrayWithOptionsUsingEquivalenceTestBlock(AnyObject arg0, AnyObject arg1);
@@ -134,41 +189,60 @@ public objc closure bool NSArrayDifferenceFromArrayWithOptionsUsingEquivalenceTe
 /// NSArrayDiffing, a category of NSArray.
 public extern objc class NSArray
 {
-    [Selector("differenceFromArray:withOptions:usingEquivalenceTest:")] public NSOrderedCollectionDifference DifferenceFromArrayWithOptionsUsingEquivalenceTest(NSArray other, NSOrderedCollectionDifferenceCalculationOptions options, NSArrayDifferenceFromArrayWithOptionsUsingEquivalenceTestBlock block);
-    [Selector("differenceFromArray:withOptions:")] public NSOrderedCollectionDifference DifferenceFromArrayWithOptions(NSArray other, NSOrderedCollectionDifferenceCalculationOptions options);
-    [Selector("differenceFromArray:")] public NSOrderedCollectionDifference DifferenceFromArray(NSArray other);
-    [Selector("arrayByApplyingDifference:")] public NSArray? ArrayByApplyingDifference(NSOrderedCollectionDifference difference);
+    [Selector("differenceFromArray:withOptions:usingEquivalenceTest:")]
+    public NSOrderedCollectionDifference DifferenceFromArrayWithOptionsUsingEquivalenceTest(NSArray other, NSOrderedCollectionDifferenceCalculationOptions options, NSArrayDifferenceFromArrayWithOptionsUsingEquivalenceTestBlock block);
+    [Selector("differenceFromArray:withOptions:")]
+    public NSOrderedCollectionDifference DifferenceFromArrayWithOptions(NSArray other, NSOrderedCollectionDifferenceCalculationOptions options);
+    [Selector("differenceFromArray:")]
+    public NSOrderedCollectionDifference DifferenceFromArray(NSArray other);
+    [Selector("arrayByApplyingDifference:")]
+    public NSArray? ArrayByApplyingDifference(NSOrderedCollectionDifference difference);
 }
 
 /// NSDeprecated, a category of NSArray.
 public extern objc class NSArray
 {
     /// Deprecated in macOS 10.13.
-    [Selector("getObjects:")] public void GetObjects(void** objects);
+    [Selector("getObjects:")]
+    public void GetObjects(void** objects);
     /// Deprecated in macOS 100000.
-    [Selector("arrayWithContentsOfFile:")] public static NSArray? ArrayWithContentsOfFile(NSString path);
+    [Selector("arrayWithContentsOfFile:")]
+    public static NSArray? ArrayWithContentsOfFile(NSString path);
     /// Deprecated in macOS 100000.
-    [Selector("arrayWithContentsOfURL:")] public static NSArray? ArrayWithContentsOfURL(NSURL url);
+    [Selector("arrayWithContentsOfURL:")]
+    public static NSArray? ArrayWithContentsOfURL(NSURL url);
     /// Deprecated in macOS 100000.
-    [Selector("initWithContentsOfFile:")] public NSArray? InitWithContentsOfFile(NSString path);
+    [Selector("initWithContentsOfFile:")]
+    public NSArray? InitWithContentsOfFile(NSString path);
     /// Deprecated in macOS 100000.
-    [Selector("initWithContentsOfURL:")] public NSArray? InitWithContentsOfURL(NSURL url);
+    [Selector("initWithContentsOfURL:")]
+    public NSArray? InitWithContentsOfURL(NSURL url);
     /// Deprecated in macOS 100000.
-    [Selector("writeToFile:atomically:")] public bool WriteToFileAtomically(NSString path, bool useAuxiliaryFile);
+    [Selector("writeToFile:atomically:")]
+    public bool WriteToFileAtomically(NSString path, bool useAuxiliaryFile);
     /// Deprecated in macOS 100000.
-    [Selector("writeToURL:atomically:")] public bool WriteToURLAtomically(NSURL url, bool atomically);
+    [Selector("writeToURL:atomically:")]
+    public bool WriteToURLAtomically(NSURL url, bool atomically);
 }
 
 public extern objc class NSMutableArray : NSArray
 {
-    [Selector("addObject:")] public void AddObject(AnyObject anObject);
-    [Selector("insertObject:atIndex:")] public void InsertObjectAtIndex(AnyObject anObject, NSUInteger index);
-    [Selector("removeLastObject")] public void RemoveLastObject();
-    [Selector("removeObjectAtIndex:")] public void RemoveObjectAtIndex(NSUInteger index);
-    [Selector("replaceObjectAtIndex:withObject:")] public void ReplaceObjectAtIndexWithObject(NSUInteger index, AnyObject anObject);
-    [Selector("init")] public Self Init();
-    [Selector("initWithCapacity:")] public Self InitWithCapacity(NSUInteger numItems);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("addObject:")]
+    public void AddObject(AnyObject anObject);
+    [Selector("insertObject:atIndex:")]
+    public void InsertObjectAtIndex(AnyObject anObject, NSUInteger index);
+    [Selector("removeLastObject")]
+    public void RemoveLastObject();
+    [Selector("removeObjectAtIndex:")]
+    public void RemoveObjectAtIndex(NSUInteger index);
+    [Selector("replaceObjectAtIndex:withObject:")]
+    public void ReplaceObjectAtIndexWithObject(NSUInteger index, AnyObject anObject);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCapacity:")]
+    public Self InitWithCapacity(NSUInteger numItems);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 public delegate NSInteger NSMutableArraySortUsingFunctionContextCompareFunction(void* arg0, void* arg1, void* arg2);
@@ -176,44 +250,71 @@ public delegate NSInteger NSMutableArraySortUsingFunctionContextCompareFunction(
 /// NSExtendedMutableArray, a category of NSMutableArray.
 public extern objc class NSMutableArray
 {
-    [Selector("addObjectsFromArray:")] public void AddObjectsFromArray(NSArray otherArray);
-    [Selector("exchangeObjectAtIndex:withObjectAtIndex:")] public void ExchangeObjectAtIndexWithObjectAtIndex(NSUInteger idx1, NSUInteger idx2);
-    [Selector("removeAllObjects")] public void RemoveAllObjects();
-    [Selector("removeObject:inRange:")] public void RemoveObjectInRange(AnyObject anObject, NSRange range);
-    [Selector("removeObject:")] public void RemoveObject(AnyObject anObject);
-    [Selector("removeObjectIdenticalTo:inRange:")] public void RemoveObjectIdenticalToInRange(AnyObject anObject, NSRange range);
-    [Selector("removeObjectIdenticalTo:")] public void RemoveObjectIdenticalTo(AnyObject anObject);
+    [Selector("addObjectsFromArray:")]
+    public void AddObjectsFromArray(NSArray otherArray);
+    [Selector("exchangeObjectAtIndex:withObjectAtIndex:")]
+    public void ExchangeObjectAtIndexWithObjectAtIndex(NSUInteger idx1, NSUInteger idx2);
+    [Selector("removeAllObjects")]
+    public void RemoveAllObjects();
+    [Selector("removeObject:inRange:")]
+    public void RemoveObjectInRange(AnyObject anObject, NSRange range);
+    [Selector("removeObject:")]
+    public void RemoveObject(AnyObject anObject);
+    [Selector("removeObjectIdenticalTo:inRange:")]
+    public void RemoveObjectIdenticalToInRange(AnyObject anObject, NSRange range);
+    [Selector("removeObjectIdenticalTo:")]
+    public void RemoveObjectIdenticalTo(AnyObject anObject);
     /// Deprecated in macOS 10.6.
-    [Selector("removeObjectsFromIndices:numIndices:")] public void RemoveObjectsFromIndicesNumIndices(NSUInteger* indices, NSUInteger cnt);
-    [Selector("removeObjectsInArray:")] public void RemoveObjectsInArray(NSArray otherArray);
-    [Selector("removeObjectsInRange:")] public void RemoveObjectsInRange(NSRange range);
-    [Selector("replaceObjectsInRange:withObjectsFromArray:range:")] public void ReplaceObjectsInRangeWithObjectsFromArrayRange(NSRange range, NSArray otherArray, NSRange otherRange);
-    [Selector("replaceObjectsInRange:withObjectsFromArray:")] public void ReplaceObjectsInRangeWithObjectsFromArray(NSRange range, NSArray otherArray);
-    [Selector("setArray:")] public void SetArray(NSArray otherArray);
-    [Selector("sortUsingFunction:context:")] public void SortUsingFunctionContext(NSMutableArraySortUsingFunctionContextCompareFunction compare, void* context);
-    [Selector("sortUsingSelector:")] public void SortUsingSelector(Selector comparator);
-    [Selector("insertObjects:atIndexes:")] public void InsertObjectsAtIndexes(NSArray objects, NSIndexSet indexes);
-    [Selector("removeObjectsAtIndexes:")] public void RemoveObjectsAtIndexes(NSIndexSet indexes);
-    [Selector("replaceObjectsAtIndexes:withObjects:")] public void ReplaceObjectsAtIndexesWithObjects(NSIndexSet indexes, NSArray objects);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(AnyObject obj, NSUInteger idx);
-    [Selector("sortUsingComparator:")] public void SortUsingComparator(NSComparator cmptr);
-    [Selector("sortWithOptions:usingComparator:")] public void SortWithOptionsUsingComparator(NSSortOptions opts, NSComparator cmptr);
+    [Selector("removeObjectsFromIndices:numIndices:")]
+    public void RemoveObjectsFromIndicesNumIndices(NSUInteger* indices, NSUInteger cnt);
+    [Selector("removeObjectsInArray:")]
+    public void RemoveObjectsInArray(NSArray otherArray);
+    [Selector("removeObjectsInRange:")]
+    public void RemoveObjectsInRange(NSRange range);
+    [Selector("replaceObjectsInRange:withObjectsFromArray:range:")]
+    public void ReplaceObjectsInRangeWithObjectsFromArrayRange(NSRange range, NSArray otherArray, NSRange otherRange);
+    [Selector("replaceObjectsInRange:withObjectsFromArray:")]
+    public void ReplaceObjectsInRangeWithObjectsFromArray(NSRange range, NSArray otherArray);
+    [Selector("setArray:")]
+    public void SetArray(NSArray otherArray);
+    [Selector("sortUsingFunction:context:")]
+    public void SortUsingFunctionContext(NSMutableArraySortUsingFunctionContextCompareFunction compare, void* context);
+    [Selector("sortUsingSelector:")]
+    public void SortUsingSelector(Selector comparator);
+    [Selector("insertObjects:atIndexes:")]
+    public void InsertObjectsAtIndexes(NSArray objects, NSIndexSet indexes);
+    [Selector("removeObjectsAtIndexes:")]
+    public void RemoveObjectsAtIndexes(NSIndexSet indexes);
+    [Selector("replaceObjectsAtIndexes:withObjects:")]
+    public void ReplaceObjectsAtIndexesWithObjects(NSIndexSet indexes, NSArray objects);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(AnyObject obj, NSUInteger idx);
+    [Selector("sortUsingComparator:")]
+    public void SortUsingComparator(NSComparator cmptr);
+    [Selector("sortWithOptions:usingComparator:")]
+    public void SortWithOptionsUsingComparator(NSSortOptions opts, NSComparator cmptr);
 }
 
 /// NSMutableArrayCreation, a category of NSMutableArray.
 public extern objc class NSMutableArray
 {
-    [Selector("arrayWithCapacity:")] public static Self ArrayWithCapacity(NSUInteger numItems);
-    [Selector("arrayWithContentsOfFile:")] public static NSMutableArray? ArrayWithContentsOfFile(NSString path);
-    [Selector("arrayWithContentsOfURL:")] public static NSMutableArray? ArrayWithContentsOfURL(NSURL url);
-    [Selector("initWithContentsOfFile:")] public NSMutableArray? InitWithContentsOfFile(NSString path);
-    [Selector("initWithContentsOfURL:")] public NSMutableArray? InitWithContentsOfURL(NSURL url);
+    [Selector("arrayWithCapacity:")]
+    public static Self ArrayWithCapacity(NSUInteger numItems);
+    [Selector("arrayWithContentsOfFile:")]
+    public static NSMutableArray? ArrayWithContentsOfFile(NSString path);
+    [Selector("arrayWithContentsOfURL:")]
+    public static NSMutableArray? ArrayWithContentsOfURL(NSURL url);
+    [Selector("initWithContentsOfFile:")]
+    public NSMutableArray? InitWithContentsOfFile(NSString path);
+    [Selector("initWithContentsOfURL:")]
+    public NSMutableArray? InitWithContentsOfURL(NSURL url);
 }
 
 /// NSMutableArrayDiffing, a category of NSMutableArray.
 public extern objc class NSMutableArray
 {
-    [Selector("applyDifference:")] public void ApplyDifference(NSOrderedCollectionDifference difference);
+    [Selector("applyDifference:")]
+    public void ApplyDifference(NSOrderedCollectionDifference difference);
 }
 
 #endif

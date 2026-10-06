@@ -43,48 +43,76 @@ public using CATransitionSubtype = NSString;
 
 public extern objc class CAAnimation : NSObject, NSSecureCoding, NSCopying, CAMediaTiming, CAAction
 {
-    [Selector("timingFunction", "setTimingFunction:")] public CAMediaTimingFunction? TimingFunction { get; set; }
-    [Selector("delegate", "setDelegate:")] public CAAnimationDelegate? Delegate { get; set; }
-    [Selector("isRemovedOnCompletion", "setRemovedOnCompletion:")] public bool RemovedOnCompletion { get; set; }
-    [Selector("preferredFrameRateRange", "setPreferredFrameRateRange:")] public CAFrameRateRange PreferredFrameRateRange { get; set; }
-    [Selector("animation")] public static Self Animation();
-    [Selector("defaultValueForKey:")] public static AnyObject? DefaultValueForKey(NSString key);
-    [Selector("shouldArchiveValueForKey:")] public bool ShouldArchiveValueForKey(NSString key);
+    [Selector("timingFunction", "setTimingFunction:")]
+    public CAMediaTimingFunction? TimingFunction { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public CAAnimationDelegate? Delegate { get; set; }
+    [Selector("isRemovedOnCompletion", "setRemovedOnCompletion:")]
+    public bool RemovedOnCompletion { get; set; }
+    [Selector("preferredFrameRateRange", "setPreferredFrameRateRange:")]
+    public CAFrameRateRange PreferredFrameRateRange { get; set; }
+    [Selector("animation")]
+    public static Self Animation();
+    [Selector("defaultValueForKey:")]
+    public static AnyObject? DefaultValueForKey(NSString key);
+    [Selector("shouldArchiveValueForKey:")]
+    public bool ShouldArchiveValueForKey(NSString key);
 }
 
 public objc interface CAAnimationDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("animationDidStart:")] void AnimationDidStart(CAAnimation anim);
-    [Optional] [Selector("animationDidStop:finished:")] void AnimationDidStopFinished(CAAnimation anim, bool flag);
+    [Optional]
+    [Selector("animationDidStart:")]
+    void AnimationDidStart(CAAnimation anim);
+    [Optional]
+    [Selector("animationDidStop:finished:")]
+    void AnimationDidStopFinished(CAAnimation anim, bool flag);
 }
 
 public extern objc class CAPropertyAnimation : CAAnimation
 {
-    [Selector("keyPath", "setKeyPath:")] public NSString? KeyPath { get; set; }
-    [Selector("isAdditive", "setAdditive:")] public bool Additive { get; set; }
-    [Selector("isCumulative", "setCumulative:")] public bool Cumulative { get; set; }
-    [Selector("valueFunction", "setValueFunction:")] public CAValueFunction? ValueFunction { get; set; }
-    [Selector("animationWithKeyPath:")] public static Self AnimationWithKeyPath(NSString? path);
+    [Selector("keyPath", "setKeyPath:")]
+    public NSString? KeyPath { get; set; }
+    [Selector("isAdditive", "setAdditive:")]
+    public bool Additive { get; set; }
+    [Selector("isCumulative", "setCumulative:")]
+    public bool Cumulative { get; set; }
+    [Selector("valueFunction", "setValueFunction:")]
+    public CAValueFunction? ValueFunction { get; set; }
+    [Selector("animationWithKeyPath:")]
+    public static Self AnimationWithKeyPath(NSString? path);
 }
 
 public extern objc class CABasicAnimation : CAPropertyAnimation
 {
-    [Selector("fromValue", "setFromValue:")] public AnyObject? FromValue { get; set; }
-    [Selector("toValue", "setToValue:")] public AnyObject? ToValue { get; set; }
-    [Selector("byValue", "setByValue:")] public AnyObject? ByValue { get; set; }
+    [Selector("fromValue", "setFromValue:")]
+    public AnyObject? FromValue { get; set; }
+    [Selector("toValue", "setToValue:")]
+    public AnyObject? ToValue { get; set; }
+    [Selector("byValue", "setByValue:")]
+    public AnyObject? ByValue { get; set; }
 }
 
 public extern objc class CAKeyframeAnimation : CAPropertyAnimation
 {
-    [Selector("values", "setValues:")] public NSArray? Values { get; set; }
-    [Selector("path", "setPath:")] public CGPathRef? Path { get; set; }
-    [Selector("keyTimes", "setKeyTimes:")] public NSArray? KeyTimes { get; set; }
-    [Selector("timingFunctions", "setTimingFunctions:")] public NSArray? TimingFunctions { get; set; }
-    [Selector("calculationMode", "setCalculationMode:")] public CAAnimationCalculationMode CalculationMode { get; set; }
-    [Selector("tensionValues", "setTensionValues:")] public NSArray? TensionValues { get; set; }
-    [Selector("continuityValues", "setContinuityValues:")] public NSArray? ContinuityValues { get; set; }
-    [Selector("biasValues", "setBiasValues:")] public NSArray? BiasValues { get; set; }
-    [Selector("rotationMode", "setRotationMode:")] public CAAnimationRotationMode? RotationMode { get; set; }
+    [Selector("values", "setValues:")]
+    public NSArray? Values { get; set; }
+    [Selector("path", "setPath:")]
+    public CGPathRef? Path { get; set; }
+    [Selector("keyTimes", "setKeyTimes:")]
+    public NSArray? KeyTimes { get; set; }
+    [Selector("timingFunctions", "setTimingFunctions:")]
+    public NSArray? TimingFunctions { get; set; }
+    [Selector("calculationMode", "setCalculationMode:")]
+    public CAAnimationCalculationMode CalculationMode { get; set; }
+    [Selector("tensionValues", "setTensionValues:")]
+    public NSArray? TensionValues { get; set; }
+    [Selector("continuityValues", "setContinuityValues:")]
+    public NSArray? ContinuityValues { get; set; }
+    [Selector("biasValues", "setBiasValues:")]
+    public NSArray? BiasValues { get; set; }
+    [Selector("rotationMode", "setRotationMode:")]
+    public CAAnimationRotationMode? RotationMode { get; set; }
 }
 
 public extern "C" CAAnimationCalculationMode? kCAAnimationLinear;
@@ -103,24 +131,38 @@ public extern "C" CAAnimationRotationMode? kCAAnimationRotateAutoReverse;
 
 public extern objc class CASpringAnimation : CABasicAnimation
 {
-    [Selector("mass", "setMass:")] public CGFloat Mass { get; set; }
-    [Selector("stiffness", "setStiffness:")] public CGFloat Stiffness { get; set; }
-    [Selector("damping", "setDamping:")] public CGFloat Damping { get; set; }
-    [Selector("initialVelocity", "setInitialVelocity:")] public CGFloat InitialVelocity { get; set; }
-    [Selector("allowsOverdamping", "setAllowsOverdamping:")] public bool AllowsOverdamping { get; set; }
-    [Selector("settlingDuration")] public CFTimeInterval SettlingDuration { get; }
-    [Selector("perceptualDuration")] public CFTimeInterval PerceptualDuration { get; }
-    [Selector("bounce")] public CGFloat Bounce { get; }
-    [Selector("initWithPerceptualDuration:bounce:")] public Self InitWithPerceptualDurationBounce(CFTimeInterval perceptualDuration, CGFloat bounce);
+    [Selector("mass", "setMass:")]
+    public CGFloat Mass { get; set; }
+    [Selector("stiffness", "setStiffness:")]
+    public CGFloat Stiffness { get; set; }
+    [Selector("damping", "setDamping:")]
+    public CGFloat Damping { get; set; }
+    [Selector("initialVelocity", "setInitialVelocity:")]
+    public CGFloat InitialVelocity { get; set; }
+    [Selector("allowsOverdamping", "setAllowsOverdamping:")]
+    public bool AllowsOverdamping { get; set; }
+    [Selector("settlingDuration")]
+    public CFTimeInterval SettlingDuration { get; }
+    [Selector("perceptualDuration")]
+    public CFTimeInterval PerceptualDuration { get; }
+    [Selector("bounce")]
+    public CGFloat Bounce { get; }
+    [Selector("initWithPerceptualDuration:bounce:")]
+    public Self InitWithPerceptualDurationBounce(CFTimeInterval perceptualDuration, CGFloat bounce);
 }
 
 public extern objc class CATransition : CAAnimation
 {
-    [Selector("type", "setType:")] public CATransitionType Type { get; set; }
-    [Selector("subtype", "setSubtype:")] public CATransitionSubtype? Subtype { get; set; }
-    [Selector("startProgress", "setStartProgress:")] public float StartProgress { get; set; }
-    [Selector("endProgress", "setEndProgress:")] public float EndProgress { get; set; }
-    [Selector("filter", "setFilter:")] public AnyObject? Filter { get; set; }
+    [Selector("type", "setType:")]
+    public CATransitionType Type { get; set; }
+    [Selector("subtype", "setSubtype:")]
+    public CATransitionSubtype? Subtype { get; set; }
+    [Selector("startProgress", "setStartProgress:")]
+    public float StartProgress { get; set; }
+    [Selector("endProgress", "setEndProgress:")]
+    public float EndProgress { get; set; }
+    [Selector("filter", "setFilter:")]
+    public AnyObject? Filter { get; set; }
 }
 
 public extern "C" CATransitionType? kCATransitionFade;
@@ -141,7 +183,8 @@ public extern "C" CATransitionSubtype? kCATransitionFromBottom;
 
 public extern objc class CAAnimationGroup : CAAnimation
 {
-    [Selector("animations", "setAnimations:")] public NSArray? Animations { get; set; }
+    [Selector("animations", "setAnimations:")]
+    public NSArray? Animations { get; set; }
 }
 
 #endif

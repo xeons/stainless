@@ -32,9 +32,13 @@ import Standard.ObjC;
 
 public objc interface MLCustomModel
 {
-    [Selector("initWithModelDescription:parameterDictionary:error:")] Self? InitWithModelDescriptionParameterDictionaryError(MLModelDescription modelDescription, NSDictionary parameters, out NSError? error);
-    [Selector("predictionFromFeatures:options:error:")] MLFeatureProvider? PredictionFromFeaturesOptionsError(MLFeatureProvider input, MLPredictionOptions options, out NSError? error);
-    [Optional] [Selector("predictionsFromBatch:options:error:")] MLBatchProvider? PredictionsFromBatchOptionsError(MLBatchProvider inputBatch, MLPredictionOptions options, out NSError? error);
+    [Selector("initWithModelDescription:parameterDictionary:error:")]
+    Self? InitWithModelDescriptionParameterDictionaryError(MLModelDescription modelDescription, NSDictionary parameters, out NSError? error);
+    [Selector("predictionFromFeatures:options:error:")]
+    MLFeatureProvider? PredictionFromFeaturesOptionsError(MLFeatureProvider input, MLPredictionOptions options, out NSError? error);
+    [Optional]
+    [Selector("predictionsFromBatch:options:error:")]
+    MLBatchProvider? PredictionsFromBatchOptionsError(MLBatchProvider inputBatch, MLPredictionOptions options, out NSError? error);
 }
 
 #endif

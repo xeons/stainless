@@ -33,14 +33,22 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCGroupNormalizationLayer : MLCLayer
 {
-    [Selector("featureChannelCount")] public NSUInteger FeatureChannelCount { get; }
-    [Selector("groupCount")] public NSUInteger GroupCount { get; }
-    [Selector("beta")] public MLCTensor? Beta { get; }
-    [Selector("gamma")] public MLCTensor? Gamma { get; }
-    [Selector("betaParameter")] public MLCTensorParameter? BetaParameter { get; }
-    [Selector("gammaParameter")] public MLCTensorParameter? GammaParameter { get; }
-    [Selector("varianceEpsilon")] public float VarianceEpsilon { get; }
-    [Selector("layerWithFeatureChannelCount:groupCount:beta:gamma:varianceEpsilon:")] public static Self? LayerWithFeatureChannelCountGroupCountBetaGammaVarianceEpsilon(NSUInteger featureChannelCount, NSUInteger groupCount, MLCTensor? beta, MLCTensor? gamma, float varianceEpsilon);
+    [Selector("featureChannelCount")]
+    public NSUInteger FeatureChannelCount { get; }
+    [Selector("groupCount")]
+    public NSUInteger GroupCount { get; }
+    [Selector("beta")]
+    public MLCTensor? Beta { get; }
+    [Selector("gamma")]
+    public MLCTensor? Gamma { get; }
+    [Selector("betaParameter")]
+    public MLCTensorParameter? BetaParameter { get; }
+    [Selector("gammaParameter")]
+    public MLCTensorParameter? GammaParameter { get; }
+    [Selector("varianceEpsilon")]
+    public float VarianceEpsilon { get; }
+    [Selector("layerWithFeatureChannelCount:groupCount:beta:gamma:varianceEpsilon:")]
+    public static Self? LayerWithFeatureChannelCountGroupCountBetaGammaVarianceEpsilon(NSUInteger featureChannelCount, NSUInteger groupCount, MLCTensor? beta, MLCTensor? gamma, float varianceEpsilon);
 }
 
 #endif

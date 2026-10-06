@@ -284,7 +284,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
         bool retained = returnsObject &&
                         (function.ReturnsRetained ??
                          (IsCFValue(function.Result) && FollowsCreateRule(function.Name)));
-        string ownership = retained ? "[ReturnsRetained] " : "";
+        string ownership = retained ? "[ReturnsRetained]\n" : "";
         return $"{ownership}public extern \"C\" {result} {Identifier(function.Name)}({string.Join(", ", parameters)});\n";
     }
 
@@ -500,8 +500,9 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
 
             string type = Spell(field.Type, context, owner + Capitalized(field.Name), Placement.Field);
             string width = field.BitWidth is { } bits ? $" : {bits}" : "";
-            string packed = field.IsPacked ? "[Packed] " : "";
-            text.Append($"{indent}{packed}public {type} {Identifier(field.Name)}{width};\n");
+            if (field.IsPacked)
+                text.Append($"{indent}[Packed]\n");
+            text.Append($"{indent}public {type} {Identifier(field.Name)}{width};\n");
         }
     }
 

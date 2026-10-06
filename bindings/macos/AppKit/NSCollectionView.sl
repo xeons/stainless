@@ -65,26 +65,44 @@ public using NSCollectionViewSupplementaryElementKind = NSString;
 
 public objc interface NSCollectionViewElement : NSObjectProtocol, NSUserInterfaceItemIdentification
 {
-    [Optional] [Selector("prepareForReuse")] void PrepareForReuse();
-    [Optional] [Selector("applyLayoutAttributes:")] void ApplyLayoutAttributes(NSCollectionViewLayoutAttributes layoutAttributes);
-    [Optional] [Selector("willTransitionFromLayout:toLayout:")] void WillTransitionFromLayoutToLayout(NSCollectionViewLayout oldLayout, NSCollectionViewLayout newLayout);
-    [Optional] [Selector("didTransitionFromLayout:toLayout:")] void DidTransitionFromLayoutToLayout(NSCollectionViewLayout oldLayout, NSCollectionViewLayout newLayout);
-    [Optional] [Selector("preferredLayoutAttributesFittingAttributes:")] NSCollectionViewLayoutAttributes PreferredLayoutAttributesFittingAttributes(NSCollectionViewLayoutAttributes layoutAttributes);
+    [Optional]
+    [Selector("prepareForReuse")]
+    void PrepareForReuse();
+    [Optional]
+    [Selector("applyLayoutAttributes:")]
+    void ApplyLayoutAttributes(NSCollectionViewLayoutAttributes layoutAttributes);
+    [Optional]
+    [Selector("willTransitionFromLayout:toLayout:")]
+    void WillTransitionFromLayoutToLayout(NSCollectionViewLayout oldLayout, NSCollectionViewLayout newLayout);
+    [Optional]
+    [Selector("didTransitionFromLayout:toLayout:")]
+    void DidTransitionFromLayoutToLayout(NSCollectionViewLayout oldLayout, NSCollectionViewLayout newLayout);
+    [Optional]
+    [Selector("preferredLayoutAttributesFittingAttributes:")]
+    NSCollectionViewLayoutAttributes PreferredLayoutAttributesFittingAttributes(NSCollectionViewLayoutAttributes layoutAttributes);
 }
 
 public objc interface NSCollectionViewSectionHeaderView : NSCollectionViewElement
 {
-    [Optional] [Selector("sectionCollapseButton", "setSectionCollapseButton:")] NSButton? SectionCollapseButton { get; set; }
+    [Optional]
+    [Selector("sectionCollapseButton", "setSectionCollapseButton:")]
+    NSButton? SectionCollapseButton { get; set; }
 }
 
 public extern objc class NSCollectionViewItem : NSViewController, NSCopying, NSCollectionViewElement
 {
-    [Selector("collectionView")] public NSCollectionView? CollectionView { get; }
-    [Selector("isSelected", "setSelected:")] public bool Selected { get; set; }
-    [Selector("highlightState", "setHighlightState:")] public NSCollectionViewItemHighlightState HighlightState { get; set; }
-    [Selector("imageView", "setImageView:")] public NSImageView? ImageView { get; set; }
-    [Selector("textField", "setTextField:")] public NSTextField? TextField { get; set; }
-    [Selector("draggingImageComponents")] public NSArray? DraggingImageComponents { get; }
+    [Selector("collectionView")]
+    public NSCollectionView? CollectionView { get; }
+    [Selector("isSelected", "setSelected:")]
+    public bool Selected { get; set; }
+    [Selector("highlightState", "setHighlightState:")]
+    public NSCollectionViewItemHighlightState HighlightState { get; set; }
+    [Selector("imageView", "setImageView:")]
+    public NSImageView? ImageView { get; set; }
+    [Selector("textField", "setTextField:")]
+    public NSTextField? TextField { get; set; }
+    [Selector("draggingImageComponents")]
+    public NSArray? DraggingImageComponents { get; }
 }
 
 public objc closure void NSCollectionViewPerformBatchUpdatesCompletionHandlerUpdatesBlock();
@@ -93,119 +111,243 @@ public objc closure void NSCollectionViewPerformBatchUpdatesCompletionHandlerCom
 
 public extern objc class NSCollectionView : NSView, NSDraggingSource, NSDraggingDestination
 {
-    [Selector("dataSource", "setDataSource:")] public NSCollectionViewDataSource? DataSource { get; set; }
-    [Selector("prefetchDataSource", "setPrefetchDataSource:")] public NSCollectionViewPrefetching? PrefetchDataSource { get; set; }
-    [Selector("content", "setContent:")] public NSArray Content { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSCollectionViewDelegate? Delegate { get; set; }
-    [Selector("backgroundView", "setBackgroundView:")] public NSView? BackgroundView { get; set; }
-    [Selector("backgroundViewScrollsWithContent", "setBackgroundViewScrollsWithContent:")] public bool BackgroundViewScrollsWithContent { get; set; }
-    [Selector("collectionViewLayout", "setCollectionViewLayout:")] public NSCollectionViewLayout? CollectionViewLayout { get; set; }
-    [Selector("backgroundColors", "setBackgroundColors:")] public NSArray? BackgroundColors { get; set; }
-    [Selector("numberOfSections")] public NSInteger NumberOfSections { get; }
-    [Selector("isFirstResponder")] public bool FirstResponder { get; }
-    [Selector("isSelectable", "setSelectable:")] public bool Selectable { get; set; }
-    [Selector("allowsEmptySelection", "setAllowsEmptySelection:")] public bool AllowsEmptySelection { get; set; }
-    [Selector("allowsMultipleSelection", "setAllowsMultipleSelection:")] public bool AllowsMultipleSelection { get; set; }
-    [Selector("selectionIndexes", "setSelectionIndexes:")] public NSIndexSet SelectionIndexes { get; set; }
-    [Selector("selectionIndexPaths", "setSelectionIndexPaths:")] public NSSet? SelectionIndexPaths { get; set; }
-    [Selector("reloadData")] public void ReloadData();
-    [Selector("layoutAttributesForItemAtIndexPath:")] public NSCollectionViewLayoutAttributes? LayoutAttributesForItemAtIndexPath(NSIndexPath indexPath);
-    [Selector("layoutAttributesForSupplementaryElementOfKind:atIndexPath:")] public NSCollectionViewLayoutAttributes? LayoutAttributesForSupplementaryElementOfKindAtIndexPath(NSCollectionViewSupplementaryElementKind kind, NSIndexPath indexPath);
-    [Selector("frameForItemAtIndex:")] public NSRect FrameForItemAtIndex(NSUInteger index);
-    [Selector("frameForItemAtIndex:withNumberOfItems:")] public NSRect FrameForItemAtIndexWithNumberOfItems(NSUInteger index, NSUInteger numberOfItems);
-    [Selector("numberOfItemsInSection:")] public NSInteger NumberOfItemsInSection(NSInteger section);
-    [Selector("selectItemsAtIndexPaths:scrollPosition:")] public void SelectItemsAtIndexPathsScrollPosition(NSSet indexPaths, NSCollectionViewScrollPosition scrollPosition);
-    [Selector("deselectItemsAtIndexPaths:")] public void DeselectItemsAtIndexPaths(NSSet indexPaths);
-    [Selector("selectAll:")] public void SelectAll(AnyObject? sender);
-    [Selector("deselectAll:")] public void DeselectAll(AnyObject? sender);
-    [Selector("registerClass:forItemWithIdentifier:")] public void RegisterClassForItemWithIdentifier(Class itemClass, NSUserInterfaceItemIdentifier identifier);
-    [Selector("registerNib:forItemWithIdentifier:")] public void RegisterNibForItemWithIdentifier(NSNib? nib, NSUserInterfaceItemIdentifier identifier);
-    [Selector("registerClass:forSupplementaryViewOfKind:withIdentifier:")] public void RegisterClassForSupplementaryViewOfKindWithIdentifier(Class viewClass, NSCollectionViewSupplementaryElementKind kind, NSUserInterfaceItemIdentifier identifier);
-    [Selector("registerNib:forSupplementaryViewOfKind:withIdentifier:")] public void RegisterNibForSupplementaryViewOfKindWithIdentifier(NSNib? nib, NSCollectionViewSupplementaryElementKind kind, NSUserInterfaceItemIdentifier identifier);
-    [Selector("makeItemWithIdentifier:forIndexPath:")] public NSCollectionViewItem MakeItemWithIdentifierForIndexPath(NSUserInterfaceItemIdentifier identifier, NSIndexPath indexPath);
-    [Selector("makeSupplementaryViewOfKind:withIdentifier:forIndexPath:")] public NSView MakeSupplementaryViewOfKindWithIdentifierForIndexPath(NSCollectionViewSupplementaryElementKind elementKind, NSUserInterfaceItemIdentifier identifier, NSIndexPath indexPath);
-    [Selector("itemAtIndex:")] public NSCollectionViewItem? ItemAtIndex(NSUInteger index);
-    [Selector("itemAtIndexPath:")] public NSCollectionViewItem? ItemAtIndexPath(NSIndexPath indexPath);
-    [Selector("visibleItems")] public NSArray VisibleItems();
-    [Selector("indexPathsForVisibleItems")] public NSSet IndexPathsForVisibleItems();
-    [Selector("indexPathForItem:")] public NSIndexPath? IndexPathForItem(NSCollectionViewItem item);
-    [Selector("indexPathForItemAtPoint:")] public NSIndexPath? IndexPathForItemAtPoint(NSPoint point);
-    [Selector("supplementaryViewForElementKind:atIndexPath:")] public NSView? SupplementaryViewForElementKindAtIndexPath(NSCollectionViewSupplementaryElementKind elementKind, NSIndexPath indexPath);
-    [Selector("visibleSupplementaryViewsOfKind:")] public NSArray VisibleSupplementaryViewsOfKind(NSCollectionViewSupplementaryElementKind elementKind);
-    [Selector("indexPathsForVisibleSupplementaryElementsOfKind:")] public NSSet IndexPathsForVisibleSupplementaryElementsOfKind(NSCollectionViewSupplementaryElementKind elementKind);
-    [Selector("insertSections:")] public void InsertSections(NSIndexSet sections);
-    [Selector("deleteSections:")] public void DeleteSections(NSIndexSet sections);
-    [Selector("reloadSections:")] public void ReloadSections(NSIndexSet sections);
-    [Selector("moveSection:toSection:")] public void MoveSectionToSection(NSInteger section, NSInteger newSection);
-    [Selector("insertItemsAtIndexPaths:")] public void InsertItemsAtIndexPaths(NSSet indexPaths);
-    [Selector("deleteItemsAtIndexPaths:")] public void DeleteItemsAtIndexPaths(NSSet indexPaths);
-    [Selector("reloadItemsAtIndexPaths:")] public void ReloadItemsAtIndexPaths(NSSet indexPaths);
-    [Selector("moveItemAtIndexPath:toIndexPath:")] public void MoveItemAtIndexPathToIndexPath(NSIndexPath indexPath, NSIndexPath newIndexPath);
-    [Selector("performBatchUpdates:completionHandler:")] public void PerformBatchUpdatesCompletionHandler(NSCollectionViewPerformBatchUpdatesCompletionHandlerUpdatesBlock? updates, NSCollectionViewPerformBatchUpdatesCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("toggleSectionCollapse:")] public void ToggleSectionCollapse(AnyObject sender);
-    [Selector("scrollToItemsAtIndexPaths:scrollPosition:")] public void ScrollToItemsAtIndexPathsScrollPosition(NSSet indexPaths, NSCollectionViewScrollPosition scrollPosition);
-    [Selector("setDraggingSourceOperationMask:forLocal:")] public void SetDraggingSourceOperationMaskForLocal(NSDragOperation dragOperationMask, bool localDestination);
-    [Selector("draggingImageForItemsAtIndexPaths:withEvent:offset:")] public NSImage DraggingImageForItemsAtIndexPathsWithEventOffset(NSSet indexPaths, NSEvent event, NSPointPointer dragImageOffset);
-    [Selector("draggingImageForItemsAtIndexes:withEvent:offset:")] public NSImage DraggingImageForItemsAtIndexesWithEventOffset(NSIndexSet indexes, NSEvent event, NSPointPointer dragImageOffset);
+    [Selector("dataSource", "setDataSource:")]
+    public NSCollectionViewDataSource? DataSource { get; set; }
+    [Selector("prefetchDataSource", "setPrefetchDataSource:")]
+    public NSCollectionViewPrefetching? PrefetchDataSource { get; set; }
+    [Selector("content", "setContent:")]
+    public NSArray Content { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSCollectionViewDelegate? Delegate { get; set; }
+    [Selector("backgroundView", "setBackgroundView:")]
+    public NSView? BackgroundView { get; set; }
+    [Selector("backgroundViewScrollsWithContent", "setBackgroundViewScrollsWithContent:")]
+    public bool BackgroundViewScrollsWithContent { get; set; }
+    [Selector("collectionViewLayout", "setCollectionViewLayout:")]
+    public NSCollectionViewLayout? CollectionViewLayout { get; set; }
+    [Selector("backgroundColors", "setBackgroundColors:")]
+    public NSArray? BackgroundColors { get; set; }
+    [Selector("numberOfSections")]
+    public NSInteger NumberOfSections { get; }
+    [Selector("isFirstResponder")]
+    public bool FirstResponder { get; }
+    [Selector("isSelectable", "setSelectable:")]
+    public bool Selectable { get; set; }
+    [Selector("allowsEmptySelection", "setAllowsEmptySelection:")]
+    public bool AllowsEmptySelection { get; set; }
+    [Selector("allowsMultipleSelection", "setAllowsMultipleSelection:")]
+    public bool AllowsMultipleSelection { get; set; }
+    [Selector("selectionIndexes", "setSelectionIndexes:")]
+    public NSIndexSet SelectionIndexes { get; set; }
+    [Selector("selectionIndexPaths", "setSelectionIndexPaths:")]
+    public NSSet? SelectionIndexPaths { get; set; }
+    [Selector("reloadData")]
+    public void ReloadData();
+    [Selector("layoutAttributesForItemAtIndexPath:")]
+    public NSCollectionViewLayoutAttributes? LayoutAttributesForItemAtIndexPath(NSIndexPath indexPath);
+    [Selector("layoutAttributesForSupplementaryElementOfKind:atIndexPath:")]
+    public NSCollectionViewLayoutAttributes? LayoutAttributesForSupplementaryElementOfKindAtIndexPath(NSCollectionViewSupplementaryElementKind kind, NSIndexPath indexPath);
+    [Selector("frameForItemAtIndex:")]
+    public NSRect FrameForItemAtIndex(NSUInteger index);
+    [Selector("frameForItemAtIndex:withNumberOfItems:")]
+    public NSRect FrameForItemAtIndexWithNumberOfItems(NSUInteger index, NSUInteger numberOfItems);
+    [Selector("numberOfItemsInSection:")]
+    public NSInteger NumberOfItemsInSection(NSInteger section);
+    [Selector("selectItemsAtIndexPaths:scrollPosition:")]
+    public void SelectItemsAtIndexPathsScrollPosition(NSSet indexPaths, NSCollectionViewScrollPosition scrollPosition);
+    [Selector("deselectItemsAtIndexPaths:")]
+    public void DeselectItemsAtIndexPaths(NSSet indexPaths);
+    [Selector("selectAll:")]
+    public void SelectAll(AnyObject? sender);
+    [Selector("deselectAll:")]
+    public void DeselectAll(AnyObject? sender);
+    [Selector("registerClass:forItemWithIdentifier:")]
+    public void RegisterClassForItemWithIdentifier(Class itemClass, NSUserInterfaceItemIdentifier identifier);
+    [Selector("registerNib:forItemWithIdentifier:")]
+    public void RegisterNibForItemWithIdentifier(NSNib? nib, NSUserInterfaceItemIdentifier identifier);
+    [Selector("registerClass:forSupplementaryViewOfKind:withIdentifier:")]
+    public void RegisterClassForSupplementaryViewOfKindWithIdentifier(Class viewClass, NSCollectionViewSupplementaryElementKind kind, NSUserInterfaceItemIdentifier identifier);
+    [Selector("registerNib:forSupplementaryViewOfKind:withIdentifier:")]
+    public void RegisterNibForSupplementaryViewOfKindWithIdentifier(NSNib? nib, NSCollectionViewSupplementaryElementKind kind, NSUserInterfaceItemIdentifier identifier);
+    [Selector("makeItemWithIdentifier:forIndexPath:")]
+    public NSCollectionViewItem MakeItemWithIdentifierForIndexPath(NSUserInterfaceItemIdentifier identifier, NSIndexPath indexPath);
+    [Selector("makeSupplementaryViewOfKind:withIdentifier:forIndexPath:")]
+    public NSView MakeSupplementaryViewOfKindWithIdentifierForIndexPath(NSCollectionViewSupplementaryElementKind elementKind, NSUserInterfaceItemIdentifier identifier, NSIndexPath indexPath);
+    [Selector("itemAtIndex:")]
+    public NSCollectionViewItem? ItemAtIndex(NSUInteger index);
+    [Selector("itemAtIndexPath:")]
+    public NSCollectionViewItem? ItemAtIndexPath(NSIndexPath indexPath);
+    [Selector("visibleItems")]
+    public NSArray VisibleItems();
+    [Selector("indexPathsForVisibleItems")]
+    public NSSet IndexPathsForVisibleItems();
+    [Selector("indexPathForItem:")]
+    public NSIndexPath? IndexPathForItem(NSCollectionViewItem item);
+    [Selector("indexPathForItemAtPoint:")]
+    public NSIndexPath? IndexPathForItemAtPoint(NSPoint point);
+    [Selector("supplementaryViewForElementKind:atIndexPath:")]
+    public NSView? SupplementaryViewForElementKindAtIndexPath(NSCollectionViewSupplementaryElementKind elementKind, NSIndexPath indexPath);
+    [Selector("visibleSupplementaryViewsOfKind:")]
+    public NSArray VisibleSupplementaryViewsOfKind(NSCollectionViewSupplementaryElementKind elementKind);
+    [Selector("indexPathsForVisibleSupplementaryElementsOfKind:")]
+    public NSSet IndexPathsForVisibleSupplementaryElementsOfKind(NSCollectionViewSupplementaryElementKind elementKind);
+    [Selector("insertSections:")]
+    public void InsertSections(NSIndexSet sections);
+    [Selector("deleteSections:")]
+    public void DeleteSections(NSIndexSet sections);
+    [Selector("reloadSections:")]
+    public void ReloadSections(NSIndexSet sections);
+    [Selector("moveSection:toSection:")]
+    public void MoveSectionToSection(NSInteger section, NSInteger newSection);
+    [Selector("insertItemsAtIndexPaths:")]
+    public void InsertItemsAtIndexPaths(NSSet indexPaths);
+    [Selector("deleteItemsAtIndexPaths:")]
+    public void DeleteItemsAtIndexPaths(NSSet indexPaths);
+    [Selector("reloadItemsAtIndexPaths:")]
+    public void ReloadItemsAtIndexPaths(NSSet indexPaths);
+    [Selector("moveItemAtIndexPath:toIndexPath:")]
+    public void MoveItemAtIndexPathToIndexPath(NSIndexPath indexPath, NSIndexPath newIndexPath);
+    [Selector("performBatchUpdates:completionHandler:")]
+    public void PerformBatchUpdatesCompletionHandler(NSCollectionViewPerformBatchUpdatesCompletionHandlerUpdatesBlock? updates, NSCollectionViewPerformBatchUpdatesCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("toggleSectionCollapse:")]
+    public void ToggleSectionCollapse(AnyObject sender);
+    [Selector("scrollToItemsAtIndexPaths:scrollPosition:")]
+    public void ScrollToItemsAtIndexPathsScrollPosition(NSSet indexPaths, NSCollectionViewScrollPosition scrollPosition);
+    [Selector("setDraggingSourceOperationMask:forLocal:")]
+    public void SetDraggingSourceOperationMaskForLocal(NSDragOperation dragOperationMask, bool localDestination);
+    [Selector("draggingImageForItemsAtIndexPaths:withEvent:offset:")]
+    public NSImage DraggingImageForItemsAtIndexPathsWithEventOffset(NSSet indexPaths, NSEvent event, NSPointPointer dragImageOffset);
+    [Selector("draggingImageForItemsAtIndexes:withEvent:offset:")]
+    public NSImage DraggingImageForItemsAtIndexesWithEventOffset(NSIndexSet indexes, NSEvent event, NSPointPointer dragImageOffset);
 }
 
 public objc interface NSCollectionViewDataSource : NSObjectProtocol
 {
-    [Selector("collectionView:numberOfItemsInSection:")] NSInteger CollectionViewNumberOfItemsInSection(NSCollectionView collectionView, NSInteger section);
-    [Selector("collectionView:itemForRepresentedObjectAtIndexPath:")] NSCollectionViewItem CollectionViewItemForRepresentedObjectAtIndexPath(NSCollectionView collectionView, NSIndexPath indexPath);
-    [Optional] [Selector("numberOfSectionsInCollectionView:")] NSInteger NumberOfSectionsInCollectionView(NSCollectionView collectionView);
-    [Optional] [Selector("collectionView:viewForSupplementaryElementOfKind:atIndexPath:")] NSView CollectionViewViewForSupplementaryElementOfKindAtIndexPath(NSCollectionView collectionView, NSCollectionViewSupplementaryElementKind kind, NSIndexPath indexPath);
+    [Selector("collectionView:numberOfItemsInSection:")]
+    NSInteger CollectionViewNumberOfItemsInSection(NSCollectionView collectionView, NSInteger section);
+    [Selector("collectionView:itemForRepresentedObjectAtIndexPath:")]
+    NSCollectionViewItem CollectionViewItemForRepresentedObjectAtIndexPath(NSCollectionView collectionView, NSIndexPath indexPath);
+    [Optional]
+    [Selector("numberOfSectionsInCollectionView:")]
+    NSInteger NumberOfSectionsInCollectionView(NSCollectionView collectionView);
+    [Optional]
+    [Selector("collectionView:viewForSupplementaryElementOfKind:atIndexPath:")]
+    NSView CollectionViewViewForSupplementaryElementOfKindAtIndexPath(NSCollectionView collectionView, NSCollectionViewSupplementaryElementKind kind, NSIndexPath indexPath);
 }
 
 public objc interface NSCollectionViewPrefetching : NSObjectProtocol
 {
-    [Selector("collectionView:prefetchItemsAtIndexPaths:")] void CollectionViewPrefetchItemsAtIndexPaths(NSCollectionView collectionView, NSArray indexPaths);
-    [Optional] [Selector("collectionView:cancelPrefetchingForItemsAtIndexPaths:")] void CollectionViewCancelPrefetchingForItemsAtIndexPaths(NSCollectionView collectionView, NSArray indexPaths);
+    [Selector("collectionView:prefetchItemsAtIndexPaths:")]
+    void CollectionViewPrefetchItemsAtIndexPaths(NSCollectionView collectionView, NSArray indexPaths);
+    [Optional]
+    [Selector("collectionView:cancelPrefetchingForItemsAtIndexPaths:")]
+    void CollectionViewCancelPrefetchingForItemsAtIndexPaths(NSCollectionView collectionView, NSArray indexPaths);
 }
 
 public objc interface NSCollectionViewDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("collectionView:canDragItemsAtIndexPaths:withEvent:")] bool CollectionViewCanDragItemsAtIndexPathsWithEvent(NSCollectionView collectionView, NSSet indexPaths, NSEvent event);
-    [Optional] [Selector("collectionView:canDragItemsAtIndexes:withEvent:")] bool CollectionViewCanDragItemsAtIndexesWithEvent(NSCollectionView collectionView, NSIndexSet indexes, NSEvent event);
+    [Optional]
+    [Selector("collectionView:canDragItemsAtIndexPaths:withEvent:")]
+    bool CollectionViewCanDragItemsAtIndexPathsWithEvent(NSCollectionView collectionView, NSSet indexPaths, NSEvent event);
+    [Optional]
+    [Selector("collectionView:canDragItemsAtIndexes:withEvent:")]
+    bool CollectionViewCanDragItemsAtIndexesWithEvent(NSCollectionView collectionView, NSIndexSet indexes, NSEvent event);
     /// Deprecated in macOS 10.15.
-    [Optional] [Selector("collectionView:writeItemsAtIndexPaths:toPasteboard:")] bool CollectionViewWriteItemsAtIndexPathsToPasteboard(NSCollectionView collectionView, NSSet indexPaths, NSPasteboard pasteboard);
+    [Optional]
+    [Selector("collectionView:writeItemsAtIndexPaths:toPasteboard:")]
+    bool CollectionViewWriteItemsAtIndexPathsToPasteboard(NSCollectionView collectionView, NSSet indexPaths, NSPasteboard pasteboard);
     /// Deprecated in macOS 10.15.
-    [Optional] [Selector("collectionView:writeItemsAtIndexes:toPasteboard:")] bool CollectionViewWriteItemsAtIndexesToPasteboard(NSCollectionView collectionView, NSIndexSet indexes, NSPasteboard pasteboard);
+    [Optional]
+    [Selector("collectionView:writeItemsAtIndexes:toPasteboard:")]
+    bool CollectionViewWriteItemsAtIndexesToPasteboard(NSCollectionView collectionView, NSIndexSet indexes, NSPasteboard pasteboard);
     /// Deprecated in macOS 10.13.
-    [Optional] [Selector("collectionView:namesOfPromisedFilesDroppedAtDestination:forDraggedItemsAtIndexPaths:")] NSArray CollectionViewNamesOfPromisedFilesDroppedAtDestinationForDraggedItemsAtIndexPaths(NSCollectionView collectionView, NSURL dropURL, NSSet indexPaths);
+    [Optional]
+    [Selector("collectionView:namesOfPromisedFilesDroppedAtDestination:forDraggedItemsAtIndexPaths:")]
+    NSArray CollectionViewNamesOfPromisedFilesDroppedAtDestinationForDraggedItemsAtIndexPaths(NSCollectionView collectionView, NSURL dropURL, NSSet indexPaths);
     /// Deprecated in macOS 10.13.
-    [Optional] [Selector("collectionView:namesOfPromisedFilesDroppedAtDestination:forDraggedItemsAtIndexes:")] NSArray CollectionViewNamesOfPromisedFilesDroppedAtDestinationForDraggedItemsAtIndexes(NSCollectionView collectionView, NSURL dropURL, NSIndexSet indexes);
-    [Optional] [Selector("collectionView:draggingImageForItemsAtIndexPaths:withEvent:offset:")] NSImage CollectionViewDraggingImageForItemsAtIndexPathsWithEventOffset(NSCollectionView collectionView, NSSet indexPaths, NSEvent event, NSPointPointer dragImageOffset);
-    [Optional] [Selector("collectionView:draggingImageForItemsAtIndexes:withEvent:offset:")] NSImage CollectionViewDraggingImageForItemsAtIndexesWithEventOffset(NSCollectionView collectionView, NSIndexSet indexes, NSEvent event, NSPointPointer dragImageOffset);
-    [Optional] [Selector("collectionView:validateDrop:proposedIndexPath:dropOperation:")] NSDragOperation CollectionViewValidateDropProposedIndexPathDropOperation(NSCollectionView collectionView, NSDraggingInfo draggingInfo, out NSIndexPath? proposedDropIndexPath, NSCollectionViewDropOperation* proposedDropOperation);
-    [Optional] [Selector("collectionView:validateDrop:proposedIndex:dropOperation:")] NSDragOperation CollectionViewValidateDropProposedIndexDropOperation(NSCollectionView collectionView, NSDraggingInfo draggingInfo, NSInteger* proposedDropIndex, NSCollectionViewDropOperation* proposedDropOperation);
-    [Optional] [Selector("collectionView:acceptDrop:indexPath:dropOperation:")] bool CollectionViewAcceptDropIndexPathDropOperation(NSCollectionView collectionView, NSDraggingInfo draggingInfo, NSIndexPath indexPath, NSCollectionViewDropOperation dropOperation);
-    [Optional] [Selector("collectionView:acceptDrop:index:dropOperation:")] bool CollectionViewAcceptDropIndexDropOperation(NSCollectionView collectionView, NSDraggingInfo draggingInfo, NSInteger index, NSCollectionViewDropOperation dropOperation);
-    [Optional] [Selector("collectionView:pasteboardWriterForItemAtIndexPath:")] NSPasteboardWriting? CollectionViewPasteboardWriterForItemAtIndexPath(NSCollectionView collectionView, NSIndexPath indexPath);
-    [Optional] [Selector("collectionView:pasteboardWriterForItemAtIndex:")] NSPasteboardWriting? CollectionViewPasteboardWriterForItemAtIndex(NSCollectionView collectionView, NSUInteger index);
-    [Optional] [Selector("collectionView:draggingSession:willBeginAtPoint:forItemsAtIndexPaths:")] void CollectionViewDraggingSessionWillBeginAtPointForItemsAtIndexPaths(NSCollectionView collectionView, NSDraggingSession session, NSPoint screenPoint, NSSet indexPaths);
-    [Optional] [Selector("collectionView:draggingSession:willBeginAtPoint:forItemsAtIndexes:")] void CollectionViewDraggingSessionWillBeginAtPointForItemsAtIndexes(NSCollectionView collectionView, NSDraggingSession session, NSPoint screenPoint, NSIndexSet indexes);
-    [Optional] [Selector("collectionView:draggingSession:endedAtPoint:dragOperation:")] void CollectionViewDraggingSessionEndedAtPointDragOperation(NSCollectionView collectionView, NSDraggingSession session, NSPoint screenPoint, NSDragOperation operation);
-    [Optional] [Selector("collectionView:updateDraggingItemsForDrag:")] void CollectionViewUpdateDraggingItemsForDrag(NSCollectionView collectionView, NSDraggingInfo draggingInfo);
-    [Optional] [Selector("collectionView:shouldChangeItemsAtIndexPaths:toHighlightState:")] NSSet CollectionViewShouldChangeItemsAtIndexPathsToHighlightState(NSCollectionView collectionView, NSSet indexPaths, NSCollectionViewItemHighlightState highlightState);
-    [Optional] [Selector("collectionView:didChangeItemsAtIndexPaths:toHighlightState:")] void CollectionViewDidChangeItemsAtIndexPathsToHighlightState(NSCollectionView collectionView, NSSet indexPaths, NSCollectionViewItemHighlightState highlightState);
-    [Optional] [Selector("collectionView:shouldSelectItemsAtIndexPaths:")] NSSet CollectionViewShouldSelectItemsAtIndexPaths(NSCollectionView collectionView, NSSet indexPaths);
-    [Optional] [Selector("collectionView:shouldDeselectItemsAtIndexPaths:")] NSSet CollectionViewShouldDeselectItemsAtIndexPaths(NSCollectionView collectionView, NSSet indexPaths);
-    [Optional] [Selector("collectionView:didSelectItemsAtIndexPaths:")] void CollectionViewDidSelectItemsAtIndexPaths(NSCollectionView collectionView, NSSet indexPaths);
-    [Optional] [Selector("collectionView:didDeselectItemsAtIndexPaths:")] void CollectionViewDidDeselectItemsAtIndexPaths(NSCollectionView collectionView, NSSet indexPaths);
-    [Optional] [Selector("collectionView:willDisplayItem:forRepresentedObjectAtIndexPath:")] void CollectionViewWillDisplayItemForRepresentedObjectAtIndexPath(NSCollectionView collectionView, NSCollectionViewItem item, NSIndexPath indexPath);
-    [Optional] [Selector("collectionView:willDisplaySupplementaryView:forElementKind:atIndexPath:")] void CollectionViewWillDisplaySupplementaryViewForElementKindAtIndexPath(NSCollectionView collectionView, NSView view, NSCollectionViewSupplementaryElementKind elementKind, NSIndexPath indexPath);
-    [Optional] [Selector("collectionView:didEndDisplayingItem:forRepresentedObjectAtIndexPath:")] void CollectionViewDidEndDisplayingItemForRepresentedObjectAtIndexPath(NSCollectionView collectionView, NSCollectionViewItem item, NSIndexPath indexPath);
-    [Optional] [Selector("collectionView:didEndDisplayingSupplementaryView:forElementOfKind:atIndexPath:")] void CollectionViewDidEndDisplayingSupplementaryViewForElementOfKindAtIndexPath(NSCollectionView collectionView, NSView view, NSCollectionViewSupplementaryElementKind elementKind, NSIndexPath indexPath);
-    [Optional] [Selector("collectionView:transitionLayoutForOldLayout:newLayout:")] NSCollectionViewTransitionLayout CollectionViewTransitionLayoutForOldLayoutNewLayout(NSCollectionView collectionView, NSCollectionViewLayout fromLayout, NSCollectionViewLayout toLayout);
+    [Optional]
+    [Selector("collectionView:namesOfPromisedFilesDroppedAtDestination:forDraggedItemsAtIndexes:")]
+    NSArray CollectionViewNamesOfPromisedFilesDroppedAtDestinationForDraggedItemsAtIndexes(NSCollectionView collectionView, NSURL dropURL, NSIndexSet indexes);
+    [Optional]
+    [Selector("collectionView:draggingImageForItemsAtIndexPaths:withEvent:offset:")]
+    NSImage CollectionViewDraggingImageForItemsAtIndexPathsWithEventOffset(NSCollectionView collectionView, NSSet indexPaths, NSEvent event, NSPointPointer dragImageOffset);
+    [Optional]
+    [Selector("collectionView:draggingImageForItemsAtIndexes:withEvent:offset:")]
+    NSImage CollectionViewDraggingImageForItemsAtIndexesWithEventOffset(NSCollectionView collectionView, NSIndexSet indexes, NSEvent event, NSPointPointer dragImageOffset);
+    [Optional]
+    [Selector("collectionView:validateDrop:proposedIndexPath:dropOperation:")]
+    NSDragOperation CollectionViewValidateDropProposedIndexPathDropOperation(NSCollectionView collectionView, NSDraggingInfo draggingInfo, out NSIndexPath? proposedDropIndexPath, NSCollectionViewDropOperation* proposedDropOperation);
+    [Optional]
+    [Selector("collectionView:validateDrop:proposedIndex:dropOperation:")]
+    NSDragOperation CollectionViewValidateDropProposedIndexDropOperation(NSCollectionView collectionView, NSDraggingInfo draggingInfo, NSInteger* proposedDropIndex, NSCollectionViewDropOperation* proposedDropOperation);
+    [Optional]
+    [Selector("collectionView:acceptDrop:indexPath:dropOperation:")]
+    bool CollectionViewAcceptDropIndexPathDropOperation(NSCollectionView collectionView, NSDraggingInfo draggingInfo, NSIndexPath indexPath, NSCollectionViewDropOperation dropOperation);
+    [Optional]
+    [Selector("collectionView:acceptDrop:index:dropOperation:")]
+    bool CollectionViewAcceptDropIndexDropOperation(NSCollectionView collectionView, NSDraggingInfo draggingInfo, NSInteger index, NSCollectionViewDropOperation dropOperation);
+    [Optional]
+    [Selector("collectionView:pasteboardWriterForItemAtIndexPath:")]
+    NSPasteboardWriting? CollectionViewPasteboardWriterForItemAtIndexPath(NSCollectionView collectionView, NSIndexPath indexPath);
+    [Optional]
+    [Selector("collectionView:pasteboardWriterForItemAtIndex:")]
+    NSPasteboardWriting? CollectionViewPasteboardWriterForItemAtIndex(NSCollectionView collectionView, NSUInteger index);
+    [Optional]
+    [Selector("collectionView:draggingSession:willBeginAtPoint:forItemsAtIndexPaths:")]
+    void CollectionViewDraggingSessionWillBeginAtPointForItemsAtIndexPaths(NSCollectionView collectionView, NSDraggingSession session, NSPoint screenPoint, NSSet indexPaths);
+    [Optional]
+    [Selector("collectionView:draggingSession:willBeginAtPoint:forItemsAtIndexes:")]
+    void CollectionViewDraggingSessionWillBeginAtPointForItemsAtIndexes(NSCollectionView collectionView, NSDraggingSession session, NSPoint screenPoint, NSIndexSet indexes);
+    [Optional]
+    [Selector("collectionView:draggingSession:endedAtPoint:dragOperation:")]
+    void CollectionViewDraggingSessionEndedAtPointDragOperation(NSCollectionView collectionView, NSDraggingSession session, NSPoint screenPoint, NSDragOperation operation);
+    [Optional]
+    [Selector("collectionView:updateDraggingItemsForDrag:")]
+    void CollectionViewUpdateDraggingItemsForDrag(NSCollectionView collectionView, NSDraggingInfo draggingInfo);
+    [Optional]
+    [Selector("collectionView:shouldChangeItemsAtIndexPaths:toHighlightState:")]
+    NSSet CollectionViewShouldChangeItemsAtIndexPathsToHighlightState(NSCollectionView collectionView, NSSet indexPaths, NSCollectionViewItemHighlightState highlightState);
+    [Optional]
+    [Selector("collectionView:didChangeItemsAtIndexPaths:toHighlightState:")]
+    void CollectionViewDidChangeItemsAtIndexPathsToHighlightState(NSCollectionView collectionView, NSSet indexPaths, NSCollectionViewItemHighlightState highlightState);
+    [Optional]
+    [Selector("collectionView:shouldSelectItemsAtIndexPaths:")]
+    NSSet CollectionViewShouldSelectItemsAtIndexPaths(NSCollectionView collectionView, NSSet indexPaths);
+    [Optional]
+    [Selector("collectionView:shouldDeselectItemsAtIndexPaths:")]
+    NSSet CollectionViewShouldDeselectItemsAtIndexPaths(NSCollectionView collectionView, NSSet indexPaths);
+    [Optional]
+    [Selector("collectionView:didSelectItemsAtIndexPaths:")]
+    void CollectionViewDidSelectItemsAtIndexPaths(NSCollectionView collectionView, NSSet indexPaths);
+    [Optional]
+    [Selector("collectionView:didDeselectItemsAtIndexPaths:")]
+    void CollectionViewDidDeselectItemsAtIndexPaths(NSCollectionView collectionView, NSSet indexPaths);
+    [Optional]
+    [Selector("collectionView:willDisplayItem:forRepresentedObjectAtIndexPath:")]
+    void CollectionViewWillDisplayItemForRepresentedObjectAtIndexPath(NSCollectionView collectionView, NSCollectionViewItem item, NSIndexPath indexPath);
+    [Optional]
+    [Selector("collectionView:willDisplaySupplementaryView:forElementKind:atIndexPath:")]
+    void CollectionViewWillDisplaySupplementaryViewForElementKindAtIndexPath(NSCollectionView collectionView, NSView view, NSCollectionViewSupplementaryElementKind elementKind, NSIndexPath indexPath);
+    [Optional]
+    [Selector("collectionView:didEndDisplayingItem:forRepresentedObjectAtIndexPath:")]
+    void CollectionViewDidEndDisplayingItemForRepresentedObjectAtIndexPath(NSCollectionView collectionView, NSCollectionViewItem item, NSIndexPath indexPath);
+    [Optional]
+    [Selector("collectionView:didEndDisplayingSupplementaryView:forElementOfKind:atIndexPath:")]
+    void CollectionViewDidEndDisplayingSupplementaryViewForElementOfKindAtIndexPath(NSCollectionView collectionView, NSView view, NSCollectionViewSupplementaryElementKind elementKind, NSIndexPath indexPath);
+    [Optional]
+    [Selector("collectionView:transitionLayoutForOldLayout:newLayout:")]
+    NSCollectionViewTransitionLayout CollectionViewTransitionLayoutForOldLayoutNewLayout(NSCollectionView collectionView, NSCollectionViewLayout fromLayout, NSCollectionViewLayout toLayout);
 }
 
 /// NSCollectionViewAdditions, a category of NSIndexPath.
 public extern objc class NSIndexPath
 {
-    [Selector("item")] public NSInteger Item { get; }
-    [Selector("section")] public NSInteger Section { get; }
-    [Selector("indexPathForItem:inSection:")] public static NSIndexPath IndexPathForItemInSection(NSInteger item, NSInteger section);
+    [Selector("item")]
+    public NSInteger Item { get; }
+    [Selector("section")]
+    public NSInteger Section { get; }
+    [Selector("indexPathForItem:inSection:")]
+    public static NSIndexPath IndexPathForItemInSection(NSInteger item, NSInteger section);
 }
 
 public objc closure void NSSetEnumerateIndexPathsWithOptionsUsingBlockBlock(NSIndexPath arg0, bool* arg1);
@@ -213,26 +355,35 @@ public objc closure void NSSetEnumerateIndexPathsWithOptionsUsingBlockBlock(NSIn
 /// NSCollectionViewAdditions, a category of NSSet.
 public extern objc class NSSet
 {
-    [Selector("setWithCollectionViewIndexPath:")] public static Self SetWithCollectionViewIndexPath(NSIndexPath indexPath);
-    [Selector("setWithCollectionViewIndexPaths:")] public static Self SetWithCollectionViewIndexPaths(NSArray indexPaths);
-    [Selector("enumerateIndexPathsWithOptions:usingBlock:")] public void EnumerateIndexPathsWithOptionsUsingBlock(NSEnumerationOptions opts, NSSetEnumerateIndexPathsWithOptionsUsingBlockBlock block);
+    [Selector("setWithCollectionViewIndexPath:")]
+    public static Self SetWithCollectionViewIndexPath(NSIndexPath indexPath);
+    [Selector("setWithCollectionViewIndexPaths:")]
+    public static Self SetWithCollectionViewIndexPaths(NSArray indexPaths);
+    [Selector("enumerateIndexPathsWithOptions:usingBlock:")]
+    public void EnumerateIndexPathsWithOptionsUsingBlock(NSEnumerationOptions opts, NSSetEnumerateIndexPathsWithOptionsUsingBlockBlock block);
 }
 
 /// NSDeprecated, a category of NSCollectionView.
 public extern objc class NSCollectionView
 {
     /// Deprecated in macOS 10.14.
-    [Selector("itemPrototype", "setItemPrototype:")] public NSCollectionViewItem? ItemPrototype { get; set; }
+    [Selector("itemPrototype", "setItemPrototype:")]
+    public NSCollectionViewItem? ItemPrototype { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("maxNumberOfRows", "setMaxNumberOfRows:")] public NSUInteger MaxNumberOfRows { get; set; }
+    [Selector("maxNumberOfRows", "setMaxNumberOfRows:")]
+    public NSUInteger MaxNumberOfRows { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("maxNumberOfColumns", "setMaxNumberOfColumns:")] public NSUInteger MaxNumberOfColumns { get; set; }
+    [Selector("maxNumberOfColumns", "setMaxNumberOfColumns:")]
+    public NSUInteger MaxNumberOfColumns { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("minItemSize", "setMinItemSize:")] public NSSize MinItemSize { get; set; }
+    [Selector("minItemSize", "setMinItemSize:")]
+    public NSSize MinItemSize { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("maxItemSize", "setMaxItemSize:")] public NSSize MaxItemSize { get; set; }
+    [Selector("maxItemSize", "setMaxItemSize:")]
+    public NSSize MaxItemSize { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("newItemForRepresentedObject:")] public NSCollectionViewItem NewItemForRepresentedObject(AnyObject object);
+    [Selector("newItemForRepresentedObject:")]
+    public NSCollectionViewItem NewItemForRepresentedObject(AnyObject object);
 }
 
 #endif

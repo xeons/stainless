@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class ASPasswordCredentialRequest : NSObject, ASCredentialRequest
 {
-    [Selector("initWithCredentialIdentity:")] public Self InitWithCredentialIdentity(ASPasswordCredentialIdentity credentialIdentity);
-    [Selector("requestWithCredentialIdentity:")] public static Self RequestWithCredentialIdentity(ASPasswordCredentialIdentity credentialIdentity);
+    [Selector("initWithCredentialIdentity:")]
+    public Self InitWithCredentialIdentity(ASPasswordCredentialIdentity credentialIdentity);
+    [Selector("requestWithCredentialIdentity:")]
+    public static Self RequestWithCredentialIdentity(ASPasswordCredentialIdentity credentialIdentity);
 }
 
 #endif

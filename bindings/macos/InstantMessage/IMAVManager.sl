@@ -59,46 +59,64 @@ public using IMVideoOptimizationOptions = NSUInteger;
 public extern objc class IMAVManager : NSObject
 {
     /// Deprecated in macOS 10.9.
-    [Selector("sharedAVManager")] public static IMAVManager? SharedAVManager();
+    [Selector("sharedAVManager")]
+    public static IMAVManager? SharedAVManager();
     /// Deprecated in macOS 10.9.
-    [Selector("state")] public IMAVManagerState State();
+    [Selector("state")]
+    public IMAVManagerState State();
     /// Deprecated in macOS 10.9.
-    [Selector("URLToShare")] public NSURL? URLToShare();
+    [Selector("URLToShare")]
+    public NSURL? URLToShare();
     /// Deprecated in macOS 10.9.
-    [Selector("setVideoDataSource:")] public void SetVideoDataSource(AnyObject? dataSource);
+    [Selector("setVideoDataSource:")]
+    public void SetVideoDataSource(AnyObject? dataSource);
     /// Deprecated in macOS 10.9.
-    [Selector("videoDataSource")] public AnyObject? VideoDataSource();
+    [Selector("videoDataSource")]
+    public AnyObject? VideoDataSource();
     /// Deprecated in macOS 10.9.
-    [Selector("setVideoOptimizationOptions:")] public void SetVideoOptimizationOptions(IMVideoOptimizationOptions options);
+    [Selector("setVideoOptimizationOptions:")]
+    public void SetVideoOptimizationOptions(IMVideoOptimizationOptions options);
     /// Deprecated in macOS 10.9.
-    [Selector("videoOptimizationOptions")] public IMVideoOptimizationOptions VideoOptimizationOptions();
+    [Selector("videoOptimizationOptions")]
+    public IMVideoOptimizationOptions VideoOptimizationOptions();
     /// Deprecated in macOS 10.9.
-    [Selector("setNumberOfAudioChannels:")] public void SetNumberOfAudioChannels(NSInteger count);
+    [Selector("setNumberOfAudioChannels:")]
+    public void SetNumberOfAudioChannels(NSInteger count);
     /// Deprecated in macOS 10.9.
-    [Selector("numberOfAudioChannels")] public NSInteger NumberOfAudioChannels();
+    [Selector("numberOfAudioChannels")]
+    public NSInteger NumberOfAudioChannels();
     /// Deprecated in macOS 10.9.
-    [Selector("audioDeviceUID")] public NSString? AudioDeviceUID();
+    [Selector("audioDeviceUID")]
+    public NSString? AudioDeviceUID();
     /// Deprecated in macOS 10.9.
-    [Selector("audioDeviceChannels")] public NSArray? AudioDeviceChannels();
+    [Selector("audioDeviceChannels")]
+    public NSArray? AudioDeviceChannels();
     /// Deprecated in macOS 10.9.
-    [Selector("controlBar")] public IMAVControlBar? ControlBar();
+    [Selector("controlBar")]
+    public IMAVControlBar? ControlBar();
     /// Deprecated in macOS 10.9.
-    [Selector("start")] public void Start();
+    [Selector("start")]
+    public void Start();
     /// Deprecated in macOS 10.9.
-    [Selector("stop")] public void Stop();
+    [Selector("stop")]
+    public void Stop();
 }
 
 /// IMVideoDataSource, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.9.
-    [Selector("getPixelBufferPixelFormat:")] public void GetPixelBufferPixelFormat(OSType* pixelFormatOut);
+    [Selector("getPixelBufferPixelFormat:")]
+    public void GetPixelBufferPixelFormat(OSType* pixelFormatOut);
     /// Deprecated in macOS 10.9.
-    [Selector("renderIntoPixelBuffer:forTime:")] public bool RenderIntoPixelBufferForTime(CVPixelBufferRef? buffer, CVTimeStamp* timeStamp);
+    [Selector("renderIntoPixelBuffer:forTime:")]
+    public bool RenderIntoPixelBufferForTime(CVPixelBufferRef? buffer, CVTimeStamp* timeStamp);
     /// Deprecated in macOS 10.9.
-    [Selector("getOpenGLBufferContext:pixelFormat:")] public void GetOpenGLBufferContextPixelFormat(CGLContextObj* contextOut, CGLPixelFormatObj* pixelFormatOut);
+    [Selector("getOpenGLBufferContext:pixelFormat:")]
+    public void GetOpenGLBufferContextPixelFormat(CGLContextObj* contextOut, CGLPixelFormatObj* pixelFormatOut);
     /// Deprecated in macOS 10.9.
-    [Selector("renderIntoOpenGLBuffer:onScreen:forTime:")] public bool RenderIntoOpenGLBufferOnScreenForTime(CVOpenGLBufferRef? buffer, int* screenInOut, CVTimeStamp* timeStamp);
+    [Selector("renderIntoOpenGLBuffer:onScreen:forTime:")]
+    public bool RenderIntoOpenGLBufferOnScreenForTime(CVOpenGLBufferRef? buffer, int* screenInOut, CVTimeStamp* timeStamp);
 }
 
 #endif

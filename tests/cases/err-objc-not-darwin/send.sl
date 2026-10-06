@@ -6,7 +6,8 @@ import Standard.ObjC;
 [ObjCRoot]
 public extern objc class NSObject
 {
-    [Selector("hash")] public nuint Hash();
+    [Selector("hash")]
+    public nuint Hash();
 }
 
 nuint Hashed(NSObject held) => held.Hash();

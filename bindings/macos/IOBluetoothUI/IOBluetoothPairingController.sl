@@ -34,22 +34,38 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothPairingController : NSWindowController
 {
-    [Selector("pairingController")] public static IOBluetoothPairingController? PairingController();
-    [Selector("runModal")] public int RunModal();
-    [Selector("getResults")] public NSArray? GetResults();
-    [Selector("setOptions:")] public void SetOptions(IOBluetoothServiceBrowserControllerOptions options);
-    [Selector("getOptions")] public IOBluetoothServiceBrowserControllerOptions GetOptions();
-    [Selector("setSearchAttributes:")] public void SetSearchAttributes(IOBluetoothDeviceSearchAttributes* searchAttributes);
-    [Selector("getSearchAttributes")] public IOBluetoothDeviceSearchAttributes* GetSearchAttributes();
-    [Selector("addAllowedUUID:")] public void AddAllowedUUID(IOBluetoothSDPUUID? allowedUUID);
-    [Selector("addAllowedUUIDArray:")] public void AddAllowedUUIDArray(NSArray? allowedUUIDArray);
-    [Selector("clearAllowedUUIDs")] public void ClearAllowedUUIDs();
-    [Selector("setTitle:")] public void SetTitle(NSString? windowTitle);
-    [Selector("getTitle")] public NSString? GetTitle();
-    [Selector("setDescriptionText:")] public void SetDescriptionText(NSString? descriptionText);
-    [Selector("getDescriptionText")] public NSString? GetDescriptionText();
-    [Selector("setPrompt:")] public void SetPrompt(NSString? prompt);
-    [Selector("getPrompt")] public NSString? GetPrompt();
+    [Selector("pairingController")]
+    public static IOBluetoothPairingController? PairingController();
+    [Selector("runModal")]
+    public int RunModal();
+    [Selector("getResults")]
+    public NSArray? GetResults();
+    [Selector("setOptions:")]
+    public void SetOptions(IOBluetoothServiceBrowserControllerOptions options);
+    [Selector("getOptions")]
+    public IOBluetoothServiceBrowserControllerOptions GetOptions();
+    [Selector("setSearchAttributes:")]
+    public void SetSearchAttributes(IOBluetoothDeviceSearchAttributes* searchAttributes);
+    [Selector("getSearchAttributes")]
+    public IOBluetoothDeviceSearchAttributes* GetSearchAttributes();
+    [Selector("addAllowedUUID:")]
+    public void AddAllowedUUID(IOBluetoothSDPUUID? allowedUUID);
+    [Selector("addAllowedUUIDArray:")]
+    public void AddAllowedUUIDArray(NSArray? allowedUUIDArray);
+    [Selector("clearAllowedUUIDs")]
+    public void ClearAllowedUUIDs();
+    [Selector("setTitle:")]
+    public void SetTitle(NSString? windowTitle);
+    [Selector("getTitle")]
+    public NSString? GetTitle();
+    [Selector("setDescriptionText:")]
+    public void SetDescriptionText(NSString? descriptionText);
+    [Selector("getDescriptionText")]
+    public NSString? GetDescriptionText();
+    [Selector("setPrompt:")]
+    public void SetPrompt(NSString? prompt);
+    [Selector("getPrompt")]
+    public NSString? GetPrompt();
 }
 
 #endif

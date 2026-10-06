@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "SystemConfiguration")
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? SCDynamicStoreCopyDHCPInfo(SCDynamicStoreRef? store, CFStringRef? serviceID);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? SCDynamicStoreCopyDHCPInfo(SCDynamicStoreRef? store, CFStringRef? serviceID);
 
 public extern "C" CFDataRef? DHCPInfoGetOptionData(CFDictionaryRef info, UInt8 code);
 

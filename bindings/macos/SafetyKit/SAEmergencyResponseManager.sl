@@ -43,13 +43,17 @@ public objc closure void SAEmergencyResponseManagerDialVoiceCallToPhoneNumberCom
 
 public extern objc class SAEmergencyResponseManager : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public SAEmergencyResponseDelegate? Delegate { get; set; }
-    [Selector("dialVoiceCallToPhoneNumber:completionHandler:")] public void DialVoiceCallToPhoneNumberCompletionHandler(NSString phoneNumber, SAEmergencyResponseManagerDialVoiceCallToPhoneNumberCompletionHandlerHandlerBlock handler);
+    [Selector("delegate", "setDelegate:")]
+    public SAEmergencyResponseDelegate? Delegate { get; set; }
+    [Selector("dialVoiceCallToPhoneNumber:completionHandler:")]
+    public void DialVoiceCallToPhoneNumberCompletionHandler(NSString phoneNumber, SAEmergencyResponseManagerDialVoiceCallToPhoneNumberCompletionHandlerHandlerBlock handler);
 }
 
 public objc interface SAEmergencyResponseDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("emergencyResponseManager:didUpdateVoiceCallStatus:")] void EmergencyResponseManagerDidUpdateVoiceCallStatus(SAEmergencyResponseManager emergencyResponseManager, SAEmergencyResponseManagerVoiceCallStatus voiceCallStatus);
+    [Optional]
+    [Selector("emergencyResponseManager:didUpdateVoiceCallStatus:")]
+    void EmergencyResponseManagerDidUpdateVoiceCallStatus(SAEmergencyResponseManager emergencyResponseManager, SAEmergencyResponseManagerVoiceCallStatus voiceCallStatus);
 }
 
 #endif

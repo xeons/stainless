@@ -33,13 +33,20 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLTableSectionElement : DOMHTMLElement
 {
-    [Selector("align", "setAlign:")] public NSString? Align { get; set; }
-    [Selector("ch", "setCh:")] public NSString? Ch { get; set; }
-    [Selector("chOff", "setChOff:")] public NSString? ChOff { get; set; }
-    [Selector("vAlign", "setVAlign:")] public NSString? VAlign { get; set; }
-    [Selector("rows")] public DOMHTMLCollection? Rows { get; }
-    [Selector("insertRow:")] public DOMHTMLElement? InsertRow(int index);
-    [Selector("deleteRow:")] public void DeleteRow(int index);
+    [Selector("align", "setAlign:")]
+    public NSString? Align { get; set; }
+    [Selector("ch", "setCh:")]
+    public NSString? Ch { get; set; }
+    [Selector("chOff", "setChOff:")]
+    public NSString? ChOff { get; set; }
+    [Selector("vAlign", "setVAlign:")]
+    public NSString? VAlign { get; set; }
+    [Selector("rows")]
+    public DOMHTMLCollection? Rows { get; }
+    [Selector("insertRow:")]
+    public DOMHTMLElement? InsertRow(int index);
+    [Selector("deleteRow:")]
+    public void DeleteRow(int index);
 }
 
 #endif

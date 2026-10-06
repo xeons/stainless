@@ -31,6 +31,7 @@ import Standard.ObjC;
 #pragma comment(framework, "Security")
 
 /// Deprecated in macOS 13.0.
-[ReturnsRetained] public extern "C" SecTransformRef SecTransformCreateReadTransformWithReadStream(CFReadStreamRef inputStream);
+[ReturnsRetained]
+public extern "C" SecTransformRef SecTransformCreateReadTransformWithReadStream(CFReadStreamRef inputStream);
 
 #endif

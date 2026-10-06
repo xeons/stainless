@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class INVoiceShortcut : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("identifier")] public NSUUID Identifier { get; }
-    [Selector("invocationPhrase")] public NSString InvocationPhrase { get; }
-    [Selector("shortcut")] public INShortcut Shortcut { get; }
+    [Selector("identifier")]
+    public NSUUID Identifier { get; }
+    [Selector("invocationPhrase")]
+    public NSString InvocationPhrase { get; }
+    [Selector("shortcut")]
+    public INShortcut Shortcut { get; }
 }
 
 #endif

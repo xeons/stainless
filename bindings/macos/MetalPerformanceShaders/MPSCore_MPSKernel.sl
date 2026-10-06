@@ -34,13 +34,20 @@ import Standard.ObjC;
 
 public extern objc class MPSKernel : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("options", "setOptions:")] public MPSKernelOptions Options { get; set; }
-    [Selector("device")] public MTLDevice Device { get; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("options", "setOptions:")]
+    public MPSKernelOptions Options { get; set; }
+    [Selector("device")]
+    public MTLDevice Device { get; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder aDecoder);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 #endif

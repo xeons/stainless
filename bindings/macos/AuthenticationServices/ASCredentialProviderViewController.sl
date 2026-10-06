@@ -33,23 +33,38 @@ import Standard.ObjC;
 
 public extern objc class ASCredentialProviderViewController : NSViewController
 {
-    [Selector("extensionContext")] public ASCredentialProviderExtensionContext ExtensionContext { get; }
-    [Selector("prepareCredentialListForServiceIdentifiers:")] public void PrepareCredentialListForServiceIdentifiers(NSArray serviceIdentifiers);
-    [Selector("prepareCredentialListForServiceIdentifiers:requestParameters:")] public void PrepareCredentialListForServiceIdentifiersRequestParameters(NSArray serviceIdentifiers, ASPasskeyCredentialRequestParameters requestParameters);
-    [Selector("prepareOneTimeCodeCredentialListForServiceIdentifiers:")] public void PrepareOneTimeCodeCredentialListForServiceIdentifiers(NSArray serviceIdentifiers);
+    [Selector("extensionContext")]
+    public ASCredentialProviderExtensionContext ExtensionContext { get; }
+    [Selector("prepareCredentialListForServiceIdentifiers:")]
+    public void PrepareCredentialListForServiceIdentifiers(NSArray serviceIdentifiers);
+    [Selector("prepareCredentialListForServiceIdentifiers:requestParameters:")]
+    public void PrepareCredentialListForServiceIdentifiersRequestParameters(NSArray serviceIdentifiers, ASPasskeyCredentialRequestParameters requestParameters);
+    [Selector("prepareOneTimeCodeCredentialListForServiceIdentifiers:")]
+    public void PrepareOneTimeCodeCredentialListForServiceIdentifiers(NSArray serviceIdentifiers);
     /// Deprecated in macOS 14.0.
-    [Selector("provideCredentialWithoutUserInteractionForIdentity:")] public void ProvideCredentialWithoutUserInteractionForIdentity(ASPasswordCredentialIdentity credentialIdentity);
-    [Selector("provideCredentialWithoutUserInteractionForRequest:")] public void ProvideCredentialWithoutUserInteractionForRequest(ASCredentialRequest credentialRequest);
+    [Selector("provideCredentialWithoutUserInteractionForIdentity:")]
+    public void ProvideCredentialWithoutUserInteractionForIdentity(ASPasswordCredentialIdentity credentialIdentity);
+    [Selector("provideCredentialWithoutUserInteractionForRequest:")]
+    public void ProvideCredentialWithoutUserInteractionForRequest(ASCredentialRequest credentialRequest);
     /// Deprecated in macOS 14.0.
-    [Selector("prepareInterfaceToProvideCredentialForIdentity:")] public void PrepareInterfaceToProvideCredentialForIdentity(ASPasswordCredentialIdentity credentialIdentity);
-    [Selector("prepareInterfaceToProvideCredentialForRequest:")] public void PrepareInterfaceToProvideCredentialForRequest(ASCredentialRequest credentialRequest);
-    [Selector("prepareInterfaceForExtensionConfiguration")] public void PrepareInterfaceForExtensionConfiguration();
-    [Selector("prepareInterfaceForPasskeyRegistration:")] public void PrepareInterfaceForPasskeyRegistration(ASCredentialRequest registrationRequest);
-    [Selector("performPasskeyRegistrationWithoutUserInteractionIfPossible:")] public void PerformPasskeyRegistrationWithoutUserInteractionIfPossible(ASPasskeyCredentialRequest registrationRequest);
-    [Selector("reportPublicKeyCredentialUpdateForRelyingParty:userHandle:newName:")] public void ReportPublicKeyCredentialUpdateForRelyingPartyUserHandleNewName(NSString relyingParty, NSData userHandle, NSString newName);
-    [Selector("reportUnknownPublicKeyCredentialForRelyingParty:credentialID:")] public void ReportUnknownPublicKeyCredentialForRelyingPartyCredentialID(NSString relyingParty, NSData credentialID);
-    [Selector("reportAllAcceptedPublicKeyCredentialsForRelyingParty:userHandle:acceptedCredentialIDs:")] public void ReportAllAcceptedPublicKeyCredentialsForRelyingPartyUserHandleAcceptedCredentialIDs(NSString relyingParty, NSData userHandle, NSArray acceptedCredentialIDs);
-    [Selector("reportUnusedPasswordCredentialForDomain:userName:")] public void ReportUnusedPasswordCredentialForDomainUserName(NSString domain, NSString userName);
+    [Selector("prepareInterfaceToProvideCredentialForIdentity:")]
+    public void PrepareInterfaceToProvideCredentialForIdentity(ASPasswordCredentialIdentity credentialIdentity);
+    [Selector("prepareInterfaceToProvideCredentialForRequest:")]
+    public void PrepareInterfaceToProvideCredentialForRequest(ASCredentialRequest credentialRequest);
+    [Selector("prepareInterfaceForExtensionConfiguration")]
+    public void PrepareInterfaceForExtensionConfiguration();
+    [Selector("prepareInterfaceForPasskeyRegistration:")]
+    public void PrepareInterfaceForPasskeyRegistration(ASCredentialRequest registrationRequest);
+    [Selector("performPasskeyRegistrationWithoutUserInteractionIfPossible:")]
+    public void PerformPasskeyRegistrationWithoutUserInteractionIfPossible(ASPasskeyCredentialRequest registrationRequest);
+    [Selector("reportPublicKeyCredentialUpdateForRelyingParty:userHandle:newName:")]
+    public void ReportPublicKeyCredentialUpdateForRelyingPartyUserHandleNewName(NSString relyingParty, NSData userHandle, NSString newName);
+    [Selector("reportUnknownPublicKeyCredentialForRelyingParty:credentialID:")]
+    public void ReportUnknownPublicKeyCredentialForRelyingPartyCredentialID(NSString relyingParty, NSData credentialID);
+    [Selector("reportAllAcceptedPublicKeyCredentialsForRelyingParty:userHandle:acceptedCredentialIDs:")]
+    public void ReportAllAcceptedPublicKeyCredentialsForRelyingPartyUserHandleAcceptedCredentialIDs(NSString relyingParty, NSData userHandle, NSArray acceptedCredentialIDs);
+    [Selector("reportUnusedPasswordCredentialForDomain:userName:")]
+    public void ReportUnusedPasswordCredentialForDomainUserName(NSString domain, NSString userName);
 }
 
 #endif

@@ -42,11 +42,16 @@ public enum MLTaskState : long
 
 public extern objc class MLTask : NSObject
 {
-    [Selector("taskIdentifier")] public NSString TaskIdentifier { get; }
-    [Selector("state")] public MLTaskState State { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("resume")] public void Resume();
-    [Selector("cancel")] public void Cancel();
+    [Selector("taskIdentifier")]
+    public NSString TaskIdentifier { get; }
+    [Selector("state")]
+    public MLTaskState State { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("resume")]
+    public void Resume();
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

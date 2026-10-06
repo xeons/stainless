@@ -38,50 +38,74 @@ public objc closure void AVAssetWriterInputRequestMediaDataWhenReadyOnQueueUsing
 
 public extern objc class AVAssetWriterInput : NSObject
 {
-    [Selector("mediaType")] public AVMediaType MediaType { get; }
-    [Selector("outputSettings")] public NSDictionary? OutputSettings { get; }
-    [Selector("sourceFormatHint")] public CMFormatDescriptionRef? SourceFormatHint { get; }
-    [Selector("metadata", "setMetadata:")] public NSArray Metadata { get; set; }
-    [Selector("isReadyForMoreMediaData")] public bool ReadyForMoreMediaData { get; }
-    [Selector("expectsMediaDataInRealTime", "setExpectsMediaDataInRealTime:")] public bool ExpectsMediaDataInRealTime { get; set; }
-    [Selector("assetWriterInputWithMediaType:outputSettings:")] public static Self AssetWriterInputWithMediaTypeOutputSettings(AVMediaType mediaType, NSDictionary? outputSettings);
-    [Selector("assetWriterInputWithMediaType:outputSettings:sourceFormatHint:")] public static Self AssetWriterInputWithMediaTypeOutputSettingsSourceFormatHint(AVMediaType mediaType, NSDictionary? outputSettings, CMFormatDescriptionRef? sourceFormatHint);
-    [Selector("initWithMediaType:outputSettings:")] public Self InitWithMediaTypeOutputSettings(AVMediaType mediaType, NSDictionary? outputSettings);
-    [Selector("initWithMediaType:outputSettings:sourceFormatHint:")] public Self InitWithMediaTypeOutputSettingsSourceFormatHint(AVMediaType mediaType, NSDictionary? outputSettings, CMFormatDescriptionRef? sourceFormatHint);
-    [Selector("requestMediaDataWhenReadyOnQueue:usingBlock:")] public void RequestMediaDataWhenReadyOnQueueUsingBlock(dispatch_queue_t queue, AVAssetWriterInputRequestMediaDataWhenReadyOnQueueUsingBlockBlock block);
-    [Selector("appendSampleBuffer:")] public bool AppendSampleBuffer(CMSampleBufferRef sampleBuffer);
-    [Selector("markAsFinished")] public void MarkAsFinished();
+    [Selector("mediaType")]
+    public AVMediaType MediaType { get; }
+    [Selector("outputSettings")]
+    public NSDictionary? OutputSettings { get; }
+    [Selector("sourceFormatHint")]
+    public CMFormatDescriptionRef? SourceFormatHint { get; }
+    [Selector("metadata", "setMetadata:")]
+    public NSArray Metadata { get; set; }
+    [Selector("isReadyForMoreMediaData")]
+    public bool ReadyForMoreMediaData { get; }
+    [Selector("expectsMediaDataInRealTime", "setExpectsMediaDataInRealTime:")]
+    public bool ExpectsMediaDataInRealTime { get; set; }
+    [Selector("assetWriterInputWithMediaType:outputSettings:")]
+    public static Self AssetWriterInputWithMediaTypeOutputSettings(AVMediaType mediaType, NSDictionary? outputSettings);
+    [Selector("assetWriterInputWithMediaType:outputSettings:sourceFormatHint:")]
+    public static Self AssetWriterInputWithMediaTypeOutputSettingsSourceFormatHint(AVMediaType mediaType, NSDictionary? outputSettings, CMFormatDescriptionRef? sourceFormatHint);
+    [Selector("initWithMediaType:outputSettings:")]
+    public Self InitWithMediaTypeOutputSettings(AVMediaType mediaType, NSDictionary? outputSettings);
+    [Selector("initWithMediaType:outputSettings:sourceFormatHint:")]
+    public Self InitWithMediaTypeOutputSettingsSourceFormatHint(AVMediaType mediaType, NSDictionary? outputSettings, CMFormatDescriptionRef? sourceFormatHint);
+    [Selector("requestMediaDataWhenReadyOnQueue:usingBlock:")]
+    public void RequestMediaDataWhenReadyOnQueueUsingBlock(dispatch_queue_t queue, AVAssetWriterInputRequestMediaDataWhenReadyOnQueueUsingBlockBlock block);
+    [Selector("appendSampleBuffer:")]
+    public bool AppendSampleBuffer(CMSampleBufferRef sampleBuffer);
+    [Selector("markAsFinished")]
+    public void MarkAsFinished();
 }
 
 /// AVAssetWriterInputLanguageProperties, a category of AVAssetWriterInput.
 public extern objc class AVAssetWriterInput
 {
-    [Selector("languageCode", "setLanguageCode:")] public NSString? LanguageCode { get; set; }
-    [Selector("extendedLanguageTag", "setExtendedLanguageTag:")] public NSString? ExtendedLanguageTag { get; set; }
+    [Selector("languageCode", "setLanguageCode:")]
+    public NSString? LanguageCode { get; set; }
+    [Selector("extendedLanguageTag", "setExtendedLanguageTag:")]
+    public NSString? ExtendedLanguageTag { get; set; }
 }
 
 /// AVAssetWriterInputPropertiesForVisualCharacteristic, a category of AVAssetWriterInput.
 public extern objc class AVAssetWriterInput
 {
-    [Selector("naturalSize", "setNaturalSize:")] public CGSize NaturalSize { get; set; }
-    [Selector("transform", "setTransform:")] public CGAffineTransform Transform { get; set; }
+    [Selector("naturalSize", "setNaturalSize:")]
+    public CGSize NaturalSize { get; set; }
+    [Selector("transform", "setTransform:")]
+    public CGAffineTransform Transform { get; set; }
 }
 
 /// AVAssetWriterInputPropertiesForAudibleCharacteristic, a category of AVAssetWriterInput.
 public extern objc class AVAssetWriterInput
 {
-    [Selector("preferredVolume", "setPreferredVolume:")] public float PreferredVolume { get; set; }
+    [Selector("preferredVolume", "setPreferredVolume:")]
+    public float PreferredVolume { get; set; }
 }
 
 /// AVAssetWriterInputFileTypeSpecificProperties, a category of AVAssetWriterInput.
 public extern objc class AVAssetWriterInput
 {
-    [Selector("marksOutputTrackAsEnabled", "setMarksOutputTrackAsEnabled:")] public bool MarksOutputTrackAsEnabled { get; set; }
-    [Selector("mediaTimeScale", "setMediaTimeScale:")] public CMTimeScale MediaTimeScale { get; set; }
-    [Selector("preferredMediaChunkDuration", "setPreferredMediaChunkDuration:")] public CMTime PreferredMediaChunkDuration { get; set; }
-    [Selector("preferredMediaChunkAlignment", "setPreferredMediaChunkAlignment:")] public NSInteger PreferredMediaChunkAlignment { get; set; }
-    [Selector("sampleReferenceBaseURL", "setSampleReferenceBaseURL:")] public NSURL? SampleReferenceBaseURL { get; set; }
-    [Selector("mediaDataLocation", "setMediaDataLocation:")] public AVAssetWriterInputMediaDataLocation? MediaDataLocation { get; set; }
+    [Selector("marksOutputTrackAsEnabled", "setMarksOutputTrackAsEnabled:")]
+    public bool MarksOutputTrackAsEnabled { get; set; }
+    [Selector("mediaTimeScale", "setMediaTimeScale:")]
+    public CMTimeScale MediaTimeScale { get; set; }
+    [Selector("preferredMediaChunkDuration", "setPreferredMediaChunkDuration:")]
+    public CMTime PreferredMediaChunkDuration { get; set; }
+    [Selector("preferredMediaChunkAlignment", "setPreferredMediaChunkAlignment:")]
+    public NSInteger PreferredMediaChunkAlignment { get; set; }
+    [Selector("sampleReferenceBaseURL", "setSampleReferenceBaseURL:")]
+    public NSURL? SampleReferenceBaseURL { get; set; }
+    [Selector("mediaDataLocation", "setMediaDataLocation:")]
+    public AVAssetWriterInputMediaDataLocation? MediaDataLocation { get; set; }
 }
 
 public using AVAssetWriterInputMediaDataLocation = NSString;
@@ -96,60 +120,89 @@ public extern "C" AVAssetWriterInputMediaDataLocation? AVAssetWriterInputMediaDa
 /// AVAssetWriterInputTrackAssociations, a category of AVAssetWriterInput.
 public extern objc class AVAssetWriterInput
 {
-    [Selector("canAddTrackAssociationWithTrackOfInput:type:")] public bool CanAddTrackAssociationWithTrackOfInputType(AVAssetWriterInput input, NSString trackAssociationType);
-    [Selector("addTrackAssociationWithTrackOfInput:type:")] public void AddTrackAssociationWithTrackOfInputType(AVAssetWriterInput input, NSString trackAssociationType);
+    [Selector("canAddTrackAssociationWithTrackOfInput:type:")]
+    public bool CanAddTrackAssociationWithTrackOfInputType(AVAssetWriterInput input, NSString trackAssociationType);
+    [Selector("addTrackAssociationWithTrackOfInput:type:")]
+    public void AddTrackAssociationWithTrackOfInputType(AVAssetWriterInput input, NSString trackAssociationType);
 }
 
 /// AVAssetWriterInputMultiPass, a category of AVAssetWriterInput.
 public extern objc class AVAssetWriterInput
 {
-    [Selector("performsMultiPassEncodingIfSupported", "setPerformsMultiPassEncodingIfSupported:")] public bool PerformsMultiPassEncodingIfSupported { get; set; }
-    [Selector("canPerformMultiplePasses")] public bool CanPerformMultiplePasses { get; }
-    [Selector("currentPassDescription")] public AVAssetWriterInputPassDescription? CurrentPassDescription { get; }
-    [Selector("respondToEachPassDescriptionOnQueue:usingBlock:")] public void RespondToEachPassDescriptionOnQueueUsingBlock(dispatch_queue_t queue, dispatch_block_t block);
-    [Selector("markCurrentPassAsFinished")] public void MarkCurrentPassAsFinished();
+    [Selector("performsMultiPassEncodingIfSupported", "setPerformsMultiPassEncodingIfSupported:")]
+    public bool PerformsMultiPassEncodingIfSupported { get; set; }
+    [Selector("canPerformMultiplePasses")]
+    public bool CanPerformMultiplePasses { get; }
+    [Selector("currentPassDescription")]
+    public AVAssetWriterInputPassDescription? CurrentPassDescription { get; }
+    [Selector("respondToEachPassDescriptionOnQueue:usingBlock:")]
+    public void RespondToEachPassDescriptionOnQueueUsingBlock(dispatch_queue_t queue, dispatch_block_t block);
+    [Selector("markCurrentPassAsFinished")]
+    public void MarkCurrentPassAsFinished();
 }
 
 public extern objc class AVAssetWriterInputPassDescription : NSObject
 {
-    [Selector("sourceTimeRanges")] public NSArray SourceTimeRanges { get; }
+    [Selector("sourceTimeRanges")]
+    public NSArray SourceTimeRanges { get; }
 }
 
 public extern objc class AVAssetWriterInputPixelBufferAdaptor : NSObject
 {
-    [Selector("assetWriterInput")] public AVAssetWriterInput AssetWriterInput { get; }
-    [Selector("sourcePixelBufferAttributes")] public NSDictionary? SourcePixelBufferAttributes { get; }
-    [Selector("pixelBufferPool")] public CVPixelBufferPoolRef? PixelBufferPool { get; }
-    [Selector("assetWriterInputPixelBufferAdaptorWithAssetWriterInput:sourcePixelBufferAttributes:")] public static Self AssetWriterInputPixelBufferAdaptorWithAssetWriterInputSourcePixelBufferAttributes(AVAssetWriterInput input, NSDictionary? sourcePixelBufferAttributes);
-    [Selector("initWithAssetWriterInput:sourcePixelBufferAttributes:")] public Self InitWithAssetWriterInputSourcePixelBufferAttributes(AVAssetWriterInput input, NSDictionary? sourcePixelBufferAttributes);
-    [Selector("appendPixelBuffer:withPresentationTime:")] public bool AppendPixelBufferWithPresentationTime(CVPixelBufferRef pixelBuffer, CMTime presentationTime);
+    [Selector("assetWriterInput")]
+    public AVAssetWriterInput AssetWriterInput { get; }
+    [Selector("sourcePixelBufferAttributes")]
+    public NSDictionary? SourcePixelBufferAttributes { get; }
+    [Selector("pixelBufferPool")]
+    public CVPixelBufferPoolRef? PixelBufferPool { get; }
+    [Selector("assetWriterInputPixelBufferAdaptorWithAssetWriterInput:sourcePixelBufferAttributes:")]
+    public static Self AssetWriterInputPixelBufferAdaptorWithAssetWriterInputSourcePixelBufferAttributes(AVAssetWriterInput input, NSDictionary? sourcePixelBufferAttributes);
+    [Selector("initWithAssetWriterInput:sourcePixelBufferAttributes:")]
+    public Self InitWithAssetWriterInputSourcePixelBufferAttributes(AVAssetWriterInput input, NSDictionary? sourcePixelBufferAttributes);
+    [Selector("appendPixelBuffer:withPresentationTime:")]
+    public bool AppendPixelBufferWithPresentationTime(CVPixelBufferRef pixelBuffer, CMTime presentationTime);
 }
 
 public extern objc class AVAssetWriterInputTaggedPixelBufferGroupAdaptor : NSObject
 {
-    [Selector("assetWriterInput")] public AVAssetWriterInput AssetWriterInput { get; }
-    [Selector("sourcePixelBufferAttributes")] public NSDictionary? SourcePixelBufferAttributes { get; }
-    [Selector("pixelBufferPool")] public CVPixelBufferPoolRef? PixelBufferPool { get; }
-    [Selector("assetWriterInputTaggedPixelBufferGroupAdaptorWithAssetWriterInput:sourcePixelBufferAttributes:")] public static Self AssetWriterInputTaggedPixelBufferGroupAdaptorWithAssetWriterInputSourcePixelBufferAttributes(AVAssetWriterInput input, NSDictionary? sourcePixelBufferAttributes);
-    [Selector("initWithAssetWriterInput:sourcePixelBufferAttributes:")] public Self InitWithAssetWriterInputSourcePixelBufferAttributes(AVAssetWriterInput input, NSDictionary? sourcePixelBufferAttributes);
-    [Selector("appendTaggedPixelBufferGroup:withPresentationTime:")] public bool AppendTaggedPixelBufferGroupWithPresentationTime(CMTaggedBufferGroupRef taggedPixelBufferGroup, CMTime presentationTime);
+    [Selector("assetWriterInput")]
+    public AVAssetWriterInput AssetWriterInput { get; }
+    [Selector("sourcePixelBufferAttributes")]
+    public NSDictionary? SourcePixelBufferAttributes { get; }
+    [Selector("pixelBufferPool")]
+    public CVPixelBufferPoolRef? PixelBufferPool { get; }
+    [Selector("assetWriterInputTaggedPixelBufferGroupAdaptorWithAssetWriterInput:sourcePixelBufferAttributes:")]
+    public static Self AssetWriterInputTaggedPixelBufferGroupAdaptorWithAssetWriterInputSourcePixelBufferAttributes(AVAssetWriterInput input, NSDictionary? sourcePixelBufferAttributes);
+    [Selector("initWithAssetWriterInput:sourcePixelBufferAttributes:")]
+    public Self InitWithAssetWriterInputSourcePixelBufferAttributes(AVAssetWriterInput input, NSDictionary? sourcePixelBufferAttributes);
+    [Selector("appendTaggedPixelBufferGroup:withPresentationTime:")]
+    public bool AppendTaggedPixelBufferGroupWithPresentationTime(CMTaggedBufferGroupRef taggedPixelBufferGroup, CMTime presentationTime);
 }
 
 public extern objc class AVAssetWriterInputMetadataAdaptor : NSObject
 {
-    [Selector("assetWriterInput")] public AVAssetWriterInput AssetWriterInput { get; }
-    [Selector("assetWriterInputMetadataAdaptorWithAssetWriterInput:")] public static Self AssetWriterInputMetadataAdaptorWithAssetWriterInput(AVAssetWriterInput input);
-    [Selector("initWithAssetWriterInput:")] public Self InitWithAssetWriterInput(AVAssetWriterInput input);
-    [Selector("appendTimedMetadataGroup:")] public bool AppendTimedMetadataGroup(AVTimedMetadataGroup timedMetadataGroup);
+    [Selector("assetWriterInput")]
+    public AVAssetWriterInput AssetWriterInput { get; }
+    [Selector("assetWriterInputMetadataAdaptorWithAssetWriterInput:")]
+    public static Self AssetWriterInputMetadataAdaptorWithAssetWriterInput(AVAssetWriterInput input);
+    [Selector("initWithAssetWriterInput:")]
+    public Self InitWithAssetWriterInput(AVAssetWriterInput input);
+    [Selector("appendTimedMetadataGroup:")]
+    public bool AppendTimedMetadataGroup(AVTimedMetadataGroup timedMetadataGroup);
 }
 
 public extern objc class AVAssetWriterInputCaptionAdaptor : NSObject
 {
-    [Selector("assetWriterInput")] public AVAssetWriterInput AssetWriterInput { get; }
-    [Selector("assetWriterInputCaptionAdaptorWithAssetWriterInput:")] public static Self AssetWriterInputCaptionAdaptorWithAssetWriterInput(AVAssetWriterInput input);
-    [Selector("initWithAssetWriterInput:")] public Self InitWithAssetWriterInput(AVAssetWriterInput input);
-    [Selector("appendCaption:")] public bool AppendCaption(AVCaption caption);
-    [Selector("appendCaptionGroup:")] public bool AppendCaptionGroup(AVCaptionGroup captionGroup);
+    [Selector("assetWriterInput")]
+    public AVAssetWriterInput AssetWriterInput { get; }
+    [Selector("assetWriterInputCaptionAdaptorWithAssetWriterInput:")]
+    public static Self AssetWriterInputCaptionAdaptorWithAssetWriterInput(AVAssetWriterInput input);
+    [Selector("initWithAssetWriterInput:")]
+    public Self InitWithAssetWriterInput(AVAssetWriterInput input);
+    [Selector("appendCaption:")]
+    public bool AppendCaption(AVCaption caption);
+    [Selector("appendCaptionGroup:")]
+    public bool AppendCaptionGroup(AVCaptionGroup captionGroup);
 }
 
 #endif

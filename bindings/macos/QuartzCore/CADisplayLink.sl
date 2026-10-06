@@ -34,14 +34,22 @@ import Standard.ObjC;
 
 public extern objc class CADisplayLink : NSObject
 {
-    [Selector("timestamp")] public CFTimeInterval Timestamp { get; }
-    [Selector("duration")] public CFTimeInterval Duration { get; }
-    [Selector("targetTimestamp")] public CFTimeInterval TargetTimestamp { get; }
-    [Selector("isPaused", "setPaused:")] public bool Paused { get; set; }
-    [Selector("preferredFrameRateRange", "setPreferredFrameRateRange:")] public CAFrameRateRange PreferredFrameRateRange { get; set; }
-    [Selector("addToRunLoop:forMode:")] public void AddToRunLoopForMode(NSRunLoop runloop, NSRunLoopMode mode);
-    [Selector("removeFromRunLoop:forMode:")] public void RemoveFromRunLoopForMode(NSRunLoop runloop, NSRunLoopMode mode);
-    [Selector("invalidate")] public void Invalidate();
+    [Selector("timestamp")]
+    public CFTimeInterval Timestamp { get; }
+    [Selector("duration")]
+    public CFTimeInterval Duration { get; }
+    [Selector("targetTimestamp")]
+    public CFTimeInterval TargetTimestamp { get; }
+    [Selector("isPaused", "setPaused:")]
+    public bool Paused { get; set; }
+    [Selector("preferredFrameRateRange", "setPreferredFrameRateRange:")]
+    public CAFrameRateRange PreferredFrameRateRange { get; set; }
+    [Selector("addToRunLoop:forMode:")]
+    public void AddToRunLoopForMode(NSRunLoop runloop, NSRunLoopMode mode);
+    [Selector("removeFromRunLoop:forMode:")]
+    public void RemoveFromRunLoopForMode(NSRunLoop runloop, NSRunLoopMode mode);
+    [Selector("invalidate")]
+    public void Invalidate();
 }
 
 #endif

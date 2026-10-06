@@ -42,7 +42,8 @@ public enum MTROnboardingPayloadType : ulong
 /// Deprecated in macOS 14.0.
 public extern objc class MTROnboardingPayloadParser : NSObject
 {
-    [Selector("setupPayloadForOnboardingPayload:error:")] public static MTRSetupPayload? SetupPayloadForOnboardingPayloadError(NSString onboardingPayload, out NSError? error);
+    [Selector("setupPayloadForOnboardingPayload:error:")]
+    public static MTRSetupPayload? SetupPayloadForOnboardingPayloadError(NSString onboardingPayload, out NSError? error);
 }
 
 #endif

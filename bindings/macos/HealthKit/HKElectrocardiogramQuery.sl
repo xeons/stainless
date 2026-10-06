@@ -33,15 +33,18 @@ import Standard.ObjC;
 
 public extern objc class HKElectrocardiogramVoltageMeasurement : NSObject, NSCopying
 {
-    [Selector("timeSinceSampleStart")] public NSTimeInterval TimeSinceSampleStart { get; }
-    [Selector("quantityForLead:")] public HKQuantity? QuantityForLead(HKElectrocardiogramLead lead);
+    [Selector("timeSinceSampleStart")]
+    public NSTimeInterval TimeSinceSampleStart { get; }
+    [Selector("quantityForLead:")]
+    public HKQuantity? QuantityForLead(HKElectrocardiogramLead lead);
 }
 
 public objc closure void HKElectrocardiogramQueryInitWithElectrocardiogramDataHandlerDataHandlerBlock(HKElectrocardiogramQuery arg0, HKElectrocardiogramVoltageMeasurement? arg1, bool arg2, NSError? arg3);
 
 public extern objc class HKElectrocardiogramQuery : HKQuery
 {
-    [Selector("initWithElectrocardiogram:dataHandler:")] public Self InitWithElectrocardiogramDataHandler(HKElectrocardiogram electrocardiogram, HKElectrocardiogramQueryInitWithElectrocardiogramDataHandlerDataHandlerBlock dataHandler);
+    [Selector("initWithElectrocardiogram:dataHandler:")]
+    public Self InitWithElectrocardiogramDataHandler(HKElectrocardiogram electrocardiogram, HKElectrocardiogramQueryInitWithElectrocardiogramDataHandlerDataHandlerBlock dataHandler);
 }
 
 #endif

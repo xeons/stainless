@@ -36,14 +36,22 @@ public objc closure void MKGeocodingRequestGetMapItemsWithCompletionHandlerCompl
 /// macOS 26.0 and later.
 public extern objc class MKGeocodingRequest : NSObject
 {
-    [Selector("isCancelled")] public bool Cancelled { get; }
-    [Selector("isLoading")] public bool Loading { get; }
-    [Selector("addressString")] public NSString AddressString { get; }
-    [Selector("region", "setRegion:")] public MKCoordinateRegion Region { get; set; }
-    [Selector("preferredLocale", "setPreferredLocale:")] public NSLocale? PreferredLocale { get; set; }
-    [Selector("initWithAddressString:")] public Self? InitWithAddressString(NSString addressString);
-    [Selector("getMapItemsWithCompletionHandler:")] public void GetMapItemsWithCompletionHandler(MKGeocodingRequestGetMapItemsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("cancel")] public void Cancel();
+    [Selector("isCancelled")]
+    public bool Cancelled { get; }
+    [Selector("isLoading")]
+    public bool Loading { get; }
+    [Selector("addressString")]
+    public NSString AddressString { get; }
+    [Selector("region", "setRegion:")]
+    public MKCoordinateRegion Region { get; set; }
+    [Selector("preferredLocale", "setPreferredLocale:")]
+    public NSLocale? PreferredLocale { get; set; }
+    [Selector("initWithAddressString:")]
+    public Self? InitWithAddressString(NSString addressString);
+    [Selector("getMapItemsWithCompletionHandler:")]
+    public void GetMapItemsWithCompletionHandler(MKGeocodingRequestGetMapItemsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

@@ -36,8 +36,10 @@ public objc closure void MEMessageEncoderEncodeMessageComposeContextCompletionHa
 
 public objc interface MEMessageEncoder : NSObjectProtocol
 {
-    [Selector("getEncodingStatusForMessage:composeContext:completionHandler:")] void GetEncodingStatusForMessageComposeContextCompletionHandler(MEMessage message, MEComposeContext composeContext, MEMessageEncoderGetEncodingStatusForMessageComposeContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("encodeMessage:composeContext:completionHandler:")] void EncodeMessageComposeContextCompletionHandler(MEMessage message, MEComposeContext composeContext, MEMessageEncoderEncodeMessageComposeContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getEncodingStatusForMessage:composeContext:completionHandler:")]
+    void GetEncodingStatusForMessageComposeContextCompletionHandler(MEMessage message, MEComposeContext composeContext, MEMessageEncoderGetEncodingStatusForMessageComposeContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("encodeMessage:composeContext:completionHandler:")]
+    void EncodeMessageComposeContextCompletionHandler(MEMessage message, MEComposeContext composeContext, MEMessageEncoderEncodeMessageComposeContextCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

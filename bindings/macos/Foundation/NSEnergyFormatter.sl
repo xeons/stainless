@@ -39,14 +39,22 @@ public enum NSEnergyFormatterUnit : long
 
 public extern objc class NSEnergyFormatter : NSFormatter
 {
-    [Selector("numberFormatter", "setNumberFormatter:")] public NSNumberFormatter? NumberFormatter { get; set; }
-    [Selector("unitStyle", "setUnitStyle:")] public NSFormattingUnitStyle UnitStyle { get; set; }
-    [Selector("isForFoodEnergyUse", "setForFoodEnergyUse:")] public bool ForFoodEnergyUse { get; set; }
-    [Selector("stringFromValue:unit:")] public NSString StringFromValueUnit(double value, NSEnergyFormatterUnit unit);
-    [Selector("stringFromJoules:")] public NSString StringFromJoules(double numberInJoules);
-    [Selector("unitStringFromValue:unit:")] public NSString UnitStringFromValueUnit(double value, NSEnergyFormatterUnit unit);
-    [Selector("unitStringFromJoules:usedUnit:")] public NSString UnitStringFromJoulesUsedUnit(double numberInJoules, NSEnergyFormatterUnit* unitp);
-    [Selector("getObjectValue:forString:errorDescription:")] public bool GetObjectValueForStringErrorDescription(out AnyObject? obj, NSString string, out NSString? error);
+    [Selector("numberFormatter", "setNumberFormatter:")]
+    public NSNumberFormatter? NumberFormatter { get; set; }
+    [Selector("unitStyle", "setUnitStyle:")]
+    public NSFormattingUnitStyle UnitStyle { get; set; }
+    [Selector("isForFoodEnergyUse", "setForFoodEnergyUse:")]
+    public bool ForFoodEnergyUse { get; set; }
+    [Selector("stringFromValue:unit:")]
+    public NSString StringFromValueUnit(double value, NSEnergyFormatterUnit unit);
+    [Selector("stringFromJoules:")]
+    public NSString StringFromJoules(double numberInJoules);
+    [Selector("unitStringFromValue:unit:")]
+    public NSString UnitStringFromValueUnit(double value, NSEnergyFormatterUnit unit);
+    [Selector("unitStringFromJoules:usedUnit:")]
+    public NSString UnitStringFromJoulesUsedUnit(double numberInJoules, NSEnergyFormatterUnit* unitp);
+    [Selector("getObjectValue:forString:errorDescription:")]
+    public bool GetObjectValueForStringErrorDescription(out AnyObject? obj, NSString string, out NSString? error);
 }
 
 #endif

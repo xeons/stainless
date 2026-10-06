@@ -32,23 +32,31 @@ import Standard.ObjC;
 
 public extern "C" CFTypeID ODNodeGetTypeID();
 
-[ReturnsRetained] public extern "C" ODNodeRef? ODNodeCreateWithNodeType(CFAllocatorRef? allocator, ODSessionRef? session, ODNodeType nodeType, __CFError** error);
+[ReturnsRetained]
+public extern "C" ODNodeRef? ODNodeCreateWithNodeType(CFAllocatorRef? allocator, ODSessionRef? session, ODNodeType nodeType, __CFError** error);
 
-[ReturnsRetained] public extern "C" ODNodeRef? ODNodeCreateWithName(CFAllocatorRef? allocator, ODSessionRef? session, CFStringRef? nodeName, __CFError** error);
+[ReturnsRetained]
+public extern "C" ODNodeRef? ODNodeCreateWithName(CFAllocatorRef? allocator, ODSessionRef? session, CFStringRef? nodeName, __CFError** error);
 
-[ReturnsRetained] public extern "C" ODNodeRef? ODNodeCreateCopy(CFAllocatorRef? allocator, ODNodeRef? node, __CFError** error);
+[ReturnsRetained]
+public extern "C" ODNodeRef? ODNodeCreateCopy(CFAllocatorRef? allocator, ODNodeRef? node, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ODNodeCopySubnodeNames(ODNodeRef? node, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ODNodeCopySubnodeNames(ODNodeRef? node, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ODNodeCopyUnreachableSubnodeNames(ODNodeRef? node, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ODNodeCopyUnreachableSubnodeNames(ODNodeRef? node, __CFError** error);
 
 public extern "C" CFStringRef? ODNodeGetName(ODNodeRef? node);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? ODNodeCopyDetails(ODNodeRef? node, CFArrayRef? keys, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? ODNodeCopyDetails(ODNodeRef? node, CFArrayRef? keys, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ODNodeCopySupportedRecordTypes(ODNodeRef? node, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ODNodeCopySupportedRecordTypes(ODNodeRef? node, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ODNodeCopySupportedAttributes(ODNodeRef? node, ODRecordType? recordType, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ODNodeCopySupportedAttributes(ODNodeRef? node, ODRecordType? recordType, __CFError** error);
 
 public extern "C" bool ODNodeSetCredentials(ODNodeRef? node, ODRecordType? recordType, CFStringRef? recordName, CFStringRef? password, __CFError** error);
 
@@ -57,19 +65,25 @@ public extern "C" bool ODNodeSetCredentialsExtended(ODNodeRef? node, ODRecordTyp
 /// Deprecated in macOS 10.7.
 public extern "C" bool ODNodeSetCredentialsUsingKerberosCache(ODNodeRef? node, CFStringRef? cacheName, __CFError** error);
 
-[ReturnsRetained] public extern "C" ODRecordRef? ODNodeCreateRecord(ODNodeRef? node, ODRecordType? recordType, CFStringRef? recordName, CFDictionaryRef? attributeDict, __CFError** error);
+[ReturnsRetained]
+public extern "C" ODRecordRef? ODNodeCreateRecord(ODNodeRef? node, ODRecordType? recordType, CFStringRef? recordName, CFDictionaryRef? attributeDict, __CFError** error);
 
-[ReturnsRetained] public extern "C" ODRecordRef? ODNodeCopyRecord(ODNodeRef? node, ODRecordType? recordType, CFStringRef? recordName, CFTypeRef? attributes, __CFError** error);
+[ReturnsRetained]
+public extern "C" ODRecordRef? ODNodeCopyRecord(ODNodeRef? node, ODRecordType? recordType, CFStringRef? recordName, CFTypeRef? attributes, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFDataRef? ODNodeCustomCall(ODNodeRef? node, CFIndex customCode, CFDataRef? data, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDataRef? ODNodeCustomCall(ODNodeRef? node, CFIndex customCode, CFDataRef? data, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFTypeRef? ODNodeCustomFunction(ODNodeRef? node, CFStringRef? function, CFTypeRef? payload, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFTypeRef? ODNodeCustomFunction(ODNodeRef? node, CFStringRef? function, CFTypeRef? payload, __CFError** error);
 
 /// Deprecated in macOS 10.10.
-[ReturnsRetained] public extern "C" CFDictionaryRef? ODNodeCopyPolicies(ODNodeRef? node, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? ODNodeCopyPolicies(ODNodeRef? node, __CFError** error);
 
 /// Deprecated in macOS 10.10.
-[ReturnsRetained] public extern "C" CFDictionaryRef? ODNodeCopySupportedPolicies(ODNodeRef? node, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? ODNodeCopySupportedPolicies(ODNodeRef? node, __CFError** error);
 
 /// Deprecated in macOS 10.10.
 public extern "C" bool ODNodeSetPolicies(ODNodeRef? node, CFDictionaryRef? policies, __CFError** error);
@@ -86,7 +100,8 @@ public extern "C" bool ODNodeRemoveAccountPolicy(ODNodeRef? node, CFDictionaryRe
 
 public extern "C" bool ODNodeSetAccountPolicies(ODNodeRef? node, CFDictionaryRef? policies, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? ODNodeCopyAccountPolicies(ODNodeRef? node, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? ODNodeCopyAccountPolicies(ODNodeRef? node, __CFError** error);
 
 public extern "C" bool ODNodePasswordContentCheck(ODNodeRef? node, CFStringRef? password, CFStringRef? recordName, __CFError** error);
 

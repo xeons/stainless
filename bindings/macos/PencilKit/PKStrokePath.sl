@@ -40,18 +40,30 @@ public objc closure void PKStrokePathEnumerateInterpolatedPointsInRangeStrideByP
 
 public extern objc class PKStrokePath : NSObject, NSCopying
 {
-    [Selector("count")] public NSUInteger Count { get; }
-    [Selector("creationDate")] public NSDate CreationDate { get; }
-    [Selector("initWithControlPoints:creationDate:")] public Self InitWithControlPointsCreationDate(NSArray controlPoints, NSDate creationDate);
-    [Selector("pointAtIndex:")] public PKStrokePoint PointAtIndex(NSUInteger i);
-    [Selector("objectAtIndexedSubscript:")] public PKStrokePoint ObjectAtIndexedSubscript(NSUInteger i);
-    [Selector("interpolatedLocationAt:")] public CGPoint InterpolatedLocationAt(CGFloat parametricValue);
-    [Selector("interpolatedPointAt:")] public PKStrokePoint InterpolatedPointAt(CGFloat parametricValue);
-    [Selector("enumerateInterpolatedPointsInRange:strideByDistance:usingBlock:")] public void EnumerateInterpolatedPointsInRangeStrideByDistanceUsingBlock(PKFloatRange range, CGFloat distanceStep, PKStrokePathEnumerateInterpolatedPointsInRangeStrideByDistanceUsingBlockBlock block);
-    [Selector("enumerateInterpolatedPointsInRange:strideByTime:usingBlock:")] public void EnumerateInterpolatedPointsInRangeStrideByTimeUsingBlock(PKFloatRange range, NSTimeInterval timeStep, PKStrokePathEnumerateInterpolatedPointsInRangeStrideByTimeUsingBlockBlock block);
-    [Selector("enumerateInterpolatedPointsInRange:strideByParametricStep:usingBlock:")] public void EnumerateInterpolatedPointsInRangeStrideByParametricStepUsingBlock(PKFloatRange range, CGFloat parametricStep, PKStrokePathEnumerateInterpolatedPointsInRangeStrideByParametricStepUsingBlockBlock block);
-    [Selector("parametricValue:offsetByDistance:")] public CGFloat ParametricValueOffsetByDistance(CGFloat parametricValue, CGFloat distanceStep);
-    [Selector("parametricValue:offsetByTime:")] public CGFloat ParametricValueOffsetByTime(CGFloat parametricValue, NSTimeInterval timeStep);
+    [Selector("count")]
+    public NSUInteger Count { get; }
+    [Selector("creationDate")]
+    public NSDate CreationDate { get; }
+    [Selector("initWithControlPoints:creationDate:")]
+    public Self InitWithControlPointsCreationDate(NSArray controlPoints, NSDate creationDate);
+    [Selector("pointAtIndex:")]
+    public PKStrokePoint PointAtIndex(NSUInteger i);
+    [Selector("objectAtIndexedSubscript:")]
+    public PKStrokePoint ObjectAtIndexedSubscript(NSUInteger i);
+    [Selector("interpolatedLocationAt:")]
+    public CGPoint InterpolatedLocationAt(CGFloat parametricValue);
+    [Selector("interpolatedPointAt:")]
+    public PKStrokePoint InterpolatedPointAt(CGFloat parametricValue);
+    [Selector("enumerateInterpolatedPointsInRange:strideByDistance:usingBlock:")]
+    public void EnumerateInterpolatedPointsInRangeStrideByDistanceUsingBlock(PKFloatRange range, CGFloat distanceStep, PKStrokePathEnumerateInterpolatedPointsInRangeStrideByDistanceUsingBlockBlock block);
+    [Selector("enumerateInterpolatedPointsInRange:strideByTime:usingBlock:")]
+    public void EnumerateInterpolatedPointsInRangeStrideByTimeUsingBlock(PKFloatRange range, NSTimeInterval timeStep, PKStrokePathEnumerateInterpolatedPointsInRangeStrideByTimeUsingBlockBlock block);
+    [Selector("enumerateInterpolatedPointsInRange:strideByParametricStep:usingBlock:")]
+    public void EnumerateInterpolatedPointsInRangeStrideByParametricStepUsingBlock(PKFloatRange range, CGFloat parametricStep, PKStrokePathEnumerateInterpolatedPointsInRangeStrideByParametricStepUsingBlockBlock block);
+    [Selector("parametricValue:offsetByDistance:")]
+    public CGFloat ParametricValueOffsetByDistance(CGFloat parametricValue, CGFloat distanceStep);
+    [Selector("parametricValue:offsetByTime:")]
+    public CGFloat ParametricValueOffsetByTime(CGFloat parametricValue, NSTimeInterval timeStep);
 }
 
 #endif

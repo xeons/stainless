@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class PKAutomaticReloadPaymentSummaryItem : PKPaymentSummaryItem
 {
-    [Selector("thresholdAmount", "setThresholdAmount:")] public NSDecimalNumber ThresholdAmount { get; set; }
+    [Selector("thresholdAmount", "setThresholdAmount:")]
+    public NSDecimalNumber ThresholdAmount { get; set; }
 }
 
 #endif

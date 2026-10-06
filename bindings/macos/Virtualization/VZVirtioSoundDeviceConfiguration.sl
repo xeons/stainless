@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioSoundDeviceConfiguration : VZAudioDeviceConfiguration
 {
-    [Selector("streams", "setStreams:")] public NSArray Streams { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("streams", "setStreams:")]
+    public NSArray Streams { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

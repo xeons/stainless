@@ -41,42 +41,68 @@ public enum MTLFXSpatialScalerColorProcessingMode : long
 
 public extern objc class MTLFXSpatialScalerDescriptor : NSObject, NSCopying
 {
-    [Selector("colorTextureFormat", "setColorTextureFormat:")] public MTLPixelFormat ColorTextureFormat { get; set; }
-    [Selector("outputTextureFormat", "setOutputTextureFormat:")] public MTLPixelFormat OutputTextureFormat { get; set; }
-    [Selector("inputWidth", "setInputWidth:")] public NSUInteger InputWidth { get; set; }
-    [Selector("inputHeight", "setInputHeight:")] public NSUInteger InputHeight { get; set; }
-    [Selector("outputWidth", "setOutputWidth:")] public NSUInteger OutputWidth { get; set; }
-    [Selector("outputHeight", "setOutputHeight:")] public NSUInteger OutputHeight { get; set; }
-    [Selector("colorProcessingMode", "setColorProcessingMode:")] public MTLFXSpatialScalerColorProcessingMode ColorProcessingMode { get; set; }
-    [Selector("newSpatialScalerWithDevice:")] public MTLFXSpatialScaler? NewSpatialScalerWithDevice(MTLDevice device);
+    [Selector("colorTextureFormat", "setColorTextureFormat:")]
+    public MTLPixelFormat ColorTextureFormat { get; set; }
+    [Selector("outputTextureFormat", "setOutputTextureFormat:")]
+    public MTLPixelFormat OutputTextureFormat { get; set; }
+    [Selector("inputWidth", "setInputWidth:")]
+    public NSUInteger InputWidth { get; set; }
+    [Selector("inputHeight", "setInputHeight:")]
+    public NSUInteger InputHeight { get; set; }
+    [Selector("outputWidth", "setOutputWidth:")]
+    public NSUInteger OutputWidth { get; set; }
+    [Selector("outputHeight", "setOutputHeight:")]
+    public NSUInteger OutputHeight { get; set; }
+    [Selector("colorProcessingMode", "setColorProcessingMode:")]
+    public MTLFXSpatialScalerColorProcessingMode ColorProcessingMode { get; set; }
+    [Selector("newSpatialScalerWithDevice:")]
+    public MTLFXSpatialScaler? NewSpatialScalerWithDevice(MTLDevice device);
     /// macOS 26.0 and later.
-    [Selector("newSpatialScalerWithDevice:compiler:")] public MTL4FXSpatialScaler? NewSpatialScalerWithDeviceCompiler(MTLDevice device, MTL4Compiler compiler);
+    [Selector("newSpatialScalerWithDevice:compiler:")]
+    public MTL4FXSpatialScaler? NewSpatialScalerWithDeviceCompiler(MTLDevice device, MTL4Compiler compiler);
     /// macOS 26.0 and later.
-    [Selector("supportsMetal4FX:")] public static bool SupportsMetal4FX(MTLDevice device);
-    [Selector("supportsDevice:")] public static bool SupportsDevice(MTLDevice device);
+    [Selector("supportsMetal4FX:")]
+    public static bool SupportsMetal4FX(MTLDevice device);
+    [Selector("supportsDevice:")]
+    public static bool SupportsDevice(MTLDevice device);
 }
 
 public objc interface MTLFXSpatialScalerBase : NSObjectProtocol
 {
-    [Selector("colorTextureUsage")] MTLTextureUsage ColorTextureUsage { get; }
-    [Selector("outputTextureUsage")] MTLTextureUsage OutputTextureUsage { get; }
-    [Selector("inputContentWidth", "setInputContentWidth:")] NSUInteger InputContentWidth { get; set; }
-    [Selector("inputContentHeight", "setInputContentHeight:")] NSUInteger InputContentHeight { get; set; }
-    [Selector("colorTexture", "setColorTexture:")] MTLTexture? ColorTexture { get; set; }
-    [Selector("outputTexture", "setOutputTexture:")] MTLTexture? OutputTexture { get; set; }
-    [Selector("colorTextureFormat")] MTLPixelFormat ColorTextureFormat { get; }
-    [Selector("outputTextureFormat")] MTLPixelFormat OutputTextureFormat { get; }
-    [Selector("inputWidth")] NSUInteger InputWidth { get; }
-    [Selector("inputHeight")] NSUInteger InputHeight { get; }
-    [Selector("outputWidth")] NSUInteger OutputWidth { get; }
-    [Selector("outputHeight")] NSUInteger OutputHeight { get; }
-    [Selector("colorProcessingMode")] MTLFXSpatialScalerColorProcessingMode ColorProcessingMode { get; }
-    [Selector("fence", "setFence:")] MTLFence? Fence { get; set; }
+    [Selector("colorTextureUsage")]
+    MTLTextureUsage ColorTextureUsage { get; }
+    [Selector("outputTextureUsage")]
+    MTLTextureUsage OutputTextureUsage { get; }
+    [Selector("inputContentWidth", "setInputContentWidth:")]
+    NSUInteger InputContentWidth { get; set; }
+    [Selector("inputContentHeight", "setInputContentHeight:")]
+    NSUInteger InputContentHeight { get; set; }
+    [Selector("colorTexture", "setColorTexture:")]
+    MTLTexture? ColorTexture { get; set; }
+    [Selector("outputTexture", "setOutputTexture:")]
+    MTLTexture? OutputTexture { get; set; }
+    [Selector("colorTextureFormat")]
+    MTLPixelFormat ColorTextureFormat { get; }
+    [Selector("outputTextureFormat")]
+    MTLPixelFormat OutputTextureFormat { get; }
+    [Selector("inputWidth")]
+    NSUInteger InputWidth { get; }
+    [Selector("inputHeight")]
+    NSUInteger InputHeight { get; }
+    [Selector("outputWidth")]
+    NSUInteger OutputWidth { get; }
+    [Selector("outputHeight")]
+    NSUInteger OutputHeight { get; }
+    [Selector("colorProcessingMode")]
+    MTLFXSpatialScalerColorProcessingMode ColorProcessingMode { get; }
+    [Selector("fence", "setFence:")]
+    MTLFence? Fence { get; set; }
 }
 
 public objc interface MTLFXSpatialScaler : MTLFXSpatialScalerBase
 {
-    [Selector("encodeToCommandBuffer:")] void EncodeToCommandBuffer(MTLCommandBuffer commandBuffer);
+    [Selector("encodeToCommandBuffer:")]
+    void EncodeToCommandBuffer(MTLCommandBuffer commandBuffer);
 }
 
 #endif

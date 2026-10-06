@@ -34,18 +34,28 @@ import Standard.ObjC;
 
 public objc interface SHSessionDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("session:didFindMatch:")] void SessionDidFindMatch(SHSession session, SHMatch match);
-    [Optional] [Selector("session:didNotFindMatchForSignature:error:")] void SessionDidNotFindMatchForSignatureError(SHSession session, SHSignature signature, NSError? error);
+    [Optional]
+    [Selector("session:didFindMatch:")]
+    void SessionDidFindMatch(SHSession session, SHMatch match);
+    [Optional]
+    [Selector("session:didNotFindMatchForSignature:error:")]
+    void SessionDidNotFindMatchForSignatureError(SHSession session, SHSignature signature, NSError? error);
 }
 
 public extern objc class SHSession : NSObject
 {
-    [Selector("catalog")] public SHCatalog Catalog { get; }
-    [Selector("delegate", "setDelegate:")] public SHSessionDelegate? Delegate { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCatalog:")] public Self InitWithCatalog(SHCatalog catalog);
-    [Selector("matchStreamingBuffer:atTime:")] public void MatchStreamingBufferAtTime(AVAudioPCMBuffer buffer, AVAudioTime? time);
-    [Selector("matchSignature:")] public void MatchSignature(SHSignature signature);
+    [Selector("catalog")]
+    public SHCatalog Catalog { get; }
+    [Selector("delegate", "setDelegate:")]
+    public SHSessionDelegate? Delegate { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCatalog:")]
+    public Self InitWithCatalog(SHCatalog catalog);
+    [Selector("matchStreamingBuffer:atTime:")]
+    public void MatchStreamingBufferAtTime(AVAudioPCMBuffer buffer, AVAudioTime? time);
+    [Selector("matchSignature:")]
+    public void MatchSignature(SHSignature signature);
 }
 
 #endif

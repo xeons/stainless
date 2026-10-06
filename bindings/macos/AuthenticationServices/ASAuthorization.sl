@@ -39,8 +39,10 @@ public extern "C" ASAuthorizationScope ASAuthorizationScopeEmail;
 
 public extern objc class ASAuthorization : NSObject
 {
-    [Selector("provider")] public ASAuthorizationProvider Provider { get; }
-    [Selector("credential")] public ASAuthorizationCredential Credential { get; }
+    [Selector("provider")]
+    public ASAuthorizationProvider Provider { get; }
+    [Selector("credential")]
+    public ASAuthorizationCredential Credential { get; }
 }
 
 #endif

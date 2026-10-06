@@ -36,76 +36,132 @@ public const int DOM_ALLOW_KEYBOARD_INPUT = 1;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMElement : DOMNode
 {
-    [Selector("tagName")] public NSString? TagName { get; }
-    [Selector("style")] public DOMCSSStyleDeclaration? Style { get; }
-    [Selector("offsetLeft")] public int OffsetLeft { get; }
-    [Selector("offsetTop")] public int OffsetTop { get; }
-    [Selector("offsetWidth")] public int OffsetWidth { get; }
-    [Selector("offsetHeight")] public int OffsetHeight { get; }
-    [Selector("clientLeft")] public int ClientLeft { get; }
-    [Selector("clientTop")] public int ClientTop { get; }
-    [Selector("clientWidth")] public int ClientWidth { get; }
-    [Selector("clientHeight")] public int ClientHeight { get; }
-    [Selector("scrollLeft", "setScrollLeft:")] public int ScrollLeft { get; set; }
-    [Selector("scrollTop", "setScrollTop:")] public int ScrollTop { get; set; }
-    [Selector("scrollWidth")] public int ScrollWidth { get; }
-    [Selector("scrollHeight")] public int ScrollHeight { get; }
-    [Selector("offsetParent")] public DOMElement? OffsetParent { get; }
-    [Selector("innerHTML", "setInnerHTML:")] public NSString? InnerHTML { get; set; }
-    [Selector("outerHTML", "setOuterHTML:")] public NSString? OuterHTML { get; set; }
-    [Selector("className", "setClassName:")] public NSString? ClassName { get; set; }
-    [Selector("innerText")] public NSString? InnerText { get; }
-    [Selector("previousElementSibling")] public DOMElement? PreviousElementSibling { get; }
-    [Selector("nextElementSibling")] public DOMElement? NextElementSibling { get; }
-    [Selector("firstElementChild")] public DOMElement? FirstElementChild { get; }
-    [Selector("lastElementChild")] public DOMElement? LastElementChild { get; }
-    [Selector("childElementCount")] public uint ChildElementCount { get; }
-    [Selector("getAttribute:")] public NSString? GetAttribute(NSString? name);
-    [Selector("setAttribute:value:")] public void SetAttributeValue(NSString? name, NSString? value);
-    [Selector("removeAttribute:")] public void RemoveAttribute(NSString? name);
-    [Selector("getAttributeNode:")] public DOMAttr? GetAttributeNode(NSString? name);
-    [Selector("setAttributeNode:")] public DOMAttr? SetAttributeNode(DOMAttr? newAttr);
-    [Selector("removeAttributeNode:")] public DOMAttr? RemoveAttributeNode(DOMAttr? oldAttr);
-    [Selector("getElementsByTagName:")] public DOMNodeList? GetElementsByTagName(NSString? name);
-    [Selector("getAttributeNS:localName:")] public NSString? GetAttributeNSLocalName(NSString? namespaceURI, NSString? localName);
-    [Selector("setAttributeNS:qualifiedName:value:")] public void SetAttributeNSQualifiedNameValue(NSString? namespaceURI, NSString? qualifiedName, NSString? value);
-    [Selector("removeAttributeNS:localName:")] public void RemoveAttributeNSLocalName(NSString? namespaceURI, NSString? localName);
-    [Selector("getElementsByTagNameNS:localName:")] public DOMNodeList? GetElementsByTagNameNSLocalName(NSString? namespaceURI, NSString? localName);
-    [Selector("getAttributeNodeNS:localName:")] public DOMAttr? GetAttributeNodeNSLocalName(NSString? namespaceURI, NSString? localName);
-    [Selector("setAttributeNodeNS:")] public DOMAttr? SetAttributeNodeNS(DOMAttr? newAttr);
-    [Selector("hasAttribute:")] public bool HasAttribute(NSString? name);
-    [Selector("hasAttributeNS:localName:")] public bool HasAttributeNSLocalName(NSString? namespaceURI, NSString? localName);
-    [Selector("focus")] public void Focus();
-    [Selector("blur")] public void Blur();
-    [Selector("scrollIntoView:")] public void ScrollIntoView(bool alignWithTop);
-    [Selector("scrollIntoViewIfNeeded:")] public void ScrollIntoViewIfNeeded(bool centerIfNeeded);
-    [Selector("getElementsByClassName:")] public DOMNodeList? GetElementsByClassName(NSString? name);
-    [Selector("webkitRequestFullScreen:")] public void WebkitRequestFullScreen(ushort flags);
-    [Selector("querySelector:")] public DOMElement? QuerySelector(NSString? selectors);
-    [Selector("querySelectorAll:")] public DOMNodeList? QuerySelectorAll(NSString? selectors);
+    [Selector("tagName")]
+    public NSString? TagName { get; }
+    [Selector("style")]
+    public DOMCSSStyleDeclaration? Style { get; }
+    [Selector("offsetLeft")]
+    public int OffsetLeft { get; }
+    [Selector("offsetTop")]
+    public int OffsetTop { get; }
+    [Selector("offsetWidth")]
+    public int OffsetWidth { get; }
+    [Selector("offsetHeight")]
+    public int OffsetHeight { get; }
+    [Selector("clientLeft")]
+    public int ClientLeft { get; }
+    [Selector("clientTop")]
+    public int ClientTop { get; }
+    [Selector("clientWidth")]
+    public int ClientWidth { get; }
+    [Selector("clientHeight")]
+    public int ClientHeight { get; }
+    [Selector("scrollLeft", "setScrollLeft:")]
+    public int ScrollLeft { get; set; }
+    [Selector("scrollTop", "setScrollTop:")]
+    public int ScrollTop { get; set; }
+    [Selector("scrollWidth")]
+    public int ScrollWidth { get; }
+    [Selector("scrollHeight")]
+    public int ScrollHeight { get; }
+    [Selector("offsetParent")]
+    public DOMElement? OffsetParent { get; }
+    [Selector("innerHTML", "setInnerHTML:")]
+    public NSString? InnerHTML { get; set; }
+    [Selector("outerHTML", "setOuterHTML:")]
+    public NSString? OuterHTML { get; set; }
+    [Selector("className", "setClassName:")]
+    public NSString? ClassName { get; set; }
+    [Selector("innerText")]
+    public NSString? InnerText { get; }
+    [Selector("previousElementSibling")]
+    public DOMElement? PreviousElementSibling { get; }
+    [Selector("nextElementSibling")]
+    public DOMElement? NextElementSibling { get; }
+    [Selector("firstElementChild")]
+    public DOMElement? FirstElementChild { get; }
+    [Selector("lastElementChild")]
+    public DOMElement? LastElementChild { get; }
+    [Selector("childElementCount")]
+    public uint ChildElementCount { get; }
+    [Selector("getAttribute:")]
+    public NSString? GetAttribute(NSString? name);
+    [Selector("setAttribute:value:")]
+    public void SetAttributeValue(NSString? name, NSString? value);
+    [Selector("removeAttribute:")]
+    public void RemoveAttribute(NSString? name);
+    [Selector("getAttributeNode:")]
+    public DOMAttr? GetAttributeNode(NSString? name);
+    [Selector("setAttributeNode:")]
+    public DOMAttr? SetAttributeNode(DOMAttr? newAttr);
+    [Selector("removeAttributeNode:")]
+    public DOMAttr? RemoveAttributeNode(DOMAttr? oldAttr);
+    [Selector("getElementsByTagName:")]
+    public DOMNodeList? GetElementsByTagName(NSString? name);
+    [Selector("getAttributeNS:localName:")]
+    public NSString? GetAttributeNSLocalName(NSString? namespaceURI, NSString? localName);
+    [Selector("setAttributeNS:qualifiedName:value:")]
+    public void SetAttributeNSQualifiedNameValue(NSString? namespaceURI, NSString? qualifiedName, NSString? value);
+    [Selector("removeAttributeNS:localName:")]
+    public void RemoveAttributeNSLocalName(NSString? namespaceURI, NSString? localName);
+    [Selector("getElementsByTagNameNS:localName:")]
+    public DOMNodeList? GetElementsByTagNameNSLocalName(NSString? namespaceURI, NSString? localName);
+    [Selector("getAttributeNodeNS:localName:")]
+    public DOMAttr? GetAttributeNodeNSLocalName(NSString? namespaceURI, NSString? localName);
+    [Selector("setAttributeNodeNS:")]
+    public DOMAttr? SetAttributeNodeNS(DOMAttr? newAttr);
+    [Selector("hasAttribute:")]
+    public bool HasAttribute(NSString? name);
+    [Selector("hasAttributeNS:localName:")]
+    public bool HasAttributeNSLocalName(NSString? namespaceURI, NSString? localName);
+    [Selector("focus")]
+    public void Focus();
+    [Selector("blur")]
+    public void Blur();
+    [Selector("scrollIntoView:")]
+    public void ScrollIntoView(bool alignWithTop);
+    [Selector("scrollIntoViewIfNeeded:")]
+    public void ScrollIntoViewIfNeeded(bool centerIfNeeded);
+    [Selector("getElementsByClassName:")]
+    public DOMNodeList? GetElementsByClassName(NSString? name);
+    [Selector("webkitRequestFullScreen:")]
+    public void WebkitRequestFullScreen(ushort flags);
+    [Selector("querySelector:")]
+    public DOMElement? QuerySelector(NSString? selectors);
+    [Selector("querySelectorAll:")]
+    public DOMNodeList? QuerySelectorAll(NSString? selectors);
 }
 
 /// DOMElementDeprecated, a category of DOMElement.
 public extern objc class DOMElement
 {
     /// Deprecated in macOS 10.5.
-    [Selector("setAttribute::")] public void SetAttribute(NSString? name, NSString? value);
+    [Selector("setAttribute::")]
+    public void SetAttribute(NSString? name, NSString? value);
     /// Deprecated in macOS 10.5.
-    [Selector("getAttributeNS::")] public NSString? GetAttributeNS(NSString? namespaceURI, NSString? localName);
+    [Selector("getAttributeNS::")]
+    public NSString? GetAttributeNS(NSString? namespaceURI, NSString? localName);
     /// Deprecated in macOS 10.5.
-    [Selector("setAttributeNS:::")] public void SetAttributeNS(NSString? namespaceURI, NSString? qualifiedName, NSString? value);
+    [Selector("setAttributeNS:::")]
+    public void SetAttributeNS(NSString? namespaceURI, NSString? qualifiedName, NSString? value);
     /// Deprecated in macOS 10.5.
-    [Selector("removeAttributeNS::")] public void RemoveAttributeNS(NSString? namespaceURI, NSString? localName);
+    [Selector("removeAttributeNS::")]
+    public void RemoveAttributeNS(NSString? namespaceURI, NSString? localName);
     /// Deprecated in macOS 10.5.
-    [Selector("getElementsByTagNameNS::")] public DOMNodeList? GetElementsByTagNameNS(NSString? namespaceURI, NSString? localName);
+    [Selector("getElementsByTagNameNS::")]
+    public DOMNodeList? GetElementsByTagNameNS(NSString? namespaceURI, NSString? localName);
     /// Deprecated in macOS 10.5.
-    [Selector("getAttributeNodeNS::")] public DOMAttr? GetAttributeNodeNS(NSString? namespaceURI, NSString? localName);
+    [Selector("getAttributeNodeNS::")]
+    public DOMAttr? GetAttributeNodeNS(NSString? namespaceURI, NSString? localName);
     /// Deprecated in macOS 10.5.
-    [Selector("hasAttributeNS::")] public bool HasAttributeNS(NSString? namespaceURI, NSString? localName);
+    [Selector("hasAttributeNS::")]
+    public bool HasAttributeNS(NSString? namespaceURI, NSString? localName);
     /// Deprecated in macOS 10.14.
-    [Selector("scrollByLines:")] public void ScrollByLines(int lines);
+    [Selector("scrollByLines:")]
+    public void ScrollByLines(int lines);
     /// Deprecated in macOS 10.14.
-    [Selector("scrollByPages:")] public void ScrollByPages(int pages);
+    [Selector("scrollByPages:")]
+    public void ScrollByPages(int pages);
 }
 
 #endif

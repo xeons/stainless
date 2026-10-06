@@ -33,27 +33,32 @@ import Standard.ObjC;
 
 public extern objc class HKBiologicalSexObject : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("biologicalSex")] public HKBiologicalSex BiologicalSex { get; }
+    [Selector("biologicalSex")]
+    public HKBiologicalSex BiologicalSex { get; }
 }
 
 public extern objc class HKBloodTypeObject : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("bloodType")] public HKBloodType BloodType { get; }
+    [Selector("bloodType")]
+    public HKBloodType BloodType { get; }
 }
 
 public extern objc class HKFitzpatrickSkinTypeObject : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("skinType")] public HKFitzpatrickSkinType SkinType { get; }
+    [Selector("skinType")]
+    public HKFitzpatrickSkinType SkinType { get; }
 }
 
 public extern objc class HKWheelchairUseObject : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("wheelchairUse")] public HKWheelchairUse WheelchairUse { get; }
+    [Selector("wheelchairUse")]
+    public HKWheelchairUse WheelchairUse { get; }
 }
 
 public extern objc class HKActivityMoveModeObject : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("activityMoveMode")] public HKActivityMoveMode ActivityMoveMode { get; }
+    [Selector("activityMoveMode")]
+    public HKActivityMoveMode ActivityMoveMode { get; }
 }
 
 #endif

@@ -35,12 +35,22 @@ public objc closure void BADownloaderExtensionBackgroundDownloadDidReceiveChalle
 
 public objc interface BADownloaderExtension : NSObjectProtocol
 {
-    [Optional] [Selector("downloadsForRequest:manifestURL:extensionInfo:")] NSSet DownloadsForRequestManifestURLExtensionInfo(BAContentRequest contentRequest, NSURL manifestURL, BAAppExtensionInfo extensionInfo);
-    [Optional] [Selector("backgroundDownload:didReceiveChallenge:completionHandler:")] void BackgroundDownloadDidReceiveChallengeCompletionHandler(BADownload download, NSURLAuthenticationChallenge challenge, BADownloaderExtensionBackgroundDownloadDidReceiveChallengeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("backgroundDownload:failedWithError:")] void BackgroundDownloadFailedWithError(BADownload download, NSError error);
-    [Optional] [Selector("backgroundDownload:finishedWithFileURL:")] void BackgroundDownloadFinishedWithFileURL(BADownload download, NSURL fileURL);
+    [Optional]
+    [Selector("downloadsForRequest:manifestURL:extensionInfo:")]
+    NSSet DownloadsForRequestManifestURLExtensionInfo(BAContentRequest contentRequest, NSURL manifestURL, BAAppExtensionInfo extensionInfo);
+    [Optional]
+    [Selector("backgroundDownload:didReceiveChallenge:completionHandler:")]
+    void BackgroundDownloadDidReceiveChallengeCompletionHandler(BADownload download, NSURLAuthenticationChallenge challenge, BADownloaderExtensionBackgroundDownloadDidReceiveChallengeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("backgroundDownload:failedWithError:")]
+    void BackgroundDownloadFailedWithError(BADownload download, NSError error);
+    [Optional]
+    [Selector("backgroundDownload:finishedWithFileURL:")]
+    void BackgroundDownloadFinishedWithFileURL(BADownload download, NSURL fileURL);
     /// Deprecated in macOS 13.3.
-    [Optional] [Selector("extensionWillTerminate")] void ExtensionWillTerminate();
+    [Optional]
+    [Selector("extensionWillTerminate")]
+    void ExtensionWillTerminate();
 }
 
 #endif

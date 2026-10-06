@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationPlatformPublicKeyCredentialProvider : NSObject, ASAuthorizationProvider
 {
-    [Selector("relyingPartyIdentifier")] public NSString RelyingPartyIdentifier { get; }
-    [Selector("initWithRelyingPartyIdentifier:")] public Self InitWithRelyingPartyIdentifier(NSString relyingPartyIdentifier);
-    [Selector("createCredentialRegistrationRequestWithChallenge:name:userID:")] public ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithChallengeNameUserID(NSData challenge, NSString name, NSData userID);
-    [Selector("createCredentialRegistrationRequestWithChallenge:name:userID:requestStyle:")] public ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithChallengeNameUserIDRequestStyle(NSData challenge, NSString name, NSData userID, ASAuthorizationPlatformPublicKeyCredentialRegistrationRequestStyle requestStyle);
-    [Selector("createCredentialAssertionRequestWithChallenge:")] public ASAuthorizationPlatformPublicKeyCredentialAssertionRequest CreateCredentialAssertionRequestWithChallenge(NSData challenge);
+    [Selector("relyingPartyIdentifier")]
+    public NSString RelyingPartyIdentifier { get; }
+    [Selector("initWithRelyingPartyIdentifier:")]
+    public Self InitWithRelyingPartyIdentifier(NSString relyingPartyIdentifier);
+    [Selector("createCredentialRegistrationRequestWithChallenge:name:userID:")]
+    public ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithChallengeNameUserID(NSData challenge, NSString name, NSData userID);
+    [Selector("createCredentialRegistrationRequestWithChallenge:name:userID:requestStyle:")]
+    public ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithChallengeNameUserIDRequestStyle(NSData challenge, NSString name, NSData userID, ASAuthorizationPlatformPublicKeyCredentialRegistrationRequestStyle requestStyle);
+    [Selector("createCredentialAssertionRequestWithChallenge:")]
+    public ASAuthorizationPlatformPublicKeyCredentialAssertionRequest CreateCredentialAssertionRequestWithChallenge(NSData challenge);
 }
 
 public extern objc class ASAuthorizationPlatformPublicKeyCredentialProvider : ASAuthorizationWebBrowserPlatformPublicKeyCredentialProvider { }

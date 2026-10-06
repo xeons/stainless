@@ -32,18 +32,30 @@ import Standard.ObjC;
 
 public extern objc class NSAtomicStore : NSPersistentStore
 {
-    [Selector("initWithPersistentStoreCoordinator:configurationName:URL:options:")] public Self InitWithPersistentStoreCoordinatorConfigurationNameURLOptions(NSPersistentStoreCoordinator? coordinator, NSString? configurationName, NSURL url, NSDictionary? options);
-    [Selector("load:")] public bool Load(out NSError? error);
-    [Selector("save:")] public bool Save(out NSError? error);
-    [Selector("newCacheNodeForManagedObject:")] public NSAtomicStoreCacheNode NewCacheNodeForManagedObject(NSManagedObject managedObject);
-    [Selector("updateCacheNode:fromManagedObject:")] public void UpdateCacheNodeFromManagedObject(NSAtomicStoreCacheNode node, NSManagedObject managedObject);
-    [Selector("cacheNodes")] public NSSet CacheNodes();
-    [Selector("addCacheNodes:")] public void AddCacheNodes(NSSet cacheNodes);
-    [Selector("willRemoveCacheNodes:")] public void WillRemoveCacheNodes(NSSet cacheNodes);
-    [Selector("cacheNodeForObjectID:")] public NSAtomicStoreCacheNode? CacheNodeForObjectID(NSManagedObjectID objectID);
-    [Selector("objectIDForEntity:referenceObject:")] public NSManagedObjectID ObjectIDForEntityReferenceObject(NSEntityDescription entity, AnyObject data);
-    [Selector("newReferenceObjectForManagedObject:")] public AnyObject NewReferenceObjectForManagedObject(NSManagedObject managedObject);
-    [Selector("referenceObjectForObjectID:")] public AnyObject ReferenceObjectForObjectID(NSManagedObjectID objectID);
+    [Selector("initWithPersistentStoreCoordinator:configurationName:URL:options:")]
+    public Self InitWithPersistentStoreCoordinatorConfigurationNameURLOptions(NSPersistentStoreCoordinator? coordinator, NSString? configurationName, NSURL url, NSDictionary? options);
+    [Selector("load:")]
+    public bool Load(out NSError? error);
+    [Selector("save:")]
+    public bool Save(out NSError? error);
+    [Selector("newCacheNodeForManagedObject:")]
+    public NSAtomicStoreCacheNode NewCacheNodeForManagedObject(NSManagedObject managedObject);
+    [Selector("updateCacheNode:fromManagedObject:")]
+    public void UpdateCacheNodeFromManagedObject(NSAtomicStoreCacheNode node, NSManagedObject managedObject);
+    [Selector("cacheNodes")]
+    public NSSet CacheNodes();
+    [Selector("addCacheNodes:")]
+    public void AddCacheNodes(NSSet cacheNodes);
+    [Selector("willRemoveCacheNodes:")]
+    public void WillRemoveCacheNodes(NSSet cacheNodes);
+    [Selector("cacheNodeForObjectID:")]
+    public NSAtomicStoreCacheNode? CacheNodeForObjectID(NSManagedObjectID objectID);
+    [Selector("objectIDForEntity:referenceObject:")]
+    public NSManagedObjectID ObjectIDForEntityReferenceObject(NSEntityDescription entity, AnyObject data);
+    [Selector("newReferenceObjectForManagedObject:")]
+    public AnyObject NewReferenceObjectForManagedObject(NSManagedObject managedObject);
+    [Selector("referenceObjectForObjectID:")]
+    public AnyObject ReferenceObjectForObjectID(NSManagedObjectID objectID);
 }
 
 #endif

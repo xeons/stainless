@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class MXAverage : NSObject, NSSecureCoding
 {
-    [Selector("averageMeasurement")] public NSMeasurement AverageMeasurement { get; }
-    [Selector("sampleCount")] public NSInteger SampleCount { get; }
-    [Selector("standardDeviation")] public double StandardDeviation { get; }
+    [Selector("averageMeasurement")]
+    public NSMeasurement AverageMeasurement { get; }
+    [Selector("sampleCount")]
+    public NSInteger SampleCount { get; }
+    [Selector("standardDeviation")]
+    public double StandardDeviation { get; }
 }
 
 #endif

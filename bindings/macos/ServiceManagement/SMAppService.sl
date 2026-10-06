@@ -45,16 +45,26 @@ public objc closure void SMAppServiceUnregisterWithCompletionHandlerHandlerBlock
 
 public extern objc class SMAppService : NSObject
 {
-    [Selector("mainAppService")] public static SMAppService? MainAppService { get; }
-    [Selector("status")] public SMAppServiceStatus Status { get; }
-    [Selector("loginItemServiceWithIdentifier:")] public static Self LoginItemServiceWithIdentifier(NSString identifier);
-    [Selector("agentServiceWithPlistName:")] public static Self AgentServiceWithPlistName(NSString plistName);
-    [Selector("daemonServiceWithPlistName:")] public static Self DaemonServiceWithPlistName(NSString plistName);
-    [Selector("registerAndReturnError:")] public bool RegisterAndReturnError(out NSError? error);
-    [Selector("unregisterAndReturnError:")] public bool UnregisterAndReturnError(out NSError? error);
-    [Selector("unregisterWithCompletionHandler:")] public void UnregisterWithCompletionHandler(SMAppServiceUnregisterWithCompletionHandlerHandlerBlock handler);
-    [Selector("statusForLegacyURL:")] public static SMAppServiceStatus StatusForLegacyURL(NSURL url);
-    [Selector("openSystemSettingsLoginItems")] public static void OpenSystemSettingsLoginItems();
+    [Selector("mainAppService")]
+    public static SMAppService? MainAppService { get; }
+    [Selector("status")]
+    public SMAppServiceStatus Status { get; }
+    [Selector("loginItemServiceWithIdentifier:")]
+    public static Self LoginItemServiceWithIdentifier(NSString identifier);
+    [Selector("agentServiceWithPlistName:")]
+    public static Self AgentServiceWithPlistName(NSString plistName);
+    [Selector("daemonServiceWithPlistName:")]
+    public static Self DaemonServiceWithPlistName(NSString plistName);
+    [Selector("registerAndReturnError:")]
+    public bool RegisterAndReturnError(out NSError? error);
+    [Selector("unregisterAndReturnError:")]
+    public bool UnregisterAndReturnError(out NSError? error);
+    [Selector("unregisterWithCompletionHandler:")]
+    public void UnregisterWithCompletionHandler(SMAppServiceUnregisterWithCompletionHandlerHandlerBlock handler);
+    [Selector("statusForLegacyURL:")]
+    public static SMAppServiceStatus StatusForLegacyURL(NSURL url);
+    [Selector("openSystemSettingsLoginItems")]
+    public static void OpenSystemSettingsLoginItems();
 }
 
 #endif

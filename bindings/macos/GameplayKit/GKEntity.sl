@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class GKEntity : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("components")] public NSArray Components { get; }
-    [Selector("entity")] public static Self Entity();
-    [Selector("init")] public Self Init();
-    [Selector("updateWithDeltaTime:")] public void UpdateWithDeltaTime(NSTimeInterval seconds);
-    [Selector("addComponent:")] public void AddComponent(GKComponent component);
-    [Selector("removeComponentForClass:")] public void RemoveComponentForClass(Class componentClass);
-    [Selector("componentForClass:")] public GKComponent? ComponentForClass(Class componentClass);
+    [Selector("components")]
+    public NSArray Components { get; }
+    [Selector("entity")]
+    public static Self Entity();
+    [Selector("init")]
+    public Self Init();
+    [Selector("updateWithDeltaTime:")]
+    public void UpdateWithDeltaTime(NSTimeInterval seconds);
+    [Selector("addComponent:")]
+    public void AddComponent(GKComponent component);
+    [Selector("removeComponentForClass:")]
+    public void RemoveComponentForClass(Class componentClass);
+    [Selector("componentForClass:")]
+    public GKComponent? ComponentForClass(Class componentClass);
 }
 
 #endif

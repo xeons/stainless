@@ -36,15 +36,24 @@ public objc closure void AVCaptureStillImageOutputCaptureStillImageAsynchronousl
 /// Deprecated in macOS 10.15.
 public extern objc class AVCaptureStillImageOutput : AVCaptureOutput
 {
-    [Selector("outputSettings", "setOutputSettings:")] public NSDictionary OutputSettings { get; set; }
-    [Selector("availableImageDataCVPixelFormatTypes")] public NSArray AvailableImageDataCVPixelFormatTypes { get; }
-    [Selector("availableImageDataCodecTypes")] public NSArray AvailableImageDataCodecTypes { get; }
-    [Selector("isHighResolutionStillImageOutputEnabled", "setHighResolutionStillImageOutputEnabled:")] public bool HighResolutionStillImageOutputEnabled { get; set; }
-    [Selector("isCapturingStillImage")] public bool CapturingStillImage { get; }
-    [Selector("init")] public Self Init();
-    [Selector("new")] public static Self New();
-    [Selector("captureStillImageAsynchronouslyFromConnection:completionHandler:")] public void CaptureStillImageAsynchronouslyFromConnectionCompletionHandler(AVCaptureConnection connection, AVCaptureStillImageOutputCaptureStillImageAsynchronouslyFromConnectionCompletionHandlerHandlerBlock handler);
-    [Selector("jpegStillImageNSDataRepresentation:")] public static NSData? JpegStillImageNSDataRepresentation(CMSampleBufferRef jpegSampleBuffer);
+    [Selector("outputSettings", "setOutputSettings:")]
+    public NSDictionary OutputSettings { get; set; }
+    [Selector("availableImageDataCVPixelFormatTypes")]
+    public NSArray AvailableImageDataCVPixelFormatTypes { get; }
+    [Selector("availableImageDataCodecTypes")]
+    public NSArray AvailableImageDataCodecTypes { get; }
+    [Selector("isHighResolutionStillImageOutputEnabled", "setHighResolutionStillImageOutputEnabled:")]
+    public bool HighResolutionStillImageOutputEnabled { get; set; }
+    [Selector("isCapturingStillImage")]
+    public bool CapturingStillImage { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("new")]
+    public static Self New();
+    [Selector("captureStillImageAsynchronouslyFromConnection:completionHandler:")]
+    public void CaptureStillImageAsynchronouslyFromConnectionCompletionHandler(AVCaptureConnection connection, AVCaptureStillImageOutputCaptureStillImageAsynchronouslyFromConnectionCompletionHandlerHandlerBlock handler);
+    [Selector("jpegStillImageNSDataRepresentation:")]
+    public static NSData? JpegStillImageNSDataRepresentation(CMSampleBufferRef jpegSampleBuffer);
 }
 
 /// Deprecated in macOS 10.15.

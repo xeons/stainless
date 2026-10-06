@@ -57,22 +57,32 @@ public struct AVAudioVoiceProcessingOtherAudioDuckingConfiguration
 
 public extern objc class AVAudioIONode : AVAudioNode
 {
-    [Selector("presentationLatency")] public NSTimeInterval PresentationLatency { get; }
-    [Selector("audioUnit")] public AudioUnit AudioUnit { get; }
-    [Selector("isVoiceProcessingEnabled")] public bool VoiceProcessingEnabled { get; }
-    [Selector("setVoiceProcessingEnabled:error:")] public bool SetVoiceProcessingEnabledError(bool enabled, out NSError? outError);
+    [Selector("presentationLatency")]
+    public NSTimeInterval PresentationLatency { get; }
+    [Selector("audioUnit")]
+    public AudioUnit AudioUnit { get; }
+    [Selector("isVoiceProcessingEnabled")]
+    public bool VoiceProcessingEnabled { get; }
+    [Selector("setVoiceProcessingEnabled:error:")]
+    public bool SetVoiceProcessingEnabledError(bool enabled, out NSError? outError);
 }
 
 public objc closure void AVAudioInputNodeSetMutedSpeechActivityEventListenerListenerBlock(AVAudioVoiceProcessingSpeechActivityEvent arg0);
 
 public extern objc class AVAudioInputNode : AVAudioIONode, AVAudioMixing
 {
-    [Selector("isVoiceProcessingBypassed", "setVoiceProcessingBypassed:")] public bool VoiceProcessingBypassed { get; set; }
-    [Selector("isVoiceProcessingAGCEnabled", "setVoiceProcessingAGCEnabled:")] public bool VoiceProcessingAGCEnabled { get; set; }
-    [Selector("isVoiceProcessingInputMuted", "setVoiceProcessingInputMuted:")] public bool VoiceProcessingInputMuted { get; set; }
-    [Selector("voiceProcessingOtherAudioDuckingConfiguration", "setVoiceProcessingOtherAudioDuckingConfiguration:")] public AVAudioVoiceProcessingOtherAudioDuckingConfiguration VoiceProcessingOtherAudioDuckingConfiguration { get; set; }
-    [Selector("setManualRenderingInputPCMFormat:inputBlock:")] public bool SetManualRenderingInputPCMFormatInputBlock(AVAudioFormat format, AVAudioIONodeInputBlock block);
-    [Selector("setMutedSpeechActivityEventListener:")] public bool SetMutedSpeechActivityEventListener(AVAudioInputNodeSetMutedSpeechActivityEventListenerListenerBlock? listenerBlock);
+    [Selector("isVoiceProcessingBypassed", "setVoiceProcessingBypassed:")]
+    public bool VoiceProcessingBypassed { get; set; }
+    [Selector("isVoiceProcessingAGCEnabled", "setVoiceProcessingAGCEnabled:")]
+    public bool VoiceProcessingAGCEnabled { get; set; }
+    [Selector("isVoiceProcessingInputMuted", "setVoiceProcessingInputMuted:")]
+    public bool VoiceProcessingInputMuted { get; set; }
+    [Selector("voiceProcessingOtherAudioDuckingConfiguration", "setVoiceProcessingOtherAudioDuckingConfiguration:")]
+    public AVAudioVoiceProcessingOtherAudioDuckingConfiguration VoiceProcessingOtherAudioDuckingConfiguration { get; set; }
+    [Selector("setManualRenderingInputPCMFormat:inputBlock:")]
+    public bool SetManualRenderingInputPCMFormatInputBlock(AVAudioFormat format, AVAudioIONodeInputBlock block);
+    [Selector("setMutedSpeechActivityEventListener:")]
+    public bool SetMutedSpeechActivityEventListener(AVAudioInputNodeSetMutedSpeechActivityEventListenerListenerBlock? listenerBlock);
 }
 
 public extern objc class AVAudioOutputNode : AVAudioIONode { }

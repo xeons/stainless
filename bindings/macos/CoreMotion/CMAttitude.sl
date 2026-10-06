@@ -63,12 +63,18 @@ public enum CMAttitudeReferenceFrame : ulong
 
 public extern objc class CMAttitude : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("roll")] public double Roll { get; }
-    [Selector("pitch")] public double Pitch { get; }
-    [Selector("yaw")] public double Yaw { get; }
-    [Selector("rotationMatrix")] public CMRotationMatrix RotationMatrix { get; }
-    [Selector("quaternion")] public CMQuaternion Quaternion { get; }
-    [Selector("multiplyByInverseOfAttitude:")] public void MultiplyByInverseOfAttitude(CMAttitude attitude);
+    [Selector("roll")]
+    public double Roll { get; }
+    [Selector("pitch")]
+    public double Pitch { get; }
+    [Selector("yaw")]
+    public double Yaw { get; }
+    [Selector("rotationMatrix")]
+    public CMRotationMatrix RotationMatrix { get; }
+    [Selector("quaternion")]
+    public CMQuaternion Quaternion { get; }
+    [Selector("multiplyByInverseOfAttitude:")]
+    public void MultiplyByInverseOfAttitude(CMAttitude attitude);
 }
 
 #endif

@@ -71,46 +71,78 @@ public enum NSTextTableLayoutAlgorithm : ulong
 
 public extern objc class NSTextBlock : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("contentWidth")] public CGFloat ContentWidth { get; }
-    [Selector("contentWidthValueType")] public NSTextBlockValueType ContentWidthValueType { get; }
-    [Selector("verticalAlignment", "setVerticalAlignment:")] public NSTextBlockVerticalAlignment VerticalAlignment { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("setValue:type:forDimension:")] public void SetValueTypeForDimension(CGFloat val, NSTextBlockValueType type, NSTextBlockDimension dimension);
-    [Selector("valueForDimension:")] public CGFloat ValueForDimension(NSTextBlockDimension dimension);
-    [Selector("valueTypeForDimension:")] public NSTextBlockValueType ValueTypeForDimension(NSTextBlockDimension dimension);
-    [Selector("setContentWidth:type:")] public void SetContentWidthType(CGFloat val, NSTextBlockValueType type);
-    [Selector("setWidth:type:forLayer:edge:")] public void SetWidthTypeForLayerEdge(CGFloat val, NSTextBlockValueType type, NSTextBlockLayer layer, NSRectEdge edge);
-    [Selector("setWidth:type:forLayer:")] public void SetWidthTypeForLayer(CGFloat val, NSTextBlockValueType type, NSTextBlockLayer layer);
-    [Selector("widthForLayer:edge:")] public CGFloat WidthForLayerEdge(NSTextBlockLayer layer, NSRectEdge edge);
-    [Selector("widthValueTypeForLayer:edge:")] public NSTextBlockValueType WidthValueTypeForLayerEdge(NSTextBlockLayer layer, NSRectEdge edge);
-    [Selector("setBorderColor:forEdge:")] public void SetBorderColorForEdge(NSColor? color, NSRectEdge edge);
-    [Selector("setBorderColor:")] public void SetBorderColor(NSColor? color);
-    [Selector("borderColorForEdge:")] public NSColor? BorderColorForEdge(NSRectEdge edge);
-    [Selector("rectForLayoutAtPoint:inRect:textContainer:characterRange:")] public NSRect RectForLayoutAtPointInRectTextContainerCharacterRange(NSPoint startingPoint, NSRect rect, NSTextContainer textContainer, NSRange charRange);
-    [Selector("boundsRectForContentRect:inRect:textContainer:characterRange:")] public NSRect BoundsRectForContentRectInRectTextContainerCharacterRange(NSRect contentRect, NSRect rect, NSTextContainer textContainer, NSRange charRange);
-    [Selector("drawBackgroundWithFrame:inView:characterRange:layoutManager:")] public void DrawBackgroundWithFrameInViewCharacterRangeLayoutManager(NSRect frameRect, NSView controlView, NSRange charRange, NSLayoutManager layoutManager);
+    [Selector("contentWidth")]
+    public CGFloat ContentWidth { get; }
+    [Selector("contentWidthValueType")]
+    public NSTextBlockValueType ContentWidthValueType { get; }
+    [Selector("verticalAlignment", "setVerticalAlignment:")]
+    public NSTextBlockVerticalAlignment VerticalAlignment { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("setValue:type:forDimension:")]
+    public void SetValueTypeForDimension(CGFloat val, NSTextBlockValueType type, NSTextBlockDimension dimension);
+    [Selector("valueForDimension:")]
+    public CGFloat ValueForDimension(NSTextBlockDimension dimension);
+    [Selector("valueTypeForDimension:")]
+    public NSTextBlockValueType ValueTypeForDimension(NSTextBlockDimension dimension);
+    [Selector("setContentWidth:type:")]
+    public void SetContentWidthType(CGFloat val, NSTextBlockValueType type);
+    [Selector("setWidth:type:forLayer:edge:")]
+    public void SetWidthTypeForLayerEdge(CGFloat val, NSTextBlockValueType type, NSTextBlockLayer layer, NSRectEdge edge);
+    [Selector("setWidth:type:forLayer:")]
+    public void SetWidthTypeForLayer(CGFloat val, NSTextBlockValueType type, NSTextBlockLayer layer);
+    [Selector("widthForLayer:edge:")]
+    public CGFloat WidthForLayerEdge(NSTextBlockLayer layer, NSRectEdge edge);
+    [Selector("widthValueTypeForLayer:edge:")]
+    public NSTextBlockValueType WidthValueTypeForLayerEdge(NSTextBlockLayer layer, NSRectEdge edge);
+    [Selector("setBorderColor:forEdge:")]
+    public void SetBorderColorForEdge(NSColor? color, NSRectEdge edge);
+    [Selector("setBorderColor:")]
+    public void SetBorderColor(NSColor? color);
+    [Selector("borderColorForEdge:")]
+    public NSColor? BorderColorForEdge(NSRectEdge edge);
+    [Selector("rectForLayoutAtPoint:inRect:textContainer:characterRange:")]
+    public NSRect RectForLayoutAtPointInRectTextContainerCharacterRange(NSPoint startingPoint, NSRect rect, NSTextContainer textContainer, NSRange charRange);
+    [Selector("boundsRectForContentRect:inRect:textContainer:characterRange:")]
+    public NSRect BoundsRectForContentRectInRectTextContainerCharacterRange(NSRect contentRect, NSRect rect, NSTextContainer textContainer, NSRange charRange);
+    [Selector("drawBackgroundWithFrame:inView:characterRange:layoutManager:")]
+    public void DrawBackgroundWithFrameInViewCharacterRangeLayoutManager(NSRect frameRect, NSView controlView, NSRange charRange, NSLayoutManager layoutManager);
 }
 
 public extern objc class NSTextTableBlock : NSTextBlock
 {
-    [Selector("table")] public NSTextTable Table { get; }
-    [Selector("startingRow")] public NSInteger StartingRow { get; }
-    [Selector("rowSpan")] public NSInteger RowSpan { get; }
-    [Selector("startingColumn")] public NSInteger StartingColumn { get; }
-    [Selector("columnSpan")] public NSInteger ColumnSpan { get; }
-    [Selector("initWithTable:startingRow:rowSpan:startingColumn:columnSpan:")] public Self InitWithTableStartingRowRowSpanStartingColumnColumnSpan(NSTextTable table, NSInteger row, NSInteger rowSpan, NSInteger col, NSInteger colSpan);
+    [Selector("table")]
+    public NSTextTable Table { get; }
+    [Selector("startingRow")]
+    public NSInteger StartingRow { get; }
+    [Selector("rowSpan")]
+    public NSInteger RowSpan { get; }
+    [Selector("startingColumn")]
+    public NSInteger StartingColumn { get; }
+    [Selector("columnSpan")]
+    public NSInteger ColumnSpan { get; }
+    [Selector("initWithTable:startingRow:rowSpan:startingColumn:columnSpan:")]
+    public Self InitWithTableStartingRowRowSpanStartingColumnColumnSpan(NSTextTable table, NSInteger row, NSInteger rowSpan, NSInteger col, NSInteger colSpan);
 }
 
 public extern objc class NSTextTable : NSTextBlock
 {
-    [Selector("numberOfColumns", "setNumberOfColumns:")] public NSUInteger NumberOfColumns { get; set; }
-    [Selector("layoutAlgorithm", "setLayoutAlgorithm:")] public NSTextTableLayoutAlgorithm LayoutAlgorithm { get; set; }
-    [Selector("collapsesBorders", "setCollapsesBorders:")] public bool CollapsesBorders { get; set; }
-    [Selector("hidesEmptyCells", "setHidesEmptyCells:")] public bool HidesEmptyCells { get; set; }
-    [Selector("rectForBlock:layoutAtPoint:inRect:textContainer:characterRange:")] public NSRect RectForBlockLayoutAtPointInRectTextContainerCharacterRange(NSTextTableBlock block, NSPoint startingPoint, NSRect rect, NSTextContainer textContainer, NSRange charRange);
-    [Selector("boundsRectForBlock:contentRect:inRect:textContainer:characterRange:")] public NSRect BoundsRectForBlockContentRectInRectTextContainerCharacterRange(NSTextTableBlock block, NSRect contentRect, NSRect rect, NSTextContainer textContainer, NSRange charRange);
-    [Selector("drawBackgroundForBlock:withFrame:inView:characterRange:layoutManager:")] public void DrawBackgroundForBlockWithFrameInViewCharacterRangeLayoutManager(NSTextTableBlock block, NSRect frameRect, NSView controlView, NSRange charRange, NSLayoutManager layoutManager);
+    [Selector("numberOfColumns", "setNumberOfColumns:")]
+    public NSUInteger NumberOfColumns { get; set; }
+    [Selector("layoutAlgorithm", "setLayoutAlgorithm:")]
+    public NSTextTableLayoutAlgorithm LayoutAlgorithm { get; set; }
+    [Selector("collapsesBorders", "setCollapsesBorders:")]
+    public bool CollapsesBorders { get; set; }
+    [Selector("hidesEmptyCells", "setHidesEmptyCells:")]
+    public bool HidesEmptyCells { get; set; }
+    [Selector("rectForBlock:layoutAtPoint:inRect:textContainer:characterRange:")]
+    public NSRect RectForBlockLayoutAtPointInRectTextContainerCharacterRange(NSTextTableBlock block, NSPoint startingPoint, NSRect rect, NSTextContainer textContainer, NSRange charRange);
+    [Selector("boundsRectForBlock:contentRect:inRect:textContainer:characterRange:")]
+    public NSRect BoundsRectForBlockContentRectInRectTextContainerCharacterRange(NSTextTableBlock block, NSRect contentRect, NSRect rect, NSTextContainer textContainer, NSRange charRange);
+    [Selector("drawBackgroundForBlock:withFrame:inView:characterRange:layoutManager:")]
+    public void DrawBackgroundForBlockWithFrameInViewCharacterRangeLayoutManager(NSTextTableBlock block, NSRect frameRect, NSView controlView, NSRange charRange, NSLayoutManager layoutManager);
 }
 
 #endif

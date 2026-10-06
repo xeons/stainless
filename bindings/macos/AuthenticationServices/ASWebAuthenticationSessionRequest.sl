@@ -33,22 +33,35 @@ import Standard.ObjC;
 
 public objc interface ASWebAuthenticationSessionRequestDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("authenticationSessionRequest:didCompleteWithCallbackURL:")] void AuthenticationSessionRequestDidCompleteWithCallbackURL(ASWebAuthenticationSessionRequest authenticationSessionRequest, NSURL callbackURL);
-    [Optional] [Selector("authenticationSessionRequest:didCancelWithError:")] void AuthenticationSessionRequestDidCancelWithError(ASWebAuthenticationSessionRequest authenticationSessionRequest, NSError error);
+    [Optional]
+    [Selector("authenticationSessionRequest:didCompleteWithCallbackURL:")]
+    void AuthenticationSessionRequestDidCompleteWithCallbackURL(ASWebAuthenticationSessionRequest authenticationSessionRequest, NSURL callbackURL);
+    [Optional]
+    [Selector("authenticationSessionRequest:didCancelWithError:")]
+    void AuthenticationSessionRequestDidCancelWithError(ASWebAuthenticationSessionRequest authenticationSessionRequest, NSError error);
 }
 
 public extern objc class ASWebAuthenticationSessionRequest : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("UUID")] public NSUUID UUID { get; }
-    [Selector("URL")] public NSURL URL { get; }
+    [Selector("UUID")]
+    public NSUUID UUID { get; }
+    [Selector("URL")]
+    public NSURL URL { get; }
     /// Deprecated in macOS 14.4.
-    [Selector("callbackURLScheme")] public NSString? CallbackURLScheme { get; }
-    [Selector("shouldUseEphemeralSession")] public bool ShouldUseEphemeralSession { get; }
-    [Selector("delegate", "setDelegate:")] public ASWebAuthenticationSessionRequestDelegate? Delegate { get; set; }
-    [Selector("additionalHeaderFields")] public NSDictionary? AdditionalHeaderFields { get; }
-    [Selector("callback")] public ASWebAuthenticationSessionCallback? Callback { get; }
-    [Selector("cancelWithError:")] public void CancelWithError(NSError error);
-    [Selector("completeWithCallbackURL:")] public void CompleteWithCallbackURL(NSURL url);
+    [Selector("callbackURLScheme")]
+    public NSString? CallbackURLScheme { get; }
+    [Selector("shouldUseEphemeralSession")]
+    public bool ShouldUseEphemeralSession { get; }
+    [Selector("delegate", "setDelegate:")]
+    public ASWebAuthenticationSessionRequestDelegate? Delegate { get; set; }
+    [Selector("additionalHeaderFields")]
+    public NSDictionary? AdditionalHeaderFields { get; }
+    [Selector("callback")]
+    public ASWebAuthenticationSessionCallback? Callback { get; }
+    [Selector("cancelWithError:")]
+    public void CancelWithError(NSError error);
+    [Selector("completeWithCallbackURL:")]
+    public void CompleteWithCallbackURL(NSURL url);
 }
 
 #endif

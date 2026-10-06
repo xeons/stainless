@@ -41,10 +41,14 @@ public objc closure bool NSFontAssetRequestDownloadFontAssetsWithCompletionHandl
 
 public extern objc class NSFontAssetRequest : NSObject, NSProgressReporting
 {
-    [Selector("downloadedFontDescriptors")] public NSArray DownloadedFontDescriptors { get; }
-    [Selector("progress")] public NSProgress Progress { get; }
-    [Selector("initWithFontDescriptors:options:")] public Self InitWithFontDescriptorsOptions(NSArray fontDescriptors, NSFontAssetRequestOptions options);
-    [Selector("downloadFontAssetsWithCompletionHandler:")] public void DownloadFontAssetsWithCompletionHandler(NSFontAssetRequestDownloadFontAssetsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("downloadedFontDescriptors")]
+    public NSArray DownloadedFontDescriptors { get; }
+    [Selector("progress")]
+    public NSProgress Progress { get; }
+    [Selector("initWithFontDescriptors:options:")]
+    public Self InitWithFontDescriptorsOptions(NSArray fontDescriptors, NSFontAssetRequestOptions options);
+    [Selector("downloadFontAssetsWithCompletionHandler:")]
+    public void DownloadFontAssetsWithCompletionHandler(NSFontAssetRequestDownloadFontAssetsWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

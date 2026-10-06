@@ -52,42 +52,78 @@ public extern objc class NSString : CNKeyDescriptor { }
 
 public extern objc class CNContact : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("contactType")] public CNContactType ContactType { get; }
-    [Selector("namePrefix")] public NSString NamePrefix { get; }
-    [Selector("givenName")] public NSString GivenName { get; }
-    [Selector("middleName")] public NSString MiddleName { get; }
-    [Selector("familyName")] public NSString FamilyName { get; }
-    [Selector("previousFamilyName")] public NSString PreviousFamilyName { get; }
-    [Selector("nameSuffix")] public NSString NameSuffix { get; }
-    [Selector("nickname")] public NSString Nickname { get; }
-    [Selector("organizationName")] public NSString OrganizationName { get; }
-    [Selector("departmentName")] public NSString DepartmentName { get; }
-    [Selector("jobTitle")] public NSString JobTitle { get; }
-    [Selector("phoneticGivenName")] public NSString PhoneticGivenName { get; }
-    [Selector("phoneticMiddleName")] public NSString PhoneticMiddleName { get; }
-    [Selector("phoneticFamilyName")] public NSString PhoneticFamilyName { get; }
-    [Selector("phoneticOrganizationName")] public NSString? PhoneticOrganizationName { get; }
-    [Selector("note")] public NSString Note { get; }
-    [Selector("imageData")] public NSData? ImageData { get; }
-    [Selector("thumbnailImageData")] public NSData? ThumbnailImageData { get; }
-    [Selector("imageDataAvailable")] public bool ImageDataAvailable { get; }
-    [Selector("phoneNumbers")] public NSArray PhoneNumbers { get; }
-    [Selector("emailAddresses")] public NSArray EmailAddresses { get; }
-    [Selector("postalAddresses")] public NSArray PostalAddresses { get; }
-    [Selector("urlAddresses")] public NSArray UrlAddresses { get; }
-    [Selector("contactRelations")] public NSArray ContactRelations { get; }
-    [Selector("socialProfiles")] public NSArray SocialProfiles { get; }
-    [Selector("instantMessageAddresses")] public NSArray InstantMessageAddresses { get; }
-    [Selector("birthday")] public NSDateComponents? Birthday { get; }
-    [Selector("nonGregorianBirthday")] public NSDateComponents? NonGregorianBirthday { get; }
-    [Selector("dates")] public NSArray Dates { get; }
-    [Selector("isKeyAvailable:")] public bool IsKeyAvailable(NSString key);
-    [Selector("areKeysAvailable:")] public bool AreKeysAvailable(NSArray keyDescriptors);
-    [Selector("localizedStringForKey:")] public static NSString LocalizedStringForKey(NSString key);
-    [Selector("comparatorForNameSortOrder:")] public static NSComparator ComparatorForNameSortOrder(CNContactSortOrder sortOrder);
-    [Selector("descriptorForAllComparatorKeys")] public static CNKeyDescriptor DescriptorForAllComparatorKeys();
-    [Selector("isUnifiedWithContactWithIdentifier:")] public bool IsUnifiedWithContactWithIdentifier(NSString contactIdentifier);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("contactType")]
+    public CNContactType ContactType { get; }
+    [Selector("namePrefix")]
+    public NSString NamePrefix { get; }
+    [Selector("givenName")]
+    public NSString GivenName { get; }
+    [Selector("middleName")]
+    public NSString MiddleName { get; }
+    [Selector("familyName")]
+    public NSString FamilyName { get; }
+    [Selector("previousFamilyName")]
+    public NSString PreviousFamilyName { get; }
+    [Selector("nameSuffix")]
+    public NSString NameSuffix { get; }
+    [Selector("nickname")]
+    public NSString Nickname { get; }
+    [Selector("organizationName")]
+    public NSString OrganizationName { get; }
+    [Selector("departmentName")]
+    public NSString DepartmentName { get; }
+    [Selector("jobTitle")]
+    public NSString JobTitle { get; }
+    [Selector("phoneticGivenName")]
+    public NSString PhoneticGivenName { get; }
+    [Selector("phoneticMiddleName")]
+    public NSString PhoneticMiddleName { get; }
+    [Selector("phoneticFamilyName")]
+    public NSString PhoneticFamilyName { get; }
+    [Selector("phoneticOrganizationName")]
+    public NSString? PhoneticOrganizationName { get; }
+    [Selector("note")]
+    public NSString Note { get; }
+    [Selector("imageData")]
+    public NSData? ImageData { get; }
+    [Selector("thumbnailImageData")]
+    public NSData? ThumbnailImageData { get; }
+    [Selector("imageDataAvailable")]
+    public bool ImageDataAvailable { get; }
+    [Selector("phoneNumbers")]
+    public NSArray PhoneNumbers { get; }
+    [Selector("emailAddresses")]
+    public NSArray EmailAddresses { get; }
+    [Selector("postalAddresses")]
+    public NSArray PostalAddresses { get; }
+    [Selector("urlAddresses")]
+    public NSArray UrlAddresses { get; }
+    [Selector("contactRelations")]
+    public NSArray ContactRelations { get; }
+    [Selector("socialProfiles")]
+    public NSArray SocialProfiles { get; }
+    [Selector("instantMessageAddresses")]
+    public NSArray InstantMessageAddresses { get; }
+    [Selector("birthday")]
+    public NSDateComponents? Birthday { get; }
+    [Selector("nonGregorianBirthday")]
+    public NSDateComponents? NonGregorianBirthday { get; }
+    [Selector("dates")]
+    public NSArray Dates { get; }
+    [Selector("isKeyAvailable:")]
+    public bool IsKeyAvailable(NSString key);
+    [Selector("areKeysAvailable:")]
+    public bool AreKeysAvailable(NSArray keyDescriptors);
+    [Selector("localizedStringForKey:")]
+    public static NSString LocalizedStringForKey(NSString key);
+    [Selector("comparatorForNameSortOrder:")]
+    public static NSComparator ComparatorForNameSortOrder(CNContactSortOrder sortOrder);
+    [Selector("descriptorForAllComparatorKeys")]
+    public static CNKeyDescriptor DescriptorForAllComparatorKeys();
+    [Selector("isUnifiedWithContactWithIdentifier:")]
+    public bool IsUnifiedWithContactWithIdentifier(NSString contactIdentifier);
 }
 
 public extern "C" NSString CNContactPropertyNotFetchedExceptionName;

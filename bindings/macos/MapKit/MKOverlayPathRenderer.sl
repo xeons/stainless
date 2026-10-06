@@ -35,22 +35,38 @@ import Standard.ObjC;
 
 public extern objc class MKOverlayPathRenderer : MKOverlayRenderer
 {
-    [Selector("fillColor", "setFillColor:")] public NSColor? FillColor { get; set; }
-    [Selector("strokeColor", "setStrokeColor:")] public NSColor? StrokeColor { get; set; }
-    [Selector("lineWidth", "setLineWidth:")] public CGFloat LineWidth { get; set; }
-    [Selector("lineJoin", "setLineJoin:")] public CGLineJoin LineJoin { get; set; }
-    [Selector("lineCap", "setLineCap:")] public CGLineCap LineCap { get; set; }
-    [Selector("miterLimit", "setMiterLimit:")] public CGFloat MiterLimit { get; set; }
-    [Selector("lineDashPhase", "setLineDashPhase:")] public CGFloat LineDashPhase { get; set; }
-    [Selector("lineDashPattern", "setLineDashPattern:")] public NSArray? LineDashPattern { get; set; }
-    [Selector("shouldRasterize", "setShouldRasterize:")] public bool ShouldRasterize { get; set; }
-    [Selector("path", "setPath:")] public CGPathRef? Path { get; set; }
-    [Selector("createPath")] public void CreatePath();
-    [Selector("invalidatePath")] public void InvalidatePath();
-    [Selector("applyStrokePropertiesToContext:atZoomScale:")] public void ApplyStrokePropertiesToContextAtZoomScale(CGContextRef context, MKZoomScale zoomScale);
-    [Selector("applyFillPropertiesToContext:atZoomScale:")] public void ApplyFillPropertiesToContextAtZoomScale(CGContextRef context, MKZoomScale zoomScale);
-    [Selector("strokePath:inContext:")] public void StrokePathInContext(CGPathRef path, CGContextRef context);
-    [Selector("fillPath:inContext:")] public void FillPathInContext(CGPathRef path, CGContextRef context);
+    [Selector("fillColor", "setFillColor:")]
+    public NSColor? FillColor { get; set; }
+    [Selector("strokeColor", "setStrokeColor:")]
+    public NSColor? StrokeColor { get; set; }
+    [Selector("lineWidth", "setLineWidth:")]
+    public CGFloat LineWidth { get; set; }
+    [Selector("lineJoin", "setLineJoin:")]
+    public CGLineJoin LineJoin { get; set; }
+    [Selector("lineCap", "setLineCap:")]
+    public CGLineCap LineCap { get; set; }
+    [Selector("miterLimit", "setMiterLimit:")]
+    public CGFloat MiterLimit { get; set; }
+    [Selector("lineDashPhase", "setLineDashPhase:")]
+    public CGFloat LineDashPhase { get; set; }
+    [Selector("lineDashPattern", "setLineDashPattern:")]
+    public NSArray? LineDashPattern { get; set; }
+    [Selector("shouldRasterize", "setShouldRasterize:")]
+    public bool ShouldRasterize { get; set; }
+    [Selector("path", "setPath:")]
+    public CGPathRef? Path { get; set; }
+    [Selector("createPath")]
+    public void CreatePath();
+    [Selector("invalidatePath")]
+    public void InvalidatePath();
+    [Selector("applyStrokePropertiesToContext:atZoomScale:")]
+    public void ApplyStrokePropertiesToContextAtZoomScale(CGContextRef context, MKZoomScale zoomScale);
+    [Selector("applyFillPropertiesToContext:atZoomScale:")]
+    public void ApplyFillPropertiesToContextAtZoomScale(CGContextRef context, MKZoomScale zoomScale);
+    [Selector("strokePath:inContext:")]
+    public void StrokePathInContext(CGPathRef path, CGContextRef context);
+    [Selector("fillPath:inContext:")]
+    public void FillPathInContext(CGPathRef path, CGContextRef context);
 }
 
 #endif

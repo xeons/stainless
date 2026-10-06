@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public objc interface SCNBoundingVolume : NSObjectProtocol
 {
-    [Selector("getBoundingBoxMin:max:")] bool GetBoundingBoxMinMax(SCNVector3* min, SCNVector3* max);
-    [Selector("setBoundingBoxMin:max:")] void SetBoundingBoxMinMax(SCNVector3* min, SCNVector3* max);
-    [Selector("getBoundingSphereCenter:radius:")] bool GetBoundingSphereCenterRadius(SCNVector3* center, CGFloat* radius);
+    [Selector("getBoundingBoxMin:max:")]
+    bool GetBoundingBoxMinMax(SCNVector3* min, SCNVector3* max);
+    [Selector("setBoundingBoxMin:max:")]
+    void SetBoundingBoxMinMax(SCNVector3* min, SCNVector3* max);
+    [Selector("getBoundingSphereCenter:radius:")]
+    bool GetBoundingSphereCenterRadius(SCNVector3* center, CGFloat* radius);
 }
 
 #endif

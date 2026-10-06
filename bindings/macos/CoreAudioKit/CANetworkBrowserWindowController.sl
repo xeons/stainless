@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class CANetworkBrowserWindowController : NSWindowController
 {
-    [Selector("isAVBSupported")] public static bool IsAVBSupported();
-    [Selector("init")] public Self Init();
+    [Selector("isAVBSupported")]
+    public static bool IsAVBSupported();
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

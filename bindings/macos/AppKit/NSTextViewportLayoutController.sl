@@ -33,22 +33,36 @@ import Standard.ObjC;
 
 public objc interface NSTextViewportLayoutControllerDelegate : NSObjectProtocol
 {
-    [Selector("viewportBoundsForTextViewportLayoutController:")] CGRect ViewportBoundsForTextViewportLayoutController(NSTextViewportLayoutController textViewportLayoutController);
-    [Selector("textViewportLayoutController:configureRenderingSurfaceForTextLayoutFragment:")] void TextViewportLayoutControllerConfigureRenderingSurfaceForTextLayoutFragment(NSTextViewportLayoutController textViewportLayoutController, NSTextLayoutFragment textLayoutFragment);
-    [Optional] [Selector("textViewportLayoutControllerWillLayout:")] void TextViewportLayoutControllerWillLayout(NSTextViewportLayoutController textViewportLayoutController);
-    [Optional] [Selector("textViewportLayoutControllerDidLayout:")] void TextViewportLayoutControllerDidLayout(NSTextViewportLayoutController textViewportLayoutController);
+    [Selector("viewportBoundsForTextViewportLayoutController:")]
+    CGRect ViewportBoundsForTextViewportLayoutController(NSTextViewportLayoutController textViewportLayoutController);
+    [Selector("textViewportLayoutController:configureRenderingSurfaceForTextLayoutFragment:")]
+    void TextViewportLayoutControllerConfigureRenderingSurfaceForTextLayoutFragment(NSTextViewportLayoutController textViewportLayoutController, NSTextLayoutFragment textLayoutFragment);
+    [Optional]
+    [Selector("textViewportLayoutControllerWillLayout:")]
+    void TextViewportLayoutControllerWillLayout(NSTextViewportLayoutController textViewportLayoutController);
+    [Optional]
+    [Selector("textViewportLayoutControllerDidLayout:")]
+    void TextViewportLayoutControllerDidLayout(NSTextViewportLayoutController textViewportLayoutController);
 }
 
 public extern objc class NSTextViewportLayoutController : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public NSTextViewportLayoutControllerDelegate? Delegate { get; set; }
-    [Selector("textLayoutManager")] public NSTextLayoutManager? TextLayoutManager { get; }
-    [Selector("viewportBounds")] public CGRect ViewportBounds { get; }
-    [Selector("viewportRange")] public NSTextRange? ViewportRange { get; }
-    [Selector("initWithTextLayoutManager:")] public Self InitWithTextLayoutManager(NSTextLayoutManager textLayoutManager);
-    [Selector("layoutViewport")] public void LayoutViewport();
-    [Selector("relocateViewportToTextLocation:")] public CGFloat RelocateViewportToTextLocation(NSTextLocation textLocation);
-    [Selector("adjustViewportByVerticalOffset:")] public void AdjustViewportByVerticalOffset(CGFloat verticalOffset);
+    [Selector("delegate", "setDelegate:")]
+    public NSTextViewportLayoutControllerDelegate? Delegate { get; set; }
+    [Selector("textLayoutManager")]
+    public NSTextLayoutManager? TextLayoutManager { get; }
+    [Selector("viewportBounds")]
+    public CGRect ViewportBounds { get; }
+    [Selector("viewportRange")]
+    public NSTextRange? ViewportRange { get; }
+    [Selector("initWithTextLayoutManager:")]
+    public Self InitWithTextLayoutManager(NSTextLayoutManager textLayoutManager);
+    [Selector("layoutViewport")]
+    public void LayoutViewport();
+    [Selector("relocateViewportToTextLocation:")]
+    public CGFloat RelocateViewportToTextLocation(NSTextLocation textLocation);
+    [Selector("adjustViewportByVerticalOffset:")]
+    public void AdjustViewportByVerticalOffset(CGFloat verticalOffset);
 }
 
 #endif

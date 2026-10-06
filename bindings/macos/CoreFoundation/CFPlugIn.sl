@@ -48,7 +48,8 @@ public delegate void* CFPlugInFactoryFunction(__CFAllocator* arg0, __CFUUID* arg
 
 public extern "C" CFTypeID CFPlugInGetTypeID();
 
-[ReturnsRetained] public extern "C" CFPlugInRef? CFPlugInCreate(CFAllocatorRef? allocator, CFURLRef? plugInURL);
+[ReturnsRetained]
+public extern "C" CFPlugInRef? CFPlugInCreate(CFAllocatorRef? allocator, CFURLRef? plugInURL);
 
 public extern "C" CFBundleRef? CFPlugInGetBundle(CFPlugInRef? plugIn);
 
@@ -56,9 +57,11 @@ public extern "C" void CFPlugInSetLoadOnDemand(CFPlugInRef? plugIn, Boolean flag
 
 public extern "C" Boolean CFPlugInIsLoadOnDemand(CFPlugInRef? plugIn);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFPlugInFindFactoriesForPlugInType(CFUUIDRef? typeUUID);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFPlugInFindFactoriesForPlugInType(CFUUIDRef? typeUUID);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFPlugInFindFactoriesForPlugInTypeInPlugIn(CFUUIDRef? typeUUID, CFPlugInRef? plugIn);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFPlugInFindFactoriesForPlugInTypeInPlugIn(CFUUIDRef? typeUUID, CFPlugInRef? plugIn);
 
 public extern "C" void* CFPlugInInstanceCreate(CFAllocatorRef? allocator, CFUUIDRef? factoryUUID, CFUUIDRef? typeUUID);
 
@@ -87,13 +90,15 @@ public delegate void CFPlugInInstanceDeallocateInstanceDataFunction(void* arg0);
 
 public extern "C" Boolean CFPlugInInstanceGetInterfaceFunctionTable(CFPlugInInstanceRef? instance, CFStringRef? interfaceName, void** ftbl);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFPlugInInstanceGetFactoryName(CFPlugInInstanceRef? instance);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFPlugInInstanceGetFactoryName(CFPlugInInstanceRef? instance);
 
 public extern "C" void* CFPlugInInstanceGetInstanceData(CFPlugInInstanceRef? instance);
 
 public extern "C" CFTypeID CFPlugInInstanceGetTypeID();
 
-[ReturnsRetained] public extern "C" CFPlugInInstanceRef? CFPlugInInstanceCreateWithInstanceDataSize(CFAllocatorRef? allocator, CFIndex instanceDataSize, CFPlugInInstanceDeallocateInstanceDataFunction deallocateInstanceFunction, CFStringRef? factoryName, CFPlugInInstanceGetInterfaceFunction getInterfaceFunction);
+[ReturnsRetained]
+public extern "C" CFPlugInInstanceRef? CFPlugInInstanceCreateWithInstanceDataSize(CFAllocatorRef? allocator, CFIndex instanceDataSize, CFPlugInInstanceDeallocateInstanceDataFunction deallocateInstanceFunction, CFStringRef? factoryName, CFPlugInInstanceGetInterfaceFunction getInterfaceFunction);
 
 public const int COREFOUNDATION_CFPLUGINCOM_SEPARATE = 1;
 

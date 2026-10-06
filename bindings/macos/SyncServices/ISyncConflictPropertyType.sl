@@ -33,19 +33,26 @@ import Standard.ObjC;
 public objc interface ISyncConflictPropertyType
 {
     /// Deprecated in macOS 10.7.
-    [Selector("name")] NSString? Name();
+    [Selector("name")]
+    NSString? Name();
     /// Deprecated in macOS 10.7.
-    [Selector("type")] NSString? Type();
+    [Selector("type")]
+    NSString? Type();
     /// Deprecated in macOS 10.7.
-    [Selector("subtype")] NSString? Subtype();
+    [Selector("subtype")]
+    NSString? Subtype();
     /// Deprecated in macOS 10.7.
-    [Selector("enumValues")] NSArray? EnumValues();
+    [Selector("enumValues")]
+    NSArray? EnumValues();
     /// Deprecated in macOS 10.7.
-    [Selector("isRelationship")] bool IsRelationship();
+    [Selector("isRelationship")]
+    bool IsRelationship();
     /// Deprecated in macOS 10.7.
-    [Selector("isToMany")] bool IsToMany();
+    [Selector("isToMany")]
+    bool IsToMany();
     /// Deprecated in macOS 10.7.
-    [Selector("isRequired")] bool IsRequired();
+    [Selector("isRequired")]
+    bool IsRequired();
 }
 
 #endif

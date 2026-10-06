@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class WKSecurityOrigin : NSObject
 {
-    [Selector("protocol")] public NSString Protocol { get; }
-    [Selector("host")] public NSString Host { get; }
-    [Selector("port")] public NSInteger Port { get; }
+    [Selector("protocol")]
+    public NSString Protocol { get; }
+    [Selector("host")]
+    public NSString Host { get; }
+    [Selector("port")]
+    public NSInteger Port { get; }
 }
 
 #endif

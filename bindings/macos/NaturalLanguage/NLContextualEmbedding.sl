@@ -35,21 +35,36 @@ public objc closure void NLContextualEmbeddingRequestEmbeddingAssetsWithCompleti
 
 public extern objc class NLContextualEmbedding : NSObject
 {
-    [Selector("modelIdentifier")] public NSString ModelIdentifier { get; }
-    [Selector("languages")] public NSArray Languages { get; }
-    [Selector("scripts")] public NSArray Scripts { get; }
-    [Selector("revision")] public NSUInteger Revision { get; }
-    [Selector("dimension")] public NSUInteger Dimension { get; }
-    [Selector("maximumSequenceLength")] public NSUInteger MaximumSequenceLength { get; }
-    [Selector("hasAvailableAssets")] public bool HasAvailableAssets { get; }
-    [Selector("contextualEmbeddingWithModelIdentifier:")] public static Self? ContextualEmbeddingWithModelIdentifier(NSString modelIdentifier);
-    [Selector("contextualEmbeddingsForValues:")] public static NSArray ContextualEmbeddingsForValues(NSDictionary valuesDictionary);
-    [Selector("contextualEmbeddingWithLanguage:")] public static NLContextualEmbedding? ContextualEmbeddingWithLanguage(NLLanguage language);
-    [Selector("contextualEmbeddingWithScript:")] public static NLContextualEmbedding? ContextualEmbeddingWithScript(NLScript script);
-    [Selector("loadWithError:")] public bool LoadWithError(out NSError? error);
-    [Selector("unload")] public void Unload();
-    [Selector("embeddingResultForString:language:error:")] public NLContextualEmbeddingResult? EmbeddingResultForStringLanguageError(NSString string, NLLanguage? language, out NSError? error);
-    [Selector("requestEmbeddingAssetsWithCompletionHandler:")] public void RequestEmbeddingAssetsWithCompletionHandler(NLContextualEmbeddingRequestEmbeddingAssetsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("modelIdentifier")]
+    public NSString ModelIdentifier { get; }
+    [Selector("languages")]
+    public NSArray Languages { get; }
+    [Selector("scripts")]
+    public NSArray Scripts { get; }
+    [Selector("revision")]
+    public NSUInteger Revision { get; }
+    [Selector("dimension")]
+    public NSUInteger Dimension { get; }
+    [Selector("maximumSequenceLength")]
+    public NSUInteger MaximumSequenceLength { get; }
+    [Selector("hasAvailableAssets")]
+    public bool HasAvailableAssets { get; }
+    [Selector("contextualEmbeddingWithModelIdentifier:")]
+    public static Self? ContextualEmbeddingWithModelIdentifier(NSString modelIdentifier);
+    [Selector("contextualEmbeddingsForValues:")]
+    public static NSArray ContextualEmbeddingsForValues(NSDictionary valuesDictionary);
+    [Selector("contextualEmbeddingWithLanguage:")]
+    public static NLContextualEmbedding? ContextualEmbeddingWithLanguage(NLLanguage language);
+    [Selector("contextualEmbeddingWithScript:")]
+    public static NLContextualEmbedding? ContextualEmbeddingWithScript(NLScript script);
+    [Selector("loadWithError:")]
+    public bool LoadWithError(out NSError? error);
+    [Selector("unload")]
+    public void Unload();
+    [Selector("embeddingResultForString:language:error:")]
+    public NLContextualEmbeddingResult? EmbeddingResultForStringLanguageError(NSString string, NLLanguage? language, out NSError? error);
+    [Selector("requestEmbeddingAssetsWithCompletionHandler:")]
+    public void RequestEmbeddingAssetsWithCompletionHandler(NLContextualEmbeddingRequestEmbeddingAssetsWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public using NLContextualEmbeddingKey = NSString;
@@ -71,11 +86,16 @@ public objc closure void NLContextualEmbeddingResultEnumerateTokenVectorsInRange
 
 public extern objc class NLContextualEmbeddingResult : NSObject
 {
-    [Selector("string")] public NSString String { get; }
-    [Selector("language")] public NLLanguage Language { get; }
-    [Selector("sequenceLength")] public NSUInteger SequenceLength { get; }
-    [Selector("enumerateTokenVectorsInRange:usingBlock:")] public void EnumerateTokenVectorsInRangeUsingBlock(NSRange range, NLContextualEmbeddingResultEnumerateTokenVectorsInRangeUsingBlockBlock block);
-    [Selector("tokenVectorAtIndex:tokenRange:")] public NSArray? TokenVectorAtIndexTokenRange(NSUInteger characterIndex, NSRangePointer tokenRange);
+    [Selector("string")]
+    public NSString String { get; }
+    [Selector("language")]
+    public NLLanguage Language { get; }
+    [Selector("sequenceLength")]
+    public NSUInteger SequenceLength { get; }
+    [Selector("enumerateTokenVectorsInRange:usingBlock:")]
+    public void EnumerateTokenVectorsInRangeUsingBlock(NSRange range, NLContextualEmbeddingResultEnumerateTokenVectorsInRangeUsingBlockBlock block);
+    [Selector("tokenVectorAtIndex:tokenRange:")]
+    public NSArray? TokenVectorAtIndexTokenRange(NSUInteger characterIndex, NSRangePointer tokenRange);
 }
 
 #endif

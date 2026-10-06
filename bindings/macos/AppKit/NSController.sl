@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class NSController : NSObject, NSCoding, NSEditor, NSEditorRegistration
 {
-    [Selector("isEditing")] public bool Editing { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("objectDidBeginEditing:")] public void ObjectDidBeginEditing(NSEditor editor);
-    [Selector("objectDidEndEditing:")] public void ObjectDidEndEditing(NSEditor editor);
-    [Selector("discardEditing")] public void DiscardEditing();
-    [Selector("commitEditing")] public bool CommitEditing();
-    [Selector("commitEditingWithDelegate:didCommitSelector:contextInfo:")] public void CommitEditingWithDelegateDidCommitSelectorContextInfo(AnyObject? @delegate, Selector didCommitSelector, void* contextInfo);
+    [Selector("isEditing")]
+    public bool Editing { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("objectDidBeginEditing:")]
+    public void ObjectDidBeginEditing(NSEditor editor);
+    [Selector("objectDidEndEditing:")]
+    public void ObjectDidEndEditing(NSEditor editor);
+    [Selector("discardEditing")]
+    public void DiscardEditing();
+    [Selector("commitEditing")]
+    public bool CommitEditing();
+    [Selector("commitEditingWithDelegate:didCommitSelector:contextInfo:")]
+    public void CommitEditingWithDelegateDidCommitSelectorContextInfo(AnyObject? @delegate, Selector didCommitSelector, void* contextInfo);
 }
 
 #endif

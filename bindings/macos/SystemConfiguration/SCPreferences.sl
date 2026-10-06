@@ -63,9 +63,11 @@ public delegate void SCPreferencesCallBack(__SCPreferences* arg0, SCPreferencesN
 
 public extern "C" CFTypeID SCPreferencesGetTypeID();
 
-[ReturnsRetained] public extern "C" SCPreferencesRef? SCPreferencesCreate(CFAllocatorRef? allocator, CFStringRef name, CFStringRef? prefsID);
+[ReturnsRetained]
+public extern "C" SCPreferencesRef? SCPreferencesCreate(CFAllocatorRef? allocator, CFStringRef name, CFStringRef? prefsID);
 
-[ReturnsRetained] public extern "C" SCPreferencesRef? SCPreferencesCreateWithAuthorization(CFAllocatorRef? allocator, CFStringRef name, CFStringRef? prefsID, AuthorizationRef authorization);
+[ReturnsRetained]
+public extern "C" SCPreferencesRef? SCPreferencesCreateWithAuthorization(CFAllocatorRef? allocator, CFStringRef name, CFStringRef? prefsID, AuthorizationRef authorization);
 
 public extern "C" Boolean SCPreferencesLock(SCPreferencesRef prefs, Boolean wait);
 
@@ -77,7 +79,8 @@ public extern "C" Boolean SCPreferencesUnlock(SCPreferencesRef prefs);
 
 public extern "C" CFDataRef? SCPreferencesGetSignature(SCPreferencesRef prefs);
 
-[ReturnsRetained] public extern "C" CFArrayRef? SCPreferencesCopyKeyList(SCPreferencesRef prefs);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SCPreferencesCopyKeyList(SCPreferencesRef prefs);
 
 public extern "C" CFPropertyListRef? SCPreferencesGetValue(SCPreferencesRef prefs, CFStringRef key);
 

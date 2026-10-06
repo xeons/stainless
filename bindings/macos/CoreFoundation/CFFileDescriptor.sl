@@ -59,7 +59,8 @@ public struct CFFileDescriptorContext
 
 public extern "C" CFTypeID CFFileDescriptorGetTypeID();
 
-[ReturnsRetained] public extern "C" CFFileDescriptorRef? CFFileDescriptorCreate(CFAllocatorRef? allocator, CFFileDescriptorNativeDescriptor fd, Boolean closeOnInvalidate, CFFileDescriptorCallBack callout, CFFileDescriptorContext* context);
+[ReturnsRetained]
+public extern "C" CFFileDescriptorRef? CFFileDescriptorCreate(CFAllocatorRef? allocator, CFFileDescriptorNativeDescriptor fd, Boolean closeOnInvalidate, CFFileDescriptorCallBack callout, CFFileDescriptorContext* context);
 
 public extern "C" CFFileDescriptorNativeDescriptor CFFileDescriptorGetNativeDescriptor(CFFileDescriptorRef? f);
 
@@ -73,6 +74,7 @@ public extern "C" void CFFileDescriptorInvalidate(CFFileDescriptorRef? f);
 
 public extern "C" Boolean CFFileDescriptorIsValid(CFFileDescriptorRef? f);
 
-[ReturnsRetained] public extern "C" CFRunLoopSourceRef? CFFileDescriptorCreateRunLoopSource(CFAllocatorRef? allocator, CFFileDescriptorRef? f, CFIndex order);
+[ReturnsRetained]
+public extern "C" CFRunLoopSourceRef? CFFileDescriptorCreateRunLoopSource(CFAllocatorRef? allocator, CFFileDescriptorRef? f, CFIndex order);
 
 #endif

@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class CKQuery : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("recordType")] public CKRecordType RecordType { get; }
-    [Selector("predicate")] public NSPredicate Predicate { get; }
-    [Selector("sortDescriptors", "setSortDescriptors:")] public NSArray? SortDescriptors { get; set; }
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder aDecoder);
-    [Selector("initWithRecordType:predicate:")] public Self InitWithRecordTypePredicate(CKRecordType recordType, NSPredicate predicate);
+    [Selector("recordType")]
+    public CKRecordType RecordType { get; }
+    [Selector("predicate")]
+    public NSPredicate Predicate { get; }
+    [Selector("sortDescriptors", "setSortDescriptors:")]
+    public NSArray? SortDescriptors { get; set; }
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder aDecoder);
+    [Selector("initWithRecordType:predicate:")]
+    public Self InitWithRecordTypePredicate(CKRecordType recordType, NSPredicate predicate);
 }
 
 #endif

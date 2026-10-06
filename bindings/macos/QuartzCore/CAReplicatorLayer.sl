@@ -34,15 +34,24 @@ import Standard.ObjC;
 
 public extern objc class CAReplicatorLayer : CALayer
 {
-    [Selector("instanceCount", "setInstanceCount:")] public NSInteger InstanceCount { get; set; }
-    [Selector("preservesDepth", "setPreservesDepth:")] public bool PreservesDepth { get; set; }
-    [Selector("instanceDelay", "setInstanceDelay:")] public CFTimeInterval InstanceDelay { get; set; }
-    [Selector("instanceTransform", "setInstanceTransform:")] public CATransform3D InstanceTransform { get; set; }
-    [Selector("instanceColor", "setInstanceColor:")] public CGColorRef? InstanceColor { get; set; }
-    [Selector("instanceRedOffset", "setInstanceRedOffset:")] public float InstanceRedOffset { get; set; }
-    [Selector("instanceGreenOffset", "setInstanceGreenOffset:")] public float InstanceGreenOffset { get; set; }
-    [Selector("instanceBlueOffset", "setInstanceBlueOffset:")] public float InstanceBlueOffset { get; set; }
-    [Selector("instanceAlphaOffset", "setInstanceAlphaOffset:")] public float InstanceAlphaOffset { get; set; }
+    [Selector("instanceCount", "setInstanceCount:")]
+    public NSInteger InstanceCount { get; set; }
+    [Selector("preservesDepth", "setPreservesDepth:")]
+    public bool PreservesDepth { get; set; }
+    [Selector("instanceDelay", "setInstanceDelay:")]
+    public CFTimeInterval InstanceDelay { get; set; }
+    [Selector("instanceTransform", "setInstanceTransform:")]
+    public CATransform3D InstanceTransform { get; set; }
+    [Selector("instanceColor", "setInstanceColor:")]
+    public CGColorRef? InstanceColor { get; set; }
+    [Selector("instanceRedOffset", "setInstanceRedOffset:")]
+    public float InstanceRedOffset { get; set; }
+    [Selector("instanceGreenOffset", "setInstanceGreenOffset:")]
+    public float InstanceGreenOffset { get; set; }
+    [Selector("instanceBlueOffset", "setInstanceBlueOffset:")]
+    public float InstanceBlueOffset { get; set; }
+    [Selector("instanceAlphaOffset", "setInstanceAlphaOffset:")]
+    public float InstanceAlphaOffset { get; set; }
 }
 
 #endif

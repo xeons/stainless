@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public objc interface MEMessageDecoder : NSObjectProtocol
 {
-    [Selector("decodedMessageForMessageData:")] MEDecodedMessage? DecodedMessageForMessageData(NSData data);
+    [Selector("decodedMessageForMessageData:")]
+    MEDecodedMessage? DecodedMessageForMessageData(NSData data);
 }
 
 #endif

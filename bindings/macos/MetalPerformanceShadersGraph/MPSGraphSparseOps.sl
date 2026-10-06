@@ -40,16 +40,21 @@ public enum MPSGraphSparseStorageType : ulong
 
 public extern objc class MPSGraphCreateSparseOpDescriptor : MPSGraphObject, NSCopying
 {
-    [Selector("sparseStorageType", "setSparseStorageType:")] public MPSGraphSparseStorageType SparseStorageType { get; set; }
-    [Selector("dataType", "setDataType:")] public MPSDataType DataType { get; set; }
-    [Selector("descriptorWithStorageType:dataType:")] public static Self? DescriptorWithStorageTypeDataType(MPSGraphSparseStorageType sparseStorageType, MPSDataType dataType);
+    [Selector("sparseStorageType", "setSparseStorageType:")]
+    public MPSGraphSparseStorageType SparseStorageType { get; set; }
+    [Selector("dataType", "setDataType:")]
+    public MPSDataType DataType { get; set; }
+    [Selector("descriptorWithStorageType:dataType:")]
+    public static Self? DescriptorWithStorageTypeDataType(MPSGraphSparseStorageType sparseStorageType, MPSDataType dataType);
 }
 
 /// MPSGraphSparseOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("sparseTensorWithType:tensors:shape:dataType:name:")] public MPSGraphTensor SparseTensorWithTypeTensorsShapeDataTypeName(MPSGraphSparseStorageType sparseStorageType, NSArray inputTensorArray, MPSShape shape, MPSDataType dataType, NSString? name);
-    [Selector("sparseTensorWithDescriptor:tensors:shape:name:")] public MPSGraphTensor SparseTensorWithDescriptorTensorsShapeName(MPSGraphCreateSparseOpDescriptor sparseDescriptor, NSArray inputTensorArray, MPSShape shape, NSString? name);
+    [Selector("sparseTensorWithType:tensors:shape:dataType:name:")]
+    public MPSGraphTensor SparseTensorWithTypeTensorsShapeDataTypeName(MPSGraphSparseStorageType sparseStorageType, NSArray inputTensorArray, MPSShape shape, MPSDataType dataType, NSString? name);
+    [Selector("sparseTensorWithDescriptor:tensors:shape:name:")]
+    public MPSGraphTensor SparseTensorWithDescriptorTensorsShapeName(MPSGraphCreateSparseOpDescriptor sparseDescriptor, NSArray inputTensorArray, MPSShape shape, NSString? name);
 }
 
 #endif

@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class PKDeferredPaymentRequest : NSObject
 {
-    [Selector("paymentDescription", "setPaymentDescription:")] public NSString PaymentDescription { get; set; }
-    [Selector("deferredBilling", "setDeferredBilling:")] public PKDeferredPaymentSummaryItem DeferredBilling { get; set; }
-    [Selector("billingAgreement", "setBillingAgreement:")] public NSString? BillingAgreement { get; set; }
-    [Selector("managementURL", "setManagementURL:")] public NSURL ManagementURL { get; set; }
-    [Selector("tokenNotificationURL", "setTokenNotificationURL:")] public NSURL? TokenNotificationURL { get; set; }
-    [Selector("freeCancellationDate", "setFreeCancellationDate:")] public NSDate? FreeCancellationDate { get; set; }
-    [Selector("freeCancellationDateTimeZone", "setFreeCancellationDateTimeZone:")] public NSTimeZone? FreeCancellationDateTimeZone { get; set; }
-    [Selector("initWithPaymentDescription:deferredBilling:managementURL:")] public Self InitWithPaymentDescriptionDeferredBillingManagementURL(NSString paymentDescription, PKDeferredPaymentSummaryItem deferredBilling, NSURL managementURL);
+    [Selector("paymentDescription", "setPaymentDescription:")]
+    public NSString PaymentDescription { get; set; }
+    [Selector("deferredBilling", "setDeferredBilling:")]
+    public PKDeferredPaymentSummaryItem DeferredBilling { get; set; }
+    [Selector("billingAgreement", "setBillingAgreement:")]
+    public NSString? BillingAgreement { get; set; }
+    [Selector("managementURL", "setManagementURL:")]
+    public NSURL ManagementURL { get; set; }
+    [Selector("tokenNotificationURL", "setTokenNotificationURL:")]
+    public NSURL? TokenNotificationURL { get; set; }
+    [Selector("freeCancellationDate", "setFreeCancellationDate:")]
+    public NSDate? FreeCancellationDate { get; set; }
+    [Selector("freeCancellationDateTimeZone", "setFreeCancellationDateTimeZone:")]
+    public NSTimeZone? FreeCancellationDateTimeZone { get; set; }
+    [Selector("initWithPaymentDescription:deferredBilling:managementURL:")]
+    public Self InitWithPaymentDescriptionDeferredBillingManagementURL(NSString paymentDescription, PKDeferredPaymentSummaryItem deferredBilling, NSURL managementURL);
 }
 
 #endif

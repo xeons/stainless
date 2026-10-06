@@ -101,36 +101,51 @@ public objc closure AUAudioUnitStatus AUInternalRenderBlock(AudioUnitRenderActio
 /// AUAudioUnitImplementation, a category of AUAudioUnit.
 public extern objc class AUAudioUnit
 {
-    [Selector("internalRenderBlock")] public AUInternalRenderBlock InternalRenderBlock { get; }
-    [Selector("renderContextObserver")] public AURenderContextObserver? RenderContextObserver { get; }
-    [Selector("MIDIOutputBufferSizeHint", "setMIDIOutputBufferSizeHint:")] public NSInteger MIDIOutputBufferSizeHint { get; set; }
-    [Selector("registerSubclass:asComponentDescription:name:version:")] public static void RegisterSubclassAsComponentDescriptionNameVersion(Class cls, AudioComponentDescription componentDescription, NSString name, UInt32 version);
-    [Selector("shouldChangeToFormat:forBus:")] public bool ShouldChangeToFormatForBus(AVAudioFormat format, AUAudioUnitBus bus);
-    [Selector("setRenderResourcesAllocated:")] public void SetRenderResourcesAllocated(bool flag);
+    [Selector("internalRenderBlock")]
+    public AUInternalRenderBlock InternalRenderBlock { get; }
+    [Selector("renderContextObserver")]
+    public AURenderContextObserver? RenderContextObserver { get; }
+    [Selector("MIDIOutputBufferSizeHint", "setMIDIOutputBufferSizeHint:")]
+    public NSInteger MIDIOutputBufferSizeHint { get; set; }
+    [Selector("registerSubclass:asComponentDescription:name:version:")]
+    public static void RegisterSubclassAsComponentDescriptionNameVersion(Class cls, AudioComponentDescription componentDescription, NSString name, UInt32 version);
+    [Selector("shouldChangeToFormat:forBus:")]
+    public bool ShouldChangeToFormatForBus(AVAudioFormat format, AUAudioUnitBus bus);
+    [Selector("setRenderResourcesAllocated:")]
+    public void SetRenderResourcesAllocated(bool flag);
 }
 
 /// AUAudioUnitImplementation, a category of AUAudioUnitBus.
 public extern objc class AUAudioUnitBus
 {
-    [Selector("supportedChannelCounts", "setSupportedChannelCounts:")] public NSArray? SupportedChannelCounts { get; set; }
-    [Selector("maximumChannelCount", "setMaximumChannelCount:")] public AUAudioChannelCount MaximumChannelCount { get; set; }
-    [Selector("initWithFormat:error:")] public Self? InitWithFormatError(AVAudioFormat format, out NSError? outError);
+    [Selector("supportedChannelCounts", "setSupportedChannelCounts:")]
+    public NSArray? SupportedChannelCounts { get; set; }
+    [Selector("maximumChannelCount", "setMaximumChannelCount:")]
+    public AUAudioChannelCount MaximumChannelCount { get; set; }
+    [Selector("initWithFormat:error:")]
+    public Self? InitWithFormatError(AVAudioFormat format, out NSError? outError);
 }
 
 /// AUAudioUnitBusImplementation, a category of AUAudioUnitBusArray.
 public extern objc class AUAudioUnitBusArray
 {
-    [Selector("replaceBusses:")] public void ReplaceBusses(NSArray busArray);
+    [Selector("replaceBusses:")]
+    public void ReplaceBusses(NSArray busArray);
 }
 
 /// Factory, a category of AUParameterTree.
 public extern objc class AUParameterTree
 {
-    [Selector("createParameterWithIdentifier:name:address:min:max:unit:unitName:flags:valueStrings:dependentParameters:")] public static AUParameter CreateParameterWithIdentifierNameAddressMinMaxUnitUnitNameFlagsValueStringsDependentParameters(NSString identifier, NSString name, AUParameterAddress address, AUValue min, AUValue max, AudioUnitParameterUnit unit, NSString? unitName, AudioUnitParameterOptions flags, NSArray? valueStrings, NSArray? dependentParameters);
-    [Selector("createGroupWithIdentifier:name:children:")] public static AUParameterGroup CreateGroupWithIdentifierNameChildren(NSString identifier, NSString name, NSArray children);
-    [Selector("createGroupTemplate:")] public static AUParameterGroup CreateGroupTemplate(NSArray children);
-    [Selector("createGroupFromTemplate:identifier:name:addressOffset:")] public static AUParameterGroup CreateGroupFromTemplateIdentifierNameAddressOffset(AUParameterGroup templateGroup, NSString identifier, NSString name, AUParameterAddress addressOffset);
-    [Selector("createTreeWithChildren:")] public static AUParameterTree CreateTreeWithChildren(NSArray children);
+    [Selector("createParameterWithIdentifier:name:address:min:max:unit:unitName:flags:valueStrings:dependentParameters:")]
+    public static AUParameter CreateParameterWithIdentifierNameAddressMinMaxUnitUnitNameFlagsValueStringsDependentParameters(NSString identifier, NSString name, AUParameterAddress address, AUValue min, AUValue max, AudioUnitParameterUnit unit, NSString? unitName, AudioUnitParameterOptions flags, NSArray? valueStrings, NSArray? dependentParameters);
+    [Selector("createGroupWithIdentifier:name:children:")]
+    public static AUParameterGroup CreateGroupWithIdentifierNameChildren(NSString identifier, NSString name, NSArray children);
+    [Selector("createGroupTemplate:")]
+    public static AUParameterGroup CreateGroupTemplate(NSArray children);
+    [Selector("createGroupFromTemplate:identifier:name:addressOffset:")]
+    public static AUParameterGroup CreateGroupFromTemplateIdentifierNameAddressOffset(AUParameterGroup templateGroup, NSString identifier, NSString name, AUParameterAddress addressOffset);
+    [Selector("createTreeWithChildren:")]
+    public static AUParameterTree CreateTreeWithChildren(NSArray children);
 }
 
 public objc closure void AUImplementorValueObserver(AUParameter arg0, AUValue arg1);
@@ -146,21 +161,28 @@ public objc closure NSString AUImplementorDisplayNameWithLengthCallback(AUParame
 /// AUParameterNodeImplementation, a category of AUParameterNode.
 public extern objc class AUParameterNode
 {
-    [Selector("implementorValueObserver", "setImplementorValueObserver:")] public AUImplementorValueObserver ImplementorValueObserver { get; set; }
-    [Selector("implementorValueProvider", "setImplementorValueProvider:")] public AUImplementorValueProvider ImplementorValueProvider { get; set; }
-    [Selector("implementorStringFromValueCallback", "setImplementorStringFromValueCallback:")] public AUImplementorStringFromValueCallback ImplementorStringFromValueCallback { get; set; }
-    [Selector("implementorValueFromStringCallback", "setImplementorValueFromStringCallback:")] public AUImplementorValueFromStringCallback ImplementorValueFromStringCallback { get; set; }
-    [Selector("implementorDisplayNameWithLengthCallback", "setImplementorDisplayNameWithLengthCallback:")] public AUImplementorDisplayNameWithLengthCallback ImplementorDisplayNameWithLengthCallback { get; set; }
+    [Selector("implementorValueObserver", "setImplementorValueObserver:")]
+    public AUImplementorValueObserver ImplementorValueObserver { get; set; }
+    [Selector("implementorValueProvider", "setImplementorValueProvider:")]
+    public AUImplementorValueProvider ImplementorValueProvider { get; set; }
+    [Selector("implementorStringFromValueCallback", "setImplementorStringFromValueCallback:")]
+    public AUImplementorStringFromValueCallback ImplementorStringFromValueCallback { get; set; }
+    [Selector("implementorValueFromStringCallback", "setImplementorValueFromStringCallback:")]
+    public AUImplementorValueFromStringCallback ImplementorValueFromStringCallback { get; set; }
+    [Selector("implementorDisplayNameWithLengthCallback", "setImplementorDisplayNameWithLengthCallback:")]
+    public AUImplementorDisplayNameWithLengthCallback ImplementorDisplayNameWithLengthCallback { get; set; }
 }
 
 public extern objc class AUAudioUnitV2Bridge : AUAudioUnit
 {
-    [Selector("audioUnit")] public AudioUnit AudioUnit { get; }
+    [Selector("audioUnit")]
+    public AudioUnit AudioUnit { get; }
 }
 
 public objc interface AUAudioUnitFactory : NSExtensionRequestHandling
 {
-    [Selector("createAudioUnitWithComponentDescription:error:")] AUAudioUnit? CreateAudioUnitWithComponentDescriptionError(AudioComponentDescription desc, out NSError? error);
+    [Selector("createAudioUnitWithComponentDescription:error:")]
+    AUAudioUnit? CreateAudioUnitWithComponentDescriptionError(AudioComponentDescription desc, out NSError? error);
 }
 
 #endif

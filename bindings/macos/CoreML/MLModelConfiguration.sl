@@ -42,28 +42,35 @@ public enum MLComputeUnits : long
 
 public extern objc class MLModelConfiguration : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("modelDisplayName", "setModelDisplayName:")] public NSString? ModelDisplayName { get; set; }
-    [Selector("computeUnits", "setComputeUnits:")] public MLComputeUnits ComputeUnits { get; set; }
-    [Selector("optimizationHints", "setOptimizationHints:")] public MLOptimizationHints? OptimizationHints { get; set; }
+    [Selector("modelDisplayName", "setModelDisplayName:")]
+    public NSString? ModelDisplayName { get; set; }
+    [Selector("computeUnits", "setComputeUnits:")]
+    public MLComputeUnits ComputeUnits { get; set; }
+    [Selector("optimizationHints", "setOptimizationHints:")]
+    public MLOptimizationHints? OptimizationHints { get; set; }
 }
 
 /// MLGPUConfigurationOptions, a category of MLModelConfiguration.
 public extern objc class MLModelConfiguration
 {
-    [Selector("allowLowPrecisionAccumulationOnGPU", "setAllowLowPrecisionAccumulationOnGPU:")] public bool AllowLowPrecisionAccumulationOnGPU { get; set; }
-    [Selector("preferredMetalDevice", "setPreferredMetalDevice:")] public MTLDevice? PreferredMetalDevice { get; set; }
+    [Selector("allowLowPrecisionAccumulationOnGPU", "setAllowLowPrecisionAccumulationOnGPU:")]
+    public bool AllowLowPrecisionAccumulationOnGPU { get; set; }
+    [Selector("preferredMetalDevice", "setPreferredMetalDevice:")]
+    public MTLDevice? PreferredMetalDevice { get; set; }
 }
 
 /// MLModelParameterAdditions, a category of MLModelConfiguration.
 public extern objc class MLModelConfiguration
 {
-    [Selector("parameters", "setParameters:")] public NSDictionary? Parameters { get; set; }
+    [Selector("parameters", "setParameters:")]
+    public NSDictionary? Parameters { get; set; }
 }
 
 /// MultiFunctions, a category of MLModelConfiguration.
 public extern objc class MLModelConfiguration
 {
-    [Selector("functionName", "setFunctionName:")] public NSString? FunctionName { get; set; }
+    [Selector("functionName", "setFunctionName:")]
+    public NSString? FunctionName { get; set; }
 }
 
 #endif

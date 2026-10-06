@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class PKPaymentAuthorizationViewController : NSViewController
 {
-    [Selector("delegate", "setDelegate:")] public PKPaymentAuthorizationViewControllerDelegate? Delegate { get; set; }
-    [Selector("canMakePayments")] public static bool CanMakePayments();
-    [Selector("canMakePaymentsUsingNetworks:")] public static bool CanMakePaymentsUsingNetworks(NSArray supportedNetworks);
-    [Selector("canMakePaymentsUsingNetworks:capabilities:")] public static bool CanMakePaymentsUsingNetworksCapabilities(NSArray supportedNetworks, PKMerchantCapability capabilties);
-    [Selector("initWithPaymentRequest:")] public Self? InitWithPaymentRequest(PKPaymentRequest request);
-    [Selector("supportsDisbursements")] public static bool SupportsDisbursements();
-    [Selector("supportsDisbursementsUsingNetworks:")] public static bool SupportsDisbursementsUsingNetworks(NSArray supportedNetworks);
-    [Selector("supportsDisbursementsUsingNetworks:capabilities:")] public static bool SupportsDisbursementsUsingNetworksCapabilities(NSArray supportedNetworks, PKMerchantCapability capabilities);
-    [Selector("initWithDisbursementRequest:")] public Self InitWithDisbursementRequest(PKDisbursementRequest request);
+    [Selector("delegate", "setDelegate:")]
+    public PKPaymentAuthorizationViewControllerDelegate? Delegate { get; set; }
+    [Selector("canMakePayments")]
+    public static bool CanMakePayments();
+    [Selector("canMakePaymentsUsingNetworks:")]
+    public static bool CanMakePaymentsUsingNetworks(NSArray supportedNetworks);
+    [Selector("canMakePaymentsUsingNetworks:capabilities:")]
+    public static bool CanMakePaymentsUsingNetworksCapabilities(NSArray supportedNetworks, PKMerchantCapability capabilties);
+    [Selector("initWithPaymentRequest:")]
+    public Self? InitWithPaymentRequest(PKPaymentRequest request);
+    [Selector("supportsDisbursements")]
+    public static bool SupportsDisbursements();
+    [Selector("supportsDisbursementsUsingNetworks:")]
+    public static bool SupportsDisbursementsUsingNetworks(NSArray supportedNetworks);
+    [Selector("supportsDisbursementsUsingNetworks:capabilities:")]
+    public static bool SupportsDisbursementsUsingNetworksCapabilities(NSArray supportedNetworks, PKMerchantCapability capabilities);
+    [Selector("initWithDisbursementRequest:")]
+    public Self InitWithDisbursementRequest(PKDisbursementRequest request);
 }
 
 #endif

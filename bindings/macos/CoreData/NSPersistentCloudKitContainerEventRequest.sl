@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class NSPersistentCloudKitContainerEventRequest : NSPersistentStoreRequest
 {
-    [Selector("resultType", "setResultType:")] public NSPersistentCloudKitContainerEventResultType ResultType { get; set; }
-    [Selector("fetchEventsAfterDate:")] public static Self FetchEventsAfterDate(NSDate date);
-    [Selector("fetchEventsAfterEvent:")] public static Self FetchEventsAfterEvent(NSPersistentCloudKitContainerEvent? event);
-    [Selector("fetchEventsMatchingFetchRequest:")] public static Self FetchEventsMatchingFetchRequest(NSFetchRequest fetchRequest);
-    [Selector("fetchRequestForEvents")] public static NSFetchRequest FetchRequestForEvents();
+    [Selector("resultType", "setResultType:")]
+    public NSPersistentCloudKitContainerEventResultType ResultType { get; set; }
+    [Selector("fetchEventsAfterDate:")]
+    public static Self FetchEventsAfterDate(NSDate date);
+    [Selector("fetchEventsAfterEvent:")]
+    public static Self FetchEventsAfterEvent(NSPersistentCloudKitContainerEvent? event);
+    [Selector("fetchEventsMatchingFetchRequest:")]
+    public static Self FetchEventsMatchingFetchRequest(NSFetchRequest fetchRequest);
+    [Selector("fetchRequestForEvents")]
+    public static NSFetchRequest FetchRequestForEvents();
 }
 
 #endif

@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public objc interface WKURLSchemeTask : NSObjectProtocol
 {
-    [Selector("request")] NSURLRequest Request { get; }
-    [Selector("didReceiveResponse:")] void DidReceiveResponse(NSURLResponse response);
-    [Selector("didReceiveData:")] void DidReceiveData(NSData data);
-    [Selector("didFinish")] void DidFinish();
-    [Selector("didFailWithError:")] void DidFailWithError(NSError error);
+    [Selector("request")]
+    NSURLRequest Request { get; }
+    [Selector("didReceiveResponse:")]
+    void DidReceiveResponse(NSURLResponse response);
+    [Selector("didReceiveData:")]
+    void DidReceiveData(NSData data);
+    [Selector("didFinish")]
+    void DidFinish();
+    [Selector("didFailWithError:")]
+    void DidFailWithError(NSError error);
 }
 
 #endif

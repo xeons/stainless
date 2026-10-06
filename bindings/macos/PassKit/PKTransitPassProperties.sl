@@ -33,14 +33,20 @@ import Standard.ObjC;
 public extern objc class PKTransitPassProperties : PKStoredValuePassProperties
 {
     /// Deprecated in macOS 12.0.
-    [Selector("transitBalance")] public NSDecimalNumber TransitBalance { get; }
+    [Selector("transitBalance")]
+    public NSDecimalNumber TransitBalance { get; }
     /// Deprecated in macOS 12.0.
-    [Selector("transitBalanceCurrencyCode")] public NSString TransitBalanceCurrencyCode { get; }
+    [Selector("transitBalanceCurrencyCode")]
+    public NSString TransitBalanceCurrencyCode { get; }
     /// Deprecated in macOS 12.0.
-    [Selector("isBlacklisted")] public bool Blacklisted { get; }
-    [Selector("expirationDate")] public NSDate? ExpirationDate { get; }
-    [Selector("isBlocked")] public bool Blocked { get; }
-    [Selector("isInStation")] public bool InStation { get; }
+    [Selector("isBlacklisted")]
+    public bool Blacklisted { get; }
+    [Selector("expirationDate")]
+    public NSDate? ExpirationDate { get; }
+    [Selector("isBlocked")]
+    public bool Blocked { get; }
+    [Selector("isInStation")]
+    public bool InStation { get; }
 }
 
 #endif

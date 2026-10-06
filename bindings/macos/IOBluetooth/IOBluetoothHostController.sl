@@ -34,20 +34,29 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothHostController : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public AnyObject? Delegate { get; set; }
-    [Selector("powerState")] public BluetoothHCIPowerState PowerState { get; }
-    [Selector("defaultController")] public static Self? DefaultController();
-    [Selector("classOfDevice")] public BluetoothClassOfDevice ClassOfDevice();
-    [Selector("setClassOfDevice:forTimeInterval:")] public IOReturn SetClassOfDeviceForTimeInterval(BluetoothClassOfDevice classOfDevice, NSTimeInterval seconds);
-    [Selector("addressAsString")] public NSString? AddressAsString();
-    [Selector("nameAsString")] public NSString? NameAsString();
+    [Selector("delegate", "setDelegate:")]
+    public AnyObject? Delegate { get; set; }
+    [Selector("powerState")]
+    public BluetoothHCIPowerState PowerState { get; }
+    [Selector("defaultController")]
+    public static Self? DefaultController();
+    [Selector("classOfDevice")]
+    public BluetoothClassOfDevice ClassOfDevice();
+    [Selector("setClassOfDevice:forTimeInterval:")]
+    public IOReturn SetClassOfDeviceForTimeInterval(BluetoothClassOfDevice classOfDevice, NSTimeInterval seconds);
+    [Selector("addressAsString")]
+    public NSString? AddressAsString();
+    [Selector("nameAsString")]
+    public NSString? NameAsString();
 }
 
 /// IOBluetoothHostControllerDelegate, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("readRSSIForDeviceComplete:device:info:error:")] public void ReadRSSIForDeviceCompleteDeviceInfoError(AnyObject? controller, IOBluetoothDevice? device, BluetoothHCIRSSIInfo* info, IOReturn error);
-    [Selector("readLinkQualityForDeviceComplete:device:info:error:")] public void ReadLinkQualityForDeviceCompleteDeviceInfoError(AnyObject? controller, IOBluetoothDevice? device, BluetoothHCILinkQualityInfo* info, IOReturn error);
+    [Selector("readRSSIForDeviceComplete:device:info:error:")]
+    public void ReadRSSIForDeviceCompleteDeviceInfoError(AnyObject? controller, IOBluetoothDevice? device, BluetoothHCIRSSIInfo* info, IOReturn error);
+    [Selector("readLinkQualityForDeviceComplete:device:info:error:")]
+    public void ReadLinkQualityForDeviceCompleteDeviceInfoError(AnyObject? controller, IOBluetoothDevice? device, BluetoothHCILinkQualityInfo* info, IOReturn error);
 }
 
 public extern "C" NSString? IOBluetoothHostControllerPoweredOnNotification;

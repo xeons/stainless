@@ -35,23 +35,34 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.15.
 public extern objc class QCCompositionParameterView : NSView
 {
-    [Selector("setCompositionRenderer:")] public void SetCompositionRenderer(QCCompositionRenderer? renderer);
-    [Selector("compositionRenderer")] public QCCompositionRenderer? CompositionRenderer();
-    [Selector("hasParameters")] public bool HasParameters();
-    [Selector("setBackgroundColor:")] public void SetBackgroundColor(NSColor? color);
-    [Selector("backgroundColor")] public NSColor? BackgroundColor();
-    [Selector("setDrawsBackground:")] public void SetDrawsBackground(bool flag);
-    [Selector("drawsBackground")] public bool DrawsBackground();
-    [Selector("setDelegate:")] public void SetDelegate(AnyObject? @delegate);
-    [Selector("delegate")] public AnyObject? Delegate();
+    [Selector("setCompositionRenderer:")]
+    public void SetCompositionRenderer(QCCompositionRenderer? renderer);
+    [Selector("compositionRenderer")]
+    public QCCompositionRenderer? CompositionRenderer();
+    [Selector("hasParameters")]
+    public bool HasParameters();
+    [Selector("setBackgroundColor:")]
+    public void SetBackgroundColor(NSColor? color);
+    [Selector("backgroundColor")]
+    public NSColor? BackgroundColor();
+    [Selector("setDrawsBackground:")]
+    public void SetDrawsBackground(bool flag);
+    [Selector("drawsBackground")]
+    public bool DrawsBackground();
+    [Selector("setDelegate:")]
+    public void SetDelegate(AnyObject? @delegate);
+    [Selector("delegate")]
+    public AnyObject? Delegate();
 }
 
 /// Deprecated in macOS 10.15.
 /// QCCompositionParameterViewDelegate, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("compositionParameterView:shouldDisplayParameterWithKey:attributes:")] public bool CompositionParameterViewShouldDisplayParameterWithKeyAttributes(QCCompositionParameterView? parameterView, NSString? portKey, NSDictionary? portAttributes);
-    [Selector("compositionParameterView:didChangeParameterWithKey:")] public void CompositionParameterViewDidChangeParameterWithKey(QCCompositionParameterView? parameterView, NSString? portKey);
+    [Selector("compositionParameterView:shouldDisplayParameterWithKey:attributes:")]
+    public bool CompositionParameterViewShouldDisplayParameterWithKeyAttributes(QCCompositionParameterView? parameterView, NSString? portKey, NSDictionary? portAttributes);
+    [Selector("compositionParameterView:didChangeParameterWithKey:")]
+    public void CompositionParameterViewDidChangeParameterWithKey(QCCompositionParameterView? parameterView, NSString? portKey);
 }
 
 #endif

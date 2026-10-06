@@ -31,13 +31,16 @@ import Standard.ObjC;
 
 public extern objc class CBDescriptor : CBAttribute
 {
-    [Selector("characteristic")] public CBCharacteristic? Characteristic { get; }
-    [Selector("value")] public AnyObject? Value { get; }
+    [Selector("characteristic")]
+    public CBCharacteristic? Characteristic { get; }
+    [Selector("value")]
+    public AnyObject? Value { get; }
 }
 
 public extern objc class CBMutableDescriptor : CBDescriptor
 {
-    [Selector("initWithType:value:")] public Self InitWithTypeValue(CBUUID UUID, AnyObject? value);
+    [Selector("initWithType:value:")]
+    public Self InitWithTypeValue(CBUUID UUID, AnyObject? value);
 }
 
 #endif

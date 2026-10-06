@@ -34,14 +34,22 @@ import Standard.ObjC;
 
 public extern objc class MPSMatrixFindTopK : MPSMatrixUnaryKernel
 {
-    [Selector("sourceRows", "setSourceRows:")] public NSUInteger SourceRows { get; set; }
-    [Selector("sourceColumns", "setSourceColumns:")] public NSUInteger SourceColumns { get; set; }
-    [Selector("indexOffset", "setIndexOffset:")] public NSUInteger IndexOffset { get; set; }
-    [Selector("numberOfTopKValues", "setNumberOfTopKValues:")] public NSUInteger NumberOfTopKValues { get; set; }
-    [Selector("initWithDevice:numberOfTopKValues:")] public Self InitWithDeviceNumberOfTopKValues(MTLDevice device, NSUInteger numberOfTopKValues);
-    [Selector("encodeToCommandBuffer:inputMatrix:resultIndexMatrix:resultValueMatrix:")] public void EncodeToCommandBufferInputMatrixResultIndexMatrixResultValueMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputMatrix, MPSMatrix resultIndexMatrix, MPSMatrix resultValueMatrix);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("sourceRows", "setSourceRows:")]
+    public NSUInteger SourceRows { get; set; }
+    [Selector("sourceColumns", "setSourceColumns:")]
+    public NSUInteger SourceColumns { get; set; }
+    [Selector("indexOffset", "setIndexOffset:")]
+    public NSUInteger IndexOffset { get; set; }
+    [Selector("numberOfTopKValues", "setNumberOfTopKValues:")]
+    public NSUInteger NumberOfTopKValues { get; set; }
+    [Selector("initWithDevice:numberOfTopKValues:")]
+    public Self InitWithDeviceNumberOfTopKValues(MTLDevice device, NSUInteger numberOfTopKValues);
+    [Selector("encodeToCommandBuffer:inputMatrix:resultIndexMatrix:resultValueMatrix:")]
+    public void EncodeToCommandBufferInputMatrixResultIndexMatrixResultValueMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputMatrix, MPSMatrix resultIndexMatrix, MPSMatrix resultValueMatrix);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
 }
 
 #endif

@@ -32,12 +32,18 @@ import Standard.ObjC;
 
 public extern objc class NSTableCellView : NSView
 {
-    [Selector("objectValue", "setObjectValue:")] public AnyObject? ObjectValue { get; set; }
-    [Selector("textField", "setTextField:")] public NSTextField? TextField { get; set; }
-    [Selector("imageView", "setImageView:")] public NSImageView? ImageView { get; set; }
-    [Selector("backgroundStyle", "setBackgroundStyle:")] public NSBackgroundStyle BackgroundStyle { get; set; }
-    [Selector("rowSizeStyle", "setRowSizeStyle:")] public NSTableViewRowSizeStyle RowSizeStyle { get; set; }
-    [Selector("draggingImageComponents")] public NSArray DraggingImageComponents { get; }
+    [Selector("objectValue", "setObjectValue:")]
+    public AnyObject? ObjectValue { get; set; }
+    [Selector("textField", "setTextField:")]
+    public NSTextField? TextField { get; set; }
+    [Selector("imageView", "setImageView:")]
+    public NSImageView? ImageView { get; set; }
+    [Selector("backgroundStyle", "setBackgroundStyle:")]
+    public NSBackgroundStyle BackgroundStyle { get; set; }
+    [Selector("rowSizeStyle", "setRowSizeStyle:")]
+    public NSTableViewRowSizeStyle RowSizeStyle { get; set; }
+    [Selector("draggingImageComponents")]
+    public NSArray DraggingImageComponents { get; }
 }
 
 #endif

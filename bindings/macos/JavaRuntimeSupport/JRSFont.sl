@@ -51,7 +51,8 @@ public extern "C" JRSFontRenderingStyle JRSFontGetRenderingStyleForContext(CGCon
 
 public extern "C" void JRSFontSetRenderingStyleOnContext(CGContextRef? context, JRSFontRenderingStyle style);
 
-[ReturnsRetained] public extern "C" CTFontRef? JRSFontCreateFallbackFontForCharacters(CTFontRef? font, UTF16Char* unichars, CFIndex length);
+[ReturnsRetained]
+public extern "C" CTFontRef? JRSFontCreateFallbackFontForCharacters(CTFontRef? font, UTF16Char* unichars, CFIndex length);
 
 /// Deprecated in macOS 11.0.
 public extern "C" CGFloat JRSFontGetAdvancesForGlyphsAndStyle(CTFontRef? font, CGAffineTransform* tx, JRSFontRenderingStyle style, CGGlyph* glyphs, nuint count, CGSize* advances);

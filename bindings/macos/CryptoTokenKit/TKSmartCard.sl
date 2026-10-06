@@ -35,10 +35,14 @@ public objc closure void TKSmartCardSlotManagerGetSlotWithNameReplyReplyBlock(TK
 
 public extern objc class TKSmartCardSlotManager : NSObject
 {
-    [Selector("defaultManager")] public static TKSmartCardSlotManager? DefaultManager { get; }
-    [Selector("slotNames")] public NSArray SlotNames { get; }
-    [Selector("getSlotWithName:reply:")] public void GetSlotWithNameReply(NSString name, TKSmartCardSlotManagerGetSlotWithNameReplyReplyBlock reply);
-    [Selector("slotNamed:")] public TKSmartCardSlot? SlotNamed(NSString name);
+    [Selector("defaultManager")]
+    public static TKSmartCardSlotManager? DefaultManager { get; }
+    [Selector("slotNames")]
+    public NSArray SlotNames { get; }
+    [Selector("getSlotWithName:reply:")]
+    public void GetSlotWithNameReply(NSString name, TKSmartCardSlotManagerGetSlotWithNameReplyReplyBlock reply);
+    [Selector("slotNamed:")]
+    public TKSmartCardSlot? SlotNamed(NSString name);
 }
 
 public enum TKSmartCardSlotState : long
@@ -88,63 +92,103 @@ public enum TKSmartCardPINConfirmation : ulong
 
 public extern objc class TKSmartCardPINFormat : NSObject
 {
-    [Selector("charset", "setCharset:")] public TKSmartCardPINCharset Charset { get; set; }
-    [Selector("encoding", "setEncoding:")] public TKSmartCardPINEncoding Encoding { get; set; }
-    [Selector("minPINLength", "setMinPINLength:")] public NSInteger MinPINLength { get; set; }
-    [Selector("maxPINLength", "setMaxPINLength:")] public NSInteger MaxPINLength { get; set; }
-    [Selector("PINBlockByteLength", "setPINBlockByteLength:")] public NSInteger PINBlockByteLength { get; set; }
-    [Selector("PINJustification", "setPINJustification:")] public TKSmartCardPINJustification PINJustification { get; set; }
-    [Selector("PINBitOffset", "setPINBitOffset:")] public NSInteger PINBitOffset { get; set; }
-    [Selector("PINLengthBitOffset", "setPINLengthBitOffset:")] public NSInteger PINLengthBitOffset { get; set; }
-    [Selector("PINLengthBitSize", "setPINLengthBitSize:")] public NSInteger PINLengthBitSize { get; set; }
+    [Selector("charset", "setCharset:")]
+    public TKSmartCardPINCharset Charset { get; set; }
+    [Selector("encoding", "setEncoding:")]
+    public TKSmartCardPINEncoding Encoding { get; set; }
+    [Selector("minPINLength", "setMinPINLength:")]
+    public NSInteger MinPINLength { get; set; }
+    [Selector("maxPINLength", "setMaxPINLength:")]
+    public NSInteger MaxPINLength { get; set; }
+    [Selector("PINBlockByteLength", "setPINBlockByteLength:")]
+    public NSInteger PINBlockByteLength { get; set; }
+    [Selector("PINJustification", "setPINJustification:")]
+    public TKSmartCardPINJustification PINJustification { get; set; }
+    [Selector("PINBitOffset", "setPINBitOffset:")]
+    public NSInteger PINBitOffset { get; set; }
+    [Selector("PINLengthBitOffset", "setPINLengthBitOffset:")]
+    public NSInteger PINLengthBitOffset { get; set; }
+    [Selector("PINLengthBitSize", "setPINLengthBitSize:")]
+    public NSInteger PINLengthBitSize { get; set; }
 }
 
 public objc interface TKSmartCardUserInteractionDelegate
 {
-    [Optional] [Selector("characterEnteredInUserInteraction:")] void CharacterEnteredInUserInteraction(TKSmartCardUserInteraction interaction);
-    [Optional] [Selector("correctionKeyPressedInUserInteraction:")] void CorrectionKeyPressedInUserInteraction(TKSmartCardUserInteraction interaction);
-    [Optional] [Selector("validationKeyPressedInUserInteraction:")] void ValidationKeyPressedInUserInteraction(TKSmartCardUserInteraction interaction);
-    [Optional] [Selector("invalidCharacterEnteredInUserInteraction:")] void InvalidCharacterEnteredInUserInteraction(TKSmartCardUserInteraction interaction);
-    [Optional] [Selector("oldPINRequestedInUserInteraction:")] void OldPINRequestedInUserInteraction(TKSmartCardUserInteraction interaction);
-    [Optional] [Selector("newPINRequestedInUserInteraction:")] void NewPINRequestedInUserInteraction(TKSmartCardUserInteraction interaction);
-    [Optional] [Selector("newPINConfirmationRequestedInUserInteraction:")] void NewPINConfirmationRequestedInUserInteraction(TKSmartCardUserInteraction interaction);
+    [Optional]
+    [Selector("characterEnteredInUserInteraction:")]
+    void CharacterEnteredInUserInteraction(TKSmartCardUserInteraction interaction);
+    [Optional]
+    [Selector("correctionKeyPressedInUserInteraction:")]
+    void CorrectionKeyPressedInUserInteraction(TKSmartCardUserInteraction interaction);
+    [Optional]
+    [Selector("validationKeyPressedInUserInteraction:")]
+    void ValidationKeyPressedInUserInteraction(TKSmartCardUserInteraction interaction);
+    [Optional]
+    [Selector("invalidCharacterEnteredInUserInteraction:")]
+    void InvalidCharacterEnteredInUserInteraction(TKSmartCardUserInteraction interaction);
+    [Optional]
+    [Selector("oldPINRequestedInUserInteraction:")]
+    void OldPINRequestedInUserInteraction(TKSmartCardUserInteraction interaction);
+    [Optional]
+    [Selector("newPINRequestedInUserInteraction:")]
+    void NewPINRequestedInUserInteraction(TKSmartCardUserInteraction interaction);
+    [Optional]
+    [Selector("newPINConfirmationRequestedInUserInteraction:")]
+    void NewPINConfirmationRequestedInUserInteraction(TKSmartCardUserInteraction interaction);
 }
 
 public objc closure void TKSmartCardUserInteractionRunWithReplyReplyBlock(bool arg0, NSError? arg1);
 
 public extern objc class TKSmartCardUserInteraction : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public TKSmartCardUserInteractionDelegate? Delegate { get; set; }
-    [Selector("initialTimeout", "setInitialTimeout:")] public NSTimeInterval InitialTimeout { get; set; }
-    [Selector("interactionTimeout", "setInteractionTimeout:")] public NSTimeInterval InteractionTimeout { get; set; }
-    [Selector("runWithReply:")] public void RunWithReply(TKSmartCardUserInteractionRunWithReplyReplyBlock reply);
-    [Selector("cancel")] public bool Cancel();
+    [Selector("delegate", "setDelegate:")]
+    public TKSmartCardUserInteractionDelegate? Delegate { get; set; }
+    [Selector("initialTimeout", "setInitialTimeout:")]
+    public NSTimeInterval InitialTimeout { get; set; }
+    [Selector("interactionTimeout", "setInteractionTimeout:")]
+    public NSTimeInterval InteractionTimeout { get; set; }
+    [Selector("runWithReply:")]
+    public void RunWithReply(TKSmartCardUserInteractionRunWithReplyReplyBlock reply);
+    [Selector("cancel")]
+    public bool Cancel();
 }
 
 public extern objc class TKSmartCardUserInteractionForPINOperation : TKSmartCardUserInteraction
 {
-    [Selector("PINCompletion", "setPINCompletion:")] public TKSmartCardPINCompletion PINCompletion { get; set; }
-    [Selector("PINMessageIndices", "setPINMessageIndices:")] public NSArray? PINMessageIndices { get; set; }
-    [Selector("locale", "setLocale:")] public NSLocale? Locale { get; set; }
-    [Selector("resultSW", "setResultSW:")] public UInt16 ResultSW { get; set; }
-    [Selector("resultData", "setResultData:")] public NSData? ResultData { get; set; }
+    [Selector("PINCompletion", "setPINCompletion:")]
+    public TKSmartCardPINCompletion PINCompletion { get; set; }
+    [Selector("PINMessageIndices", "setPINMessageIndices:")]
+    public NSArray? PINMessageIndices { get; set; }
+    [Selector("locale", "setLocale:")]
+    public NSLocale? Locale { get; set; }
+    [Selector("resultSW", "setResultSW:")]
+    public UInt16 ResultSW { get; set; }
+    [Selector("resultData", "setResultData:")]
+    public NSData? ResultData { get; set; }
 }
 
 public extern objc class TKSmartCardUserInteractionForSecurePINVerification : TKSmartCardUserInteractionForPINOperation { }
 
 public extern objc class TKSmartCardUserInteractionForSecurePINChange : TKSmartCardUserInteractionForPINOperation
 {
-    [Selector("PINConfirmation", "setPINConfirmation:")] public TKSmartCardPINConfirmation PINConfirmation { get; set; }
+    [Selector("PINConfirmation", "setPINConfirmation:")]
+    public TKSmartCardPINConfirmation PINConfirmation { get; set; }
 }
 
 public extern objc class TKSmartCardSlot : NSObject
 {
-    [Selector("state")] public TKSmartCardSlotState State { get; }
-    [Selector("ATR")] public TKSmartCardATR? ATR { get; }
-    [Selector("name")] public NSString Name { get; }
-    [Selector("maxInputLength")] public NSInteger MaxInputLength { get; }
-    [Selector("maxOutputLength")] public NSInteger MaxOutputLength { get; }
-    [Selector("makeSmartCard")] public TKSmartCard? MakeSmartCard();
+    [Selector("state")]
+    public TKSmartCardSlotState State { get; }
+    [Selector("ATR")]
+    public TKSmartCardATR? ATR { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("maxInputLength")]
+    public NSInteger MaxInputLength { get; }
+    [Selector("maxOutputLength")]
+    public NSInteger MaxOutputLength { get; }
+    [Selector("makeSmartCard")]
+    public TKSmartCard? MakeSmartCard();
 }
 
 public objc closure void TKSmartCardBeginSessionWithReplyReplyBlock(bool arg0, NSError? arg1);
@@ -153,17 +197,28 @@ public objc closure void TKSmartCardTransmitRequestReplyReplyBlock(NSData? arg0,
 
 public extern objc class TKSmartCard : NSObject
 {
-    [Selector("slot")] public TKSmartCardSlot Slot { get; }
-    [Selector("valid")] public bool Valid { get; }
-    [Selector("allowedProtocols", "setAllowedProtocols:")] public TKSmartCardProtocol AllowedProtocols { get; set; }
-    [Selector("currentProtocol")] public TKSmartCardProtocol CurrentProtocol { get; }
-    [Selector("sensitive", "setSensitive:")] public bool Sensitive { get; set; }
-    [Selector("context", "setContext:")] public AnyObject? Context { get; set; }
-    [Selector("beginSessionWithReply:")] public void BeginSessionWithReply(TKSmartCardBeginSessionWithReplyReplyBlock reply);
-    [Selector("transmitRequest:reply:")] public void TransmitRequestReply(NSData request, TKSmartCardTransmitRequestReplyReplyBlock reply);
-    [Selector("endSession")] public void EndSession();
-    [Selector("userInteractionForSecurePINVerificationWithPINFormat:APDU:PINByteOffset:")] public TKSmartCardUserInteractionForSecurePINVerification? UserInteractionForSecurePINVerificationWithPINFormatAPDUPINByteOffset(TKSmartCardPINFormat PINFormat, NSData APDU, NSInteger PINByteOffset);
-    [Selector("userInteractionForSecurePINChangeWithPINFormat:APDU:currentPINByteOffset:newPINByteOffset:")] public TKSmartCardUserInteractionForSecurePINChange? UserInteractionForSecurePINChangeWithPINFormatAPDUCurrentPINByteOffsetNewPINByteOffset(TKSmartCardPINFormat PINFormat, NSData APDU, NSInteger currentPINByteOffset, NSInteger newPINByteOffset);
+    [Selector("slot")]
+    public TKSmartCardSlot Slot { get; }
+    [Selector("valid")]
+    public bool Valid { get; }
+    [Selector("allowedProtocols", "setAllowedProtocols:")]
+    public TKSmartCardProtocol AllowedProtocols { get; set; }
+    [Selector("currentProtocol")]
+    public TKSmartCardProtocol CurrentProtocol { get; }
+    [Selector("sensitive", "setSensitive:")]
+    public bool Sensitive { get; set; }
+    [Selector("context", "setContext:")]
+    public AnyObject? Context { get; set; }
+    [Selector("beginSessionWithReply:")]
+    public void BeginSessionWithReply(TKSmartCardBeginSessionWithReplyReplyBlock reply);
+    [Selector("transmitRequest:reply:")]
+    public void TransmitRequestReply(NSData request, TKSmartCardTransmitRequestReplyReplyBlock reply);
+    [Selector("endSession")]
+    public void EndSession();
+    [Selector("userInteractionForSecurePINVerificationWithPINFormat:APDU:PINByteOffset:")]
+    public TKSmartCardUserInteractionForSecurePINVerification? UserInteractionForSecurePINVerificationWithPINFormatAPDUPINByteOffset(TKSmartCardPINFormat PINFormat, NSData APDU, NSInteger PINByteOffset);
+    [Selector("userInteractionForSecurePINChangeWithPINFormat:APDU:currentPINByteOffset:newPINByteOffset:")]
+    public TKSmartCardUserInteractionForSecurePINChange? UserInteractionForSecurePINChangeWithPINFormatAPDUCurrentPINByteOffsetNewPINByteOffset(TKSmartCardPINFormat PINFormat, NSData APDU, NSInteger currentPINByteOffset, NSInteger newPINByteOffset);
 }
 
 public objc closure void TKSmartCardSendInsP1P2DataLeReplyReplyBlock(NSData? arg0, UInt16 arg1, NSError? arg2);
@@ -173,12 +228,18 @@ public objc closure bool TKSmartCardInSessionWithErrorExecuteBlockBlock(void** a
 /// APDULevelTransmit, a category of TKSmartCard.
 public extern objc class TKSmartCard
 {
-    [Selector("cla", "setCla:")] public UInt8 Cla { get; set; }
-    [Selector("useExtendedLength", "setUseExtendedLength:")] public bool UseExtendedLength { get; set; }
-    [Selector("useCommandChaining", "setUseCommandChaining:")] public bool UseCommandChaining { get; set; }
-    [Selector("sendIns:p1:p2:data:le:reply:")] public void SendInsP1P2DataLeReply(UInt8 ins, UInt8 p1, UInt8 p2, NSData? requestData, NSNumber? le, TKSmartCardSendInsP1P2DataLeReplyReplyBlock reply);
-    [Selector("inSessionWithError:executeBlock:")] public bool InSessionWithErrorExecuteBlock(out NSError? error, TKSmartCardInSessionWithErrorExecuteBlockBlock block);
-    [Selector("sendIns:p1:p2:data:le:sw:error:")] public NSData? SendInsP1P2DataLeSwError(UInt8 ins, UInt8 p1, UInt8 p2, NSData? requestData, NSNumber? le, UInt16* sw, out NSError? error);
+    [Selector("cla", "setCla:")]
+    public UInt8 Cla { get; set; }
+    [Selector("useExtendedLength", "setUseExtendedLength:")]
+    public bool UseExtendedLength { get; set; }
+    [Selector("useCommandChaining", "setUseCommandChaining:")]
+    public bool UseCommandChaining { get; set; }
+    [Selector("sendIns:p1:p2:data:le:reply:")]
+    public void SendInsP1P2DataLeReply(UInt8 ins, UInt8 p1, UInt8 p2, NSData? requestData, NSNumber? le, TKSmartCardSendInsP1P2DataLeReplyReplyBlock reply);
+    [Selector("inSessionWithError:executeBlock:")]
+    public bool InSessionWithErrorExecuteBlock(out NSError? error, TKSmartCardInSessionWithErrorExecuteBlockBlock block);
+    [Selector("sendIns:p1:p2:data:le:sw:error:")]
+    public NSData? SendInsP1P2DataLeSwError(UInt8 ins, UInt8 p1, UInt8 p2, NSData? requestData, NSNumber? le, UInt16* sw, out NSError? error);
 }
 
 #endif

@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLModElement : DOMHTMLElement
 {
-    [Selector("cite", "setCite:")] public NSString? Cite { get; set; }
-    [Selector("dateTime", "setDateTime:")] public NSString? DateTime { get; set; }
+    [Selector("cite", "setCite:")]
+    public NSString? Cite { get; set; }
+    [Selector("dateTime", "setDateTime:")]
+    public NSString? DateTime { get; set; }
 }
 
 #endif

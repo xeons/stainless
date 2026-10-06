@@ -504,7 +504,8 @@ IOKit's event record packs its 64-bit time this way:
 ```csharp
 public struct Event {        // 16 bytes, on a four-byte boundary
     public int Type;         // at 0
-    [Packed] public long Time;   // at 4, not 8
+    [Packed]
+    public long Time;        // at 4, not 8
     public int Flags;        // at 12
 }
 ```

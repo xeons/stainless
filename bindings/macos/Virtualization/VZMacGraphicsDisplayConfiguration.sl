@@ -34,11 +34,16 @@ import Standard.ObjC;
 
 public extern objc class VZMacGraphicsDisplayConfiguration : VZGraphicsDisplayConfiguration
 {
-    [Selector("widthInPixels", "setWidthInPixels:")] public NSInteger WidthInPixels { get; set; }
-    [Selector("heightInPixels", "setHeightInPixels:")] public NSInteger HeightInPixels { get; set; }
-    [Selector("pixelsPerInch", "setPixelsPerInch:")] public NSInteger PixelsPerInch { get; set; }
-    [Selector("initWithWidthInPixels:heightInPixels:pixelsPerInch:")] public Self InitWithWidthInPixelsHeightInPixelsPixelsPerInch(NSInteger widthInPixels, NSInteger heightInPixels, NSInteger pixelsPerInch);
-    [Selector("initForScreen:sizeInPoints:")] public Self InitForScreenSizeInPoints(NSScreen screen, NSSize sizeInPoints);
+    [Selector("widthInPixels", "setWidthInPixels:")]
+    public NSInteger WidthInPixels { get; set; }
+    [Selector("heightInPixels", "setHeightInPixels:")]
+    public NSInteger HeightInPixels { get; set; }
+    [Selector("pixelsPerInch", "setPixelsPerInch:")]
+    public NSInteger PixelsPerInch { get; set; }
+    [Selector("initWithWidthInPixels:heightInPixels:pixelsPerInch:")]
+    public Self InitWithWidthInPixelsHeightInPixelsPixelsPerInch(NSInteger widthInPixels, NSInteger heightInPixels, NSInteger pixelsPerInch);
+    [Selector("initForScreen:sizeInPoints:")]
+    public Self InitForScreenSizeInPoints(NSScreen screen, NSSize sizeInPoints);
 }
 
 #endif

@@ -58,13 +58,15 @@ public struct CTRunDelegateCallbacks
 public const int kCTRunDelegateVersion1 = 1;
 public const int kCTRunDelegateCurrentVersion = 1;
 
-[ReturnsRetained] public extern "C" CTRunDelegateRef? CTRunDelegateCreate(CTRunDelegateCallbacks* callbacks, void* refCon);
+[ReturnsRetained]
+public extern "C" CTRunDelegateRef? CTRunDelegateCreate(CTRunDelegateCallbacks* callbacks, void* refCon);
 
 public extern "C" void* CTRunDelegateGetRefCon(CTRunDelegateRef runDelegate);
 
 public objc interface CTAdaptiveImageProviding
 {
-    [Selector("imageForProposedSize:scaleFactor:imageOffset:imageSize:")] CGImageRef? ImageForProposedSizeScaleFactorImageOffsetImageSize(CGSize proposedSize, CGFloat scaleFactor, CGPoint* outImageOffset, CGSize* outImageSize);
+    [Selector("imageForProposedSize:scaleFactor:imageOffset:imageSize:")]
+    CGImageRef? ImageForProposedSizeScaleFactorImageOffsetImageSize(CGSize proposedSize, CGFloat scaleFactor, CGPoint* outImageOffset, CGSize* outImageSize);
 }
 
 #endif

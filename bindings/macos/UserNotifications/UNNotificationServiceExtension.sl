@@ -34,8 +34,10 @@ public objc closure void UNNotificationServiceExtensionDidReceiveNotificationReq
 
 public extern objc class UNNotificationServiceExtension : NSObject
 {
-    [Selector("didReceiveNotificationRequest:withContentHandler:")] public void DidReceiveNotificationRequestWithContentHandler(UNNotificationRequest request, UNNotificationServiceExtensionDidReceiveNotificationRequestWithContentHandlerContentHandlerBlock contentHandler);
-    [Selector("serviceExtensionTimeWillExpire")] public void ServiceExtensionTimeWillExpire();
+    [Selector("didReceiveNotificationRequest:withContentHandler:")]
+    public void DidReceiveNotificationRequestWithContentHandler(UNNotificationRequest request, UNNotificationServiceExtensionDidReceiveNotificationRequestWithContentHandlerContentHandlerBlock contentHandler);
+    [Selector("serviceExtensionTimeWillExpire")]
+    public void ServiceExtensionTimeWillExpire();
 }
 
 #endif

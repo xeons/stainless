@@ -53,41 +53,76 @@ public objc closure AnyObject NSExpressionExpressionForBlockArgumentsBlock(AnyOb
 
 public extern objc class NSExpression : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("expressionType")] public NSExpressionType ExpressionType { get; }
-    [Selector("constantValue")] public AnyObject? ConstantValue { get; }
-    [Selector("keyPath")] public NSString KeyPath { get; }
-    [Selector("function")] public NSString Function { get; }
-    [Selector("variable")] public NSString Variable { get; }
-    [Selector("operand")] public NSExpression Operand { get; }
-    [Selector("arguments")] public NSArray? Arguments { get; }
-    [Selector("collection")] public AnyObject Collection { get; }
-    [Selector("predicate")] public NSPredicate Predicate { get; }
-    [Selector("leftExpression")] public NSExpression LeftExpression { get; }
-    [Selector("rightExpression")] public NSExpression RightExpression { get; }
-    [Selector("trueExpression")] public NSExpression TrueExpression { get; }
-    [Selector("falseExpression")] public NSExpression FalseExpression { get; }
-    [Selector("expressionBlock")] public NSExpressionExpressionBlock ExpressionBlock { get; }
-    [Selector("expressionWithFormat:argumentArray:")] public static NSExpression ExpressionWithFormatArgumentArray(NSString expressionFormat, NSArray arguments);
-    [Selector("expressionWithFormat:")] public static NSExpression ExpressionWithFormat(NSString expressionFormat, ...);
-    [Selector("expressionWithFormat:arguments:")] public static NSExpression ExpressionWithFormatArguments(NSString expressionFormat, VaList argList);
-    [Selector("expressionForConstantValue:")] public static NSExpression ExpressionForConstantValue(AnyObject? obj);
-    [Selector("expressionForEvaluatedObject")] public static NSExpression ExpressionForEvaluatedObject();
-    [Selector("expressionForVariable:")] public static NSExpression ExpressionForVariable(NSString string);
-    [Selector("expressionForKeyPath:")] public static NSExpression ExpressionForKeyPath(NSString keyPath);
-    [Selector("expressionForFunction:arguments:")] public static NSExpression ExpressionForFunctionArguments(NSString name, NSArray parameters);
-    [Selector("expressionForAggregate:")] public static NSExpression ExpressionForAggregate(NSArray subexpressions);
-    [Selector("expressionForUnionSet:with:")] public static NSExpression ExpressionForUnionSetWith(NSExpression left, NSExpression right);
-    [Selector("expressionForIntersectSet:with:")] public static NSExpression ExpressionForIntersectSetWith(NSExpression left, NSExpression right);
-    [Selector("expressionForMinusSet:with:")] public static NSExpression ExpressionForMinusSetWith(NSExpression left, NSExpression right);
-    [Selector("expressionForSubquery:usingIteratorVariable:predicate:")] public static NSExpression ExpressionForSubqueryUsingIteratorVariablePredicate(NSExpression expression, NSString variable, NSPredicate predicate);
-    [Selector("expressionForFunction:selectorName:arguments:")] public static NSExpression ExpressionForFunctionSelectorNameArguments(NSExpression target, NSString name, NSArray? parameters);
-    [Selector("expressionForAnyKey")] public static NSExpression ExpressionForAnyKey();
-    [Selector("expressionForBlock:arguments:")] public static NSExpression ExpressionForBlockArguments(NSExpressionExpressionForBlockArgumentsBlock block, NSArray? arguments);
-    [Selector("expressionForConditional:trueExpression:falseExpression:")] public static NSExpression ExpressionForConditionalTrueExpressionFalseExpression(NSPredicate predicate, NSExpression trueExpression, NSExpression falseExpression);
-    [Selector("initWithExpressionType:")] public Self InitWithExpressionType(NSExpressionType type);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("expressionValueWithObject:context:")] public AnyObject? ExpressionValueWithObjectContext(AnyObject? object, NSMutableDictionary? context);
-    [Selector("allowEvaluation")] public void AllowEvaluation();
+    [Selector("expressionType")]
+    public NSExpressionType ExpressionType { get; }
+    [Selector("constantValue")]
+    public AnyObject? ConstantValue { get; }
+    [Selector("keyPath")]
+    public NSString KeyPath { get; }
+    [Selector("function")]
+    public NSString Function { get; }
+    [Selector("variable")]
+    public NSString Variable { get; }
+    [Selector("operand")]
+    public NSExpression Operand { get; }
+    [Selector("arguments")]
+    public NSArray? Arguments { get; }
+    [Selector("collection")]
+    public AnyObject Collection { get; }
+    [Selector("predicate")]
+    public NSPredicate Predicate { get; }
+    [Selector("leftExpression")]
+    public NSExpression LeftExpression { get; }
+    [Selector("rightExpression")]
+    public NSExpression RightExpression { get; }
+    [Selector("trueExpression")]
+    public NSExpression TrueExpression { get; }
+    [Selector("falseExpression")]
+    public NSExpression FalseExpression { get; }
+    [Selector("expressionBlock")]
+    public NSExpressionExpressionBlock ExpressionBlock { get; }
+    [Selector("expressionWithFormat:argumentArray:")]
+    public static NSExpression ExpressionWithFormatArgumentArray(NSString expressionFormat, NSArray arguments);
+    [Selector("expressionWithFormat:")]
+    public static NSExpression ExpressionWithFormat(NSString expressionFormat, ...);
+    [Selector("expressionWithFormat:arguments:")]
+    public static NSExpression ExpressionWithFormatArguments(NSString expressionFormat, VaList argList);
+    [Selector("expressionForConstantValue:")]
+    public static NSExpression ExpressionForConstantValue(AnyObject? obj);
+    [Selector("expressionForEvaluatedObject")]
+    public static NSExpression ExpressionForEvaluatedObject();
+    [Selector("expressionForVariable:")]
+    public static NSExpression ExpressionForVariable(NSString string);
+    [Selector("expressionForKeyPath:")]
+    public static NSExpression ExpressionForKeyPath(NSString keyPath);
+    [Selector("expressionForFunction:arguments:")]
+    public static NSExpression ExpressionForFunctionArguments(NSString name, NSArray parameters);
+    [Selector("expressionForAggregate:")]
+    public static NSExpression ExpressionForAggregate(NSArray subexpressions);
+    [Selector("expressionForUnionSet:with:")]
+    public static NSExpression ExpressionForUnionSetWith(NSExpression left, NSExpression right);
+    [Selector("expressionForIntersectSet:with:")]
+    public static NSExpression ExpressionForIntersectSetWith(NSExpression left, NSExpression right);
+    [Selector("expressionForMinusSet:with:")]
+    public static NSExpression ExpressionForMinusSetWith(NSExpression left, NSExpression right);
+    [Selector("expressionForSubquery:usingIteratorVariable:predicate:")]
+    public static NSExpression ExpressionForSubqueryUsingIteratorVariablePredicate(NSExpression expression, NSString variable, NSPredicate predicate);
+    [Selector("expressionForFunction:selectorName:arguments:")]
+    public static NSExpression ExpressionForFunctionSelectorNameArguments(NSExpression target, NSString name, NSArray? parameters);
+    [Selector("expressionForAnyKey")]
+    public static NSExpression ExpressionForAnyKey();
+    [Selector("expressionForBlock:arguments:")]
+    public static NSExpression ExpressionForBlockArguments(NSExpressionExpressionForBlockArgumentsBlock block, NSArray? arguments);
+    [Selector("expressionForConditional:trueExpression:falseExpression:")]
+    public static NSExpression ExpressionForConditionalTrueExpressionFalseExpression(NSPredicate predicate, NSExpression trueExpression, NSExpression falseExpression);
+    [Selector("initWithExpressionType:")]
+    public Self InitWithExpressionType(NSExpressionType type);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("expressionValueWithObject:context:")]
+    public AnyObject? ExpressionValueWithObjectContext(AnyObject? object, NSMutableDictionary? context);
+    [Selector("allowEvaluation")]
+    public void AllowEvaluation();
 }
 
 #endif

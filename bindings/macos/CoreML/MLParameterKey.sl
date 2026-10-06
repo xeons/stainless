@@ -32,36 +32,51 @@ import Standard.ObjC;
 
 public extern objc class MLParameterKey : MLKey
 {
-    [Selector("learningRate")] public static MLParameterKey LearningRate { get; }
-    [Selector("momentum")] public static MLParameterKey Momentum { get; }
-    [Selector("miniBatchSize")] public static MLParameterKey MiniBatchSize { get; }
-    [Selector("beta1")] public static MLParameterKey Beta1 { get; }
-    [Selector("beta2")] public static MLParameterKey Beta2 { get; }
-    [Selector("eps")] public static MLParameterKey Eps { get; }
-    [Selector("epochs")] public static MLParameterKey Epochs { get; }
-    [Selector("shuffle")] public static MLParameterKey Shuffle { get; }
-    [Selector("seed")] public static MLParameterKey Seed { get; }
-    [Selector("numberOfNeighbors")] public static MLParameterKey NumberOfNeighbors { get; }
+    [Selector("learningRate")]
+    public static MLParameterKey LearningRate { get; }
+    [Selector("momentum")]
+    public static MLParameterKey Momentum { get; }
+    [Selector("miniBatchSize")]
+    public static MLParameterKey MiniBatchSize { get; }
+    [Selector("beta1")]
+    public static MLParameterKey Beta1 { get; }
+    [Selector("beta2")]
+    public static MLParameterKey Beta2 { get; }
+    [Selector("eps")]
+    public static MLParameterKey Eps { get; }
+    [Selector("epochs")]
+    public static MLParameterKey Epochs { get; }
+    [Selector("shuffle")]
+    public static MLParameterKey Shuffle { get; }
+    [Selector("seed")]
+    public static MLParameterKey Seed { get; }
+    [Selector("numberOfNeighbors")]
+    public static MLParameterKey NumberOfNeighbors { get; }
 }
 
 /// MLLinkedModelParameters, a category of MLParameterKey.
 public extern objc class MLParameterKey
 {
-    [Selector("linkedModelFileName")] public static MLParameterKey LinkedModelFileName { get; }
-    [Selector("linkedModelSearchPath")] public static MLParameterKey LinkedModelSearchPath { get; }
+    [Selector("linkedModelFileName")]
+    public static MLParameterKey LinkedModelFileName { get; }
+    [Selector("linkedModelSearchPath")]
+    public static MLParameterKey LinkedModelSearchPath { get; }
 }
 
 /// MLNeuralNetworkParameters, a category of MLParameterKey.
 public extern objc class MLParameterKey
 {
-    [Selector("weights")] public static MLParameterKey Weights { get; }
-    [Selector("biases")] public static MLParameterKey Biases { get; }
+    [Selector("weights")]
+    public static MLParameterKey Weights { get; }
+    [Selector("biases")]
+    public static MLParameterKey Biases { get; }
 }
 
 /// MLScopedParameters, a category of MLParameterKey.
 public extern objc class MLParameterKey
 {
-    [Selector("scopedTo:")] public MLParameterKey ScopedTo(NSString scope);
+    [Selector("scopedTo:")]
+    public MLParameterKey ScopedTo(NSString scope);
 }
 
 #endif

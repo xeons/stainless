@@ -45,14 +45,22 @@ public using CHHapticAudioResourceID = NSUInteger;
 
 public extern objc class CHHapticEvent : NSObject
 {
-    [Selector("type")] public CHHapticEventType Type { get; }
-    [Selector("eventParameters")] public NSArray EventParameters { get; }
-    [Selector("relativeTime", "setRelativeTime:")] public NSTimeInterval RelativeTime { get; set; }
-    [Selector("duration", "setDuration:")] public NSTimeInterval Duration { get; set; }
-    [Selector("initWithEventType:parameters:relativeTime:")] public Self InitWithEventTypeParametersRelativeTime(CHHapticEventType type, NSArray eventParams, NSTimeInterval time);
-    [Selector("initWithEventType:parameters:relativeTime:duration:")] public Self InitWithEventTypeParametersRelativeTimeDuration(CHHapticEventType type, NSArray eventParams, NSTimeInterval time, NSTimeInterval duration);
-    [Selector("initWithAudioResourceID:parameters:relativeTime:")] public Self InitWithAudioResourceIDParametersRelativeTime(CHHapticAudioResourceID resID, NSArray eventParams, NSTimeInterval time);
-    [Selector("initWithAudioResourceID:parameters:relativeTime:duration:")] public Self InitWithAudioResourceIDParametersRelativeTimeDuration(CHHapticAudioResourceID resID, NSArray eventParams, NSTimeInterval time, NSTimeInterval duration);
+    [Selector("type")]
+    public CHHapticEventType Type { get; }
+    [Selector("eventParameters")]
+    public NSArray EventParameters { get; }
+    [Selector("relativeTime", "setRelativeTime:")]
+    public NSTimeInterval RelativeTime { get; set; }
+    [Selector("duration", "setDuration:")]
+    public NSTimeInterval Duration { get; set; }
+    [Selector("initWithEventType:parameters:relativeTime:")]
+    public Self InitWithEventTypeParametersRelativeTime(CHHapticEventType type, NSArray eventParams, NSTimeInterval time);
+    [Selector("initWithEventType:parameters:relativeTime:duration:")]
+    public Self InitWithEventTypeParametersRelativeTimeDuration(CHHapticEventType type, NSArray eventParams, NSTimeInterval time, NSTimeInterval duration);
+    [Selector("initWithAudioResourceID:parameters:relativeTime:")]
+    public Self InitWithAudioResourceIDParametersRelativeTime(CHHapticAudioResourceID resID, NSArray eventParams, NSTimeInterval time);
+    [Selector("initWithAudioResourceID:parameters:relativeTime:duration:")]
+    public Self InitWithAudioResourceIDParametersRelativeTimeDuration(CHHapticAudioResourceID resID, NSArray eventParams, NSTimeInterval time, NSTimeInterval duration);
 }
 
 #endif

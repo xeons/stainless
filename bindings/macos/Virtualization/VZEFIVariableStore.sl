@@ -39,9 +39,12 @@ public enum VZEFIVariableStoreInitializationOptions : ulong
 
 public extern objc class VZEFIVariableStore : NSObject
 {
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL URL);
-    [Selector("initCreatingVariableStoreAtURL:options:error:")] public Self? InitCreatingVariableStoreAtURLOptionsError(NSURL URL, VZEFIVariableStoreInitializationOptions options, out NSError? error);
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL URL);
+    [Selector("initCreatingVariableStoreAtURL:options:error:")]
+    public Self? InitCreatingVariableStoreAtURLOptionsError(NSURL URL, VZEFIVariableStoreInitializationOptions options, out NSError? error);
 }
 
 #endif

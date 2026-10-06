@@ -56,53 +56,79 @@ public enum NSImageInterpolation : ulong
 
 public extern objc class NSGraphicsContext : NSObject
 {
-    [Selector("currentContext", "setCurrentContext:")] public static NSGraphicsContext? CurrentContext { get; set; }
-    [Selector("attributes")] public NSDictionary? Attributes { get; }
-    [Selector("isDrawingToScreen")] public bool DrawingToScreen { get; }
-    [Selector("CGContext")] public CGContextRef? CGContext { get; }
-    [Selector("isFlipped")] public bool Flipped { get; }
-    [Selector("graphicsContextWithAttributes:")] public static NSGraphicsContext? GraphicsContextWithAttributes(NSDictionary attributes);
-    [Selector("graphicsContextWithBitmapImageRep:")] public static NSGraphicsContext? GraphicsContextWithBitmapImageRep(NSBitmapImageRep bitmapRep);
-    [Selector("graphicsContextWithCGContext:flipped:")] public static NSGraphicsContext GraphicsContextWithCGContextFlipped(CGContextRef graphicsPort, bool initialFlippedState);
-    [Selector("currentContextDrawingToScreen")] public static bool CurrentContextDrawingToScreen();
-    [Selector("saveGraphicsState")] public static void SaveGraphicsState();
-    [Selector("restoreGraphicsState")] public static void RestoreGraphicsState();
-    [Selector("saveGraphicsState")] public void SaveGraphicsStateMethod();
-    [Selector("restoreGraphicsState")] public void RestoreGraphicsStateMethod();
-    [Selector("flushGraphics")] public void FlushGraphics();
+    [Selector("currentContext", "setCurrentContext:")]
+    public static NSGraphicsContext? CurrentContext { get; set; }
+    [Selector("attributes")]
+    public NSDictionary? Attributes { get; }
+    [Selector("isDrawingToScreen")]
+    public bool DrawingToScreen { get; }
+    [Selector("CGContext")]
+    public CGContextRef? CGContext { get; }
+    [Selector("isFlipped")]
+    public bool Flipped { get; }
+    [Selector("graphicsContextWithAttributes:")]
+    public static NSGraphicsContext? GraphicsContextWithAttributes(NSDictionary attributes);
+    [Selector("graphicsContextWithBitmapImageRep:")]
+    public static NSGraphicsContext? GraphicsContextWithBitmapImageRep(NSBitmapImageRep bitmapRep);
+    [Selector("graphicsContextWithCGContext:flipped:")]
+    public static NSGraphicsContext GraphicsContextWithCGContextFlipped(CGContextRef graphicsPort, bool initialFlippedState);
+    [Selector("currentContextDrawingToScreen")]
+    public static bool CurrentContextDrawingToScreen();
+    [Selector("saveGraphicsState")]
+    public static void SaveGraphicsState();
+    [Selector("restoreGraphicsState")]
+    public static void RestoreGraphicsState();
+    [Selector("saveGraphicsState")]
+    public void SaveGraphicsStateMethod();
+    [Selector("restoreGraphicsState")]
+    public void RestoreGraphicsStateMethod();
+    [Selector("flushGraphics")]
+    public void FlushGraphics();
 }
 
 /// NSGraphicsContext_RenderingOptions, a category of NSGraphicsContext.
 public extern objc class NSGraphicsContext
 {
-    [Selector("shouldAntialias", "setShouldAntialias:")] public bool ShouldAntialias { get; set; }
-    [Selector("imageInterpolation", "setImageInterpolation:")] public NSImageInterpolation ImageInterpolation { get; set; }
-    [Selector("patternPhase", "setPatternPhase:")] public NSPoint PatternPhase { get; set; }
-    [Selector("compositingOperation", "setCompositingOperation:")] public NSCompositingOperation CompositingOperation { get; set; }
-    [Selector("colorRenderingIntent", "setColorRenderingIntent:")] public NSColorRenderingIntent ColorRenderingIntent { get; set; }
+    [Selector("shouldAntialias", "setShouldAntialias:")]
+    public bool ShouldAntialias { get; set; }
+    [Selector("imageInterpolation", "setImageInterpolation:")]
+    public NSImageInterpolation ImageInterpolation { get; set; }
+    [Selector("patternPhase", "setPatternPhase:")]
+    public NSPoint PatternPhase { get; set; }
+    [Selector("compositingOperation", "setCompositingOperation:")]
+    public NSCompositingOperation CompositingOperation { get; set; }
+    [Selector("colorRenderingIntent", "setColorRenderingIntent:")]
+    public NSColorRenderingIntent ColorRenderingIntent { get; set; }
 }
 
 /// NSQuartzCoreAdditions, a category of NSGraphicsContext.
 public extern objc class NSGraphicsContext
 {
-    [Selector("CIContext")] public CIContext? CIContext { get; }
+    [Selector("CIContext")]
+    public CIContext? CIContext { get; }
 }
 
 /// NSGraphicsContextDeprecated, a category of NSGraphicsContext.
 public extern objc class NSGraphicsContext
 {
     /// Deprecated in macOS 10.14.
-    [Selector("graphicsPort")] public void* GraphicsPort { get; }
+    [Selector("graphicsPort")]
+    public void* GraphicsPort { get; }
     /// Deprecated in macOS 10.10.
-    [Selector("setGraphicsState:")] public static void SetGraphicsState(NSInteger gState);
+    [Selector("setGraphicsState:")]
+    public static void SetGraphicsState(NSInteger gState);
     /// Deprecated in macOS 10.6.
-    [Selector("focusStack")] public AnyObject? FocusStack();
+    [Selector("focusStack")]
+    public AnyObject? FocusStack();
     /// Deprecated in macOS 10.6.
-    [Selector("setFocusStack:")] public void SetFocusStack(AnyObject? stack);
+    [Selector("setFocusStack:")]
+    public void SetFocusStack(AnyObject? stack);
     /// Deprecated in macOS 10.14.
-    [Selector("graphicsContextWithGraphicsPort:flipped:")] public static NSGraphicsContext GraphicsContextWithGraphicsPortFlipped(void* graphicsPort, bool initialFlippedState);
+    [Selector("graphicsContextWithGraphicsPort:flipped:")]
+    public static NSGraphicsContext GraphicsContextWithGraphicsPortFlipped(void* graphicsPort, bool initialFlippedState);
     /// Deprecated in macOS 10.14.
-    [Selector("graphicsContextWithWindow:")] public static NSGraphicsContext GraphicsContextWithWindow(NSWindow window);
+    [Selector("graphicsContextWithWindow:")]
+    public static NSGraphicsContext GraphicsContextWithWindow(NSWindow window);
 }
 
 #endif

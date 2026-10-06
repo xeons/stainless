@@ -36,13 +36,20 @@ public objc interface NSAlignmentFeedbackToken : NSObjectProtocol { }
 
 public extern objc class NSAlignmentFeedbackFilter : NSObject
 {
-    [Selector("inputEventMask")] public static NSEventMask InputEventMask { get; }
-    [Selector("updateWithEvent:")] public void UpdateWithEvent(NSEvent event);
-    [Selector("updateWithPanRecognizer:")] public void UpdateWithPanRecognizer(NSPanGestureRecognizer panRecognizer);
-    [Selector("alignmentFeedbackTokenForMovementInView:previousPoint:alignedPoint:defaultPoint:")] public NSAlignmentFeedbackToken? AlignmentFeedbackTokenForMovementInViewPreviousPointAlignedPointDefaultPoint(NSView? view, NSPoint previousPoint, NSPoint alignedPoint, NSPoint defaultPoint);
-    [Selector("alignmentFeedbackTokenForHorizontalMovementInView:previousX:alignedX:defaultX:")] public NSAlignmentFeedbackToken? AlignmentFeedbackTokenForHorizontalMovementInViewPreviousXAlignedXDefaultX(NSView? view, CGFloat previousX, CGFloat alignedX, CGFloat defaultX);
-    [Selector("alignmentFeedbackTokenForVerticalMovementInView:previousY:alignedY:defaultY:")] public NSAlignmentFeedbackToken? AlignmentFeedbackTokenForVerticalMovementInViewPreviousYAlignedYDefaultY(NSView? view, CGFloat previousY, CGFloat alignedY, CGFloat defaultY);
-    [Selector("performFeedback:performanceTime:")] public void PerformFeedbackPerformanceTime(NSArray alignmentFeedbackTokens, NSHapticFeedbackPerformanceTime performanceTime);
+    [Selector("inputEventMask")]
+    public static NSEventMask InputEventMask { get; }
+    [Selector("updateWithEvent:")]
+    public void UpdateWithEvent(NSEvent event);
+    [Selector("updateWithPanRecognizer:")]
+    public void UpdateWithPanRecognizer(NSPanGestureRecognizer panRecognizer);
+    [Selector("alignmentFeedbackTokenForMovementInView:previousPoint:alignedPoint:defaultPoint:")]
+    public NSAlignmentFeedbackToken? AlignmentFeedbackTokenForMovementInViewPreviousPointAlignedPointDefaultPoint(NSView? view, NSPoint previousPoint, NSPoint alignedPoint, NSPoint defaultPoint);
+    [Selector("alignmentFeedbackTokenForHorizontalMovementInView:previousX:alignedX:defaultX:")]
+    public NSAlignmentFeedbackToken? AlignmentFeedbackTokenForHorizontalMovementInViewPreviousXAlignedXDefaultX(NSView? view, CGFloat previousX, CGFloat alignedX, CGFloat defaultX);
+    [Selector("alignmentFeedbackTokenForVerticalMovementInView:previousY:alignedY:defaultY:")]
+    public NSAlignmentFeedbackToken? AlignmentFeedbackTokenForVerticalMovementInViewPreviousYAlignedYDefaultY(NSView? view, CGFloat previousY, CGFloat alignedY, CGFloat defaultY);
+    [Selector("performFeedback:performanceTime:")]
+    public void PerformFeedbackPerformanceTime(NSArray alignmentFeedbackTokens, NSHapticFeedbackPerformanceTime performanceTime);
 }
 
 #endif

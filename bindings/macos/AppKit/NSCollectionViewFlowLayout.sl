@@ -44,35 +44,62 @@ public extern "C" NSCollectionViewSupplementaryElementKind? NSCollectionElementK
 
 public extern objc class NSCollectionViewFlowLayoutInvalidationContext : NSCollectionViewLayoutInvalidationContext
 {
-    [Selector("invalidateFlowLayoutDelegateMetrics", "setInvalidateFlowLayoutDelegateMetrics:")] public bool InvalidateFlowLayoutDelegateMetrics { get; set; }
-    [Selector("invalidateFlowLayoutAttributes", "setInvalidateFlowLayoutAttributes:")] public bool InvalidateFlowLayoutAttributes { get; set; }
+    [Selector("invalidateFlowLayoutDelegateMetrics", "setInvalidateFlowLayoutDelegateMetrics:")]
+    public bool InvalidateFlowLayoutDelegateMetrics { get; set; }
+    [Selector("invalidateFlowLayoutAttributes", "setInvalidateFlowLayoutAttributes:")]
+    public bool InvalidateFlowLayoutAttributes { get; set; }
 }
 
 public objc interface NSCollectionViewDelegateFlowLayout : NSCollectionViewDelegate
 {
-    [Optional] [Selector("collectionView:layout:sizeForItemAtIndexPath:")] NSSize CollectionViewLayoutSizeForItemAtIndexPath(NSCollectionView collectionView, NSCollectionViewLayout collectionViewLayout, NSIndexPath indexPath);
-    [Optional] [Selector("collectionView:layout:insetForSectionAtIndex:")] NSEdgeInsets CollectionViewLayoutInsetForSectionAtIndex(NSCollectionView collectionView, NSCollectionViewLayout collectionViewLayout, NSInteger section);
-    [Optional] [Selector("collectionView:layout:minimumLineSpacingForSectionAtIndex:")] CGFloat CollectionViewLayoutMinimumLineSpacingForSectionAtIndex(NSCollectionView collectionView, NSCollectionViewLayout collectionViewLayout, NSInteger section);
-    [Optional] [Selector("collectionView:layout:minimumInteritemSpacingForSectionAtIndex:")] CGFloat CollectionViewLayoutMinimumInteritemSpacingForSectionAtIndex(NSCollectionView collectionView, NSCollectionViewLayout collectionViewLayout, NSInteger section);
-    [Optional] [Selector("collectionView:layout:referenceSizeForHeaderInSection:")] NSSize CollectionViewLayoutReferenceSizeForHeaderInSection(NSCollectionView collectionView, NSCollectionViewLayout collectionViewLayout, NSInteger section);
-    [Optional] [Selector("collectionView:layout:referenceSizeForFooterInSection:")] NSSize CollectionViewLayoutReferenceSizeForFooterInSection(NSCollectionView collectionView, NSCollectionViewLayout collectionViewLayout, NSInteger section);
+    [Optional]
+    [Selector("collectionView:layout:sizeForItemAtIndexPath:")]
+    NSSize CollectionViewLayoutSizeForItemAtIndexPath(NSCollectionView collectionView, NSCollectionViewLayout collectionViewLayout, NSIndexPath indexPath);
+    [Optional]
+    [Selector("collectionView:layout:insetForSectionAtIndex:")]
+    NSEdgeInsets CollectionViewLayoutInsetForSectionAtIndex(NSCollectionView collectionView, NSCollectionViewLayout collectionViewLayout, NSInteger section);
+    [Optional]
+    [Selector("collectionView:layout:minimumLineSpacingForSectionAtIndex:")]
+    CGFloat CollectionViewLayoutMinimumLineSpacingForSectionAtIndex(NSCollectionView collectionView, NSCollectionViewLayout collectionViewLayout, NSInteger section);
+    [Optional]
+    [Selector("collectionView:layout:minimumInteritemSpacingForSectionAtIndex:")]
+    CGFloat CollectionViewLayoutMinimumInteritemSpacingForSectionAtIndex(NSCollectionView collectionView, NSCollectionViewLayout collectionViewLayout, NSInteger section);
+    [Optional]
+    [Selector("collectionView:layout:referenceSizeForHeaderInSection:")]
+    NSSize CollectionViewLayoutReferenceSizeForHeaderInSection(NSCollectionView collectionView, NSCollectionViewLayout collectionViewLayout, NSInteger section);
+    [Optional]
+    [Selector("collectionView:layout:referenceSizeForFooterInSection:")]
+    NSSize CollectionViewLayoutReferenceSizeForFooterInSection(NSCollectionView collectionView, NSCollectionViewLayout collectionViewLayout, NSInteger section);
 }
 
 public extern objc class NSCollectionViewFlowLayout : NSCollectionViewLayout
 {
-    [Selector("minimumLineSpacing", "setMinimumLineSpacing:")] public CGFloat MinimumLineSpacing { get; set; }
-    [Selector("minimumInteritemSpacing", "setMinimumInteritemSpacing:")] public CGFloat MinimumInteritemSpacing { get; set; }
-    [Selector("itemSize", "setItemSize:")] public NSSize ItemSize { get; set; }
-    [Selector("estimatedItemSize", "setEstimatedItemSize:")] public NSSize EstimatedItemSize { get; set; }
-    [Selector("scrollDirection", "setScrollDirection:")] public NSCollectionViewScrollDirection ScrollDirection { get; set; }
-    [Selector("headerReferenceSize", "setHeaderReferenceSize:")] public NSSize HeaderReferenceSize { get; set; }
-    [Selector("footerReferenceSize", "setFooterReferenceSize:")] public NSSize FooterReferenceSize { get; set; }
-    [Selector("sectionInset", "setSectionInset:")] public NSEdgeInsets SectionInset { get; set; }
-    [Selector("sectionHeadersPinToVisibleBounds", "setSectionHeadersPinToVisibleBounds:")] public bool SectionHeadersPinToVisibleBounds { get; set; }
-    [Selector("sectionFootersPinToVisibleBounds", "setSectionFootersPinToVisibleBounds:")] public bool SectionFootersPinToVisibleBounds { get; set; }
-    [Selector("sectionAtIndexIsCollapsed:")] public bool SectionAtIndexIsCollapsed(NSUInteger sectionIndex);
-    [Selector("collapseSectionAtIndex:")] public void CollapseSectionAtIndex(NSUInteger sectionIndex);
-    [Selector("expandSectionAtIndex:")] public void ExpandSectionAtIndex(NSUInteger sectionIndex);
+    [Selector("minimumLineSpacing", "setMinimumLineSpacing:")]
+    public CGFloat MinimumLineSpacing { get; set; }
+    [Selector("minimumInteritemSpacing", "setMinimumInteritemSpacing:")]
+    public CGFloat MinimumInteritemSpacing { get; set; }
+    [Selector("itemSize", "setItemSize:")]
+    public NSSize ItemSize { get; set; }
+    [Selector("estimatedItemSize", "setEstimatedItemSize:")]
+    public NSSize EstimatedItemSize { get; set; }
+    [Selector("scrollDirection", "setScrollDirection:")]
+    public NSCollectionViewScrollDirection ScrollDirection { get; set; }
+    [Selector("headerReferenceSize", "setHeaderReferenceSize:")]
+    public NSSize HeaderReferenceSize { get; set; }
+    [Selector("footerReferenceSize", "setFooterReferenceSize:")]
+    public NSSize FooterReferenceSize { get; set; }
+    [Selector("sectionInset", "setSectionInset:")]
+    public NSEdgeInsets SectionInset { get; set; }
+    [Selector("sectionHeadersPinToVisibleBounds", "setSectionHeadersPinToVisibleBounds:")]
+    public bool SectionHeadersPinToVisibleBounds { get; set; }
+    [Selector("sectionFootersPinToVisibleBounds", "setSectionFootersPinToVisibleBounds:")]
+    public bool SectionFootersPinToVisibleBounds { get; set; }
+    [Selector("sectionAtIndexIsCollapsed:")]
+    public bool SectionAtIndexIsCollapsed(NSUInteger sectionIndex);
+    [Selector("collapseSectionAtIndex:")]
+    public void CollapseSectionAtIndex(NSUInteger sectionIndex);
+    [Selector("expandSectionAtIndex:")]
+    public void ExpandSectionAtIndex(NSUInteger sectionIndex);
 }
 
 #endif

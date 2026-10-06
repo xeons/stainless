@@ -34,18 +34,30 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCInferenceGraph : MLCGraph
 {
-    [Selector("deviceMemorySize")] public NSUInteger DeviceMemorySize { get; }
-    [Selector("graphWithGraphObjects:")] public static Self GraphWithGraphObjects(NSArray graphObjects);
-    [Selector("addInputs:")] public bool AddInputs(NSDictionary inputs);
-    [Selector("addInputs:lossLabels:lossLabelWeights:")] public bool AddInputsLossLabelsLossLabelWeights(NSDictionary inputs, NSDictionary? lossLabels, NSDictionary? lossLabelWeights);
-    [Selector("addOutputs:")] public bool AddOutputs(NSDictionary outputs);
-    [Selector("compileWithOptions:device:")] public bool CompileWithOptionsDevice(MLCGraphCompilationOptions options, MLCDevice device);
-    [Selector("compileWithOptions:device:inputTensors:inputTensorsData:")] public bool CompileWithOptionsDeviceInputTensorsInputTensorsData(MLCGraphCompilationOptions options, MLCDevice device, NSDictionary? inputTensors, NSDictionary? inputTensorsData);
-    [Selector("linkWithGraphs:")] public bool LinkWithGraphs(NSArray graphs);
-    [Selector("executeWithInputsData:batchSize:options:completionHandler:")] public bool ExecuteWithInputsDataBatchSizeOptionsCompletionHandler(NSDictionary inputsData, NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
-    [Selector("executeWithInputsData:outputsData:batchSize:options:completionHandler:")] public bool ExecuteWithInputsDataOutputsDataBatchSizeOptionsCompletionHandler(NSDictionary inputsData, NSDictionary? outputsData, NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
-    [Selector("executeWithInputsData:lossLabelsData:lossLabelWeightsData:batchSize:options:completionHandler:")] public bool ExecuteWithInputsDataLossLabelsDataLossLabelWeightsDataBatchSizeOptionsCompletionHandler(NSDictionary inputsData, NSDictionary? lossLabelsData, NSDictionary? lossLabelWeightsData, NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
-    [Selector("executeWithInputsData:lossLabelsData:lossLabelWeightsData:outputsData:batchSize:options:completionHandler:")] public bool ExecuteWithInputsDataLossLabelsDataLossLabelWeightsDataOutputsDataBatchSizeOptionsCompletionHandler(NSDictionary inputsData, NSDictionary? lossLabelsData, NSDictionary? lossLabelWeightsData, NSDictionary? outputsData, NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
+    [Selector("deviceMemorySize")]
+    public NSUInteger DeviceMemorySize { get; }
+    [Selector("graphWithGraphObjects:")]
+    public static Self GraphWithGraphObjects(NSArray graphObjects);
+    [Selector("addInputs:")]
+    public bool AddInputs(NSDictionary inputs);
+    [Selector("addInputs:lossLabels:lossLabelWeights:")]
+    public bool AddInputsLossLabelsLossLabelWeights(NSDictionary inputs, NSDictionary? lossLabels, NSDictionary? lossLabelWeights);
+    [Selector("addOutputs:")]
+    public bool AddOutputs(NSDictionary outputs);
+    [Selector("compileWithOptions:device:")]
+    public bool CompileWithOptionsDevice(MLCGraphCompilationOptions options, MLCDevice device);
+    [Selector("compileWithOptions:device:inputTensors:inputTensorsData:")]
+    public bool CompileWithOptionsDeviceInputTensorsInputTensorsData(MLCGraphCompilationOptions options, MLCDevice device, NSDictionary? inputTensors, NSDictionary? inputTensorsData);
+    [Selector("linkWithGraphs:")]
+    public bool LinkWithGraphs(NSArray graphs);
+    [Selector("executeWithInputsData:batchSize:options:completionHandler:")]
+    public bool ExecuteWithInputsDataBatchSizeOptionsCompletionHandler(NSDictionary inputsData, NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
+    [Selector("executeWithInputsData:outputsData:batchSize:options:completionHandler:")]
+    public bool ExecuteWithInputsDataOutputsDataBatchSizeOptionsCompletionHandler(NSDictionary inputsData, NSDictionary? outputsData, NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
+    [Selector("executeWithInputsData:lossLabelsData:lossLabelWeightsData:batchSize:options:completionHandler:")]
+    public bool ExecuteWithInputsDataLossLabelsDataLossLabelWeightsDataBatchSizeOptionsCompletionHandler(NSDictionary inputsData, NSDictionary? lossLabelsData, NSDictionary? lossLabelWeightsData, NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
+    [Selector("executeWithInputsData:lossLabelsData:lossLabelWeightsData:outputsData:batchSize:options:completionHandler:")]
+    public bool ExecuteWithInputsDataLossLabelsDataLossLabelWeightsDataOutputsDataBatchSizeOptionsCompletionHandler(NSDictionary inputsData, NSDictionary? lossLabelsData, NSDictionary? lossLabelWeightsData, NSDictionary? outputsData, NSUInteger batchSize, MLCExecutionOptions options, MLCGraphCompletionHandler? completionHandler);
 }
 
 #endif

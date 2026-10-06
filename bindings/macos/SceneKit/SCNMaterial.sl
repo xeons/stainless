@@ -80,38 +80,70 @@ public enum SCNBlendMode : long
 
 public extern objc class SCNMaterial : NSObject, SCNAnimatable, SCNShadable, NSCopying, NSSecureCoding
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("diffuse")] public SCNMaterialProperty Diffuse { get; }
-    [Selector("ambient")] public SCNMaterialProperty Ambient { get; }
-    [Selector("specular")] public SCNMaterialProperty Specular { get; }
-    [Selector("emission")] public SCNMaterialProperty Emission { get; }
-    [Selector("transparent")] public SCNMaterialProperty Transparent { get; }
-    [Selector("reflective")] public SCNMaterialProperty Reflective { get; }
-    [Selector("multiply")] public SCNMaterialProperty Multiply { get; }
-    [Selector("normal")] public SCNMaterialProperty Normal { get; }
-    [Selector("displacement")] public SCNMaterialProperty Displacement { get; }
-    [Selector("ambientOcclusion")] public SCNMaterialProperty AmbientOcclusion { get; }
-    [Selector("selfIllumination")] public SCNMaterialProperty SelfIllumination { get; }
-    [Selector("metalness")] public SCNMaterialProperty Metalness { get; }
-    [Selector("roughness")] public SCNMaterialProperty Roughness { get; }
-    [Selector("clearCoat")] public SCNMaterialProperty ClearCoat { get; }
-    [Selector("clearCoatRoughness")] public SCNMaterialProperty ClearCoatRoughness { get; }
-    [Selector("clearCoatNormal")] public SCNMaterialProperty ClearCoatNormal { get; }
-    [Selector("shininess", "setShininess:")] public CGFloat Shininess { get; set; }
-    [Selector("transparency", "setTransparency:")] public CGFloat Transparency { get; set; }
-    [Selector("lightingModelName", "setLightingModelName:")] public SCNLightingModel LightingModelName { get; set; }
-    [Selector("isLitPerPixel", "setLitPerPixel:")] public bool LitPerPixel { get; set; }
-    [Selector("isDoubleSided", "setDoubleSided:")] public bool DoubleSided { get; set; }
-    [Selector("fillMode", "setFillMode:")] public SCNFillMode FillMode { get; set; }
-    [Selector("cullMode", "setCullMode:")] public SCNCullMode CullMode { get; set; }
-    [Selector("transparencyMode", "setTransparencyMode:")] public SCNTransparencyMode TransparencyMode { get; set; }
-    [Selector("locksAmbientWithDiffuse", "setLocksAmbientWithDiffuse:")] public bool LocksAmbientWithDiffuse { get; set; }
-    [Selector("writesToDepthBuffer", "setWritesToDepthBuffer:")] public bool WritesToDepthBuffer { get; set; }
-    [Selector("colorBufferWriteMask", "setColorBufferWriteMask:")] public SCNColorMask ColorBufferWriteMask { get; set; }
-    [Selector("readsFromDepthBuffer", "setReadsFromDepthBuffer:")] public bool ReadsFromDepthBuffer { get; set; }
-    [Selector("fresnelExponent", "setFresnelExponent:")] public CGFloat FresnelExponent { get; set; }
-    [Selector("blendMode", "setBlendMode:")] public SCNBlendMode BlendMode { get; set; }
-    [Selector("material")] public static Self Material();
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("diffuse")]
+    public SCNMaterialProperty Diffuse { get; }
+    [Selector("ambient")]
+    public SCNMaterialProperty Ambient { get; }
+    [Selector("specular")]
+    public SCNMaterialProperty Specular { get; }
+    [Selector("emission")]
+    public SCNMaterialProperty Emission { get; }
+    [Selector("transparent")]
+    public SCNMaterialProperty Transparent { get; }
+    [Selector("reflective")]
+    public SCNMaterialProperty Reflective { get; }
+    [Selector("multiply")]
+    public SCNMaterialProperty Multiply { get; }
+    [Selector("normal")]
+    public SCNMaterialProperty Normal { get; }
+    [Selector("displacement")]
+    public SCNMaterialProperty Displacement { get; }
+    [Selector("ambientOcclusion")]
+    public SCNMaterialProperty AmbientOcclusion { get; }
+    [Selector("selfIllumination")]
+    public SCNMaterialProperty SelfIllumination { get; }
+    [Selector("metalness")]
+    public SCNMaterialProperty Metalness { get; }
+    [Selector("roughness")]
+    public SCNMaterialProperty Roughness { get; }
+    [Selector("clearCoat")]
+    public SCNMaterialProperty ClearCoat { get; }
+    [Selector("clearCoatRoughness")]
+    public SCNMaterialProperty ClearCoatRoughness { get; }
+    [Selector("clearCoatNormal")]
+    public SCNMaterialProperty ClearCoatNormal { get; }
+    [Selector("shininess", "setShininess:")]
+    public CGFloat Shininess { get; set; }
+    [Selector("transparency", "setTransparency:")]
+    public CGFloat Transparency { get; set; }
+    [Selector("lightingModelName", "setLightingModelName:")]
+    public SCNLightingModel LightingModelName { get; set; }
+    [Selector("isLitPerPixel", "setLitPerPixel:")]
+    public bool LitPerPixel { get; set; }
+    [Selector("isDoubleSided", "setDoubleSided:")]
+    public bool DoubleSided { get; set; }
+    [Selector("fillMode", "setFillMode:")]
+    public SCNFillMode FillMode { get; set; }
+    [Selector("cullMode", "setCullMode:")]
+    public SCNCullMode CullMode { get; set; }
+    [Selector("transparencyMode", "setTransparencyMode:")]
+    public SCNTransparencyMode TransparencyMode { get; set; }
+    [Selector("locksAmbientWithDiffuse", "setLocksAmbientWithDiffuse:")]
+    public bool LocksAmbientWithDiffuse { get; set; }
+    [Selector("writesToDepthBuffer", "setWritesToDepthBuffer:")]
+    public bool WritesToDepthBuffer { get; set; }
+    [Selector("colorBufferWriteMask", "setColorBufferWriteMask:")]
+    public SCNColorMask ColorBufferWriteMask { get; set; }
+    [Selector("readsFromDepthBuffer", "setReadsFromDepthBuffer:")]
+    public bool ReadsFromDepthBuffer { get; set; }
+    [Selector("fresnelExponent", "setFresnelExponent:")]
+    public CGFloat FresnelExponent { get; set; }
+    [Selector("blendMode", "setBlendMode:")]
+    public SCNBlendMode BlendMode { get; set; }
+    [Selector("material")]
+    public static Self Material();
 }
 
 public const long SCNCullBack = 0;

@@ -59,22 +59,34 @@ public enum MTLPatchType : ulong
 
 public extern objc class MTLVertexAttribute : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("attributeIndex")] public NSUInteger AttributeIndex { get; }
-    [Selector("attributeType")] public MTLDataType AttributeType { get; }
-    [Selector("isActive")] public bool Active { get; }
-    [Selector("isPatchData")] public bool PatchData { get; }
-    [Selector("isPatchControlPointData")] public bool PatchControlPointData { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("attributeIndex")]
+    public NSUInteger AttributeIndex { get; }
+    [Selector("attributeType")]
+    public MTLDataType AttributeType { get; }
+    [Selector("isActive")]
+    public bool Active { get; }
+    [Selector("isPatchData")]
+    public bool PatchData { get; }
+    [Selector("isPatchControlPointData")]
+    public bool PatchControlPointData { get; }
 }
 
 public extern objc class MTLAttribute : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("attributeIndex")] public NSUInteger AttributeIndex { get; }
-    [Selector("attributeType")] public MTLDataType AttributeType { get; }
-    [Selector("isActive")] public bool Active { get; }
-    [Selector("isPatchData")] public bool PatchData { get; }
-    [Selector("isPatchControlPointData")] public bool PatchControlPointData { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("attributeIndex")]
+    public NSUInteger AttributeIndex { get; }
+    [Selector("attributeType")]
+    public MTLDataType AttributeType { get; }
+    [Selector("isActive")]
+    public bool Active { get; }
+    [Selector("isPatchData")]
+    public bool PatchData { get; }
+    [Selector("isPatchControlPointData")]
+    public bool PatchControlPointData { get; }
 }
 
 public enum MTLFunctionType : ulong
@@ -90,27 +102,43 @@ public enum MTLFunctionType : ulong
 
 public extern objc class MTLFunctionConstant : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("type")] public MTLDataType Type { get; }
-    [Selector("index")] public NSUInteger Index { get; }
-    [Selector("required")] public bool Required { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("type")]
+    public MTLDataType Type { get; }
+    [Selector("index")]
+    public NSUInteger Index { get; }
+    [Selector("required")]
+    public bool Required { get; }
 }
 
 public objc interface MTLFunction : NSObjectProtocol
 {
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("functionType")] MTLFunctionType FunctionType { get; }
-    [Selector("patchType")] MTLPatchType PatchType { get; }
-    [Selector("patchControlPointCount")] NSInteger PatchControlPointCount { get; }
-    [Selector("vertexAttributes")] NSArray? VertexAttributes { get; }
-    [Selector("stageInputAttributes")] NSArray? StageInputAttributes { get; }
-    [Selector("name")] NSString Name { get; }
-    [Selector("functionConstantsDictionary")] NSDictionary FunctionConstantsDictionary { get; }
-    [Selector("options")] MTLFunctionOptions Options { get; }
-    [Selector("newArgumentEncoderWithBufferIndex:")] MTLArgumentEncoder NewArgumentEncoderWithBufferIndex(NSUInteger bufferIndex);
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("functionType")]
+    MTLFunctionType FunctionType { get; }
+    [Selector("patchType")]
+    MTLPatchType PatchType { get; }
+    [Selector("patchControlPointCount")]
+    NSInteger PatchControlPointCount { get; }
+    [Selector("vertexAttributes")]
+    NSArray? VertexAttributes { get; }
+    [Selector("stageInputAttributes")]
+    NSArray? StageInputAttributes { get; }
+    [Selector("name")]
+    NSString Name { get; }
+    [Selector("functionConstantsDictionary")]
+    NSDictionary FunctionConstantsDictionary { get; }
+    [Selector("options")]
+    MTLFunctionOptions Options { get; }
+    [Selector("newArgumentEncoderWithBufferIndex:")]
+    MTLArgumentEncoder NewArgumentEncoderWithBufferIndex(NSUInteger bufferIndex);
     /// Deprecated in macOS 13.0.
-    [Selector("newArgumentEncoderWithBufferIndex:reflection:")] MTLArgumentEncoder NewArgumentEncoderWithBufferIndexReflection(NSUInteger bufferIndex, void** reflection);
+    [Selector("newArgumentEncoderWithBufferIndex:reflection:")]
+    MTLArgumentEncoder NewArgumentEncoderWithBufferIndexReflection(NSUInteger bufferIndex, void** reflection);
 }
 
 public enum MTLLanguageVersion : ulong
@@ -161,31 +189,48 @@ public enum MTLMathFloatingPointFunctions : long
 
 public extern objc class MTLCompileOptions : NSObject, NSCopying
 {
-    [Selector("preprocessorMacros", "setPreprocessorMacros:")] public NSDictionary? PreprocessorMacros { get; set; }
+    [Selector("preprocessorMacros", "setPreprocessorMacros:")]
+    public NSDictionary? PreprocessorMacros { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("fastMathEnabled", "setFastMathEnabled:")] public bool FastMathEnabled { get; set; }
-    [Selector("mathMode", "setMathMode:")] public MTLMathMode MathMode { get; set; }
-    [Selector("mathFloatingPointFunctions", "setMathFloatingPointFunctions:")] public MTLMathFloatingPointFunctions MathFloatingPointFunctions { get; set; }
-    [Selector("languageVersion", "setLanguageVersion:")] public MTLLanguageVersion LanguageVersion { get; set; }
-    [Selector("libraryType", "setLibraryType:")] public MTLLibraryType LibraryType { get; set; }
-    [Selector("installName", "setInstallName:")] public NSString? InstallName { get; set; }
-    [Selector("libraries", "setLibraries:")] public NSArray? Libraries { get; set; }
-    [Selector("preserveInvariance", "setPreserveInvariance:")] public bool PreserveInvariance { get; set; }
-    [Selector("optimizationLevel", "setOptimizationLevel:")] public MTLLibraryOptimizationLevel OptimizationLevel { get; set; }
-    [Selector("compileSymbolVisibility", "setCompileSymbolVisibility:")] public MTLCompileSymbolVisibility CompileSymbolVisibility { get; set; }
-    [Selector("allowReferencingUndefinedSymbols", "setAllowReferencingUndefinedSymbols:")] public bool AllowReferencingUndefinedSymbols { get; set; }
-    [Selector("maxTotalThreadsPerThreadgroup", "setMaxTotalThreadsPerThreadgroup:")] public NSUInteger MaxTotalThreadsPerThreadgroup { get; set; }
+    [Selector("fastMathEnabled", "setFastMathEnabled:")]
+    public bool FastMathEnabled { get; set; }
+    [Selector("mathMode", "setMathMode:")]
+    public MTLMathMode MathMode { get; set; }
+    [Selector("mathFloatingPointFunctions", "setMathFloatingPointFunctions:")]
+    public MTLMathFloatingPointFunctions MathFloatingPointFunctions { get; set; }
+    [Selector("languageVersion", "setLanguageVersion:")]
+    public MTLLanguageVersion LanguageVersion { get; set; }
+    [Selector("libraryType", "setLibraryType:")]
+    public MTLLibraryType LibraryType { get; set; }
+    [Selector("installName", "setInstallName:")]
+    public NSString? InstallName { get; set; }
+    [Selector("libraries", "setLibraries:")]
+    public NSArray? Libraries { get; set; }
+    [Selector("preserveInvariance", "setPreserveInvariance:")]
+    public bool PreserveInvariance { get; set; }
+    [Selector("optimizationLevel", "setOptimizationLevel:")]
+    public MTLLibraryOptimizationLevel OptimizationLevel { get; set; }
+    [Selector("compileSymbolVisibility", "setCompileSymbolVisibility:")]
+    public MTLCompileSymbolVisibility CompileSymbolVisibility { get; set; }
+    [Selector("allowReferencingUndefinedSymbols", "setAllowReferencingUndefinedSymbols:")]
+    public bool AllowReferencingUndefinedSymbols { get; set; }
+    [Selector("maxTotalThreadsPerThreadgroup", "setMaxTotalThreadsPerThreadgroup:")]
+    public NSUInteger MaxTotalThreadsPerThreadgroup { get; set; }
     /// macOS 26.0 and later.
-    [Selector("requiredThreadsPerThreadgroup", "setRequiredThreadsPerThreadgroup:")] public MTLSize RequiredThreadsPerThreadgroup { get; set; }
-    [Selector("enableLogging", "setEnableLogging:")] public bool EnableLogging { get; set; }
+    [Selector("requiredThreadsPerThreadgroup", "setRequiredThreadsPerThreadgroup:")]
+    public MTLSize RequiredThreadsPerThreadgroup { get; set; }
+    [Selector("enableLogging", "setEnableLogging:")]
+    public bool EnableLogging { get; set; }
 }
 
 /// macOS 26.0 and later.
 public extern objc class MTLFunctionReflection : NSObject
 {
-    [Selector("bindings")] public NSArray Bindings { get; }
+    [Selector("bindings")]
+    public NSArray Bindings { get; }
     /// macOS 26.0 and later.
-    [Selector("userAnnotation")] public NSString? UserAnnotation { get; }
+    [Selector("userAnnotation")]
+    public NSString? UserAnnotation { get; }
 }
 
 public extern "C" NSErrorDomain MTLLibraryErrorDomain;
@@ -208,20 +253,33 @@ public objc closure void MTLLibraryNewIntersectionFunctionWithDescriptorCompleti
 
 public objc interface MTLLibrary : NSObjectProtocol
 {
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("functionNames")] NSArray FunctionNames { get; }
-    [Selector("type")] MTLLibraryType Type { get; }
-    [Selector("installName")] NSString? InstallName { get; }
-    [Selector("newFunctionWithName:")] MTLFunction? NewFunctionWithName(NSString functionName);
-    [Selector("newFunctionWithName:constantValues:error:")] MTLFunction? NewFunctionWithNameConstantValuesError(NSString name, MTLFunctionConstantValues constantValues, out NSError? error);
-    [Selector("newFunctionWithName:constantValues:completionHandler:")] void NewFunctionWithNameConstantValuesCompletionHandler(NSString name, MTLFunctionConstantValues constantValues, MTLLibraryNewFunctionWithNameConstantValuesCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("functionNames")]
+    NSArray FunctionNames { get; }
+    [Selector("type")]
+    MTLLibraryType Type { get; }
+    [Selector("installName")]
+    NSString? InstallName { get; }
+    [Selector("newFunctionWithName:")]
+    MTLFunction? NewFunctionWithName(NSString functionName);
+    [Selector("newFunctionWithName:constantValues:error:")]
+    MTLFunction? NewFunctionWithNameConstantValuesError(NSString name, MTLFunctionConstantValues constantValues, out NSError? error);
+    [Selector("newFunctionWithName:constantValues:completionHandler:")]
+    void NewFunctionWithNameConstantValuesCompletionHandler(NSString name, MTLFunctionConstantValues constantValues, MTLLibraryNewFunctionWithNameConstantValuesCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 26.0 and later.
-    [Selector("reflectionForFunctionWithName:")] MTLFunctionReflection? ReflectionForFunctionWithName(NSString functionName);
-    [Selector("newFunctionWithDescriptor:completionHandler:")] void NewFunctionWithDescriptorCompletionHandler(MTLFunctionDescriptor descriptor, MTLLibraryNewFunctionWithDescriptorCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("newFunctionWithDescriptor:error:")] MTLFunction? NewFunctionWithDescriptorError(MTLFunctionDescriptor descriptor, out NSError? error);
-    [Selector("newIntersectionFunctionWithDescriptor:completionHandler:")] void NewIntersectionFunctionWithDescriptorCompletionHandler(MTLIntersectionFunctionDescriptor descriptor, MTLLibraryNewIntersectionFunctionWithDescriptorCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("newIntersectionFunctionWithDescriptor:error:")] MTLFunction? NewIntersectionFunctionWithDescriptorError(MTLIntersectionFunctionDescriptor descriptor, out NSError? error);
+    [Selector("reflectionForFunctionWithName:")]
+    MTLFunctionReflection? ReflectionForFunctionWithName(NSString functionName);
+    [Selector("newFunctionWithDescriptor:completionHandler:")]
+    void NewFunctionWithDescriptorCompletionHandler(MTLFunctionDescriptor descriptor, MTLLibraryNewFunctionWithDescriptorCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("newFunctionWithDescriptor:error:")]
+    MTLFunction? NewFunctionWithDescriptorError(MTLFunctionDescriptor descriptor, out NSError? error);
+    [Selector("newIntersectionFunctionWithDescriptor:completionHandler:")]
+    void NewIntersectionFunctionWithDescriptorCompletionHandler(MTLIntersectionFunctionDescriptor descriptor, MTLLibraryNewIntersectionFunctionWithDescriptorCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("newIntersectionFunctionWithDescriptor:error:")]
+    MTLFunction? NewIntersectionFunctionWithDescriptorError(MTLIntersectionFunctionDescriptor descriptor, out NSError? error);
 }
 
 #endif

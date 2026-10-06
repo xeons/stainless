@@ -111,9 +111,11 @@ public struct OpaqueFCFontDescriptorRef;
 
 public using FCFontDescriptorRef = OpaqueFCFontDescriptorRef*;
 
-[ReturnsRetained] public extern "C" CFArrayRef? FCCopyCollectionNames();
+[ReturnsRetained]
+public extern "C" CFArrayRef? FCCopyCollectionNames();
 
-[ReturnsRetained] public extern "C" CFArrayRef? FCCopyFontDescriptorsInCollection(CFStringRef? iCollection);
+[ReturnsRetained]
+public extern "C" CFArrayRef? FCCopyFontDescriptorsInCollection(CFStringRef? iCollection);
 
 public extern "C" OSStatus FCAddCollection(CFStringRef? iCollection, OptionBits iCollectionOptions);
 

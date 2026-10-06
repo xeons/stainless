@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class SFChooseIdentityTableCellView : NSTableCellView
 {
-    [Selector("issuerTextField", "setIssuerTextField:")] public NSTextField? IssuerTextField { get; set; }
+    [Selector("issuerTextField", "setIssuerTextField:")]
+    public NSTextField? IssuerTextField { get; set; }
 }
 
 #endif

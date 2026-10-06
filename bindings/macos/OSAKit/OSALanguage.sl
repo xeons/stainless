@@ -47,22 +47,38 @@ public enum OSALanguageFeatures : ulong
 
 public extern objc class OSALanguage : NSObject
 {
-    [Selector("componentInstance")] public ComponentInstance ComponentInstance { get; }
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("info")] public NSString? Info { get; }
-    [Selector("version")] public NSString? Version { get; }
-    [Selector("type")] public OSType Type { get; }
-    [Selector("subType")] public OSType SubType { get; }
-    [Selector("manufacturer")] public OSType Manufacturer { get; }
-    [Selector("features")] public OSALanguageFeatures Features { get; }
-    [Selector("isThreadSafe")] public bool ThreadSafe { get; }
-    [Selector("availableLanguages")] public static NSArray AvailableLanguages();
-    [Selector("languageForName:")] public static OSALanguage? LanguageForName(NSString name);
-    [Selector("languageForScriptDataDescriptor:")] public static OSALanguage? LanguageForScriptDataDescriptor(NSAppleEventDescriptor descriptor);
-    [Selector("defaultLanguage")] public static OSALanguage? DefaultLanguage();
-    [Selector("setDefaultLanguage:")] public static void SetDefaultLanguage(OSALanguage defaultLanguage);
-    [Selector("initWithComponent:")] public Self InitWithComponent(Component component);
-    [Selector("sharedLanguageInstance")] public OSALanguageInstance SharedLanguageInstance();
+    [Selector("componentInstance")]
+    public ComponentInstance ComponentInstance { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("info")]
+    public NSString? Info { get; }
+    [Selector("version")]
+    public NSString? Version { get; }
+    [Selector("type")]
+    public OSType Type { get; }
+    [Selector("subType")]
+    public OSType SubType { get; }
+    [Selector("manufacturer")]
+    public OSType Manufacturer { get; }
+    [Selector("features")]
+    public OSALanguageFeatures Features { get; }
+    [Selector("isThreadSafe")]
+    public bool ThreadSafe { get; }
+    [Selector("availableLanguages")]
+    public static NSArray AvailableLanguages();
+    [Selector("languageForName:")]
+    public static OSALanguage? LanguageForName(NSString name);
+    [Selector("languageForScriptDataDescriptor:")]
+    public static OSALanguage? LanguageForScriptDataDescriptor(NSAppleEventDescriptor descriptor);
+    [Selector("defaultLanguage")]
+    public static OSALanguage? DefaultLanguage();
+    [Selector("setDefaultLanguage:")]
+    public static void SetDefaultLanguage(OSALanguage defaultLanguage);
+    [Selector("initWithComponent:")]
+    public Self InitWithComponent(Component component);
+    [Selector("sharedLanguageInstance")]
+    public OSALanguageInstance SharedLanguageInstance();
 }
 
 #endif

@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMCSSPageRule : DOMCSSRule
 {
-    [Selector("selectorText", "setSelectorText:")] public NSString? SelectorText { get; set; }
-    [Selector("style")] public DOMCSSStyleDeclaration? Style { get; }
+    [Selector("selectorText", "setSelectorText:")]
+    public NSString? SelectorText { get; set; }
+    [Selector("style")]
+    public DOMCSSStyleDeclaration? Style { get; }
 }
 
 #endif

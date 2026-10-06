@@ -81,105 +81,194 @@ public extern "C" NSNotificationName? PDFViewVisiblePagesChangedNotification;
 
 public extern objc class PDFView : NSView, NSAnimationDelegate, NSMenuDelegate
 {
-    [Selector("document", "setDocument:")] public PDFDocument? Document { get; set; }
-    [Selector("canGoToFirstPage")] public bool CanGoToFirstPage { get; }
-    [Selector("canGoToLastPage")] public bool CanGoToLastPage { get; }
-    [Selector("canGoToNextPage")] public bool CanGoToNextPage { get; }
-    [Selector("canGoToPreviousPage")] public bool CanGoToPreviousPage { get; }
-    [Selector("canGoBack")] public bool CanGoBack { get; }
-    [Selector("canGoForward")] public bool CanGoForward { get; }
-    [Selector("currentPage")] public PDFPage? CurrentPage { get; }
-    [Selector("currentDestination")] public PDFDestination? CurrentDestination { get; }
-    [Selector("displayMode", "setDisplayMode:")] public PDFDisplayMode DisplayMode { get; set; }
-    [Selector("displayDirection", "setDisplayDirection:")] public PDFDisplayDirection DisplayDirection { get; set; }
-    [Selector("displaysPageBreaks", "setDisplaysPageBreaks:")] public bool DisplaysPageBreaks { get; set; }
-    [Selector("pageBreakMargins", "setPageBreakMargins:")] public NSEdgeInsets PageBreakMargins { get; set; }
-    [Selector("displayBox", "setDisplayBox:")] public PDFDisplayBox DisplayBox { get; set; }
-    [Selector("displaysAsBook", "setDisplaysAsBook:")] public bool DisplaysAsBook { get; set; }
-    [Selector("displaysRTL", "setDisplaysRTL:")] public bool DisplaysRTL { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor BackgroundColor { get; set; }
-    [Selector("interpolationQuality", "setInterpolationQuality:")] public PDFInterpolationQuality InterpolationQuality { get; set; }
-    [Selector("pageShadowsEnabled", "enablePageShadows:")] public bool PageShadowsEnabled { get; set; }
-    [Selector("delegate", "setDelegate:")] public PDFViewDelegate? Delegate { get; set; }
-    [Selector("pageOverlayViewProvider", "setPageOverlayViewProvider:")] public PDFPageOverlayViewProvider? PageOverlayViewProvider { get; set; }
-    [Selector("scaleFactor", "setScaleFactor:")] public CGFloat ScaleFactor { get; set; }
-    [Selector("minScaleFactor", "setMinScaleFactor:")] public CGFloat MinScaleFactor { get; set; }
-    [Selector("maxScaleFactor", "setMaxScaleFactor:")] public CGFloat MaxScaleFactor { get; set; }
-    [Selector("autoScales", "setAutoScales:")] public bool AutoScales { get; set; }
-    [Selector("scaleFactorForSizeToFit")] public CGFloat ScaleFactorForSizeToFit { get; }
-    [Selector("canZoomIn")] public bool CanZoomIn { get; }
-    [Selector("canZoomOut")] public bool CanZoomOut { get; }
-    [Selector("currentSelection", "setCurrentSelection:")] public PDFSelection? CurrentSelection { get; set; }
-    [Selector("highlightedSelections", "setHighlightedSelections:")] public NSArray? HighlightedSelections { get; set; }
-    [Selector("documentView")] public NSView? DocumentView { get; }
-    [Selector("acceptsDraggedFiles", "setAcceptsDraggedFiles:")] public bool AcceptsDraggedFiles { get; set; }
-    [Selector("visiblePages")] public NSArray? VisiblePages { get; }
+    [Selector("document", "setDocument:")]
+    public PDFDocument? Document { get; set; }
+    [Selector("canGoToFirstPage")]
+    public bool CanGoToFirstPage { get; }
+    [Selector("canGoToLastPage")]
+    public bool CanGoToLastPage { get; }
+    [Selector("canGoToNextPage")]
+    public bool CanGoToNextPage { get; }
+    [Selector("canGoToPreviousPage")]
+    public bool CanGoToPreviousPage { get; }
+    [Selector("canGoBack")]
+    public bool CanGoBack { get; }
+    [Selector("canGoForward")]
+    public bool CanGoForward { get; }
+    [Selector("currentPage")]
+    public PDFPage? CurrentPage { get; }
+    [Selector("currentDestination")]
+    public PDFDestination? CurrentDestination { get; }
+    [Selector("displayMode", "setDisplayMode:")]
+    public PDFDisplayMode DisplayMode { get; set; }
+    [Selector("displayDirection", "setDisplayDirection:")]
+    public PDFDisplayDirection DisplayDirection { get; set; }
+    [Selector("displaysPageBreaks", "setDisplaysPageBreaks:")]
+    public bool DisplaysPageBreaks { get; set; }
+    [Selector("pageBreakMargins", "setPageBreakMargins:")]
+    public NSEdgeInsets PageBreakMargins { get; set; }
+    [Selector("displayBox", "setDisplayBox:")]
+    public PDFDisplayBox DisplayBox { get; set; }
+    [Selector("displaysAsBook", "setDisplaysAsBook:")]
+    public bool DisplaysAsBook { get; set; }
+    [Selector("displaysRTL", "setDisplaysRTL:")]
+    public bool DisplaysRTL { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor BackgroundColor { get; set; }
+    [Selector("interpolationQuality", "setInterpolationQuality:")]
+    public PDFInterpolationQuality InterpolationQuality { get; set; }
+    [Selector("pageShadowsEnabled", "enablePageShadows:")]
+    public bool PageShadowsEnabled { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public PDFViewDelegate? Delegate { get; set; }
+    [Selector("pageOverlayViewProvider", "setPageOverlayViewProvider:")]
+    public PDFPageOverlayViewProvider? PageOverlayViewProvider { get; set; }
+    [Selector("scaleFactor", "setScaleFactor:")]
+    public CGFloat ScaleFactor { get; set; }
+    [Selector("minScaleFactor", "setMinScaleFactor:")]
+    public CGFloat MinScaleFactor { get; set; }
+    [Selector("maxScaleFactor", "setMaxScaleFactor:")]
+    public CGFloat MaxScaleFactor { get; set; }
+    [Selector("autoScales", "setAutoScales:")]
+    public bool AutoScales { get; set; }
+    [Selector("scaleFactorForSizeToFit")]
+    public CGFloat ScaleFactorForSizeToFit { get; }
+    [Selector("canZoomIn")]
+    public bool CanZoomIn { get; }
+    [Selector("canZoomOut")]
+    public bool CanZoomOut { get; }
+    [Selector("currentSelection", "setCurrentSelection:")]
+    public PDFSelection? CurrentSelection { get; set; }
+    [Selector("highlightedSelections", "setHighlightedSelections:")]
+    public NSArray? HighlightedSelections { get; set; }
+    [Selector("documentView")]
+    public NSView? DocumentView { get; }
+    [Selector("acceptsDraggedFiles", "setAcceptsDraggedFiles:")]
+    public bool AcceptsDraggedFiles { get; set; }
+    [Selector("visiblePages")]
+    public NSArray? VisiblePages { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("enableDataDetectors", "setEnableDataDetectors:")] public bool EnableDataDetectors { get; set; }
-    [Selector("isInMarkupMode", "setInMarkupMode:")] public bool InMarkupMode { get; set; }
-    [Selector("goToFirstPage:")] public void GoToFirstPage(AnyObject? sender);
-    [Selector("goToLastPage:")] public void GoToLastPage(AnyObject? sender);
-    [Selector("goToNextPage:")] public void GoToNextPage(AnyObject? sender);
-    [Selector("goToPreviousPage:")] public void GoToPreviousPage(AnyObject? sender);
-    [Selector("goBack:")] public void GoBack(AnyObject? sender);
-    [Selector("goForward:")] public void GoForward(AnyObject? sender);
-    [Selector("goToPage:")] public void GoToPage(PDFPage page);
-    [Selector("goToDestination:")] public void GoToDestination(PDFDestination destination);
-    [Selector("goToSelection:")] public void GoToSelection(PDFSelection selection);
-    [Selector("goToRect:onPage:")] public void GoToRectOnPage(NSRect rect, PDFPage page);
-    [Selector("zoomIn:")] public void ZoomIn(AnyObject? sender);
-    [Selector("zoomOut:")] public void ZoomOut(AnyObject? sender);
-    [Selector("areaOfInterestForMouse:")] public PDFAreaOfInterest AreaOfInterestForMouse(NSEvent event);
-    [Selector("areaOfInterestForPoint:")] public PDFAreaOfInterest AreaOfInterestForPoint(NSPoint cursorLocation);
-    [Selector("setCursorForAreaOfInterest:")] public void SetCursorForAreaOfInterest(PDFAreaOfInterest area);
-    [Selector("performAction:")] public void PerformAction(PDFAction action);
-    [Selector("setCurrentSelection:animate:")] public void SetCurrentSelectionAnimate(PDFSelection? selection, bool animate);
-    [Selector("clearSelection")] public void ClearSelection();
-    [Selector("selectAll:")] public void SelectAll(AnyObject? sender);
-    [Selector("scrollSelectionToVisible:")] public void ScrollSelectionToVisible(AnyObject? sender);
-    [Selector("drawPage:toContext:")] public void DrawPageToContext(PDFPage page, CGContextRef context);
-    [Selector("drawPagePost:toContext:")] public void DrawPagePostToContext(PDFPage page, CGContextRef context);
-    [Selector("copy:")] public void Copy(AnyObject? sender);
-    [Selector("printWithInfo:autoRotate:")] public void PrintWithInfoAutoRotate(NSPrintInfo printInfo, bool doRotate);
-    [Selector("printWithInfo:autoRotate:pageScaling:")] public void PrintWithInfoAutoRotatePageScaling(NSPrintInfo printInfo, bool doRotate, PDFPrintScalingMode scale);
-    [Selector("pageForPoint:nearest:")] public PDFPage? PageForPointNearest(NSPoint point, bool nearest);
-    [Selector("convertPoint:toPage:")] public NSPoint ConvertPointToPage(NSPoint point, PDFPage page);
-    [Selector("convertRect:toPage:")] public NSRect ConvertRectToPage(NSRect rect, PDFPage page);
-    [Selector("convertPoint:fromPage:")] public NSPoint ConvertPointFromPage(NSPoint point, PDFPage page);
-    [Selector("convertRect:fromPage:")] public NSRect ConvertRectFromPage(NSRect rect, PDFPage page);
-    [Selector("layoutDocumentView")] public void LayoutDocumentView();
-    [Selector("annotationsChangedOnPage:")] public void AnnotationsChangedOnPage(PDFPage page);
-    [Selector("rowSizeForPage:")] public NSSize RowSizeForPage(PDFPage page);
+    [Selector("enableDataDetectors", "setEnableDataDetectors:")]
+    public bool EnableDataDetectors { get; set; }
+    [Selector("isInMarkupMode", "setInMarkupMode:")]
+    public bool InMarkupMode { get; set; }
+    [Selector("goToFirstPage:")]
+    public void GoToFirstPage(AnyObject? sender);
+    [Selector("goToLastPage:")]
+    public void GoToLastPage(AnyObject? sender);
+    [Selector("goToNextPage:")]
+    public void GoToNextPage(AnyObject? sender);
+    [Selector("goToPreviousPage:")]
+    public void GoToPreviousPage(AnyObject? sender);
+    [Selector("goBack:")]
+    public void GoBack(AnyObject? sender);
+    [Selector("goForward:")]
+    public void GoForward(AnyObject? sender);
+    [Selector("goToPage:")]
+    public void GoToPage(PDFPage page);
+    [Selector("goToDestination:")]
+    public void GoToDestination(PDFDestination destination);
+    [Selector("goToSelection:")]
+    public void GoToSelection(PDFSelection selection);
+    [Selector("goToRect:onPage:")]
+    public void GoToRectOnPage(NSRect rect, PDFPage page);
+    [Selector("zoomIn:")]
+    public void ZoomIn(AnyObject? sender);
+    [Selector("zoomOut:")]
+    public void ZoomOut(AnyObject? sender);
+    [Selector("areaOfInterestForMouse:")]
+    public PDFAreaOfInterest AreaOfInterestForMouse(NSEvent event);
+    [Selector("areaOfInterestForPoint:")]
+    public PDFAreaOfInterest AreaOfInterestForPoint(NSPoint cursorLocation);
+    [Selector("setCursorForAreaOfInterest:")]
+    public void SetCursorForAreaOfInterest(PDFAreaOfInterest area);
+    [Selector("performAction:")]
+    public void PerformAction(PDFAction action);
+    [Selector("setCurrentSelection:animate:")]
+    public void SetCurrentSelectionAnimate(PDFSelection? selection, bool animate);
+    [Selector("clearSelection")]
+    public void ClearSelection();
+    [Selector("selectAll:")]
+    public void SelectAll(AnyObject? sender);
+    [Selector("scrollSelectionToVisible:")]
+    public void ScrollSelectionToVisible(AnyObject? sender);
+    [Selector("drawPage:toContext:")]
+    public void DrawPageToContext(PDFPage page, CGContextRef context);
+    [Selector("drawPagePost:toContext:")]
+    public void DrawPagePostToContext(PDFPage page, CGContextRef context);
+    [Selector("copy:")]
+    public void Copy(AnyObject? sender);
+    [Selector("printWithInfo:autoRotate:")]
+    public void PrintWithInfoAutoRotate(NSPrintInfo printInfo, bool doRotate);
+    [Selector("printWithInfo:autoRotate:pageScaling:")]
+    public void PrintWithInfoAutoRotatePageScaling(NSPrintInfo printInfo, bool doRotate, PDFPrintScalingMode scale);
+    [Selector("pageForPoint:nearest:")]
+    public PDFPage? PageForPointNearest(NSPoint point, bool nearest);
+    [Selector("convertPoint:toPage:")]
+    public NSPoint ConvertPointToPage(NSPoint point, PDFPage page);
+    [Selector("convertRect:toPage:")]
+    public NSRect ConvertRectToPage(NSRect rect, PDFPage page);
+    [Selector("convertPoint:fromPage:")]
+    public NSPoint ConvertPointFromPage(NSPoint point, PDFPage page);
+    [Selector("convertRect:fromPage:")]
+    public NSRect ConvertRectFromPage(NSRect rect, PDFPage page);
+    [Selector("layoutDocumentView")]
+    public void LayoutDocumentView();
+    [Selector("annotationsChangedOnPage:")]
+    public void AnnotationsChangedOnPage(PDFPage page);
+    [Selector("rowSizeForPage:")]
+    public NSSize RowSizeForPage(PDFPage page);
 }
 
 public objc interface PDFViewDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("PDFViewWillClickOnLink:withURL:")] void PDFViewWillClickOnLinkWithURL(PDFView sender, NSURL url);
-    [Optional] [Selector("PDFViewWillChangeScaleFactor:toScale:")] CGFloat PDFViewWillChangeScaleFactorToScale(PDFView sender, CGFloat scaler);
-    [Optional] [Selector("PDFViewPrintJobTitle:")] NSString PDFViewPrintJobTitle(PDFView sender);
-    [Optional] [Selector("PDFViewPerformPrint:")] void PDFViewPerformPrint(PDFView sender);
-    [Optional] [Selector("PDFViewPerformFind:")] void PDFViewPerformFind(PDFView sender);
-    [Optional] [Selector("PDFViewPerformGoToPage:")] void PDFViewPerformGoToPage(PDFView sender);
-    [Optional] [Selector("PDFViewOpenPDF:forRemoteGoToAction:")] void PDFViewOpenPDFForRemoteGoToAction(PDFView sender, PDFActionRemoteGoTo action);
+    [Optional]
+    [Selector("PDFViewWillClickOnLink:withURL:")]
+    void PDFViewWillClickOnLinkWithURL(PDFView sender, NSURL url);
+    [Optional]
+    [Selector("PDFViewWillChangeScaleFactor:toScale:")]
+    CGFloat PDFViewWillChangeScaleFactorToScale(PDFView sender, CGFloat scaler);
+    [Optional]
+    [Selector("PDFViewPrintJobTitle:")]
+    NSString PDFViewPrintJobTitle(PDFView sender);
+    [Optional]
+    [Selector("PDFViewPerformPrint:")]
+    void PDFViewPerformPrint(PDFView sender);
+    [Optional]
+    [Selector("PDFViewPerformFind:")]
+    void PDFViewPerformFind(PDFView sender);
+    [Optional]
+    [Selector("PDFViewPerformGoToPage:")]
+    void PDFViewPerformGoToPage(PDFView sender);
+    [Optional]
+    [Selector("PDFViewOpenPDF:forRemoteGoToAction:")]
+    void PDFViewOpenPDFForRemoteGoToAction(PDFView sender, PDFActionRemoteGoTo action);
 }
 
 /// PDFViewDeprecated, a category of PDFView.
 public extern objc class PDFView
 {
     /// Deprecated in macOS 10.12.
-    [Selector("shouldAntiAlias", "setShouldAntiAlias:")] public bool ShouldAntiAlias { get; set; }
+    [Selector("shouldAntiAlias", "setShouldAntiAlias:")]
+    public bool ShouldAntiAlias { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("greekingThreshold", "setGreekingThreshold:")] public CGFloat GreekingThreshold { get; set; }
+    [Selector("greekingThreshold", "setGreekingThreshold:")]
+    public CGFloat GreekingThreshold { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("allowsDragging", "setAllowsDragging:")] public bool AllowsDragging { get; set; }
+    [Selector("allowsDragging", "setAllowsDragging:")]
+    public bool AllowsDragging { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("takePasswordFrom:")] public void TakePasswordFrom(AnyObject sender);
+    [Selector("takePasswordFrom:")]
+    public void TakePasswordFrom(AnyObject sender);
     /// Deprecated in macOS 10.12.
-    [Selector("drawPage:")] public void DrawPage(PDFPage page);
+    [Selector("drawPage:")]
+    public void DrawPage(PDFPage page);
     /// Deprecated in macOS 10.12.
-    [Selector("drawPagePost:")] public void DrawPagePost(PDFPage page);
+    [Selector("drawPagePost:")]
+    public void DrawPagePost(PDFPage page);
     /// Deprecated in macOS 10.12.
-    [Selector("takeBackgroundColorFrom:")] public void TakeBackgroundColorFrom(AnyObject sender);
+    [Selector("takeBackgroundColorFrom:")]
+    public void TakeBackgroundColorFrom(AnyObject sender);
 }
 
 #endif

@@ -35,12 +35,18 @@ public using NSCollectionViewTransitionLayoutAnimatedKey = NSString;
 
 public extern objc class NSCollectionViewTransitionLayout : NSCollectionViewLayout
 {
-    [Selector("transitionProgress", "setTransitionProgress:")] public CGFloat TransitionProgress { get; set; }
-    [Selector("currentLayout")] public NSCollectionViewLayout CurrentLayout { get; }
-    [Selector("nextLayout")] public NSCollectionViewLayout NextLayout { get; }
-    [Selector("initWithCurrentLayout:nextLayout:")] public Self InitWithCurrentLayoutNextLayout(NSCollectionViewLayout currentLayout, NSCollectionViewLayout newLayout);
-    [Selector("updateValue:forAnimatedKey:")] public void UpdateValueForAnimatedKey(CGFloat value, NSCollectionViewTransitionLayoutAnimatedKey key);
-    [Selector("valueForAnimatedKey:")] public CGFloat ValueForAnimatedKey(NSCollectionViewTransitionLayoutAnimatedKey key);
+    [Selector("transitionProgress", "setTransitionProgress:")]
+    public CGFloat TransitionProgress { get; set; }
+    [Selector("currentLayout")]
+    public NSCollectionViewLayout CurrentLayout { get; }
+    [Selector("nextLayout")]
+    public NSCollectionViewLayout NextLayout { get; }
+    [Selector("initWithCurrentLayout:nextLayout:")]
+    public Self InitWithCurrentLayoutNextLayout(NSCollectionViewLayout currentLayout, NSCollectionViewLayout newLayout);
+    [Selector("updateValue:forAnimatedKey:")]
+    public void UpdateValueForAnimatedKey(CGFloat value, NSCollectionViewTransitionLayoutAnimatedKey key);
+    [Selector("valueForAnimatedKey:")]
+    public CGFloat ValueForAnimatedKey(NSCollectionViewTransitionLayoutAnimatedKey key);
 }
 
 #endif

@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class SWCollaborationOption : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("subtitle", "setSubtitle:")] public NSString Subtitle { get; set; }
-    [Selector("isSelected", "setSelected:")] public bool Selected { get; set; }
-    [Selector("requiredOptionsIdentifiers", "setRequiredOptionsIdentifiers:")] public NSArray RequiredOptionsIdentifiers { get; set; }
-    [Selector("initWithTitle:identifier:")] public Self InitWithTitleIdentifier(NSString title, NSString identifier);
-    [Selector("optionWithTitle:identifier:")] public static SWCollaborationOption OptionWithTitleIdentifier(NSString title, NSString identifier);
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("subtitle", "setSubtitle:")]
+    public NSString Subtitle { get; set; }
+    [Selector("isSelected", "setSelected:")]
+    public bool Selected { get; set; }
+    [Selector("requiredOptionsIdentifiers", "setRequiredOptionsIdentifiers:")]
+    public NSArray RequiredOptionsIdentifiers { get; set; }
+    [Selector("initWithTitle:identifier:")]
+    public Self InitWithTitleIdentifier(NSString title, NSString identifier);
+    [Selector("optionWithTitle:identifier:")]
+    public static SWCollaborationOption OptionWithTitleIdentifier(NSString title, NSString identifier);
 }
 
 #endif

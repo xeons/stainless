@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class AVBIPAddress : NSObject, NSCopying
 {
-    [Selector("representsIPv4Address")] public bool RepresentsIPv4Address { get; }
-    [Selector("ipv6Address", "setIpv6Address:")] public NSData Ipv6Address { get; set; }
-    [Selector("ipv4Address", "setIpv4Address:")] public uint Ipv4Address { get; set; }
-    [Selector("stringRepresentation", "setStringRepresentation:")] public NSString? StringRepresentation { get; set; }
-    [Selector("initWithIPv6Address:")] public Self InitWithIPv6Address(byte* ipv6Address);
-    [Selector("initWithIPv6AddressData:")] public Self InitWithIPv6AddressData(NSData ipv6Address);
-    [Selector("initWithIPv4Address:")] public Self InitWithIPv4Address(uint ipv4Address);
-    [Selector("initWithSockAddr:")] public Self InitWithSockAddr(sockaddr* sockAddr);
+    [Selector("representsIPv4Address")]
+    public bool RepresentsIPv4Address { get; }
+    [Selector("ipv6Address", "setIpv6Address:")]
+    public NSData Ipv6Address { get; set; }
+    [Selector("ipv4Address", "setIpv4Address:")]
+    public uint Ipv4Address { get; set; }
+    [Selector("stringRepresentation", "setStringRepresentation:")]
+    public NSString? StringRepresentation { get; set; }
+    [Selector("initWithIPv6Address:")]
+    public Self InitWithIPv6Address(byte* ipv6Address);
+    [Selector("initWithIPv6AddressData:")]
+    public Self InitWithIPv6AddressData(NSData ipv6Address);
+    [Selector("initWithIPv4Address:")]
+    public Self InitWithIPv4Address(uint ipv4Address);
+    [Selector("initWithSockAddr:")]
+    public Self InitWithSockAddr(sockaddr* sockAddr);
 }
 
 #endif

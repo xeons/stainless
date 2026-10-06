@@ -46,10 +46,14 @@ public enum MTLDynamicLibraryError : ulong
 [ObjCName("MTLDynamicLibrary")]
 public objc interface MTLDynamicLibraryProtocol : NSObjectProtocol
 {
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("installName")] NSString InstallName { get; }
-    [Selector("serializeToURL:error:")] bool SerializeToURLError(NSURL url, out NSError? error);
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("installName")]
+    NSString InstallName { get; }
+    [Selector("serializeToURL:error:")]
+    bool SerializeToURLError(NSURL url, out NSError? error);
 }
 
 #endif

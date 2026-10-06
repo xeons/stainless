@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class NSPathControlItem : NSObject
 {
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("attributedTitle", "setAttributedTitle:")] public NSAttributedString AttributedTitle { get; set; }
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("URL")] public NSURL? URL { get; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("attributedTitle", "setAttributedTitle:")]
+    public NSAttributedString AttributedTitle { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
 }
 
 #endif

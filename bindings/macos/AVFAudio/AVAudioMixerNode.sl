@@ -31,9 +31,12 @@ import Standard.ObjC;
 
 public extern objc class AVAudioMixerNode : AVAudioNode, AVAudioMixing
 {
-    [Selector("outputVolume", "setOutputVolume:")] public float OutputVolume { get; set; }
-    [Selector("nextAvailableInputBus")] public AVAudioNodeBus NextAvailableInputBus { get; }
-    [Selector("init")] public Self Init();
+    [Selector("outputVolume", "setOutputVolume:")]
+    public float OutputVolume { get; set; }
+    [Selector("nextAvailableInputBus")]
+    public AVAudioNodeBus NextAvailableInputBus { get; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

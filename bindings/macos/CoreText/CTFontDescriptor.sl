@@ -118,23 +118,32 @@ public extern "C" CFStringRef kCTFontDownloadedAttribute;
 
 public extern "C" CFStringRef kCTFontOpticalSizeAttribute;
 
-[ReturnsRetained] public extern "C" CTFontDescriptorRef CTFontDescriptorCreateWithNameAndSize(CFStringRef name, CGFloat size);
+[ReturnsRetained]
+public extern "C" CTFontDescriptorRef CTFontDescriptorCreateWithNameAndSize(CFStringRef name, CGFloat size);
 
-[ReturnsRetained] public extern "C" CTFontDescriptorRef CTFontDescriptorCreateWithAttributes(CFDictionaryRef attributes);
+[ReturnsRetained]
+public extern "C" CTFontDescriptorRef CTFontDescriptorCreateWithAttributes(CFDictionaryRef attributes);
 
-[ReturnsRetained] public extern "C" CTFontDescriptorRef CTFontDescriptorCreateCopyWithAttributes(CTFontDescriptorRef original, CFDictionaryRef attributes);
+[ReturnsRetained]
+public extern "C" CTFontDescriptorRef CTFontDescriptorCreateCopyWithAttributes(CTFontDescriptorRef original, CFDictionaryRef attributes);
 
-[ReturnsRetained] public extern "C" CTFontDescriptorRef? CTFontDescriptorCreateCopyWithFamily(CTFontDescriptorRef original, CFStringRef family);
+[ReturnsRetained]
+public extern "C" CTFontDescriptorRef? CTFontDescriptorCreateCopyWithFamily(CTFontDescriptorRef original, CFStringRef family);
 
-[ReturnsRetained] public extern "C" CTFontDescriptorRef? CTFontDescriptorCreateCopyWithSymbolicTraits(CTFontDescriptorRef original, CTFontSymbolicTraits symTraitValue, CTFontSymbolicTraits symTraitMask);
+[ReturnsRetained]
+public extern "C" CTFontDescriptorRef? CTFontDescriptorCreateCopyWithSymbolicTraits(CTFontDescriptorRef original, CTFontSymbolicTraits symTraitValue, CTFontSymbolicTraits symTraitMask);
 
-[ReturnsRetained] public extern "C" CTFontDescriptorRef CTFontDescriptorCreateCopyWithVariation(CTFontDescriptorRef original, CFNumberRef variationIdentifier, CGFloat variationValue);
+[ReturnsRetained]
+public extern "C" CTFontDescriptorRef CTFontDescriptorCreateCopyWithVariation(CTFontDescriptorRef original, CFNumberRef variationIdentifier, CGFloat variationValue);
 
-[ReturnsRetained] public extern "C" CTFontDescriptorRef CTFontDescriptorCreateCopyWithFeature(CTFontDescriptorRef original, CFNumberRef featureTypeIdentifier, CFNumberRef featureSelectorIdentifier);
+[ReturnsRetained]
+public extern "C" CTFontDescriptorRef CTFontDescriptorCreateCopyWithFeature(CTFontDescriptorRef original, CFNumberRef featureTypeIdentifier, CFNumberRef featureSelectorIdentifier);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CTFontDescriptorCreateMatchingFontDescriptors(CTFontDescriptorRef descriptor, CFSetRef? mandatoryAttributes);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CTFontDescriptorCreateMatchingFontDescriptors(CTFontDescriptorRef descriptor, CFSetRef? mandatoryAttributes);
 
-[ReturnsRetained] public extern "C" CTFontDescriptorRef? CTFontDescriptorCreateMatchingFontDescriptor(CTFontDescriptorRef descriptor, CFSetRef? mandatoryAttributes);
+[ReturnsRetained]
+public extern "C" CTFontDescriptorRef? CTFontDescriptorCreateMatchingFontDescriptor(CTFontDescriptorRef descriptor, CFSetRef? mandatoryAttributes);
 
 public enum CTFontDescriptorMatchingState : uint
 {
@@ -169,10 +178,13 @@ public objc closure bool CTFontDescriptorProgressHandler(CTFontDescriptorMatchin
 
 public extern "C" bool CTFontDescriptorMatchFontDescriptorsWithProgressHandler(CFArrayRef descriptors, CFSetRef? mandatoryAttributes, CTFontDescriptorProgressHandler progressBlock);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef CTFontDescriptorCopyAttributes(CTFontDescriptorRef descriptor);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef CTFontDescriptorCopyAttributes(CTFontDescriptorRef descriptor);
 
-[ReturnsRetained] public extern "C" CFTypeRef? CTFontDescriptorCopyAttribute(CTFontDescriptorRef descriptor, CFStringRef @attribute);
+[ReturnsRetained]
+public extern "C" CFTypeRef? CTFontDescriptorCopyAttribute(CTFontDescriptorRef descriptor, CFStringRef @attribute);
 
-[ReturnsRetained] public extern "C" CFTypeRef? CTFontDescriptorCopyLocalizedAttribute(CTFontDescriptorRef descriptor, CFStringRef @attribute, __CFString** language);
+[ReturnsRetained]
+public extern "C" CFTypeRef? CTFontDescriptorCopyLocalizedAttribute(CTFontDescriptorRef descriptor, CFStringRef @attribute, __CFString** language);
 
 #endif

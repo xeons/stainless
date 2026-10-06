@@ -33,25 +33,44 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLObjectElement : DOMHTMLElement
 {
-    [Selector("form")] public DOMHTMLFormElement? Form { get; }
-    [Selector("code", "setCode:")] public NSString? Code { get; set; }
-    [Selector("align", "setAlign:")] public NSString? Align { get; set; }
-    [Selector("archive", "setArchive:")] public NSString? Archive { get; set; }
-    [Selector("border", "setBorder:")] public NSString? Border { get; set; }
-    [Selector("codeBase", "setCodeBase:")] public NSString? CodeBase { get; set; }
-    [Selector("codeType", "setCodeType:")] public NSString? CodeType { get; set; }
-    [Selector("data", "setData:")] public NSString? Data { get; set; }
-    [Selector("declare", "setDeclare:")] public bool Declare { get; set; }
-    [Selector("height", "setHeight:")] public NSString? Height { get; set; }
-    [Selector("hspace", "setHspace:")] public int Hspace { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("standby", "setStandby:")] public NSString? Standby { get; set; }
-    [Selector("type", "setType:")] public NSString? Type { get; set; }
-    [Selector("useMap", "setUseMap:")] public NSString? UseMap { get; set; }
-    [Selector("vspace", "setVspace:")] public int Vspace { get; set; }
-    [Selector("width", "setWidth:")] public NSString? Width { get; set; }
-    [Selector("contentDocument")] public DOMDocument? ContentDocument { get; }
-    [Selector("absoluteImageURL")] public NSURL? AbsoluteImageURL { get; }
+    [Selector("form")]
+    public DOMHTMLFormElement? Form { get; }
+    [Selector("code", "setCode:")]
+    public NSString? Code { get; set; }
+    [Selector("align", "setAlign:")]
+    public NSString? Align { get; set; }
+    [Selector("archive", "setArchive:")]
+    public NSString? Archive { get; set; }
+    [Selector("border", "setBorder:")]
+    public NSString? Border { get; set; }
+    [Selector("codeBase", "setCodeBase:")]
+    public NSString? CodeBase { get; set; }
+    [Selector("codeType", "setCodeType:")]
+    public NSString? CodeType { get; set; }
+    [Selector("data", "setData:")]
+    public NSString? Data { get; set; }
+    [Selector("declare", "setDeclare:")]
+    public bool Declare { get; set; }
+    [Selector("height", "setHeight:")]
+    public NSString? Height { get; set; }
+    [Selector("hspace", "setHspace:")]
+    public int Hspace { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("standby", "setStandby:")]
+    public NSString? Standby { get; set; }
+    [Selector("type", "setType:")]
+    public NSString? Type { get; set; }
+    [Selector("useMap", "setUseMap:")]
+    public NSString? UseMap { get; set; }
+    [Selector("vspace", "setVspace:")]
+    public int Vspace { get; set; }
+    [Selector("width", "setWidth:")]
+    public NSString? Width { get; set; }
+    [Selector("contentDocument")]
+    public DOMDocument? ContentDocument { get; }
+    [Selector("absoluteImageURL")]
+    public NSURL? AbsoluteImageURL { get; }
 }
 
 #endif

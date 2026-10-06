@@ -33,26 +33,42 @@ import Standard.ObjC;
 
 public extern objc class MTLResidencySetDescriptor : NSObject, NSCopying
 {
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("initialCapacity", "setInitialCapacity:")] public NSUInteger InitialCapacity { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("initialCapacity", "setInitialCapacity:")]
+    public NSUInteger InitialCapacity { get; set; }
 }
 
 public objc interface MTLResidencySet : NSObjectProtocol
 {
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("label")] NSString? Label { get; }
-    [Selector("allocatedSize")] ulong AllocatedSize { get; }
-    [Selector("allAllocations")] NSArray AllAllocations { get; }
-    [Selector("allocationCount")] NSUInteger AllocationCount { get; }
-    [Selector("requestResidency")] void RequestResidency();
-    [Selector("endResidency")] void EndResidency();
-    [Selector("addAllocation:")] void AddAllocation(MTLAllocation allocation);
-    [Selector("addAllocations:count:")] void AddAllocationsCount(void** allocations, NSUInteger count);
-    [Selector("removeAllocation:")] void RemoveAllocation(MTLAllocation allocation);
-    [Selector("removeAllocations:count:")] void RemoveAllocationsCount(void** allocations, NSUInteger count);
-    [Selector("removeAllAllocations")] void RemoveAllAllocations();
-    [Selector("containsAllocation:")] bool ContainsAllocation(MTLAllocation anAllocation);
-    [Selector("commit")] void Commit();
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("label")]
+    NSString? Label { get; }
+    [Selector("allocatedSize")]
+    ulong AllocatedSize { get; }
+    [Selector("allAllocations")]
+    NSArray AllAllocations { get; }
+    [Selector("allocationCount")]
+    NSUInteger AllocationCount { get; }
+    [Selector("requestResidency")]
+    void RequestResidency();
+    [Selector("endResidency")]
+    void EndResidency();
+    [Selector("addAllocation:")]
+    void AddAllocation(MTLAllocation allocation);
+    [Selector("addAllocations:count:")]
+    void AddAllocationsCount(void** allocations, NSUInteger count);
+    [Selector("removeAllocation:")]
+    void RemoveAllocation(MTLAllocation allocation);
+    [Selector("removeAllocations:count:")]
+    void RemoveAllocationsCount(void** allocations, NSUInteger count);
+    [Selector("removeAllAllocations")]
+    void RemoveAllAllocations();
+    [Selector("containsAllocation:")]
+    bool ContainsAllocation(MTLAllocation anAllocation);
+    [Selector("commit")]
+    void Commit();
 }
 
 #endif

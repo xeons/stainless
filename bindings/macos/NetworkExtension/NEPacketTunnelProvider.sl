@@ -37,15 +37,22 @@ public objc closure void NEPacketTunnelProviderStopTunnelWithReasonCompletionHan
 
 public extern objc class NEPacketTunnelProvider : NETunnelProvider
 {
-    [Selector("packetFlow")] public NEPacketTunnelFlow? PacketFlow { get; }
-    [Selector("virtualInterface")] public nw_interface_t? VirtualInterface { get; }
-    [Selector("startTunnelWithOptions:completionHandler:")] public void StartTunnelWithOptionsCompletionHandler(NSDictionary? options, NEPacketTunnelProviderStartTunnelWithOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("stopTunnelWithReason:completionHandler:")] public void StopTunnelWithReasonCompletionHandler(NEProviderStopReason reason, NEPacketTunnelProviderStopTunnelWithReasonCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("cancelTunnelWithError:")] public void CancelTunnelWithError(NSError? error);
+    [Selector("packetFlow")]
+    public NEPacketTunnelFlow? PacketFlow { get; }
+    [Selector("virtualInterface")]
+    public nw_interface_t? VirtualInterface { get; }
+    [Selector("startTunnelWithOptions:completionHandler:")]
+    public void StartTunnelWithOptionsCompletionHandler(NSDictionary? options, NEPacketTunnelProviderStartTunnelWithOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("stopTunnelWithReason:completionHandler:")]
+    public void StopTunnelWithReasonCompletionHandler(NEProviderStopReason reason, NEPacketTunnelProviderStopTunnelWithReasonCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("cancelTunnelWithError:")]
+    public void CancelTunnelWithError(NSError? error);
     /// Deprecated in macOS 15.0.
-    [Selector("createTCPConnectionThroughTunnelToEndpoint:enableTLS:TLSParameters:delegate:")] public NWTCPConnection CreateTCPConnectionThroughTunnelToEndpointEnableTLSTLSParametersDelegate(NWEndpoint remoteEndpoint, bool enableTLS, NWTLSParameters? TLSParameters, AnyObject? @delegate);
+    [Selector("createTCPConnectionThroughTunnelToEndpoint:enableTLS:TLSParameters:delegate:")]
+    public NWTCPConnection CreateTCPConnectionThroughTunnelToEndpointEnableTLSTLSParametersDelegate(NWEndpoint remoteEndpoint, bool enableTLS, NWTLSParameters? TLSParameters, AnyObject? @delegate);
     /// Deprecated in macOS 15.0.
-    [Selector("createUDPSessionThroughTunnelToEndpoint:fromEndpoint:")] public NWUDPSession CreateUDPSessionThroughTunnelToEndpointFromEndpoint(NWEndpoint remoteEndpoint, NWHostEndpoint? localEndpoint);
+    [Selector("createUDPSessionThroughTunnelToEndpoint:fromEndpoint:")]
+    public NWUDPSession CreateUDPSessionThroughTunnelToEndpointFromEndpoint(NWEndpoint remoteEndpoint, NWHostEndpoint? localEndpoint);
 }
 
 #endif

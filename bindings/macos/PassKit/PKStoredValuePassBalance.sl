@@ -39,11 +39,16 @@ public extern "C" PKStoredValuePassBalanceType PKStoredValuePassBalanceTypeLoyal
 
 public extern objc class PKStoredValuePassBalance : NSObject
 {
-    [Selector("amount")] public NSDecimalNumber? Amount { get; }
-    [Selector("currencyCode")] public NSString? CurrencyCode { get; }
-    [Selector("balanceType")] public PKStoredValuePassBalanceType BalanceType { get; }
-    [Selector("expiryDate")] public NSDate? ExpiryDate { get; }
-    [Selector("isEqualToBalance:")] public bool IsEqualToBalance(PKStoredValuePassBalance balance);
+    [Selector("amount")]
+    public NSDecimalNumber? Amount { get; }
+    [Selector("currencyCode")]
+    public NSString? CurrencyCode { get; }
+    [Selector("balanceType")]
+    public PKStoredValuePassBalanceType BalanceType { get; }
+    [Selector("expiryDate")]
+    public NSDate? ExpiryDate { get; }
+    [Selector("isEqualToBalance:")]
+    public bool IsEqualToBalance(PKStoredValuePassBalance balance);
 }
 
 #endif

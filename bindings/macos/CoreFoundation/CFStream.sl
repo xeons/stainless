@@ -96,15 +96,20 @@ public extern "C" CFTypeID CFWriteStreamGetTypeID();
 
 public extern "C" CFStreamPropertyKey? kCFStreamPropertyDataWritten;
 
-[ReturnsRetained] public extern "C" CFReadStreamRef? CFReadStreamCreateWithBytesNoCopy(CFAllocatorRef? alloc, UInt8* bytes, CFIndex length, CFAllocatorRef? bytesDeallocator);
+[ReturnsRetained]
+public extern "C" CFReadStreamRef? CFReadStreamCreateWithBytesNoCopy(CFAllocatorRef? alloc, UInt8* bytes, CFIndex length, CFAllocatorRef? bytesDeallocator);
 
-[ReturnsRetained] public extern "C" CFWriteStreamRef? CFWriteStreamCreateWithBuffer(CFAllocatorRef? alloc, UInt8* buffer, CFIndex bufferCapacity);
+[ReturnsRetained]
+public extern "C" CFWriteStreamRef? CFWriteStreamCreateWithBuffer(CFAllocatorRef? alloc, UInt8* buffer, CFIndex bufferCapacity);
 
-[ReturnsRetained] public extern "C" CFWriteStreamRef? CFWriteStreamCreateWithAllocatedBuffers(CFAllocatorRef? alloc, CFAllocatorRef? bufferAllocator);
+[ReturnsRetained]
+public extern "C" CFWriteStreamRef? CFWriteStreamCreateWithAllocatedBuffers(CFAllocatorRef? alloc, CFAllocatorRef? bufferAllocator);
 
-[ReturnsRetained] public extern "C" CFReadStreamRef? CFReadStreamCreateWithFile(CFAllocatorRef? alloc, CFURLRef? fileURL);
+[ReturnsRetained]
+public extern "C" CFReadStreamRef? CFReadStreamCreateWithFile(CFAllocatorRef? alloc, CFURLRef? fileURL);
 
-[ReturnsRetained] public extern "C" CFWriteStreamRef? CFWriteStreamCreateWithFile(CFAllocatorRef? alloc, CFURLRef? fileURL);
+[ReturnsRetained]
+public extern "C" CFWriteStreamRef? CFWriteStreamCreateWithFile(CFAllocatorRef? alloc, CFURLRef? fileURL);
 
 public extern "C" void CFStreamCreateBoundPair(CFAllocatorRef? alloc, __CFReadStream** readStream, __CFWriteStream** writeStream, CFIndex transferBufferSize);
 
@@ -167,9 +172,11 @@ public extern "C" CFStreamStatus CFReadStreamGetStatus(CFReadStreamRef? stream);
 
 public extern "C" CFStreamStatus CFWriteStreamGetStatus(CFWriteStreamRef? stream);
 
-[ReturnsRetained] public extern "C" CFErrorRef? CFReadStreamCopyError(CFReadStreamRef? stream);
+[ReturnsRetained]
+public extern "C" CFErrorRef? CFReadStreamCopyError(CFReadStreamRef? stream);
 
-[ReturnsRetained] public extern "C" CFErrorRef? CFWriteStreamCopyError(CFWriteStreamRef? stream);
+[ReturnsRetained]
+public extern "C" CFErrorRef? CFWriteStreamCopyError(CFWriteStreamRef? stream);
 
 public extern "C" Boolean CFReadStreamOpen(CFReadStreamRef? stream);
 
@@ -189,9 +196,11 @@ public extern "C" Boolean CFWriteStreamCanAcceptBytes(CFWriteStreamRef? stream);
 
 public extern "C" CFIndex CFWriteStreamWrite(CFWriteStreamRef? stream, UInt8* buffer, CFIndex bufferLength);
 
-[ReturnsRetained] public extern "C" CFTypeRef? CFReadStreamCopyProperty(CFReadStreamRef? stream, CFStreamPropertyKey? propertyName);
+[ReturnsRetained]
+public extern "C" CFTypeRef? CFReadStreamCopyProperty(CFReadStreamRef? stream, CFStreamPropertyKey? propertyName);
 
-[ReturnsRetained] public extern "C" CFTypeRef? CFWriteStreamCopyProperty(CFWriteStreamRef? stream, CFStreamPropertyKey? propertyName);
+[ReturnsRetained]
+public extern "C" CFTypeRef? CFWriteStreamCopyProperty(CFWriteStreamRef? stream, CFStreamPropertyKey? propertyName);
 
 public extern "C" Boolean CFReadStreamSetProperty(CFReadStreamRef? stream, CFStreamPropertyKey? propertyName, CFTypeRef? propertyValue);
 

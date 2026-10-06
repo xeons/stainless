@@ -35,31 +35,51 @@ public objc closure NSAttributedString NSCandidateListTouchBarItemAttributedStri
 
 public extern objc class NSCandidateListTouchBarItem : NSTouchBarItem
 {
-    [Selector("client", "setClient:")] public NSView? Client { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSCandidateListTouchBarItemDelegate? Delegate { get; set; }
-    [Selector("isCollapsed", "setCollapsed:")] public bool Collapsed { get; set; }
-    [Selector("allowsCollapsing", "setAllowsCollapsing:")] public bool AllowsCollapsing { get; set; }
-    [Selector("isCandidateListVisible")] public bool CandidateListVisible { get; }
-    [Selector("allowsTextInputContextCandidates", "setAllowsTextInputContextCandidates:")] public bool AllowsTextInputContextCandidates { get; set; }
-    [Selector("attributedStringForCandidate", "setAttributedStringForCandidate:")] public NSCandidateListTouchBarItemAttributedStringForCandidateBlock? AttributedStringForCandidate { get; set; }
-    [Selector("candidates")] public NSArray? Candidates { get; }
-    [Selector("customizationLabel", "setCustomizationLabel:")] public NSString? CustomizationLabel { get; set; }
-    [Selector("updateWithInsertionPointVisibility:")] public void UpdateWithInsertionPointVisibility(bool isVisible);
-    [Selector("setCandidates:forSelectedRange:inString:")] public void SetCandidatesForSelectedRangeInString(NSArray candidates, NSRange selectedRange, NSString? originalString);
+    [Selector("client", "setClient:")]
+    public NSView? Client { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSCandidateListTouchBarItemDelegate? Delegate { get; set; }
+    [Selector("isCollapsed", "setCollapsed:")]
+    public bool Collapsed { get; set; }
+    [Selector("allowsCollapsing", "setAllowsCollapsing:")]
+    public bool AllowsCollapsing { get; set; }
+    [Selector("isCandidateListVisible")]
+    public bool CandidateListVisible { get; }
+    [Selector("allowsTextInputContextCandidates", "setAllowsTextInputContextCandidates:")]
+    public bool AllowsTextInputContextCandidates { get; set; }
+    [Selector("attributedStringForCandidate", "setAttributedStringForCandidate:")]
+    public NSCandidateListTouchBarItemAttributedStringForCandidateBlock? AttributedStringForCandidate { get; set; }
+    [Selector("candidates")]
+    public NSArray? Candidates { get; }
+    [Selector("customizationLabel", "setCustomizationLabel:")]
+    public NSString? CustomizationLabel { get; set; }
+    [Selector("updateWithInsertionPointVisibility:")]
+    public void UpdateWithInsertionPointVisibility(bool isVisible);
+    [Selector("setCandidates:forSelectedRange:inString:")]
+    public void SetCandidatesForSelectedRangeInString(NSArray candidates, NSRange selectedRange, NSString? originalString);
 }
 
 public objc interface NSCandidateListTouchBarItemDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("candidateListTouchBarItem:beginSelectingCandidateAtIndex:")] void CandidateListTouchBarItemBeginSelectingCandidateAtIndex(NSCandidateListTouchBarItem anItem, NSInteger index);
-    [Optional] [Selector("candidateListTouchBarItem:changeSelectionFromCandidateAtIndex:toIndex:")] void CandidateListTouchBarItemChangeSelectionFromCandidateAtIndexToIndex(NSCandidateListTouchBarItem anItem, NSInteger previousIndex, NSInteger index);
-    [Optional] [Selector("candidateListTouchBarItem:endSelectingCandidateAtIndex:")] void CandidateListTouchBarItemEndSelectingCandidateAtIndex(NSCandidateListTouchBarItem anItem, NSInteger index);
-    [Optional] [Selector("candidateListTouchBarItem:changedCandidateListVisibility:")] void CandidateListTouchBarItemChangedCandidateListVisibility(NSCandidateListTouchBarItem anItem, bool isVisible);
+    [Optional]
+    [Selector("candidateListTouchBarItem:beginSelectingCandidateAtIndex:")]
+    void CandidateListTouchBarItemBeginSelectingCandidateAtIndex(NSCandidateListTouchBarItem anItem, NSInteger index);
+    [Optional]
+    [Selector("candidateListTouchBarItem:changeSelectionFromCandidateAtIndex:toIndex:")]
+    void CandidateListTouchBarItemChangeSelectionFromCandidateAtIndexToIndex(NSCandidateListTouchBarItem anItem, NSInteger previousIndex, NSInteger index);
+    [Optional]
+    [Selector("candidateListTouchBarItem:endSelectingCandidateAtIndex:")]
+    void CandidateListTouchBarItemEndSelectingCandidateAtIndex(NSCandidateListTouchBarItem anItem, NSInteger index);
+    [Optional]
+    [Selector("candidateListTouchBarItem:changedCandidateListVisibility:")]
+    void CandidateListTouchBarItemChangedCandidateListVisibility(NSCandidateListTouchBarItem anItem, bool isVisible);
 }
 
 /// NSCandidateListTouchBarItem, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("candidateListTouchBarItem")] public NSCandidateListTouchBarItem? CandidateListTouchBarItem { get; }
+    [Selector("candidateListTouchBarItem")]
+    public NSCandidateListTouchBarItem? CandidateListTouchBarItem { get; }
 }
 
 public extern "C" NSTouchBarItemIdentifier? NSTouchBarItemIdentifierCandidateList;

@@ -57,29 +57,43 @@ public enum MTLStencilOperation : ulong
 
 public extern objc class MTLStencilDescriptor : NSObject, NSCopying
 {
-    [Selector("stencilCompareFunction", "setStencilCompareFunction:")] public MTLCompareFunction StencilCompareFunction { get; set; }
-    [Selector("stencilFailureOperation", "setStencilFailureOperation:")] public MTLStencilOperation StencilFailureOperation { get; set; }
-    [Selector("depthFailureOperation", "setDepthFailureOperation:")] public MTLStencilOperation DepthFailureOperation { get; set; }
-    [Selector("depthStencilPassOperation", "setDepthStencilPassOperation:")] public MTLStencilOperation DepthStencilPassOperation { get; set; }
-    [Selector("readMask", "setReadMask:")] public uint ReadMask { get; set; }
-    [Selector("writeMask", "setWriteMask:")] public uint WriteMask { get; set; }
+    [Selector("stencilCompareFunction", "setStencilCompareFunction:")]
+    public MTLCompareFunction StencilCompareFunction { get; set; }
+    [Selector("stencilFailureOperation", "setStencilFailureOperation:")]
+    public MTLStencilOperation StencilFailureOperation { get; set; }
+    [Selector("depthFailureOperation", "setDepthFailureOperation:")]
+    public MTLStencilOperation DepthFailureOperation { get; set; }
+    [Selector("depthStencilPassOperation", "setDepthStencilPassOperation:")]
+    public MTLStencilOperation DepthStencilPassOperation { get; set; }
+    [Selector("readMask", "setReadMask:")]
+    public uint ReadMask { get; set; }
+    [Selector("writeMask", "setWriteMask:")]
+    public uint WriteMask { get; set; }
 }
 
 public extern objc class MTLDepthStencilDescriptor : NSObject, NSCopying
 {
-    [Selector("depthCompareFunction", "setDepthCompareFunction:")] public MTLCompareFunction DepthCompareFunction { get; set; }
-    [Selector("isDepthWriteEnabled", "setDepthWriteEnabled:")] public bool DepthWriteEnabled { get; set; }
-    [Selector("frontFaceStencil", "setFrontFaceStencil:")] public MTLStencilDescriptor? FrontFaceStencil { get; set; }
-    [Selector("backFaceStencil", "setBackFaceStencil:")] public MTLStencilDescriptor? BackFaceStencil { get; set; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
+    [Selector("depthCompareFunction", "setDepthCompareFunction:")]
+    public MTLCompareFunction DepthCompareFunction { get; set; }
+    [Selector("isDepthWriteEnabled", "setDepthWriteEnabled:")]
+    public bool DepthWriteEnabled { get; set; }
+    [Selector("frontFaceStencil", "setFrontFaceStencil:")]
+    public MTLStencilDescriptor? FrontFaceStencil { get; set; }
+    [Selector("backFaceStencil", "setBackFaceStencil:")]
+    public MTLStencilDescriptor? BackFaceStencil { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
 }
 
 public objc interface MTLDepthStencilState : NSObjectProtocol
 {
-    [Selector("label")] NSString? Label { get; }
-    [Selector("device")] MTLDevice Device { get; }
+    [Selector("label")]
+    NSString? Label { get; }
+    [Selector("device")]
+    MTLDevice Device { get; }
     /// macOS 26.0 and later.
-    [Selector("gpuResourceID")] MTLResourceID GpuResourceID { get; }
+    [Selector("gpuResourceID")]
+    MTLResourceID GpuResourceID { get; }
 }
 
 #endif

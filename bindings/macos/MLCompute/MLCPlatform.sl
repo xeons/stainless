@@ -34,8 +34,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCPlatform : NSObject
 {
-    [Selector("setRNGSeedTo:")] public static void SetRNGSeedTo(NSNumber seed);
-    [Selector("getRNGseed")] public static NSNumber? GetRNGseed();
+    [Selector("setRNGSeedTo:")]
+    public static void SetRNGSeedTo(NSNumber seed);
+    [Selector("getRNGseed")]
+    public static NSNumber? GetRNGseed();
 }
 
 #endif

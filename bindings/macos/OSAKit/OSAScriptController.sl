@@ -39,16 +39,26 @@ public enum OSAScriptState : long
 
 public extern objc class OSAScriptController : NSController
 {
-    [Selector("scriptView", "setScriptView:")] public OSAScriptView? ScriptView { get; set; }
-    [Selector("resultView", "setResultView:")] public NSTextView? ResultView { get; set; }
-    [Selector("script", "setScript:")] public OSAScript? Script { get; set; }
-    [Selector("language", "setLanguage:")] public OSALanguage? Language { get; set; }
-    [Selector("scriptState")] public OSAScriptState ScriptState { get; }
-    [Selector("isCompiling")] public bool Compiling { get; }
-    [Selector("compileScript:")] public void CompileScript(AnyObject? sender);
-    [Selector("recordScript:")] public void RecordScript(AnyObject? sender);
-    [Selector("runScript:")] public void RunScript(AnyObject? sender);
-    [Selector("stopScript:")] public void StopScript(AnyObject? sender);
+    [Selector("scriptView", "setScriptView:")]
+    public OSAScriptView? ScriptView { get; set; }
+    [Selector("resultView", "setResultView:")]
+    public NSTextView? ResultView { get; set; }
+    [Selector("script", "setScript:")]
+    public OSAScript? Script { get; set; }
+    [Selector("language", "setLanguage:")]
+    public OSALanguage? Language { get; set; }
+    [Selector("scriptState")]
+    public OSAScriptState ScriptState { get; }
+    [Selector("isCompiling")]
+    public bool Compiling { get; }
+    [Selector("compileScript:")]
+    public void CompileScript(AnyObject? sender);
+    [Selector("recordScript:")]
+    public void RecordScript(AnyObject? sender);
+    [Selector("runScript:")]
+    public void RunScript(AnyObject? sender);
+    [Selector("stopScript:")]
+    public void StopScript(AnyObject? sender);
 }
 
 #endif

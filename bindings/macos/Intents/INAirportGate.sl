@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class INAirportGate : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("airport")] public INAirport Airport { get; }
-    [Selector("terminal")] public NSString? Terminal { get; }
-    [Selector("gate")] public NSString? Gate { get; }
-    [Selector("initWithAirport:terminal:gate:")] public Self InitWithAirportTerminalGate(INAirport airport, NSString? terminal, NSString? gate);
+    [Selector("airport")]
+    public INAirport Airport { get; }
+    [Selector("terminal")]
+    public NSString? Terminal { get; }
+    [Selector("gate")]
+    public NSString? Gate { get; }
+    [Selector("initWithAirport:terminal:gate:")]
+    public Self InitWithAirportTerminalGate(INAirport airport, NSString? terminal, NSString? gate);
 }
 
 #endif

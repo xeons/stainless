@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class MXCPUExceptionDiagnostic : MXDiagnostic
 {
-    [Selector("callStackTree")] public MXCallStackTree CallStackTree { get; }
-    [Selector("totalCPUTime")] public NSMeasurement TotalCPUTime { get; }
-    [Selector("totalSampledTime")] public NSMeasurement TotalSampledTime { get; }
+    [Selector("callStackTree")]
+    public MXCallStackTree CallStackTree { get; }
+    [Selector("totalCPUTime")]
+    public NSMeasurement TotalCPUTime { get; }
+    [Selector("totalSampledTime")]
+    public NSMeasurement TotalSampledTime { get; }
 }
 
 #endif

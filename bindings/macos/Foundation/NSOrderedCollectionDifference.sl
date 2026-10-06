@@ -42,14 +42,22 @@ public objc closure NSOrderedCollectionChange NSOrderedCollectionDifferenceDiffe
 
 public extern objc class NSOrderedCollectionDifference : NSObject, NSFastEnumeration
 {
-    [Selector("insertions")] public NSArray Insertions { get; }
-    [Selector("removals")] public NSArray Removals { get; }
-    [Selector("hasChanges")] public bool HasChanges { get; }
-    [Selector("initWithChanges:")] public Self InitWithChanges(NSArray changes);
-    [Selector("initWithInsertIndexes:insertedObjects:removeIndexes:removedObjects:additionalChanges:")] public Self InitWithInsertIndexesInsertedObjectsRemoveIndexesRemovedObjectsAdditionalChanges(NSIndexSet inserts, NSArray? insertedObjects, NSIndexSet removes, NSArray? removedObjects, NSArray changes);
-    [Selector("initWithInsertIndexes:insertedObjects:removeIndexes:removedObjects:")] public Self InitWithInsertIndexesInsertedObjectsRemoveIndexesRemovedObjects(NSIndexSet inserts, NSArray? insertedObjects, NSIndexSet removes, NSArray? removedObjects);
-    [Selector("differenceByTransformingChangesWithBlock:")] public NSOrderedCollectionDifference DifferenceByTransformingChangesWithBlock(NSOrderedCollectionDifferenceDifferenceByTransformingChangesWithBlockBlock block);
-    [Selector("inverseDifference")] public Self InverseDifference();
+    [Selector("insertions")]
+    public NSArray Insertions { get; }
+    [Selector("removals")]
+    public NSArray Removals { get; }
+    [Selector("hasChanges")]
+    public bool HasChanges { get; }
+    [Selector("initWithChanges:")]
+    public Self InitWithChanges(NSArray changes);
+    [Selector("initWithInsertIndexes:insertedObjects:removeIndexes:removedObjects:additionalChanges:")]
+    public Self InitWithInsertIndexesInsertedObjectsRemoveIndexesRemovedObjectsAdditionalChanges(NSIndexSet inserts, NSArray? insertedObjects, NSIndexSet removes, NSArray? removedObjects, NSArray changes);
+    [Selector("initWithInsertIndexes:insertedObjects:removeIndexes:removedObjects:")]
+    public Self InitWithInsertIndexesInsertedObjectsRemoveIndexesRemovedObjects(NSIndexSet inserts, NSArray? insertedObjects, NSIndexSet removes, NSArray? removedObjects);
+    [Selector("differenceByTransformingChangesWithBlock:")]
+    public NSOrderedCollectionDifference DifferenceByTransformingChangesWithBlock(NSOrderedCollectionDifferenceDifferenceByTransformingChangesWithBlockBlock block);
+    [Selector("inverseDifference")]
+    public Self InverseDifference();
 }
 
 #endif

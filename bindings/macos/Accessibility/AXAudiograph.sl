@@ -34,13 +34,16 @@ import Standard.ObjC;
 
 public objc interface AXChart : NSObjectProtocol
 {
-    [Selector("accessibilityChartDescriptor", "setAccessibilityChartDescriptor:")] AXChartDescriptor? AccessibilityChartDescriptor { get; set; }
+    [Selector("accessibilityChartDescriptor", "setAccessibilityChartDescriptor:")]
+    AXChartDescriptor? AccessibilityChartDescriptor { get; set; }
 }
 
 public objc interface AXDataAxisDescriptor : NSCopying
 {
-    [Selector("title", "setTitle:")] NSString Title { get; set; }
-    [Selector("attributedTitle", "setAttributedTitle:")] NSAttributedString AttributedTitle { get; set; }
+    [Selector("title", "setTitle:")]
+    NSString Title { get; set; }
+    [Selector("attributedTitle", "setAttributedTitle:")]
+    NSAttributedString AttributedTitle { get; set; }
 }
 
 public enum AXNumericDataAxisDescriptorScale : long
@@ -58,50 +61,78 @@ public objc closure NSString AXNumericDataAxisDescriptorInitWithAttributedTitleL
 
 public extern objc class AXNumericDataAxisDescriptor : NSObject, AXDataAxisDescriptor
 {
-    [Selector("scaleType", "setScaleType:")] public AXNumericDataAxisDescriptorScale ScaleType { get; set; }
-    [Selector("lowerBound", "setLowerBound:")] public double LowerBound { get; set; }
-    [Selector("upperBound", "setUpperBound:")] public double UpperBound { get; set; }
-    [Selector("valueDescriptionProvider", "setValueDescriptionProvider:")] public AXNumericDataAxisDescriptorValueDescriptionProviderBlock ValueDescriptionProvider { get; set; }
-    [Selector("gridlinePositions", "setGridlinePositions:")] public NSArray? GridlinePositions { get; set; }
-    [Selector("initWithTitle:lowerBound:upperBound:gridlinePositions:valueDescriptionProvider:")] public Self InitWithTitleLowerBoundUpperBoundGridlinePositionsValueDescriptionProvider(NSString title, double lowerbound, double upperBound, NSArray? gridlinePositions, AXNumericDataAxisDescriptorInitWithTitleLowerBoundUpperBoundGridlinePositionsValueDescriptionProviderValueDescriptionProviderBlock valueDescriptionProvider);
-    [Selector("initWithAttributedTitle:lowerBound:upperBound:gridlinePositions:valueDescriptionProvider:")] public Self InitWithAttributedTitleLowerBoundUpperBoundGridlinePositionsValueDescriptionProvider(NSAttributedString attributedTitle, double lowerbound, double upperBound, NSArray? gridlinePositions, AXNumericDataAxisDescriptorInitWithAttributedTitleLowerBoundUpperBoundGridlinePositionsValueDescriptionProviderValueDescriptionProviderBlock valueDescriptionProvider);
+    [Selector("scaleType", "setScaleType:")]
+    public AXNumericDataAxisDescriptorScale ScaleType { get; set; }
+    [Selector("lowerBound", "setLowerBound:")]
+    public double LowerBound { get; set; }
+    [Selector("upperBound", "setUpperBound:")]
+    public double UpperBound { get; set; }
+    [Selector("valueDescriptionProvider", "setValueDescriptionProvider:")]
+    public AXNumericDataAxisDescriptorValueDescriptionProviderBlock ValueDescriptionProvider { get; set; }
+    [Selector("gridlinePositions", "setGridlinePositions:")]
+    public NSArray? GridlinePositions { get; set; }
+    [Selector("initWithTitle:lowerBound:upperBound:gridlinePositions:valueDescriptionProvider:")]
+    public Self InitWithTitleLowerBoundUpperBoundGridlinePositionsValueDescriptionProvider(NSString title, double lowerbound, double upperBound, NSArray? gridlinePositions, AXNumericDataAxisDescriptorInitWithTitleLowerBoundUpperBoundGridlinePositionsValueDescriptionProviderValueDescriptionProviderBlock valueDescriptionProvider);
+    [Selector("initWithAttributedTitle:lowerBound:upperBound:gridlinePositions:valueDescriptionProvider:")]
+    public Self InitWithAttributedTitleLowerBoundUpperBoundGridlinePositionsValueDescriptionProvider(NSAttributedString attributedTitle, double lowerbound, double upperBound, NSArray? gridlinePositions, AXNumericDataAxisDescriptorInitWithAttributedTitleLowerBoundUpperBoundGridlinePositionsValueDescriptionProviderValueDescriptionProviderBlock valueDescriptionProvider);
 }
 
 public extern objc class AXCategoricalDataAxisDescriptor : NSObject, AXDataAxisDescriptor
 {
-    [Selector("categoryOrder", "setCategoryOrder:")] public NSArray CategoryOrder { get; set; }
-    [Selector("initWithTitle:categoryOrder:")] public Self InitWithTitleCategoryOrder(NSString title, NSArray categoryOrder);
-    [Selector("initWithAttributedTitle:categoryOrder:")] public Self InitWithAttributedTitleCategoryOrder(NSAttributedString attributedTitle, NSArray categoryOrder);
+    [Selector("categoryOrder", "setCategoryOrder:")]
+    public NSArray CategoryOrder { get; set; }
+    [Selector("initWithTitle:categoryOrder:")]
+    public Self InitWithTitleCategoryOrder(NSString title, NSArray categoryOrder);
+    [Selector("initWithAttributedTitle:categoryOrder:")]
+    public Self InitWithAttributedTitleCategoryOrder(NSAttributedString attributedTitle, NSArray categoryOrder);
 }
 
 public extern objc class AXDataPointValue : NSObject, NSCopying
 {
-    [Selector("number", "setNumber:")] public double Number { get; set; }
-    [Selector("category", "setCategory:")] public NSString? Category { get; set; }
-    [Selector("valueWithNumber:")] public static Self ValueWithNumber(double number);
-    [Selector("valueWithCategory:")] public static Self ValueWithCategory(NSString category);
+    [Selector("number", "setNumber:")]
+    public double Number { get; set; }
+    [Selector("category", "setCategory:")]
+    public NSString? Category { get; set; }
+    [Selector("valueWithNumber:")]
+    public static Self ValueWithNumber(double number);
+    [Selector("valueWithCategory:")]
+    public static Self ValueWithCategory(NSString category);
 }
 
 public extern objc class AXDataPoint : NSObject, NSCopying
 {
-    [Selector("xValue", "setXValue:")] public AXDataPointValue XValue { get; set; }
-    [Selector("yValue", "setYValue:")] public AXDataPointValue? YValue { get; set; }
-    [Selector("additionalValues", "setAdditionalValues:")] public NSArray? AdditionalValues { get; set; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("attributedLabel", "setAttributedLabel:")] public NSAttributedString? AttributedLabel { get; set; }
-    [Selector("initWithX:y:")] public Self InitWithXY(AXDataPointValue xValue, AXDataPointValue? yValue);
-    [Selector("initWithX:y:additionalValues:")] public Self InitWithXYAdditionalValues(AXDataPointValue xValue, AXDataPointValue? yValue, NSArray? additionalValues);
-    [Selector("initWithX:y:additionalValues:label:")] public Self InitWithXYAdditionalValuesLabel(AXDataPointValue xValue, AXDataPointValue? yValue, NSArray? additionalValues, NSString? label);
+    [Selector("xValue", "setXValue:")]
+    public AXDataPointValue XValue { get; set; }
+    [Selector("yValue", "setYValue:")]
+    public AXDataPointValue? YValue { get; set; }
+    [Selector("additionalValues", "setAdditionalValues:")]
+    public NSArray? AdditionalValues { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("attributedLabel", "setAttributedLabel:")]
+    public NSAttributedString? AttributedLabel { get; set; }
+    [Selector("initWithX:y:")]
+    public Self InitWithXY(AXDataPointValue xValue, AXDataPointValue? yValue);
+    [Selector("initWithX:y:additionalValues:")]
+    public Self InitWithXYAdditionalValues(AXDataPointValue xValue, AXDataPointValue? yValue, NSArray? additionalValues);
+    [Selector("initWithX:y:additionalValues:label:")]
+    public Self InitWithXYAdditionalValuesLabel(AXDataPointValue xValue, AXDataPointValue? yValue, NSArray? additionalValues, NSString? label);
 }
 
 public extern objc class AXDataSeriesDescriptor : NSObject, NSCopying
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("attributedName", "setAttributedName:")] public NSAttributedString AttributedName { get; set; }
-    [Selector("isContinuous", "setIsContinuous:")] public bool IsContinuous { get; set; }
-    [Selector("dataPoints", "setDataPoints:")] public NSArray DataPoints { get; set; }
-    [Selector("initWithName:isContinuous:dataPoints:")] public Self InitWithNameIsContinuousDataPoints(NSString name, bool isContinuous, NSArray dataPoints);
-    [Selector("initWithAttributedName:isContinuous:dataPoints:")] public Self InitWithAttributedNameIsContinuousDataPoints(NSAttributedString attributedName, bool isContinuous, NSArray dataPoints);
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("attributedName", "setAttributedName:")]
+    public NSAttributedString AttributedName { get; set; }
+    [Selector("isContinuous", "setIsContinuous:")]
+    public bool IsContinuous { get; set; }
+    [Selector("dataPoints", "setDataPoints:")]
+    public NSArray DataPoints { get; set; }
+    [Selector("initWithName:isContinuous:dataPoints:")]
+    public Self InitWithNameIsContinuousDataPoints(NSString name, bool isContinuous, NSArray dataPoints);
+    [Selector("initWithAttributedName:isContinuous:dataPoints:")]
+    public Self InitWithAttributedNameIsContinuousDataPoints(NSAttributedString attributedName, bool isContinuous, NSArray dataPoints);
 }
 
 public enum AXChartDescriptorContentDirection : long
@@ -116,26 +147,42 @@ public enum AXChartDescriptorContentDirection : long
 
 public extern objc class AXChartDescriptor : NSObject, NSCopying
 {
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("attributedTitle", "setAttributedTitle:")] public NSAttributedString? AttributedTitle { get; set; }
-    [Selector("summary", "setSummary:")] public NSString? Summary { get; set; }
-    [Selector("contentDirection", "setContentDirection:")] public AXChartDescriptorContentDirection ContentDirection { get; set; }
-    [Selector("contentFrame", "setContentFrame:")] public CGRect ContentFrame { get; set; }
-    [Selector("series", "setSeries:")] public NSArray Series { get; set; }
-    [Selector("xAxis", "setXAxis:")] public AXDataAxisDescriptor? XAxis { get; set; }
-    [Selector("yAxis", "setYAxis:")] public AXNumericDataAxisDescriptor? YAxis { get; set; }
-    [Selector("additionalAxes", "setAdditionalAxes:")] public NSArray? AdditionalAxes { get; set; }
-    [Selector("initWithTitle:summary:xAxisDescriptor:yAxisDescriptor:series:")] public Self InitWithTitleSummaryXAxisDescriptorYAxisDescriptorSeries(NSString? title, NSString? summary, AXDataAxisDescriptor xAxis, AXNumericDataAxisDescriptor? yAxis, NSArray series);
-    [Selector("initWithAttributedTitle:summary:xAxisDescriptor:yAxisDescriptor:series:")] public Self InitWithAttributedTitleSummaryXAxisDescriptorYAxisDescriptorSeries(NSAttributedString? attributedTitle, NSString? summary, AXDataAxisDescriptor xAxis, AXNumericDataAxisDescriptor yAxis, NSArray series);
-    [Selector("initWithTitle:summary:xAxisDescriptor:yAxisDescriptor:additionalAxes:series:")] public Self InitWithTitleSummaryXAxisDescriptorYAxisDescriptorAdditionalAxesSeries(NSString? title, NSString? summary, AXDataAxisDescriptor xAxis, AXNumericDataAxisDescriptor? yAxis, NSArray? additionalAxes, NSArray series);
-    [Selector("initWithAttributedTitle:summary:xAxisDescriptor:yAxisDescriptor:additionalAxes:series:")] public Self InitWithAttributedTitleSummaryXAxisDescriptorYAxisDescriptorAdditionalAxesSeries(NSAttributedString? attributedTitle, NSString? summary, AXDataAxisDescriptor xAxis, AXNumericDataAxisDescriptor? yAxis, NSArray? additionalAxes, NSArray series);
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("attributedTitle", "setAttributedTitle:")]
+    public NSAttributedString? AttributedTitle { get; set; }
+    [Selector("summary", "setSummary:")]
+    public NSString? Summary { get; set; }
+    [Selector("contentDirection", "setContentDirection:")]
+    public AXChartDescriptorContentDirection ContentDirection { get; set; }
+    [Selector("contentFrame", "setContentFrame:")]
+    public CGRect ContentFrame { get; set; }
+    [Selector("series", "setSeries:")]
+    public NSArray Series { get; set; }
+    [Selector("xAxis", "setXAxis:")]
+    public AXDataAxisDescriptor? XAxis { get; set; }
+    [Selector("yAxis", "setYAxis:")]
+    public AXNumericDataAxisDescriptor? YAxis { get; set; }
+    [Selector("additionalAxes", "setAdditionalAxes:")]
+    public NSArray? AdditionalAxes { get; set; }
+    [Selector("initWithTitle:summary:xAxisDescriptor:yAxisDescriptor:series:")]
+    public Self InitWithTitleSummaryXAxisDescriptorYAxisDescriptorSeries(NSString? title, NSString? summary, AXDataAxisDescriptor xAxis, AXNumericDataAxisDescriptor? yAxis, NSArray series);
+    [Selector("initWithAttributedTitle:summary:xAxisDescriptor:yAxisDescriptor:series:")]
+    public Self InitWithAttributedTitleSummaryXAxisDescriptorYAxisDescriptorSeries(NSAttributedString? attributedTitle, NSString? summary, AXDataAxisDescriptor xAxis, AXNumericDataAxisDescriptor yAxis, NSArray series);
+    [Selector("initWithTitle:summary:xAxisDescriptor:yAxisDescriptor:additionalAxes:series:")]
+    public Self InitWithTitleSummaryXAxisDescriptorYAxisDescriptorAdditionalAxesSeries(NSString? title, NSString? summary, AXDataAxisDescriptor xAxis, AXNumericDataAxisDescriptor? yAxis, NSArray? additionalAxes, NSArray series);
+    [Selector("initWithAttributedTitle:summary:xAxisDescriptor:yAxisDescriptor:additionalAxes:series:")]
+    public Self InitWithAttributedTitleSummaryXAxisDescriptorYAxisDescriptorAdditionalAxesSeries(NSAttributedString? attributedTitle, NSString? summary, AXDataAxisDescriptor xAxis, AXNumericDataAxisDescriptor? yAxis, NSArray? additionalAxes, NSArray series);
 }
 
 public extern objc class AXLiveAudioGraph : NSObject
 {
-    [Selector("start")] public static void Start();
-    [Selector("updateValue:")] public static void UpdateValue(double value);
-    [Selector("stop")] public static void Stop();
+    [Selector("start")]
+    public static void Start();
+    [Selector("updateValue:")]
+    public static void UpdateValue(double value);
+    [Selector("stop")]
+    public static void Stop();
 }
 
 #endif

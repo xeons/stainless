@@ -40,25 +40,36 @@ public enum AVAssetSegmentType : long
 
 public extern objc class AVAssetSegmentReport : NSObject
 {
-    [Selector("segmentType")] public AVAssetSegmentType SegmentType { get; }
-    [Selector("trackReports")] public NSArray TrackReports { get; }
+    [Selector("segmentType")]
+    public AVAssetSegmentType SegmentType { get; }
+    [Selector("trackReports")]
+    public NSArray TrackReports { get; }
 }
 
 public extern objc class AVAssetSegmentTrackReport : NSObject
 {
-    [Selector("trackID")] public CMPersistentTrackID TrackID { get; }
-    [Selector("mediaType")] public AVMediaType MediaType { get; }
-    [Selector("earliestPresentationTimeStamp")] public CMTime EarliestPresentationTimeStamp { get; }
-    [Selector("duration")] public CMTime Duration { get; }
-    [Selector("firstVideoSampleInformation")] public AVAssetSegmentReportSampleInformation? FirstVideoSampleInformation { get; }
+    [Selector("trackID")]
+    public CMPersistentTrackID TrackID { get; }
+    [Selector("mediaType")]
+    public AVMediaType MediaType { get; }
+    [Selector("earliestPresentationTimeStamp")]
+    public CMTime EarliestPresentationTimeStamp { get; }
+    [Selector("duration")]
+    public CMTime Duration { get; }
+    [Selector("firstVideoSampleInformation")]
+    public AVAssetSegmentReportSampleInformation? FirstVideoSampleInformation { get; }
 }
 
 public extern objc class AVAssetSegmentReportSampleInformation : NSObject
 {
-    [Selector("presentationTimeStamp")] public CMTime PresentationTimeStamp { get; }
-    [Selector("offset")] public NSInteger Offset { get; }
-    [Selector("length")] public NSInteger Length { get; }
-    [Selector("isSyncSample")] public bool IsSyncSample { get; }
+    [Selector("presentationTimeStamp")]
+    public CMTime PresentationTimeStamp { get; }
+    [Selector("offset")]
+    public NSInteger Offset { get; }
+    [Selector("length")]
+    public NSInteger Length { get; }
+    [Selector("isSyncSample")]
+    public bool IsSyncSample { get; }
 }
 
 #endif

@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class NSClickGestureRecognizer : NSGestureRecognizer, NSCoding
 {
-    [Selector("buttonMask", "setButtonMask:")] public NSUInteger ButtonMask { get; set; }
-    [Selector("numberOfClicksRequired", "setNumberOfClicksRequired:")] public NSInteger NumberOfClicksRequired { get; set; }
-    [Selector("numberOfTouchesRequired", "setNumberOfTouchesRequired:")] public NSInteger NumberOfTouchesRequired { get; set; }
+    [Selector("buttonMask", "setButtonMask:")]
+    public NSUInteger ButtonMask { get; set; }
+    [Selector("numberOfClicksRequired", "setNumberOfClicksRequired:")]
+    public NSInteger NumberOfClicksRequired { get; set; }
+    [Selector("numberOfTouchesRequired", "setNumberOfTouchesRequired:")]
+    public NSInteger NumberOfTouchesRequired { get; set; }
 }
 
 #endif

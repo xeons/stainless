@@ -119,19 +119,32 @@ public objc closure void AVAssetExportSessionExportAsynchronouslyWithCompletionH
 
 public extern objc class AVAssetExportSession : NSObject
 {
-    [Selector("presetName")] public NSString PresetName { get; }
-    [Selector("asset")] public AVAsset? Asset { get; }
-    [Selector("outputFileType", "setOutputFileType:")] public AVFileType? OutputFileType { get; set; }
-    [Selector("outputURL", "setOutputURL:")] public NSURL? OutputURL { get; set; }
-    [Selector("shouldOptimizeForNetworkUse", "setShouldOptimizeForNetworkUse:")] public bool ShouldOptimizeForNetworkUse { get; set; }
-    [Selector("allowsParallelizedExport", "setAllowsParallelizedExport:")] public bool AllowsParallelizedExport { get; set; }
-    [Selector("status")] public AVAssetExportSessionStatus Status { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("progress")] public float Progress { get; }
-    [Selector("exportSessionWithAsset:presetName:")] public static Self? ExportSessionWithAssetPresetName(AVAsset asset, NSString presetName);
-    [Selector("initWithAsset:presetName:")] public Self? InitWithAssetPresetName(AVAsset asset, NSString presetName);
-    [Selector("exportAsynchronouslyWithCompletionHandler:")] public void ExportAsynchronouslyWithCompletionHandler(AVAssetExportSessionExportAsynchronouslyWithCompletionHandlerHandlerBlock handler);
-    [Selector("cancelExport")] public void CancelExport();
+    [Selector("presetName")]
+    public NSString PresetName { get; }
+    [Selector("asset")]
+    public AVAsset? Asset { get; }
+    [Selector("outputFileType", "setOutputFileType:")]
+    public AVFileType? OutputFileType { get; set; }
+    [Selector("outputURL", "setOutputURL:")]
+    public NSURL? OutputURL { get; set; }
+    [Selector("shouldOptimizeForNetworkUse", "setShouldOptimizeForNetworkUse:")]
+    public bool ShouldOptimizeForNetworkUse { get; set; }
+    [Selector("allowsParallelizedExport", "setAllowsParallelizedExport:")]
+    public bool AllowsParallelizedExport { get; set; }
+    [Selector("status")]
+    public AVAssetExportSessionStatus Status { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("progress")]
+    public float Progress { get; }
+    [Selector("exportSessionWithAsset:presetName:")]
+    public static Self? ExportSessionWithAssetPresetName(AVAsset asset, NSString presetName);
+    [Selector("initWithAsset:presetName:")]
+    public Self? InitWithAssetPresetName(AVAsset asset, NSString presetName);
+    [Selector("exportAsynchronouslyWithCompletionHandler:")]
+    public void ExportAsynchronouslyWithCompletionHandler(AVAssetExportSessionExportAsynchronouslyWithCompletionHandlerHandlerBlock handler);
+    [Selector("cancelExport")]
+    public void CancelExport();
 }
 
 public objc closure void AVAssetExportSessionDetermineCompatibilityOfExportPresetWithAssetOutputFileTypeCompletionHandlerHandlerBlock(bool arg0);
@@ -139,10 +152,13 @@ public objc closure void AVAssetExportSessionDetermineCompatibilityOfExportPrese
 /// AVAssetExportSessionPresets, a category of AVAssetExportSession.
 public extern objc class AVAssetExportSession
 {
-    [Selector("allExportPresets")] public static NSArray AllExportPresets();
+    [Selector("allExportPresets")]
+    public static NSArray AllExportPresets();
     /// Deprecated in macOS 13.0.
-    [Selector("exportPresetsCompatibleWithAsset:")] public static NSArray ExportPresetsCompatibleWithAsset(AVAsset asset);
-    [Selector("determineCompatibilityOfExportPreset:withAsset:outputFileType:completionHandler:")] public static void DetermineCompatibilityOfExportPresetWithAssetOutputFileTypeCompletionHandler(NSString presetName, AVAsset asset, AVFileType? outputFileType, AVAssetExportSessionDetermineCompatibilityOfExportPresetWithAssetOutputFileTypeCompletionHandlerHandlerBlock handler);
+    [Selector("exportPresetsCompatibleWithAsset:")]
+    public static NSArray ExportPresetsCompatibleWithAsset(AVAsset asset);
+    [Selector("determineCompatibilityOfExportPreset:withAsset:outputFileType:completionHandler:")]
+    public static void DetermineCompatibilityOfExportPresetWithAssetOutputFileTypeCompletionHandler(NSString presetName, AVAsset asset, AVFileType? outputFileType, AVAssetExportSessionDetermineCompatibilityOfExportPresetWithAssetOutputFileTypeCompletionHandlerHandlerBlock handler);
 }
 
 public objc closure void AVAssetExportSessionDetermineCompatibleFileTypesWithCompletionHandlerHandlerBlock(NSArray arg0);
@@ -150,8 +166,10 @@ public objc closure void AVAssetExportSessionDetermineCompatibleFileTypesWithCom
 /// AVAssetExportSessionFileTypes, a category of AVAssetExportSession.
 public extern objc class AVAssetExportSession
 {
-    [Selector("supportedFileTypes")] public NSArray SupportedFileTypes { get; }
-    [Selector("determineCompatibleFileTypesWithCompletionHandler:")] public void DetermineCompatibleFileTypesWithCompletionHandler(AVAssetExportSessionDetermineCompatibleFileTypesWithCompletionHandlerHandlerBlock handler);
+    [Selector("supportedFileTypes")]
+    public NSArray SupportedFileTypes { get; }
+    [Selector("determineCompatibleFileTypesWithCompletionHandler:")]
+    public void DetermineCompatibleFileTypesWithCompletionHandler(AVAssetExportSessionDetermineCompatibleFileTypesWithCompletionHandlerHandlerBlock handler);
 }
 
 public objc closure void AVAssetExportSessionEstimateMaximumDurationWithCompletionHandlerHandlerBlock(CMTime arg0, NSError? arg1);
@@ -161,38 +179,53 @@ public objc closure void AVAssetExportSessionEstimateOutputFileLengthWithComplet
 /// AVAssetExportSessionDurationAndLength, a category of AVAssetExportSession.
 public extern objc class AVAssetExportSession
 {
-    [Selector("timeRange", "setTimeRange:")] public CMTimeRange TimeRange { get; set; }
+    [Selector("timeRange", "setTimeRange:")]
+    public CMTimeRange TimeRange { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("maxDuration")] public CMTime MaxDuration { get; }
+    [Selector("maxDuration")]
+    public CMTime MaxDuration { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("estimatedOutputFileLength")] public long EstimatedOutputFileLength { get; }
-    [Selector("fileLengthLimit", "setFileLengthLimit:")] public long FileLengthLimit { get; set; }
-    [Selector("estimateMaximumDurationWithCompletionHandler:")] public void EstimateMaximumDurationWithCompletionHandler(AVAssetExportSessionEstimateMaximumDurationWithCompletionHandlerHandlerBlock handler);
-    [Selector("estimateOutputFileLengthWithCompletionHandler:")] public void EstimateOutputFileLengthWithCompletionHandler(AVAssetExportSessionEstimateOutputFileLengthWithCompletionHandlerHandlerBlock handler);
+    [Selector("estimatedOutputFileLength")]
+    public long EstimatedOutputFileLength { get; }
+    [Selector("fileLengthLimit", "setFileLengthLimit:")]
+    public long FileLengthLimit { get; set; }
+    [Selector("estimateMaximumDurationWithCompletionHandler:")]
+    public void EstimateMaximumDurationWithCompletionHandler(AVAssetExportSessionEstimateMaximumDurationWithCompletionHandlerHandlerBlock handler);
+    [Selector("estimateOutputFileLengthWithCompletionHandler:")]
+    public void EstimateOutputFileLengthWithCompletionHandler(AVAssetExportSessionEstimateOutputFileLengthWithCompletionHandlerHandlerBlock handler);
 }
 
 /// AVAssetExportSessionMetadata, a category of AVAssetExportSession.
 public extern objc class AVAssetExportSession
 {
-    [Selector("metadata", "setMetadata:")] public NSArray? Metadata { get; set; }
-    [Selector("metadataItemFilter", "setMetadataItemFilter:")] public AVMetadataItemFilter? MetadataItemFilter { get; set; }
+    [Selector("metadata", "setMetadata:")]
+    public NSArray? Metadata { get; set; }
+    [Selector("metadataItemFilter", "setMetadataItemFilter:")]
+    public AVMetadataItemFilter? MetadataItemFilter { get; set; }
 }
 
 /// AVAssetExportSessionMediaProcessing, a category of AVAssetExportSession.
 public extern objc class AVAssetExportSession
 {
-    [Selector("audioTimePitchAlgorithm", "setAudioTimePitchAlgorithm:")] public AVAudioTimePitchAlgorithm? AudioTimePitchAlgorithm { get; set; }
-    [Selector("audioMix", "setAudioMix:")] public AVAudioMix? AudioMix { get; set; }
-    [Selector("videoComposition", "setVideoComposition:")] public AVVideoComposition? VideoComposition { get; set; }
-    [Selector("customVideoCompositor")] public AVVideoCompositing? CustomVideoCompositor { get; }
-    [Selector("audioTrackGroupHandling", "setAudioTrackGroupHandling:")] public AVAssetTrackGroupOutputHandling AudioTrackGroupHandling { get; set; }
+    [Selector("audioTimePitchAlgorithm", "setAudioTimePitchAlgorithm:")]
+    public AVAudioTimePitchAlgorithm? AudioTimePitchAlgorithm { get; set; }
+    [Selector("audioMix", "setAudioMix:")]
+    public AVAudioMix? AudioMix { get; set; }
+    [Selector("videoComposition", "setVideoComposition:")]
+    public AVVideoComposition? VideoComposition { get; set; }
+    [Selector("customVideoCompositor")]
+    public AVVideoCompositing? CustomVideoCompositor { get; }
+    [Selector("audioTrackGroupHandling", "setAudioTrackGroupHandling:")]
+    public AVAssetTrackGroupOutputHandling AudioTrackGroupHandling { get; set; }
 }
 
 /// AVAssetExportSessionMultipass, a category of AVAssetExportSession.
 public extern objc class AVAssetExportSession
 {
-    [Selector("canPerformMultiplePassesOverSourceMediaData", "setCanPerformMultiplePassesOverSourceMediaData:")] public bool CanPerformMultiplePassesOverSourceMediaData { get; set; }
-    [Selector("directoryForTemporaryFiles", "setDirectoryForTemporaryFiles:")] public NSURL? DirectoryForTemporaryFiles { get; set; }
+    [Selector("canPerformMultiplePassesOverSourceMediaData", "setCanPerformMultiplePassesOverSourceMediaData:")]
+    public bool CanPerformMultiplePassesOverSourceMediaData { get; set; }
+    [Selector("directoryForTemporaryFiles", "setDirectoryForTemporaryFiles:")]
+    public NSURL? DirectoryForTemporaryFiles { get; set; }
 }
 
 #endif

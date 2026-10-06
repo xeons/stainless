@@ -143,51 +143,87 @@ public objc closure void NSPersistentStoreCoordinatorPerformBlockAndWaitBlock();
 
 public extern objc class NSPersistentStoreCoordinator : NSObject, NSLocking
 {
-    [Selector("managedObjectModel")] public NSManagedObjectModel ManagedObjectModel { get; }
-    [Selector("persistentStores")] public NSArray PersistentStores { get; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("registeredStoreTypes")] public static NSDictionary RegisteredStoreTypes { get; }
-    [Selector("initWithManagedObjectModel:")] public Self InitWithManagedObjectModel(NSManagedObjectModel model);
-    [Selector("persistentStoreForURL:")] public NSPersistentStore? PersistentStoreForURL(NSURL URL);
-    [Selector("URLForPersistentStore:")] public NSURL URLForPersistentStore(NSPersistentStore store);
-    [Selector("setURL:forPersistentStore:")] public bool SetURLForPersistentStore(NSURL url, NSPersistentStore store);
-    [Selector("addPersistentStoreWithType:configuration:URL:options:error:")] public NSPersistentStore? AddPersistentStoreWithTypeConfigurationURLOptionsError(NSString storeType, NSString? configuration, NSURL? storeURL, NSDictionary? options, out NSError? error);
-    [Selector("addPersistentStoreWithDescription:completionHandler:")] public void AddPersistentStoreWithDescriptionCompletionHandler(NSPersistentStoreDescription storeDescription, NSPersistentStoreCoordinatorAddPersistentStoreWithDescriptionCompletionHandlerBlock block);
-    [Selector("removePersistentStore:error:")] public bool RemovePersistentStoreError(NSPersistentStore store, out NSError? error);
-    [Selector("setMetadata:forPersistentStore:")] public void SetMetadataForPersistentStore(NSDictionary? metadata, NSPersistentStore store);
-    [Selector("metadataForPersistentStore:")] public NSDictionary MetadataForPersistentStore(NSPersistentStore store);
-    [Selector("managedObjectIDForURIRepresentation:")] public NSManagedObjectID? ManagedObjectIDForURIRepresentation(NSURL url);
-    [Selector("executeRequest:withContext:error:")] public AnyObject? ExecuteRequestWithContextError(NSPersistentStoreRequest request, NSManagedObjectContext context, out NSError? error);
-    [Selector("registerStoreClass:forStoreType:")] public static void RegisterStoreClassForStoreType(Class storeClass, NSString storeType);
-    [Selector("metadataForPersistentStoreOfType:URL:options:error:")] public static NSDictionary? MetadataForPersistentStoreOfTypeURLOptionsError(NSString storeType, NSURL url, NSDictionary? options, out NSError? error);
-    [Selector("setMetadata:forPersistentStoreOfType:URL:options:error:")] public static bool SetMetadataForPersistentStoreOfTypeURLOptionsError(NSDictionary? metadata, NSString storeType, NSURL url, NSDictionary? options, out NSError? error);
+    [Selector("managedObjectModel")]
+    public NSManagedObjectModel ManagedObjectModel { get; }
+    [Selector("persistentStores")]
+    public NSArray PersistentStores { get; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("registeredStoreTypes")]
+    public static NSDictionary RegisteredStoreTypes { get; }
+    [Selector("initWithManagedObjectModel:")]
+    public Self InitWithManagedObjectModel(NSManagedObjectModel model);
+    [Selector("persistentStoreForURL:")]
+    public NSPersistentStore? PersistentStoreForURL(NSURL URL);
+    [Selector("URLForPersistentStore:")]
+    public NSURL URLForPersistentStore(NSPersistentStore store);
+    [Selector("setURL:forPersistentStore:")]
+    public bool SetURLForPersistentStore(NSURL url, NSPersistentStore store);
+    [Selector("addPersistentStoreWithType:configuration:URL:options:error:")]
+    public NSPersistentStore? AddPersistentStoreWithTypeConfigurationURLOptionsError(NSString storeType, NSString? configuration, NSURL? storeURL, NSDictionary? options, out NSError? error);
+    [Selector("addPersistentStoreWithDescription:completionHandler:")]
+    public void AddPersistentStoreWithDescriptionCompletionHandler(NSPersistentStoreDescription storeDescription, NSPersistentStoreCoordinatorAddPersistentStoreWithDescriptionCompletionHandlerBlock block);
+    [Selector("removePersistentStore:error:")]
+    public bool RemovePersistentStoreError(NSPersistentStore store, out NSError? error);
+    [Selector("setMetadata:forPersistentStore:")]
+    public void SetMetadataForPersistentStore(NSDictionary? metadata, NSPersistentStore store);
+    [Selector("metadataForPersistentStore:")]
+    public NSDictionary MetadataForPersistentStore(NSPersistentStore store);
+    [Selector("managedObjectIDForURIRepresentation:")]
+    public NSManagedObjectID? ManagedObjectIDForURIRepresentation(NSURL url);
+    [Selector("executeRequest:withContext:error:")]
+    public AnyObject? ExecuteRequestWithContextError(NSPersistentStoreRequest request, NSManagedObjectContext context, out NSError? error);
+    [Selector("registerStoreClass:forStoreType:")]
+    public static void RegisterStoreClassForStoreType(Class storeClass, NSString storeType);
+    [Selector("metadataForPersistentStoreOfType:URL:options:error:")]
+    public static NSDictionary? MetadataForPersistentStoreOfTypeURLOptionsError(NSString storeType, NSURL url, NSDictionary? options, out NSError? error);
+    [Selector("setMetadata:forPersistentStoreOfType:URL:options:error:")]
+    public static bool SetMetadataForPersistentStoreOfTypeURLOptionsError(NSDictionary? metadata, NSString storeType, NSURL url, NSDictionary? options, out NSError? error);
     /// Deprecated in macOS 10.13.
-    [Selector("elementsDerivedFromExternalRecordURL:")] public static NSDictionary ElementsDerivedFromExternalRecordURL(NSURL fileURL);
+    [Selector("elementsDerivedFromExternalRecordURL:")]
+    public static NSDictionary ElementsDerivedFromExternalRecordURL(NSURL fileURL);
     /// Deprecated in macOS 10.13.
-    [Selector("importStoreWithIdentifier:fromExternalRecordsDirectory:toURL:options:withType:error:")] public NSPersistentStore? ImportStoreWithIdentifierFromExternalRecordsDirectoryToURLOptionsWithTypeError(NSString? storeIdentifier, NSURL externalRecordsURL, NSURL destinationURL, NSDictionary? options, NSString storeType, out NSError? error);
-    [Selector("migratePersistentStore:toURL:options:withType:error:")] public NSPersistentStore? MigratePersistentStoreToURLOptionsWithTypeError(NSPersistentStore store, NSURL URL, NSDictionary? options, NSString storeType, out NSError? error);
-    [Selector("destroyPersistentStoreAtURL:withType:options:error:")] public bool DestroyPersistentStoreAtURLWithTypeOptionsError(NSURL url, NSString storeType, NSDictionary? options, out NSError? error);
-    [Selector("replacePersistentStoreAtURL:destinationOptions:withPersistentStoreFromURL:sourceOptions:storeType:error:")] public bool ReplacePersistentStoreAtURLDestinationOptionsWithPersistentStoreFromURLSourceOptionsStoreTypeError(NSURL destinationURL, NSDictionary? destinationOptions, NSURL sourceURL, NSDictionary? sourceOptions, NSString storeType, out NSError? error);
-    [Selector("performBlock:")] public void PerformBlock(NSPersistentStoreCoordinatorPerformBlockBlock block);
-    [Selector("performBlockAndWait:")] public void PerformBlockAndWait(NSPersistentStoreCoordinatorPerformBlockAndWaitBlock block);
-    [Selector("currentPersistentHistoryTokenFromStores:")] public NSPersistentHistoryToken? CurrentPersistentHistoryTokenFromStores(NSArray? stores);
-    [Selector("finishDeferredLightweightMigration:")] public bool FinishDeferredLightweightMigration(out NSError? error);
-    [Selector("finishDeferredLightweightMigrationTask:")] public bool FinishDeferredLightweightMigrationTask(out NSError? error);
-    [Selector("managedObjectIDFromUTF8String:length:")] public NSManagedObjectID ManagedObjectIDFromUTF8StringLength(byte* utf8string, NSUInteger len);
+    [Selector("importStoreWithIdentifier:fromExternalRecordsDirectory:toURL:options:withType:error:")]
+    public NSPersistentStore? ImportStoreWithIdentifierFromExternalRecordsDirectoryToURLOptionsWithTypeError(NSString? storeIdentifier, NSURL externalRecordsURL, NSURL destinationURL, NSDictionary? options, NSString storeType, out NSError? error);
+    [Selector("migratePersistentStore:toURL:options:withType:error:")]
+    public NSPersistentStore? MigratePersistentStoreToURLOptionsWithTypeError(NSPersistentStore store, NSURL URL, NSDictionary? options, NSString storeType, out NSError? error);
+    [Selector("destroyPersistentStoreAtURL:withType:options:error:")]
+    public bool DestroyPersistentStoreAtURLWithTypeOptionsError(NSURL url, NSString storeType, NSDictionary? options, out NSError? error);
+    [Selector("replacePersistentStoreAtURL:destinationOptions:withPersistentStoreFromURL:sourceOptions:storeType:error:")]
+    public bool ReplacePersistentStoreAtURLDestinationOptionsWithPersistentStoreFromURLSourceOptionsStoreTypeError(NSURL destinationURL, NSDictionary? destinationOptions, NSURL sourceURL, NSDictionary? sourceOptions, NSString storeType, out NSError? error);
+    [Selector("performBlock:")]
+    public void PerformBlock(NSPersistentStoreCoordinatorPerformBlockBlock block);
+    [Selector("performBlockAndWait:")]
+    public void PerformBlockAndWait(NSPersistentStoreCoordinatorPerformBlockAndWaitBlock block);
+    [Selector("currentPersistentHistoryTokenFromStores:")]
+    public NSPersistentHistoryToken? CurrentPersistentHistoryTokenFromStores(NSArray? stores);
+    [Selector("finishDeferredLightweightMigration:")]
+    public bool FinishDeferredLightweightMigration(out NSError? error);
+    [Selector("finishDeferredLightweightMigrationTask:")]
+    public bool FinishDeferredLightweightMigrationTask(out NSError? error);
+    [Selector("managedObjectIDFromUTF8String:length:")]
+    public NSManagedObjectID ManagedObjectIDFromUTF8StringLength(byte* utf8string, NSUInteger len);
     /// Deprecated in macOS 10.5.
-    [Selector("metadataForPersistentStoreWithURL:error:")] public static NSDictionary? MetadataForPersistentStoreWithURLError(NSURL url, out NSError? error);
+    [Selector("metadataForPersistentStoreWithURL:error:")]
+    public static NSDictionary? MetadataForPersistentStoreWithURLError(NSURL url, out NSError? error);
     /// Deprecated in macOS 10.10.
-    [Selector("lock")] public void Lock();
+    [Selector("lock")]
+    public void Lock();
     /// Deprecated in macOS 10.10.
-    [Selector("unlock")] public void Unlock();
+    [Selector("unlock")]
+    public void Unlock();
     /// Deprecated in macOS 10.10.
-    [Selector("tryLock")] public bool TryLock();
+    [Selector("tryLock")]
+    public bool TryLock();
     /// Deprecated in macOS 10.11.
-    [Selector("metadataForPersistentStoreOfType:URL:error:")] public static NSDictionary? MetadataForPersistentStoreOfTypeURLError(NSString? storeType, NSURL url, out NSError? error);
+    [Selector("metadataForPersistentStoreOfType:URL:error:")]
+    public static NSDictionary? MetadataForPersistentStoreOfTypeURLError(NSString? storeType, NSURL url, out NSError? error);
     /// Deprecated in macOS 10.11.
-    [Selector("setMetadata:forPersistentStoreOfType:URL:error:")] public static bool SetMetadataForPersistentStoreOfTypeURLError(NSDictionary? metadata, NSString? storeType, NSURL url, out NSError? error);
+    [Selector("setMetadata:forPersistentStoreOfType:URL:error:")]
+    public static bool SetMetadataForPersistentStoreOfTypeURLError(NSDictionary? metadata, NSString? storeType, NSURL url, out NSError? error);
     /// Deprecated in macOS 10.12.
-    [Selector("removeUbiquitousContentAndPersistentStoreAtURL:options:error:")] public static bool RemoveUbiquitousContentAndPersistentStoreAtURLOptionsError(NSURL storeURL, NSDictionary? options, out NSError? error);
+    [Selector("removeUbiquitousContentAndPersistentStoreAtURL:options:error:")]
+    public static bool RemoveUbiquitousContentAndPersistentStoreAtURLOptionsError(NSURL storeURL, NSDictionary? options, out NSError? error);
 }
 
 /// Deprecated in macOS 10.12.

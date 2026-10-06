@@ -40,36 +40,52 @@ public enum PKAddIdentityDocumentType : long
 
 public extern objc class PKIdentityDocumentMetadata : NSObject
 {
-    [Selector("credentialIdentifier")] public NSString CredentialIdentifier { get; }
-    [Selector("sharingInstanceIdentifier")] public NSString SharingInstanceIdentifier { get; }
-    [Selector("cardTemplateIdentifier")] public NSString CardTemplateIdentifier { get; }
-    [Selector("cardConfigurationIdentifier")] public NSString CardConfigurationIdentifier { get; }
-    [Selector("serverEnvironmentIdentifier", "setServerEnvironmentIdentifier:")] public NSString ServerEnvironmentIdentifier { get; set; }
-    [Selector("issuingCountryCode")] public NSString? IssuingCountryCode { get; }
-    [Selector("documentType")] public PKAddIdentityDocumentType DocumentType { get; }
+    [Selector("credentialIdentifier")]
+    public NSString CredentialIdentifier { get; }
+    [Selector("sharingInstanceIdentifier")]
+    public NSString SharingInstanceIdentifier { get; }
+    [Selector("cardTemplateIdentifier")]
+    public NSString CardTemplateIdentifier { get; }
+    [Selector("cardConfigurationIdentifier")]
+    public NSString CardConfigurationIdentifier { get; }
+    [Selector("serverEnvironmentIdentifier", "setServerEnvironmentIdentifier:")]
+    public NSString ServerEnvironmentIdentifier { get; set; }
+    [Selector("issuingCountryCode")]
+    public NSString? IssuingCountryCode { get; }
+    [Selector("documentType")]
+    public PKAddIdentityDocumentType DocumentType { get; }
 }
 
 public extern objc class PKAddIdentityDocumentMetadata : PKIdentityDocumentMetadata
 {
-    [Selector("preview")] public PKAddPassMetadataPreview Preview { get; }
-    [Selector("initWithProvisioningCredentialIdentifier:sharingInstanceIdentifier:cardTemplateIdentifier:issuingCountryCode:documentType:preview:")] public Self InitWithProvisioningCredentialIdentifierSharingInstanceIdentifierCardTemplateIdentifierIssuingCountryCodeDocumentTypePreview(NSString credentialIdentifier, NSString sharingInstanceIdentifier, NSString templateIdentifier, NSString issuingCountryCode, PKAddIdentityDocumentType documentType, PKAddPassMetadataPreview preview);
+    [Selector("preview")]
+    public PKAddPassMetadataPreview Preview { get; }
+    [Selector("initWithProvisioningCredentialIdentifier:sharingInstanceIdentifier:cardTemplateIdentifier:issuingCountryCode:documentType:preview:")]
+    public Self InitWithProvisioningCredentialIdentifierSharingInstanceIdentifierCardTemplateIdentifierIssuingCountryCodeDocumentTypePreview(NSString credentialIdentifier, NSString sharingInstanceIdentifier, NSString templateIdentifier, NSString issuingCountryCode, PKAddIdentityDocumentType documentType, PKAddPassMetadataPreview preview);
 }
 
 public extern objc class PKJapanIndividualNumberCardMetadata : PKIdentityDocumentMetadata
 {
-    [Selector("authenticationPassword", "setAuthenticationPassword:")] public NSString? AuthenticationPassword { get; set; }
-    [Selector("signingPassword", "setSigningPassword:")] public NSString? SigningPassword { get; set; }
-    [Selector("preview", "setPreview:")] public PKAddPassMetadataPreview Preview { get; set; }
-    [Selector("initWithProvisioningCredentialIdentifier:sharingInstanceIdentifier:cardTemplateIdentifier:preview:")] public Self InitWithProvisioningCredentialIdentifierSharingInstanceIdentifierCardTemplateIdentifierPreview(NSString credentialIdentifier, NSString sharingInstanceIdentifier, NSString templateIdentifier, PKAddPassMetadataPreview preview);
-    [Selector("initWithProvisioningCredentialIdentifier:sharingInstanceIdentifier:cardConfigurationIdentifier:preview:")] public Self InitWithProvisioningCredentialIdentifierSharingInstanceIdentifierCardConfigurationIdentifierPreview(NSString credentialIdentifier, NSString sharingInstanceIdentifier, NSString cardConfigurationIdentifier, PKAddPassMetadataPreview preview);
+    [Selector("authenticationPassword", "setAuthenticationPassword:")]
+    public NSString? AuthenticationPassword { get; set; }
+    [Selector("signingPassword", "setSigningPassword:")]
+    public NSString? SigningPassword { get; set; }
+    [Selector("preview", "setPreview:")]
+    public PKAddPassMetadataPreview Preview { get; set; }
+    [Selector("initWithProvisioningCredentialIdentifier:sharingInstanceIdentifier:cardTemplateIdentifier:preview:")]
+    public Self InitWithProvisioningCredentialIdentifierSharingInstanceIdentifierCardTemplateIdentifierPreview(NSString credentialIdentifier, NSString sharingInstanceIdentifier, NSString templateIdentifier, PKAddPassMetadataPreview preview);
+    [Selector("initWithProvisioningCredentialIdentifier:sharingInstanceIdentifier:cardConfigurationIdentifier:preview:")]
+    public Self InitWithProvisioningCredentialIdentifierSharingInstanceIdentifierCardConfigurationIdentifierPreview(NSString credentialIdentifier, NSString sharingInstanceIdentifier, NSString cardConfigurationIdentifier, PKAddPassMetadataPreview preview);
 }
 
 public objc closure void PKAddIdentityDocumentConfigurationConfigurationForMetadataCompletionCompletionBlock(PKAddIdentityDocumentConfiguration? arg0, NSError? arg1);
 
 public extern objc class PKAddIdentityDocumentConfiguration : PKAddSecureElementPassConfiguration
 {
-    [Selector("metadata")] public PKIdentityDocumentMetadata Metadata { get; }
-    [Selector("configurationForMetadata:completion:")] public static void ConfigurationForMetadataCompletion(PKIdentityDocumentMetadata metadata, PKAddIdentityDocumentConfigurationConfigurationForMetadataCompletionCompletionBlock completion);
+    [Selector("metadata")]
+    public PKIdentityDocumentMetadata Metadata { get; }
+    [Selector("configurationForMetadata:completion:")]
+    public static void ConfigurationForMetadataCompletion(PKIdentityDocumentMetadata metadata, PKAddIdentityDocumentConfigurationConfigurationForMetadataCompletionCompletionBlock completion);
 }
 
 #endif

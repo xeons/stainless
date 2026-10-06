@@ -69,7 +69,8 @@ public extern "C" OSStatus SecACLSetContents(SecACLRef acl, CFArrayRef? applicat
 public extern "C" OSStatus SecACLGetAuthorizations(SecACLRef acl, CSSM_ACL_AUTHORIZATION_TAG* tags, uint32* tagCount);
 
 /// Deprecated in macOS 10.10.
-[ReturnsRetained] public extern "C" CFArrayRef SecACLCopyAuthorizations(SecACLRef acl);
+[ReturnsRetained]
+public extern "C" CFArrayRef SecACLCopyAuthorizations(SecACLRef acl);
 
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecACLSetAuthorizations(SecACLRef acl, CSSM_ACL_AUTHORIZATION_TAG* tags, uint32 tagCount);

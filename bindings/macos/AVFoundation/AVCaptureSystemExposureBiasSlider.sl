@@ -33,8 +33,10 @@ public objc closure void AVCaptureSystemExposureBiasSliderInitWithDeviceActionAc
 
 public extern objc class AVCaptureSystemExposureBiasSlider : AVCaptureControl
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(AVCaptureDevice device);
-    [Selector("initWithDevice:action:")] public Self InitWithDeviceAction(AVCaptureDevice device, AVCaptureSystemExposureBiasSliderInitWithDeviceActionActionBlock action);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(AVCaptureDevice device);
+    [Selector("initWithDevice:action:")]
+    public Self InitWithDeviceAction(AVCaptureDevice device, AVCaptureSystemExposureBiasSliderInitWithDeviceActionActionBlock action);
 }
 
 #endif

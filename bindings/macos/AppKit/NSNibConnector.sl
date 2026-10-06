@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class NSNibConnector : NSObject, NSCoding
 {
-    [Selector("source", "setSource:")] public AnyObject? Source { get; set; }
-    [Selector("destination", "setDestination:")] public AnyObject? Destination { get; set; }
-    [Selector("label", "setLabel:")] public NSString Label { get; set; }
-    [Selector("replaceObject:withObject:")] public void ReplaceObjectWithObject(AnyObject oldObject, AnyObject newObject);
-    [Selector("establishConnection")] public void EstablishConnection();
+    [Selector("source", "setSource:")]
+    public AnyObject? Source { get; set; }
+    [Selector("destination", "setDestination:")]
+    public AnyObject? Destination { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString Label { get; set; }
+    [Selector("replaceObject:withObject:")]
+    public void ReplaceObjectWithObject(AnyObject oldObject, AnyObject newObject);
+    [Selector("establishConnection")]
+    public void EstablishConnection();
 }
 
 #endif

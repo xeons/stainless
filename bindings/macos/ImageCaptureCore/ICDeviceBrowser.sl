@@ -35,25 +35,43 @@ public using ICAuthorizationStatus = NSString;
 
 public objc interface ICDeviceBrowserDelegate : NSObjectProtocol
 {
-    [Selector("deviceBrowser:didAddDevice:moreComing:")] void DeviceBrowserDidAddDeviceMoreComing(ICDeviceBrowser browser, ICDevice device, bool moreComing);
-    [Selector("deviceBrowser:didRemoveDevice:moreGoing:")] void DeviceBrowserDidRemoveDeviceMoreGoing(ICDeviceBrowser browser, ICDevice device, bool moreGoing);
-    [Optional] [Selector("deviceBrowser:deviceDidChangeName:")] void DeviceBrowserDeviceDidChangeName(ICDeviceBrowser browser, ICDevice device);
+    [Selector("deviceBrowser:didAddDevice:moreComing:")]
+    void DeviceBrowserDidAddDeviceMoreComing(ICDeviceBrowser browser, ICDevice device, bool moreComing);
+    [Selector("deviceBrowser:didRemoveDevice:moreGoing:")]
+    void DeviceBrowserDidRemoveDeviceMoreGoing(ICDeviceBrowser browser, ICDevice device, bool moreGoing);
+    [Optional]
+    [Selector("deviceBrowser:deviceDidChangeName:")]
+    void DeviceBrowserDeviceDidChangeName(ICDeviceBrowser browser, ICDevice device);
     /// Deprecated in macOS 10.13.
-    [Optional] [Selector("deviceBrowser:deviceDidChangeSharingState:")] void DeviceBrowserDeviceDidChangeSharingState(ICDeviceBrowser browser, ICDevice device);
-    [Optional] [Selector("deviceBrowser:requestsSelectDevice:")] void DeviceBrowserRequestsSelectDevice(ICDeviceBrowser browser, ICDevice device);
-    [Optional] [Selector("deviceBrowserDidEnumerateLocalDevices:")] void DeviceBrowserDidEnumerateLocalDevices(ICDeviceBrowser browser);
+    [Optional]
+    [Selector("deviceBrowser:deviceDidChangeSharingState:")]
+    void DeviceBrowserDeviceDidChangeSharingState(ICDeviceBrowser browser, ICDevice device);
+    [Optional]
+    [Selector("deviceBrowser:requestsSelectDevice:")]
+    void DeviceBrowserRequestsSelectDevice(ICDeviceBrowser browser, ICDevice device);
+    [Optional]
+    [Selector("deviceBrowserDidEnumerateLocalDevices:")]
+    void DeviceBrowserDidEnumerateLocalDevices(ICDeviceBrowser browser);
 }
 
 public extern objc class ICDeviceBrowser : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public ICDeviceBrowserDelegate? Delegate { get; set; }
-    [Selector("isBrowsing")] public bool Browsing { get; }
-    [Selector("browsedDeviceTypeMask", "setBrowsedDeviceTypeMask:")] public ICDeviceTypeMask BrowsedDeviceTypeMask { get; set; }
-    [Selector("devices")] public NSArray? Devices { get; }
-    [Selector("preferredDevice")] public ICDevice? PreferredDevice { get; }
-    [Selector("init")] public Self Init();
-    [Selector("start")] public void Start();
-    [Selector("stop")] public void Stop();
+    [Selector("delegate", "setDelegate:")]
+    public ICDeviceBrowserDelegate? Delegate { get; set; }
+    [Selector("isBrowsing")]
+    public bool Browsing { get; }
+    [Selector("browsedDeviceTypeMask", "setBrowsedDeviceTypeMask:")]
+    public ICDeviceTypeMask BrowsedDeviceTypeMask { get; set; }
+    [Selector("devices")]
+    public NSArray? Devices { get; }
+    [Selector("preferredDevice")]
+    public ICDevice? PreferredDevice { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("start")]
+    public void Start();
+    [Selector("stop")]
+    public void Stop();
 }
 
 #endif

@@ -45,9 +45,12 @@ public objc closure void PHLivePhotoRequestLivePhotoWithResourceFileURLsPlacehol
 
 public extern objc class PHLivePhoto : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("size")] public CGSize Size { get; }
-    [Selector("requestLivePhotoWithResourceFileURLs:placeholderImage:targetSize:contentMode:resultHandler:")] public static PHLivePhotoRequestID RequestLivePhotoWithResourceFileURLsPlaceholderImageTargetSizeContentModeResultHandler(NSArray fileURLs, NSImage? image, CGSize targetSize, PHImageContentMode contentMode, PHLivePhotoRequestLivePhotoWithResourceFileURLsPlaceholderImageTargetSizeContentModeResultHandlerResultHandlerBlock resultHandler);
-    [Selector("cancelLivePhotoRequestWithRequestID:")] public static void CancelLivePhotoRequestWithRequestID(PHLivePhotoRequestID requestID);
+    [Selector("size")]
+    public CGSize Size { get; }
+    [Selector("requestLivePhotoWithResourceFileURLs:placeholderImage:targetSize:contentMode:resultHandler:")]
+    public static PHLivePhotoRequestID RequestLivePhotoWithResourceFileURLsPlaceholderImageTargetSizeContentModeResultHandler(NSArray fileURLs, NSImage? image, CGSize targetSize, PHImageContentMode contentMode, PHLivePhotoRequestLivePhotoWithResourceFileURLsPlaceholderImageTargetSizeContentModeResultHandlerResultHandlerBlock resultHandler);
+    [Selector("cancelLivePhotoRequestWithRequestID:")]
+    public static void CancelLivePhotoRequestWithRequestID(PHLivePhotoRequestID requestID);
 }
 
 #endif

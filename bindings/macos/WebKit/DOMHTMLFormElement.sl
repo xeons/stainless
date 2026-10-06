@@ -33,17 +33,28 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLFormElement : DOMHTMLElement
 {
-    [Selector("acceptCharset", "setAcceptCharset:")] public NSString? AcceptCharset { get; set; }
-    [Selector("action", "setAction:")] public NSString? Action { get; set; }
-    [Selector("enctype", "setEnctype:")] public NSString? Enctype { get; set; }
-    [Selector("encoding", "setEncoding:")] public NSString? Encoding { get; set; }
-    [Selector("method", "setMethod:")] public NSString? Method { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("target", "setTarget:")] public NSString? Target { get; set; }
-    [Selector("elements")] public DOMHTMLCollection? Elements { get; }
-    [Selector("length")] public int Length { get; }
-    [Selector("submit")] public void Submit();
-    [Selector("reset")] public void Reset();
+    [Selector("acceptCharset", "setAcceptCharset:")]
+    public NSString? AcceptCharset { get; set; }
+    [Selector("action", "setAction:")]
+    public NSString? Action { get; set; }
+    [Selector("enctype", "setEnctype:")]
+    public NSString? Enctype { get; set; }
+    [Selector("encoding", "setEncoding:")]
+    public NSString? Encoding { get; set; }
+    [Selector("method", "setMethod:")]
+    public NSString? Method { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("target", "setTarget:")]
+    public NSString? Target { get; set; }
+    [Selector("elements")]
+    public DOMHTMLCollection? Elements { get; }
+    [Selector("length")]
+    public int Length { get; }
+    [Selector("submit")]
+    public void Submit();
+    [Selector("reset")]
+    public void Reset();
 }
 
 #endif

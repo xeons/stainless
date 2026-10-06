@@ -55,51 +55,83 @@ public using NSStackViewVisibilityPriority = float;
 
 public extern objc class NSStackView : NSView
 {
-    [Selector("delegate", "setDelegate:")] public NSStackViewDelegate? Delegate { get; set; }
-    [Selector("orientation", "setOrientation:")] public NSUserInterfaceLayoutOrientation Orientation { get; set; }
-    [Selector("alignment", "setAlignment:")] public NSLayoutAttribute Alignment { get; set; }
-    [Selector("edgeInsets", "setEdgeInsets:")] public NSEdgeInsets EdgeInsets { get; set; }
-    [Selector("distribution", "setDistribution:")] public NSStackViewDistribution Distribution { get; set; }
-    [Selector("spacing", "setSpacing:")] public CGFloat Spacing { get; set; }
-    [Selector("detachesHiddenViews", "setDetachesHiddenViews:")] public bool DetachesHiddenViews { get; set; }
-    [Selector("arrangedSubviews")] public NSArray? ArrangedSubviews { get; }
-    [Selector("detachedViews")] public NSArray DetachedViews { get; }
-    [Selector("stackViewWithViews:")] public static Self StackViewWithViews(NSArray views);
-    [Selector("setCustomSpacing:afterView:")] public void SetCustomSpacingAfterView(CGFloat spacing, NSView view);
-    [Selector("customSpacingAfterView:")] public CGFloat CustomSpacingAfterView(NSView view);
-    [Selector("addArrangedSubview:")] public void AddArrangedSubview(NSView view);
-    [Selector("insertArrangedSubview:atIndex:")] public void InsertArrangedSubviewAtIndex(NSView view, NSInteger index);
-    [Selector("removeArrangedSubview:")] public void RemoveArrangedSubview(NSView view);
-    [Selector("setVisibilityPriority:forView:")] public void SetVisibilityPriorityForView(NSStackViewVisibilityPriority priority, NSView view);
-    [Selector("visibilityPriorityForView:")] public NSStackViewVisibilityPriority VisibilityPriorityForView(NSView view);
-    [Selector("clippingResistancePriorityForOrientation:")] public NSLayoutPriority ClippingResistancePriorityForOrientation(NSLayoutConstraintOrientation orientation);
-    [Selector("setClippingResistancePriority:forOrientation:")] public void SetClippingResistancePriorityForOrientation(NSLayoutPriority clippingResistancePriority, NSLayoutConstraintOrientation orientation);
-    [Selector("huggingPriorityForOrientation:")] public NSLayoutPriority HuggingPriorityForOrientation(NSLayoutConstraintOrientation orientation);
-    [Selector("setHuggingPriority:forOrientation:")] public void SetHuggingPriorityForOrientation(NSLayoutPriority huggingPriority, NSLayoutConstraintOrientation orientation);
+    [Selector("delegate", "setDelegate:")]
+    public NSStackViewDelegate? Delegate { get; set; }
+    [Selector("orientation", "setOrientation:")]
+    public NSUserInterfaceLayoutOrientation Orientation { get; set; }
+    [Selector("alignment", "setAlignment:")]
+    public NSLayoutAttribute Alignment { get; set; }
+    [Selector("edgeInsets", "setEdgeInsets:")]
+    public NSEdgeInsets EdgeInsets { get; set; }
+    [Selector("distribution", "setDistribution:")]
+    public NSStackViewDistribution Distribution { get; set; }
+    [Selector("spacing", "setSpacing:")]
+    public CGFloat Spacing { get; set; }
+    [Selector("detachesHiddenViews", "setDetachesHiddenViews:")]
+    public bool DetachesHiddenViews { get; set; }
+    [Selector("arrangedSubviews")]
+    public NSArray? ArrangedSubviews { get; }
+    [Selector("detachedViews")]
+    public NSArray DetachedViews { get; }
+    [Selector("stackViewWithViews:")]
+    public static Self StackViewWithViews(NSArray views);
+    [Selector("setCustomSpacing:afterView:")]
+    public void SetCustomSpacingAfterView(CGFloat spacing, NSView view);
+    [Selector("customSpacingAfterView:")]
+    public CGFloat CustomSpacingAfterView(NSView view);
+    [Selector("addArrangedSubview:")]
+    public void AddArrangedSubview(NSView view);
+    [Selector("insertArrangedSubview:atIndex:")]
+    public void InsertArrangedSubviewAtIndex(NSView view, NSInteger index);
+    [Selector("removeArrangedSubview:")]
+    public void RemoveArrangedSubview(NSView view);
+    [Selector("setVisibilityPriority:forView:")]
+    public void SetVisibilityPriorityForView(NSStackViewVisibilityPriority priority, NSView view);
+    [Selector("visibilityPriorityForView:")]
+    public NSStackViewVisibilityPriority VisibilityPriorityForView(NSView view);
+    [Selector("clippingResistancePriorityForOrientation:")]
+    public NSLayoutPriority ClippingResistancePriorityForOrientation(NSLayoutConstraintOrientation orientation);
+    [Selector("setClippingResistancePriority:forOrientation:")]
+    public void SetClippingResistancePriorityForOrientation(NSLayoutPriority clippingResistancePriority, NSLayoutConstraintOrientation orientation);
+    [Selector("huggingPriorityForOrientation:")]
+    public NSLayoutPriority HuggingPriorityForOrientation(NSLayoutConstraintOrientation orientation);
+    [Selector("setHuggingPriority:forOrientation:")]
+    public void SetHuggingPriorityForOrientation(NSLayoutPriority huggingPriority, NSLayoutConstraintOrientation orientation);
 }
 
 public objc interface NSStackViewDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("stackView:willDetachViews:")] void StackViewWillDetachViews(NSStackView stackView, NSArray views);
-    [Optional] [Selector("stackView:didReattachViews:")] void StackViewDidReattachViews(NSStackView stackView, NSArray views);
+    [Optional]
+    [Selector("stackView:willDetachViews:")]
+    void StackViewWillDetachViews(NSStackView stackView, NSArray views);
+    [Optional]
+    [Selector("stackView:didReattachViews:")]
+    void StackViewDidReattachViews(NSStackView stackView, NSArray views);
 }
 
 /// NSStackViewGravityAreas, a category of NSStackView.
 public extern objc class NSStackView
 {
-    [Selector("views")] public NSArray Views { get; }
-    [Selector("addView:inGravity:")] public void AddViewInGravity(NSView view, NSStackViewGravity gravity);
-    [Selector("insertView:atIndex:inGravity:")] public void InsertViewAtIndexInGravity(NSView view, NSUInteger index, NSStackViewGravity gravity);
-    [Selector("removeView:")] public void RemoveView(NSView view);
-    [Selector("viewsInGravity:")] public NSArray ViewsInGravity(NSStackViewGravity gravity);
-    [Selector("setViews:inGravity:")] public void SetViewsInGravity(NSArray views, NSStackViewGravity gravity);
+    [Selector("views")]
+    public NSArray Views { get; }
+    [Selector("addView:inGravity:")]
+    public void AddViewInGravity(NSView view, NSStackViewGravity gravity);
+    [Selector("insertView:atIndex:inGravity:")]
+    public void InsertViewAtIndexInGravity(NSView view, NSUInteger index, NSStackViewGravity gravity);
+    [Selector("removeView:")]
+    public void RemoveView(NSView view);
+    [Selector("viewsInGravity:")]
+    public NSArray ViewsInGravity(NSStackViewGravity gravity);
+    [Selector("setViews:inGravity:")]
+    public void SetViewsInGravity(NSArray views, NSStackViewGravity gravity);
 }
 
 /// NSStackViewDeprecated, a category of NSStackView.
 public extern objc class NSStackView
 {
     /// Deprecated in macOS 10.11.
-    [Selector("hasEqualSpacing", "setHasEqualSpacing:")] public bool HasEqualSpacing { get; set; }
+    [Selector("hasEqualSpacing", "setHasEqualSpacing:")]
+    public bool HasEqualSpacing { get; set; }
 }
 
 #endif

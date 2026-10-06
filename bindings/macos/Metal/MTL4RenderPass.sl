@@ -34,23 +34,40 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTL4RenderPassDescriptor : NSObject, NSCopying
 {
-    [Selector("colorAttachments")] public MTLRenderPassColorAttachmentDescriptorArray ColorAttachments { get; }
-    [Selector("depthAttachment", "setDepthAttachment:")] public MTLRenderPassDepthAttachmentDescriptor? DepthAttachment { get; set; }
-    [Selector("stencilAttachment", "setStencilAttachment:")] public MTLRenderPassStencilAttachmentDescriptor? StencilAttachment { get; set; }
-    [Selector("renderTargetArrayLength", "setRenderTargetArrayLength:")] public NSUInteger RenderTargetArrayLength { get; set; }
-    [Selector("imageblockSampleLength", "setImageblockSampleLength:")] public NSUInteger ImageblockSampleLength { get; set; }
-    [Selector("threadgroupMemoryLength", "setThreadgroupMemoryLength:")] public NSUInteger ThreadgroupMemoryLength { get; set; }
-    [Selector("tileWidth", "setTileWidth:")] public NSUInteger TileWidth { get; set; }
-    [Selector("tileHeight", "setTileHeight:")] public NSUInteger TileHeight { get; set; }
-    [Selector("defaultRasterSampleCount", "setDefaultRasterSampleCount:")] public NSUInteger DefaultRasterSampleCount { get; set; }
-    [Selector("renderTargetWidth", "setRenderTargetWidth:")] public NSUInteger RenderTargetWidth { get; set; }
-    [Selector("renderTargetHeight", "setRenderTargetHeight:")] public NSUInteger RenderTargetHeight { get; set; }
-    [Selector("rasterizationRateMap", "setRasterizationRateMap:")] public MTLRasterizationRateMap? RasterizationRateMap { get; set; }
-    [Selector("visibilityResultBuffer", "setVisibilityResultBuffer:")] public MTLBuffer? VisibilityResultBuffer { get; set; }
-    [Selector("visibilityResultType", "setVisibilityResultType:")] public MTLVisibilityResultType VisibilityResultType { get; set; }
-    [Selector("supportColorAttachmentMapping", "setSupportColorAttachmentMapping:")] public bool SupportColorAttachmentMapping { get; set; }
-    [Selector("setSamplePositions:count:")] public void SetSamplePositionsCount(MTLSamplePosition* positions, NSUInteger count);
-    [Selector("getSamplePositions:count:")] public NSUInteger GetSamplePositionsCount(MTLSamplePosition* positions, NSUInteger count);
+    [Selector("colorAttachments")]
+    public MTLRenderPassColorAttachmentDescriptorArray ColorAttachments { get; }
+    [Selector("depthAttachment", "setDepthAttachment:")]
+    public MTLRenderPassDepthAttachmentDescriptor? DepthAttachment { get; set; }
+    [Selector("stencilAttachment", "setStencilAttachment:")]
+    public MTLRenderPassStencilAttachmentDescriptor? StencilAttachment { get; set; }
+    [Selector("renderTargetArrayLength", "setRenderTargetArrayLength:")]
+    public NSUInteger RenderTargetArrayLength { get; set; }
+    [Selector("imageblockSampleLength", "setImageblockSampleLength:")]
+    public NSUInteger ImageblockSampleLength { get; set; }
+    [Selector("threadgroupMemoryLength", "setThreadgroupMemoryLength:")]
+    public NSUInteger ThreadgroupMemoryLength { get; set; }
+    [Selector("tileWidth", "setTileWidth:")]
+    public NSUInteger TileWidth { get; set; }
+    [Selector("tileHeight", "setTileHeight:")]
+    public NSUInteger TileHeight { get; set; }
+    [Selector("defaultRasterSampleCount", "setDefaultRasterSampleCount:")]
+    public NSUInteger DefaultRasterSampleCount { get; set; }
+    [Selector("renderTargetWidth", "setRenderTargetWidth:")]
+    public NSUInteger RenderTargetWidth { get; set; }
+    [Selector("renderTargetHeight", "setRenderTargetHeight:")]
+    public NSUInteger RenderTargetHeight { get; set; }
+    [Selector("rasterizationRateMap", "setRasterizationRateMap:")]
+    public MTLRasterizationRateMap? RasterizationRateMap { get; set; }
+    [Selector("visibilityResultBuffer", "setVisibilityResultBuffer:")]
+    public MTLBuffer? VisibilityResultBuffer { get; set; }
+    [Selector("visibilityResultType", "setVisibilityResultType:")]
+    public MTLVisibilityResultType VisibilityResultType { get; set; }
+    [Selector("supportColorAttachmentMapping", "setSupportColorAttachmentMapping:")]
+    public bool SupportColorAttachmentMapping { get; set; }
+    [Selector("setSamplePositions:count:")]
+    public void SetSamplePositionsCount(MTLSamplePosition* positions, NSUInteger count);
+    [Selector("getSamplePositions:count:")]
+    public NSUInteger GetSamplePositionsCount(MTLSamplePosition* positions, NSUInteger count);
 }
 
 #endif

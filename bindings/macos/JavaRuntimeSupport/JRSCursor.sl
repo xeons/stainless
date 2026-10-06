@@ -33,13 +33,20 @@ import Standard.ObjC;
 /// JavaRuntimeSupport, a category of NSCursor.
 public extern objc class NSCursor
 {
-    [Selector("javaBusyButClickableCursor")] public static NSCursor? JavaBusyButClickableCursor();
-    [Selector("javaResizeNECursor")] public static NSCursor? JavaResizeNECursor();
-    [Selector("javaResizeNWCursor")] public static NSCursor? JavaResizeNWCursor();
-    [Selector("javaResizeSECursor")] public static NSCursor? JavaResizeSECursor();
-    [Selector("javaResizeSWCursor")] public static NSCursor? JavaResizeSWCursor();
-    [Selector("javaMoveCursor")] public static NSCursor? JavaMoveCursor();
-    [Selector("javaSetAllowsCursorSetInBackground:")] public static void JavaSetAllowsCursorSetInBackground(bool allows);
+    [Selector("javaBusyButClickableCursor")]
+    public static NSCursor? JavaBusyButClickableCursor();
+    [Selector("javaResizeNECursor")]
+    public static NSCursor? JavaResizeNECursor();
+    [Selector("javaResizeNWCursor")]
+    public static NSCursor? JavaResizeNWCursor();
+    [Selector("javaResizeSECursor")]
+    public static NSCursor? JavaResizeSECursor();
+    [Selector("javaResizeSWCursor")]
+    public static NSCursor? JavaResizeSWCursor();
+    [Selector("javaMoveCursor")]
+    public static NSCursor? JavaMoveCursor();
+    [Selector("javaSetAllowsCursorSetInBackground:")]
+    public static void JavaSetAllowsCursorSetInBackground(bool allows);
 }
 
 #endif

@@ -42,7 +42,8 @@ public using DRTrackMessage = UInt32;
 
 public delegate OSStatus DRTrackCallbackProc(__DRTrack* arg0, DRTrackMessage arg1, void* arg2);
 
-[ReturnsRetained] public extern "C" DRTrackRef? DRTrackCreate(CFDictionaryRef? properties, DRTrackCallbackProc callback);
+[ReturnsRetained]
+public extern "C" DRTrackRef? DRTrackCreate(CFDictionaryRef? properties, DRTrackCallbackProc callback);
 
 public extern "C" void DRTrackSetProperties(DRTrackRef? track, CFDictionaryRef? properties);
 

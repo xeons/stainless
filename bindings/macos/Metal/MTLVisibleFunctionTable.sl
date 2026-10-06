@@ -33,15 +33,20 @@ import Standard.ObjC;
 
 public extern objc class MTLVisibleFunctionTableDescriptor : NSObject, NSCopying
 {
-    [Selector("functionCount", "setFunctionCount:")] public NSUInteger FunctionCount { get; set; }
-    [Selector("visibleFunctionTableDescriptor")] public static MTLVisibleFunctionTableDescriptor VisibleFunctionTableDescriptor();
+    [Selector("functionCount", "setFunctionCount:")]
+    public NSUInteger FunctionCount { get; set; }
+    [Selector("visibleFunctionTableDescriptor")]
+    public static MTLVisibleFunctionTableDescriptor VisibleFunctionTableDescriptor();
 }
 
 public objc interface MTLVisibleFunctionTable : MTLResource
 {
-    [Selector("gpuResourceID")] MTLResourceID GpuResourceID { get; }
-    [Selector("setFunction:atIndex:")] void SetFunctionAtIndex(MTLFunctionHandle? function, NSUInteger index);
-    [Selector("setFunctions:withRange:")] void SetFunctionsWithRange(void** functions, NSRange range);
+    [Selector("gpuResourceID")]
+    MTLResourceID GpuResourceID { get; }
+    [Selector("setFunction:atIndex:")]
+    void SetFunctionAtIndex(MTLFunctionHandle? function, NSUInteger index);
+    [Selector("setFunctions:withRange:")]
+    void SetFunctionsWithRange(void** functions, NSRange range);
 }
 
 #endif

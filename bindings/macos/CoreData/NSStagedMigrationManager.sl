@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class NSStagedMigrationManager : NSObject
 {
-    [Selector("stages")] public NSArray Stages { get; }
-    [Selector("container")] public NSPersistentContainer? Container { get; }
-    [Selector("initWithMigrationStages:")] public Self InitWithMigrationStages(NSArray stages);
+    [Selector("stages")]
+    public NSArray Stages { get; }
+    [Selector("container")]
+    public NSPersistentContainer? Container { get; }
+    [Selector("initWithMigrationStages:")]
+    public Self InitWithMigrationStages(NSArray stages);
 }
 
 #endif

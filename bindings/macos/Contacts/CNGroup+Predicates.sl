@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// Predicates, a category of CNGroup.
 public extern objc class CNGroup
 {
-    [Selector("predicateForGroupsWithIdentifiers:")] public static NSPredicate PredicateForGroupsWithIdentifiers(NSArray identifiers);
-    [Selector("predicateForSubgroupsInGroupWithIdentifier:")] public static NSPredicate PredicateForSubgroupsInGroupWithIdentifier(NSString parentGroupIdentifier);
-    [Selector("predicateForGroupsInContainerWithIdentifier:")] public static NSPredicate PredicateForGroupsInContainerWithIdentifier(NSString containerIdentifier);
+    [Selector("predicateForGroupsWithIdentifiers:")]
+    public static NSPredicate PredicateForGroupsWithIdentifiers(NSArray identifiers);
+    [Selector("predicateForSubgroupsInGroupWithIdentifier:")]
+    public static NSPredicate PredicateForSubgroupsInGroupWithIdentifier(NSString parentGroupIdentifier);
+    [Selector("predicateForGroupsInContainerWithIdentifier:")]
+    public static NSPredicate PredicateForGroupsInContainerWithIdentifier(NSString containerIdentifier);
 }
 
 #endif

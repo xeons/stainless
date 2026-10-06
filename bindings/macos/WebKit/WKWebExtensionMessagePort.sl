@@ -51,13 +51,20 @@ public objc closure void WKWebExtensionMessagePortSendMessageCompletionHandlerCo
 /// macOS 15.4 and later.
 public extern objc class WKWebExtensionMessagePort : NSObject
 {
-    [Selector("applicationIdentifier")] public NSString? ApplicationIdentifier { get; }
-    [Selector("messageHandler", "setMessageHandler:")] public WKWebExtensionMessagePortMessageHandlerBlock? MessageHandler { get; set; }
-    [Selector("disconnectHandler", "setDisconnectHandler:")] public WKWebExtensionMessagePortDisconnectHandlerBlock? DisconnectHandler { get; set; }
-    [Selector("isDisconnected")] public bool Disconnected { get; }
-    [Selector("sendMessage:completionHandler:")] public void SendMessageCompletionHandler(AnyObject? message, WKWebExtensionMessagePortSendMessageCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("disconnect")] public void Disconnect();
-    [Selector("disconnectWithError:")] public void DisconnectWithError(NSError? error);
+    [Selector("applicationIdentifier")]
+    public NSString? ApplicationIdentifier { get; }
+    [Selector("messageHandler", "setMessageHandler:")]
+    public WKWebExtensionMessagePortMessageHandlerBlock? MessageHandler { get; set; }
+    [Selector("disconnectHandler", "setDisconnectHandler:")]
+    public WKWebExtensionMessagePortDisconnectHandlerBlock? DisconnectHandler { get; set; }
+    [Selector("isDisconnected")]
+    public bool Disconnected { get; }
+    [Selector("sendMessage:completionHandler:")]
+    public void SendMessageCompletionHandler(AnyObject? message, WKWebExtensionMessagePortSendMessageCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("disconnect")]
+    public void Disconnect();
+    [Selector("disconnectWithError:")]
+    public void DisconnectWithError(NSError? error);
 }
 
 #endif

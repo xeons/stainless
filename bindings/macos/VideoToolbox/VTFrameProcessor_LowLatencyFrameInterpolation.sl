@@ -34,26 +34,41 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class VTLowLatencyFrameInterpolationConfiguration : NSObject, VTFrameProcessorConfiguration
 {
-    [Selector("frameWidth")] public NSInteger FrameWidth { get; }
-    [Selector("frameHeight")] public NSInteger FrameHeight { get; }
-    [Selector("spatialScaleFactor")] public NSInteger SpatialScaleFactor { get; }
-    [Selector("numberOfInterpolatedFrames")] public NSInteger NumberOfInterpolatedFrames { get; }
-    [Selector("frameSupportedPixelFormats")] public NSArray? FrameSupportedPixelFormats { get; }
-    [Selector("sourcePixelBufferAttributes")] public NSDictionary SourcePixelBufferAttributes { get; }
-    [Selector("destinationPixelBufferAttributes")] public NSDictionary DestinationPixelBufferAttributes { get; }
-    [Selector("isSupported")] public static bool Supported { get; }
-    [Selector("initWithFrameWidth:frameHeight:numberOfInterpolatedFrames:")] public Self? InitWithFrameWidthFrameHeightNumberOfInterpolatedFrames(NSInteger frameWidth, NSInteger frameHeight, NSInteger numberOfInterpolatedFrames);
-    [Selector("initWithFrameWidth:frameHeight:spatialScaleFactor:")] public Self? InitWithFrameWidthFrameHeightSpatialScaleFactor(NSInteger frameWidth, NSInteger frameHeight, NSInteger spatialScaleFactor);
+    [Selector("frameWidth")]
+    public NSInteger FrameWidth { get; }
+    [Selector("frameHeight")]
+    public NSInteger FrameHeight { get; }
+    [Selector("spatialScaleFactor")]
+    public NSInteger SpatialScaleFactor { get; }
+    [Selector("numberOfInterpolatedFrames")]
+    public NSInteger NumberOfInterpolatedFrames { get; }
+    [Selector("frameSupportedPixelFormats")]
+    public NSArray? FrameSupportedPixelFormats { get; }
+    [Selector("sourcePixelBufferAttributes")]
+    public NSDictionary SourcePixelBufferAttributes { get; }
+    [Selector("destinationPixelBufferAttributes")]
+    public NSDictionary DestinationPixelBufferAttributes { get; }
+    [Selector("isSupported")]
+    public static bool Supported { get; }
+    [Selector("initWithFrameWidth:frameHeight:numberOfInterpolatedFrames:")]
+    public Self? InitWithFrameWidthFrameHeightNumberOfInterpolatedFrames(NSInteger frameWidth, NSInteger frameHeight, NSInteger numberOfInterpolatedFrames);
+    [Selector("initWithFrameWidth:frameHeight:spatialScaleFactor:")]
+    public Self? InitWithFrameWidthFrameHeightSpatialScaleFactor(NSInteger frameWidth, NSInteger frameHeight, NSInteger spatialScaleFactor);
 }
 
 /// macOS 26.0 and later.
 public extern objc class VTLowLatencyFrameInterpolationParameters : NSObject, VTFrameProcessorParameters
 {
-    [Selector("sourceFrame")] public VTFrameProcessorFrame SourceFrame { get; }
-    [Selector("previousFrame")] public VTFrameProcessorFrame PreviousFrame { get; }
-    [Selector("interpolationPhase")] public NSArray? InterpolationPhase { get; }
-    [Selector("destinationFrames")] public NSArray DestinationFrames { get; }
-    [Selector("initWithSourceFrame:previousFrame:interpolationPhase:destinationFrames:")] public Self? InitWithSourceFramePreviousFrameInterpolationPhaseDestinationFrames(VTFrameProcessorFrame sourceFrame, VTFrameProcessorFrame previousFrame, NSArray interpolationPhase, NSArray destinationFrames);
+    [Selector("sourceFrame")]
+    public VTFrameProcessorFrame SourceFrame { get; }
+    [Selector("previousFrame")]
+    public VTFrameProcessorFrame PreviousFrame { get; }
+    [Selector("interpolationPhase")]
+    public NSArray? InterpolationPhase { get; }
+    [Selector("destinationFrames")]
+    public NSArray DestinationFrames { get; }
+    [Selector("initWithSourceFrame:previousFrame:interpolationPhase:destinationFrames:")]
+    public Self? InitWithSourceFramePreviousFrameInterpolationPhaseDestinationFrames(VTFrameProcessorFrame sourceFrame, VTFrameProcessorFrame previousFrame, NSArray interpolationPhase, NSArray destinationFrames);
 }
 
 #endif

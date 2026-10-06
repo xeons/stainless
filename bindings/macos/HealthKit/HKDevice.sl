@@ -49,16 +49,26 @@ public extern "C" NSString HKDevicePropertyKeyUDIDeviceIdentifier;
 
 public extern objc class HKDevice : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("manufacturer")] public NSString? Manufacturer { get; }
-    [Selector("model")] public NSString? Model { get; }
-    [Selector("hardwareVersion")] public NSString? HardwareVersion { get; }
-    [Selector("firmwareVersion")] public NSString? FirmwareVersion { get; }
-    [Selector("softwareVersion")] public NSString? SoftwareVersion { get; }
-    [Selector("localIdentifier")] public NSString? LocalIdentifier { get; }
-    [Selector("UDIDeviceIdentifier")] public NSString? UDIDeviceIdentifier { get; }
-    [Selector("initWithName:manufacturer:model:hardwareVersion:firmwareVersion:softwareVersion:localIdentifier:UDIDeviceIdentifier:")] public Self InitWithNameManufacturerModelHardwareVersionFirmwareVersionSoftwareVersionLocalIdentifierUDIDeviceIdentifier(NSString? name, NSString? manufacturer, NSString? model, NSString? hardwareVersion, NSString? firmwareVersion, NSString? softwareVersion, NSString? localIdentifier, NSString? UDIDeviceIdentifier);
-    [Selector("localDevice")] public static HKDevice LocalDevice();
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("manufacturer")]
+    public NSString? Manufacturer { get; }
+    [Selector("model")]
+    public NSString? Model { get; }
+    [Selector("hardwareVersion")]
+    public NSString? HardwareVersion { get; }
+    [Selector("firmwareVersion")]
+    public NSString? FirmwareVersion { get; }
+    [Selector("softwareVersion")]
+    public NSString? SoftwareVersion { get; }
+    [Selector("localIdentifier")]
+    public NSString? LocalIdentifier { get; }
+    [Selector("UDIDeviceIdentifier")]
+    public NSString? UDIDeviceIdentifier { get; }
+    [Selector("initWithName:manufacturer:model:hardwareVersion:firmwareVersion:softwareVersion:localIdentifier:UDIDeviceIdentifier:")]
+    public Self InitWithNameManufacturerModelHardwareVersionFirmwareVersionSoftwareVersionLocalIdentifierUDIDeviceIdentifier(NSString? name, NSString? manufacturer, NSString? model, NSString? hardwareVersion, NSString? firmwareVersion, NSString? softwareVersion, NSString? localIdentifier, NSString? UDIDeviceIdentifier);
+    [Selector("localDevice")]
+    public static HKDevice LocalDevice();
 }
 
 #endif

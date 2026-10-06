@@ -34,11 +34,16 @@ import Standard.ObjC;
 
 public extern objc class MKPolygon : MKMultiPoint, MKOverlay
 {
-    [Selector("interiorPolygons")] public NSArray? InteriorPolygons { get; }
-    [Selector("polygonWithPoints:count:")] public static Self PolygonWithPointsCount(MKMapPoint* points, NSUInteger count);
-    [Selector("polygonWithPoints:count:interiorPolygons:")] public static Self PolygonWithPointsCountInteriorPolygons(MKMapPoint* points, NSUInteger count, NSArray? interiorPolygons);
-    [Selector("polygonWithCoordinates:count:")] public static Self PolygonWithCoordinatesCount(CLLocationCoordinate2D* coords, NSUInteger count);
-    [Selector("polygonWithCoordinates:count:interiorPolygons:")] public static Self PolygonWithCoordinatesCountInteriorPolygons(CLLocationCoordinate2D* coords, NSUInteger count, NSArray? interiorPolygons);
+    [Selector("interiorPolygons")]
+    public NSArray? InteriorPolygons { get; }
+    [Selector("polygonWithPoints:count:")]
+    public static Self PolygonWithPointsCount(MKMapPoint* points, NSUInteger count);
+    [Selector("polygonWithPoints:count:interiorPolygons:")]
+    public static Self PolygonWithPointsCountInteriorPolygons(MKMapPoint* points, NSUInteger count, NSArray? interiorPolygons);
+    [Selector("polygonWithCoordinates:count:")]
+    public static Self PolygonWithCoordinatesCount(CLLocationCoordinate2D* coords, NSUInteger count);
+    [Selector("polygonWithCoordinates:count:interiorPolygons:")]
+    public static Self PolygonWithCoordinatesCountInteriorPolygons(CLLocationCoordinate2D* coords, NSUInteger count, NSArray? interiorPolygons);
 }
 
 #endif

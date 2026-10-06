@@ -39,7 +39,8 @@ public extern objc class DREraseSessionRef : CFTypeRef { }
 
 public extern "C" CFTypeID DREraseSessionGetTypeID();
 
-[ReturnsRetained] public extern "C" DREraseSessionRef? DREraseSessionCreate();
+[ReturnsRetained]
+public extern "C" DREraseSessionRef? DREraseSessionCreate();
 
 public extern "C" void DREraseSessionSetErase(DREraseSessionRef? eraseSession, DREraseRef? erase);
 

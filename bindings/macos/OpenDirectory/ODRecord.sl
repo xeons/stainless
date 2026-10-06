@@ -33,55 +33,91 @@ import Standard.ObjC;
 
 public extern objc class ODRecord : NSObject
 {
-    [Selector("recordType")] public NSString? RecordType { get; }
-    [Selector("recordName")] public NSString? RecordName { get; }
-    [Selector("secondsUntilPasswordExpires")] public long SecondsUntilPasswordExpires { get; }
-    [Selector("secondsUntilAuthenticationsExpire")] public long SecondsUntilAuthenticationsExpire { get; }
-    [Selector("setNodeCredentials:password:error:")] public bool SetNodeCredentialsPasswordError(NSString? inUsername, NSString? inPassword, out NSError? outError);
-    [Selector("setNodeCredentialsWithRecordType:authenticationType:authenticationItems:continueItems:context:error:")] public bool SetNodeCredentialsWithRecordTypeAuthenticationTypeAuthenticationItemsContinueItemsContextError(ODRecordType? inRecordType, ODAuthenticationType? inType, NSArray? inItems, out NSArray? outItems, out AnyObject? outContext, out NSError? outError);
+    [Selector("recordType")]
+    public NSString? RecordType { get; }
+    [Selector("recordName")]
+    public NSString? RecordName { get; }
+    [Selector("secondsUntilPasswordExpires")]
+    public long SecondsUntilPasswordExpires { get; }
+    [Selector("secondsUntilAuthenticationsExpire")]
+    public long SecondsUntilAuthenticationsExpire { get; }
+    [Selector("setNodeCredentials:password:error:")]
+    public bool SetNodeCredentialsPasswordError(NSString? inUsername, NSString? inPassword, out NSError? outError);
+    [Selector("setNodeCredentialsWithRecordType:authenticationType:authenticationItems:continueItems:context:error:")]
+    public bool SetNodeCredentialsWithRecordTypeAuthenticationTypeAuthenticationItemsContinueItemsContextError(ODRecordType? inRecordType, ODAuthenticationType? inType, NSArray? inItems, out NSArray? outItems, out AnyObject? outContext, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Selector("setNodeCredentialsUsingKerberosCache:error:")] public bool SetNodeCredentialsUsingKerberosCacheError(NSString? inCacheName, out NSError? outError);
+    [Selector("setNodeCredentialsUsingKerberosCache:error:")]
+    public bool SetNodeCredentialsUsingKerberosCacheError(NSString? inCacheName, out NSError? outError);
     /// Deprecated in macOS 10.9.
-    [Selector("passwordPolicyAndReturnError:")] public NSDictionary? PasswordPolicyAndReturnError(out NSError? outError);
-    [Selector("verifyPassword:error:")] public bool VerifyPasswordError(NSString? inPassword, out NSError? outError);
-    [Selector("verifyExtendedWithAuthenticationType:authenticationItems:continueItems:context:error:")] public bool VerifyExtendedWithAuthenticationTypeAuthenticationItemsContinueItemsContextError(ODAuthenticationType? inType, NSArray? inItems, out NSArray? outItems, out AnyObject? outContext, out NSError? outError);
-    [Selector("changePassword:toPassword:error:")] public bool ChangePasswordToPasswordError(NSString? oldPassword, NSString? newPassword, out NSError? outError);
-    [Selector("synchronizeAndReturnError:")] public bool SynchronizeAndReturnError(out NSError? outError);
-    [Selector("recordDetailsForAttributes:error:")] public NSDictionary? RecordDetailsForAttributesError(NSArray? inAttributes, out NSError? outError);
-    [Selector("valuesForAttribute:error:")] public NSArray? ValuesForAttributeError(ODAttributeType? inAttribute, out NSError? outError);
-    [Selector("setValue:forAttribute:error:")] public bool SetValueForAttributeError(AnyObject? inValueOrValues, ODAttributeType? inAttribute, out NSError? outError);
-    [Selector("removeValuesForAttribute:error:")] public bool RemoveValuesForAttributeError(ODAttributeType? inAttribute, out NSError? outError);
-    [Selector("addValue:toAttribute:error:")] public bool AddValueToAttributeError(AnyObject? inValue, ODAttributeType? inAttribute, out NSError? outError);
-    [Selector("removeValue:fromAttribute:error:")] public bool RemoveValueFromAttributeError(AnyObject? inValue, ODAttributeType? inAttribute, out NSError? outError);
-    [Selector("deleteRecordAndReturnError:")] public bool DeleteRecordAndReturnError(out NSError? outError);
+    [Selector("passwordPolicyAndReturnError:")]
+    public NSDictionary? PasswordPolicyAndReturnError(out NSError? outError);
+    [Selector("verifyPassword:error:")]
+    public bool VerifyPasswordError(NSString? inPassword, out NSError? outError);
+    [Selector("verifyExtendedWithAuthenticationType:authenticationItems:continueItems:context:error:")]
+    public bool VerifyExtendedWithAuthenticationTypeAuthenticationItemsContinueItemsContextError(ODAuthenticationType? inType, NSArray? inItems, out NSArray? outItems, out AnyObject? outContext, out NSError? outError);
+    [Selector("changePassword:toPassword:error:")]
+    public bool ChangePasswordToPasswordError(NSString? oldPassword, NSString? newPassword, out NSError? outError);
+    [Selector("synchronizeAndReturnError:")]
+    public bool SynchronizeAndReturnError(out NSError? outError);
+    [Selector("recordDetailsForAttributes:error:")]
+    public NSDictionary? RecordDetailsForAttributesError(NSArray? inAttributes, out NSError? outError);
+    [Selector("valuesForAttribute:error:")]
+    public NSArray? ValuesForAttributeError(ODAttributeType? inAttribute, out NSError? outError);
+    [Selector("setValue:forAttribute:error:")]
+    public bool SetValueForAttributeError(AnyObject? inValueOrValues, ODAttributeType? inAttribute, out NSError? outError);
+    [Selector("removeValuesForAttribute:error:")]
+    public bool RemoveValuesForAttributeError(ODAttributeType? inAttribute, out NSError? outError);
+    [Selector("addValue:toAttribute:error:")]
+    public bool AddValueToAttributeError(AnyObject? inValue, ODAttributeType? inAttribute, out NSError? outError);
+    [Selector("removeValue:fromAttribute:error:")]
+    public bool RemoveValueFromAttributeError(AnyObject? inValue, ODAttributeType? inAttribute, out NSError? outError);
+    [Selector("deleteRecordAndReturnError:")]
+    public bool DeleteRecordAndReturnError(out NSError? outError);
     /// Deprecated in macOS 10.10.
-    [Selector("policiesAndReturnError:")] public NSDictionary? PoliciesAndReturnError(out NSError? error);
+    [Selector("policiesAndReturnError:")]
+    public NSDictionary? PoliciesAndReturnError(out NSError? error);
     /// Deprecated in macOS 10.10.
-    [Selector("effectivePoliciesAndReturnError:")] public NSDictionary? EffectivePoliciesAndReturnError(out NSError? error);
+    [Selector("effectivePoliciesAndReturnError:")]
+    public NSDictionary? EffectivePoliciesAndReturnError(out NSError? error);
     /// Deprecated in macOS 10.10.
-    [Selector("supportedPoliciesAndReturnError:")] public NSDictionary? SupportedPoliciesAndReturnError(out NSError? error);
+    [Selector("supportedPoliciesAndReturnError:")]
+    public NSDictionary? SupportedPoliciesAndReturnError(out NSError? error);
     /// Deprecated in macOS 10.10.
-    [Selector("setPolicies:error:")] public bool SetPoliciesError(NSDictionary? policies, out NSError? error);
+    [Selector("setPolicies:error:")]
+    public bool SetPoliciesError(NSDictionary? policies, out NSError? error);
     /// Deprecated in macOS 10.10.
-    [Selector("setPolicy:value:error:")] public bool SetPolicyValueError(ODPolicyType? policy, AnyObject? value, out NSError? error);
+    [Selector("setPolicy:value:error:")]
+    public bool SetPolicyValueError(ODPolicyType? policy, AnyObject? value, out NSError? error);
     /// Deprecated in macOS 10.10.
-    [Selector("removePolicy:error:")] public bool RemovePolicyError(ODPolicyType? policy, out NSError? error);
-    [Selector("addAccountPolicy:toCategory:error:")] public bool AddAccountPolicyToCategoryError(NSDictionary? policy, ODPolicyCategoryType? category, out NSError? error);
-    [Selector("removeAccountPolicy:fromCategory:error:")] public bool RemoveAccountPolicyFromCategoryError(NSDictionary? policy, ODPolicyCategoryType? category, out NSError? error);
-    [Selector("setAccountPolicies:error:")] public bool SetAccountPoliciesError(NSDictionary? policies, out NSError? error);
-    [Selector("accountPoliciesAndReturnError:")] public NSDictionary? AccountPoliciesAndReturnError(out NSError? error);
-    [Selector("authenticationAllowedAndReturnError:")] public bool AuthenticationAllowedAndReturnError(out NSError? error);
-    [Selector("passwordChangeAllowed:error:")] public bool PasswordChangeAllowedError(NSString? newPassword, out NSError? error);
-    [Selector("willPasswordExpire:")] public bool WillPasswordExpire(ulong willExpireIn);
-    [Selector("willAuthenticationsExpire:")] public bool WillAuthenticationsExpire(ulong willExpireIn);
+    [Selector("removePolicy:error:")]
+    public bool RemovePolicyError(ODPolicyType? policy, out NSError? error);
+    [Selector("addAccountPolicy:toCategory:error:")]
+    public bool AddAccountPolicyToCategoryError(NSDictionary? policy, ODPolicyCategoryType? category, out NSError? error);
+    [Selector("removeAccountPolicy:fromCategory:error:")]
+    public bool RemoveAccountPolicyFromCategoryError(NSDictionary? policy, ODPolicyCategoryType? category, out NSError? error);
+    [Selector("setAccountPolicies:error:")]
+    public bool SetAccountPoliciesError(NSDictionary? policies, out NSError? error);
+    [Selector("accountPoliciesAndReturnError:")]
+    public NSDictionary? AccountPoliciesAndReturnError(out NSError? error);
+    [Selector("authenticationAllowedAndReturnError:")]
+    public bool AuthenticationAllowedAndReturnError(out NSError? error);
+    [Selector("passwordChangeAllowed:error:")]
+    public bool PasswordChangeAllowedError(NSString? newPassword, out NSError? error);
+    [Selector("willPasswordExpire:")]
+    public bool WillPasswordExpire(ulong willExpireIn);
+    [Selector("willAuthenticationsExpire:")]
+    public bool WillAuthenticationsExpire(ulong willExpireIn);
 }
 
 /// ODRecordGroupExtensions, a category of ODRecord.
 public extern objc class ODRecord
 {
-    [Selector("addMemberRecord:error:")] public bool AddMemberRecordError(ODRecord? inRecord, out NSError? outError);
-    [Selector("removeMemberRecord:error:")] public bool RemoveMemberRecordError(ODRecord? inRecord, out NSError? outError);
-    [Selector("isMemberRecord:error:")] public bool IsMemberRecordError(ODRecord? inRecord, out NSError? outError);
+    [Selector("addMemberRecord:error:")]
+    public bool AddMemberRecordError(ODRecord? inRecord, out NSError? outError);
+    [Selector("removeMemberRecord:error:")]
+    public bool RemoveMemberRecordError(ODRecord? inRecord, out NSError? outError);
+    [Selector("isMemberRecord:error:")]
+    public bool IsMemberRecordError(ODRecord? inRecord, out NSError? outError);
 }
 
 #endif

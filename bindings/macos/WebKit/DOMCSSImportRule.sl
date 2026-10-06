@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMCSSImportRule : DOMCSSRule
 {
-    [Selector("href")] public NSString? Href { get; }
-    [Selector("media")] public DOMMediaList? Media { get; }
-    [Selector("styleSheet")] public DOMCSSStyleSheet? StyleSheet { get; }
+    [Selector("href")]
+    public NSString? Href { get; }
+    [Selector("media")]
+    public DOMMediaList? Media { get; }
+    [Selector("styleSheet")]
+    public DOMCSSStyleSheet? StyleSheet { get; }
 }
 
 #endif

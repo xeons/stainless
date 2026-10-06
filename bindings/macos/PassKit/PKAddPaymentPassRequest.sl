@@ -39,26 +39,42 @@ public enum PKAddPaymentPassStyle : long
 
 public extern objc class PKAddPaymentPassRequestConfiguration : NSObject
 {
-    [Selector("encryptionScheme")] public PKEncryptionScheme EncryptionScheme { get; }
-    [Selector("style", "setStyle:")] public PKAddPaymentPassStyle Style { get; set; }
-    [Selector("cardholderName", "setCardholderName:")] public NSString? CardholderName { get; set; }
-    [Selector("primaryAccountSuffix", "setPrimaryAccountSuffix:")] public NSString? PrimaryAccountSuffix { get; set; }
-    [Selector("cardDetails", "setCardDetails:")] public NSArray CardDetails { get; set; }
-    [Selector("localizedDescription", "setLocalizedDescription:")] public NSString? LocalizedDescription { get; set; }
-    [Selector("primaryAccountIdentifier", "setPrimaryAccountIdentifier:")] public NSString? PrimaryAccountIdentifier { get; set; }
-    [Selector("paymentNetwork", "setPaymentNetwork:")] public PKPaymentNetwork? PaymentNetwork { get; set; }
-    [Selector("productIdentifiers", "setProductIdentifiers:")] public NSSet ProductIdentifiers { get; set; }
-    [Selector("requiresFelicaSecureElement", "setRequiresFelicaSecureElement:")] public bool RequiresFelicaSecureElement { get; set; }
-    [Selector("initWithEncryptionScheme:")] public Self? InitWithEncryptionScheme(PKEncryptionScheme encryptionScheme);
+    [Selector("encryptionScheme")]
+    public PKEncryptionScheme EncryptionScheme { get; }
+    [Selector("style", "setStyle:")]
+    public PKAddPaymentPassStyle Style { get; set; }
+    [Selector("cardholderName", "setCardholderName:")]
+    public NSString? CardholderName { get; set; }
+    [Selector("primaryAccountSuffix", "setPrimaryAccountSuffix:")]
+    public NSString? PrimaryAccountSuffix { get; set; }
+    [Selector("cardDetails", "setCardDetails:")]
+    public NSArray CardDetails { get; set; }
+    [Selector("localizedDescription", "setLocalizedDescription:")]
+    public NSString? LocalizedDescription { get; set; }
+    [Selector("primaryAccountIdentifier", "setPrimaryAccountIdentifier:")]
+    public NSString? PrimaryAccountIdentifier { get; set; }
+    [Selector("paymentNetwork", "setPaymentNetwork:")]
+    public PKPaymentNetwork? PaymentNetwork { get; set; }
+    [Selector("productIdentifiers", "setProductIdentifiers:")]
+    public NSSet ProductIdentifiers { get; set; }
+    [Selector("requiresFelicaSecureElement", "setRequiresFelicaSecureElement:")]
+    public bool RequiresFelicaSecureElement { get; set; }
+    [Selector("initWithEncryptionScheme:")]
+    public Self? InitWithEncryptionScheme(PKEncryptionScheme encryptionScheme);
 }
 
 public extern objc class PKAddPaymentPassRequest : NSObject
 {
-    [Selector("encryptedPassData", "setEncryptedPassData:")] public NSData? EncryptedPassData { get; set; }
-    [Selector("activationData", "setActivationData:")] public NSData? ActivationData { get; set; }
-    [Selector("ephemeralPublicKey", "setEphemeralPublicKey:")] public NSData? EphemeralPublicKey { get; set; }
-    [Selector("wrappedKey", "setWrappedKey:")] public NSData? WrappedKey { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("encryptedPassData", "setEncryptedPassData:")]
+    public NSData? EncryptedPassData { get; set; }
+    [Selector("activationData", "setActivationData:")]
+    public NSData? ActivationData { get; set; }
+    [Selector("ephemeralPublicKey", "setEphemeralPublicKey:")]
+    public NSData? EphemeralPublicKey { get; set; }
+    [Selector("wrappedKey", "setWrappedKey:")]
+    public NSData? WrappedKey { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

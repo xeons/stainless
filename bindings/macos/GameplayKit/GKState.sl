@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class GKState : NSObject
 {
-    [Selector("stateMachine")] public GKStateMachine? StateMachine { get; }
-    [Selector("state")] public static Self State();
-    [Selector("init")] public Self Init();
-    [Selector("isValidNextState:")] public bool IsValidNextState(Class stateClass);
-    [Selector("didEnterWithPreviousState:")] public void DidEnterWithPreviousState(GKState? previousState);
-    [Selector("updateWithDeltaTime:")] public void UpdateWithDeltaTime(NSTimeInterval seconds);
-    [Selector("willExitWithNextState:")] public void WillExitWithNextState(GKState nextState);
+    [Selector("stateMachine")]
+    public GKStateMachine? StateMachine { get; }
+    [Selector("state")]
+    public static Self State();
+    [Selector("init")]
+    public Self Init();
+    [Selector("isValidNextState:")]
+    public bool IsValidNextState(Class stateClass);
+    [Selector("didEnterWithPreviousState:")]
+    public void DidEnterWithPreviousState(GKState? previousState);
+    [Selector("updateWithDeltaTime:")]
+    public void UpdateWithDeltaTime(NSTimeInterval seconds);
+    [Selector("willExitWithNextState:")]
+    public void WillExitWithNextState(GKState nextState);
 }
 
 #endif

@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class AUPannerView : NSView
 {
-    [Selector("audioUnit")] public AudioUnit AudioUnit { get; }
-    [Selector("AUPannerViewWithAudioUnit:")] public static AUPannerView AUPannerViewWithAudioUnit(AudioUnit au);
+    [Selector("audioUnit")]
+    public AudioUnit AudioUnit { get; }
+    [Selector("AUPannerViewWithAudioUnit:")]
+    public static AUPannerView AUPannerViewWithAudioUnit(AudioUnit au);
 }
 
 #endif

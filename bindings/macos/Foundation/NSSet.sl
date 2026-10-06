@@ -32,12 +32,18 @@ import Standard.ObjC;
 
 public extern objc class NSSet : NSObject, NSCopying, NSMutableCopying, NSSecureCoding, NSFastEnumeration
 {
-    [Selector("count")] public NSUInteger Count { get; }
-    [Selector("member:")] public AnyObject? Member(AnyObject object);
-    [Selector("objectEnumerator")] public NSEnumerator ObjectEnumerator();
-    [Selector("init")] public Self Init();
-    [Selector("initWithObjects:count:")] public Self InitWithObjectsCount(void** objects, NSUInteger cnt);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("count")]
+    public NSUInteger Count { get; }
+    [Selector("member:")]
+    public AnyObject? Member(AnyObject object);
+    [Selector("objectEnumerator")]
+    public NSEnumerator ObjectEnumerator();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithObjects:count:")]
+    public Self InitWithObjectsCount(void** objects, NSUInteger cnt);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 public objc closure void NSSetEnumerateObjectsUsingBlockBlock(AnyObject arg0, bool* arg1);
@@ -51,75 +57,121 @@ public objc closure bool NSSetObjectsWithOptionsPassingTestPredicateBlock(AnyObj
 /// NSExtendedSet, a category of NSSet.
 public extern objc class NSSet
 {
-    [Selector("allObjects")] public NSArray AllObjects { get; }
-    [Selector("description")] public NSString Description { get; }
-    [Selector("anyObject")] public AnyObject? AnyObject();
-    [Selector("containsObject:")] public bool ContainsObject(AnyObject anObject);
-    [Selector("descriptionWithLocale:")] public NSString DescriptionWithLocale(AnyObject? locale);
-    [Selector("intersectsSet:")] public bool IntersectsSet(NSSet otherSet);
-    [Selector("isEqualToSet:")] public bool IsEqualToSet(NSSet otherSet);
-    [Selector("isSubsetOfSet:")] public bool IsSubsetOfSet(NSSet otherSet);
-    [Selector("makeObjectsPerformSelector:")] public void MakeObjectsPerformSelector(Selector aSelector);
-    [Selector("makeObjectsPerformSelector:withObject:")] public void MakeObjectsPerformSelectorWithObject(Selector aSelector, AnyObject? argument);
-    [Selector("setByAddingObject:")] public NSSet SetByAddingObject(AnyObject anObject);
-    [Selector("setByAddingObjectsFromSet:")] public NSSet SetByAddingObjectsFromSet(NSSet other);
-    [Selector("setByAddingObjectsFromArray:")] public NSSet SetByAddingObjectsFromArray(NSArray other);
-    [Selector("enumerateObjectsUsingBlock:")] public void EnumerateObjectsUsingBlock(NSSetEnumerateObjectsUsingBlockBlock block);
-    [Selector("enumerateObjectsWithOptions:usingBlock:")] public void EnumerateObjectsWithOptionsUsingBlock(NSEnumerationOptions opts, NSSetEnumerateObjectsWithOptionsUsingBlockBlock block);
-    [Selector("objectsPassingTest:")] public NSSet ObjectsPassingTest(NSSetObjectsPassingTestPredicateBlock predicate);
-    [Selector("objectsWithOptions:passingTest:")] public NSSet ObjectsWithOptionsPassingTest(NSEnumerationOptions opts, NSSetObjectsWithOptionsPassingTestPredicateBlock predicate);
+    [Selector("allObjects")]
+    public NSArray AllObjects { get; }
+    [Selector("description")]
+    public NSString Description { get; }
+    [Selector("anyObject")]
+    public AnyObject? AnyObject();
+    [Selector("containsObject:")]
+    public bool ContainsObject(AnyObject anObject);
+    [Selector("descriptionWithLocale:")]
+    public NSString DescriptionWithLocale(AnyObject? locale);
+    [Selector("intersectsSet:")]
+    public bool IntersectsSet(NSSet otherSet);
+    [Selector("isEqualToSet:")]
+    public bool IsEqualToSet(NSSet otherSet);
+    [Selector("isSubsetOfSet:")]
+    public bool IsSubsetOfSet(NSSet otherSet);
+    [Selector("makeObjectsPerformSelector:")]
+    public void MakeObjectsPerformSelector(Selector aSelector);
+    [Selector("makeObjectsPerformSelector:withObject:")]
+    public void MakeObjectsPerformSelectorWithObject(Selector aSelector, AnyObject? argument);
+    [Selector("setByAddingObject:")]
+    public NSSet SetByAddingObject(AnyObject anObject);
+    [Selector("setByAddingObjectsFromSet:")]
+    public NSSet SetByAddingObjectsFromSet(NSSet other);
+    [Selector("setByAddingObjectsFromArray:")]
+    public NSSet SetByAddingObjectsFromArray(NSArray other);
+    [Selector("enumerateObjectsUsingBlock:")]
+    public void EnumerateObjectsUsingBlock(NSSetEnumerateObjectsUsingBlockBlock block);
+    [Selector("enumerateObjectsWithOptions:usingBlock:")]
+    public void EnumerateObjectsWithOptionsUsingBlock(NSEnumerationOptions opts, NSSetEnumerateObjectsWithOptionsUsingBlockBlock block);
+    [Selector("objectsPassingTest:")]
+    public NSSet ObjectsPassingTest(NSSetObjectsPassingTestPredicateBlock predicate);
+    [Selector("objectsWithOptions:passingTest:")]
+    public NSSet ObjectsWithOptionsPassingTest(NSEnumerationOptions opts, NSSetObjectsWithOptionsPassingTestPredicateBlock predicate);
 }
 
 /// NSSetCreation, a category of NSSet.
 public extern objc class NSSet
 {
-    [Selector("set")] public static Self Set();
-    [Selector("setWithObject:")] public static Self SetWithObject(AnyObject object);
-    [Selector("setWithObjects:count:")] public static Self SetWithObjectsCount(void** objects, NSUInteger cnt);
-    [Selector("setWithObjects:")] public static Self SetWithObjects(AnyObject firstObj, ...);
-    [Selector("setWithSet:")] public static Self SetWithSet(NSSet set);
-    [Selector("setWithArray:")] public static Self SetWithArray(NSArray array);
-    [Selector("initWithObjects:")] public Self InitWithObjects(AnyObject firstObj, ...);
-    [Selector("initWithSet:")] public Self InitWithSet(NSSet set);
-    [Selector("initWithSet:copyItems:")] public Self InitWithSetCopyItems(NSSet set, bool flag);
-    [Selector("initWithArray:")] public Self InitWithArray(NSArray array);
+    [Selector("set")]
+    public static Self Set();
+    [Selector("setWithObject:")]
+    public static Self SetWithObject(AnyObject object);
+    [Selector("setWithObjects:count:")]
+    public static Self SetWithObjectsCount(void** objects, NSUInteger cnt);
+    [Selector("setWithObjects:")]
+    public static Self SetWithObjects(AnyObject firstObj, ...);
+    [Selector("setWithSet:")]
+    public static Self SetWithSet(NSSet set);
+    [Selector("setWithArray:")]
+    public static Self SetWithArray(NSArray array);
+    [Selector("initWithObjects:")]
+    public Self InitWithObjects(AnyObject firstObj, ...);
+    [Selector("initWithSet:")]
+    public Self InitWithSet(NSSet set);
+    [Selector("initWithSet:copyItems:")]
+    public Self InitWithSetCopyItems(NSSet set, bool flag);
+    [Selector("initWithArray:")]
+    public Self InitWithArray(NSArray array);
 }
 
 public extern objc class NSMutableSet : NSSet
 {
-    [Selector("addObject:")] public void AddObject(AnyObject object);
-    [Selector("removeObject:")] public void RemoveObject(AnyObject object);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("init")] public Self Init();
-    [Selector("initWithCapacity:")] public Self InitWithCapacity(NSUInteger numItems);
+    [Selector("addObject:")]
+    public void AddObject(AnyObject object);
+    [Selector("removeObject:")]
+    public void RemoveObject(AnyObject object);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCapacity:")]
+    public Self InitWithCapacity(NSUInteger numItems);
 }
 
 /// NSExtendedMutableSet, a category of NSMutableSet.
 public extern objc class NSMutableSet
 {
-    [Selector("addObjectsFromArray:")] public void AddObjectsFromArray(NSArray array);
-    [Selector("intersectSet:")] public void IntersectSet(NSSet otherSet);
-    [Selector("minusSet:")] public void MinusSet(NSSet otherSet);
-    [Selector("removeAllObjects")] public void RemoveAllObjects();
-    [Selector("unionSet:")] public void UnionSet(NSSet otherSet);
-    [Selector("setSet:")] public void SetSet(NSSet otherSet);
+    [Selector("addObjectsFromArray:")]
+    public void AddObjectsFromArray(NSArray array);
+    [Selector("intersectSet:")]
+    public void IntersectSet(NSSet otherSet);
+    [Selector("minusSet:")]
+    public void MinusSet(NSSet otherSet);
+    [Selector("removeAllObjects")]
+    public void RemoveAllObjects();
+    [Selector("unionSet:")]
+    public void UnionSet(NSSet otherSet);
+    [Selector("setSet:")]
+    public void SetSet(NSSet otherSet);
 }
 
 /// NSMutableSetCreation, a category of NSMutableSet.
 public extern objc class NSMutableSet
 {
-    [Selector("setWithCapacity:")] public static Self SetWithCapacity(NSUInteger numItems);
+    [Selector("setWithCapacity:")]
+    public static Self SetWithCapacity(NSUInteger numItems);
 }
 
 public extern objc class NSCountedSet : NSMutableSet
 {
-    [Selector("initWithCapacity:")] public Self InitWithCapacity(NSUInteger numItems);
-    [Selector("initWithArray:")] public Self InitWithArray(NSArray array);
-    [Selector("initWithSet:")] public Self InitWithSet(NSSet set);
-    [Selector("countForObject:")] public NSUInteger CountForObject(AnyObject object);
-    [Selector("objectEnumerator")] public NSEnumerator ObjectEnumerator();
-    [Selector("addObject:")] public void AddObject(AnyObject object);
-    [Selector("removeObject:")] public void RemoveObject(AnyObject object);
+    [Selector("initWithCapacity:")]
+    public Self InitWithCapacity(NSUInteger numItems);
+    [Selector("initWithArray:")]
+    public Self InitWithArray(NSArray array);
+    [Selector("initWithSet:")]
+    public Self InitWithSet(NSSet set);
+    [Selector("countForObject:")]
+    public NSUInteger CountForObject(AnyObject object);
+    [Selector("objectEnumerator")]
+    public NSEnumerator ObjectEnumerator();
+    [Selector("addObject:")]
+    public void AddObject(AnyObject object);
+    [Selector("removeObject:")]
+    public void RemoveObject(AnyObject object);
 }
 
 #endif

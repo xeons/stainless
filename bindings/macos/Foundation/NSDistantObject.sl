@@ -32,12 +32,18 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.13.
 public extern objc class NSDistantObject : NSProxy, NSCoding
 {
-    [Selector("connectionForProxy")] public NSConnection ConnectionForProxy { get; }
-    [Selector("proxyWithTarget:connection:")] public static AnyObject? ProxyWithTargetConnection(AnyObject target, NSConnection connection);
-    [Selector("initWithTarget:connection:")] public Self? InitWithTargetConnection(AnyObject target, NSConnection connection);
-    [Selector("proxyWithLocal:connection:")] public static AnyObject ProxyWithLocalConnection(AnyObject target, NSConnection connection);
-    [Selector("initWithLocal:connection:")] public Self InitWithLocalConnection(AnyObject target, NSConnection connection);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder inCoder);
+    [Selector("connectionForProxy")]
+    public NSConnection ConnectionForProxy { get; }
+    [Selector("proxyWithTarget:connection:")]
+    public static AnyObject? ProxyWithTargetConnection(AnyObject target, NSConnection connection);
+    [Selector("initWithTarget:connection:")]
+    public Self? InitWithTargetConnection(AnyObject target, NSConnection connection);
+    [Selector("proxyWithLocal:connection:")]
+    public static AnyObject ProxyWithLocalConnection(AnyObject target, NSConnection connection);
+    [Selector("initWithLocal:connection:")]
+    public Self InitWithLocalConnection(AnyObject target, NSConnection connection);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder inCoder);
 }
 
 #endif

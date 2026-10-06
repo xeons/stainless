@@ -37,11 +37,15 @@ public objc closure void NEAppProxyTCPFlowWriteDataWithCompletionHandlerCompleti
 
 public extern objc class NEAppProxyTCPFlow : NEAppProxyFlow
 {
-    [Selector("remoteFlowEndpoint")] public nw_endpoint_t RemoteFlowEndpoint { get; }
+    [Selector("remoteFlowEndpoint")]
+    public nw_endpoint_t RemoteFlowEndpoint { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("remoteEndpoint")] public NWEndpoint RemoteEndpoint { get; }
-    [Selector("readDataWithCompletionHandler:")] public void ReadDataWithCompletionHandler(NEAppProxyTCPFlowReadDataWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("writeData:withCompletionHandler:")] public void WriteDataWithCompletionHandler(NSData data, NEAppProxyTCPFlowWriteDataWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("remoteEndpoint")]
+    public NWEndpoint RemoteEndpoint { get; }
+    [Selector("readDataWithCompletionHandler:")]
+    public void ReadDataWithCompletionHandler(NEAppProxyTCPFlowReadDataWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("writeData:withCompletionHandler:")]
+    public void WriteDataWithCompletionHandler(NSData data, NEAppProxyTCPFlowWriteDataWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

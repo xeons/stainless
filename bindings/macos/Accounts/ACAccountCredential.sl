@@ -34,9 +34,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 12.0.
 public extern objc class ACAccountCredential : NSObject
 {
-    [Selector("oauthToken", "setOauthToken:")] public NSString? OauthToken { get; set; }
-    [Selector("initWithOAuthToken:tokenSecret:")] public Self? InitWithOAuthTokenTokenSecret(NSString? token, NSString? secret);
-    [Selector("initWithOAuth2Token:refreshToken:expiryDate:")] public Self? InitWithOAuth2TokenRefreshTokenExpiryDate(NSString? token, NSString? refreshToken, NSDate? expiryDate);
+    [Selector("oauthToken", "setOauthToken:")]
+    public NSString? OauthToken { get; set; }
+    [Selector("initWithOAuthToken:tokenSecret:")]
+    public Self? InitWithOAuthTokenTokenSecret(NSString? token, NSString? secret);
+    [Selector("initWithOAuth2Token:refreshToken:expiryDate:")]
+    public Self? InitWithOAuth2TokenRefreshTokenExpiryDate(NSString? token, NSString? refreshToken, NSDate? expiryDate);
 }
 
 #endif

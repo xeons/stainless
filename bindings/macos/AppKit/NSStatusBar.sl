@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class NSStatusBar : NSObject
 {
-    [Selector("systemStatusBar")] public static NSStatusBar SystemStatusBar { get; }
-    [Selector("isVertical")] public bool Vertical { get; }
-    [Selector("thickness")] public CGFloat Thickness { get; }
-    [Selector("statusItemWithLength:")] public NSStatusItem StatusItemWithLength(CGFloat length);
-    [Selector("removeStatusItem:")] public void RemoveStatusItem(NSStatusItem item);
+    [Selector("systemStatusBar")]
+    public static NSStatusBar SystemStatusBar { get; }
+    [Selector("isVertical")]
+    public bool Vertical { get; }
+    [Selector("thickness")]
+    public CGFloat Thickness { get; }
+    [Selector("statusItemWithLength:")]
+    public NSStatusItem StatusItemWithLength(CGFloat length);
+    [Selector("removeStatusItem:")]
+    public void RemoveStatusItem(NSStatusItem item);
 }
 
 #endif

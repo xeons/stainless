@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public objc interface WKURLSchemeHandler : NSObjectProtocol
 {
-    [Selector("webView:startURLSchemeTask:")] void WebViewStartURLSchemeTask(WKWebView webView, WKURLSchemeTask urlSchemeTask);
-    [Selector("webView:stopURLSchemeTask:")] void WebViewStopURLSchemeTask(WKWebView webView, WKURLSchemeTask urlSchemeTask);
+    [Selector("webView:startURLSchemeTask:")]
+    void WebViewStartURLSchemeTask(WKWebView webView, WKURLSchemeTask urlSchemeTask);
+    [Selector("webView:stopURLSchemeTask:")]
+    void WebViewStopURLSchemeTask(WKWebView webView, WKURLSchemeTask urlSchemeTask);
 }
 
 #endif

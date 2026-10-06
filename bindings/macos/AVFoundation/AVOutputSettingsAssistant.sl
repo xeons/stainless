@@ -69,20 +69,29 @@ public extern "C" AVOutputSettingsPreset AVOutputSettingsPresetMVHEVC7680x7680;
 
 public extern objc class AVOutputSettingsAssistant : NSObject
 {
-    [Selector("audioSettings")] public NSDictionary? AudioSettings { get; }
-    [Selector("videoSettings")] public NSDictionary? VideoSettings { get; }
-    [Selector("outputFileType")] public AVFileType OutputFileType { get; }
-    [Selector("availableOutputSettingsPresets")] public static NSArray AvailableOutputSettingsPresets();
-    [Selector("outputSettingsAssistantWithPreset:")] public static Self? OutputSettingsAssistantWithPreset(AVOutputSettingsPreset presetIdentifier);
+    [Selector("audioSettings")]
+    public NSDictionary? AudioSettings { get; }
+    [Selector("videoSettings")]
+    public NSDictionary? VideoSettings { get; }
+    [Selector("outputFileType")]
+    public AVFileType OutputFileType { get; }
+    [Selector("availableOutputSettingsPresets")]
+    public static NSArray AvailableOutputSettingsPresets();
+    [Selector("outputSettingsAssistantWithPreset:")]
+    public static Self? OutputSettingsAssistantWithPreset(AVOutputSettingsPreset presetIdentifier);
 }
 
 /// AVOutputSettingsAssistant_SourceInformation, a category of AVOutputSettingsAssistant.
 public extern objc class AVOutputSettingsAssistant
 {
-    [Selector("sourceAudioFormat", "setSourceAudioFormat:")] public CMAudioFormatDescriptionRef? SourceAudioFormat { get; set; }
-    [Selector("sourceVideoFormat", "setSourceVideoFormat:")] public CMVideoFormatDescriptionRef? SourceVideoFormat { get; set; }
-    [Selector("sourceVideoAverageFrameDuration", "setSourceVideoAverageFrameDuration:")] public CMTime SourceVideoAverageFrameDuration { get; set; }
-    [Selector("sourceVideoMinFrameDuration", "setSourceVideoMinFrameDuration:")] public CMTime SourceVideoMinFrameDuration { get; set; }
+    [Selector("sourceAudioFormat", "setSourceAudioFormat:")]
+    public CMAudioFormatDescriptionRef? SourceAudioFormat { get; set; }
+    [Selector("sourceVideoFormat", "setSourceVideoFormat:")]
+    public CMVideoFormatDescriptionRef? SourceVideoFormat { get; set; }
+    [Selector("sourceVideoAverageFrameDuration", "setSourceVideoAverageFrameDuration:")]
+    public CMTime SourceVideoAverageFrameDuration { get; set; }
+    [Selector("sourceVideoMinFrameDuration", "setSourceVideoMinFrameDuration:")]
+    public CMTime SourceVideoMinFrameDuration { get; set; }
 }
 
 #endif

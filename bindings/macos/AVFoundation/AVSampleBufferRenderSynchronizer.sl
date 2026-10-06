@@ -34,12 +34,18 @@ import Standard.ObjC;
 
 public extern objc class AVSampleBufferRenderSynchronizer : NSObject
 {
-    [Selector("timebase")] public CMTimebaseRef Timebase { get; }
-    [Selector("rate", "setRate:")] public float Rate { get; set; }
-    [Selector("delaysRateChangeUntilHasSufficientMediaData", "setDelaysRateChangeUntilHasSufficientMediaData:")] public bool DelaysRateChangeUntilHasSufficientMediaData { get; set; }
-    [Selector("currentTime")] public CMTime CurrentTime();
-    [Selector("setRate:time:")] public void SetRateTime(float rate, CMTime time);
-    [Selector("setRate:time:atHostTime:")] public void SetRateTimeAtHostTime(float rate, CMTime time, CMTime hostTime);
+    [Selector("timebase")]
+    public CMTimebaseRef Timebase { get; }
+    [Selector("rate", "setRate:")]
+    public float Rate { get; set; }
+    [Selector("delaysRateChangeUntilHasSufficientMediaData", "setDelaysRateChangeUntilHasSufficientMediaData:")]
+    public bool DelaysRateChangeUntilHasSufficientMediaData { get; set; }
+    [Selector("currentTime")]
+    public CMTime CurrentTime();
+    [Selector("setRate:time:")]
+    public void SetRateTime(float rate, CMTime time);
+    [Selector("setRate:time:atHostTime:")]
+    public void SetRateTimeAtHostTime(float rate, CMTime time, CMTime hostTime);
 }
 
 public extern "C" NSNotificationName AVSampleBufferRenderSynchronizerRateDidChangeNotification;
@@ -49,9 +55,12 @@ public objc closure void AVSampleBufferRenderSynchronizerRemoveRendererAtTimeCom
 /// AVSampleBufferRenderSynchronizerRendererManagement, a category of AVSampleBufferRenderSynchronizer.
 public extern objc class AVSampleBufferRenderSynchronizer
 {
-    [Selector("renderers")] public NSArray Renderers { get; }
-    [Selector("addRenderer:")] public void AddRenderer(AVQueuedSampleBufferRendering renderer);
-    [Selector("removeRenderer:atTime:completionHandler:")] public void RemoveRendererAtTimeCompletionHandler(AVQueuedSampleBufferRendering renderer, CMTime time, AVSampleBufferRenderSynchronizerRemoveRendererAtTimeCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("renderers")]
+    public NSArray Renderers { get; }
+    [Selector("addRenderer:")]
+    public void AddRenderer(AVQueuedSampleBufferRendering renderer);
+    [Selector("removeRenderer:atTime:completionHandler:")]
+    public void RemoveRendererAtTimeCompletionHandler(AVQueuedSampleBufferRendering renderer, CMTime time, AVSampleBufferRenderSynchronizerRemoveRendererAtTimeCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public objc closure void AVSampleBufferRenderSynchronizerAddPeriodicTimeObserverForIntervalQueueUsingBlockBlock(CMTime arg0);
@@ -61,9 +70,12 @@ public objc closure void AVSampleBufferRenderSynchronizerAddBoundaryTimeObserver
 /// AVSampleBufferRenderSynchronizerTimeObservation, a category of AVSampleBufferRenderSynchronizer.
 public extern objc class AVSampleBufferRenderSynchronizer
 {
-    [Selector("addPeriodicTimeObserverForInterval:queue:usingBlock:")] public AnyObject AddPeriodicTimeObserverForIntervalQueueUsingBlock(CMTime interval, dispatch_queue_t? queue, AVSampleBufferRenderSynchronizerAddPeriodicTimeObserverForIntervalQueueUsingBlockBlock block);
-    [Selector("addBoundaryTimeObserverForTimes:queue:usingBlock:")] public AnyObject AddBoundaryTimeObserverForTimesQueueUsingBlock(NSArray times, dispatch_queue_t? queue, AVSampleBufferRenderSynchronizerAddBoundaryTimeObserverForTimesQueueUsingBlockBlock block);
-    [Selector("removeTimeObserver:")] public void RemoveTimeObserver(AnyObject observer);
+    [Selector("addPeriodicTimeObserverForInterval:queue:usingBlock:")]
+    public AnyObject AddPeriodicTimeObserverForIntervalQueueUsingBlock(CMTime interval, dispatch_queue_t? queue, AVSampleBufferRenderSynchronizerAddPeriodicTimeObserverForIntervalQueueUsingBlockBlock block);
+    [Selector("addBoundaryTimeObserverForTimes:queue:usingBlock:")]
+    public AnyObject AddBoundaryTimeObserverForTimesQueueUsingBlock(NSArray times, dispatch_queue_t? queue, AVSampleBufferRenderSynchronizerAddBoundaryTimeObserverForTimesQueueUsingBlockBlock block);
+    [Selector("removeTimeObserver:")]
+    public void RemoveTimeObserver(AnyObject observer);
 }
 
 #endif

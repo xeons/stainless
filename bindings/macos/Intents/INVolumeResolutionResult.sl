@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INVolumeResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedVolume:")] public static Self SuccessWithResolvedVolume(NSMeasurement resolvedVolume);
-    [Selector("disambiguationWithVolumeToDisambiguate:")] public static Self DisambiguationWithVolumeToDisambiguate(NSArray volumeToDisambiguate);
-    [Selector("confirmationRequiredWithVolumeToConfirm:")] public static Self ConfirmationRequiredWithVolumeToConfirm(NSMeasurement? volumeToConfirm);
+    [Selector("successWithResolvedVolume:")]
+    public static Self SuccessWithResolvedVolume(NSMeasurement resolvedVolume);
+    [Selector("disambiguationWithVolumeToDisambiguate:")]
+    public static Self DisambiguationWithVolumeToDisambiguate(NSArray volumeToDisambiguate);
+    [Selector("confirmationRequiredWithVolumeToConfirm:")]
+    public static Self ConfirmationRequiredWithVolumeToConfirm(NSMeasurement? volumeToConfirm);
 }
 
 #endif

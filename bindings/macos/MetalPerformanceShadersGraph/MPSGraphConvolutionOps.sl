@@ -34,59 +34,103 @@ import Standard.ObjC;
 
 public extern objc class MPSGraphConvolution2DOpDescriptor : MPSGraphObject, NSCopying
 {
-    [Selector("strideInX", "setStrideInX:")] public NSUInteger StrideInX { get; set; }
-    [Selector("strideInY", "setStrideInY:")] public NSUInteger StrideInY { get; set; }
-    [Selector("dilationRateInX", "setDilationRateInX:")] public NSUInteger DilationRateInX { get; set; }
-    [Selector("dilationRateInY", "setDilationRateInY:")] public NSUInteger DilationRateInY { get; set; }
-    [Selector("paddingLeft", "setPaddingLeft:")] public NSUInteger PaddingLeft { get; set; }
-    [Selector("paddingRight", "setPaddingRight:")] public NSUInteger PaddingRight { get; set; }
-    [Selector("paddingTop", "setPaddingTop:")] public NSUInteger PaddingTop { get; set; }
-    [Selector("paddingBottom", "setPaddingBottom:")] public NSUInteger PaddingBottom { get; set; }
-    [Selector("paddingStyle", "setPaddingStyle:")] public MPSGraphPaddingStyle PaddingStyle { get; set; }
-    [Selector("dataLayout", "setDataLayout:")] public MPSGraphTensorNamedDataLayout DataLayout { get; set; }
-    [Selector("weightsLayout", "setWeightsLayout:")] public MPSGraphTensorNamedDataLayout WeightsLayout { get; set; }
-    [Selector("groups", "setGroups:")] public NSUInteger Groups { get; set; }
-    [Selector("descriptorWithStrideInX:strideInY:dilationRateInX:dilationRateInY:groups:paddingLeft:paddingRight:paddingTop:paddingBottom:paddingStyle:dataLayout:weightsLayout:")] public static Self? DescriptorWithStrideInXStrideInYDilationRateInXDilationRateInYGroupsPaddingLeftPaddingRightPaddingTopPaddingBottomPaddingStyleDataLayoutWeightsLayout(NSUInteger strideInX, NSUInteger strideInY, NSUInteger dilationRateInX, NSUInteger dilationRateInY, NSUInteger groups, NSUInteger paddingLeft, NSUInteger paddingRight, NSUInteger paddingTop, NSUInteger paddingBottom, MPSGraphPaddingStyle paddingStyle, MPSGraphTensorNamedDataLayout dataLayout, MPSGraphTensorNamedDataLayout weightsLayout);
-    [Selector("descriptorWithStrideInX:strideInY:dilationRateInX:dilationRateInY:groups:paddingStyle:dataLayout:weightsLayout:")] public static Self? DescriptorWithStrideInXStrideInYDilationRateInXDilationRateInYGroupsPaddingStyleDataLayoutWeightsLayout(NSUInteger strideInX, NSUInteger strideInY, NSUInteger dilationRateInX, NSUInteger dilationRateInY, NSUInteger groups, MPSGraphPaddingStyle paddingStyle, MPSGraphTensorNamedDataLayout dataLayout, MPSGraphTensorNamedDataLayout weightsLayout);
-    [Selector("setExplicitPaddingWithPaddingLeft:paddingRight:paddingTop:paddingBottom:")] public void SetExplicitPaddingWithPaddingLeftPaddingRightPaddingTopPaddingBottom(NSUInteger paddingLeft, NSUInteger paddingRight, NSUInteger paddingTop, NSUInteger paddingBottom);
+    [Selector("strideInX", "setStrideInX:")]
+    public NSUInteger StrideInX { get; set; }
+    [Selector("strideInY", "setStrideInY:")]
+    public NSUInteger StrideInY { get; set; }
+    [Selector("dilationRateInX", "setDilationRateInX:")]
+    public NSUInteger DilationRateInX { get; set; }
+    [Selector("dilationRateInY", "setDilationRateInY:")]
+    public NSUInteger DilationRateInY { get; set; }
+    [Selector("paddingLeft", "setPaddingLeft:")]
+    public NSUInteger PaddingLeft { get; set; }
+    [Selector("paddingRight", "setPaddingRight:")]
+    public NSUInteger PaddingRight { get; set; }
+    [Selector("paddingTop", "setPaddingTop:")]
+    public NSUInteger PaddingTop { get; set; }
+    [Selector("paddingBottom", "setPaddingBottom:")]
+    public NSUInteger PaddingBottom { get; set; }
+    [Selector("paddingStyle", "setPaddingStyle:")]
+    public MPSGraphPaddingStyle PaddingStyle { get; set; }
+    [Selector("dataLayout", "setDataLayout:")]
+    public MPSGraphTensorNamedDataLayout DataLayout { get; set; }
+    [Selector("weightsLayout", "setWeightsLayout:")]
+    public MPSGraphTensorNamedDataLayout WeightsLayout { get; set; }
+    [Selector("groups", "setGroups:")]
+    public NSUInteger Groups { get; set; }
+    [Selector("descriptorWithStrideInX:strideInY:dilationRateInX:dilationRateInY:groups:paddingLeft:paddingRight:paddingTop:paddingBottom:paddingStyle:dataLayout:weightsLayout:")]
+    public static Self? DescriptorWithStrideInXStrideInYDilationRateInXDilationRateInYGroupsPaddingLeftPaddingRightPaddingTopPaddingBottomPaddingStyleDataLayoutWeightsLayout(NSUInteger strideInX, NSUInteger strideInY, NSUInteger dilationRateInX, NSUInteger dilationRateInY, NSUInteger groups, NSUInteger paddingLeft, NSUInteger paddingRight, NSUInteger paddingTop, NSUInteger paddingBottom, MPSGraphPaddingStyle paddingStyle, MPSGraphTensorNamedDataLayout dataLayout, MPSGraphTensorNamedDataLayout weightsLayout);
+    [Selector("descriptorWithStrideInX:strideInY:dilationRateInX:dilationRateInY:groups:paddingStyle:dataLayout:weightsLayout:")]
+    public static Self? DescriptorWithStrideInXStrideInYDilationRateInXDilationRateInYGroupsPaddingStyleDataLayoutWeightsLayout(NSUInteger strideInX, NSUInteger strideInY, NSUInteger dilationRateInX, NSUInteger dilationRateInY, NSUInteger groups, MPSGraphPaddingStyle paddingStyle, MPSGraphTensorNamedDataLayout dataLayout, MPSGraphTensorNamedDataLayout weightsLayout);
+    [Selector("setExplicitPaddingWithPaddingLeft:paddingRight:paddingTop:paddingBottom:")]
+    public void SetExplicitPaddingWithPaddingLeftPaddingRightPaddingTopPaddingBottom(NSUInteger paddingLeft, NSUInteger paddingRight, NSUInteger paddingTop, NSUInteger paddingBottom);
 }
 
 public extern objc class MPSGraphConvolution3DOpDescriptor : MPSGraphObject, NSCopying
 {
-    [Selector("strideInX", "setStrideInX:")] public NSUInteger StrideInX { get; set; }
-    [Selector("strideInY", "setStrideInY:")] public NSUInteger StrideInY { get; set; }
-    [Selector("strideInZ", "setStrideInZ:")] public NSUInteger StrideInZ { get; set; }
-    [Selector("dilationRateInX", "setDilationRateInX:")] public NSUInteger DilationRateInX { get; set; }
-    [Selector("dilationRateInY", "setDilationRateInY:")] public NSUInteger DilationRateInY { get; set; }
-    [Selector("dilationRateInZ", "setDilationRateInZ:")] public NSUInteger DilationRateInZ { get; set; }
-    [Selector("paddingLeft", "setPaddingLeft:")] public NSUInteger PaddingLeft { get; set; }
-    [Selector("paddingRight", "setPaddingRight:")] public NSUInteger PaddingRight { get; set; }
-    [Selector("paddingTop", "setPaddingTop:")] public NSUInteger PaddingTop { get; set; }
-    [Selector("paddingBottom", "setPaddingBottom:")] public NSUInteger PaddingBottom { get; set; }
-    [Selector("paddingFront", "setPaddingFront:")] public NSUInteger PaddingFront { get; set; }
-    [Selector("paddingBack", "setPaddingBack:")] public NSUInteger PaddingBack { get; set; }
-    [Selector("paddingStyle", "setPaddingStyle:")] public MPSGraphPaddingStyle PaddingStyle { get; set; }
-    [Selector("dataLayout", "setDataLayout:")] public MPSGraphTensorNamedDataLayout DataLayout { get; set; }
-    [Selector("weightsLayout", "setWeightsLayout:")] public MPSGraphTensorNamedDataLayout WeightsLayout { get; set; }
-    [Selector("groups", "setGroups:")] public NSUInteger Groups { get; set; }
-    [Selector("descriptorWithStrideInX:strideInY:strideInZ:dilationRateInX:dilationRateInY:dilationRateInZ:groups:paddingLeft:paddingRight:paddingTop:paddingBottom:paddingFront:paddingBack:paddingStyle:dataLayout:weightsLayout:")] public static Self? DescriptorWithStrideInXStrideInYStrideInZDilationRateInXDilationRateInYDilationRateInZGroupsPaddingLeftPaddingRightPaddingTopPaddingBottomPaddingFrontPaddingBackPaddingStyleDataLayoutWeightsLayout(NSUInteger strideInX, NSUInteger strideInY, NSUInteger strideInZ, NSUInteger dilationRateInX, NSUInteger dilationRateInY, NSUInteger dilationRateInZ, NSUInteger groups, NSUInteger paddingLeft, NSUInteger paddingRight, NSUInteger paddingTop, NSUInteger paddingBottom, NSUInteger paddingFront, NSUInteger paddingBack, MPSGraphPaddingStyle paddingStyle, MPSGraphTensorNamedDataLayout dataLayout, MPSGraphTensorNamedDataLayout weightsLayout);
-    [Selector("descriptorWithStrideInX:strideInY:strideInZ:dilationRateInX:dilationRateInY:dilationRateInZ:groups:paddingStyle:dataLayout:weightsLayout:")] public static Self? DescriptorWithStrideInXStrideInYStrideInZDilationRateInXDilationRateInYDilationRateInZGroupsPaddingStyleDataLayoutWeightsLayout(NSUInteger strideInX, NSUInteger strideInY, NSUInteger strideInZ, NSUInteger dilationRateInX, NSUInteger dilationRateInY, NSUInteger dilationRateInZ, NSUInteger groups, MPSGraphPaddingStyle paddingStyle, MPSGraphTensorNamedDataLayout dataLayout, MPSGraphTensorNamedDataLayout weightsLayout);
-    [Selector("setExplicitPaddingWithPaddingLeft:paddingRight:paddingTop:paddingBottom:paddingFront:paddingBack:")] public void SetExplicitPaddingWithPaddingLeftPaddingRightPaddingTopPaddingBottomPaddingFrontPaddingBack(NSUInteger paddingLeft, NSUInteger paddingRight, NSUInteger paddingTop, NSUInteger paddingBottom, NSUInteger paddingFront, NSUInteger paddingBack);
+    [Selector("strideInX", "setStrideInX:")]
+    public NSUInteger StrideInX { get; set; }
+    [Selector("strideInY", "setStrideInY:")]
+    public NSUInteger StrideInY { get; set; }
+    [Selector("strideInZ", "setStrideInZ:")]
+    public NSUInteger StrideInZ { get; set; }
+    [Selector("dilationRateInX", "setDilationRateInX:")]
+    public NSUInteger DilationRateInX { get; set; }
+    [Selector("dilationRateInY", "setDilationRateInY:")]
+    public NSUInteger DilationRateInY { get; set; }
+    [Selector("dilationRateInZ", "setDilationRateInZ:")]
+    public NSUInteger DilationRateInZ { get; set; }
+    [Selector("paddingLeft", "setPaddingLeft:")]
+    public NSUInteger PaddingLeft { get; set; }
+    [Selector("paddingRight", "setPaddingRight:")]
+    public NSUInteger PaddingRight { get; set; }
+    [Selector("paddingTop", "setPaddingTop:")]
+    public NSUInteger PaddingTop { get; set; }
+    [Selector("paddingBottom", "setPaddingBottom:")]
+    public NSUInteger PaddingBottom { get; set; }
+    [Selector("paddingFront", "setPaddingFront:")]
+    public NSUInteger PaddingFront { get; set; }
+    [Selector("paddingBack", "setPaddingBack:")]
+    public NSUInteger PaddingBack { get; set; }
+    [Selector("paddingStyle", "setPaddingStyle:")]
+    public MPSGraphPaddingStyle PaddingStyle { get; set; }
+    [Selector("dataLayout", "setDataLayout:")]
+    public MPSGraphTensorNamedDataLayout DataLayout { get; set; }
+    [Selector("weightsLayout", "setWeightsLayout:")]
+    public MPSGraphTensorNamedDataLayout WeightsLayout { get; set; }
+    [Selector("groups", "setGroups:")]
+    public NSUInteger Groups { get; set; }
+    [Selector("descriptorWithStrideInX:strideInY:strideInZ:dilationRateInX:dilationRateInY:dilationRateInZ:groups:paddingLeft:paddingRight:paddingTop:paddingBottom:paddingFront:paddingBack:paddingStyle:dataLayout:weightsLayout:")]
+    public static Self? DescriptorWithStrideInXStrideInYStrideInZDilationRateInXDilationRateInYDilationRateInZGroupsPaddingLeftPaddingRightPaddingTopPaddingBottomPaddingFrontPaddingBackPaddingStyleDataLayoutWeightsLayout(NSUInteger strideInX, NSUInteger strideInY, NSUInteger strideInZ, NSUInteger dilationRateInX, NSUInteger dilationRateInY, NSUInteger dilationRateInZ, NSUInteger groups, NSUInteger paddingLeft, NSUInteger paddingRight, NSUInteger paddingTop, NSUInteger paddingBottom, NSUInteger paddingFront, NSUInteger paddingBack, MPSGraphPaddingStyle paddingStyle, MPSGraphTensorNamedDataLayout dataLayout, MPSGraphTensorNamedDataLayout weightsLayout);
+    [Selector("descriptorWithStrideInX:strideInY:strideInZ:dilationRateInX:dilationRateInY:dilationRateInZ:groups:paddingStyle:dataLayout:weightsLayout:")]
+    public static Self? DescriptorWithStrideInXStrideInYStrideInZDilationRateInXDilationRateInYDilationRateInZGroupsPaddingStyleDataLayoutWeightsLayout(NSUInteger strideInX, NSUInteger strideInY, NSUInteger strideInZ, NSUInteger dilationRateInX, NSUInteger dilationRateInY, NSUInteger dilationRateInZ, NSUInteger groups, MPSGraphPaddingStyle paddingStyle, MPSGraphTensorNamedDataLayout dataLayout, MPSGraphTensorNamedDataLayout weightsLayout);
+    [Selector("setExplicitPaddingWithPaddingLeft:paddingRight:paddingTop:paddingBottom:paddingFront:paddingBack:")]
+    public void SetExplicitPaddingWithPaddingLeftPaddingRightPaddingTopPaddingBottomPaddingFrontPaddingBack(NSUInteger paddingLeft, NSUInteger paddingRight, NSUInteger paddingTop, NSUInteger paddingBottom, NSUInteger paddingFront, NSUInteger paddingBack);
 }
 
 /// MPSGraphConvolutionOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("convolution2DWithSourceTensor:weightsTensor:descriptor:name:")] public MPSGraphTensor Convolution2DWithSourceTensorWeightsTensorDescriptorName(MPSGraphTensor source, MPSGraphTensor weights, MPSGraphConvolution2DOpDescriptor descriptor, NSString? name);
-    [Selector("convolution2DDataGradientWithIncomingGradientTensor:weightsTensor:outputShape:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution2DDataGradientWithIncomingGradientTensorWeightsTensorOutputShapeForwardConvolutionDescriptorName(MPSGraphTensor incomingGradient, MPSGraphTensor weights, MPSShape outputShape, MPSGraphConvolution2DOpDescriptor forwardConvolutionDescriptor, NSString? name);
-    [Selector("convolution2DDataGradientWithIncomingGradientTensor:weightsTensor:outputShapeTensor:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution2DDataGradientWithIncomingGradientTensorWeightsTensorOutputShapeTensorForwardConvolutionDescriptorName(MPSGraphTensor gradient, MPSGraphTensor weights, MPSGraphTensor outputShapeTensor, MPSGraphConvolution2DOpDescriptor forwardConvolutionDescriptor, NSString? name);
-    [Selector("convolution2DWeightsGradientWithIncomingGradientTensor:sourceTensor:outputShape:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution2DWeightsGradientWithIncomingGradientTensorSourceTensorOutputShapeForwardConvolutionDescriptorName(MPSGraphTensor incomingGradient, MPSGraphTensor source, MPSShape outputShape, MPSGraphConvolution2DOpDescriptor forwardConvolutionDescriptor, NSString? name);
-    [Selector("convolution2DWeightsGradientWithIncomingGradientTensor:sourceTensor:outputShapeTensor:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution2DWeightsGradientWithIncomingGradientTensorSourceTensorOutputShapeTensorForwardConvolutionDescriptorName(MPSGraphTensor gradient, MPSGraphTensor source, MPSGraphTensor outputShapeTensor, MPSGraphConvolution2DOpDescriptor forwardConvolutionDescriptor, NSString? name);
-    [Selector("convolution3DWithSourceTensor:weightsTensor:descriptor:name:")] public MPSGraphTensor Convolution3DWithSourceTensorWeightsTensorDescriptorName(MPSGraphTensor source, MPSGraphTensor weights, MPSGraphConvolution3DOpDescriptor descriptor, NSString? name);
-    [Selector("convolution3DDataGradientWithIncomingGradientTensor:weightsTensor:outputShape:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution3DDataGradientWithIncomingGradientTensorWeightsTensorOutputShapeForwardConvolutionDescriptorName(MPSGraphTensor incomingGradient, MPSGraphTensor weights, MPSShape outputShape, MPSGraphConvolution3DOpDescriptor forwardConvolutionDescriptor, NSString? name);
-    [Selector("convolution3DDataGradientWithIncomingGradientTensor:weightsTensor:outputShapeTensor:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution3DDataGradientWithIncomingGradientTensorWeightsTensorOutputShapeTensorForwardConvolutionDescriptorName(MPSGraphTensor gradient, MPSGraphTensor weights, MPSGraphTensor outputShapeTensor, MPSGraphConvolution3DOpDescriptor forwardConvolutionDescriptor, NSString? name);
-    [Selector("convolution3DWeightsGradientWithIncomingGradientTensor:sourceTensor:outputShape:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution3DWeightsGradientWithIncomingGradientTensorSourceTensorOutputShapeForwardConvolutionDescriptorName(MPSGraphTensor incomingGradient, MPSGraphTensor source, MPSShape outputShape, MPSGraphConvolution3DOpDescriptor forwardConvolutionDescriptor, NSString? name);
-    [Selector("convolution3DWeightsGradientWithIncomingGradientTensor:sourceTensor:outputShapeTensor:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution3DWeightsGradientWithIncomingGradientTensorSourceTensorOutputShapeTensorForwardConvolutionDescriptorName(MPSGraphTensor gradient, MPSGraphTensor source, MPSGraphTensor outputShapeTensor, MPSGraphConvolution3DOpDescriptor forwardConvolutionDescriptor, NSString? name);
+    [Selector("convolution2DWithSourceTensor:weightsTensor:descriptor:name:")]
+    public MPSGraphTensor Convolution2DWithSourceTensorWeightsTensorDescriptorName(MPSGraphTensor source, MPSGraphTensor weights, MPSGraphConvolution2DOpDescriptor descriptor, NSString? name);
+    [Selector("convolution2DDataGradientWithIncomingGradientTensor:weightsTensor:outputShape:forwardConvolutionDescriptor:name:")]
+    public MPSGraphTensor Convolution2DDataGradientWithIncomingGradientTensorWeightsTensorOutputShapeForwardConvolutionDescriptorName(MPSGraphTensor incomingGradient, MPSGraphTensor weights, MPSShape outputShape, MPSGraphConvolution2DOpDescriptor forwardConvolutionDescriptor, NSString? name);
+    [Selector("convolution2DDataGradientWithIncomingGradientTensor:weightsTensor:outputShapeTensor:forwardConvolutionDescriptor:name:")]
+    public MPSGraphTensor Convolution2DDataGradientWithIncomingGradientTensorWeightsTensorOutputShapeTensorForwardConvolutionDescriptorName(MPSGraphTensor gradient, MPSGraphTensor weights, MPSGraphTensor outputShapeTensor, MPSGraphConvolution2DOpDescriptor forwardConvolutionDescriptor, NSString? name);
+    [Selector("convolution2DWeightsGradientWithIncomingGradientTensor:sourceTensor:outputShape:forwardConvolutionDescriptor:name:")]
+    public MPSGraphTensor Convolution2DWeightsGradientWithIncomingGradientTensorSourceTensorOutputShapeForwardConvolutionDescriptorName(MPSGraphTensor incomingGradient, MPSGraphTensor source, MPSShape outputShape, MPSGraphConvolution2DOpDescriptor forwardConvolutionDescriptor, NSString? name);
+    [Selector("convolution2DWeightsGradientWithIncomingGradientTensor:sourceTensor:outputShapeTensor:forwardConvolutionDescriptor:name:")]
+    public MPSGraphTensor Convolution2DWeightsGradientWithIncomingGradientTensorSourceTensorOutputShapeTensorForwardConvolutionDescriptorName(MPSGraphTensor gradient, MPSGraphTensor source, MPSGraphTensor outputShapeTensor, MPSGraphConvolution2DOpDescriptor forwardConvolutionDescriptor, NSString? name);
+    [Selector("convolution3DWithSourceTensor:weightsTensor:descriptor:name:")]
+    public MPSGraphTensor Convolution3DWithSourceTensorWeightsTensorDescriptorName(MPSGraphTensor source, MPSGraphTensor weights, MPSGraphConvolution3DOpDescriptor descriptor, NSString? name);
+    [Selector("convolution3DDataGradientWithIncomingGradientTensor:weightsTensor:outputShape:forwardConvolutionDescriptor:name:")]
+    public MPSGraphTensor Convolution3DDataGradientWithIncomingGradientTensorWeightsTensorOutputShapeForwardConvolutionDescriptorName(MPSGraphTensor incomingGradient, MPSGraphTensor weights, MPSShape outputShape, MPSGraphConvolution3DOpDescriptor forwardConvolutionDescriptor, NSString? name);
+    [Selector("convolution3DDataGradientWithIncomingGradientTensor:weightsTensor:outputShapeTensor:forwardConvolutionDescriptor:name:")]
+    public MPSGraphTensor Convolution3DDataGradientWithIncomingGradientTensorWeightsTensorOutputShapeTensorForwardConvolutionDescriptorName(MPSGraphTensor gradient, MPSGraphTensor weights, MPSGraphTensor outputShapeTensor, MPSGraphConvolution3DOpDescriptor forwardConvolutionDescriptor, NSString? name);
+    [Selector("convolution3DWeightsGradientWithIncomingGradientTensor:sourceTensor:outputShape:forwardConvolutionDescriptor:name:")]
+    public MPSGraphTensor Convolution3DWeightsGradientWithIncomingGradientTensorSourceTensorOutputShapeForwardConvolutionDescriptorName(MPSGraphTensor incomingGradient, MPSGraphTensor source, MPSShape outputShape, MPSGraphConvolution3DOpDescriptor forwardConvolutionDescriptor, NSString? name);
+    [Selector("convolution3DWeightsGradientWithIncomingGradientTensor:sourceTensor:outputShapeTensor:forwardConvolutionDescriptor:name:")]
+    public MPSGraphTensor Convolution3DWeightsGradientWithIncomingGradientTensorSourceTensorOutputShapeTensorForwardConvolutionDescriptorName(MPSGraphTensor gradient, MPSGraphTensor source, MPSGraphTensor outputShapeTensor, MPSGraphConvolution3DOpDescriptor forwardConvolutionDescriptor, NSString? name);
 }
 
 #endif

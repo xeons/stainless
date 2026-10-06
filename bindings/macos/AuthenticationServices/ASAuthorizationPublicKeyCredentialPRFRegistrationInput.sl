@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationPublicKeyCredentialPRFRegistrationInput : NSObject
 {
-    [Selector("shouldCheckForSupport")] public bool ShouldCheckForSupport { get; }
-    [Selector("inputValues")] public ASAuthorizationPublicKeyCredentialPRFAssertionInputValues? InputValues { get; }
-    [Selector("checkForSupport")] public static Self CheckForSupport();
-    [Selector("initWithInputValues:")] public Self InitWithInputValues(ASAuthorizationPublicKeyCredentialPRFAssertionInputValues? inputValues);
+    [Selector("shouldCheckForSupport")]
+    public bool ShouldCheckForSupport { get; }
+    [Selector("inputValues")]
+    public ASAuthorizationPublicKeyCredentialPRFAssertionInputValues? InputValues { get; }
+    [Selector("checkForSupport")]
+    public static Self CheckForSupport();
+    [Selector("initWithInputValues:")]
+    public Self InitWithInputValues(ASAuthorizationPublicKeyCredentialPRFAssertionInputValues? inputValues);
 }
 
 #endif

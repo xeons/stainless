@@ -34,10 +34,14 @@ import Standard.ObjC;
 #if ARM64
 public extern objc class VZLinuxRosettaUnixSocketCachingOptions : VZLinuxRosettaCachingOptions
 {
-    [Selector("path")] public NSString Path { get; }
-    [Selector("maximumPathLength")] public static NSUInteger MaximumPathLength { get; }
-    [Selector("initWithPath:error:")] public Self? InitWithPathError(NSString path, out NSError? error);
-    [Selector("init")] public Self Init();
+    [Selector("path")]
+    public NSString Path { get; }
+    [Selector("maximumPathLength")]
+    public static NSUInteger MaximumPathLength { get; }
+    [Selector("initWithPath:error:")]
+    public Self? InitWithPathError(NSString path, out NSError? error);
+    [Selector("init")]
+    public Self Init();
 }
 #endif
 

@@ -33,21 +33,31 @@ import Standard.ObjC;
 
 public extern objc class MCNearbyServiceAdvertiser : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public MCNearbyServiceAdvertiserDelegate? Delegate { get; set; }
-    [Selector("myPeerID")] public MCPeerID MyPeerID { get; }
-    [Selector("discoveryInfo")] public NSDictionary? DiscoveryInfo { get; }
-    [Selector("serviceType")] public NSString ServiceType { get; }
-    [Selector("initWithPeer:discoveryInfo:serviceType:")] public Self InitWithPeerDiscoveryInfoServiceType(MCPeerID myPeerID, NSDictionary? info, NSString serviceType);
-    [Selector("startAdvertisingPeer")] public void StartAdvertisingPeer();
-    [Selector("stopAdvertisingPeer")] public void StopAdvertisingPeer();
+    [Selector("delegate", "setDelegate:")]
+    public MCNearbyServiceAdvertiserDelegate? Delegate { get; set; }
+    [Selector("myPeerID")]
+    public MCPeerID MyPeerID { get; }
+    [Selector("discoveryInfo")]
+    public NSDictionary? DiscoveryInfo { get; }
+    [Selector("serviceType")]
+    public NSString ServiceType { get; }
+    [Selector("initWithPeer:discoveryInfo:serviceType:")]
+    public Self InitWithPeerDiscoveryInfoServiceType(MCPeerID myPeerID, NSDictionary? info, NSString serviceType);
+    [Selector("startAdvertisingPeer")]
+    public void StartAdvertisingPeer();
+    [Selector("stopAdvertisingPeer")]
+    public void StopAdvertisingPeer();
 }
 
 public objc closure void MCNearbyServiceAdvertiserDelegateAdvertiserDidReceiveInvitationFromPeerWithContextInvitationHandlerInvitationHandlerBlock(bool arg0, MCSession? arg1);
 
 public objc interface MCNearbyServiceAdvertiserDelegate : NSObjectProtocol
 {
-    [Selector("advertiser:didReceiveInvitationFromPeer:withContext:invitationHandler:")] void AdvertiserDidReceiveInvitationFromPeerWithContextInvitationHandler(MCNearbyServiceAdvertiser advertiser, MCPeerID peerID, NSData? context, MCNearbyServiceAdvertiserDelegateAdvertiserDidReceiveInvitationFromPeerWithContextInvitationHandlerInvitationHandlerBlock invitationHandler);
-    [Optional] [Selector("advertiser:didNotStartAdvertisingPeer:")] void AdvertiserDidNotStartAdvertisingPeer(MCNearbyServiceAdvertiser advertiser, NSError error);
+    [Selector("advertiser:didReceiveInvitationFromPeer:withContext:invitationHandler:")]
+    void AdvertiserDidReceiveInvitationFromPeerWithContextInvitationHandler(MCNearbyServiceAdvertiser advertiser, MCPeerID peerID, NSData? context, MCNearbyServiceAdvertiserDelegateAdvertiserDidReceiveInvitationFromPeerWithContextInvitationHandlerInvitationHandlerBlock invitationHandler);
+    [Optional]
+    [Selector("advertiser:didNotStartAdvertisingPeer:")]
+    void AdvertiserDidNotStartAdvertisingPeer(MCNearbyServiceAdvertiser advertiser, NSError error);
 }
 
 #endif

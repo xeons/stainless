@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// MPSGraphGradientOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("gradientForPrimaryTensor:withTensors:name:")] public NSDictionary GradientForPrimaryTensorWithTensorsName(MPSGraphTensor primaryTensor, NSArray tensors, NSString? name);
+    [Selector("gradientForPrimaryTensor:withTensors:name:")]
+    public NSDictionary GradientForPrimaryTensorWithTensorsName(MPSGraphTensor primaryTensor, NSArray tensors, NSString? name);
 }
 
 #endif

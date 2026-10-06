@@ -34,16 +34,22 @@ import Standard.ObjC;
 
 public extern objc class PKAddPassMetadataPreview : NSObject
 {
-    [Selector("passThumbnailImage")] public CGImageRef? PassThumbnailImage { get; }
-    [Selector("localizedDescription")] public NSString? LocalizedDescription { get; }
-    [Selector("initWithPassThumbnail:localizedDescription:")] public Self InitWithPassThumbnailLocalizedDescription(CGImageRef passThumbnail, NSString description);
-    [Selector("previewWithPassThumbnail:localizedDescription:")] public static Self PreviewWithPassThumbnailLocalizedDescription(CGImageRef passThumbnail, NSString description);
+    [Selector("passThumbnailImage")]
+    public CGImageRef? PassThumbnailImage { get; }
+    [Selector("localizedDescription")]
+    public NSString? LocalizedDescription { get; }
+    [Selector("initWithPassThumbnail:localizedDescription:")]
+    public Self InitWithPassThumbnailLocalizedDescription(CGImageRef passThumbnail, NSString description);
+    [Selector("previewWithPassThumbnail:localizedDescription:")]
+    public static Self PreviewWithPassThumbnailLocalizedDescription(CGImageRef passThumbnail, NSString description);
 }
 
 public extern objc class PKAddSecureElementPassConfiguration : NSObject
 {
-    [Selector("issuerIdentifier", "setIssuerIdentifier:")] public NSString? IssuerIdentifier { get; set; }
-    [Selector("localizedDescription", "setLocalizedDescription:")] public NSString? LocalizedDescription { get; set; }
+    [Selector("issuerIdentifier", "setIssuerIdentifier:")]
+    public NSString? IssuerIdentifier { get; set; }
+    [Selector("localizedDescription", "setLocalizedDescription:")]
+    public NSString? LocalizedDescription { get; set; }
 }
 
 #endif

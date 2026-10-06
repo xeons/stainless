@@ -33,22 +33,38 @@ import Standard.ObjC;
 
 public extern objc class NSPersistentStore : NSObject
 {
-    [Selector("persistentStoreCoordinator")] public NSPersistentStoreCoordinator? PersistentStoreCoordinator { get; }
-    [Selector("configurationName")] public NSString ConfigurationName { get; }
-    [Selector("options")] public NSDictionary? Options { get; }
-    [Selector("URL", "setURL:")] public NSURL? URL { get; set; }
-    [Selector("identifier", "setIdentifier:")] public NSString? Identifier { get; set; }
-    [Selector("type")] public NSString Type { get; }
-    [Selector("isReadOnly", "setReadOnly:")] public bool ReadOnly { get; set; }
-    [Selector("metadata", "setMetadata:")] public NSDictionary? Metadata { get; set; }
-    [Selector("coreSpotlightExporter")] public NSCoreDataCoreSpotlightDelegate CoreSpotlightExporter { get; }
-    [Selector("metadataForPersistentStoreWithURL:error:")] public static NSDictionary? MetadataForPersistentStoreWithURLError(NSURL url, out NSError? error);
-    [Selector("setMetadata:forPersistentStoreWithURL:error:")] public static bool SetMetadataForPersistentStoreWithURLError(NSDictionary? metadata, NSURL url, out NSError? error);
-    [Selector("migrationManagerClass")] public static Class MigrationManagerClass();
-    [Selector("initWithPersistentStoreCoordinator:configurationName:URL:options:")] public Self InitWithPersistentStoreCoordinatorConfigurationNameURLOptions(NSPersistentStoreCoordinator? root, NSString? name, NSURL url, NSDictionary? options);
-    [Selector("loadMetadata:")] public bool LoadMetadata(out NSError? error);
-    [Selector("didAddToPersistentStoreCoordinator:")] public void DidAddToPersistentStoreCoordinator(NSPersistentStoreCoordinator coordinator);
-    [Selector("willRemoveFromPersistentStoreCoordinator:")] public void WillRemoveFromPersistentStoreCoordinator(NSPersistentStoreCoordinator? coordinator);
+    [Selector("persistentStoreCoordinator")]
+    public NSPersistentStoreCoordinator? PersistentStoreCoordinator { get; }
+    [Selector("configurationName")]
+    public NSString ConfigurationName { get; }
+    [Selector("options")]
+    public NSDictionary? Options { get; }
+    [Selector("URL", "setURL:")]
+    public NSURL? URL { get; set; }
+    [Selector("identifier", "setIdentifier:")]
+    public NSString? Identifier { get; set; }
+    [Selector("type")]
+    public NSString Type { get; }
+    [Selector("isReadOnly", "setReadOnly:")]
+    public bool ReadOnly { get; set; }
+    [Selector("metadata", "setMetadata:")]
+    public NSDictionary? Metadata { get; set; }
+    [Selector("coreSpotlightExporter")]
+    public NSCoreDataCoreSpotlightDelegate CoreSpotlightExporter { get; }
+    [Selector("metadataForPersistentStoreWithURL:error:")]
+    public static NSDictionary? MetadataForPersistentStoreWithURLError(NSURL url, out NSError? error);
+    [Selector("setMetadata:forPersistentStoreWithURL:error:")]
+    public static bool SetMetadataForPersistentStoreWithURLError(NSDictionary? metadata, NSURL url, out NSError? error);
+    [Selector("migrationManagerClass")]
+    public static Class MigrationManagerClass();
+    [Selector("initWithPersistentStoreCoordinator:configurationName:URL:options:")]
+    public Self InitWithPersistentStoreCoordinatorConfigurationNameURLOptions(NSPersistentStoreCoordinator? root, NSString? name, NSURL url, NSDictionary? options);
+    [Selector("loadMetadata:")]
+    public bool LoadMetadata(out NSError? error);
+    [Selector("didAddToPersistentStoreCoordinator:")]
+    public void DidAddToPersistentStoreCoordinator(NSPersistentStoreCoordinator coordinator);
+    [Selector("willRemoveFromPersistentStoreCoordinator:")]
+    public void WillRemoveFromPersistentStoreCoordinator(NSPersistentStoreCoordinator? coordinator);
 }
 
 #endif

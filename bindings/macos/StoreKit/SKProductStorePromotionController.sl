@@ -50,15 +50,20 @@ public objc closure void SKProductStorePromotionControllerUpdateStorePromotionOr
 /// Deprecated in macOS 15.0.
 public extern objc class SKProductStorePromotionController : NSObject
 {
-    [Selector("defaultController")] public static Self DefaultController();
+    [Selector("defaultController")]
+    public static Self DefaultController();
     /// Deprecated in macOS 15.0.
-    [Selector("fetchStorePromotionVisibilityForProduct:completionHandler:")] public void FetchStorePromotionVisibilityForProductCompletionHandler(SKProduct product, SKProductStorePromotionControllerFetchStorePromotionVisibilityForProductCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("fetchStorePromotionVisibilityForProduct:completionHandler:")]
+    public void FetchStorePromotionVisibilityForProductCompletionHandler(SKProduct product, SKProductStorePromotionControllerFetchStorePromotionVisibilityForProductCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("updateStorePromotionVisibility:forProduct:completionHandler:")] public void UpdateStorePromotionVisibilityForProductCompletionHandler(SKProductStorePromotionVisibility promotionVisibility, SKProduct product, SKProductStorePromotionControllerUpdateStorePromotionVisibilityForProductCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("updateStorePromotionVisibility:forProduct:completionHandler:")]
+    public void UpdateStorePromotionVisibilityForProductCompletionHandler(SKProductStorePromotionVisibility promotionVisibility, SKProduct product, SKProductStorePromotionControllerUpdateStorePromotionVisibilityForProductCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("fetchStorePromotionOrderWithCompletionHandler:")] public void FetchStorePromotionOrderWithCompletionHandler(SKProductStorePromotionControllerFetchStorePromotionOrderWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("fetchStorePromotionOrderWithCompletionHandler:")]
+    public void FetchStorePromotionOrderWithCompletionHandler(SKProductStorePromotionControllerFetchStorePromotionOrderWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("updateStorePromotionOrder:completionHandler:")] public void UpdateStorePromotionOrderCompletionHandler(NSArray promotionOrder, SKProductStorePromotionControllerUpdateStorePromotionOrderCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("updateStorePromotionOrder:completionHandler:")]
+    public void UpdateStorePromotionOrderCompletionHandler(NSArray promotionOrder, SKProductStorePromotionControllerUpdateStorePromotionOrderCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 #endif

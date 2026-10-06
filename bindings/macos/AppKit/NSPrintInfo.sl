@@ -121,46 +121,79 @@ public using NSPrintInfoSettingKey = NSString;
 
 public extern objc class NSPrintInfo : NSObject, NSCopying, NSCoding
 {
-    [Selector("sharedPrintInfo", "setSharedPrintInfo:")] public static NSPrintInfo SharedPrintInfo { get; set; }
-    [Selector("paperName", "setPaperName:")] public NSPrinterPaperName? PaperName { get; set; }
-    [Selector("paperSize", "setPaperSize:")] public NSSize PaperSize { get; set; }
-    [Selector("orientation", "setOrientation:")] public NSPaperOrientation Orientation { get; set; }
-    [Selector("scalingFactor", "setScalingFactor:")] public CGFloat ScalingFactor { get; set; }
-    [Selector("leftMargin", "setLeftMargin:")] public CGFloat LeftMargin { get; set; }
-    [Selector("rightMargin", "setRightMargin:")] public CGFloat RightMargin { get; set; }
-    [Selector("topMargin", "setTopMargin:")] public CGFloat TopMargin { get; set; }
-    [Selector("bottomMargin", "setBottomMargin:")] public CGFloat BottomMargin { get; set; }
-    [Selector("isHorizontallyCentered", "setHorizontallyCentered:")] public bool HorizontallyCentered { get; set; }
-    [Selector("isVerticallyCentered", "setVerticallyCentered:")] public bool VerticallyCentered { get; set; }
-    [Selector("horizontalPagination", "setHorizontalPagination:")] public NSPrintingPaginationMode HorizontalPagination { get; set; }
-    [Selector("verticalPagination", "setVerticalPagination:")] public NSPrintingPaginationMode VerticalPagination { get; set; }
-    [Selector("jobDisposition", "setJobDisposition:")] public NSPrintJobDispositionValue JobDisposition { get; set; }
-    [Selector("printer", "setPrinter:")] public NSPrinter Printer { get; set; }
-    [Selector("imageablePageBounds")] public NSRect ImageablePageBounds { get; }
-    [Selector("localizedPaperName")] public NSString? LocalizedPaperName { get; }
-    [Selector("defaultPrinter")] public static NSPrinter? DefaultPrinter { get; }
-    [Selector("printSettings")] public NSMutableDictionary? PrintSettings { get; }
-    [Selector("isSelectionOnly", "setSelectionOnly:")] public bool SelectionOnly { get; set; }
-    [Selector("initWithDictionary:")] public Self InitWithDictionary(NSDictionary attributes);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("init")] public Self Init();
-    [Selector("dictionary")] public NSMutableDictionary Dictionary();
-    [Selector("setUpPrintOperationDefaultValues")] public void SetUpPrintOperationDefaultValues();
-    [Selector("PMPrintSession")] public void* PMPrintSession();
-    [Selector("PMPageFormat")] public void* PMPageFormat();
-    [Selector("PMPrintSettings")] public void* PMPrintSettings();
-    [Selector("updateFromPMPageFormat")] public void UpdateFromPMPageFormat();
-    [Selector("updateFromPMPrintSettings")] public void UpdateFromPMPrintSettings();
-    [Selector("takeSettingsFromPDFInfo:")] public void TakeSettingsFromPDFInfo(NSPDFInfo inPDFInfo);
+    [Selector("sharedPrintInfo", "setSharedPrintInfo:")]
+    public static NSPrintInfo SharedPrintInfo { get; set; }
+    [Selector("paperName", "setPaperName:")]
+    public NSPrinterPaperName? PaperName { get; set; }
+    [Selector("paperSize", "setPaperSize:")]
+    public NSSize PaperSize { get; set; }
+    [Selector("orientation", "setOrientation:")]
+    public NSPaperOrientation Orientation { get; set; }
+    [Selector("scalingFactor", "setScalingFactor:")]
+    public CGFloat ScalingFactor { get; set; }
+    [Selector("leftMargin", "setLeftMargin:")]
+    public CGFloat LeftMargin { get; set; }
+    [Selector("rightMargin", "setRightMargin:")]
+    public CGFloat RightMargin { get; set; }
+    [Selector("topMargin", "setTopMargin:")]
+    public CGFloat TopMargin { get; set; }
+    [Selector("bottomMargin", "setBottomMargin:")]
+    public CGFloat BottomMargin { get; set; }
+    [Selector("isHorizontallyCentered", "setHorizontallyCentered:")]
+    public bool HorizontallyCentered { get; set; }
+    [Selector("isVerticallyCentered", "setVerticallyCentered:")]
+    public bool VerticallyCentered { get; set; }
+    [Selector("horizontalPagination", "setHorizontalPagination:")]
+    public NSPrintingPaginationMode HorizontalPagination { get; set; }
+    [Selector("verticalPagination", "setVerticalPagination:")]
+    public NSPrintingPaginationMode VerticalPagination { get; set; }
+    [Selector("jobDisposition", "setJobDisposition:")]
+    public NSPrintJobDispositionValue JobDisposition { get; set; }
+    [Selector("printer", "setPrinter:")]
+    public NSPrinter Printer { get; set; }
+    [Selector("imageablePageBounds")]
+    public NSRect ImageablePageBounds { get; }
+    [Selector("localizedPaperName")]
+    public NSString? LocalizedPaperName { get; }
+    [Selector("defaultPrinter")]
+    public static NSPrinter? DefaultPrinter { get; }
+    [Selector("printSettings")]
+    public NSMutableDictionary? PrintSettings { get; }
+    [Selector("isSelectionOnly", "setSelectionOnly:")]
+    public bool SelectionOnly { get; set; }
+    [Selector("initWithDictionary:")]
+    public Self InitWithDictionary(NSDictionary attributes);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("init")]
+    public Self Init();
+    [Selector("dictionary")]
+    public NSMutableDictionary Dictionary();
+    [Selector("setUpPrintOperationDefaultValues")]
+    public void SetUpPrintOperationDefaultValues();
+    [Selector("PMPrintSession")]
+    public void* PMPrintSession();
+    [Selector("PMPageFormat")]
+    public void* PMPageFormat();
+    [Selector("PMPrintSettings")]
+    public void* PMPrintSettings();
+    [Selector("updateFromPMPageFormat")]
+    public void UpdateFromPMPageFormat();
+    [Selector("updateFromPMPrintSettings")]
+    public void UpdateFromPMPrintSettings();
+    [Selector("takeSettingsFromPDFInfo:")]
+    public void TakeSettingsFromPDFInfo(NSPDFInfo inPDFInfo);
 }
 
 /// NSDeprecated, a category of NSPrintInfo.
 public extern objc class NSPrintInfo
 {
     /// Deprecated in macOS 10.2.
-    [Selector("setDefaultPrinter:")] public static void SetDefaultPrinter(NSPrinter? printer);
+    [Selector("setDefaultPrinter:")]
+    public static void SetDefaultPrinter(NSPrinter? printer);
     /// Deprecated in macOS 10.2.
-    [Selector("sizeForPaperName:")] public static NSSize SizeForPaperName(NSPrinterPaperName? name);
+    [Selector("sizeForPaperName:")]
+    public static NSSize SizeForPaperName(NSPrinterPaperName? name);
 }
 
 /// Deprecated in macOS 10.2.

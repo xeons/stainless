@@ -35,7 +35,8 @@ public objc closure void LASecretLoadDataWithCompletionHandlerBlock(NSData? arg0
 
 public extern objc class LASecret : NSObject
 {
-    [Selector("loadDataWithCompletion:")] public void LoadDataWithCompletion(LASecretLoadDataWithCompletionHandlerBlock handler);
+    [Selector("loadDataWithCompletion:")]
+    public void LoadDataWithCompletion(LASecretLoadDataWithCompletionHandlerBlock handler);
 }
 
 #endif

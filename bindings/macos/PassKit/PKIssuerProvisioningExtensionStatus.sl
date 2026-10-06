@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class PKIssuerProvisioningExtensionStatus : NSObject
 {
-    [Selector("requiresAuthentication", "setRequiresAuthentication:")] public bool RequiresAuthentication { get; set; }
-    [Selector("passEntriesAvailable", "setPassEntriesAvailable:")] public bool PassEntriesAvailable { get; set; }
-    [Selector("remotePassEntriesAvailable", "setRemotePassEntriesAvailable:")] public bool RemotePassEntriesAvailable { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("requiresAuthentication", "setRequiresAuthentication:")]
+    public bool RequiresAuthentication { get; set; }
+    [Selector("passEntriesAvailable", "setPassEntriesAvailable:")]
+    public bool PassEntriesAvailable { get; set; }
+    [Selector("remotePassEntriesAvailable", "setRemotePassEntriesAvailable:")]
+    public bool RemotePassEntriesAvailable { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

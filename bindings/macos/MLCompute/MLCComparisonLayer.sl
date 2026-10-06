@@ -32,8 +32,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCComparisonLayer : MLCLayer
 {
-    [Selector("operation")] public MLCComparisonOperation Operation { get; }
-    [Selector("layerWithOperation:")] public static Self LayerWithOperation(MLCComparisonOperation operation);
+    [Selector("operation")]
+    public MLCComparisonOperation Operation { get; }
+    [Selector("layerWithOperation:")]
+    public static Self LayerWithOperation(MLCComparisonOperation operation);
 }
 
 #endif

@@ -34,13 +34,20 @@ import Standard.ObjC;
 
 public extern objc class OSAScriptView : NSTextView
 {
-    [Selector("source", "setSource:")] public NSString? Source { get; set; }
-    [Selector("usesScriptAssistant", "setUsesScriptAssistant:")] public bool UsesScriptAssistant { get; set; }
-    [Selector("usesTabs", "setUsesTabs:")] public bool UsesTabs { get; set; }
-    [Selector("tabWidth", "setTabWidth:")] public NSUInteger TabWidth { get; set; }
-    [Selector("wrapsLines", "setWrapsLines:")] public bool WrapsLines { get; set; }
-    [Selector("indentsWrappedLines", "setIndentsWrappedLines:")] public bool IndentsWrappedLines { get; set; }
-    [Selector("indentWidth", "setIndentWidth:")] public NSUInteger IndentWidth { get; set; }
+    [Selector("source", "setSource:")]
+    public NSString? Source { get; set; }
+    [Selector("usesScriptAssistant", "setUsesScriptAssistant:")]
+    public bool UsesScriptAssistant { get; set; }
+    [Selector("usesTabs", "setUsesTabs:")]
+    public bool UsesTabs { get; set; }
+    [Selector("tabWidth", "setTabWidth:")]
+    public NSUInteger TabWidth { get; set; }
+    [Selector("wrapsLines", "setWrapsLines:")]
+    public bool WrapsLines { get; set; }
+    [Selector("indentsWrappedLines", "setIndentsWrappedLines:")]
+    public bool IndentsWrappedLines { get; set; }
+    [Selector("indentWidth", "setIndentWidth:")]
+    public NSUInteger IndentWidth { get; set; }
 }
 
 #endif

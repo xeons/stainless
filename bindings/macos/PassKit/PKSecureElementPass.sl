@@ -41,13 +41,20 @@ public enum PKSecureElementPassActivationState : long
 
 public extern objc class PKSecureElementPass : PKPass
 {
-    [Selector("primaryAccountIdentifier")] public NSString PrimaryAccountIdentifier { get; }
-    [Selector("primaryAccountNumberSuffix")] public NSString PrimaryAccountNumberSuffix { get; }
-    [Selector("deviceAccountIdentifier")] public NSString DeviceAccountIdentifier { get; }
-    [Selector("deviceAccountNumberSuffix")] public NSString DeviceAccountNumberSuffix { get; }
-    [Selector("passActivationState")] public PKSecureElementPassActivationState PassActivationState { get; }
-    [Selector("devicePassIdentifier")] public NSString? DevicePassIdentifier { get; }
-    [Selector("pairedTerminalIdentifier")] public NSString? PairedTerminalIdentifier { get; }
+    [Selector("primaryAccountIdentifier")]
+    public NSString PrimaryAccountIdentifier { get; }
+    [Selector("primaryAccountNumberSuffix")]
+    public NSString PrimaryAccountNumberSuffix { get; }
+    [Selector("deviceAccountIdentifier")]
+    public NSString DeviceAccountIdentifier { get; }
+    [Selector("deviceAccountNumberSuffix")]
+    public NSString DeviceAccountNumberSuffix { get; }
+    [Selector("passActivationState")]
+    public PKSecureElementPassActivationState PassActivationState { get; }
+    [Selector("devicePassIdentifier")]
+    public NSString? DevicePassIdentifier { get; }
+    [Selector("pairedTerminalIdentifier")]
+    public NSString? PairedTerminalIdentifier { get; }
 }
 
 #endif

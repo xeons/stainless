@@ -96,92 +96,163 @@ public objc closure void NSFileManagerGetFileProviderServicesForItemAtURLComplet
 
 public extern objc class NSFileManager : NSObject
 {
-    [Selector("defaultManager")] public static NSFileManager DefaultManager { get; }
-    [Selector("delegate", "setDelegate:")] public NSFileManagerDelegate? Delegate { get; set; }
-    [Selector("currentDirectoryPath")] public NSString CurrentDirectoryPath { get; }
-    [Selector("ubiquityIdentityToken")] public NSObjectProtocol? UbiquityIdentityToken { get; }
-    [Selector("mountedVolumeURLsIncludingResourceValuesForKeys:options:")] public NSArray? MountedVolumeURLsIncludingResourceValuesForKeysOptions(NSArray? propertyKeys, NSVolumeEnumerationOptions options);
-    [Selector("unmountVolumeAtURL:options:completionHandler:")] public void UnmountVolumeAtURLOptionsCompletionHandler(NSURL url, NSFileManagerUnmountOptions mask, NSFileManagerUnmountVolumeAtURLOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("contentsOfDirectoryAtURL:includingPropertiesForKeys:options:error:")] public NSArray? ContentsOfDirectoryAtURLIncludingPropertiesForKeysOptionsError(NSURL url, NSArray? keys, NSDirectoryEnumerationOptions mask, out NSError? error);
-    [Selector("URLsForDirectory:inDomains:")] public NSArray URLsForDirectoryInDomains(NSSearchPathDirectory directory, NSSearchPathDomainMask domainMask);
-    [Selector("URLForDirectory:inDomain:appropriateForURL:create:error:")] public NSURL? URLForDirectoryInDomainAppropriateForURLCreateError(NSSearchPathDirectory directory, NSSearchPathDomainMask domain, NSURL? url, bool shouldCreate, out NSError? error);
-    [Selector("getRelationship:ofDirectoryAtURL:toItemAtURL:error:")] public bool GetRelationshipOfDirectoryAtURLToItemAtURLError(NSURLRelationship* outRelationship, NSURL directoryURL, NSURL otherURL, out NSError? error);
-    [Selector("getRelationship:ofDirectory:inDomain:toItemAtURL:error:")] public bool GetRelationshipOfDirectoryInDomainToItemAtURLError(NSURLRelationship* outRelationship, NSSearchPathDirectory directory, NSSearchPathDomainMask domainMask, NSURL url, out NSError? error);
-    [Selector("createDirectoryAtURL:withIntermediateDirectories:attributes:error:")] public bool CreateDirectoryAtURLWithIntermediateDirectoriesAttributesError(NSURL url, bool createIntermediates, NSDictionary? attributes, out NSError? error);
-    [Selector("createSymbolicLinkAtURL:withDestinationURL:error:")] public bool CreateSymbolicLinkAtURLWithDestinationURLError(NSURL url, NSURL destURL, out NSError? error);
-    [Selector("setAttributes:ofItemAtPath:error:")] public bool SetAttributesOfItemAtPathError(NSDictionary attributes, NSString path, out NSError? error);
-    [Selector("createDirectoryAtPath:withIntermediateDirectories:attributes:error:")] public bool CreateDirectoryAtPathWithIntermediateDirectoriesAttributesError(NSString path, bool createIntermediates, NSDictionary? attributes, out NSError? error);
-    [Selector("contentsOfDirectoryAtPath:error:")] public NSArray? ContentsOfDirectoryAtPathError(NSString path, out NSError? error);
-    [Selector("subpathsOfDirectoryAtPath:error:")] public NSArray? SubpathsOfDirectoryAtPathError(NSString path, out NSError? error);
-    [Selector("attributesOfItemAtPath:error:")] public NSDictionary? AttributesOfItemAtPathError(NSString path, out NSError? error);
-    [Selector("attributesOfFileSystemForPath:error:")] public NSDictionary? AttributesOfFileSystemForPathError(NSString path, out NSError? error);
-    [Selector("createSymbolicLinkAtPath:withDestinationPath:error:")] public bool CreateSymbolicLinkAtPathWithDestinationPathError(NSString path, NSString destPath, out NSError? error);
-    [Selector("destinationOfSymbolicLinkAtPath:error:")] public NSString? DestinationOfSymbolicLinkAtPathError(NSString path, out NSError? error);
-    [Selector("copyItemAtPath:toPath:error:")] public bool CopyItemAtPathToPathError(NSString srcPath, NSString dstPath, out NSError? error);
-    [Selector("moveItemAtPath:toPath:error:")] public bool MoveItemAtPathToPathError(NSString srcPath, NSString dstPath, out NSError? error);
-    [Selector("linkItemAtPath:toPath:error:")] public bool LinkItemAtPathToPathError(NSString srcPath, NSString dstPath, out NSError? error);
-    [Selector("removeItemAtPath:error:")] public bool RemoveItemAtPathError(NSString path, out NSError? error);
-    [Selector("copyItemAtURL:toURL:error:")] public bool CopyItemAtURLToURLError(NSURL srcURL, NSURL dstURL, out NSError? error);
-    [Selector("moveItemAtURL:toURL:error:")] public bool MoveItemAtURLToURLError(NSURL srcURL, NSURL dstURL, out NSError? error);
-    [Selector("linkItemAtURL:toURL:error:")] public bool LinkItemAtURLToURLError(NSURL srcURL, NSURL dstURL, out NSError? error);
-    [Selector("removeItemAtURL:error:")] public bool RemoveItemAtURLError(NSURL URL, out NSError? error);
-    [Selector("trashItemAtURL:resultingItemURL:error:")] public bool TrashItemAtURLResultingItemURLError(NSURL url, out NSURL? outResultingURL, out NSError? error);
+    [Selector("defaultManager")]
+    public static NSFileManager DefaultManager { get; }
+    [Selector("delegate", "setDelegate:")]
+    public NSFileManagerDelegate? Delegate { get; set; }
+    [Selector("currentDirectoryPath")]
+    public NSString CurrentDirectoryPath { get; }
+    [Selector("ubiquityIdentityToken")]
+    public NSObjectProtocol? UbiquityIdentityToken { get; }
+    [Selector("mountedVolumeURLsIncludingResourceValuesForKeys:options:")]
+    public NSArray? MountedVolumeURLsIncludingResourceValuesForKeysOptions(NSArray? propertyKeys, NSVolumeEnumerationOptions options);
+    [Selector("unmountVolumeAtURL:options:completionHandler:")]
+    public void UnmountVolumeAtURLOptionsCompletionHandler(NSURL url, NSFileManagerUnmountOptions mask, NSFileManagerUnmountVolumeAtURLOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("contentsOfDirectoryAtURL:includingPropertiesForKeys:options:error:")]
+    public NSArray? ContentsOfDirectoryAtURLIncludingPropertiesForKeysOptionsError(NSURL url, NSArray? keys, NSDirectoryEnumerationOptions mask, out NSError? error);
+    [Selector("URLsForDirectory:inDomains:")]
+    public NSArray URLsForDirectoryInDomains(NSSearchPathDirectory directory, NSSearchPathDomainMask domainMask);
+    [Selector("URLForDirectory:inDomain:appropriateForURL:create:error:")]
+    public NSURL? URLForDirectoryInDomainAppropriateForURLCreateError(NSSearchPathDirectory directory, NSSearchPathDomainMask domain, NSURL? url, bool shouldCreate, out NSError? error);
+    [Selector("getRelationship:ofDirectoryAtURL:toItemAtURL:error:")]
+    public bool GetRelationshipOfDirectoryAtURLToItemAtURLError(NSURLRelationship* outRelationship, NSURL directoryURL, NSURL otherURL, out NSError? error);
+    [Selector("getRelationship:ofDirectory:inDomain:toItemAtURL:error:")]
+    public bool GetRelationshipOfDirectoryInDomainToItemAtURLError(NSURLRelationship* outRelationship, NSSearchPathDirectory directory, NSSearchPathDomainMask domainMask, NSURL url, out NSError? error);
+    [Selector("createDirectoryAtURL:withIntermediateDirectories:attributes:error:")]
+    public bool CreateDirectoryAtURLWithIntermediateDirectoriesAttributesError(NSURL url, bool createIntermediates, NSDictionary? attributes, out NSError? error);
+    [Selector("createSymbolicLinkAtURL:withDestinationURL:error:")]
+    public bool CreateSymbolicLinkAtURLWithDestinationURLError(NSURL url, NSURL destURL, out NSError? error);
+    [Selector("setAttributes:ofItemAtPath:error:")]
+    public bool SetAttributesOfItemAtPathError(NSDictionary attributes, NSString path, out NSError? error);
+    [Selector("createDirectoryAtPath:withIntermediateDirectories:attributes:error:")]
+    public bool CreateDirectoryAtPathWithIntermediateDirectoriesAttributesError(NSString path, bool createIntermediates, NSDictionary? attributes, out NSError? error);
+    [Selector("contentsOfDirectoryAtPath:error:")]
+    public NSArray? ContentsOfDirectoryAtPathError(NSString path, out NSError? error);
+    [Selector("subpathsOfDirectoryAtPath:error:")]
+    public NSArray? SubpathsOfDirectoryAtPathError(NSString path, out NSError? error);
+    [Selector("attributesOfItemAtPath:error:")]
+    public NSDictionary? AttributesOfItemAtPathError(NSString path, out NSError? error);
+    [Selector("attributesOfFileSystemForPath:error:")]
+    public NSDictionary? AttributesOfFileSystemForPathError(NSString path, out NSError? error);
+    [Selector("createSymbolicLinkAtPath:withDestinationPath:error:")]
+    public bool CreateSymbolicLinkAtPathWithDestinationPathError(NSString path, NSString destPath, out NSError? error);
+    [Selector("destinationOfSymbolicLinkAtPath:error:")]
+    public NSString? DestinationOfSymbolicLinkAtPathError(NSString path, out NSError? error);
+    [Selector("copyItemAtPath:toPath:error:")]
+    public bool CopyItemAtPathToPathError(NSString srcPath, NSString dstPath, out NSError? error);
+    [Selector("moveItemAtPath:toPath:error:")]
+    public bool MoveItemAtPathToPathError(NSString srcPath, NSString dstPath, out NSError? error);
+    [Selector("linkItemAtPath:toPath:error:")]
+    public bool LinkItemAtPathToPathError(NSString srcPath, NSString dstPath, out NSError? error);
+    [Selector("removeItemAtPath:error:")]
+    public bool RemoveItemAtPathError(NSString path, out NSError? error);
+    [Selector("copyItemAtURL:toURL:error:")]
+    public bool CopyItemAtURLToURLError(NSURL srcURL, NSURL dstURL, out NSError? error);
+    [Selector("moveItemAtURL:toURL:error:")]
+    public bool MoveItemAtURLToURLError(NSURL srcURL, NSURL dstURL, out NSError? error);
+    [Selector("linkItemAtURL:toURL:error:")]
+    public bool LinkItemAtURLToURLError(NSURL srcURL, NSURL dstURL, out NSError? error);
+    [Selector("removeItemAtURL:error:")]
+    public bool RemoveItemAtURLError(NSURL URL, out NSError? error);
+    [Selector("trashItemAtURL:resultingItemURL:error:")]
+    public bool TrashItemAtURLResultingItemURLError(NSURL url, out NSURL? outResultingURL, out NSError? error);
     /// Deprecated in macOS 10.5.
-    [Selector("fileAttributesAtPath:traverseLink:")] public NSDictionary? FileAttributesAtPathTraverseLink(NSString path, bool yorn);
+    [Selector("fileAttributesAtPath:traverseLink:")]
+    public NSDictionary? FileAttributesAtPathTraverseLink(NSString path, bool yorn);
     /// Deprecated in macOS 10.5.
-    [Selector("changeFileAttributes:atPath:")] public bool ChangeFileAttributesAtPath(NSDictionary attributes, NSString path);
+    [Selector("changeFileAttributes:atPath:")]
+    public bool ChangeFileAttributesAtPath(NSDictionary attributes, NSString path);
     /// Deprecated in macOS 10.5.
-    [Selector("directoryContentsAtPath:")] public NSArray? DirectoryContentsAtPath(NSString path);
+    [Selector("directoryContentsAtPath:")]
+    public NSArray? DirectoryContentsAtPath(NSString path);
     /// Deprecated in macOS 10.5.
-    [Selector("fileSystemAttributesAtPath:")] public NSDictionary? FileSystemAttributesAtPath(NSString path);
+    [Selector("fileSystemAttributesAtPath:")]
+    public NSDictionary? FileSystemAttributesAtPath(NSString path);
     /// Deprecated in macOS 10.5.
-    [Selector("pathContentOfSymbolicLinkAtPath:")] public NSString? PathContentOfSymbolicLinkAtPath(NSString path);
+    [Selector("pathContentOfSymbolicLinkAtPath:")]
+    public NSString? PathContentOfSymbolicLinkAtPath(NSString path);
     /// Deprecated in macOS 10.5.
-    [Selector("createSymbolicLinkAtPath:pathContent:")] public bool CreateSymbolicLinkAtPathPathContent(NSString path, NSString otherpath);
+    [Selector("createSymbolicLinkAtPath:pathContent:")]
+    public bool CreateSymbolicLinkAtPathPathContent(NSString path, NSString otherpath);
     /// Deprecated in macOS 10.5.
-    [Selector("createDirectoryAtPath:attributes:")] public bool CreateDirectoryAtPathAttributes(NSString path, NSDictionary attributes);
+    [Selector("createDirectoryAtPath:attributes:")]
+    public bool CreateDirectoryAtPathAttributes(NSString path, NSDictionary attributes);
     /// Deprecated in macOS 10.5.
-    [Selector("linkPath:toPath:handler:")] public bool LinkPathToPathHandler(NSString src, NSString dest, AnyObject? handler);
+    [Selector("linkPath:toPath:handler:")]
+    public bool LinkPathToPathHandler(NSString src, NSString dest, AnyObject? handler);
     /// Deprecated in macOS 10.5.
-    [Selector("copyPath:toPath:handler:")] public bool CopyPathToPathHandler(NSString src, NSString dest, AnyObject? handler);
+    [Selector("copyPath:toPath:handler:")]
+    public bool CopyPathToPathHandler(NSString src, NSString dest, AnyObject? handler);
     /// Deprecated in macOS 10.5.
-    [Selector("movePath:toPath:handler:")] public bool MovePathToPathHandler(NSString src, NSString dest, AnyObject? handler);
+    [Selector("movePath:toPath:handler:")]
+    public bool MovePathToPathHandler(NSString src, NSString dest, AnyObject? handler);
     /// Deprecated in macOS 10.5.
-    [Selector("removeFileAtPath:handler:")] public bool RemoveFileAtPathHandler(NSString path, AnyObject? handler);
-    [Selector("changeCurrentDirectoryPath:")] public bool ChangeCurrentDirectoryPath(NSString path);
-    [Selector("fileExistsAtPath:")] public bool FileExistsAtPath(NSString path);
-    [Selector("fileExistsAtPath:isDirectory:")] public bool FileExistsAtPathIsDirectory(NSString path, bool* isDirectory);
-    [Selector("isReadableFileAtPath:")] public bool IsReadableFileAtPath(NSString path);
-    [Selector("isWritableFileAtPath:")] public bool IsWritableFileAtPath(NSString path);
-    [Selector("isExecutableFileAtPath:")] public bool IsExecutableFileAtPath(NSString path);
-    [Selector("isDeletableFileAtPath:")] public bool IsDeletableFileAtPath(NSString path);
-    [Selector("contentsEqualAtPath:andPath:")] public bool ContentsEqualAtPathAndPath(NSString path1, NSString path2);
-    [Selector("displayNameAtPath:")] public NSString DisplayNameAtPath(NSString path);
-    [Selector("componentsToDisplayForPath:")] public NSArray? ComponentsToDisplayForPath(NSString path);
-    [Selector("enumeratorAtPath:")] public NSDirectoryEnumerator? EnumeratorAtPath(NSString path);
-    [Selector("enumeratorAtURL:includingPropertiesForKeys:options:errorHandler:")] public NSDirectoryEnumerator? EnumeratorAtURLIncludingPropertiesForKeysOptionsErrorHandler(NSURL url, NSArray? keys, NSDirectoryEnumerationOptions mask, NSFileManagerEnumeratorAtURLIncludingPropertiesForKeysOptionsErrorHandlerHandlerBlock? handler);
-    [Selector("subpathsAtPath:")] public NSArray? SubpathsAtPath(NSString path);
-    [Selector("contentsAtPath:")] public NSData? ContentsAtPath(NSString path);
-    [Selector("createFileAtPath:contents:attributes:")] public bool CreateFileAtPathContentsAttributes(NSString path, NSData? data, NSDictionary? attr);
-    [Selector("fileSystemRepresentationWithPath:")] public byte* FileSystemRepresentationWithPath(NSString path);
-    [Selector("stringWithFileSystemRepresentation:length:")] public NSString StringWithFileSystemRepresentationLength(byte* str, NSUInteger len);
-    [Selector("replaceItemAtURL:withItemAtURL:backupItemName:options:resultingItemURL:error:")] public bool ReplaceItemAtURLWithItemAtURLBackupItemNameOptionsResultingItemURLError(NSURL originalItemURL, NSURL newItemURL, NSString? backupItemName, NSFileManagerItemReplacementOptions options, out NSURL? resultingURL, out NSError? error);
-    [Selector("setUbiquitous:itemAtURL:destinationURL:error:")] public bool SetUbiquitousItemAtURLDestinationURLError(bool flag, NSURL url, NSURL destinationURL, out NSError? error);
-    [Selector("isUbiquitousItemAtURL:")] public bool IsUbiquitousItemAtURL(NSURL url);
-    [Selector("startDownloadingUbiquitousItemAtURL:error:")] public bool StartDownloadingUbiquitousItemAtURLError(NSURL url, out NSError? error);
-    [Selector("evictUbiquitousItemAtURL:error:")] public bool EvictUbiquitousItemAtURLError(NSURL url, out NSError? error);
-    [Selector("URLForUbiquityContainerIdentifier:")] public NSURL? URLForUbiquityContainerIdentifier(NSString? containerIdentifier);
-    [Selector("URLForPublishingUbiquitousItemAtURL:expirationDate:error:")] public NSURL? URLForPublishingUbiquitousItemAtURLExpirationDateError(NSURL url, out NSDate? outDate, out NSError? error);
+    [Selector("removeFileAtPath:handler:")]
+    public bool RemoveFileAtPathHandler(NSString path, AnyObject? handler);
+    [Selector("changeCurrentDirectoryPath:")]
+    public bool ChangeCurrentDirectoryPath(NSString path);
+    [Selector("fileExistsAtPath:")]
+    public bool FileExistsAtPath(NSString path);
+    [Selector("fileExistsAtPath:isDirectory:")]
+    public bool FileExistsAtPathIsDirectory(NSString path, bool* isDirectory);
+    [Selector("isReadableFileAtPath:")]
+    public bool IsReadableFileAtPath(NSString path);
+    [Selector("isWritableFileAtPath:")]
+    public bool IsWritableFileAtPath(NSString path);
+    [Selector("isExecutableFileAtPath:")]
+    public bool IsExecutableFileAtPath(NSString path);
+    [Selector("isDeletableFileAtPath:")]
+    public bool IsDeletableFileAtPath(NSString path);
+    [Selector("contentsEqualAtPath:andPath:")]
+    public bool ContentsEqualAtPathAndPath(NSString path1, NSString path2);
+    [Selector("displayNameAtPath:")]
+    public NSString DisplayNameAtPath(NSString path);
+    [Selector("componentsToDisplayForPath:")]
+    public NSArray? ComponentsToDisplayForPath(NSString path);
+    [Selector("enumeratorAtPath:")]
+    public NSDirectoryEnumerator? EnumeratorAtPath(NSString path);
+    [Selector("enumeratorAtURL:includingPropertiesForKeys:options:errorHandler:")]
+    public NSDirectoryEnumerator? EnumeratorAtURLIncludingPropertiesForKeysOptionsErrorHandler(NSURL url, NSArray? keys, NSDirectoryEnumerationOptions mask, NSFileManagerEnumeratorAtURLIncludingPropertiesForKeysOptionsErrorHandlerHandlerBlock? handler);
+    [Selector("subpathsAtPath:")]
+    public NSArray? SubpathsAtPath(NSString path);
+    [Selector("contentsAtPath:")]
+    public NSData? ContentsAtPath(NSString path);
+    [Selector("createFileAtPath:contents:attributes:")]
+    public bool CreateFileAtPathContentsAttributes(NSString path, NSData? data, NSDictionary? attr);
+    [Selector("fileSystemRepresentationWithPath:")]
+    public byte* FileSystemRepresentationWithPath(NSString path);
+    [Selector("stringWithFileSystemRepresentation:length:")]
+    public NSString StringWithFileSystemRepresentationLength(byte* str, NSUInteger len);
+    [Selector("replaceItemAtURL:withItemAtURL:backupItemName:options:resultingItemURL:error:")]
+    public bool ReplaceItemAtURLWithItemAtURLBackupItemNameOptionsResultingItemURLError(NSURL originalItemURL, NSURL newItemURL, NSString? backupItemName, NSFileManagerItemReplacementOptions options, out NSURL? resultingURL, out NSError? error);
+    [Selector("setUbiquitous:itemAtURL:destinationURL:error:")]
+    public bool SetUbiquitousItemAtURLDestinationURLError(bool flag, NSURL url, NSURL destinationURL, out NSError? error);
+    [Selector("isUbiquitousItemAtURL:")]
+    public bool IsUbiquitousItemAtURL(NSURL url);
+    [Selector("startDownloadingUbiquitousItemAtURL:error:")]
+    public bool StartDownloadingUbiquitousItemAtURLError(NSURL url, out NSError? error);
+    [Selector("evictUbiquitousItemAtURL:error:")]
+    public bool EvictUbiquitousItemAtURLError(NSURL url, out NSError? error);
+    [Selector("URLForUbiquityContainerIdentifier:")]
+    public NSURL? URLForUbiquityContainerIdentifier(NSString? containerIdentifier);
+    [Selector("URLForPublishingUbiquitousItemAtURL:expirationDate:error:")]
+    public NSURL? URLForPublishingUbiquitousItemAtURLExpirationDateError(NSURL url, out NSDate? outDate, out NSError? error);
     /// macOS 26.0 and later.
-    [Selector("pauseSyncForUbiquitousItemAtURL:completionHandler:")] public void PauseSyncForUbiquitousItemAtURLCompletionHandler(NSURL url, NSFileManagerPauseSyncForUbiquitousItemAtURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("pauseSyncForUbiquitousItemAtURL:completionHandler:")]
+    public void PauseSyncForUbiquitousItemAtURLCompletionHandler(NSURL url, NSFileManagerPauseSyncForUbiquitousItemAtURLCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 26.0 and later.
-    [Selector("resumeSyncForUbiquitousItemAtURL:withBehavior:completionHandler:")] public void ResumeSyncForUbiquitousItemAtURLWithBehaviorCompletionHandler(NSURL url, NSFileManagerResumeSyncBehavior behavior, NSFileManagerResumeSyncForUbiquitousItemAtURLWithBehaviorCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("resumeSyncForUbiquitousItemAtURL:withBehavior:completionHandler:")]
+    public void ResumeSyncForUbiquitousItemAtURLWithBehaviorCompletionHandler(NSURL url, NSFileManagerResumeSyncBehavior behavior, NSFileManagerResumeSyncForUbiquitousItemAtURLWithBehaviorCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 26.0 and later.
-    [Selector("fetchLatestRemoteVersionOfItemAtURL:completionHandler:")] public void FetchLatestRemoteVersionOfItemAtURLCompletionHandler(NSURL url, NSFileManagerFetchLatestRemoteVersionOfItemAtURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchLatestRemoteVersionOfItemAtURL:completionHandler:")]
+    public void FetchLatestRemoteVersionOfItemAtURLCompletionHandler(NSURL url, NSFileManagerFetchLatestRemoteVersionOfItemAtURLCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 26.0 and later.
-    [Selector("uploadLocalVersionOfUbiquitousItemAtURL:withConflictResolutionPolicy:completionHandler:")] public void UploadLocalVersionOfUbiquitousItemAtURLWithConflictResolutionPolicyCompletionHandler(NSURL url, NSFileManagerUploadLocalVersionConflictPolicy conflictResolutionPolicy, NSFileManagerUploadLocalVersionOfUbiquitousItemAtURLWithConflictResolutionPolicyCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getFileProviderServicesForItemAtURL:completionHandler:")] public void GetFileProviderServicesForItemAtURLCompletionHandler(NSURL url, NSFileManagerGetFileProviderServicesForItemAtURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("containerURLForSecurityApplicationGroupIdentifier:")] public NSURL? ContainerURLForSecurityApplicationGroupIdentifier(NSString groupIdentifier);
+    [Selector("uploadLocalVersionOfUbiquitousItemAtURL:withConflictResolutionPolicy:completionHandler:")]
+    public void UploadLocalVersionOfUbiquitousItemAtURLWithConflictResolutionPolicyCompletionHandler(NSURL url, NSFileManagerUploadLocalVersionConflictPolicy conflictResolutionPolicy, NSFileManagerUploadLocalVersionOfUbiquitousItemAtURLWithConflictResolutionPolicyCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getFileProviderServicesForItemAtURL:completionHandler:")]
+    public void GetFileProviderServicesForItemAtURLCompletionHandler(NSURL url, NSFileManagerGetFileProviderServicesForItemAtURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("containerURLForSecurityApplicationGroupIdentifier:")]
+    public NSURL? ContainerURLForSecurityApplicationGroupIdentifier(NSString groupIdentifier);
 }
 
 /// macOS 26.0 and later.
@@ -210,56 +281,101 @@ public enum NSFileManagerUploadLocalVersionConflictPolicy : long
 /// NSUserInformation, a category of NSFileManager.
 public extern objc class NSFileManager
 {
-    [Selector("homeDirectoryForCurrentUser")] public NSURL? HomeDirectoryForCurrentUser { get; }
-    [Selector("temporaryDirectory")] public NSURL TemporaryDirectory { get; }
-    [Selector("homeDirectoryForUser:")] public NSURL? HomeDirectoryForUser(NSString userName);
+    [Selector("homeDirectoryForCurrentUser")]
+    public NSURL? HomeDirectoryForCurrentUser { get; }
+    [Selector("temporaryDirectory")]
+    public NSURL TemporaryDirectory { get; }
+    [Selector("homeDirectoryForUser:")]
+    public NSURL? HomeDirectoryForUser(NSString userName);
 }
 
 /// NSCopyLinkMoveHandler, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.5.
-    [Selector("fileManager:shouldProceedAfterError:")] public bool FileManagerShouldProceedAfterError(NSFileManager fm, NSDictionary errorInfo);
+    [Selector("fileManager:shouldProceedAfterError:")]
+    public bool FileManagerShouldProceedAfterError(NSFileManager fm, NSDictionary errorInfo);
     /// Deprecated in macOS 10.5.
-    [Selector("fileManager:willProcessPath:")] public void FileManagerWillProcessPath(NSFileManager fm, NSString path);
+    [Selector("fileManager:willProcessPath:")]
+    public void FileManagerWillProcessPath(NSFileManager fm, NSString path);
 }
 
 public objc interface NSFileManagerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("fileManager:shouldCopyItemAtPath:toPath:")] bool FileManagerShouldCopyItemAtPathToPath(NSFileManager fileManager, NSString srcPath, NSString dstPath);
-    [Optional] [Selector("fileManager:shouldCopyItemAtURL:toURL:")] bool FileManagerShouldCopyItemAtURLToURL(NSFileManager fileManager, NSURL srcURL, NSURL dstURL);
-    [Optional] [Selector("fileManager:shouldProceedAfterError:copyingItemAtPath:toPath:")] bool FileManagerShouldProceedAfterErrorCopyingItemAtPathToPath(NSFileManager fileManager, NSError error, NSString srcPath, NSString dstPath);
-    [Optional] [Selector("fileManager:shouldProceedAfterError:copyingItemAtURL:toURL:")] bool FileManagerShouldProceedAfterErrorCopyingItemAtURLToURL(NSFileManager fileManager, NSError error, NSURL srcURL, NSURL dstURL);
-    [Optional] [Selector("fileManager:shouldMoveItemAtPath:toPath:")] bool FileManagerShouldMoveItemAtPathToPath(NSFileManager fileManager, NSString srcPath, NSString dstPath);
-    [Optional] [Selector("fileManager:shouldMoveItemAtURL:toURL:")] bool FileManagerShouldMoveItemAtURLToURL(NSFileManager fileManager, NSURL srcURL, NSURL dstURL);
-    [Optional] [Selector("fileManager:shouldProceedAfterError:movingItemAtPath:toPath:")] bool FileManagerShouldProceedAfterErrorMovingItemAtPathToPath(NSFileManager fileManager, NSError error, NSString srcPath, NSString dstPath);
-    [Optional] [Selector("fileManager:shouldProceedAfterError:movingItemAtURL:toURL:")] bool FileManagerShouldProceedAfterErrorMovingItemAtURLToURL(NSFileManager fileManager, NSError error, NSURL srcURL, NSURL dstURL);
-    [Optional] [Selector("fileManager:shouldLinkItemAtPath:toPath:")] bool FileManagerShouldLinkItemAtPathToPath(NSFileManager fileManager, NSString srcPath, NSString dstPath);
-    [Optional] [Selector("fileManager:shouldLinkItemAtURL:toURL:")] bool FileManagerShouldLinkItemAtURLToURL(NSFileManager fileManager, NSURL srcURL, NSURL dstURL);
-    [Optional] [Selector("fileManager:shouldProceedAfterError:linkingItemAtPath:toPath:")] bool FileManagerShouldProceedAfterErrorLinkingItemAtPathToPath(NSFileManager fileManager, NSError error, NSString srcPath, NSString dstPath);
-    [Optional] [Selector("fileManager:shouldProceedAfterError:linkingItemAtURL:toURL:")] bool FileManagerShouldProceedAfterErrorLinkingItemAtURLToURL(NSFileManager fileManager, NSError error, NSURL srcURL, NSURL dstURL);
-    [Optional] [Selector("fileManager:shouldRemoveItemAtPath:")] bool FileManagerShouldRemoveItemAtPath(NSFileManager fileManager, NSString path);
-    [Optional] [Selector("fileManager:shouldRemoveItemAtURL:")] bool FileManagerShouldRemoveItemAtURL(NSFileManager fileManager, NSURL URL);
-    [Optional] [Selector("fileManager:shouldProceedAfterError:removingItemAtPath:")] bool FileManagerShouldProceedAfterErrorRemovingItemAtPath(NSFileManager fileManager, NSError error, NSString path);
-    [Optional] [Selector("fileManager:shouldProceedAfterError:removingItemAtURL:")] bool FileManagerShouldProceedAfterErrorRemovingItemAtURL(NSFileManager fileManager, NSError error, NSURL URL);
+    [Optional]
+    [Selector("fileManager:shouldCopyItemAtPath:toPath:")]
+    bool FileManagerShouldCopyItemAtPathToPath(NSFileManager fileManager, NSString srcPath, NSString dstPath);
+    [Optional]
+    [Selector("fileManager:shouldCopyItemAtURL:toURL:")]
+    bool FileManagerShouldCopyItemAtURLToURL(NSFileManager fileManager, NSURL srcURL, NSURL dstURL);
+    [Optional]
+    [Selector("fileManager:shouldProceedAfterError:copyingItemAtPath:toPath:")]
+    bool FileManagerShouldProceedAfterErrorCopyingItemAtPathToPath(NSFileManager fileManager, NSError error, NSString srcPath, NSString dstPath);
+    [Optional]
+    [Selector("fileManager:shouldProceedAfterError:copyingItemAtURL:toURL:")]
+    bool FileManagerShouldProceedAfterErrorCopyingItemAtURLToURL(NSFileManager fileManager, NSError error, NSURL srcURL, NSURL dstURL);
+    [Optional]
+    [Selector("fileManager:shouldMoveItemAtPath:toPath:")]
+    bool FileManagerShouldMoveItemAtPathToPath(NSFileManager fileManager, NSString srcPath, NSString dstPath);
+    [Optional]
+    [Selector("fileManager:shouldMoveItemAtURL:toURL:")]
+    bool FileManagerShouldMoveItemAtURLToURL(NSFileManager fileManager, NSURL srcURL, NSURL dstURL);
+    [Optional]
+    [Selector("fileManager:shouldProceedAfterError:movingItemAtPath:toPath:")]
+    bool FileManagerShouldProceedAfterErrorMovingItemAtPathToPath(NSFileManager fileManager, NSError error, NSString srcPath, NSString dstPath);
+    [Optional]
+    [Selector("fileManager:shouldProceedAfterError:movingItemAtURL:toURL:")]
+    bool FileManagerShouldProceedAfterErrorMovingItemAtURLToURL(NSFileManager fileManager, NSError error, NSURL srcURL, NSURL dstURL);
+    [Optional]
+    [Selector("fileManager:shouldLinkItemAtPath:toPath:")]
+    bool FileManagerShouldLinkItemAtPathToPath(NSFileManager fileManager, NSString srcPath, NSString dstPath);
+    [Optional]
+    [Selector("fileManager:shouldLinkItemAtURL:toURL:")]
+    bool FileManagerShouldLinkItemAtURLToURL(NSFileManager fileManager, NSURL srcURL, NSURL dstURL);
+    [Optional]
+    [Selector("fileManager:shouldProceedAfterError:linkingItemAtPath:toPath:")]
+    bool FileManagerShouldProceedAfterErrorLinkingItemAtPathToPath(NSFileManager fileManager, NSError error, NSString srcPath, NSString dstPath);
+    [Optional]
+    [Selector("fileManager:shouldProceedAfterError:linkingItemAtURL:toURL:")]
+    bool FileManagerShouldProceedAfterErrorLinkingItemAtURLToURL(NSFileManager fileManager, NSError error, NSURL srcURL, NSURL dstURL);
+    [Optional]
+    [Selector("fileManager:shouldRemoveItemAtPath:")]
+    bool FileManagerShouldRemoveItemAtPath(NSFileManager fileManager, NSString path);
+    [Optional]
+    [Selector("fileManager:shouldRemoveItemAtURL:")]
+    bool FileManagerShouldRemoveItemAtURL(NSFileManager fileManager, NSURL URL);
+    [Optional]
+    [Selector("fileManager:shouldProceedAfterError:removingItemAtPath:")]
+    bool FileManagerShouldProceedAfterErrorRemovingItemAtPath(NSFileManager fileManager, NSError error, NSString path);
+    [Optional]
+    [Selector("fileManager:shouldProceedAfterError:removingItemAtURL:")]
+    bool FileManagerShouldProceedAfterErrorRemovingItemAtURL(NSFileManager fileManager, NSError error, NSURL URL);
 }
 
 public extern objc class NSDirectoryEnumerator : NSEnumerator
 {
-    [Selector("fileAttributes")] public NSDictionary? FileAttributes { get; }
-    [Selector("directoryAttributes")] public NSDictionary? DirectoryAttributes { get; }
-    [Selector("isEnumeratingDirectoryPostOrder")] public bool IsEnumeratingDirectoryPostOrder { get; }
-    [Selector("level")] public NSUInteger Level { get; }
-    [Selector("skipDescendents")] public void SkipDescendents();
-    [Selector("skipDescendants")] public void SkipDescendants();
+    [Selector("fileAttributes")]
+    public NSDictionary? FileAttributes { get; }
+    [Selector("directoryAttributes")]
+    public NSDictionary? DirectoryAttributes { get; }
+    [Selector("isEnumeratingDirectoryPostOrder")]
+    public bool IsEnumeratingDirectoryPostOrder { get; }
+    [Selector("level")]
+    public NSUInteger Level { get; }
+    [Selector("skipDescendents")]
+    public void SkipDescendents();
+    [Selector("skipDescendants")]
+    public void SkipDescendants();
 }
 
 public objc closure void NSFileProviderServiceGetFileProviderConnectionWithCompletionHandlerCompletionHandlerBlock(NSXPCConnection? arg0, NSError? arg1);
 
 public extern objc class NSFileProviderService : NSObject
 {
-    [Selector("name")] public NSFileProviderServiceName Name { get; }
-    [Selector("getFileProviderConnectionWithCompletionHandler:")] public void GetFileProviderConnectionWithCompletionHandler(NSFileProviderServiceGetFileProviderConnectionWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("name")]
+    public NSFileProviderServiceName Name { get; }
+    [Selector("getFileProviderConnectionWithCompletionHandler:")]
+    public void GetFileProviderConnectionWithCompletionHandler(NSFileProviderServiceGetFileProviderConnectionWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public extern "C" NSFileAttributeKey NSFileType;
@@ -335,22 +451,38 @@ public extern "C" NSFileAttributeKey NSFileSystemFreeNodes;
 /// NSFileAttributes, a category of NSDictionary.
 public extern objc class NSDictionary
 {
-    [Selector("fileSize")] public ulong FileSize();
-    [Selector("fileModificationDate")] public NSDate? FileModificationDate();
-    [Selector("fileType")] public NSString? FileType();
-    [Selector("filePosixPermissions")] public NSUInteger FilePosixPermissions();
-    [Selector("fileOwnerAccountName")] public NSString? FileOwnerAccountName();
-    [Selector("fileGroupOwnerAccountName")] public NSString? FileGroupOwnerAccountName();
-    [Selector("fileSystemNumber")] public NSInteger FileSystemNumber();
-    [Selector("fileSystemFileNumber")] public NSUInteger FileSystemFileNumber();
-    [Selector("fileExtensionHidden")] public bool FileExtensionHidden();
-    [Selector("fileHFSCreatorCode")] public OSType FileHFSCreatorCode();
-    [Selector("fileHFSTypeCode")] public OSType FileHFSTypeCode();
-    [Selector("fileIsImmutable")] public bool FileIsImmutable();
-    [Selector("fileIsAppendOnly")] public bool FileIsAppendOnly();
-    [Selector("fileCreationDate")] public NSDate? FileCreationDate();
-    [Selector("fileOwnerAccountID")] public NSNumber? FileOwnerAccountID();
-    [Selector("fileGroupOwnerAccountID")] public NSNumber? FileGroupOwnerAccountID();
+    [Selector("fileSize")]
+    public ulong FileSize();
+    [Selector("fileModificationDate")]
+    public NSDate? FileModificationDate();
+    [Selector("fileType")]
+    public NSString? FileType();
+    [Selector("filePosixPermissions")]
+    public NSUInteger FilePosixPermissions();
+    [Selector("fileOwnerAccountName")]
+    public NSString? FileOwnerAccountName();
+    [Selector("fileGroupOwnerAccountName")]
+    public NSString? FileGroupOwnerAccountName();
+    [Selector("fileSystemNumber")]
+    public NSInteger FileSystemNumber();
+    [Selector("fileSystemFileNumber")]
+    public NSUInteger FileSystemFileNumber();
+    [Selector("fileExtensionHidden")]
+    public bool FileExtensionHidden();
+    [Selector("fileHFSCreatorCode")]
+    public OSType FileHFSCreatorCode();
+    [Selector("fileHFSTypeCode")]
+    public OSType FileHFSTypeCode();
+    [Selector("fileIsImmutable")]
+    public bool FileIsImmutable();
+    [Selector("fileIsAppendOnly")]
+    public bool FileIsAppendOnly();
+    [Selector("fileCreationDate")]
+    public NSDate? FileCreationDate();
+    [Selector("fileOwnerAccountID")]
+    public NSNumber? FileOwnerAccountID();
+    [Selector("fileGroupOwnerAccountID")]
+    public NSNumber? FileGroupOwnerAccountID();
 }
 
 public const int NSFoundationVersionWithFileManagerResourceForkSupport = 412;

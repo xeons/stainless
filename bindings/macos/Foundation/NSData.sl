@@ -78,8 +78,10 @@ public enum NSDataBase64DecodingOptions : ulong
 
 public extern objc class NSData : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("length")] public NSUInteger Length { get; }
-    [Selector("bytes")] public void* Bytes { get; }
+    [Selector("length")]
+    public NSUInteger Length { get; }
+    [Selector("bytes")]
+    public void* Bytes { get; }
 }
 
 public objc closure void NSDataEnumerateByteRangesUsingBlockBlock(void* arg0, NSRange arg1, bool* arg2);
@@ -87,17 +89,28 @@ public objc closure void NSDataEnumerateByteRangesUsingBlockBlock(void* arg0, NS
 /// NSExtendedData, a category of NSData.
 public extern objc class NSData
 {
-    [Selector("description")] public NSString Description { get; }
-    [Selector("getBytes:length:")] public void GetBytesLength(void* buffer, NSUInteger length);
-    [Selector("getBytes:range:")] public void GetBytesRange(void* buffer, NSRange range);
-    [Selector("isEqualToData:")] public bool IsEqualToData(NSData other);
-    [Selector("subdataWithRange:")] public NSData SubdataWithRange(NSRange range);
-    [Selector("writeToFile:atomically:")] public bool WriteToFileAtomically(NSString path, bool useAuxiliaryFile);
-    [Selector("writeToURL:atomically:")] public bool WriteToURLAtomically(NSURL url, bool atomically);
-    [Selector("writeToFile:options:error:")] public bool WriteToFileOptionsError(NSString path, NSDataWritingOptions writeOptionsMask, out NSError? errorPtr);
-    [Selector("writeToURL:options:error:")] public bool WriteToURLOptionsError(NSURL url, NSDataWritingOptions writeOptionsMask, out NSError? errorPtr);
-    [Selector("rangeOfData:options:range:")] public NSRange RangeOfDataOptionsRange(NSData dataToFind, NSDataSearchOptions mask, NSRange searchRange);
-    [Selector("enumerateByteRangesUsingBlock:")] public void EnumerateByteRangesUsingBlock(NSDataEnumerateByteRangesUsingBlockBlock block);
+    [Selector("description")]
+    public NSString Description { get; }
+    [Selector("getBytes:length:")]
+    public void GetBytesLength(void* buffer, NSUInteger length);
+    [Selector("getBytes:range:")]
+    public void GetBytesRange(void* buffer, NSRange range);
+    [Selector("isEqualToData:")]
+    public bool IsEqualToData(NSData other);
+    [Selector("subdataWithRange:")]
+    public NSData SubdataWithRange(NSRange range);
+    [Selector("writeToFile:atomically:")]
+    public bool WriteToFileAtomically(NSString path, bool useAuxiliaryFile);
+    [Selector("writeToURL:atomically:")]
+    public bool WriteToURLAtomically(NSURL url, bool atomically);
+    [Selector("writeToFile:options:error:")]
+    public bool WriteToFileOptionsError(NSString path, NSDataWritingOptions writeOptionsMask, out NSError? errorPtr);
+    [Selector("writeToURL:options:error:")]
+    public bool WriteToURLOptionsError(NSURL url, NSDataWritingOptions writeOptionsMask, out NSError? errorPtr);
+    [Selector("rangeOfData:options:range:")]
+    public NSRange RangeOfDataOptionsRange(NSData dataToFind, NSDataSearchOptions mask, NSRange searchRange);
+    [Selector("enumerateByteRangesUsingBlock:")]
+    public void EnumerateByteRangesUsingBlock(NSDataEnumerateByteRangesUsingBlockBlock block);
 }
 
 public objc closure void NSDataInitWithBytesNoCopyLengthDeallocatorDeallocatorBlock(void* arg0, NSUInteger arg1);
@@ -105,33 +118,55 @@ public objc closure void NSDataInitWithBytesNoCopyLengthDeallocatorDeallocatorBl
 /// NSDataCreation, a category of NSData.
 public extern objc class NSData
 {
-    [Selector("data")] public static Self Data();
-    [Selector("dataWithBytes:length:")] public static Self DataWithBytesLength(void* bytes, NSUInteger length);
-    [Selector("dataWithBytesNoCopy:length:")] public static Self DataWithBytesNoCopyLength(void* bytes, NSUInteger length);
-    [Selector("dataWithBytesNoCopy:length:freeWhenDone:")] public static Self DataWithBytesNoCopyLengthFreeWhenDone(void* bytes, NSUInteger length, bool b);
-    [Selector("dataWithContentsOfFile:options:error:")] public static Self? DataWithContentsOfFileOptionsError(NSString path, NSDataReadingOptions readOptionsMask, out NSError? errorPtr);
-    [Selector("dataWithContentsOfURL:options:error:")] public static Self? DataWithContentsOfURLOptionsError(NSURL url, NSDataReadingOptions readOptionsMask, out NSError? errorPtr);
-    [Selector("dataWithContentsOfFile:")] public static Self? DataWithContentsOfFile(NSString path);
-    [Selector("dataWithContentsOfURL:")] public static Self? DataWithContentsOfURL(NSURL url);
-    [Selector("initWithBytes:length:")] public Self InitWithBytesLength(void* bytes, NSUInteger length);
-    [Selector("initWithBytesNoCopy:length:")] public Self InitWithBytesNoCopyLength(void* bytes, NSUInteger length);
-    [Selector("initWithBytesNoCopy:length:freeWhenDone:")] public Self InitWithBytesNoCopyLengthFreeWhenDone(void* bytes, NSUInteger length, bool b);
-    [Selector("initWithBytesNoCopy:length:deallocator:")] public Self InitWithBytesNoCopyLengthDeallocator(void* bytes, NSUInteger length, NSDataInitWithBytesNoCopyLengthDeallocatorDeallocatorBlock? deallocator);
-    [Selector("initWithContentsOfFile:options:error:")] public Self? InitWithContentsOfFileOptionsError(NSString path, NSDataReadingOptions readOptionsMask, out NSError? errorPtr);
-    [Selector("initWithContentsOfURL:options:error:")] public Self? InitWithContentsOfURLOptionsError(NSURL url, NSDataReadingOptions readOptionsMask, out NSError? errorPtr);
-    [Selector("initWithContentsOfFile:")] public Self? InitWithContentsOfFile(NSString path);
-    [Selector("initWithContentsOfURL:")] public Self? InitWithContentsOfURL(NSURL url);
-    [Selector("initWithData:")] public Self InitWithData(NSData data);
-    [Selector("dataWithData:")] public static Self DataWithData(NSData data);
+    [Selector("data")]
+    public static Self Data();
+    [Selector("dataWithBytes:length:")]
+    public static Self DataWithBytesLength(void* bytes, NSUInteger length);
+    [Selector("dataWithBytesNoCopy:length:")]
+    public static Self DataWithBytesNoCopyLength(void* bytes, NSUInteger length);
+    [Selector("dataWithBytesNoCopy:length:freeWhenDone:")]
+    public static Self DataWithBytesNoCopyLengthFreeWhenDone(void* bytes, NSUInteger length, bool b);
+    [Selector("dataWithContentsOfFile:options:error:")]
+    public static Self? DataWithContentsOfFileOptionsError(NSString path, NSDataReadingOptions readOptionsMask, out NSError? errorPtr);
+    [Selector("dataWithContentsOfURL:options:error:")]
+    public static Self? DataWithContentsOfURLOptionsError(NSURL url, NSDataReadingOptions readOptionsMask, out NSError? errorPtr);
+    [Selector("dataWithContentsOfFile:")]
+    public static Self? DataWithContentsOfFile(NSString path);
+    [Selector("dataWithContentsOfURL:")]
+    public static Self? DataWithContentsOfURL(NSURL url);
+    [Selector("initWithBytes:length:")]
+    public Self InitWithBytesLength(void* bytes, NSUInteger length);
+    [Selector("initWithBytesNoCopy:length:")]
+    public Self InitWithBytesNoCopyLength(void* bytes, NSUInteger length);
+    [Selector("initWithBytesNoCopy:length:freeWhenDone:")]
+    public Self InitWithBytesNoCopyLengthFreeWhenDone(void* bytes, NSUInteger length, bool b);
+    [Selector("initWithBytesNoCopy:length:deallocator:")]
+    public Self InitWithBytesNoCopyLengthDeallocator(void* bytes, NSUInteger length, NSDataInitWithBytesNoCopyLengthDeallocatorDeallocatorBlock? deallocator);
+    [Selector("initWithContentsOfFile:options:error:")]
+    public Self? InitWithContentsOfFileOptionsError(NSString path, NSDataReadingOptions readOptionsMask, out NSError? errorPtr);
+    [Selector("initWithContentsOfURL:options:error:")]
+    public Self? InitWithContentsOfURLOptionsError(NSURL url, NSDataReadingOptions readOptionsMask, out NSError? errorPtr);
+    [Selector("initWithContentsOfFile:")]
+    public Self? InitWithContentsOfFile(NSString path);
+    [Selector("initWithContentsOfURL:")]
+    public Self? InitWithContentsOfURL(NSURL url);
+    [Selector("initWithData:")]
+    public Self InitWithData(NSData data);
+    [Selector("dataWithData:")]
+    public static Self DataWithData(NSData data);
 }
 
 /// NSDataBase64Encoding, a category of NSData.
 public extern objc class NSData
 {
-    [Selector("initWithBase64EncodedString:options:")] public Self? InitWithBase64EncodedStringOptions(NSString base64String, NSDataBase64DecodingOptions options);
-    [Selector("base64EncodedStringWithOptions:")] public NSString Base64EncodedStringWithOptions(NSDataBase64EncodingOptions options);
-    [Selector("initWithBase64EncodedData:options:")] public Self? InitWithBase64EncodedDataOptions(NSData base64Data, NSDataBase64DecodingOptions options);
-    [Selector("base64EncodedDataWithOptions:")] public NSData Base64EncodedDataWithOptions(NSDataBase64EncodingOptions options);
+    [Selector("initWithBase64EncodedString:options:")]
+    public Self? InitWithBase64EncodedStringOptions(NSString base64String, NSDataBase64DecodingOptions options);
+    [Selector("base64EncodedStringWithOptions:")]
+    public NSString Base64EncodedStringWithOptions(NSDataBase64EncodingOptions options);
+    [Selector("initWithBase64EncodedData:options:")]
+    public Self? InitWithBase64EncodedDataOptions(NSData base64Data, NSDataBase64DecodingOptions options);
+    [Selector("base64EncodedDataWithOptions:")]
+    public NSData Base64EncodedDataWithOptions(NSDataBase64EncodingOptions options);
 }
 
 public enum NSDataCompressionAlgorithm : long
@@ -145,57 +180,79 @@ public enum NSDataCompressionAlgorithm : long
 /// NSDataCompression, a category of NSData.
 public extern objc class NSData
 {
-    [Selector("decompressedDataUsingAlgorithm:error:")] public Self? DecompressedDataUsingAlgorithmError(NSDataCompressionAlgorithm algorithm, out NSError? error);
-    [Selector("compressedDataUsingAlgorithm:error:")] public Self? CompressedDataUsingAlgorithmError(NSDataCompressionAlgorithm algorithm, out NSError? error);
+    [Selector("decompressedDataUsingAlgorithm:error:")]
+    public Self? DecompressedDataUsingAlgorithmError(NSDataCompressionAlgorithm algorithm, out NSError? error);
+    [Selector("compressedDataUsingAlgorithm:error:")]
+    public Self? CompressedDataUsingAlgorithmError(NSDataCompressionAlgorithm algorithm, out NSError? error);
 }
 
 /// NSDeprecated, a category of NSData.
 public extern objc class NSData
 {
     /// Deprecated in macOS 10.10.
-    [Selector("getBytes:")] public void GetBytes(void* buffer);
+    [Selector("getBytes:")]
+    public void GetBytes(void* buffer);
     /// Deprecated in macOS 10.10.
-    [Selector("dataWithContentsOfMappedFile:")] public static AnyObject? DataWithContentsOfMappedFile(NSString path);
+    [Selector("dataWithContentsOfMappedFile:")]
+    public static AnyObject? DataWithContentsOfMappedFile(NSString path);
     /// Deprecated in macOS 10.10.
-    [Selector("initWithContentsOfMappedFile:")] public AnyObject? InitWithContentsOfMappedFile(NSString path);
+    [Selector("initWithContentsOfMappedFile:")]
+    public AnyObject? InitWithContentsOfMappedFile(NSString path);
     /// Deprecated in macOS 10.9.
-    [Selector("initWithBase64Encoding:")] public AnyObject? InitWithBase64Encoding(NSString base64String);
+    [Selector("initWithBase64Encoding:")]
+    public AnyObject? InitWithBase64Encoding(NSString base64String);
     /// Deprecated in macOS 10.9.
-    [Selector("base64Encoding")] public NSString Base64Encoding();
+    [Selector("base64Encoding")]
+    public NSString Base64Encoding();
 }
 
 public extern objc class NSMutableData : NSData
 {
-    [Selector("mutableBytes")] public void* MutableBytes { get; }
-    [Selector("length", "setLength:")] public NSUInteger Length { get; set; }
+    [Selector("mutableBytes")]
+    public void* MutableBytes { get; }
+    [Selector("length", "setLength:")]
+    public NSUInteger Length { get; set; }
 }
 
 /// NSExtendedMutableData, a category of NSMutableData.
 public extern objc class NSMutableData
 {
-    [Selector("appendBytes:length:")] public void AppendBytesLength(void* bytes, NSUInteger length);
-    [Selector("appendData:")] public void AppendData(NSData other);
-    [Selector("increaseLengthBy:")] public void IncreaseLengthBy(NSUInteger extraLength);
-    [Selector("replaceBytesInRange:withBytes:")] public void ReplaceBytesInRangeWithBytes(NSRange range, void* bytes);
-    [Selector("resetBytesInRange:")] public void ResetBytesInRange(NSRange range);
-    [Selector("setData:")] public void SetData(NSData data);
-    [Selector("replaceBytesInRange:withBytes:length:")] public void ReplaceBytesInRangeWithBytesLength(NSRange range, void* replacementBytes, NSUInteger replacementLength);
+    [Selector("appendBytes:length:")]
+    public void AppendBytesLength(void* bytes, NSUInteger length);
+    [Selector("appendData:")]
+    public void AppendData(NSData other);
+    [Selector("increaseLengthBy:")]
+    public void IncreaseLengthBy(NSUInteger extraLength);
+    [Selector("replaceBytesInRange:withBytes:")]
+    public void ReplaceBytesInRangeWithBytes(NSRange range, void* bytes);
+    [Selector("resetBytesInRange:")]
+    public void ResetBytesInRange(NSRange range);
+    [Selector("setData:")]
+    public void SetData(NSData data);
+    [Selector("replaceBytesInRange:withBytes:length:")]
+    public void ReplaceBytesInRangeWithBytesLength(NSRange range, void* replacementBytes, NSUInteger replacementLength);
 }
 
 /// NSMutableDataCreation, a category of NSMutableData.
 public extern objc class NSMutableData
 {
-    [Selector("dataWithCapacity:")] public static Self? DataWithCapacity(NSUInteger aNumItems);
-    [Selector("dataWithLength:")] public static Self? DataWithLength(NSUInteger length);
-    [Selector("initWithCapacity:")] public Self? InitWithCapacity(NSUInteger capacity);
-    [Selector("initWithLength:")] public Self? InitWithLength(NSUInteger length);
+    [Selector("dataWithCapacity:")]
+    public static Self? DataWithCapacity(NSUInteger aNumItems);
+    [Selector("dataWithLength:")]
+    public static Self? DataWithLength(NSUInteger length);
+    [Selector("initWithCapacity:")]
+    public Self? InitWithCapacity(NSUInteger capacity);
+    [Selector("initWithLength:")]
+    public Self? InitWithLength(NSUInteger length);
 }
 
 /// NSMutableDataCompression, a category of NSMutableData.
 public extern objc class NSMutableData
 {
-    [Selector("decompressUsingAlgorithm:error:")] public bool DecompressUsingAlgorithmError(NSDataCompressionAlgorithm algorithm, out NSError? error);
-    [Selector("compressUsingAlgorithm:error:")] public bool CompressUsingAlgorithmError(NSDataCompressionAlgorithm algorithm, out NSError? error);
+    [Selector("decompressUsingAlgorithm:error:")]
+    public bool DecompressUsingAlgorithmError(NSDataCompressionAlgorithm algorithm, out NSError? error);
+    [Selector("compressUsingAlgorithm:error:")]
+    public bool CompressUsingAlgorithmError(NSDataCompressionAlgorithm algorithm, out NSError? error);
 }
 
 public extern objc class NSPurgeableData : NSMutableData, NSDiscardableContent { }

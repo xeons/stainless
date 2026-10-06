@@ -34,12 +34,18 @@ import Standard.ObjC;
 
 public extern objc class CBIdentityAuthority : NSObject
 {
-    [Selector("CSIdentityAuthority")] public CSIdentityAuthorityRef? CSIdentityAuthority { get; }
-    [Selector("localizedName")] public NSString LocalizedName { get; }
-    [Selector("localIdentityAuthority")] public static CBIdentityAuthority LocalIdentityAuthority();
-    [Selector("managedIdentityAuthority")] public static CBIdentityAuthority ManagedIdentityAuthority();
-    [Selector("defaultIdentityAuthority")] public static CBIdentityAuthority DefaultIdentityAuthority();
-    [Selector("identityAuthorityWithCSIdentityAuthority:")] public static CBIdentityAuthority IdentityAuthorityWithCSIdentityAuthority(CSIdentityAuthorityRef CSIdentityAuthority);
+    [Selector("CSIdentityAuthority")]
+    public CSIdentityAuthorityRef? CSIdentityAuthority { get; }
+    [Selector("localizedName")]
+    public NSString LocalizedName { get; }
+    [Selector("localIdentityAuthority")]
+    public static CBIdentityAuthority LocalIdentityAuthority();
+    [Selector("managedIdentityAuthority")]
+    public static CBIdentityAuthority ManagedIdentityAuthority();
+    [Selector("defaultIdentityAuthority")]
+    public static CBIdentityAuthority DefaultIdentityAuthority();
+    [Selector("identityAuthorityWithCSIdentityAuthority:")]
+    public static CBIdentityAuthority IdentityAuthorityWithCSIdentityAuthority(CSIdentityAuthorityRef CSIdentityAuthority);
 }
 
 #endif

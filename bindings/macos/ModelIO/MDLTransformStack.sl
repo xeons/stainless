@@ -43,77 +43,112 @@ public enum MDLTransformOpRotationOrder : ulong
 
 public objc interface MDLTransformOp
 {
-    [Selector("name")] NSString Name { get; }
-    [Selector("float4x4AtTime:")] matrix_float4x4 Float4x4AtTime(NSTimeInterval time);
-    [Selector("double4x4AtTime:")] matrix_double4x4 Double4x4AtTime(NSTimeInterval time);
-    [Selector("IsInverseOp")] bool IsInverseOp();
+    [Selector("name")]
+    NSString Name { get; }
+    [Selector("float4x4AtTime:")]
+    matrix_float4x4 Float4x4AtTime(NSTimeInterval time);
+    [Selector("double4x4AtTime:")]
+    matrix_double4x4 Double4x4AtTime(NSTimeInterval time);
+    [Selector("IsInverseOp")]
+    bool IsInverseOp();
 }
 
 public extern objc class MDLTransformRotateXOp : NSObject, MDLTransformOp
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("animatedValue")] public MDLAnimatedScalar AnimatedValue { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("animatedValue")]
+    public MDLAnimatedScalar AnimatedValue { get; }
 }
 
 public extern objc class MDLTransformRotateYOp : NSObject, MDLTransformOp
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("animatedValue")] public MDLAnimatedScalar AnimatedValue { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("animatedValue")]
+    public MDLAnimatedScalar AnimatedValue { get; }
 }
 
 public extern objc class MDLTransformRotateZOp : NSObject, MDLTransformOp
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("animatedValue")] public MDLAnimatedScalar AnimatedValue { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("animatedValue")]
+    public MDLAnimatedScalar AnimatedValue { get; }
 }
 
 public extern objc class MDLTransformRotateOp : NSObject, MDLTransformOp
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("animatedValue")] public MDLAnimatedVector3 AnimatedValue { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("animatedValue")]
+    public MDLAnimatedVector3 AnimatedValue { get; }
 }
 
 public extern objc class MDLTransformTranslateOp : NSObject, MDLTransformOp
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("animatedValue")] public MDLAnimatedVector3 AnimatedValue { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("animatedValue")]
+    public MDLAnimatedVector3 AnimatedValue { get; }
 }
 
 public extern objc class MDLTransformScaleOp : NSObject, MDLTransformOp
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("animatedValue")] public MDLAnimatedVector3 AnimatedValue { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("animatedValue")]
+    public MDLAnimatedVector3 AnimatedValue { get; }
 }
 
 public extern objc class MDLTransformMatrixOp : NSObject, MDLTransformOp
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("animatedValue")] public MDLAnimatedMatrix4x4 AnimatedValue { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("animatedValue")]
+    public MDLAnimatedMatrix4x4 AnimatedValue { get; }
 }
 
 public extern objc class MDLTransformOrientOp : NSObject, MDLTransformOp
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("animatedValue")] public MDLAnimatedQuaternion AnimatedValue { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("animatedValue")]
+    public MDLAnimatedQuaternion AnimatedValue { get; }
 }
 
 public extern objc class MDLTransformStack : NSObject, NSCopying, MDLTransformComponent
 {
-    [Selector("keyTimes")] public NSArray KeyTimes { get; }
-    [Selector("transformOps")] public NSArray TransformOps { get; }
-    [Selector("init")] public AnyObject Init();
-    [Selector("addTranslateOp:inverse:")] public MDLTransformTranslateOp AddTranslateOpInverse(NSString animatedValueName, bool inverse);
-    [Selector("addRotateXOp:inverse:")] public MDLTransformRotateXOp AddRotateXOpInverse(NSString animatedValueName, bool inverse);
-    [Selector("addRotateYOp:inverse:")] public MDLTransformRotateYOp AddRotateYOpInverse(NSString animatedValueName, bool inverse);
-    [Selector("addRotateZOp:inverse:")] public MDLTransformRotateZOp AddRotateZOpInverse(NSString animatedValueName, bool inverse);
-    [Selector("addRotateOp:order:inverse:")] public MDLTransformRotateOp AddRotateOpOrderInverse(NSString animatedValueName, MDLTransformOpRotationOrder order, bool inverse);
-    [Selector("addScaleOp:inverse:")] public MDLTransformScaleOp AddScaleOpInverse(NSString animatedValueName, bool inverse);
-    [Selector("addMatrixOp:inverse:")] public MDLTransformMatrixOp AddMatrixOpInverse(NSString animatedValueName, bool inverse);
-    [Selector("addOrientOp:inverse:")] public MDLTransformOrientOp AddOrientOpInverse(NSString animatedValueName, bool inverse);
-    [Selector("animatedValueWithName:")] public MDLAnimatedValue AnimatedValueWithName(NSString name);
-    [Selector("float4x4AtTime:")] public matrix_float4x4 Float4x4AtTime(NSTimeInterval time);
-    [Selector("double4x4AtTime:")] public matrix_double4x4 Double4x4AtTime(NSTimeInterval time);
-    [Selector("count")] public NSUInteger Count();
+    [Selector("keyTimes")]
+    public NSArray KeyTimes { get; }
+    [Selector("transformOps")]
+    public NSArray TransformOps { get; }
+    [Selector("init")]
+    public AnyObject Init();
+    [Selector("addTranslateOp:inverse:")]
+    public MDLTransformTranslateOp AddTranslateOpInverse(NSString animatedValueName, bool inverse);
+    [Selector("addRotateXOp:inverse:")]
+    public MDLTransformRotateXOp AddRotateXOpInverse(NSString animatedValueName, bool inverse);
+    [Selector("addRotateYOp:inverse:")]
+    public MDLTransformRotateYOp AddRotateYOpInverse(NSString animatedValueName, bool inverse);
+    [Selector("addRotateZOp:inverse:")]
+    public MDLTransformRotateZOp AddRotateZOpInverse(NSString animatedValueName, bool inverse);
+    [Selector("addRotateOp:order:inverse:")]
+    public MDLTransformRotateOp AddRotateOpOrderInverse(NSString animatedValueName, MDLTransformOpRotationOrder order, bool inverse);
+    [Selector("addScaleOp:inverse:")]
+    public MDLTransformScaleOp AddScaleOpInverse(NSString animatedValueName, bool inverse);
+    [Selector("addMatrixOp:inverse:")]
+    public MDLTransformMatrixOp AddMatrixOpInverse(NSString animatedValueName, bool inverse);
+    [Selector("addOrientOp:inverse:")]
+    public MDLTransformOrientOp AddOrientOpInverse(NSString animatedValueName, bool inverse);
+    [Selector("animatedValueWithName:")]
+    public MDLAnimatedValue AnimatedValueWithName(NSString name);
+    [Selector("float4x4AtTime:")]
+    public matrix_float4x4 Float4x4AtTime(NSTimeInterval time);
+    [Selector("double4x4AtTime:")]
+    public matrix_double4x4 Double4x4AtTime(NSTimeInterval time);
+    [Selector("count")]
+    public NSUInteger Count();
 }
 
 #endif

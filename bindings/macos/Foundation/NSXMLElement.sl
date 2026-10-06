@@ -32,39 +32,66 @@ import Standard.ObjC;
 
 public extern objc class NSXMLElement : NSXMLNode
 {
-    [Selector("attributes", "setAttributes:")] public NSArray? Attributes { get; set; }
-    [Selector("namespaces", "setNamespaces:")] public NSArray? Namespaces { get; set; }
-    [Selector("initWithName:")] public Self InitWithName(NSString name);
-    [Selector("initWithName:URI:")] public Self InitWithNameURI(NSString name, NSString? URI);
-    [Selector("initWithName:stringValue:")] public Self InitWithNameStringValue(NSString name, NSString? string);
-    [Selector("initWithXMLString:error:")] public Self? InitWithXMLStringError(NSString string, out NSError? error);
-    [Selector("initWithKind:options:")] public Self InitWithKindOptions(NSXMLNodeKind kind, NSXMLNodeOptions options);
-    [Selector("elementsForName:")] public NSArray ElementsForName(NSString name);
-    [Selector("elementsForLocalName:URI:")] public NSArray ElementsForLocalNameURI(NSString localName, NSString? URI);
-    [Selector("addAttribute:")] public void AddAttribute(NSXMLNode @attribute);
-    [Selector("removeAttributeForName:")] public void RemoveAttributeForName(NSString name);
-    [Selector("setAttributesWithDictionary:")] public void SetAttributesWithDictionary(NSDictionary attributes);
-    [Selector("attributeForName:")] public NSXMLNode? AttributeForName(NSString name);
-    [Selector("attributeForLocalName:URI:")] public NSXMLNode? AttributeForLocalNameURI(NSString localName, NSString? URI);
-    [Selector("addNamespace:")] public void AddNamespace(NSXMLNode aNamespace);
-    [Selector("removeNamespaceForPrefix:")] public void RemoveNamespaceForPrefix(NSString name);
-    [Selector("namespaceForPrefix:")] public NSXMLNode? NamespaceForPrefix(NSString name);
-    [Selector("resolveNamespaceForName:")] public NSXMLNode? ResolveNamespaceForName(NSString name);
-    [Selector("resolvePrefixForNamespaceURI:")] public NSString? ResolvePrefixForNamespaceURI(NSString namespaceURI);
-    [Selector("insertChild:atIndex:")] public void InsertChildAtIndex(NSXMLNode child, NSUInteger index);
-    [Selector("insertChildren:atIndex:")] public void InsertChildrenAtIndex(NSArray children, NSUInteger index);
-    [Selector("removeChildAtIndex:")] public void RemoveChildAtIndex(NSUInteger index);
-    [Selector("setChildren:")] public void SetChildren(NSArray? children);
-    [Selector("addChild:")] public void AddChild(NSXMLNode child);
-    [Selector("replaceChildAtIndex:withNode:")] public void ReplaceChildAtIndexWithNode(NSUInteger index, NSXMLNode node);
-    [Selector("normalizeAdjacentTextNodesPreservingCDATA:")] public void NormalizeAdjacentTextNodesPreservingCDATA(bool preserve);
+    [Selector("attributes", "setAttributes:")]
+    public NSArray? Attributes { get; set; }
+    [Selector("namespaces", "setNamespaces:")]
+    public NSArray? Namespaces { get; set; }
+    [Selector("initWithName:")]
+    public Self InitWithName(NSString name);
+    [Selector("initWithName:URI:")]
+    public Self InitWithNameURI(NSString name, NSString? URI);
+    [Selector("initWithName:stringValue:")]
+    public Self InitWithNameStringValue(NSString name, NSString? string);
+    [Selector("initWithXMLString:error:")]
+    public Self? InitWithXMLStringError(NSString string, out NSError? error);
+    [Selector("initWithKind:options:")]
+    public Self InitWithKindOptions(NSXMLNodeKind kind, NSXMLNodeOptions options);
+    [Selector("elementsForName:")]
+    public NSArray ElementsForName(NSString name);
+    [Selector("elementsForLocalName:URI:")]
+    public NSArray ElementsForLocalNameURI(NSString localName, NSString? URI);
+    [Selector("addAttribute:")]
+    public void AddAttribute(NSXMLNode @attribute);
+    [Selector("removeAttributeForName:")]
+    public void RemoveAttributeForName(NSString name);
+    [Selector("setAttributesWithDictionary:")]
+    public void SetAttributesWithDictionary(NSDictionary attributes);
+    [Selector("attributeForName:")]
+    public NSXMLNode? AttributeForName(NSString name);
+    [Selector("attributeForLocalName:URI:")]
+    public NSXMLNode? AttributeForLocalNameURI(NSString localName, NSString? URI);
+    [Selector("addNamespace:")]
+    public void AddNamespace(NSXMLNode aNamespace);
+    [Selector("removeNamespaceForPrefix:")]
+    public void RemoveNamespaceForPrefix(NSString name);
+    [Selector("namespaceForPrefix:")]
+    public NSXMLNode? NamespaceForPrefix(NSString name);
+    [Selector("resolveNamespaceForName:")]
+    public NSXMLNode? ResolveNamespaceForName(NSString name);
+    [Selector("resolvePrefixForNamespaceURI:")]
+    public NSString? ResolvePrefixForNamespaceURI(NSString namespaceURI);
+    [Selector("insertChild:atIndex:")]
+    public void InsertChildAtIndex(NSXMLNode child, NSUInteger index);
+    [Selector("insertChildren:atIndex:")]
+    public void InsertChildrenAtIndex(NSArray children, NSUInteger index);
+    [Selector("removeChildAtIndex:")]
+    public void RemoveChildAtIndex(NSUInteger index);
+    [Selector("setChildren:")]
+    public void SetChildren(NSArray? children);
+    [Selector("addChild:")]
+    public void AddChild(NSXMLNode child);
+    [Selector("replaceChildAtIndex:withNode:")]
+    public void ReplaceChildAtIndexWithNode(NSUInteger index, NSXMLNode node);
+    [Selector("normalizeAdjacentTextNodesPreservingCDATA:")]
+    public void NormalizeAdjacentTextNodesPreservingCDATA(bool preserve);
 }
 
 /// NSDeprecated, a category of NSXMLElement.
 public extern objc class NSXMLElement
 {
     /// Deprecated in macOS 100000.
-    [Selector("setAttributesAsDictionary:")] public void SetAttributesAsDictionary(NSDictionary attributes);
+    [Selector("setAttributesAsDictionary:")]
+    public void SetAttributesAsDictionary(NSDictionary attributes);
 }
 
 #endif

@@ -40,32 +40,58 @@ public enum NSXMLDocumentContentKind : ulong
 
 public extern objc class NSXMLDocument : NSXMLNode
 {
-    [Selector("characterEncoding", "setCharacterEncoding:")] public NSString? CharacterEncoding { get; set; }
-    [Selector("version", "setVersion:")] public NSString? Version { get; set; }
-    [Selector("isStandalone", "setStandalone:")] public bool Standalone { get; set; }
-    [Selector("documentContentKind", "setDocumentContentKind:")] public NSXMLDocumentContentKind DocumentContentKind { get; set; }
-    [Selector("MIMEType", "setMIMEType:")] public NSString? MIMEType { get; set; }
-    [Selector("DTD", "setDTD:")] public NSXMLDTD? DTD { get; set; }
-    [Selector("XMLData")] public NSData XMLData { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithXMLString:options:error:")] public Self? InitWithXMLStringOptionsError(NSString string, NSXMLNodeOptions mask, out NSError? error);
-    [Selector("initWithContentsOfURL:options:error:")] public Self? InitWithContentsOfURLOptionsError(NSURL url, NSXMLNodeOptions mask, out NSError? error);
-    [Selector("initWithData:options:error:")] public Self? InitWithDataOptionsError(NSData data, NSXMLNodeOptions mask, out NSError? error);
-    [Selector("initWithRootElement:")] public Self InitWithRootElement(NSXMLElement? element);
-    [Selector("replacementClassForClass:")] public static Class ReplacementClassForClass(Class cls);
-    [Selector("setRootElement:")] public void SetRootElement(NSXMLElement root);
-    [Selector("rootElement")] public NSXMLElement? RootElement();
-    [Selector("insertChild:atIndex:")] public void InsertChildAtIndex(NSXMLNode child, NSUInteger index);
-    [Selector("insertChildren:atIndex:")] public void InsertChildrenAtIndex(NSArray children, NSUInteger index);
-    [Selector("removeChildAtIndex:")] public void RemoveChildAtIndex(NSUInteger index);
-    [Selector("setChildren:")] public void SetChildren(NSArray? children);
-    [Selector("addChild:")] public void AddChild(NSXMLNode child);
-    [Selector("replaceChildAtIndex:withNode:")] public void ReplaceChildAtIndexWithNode(NSUInteger index, NSXMLNode node);
-    [Selector("XMLDataWithOptions:")] public NSData XMLDataWithOptions(NSXMLNodeOptions options);
-    [Selector("objectByApplyingXSLT:arguments:error:")] public AnyObject? ObjectByApplyingXSLTArgumentsError(NSData xslt, NSDictionary? arguments, out NSError? error);
-    [Selector("objectByApplyingXSLTString:arguments:error:")] public AnyObject? ObjectByApplyingXSLTStringArgumentsError(NSString xslt, NSDictionary? arguments, out NSError? error);
-    [Selector("objectByApplyingXSLTAtURL:arguments:error:")] public AnyObject? ObjectByApplyingXSLTAtURLArgumentsError(NSURL xsltURL, NSDictionary? argument, out NSError? error);
-    [Selector("validateAndReturnError:")] public bool ValidateAndReturnError(out NSError? error);
+    [Selector("characterEncoding", "setCharacterEncoding:")]
+    public NSString? CharacterEncoding { get; set; }
+    [Selector("version", "setVersion:")]
+    public NSString? Version { get; set; }
+    [Selector("isStandalone", "setStandalone:")]
+    public bool Standalone { get; set; }
+    [Selector("documentContentKind", "setDocumentContentKind:")]
+    public NSXMLDocumentContentKind DocumentContentKind { get; set; }
+    [Selector("MIMEType", "setMIMEType:")]
+    public NSString? MIMEType { get; set; }
+    [Selector("DTD", "setDTD:")]
+    public NSXMLDTD? DTD { get; set; }
+    [Selector("XMLData")]
+    public NSData XMLData { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithXMLString:options:error:")]
+    public Self? InitWithXMLStringOptionsError(NSString string, NSXMLNodeOptions mask, out NSError? error);
+    [Selector("initWithContentsOfURL:options:error:")]
+    public Self? InitWithContentsOfURLOptionsError(NSURL url, NSXMLNodeOptions mask, out NSError? error);
+    [Selector("initWithData:options:error:")]
+    public Self? InitWithDataOptionsError(NSData data, NSXMLNodeOptions mask, out NSError? error);
+    [Selector("initWithRootElement:")]
+    public Self InitWithRootElement(NSXMLElement? element);
+    [Selector("replacementClassForClass:")]
+    public static Class ReplacementClassForClass(Class cls);
+    [Selector("setRootElement:")]
+    public void SetRootElement(NSXMLElement root);
+    [Selector("rootElement")]
+    public NSXMLElement? RootElement();
+    [Selector("insertChild:atIndex:")]
+    public void InsertChildAtIndex(NSXMLNode child, NSUInteger index);
+    [Selector("insertChildren:atIndex:")]
+    public void InsertChildrenAtIndex(NSArray children, NSUInteger index);
+    [Selector("removeChildAtIndex:")]
+    public void RemoveChildAtIndex(NSUInteger index);
+    [Selector("setChildren:")]
+    public void SetChildren(NSArray? children);
+    [Selector("addChild:")]
+    public void AddChild(NSXMLNode child);
+    [Selector("replaceChildAtIndex:withNode:")]
+    public void ReplaceChildAtIndexWithNode(NSUInteger index, NSXMLNode node);
+    [Selector("XMLDataWithOptions:")]
+    public NSData XMLDataWithOptions(NSXMLNodeOptions options);
+    [Selector("objectByApplyingXSLT:arguments:error:")]
+    public AnyObject? ObjectByApplyingXSLTArgumentsError(NSData xslt, NSDictionary? arguments, out NSError? error);
+    [Selector("objectByApplyingXSLTString:arguments:error:")]
+    public AnyObject? ObjectByApplyingXSLTStringArgumentsError(NSString xslt, NSDictionary? arguments, out NSError? error);
+    [Selector("objectByApplyingXSLTAtURL:arguments:error:")]
+    public AnyObject? ObjectByApplyingXSLTAtURLArgumentsError(NSURL xsltURL, NSDictionary? argument, out NSError? error);
+    [Selector("validateAndReturnError:")]
+    public bool ValidateAndReturnError(out NSError? error);
 }
 
 #endif

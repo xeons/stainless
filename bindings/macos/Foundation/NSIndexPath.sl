@@ -32,23 +32,34 @@ import Standard.ObjC;
 
 public extern objc class NSIndexPath : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("length")] public NSUInteger Length { get; }
-    [Selector("indexPathWithIndex:")] public static Self IndexPathWithIndex(NSUInteger index);
-    [Selector("indexPathWithIndexes:length:")] public static Self IndexPathWithIndexesLength(NSUInteger* indexes, NSUInteger length);
-    [Selector("initWithIndexes:length:")] public Self InitWithIndexesLength(NSUInteger* indexes, NSUInteger length);
-    [Selector("initWithIndex:")] public Self InitWithIndex(NSUInteger index);
-    [Selector("indexPathByAddingIndex:")] public NSIndexPath IndexPathByAddingIndex(NSUInteger index);
-    [Selector("indexPathByRemovingLastIndex")] public NSIndexPath IndexPathByRemovingLastIndex();
-    [Selector("indexAtPosition:")] public NSUInteger IndexAtPosition(NSUInteger position);
-    [Selector("getIndexes:range:")] public void GetIndexesRange(NSUInteger* indexes, NSRange positionRange);
-    [Selector("compare:")] public NSComparisonResult Compare(NSIndexPath otherObject);
+    [Selector("length")]
+    public NSUInteger Length { get; }
+    [Selector("indexPathWithIndex:")]
+    public static Self IndexPathWithIndex(NSUInteger index);
+    [Selector("indexPathWithIndexes:length:")]
+    public static Self IndexPathWithIndexesLength(NSUInteger* indexes, NSUInteger length);
+    [Selector("initWithIndexes:length:")]
+    public Self InitWithIndexesLength(NSUInteger* indexes, NSUInteger length);
+    [Selector("initWithIndex:")]
+    public Self InitWithIndex(NSUInteger index);
+    [Selector("indexPathByAddingIndex:")]
+    public NSIndexPath IndexPathByAddingIndex(NSUInteger index);
+    [Selector("indexPathByRemovingLastIndex")]
+    public NSIndexPath IndexPathByRemovingLastIndex();
+    [Selector("indexAtPosition:")]
+    public NSUInteger IndexAtPosition(NSUInteger position);
+    [Selector("getIndexes:range:")]
+    public void GetIndexesRange(NSUInteger* indexes, NSRange positionRange);
+    [Selector("compare:")]
+    public NSComparisonResult Compare(NSIndexPath otherObject);
 }
 
 /// NSDeprecated, a category of NSIndexPath.
 public extern objc class NSIndexPath
 {
     /// Deprecated in macOS 100000.
-    [Selector("getIndexes:")] public void GetIndexes(NSUInteger* indexes);
+    [Selector("getIndexes:")]
+    public void GetIndexes(NSUInteger* indexes);
 }
 
 #endif

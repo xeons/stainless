@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class MTLFunctionConstantValues : NSObject, NSCopying
 {
-    [Selector("setConstantValue:type:atIndex:")] public void SetConstantValueTypeAtIndex(void* value, MTLDataType type, NSUInteger index);
-    [Selector("setConstantValues:type:withRange:")] public void SetConstantValuesTypeWithRange(void* values, MTLDataType type, NSRange range);
-    [Selector("setConstantValue:type:withName:")] public void SetConstantValueTypeWithName(void* value, MTLDataType type, NSString name);
-    [Selector("reset")] public void Reset();
+    [Selector("setConstantValue:type:atIndex:")]
+    public void SetConstantValueTypeAtIndex(void* value, MTLDataType type, NSUInteger index);
+    [Selector("setConstantValues:type:withRange:")]
+    public void SetConstantValuesTypeWithRange(void* values, MTLDataType type, NSRange range);
+    [Selector("setConstantValue:type:withName:")]
+    public void SetConstantValueTypeWithName(void* value, MTLDataType type, NSString name);
+    [Selector("reset")]
+    public void Reset();
 }
 
 #endif

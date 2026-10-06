@@ -43,35 +43,52 @@ public enum SCShareableContentStyle : long
 
 public extern objc class SCRunningApplication : NSObject
 {
-    [Selector("bundleIdentifier")] public NSString BundleIdentifier { get; }
-    [Selector("applicationName")] public NSString ApplicationName { get; }
-    [Selector("processID")] public pid_t ProcessID { get; }
+    [Selector("bundleIdentifier")]
+    public NSString BundleIdentifier { get; }
+    [Selector("applicationName")]
+    public NSString ApplicationName { get; }
+    [Selector("processID")]
+    public pid_t ProcessID { get; }
 }
 
 public extern objc class SCWindow : NSObject
 {
-    [Selector("windowID")] public CGWindowID WindowID { get; }
-    [Selector("frame")] public CGRect Frame { get; }
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("windowLayer")] public NSInteger WindowLayer { get; }
-    [Selector("owningApplication")] public SCRunningApplication? OwningApplication { get; }
-    [Selector("isOnScreen")] public bool OnScreen { get; }
-    [Selector("isActive")] public bool Active { get; }
+    [Selector("windowID")]
+    public CGWindowID WindowID { get; }
+    [Selector("frame")]
+    public CGRect Frame { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("windowLayer")]
+    public NSInteger WindowLayer { get; }
+    [Selector("owningApplication")]
+    public SCRunningApplication? OwningApplication { get; }
+    [Selector("isOnScreen")]
+    public bool OnScreen { get; }
+    [Selector("isActive")]
+    public bool Active { get; }
 }
 
 public extern objc class SCDisplay : NSObject
 {
-    [Selector("displayID")] public CGDirectDisplayID DisplayID { get; }
-    [Selector("width")] public NSInteger Width { get; }
-    [Selector("height")] public NSInteger Height { get; }
-    [Selector("frame")] public CGRect Frame { get; }
+    [Selector("displayID")]
+    public CGDirectDisplayID DisplayID { get; }
+    [Selector("width")]
+    public NSInteger Width { get; }
+    [Selector("height")]
+    public NSInteger Height { get; }
+    [Selector("frame")]
+    public CGRect Frame { get; }
 }
 
 public extern objc class SCShareableContentInfo : NSObject
 {
-    [Selector("style")] public SCShareableContentStyle Style { get; }
-    [Selector("pointPixelScale")] public float PointPixelScale { get; }
-    [Selector("contentRect")] public CGRect ContentRect { get; }
+    [Selector("style")]
+    public SCShareableContentStyle Style { get; }
+    [Selector("pointPixelScale")]
+    public float PointPixelScale { get; }
+    [Selector("contentRect")]
+    public CGRect ContentRect { get; }
 }
 
 public objc closure void SCShareableContentGetShareableContentWithCompletionHandlerCompletionHandlerBlock(SCShareableContent? arg0, NSError? arg1);
@@ -86,15 +103,24 @@ public objc closure void SCShareableContentGetShareableContentExcludingDesktopWi
 
 public extern objc class SCShareableContent : NSObject
 {
-    [Selector("windows")] public NSArray Windows { get; }
-    [Selector("displays")] public NSArray Displays { get; }
-    [Selector("applications")] public NSArray Applications { get; }
-    [Selector("getShareableContentWithCompletionHandler:")] public static void GetShareableContentWithCompletionHandler(SCShareableContentGetShareableContentWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getCurrentProcessShareableContentWithCompletionHandler:")] public static void GetCurrentProcessShareableContentWithCompletionHandler(SCShareableContentGetCurrentProcessShareableContentWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getShareableContentExcludingDesktopWindows:onScreenWindowsOnly:completionHandler:")] public static void GetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyCompletionHandler(bool excludeDesktopWindows, bool onScreenWindowsOnly, SCShareableContentGetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getShareableContentExcludingDesktopWindows:onScreenWindowsOnlyBelowWindow:completionHandler:")] public static void GetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyBelowWindowCompletionHandler(bool excludeDesktopWindows, SCWindow window, SCShareableContentGetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyBelowWindowCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getShareableContentExcludingDesktopWindows:onScreenWindowsOnlyAboveWindow:completionHandler:")] public static void GetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyAboveWindowCompletionHandler(bool excludeDesktopWindows, SCWindow window, SCShareableContentGetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyAboveWindowCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("infoForFilter:")] public static SCShareableContentInfo InfoForFilter(SCContentFilter filter);
+    [Selector("windows")]
+    public NSArray Windows { get; }
+    [Selector("displays")]
+    public NSArray Displays { get; }
+    [Selector("applications")]
+    public NSArray Applications { get; }
+    [Selector("getShareableContentWithCompletionHandler:")]
+    public static void GetShareableContentWithCompletionHandler(SCShareableContentGetShareableContentWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getCurrentProcessShareableContentWithCompletionHandler:")]
+    public static void GetCurrentProcessShareableContentWithCompletionHandler(SCShareableContentGetCurrentProcessShareableContentWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getShareableContentExcludingDesktopWindows:onScreenWindowsOnly:completionHandler:")]
+    public static void GetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyCompletionHandler(bool excludeDesktopWindows, bool onScreenWindowsOnly, SCShareableContentGetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getShareableContentExcludingDesktopWindows:onScreenWindowsOnlyBelowWindow:completionHandler:")]
+    public static void GetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyBelowWindowCompletionHandler(bool excludeDesktopWindows, SCWindow window, SCShareableContentGetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyBelowWindowCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getShareableContentExcludingDesktopWindows:onScreenWindowsOnlyAboveWindow:completionHandler:")]
+    public static void GetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyAboveWindowCompletionHandler(bool excludeDesktopWindows, SCWindow window, SCShareableContentGetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyAboveWindowCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("infoForFilter:")]
+    public static SCShareableContentInfo InfoForFilter(SCContentFilter filter);
 }
 
 #endif

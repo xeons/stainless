@@ -37,17 +37,28 @@ public extern "C" CFStringRef PKAppleDrawingTypeIdentifier;
 
 public extern objc class PKDrawing : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("strokes")] public NSArray Strokes { get; }
-    [Selector("bounds")] public CGRect Bounds { get; }
-    [Selector("requiredContentVersion")] public PKContentVersion RequiredContentVersion { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithStrokes:")] public Self InitWithStrokes(NSArray strokes);
-    [Selector("initWithData:error:")] public Self? InitWithDataError(NSData data, out NSError? error);
-    [Selector("dataRepresentation")] public NSData DataRepresentation();
-    [Selector("imageFromRect:scale:")] public NSImage ImageFromRectScale(CGRect rect, CGFloat scale);
-    [Selector("drawingByApplyingTransform:")] public PKDrawing DrawingByApplyingTransform(CGAffineTransform transform);
-    [Selector("drawingByAppendingDrawing:")] public PKDrawing DrawingByAppendingDrawing(PKDrawing drawing);
-    [Selector("drawingByAppendingStrokes:")] public PKDrawing DrawingByAppendingStrokes(NSArray strokes);
+    [Selector("strokes")]
+    public NSArray Strokes { get; }
+    [Selector("bounds")]
+    public CGRect Bounds { get; }
+    [Selector("requiredContentVersion")]
+    public PKContentVersion RequiredContentVersion { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithStrokes:")]
+    public Self InitWithStrokes(NSArray strokes);
+    [Selector("initWithData:error:")]
+    public Self? InitWithDataError(NSData data, out NSError? error);
+    [Selector("dataRepresentation")]
+    public NSData DataRepresentation();
+    [Selector("imageFromRect:scale:")]
+    public NSImage ImageFromRectScale(CGRect rect, CGFloat scale);
+    [Selector("drawingByApplyingTransform:")]
+    public PKDrawing DrawingByApplyingTransform(CGAffineTransform transform);
+    [Selector("drawingByAppendingDrawing:")]
+    public PKDrawing DrawingByAppendingDrawing(PKDrawing drawing);
+    [Selector("drawingByAppendingStrokes:")]
+    public PKDrawing DrawingByAppendingStrokes(NSArray strokes);
 }
 
 #endif

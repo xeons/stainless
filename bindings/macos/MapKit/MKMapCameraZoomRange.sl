@@ -36,11 +36,16 @@ public extern "C" CLLocationDistance MKMapCameraZoomDefault;
 
 public extern objc class MKMapCameraZoomRange : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("minCenterCoordinateDistance")] public CLLocationDistance MinCenterCoordinateDistance { get; }
-    [Selector("maxCenterCoordinateDistance")] public CLLocationDistance MaxCenterCoordinateDistance { get; }
-    [Selector("initWithMinCenterCoordinateDistance:maxCenterCoordinateDistance:")] public Self? InitWithMinCenterCoordinateDistanceMaxCenterCoordinateDistance(CLLocationDistance minDistance, CLLocationDistance maxDistance);
-    [Selector("initWithMinCenterCoordinateDistance:")] public Self? InitWithMinCenterCoordinateDistance(CLLocationDistance minDistance);
-    [Selector("initWithMaxCenterCoordinateDistance:")] public Self? InitWithMaxCenterCoordinateDistance(CLLocationDistance maxDistance);
+    [Selector("minCenterCoordinateDistance")]
+    public CLLocationDistance MinCenterCoordinateDistance { get; }
+    [Selector("maxCenterCoordinateDistance")]
+    public CLLocationDistance MaxCenterCoordinateDistance { get; }
+    [Selector("initWithMinCenterCoordinateDistance:maxCenterCoordinateDistance:")]
+    public Self? InitWithMinCenterCoordinateDistanceMaxCenterCoordinateDistance(CLLocationDistance minDistance, CLLocationDistance maxDistance);
+    [Selector("initWithMinCenterCoordinateDistance:")]
+    public Self? InitWithMinCenterCoordinateDistance(CLLocationDistance minDistance);
+    [Selector("initWithMaxCenterCoordinateDistance:")]
+    public Self? InitWithMaxCenterCoordinateDistance(CLLocationDistance maxDistance);
 }
 
 #endif

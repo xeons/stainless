@@ -46,10 +46,14 @@ public struct MPSImageKeypointData
 
 public extern objc class MPSImageFindKeypoints : MPSKernel
 {
-    [Selector("keypointRangeInfo")] public MPSImageKeypointRangeInfo KeypointRangeInfo { get; }
-    [Selector("initWithDevice:info:")] public Self InitWithDeviceInfo(MTLDevice device, MPSImageKeypointRangeInfo* info);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:sourceTexture:regions:numberOfRegions:keypointCountBuffer:keypointCountBufferOffset:keypointDataBuffer:keypointDataBufferOffset:")] public void EncodeToCommandBufferSourceTextureRegionsNumberOfRegionsKeypointCountBufferKeypointCountBufferOffsetKeypointDataBufferKeypointDataBufferOffset(MTLCommandBuffer commandBuffer, MTLTexture source, MTLRegion* regions, NSUInteger numberOfRegions, MTLBuffer keypointCountBuffer, NSUInteger keypointCountBufferOffset, MTLBuffer keypointDataBuffer, NSUInteger keypointDataBufferOffset);
+    [Selector("keypointRangeInfo")]
+    public MPSImageKeypointRangeInfo KeypointRangeInfo { get; }
+    [Selector("initWithDevice:info:")]
+    public Self InitWithDeviceInfo(MTLDevice device, MPSImageKeypointRangeInfo* info);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:sourceTexture:regions:numberOfRegions:keypointCountBuffer:keypointCountBufferOffset:keypointDataBuffer:keypointDataBufferOffset:")]
+    public void EncodeToCommandBufferSourceTextureRegionsNumberOfRegionsKeypointCountBufferKeypointCountBufferOffsetKeypointDataBufferKeypointDataBufferOffset(MTLCommandBuffer commandBuffer, MTLTexture source, MTLRegion* regions, NSUInteger numberOfRegions, MTLBuffer keypointCountBuffer, NSUInteger keypointCountBufferOffset, MTLBuffer keypointDataBuffer, NSUInteger keypointDataBufferOffset);
 }
 
 #endif

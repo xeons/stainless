@@ -46,17 +46,23 @@ public enum __ISyncChangeType : int
 public extern objc class ISyncChange : NSObject
 {
     /// Deprecated in macOS 10.7.
-    [Selector("changeWithType:recordIdentifier:changes:")] public static AnyObject? ChangeWithTypeRecordIdentifierChanges(ISyncChangeType type, NSString? recordIdentifier, NSArray? changes);
+    [Selector("changeWithType:recordIdentifier:changes:")]
+    public static AnyObject? ChangeWithTypeRecordIdentifierChanges(ISyncChangeType type, NSString? recordIdentifier, NSArray? changes);
     /// Deprecated in macOS 10.7.
-    [Selector("initWithChangeType:recordIdentifier:changes:")] public AnyObject? InitWithChangeTypeRecordIdentifierChanges(ISyncChangeType type, NSString? recordIdentifier, NSArray? changes);
+    [Selector("initWithChangeType:recordIdentifier:changes:")]
+    public AnyObject? InitWithChangeTypeRecordIdentifierChanges(ISyncChangeType type, NSString? recordIdentifier, NSArray? changes);
     /// Deprecated in macOS 10.7.
-    [Selector("type")] public ISyncChangeType Type();
+    [Selector("type")]
+    public ISyncChangeType Type();
     /// Deprecated in macOS 10.7.
-    [Selector("recordIdentifier")] public NSString? RecordIdentifier();
+    [Selector("recordIdentifier")]
+    public NSString? RecordIdentifier();
     /// Deprecated in macOS 10.7.
-    [Selector("record")] public NSDictionary? Record();
+    [Selector("record")]
+    public NSDictionary? Record();
     /// Deprecated in macOS 10.7.
-    [Selector("changes")] public NSArray? Changes();
+    [Selector("changes")]
+    public NSArray? Changes();
 }
 
 /// Deprecated in macOS 10.7.

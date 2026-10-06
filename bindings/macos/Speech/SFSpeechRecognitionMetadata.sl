@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class SFSpeechRecognitionMetadata : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("speakingRate")] public double SpeakingRate { get; }
-    [Selector("averagePauseDuration")] public NSTimeInterval AveragePauseDuration { get; }
-    [Selector("speechStartTimestamp")] public NSTimeInterval SpeechStartTimestamp { get; }
-    [Selector("speechDuration")] public NSTimeInterval SpeechDuration { get; }
-    [Selector("voiceAnalytics")] public SFVoiceAnalytics? VoiceAnalytics { get; }
+    [Selector("speakingRate")]
+    public double SpeakingRate { get; }
+    [Selector("averagePauseDuration")]
+    public NSTimeInterval AveragePauseDuration { get; }
+    [Selector("speechStartTimestamp")]
+    public NSTimeInterval SpeechStartTimestamp { get; }
+    [Selector("speechDuration")]
+    public NSTimeInterval SpeechDuration { get; }
+    [Selector("voiceAnalytics")]
+    public SFVoiceAnalytics? VoiceAnalytics { get; }
 }
 
 #endif

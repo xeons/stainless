@@ -33,8 +33,12 @@ import Standard.ObjC;
 
 public objc interface GKSavedGameListener : NSObjectProtocol
 {
-    [Optional] [Selector("player:didModifySavedGame:")] void PlayerDidModifySavedGame(GKPlayer player, GKSavedGame savedGame);
-    [Optional] [Selector("player:hasConflictingSavedGames:")] void PlayerHasConflictingSavedGames(GKPlayer player, NSArray savedGames);
+    [Optional]
+    [Selector("player:didModifySavedGame:")]
+    void PlayerDidModifySavedGame(GKPlayer player, GKSavedGame savedGame);
+    [Optional]
+    [Selector("player:hasConflictingSavedGames:")]
+    void PlayerHasConflictingSavedGames(GKPlayer player, NSArray savedGames);
 }
 
 #endif

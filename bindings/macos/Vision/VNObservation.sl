@@ -39,193 +39,278 @@ import Standard.ObjC;
 
 public extern objc class VNObservation : NSObject, NSCopying, NSSecureCoding, VNRequestRevisionProviding
 {
-    [Selector("uuid")] public NSUUID Uuid { get; }
-    [Selector("confidence")] public VNConfidence Confidence { get; }
-    [Selector("timeRange")] public CMTimeRange TimeRange { get; }
+    [Selector("uuid")]
+    public NSUUID Uuid { get; }
+    [Selector("confidence")]
+    public VNConfidence Confidence { get; }
+    [Selector("timeRange")]
+    public CMTimeRange TimeRange { get; }
 }
 
 public extern objc class VNDetectedObjectObservation : VNObservation
 {
-    [Selector("boundingBox")] public CGRect BoundingBox { get; }
-    [Selector("globalSegmentationMask")] public VNPixelBufferObservation? GlobalSegmentationMask { get; }
-    [Selector("observationWithBoundingBox:")] public static Self ObservationWithBoundingBox(CGRect boundingBox);
-    [Selector("observationWithRequestRevision:boundingBox:")] public static Self ObservationWithRequestRevisionBoundingBox(NSUInteger requestRevision, CGRect boundingBox);
+    [Selector("boundingBox")]
+    public CGRect BoundingBox { get; }
+    [Selector("globalSegmentationMask")]
+    public VNPixelBufferObservation? GlobalSegmentationMask { get; }
+    [Selector("observationWithBoundingBox:")]
+    public static Self ObservationWithBoundingBox(CGRect boundingBox);
+    [Selector("observationWithRequestRevision:boundingBox:")]
+    public static Self ObservationWithRequestRevisionBoundingBox(NSUInteger requestRevision, CGRect boundingBox);
 }
 
 public extern objc class VNFaceObservation : VNDetectedObjectObservation
 {
-    [Selector("landmarks")] public VNFaceLandmarks2D? Landmarks { get; }
-    [Selector("faceCaptureQuality")] public NSNumber? FaceCaptureQuality { get; }
-    [Selector("roll")] public NSNumber? Roll { get; }
-    [Selector("yaw")] public NSNumber? Yaw { get; }
-    [Selector("pitch")] public NSNumber? Pitch { get; }
+    [Selector("landmarks")]
+    public VNFaceLandmarks2D? Landmarks { get; }
+    [Selector("faceCaptureQuality")]
+    public NSNumber? FaceCaptureQuality { get; }
+    [Selector("roll")]
+    public NSNumber? Roll { get; }
+    [Selector("yaw")]
+    public NSNumber? Yaw { get; }
+    [Selector("pitch")]
+    public NSNumber? Pitch { get; }
     /// Deprecated in macOS 12.0.
-    [Selector("faceObservationWithRequestRevision:boundingBox:roll:yaw:")] public static Self FaceObservationWithRequestRevisionBoundingBoxRollYaw(NSUInteger requestRevision, CGRect boundingBox, NSNumber? roll, NSNumber? yaw);
-    [Selector("faceObservationWithRequestRevision:boundingBox:roll:yaw:pitch:")] public static Self FaceObservationWithRequestRevisionBoundingBoxRollYawPitch(NSUInteger requestRevision, CGRect boundingBox, NSNumber? roll, NSNumber? yaw, NSNumber? pitch);
+    [Selector("faceObservationWithRequestRevision:boundingBox:roll:yaw:")]
+    public static Self FaceObservationWithRequestRevisionBoundingBoxRollYaw(NSUInteger requestRevision, CGRect boundingBox, NSNumber? roll, NSNumber? yaw);
+    [Selector("faceObservationWithRequestRevision:boundingBox:roll:yaw:pitch:")]
+    public static Self FaceObservationWithRequestRevisionBoundingBoxRollYawPitch(NSUInteger requestRevision, CGRect boundingBox, NSNumber? roll, NSNumber? yaw, NSNumber? pitch);
 }
 
 public extern objc class VNClassificationObservation : VNObservation
 {
-    [Selector("identifier")] public NSString Identifier { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
 }
 
 /// PrecisionRecallAdditions, a category of VNClassificationObservation.
 public extern objc class VNClassificationObservation
 {
-    [Selector("hasPrecisionRecallCurve")] public bool HasPrecisionRecallCurve { get; }
-    [Selector("hasMinimumRecall:forPrecision:")] public bool HasMinimumRecallForPrecision(float minimumRecall, float precision);
-    [Selector("hasMinimumPrecision:forRecall:")] public bool HasMinimumPrecisionForRecall(float minimumPrecision, float recall);
+    [Selector("hasPrecisionRecallCurve")]
+    public bool HasPrecisionRecallCurve { get; }
+    [Selector("hasMinimumRecall:forPrecision:")]
+    public bool HasMinimumRecallForPrecision(float minimumRecall, float precision);
+    [Selector("hasMinimumPrecision:forRecall:")]
+    public bool HasMinimumPrecisionForRecall(float minimumPrecision, float recall);
 }
 
 public extern objc class VNRecognizedObjectObservation : VNDetectedObjectObservation
 {
-    [Selector("labels")] public NSArray Labels { get; }
+    [Selector("labels")]
+    public NSArray Labels { get; }
 }
 
 public extern objc class VNCoreMLFeatureValueObservation : VNObservation
 {
-    [Selector("featureValue")] public MLFeatureValue FeatureValue { get; }
-    [Selector("featureName")] public NSString FeatureName { get; }
+    [Selector("featureValue")]
+    public MLFeatureValue FeatureValue { get; }
+    [Selector("featureName")]
+    public NSString FeatureName { get; }
 }
 
 public extern objc class VNPixelBufferObservation : VNObservation
 {
-    [Selector("pixelBuffer")] public CVPixelBufferRef? PixelBuffer { get; }
-    [Selector("featureName")] public NSString? FeatureName { get; }
+    [Selector("pixelBuffer")]
+    public CVPixelBufferRef? PixelBuffer { get; }
+    [Selector("featureName")]
+    public NSString? FeatureName { get; }
 }
 
 public extern objc class VNRectangleObservation : VNDetectedObjectObservation
 {
-    [Selector("topLeft")] public CGPoint TopLeft { get; }
-    [Selector("topRight")] public CGPoint TopRight { get; }
-    [Selector("bottomLeft")] public CGPoint BottomLeft { get; }
-    [Selector("bottomRight")] public CGPoint BottomRight { get; }
+    [Selector("topLeft")]
+    public CGPoint TopLeft { get; }
+    [Selector("topRight")]
+    public CGPoint TopRight { get; }
+    [Selector("bottomLeft")]
+    public CGPoint BottomLeft { get; }
+    [Selector("bottomRight")]
+    public CGPoint BottomRight { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("rectangleObservationWithRequestRevision:topLeft:bottomLeft:bottomRight:topRight:")] public static Self RectangleObservationWithRequestRevisionTopLeftBottomLeftBottomRightTopRight(NSUInteger requestRevision, CGPoint topLeft, CGPoint bottomLeft, CGPoint bottomRight, CGPoint topRight);
-    [Selector("rectangleObservationWithRequestRevision:topLeft:topRight:bottomRight:bottomLeft:")] public static Self RectangleObservationWithRequestRevisionTopLeftTopRightBottomRightBottomLeft(NSUInteger requestRevision, CGPoint topLeft, CGPoint topRight, CGPoint bottomRight, CGPoint bottomLeft);
+    [Selector("rectangleObservationWithRequestRevision:topLeft:bottomLeft:bottomRight:topRight:")]
+    public static Self RectangleObservationWithRequestRevisionTopLeftBottomLeftBottomRightTopRight(NSUInteger requestRevision, CGPoint topLeft, CGPoint bottomLeft, CGPoint bottomRight, CGPoint topRight);
+    [Selector("rectangleObservationWithRequestRevision:topLeft:topRight:bottomRight:bottomLeft:")]
+    public static Self RectangleObservationWithRequestRevisionTopLeftTopRightBottomRightBottomLeft(NSUInteger requestRevision, CGPoint topLeft, CGPoint topRight, CGPoint bottomRight, CGPoint bottomLeft);
 }
 
 public extern objc class VNTrajectoryObservation : VNObservation
 {
-    [Selector("detectedPoints")] public NSArray DetectedPoints { get; }
-    [Selector("projectedPoints")] public NSArray ProjectedPoints { get; }
-    [Selector("equationCoefficients")] public simd_float3 EquationCoefficients { get; }
-    [Selector("movingAverageRadius")] public CGFloat MovingAverageRadius { get; }
+    [Selector("detectedPoints")]
+    public NSArray DetectedPoints { get; }
+    [Selector("projectedPoints")]
+    public NSArray ProjectedPoints { get; }
+    [Selector("equationCoefficients")]
+    public simd_float3 EquationCoefficients { get; }
+    [Selector("movingAverageRadius")]
+    public CGFloat MovingAverageRadius { get; }
 }
 
 public extern objc class VNTextObservation : VNRectangleObservation
 {
-    [Selector("characterBoxes")] public NSArray? CharacterBoxes { get; }
+    [Selector("characterBoxes")]
+    public NSArray? CharacterBoxes { get; }
 }
 
 public extern objc class VNRecognizedText : NSObject, NSCopying, NSSecureCoding, VNRequestRevisionProviding
 {
-    [Selector("string")] public NSString String { get; }
-    [Selector("confidence")] public VNConfidence Confidence { get; }
-    [Selector("boundingBoxForRange:error:")] public VNRectangleObservation? BoundingBoxForRangeError(NSRange range, out NSError? error);
+    [Selector("string")]
+    public NSString String { get; }
+    [Selector("confidence")]
+    public VNConfidence Confidence { get; }
+    [Selector("boundingBoxForRange:error:")]
+    public VNRectangleObservation? BoundingBoxForRangeError(NSRange range, out NSError? error);
 }
 
 public extern objc class VNRecognizedTextObservation : VNRectangleObservation
 {
-    [Selector("topCandidates:")] public NSArray TopCandidates(NSUInteger maxCandidateCount);
+    [Selector("topCandidates:")]
+    public NSArray TopCandidates(NSUInteger maxCandidateCount);
 }
 
 public extern objc class VNBarcodeObservation : VNRectangleObservation
 {
-    [Selector("symbology")] public VNBarcodeSymbology Symbology { get; }
-    [Selector("barcodeDescriptor")] public CIBarcodeDescriptor? BarcodeDescriptor { get; }
-    [Selector("payloadStringValue")] public NSString? PayloadStringValue { get; }
-    [Selector("payloadData")] public NSData? PayloadData { get; }
-    [Selector("isGS1DataCarrier")] public bool IsGS1DataCarrier { get; }
-    [Selector("isColorInverted")] public bool IsColorInverted { get; }
-    [Selector("supplementalCompositeType")] public VNBarcodeCompositeType SupplementalCompositeType { get; }
-    [Selector("supplementalPayloadString")] public NSString? SupplementalPayloadString { get; }
-    [Selector("supplementalPayloadData")] public NSData? SupplementalPayloadData { get; }
+    [Selector("symbology")]
+    public VNBarcodeSymbology Symbology { get; }
+    [Selector("barcodeDescriptor")]
+    public CIBarcodeDescriptor? BarcodeDescriptor { get; }
+    [Selector("payloadStringValue")]
+    public NSString? PayloadStringValue { get; }
+    [Selector("payloadData")]
+    public NSData? PayloadData { get; }
+    [Selector("isGS1DataCarrier")]
+    public bool IsGS1DataCarrier { get; }
+    [Selector("isColorInverted")]
+    public bool IsColorInverted { get; }
+    [Selector("supplementalCompositeType")]
+    public VNBarcodeCompositeType SupplementalCompositeType { get; }
+    [Selector("supplementalPayloadString")]
+    public NSString? SupplementalPayloadString { get; }
+    [Selector("supplementalPayloadData")]
+    public NSData? SupplementalPayloadData { get; }
 }
 
 public extern objc class VNHorizonObservation : VNObservation
 {
-    [Selector("transform")] public CGAffineTransform Transform { get; }
-    [Selector("angle")] public CGFloat Angle { get; }
-    [Selector("transformForImageWidth:height:")] public CGAffineTransform TransformForImageWidthHeight(nuint width, nuint height);
+    [Selector("transform")]
+    public CGAffineTransform Transform { get; }
+    [Selector("angle")]
+    public CGFloat Angle { get; }
+    [Selector("transformForImageWidth:height:")]
+    public CGAffineTransform TransformForImageWidthHeight(nuint width, nuint height);
 }
 
 public extern objc class VNImageAlignmentObservation : VNObservation { }
 
 public extern objc class VNImageTranslationAlignmentObservation : VNImageAlignmentObservation
 {
-    [Selector("alignmentTransform")] public CGAffineTransform AlignmentTransform { get; }
+    [Selector("alignmentTransform")]
+    public CGAffineTransform AlignmentTransform { get; }
 }
 
 public extern objc class VNImageHomographicAlignmentObservation : VNImageAlignmentObservation
 {
-    [Selector("warpTransform")] public matrix_float3x3 WarpTransform { get; }
+    [Selector("warpTransform")]
+    public matrix_float3x3 WarpTransform { get; }
 }
 
 public extern objc class VNSaliencyImageObservation : VNPixelBufferObservation
 {
-    [Selector("salientObjects")] public NSArray? SalientObjects { get; }
+    [Selector("salientObjects")]
+    public NSArray? SalientObjects { get; }
 }
 
 public extern objc class VNFeaturePrintObservation : VNObservation
 {
-    [Selector("elementType")] public VNElementType ElementType { get; }
-    [Selector("elementCount")] public NSUInteger ElementCount { get; }
-    [Selector("data")] public NSData Data { get; }
-    [Selector("computeDistance:toFeaturePrintObservation:error:")] public bool ComputeDistanceToFeaturePrintObservationError(float* outDistance, VNFeaturePrintObservation featurePrint, out NSError? error);
+    [Selector("elementType")]
+    public VNElementType ElementType { get; }
+    [Selector("elementCount")]
+    public NSUInteger ElementCount { get; }
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("computeDistance:toFeaturePrintObservation:error:")]
+    public bool ComputeDistanceToFeaturePrintObservationError(float* outDistance, VNFeaturePrintObservation featurePrint, out NSError? error);
 }
 
 public extern objc class VNContoursObservation : VNObservation
 {
-    [Selector("contourCount")] public NSInteger ContourCount { get; }
-    [Selector("topLevelContourCount")] public NSInteger TopLevelContourCount { get; }
-    [Selector("topLevelContours")] public NSArray TopLevelContours { get; }
-    [Selector("normalizedPath")] public CGPathRef? NormalizedPath { get; }
-    [Selector("contourAtIndex:error:")] public VNContour? ContourAtIndexError(NSInteger contourIndex, out NSError? error);
-    [Selector("contourAtIndexPath:error:")] public VNContour? ContourAtIndexPathError(NSIndexPath indexPath, out NSError? error);
+    [Selector("contourCount")]
+    public NSInteger ContourCount { get; }
+    [Selector("topLevelContourCount")]
+    public NSInteger TopLevelContourCount { get; }
+    [Selector("topLevelContours")]
+    public NSArray TopLevelContours { get; }
+    [Selector("normalizedPath")]
+    public CGPathRef? NormalizedPath { get; }
+    [Selector("contourAtIndex:error:")]
+    public VNContour? ContourAtIndexError(NSInteger contourIndex, out NSError? error);
+    [Selector("contourAtIndexPath:error:")]
+    public VNContour? ContourAtIndexPathError(NSIndexPath indexPath, out NSError? error);
 }
 
 public extern "C" VNRecognizedPointGroupKey VNRecognizedPointGroupKeyAll;
 
 public extern objc class VNRecognizedPointsObservation : VNObservation
 {
-    [Selector("availableKeys")] public NSArray AvailableKeys { get; }
-    [Selector("availableGroupKeys")] public NSArray AvailableGroupKeys { get; }
-    [Selector("recognizedPointForKey:error:")] public VNRecognizedPoint? RecognizedPointForKeyError(VNRecognizedPointKey pointKey, out NSError? error);
-    [Selector("recognizedPointsForGroupKey:error:")] public NSDictionary? RecognizedPointsForGroupKeyError(VNRecognizedPointGroupKey groupKey, out NSError? error);
-    [Selector("keypointsMultiArrayAndReturnError:")] public MLMultiArray? KeypointsMultiArrayAndReturnError(out NSError? error);
+    [Selector("availableKeys")]
+    public NSArray AvailableKeys { get; }
+    [Selector("availableGroupKeys")]
+    public NSArray AvailableGroupKeys { get; }
+    [Selector("recognizedPointForKey:error:")]
+    public VNRecognizedPoint? RecognizedPointForKeyError(VNRecognizedPointKey pointKey, out NSError? error);
+    [Selector("recognizedPointsForGroupKey:error:")]
+    public NSDictionary? RecognizedPointsForGroupKeyError(VNRecognizedPointGroupKey groupKey, out NSError? error);
+    [Selector("keypointsMultiArrayAndReturnError:")]
+    public MLMultiArray? KeypointsMultiArrayAndReturnError(out NSError? error);
 }
 
 public extern objc class VNHumanObservation : VNDetectedObjectObservation
 {
-    [Selector("upperBodyOnly")] public bool UpperBodyOnly { get; }
+    [Selector("upperBodyOnly")]
+    public bool UpperBodyOnly { get; }
 }
 
 public extern objc class VNInstanceMaskObservation : VNObservation
 {
-    [Selector("instanceMask")] public CVPixelBufferRef? InstanceMask { get; }
-    [Selector("allInstances")] public NSIndexSet AllInstances { get; }
-    [ReturnsRetained] [Selector("generateMaskForInstances:error:")] public CVPixelBufferRef? GenerateMaskForInstancesError(NSIndexSet instances, out NSError? error);
-    [ReturnsRetained] [Selector("generateMaskedImageOfInstances:fromRequestHandler:croppedToInstancesExtent:error:")] public CVPixelBufferRef? GenerateMaskedImageOfInstancesFromRequestHandlerCroppedToInstancesExtentError(NSIndexSet instances, VNImageRequestHandler requestHandler, bool cropResult, out NSError? error);
-    [ReturnsRetained] [Selector("generateScaledMaskForImageForInstances:fromRequestHandler:error:")] public CVPixelBufferRef? GenerateScaledMaskForImageForInstancesFromRequestHandlerError(NSIndexSet instances, VNImageRequestHandler requestHandler, out NSError? error);
+    [Selector("instanceMask")]
+    public CVPixelBufferRef? InstanceMask { get; }
+    [Selector("allInstances")]
+    public NSIndexSet AllInstances { get; }
+    [ReturnsRetained]
+    [Selector("generateMaskForInstances:error:")]
+    public CVPixelBufferRef? GenerateMaskForInstancesError(NSIndexSet instances, out NSError? error);
+    [ReturnsRetained]
+    [Selector("generateMaskedImageOfInstances:fromRequestHandler:croppedToInstancesExtent:error:")]
+    public CVPixelBufferRef? GenerateMaskedImageOfInstancesFromRequestHandlerCroppedToInstancesExtentError(NSIndexSet instances, VNImageRequestHandler requestHandler, bool cropResult, out NSError? error);
+    [ReturnsRetained]
+    [Selector("generateScaledMaskForImageForInstances:fromRequestHandler:error:")]
+    public CVPixelBufferRef? GenerateScaledMaskForImageForInstancesFromRequestHandlerError(NSIndexSet instances, VNImageRequestHandler requestHandler, out NSError? error);
 }
 
 public extern objc class VNAnimalBodyPoseObservation : VNRecognizedPointsObservation
 {
-    [Selector("availableJointNames")] public NSArray AvailableJointNames { get; }
-    [Selector("availableJointGroupNames")] public NSArray AvailableJointGroupNames { get; }
-    [Selector("recognizedPointForJointName:error:")] public VNRecognizedPoint? RecognizedPointForJointNameError(VNAnimalBodyPoseObservationJointName jointName, out NSError? error);
-    [Selector("recognizedPointsForJointsGroupName:error:")] public NSDictionary? RecognizedPointsForJointsGroupNameError(VNAnimalBodyPoseObservationJointsGroupName jointsGroupName, out NSError? error);
+    [Selector("availableJointNames")]
+    public NSArray AvailableJointNames { get; }
+    [Selector("availableJointGroupNames")]
+    public NSArray AvailableJointGroupNames { get; }
+    [Selector("recognizedPointForJointName:error:")]
+    public VNRecognizedPoint? RecognizedPointForJointNameError(VNAnimalBodyPoseObservationJointName jointName, out NSError? error);
+    [Selector("recognizedPointsForJointsGroupName:error:")]
+    public NSDictionary? RecognizedPointsForJointsGroupNameError(VNAnimalBodyPoseObservationJointsGroupName jointsGroupName, out NSError? error);
 }
 
 public extern "C" VNRecognizedPointGroupKey VNRecognizedPoint3DGroupKeyAll;
 
 public extern objc class VNRecognizedPoints3DObservation : VNObservation
 {
-    [Selector("availableKeys")] public NSArray AvailableKeys { get; }
-    [Selector("availableGroupKeys")] public NSArray AvailableGroupKeys { get; }
-    [Selector("recognizedPointForKey:error:")] public VNRecognizedPoint3D? RecognizedPointForKeyError(VNRecognizedPointKey pointKey, out NSError? error);
-    [Selector("recognizedPointsForGroupKey:error:")] public NSDictionary? RecognizedPointsForGroupKeyError(VNRecognizedPointGroupKey groupKey, out NSError? error);
+    [Selector("availableKeys")]
+    public NSArray AvailableKeys { get; }
+    [Selector("availableGroupKeys")]
+    public NSArray AvailableGroupKeys { get; }
+    [Selector("recognizedPointForKey:error:")]
+    public VNRecognizedPoint3D? RecognizedPointForKeyError(VNRecognizedPointKey pointKey, out NSError? error);
+    [Selector("recognizedPointsForGroupKey:error:")]
+    public NSDictionary? RecognizedPointsForGroupKeyError(VNRecognizedPointGroupKey groupKey, out NSError? error);
 }
 
 public enum VNHumanBodyPose3DObservationHeightEstimation : long
@@ -236,22 +321,34 @@ public enum VNHumanBodyPose3DObservationHeightEstimation : long
 
 public extern objc class VNHumanBodyPose3DObservation : VNRecognizedPoints3DObservation
 {
-    [Selector("heightEstimation")] public VNHumanBodyPose3DObservationHeightEstimation HeightEstimation { get; }
-    [Selector("cameraOriginMatrix")] public simd_float4x4 CameraOriginMatrix { get; }
-    [Selector("availableJointsGroupNames")] public NSArray AvailableJointsGroupNames { get; }
-    [Selector("availableJointNames")] public NSArray AvailableJointNames { get; }
-    [Selector("bodyHeight")] public float BodyHeight { get; }
-    [Selector("recognizedPointsForJointsGroupName:error:")] public NSDictionary? RecognizedPointsForJointsGroupNameError(VNHumanBodyPose3DObservationJointsGroupName jointsGroupName, out NSError? error);
-    [Selector("recognizedPointForJointName:error:")] public VNHumanBodyRecognizedPoint3D? RecognizedPointForJointNameError(VNHumanBodyPose3DObservationJointName jointName, out NSError? error);
-    [Selector("pointInImageForJointName:error:")] public VNPoint? PointInImageForJointNameError(VNHumanBodyPose3DObservationJointName jointName, out NSError? error);
-    [Selector("parentJointNameForJointName:")] public VNHumanBodyPose3DObservationJointName? ParentJointNameForJointName(VNHumanBodyPose3DObservationJointName jointName);
-    [Selector("getCameraRelativePosition:forJointName:error:")] public bool GetCameraRelativePositionForJointNameError(simd_float4x4* modelPositionOut, VNHumanBodyPose3DObservationJointName jointName, out NSError? error);
+    [Selector("heightEstimation")]
+    public VNHumanBodyPose3DObservationHeightEstimation HeightEstimation { get; }
+    [Selector("cameraOriginMatrix")]
+    public simd_float4x4 CameraOriginMatrix { get; }
+    [Selector("availableJointsGroupNames")]
+    public NSArray AvailableJointsGroupNames { get; }
+    [Selector("availableJointNames")]
+    public NSArray AvailableJointNames { get; }
+    [Selector("bodyHeight")]
+    public float BodyHeight { get; }
+    [Selector("recognizedPointsForJointsGroupName:error:")]
+    public NSDictionary? RecognizedPointsForJointsGroupNameError(VNHumanBodyPose3DObservationJointsGroupName jointsGroupName, out NSError? error);
+    [Selector("recognizedPointForJointName:error:")]
+    public VNHumanBodyRecognizedPoint3D? RecognizedPointForJointNameError(VNHumanBodyPose3DObservationJointName jointName, out NSError? error);
+    [Selector("pointInImageForJointName:error:")]
+    public VNPoint? PointInImageForJointNameError(VNHumanBodyPose3DObservationJointName jointName, out NSError? error);
+    [Selector("parentJointNameForJointName:")]
+    public VNHumanBodyPose3DObservationJointName? ParentJointNameForJointName(VNHumanBodyPose3DObservationJointName jointName);
+    [Selector("getCameraRelativePosition:forJointName:error:")]
+    public bool GetCameraRelativePositionForJointNameError(simd_float4x4* modelPositionOut, VNHumanBodyPose3DObservationJointName jointName, out NSError? error);
 }
 
 public extern objc class VNImageAestheticsScoresObservation : VNObservation
 {
-    [Selector("isUtility")] public bool IsUtility { get; }
-    [Selector("overallScore")] public float OverallScore { get; }
+    [Selector("isUtility")]
+    public bool IsUtility { get; }
+    [Selector("overallScore")]
+    public float OverallScore { get; }
 }
 
 #endif

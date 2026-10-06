@@ -34,15 +34,24 @@ import Standard.ObjC;
 /// macOS 15.4 and later.
 public extern objc class WKWebExtensionTabConfiguration : NSObject
 {
-    [Selector("window")] public WKWebExtensionWindow? Window { get; }
-    [Selector("index")] public NSUInteger Index { get; }
-    [Selector("parentTab")] public WKWebExtensionTab? ParentTab { get; }
-    [Selector("url")] public NSURL? Url { get; }
-    [Selector("shouldBeActive")] public bool ShouldBeActive { get; }
-    [Selector("shouldAddToSelection")] public bool ShouldAddToSelection { get; }
-    [Selector("shouldBePinned")] public bool ShouldBePinned { get; }
-    [Selector("shouldBeMuted")] public bool ShouldBeMuted { get; }
-    [Selector("shouldReaderModeBeActive")] public bool ShouldReaderModeBeActive { get; }
+    [Selector("window")]
+    public WKWebExtensionWindow? Window { get; }
+    [Selector("index")]
+    public NSUInteger Index { get; }
+    [Selector("parentTab")]
+    public WKWebExtensionTab? ParentTab { get; }
+    [Selector("url")]
+    public NSURL? Url { get; }
+    [Selector("shouldBeActive")]
+    public bool ShouldBeActive { get; }
+    [Selector("shouldAddToSelection")]
+    public bool ShouldAddToSelection { get; }
+    [Selector("shouldBePinned")]
+    public bool ShouldBePinned { get; }
+    [Selector("shouldBeMuted")]
+    public bool ShouldBeMuted { get; }
+    [Selector("shouldReaderModeBeActive")]
+    public bool ShouldReaderModeBeActive { get; }
 }
 
 #endif

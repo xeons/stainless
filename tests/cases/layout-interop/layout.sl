@@ -55,7 +55,8 @@ public struct Carbon
 public struct Event
 {
     public int Type;
-    [Packed] public long Time;
+    [Packed]
+    public long Time;
     public int Flags;
 }
 

@@ -32,33 +32,44 @@ import Standard.ObjC;
 
 public objc interface NSCopying
 {
-    [Selector("copyWithZone:")] AnyObject CopyWithZone(_NSZone* zone);
+    [Selector("copyWithZone:")]
+    AnyObject CopyWithZone(_NSZone* zone);
 }
 
 public objc interface NSMutableCopying
 {
-    [Selector("mutableCopyWithZone:")] AnyObject MutableCopyWithZone(_NSZone* zone);
+    [Selector("mutableCopyWithZone:")]
+    AnyObject MutableCopyWithZone(_NSZone* zone);
 }
 
 public objc interface NSCoding
 {
-    [Selector("encodeWithCoder:")] void EncodeWithCoder(NSCoder coder);
-    [Selector("initWithCoder:")] Self? InitWithCoder(NSCoder coder);
+    [Selector("encodeWithCoder:")]
+    void EncodeWithCoder(NSCoder coder);
+    [Selector("initWithCoder:")]
+    Self? InitWithCoder(NSCoder coder);
 }
 
 public objc interface NSSecureCoding : NSCoding
 {
-    [Selector("supportsSecureCoding")] static abstract bool SupportsSecureCoding { get; }
+    [Selector("supportsSecureCoding")]
+    static abstract bool SupportsSecureCoding { get; }
 }
 
 /// NSCoderMethods, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("classForCoder")] public Class ClassForCoder { get; }
-    [Selector("version")] public static NSInteger Version();
-    [Selector("setVersion:")] public static void SetVersion(NSInteger aVersion);
-    [Selector("replacementObjectForCoder:")] public AnyObject? ReplacementObjectForCoder(NSCoder coder);
-    [ReturnsRetained] [Selector("awakeAfterUsingCoder:")] public AnyObject? AwakeAfterUsingCoder(NSCoder coder);
+    [Selector("classForCoder")]
+    public Class ClassForCoder { get; }
+    [Selector("version")]
+    public static NSInteger Version();
+    [Selector("setVersion:")]
+    public static void SetVersion(NSInteger aVersion);
+    [Selector("replacementObjectForCoder:")]
+    public AnyObject? ReplacementObjectForCoder(NSCoder coder);
+    [ReturnsRetained]
+    [Selector("awakeAfterUsingCoder:")]
+    public AnyObject? AwakeAfterUsingCoder(NSCoder coder);
 }
 
 /// NSDeprecatedMethods, a category of NSObject.
@@ -66,16 +77,21 @@ public extern objc class NSObject { }
 
 public objc interface NSDiscardableContent
 {
-    [Selector("beginContentAccess")] bool BeginContentAccess();
-    [Selector("endContentAccess")] void EndContentAccess();
-    [Selector("discardContentIfPossible")] void DiscardContentIfPossible();
-    [Selector("isContentDiscarded")] bool IsContentDiscarded();
+    [Selector("beginContentAccess")]
+    bool BeginContentAccess();
+    [Selector("endContentAccess")]
+    void EndContentAccess();
+    [Selector("discardContentIfPossible")]
+    void DiscardContentIfPossible();
+    [Selector("isContentDiscarded")]
+    bool IsContentDiscarded();
 }
 
 /// NSDiscardableContentProxy, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("autoContentAccessingProxy")] public AnyObject AutoContentAccessingProxy { get; }
+    [Selector("autoContentAccessingProxy")]
+    public AnyObject AutoContentAccessingProxy { get; }
 }
 
 #endif

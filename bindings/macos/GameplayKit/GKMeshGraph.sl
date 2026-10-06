@@ -41,20 +41,34 @@ public enum GKMeshGraphTriangulationMode : ulong
 
 public extern objc class GKMeshGraph : GKGraph
 {
-    [Selector("obstacles")] public NSArray Obstacles { get; }
-    [Selector("bufferRadius")] public float BufferRadius { get; }
-    [Selector("triangulationMode", "setTriangulationMode:")] public GKMeshGraphTriangulationMode TriangulationMode { get; set; }
-    [Selector("triangleCount")] public NSUInteger TriangleCount { get; }
-    [Selector("graphWithBufferRadius:minCoordinate:maxCoordinate:nodeClass:")] public static Self GraphWithBufferRadiusMinCoordinateMaxCoordinateNodeClass(float bufferRadius, vector_float2 min, vector_float2 max, Class nodeClass);
-    [Selector("initWithBufferRadius:minCoordinate:maxCoordinate:nodeClass:")] public Self InitWithBufferRadiusMinCoordinateMaxCoordinateNodeClass(float bufferRadius, vector_float2 min, vector_float2 max, Class nodeClass);
-    [Selector("graphWithBufferRadius:minCoordinate:maxCoordinate:")] public static Self GraphWithBufferRadiusMinCoordinateMaxCoordinate(float bufferRadius, vector_float2 min, vector_float2 max);
-    [Selector("initWithBufferRadius:minCoordinate:maxCoordinate:")] public Self InitWithBufferRadiusMinCoordinateMaxCoordinate(float bufferRadius, vector_float2 min, vector_float2 max);
-    [Selector("addObstacles:")] public void AddObstacles(NSArray obstacles);
-    [Selector("removeObstacles:")] public void RemoveObstacles(NSArray obstacles);
-    [Selector("connectNodeUsingObstacles:")] public void ConnectNodeUsingObstacles(AnyObject node);
-    [Selector("triangulate")] public void Triangulate();
-    [Selector("triangleAtIndex:")] public GKTriangle TriangleAtIndex(NSUInteger index);
-    [Selector("classForGenericArgumentAtIndex:")] public Class ClassForGenericArgumentAtIndex(NSUInteger index);
+    [Selector("obstacles")]
+    public NSArray Obstacles { get; }
+    [Selector("bufferRadius")]
+    public float BufferRadius { get; }
+    [Selector("triangulationMode", "setTriangulationMode:")]
+    public GKMeshGraphTriangulationMode TriangulationMode { get; set; }
+    [Selector("triangleCount")]
+    public NSUInteger TriangleCount { get; }
+    [Selector("graphWithBufferRadius:minCoordinate:maxCoordinate:nodeClass:")]
+    public static Self GraphWithBufferRadiusMinCoordinateMaxCoordinateNodeClass(float bufferRadius, vector_float2 min, vector_float2 max, Class nodeClass);
+    [Selector("initWithBufferRadius:minCoordinate:maxCoordinate:nodeClass:")]
+    public Self InitWithBufferRadiusMinCoordinateMaxCoordinateNodeClass(float bufferRadius, vector_float2 min, vector_float2 max, Class nodeClass);
+    [Selector("graphWithBufferRadius:minCoordinate:maxCoordinate:")]
+    public static Self GraphWithBufferRadiusMinCoordinateMaxCoordinate(float bufferRadius, vector_float2 min, vector_float2 max);
+    [Selector("initWithBufferRadius:minCoordinate:maxCoordinate:")]
+    public Self InitWithBufferRadiusMinCoordinateMaxCoordinate(float bufferRadius, vector_float2 min, vector_float2 max);
+    [Selector("addObstacles:")]
+    public void AddObstacles(NSArray obstacles);
+    [Selector("removeObstacles:")]
+    public void RemoveObstacles(NSArray obstacles);
+    [Selector("connectNodeUsingObstacles:")]
+    public void ConnectNodeUsingObstacles(AnyObject node);
+    [Selector("triangulate")]
+    public void Triangulate();
+    [Selector("triangleAtIndex:")]
+    public GKTriangle TriangleAtIndex(NSUInteger index);
+    [Selector("classForGenericArgumentAtIndex:")]
+    public Class ClassForGenericArgumentAtIndex(NSUInteger index);
 }
 
 #endif

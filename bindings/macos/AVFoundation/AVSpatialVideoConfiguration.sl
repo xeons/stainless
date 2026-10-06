@@ -35,12 +35,18 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class AVSpatialVideoConfiguration : NSObject
 {
-    [Selector("cameraCalibrationDataLensCollection", "setCameraCalibrationDataLensCollection:")] public NSArray? CameraCalibrationDataLensCollection { get; set; }
-    [Selector("horizontalFieldOfView", "setHorizontalFieldOfView:")] public NSNumber? HorizontalFieldOfView { get; set; }
-    [Selector("cameraSystemBaseline", "setCameraSystemBaseline:")] public NSNumber? CameraSystemBaseline { get; set; }
-    [Selector("disparityAdjustment", "setDisparityAdjustment:")] public NSNumber? DisparityAdjustment { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithFormatDescription:")] public Self InitWithFormatDescription(CMFormatDescriptionRef formatDescription);
+    [Selector("cameraCalibrationDataLensCollection", "setCameraCalibrationDataLensCollection:")]
+    public NSArray? CameraCalibrationDataLensCollection { get; set; }
+    [Selector("horizontalFieldOfView", "setHorizontalFieldOfView:")]
+    public NSNumber? HorizontalFieldOfView { get; set; }
+    [Selector("cameraSystemBaseline", "setCameraSystemBaseline:")]
+    public NSNumber? CameraSystemBaseline { get; set; }
+    [Selector("disparityAdjustment", "setDisparityAdjustment:")]
+    public NSNumber? DisparityAdjustment { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithFormatDescription:")]
+    public Self InitWithFormatDescription(CMFormatDescriptionRef formatDescription);
 }
 
 #endif

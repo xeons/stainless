@@ -38,21 +38,36 @@ public objc closure void CATransactionSetCompletionBlockBlock();
 
 public extern objc class CATransaction : NSObject
 {
-    [Selector("begin")] public static void Begin();
-    [Selector("commit")] public static void Commit();
-    [Selector("flush")] public static void Flush();
-    [Selector("lock")] public static void Lock();
-    [Selector("unlock")] public static void Unlock();
-    [Selector("animationDuration")] public static CFTimeInterval AnimationDuration();
-    [Selector("setAnimationDuration:")] public static void SetAnimationDuration(CFTimeInterval dur);
-    [Selector("animationTimingFunction")] public static CAMediaTimingFunction? AnimationTimingFunction();
-    [Selector("setAnimationTimingFunction:")] public static void SetAnimationTimingFunction(CAMediaTimingFunction? function);
-    [Selector("disableActions")] public static bool DisableActions();
-    [Selector("setDisableActions:")] public static void SetDisableActions(bool flag);
-    [Selector("completionBlock")] public static CATransactionCompletionBlockResultBlock? CompletionBlock();
-    [Selector("setCompletionBlock:")] public static void SetCompletionBlock(CATransactionSetCompletionBlockBlock? block);
-    [Selector("valueForKey:")] public static AnyObject? ValueForKey(NSString key);
-    [Selector("setValue:forKey:")] public static void SetValueForKey(AnyObject? anObject, NSString key);
+    [Selector("begin")]
+    public static void Begin();
+    [Selector("commit")]
+    public static void Commit();
+    [Selector("flush")]
+    public static void Flush();
+    [Selector("lock")]
+    public static void Lock();
+    [Selector("unlock")]
+    public static void Unlock();
+    [Selector("animationDuration")]
+    public static CFTimeInterval AnimationDuration();
+    [Selector("setAnimationDuration:")]
+    public static void SetAnimationDuration(CFTimeInterval dur);
+    [Selector("animationTimingFunction")]
+    public static CAMediaTimingFunction? AnimationTimingFunction();
+    [Selector("setAnimationTimingFunction:")]
+    public static void SetAnimationTimingFunction(CAMediaTimingFunction? function);
+    [Selector("disableActions")]
+    public static bool DisableActions();
+    [Selector("setDisableActions:")]
+    public static void SetDisableActions(bool flag);
+    [Selector("completionBlock")]
+    public static CATransactionCompletionBlockResultBlock? CompletionBlock();
+    [Selector("setCompletionBlock:")]
+    public static void SetCompletionBlock(CATransactionSetCompletionBlockBlock? block);
+    [Selector("valueForKey:")]
+    public static AnyObject? ValueForKey(NSString key);
+    [Selector("setValue:forKey:")]
+    public static void SetValueForKey(AnyObject? anObject, NSString key);
 }
 
 public extern "C" NSString? kCATransactionAnimationDuration;

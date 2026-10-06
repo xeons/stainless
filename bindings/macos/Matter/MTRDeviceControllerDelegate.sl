@@ -41,22 +41,42 @@ public enum MTRCommissioningStatus : long
 
 public objc interface MTRDeviceControllerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("controller:statusUpdate:")] void ControllerStatusUpdate(MTRDeviceController controller, MTRCommissioningStatus status);
-    [Optional] [Selector("controller:commissioningSessionEstablishmentDone:")] void ControllerCommissioningSessionEstablishmentDone(MTRDeviceController controller, NSError? error);
+    [Optional]
+    [Selector("controller:statusUpdate:")]
+    void ControllerStatusUpdate(MTRDeviceController controller, MTRCommissioningStatus status);
+    [Optional]
+    [Selector("controller:commissioningSessionEstablishmentDone:")]
+    void ControllerCommissioningSessionEstablishmentDone(MTRDeviceController controller, NSError? error);
     /// Deprecated in macOS 14.0.
-    [Optional] [Selector("controller:commissioningComplete:")] void ControllerCommissioningComplete(MTRDeviceController controller, NSError? error);
-    [Optional] [Selector("controller:commissioningComplete:nodeID:")] void ControllerCommissioningCompleteNodeID(MTRDeviceController controller, NSError? error, NSNumber? nodeID);
-    [Optional] [Selector("controller:commissioningComplete:nodeID:metrics:")] void ControllerCommissioningCompleteNodeIDMetrics(MTRDeviceController controller, NSError? error, NSNumber? nodeID, MTRMetrics metrics);
+    [Optional]
+    [Selector("controller:commissioningComplete:")]
+    void ControllerCommissioningComplete(MTRDeviceController controller, NSError? error);
+    [Optional]
+    [Selector("controller:commissioningComplete:nodeID:")]
+    void ControllerCommissioningCompleteNodeID(MTRDeviceController controller, NSError? error, NSNumber? nodeID);
+    [Optional]
+    [Selector("controller:commissioningComplete:nodeID:metrics:")]
+    void ControllerCommissioningCompleteNodeIDMetrics(MTRDeviceController controller, NSError? error, NSNumber? nodeID, MTRMetrics metrics);
     /// macOS 15.4 and later.
-    [Optional] [Selector("controller:readCommissioneeInfo:")] void ControllerReadCommissioneeInfo(MTRDeviceController controller, MTRCommissioneeInfo info);
+    [Optional]
+    [Selector("controller:readCommissioneeInfo:")]
+    void ControllerReadCommissioneeInfo(MTRDeviceController controller, MTRCommissioneeInfo info);
     /// Deprecated in macOS 15.4.
-    [Optional] [Selector("controller:readCommissioningInfo:")] void ControllerReadCommissioningInfo(MTRDeviceController controller, MTRProductIdentity info);
+    [Optional]
+    [Selector("controller:readCommissioningInfo:")]
+    void ControllerReadCommissioningInfo(MTRDeviceController controller, MTRProductIdentity info);
     /// macOS 15.2 and later.
-    [Optional] [Selector("controller:suspendedChangedTo:")] void ControllerSuspendedChangedTo(MTRDeviceController controller, bool suspended);
+    [Optional]
+    [Selector("controller:suspendedChangedTo:")]
+    void ControllerSuspendedChangedTo(MTRDeviceController controller, bool suspended);
     /// macOS 15.4 and later.
-    [Optional] [Selector("devicesChangedForController:")] void DevicesChangedForController(MTRDeviceController controller);
+    [Optional]
+    [Selector("devicesChangedForController:")]
+    void DevicesChangedForController(MTRDeviceController controller);
     /// macOS 15.5 and later.
-    [Optional] [Selector("controller:commissioneeHasReceivedNetworkCredentials:")] void ControllerCommissioneeHasReceivedNetworkCredentials(MTRDeviceController controller, NSNumber nodeID);
+    [Optional]
+    [Selector("controller:commissioneeHasReceivedNetworkCredentials:")]
+    void ControllerCommissioneeHasReceivedNetworkCredentials(MTRDeviceController controller, NSNumber nodeID);
 }
 
 /// Deprecated in macOS 13.3.
@@ -71,10 +91,18 @@ public enum MTRPairingStatus : ulong
 /// Deprecated in macOS 13.3.
 public objc interface MTRDevicePairingDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("onStatusUpdate:")] void OnStatusUpdate(MTRPairingStatus status);
-    [Optional] [Selector("onPairingComplete:")] void OnPairingComplete(NSError? error);
-    [Optional] [Selector("onCommissioningComplete:")] void OnCommissioningComplete(NSError? error);
-    [Optional] [Selector("onPairingDeleted:")] void OnPairingDeleted(NSError? error);
+    [Optional]
+    [Selector("onStatusUpdate:")]
+    void OnStatusUpdate(MTRPairingStatus status);
+    [Optional]
+    [Selector("onPairingComplete:")]
+    void OnPairingComplete(NSError? error);
+    [Optional]
+    [Selector("onCommissioningComplete:")]
+    void OnCommissioningComplete(NSError? error);
+    [Optional]
+    [Selector("onPairingDeleted:")]
+    void OnPairingDeleted(NSError? error);
 }
 
 #endif

@@ -66,14 +66,21 @@ public enum MTLStages : ulong
 
 public objc interface MTLCommandEncoder : NSObjectProtocol
 {
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("endEncoding")] void EndEncoding();
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("endEncoding")]
+    void EndEncoding();
     /// macOS 26.0 and later.
-    [Selector("barrierAfterQueueStages:beforeStages:")] void BarrierAfterQueueStagesBeforeStages(MTLStages afterQueueStages, MTLStages beforeStages);
-    [Selector("insertDebugSignpost:")] void InsertDebugSignpost(NSString string);
-    [Selector("pushDebugGroup:")] void PushDebugGroup(NSString string);
-    [Selector("popDebugGroup")] void PopDebugGroup();
+    [Selector("barrierAfterQueueStages:beforeStages:")]
+    void BarrierAfterQueueStagesBeforeStages(MTLStages afterQueueStages, MTLStages beforeStages);
+    [Selector("insertDebugSignpost:")]
+    void InsertDebugSignpost(NSString string);
+    [Selector("pushDebugGroup:")]
+    void PushDebugGroup(NSString string);
+    [Selector("popDebugGroup")]
+    void PopDebugGroup();
 }
 
 #endif

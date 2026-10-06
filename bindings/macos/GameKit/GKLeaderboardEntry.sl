@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class GKLeaderboardEntry : NSObject
 {
-    [Selector("player")] public GKPlayer Player { get; }
-    [Selector("rank")] public NSInteger Rank { get; }
-    [Selector("score")] public NSInteger Score { get; }
-    [Selector("formattedScore")] public NSString FormattedScore { get; }
-    [Selector("context")] public NSUInteger Context { get; }
-    [Selector("date")] public NSDate Date { get; }
+    [Selector("player")]
+    public GKPlayer Player { get; }
+    [Selector("rank")]
+    public NSInteger Rank { get; }
+    [Selector("score")]
+    public NSInteger Score { get; }
+    [Selector("formattedScore")]
+    public NSString FormattedScore { get; }
+    [Selector("context")]
+    public NSUInteger Context { get; }
+    [Selector("date")]
+    public NSDate Date { get; }
 }
 
 #endif

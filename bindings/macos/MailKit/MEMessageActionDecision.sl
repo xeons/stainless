@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class MEMessageActionDecision : NSObject, NSSecureCoding
 {
-    [Selector("invokeAgainWithBody")] public static MEMessageActionDecision InvokeAgainWithBody { get; }
-    [Selector("decisionApplyingAction:")] public static Self DecisionApplyingAction(MEMessageAction action);
-    [Selector("decisionApplyingActions:")] public static Self DecisionApplyingActions(NSArray actions);
+    [Selector("invokeAgainWithBody")]
+    public static MEMessageActionDecision InvokeAgainWithBody { get; }
+    [Selector("decisionApplyingAction:")]
+    public static Self DecisionApplyingAction(MEMessageAction action);
+    [Selector("decisionApplyingActions:")]
+    public static Self DecisionApplyingActions(NSArray actions);
 }
 
 #endif

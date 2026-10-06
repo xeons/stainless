@@ -82,33 +82,58 @@ public enum OSAStorageOptions : ulong
 
 public extern objc class OSAScript : NSObject, NSCopying
 {
-    [Selector("source")] public NSString Source { get; }
-    [Selector("url")] public NSURL? Url { get; }
-    [Selector("language", "setLanguage:")] public OSALanguage Language { get; set; }
-    [Selector("languageInstance", "setLanguageInstance:")] public OSALanguageInstance? LanguageInstance { get; set; }
-    [Selector("isCompiled")] public bool Compiled { get; }
-    [Selector("richTextSource")] public NSAttributedString? RichTextSource { get; }
-    [Selector("scriptDataDescriptorWithContentsOfURL:")] public static NSAppleEventDescriptor? ScriptDataDescriptorWithContentsOfURL(NSURL url);
-    [Selector("initWithSource:")] public Self InitWithSource(NSString source);
-    [Selector("initWithSource:language:")] public Self InitWithSourceLanguage(NSString source, OSALanguage? language);
-    [Selector("initWithSource:fromURL:languageInstance:usingStorageOptions:")] public Self InitWithSourceFromURLLanguageInstanceUsingStorageOptions(NSString source, NSURL? url, OSALanguageInstance? instance, OSAStorageOptions storageOptions);
-    [Selector("initWithContentsOfURL:error:")] public Self? InitWithContentsOfURLError(NSURL url, out NSDictionary? errorInfo);
+    [Selector("source")]
+    public NSString Source { get; }
+    [Selector("url")]
+    public NSURL? Url { get; }
+    [Selector("language", "setLanguage:")]
+    public OSALanguage Language { get; set; }
+    [Selector("languageInstance", "setLanguageInstance:")]
+    public OSALanguageInstance? LanguageInstance { get; set; }
+    [Selector("isCompiled")]
+    public bool Compiled { get; }
+    [Selector("richTextSource")]
+    public NSAttributedString? RichTextSource { get; }
+    [Selector("scriptDataDescriptorWithContentsOfURL:")]
+    public static NSAppleEventDescriptor? ScriptDataDescriptorWithContentsOfURL(NSURL url);
+    [Selector("initWithSource:")]
+    public Self InitWithSource(NSString source);
+    [Selector("initWithSource:language:")]
+    public Self InitWithSourceLanguage(NSString source, OSALanguage? language);
+    [Selector("initWithSource:fromURL:languageInstance:usingStorageOptions:")]
+    public Self InitWithSourceFromURLLanguageInstanceUsingStorageOptions(NSString source, NSURL? url, OSALanguageInstance? instance, OSAStorageOptions storageOptions);
+    [Selector("initWithContentsOfURL:error:")]
+    public Self? InitWithContentsOfURLError(NSURL url, out NSDictionary? errorInfo);
     /// Deprecated in macOS 10.6.
-    [Selector("initWithContentsOfURL:language:error:")] public AnyObject InitWithContentsOfURLLanguageError(NSURL url, OSALanguage language, out NSDictionary? errorInfo);
-    [Selector("initWithContentsOfURL:languageInstance:usingStorageOptions:error:")] public Self? InitWithContentsOfURLLanguageInstanceUsingStorageOptionsError(NSURL url, OSALanguageInstance? instance, OSAStorageOptions storageOptions, out NSError? errorInfo);
+    [Selector("initWithContentsOfURL:language:error:")]
+    public AnyObject InitWithContentsOfURLLanguageError(NSURL url, OSALanguage language, out NSDictionary? errorInfo);
+    [Selector("initWithContentsOfURL:languageInstance:usingStorageOptions:error:")]
+    public Self? InitWithContentsOfURLLanguageInstanceUsingStorageOptionsError(NSURL url, OSALanguageInstance? instance, OSAStorageOptions storageOptions, out NSError? errorInfo);
     /// Deprecated in macOS 10.6.
-    [Selector("initWithCompiledData:error:")] public AnyObject InitWithCompiledDataError(NSData data, out NSDictionary? errorInfo);
-    [Selector("initWithCompiledData:fromURL:usingStorageOptions:error:")] public Self? InitWithCompiledDataFromURLUsingStorageOptionsError(NSData data, NSURL? url, OSAStorageOptions storageOptions, out NSError? errorInfo);
-    [Selector("initWithScriptDataDescriptor:fromURL:languageInstance:usingStorageOptions:error:")] public Self? InitWithScriptDataDescriptorFromURLLanguageInstanceUsingStorageOptionsError(NSAppleEventDescriptor data, NSURL? url, OSALanguageInstance? instance, OSAStorageOptions storageOptions, out NSError? errorInfo);
-    [Selector("compileAndReturnError:")] public bool CompileAndReturnError(out NSDictionary? errorInfo);
-    [Selector("executeAndReturnError:")] public NSAppleEventDescriptor? ExecuteAndReturnError(out NSDictionary? errorInfo);
-    [Selector("executeAppleEvent:error:")] public NSAppleEventDescriptor? ExecuteAppleEventError(NSAppleEventDescriptor event, out NSDictionary? errorInfo);
-    [Selector("executeAndReturnDisplayValue:error:")] public NSAppleEventDescriptor? ExecuteAndReturnDisplayValueError(out NSAttributedString? displayValue, out NSDictionary? errorInfo);
-    [Selector("executeHandlerWithName:arguments:error:")] public NSAppleEventDescriptor? ExecuteHandlerWithNameArgumentsError(NSString name, NSArray arguments, out NSDictionary? errorInfo);
-    [Selector("richTextFromDescriptor:")] public NSAttributedString? RichTextFromDescriptor(NSAppleEventDescriptor descriptor);
-    [Selector("writeToURL:ofType:error:")] public bool WriteToURLOfTypeError(NSURL url, NSString type, out NSDictionary? errorInfo);
-    [Selector("writeToURL:ofType:usingStorageOptions:error:")] public bool WriteToURLOfTypeUsingStorageOptionsError(NSURL url, NSString type, OSAStorageOptions storageOptions, out NSDictionary? errorInfo);
-    [Selector("compiledDataForType:usingStorageOptions:error:")] public NSData? CompiledDataForTypeUsingStorageOptionsError(NSString type, OSAStorageOptions storageOptions, out NSDictionary? errorInfo);
+    [Selector("initWithCompiledData:error:")]
+    public AnyObject InitWithCompiledDataError(NSData data, out NSDictionary? errorInfo);
+    [Selector("initWithCompiledData:fromURL:usingStorageOptions:error:")]
+    public Self? InitWithCompiledDataFromURLUsingStorageOptionsError(NSData data, NSURL? url, OSAStorageOptions storageOptions, out NSError? errorInfo);
+    [Selector("initWithScriptDataDescriptor:fromURL:languageInstance:usingStorageOptions:error:")]
+    public Self? InitWithScriptDataDescriptorFromURLLanguageInstanceUsingStorageOptionsError(NSAppleEventDescriptor data, NSURL? url, OSALanguageInstance? instance, OSAStorageOptions storageOptions, out NSError? errorInfo);
+    [Selector("compileAndReturnError:")]
+    public bool CompileAndReturnError(out NSDictionary? errorInfo);
+    [Selector("executeAndReturnError:")]
+    public NSAppleEventDescriptor? ExecuteAndReturnError(out NSDictionary? errorInfo);
+    [Selector("executeAppleEvent:error:")]
+    public NSAppleEventDescriptor? ExecuteAppleEventError(NSAppleEventDescriptor event, out NSDictionary? errorInfo);
+    [Selector("executeAndReturnDisplayValue:error:")]
+    public NSAppleEventDescriptor? ExecuteAndReturnDisplayValueError(out NSAttributedString? displayValue, out NSDictionary? errorInfo);
+    [Selector("executeHandlerWithName:arguments:error:")]
+    public NSAppleEventDescriptor? ExecuteHandlerWithNameArgumentsError(NSString name, NSArray arguments, out NSDictionary? errorInfo);
+    [Selector("richTextFromDescriptor:")]
+    public NSAttributedString? RichTextFromDescriptor(NSAppleEventDescriptor descriptor);
+    [Selector("writeToURL:ofType:error:")]
+    public bool WriteToURLOfTypeError(NSURL url, NSString type, out NSDictionary? errorInfo);
+    [Selector("writeToURL:ofType:usingStorageOptions:error:")]
+    public bool WriteToURLOfTypeUsingStorageOptionsError(NSURL url, NSString type, OSAStorageOptions storageOptions, out NSDictionary? errorInfo);
+    [Selector("compiledDataForType:usingStorageOptions:error:")]
+    public NSData? CompiledDataForTypeUsingStorageOptionsError(NSString type, OSAStorageOptions storageOptions, out NSDictionary? errorInfo);
 }
 
 #endif

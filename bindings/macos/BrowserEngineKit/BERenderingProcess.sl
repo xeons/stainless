@@ -41,10 +41,14 @@ public objc closure void BERenderingProcessRenderingProcessWithBundleIDInterrupt
 
 public extern objc class BERenderingProcess : NSObject
 {
-    [Selector("renderingProcessWithInterruptionHandler:completion:")] public static void RenderingProcessWithInterruptionHandlerCompletion(BERenderingProcessRenderingProcessWithInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BERenderingProcessRenderingProcessWithInterruptionHandlerCompletionCompletionBlock completion);
-    [Selector("renderingProcessWithBundleID:interruptionHandler:completion:")] public static void RenderingProcessWithBundleIDInterruptionHandlerCompletion(NSString bundleID, BERenderingProcessRenderingProcessWithBundleIDInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BERenderingProcessRenderingProcessWithBundleIDInterruptionHandlerCompletionCompletionBlock completion);
-    [Selector("invalidate")] public void Invalidate();
-    [Selector("makeLibXPCConnectionError:")] public xpc_connection_t? MakeLibXPCConnectionError(out NSError? error);
+    [Selector("renderingProcessWithInterruptionHandler:completion:")]
+    public static void RenderingProcessWithInterruptionHandlerCompletion(BERenderingProcessRenderingProcessWithInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BERenderingProcessRenderingProcessWithInterruptionHandlerCompletionCompletionBlock completion);
+    [Selector("renderingProcessWithBundleID:interruptionHandler:completion:")]
+    public static void RenderingProcessWithBundleIDInterruptionHandlerCompletion(NSString bundleID, BERenderingProcessRenderingProcessWithBundleIDInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BERenderingProcessRenderingProcessWithBundleIDInterruptionHandlerCompletionCompletionBlock completion);
+    [Selector("invalidate")]
+    public void Invalidate();
+    [Selector("makeLibXPCConnectionError:")]
+    public xpc_connection_t? MakeLibXPCConnectionError(out NSError? error);
 }
 
 /// BEExtensionProcessConformance, a category of BERenderingProcess.

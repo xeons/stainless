@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class INRestaurantReservation : INReservation, NSCopying, NSSecureCoding
 {
-    [Selector("reservationDuration")] public INDateComponentsRange ReservationDuration { get; }
-    [Selector("partySize")] public NSNumber? PartySize { get; }
-    [Selector("restaurantLocation")] public CLPlacemark RestaurantLocation { get; }
-    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:URL:reservationDuration:partySize:restaurantLocation:")] public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsURLReservationDurationPartySizeRestaurantLocation(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, NSURL? URL, INDateComponentsRange reservationDuration, NSNumber? partySize, CLPlacemark restaurantLocation);
-    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:reservationDuration:partySize:restaurantLocation:")] public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsReservationDurationPartySizeRestaurantLocation(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, INDateComponentsRange reservationDuration, NSNumber? partySize, CLPlacemark restaurantLocation);
+    [Selector("reservationDuration")]
+    public INDateComponentsRange ReservationDuration { get; }
+    [Selector("partySize")]
+    public NSNumber? PartySize { get; }
+    [Selector("restaurantLocation")]
+    public CLPlacemark RestaurantLocation { get; }
+    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:URL:reservationDuration:partySize:restaurantLocation:")]
+    public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsURLReservationDurationPartySizeRestaurantLocation(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, NSURL? URL, INDateComponentsRange reservationDuration, NSNumber? partySize, CLPlacemark restaurantLocation);
+    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:reservationDuration:partySize:restaurantLocation:")]
+    public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsReservationDurationPartySizeRestaurantLocation(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, INDateComponentsRange reservationDuration, NSNumber? partySize, CLPlacemark restaurantLocation);
 }
 
 #endif

@@ -33,32 +33,50 @@ import Standard.ObjC;
 
 public extern objc class MXForegroundExitData : NSObject, NSSecureCoding
 {
-    [Selector("cumulativeNormalAppExitCount")] public NSUInteger CumulativeNormalAppExitCount { get; }
-    [Selector("cumulativeMemoryResourceLimitExitCount")] public NSUInteger CumulativeMemoryResourceLimitExitCount { get; }
-    [Selector("cumulativeBadAccessExitCount")] public NSUInteger CumulativeBadAccessExitCount { get; }
-    [Selector("cumulativeAbnormalExitCount")] public NSUInteger CumulativeAbnormalExitCount { get; }
-    [Selector("cumulativeIllegalInstructionExitCount")] public NSUInteger CumulativeIllegalInstructionExitCount { get; }
-    [Selector("cumulativeAppWatchdogExitCount")] public NSUInteger CumulativeAppWatchdogExitCount { get; }
+    [Selector("cumulativeNormalAppExitCount")]
+    public NSUInteger CumulativeNormalAppExitCount { get; }
+    [Selector("cumulativeMemoryResourceLimitExitCount")]
+    public NSUInteger CumulativeMemoryResourceLimitExitCount { get; }
+    [Selector("cumulativeBadAccessExitCount")]
+    public NSUInteger CumulativeBadAccessExitCount { get; }
+    [Selector("cumulativeAbnormalExitCount")]
+    public NSUInteger CumulativeAbnormalExitCount { get; }
+    [Selector("cumulativeIllegalInstructionExitCount")]
+    public NSUInteger CumulativeIllegalInstructionExitCount { get; }
+    [Selector("cumulativeAppWatchdogExitCount")]
+    public NSUInteger CumulativeAppWatchdogExitCount { get; }
 }
 
 public extern objc class MXBackgroundExitData : NSObject, NSSecureCoding
 {
-    [Selector("cumulativeNormalAppExitCount")] public NSUInteger CumulativeNormalAppExitCount { get; }
-    [Selector("cumulativeMemoryResourceLimitExitCount")] public NSUInteger CumulativeMemoryResourceLimitExitCount { get; }
-    [Selector("cumulativeCPUResourceLimitExitCount")] public NSUInteger CumulativeCPUResourceLimitExitCount { get; }
-    [Selector("cumulativeMemoryPressureExitCount")] public NSUInteger CumulativeMemoryPressureExitCount { get; }
-    [Selector("cumulativeBadAccessExitCount")] public NSUInteger CumulativeBadAccessExitCount { get; }
-    [Selector("cumulativeAbnormalExitCount")] public NSUInteger CumulativeAbnormalExitCount { get; }
-    [Selector("cumulativeIllegalInstructionExitCount")] public NSUInteger CumulativeIllegalInstructionExitCount { get; }
-    [Selector("cumulativeAppWatchdogExitCount")] public NSUInteger CumulativeAppWatchdogExitCount { get; }
-    [Selector("cumulativeSuspendedWithLockedFileExitCount")] public NSUInteger CumulativeSuspendedWithLockedFileExitCount { get; }
-    [Selector("cumulativeBackgroundTaskAssertionTimeoutExitCount")] public NSUInteger CumulativeBackgroundTaskAssertionTimeoutExitCount { get; }
+    [Selector("cumulativeNormalAppExitCount")]
+    public NSUInteger CumulativeNormalAppExitCount { get; }
+    [Selector("cumulativeMemoryResourceLimitExitCount")]
+    public NSUInteger CumulativeMemoryResourceLimitExitCount { get; }
+    [Selector("cumulativeCPUResourceLimitExitCount")]
+    public NSUInteger CumulativeCPUResourceLimitExitCount { get; }
+    [Selector("cumulativeMemoryPressureExitCount")]
+    public NSUInteger CumulativeMemoryPressureExitCount { get; }
+    [Selector("cumulativeBadAccessExitCount")]
+    public NSUInteger CumulativeBadAccessExitCount { get; }
+    [Selector("cumulativeAbnormalExitCount")]
+    public NSUInteger CumulativeAbnormalExitCount { get; }
+    [Selector("cumulativeIllegalInstructionExitCount")]
+    public NSUInteger CumulativeIllegalInstructionExitCount { get; }
+    [Selector("cumulativeAppWatchdogExitCount")]
+    public NSUInteger CumulativeAppWatchdogExitCount { get; }
+    [Selector("cumulativeSuspendedWithLockedFileExitCount")]
+    public NSUInteger CumulativeSuspendedWithLockedFileExitCount { get; }
+    [Selector("cumulativeBackgroundTaskAssertionTimeoutExitCount")]
+    public NSUInteger CumulativeBackgroundTaskAssertionTimeoutExitCount { get; }
 }
 
 public extern objc class MXAppExitMetric : MXMetric
 {
-    [Selector("foregroundExitData")] public MXForegroundExitData ForegroundExitData { get; }
-    [Selector("backgroundExitData")] public MXBackgroundExitData BackgroundExitData { get; }
+    [Selector("foregroundExitData")]
+    public MXForegroundExitData ForegroundExitData { get; }
+    [Selector("backgroundExitData")]
+    public MXBackgroundExitData BackgroundExitData { get; }
 }
 
 #endif

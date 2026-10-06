@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class MKSelectionAccessory : NSObject
 {
-    [Selector("mapItemDetailWithPresentationStyle:")] public static MKSelectionAccessory MapItemDetailWithPresentationStyle(MKMapItemDetailSelectionAccessoryPresentationStyle presentationStyle);
+    [Selector("mapItemDetailWithPresentationStyle:")]
+    public static MKSelectionAccessory MapItemDetailWithPresentationStyle(MKMapItemDetailSelectionAccessoryPresentationStyle presentationStyle);
 }
 
 public enum MKMapItemDetailSelectionAccessoryCalloutStyle : long
@@ -45,11 +46,16 @@ public enum MKMapItemDetailSelectionAccessoryCalloutStyle : long
 
 public extern objc class MKMapItemDetailSelectionAccessoryPresentationStyle : NSObject
 {
-    [Selector("callout")] public static MKMapItemDetailSelectionAccessoryPresentationStyle Callout { get; }
-    [Selector("openInMaps")] public static MKMapItemDetailSelectionAccessoryPresentationStyle OpenInMaps { get; }
-    [Selector("automaticWithPresentationViewController:")] public static MKMapItemDetailSelectionAccessoryPresentationStyle AutomaticWithPresentationViewController(NSViewController? presentationViewController);
-    [Selector("calloutWithCalloutStyle:")] public static MKMapItemDetailSelectionAccessoryPresentationStyle CalloutWithCalloutStyle(MKMapItemDetailSelectionAccessoryCalloutStyle style);
-    [Selector("sheetPresentedFromViewController:")] public static MKMapItemDetailSelectionAccessoryPresentationStyle SheetPresentedFromViewController(NSViewController viewController);
+    [Selector("callout")]
+    public static MKMapItemDetailSelectionAccessoryPresentationStyle Callout { get; }
+    [Selector("openInMaps")]
+    public static MKMapItemDetailSelectionAccessoryPresentationStyle OpenInMaps { get; }
+    [Selector("automaticWithPresentationViewController:")]
+    public static MKMapItemDetailSelectionAccessoryPresentationStyle AutomaticWithPresentationViewController(NSViewController? presentationViewController);
+    [Selector("calloutWithCalloutStyle:")]
+    public static MKMapItemDetailSelectionAccessoryPresentationStyle CalloutWithCalloutStyle(MKMapItemDetailSelectionAccessoryCalloutStyle style);
+    [Selector("sheetPresentedFromViewController:")]
+    public static MKMapItemDetailSelectionAccessoryPresentationStyle SheetPresentedFromViewController(NSViewController viewController);
 }
 
 #endif

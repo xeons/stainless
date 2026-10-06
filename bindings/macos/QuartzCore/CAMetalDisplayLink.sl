@@ -34,26 +34,38 @@ import Standard.ObjC;
 
 public extern objc class CAMetalDisplayLinkUpdate : NSObject
 {
-    [Selector("drawable")] public CAMetalDrawable Drawable { get; }
-    [Selector("targetTimestamp")] public CFTimeInterval TargetTimestamp { get; }
-    [Selector("targetPresentationTimestamp")] public CFTimeInterval TargetPresentationTimestamp { get; }
+    [Selector("drawable")]
+    public CAMetalDrawable Drawable { get; }
+    [Selector("targetTimestamp")]
+    public CFTimeInterval TargetTimestamp { get; }
+    [Selector("targetPresentationTimestamp")]
+    public CFTimeInterval TargetPresentationTimestamp { get; }
 }
 
 public objc interface CAMetalDisplayLinkDelegate
 {
-    [Selector("metalDisplayLink:needsUpdate:")] void MetalDisplayLinkNeedsUpdate(CAMetalDisplayLink link, CAMetalDisplayLinkUpdate update);
+    [Selector("metalDisplayLink:needsUpdate:")]
+    void MetalDisplayLinkNeedsUpdate(CAMetalDisplayLink link, CAMetalDisplayLinkUpdate update);
 }
 
 public extern objc class CAMetalDisplayLink : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public CAMetalDisplayLinkDelegate? Delegate { get; set; }
-    [Selector("preferredFrameLatency", "setPreferredFrameLatency:")] public float PreferredFrameLatency { get; set; }
-    [Selector("preferredFrameRateRange", "setPreferredFrameRateRange:")] public CAFrameRateRange PreferredFrameRateRange { get; set; }
-    [Selector("isPaused", "setPaused:")] public bool Paused { get; set; }
-    [Selector("initWithMetalLayer:")] public Self InitWithMetalLayer(CAMetalLayer layer);
-    [Selector("addToRunLoop:forMode:")] public void AddToRunLoopForMode(NSRunLoop runloop, NSRunLoopMode mode);
-    [Selector("removeFromRunLoop:forMode:")] public void RemoveFromRunLoopForMode(NSRunLoop runloop, NSRunLoopMode mode);
-    [Selector("invalidate")] public void Invalidate();
+    [Selector("delegate", "setDelegate:")]
+    public CAMetalDisplayLinkDelegate? Delegate { get; set; }
+    [Selector("preferredFrameLatency", "setPreferredFrameLatency:")]
+    public float PreferredFrameLatency { get; set; }
+    [Selector("preferredFrameRateRange", "setPreferredFrameRateRange:")]
+    public CAFrameRateRange PreferredFrameRateRange { get; set; }
+    [Selector("isPaused", "setPaused:")]
+    public bool Paused { get; set; }
+    [Selector("initWithMetalLayer:")]
+    public Self InitWithMetalLayer(CAMetalLayer layer);
+    [Selector("addToRunLoop:forMode:")]
+    public void AddToRunLoopForMode(NSRunLoop runloop, NSRunLoopMode mode);
+    [Selector("removeFromRunLoop:forMode:")]
+    public void RemoveFromRunLoopForMode(NSRunLoop runloop, NSRunLoopMode mode);
+    [Selector("invalidate")]
+    public void Invalidate();
 }
 
 #endif

@@ -50,10 +50,14 @@ public enum CSSearchQuerySourceOptions : ulong
 
 public extern objc class CSSearchQueryContext : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("fetchAttributes", "setFetchAttributes:")] public NSArray FetchAttributes { get; set; }
-    [Selector("filterQueries", "setFilterQueries:")] public NSArray FilterQueries { get; set; }
-    [Selector("keyboardLanguage", "setKeyboardLanguage:")] public NSString? KeyboardLanguage { get; set; }
-    [Selector("sourceOptions", "setSourceOptions:")] public CSSearchQuerySourceOptions SourceOptions { get; set; }
+    [Selector("fetchAttributes", "setFetchAttributes:")]
+    public NSArray FetchAttributes { get; set; }
+    [Selector("filterQueries", "setFilterQueries:")]
+    public NSArray FilterQueries { get; set; }
+    [Selector("keyboardLanguage", "setKeyboardLanguage:")]
+    public NSString? KeyboardLanguage { get; set; }
+    [Selector("sourceOptions", "setSourceOptions:")]
+    public CSSearchQuerySourceOptions SourceOptions { get; set; }
 }
 
 public objc closure void CSSearchQueryFoundItemsHandlerBlock(NSArray arg0);
@@ -62,16 +66,25 @@ public objc closure void CSSearchQueryCompletionHandlerBlock(NSError? arg0);
 
 public extern objc class CSSearchQuery : NSObject
 {
-    [Selector("isCancelled")] public bool Cancelled { get; }
-    [Selector("foundItemCount")] public NSUInteger FoundItemCount { get; }
-    [Selector("foundItemsHandler", "setFoundItemsHandler:")] public CSSearchQueryFoundItemsHandlerBlock? FoundItemsHandler { get; set; }
-    [Selector("completionHandler", "setCompletionHandler:")] public CSSearchQueryCompletionHandlerBlock? CompletionHandler { get; set; }
-    [Selector("protectionClasses", "setProtectionClasses:")] public NSArray ProtectionClasses { get; set; }
-    [Selector("initWithQueryString:queryContext:")] public Self InitWithQueryStringQueryContext(NSString queryString, CSSearchQueryContext? queryContext);
+    [Selector("isCancelled")]
+    public bool Cancelled { get; }
+    [Selector("foundItemCount")]
+    public NSUInteger FoundItemCount { get; }
+    [Selector("foundItemsHandler", "setFoundItemsHandler:")]
+    public CSSearchQueryFoundItemsHandlerBlock? FoundItemsHandler { get; set; }
+    [Selector("completionHandler", "setCompletionHandler:")]
+    public CSSearchQueryCompletionHandlerBlock? CompletionHandler { get; set; }
+    [Selector("protectionClasses", "setProtectionClasses:")]
+    public NSArray ProtectionClasses { get; set; }
+    [Selector("initWithQueryString:queryContext:")]
+    public Self InitWithQueryStringQueryContext(NSString queryString, CSSearchQueryContext? queryContext);
     /// Deprecated in macOS 13.0.
-    [Selector("initWithQueryString:attributes:")] public Self InitWithQueryStringAttributes(NSString queryString, NSArray? attributes);
-    [Selector("start")] public void Start();
-    [Selector("cancel")] public void Cancel();
+    [Selector("initWithQueryString:attributes:")]
+    public Self InitWithQueryStringAttributes(NSString queryString, NSArray? attributes);
+    [Selector("start")]
+    public void Start();
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

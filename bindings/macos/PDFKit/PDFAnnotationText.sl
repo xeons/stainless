@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.12.
 public extern objc class PDFAnnotationText : PDFAnnotation, NSCopying, NSCoding
 {
-    [Selector("iconType")] public PDFTextAnnotationIconType IconType();
-    [Selector("setIconType:")] public void SetIconType(PDFTextAnnotationIconType type);
+    [Selector("iconType")]
+    public PDFTextAnnotationIconType IconType();
+    [Selector("setIconType:")]
+    public void SetIconType(PDFTextAnnotationIconType type);
 }
 
 #endif

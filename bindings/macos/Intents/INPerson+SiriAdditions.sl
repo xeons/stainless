@@ -32,7 +32,8 @@ import Standard.ObjC;
 /// SiriAdditions, a category of INPerson.
 public extern objc class INPerson : INSpeakable
 {
-    [Selector("isMe")] public bool IsMe { get; }
+    [Selector("isMe")]
+    public bool IsMe { get; }
 }
 
 #endif

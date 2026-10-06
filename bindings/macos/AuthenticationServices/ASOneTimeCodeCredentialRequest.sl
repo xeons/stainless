@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class ASOneTimeCodeCredentialRequest : NSObject, ASCredentialRequest
 {
-    [Selector("initWithCredentialIdentity:")] public Self InitWithCredentialIdentity(ASOneTimeCodeCredentialIdentity credentialIdentity);
+    [Selector("initWithCredentialIdentity:")]
+    public Self InitWithCredentialIdentity(ASOneTimeCodeCredentialIdentity credentialIdentity);
 }
 
 #endif

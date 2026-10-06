@@ -39,16 +39,26 @@ public enum NSSharingCollaborationMode : long
 
 public extern objc class NSSharingCollaborationModeRestriction : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("disabledMode")] public NSSharingCollaborationMode DisabledMode { get; }
-    [Selector("alertTitle")] public NSString? AlertTitle { get; }
-    [Selector("alertMessage")] public NSString? AlertMessage { get; }
-    [Selector("alertDismissButtonTitle")] public NSString? AlertDismissButtonTitle { get; }
-    [Selector("alertRecoverySuggestionButtonTitle")] public NSString? AlertRecoverySuggestionButtonTitle { get; }
-    [Selector("alertRecoverySuggestionButtonLaunchURL")] public NSURL? AlertRecoverySuggestionButtonLaunchURL { get; }
-    [Selector("initWithDisabledMode:")] public Self InitWithDisabledMode(NSSharingCollaborationMode disabledMode);
-    [Selector("initWithDisabledMode:alertTitle:alertMessage:")] public Self InitWithDisabledModeAlertTitleAlertMessage(NSSharingCollaborationMode disabledMode, NSString alertTitle, NSString alertMessage);
-    [Selector("initWithDisabledMode:alertTitle:alertMessage:alertDismissButtonTitle:")] public Self InitWithDisabledModeAlertTitleAlertMessageAlertDismissButtonTitle(NSSharingCollaborationMode disabledMode, NSString alertTitle, NSString alertMessage, NSString alertDismissButtonTitle);
-    [Selector("initWithDisabledMode:alertTitle:alertMessage:alertDismissButtonTitle:alertRecoverySuggestionButtonTitle:alertRecoverySuggestionButtonLaunchURL:")] public Self InitWithDisabledModeAlertTitleAlertMessageAlertDismissButtonTitleAlertRecoverySuggestionButtonTitleAlertRecoverySuggestionButtonLaunchURL(NSSharingCollaborationMode disabledMode, NSString alertTitle, NSString alertMessage, NSString alertDismissButtonTitle, NSString alertRecoverySuggestionButtonTitle, NSURL alertRecoverySuggestionButtonLaunchURL);
+    [Selector("disabledMode")]
+    public NSSharingCollaborationMode DisabledMode { get; }
+    [Selector("alertTitle")]
+    public NSString? AlertTitle { get; }
+    [Selector("alertMessage")]
+    public NSString? AlertMessage { get; }
+    [Selector("alertDismissButtonTitle")]
+    public NSString? AlertDismissButtonTitle { get; }
+    [Selector("alertRecoverySuggestionButtonTitle")]
+    public NSString? AlertRecoverySuggestionButtonTitle { get; }
+    [Selector("alertRecoverySuggestionButtonLaunchURL")]
+    public NSURL? AlertRecoverySuggestionButtonLaunchURL { get; }
+    [Selector("initWithDisabledMode:")]
+    public Self InitWithDisabledMode(NSSharingCollaborationMode disabledMode);
+    [Selector("initWithDisabledMode:alertTitle:alertMessage:")]
+    public Self InitWithDisabledModeAlertTitleAlertMessage(NSSharingCollaborationMode disabledMode, NSString alertTitle, NSString alertMessage);
+    [Selector("initWithDisabledMode:alertTitle:alertMessage:alertDismissButtonTitle:")]
+    public Self InitWithDisabledModeAlertTitleAlertMessageAlertDismissButtonTitle(NSSharingCollaborationMode disabledMode, NSString alertTitle, NSString alertMessage, NSString alertDismissButtonTitle);
+    [Selector("initWithDisabledMode:alertTitle:alertMessage:alertDismissButtonTitle:alertRecoverySuggestionButtonTitle:alertRecoverySuggestionButtonLaunchURL:")]
+    public Self InitWithDisabledModeAlertTitleAlertMessageAlertDismissButtonTitleAlertRecoverySuggestionButtonTitleAlertRecoverySuggestionButtonLaunchURL(NSSharingCollaborationMode disabledMode, NSString alertTitle, NSString alertMessage, NSString alertDismissButtonTitle, NSString alertRecoverySuggestionButtonTitle, NSURL alertRecoverySuggestionButtonLaunchURL);
 }
 
 #endif

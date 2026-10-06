@@ -286,15 +286,19 @@ public attribute Hidden { }
 [Reflect]
 public class Person
 {
-    [Column("full_name")] public String Name;
-    [Column("age")]       public int    Years;
+    [Column("full_name")]
+    public String Name;
+    [Column("age")]
+    public int    Years;
                           public bool Active;
                           public double Rating;
-    [Hidden]              public int    Internal;
+    [Hidden]
+    public int    Internal;
 
     /// A property's storage is an ordinary field, so a reflected type sees it
     /// under the property's own name and carries the annotation with it.
-    [Column("city")]      public String City { get; set; }
+    [Column("city")]
+    public String City { get; set; }
 
     public Person(String name, int years)
     {

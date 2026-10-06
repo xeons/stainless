@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class AVAssetTrackSegment : NSObject
 {
-    [Selector("timeMapping")] public CMTimeMapping TimeMapping { get; }
-    [Selector("isEmpty")] public bool Empty { get; }
+    [Selector("timeMapping")]
+    public CMTimeMapping TimeMapping { get; }
+    [Selector("isEmpty")]
+    public bool Empty { get; }
 }
 
 #endif

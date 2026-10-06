@@ -44,12 +44,18 @@ public enum MTLFunctionOptions : ulong
 
 public extern objc class MTLFunctionDescriptor : NSObject, NSCopying
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("specializedName", "setSpecializedName:")] public NSString? SpecializedName { get; set; }
-    [Selector("constantValues", "setConstantValues:")] public MTLFunctionConstantValues? ConstantValues { get; set; }
-    [Selector("options", "setOptions:")] public MTLFunctionOptions Options { get; set; }
-    [Selector("binaryArchives", "setBinaryArchives:")] public NSArray? BinaryArchives { get; set; }
-    [Selector("functionDescriptor")] public static MTLFunctionDescriptor FunctionDescriptor();
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("specializedName", "setSpecializedName:")]
+    public NSString? SpecializedName { get; set; }
+    [Selector("constantValues", "setConstantValues:")]
+    public MTLFunctionConstantValues? ConstantValues { get; set; }
+    [Selector("options", "setOptions:")]
+    public MTLFunctionOptions Options { get; set; }
+    [Selector("binaryArchives", "setBinaryArchives:")]
+    public NSArray? BinaryArchives { get; set; }
+    [Selector("functionDescriptor")]
+    public static MTLFunctionDescriptor FunctionDescriptor();
 }
 
 public extern objc class MTLIntersectionFunctionDescriptor : MTLFunctionDescriptor, NSCopying { }

@@ -51,28 +51,52 @@ public enum CBConnectionEvent : long
 
 public extern objc class CBCentralManager : CBManager
 {
-    [Selector("delegate", "setDelegate:")] public CBCentralManagerDelegate? Delegate { get; set; }
-    [Selector("isScanning")] public bool IsScanning { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithDelegate:queue:")] public Self InitWithDelegateQueue(CBCentralManagerDelegate? @delegate, dispatch_queue_t? queue);
-    [Selector("initWithDelegate:queue:options:")] public Self InitWithDelegateQueueOptions(CBCentralManagerDelegate? @delegate, dispatch_queue_t? queue, NSDictionary? options);
-    [Selector("retrievePeripheralsWithIdentifiers:")] public NSArray RetrievePeripheralsWithIdentifiers(NSArray identifiers);
-    [Selector("retrieveConnectedPeripheralsWithServices:")] public NSArray RetrieveConnectedPeripheralsWithServices(NSArray serviceUUIDs);
-    [Selector("scanForPeripheralsWithServices:options:")] public void ScanForPeripheralsWithServicesOptions(NSArray? serviceUUIDs, NSDictionary? options);
-    [Selector("stopScan")] public void StopScan();
-    [Selector("connectPeripheral:options:")] public void ConnectPeripheralOptions(CBPeripheral peripheral, NSDictionary? options);
-    [Selector("cancelPeripheralConnection:")] public void CancelPeripheralConnection(CBPeripheral peripheral);
+    [Selector("delegate", "setDelegate:")]
+    public CBCentralManagerDelegate? Delegate { get; set; }
+    [Selector("isScanning")]
+    public bool IsScanning { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithDelegate:queue:")]
+    public Self InitWithDelegateQueue(CBCentralManagerDelegate? @delegate, dispatch_queue_t? queue);
+    [Selector("initWithDelegate:queue:options:")]
+    public Self InitWithDelegateQueueOptions(CBCentralManagerDelegate? @delegate, dispatch_queue_t? queue, NSDictionary? options);
+    [Selector("retrievePeripheralsWithIdentifiers:")]
+    public NSArray RetrievePeripheralsWithIdentifiers(NSArray identifiers);
+    [Selector("retrieveConnectedPeripheralsWithServices:")]
+    public NSArray RetrieveConnectedPeripheralsWithServices(NSArray serviceUUIDs);
+    [Selector("scanForPeripheralsWithServices:options:")]
+    public void ScanForPeripheralsWithServicesOptions(NSArray? serviceUUIDs, NSDictionary? options);
+    [Selector("stopScan")]
+    public void StopScan();
+    [Selector("connectPeripheral:options:")]
+    public void ConnectPeripheralOptions(CBPeripheral peripheral, NSDictionary? options);
+    [Selector("cancelPeripheralConnection:")]
+    public void CancelPeripheralConnection(CBPeripheral peripheral);
 }
 
 public objc interface CBCentralManagerDelegate : NSObjectProtocol
 {
-    [Selector("centralManagerDidUpdateState:")] void CentralManagerDidUpdateState(CBCentralManager central);
-    [Optional] [Selector("centralManager:willRestoreState:")] void CentralManagerWillRestoreState(CBCentralManager central, NSDictionary dict);
-    [Optional] [Selector("centralManager:didDiscoverPeripheral:advertisementData:RSSI:")] void CentralManagerDidDiscoverPeripheralAdvertisementDataRSSI(CBCentralManager central, CBPeripheral peripheral, NSDictionary advertisementData, NSNumber RSSI);
-    [Optional] [Selector("centralManager:didConnectPeripheral:")] void CentralManagerDidConnectPeripheral(CBCentralManager central, CBPeripheral peripheral);
-    [Optional] [Selector("centralManager:didFailToConnectPeripheral:error:")] void CentralManagerDidFailToConnectPeripheralError(CBCentralManager central, CBPeripheral peripheral, NSError? error);
-    [Optional] [Selector("centralManager:didDisconnectPeripheral:error:")] void CentralManagerDidDisconnectPeripheralError(CBCentralManager central, CBPeripheral peripheral, NSError? error);
-    [Optional] [Selector("centralManager:didDisconnectPeripheral:timestamp:isReconnecting:error:")] void CentralManagerDidDisconnectPeripheralTimestampIsReconnectingError(CBCentralManager central, CBPeripheral peripheral, CFAbsoluteTime timestamp, bool isReconnecting, NSError? error);
+    [Selector("centralManagerDidUpdateState:")]
+    void CentralManagerDidUpdateState(CBCentralManager central);
+    [Optional]
+    [Selector("centralManager:willRestoreState:")]
+    void CentralManagerWillRestoreState(CBCentralManager central, NSDictionary dict);
+    [Optional]
+    [Selector("centralManager:didDiscoverPeripheral:advertisementData:RSSI:")]
+    void CentralManagerDidDiscoverPeripheralAdvertisementDataRSSI(CBCentralManager central, CBPeripheral peripheral, NSDictionary advertisementData, NSNumber RSSI);
+    [Optional]
+    [Selector("centralManager:didConnectPeripheral:")]
+    void CentralManagerDidConnectPeripheral(CBCentralManager central, CBPeripheral peripheral);
+    [Optional]
+    [Selector("centralManager:didFailToConnectPeripheral:error:")]
+    void CentralManagerDidFailToConnectPeripheralError(CBCentralManager central, CBPeripheral peripheral, NSError? error);
+    [Optional]
+    [Selector("centralManager:didDisconnectPeripheral:error:")]
+    void CentralManagerDidDisconnectPeripheralError(CBCentralManager central, CBPeripheral peripheral, NSError? error);
+    [Optional]
+    [Selector("centralManager:didDisconnectPeripheral:timestamp:isReconnecting:error:")]
+    void CentralManagerDidDisconnectPeripheralTimestampIsReconnectingError(CBCentralManager central, CBPeripheral peripheral, CFAbsoluteTime timestamp, bool isReconnecting, NSError? error);
 }
 
 #endif

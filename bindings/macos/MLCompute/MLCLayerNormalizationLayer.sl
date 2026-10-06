@@ -33,13 +33,20 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCLayerNormalizationLayer : MLCLayer
 {
-    [Selector("normalizedShape")] public NSArray? NormalizedShape { get; }
-    [Selector("beta")] public MLCTensor? Beta { get; }
-    [Selector("gamma")] public MLCTensor? Gamma { get; }
-    [Selector("betaParameter")] public MLCTensorParameter? BetaParameter { get; }
-    [Selector("gammaParameter")] public MLCTensorParameter? GammaParameter { get; }
-    [Selector("varianceEpsilon")] public float VarianceEpsilon { get; }
-    [Selector("layerWithNormalizedShape:beta:gamma:varianceEpsilon:")] public static Self? LayerWithNormalizedShapeBetaGammaVarianceEpsilon(NSArray normalizedShape, MLCTensor? beta, MLCTensor? gamma, float varianceEpsilon);
+    [Selector("normalizedShape")]
+    public NSArray? NormalizedShape { get; }
+    [Selector("beta")]
+    public MLCTensor? Beta { get; }
+    [Selector("gamma")]
+    public MLCTensor? Gamma { get; }
+    [Selector("betaParameter")]
+    public MLCTensorParameter? BetaParameter { get; }
+    [Selector("gammaParameter")]
+    public MLCTensorParameter? GammaParameter { get; }
+    [Selector("varianceEpsilon")]
+    public float VarianceEpsilon { get; }
+    [Selector("layerWithNormalizedShape:beta:gamma:varianceEpsilon:")]
+    public static Self? LayerWithNormalizedShapeBetaGammaVarianceEpsilon(NSArray normalizedShape, MLCTensor? beta, MLCTensor? gamma, float varianceEpsilon);
 }
 
 #endif

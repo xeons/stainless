@@ -37,9 +37,12 @@ public objc closure void SHSignatureGeneratorGenerateSignatureFromAssetCompletio
 
 public extern objc class SHSignatureGenerator : NSObject
 {
-    [Selector("generateSignatureFromAsset:completionHandler:")] public static void GenerateSignatureFromAssetCompletionHandler(AVAsset asset, SHSignatureGeneratorGenerateSignatureFromAssetCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("appendBuffer:atTime:error:")] public bool AppendBufferAtTimeError(AVAudioPCMBuffer buffer, AVAudioTime? time, out NSError? error);
-    [Selector("signature")] public SHSignature Signature();
+    [Selector("generateSignatureFromAsset:completionHandler:")]
+    public static void GenerateSignatureFromAssetCompletionHandler(AVAsset asset, SHSignatureGeneratorGenerateSignatureFromAssetCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("appendBuffer:atTime:error:")]
+    public bool AppendBufferAtTimeError(AVAudioPCMBuffer buffer, AVAudioTime? time, out NSError? error);
+    [Selector("signature")]
+    public SHSignature Signature();
 }
 
 #endif

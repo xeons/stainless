@@ -58,40 +58,74 @@ public extern "C" NSString? IMKCandidatesSendServerKeyEventFirst;
 
 public extern objc class IMKCandidates : NSResponder
 {
-    [Selector("initWithServer:panelType:")] public AnyObject? InitWithServerPanelType(IMKServer? server, IMKCandidatePanelType panelType);
-    [Selector("initWithServer:panelType:styleType:")] public AnyObject? InitWithServerPanelTypeStyleType(IMKServer? server, IMKCandidatePanelType panelType, IMKStyleType style);
-    [Selector("panelType")] public IMKCandidatePanelType PanelType();
-    [Selector("setPanelType:")] public void SetPanelType(IMKCandidatePanelType panelType);
-    [Selector("show:")] public void Show(IMKCandidatesLocationHint locationHint);
-    [Selector("hide")] public void Hide();
-    [Selector("isVisible")] public bool IsVisible();
-    [Selector("updateCandidates")] public void UpdateCandidates();
-    [Selector("showAnnotation:")] public void ShowAnnotation(NSAttributedString? annotationString);
-    [Selector("showSublist:subListDelegate:")] public void ShowSublistSubListDelegate(NSArray? candidates, AnyObject? @delegate);
-    [Selector("candidateFrame")] public NSRect CandidateFrame();
-    [Selector("setSelectionKeys:")] public void SetSelectionKeys(NSArray? keyCodes);
-    [Selector("selectionKeys")] public NSArray? SelectionKeys();
-    [Selector("setSelectionKeysKeylayout:")] public void SetSelectionKeysKeylayout(TISInputSourceRef? layout);
-    [Selector("selectionKeysKeylayout")] public TISInputSourceRef? SelectionKeysKeylayout();
-    [Selector("setAttributes:")] public void SetAttributes(NSDictionary? attributes);
-    [Selector("attributes")] public NSDictionary? Attributes();
-    [Selector("setDismissesAutomatically:")] public void SetDismissesAutomatically(bool flag);
-    [Selector("dismissesAutomatically")] public bool DismissesAutomatically();
-    [Selector("selectedCandidate")] public NSInteger SelectedCandidate();
-    [Selector("setCandidateFrameTopLeft:")] public void SetCandidateFrameTopLeft(NSPoint point);
-    [Selector("showChild")] public void ShowChild();
-    [Selector("hideChild")] public void HideChild();
-    [Selector("attachChild:toCandidate:type:")] public void AttachChildToCandidateType(IMKCandidates? child, NSInteger candidateIdentifier, IMKStyleType theType);
-    [Selector("detachChild:")] public void DetachChild(NSInteger candidateIdentifier);
-    [Selector("setCandidateData:")] public void SetCandidateData(NSArray? candidatesArray);
-    [Selector("selectCandidateWithIdentifier:")] public bool SelectCandidateWithIdentifier(NSInteger candidateIdentifier);
-    [Selector("selectCandidate:")] public void SelectCandidate(NSInteger candidateIdentifier);
-    [Selector("showCandidates")] public void ShowCandidates();
-    [Selector("candidateStringIdentifier:")] public NSInteger CandidateStringIdentifier(AnyObject? candidateString);
-    [Selector("selectedCandidateString")] public NSAttributedString? SelectedCandidateString();
-    [Selector("candidateIdentifierAtLineNumber:")] public NSInteger CandidateIdentifierAtLineNumber(NSInteger lineNumber);
-    [Selector("lineNumberForCandidateWithIdentifier:")] public NSInteger LineNumberForCandidateWithIdentifier(NSInteger candidateIdentifier);
-    [Selector("clearSelection")] public void ClearSelection();
+    [Selector("initWithServer:panelType:")]
+    public AnyObject? InitWithServerPanelType(IMKServer? server, IMKCandidatePanelType panelType);
+    [Selector("initWithServer:panelType:styleType:")]
+    public AnyObject? InitWithServerPanelTypeStyleType(IMKServer? server, IMKCandidatePanelType panelType, IMKStyleType style);
+    [Selector("panelType")]
+    public IMKCandidatePanelType PanelType();
+    [Selector("setPanelType:")]
+    public void SetPanelType(IMKCandidatePanelType panelType);
+    [Selector("show:")]
+    public void Show(IMKCandidatesLocationHint locationHint);
+    [Selector("hide")]
+    public void Hide();
+    [Selector("isVisible")]
+    public bool IsVisible();
+    [Selector("updateCandidates")]
+    public void UpdateCandidates();
+    [Selector("showAnnotation:")]
+    public void ShowAnnotation(NSAttributedString? annotationString);
+    [Selector("showSublist:subListDelegate:")]
+    public void ShowSublistSubListDelegate(NSArray? candidates, AnyObject? @delegate);
+    [Selector("candidateFrame")]
+    public NSRect CandidateFrame();
+    [Selector("setSelectionKeys:")]
+    public void SetSelectionKeys(NSArray? keyCodes);
+    [Selector("selectionKeys")]
+    public NSArray? SelectionKeys();
+    [Selector("setSelectionKeysKeylayout:")]
+    public void SetSelectionKeysKeylayout(TISInputSourceRef? layout);
+    [Selector("selectionKeysKeylayout")]
+    public TISInputSourceRef? SelectionKeysKeylayout();
+    [Selector("setAttributes:")]
+    public void SetAttributes(NSDictionary? attributes);
+    [Selector("attributes")]
+    public NSDictionary? Attributes();
+    [Selector("setDismissesAutomatically:")]
+    public void SetDismissesAutomatically(bool flag);
+    [Selector("dismissesAutomatically")]
+    public bool DismissesAutomatically();
+    [Selector("selectedCandidate")]
+    public NSInteger SelectedCandidate();
+    [Selector("setCandidateFrameTopLeft:")]
+    public void SetCandidateFrameTopLeft(NSPoint point);
+    [Selector("showChild")]
+    public void ShowChild();
+    [Selector("hideChild")]
+    public void HideChild();
+    [Selector("attachChild:toCandidate:type:")]
+    public void AttachChildToCandidateType(IMKCandidates? child, NSInteger candidateIdentifier, IMKStyleType theType);
+    [Selector("detachChild:")]
+    public void DetachChild(NSInteger candidateIdentifier);
+    [Selector("setCandidateData:")]
+    public void SetCandidateData(NSArray? candidatesArray);
+    [Selector("selectCandidateWithIdentifier:")]
+    public bool SelectCandidateWithIdentifier(NSInteger candidateIdentifier);
+    [Selector("selectCandidate:")]
+    public void SelectCandidate(NSInteger candidateIdentifier);
+    [Selector("showCandidates")]
+    public void ShowCandidates();
+    [Selector("candidateStringIdentifier:")]
+    public NSInteger CandidateStringIdentifier(AnyObject? candidateString);
+    [Selector("selectedCandidateString")]
+    public NSAttributedString? SelectedCandidateString();
+    [Selector("candidateIdentifierAtLineNumber:")]
+    public NSInteger CandidateIdentifierAtLineNumber(NSInteger lineNumber);
+    [Selector("lineNumberForCandidateWithIdentifier:")]
+    public NSInteger LineNumberForCandidateWithIdentifier(NSInteger candidateIdentifier);
+    [Selector("clearSelection")]
+    public void ClearSelection();
 }
 
 #endif

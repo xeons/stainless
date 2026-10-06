@@ -41,9 +41,12 @@ public enum CNContainerType : long
 
 public extern objc class CNContainer : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("name")] public NSString Name { get; }
-    [Selector("type")] public CNContainerType Type { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("type")]
+    public CNContainerType Type { get; }
 }
 
 public extern "C" NSString? CNContainerIdentifierKey;

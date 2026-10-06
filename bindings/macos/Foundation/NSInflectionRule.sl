@@ -32,20 +32,25 @@ import Standard.ObjC;
 
 public extern objc class NSInflectionRule : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("automaticRule")] public static NSInflectionRule AutomaticRule { get; }
+    [Selector("automaticRule")]
+    public static NSInflectionRule AutomaticRule { get; }
 }
 
 public extern objc class NSInflectionRuleExplicit : NSInflectionRule
 {
-    [Selector("morphology")] public NSMorphology Morphology { get; }
-    [Selector("initWithMorphology:")] public Self InitWithMorphology(NSMorphology morphology);
+    [Selector("morphology")]
+    public NSMorphology Morphology { get; }
+    [Selector("initWithMorphology:")]
+    public Self InitWithMorphology(NSMorphology morphology);
 }
 
 /// NSInflectionAvailability, a category of NSInflectionRule.
 public extern objc class NSInflectionRule
 {
-    [Selector("canInflectPreferredLocalization")] public static bool CanInflectPreferredLocalization { get; }
-    [Selector("canInflectLanguage:")] public static bool CanInflectLanguage(NSString language);
+    [Selector("canInflectPreferredLocalization")]
+    public static bool CanInflectPreferredLocalization { get; }
+    [Selector("canInflectLanguage:")]
+    public static bool CanInflectLanguage(NSString language);
 }
 
 #endif

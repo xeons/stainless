@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class NSMenuToolbarItem : NSToolbarItem
 {
-    [Selector("menu", "setMenu:")] public NSMenu? Menu { get; set; }
-    [Selector("showsIndicator", "setShowsIndicator:")] public bool ShowsIndicator { get; set; }
+    [Selector("menu", "setMenu:")]
+    public NSMenu? Menu { get; set; }
+    [Selector("showsIndicator", "setShowsIndicator:")]
+    public bool ShowsIndicator { get; set; }
 }
 
 #endif

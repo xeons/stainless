@@ -50,21 +50,36 @@ public enum SCNWrapMode : long
 
 public extern objc class SCNMaterialProperty : NSObject, SCNAnimatable, NSSecureCoding
 {
-    [Selector("contents", "setContents:")] public AnyObject? Contents { get; set; }
-    [Selector("intensity", "setIntensity:")] public CGFloat Intensity { get; set; }
-    [Selector("minificationFilter", "setMinificationFilter:")] public SCNFilterMode MinificationFilter { get; set; }
-    [Selector("magnificationFilter", "setMagnificationFilter:")] public SCNFilterMode MagnificationFilter { get; set; }
-    [Selector("mipFilter", "setMipFilter:")] public SCNFilterMode MipFilter { get; set; }
-    [Selector("contentsTransform", "setContentsTransform:")] public SCNMatrix4 ContentsTransform { get; set; }
-    [Selector("wrapS", "setWrapS:")] public SCNWrapMode WrapS { get; set; }
-    [Selector("wrapT", "setWrapT:")] public SCNWrapMode WrapT { get; set; }
-    [Selector("mappingChannel", "setMappingChannel:")] public NSInteger MappingChannel { get; set; }
-    [Selector("textureComponents", "setTextureComponents:")] public SCNColorMask TextureComponents { get; set; }
-    [Selector("maxAnisotropy", "setMaxAnisotropy:")] public CGFloat MaxAnisotropy { get; set; }
-    [Selector("materialPropertyWithContents:")] public static Self MaterialPropertyWithContents(AnyObject contents);
-    [Selector("precomputedLightingEnvironmentContentsWithURL:error:")] public static AnyObject? PrecomputedLightingEnvironmentContentsWithURLError(NSURL url, out NSError? error);
-    [Selector("precomputedLightingEnvironmentContentsWithData:error:")] public static AnyObject? PrecomputedLightingEnvironmentContentsWithDataError(NSData data, out NSError? error);
-    [Selector("precomputedLightingEnvironmentDataForContents:device:error:")] public static NSData? PrecomputedLightingEnvironmentDataForContentsDeviceError(AnyObject contents, MTLDevice? device, out NSError? error);
+    [Selector("contents", "setContents:")]
+    public AnyObject? Contents { get; set; }
+    [Selector("intensity", "setIntensity:")]
+    public CGFloat Intensity { get; set; }
+    [Selector("minificationFilter", "setMinificationFilter:")]
+    public SCNFilterMode MinificationFilter { get; set; }
+    [Selector("magnificationFilter", "setMagnificationFilter:")]
+    public SCNFilterMode MagnificationFilter { get; set; }
+    [Selector("mipFilter", "setMipFilter:")]
+    public SCNFilterMode MipFilter { get; set; }
+    [Selector("contentsTransform", "setContentsTransform:")]
+    public SCNMatrix4 ContentsTransform { get; set; }
+    [Selector("wrapS", "setWrapS:")]
+    public SCNWrapMode WrapS { get; set; }
+    [Selector("wrapT", "setWrapT:")]
+    public SCNWrapMode WrapT { get; set; }
+    [Selector("mappingChannel", "setMappingChannel:")]
+    public NSInteger MappingChannel { get; set; }
+    [Selector("textureComponents", "setTextureComponents:")]
+    public SCNColorMask TextureComponents { get; set; }
+    [Selector("maxAnisotropy", "setMaxAnisotropy:")]
+    public CGFloat MaxAnisotropy { get; set; }
+    [Selector("materialPropertyWithContents:")]
+    public static Self MaterialPropertyWithContents(AnyObject contents);
+    [Selector("precomputedLightingEnvironmentContentsWithURL:error:")]
+    public static AnyObject? PrecomputedLightingEnvironmentContentsWithURLError(NSURL url, out NSError? error);
+    [Selector("precomputedLightingEnvironmentContentsWithData:error:")]
+    public static AnyObject? PrecomputedLightingEnvironmentContentsWithDataError(NSData data, out NSError? error);
+    [Selector("precomputedLightingEnvironmentDataForContents:device:error:")]
+    public static NSData? PrecomputedLightingEnvironmentDataForContentsDeviceError(AnyObject contents, MTLDevice? device, out NSError? error);
 }
 
 #endif

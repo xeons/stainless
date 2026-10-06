@@ -62,8 +62,10 @@ public extern "C" AVAudioSessionPolarPattern AVAudioSessionPolarPatternSubcardio
 /// macOS 26.0 and later.
 public extern objc class AVAudioSessionCapability : NSObject
 {
-    [Selector("isSupported")] public bool Supported { get; }
-    [Selector("isEnabled")] public bool Enabled { get; }
+    [Selector("isSupported")]
+    public bool Supported { get; }
+    [Selector("isEnabled")]
+    public bool Enabled { get; }
 }
 
 #endif

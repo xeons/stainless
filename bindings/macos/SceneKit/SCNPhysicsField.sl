@@ -40,27 +40,48 @@ public enum SCNPhysicsFieldScope : long
 
 public extern objc class SCNPhysicsField : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("strength", "setStrength:")] public CGFloat Strength { get; set; }
-    [Selector("falloffExponent", "setFalloffExponent:")] public CGFloat FalloffExponent { get; set; }
-    [Selector("minimumDistance", "setMinimumDistance:")] public CGFloat MinimumDistance { get; set; }
-    [Selector("isActive", "setActive:")] public bool Active { get; set; }
-    [Selector("isExclusive", "setExclusive:")] public bool Exclusive { get; set; }
-    [Selector("halfExtent", "setHalfExtent:")] public SCNVector3 HalfExtent { get; set; }
-    [Selector("usesEllipsoidalExtent", "setUsesEllipsoidalExtent:")] public bool UsesEllipsoidalExtent { get; set; }
-    [Selector("scope", "setScope:")] public SCNPhysicsFieldScope Scope { get; set; }
-    [Selector("offset", "setOffset:")] public SCNVector3 Offset { get; set; }
-    [Selector("direction", "setDirection:")] public SCNVector3 Direction { get; set; }
-    [Selector("categoryBitMask", "setCategoryBitMask:")] public NSUInteger CategoryBitMask { get; set; }
-    [Selector("dragField")] public static SCNPhysicsField DragField();
-    [Selector("vortexField")] public static SCNPhysicsField VortexField();
-    [Selector("radialGravityField")] public static SCNPhysicsField RadialGravityField();
-    [Selector("linearGravityField")] public static SCNPhysicsField LinearGravityField();
-    [Selector("noiseFieldWithSmoothness:animationSpeed:")] public static SCNPhysicsField NoiseFieldWithSmoothnessAnimationSpeed(CGFloat smoothness, CGFloat speed);
-    [Selector("turbulenceFieldWithSmoothness:animationSpeed:")] public static SCNPhysicsField TurbulenceFieldWithSmoothnessAnimationSpeed(CGFloat smoothness, CGFloat speed);
-    [Selector("springField")] public static SCNPhysicsField SpringField();
-    [Selector("electricField")] public static SCNPhysicsField ElectricField();
-    [Selector("magneticField")] public static SCNPhysicsField MagneticField();
-    [Selector("customFieldWithEvaluationBlock:")] public static SCNPhysicsField CustomFieldWithEvaluationBlock(SCNFieldForceEvaluator block);
+    [Selector("strength", "setStrength:")]
+    public CGFloat Strength { get; set; }
+    [Selector("falloffExponent", "setFalloffExponent:")]
+    public CGFloat FalloffExponent { get; set; }
+    [Selector("minimumDistance", "setMinimumDistance:")]
+    public CGFloat MinimumDistance { get; set; }
+    [Selector("isActive", "setActive:")]
+    public bool Active { get; set; }
+    [Selector("isExclusive", "setExclusive:")]
+    public bool Exclusive { get; set; }
+    [Selector("halfExtent", "setHalfExtent:")]
+    public SCNVector3 HalfExtent { get; set; }
+    [Selector("usesEllipsoidalExtent", "setUsesEllipsoidalExtent:")]
+    public bool UsesEllipsoidalExtent { get; set; }
+    [Selector("scope", "setScope:")]
+    public SCNPhysicsFieldScope Scope { get; set; }
+    [Selector("offset", "setOffset:")]
+    public SCNVector3 Offset { get; set; }
+    [Selector("direction", "setDirection:")]
+    public SCNVector3 Direction { get; set; }
+    [Selector("categoryBitMask", "setCategoryBitMask:")]
+    public NSUInteger CategoryBitMask { get; set; }
+    [Selector("dragField")]
+    public static SCNPhysicsField DragField();
+    [Selector("vortexField")]
+    public static SCNPhysicsField VortexField();
+    [Selector("radialGravityField")]
+    public static SCNPhysicsField RadialGravityField();
+    [Selector("linearGravityField")]
+    public static SCNPhysicsField LinearGravityField();
+    [Selector("noiseFieldWithSmoothness:animationSpeed:")]
+    public static SCNPhysicsField NoiseFieldWithSmoothnessAnimationSpeed(CGFloat smoothness, CGFloat speed);
+    [Selector("turbulenceFieldWithSmoothness:animationSpeed:")]
+    public static SCNPhysicsField TurbulenceFieldWithSmoothnessAnimationSpeed(CGFloat smoothness, CGFloat speed);
+    [Selector("springField")]
+    public static SCNPhysicsField SpringField();
+    [Selector("electricField")]
+    public static SCNPhysicsField ElectricField();
+    [Selector("magneticField")]
+    public static SCNPhysicsField MagneticField();
+    [Selector("customFieldWithEvaluationBlock:")]
+    public static SCNPhysicsField CustomFieldWithEvaluationBlock(SCNFieldForceEvaluator block);
 }
 
 public objc closure SCNVector3 SCNFieldForceEvaluator(SCNVector3 arg0, SCNVector3 arg1, float arg2, float arg3, NSTimeInterval arg4);

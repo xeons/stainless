@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioConsolePort : NSObject
 {
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("attachment", "setAttachment:")] public VZSerialPortAttachment? Attachment { get; set; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("attachment", "setAttachment:")]
+    public VZSerialPortAttachment? Attachment { get; set; }
 }
 
 #endif

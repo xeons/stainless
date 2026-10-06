@@ -34,29 +34,42 @@ import Standard.ObjC;
 
 public extern objc class AVMetadataItem : NSObject, AVAsynchronousKeyValueLoading, NSCopying, NSMutableCopying
 {
-    [Selector("identifier")] public AVMetadataIdentifier? Identifier { get; }
-    [Selector("extendedLanguageTag")] public NSString? ExtendedLanguageTag { get; }
-    [Selector("locale")] public NSLocale? Locale { get; }
-    [Selector("time")] public CMTime Time { get; }
-    [Selector("duration")] public CMTime Duration { get; }
-    [Selector("dataType")] public NSString? DataType { get; }
-    [Selector("value")] public NSObjectProtocol? Value { get; }
-    [Selector("extraAttributes")] public NSDictionary? ExtraAttributes { get; }
+    [Selector("identifier")]
+    public AVMetadataIdentifier? Identifier { get; }
+    [Selector("extendedLanguageTag")]
+    public NSString? ExtendedLanguageTag { get; }
+    [Selector("locale")]
+    public NSLocale? Locale { get; }
+    [Selector("time")]
+    public CMTime Time { get; }
+    [Selector("duration")]
+    public CMTime Duration { get; }
+    [Selector("dataType")]
+    public NSString? DataType { get; }
+    [Selector("value")]
+    public NSObjectProtocol? Value { get; }
+    [Selector("extraAttributes")]
+    public NSDictionary? ExtraAttributes { get; }
 }
 
 /// AVMetadataItemDateRepresentation, a category of AVMetadataItem.
 public extern objc class AVMetadataItem
 {
-    [Selector("startDate")] public NSDate? StartDate { get; }
+    [Selector("startDate")]
+    public NSDate? StartDate { get; }
 }
 
 /// AVMetadataItemTypeCoercion, a category of AVMetadataItem.
 public extern objc class AVMetadataItem
 {
-    [Selector("stringValue")] public NSString? StringValue { get; }
-    [Selector("numberValue")] public NSNumber? NumberValue { get; }
-    [Selector("dateValue")] public NSDate? DateValue { get; }
-    [Selector("dataValue")] public NSData? DataValue { get; }
+    [Selector("stringValue")]
+    public NSString? StringValue { get; }
+    [Selector("numberValue")]
+    public NSNumber? NumberValue { get; }
+    [Selector("dateValue")]
+    public NSDate? DateValue { get; }
+    [Selector("dataValue")]
+    public NSData? DataValue { get; }
 }
 
 public objc closure void AVMetadataItemLoadValuesAsynchronouslyForKeysCompletionHandlerHandlerBlock();
@@ -64,53 +77,76 @@ public objc closure void AVMetadataItemLoadValuesAsynchronouslyForKeysCompletion
 /// AVAsynchronousKeyValueLoading, a category of AVMetadataItem.
 public extern objc class AVMetadataItem
 {
-    [Selector("statusOfValueForKey:error:")] public AVKeyValueStatus StatusOfValueForKeyError(NSString key, out NSError? outError);
-    [Selector("loadValuesAsynchronouslyForKeys:completionHandler:")] public void LoadValuesAsynchronouslyForKeysCompletionHandler(NSArray keys, AVMetadataItemLoadValuesAsynchronouslyForKeysCompletionHandlerHandlerBlock? handler);
+    [Selector("statusOfValueForKey:error:")]
+    public AVKeyValueStatus StatusOfValueForKeyError(NSString key, out NSError? outError);
+    [Selector("loadValuesAsynchronouslyForKeys:completionHandler:")]
+    public void LoadValuesAsynchronouslyForKeysCompletionHandler(NSArray keys, AVMetadataItemLoadValuesAsynchronouslyForKeysCompletionHandlerHandlerBlock? handler);
 }
 
 /// AVMetadataItemArrayFiltering, a category of AVMetadataItem.
 public extern objc class AVMetadataItem
 {
-    [Selector("metadataItemsFromArray:filteredAndSortedAccordingToPreferredLanguages:")] public static NSArray MetadataItemsFromArrayFilteredAndSortedAccordingToPreferredLanguages(NSArray metadataItems, NSArray preferredLanguages);
-    [Selector("metadataItemsFromArray:filteredByIdentifier:")] public static NSArray MetadataItemsFromArrayFilteredByIdentifier(NSArray metadataItems, AVMetadataIdentifier identifier);
-    [Selector("metadataItemsFromArray:filteredByMetadataItemFilter:")] public static NSArray MetadataItemsFromArrayFilteredByMetadataItemFilter(NSArray metadataItems, AVMetadataItemFilter metadataItemFilter);
+    [Selector("metadataItemsFromArray:filteredAndSortedAccordingToPreferredLanguages:")]
+    public static NSArray MetadataItemsFromArrayFilteredAndSortedAccordingToPreferredLanguages(NSArray metadataItems, NSArray preferredLanguages);
+    [Selector("metadataItemsFromArray:filteredByIdentifier:")]
+    public static NSArray MetadataItemsFromArrayFilteredByIdentifier(NSArray metadataItems, AVMetadataIdentifier identifier);
+    [Selector("metadataItemsFromArray:filteredByMetadataItemFilter:")]
+    public static NSArray MetadataItemsFromArrayFilteredByMetadataItemFilter(NSArray metadataItems, AVMetadataItemFilter metadataItemFilter);
 }
 
 /// AVMetadataItemKeyAndKeyspace, a category of AVMetadataItem.
 public extern objc class AVMetadataItem
 {
-    [Selector("key")] public NSObjectProtocol? Key { get; }
-    [Selector("commonKey")] public AVMetadataKey? CommonKey { get; }
-    [Selector("keySpace")] public AVMetadataKeySpace? KeySpace { get; }
-    [Selector("identifierForKey:keySpace:")] public static AVMetadataIdentifier? IdentifierForKeyKeySpace(AnyObject key, AVMetadataKeySpace keySpace);
-    [Selector("keySpaceForIdentifier:")] public static AVMetadataKeySpace? KeySpaceForIdentifier(AVMetadataIdentifier identifier);
-    [Selector("keyForIdentifier:")] public static AnyObject? KeyForIdentifier(AVMetadataIdentifier identifier);
+    [Selector("key")]
+    public NSObjectProtocol? Key { get; }
+    [Selector("commonKey")]
+    public AVMetadataKey? CommonKey { get; }
+    [Selector("keySpace")]
+    public AVMetadataKeySpace? KeySpace { get; }
+    [Selector("identifierForKey:keySpace:")]
+    public static AVMetadataIdentifier? IdentifierForKeyKeySpace(AnyObject key, AVMetadataKeySpace keySpace);
+    [Selector("keySpaceForIdentifier:")]
+    public static AVMetadataKeySpace? KeySpaceForIdentifier(AVMetadataIdentifier identifier);
+    [Selector("keyForIdentifier:")]
+    public static AnyObject? KeyForIdentifier(AVMetadataIdentifier identifier);
 }
 
 public extern objc class AVMutableMetadataItem : AVMetadataItem
 {
-    [Selector("identifier", "setIdentifier:")] public AVMetadataIdentifier? Identifier { get; set; }
-    [Selector("extendedLanguageTag", "setExtendedLanguageTag:")] public NSString? ExtendedLanguageTag { get; set; }
-    [Selector("locale", "setLocale:")] public NSLocale? Locale { get; set; }
-    [Selector("time", "setTime:")] public CMTime Time { get; set; }
-    [Selector("duration", "setDuration:")] public CMTime Duration { get; set; }
-    [Selector("dataType", "setDataType:")] public NSString? DataType { get; set; }
-    [Selector("value", "setValue:")] public NSObjectProtocol? Value { get; set; }
-    [Selector("extraAttributes", "setExtraAttributes:")] public NSDictionary? ExtraAttributes { get; set; }
-    [Selector("metadataItem")] public static AVMutableMetadataItem MetadataItem();
+    [Selector("identifier", "setIdentifier:")]
+    public AVMetadataIdentifier? Identifier { get; set; }
+    [Selector("extendedLanguageTag", "setExtendedLanguageTag:")]
+    public NSString? ExtendedLanguageTag { get; set; }
+    [Selector("locale", "setLocale:")]
+    public NSLocale? Locale { get; set; }
+    [Selector("time", "setTime:")]
+    public CMTime Time { get; set; }
+    [Selector("duration", "setDuration:")]
+    public CMTime Duration { get; set; }
+    [Selector("dataType", "setDataType:")]
+    public NSString? DataType { get; set; }
+    [Selector("value", "setValue:")]
+    public NSObjectProtocol? Value { get; set; }
+    [Selector("extraAttributes", "setExtraAttributes:")]
+    public NSDictionary? ExtraAttributes { get; set; }
+    [Selector("metadataItem")]
+    public static AVMutableMetadataItem MetadataItem();
 }
 
 /// AVMutableMetadataItemDateRepresentation, a category of AVMutableMetadataItem.
 public extern objc class AVMutableMetadataItem
 {
-    [Selector("startDate", "setStartDate:")] public NSDate? StartDate { get; set; }
+    [Selector("startDate", "setStartDate:")]
+    public NSDate? StartDate { get; set; }
 }
 
 /// AVMutableMetadataItemKeyAndKeyspace, a category of AVMutableMetadataItem.
 public extern objc class AVMutableMetadataItem
 {
-    [Selector("keySpace", "setKeySpace:")] public AVMetadataKeySpace? KeySpace { get; set; }
-    [Selector("key", "setKey:")] public NSObjectProtocol? Key { get; set; }
+    [Selector("keySpace", "setKeySpace:")]
+    public AVMetadataKeySpace? KeySpace { get; set; }
+    [Selector("key", "setKey:")]
+    public NSObjectProtocol? Key { get; set; }
 }
 
 public objc closure void AVMetadataItemMetadataItemWithPropertiesOfMetadataItemValueLoadingHandlerHandlerBlock(AVMetadataItemValueRequest arg0);
@@ -118,26 +154,33 @@ public objc closure void AVMetadataItemMetadataItemWithPropertiesOfMetadataItemV
 /// AVMetadataItemLazyValueLoading, a category of AVMetadataItem.
 public extern objc class AVMetadataItem
 {
-    [Selector("metadataItemWithPropertiesOfMetadataItem:valueLoadingHandler:")] public static AVMetadataItem MetadataItemWithPropertiesOfMetadataItemValueLoadingHandler(AVMetadataItem metadataItem, AVMetadataItemMetadataItemWithPropertiesOfMetadataItemValueLoadingHandlerHandlerBlock handler);
+    [Selector("metadataItemWithPropertiesOfMetadataItem:valueLoadingHandler:")]
+    public static AVMetadataItem MetadataItemWithPropertiesOfMetadataItemValueLoadingHandler(AVMetadataItem metadataItem, AVMetadataItemMetadataItemWithPropertiesOfMetadataItemValueLoadingHandlerHandlerBlock handler);
 }
 
 public extern objc class AVMetadataItemValueRequest : NSObject
 {
-    [Selector("metadataItem")] public AVMetadataItem? MetadataItem { get; }
-    [Selector("respondWithValue:")] public void RespondWithValue(NSObjectProtocol value);
-    [Selector("respondWithError:")] public void RespondWithError(NSError error);
+    [Selector("metadataItem")]
+    public AVMetadataItem? MetadataItem { get; }
+    [Selector("respondWithValue:")]
+    public void RespondWithValue(NSObjectProtocol value);
+    [Selector("respondWithError:")]
+    public void RespondWithError(NSError error);
 }
 
 public extern objc class AVMetadataItemFilter : NSObject
 {
-    [Selector("metadataItemFilterForSharing")] public static AVMetadataItemFilter MetadataItemFilterForSharing();
+    [Selector("metadataItemFilterForSharing")]
+    public static AVMetadataItemFilter MetadataItemFilterForSharing();
 }
 
 /// AVMetadataItemArrayFilteringDeprecable, a category of AVMetadataItem.
 public extern objc class AVMetadataItem
 {
-    [Selector("metadataItemsFromArray:withLocale:")] public static NSArray MetadataItemsFromArrayWithLocale(NSArray metadataItems, NSLocale locale);
-    [Selector("metadataItemsFromArray:withKey:keySpace:")] public static NSArray MetadataItemsFromArrayWithKeyKeySpace(NSArray metadataItems, AnyObject? key, AVMetadataKeySpace? keySpace);
+    [Selector("metadataItemsFromArray:withLocale:")]
+    public static NSArray MetadataItemsFromArrayWithLocale(NSArray metadataItems, NSLocale locale);
+    [Selector("metadataItemsFromArray:withKey:keySpace:")]
+    public static NSArray MetadataItemsFromArrayWithKeyKeySpace(NSArray metadataItems, AnyObject? key, AVMetadataKeySpace? keySpace);
 }
 
 /// SynchronousMetadataItemInterface, a category of AVMutableMetadataItem.

@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class NSMagnificationGestureRecognizer : NSGestureRecognizer
 {
-    [Selector("magnification", "setMagnification:")] public CGFloat Magnification { get; set; }
+    [Selector("magnification", "setMagnification:")]
+    public CGFloat Magnification { get; set; }
 }
 
 #endif

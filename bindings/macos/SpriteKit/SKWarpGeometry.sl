@@ -33,34 +33,51 @@ import Standard.ObjC;
 
 public objc interface SKWarpable : NSObjectProtocol
 {
-    [Selector("warpGeometry", "setWarpGeometry:")] SKWarpGeometry? WarpGeometry { get; set; }
-    [Selector("subdivisionLevels", "setSubdivisionLevels:")] NSInteger SubdivisionLevels { get; set; }
+    [Selector("warpGeometry", "setWarpGeometry:")]
+    SKWarpGeometry? WarpGeometry { get; set; }
+    [Selector("subdivisionLevels", "setSubdivisionLevels:")]
+    NSInteger SubdivisionLevels { get; set; }
 }
 
 public extern objc class SKWarpGeometry : NSObject, NSCopying, NSSecureCoding { }
 
 public extern objc class SKWarpGeometryGrid : SKWarpGeometry, NSSecureCoding
 {
-    [Selector("numberOfColumns")] public NSInteger NumberOfColumns { get; }
-    [Selector("numberOfRows")] public NSInteger NumberOfRows { get; }
-    [Selector("vertexCount")] public NSInteger VertexCount { get; }
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
-    [Selector("grid")] public static Self Grid();
-    [Selector("gridWithColumns:rows:")] public static Self GridWithColumnsRows(NSInteger cols, NSInteger rows);
-    [Selector("gridWithColumns:rows:sourcePositions:destPositions:")] public static Self GridWithColumnsRowsSourcePositionsDestPositions(NSInteger cols, NSInteger rows, vector_float2* sourcePositions, vector_float2* destPositions);
-    [Selector("initWithColumns:rows:sourcePositions:destPositions:")] public Self InitWithColumnsRowsSourcePositionsDestPositions(NSInteger cols, NSInteger rows, vector_float2* sourcePositions, vector_float2* destPositions);
-    [Selector("sourcePositionAtIndex:")] public vector_float2 SourcePositionAtIndex(NSInteger index);
-    [Selector("destPositionAtIndex:")] public vector_float2 DestPositionAtIndex(NSInteger index);
-    [Selector("gridByReplacingSourcePositions:")] public Self GridByReplacingSourcePositions(vector_float2* sourcePositions);
-    [Selector("gridByReplacingDestPositions:")] public Self GridByReplacingDestPositions(vector_float2* destPositions);
+    [Selector("numberOfColumns")]
+    public NSInteger NumberOfColumns { get; }
+    [Selector("numberOfRows")]
+    public NSInteger NumberOfRows { get; }
+    [Selector("vertexCount")]
+    public NSInteger VertexCount { get; }
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder aDecoder);
+    [Selector("grid")]
+    public static Self Grid();
+    [Selector("gridWithColumns:rows:")]
+    public static Self GridWithColumnsRows(NSInteger cols, NSInteger rows);
+    [Selector("gridWithColumns:rows:sourcePositions:destPositions:")]
+    public static Self GridWithColumnsRowsSourcePositionsDestPositions(NSInteger cols, NSInteger rows, vector_float2* sourcePositions, vector_float2* destPositions);
+    [Selector("initWithColumns:rows:sourcePositions:destPositions:")]
+    public Self InitWithColumnsRowsSourcePositionsDestPositions(NSInteger cols, NSInteger rows, vector_float2* sourcePositions, vector_float2* destPositions);
+    [Selector("sourcePositionAtIndex:")]
+    public vector_float2 SourcePositionAtIndex(NSInteger index);
+    [Selector("destPositionAtIndex:")]
+    public vector_float2 DestPositionAtIndex(NSInteger index);
+    [Selector("gridByReplacingSourcePositions:")]
+    public Self GridByReplacingSourcePositions(vector_float2* sourcePositions);
+    [Selector("gridByReplacingDestPositions:")]
+    public Self GridByReplacingDestPositions(vector_float2* destPositions);
 }
 
 /// SKWarpable, a category of SKAction.
 public extern objc class SKAction
 {
-    [Selector("warpTo:duration:")] public static SKAction? WarpToDuration(SKWarpGeometry warp, NSTimeInterval duration);
-    [Selector("animateWithWarps:times:")] public static SKAction? AnimateWithWarpsTimes(NSArray warps, NSArray times);
-    [Selector("animateWithWarps:times:restore:")] public static SKAction? AnimateWithWarpsTimesRestore(NSArray warps, NSArray times, bool restore);
+    [Selector("warpTo:duration:")]
+    public static SKAction? WarpToDuration(SKWarpGeometry warp, NSTimeInterval duration);
+    [Selector("animateWithWarps:times:")]
+    public static SKAction? AnimateWithWarpsTimes(NSArray warps, NSArray times);
+    [Selector("animateWithWarps:times:restore:")]
+    public static SKAction? AnimateWithWarpsTimesRestore(NSArray warps, NSArray times, bool restore);
 }
 
 #endif

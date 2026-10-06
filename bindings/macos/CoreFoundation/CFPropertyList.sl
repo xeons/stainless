@@ -39,12 +39,15 @@ public enum CFPropertyListMutabilityOptions : ulong
 }
 
 /// Deprecated in macOS 10.10.
-[ReturnsRetained] public extern "C" CFPropertyListRef? CFPropertyListCreateFromXMLData(CFAllocatorRef? allocator, CFDataRef? xmlData, CFOptionFlags mutabilityOption, __CFString** errorString);
+[ReturnsRetained]
+public extern "C" CFPropertyListRef? CFPropertyListCreateFromXMLData(CFAllocatorRef? allocator, CFDataRef? xmlData, CFOptionFlags mutabilityOption, __CFString** errorString);
 
 /// Deprecated in macOS 10.10.
-[ReturnsRetained] public extern "C" CFDataRef? CFPropertyListCreateXMLData(CFAllocatorRef? allocator, CFPropertyListRef? propertyList);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFPropertyListCreateXMLData(CFAllocatorRef? allocator, CFPropertyListRef? propertyList);
 
-[ReturnsRetained] public extern "C" CFPropertyListRef? CFPropertyListCreateDeepCopy(CFAllocatorRef? allocator, CFPropertyListRef? propertyList, CFOptionFlags mutabilityOption);
+[ReturnsRetained]
+public extern "C" CFPropertyListRef? CFPropertyListCreateDeepCopy(CFAllocatorRef? allocator, CFPropertyListRef? propertyList, CFOptionFlags mutabilityOption);
 
 public enum CFPropertyListFormat : long
 {
@@ -59,19 +62,23 @@ public extern "C" Boolean CFPropertyListIsValid(CFPropertyListRef? plist, CFProp
 public extern "C" CFIndex CFPropertyListWriteToStream(CFPropertyListRef? propertyList, CFWriteStreamRef? stream, CFPropertyListFormat format, __CFString** errorString);
 
 /// Deprecated in macOS 10.10.
-[ReturnsRetained] public extern "C" CFPropertyListRef? CFPropertyListCreateFromStream(CFAllocatorRef? allocator, CFReadStreamRef? stream, CFIndex streamLength, CFOptionFlags mutabilityOption, CFPropertyListFormat* format, __CFString** errorString);
+[ReturnsRetained]
+public extern "C" CFPropertyListRef? CFPropertyListCreateFromStream(CFAllocatorRef? allocator, CFReadStreamRef? stream, CFIndex streamLength, CFOptionFlags mutabilityOption, CFPropertyListFormat* format, __CFString** errorString);
 
 public const long kCFPropertyListReadCorruptError = 3840;
 public const long kCFPropertyListReadUnknownVersionError = 3841;
 public const long kCFPropertyListReadStreamError = 3842;
 public const long kCFPropertyListWriteStreamError = 3851;
 
-[ReturnsRetained] public extern "C" CFPropertyListRef? CFPropertyListCreateWithData(CFAllocatorRef? allocator, CFDataRef? data, CFOptionFlags options, CFPropertyListFormat* format, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFPropertyListRef? CFPropertyListCreateWithData(CFAllocatorRef? allocator, CFDataRef? data, CFOptionFlags options, CFPropertyListFormat* format, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFPropertyListRef? CFPropertyListCreateWithStream(CFAllocatorRef? allocator, CFReadStreamRef? stream, CFIndex streamLength, CFOptionFlags options, CFPropertyListFormat* format, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFPropertyListRef? CFPropertyListCreateWithStream(CFAllocatorRef? allocator, CFReadStreamRef? stream, CFIndex streamLength, CFOptionFlags options, CFPropertyListFormat* format, __CFError** error);
 
 public extern "C" CFIndex CFPropertyListWrite(CFPropertyListRef? propertyList, CFWriteStreamRef? stream, CFPropertyListFormat format, CFOptionFlags options, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFDataRef? CFPropertyListCreateData(CFAllocatorRef? allocator, CFPropertyListRef? propertyList, CFPropertyListFormat format, CFOptionFlags options, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFPropertyListCreateData(CFAllocatorRef? allocator, CFPropertyListRef? propertyList, CFPropertyListFormat format, CFOptionFlags options, __CFError** error);
 
 #endif

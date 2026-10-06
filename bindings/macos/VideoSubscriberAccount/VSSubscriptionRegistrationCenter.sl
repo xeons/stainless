@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class VSSubscriptionRegistrationCenter : NSObject
 {
-    [Selector("defaultSubscriptionRegistrationCenter")] public static VSSubscriptionRegistrationCenter DefaultSubscriptionRegistrationCenter();
-    [Selector("setCurrentSubscription:")] public void SetCurrentSubscription(VSSubscription? currentSubscription);
+    [Selector("defaultSubscriptionRegistrationCenter")]
+    public static VSSubscriptionRegistrationCenter DefaultSubscriptionRegistrationCenter();
+    [Selector("setCurrentSubscription:")]
+    public void SetCurrentSubscription(VSSubscription? currentSubscription);
 }
 
 #endif

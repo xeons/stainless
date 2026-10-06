@@ -41,83 +41,141 @@ public objc closure void NSDocumentControllerReopenDocumentForURLWithContentsOfU
 
 public extern objc class NSDocumentController : NSObject, NSCoding, NSMenuItemValidation, NSUserInterfaceValidations
 {
-    [Selector("sharedDocumentController")] public static NSDocumentController SharedDocumentController { get; }
-    [Selector("documents")] public NSArray Documents { get; }
-    [Selector("currentDocument")] public NSDocument? CurrentDocument { get; }
-    [Selector("currentDirectory")] public NSString? CurrentDirectory { get; }
-    [Selector("autosavingDelay", "setAutosavingDelay:")] public NSTimeInterval AutosavingDelay { get; set; }
-    [Selector("hasEditedDocuments")] public bool HasEditedDocuments { get; }
-    [Selector("allowsAutomaticShareMenu")] public bool AllowsAutomaticShareMenu { get; }
-    [Selector("maximumRecentDocumentCount")] public NSUInteger MaximumRecentDocumentCount { get; }
-    [Selector("recentDocumentURLs")] public NSArray RecentDocumentURLs { get; }
-    [Selector("defaultType")] public NSString? DefaultType { get; }
-    [Selector("documentClassNames")] public NSArray DocumentClassNames { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("documentForURL:")] public NSDocument? DocumentForURL(NSURL url);
-    [Selector("documentForWindow:")] public NSDocument? DocumentForWindow(NSWindow window);
-    [Selector("addDocument:")] public void AddDocument(NSDocument document);
-    [Selector("removeDocument:")] public void RemoveDocument(NSDocument document);
-    [Selector("newDocument:")] public void NewDocument(AnyObject? sender);
-    [Selector("openUntitledDocumentAndDisplay:error:")] public NSDocument? OpenUntitledDocumentAndDisplayError(bool displayDocument, out NSError? outError);
-    [Selector("makeUntitledDocumentOfType:error:")] public NSDocument? MakeUntitledDocumentOfTypeError(NSString typeName, out NSError? outError);
-    [Selector("openDocument:")] public void OpenDocument(AnyObject? sender);
-    [Selector("URLsFromRunningOpenPanel")] public NSArray? URLsFromRunningOpenPanel();
-    [Selector("runModalOpenPanel:forTypes:")] public NSInteger RunModalOpenPanelForTypes(NSOpenPanel openPanel, NSArray? types);
-    [Selector("beginOpenPanelWithCompletionHandler:")] public void BeginOpenPanelWithCompletionHandler(NSDocumentControllerBeginOpenPanelWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("beginOpenPanel:forTypes:completionHandler:")] public void BeginOpenPanelForTypesCompletionHandler(NSOpenPanel openPanel, NSArray? inTypes, NSDocumentControllerBeginOpenPanelForTypesCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("openDocumentWithContentsOfURL:display:completionHandler:")] public void OpenDocumentWithContentsOfURLDisplayCompletionHandler(NSURL url, bool displayDocument, NSDocumentControllerOpenDocumentWithContentsOfURLDisplayCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("makeDocumentWithContentsOfURL:ofType:error:")] public NSDocument? MakeDocumentWithContentsOfURLOfTypeError(NSURL url, NSString typeName, out NSError? outError);
-    [Selector("reopenDocumentForURL:withContentsOfURL:display:completionHandler:")] public void ReopenDocumentForURLWithContentsOfURLDisplayCompletionHandler(NSURL? urlOrNil, NSURL contentsURL, bool displayDocument, NSDocumentControllerReopenDocumentForURLWithContentsOfURLDisplayCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("makeDocumentForURL:withContentsOfURL:ofType:error:")] public NSDocument? MakeDocumentForURLWithContentsOfURLOfTypeError(NSURL? urlOrNil, NSURL contentsURL, NSString typeName, out NSError? outError);
-    [Selector("saveAllDocuments:")] public void SaveAllDocuments(AnyObject? sender);
-    [Selector("reviewUnsavedDocumentsWithAlertTitle:cancellable:delegate:didReviewAllSelector:contextInfo:")] public void ReviewUnsavedDocumentsWithAlertTitleCancellableDelegateDidReviewAllSelectorContextInfo(NSString? title, bool cancellable, AnyObject? @delegate, Selector didReviewAllSelector, void* contextInfo);
-    [Selector("closeAllDocumentsWithDelegate:didCloseAllSelector:contextInfo:")] public void CloseAllDocumentsWithDelegateDidCloseAllSelectorContextInfo(AnyObject? @delegate, Selector didCloseAllSelector, void* contextInfo);
-    [Selector("duplicateDocumentWithContentsOfURL:copying:displayName:error:")] public NSDocument? DuplicateDocumentWithContentsOfURLCopyingDisplayNameError(NSURL url, bool duplicateByCopying, NSString? displayNameOrNil, out NSError? outError);
-    [Selector("standardShareMenuItem")] public NSMenuItem StandardShareMenuItem();
-    [Selector("presentError:modalForWindow:delegate:didPresentSelector:contextInfo:")] public void PresentErrorModalForWindowDelegateDidPresentSelectorContextInfo(NSError error, NSWindow window, AnyObject? @delegate, Selector didPresentSelector, void* contextInfo);
-    [Selector("presentError:")] public bool PresentError(NSError error);
-    [Selector("willPresentError:")] public NSError WillPresentError(NSError error);
-    [Selector("clearRecentDocuments:")] public void ClearRecentDocuments(AnyObject? sender);
-    [Selector("noteNewRecentDocument:")] public void NoteNewRecentDocument(NSDocument document);
-    [Selector("noteNewRecentDocumentURL:")] public void NoteNewRecentDocumentURL(NSURL url);
-    [Selector("typeForContentsOfURL:error:")] public NSString? TypeForContentsOfURLError(NSURL url, out NSError? outError);
-    [Selector("documentClassForType:")] public Class DocumentClassForType(NSString typeName);
-    [Selector("displayNameForType:")] public NSString? DisplayNameForType(NSString typeName);
-    [Selector("validateUserInterfaceItem:")] public bool ValidateUserInterfaceItem(NSValidatedUserInterfaceItem item);
+    [Selector("sharedDocumentController")]
+    public static NSDocumentController SharedDocumentController { get; }
+    [Selector("documents")]
+    public NSArray Documents { get; }
+    [Selector("currentDocument")]
+    public NSDocument? CurrentDocument { get; }
+    [Selector("currentDirectory")]
+    public NSString? CurrentDirectory { get; }
+    [Selector("autosavingDelay", "setAutosavingDelay:")]
+    public NSTimeInterval AutosavingDelay { get; set; }
+    [Selector("hasEditedDocuments")]
+    public bool HasEditedDocuments { get; }
+    [Selector("allowsAutomaticShareMenu")]
+    public bool AllowsAutomaticShareMenu { get; }
+    [Selector("maximumRecentDocumentCount")]
+    public NSUInteger MaximumRecentDocumentCount { get; }
+    [Selector("recentDocumentURLs")]
+    public NSArray RecentDocumentURLs { get; }
+    [Selector("defaultType")]
+    public NSString? DefaultType { get; }
+    [Selector("documentClassNames")]
+    public NSArray DocumentClassNames { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("documentForURL:")]
+    public NSDocument? DocumentForURL(NSURL url);
+    [Selector("documentForWindow:")]
+    public NSDocument? DocumentForWindow(NSWindow window);
+    [Selector("addDocument:")]
+    public void AddDocument(NSDocument document);
+    [Selector("removeDocument:")]
+    public void RemoveDocument(NSDocument document);
+    [Selector("newDocument:")]
+    public void NewDocument(AnyObject? sender);
+    [Selector("openUntitledDocumentAndDisplay:error:")]
+    public NSDocument? OpenUntitledDocumentAndDisplayError(bool displayDocument, out NSError? outError);
+    [Selector("makeUntitledDocumentOfType:error:")]
+    public NSDocument? MakeUntitledDocumentOfTypeError(NSString typeName, out NSError? outError);
+    [Selector("openDocument:")]
+    public void OpenDocument(AnyObject? sender);
+    [Selector("URLsFromRunningOpenPanel")]
+    public NSArray? URLsFromRunningOpenPanel();
+    [Selector("runModalOpenPanel:forTypes:")]
+    public NSInteger RunModalOpenPanelForTypes(NSOpenPanel openPanel, NSArray? types);
+    [Selector("beginOpenPanelWithCompletionHandler:")]
+    public void BeginOpenPanelWithCompletionHandler(NSDocumentControllerBeginOpenPanelWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("beginOpenPanel:forTypes:completionHandler:")]
+    public void BeginOpenPanelForTypesCompletionHandler(NSOpenPanel openPanel, NSArray? inTypes, NSDocumentControllerBeginOpenPanelForTypesCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("openDocumentWithContentsOfURL:display:completionHandler:")]
+    public void OpenDocumentWithContentsOfURLDisplayCompletionHandler(NSURL url, bool displayDocument, NSDocumentControllerOpenDocumentWithContentsOfURLDisplayCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("makeDocumentWithContentsOfURL:ofType:error:")]
+    public NSDocument? MakeDocumentWithContentsOfURLOfTypeError(NSURL url, NSString typeName, out NSError? outError);
+    [Selector("reopenDocumentForURL:withContentsOfURL:display:completionHandler:")]
+    public void ReopenDocumentForURLWithContentsOfURLDisplayCompletionHandler(NSURL? urlOrNil, NSURL contentsURL, bool displayDocument, NSDocumentControllerReopenDocumentForURLWithContentsOfURLDisplayCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("makeDocumentForURL:withContentsOfURL:ofType:error:")]
+    public NSDocument? MakeDocumentForURLWithContentsOfURLOfTypeError(NSURL? urlOrNil, NSURL contentsURL, NSString typeName, out NSError? outError);
+    [Selector("saveAllDocuments:")]
+    public void SaveAllDocuments(AnyObject? sender);
+    [Selector("reviewUnsavedDocumentsWithAlertTitle:cancellable:delegate:didReviewAllSelector:contextInfo:")]
+    public void ReviewUnsavedDocumentsWithAlertTitleCancellableDelegateDidReviewAllSelectorContextInfo(NSString? title, bool cancellable, AnyObject? @delegate, Selector didReviewAllSelector, void* contextInfo);
+    [Selector("closeAllDocumentsWithDelegate:didCloseAllSelector:contextInfo:")]
+    public void CloseAllDocumentsWithDelegateDidCloseAllSelectorContextInfo(AnyObject? @delegate, Selector didCloseAllSelector, void* contextInfo);
+    [Selector("duplicateDocumentWithContentsOfURL:copying:displayName:error:")]
+    public NSDocument? DuplicateDocumentWithContentsOfURLCopyingDisplayNameError(NSURL url, bool duplicateByCopying, NSString? displayNameOrNil, out NSError? outError);
+    [Selector("standardShareMenuItem")]
+    public NSMenuItem StandardShareMenuItem();
+    [Selector("presentError:modalForWindow:delegate:didPresentSelector:contextInfo:")]
+    public void PresentErrorModalForWindowDelegateDidPresentSelectorContextInfo(NSError error, NSWindow window, AnyObject? @delegate, Selector didPresentSelector, void* contextInfo);
+    [Selector("presentError:")]
+    public bool PresentError(NSError error);
+    [Selector("willPresentError:")]
+    public NSError WillPresentError(NSError error);
+    [Selector("clearRecentDocuments:")]
+    public void ClearRecentDocuments(AnyObject? sender);
+    [Selector("noteNewRecentDocument:")]
+    public void NoteNewRecentDocument(NSDocument document);
+    [Selector("noteNewRecentDocumentURL:")]
+    public void NoteNewRecentDocumentURL(NSURL url);
+    [Selector("typeForContentsOfURL:error:")]
+    public NSString? TypeForContentsOfURLError(NSURL url, out NSError? outError);
+    [Selector("documentClassForType:")]
+    public Class DocumentClassForType(NSString typeName);
+    [Selector("displayNameForType:")]
+    public NSString? DisplayNameForType(NSString typeName);
+    [Selector("validateUserInterfaceItem:")]
+    public bool ValidateUserInterfaceItem(NSValidatedUserInterfaceItem item);
 }
 
 /// NSDeprecated, a category of NSDocumentController.
 public extern objc class NSDocumentController
 {
     /// Deprecated in macOS 10.7.
-    [Selector("openDocumentWithContentsOfURL:display:error:")] public AnyObject? OpenDocumentWithContentsOfURLDisplayError(NSURL url, bool displayDocument, out NSError? outError);
+    [Selector("openDocumentWithContentsOfURL:display:error:")]
+    public AnyObject? OpenDocumentWithContentsOfURLDisplayError(NSURL url, bool displayDocument, out NSError? outError);
     /// Deprecated in macOS 10.7.
-    [Selector("reopenDocumentForURL:withContentsOfURL:error:")] public bool ReopenDocumentForURLWithContentsOfURLError(NSURL? url, NSURL contentsURL, out NSError? outError);
+    [Selector("reopenDocumentForURL:withContentsOfURL:error:")]
+    public bool ReopenDocumentForURLWithContentsOfURLError(NSURL? url, NSURL contentsURL, out NSError? outError);
     /// Deprecated in macOS 10.5.
-    [Selector("fileExtensionsFromType:")] public NSArray? FileExtensionsFromType(NSString typeName);
+    [Selector("fileExtensionsFromType:")]
+    public NSArray? FileExtensionsFromType(NSString typeName);
     /// Deprecated in macOS 10.5.
-    [Selector("typeFromFileExtension:")] public NSString? TypeFromFileExtension(NSString fileNameExtensionOrHFSFileType);
+    [Selector("typeFromFileExtension:")]
+    public NSString? TypeFromFileExtension(NSString fileNameExtensionOrHFSFileType);
     /// Deprecated in macOS 10.4.
-    [Selector("documentForFileName:")] public AnyObject? DocumentForFileName(NSString fileName);
+    [Selector("documentForFileName:")]
+    public AnyObject? DocumentForFileName(NSString fileName);
     /// Deprecated in macOS 10.4.
-    [Selector("fileNamesFromRunningOpenPanel")] public NSArray? FileNamesFromRunningOpenPanel();
+    [Selector("fileNamesFromRunningOpenPanel")]
+    public NSArray? FileNamesFromRunningOpenPanel();
     /// Deprecated in macOS 10.4.
-    [Selector("makeDocumentWithContentsOfFile:ofType:")] public AnyObject? MakeDocumentWithContentsOfFileOfType(NSString fileName, NSString type);
+    [Selector("makeDocumentWithContentsOfFile:ofType:")]
+    public AnyObject? MakeDocumentWithContentsOfFileOfType(NSString fileName, NSString type);
     /// Deprecated in macOS 10.4.
-    [Selector("makeDocumentWithContentsOfURL:ofType:")] public AnyObject? MakeDocumentWithContentsOfURLOfType(NSURL url, NSString? type);
+    [Selector("makeDocumentWithContentsOfURL:ofType:")]
+    public AnyObject? MakeDocumentWithContentsOfURLOfType(NSURL url, NSString? type);
     /// Deprecated in macOS 10.4.
-    [Selector("makeUntitledDocumentOfType:")] public AnyObject? MakeUntitledDocumentOfType(NSString type);
+    [Selector("makeUntitledDocumentOfType:")]
+    public AnyObject? MakeUntitledDocumentOfType(NSString type);
     /// Deprecated in macOS 10.4.
-    [Selector("openDocumentWithContentsOfFile:display:")] public AnyObject? OpenDocumentWithContentsOfFileDisplay(NSString fileName, bool display);
+    [Selector("openDocumentWithContentsOfFile:display:")]
+    public AnyObject? OpenDocumentWithContentsOfFileDisplay(NSString fileName, bool display);
     /// Deprecated in macOS 10.4.
-    [Selector("openDocumentWithContentsOfURL:display:")] public AnyObject? OpenDocumentWithContentsOfURLDisplay(NSURL url, bool display);
+    [Selector("openDocumentWithContentsOfURL:display:")]
+    public AnyObject? OpenDocumentWithContentsOfURLDisplay(NSURL url, bool display);
     /// Deprecated in macOS 10.4.
-    [Selector("openUntitledDocumentOfType:display:")] public AnyObject? OpenUntitledDocumentOfTypeDisplay(NSString type, bool display);
+    [Selector("openUntitledDocumentOfType:display:")]
+    public AnyObject? OpenUntitledDocumentOfTypeDisplay(NSString type, bool display);
     /// Deprecated in macOS 10.4.
-    [Selector("setShouldCreateUI:")] public void SetShouldCreateUI(bool flag);
+    [Selector("setShouldCreateUI:")]
+    public void SetShouldCreateUI(bool flag);
     /// Deprecated in macOS 10.4.
-    [Selector("shouldCreateUI")] public bool ShouldCreateUI();
+    [Selector("shouldCreateUI")]
+    public bool ShouldCreateUI();
 }
 
 #endif

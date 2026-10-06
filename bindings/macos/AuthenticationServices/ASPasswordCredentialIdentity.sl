@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class ASPasswordCredentialIdentity : NSObject, NSCopying, NSSecureCoding, ASCredentialIdentity
 {
-    [Selector("serviceIdentifier")] public ASCredentialServiceIdentifier ServiceIdentifier { get; }
-    [Selector("user")] public NSString User { get; }
-    [Selector("recordIdentifier")] public NSString? RecordIdentifier { get; }
-    [Selector("rank", "setRank:")] public NSInteger Rank { get; set; }
-    [Selector("initWithServiceIdentifier:user:recordIdentifier:")] public Self InitWithServiceIdentifierUserRecordIdentifier(ASCredentialServiceIdentifier serviceIdentifier, NSString user, NSString? recordIdentifier);
-    [Selector("identityWithServiceIdentifier:user:recordIdentifier:")] public static Self IdentityWithServiceIdentifierUserRecordIdentifier(ASCredentialServiceIdentifier serviceIdentifier, NSString user, NSString? recordIdentifier);
+    [Selector("serviceIdentifier")]
+    public ASCredentialServiceIdentifier ServiceIdentifier { get; }
+    [Selector("user")]
+    public NSString User { get; }
+    [Selector("recordIdentifier")]
+    public NSString? RecordIdentifier { get; }
+    [Selector("rank", "setRank:")]
+    public NSInteger Rank { get; set; }
+    [Selector("initWithServiceIdentifier:user:recordIdentifier:")]
+    public Self InitWithServiceIdentifierUserRecordIdentifier(ASCredentialServiceIdentifier serviceIdentifier, NSString user, NSString? recordIdentifier);
+    [Selector("identityWithServiceIdentifier:user:recordIdentifier:")]
+    public static Self IdentityWithServiceIdentifierUserRecordIdentifier(ASCredentialServiceIdentifier serviceIdentifier, NSString user, NSString? recordIdentifier);
 }
 
 #endif

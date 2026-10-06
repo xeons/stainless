@@ -65,26 +65,41 @@ public extern "C" SCNHitTestOption SCNHitTestSortResultsKey;
 
 public extern objc class SCNHitTestResult : NSObject
 {
-    [Selector("node")] public SCNNode Node { get; }
-    [Selector("geometryIndex")] public NSInteger GeometryIndex { get; }
-    [Selector("faceIndex")] public NSInteger FaceIndex { get; }
-    [Selector("localCoordinates")] public SCNVector3 LocalCoordinates { get; }
-    [Selector("worldCoordinates")] public SCNVector3 WorldCoordinates { get; }
-    [Selector("localNormal")] public SCNVector3 LocalNormal { get; }
-    [Selector("worldNormal")] public SCNVector3 WorldNormal { get; }
-    [Selector("modelTransform")] public SCNMatrix4 ModelTransform { get; }
-    [Selector("boneNode")] public SCNNode? BoneNode { get; }
-    [Selector("textureCoordinatesWithMappingChannel:")] public CGPoint TextureCoordinatesWithMappingChannel(NSInteger channel);
+    [Selector("node")]
+    public SCNNode Node { get; }
+    [Selector("geometryIndex")]
+    public NSInteger GeometryIndex { get; }
+    [Selector("faceIndex")]
+    public NSInteger FaceIndex { get; }
+    [Selector("localCoordinates")]
+    public SCNVector3 LocalCoordinates { get; }
+    [Selector("worldCoordinates")]
+    public SCNVector3 WorldCoordinates { get; }
+    [Selector("localNormal")]
+    public SCNVector3 LocalNormal { get; }
+    [Selector("worldNormal")]
+    public SCNVector3 WorldNormal { get; }
+    [Selector("modelTransform")]
+    public SCNMatrix4 ModelTransform { get; }
+    [Selector("boneNode")]
+    public SCNNode? BoneNode { get; }
+    [Selector("textureCoordinatesWithMappingChannel:")]
+    public CGPoint TextureCoordinatesWithMappingChannel(NSInteger channel);
 }
 
 /// SIMD, a category of SCNHitTestResult.
 public extern objc class SCNHitTestResult
 {
-    [Selector("simdLocalCoordinates")] public simd_float3 SimdLocalCoordinates { get; }
-    [Selector("simdWorldCoordinates")] public simd_float3 SimdWorldCoordinates { get; }
-    [Selector("simdLocalNormal")] public simd_float3 SimdLocalNormal { get; }
-    [Selector("simdWorldNormal")] public simd_float3 SimdWorldNormal { get; }
-    [Selector("simdModelTransform")] public simd_float4x4 SimdModelTransform { get; }
+    [Selector("simdLocalCoordinates")]
+    public simd_float3 SimdLocalCoordinates { get; }
+    [Selector("simdWorldCoordinates")]
+    public simd_float3 SimdWorldCoordinates { get; }
+    [Selector("simdLocalNormal")]
+    public simd_float3 SimdLocalNormal { get; }
+    [Selector("simdWorldNormal")]
+    public simd_float3 SimdWorldNormal { get; }
+    [Selector("simdModelTransform")]
+    public simd_float4x4 SimdModelTransform { get; }
 }
 
 #endif

@@ -34,22 +34,28 @@ import Standard.ObjC;
 public extern objc class ISyncRecordSnapshot : NSObject
 {
     /// Deprecated in macOS 10.7.
-    [Selector("recordsWithIdentifiers:")] public NSDictionary? RecordsWithIdentifiers(NSArray? recordIds);
+    [Selector("recordsWithIdentifiers:")]
+    public NSDictionary? RecordsWithIdentifiers(NSArray? recordIds);
     /// Deprecated in macOS 10.7.
-    [Selector("targetIdentifiersForRelationshipName:withSourceIdentifier:")] public NSArray? TargetIdentifiersForRelationshipNameWithSourceIdentifier(NSString? relationshipName, NSString? sourceId);
+    [Selector("targetIdentifiersForRelationshipName:withSourceIdentifier:")]
+    public NSArray? TargetIdentifiersForRelationshipNameWithSourceIdentifier(NSString? relationshipName, NSString? sourceId);
     /// Deprecated in macOS 10.7.
-    [Selector("sourceIdentifiersForRelationshipName:withTargetIdentifier:")] public NSArray? SourceIdentifiersForRelationshipNameWithTargetIdentifier(NSString? relationshipName, NSString? sourceId);
+    [Selector("sourceIdentifiersForRelationshipName:withTargetIdentifier:")]
+    public NSArray? SourceIdentifiersForRelationshipNameWithTargetIdentifier(NSString? relationshipName, NSString? sourceId);
     /// Deprecated in macOS 10.7.
-    [Selector("recordsWithMatchingAttributes:")] public NSDictionary? RecordsWithMatchingAttributes(NSDictionary? attributes);
+    [Selector("recordsWithMatchingAttributes:")]
+    public NSDictionary? RecordsWithMatchingAttributes(NSDictionary? attributes);
 }
 
 /// ISyncRecordReference, a category of ISyncRecordSnapshot.
 public extern objc class ISyncRecordSnapshot
 {
     /// Deprecated in macOS 10.7.
-    [Selector("recordReferenceForRecordWithIdentifier:")] public ISyncRecordReference? RecordReferenceForRecordWithIdentifier(NSString? identifier);
+    [Selector("recordReferenceForRecordWithIdentifier:")]
+    public ISyncRecordReference? RecordReferenceForRecordWithIdentifier(NSString? identifier);
     /// Deprecated in macOS 10.7.
-    [Selector("recordIdentifierForReference:isModified:")] public NSString? RecordIdentifierForReferenceIsModified(ISyncRecordReference? reference, bool* pModified);
+    [Selector("recordIdentifierForReference:isModified:")]
+    public NSString? RecordIdentifierForReferenceIsModified(ISyncRecordReference? reference, bool* pModified);
 }
 
 #endif

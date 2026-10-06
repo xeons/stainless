@@ -42,8 +42,10 @@ public enum NSPersistentStoreRequestType : ulong
 
 public extern objc class NSPersistentStoreRequest : NSObject, NSCopying
 {
-    [Selector("affectedStores", "setAffectedStores:")] public NSArray? AffectedStores { get; set; }
-    [Selector("requestType")] public NSPersistentStoreRequestType RequestType { get; }
+    [Selector("affectedStores", "setAffectedStores:")]
+    public NSArray? AffectedStores { get; set; }
+    [Selector("requestType")]
+    public NSPersistentStoreRequestType RequestType { get; }
 }
 
 #endif

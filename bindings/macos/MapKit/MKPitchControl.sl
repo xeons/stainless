@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class MKPitchControl : NSView
 {
-    [Selector("mapView", "setMapView:")] public MKMapView? MapView { get; set; }
-    [Selector("pitchControlWithMapView:")] public static Self PitchControlWithMapView(MKMapView? mapView);
+    [Selector("mapView", "setMapView:")]
+    public MKMapView? MapView { get; set; }
+    [Selector("pitchControlWithMapView:")]
+    public static Self PitchControlWithMapView(MKMapView? mapView);
 }
 
 #endif

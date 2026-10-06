@@ -34,14 +34,22 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MXDiskSpaceUsageMetric : MXMetric
 {
-    [Selector("totalBinaryFileSize")] public NSMeasurement TotalBinaryFileSize { get; }
-    [Selector("totalBinaryFileCount")] public NSInteger TotalBinaryFileCount { get; }
-    [Selector("totalDataFileSize")] public NSMeasurement TotalDataFileSize { get; }
-    [Selector("totalDataFileCount")] public NSInteger TotalDataFileCount { get; }
-    [Selector("totalCacheFolderSize")] public NSMeasurement TotalCacheFolderSize { get; }
-    [Selector("totalCloneSize")] public NSMeasurement TotalCloneSize { get; }
-    [Selector("totalDiskSpaceUsedSize")] public NSMeasurement TotalDiskSpaceUsedSize { get; }
-    [Selector("totalDiskSpaceCapacity")] public NSMeasurement TotalDiskSpaceCapacity { get; }
+    [Selector("totalBinaryFileSize")]
+    public NSMeasurement TotalBinaryFileSize { get; }
+    [Selector("totalBinaryFileCount")]
+    public NSInteger TotalBinaryFileCount { get; }
+    [Selector("totalDataFileSize")]
+    public NSMeasurement TotalDataFileSize { get; }
+    [Selector("totalDataFileCount")]
+    public NSInteger TotalDataFileCount { get; }
+    [Selector("totalCacheFolderSize")]
+    public NSMeasurement TotalCacheFolderSize { get; }
+    [Selector("totalCloneSize")]
+    public NSMeasurement TotalCloneSize { get; }
+    [Selector("totalDiskSpaceUsedSize")]
+    public NSMeasurement TotalDiskSpaceUsedSize { get; }
+    [Selector("totalDiskSpaceCapacity")]
+    public NSMeasurement TotalDiskSpaceCapacity { get; }
 }
 
 #endif

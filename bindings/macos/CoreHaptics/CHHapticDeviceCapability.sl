@@ -33,17 +33,24 @@ import Standard.ObjC;
 
 public objc interface CHHapticParameterAttributes : NSObjectProtocol
 {
-    [Selector("minValue")] float MinValue { get; }
-    [Selector("maxValue")] float MaxValue { get; }
-    [Selector("defaultValue")] float DefaultValue { get; }
+    [Selector("minValue")]
+    float MinValue { get; }
+    [Selector("maxValue")]
+    float MaxValue { get; }
+    [Selector("defaultValue")]
+    float DefaultValue { get; }
 }
 
 public objc interface CHHapticDeviceCapability
 {
-    [Selector("supportsHaptics")] bool SupportsHaptics { get; }
-    [Selector("supportsAudio")] bool SupportsAudio { get; }
-    [Selector("attributesForEventParameter:eventType:error:")] CHHapticParameterAttributes? AttributesForEventParameterEventTypeError(CHHapticEventParameterID inParameter, CHHapticEventType type, out NSError? outError);
-    [Selector("attributesForDynamicParameter:error:")] CHHapticParameterAttributes? AttributesForDynamicParameterError(CHHapticDynamicParameterID inParameter, out NSError? outError);
+    [Selector("supportsHaptics")]
+    bool SupportsHaptics { get; }
+    [Selector("supportsAudio")]
+    bool SupportsAudio { get; }
+    [Selector("attributesForEventParameter:eventType:error:")]
+    CHHapticParameterAttributes? AttributesForEventParameterEventTypeError(CHHapticEventParameterID inParameter, CHHapticEventType type, out NSError? outError);
+    [Selector("attributesForDynamicParameter:error:")]
+    CHHapticParameterAttributes? AttributesForDynamicParameterError(CHHapticDynamicParameterID inParameter, out NSError? outError);
 }
 
 #endif

@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class PKPaymentToken : NSObject
 {
-    [Selector("paymentMethod")] public PKPaymentMethod PaymentMethod { get; }
-    [Selector("paymentInstrumentName")] public NSString? PaymentInstrumentName { get; }
-    [Selector("paymentNetwork")] public NSString? PaymentNetwork { get; }
-    [Selector("transactionIdentifier")] public NSString TransactionIdentifier { get; }
-    [Selector("paymentData")] public NSData PaymentData { get; }
+    [Selector("paymentMethod")]
+    public PKPaymentMethod PaymentMethod { get; }
+    [Selector("paymentInstrumentName")]
+    public NSString? PaymentInstrumentName { get; }
+    [Selector("paymentNetwork")]
+    public NSString? PaymentNetwork { get; }
+    [Selector("transactionIdentifier")]
+    public NSString TransactionIdentifier { get; }
+    [Selector("paymentData")]
+    public NSData PaymentData { get; }
 }
 
 #endif

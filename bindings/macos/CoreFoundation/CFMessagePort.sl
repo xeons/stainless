@@ -63,9 +63,11 @@ public delegate void CFMessagePortInvalidationCallBack(__CFMessagePort* arg0, vo
 
 public extern "C" CFTypeID CFMessagePortGetTypeID();
 
-[ReturnsRetained] public extern "C" CFMessagePortRef? CFMessagePortCreateLocal(CFAllocatorRef? allocator, CFStringRef? name, CFMessagePortCallBack callout, CFMessagePortContext* context, Boolean* shouldFreeInfo);
+[ReturnsRetained]
+public extern "C" CFMessagePortRef? CFMessagePortCreateLocal(CFAllocatorRef? allocator, CFStringRef? name, CFMessagePortCallBack callout, CFMessagePortContext* context, Boolean* shouldFreeInfo);
 
-[ReturnsRetained] public extern "C" CFMessagePortRef? CFMessagePortCreateRemote(CFAllocatorRef? allocator, CFStringRef? name);
+[ReturnsRetained]
+public extern "C" CFMessagePortRef? CFMessagePortCreateRemote(CFAllocatorRef? allocator, CFStringRef? name);
 
 public extern "C" Boolean CFMessagePortIsRemote(CFMessagePortRef? ms);
 
@@ -85,7 +87,8 @@ public extern "C" void CFMessagePortSetInvalidationCallBack(CFMessagePortRef? ms
 
 public extern "C" SInt32 CFMessagePortSendRequest(CFMessagePortRef? remote, SInt32 msgid, CFDataRef? data, CFTimeInterval sendTimeout, CFTimeInterval rcvTimeout, CFStringRef? replyMode, __CFData** returnData);
 
-[ReturnsRetained] public extern "C" CFRunLoopSourceRef? CFMessagePortCreateRunLoopSource(CFAllocatorRef? allocator, CFMessagePortRef? local, CFIndex order);
+[ReturnsRetained]
+public extern "C" CFRunLoopSourceRef? CFMessagePortCreateRunLoopSource(CFAllocatorRef? allocator, CFMessagePortRef? local, CFIndex order);
 
 public extern "C" void CFMessagePortSetDispatchQueue(CFMessagePortRef? ms, dispatch_queue_t? queue);
 

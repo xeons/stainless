@@ -39,70 +39,134 @@ public enum NSNumberFormatterBehavior : ulong
 
 public extern objc class NSNumberFormatter : NSFormatter
 {
-    [Selector("formattingContext", "setFormattingContext:")] public NSFormattingContext FormattingContext { get; set; }
-    [Selector("minimumGroupingDigits", "setMinimumGroupingDigits:")] public NSInteger MinimumGroupingDigits { get; set; }
-    [Selector("numberStyle", "setNumberStyle:")] public NSNumberFormatterStyle NumberStyle { get; set; }
-    [Selector("locale", "setLocale:")] public NSLocale? Locale { get; set; }
-    [Selector("generatesDecimalNumbers", "setGeneratesDecimalNumbers:")] public bool GeneratesDecimalNumbers { get; set; }
-    [Selector("formatterBehavior", "setFormatterBehavior:")] public NSNumberFormatterBehavior FormatterBehavior { get; set; }
-    [Selector("negativeFormat", "setNegativeFormat:")] public NSString? NegativeFormat { get; set; }
-    [Selector("textAttributesForNegativeValues", "setTextAttributesForNegativeValues:")] public NSDictionary? TextAttributesForNegativeValues { get; set; }
-    [Selector("positiveFormat", "setPositiveFormat:")] public NSString? PositiveFormat { get; set; }
-    [Selector("textAttributesForPositiveValues", "setTextAttributesForPositiveValues:")] public NSDictionary? TextAttributesForPositiveValues { get; set; }
-    [Selector("allowsFloats", "setAllowsFloats:")] public bool AllowsFloats { get; set; }
-    [Selector("decimalSeparator", "setDecimalSeparator:")] public NSString? DecimalSeparator { get; set; }
-    [Selector("alwaysShowsDecimalSeparator", "setAlwaysShowsDecimalSeparator:")] public bool AlwaysShowsDecimalSeparator { get; set; }
-    [Selector("currencyDecimalSeparator", "setCurrencyDecimalSeparator:")] public NSString? CurrencyDecimalSeparator { get; set; }
-    [Selector("usesGroupingSeparator", "setUsesGroupingSeparator:")] public bool UsesGroupingSeparator { get; set; }
-    [Selector("groupingSeparator", "setGroupingSeparator:")] public NSString? GroupingSeparator { get; set; }
-    [Selector("zeroSymbol", "setZeroSymbol:")] public NSString? ZeroSymbol { get; set; }
-    [Selector("textAttributesForZero", "setTextAttributesForZero:")] public NSDictionary? TextAttributesForZero { get; set; }
-    [Selector("nilSymbol", "setNilSymbol:")] public NSString NilSymbol { get; set; }
-    [Selector("textAttributesForNil", "setTextAttributesForNil:")] public NSDictionary? TextAttributesForNil { get; set; }
-    [Selector("notANumberSymbol", "setNotANumberSymbol:")] public NSString? NotANumberSymbol { get; set; }
-    [Selector("textAttributesForNotANumber", "setTextAttributesForNotANumber:")] public NSDictionary? TextAttributesForNotANumber { get; set; }
-    [Selector("positiveInfinitySymbol", "setPositiveInfinitySymbol:")] public NSString PositiveInfinitySymbol { get; set; }
-    [Selector("textAttributesForPositiveInfinity", "setTextAttributesForPositiveInfinity:")] public NSDictionary? TextAttributesForPositiveInfinity { get; set; }
-    [Selector("negativeInfinitySymbol", "setNegativeInfinitySymbol:")] public NSString NegativeInfinitySymbol { get; set; }
-    [Selector("textAttributesForNegativeInfinity", "setTextAttributesForNegativeInfinity:")] public NSDictionary? TextAttributesForNegativeInfinity { get; set; }
-    [Selector("positivePrefix", "setPositivePrefix:")] public NSString? PositivePrefix { get; set; }
-    [Selector("positiveSuffix", "setPositiveSuffix:")] public NSString? PositiveSuffix { get; set; }
-    [Selector("negativePrefix", "setNegativePrefix:")] public NSString? NegativePrefix { get; set; }
-    [Selector("negativeSuffix", "setNegativeSuffix:")] public NSString? NegativeSuffix { get; set; }
-    [Selector("currencyCode", "setCurrencyCode:")] public NSString? CurrencyCode { get; set; }
-    [Selector("currencySymbol", "setCurrencySymbol:")] public NSString? CurrencySymbol { get; set; }
-    [Selector("internationalCurrencySymbol", "setInternationalCurrencySymbol:")] public NSString? InternationalCurrencySymbol { get; set; }
-    [Selector("percentSymbol", "setPercentSymbol:")] public NSString? PercentSymbol { get; set; }
-    [Selector("perMillSymbol", "setPerMillSymbol:")] public NSString? PerMillSymbol { get; set; }
-    [Selector("minusSign", "setMinusSign:")] public NSString? MinusSign { get; set; }
-    [Selector("plusSign", "setPlusSign:")] public NSString? PlusSign { get; set; }
-    [Selector("exponentSymbol", "setExponentSymbol:")] public NSString? ExponentSymbol { get; set; }
-    [Selector("groupingSize", "setGroupingSize:")] public NSUInteger GroupingSize { get; set; }
-    [Selector("secondaryGroupingSize", "setSecondaryGroupingSize:")] public NSUInteger SecondaryGroupingSize { get; set; }
-    [Selector("multiplier", "setMultiplier:")] public NSNumber? Multiplier { get; set; }
-    [Selector("formatWidth", "setFormatWidth:")] public NSUInteger FormatWidth { get; set; }
-    [Selector("paddingCharacter", "setPaddingCharacter:")] public NSString? PaddingCharacter { get; set; }
-    [Selector("paddingPosition", "setPaddingPosition:")] public NSNumberFormatterPadPosition PaddingPosition { get; set; }
-    [Selector("roundingMode", "setRoundingMode:")] public NSNumberFormatterRoundingMode RoundingMode { get; set; }
-    [Selector("roundingIncrement", "setRoundingIncrement:")] public NSNumber? RoundingIncrement { get; set; }
-    [Selector("minimumIntegerDigits", "setMinimumIntegerDigits:")] public NSUInteger MinimumIntegerDigits { get; set; }
-    [Selector("maximumIntegerDigits", "setMaximumIntegerDigits:")] public NSUInteger MaximumIntegerDigits { get; set; }
-    [Selector("minimumFractionDigits", "setMinimumFractionDigits:")] public NSUInteger MinimumFractionDigits { get; set; }
-    [Selector("maximumFractionDigits", "setMaximumFractionDigits:")] public NSUInteger MaximumFractionDigits { get; set; }
-    [Selector("minimum", "setMinimum:")] public NSNumber? Minimum { get; set; }
-    [Selector("maximum", "setMaximum:")] public NSNumber? Maximum { get; set; }
-    [Selector("currencyGroupingSeparator", "setCurrencyGroupingSeparator:")] public NSString? CurrencyGroupingSeparator { get; set; }
-    [Selector("isLenient", "setLenient:")] public bool Lenient { get; set; }
-    [Selector("usesSignificantDigits", "setUsesSignificantDigits:")] public bool UsesSignificantDigits { get; set; }
-    [Selector("minimumSignificantDigits", "setMinimumSignificantDigits:")] public NSUInteger MinimumSignificantDigits { get; set; }
-    [Selector("maximumSignificantDigits", "setMaximumSignificantDigits:")] public NSUInteger MaximumSignificantDigits { get; set; }
-    [Selector("isPartialStringValidationEnabled", "setPartialStringValidationEnabled:")] public bool PartialStringValidationEnabled { get; set; }
-    [Selector("getObjectValue:forString:range:error:")] public bool GetObjectValueForStringRangeError(out AnyObject? obj, NSString string, NSRange* rangep, out NSError? error);
-    [Selector("stringFromNumber:")] public NSString? StringFromNumber(NSNumber number);
-    [Selector("numberFromString:")] public NSNumber? NumberFromString(NSString string);
-    [Selector("localizedStringFromNumber:numberStyle:")] public static NSString LocalizedStringFromNumberNumberStyle(NSNumber num, NSNumberFormatterStyle nstyle);
-    [Selector("defaultFormatterBehavior")] public static NSNumberFormatterBehavior DefaultFormatterBehavior();
-    [Selector("setDefaultFormatterBehavior:")] public static void SetDefaultFormatterBehavior(NSNumberFormatterBehavior behavior);
+    [Selector("formattingContext", "setFormattingContext:")]
+    public NSFormattingContext FormattingContext { get; set; }
+    [Selector("minimumGroupingDigits", "setMinimumGroupingDigits:")]
+    public NSInteger MinimumGroupingDigits { get; set; }
+    [Selector("numberStyle", "setNumberStyle:")]
+    public NSNumberFormatterStyle NumberStyle { get; set; }
+    [Selector("locale", "setLocale:")]
+    public NSLocale? Locale { get; set; }
+    [Selector("generatesDecimalNumbers", "setGeneratesDecimalNumbers:")]
+    public bool GeneratesDecimalNumbers { get; set; }
+    [Selector("formatterBehavior", "setFormatterBehavior:")]
+    public NSNumberFormatterBehavior FormatterBehavior { get; set; }
+    [Selector("negativeFormat", "setNegativeFormat:")]
+    public NSString? NegativeFormat { get; set; }
+    [Selector("textAttributesForNegativeValues", "setTextAttributesForNegativeValues:")]
+    public NSDictionary? TextAttributesForNegativeValues { get; set; }
+    [Selector("positiveFormat", "setPositiveFormat:")]
+    public NSString? PositiveFormat { get; set; }
+    [Selector("textAttributesForPositiveValues", "setTextAttributesForPositiveValues:")]
+    public NSDictionary? TextAttributesForPositiveValues { get; set; }
+    [Selector("allowsFloats", "setAllowsFloats:")]
+    public bool AllowsFloats { get; set; }
+    [Selector("decimalSeparator", "setDecimalSeparator:")]
+    public NSString? DecimalSeparator { get; set; }
+    [Selector("alwaysShowsDecimalSeparator", "setAlwaysShowsDecimalSeparator:")]
+    public bool AlwaysShowsDecimalSeparator { get; set; }
+    [Selector("currencyDecimalSeparator", "setCurrencyDecimalSeparator:")]
+    public NSString? CurrencyDecimalSeparator { get; set; }
+    [Selector("usesGroupingSeparator", "setUsesGroupingSeparator:")]
+    public bool UsesGroupingSeparator { get; set; }
+    [Selector("groupingSeparator", "setGroupingSeparator:")]
+    public NSString? GroupingSeparator { get; set; }
+    [Selector("zeroSymbol", "setZeroSymbol:")]
+    public NSString? ZeroSymbol { get; set; }
+    [Selector("textAttributesForZero", "setTextAttributesForZero:")]
+    public NSDictionary? TextAttributesForZero { get; set; }
+    [Selector("nilSymbol", "setNilSymbol:")]
+    public NSString NilSymbol { get; set; }
+    [Selector("textAttributesForNil", "setTextAttributesForNil:")]
+    public NSDictionary? TextAttributesForNil { get; set; }
+    [Selector("notANumberSymbol", "setNotANumberSymbol:")]
+    public NSString? NotANumberSymbol { get; set; }
+    [Selector("textAttributesForNotANumber", "setTextAttributesForNotANumber:")]
+    public NSDictionary? TextAttributesForNotANumber { get; set; }
+    [Selector("positiveInfinitySymbol", "setPositiveInfinitySymbol:")]
+    public NSString PositiveInfinitySymbol { get; set; }
+    [Selector("textAttributesForPositiveInfinity", "setTextAttributesForPositiveInfinity:")]
+    public NSDictionary? TextAttributesForPositiveInfinity { get; set; }
+    [Selector("negativeInfinitySymbol", "setNegativeInfinitySymbol:")]
+    public NSString NegativeInfinitySymbol { get; set; }
+    [Selector("textAttributesForNegativeInfinity", "setTextAttributesForNegativeInfinity:")]
+    public NSDictionary? TextAttributesForNegativeInfinity { get; set; }
+    [Selector("positivePrefix", "setPositivePrefix:")]
+    public NSString? PositivePrefix { get; set; }
+    [Selector("positiveSuffix", "setPositiveSuffix:")]
+    public NSString? PositiveSuffix { get; set; }
+    [Selector("negativePrefix", "setNegativePrefix:")]
+    public NSString? NegativePrefix { get; set; }
+    [Selector("negativeSuffix", "setNegativeSuffix:")]
+    public NSString? NegativeSuffix { get; set; }
+    [Selector("currencyCode", "setCurrencyCode:")]
+    public NSString? CurrencyCode { get; set; }
+    [Selector("currencySymbol", "setCurrencySymbol:")]
+    public NSString? CurrencySymbol { get; set; }
+    [Selector("internationalCurrencySymbol", "setInternationalCurrencySymbol:")]
+    public NSString? InternationalCurrencySymbol { get; set; }
+    [Selector("percentSymbol", "setPercentSymbol:")]
+    public NSString? PercentSymbol { get; set; }
+    [Selector("perMillSymbol", "setPerMillSymbol:")]
+    public NSString? PerMillSymbol { get; set; }
+    [Selector("minusSign", "setMinusSign:")]
+    public NSString? MinusSign { get; set; }
+    [Selector("plusSign", "setPlusSign:")]
+    public NSString? PlusSign { get; set; }
+    [Selector("exponentSymbol", "setExponentSymbol:")]
+    public NSString? ExponentSymbol { get; set; }
+    [Selector("groupingSize", "setGroupingSize:")]
+    public NSUInteger GroupingSize { get; set; }
+    [Selector("secondaryGroupingSize", "setSecondaryGroupingSize:")]
+    public NSUInteger SecondaryGroupingSize { get; set; }
+    [Selector("multiplier", "setMultiplier:")]
+    public NSNumber? Multiplier { get; set; }
+    [Selector("formatWidth", "setFormatWidth:")]
+    public NSUInteger FormatWidth { get; set; }
+    [Selector("paddingCharacter", "setPaddingCharacter:")]
+    public NSString? PaddingCharacter { get; set; }
+    [Selector("paddingPosition", "setPaddingPosition:")]
+    public NSNumberFormatterPadPosition PaddingPosition { get; set; }
+    [Selector("roundingMode", "setRoundingMode:")]
+    public NSNumberFormatterRoundingMode RoundingMode { get; set; }
+    [Selector("roundingIncrement", "setRoundingIncrement:")]
+    public NSNumber? RoundingIncrement { get; set; }
+    [Selector("minimumIntegerDigits", "setMinimumIntegerDigits:")]
+    public NSUInteger MinimumIntegerDigits { get; set; }
+    [Selector("maximumIntegerDigits", "setMaximumIntegerDigits:")]
+    public NSUInteger MaximumIntegerDigits { get; set; }
+    [Selector("minimumFractionDigits", "setMinimumFractionDigits:")]
+    public NSUInteger MinimumFractionDigits { get; set; }
+    [Selector("maximumFractionDigits", "setMaximumFractionDigits:")]
+    public NSUInteger MaximumFractionDigits { get; set; }
+    [Selector("minimum", "setMinimum:")]
+    public NSNumber? Minimum { get; set; }
+    [Selector("maximum", "setMaximum:")]
+    public NSNumber? Maximum { get; set; }
+    [Selector("currencyGroupingSeparator", "setCurrencyGroupingSeparator:")]
+    public NSString? CurrencyGroupingSeparator { get; set; }
+    [Selector("isLenient", "setLenient:")]
+    public bool Lenient { get; set; }
+    [Selector("usesSignificantDigits", "setUsesSignificantDigits:")]
+    public bool UsesSignificantDigits { get; set; }
+    [Selector("minimumSignificantDigits", "setMinimumSignificantDigits:")]
+    public NSUInteger MinimumSignificantDigits { get; set; }
+    [Selector("maximumSignificantDigits", "setMaximumSignificantDigits:")]
+    public NSUInteger MaximumSignificantDigits { get; set; }
+    [Selector("isPartialStringValidationEnabled", "setPartialStringValidationEnabled:")]
+    public bool PartialStringValidationEnabled { get; set; }
+    [Selector("getObjectValue:forString:range:error:")]
+    public bool GetObjectValueForStringRangeError(out AnyObject? obj, NSString string, NSRange* rangep, out NSError? error);
+    [Selector("stringFromNumber:")]
+    public NSString? StringFromNumber(NSNumber number);
+    [Selector("numberFromString:")]
+    public NSNumber? NumberFromString(NSString string);
+    [Selector("localizedStringFromNumber:numberStyle:")]
+    public static NSString LocalizedStringFromNumberNumberStyle(NSNumber num, NSNumberFormatterStyle nstyle);
+    [Selector("defaultFormatterBehavior")]
+    public static NSNumberFormatterBehavior DefaultFormatterBehavior();
+    [Selector("setDefaultFormatterBehavior:")]
+    public static void SetDefaultFormatterBehavior(NSNumberFormatterBehavior behavior);
 }
 
 public enum NSNumberFormatterStyle : ulong
@@ -141,14 +205,22 @@ public enum NSNumberFormatterRoundingMode : ulong
 /// NSNumberFormatterCompatibility, a category of NSNumberFormatter.
 public extern objc class NSNumberFormatter
 {
-    [Selector("hasThousandSeparators", "setHasThousandSeparators:")] public bool HasThousandSeparators { get; set; }
-    [Selector("thousandSeparator", "setThousandSeparator:")] public NSString? ThousandSeparator { get; set; }
-    [Selector("localizesFormat", "setLocalizesFormat:")] public bool LocalizesFormat { get; set; }
-    [Selector("format", "setFormat:")] public NSString Format { get; set; }
-    [Selector("attributedStringForZero", "setAttributedStringForZero:")] public NSAttributedString AttributedStringForZero { get; set; }
-    [Selector("attributedStringForNil", "setAttributedStringForNil:")] public NSAttributedString AttributedStringForNil { get; set; }
-    [Selector("attributedStringForNotANumber", "setAttributedStringForNotANumber:")] public NSAttributedString AttributedStringForNotANumber { get; set; }
-    [Selector("roundingBehavior", "setRoundingBehavior:")] public NSDecimalNumberHandler RoundingBehavior { get; set; }
+    [Selector("hasThousandSeparators", "setHasThousandSeparators:")]
+    public bool HasThousandSeparators { get; set; }
+    [Selector("thousandSeparator", "setThousandSeparator:")]
+    public NSString? ThousandSeparator { get; set; }
+    [Selector("localizesFormat", "setLocalizesFormat:")]
+    public bool LocalizesFormat { get; set; }
+    [Selector("format", "setFormat:")]
+    public NSString Format { get; set; }
+    [Selector("attributedStringForZero", "setAttributedStringForZero:")]
+    public NSAttributedString AttributedStringForZero { get; set; }
+    [Selector("attributedStringForNil", "setAttributedStringForNil:")]
+    public NSAttributedString AttributedStringForNil { get; set; }
+    [Selector("attributedStringForNotANumber", "setAttributedStringForNotANumber:")]
+    public NSAttributedString AttributedStringForNotANumber { get; set; }
+    [Selector("roundingBehavior", "setRoundingBehavior:")]
+    public NSDecimalNumberHandler RoundingBehavior { get; set; }
 }
 
 #endif

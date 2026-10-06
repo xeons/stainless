@@ -34,9 +34,12 @@ import Standard.ObjC;
 
 public extern objc class SWHighlightMentionEvent : NSObject, SWHighlightEvent
 {
-    [Selector("mentionedPersonHandle")] public NSString MentionedPersonHandle { get; }
-    [Selector("initWithHighlight:mentionedPersonCloudKitShareHandle:")] public Self InitWithHighlightMentionedPersonCloudKitShareHandle(SWHighlight highlight, NSString handle);
-    [Selector("initWithHighlight:mentionedPersonIdentity:")] public Self InitWithHighlightMentionedPersonIdentity(SWHighlight highlight, SWPersonIdentity identity);
+    [Selector("mentionedPersonHandle")]
+    public NSString MentionedPersonHandle { get; }
+    [Selector("initWithHighlight:mentionedPersonCloudKitShareHandle:")]
+    public Self InitWithHighlightMentionedPersonCloudKitShareHandle(SWHighlight highlight, NSString handle);
+    [Selector("initWithHighlight:mentionedPersonIdentity:")]
+    public Self InitWithHighlightMentionedPersonIdentity(SWHighlight highlight, SWPersonIdentity identity);
 }
 
 #endif

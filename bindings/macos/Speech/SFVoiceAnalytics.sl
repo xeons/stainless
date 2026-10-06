@@ -33,16 +33,22 @@ import Standard.ObjC;
 
 public extern objc class SFAcousticFeature : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("acousticFeatureValuePerFrame")] public NSArray AcousticFeatureValuePerFrame { get; }
-    [Selector("frameDuration")] public NSTimeInterval FrameDuration { get; }
+    [Selector("acousticFeatureValuePerFrame")]
+    public NSArray AcousticFeatureValuePerFrame { get; }
+    [Selector("frameDuration")]
+    public NSTimeInterval FrameDuration { get; }
 }
 
 public extern objc class SFVoiceAnalytics : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("jitter")] public SFAcousticFeature Jitter { get; }
-    [Selector("shimmer")] public SFAcousticFeature Shimmer { get; }
-    [Selector("pitch")] public SFAcousticFeature Pitch { get; }
-    [Selector("voicing")] public SFAcousticFeature Voicing { get; }
+    [Selector("jitter")]
+    public SFAcousticFeature Jitter { get; }
+    [Selector("shimmer")]
+    public SFAcousticFeature Shimmer { get; }
+    [Selector("pitch")]
+    public SFAcousticFeature Pitch { get; }
+    [Selector("voicing")]
+    public SFAcousticFeature Voicing { get; }
 }
 
 #endif

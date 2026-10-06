@@ -33,26 +33,37 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMCharacterData : DOMNode
 {
-    [Selector("data", "setData:")] public NSString? Data { get; set; }
-    [Selector("length")] public uint Length { get; }
-    [Selector("substringData:length:")] public NSString? SubstringDataLength(uint offset, uint length);
-    [Selector("appendData:")] public void AppendData(NSString? data);
-    [Selector("insertData:data:")] public void InsertDataData(uint offset, NSString? data);
-    [Selector("deleteData:length:")] public void DeleteDataLength(uint offset, uint length);
-    [Selector("replaceData:length:data:")] public void ReplaceDataLengthData(uint offset, uint length, NSString? data);
+    [Selector("data", "setData:")]
+    public NSString? Data { get; set; }
+    [Selector("length")]
+    public uint Length { get; }
+    [Selector("substringData:length:")]
+    public NSString? SubstringDataLength(uint offset, uint length);
+    [Selector("appendData:")]
+    public void AppendData(NSString? data);
+    [Selector("insertData:data:")]
+    public void InsertDataData(uint offset, NSString? data);
+    [Selector("deleteData:length:")]
+    public void DeleteDataLength(uint offset, uint length);
+    [Selector("replaceData:length:data:")]
+    public void ReplaceDataLengthData(uint offset, uint length, NSString? data);
 }
 
 /// DOMCharacterDataDeprecated, a category of DOMCharacterData.
 public extern objc class DOMCharacterData
 {
     /// Deprecated in macOS 10.5.
-    [Selector("substringData::")] public NSString? SubstringData(uint offset, uint length);
+    [Selector("substringData::")]
+    public NSString? SubstringData(uint offset, uint length);
     /// Deprecated in macOS 10.5.
-    [Selector("insertData::")] public void InsertData(uint offset, NSString? data);
+    [Selector("insertData::")]
+    public void InsertData(uint offset, NSString? data);
     /// Deprecated in macOS 10.5.
-    [Selector("deleteData::")] public void DeleteData(uint offset, uint length);
+    [Selector("deleteData::")]
+    public void DeleteData(uint offset, uint length);
     /// Deprecated in macOS 10.5.
-    [Selector("replaceData:::")] public void ReplaceData(uint offset, uint length, NSString? data);
+    [Selector("replaceData:::")]
+    public void ReplaceData(uint offset, uint length, NSString? data);
 }
 
 #endif

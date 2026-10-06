@@ -44,22 +44,33 @@ public objc closure void NCWidgetProvidingWidgetPerformUpdateWithCompletionHandl
 public objc interface NCWidgetProviding : NSExtensionRequestHandling
 {
     /// Deprecated in macOS 11.0.
-    [Optional] [Selector("widgetAllowsEditing")] bool WidgetAllowsEditing { get; }
+    [Optional]
+    [Selector("widgetAllowsEditing")]
+    bool WidgetAllowsEditing { get; }
     /// Deprecated in macOS 11.0.
-    [Optional] [Selector("widgetPerformUpdateWithCompletionHandler:")] void WidgetPerformUpdateWithCompletionHandler(NCWidgetProvidingWidgetPerformUpdateWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("widgetPerformUpdateWithCompletionHandler:")]
+    void WidgetPerformUpdateWithCompletionHandler(NCWidgetProvidingWidgetPerformUpdateWithCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 11.0.
-    [Optional] [Selector("widgetMarginInsetsForProposedMarginInsets:")] NSEdgeInsets WidgetMarginInsetsForProposedMarginInsets(NSEdgeInsets defaultMarginInset);
+    [Optional]
+    [Selector("widgetMarginInsetsForProposedMarginInsets:")]
+    NSEdgeInsets WidgetMarginInsetsForProposedMarginInsets(NSEdgeInsets defaultMarginInset);
     /// Deprecated in macOS 11.0.
-    [Optional] [Selector("widgetDidBeginEditing")] void WidgetDidBeginEditing();
+    [Optional]
+    [Selector("widgetDidBeginEditing")]
+    void WidgetDidBeginEditing();
     /// Deprecated in macOS 11.0.
-    [Optional] [Selector("widgetDidEndEditing")] void WidgetDidEndEditing();
+    [Optional]
+    [Selector("widgetDidEndEditing")]
+    void WidgetDidEndEditing();
 }
 
 /// NCWidgetProvidingPresentationStyles, a category of NSViewController.
 public extern objc class NSViewController
 {
     /// Deprecated in macOS 11.0.
-    [Selector("presentViewControllerInWidget:")] public void PresentViewControllerInWidget(NSViewController viewController);
+    [Selector("presentViewControllerInWidget:")]
+    public void PresentViewControllerInWidget(NSViewController viewController);
 }
 
 #endif

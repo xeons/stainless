@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class MEMessageSigner : NSObject, NSSecureCoding
 {
-    [Selector("emailAddresses")] public NSArray EmailAddresses { get; }
-    [Selector("label")] public NSString Label { get; }
-    [Selector("context")] public NSData Context { get; }
-    [Selector("initWithEmailAddresses:signatureLabel:context:")] public Self InitWithEmailAddressesSignatureLabelContext(NSArray emailAddresses, NSString label, NSData? context);
+    [Selector("emailAddresses")]
+    public NSArray EmailAddresses { get; }
+    [Selector("label")]
+    public NSString Label { get; }
+    [Selector("context")]
+    public NSData Context { get; }
+    [Selector("initWithEmailAddresses:signatureLabel:context:")]
+    public Self InitWithEmailAddressesSignatureLabelContext(NSArray emailAddresses, NSString label, NSData? context);
 }
 
 #endif

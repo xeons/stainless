@@ -33,11 +33,16 @@ import Standard.ObjC;
 /// NSScripting, a category of NSDocument.
 public extern objc class NSDocument
 {
-    [Selector("lastComponentOfFileName", "setLastComponentOfFileName:")] public NSString LastComponentOfFileName { get; set; }
-    [Selector("objectSpecifier")] public NSScriptObjectSpecifier ObjectSpecifier { get; }
-    [Selector("handleSaveScriptCommand:")] public AnyObject? HandleSaveScriptCommand(NSScriptCommand command);
-    [Selector("handleCloseScriptCommand:")] public AnyObject? HandleCloseScriptCommand(NSCloseCommand command);
-    [Selector("handlePrintScriptCommand:")] public AnyObject? HandlePrintScriptCommand(NSScriptCommand command);
+    [Selector("lastComponentOfFileName", "setLastComponentOfFileName:")]
+    public NSString LastComponentOfFileName { get; set; }
+    [Selector("objectSpecifier")]
+    public NSScriptObjectSpecifier ObjectSpecifier { get; }
+    [Selector("handleSaveScriptCommand:")]
+    public AnyObject? HandleSaveScriptCommand(NSScriptCommand command);
+    [Selector("handleCloseScriptCommand:")]
+    public AnyObject? HandleCloseScriptCommand(NSCloseCommand command);
+    [Selector("handlePrintScriptCommand:")]
+    public AnyObject? HandlePrintScriptCommand(NSScriptCommand command);
 }
 
 #endif

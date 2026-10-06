@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class NSTableHeaderCell : NSTextFieldCell
 {
-    [Selector("drawSortIndicatorWithFrame:inView:ascending:priority:")] public void DrawSortIndicatorWithFrameInViewAscendingPriority(NSRect cellFrame, NSView controlView, bool ascending, NSInteger priority);
-    [Selector("sortIndicatorRectForBounds:")] public NSRect SortIndicatorRectForBounds(NSRect rect);
+    [Selector("drawSortIndicatorWithFrame:inView:ascending:priority:")]
+    public void DrawSortIndicatorWithFrameInViewAscendingPriority(NSRect cellFrame, NSView controlView, bool ascending, NSInteger priority);
+    [Selector("sortIndicatorRectForBounds:")]
+    public NSRect SortIndicatorRectForBounds(NSRect rect);
 }
 
 #endif

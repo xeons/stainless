@@ -33,20 +33,30 @@ import Standard.ObjC;
 
 public extern objc class CWNetworkProfile : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("ssid")] public NSString? Ssid { get; }
-    [Selector("ssidData")] public NSData? SsidData { get; }
-    [Selector("security")] public CWSecurity Security { get; }
-    [Selector("networkProfile")] public static Self NetworkProfile();
-    [Selector("init")] public Self Init();
-    [Selector("initWithNetworkProfile:")] public Self InitWithNetworkProfile(CWNetworkProfile networkProfile);
-    [Selector("networkProfileWithNetworkProfile:")] public static Self NetworkProfileWithNetworkProfile(CWNetworkProfile networkProfile);
-    [Selector("isEqualToNetworkProfile:")] public bool IsEqualToNetworkProfile(CWNetworkProfile networkProfile);
+    [Selector("ssid")]
+    public NSString? Ssid { get; }
+    [Selector("ssidData")]
+    public NSData? SsidData { get; }
+    [Selector("security")]
+    public CWSecurity Security { get; }
+    [Selector("networkProfile")]
+    public static Self NetworkProfile();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithNetworkProfile:")]
+    public Self InitWithNetworkProfile(CWNetworkProfile networkProfile);
+    [Selector("networkProfileWithNetworkProfile:")]
+    public static Self NetworkProfileWithNetworkProfile(CWNetworkProfile networkProfile);
+    [Selector("isEqualToNetworkProfile:")]
+    public bool IsEqualToNetworkProfile(CWNetworkProfile networkProfile);
 }
 
 public extern objc class CWMutableNetworkProfile : CWNetworkProfile
 {
-    [Selector("ssidData", "setSsidData:")] public NSData? SsidData { get; set; }
-    [Selector("security", "setSecurity:")] public CWSecurity Security { get; set; }
+    [Selector("ssidData", "setSsidData:")]
+    public NSData? SsidData { get; set; }
+    [Selector("security", "setSecurity:")]
+    public CWSecurity Security { get; set; }
 }
 
 #endif

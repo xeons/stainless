@@ -46,12 +46,18 @@ public enum MLMultiArrayDataType : long
 public extern objc class MLMultiArray : NSObject, NSSecureCoding
 {
     /// Deprecated in macOS 100000.
-    [Selector("dataPointer")] public void* DataPointer { get; }
-    [Selector("dataType")] public MLMultiArrayDataType DataType { get; }
-    [Selector("shape")] public NSArray Shape { get; }
-    [Selector("strides")] public NSArray Strides { get; }
-    [Selector("count")] public NSInteger Count { get; }
-    [Selector("pixelBuffer")] public CVPixelBufferRef? PixelBuffer { get; }
+    [Selector("dataPointer")]
+    public void* DataPointer { get; }
+    [Selector("dataType")]
+    public MLMultiArrayDataType DataType { get; }
+    [Selector("shape")]
+    public NSArray Shape { get; }
+    [Selector("strides")]
+    public NSArray Strides { get; }
+    [Selector("count")]
+    public NSInteger Count { get; }
+    [Selector("pixelBuffer")]
+    public CVPixelBufferRef? PixelBuffer { get; }
 }
 
 public objc closure void MLMultiArrayInitWithDataPointerShapeDataTypeStridesDeallocatorErrorDeallocatorBlock(void* arg0);
@@ -59,10 +65,14 @@ public objc closure void MLMultiArrayInitWithDataPointerShapeDataTypeStridesDeal
 /// Creation, a category of MLMultiArray.
 public extern objc class MLMultiArray
 {
-    [Selector("initWithShape:dataType:error:")] public Self? InitWithShapeDataTypeError(NSArray shape, MLMultiArrayDataType dataType, out NSError? error);
-    [Selector("initWithShape:dataType:strides:")] public Self InitWithShapeDataTypeStrides(NSArray shape, MLMultiArrayDataType dataType, NSArray strides);
-    [Selector("initWithDataPointer:shape:dataType:strides:deallocator:error:")] public Self? InitWithDataPointerShapeDataTypeStridesDeallocatorError(void* dataPointer, NSArray shape, MLMultiArrayDataType dataType, NSArray strides, MLMultiArrayInitWithDataPointerShapeDataTypeStridesDeallocatorErrorDeallocatorBlock? deallocator, out NSError? error);
-    [Selector("initWithPixelBuffer:shape:")] public Self InitWithPixelBufferShape(CVPixelBufferRef pixelBuffer, NSArray shape);
+    [Selector("initWithShape:dataType:error:")]
+    public Self? InitWithShapeDataTypeError(NSArray shape, MLMultiArrayDataType dataType, out NSError? error);
+    [Selector("initWithShape:dataType:strides:")]
+    public Self InitWithShapeDataTypeStrides(NSArray shape, MLMultiArrayDataType dataType, NSArray strides);
+    [Selector("initWithDataPointer:shape:dataType:strides:deallocator:error:")]
+    public Self? InitWithDataPointerShapeDataTypeStridesDeallocatorError(void* dataPointer, NSArray shape, MLMultiArrayDataType dataType, NSArray strides, MLMultiArrayInitWithDataPointerShapeDataTypeStridesDeallocatorErrorDeallocatorBlock? deallocator, out NSError? error);
+    [Selector("initWithPixelBuffer:shape:")]
+    public Self InitWithPixelBufferShape(CVPixelBufferRef pixelBuffer, NSArray shape);
 }
 
 public objc closure void MLMultiArrayGetBytesWithHandlerHandlerBlock(void* arg0, NSInteger arg1);
@@ -72,29 +82,37 @@ public objc closure void MLMultiArrayGetMutableBytesWithHandlerHandlerBlock(void
 /// ScopedBufferAccess, a category of MLMultiArray.
 public extern objc class MLMultiArray
 {
-    [Selector("getBytesWithHandler:")] public void GetBytesWithHandler(MLMultiArrayGetBytesWithHandlerHandlerBlock handler);
-    [Selector("getMutableBytesWithHandler:")] public void GetMutableBytesWithHandler(MLMultiArrayGetMutableBytesWithHandlerHandlerBlock handler);
+    [Selector("getBytesWithHandler:")]
+    public void GetBytesWithHandler(MLMultiArrayGetBytesWithHandlerHandlerBlock handler);
+    [Selector("getMutableBytesWithHandler:")]
+    public void GetMutableBytesWithHandler(MLMultiArrayGetMutableBytesWithHandlerHandlerBlock handler);
 }
 
 /// Concatenating, a category of MLMultiArray.
 public extern objc class MLMultiArray
 {
-    [Selector("multiArrayByConcatenatingMultiArrays:alongAxis:dataType:")] public static Self MultiArrayByConcatenatingMultiArraysAlongAxisDataType(NSArray multiArrays, NSInteger axis, MLMultiArrayDataType dataType);
+    [Selector("multiArrayByConcatenatingMultiArrays:alongAxis:dataType:")]
+    public static Self MultiArrayByConcatenatingMultiArraysAlongAxisDataType(NSArray multiArrays, NSInteger axis, MLMultiArrayDataType dataType);
 }
 
 /// NSNumberDataAccess, a category of MLMultiArray.
 public extern objc class MLMultiArray
 {
-    [Selector("objectAtIndexedSubscript:")] public NSNumber ObjectAtIndexedSubscript(NSInteger idx);
-    [Selector("objectForKeyedSubscript:")] public NSNumber ObjectForKeyedSubscript(NSArray key);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(NSNumber obj, NSInteger idx);
-    [Selector("setObject:forKeyedSubscript:")] public void SetObjectForKeyedSubscript(NSNumber obj, NSArray key);
+    [Selector("objectAtIndexedSubscript:")]
+    public NSNumber ObjectAtIndexedSubscript(NSInteger idx);
+    [Selector("objectForKeyedSubscript:")]
+    public NSNumber ObjectForKeyedSubscript(NSArray key);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(NSNumber obj, NSInteger idx);
+    [Selector("setObject:forKeyedSubscript:")]
+    public void SetObjectForKeyedSubscript(NSNumber obj, NSArray key);
 }
 
 /// Transferring, a category of MLMultiArray.
 public extern objc class MLMultiArray
 {
-    [Selector("transferToMultiArray:")] public void TransferToMultiArray(MLMultiArray destinationMultiArray);
+    [Selector("transferToMultiArray:")]
+    public void TransferToMultiArray(MLMultiArray destinationMultiArray);
 }
 
 #endif

@@ -37,9 +37,12 @@ public objc closure void CKDiscoverAllUserIdentitiesOperationDiscoverAllUserIden
 /// Deprecated in macOS 14.0.
 public extern objc class CKDiscoverAllUserIdentitiesOperation : CKOperation
 {
-    [Selector("userIdentityDiscoveredBlock", "setUserIdentityDiscoveredBlock:")] public CKDiscoverAllUserIdentitiesOperationUserIdentityDiscoveredBlock? UserIdentityDiscoveredBlock { get; set; }
-    [Selector("discoverAllUserIdentitiesCompletionBlock", "setDiscoverAllUserIdentitiesCompletionBlock:")] public CKDiscoverAllUserIdentitiesOperationDiscoverAllUserIdentitiesCompletionBlock? DiscoverAllUserIdentitiesCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("userIdentityDiscoveredBlock", "setUserIdentityDiscoveredBlock:")]
+    public CKDiscoverAllUserIdentitiesOperationUserIdentityDiscoveredBlock? UserIdentityDiscoveredBlock { get; set; }
+    [Selector("discoverAllUserIdentitiesCompletionBlock", "setDiscoverAllUserIdentitiesCompletionBlock:")]
+    public CKDiscoverAllUserIdentitiesOperationDiscoverAllUserIdentitiesCompletionBlock? DiscoverAllUserIdentitiesCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

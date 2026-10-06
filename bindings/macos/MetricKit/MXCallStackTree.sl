@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class MXCallStackTree : NSObject, NSSecureCoding
 {
-    [Selector("JSONRepresentation")] public NSData JSONRepresentation();
+    [Selector("JSONRepresentation")]
+    public NSData JSONRepresentation();
 }
 
 #endif

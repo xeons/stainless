@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class HKSeriesBuilder : NSObject
 {
-    [Selector("discard")] public void Discard();
+    [Selector("discard")]
+    public void Discard();
 }
 
 #endif

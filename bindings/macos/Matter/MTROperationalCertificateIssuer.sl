@@ -33,19 +33,26 @@ import Standard.ObjC;
 
 public extern objc class MTROperationalCertificateChain : NSObject
 {
-    [Selector("operationalCertificate", "setOperationalCertificate:")] public MTRCertificateDERBytes OperationalCertificate { get; set; }
-    [Selector("intermediateCertificate", "setIntermediateCertificate:")] public MTRCertificateDERBytes? IntermediateCertificate { get; set; }
-    [Selector("rootCertificate", "setRootCertificate:")] public MTRCertificateDERBytes RootCertificate { get; set; }
-    [Selector("adminSubject", "setAdminSubject:")] public NSNumber? AdminSubject { get; set; }
-    [Selector("initWithOperationalCertificate:intermediateCertificate:rootCertificate:adminSubject:")] public Self InitWithOperationalCertificateIntermediateCertificateRootCertificateAdminSubject(MTRCertificateDERBytes operationalCertificate, MTRCertificateDERBytes? intermediateCertificate, MTRCertificateDERBytes rootCertificate, NSNumber? adminSubject);
+    [Selector("operationalCertificate", "setOperationalCertificate:")]
+    public MTRCertificateDERBytes OperationalCertificate { get; set; }
+    [Selector("intermediateCertificate", "setIntermediateCertificate:")]
+    public MTRCertificateDERBytes? IntermediateCertificate { get; set; }
+    [Selector("rootCertificate", "setRootCertificate:")]
+    public MTRCertificateDERBytes RootCertificate { get; set; }
+    [Selector("adminSubject", "setAdminSubject:")]
+    public NSNumber? AdminSubject { get; set; }
+    [Selector("initWithOperationalCertificate:intermediateCertificate:rootCertificate:adminSubject:")]
+    public Self InitWithOperationalCertificateIntermediateCertificateRootCertificateAdminSubject(MTRCertificateDERBytes operationalCertificate, MTRCertificateDERBytes? intermediateCertificate, MTRCertificateDERBytes rootCertificate, NSNumber? adminSubject);
 }
 
 public objc closure void MTROperationalCertificateIssuerIssueOperationalCertificateForRequestAttestationInfoControllerCompletionCompletionBlock(MTROperationalCertificateChain? arg0, NSError? arg1);
 
 public objc interface MTROperationalCertificateIssuer
 {
-    [Selector("shouldSkipAttestationCertificateValidation")] bool ShouldSkipAttestationCertificateValidation { get; }
-    [Selector("issueOperationalCertificateForRequest:attestationInfo:controller:completion:")] void IssueOperationalCertificateForRequestAttestationInfoControllerCompletion(MTROperationalCSRInfo csrInfo, MTRDeviceAttestationInfo attestationInfo, MTRDeviceController controller, MTROperationalCertificateIssuerIssueOperationalCertificateForRequestAttestationInfoControllerCompletionCompletionBlock completion);
+    [Selector("shouldSkipAttestationCertificateValidation")]
+    bool ShouldSkipAttestationCertificateValidation { get; }
+    [Selector("issueOperationalCertificateForRequest:attestationInfo:controller:completion:")]
+    void IssueOperationalCertificateForRequestAttestationInfoControllerCompletion(MTROperationalCSRInfo csrInfo, MTRDeviceAttestationInfo attestationInfo, MTRDeviceController controller, MTROperationalCertificateIssuerIssueOperationalCertificateForRequestAttestationInfoControllerCompletionCompletionBlock completion);
 }
 
 /// Deprecated in macOS 13.3.
@@ -54,7 +61,8 @@ public objc closure void MTRNOCChainGenerationCompleteHandler(NSData arg0, NSDat
 /// Deprecated in macOS 13.3.
 public objc interface MTRNOCChainIssuer : NSObjectProtocol
 {
-    [Selector("onNOCChainGenerationNeeded:attestationInfo:onNOCChainGenerationComplete:")] void OnNOCChainGenerationNeededAttestationInfoOnNOCChainGenerationComplete(CSRInfo csrInfo, AttestationInfo attestationInfo, MTRNOCChainGenerationCompleteHandler onNOCChainGenerationComplete);
+    [Selector("onNOCChainGenerationNeeded:attestationInfo:onNOCChainGenerationComplete:")]
+    void OnNOCChainGenerationNeededAttestationInfoOnNOCChainGenerationComplete(CSRInfo csrInfo, AttestationInfo attestationInfo, MTRNOCChainGenerationCompleteHandler onNOCChainGenerationComplete);
 }
 
 #endif

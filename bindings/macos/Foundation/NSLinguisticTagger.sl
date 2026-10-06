@@ -176,49 +176,71 @@ public objc closure void NSLinguisticTaggerEnumerateTagsForStringRangeUnitScheme
 public extern objc class NSLinguisticTagger : NSObject
 {
     /// Deprecated in macOS 100000.
-    [Selector("tagSchemes")] public NSArray TagSchemes { get; }
+    [Selector("tagSchemes")]
+    public NSArray TagSchemes { get; }
     /// Deprecated in macOS 100000.
-    [Selector("string", "setString:")] public NSString? String { get; set; }
+    [Selector("string", "setString:")]
+    public NSString? String { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("dominantLanguage")] public NSString? DominantLanguage { get; }
+    [Selector("dominantLanguage")]
+    public NSString? DominantLanguage { get; }
     /// Deprecated in macOS 100000.
-    [Selector("initWithTagSchemes:options:")] public Self InitWithTagSchemesOptions(NSArray tagSchemes, NSUInteger opts);
+    [Selector("initWithTagSchemes:options:")]
+    public Self InitWithTagSchemesOptions(NSArray tagSchemes, NSUInteger opts);
     /// Deprecated in macOS 100000.
-    [Selector("availableTagSchemesForUnit:language:")] public static NSArray AvailableTagSchemesForUnitLanguage(NSLinguisticTaggerUnit unit, NSString language);
+    [Selector("availableTagSchemesForUnit:language:")]
+    public static NSArray AvailableTagSchemesForUnitLanguage(NSLinguisticTaggerUnit unit, NSString language);
     /// Deprecated in macOS 100000.
-    [Selector("availableTagSchemesForLanguage:")] public static NSArray AvailableTagSchemesForLanguage(NSString language);
+    [Selector("availableTagSchemesForLanguage:")]
+    public static NSArray AvailableTagSchemesForLanguage(NSString language);
     /// Deprecated in macOS 100000.
-    [Selector("setOrthography:range:")] public void SetOrthographyRange(NSOrthography? orthography, NSRange range);
+    [Selector("setOrthography:range:")]
+    public void SetOrthographyRange(NSOrthography? orthography, NSRange range);
     /// Deprecated in macOS 100000.
-    [Selector("orthographyAtIndex:effectiveRange:")] public NSOrthography? OrthographyAtIndexEffectiveRange(NSUInteger charIndex, NSRangePointer effectiveRange);
+    [Selector("orthographyAtIndex:effectiveRange:")]
+    public NSOrthography? OrthographyAtIndexEffectiveRange(NSUInteger charIndex, NSRangePointer effectiveRange);
     /// Deprecated in macOS 100000.
-    [Selector("stringEditedInRange:changeInLength:")] public void StringEditedInRangeChangeInLength(NSRange newRange, NSInteger delta);
+    [Selector("stringEditedInRange:changeInLength:")]
+    public void StringEditedInRangeChangeInLength(NSRange newRange, NSInteger delta);
     /// Deprecated in macOS 100000.
-    [Selector("tokenRangeAtIndex:unit:")] public NSRange TokenRangeAtIndexUnit(NSUInteger charIndex, NSLinguisticTaggerUnit unit);
+    [Selector("tokenRangeAtIndex:unit:")]
+    public NSRange TokenRangeAtIndexUnit(NSUInteger charIndex, NSLinguisticTaggerUnit unit);
     /// Deprecated in macOS 100000.
-    [Selector("sentenceRangeForRange:")] public NSRange SentenceRangeForRange(NSRange range);
+    [Selector("sentenceRangeForRange:")]
+    public NSRange SentenceRangeForRange(NSRange range);
     /// Deprecated in macOS 100000.
-    [Selector("enumerateTagsInRange:unit:scheme:options:usingBlock:")] public void EnumerateTagsInRangeUnitSchemeOptionsUsingBlock(NSRange range, NSLinguisticTaggerUnit unit, NSLinguisticTagScheme scheme, NSLinguisticTaggerOptions options, NSLinguisticTaggerEnumerateTagsInRangeUnitSchemeOptionsUsingBlockBlock block);
+    [Selector("enumerateTagsInRange:unit:scheme:options:usingBlock:")]
+    public void EnumerateTagsInRangeUnitSchemeOptionsUsingBlock(NSRange range, NSLinguisticTaggerUnit unit, NSLinguisticTagScheme scheme, NSLinguisticTaggerOptions options, NSLinguisticTaggerEnumerateTagsInRangeUnitSchemeOptionsUsingBlockBlock block);
     /// Deprecated in macOS 100000.
-    [Selector("tagAtIndex:unit:scheme:tokenRange:")] public NSLinguisticTag? TagAtIndexUnitSchemeTokenRange(NSUInteger charIndex, NSLinguisticTaggerUnit unit, NSLinguisticTagScheme scheme, NSRangePointer tokenRange);
+    [Selector("tagAtIndex:unit:scheme:tokenRange:")]
+    public NSLinguisticTag? TagAtIndexUnitSchemeTokenRange(NSUInteger charIndex, NSLinguisticTaggerUnit unit, NSLinguisticTagScheme scheme, NSRangePointer tokenRange);
     /// Deprecated in macOS 100000.
-    [Selector("tagsInRange:unit:scheme:options:tokenRanges:")] public NSArray TagsInRangeUnitSchemeOptionsTokenRanges(NSRange range, NSLinguisticTaggerUnit unit, NSLinguisticTagScheme scheme, NSLinguisticTaggerOptions options, out NSArray? tokenRanges);
+    [Selector("tagsInRange:unit:scheme:options:tokenRanges:")]
+    public NSArray TagsInRangeUnitSchemeOptionsTokenRanges(NSRange range, NSLinguisticTaggerUnit unit, NSLinguisticTagScheme scheme, NSLinguisticTaggerOptions options, out NSArray? tokenRanges);
     /// Deprecated in macOS 100000.
-    [Selector("enumerateTagsInRange:scheme:options:usingBlock:")] public void EnumerateTagsInRangeSchemeOptionsUsingBlock(NSRange range, NSLinguisticTagScheme tagScheme, NSLinguisticTaggerOptions opts, NSLinguisticTaggerEnumerateTagsInRangeSchemeOptionsUsingBlockBlock block);
+    [Selector("enumerateTagsInRange:scheme:options:usingBlock:")]
+    public void EnumerateTagsInRangeSchemeOptionsUsingBlock(NSRange range, NSLinguisticTagScheme tagScheme, NSLinguisticTaggerOptions opts, NSLinguisticTaggerEnumerateTagsInRangeSchemeOptionsUsingBlockBlock block);
     /// Deprecated in macOS 100000.
-    [Selector("tagAtIndex:scheme:tokenRange:sentenceRange:")] public NSLinguisticTag? TagAtIndexSchemeTokenRangeSentenceRange(NSUInteger charIndex, NSLinguisticTagScheme scheme, NSRangePointer tokenRange, NSRangePointer sentenceRange);
+    [Selector("tagAtIndex:scheme:tokenRange:sentenceRange:")]
+    public NSLinguisticTag? TagAtIndexSchemeTokenRangeSentenceRange(NSUInteger charIndex, NSLinguisticTagScheme scheme, NSRangePointer tokenRange, NSRangePointer sentenceRange);
     /// Deprecated in macOS 100000.
-    [Selector("tagsInRange:scheme:options:tokenRanges:")] public NSArray TagsInRangeSchemeOptionsTokenRanges(NSRange range, NSString tagScheme, NSLinguisticTaggerOptions opts, out NSArray? tokenRanges);
+    [Selector("tagsInRange:scheme:options:tokenRanges:")]
+    public NSArray TagsInRangeSchemeOptionsTokenRanges(NSRange range, NSString tagScheme, NSLinguisticTaggerOptions opts, out NSArray? tokenRanges);
     /// Deprecated in macOS 100000.
-    [Selector("dominantLanguageForString:")] public static NSString? DominantLanguageForString(NSString string);
+    [Selector("dominantLanguageForString:")]
+    public static NSString? DominantLanguageForString(NSString string);
     /// Deprecated in macOS 100000.
-    [Selector("tagForString:atIndex:unit:scheme:orthography:tokenRange:")] public static NSLinguisticTag? TagForStringAtIndexUnitSchemeOrthographyTokenRange(NSString string, NSUInteger charIndex, NSLinguisticTaggerUnit unit, NSLinguisticTagScheme scheme, NSOrthography? orthography, NSRangePointer tokenRange);
+    [Selector("tagForString:atIndex:unit:scheme:orthography:tokenRange:")]
+    public static NSLinguisticTag? TagForStringAtIndexUnitSchemeOrthographyTokenRange(NSString string, NSUInteger charIndex, NSLinguisticTaggerUnit unit, NSLinguisticTagScheme scheme, NSOrthography? orthography, NSRangePointer tokenRange);
     /// Deprecated in macOS 100000.
-    [Selector("tagsForString:range:unit:scheme:options:orthography:tokenRanges:")] public static NSArray TagsForStringRangeUnitSchemeOptionsOrthographyTokenRanges(NSString string, NSRange range, NSLinguisticTaggerUnit unit, NSLinguisticTagScheme scheme, NSLinguisticTaggerOptions options, NSOrthography? orthography, out NSArray? tokenRanges);
+    [Selector("tagsForString:range:unit:scheme:options:orthography:tokenRanges:")]
+    public static NSArray TagsForStringRangeUnitSchemeOptionsOrthographyTokenRanges(NSString string, NSRange range, NSLinguisticTaggerUnit unit, NSLinguisticTagScheme scheme, NSLinguisticTaggerOptions options, NSOrthography? orthography, out NSArray? tokenRanges);
     /// Deprecated in macOS 100000.
-    [Selector("enumerateTagsForString:range:unit:scheme:options:orthography:usingBlock:")] public static void EnumerateTagsForStringRangeUnitSchemeOptionsOrthographyUsingBlock(NSString string, NSRange range, NSLinguisticTaggerUnit unit, NSLinguisticTagScheme scheme, NSLinguisticTaggerOptions options, NSOrthography? orthography, NSLinguisticTaggerEnumerateTagsForStringRangeUnitSchemeOptionsOrthographyUsingBlockBlock block);
+    [Selector("enumerateTagsForString:range:unit:scheme:options:orthography:usingBlock:")]
+    public static void EnumerateTagsForStringRangeUnitSchemeOptionsOrthographyUsingBlock(NSString string, NSRange range, NSLinguisticTaggerUnit unit, NSLinguisticTagScheme scheme, NSLinguisticTaggerOptions options, NSOrthography? orthography, NSLinguisticTaggerEnumerateTagsForStringRangeUnitSchemeOptionsOrthographyUsingBlockBlock block);
     /// Deprecated in macOS 100000.
-    [Selector("possibleTagsAtIndex:scheme:tokenRange:sentenceRange:scores:")] public NSArray? PossibleTagsAtIndexSchemeTokenRangeSentenceRangeScores(NSUInteger charIndex, NSString tagScheme, NSRangePointer tokenRange, NSRangePointer sentenceRange, out NSArray? scores);
+    [Selector("possibleTagsAtIndex:scheme:tokenRange:sentenceRange:scores:")]
+    public NSArray? PossibleTagsAtIndexSchemeTokenRangeSentenceRangeScores(NSUInteger charIndex, NSString tagScheme, NSRangePointer tokenRange, NSRangePointer sentenceRange, out NSArray? scores);
 }
 
 public objc closure void NSStringEnumerateLinguisticTagsInRangeSchemeOptionsOrthographyUsingBlockBlock(NSLinguisticTag? arg0, NSRange arg1, NSRange arg2, bool* arg3);
@@ -227,9 +249,11 @@ public objc closure void NSStringEnumerateLinguisticTagsInRangeSchemeOptionsOrth
 public extern objc class NSString
 {
     /// Deprecated in macOS 100000.
-    [Selector("linguisticTagsInRange:scheme:options:orthography:tokenRanges:")] public NSArray LinguisticTagsInRangeSchemeOptionsOrthographyTokenRanges(NSRange range, NSLinguisticTagScheme scheme, NSLinguisticTaggerOptions options, NSOrthography? orthography, out NSArray? tokenRanges);
+    [Selector("linguisticTagsInRange:scheme:options:orthography:tokenRanges:")]
+    public NSArray LinguisticTagsInRangeSchemeOptionsOrthographyTokenRanges(NSRange range, NSLinguisticTagScheme scheme, NSLinguisticTaggerOptions options, NSOrthography? orthography, out NSArray? tokenRanges);
     /// Deprecated in macOS 100000.
-    [Selector("enumerateLinguisticTagsInRange:scheme:options:orthography:usingBlock:")] public void EnumerateLinguisticTagsInRangeSchemeOptionsOrthographyUsingBlock(NSRange range, NSLinguisticTagScheme scheme, NSLinguisticTaggerOptions options, NSOrthography? orthography, NSStringEnumerateLinguisticTagsInRangeSchemeOptionsOrthographyUsingBlockBlock block);
+    [Selector("enumerateLinguisticTagsInRange:scheme:options:orthography:usingBlock:")]
+    public void EnumerateLinguisticTagsInRangeSchemeOptionsOrthographyUsingBlock(NSRange range, NSLinguisticTagScheme scheme, NSLinguisticTaggerOptions options, NSOrthography? orthography, NSStringEnumerateLinguisticTagsInRangeSchemeOptionsOrthographyUsingBlockBlock block);
 }
 
 #endif

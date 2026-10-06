@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class HKQuery : NSObject
 {
-    [Selector("objectType")] public HKObjectType? ObjectType { get; }
-    [Selector("sampleType")] public HKSampleType? SampleType { get; }
-    [Selector("predicate")] public NSPredicate? Predicate { get; }
+    [Selector("objectType")]
+    public HKObjectType? ObjectType { get; }
+    [Selector("sampleType")]
+    public HKSampleType? SampleType { get; }
+    [Selector("predicate")]
+    public NSPredicate? Predicate { get; }
 }
 
 [Flags]
@@ -49,135 +52,191 @@ public enum HKQueryOptions : ulong
 /// HKObjectPredicates, a category of HKQuery.
 public extern objc class HKQuery
 {
-    [Selector("predicateForObjectsWithMetadataKey:")] public static NSPredicate PredicateForObjectsWithMetadataKey(NSString key);
-    [Selector("predicateForObjectsWithMetadataKey:allowedValues:")] public static NSPredicate PredicateForObjectsWithMetadataKeyAllowedValues(NSString key, NSArray allowedValues);
-    [Selector("predicateForObjectsWithMetadataKey:operatorType:value:")] public static NSPredicate PredicateForObjectsWithMetadataKeyOperatorTypeValue(NSString key, NSPredicateOperatorType operatorType, AnyObject value);
-    [Selector("predicateForObjectsFromSource:")] public static NSPredicate PredicateForObjectsFromSource(HKSource source);
-    [Selector("predicateForObjectsFromSources:")] public static NSPredicate PredicateForObjectsFromSources(NSSet sources);
-    [Selector("predicateForObjectsFromSourceRevisions:")] public static NSPredicate PredicateForObjectsFromSourceRevisions(NSSet sourceRevisions);
-    [Selector("predicateForObjectsFromDevices:")] public static NSPredicate PredicateForObjectsFromDevices(NSSet devices);
-    [Selector("predicateForObjectsWithDeviceProperty:allowedValues:")] public static NSPredicate PredicateForObjectsWithDevicePropertyAllowedValues(NSString key, NSSet allowedValues);
-    [Selector("predicateForObjectWithUUID:")] public static NSPredicate PredicateForObjectWithUUID(NSUUID UUID);
-    [Selector("predicateForObjectsWithUUIDs:")] public static NSPredicate PredicateForObjectsWithUUIDs(NSSet UUIDs);
-    [Selector("predicateForObjectsWithNoCorrelation")] public static NSPredicate PredicateForObjectsWithNoCorrelation();
-    [Selector("predicateForObjectsFromWorkout:")] public static NSPredicate PredicateForObjectsFromWorkout(HKWorkout workout);
-    [Selector("predicateForObjectsAssociatedWithElectrocardiogram:")] public static NSPredicate PredicateForObjectsAssociatedWithElectrocardiogram(HKElectrocardiogram electrocardiogram);
-    [Selector("predicateForWorkoutEffortSamplesRelatedToWorkout:activity:")] public static NSPredicate PredicateForWorkoutEffortSamplesRelatedToWorkoutActivity(HKWorkout workout, HKWorkoutActivity? activity);
+    [Selector("predicateForObjectsWithMetadataKey:")]
+    public static NSPredicate PredicateForObjectsWithMetadataKey(NSString key);
+    [Selector("predicateForObjectsWithMetadataKey:allowedValues:")]
+    public static NSPredicate PredicateForObjectsWithMetadataKeyAllowedValues(NSString key, NSArray allowedValues);
+    [Selector("predicateForObjectsWithMetadataKey:operatorType:value:")]
+    public static NSPredicate PredicateForObjectsWithMetadataKeyOperatorTypeValue(NSString key, NSPredicateOperatorType operatorType, AnyObject value);
+    [Selector("predicateForObjectsFromSource:")]
+    public static NSPredicate PredicateForObjectsFromSource(HKSource source);
+    [Selector("predicateForObjectsFromSources:")]
+    public static NSPredicate PredicateForObjectsFromSources(NSSet sources);
+    [Selector("predicateForObjectsFromSourceRevisions:")]
+    public static NSPredicate PredicateForObjectsFromSourceRevisions(NSSet sourceRevisions);
+    [Selector("predicateForObjectsFromDevices:")]
+    public static NSPredicate PredicateForObjectsFromDevices(NSSet devices);
+    [Selector("predicateForObjectsWithDeviceProperty:allowedValues:")]
+    public static NSPredicate PredicateForObjectsWithDevicePropertyAllowedValues(NSString key, NSSet allowedValues);
+    [Selector("predicateForObjectWithUUID:")]
+    public static NSPredicate PredicateForObjectWithUUID(NSUUID UUID);
+    [Selector("predicateForObjectsWithUUIDs:")]
+    public static NSPredicate PredicateForObjectsWithUUIDs(NSSet UUIDs);
+    [Selector("predicateForObjectsWithNoCorrelation")]
+    public static NSPredicate PredicateForObjectsWithNoCorrelation();
+    [Selector("predicateForObjectsFromWorkout:")]
+    public static NSPredicate PredicateForObjectsFromWorkout(HKWorkout workout);
+    [Selector("predicateForObjectsAssociatedWithElectrocardiogram:")]
+    public static NSPredicate PredicateForObjectsAssociatedWithElectrocardiogram(HKElectrocardiogram electrocardiogram);
+    [Selector("predicateForWorkoutEffortSamplesRelatedToWorkout:activity:")]
+    public static NSPredicate PredicateForWorkoutEffortSamplesRelatedToWorkoutActivity(HKWorkout workout, HKWorkoutActivity? activity);
 }
 
 /// HKSamplePredicates, a category of HKQuery.
 public extern objc class HKQuery
 {
-    [Selector("predicateForSamplesWithStartDate:endDate:options:")] public static NSPredicate PredicateForSamplesWithStartDateEndDateOptions(NSDate? startDate, NSDate? endDate, HKQueryOptions options);
+    [Selector("predicateForSamplesWithStartDate:endDate:options:")]
+    public static NSPredicate PredicateForSamplesWithStartDateEndDateOptions(NSDate? startDate, NSDate? endDate, HKQueryOptions options);
 }
 
 /// HKQuantitySamplePredicates, a category of HKQuery.
 public extern objc class HKQuery
 {
-    [Selector("predicateForQuantitySamplesWithOperatorType:quantity:")] public static NSPredicate PredicateForQuantitySamplesWithOperatorTypeQuantity(NSPredicateOperatorType operatorType, HKQuantity quantity);
+    [Selector("predicateForQuantitySamplesWithOperatorType:quantity:")]
+    public static NSPredicate PredicateForQuantitySamplesWithOperatorTypeQuantity(NSPredicateOperatorType operatorType, HKQuantity quantity);
 }
 
 /// HKCategorySamplePredicates, a category of HKQuery.
 public extern objc class HKQuery
 {
-    [Selector("predicateForCategorySamplesWithOperatorType:value:")] public static NSPredicate PredicateForCategorySamplesWithOperatorTypeValue(NSPredicateOperatorType operatorType, NSInteger value);
-    [Selector("predicateForCategorySamplesEqualToValues:")] public static NSPredicate PredicateForCategorySamplesEqualToValues(NSSet values);
+    [Selector("predicateForCategorySamplesWithOperatorType:value:")]
+    public static NSPredicate PredicateForCategorySamplesWithOperatorTypeValue(NSPredicateOperatorType operatorType, NSInteger value);
+    [Selector("predicateForCategorySamplesEqualToValues:")]
+    public static NSPredicate PredicateForCategorySamplesEqualToValues(NSSet values);
 }
 
 /// HKWorkoutPredicates, a category of HKQuery.
 public extern objc class HKQuery
 {
-    [Selector("predicateForWorkoutsWithWorkoutActivityType:")] public static NSPredicate PredicateForWorkoutsWithWorkoutActivityType(HKWorkoutActivityType workoutActivityType);
-    [Selector("predicateForWorkoutsWithOperatorType:duration:")] public static NSPredicate PredicateForWorkoutsWithOperatorTypeDuration(NSPredicateOperatorType operatorType, NSTimeInterval duration);
+    [Selector("predicateForWorkoutsWithWorkoutActivityType:")]
+    public static NSPredicate PredicateForWorkoutsWithWorkoutActivityType(HKWorkoutActivityType workoutActivityType);
+    [Selector("predicateForWorkoutsWithOperatorType:duration:")]
+    public static NSPredicate PredicateForWorkoutsWithOperatorTypeDuration(NSPredicateOperatorType operatorType, NSTimeInterval duration);
     /// Deprecated in macOS 15.0.
-    [Selector("predicateForWorkoutsWithOperatorType:totalEnergyBurned:")] public static NSPredicate PredicateForWorkoutsWithOperatorTypeTotalEnergyBurned(NSPredicateOperatorType operatorType, HKQuantity totalEnergyBurned);
+    [Selector("predicateForWorkoutsWithOperatorType:totalEnergyBurned:")]
+    public static NSPredicate PredicateForWorkoutsWithOperatorTypeTotalEnergyBurned(NSPredicateOperatorType operatorType, HKQuantity totalEnergyBurned);
     /// Deprecated in macOS 100000.
-    [Selector("predicateForWorkoutsWithOperatorType:totalDistance:")] public static NSPredicate PredicateForWorkoutsWithOperatorTypeTotalDistance(NSPredicateOperatorType operatorType, HKQuantity totalDistance);
+    [Selector("predicateForWorkoutsWithOperatorType:totalDistance:")]
+    public static NSPredicate PredicateForWorkoutsWithOperatorTypeTotalDistance(NSPredicateOperatorType operatorType, HKQuantity totalDistance);
     /// Deprecated in macOS 15.0.
-    [Selector("predicateForWorkoutsWithOperatorType:totalSwimmingStrokeCount:")] public static NSPredicate PredicateForWorkoutsWithOperatorTypeTotalSwimmingStrokeCount(NSPredicateOperatorType operatorType, HKQuantity totalSwimmingStrokeCount);
+    [Selector("predicateForWorkoutsWithOperatorType:totalSwimmingStrokeCount:")]
+    public static NSPredicate PredicateForWorkoutsWithOperatorTypeTotalSwimmingStrokeCount(NSPredicateOperatorType operatorType, HKQuantity totalSwimmingStrokeCount);
     /// Deprecated in macOS 15.0.
-    [Selector("predicateForWorkoutsWithOperatorType:totalFlightsClimbed:")] public static NSPredicate PredicateForWorkoutsWithOperatorTypeTotalFlightsClimbed(NSPredicateOperatorType operatorType, HKQuantity totalFlightsClimbed);
-    [Selector("predicateForWorkoutsWithOperatorType:quantityType:sumQuantity:")] public static NSPredicate PredicateForWorkoutsWithOperatorTypeQuantityTypeSumQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity sumQuantity);
-    [Selector("predicateForWorkoutsWithOperatorType:quantityType:minimumQuantity:")] public static NSPredicate PredicateForWorkoutsWithOperatorTypeQuantityTypeMinimumQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity minimumQuantity);
-    [Selector("predicateForWorkoutsWithOperatorType:quantityType:maximumQuantity:")] public static NSPredicate PredicateForWorkoutsWithOperatorTypeQuantityTypeMaximumQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity maximumQuantity);
-    [Selector("predicateForWorkoutsWithOperatorType:quantityType:averageQuantity:")] public static NSPredicate PredicateForWorkoutsWithOperatorTypeQuantityTypeAverageQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity averageQuantity);
+    [Selector("predicateForWorkoutsWithOperatorType:totalFlightsClimbed:")]
+    public static NSPredicate PredicateForWorkoutsWithOperatorTypeTotalFlightsClimbed(NSPredicateOperatorType operatorType, HKQuantity totalFlightsClimbed);
+    [Selector("predicateForWorkoutsWithOperatorType:quantityType:sumQuantity:")]
+    public static NSPredicate PredicateForWorkoutsWithOperatorTypeQuantityTypeSumQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity sumQuantity);
+    [Selector("predicateForWorkoutsWithOperatorType:quantityType:minimumQuantity:")]
+    public static NSPredicate PredicateForWorkoutsWithOperatorTypeQuantityTypeMinimumQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity minimumQuantity);
+    [Selector("predicateForWorkoutsWithOperatorType:quantityType:maximumQuantity:")]
+    public static NSPredicate PredicateForWorkoutsWithOperatorTypeQuantityTypeMaximumQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity maximumQuantity);
+    [Selector("predicateForWorkoutsWithOperatorType:quantityType:averageQuantity:")]
+    public static NSPredicate PredicateForWorkoutsWithOperatorTypeQuantityTypeAverageQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity averageQuantity);
 }
 
 /// HKWorkoutActivityPredicates, a category of HKQuery.
 public extern objc class HKQuery
 {
-    [Selector("predicateForWorkoutActivitiesWithWorkoutActivityType:")] public static NSPredicate PredicateForWorkoutActivitiesWithWorkoutActivityType(HKWorkoutActivityType workoutActivityType);
-    [Selector("predicateForWorkoutActivitiesWithOperatorType:duration:")] public static NSPredicate PredicateForWorkoutActivitiesWithOperatorTypeDuration(NSPredicateOperatorType operatorType, NSTimeInterval duration);
-    [Selector("predicateForWorkoutActivitiesWithStartDate:endDate:options:")] public static NSPredicate PredicateForWorkoutActivitiesWithStartDateEndDateOptions(NSDate? startDate, NSDate? endDate, HKQueryOptions options);
-    [Selector("predicateForWorkoutActivitiesWithOperatorType:quantityType:sumQuantity:")] public static NSPredicate PredicateForWorkoutActivitiesWithOperatorTypeQuantityTypeSumQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity sumQuantity);
-    [Selector("predicateForWorkoutActivitiesWithOperatorType:quantityType:minimumQuantity:")] public static NSPredicate PredicateForWorkoutActivitiesWithOperatorTypeQuantityTypeMinimumQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity minimumQuantity);
-    [Selector("predicateForWorkoutActivitiesWithOperatorType:quantityType:maximumQuantity:")] public static NSPredicate PredicateForWorkoutActivitiesWithOperatorTypeQuantityTypeMaximumQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity maximumQuantity);
-    [Selector("predicateForWorkoutActivitiesWithOperatorType:quantityType:averageQuantity:")] public static NSPredicate PredicateForWorkoutActivitiesWithOperatorTypeQuantityTypeAverageQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity averageQuantity);
-    [Selector("predicateForWorkoutsWithActivityPredicate:")] public static NSPredicate PredicateForWorkoutsWithActivityPredicate(NSPredicate activityPredicate);
+    [Selector("predicateForWorkoutActivitiesWithWorkoutActivityType:")]
+    public static NSPredicate PredicateForWorkoutActivitiesWithWorkoutActivityType(HKWorkoutActivityType workoutActivityType);
+    [Selector("predicateForWorkoutActivitiesWithOperatorType:duration:")]
+    public static NSPredicate PredicateForWorkoutActivitiesWithOperatorTypeDuration(NSPredicateOperatorType operatorType, NSTimeInterval duration);
+    [Selector("predicateForWorkoutActivitiesWithStartDate:endDate:options:")]
+    public static NSPredicate PredicateForWorkoutActivitiesWithStartDateEndDateOptions(NSDate? startDate, NSDate? endDate, HKQueryOptions options);
+    [Selector("predicateForWorkoutActivitiesWithOperatorType:quantityType:sumQuantity:")]
+    public static NSPredicate PredicateForWorkoutActivitiesWithOperatorTypeQuantityTypeSumQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity sumQuantity);
+    [Selector("predicateForWorkoutActivitiesWithOperatorType:quantityType:minimumQuantity:")]
+    public static NSPredicate PredicateForWorkoutActivitiesWithOperatorTypeQuantityTypeMinimumQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity minimumQuantity);
+    [Selector("predicateForWorkoutActivitiesWithOperatorType:quantityType:maximumQuantity:")]
+    public static NSPredicate PredicateForWorkoutActivitiesWithOperatorTypeQuantityTypeMaximumQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity maximumQuantity);
+    [Selector("predicateForWorkoutActivitiesWithOperatorType:quantityType:averageQuantity:")]
+    public static NSPredicate PredicateForWorkoutActivitiesWithOperatorTypeQuantityTypeAverageQuantity(NSPredicateOperatorType operatorType, HKQuantityType quantityType, HKQuantity averageQuantity);
+    [Selector("predicateForWorkoutsWithActivityPredicate:")]
+    public static NSPredicate PredicateForWorkoutsWithActivityPredicate(NSPredicate activityPredicate);
 }
 
 /// HKActivitySummaryPredicates, a category of HKQuery.
 public extern objc class HKQuery
 {
-    [Selector("predicateForActivitySummaryWithDateComponents:")] public static NSPredicate PredicateForActivitySummaryWithDateComponents(NSDateComponents dateComponents);
-    [Selector("predicateForActivitySummariesBetweenStartDateComponents:endDateComponents:")] public static NSPredicate PredicateForActivitySummariesBetweenStartDateComponentsEndDateComponents(NSDateComponents startDateComponents, NSDateComponents endDateComponents);
+    [Selector("predicateForActivitySummaryWithDateComponents:")]
+    public static NSPredicate PredicateForActivitySummaryWithDateComponents(NSDateComponents dateComponents);
+    [Selector("predicateForActivitySummariesBetweenStartDateComponents:endDateComponents:")]
+    public static NSPredicate PredicateForActivitySummariesBetweenStartDateComponentsEndDateComponents(NSDateComponents startDateComponents, NSDateComponents endDateComponents);
 }
 
 /// HKClinicalRecordPredicates, a category of HKQuery.
 public extern objc class HKQuery
 {
-    [Selector("predicateForClinicalRecordsWithFHIRResourceType:")] public static NSPredicate PredicateForClinicalRecordsWithFHIRResourceType(HKFHIRResourceType resourceType);
-    [Selector("predicateForClinicalRecordsFromSource:FHIRResourceType:identifier:")] public static NSPredicate PredicateForClinicalRecordsFromSourceFHIRResourceTypeIdentifier(HKSource source, HKFHIRResourceType resourceType, NSString identifier);
+    [Selector("predicateForClinicalRecordsWithFHIRResourceType:")]
+    public static NSPredicate PredicateForClinicalRecordsWithFHIRResourceType(HKFHIRResourceType resourceType);
+    [Selector("predicateForClinicalRecordsFromSource:FHIRResourceType:identifier:")]
+    public static NSPredicate PredicateForClinicalRecordsFromSourceFHIRResourceTypeIdentifier(HKSource source, HKFHIRResourceType resourceType, NSString identifier);
 }
 
 /// HKElectrocardiogramPredicates, a category of HKQuery.
 public extern objc class HKQuery
 {
-    [Selector("predicateForElectrocardiogramsWithClassification:")] public static NSPredicate PredicateForElectrocardiogramsWithClassification(HKElectrocardiogramClassification classification);
-    [Selector("predicateForElectrocardiogramsWithSymptomsStatus:")] public static NSPredicate PredicateForElectrocardiogramsWithSymptomsStatus(HKElectrocardiogramSymptomsStatus symptomsStatus);
+    [Selector("predicateForElectrocardiogramsWithClassification:")]
+    public static NSPredicate PredicateForElectrocardiogramsWithClassification(HKElectrocardiogramClassification classification);
+    [Selector("predicateForElectrocardiogramsWithSymptomsStatus:")]
+    public static NSPredicate PredicateForElectrocardiogramsWithSymptomsStatus(HKElectrocardiogramSymptomsStatus symptomsStatus);
 }
 
 /// HKVerifiableClinicalRecordPredicates, a category of HKQuery.
 public extern objc class HKQuery
 {
-    [Selector("predicateForVerifiableClinicalRecordsWithRelevantDateWithinDateInterval:")] public static NSPredicate PredicateForVerifiableClinicalRecordsWithRelevantDateWithinDateInterval(NSDateInterval dateInterval);
+    [Selector("predicateForVerifiableClinicalRecordsWithRelevantDateWithinDateInterval:")]
+    public static NSPredicate PredicateForVerifiableClinicalRecordsWithRelevantDateWithinDateInterval(NSDateInterval dateInterval);
 }
 
 /// HKStateOfMind, a category of HKQuery.
 public extern objc class HKQuery
 {
-    [Selector("predicateForStatesOfMindWithValence:operatorType:")] public static NSPredicate PredicateForStatesOfMindWithValenceOperatorType(double valence, NSPredicateOperatorType operatorType);
-    [Selector("predicateForStatesOfMindWithKind:")] public static NSPredicate PredicateForStatesOfMindWithKind(HKStateOfMindKind kind);
-    [Selector("predicateForStatesOfMindWithLabel:")] public static NSPredicate PredicateForStatesOfMindWithLabel(HKStateOfMindLabel label);
-    [Selector("predicateForStatesOfMindWithAssociation:")] public static NSPredicate PredicateForStatesOfMindWithAssociation(HKStateOfMindAssociation association);
+    [Selector("predicateForStatesOfMindWithValence:operatorType:")]
+    public static NSPredicate PredicateForStatesOfMindWithValenceOperatorType(double valence, NSPredicateOperatorType operatorType);
+    [Selector("predicateForStatesOfMindWithKind:")]
+    public static NSPredicate PredicateForStatesOfMindWithKind(HKStateOfMindKind kind);
+    [Selector("predicateForStatesOfMindWithLabel:")]
+    public static NSPredicate PredicateForStatesOfMindWithLabel(HKStateOfMindLabel label);
+    [Selector("predicateForStatesOfMindWithAssociation:")]
+    public static NSPredicate PredicateForStatesOfMindWithAssociation(HKStateOfMindAssociation association);
 }
 
 /// HKMedicationDoseEvent, a category of HKQuery.
 public extern objc class HKQuery
 {
     /// macOS 26.0 and later.
-    [Selector("predicateForMedicationDoseEventWithStatus:")] public static NSPredicate PredicateForMedicationDoseEventWithStatus(HKMedicationDoseEventLogStatus status);
+    [Selector("predicateForMedicationDoseEventWithStatus:")]
+    public static NSPredicate PredicateForMedicationDoseEventWithStatus(HKMedicationDoseEventLogStatus status);
     /// macOS 26.0 and later.
-    [Selector("predicateForMedicationDoseEventWithStatuses:")] public static NSPredicate PredicateForMedicationDoseEventWithStatuses(NSSet statuses);
+    [Selector("predicateForMedicationDoseEventWithStatuses:")]
+    public static NSPredicate PredicateForMedicationDoseEventWithStatuses(NSSet statuses);
     /// macOS 26.0 and later.
-    [Selector("predicateForMedicationDoseEventWithScheduledDate:")] public static NSPredicate PredicateForMedicationDoseEventWithScheduledDate(NSDate scheduledDate);
+    [Selector("predicateForMedicationDoseEventWithScheduledDate:")]
+    public static NSPredicate PredicateForMedicationDoseEventWithScheduledDate(NSDate scheduledDate);
     /// macOS 26.0 and later.
-    [Selector("predicateForMedicationDoseEventWithScheduledDates:")] public static NSPredicate PredicateForMedicationDoseEventWithScheduledDates(NSSet scheduledDates);
+    [Selector("predicateForMedicationDoseEventWithScheduledDates:")]
+    public static NSPredicate PredicateForMedicationDoseEventWithScheduledDates(NSSet scheduledDates);
     /// macOS 26.0 and later.
-    [Selector("predicateForMedicationDoseEventWithScheduledStartDate:endDate:")] public static NSPredicate PredicateForMedicationDoseEventWithScheduledStartDateEndDate(NSDate? startDate, NSDate? endDate);
+    [Selector("predicateForMedicationDoseEventWithScheduledStartDate:endDate:")]
+    public static NSPredicate PredicateForMedicationDoseEventWithScheduledStartDateEndDate(NSDate? startDate, NSDate? endDate);
     /// macOS 26.0 and later.
-    [Selector("predicateForMedicationDoseEventWithMedicationConceptIdentifier:")] public static NSPredicate PredicateForMedicationDoseEventWithMedicationConceptIdentifier(HKHealthConceptIdentifier medicationConceptIdentifier);
+    [Selector("predicateForMedicationDoseEventWithMedicationConceptIdentifier:")]
+    public static NSPredicate PredicateForMedicationDoseEventWithMedicationConceptIdentifier(HKHealthConceptIdentifier medicationConceptIdentifier);
     /// macOS 26.0 and later.
-    [Selector("predicateForMedicationDoseEventWithMedicationConceptIdentifiers:")] public static NSPredicate PredicateForMedicationDoseEventWithMedicationConceptIdentifiers(NSSet medicationConceptIdentifiers);
+    [Selector("predicateForMedicationDoseEventWithMedicationConceptIdentifiers:")]
+    public static NSPredicate PredicateForMedicationDoseEventWithMedicationConceptIdentifiers(NSSet medicationConceptIdentifiers);
 }
 
 /// HKUserAnnotatedMedications, a category of HKQuery.
 public extern objc class HKQuery
 {
     /// macOS 26.0 and later.
-    [Selector("predicateForUserAnnotatedMedicationsWithIsArchived:")] public static NSPredicate PredicateForUserAnnotatedMedicationsWithIsArchived(bool isArchived);
+    [Selector("predicateForUserAnnotatedMedicationsWithIsArchived:")]
+    public static NSPredicate PredicateForUserAnnotatedMedicationsWithIsArchived(bool isArchived);
     /// macOS 26.0 and later.
-    [Selector("predicateForUserAnnotatedMedicationsWithHasSchedule:")] public static NSPredicate PredicateForUserAnnotatedMedicationsWithHasSchedule(bool hasSchedule);
+    [Selector("predicateForUserAnnotatedMedicationsWithHasSchedule:")]
+    public static NSPredicate PredicateForUserAnnotatedMedicationsWithHasSchedule(bool hasSchedule);
 }
 
 #endif

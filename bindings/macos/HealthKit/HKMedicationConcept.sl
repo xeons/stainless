@@ -72,10 +72,14 @@ public extern "C" HKMedicationGeneralForm HKMedicationGeneralFormUnknown;
 /// macOS 26.0 and later.
 public extern objc class HKMedicationConcept : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("identifier")] public HKHealthConceptIdentifier Identifier { get; }
-    [Selector("displayText")] public NSString DisplayText { get; }
-    [Selector("generalForm")] public HKMedicationGeneralForm GeneralForm { get; }
-    [Selector("relatedCodings")] public NSSet RelatedCodings { get; }
+    [Selector("identifier")]
+    public HKHealthConceptIdentifier Identifier { get; }
+    [Selector("displayText")]
+    public NSString DisplayText { get; }
+    [Selector("generalForm")]
+    public HKMedicationGeneralForm GeneralForm { get; }
+    [Selector("relatedCodings")]
+    public NSSet RelatedCodings { get; }
 }
 
 #endif

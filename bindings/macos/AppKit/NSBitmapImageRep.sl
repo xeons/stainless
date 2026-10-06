@@ -112,53 +112,94 @@ public extern "C" NSBitmapImageRepPropertyKey? NSImageFallbackBackgroundColor;
 
 public extern objc class NSBitmapImageRep : NSImageRep, NSSecureCoding
 {
-    [Selector("bitmapData")] public byte* BitmapData { get; }
-    [Selector("isPlanar")] public bool Planar { get; }
-    [Selector("samplesPerPixel")] public NSInteger SamplesPerPixel { get; }
-    [Selector("bitsPerPixel")] public NSInteger BitsPerPixel { get; }
-    [Selector("bytesPerRow")] public NSInteger BytesPerRow { get; }
-    [Selector("bytesPerPlane")] public NSInteger BytesPerPlane { get; }
-    [Selector("numberOfPlanes")] public NSInteger NumberOfPlanes { get; }
-    [Selector("bitmapFormat")] public NSBitmapFormat BitmapFormat { get; }
-    [Selector("TIFFRepresentation")] public NSData? TIFFRepresentation { get; }
-    [Selector("CGImage")] public CGImageRef? CGImage { get; }
-    [Selector("colorSpace")] public NSColorSpace? ColorSpace { get; }
+    [Selector("bitmapData")]
+    public byte* BitmapData { get; }
+    [Selector("isPlanar")]
+    public bool Planar { get; }
+    [Selector("samplesPerPixel")]
+    public NSInteger SamplesPerPixel { get; }
+    [Selector("bitsPerPixel")]
+    public NSInteger BitsPerPixel { get; }
+    [Selector("bytesPerRow")]
+    public NSInteger BytesPerRow { get; }
+    [Selector("bytesPerPlane")]
+    public NSInteger BytesPerPlane { get; }
+    [Selector("numberOfPlanes")]
+    public NSInteger NumberOfPlanes { get; }
+    [Selector("bitmapFormat")]
+    public NSBitmapFormat BitmapFormat { get; }
+    [Selector("TIFFRepresentation")]
+    public NSData? TIFFRepresentation { get; }
+    [Selector("CGImage")]
+    public CGImageRef? CGImage { get; }
+    [Selector("colorSpace")]
+    public NSColorSpace? ColorSpace { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("initWithFocusedViewRect:")] public Self? InitWithFocusedViewRect(NSRect rect);
-    [Selector("initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bytesPerRow:bitsPerPixel:")] public Self? InitWithBitmapDataPlanesPixelsWidePixelsHighBitsPerSampleSamplesPerPixelHasAlphaIsPlanarColorSpaceNameBytesPerRowBitsPerPixel(byte** planes, NSInteger width, NSInteger height, NSInteger bps, NSInteger spp, bool alpha, bool isPlanar, NSColorSpaceName colorSpaceName, NSInteger rBytes, NSInteger pBits);
-    [Selector("initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bitmapFormat:bytesPerRow:bitsPerPixel:")] public Self? InitWithBitmapDataPlanesPixelsWidePixelsHighBitsPerSampleSamplesPerPixelHasAlphaIsPlanarColorSpaceNameBitmapFormatBytesPerRowBitsPerPixel(byte** planes, NSInteger width, NSInteger height, NSInteger bps, NSInteger spp, bool alpha, bool isPlanar, NSColorSpaceName colorSpaceName, NSBitmapFormat bitmapFormat, NSInteger rBytes, NSInteger pBits);
-    [Selector("initWithCGImage:")] public Self InitWithCGImage(CGImageRef cgImage);
-    [Selector("initWithCIImage:")] public Self InitWithCIImage(CIImage ciImage);
-    [Selector("imageRepsWithData:")] public static NSArray ImageRepsWithData(NSData data);
-    [Selector("imageRepWithData:")] public static Self? ImageRepWithData(NSData data);
-    [Selector("initWithData:")] public Self? InitWithData(NSData data);
-    [Selector("getBitmapDataPlanes:")] public void GetBitmapDataPlanes(byte** data);
-    [Selector("getCompression:factor:")] public void GetCompressionFactor(NSTIFFCompression* compression, float* factor);
-    [Selector("setCompression:factor:")] public void SetCompressionFactor(NSTIFFCompression compression, float factor);
-    [Selector("TIFFRepresentationUsingCompression:factor:")] public NSData? TIFFRepresentationUsingCompressionFactor(NSTIFFCompression comp, float factor);
-    [Selector("TIFFRepresentationOfImageRepsInArray:")] public static NSData? TIFFRepresentationOfImageRepsInArray(NSArray array);
-    [Selector("TIFFRepresentationOfImageRepsInArray:usingCompression:factor:")] public static NSData? TIFFRepresentationOfImageRepsInArrayUsingCompressionFactor(NSArray array, NSTIFFCompression comp, float factor);
-    [Selector("getTIFFCompressionTypes:count:")] public static void GetTIFFCompressionTypesCount(NSTIFFCompression** list, NSInteger* numTypes);
-    [Selector("localizedNameForTIFFCompressionType:")] public static NSString? LocalizedNameForTIFFCompressionType(NSTIFFCompression compression);
-    [Selector("canBeCompressedUsing:")] public bool CanBeCompressedUsing(NSTIFFCompression compression);
-    [Selector("colorizeByMappingGray:toColor:blackMapping:whiteMapping:")] public void ColorizeByMappingGrayToColorBlackMappingWhiteMapping(CGFloat midPoint, NSColor? midPointColor, NSColor? shadowColor, NSColor? lightColor);
-    [Selector("initForIncrementalLoad")] public Self InitForIncrementalLoad();
-    [Selector("incrementalLoadFromData:complete:")] public NSInteger IncrementalLoadFromDataComplete(NSData data, bool complete);
-    [Selector("setColor:atX:y:")] public void SetColorAtXY(NSColor color, NSInteger x, NSInteger y);
-    [Selector("colorAtX:y:")] public NSColor? ColorAtXY(NSInteger x, NSInteger y);
-    [Selector("getPixel:atX:y:")] public void GetPixelAtXY(NSUInteger* p, NSInteger x, NSInteger y);
-    [Selector("setPixel:atX:y:")] public void SetPixelAtXY(NSUInteger* p, NSInteger x, NSInteger y);
-    [Selector("bitmapImageRepByConvertingToColorSpace:renderingIntent:")] public NSBitmapImageRep? BitmapImageRepByConvertingToColorSpaceRenderingIntent(NSColorSpace targetSpace, NSColorRenderingIntent renderingIntent);
-    [Selector("bitmapImageRepByRetaggingWithColorSpace:")] public NSBitmapImageRep? BitmapImageRepByRetaggingWithColorSpace(NSColorSpace newSpace);
+    [Selector("initWithFocusedViewRect:")]
+    public Self? InitWithFocusedViewRect(NSRect rect);
+    [Selector("initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bytesPerRow:bitsPerPixel:")]
+    public Self? InitWithBitmapDataPlanesPixelsWidePixelsHighBitsPerSampleSamplesPerPixelHasAlphaIsPlanarColorSpaceNameBytesPerRowBitsPerPixel(byte** planes, NSInteger width, NSInteger height, NSInteger bps, NSInteger spp, bool alpha, bool isPlanar, NSColorSpaceName colorSpaceName, NSInteger rBytes, NSInteger pBits);
+    [Selector("initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bitmapFormat:bytesPerRow:bitsPerPixel:")]
+    public Self? InitWithBitmapDataPlanesPixelsWidePixelsHighBitsPerSampleSamplesPerPixelHasAlphaIsPlanarColorSpaceNameBitmapFormatBytesPerRowBitsPerPixel(byte** planes, NSInteger width, NSInteger height, NSInteger bps, NSInteger spp, bool alpha, bool isPlanar, NSColorSpaceName colorSpaceName, NSBitmapFormat bitmapFormat, NSInteger rBytes, NSInteger pBits);
+    [Selector("initWithCGImage:")]
+    public Self InitWithCGImage(CGImageRef cgImage);
+    [Selector("initWithCIImage:")]
+    public Self InitWithCIImage(CIImage ciImage);
+    [Selector("imageRepsWithData:")]
+    public static NSArray ImageRepsWithData(NSData data);
+    [Selector("imageRepWithData:")]
+    public static Self? ImageRepWithData(NSData data);
+    [Selector("initWithData:")]
+    public Self? InitWithData(NSData data);
+    [Selector("getBitmapDataPlanes:")]
+    public void GetBitmapDataPlanes(byte** data);
+    [Selector("getCompression:factor:")]
+    public void GetCompressionFactor(NSTIFFCompression* compression, float* factor);
+    [Selector("setCompression:factor:")]
+    public void SetCompressionFactor(NSTIFFCompression compression, float factor);
+    [Selector("TIFFRepresentationUsingCompression:factor:")]
+    public NSData? TIFFRepresentationUsingCompressionFactor(NSTIFFCompression comp, float factor);
+    [Selector("TIFFRepresentationOfImageRepsInArray:")]
+    public static NSData? TIFFRepresentationOfImageRepsInArray(NSArray array);
+    [Selector("TIFFRepresentationOfImageRepsInArray:usingCompression:factor:")]
+    public static NSData? TIFFRepresentationOfImageRepsInArrayUsingCompressionFactor(NSArray array, NSTIFFCompression comp, float factor);
+    [Selector("getTIFFCompressionTypes:count:")]
+    public static void GetTIFFCompressionTypesCount(NSTIFFCompression** list, NSInteger* numTypes);
+    [Selector("localizedNameForTIFFCompressionType:")]
+    public static NSString? LocalizedNameForTIFFCompressionType(NSTIFFCompression compression);
+    [Selector("canBeCompressedUsing:")]
+    public bool CanBeCompressedUsing(NSTIFFCompression compression);
+    [Selector("colorizeByMappingGray:toColor:blackMapping:whiteMapping:")]
+    public void ColorizeByMappingGrayToColorBlackMappingWhiteMapping(CGFloat midPoint, NSColor? midPointColor, NSColor? shadowColor, NSColor? lightColor);
+    [Selector("initForIncrementalLoad")]
+    public Self InitForIncrementalLoad();
+    [Selector("incrementalLoadFromData:complete:")]
+    public NSInteger IncrementalLoadFromDataComplete(NSData data, bool complete);
+    [Selector("setColor:atX:y:")]
+    public void SetColorAtXY(NSColor color, NSInteger x, NSInteger y);
+    [Selector("colorAtX:y:")]
+    public NSColor? ColorAtXY(NSInteger x, NSInteger y);
+    [Selector("getPixel:atX:y:")]
+    public void GetPixelAtXY(NSUInteger* p, NSInteger x, NSInteger y);
+    [Selector("setPixel:atX:y:")]
+    public void SetPixelAtXY(NSUInteger* p, NSInteger x, NSInteger y);
+    [Selector("bitmapImageRepByConvertingToColorSpace:renderingIntent:")]
+    public NSBitmapImageRep? BitmapImageRepByConvertingToColorSpaceRenderingIntent(NSColorSpace targetSpace, NSColorRenderingIntent renderingIntent);
+    [Selector("bitmapImageRepByRetaggingWithColorSpace:")]
+    public NSBitmapImageRep? BitmapImageRepByRetaggingWithColorSpace(NSColorSpace newSpace);
 }
 
 /// NSBitmapImageFileTypeExtensions, a category of NSBitmapImageRep.
 public extern objc class NSBitmapImageRep
 {
-    [Selector("representationOfImageRepsInArray:usingType:properties:")] public static NSData? RepresentationOfImageRepsInArrayUsingTypeProperties(NSArray imageReps, NSBitmapImageFileType storageType, NSDictionary properties);
-    [Selector("representationUsingType:properties:")] public NSData? RepresentationUsingTypeProperties(NSBitmapImageFileType storageType, NSDictionary properties);
-    [Selector("setProperty:withValue:")] public void SetPropertyWithValue(NSBitmapImageRepPropertyKey property, AnyObject? value);
-    [Selector("valueForProperty:")] public AnyObject? ValueForProperty(NSBitmapImageRepPropertyKey property);
+    [Selector("representationOfImageRepsInArray:usingType:properties:")]
+    public static NSData? RepresentationOfImageRepsInArrayUsingTypeProperties(NSArray imageReps, NSBitmapImageFileType storageType, NSDictionary properties);
+    [Selector("representationUsingType:properties:")]
+    public NSData? RepresentationUsingTypeProperties(NSBitmapImageFileType storageType, NSDictionary properties);
+    [Selector("setProperty:withValue:")]
+    public void SetPropertyWithValue(NSBitmapImageRepPropertyKey property, AnyObject? value);
+    [Selector("valueForProperty:")]
+    public AnyObject? ValueForProperty(NSBitmapImageRepPropertyKey property);
 }
 
 #endif

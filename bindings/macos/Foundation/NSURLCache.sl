@@ -39,29 +39,47 @@ public enum NSURLCacheStoragePolicy : ulong
 
 public extern objc class NSCachedURLResponse : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("response")] public NSURLResponse Response { get; }
-    [Selector("data")] public NSData Data { get; }
-    [Selector("userInfo")] public NSDictionary? UserInfo { get; }
-    [Selector("storagePolicy")] public NSURLCacheStoragePolicy StoragePolicy { get; }
-    [Selector("initWithResponse:data:")] public Self InitWithResponseData(NSURLResponse response, NSData data);
-    [Selector("initWithResponse:data:userInfo:storagePolicy:")] public Self InitWithResponseDataUserInfoStoragePolicy(NSURLResponse response, NSData data, NSDictionary? userInfo, NSURLCacheStoragePolicy storagePolicy);
+    [Selector("response")]
+    public NSURLResponse Response { get; }
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("userInfo")]
+    public NSDictionary? UserInfo { get; }
+    [Selector("storagePolicy")]
+    public NSURLCacheStoragePolicy StoragePolicy { get; }
+    [Selector("initWithResponse:data:")]
+    public Self InitWithResponseData(NSURLResponse response, NSData data);
+    [Selector("initWithResponse:data:userInfo:storagePolicy:")]
+    public Self InitWithResponseDataUserInfoStoragePolicy(NSURLResponse response, NSData data, NSDictionary? userInfo, NSURLCacheStoragePolicy storagePolicy);
 }
 
 public extern objc class NSURLCache : NSObject
 {
-    [Selector("sharedURLCache", "setSharedURLCache:")] public static NSURLCache SharedURLCache { get; set; }
-    [Selector("memoryCapacity", "setMemoryCapacity:")] public NSUInteger MemoryCapacity { get; set; }
-    [Selector("diskCapacity", "setDiskCapacity:")] public NSUInteger DiskCapacity { get; set; }
-    [Selector("currentMemoryUsage")] public NSUInteger CurrentMemoryUsage { get; }
-    [Selector("currentDiskUsage")] public NSUInteger CurrentDiskUsage { get; }
+    [Selector("sharedURLCache", "setSharedURLCache:")]
+    public static NSURLCache SharedURLCache { get; set; }
+    [Selector("memoryCapacity", "setMemoryCapacity:")]
+    public NSUInteger MemoryCapacity { get; set; }
+    [Selector("diskCapacity", "setDiskCapacity:")]
+    public NSUInteger DiskCapacity { get; set; }
+    [Selector("currentMemoryUsage")]
+    public NSUInteger CurrentMemoryUsage { get; }
+    [Selector("currentDiskUsage")]
+    public NSUInteger CurrentDiskUsage { get; }
     /// Deprecated in macOS 100000.
-    [Selector("initWithMemoryCapacity:diskCapacity:diskPath:")] public Self InitWithMemoryCapacityDiskCapacityDiskPath(NSUInteger memoryCapacity, NSUInteger diskCapacity, NSString? path);
-    [Selector("initWithMemoryCapacity:diskCapacity:directoryURL:")] public Self InitWithMemoryCapacityDiskCapacityDirectoryURL(NSUInteger memoryCapacity, NSUInteger diskCapacity, NSURL? directoryURL);
-    [Selector("cachedResponseForRequest:")] public NSCachedURLResponse? CachedResponseForRequest(NSURLRequest request);
-    [Selector("storeCachedResponse:forRequest:")] public void StoreCachedResponseForRequest(NSCachedURLResponse cachedResponse, NSURLRequest request);
-    [Selector("removeCachedResponseForRequest:")] public void RemoveCachedResponseForRequest(NSURLRequest request);
-    [Selector("removeAllCachedResponses")] public void RemoveAllCachedResponses();
-    [Selector("removeCachedResponsesSinceDate:")] public void RemoveCachedResponsesSinceDate(NSDate date);
+    [Selector("initWithMemoryCapacity:diskCapacity:diskPath:")]
+    public Self InitWithMemoryCapacityDiskCapacityDiskPath(NSUInteger memoryCapacity, NSUInteger diskCapacity, NSString? path);
+    [Selector("initWithMemoryCapacity:diskCapacity:directoryURL:")]
+    public Self InitWithMemoryCapacityDiskCapacityDirectoryURL(NSUInteger memoryCapacity, NSUInteger diskCapacity, NSURL? directoryURL);
+    [Selector("cachedResponseForRequest:")]
+    public NSCachedURLResponse? CachedResponseForRequest(NSURLRequest request);
+    [Selector("storeCachedResponse:forRequest:")]
+    public void StoreCachedResponseForRequest(NSCachedURLResponse cachedResponse, NSURLRequest request);
+    [Selector("removeCachedResponseForRequest:")]
+    public void RemoveCachedResponseForRequest(NSURLRequest request);
+    [Selector("removeAllCachedResponses")]
+    public void RemoveAllCachedResponses();
+    [Selector("removeCachedResponsesSinceDate:")]
+    public void RemoveCachedResponsesSinceDate(NSDate date);
 }
 
 public objc closure void NSURLCacheGetCachedResponseForDataTaskCompletionHandlerCompletionHandlerBlock(NSCachedURLResponse? arg0);
@@ -69,9 +87,12 @@ public objc closure void NSURLCacheGetCachedResponseForDataTaskCompletionHandler
 /// NSURLSessionTaskAdditions, a category of NSURLCache.
 public extern objc class NSURLCache
 {
-    [Selector("storeCachedResponse:forDataTask:")] public void StoreCachedResponseForDataTask(NSCachedURLResponse cachedResponse, NSURLSessionDataTask dataTask);
-    [Selector("getCachedResponseForDataTask:completionHandler:")] public void GetCachedResponseForDataTaskCompletionHandler(NSURLSessionDataTask dataTask, NSURLCacheGetCachedResponseForDataTaskCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removeCachedResponseForDataTask:")] public void RemoveCachedResponseForDataTask(NSURLSessionDataTask dataTask);
+    [Selector("storeCachedResponse:forDataTask:")]
+    public void StoreCachedResponseForDataTask(NSCachedURLResponse cachedResponse, NSURLSessionDataTask dataTask);
+    [Selector("getCachedResponseForDataTask:completionHandler:")]
+    public void GetCachedResponseForDataTaskCompletionHandler(NSURLSessionDataTask dataTask, NSURLCacheGetCachedResponseForDataTaskCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removeCachedResponseForDataTask:")]
+    public void RemoveCachedResponseForDataTask(NSURLSessionDataTask dataTask);
 }
 
 #endif

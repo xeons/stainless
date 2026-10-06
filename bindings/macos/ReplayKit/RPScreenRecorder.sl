@@ -61,29 +61,50 @@ public objc closure void RPScreenRecorderExportClipToURLDurationCompletionHandle
 
 public extern objc class RPScreenRecorder : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public RPScreenRecorderDelegate? Delegate { get; set; }
-    [Selector("isAvailable")] public bool Available { get; }
-    [Selector("isRecording")] public bool Recording { get; }
-    [Selector("isMicrophoneEnabled", "setMicrophoneEnabled:")] public bool MicrophoneEnabled { get; set; }
-    [Selector("isCameraEnabled", "setCameraEnabled:")] public bool CameraEnabled { get; set; }
-    [Selector("cameraPosition", "setCameraPosition:")] public RPCameraPosition CameraPosition { get; set; }
-    [Selector("cameraPreviewView")] public NSView? CameraPreviewView { get; }
-    [Selector("sharedRecorder")] public static RPScreenRecorder SharedRecorder();
-    [Selector("startRecordingWithHandler:")] public void StartRecordingWithHandler(RPScreenRecorderStartRecordingWithHandlerHandlerBlock? handler);
-    [Selector("stopRecordingWithHandler:")] public void StopRecordingWithHandler(RPScreenRecorderStopRecordingWithHandlerHandlerBlock? handler);
-    [Selector("stopRecordingWithOutputURL:completionHandler:")] public void StopRecordingWithOutputURLCompletionHandler(NSURL url, RPScreenRecorderStopRecordingWithOutputURLCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("discardRecordingWithHandler:")] public void DiscardRecordingWithHandler(RPScreenRecorderDiscardRecordingWithHandlerHandlerBlock handler);
-    [Selector("startCaptureWithHandler:completionHandler:")] public void StartCaptureWithHandlerCompletionHandler(RPScreenRecorderStartCaptureWithHandlerCompletionHandlerCaptureHandlerBlock? captureHandler, RPScreenRecorderStartCaptureWithHandlerCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("stopCaptureWithHandler:")] public void StopCaptureWithHandler(RPScreenRecorderStopCaptureWithHandlerHandlerBlock? handler);
-    [Selector("startClipBufferingWithCompletionHandler:")] public void StartClipBufferingWithCompletionHandler(RPScreenRecorderStartClipBufferingWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("stopClipBufferingWithCompletionHandler:")] public void StopClipBufferingWithCompletionHandler(RPScreenRecorderStopClipBufferingWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("exportClipToURL:duration:completionHandler:")] public void ExportClipToURLDurationCompletionHandler(NSURL url, NSTimeInterval duration, RPScreenRecorderExportClipToURLDurationCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("delegate", "setDelegate:")]
+    public RPScreenRecorderDelegate? Delegate { get; set; }
+    [Selector("isAvailable")]
+    public bool Available { get; }
+    [Selector("isRecording")]
+    public bool Recording { get; }
+    [Selector("isMicrophoneEnabled", "setMicrophoneEnabled:")]
+    public bool MicrophoneEnabled { get; set; }
+    [Selector("isCameraEnabled", "setCameraEnabled:")]
+    public bool CameraEnabled { get; set; }
+    [Selector("cameraPosition", "setCameraPosition:")]
+    public RPCameraPosition CameraPosition { get; set; }
+    [Selector("cameraPreviewView")]
+    public NSView? CameraPreviewView { get; }
+    [Selector("sharedRecorder")]
+    public static RPScreenRecorder SharedRecorder();
+    [Selector("startRecordingWithHandler:")]
+    public void StartRecordingWithHandler(RPScreenRecorderStartRecordingWithHandlerHandlerBlock? handler);
+    [Selector("stopRecordingWithHandler:")]
+    public void StopRecordingWithHandler(RPScreenRecorderStopRecordingWithHandlerHandlerBlock? handler);
+    [Selector("stopRecordingWithOutputURL:completionHandler:")]
+    public void StopRecordingWithOutputURLCompletionHandler(NSURL url, RPScreenRecorderStopRecordingWithOutputURLCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("discardRecordingWithHandler:")]
+    public void DiscardRecordingWithHandler(RPScreenRecorderDiscardRecordingWithHandlerHandlerBlock handler);
+    [Selector("startCaptureWithHandler:completionHandler:")]
+    public void StartCaptureWithHandlerCompletionHandler(RPScreenRecorderStartCaptureWithHandlerCompletionHandlerCaptureHandlerBlock? captureHandler, RPScreenRecorderStartCaptureWithHandlerCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("stopCaptureWithHandler:")]
+    public void StopCaptureWithHandler(RPScreenRecorderStopCaptureWithHandlerHandlerBlock? handler);
+    [Selector("startClipBufferingWithCompletionHandler:")]
+    public void StartClipBufferingWithCompletionHandler(RPScreenRecorderStartClipBufferingWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("stopClipBufferingWithCompletionHandler:")]
+    public void StopClipBufferingWithCompletionHandler(RPScreenRecorderStopClipBufferingWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("exportClipToURL:duration:completionHandler:")]
+    public void ExportClipToURLDurationCompletionHandler(NSURL url, NSTimeInterval duration, RPScreenRecorderExportClipToURLDurationCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public objc interface RPScreenRecorderDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("screenRecorder:didStopRecordingWithPreviewViewController:error:")] void ScreenRecorderDidStopRecordingWithPreviewViewControllerError(RPScreenRecorder screenRecorder, RPPreviewViewController? previewViewController, NSError? error);
-    [Optional] [Selector("screenRecorderDidChangeAvailability:")] void ScreenRecorderDidChangeAvailability(RPScreenRecorder screenRecorder);
+    [Optional]
+    [Selector("screenRecorder:didStopRecordingWithPreviewViewController:error:")]
+    void ScreenRecorderDidStopRecordingWithPreviewViewControllerError(RPScreenRecorder screenRecorder, RPPreviewViewController? previewViewController, NSError? error);
+    [Optional]
+    [Selector("screenRecorderDidChangeAvailability:")]
+    void ScreenRecorderDidChangeAvailability(RPScreenRecorder screenRecorder);
 }
 
 #endif

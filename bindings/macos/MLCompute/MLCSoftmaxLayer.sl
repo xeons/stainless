@@ -33,10 +33,14 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCSoftmaxLayer : MLCLayer
 {
-    [Selector("operation")] public MLCSoftmaxOperation Operation { get; }
-    [Selector("dimension")] public NSUInteger Dimension { get; }
-    [Selector("layerWithOperation:")] public static Self LayerWithOperation(MLCSoftmaxOperation operation);
-    [Selector("layerWithOperation:dimension:")] public static Self LayerWithOperationDimension(MLCSoftmaxOperation operation, NSUInteger dimension);
+    [Selector("operation")]
+    public MLCSoftmaxOperation Operation { get; }
+    [Selector("dimension")]
+    public NSUInteger Dimension { get; }
+    [Selector("layerWithOperation:")]
+    public static Self LayerWithOperation(MLCSoftmaxOperation operation);
+    [Selector("layerWithOperation:dimension:")]
+    public static Self LayerWithOperationDimension(MLCSoftmaxOperation operation, NSUInteger dimension);
 }
 
 #endif

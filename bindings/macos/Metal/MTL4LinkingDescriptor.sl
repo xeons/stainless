@@ -34,27 +34,38 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTL4StaticLinkingDescriptor : NSObject, NSCopying
 {
-    [Selector("functionDescriptors", "setFunctionDescriptors:")] public NSArray? FunctionDescriptors { get; set; }
-    [Selector("privateFunctionDescriptors", "setPrivateFunctionDescriptors:")] public NSArray? PrivateFunctionDescriptors { get; set; }
-    [Selector("groups", "setGroups:")] public NSDictionary? Groups { get; set; }
+    [Selector("functionDescriptors", "setFunctionDescriptors:")]
+    public NSArray? FunctionDescriptors { get; set; }
+    [Selector("privateFunctionDescriptors", "setPrivateFunctionDescriptors:")]
+    public NSArray? PrivateFunctionDescriptors { get; set; }
+    [Selector("groups", "setGroups:")]
+    public NSDictionary? Groups { get; set; }
 }
 
 /// macOS 26.0 and later.
 public extern objc class MTL4PipelineStageDynamicLinkingDescriptor : NSObject, NSCopying
 {
-    [Selector("maxCallStackDepth", "setMaxCallStackDepth:")] public NSUInteger MaxCallStackDepth { get; set; }
-    [Selector("binaryLinkedFunctions", "setBinaryLinkedFunctions:")] public NSArray? BinaryLinkedFunctions { get; set; }
-    [Selector("preloadedLibraries", "setPreloadedLibraries:")] public NSArray PreloadedLibraries { get; set; }
+    [Selector("maxCallStackDepth", "setMaxCallStackDepth:")]
+    public NSUInteger MaxCallStackDepth { get; set; }
+    [Selector("binaryLinkedFunctions", "setBinaryLinkedFunctions:")]
+    public NSArray? BinaryLinkedFunctions { get; set; }
+    [Selector("preloadedLibraries", "setPreloadedLibraries:")]
+    public NSArray PreloadedLibraries { get; set; }
 }
 
 /// macOS 26.0 and later.
 public extern objc class MTL4RenderPipelineDynamicLinkingDescriptor : NSObject, NSCopying
 {
-    [Selector("vertexLinkingDescriptor")] public MTL4PipelineStageDynamicLinkingDescriptor VertexLinkingDescriptor { get; }
-    [Selector("fragmentLinkingDescriptor")] public MTL4PipelineStageDynamicLinkingDescriptor FragmentLinkingDescriptor { get; }
-    [Selector("tileLinkingDescriptor")] public MTL4PipelineStageDynamicLinkingDescriptor TileLinkingDescriptor { get; }
-    [Selector("objectLinkingDescriptor")] public MTL4PipelineStageDynamicLinkingDescriptor ObjectLinkingDescriptor { get; }
-    [Selector("meshLinkingDescriptor")] public MTL4PipelineStageDynamicLinkingDescriptor MeshLinkingDescriptor { get; }
+    [Selector("vertexLinkingDescriptor")]
+    public MTL4PipelineStageDynamicLinkingDescriptor VertexLinkingDescriptor { get; }
+    [Selector("fragmentLinkingDescriptor")]
+    public MTL4PipelineStageDynamicLinkingDescriptor FragmentLinkingDescriptor { get; }
+    [Selector("tileLinkingDescriptor")]
+    public MTL4PipelineStageDynamicLinkingDescriptor TileLinkingDescriptor { get; }
+    [Selector("objectLinkingDescriptor")]
+    public MTL4PipelineStageDynamicLinkingDescriptor ObjectLinkingDescriptor { get; }
+    [Selector("meshLinkingDescriptor")]
+    public MTL4PipelineStageDynamicLinkingDescriptor MeshLinkingDescriptor { get; }
 }
 
 #endif

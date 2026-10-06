@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class HKGlassesLensSpecification : HKLensSpecification, NSSecureCoding, NSCopying
 {
-    [Selector("vertexDistance")] public HKQuantity? VertexDistance { get; }
-    [Selector("prism")] public HKVisionPrism? Prism { get; }
-    [Selector("farPupillaryDistance")] public HKQuantity? FarPupillaryDistance { get; }
-    [Selector("nearPupillaryDistance")] public HKQuantity? NearPupillaryDistance { get; }
-    [Selector("initWithSphere:cylinder:axis:addPower:vertexDistance:prism:farPupillaryDistance:nearPupillaryDistance:")] public Self InitWithSphereCylinderAxisAddPowerVertexDistancePrismFarPupillaryDistanceNearPupillaryDistance(HKQuantity sphere, HKQuantity? cylinder, HKQuantity? axis, HKQuantity? addPower, HKQuantity? vertexDistance, HKVisionPrism? prism, HKQuantity? farPupillaryDistance, HKQuantity? nearPupillaryDistance);
+    [Selector("vertexDistance")]
+    public HKQuantity? VertexDistance { get; }
+    [Selector("prism")]
+    public HKVisionPrism? Prism { get; }
+    [Selector("farPupillaryDistance")]
+    public HKQuantity? FarPupillaryDistance { get; }
+    [Selector("nearPupillaryDistance")]
+    public HKQuantity? NearPupillaryDistance { get; }
+    [Selector("initWithSphere:cylinder:axis:addPower:vertexDistance:prism:farPupillaryDistance:nearPupillaryDistance:")]
+    public Self InitWithSphereCylinderAxisAddPowerVertexDistancePrismFarPupillaryDistanceNearPupillaryDistance(HKQuantity sphere, HKQuantity? cylinder, HKQuantity? axis, HKQuantity? addPower, HKQuantity? vertexDistance, HKVisionPrism? prism, HKQuantity? farPupillaryDistance, HKQuantity? nearPupillaryDistance);
 }
 
 #endif

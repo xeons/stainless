@@ -32,33 +32,60 @@ import Standard.ObjC;
 
 public extern objc class CNMutableContact : CNContact
 {
-    [Selector("contactType", "setContactType:")] public CNContactType ContactType { get; set; }
-    [Selector("namePrefix", "setNamePrefix:")] public NSString NamePrefix { get; set; }
-    [Selector("givenName", "setGivenName:")] public NSString GivenName { get; set; }
-    [Selector("middleName", "setMiddleName:")] public NSString MiddleName { get; set; }
-    [Selector("familyName", "setFamilyName:")] public NSString FamilyName { get; set; }
-    [Selector("previousFamilyName", "setPreviousFamilyName:")] public NSString PreviousFamilyName { get; set; }
-    [Selector("nameSuffix", "setNameSuffix:")] public NSString NameSuffix { get; set; }
-    [Selector("nickname", "setNickname:")] public NSString Nickname { get; set; }
-    [Selector("organizationName", "setOrganizationName:")] public NSString OrganizationName { get; set; }
-    [Selector("departmentName", "setDepartmentName:")] public NSString DepartmentName { get; set; }
-    [Selector("jobTitle", "setJobTitle:")] public NSString JobTitle { get; set; }
-    [Selector("phoneticGivenName", "setPhoneticGivenName:")] public NSString PhoneticGivenName { get; set; }
-    [Selector("phoneticMiddleName", "setPhoneticMiddleName:")] public NSString PhoneticMiddleName { get; set; }
-    [Selector("phoneticFamilyName", "setPhoneticFamilyName:")] public NSString PhoneticFamilyName { get; set; }
-    [Selector("phoneticOrganizationName", "setPhoneticOrganizationName:")] public NSString PhoneticOrganizationName { get; set; }
-    [Selector("note", "setNote:")] public NSString Note { get; set; }
-    [Selector("imageData", "setImageData:")] public NSData? ImageData { get; set; }
-    [Selector("phoneNumbers", "setPhoneNumbers:")] public NSArray PhoneNumbers { get; set; }
-    [Selector("emailAddresses", "setEmailAddresses:")] public NSArray EmailAddresses { get; set; }
-    [Selector("postalAddresses", "setPostalAddresses:")] public NSArray PostalAddresses { get; set; }
-    [Selector("urlAddresses", "setUrlAddresses:")] public NSArray UrlAddresses { get; set; }
-    [Selector("contactRelations", "setContactRelations:")] public NSArray ContactRelations { get; set; }
-    [Selector("socialProfiles", "setSocialProfiles:")] public NSArray SocialProfiles { get; set; }
-    [Selector("instantMessageAddresses", "setInstantMessageAddresses:")] public NSArray InstantMessageAddresses { get; set; }
-    [Selector("birthday", "setBirthday:")] public NSDateComponents? Birthday { get; set; }
-    [Selector("nonGregorianBirthday", "setNonGregorianBirthday:")] public NSDateComponents? NonGregorianBirthday { get; set; }
-    [Selector("dates", "setDates:")] public NSArray Dates { get; set; }
+    [Selector("contactType", "setContactType:")]
+    public CNContactType ContactType { get; set; }
+    [Selector("namePrefix", "setNamePrefix:")]
+    public NSString NamePrefix { get; set; }
+    [Selector("givenName", "setGivenName:")]
+    public NSString GivenName { get; set; }
+    [Selector("middleName", "setMiddleName:")]
+    public NSString MiddleName { get; set; }
+    [Selector("familyName", "setFamilyName:")]
+    public NSString FamilyName { get; set; }
+    [Selector("previousFamilyName", "setPreviousFamilyName:")]
+    public NSString PreviousFamilyName { get; set; }
+    [Selector("nameSuffix", "setNameSuffix:")]
+    public NSString NameSuffix { get; set; }
+    [Selector("nickname", "setNickname:")]
+    public NSString Nickname { get; set; }
+    [Selector("organizationName", "setOrganizationName:")]
+    public NSString OrganizationName { get; set; }
+    [Selector("departmentName", "setDepartmentName:")]
+    public NSString DepartmentName { get; set; }
+    [Selector("jobTitle", "setJobTitle:")]
+    public NSString JobTitle { get; set; }
+    [Selector("phoneticGivenName", "setPhoneticGivenName:")]
+    public NSString PhoneticGivenName { get; set; }
+    [Selector("phoneticMiddleName", "setPhoneticMiddleName:")]
+    public NSString PhoneticMiddleName { get; set; }
+    [Selector("phoneticFamilyName", "setPhoneticFamilyName:")]
+    public NSString PhoneticFamilyName { get; set; }
+    [Selector("phoneticOrganizationName", "setPhoneticOrganizationName:")]
+    public NSString PhoneticOrganizationName { get; set; }
+    [Selector("note", "setNote:")]
+    public NSString Note { get; set; }
+    [Selector("imageData", "setImageData:")]
+    public NSData? ImageData { get; set; }
+    [Selector("phoneNumbers", "setPhoneNumbers:")]
+    public NSArray PhoneNumbers { get; set; }
+    [Selector("emailAddresses", "setEmailAddresses:")]
+    public NSArray EmailAddresses { get; set; }
+    [Selector("postalAddresses", "setPostalAddresses:")]
+    public NSArray PostalAddresses { get; set; }
+    [Selector("urlAddresses", "setUrlAddresses:")]
+    public NSArray UrlAddresses { get; set; }
+    [Selector("contactRelations", "setContactRelations:")]
+    public NSArray ContactRelations { get; set; }
+    [Selector("socialProfiles", "setSocialProfiles:")]
+    public NSArray SocialProfiles { get; set; }
+    [Selector("instantMessageAddresses", "setInstantMessageAddresses:")]
+    public NSArray InstantMessageAddresses { get; set; }
+    [Selector("birthday", "setBirthday:")]
+    public NSDateComponents? Birthday { get; set; }
+    [Selector("nonGregorianBirthday", "setNonGregorianBirthday:")]
+    public NSDateComponents? NonGregorianBirthday { get; set; }
+    [Selector("dates", "setDates:")]
+    public NSArray Dates { get; set; }
 }
 
 #endif

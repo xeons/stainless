@@ -37,9 +37,12 @@ public objc closure void SKArcadeServiceArcadeSubscriptionStatusWithNonceResultH
 
 public extern objc class SKArcadeService : NSObject
 {
-    [Selector("registerArcadeAppWithRandomFromLib:randomFromLibLength:resultHandler:")] public static void RegisterArcadeAppWithRandomFromLibRandomFromLibLengthResultHandler(NSData randomFromLib, uint randomFromLibLength, SKArcadeServiceRegisterArcadeAppWithRandomFromLibRandomFromLibLengthResultHandlerResultHandlerBlock resultHandler);
-    [Selector("arcadeSubscriptionStatusWithNonce:resultHandler:")] public static void ArcadeSubscriptionStatusWithNonceResultHandler(ulong nonce, SKArcadeServiceArcadeSubscriptionStatusWithNonceResultHandlerResultHandlerBlock resultHandler);
-    [Selector("repairArcadeApp")] public static void RepairArcadeApp();
+    [Selector("registerArcadeAppWithRandomFromLib:randomFromLibLength:resultHandler:")]
+    public static void RegisterArcadeAppWithRandomFromLibRandomFromLibLengthResultHandler(NSData randomFromLib, uint randomFromLibLength, SKArcadeServiceRegisterArcadeAppWithRandomFromLibRandomFromLibLengthResultHandlerResultHandlerBlock resultHandler);
+    [Selector("arcadeSubscriptionStatusWithNonce:resultHandler:")]
+    public static void ArcadeSubscriptionStatusWithNonceResultHandler(ulong nonce, SKArcadeServiceArcadeSubscriptionStatusWithNonceResultHandlerResultHandlerBlock resultHandler);
+    [Selector("repairArcadeApp")]
+    public static void RepairArcadeApp();
 }
 
 #endif

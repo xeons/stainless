@@ -34,23 +34,37 @@ import Standard.ObjC;
 
 public extern objc class PKInkingTool : PKTool
 {
-    [Selector("inkType")] public PKInkType InkType { get; }
-    [Selector("color")] public NSColor Color { get; }
-    [Selector("width")] public CGFloat Width { get; }
+    [Selector("inkType")]
+    public PKInkType InkType { get; }
+    [Selector("color")]
+    public NSColor Color { get; }
+    [Selector("width")]
+    public CGFloat Width { get; }
     /// macOS 26.0 and later.
-    [Selector("azimuth")] public CGFloat Azimuth { get; }
-    [Selector("ink")] public PKInk? Ink { get; }
-    [Selector("requiredContentVersion")] public PKContentVersion RequiredContentVersion { get; }
-    [Selector("initWithInkType:color:width:")] public Self InitWithInkTypeColorWidth(PKInkType type, NSColor color, CGFloat width);
+    [Selector("azimuth")]
+    public CGFloat Azimuth { get; }
+    [Selector("ink")]
+    public PKInk? Ink { get; }
+    [Selector("requiredContentVersion")]
+    public PKContentVersion RequiredContentVersion { get; }
+    [Selector("initWithInkType:color:width:")]
+    public Self InitWithInkTypeColorWidth(PKInkType type, NSColor color, CGFloat width);
     /// macOS 26.0 and later.
-    [Selector("initWithInkType:color:width:azimuth:")] public Self InitWithInkTypeColorWidthAzimuth(PKInkType type, NSColor color, CGFloat width, CGFloat angle);
-    [Selector("initWithInkType:color:")] public Self InitWithInkTypeColor(PKInkType type, NSColor color);
-    [Selector("initWithInk:width:")] public Self InitWithInkWidth(PKInk ink, CGFloat width);
-    [Selector("defaultWidthForInkType:")] public static CGFloat DefaultWidthForInkType(PKInkType inkType);
-    [Selector("minimumWidthForInkType:")] public static CGFloat MinimumWidthForInkType(PKInkType inkType);
-    [Selector("maximumWidthForInkType:")] public static CGFloat MaximumWidthForInkType(PKInkType inkType);
+    [Selector("initWithInkType:color:width:azimuth:")]
+    public Self InitWithInkTypeColorWidthAzimuth(PKInkType type, NSColor color, CGFloat width, CGFloat angle);
+    [Selector("initWithInkType:color:")]
+    public Self InitWithInkTypeColor(PKInkType type, NSColor color);
+    [Selector("initWithInk:width:")]
+    public Self InitWithInkWidth(PKInk ink, CGFloat width);
+    [Selector("defaultWidthForInkType:")]
+    public static CGFloat DefaultWidthForInkType(PKInkType inkType);
+    [Selector("minimumWidthForInkType:")]
+    public static CGFloat MinimumWidthForInkType(PKInkType inkType);
+    [Selector("maximumWidthForInkType:")]
+    public static CGFloat MaximumWidthForInkType(PKInkType inkType);
     /// macOS 26.0 and later.
-    [Selector("invertColor:")] public static CGColorRef InvertColor(CGColorRef color);
+    [Selector("invertColor:")]
+    public static CGColorRef InvertColor(CGColorRef color);
 }
 
 #endif

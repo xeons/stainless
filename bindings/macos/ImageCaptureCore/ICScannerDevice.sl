@@ -57,31 +57,58 @@ public enum ICScannerTransferMode : ulong
 
 public objc interface ICScannerDeviceDelegate : ICDeviceDelegate
 {
-    [Optional] [Selector("scannerDeviceDidBecomeAvailable:")] void ScannerDeviceDidBecomeAvailable(ICScannerDevice scanner);
-    [Optional] [Selector("scannerDevice:didSelectFunctionalUnit:error:")] void ScannerDeviceDidSelectFunctionalUnitError(ICScannerDevice scanner, ICScannerFunctionalUnit functionalUnit, NSError? error);
+    [Optional]
+    [Selector("scannerDeviceDidBecomeAvailable:")]
+    void ScannerDeviceDidBecomeAvailable(ICScannerDevice scanner);
+    [Optional]
+    [Selector("scannerDevice:didSelectFunctionalUnit:error:")]
+    void ScannerDeviceDidSelectFunctionalUnitError(ICScannerDevice scanner, ICScannerFunctionalUnit functionalUnit, NSError? error);
     /// Deprecated in macOS 10.7.
-    [Optional] [Selector("scannerDevice:didScanToURL:data:")] void ScannerDeviceDidScanToURLData(ICScannerDevice scanner, NSURL url, NSData data);
-    [Optional] [Selector("scannerDevice:didScanToURL:")] void ScannerDeviceDidScanToURL(ICScannerDevice scanner, NSURL url);
-    [Optional] [Selector("scannerDevice:didScanToBandData:")] void ScannerDeviceDidScanToBandData(ICScannerDevice scanner, ICScannerBandData data);
-    [Optional] [Selector("scannerDevice:didCompleteOverviewScanWithError:")] void ScannerDeviceDidCompleteOverviewScanWithError(ICScannerDevice scanner, NSError? error);
-    [Optional] [Selector("scannerDevice:didCompleteScanWithError:")] void ScannerDeviceDidCompleteScanWithError(ICScannerDevice scanner, NSError? error);
+    [Optional]
+    [Selector("scannerDevice:didScanToURL:data:")]
+    void ScannerDeviceDidScanToURLData(ICScannerDevice scanner, NSURL url, NSData data);
+    [Optional]
+    [Selector("scannerDevice:didScanToURL:")]
+    void ScannerDeviceDidScanToURL(ICScannerDevice scanner, NSURL url);
+    [Optional]
+    [Selector("scannerDevice:didScanToBandData:")]
+    void ScannerDeviceDidScanToBandData(ICScannerDevice scanner, ICScannerBandData data);
+    [Optional]
+    [Selector("scannerDevice:didCompleteOverviewScanWithError:")]
+    void ScannerDeviceDidCompleteOverviewScanWithError(ICScannerDevice scanner, NSError? error);
+    [Optional]
+    [Selector("scannerDevice:didCompleteScanWithError:")]
+    void ScannerDeviceDidCompleteScanWithError(ICScannerDevice scanner, NSError? error);
 }
 
 public extern objc class ICScannerDevice : ICDevice
 {
-    [Selector("availableFunctionalUnitTypes")] public NSArray? AvailableFunctionalUnitTypes { get; }
-    [Selector("selectedFunctionalUnit")] public ICScannerFunctionalUnit? SelectedFunctionalUnit { get; }
-    [Selector("transferMode", "setTransferMode:")] public ICScannerTransferMode TransferMode { get; set; }
-    [Selector("maxMemoryBandSize", "setMaxMemoryBandSize:")] public UInt32 MaxMemoryBandSize { get; set; }
-    [Selector("downloadsDirectory", "setDownloadsDirectory:")] public NSURL? DownloadsDirectory { get; set; }
-    [Selector("documentName", "setDocumentName:")] public NSString? DocumentName { get; set; }
-    [Selector("documentUTI", "setDocumentUTI:")] public NSString? DocumentUTI { get; set; }
-    [Selector("defaultUsername", "setDefaultUsername:")] public NSString? DefaultUsername { get; set; }
-    [Selector("requestOpenSessionWithCredentials:password:")] public void RequestOpenSessionWithCredentialsPassword(NSString username, NSString password);
-    [Selector("requestSelectFunctionalUnit:")] public void RequestSelectFunctionalUnit(ICScannerFunctionalUnitType type);
-    [Selector("requestOverviewScan")] public void RequestOverviewScan();
-    [Selector("requestScan")] public void RequestScan();
-    [Selector("cancelScan")] public void CancelScan();
+    [Selector("availableFunctionalUnitTypes")]
+    public NSArray? AvailableFunctionalUnitTypes { get; }
+    [Selector("selectedFunctionalUnit")]
+    public ICScannerFunctionalUnit? SelectedFunctionalUnit { get; }
+    [Selector("transferMode", "setTransferMode:")]
+    public ICScannerTransferMode TransferMode { get; set; }
+    [Selector("maxMemoryBandSize", "setMaxMemoryBandSize:")]
+    public UInt32 MaxMemoryBandSize { get; set; }
+    [Selector("downloadsDirectory", "setDownloadsDirectory:")]
+    public NSURL? DownloadsDirectory { get; set; }
+    [Selector("documentName", "setDocumentName:")]
+    public NSString? DocumentName { get; set; }
+    [Selector("documentUTI", "setDocumentUTI:")]
+    public NSString? DocumentUTI { get; set; }
+    [Selector("defaultUsername", "setDefaultUsername:")]
+    public NSString? DefaultUsername { get; set; }
+    [Selector("requestOpenSessionWithCredentials:password:")]
+    public void RequestOpenSessionWithCredentialsPassword(NSString username, NSString password);
+    [Selector("requestSelectFunctionalUnit:")]
+    public void RequestSelectFunctionalUnit(ICScannerFunctionalUnitType type);
+    [Selector("requestOverviewScan")]
+    public void RequestOverviewScan();
+    [Selector("requestScan")]
+    public void RequestScan();
+    [Selector("cancelScan")]
+    public void CancelScan();
 }
 
 #endif

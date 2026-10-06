@@ -39,10 +39,13 @@ public extern "C" VNAnimalIdentifier VNAnimalIdentifierCat;
 
 public extern objc class VNRecognizeAnimalsRequest : VNImageBasedRequest
 {
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("results")]
+    public NSArray? Results { get; }
     /// Deprecated in macOS 12.0.
-    [Selector("knownAnimalIdentifiersForRevision:error:")] public static NSArray? KnownAnimalIdentifiersForRevisionError(NSUInteger requestRevision, out NSError? error);
-    [Selector("supportedIdentifiersAndReturnError:")] public NSArray? SupportedIdentifiersAndReturnError(out NSError? error);
+    [Selector("knownAnimalIdentifiersForRevision:error:")]
+    public static NSArray? KnownAnimalIdentifiersForRevisionError(NSUInteger requestRevision, out NSError? error);
+    [Selector("supportedIdentifiersAndReturnError:")]
+    public NSArray? SupportedIdentifiersAndReturnError(out NSError? error);
 }
 
 #endif

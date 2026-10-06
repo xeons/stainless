@@ -33,19 +33,32 @@ import Standard.ObjC;
 
 public extern objc class NSPersistentHistoryTransaction : NSObject, NSCopying
 {
-    [Selector("entityDescription")] public static NSEntityDescription? EntityDescription { get; }
-    [Selector("fetchRequest")] public static NSFetchRequest? FetchRequest { get; }
-    [Selector("timestamp")] public NSDate Timestamp { get; }
-    [Selector("changes")] public NSArray? Changes { get; }
-    [Selector("transactionNumber")] public long TransactionNumber { get; }
-    [Selector("storeID")] public NSString StoreID { get; }
-    [Selector("bundleID")] public NSString BundleID { get; }
-    [Selector("processID")] public NSString ProcessID { get; }
-    [Selector("contextName")] public NSString? ContextName { get; }
-    [Selector("author")] public NSString? Author { get; }
-    [Selector("token")] public NSPersistentHistoryToken Token { get; }
-    [Selector("entityDescriptionWithContext:")] public static NSEntityDescription? EntityDescriptionWithContext(NSManagedObjectContext context);
-    [Selector("objectIDNotification")] public NSNotification ObjectIDNotification();
+    [Selector("entityDescription")]
+    public static NSEntityDescription? EntityDescription { get; }
+    [Selector("fetchRequest")]
+    public static NSFetchRequest? FetchRequest { get; }
+    [Selector("timestamp")]
+    public NSDate Timestamp { get; }
+    [Selector("changes")]
+    public NSArray? Changes { get; }
+    [Selector("transactionNumber")]
+    public long TransactionNumber { get; }
+    [Selector("storeID")]
+    public NSString StoreID { get; }
+    [Selector("bundleID")]
+    public NSString BundleID { get; }
+    [Selector("processID")]
+    public NSString ProcessID { get; }
+    [Selector("contextName")]
+    public NSString? ContextName { get; }
+    [Selector("author")]
+    public NSString? Author { get; }
+    [Selector("token")]
+    public NSPersistentHistoryToken Token { get; }
+    [Selector("entityDescriptionWithContext:")]
+    public static NSEntityDescription? EntityDescriptionWithContext(NSManagedObjectContext context);
+    [Selector("objectIDNotification")]
+    public NSNotification ObjectIDNotification();
 }
 
 #endif

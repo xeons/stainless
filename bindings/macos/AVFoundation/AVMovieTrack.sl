@@ -35,93 +35,126 @@ import Standard.ObjC;
 
 public extern objc class AVMovieTrack : AVAssetTrack
 {
-    [Selector("mediaPresentationTimeRange")] public CMTimeRange MediaPresentationTimeRange { get; }
-    [Selector("mediaDecodeTimeRange")] public CMTimeRange MediaDecodeTimeRange { get; }
-    [Selector("alternateGroupID")] public NSInteger AlternateGroupID { get; }
+    [Selector("mediaPresentationTimeRange")]
+    public CMTimeRange MediaPresentationTimeRange { get; }
+    [Selector("mediaDecodeTimeRange")]
+    public CMTimeRange MediaDecodeTimeRange { get; }
+    [Selector("alternateGroupID")]
+    public NSInteger AlternateGroupID { get; }
 }
 
 /// AVMovieTrackMediaDataStorage, a category of AVMovieTrack.
 public extern objc class AVMovieTrack
 {
-    [Selector("mediaDataStorage")] public AVMediaDataStorage? MediaDataStorage { get; }
+    [Selector("mediaDataStorage")]
+    public AVMediaDataStorage? MediaDataStorage { get; }
 }
 
 public extern objc class AVMutableMovieTrack : AVMovieTrack
 {
-    [Selector("mediaDataStorage", "setMediaDataStorage:")] public AVMediaDataStorage? MediaDataStorage { get; set; }
-    [Selector("sampleReferenceBaseURL", "setSampleReferenceBaseURL:")] public NSURL? SampleReferenceBaseURL { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("alternateGroupID", "setAlternateGroupID:")] public NSInteger AlternateGroupID { get; set; }
-    [Selector("isModified", "setModified:")] public bool Modified { get; set; }
-    [Selector("hasProtectedContent")] public bool HasProtectedContent { get; }
-    [Selector("timescale", "setTimescale:")] public CMTimeScale Timescale { get; set; }
+    [Selector("mediaDataStorage", "setMediaDataStorage:")]
+    public AVMediaDataStorage? MediaDataStorage { get; set; }
+    [Selector("sampleReferenceBaseURL", "setSampleReferenceBaseURL:")]
+    public NSURL? SampleReferenceBaseURL { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("alternateGroupID", "setAlternateGroupID:")]
+    public NSInteger AlternateGroupID { get; set; }
+    [Selector("isModified", "setModified:")]
+    public bool Modified { get; set; }
+    [Selector("hasProtectedContent")]
+    public bool HasProtectedContent { get; }
+    [Selector("timescale", "setTimescale:")]
+    public CMTimeScale Timescale { get; set; }
 }
 
 /// AVMutableMovieTrackLanguageProperties, a category of AVMutableMovieTrack.
 public extern objc class AVMutableMovieTrack
 {
-    [Selector("languageCode", "setLanguageCode:")] public NSString? LanguageCode { get; set; }
-    [Selector("extendedLanguageTag", "setExtendedLanguageTag:")] public NSString? ExtendedLanguageTag { get; set; }
+    [Selector("languageCode", "setLanguageCode:")]
+    public NSString? LanguageCode { get; set; }
+    [Selector("extendedLanguageTag", "setExtendedLanguageTag:")]
+    public NSString? ExtendedLanguageTag { get; set; }
 }
 
 /// AVMutableMovieTrackVisualProperties, a category of AVMutableMovieTrack.
 public extern objc class AVMutableMovieTrack
 {
-    [Selector("naturalSize", "setNaturalSize:")] public CGSize NaturalSize { get; set; }
-    [Selector("preferredTransform", "setPreferredTransform:")] public CGAffineTransform PreferredTransform { get; set; }
-    [Selector("layer", "setLayer:")] public NSInteger Layer { get; set; }
-    [Selector("cleanApertureDimensions", "setCleanApertureDimensions:")] public CGSize CleanApertureDimensions { get; set; }
-    [Selector("productionApertureDimensions", "setProductionApertureDimensions:")] public CGSize ProductionApertureDimensions { get; set; }
-    [Selector("encodedPixelsDimensions", "setEncodedPixelsDimensions:")] public CGSize EncodedPixelsDimensions { get; set; }
+    [Selector("naturalSize", "setNaturalSize:")]
+    public CGSize NaturalSize { get; set; }
+    [Selector("preferredTransform", "setPreferredTransform:")]
+    public CGAffineTransform PreferredTransform { get; set; }
+    [Selector("layer", "setLayer:")]
+    public NSInteger Layer { get; set; }
+    [Selector("cleanApertureDimensions", "setCleanApertureDimensions:")]
+    public CGSize CleanApertureDimensions { get; set; }
+    [Selector("productionApertureDimensions", "setProductionApertureDimensions:")]
+    public CGSize ProductionApertureDimensions { get; set; }
+    [Selector("encodedPixelsDimensions", "setEncodedPixelsDimensions:")]
+    public CGSize EncodedPixelsDimensions { get; set; }
 }
 
 /// AVMutableMovieTrackAudibleProperties, a category of AVMutableMovieTrack.
 public extern objc class AVMutableMovieTrack
 {
-    [Selector("preferredVolume", "setPreferredVolume:")] public float PreferredVolume { get; set; }
+    [Selector("preferredVolume", "setPreferredVolume:")]
+    public float PreferredVolume { get; set; }
 }
 
 /// AVMutableMovieTrackChunkProperties, a category of AVMutableMovieTrack.
 public extern objc class AVMutableMovieTrack
 {
-    [Selector("preferredMediaChunkSize", "setPreferredMediaChunkSize:")] public NSInteger PreferredMediaChunkSize { get; set; }
-    [Selector("preferredMediaChunkDuration", "setPreferredMediaChunkDuration:")] public CMTime PreferredMediaChunkDuration { get; set; }
-    [Selector("preferredMediaChunkAlignment", "setPreferredMediaChunkAlignment:")] public NSInteger PreferredMediaChunkAlignment { get; set; }
+    [Selector("preferredMediaChunkSize", "setPreferredMediaChunkSize:")]
+    public NSInteger PreferredMediaChunkSize { get; set; }
+    [Selector("preferredMediaChunkDuration", "setPreferredMediaChunkDuration:")]
+    public CMTime PreferredMediaChunkDuration { get; set; }
+    [Selector("preferredMediaChunkAlignment", "setPreferredMediaChunkAlignment:")]
+    public NSInteger PreferredMediaChunkAlignment { get; set; }
 }
 
 /// AVMutableMovieTrackTrackLevelEditing, a category of AVMutableMovieTrack.
 public extern objc class AVMutableMovieTrack
 {
-    [Selector("insertTimeRange:ofTrack:atTime:copySampleData:error:")] public bool InsertTimeRangeOfTrackAtTimeCopySampleDataError(CMTimeRange timeRange, AVAssetTrack track, CMTime startTime, bool copySampleData, out NSError? outError);
-    [Selector("insertEmptyTimeRange:")] public void InsertEmptyTimeRange(CMTimeRange timeRange);
-    [Selector("removeTimeRange:")] public void RemoveTimeRange(CMTimeRange timeRange);
-    [Selector("scaleTimeRange:toDuration:")] public void ScaleTimeRangeToDuration(CMTimeRange timeRange, CMTime duration);
+    [Selector("insertTimeRange:ofTrack:atTime:copySampleData:error:")]
+    public bool InsertTimeRangeOfTrackAtTimeCopySampleDataError(CMTimeRange timeRange, AVAssetTrack track, CMTime startTime, bool copySampleData, out NSError? outError);
+    [Selector("insertEmptyTimeRange:")]
+    public void InsertEmptyTimeRange(CMTimeRange timeRange);
+    [Selector("removeTimeRange:")]
+    public void RemoveTimeRange(CMTimeRange timeRange);
+    [Selector("scaleTimeRange:toDuration:")]
+    public void ScaleTimeRangeToDuration(CMTimeRange timeRange, CMTime duration);
 }
 
 /// AVMutableMovieTrackMetadataEditing, a category of AVMutableMovieTrack.
 public extern objc class AVMutableMovieTrack
 {
-    [Selector("metadata", "setMetadata:")] public NSArray Metadata { get; set; }
+    [Selector("metadata", "setMetadata:")]
+    public NSArray Metadata { get; set; }
 }
 
 /// AVMutableMovieTrackTrackAssociations, a category of AVMutableMovieTrack.
 public extern objc class AVMutableMovieTrack
 {
-    [Selector("addTrackAssociationToTrack:type:")] public void AddTrackAssociationToTrackType(AVMovieTrack movieTrack, AVTrackAssociationType trackAssociationType);
-    [Selector("removeTrackAssociationToTrack:type:")] public void RemoveTrackAssociationToTrackType(AVMovieTrack movieTrack, AVTrackAssociationType trackAssociationType);
+    [Selector("addTrackAssociationToTrack:type:")]
+    public void AddTrackAssociationToTrackType(AVMovieTrack movieTrack, AVTrackAssociationType trackAssociationType);
+    [Selector("removeTrackAssociationToTrack:type:")]
+    public void RemoveTrackAssociationToTrackType(AVMovieTrack movieTrack, AVTrackAssociationType trackAssociationType);
 }
 
 /// AVMutableMovieTrackFormatDescriptions, a category of AVMutableMovieTrack.
 public extern objc class AVMutableMovieTrack
 {
-    [Selector("replaceFormatDescription:withFormatDescription:")] public void ReplaceFormatDescriptionWithFormatDescription(CMFormatDescriptionRef formatDescription, CMFormatDescriptionRef newFormatDescription);
+    [Selector("replaceFormatDescription:withFormatDescription:")]
+    public void ReplaceFormatDescriptionWithFormatDescription(CMFormatDescriptionRef formatDescription, CMFormatDescriptionRef newFormatDescription);
 }
 
 /// AVMutableMovieTrackSampleLevelEditing, a category of AVMutableMovieTrack.
 public extern objc class AVMutableMovieTrack
 {
-    [Selector("appendSampleBuffer:decodeTime:presentationTime:error:")] public bool AppendSampleBufferDecodeTimePresentationTimeError(CMSampleBufferRef sampleBuffer, CMTime* outDecodeTime, CMTime* outPresentationTime, out NSError? outError);
-    [Selector("insertMediaTimeRange:intoTimeRange:")] public bool InsertMediaTimeRangeIntoTimeRange(CMTimeRange mediaTimeRange, CMTimeRange trackTimeRange);
+    [Selector("appendSampleBuffer:decodeTime:presentationTime:error:")]
+    public bool AppendSampleBufferDecodeTimePresentationTimeError(CMSampleBufferRef sampleBuffer, CMTime* outDecodeTime, CMTime* outPresentationTime, out NSError? outError);
+    [Selector("insertMediaTimeRange:intoTimeRange:")]
+    public bool InsertMediaTimeRangeIntoTimeRange(CMTimeRange mediaTimeRange, CMTimeRange trackTimeRange);
 }
 
 public extern "C" NSString? AVFragmentedMovieTrackTimeRangeDidChangeNotification;
@@ -136,11 +169,16 @@ public extern objc class AVFragmentedMovieTrack : AVMovieTrack { }
 /// SynchronousTrackInterface, a category of AVMutableMovieTrack.
 public extern objc class AVMutableMovieTrack
 {
-    [Selector("hasMediaCharacteristic:")] public bool HasMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
-    [Selector("segmentForTrackTime:")] public AVAssetTrackSegment? SegmentForTrackTime(CMTime trackTime);
-    [Selector("samplePresentationTimeForTrackTime:")] public CMTime SamplePresentationTimeForTrackTime(CMTime trackTime);
-    [Selector("metadataForFormat:")] public NSArray MetadataForFormat(AVMetadataFormat format);
-    [Selector("associatedTracksOfType:")] public NSArray AssociatedTracksOfType(AVTrackAssociationType trackAssociationType);
+    [Selector("hasMediaCharacteristic:")]
+    public bool HasMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("segmentForTrackTime:")]
+    public AVAssetTrackSegment? SegmentForTrackTime(CMTime trackTime);
+    [Selector("samplePresentationTimeForTrackTime:")]
+    public CMTime SamplePresentationTimeForTrackTime(CMTime trackTime);
+    [Selector("metadataForFormat:")]
+    public NSArray MetadataForFormat(AVMetadataFormat format);
+    [Selector("associatedTracksOfType:")]
+    public NSArray AssociatedTracksOfType(AVTrackAssociationType trackAssociationType);
 }
 
 #endif

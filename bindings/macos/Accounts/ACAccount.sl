@@ -34,12 +34,18 @@ import Standard.ObjC;
 /// Deprecated in macOS 12.0.
 public extern objc class ACAccount : NSObject
 {
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("accountType", "setAccountType:")] public ACAccountType? AccountType { get; set; }
-    [Selector("accountDescription", "setAccountDescription:")] public NSString? AccountDescription { get; set; }
-    [Selector("username", "setUsername:")] public NSString? Username { get; set; }
-    [Selector("credential", "setCredential:")] public ACAccountCredential? Credential { get; set; }
-    [Selector("initWithAccountType:")] public Self? InitWithAccountType(ACAccountType? type);
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("accountType", "setAccountType:")]
+    public ACAccountType? AccountType { get; set; }
+    [Selector("accountDescription", "setAccountDescription:")]
+    public NSString? AccountDescription { get; set; }
+    [Selector("username", "setUsername:")]
+    public NSString? Username { get; set; }
+    [Selector("credential", "setCredential:")]
+    public ACAccountCredential? Credential { get; set; }
+    [Selector("initWithAccountType:")]
+    public Self? InitWithAccountType(ACAccountType? type);
 }
 
 #endif

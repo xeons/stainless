@@ -64,45 +64,82 @@ public enum NSRuleEditorRowType : ulong
 
 public extern objc class NSRuleEditor : NSControl
 {
-    [Selector("delegate", "setDelegate:")] public NSRuleEditorDelegate? Delegate { get; set; }
-    [Selector("formattingStringsFilename", "setFormattingStringsFilename:")] public NSString? FormattingStringsFilename { get; set; }
-    [Selector("formattingDictionary", "setFormattingDictionary:")] public NSDictionary? FormattingDictionary { get; set; }
-    [Selector("nestingMode", "setNestingMode:")] public NSRuleEditorNestingMode NestingMode { get; set; }
-    [Selector("rowHeight", "setRowHeight:")] public CGFloat RowHeight { get; set; }
-    [Selector("isEditable", "setEditable:")] public bool Editable { get; set; }
-    [Selector("canRemoveAllRows", "setCanRemoveAllRows:")] public bool CanRemoveAllRows { get; set; }
-    [Selector("predicate")] public NSPredicate? Predicate { get; }
-    [Selector("numberOfRows")] public NSInteger NumberOfRows { get; }
-    [Selector("selectedRowIndexes")] public NSIndexSet SelectedRowIndexes { get; }
-    [Selector("rowClass", "setRowClass:")] public Class RowClass { get; set; }
-    [Selector("rowTypeKeyPath", "setRowTypeKeyPath:")] public NSString RowTypeKeyPath { get; set; }
-    [Selector("subrowsKeyPath", "setSubrowsKeyPath:")] public NSString SubrowsKeyPath { get; set; }
-    [Selector("criteriaKeyPath", "setCriteriaKeyPath:")] public NSString CriteriaKeyPath { get; set; }
-    [Selector("displayValuesKeyPath", "setDisplayValuesKeyPath:")] public NSString DisplayValuesKeyPath { get; set; }
-    [Selector("reloadCriteria")] public void ReloadCriteria();
-    [Selector("reloadPredicate")] public void ReloadPredicate();
-    [Selector("predicateForRow:")] public NSPredicate? PredicateForRow(NSInteger row);
-    [Selector("subrowIndexesForRow:")] public NSIndexSet SubrowIndexesForRow(NSInteger rowIndex);
-    [Selector("criteriaForRow:")] public NSArray CriteriaForRow(NSInteger row);
-    [Selector("displayValuesForRow:")] public NSArray DisplayValuesForRow(NSInteger row);
-    [Selector("rowForDisplayValue:")] public NSInteger RowForDisplayValue(AnyObject displayValue);
-    [Selector("rowTypeForRow:")] public NSRuleEditorRowType RowTypeForRow(NSInteger rowIndex);
-    [Selector("parentRowForRow:")] public NSInteger ParentRowForRow(NSInteger rowIndex);
-    [Selector("addRow:")] public void AddRow(AnyObject? sender);
-    [Selector("insertRowAtIndex:withType:asSubrowOfRow:animate:")] public void InsertRowAtIndexWithTypeAsSubrowOfRowAnimate(NSInteger rowIndex, NSRuleEditorRowType rowType, NSInteger parentRow, bool shouldAnimate);
-    [Selector("setCriteria:andDisplayValues:forRowAtIndex:")] public void SetCriteriaAndDisplayValuesForRowAtIndex(NSArray criteria, NSArray values, NSInteger rowIndex);
-    [Selector("removeRowAtIndex:")] public void RemoveRowAtIndex(NSInteger rowIndex);
-    [Selector("removeRowsAtIndexes:includeSubrows:")] public void RemoveRowsAtIndexesIncludeSubrows(NSIndexSet rowIndexes, bool includeSubrows);
-    [Selector("selectRowIndexes:byExtendingSelection:")] public void SelectRowIndexesByExtendingSelection(NSIndexSet indexes, bool extend);
+    [Selector("delegate", "setDelegate:")]
+    public NSRuleEditorDelegate? Delegate { get; set; }
+    [Selector("formattingStringsFilename", "setFormattingStringsFilename:")]
+    public NSString? FormattingStringsFilename { get; set; }
+    [Selector("formattingDictionary", "setFormattingDictionary:")]
+    public NSDictionary? FormattingDictionary { get; set; }
+    [Selector("nestingMode", "setNestingMode:")]
+    public NSRuleEditorNestingMode NestingMode { get; set; }
+    [Selector("rowHeight", "setRowHeight:")]
+    public CGFloat RowHeight { get; set; }
+    [Selector("isEditable", "setEditable:")]
+    public bool Editable { get; set; }
+    [Selector("canRemoveAllRows", "setCanRemoveAllRows:")]
+    public bool CanRemoveAllRows { get; set; }
+    [Selector("predicate")]
+    public NSPredicate? Predicate { get; }
+    [Selector("numberOfRows")]
+    public NSInteger NumberOfRows { get; }
+    [Selector("selectedRowIndexes")]
+    public NSIndexSet SelectedRowIndexes { get; }
+    [Selector("rowClass", "setRowClass:")]
+    public Class RowClass { get; set; }
+    [Selector("rowTypeKeyPath", "setRowTypeKeyPath:")]
+    public NSString RowTypeKeyPath { get; set; }
+    [Selector("subrowsKeyPath", "setSubrowsKeyPath:")]
+    public NSString SubrowsKeyPath { get; set; }
+    [Selector("criteriaKeyPath", "setCriteriaKeyPath:")]
+    public NSString CriteriaKeyPath { get; set; }
+    [Selector("displayValuesKeyPath", "setDisplayValuesKeyPath:")]
+    public NSString DisplayValuesKeyPath { get; set; }
+    [Selector("reloadCriteria")]
+    public void ReloadCriteria();
+    [Selector("reloadPredicate")]
+    public void ReloadPredicate();
+    [Selector("predicateForRow:")]
+    public NSPredicate? PredicateForRow(NSInteger row);
+    [Selector("subrowIndexesForRow:")]
+    public NSIndexSet SubrowIndexesForRow(NSInteger rowIndex);
+    [Selector("criteriaForRow:")]
+    public NSArray CriteriaForRow(NSInteger row);
+    [Selector("displayValuesForRow:")]
+    public NSArray DisplayValuesForRow(NSInteger row);
+    [Selector("rowForDisplayValue:")]
+    public NSInteger RowForDisplayValue(AnyObject displayValue);
+    [Selector("rowTypeForRow:")]
+    public NSRuleEditorRowType RowTypeForRow(NSInteger rowIndex);
+    [Selector("parentRowForRow:")]
+    public NSInteger ParentRowForRow(NSInteger rowIndex);
+    [Selector("addRow:")]
+    public void AddRow(AnyObject? sender);
+    [Selector("insertRowAtIndex:withType:asSubrowOfRow:animate:")]
+    public void InsertRowAtIndexWithTypeAsSubrowOfRowAnimate(NSInteger rowIndex, NSRuleEditorRowType rowType, NSInteger parentRow, bool shouldAnimate);
+    [Selector("setCriteria:andDisplayValues:forRowAtIndex:")]
+    public void SetCriteriaAndDisplayValuesForRowAtIndex(NSArray criteria, NSArray values, NSInteger rowIndex);
+    [Selector("removeRowAtIndex:")]
+    public void RemoveRowAtIndex(NSInteger rowIndex);
+    [Selector("removeRowsAtIndexes:includeSubrows:")]
+    public void RemoveRowsAtIndexesIncludeSubrows(NSIndexSet rowIndexes, bool includeSubrows);
+    [Selector("selectRowIndexes:byExtendingSelection:")]
+    public void SelectRowIndexesByExtendingSelection(NSIndexSet indexes, bool extend);
 }
 
 public objc interface NSRuleEditorDelegate : NSObjectProtocol
 {
-    [Selector("ruleEditor:numberOfChildrenForCriterion:withRowType:")] NSInteger RuleEditorNumberOfChildrenForCriterionWithRowType(NSRuleEditor editor, AnyObject? criterion, NSRuleEditorRowType rowType);
-    [Selector("ruleEditor:child:forCriterion:withRowType:")] AnyObject RuleEditorChildForCriterionWithRowType(NSRuleEditor editor, NSInteger index, AnyObject? criterion, NSRuleEditorRowType rowType);
-    [Selector("ruleEditor:displayValueForCriterion:inRow:")] AnyObject RuleEditorDisplayValueForCriterionInRow(NSRuleEditor editor, AnyObject criterion, NSInteger row);
-    [Optional] [Selector("ruleEditor:predicatePartsForCriterion:withDisplayValue:inRow:")] NSDictionary? RuleEditorPredicatePartsForCriterionWithDisplayValueInRow(NSRuleEditor editor, AnyObject criterion, AnyObject value, NSInteger row);
-    [Optional] [Selector("ruleEditorRowsDidChange:")] void RuleEditorRowsDidChange(NSNotification notification);
+    [Selector("ruleEditor:numberOfChildrenForCriterion:withRowType:")]
+    NSInteger RuleEditorNumberOfChildrenForCriterionWithRowType(NSRuleEditor editor, AnyObject? criterion, NSRuleEditorRowType rowType);
+    [Selector("ruleEditor:child:forCriterion:withRowType:")]
+    AnyObject RuleEditorChildForCriterionWithRowType(NSRuleEditor editor, NSInteger index, AnyObject? criterion, NSRuleEditorRowType rowType);
+    [Selector("ruleEditor:displayValueForCriterion:inRow:")]
+    AnyObject RuleEditorDisplayValueForCriterionInRow(NSRuleEditor editor, AnyObject criterion, NSInteger row);
+    [Optional]
+    [Selector("ruleEditor:predicatePartsForCriterion:withDisplayValue:inRow:")]
+    NSDictionary? RuleEditorPredicatePartsForCriterionWithDisplayValueInRow(NSRuleEditor editor, AnyObject criterion, AnyObject value, NSInteger row);
+    [Optional]
+    [Selector("ruleEditorRowsDidChange:")]
+    void RuleEditorRowsDidChange(NSNotification notification);
 }
 
 public extern "C" NSNotificationName NSRuleEditorRowsDidChangeNotification;

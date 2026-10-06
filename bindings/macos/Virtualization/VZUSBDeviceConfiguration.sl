@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public objc interface VZUSBDeviceConfiguration : NSObjectProtocol
 {
-    [Selector("uuid", "setUuid:")] NSUUID Uuid { get; set; }
+    [Selector("uuid", "setUuid:")]
+    NSUUID Uuid { get; set; }
 }
 
 #endif

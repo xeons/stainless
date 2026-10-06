@@ -33,10 +33,14 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.12.
 public extern objc class PDFAnnotationMarkup : PDFAnnotation, NSCopying, NSCoding
 {
-    [Selector("quadrilateralPoints")] public NSArray? QuadrilateralPoints();
-    [Selector("setQuadrilateralPoints:")] public void SetQuadrilateralPoints(NSArray? points);
-    [Selector("markupType")] public PDFMarkupType MarkupType();
-    [Selector("setMarkupType:")] public void SetMarkupType(PDFMarkupType type);
+    [Selector("quadrilateralPoints")]
+    public NSArray? QuadrilateralPoints();
+    [Selector("setQuadrilateralPoints:")]
+    public void SetQuadrilateralPoints(NSArray? points);
+    [Selector("markupType")]
+    public PDFMarkupType MarkupType();
+    [Selector("setMarkupType:")]
+    public void SetMarkupType(PDFMarkupType type);
 }
 
 #endif

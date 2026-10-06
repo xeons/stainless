@@ -43,49 +43,82 @@ public enum NSDrawerState : ulong
 /// Deprecated in macOS 10.13.
 public extern objc class NSDrawer : NSResponder, NSAccessibilityElementProtocol, NSAccessibility
 {
-    [Selector("parentWindow", "setParentWindow:")] public NSWindow? ParentWindow { get; set; }
-    [Selector("contentView", "setContentView:")] public NSView? ContentView { get; set; }
-    [Selector("preferredEdge", "setPreferredEdge:")] public NSRectEdge PreferredEdge { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSDrawerDelegate? Delegate { get; set; }
-    [Selector("state")] public NSInteger State { get; }
-    [Selector("edge")] public NSRectEdge Edge { get; }
-    [Selector("contentSize", "setContentSize:")] public NSSize ContentSize { get; set; }
-    [Selector("minContentSize", "setMinContentSize:")] public NSSize MinContentSize { get; set; }
-    [Selector("maxContentSize", "setMaxContentSize:")] public NSSize MaxContentSize { get; set; }
-    [Selector("leadingOffset", "setLeadingOffset:")] public CGFloat LeadingOffset { get; set; }
-    [Selector("trailingOffset", "setTrailingOffset:")] public CGFloat TrailingOffset { get; set; }
-    [Selector("initWithContentSize:preferredEdge:")] public Self InitWithContentSizePreferredEdge(NSSize contentSize, NSRectEdge edge);
-    [Selector("open")] public void Open();
-    [Selector("openOnEdge:")] public void OpenOnEdge(NSRectEdge edge);
-    [Selector("close")] public void Close();
-    [Selector("open:")] public void Open(AnyObject? sender);
-    [Selector("close:")] public void Close(AnyObject? sender);
-    [Selector("toggle:")] public void Toggle(AnyObject? sender);
+    [Selector("parentWindow", "setParentWindow:")]
+    public NSWindow? ParentWindow { get; set; }
+    [Selector("contentView", "setContentView:")]
+    public NSView? ContentView { get; set; }
+    [Selector("preferredEdge", "setPreferredEdge:")]
+    public NSRectEdge PreferredEdge { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSDrawerDelegate? Delegate { get; set; }
+    [Selector("state")]
+    public NSInteger State { get; }
+    [Selector("edge")]
+    public NSRectEdge Edge { get; }
+    [Selector("contentSize", "setContentSize:")]
+    public NSSize ContentSize { get; set; }
+    [Selector("minContentSize", "setMinContentSize:")]
+    public NSSize MinContentSize { get; set; }
+    [Selector("maxContentSize", "setMaxContentSize:")]
+    public NSSize MaxContentSize { get; set; }
+    [Selector("leadingOffset", "setLeadingOffset:")]
+    public CGFloat LeadingOffset { get; set; }
+    [Selector("trailingOffset", "setTrailingOffset:")]
+    public CGFloat TrailingOffset { get; set; }
+    [Selector("initWithContentSize:preferredEdge:")]
+    public Self InitWithContentSizePreferredEdge(NSSize contentSize, NSRectEdge edge);
+    [Selector("open")]
+    public void Open();
+    [Selector("openOnEdge:")]
+    public void OpenOnEdge(NSRectEdge edge);
+    [Selector("close")]
+    public void Close();
+    [Selector("open:")]
+    public void Open(AnyObject? sender);
+    [Selector("close:")]
+    public void Close(AnyObject? sender);
+    [Selector("toggle:")]
+    public void Toggle(AnyObject? sender);
 }
 
 /// NSDrawers, a category of NSWindow.
 public extern objc class NSWindow
 {
     /// Deprecated in macOS 10.13.
-    [Selector("drawers")] public NSArray? Drawers { get; }
+    [Selector("drawers")]
+    public NSArray? Drawers { get; }
 }
 
 public objc interface NSDrawerDelegate : NSObjectProtocol
 {
     /// Deprecated in macOS 10.13.
-    [Optional] [Selector("drawerShouldOpen:")] bool DrawerShouldOpen(NSDrawer sender);
+    [Optional]
+    [Selector("drawerShouldOpen:")]
+    bool DrawerShouldOpen(NSDrawer sender);
     /// Deprecated in macOS 10.13.
-    [Optional] [Selector("drawerShouldClose:")] bool DrawerShouldClose(NSDrawer sender);
+    [Optional]
+    [Selector("drawerShouldClose:")]
+    bool DrawerShouldClose(NSDrawer sender);
     /// Deprecated in macOS 10.13.
-    [Optional] [Selector("drawerWillResizeContents:toSize:")] NSSize DrawerWillResizeContentsToSize(NSDrawer sender, NSSize contentSize);
+    [Optional]
+    [Selector("drawerWillResizeContents:toSize:")]
+    NSSize DrawerWillResizeContentsToSize(NSDrawer sender, NSSize contentSize);
     /// Deprecated in macOS 10.13.
-    [Optional] [Selector("drawerWillOpen:")] void DrawerWillOpen(NSNotification notification);
+    [Optional]
+    [Selector("drawerWillOpen:")]
+    void DrawerWillOpen(NSNotification notification);
     /// Deprecated in macOS 10.13.
-    [Optional] [Selector("drawerDidOpen:")] void DrawerDidOpen(NSNotification notification);
+    [Optional]
+    [Selector("drawerDidOpen:")]
+    void DrawerDidOpen(NSNotification notification);
     /// Deprecated in macOS 10.13.
-    [Optional] [Selector("drawerWillClose:")] void DrawerWillClose(NSNotification notification);
+    [Optional]
+    [Selector("drawerWillClose:")]
+    void DrawerWillClose(NSNotification notification);
     /// Deprecated in macOS 10.13.
-    [Optional] [Selector("drawerDidClose:")] void DrawerDidClose(NSNotification notification);
+    [Optional]
+    [Selector("drawerDidClose:")]
+    void DrawerDidClose(NSNotification notification);
 }
 
 /// Deprecated in macOS 10.13.

@@ -34,34 +34,62 @@ import Standard.ObjC;
 
 public extern objc class IOUSBHostObject : NSObject
 {
-    [Selector("ioService")] public io_service_t IoService { get; }
-    [Selector("queue")] public dispatch_queue_t Queue { get; }
-    [Selector("deviceDescriptor")] public IOUSBDeviceDescriptor* DeviceDescriptor { get; }
-    [Selector("capabilityDescriptors")] public IOUSBBOSDescriptor* CapabilityDescriptors { get; }
-    [Selector("deviceAddress")] public NSUInteger DeviceAddress { get; }
-    [Selector("initWithIOService:options:queue:error:interestHandler:")] public Self? InitWithIOServiceOptionsQueueErrorInterestHandler(io_service_t ioService, IOUSBHostObjectInitOptions options, dispatch_queue_t? queue, out NSError? error, IOUSBHostInterestHandler? interestHandler);
-    [Selector("initWithIOService:queue:error:interestHandler:")] public Self? InitWithIOServiceQueueErrorInterestHandler(io_service_t ioService, dispatch_queue_t? queue, out NSError? error, IOUSBHostInterestHandler? interestHandler);
-    [Selector("destroy")] public void Destroy();
-    [Selector("destroyWithOptions:")] public void DestroyWithOptions(IOUSBHostObjectDestroyOptions options);
-    [Selector("sendDeviceRequest:data:bytesTransferred:completionTimeout:error:")] public bool SendDeviceRequestDataBytesTransferredCompletionTimeoutError(IOUSBDeviceRequest request, NSMutableData? data, NSUInteger* bytesTransferred, NSTimeInterval completionTimeout, out NSError? error);
-    [Selector("sendDeviceRequest:data:bytesTransferred:error:")] public bool SendDeviceRequestDataBytesTransferredError(IOUSBDeviceRequest request, NSMutableData? data, NSUInteger* bytesTransferred, out NSError? error);
-    [Selector("sendDeviceRequest:error:")] public bool SendDeviceRequestError(IOUSBDeviceRequest request, out NSError? error);
-    [Selector("enqueueDeviceRequest:data:completionTimeout:error:completionHandler:")] public bool EnqueueDeviceRequestDataCompletionTimeoutErrorCompletionHandler(IOUSBDeviceRequest request, NSMutableData? data, NSTimeInterval completionTimeout, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
-    [Selector("enqueueDeviceRequest:data:error:completionHandler:")] public bool EnqueueDeviceRequestDataErrorCompletionHandler(IOUSBDeviceRequest request, NSMutableData? data, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
-    [Selector("enqueueDeviceRequest:error:completionHandler:")] public bool EnqueueDeviceRequestErrorCompletionHandler(IOUSBDeviceRequest request, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
-    [Selector("abortDeviceRequestsWithOption:error:")] public bool AbortDeviceRequestsWithOptionError(IOUSBHostAbortOption option, out NSError? error);
-    [Selector("abortDeviceRequestsWithError:")] public bool AbortDeviceRequestsWithError(out NSError? error);
-    [Selector("descriptorWithType:length:index:languageID:requestType:requestRecipient:error:")] public IOUSBDescriptor* DescriptorWithTypeLengthIndexLanguageIDRequestTypeRequestRecipientError(tIOUSBDescriptorType type, NSUInteger* length, NSUInteger index, NSUInteger languageID, tIOUSBDeviceRequestTypeValue requestType, tIOUSBDeviceRequestRecipientValue requestRecipient, out NSError? error);
-    [Selector("descriptorWithType:length:index:languageID:error:")] public IOUSBDescriptor* DescriptorWithTypeLengthIndexLanguageIDError(tIOUSBDescriptorType type, NSUInteger* length, NSUInteger index, NSUInteger languageID, out NSError? error);
-    [Selector("descriptorWithType:length:error:")] public IOUSBDescriptor* DescriptorWithTypeLengthError(tIOUSBDescriptorType type, NSUInteger* length, out NSError? error);
-    [Selector("configurationDescriptorWithIndex:error:")] public IOUSBConfigurationDescriptor* ConfigurationDescriptorWithIndexError(NSUInteger index, out NSError? error);
-    [Selector("configurationDescriptorWithConfigurationValue:error:")] public IOUSBConfigurationDescriptor* ConfigurationDescriptorWithConfigurationValueError(NSUInteger configurationValue, out NSError? error);
-    [Selector("stringWithIndex:languageID:error:")] public NSString? StringWithIndexLanguageIDError(NSUInteger index, NSUInteger languageID, out NSError? error);
-    [Selector("stringWithIndex:error:")] public NSString? StringWithIndexError(NSUInteger index, out NSError? error);
-    [Selector("frameNumberWithTime:")] public ulong FrameNumberWithTime(IOUSBHostTime* time);
-    [Selector("currentMicroframeWithTime:error:")] public ulong CurrentMicroframeWithTimeError(IOUSBHostTime* time, out NSError? error);
-    [Selector("referenceMicroframeWithTime:error:")] public ulong ReferenceMicroframeWithTimeError(IOUSBHostTime* time, out NSError? error);
-    [Selector("ioDataWithCapacity:error:")] public NSMutableData? IoDataWithCapacityError(NSUInteger capacity, out NSError? error);
+    [Selector("ioService")]
+    public io_service_t IoService { get; }
+    [Selector("queue")]
+    public dispatch_queue_t Queue { get; }
+    [Selector("deviceDescriptor")]
+    public IOUSBDeviceDescriptor* DeviceDescriptor { get; }
+    [Selector("capabilityDescriptors")]
+    public IOUSBBOSDescriptor* CapabilityDescriptors { get; }
+    [Selector("deviceAddress")]
+    public NSUInteger DeviceAddress { get; }
+    [Selector("initWithIOService:options:queue:error:interestHandler:")]
+    public Self? InitWithIOServiceOptionsQueueErrorInterestHandler(io_service_t ioService, IOUSBHostObjectInitOptions options, dispatch_queue_t? queue, out NSError? error, IOUSBHostInterestHandler? interestHandler);
+    [Selector("initWithIOService:queue:error:interestHandler:")]
+    public Self? InitWithIOServiceQueueErrorInterestHandler(io_service_t ioService, dispatch_queue_t? queue, out NSError? error, IOUSBHostInterestHandler? interestHandler);
+    [Selector("destroy")]
+    public void Destroy();
+    [Selector("destroyWithOptions:")]
+    public void DestroyWithOptions(IOUSBHostObjectDestroyOptions options);
+    [Selector("sendDeviceRequest:data:bytesTransferred:completionTimeout:error:")]
+    public bool SendDeviceRequestDataBytesTransferredCompletionTimeoutError(IOUSBDeviceRequest request, NSMutableData? data, NSUInteger* bytesTransferred, NSTimeInterval completionTimeout, out NSError? error);
+    [Selector("sendDeviceRequest:data:bytesTransferred:error:")]
+    public bool SendDeviceRequestDataBytesTransferredError(IOUSBDeviceRequest request, NSMutableData? data, NSUInteger* bytesTransferred, out NSError? error);
+    [Selector("sendDeviceRequest:error:")]
+    public bool SendDeviceRequestError(IOUSBDeviceRequest request, out NSError? error);
+    [Selector("enqueueDeviceRequest:data:completionTimeout:error:completionHandler:")]
+    public bool EnqueueDeviceRequestDataCompletionTimeoutErrorCompletionHandler(IOUSBDeviceRequest request, NSMutableData? data, NSTimeInterval completionTimeout, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
+    [Selector("enqueueDeviceRequest:data:error:completionHandler:")]
+    public bool EnqueueDeviceRequestDataErrorCompletionHandler(IOUSBDeviceRequest request, NSMutableData? data, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
+    [Selector("enqueueDeviceRequest:error:completionHandler:")]
+    public bool EnqueueDeviceRequestErrorCompletionHandler(IOUSBDeviceRequest request, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
+    [Selector("abortDeviceRequestsWithOption:error:")]
+    public bool AbortDeviceRequestsWithOptionError(IOUSBHostAbortOption option, out NSError? error);
+    [Selector("abortDeviceRequestsWithError:")]
+    public bool AbortDeviceRequestsWithError(out NSError? error);
+    [Selector("descriptorWithType:length:index:languageID:requestType:requestRecipient:error:")]
+    public IOUSBDescriptor* DescriptorWithTypeLengthIndexLanguageIDRequestTypeRequestRecipientError(tIOUSBDescriptorType type, NSUInteger* length, NSUInteger index, NSUInteger languageID, tIOUSBDeviceRequestTypeValue requestType, tIOUSBDeviceRequestRecipientValue requestRecipient, out NSError? error);
+    [Selector("descriptorWithType:length:index:languageID:error:")]
+    public IOUSBDescriptor* DescriptorWithTypeLengthIndexLanguageIDError(tIOUSBDescriptorType type, NSUInteger* length, NSUInteger index, NSUInteger languageID, out NSError? error);
+    [Selector("descriptorWithType:length:error:")]
+    public IOUSBDescriptor* DescriptorWithTypeLengthError(tIOUSBDescriptorType type, NSUInteger* length, out NSError? error);
+    [Selector("configurationDescriptorWithIndex:error:")]
+    public IOUSBConfigurationDescriptor* ConfigurationDescriptorWithIndexError(NSUInteger index, out NSError? error);
+    [Selector("configurationDescriptorWithConfigurationValue:error:")]
+    public IOUSBConfigurationDescriptor* ConfigurationDescriptorWithConfigurationValueError(NSUInteger configurationValue, out NSError? error);
+    [Selector("stringWithIndex:languageID:error:")]
+    public NSString? StringWithIndexLanguageIDError(NSUInteger index, NSUInteger languageID, out NSError? error);
+    [Selector("stringWithIndex:error:")]
+    public NSString? StringWithIndexError(NSUInteger index, out NSError? error);
+    [Selector("frameNumberWithTime:")]
+    public ulong FrameNumberWithTime(IOUSBHostTime* time);
+    [Selector("currentMicroframeWithTime:error:")]
+    public ulong CurrentMicroframeWithTimeError(IOUSBHostTime* time, out NSError? error);
+    [Selector("referenceMicroframeWithTime:error:")]
+    public ulong ReferenceMicroframeWithTimeError(IOUSBHostTime* time, out NSError? error);
+    [Selector("ioDataWithCapacity:error:")]
+    public NSMutableData? IoDataWithCapacityError(NSUInteger capacity, out NSError? error);
 }
 
 public objc closure void IOUSBHostInterestHandler(IOUSBHostObject arg0, uint arg1, void* arg2);

@@ -77,144 +77,240 @@ public objc closure bool NSImageImageWithSizeFlippedDrawingHandlerDrawingHandler
 
 public extern objc class NSImage : NSObject
 {
-    [Selector("size", "setSize:")] public NSSize Size { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor BackgroundColor { get; set; }
-    [Selector("usesEPSOnResolutionMismatch", "setUsesEPSOnResolutionMismatch:")] public bool UsesEPSOnResolutionMismatch { get; set; }
-    [Selector("prefersColorMatch", "setPrefersColorMatch:")] public bool PrefersColorMatch { get; set; }
-    [Selector("matchesOnMultipleResolution", "setMatchesOnMultipleResolution:")] public bool MatchesOnMultipleResolution { get; set; }
-    [Selector("matchesOnlyOnBestFittingAxis", "setMatchesOnlyOnBestFittingAxis:")] public bool MatchesOnlyOnBestFittingAxis { get; set; }
-    [Selector("TIFFRepresentation")] public NSData? TIFFRepresentation { get; }
-    [Selector("representations")] public NSArray Representations { get; }
-    [Selector("isValid")] public bool Valid { get; }
-    [Selector("delegate", "setDelegate:")] public NSImageDelegate? Delegate { get; set; }
-    [Selector("imageTypes")] public static NSArray? ImageTypes { get; }
-    [Selector("imageUnfilteredTypes")] public static NSArray? ImageUnfilteredTypes { get; }
-    [Selector("cacheMode", "setCacheMode:")] public NSImageCacheMode CacheMode { get; set; }
-    [Selector("alignmentRect", "setAlignmentRect:")] public NSRect AlignmentRect { get; set; }
-    [Selector("isTemplate", "setTemplate:")] public bool Template { get; set; }
-    [Selector("accessibilityDescription", "setAccessibilityDescription:")] public NSString? AccessibilityDescription { get; set; }
-    [Selector("capInsets", "setCapInsets:")] public NSEdgeInsets CapInsets { get; set; }
-    [Selector("resizingMode", "setResizingMode:")] public NSImageResizingMode ResizingMode { get; set; }
-    [Selector("symbolConfiguration")] public NSImageSymbolConfiguration? SymbolConfiguration { get; }
-    [Selector("locale")] public NSLocale? Locale { get; }
-    [Selector("imageNamed:")] public static NSImage? ImageNamed(NSImageName name);
-    [Selector("imageWithSystemSymbolName:accessibilityDescription:")] public static Self? ImageWithSystemSymbolNameAccessibilityDescription(NSString name, NSString? description);
-    [Selector("imageWithSystemSymbolName:variableValue:accessibilityDescription:")] public static Self? ImageWithSystemSymbolNameVariableValueAccessibilityDescription(NSString name, double value, NSString? description);
-    [Selector("imageWithSymbolName:variableValue:")] public static Self? ImageWithSymbolNameVariableValue(NSString name, double value);
-    [Selector("imageWithSymbolName:bundle:variableValue:")] public static Self? ImageWithSymbolNameBundleVariableValue(NSString name, NSBundle? bundle, double value);
-    [Selector("initWithSize:")] public Self InitWithSize(NSSize size);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("initWithData:")] public Self? InitWithData(NSData data);
-    [Selector("initWithContentsOfFile:")] public Self? InitWithContentsOfFile(NSString fileName);
-    [Selector("initWithContentsOfURL:")] public Self? InitWithContentsOfURL(NSURL url);
-    [Selector("initByReferencingFile:")] public Self? InitByReferencingFile(NSString fileName);
-    [Selector("initByReferencingURL:")] public Self InitByReferencingURL(NSURL url);
-    [Selector("initWithPasteboard:")] public Self? InitWithPasteboard(NSPasteboard pasteboard);
-    [Selector("initWithDataIgnoringOrientation:")] public Self? InitWithDataIgnoringOrientation(NSData data);
-    [Selector("imageWithSize:flipped:drawingHandler:")] public static Self ImageWithSizeFlippedDrawingHandler(NSSize size, bool drawingHandlerShouldBeCalledWithFlippedContext, NSImageImageWithSizeFlippedDrawingHandlerDrawingHandlerBlock drawingHandler);
-    [Selector("setName:")] public bool SetName(NSImageName? string);
-    [Selector("name")] public NSImageName? Name();
-    [Selector("drawAtPoint:fromRect:operation:fraction:")] public void DrawAtPointFromRectOperationFraction(NSPoint point, NSRect fromRect, NSCompositingOperation op, CGFloat delta);
-    [Selector("drawInRect:fromRect:operation:fraction:")] public void DrawInRectFromRectOperationFraction(NSRect rect, NSRect fromRect, NSCompositingOperation op, CGFloat delta);
-    [Selector("drawInRect:fromRect:operation:fraction:respectFlipped:hints:")] public void DrawInRectFromRectOperationFractionRespectFlippedHints(NSRect dstSpacePortionRect, NSRect srcSpacePortionRect, NSCompositingOperation op, CGFloat requestedAlpha, bool respectContextIsFlipped, NSDictionary? hints);
-    [Selector("drawRepresentation:inRect:")] public bool DrawRepresentationInRect(NSImageRep imageRep, NSRect rect);
-    [Selector("drawInRect:")] public void DrawInRect(NSRect rect);
-    [Selector("recache")] public void Recache();
-    [Selector("TIFFRepresentationUsingCompression:factor:")] public NSData? TIFFRepresentationUsingCompressionFactor(NSTIFFCompression comp, float factor);
-    [Selector("addRepresentations:")] public void AddRepresentations(NSArray imageReps);
-    [Selector("addRepresentation:")] public void AddRepresentation(NSImageRep imageRep);
-    [Selector("removeRepresentation:")] public void RemoveRepresentation(NSImageRep imageRep);
-    [Selector("canInitWithPasteboard:")] public static bool CanInitWithPasteboard(NSPasteboard pasteboard);
-    [Selector("initWithCGImage:size:")] public Self InitWithCGImageSize(CGImageRef cgImage, NSSize size);
-    [Selector("CGImageForProposedRect:context:hints:")] public CGImageRef? CGImageForProposedRectContextHints(NSRect* proposedDestRect, NSGraphicsContext? referenceContext, NSDictionary? hints);
-    [Selector("bestRepresentationForRect:context:hints:")] public NSImageRep? BestRepresentationForRectContextHints(NSRect rect, NSGraphicsContext? referenceContext, NSDictionary? hints);
-    [Selector("hitTestRect:withImageDestinationRect:context:hints:flipped:")] public bool HitTestRectWithImageDestinationRectContextHintsFlipped(NSRect testRectDestSpace, NSRect imageRectDestSpace, NSGraphicsContext? context, NSDictionary? hints, bool flipped);
-    [Selector("recommendedLayerContentsScale:")] public CGFloat RecommendedLayerContentsScale(CGFloat preferredContentsScale);
-    [Selector("layerContentsForContentsScale:")] public AnyObject LayerContentsForContentsScale(CGFloat layerContentsScale);
-    [Selector("imageWithSymbolConfiguration:")] public NSImage? ImageWithSymbolConfiguration(NSImageSymbolConfiguration configuration);
-    [Selector("imageWithLocale:")] public NSImage ImageWithLocale(NSLocale? locale);
+    [Selector("size", "setSize:")]
+    public NSSize Size { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor BackgroundColor { get; set; }
+    [Selector("usesEPSOnResolutionMismatch", "setUsesEPSOnResolutionMismatch:")]
+    public bool UsesEPSOnResolutionMismatch { get; set; }
+    [Selector("prefersColorMatch", "setPrefersColorMatch:")]
+    public bool PrefersColorMatch { get; set; }
+    [Selector("matchesOnMultipleResolution", "setMatchesOnMultipleResolution:")]
+    public bool MatchesOnMultipleResolution { get; set; }
+    [Selector("matchesOnlyOnBestFittingAxis", "setMatchesOnlyOnBestFittingAxis:")]
+    public bool MatchesOnlyOnBestFittingAxis { get; set; }
+    [Selector("TIFFRepresentation")]
+    public NSData? TIFFRepresentation { get; }
+    [Selector("representations")]
+    public NSArray Representations { get; }
+    [Selector("isValid")]
+    public bool Valid { get; }
+    [Selector("delegate", "setDelegate:")]
+    public NSImageDelegate? Delegate { get; set; }
+    [Selector("imageTypes")]
+    public static NSArray? ImageTypes { get; }
+    [Selector("imageUnfilteredTypes")]
+    public static NSArray? ImageUnfilteredTypes { get; }
+    [Selector("cacheMode", "setCacheMode:")]
+    public NSImageCacheMode CacheMode { get; set; }
+    [Selector("alignmentRect", "setAlignmentRect:")]
+    public NSRect AlignmentRect { get; set; }
+    [Selector("isTemplate", "setTemplate:")]
+    public bool Template { get; set; }
+    [Selector("accessibilityDescription", "setAccessibilityDescription:")]
+    public NSString? AccessibilityDescription { get; set; }
+    [Selector("capInsets", "setCapInsets:")]
+    public NSEdgeInsets CapInsets { get; set; }
+    [Selector("resizingMode", "setResizingMode:")]
+    public NSImageResizingMode ResizingMode { get; set; }
+    [Selector("symbolConfiguration")]
+    public NSImageSymbolConfiguration? SymbolConfiguration { get; }
+    [Selector("locale")]
+    public NSLocale? Locale { get; }
+    [Selector("imageNamed:")]
+    public static NSImage? ImageNamed(NSImageName name);
+    [Selector("imageWithSystemSymbolName:accessibilityDescription:")]
+    public static Self? ImageWithSystemSymbolNameAccessibilityDescription(NSString name, NSString? description);
+    [Selector("imageWithSystemSymbolName:variableValue:accessibilityDescription:")]
+    public static Self? ImageWithSystemSymbolNameVariableValueAccessibilityDescription(NSString name, double value, NSString? description);
+    [Selector("imageWithSymbolName:variableValue:")]
+    public static Self? ImageWithSymbolNameVariableValue(NSString name, double value);
+    [Selector("imageWithSymbolName:bundle:variableValue:")]
+    public static Self? ImageWithSymbolNameBundleVariableValue(NSString name, NSBundle? bundle, double value);
+    [Selector("initWithSize:")]
+    public Self InitWithSize(NSSize size);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("initWithData:")]
+    public Self? InitWithData(NSData data);
+    [Selector("initWithContentsOfFile:")]
+    public Self? InitWithContentsOfFile(NSString fileName);
+    [Selector("initWithContentsOfURL:")]
+    public Self? InitWithContentsOfURL(NSURL url);
+    [Selector("initByReferencingFile:")]
+    public Self? InitByReferencingFile(NSString fileName);
+    [Selector("initByReferencingURL:")]
+    public Self InitByReferencingURL(NSURL url);
+    [Selector("initWithPasteboard:")]
+    public Self? InitWithPasteboard(NSPasteboard pasteboard);
+    [Selector("initWithDataIgnoringOrientation:")]
+    public Self? InitWithDataIgnoringOrientation(NSData data);
+    [Selector("imageWithSize:flipped:drawingHandler:")]
+    public static Self ImageWithSizeFlippedDrawingHandler(NSSize size, bool drawingHandlerShouldBeCalledWithFlippedContext, NSImageImageWithSizeFlippedDrawingHandlerDrawingHandlerBlock drawingHandler);
+    [Selector("setName:")]
+    public bool SetName(NSImageName? string);
+    [Selector("name")]
+    public NSImageName? Name();
+    [Selector("drawAtPoint:fromRect:operation:fraction:")]
+    public void DrawAtPointFromRectOperationFraction(NSPoint point, NSRect fromRect, NSCompositingOperation op, CGFloat delta);
+    [Selector("drawInRect:fromRect:operation:fraction:")]
+    public void DrawInRectFromRectOperationFraction(NSRect rect, NSRect fromRect, NSCompositingOperation op, CGFloat delta);
+    [Selector("drawInRect:fromRect:operation:fraction:respectFlipped:hints:")]
+    public void DrawInRectFromRectOperationFractionRespectFlippedHints(NSRect dstSpacePortionRect, NSRect srcSpacePortionRect, NSCompositingOperation op, CGFloat requestedAlpha, bool respectContextIsFlipped, NSDictionary? hints);
+    [Selector("drawRepresentation:inRect:")]
+    public bool DrawRepresentationInRect(NSImageRep imageRep, NSRect rect);
+    [Selector("drawInRect:")]
+    public void DrawInRect(NSRect rect);
+    [Selector("recache")]
+    public void Recache();
+    [Selector("TIFFRepresentationUsingCompression:factor:")]
+    public NSData? TIFFRepresentationUsingCompressionFactor(NSTIFFCompression comp, float factor);
+    [Selector("addRepresentations:")]
+    public void AddRepresentations(NSArray imageReps);
+    [Selector("addRepresentation:")]
+    public void AddRepresentation(NSImageRep imageRep);
+    [Selector("removeRepresentation:")]
+    public void RemoveRepresentation(NSImageRep imageRep);
+    [Selector("canInitWithPasteboard:")]
+    public static bool CanInitWithPasteboard(NSPasteboard pasteboard);
+    [Selector("initWithCGImage:size:")]
+    public Self InitWithCGImageSize(CGImageRef cgImage, NSSize size);
+    [Selector("CGImageForProposedRect:context:hints:")]
+    public CGImageRef? CGImageForProposedRectContextHints(NSRect* proposedDestRect, NSGraphicsContext? referenceContext, NSDictionary? hints);
+    [Selector("bestRepresentationForRect:context:hints:")]
+    public NSImageRep? BestRepresentationForRectContextHints(NSRect rect, NSGraphicsContext? referenceContext, NSDictionary? hints);
+    [Selector("hitTestRect:withImageDestinationRect:context:hints:flipped:")]
+    public bool HitTestRectWithImageDestinationRectContextHintsFlipped(NSRect testRectDestSpace, NSRect imageRectDestSpace, NSGraphicsContext? context, NSDictionary? hints, bool flipped);
+    [Selector("recommendedLayerContentsScale:")]
+    public CGFloat RecommendedLayerContentsScale(CGFloat preferredContentsScale);
+    [Selector("layerContentsForContentsScale:")]
+    public AnyObject LayerContentsForContentsScale(CGFloat layerContentsScale);
+    [Selector("imageWithSymbolConfiguration:")]
+    public NSImage? ImageWithSymbolConfiguration(NSImageSymbolConfiguration configuration);
+    [Selector("imageWithLocale:")]
+    public NSImage ImageWithLocale(NSLocale? locale);
 }
 
 public extern objc class NSImage : NSCopying, NSSecureCoding, NSPasteboardReading, NSPasteboardWriting { }
 
 public objc interface NSImageDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("imageDidNotDraw:inRect:")] NSImage? ImageDidNotDrawInRect(NSImage sender, NSRect rect);
+    [Optional]
+    [Selector("imageDidNotDraw:inRect:")]
+    NSImage? ImageDidNotDrawInRect(NSImage sender, NSRect rect);
     /// Deprecated in macOS 10.4.
-    [Optional] [Selector("image:willLoadRepresentation:")] void ImageWillLoadRepresentation(NSImage image, NSImageRep rep);
+    [Optional]
+    [Selector("image:willLoadRepresentation:")]
+    void ImageWillLoadRepresentation(NSImage image, NSImageRep rep);
     /// Deprecated in macOS 10.4.
-    [Optional] [Selector("image:didLoadRepresentationHeader:")] void ImageDidLoadRepresentationHeader(NSImage image, NSImageRep rep);
+    [Optional]
+    [Selector("image:didLoadRepresentationHeader:")]
+    void ImageDidLoadRepresentationHeader(NSImage image, NSImageRep rep);
     /// Deprecated in macOS 10.4.
-    [Optional] [Selector("image:didLoadPartOfRepresentation:withValidRows:")] void ImageDidLoadPartOfRepresentationWithValidRows(NSImage image, NSImageRep rep, NSInteger rows);
+    [Optional]
+    [Selector("image:didLoadPartOfRepresentation:withValidRows:")]
+    void ImageDidLoadPartOfRepresentationWithValidRows(NSImage image, NSImageRep rep, NSInteger rows);
     /// Deprecated in macOS 10.4.
-    [Optional] [Selector("image:didLoadRepresentation:withStatus:")] void ImageDidLoadRepresentationWithStatus(NSImage image, NSImageRep rep, NSImageLoadStatus status);
+    [Optional]
+    [Selector("image:didLoadRepresentation:withStatus:")]
+    void ImageDidLoadRepresentationWithStatus(NSImage image, NSImageRep rep, NSImageLoadStatus status);
 }
 
 /// NSBundleImageExtension, a category of NSBundle.
 public extern objc class NSBundle
 {
-    [Selector("imageForResource:")] public NSImage? ImageForResource(NSImageName name);
-    [Selector("pathForImageResource:")] public NSString? PathForImageResource(NSImageName name);
-    [Selector("URLForImageResource:")] public NSURL? URLForImageResource(NSImageName name);
+    [Selector("imageForResource:")]
+    public NSImage? ImageForResource(NSImageName name);
+    [Selector("pathForImageResource:")]
+    public NSString? PathForImageResource(NSImageName name);
+    [Selector("URLForImageResource:")]
+    public NSURL? URLForImageResource(NSImageName name);
 }
 
 /// Deprecated, a category of NSImage.
 public extern objc class NSImage
 {
     /// Deprecated in macOS 10.10.
-    [Selector("imageUnfilteredFileTypes")] public static NSArray ImageUnfilteredFileTypes();
+    [Selector("imageUnfilteredFileTypes")]
+    public static NSArray ImageUnfilteredFileTypes();
     /// Deprecated in macOS 10.10.
-    [Selector("imageUnfilteredPasteboardTypes")] public static NSArray ImageUnfilteredPasteboardTypes();
+    [Selector("imageUnfilteredPasteboardTypes")]
+    public static NSArray ImageUnfilteredPasteboardTypes();
     /// Deprecated in macOS 10.10.
-    [Selector("imageFileTypes")] public static NSArray ImageFileTypes();
+    [Selector("imageFileTypes")]
+    public static NSArray ImageFileTypes();
     /// Deprecated in macOS 10.10.
-    [Selector("imagePasteboardTypes")] public static NSArray ImagePasteboardTypes();
+    [Selector("imagePasteboardTypes")]
+    public static NSArray ImagePasteboardTypes();
     /// Deprecated in macOS 11.0.
-    [Selector("initWithIconRef:")] public Self InitWithIconRef(IconRef iconRef);
+    [Selector("initWithIconRef:")]
+    public Self InitWithIconRef(IconRef iconRef);
     /// Deprecated in macOS 10.6.
-    [Selector("bestRepresentationForDevice:")] public NSImageRep? BestRepresentationForDevice(NSDictionary? deviceDescription);
+    [Selector("bestRepresentationForDevice:")]
+    public NSImageRep? BestRepresentationForDevice(NSDictionary? deviceDescription);
     /// Deprecated in macOS 100000.
-    [Selector("lockFocus")] public void LockFocus();
+    [Selector("lockFocus")]
+    public void LockFocus();
     /// Deprecated in macOS 100000.
-    [Selector("lockFocusFlipped:")] public void LockFocusFlipped(bool flipped);
+    [Selector("lockFocusFlipped:")]
+    public void LockFocusFlipped(bool flipped);
     /// Deprecated in macOS 100000.
-    [Selector("unlockFocus")] public void UnlockFocus();
+    [Selector("unlockFocus")]
+    public void UnlockFocus();
     /// Deprecated in macOS 10.6.
-    [Selector("setFlipped:")] public void SetFlipped(bool flag);
+    [Selector("setFlipped:")]
+    public void SetFlipped(bool flag);
     /// Deprecated in macOS 10.6.
-    [Selector("isFlipped")] public bool IsFlipped();
+    [Selector("isFlipped")]
+    public bool IsFlipped();
     /// Deprecated in macOS 10.6.
-    [Selector("setScalesWhenResized:")] public void SetScalesWhenResized(bool flag);
+    [Selector("setScalesWhenResized:")]
+    public void SetScalesWhenResized(bool flag);
     /// Deprecated in macOS 10.6.
-    [Selector("scalesWhenResized")] public bool ScalesWhenResized();
+    [Selector("scalesWhenResized")]
+    public bool ScalesWhenResized();
     /// Deprecated in macOS 10.6.
-    [Selector("setDataRetained:")] public void SetDataRetained(bool flag);
+    [Selector("setDataRetained:")]
+    public void SetDataRetained(bool flag);
     /// Deprecated in macOS 10.6.
-    [Selector("isDataRetained")] public bool IsDataRetained();
+    [Selector("isDataRetained")]
+    public bool IsDataRetained();
     /// Deprecated in macOS 10.6.
-    [Selector("setCachedSeparately:")] public void SetCachedSeparately(bool flag);
+    [Selector("setCachedSeparately:")]
+    public void SetCachedSeparately(bool flag);
     /// Deprecated in macOS 10.6.
-    [Selector("isCachedSeparately")] public bool IsCachedSeparately();
+    [Selector("isCachedSeparately")]
+    public bool IsCachedSeparately();
     /// Deprecated in macOS 10.6.
-    [Selector("setCacheDepthMatchesImageDepth:")] public void SetCacheDepthMatchesImageDepth(bool flag);
+    [Selector("setCacheDepthMatchesImageDepth:")]
+    public void SetCacheDepthMatchesImageDepth(bool flag);
     /// Deprecated in macOS 10.6.
-    [Selector("cacheDepthMatchesImageDepth")] public bool CacheDepthMatchesImageDepth();
+    [Selector("cacheDepthMatchesImageDepth")]
+    public bool CacheDepthMatchesImageDepth();
     /// Deprecated in macOS 10.6.
-    [Selector("dissolveToPoint:fraction:")] public void DissolveToPointFraction(NSPoint point, CGFloat fraction);
+    [Selector("dissolveToPoint:fraction:")]
+    public void DissolveToPointFraction(NSPoint point, CGFloat fraction);
     /// Deprecated in macOS 10.6.
-    [Selector("dissolveToPoint:fromRect:fraction:")] public void DissolveToPointFromRectFraction(NSPoint point, NSRect rect, CGFloat fraction);
+    [Selector("dissolveToPoint:fromRect:fraction:")]
+    public void DissolveToPointFromRectFraction(NSPoint point, NSRect rect, CGFloat fraction);
     /// Deprecated in macOS 10.6.
-    [Selector("compositeToPoint:operation:")] public void CompositeToPointOperation(NSPoint point, NSCompositingOperation operation);
+    [Selector("compositeToPoint:operation:")]
+    public void CompositeToPointOperation(NSPoint point, NSCompositingOperation operation);
     /// Deprecated in macOS 10.6.
-    [Selector("compositeToPoint:fromRect:operation:")] public void CompositeToPointFromRectOperation(NSPoint point, NSRect rect, NSCompositingOperation operation);
+    [Selector("compositeToPoint:fromRect:operation:")]
+    public void CompositeToPointFromRectOperation(NSPoint point, NSRect rect, NSCompositingOperation operation);
     /// Deprecated in macOS 10.6.
-    [Selector("compositeToPoint:operation:fraction:")] public void CompositeToPointOperationFraction(NSPoint point, NSCompositingOperation operation, CGFloat fraction);
+    [Selector("compositeToPoint:operation:fraction:")]
+    public void CompositeToPointOperationFraction(NSPoint point, NSCompositingOperation operation, CGFloat fraction);
     /// Deprecated in macOS 10.6.
-    [Selector("compositeToPoint:fromRect:operation:fraction:")] public void CompositeToPointFromRectOperationFraction(NSPoint point, NSRect rect, NSCompositingOperation operation, CGFloat fraction);
+    [Selector("compositeToPoint:fromRect:operation:fraction:")]
+    public void CompositeToPointFromRectOperationFraction(NSPoint point, NSRect rect, NSCompositingOperation operation, CGFloat fraction);
     /// Deprecated in macOS 10.6.
-    [Selector("lockFocusOnRepresentation:")] public void LockFocusOnRepresentation(NSImageRep? imageRepresentation);
+    [Selector("lockFocusOnRepresentation:")]
+    public void LockFocusOnRepresentation(NSImageRep? imageRepresentation);
     /// Deprecated in macOS 10.4.
-    [Selector("cancelIncrementalLoad")] public void CancelIncrementalLoad();
+    [Selector("cancelIncrementalLoad")]
+    public void CancelIncrementalLoad();
 }
 
 public extern "C" NSImageName NSImageNameAddTemplate;
@@ -521,21 +617,34 @@ public enum NSImageSymbolColorRenderingMode : long
 
 public extern objc class NSImageSymbolConfiguration : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("configurationWithPointSize:weight:scale:")] public static Self ConfigurationWithPointSizeWeightScale(CGFloat pointSize, NSFontWeight weight, NSImageSymbolScale scale);
-    [Selector("configurationWithPointSize:weight:")] public static Self ConfigurationWithPointSizeWeight(CGFloat pointSize, NSFontWeight weight);
-    [Selector("configurationWithTextStyle:scale:")] public static Self ConfigurationWithTextStyleScale(NSFontTextStyle style, NSImageSymbolScale scale);
-    [Selector("configurationWithTextStyle:")] public static Self ConfigurationWithTextStyle(NSFontTextStyle style);
-    [Selector("configurationWithScale:")] public static Self ConfigurationWithScale(NSImageSymbolScale scale);
-    [Selector("configurationPreferringMonochrome")] public static Self ConfigurationPreferringMonochrome();
-    [Selector("configurationPreferringHierarchical")] public static Self ConfigurationPreferringHierarchical();
-    [Selector("configurationWithHierarchicalColor:")] public static Self ConfigurationWithHierarchicalColor(NSColor hierarchicalColor);
-    [Selector("configurationWithPaletteColors:")] public static Self ConfigurationWithPaletteColors(NSArray paletteColors);
-    [Selector("configurationPreferringMulticolor")] public static Self ConfigurationPreferringMulticolor();
+    [Selector("configurationWithPointSize:weight:scale:")]
+    public static Self ConfigurationWithPointSizeWeightScale(CGFloat pointSize, NSFontWeight weight, NSImageSymbolScale scale);
+    [Selector("configurationWithPointSize:weight:")]
+    public static Self ConfigurationWithPointSizeWeight(CGFloat pointSize, NSFontWeight weight);
+    [Selector("configurationWithTextStyle:scale:")]
+    public static Self ConfigurationWithTextStyleScale(NSFontTextStyle style, NSImageSymbolScale scale);
+    [Selector("configurationWithTextStyle:")]
+    public static Self ConfigurationWithTextStyle(NSFontTextStyle style);
+    [Selector("configurationWithScale:")]
+    public static Self ConfigurationWithScale(NSImageSymbolScale scale);
+    [Selector("configurationPreferringMonochrome")]
+    public static Self ConfigurationPreferringMonochrome();
+    [Selector("configurationPreferringHierarchical")]
+    public static Self ConfigurationPreferringHierarchical();
+    [Selector("configurationWithHierarchicalColor:")]
+    public static Self ConfigurationWithHierarchicalColor(NSColor hierarchicalColor);
+    [Selector("configurationWithPaletteColors:")]
+    public static Self ConfigurationWithPaletteColors(NSArray paletteColors);
+    [Selector("configurationPreferringMulticolor")]
+    public static Self ConfigurationPreferringMulticolor();
     /// macOS 26.0 and later.
-    [Selector("configurationWithVariableValueMode:")] public static Self ConfigurationWithVariableValueMode(NSImageSymbolVariableValueMode variableValueMode);
+    [Selector("configurationWithVariableValueMode:")]
+    public static Self ConfigurationWithVariableValueMode(NSImageSymbolVariableValueMode variableValueMode);
     /// macOS 26.0 and later.
-    [Selector("configurationWithColorRenderingMode:")] public static Self ConfigurationWithColorRenderingMode(NSImageSymbolColorRenderingMode mode);
-    [Selector("configurationByApplyingConfiguration:")] public Self ConfigurationByApplyingConfiguration(NSImageSymbolConfiguration configuration);
+    [Selector("configurationWithColorRenderingMode:")]
+    public static Self ConfigurationWithColorRenderingMode(NSImageSymbolColorRenderingMode mode);
+    [Selector("configurationByApplyingConfiguration:")]
+    public Self ConfigurationByApplyingConfiguration(NSImageSymbolConfiguration configuration);
 }
 
 public const int NSIMAGE_UNAVAILABLE_MACCATALYST = 0;

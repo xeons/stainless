@@ -32,8 +32,12 @@ import Standard.ObjC;
 
 public objc interface CMHeadphoneMotionManagerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("headphoneMotionManagerDidConnect:")] void HeadphoneMotionManagerDidConnect(CMHeadphoneMotionManager manager);
-    [Optional] [Selector("headphoneMotionManagerDidDisconnect:")] void HeadphoneMotionManagerDidDisconnect(CMHeadphoneMotionManager manager);
+    [Optional]
+    [Selector("headphoneMotionManagerDidConnect:")]
+    void HeadphoneMotionManagerDidConnect(CMHeadphoneMotionManager manager);
+    [Optional]
+    [Selector("headphoneMotionManagerDidDisconnect:")]
+    void HeadphoneMotionManagerDidDisconnect(CMHeadphoneMotionManager manager);
 }
 
 #endif

@@ -31,51 +31,92 @@ import Standard.ObjC;
 [ObjCRoot]
 public extern objc class NSObject : NSObjectProtocol
 {
-    [Selector("load")] public static void Load();
-    [Selector("initialize")] public static void Initialize();
-    [Selector("init")] public Self? Init();
-    [Selector("new")] public static Self? New();
-    [Selector("allocWithZone:")] public static Self AllocWithZone(_NSZone* zone);
-    [Selector("alloc")] public static Self Alloc();
-    [Selector("dealloc")] public void Dealloc();
-    [Selector("finalize")] public void Finalize();
-    [Selector("copy")] public AnyObject? Copy();
-    [Selector("mutableCopy")] public AnyObject? MutableCopy();
-    [Selector("instancesRespondToSelector:")] public static bool InstancesRespondToSelector(Selector aSelector);
-    [Selector("methodForSelector:")] public IMP MethodForSelector(Selector aSelector);
-    [Selector("instanceMethodForSelector:")] public static IMP InstanceMethodForSelector(Selector aSelector);
-    [Selector("doesNotRecognizeSelector:")] public void DoesNotRecognizeSelector(Selector aSelector);
-    [Selector("forwardingTargetForSelector:")] public AnyObject? ForwardingTargetForSelector(Selector aSelector);
-    [Selector("forwardInvocation:")] public void ForwardInvocation(NSInvocation? anInvocation);
-    [Selector("methodSignatureForSelector:")] public NSMethodSignature? MethodSignatureForSelector(Selector aSelector);
-    [Selector("instanceMethodSignatureForSelector:")] public static NSMethodSignature? InstanceMethodSignatureForSelector(Selector aSelector);
-    [Selector("isSubclassOfClass:")] public static bool IsSubclassOfClass(Class aClass);
-    [Selector("resolveClassMethod:")] public static bool ResolveClassMethod(Selector sel);
-    [Selector("resolveInstanceMethod:")] public static bool ResolveInstanceMethod(Selector sel);
-    [Selector("hash")] public static NSUInteger Hash();
-    [Selector("superclass")] public static Class Superclass();
-    [Selector("class")] public static Class Class();
-    [Selector("description")] public static NSString? Description();
-    [Selector("debugDescription")] public static NSString? DebugDescription();
+    [Selector("load")]
+    public static void Load();
+    [Selector("initialize")]
+    public static void Initialize();
+    [Selector("init")]
+    public Self? Init();
+    [Selector("new")]
+    public static Self? New();
+    [Selector("allocWithZone:")]
+    public static Self AllocWithZone(_NSZone* zone);
+    [Selector("alloc")]
+    public static Self Alloc();
+    [Selector("dealloc")]
+    public void Dealloc();
+    [Selector("finalize")]
+    public void Finalize();
+    [Selector("copy")]
+    public AnyObject? Copy();
+    [Selector("mutableCopy")]
+    public AnyObject? MutableCopy();
+    [Selector("instancesRespondToSelector:")]
+    public static bool InstancesRespondToSelector(Selector aSelector);
+    [Selector("methodForSelector:")]
+    public IMP MethodForSelector(Selector aSelector);
+    [Selector("instanceMethodForSelector:")]
+    public static IMP InstanceMethodForSelector(Selector aSelector);
+    [Selector("doesNotRecognizeSelector:")]
+    public void DoesNotRecognizeSelector(Selector aSelector);
+    [Selector("forwardingTargetForSelector:")]
+    public AnyObject? ForwardingTargetForSelector(Selector aSelector);
+    [Selector("forwardInvocation:")]
+    public void ForwardInvocation(NSInvocation? anInvocation);
+    [Selector("methodSignatureForSelector:")]
+    public NSMethodSignature? MethodSignatureForSelector(Selector aSelector);
+    [Selector("instanceMethodSignatureForSelector:")]
+    public static NSMethodSignature? InstanceMethodSignatureForSelector(Selector aSelector);
+    [Selector("isSubclassOfClass:")]
+    public static bool IsSubclassOfClass(Class aClass);
+    [Selector("resolveClassMethod:")]
+    public static bool ResolveClassMethod(Selector sel);
+    [Selector("resolveInstanceMethod:")]
+    public static bool ResolveInstanceMethod(Selector sel);
+    [Selector("hash")]
+    public static NSUInteger Hash();
+    [Selector("superclass")]
+    public static Class Superclass();
+    [Selector("class")]
+    public static Class Class();
+    [Selector("description")]
+    public static NSString? Description();
+    [Selector("debugDescription")]
+    public static NSString? DebugDescription();
 }
 
 [ObjCName("NSObject")]
 public objc interface NSObjectProtocol
 {
-    [Selector("hash")] NSUInteger Hash { get; }
-    [Selector("superclass")] Class Superclass { get; }
-    [Selector("description")] NSString? Description { get; }
-    [Optional] [Selector("debugDescription")] NSString? DebugDescription { get; }
-    [Selector("isEqual:")] bool IsEqual(AnyObject? object);
-    [Selector("class")] Class Class();
-    [Selector("self")] Self? Self();
-    [Selector("performSelector:")] AnyObject? PerformSelector(Selector aSelector);
-    [Selector("performSelector:withObject:")] AnyObject? PerformSelectorWithObject(Selector aSelector, AnyObject? object);
-    [Selector("performSelector:withObject:withObject:")] AnyObject? PerformSelectorWithObjectWithObject(Selector aSelector, AnyObject? object1, AnyObject? object2);
-    [Selector("isProxy")] bool IsProxy();
-    [Selector("isKindOfClass:")] bool IsKindOfClass(Class aClass);
-    [Selector("isMemberOfClass:")] bool IsMemberOfClass(Class aClass);
-    [Selector("respondsToSelector:")] bool RespondsToSelector(Selector aSelector);
+    [Selector("hash")]
+    NSUInteger Hash { get; }
+    [Selector("superclass")]
+    Class Superclass { get; }
+    [Selector("description")]
+    NSString? Description { get; }
+    [Optional]
+    [Selector("debugDescription")]
+    NSString? DebugDescription { get; }
+    [Selector("isEqual:")]
+    bool IsEqual(AnyObject? object);
+    [Selector("class")]
+    Class Class();
+    [Selector("self")]
+    Self? Self();
+    [Selector("performSelector:")]
+    AnyObject? PerformSelector(Selector aSelector);
+    [Selector("performSelector:withObject:")]
+    AnyObject? PerformSelectorWithObject(Selector aSelector, AnyObject? object);
+    [Selector("performSelector:withObject:withObject:")]
+    AnyObject? PerformSelectorWithObjectWithObject(Selector aSelector, AnyObject? object1, AnyObject? object2);
+    [Selector("isProxy")]
+    bool IsProxy();
+    [Selector("isKindOfClass:")]
+    bool IsKindOfClass(Class aClass);
+    [Selector("isMemberOfClass:")]
+    bool IsMemberOfClass(Class aClass);
+    [Selector("respondsToSelector:")]
+    bool RespondsToSelector(Selector aSelector);
 }
 
 public struct _NSZone;

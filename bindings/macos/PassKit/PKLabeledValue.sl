@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class PKLabeledValue : NSObject
 {
-    [Selector("label")] public NSString Label { get; }
-    [Selector("value")] public NSString Value { get; }
-    [Selector("initWithLabel:value:")] public Self InitWithLabelValue(NSString label, NSString value);
+    [Selector("label")]
+    public NSString Label { get; }
+    [Selector("value")]
+    public NSString Value { get; }
+    [Selector("initWithLabel:value:")]
+    public Self InitWithLabelValue(NSString label, NSString value);
 }
 
 #endif

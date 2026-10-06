@@ -38,11 +38,16 @@ public objc closure void MPSGraphExecutableScheduledHandler(NSArray arg0, NSErro
 
 public extern objc class MPSGraphExecutableExecutionDescriptor : MPSGraphObject, NSCopying
 {
-    [Selector("scheduledHandler", "setScheduledHandler:")] public MPSGraphExecutableScheduledHandler ScheduledHandler { get; set; }
-    [Selector("completionHandler", "setCompletionHandler:")] public MPSGraphExecutableCompletionHandler CompletionHandler { get; set; }
-    [Selector("waitUntilCompleted", "setWaitUntilCompleted:")] public bool WaitUntilCompleted { get; set; }
-    [Selector("waitForEvent:value:")] public void WaitForEventValue(MTLSharedEvent event, ulong value);
-    [Selector("signalEvent:atExecutionEvent:value:")] public void SignalEventAtExecutionEventValue(MTLSharedEvent event, MPSGraphExecutionStage executionStage, ulong value);
+    [Selector("scheduledHandler", "setScheduledHandler:")]
+    public MPSGraphExecutableScheduledHandler ScheduledHandler { get; set; }
+    [Selector("completionHandler", "setCompletionHandler:")]
+    public MPSGraphExecutableCompletionHandler CompletionHandler { get; set; }
+    [Selector("waitUntilCompleted", "setWaitUntilCompleted:")]
+    public bool WaitUntilCompleted { get; set; }
+    [Selector("waitForEvent:value:")]
+    public void WaitForEventValue(MTLSharedEvent event, ulong value);
+    [Selector("signalEvent:atExecutionEvent:value:")]
+    public void SignalEventAtExecutionEventValue(MTLSharedEvent event, MPSGraphExecutionStage executionStage, ulong value);
 }
 
 public enum MPSGraphDeploymentPlatform : ulong
@@ -55,24 +60,38 @@ public enum MPSGraphDeploymentPlatform : ulong
 
 public extern objc class MPSGraphExecutableSerializationDescriptor : MPSGraphObject
 {
-    [Selector("append", "setAppend:")] public bool Append { get; set; }
-    [Selector("deploymentPlatform", "setDeploymentPlatform:")] public MPSGraphDeploymentPlatform DeploymentPlatform { get; set; }
-    [Selector("minimumDeploymentTarget", "setMinimumDeploymentTarget:")] public NSString MinimumDeploymentTarget { get; set; }
+    [Selector("append", "setAppend:")]
+    public bool Append { get; set; }
+    [Selector("deploymentPlatform", "setDeploymentPlatform:")]
+    public MPSGraphDeploymentPlatform DeploymentPlatform { get; set; }
+    [Selector("minimumDeploymentTarget", "setMinimumDeploymentTarget:")]
+    public NSString MinimumDeploymentTarget { get; set; }
 }
 
 public extern objc class MPSGraphExecutable : MPSGraphObject
 {
-    [Selector("options", "setOptions:")] public MPSGraphOptions Options { get; set; }
-    [Selector("feedTensors")] public NSArray? FeedTensors { get; }
-    [Selector("targetTensors")] public NSArray? TargetTensors { get; }
-    [Selector("specializeWithDevice:inputTypes:compilationDescriptor:")] public void SpecializeWithDeviceInputTypesCompilationDescriptor(MPSGraphDevice? device, NSArray inputTypes, MPSGraphCompilationDescriptor? compilationDescriptor);
-    [Selector("getOutputTypesWithDevice:inputTypes:compilationDescriptor:")] public NSArray? GetOutputTypesWithDeviceInputTypesCompilationDescriptor(MPSGraphDevice? device, NSArray inputTypes, MPSGraphCompilationDescriptor? compilationDescriptor);
-    [Selector("runWithMTLCommandQueue:inputsArray:resultsArray:executionDescriptor:")] public NSArray RunWithMTLCommandQueueInputsArrayResultsArrayExecutionDescriptor(MTLCommandQueue commandQueue, NSArray inputsArray, NSArray? resultsArray, MPSGraphExecutableExecutionDescriptor? executionDescriptor);
-    [Selector("runAsyncWithMTLCommandQueue:inputsArray:resultsArray:executionDescriptor:")] public NSArray RunAsyncWithMTLCommandQueueInputsArrayResultsArrayExecutionDescriptor(MTLCommandQueue commandQueue, NSArray inputsArray, NSArray? resultsArray, MPSGraphExecutableExecutionDescriptor? executionDescriptor);
-    [Selector("encodeToCommandBuffer:inputsArray:resultsArray:executionDescriptor:")] public NSArray EncodeToCommandBufferInputsArrayResultsArrayExecutionDescriptor(MPSCommandBuffer commandBuffer, NSArray inputsArray, NSArray? resultsArray, MPSGraphExecutableExecutionDescriptor? executionDescriptor);
-    [Selector("serializeToMPSGraphPackageAtURL:descriptor:")] public void SerializeToMPSGraphPackageAtURLDescriptor(NSURL url, MPSGraphExecutableSerializationDescriptor? descriptor);
-    [Selector("initWithMPSGraphPackageAtURL:compilationDescriptor:")] public Self InitWithMPSGraphPackageAtURLCompilationDescriptor(NSURL mpsgraphPackageURL, MPSGraphCompilationDescriptor? compilationDescriptor);
-    [Selector("initWithCoreMLPackageAtURL:compilationDescriptor:")] public Self InitWithCoreMLPackageAtURLCompilationDescriptor(NSURL coreMLPackageURL, MPSGraphCompilationDescriptor? compilationDescriptor);
+    [Selector("options", "setOptions:")]
+    public MPSGraphOptions Options { get; set; }
+    [Selector("feedTensors")]
+    public NSArray? FeedTensors { get; }
+    [Selector("targetTensors")]
+    public NSArray? TargetTensors { get; }
+    [Selector("specializeWithDevice:inputTypes:compilationDescriptor:")]
+    public void SpecializeWithDeviceInputTypesCompilationDescriptor(MPSGraphDevice? device, NSArray inputTypes, MPSGraphCompilationDescriptor? compilationDescriptor);
+    [Selector("getOutputTypesWithDevice:inputTypes:compilationDescriptor:")]
+    public NSArray? GetOutputTypesWithDeviceInputTypesCompilationDescriptor(MPSGraphDevice? device, NSArray inputTypes, MPSGraphCompilationDescriptor? compilationDescriptor);
+    [Selector("runWithMTLCommandQueue:inputsArray:resultsArray:executionDescriptor:")]
+    public NSArray RunWithMTLCommandQueueInputsArrayResultsArrayExecutionDescriptor(MTLCommandQueue commandQueue, NSArray inputsArray, NSArray? resultsArray, MPSGraphExecutableExecutionDescriptor? executionDescriptor);
+    [Selector("runAsyncWithMTLCommandQueue:inputsArray:resultsArray:executionDescriptor:")]
+    public NSArray RunAsyncWithMTLCommandQueueInputsArrayResultsArrayExecutionDescriptor(MTLCommandQueue commandQueue, NSArray inputsArray, NSArray? resultsArray, MPSGraphExecutableExecutionDescriptor? executionDescriptor);
+    [Selector("encodeToCommandBuffer:inputsArray:resultsArray:executionDescriptor:")]
+    public NSArray EncodeToCommandBufferInputsArrayResultsArrayExecutionDescriptor(MPSCommandBuffer commandBuffer, NSArray inputsArray, NSArray? resultsArray, MPSGraphExecutableExecutionDescriptor? executionDescriptor);
+    [Selector("serializeToMPSGraphPackageAtURL:descriptor:")]
+    public void SerializeToMPSGraphPackageAtURLDescriptor(NSURL url, MPSGraphExecutableSerializationDescriptor? descriptor);
+    [Selector("initWithMPSGraphPackageAtURL:compilationDescriptor:")]
+    public Self InitWithMPSGraphPackageAtURLCompilationDescriptor(NSURL mpsgraphPackageURL, MPSGraphCompilationDescriptor? compilationDescriptor);
+    [Selector("initWithCoreMLPackageAtURL:compilationDescriptor:")]
+    public Self InitWithCoreMLPackageAtURLCompilationDescriptor(NSURL coreMLPackageURL, MPSGraphCompilationDescriptor? compilationDescriptor);
 }
 
 #endif

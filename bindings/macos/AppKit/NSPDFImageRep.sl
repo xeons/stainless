@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class NSPDFImageRep : NSImageRep
 {
-    [Selector("PDFRepresentation")] public NSData PDFRepresentation { get; }
-    [Selector("bounds")] public NSRect Bounds { get; }
-    [Selector("currentPage", "setCurrentPage:")] public NSInteger CurrentPage { get; set; }
-    [Selector("pageCount")] public NSInteger PageCount { get; }
-    [Selector("imageRepWithData:")] public static Self? ImageRepWithData(NSData pdfData);
-    [Selector("initWithData:")] public Self? InitWithData(NSData pdfData);
+    [Selector("PDFRepresentation")]
+    public NSData PDFRepresentation { get; }
+    [Selector("bounds")]
+    public NSRect Bounds { get; }
+    [Selector("currentPage", "setCurrentPage:")]
+    public NSInteger CurrentPage { get; set; }
+    [Selector("pageCount")]
+    public NSInteger PageCount { get; }
+    [Selector("imageRepWithData:")]
+    public static Self? ImageRepWithData(NSData pdfData);
+    [Selector("initWithData:")]
+    public Self? InitWithData(NSData pdfData);
 }
 
 #endif

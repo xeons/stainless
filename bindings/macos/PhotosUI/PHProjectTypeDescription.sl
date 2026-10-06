@@ -34,18 +34,30 @@ import Standard.ObjC;
 
 public extern objc class PHProjectTypeDescription : NSObject, NSSecureCoding
 {
-    [Selector("projectType")] public PHProjectType ProjectType { get; }
-    [Selector("localizedTitle")] public NSString LocalizedTitle { get; }
-    [Selector("localizedDescription")] public NSString? LocalizedDescription { get; }
-    [Selector("localizedAttributedDescription")] public NSAttributedString? LocalizedAttributedDescription { get; }
-    [Selector("image")] public NSImage? Image { get; }
-    [Selector("subtypeDescriptions")] public NSArray SubtypeDescriptions { get; }
-    [Selector("canProvideSubtypes")] public bool CanProvideSubtypes { get; }
-    [Selector("initWithProjectType:title:description:image:subtypeDescriptions:")] public Self InitWithProjectTypeTitleDescriptionImageSubtypeDescriptions(PHProjectType projectType, NSString localizedTitle, NSString? localizedDescription, NSImage? image, NSArray subtypeDescriptions);
-    [Selector("initWithProjectType:title:attributedDescription:image:subtypeDescriptions:")] public Self InitWithProjectTypeTitleAttributedDescriptionImageSubtypeDescriptions(PHProjectType projectType, NSString localizedTitle, NSAttributedString? localizedAttributedDescription, NSImage? image, NSArray subtypeDescriptions);
-    [Selector("initWithProjectType:title:description:image:")] public Self InitWithProjectTypeTitleDescriptionImage(PHProjectType projectType, NSString localizedTitle, NSString? localizedDescription, NSImage? image);
-    [Selector("initWithProjectType:title:description:image:canProvideSubtypes:")] public Self InitWithProjectTypeTitleDescriptionImageCanProvideSubtypes(PHProjectType projectType, NSString localizedTitle, NSString? localizedDescription, NSImage? image, bool canProvideSubtypes);
-    [Selector("initWithProjectType:title:attributedDescription:image:canProvideSubtypes:")] public Self InitWithProjectTypeTitleAttributedDescriptionImageCanProvideSubtypes(PHProjectType projectType, NSString localizedTitle, NSAttributedString? localizedAttributedDescription, NSImage? image, bool canProvideSubtypes);
+    [Selector("projectType")]
+    public PHProjectType ProjectType { get; }
+    [Selector("localizedTitle")]
+    public NSString LocalizedTitle { get; }
+    [Selector("localizedDescription")]
+    public NSString? LocalizedDescription { get; }
+    [Selector("localizedAttributedDescription")]
+    public NSAttributedString? LocalizedAttributedDescription { get; }
+    [Selector("image")]
+    public NSImage? Image { get; }
+    [Selector("subtypeDescriptions")]
+    public NSArray SubtypeDescriptions { get; }
+    [Selector("canProvideSubtypes")]
+    public bool CanProvideSubtypes { get; }
+    [Selector("initWithProjectType:title:description:image:subtypeDescriptions:")]
+    public Self InitWithProjectTypeTitleDescriptionImageSubtypeDescriptions(PHProjectType projectType, NSString localizedTitle, NSString? localizedDescription, NSImage? image, NSArray subtypeDescriptions);
+    [Selector("initWithProjectType:title:attributedDescription:image:subtypeDescriptions:")]
+    public Self InitWithProjectTypeTitleAttributedDescriptionImageSubtypeDescriptions(PHProjectType projectType, NSString localizedTitle, NSAttributedString? localizedAttributedDescription, NSImage? image, NSArray subtypeDescriptions);
+    [Selector("initWithProjectType:title:description:image:")]
+    public Self InitWithProjectTypeTitleDescriptionImage(PHProjectType projectType, NSString localizedTitle, NSString? localizedDescription, NSImage? image);
+    [Selector("initWithProjectType:title:description:image:canProvideSubtypes:")]
+    public Self InitWithProjectTypeTitleDescriptionImageCanProvideSubtypes(PHProjectType projectType, NSString localizedTitle, NSString? localizedDescription, NSImage? image, bool canProvideSubtypes);
+    [Selector("initWithProjectType:title:attributedDescription:image:canProvideSubtypes:")]
+    public Self InitWithProjectTypeTitleAttributedDescriptionImageCanProvideSubtypes(PHProjectType projectType, NSString localizedTitle, NSAttributedString? localizedAttributedDescription, NSImage? image, bool canProvideSubtypes);
 }
 
 #endif

@@ -40,11 +40,16 @@ public enum ASPublicKeyCredentialClientDataCrossOriginValue : long
 
 public extern objc class ASPublicKeyCredentialClientData : NSObject
 {
-    [Selector("challenge", "setChallenge:")] public NSData Challenge { get; set; }
-    [Selector("origin", "setOrigin:")] public NSString Origin { get; set; }
-    [Selector("topOrigin", "setTopOrigin:")] public NSString? TopOrigin { get; set; }
-    [Selector("crossOrigin", "setCrossOrigin:")] public ASPublicKeyCredentialClientDataCrossOriginValue CrossOrigin { get; set; }
-    [Selector("initWithChallenge:origin:")] public Self InitWithChallengeOrigin(NSData challenge, NSString origin);
+    [Selector("challenge", "setChallenge:")]
+    public NSData Challenge { get; set; }
+    [Selector("origin", "setOrigin:")]
+    public NSString Origin { get; set; }
+    [Selector("topOrigin", "setTopOrigin:")]
+    public NSString? TopOrigin { get; set; }
+    [Selector("crossOrigin", "setCrossOrigin:")]
+    public ASPublicKeyCredentialClientDataCrossOriginValue CrossOrigin { get; set; }
+    [Selector("initWithChallenge:origin:")]
+    public Self InitWithChallengeOrigin(NSData challenge, NSString origin);
 }
 
 #endif

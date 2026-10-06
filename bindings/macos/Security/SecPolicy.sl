@@ -92,11 +92,14 @@ public extern "C" CFStringRef? kSecPolicyTeamIdentifier;
 
 public extern "C" CFTypeID SecPolicyGetTypeID();
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? SecPolicyCopyProperties(SecPolicyRef policyRef);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? SecPolicyCopyProperties(SecPolicyRef policyRef);
 
-[ReturnsRetained] public extern "C" SecPolicyRef SecPolicyCreateBasicX509();
+[ReturnsRetained]
+public extern "C" SecPolicyRef SecPolicyCreateBasicX509();
 
-[ReturnsRetained] public extern "C" SecPolicyRef SecPolicyCreateSSL(Boolean server, CFStringRef? hostname);
+[ReturnsRetained]
+public extern "C" SecPolicyRef SecPolicyCreateSSL(Boolean server, CFStringRef? hostname);
 
 public const ulong kSecRevocationOCSPMethod = 1;
 public const ulong kSecRevocationCRLMethod = 2;
@@ -105,9 +108,11 @@ public const ulong kSecRevocationRequirePositiveResponse = 8;
 public const ulong kSecRevocationNetworkAccessDisabled = 16;
 public const ulong kSecRevocationUseAnyAvailableMethod = 3;
 
-[ReturnsRetained] public extern "C" SecPolicyRef? SecPolicyCreateRevocation(CFOptionFlags revocationFlags);
+[ReturnsRetained]
+public extern "C" SecPolicyRef? SecPolicyCreateRevocation(CFOptionFlags revocationFlags);
 
-[ReturnsRetained] public extern "C" SecPolicyRef? SecPolicyCreateWithProperties(CFTypeRef policyIdentifier, CFDictionaryRef? properties);
+[ReturnsRetained]
+public extern "C" SecPolicyRef? SecPolicyCreateWithProperties(CFTypeRef policyIdentifier, CFDictionaryRef? properties);
 
 public extern "C" CFStringRef? kSecPolicyKU_DigitalSignature;
 
@@ -128,7 +133,8 @@ public extern "C" CFStringRef? kSecPolicyKU_EncipherOnly;
 public extern "C" CFStringRef? kSecPolicyKU_DecipherOnly;
 
 /// Deprecated in macOS 10.9.
-[ReturnsRetained] public extern "C" SecPolicyRef? SecPolicyCreateWithOID(CFTypeRef policyOID);
+[ReturnsRetained]
+public extern "C" SecPolicyRef? SecPolicyCreateWithOID(CFTypeRef policyOID);
 
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecPolicyGetOID(SecPolicyRef policyRef, SecAsn1Oid* oid);

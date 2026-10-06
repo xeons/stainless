@@ -42,10 +42,14 @@ public objc closure void INFocusStatusCenterRequestAuthorizationWithCompletionHa
 
 public extern objc class INFocusStatusCenter : NSObject
 {
-    [Selector("defaultCenter")] public static INFocusStatusCenter DefaultCenter { get; }
-    [Selector("focusStatus")] public INFocusStatus FocusStatus { get; }
-    [Selector("authorizationStatus")] public INFocusStatusAuthorizationStatus AuthorizationStatus { get; }
-    [Selector("requestAuthorizationWithCompletionHandler:")] public void RequestAuthorizationWithCompletionHandler(INFocusStatusCenterRequestAuthorizationWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("defaultCenter")]
+    public static INFocusStatusCenter DefaultCenter { get; }
+    [Selector("focusStatus")]
+    public INFocusStatus FocusStatus { get; }
+    [Selector("authorizationStatus")]
+    public INFocusStatusAuthorizationStatus AuthorizationStatus { get; }
+    [Selector("requestAuthorizationWithCompletionHandler:")]
+    public void RequestAuthorizationWithCompletionHandler(INFocusStatusCenterRequestAuthorizationWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 #endif

@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class AMAppleScriptAction : AMBundleAction
 {
-    [Selector("script", "setScript:")] public OSAScript? Script { get; set; }
+    [Selector("script", "setScript:")]
+    public OSAScript? Script { get; set; }
 }
 
 #endif

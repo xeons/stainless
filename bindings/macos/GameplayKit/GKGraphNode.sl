@@ -33,34 +33,50 @@ import Standard.ObjC;
 
 public extern objc class GKGraphNode : NSObject, NSSecureCoding
 {
-    [Selector("connectedNodes")] public NSArray ConnectedNodes { get; }
-    [Selector("addConnectionsToNodes:bidirectional:")] public void AddConnectionsToNodesBidirectional(NSArray nodes, bool bidirectional);
-    [Selector("removeConnectionsToNodes:bidirectional:")] public void RemoveConnectionsToNodesBidirectional(NSArray nodes, bool bidirectional);
-    [Selector("estimatedCostToNode:")] public float EstimatedCostToNode(GKGraphNode node);
-    [Selector("costToNode:")] public float CostToNode(GKGraphNode node);
-    [Selector("findPathToNode:")] public NSArray FindPathToNode(GKGraphNode goalNode);
-    [Selector("findPathFromNode:")] public NSArray FindPathFromNode(GKGraphNode startNode);
+    [Selector("connectedNodes")]
+    public NSArray ConnectedNodes { get; }
+    [Selector("addConnectionsToNodes:bidirectional:")]
+    public void AddConnectionsToNodesBidirectional(NSArray nodes, bool bidirectional);
+    [Selector("removeConnectionsToNodes:bidirectional:")]
+    public void RemoveConnectionsToNodesBidirectional(NSArray nodes, bool bidirectional);
+    [Selector("estimatedCostToNode:")]
+    public float EstimatedCostToNode(GKGraphNode node);
+    [Selector("costToNode:")]
+    public float CostToNode(GKGraphNode node);
+    [Selector("findPathToNode:")]
+    public NSArray FindPathToNode(GKGraphNode goalNode);
+    [Selector("findPathFromNode:")]
+    public NSArray FindPathFromNode(GKGraphNode startNode);
 }
 
 public extern objc class GKGraphNode2D : GKGraphNode
 {
-    [Selector("position", "setPosition:")] public vector_float2 Position { get; set; }
-    [Selector("nodeWithPoint:")] public static Self NodeWithPoint(vector_float2 point);
-    [Selector("initWithPoint:")] public Self InitWithPoint(vector_float2 point);
+    [Selector("position", "setPosition:")]
+    public vector_float2 Position { get; set; }
+    [Selector("nodeWithPoint:")]
+    public static Self NodeWithPoint(vector_float2 point);
+    [Selector("initWithPoint:")]
+    public Self InitWithPoint(vector_float2 point);
 }
 
 public extern objc class GKGraphNode3D : GKGraphNode
 {
-    [Selector("position", "setPosition:")] public vector_float3 Position { get; set; }
-    [Selector("nodeWithPoint:")] public static Self NodeWithPoint(vector_float3 point);
-    [Selector("initWithPoint:")] public Self InitWithPoint(vector_float3 point);
+    [Selector("position", "setPosition:")]
+    public vector_float3 Position { get; set; }
+    [Selector("nodeWithPoint:")]
+    public static Self NodeWithPoint(vector_float3 point);
+    [Selector("initWithPoint:")]
+    public Self InitWithPoint(vector_float3 point);
 }
 
 public extern objc class GKGridGraphNode : GKGraphNode
 {
-    [Selector("gridPosition")] public vector_int2 GridPosition { get; }
-    [Selector("nodeWithGridPosition:")] public static Self NodeWithGridPosition(vector_int2 gridPosition);
-    [Selector("initWithGridPosition:")] public Self InitWithGridPosition(vector_int2 gridPosition);
+    [Selector("gridPosition")]
+    public vector_int2 GridPosition { get; }
+    [Selector("nodeWithGridPosition:")]
+    public static Self NodeWithGridPosition(vector_int2 gridPosition);
+    [Selector("initWithGridPosition:")]
+    public Self InitWithGridPosition(vector_int2 gridPosition);
 }
 
 #endif

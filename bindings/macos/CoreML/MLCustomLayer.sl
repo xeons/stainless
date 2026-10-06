@@ -33,11 +33,17 @@ import Standard.ObjC;
 
 public objc interface MLCustomLayer
 {
-    [Selector("initWithParameterDictionary:error:")] Self? InitWithParameterDictionaryError(NSDictionary parameters, out NSError? error);
-    [Selector("setWeightData:error:")] bool SetWeightDataError(NSArray weights, out NSError? error);
-    [Selector("outputShapesForInputShapes:error:")] NSArray? OutputShapesForInputShapesError(NSArray inputShapes, out NSError? error);
-    [Selector("evaluateOnCPUWithInputs:outputs:error:")] bool EvaluateOnCPUWithInputsOutputsError(NSArray inputs, NSArray outputs, out NSError? error);
-    [Optional] [Selector("encodeToCommandBuffer:inputs:outputs:error:")] bool EncodeToCommandBufferInputsOutputsError(MTLCommandBuffer commandBuffer, NSArray inputs, NSArray outputs, out NSError? error);
+    [Selector("initWithParameterDictionary:error:")]
+    Self? InitWithParameterDictionaryError(NSDictionary parameters, out NSError? error);
+    [Selector("setWeightData:error:")]
+    bool SetWeightDataError(NSArray weights, out NSError? error);
+    [Selector("outputShapesForInputShapes:error:")]
+    NSArray? OutputShapesForInputShapesError(NSArray inputShapes, out NSError? error);
+    [Selector("evaluateOnCPUWithInputs:outputs:error:")]
+    bool EvaluateOnCPUWithInputsOutputsError(NSArray inputs, NSArray outputs, out NSError? error);
+    [Optional]
+    [Selector("encodeToCommandBuffer:inputs:outputs:error:")]
+    bool EncodeToCommandBufferInputsOutputsError(MTLCommandBuffer commandBuffer, NSArray inputs, NSArray outputs, out NSError? error);
 }
 
 #endif

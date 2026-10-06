@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class NSExpressionDescription : NSPropertyDescription
 {
-    [Selector("expression", "setExpression:")] public NSExpression? Expression { get; set; }
-    [Selector("expressionResultType", "setExpressionResultType:")] public NSAttributeType ExpressionResultType { get; set; }
+    [Selector("expression", "setExpression:")]
+    public NSExpression? Expression { get; set; }
+    [Selector("expressionResultType", "setExpressionResultType:")]
+    public NSAttributeType ExpressionResultType { get; set; }
 }
 
 #endif

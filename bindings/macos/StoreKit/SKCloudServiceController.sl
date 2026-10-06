@@ -64,17 +64,23 @@ public objc closure void SKCloudServiceControllerRequestUserTokenForDeveloperTok
 public extern objc class SKCloudServiceController : NSObject
 {
     /// Deprecated in macOS 15.0.
-    [Selector("authorizationStatus")] public static SKCloudServiceAuthorizationStatus AuthorizationStatus();
+    [Selector("authorizationStatus")]
+    public static SKCloudServiceAuthorizationStatus AuthorizationStatus();
     /// Deprecated in macOS 15.0.
-    [Selector("requestAuthorization:")] public static void RequestAuthorization(SKCloudServiceControllerRequestAuthorizationCompletionHandlerBlock completionHandler);
+    [Selector("requestAuthorization:")]
+    public static void RequestAuthorization(SKCloudServiceControllerRequestAuthorizationCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("requestCapabilitiesWithCompletionHandler:")] public void RequestCapabilitiesWithCompletionHandler(SKCloudServiceControllerRequestCapabilitiesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("requestCapabilitiesWithCompletionHandler:")]
+    public void RequestCapabilitiesWithCompletionHandler(SKCloudServiceControllerRequestCapabilitiesWithCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("requestStorefrontCountryCodeWithCompletionHandler:")] public void RequestStorefrontCountryCodeWithCompletionHandler(SKCloudServiceControllerRequestStorefrontCountryCodeWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("requestStorefrontCountryCodeWithCompletionHandler:")]
+    public void RequestStorefrontCountryCodeWithCompletionHandler(SKCloudServiceControllerRequestStorefrontCountryCodeWithCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("requestStorefrontIdentifierWithCompletionHandler:")] public void RequestStorefrontIdentifierWithCompletionHandler(SKCloudServiceControllerRequestStorefrontIdentifierWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("requestStorefrontIdentifierWithCompletionHandler:")]
+    public void RequestStorefrontIdentifierWithCompletionHandler(SKCloudServiceControllerRequestStorefrontIdentifierWithCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("requestUserTokenForDeveloperToken:completionHandler:")] public void RequestUserTokenForDeveloperTokenCompletionHandler(NSString developerToken, SKCloudServiceControllerRequestUserTokenForDeveloperTokenCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("requestUserTokenForDeveloperToken:completionHandler:")]
+    public void RequestUserTokenForDeveloperTokenCompletionHandler(NSString developerToken, SKCloudServiceControllerRequestUserTokenForDeveloperTokenCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 /// Deprecated in macOS 15.0.

@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INBusReservation : INReservation, NSCopying, NSSecureCoding
 {
-    [Selector("reservedSeat")] public INSeat? ReservedSeat { get; }
-    [Selector("busTrip")] public INBusTrip BusTrip { get; }
-    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:URL:reservedSeat:busTrip:")] public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsURLReservedSeatBusTrip(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, NSURL? URL, INSeat? reservedSeat, INBusTrip? busTrip);
+    [Selector("reservedSeat")]
+    public INSeat? ReservedSeat { get; }
+    [Selector("busTrip")]
+    public INBusTrip BusTrip { get; }
+    [Selector("initWithItemReference:reservationNumber:bookingTime:reservationStatus:reservationHolderName:actions:URL:reservedSeat:busTrip:")]
+    public Self InitWithItemReferenceReservationNumberBookingTimeReservationStatusReservationHolderNameActionsURLReservedSeatBusTrip(INSpeakableString itemReference, NSString? reservationNumber, NSDate? bookingTime, INReservationStatus reservationStatus, NSString? reservationHolderName, NSArray? actions, NSURL? URL, INSeat? reservedSeat, INBusTrip? busTrip);
 }
 
 #endif

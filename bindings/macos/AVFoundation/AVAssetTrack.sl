@@ -35,58 +35,80 @@ import Standard.ObjC;
 
 public extern objc class AVAssetTrack : NSObject, NSCopying, AVAsynchronousKeyValueLoading
 {
-    [Selector("asset")] public AVAsset? Asset { get; }
-    [Selector("trackID")] public CMPersistentTrackID TrackID { get; }
+    [Selector("asset")]
+    public AVAsset? Asset { get; }
+    [Selector("trackID")]
+    public CMPersistentTrackID TrackID { get; }
 }
 
 /// AVAssetTrackBasicPropertiesAndCharacteristics, a category of AVAssetTrack.
 public extern objc class AVAssetTrack
 {
-    [Selector("mediaType")] public AVMediaType MediaType { get; }
-    [Selector("formatDescriptions")] public NSArray FormatDescriptions { get; }
-    [Selector("isPlayable")] public bool Playable { get; }
-    [Selector("isDecodable")] public bool Decodable { get; }
-    [Selector("isEnabled")] public bool Enabled { get; }
-    [Selector("isSelfContained")] public bool SelfContained { get; }
-    [Selector("totalSampleDataLength")] public long TotalSampleDataLength { get; }
-    [Selector("hasMediaCharacteristic:")] public bool HasMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("mediaType")]
+    public AVMediaType MediaType { get; }
+    [Selector("formatDescriptions")]
+    public NSArray FormatDescriptions { get; }
+    [Selector("isPlayable")]
+    public bool Playable { get; }
+    [Selector("isDecodable")]
+    public bool Decodable { get; }
+    [Selector("isEnabled")]
+    public bool Enabled { get; }
+    [Selector("isSelfContained")]
+    public bool SelfContained { get; }
+    [Selector("totalSampleDataLength")]
+    public long TotalSampleDataLength { get; }
+    [Selector("hasMediaCharacteristic:")]
+    public bool HasMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
 }
 
 /// AVAssetTrackTemporalProperties, a category of AVAssetTrack.
 public extern objc class AVAssetTrack
 {
-    [Selector("timeRange")] public CMTimeRange TimeRange { get; }
-    [Selector("naturalTimeScale")] public CMTimeScale NaturalTimeScale { get; }
-    [Selector("estimatedDataRate")] public float EstimatedDataRate { get; }
+    [Selector("timeRange")]
+    public CMTimeRange TimeRange { get; }
+    [Selector("naturalTimeScale")]
+    public CMTimeScale NaturalTimeScale { get; }
+    [Selector("estimatedDataRate")]
+    public float EstimatedDataRate { get; }
 }
 
 /// AVAssetTrackLanguageProperties, a category of AVAssetTrack.
 public extern objc class AVAssetTrack
 {
-    [Selector("languageCode")] public NSString? LanguageCode { get; }
-    [Selector("extendedLanguageTag")] public NSString? ExtendedLanguageTag { get; }
+    [Selector("languageCode")]
+    public NSString? LanguageCode { get; }
+    [Selector("extendedLanguageTag")]
+    public NSString? ExtendedLanguageTag { get; }
 }
 
 /// AVAssetTrackPropertiesForVisualCharacteristic, a category of AVAssetTrack.
 public extern objc class AVAssetTrack
 {
-    [Selector("naturalSize")] public CGSize NaturalSize { get; }
-    [Selector("preferredTransform")] public CGAffineTransform PreferredTransform { get; }
+    [Selector("naturalSize")]
+    public CGSize NaturalSize { get; }
+    [Selector("preferredTransform")]
+    public CGAffineTransform PreferredTransform { get; }
 }
 
 /// AVAssetTrackPropertiesForAudibleCharacteristic, a category of AVAssetTrack.
 public extern objc class AVAssetTrack
 {
-    [Selector("preferredVolume")] public float PreferredVolume { get; }
-    [Selector("hasAudioSampleDependencies")] public bool HasAudioSampleDependencies { get; }
+    [Selector("preferredVolume")]
+    public float PreferredVolume { get; }
+    [Selector("hasAudioSampleDependencies")]
+    public bool HasAudioSampleDependencies { get; }
 }
 
 /// AVAssetTrackPropertiesForFrameBasedCharacteristic, a category of AVAssetTrack.
 public extern objc class AVAssetTrack
 {
-    [Selector("nominalFrameRate")] public float NominalFrameRate { get; }
-    [Selector("minFrameDuration")] public CMTime MinFrameDuration { get; }
-    [Selector("requiresFrameReordering")] public bool RequiresFrameReordering { get; }
+    [Selector("nominalFrameRate")]
+    public float NominalFrameRate { get; }
+    [Selector("minFrameDuration")]
+    public CMTime MinFrameDuration { get; }
+    [Selector("requiresFrameReordering")]
+    public bool RequiresFrameReordering { get; }
 }
 
 public objc closure void AVAssetTrackLoadSegmentForTrackTimeCompletionHandlerCompletionHandlerBlock(AVAssetTrackSegment? arg0, NSError? arg1);
@@ -96,13 +118,18 @@ public objc closure void AVAssetTrackLoadSamplePresentationTimeForTrackTimeCompl
 /// AVAssetTrackSegments, a category of AVAssetTrack.
 public extern objc class AVAssetTrack
 {
-    [Selector("segments")] public NSArray Segments { get; }
+    [Selector("segments")]
+    public NSArray Segments { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("segmentForTrackTime:")] public AVAssetTrackSegment? SegmentForTrackTime(CMTime trackTime);
-    [Selector("loadSegmentForTrackTime:completionHandler:")] public void LoadSegmentForTrackTimeCompletionHandler(CMTime trackTime, AVAssetTrackLoadSegmentForTrackTimeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("segmentForTrackTime:")]
+    public AVAssetTrackSegment? SegmentForTrackTime(CMTime trackTime);
+    [Selector("loadSegmentForTrackTime:completionHandler:")]
+    public void LoadSegmentForTrackTimeCompletionHandler(CMTime trackTime, AVAssetTrackLoadSegmentForTrackTimeCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("samplePresentationTimeForTrackTime:")] public CMTime SamplePresentationTimeForTrackTime(CMTime trackTime);
-    [Selector("loadSamplePresentationTimeForTrackTime:completionHandler:")] public void LoadSamplePresentationTimeForTrackTimeCompletionHandler(CMTime trackTime, AVAssetTrackLoadSamplePresentationTimeForTrackTimeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("samplePresentationTimeForTrackTime:")]
+    public CMTime SamplePresentationTimeForTrackTime(CMTime trackTime);
+    [Selector("loadSamplePresentationTimeForTrackTime:completionHandler:")]
+    public void LoadSamplePresentationTimeForTrackTimeCompletionHandler(CMTime trackTime, AVAssetTrackLoadSamplePresentationTimeForTrackTimeCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void AVAssetTrackLoadMetadataForFormatCompletionHandlerCompletionHandlerBlock(NSArray? arg0, NSError? arg1);
@@ -110,12 +137,17 @@ public objc closure void AVAssetTrackLoadMetadataForFormatCompletionHandlerCompl
 /// AVAssetTrackMetadataReading, a category of AVAssetTrack.
 public extern objc class AVAssetTrack
 {
-    [Selector("commonMetadata")] public NSArray CommonMetadata { get; }
-    [Selector("metadata")] public NSArray Metadata { get; }
-    [Selector("availableMetadataFormats")] public NSArray AvailableMetadataFormats { get; }
+    [Selector("commonMetadata")]
+    public NSArray CommonMetadata { get; }
+    [Selector("metadata")]
+    public NSArray Metadata { get; }
+    [Selector("availableMetadataFormats")]
+    public NSArray AvailableMetadataFormats { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("metadataForFormat:")] public NSArray MetadataForFormat(AVMetadataFormat format);
-    [Selector("loadMetadataForFormat:completionHandler:")] public void LoadMetadataForFormatCompletionHandler(AVMetadataFormat format, AVAssetTrackLoadMetadataForFormatCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("metadataForFormat:")]
+    public NSArray MetadataForFormat(AVMetadataFormat format);
+    [Selector("loadMetadataForFormat:completionHandler:")]
+    public void LoadMetadataForFormatCompletionHandler(AVMetadataFormat format, AVAssetTrackLoadMetadataForFormatCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void AVAssetTrackLoadAssociatedTracksOfTypeCompletionHandlerCompletionHandlerBlock(NSArray? arg0, NSError? arg1);
@@ -123,10 +155,13 @@ public objc closure void AVAssetTrackLoadAssociatedTracksOfTypeCompletionHandler
 /// AVAssetTrackTrackAssociations, a category of AVAssetTrack.
 public extern objc class AVAssetTrack
 {
-    [Selector("availableTrackAssociationTypes")] public NSArray AvailableTrackAssociationTypes { get; }
+    [Selector("availableTrackAssociationTypes")]
+    public NSArray AvailableTrackAssociationTypes { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("associatedTracksOfType:")] public NSArray AssociatedTracksOfType(AVTrackAssociationType trackAssociationType);
-    [Selector("loadAssociatedTracksOfType:completionHandler:")] public void LoadAssociatedTracksOfTypeCompletionHandler(AVTrackAssociationType trackAssociationType, AVAssetTrackLoadAssociatedTracksOfTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("associatedTracksOfType:")]
+    public NSArray AssociatedTracksOfType(AVTrackAssociationType trackAssociationType);
+    [Selector("loadAssociatedTracksOfType:completionHandler:")]
+    public void LoadAssociatedTracksOfTypeCompletionHandler(AVTrackAssociationType trackAssociationType, AVAssetTrackLoadAssociatedTracksOfTypeCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public using AVTrackAssociationType = NSString;
@@ -149,10 +184,14 @@ public extern "C" AVTrackAssociationType AVTrackAssociationTypeRenderMetadataSou
 /// AVAssetTrackSampleCursorProvision, a category of AVAssetTrack.
 public extern objc class AVAssetTrack
 {
-    [Selector("canProvideSampleCursors")] public bool CanProvideSampleCursors { get; }
-    [Selector("makeSampleCursorWithPresentationTimeStamp:")] public AVSampleCursor? MakeSampleCursorWithPresentationTimeStamp(CMTime presentationTimeStamp);
-    [Selector("makeSampleCursorAtFirstSampleInDecodeOrder")] public AVSampleCursor? MakeSampleCursorAtFirstSampleInDecodeOrder();
-    [Selector("makeSampleCursorAtLastSampleInDecodeOrder")] public AVSampleCursor? MakeSampleCursorAtLastSampleInDecodeOrder();
+    [Selector("canProvideSampleCursors")]
+    public bool CanProvideSampleCursors { get; }
+    [Selector("makeSampleCursorWithPresentationTimeStamp:")]
+    public AVSampleCursor? MakeSampleCursorWithPresentationTimeStamp(CMTime presentationTimeStamp);
+    [Selector("makeSampleCursorAtFirstSampleInDecodeOrder")]
+    public AVSampleCursor? MakeSampleCursorAtFirstSampleInDecodeOrder();
+    [Selector("makeSampleCursorAtLastSampleInDecodeOrder")]
+    public AVSampleCursor? MakeSampleCursorAtLastSampleInDecodeOrder();
 }
 
 public extern "C" NSString AVAssetTrackTimeRangeDidChangeNotification;

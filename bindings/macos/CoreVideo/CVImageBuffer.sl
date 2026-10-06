@@ -194,7 +194,8 @@ public extern "C" Boolean CVImageBufferIsFlipped(CVImageBufferRef imageBuffer);
 
 public extern "C" CGColorSpaceRef? CVImageBufferGetColorSpace(CVImageBufferRef imageBuffer);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CVImageBufferCreateColorSpaceFromAttachments(CFDictionaryRef attachments);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CVImageBufferCreateColorSpaceFromAttachments(CFDictionaryRef attachments);
 
 public extern "C" CFStringRef? kCVImageBufferMasteringDisplayColorVolumeKey;
 

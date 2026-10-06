@@ -49,37 +49,68 @@ public extern "C" NSString? ODTrustTypeAnonymous;
 
 public extern objc class ODConfiguration : NSObject
 {
-    [Selector("nodeName", "setNodeName:")] public NSString? NodeName { get; set; }
-    [Selector("comment", "setComment:")] public NSString? Comment { get; set; }
-    [Selector("defaultMappings", "setDefaultMappings:")] public ODMappings? DefaultMappings { get; set; }
-    [Selector("templateName", "setTemplateName:")] public NSString? TemplateName { get; set; }
-    [Selector("virtualSubnodes", "setVirtualSubnodes:")] public NSArray? VirtualSubnodes { get; set; }
-    [Selector("hideRegistration", "setHideRegistration:")] public bool HideRegistration { get; set; }
-    [Selector("preferredDestinationHostName", "setPreferredDestinationHostName:")] public NSString? PreferredDestinationHostName { get; set; }
-    [Selector("preferredDestinationHostPort", "setPreferredDestinationHostPort:")] public ushort PreferredDestinationHostPort { get; set; }
-    [Selector("trustAccount")] public NSString? TrustAccount { get; }
-    [Selector("trustMetaAccount")] public NSString? TrustMetaAccount { get; }
-    [Selector("trustKerberosPrincipal")] public NSString? TrustKerberosPrincipal { get; }
-    [Selector("trustType")] public NSString? TrustType { get; }
-    [Selector("trustUsesMutualAuthentication")] public bool TrustUsesMutualAuthentication { get; }
-    [Selector("trustUsesKerberosKeytab")] public bool TrustUsesKerberosKeytab { get; }
-    [Selector("trustUsesSystemKeychain")] public bool TrustUsesSystemKeychain { get; }
-    [Selector("packetSigning", "setPacketSigning:")] public NSInteger PacketSigning { get; set; }
-    [Selector("packetEncryption", "setPacketEncryption:")] public NSInteger PacketEncryption { get; set; }
-    [Selector("manInTheMiddleProtection", "setManInTheMiddleProtection:")] public bool ManInTheMiddleProtection { get; set; }
-    [Selector("queryTimeoutInSeconds", "setQueryTimeoutInSeconds:")] public NSInteger QueryTimeoutInSeconds { get; set; }
-    [Selector("connectionSetupTimeoutInSeconds", "setConnectionSetupTimeoutInSeconds:")] public NSInteger ConnectionSetupTimeoutInSeconds { get; set; }
-    [Selector("connectionIdleTimeoutInSeconds", "setConnectionIdleTimeoutInSeconds:")] public NSInteger ConnectionIdleTimeoutInSeconds { get; set; }
-    [Selector("defaultModuleEntries", "setDefaultModuleEntries:")] public NSArray? DefaultModuleEntries { get; set; }
-    [Selector("authenticationModuleEntries", "setAuthenticationModuleEntries:")] public NSArray? AuthenticationModuleEntries { get; set; }
-    [Selector("discoveryModuleEntries", "setDiscoveryModuleEntries:")] public NSArray? DiscoveryModuleEntries { get; set; }
-    [Selector("generalModuleEntries", "setGeneralModuleEntries:")] public NSArray? GeneralModuleEntries { get; set; }
-    [Selector("configuration")] public static Self? Configuration();
-    [Selector("suggestedTrustAccount:")] public static NSString? SuggestedTrustAccount(NSString? hostname);
-    [Selector("suggestedTrustPassword:")] public static NSString? SuggestedTrustPassword(nuint length);
-    [Selector("saveUsingAuthorization:error:")] public bool SaveUsingAuthorizationError(SFAuthorization? authorization, out NSError? error);
-    [Selector("addTrustType:trustAccount:trustPassword:username:password:joinExisting:error:")] public bool AddTrustTypeTrustAccountTrustPasswordUsernamePasswordJoinExistingError(NSString? trustType, NSString? account, NSString? accountPassword, NSString? username, NSString? password, bool join, out NSError? error);
-    [Selector("removeTrustUsingUsername:password:deleteTrustAccount:error:")] public bool RemoveTrustUsingUsernamePasswordDeleteTrustAccountError(NSString? username, NSString? password, bool deleteAccount, out NSError? error);
+    [Selector("nodeName", "setNodeName:")]
+    public NSString? NodeName { get; set; }
+    [Selector("comment", "setComment:")]
+    public NSString? Comment { get; set; }
+    [Selector("defaultMappings", "setDefaultMappings:")]
+    public ODMappings? DefaultMappings { get; set; }
+    [Selector("templateName", "setTemplateName:")]
+    public NSString? TemplateName { get; set; }
+    [Selector("virtualSubnodes", "setVirtualSubnodes:")]
+    public NSArray? VirtualSubnodes { get; set; }
+    [Selector("hideRegistration", "setHideRegistration:")]
+    public bool HideRegistration { get; set; }
+    [Selector("preferredDestinationHostName", "setPreferredDestinationHostName:")]
+    public NSString? PreferredDestinationHostName { get; set; }
+    [Selector("preferredDestinationHostPort", "setPreferredDestinationHostPort:")]
+    public ushort PreferredDestinationHostPort { get; set; }
+    [Selector("trustAccount")]
+    public NSString? TrustAccount { get; }
+    [Selector("trustMetaAccount")]
+    public NSString? TrustMetaAccount { get; }
+    [Selector("trustKerberosPrincipal")]
+    public NSString? TrustKerberosPrincipal { get; }
+    [Selector("trustType")]
+    public NSString? TrustType { get; }
+    [Selector("trustUsesMutualAuthentication")]
+    public bool TrustUsesMutualAuthentication { get; }
+    [Selector("trustUsesKerberosKeytab")]
+    public bool TrustUsesKerberosKeytab { get; }
+    [Selector("trustUsesSystemKeychain")]
+    public bool TrustUsesSystemKeychain { get; }
+    [Selector("packetSigning", "setPacketSigning:")]
+    public NSInteger PacketSigning { get; set; }
+    [Selector("packetEncryption", "setPacketEncryption:")]
+    public NSInteger PacketEncryption { get; set; }
+    [Selector("manInTheMiddleProtection", "setManInTheMiddleProtection:")]
+    public bool ManInTheMiddleProtection { get; set; }
+    [Selector("queryTimeoutInSeconds", "setQueryTimeoutInSeconds:")]
+    public NSInteger QueryTimeoutInSeconds { get; set; }
+    [Selector("connectionSetupTimeoutInSeconds", "setConnectionSetupTimeoutInSeconds:")]
+    public NSInteger ConnectionSetupTimeoutInSeconds { get; set; }
+    [Selector("connectionIdleTimeoutInSeconds", "setConnectionIdleTimeoutInSeconds:")]
+    public NSInteger ConnectionIdleTimeoutInSeconds { get; set; }
+    [Selector("defaultModuleEntries", "setDefaultModuleEntries:")]
+    public NSArray? DefaultModuleEntries { get; set; }
+    [Selector("authenticationModuleEntries", "setAuthenticationModuleEntries:")]
+    public NSArray? AuthenticationModuleEntries { get; set; }
+    [Selector("discoveryModuleEntries", "setDiscoveryModuleEntries:")]
+    public NSArray? DiscoveryModuleEntries { get; set; }
+    [Selector("generalModuleEntries", "setGeneralModuleEntries:")]
+    public NSArray? GeneralModuleEntries { get; set; }
+    [Selector("configuration")]
+    public static Self? Configuration();
+    [Selector("suggestedTrustAccount:")]
+    public static NSString? SuggestedTrustAccount(NSString? hostname);
+    [Selector("suggestedTrustPassword:")]
+    public static NSString? SuggestedTrustPassword(nuint length);
+    [Selector("saveUsingAuthorization:error:")]
+    public bool SaveUsingAuthorizationError(SFAuthorization? authorization, out NSError? error);
+    [Selector("addTrustType:trustAccount:trustPassword:username:password:joinExisting:error:")]
+    public bool AddTrustTypeTrustAccountTrustPasswordUsernamePasswordJoinExistingError(NSString? trustType, NSString? account, NSString? accountPassword, NSString? username, NSString? password, bool join, out NSError? error);
+    [Selector("removeTrustUsingUsername:password:deleteTrustAccount:error:")]
+    public bool RemoveTrustUsingUsernamePasswordDeleteTrustAccountError(NSString? username, NSString? password, bool deleteAccount, out NSError? error);
 }
 
 #endif

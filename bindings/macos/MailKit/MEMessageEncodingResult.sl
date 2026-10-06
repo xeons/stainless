@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class MEMessageEncodingResult : NSObject, NSSecureCoding
 {
-    [Selector("encodedMessage")] public MEEncodedOutgoingMessage? EncodedMessage { get; }
-    [Selector("signingError")] public NSError? SigningError { get; }
-    [Selector("encryptionError")] public NSError? EncryptionError { get; }
-    [Selector("initWithEncodedMessage:signingError:encryptionError:")] public Self InitWithEncodedMessageSigningErrorEncryptionError(MEEncodedOutgoingMessage? encodedMessage, NSError? signingError, NSError? encryptionError);
+    [Selector("encodedMessage")]
+    public MEEncodedOutgoingMessage? EncodedMessage { get; }
+    [Selector("signingError")]
+    public NSError? SigningError { get; }
+    [Selector("encryptionError")]
+    public NSError? EncryptionError { get; }
+    [Selector("initWithEncodedMessage:signingError:encryptionError:")]
+    public Self InitWithEncodedMessageSigningErrorEncryptionError(MEEncodedOutgoingMessage? encodedMessage, NSError? signingError, NSError? encryptionError);
 }
 
 #endif

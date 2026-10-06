@@ -37,17 +37,28 @@ public objc closure void SCNTransactionCompletionBlock();
 
 public extern objc class SCNTransaction : NSObject
 {
-    [Selector("animationDuration", "setAnimationDuration:")] public static CFTimeInterval AnimationDuration { get; set; }
-    [Selector("animationTimingFunction", "setAnimationTimingFunction:")] public static CAMediaTimingFunction? AnimationTimingFunction { get; set; }
-    [Selector("disableActions", "setDisableActions:")] public static bool DisableActions { get; set; }
-    [Selector("completionBlock", "setCompletionBlock:")] public static SCNTransactionCompletionBlock? CompletionBlock { get; set; }
-    [Selector("begin")] public static void Begin();
-    [Selector("commit")] public static void Commit();
-    [Selector("flush")] public static void Flush();
-    [Selector("lock")] public static void Lock();
-    [Selector("unlock")] public static void Unlock();
-    [Selector("valueForKey:")] public static AnyObject? ValueForKey(NSString key);
-    [Selector("setValue:forKey:")] public static void SetValueForKey(AnyObject? value, NSString key);
+    [Selector("animationDuration", "setAnimationDuration:")]
+    public static CFTimeInterval AnimationDuration { get; set; }
+    [Selector("animationTimingFunction", "setAnimationTimingFunction:")]
+    public static CAMediaTimingFunction? AnimationTimingFunction { get; set; }
+    [Selector("disableActions", "setDisableActions:")]
+    public static bool DisableActions { get; set; }
+    [Selector("completionBlock", "setCompletionBlock:")]
+    public static SCNTransactionCompletionBlock? CompletionBlock { get; set; }
+    [Selector("begin")]
+    public static void Begin();
+    [Selector("commit")]
+    public static void Commit();
+    [Selector("flush")]
+    public static void Flush();
+    [Selector("lock")]
+    public static void Lock();
+    [Selector("unlock")]
+    public static void Unlock();
+    [Selector("valueForKey:")]
+    public static AnyObject? ValueForKey(NSString key);
+    [Selector("setValue:forKey:")]
+    public static void SetValueForKey(AnyObject? value, NSString key);
 }
 
 #endif

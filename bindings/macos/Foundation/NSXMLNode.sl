@@ -49,53 +49,100 @@ public enum NSXMLNodeKind : ulong
 
 public extern objc class NSXMLNode : NSObject, NSCopying
 {
-    [Selector("kind")] public NSXMLNodeKind Kind { get; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("objectValue", "setObjectValue:")] public AnyObject? ObjectValue { get; set; }
-    [Selector("stringValue", "setStringValue:")] public NSString? StringValue { get; set; }
-    [Selector("index")] public NSUInteger Index { get; }
-    [Selector("level")] public NSUInteger Level { get; }
-    [Selector("rootDocument")] public NSXMLDocument? RootDocument { get; }
-    [Selector("parent")] public NSXMLNode? Parent { get; }
-    [Selector("childCount")] public NSUInteger ChildCount { get; }
-    [Selector("children")] public NSArray? Children { get; }
-    [Selector("previousSibling")] public NSXMLNode? PreviousSibling { get; }
-    [Selector("nextSibling")] public NSXMLNode? NextSibling { get; }
-    [Selector("previousNode")] public NSXMLNode? PreviousNode { get; }
-    [Selector("nextNode")] public NSXMLNode? NextNode { get; }
-    [Selector("XPath")] public NSString? XPath { get; }
-    [Selector("localName")] public NSString? LocalName { get; }
-    [Selector("prefix")] public NSString? Prefix { get; }
-    [Selector("URI", "setURI:")] public NSString? URI { get; set; }
-    [Selector("description")] public NSString Description { get; }
-    [Selector("XMLString")] public NSString XMLString { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithKind:")] public Self InitWithKind(NSXMLNodeKind kind);
-    [Selector("initWithKind:options:")] public Self InitWithKindOptions(NSXMLNodeKind kind, NSXMLNodeOptions options);
-    [Selector("document")] public static AnyObject Document();
-    [Selector("documentWithRootElement:")] public static AnyObject DocumentWithRootElement(NSXMLElement element);
-    [Selector("elementWithName:")] public static AnyObject ElementWithName(NSString name);
-    [Selector("elementWithName:URI:")] public static AnyObject ElementWithNameURI(NSString name, NSString URI);
-    [Selector("elementWithName:stringValue:")] public static AnyObject ElementWithNameStringValue(NSString name, NSString string);
-    [Selector("elementWithName:children:attributes:")] public static AnyObject ElementWithNameChildrenAttributes(NSString name, NSArray? children, NSArray? attributes);
-    [Selector("attributeWithName:stringValue:")] public static AnyObject AttributeWithNameStringValue(NSString name, NSString stringValue);
-    [Selector("attributeWithName:URI:stringValue:")] public static AnyObject AttributeWithNameURIStringValue(NSString name, NSString URI, NSString stringValue);
-    [Selector("namespaceWithName:stringValue:")] public static AnyObject NamespaceWithNameStringValue(NSString name, NSString stringValue);
-    [Selector("processingInstructionWithName:stringValue:")] public static AnyObject ProcessingInstructionWithNameStringValue(NSString name, NSString stringValue);
-    [Selector("commentWithStringValue:")] public static AnyObject CommentWithStringValue(NSString stringValue);
-    [Selector("textWithStringValue:")] public static AnyObject TextWithStringValue(NSString stringValue);
-    [Selector("DTDNodeWithXMLString:")] public static AnyObject? DTDNodeWithXMLString(NSString string);
-    [Selector("setStringValue:resolvingEntities:")] public void SetStringValueResolvingEntities(NSString string, bool resolve);
-    [Selector("childAtIndex:")] public NSXMLNode? ChildAtIndex(NSUInteger index);
-    [Selector("detach")] public void Detach();
-    [Selector("localNameForName:")] public static NSString LocalNameForName(NSString name);
-    [Selector("prefixForName:")] public static NSString? PrefixForName(NSString name);
-    [Selector("predefinedNamespaceForPrefix:")] public static NSXMLNode? PredefinedNamespaceForPrefix(NSString name);
-    [Selector("XMLStringWithOptions:")] public NSString XMLStringWithOptions(NSXMLNodeOptions options);
-    [Selector("canonicalXMLStringPreservingComments:")] public NSString CanonicalXMLStringPreservingComments(bool comments);
-    [Selector("nodesForXPath:error:")] public NSArray? NodesForXPathError(NSString xpath, out NSError? error);
-    [Selector("objectsForXQuery:constants:error:")] public NSArray? ObjectsForXQueryConstantsError(NSString xquery, NSDictionary? constants, out NSError? error);
-    [Selector("objectsForXQuery:error:")] public NSArray? ObjectsForXQueryError(NSString xquery, out NSError? error);
+    [Selector("kind")]
+    public NSXMLNodeKind Kind { get; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("objectValue", "setObjectValue:")]
+    public AnyObject? ObjectValue { get; set; }
+    [Selector("stringValue", "setStringValue:")]
+    public NSString? StringValue { get; set; }
+    [Selector("index")]
+    public NSUInteger Index { get; }
+    [Selector("level")]
+    public NSUInteger Level { get; }
+    [Selector("rootDocument")]
+    public NSXMLDocument? RootDocument { get; }
+    [Selector("parent")]
+    public NSXMLNode? Parent { get; }
+    [Selector("childCount")]
+    public NSUInteger ChildCount { get; }
+    [Selector("children")]
+    public NSArray? Children { get; }
+    [Selector("previousSibling")]
+    public NSXMLNode? PreviousSibling { get; }
+    [Selector("nextSibling")]
+    public NSXMLNode? NextSibling { get; }
+    [Selector("previousNode")]
+    public NSXMLNode? PreviousNode { get; }
+    [Selector("nextNode")]
+    public NSXMLNode? NextNode { get; }
+    [Selector("XPath")]
+    public NSString? XPath { get; }
+    [Selector("localName")]
+    public NSString? LocalName { get; }
+    [Selector("prefix")]
+    public NSString? Prefix { get; }
+    [Selector("URI", "setURI:")]
+    public NSString? URI { get; set; }
+    [Selector("description")]
+    public NSString Description { get; }
+    [Selector("XMLString")]
+    public NSString XMLString { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithKind:")]
+    public Self InitWithKind(NSXMLNodeKind kind);
+    [Selector("initWithKind:options:")]
+    public Self InitWithKindOptions(NSXMLNodeKind kind, NSXMLNodeOptions options);
+    [Selector("document")]
+    public static AnyObject Document();
+    [Selector("documentWithRootElement:")]
+    public static AnyObject DocumentWithRootElement(NSXMLElement element);
+    [Selector("elementWithName:")]
+    public static AnyObject ElementWithName(NSString name);
+    [Selector("elementWithName:URI:")]
+    public static AnyObject ElementWithNameURI(NSString name, NSString URI);
+    [Selector("elementWithName:stringValue:")]
+    public static AnyObject ElementWithNameStringValue(NSString name, NSString string);
+    [Selector("elementWithName:children:attributes:")]
+    public static AnyObject ElementWithNameChildrenAttributes(NSString name, NSArray? children, NSArray? attributes);
+    [Selector("attributeWithName:stringValue:")]
+    public static AnyObject AttributeWithNameStringValue(NSString name, NSString stringValue);
+    [Selector("attributeWithName:URI:stringValue:")]
+    public static AnyObject AttributeWithNameURIStringValue(NSString name, NSString URI, NSString stringValue);
+    [Selector("namespaceWithName:stringValue:")]
+    public static AnyObject NamespaceWithNameStringValue(NSString name, NSString stringValue);
+    [Selector("processingInstructionWithName:stringValue:")]
+    public static AnyObject ProcessingInstructionWithNameStringValue(NSString name, NSString stringValue);
+    [Selector("commentWithStringValue:")]
+    public static AnyObject CommentWithStringValue(NSString stringValue);
+    [Selector("textWithStringValue:")]
+    public static AnyObject TextWithStringValue(NSString stringValue);
+    [Selector("DTDNodeWithXMLString:")]
+    public static AnyObject? DTDNodeWithXMLString(NSString string);
+    [Selector("setStringValue:resolvingEntities:")]
+    public void SetStringValueResolvingEntities(NSString string, bool resolve);
+    [Selector("childAtIndex:")]
+    public NSXMLNode? ChildAtIndex(NSUInteger index);
+    [Selector("detach")]
+    public void Detach();
+    [Selector("localNameForName:")]
+    public static NSString LocalNameForName(NSString name);
+    [Selector("prefixForName:")]
+    public static NSString? PrefixForName(NSString name);
+    [Selector("predefinedNamespaceForPrefix:")]
+    public static NSXMLNode? PredefinedNamespaceForPrefix(NSString name);
+    [Selector("XMLStringWithOptions:")]
+    public NSString XMLStringWithOptions(NSXMLNodeOptions options);
+    [Selector("canonicalXMLStringPreservingComments:")]
+    public NSString CanonicalXMLStringPreservingComments(bool comments);
+    [Selector("nodesForXPath:error:")]
+    public NSArray? NodesForXPathError(NSString xpath, out NSError? error);
+    [Selector("objectsForXQuery:constants:error:")]
+    public NSArray? ObjectsForXQueryConstantsError(NSString xquery, NSDictionary? constants, out NSError? error);
+    [Selector("objectsForXQuery:error:")]
+    public NSArray? ObjectsForXQueryError(NSString xquery, out NSError? error);
 }
 
 #endif

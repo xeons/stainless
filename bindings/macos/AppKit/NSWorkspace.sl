@@ -59,60 +59,110 @@ public objc closure void NSWorkspaceSetDefaultApplicationAtURLToOpenContentTypeC
 
 public extern objc class NSWorkspace : NSObject
 {
-    [Selector("sharedWorkspace")] public static NSWorkspace SharedWorkspace { get; }
-    [Selector("notificationCenter")] public NSNotificationCenter NotificationCenter { get; }
-    [Selector("fileLabels")] public NSArray? FileLabels { get; }
-    [Selector("fileLabelColors")] public NSArray? FileLabelColors { get; }
-    [Selector("frontmostApplication")] public NSRunningApplication? FrontmostApplication { get; }
-    [Selector("menuBarOwningApplication")] public NSRunningApplication? MenuBarOwningApplication { get; }
-    [Selector("openURL:")] public bool OpenURL(NSURL url);
-    [Selector("openURL:configuration:completionHandler:")] public void OpenURLConfigurationCompletionHandler(NSURL url, NSWorkspaceOpenConfiguration configuration, NSWorkspaceOpenURLConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("openURLs:withApplicationAtURL:configuration:completionHandler:")] public void OpenURLsWithApplicationAtURLConfigurationCompletionHandler(NSArray urls, NSURL applicationURL, NSWorkspaceOpenConfiguration configuration, NSWorkspaceOpenURLsWithApplicationAtURLConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("openApplicationAtURL:configuration:completionHandler:")] public void OpenApplicationAtURLConfigurationCompletionHandler(NSURL applicationURL, NSWorkspaceOpenConfiguration configuration, NSWorkspaceOpenApplicationAtURLConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("selectFile:inFileViewerRootedAtPath:")] public bool SelectFileInFileViewerRootedAtPath(NSString? fullPath, NSString rootFullPath);
-    [Selector("activateFileViewerSelectingURLs:")] public void ActivateFileViewerSelectingURLs(NSArray fileURLs);
-    [Selector("showSearchResultsForQueryString:")] public bool ShowSearchResultsForQueryString(NSString queryString);
-    [Selector("noteFileSystemChanged:")] public void NoteFileSystemChanged(NSString path);
-    [Selector("isFilePackageAtPath:")] public bool IsFilePackageAtPath(NSString fullPath);
-    [Selector("iconForFile:")] public NSImage IconForFile(NSString fullPath);
-    [Selector("iconForFiles:")] public NSImage? IconForFiles(NSArray fullPaths);
-    [Selector("iconForContentType:")] public NSImage IconForContentType(UTType contentType);
-    [Selector("setIcon:forFile:options:")] public bool SetIconForFileOptions(NSImage? image, NSString fullPath, NSWorkspaceIconCreationOptions options);
-    [Selector("recycleURLs:completionHandler:")] public void RecycleURLsCompletionHandler(NSArray URLs, NSWorkspaceRecycleURLsCompletionHandlerHandlerBlock? handler);
-    [Selector("duplicateURLs:completionHandler:")] public void DuplicateURLsCompletionHandler(NSArray URLs, NSWorkspaceDuplicateURLsCompletionHandlerHandlerBlock? handler);
-    [Selector("getFileSystemInfoForPath:isRemovable:isWritable:isUnmountable:description:type:")] public bool GetFileSystemInfoForPathIsRemovableIsWritableIsUnmountableDescriptionType(NSString fullPath, bool* removableFlag, bool* writableFlag, bool* unmountableFlag, out NSString? description, out NSString? fileSystemType);
-    [Selector("unmountAndEjectDeviceAtPath:")] public bool UnmountAndEjectDeviceAtPath(NSString path);
-    [Selector("unmountAndEjectDeviceAtURL:error:")] public bool UnmountAndEjectDeviceAtURLError(NSURL url, out NSError? error);
-    [Selector("extendPowerOffBy:")] public NSInteger ExtendPowerOffBy(NSInteger requested);
-    [Selector("hideOtherApplications")] public void HideOtherApplications();
-    [Selector("URLForApplicationWithBundleIdentifier:")] public NSURL? URLForApplicationWithBundleIdentifier(NSString bundleIdentifier);
-    [Selector("URLsForApplicationsWithBundleIdentifier:")] public NSArray URLsForApplicationsWithBundleIdentifier(NSString bundleIdentifier);
-    [Selector("URLForApplicationToOpenURL:")] public NSURL? URLForApplicationToOpenURL(NSURL url);
-    [Selector("URLsForApplicationsToOpenURL:")] public NSArray URLsForApplicationsToOpenURL(NSURL url);
-    [Selector("setDefaultApplicationAtURL:toOpenContentTypeOfFileAtURL:completionHandler:")] public void SetDefaultApplicationAtURLToOpenContentTypeOfFileAtURLCompletionHandler(NSURL applicationURL, NSURL url, NSWorkspaceSetDefaultApplicationAtURLToOpenContentTypeOfFileAtURLCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("setDefaultApplicationAtURL:toOpenURLsWithScheme:completionHandler:")] public void SetDefaultApplicationAtURLToOpenURLsWithSchemeCompletionHandler(NSURL applicationURL, NSString urlScheme, NSWorkspaceSetDefaultApplicationAtURLToOpenURLsWithSchemeCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("setDefaultApplicationAtURL:toOpenFileAtURL:completionHandler:")] public void SetDefaultApplicationAtURLToOpenFileAtURLCompletionHandler(NSURL applicationURL, NSURL url, NSWorkspaceSetDefaultApplicationAtURLToOpenFileAtURLCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("URLForApplicationToOpenContentType:")] public NSURL? URLForApplicationToOpenContentType(UTType contentType);
-    [Selector("URLsForApplicationsToOpenContentType:")] public NSArray URLsForApplicationsToOpenContentType(UTType contentType);
-    [Selector("setDefaultApplicationAtURL:toOpenContentType:completionHandler:")] public void SetDefaultApplicationAtURLToOpenContentTypeCompletionHandler(NSURL applicationURL, UTType contentType, NSWorkspaceSetDefaultApplicationAtURLToOpenContentTypeCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("sharedWorkspace")]
+    public static NSWorkspace SharedWorkspace { get; }
+    [Selector("notificationCenter")]
+    public NSNotificationCenter NotificationCenter { get; }
+    [Selector("fileLabels")]
+    public NSArray? FileLabels { get; }
+    [Selector("fileLabelColors")]
+    public NSArray? FileLabelColors { get; }
+    [Selector("frontmostApplication")]
+    public NSRunningApplication? FrontmostApplication { get; }
+    [Selector("menuBarOwningApplication")]
+    public NSRunningApplication? MenuBarOwningApplication { get; }
+    [Selector("openURL:")]
+    public bool OpenURL(NSURL url);
+    [Selector("openURL:configuration:completionHandler:")]
+    public void OpenURLConfigurationCompletionHandler(NSURL url, NSWorkspaceOpenConfiguration configuration, NSWorkspaceOpenURLConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("openURLs:withApplicationAtURL:configuration:completionHandler:")]
+    public void OpenURLsWithApplicationAtURLConfigurationCompletionHandler(NSArray urls, NSURL applicationURL, NSWorkspaceOpenConfiguration configuration, NSWorkspaceOpenURLsWithApplicationAtURLConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("openApplicationAtURL:configuration:completionHandler:")]
+    public void OpenApplicationAtURLConfigurationCompletionHandler(NSURL applicationURL, NSWorkspaceOpenConfiguration configuration, NSWorkspaceOpenApplicationAtURLConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("selectFile:inFileViewerRootedAtPath:")]
+    public bool SelectFileInFileViewerRootedAtPath(NSString? fullPath, NSString rootFullPath);
+    [Selector("activateFileViewerSelectingURLs:")]
+    public void ActivateFileViewerSelectingURLs(NSArray fileURLs);
+    [Selector("showSearchResultsForQueryString:")]
+    public bool ShowSearchResultsForQueryString(NSString queryString);
+    [Selector("noteFileSystemChanged:")]
+    public void NoteFileSystemChanged(NSString path);
+    [Selector("isFilePackageAtPath:")]
+    public bool IsFilePackageAtPath(NSString fullPath);
+    [Selector("iconForFile:")]
+    public NSImage IconForFile(NSString fullPath);
+    [Selector("iconForFiles:")]
+    public NSImage? IconForFiles(NSArray fullPaths);
+    [Selector("iconForContentType:")]
+    public NSImage IconForContentType(UTType contentType);
+    [Selector("setIcon:forFile:options:")]
+    public bool SetIconForFileOptions(NSImage? image, NSString fullPath, NSWorkspaceIconCreationOptions options);
+    [Selector("recycleURLs:completionHandler:")]
+    public void RecycleURLsCompletionHandler(NSArray URLs, NSWorkspaceRecycleURLsCompletionHandlerHandlerBlock? handler);
+    [Selector("duplicateURLs:completionHandler:")]
+    public void DuplicateURLsCompletionHandler(NSArray URLs, NSWorkspaceDuplicateURLsCompletionHandlerHandlerBlock? handler);
+    [Selector("getFileSystemInfoForPath:isRemovable:isWritable:isUnmountable:description:type:")]
+    public bool GetFileSystemInfoForPathIsRemovableIsWritableIsUnmountableDescriptionType(NSString fullPath, bool* removableFlag, bool* writableFlag, bool* unmountableFlag, out NSString? description, out NSString? fileSystemType);
+    [Selector("unmountAndEjectDeviceAtPath:")]
+    public bool UnmountAndEjectDeviceAtPath(NSString path);
+    [Selector("unmountAndEjectDeviceAtURL:error:")]
+    public bool UnmountAndEjectDeviceAtURLError(NSURL url, out NSError? error);
+    [Selector("extendPowerOffBy:")]
+    public NSInteger ExtendPowerOffBy(NSInteger requested);
+    [Selector("hideOtherApplications")]
+    public void HideOtherApplications();
+    [Selector("URLForApplicationWithBundleIdentifier:")]
+    public NSURL? URLForApplicationWithBundleIdentifier(NSString bundleIdentifier);
+    [Selector("URLsForApplicationsWithBundleIdentifier:")]
+    public NSArray URLsForApplicationsWithBundleIdentifier(NSString bundleIdentifier);
+    [Selector("URLForApplicationToOpenURL:")]
+    public NSURL? URLForApplicationToOpenURL(NSURL url);
+    [Selector("URLsForApplicationsToOpenURL:")]
+    public NSArray URLsForApplicationsToOpenURL(NSURL url);
+    [Selector("setDefaultApplicationAtURL:toOpenContentTypeOfFileAtURL:completionHandler:")]
+    public void SetDefaultApplicationAtURLToOpenContentTypeOfFileAtURLCompletionHandler(NSURL applicationURL, NSURL url, NSWorkspaceSetDefaultApplicationAtURLToOpenContentTypeOfFileAtURLCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("setDefaultApplicationAtURL:toOpenURLsWithScheme:completionHandler:")]
+    public void SetDefaultApplicationAtURLToOpenURLsWithSchemeCompletionHandler(NSURL applicationURL, NSString urlScheme, NSWorkspaceSetDefaultApplicationAtURLToOpenURLsWithSchemeCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("setDefaultApplicationAtURL:toOpenFileAtURL:completionHandler:")]
+    public void SetDefaultApplicationAtURLToOpenFileAtURLCompletionHandler(NSURL applicationURL, NSURL url, NSWorkspaceSetDefaultApplicationAtURLToOpenFileAtURLCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("URLForApplicationToOpenContentType:")]
+    public NSURL? URLForApplicationToOpenContentType(UTType contentType);
+    [Selector("URLsForApplicationsToOpenContentType:")]
+    public NSArray URLsForApplicationsToOpenContentType(UTType contentType);
+    [Selector("setDefaultApplicationAtURL:toOpenContentType:completionHandler:")]
+    public void SetDefaultApplicationAtURLToOpenContentTypeCompletionHandler(NSURL applicationURL, UTType contentType, NSWorkspaceSetDefaultApplicationAtURLToOpenContentTypeCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public extern objc class NSWorkspaceOpenConfiguration : NSObject, NSCopying
 {
-    [Selector("promptsUserIfNeeded", "setPromptsUserIfNeeded:")] public bool PromptsUserIfNeeded { get; set; }
-    [Selector("addsToRecentItems", "setAddsToRecentItems:")] public bool AddsToRecentItems { get; set; }
-    [Selector("activates", "setActivates:")] public bool Activates { get; set; }
-    [Selector("hides", "setHides:")] public bool Hides { get; set; }
-    [Selector("hidesOthers", "setHidesOthers:")] public bool HidesOthers { get; set; }
-    [Selector("isForPrinting", "setForPrinting:")] public bool ForPrinting { get; set; }
-    [Selector("createsNewApplicationInstance", "setCreatesNewApplicationInstance:")] public bool CreatesNewApplicationInstance { get; set; }
-    [Selector("allowsRunningApplicationSubstitution", "setAllowsRunningApplicationSubstitution:")] public bool AllowsRunningApplicationSubstitution { get; set; }
-    [Selector("arguments", "setArguments:")] public NSArray Arguments { get; set; }
-    [Selector("environment", "setEnvironment:")] public NSDictionary Environment { get; set; }
-    [Selector("appleEvent", "setAppleEvent:")] public NSAppleEventDescriptor? AppleEvent { get; set; }
-    [Selector("architecture", "setArchitecture:")] public cpu_type_t Architecture { get; set; }
-    [Selector("requiresUniversalLinks", "setRequiresUniversalLinks:")] public bool RequiresUniversalLinks { get; set; }
-    [Selector("configuration")] public static Self Configuration();
+    [Selector("promptsUserIfNeeded", "setPromptsUserIfNeeded:")]
+    public bool PromptsUserIfNeeded { get; set; }
+    [Selector("addsToRecentItems", "setAddsToRecentItems:")]
+    public bool AddsToRecentItems { get; set; }
+    [Selector("activates", "setActivates:")]
+    public bool Activates { get; set; }
+    [Selector("hides", "setHides:")]
+    public bool Hides { get; set; }
+    [Selector("hidesOthers", "setHidesOthers:")]
+    public bool HidesOthers { get; set; }
+    [Selector("isForPrinting", "setForPrinting:")]
+    public bool ForPrinting { get; set; }
+    [Selector("createsNewApplicationInstance", "setCreatesNewApplicationInstance:")]
+    public bool CreatesNewApplicationInstance { get; set; }
+    [Selector("allowsRunningApplicationSubstitution", "setAllowsRunningApplicationSubstitution:")]
+    public bool AllowsRunningApplicationSubstitution { get; set; }
+    [Selector("arguments", "setArguments:")]
+    public NSArray Arguments { get; set; }
+    [Selector("environment", "setEnvironment:")]
+    public NSDictionary Environment { get; set; }
+    [Selector("appleEvent", "setAppleEvent:")]
+    public NSAppleEventDescriptor? AppleEvent { get; set; }
+    [Selector("architecture", "setArchitecture:")]
+    public cpu_type_t Architecture { get; set; }
+    [Selector("requiresUniversalLinks", "setRequiresUniversalLinks:")]
+    public bool RequiresUniversalLinks { get; set; }
+    [Selector("configuration")]
+    public static Self Configuration();
 }
 
 public using NSWorkspaceDesktopImageOptionKey = NSString;
@@ -126,9 +176,12 @@ public extern "C" NSWorkspaceDesktopImageOptionKey? NSWorkspaceDesktopImageFillC
 /// NSDesktopImages, a category of NSWorkspace.
 public extern objc class NSWorkspace
 {
-    [Selector("setDesktopImageURL:forScreen:options:error:")] public bool SetDesktopImageURLForScreenOptionsError(NSURL url, NSScreen screen, NSDictionary options, out NSError? error);
-    [Selector("desktopImageURLForScreen:")] public NSURL? DesktopImageURLForScreen(NSScreen screen);
-    [Selector("desktopImageOptionsForScreen:")] public NSDictionary? DesktopImageOptionsForScreen(NSScreen screen);
+    [Selector("setDesktopImageURL:forScreen:options:error:")]
+    public bool SetDesktopImageURLForScreenOptionsError(NSURL url, NSScreen screen, NSDictionary options, out NSError? error);
+    [Selector("desktopImageURLForScreen:")]
+    public NSURL? DesktopImageURLForScreen(NSScreen screen);
+    [Selector("desktopImageOptionsForScreen:")]
+    public NSDictionary? DesktopImageOptionsForScreen(NSScreen screen);
 }
 
 public enum NSWorkspaceAuthorizationType : long
@@ -145,13 +198,15 @@ public objc closure void NSWorkspaceRequestAuthorizationOfTypeCompletionHandlerC
 /// NSWorkspaceAuthorization, a category of NSWorkspace.
 public extern objc class NSWorkspace
 {
-    [Selector("requestAuthorizationOfType:completionHandler:")] public void RequestAuthorizationOfTypeCompletionHandler(NSWorkspaceAuthorizationType type, NSWorkspaceRequestAuthorizationOfTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("requestAuthorizationOfType:completionHandler:")]
+    public void RequestAuthorizationOfTypeCompletionHandler(NSWorkspaceAuthorizationType type, NSWorkspaceRequestAuthorizationOfTypeCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 /// NSWorkspaceAuthorization, a category of NSFileManager.
 public extern objc class NSFileManager
 {
-    [Selector("fileManagerWithAuthorization:")] public static Self FileManagerWithAuthorization(NSWorkspaceAuthorization authorization);
+    [Selector("fileManagerWithAuthorization:")]
+    public static Self FileManagerWithAuthorization(NSWorkspaceAuthorization authorization);
 }
 
 public extern "C" NSString? NSWorkspaceApplicationKey;
@@ -243,73 +298,107 @@ public extern "C" NSWorkspaceLaunchConfigurationKey? NSWorkspaceLaunchConfigurat
 public extern objc class NSWorkspace
 {
     /// Deprecated in macOS 11.0.
-    [Selector("openFile:")] public bool OpenFile(NSString fullPath);
+    [Selector("openFile:")]
+    public bool OpenFile(NSString fullPath);
     /// Deprecated in macOS 11.0.
-    [Selector("openFile:withApplication:")] public bool OpenFileWithApplication(NSString fullPath, NSString? appName);
+    [Selector("openFile:withApplication:")]
+    public bool OpenFileWithApplication(NSString fullPath, NSString? appName);
     /// Deprecated in macOS 11.0.
-    [Selector("openFile:withApplication:andDeactivate:")] public bool OpenFileWithApplicationAndDeactivate(NSString fullPath, NSString? appName, bool flag);
+    [Selector("openFile:withApplication:andDeactivate:")]
+    public bool OpenFileWithApplicationAndDeactivate(NSString fullPath, NSString? appName, bool flag);
     /// Deprecated in macOS 11.0.
-    [Selector("launchApplication:")] public bool LaunchApplication(NSString appName);
+    [Selector("launchApplication:")]
+    public bool LaunchApplication(NSString appName);
     /// Deprecated in macOS 11.0.
-    [Selector("launchApplicationAtURL:options:configuration:error:")] public NSRunningApplication? LaunchApplicationAtURLOptionsConfigurationError(NSURL url, NSWorkspaceLaunchOptions options, NSDictionary configuration, out NSError? error);
+    [Selector("launchApplicationAtURL:options:configuration:error:")]
+    public NSRunningApplication? LaunchApplicationAtURLOptionsConfigurationError(NSURL url, NSWorkspaceLaunchOptions options, NSDictionary configuration, out NSError? error);
     /// Deprecated in macOS 11.0.
-    [Selector("openURL:options:configuration:error:")] public NSRunningApplication? OpenURLOptionsConfigurationError(NSURL url, NSWorkspaceLaunchOptions options, NSDictionary configuration, out NSError? error);
+    [Selector("openURL:options:configuration:error:")]
+    public NSRunningApplication? OpenURLOptionsConfigurationError(NSURL url, NSWorkspaceLaunchOptions options, NSDictionary configuration, out NSError? error);
     /// Deprecated in macOS 11.0.
-    [Selector("openURLs:withApplicationAtURL:options:configuration:error:")] public NSRunningApplication? OpenURLsWithApplicationAtURLOptionsConfigurationError(NSArray urls, NSURL applicationURL, NSWorkspaceLaunchOptions options, NSDictionary configuration, out NSError? error);
+    [Selector("openURLs:withApplicationAtURL:options:configuration:error:")]
+    public NSRunningApplication? OpenURLsWithApplicationAtURLOptionsConfigurationError(NSArray urls, NSURL applicationURL, NSWorkspaceLaunchOptions options, NSDictionary configuration, out NSError? error);
     /// Deprecated in macOS 11.0.
-    [Selector("launchApplication:showIcon:autolaunch:")] public bool LaunchApplicationShowIconAutolaunch(NSString appName, bool showIcon, bool autolaunch);
+    [Selector("launchApplication:showIcon:autolaunch:")]
+    public bool LaunchApplicationShowIconAutolaunch(NSString appName, bool showIcon, bool autolaunch);
     /// Deprecated in macOS 11.0.
-    [Selector("fullPathForApplication:")] public NSString? FullPathForApplication(NSString appName);
+    [Selector("fullPathForApplication:")]
+    public NSString? FullPathForApplication(NSString appName);
     /// Deprecated in macOS 11.0.
-    [Selector("absolutePathForAppBundleWithIdentifier:")] public NSString? AbsolutePathForAppBundleWithIdentifier(NSString bundleIdentifier);
+    [Selector("absolutePathForAppBundleWithIdentifier:")]
+    public NSString? AbsolutePathForAppBundleWithIdentifier(NSString bundleIdentifier);
     /// Deprecated in macOS 11.0.
-    [Selector("launchAppWithBundleIdentifier:options:additionalEventParamDescriptor:launchIdentifier:")] public bool LaunchAppWithBundleIdentifierOptionsAdditionalEventParamDescriptorLaunchIdentifier(NSString bundleIdentifier, NSWorkspaceLaunchOptions options, NSAppleEventDescriptor? descriptor, out NSNumber? identifier);
+    [Selector("launchAppWithBundleIdentifier:options:additionalEventParamDescriptor:launchIdentifier:")]
+    public bool LaunchAppWithBundleIdentifierOptionsAdditionalEventParamDescriptorLaunchIdentifier(NSString bundleIdentifier, NSWorkspaceLaunchOptions options, NSAppleEventDescriptor? descriptor, out NSNumber? identifier);
     /// Deprecated in macOS 11.0.
-    [Selector("openURLs:withAppBundleIdentifier:options:additionalEventParamDescriptor:launchIdentifiers:")] public bool OpenURLsWithAppBundleIdentifierOptionsAdditionalEventParamDescriptorLaunchIdentifiers(NSArray urls, NSString? bundleIdentifier, NSWorkspaceLaunchOptions options, NSAppleEventDescriptor? descriptor, out NSArray? identifiers);
+    [Selector("openURLs:withAppBundleIdentifier:options:additionalEventParamDescriptor:launchIdentifiers:")]
+    public bool OpenURLsWithAppBundleIdentifierOptionsAdditionalEventParamDescriptorLaunchIdentifiers(NSArray urls, NSString? bundleIdentifier, NSWorkspaceLaunchOptions options, NSAppleEventDescriptor? descriptor, out NSArray? identifiers);
     /// Deprecated in macOS 10.6.
-    [Selector("openTempFile:")] public bool OpenTempFile(NSString fullPath);
+    [Selector("openTempFile:")]
+    public bool OpenTempFile(NSString fullPath);
     /// Deprecated in macOS 10.6.
-    [Selector("findApplications")] public void FindApplications();
+    [Selector("findApplications")]
+    public void FindApplications();
     /// Deprecated in macOS 10.6.
-    [Selector("noteUserDefaultsChanged")] public void NoteUserDefaultsChanged();
+    [Selector("noteUserDefaultsChanged")]
+    public void NoteUserDefaultsChanged();
     /// Deprecated in macOS 10.6.
-    [Selector("slideImage:from:to:")] public void SlideImageFromTo(NSImage image, NSPoint fromPoint, NSPoint toPoint);
+    [Selector("slideImage:from:to:")]
+    public void SlideImageFromTo(NSImage image, NSPoint fromPoint, NSPoint toPoint);
     /// Deprecated in macOS 10.6.
-    [Selector("checkForRemovableMedia")] public void CheckForRemovableMedia();
+    [Selector("checkForRemovableMedia")]
+    public void CheckForRemovableMedia();
     /// Deprecated in macOS 10.6.
-    [Selector("noteFileSystemChanged")] public void NoteFileSystemChanged();
+    [Selector("noteFileSystemChanged")]
+    public void NoteFileSystemChanged();
     /// Deprecated in macOS 10.6.
-    [Selector("fileSystemChanged")] public bool FileSystemChanged();
+    [Selector("fileSystemChanged")]
+    public bool FileSystemChanged();
     /// Deprecated in macOS 10.6.
-    [Selector("userDefaultsChanged")] public bool UserDefaultsChanged();
+    [Selector("userDefaultsChanged")]
+    public bool UserDefaultsChanged();
     /// Deprecated in macOS 10.6.
-    [Selector("mountNewRemovableMedia")] public NSArray? MountNewRemovableMedia();
+    [Selector("mountNewRemovableMedia")]
+    public NSArray? MountNewRemovableMedia();
     /// Deprecated in macOS 10.11.
-    [Selector("activeApplication")] public NSDictionary? ActiveApplication();
+    [Selector("activeApplication")]
+    public NSDictionary? ActiveApplication();
     /// Deprecated in macOS 10.11.
-    [Selector("mountedLocalVolumePaths")] public NSArray? MountedLocalVolumePaths();
+    [Selector("mountedLocalVolumePaths")]
+    public NSArray? MountedLocalVolumePaths();
     /// Deprecated in macOS 10.11.
-    [Selector("mountedRemovableMedia")] public NSArray? MountedRemovableMedia();
+    [Selector("mountedRemovableMedia")]
+    public NSArray? MountedRemovableMedia();
     /// Deprecated in macOS 10.7.
-    [Selector("launchedApplications")] public NSArray? LaunchedApplications();
+    [Selector("launchedApplications")]
+    public NSArray? LaunchedApplications();
     /// Deprecated in macOS 10.11.
-    [Selector("openFile:fromImage:at:inView:")] public bool OpenFileFromImageAtInView(NSString fullPath, NSImage? image, NSPoint point, NSView? view);
+    [Selector("openFile:fromImage:at:inView:")]
+    public bool OpenFileFromImageAtInView(NSString fullPath, NSImage? image, NSPoint point, NSView? view);
     /// Deprecated in macOS 10.11.
-    [Selector("performFileOperation:source:destination:files:tag:")] public bool PerformFileOperationSourceDestinationFilesTag(NSWorkspaceFileOperationName operation, NSString source, NSString destination, NSArray files, NSInteger* tag);
+    [Selector("performFileOperation:source:destination:files:tag:")]
+    public bool PerformFileOperationSourceDestinationFilesTag(NSWorkspaceFileOperationName operation, NSString source, NSString destination, NSArray files, NSInteger* tag);
     /// Deprecated in macOS 12.0.
-    [Selector("getInfoForFile:application:type:")] public bool GetInfoForFileApplicationType(NSString fullPath, out NSString? appName, out NSString? type);
+    [Selector("getInfoForFile:application:type:")]
+    public bool GetInfoForFileApplicationType(NSString fullPath, out NSString? appName, out NSString? type);
     /// Deprecated in macOS 12.0.
-    [Selector("iconForFileType:")] public NSImage IconForFileType(NSString fileType);
+    [Selector("iconForFileType:")]
+    public NSImage IconForFileType(NSString fileType);
     /// Deprecated in macOS 12.0.
-    [Selector("typeOfFile:error:")] public NSString? TypeOfFileError(NSString absoluteFilePath, out NSError? outError);
+    [Selector("typeOfFile:error:")]
+    public NSString? TypeOfFileError(NSString absoluteFilePath, out NSError? outError);
     /// Deprecated in macOS 12.0.
-    [Selector("localizedDescriptionForType:")] public NSString? LocalizedDescriptionForType(NSString typeName);
+    [Selector("localizedDescriptionForType:")]
+    public NSString? LocalizedDescriptionForType(NSString typeName);
     /// Deprecated in macOS 12.0.
-    [Selector("preferredFilenameExtensionForType:")] public NSString? PreferredFilenameExtensionForType(NSString typeName);
+    [Selector("preferredFilenameExtensionForType:")]
+    public NSString? PreferredFilenameExtensionForType(NSString typeName);
     /// Deprecated in macOS 12.0.
-    [Selector("filenameExtension:isValidForType:")] public bool FilenameExtensionIsValidForType(NSString filenameExtension, NSString typeName);
+    [Selector("filenameExtension:isValidForType:")]
+    public bool FilenameExtensionIsValidForType(NSString filenameExtension, NSString typeName);
     /// Deprecated in macOS 12.0.
-    [Selector("type:conformsToType:")] public bool TypeConformsToType(NSString firstTypeName, NSString secondTypeName);
+    [Selector("type:conformsToType:")]
+    public bool TypeConformsToType(NSString firstTypeName, NSString secondTypeName);
 }
 
 /// Deprecated in macOS 10.11.

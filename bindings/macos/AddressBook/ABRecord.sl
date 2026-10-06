@@ -33,20 +33,29 @@ import Standard.ObjC;
 
 public extern objc class ABRecord : NSObject
 {
-    [Selector("init")] public AnyObject? Init();
-    [Selector("initWithAddressBook:")] public AnyObject? InitWithAddressBook(ABAddressBook? addressBook);
-    [Selector("valueForProperty:")] public AnyObject? ValueForProperty(NSString? property);
-    [Selector("setValue:forProperty:error:")] public bool SetValueForPropertyError(AnyObject? value, NSString? property, out NSError? error);
-    [Selector("setValue:forProperty:")] public bool SetValueForProperty(AnyObject? value, NSString? property);
-    [Selector("removeValueForProperty:")] public bool RemoveValueForProperty(NSString? property);
-    [Selector("isReadOnly")] public bool IsReadOnly();
+    [Selector("init")]
+    public AnyObject? Init();
+    [Selector("initWithAddressBook:")]
+    public AnyObject? InitWithAddressBook(ABAddressBook? addressBook);
+    [Selector("valueForProperty:")]
+    public AnyObject? ValueForProperty(NSString? property);
+    [Selector("setValue:forProperty:error:")]
+    public bool SetValueForPropertyError(AnyObject? value, NSString? property, out NSError? error);
+    [Selector("setValue:forProperty:")]
+    public bool SetValueForProperty(AnyObject? value, NSString? property);
+    [Selector("removeValueForProperty:")]
+    public bool RemoveValueForProperty(NSString? property);
+    [Selector("isReadOnly")]
+    public bool IsReadOnly();
 }
 
 /// ABRecord_Convenience, a category of ABRecord.
 public extern objc class ABRecord
 {
-    [Selector("uniqueId")] public NSString? UniqueId { get; }
-    [Selector("displayName")] public NSString? DisplayName { get; }
+    [Selector("uniqueId")]
+    public NSString? UniqueId { get; }
+    [Selector("displayName")]
+    public NSString? DisplayName { get; }
 }
 
 #endif

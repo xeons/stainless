@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class MPSNDArrayMatrixMultiplication : MPSNDArrayMultiaryKernel
 {
-    [Selector("alpha", "setAlpha:")] public double Alpha { get; set; }
-    [Selector("beta", "setBeta:")] public double Beta { get; set; }
+    [Selector("alpha", "setAlpha:")]
+    public double Alpha { get; set; }
+    [Selector("beta", "setBeta:")]
+    public double Beta { get; set; }
 }
 
 #endif

@@ -33,13 +33,20 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class WebFrameView : NSView
 {
-    [Selector("webFrame")] public WebFrame? WebFrame { get; }
-    [Selector("documentView")] public NSView? DocumentView { get; }
-    [Selector("allowsScrolling", "setAllowsScrolling:")] public bool AllowsScrolling { get; set; }
-    [Selector("canPrintHeadersAndFooters")] public bool CanPrintHeadersAndFooters { get; }
-    [Selector("documentViewShouldHandlePrint")] public bool DocumentViewShouldHandlePrint { get; }
-    [Selector("printOperationWithPrintInfo:")] public NSPrintOperation? PrintOperationWithPrintInfo(NSPrintInfo? printInfo);
-    [Selector("printDocumentView")] public void PrintDocumentView();
+    [Selector("webFrame")]
+    public WebFrame? WebFrame { get; }
+    [Selector("documentView")]
+    public NSView? DocumentView { get; }
+    [Selector("allowsScrolling", "setAllowsScrolling:")]
+    public bool AllowsScrolling { get; set; }
+    [Selector("canPrintHeadersAndFooters")]
+    public bool CanPrintHeadersAndFooters { get; }
+    [Selector("documentViewShouldHandlePrint")]
+    public bool DocumentViewShouldHandlePrint { get; }
+    [Selector("printOperationWithPrintInfo:")]
+    public NSPrintOperation? PrintOperationWithPrintInfo(NSPrintInfo? printInfo);
+    [Selector("printDocumentView")]
+    public void PrintDocumentView();
 }
 
 #endif

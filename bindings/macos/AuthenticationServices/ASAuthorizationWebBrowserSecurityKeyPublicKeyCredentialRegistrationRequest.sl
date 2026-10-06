@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public objc interface ASAuthorizationWebBrowserSecurityKeyPublicKeyCredentialRegistrationRequest
 {
-    [Selector("clientData")] ASPublicKeyCredentialClientData? ClientData { get; }
+    [Selector("clientData")]
+    ASPublicKeyCredentialClientData? ClientData { get; }
 }
 
 #endif

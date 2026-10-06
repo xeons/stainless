@@ -57,9 +57,12 @@ public enum AVAudioUnitDistortionPreset : long
 
 public extern objc class AVAudioUnitDistortion : AVAudioUnitEffect
 {
-    [Selector("preGain", "setPreGain:")] public float PreGain { get; set; }
-    [Selector("wetDryMix", "setWetDryMix:")] public float WetDryMix { get; set; }
-    [Selector("loadFactoryPreset:")] public void LoadFactoryPreset(AVAudioUnitDistortionPreset preset);
+    [Selector("preGain", "setPreGain:")]
+    public float PreGain { get; set; }
+    [Selector("wetDryMix", "setWetDryMix:")]
+    public float WetDryMix { get; set; }
+    [Selector("loadFactoryPreset:")]
+    public void LoadFactoryPreset(AVAudioUnitDistortionPreset preset);
 }
 
 #endif

@@ -36,14 +36,22 @@ public objc closure void AVAudioUnitInstantiateWithComponentDescriptionOptionsCo
 
 public extern objc class AVAudioUnit : AVAudioNode
 {
-    [Selector("audioComponentDescription")] public AudioComponentDescription AudioComponentDescription { get; }
-    [Selector("audioUnit")] public AudioUnit AudioUnit { get; }
-    [Selector("AUAudioUnit")] public AUAudioUnit AUAudioUnit { get; }
-    [Selector("name")] public NSString Name { get; }
-    [Selector("manufacturerName")] public NSString ManufacturerName { get; }
-    [Selector("version")] public NSUInteger Version { get; }
-    [Selector("instantiateWithComponentDescription:options:completionHandler:")] public static void InstantiateWithComponentDescriptionOptionsCompletionHandler(AudioComponentDescription audioComponentDescription, AudioComponentInstantiationOptions options, AVAudioUnitInstantiateWithComponentDescriptionOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadAudioUnitPresetAtURL:error:")] public bool LoadAudioUnitPresetAtURLError(NSURL url, out NSError? outError);
+    [Selector("audioComponentDescription")]
+    public AudioComponentDescription AudioComponentDescription { get; }
+    [Selector("audioUnit")]
+    public AudioUnit AudioUnit { get; }
+    [Selector("AUAudioUnit")]
+    public AUAudioUnit AUAudioUnit { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("manufacturerName")]
+    public NSString ManufacturerName { get; }
+    [Selector("version")]
+    public NSUInteger Version { get; }
+    [Selector("instantiateWithComponentDescription:options:completionHandler:")]
+    public static void InstantiateWithComponentDescriptionOptionsCompletionHandler(AudioComponentDescription audioComponentDescription, AudioComponentInstantiationOptions options, AVAudioUnitInstantiateWithComponentDescriptionOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadAudioUnitPresetAtURL:error:")]
+    public bool LoadAudioUnitPresetAtURLError(NSURL url, out NSError? outError);
 }
 
 public const int AVAUDIOUNIT_HAVE_AUDIOUNIT = 1;

@@ -35,14 +35,22 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class PKToolPickerInkingItem : PKToolPickerItem
 {
-    [Selector("inkingTool")] public PKInkingTool? InkingTool { get; }
-    [Selector("allowsColorSelection", "setAllowsColorSelection:")] public bool AllowsColorSelection { get; set; }
-    [Selector("initWithInkType:")] public Self InitWithInkType(PKInkType inkType);
-    [Selector("initWithInkType:color:")] public Self InitWithInkTypeColor(PKInkType inkType, NSColor color);
-    [Selector("initWithInkType:width:")] public Self InitWithInkTypeWidth(PKInkType inkType, CGFloat width);
-    [Selector("initWithInkType:color:width:")] public Self InitWithInkTypeColorWidth(PKInkType inkType, NSColor color, CGFloat width);
-    [Selector("initWithInkType:color:width:identifier:")] public Self InitWithInkTypeColorWidthIdentifier(PKInkType inkType, NSColor color, CGFloat width, NSString? identifier);
-    [Selector("initWithInkType:color:width:azimuth:identifier:")] public Self InitWithInkTypeColorWidthAzimuthIdentifier(PKInkType inkType, NSColor color, CGFloat width, CGFloat azimuth, NSString? identifier);
+    [Selector("inkingTool")]
+    public PKInkingTool? InkingTool { get; }
+    [Selector("allowsColorSelection", "setAllowsColorSelection:")]
+    public bool AllowsColorSelection { get; set; }
+    [Selector("initWithInkType:")]
+    public Self InitWithInkType(PKInkType inkType);
+    [Selector("initWithInkType:color:")]
+    public Self InitWithInkTypeColor(PKInkType inkType, NSColor color);
+    [Selector("initWithInkType:width:")]
+    public Self InitWithInkTypeWidth(PKInkType inkType, CGFloat width);
+    [Selector("initWithInkType:color:width:")]
+    public Self InitWithInkTypeColorWidth(PKInkType inkType, NSColor color, CGFloat width);
+    [Selector("initWithInkType:color:width:identifier:")]
+    public Self InitWithInkTypeColorWidthIdentifier(PKInkType inkType, NSColor color, CGFloat width, NSString? identifier);
+    [Selector("initWithInkType:color:width:azimuth:identifier:")]
+    public Self InitWithInkTypeColorWidthAzimuthIdentifier(PKInkType inkType, NSColor color, CGFloat width, CGFloat azimuth, NSString? identifier);
 }
 
 #endif

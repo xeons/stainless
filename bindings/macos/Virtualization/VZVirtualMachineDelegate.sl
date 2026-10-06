@@ -33,9 +33,15 @@ import Standard.ObjC;
 
 public objc interface VZVirtualMachineDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("guestDidStopVirtualMachine:")] void GuestDidStopVirtualMachine(VZVirtualMachine virtualMachine);
-    [Optional] [Selector("virtualMachine:didStopWithError:")] void VirtualMachineDidStopWithError(VZVirtualMachine virtualMachine, NSError error);
-    [Optional] [Selector("virtualMachine:networkDevice:attachmentWasDisconnectedWithError:")] void VirtualMachineNetworkDeviceAttachmentWasDisconnectedWithError(VZVirtualMachine virtualMachine, VZNetworkDevice networkDevice, NSError error);
+    [Optional]
+    [Selector("guestDidStopVirtualMachine:")]
+    void GuestDidStopVirtualMachine(VZVirtualMachine virtualMachine);
+    [Optional]
+    [Selector("virtualMachine:didStopWithError:")]
+    void VirtualMachineDidStopWithError(VZVirtualMachine virtualMachine, NSError error);
+    [Optional]
+    [Selector("virtualMachine:networkDevice:attachmentWasDisconnectedWithError:")]
+    void VirtualMachineNetworkDeviceAttachmentWasDisconnectedWithError(VZVirtualMachine virtualMachine, VZNetworkDevice networkDevice, NSError error);
 }
 
 #endif

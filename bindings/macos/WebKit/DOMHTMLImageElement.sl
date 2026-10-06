@@ -33,26 +33,46 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLImageElement : DOMHTMLElement
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("align", "setAlign:")] public NSString? Align { get; set; }
-    [Selector("alt", "setAlt:")] public NSString? Alt { get; set; }
-    [Selector("border", "setBorder:")] public NSString? Border { get; set; }
-    [Selector("height", "setHeight:")] public int Height { get; set; }
-    [Selector("hspace", "setHspace:")] public int Hspace { get; set; }
-    [Selector("isMap", "setIsMap:")] public bool IsMap { get; set; }
-    [Selector("longDesc", "setLongDesc:")] public NSString? LongDesc { get; set; }
-    [Selector("src", "setSrc:")] public NSString? Src { get; set; }
-    [Selector("useMap", "setUseMap:")] public NSString? UseMap { get; set; }
-    [Selector("vspace", "setVspace:")] public int Vspace { get; set; }
-    [Selector("width", "setWidth:")] public int Width { get; set; }
-    [Selector("complete")] public bool Complete { get; }
-    [Selector("lowsrc", "setLowsrc:")] public NSString? Lowsrc { get; set; }
-    [Selector("naturalHeight")] public int NaturalHeight { get; }
-    [Selector("naturalWidth")] public int NaturalWidth { get; }
-    [Selector("x")] public int X { get; }
-    [Selector("y")] public int Y { get; }
-    [Selector("altDisplayString")] public NSString? AltDisplayString { get; }
-    [Selector("absoluteImageURL")] public NSURL? AbsoluteImageURL { get; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("align", "setAlign:")]
+    public NSString? Align { get; set; }
+    [Selector("alt", "setAlt:")]
+    public NSString? Alt { get; set; }
+    [Selector("border", "setBorder:")]
+    public NSString? Border { get; set; }
+    [Selector("height", "setHeight:")]
+    public int Height { get; set; }
+    [Selector("hspace", "setHspace:")]
+    public int Hspace { get; set; }
+    [Selector("isMap", "setIsMap:")]
+    public bool IsMap { get; set; }
+    [Selector("longDesc", "setLongDesc:")]
+    public NSString? LongDesc { get; set; }
+    [Selector("src", "setSrc:")]
+    public NSString? Src { get; set; }
+    [Selector("useMap", "setUseMap:")]
+    public NSString? UseMap { get; set; }
+    [Selector("vspace", "setVspace:")]
+    public int Vspace { get; set; }
+    [Selector("width", "setWidth:")]
+    public int Width { get; set; }
+    [Selector("complete")]
+    public bool Complete { get; }
+    [Selector("lowsrc", "setLowsrc:")]
+    public NSString? Lowsrc { get; set; }
+    [Selector("naturalHeight")]
+    public int NaturalHeight { get; }
+    [Selector("naturalWidth")]
+    public int NaturalWidth { get; }
+    [Selector("x")]
+    public int X { get; }
+    [Selector("y")]
+    public int Y { get; }
+    [Selector("altDisplayString")]
+    public NSString? AltDisplayString { get; }
+    [Selector("absoluteImageURL")]
+    public NSURL? AbsoluteImageURL { get; }
 }
 
 #endif

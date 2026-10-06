@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class SFUniversalLink : NSObject
 {
-    [Selector("webpageURL")] public NSURL WebpageURL { get; }
-    [Selector("applicationURL")] public NSURL ApplicationURL { get; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("initWithWebpageURL:")] public Self? InitWithWebpageURL(NSURL url);
+    [Selector("webpageURL")]
+    public NSURL WebpageURL { get; }
+    [Selector("applicationURL")]
+    public NSURL ApplicationURL { get; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("initWithWebpageURL:")]
+    public Self? InitWithWebpageURL(NSURL url);
 }
 
 #endif

@@ -123,10 +123,12 @@ public extern "C" OSStatus SecKeyGetCSPHandle(SecKeyRef keyRef, CSSM_CSP_HANDLE*
 public extern "C" OSStatus SecKeyGetCredentials(SecKeyRef keyRef, CSSM_ACL_AUTHORIZATION_TAG operation, SecCredentialType credentialType, CSSM_ACCESS_CREDENTIALS** outCredentials);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" SecKeyRef? SecKeyGenerateSymmetric(CFDictionaryRef parameters, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecKeyRef? SecKeyGenerateSymmetric(CFDictionaryRef parameters, __CFError** error);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" SecKeyRef? SecKeyCreateFromData(CFDictionaryRef parameters, CFDataRef keyData, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecKeyRef? SecKeyCreateFromData(CFDictionaryRef parameters, CFDataRef keyData, __CFError** error);
 
 public objc closure void SecKeyGeneratePairBlock(SecKeyRef arg0, SecKeyRef arg1, CFErrorRef arg2);
 
@@ -134,7 +136,8 @@ public objc closure void SecKeyGeneratePairBlock(SecKeyRef arg0, SecKeyRef arg1,
 public extern "C" void SecKeyGeneratePairAsync(CFDictionaryRef parameters, dispatch_queue_t deliveryQueue, SecKeyGeneratePairBlock result);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" SecKeyRef? SecKeyDeriveFromPassword(CFStringRef password, CFDictionaryRef parameters, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecKeyRef? SecKeyDeriveFromPassword(CFStringRef password, CFDictionaryRef parameters, __CFError** error);
 
 /// Deprecated in macOS 12.0.
 public extern "C" CFDataRef? SecKeyWrapSymmetric(SecKeyRef keyToWrap, SecKeyRef wrappingKey, CFDictionaryRef parameters, __CFError** error);
@@ -145,17 +148,22 @@ public extern "C" SecKeyRef? SecKeyUnwrapSymmetric(__CFData** keyToUnwrap, SecKe
 /// Deprecated in macOS 12.0.
 public extern "C" OSStatus SecKeyGeneratePair(CFDictionaryRef parameters, __SecKey** publicKey, __SecKey** privateKey);
 
-[ReturnsRetained] public extern "C" SecKeyRef? SecKeyCreateRandomKey(CFDictionaryRef parameters, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecKeyRef? SecKeyCreateRandomKey(CFDictionaryRef parameters, __CFError** error);
 
-[ReturnsRetained] public extern "C" SecKeyRef? SecKeyCreateWithData(CFDataRef keyData, CFDictionaryRef attributes, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecKeyRef? SecKeyCreateWithData(CFDataRef keyData, CFDictionaryRef attributes, __CFError** error);
 
 public extern "C" nuint SecKeyGetBlockSize(SecKeyRef key);
 
-[ReturnsRetained] public extern "C" CFDataRef? SecKeyCopyExternalRepresentation(SecKeyRef key, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDataRef? SecKeyCopyExternalRepresentation(SecKeyRef key, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? SecKeyCopyAttributes(SecKeyRef key);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? SecKeyCopyAttributes(SecKeyRef key);
 
-[ReturnsRetained] public extern "C" SecKeyRef? SecKeyCopyPublicKey(SecKeyRef key);
+[ReturnsRetained]
+public extern "C" SecKeyRef? SecKeyCopyPublicKey(SecKeyRef key);
 
 public using SecKeyAlgorithm = CFStringRef;
 
@@ -334,13 +342,16 @@ public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDHKeyExchangeCofactorX963SHA
 
 public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDHKeyExchangeCofactorX963SHA512;
 
-[ReturnsRetained] public extern "C" CFDataRef? SecKeyCreateSignature(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef dataToSign, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDataRef? SecKeyCreateSignature(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef dataToSign, __CFError** error);
 
 public extern "C" Boolean SecKeyVerifySignature(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef signedData, CFDataRef signature, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFDataRef? SecKeyCreateEncryptedData(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef plaintext, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDataRef? SecKeyCreateEncryptedData(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef plaintext, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFDataRef? SecKeyCreateDecryptedData(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef ciphertext, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDataRef? SecKeyCreateDecryptedData(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef ciphertext, __CFError** error);
 
 public using SecKeyKeyExchangeParameter = CFStringRef;
 
@@ -348,7 +359,8 @@ public extern "C" SecKeyKeyExchangeParameter kSecKeyKeyExchangeParameterRequeste
 
 public extern "C" SecKeyKeyExchangeParameter kSecKeyKeyExchangeParameterSharedInfo;
 
-[ReturnsRetained] public extern "C" CFDataRef? SecKeyCopyKeyExchangeResult(SecKeyRef privateKey, SecKeyAlgorithm algorithm, SecKeyRef publicKey, CFDictionaryRef parameters, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDataRef? SecKeyCopyKeyExchangeResult(SecKeyRef privateKey, SecKeyAlgorithm algorithm, SecKeyRef publicKey, CFDictionaryRef parameters, __CFError** error);
 
 public enum SecKeyOperationType : long
 {

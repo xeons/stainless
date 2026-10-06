@@ -34,13 +34,20 @@ import Standard.ObjC;
 
 public extern objc class INBoatTrip : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("provider")] public NSString? Provider { get; }
-    [Selector("boatName")] public NSString? BoatName { get; }
-    [Selector("boatNumber")] public NSString? BoatNumber { get; }
-    [Selector("tripDuration")] public INDateComponentsRange TripDuration { get; }
-    [Selector("departureBoatTerminalLocation")] public CLPlacemark DepartureBoatTerminalLocation { get; }
-    [Selector("arrivalBoatTerminalLocation")] public CLPlacemark ArrivalBoatTerminalLocation { get; }
-    [Selector("initWithProvider:boatName:boatNumber:tripDuration:departureBoatTerminalLocation:arrivalBoatTerminalLocation:")] public Self InitWithProviderBoatNameBoatNumberTripDurationDepartureBoatTerminalLocationArrivalBoatTerminalLocation(NSString? provider, NSString? boatName, NSString? boatNumber, INDateComponentsRange tripDuration, CLPlacemark departureBoatTerminalLocation, CLPlacemark arrivalBoatTerminalLocation);
+    [Selector("provider")]
+    public NSString? Provider { get; }
+    [Selector("boatName")]
+    public NSString? BoatName { get; }
+    [Selector("boatNumber")]
+    public NSString? BoatNumber { get; }
+    [Selector("tripDuration")]
+    public INDateComponentsRange TripDuration { get; }
+    [Selector("departureBoatTerminalLocation")]
+    public CLPlacemark DepartureBoatTerminalLocation { get; }
+    [Selector("arrivalBoatTerminalLocation")]
+    public CLPlacemark ArrivalBoatTerminalLocation { get; }
+    [Selector("initWithProvider:boatName:boatNumber:tripDuration:departureBoatTerminalLocation:arrivalBoatTerminalLocation:")]
+    public Self InitWithProviderBoatNameBoatNumberTripDurationDepartureBoatTerminalLocationArrivalBoatTerminalLocation(NSString? provider, NSString? boatName, NSString? boatNumber, INDateComponentsRange tripDuration, CLPlacemark departureBoatTerminalLocation, CLPlacemark arrivalBoatTerminalLocation);
 }
 
 #endif

@@ -35,8 +35,11 @@ public objc closure void MEMessageActionHandlerDecideActionForMessageCompletionH
 
 public objc interface MEMessageActionHandler : NSObjectProtocol
 {
-    [Optional] [Selector("requiredHeaders")] NSArray RequiredHeaders { get; }
-    [Selector("decideActionForMessage:completionHandler:")] void DecideActionForMessageCompletionHandler(MEMessage message, MEMessageActionHandlerDecideActionForMessageCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("requiredHeaders")]
+    NSArray RequiredHeaders { get; }
+    [Selector("decideActionForMessage:completionHandler:")]
+    void DecideActionForMessageCompletionHandler(MEMessage message, MEMessageActionHandlerDecideActionForMessageCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

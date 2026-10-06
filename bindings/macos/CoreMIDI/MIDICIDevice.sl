@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class MIDICIDevice : NSObject
 {
-    [Selector("deviceInfo")] public MIDI2DeviceInfo DeviceInfo { get; }
-    [Selector("MUID")] public MIDICIMUID MUID { get; }
-    [Selector("supportsProtocolNegotiation")] public bool SupportsProtocolNegotiation { get; }
-    [Selector("supportsProfileConfiguration")] public bool SupportsProfileConfiguration { get; }
-    [Selector("supportsPropertyExchange")] public bool SupportsPropertyExchange { get; }
-    [Selector("supportsProcessInquiry")] public bool SupportsProcessInquiry { get; }
-    [Selector("maxSysExSize")] public NSUInteger MaxSysExSize { get; }
-    [Selector("maxPropertyExchangeRequests")] public NSUInteger MaxPropertyExchangeRequests { get; }
-    [Selector("deviceType")] public MIDICIDeviceType DeviceType { get; }
-    [Selector("profiles")] public NSArray Profiles { get; }
+    [Selector("deviceInfo")]
+    public MIDI2DeviceInfo DeviceInfo { get; }
+    [Selector("MUID")]
+    public MIDICIMUID MUID { get; }
+    [Selector("supportsProtocolNegotiation")]
+    public bool SupportsProtocolNegotiation { get; }
+    [Selector("supportsProfileConfiguration")]
+    public bool SupportsProfileConfiguration { get; }
+    [Selector("supportsPropertyExchange")]
+    public bool SupportsPropertyExchange { get; }
+    [Selector("supportsProcessInquiry")]
+    public bool SupportsProcessInquiry { get; }
+    [Selector("maxSysExSize")]
+    public NSUInteger MaxSysExSize { get; }
+    [Selector("maxPropertyExchangeRequests")]
+    public NSUInteger MaxPropertyExchangeRequests { get; }
+    [Selector("deviceType")]
+    public MIDICIDeviceType DeviceType { get; }
+    [Selector("profiles")]
+    public NSArray Profiles { get; }
 }
 
 #endif

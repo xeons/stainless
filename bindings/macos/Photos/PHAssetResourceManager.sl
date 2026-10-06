@@ -37,8 +37,10 @@ public objc closure void PHAssetResourceProgressHandler(double arg0);
 
 public extern objc class PHAssetResourceRequestOptions : NSObject, NSCopying
 {
-    [Selector("isNetworkAccessAllowed", "setNetworkAccessAllowed:")] public bool NetworkAccessAllowed { get; set; }
-    [Selector("progressHandler", "setProgressHandler:")] public PHAssetResourceProgressHandler? ProgressHandler { get; set; }
+    [Selector("isNetworkAccessAllowed", "setNetworkAccessAllowed:")]
+    public bool NetworkAccessAllowed { get; set; }
+    [Selector("progressHandler", "setProgressHandler:")]
+    public PHAssetResourceProgressHandler? ProgressHandler { get; set; }
 }
 
 public objc closure void PHAssetResourceManagerRequestDataForAssetResourceOptionsDataReceivedHandlerCompletionHandlerHandlerBlock(NSData arg0);
@@ -49,10 +51,14 @@ public objc closure void PHAssetResourceManagerWriteDataForAssetResourceToFileOp
 
 public extern objc class PHAssetResourceManager : NSObject
 {
-    [Selector("defaultManager")] public static PHAssetResourceManager DefaultManager();
-    [Selector("requestDataForAssetResource:options:dataReceivedHandler:completionHandler:")] public PHAssetResourceDataRequestID RequestDataForAssetResourceOptionsDataReceivedHandlerCompletionHandler(PHAssetResource resource, PHAssetResourceRequestOptions? options, PHAssetResourceManagerRequestDataForAssetResourceOptionsDataReceivedHandlerCompletionHandlerHandlerBlock handler, PHAssetResourceManagerRequestDataForAssetResourceOptionsDataReceivedHandlerCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("writeDataForAssetResource:toFile:options:completionHandler:")] public void WriteDataForAssetResourceToFileOptionsCompletionHandler(PHAssetResource resource, NSURL fileURL, PHAssetResourceRequestOptions? options, PHAssetResourceManagerWriteDataForAssetResourceToFileOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("cancelDataRequest:")] public void CancelDataRequest(PHAssetResourceDataRequestID requestID);
+    [Selector("defaultManager")]
+    public static PHAssetResourceManager DefaultManager();
+    [Selector("requestDataForAssetResource:options:dataReceivedHandler:completionHandler:")]
+    public PHAssetResourceDataRequestID RequestDataForAssetResourceOptionsDataReceivedHandlerCompletionHandler(PHAssetResource resource, PHAssetResourceRequestOptions? options, PHAssetResourceManagerRequestDataForAssetResourceOptionsDataReceivedHandlerCompletionHandlerHandlerBlock handler, PHAssetResourceManagerRequestDataForAssetResourceOptionsDataReceivedHandlerCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("writeDataForAssetResource:toFile:options:completionHandler:")]
+    public void WriteDataForAssetResourceToFileOptionsCompletionHandler(PHAssetResource resource, NSURL fileURL, PHAssetResourceRequestOptions? options, PHAssetResourceManagerWriteDataForAssetResourceToFileOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("cancelDataRequest:")]
+    public void CancelDataRequest(PHAssetResourceDataRequestID requestID);
 }
 
 #endif

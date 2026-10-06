@@ -34,7 +34,8 @@ public objc closure void CLSContextProviderUpdateDescendantsOfContextCompletionC
 
 public objc interface CLSContextProvider
 {
-    [Selector("updateDescendantsOfContext:completion:")] void UpdateDescendantsOfContextCompletion(CLSContext context, CLSContextProviderUpdateDescendantsOfContextCompletionCompletionBlock completion);
+    [Selector("updateDescendantsOfContext:completion:")]
+    void UpdateDescendantsOfContextCompletion(CLSContext context, CLSContextProviderUpdateDescendantsOfContextCompletionCompletionBlock completion);
 }
 
 #endif

@@ -32,15 +32,20 @@ import Standard.ObjC;
 
 public extern objc class STScreenTimeConfiguration : NSObject
 {
-    [Selector("enforcesChildRestrictions")] public bool EnforcesChildRestrictions { get; }
+    [Selector("enforcesChildRestrictions")]
+    public bool EnforcesChildRestrictions { get; }
 }
 
 public extern objc class STScreenTimeConfigurationObserver : NSObject
 {
-    [Selector("configuration")] public STScreenTimeConfiguration? Configuration { get; }
-    [Selector("initWithUpdateQueue:")] public Self InitWithUpdateQueue(dispatch_queue_t updateQueue);
-    [Selector("startObserving")] public void StartObserving();
-    [Selector("stopObserving")] public void StopObserving();
+    [Selector("configuration")]
+    public STScreenTimeConfiguration? Configuration { get; }
+    [Selector("initWithUpdateQueue:")]
+    public Self InitWithUpdateQueue(dispatch_queue_t updateQueue);
+    [Selector("startObserving")]
+    public void StartObserving();
+    [Selector("stopObserving")]
+    public void StopObserving();
 }
 
 #endif

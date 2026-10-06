@@ -67,31 +67,41 @@ public extern "C" CFStringRef kCGImageSourceSubsampleFactor;
 
 public extern "C" CFTypeID CGImageSourceGetTypeID();
 
-[ReturnsRetained] public extern "C" CFArrayRef CGImageSourceCopyTypeIdentifiers();
+[ReturnsRetained]
+public extern "C" CFArrayRef CGImageSourceCopyTypeIdentifiers();
 
-[ReturnsRetained] public extern "C" CGImageSourceRef? CGImageSourceCreateWithDataProvider(CGDataProviderRef provider, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGImageSourceRef? CGImageSourceCreateWithDataProvider(CGDataProviderRef provider, CFDictionaryRef? options);
 
-[ReturnsRetained] public extern "C" CGImageSourceRef? CGImageSourceCreateWithData(CFDataRef data, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGImageSourceRef? CGImageSourceCreateWithData(CFDataRef data, CFDictionaryRef? options);
 
-[ReturnsRetained] public extern "C" CGImageSourceRef? CGImageSourceCreateWithURL(CFURLRef url, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGImageSourceRef? CGImageSourceCreateWithURL(CFURLRef url, CFDictionaryRef? options);
 
 public extern "C" CFStringRef? CGImageSourceGetType(CGImageSourceRef isrc);
 
 public extern "C" nuint CGImageSourceGetCount(CGImageSourceRef isrc);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CGImageSourceCopyProperties(CGImageSourceRef isrc, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CGImageSourceCopyProperties(CGImageSourceRef isrc, CFDictionaryRef? options);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CGImageSourceCopyPropertiesAtIndex(CGImageSourceRef isrc, nuint index, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CGImageSourceCopyPropertiesAtIndex(CGImageSourceRef isrc, nuint index, CFDictionaryRef? options);
 
-[ReturnsRetained] public extern "C" CGImageMetadataRef? CGImageSourceCopyMetadataAtIndex(CGImageSourceRef isrc, nuint index, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGImageMetadataRef? CGImageSourceCopyMetadataAtIndex(CGImageSourceRef isrc, nuint index, CFDictionaryRef? options);
 
-[ReturnsRetained] public extern "C" CGImageRef? CGImageSourceCreateImageAtIndex(CGImageSourceRef isrc, nuint index, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageSourceCreateImageAtIndex(CGImageSourceRef isrc, nuint index, CFDictionaryRef? options);
 
 public extern "C" void CGImageSourceRemoveCacheAtIndex(CGImageSourceRef isrc, nuint index);
 
-[ReturnsRetained] public extern "C" CGImageRef? CGImageSourceCreateThumbnailAtIndex(CGImageSourceRef isrc, nuint index, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageSourceCreateThumbnailAtIndex(CGImageSourceRef isrc, nuint index, CFDictionaryRef? options);
 
-[ReturnsRetained] public extern "C" CGImageSourceRef CGImageSourceCreateIncremental(CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGImageSourceRef CGImageSourceCreateIncremental(CFDictionaryRef? options);
 
 public extern "C" void CGImageSourceUpdateData(CGImageSourceRef isrc, CFDataRef data, bool final);
 
@@ -103,7 +113,8 @@ public extern "C" CGImageSourceStatus CGImageSourceGetStatusAtIndex(CGImageSourc
 
 public extern "C" nuint CGImageSourceGetPrimaryImageIndex(CGImageSourceRef isrc);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CGImageSourceCopyAuxiliaryDataInfoAtIndex(CGImageSourceRef isrc, nuint index, CFStringRef auxiliaryImageDataType);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CGImageSourceCopyAuxiliaryDataInfoAtIndex(CGImageSourceRef isrc, nuint index, CFStringRef auxiliaryImageDataType);
 
 public extern "C" CFStringRef kCGImageSourceDecodeRequest;
 

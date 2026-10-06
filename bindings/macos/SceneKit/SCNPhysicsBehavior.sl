@@ -36,85 +36,144 @@ public extern objc class SCNPhysicsBehavior : NSObject, NSSecureCoding { }
 
 public extern objc class SCNPhysicsHingeJoint : SCNPhysicsBehavior
 {
-    [Selector("bodyA")] public SCNPhysicsBody BodyA { get; }
-    [Selector("axisA", "setAxisA:")] public SCNVector3 AxisA { get; set; }
-    [Selector("anchorA", "setAnchorA:")] public SCNVector3 AnchorA { get; set; }
-    [Selector("bodyB")] public SCNPhysicsBody? BodyB { get; }
-    [Selector("axisB", "setAxisB:")] public SCNVector3 AxisB { get; set; }
-    [Selector("anchorB", "setAnchorB:")] public SCNVector3 AnchorB { get; set; }
-    [Selector("jointWithBodyA:axisA:anchorA:bodyB:axisB:anchorB:")] public static Self JointWithBodyAAxisAAnchorABodyBAxisBAnchorB(SCNPhysicsBody bodyA, SCNVector3 axisA, SCNVector3 anchorA, SCNPhysicsBody bodyB, SCNVector3 axisB, SCNVector3 anchorB);
-    [Selector("jointWithBody:axis:anchor:")] public static Self JointWithBodyAxisAnchor(SCNPhysicsBody body, SCNVector3 axis, SCNVector3 anchor);
+    [Selector("bodyA")]
+    public SCNPhysicsBody BodyA { get; }
+    [Selector("axisA", "setAxisA:")]
+    public SCNVector3 AxisA { get; set; }
+    [Selector("anchorA", "setAnchorA:")]
+    public SCNVector3 AnchorA { get; set; }
+    [Selector("bodyB")]
+    public SCNPhysicsBody? BodyB { get; }
+    [Selector("axisB", "setAxisB:")]
+    public SCNVector3 AxisB { get; set; }
+    [Selector("anchorB", "setAnchorB:")]
+    public SCNVector3 AnchorB { get; set; }
+    [Selector("jointWithBodyA:axisA:anchorA:bodyB:axisB:anchorB:")]
+    public static Self JointWithBodyAAxisAAnchorABodyBAxisBAnchorB(SCNPhysicsBody bodyA, SCNVector3 axisA, SCNVector3 anchorA, SCNPhysicsBody bodyB, SCNVector3 axisB, SCNVector3 anchorB);
+    [Selector("jointWithBody:axis:anchor:")]
+    public static Self JointWithBodyAxisAnchor(SCNPhysicsBody body, SCNVector3 axis, SCNVector3 anchor);
 }
 
 public extern objc class SCNPhysicsBallSocketJoint : SCNPhysicsBehavior
 {
-    [Selector("bodyA")] public SCNPhysicsBody BodyA { get; }
-    [Selector("anchorA", "setAnchorA:")] public SCNVector3 AnchorA { get; set; }
-    [Selector("bodyB")] public SCNPhysicsBody? BodyB { get; }
-    [Selector("anchorB", "setAnchorB:")] public SCNVector3 AnchorB { get; set; }
-    [Selector("jointWithBodyA:anchorA:bodyB:anchorB:")] public static Self JointWithBodyAAnchorABodyBAnchorB(SCNPhysicsBody bodyA, SCNVector3 anchorA, SCNPhysicsBody bodyB, SCNVector3 anchorB);
-    [Selector("jointWithBody:anchor:")] public static Self JointWithBodyAnchor(SCNPhysicsBody body, SCNVector3 anchor);
+    [Selector("bodyA")]
+    public SCNPhysicsBody BodyA { get; }
+    [Selector("anchorA", "setAnchorA:")]
+    public SCNVector3 AnchorA { get; set; }
+    [Selector("bodyB")]
+    public SCNPhysicsBody? BodyB { get; }
+    [Selector("anchorB", "setAnchorB:")]
+    public SCNVector3 AnchorB { get; set; }
+    [Selector("jointWithBodyA:anchorA:bodyB:anchorB:")]
+    public static Self JointWithBodyAAnchorABodyBAnchorB(SCNPhysicsBody bodyA, SCNVector3 anchorA, SCNPhysicsBody bodyB, SCNVector3 anchorB);
+    [Selector("jointWithBody:anchor:")]
+    public static Self JointWithBodyAnchor(SCNPhysicsBody body, SCNVector3 anchor);
 }
 
 public extern objc class SCNPhysicsSliderJoint : SCNPhysicsBehavior
 {
-    [Selector("bodyA")] public SCNPhysicsBody BodyA { get; }
-    [Selector("axisA", "setAxisA:")] public SCNVector3 AxisA { get; set; }
-    [Selector("anchorA", "setAnchorA:")] public SCNVector3 AnchorA { get; set; }
-    [Selector("bodyB")] public SCNPhysicsBody? BodyB { get; }
-    [Selector("axisB", "setAxisB:")] public SCNVector3 AxisB { get; set; }
-    [Selector("anchorB", "setAnchorB:")] public SCNVector3 AnchorB { get; set; }
-    [Selector("minimumLinearLimit", "setMinimumLinearLimit:")] public CGFloat MinimumLinearLimit { get; set; }
-    [Selector("maximumLinearLimit", "setMaximumLinearLimit:")] public CGFloat MaximumLinearLimit { get; set; }
-    [Selector("minimumAngularLimit", "setMinimumAngularLimit:")] public CGFloat MinimumAngularLimit { get; set; }
-    [Selector("maximumAngularLimit", "setMaximumAngularLimit:")] public CGFloat MaximumAngularLimit { get; set; }
-    [Selector("motorTargetLinearVelocity", "setMotorTargetLinearVelocity:")] public CGFloat MotorTargetLinearVelocity { get; set; }
-    [Selector("motorMaximumForce", "setMotorMaximumForce:")] public CGFloat MotorMaximumForce { get; set; }
-    [Selector("motorTargetAngularVelocity", "setMotorTargetAngularVelocity:")] public CGFloat MotorTargetAngularVelocity { get; set; }
-    [Selector("motorMaximumTorque", "setMotorMaximumTorque:")] public CGFloat MotorMaximumTorque { get; set; }
-    [Selector("jointWithBodyA:axisA:anchorA:bodyB:axisB:anchorB:")] public static Self JointWithBodyAAxisAAnchorABodyBAxisBAnchorB(SCNPhysicsBody bodyA, SCNVector3 axisA, SCNVector3 anchorA, SCNPhysicsBody bodyB, SCNVector3 axisB, SCNVector3 anchorB);
-    [Selector("jointWithBody:axis:anchor:")] public static Self JointWithBodyAxisAnchor(SCNPhysicsBody body, SCNVector3 axis, SCNVector3 anchor);
+    [Selector("bodyA")]
+    public SCNPhysicsBody BodyA { get; }
+    [Selector("axisA", "setAxisA:")]
+    public SCNVector3 AxisA { get; set; }
+    [Selector("anchorA", "setAnchorA:")]
+    public SCNVector3 AnchorA { get; set; }
+    [Selector("bodyB")]
+    public SCNPhysicsBody? BodyB { get; }
+    [Selector("axisB", "setAxisB:")]
+    public SCNVector3 AxisB { get; set; }
+    [Selector("anchorB", "setAnchorB:")]
+    public SCNVector3 AnchorB { get; set; }
+    [Selector("minimumLinearLimit", "setMinimumLinearLimit:")]
+    public CGFloat MinimumLinearLimit { get; set; }
+    [Selector("maximumLinearLimit", "setMaximumLinearLimit:")]
+    public CGFloat MaximumLinearLimit { get; set; }
+    [Selector("minimumAngularLimit", "setMinimumAngularLimit:")]
+    public CGFloat MinimumAngularLimit { get; set; }
+    [Selector("maximumAngularLimit", "setMaximumAngularLimit:")]
+    public CGFloat MaximumAngularLimit { get; set; }
+    [Selector("motorTargetLinearVelocity", "setMotorTargetLinearVelocity:")]
+    public CGFloat MotorTargetLinearVelocity { get; set; }
+    [Selector("motorMaximumForce", "setMotorMaximumForce:")]
+    public CGFloat MotorMaximumForce { get; set; }
+    [Selector("motorTargetAngularVelocity", "setMotorTargetAngularVelocity:")]
+    public CGFloat MotorTargetAngularVelocity { get; set; }
+    [Selector("motorMaximumTorque", "setMotorMaximumTorque:")]
+    public CGFloat MotorMaximumTorque { get; set; }
+    [Selector("jointWithBodyA:axisA:anchorA:bodyB:axisB:anchorB:")]
+    public static Self JointWithBodyAAxisAAnchorABodyBAxisBAnchorB(SCNPhysicsBody bodyA, SCNVector3 axisA, SCNVector3 anchorA, SCNPhysicsBody bodyB, SCNVector3 axisB, SCNVector3 anchorB);
+    [Selector("jointWithBody:axis:anchor:")]
+    public static Self JointWithBodyAxisAnchor(SCNPhysicsBody body, SCNVector3 axis, SCNVector3 anchor);
 }
 
 public extern objc class SCNPhysicsConeTwistJoint : SCNPhysicsBehavior
 {
-    [Selector("bodyA")] public SCNPhysicsBody BodyA { get; }
-    [Selector("frameA", "setFrameA:")] public SCNMatrix4 FrameA { get; set; }
-    [Selector("bodyB")] public SCNPhysicsBody? BodyB { get; }
-    [Selector("frameB", "setFrameB:")] public SCNMatrix4 FrameB { get; set; }
-    [Selector("maximumAngularLimit1", "setMaximumAngularLimit1:")] public CGFloat MaximumAngularLimit1 { get; set; }
-    [Selector("maximumAngularLimit2", "setMaximumAngularLimit2:")] public CGFloat MaximumAngularLimit2 { get; set; }
-    [Selector("maximumTwistAngle", "setMaximumTwistAngle:")] public CGFloat MaximumTwistAngle { get; set; }
-    [Selector("jointWithBodyA:frameA:bodyB:frameB:")] public static Self JointWithBodyAFrameABodyBFrameB(SCNPhysicsBody bodyA, SCNMatrix4 frameA, SCNPhysicsBody bodyB, SCNMatrix4 frameB);
-    [Selector("jointWithBody:frame:")] public static Self JointWithBodyFrame(SCNPhysicsBody body, SCNMatrix4 frame);
+    [Selector("bodyA")]
+    public SCNPhysicsBody BodyA { get; }
+    [Selector("frameA", "setFrameA:")]
+    public SCNMatrix4 FrameA { get; set; }
+    [Selector("bodyB")]
+    public SCNPhysicsBody? BodyB { get; }
+    [Selector("frameB", "setFrameB:")]
+    public SCNMatrix4 FrameB { get; set; }
+    [Selector("maximumAngularLimit1", "setMaximumAngularLimit1:")]
+    public CGFloat MaximumAngularLimit1 { get; set; }
+    [Selector("maximumAngularLimit2", "setMaximumAngularLimit2:")]
+    public CGFloat MaximumAngularLimit2 { get; set; }
+    [Selector("maximumTwistAngle", "setMaximumTwistAngle:")]
+    public CGFloat MaximumTwistAngle { get; set; }
+    [Selector("jointWithBodyA:frameA:bodyB:frameB:")]
+    public static Self JointWithBodyAFrameABodyBFrameB(SCNPhysicsBody bodyA, SCNMatrix4 frameA, SCNPhysicsBody bodyB, SCNMatrix4 frameB);
+    [Selector("jointWithBody:frame:")]
+    public static Self JointWithBodyFrame(SCNPhysicsBody body, SCNMatrix4 frame);
 }
 
 public extern objc class SCNPhysicsVehicleWheel : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("node")] public SCNNode Node { get; }
-    [Selector("suspensionStiffness", "setSuspensionStiffness:")] public CGFloat SuspensionStiffness { get; set; }
-    [Selector("suspensionCompression", "setSuspensionCompression:")] public CGFloat SuspensionCompression { get; set; }
-    [Selector("suspensionDamping", "setSuspensionDamping:")] public CGFloat SuspensionDamping { get; set; }
-    [Selector("maximumSuspensionTravel", "setMaximumSuspensionTravel:")] public CGFloat MaximumSuspensionTravel { get; set; }
-    [Selector("frictionSlip", "setFrictionSlip:")] public CGFloat FrictionSlip { get; set; }
-    [Selector("maximumSuspensionForce", "setMaximumSuspensionForce:")] public CGFloat MaximumSuspensionForce { get; set; }
-    [Selector("connectionPosition", "setConnectionPosition:")] public SCNVector3 ConnectionPosition { get; set; }
-    [Selector("steeringAxis", "setSteeringAxis:")] public SCNVector3 SteeringAxis { get; set; }
-    [Selector("axle", "setAxle:")] public SCNVector3 Axle { get; set; }
-    [Selector("radius", "setRadius:")] public CGFloat Radius { get; set; }
-    [Selector("suspensionRestLength", "setSuspensionRestLength:")] public CGFloat SuspensionRestLength { get; set; }
-    [Selector("wheelWithNode:")] public static Self WheelWithNode(SCNNode node);
+    [Selector("node")]
+    public SCNNode Node { get; }
+    [Selector("suspensionStiffness", "setSuspensionStiffness:")]
+    public CGFloat SuspensionStiffness { get; set; }
+    [Selector("suspensionCompression", "setSuspensionCompression:")]
+    public CGFloat SuspensionCompression { get; set; }
+    [Selector("suspensionDamping", "setSuspensionDamping:")]
+    public CGFloat SuspensionDamping { get; set; }
+    [Selector("maximumSuspensionTravel", "setMaximumSuspensionTravel:")]
+    public CGFloat MaximumSuspensionTravel { get; set; }
+    [Selector("frictionSlip", "setFrictionSlip:")]
+    public CGFloat FrictionSlip { get; set; }
+    [Selector("maximumSuspensionForce", "setMaximumSuspensionForce:")]
+    public CGFloat MaximumSuspensionForce { get; set; }
+    [Selector("connectionPosition", "setConnectionPosition:")]
+    public SCNVector3 ConnectionPosition { get; set; }
+    [Selector("steeringAxis", "setSteeringAxis:")]
+    public SCNVector3 SteeringAxis { get; set; }
+    [Selector("axle", "setAxle:")]
+    public SCNVector3 Axle { get; set; }
+    [Selector("radius", "setRadius:")]
+    public CGFloat Radius { get; set; }
+    [Selector("suspensionRestLength", "setSuspensionRestLength:")]
+    public CGFloat SuspensionRestLength { get; set; }
+    [Selector("wheelWithNode:")]
+    public static Self WheelWithNode(SCNNode node);
 }
 
 public extern objc class SCNPhysicsVehicle : SCNPhysicsBehavior
 {
-    [Selector("speedInKilometersPerHour")] public CGFloat SpeedInKilometersPerHour { get; }
-    [Selector("wheels")] public NSArray Wheels { get; }
-    [Selector("chassisBody")] public SCNPhysicsBody ChassisBody { get; }
-    [Selector("vehicleWithChassisBody:wheels:")] public static Self VehicleWithChassisBodyWheels(SCNPhysicsBody chassisBody, NSArray wheels);
-    [Selector("applyEngineForce:forWheelAtIndex:")] public void ApplyEngineForceForWheelAtIndex(CGFloat value, NSInteger index);
-    [Selector("setSteeringAngle:forWheelAtIndex:")] public void SetSteeringAngleForWheelAtIndex(CGFloat value, NSInteger index);
-    [Selector("applyBrakingForce:forWheelAtIndex:")] public void ApplyBrakingForceForWheelAtIndex(CGFloat value, NSInteger index);
+    [Selector("speedInKilometersPerHour")]
+    public CGFloat SpeedInKilometersPerHour { get; }
+    [Selector("wheels")]
+    public NSArray Wheels { get; }
+    [Selector("chassisBody")]
+    public SCNPhysicsBody ChassisBody { get; }
+    [Selector("vehicleWithChassisBody:wheels:")]
+    public static Self VehicleWithChassisBodyWheels(SCNPhysicsBody chassisBody, NSArray wheels);
+    [Selector("applyEngineForce:forWheelAtIndex:")]
+    public void ApplyEngineForceForWheelAtIndex(CGFloat value, NSInteger index);
+    [Selector("setSteeringAngle:forWheelAtIndex:")]
+    public void SetSteeringAngleForWheelAtIndex(CGFloat value, NSInteger index);
+    [Selector("applyBrakingForce:forWheelAtIndex:")]
+    public void ApplyBrakingForceForWheelAtIndex(CGFloat value, NSInteger index);
 }
 
 #endif

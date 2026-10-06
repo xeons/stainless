@@ -34,31 +34,52 @@ public using NSMapTableOptions = NSUInteger;
 
 public extern objc class NSMapTable : NSObject, NSCopying, NSSecureCoding, NSFastEnumeration
 {
-    [Selector("keyPointerFunctions")] public NSPointerFunctions KeyPointerFunctions { get; }
-    [Selector("valuePointerFunctions")] public NSPointerFunctions ValuePointerFunctions { get; }
-    [Selector("count")] public NSUInteger Count { get; }
-    [Selector("initWithKeyOptions:valueOptions:capacity:")] public Self InitWithKeyOptionsValueOptionsCapacity(NSPointerFunctionsOptions keyOptions, NSPointerFunctionsOptions valueOptions, NSUInteger initialCapacity);
-    [Selector("initWithKeyPointerFunctions:valuePointerFunctions:capacity:")] public Self InitWithKeyPointerFunctionsValuePointerFunctionsCapacity(NSPointerFunctions keyFunctions, NSPointerFunctions valueFunctions, NSUInteger initialCapacity);
-    [Selector("mapTableWithKeyOptions:valueOptions:")] public static NSMapTable MapTableWithKeyOptionsValueOptions(NSPointerFunctionsOptions keyOptions, NSPointerFunctionsOptions valueOptions);
+    [Selector("keyPointerFunctions")]
+    public NSPointerFunctions KeyPointerFunctions { get; }
+    [Selector("valuePointerFunctions")]
+    public NSPointerFunctions ValuePointerFunctions { get; }
+    [Selector("count")]
+    public NSUInteger Count { get; }
+    [Selector("initWithKeyOptions:valueOptions:capacity:")]
+    public Self InitWithKeyOptionsValueOptionsCapacity(NSPointerFunctionsOptions keyOptions, NSPointerFunctionsOptions valueOptions, NSUInteger initialCapacity);
+    [Selector("initWithKeyPointerFunctions:valuePointerFunctions:capacity:")]
+    public Self InitWithKeyPointerFunctionsValuePointerFunctionsCapacity(NSPointerFunctions keyFunctions, NSPointerFunctions valueFunctions, NSUInteger initialCapacity);
+    [Selector("mapTableWithKeyOptions:valueOptions:")]
+    public static NSMapTable MapTableWithKeyOptionsValueOptions(NSPointerFunctionsOptions keyOptions, NSPointerFunctionsOptions valueOptions);
     /// Deprecated in macOS 10.8.
-    [Selector("mapTableWithStrongToStrongObjects")] public static AnyObject MapTableWithStrongToStrongObjects();
+    [Selector("mapTableWithStrongToStrongObjects")]
+    public static AnyObject MapTableWithStrongToStrongObjects();
     /// Deprecated in macOS 10.8.
-    [Selector("mapTableWithWeakToStrongObjects")] public static AnyObject MapTableWithWeakToStrongObjects();
+    [Selector("mapTableWithWeakToStrongObjects")]
+    public static AnyObject MapTableWithWeakToStrongObjects();
     /// Deprecated in macOS 10.8.
-    [Selector("mapTableWithStrongToWeakObjects")] public static AnyObject MapTableWithStrongToWeakObjects();
+    [Selector("mapTableWithStrongToWeakObjects")]
+    public static AnyObject MapTableWithStrongToWeakObjects();
     /// Deprecated in macOS 10.8.
-    [Selector("mapTableWithWeakToWeakObjects")] public static AnyObject MapTableWithWeakToWeakObjects();
-    [Selector("strongToStrongObjectsMapTable")] public static NSMapTable StrongToStrongObjectsMapTable();
-    [Selector("weakToStrongObjectsMapTable")] public static NSMapTable WeakToStrongObjectsMapTable();
-    [Selector("strongToWeakObjectsMapTable")] public static NSMapTable StrongToWeakObjectsMapTable();
-    [Selector("weakToWeakObjectsMapTable")] public static NSMapTable WeakToWeakObjectsMapTable();
-    [Selector("objectForKey:")] public AnyObject? ObjectForKey(AnyObject? aKey);
-    [Selector("removeObjectForKey:")] public void RemoveObjectForKey(AnyObject? aKey);
-    [Selector("setObject:forKey:")] public void SetObjectForKey(AnyObject? anObject, AnyObject? aKey);
-    [Selector("keyEnumerator")] public NSEnumerator KeyEnumerator();
-    [Selector("objectEnumerator")] public NSEnumerator? ObjectEnumerator();
-    [Selector("removeAllObjects")] public void RemoveAllObjects();
-    [Selector("dictionaryRepresentation")] public NSDictionary DictionaryRepresentation();
+    [Selector("mapTableWithWeakToWeakObjects")]
+    public static AnyObject MapTableWithWeakToWeakObjects();
+    [Selector("strongToStrongObjectsMapTable")]
+    public static NSMapTable StrongToStrongObjectsMapTable();
+    [Selector("weakToStrongObjectsMapTable")]
+    public static NSMapTable WeakToStrongObjectsMapTable();
+    [Selector("strongToWeakObjectsMapTable")]
+    public static NSMapTable StrongToWeakObjectsMapTable();
+    [Selector("weakToWeakObjectsMapTable")]
+    public static NSMapTable WeakToWeakObjectsMapTable();
+    [Selector("objectForKey:")]
+    public AnyObject? ObjectForKey(AnyObject? aKey);
+    [Selector("removeObjectForKey:")]
+    public void RemoveObjectForKey(AnyObject? aKey);
+    [Selector("setObject:forKey:")]
+    public void SetObjectForKey(AnyObject? anObject, AnyObject? aKey);
+    [Selector("keyEnumerator")]
+    public NSEnumerator KeyEnumerator();
+    [Selector("objectEnumerator")]
+    public NSEnumerator? ObjectEnumerator();
+    [Selector("removeAllObjects")]
+    public void RemoveAllObjects();
+    [Selector("dictionaryRepresentation")]
+    public NSDictionary DictionaryRepresentation();
 }
 
 public struct NSMapEnumerator

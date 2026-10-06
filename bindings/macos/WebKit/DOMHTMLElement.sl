@@ -33,19 +33,32 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLElement : DOMElement
 {
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("lang", "setLang:")] public NSString? Lang { get; set; }
-    [Selector("dir", "setDir:")] public NSString? Dir { get; set; }
-    [Selector("tabIndex", "setTabIndex:")] public int TabIndex { get; set; }
-    [Selector("accessKey", "setAccessKey:")] public NSString? AccessKey { get; set; }
-    [Selector("innerText", "setInnerText:")] public NSString? InnerText { get; set; }
-    [Selector("outerText", "setOuterText:")] public NSString? OuterText { get; set; }
-    [Selector("contentEditable", "setContentEditable:")] public NSString? ContentEditable { get; set; }
-    [Selector("isContentEditable")] public bool IsContentEditable { get; }
-    [Selector("idName", "setIdName:")] public NSString? IdName { get; set; }
-    [Selector("children")] public DOMHTMLCollection? Children { get; }
-    [Selector("titleDisplayString")] public NSString? TitleDisplayString { get; }
-    [Selector("click")] public void Click();
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("lang", "setLang:")]
+    public NSString? Lang { get; set; }
+    [Selector("dir", "setDir:")]
+    public NSString? Dir { get; set; }
+    [Selector("tabIndex", "setTabIndex:")]
+    public int TabIndex { get; set; }
+    [Selector("accessKey", "setAccessKey:")]
+    public NSString? AccessKey { get; set; }
+    [Selector("innerText", "setInnerText:")]
+    public NSString? InnerText { get; set; }
+    [Selector("outerText", "setOuterText:")]
+    public NSString? OuterText { get; set; }
+    [Selector("contentEditable", "setContentEditable:")]
+    public NSString? ContentEditable { get; set; }
+    [Selector("isContentEditable")]
+    public bool IsContentEditable { get; }
+    [Selector("idName", "setIdName:")]
+    public NSString? IdName { get; set; }
+    [Selector("children")]
+    public DOMHTMLCollection? Children { get; }
+    [Selector("titleDisplayString")]
+    public NSString? TitleDisplayString { get; }
+    [Selector("click")]
+    public void Click();
 }
 
 #endif

@@ -32,23 +32,35 @@ import Standard.ObjC;
 
 public extern objc class NSClassDescription : NSObject
 {
-    [Selector("attributeKeys")] public NSArray AttributeKeys { get; }
-    [Selector("toOneRelationshipKeys")] public NSArray ToOneRelationshipKeys { get; }
-    [Selector("toManyRelationshipKeys")] public NSArray ToManyRelationshipKeys { get; }
-    [Selector("registerClassDescription:forClass:")] public static void RegisterClassDescriptionForClass(NSClassDescription description, Class aClass);
-    [Selector("invalidateClassDescriptionCache")] public static void InvalidateClassDescriptionCache();
-    [Selector("classDescriptionForClass:")] public static NSClassDescription? ClassDescriptionForClass(Class aClass);
-    [Selector("inverseForRelationshipKey:")] public NSString? InverseForRelationshipKey(NSString relationshipKey);
+    [Selector("attributeKeys")]
+    public NSArray AttributeKeys { get; }
+    [Selector("toOneRelationshipKeys")]
+    public NSArray ToOneRelationshipKeys { get; }
+    [Selector("toManyRelationshipKeys")]
+    public NSArray ToManyRelationshipKeys { get; }
+    [Selector("registerClassDescription:forClass:")]
+    public static void RegisterClassDescriptionForClass(NSClassDescription description, Class aClass);
+    [Selector("invalidateClassDescriptionCache")]
+    public static void InvalidateClassDescriptionCache();
+    [Selector("classDescriptionForClass:")]
+    public static NSClassDescription? ClassDescriptionForClass(Class aClass);
+    [Selector("inverseForRelationshipKey:")]
+    public NSString? InverseForRelationshipKey(NSString relationshipKey);
 }
 
 /// NSClassDescriptionPrimitives, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("classDescription")] public NSClassDescription ClassDescription { get; }
-    [Selector("attributeKeys")] public NSArray AttributeKeys { get; }
-    [Selector("toOneRelationshipKeys")] public NSArray ToOneRelationshipKeys { get; }
-    [Selector("toManyRelationshipKeys")] public NSArray ToManyRelationshipKeys { get; }
-    [Selector("inverseForRelationshipKey:")] public NSString? InverseForRelationshipKey(NSString relationshipKey);
+    [Selector("classDescription")]
+    public NSClassDescription ClassDescription { get; }
+    [Selector("attributeKeys")]
+    public NSArray AttributeKeys { get; }
+    [Selector("toOneRelationshipKeys")]
+    public NSArray ToOneRelationshipKeys { get; }
+    [Selector("toManyRelationshipKeys")]
+    public NSArray ToManyRelationshipKeys { get; }
+    [Selector("inverseForRelationshipKey:")]
+    public NSString? InverseForRelationshipKey(NSString relationshipKey);
 }
 
 public extern "C" NSNotificationName NSClassDescriptionNeededForClassNotification;

@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INSpeedResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedSpeed:")] public static Self SuccessWithResolvedSpeed(NSMeasurement resolvedSpeed);
-    [Selector("disambiguationWithSpeedToDisambiguate:")] public static Self DisambiguationWithSpeedToDisambiguate(NSArray speedToDisambiguate);
-    [Selector("confirmationRequiredWithSpeedToConfirm:")] public static Self ConfirmationRequiredWithSpeedToConfirm(NSMeasurement? speedToConfirm);
+    [Selector("successWithResolvedSpeed:")]
+    public static Self SuccessWithResolvedSpeed(NSMeasurement resolvedSpeed);
+    [Selector("disambiguationWithSpeedToDisambiguate:")]
+    public static Self DisambiguationWithSpeedToDisambiguate(NSArray speedToDisambiguate);
+    [Selector("confirmationRequiredWithSpeedToConfirm:")]
+    public static Self ConfirmationRequiredWithSpeedToConfirm(NSMeasurement? speedToConfirm);
 }
 
 #endif

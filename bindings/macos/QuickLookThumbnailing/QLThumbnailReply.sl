@@ -39,10 +39,14 @@ public objc closure bool QLThumbnailReplyReplyWithContextSizeCurrentContextDrawi
 
 public extern objc class QLThumbnailReply : NSObject
 {
-    [Selector("extensionBadge", "setExtensionBadge:")] public NSString ExtensionBadge { get; set; }
-    [Selector("replyWithContextSize:drawingBlock:")] public static Self ReplyWithContextSizeDrawingBlock(CGSize contextSize, QLThumbnailReplyReplyWithContextSizeDrawingBlockDrawingBlock drawingBlock);
-    [Selector("replyWithContextSize:currentContextDrawingBlock:")] public static Self ReplyWithContextSizeCurrentContextDrawingBlock(CGSize contextSize, QLThumbnailReplyReplyWithContextSizeCurrentContextDrawingBlockDrawingBlock drawingBlock);
-    [Selector("replyWithImageFileURL:")] public static Self ReplyWithImageFileURL(NSURL fileURL);
+    [Selector("extensionBadge", "setExtensionBadge:")]
+    public NSString ExtensionBadge { get; set; }
+    [Selector("replyWithContextSize:drawingBlock:")]
+    public static Self ReplyWithContextSizeDrawingBlock(CGSize contextSize, QLThumbnailReplyReplyWithContextSizeDrawingBlockDrawingBlock drawingBlock);
+    [Selector("replyWithContextSize:currentContextDrawingBlock:")]
+    public static Self ReplyWithContextSizeCurrentContextDrawingBlock(CGSize contextSize, QLThumbnailReplyReplyWithContextSizeCurrentContextDrawingBlockDrawingBlock drawingBlock);
+    [Selector("replyWithImageFileURL:")]
+    public static Self ReplyWithImageFileURL(NSURL fileURL);
 }
 
 #endif

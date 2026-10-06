@@ -35,10 +35,14 @@ public objc closure void HKStatisticsCollectionEnumerateStatisticsFromDateToDate
 
 public extern objc class HKStatisticsCollection : NSObject
 {
-    [Selector("statisticsForDate:")] public HKStatistics? StatisticsForDate(NSDate date);
-    [Selector("enumerateStatisticsFromDate:toDate:withBlock:")] public void EnumerateStatisticsFromDateToDateWithBlock(NSDate startDate, NSDate endDate, HKStatisticsCollectionEnumerateStatisticsFromDateToDateWithBlockBlock block);
-    [Selector("statistics")] public NSArray Statistics();
-    [Selector("sources")] public NSSet Sources();
+    [Selector("statisticsForDate:")]
+    public HKStatistics? StatisticsForDate(NSDate date);
+    [Selector("enumerateStatisticsFromDate:toDate:withBlock:")]
+    public void EnumerateStatisticsFromDateToDateWithBlock(NSDate startDate, NSDate endDate, HKStatisticsCollectionEnumerateStatisticsFromDateToDateWithBlockBlock block);
+    [Selector("statistics")]
+    public NSArray Statistics();
+    [Selector("sources")]
+    public NSSet Sources();
 }
 
 public objc closure void HKStatisticsCollectionQueryInitialResultsHandlerBlock(HKStatisticsCollectionQuery arg0, HKStatisticsCollection? arg1, NSError? arg2);
@@ -47,12 +51,18 @@ public objc closure void HKStatisticsCollectionQueryStatisticsUpdateHandlerBlock
 
 public extern objc class HKStatisticsCollectionQuery : HKQuery
 {
-    [Selector("anchorDate")] public NSDate AnchorDate { get; }
-    [Selector("options")] public HKStatisticsOptions Options { get; }
-    [Selector("intervalComponents")] public NSDateComponents IntervalComponents { get; }
-    [Selector("initialResultsHandler", "setInitialResultsHandler:")] public HKStatisticsCollectionQueryInitialResultsHandlerBlock? InitialResultsHandler { get; set; }
-    [Selector("statisticsUpdateHandler", "setStatisticsUpdateHandler:")] public HKStatisticsCollectionQueryStatisticsUpdateHandlerBlock? StatisticsUpdateHandler { get; set; }
-    [Selector("initWithQuantityType:quantitySamplePredicate:options:anchorDate:intervalComponents:")] public Self InitWithQuantityTypeQuantitySamplePredicateOptionsAnchorDateIntervalComponents(HKQuantityType quantityType, NSPredicate? quantitySamplePredicate, HKStatisticsOptions options, NSDate anchorDate, NSDateComponents intervalComponents);
+    [Selector("anchorDate")]
+    public NSDate AnchorDate { get; }
+    [Selector("options")]
+    public HKStatisticsOptions Options { get; }
+    [Selector("intervalComponents")]
+    public NSDateComponents IntervalComponents { get; }
+    [Selector("initialResultsHandler", "setInitialResultsHandler:")]
+    public HKStatisticsCollectionQueryInitialResultsHandlerBlock? InitialResultsHandler { get; set; }
+    [Selector("statisticsUpdateHandler", "setStatisticsUpdateHandler:")]
+    public HKStatisticsCollectionQueryStatisticsUpdateHandlerBlock? StatisticsUpdateHandler { get; set; }
+    [Selector("initWithQuantityType:quantitySamplePredicate:options:anchorDate:intervalComponents:")]
+    public Self InitWithQuantityTypeQuantitySamplePredicateOptionsAnchorDateIntervalComponents(HKQuantityType quantityType, NSPredicate? quantitySamplePredicate, HKStatisticsOptions options, NSDate anchorDate, NSDateComponents intervalComponents);
 }
 
 #endif

@@ -71,19 +71,33 @@ public objc closure void MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDDow
 /// macOS 15.2 and later.
 public objc interface MTRXPCServerProtocol_MTRDevice : NSObjectProtocol
 {
-    [Selector("deviceController:nodeID:getStateWithReply:")] void DeviceControllerNodeIDGetStateWithReply(NSUUID controller, NSNumber nodeID, MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDGetStateWithReplyReplyBlock reply);
-    [Selector("deviceController:nodeID:getDeviceCachePrimedWithReply:")] void DeviceControllerNodeIDGetDeviceCachePrimedWithReply(NSUUID controller, NSNumber nodeID, MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDGetDeviceCachePrimedWithReplyReplyBlock reply);
-    [Selector("deviceController:nodeID:getEstimatedStartTimeWithReply:")] void DeviceControllerNodeIDGetEstimatedStartTimeWithReply(NSUUID controller, NSNumber nodeID, MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDGetEstimatedStartTimeWithReplyReplyBlock reply);
-    [Selector("deviceController:nodeID:getEstimatedSubscriptionLatencyWithReply:")] void DeviceControllerNodeIDGetEstimatedSubscriptionLatencyWithReply(NSUUID controller, NSNumber nodeID, MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDGetEstimatedSubscriptionLatencyWithReplyReplyBlock reply);
-    [Selector("deviceController:nodeID:readAttributeWithEndpointID:clusterID:attributeID:params:withReply:")] void DeviceControllerNodeIDReadAttributeWithEndpointIDClusterIDAttributeIDParamsWithReply(NSUUID controller, NSNumber nodeID, NSNumber endpointID, NSNumber clusterID, NSNumber attributeID, MTRReadParams? params, MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDReadAttributeWithEndpointIDClusterIDAttributeIDParamsWithReplyReplyBlock reply);
-    [Selector("deviceController:nodeID:writeAttributeWithEndpointID:clusterID:attributeID:value:expectedValueInterval:timedWriteTimeout:")] void DeviceControllerNodeIDWriteAttributeWithEndpointIDClusterIDAttributeIDValueExpectedValueIntervalTimedWriteTimeout(NSUUID controller, NSNumber nodeID, NSNumber endpointID, NSNumber clusterID, NSNumber attributeID, AnyObject value, NSNumber? expectedValueInterval, NSNumber? timeout);
-    [Selector("deviceController:nodeID:readAttributePaths:withReply:")] void DeviceControllerNodeIDReadAttributePathsWithReply(NSUUID controller, NSNumber nodeID, NSArray attributePaths, MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDReadAttributePathsWithReplyReplyBlock reply);
-    [Selector("deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:")] void DeviceControllerNodeIDInvokeCommandWithEndpointIDClusterIDCommandIDCommandFieldsExpectedValuesExpectedValueIntervalTimedInvokeTimeoutServerSideProcessingTimeoutCompletion(NSUUID controller, NSNumber nodeID, NSNumber endpointID, NSNumber clusterID, NSNumber commandID, AnyObject commandFields, NSArray? expectedValues, NSNumber? expectedValueInterval, NSNumber? timeout, NSNumber? serverSideProcessingTimeout, MTRDeviceResponseHandler completion);
-    [Selector("deviceController:nodeID:openCommissioningWindowWithSetupPasscode:discriminator:duration:completion:")] void DeviceControllerNodeIDOpenCommissioningWindowWithSetupPasscodeDiscriminatorDurationCompletion(NSUUID controller, NSNumber nodeID, NSNumber setupPasscode, NSNumber discriminator, NSNumber duration, MTRDeviceOpenCommissioningWindowHandler completion);
-    [Selector("downloadLogOfType:nodeID:timeout:completion:")] void DownloadLogOfTypeNodeIDTimeoutCompletion(MTRDiagnosticLogType type, NSNumber nodeID, NSTimeInterval timeout, MTRXPCServerProtocol_MTRDeviceDownloadLogOfTypeNodeIDTimeoutCompletionCompletionBlock completion);
-    [Optional] [Selector("deviceController:nodeID:downloadLogOfType:timeout:completion:")] void DeviceControllerNodeIDDownloadLogOfTypeTimeoutCompletion(NSUUID controller, NSNumber nodeID, MTRDiagnosticLogType type, NSTimeInterval timeout, MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDDownloadLogOfTypeTimeoutCompletionCompletionBlock completion);
+    [Selector("deviceController:nodeID:getStateWithReply:")]
+    void DeviceControllerNodeIDGetStateWithReply(NSUUID controller, NSNumber nodeID, MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDGetStateWithReplyReplyBlock reply);
+    [Selector("deviceController:nodeID:getDeviceCachePrimedWithReply:")]
+    void DeviceControllerNodeIDGetDeviceCachePrimedWithReply(NSUUID controller, NSNumber nodeID, MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDGetDeviceCachePrimedWithReplyReplyBlock reply);
+    [Selector("deviceController:nodeID:getEstimatedStartTimeWithReply:")]
+    void DeviceControllerNodeIDGetEstimatedStartTimeWithReply(NSUUID controller, NSNumber nodeID, MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDGetEstimatedStartTimeWithReplyReplyBlock reply);
+    [Selector("deviceController:nodeID:getEstimatedSubscriptionLatencyWithReply:")]
+    void DeviceControllerNodeIDGetEstimatedSubscriptionLatencyWithReply(NSUUID controller, NSNumber nodeID, MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDGetEstimatedSubscriptionLatencyWithReplyReplyBlock reply);
+    [Selector("deviceController:nodeID:readAttributeWithEndpointID:clusterID:attributeID:params:withReply:")]
+    void DeviceControllerNodeIDReadAttributeWithEndpointIDClusterIDAttributeIDParamsWithReply(NSUUID controller, NSNumber nodeID, NSNumber endpointID, NSNumber clusterID, NSNumber attributeID, MTRReadParams? params, MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDReadAttributeWithEndpointIDClusterIDAttributeIDParamsWithReplyReplyBlock reply);
+    [Selector("deviceController:nodeID:writeAttributeWithEndpointID:clusterID:attributeID:value:expectedValueInterval:timedWriteTimeout:")]
+    void DeviceControllerNodeIDWriteAttributeWithEndpointIDClusterIDAttributeIDValueExpectedValueIntervalTimedWriteTimeout(NSUUID controller, NSNumber nodeID, NSNumber endpointID, NSNumber clusterID, NSNumber attributeID, AnyObject value, NSNumber? expectedValueInterval, NSNumber? timeout);
+    [Selector("deviceController:nodeID:readAttributePaths:withReply:")]
+    void DeviceControllerNodeIDReadAttributePathsWithReply(NSUUID controller, NSNumber nodeID, NSArray attributePaths, MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDReadAttributePathsWithReplyReplyBlock reply);
+    [Selector("deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:")]
+    void DeviceControllerNodeIDInvokeCommandWithEndpointIDClusterIDCommandIDCommandFieldsExpectedValuesExpectedValueIntervalTimedInvokeTimeoutServerSideProcessingTimeoutCompletion(NSUUID controller, NSNumber nodeID, NSNumber endpointID, NSNumber clusterID, NSNumber commandID, AnyObject commandFields, NSArray? expectedValues, NSNumber? expectedValueInterval, NSNumber? timeout, NSNumber? serverSideProcessingTimeout, MTRDeviceResponseHandler completion);
+    [Selector("deviceController:nodeID:openCommissioningWindowWithSetupPasscode:discriminator:duration:completion:")]
+    void DeviceControllerNodeIDOpenCommissioningWindowWithSetupPasscodeDiscriminatorDurationCompletion(NSUUID controller, NSNumber nodeID, NSNumber setupPasscode, NSNumber discriminator, NSNumber duration, MTRDeviceOpenCommissioningWindowHandler completion);
+    [Selector("downloadLogOfType:nodeID:timeout:completion:")]
+    void DownloadLogOfTypeNodeIDTimeoutCompletion(MTRDiagnosticLogType type, NSNumber nodeID, NSTimeInterval timeout, MTRXPCServerProtocol_MTRDeviceDownloadLogOfTypeNodeIDTimeoutCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("deviceController:nodeID:downloadLogOfType:timeout:completion:")]
+    void DeviceControllerNodeIDDownloadLogOfTypeTimeoutCompletion(NSUUID controller, NSNumber nodeID, MTRDiagnosticLogType type, NSTimeInterval timeout, MTRXPCServerProtocol_MTRDeviceDeviceControllerNodeIDDownloadLogOfTypeTimeoutCompletionCompletionBlock completion);
     /// macOS 15.4 and later.
-    [Optional] [Selector("deviceController:nodeID:invokeCommands:completion:")] void DeviceControllerNodeIDInvokeCommandsCompletion(NSUUID controller, NSNumber nodeID, NSArray commands, MTRDeviceResponseHandler completion);
+    [Optional]
+    [Selector("deviceController:nodeID:invokeCommands:completion:")]
+    void DeviceControllerNodeIDInvokeCommandsCompletion(NSUUID controller, NSNumber nodeID, NSArray commands, MTRDeviceResponseHandler completion);
 }
 
 public objc closure void MTRXPCServerProtocol_MTRDeviceControllerDeviceControllerGetNodesWithStoredDataWithReplyReplyBlock(NSArray arg0);
@@ -92,19 +106,31 @@ public objc closure void MTRXPCServerProtocol_MTRDeviceControllerDeviceControlle
 public objc interface MTRXPCServerProtocol_MTRDeviceController : NSObjectProtocol
 {
     /// macOS 15.4 and later.
-    [Optional] [Selector("deviceController:deleteNodeID:")] void DeviceControllerDeleteNodeID(NSUUID controller, NSNumber nodeID);
-    [Optional] [Selector("deviceController:registerNodeID:")] void DeviceControllerRegisterNodeID(NSUUID controller, NSNumber nodeID);
-    [Optional] [Selector("deviceController:unregisterNodeID:")] void DeviceControllerUnregisterNodeID(NSUUID controller, NSNumber nodeID);
+    [Optional]
+    [Selector("deviceController:deleteNodeID:")]
+    void DeviceControllerDeleteNodeID(NSUUID controller, NSNumber nodeID);
+    [Optional]
+    [Selector("deviceController:registerNodeID:")]
+    void DeviceControllerRegisterNodeID(NSUUID controller, NSNumber nodeID);
+    [Optional]
+    [Selector("deviceController:unregisterNodeID:")]
+    void DeviceControllerUnregisterNodeID(NSUUID controller, NSNumber nodeID);
     /// macOS 15.3 and later.
-    [Optional] [Selector("deviceController:updateControllerConfiguration:")] void DeviceControllerUpdateControllerConfiguration(NSUUID controller, NSDictionary controllerState);
+    [Optional]
+    [Selector("deviceController:updateControllerConfiguration:")]
+    void DeviceControllerUpdateControllerConfiguration(NSUUID controller, NSDictionary controllerState);
     /// macOS 15.4 and later.
-    [Optional] [Selector("deviceController:getNodesWithStoredDataWithReply:")] void DeviceControllerGetNodesWithStoredDataWithReply(NSUUID controller, MTRXPCServerProtocol_MTRDeviceControllerDeviceControllerGetNodesWithStoredDataWithReplyReplyBlock reply);
+    [Optional]
+    [Selector("deviceController:getNodesWithStoredDataWithReply:")]
+    void DeviceControllerGetNodesWithStoredDataWithReply(NSUUID controller, MTRXPCServerProtocol_MTRDeviceControllerDeviceControllerGetNodesWithStoredDataWithReplyReplyBlock reply);
 }
 
 /// macOS 15.3 and later.
 public objc interface MTRXPCServerProtocol : NSObjectProtocol, MTRXPCServerProtocol_MTRDevice, MTRXPCServerProtocol_MTRDeviceController
 {
-    [Optional] [Selector("deviceController:checkInWithContext:")] void DeviceControllerCheckInWithContext(NSUUID controller, NSDictionary context);
+    [Optional]
+    [Selector("deviceController:checkInWithContext:")]
+    void DeviceControllerCheckInWithContext(NSUUID controller, NSDictionary context);
 }
 
 #endif

@@ -96,16 +96,26 @@ public enum GLKTextureInfoOrigin : int
 /// Deprecated in macOS 10.14.
 public extern objc class GLKTextureInfo : NSObject, NSCopying
 {
-    [Selector("name")] public GLuint Name { get; }
-    [Selector("target")] public GLenum Target { get; }
-    [Selector("width")] public GLuint Width { get; }
-    [Selector("height")] public GLuint Height { get; }
-    [Selector("depth")] public GLuint Depth { get; }
-    [Selector("alphaState")] public GLKTextureInfoAlphaState AlphaState { get; }
-    [Selector("textureOrigin")] public GLKTextureInfoOrigin TextureOrigin { get; }
-    [Selector("containsMipmaps")] public bool ContainsMipmaps { get; }
-    [Selector("mimapLevelCount")] public GLuint MimapLevelCount { get; }
-    [Selector("arrayLength")] public GLuint ArrayLength { get; }
+    [Selector("name")]
+    public GLuint Name { get; }
+    [Selector("target")]
+    public GLenum Target { get; }
+    [Selector("width")]
+    public GLuint Width { get; }
+    [Selector("height")]
+    public GLuint Height { get; }
+    [Selector("depth")]
+    public GLuint Depth { get; }
+    [Selector("alphaState")]
+    public GLKTextureInfoAlphaState AlphaState { get; }
+    [Selector("textureOrigin")]
+    public GLKTextureInfoOrigin TextureOrigin { get; }
+    [Selector("containsMipmaps")]
+    public bool ContainsMipmaps { get; }
+    [Selector("mimapLevelCount")]
+    public GLuint MimapLevelCount { get; }
+    [Selector("arrayLength")]
+    public GLuint ArrayLength { get; }
 }
 
 public objc closure void GLKTextureLoaderCallback(GLKTextureInfo? arg0, NSError? arg1);
@@ -113,23 +123,40 @@ public objc closure void GLKTextureLoaderCallback(GLKTextureInfo? arg0, NSError?
 /// Deprecated in macOS 10.14.
 public extern objc class GLKTextureLoader : NSObject
 {
-    [Selector("textureWithContentsOfFile:options:error:")] public static GLKTextureInfo? TextureWithContentsOfFileOptionsError(NSString path, NSDictionary? options, out NSError? outError);
-    [Selector("textureWithContentsOfURL:options:error:")] public static GLKTextureInfo? TextureWithContentsOfURLOptionsError(NSURL url, NSDictionary? options, out NSError? outError);
-    [Selector("textureWithName:scaleFactor:bundle:options:error:")] public static GLKTextureInfo? TextureWithNameScaleFactorBundleOptionsError(NSString name, CGFloat scaleFactor, NSBundle? bundle, NSDictionary? options, out NSError? outError);
-    [Selector("textureWithContentsOfData:options:error:")] public static GLKTextureInfo? TextureWithContentsOfDataOptionsError(NSData data, NSDictionary? options, out NSError? outError);
-    [Selector("textureWithCGImage:options:error:")] public static GLKTextureInfo? TextureWithCGImageOptionsError(CGImageRef cgImage, NSDictionary? options, out NSError? outError);
-    [Selector("cubeMapWithContentsOfFiles:options:error:")] public static GLKTextureInfo? CubeMapWithContentsOfFilesOptionsError(NSArray paths, NSDictionary? options, out NSError? outError);
-    [Selector("cubeMapWithContentsOfFile:options:error:")] public static GLKTextureInfo? CubeMapWithContentsOfFileOptionsError(NSString path, NSDictionary? options, out NSError? outError);
-    [Selector("cubeMapWithContentsOfURL:options:error:")] public static GLKTextureInfo? CubeMapWithContentsOfURLOptionsError(NSURL url, NSDictionary? options, out NSError? outError);
-    [Selector("initWithShareContext:")] public Self InitWithShareContext(NSOpenGLContext context);
-    [Selector("textureWithContentsOfFile:options:queue:completionHandler:")] public void TextureWithContentsOfFileOptionsQueueCompletionHandler(NSString path, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
-    [Selector("textureWithContentsOfURL:options:queue:completionHandler:")] public void TextureWithContentsOfURLOptionsQueueCompletionHandler(NSURL url, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
-    [Selector("textureWithName:scaleFactor:bundle:options:queue:completionHandler:")] public void TextureWithNameScaleFactorBundleOptionsQueueCompletionHandler(NSString name, CGFloat scaleFactor, NSBundle? bundle, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
-    [Selector("textureWithContentsOfData:options:queue:completionHandler:")] public void TextureWithContentsOfDataOptionsQueueCompletionHandler(NSData data, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
-    [Selector("textureWithCGImage:options:queue:completionHandler:")] public void TextureWithCGImageOptionsQueueCompletionHandler(CGImageRef cgImage, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
-    [Selector("cubeMapWithContentsOfFiles:options:queue:completionHandler:")] public void CubeMapWithContentsOfFilesOptionsQueueCompletionHandler(NSArray paths, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
-    [Selector("cubeMapWithContentsOfFile:options:queue:completionHandler:")] public void CubeMapWithContentsOfFileOptionsQueueCompletionHandler(NSString path, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
-    [Selector("cubeMapWithContentsOfURL:options:queue:completionHandler:")] public void CubeMapWithContentsOfURLOptionsQueueCompletionHandler(NSURL url, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
+    [Selector("textureWithContentsOfFile:options:error:")]
+    public static GLKTextureInfo? TextureWithContentsOfFileOptionsError(NSString path, NSDictionary? options, out NSError? outError);
+    [Selector("textureWithContentsOfURL:options:error:")]
+    public static GLKTextureInfo? TextureWithContentsOfURLOptionsError(NSURL url, NSDictionary? options, out NSError? outError);
+    [Selector("textureWithName:scaleFactor:bundle:options:error:")]
+    public static GLKTextureInfo? TextureWithNameScaleFactorBundleOptionsError(NSString name, CGFloat scaleFactor, NSBundle? bundle, NSDictionary? options, out NSError? outError);
+    [Selector("textureWithContentsOfData:options:error:")]
+    public static GLKTextureInfo? TextureWithContentsOfDataOptionsError(NSData data, NSDictionary? options, out NSError? outError);
+    [Selector("textureWithCGImage:options:error:")]
+    public static GLKTextureInfo? TextureWithCGImageOptionsError(CGImageRef cgImage, NSDictionary? options, out NSError? outError);
+    [Selector("cubeMapWithContentsOfFiles:options:error:")]
+    public static GLKTextureInfo? CubeMapWithContentsOfFilesOptionsError(NSArray paths, NSDictionary? options, out NSError? outError);
+    [Selector("cubeMapWithContentsOfFile:options:error:")]
+    public static GLKTextureInfo? CubeMapWithContentsOfFileOptionsError(NSString path, NSDictionary? options, out NSError? outError);
+    [Selector("cubeMapWithContentsOfURL:options:error:")]
+    public static GLKTextureInfo? CubeMapWithContentsOfURLOptionsError(NSURL url, NSDictionary? options, out NSError? outError);
+    [Selector("initWithShareContext:")]
+    public Self InitWithShareContext(NSOpenGLContext context);
+    [Selector("textureWithContentsOfFile:options:queue:completionHandler:")]
+    public void TextureWithContentsOfFileOptionsQueueCompletionHandler(NSString path, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
+    [Selector("textureWithContentsOfURL:options:queue:completionHandler:")]
+    public void TextureWithContentsOfURLOptionsQueueCompletionHandler(NSURL url, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
+    [Selector("textureWithName:scaleFactor:bundle:options:queue:completionHandler:")]
+    public void TextureWithNameScaleFactorBundleOptionsQueueCompletionHandler(NSString name, CGFloat scaleFactor, NSBundle? bundle, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
+    [Selector("textureWithContentsOfData:options:queue:completionHandler:")]
+    public void TextureWithContentsOfDataOptionsQueueCompletionHandler(NSData data, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
+    [Selector("textureWithCGImage:options:queue:completionHandler:")]
+    public void TextureWithCGImageOptionsQueueCompletionHandler(CGImageRef cgImage, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
+    [Selector("cubeMapWithContentsOfFiles:options:queue:completionHandler:")]
+    public void CubeMapWithContentsOfFilesOptionsQueueCompletionHandler(NSArray paths, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
+    [Selector("cubeMapWithContentsOfFile:options:queue:completionHandler:")]
+    public void CubeMapWithContentsOfFileOptionsQueueCompletionHandler(NSString path, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
+    [Selector("cubeMapWithContentsOfURL:options:queue:completionHandler:")]
+    public void CubeMapWithContentsOfURLOptionsQueueCompletionHandler(NSURL url, NSDictionary? options, dispatch_queue_t? queue, GLKTextureLoaderCallback block);
 }
 
 #endif

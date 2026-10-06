@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class WKNavigationResponse : NSObject
 {
-    [Selector("isForMainFrame")] public bool ForMainFrame { get; }
-    [Selector("response")] public NSURLResponse Response { get; }
-    [Selector("canShowMIMEType")] public bool CanShowMIMEType { get; }
+    [Selector("isForMainFrame")]
+    public bool ForMainFrame { get; }
+    [Selector("response")]
+    public NSURLResponse Response { get; }
+    [Selector("canShowMIMEType")]
+    public bool CanShowMIMEType { get; }
 }
 
 #endif

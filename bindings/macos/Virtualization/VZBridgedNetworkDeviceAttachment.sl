@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class VZBridgedNetworkDeviceAttachment : VZNetworkDeviceAttachment
 {
-    [Selector("interface")] public VZBridgedNetworkInterface Interface { get; }
-    [Selector("initWithInterface:")] public Self InitWithInterface(VZBridgedNetworkInterface @interface);
+    [Selector("interface")]
+    public VZBridgedNetworkInterface Interface { get; }
+    [Selector("initWithInterface:")]
+    public Self InitWithInterface(VZBridgedNetworkInterface @interface);
 }
 
 #endif

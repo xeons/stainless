@@ -33,10 +33,18 @@ import Standard.ObjC;
 
 public objc interface CNContactPickerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("contactPicker:didSelectContact:")] void ContactPickerDidSelectContact(CNContactPicker picker, CNContact contact);
-    [Optional] [Selector("contactPicker:didSelectContactProperty:")] void ContactPickerDidSelectContactProperty(CNContactPicker picker, CNContactProperty contactProperty);
-    [Optional] [Selector("contactPickerWillClose:")] void ContactPickerWillClose(CNContactPicker picker);
-    [Optional] [Selector("contactPickerDidClose:")] void ContactPickerDidClose(CNContactPicker picker);
+    [Optional]
+    [Selector("contactPicker:didSelectContact:")]
+    void ContactPickerDidSelectContact(CNContactPicker picker, CNContact contact);
+    [Optional]
+    [Selector("contactPicker:didSelectContactProperty:")]
+    void ContactPickerDidSelectContactProperty(CNContactPicker picker, CNContactProperty contactProperty);
+    [Optional]
+    [Selector("contactPickerWillClose:")]
+    void ContactPickerWillClose(CNContactPicker picker);
+    [Optional]
+    [Selector("contactPickerDidClose:")]
+    void ContactPickerDidClose(CNContactPicker picker);
 }
 
 #endif

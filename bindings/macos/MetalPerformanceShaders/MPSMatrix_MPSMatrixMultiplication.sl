@@ -33,21 +33,32 @@ import Standard.ObjC;
 
 public extern objc class MPSMatrixMultiplication : MPSKernel
 {
-    [Selector("resultMatrixOrigin", "setResultMatrixOrigin:")] public MTLOrigin ResultMatrixOrigin { get; set; }
-    [Selector("leftMatrixOrigin", "setLeftMatrixOrigin:")] public MTLOrigin LeftMatrixOrigin { get; set; }
-    [Selector("rightMatrixOrigin", "setRightMatrixOrigin:")] public MTLOrigin RightMatrixOrigin { get; set; }
-    [Selector("batchStart", "setBatchStart:")] public NSUInteger BatchStart { get; set; }
-    [Selector("batchSize", "setBatchSize:")] public NSUInteger BatchSize { get; set; }
-    [Selector("initWithDevice:transposeLeft:transposeRight:resultRows:resultColumns:interiorColumns:alpha:beta:")] public Self InitWithDeviceTransposeLeftTransposeRightResultRowsResultColumnsInteriorColumnsAlphaBeta(MTLDevice device, bool transposeLeft, bool transposeRight, NSUInteger resultRows, NSUInteger resultColumns, NSUInteger interiorColumns, double alpha, double beta);
-    [Selector("initWithDevice:resultRows:resultColumns:interiorColumns:")] public Self InitWithDeviceResultRowsResultColumnsInteriorColumns(MTLDevice device, NSUInteger resultRows, NSUInteger resultColumns, NSUInteger interiorColumns);
-    [Selector("encodeToCommandBuffer:leftMatrix:rightMatrix:resultMatrix:")] public void EncodeToCommandBufferLeftMatrixRightMatrixResultMatrix(MTLCommandBuffer commandBuffer, MPSMatrix leftMatrix, MPSMatrix rightMatrix, MPSMatrix resultMatrix);
+    [Selector("resultMatrixOrigin", "setResultMatrixOrigin:")]
+    public MTLOrigin ResultMatrixOrigin { get; set; }
+    [Selector("leftMatrixOrigin", "setLeftMatrixOrigin:")]
+    public MTLOrigin LeftMatrixOrigin { get; set; }
+    [Selector("rightMatrixOrigin", "setRightMatrixOrigin:")]
+    public MTLOrigin RightMatrixOrigin { get; set; }
+    [Selector("batchStart", "setBatchStart:")]
+    public NSUInteger BatchStart { get; set; }
+    [Selector("batchSize", "setBatchSize:")]
+    public NSUInteger BatchSize { get; set; }
+    [Selector("initWithDevice:transposeLeft:transposeRight:resultRows:resultColumns:interiorColumns:alpha:beta:")]
+    public Self InitWithDeviceTransposeLeftTransposeRightResultRowsResultColumnsInteriorColumnsAlphaBeta(MTLDevice device, bool transposeLeft, bool transposeRight, NSUInteger resultRows, NSUInteger resultColumns, NSUInteger interiorColumns, double alpha, double beta);
+    [Selector("initWithDevice:resultRows:resultColumns:interiorColumns:")]
+    public Self InitWithDeviceResultRowsResultColumnsInteriorColumns(MTLDevice device, NSUInteger resultRows, NSUInteger resultColumns, NSUInteger interiorColumns);
+    [Selector("encodeToCommandBuffer:leftMatrix:rightMatrix:resultMatrix:")]
+    public void EncodeToCommandBufferLeftMatrixRightMatrixResultMatrix(MTLCommandBuffer commandBuffer, MPSMatrix leftMatrix, MPSMatrix rightMatrix, MPSMatrix resultMatrix);
 }
 
 public extern objc class MPSMatrixVectorMultiplication : MPSMatrixBinaryKernel
 {
-    [Selector("initWithDevice:transpose:rows:columns:alpha:beta:")] public Self InitWithDeviceTransposeRowsColumnsAlphaBeta(MTLDevice device, bool transpose, NSUInteger rows, NSUInteger columns, double alpha, double beta);
-    [Selector("initWithDevice:rows:columns:")] public Self InitWithDeviceRowsColumns(MTLDevice device, NSUInteger rows, NSUInteger columns);
-    [Selector("encodeToCommandBuffer:inputMatrix:inputVector:resultVector:")] public void EncodeToCommandBufferInputMatrixInputVectorResultVector(MTLCommandBuffer commandBuffer, MPSMatrix inputMatrix, MPSVector inputVector, MPSVector resultVector);
+    [Selector("initWithDevice:transpose:rows:columns:alpha:beta:")]
+    public Self InitWithDeviceTransposeRowsColumnsAlphaBeta(MTLDevice device, bool transpose, NSUInteger rows, NSUInteger columns, double alpha, double beta);
+    [Selector("initWithDevice:rows:columns:")]
+    public Self InitWithDeviceRowsColumns(MTLDevice device, NSUInteger rows, NSUInteger columns);
+    [Selector("encodeToCommandBuffer:inputMatrix:inputVector:resultVector:")]
+    public void EncodeToCommandBufferInputMatrixInputVectorResultVector(MTLCommandBuffer commandBuffer, MPSMatrix inputMatrix, MPSVector inputVector, MPSVector resultVector);
 }
 
 #endif

@@ -34,10 +34,14 @@ import Standard.ObjC;
 
 public extern objc class IKFilterUIView : NSView
 {
-    [Selector("viewWithFrame:filter:")] public static AnyObject? ViewWithFrameFilter(NSRect frameRect, CIFilter? inFilter);
-    [Selector("initWithFrame:filter:")] public AnyObject? InitWithFrameFilter(NSRect frameRect, CIFilter? inFilter);
-    [Selector("filter")] public CIFilter? Filter();
-    [Selector("objectController")] public NSObjectController? ObjectController();
+    [Selector("viewWithFrame:filter:")]
+    public static AnyObject? ViewWithFrameFilter(NSRect frameRect, CIFilter? inFilter);
+    [Selector("initWithFrame:filter:")]
+    public AnyObject? InitWithFrameFilter(NSRect frameRect, CIFilter? inFilter);
+    [Selector("filter")]
+    public CIFilter? Filter();
+    [Selector("objectController")]
+    public NSObjectController? ObjectController();
 }
 
 #endif

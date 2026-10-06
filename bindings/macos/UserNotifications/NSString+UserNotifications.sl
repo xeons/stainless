@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// UNUserNotificationCenterSupport, a category of NSString.
 public extern objc class NSString
 {
-    [Selector("localizedUserNotificationStringForKey:arguments:")] public static NSString LocalizedUserNotificationStringForKeyArguments(NSString key, NSArray? arguments);
+    [Selector("localizedUserNotificationStringForKey:arguments:")]
+    public static NSString LocalizedUserNotificationStringForKeyArguments(NSString key, NSArray? arguments);
 }
 
 #endif

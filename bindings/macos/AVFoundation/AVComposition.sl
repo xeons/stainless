@@ -34,9 +34,12 @@ import Standard.ObjC;
 
 public extern objc class AVComposition : AVAsset, NSMutableCopying
 {
-    [Selector("tracks")] public NSArray Tracks { get; }
-    [Selector("naturalSize")] public CGSize NaturalSize { get; }
-    [Selector("URLAssetInitializationOptions")] public NSDictionary URLAssetInitializationOptions { get; }
+    [Selector("tracks")]
+    public NSArray Tracks { get; }
+    [Selector("naturalSize")]
+    public CGSize NaturalSize { get; }
+    [Selector("URLAssetInitializationOptions")]
+    public NSDictionary URLAssetInitializationOptions { get; }
 }
 
 public objc closure void AVCompositionLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock(AVCompositionTrack? arg0, NSError? arg1);
@@ -48,20 +51,30 @@ public objc closure void AVCompositionLoadTracksWithMediaCharacteristicCompletio
 /// AVCompositionTrackInspection, a category of AVComposition.
 public extern objc class AVComposition
 {
-    [Selector("trackWithTrackID:")] public AVCompositionTrack? TrackWithTrackID(CMPersistentTrackID trackID);
-    [Selector("loadTrackWithTrackID:completionHandler:")] public void LoadTrackWithTrackIDCompletionHandler(CMPersistentTrackID trackID, AVCompositionLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("tracksWithMediaType:")] public NSArray TracksWithMediaType(AVMediaType mediaType);
-    [Selector("loadTracksWithMediaType:completionHandler:")] public void LoadTracksWithMediaTypeCompletionHandler(AVMediaType mediaType, AVCompositionLoadTracksWithMediaTypeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("tracksWithMediaCharacteristic:")] public NSArray TracksWithMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
-    [Selector("loadTracksWithMediaCharacteristic:completionHandler:")] public void LoadTracksWithMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVCompositionLoadTracksWithMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("trackWithTrackID:")]
+    public AVCompositionTrack? TrackWithTrackID(CMPersistentTrackID trackID);
+    [Selector("loadTrackWithTrackID:completionHandler:")]
+    public void LoadTrackWithTrackIDCompletionHandler(CMPersistentTrackID trackID, AVCompositionLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tracksWithMediaType:")]
+    public NSArray TracksWithMediaType(AVMediaType mediaType);
+    [Selector("loadTracksWithMediaType:completionHandler:")]
+    public void LoadTracksWithMediaTypeCompletionHandler(AVMediaType mediaType, AVCompositionLoadTracksWithMediaTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tracksWithMediaCharacteristic:")]
+    public NSArray TracksWithMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("loadTracksWithMediaCharacteristic:completionHandler:")]
+    public void LoadTracksWithMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVCompositionLoadTracksWithMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public extern objc class AVMutableComposition : AVComposition
 {
-    [Selector("tracks")] public NSArray Tracks { get; }
-    [Selector("naturalSize", "setNaturalSize:")] public CGSize NaturalSize { get; set; }
-    [Selector("composition")] public static Self Composition();
-    [Selector("compositionWithURLAssetInitializationOptions:")] public static Self CompositionWithURLAssetInitializationOptions(NSDictionary? URLAssetInitializationOptions);
+    [Selector("tracks")]
+    public NSArray Tracks { get; }
+    [Selector("naturalSize", "setNaturalSize:")]
+    public CGSize NaturalSize { get; set; }
+    [Selector("composition")]
+    public static Self Composition();
+    [Selector("compositionWithURLAssetInitializationOptions:")]
+    public static Self CompositionWithURLAssetInitializationOptions(NSDictionary? URLAssetInitializationOptions);
 }
 
 public objc closure void AVMutableCompositionInsertTimeRangeOfAssetAtTimeCompletionHandlerCompletionHandlerBlock(NSError? arg0);
@@ -70,19 +83,27 @@ public objc closure void AVMutableCompositionInsertTimeRangeOfAssetAtTimeComplet
 public extern objc class AVMutableComposition
 {
     /// Deprecated in macOS 15.0.
-    [Selector("insertTimeRange:ofAsset:atTime:error:")] public bool InsertTimeRangeOfAssetAtTimeError(CMTimeRange timeRange, AVAsset asset, CMTime startTime, out NSError? outError);
-    [Selector("insertTimeRange:ofAsset:atTime:completionHandler:")] public void InsertTimeRangeOfAssetAtTimeCompletionHandler(CMTimeRange timeRange, AVAsset asset, CMTime startTime, AVMutableCompositionInsertTimeRangeOfAssetAtTimeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("insertEmptyTimeRange:")] public void InsertEmptyTimeRange(CMTimeRange timeRange);
-    [Selector("removeTimeRange:")] public void RemoveTimeRange(CMTimeRange timeRange);
-    [Selector("scaleTimeRange:toDuration:")] public void ScaleTimeRangeToDuration(CMTimeRange timeRange, CMTime duration);
+    [Selector("insertTimeRange:ofAsset:atTime:error:")]
+    public bool InsertTimeRangeOfAssetAtTimeError(CMTimeRange timeRange, AVAsset asset, CMTime startTime, out NSError? outError);
+    [Selector("insertTimeRange:ofAsset:atTime:completionHandler:")]
+    public void InsertTimeRangeOfAssetAtTimeCompletionHandler(CMTimeRange timeRange, AVAsset asset, CMTime startTime, AVMutableCompositionInsertTimeRangeOfAssetAtTimeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("insertEmptyTimeRange:")]
+    public void InsertEmptyTimeRange(CMTimeRange timeRange);
+    [Selector("removeTimeRange:")]
+    public void RemoveTimeRange(CMTimeRange timeRange);
+    [Selector("scaleTimeRange:toDuration:")]
+    public void ScaleTimeRangeToDuration(CMTimeRange timeRange, CMTime duration);
 }
 
 /// AVMutableCompositionTrackLevelEditing, a category of AVMutableComposition.
 public extern objc class AVMutableComposition
 {
-    [Selector("addMutableTrackWithMediaType:preferredTrackID:")] public AVMutableCompositionTrack? AddMutableTrackWithMediaTypePreferredTrackID(AVMediaType mediaType, CMPersistentTrackID preferredTrackID);
-    [Selector("removeTrack:")] public void RemoveTrack(AVCompositionTrack track);
-    [Selector("mutableTrackCompatibleWithTrack:")] public AVMutableCompositionTrack? MutableTrackCompatibleWithTrack(AVAssetTrack track);
+    [Selector("addMutableTrackWithMediaType:preferredTrackID:")]
+    public AVMutableCompositionTrack? AddMutableTrackWithMediaTypePreferredTrackID(AVMediaType mediaType, CMPersistentTrackID preferredTrackID);
+    [Selector("removeTrack:")]
+    public void RemoveTrack(AVCompositionTrack track);
+    [Selector("mutableTrackCompatibleWithTrack:")]
+    public AVMutableCompositionTrack? MutableTrackCompatibleWithTrack(AVAssetTrack track);
 }
 
 public objc closure void AVMutableCompositionLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock(AVMutableCompositionTrack? arg0, NSError? arg1);
@@ -94,22 +115,33 @@ public objc closure void AVMutableCompositionLoadTracksWithMediaCharacteristicCo
 /// AVMutableCompositionTrackInspection, a category of AVMutableComposition.
 public extern objc class AVMutableComposition
 {
-    [Selector("trackWithTrackID:")] public AVMutableCompositionTrack? TrackWithTrackID(CMPersistentTrackID trackID);
-    [Selector("loadTrackWithTrackID:completionHandler:")] public void LoadTrackWithTrackIDCompletionHandler(CMPersistentTrackID trackID, AVMutableCompositionLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("tracksWithMediaType:")] public NSArray TracksWithMediaType(AVMediaType mediaType);
-    [Selector("loadTracksWithMediaType:completionHandler:")] public void LoadTracksWithMediaTypeCompletionHandler(AVMediaType mediaType, AVMutableCompositionLoadTracksWithMediaTypeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("tracksWithMediaCharacteristic:")] public NSArray TracksWithMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
-    [Selector("loadTracksWithMediaCharacteristic:completionHandler:")] public void LoadTracksWithMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVMutableCompositionLoadTracksWithMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("trackWithTrackID:")]
+    public AVMutableCompositionTrack? TrackWithTrackID(CMPersistentTrackID trackID);
+    [Selector("loadTrackWithTrackID:completionHandler:")]
+    public void LoadTrackWithTrackIDCompletionHandler(CMPersistentTrackID trackID, AVMutableCompositionLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tracksWithMediaType:")]
+    public NSArray TracksWithMediaType(AVMediaType mediaType);
+    [Selector("loadTracksWithMediaType:completionHandler:")]
+    public void LoadTracksWithMediaTypeCompletionHandler(AVMediaType mediaType, AVMutableCompositionLoadTracksWithMediaTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tracksWithMediaCharacteristic:")]
+    public NSArray TracksWithMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("loadTracksWithMediaCharacteristic:completionHandler:")]
+    public void LoadTracksWithMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVMutableCompositionLoadTracksWithMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 /// SynchronousAssetInterface, a category of AVComposition.
 public extern objc class AVComposition
 {
-    [Selector("metadataForFormat:")] public NSArray MetadataForFormat(AVMetadataFormat format);
-    [Selector("chapterMetadataGroupsWithTitleLocale:containingItemsWithCommonKeys:")] public NSArray ChapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeys(NSLocale locale, NSArray? commonKeys);
-    [Selector("chapterMetadataGroupsBestMatchingPreferredLanguages:")] public NSArray ChapterMetadataGroupsBestMatchingPreferredLanguages(NSArray preferredLanguages);
-    [Selector("mediaSelectionGroupForMediaCharacteristic:")] public AVMediaSelectionGroup? MediaSelectionGroupForMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
-    [Selector("unusedTrackID")] public CMPersistentTrackID UnusedTrackID();
+    [Selector("metadataForFormat:")]
+    public NSArray MetadataForFormat(AVMetadataFormat format);
+    [Selector("chapterMetadataGroupsWithTitleLocale:containingItemsWithCommonKeys:")]
+    public NSArray ChapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeys(NSLocale locale, NSArray? commonKeys);
+    [Selector("chapterMetadataGroupsBestMatchingPreferredLanguages:")]
+    public NSArray ChapterMetadataGroupsBestMatchingPreferredLanguages(NSArray preferredLanguages);
+    [Selector("mediaSelectionGroupForMediaCharacteristic:")]
+    public AVMediaSelectionGroup? MediaSelectionGroupForMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("unusedTrackID")]
+    public CMPersistentTrackID UnusedTrackID();
 }
 
 #endif

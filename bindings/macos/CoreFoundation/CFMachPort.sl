@@ -56,9 +56,11 @@ public delegate void CFMachPortInvalidationCallBack(__CFMachPort* arg0, void* ar
 
 public extern "C" CFTypeID CFMachPortGetTypeID();
 
-[ReturnsRetained] public extern "C" CFMachPortRef? CFMachPortCreate(CFAllocatorRef? allocator, CFMachPortCallBack callout, CFMachPortContext* context, Boolean* shouldFreeInfo);
+[ReturnsRetained]
+public extern "C" CFMachPortRef? CFMachPortCreate(CFAllocatorRef? allocator, CFMachPortCallBack callout, CFMachPortContext* context, Boolean* shouldFreeInfo);
 
-[ReturnsRetained] public extern "C" CFMachPortRef? CFMachPortCreateWithPort(CFAllocatorRef? allocator, mach_port_t portNum, CFMachPortCallBack callout, CFMachPortContext* context, Boolean* shouldFreeInfo);
+[ReturnsRetained]
+public extern "C" CFMachPortRef? CFMachPortCreateWithPort(CFAllocatorRef? allocator, mach_port_t portNum, CFMachPortCallBack callout, CFMachPortContext* context, Boolean* shouldFreeInfo);
 
 public extern "C" mach_port_t CFMachPortGetPort(CFMachPortRef? port);
 
@@ -72,6 +74,7 @@ public extern "C" CFMachPortInvalidationCallBack CFMachPortGetInvalidationCallBa
 
 public extern "C" void CFMachPortSetInvalidationCallBack(CFMachPortRef? port, CFMachPortInvalidationCallBack callout);
 
-[ReturnsRetained] public extern "C" CFRunLoopSourceRef? CFMachPortCreateRunLoopSource(CFAllocatorRef? allocator, CFMachPortRef? port, CFIndex order);
+[ReturnsRetained]
+public extern "C" CFRunLoopSourceRef? CFMachPortCreateRunLoopSource(CFAllocatorRef? allocator, CFMachPortRef? port, CFIndex order);
 
 #endif

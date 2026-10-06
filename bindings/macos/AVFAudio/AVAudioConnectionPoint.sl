@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class AVAudioConnectionPoint : NSObject
 {
-    [Selector("node")] public AVAudioNode? Node { get; }
-    [Selector("bus")] public AVAudioNodeBus Bus { get; }
-    [Selector("initWithNode:bus:")] public Self InitWithNodeBus(AVAudioNode node, AVAudioNodeBus bus);
+    [Selector("node")]
+    public AVAudioNode? Node { get; }
+    [Selector("bus")]
+    public AVAudioNodeBus Bus { get; }
+    [Selector("initWithNode:bus:")]
+    public Self InitWithNodeBus(AVAudioNode node, AVAudioNodeBus bus);
 }
 
 #endif

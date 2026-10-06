@@ -34,9 +34,12 @@ import Standard.ObjC;
 
 public extern objc class NSPersistentCloudKitContainerOptions : NSObject
 {
-    [Selector("containerIdentifier")] public NSString ContainerIdentifier { get; }
-    [Selector("databaseScope", "setDatabaseScope:")] public CKDatabaseScope DatabaseScope { get; set; }
-    [Selector("initWithContainerIdentifier:")] public Self InitWithContainerIdentifier(NSString containerIdentifier);
+    [Selector("containerIdentifier")]
+    public NSString ContainerIdentifier { get; }
+    [Selector("databaseScope", "setDatabaseScope:")]
+    public CKDatabaseScope DatabaseScope { get; set; }
+    [Selector("initWithContainerIdentifier:")]
+    public Self InitWithContainerIdentifier(NSString containerIdentifier);
 }
 
 #endif

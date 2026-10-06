@@ -40,11 +40,16 @@ public enum INPersonHandleType : long
 
 public extern objc class INPersonHandle : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("value")] public NSString? Value { get; }
-    [Selector("type")] public INPersonHandleType Type { get; }
-    [Selector("label")] public INPersonHandleLabel? Label { get; }
-    [Selector("initWithValue:type:label:")] public Self InitWithValueTypeLabel(NSString? value, INPersonHandleType type, INPersonHandleLabel? label);
-    [Selector("initWithValue:type:")] public Self InitWithValueType(NSString? value, INPersonHandleType type);
+    [Selector("value")]
+    public NSString? Value { get; }
+    [Selector("type")]
+    public INPersonHandleType Type { get; }
+    [Selector("label")]
+    public INPersonHandleLabel? Label { get; }
+    [Selector("initWithValue:type:label:")]
+    public Self InitWithValueTypeLabel(NSString? value, INPersonHandleType type, INPersonHandleLabel? label);
+    [Selector("initWithValue:type:")]
+    public Self InitWithValueType(NSString? value, INPersonHandleType type);
 }
 
 #endif

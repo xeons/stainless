@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class MKMapItemAnnotation : NSObject, MKAnnotation
 {
-    [Selector("mapItem")] public MKMapItem MapItem { get; }
-    [Selector("initWithMapItem:")] public Self? InitWithMapItem(MKMapItem mapItem);
+    [Selector("mapItem")]
+    public MKMapItem MapItem { get; }
+    [Selector("initWithMapItem:")]
+    public Self? InitWithMapItem(MKMapItem mapItem);
 }
 
 #endif

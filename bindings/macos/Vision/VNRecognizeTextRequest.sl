@@ -39,16 +39,25 @@ public enum VNRequestTextRecognitionLevel : long
 
 public extern objc class VNRecognizeTextRequest : VNImageBasedRequest, VNRequestProgressProviding
 {
-    [Selector("recognitionLanguages", "setRecognitionLanguages:")] public NSArray RecognitionLanguages { get; set; }
-    [Selector("customWords", "setCustomWords:")] public NSArray CustomWords { get; set; }
-    [Selector("recognitionLevel", "setRecognitionLevel:")] public VNRequestTextRecognitionLevel RecognitionLevel { get; set; }
-    [Selector("usesLanguageCorrection", "setUsesLanguageCorrection:")] public bool UsesLanguageCorrection { get; set; }
-    [Selector("automaticallyDetectsLanguage", "setAutomaticallyDetectsLanguage:")] public bool AutomaticallyDetectsLanguage { get; set; }
-    [Selector("minimumTextHeight", "setMinimumTextHeight:")] public float MinimumTextHeight { get; set; }
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("recognitionLanguages", "setRecognitionLanguages:")]
+    public NSArray RecognitionLanguages { get; set; }
+    [Selector("customWords", "setCustomWords:")]
+    public NSArray CustomWords { get; set; }
+    [Selector("recognitionLevel", "setRecognitionLevel:")]
+    public VNRequestTextRecognitionLevel RecognitionLevel { get; set; }
+    [Selector("usesLanguageCorrection", "setUsesLanguageCorrection:")]
+    public bool UsesLanguageCorrection { get; set; }
+    [Selector("automaticallyDetectsLanguage", "setAutomaticallyDetectsLanguage:")]
+    public bool AutomaticallyDetectsLanguage { get; set; }
+    [Selector("minimumTextHeight", "setMinimumTextHeight:")]
+    public float MinimumTextHeight { get; set; }
+    [Selector("results")]
+    public NSArray? Results { get; }
     /// Deprecated in macOS 12.0.
-    [Selector("supportedRecognitionLanguagesForTextRecognitionLevel:revision:error:")] public static NSArray? SupportedRecognitionLanguagesForTextRecognitionLevelRevisionError(VNRequestTextRecognitionLevel recognitionLevel, NSUInteger requestRevision, out NSError? error);
-    [Selector("supportedRecognitionLanguagesAndReturnError:")] public NSArray? SupportedRecognitionLanguagesAndReturnError(out NSError? error);
+    [Selector("supportedRecognitionLanguagesForTextRecognitionLevel:revision:error:")]
+    public static NSArray? SupportedRecognitionLanguagesForTextRecognitionLevelRevisionError(VNRequestTextRecognitionLevel recognitionLevel, NSUInteger requestRevision, out NSError? error);
+    [Selector("supportedRecognitionLanguagesAndReturnError:")]
+    public NSArray? SupportedRecognitionLanguagesAndReturnError(out NSError? error);
 }
 
 #endif

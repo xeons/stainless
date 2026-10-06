@@ -67,9 +67,12 @@ public enum NSFileProviderErrorCode : long
 /// NSFileProviderError, a category of NSError.
 public extern objc class NSError
 {
-    [Selector("fileProviderErrorForCollisionWithItem:")] public static Self FileProviderErrorForCollisionWithItem(NSFileProviderItem existingItem);
-    [Selector("fileProviderErrorForNonExistentItemWithIdentifier:")] public static Self FileProviderErrorForNonExistentItemWithIdentifier(NSFileProviderItemIdentifier itemIdentifier);
-    [Selector("fileProviderErrorForRejectedDeletionOfItem:")] public static Self FileProviderErrorForRejectedDeletionOfItem(NSFileProviderItem updatedVersion);
+    [Selector("fileProviderErrorForCollisionWithItem:")]
+    public static Self FileProviderErrorForCollisionWithItem(NSFileProviderItem existingItem);
+    [Selector("fileProviderErrorForNonExistentItemWithIdentifier:")]
+    public static Self FileProviderErrorForNonExistentItemWithIdentifier(NSFileProviderItemIdentifier itemIdentifier);
+    [Selector("fileProviderErrorForRejectedDeletionOfItem:")]
+    public static Self FileProviderErrorForRejectedDeletionOfItem(NSFileProviderItem updatedVersion);
 }
 
 #endif

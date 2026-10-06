@@ -101,185 +101,337 @@ public objc closure void NSDocumentAccommodatePresentedItemDeletionWithCompletio
 
 public extern objc class NSDocument : NSObject, NSEditorRegistration, NSFilePresenter, NSMenuItemValidation, NSUserInterfaceValidations
 {
-    [Selector("fileType", "setFileType:")] public NSString? FileType { get; set; }
-    [Selector("fileURL", "setFileURL:")] public NSURL? FileURL { get; set; }
-    [Selector("fileModificationDate", "setFileModificationDate:")] public NSDate? FileModificationDate { get; set; }
-    [Selector("isDraft", "setDraft:")] public bool Draft { get; set; }
-    [Selector("isEntireFileLoaded")] public bool EntireFileLoaded { get; }
-    [Selector("autosavingIsImplicitlyCancellable")] public bool AutosavingIsImplicitlyCancellable { get; }
-    [Selector("keepBackupFile")] public bool KeepBackupFile { get; }
-    [Selector("backupFileURL")] public NSURL? BackupFileURL { get; }
-    [Selector("savePanelShowsFileFormatsControl")] public bool SavePanelShowsFileFormatsControl { get; }
-    [Selector("fileNameExtensionWasHiddenInLastRunSavePanel")] public bool FileNameExtensionWasHiddenInLastRunSavePanel { get; }
-    [Selector("fileTypeFromLastRunSavePanel")] public NSString? FileTypeFromLastRunSavePanel { get; }
-    [Selector("hasUnautosavedChanges")] public bool HasUnautosavedChanges { get; }
-    [Selector("autosavesInPlace")] public static bool AutosavesInPlace { get; }
-    [Selector("preservesVersions")] public static bool PreservesVersions { get; }
-    [Selector("isBrowsingVersions")] public bool BrowsingVersions { get; }
-    [Selector("autosavesDrafts")] public static bool AutosavesDrafts { get; }
-    [Selector("autosavingFileType")] public NSString? AutosavingFileType { get; }
-    [Selector("autosavedContentsFileURL", "setAutosavedContentsFileURL:")] public NSURL? AutosavedContentsFileURL { get; set; }
-    [Selector("isLocked")] public bool Locked { get; }
-    [Selector("printInfo", "setPrintInfo:")] public NSPrintInfo PrintInfo { get; set; }
-    [Selector("PDFPrintOperation")] public NSPrintOperation? PDFPrintOperation { get; }
-    [Selector("allowsDocumentSharing")] public bool AllowsDocumentSharing { get; }
-    [Selector("previewRepresentableActivityItems", "setPreviewRepresentableActivityItems:")] public NSArray? PreviewRepresentableActivityItems { get; set; }
-    [Selector("isDocumentEdited")] public bool DocumentEdited { get; }
-    [Selector("isInViewingMode")] public bool InViewingMode { get; }
-    [Selector("undoManager", "setUndoManager:")] public NSUndoManager? UndoManager { get; set; }
-    [Selector("hasUndoManager", "setHasUndoManager:")] public bool HasUndoManager { get; set; }
-    [Selector("windowNibName")] public NSNibName? WindowNibName { get; }
-    [Selector("windowControllers")] public NSArray WindowControllers { get; }
-    [Selector("displayName", "setDisplayName:")] public NSString? DisplayName { get; set; }
-    [Selector("windowForSheet")] public NSWindow? WindowForSheet { get; }
-    [Selector("readableTypes")] public static NSArray ReadableTypes { get; }
-    [Selector("writableTypes")] public static NSArray WritableTypes { get; }
-    [Selector("usesUbiquitousStorage")] public static bool UsesUbiquitousStorage { get; }
-    [Selector("presentedItemURL")] public NSURL? PresentedItemURL { get; }
-    [Selector("observedPresentedItemUbiquityAttributes")] public NSSet? ObservedPresentedItemUbiquityAttributes { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithType:error:")] public Self? InitWithTypeError(NSString typeName, out NSError? outError);
-    [Selector("canConcurrentlyReadDocumentsOfType:")] public static bool CanConcurrentlyReadDocumentsOfType(NSString typeName);
-    [Selector("initWithContentsOfURL:ofType:error:")] public Self? InitWithContentsOfURLOfTypeError(NSURL url, NSString typeName, out NSError? outError);
-    [Selector("initForURL:withContentsOfURL:ofType:error:")] public Self? InitForURLWithContentsOfURLOfTypeError(NSURL? urlOrNil, NSURL contentsURL, NSString typeName, out NSError? outError);
-    [Selector("performActivityWithSynchronousWaiting:usingBlock:")] public void PerformActivityWithSynchronousWaitingUsingBlock(bool waitSynchronously, NSDocumentPerformActivityWithSynchronousWaitingUsingBlockBlock block);
-    [Selector("continueActivityUsingBlock:")] public void ContinueActivityUsingBlock(NSDocumentContinueActivityUsingBlockBlock block);
-    [Selector("continueAsynchronousWorkOnMainThreadUsingBlock:")] public void ContinueAsynchronousWorkOnMainThreadUsingBlock(NSDocumentContinueAsynchronousWorkOnMainThreadUsingBlockBlock block);
-    [Selector("performSynchronousFileAccessUsingBlock:")] public void PerformSynchronousFileAccessUsingBlock(NSDocumentPerformSynchronousFileAccessUsingBlockBlock block);
-    [Selector("performAsynchronousFileAccessUsingBlock:")] public void PerformAsynchronousFileAccessUsingBlock(NSDocumentPerformAsynchronousFileAccessUsingBlockBlock block);
-    [Selector("revertDocumentToSaved:")] public void RevertDocumentToSaved(AnyObject? sender);
-    [Selector("revertToContentsOfURL:ofType:error:")] public bool RevertToContentsOfURLOfTypeError(NSURL url, NSString typeName, out NSError? outError);
-    [Selector("readFromURL:ofType:error:")] public bool ReadFromURLOfTypeError(NSURL url, NSString typeName, out NSError? outError);
-    [Selector("readFromFileWrapper:ofType:error:")] public bool ReadFromFileWrapperOfTypeError(NSFileWrapper fileWrapper, NSString typeName, out NSError? outError);
-    [Selector("readFromData:ofType:error:")] public bool ReadFromDataOfTypeError(NSData data, NSString typeName, out NSError? outError);
-    [Selector("writeToURL:ofType:error:")] public bool WriteToURLOfTypeError(NSURL url, NSString typeName, out NSError? outError);
-    [Selector("fileWrapperOfType:error:")] public NSFileWrapper? FileWrapperOfTypeError(NSString typeName, out NSError? outError);
-    [Selector("dataOfType:error:")] public NSData? DataOfTypeError(NSString typeName, out NSError? outError);
-    [Selector("unblockUserInteraction")] public void UnblockUserInteraction();
-    [Selector("writeSafelyToURL:ofType:forSaveOperation:error:")] public bool WriteSafelyToURLOfTypeForSaveOperationError(NSURL url, NSString typeName, NSSaveOperationType saveOperation, out NSError? outError);
-    [Selector("writeToURL:ofType:forSaveOperation:originalContentsURL:error:")] public bool WriteToURLOfTypeForSaveOperationOriginalContentsURLError(NSURL url, NSString typeName, NSSaveOperationType saveOperation, NSURL? absoluteOriginalContentsURL, out NSError? outError);
-    [Selector("fileAttributesToWriteToURL:ofType:forSaveOperation:originalContentsURL:error:")] public NSDictionary? FileAttributesToWriteToURLOfTypeForSaveOperationOriginalContentsURLError(NSURL url, NSString typeName, NSSaveOperationType saveOperation, NSURL? absoluteOriginalContentsURL, out NSError? outError);
-    [Selector("saveDocument:")] public void SaveDocument(AnyObject? sender);
-    [Selector("saveDocumentAs:")] public void SaveDocumentAs(AnyObject? sender);
-    [Selector("saveDocumentTo:")] public void SaveDocumentTo(AnyObject? sender);
-    [Selector("saveDocumentWithDelegate:didSaveSelector:contextInfo:")] public void SaveDocumentWithDelegateDidSaveSelectorContextInfo(AnyObject? @delegate, Selector didSaveSelector, void* contextInfo);
-    [Selector("runModalSavePanelForSaveOperation:delegate:didSaveSelector:contextInfo:")] public void RunModalSavePanelForSaveOperationDelegateDidSaveSelectorContextInfo(NSSaveOperationType saveOperation, AnyObject? @delegate, Selector didSaveSelector, void* contextInfo);
-    [Selector("prepareSavePanel:")] public bool PrepareSavePanel(NSSavePanel savePanel);
-    [Selector("saveToURL:ofType:forSaveOperation:delegate:didSaveSelector:contextInfo:")] public void SaveToURLOfTypeForSaveOperationDelegateDidSaveSelectorContextInfo(NSURL url, NSString typeName, NSSaveOperationType saveOperation, AnyObject? @delegate, Selector didSaveSelector, void* contextInfo);
-    [Selector("saveToURL:ofType:forSaveOperation:completionHandler:")] public void SaveToURLOfTypeForSaveOperationCompletionHandler(NSURL url, NSString typeName, NSSaveOperationType saveOperation, NSDocumentSaveToURLOfTypeForSaveOperationCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("canAsynchronouslyWriteToURL:ofType:forSaveOperation:")] public bool CanAsynchronouslyWriteToURLOfTypeForSaveOperation(NSURL url, NSString typeName, NSSaveOperationType saveOperation);
-    [Selector("checkAutosavingSafetyAndReturnError:")] public bool CheckAutosavingSafetyAndReturnError(out NSError? outError);
-    [Selector("scheduleAutosaving")] public void ScheduleAutosaving();
-    [Selector("autosaveDocumentWithDelegate:didAutosaveSelector:contextInfo:")] public void AutosaveDocumentWithDelegateDidAutosaveSelectorContextInfo(AnyObject? @delegate, Selector didAutosaveSelector, void* contextInfo);
-    [Selector("autosaveWithImplicitCancellability:completionHandler:")] public void AutosaveWithImplicitCancellabilityCompletionHandler(bool autosavingIsImplicitlyCancellable, NSDocumentAutosaveWithImplicitCancellabilityCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("browseDocumentVersions:")] public void BrowseDocumentVersions(AnyObject? sender);
-    [Selector("stopBrowsingVersionsWithCompletionHandler:")] public void StopBrowsingVersionsWithCompletionHandler(NSDocumentStopBrowsingVersionsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("canCloseDocumentWithDelegate:shouldCloseSelector:contextInfo:")] public void CanCloseDocumentWithDelegateShouldCloseSelectorContextInfo(AnyObject @delegate, Selector shouldCloseSelector, void* contextInfo);
-    [Selector("close")] public void Close();
-    [Selector("duplicateDocument:")] public void DuplicateDocument(AnyObject? sender);
-    [Selector("duplicateDocumentWithDelegate:didDuplicateSelector:contextInfo:")] public void DuplicateDocumentWithDelegateDidDuplicateSelectorContextInfo(AnyObject? @delegate, Selector didDuplicateSelector, void* contextInfo);
-    [Selector("duplicateAndReturnError:")] public NSDocument? DuplicateAndReturnError(out NSError? outError);
-    [Selector("renameDocument:")] public void RenameDocument(AnyObject? sender);
-    [Selector("moveDocumentToUbiquityContainer:")] public void MoveDocumentToUbiquityContainer(AnyObject? sender);
-    [Selector("moveDocument:")] public void MoveDocument(AnyObject? sender);
-    [Selector("moveDocumentWithCompletionHandler:")] public void MoveDocumentWithCompletionHandler(NSDocumentMoveDocumentWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("moveToURL:completionHandler:")] public void MoveToURLCompletionHandler(NSURL url, NSDocumentMoveToURLCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("lockDocument:")] public void LockDocument(AnyObject? sender);
-    [Selector("unlockDocument:")] public void UnlockDocument(AnyObject? sender);
-    [Selector("lockDocumentWithCompletionHandler:")] public void LockDocumentWithCompletionHandler(NSDocumentLockDocumentWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("lockWithCompletionHandler:")] public void LockWithCompletionHandler(NSDocumentLockWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("unlockDocumentWithCompletionHandler:")] public void UnlockDocumentWithCompletionHandler(NSDocumentUnlockDocumentWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("unlockWithCompletionHandler:")] public void UnlockWithCompletionHandler(NSDocumentUnlockWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("runPageLayout:")] public void RunPageLayout(AnyObject? sender);
-    [Selector("runModalPageLayoutWithPrintInfo:delegate:didRunSelector:contextInfo:")] public void RunModalPageLayoutWithPrintInfoDelegateDidRunSelectorContextInfo(NSPrintInfo printInfo, AnyObject? @delegate, Selector didRunSelector, void* contextInfo);
-    [Selector("preparePageLayout:")] public bool PreparePageLayout(NSPageLayout pageLayout);
-    [Selector("shouldChangePrintInfo:")] public bool ShouldChangePrintInfo(NSPrintInfo newPrintInfo);
-    [Selector("printDocument:")] public void PrintDocument(AnyObject? sender);
-    [Selector("printDocumentWithSettings:showPrintPanel:delegate:didPrintSelector:contextInfo:")] public void PrintDocumentWithSettingsShowPrintPanelDelegateDidPrintSelectorContextInfo(NSDictionary printSettings, bool showPrintPanel, AnyObject? @delegate, Selector didPrintSelector, void* contextInfo);
-    [Selector("printOperationWithSettings:error:")] public NSPrintOperation? PrintOperationWithSettingsError(NSDictionary printSettings, out NSError? outError);
-    [Selector("runModalPrintOperation:delegate:didRunSelector:contextInfo:")] public void RunModalPrintOperationDelegateDidRunSelectorContextInfo(NSPrintOperation printOperation, AnyObject? @delegate, Selector didRunSelector, void* contextInfo);
-    [Selector("saveDocumentToPDF:")] public void SaveDocumentToPDF(AnyObject? sender);
-    [Selector("shareDocumentWithSharingService:completionHandler:")] public void ShareDocumentWithSharingServiceCompletionHandler(NSSharingService sharingService, NSDocumentShareDocumentWithSharingServiceCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("prepareSharingServicePicker:")] public void PrepareSharingServicePicker(NSSharingServicePicker sharingServicePicker);
-    [Selector("updateChangeCount:")] public void UpdateChangeCount(NSDocumentChangeType change);
-    [Selector("changeCountTokenForSaveOperation:")] public AnyObject ChangeCountTokenForSaveOperation(NSSaveOperationType saveOperation);
-    [Selector("updateChangeCountWithToken:forSaveOperation:")] public void UpdateChangeCountWithTokenForSaveOperation(AnyObject changeCountToken, NSSaveOperationType saveOperation);
-    [Selector("presentError:modalForWindow:delegate:didPresentSelector:contextInfo:")] public void PresentErrorModalForWindowDelegateDidPresentSelectorContextInfo(NSError error, NSWindow window, AnyObject? @delegate, Selector didPresentSelector, void* contextInfo);
-    [Selector("presentError:")] public bool PresentError(NSError error);
-    [Selector("willPresentError:")] public NSError WillPresentError(NSError error);
-    [Selector("willNotPresentError:")] public void WillNotPresentError(NSError error);
-    [Selector("makeWindowControllers")] public void MakeWindowControllers();
-    [Selector("windowControllerWillLoadNib:")] public void WindowControllerWillLoadNib(NSWindowController windowController);
-    [Selector("windowControllerDidLoadNib:")] public void WindowControllerDidLoadNib(NSWindowController windowController);
-    [Selector("setWindow:")] public void SetWindow(NSWindow? window);
-    [Selector("addWindowController:")] public void AddWindowController(NSWindowController windowController);
-    [Selector("removeWindowController:")] public void RemoveWindowController(NSWindowController windowController);
-    [Selector("showWindows")] public void ShowWindows();
-    [Selector("shouldCloseWindowController:delegate:shouldCloseSelector:contextInfo:")] public void ShouldCloseWindowControllerDelegateShouldCloseSelectorContextInfo(NSWindowController windowController, AnyObject? @delegate, Selector shouldCloseSelector, void* contextInfo);
-    [Selector("defaultDraftName")] public NSString DefaultDraftName();
-    [Selector("isNativeType:")] public static bool IsNativeType(NSString type);
-    [Selector("writableTypesForSaveOperation:")] public NSArray WritableTypesForSaveOperation(NSSaveOperationType saveOperation);
-    [Selector("fileNameExtensionForType:saveOperation:")] public NSString? FileNameExtensionForTypeSaveOperation(NSString typeName, NSSaveOperationType saveOperation);
-    [Selector("validateUserInterfaceItem:")] public bool ValidateUserInterfaceItem(NSValidatedUserInterfaceItem item);
-    [Selector("relinquishPresentedItemToReader:")] public void RelinquishPresentedItemToReader(NSDocumentRelinquishPresentedItemToReaderReaderBlock reader);
-    [Selector("relinquishPresentedItemToWriter:")] public void RelinquishPresentedItemToWriter(NSDocumentRelinquishPresentedItemToWriterWriterBlock writer);
-    [Selector("savePresentedItemChangesWithCompletionHandler:")] public void SavePresentedItemChangesWithCompletionHandler(NSDocumentSavePresentedItemChangesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("accommodatePresentedItemDeletionWithCompletionHandler:")] public void AccommodatePresentedItemDeletionWithCompletionHandler(NSDocumentAccommodatePresentedItemDeletionWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("presentedItemDidMoveToURL:")] public void PresentedItemDidMoveToURL(NSURL newURL);
-    [Selector("presentedItemDidChange")] public void PresentedItemDidChange();
-    [Selector("presentedItemDidChangeUbiquityAttributes:")] public void PresentedItemDidChangeUbiquityAttributes(NSSet attributes);
-    [Selector("presentedItemDidGainVersion:")] public void PresentedItemDidGainVersion(NSFileVersion version);
-    [Selector("presentedItemDidLoseVersion:")] public void PresentedItemDidLoseVersion(NSFileVersion version);
-    [Selector("presentedItemDidResolveConflictVersion:")] public void PresentedItemDidResolveConflictVersion(NSFileVersion version);
+    [Selector("fileType", "setFileType:")]
+    public NSString? FileType { get; set; }
+    [Selector("fileURL", "setFileURL:")]
+    public NSURL? FileURL { get; set; }
+    [Selector("fileModificationDate", "setFileModificationDate:")]
+    public NSDate? FileModificationDate { get; set; }
+    [Selector("isDraft", "setDraft:")]
+    public bool Draft { get; set; }
+    [Selector("isEntireFileLoaded")]
+    public bool EntireFileLoaded { get; }
+    [Selector("autosavingIsImplicitlyCancellable")]
+    public bool AutosavingIsImplicitlyCancellable { get; }
+    [Selector("keepBackupFile")]
+    public bool KeepBackupFile { get; }
+    [Selector("backupFileURL")]
+    public NSURL? BackupFileURL { get; }
+    [Selector("savePanelShowsFileFormatsControl")]
+    public bool SavePanelShowsFileFormatsControl { get; }
+    [Selector("fileNameExtensionWasHiddenInLastRunSavePanel")]
+    public bool FileNameExtensionWasHiddenInLastRunSavePanel { get; }
+    [Selector("fileTypeFromLastRunSavePanel")]
+    public NSString? FileTypeFromLastRunSavePanel { get; }
+    [Selector("hasUnautosavedChanges")]
+    public bool HasUnautosavedChanges { get; }
+    [Selector("autosavesInPlace")]
+    public static bool AutosavesInPlace { get; }
+    [Selector("preservesVersions")]
+    public static bool PreservesVersions { get; }
+    [Selector("isBrowsingVersions")]
+    public bool BrowsingVersions { get; }
+    [Selector("autosavesDrafts")]
+    public static bool AutosavesDrafts { get; }
+    [Selector("autosavingFileType")]
+    public NSString? AutosavingFileType { get; }
+    [Selector("autosavedContentsFileURL", "setAutosavedContentsFileURL:")]
+    public NSURL? AutosavedContentsFileURL { get; set; }
+    [Selector("isLocked")]
+    public bool Locked { get; }
+    [Selector("printInfo", "setPrintInfo:")]
+    public NSPrintInfo PrintInfo { get; set; }
+    [Selector("PDFPrintOperation")]
+    public NSPrintOperation? PDFPrintOperation { get; }
+    [Selector("allowsDocumentSharing")]
+    public bool AllowsDocumentSharing { get; }
+    [Selector("previewRepresentableActivityItems", "setPreviewRepresentableActivityItems:")]
+    public NSArray? PreviewRepresentableActivityItems { get; set; }
+    [Selector("isDocumentEdited")]
+    public bool DocumentEdited { get; }
+    [Selector("isInViewingMode")]
+    public bool InViewingMode { get; }
+    [Selector("undoManager", "setUndoManager:")]
+    public NSUndoManager? UndoManager { get; set; }
+    [Selector("hasUndoManager", "setHasUndoManager:")]
+    public bool HasUndoManager { get; set; }
+    [Selector("windowNibName")]
+    public NSNibName? WindowNibName { get; }
+    [Selector("windowControllers")]
+    public NSArray WindowControllers { get; }
+    [Selector("displayName", "setDisplayName:")]
+    public NSString? DisplayName { get; set; }
+    [Selector("windowForSheet")]
+    public NSWindow? WindowForSheet { get; }
+    [Selector("readableTypes")]
+    public static NSArray ReadableTypes { get; }
+    [Selector("writableTypes")]
+    public static NSArray WritableTypes { get; }
+    [Selector("usesUbiquitousStorage")]
+    public static bool UsesUbiquitousStorage { get; }
+    [Selector("presentedItemURL")]
+    public NSURL? PresentedItemURL { get; }
+    [Selector("observedPresentedItemUbiquityAttributes")]
+    public NSSet? ObservedPresentedItemUbiquityAttributes { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithType:error:")]
+    public Self? InitWithTypeError(NSString typeName, out NSError? outError);
+    [Selector("canConcurrentlyReadDocumentsOfType:")]
+    public static bool CanConcurrentlyReadDocumentsOfType(NSString typeName);
+    [Selector("initWithContentsOfURL:ofType:error:")]
+    public Self? InitWithContentsOfURLOfTypeError(NSURL url, NSString typeName, out NSError? outError);
+    [Selector("initForURL:withContentsOfURL:ofType:error:")]
+    public Self? InitForURLWithContentsOfURLOfTypeError(NSURL? urlOrNil, NSURL contentsURL, NSString typeName, out NSError? outError);
+    [Selector("performActivityWithSynchronousWaiting:usingBlock:")]
+    public void PerformActivityWithSynchronousWaitingUsingBlock(bool waitSynchronously, NSDocumentPerformActivityWithSynchronousWaitingUsingBlockBlock block);
+    [Selector("continueActivityUsingBlock:")]
+    public void ContinueActivityUsingBlock(NSDocumentContinueActivityUsingBlockBlock block);
+    [Selector("continueAsynchronousWorkOnMainThreadUsingBlock:")]
+    public void ContinueAsynchronousWorkOnMainThreadUsingBlock(NSDocumentContinueAsynchronousWorkOnMainThreadUsingBlockBlock block);
+    [Selector("performSynchronousFileAccessUsingBlock:")]
+    public void PerformSynchronousFileAccessUsingBlock(NSDocumentPerformSynchronousFileAccessUsingBlockBlock block);
+    [Selector("performAsynchronousFileAccessUsingBlock:")]
+    public void PerformAsynchronousFileAccessUsingBlock(NSDocumentPerformAsynchronousFileAccessUsingBlockBlock block);
+    [Selector("revertDocumentToSaved:")]
+    public void RevertDocumentToSaved(AnyObject? sender);
+    [Selector("revertToContentsOfURL:ofType:error:")]
+    public bool RevertToContentsOfURLOfTypeError(NSURL url, NSString typeName, out NSError? outError);
+    [Selector("readFromURL:ofType:error:")]
+    public bool ReadFromURLOfTypeError(NSURL url, NSString typeName, out NSError? outError);
+    [Selector("readFromFileWrapper:ofType:error:")]
+    public bool ReadFromFileWrapperOfTypeError(NSFileWrapper fileWrapper, NSString typeName, out NSError? outError);
+    [Selector("readFromData:ofType:error:")]
+    public bool ReadFromDataOfTypeError(NSData data, NSString typeName, out NSError? outError);
+    [Selector("writeToURL:ofType:error:")]
+    public bool WriteToURLOfTypeError(NSURL url, NSString typeName, out NSError? outError);
+    [Selector("fileWrapperOfType:error:")]
+    public NSFileWrapper? FileWrapperOfTypeError(NSString typeName, out NSError? outError);
+    [Selector("dataOfType:error:")]
+    public NSData? DataOfTypeError(NSString typeName, out NSError? outError);
+    [Selector("unblockUserInteraction")]
+    public void UnblockUserInteraction();
+    [Selector("writeSafelyToURL:ofType:forSaveOperation:error:")]
+    public bool WriteSafelyToURLOfTypeForSaveOperationError(NSURL url, NSString typeName, NSSaveOperationType saveOperation, out NSError? outError);
+    [Selector("writeToURL:ofType:forSaveOperation:originalContentsURL:error:")]
+    public bool WriteToURLOfTypeForSaveOperationOriginalContentsURLError(NSURL url, NSString typeName, NSSaveOperationType saveOperation, NSURL? absoluteOriginalContentsURL, out NSError? outError);
+    [Selector("fileAttributesToWriteToURL:ofType:forSaveOperation:originalContentsURL:error:")]
+    public NSDictionary? FileAttributesToWriteToURLOfTypeForSaveOperationOriginalContentsURLError(NSURL url, NSString typeName, NSSaveOperationType saveOperation, NSURL? absoluteOriginalContentsURL, out NSError? outError);
+    [Selector("saveDocument:")]
+    public void SaveDocument(AnyObject? sender);
+    [Selector("saveDocumentAs:")]
+    public void SaveDocumentAs(AnyObject? sender);
+    [Selector("saveDocumentTo:")]
+    public void SaveDocumentTo(AnyObject? sender);
+    [Selector("saveDocumentWithDelegate:didSaveSelector:contextInfo:")]
+    public void SaveDocumentWithDelegateDidSaveSelectorContextInfo(AnyObject? @delegate, Selector didSaveSelector, void* contextInfo);
+    [Selector("runModalSavePanelForSaveOperation:delegate:didSaveSelector:contextInfo:")]
+    public void RunModalSavePanelForSaveOperationDelegateDidSaveSelectorContextInfo(NSSaveOperationType saveOperation, AnyObject? @delegate, Selector didSaveSelector, void* contextInfo);
+    [Selector("prepareSavePanel:")]
+    public bool PrepareSavePanel(NSSavePanel savePanel);
+    [Selector("saveToURL:ofType:forSaveOperation:delegate:didSaveSelector:contextInfo:")]
+    public void SaveToURLOfTypeForSaveOperationDelegateDidSaveSelectorContextInfo(NSURL url, NSString typeName, NSSaveOperationType saveOperation, AnyObject? @delegate, Selector didSaveSelector, void* contextInfo);
+    [Selector("saveToURL:ofType:forSaveOperation:completionHandler:")]
+    public void SaveToURLOfTypeForSaveOperationCompletionHandler(NSURL url, NSString typeName, NSSaveOperationType saveOperation, NSDocumentSaveToURLOfTypeForSaveOperationCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("canAsynchronouslyWriteToURL:ofType:forSaveOperation:")]
+    public bool CanAsynchronouslyWriteToURLOfTypeForSaveOperation(NSURL url, NSString typeName, NSSaveOperationType saveOperation);
+    [Selector("checkAutosavingSafetyAndReturnError:")]
+    public bool CheckAutosavingSafetyAndReturnError(out NSError? outError);
+    [Selector("scheduleAutosaving")]
+    public void ScheduleAutosaving();
+    [Selector("autosaveDocumentWithDelegate:didAutosaveSelector:contextInfo:")]
+    public void AutosaveDocumentWithDelegateDidAutosaveSelectorContextInfo(AnyObject? @delegate, Selector didAutosaveSelector, void* contextInfo);
+    [Selector("autosaveWithImplicitCancellability:completionHandler:")]
+    public void AutosaveWithImplicitCancellabilityCompletionHandler(bool autosavingIsImplicitlyCancellable, NSDocumentAutosaveWithImplicitCancellabilityCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("browseDocumentVersions:")]
+    public void BrowseDocumentVersions(AnyObject? sender);
+    [Selector("stopBrowsingVersionsWithCompletionHandler:")]
+    public void StopBrowsingVersionsWithCompletionHandler(NSDocumentStopBrowsingVersionsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("canCloseDocumentWithDelegate:shouldCloseSelector:contextInfo:")]
+    public void CanCloseDocumentWithDelegateShouldCloseSelectorContextInfo(AnyObject @delegate, Selector shouldCloseSelector, void* contextInfo);
+    [Selector("close")]
+    public void Close();
+    [Selector("duplicateDocument:")]
+    public void DuplicateDocument(AnyObject? sender);
+    [Selector("duplicateDocumentWithDelegate:didDuplicateSelector:contextInfo:")]
+    public void DuplicateDocumentWithDelegateDidDuplicateSelectorContextInfo(AnyObject? @delegate, Selector didDuplicateSelector, void* contextInfo);
+    [Selector("duplicateAndReturnError:")]
+    public NSDocument? DuplicateAndReturnError(out NSError? outError);
+    [Selector("renameDocument:")]
+    public void RenameDocument(AnyObject? sender);
+    [Selector("moveDocumentToUbiquityContainer:")]
+    public void MoveDocumentToUbiquityContainer(AnyObject? sender);
+    [Selector("moveDocument:")]
+    public void MoveDocument(AnyObject? sender);
+    [Selector("moveDocumentWithCompletionHandler:")]
+    public void MoveDocumentWithCompletionHandler(NSDocumentMoveDocumentWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("moveToURL:completionHandler:")]
+    public void MoveToURLCompletionHandler(NSURL url, NSDocumentMoveToURLCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("lockDocument:")]
+    public void LockDocument(AnyObject? sender);
+    [Selector("unlockDocument:")]
+    public void UnlockDocument(AnyObject? sender);
+    [Selector("lockDocumentWithCompletionHandler:")]
+    public void LockDocumentWithCompletionHandler(NSDocumentLockDocumentWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("lockWithCompletionHandler:")]
+    public void LockWithCompletionHandler(NSDocumentLockWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("unlockDocumentWithCompletionHandler:")]
+    public void UnlockDocumentWithCompletionHandler(NSDocumentUnlockDocumentWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("unlockWithCompletionHandler:")]
+    public void UnlockWithCompletionHandler(NSDocumentUnlockWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("runPageLayout:")]
+    public void RunPageLayout(AnyObject? sender);
+    [Selector("runModalPageLayoutWithPrintInfo:delegate:didRunSelector:contextInfo:")]
+    public void RunModalPageLayoutWithPrintInfoDelegateDidRunSelectorContextInfo(NSPrintInfo printInfo, AnyObject? @delegate, Selector didRunSelector, void* contextInfo);
+    [Selector("preparePageLayout:")]
+    public bool PreparePageLayout(NSPageLayout pageLayout);
+    [Selector("shouldChangePrintInfo:")]
+    public bool ShouldChangePrintInfo(NSPrintInfo newPrintInfo);
+    [Selector("printDocument:")]
+    public void PrintDocument(AnyObject? sender);
+    [Selector("printDocumentWithSettings:showPrintPanel:delegate:didPrintSelector:contextInfo:")]
+    public void PrintDocumentWithSettingsShowPrintPanelDelegateDidPrintSelectorContextInfo(NSDictionary printSettings, bool showPrintPanel, AnyObject? @delegate, Selector didPrintSelector, void* contextInfo);
+    [Selector("printOperationWithSettings:error:")]
+    public NSPrintOperation? PrintOperationWithSettingsError(NSDictionary printSettings, out NSError? outError);
+    [Selector("runModalPrintOperation:delegate:didRunSelector:contextInfo:")]
+    public void RunModalPrintOperationDelegateDidRunSelectorContextInfo(NSPrintOperation printOperation, AnyObject? @delegate, Selector didRunSelector, void* contextInfo);
+    [Selector("saveDocumentToPDF:")]
+    public void SaveDocumentToPDF(AnyObject? sender);
+    [Selector("shareDocumentWithSharingService:completionHandler:")]
+    public void ShareDocumentWithSharingServiceCompletionHandler(NSSharingService sharingService, NSDocumentShareDocumentWithSharingServiceCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("prepareSharingServicePicker:")]
+    public void PrepareSharingServicePicker(NSSharingServicePicker sharingServicePicker);
+    [Selector("updateChangeCount:")]
+    public void UpdateChangeCount(NSDocumentChangeType change);
+    [Selector("changeCountTokenForSaveOperation:")]
+    public AnyObject ChangeCountTokenForSaveOperation(NSSaveOperationType saveOperation);
+    [Selector("updateChangeCountWithToken:forSaveOperation:")]
+    public void UpdateChangeCountWithTokenForSaveOperation(AnyObject changeCountToken, NSSaveOperationType saveOperation);
+    [Selector("presentError:modalForWindow:delegate:didPresentSelector:contextInfo:")]
+    public void PresentErrorModalForWindowDelegateDidPresentSelectorContextInfo(NSError error, NSWindow window, AnyObject? @delegate, Selector didPresentSelector, void* contextInfo);
+    [Selector("presentError:")]
+    public bool PresentError(NSError error);
+    [Selector("willPresentError:")]
+    public NSError WillPresentError(NSError error);
+    [Selector("willNotPresentError:")]
+    public void WillNotPresentError(NSError error);
+    [Selector("makeWindowControllers")]
+    public void MakeWindowControllers();
+    [Selector("windowControllerWillLoadNib:")]
+    public void WindowControllerWillLoadNib(NSWindowController windowController);
+    [Selector("windowControllerDidLoadNib:")]
+    public void WindowControllerDidLoadNib(NSWindowController windowController);
+    [Selector("setWindow:")]
+    public void SetWindow(NSWindow? window);
+    [Selector("addWindowController:")]
+    public void AddWindowController(NSWindowController windowController);
+    [Selector("removeWindowController:")]
+    public void RemoveWindowController(NSWindowController windowController);
+    [Selector("showWindows")]
+    public void ShowWindows();
+    [Selector("shouldCloseWindowController:delegate:shouldCloseSelector:contextInfo:")]
+    public void ShouldCloseWindowControllerDelegateShouldCloseSelectorContextInfo(NSWindowController windowController, AnyObject? @delegate, Selector shouldCloseSelector, void* contextInfo);
+    [Selector("defaultDraftName")]
+    public NSString DefaultDraftName();
+    [Selector("isNativeType:")]
+    public static bool IsNativeType(NSString type);
+    [Selector("writableTypesForSaveOperation:")]
+    public NSArray WritableTypesForSaveOperation(NSSaveOperationType saveOperation);
+    [Selector("fileNameExtensionForType:saveOperation:")]
+    public NSString? FileNameExtensionForTypeSaveOperation(NSString typeName, NSSaveOperationType saveOperation);
+    [Selector("validateUserInterfaceItem:")]
+    public bool ValidateUserInterfaceItem(NSValidatedUserInterfaceItem item);
+    [Selector("relinquishPresentedItemToReader:")]
+    public void RelinquishPresentedItemToReader(NSDocumentRelinquishPresentedItemToReaderReaderBlock reader);
+    [Selector("relinquishPresentedItemToWriter:")]
+    public void RelinquishPresentedItemToWriter(NSDocumentRelinquishPresentedItemToWriterWriterBlock writer);
+    [Selector("savePresentedItemChangesWithCompletionHandler:")]
+    public void SavePresentedItemChangesWithCompletionHandler(NSDocumentSavePresentedItemChangesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("accommodatePresentedItemDeletionWithCompletionHandler:")]
+    public void AccommodatePresentedItemDeletionWithCompletionHandler(NSDocumentAccommodatePresentedItemDeletionWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("presentedItemDidMoveToURL:")]
+    public void PresentedItemDidMoveToURL(NSURL newURL);
+    [Selector("presentedItemDidChange")]
+    public void PresentedItemDidChange();
+    [Selector("presentedItemDidChangeUbiquityAttributes:")]
+    public void PresentedItemDidChangeUbiquityAttributes(NSSet attributes);
+    [Selector("presentedItemDidGainVersion:")]
+    public void PresentedItemDidGainVersion(NSFileVersion version);
+    [Selector("presentedItemDidLoseVersion:")]
+    public void PresentedItemDidLoseVersion(NSFileVersion version);
+    [Selector("presentedItemDidResolveConflictVersion:")]
+    public void PresentedItemDidResolveConflictVersion(NSFileVersion version);
 }
 
 /// NSDeprecated, a category of NSDocument.
 public extern objc class NSDocument
 {
     /// Deprecated in macOS 100000.
-    [Selector("shouldRunSavePanelWithAccessoryView")] public bool ShouldRunSavePanelWithAccessoryView { get; }
+    [Selector("shouldRunSavePanelWithAccessoryView")]
+    public bool ShouldRunSavePanelWithAccessoryView { get; }
     /// Deprecated in macOS 10.6.
-    [Selector("saveToURL:ofType:forSaveOperation:error:")] public bool SaveToURLOfTypeForSaveOperationError(NSURL url, NSString typeName, NSSaveOperationType saveOperation, out NSError? outError);
+    [Selector("saveToURL:ofType:forSaveOperation:error:")]
+    public bool SaveToURLOfTypeForSaveOperationError(NSURL url, NSString typeName, NSSaveOperationType saveOperation, out NSError? outError);
     /// Deprecated in macOS 10.4.
-    [Selector("dataRepresentationOfType:")] public NSData? DataRepresentationOfType(NSString type);
+    [Selector("dataRepresentationOfType:")]
+    public NSData? DataRepresentationOfType(NSString type);
     /// Deprecated in macOS 10.4.
-    [Selector("fileAttributesToWriteToFile:ofType:saveOperation:")] public NSDictionary? FileAttributesToWriteToFileOfTypeSaveOperation(NSString fullDocumentPath, NSString documentTypeName, NSSaveOperationType saveOperationType);
+    [Selector("fileAttributesToWriteToFile:ofType:saveOperation:")]
+    public NSDictionary? FileAttributesToWriteToFileOfTypeSaveOperation(NSString fullDocumentPath, NSString documentTypeName, NSSaveOperationType saveOperationType);
     /// Deprecated in macOS 10.4.
-    [Selector("fileName")] public NSString? FileName();
+    [Selector("fileName")]
+    public NSString? FileName();
     /// Deprecated in macOS 10.4.
-    [Selector("fileWrapperRepresentationOfType:")] public NSFileWrapper? FileWrapperRepresentationOfType(NSString type);
+    [Selector("fileWrapperRepresentationOfType:")]
+    public NSFileWrapper? FileWrapperRepresentationOfType(NSString type);
     /// Deprecated in macOS 10.4.
-    [Selector("initWithContentsOfFile:ofType:")] public AnyObject? InitWithContentsOfFileOfType(NSString absolutePath, NSString typeName);
+    [Selector("initWithContentsOfFile:ofType:")]
+    public AnyObject? InitWithContentsOfFileOfType(NSString absolutePath, NSString typeName);
     /// Deprecated in macOS 10.4.
-    [Selector("initWithContentsOfURL:ofType:")] public AnyObject? InitWithContentsOfURLOfType(NSURL url, NSString typeName);
+    [Selector("initWithContentsOfURL:ofType:")]
+    public AnyObject? InitWithContentsOfURLOfType(NSURL url, NSString typeName);
     /// Deprecated in macOS 10.4.
-    [Selector("loadDataRepresentation:ofType:")] public bool LoadDataRepresentationOfType(NSData data, NSString type);
+    [Selector("loadDataRepresentation:ofType:")]
+    public bool LoadDataRepresentationOfType(NSData data, NSString type);
     /// Deprecated in macOS 10.4.
-    [Selector("loadFileWrapperRepresentation:ofType:")] public bool LoadFileWrapperRepresentationOfType(NSFileWrapper wrapper, NSString type);
+    [Selector("loadFileWrapperRepresentation:ofType:")]
+    public bool LoadFileWrapperRepresentationOfType(NSFileWrapper wrapper, NSString type);
     /// Deprecated in macOS 10.4.
-    [Selector("printShowingPrintPanel:")] public void PrintShowingPrintPanel(bool flag);
+    [Selector("printShowingPrintPanel:")]
+    public void PrintShowingPrintPanel(bool flag);
     /// Deprecated in macOS 10.4.
-    [Selector("readFromFile:ofType:")] public bool ReadFromFileOfType(NSString fileName, NSString type);
+    [Selector("readFromFile:ofType:")]
+    public bool ReadFromFileOfType(NSString fileName, NSString type);
     /// Deprecated in macOS 10.4.
-    [Selector("readFromURL:ofType:")] public bool ReadFromURLOfType(NSURL url, NSString type);
+    [Selector("readFromURL:ofType:")]
+    public bool ReadFromURLOfType(NSURL url, NSString type);
     /// Deprecated in macOS 10.4.
-    [Selector("revertToSavedFromFile:ofType:")] public bool RevertToSavedFromFileOfType(NSString fileName, NSString type);
+    [Selector("revertToSavedFromFile:ofType:")]
+    public bool RevertToSavedFromFileOfType(NSString fileName, NSString type);
     /// Deprecated in macOS 10.4.
-    [Selector("revertToSavedFromURL:ofType:")] public bool RevertToSavedFromURLOfType(NSURL url, NSString type);
+    [Selector("revertToSavedFromURL:ofType:")]
+    public bool RevertToSavedFromURLOfType(NSURL url, NSString type);
     /// Deprecated in macOS 10.4.
-    [Selector("runModalPageLayoutWithPrintInfo:")] public NSInteger RunModalPageLayoutWithPrintInfo(NSPrintInfo printInfo);
+    [Selector("runModalPageLayoutWithPrintInfo:")]
+    public NSInteger RunModalPageLayoutWithPrintInfo(NSPrintInfo printInfo);
     /// Deprecated in macOS 10.4.
-    [Selector("saveToFile:saveOperation:delegate:didSaveSelector:contextInfo:")] public void SaveToFileSaveOperationDelegateDidSaveSelectorContextInfo(NSString fileName, NSSaveOperationType saveOperation, AnyObject? @delegate, Selector didSaveSelector, void* contextInfo);
+    [Selector("saveToFile:saveOperation:delegate:didSaveSelector:contextInfo:")]
+    public void SaveToFileSaveOperationDelegateDidSaveSelectorContextInfo(NSString fileName, NSSaveOperationType saveOperation, AnyObject? @delegate, Selector didSaveSelector, void* contextInfo);
     /// Deprecated in macOS 10.4.
-    [Selector("setFileName:")] public void SetFileName(NSString? fileName);
+    [Selector("setFileName:")]
+    public void SetFileName(NSString? fileName);
     /// Deprecated in macOS 10.4.
-    [Selector("writeToFile:ofType:")] public bool WriteToFileOfType(NSString fileName, NSString type);
+    [Selector("writeToFile:ofType:")]
+    public bool WriteToFileOfType(NSString fileName, NSString type);
     /// Deprecated in macOS 10.4.
-    [Selector("writeToFile:ofType:originalFile:saveOperation:")] public bool WriteToFileOfTypeOriginalFileSaveOperation(NSString fullDocumentPath, NSString documentTypeName, NSString? fullOriginalDocumentPath, NSSaveOperationType saveOperationType);
+    [Selector("writeToFile:ofType:originalFile:saveOperation:")]
+    public bool WriteToFileOfTypeOriginalFileSaveOperation(NSString fullDocumentPath, NSString documentTypeName, NSString? fullOriginalDocumentPath, NSSaveOperationType saveOperationType);
     /// Deprecated in macOS 10.4.
-    [Selector("writeToURL:ofType:")] public bool WriteToURLOfType(NSURL url, NSString type);
+    [Selector("writeToURL:ofType:")]
+    public bool WriteToURLOfType(NSURL url, NSString type);
     /// Deprecated in macOS 10.4.
-    [Selector("writeWithBackupToFile:ofType:saveOperation:")] public bool WriteWithBackupToFileOfTypeSaveOperation(NSString fullDocumentPath, NSString documentTypeName, NSSaveOperationType saveOperationType);
+    [Selector("writeWithBackupToFile:ofType:saveOperation:")]
+    public bool WriteWithBackupToFileOfTypeSaveOperation(NSString fullDocumentPath, NSString documentTypeName, NSSaveOperationType saveOperationType);
 }
 
 #endif

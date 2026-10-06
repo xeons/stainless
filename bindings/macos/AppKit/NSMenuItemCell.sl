@@ -34,26 +34,46 @@ import Standard.ObjC;
 
 public extern objc class NSMenuItemCell : NSButtonCell
 {
-    [Selector("menuItem", "setMenuItem:")] public NSMenuItem? MenuItem { get; set; }
-    [Selector("needsSizing", "setNeedsSizing:")] public bool NeedsSizing { get; set; }
-    [Selector("needsDisplay", "setNeedsDisplay:")] public bool NeedsDisplay { get; set; }
-    [Selector("stateImageWidth")] public CGFloat StateImageWidth { get; }
-    [Selector("imageWidth")] public CGFloat ImageWidth { get; }
-    [Selector("titleWidth")] public CGFloat TitleWidth { get; }
-    [Selector("keyEquivalentWidth")] public CGFloat KeyEquivalentWidth { get; }
-    [Selector("tag", "setTag:")] public NSInteger Tag { get; set; }
-    [Selector("initTextCell:")] public Self InitTextCell(NSString string);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("calcSize")] public void CalcSize();
-    [Selector("stateImageRectForBounds:")] public NSRect StateImageRectForBounds(NSRect cellFrame);
-    [Selector("titleRectForBounds:")] public NSRect TitleRectForBounds(NSRect cellFrame);
-    [Selector("keyEquivalentRectForBounds:")] public NSRect KeyEquivalentRectForBounds(NSRect cellFrame);
-    [Selector("drawSeparatorItemWithFrame:inView:")] public void DrawSeparatorItemWithFrameInView(NSRect cellFrame, NSView controlView);
-    [Selector("drawStateImageWithFrame:inView:")] public void DrawStateImageWithFrameInView(NSRect cellFrame, NSView controlView);
-    [Selector("drawImageWithFrame:inView:")] public void DrawImageWithFrameInView(NSRect cellFrame, NSView controlView);
-    [Selector("drawTitleWithFrame:inView:")] public void DrawTitleWithFrameInView(NSRect cellFrame, NSView controlView);
-    [Selector("drawKeyEquivalentWithFrame:inView:")] public void DrawKeyEquivalentWithFrameInView(NSRect cellFrame, NSView controlView);
-    [Selector("drawBorderAndBackgroundWithFrame:inView:")] public void DrawBorderAndBackgroundWithFrameInView(NSRect cellFrame, NSView controlView);
+    [Selector("menuItem", "setMenuItem:")]
+    public NSMenuItem? MenuItem { get; set; }
+    [Selector("needsSizing", "setNeedsSizing:")]
+    public bool NeedsSizing { get; set; }
+    [Selector("needsDisplay", "setNeedsDisplay:")]
+    public bool NeedsDisplay { get; set; }
+    [Selector("stateImageWidth")]
+    public CGFloat StateImageWidth { get; }
+    [Selector("imageWidth")]
+    public CGFloat ImageWidth { get; }
+    [Selector("titleWidth")]
+    public CGFloat TitleWidth { get; }
+    [Selector("keyEquivalentWidth")]
+    public CGFloat KeyEquivalentWidth { get; }
+    [Selector("tag", "setTag:")]
+    public NSInteger Tag { get; set; }
+    [Selector("initTextCell:")]
+    public Self InitTextCell(NSString string);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("calcSize")]
+    public void CalcSize();
+    [Selector("stateImageRectForBounds:")]
+    public NSRect StateImageRectForBounds(NSRect cellFrame);
+    [Selector("titleRectForBounds:")]
+    public NSRect TitleRectForBounds(NSRect cellFrame);
+    [Selector("keyEquivalentRectForBounds:")]
+    public NSRect KeyEquivalentRectForBounds(NSRect cellFrame);
+    [Selector("drawSeparatorItemWithFrame:inView:")]
+    public void DrawSeparatorItemWithFrameInView(NSRect cellFrame, NSView controlView);
+    [Selector("drawStateImageWithFrame:inView:")]
+    public void DrawStateImageWithFrameInView(NSRect cellFrame, NSView controlView);
+    [Selector("drawImageWithFrame:inView:")]
+    public void DrawImageWithFrameInView(NSRect cellFrame, NSView controlView);
+    [Selector("drawTitleWithFrame:inView:")]
+    public void DrawTitleWithFrameInView(NSRect cellFrame, NSView controlView);
+    [Selector("drawKeyEquivalentWithFrame:inView:")]
+    public void DrawKeyEquivalentWithFrameInView(NSRect cellFrame, NSView controlView);
+    [Selector("drawBorderAndBackgroundWithFrame:inView:")]
+    public void DrawBorderAndBackgroundWithFrameInView(NSRect cellFrame, NSView controlView);
 }
 
 #endif

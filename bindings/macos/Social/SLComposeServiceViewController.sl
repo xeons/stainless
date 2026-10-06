@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class SLComposeServiceViewController : NSViewController, NSTextViewDelegate
 {
-    [Selector("textView")] public NSTextView? TextView { get; }
-    [Selector("contentText")] public NSString? ContentText { get; }
-    [Selector("placeholder", "setPlaceholder:")] public NSString? Placeholder { get; set; }
-    [Selector("charactersRemaining", "setCharactersRemaining:")] public NSNumber? CharactersRemaining { get; set; }
-    [Selector("presentationAnimationDidFinish")] public void PresentationAnimationDidFinish();
-    [Selector("didSelectPost")] public void DidSelectPost();
-    [Selector("didSelectCancel")] public void DidSelectCancel();
-    [Selector("cancel")] public void Cancel();
-    [Selector("isContentValid")] public bool IsContentValid();
-    [Selector("validateContent")] public void ValidateContent();
+    [Selector("textView")]
+    public NSTextView? TextView { get; }
+    [Selector("contentText")]
+    public NSString? ContentText { get; }
+    [Selector("placeholder", "setPlaceholder:")]
+    public NSString? Placeholder { get; set; }
+    [Selector("charactersRemaining", "setCharactersRemaining:")]
+    public NSNumber? CharactersRemaining { get; set; }
+    [Selector("presentationAnimationDidFinish")]
+    public void PresentationAnimationDidFinish();
+    [Selector("didSelectPost")]
+    public void DidSelectPost();
+    [Selector("didSelectCancel")]
+    public void DidSelectCancel();
+    [Selector("cancel")]
+    public void Cancel();
+    [Selector("isContentValid")]
+    public bool IsContentValid();
+    [Selector("validateContent")]
+    public void ValidateContent();
 }
 
 #endif

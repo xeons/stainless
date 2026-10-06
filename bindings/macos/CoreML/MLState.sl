@@ -35,7 +35,8 @@ public objc closure void MLStateGetMultiArrayForStateNamedHandlerHandlerBlock(ML
 
 public extern objc class MLState : NSObject
 {
-    [Selector("getMultiArrayForStateNamed:handler:")] public void GetMultiArrayForStateNamedHandler(NSString stateName, MLStateGetMultiArrayForStateNamedHandlerHandlerBlock handler);
+    [Selector("getMultiArrayForStateNamed:handler:")]
+    public void GetMultiArrayForStateNamedHandler(NSString stateName, MLStateGetMultiArrayForStateNamedHandlerHandlerBlock handler);
 }
 
 #endif

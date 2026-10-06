@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class ODAttributeMap : NSObject
 {
-    [Selector("customQueryFunction", "setCustomQueryFunction:")] public NSString? CustomQueryFunction { get; set; }
-    [Selector("customTranslationFunction", "setCustomTranslationFunction:")] public NSString? CustomTranslationFunction { get; set; }
-    [Selector("customAttributes", "setCustomAttributes:")] public NSArray? CustomAttributes { get; set; }
-    [Selector("value", "setValue:")] public NSString? Value { get; set; }
-    [Selector("attributeMapWithValue:")] public static Self? AttributeMapWithValue(NSString? value);
-    [Selector("attributeMapWithStaticValue:")] public static Self? AttributeMapWithStaticValue(NSString? staticValue);
-    [Selector("setStaticValue:")] public void SetStaticValue(NSString? staticValue);
-    [Selector("setVariableSubstitution:")] public void SetVariableSubstitution(NSString? variableSubstitution);
+    [Selector("customQueryFunction", "setCustomQueryFunction:")]
+    public NSString? CustomQueryFunction { get; set; }
+    [Selector("customTranslationFunction", "setCustomTranslationFunction:")]
+    public NSString? CustomTranslationFunction { get; set; }
+    [Selector("customAttributes", "setCustomAttributes:")]
+    public NSArray? CustomAttributes { get; set; }
+    [Selector("value", "setValue:")]
+    public NSString? Value { get; set; }
+    [Selector("attributeMapWithValue:")]
+    public static Self? AttributeMapWithValue(NSString? value);
+    [Selector("attributeMapWithStaticValue:")]
+    public static Self? AttributeMapWithStaticValue(NSString? staticValue);
+    [Selector("setStaticValue:")]
+    public void SetStaticValue(NSString? staticValue);
+    [Selector("setVariableSubstitution:")]
+    public void SetVariableSubstitution(NSString? variableSubstitution);
 }
 
 #endif

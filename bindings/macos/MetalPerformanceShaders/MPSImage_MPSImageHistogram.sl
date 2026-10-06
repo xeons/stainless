@@ -42,41 +42,64 @@ public struct MPSImageHistogramInfo
 
 public extern objc class MPSImageHistogram : MPSKernel
 {
-    [Selector("clipRectSource", "setClipRectSource:")] public MTLRegion ClipRectSource { get; set; }
-    [Selector("zeroHistogram", "setZeroHistogram:")] public bool ZeroHistogram { get; set; }
-    [Selector("minPixelThresholdValue", "setMinPixelThresholdValue:")] public vector_float4 MinPixelThresholdValue { get; set; }
-    [Selector("histogramInfo")] public MPSImageHistogramInfo HistogramInfo { get; }
-    [Selector("initWithDevice:histogramInfo:")] public Self InitWithDeviceHistogramInfo(MTLDevice device, MPSImageHistogramInfo* histogramInfo);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:sourceTexture:histogram:histogramOffset:")] public void EncodeToCommandBufferSourceTextureHistogramHistogramOffset(MTLCommandBuffer commandBuffer, MTLTexture source, MTLBuffer histogram, NSUInteger histogramOffset);
-    [Selector("histogramSizeForSourceFormat:")] public nuint HistogramSizeForSourceFormat(MTLPixelFormat sourceFormat);
+    [Selector("clipRectSource", "setClipRectSource:")]
+    public MTLRegion ClipRectSource { get; set; }
+    [Selector("zeroHistogram", "setZeroHistogram:")]
+    public bool ZeroHistogram { get; set; }
+    [Selector("minPixelThresholdValue", "setMinPixelThresholdValue:")]
+    public vector_float4 MinPixelThresholdValue { get; set; }
+    [Selector("histogramInfo")]
+    public MPSImageHistogramInfo HistogramInfo { get; }
+    [Selector("initWithDevice:histogramInfo:")]
+    public Self InitWithDeviceHistogramInfo(MTLDevice device, MPSImageHistogramInfo* histogramInfo);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:sourceTexture:histogram:histogramOffset:")]
+    public void EncodeToCommandBufferSourceTextureHistogramHistogramOffset(MTLCommandBuffer commandBuffer, MTLTexture source, MTLBuffer histogram, NSUInteger histogramOffset);
+    [Selector("histogramSizeForSourceFormat:")]
+    public nuint HistogramSizeForSourceFormat(MTLPixelFormat sourceFormat);
 }
 
 public extern objc class MPSImageNormalizedHistogram : MPSKernel
 {
-    [Selector("clipRectSource", "setClipRectSource:")] public MTLRegion ClipRectSource { get; set; }
-    [Selector("zeroHistogram", "setZeroHistogram:")] public bool ZeroHistogram { get; set; }
-    [Selector("histogramInfo")] public MPSImageHistogramInfo HistogramInfo { get; }
-    [Selector("initWithDevice:histogramInfo:")] public Self InitWithDeviceHistogramInfo(MTLDevice device, MPSImageHistogramInfo* histogramInfo);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:sourceTexture:minmaxTexture:histogram:histogramOffset:")] public void EncodeToCommandBufferSourceTextureMinmaxTextureHistogramHistogramOffset(MTLCommandBuffer commandBuffer, MTLTexture source, MTLTexture minmaxTexture, MTLBuffer histogram, NSUInteger histogramOffset);
-    [Selector("histogramSizeForSourceFormat:")] public nuint HistogramSizeForSourceFormat(MTLPixelFormat sourceFormat);
+    [Selector("clipRectSource", "setClipRectSource:")]
+    public MTLRegion ClipRectSource { get; set; }
+    [Selector("zeroHistogram", "setZeroHistogram:")]
+    public bool ZeroHistogram { get; set; }
+    [Selector("histogramInfo")]
+    public MPSImageHistogramInfo HistogramInfo { get; }
+    [Selector("initWithDevice:histogramInfo:")]
+    public Self InitWithDeviceHistogramInfo(MTLDevice device, MPSImageHistogramInfo* histogramInfo);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:sourceTexture:minmaxTexture:histogram:histogramOffset:")]
+    public void EncodeToCommandBufferSourceTextureMinmaxTextureHistogramHistogramOffset(MTLCommandBuffer commandBuffer, MTLTexture source, MTLTexture minmaxTexture, MTLBuffer histogram, NSUInteger histogramOffset);
+    [Selector("histogramSizeForSourceFormat:")]
+    public nuint HistogramSizeForSourceFormat(MTLPixelFormat sourceFormat);
 }
 
 public extern objc class MPSImageHistogramEqualization : MPSUnaryImageKernel
 {
-    [Selector("histogramInfo")] public MPSImageHistogramInfo HistogramInfo { get; }
-    [Selector("initWithDevice:histogramInfo:")] public Self InitWithDeviceHistogramInfo(MTLDevice device, MPSImageHistogramInfo* histogramInfo);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeTransformToCommandBuffer:sourceTexture:histogram:histogramOffset:")] public void EncodeTransformToCommandBufferSourceTextureHistogramHistogramOffset(MTLCommandBuffer commandBuffer, MTLTexture source, MTLBuffer histogram, NSUInteger histogramOffset);
+    [Selector("histogramInfo")]
+    public MPSImageHistogramInfo HistogramInfo { get; }
+    [Selector("initWithDevice:histogramInfo:")]
+    public Self InitWithDeviceHistogramInfo(MTLDevice device, MPSImageHistogramInfo* histogramInfo);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeTransformToCommandBuffer:sourceTexture:histogram:histogramOffset:")]
+    public void EncodeTransformToCommandBufferSourceTextureHistogramHistogramOffset(MTLCommandBuffer commandBuffer, MTLTexture source, MTLBuffer histogram, NSUInteger histogramOffset);
 }
 
 public extern objc class MPSImageHistogramSpecification : MPSUnaryImageKernel
 {
-    [Selector("histogramInfo")] public MPSImageHistogramInfo HistogramInfo { get; }
-    [Selector("initWithDevice:histogramInfo:")] public Self InitWithDeviceHistogramInfo(MTLDevice device, MPSImageHistogramInfo* histogramInfo);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeTransformToCommandBuffer:sourceTexture:sourceHistogram:sourceHistogramOffset:desiredHistogram:desiredHistogramOffset:")] public void EncodeTransformToCommandBufferSourceTextureSourceHistogramSourceHistogramOffsetDesiredHistogramDesiredHistogramOffset(MTLCommandBuffer commandBuffer, MTLTexture source, MTLBuffer sourceHistogram, NSUInteger sourceHistogramOffset, MTLBuffer desiredHistogram, NSUInteger desiredHistogramOffset);
+    [Selector("histogramInfo")]
+    public MPSImageHistogramInfo HistogramInfo { get; }
+    [Selector("initWithDevice:histogramInfo:")]
+    public Self InitWithDeviceHistogramInfo(MTLDevice device, MPSImageHistogramInfo* histogramInfo);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeTransformToCommandBuffer:sourceTexture:sourceHistogram:sourceHistogramOffset:desiredHistogram:desiredHistogramOffset:")]
+    public void EncodeTransformToCommandBufferSourceTextureSourceHistogramSourceHistogramOffsetDesiredHistogramDesiredHistogramOffset(MTLCommandBuffer commandBuffer, MTLTexture source, MTLBuffer sourceHistogram, NSUInteger sourceHistogramOffset, MTLBuffer desiredHistogram, NSUInteger desiredHistogramOffset);
 }
 
 #endif

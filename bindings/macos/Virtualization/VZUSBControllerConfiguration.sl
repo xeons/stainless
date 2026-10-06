@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class VZUSBControllerConfiguration : NSObject, NSCopying
 {
-    [Selector("usbDevices", "setUsbDevices:")] public NSArray UsbDevices { get; set; }
+    [Selector("usbDevices", "setUsbDevices:")]
+    public NSArray UsbDevices { get; set; }
 }
 
 #endif

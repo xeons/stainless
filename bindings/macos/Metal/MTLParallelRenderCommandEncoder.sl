@@ -32,13 +32,20 @@ import Standard.ObjC;
 
 public objc interface MTLParallelRenderCommandEncoder : MTLCommandEncoder
 {
-    [Selector("renderCommandEncoder")] MTLRenderCommandEncoder? RenderCommandEncoder();
-    [Selector("setColorStoreAction:atIndex:")] void SetColorStoreActionAtIndex(MTLStoreAction storeAction, NSUInteger colorAttachmentIndex);
-    [Selector("setDepthStoreAction:")] void SetDepthStoreAction(MTLStoreAction storeAction);
-    [Selector("setStencilStoreAction:")] void SetStencilStoreAction(MTLStoreAction storeAction);
-    [Selector("setColorStoreActionOptions:atIndex:")] void SetColorStoreActionOptionsAtIndex(MTLStoreActionOptions storeActionOptions, NSUInteger colorAttachmentIndex);
-    [Selector("setDepthStoreActionOptions:")] void SetDepthStoreActionOptions(MTLStoreActionOptions storeActionOptions);
-    [Selector("setStencilStoreActionOptions:")] void SetStencilStoreActionOptions(MTLStoreActionOptions storeActionOptions);
+    [Selector("renderCommandEncoder")]
+    MTLRenderCommandEncoder? RenderCommandEncoder();
+    [Selector("setColorStoreAction:atIndex:")]
+    void SetColorStoreActionAtIndex(MTLStoreAction storeAction, NSUInteger colorAttachmentIndex);
+    [Selector("setDepthStoreAction:")]
+    void SetDepthStoreAction(MTLStoreAction storeAction);
+    [Selector("setStencilStoreAction:")]
+    void SetStencilStoreAction(MTLStoreAction storeAction);
+    [Selector("setColorStoreActionOptions:atIndex:")]
+    void SetColorStoreActionOptionsAtIndex(MTLStoreActionOptions storeActionOptions, NSUInteger colorAttachmentIndex);
+    [Selector("setDepthStoreActionOptions:")]
+    void SetDepthStoreActionOptions(MTLStoreActionOptions storeActionOptions);
+    [Selector("setStencilStoreActionOptions:")]
+    void SetStencilStoreActionOptions(MTLStoreActionOptions storeActionOptions);
 }
 
 #endif

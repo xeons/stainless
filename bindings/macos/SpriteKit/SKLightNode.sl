@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class SKLightNode : SKNode
 {
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("lightColor", "setLightColor:")] public NSColor LightColor { get; set; }
-    [Selector("ambientColor", "setAmbientColor:")] public NSColor AmbientColor { get; set; }
-    [Selector("shadowColor", "setShadowColor:")] public NSColor ShadowColor { get; set; }
-    [Selector("falloff", "setFalloff:")] public CGFloat Falloff { get; set; }
-    [Selector("categoryBitMask", "setCategoryBitMask:")] public uint CategoryBitMask { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("lightColor", "setLightColor:")]
+    public NSColor LightColor { get; set; }
+    [Selector("ambientColor", "setAmbientColor:")]
+    public NSColor AmbientColor { get; set; }
+    [Selector("shadowColor", "setShadowColor:")]
+    public NSColor ShadowColor { get; set; }
+    [Selector("falloff", "setFalloff:")]
+    public CGFloat Falloff { get; set; }
+    [Selector("categoryBitMask", "setCategoryBitMask:")]
+    public uint CategoryBitMask { get; set; }
 }
 
 #endif

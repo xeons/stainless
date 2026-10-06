@@ -40,18 +40,26 @@ public enum AVAudioEnvironmentDistanceAttenuationModel : long
 
 public extern objc class AVAudioEnvironmentDistanceAttenuationParameters : NSObject
 {
-    [Selector("distanceAttenuationModel", "setDistanceAttenuationModel:")] public AVAudioEnvironmentDistanceAttenuationModel DistanceAttenuationModel { get; set; }
-    [Selector("referenceDistance", "setReferenceDistance:")] public float ReferenceDistance { get; set; }
-    [Selector("maximumDistance", "setMaximumDistance:")] public float MaximumDistance { get; set; }
-    [Selector("rolloffFactor", "setRolloffFactor:")] public float RolloffFactor { get; set; }
+    [Selector("distanceAttenuationModel", "setDistanceAttenuationModel:")]
+    public AVAudioEnvironmentDistanceAttenuationModel DistanceAttenuationModel { get; set; }
+    [Selector("referenceDistance", "setReferenceDistance:")]
+    public float ReferenceDistance { get; set; }
+    [Selector("maximumDistance", "setMaximumDistance:")]
+    public float MaximumDistance { get; set; }
+    [Selector("rolloffFactor", "setRolloffFactor:")]
+    public float RolloffFactor { get; set; }
 }
 
 public extern objc class AVAudioEnvironmentReverbParameters : NSObject
 {
-    [Selector("enable", "setEnable:")] public bool Enable { get; set; }
-    [Selector("level", "setLevel:")] public float Level { get; set; }
-    [Selector("filterParameters")] public AVAudioUnitEQFilterParameters FilterParameters { get; }
-    [Selector("loadFactoryReverbPreset:")] public void LoadFactoryReverbPreset(AVAudioUnitReverbPreset preset);
+    [Selector("enable", "setEnable:")]
+    public bool Enable { get; set; }
+    [Selector("level", "setLevel:")]
+    public float Level { get; set; }
+    [Selector("filterParameters")]
+    public AVAudioUnitEQFilterParameters FilterParameters { get; }
+    [Selector("loadFactoryReverbPreset:")]
+    public void LoadFactoryReverbPreset(AVAudioUnitReverbPreset preset);
 }
 
 public enum AVAudioEnvironmentOutputType : long
@@ -64,17 +72,28 @@ public enum AVAudioEnvironmentOutputType : long
 
 public extern objc class AVAudioEnvironmentNode : AVAudioNode, AVAudioMixing
 {
-    [Selector("outputType", "setOutputType:")] public AVAudioEnvironmentOutputType OutputType { get; set; }
-    [Selector("outputVolume", "setOutputVolume:")] public float OutputVolume { get; set; }
-    [Selector("nextAvailableInputBus")] public AVAudioNodeBus NextAvailableInputBus { get; }
-    [Selector("listenerPosition", "setListenerPosition:")] public AVAudio3DPoint ListenerPosition { get; set; }
-    [Selector("listenerVectorOrientation", "setListenerVectorOrientation:")] public AVAudio3DVectorOrientation ListenerVectorOrientation { get; set; }
-    [Selector("listenerAngularOrientation", "setListenerAngularOrientation:")] public AVAudio3DAngularOrientation ListenerAngularOrientation { get; set; }
-    [Selector("distanceAttenuationParameters")] public AVAudioEnvironmentDistanceAttenuationParameters DistanceAttenuationParameters { get; }
-    [Selector("reverbParameters")] public AVAudioEnvironmentReverbParameters ReverbParameters { get; }
-    [Selector("applicableRenderingAlgorithms")] public NSArray ApplicableRenderingAlgorithms { get; }
-    [Selector("isListenerHeadTrackingEnabled", "setListenerHeadTrackingEnabled:")] public bool ListenerHeadTrackingEnabled { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("outputType", "setOutputType:")]
+    public AVAudioEnvironmentOutputType OutputType { get; set; }
+    [Selector("outputVolume", "setOutputVolume:")]
+    public float OutputVolume { get; set; }
+    [Selector("nextAvailableInputBus")]
+    public AVAudioNodeBus NextAvailableInputBus { get; }
+    [Selector("listenerPosition", "setListenerPosition:")]
+    public AVAudio3DPoint ListenerPosition { get; set; }
+    [Selector("listenerVectorOrientation", "setListenerVectorOrientation:")]
+    public AVAudio3DVectorOrientation ListenerVectorOrientation { get; set; }
+    [Selector("listenerAngularOrientation", "setListenerAngularOrientation:")]
+    public AVAudio3DAngularOrientation ListenerAngularOrientation { get; set; }
+    [Selector("distanceAttenuationParameters")]
+    public AVAudioEnvironmentDistanceAttenuationParameters DistanceAttenuationParameters { get; }
+    [Selector("reverbParameters")]
+    public AVAudioEnvironmentReverbParameters ReverbParameters { get; }
+    [Selector("applicableRenderingAlgorithms")]
+    public NSArray ApplicableRenderingAlgorithms { get; }
+    [Selector("isListenerHeadTrackingEnabled", "setListenerHeadTrackingEnabled:")]
+    public bool ListenerHeadTrackingEnabled { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

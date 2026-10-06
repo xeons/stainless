@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class WKOpenPanelParameters : NSObject
 {
-    [Selector("allowsMultipleSelection")] public bool AllowsMultipleSelection { get; }
-    [Selector("allowsDirectories")] public bool AllowsDirectories { get; }
+    [Selector("allowsMultipleSelection")]
+    public bool AllowsMultipleSelection { get; }
+    [Selector("allowsDirectories")]
+    public bool AllowsDirectories { get; }
 }
 
 #endif

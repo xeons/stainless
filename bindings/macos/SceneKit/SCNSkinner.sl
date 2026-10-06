@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class SCNSkinner : NSObject, NSSecureCoding
 {
-    [Selector("skeleton", "setSkeleton:")] public SCNNode? Skeleton { get; set; }
-    [Selector("baseGeometry", "setBaseGeometry:")] public SCNGeometry? BaseGeometry { get; set; }
-    [Selector("baseGeometryBindTransform", "setBaseGeometryBindTransform:")] public SCNMatrix4 BaseGeometryBindTransform { get; set; }
-    [Selector("boneInverseBindTransforms")] public NSArray? BoneInverseBindTransforms { get; }
-    [Selector("bones")] public NSArray? Bones { get; }
-    [Selector("boneWeights")] public SCNGeometrySource? BoneWeights { get; }
-    [Selector("boneIndices")] public SCNGeometrySource? BoneIndices { get; }
-    [Selector("skinnerWithBaseGeometry:bones:boneInverseBindTransforms:boneWeights:boneIndices:")] public static Self SkinnerWithBaseGeometryBonesBoneInverseBindTransformsBoneWeightsBoneIndices(SCNGeometry? baseGeometry, NSArray bones, NSArray? boneInverseBindTransforms, SCNGeometrySource boneWeights, SCNGeometrySource boneIndices);
+    [Selector("skeleton", "setSkeleton:")]
+    public SCNNode? Skeleton { get; set; }
+    [Selector("baseGeometry", "setBaseGeometry:")]
+    public SCNGeometry? BaseGeometry { get; set; }
+    [Selector("baseGeometryBindTransform", "setBaseGeometryBindTransform:")]
+    public SCNMatrix4 BaseGeometryBindTransform { get; set; }
+    [Selector("boneInverseBindTransforms")]
+    public NSArray? BoneInverseBindTransforms { get; }
+    [Selector("bones")]
+    public NSArray? Bones { get; }
+    [Selector("boneWeights")]
+    public SCNGeometrySource? BoneWeights { get; }
+    [Selector("boneIndices")]
+    public SCNGeometrySource? BoneIndices { get; }
+    [Selector("skinnerWithBaseGeometry:bones:boneInverseBindTransforms:boneWeights:boneIndices:")]
+    public static Self SkinnerWithBaseGeometryBonesBoneInverseBindTransformsBoneWeightsBoneIndices(SCNGeometry? baseGeometry, NSArray bones, NSArray? boneInverseBindTransforms, SCNGeometrySource boneWeights, SCNGeometrySource boneIndices);
 }
 
 #endif

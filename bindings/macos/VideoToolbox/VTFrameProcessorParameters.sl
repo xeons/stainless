@@ -34,9 +34,14 @@ import Standard.ObjC;
 /// macOS 15.4 and later.
 public objc interface VTFrameProcessorParameters : NSObjectProtocol
 {
-    [Selector("sourceFrame")] VTFrameProcessorFrame SourceFrame { get; }
-    [Optional] [Selector("destinationFrame")] VTFrameProcessorFrame? DestinationFrame { get; }
-    [Optional] [Selector("destinationFrames")] NSArray? DestinationFrames { get; }
+    [Selector("sourceFrame")]
+    VTFrameProcessorFrame SourceFrame { get; }
+    [Optional]
+    [Selector("destinationFrame")]
+    VTFrameProcessorFrame? DestinationFrame { get; }
+    [Optional]
+    [Selector("destinationFrames")]
+    NSArray? DestinationFrames { get; }
 }
 
 #endif

@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLBaseElement : DOMHTMLElement
 {
-    [Selector("href", "setHref:")] public NSString? Href { get; set; }
-    [Selector("target", "setTarget:")] public NSString? Target { get; set; }
+    [Selector("href", "setHref:")]
+    public NSString? Href { get; set; }
+    [Selector("target", "setTarget:")]
+    public NSString? Target { get; set; }
 }
 
 #endif

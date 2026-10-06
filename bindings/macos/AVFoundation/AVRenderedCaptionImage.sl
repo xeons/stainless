@@ -34,8 +34,10 @@ import Standard.ObjC;
 
 public extern objc class AVRenderedCaptionImage : NSObject
 {
-    [Selector("pixelBuffer")] public CVPixelBufferRef PixelBuffer { get; }
-    [Selector("position")] public CGPoint Position { get; }
+    [Selector("pixelBuffer")]
+    public CVPixelBufferRef PixelBuffer { get; }
+    [Selector("position")]
+    public CGPoint Position { get; }
 }
 
 #endif

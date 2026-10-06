@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class PKPushPayload : NSObject
 {
-    [Selector("type")] public PKPushType Type { get; }
-    [Selector("dictionaryPayload")] public NSDictionary DictionaryPayload { get; }
+    [Selector("type")]
+    public PKPushType Type { get; }
+    [Selector("dictionaryPayload")]
+    public NSDictionary DictionaryPayload { get; }
 }
 
 #endif

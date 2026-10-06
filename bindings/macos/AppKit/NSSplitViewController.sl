@@ -36,28 +36,44 @@ public extern "C" CGFloat NSSplitViewControllerAutomaticDimension;
 
 public extern objc class NSSplitViewController : NSViewController, NSSplitViewDelegate, NSUserInterfaceValidations
 {
-    [Selector("splitView", "setSplitView:")] public NSSplitView SplitView { get; set; }
-    [Selector("splitViewItems", "setSplitViewItems:")] public NSArray SplitViewItems { get; set; }
-    [Selector("minimumThicknessForInlineSidebars", "setMinimumThicknessForInlineSidebars:")] public CGFloat MinimumThicknessForInlineSidebars { get; set; }
-    [Selector("addSplitViewItem:")] public void AddSplitViewItem(NSSplitViewItem splitViewItem);
-    [Selector("insertSplitViewItem:atIndex:")] public void InsertSplitViewItemAtIndex(NSSplitViewItem splitViewItem, NSInteger index);
-    [Selector("removeSplitViewItem:")] public void RemoveSplitViewItem(NSSplitViewItem splitViewItem);
-    [Selector("splitViewItemForViewController:")] public NSSplitViewItem? SplitViewItemForViewController(NSViewController viewController);
-    [Selector("validateUserInterfaceItem:")] public bool ValidateUserInterfaceItem(NSValidatedUserInterfaceItem item);
-    [Selector("viewDidLoad")] public void ViewDidLoad();
-    [Selector("splitView:canCollapseSubview:")] public bool SplitViewCanCollapseSubview(NSSplitView splitView, NSView subview);
+    [Selector("splitView", "setSplitView:")]
+    public NSSplitView SplitView { get; set; }
+    [Selector("splitViewItems", "setSplitViewItems:")]
+    public NSArray SplitViewItems { get; set; }
+    [Selector("minimumThicknessForInlineSidebars", "setMinimumThicknessForInlineSidebars:")]
+    public CGFloat MinimumThicknessForInlineSidebars { get; set; }
+    [Selector("addSplitViewItem:")]
+    public void AddSplitViewItem(NSSplitViewItem splitViewItem);
+    [Selector("insertSplitViewItem:atIndex:")]
+    public void InsertSplitViewItemAtIndex(NSSplitViewItem splitViewItem, NSInteger index);
+    [Selector("removeSplitViewItem:")]
+    public void RemoveSplitViewItem(NSSplitViewItem splitViewItem);
+    [Selector("splitViewItemForViewController:")]
+    public NSSplitViewItem? SplitViewItemForViewController(NSViewController viewController);
+    [Selector("validateUserInterfaceItem:")]
+    public bool ValidateUserInterfaceItem(NSValidatedUserInterfaceItem item);
+    [Selector("viewDidLoad")]
+    public void ViewDidLoad();
+    [Selector("splitView:canCollapseSubview:")]
+    public bool SplitViewCanCollapseSubview(NSSplitView splitView, NSView subview);
     /// Deprecated in macOS 10.15.
-    [Selector("splitView:shouldCollapseSubview:forDoubleClickOnDividerAtIndex:")] public bool SplitViewShouldCollapseSubviewForDoubleClickOnDividerAtIndex(NSSplitView splitView, NSView subview, NSInteger dividerIndex);
-    [Selector("splitView:shouldHideDividerAtIndex:")] public bool SplitViewShouldHideDividerAtIndex(NSSplitView splitView, NSInteger dividerIndex);
-    [Selector("splitView:effectiveRect:forDrawnRect:ofDividerAtIndex:")] public NSRect SplitViewEffectiveRectForDrawnRectOfDividerAtIndex(NSSplitView splitView, NSRect proposedEffectiveRect, NSRect drawnRect, NSInteger dividerIndex);
-    [Selector("splitView:additionalEffectiveRectOfDividerAtIndex:")] public NSRect SplitViewAdditionalEffectiveRectOfDividerAtIndex(NSSplitView splitView, NSInteger dividerIndex);
+    [Selector("splitView:shouldCollapseSubview:forDoubleClickOnDividerAtIndex:")]
+    public bool SplitViewShouldCollapseSubviewForDoubleClickOnDividerAtIndex(NSSplitView splitView, NSView subview, NSInteger dividerIndex);
+    [Selector("splitView:shouldHideDividerAtIndex:")]
+    public bool SplitViewShouldHideDividerAtIndex(NSSplitView splitView, NSInteger dividerIndex);
+    [Selector("splitView:effectiveRect:forDrawnRect:ofDividerAtIndex:")]
+    public NSRect SplitViewEffectiveRectForDrawnRectOfDividerAtIndex(NSSplitView splitView, NSRect proposedEffectiveRect, NSRect drawnRect, NSInteger dividerIndex);
+    [Selector("splitView:additionalEffectiveRectOfDividerAtIndex:")]
+    public NSRect SplitViewAdditionalEffectiveRectOfDividerAtIndex(NSSplitView splitView, NSInteger dividerIndex);
 }
 
 /// NSSplitViewControllerToggleSidebarAction, a category of NSSplitViewController.
 public extern objc class NSSplitViewController
 {
-    [Selector("toggleSidebar:")] public void ToggleSidebar(AnyObject? sender);
-    [Selector("toggleInspector:")] public void ToggleInspector(AnyObject? sender);
+    [Selector("toggleSidebar:")]
+    public void ToggleSidebar(AnyObject? sender);
+    [Selector("toggleInspector:")]
+    public void ToggleInspector(AnyObject? sender);
 }
 
 #endif

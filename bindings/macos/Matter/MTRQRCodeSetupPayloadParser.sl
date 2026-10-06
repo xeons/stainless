@@ -34,8 +34,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 13.3.
 public extern objc class MTRQRCodeSetupPayloadParser : NSObject
 {
-    [Selector("initWithBase38Representation:")] public Self InitWithBase38Representation(NSString base38Representation);
-    [Selector("populatePayload:")] public MTRSetupPayload? PopulatePayload(out NSError? error);
+    [Selector("initWithBase38Representation:")]
+    public Self InitWithBase38Representation(NSString base38Representation);
+    [Selector("populatePayload:")]
+    public MTRSetupPayload? PopulatePayload(out NSError? error);
 }
 
 #endif

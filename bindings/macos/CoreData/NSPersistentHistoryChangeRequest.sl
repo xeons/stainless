@@ -32,16 +32,26 @@ import Standard.ObjC;
 
 public extern objc class NSPersistentHistoryChangeRequest : NSPersistentStoreRequest
 {
-    [Selector("resultType", "setResultType:")] public NSPersistentHistoryResultType ResultType { get; set; }
-    [Selector("token")] public NSPersistentHistoryToken? Token { get; }
-    [Selector("fetchRequest", "setFetchRequest:")] public NSFetchRequest? FetchRequest { get; set; }
-    [Selector("fetchHistoryAfterDate:")] public static Self FetchHistoryAfterDate(NSDate date);
-    [Selector("fetchHistoryAfterToken:")] public static Self FetchHistoryAfterToken(NSPersistentHistoryToken? token);
-    [Selector("fetchHistoryAfterTransaction:")] public static Self FetchHistoryAfterTransaction(NSPersistentHistoryTransaction? transaction);
-    [Selector("fetchHistoryWithFetchRequest:")] public static Self FetchHistoryWithFetchRequest(NSFetchRequest fetchRequest);
-    [Selector("deleteHistoryBeforeDate:")] public static Self DeleteHistoryBeforeDate(NSDate date);
-    [Selector("deleteHistoryBeforeToken:")] public static Self DeleteHistoryBeforeToken(NSPersistentHistoryToken? token);
-    [Selector("deleteHistoryBeforeTransaction:")] public static Self DeleteHistoryBeforeTransaction(NSPersistentHistoryTransaction? transaction);
+    [Selector("resultType", "setResultType:")]
+    public NSPersistentHistoryResultType ResultType { get; set; }
+    [Selector("token")]
+    public NSPersistentHistoryToken? Token { get; }
+    [Selector("fetchRequest", "setFetchRequest:")]
+    public NSFetchRequest? FetchRequest { get; set; }
+    [Selector("fetchHistoryAfterDate:")]
+    public static Self FetchHistoryAfterDate(NSDate date);
+    [Selector("fetchHistoryAfterToken:")]
+    public static Self FetchHistoryAfterToken(NSPersistentHistoryToken? token);
+    [Selector("fetchHistoryAfterTransaction:")]
+    public static Self FetchHistoryAfterTransaction(NSPersistentHistoryTransaction? transaction);
+    [Selector("fetchHistoryWithFetchRequest:")]
+    public static Self FetchHistoryWithFetchRequest(NSFetchRequest fetchRequest);
+    [Selector("deleteHistoryBeforeDate:")]
+    public static Self DeleteHistoryBeforeDate(NSDate date);
+    [Selector("deleteHistoryBeforeToken:")]
+    public static Self DeleteHistoryBeforeToken(NSPersistentHistoryToken? token);
+    [Selector("deleteHistoryBeforeTransaction:")]
+    public static Self DeleteHistoryBeforeTransaction(NSPersistentHistoryTransaction? transaction);
 }
 
 #endif

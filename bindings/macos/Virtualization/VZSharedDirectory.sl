@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class VZSharedDirectory : NSObject
 {
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("isReadOnly")] public bool ReadOnly { get; }
-    [Selector("initWithURL:readOnly:")] public Self InitWithURLReadOnly(NSURL url, bool readOnly);
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("isReadOnly")]
+    public bool ReadOnly { get; }
+    [Selector("initWithURL:readOnly:")]
+    public Self InitWithURLReadOnly(NSURL url, bool readOnly);
 }
 
 #endif

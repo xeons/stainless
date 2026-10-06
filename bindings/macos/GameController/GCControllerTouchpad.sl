@@ -38,14 +38,22 @@ public enum GCTouchState : long
 
 public extern objc class GCControllerTouchpad : GCControllerElement
 {
-    [Selector("button")] public GCControllerButtonInput Button { get; }
-    [Selector("touchDown", "setTouchDown:")] public GCControllerTouchpadHandler? TouchDown { get; set; }
-    [Selector("touchMoved", "setTouchMoved:")] public GCControllerTouchpadHandler? TouchMoved { get; set; }
-    [Selector("touchUp", "setTouchUp:")] public GCControllerTouchpadHandler? TouchUp { get; set; }
-    [Selector("touchSurface")] public GCControllerDirectionPad TouchSurface { get; }
-    [Selector("touchState")] public GCTouchState TouchState { get; }
-    [Selector("reportsAbsoluteTouchSurfaceValues", "setReportsAbsoluteTouchSurfaceValues:")] public bool ReportsAbsoluteTouchSurfaceValues { get; set; }
-    [Selector("setValueForXAxis:yAxis:touchDown:buttonValue:")] public void SetValueForXAxisYAxisTouchDownButtonValue(float xAxis, float yAxis, bool touchDown, float buttonValue);
+    [Selector("button")]
+    public GCControllerButtonInput Button { get; }
+    [Selector("touchDown", "setTouchDown:")]
+    public GCControllerTouchpadHandler? TouchDown { get; set; }
+    [Selector("touchMoved", "setTouchMoved:")]
+    public GCControllerTouchpadHandler? TouchMoved { get; set; }
+    [Selector("touchUp", "setTouchUp:")]
+    public GCControllerTouchpadHandler? TouchUp { get; set; }
+    [Selector("touchSurface")]
+    public GCControllerDirectionPad TouchSurface { get; }
+    [Selector("touchState")]
+    public GCTouchState TouchState { get; }
+    [Selector("reportsAbsoluteTouchSurfaceValues", "setReportsAbsoluteTouchSurfaceValues:")]
+    public bool ReportsAbsoluteTouchSurfaceValues { get; set; }
+    [Selector("setValueForXAxis:yAxis:touchDown:buttonValue:")]
+    public void SetValueForXAxisYAxisTouchDownButtonValue(float xAxis, float yAxis, bool touchDown, float buttonValue);
 }
 
 public objc closure void GCControllerTouchpadHandler(GCControllerTouchpad arg0, float arg1, float arg2, float arg3, bool arg4);

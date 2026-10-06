@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class NSFetchedPropertyDescription : NSPropertyDescription
 {
-    [Selector("fetchRequest", "setFetchRequest:")] public NSFetchRequest? FetchRequest { get; set; }
+    [Selector("fetchRequest", "setFetchRequest:")]
+    public NSFetchRequest? FetchRequest { get; set; }
 }
 
 #endif

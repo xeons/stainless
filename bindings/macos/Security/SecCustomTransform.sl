@@ -116,7 +116,8 @@ public extern "C" CFStringRef? kSecTransformActionAttributeValidation;
 public extern "C" Boolean SecTransformRegister(CFStringRef uniqueName, SecTransformCreateFP createTransformFunction, __CFError** error);
 
 /// Deprecated in macOS 13.0.
-[ReturnsRetained] public extern "C" SecTransformRef? SecTransformCreate(CFStringRef name, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecTransformRef? SecTransformCreate(CFStringRef name, __CFError** error);
 
 /// Deprecated in macOS 13.0.
 public extern "C" CFTypeRef SecTransformNoData();

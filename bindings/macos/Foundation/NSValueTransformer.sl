@@ -48,18 +48,26 @@ public extern "C" NSValueTransformerName NSSecureUnarchiveFromDataTransformerNam
 
 public extern objc class NSValueTransformer : NSObject
 {
-    [Selector("setValueTransformer:forName:")] public static void SetValueTransformerForName(NSValueTransformer? transformer, NSValueTransformerName name);
-    [Selector("valueTransformerForName:")] public static NSValueTransformer? ValueTransformerForName(NSValueTransformerName name);
-    [Selector("valueTransformerNames")] public static NSArray ValueTransformerNames();
-    [Selector("transformedValueClass")] public static Class TransformedValueClass();
-    [Selector("allowsReverseTransformation")] public static bool AllowsReverseTransformation();
-    [Selector("transformedValue:")] public AnyObject? TransformedValue(AnyObject? value);
-    [Selector("reverseTransformedValue:")] public AnyObject? ReverseTransformedValue(AnyObject? value);
+    [Selector("setValueTransformer:forName:")]
+    public static void SetValueTransformerForName(NSValueTransformer? transformer, NSValueTransformerName name);
+    [Selector("valueTransformerForName:")]
+    public static NSValueTransformer? ValueTransformerForName(NSValueTransformerName name);
+    [Selector("valueTransformerNames")]
+    public static NSArray ValueTransformerNames();
+    [Selector("transformedValueClass")]
+    public static Class TransformedValueClass();
+    [Selector("allowsReverseTransformation")]
+    public static bool AllowsReverseTransformation();
+    [Selector("transformedValue:")]
+    public AnyObject? TransformedValue(AnyObject? value);
+    [Selector("reverseTransformedValue:")]
+    public AnyObject? ReverseTransformedValue(AnyObject? value);
 }
 
 public extern objc class NSSecureUnarchiveFromDataTransformer : NSValueTransformer
 {
-    [Selector("allowedTopLevelClasses")] public static NSArray AllowedTopLevelClasses { get; }
+    [Selector("allowedTopLevelClasses")]
+    public static NSArray AllowedTopLevelClasses { get; }
 }
 
 #endif

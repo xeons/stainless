@@ -35,23 +35,30 @@ import Standard.ObjC;
 /// Deprecated in macOS 11.0.
 public objc interface JRSRemoteLayer
 {
-    [Selector("layerID")] uint LayerID { get; }
+    [Selector("layerID")]
+    uint LayerID { get; }
 }
 
 /// Deprecated in macOS 11.0.
 /// JavaRuntimeSupport, a category of CALayer.
 public extern objc class CALayer
 {
-    [ReturnsRetained] [Selector("createRemoteLayerBoundTo:")] public NSObject? CreateRemoteLayerBoundTo(mach_port_t serverPort);
-    [Selector("hostRemoteLayer:")] public void HostRemoteLayer(uint layerID);
+    [ReturnsRetained]
+    [Selector("createRemoteLayerBoundTo:")]
+    public NSObject? CreateRemoteLayerBoundTo(mach_port_t serverPort);
+    [Selector("hostRemoteLayer:")]
+    public void HostRemoteLayer(uint layerID);
 }
 
 /// Deprecated in macOS 11.0.
 public extern objc class JRSRenderServer : NSObject
 {
-    [Selector("startRenderServer")] public static mach_port_t StartRenderServer();
-    [Selector("sendRenderServer:")] public static NSString? SendRenderServer(mach_port_t serverPort);
-    [Selector("recieveRenderServer:")] public static mach_port_t RecieveRenderServer(NSString? serverName);
+    [Selector("startRenderServer")]
+    public static mach_port_t StartRenderServer();
+    [Selector("sendRenderServer:")]
+    public static NSString? SendRenderServer(mach_port_t serverPort);
+    [Selector("recieveRenderServer:")]
+    public static mach_port_t RecieveRenderServer(NSString? serverName);
 }
 
 #endif

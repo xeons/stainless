@@ -43,8 +43,10 @@ public enum INHangUpCallIntentResponseCode : long
 
 public extern objc class INHangUpCallIntentResponse : INIntentResponse
 {
-    [Selector("code")] public INHangUpCallIntentResponseCode Code { get; }
-    [Selector("initWithCode:userActivity:")] public Self InitWithCodeUserActivity(INHangUpCallIntentResponseCode code, NSUserActivity? userActivity);
+    [Selector("code")]
+    public INHangUpCallIntentResponseCode Code { get; }
+    [Selector("initWithCode:userActivity:")]
+    public Self InitWithCodeUserActivity(INHangUpCallIntentResponseCode code, NSUserActivity? userActivity);
 }
 
 #endif

@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MLComputePlanDeviceUsage : NSObject
 {
-    [Selector("supportedComputeDevices")] public NSArray? SupportedComputeDevices { get; }
-    [Selector("preferredComputeDevice")] public MLComputeDeviceProtocol? PreferredComputeDevice { get; }
+    [Selector("supportedComputeDevices")]
+    public NSArray? SupportedComputeDevices { get; }
+    [Selector("preferredComputeDevice")]
+    public MLComputeDeviceProtocol? PreferredComputeDevice { get; }
 }
 
 #endif

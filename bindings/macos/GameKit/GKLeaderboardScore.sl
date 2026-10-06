@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class GKLeaderboardScore : NSObject
 {
-    [Selector("player", "setPlayer:")] public GKPlayer Player { get; set; }
-    [Selector("value", "setValue:")] public NSInteger Value { get; set; }
-    [Selector("context", "setContext:")] public NSUInteger Context { get; set; }
-    [Selector("leaderboardID", "setLeaderboardID:")] public NSString LeaderboardID { get; set; }
+    [Selector("player", "setPlayer:")]
+    public GKPlayer Player { get; set; }
+    [Selector("value", "setValue:")]
+    public NSInteger Value { get; set; }
+    [Selector("context", "setContext:")]
+    public NSUInteger Context { get; set; }
+    [Selector("leaderboardID", "setLeaderboardID:")]
+    public NSString LeaderboardID { get; set; }
 }
 
 #endif

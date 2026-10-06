@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INDateComponentsResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedDateComponents:")] public static Self SuccessWithResolvedDateComponents(NSDateComponents resolvedDateComponents);
-    [Selector("disambiguationWithDateComponentsToDisambiguate:")] public static Self DisambiguationWithDateComponentsToDisambiguate(NSArray dateComponentsToDisambiguate);
-    [Selector("confirmationRequiredWithDateComponentsToConfirm:")] public static Self ConfirmationRequiredWithDateComponentsToConfirm(NSDateComponents? dateComponentsToConfirm);
+    [Selector("successWithResolvedDateComponents:")]
+    public static Self SuccessWithResolvedDateComponents(NSDateComponents resolvedDateComponents);
+    [Selector("disambiguationWithDateComponentsToDisambiguate:")]
+    public static Self DisambiguationWithDateComponentsToDisambiguate(NSArray dateComponentsToDisambiguate);
+    [Selector("confirmationRequiredWithDateComponentsToConfirm:")]
+    public static Self ConfirmationRequiredWithDateComponentsToConfirm(NSDateComponents? dateComponentsToConfirm);
 }
 
 #endif

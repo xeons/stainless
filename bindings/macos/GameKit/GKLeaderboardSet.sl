@@ -38,11 +38,16 @@ public objc closure void GKLeaderboardSetLoadLeaderboardsWithHandlerHandlerBlock
 
 public extern objc class GKLeaderboardSet : NSObject, NSCoding, NSSecureCoding
 {
-    [Selector("title")] public NSString Title { get; }
-    [Selector("groupIdentifier")] public NSString? GroupIdentifier { get; }
-    [Selector("identifier", "setIdentifier:")] public NSString? Identifier { get; set; }
-    [Selector("loadLeaderboardSetsWithCompletionHandler:")] public static void LoadLeaderboardSetsWithCompletionHandler(GKLeaderboardSetLoadLeaderboardSetsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("loadLeaderboardsWithHandler:")] public void LoadLeaderboardsWithHandler(GKLeaderboardSetLoadLeaderboardsWithHandlerHandlerBlock handler);
+    [Selector("title")]
+    public NSString Title { get; }
+    [Selector("groupIdentifier")]
+    public NSString? GroupIdentifier { get; }
+    [Selector("identifier", "setIdentifier:")]
+    public NSString? Identifier { get; set; }
+    [Selector("loadLeaderboardSetsWithCompletionHandler:")]
+    public static void LoadLeaderboardSetsWithCompletionHandler(GKLeaderboardSetLoadLeaderboardSetsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadLeaderboardsWithHandler:")]
+    public void LoadLeaderboardsWithHandler(GKLeaderboardSetLoadLeaderboardsWithHandlerHandlerBlock handler);
 }
 
 public objc closure void GKLeaderboardSetLoadLeaderboardsWithCompletionHandlerCompletionHandlerBlock(NSArray? arg0, NSError? arg1);
@@ -51,7 +56,8 @@ public objc closure void GKLeaderboardSetLoadLeaderboardsWithCompletionHandlerCo
 public extern objc class GKLeaderboardSet
 {
     /// Deprecated in macOS 11.0.
-    [Selector("loadLeaderboardsWithCompletionHandler:")] public void LoadLeaderboardsWithCompletionHandler(GKLeaderboardSetLoadLeaderboardsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadLeaderboardsWithCompletionHandler:")]
+    public void LoadLeaderboardsWithCompletionHandler(GKLeaderboardSetLoadLeaderboardsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public objc closure void GKLeaderboardSetLoadImageWithCompletionHandlerCompletionHandlerBlock(NSImage? arg0, NSError? arg1);
@@ -59,7 +65,8 @@ public objc closure void GKLeaderboardSetLoadImageWithCompletionHandlerCompletio
 /// UI, a category of GKLeaderboardSet.
 public extern objc class GKLeaderboardSet
 {
-    [Selector("loadImageWithCompletionHandler:")] public void LoadImageWithCompletionHandler(GKLeaderboardSetLoadImageWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadImageWithCompletionHandler:")]
+    public void LoadImageWithCompletionHandler(GKLeaderboardSetLoadImageWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 #endif

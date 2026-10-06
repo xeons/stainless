@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class VZStorageDeviceConfiguration : NSObject, NSCopying
 {
-    [Selector("attachment")] public VZStorageDeviceAttachment Attachment { get; }
+    [Selector("attachment")]
+    public VZStorageDeviceAttachment Attachment { get; }
 }
 
 #endif

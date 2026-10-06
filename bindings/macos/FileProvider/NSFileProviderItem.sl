@@ -42,10 +42,14 @@ public extern "C" NSFileProviderItemIdentifier? NSFileProviderTrashContainerItem
 
 public extern objc class NSFileProviderItemVersion : NSObject
 {
-    [Selector("beforeFirstSyncComponent")] public static NSData BeforeFirstSyncComponent { get; }
-    [Selector("contentVersion")] public NSData ContentVersion { get; }
-    [Selector("metadataVersion")] public NSData MetadataVersion { get; }
-    [Selector("initWithContentVersion:metadataVersion:")] public Self InitWithContentVersionMetadataVersion(NSData contentVersion, NSData metadataVersion);
+    [Selector("beforeFirstSyncComponent")]
+    public static NSData BeforeFirstSyncComponent { get; }
+    [Selector("contentVersion")]
+    public NSData ContentVersion { get; }
+    [Selector("metadataVersion")]
+    public NSData MetadataVersion { get; }
+    [Selector("initWithContentVersion:metadataVersion:")]
+    public Self InitWithContentVersionMetadataVersion(NSData contentVersion, NSData metadataVersion);
 }
 
 public extern "C" ulong NSFileProviderFavoriteRankUnranked;
@@ -108,35 +112,90 @@ public enum NSFileProviderContentPolicy : long
 
 public objc interface NSFileProviderItem : NSObjectProtocol
 {
-    [Selector("itemIdentifier")] NSFileProviderItemIdentifier ItemIdentifier { get; }
-    [Selector("parentItemIdentifier")] NSFileProviderItemIdentifier ParentItemIdentifier { get; }
-    [Selector("filename")] NSString Filename { get; }
-    [Optional] [Selector("contentType")] UTType ContentType { get; }
-    [Optional] [Selector("typeAndCreator")] NSFileProviderTypeAndCreator TypeAndCreator { get; }
-    [Optional] [Selector("capabilities")] NSFileProviderItemCapabilities Capabilities { get; }
-    [Optional] [Selector("fileSystemFlags")] NSFileProviderFileSystemFlags FileSystemFlags { get; }
-    [Optional] [Selector("documentSize")] NSNumber? DocumentSize { get; }
-    [Optional] [Selector("childItemCount")] NSNumber? ChildItemCount { get; }
-    [Optional] [Selector("creationDate")] NSDate? CreationDate { get; }
-    [Optional] [Selector("contentModificationDate")] NSDate? ContentModificationDate { get; }
-    [Optional] [Selector("extendedAttributes")] NSDictionary ExtendedAttributes { get; }
-    [Optional] [Selector("lastUsedDate")] NSDate? LastUsedDate { get; }
-    [Optional] [Selector("tagData")] NSData? TagData { get; }
-    [Optional] [Selector("isUploaded")] bool Uploaded { get; }
-    [Optional] [Selector("isUploading")] bool Uploading { get; }
-    [Optional] [Selector("uploadingError")] NSError? UploadingError { get; }
-    [Optional] [Selector("isDownloaded")] bool Downloaded { get; }
-    [Optional] [Selector("isDownloading")] bool Downloading { get; }
-    [Optional] [Selector("downloadingError")] NSError? DownloadingError { get; }
-    [Optional] [Selector("isMostRecentVersionDownloaded")] bool MostRecentVersionDownloaded { get; }
-    [Optional] [Selector("isShared")] bool Shared { get; }
-    [Optional] [Selector("isSharedByCurrentUser")] bool SharedByCurrentUser { get; }
-    [Optional] [Selector("ownerNameComponents")] NSPersonNameComponents? OwnerNameComponents { get; }
-    [Optional] [Selector("mostRecentEditorNameComponents")] NSPersonNameComponents? MostRecentEditorNameComponents { get; }
-    [Optional] [Selector("itemVersion")] NSFileProviderItemVersion ItemVersion { get; }
-    [Optional] [Selector("symlinkTargetPath")] NSString? SymlinkTargetPath { get; }
-    [Optional] [Selector("userInfo")] NSDictionary? UserInfo { get; }
-    [Optional] [Selector("contentPolicy")] NSFileProviderContentPolicy ContentPolicy { get; }
+    [Selector("itemIdentifier")]
+    NSFileProviderItemIdentifier ItemIdentifier { get; }
+    [Selector("parentItemIdentifier")]
+    NSFileProviderItemIdentifier ParentItemIdentifier { get; }
+    [Selector("filename")]
+    NSString Filename { get; }
+    [Optional]
+    [Selector("contentType")]
+    UTType ContentType { get; }
+    [Optional]
+    [Selector("typeAndCreator")]
+    NSFileProviderTypeAndCreator TypeAndCreator { get; }
+    [Optional]
+    [Selector("capabilities")]
+    NSFileProviderItemCapabilities Capabilities { get; }
+    [Optional]
+    [Selector("fileSystemFlags")]
+    NSFileProviderFileSystemFlags FileSystemFlags { get; }
+    [Optional]
+    [Selector("documentSize")]
+    NSNumber? DocumentSize { get; }
+    [Optional]
+    [Selector("childItemCount")]
+    NSNumber? ChildItemCount { get; }
+    [Optional]
+    [Selector("creationDate")]
+    NSDate? CreationDate { get; }
+    [Optional]
+    [Selector("contentModificationDate")]
+    NSDate? ContentModificationDate { get; }
+    [Optional]
+    [Selector("extendedAttributes")]
+    NSDictionary ExtendedAttributes { get; }
+    [Optional]
+    [Selector("lastUsedDate")]
+    NSDate? LastUsedDate { get; }
+    [Optional]
+    [Selector("tagData")]
+    NSData? TagData { get; }
+    [Optional]
+    [Selector("isUploaded")]
+    bool Uploaded { get; }
+    [Optional]
+    [Selector("isUploading")]
+    bool Uploading { get; }
+    [Optional]
+    [Selector("uploadingError")]
+    NSError? UploadingError { get; }
+    [Optional]
+    [Selector("isDownloaded")]
+    bool Downloaded { get; }
+    [Optional]
+    [Selector("isDownloading")]
+    bool Downloading { get; }
+    [Optional]
+    [Selector("downloadingError")]
+    NSError? DownloadingError { get; }
+    [Optional]
+    [Selector("isMostRecentVersionDownloaded")]
+    bool MostRecentVersionDownloaded { get; }
+    [Optional]
+    [Selector("isShared")]
+    bool Shared { get; }
+    [Optional]
+    [Selector("isSharedByCurrentUser")]
+    bool SharedByCurrentUser { get; }
+    [Optional]
+    [Selector("ownerNameComponents")]
+    NSPersonNameComponents? OwnerNameComponents { get; }
+    [Optional]
+    [Selector("mostRecentEditorNameComponents")]
+    NSPersonNameComponents? MostRecentEditorNameComponents { get; }
+    [Optional]
+    [Selector("itemVersion")]
+    NSFileProviderItemVersion ItemVersion { get; }
+    [Optional]
+    [Selector("symlinkTargetPath")]
+    NSString? SymlinkTargetPath { get; }
+    [Optional]
+    [Selector("userInfo")]
+    NSDictionary? UserInfo { get; }
+    [Optional]
+    [Selector("contentPolicy")]
+    NSFileProviderContentPolicy ContentPolicy { get; }
 }
 
 #endif

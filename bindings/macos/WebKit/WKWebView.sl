@@ -77,91 +77,165 @@ public objc closure void WKWebViewRestoreDataCompletionHandlerCompletionHandlerB
 
 public extern objc class WKWebView : NSView
 {
-    [Selector("configuration")] public WKWebViewConfiguration Configuration { get; }
-    [Selector("navigationDelegate", "setNavigationDelegate:")] public WKNavigationDelegate? NavigationDelegate { get; set; }
-    [Selector("UIDelegate", "setUIDelegate:")] public WKUIDelegate? UIDelegate { get; set; }
-    [Selector("backForwardList")] public WKBackForwardList BackForwardList { get; }
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("URL")] public NSURL? URL { get; }
-    [Selector("isLoading")] public bool Loading { get; }
-    [Selector("estimatedProgress")] public double EstimatedProgress { get; }
-    [Selector("hasOnlySecureContent")] public bool HasOnlySecureContent { get; }
-    [Selector("serverTrust")] public SecTrustRef? ServerTrust { get; }
-    [Selector("canGoBack")] public bool CanGoBack { get; }
-    [Selector("canGoForward")] public bool CanGoForward { get; }
-    [Selector("cameraCaptureState")] public WKMediaCaptureState CameraCaptureState { get; }
-    [Selector("microphoneCaptureState")] public WKMediaCaptureState MicrophoneCaptureState { get; }
-    [Selector("allowsBackForwardNavigationGestures", "setAllowsBackForwardNavigationGestures:")] public bool AllowsBackForwardNavigationGestures { get; set; }
-    [Selector("customUserAgent", "setCustomUserAgent:")] public NSString? CustomUserAgent { get; set; }
-    [Selector("allowsLinkPreview", "setAllowsLinkPreview:")] public bool AllowsLinkPreview { get; set; }
-    [Selector("allowsMagnification", "setAllowsMagnification:")] public bool AllowsMagnification { get; set; }
-    [Selector("magnification", "setMagnification:")] public CGFloat Magnification { get; set; }
-    [Selector("pageZoom", "setPageZoom:")] public CGFloat PageZoom { get; set; }
-    [Selector("mediaType", "setMediaType:")] public NSString? MediaType { get; set; }
-    [Selector("interactionState", "setInteractionState:")] public AnyObject? InteractionState { get; set; }
+    [Selector("configuration")]
+    public WKWebViewConfiguration Configuration { get; }
+    [Selector("navigationDelegate", "setNavigationDelegate:")]
+    public WKNavigationDelegate? NavigationDelegate { get; set; }
+    [Selector("UIDelegate", "setUIDelegate:")]
+    public WKUIDelegate? UIDelegate { get; set; }
+    [Selector("backForwardList")]
+    public WKBackForwardList BackForwardList { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
+    [Selector("isLoading")]
+    public bool Loading { get; }
+    [Selector("estimatedProgress")]
+    public double EstimatedProgress { get; }
+    [Selector("hasOnlySecureContent")]
+    public bool HasOnlySecureContent { get; }
+    [Selector("serverTrust")]
+    public SecTrustRef? ServerTrust { get; }
+    [Selector("canGoBack")]
+    public bool CanGoBack { get; }
+    [Selector("canGoForward")]
+    public bool CanGoForward { get; }
+    [Selector("cameraCaptureState")]
+    public WKMediaCaptureState CameraCaptureState { get; }
+    [Selector("microphoneCaptureState")]
+    public WKMediaCaptureState MicrophoneCaptureState { get; }
+    [Selector("allowsBackForwardNavigationGestures", "setAllowsBackForwardNavigationGestures:")]
+    public bool AllowsBackForwardNavigationGestures { get; set; }
+    [Selector("customUserAgent", "setCustomUserAgent:")]
+    public NSString? CustomUserAgent { get; set; }
+    [Selector("allowsLinkPreview", "setAllowsLinkPreview:")]
+    public bool AllowsLinkPreview { get; set; }
+    [Selector("allowsMagnification", "setAllowsMagnification:")]
+    public bool AllowsMagnification { get; set; }
+    [Selector("magnification", "setMagnification:")]
+    public CGFloat Magnification { get; set; }
+    [Selector("pageZoom", "setPageZoom:")]
+    public CGFloat PageZoom { get; set; }
+    [Selector("mediaType", "setMediaType:")]
+    public NSString? MediaType { get; set; }
+    [Selector("interactionState", "setInteractionState:")]
+    public AnyObject? InteractionState { get; set; }
     /// macOS 26.0 and later.
-    [Selector("isBlockedByScreenTime")] public bool IsBlockedByScreenTime { get; }
-    [Selector("themeColor")] public NSColor? ThemeColor { get; }
-    [Selector("underPageBackgroundColor", "setUnderPageBackgroundColor:")] public NSColor? UnderPageBackgroundColor { get; set; }
-    [Selector("fullscreenState")] public WKFullscreenState FullscreenState { get; }
-    [Selector("minimumViewportInset")] public NSEdgeInsets MinimumViewportInset { get; }
-    [Selector("maximumViewportInset")] public NSEdgeInsets MaximumViewportInset { get; }
-    [Selector("isInspectable", "setInspectable:")] public bool Inspectable { get; set; }
-    [Selector("isWritingToolsActive")] public bool WritingToolsActive { get; }
+    [Selector("isBlockedByScreenTime")]
+    public bool IsBlockedByScreenTime { get; }
+    [Selector("themeColor")]
+    public NSColor? ThemeColor { get; }
+    [Selector("underPageBackgroundColor", "setUnderPageBackgroundColor:")]
+    public NSColor? UnderPageBackgroundColor { get; set; }
+    [Selector("fullscreenState")]
+    public WKFullscreenState FullscreenState { get; }
+    [Selector("minimumViewportInset")]
+    public NSEdgeInsets MinimumViewportInset { get; }
+    [Selector("maximumViewportInset")]
+    public NSEdgeInsets MaximumViewportInset { get; }
+    [Selector("isInspectable", "setInspectable:")]
+    public bool Inspectable { get; set; }
+    [Selector("isWritingToolsActive")]
+    public bool WritingToolsActive { get; }
     /// macOS 26.0 and later.
-    [Selector("obscuredContentInsets", "setObscuredContentInsets:")] public NSEdgeInsets ObscuredContentInsets { get; set; }
-    [Selector("initWithFrame:configuration:")] public Self InitWithFrameConfiguration(CGRect frame, WKWebViewConfiguration configuration);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("loadRequest:")] public WKNavigation? LoadRequest(NSURLRequest request);
-    [Selector("loadFileURL:allowingReadAccessToURL:")] public WKNavigation? LoadFileURLAllowingReadAccessToURL(NSURL URL, NSURL readAccessURL);
-    [Selector("loadHTMLString:baseURL:")] public WKNavigation? LoadHTMLStringBaseURL(NSString string, NSURL? baseURL);
-    [Selector("loadData:MIMEType:characterEncodingName:baseURL:")] public WKNavigation? LoadDataMIMETypeCharacterEncodingNameBaseURL(NSData data, NSString MIMEType, NSString characterEncodingName, NSURL baseURL);
-    [Selector("goToBackForwardListItem:")] public WKNavigation? GoToBackForwardListItem(WKBackForwardListItem item);
-    [Selector("goBack")] public WKNavigation? GoBack();
-    [Selector("goForward")] public WKNavigation? GoForward();
-    [Selector("reload")] public WKNavigation? Reload();
-    [Selector("reloadFromOrigin")] public WKNavigation? ReloadFromOrigin();
-    [Selector("stopLoading")] public void StopLoading();
-    [Selector("evaluateJavaScript:completionHandler:")] public void EvaluateJavaScriptCompletionHandler(NSString javaScriptString, WKWebViewEvaluateJavaScriptCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("evaluateJavaScript:inFrame:inContentWorld:completionHandler:")] public void EvaluateJavaScriptInFrameInContentWorldCompletionHandler(NSString javaScriptString, WKFrameInfo? frame, WKContentWorld contentWorld, WKWebViewEvaluateJavaScriptInFrameInContentWorldCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("callAsyncJavaScript:arguments:inFrame:inContentWorld:completionHandler:")] public void CallAsyncJavaScriptArgumentsInFrameInContentWorldCompletionHandler(NSString functionBody, NSDictionary? arguments, WKFrameInfo? frame, WKContentWorld contentWorld, WKWebViewCallAsyncJavaScriptArgumentsInFrameInContentWorldCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("closeAllMediaPresentationsWithCompletionHandler:")] public void CloseAllMediaPresentationsWithCompletionHandler(WKWebViewCloseAllMediaPresentationsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("obscuredContentInsets", "setObscuredContentInsets:")]
+    public NSEdgeInsets ObscuredContentInsets { get; set; }
+    [Selector("initWithFrame:configuration:")]
+    public Self InitWithFrameConfiguration(CGRect frame, WKWebViewConfiguration configuration);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("loadRequest:")]
+    public WKNavigation? LoadRequest(NSURLRequest request);
+    [Selector("loadFileURL:allowingReadAccessToURL:")]
+    public WKNavigation? LoadFileURLAllowingReadAccessToURL(NSURL URL, NSURL readAccessURL);
+    [Selector("loadHTMLString:baseURL:")]
+    public WKNavigation? LoadHTMLStringBaseURL(NSString string, NSURL? baseURL);
+    [Selector("loadData:MIMEType:characterEncodingName:baseURL:")]
+    public WKNavigation? LoadDataMIMETypeCharacterEncodingNameBaseURL(NSData data, NSString MIMEType, NSString characterEncodingName, NSURL baseURL);
+    [Selector("goToBackForwardListItem:")]
+    public WKNavigation? GoToBackForwardListItem(WKBackForwardListItem item);
+    [Selector("goBack")]
+    public WKNavigation? GoBack();
+    [Selector("goForward")]
+    public WKNavigation? GoForward();
+    [Selector("reload")]
+    public WKNavigation? Reload();
+    [Selector("reloadFromOrigin")]
+    public WKNavigation? ReloadFromOrigin();
+    [Selector("stopLoading")]
+    public void StopLoading();
+    [Selector("evaluateJavaScript:completionHandler:")]
+    public void EvaluateJavaScriptCompletionHandler(NSString javaScriptString, WKWebViewEvaluateJavaScriptCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("evaluateJavaScript:inFrame:inContentWorld:completionHandler:")]
+    public void EvaluateJavaScriptInFrameInContentWorldCompletionHandler(NSString javaScriptString, WKFrameInfo? frame, WKContentWorld contentWorld, WKWebViewEvaluateJavaScriptInFrameInContentWorldCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("callAsyncJavaScript:arguments:inFrame:inContentWorld:completionHandler:")]
+    public void CallAsyncJavaScriptArgumentsInFrameInContentWorldCompletionHandler(NSString functionBody, NSDictionary? arguments, WKFrameInfo? frame, WKContentWorld contentWorld, WKWebViewCallAsyncJavaScriptArgumentsInFrameInContentWorldCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("closeAllMediaPresentationsWithCompletionHandler:")]
+    public void CloseAllMediaPresentationsWithCompletionHandler(WKWebViewCloseAllMediaPresentationsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 12.0.
-    [Selector("closeAllMediaPresentations")] public void CloseAllMediaPresentations();
-    [Selector("pauseAllMediaPlaybackWithCompletionHandler:")] public void PauseAllMediaPlaybackWithCompletionHandler(WKWebViewPauseAllMediaPlaybackWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("closeAllMediaPresentations")]
+    public void CloseAllMediaPresentations();
+    [Selector("pauseAllMediaPlaybackWithCompletionHandler:")]
+    public void PauseAllMediaPlaybackWithCompletionHandler(WKWebViewPauseAllMediaPlaybackWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 12.0.
-    [Selector("pauseAllMediaPlayback:")] public void PauseAllMediaPlayback(WKWebViewPauseAllMediaPlaybackCompletionHandlerBlock? completionHandler);
-    [Selector("setAllMediaPlaybackSuspended:completionHandler:")] public void SetAllMediaPlaybackSuspendedCompletionHandler(bool suspended, WKWebViewSetAllMediaPlaybackSuspendedCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("pauseAllMediaPlayback:")]
+    public void PauseAllMediaPlayback(WKWebViewPauseAllMediaPlaybackCompletionHandlerBlock? completionHandler);
+    [Selector("setAllMediaPlaybackSuspended:completionHandler:")]
+    public void SetAllMediaPlaybackSuspendedCompletionHandler(bool suspended, WKWebViewSetAllMediaPlaybackSuspendedCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 12.0.
-    [Selector("resumeAllMediaPlayback:")] public void ResumeAllMediaPlayback(WKWebViewResumeAllMediaPlaybackCompletionHandlerBlock? completionHandler);
+    [Selector("resumeAllMediaPlayback:")]
+    public void ResumeAllMediaPlayback(WKWebViewResumeAllMediaPlaybackCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 12.0.
-    [Selector("suspendAllMediaPlayback:")] public void SuspendAllMediaPlayback(WKWebViewSuspendAllMediaPlaybackCompletionHandlerBlock? completionHandler);
-    [Selector("requestMediaPlaybackStateWithCompletionHandler:")] public void RequestMediaPlaybackStateWithCompletionHandler(WKWebViewRequestMediaPlaybackStateWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("suspendAllMediaPlayback:")]
+    public void SuspendAllMediaPlayback(WKWebViewSuspendAllMediaPlaybackCompletionHandlerBlock? completionHandler);
+    [Selector("requestMediaPlaybackStateWithCompletionHandler:")]
+    public void RequestMediaPlaybackStateWithCompletionHandler(WKWebViewRequestMediaPlaybackStateWithCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 12.0.
-    [Selector("requestMediaPlaybackState:")] public void RequestMediaPlaybackState(WKWebViewRequestMediaPlaybackStateCompletionHandlerBlock completionHandler);
-    [Selector("setCameraCaptureState:completionHandler:")] public void SetCameraCaptureStateCompletionHandler(WKMediaCaptureState state, WKWebViewSetCameraCaptureStateCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("setMicrophoneCaptureState:completionHandler:")] public void SetMicrophoneCaptureStateCompletionHandler(WKMediaCaptureState state, WKWebViewSetMicrophoneCaptureStateCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("takeSnapshotWithConfiguration:completionHandler:")] public void TakeSnapshotWithConfigurationCompletionHandler(WKSnapshotConfiguration? snapshotConfiguration, WKWebViewTakeSnapshotWithConfigurationCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("createPDFWithConfiguration:completionHandler:")] public void CreatePDFWithConfigurationCompletionHandler(WKPDFConfiguration? pdfConfiguration, WKWebViewCreatePDFWithConfigurationCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("createWebArchiveDataWithCompletionHandler:")] public void CreateWebArchiveDataWithCompletionHandler(WKWebViewCreateWebArchiveDataWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("setMagnification:centeredAtPoint:")] public void SetMagnificationCenteredAtPoint(CGFloat magnification, CGPoint point);
-    [Selector("findString:withConfiguration:completionHandler:")] public void FindStringWithConfigurationCompletionHandler(NSString string, WKFindConfiguration? configuration, WKWebViewFindStringWithConfigurationCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("handlesURLScheme:")] public static bool HandlesURLScheme(NSString urlScheme);
-    [Selector("startDownloadUsingRequest:completionHandler:")] public void StartDownloadUsingRequestCompletionHandler(NSURLRequest request, WKWebViewStartDownloadUsingRequestCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("resumeDownloadFromResumeData:completionHandler:")] public void ResumeDownloadFromResumeDataCompletionHandler(NSData resumeData, WKWebViewResumeDownloadFromResumeDataCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadSimulatedRequest:response:responseData:")] public WKNavigation LoadSimulatedRequestResponseResponseData(NSURLRequest request, NSURLResponse response, NSData data);
+    [Selector("requestMediaPlaybackState:")]
+    public void RequestMediaPlaybackState(WKWebViewRequestMediaPlaybackStateCompletionHandlerBlock completionHandler);
+    [Selector("setCameraCaptureState:completionHandler:")]
+    public void SetCameraCaptureStateCompletionHandler(WKMediaCaptureState state, WKWebViewSetCameraCaptureStateCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("setMicrophoneCaptureState:completionHandler:")]
+    public void SetMicrophoneCaptureStateCompletionHandler(WKMediaCaptureState state, WKWebViewSetMicrophoneCaptureStateCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("takeSnapshotWithConfiguration:completionHandler:")]
+    public void TakeSnapshotWithConfigurationCompletionHandler(WKSnapshotConfiguration? snapshotConfiguration, WKWebViewTakeSnapshotWithConfigurationCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("createPDFWithConfiguration:completionHandler:")]
+    public void CreatePDFWithConfigurationCompletionHandler(WKPDFConfiguration? pdfConfiguration, WKWebViewCreatePDFWithConfigurationCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("createWebArchiveDataWithCompletionHandler:")]
+    public void CreateWebArchiveDataWithCompletionHandler(WKWebViewCreateWebArchiveDataWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("setMagnification:centeredAtPoint:")]
+    public void SetMagnificationCenteredAtPoint(CGFloat magnification, CGPoint point);
+    [Selector("findString:withConfiguration:completionHandler:")]
+    public void FindStringWithConfigurationCompletionHandler(NSString string, WKFindConfiguration? configuration, WKWebViewFindStringWithConfigurationCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("handlesURLScheme:")]
+    public static bool HandlesURLScheme(NSString urlScheme);
+    [Selector("startDownloadUsingRequest:completionHandler:")]
+    public void StartDownloadUsingRequestCompletionHandler(NSURLRequest request, WKWebViewStartDownloadUsingRequestCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("resumeDownloadFromResumeData:completionHandler:")]
+    public void ResumeDownloadFromResumeDataCompletionHandler(NSData resumeData, WKWebViewResumeDownloadFromResumeDataCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadSimulatedRequest:response:responseData:")]
+    public WKNavigation LoadSimulatedRequestResponseResponseData(NSURLRequest request, NSURLResponse response, NSData data);
     /// Deprecated in macOS 12.0.
-    [Selector("loadSimulatedRequest:withResponse:responseData:")] public WKNavigation LoadSimulatedRequestWithResponseResponseData(NSURLRequest request, NSURLResponse response, NSData data);
-    [Selector("loadFileRequest:allowingReadAccessToURL:")] public WKNavigation LoadFileRequestAllowingReadAccessToURL(NSURLRequest request, NSURL readAccessURL);
-    [Selector("loadSimulatedRequest:responseHTMLString:")] public WKNavigation LoadSimulatedRequestResponseHTMLString(NSURLRequest request, NSString string);
+    [Selector("loadSimulatedRequest:withResponse:responseData:")]
+    public WKNavigation LoadSimulatedRequestWithResponseResponseData(NSURLRequest request, NSURLResponse response, NSData data);
+    [Selector("loadFileRequest:allowingReadAccessToURL:")]
+    public WKNavigation LoadFileRequestAllowingReadAccessToURL(NSURLRequest request, NSURL readAccessURL);
+    [Selector("loadSimulatedRequest:responseHTMLString:")]
+    public WKNavigation LoadSimulatedRequestResponseHTMLString(NSURLRequest request, NSString string);
     /// Deprecated in macOS 12.0.
-    [Selector("loadSimulatedRequest:withResponseHTMLString:")] public WKNavigation LoadSimulatedRequestWithResponseHTMLString(NSURLRequest request, NSString string);
-    [Selector("printOperationWithPrintInfo:")] public NSPrintOperation PrintOperationWithPrintInfo(NSPrintInfo printInfo);
-    [Selector("setMinimumViewportInset:maximumViewportInset:")] public void SetMinimumViewportInsetMaximumViewportInset(NSEdgeInsets minimumViewportInset, NSEdgeInsets maximumViewportInset);
+    [Selector("loadSimulatedRequest:withResponseHTMLString:")]
+    public WKNavigation LoadSimulatedRequestWithResponseHTMLString(NSURLRequest request, NSString string);
+    [Selector("printOperationWithPrintInfo:")]
+    public NSPrintOperation PrintOperationWithPrintInfo(NSPrintInfo printInfo);
+    [Selector("setMinimumViewportInset:maximumViewportInset:")]
+    public void SetMinimumViewportInsetMaximumViewportInset(NSEdgeInsets minimumViewportInset, NSEdgeInsets maximumViewportInset);
     /// macOS 26.0 and later.
-    [Selector("fetchDataOfTypes:completionHandler:")] public void FetchDataOfTypesCompletionHandler(WKWebViewDataType dataTypes, WKWebViewFetchDataOfTypesCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchDataOfTypes:completionHandler:")]
+    public void FetchDataOfTypesCompletionHandler(WKWebViewDataType dataTypes, WKWebViewFetchDataOfTypesCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 26.0 and later.
-    [Selector("restoreData:completionHandler:")] public void RestoreDataCompletionHandler(NSData data, WKWebViewRestoreDataCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("restoreData:completionHandler:")]
+    public void RestoreDataCompletionHandler(NSData data, WKWebViewRestoreDataCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public enum WKMediaPlaybackState : long
@@ -197,11 +271,16 @@ public enum WKWebViewDataType : ulong
 /// WKIBActions, a category of WKWebView.
 public extern objc class WKWebView : NSUserInterfaceValidations
 {
-    [Selector("goBack:")] public void GoBack(AnyObject? sender);
-    [Selector("goForward:")] public void GoForward(AnyObject? sender);
-    [Selector("reload:")] public void Reload(AnyObject? sender);
-    [Selector("reloadFromOrigin:")] public void ReloadFromOrigin(AnyObject? sender);
-    [Selector("stopLoading:")] public void StopLoading(AnyObject? sender);
+    [Selector("goBack:")]
+    public void GoBack(AnyObject? sender);
+    [Selector("goForward:")]
+    public void GoForward(AnyObject? sender);
+    [Selector("reload:")]
+    public void Reload(AnyObject? sender);
+    [Selector("reloadFromOrigin:")]
+    public void ReloadFromOrigin(AnyObject? sender);
+    [Selector("stopLoading:")]
+    public void StopLoading(AnyObject? sender);
 }
 
 /// WKNSTextFinderClient, a category of WKWebView.
@@ -211,7 +290,8 @@ public extern objc class WKWebView : NSTextFinderClient { }
 public extern objc class WKWebView
 {
     /// Deprecated in macOS 10.12.
-    [Selector("certificateChain")] public NSArray CertificateChain { get; }
+    [Selector("certificateChain")]
+    public NSArray CertificateChain { get; }
 }
 
 #endif

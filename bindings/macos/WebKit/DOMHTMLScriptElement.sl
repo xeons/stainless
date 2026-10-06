@@ -33,13 +33,20 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLScriptElement : DOMHTMLElement
 {
-    [Selector("text", "setText:")] public NSString? Text { get; set; }
-    [Selector("htmlFor", "setHtmlFor:")] public NSString? HtmlFor { get; set; }
-    [Selector("event", "setEvent:")] public NSString? Event { get; set; }
-    [Selector("charset", "setCharset:")] public NSString? Charset { get; set; }
-    [Selector("defer", "setDefer:")] public bool Defer { get; set; }
-    [Selector("src", "setSrc:")] public NSString? Src { get; set; }
-    [Selector("type", "setType:")] public NSString? Type { get; set; }
+    [Selector("text", "setText:")]
+    public NSString? Text { get; set; }
+    [Selector("htmlFor", "setHtmlFor:")]
+    public NSString? HtmlFor { get; set; }
+    [Selector("event", "setEvent:")]
+    public NSString? Event { get; set; }
+    [Selector("charset", "setCharset:")]
+    public NSString? Charset { get; set; }
+    [Selector("defer", "setDefer:")]
+    public bool Defer { get; set; }
+    [Selector("src", "setSrc:")]
+    public NSString? Src { get; set; }
+    [Selector("type", "setType:")]
+    public NSString? Type { get; set; }
 }
 
 #endif

@@ -75,9 +75,11 @@ public extern "C" CFStringRef kCTFontSampleTextNameKey;
 
 public extern "C" CFStringRef kCTFontPostScriptCIDNameKey;
 
-[ReturnsRetained] public extern "C" CTFontRef CTFontCreateWithName(CFStringRef name, CGFloat size, CGAffineTransform* matrix);
+[ReturnsRetained]
+public extern "C" CTFontRef CTFontCreateWithName(CFStringRef name, CGFloat size, CGAffineTransform* matrix);
 
-[ReturnsRetained] public extern "C" CTFontRef CTFontCreateWithFontDescriptor(CTFontDescriptorRef descriptor, CGFloat size, CGAffineTransform* matrix);
+[ReturnsRetained]
+public extern "C" CTFontRef CTFontCreateWithFontDescriptor(CTFontDescriptorRef descriptor, CGFloat size, CGAffineTransform* matrix);
 
 [Flags]
 public enum CTFontOptions : ulong
@@ -88,9 +90,11 @@ public enum CTFontOptions : ulong
     PreferSystemFont = 4,
 }
 
-[ReturnsRetained] public extern "C" CTFontRef CTFontCreateWithNameAndOptions(CFStringRef name, CGFloat size, CGAffineTransform* matrix, CTFontOptions options);
+[ReturnsRetained]
+public extern "C" CTFontRef CTFontCreateWithNameAndOptions(CFStringRef name, CGFloat size, CGAffineTransform* matrix, CTFontOptions options);
 
-[ReturnsRetained] public extern "C" CTFontRef CTFontCreateWithFontDescriptorAndOptions(CTFontDescriptorRef descriptor, CGFloat size, CGAffineTransform* matrix, CTFontOptions options);
+[ReturnsRetained]
+public extern "C" CTFontRef CTFontCreateWithFontDescriptorAndOptions(CTFontDescriptorRef descriptor, CGFloat size, CGAffineTransform* matrix, CTFontOptions options);
 
 public enum CTFontUIFontType : uint
 {
@@ -152,21 +156,29 @@ public enum CTFontUIFontType : uint
     ControlContentFontType = 26,
 }
 
-[ReturnsRetained] public extern "C" CTFontRef? CTFontCreateUIFontForLanguage(CTFontUIFontType uiType, CGFloat size, CFStringRef? language);
+[ReturnsRetained]
+public extern "C" CTFontRef? CTFontCreateUIFontForLanguage(CTFontUIFontType uiType, CGFloat size, CFStringRef? language);
 
-[ReturnsRetained] public extern "C" CTFontRef CTFontCreateCopyWithAttributes(CTFontRef font, CGFloat size, CGAffineTransform* matrix, CTFontDescriptorRef? attributes);
+[ReturnsRetained]
+public extern "C" CTFontRef CTFontCreateCopyWithAttributes(CTFontRef font, CGFloat size, CGAffineTransform* matrix, CTFontDescriptorRef? attributes);
 
-[ReturnsRetained] public extern "C" CTFontRef? CTFontCreateCopyWithSymbolicTraits(CTFontRef font, CGFloat size, CGAffineTransform* matrix, CTFontSymbolicTraits symTraitValue, CTFontSymbolicTraits symTraitMask);
+[ReturnsRetained]
+public extern "C" CTFontRef? CTFontCreateCopyWithSymbolicTraits(CTFontRef font, CGFloat size, CGAffineTransform* matrix, CTFontSymbolicTraits symTraitValue, CTFontSymbolicTraits symTraitMask);
 
-[ReturnsRetained] public extern "C" CTFontRef? CTFontCreateCopyWithFamily(CTFontRef font, CGFloat size, CGAffineTransform* matrix, CFStringRef family);
+[ReturnsRetained]
+public extern "C" CTFontRef? CTFontCreateCopyWithFamily(CTFontRef font, CGFloat size, CGAffineTransform* matrix, CFStringRef family);
 
-[ReturnsRetained] public extern "C" CTFontRef CTFontCreateForString(CTFontRef currentFont, CFStringRef string, CFRange range);
+[ReturnsRetained]
+public extern "C" CTFontRef CTFontCreateForString(CTFontRef currentFont, CFStringRef string, CFRange range);
 
-[ReturnsRetained] public extern "C" CTFontRef CTFontCreateForStringWithLanguage(CTFontRef currentFont, CFStringRef string, CFRange range, CFStringRef? language);
+[ReturnsRetained]
+public extern "C" CTFontRef CTFontCreateForStringWithLanguage(CTFontRef currentFont, CFStringRef string, CFRange range, CFStringRef? language);
 
-[ReturnsRetained] public extern "C" CTFontDescriptorRef CTFontCopyFontDescriptor(CTFontRef font);
+[ReturnsRetained]
+public extern "C" CTFontDescriptorRef CTFontCopyFontDescriptor(CTFontRef font);
 
-[ReturnsRetained] public extern "C" CFTypeRef? CTFontCopyAttribute(CTFontRef font, CFStringRef @attribute);
+[ReturnsRetained]
+public extern "C" CFTypeRef? CTFontCopyAttribute(CTFontRef font, CFStringRef @attribute);
 
 public extern "C" CGFloat CTFontGetSize(CTFontRef font);
 
@@ -174,27 +186,37 @@ public extern "C" CGAffineTransform CTFontGetMatrix(CTFontRef font);
 
 public extern "C" CTFontSymbolicTraits CTFontGetSymbolicTraits(CTFontRef font);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef CTFontCopyTraits(CTFontRef font);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef CTFontCopyTraits(CTFontRef font);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CTFontCopyDefaultCascadeListForLanguages(CTFontRef font, CFArrayRef? languagePrefList);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CTFontCopyDefaultCascadeListForLanguages(CTFontRef font, CFArrayRef? languagePrefList);
 
-[ReturnsRetained] public extern "C" CFStringRef CTFontCopyPostScriptName(CTFontRef font);
+[ReturnsRetained]
+public extern "C" CFStringRef CTFontCopyPostScriptName(CTFontRef font);
 
-[ReturnsRetained] public extern "C" CFStringRef CTFontCopyFamilyName(CTFontRef font);
+[ReturnsRetained]
+public extern "C" CFStringRef CTFontCopyFamilyName(CTFontRef font);
 
-[ReturnsRetained] public extern "C" CFStringRef CTFontCopyFullName(CTFontRef font);
+[ReturnsRetained]
+public extern "C" CFStringRef CTFontCopyFullName(CTFontRef font);
 
-[ReturnsRetained] public extern "C" CFStringRef CTFontCopyDisplayName(CTFontRef font);
+[ReturnsRetained]
+public extern "C" CFStringRef CTFontCopyDisplayName(CTFontRef font);
 
-[ReturnsRetained] public extern "C" CFStringRef? CTFontCopyName(CTFontRef font, CFStringRef nameKey);
+[ReturnsRetained]
+public extern "C" CFStringRef? CTFontCopyName(CTFontRef font, CFStringRef nameKey);
 
-[ReturnsRetained] public extern "C" CFStringRef? CTFontCopyLocalizedName(CTFontRef font, CFStringRef nameKey, __CFString** actualLanguage);
+[ReturnsRetained]
+public extern "C" CFStringRef? CTFontCopyLocalizedName(CTFontRef font, CFStringRef nameKey, __CFString** actualLanguage);
 
-[ReturnsRetained] public extern "C" CFCharacterSetRef CTFontCopyCharacterSet(CTFontRef font);
+[ReturnsRetained]
+public extern "C" CFCharacterSetRef CTFontCopyCharacterSet(CTFontRef font);
 
 public extern "C" CFStringEncoding CTFontGetStringEncoding(CTFontRef font);
 
-[ReturnsRetained] public extern "C" CFArrayRef CTFontCopySupportedLanguages(CTFontRef font);
+[ReturnsRetained]
+public extern "C" CFArrayRef CTFontCopySupportedLanguages(CTFontRef font);
 
 public extern "C" bool CTFontGetGlyphsForCharacters(CTFontRef font, UniChar* characters, CGGlyph* glyphs, CFIndex count);
 
@@ -222,7 +244,8 @@ public extern "C" CGFloat CTFontGetXHeight(CTFontRef font);
 
 public extern "C" CGGlyph CTFontGetGlyphWithName(CTFontRef font, CFStringRef glyphName);
 
-[ReturnsRetained] public extern "C" CFStringRef? CTFontCopyNameForGlyph(CTFontRef font, CGGlyph glyph);
+[ReturnsRetained]
+public extern "C" CFStringRef? CTFontCopyNameForGlyph(CTFontRef font, CGGlyph glyph);
 
 public extern "C" CGRect CTFontGetBoundingRectsForGlyphs(CTFontRef font, CTFontOrientation orientation, CGGlyph* glyphs, CGRect* boundingRects, CFIndex count);
 
@@ -232,7 +255,8 @@ public extern "C" double CTFontGetAdvancesForGlyphs(CTFontRef font, CTFontOrient
 
 public extern "C" void CTFontGetVerticalTranslationsForGlyphs(CTFontRef font, CGGlyph* glyphs, CGSize* translations, CFIndex count);
 
-[ReturnsRetained] public extern "C" CGPathRef? CTFontCreatePathForGlyph(CTFontRef font, CGGlyph glyph, CGAffineTransform* matrix);
+[ReturnsRetained]
+public extern "C" CGPathRef? CTFontCreatePathForGlyph(CTFontRef font, CGGlyph glyph, CGAffineTransform* matrix);
 
 public extern "C" CFStringRef kCTFontVariationAxisIdentifierKey;
 
@@ -246,9 +270,11 @@ public extern "C" CFStringRef kCTFontVariationAxisNameKey;
 
 public extern "C" CFStringRef kCTFontVariationAxisHiddenKey;
 
-[ReturnsRetained] public extern "C" CFArrayRef? CTFontCopyVariationAxes(CTFontRef font);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CTFontCopyVariationAxes(CTFontRef font);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CTFontCopyVariation(CTFontRef font);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CTFontCopyVariation(CTFontRef font);
 
 public extern "C" CFStringRef kCTFontOpenTypeFeatureTag;
 
@@ -274,13 +300,17 @@ public extern "C" CFStringRef kCTFontFeatureSampleTextKey;
 
 public extern "C" CFStringRef kCTFontFeatureTooltipTextKey;
 
-[ReturnsRetained] public extern "C" CFArrayRef? CTFontCopyFeatures(CTFontRef font);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CTFontCopyFeatures(CTFontRef font);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CTFontCopyFeatureSettings(CTFontRef font);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CTFontCopyFeatureSettings(CTFontRef font);
 
-[ReturnsRetained] public extern "C" CGFontRef CTFontCopyGraphicsFont(CTFontRef font, __CTFontDescriptor** attributes);
+[ReturnsRetained]
+public extern "C" CGFontRef CTFontCopyGraphicsFont(CTFontRef font, __CTFontDescriptor** attributes);
 
-[ReturnsRetained] public extern "C" CTFontRef CTFontCreateWithGraphicsFont(CGFontRef graphicsFont, CGFloat size, CGAffineTransform* matrix, CTFontDescriptorRef? attributes);
+[ReturnsRetained]
+public extern "C" CTFontRef CTFontCreateWithGraphicsFont(CGFontRef graphicsFont, CGFloat size, CGAffineTransform* matrix, CTFontDescriptorRef? attributes);
 
 public using ATSFontRef = UInt32;
 
@@ -288,10 +318,12 @@ public using ATSFontRef = UInt32;
 public extern "C" ATSFontRef CTFontGetPlatformFont(CTFontRef font, __CTFontDescriptor** attributes);
 
 /// Deprecated in macOS 11.0.
-[ReturnsRetained] public extern "C" CTFontRef? CTFontCreateWithPlatformFont(ATSFontRef platformFont, CGFloat size, CGAffineTransform* matrix, CTFontDescriptorRef? attributes);
+[ReturnsRetained]
+public extern "C" CTFontRef? CTFontCreateWithPlatformFont(ATSFontRef platformFont, CGFloat size, CGAffineTransform* matrix, CTFontDescriptorRef? attributes);
 
 /// Deprecated in macOS 10.15.
-[ReturnsRetained] public extern "C" CTFontRef CTFontCreateWithQuickdrawInstance(ConstStr255Param name, short identifier, byte style, CGFloat size);
+[ReturnsRetained]
+public extern "C" CTFontRef CTFontCreateWithQuickdrawInstance(ConstStr255Param name, short identifier, byte style, CGFloat size);
 
 public const int kCTFontTableBASE = 1111577413;
 public const int kCTFontTableCBDT = 1128416340;
@@ -377,11 +409,13 @@ public enum CTFontTableOptions : uint
     ExcludeSynthetic = 1,
 }
 
-[ReturnsRetained] public extern "C" CFArrayRef? CTFontCopyAvailableTables(CTFontRef font, CTFontTableOptions options);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CTFontCopyAvailableTables(CTFontRef font, CTFontTableOptions options);
 
 public extern "C" bool CTFontHasTable(CTFontRef font, CTFontTableTag tag);
 
-[ReturnsRetained] public extern "C" CFDataRef? CTFontCopyTable(CTFontRef font, CTFontTableTag table, CTFontTableOptions options);
+[ReturnsRetained]
+public extern "C" CFDataRef? CTFontCopyTable(CTFontRef font, CTFontTableTag table, CTFontTableOptions options);
 
 public extern "C" void CTFontDrawGlyphs(CTFontRef font, CGGlyph* glyphs, CGPoint* positions, nuint count, CGContextRef context);
 

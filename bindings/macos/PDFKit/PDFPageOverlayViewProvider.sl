@@ -33,9 +33,14 @@ import Standard.ObjC;
 
 public objc interface PDFPageOverlayViewProvider : NSObjectProtocol
 {
-    [Selector("pdfView:overlayViewForPage:")] NSView? PdfViewOverlayViewForPage(PDFView view, PDFPage page);
-    [Optional] [Selector("pdfView:willDisplayOverlayView:forPage:")] void PdfViewWillDisplayOverlayViewForPage(PDFView pdfView, NSView overlayView, PDFPage page);
-    [Optional] [Selector("pdfView:willEndDisplayingOverlayView:forPage:")] void PdfViewWillEndDisplayingOverlayViewForPage(PDFView pdfView, NSView overlayView, PDFPage page);
+    [Selector("pdfView:overlayViewForPage:")]
+    NSView? PdfViewOverlayViewForPage(PDFView view, PDFPage page);
+    [Optional]
+    [Selector("pdfView:willDisplayOverlayView:forPage:")]
+    void PdfViewWillDisplayOverlayViewForPage(PDFView pdfView, NSView overlayView, PDFPage page);
+    [Optional]
+    [Selector("pdfView:willEndDisplayingOverlayView:forPage:")]
+    void PdfViewWillEndDisplayingOverlayViewForPage(PDFView pdfView, NSView overlayView, PDFPage page);
 }
 
 #endif

@@ -50,23 +50,40 @@ public enum SKLabelHorizontalAlignmentMode : long
 
 public extern objc class SKLabelNode : SKNode
 {
-    [Selector("verticalAlignmentMode", "setVerticalAlignmentMode:")] public SKLabelVerticalAlignmentMode VerticalAlignmentMode { get; set; }
-    [Selector("horizontalAlignmentMode", "setHorizontalAlignmentMode:")] public SKLabelHorizontalAlignmentMode HorizontalAlignmentMode { get; set; }
-    [Selector("numberOfLines", "setNumberOfLines:")] public NSInteger NumberOfLines { get; set; }
-    [Selector("lineBreakMode", "setLineBreakMode:")] public NSLineBreakMode LineBreakMode { get; set; }
-    [Selector("preferredMaxLayoutWidth", "setPreferredMaxLayoutWidth:")] public CGFloat PreferredMaxLayoutWidth { get; set; }
-    [Selector("fontName", "setFontName:")] public NSString? FontName { get; set; }
-    [Selector("text", "setText:")] public NSString? Text { get; set; }
-    [Selector("attributedText", "setAttributedText:")] public NSAttributedString? AttributedText { get; set; }
-    [Selector("fontSize", "setFontSize:")] public CGFloat FontSize { get; set; }
-    [Selector("fontColor", "setFontColor:")] public NSColor? FontColor { get; set; }
-    [Selector("colorBlendFactor", "setColorBlendFactor:")] public CGFloat ColorBlendFactor { get; set; }
-    [Selector("color", "setColor:")] public NSColor? Color { get; set; }
-    [Selector("blendMode", "setBlendMode:")] public SKBlendMode BlendMode { get; set; }
-    [Selector("labelNodeWithText:")] public static Self LabelNodeWithText(NSString? text);
-    [Selector("labelNodeWithAttributedText:")] public static Self LabelNodeWithAttributedText(NSAttributedString? attributedText);
-    [Selector("labelNodeWithFontNamed:")] public static Self LabelNodeWithFontNamed(NSString? fontName);
-    [Selector("initWithFontNamed:")] public Self InitWithFontNamed(NSString? fontName);
+    [Selector("verticalAlignmentMode", "setVerticalAlignmentMode:")]
+    public SKLabelVerticalAlignmentMode VerticalAlignmentMode { get; set; }
+    [Selector("horizontalAlignmentMode", "setHorizontalAlignmentMode:")]
+    public SKLabelHorizontalAlignmentMode HorizontalAlignmentMode { get; set; }
+    [Selector("numberOfLines", "setNumberOfLines:")]
+    public NSInteger NumberOfLines { get; set; }
+    [Selector("lineBreakMode", "setLineBreakMode:")]
+    public NSLineBreakMode LineBreakMode { get; set; }
+    [Selector("preferredMaxLayoutWidth", "setPreferredMaxLayoutWidth:")]
+    public CGFloat PreferredMaxLayoutWidth { get; set; }
+    [Selector("fontName", "setFontName:")]
+    public NSString? FontName { get; set; }
+    [Selector("text", "setText:")]
+    public NSString? Text { get; set; }
+    [Selector("attributedText", "setAttributedText:")]
+    public NSAttributedString? AttributedText { get; set; }
+    [Selector("fontSize", "setFontSize:")]
+    public CGFloat FontSize { get; set; }
+    [Selector("fontColor", "setFontColor:")]
+    public NSColor? FontColor { get; set; }
+    [Selector("colorBlendFactor", "setColorBlendFactor:")]
+    public CGFloat ColorBlendFactor { get; set; }
+    [Selector("color", "setColor:")]
+    public NSColor? Color { get; set; }
+    [Selector("blendMode", "setBlendMode:")]
+    public SKBlendMode BlendMode { get; set; }
+    [Selector("labelNodeWithText:")]
+    public static Self LabelNodeWithText(NSString? text);
+    [Selector("labelNodeWithAttributedText:")]
+    public static Self LabelNodeWithAttributedText(NSAttributedString? attributedText);
+    [Selector("labelNodeWithFontNamed:")]
+    public static Self LabelNodeWithFontNamed(NSString? fontName);
+    [Selector("initWithFontNamed:")]
+    public Self InitWithFontNamed(NSString? fontName);
 }
 
 #endif

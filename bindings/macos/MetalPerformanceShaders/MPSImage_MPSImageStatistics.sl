@@ -33,23 +33,32 @@ import Standard.ObjC;
 
 public extern objc class MPSImageStatisticsMinAndMax : MPSUnaryImageKernel
 {
-    [Selector("clipRectSource", "setClipRectSource:")] public MTLRegion ClipRectSource { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("clipRectSource", "setClipRectSource:")]
+    public MTLRegion ClipRectSource { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSImageStatisticsMeanAndVariance : MPSUnaryImageKernel
 {
-    [Selector("clipRectSource", "setClipRectSource:")] public MTLRegion ClipRectSource { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("clipRectSource", "setClipRectSource:")]
+    public MTLRegion ClipRectSource { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSImageStatisticsMean : MPSUnaryImageKernel
 {
-    [Selector("clipRectSource", "setClipRectSource:")] public MTLRegion ClipRectSource { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("clipRectSource", "setClipRectSource:")]
+    public MTLRegion ClipRectSource { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 #endif

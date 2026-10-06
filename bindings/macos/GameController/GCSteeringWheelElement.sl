@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class GCSteeringWheelElement : NSObject, GCAxisElement
 {
-    [Selector("maximumDegreesOfRotation")] public float MaximumDegreesOfRotation { get; }
+    [Selector("maximumDegreesOfRotation")]
+    public float MaximumDegreesOfRotation { get; }
 }
 
 #endif

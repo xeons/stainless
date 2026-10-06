@@ -34,7 +34,8 @@ public objc closure void HKHeartbeatSeriesQueryInitWithHeartbeatSeriesDataHandle
 
 public extern objc class HKHeartbeatSeriesQuery : HKQuery
 {
-    [Selector("initWithHeartbeatSeries:dataHandler:")] public Self InitWithHeartbeatSeriesDataHandler(HKHeartbeatSeriesSample heartbeatSeries, HKHeartbeatSeriesQueryInitWithHeartbeatSeriesDataHandlerDataHandlerBlock dataHandler);
+    [Selector("initWithHeartbeatSeries:dataHandler:")]
+    public Self InitWithHeartbeatSeriesDataHandler(HKHeartbeatSeriesSample heartbeatSeries, HKHeartbeatSeriesQueryInitWithHeartbeatSeriesDataHandlerDataHandlerBlock dataHandler);
 }
 
 #endif

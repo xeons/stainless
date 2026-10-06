@@ -39,12 +39,18 @@ public enum NSFetchIndexElementType : ulong
 
 public extern objc class NSFetchIndexElementDescription : NSObject, NSCoding, NSCopying
 {
-    [Selector("property")] public NSPropertyDescription? Property { get; }
-    [Selector("propertyName")] public NSString? PropertyName { get; }
-    [Selector("collationType", "setCollationType:")] public NSFetchIndexElementType CollationType { get; set; }
-    [Selector("isAscending", "setAscending:")] public bool Ascending { get; set; }
-    [Selector("indexDescription")] public NSFetchIndexDescription? IndexDescription { get; }
-    [Selector("initWithProperty:collationType:")] public Self InitWithPropertyCollationType(NSPropertyDescription property, NSFetchIndexElementType collationType);
+    [Selector("property")]
+    public NSPropertyDescription? Property { get; }
+    [Selector("propertyName")]
+    public NSString? PropertyName { get; }
+    [Selector("collationType", "setCollationType:")]
+    public NSFetchIndexElementType CollationType { get; set; }
+    [Selector("isAscending", "setAscending:")]
+    public bool Ascending { get; set; }
+    [Selector("indexDescription")]
+    public NSFetchIndexDescription? IndexDescription { get; }
+    [Selector("initWithProperty:collationType:")]
+    public Self InitWithPropertyCollationType(NSPropertyDescription property, NSFetchIndexElementType collationType);
 }
 
 #endif

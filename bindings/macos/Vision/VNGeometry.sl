@@ -35,66 +35,109 @@ import Standard.ObjC;
 
 public extern objc class VNPoint : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("zeroPoint")] public static VNPoint ZeroPoint { get; }
-    [Selector("location")] public CGPoint Location { get; }
-    [Selector("x")] public double X { get; }
-    [Selector("y")] public double Y { get; }
-    [Selector("pointByApplyingVector:toPoint:")] public static VNPoint PointByApplyingVectorToPoint(VNVector vector, VNPoint point);
+    [Selector("zeroPoint")]
+    public static VNPoint ZeroPoint { get; }
+    [Selector("location")]
+    public CGPoint Location { get; }
+    [Selector("x")]
+    public double X { get; }
+    [Selector("y")]
+    public double Y { get; }
+    [Selector("pointByApplyingVector:toPoint:")]
+    public static VNPoint PointByApplyingVectorToPoint(VNVector vector, VNPoint point);
     /// Deprecated in macOS 11.0.
-    [Selector("distanceBetweenPoint:point:")] public static double DistanceBetweenPointPoint(VNPoint point1, VNPoint point2);
-    [Selector("distanceToPoint:")] public double DistanceToPoint(VNPoint point);
-    [Selector("initWithX:y:")] public Self InitWithXY(double x, double y);
-    [Selector("initWithLocation:")] public Self InitWithLocation(CGPoint location);
+    [Selector("distanceBetweenPoint:point:")]
+    public static double DistanceBetweenPointPoint(VNPoint point1, VNPoint point2);
+    [Selector("distanceToPoint:")]
+    public double DistanceToPoint(VNPoint point);
+    [Selector("initWithX:y:")]
+    public Self InitWithXY(double x, double y);
+    [Selector("initWithLocation:")]
+    public Self InitWithLocation(CGPoint location);
 }
 
 public extern objc class VNPoint3D : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("position")] public simd_float4x4 Position { get; }
-    [Selector("initWithPosition:")] public Self? InitWithPosition(simd_float4x4 position);
+    [Selector("position")]
+    public simd_float4x4 Position { get; }
+    [Selector("initWithPosition:")]
+    public Self? InitWithPosition(simd_float4x4 position);
 }
 
 public extern objc class VNVector : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("zeroVector")] public static VNVector ZeroVector { get; }
-    [Selector("x")] public double X { get; }
-    [Selector("y")] public double Y { get; }
-    [Selector("r")] public double R { get; }
-    [Selector("theta")] public double Theta { get; }
-    [Selector("length")] public double Length { get; }
-    [Selector("squaredLength")] public double SquaredLength { get; }
-    [Selector("unitVectorForVector:")] public static VNVector UnitVectorForVector(VNVector vector);
-    [Selector("vectorByMultiplyingVector:byScalar:")] public static VNVector VectorByMultiplyingVectorByScalar(VNVector vector, double scalar);
-    [Selector("vectorByAddingVector:toVector:")] public static VNVector VectorByAddingVectorToVector(VNVector v1, VNVector v2);
-    [Selector("vectorBySubtractingVector:fromVector:")] public static VNVector VectorBySubtractingVectorFromVector(VNVector v1, VNVector v2);
-    [Selector("dotProductOfVector:vector:")] public static double DotProductOfVectorVector(VNVector v1, VNVector v2);
-    [Selector("initWithXComponent:yComponent:")] public Self InitWithXComponentYComponent(double x, double y);
-    [Selector("initWithR:theta:")] public Self InitWithRTheta(double r, double theta);
-    [Selector("initWithVectorHead:tail:")] public Self InitWithVectorHeadTail(VNPoint head, VNPoint tail);
+    [Selector("zeroVector")]
+    public static VNVector ZeroVector { get; }
+    [Selector("x")]
+    public double X { get; }
+    [Selector("y")]
+    public double Y { get; }
+    [Selector("r")]
+    public double R { get; }
+    [Selector("theta")]
+    public double Theta { get; }
+    [Selector("length")]
+    public double Length { get; }
+    [Selector("squaredLength")]
+    public double SquaredLength { get; }
+    [Selector("unitVectorForVector:")]
+    public static VNVector UnitVectorForVector(VNVector vector);
+    [Selector("vectorByMultiplyingVector:byScalar:")]
+    public static VNVector VectorByMultiplyingVectorByScalar(VNVector vector, double scalar);
+    [Selector("vectorByAddingVector:toVector:")]
+    public static VNVector VectorByAddingVectorToVector(VNVector v1, VNVector v2);
+    [Selector("vectorBySubtractingVector:fromVector:")]
+    public static VNVector VectorBySubtractingVectorFromVector(VNVector v1, VNVector v2);
+    [Selector("dotProductOfVector:vector:")]
+    public static double DotProductOfVectorVector(VNVector v1, VNVector v2);
+    [Selector("initWithXComponent:yComponent:")]
+    public Self InitWithXComponentYComponent(double x, double y);
+    [Selector("initWithR:theta:")]
+    public Self InitWithRTheta(double r, double theta);
+    [Selector("initWithVectorHead:tail:")]
+    public Self InitWithVectorHeadTail(VNPoint head, VNPoint tail);
 }
 
 public extern objc class VNCircle : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("zeroCircle")] public static VNCircle ZeroCircle { get; }
-    [Selector("center")] public VNPoint Center { get; }
-    [Selector("radius")] public double Radius { get; }
-    [Selector("diameter")] public double Diameter { get; }
-    [Selector("initWithCenter:radius:")] public Self InitWithCenterRadius(VNPoint center, double radius);
-    [Selector("initWithCenter:diameter:")] public Self InitWithCenterDiameter(VNPoint center, double diameter);
-    [Selector("containsPoint:")] public bool ContainsPoint(VNPoint point);
-    [Selector("containsPoint:inCircumferentialRingOfWidth:")] public bool ContainsPointInCircumferentialRingOfWidth(VNPoint point, double ringWidth);
+    [Selector("zeroCircle")]
+    public static VNCircle ZeroCircle { get; }
+    [Selector("center")]
+    public VNPoint Center { get; }
+    [Selector("radius")]
+    public double Radius { get; }
+    [Selector("diameter")]
+    public double Diameter { get; }
+    [Selector("initWithCenter:radius:")]
+    public Self InitWithCenterRadius(VNPoint center, double radius);
+    [Selector("initWithCenter:diameter:")]
+    public Self InitWithCenterDiameter(VNPoint center, double diameter);
+    [Selector("containsPoint:")]
+    public bool ContainsPoint(VNPoint point);
+    [Selector("containsPoint:inCircumferentialRingOfWidth:")]
+    public bool ContainsPointInCircumferentialRingOfWidth(VNPoint point, double ringWidth);
 }
 
 public extern objc class VNContour : NSObject, NSCopying, VNRequestRevisionProviding
 {
-    [Selector("indexPath")] public NSIndexPath IndexPath { get; }
-    [Selector("childContourCount")] public NSInteger ChildContourCount { get; }
-    [Selector("childContours")] public NSArray ChildContours { get; }
-    [Selector("pointCount")] public NSInteger PointCount { get; }
-    [Selector("normalizedPoints")] public simd_float2* NormalizedPoints { get; }
-    [Selector("normalizedPath")] public CGPathRef? NormalizedPath { get; }
-    [Selector("aspectRatio")] public float AspectRatio { get; }
-    [Selector("childContourAtIndex:error:")] public VNContour? ChildContourAtIndexError(NSUInteger childContourIndex, out NSError? error);
-    [Selector("polygonApproximationWithEpsilon:error:")] public VNContour? PolygonApproximationWithEpsilonError(float epsilon, out NSError? error);
+    [Selector("indexPath")]
+    public NSIndexPath IndexPath { get; }
+    [Selector("childContourCount")]
+    public NSInteger ChildContourCount { get; }
+    [Selector("childContours")]
+    public NSArray ChildContours { get; }
+    [Selector("pointCount")]
+    public NSInteger PointCount { get; }
+    [Selector("normalizedPoints")]
+    public simd_float2* NormalizedPoints { get; }
+    [Selector("normalizedPath")]
+    public CGPathRef? NormalizedPath { get; }
+    [Selector("aspectRatio")]
+    public float AspectRatio { get; }
+    [Selector("childContourAtIndex:error:")]
+    public VNContour? ChildContourAtIndexError(NSUInteger childContourIndex, out NSError? error);
+    [Selector("polygonApproximationWithEpsilon:error:")]
+    public VNContour? PolygonApproximationWithEpsilonError(float epsilon, out NSError? error);
 }
 
 #endif

@@ -34,43 +34,80 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCTensor : NSObject, NSCopying
 {
-    [Selector("tensorID")] public NSUInteger TensorID { get; }
-    [Selector("descriptor")] public MLCTensorDescriptor Descriptor { get; }
-    [Selector("data")] public NSData? Data { get; }
-    [Selector("label", "setLabel:")] public NSString Label { get; set; }
-    [Selector("device")] public MLCDevice? Device { get; }
-    [Selector("optimizerData")] public NSArray OptimizerData { get; }
-    [Selector("optimizerDeviceData")] public NSArray OptimizerDeviceData { get; }
-    [Selector("hasValidNumerics")] public bool HasValidNumerics { get; }
-    [Selector("tensorWithDescriptor:")] public static Self TensorWithDescriptor(MLCTensorDescriptor tensorDescriptor);
-    [Selector("tensorWithDescriptor:randomInitializerType:")] public static Self TensorWithDescriptorRandomInitializerType(MLCTensorDescriptor tensorDescriptor, MLCRandomInitializerType randomInitializerType);
-    [Selector("tensorWithDescriptor:fillWithData:")] public static Self TensorWithDescriptorFillWithData(MLCTensorDescriptor tensorDescriptor, NSNumber fillData);
-    [Selector("tensorWithDescriptor:data:")] public static Self TensorWithDescriptorData(MLCTensorDescriptor tensorDescriptor, MLCTensorData data);
-    [Selector("tensorWithShape:")] public static Self TensorWithShape(NSArray shape);
-    [Selector("tensorWithShape:randomInitializerType:")] public static Self TensorWithShapeRandomInitializerType(NSArray shape, MLCRandomInitializerType randomInitializerType);
-    [Selector("tensorWithShape:randomInitializerType:dataType:")] public static Self TensorWithShapeRandomInitializerTypeDataType(NSArray shape, MLCRandomInitializerType randomInitializerType, MLCDataType dataType);
-    [Selector("tensorWithShape:dataType:")] public static Self TensorWithShapeDataType(NSArray shape, MLCDataType dataType);
-    [Selector("tensorWithShape:data:dataType:")] public static Self TensorWithShapeDataDataType(NSArray shape, MLCTensorData data, MLCDataType dataType);
-    [Selector("tensorWithShape:fillWithData:dataType:")] public static Self TensorWithShapeFillWithDataDataType(NSArray shape, NSNumber fillData, MLCDataType dataType);
-    [Selector("tensorWithWidth:height:featureChannelCount:batchSize:")] public static Self TensorWithWidthHeightFeatureChannelCountBatchSize(NSUInteger width, NSUInteger height, NSUInteger featureChannelCount, NSUInteger batchSize);
-    [Selector("tensorWithWidth:height:featureChannelCount:batchSize:fillWithData:dataType:")] public static Self TensorWithWidthHeightFeatureChannelCountBatchSizeFillWithDataDataType(NSUInteger width, NSUInteger height, NSUInteger featureChannelCount, NSUInteger batchSize, float fillData, MLCDataType dataType);
-    [Selector("tensorWithWidth:height:featureChannelCount:batchSize:randomInitializerType:")] public static Self TensorWithWidthHeightFeatureChannelCountBatchSizeRandomInitializerType(NSUInteger width, NSUInteger height, NSUInteger featureChannelCount, NSUInteger batchSize, MLCRandomInitializerType randomInitializerType);
-    [Selector("tensorWithWidth:height:featureChannelCount:batchSize:data:")] public static Self TensorWithWidthHeightFeatureChannelCountBatchSizeData(NSUInteger width, NSUInteger height, NSUInteger featureChannelCount, NSUInteger batchSize, MLCTensorData data);
-    [Selector("tensorWithWidth:height:featureChannelCount:batchSize:data:dataType:")] public static Self TensorWithWidthHeightFeatureChannelCountBatchSizeDataDataType(NSUInteger width, NSUInteger height, NSUInteger featureChannelCount, NSUInteger batchSize, MLCTensorData data, MLCDataType dataType);
-    [Selector("tensorWithSequenceLength:featureChannelCount:batchSize:")] public static Self TensorWithSequenceLengthFeatureChannelCountBatchSize(NSUInteger sequenceLength, NSUInteger featureChannelCount, NSUInteger batchSize);
-    [Selector("tensorWithSequenceLength:featureChannelCount:batchSize:randomInitializerType:")] public static Self TensorWithSequenceLengthFeatureChannelCountBatchSizeRandomInitializerType(NSUInteger sequenceLength, NSUInteger featureChannelCount, NSUInteger batchSize, MLCRandomInitializerType randomInitializerType);
-    [Selector("tensorWithSequenceLength:featureChannelCount:batchSize:data:")] public static Self TensorWithSequenceLengthFeatureChannelCountBatchSizeData(NSUInteger sequenceLength, NSUInteger featureChannelCount, NSUInteger batchSize, MLCTensorData? data);
-    [Selector("tensorWithSequenceLengths:sortedSequences:featureChannelCount:batchSize:randomInitializerType:")] public static Self? TensorWithSequenceLengthsSortedSequencesFeatureChannelCountBatchSizeRandomInitializerType(NSArray sequenceLengths, bool sortedSequences, NSUInteger featureChannelCount, NSUInteger batchSize, MLCRandomInitializerType randomInitializerType);
-    [Selector("tensorWithSequenceLengths:sortedSequences:featureChannelCount:batchSize:data:")] public static Self? TensorWithSequenceLengthsSortedSequencesFeatureChannelCountBatchSizeData(NSArray sequenceLengths, bool sortedSequences, NSUInteger featureChannelCount, NSUInteger batchSize, MLCTensorData? data);
-    [Selector("synchronizeData")] public bool SynchronizeData();
-    [Selector("synchronizeOptimizerData")] public bool SynchronizeOptimizerData();
-    [Selector("copyDataFromDeviceMemoryToBytes:length:synchronizeWithDevice:")] public bool CopyDataFromDeviceMemoryToBytesLengthSynchronizeWithDevice(void* bytes, NSUInteger length, bool synchronizeWithDevice);
-    [Selector("bindAndWriteData:toDevice:")] public bool BindAndWriteDataToDevice(MLCTensorData data, MLCDevice device);
-    [Selector("bindOptimizerData:deviceData:")] public bool BindOptimizerDataDeviceData(NSArray data, NSArray? deviceData);
-    [Selector("tensorByQuantizingToType:scale:bias:")] public MLCTensor? TensorByQuantizingToTypeScaleBias(MLCDataType type, float scale, NSInteger bias);
-    [Selector("tensorByQuantizingToType:scale:bias:axis:")] public MLCTensor? TensorByQuantizingToTypeScaleBiasAxis(MLCDataType type, MLCTensor scale, MLCTensor bias, NSInteger axis);
-    [Selector("tensorByDequantizingToType:scale:bias:")] public MLCTensor? TensorByDequantizingToTypeScaleBias(MLCDataType type, MLCTensor scale, MLCTensor bias);
-    [Selector("tensorByDequantizingToType:scale:bias:axis:")] public MLCTensor? TensorByDequantizingToTypeScaleBiasAxis(MLCDataType type, MLCTensor scale, MLCTensor bias, NSInteger axis);
+    [Selector("tensorID")]
+    public NSUInteger TensorID { get; }
+    [Selector("descriptor")]
+    public MLCTensorDescriptor Descriptor { get; }
+    [Selector("data")]
+    public NSData? Data { get; }
+    [Selector("label", "setLabel:")]
+    public NSString Label { get; set; }
+    [Selector("device")]
+    public MLCDevice? Device { get; }
+    [Selector("optimizerData")]
+    public NSArray OptimizerData { get; }
+    [Selector("optimizerDeviceData")]
+    public NSArray OptimizerDeviceData { get; }
+    [Selector("hasValidNumerics")]
+    public bool HasValidNumerics { get; }
+    [Selector("tensorWithDescriptor:")]
+    public static Self TensorWithDescriptor(MLCTensorDescriptor tensorDescriptor);
+    [Selector("tensorWithDescriptor:randomInitializerType:")]
+    public static Self TensorWithDescriptorRandomInitializerType(MLCTensorDescriptor tensorDescriptor, MLCRandomInitializerType randomInitializerType);
+    [Selector("tensorWithDescriptor:fillWithData:")]
+    public static Self TensorWithDescriptorFillWithData(MLCTensorDescriptor tensorDescriptor, NSNumber fillData);
+    [Selector("tensorWithDescriptor:data:")]
+    public static Self TensorWithDescriptorData(MLCTensorDescriptor tensorDescriptor, MLCTensorData data);
+    [Selector("tensorWithShape:")]
+    public static Self TensorWithShape(NSArray shape);
+    [Selector("tensorWithShape:randomInitializerType:")]
+    public static Self TensorWithShapeRandomInitializerType(NSArray shape, MLCRandomInitializerType randomInitializerType);
+    [Selector("tensorWithShape:randomInitializerType:dataType:")]
+    public static Self TensorWithShapeRandomInitializerTypeDataType(NSArray shape, MLCRandomInitializerType randomInitializerType, MLCDataType dataType);
+    [Selector("tensorWithShape:dataType:")]
+    public static Self TensorWithShapeDataType(NSArray shape, MLCDataType dataType);
+    [Selector("tensorWithShape:data:dataType:")]
+    public static Self TensorWithShapeDataDataType(NSArray shape, MLCTensorData data, MLCDataType dataType);
+    [Selector("tensorWithShape:fillWithData:dataType:")]
+    public static Self TensorWithShapeFillWithDataDataType(NSArray shape, NSNumber fillData, MLCDataType dataType);
+    [Selector("tensorWithWidth:height:featureChannelCount:batchSize:")]
+    public static Self TensorWithWidthHeightFeatureChannelCountBatchSize(NSUInteger width, NSUInteger height, NSUInteger featureChannelCount, NSUInteger batchSize);
+    [Selector("tensorWithWidth:height:featureChannelCount:batchSize:fillWithData:dataType:")]
+    public static Self TensorWithWidthHeightFeatureChannelCountBatchSizeFillWithDataDataType(NSUInteger width, NSUInteger height, NSUInteger featureChannelCount, NSUInteger batchSize, float fillData, MLCDataType dataType);
+    [Selector("tensorWithWidth:height:featureChannelCount:batchSize:randomInitializerType:")]
+    public static Self TensorWithWidthHeightFeatureChannelCountBatchSizeRandomInitializerType(NSUInteger width, NSUInteger height, NSUInteger featureChannelCount, NSUInteger batchSize, MLCRandomInitializerType randomInitializerType);
+    [Selector("tensorWithWidth:height:featureChannelCount:batchSize:data:")]
+    public static Self TensorWithWidthHeightFeatureChannelCountBatchSizeData(NSUInteger width, NSUInteger height, NSUInteger featureChannelCount, NSUInteger batchSize, MLCTensorData data);
+    [Selector("tensorWithWidth:height:featureChannelCount:batchSize:data:dataType:")]
+    public static Self TensorWithWidthHeightFeatureChannelCountBatchSizeDataDataType(NSUInteger width, NSUInteger height, NSUInteger featureChannelCount, NSUInteger batchSize, MLCTensorData data, MLCDataType dataType);
+    [Selector("tensorWithSequenceLength:featureChannelCount:batchSize:")]
+    public static Self TensorWithSequenceLengthFeatureChannelCountBatchSize(NSUInteger sequenceLength, NSUInteger featureChannelCount, NSUInteger batchSize);
+    [Selector("tensorWithSequenceLength:featureChannelCount:batchSize:randomInitializerType:")]
+    public static Self TensorWithSequenceLengthFeatureChannelCountBatchSizeRandomInitializerType(NSUInteger sequenceLength, NSUInteger featureChannelCount, NSUInteger batchSize, MLCRandomInitializerType randomInitializerType);
+    [Selector("tensorWithSequenceLength:featureChannelCount:batchSize:data:")]
+    public static Self TensorWithSequenceLengthFeatureChannelCountBatchSizeData(NSUInteger sequenceLength, NSUInteger featureChannelCount, NSUInteger batchSize, MLCTensorData? data);
+    [Selector("tensorWithSequenceLengths:sortedSequences:featureChannelCount:batchSize:randomInitializerType:")]
+    public static Self? TensorWithSequenceLengthsSortedSequencesFeatureChannelCountBatchSizeRandomInitializerType(NSArray sequenceLengths, bool sortedSequences, NSUInteger featureChannelCount, NSUInteger batchSize, MLCRandomInitializerType randomInitializerType);
+    [Selector("tensorWithSequenceLengths:sortedSequences:featureChannelCount:batchSize:data:")]
+    public static Self? TensorWithSequenceLengthsSortedSequencesFeatureChannelCountBatchSizeData(NSArray sequenceLengths, bool sortedSequences, NSUInteger featureChannelCount, NSUInteger batchSize, MLCTensorData? data);
+    [Selector("synchronizeData")]
+    public bool SynchronizeData();
+    [Selector("synchronizeOptimizerData")]
+    public bool SynchronizeOptimizerData();
+    [Selector("copyDataFromDeviceMemoryToBytes:length:synchronizeWithDevice:")]
+    public bool CopyDataFromDeviceMemoryToBytesLengthSynchronizeWithDevice(void* bytes, NSUInteger length, bool synchronizeWithDevice);
+    [Selector("bindAndWriteData:toDevice:")]
+    public bool BindAndWriteDataToDevice(MLCTensorData data, MLCDevice device);
+    [Selector("bindOptimizerData:deviceData:")]
+    public bool BindOptimizerDataDeviceData(NSArray data, NSArray? deviceData);
+    [Selector("tensorByQuantizingToType:scale:bias:")]
+    public MLCTensor? TensorByQuantizingToTypeScaleBias(MLCDataType type, float scale, NSInteger bias);
+    [Selector("tensorByQuantizingToType:scale:bias:axis:")]
+    public MLCTensor? TensorByQuantizingToTypeScaleBiasAxis(MLCDataType type, MLCTensor scale, MLCTensor bias, NSInteger axis);
+    [Selector("tensorByDequantizingToType:scale:bias:")]
+    public MLCTensor? TensorByDequantizingToTypeScaleBias(MLCDataType type, MLCTensor scale, MLCTensor bias);
+    [Selector("tensorByDequantizingToType:scale:bias:axis:")]
+    public MLCTensor? TensorByDequantizingToTypeScaleBiasAxis(MLCDataType type, MLCTensor scale, MLCTensor bias, NSInteger axis);
 }
 
 #endif

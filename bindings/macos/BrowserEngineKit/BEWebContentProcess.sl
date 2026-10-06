@@ -41,10 +41,14 @@ public objc closure void BEWebContentProcessWebContentProcessWithBundleIDInterru
 
 public extern objc class BEWebContentProcess : NSObject
 {
-    [Selector("webContentProcessWithInterruptionHandler:completion:")] public static void WebContentProcessWithInterruptionHandlerCompletion(BEWebContentProcessWebContentProcessWithInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BEWebContentProcessWebContentProcessWithInterruptionHandlerCompletionCompletionBlock completion);
-    [Selector("webContentProcessWithBundleID:interruptionHandler:completion:")] public static void WebContentProcessWithBundleIDInterruptionHandlerCompletion(NSString bundleID, BEWebContentProcessWebContentProcessWithBundleIDInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BEWebContentProcessWebContentProcessWithBundleIDInterruptionHandlerCompletionCompletionBlock completion);
-    [Selector("invalidate")] public void Invalidate();
-    [Selector("makeLibXPCConnectionError:")] public xpc_connection_t? MakeLibXPCConnectionError(out NSError? error);
+    [Selector("webContentProcessWithInterruptionHandler:completion:")]
+    public static void WebContentProcessWithInterruptionHandlerCompletion(BEWebContentProcessWebContentProcessWithInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BEWebContentProcessWebContentProcessWithInterruptionHandlerCompletionCompletionBlock completion);
+    [Selector("webContentProcessWithBundleID:interruptionHandler:completion:")]
+    public static void WebContentProcessWithBundleIDInterruptionHandlerCompletion(NSString bundleID, BEWebContentProcessWebContentProcessWithBundleIDInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BEWebContentProcessWebContentProcessWithBundleIDInterruptionHandlerCompletionCompletionBlock completion);
+    [Selector("invalidate")]
+    public void Invalidate();
+    [Selector("makeLibXPCConnectionError:")]
+    public xpc_connection_t? MakeLibXPCConnectionError(out NSError? error);
 }
 
 /// BEExtensionProcessConformance, a category of BEWebContentProcess.

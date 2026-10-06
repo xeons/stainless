@@ -35,34 +35,52 @@ public objc closure void JSContextExceptionHandlerBlock(JSContext? arg0, JSValue
 
 public extern objc class JSContext : NSObject
 {
-    [Selector("globalObject")] public JSValue? GlobalObject { get; }
-    [Selector("exception", "setException:")] public JSValue? Exception { get; set; }
-    [Selector("exceptionHandler", "setExceptionHandler:")] public JSContextExceptionHandlerBlock? ExceptionHandler { get; set; }
-    [Selector("virtualMachine")] public JSVirtualMachine? VirtualMachine { get; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("isInspectable", "setInspectable:")] public bool Inspectable { get; set; }
-    [Selector("init")] public Self? Init();
-    [Selector("initWithVirtualMachine:")] public Self? InitWithVirtualMachine(JSVirtualMachine? virtualMachine);
-    [Selector("evaluateScript:")] public JSValue? EvaluateScript(NSString? script);
-    [Selector("evaluateScript:withSourceURL:")] public JSValue? EvaluateScriptWithSourceURL(NSString? script, NSURL? sourceURL);
-    [Selector("currentContext")] public static JSContext? CurrentContext();
-    [Selector("currentCallee")] public static JSValue? CurrentCallee();
-    [Selector("currentThis")] public static JSValue? CurrentThis();
-    [Selector("currentArguments")] public static NSArray? CurrentArguments();
+    [Selector("globalObject")]
+    public JSValue? GlobalObject { get; }
+    [Selector("exception", "setException:")]
+    public JSValue? Exception { get; set; }
+    [Selector("exceptionHandler", "setExceptionHandler:")]
+    public JSContextExceptionHandlerBlock? ExceptionHandler { get; set; }
+    [Selector("virtualMachine")]
+    public JSVirtualMachine? VirtualMachine { get; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("isInspectable", "setInspectable:")]
+    public bool Inspectable { get; set; }
+    [Selector("init")]
+    public Self? Init();
+    [Selector("initWithVirtualMachine:")]
+    public Self? InitWithVirtualMachine(JSVirtualMachine? virtualMachine);
+    [Selector("evaluateScript:")]
+    public JSValue? EvaluateScript(NSString? script);
+    [Selector("evaluateScript:withSourceURL:")]
+    public JSValue? EvaluateScriptWithSourceURL(NSString? script, NSURL? sourceURL);
+    [Selector("currentContext")]
+    public static JSContext? CurrentContext();
+    [Selector("currentCallee")]
+    public static JSValue? CurrentCallee();
+    [Selector("currentThis")]
+    public static JSValue? CurrentThis();
+    [Selector("currentArguments")]
+    public static NSArray? CurrentArguments();
 }
 
 /// SubscriptSupport, a category of JSContext.
 public extern objc class JSContext
 {
-    [Selector("objectForKeyedSubscript:")] public JSValue? ObjectForKeyedSubscript(AnyObject? key);
-    [Selector("setObject:forKeyedSubscript:")] public void SetObjectForKeyedSubscript(AnyObject? object, NSObject? key);
+    [Selector("objectForKeyedSubscript:")]
+    public JSValue? ObjectForKeyedSubscript(AnyObject? key);
+    [Selector("setObject:forKeyedSubscript:")]
+    public void SetObjectForKeyedSubscript(AnyObject? object, NSObject? key);
 }
 
 /// JSContextRefSupport, a category of JSContext.
 public extern objc class JSContext
 {
-    [Selector("JSGlobalContextRef")] public JSGlobalContextRef JSGlobalContextRef { get; }
-    [Selector("contextWithJSGlobalContextRef:")] public static JSContext? ContextWithJSGlobalContextRef(JSGlobalContextRef jsGlobalContextRef);
+    [Selector("JSGlobalContextRef")]
+    public JSGlobalContextRef JSGlobalContextRef { get; }
+    [Selector("contextWithJSGlobalContextRef:")]
+    public static JSContext? ContextWithJSGlobalContextRef(JSGlobalContextRef jsGlobalContextRef);
 }
 
 #endif

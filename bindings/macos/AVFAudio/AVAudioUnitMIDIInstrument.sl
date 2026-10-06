@@ -34,19 +34,32 @@ import Standard.ObjC;
 
 public extern objc class AVAudioUnitMIDIInstrument : AVAudioUnit, AVAudioMixing
 {
-    [Selector("initWithAudioComponentDescription:")] public Self InitWithAudioComponentDescription(AudioComponentDescription description);
-    [Selector("startNote:withVelocity:onChannel:")] public void StartNoteWithVelocityOnChannel(byte note, byte velocity, byte channel);
-    [Selector("stopNote:onChannel:")] public void StopNoteOnChannel(byte note, byte channel);
-    [Selector("sendController:withValue:onChannel:")] public void SendControllerWithValueOnChannel(byte controller, byte value, byte channel);
-    [Selector("sendPitchBend:onChannel:")] public void SendPitchBendOnChannel(ushort pitchbend, byte channel);
-    [Selector("sendPressure:onChannel:")] public void SendPressureOnChannel(byte pressure, byte channel);
-    [Selector("sendPressureForKey:withValue:onChannel:")] public void SendPressureForKeyWithValueOnChannel(byte key, byte value, byte channel);
-    [Selector("sendProgramChange:onChannel:")] public void SendProgramChangeOnChannel(byte program, byte channel);
-    [Selector("sendProgramChange:bankMSB:bankLSB:onChannel:")] public void SendProgramChangeBankMSBBankLSBOnChannel(byte program, byte bankMSB, byte bankLSB, byte channel);
-    [Selector("sendMIDIEvent:data1:data2:")] public void SendMIDIEventData1Data2(byte midiStatus, byte data1, byte data2);
-    [Selector("sendMIDIEvent:data1:")] public void SendMIDIEventData1(byte midiStatus, byte data1);
-    [Selector("sendMIDISysExEvent:")] public void SendMIDISysExEvent(NSData midiData);
-    [Selector("sendMIDIEventList:")] public void SendMIDIEventList(MIDIEventList* eventList);
+    [Selector("initWithAudioComponentDescription:")]
+    public Self InitWithAudioComponentDescription(AudioComponentDescription description);
+    [Selector("startNote:withVelocity:onChannel:")]
+    public void StartNoteWithVelocityOnChannel(byte note, byte velocity, byte channel);
+    [Selector("stopNote:onChannel:")]
+    public void StopNoteOnChannel(byte note, byte channel);
+    [Selector("sendController:withValue:onChannel:")]
+    public void SendControllerWithValueOnChannel(byte controller, byte value, byte channel);
+    [Selector("sendPitchBend:onChannel:")]
+    public void SendPitchBendOnChannel(ushort pitchbend, byte channel);
+    [Selector("sendPressure:onChannel:")]
+    public void SendPressureOnChannel(byte pressure, byte channel);
+    [Selector("sendPressureForKey:withValue:onChannel:")]
+    public void SendPressureForKeyWithValueOnChannel(byte key, byte value, byte channel);
+    [Selector("sendProgramChange:onChannel:")]
+    public void SendProgramChangeOnChannel(byte program, byte channel);
+    [Selector("sendProgramChange:bankMSB:bankLSB:onChannel:")]
+    public void SendProgramChangeBankMSBBankLSBOnChannel(byte program, byte bankMSB, byte bankLSB, byte channel);
+    [Selector("sendMIDIEvent:data1:data2:")]
+    public void SendMIDIEventData1Data2(byte midiStatus, byte data1, byte data2);
+    [Selector("sendMIDIEvent:data1:")]
+    public void SendMIDIEventData1(byte midiStatus, byte data1);
+    [Selector("sendMIDISysExEvent:")]
+    public void SendMIDISysExEvent(NSData midiData);
+    [Selector("sendMIDIEventList:")]
+    public void SendMIDIEventList(MIDIEventList* eventList);
 }
 
 #endif

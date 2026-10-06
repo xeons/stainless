@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class MKMultiPolygon : MKShape, MKOverlay
 {
-    [Selector("polygons")] public NSArray Polygons { get; }
-    [Selector("initWithPolygons:")] public Self InitWithPolygons(NSArray polygons);
+    [Selector("polygons")]
+    public NSArray Polygons { get; }
+    [Selector("initWithPolygons:")]
+    public Self InitWithPolygons(NSArray polygons);
 }
 
 #endif

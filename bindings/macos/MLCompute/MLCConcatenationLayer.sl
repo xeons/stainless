@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCConcatenationLayer : MLCLayer
 {
-    [Selector("dimension")] public NSUInteger Dimension { get; }
-    [Selector("layer")] public static Self Layer();
-    [Selector("layerWithDimension:")] public static Self LayerWithDimension(NSUInteger dimension);
+    [Selector("dimension")]
+    public NSUInteger Dimension { get; }
+    [Selector("layer")]
+    public static Self Layer();
+    [Selector("layerWithDimension:")]
+    public static Self LayerWithDimension(NSUInteger dimension);
 }
 
 #endif

@@ -54,23 +54,40 @@ public enum NSDateComponentsFormatterZeroFormattingBehavior : ulong
 
 public extern objc class NSDateComponentsFormatter : NSFormatter
 {
-    [Selector("unitsStyle", "setUnitsStyle:")] public NSDateComponentsFormatterUnitsStyle UnitsStyle { get; set; }
-    [Selector("allowedUnits", "setAllowedUnits:")] public NSCalendarUnit AllowedUnits { get; set; }
-    [Selector("zeroFormattingBehavior", "setZeroFormattingBehavior:")] public NSDateComponentsFormatterZeroFormattingBehavior ZeroFormattingBehavior { get; set; }
-    [Selector("calendar", "setCalendar:")] public NSCalendar? Calendar { get; set; }
-    [Selector("referenceDate", "setReferenceDate:")] public NSDate? ReferenceDate { get; set; }
-    [Selector("allowsFractionalUnits", "setAllowsFractionalUnits:")] public bool AllowsFractionalUnits { get; set; }
-    [Selector("maximumUnitCount", "setMaximumUnitCount:")] public NSInteger MaximumUnitCount { get; set; }
-    [Selector("collapsesLargestUnit", "setCollapsesLargestUnit:")] public bool CollapsesLargestUnit { get; set; }
-    [Selector("includesApproximationPhrase", "setIncludesApproximationPhrase:")] public bool IncludesApproximationPhrase { get; set; }
-    [Selector("includesTimeRemainingPhrase", "setIncludesTimeRemainingPhrase:")] public bool IncludesTimeRemainingPhrase { get; set; }
-    [Selector("formattingContext", "setFormattingContext:")] public NSFormattingContext FormattingContext { get; set; }
-    [Selector("stringForObjectValue:")] public NSString? StringForObjectValue(AnyObject? obj);
-    [Selector("stringFromDateComponents:")] public NSString? StringFromDateComponents(NSDateComponents components);
-    [Selector("stringFromDate:toDate:")] public NSString? StringFromDateToDate(NSDate startDate, NSDate endDate);
-    [Selector("stringFromTimeInterval:")] public NSString? StringFromTimeInterval(NSTimeInterval ti);
-    [Selector("localizedStringFromDateComponents:unitsStyle:")] public static NSString? LocalizedStringFromDateComponentsUnitsStyle(NSDateComponents components, NSDateComponentsFormatterUnitsStyle unitsStyle);
-    [Selector("getObjectValue:forString:errorDescription:")] public bool GetObjectValueForStringErrorDescription(out AnyObject? obj, NSString string, out NSString? error);
+    [Selector("unitsStyle", "setUnitsStyle:")]
+    public NSDateComponentsFormatterUnitsStyle UnitsStyle { get; set; }
+    [Selector("allowedUnits", "setAllowedUnits:")]
+    public NSCalendarUnit AllowedUnits { get; set; }
+    [Selector("zeroFormattingBehavior", "setZeroFormattingBehavior:")]
+    public NSDateComponentsFormatterZeroFormattingBehavior ZeroFormattingBehavior { get; set; }
+    [Selector("calendar", "setCalendar:")]
+    public NSCalendar? Calendar { get; set; }
+    [Selector("referenceDate", "setReferenceDate:")]
+    public NSDate? ReferenceDate { get; set; }
+    [Selector("allowsFractionalUnits", "setAllowsFractionalUnits:")]
+    public bool AllowsFractionalUnits { get; set; }
+    [Selector("maximumUnitCount", "setMaximumUnitCount:")]
+    public NSInteger MaximumUnitCount { get; set; }
+    [Selector("collapsesLargestUnit", "setCollapsesLargestUnit:")]
+    public bool CollapsesLargestUnit { get; set; }
+    [Selector("includesApproximationPhrase", "setIncludesApproximationPhrase:")]
+    public bool IncludesApproximationPhrase { get; set; }
+    [Selector("includesTimeRemainingPhrase", "setIncludesTimeRemainingPhrase:")]
+    public bool IncludesTimeRemainingPhrase { get; set; }
+    [Selector("formattingContext", "setFormattingContext:")]
+    public NSFormattingContext FormattingContext { get; set; }
+    [Selector("stringForObjectValue:")]
+    public NSString? StringForObjectValue(AnyObject? obj);
+    [Selector("stringFromDateComponents:")]
+    public NSString? StringFromDateComponents(NSDateComponents components);
+    [Selector("stringFromDate:toDate:")]
+    public NSString? StringFromDateToDate(NSDate startDate, NSDate endDate);
+    [Selector("stringFromTimeInterval:")]
+    public NSString? StringFromTimeInterval(NSTimeInterval ti);
+    [Selector("localizedStringFromDateComponents:unitsStyle:")]
+    public static NSString? LocalizedStringFromDateComponentsUnitsStyle(NSDateComponents components, NSDateComponentsFormatterUnitsStyle unitsStyle);
+    [Selector("getObjectValue:forString:errorDescription:")]
+    public bool GetObjectValueForStringErrorDescription(out AnyObject? obj, NSString string, out NSString? error);
 }
 
 #endif

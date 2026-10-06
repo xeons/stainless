@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class MKPolylineRenderer : MKOverlayPathRenderer
 {
-    [Selector("polyline")] public MKPolyline Polyline { get; }
-    [Selector("strokeStart", "setStrokeStart:")] public CGFloat StrokeStart { get; set; }
-    [Selector("strokeEnd", "setStrokeEnd:")] public CGFloat StrokeEnd { get; set; }
-    [Selector("initWithPolyline:")] public Self InitWithPolyline(MKPolyline polyline);
+    [Selector("polyline")]
+    public MKPolyline Polyline { get; }
+    [Selector("strokeStart", "setStrokeStart:")]
+    public CGFloat StrokeStart { get; set; }
+    [Selector("strokeEnd", "setStrokeEnd:")]
+    public CGFloat StrokeEnd { get; set; }
+    [Selector("initWithPolyline:")]
+    public Self InitWithPolyline(MKPolyline polyline);
 }
 
 #endif

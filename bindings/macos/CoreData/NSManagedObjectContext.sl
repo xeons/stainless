@@ -88,62 +88,113 @@ public objc closure void NSManagedObjectContextPerformBlockAndWaitBlock();
 
 public extern objc class NSManagedObjectContext : NSObject, NSCoding, NSLocking
 {
-    [Selector("persistentStoreCoordinator", "setPersistentStoreCoordinator:")] public NSPersistentStoreCoordinator? PersistentStoreCoordinator { get; set; }
-    [Selector("parentContext", "setParentContext:")] public NSManagedObjectContext? ParentContext { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("undoManager", "setUndoManager:")] public NSUndoManager? UndoManager { get; set; }
-    [Selector("hasChanges")] public bool HasChanges { get; }
-    [Selector("userInfo")] public NSMutableDictionary UserInfo { get; }
-    [Selector("concurrencyType")] public NSManagedObjectContextConcurrencyType ConcurrencyType { get; }
-    [Selector("insertedObjects")] public NSSet InsertedObjects { get; }
-    [Selector("updatedObjects")] public NSSet UpdatedObjects { get; }
-    [Selector("deletedObjects")] public NSSet DeletedObjects { get; }
-    [Selector("registeredObjects")] public NSSet RegisteredObjects { get; }
-    [Selector("propagatesDeletesAtEndOfEvent", "setPropagatesDeletesAtEndOfEvent:")] public bool PropagatesDeletesAtEndOfEvent { get; set; }
-    [Selector("retainsRegisteredObjects", "setRetainsRegisteredObjects:")] public bool RetainsRegisteredObjects { get; set; }
-    [Selector("shouldDeleteInaccessibleFaults", "setShouldDeleteInaccessibleFaults:")] public bool ShouldDeleteInaccessibleFaults { get; set; }
-    [Selector("stalenessInterval", "setStalenessInterval:")] public NSTimeInterval StalenessInterval { get; set; }
-    [Selector("mergePolicy", "setMergePolicy:")] public AnyObject MergePolicy { get; set; }
-    [Selector("queryGenerationToken")] public NSQueryGenerationToken? QueryGenerationToken { get; }
-    [Selector("automaticallyMergesChangesFromParent", "setAutomaticallyMergesChangesFromParent:")] public bool AutomaticallyMergesChangesFromParent { get; set; }
-    [Selector("transactionAuthor", "setTransactionAuthor:")] public NSString? TransactionAuthor { get; set; }
+    [Selector("persistentStoreCoordinator", "setPersistentStoreCoordinator:")]
+    public NSPersistentStoreCoordinator? PersistentStoreCoordinator { get; set; }
+    [Selector("parentContext", "setParentContext:")]
+    public NSManagedObjectContext? ParentContext { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("undoManager", "setUndoManager:")]
+    public NSUndoManager? UndoManager { get; set; }
+    [Selector("hasChanges")]
+    public bool HasChanges { get; }
+    [Selector("userInfo")]
+    public NSMutableDictionary UserInfo { get; }
+    [Selector("concurrencyType")]
+    public NSManagedObjectContextConcurrencyType ConcurrencyType { get; }
+    [Selector("insertedObjects")]
+    public NSSet InsertedObjects { get; }
+    [Selector("updatedObjects")]
+    public NSSet UpdatedObjects { get; }
+    [Selector("deletedObjects")]
+    public NSSet DeletedObjects { get; }
+    [Selector("registeredObjects")]
+    public NSSet RegisteredObjects { get; }
+    [Selector("propagatesDeletesAtEndOfEvent", "setPropagatesDeletesAtEndOfEvent:")]
+    public bool PropagatesDeletesAtEndOfEvent { get; set; }
+    [Selector("retainsRegisteredObjects", "setRetainsRegisteredObjects:")]
+    public bool RetainsRegisteredObjects { get; set; }
+    [Selector("shouldDeleteInaccessibleFaults", "setShouldDeleteInaccessibleFaults:")]
+    public bool ShouldDeleteInaccessibleFaults { get; set; }
+    [Selector("stalenessInterval", "setStalenessInterval:")]
+    public NSTimeInterval StalenessInterval { get; set; }
+    [Selector("mergePolicy", "setMergePolicy:")]
+    public AnyObject MergePolicy { get; set; }
+    [Selector("queryGenerationToken")]
+    public NSQueryGenerationToken? QueryGenerationToken { get; }
+    [Selector("automaticallyMergesChangesFromParent", "setAutomaticallyMergesChangesFromParent:")]
+    public bool AutomaticallyMergesChangesFromParent { get; set; }
+    [Selector("transactionAuthor", "setTransactionAuthor:")]
+    public NSString? TransactionAuthor { get; set; }
     /// Deprecated in macOS 10.11.
-    [Selector("new")] public static Self New();
+    [Selector("new")]
+    public static Self New();
     /// Deprecated in macOS 10.11.
-    [Selector("init")] public Self Init();
-    [Selector("initWithConcurrencyType:")] public Self InitWithConcurrencyType(NSManagedObjectContextConcurrencyType ct);
-    [Selector("performBlock:")] public void PerformBlock(NSManagedObjectContextPerformBlockBlock block);
-    [Selector("performBlockAndWait:")] public void PerformBlockAndWait(NSManagedObjectContextPerformBlockAndWaitBlock block);
-    [Selector("objectRegisteredForID:")] public NSManagedObject? ObjectRegisteredForID(NSManagedObjectID objectID);
-    [Selector("objectWithID:")] public NSManagedObject ObjectWithID(NSManagedObjectID objectID);
-    [Selector("existingObjectWithID:error:")] public NSManagedObject? ExistingObjectWithIDError(NSManagedObjectID objectID, out NSError? error);
-    [Selector("executeFetchRequest:error:")] public NSArray? ExecuteFetchRequestError(NSFetchRequest request, out NSError? error);
-    [Selector("countForFetchRequest:error:")] public NSUInteger CountForFetchRequestError(NSFetchRequest request, out NSError? error);
-    [Selector("executeRequest:error:")] public NSPersistentStoreResult? ExecuteRequestError(NSPersistentStoreRequest request, out NSError? error);
-    [Selector("insertObject:")] public void InsertObject(NSManagedObject object);
-    [Selector("deleteObject:")] public void DeleteObject(NSManagedObject object);
-    [Selector("refreshObject:mergeChanges:")] public void RefreshObjectMergeChanges(NSManagedObject object, bool flag);
-    [Selector("detectConflictsForObject:")] public void DetectConflictsForObject(NSManagedObject object);
-    [Selector("observeValueForKeyPath:ofObject:change:context:")] public void ObserveValueForKeyPathOfObjectChangeContext(NSString? keyPath, AnyObject? object, NSDictionary? change, void* context);
-    [Selector("processPendingChanges")] public void ProcessPendingChanges();
-    [Selector("assignObject:toPersistentStore:")] public void AssignObjectToPersistentStore(AnyObject object, NSPersistentStore store);
-    [Selector("undo")] public void Undo();
-    [Selector("redo")] public void Redo();
-    [Selector("reset")] public void Reset();
-    [Selector("rollback")] public void Rollback();
-    [Selector("save:")] public bool Save(out NSError? error);
-    [Selector("refreshAllObjects")] public void RefreshAllObjects();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithConcurrencyType:")]
+    public Self InitWithConcurrencyType(NSManagedObjectContextConcurrencyType ct);
+    [Selector("performBlock:")]
+    public void PerformBlock(NSManagedObjectContextPerformBlockBlock block);
+    [Selector("performBlockAndWait:")]
+    public void PerformBlockAndWait(NSManagedObjectContextPerformBlockAndWaitBlock block);
+    [Selector("objectRegisteredForID:")]
+    public NSManagedObject? ObjectRegisteredForID(NSManagedObjectID objectID);
+    [Selector("objectWithID:")]
+    public NSManagedObject ObjectWithID(NSManagedObjectID objectID);
+    [Selector("existingObjectWithID:error:")]
+    public NSManagedObject? ExistingObjectWithIDError(NSManagedObjectID objectID, out NSError? error);
+    [Selector("executeFetchRequest:error:")]
+    public NSArray? ExecuteFetchRequestError(NSFetchRequest request, out NSError? error);
+    [Selector("countForFetchRequest:error:")]
+    public NSUInteger CountForFetchRequestError(NSFetchRequest request, out NSError? error);
+    [Selector("executeRequest:error:")]
+    public NSPersistentStoreResult? ExecuteRequestError(NSPersistentStoreRequest request, out NSError? error);
+    [Selector("insertObject:")]
+    public void InsertObject(NSManagedObject object);
+    [Selector("deleteObject:")]
+    public void DeleteObject(NSManagedObject object);
+    [Selector("refreshObject:mergeChanges:")]
+    public void RefreshObjectMergeChanges(NSManagedObject object, bool flag);
+    [Selector("detectConflictsForObject:")]
+    public void DetectConflictsForObject(NSManagedObject object);
+    [Selector("observeValueForKeyPath:ofObject:change:context:")]
+    public void ObserveValueForKeyPathOfObjectChangeContext(NSString? keyPath, AnyObject? object, NSDictionary? change, void* context);
+    [Selector("processPendingChanges")]
+    public void ProcessPendingChanges();
+    [Selector("assignObject:toPersistentStore:")]
+    public void AssignObjectToPersistentStore(AnyObject object, NSPersistentStore store);
+    [Selector("undo")]
+    public void Undo();
+    [Selector("redo")]
+    public void Redo();
+    [Selector("reset")]
+    public void Reset();
+    [Selector("rollback")]
+    public void Rollback();
+    [Selector("save:")]
+    public bool Save(out NSError? error);
+    [Selector("refreshAllObjects")]
+    public void RefreshAllObjects();
     /// Deprecated in macOS 10.10.
-    [Selector("lock")] public void Lock();
+    [Selector("lock")]
+    public void Lock();
     /// Deprecated in macOS 10.10.
-    [Selector("unlock")] public void Unlock();
+    [Selector("unlock")]
+    public void Unlock();
     /// Deprecated in macOS 10.10.
-    [Selector("tryLock")] public bool TryLock();
-    [Selector("shouldHandleInaccessibleFault:forObjectID:triggeredByProperty:")] public bool ShouldHandleInaccessibleFaultForObjectIDTriggeredByProperty(NSManagedObject fault, NSManagedObjectID oid, NSPropertyDescription? property);
-    [Selector("obtainPermanentIDsForObjects:error:")] public bool ObtainPermanentIDsForObjectsError(NSArray objects, out NSError? error);
-    [Selector("mergeChangesFromContextDidSaveNotification:")] public void MergeChangesFromContextDidSaveNotification(NSNotification notification);
-    [Selector("mergeChangesFromRemoteContextSave:intoContexts:")] public static void MergeChangesFromRemoteContextSaveIntoContexts(NSDictionary changeNotificationData, NSArray contexts);
-    [Selector("setQueryGenerationFromToken:error:")] public bool SetQueryGenerationFromTokenError(NSQueryGenerationToken? generation, out NSError? error);
+    [Selector("tryLock")]
+    public bool TryLock();
+    [Selector("shouldHandleInaccessibleFault:forObjectID:triggeredByProperty:")]
+    public bool ShouldHandleInaccessibleFaultForObjectIDTriggeredByProperty(NSManagedObject fault, NSManagedObjectID oid, NSPropertyDescription? property);
+    [Selector("obtainPermanentIDsForObjects:error:")]
+    public bool ObtainPermanentIDsForObjectsError(NSArray objects, out NSError? error);
+    [Selector("mergeChangesFromContextDidSaveNotification:")]
+    public void MergeChangesFromContextDidSaveNotification(NSNotification notification);
+    [Selector("mergeChangesFromRemoteContextSave:intoContexts:")]
+    public static void MergeChangesFromRemoteContextSaveIntoContexts(NSDictionary changeNotificationData, NSArray contexts);
+    [Selector("setQueryGenerationFromToken:error:")]
+    public bool SetQueryGenerationFromTokenError(NSQueryGenerationToken? generation, out NSError? error);
 }
 
 #endif

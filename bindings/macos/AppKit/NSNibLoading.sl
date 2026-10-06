@@ -34,25 +34,31 @@ import Standard.ObjC;
 /// NSNibLoading, a category of NSBundle.
 public extern objc class NSBundle
 {
-    [Selector("loadNibNamed:owner:topLevelObjects:")] public bool LoadNibNamedOwnerTopLevelObjects(NSNibName nibName, AnyObject? owner, out NSArray? topLevelObjects);
+    [Selector("loadNibNamed:owner:topLevelObjects:")]
+    public bool LoadNibNamedOwnerTopLevelObjects(NSNibName nibName, AnyObject? owner, out NSArray? topLevelObjects);
 }
 
 /// NSNibAwaking, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("awakeFromNib")] public void AwakeFromNib();
-    [Selector("prepareForInterfaceBuilder")] public void PrepareForInterfaceBuilder();
+    [Selector("awakeFromNib")]
+    public void AwakeFromNib();
+    [Selector("prepareForInterfaceBuilder")]
+    public void PrepareForInterfaceBuilder();
 }
 
 /// NSNibLoadingDeprecated, a category of NSBundle.
 public extern objc class NSBundle
 {
     /// Deprecated in macOS 10.8.
-    [Selector("loadNibFile:externalNameTable:withZone:")] public static bool LoadNibFileExternalNameTableWithZone(NSString? fileName, NSDictionary? context, _NSZone* zone);
+    [Selector("loadNibFile:externalNameTable:withZone:")]
+    public static bool LoadNibFileExternalNameTableWithZone(NSString? fileName, NSDictionary? context, _NSZone* zone);
     /// Deprecated in macOS 10.8.
-    [Selector("loadNibNamed:owner:")] public static bool LoadNibNamedOwner(NSString? nibName, AnyObject? owner);
+    [Selector("loadNibNamed:owner:")]
+    public static bool LoadNibNamedOwner(NSString? nibName, AnyObject? owner);
     /// Deprecated in macOS 10.8.
-    [Selector("loadNibFile:externalNameTable:withZone:")] public bool LoadNibFileExternalNameTableWithZoneMethod(NSString? fileName, NSDictionary? context, _NSZone* zone);
+    [Selector("loadNibFile:externalNameTable:withZone:")]
+    public bool LoadNibFileExternalNameTableWithZoneMethod(NSString? fileName, NSDictionary? context, _NSZone* zone);
 }
 
 #endif

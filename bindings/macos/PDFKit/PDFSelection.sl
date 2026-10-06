@@ -41,22 +41,38 @@ public enum PDFSelectionGranularity : ulong
 
 public extern objc class PDFSelection : NSObject, NSCopying
 {
-    [Selector("pages")] public NSArray Pages { get; }
-    [Selector("color", "setColor:")] public NSColor? Color { get; set; }
-    [Selector("string")] public NSString? String { get; }
-    [Selector("attributedString")] public NSAttributedString? AttributedString { get; }
-    [Selector("initWithDocument:")] public Self InitWithDocument(PDFDocument document);
-    [Selector("boundsForPage:")] public NSRect BoundsForPage(PDFPage page);
-    [Selector("numberOfTextRangesOnPage:")] public NSUInteger NumberOfTextRangesOnPage(PDFPage page);
-    [Selector("rangeAtIndex:onPage:")] public NSRange RangeAtIndexOnPage(NSUInteger index, PDFPage page);
-    [Selector("selectionsByLine")] public NSArray SelectionsByLine();
-    [Selector("addSelection:")] public void AddSelection(PDFSelection selection);
-    [Selector("addSelections:")] public void AddSelections(NSArray selections);
-    [Selector("extendSelectionAtEnd:")] public void ExtendSelectionAtEnd(NSInteger succeed);
-    [Selector("extendSelectionAtStart:")] public void ExtendSelectionAtStart(NSInteger precede);
-    [Selector("extendSelectionForLineBoundaries")] public void ExtendSelectionForLineBoundaries();
-    [Selector("drawForPage:active:")] public void DrawForPageActive(PDFPage page, bool active);
-    [Selector("drawForPage:withBox:active:")] public void DrawForPageWithBoxActive(PDFPage page, PDFDisplayBox box, bool active);
+    [Selector("pages")]
+    public NSArray Pages { get; }
+    [Selector("color", "setColor:")]
+    public NSColor? Color { get; set; }
+    [Selector("string")]
+    public NSString? String { get; }
+    [Selector("attributedString")]
+    public NSAttributedString? AttributedString { get; }
+    [Selector("initWithDocument:")]
+    public Self InitWithDocument(PDFDocument document);
+    [Selector("boundsForPage:")]
+    public NSRect BoundsForPage(PDFPage page);
+    [Selector("numberOfTextRangesOnPage:")]
+    public NSUInteger NumberOfTextRangesOnPage(PDFPage page);
+    [Selector("rangeAtIndex:onPage:")]
+    public NSRange RangeAtIndexOnPage(NSUInteger index, PDFPage page);
+    [Selector("selectionsByLine")]
+    public NSArray SelectionsByLine();
+    [Selector("addSelection:")]
+    public void AddSelection(PDFSelection selection);
+    [Selector("addSelections:")]
+    public void AddSelections(NSArray selections);
+    [Selector("extendSelectionAtEnd:")]
+    public void ExtendSelectionAtEnd(NSInteger succeed);
+    [Selector("extendSelectionAtStart:")]
+    public void ExtendSelectionAtStart(NSInteger precede);
+    [Selector("extendSelectionForLineBoundaries")]
+    public void ExtendSelectionForLineBoundaries();
+    [Selector("drawForPage:active:")]
+    public void DrawForPageActive(PDFPage page, bool active);
+    [Selector("drawForPage:withBox:active:")]
+    public void DrawForPageWithBoxActive(PDFPage page, PDFDisplayBox box, bool active);
 }
 
 #endif

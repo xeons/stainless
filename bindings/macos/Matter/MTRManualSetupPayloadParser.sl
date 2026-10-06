@@ -34,8 +34,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 13.3.
 public extern objc class MTRManualSetupPayloadParser : NSObject
 {
-    [Selector("initWithDecimalStringRepresentation:")] public Self InitWithDecimalStringRepresentation(NSString decimalStringRepresentation);
-    [Selector("populatePayload:")] public MTRSetupPayload? PopulatePayload(out NSError? error);
+    [Selector("initWithDecimalStringRepresentation:")]
+    public Self InitWithDecimalStringRepresentation(NSString decimalStringRepresentation);
+    [Selector("populatePayload:")]
+    public MTRSetupPayload? PopulatePayload(out NSError? error);
 }
 
 #endif

@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class MLSequence : NSObject, NSSecureCoding
 {
-    [Selector("type")] public MLFeatureType Type { get; }
-    [Selector("stringValues")] public NSArray StringValues { get; }
-    [Selector("int64Values")] public NSArray Int64Values { get; }
-    [Selector("emptySequenceWithType:")] public static Self EmptySequenceWithType(MLFeatureType type);
-    [Selector("sequenceWithStringArray:")] public static Self SequenceWithStringArray(NSArray stringValues);
-    [Selector("sequenceWithInt64Array:")] public static Self SequenceWithInt64Array(NSArray int64Values);
+    [Selector("type")]
+    public MLFeatureType Type { get; }
+    [Selector("stringValues")]
+    public NSArray StringValues { get; }
+    [Selector("int64Values")]
+    public NSArray Int64Values { get; }
+    [Selector("emptySequenceWithType:")]
+    public static Self EmptySequenceWithType(MLFeatureType type);
+    [Selector("sequenceWithStringArray:")]
+    public static Self SequenceWithStringArray(NSArray stringValues);
+    [Selector("sequenceWithInt64Array:")]
+    public static Self SequenceWithInt64Array(NSArray int64Values);
 }
 
 #endif

@@ -33,14 +33,22 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLOptionElement : DOMHTMLElement
 {
-    [Selector("disabled", "setDisabled:")] public bool Disabled { get; set; }
-    [Selector("form")] public DOMHTMLFormElement? Form { get; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("defaultSelected", "setDefaultSelected:")] public bool DefaultSelected { get; set; }
-    [Selector("selected", "setSelected:")] public bool Selected { get; set; }
-    [Selector("value", "setValue:")] public NSString? Value { get; set; }
-    [Selector("text")] public NSString? Text { get; }
-    [Selector("index")] public int Index { get; }
+    [Selector("disabled", "setDisabled:")]
+    public bool Disabled { get; set; }
+    [Selector("form")]
+    public DOMHTMLFormElement? Form { get; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("defaultSelected", "setDefaultSelected:")]
+    public bool DefaultSelected { get; set; }
+    [Selector("selected", "setSelected:")]
+    public bool Selected { get; set; }
+    [Selector("value", "setValue:")]
+    public NSString? Value { get; set; }
+    [Selector("text")]
+    public NSString? Text { get; }
+    [Selector("index")]
+    public int Index { get; }
 }
 
 #endif

@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class VZSpiceAgentPortAttachment : VZSerialPortAttachment
 {
-    [Selector("sharesClipboard", "setSharesClipboard:")] public bool SharesClipboard { get; set; }
-    [Selector("spiceAgentPortName")] public static NSString SpiceAgentPortName { get; }
-    [Selector("init")] public Self Init();
+    [Selector("sharesClipboard", "setSharesClipboard:")]
+    public bool SharesClipboard { get; set; }
+    [Selector("spiceAgentPortName")]
+    public static NSString SpiceAgentPortName { get; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

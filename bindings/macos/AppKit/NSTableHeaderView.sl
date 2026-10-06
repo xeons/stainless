@@ -34,12 +34,18 @@ import Standard.ObjC;
 
 public extern objc class NSTableHeaderView : NSView, NSViewToolTipOwner
 {
-    [Selector("tableView", "setTableView:")] public NSTableView? TableView { get; set; }
-    [Selector("draggedColumn")] public NSInteger DraggedColumn { get; }
-    [Selector("draggedDistance")] public CGFloat DraggedDistance { get; }
-    [Selector("resizedColumn")] public NSInteger ResizedColumn { get; }
-    [Selector("headerRectOfColumn:")] public NSRect HeaderRectOfColumn(NSInteger column);
-    [Selector("columnAtPoint:")] public NSInteger ColumnAtPoint(NSPoint point);
+    [Selector("tableView", "setTableView:")]
+    public NSTableView? TableView { get; set; }
+    [Selector("draggedColumn")]
+    public NSInteger DraggedColumn { get; }
+    [Selector("draggedDistance")]
+    public CGFloat DraggedDistance { get; }
+    [Selector("resizedColumn")]
+    public NSInteger ResizedColumn { get; }
+    [Selector("headerRectOfColumn:")]
+    public NSRect HeaderRectOfColumn(NSInteger column);
+    [Selector("columnAtPoint:")]
+    public NSInteger ColumnAtPoint(NSPoint point);
 }
 
 #endif

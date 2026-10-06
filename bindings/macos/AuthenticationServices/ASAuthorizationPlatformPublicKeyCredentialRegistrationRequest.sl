@@ -37,9 +37,12 @@ public enum ASAuthorizationPlatformPublicKeyCredentialRegistrationRequestStyle :
 
 public extern objc class ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest : ASAuthorizationRequest, ASAuthorizationPublicKeyCredentialRegistrationRequest
 {
-    [Selector("largeBlob", "setLargeBlob:")] public ASAuthorizationPublicKeyCredentialLargeBlobRegistrationInput? LargeBlob { get; set; }
-    [Selector("prf", "setPrf:")] public ASAuthorizationPublicKeyCredentialPRFRegistrationInput? Prf { get; set; }
-    [Selector("requestStyle", "setRequestStyle:")] public ASAuthorizationPlatformPublicKeyCredentialRegistrationRequestStyle RequestStyle { get; set; }
+    [Selector("largeBlob", "setLargeBlob:")]
+    public ASAuthorizationPublicKeyCredentialLargeBlobRegistrationInput? LargeBlob { get; set; }
+    [Selector("prf", "setPrf:")]
+    public ASAuthorizationPublicKeyCredentialPRFRegistrationInput? Prf { get; set; }
+    [Selector("requestStyle", "setRequestStyle:")]
+    public ASAuthorizationPlatformPublicKeyCredentialRegistrationRequestStyle RequestStyle { get; set; }
 }
 
 public extern objc class ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest : ASAuthorizationWebBrowserPlatformPublicKeyCredentialRegistrationRequest { }

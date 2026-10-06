@@ -37,56 +37,93 @@ public objc closure void CNScriptLoadFromAssetChangesProgressCompletionHandlerCo
 
 public extern objc class CNScript : NSObject
 {
-    [Selector("timeRange")] public CMTimeRange TimeRange { get; }
-    [Selector("fNumber", "setFNumber:")] public float FNumber { get; set; }
-    [Selector("addedDetectionTracks")] public NSArray AddedDetectionTracks { get; }
-    [Selector("loadFromAsset:changes:progress:completionHandler:")] public static void LoadFromAssetChangesProgressCompletionHandler(AVAsset asset, CNScriptChanges? changes, NSProgress? progress, CNScriptLoadFromAssetChangesProgressCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("reloadWithChanges:")] public void ReloadWithChanges(CNScriptChanges? changes);
-    [Selector("changes")] public CNScriptChanges Changes();
-    [Selector("changesTrimmedByTimeRange:")] public CNScriptChanges ChangesTrimmedByTimeRange(CMTimeRange timeRange);
-    [Selector("frameAtTime:tolerance:")] public CNScriptFrame? FrameAtTimeTolerance(CMTime time, CMTime tolerance);
-    [Selector("framesInTimeRange:")] public NSArray FramesInTimeRange(CMTimeRange timeRange);
-    [Selector("decisionAtTime:tolerance:")] public CNDecision? DecisionAtTimeTolerance(CMTime time, CMTime tolerance);
-    [Selector("decisionsInTimeRange:")] public NSArray DecisionsInTimeRange(CMTimeRange timeRange);
-    [Selector("decisionAfterTime:")] public CNDecision? DecisionAfterTime(CMTime time);
-    [Selector("decisionBeforeTime:")] public CNDecision? DecisionBeforeTime(CMTime time);
-    [Selector("primaryDecisionAtTime:")] public CNDecision? PrimaryDecisionAtTime(CMTime time);
-    [Selector("secondaryDecisionAtTime:")] public CNDecision? SecondaryDecisionAtTime(CMTime time);
-    [Selector("timeRangeOfTransitionAfterDecision:")] public CMTimeRange TimeRangeOfTransitionAfterDecision(CNDecision decision);
-    [Selector("timeRangeOfTransitionBeforeDecision:")] public CMTimeRange TimeRangeOfTransitionBeforeDecision(CNDecision decision);
-    [Selector("userDecisionsInTimeRange:")] public NSArray UserDecisionsInTimeRange(CMTimeRange timeRange);
-    [Selector("baseDecisionsInTimeRange:")] public NSArray BaseDecisionsInTimeRange(CMTimeRange timeRange);
-    [Selector("detectionTrackForID:")] public CNDetectionTrack? DetectionTrackForID(CNDetectionID detectionID);
-    [Selector("detectionTrackForDecision:")] public CNDetectionTrack? DetectionTrackForDecision(CNDecision decision);
-    [Selector("addUserDecision:")] public bool AddUserDecision(CNDecision decision);
-    [Selector("removeUserDecision:")] public bool RemoveUserDecision(CNDecision decision);
-    [Selector("removeAllUserDecisions")] public void RemoveAllUserDecisions();
-    [Selector("addDetectionTrack:")] public CNDetectionID AddDetectionTrack(CNDetectionTrack detectionTrack);
-    [Selector("removeDetectionTrack:")] public bool RemoveDetectionTrack(CNDetectionTrack detectionTrack);
+    [Selector("timeRange")]
+    public CMTimeRange TimeRange { get; }
+    [Selector("fNumber", "setFNumber:")]
+    public float FNumber { get; set; }
+    [Selector("addedDetectionTracks")]
+    public NSArray AddedDetectionTracks { get; }
+    [Selector("loadFromAsset:changes:progress:completionHandler:")]
+    public static void LoadFromAssetChangesProgressCompletionHandler(AVAsset asset, CNScriptChanges? changes, NSProgress? progress, CNScriptLoadFromAssetChangesProgressCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("reloadWithChanges:")]
+    public void ReloadWithChanges(CNScriptChanges? changes);
+    [Selector("changes")]
+    public CNScriptChanges Changes();
+    [Selector("changesTrimmedByTimeRange:")]
+    public CNScriptChanges ChangesTrimmedByTimeRange(CMTimeRange timeRange);
+    [Selector("frameAtTime:tolerance:")]
+    public CNScriptFrame? FrameAtTimeTolerance(CMTime time, CMTime tolerance);
+    [Selector("framesInTimeRange:")]
+    public NSArray FramesInTimeRange(CMTimeRange timeRange);
+    [Selector("decisionAtTime:tolerance:")]
+    public CNDecision? DecisionAtTimeTolerance(CMTime time, CMTime tolerance);
+    [Selector("decisionsInTimeRange:")]
+    public NSArray DecisionsInTimeRange(CMTimeRange timeRange);
+    [Selector("decisionAfterTime:")]
+    public CNDecision? DecisionAfterTime(CMTime time);
+    [Selector("decisionBeforeTime:")]
+    public CNDecision? DecisionBeforeTime(CMTime time);
+    [Selector("primaryDecisionAtTime:")]
+    public CNDecision? PrimaryDecisionAtTime(CMTime time);
+    [Selector("secondaryDecisionAtTime:")]
+    public CNDecision? SecondaryDecisionAtTime(CMTime time);
+    [Selector("timeRangeOfTransitionAfterDecision:")]
+    public CMTimeRange TimeRangeOfTransitionAfterDecision(CNDecision decision);
+    [Selector("timeRangeOfTransitionBeforeDecision:")]
+    public CMTimeRange TimeRangeOfTransitionBeforeDecision(CNDecision decision);
+    [Selector("userDecisionsInTimeRange:")]
+    public NSArray UserDecisionsInTimeRange(CMTimeRange timeRange);
+    [Selector("baseDecisionsInTimeRange:")]
+    public NSArray BaseDecisionsInTimeRange(CMTimeRange timeRange);
+    [Selector("detectionTrackForID:")]
+    public CNDetectionTrack? DetectionTrackForID(CNDetectionID detectionID);
+    [Selector("detectionTrackForDecision:")]
+    public CNDetectionTrack? DetectionTrackForDecision(CNDecision decision);
+    [Selector("addUserDecision:")]
+    public bool AddUserDecision(CNDecision decision);
+    [Selector("removeUserDecision:")]
+    public bool RemoveUserDecision(CNDecision decision);
+    [Selector("removeAllUserDecisions")]
+    public void RemoveAllUserDecisions();
+    [Selector("addDetectionTrack:")]
+    public CNDetectionID AddDetectionTrack(CNDetectionTrack detectionTrack);
+    [Selector("removeDetectionTrack:")]
+    public bool RemoveDetectionTrack(CNDetectionTrack detectionTrack);
 }
 
 public extern objc class CNScriptChanges : NSObject
 {
-    [Selector("dataRepresentation")] public NSData DataRepresentation { get; }
-    [Selector("fNumber")] public float FNumber { get; }
-    [Selector("userDecisions")] public NSArray UserDecisions { get; }
-    [Selector("addedDetectionTracks")] public NSArray AddedDetectionTracks { get; }
-    [Selector("initWithDataRepresentation:")] public Self? InitWithDataRepresentation(NSData dataRepresentation);
+    [Selector("dataRepresentation")]
+    public NSData DataRepresentation { get; }
+    [Selector("fNumber")]
+    public float FNumber { get; }
+    [Selector("userDecisions")]
+    public NSArray UserDecisions { get; }
+    [Selector("addedDetectionTracks")]
+    public NSArray AddedDetectionTracks { get; }
+    [Selector("initWithDataRepresentation:")]
+    public Self? InitWithDataRepresentation(NSData dataRepresentation);
 }
 
 public extern objc class CNScriptFrame : NSObject, NSCopying
 {
-    [Selector("time")] public CMTime Time { get; }
-    [Selector("focusDisparity")] public float FocusDisparity { get; }
-    [Selector("focusDetection")] public CNDetection FocusDetection { get; }
-    [Selector("allDetections")] public NSArray AllDetections { get; }
+    [Selector("time")]
+    public CMTime Time { get; }
+    [Selector("focusDisparity")]
+    public float FocusDisparity { get; }
+    [Selector("focusDetection")]
+    public CNDetection FocusDetection { get; }
+    [Selector("allDetections")]
+    public NSArray AllDetections { get; }
 }
 
 /// CNExtensions, a category of CNScriptFrame.
 public extern objc class CNScriptFrame
 {
-    [Selector("detectionForID:")] public CNDetection? DetectionForID(CNDetectionID detectionID);
-    [Selector("bestDetectionForGroupID:")] public CNDetection? BestDetectionForGroupID(CNDetectionGroupID detectionGroupID);
+    [Selector("detectionForID:")]
+    public CNDetection? DetectionForID(CNDetectionID detectionID);
+    [Selector("bestDetectionForGroupID:")]
+    public CNDetection? BestDetectionForGroupID(CNDetectionGroupID detectionGroupID);
 }
 
 #endif

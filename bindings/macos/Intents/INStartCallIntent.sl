@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class INStartCallIntent : INIntent
 {
-    [Selector("callRecordFilter")] public INCallRecordFilter? CallRecordFilter { get; }
-    [Selector("callRecordToCallBack")] public INCallRecord? CallRecordToCallBack { get; }
-    [Selector("audioRoute")] public INCallAudioRoute AudioRoute { get; }
-    [Selector("destinationType")] public INCallDestinationType DestinationType { get; }
-    [Selector("contacts")] public NSArray? Contacts { get; }
-    [Selector("callCapability")] public INCallCapability CallCapability { get; }
-    [Selector("initWithCallRecordFilter:callRecordToCallBack:audioRoute:destinationType:contacts:callCapability:")] public Self InitWithCallRecordFilterCallRecordToCallBackAudioRouteDestinationTypeContactsCallCapability(INCallRecordFilter? callRecordFilter, INCallRecord? callRecordToCallBack, INCallAudioRoute audioRoute, INCallDestinationType destinationType, NSArray? contacts, INCallCapability callCapability);
+    [Selector("callRecordFilter")]
+    public INCallRecordFilter? CallRecordFilter { get; }
+    [Selector("callRecordToCallBack")]
+    public INCallRecord? CallRecordToCallBack { get; }
+    [Selector("audioRoute")]
+    public INCallAudioRoute AudioRoute { get; }
+    [Selector("destinationType")]
+    public INCallDestinationType DestinationType { get; }
+    [Selector("contacts")]
+    public NSArray? Contacts { get; }
+    [Selector("callCapability")]
+    public INCallCapability CallCapability { get; }
+    [Selector("initWithCallRecordFilter:callRecordToCallBack:audioRoute:destinationType:contacts:callCapability:")]
+    public Self InitWithCallRecordFilterCallRecordToCallBackAudioRouteDestinationTypeContactsCallCapability(INCallRecordFilter? callRecordFilter, INCallRecord? callRecordToCallBack, INCallAudioRoute audioRoute, INCallDestinationType destinationType, NSArray? contacts, INCallCapability callCapability);
 }
 
 public objc closure void INStartCallIntentHandlingResolveCallRecordToCallBackForStartCallWithCompletionCompletionBlock(INCallRecordResolutionResult arg0);
@@ -50,9 +57,15 @@ public objc closure void INStartCallIntentHandlingResolveContactsForStartCallWit
 
 public objc interface INStartCallIntentHandling : NSObjectProtocol
 {
-    [Optional] [Selector("resolveCallRecordToCallBackForStartCall:withCompletion:")] void ResolveCallRecordToCallBackForStartCallWithCompletion(INStartCallIntent intent, INStartCallIntentHandlingResolveCallRecordToCallBackForStartCallWithCompletionCompletionBlock completion);
-    [Optional] [Selector("resolveDestinationTypeForStartCall:withCompletion:")] void ResolveDestinationTypeForStartCallWithCompletion(INStartCallIntent intent, INStartCallIntentHandlingResolveDestinationTypeForStartCallWithCompletionCompletionBlock completion);
-    [Optional] [Selector("resolveContactsForStartCall:withCompletion:")] void ResolveContactsForStartCallWithCompletion(INStartCallIntent intent, INStartCallIntentHandlingResolveContactsForStartCallWithCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("resolveCallRecordToCallBackForStartCall:withCompletion:")]
+    void ResolveCallRecordToCallBackForStartCallWithCompletion(INStartCallIntent intent, INStartCallIntentHandlingResolveCallRecordToCallBackForStartCallWithCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("resolveDestinationTypeForStartCall:withCompletion:")]
+    void ResolveDestinationTypeForStartCallWithCompletion(INStartCallIntent intent, INStartCallIntentHandlingResolveDestinationTypeForStartCallWithCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("resolveContactsForStartCall:withCompletion:")]
+    void ResolveContactsForStartCallWithCompletion(INStartCallIntent intent, INStartCallIntentHandlingResolveContactsForStartCallWithCompletionCompletionBlock completion);
 }
 
 #endif

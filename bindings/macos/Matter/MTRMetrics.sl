@@ -33,16 +33,22 @@ import Standard.ObjC;
 
 public extern objc class MTRMetricData : NSObject
 {
-    [Selector("value")] public NSNumber? Value { get; }
-    [Selector("errorCode")] public NSNumber? ErrorCode { get; }
-    [Selector("duration")] public NSNumber? Duration { get; }
+    [Selector("value")]
+    public NSNumber? Value { get; }
+    [Selector("errorCode")]
+    public NSNumber? ErrorCode { get; }
+    [Selector("duration")]
+    public NSNumber? Duration { get; }
 }
 
 public extern objc class MTRMetrics : NSObject
 {
-    [Selector("uniqueIdentifier")] public NSUUID UniqueIdentifier { get; }
-    [Selector("allKeys")] public NSArray AllKeys { get; }
-    [Selector("metricDataForKey:")] public MTRMetricData? MetricDataForKey(NSString key);
+    [Selector("uniqueIdentifier")]
+    public NSUUID UniqueIdentifier { get; }
+    [Selector("allKeys")]
+    public NSArray AllKeys { get; }
+    [Selector("metricDataForKey:")]
+    public MTRMetricData? MetricDataForKey(NSString key);
 }
 
 #endif

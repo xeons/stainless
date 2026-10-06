@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public objc interface ASWebAuthenticationSessionWebBrowserSessionHandling
 {
-    [Selector("beginHandlingWebAuthenticationSessionRequest:")] void BeginHandlingWebAuthenticationSessionRequest(ASWebAuthenticationSessionRequest? request);
-    [Selector("cancelWebAuthenticationSessionRequest:")] void CancelWebAuthenticationSessionRequest(ASWebAuthenticationSessionRequest? request);
+    [Selector("beginHandlingWebAuthenticationSessionRequest:")]
+    void BeginHandlingWebAuthenticationSessionRequest(ASWebAuthenticationSessionRequest? request);
+    [Selector("cancelWebAuthenticationSessionRequest:")]
+    void CancelWebAuthenticationSessionRequest(ASWebAuthenticationSessionRequest? request);
 }
 
 #endif

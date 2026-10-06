@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class CKAsset : NSObject
 {
-    [Selector("fileURL")] public NSURL? FileURL { get; }
-    [Selector("initWithFileURL:")] public Self InitWithFileURL(NSURL fileURL);
+    [Selector("fileURL")]
+    public NSURL? FileURL { get; }
+    [Selector("initWithFileURL:")]
+    public Self InitWithFileURL(NSURL fileURL);
 }
 
 #endif

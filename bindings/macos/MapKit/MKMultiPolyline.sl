@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class MKMultiPolyline : MKShape, MKOverlay
 {
-    [Selector("polylines")] public NSArray Polylines { get; }
-    [Selector("initWithPolylines:")] public Self InitWithPolylines(NSArray polylines);
+    [Selector("polylines")]
+    public NSArray Polylines { get; }
+    [Selector("initWithPolylines:")]
+    public Self InitWithPolylines(NSArray polylines);
 }
 
 #endif

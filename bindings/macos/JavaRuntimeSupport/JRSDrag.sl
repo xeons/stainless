@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class JRSDrag : NSObject
 {
-    [Selector("currentAllowableActions")] public static NSDragOperation CurrentAllowableActions();
-    [Selector("currentModifiers")] public static NSUInteger CurrentModifiers();
+    [Selector("currentAllowableActions")]
+    public static NSDragOperation CurrentAllowableActions();
+    [Selector("currentModifiers")]
+    public static NSUInteger CurrentModifiers();
 }
 
 #endif

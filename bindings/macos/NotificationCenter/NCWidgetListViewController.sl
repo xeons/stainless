@@ -35,25 +35,44 @@ import Standard.ObjC;
 /// Deprecated in macOS 11.0.
 public extern objc class NCWidgetListViewController : NSViewController
 {
-    [Selector("delegate", "setDelegate:")] public NCWidgetListViewDelegate? Delegate { get; set; }
-    [Selector("contents", "setContents:")] public NSArray Contents { get; set; }
-    [Selector("minimumVisibleRowCount", "setMinimumVisibleRowCount:")] public NSUInteger MinimumVisibleRowCount { get; set; }
-    [Selector("hasDividerLines", "setHasDividerLines:")] public bool HasDividerLines { get; set; }
-    [Selector("editing", "setEditing:")] public bool Editing { get; set; }
-    [Selector("showsAddButtonWhenEditing", "setShowsAddButtonWhenEditing:")] public bool ShowsAddButtonWhenEditing { get; set; }
-    [Selector("viewControllerAtRow:makeIfNecessary:")] public NSViewController ViewControllerAtRowMakeIfNecessary(NSUInteger row, bool makeIfNecesary);
-    [Selector("rowForViewController:")] public NSUInteger RowForViewController(NSViewController viewController);
+    [Selector("delegate", "setDelegate:")]
+    public NCWidgetListViewDelegate? Delegate { get; set; }
+    [Selector("contents", "setContents:")]
+    public NSArray Contents { get; set; }
+    [Selector("minimumVisibleRowCount", "setMinimumVisibleRowCount:")]
+    public NSUInteger MinimumVisibleRowCount { get; set; }
+    [Selector("hasDividerLines", "setHasDividerLines:")]
+    public bool HasDividerLines { get; set; }
+    [Selector("editing", "setEditing:")]
+    public bool Editing { get; set; }
+    [Selector("showsAddButtonWhenEditing", "setShowsAddButtonWhenEditing:")]
+    public bool ShowsAddButtonWhenEditing { get; set; }
+    [Selector("viewControllerAtRow:makeIfNecessary:")]
+    public NSViewController ViewControllerAtRowMakeIfNecessary(NSUInteger row, bool makeIfNecesary);
+    [Selector("rowForViewController:")]
+    public NSUInteger RowForViewController(NSViewController viewController);
 }
 
 /// Deprecated in macOS 11.0.
 public objc interface NCWidgetListViewDelegate : NSObjectProtocol
 {
-    [Selector("widgetList:viewControllerForRow:")] NSViewController WidgetListViewControllerForRow(NCWidgetListViewController list, NSUInteger row);
-    [Optional] [Selector("widgetListPerformAddAction:")] void WidgetListPerformAddAction(NCWidgetListViewController list);
-    [Optional] [Selector("widgetList:shouldReorderRow:")] bool WidgetListShouldReorderRow(NCWidgetListViewController list, NSUInteger row);
-    [Optional] [Selector("widgetList:didReorderRow:toRow:")] void WidgetListDidReorderRowToRow(NCWidgetListViewController list, NSUInteger row, NSUInteger newIndex);
-    [Optional] [Selector("widgetList:shouldRemoveRow:")] bool WidgetListShouldRemoveRow(NCWidgetListViewController list, NSUInteger row);
-    [Optional] [Selector("widgetList:didRemoveRow:")] void WidgetListDidRemoveRow(NCWidgetListViewController list, NSUInteger row);
+    [Selector("widgetList:viewControllerForRow:")]
+    NSViewController WidgetListViewControllerForRow(NCWidgetListViewController list, NSUInteger row);
+    [Optional]
+    [Selector("widgetListPerformAddAction:")]
+    void WidgetListPerformAddAction(NCWidgetListViewController list);
+    [Optional]
+    [Selector("widgetList:shouldReorderRow:")]
+    bool WidgetListShouldReorderRow(NCWidgetListViewController list, NSUInteger row);
+    [Optional]
+    [Selector("widgetList:didReorderRow:toRow:")]
+    void WidgetListDidReorderRowToRow(NCWidgetListViewController list, NSUInteger row, NSUInteger newIndex);
+    [Optional]
+    [Selector("widgetList:shouldRemoveRow:")]
+    bool WidgetListShouldRemoveRow(NCWidgetListViewController list, NSUInteger row);
+    [Optional]
+    [Selector("widgetList:didRemoveRow:")]
+    void WidgetListDidRemoveRow(NCWidgetListViewController list, NSUInteger row);
 }
 
 #endif

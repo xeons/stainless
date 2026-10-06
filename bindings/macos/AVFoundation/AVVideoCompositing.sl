@@ -51,77 +51,131 @@ public struct AVEdgeWidths
 
 public extern objc class AVVideoCompositionRenderContext : NSObject
 {
-    [Selector("size")] public CGSize Size { get; }
-    [Selector("renderTransform")] public CGAffineTransform RenderTransform { get; }
-    [Selector("renderScale")] public float RenderScale { get; }
-    [Selector("pixelAspectRatio")] public AVPixelAspectRatio PixelAspectRatio { get; }
-    [Selector("edgeWidths")] public AVEdgeWidths EdgeWidths { get; }
-    [Selector("highQualityRendering")] public bool HighQualityRendering { get; }
-    [Selector("videoComposition")] public AVVideoComposition VideoComposition { get; }
-    [Selector("newPixelBuffer")] public CVPixelBufferRef? NewPixelBuffer();
+    [Selector("size")]
+    public CGSize Size { get; }
+    [Selector("renderTransform")]
+    public CGAffineTransform RenderTransform { get; }
+    [Selector("renderScale")]
+    public float RenderScale { get; }
+    [Selector("pixelAspectRatio")]
+    public AVPixelAspectRatio PixelAspectRatio { get; }
+    [Selector("edgeWidths")]
+    public AVEdgeWidths EdgeWidths { get; }
+    [Selector("highQualityRendering")]
+    public bool HighQualityRendering { get; }
+    [Selector("videoComposition")]
+    public AVVideoComposition VideoComposition { get; }
+    [Selector("newPixelBuffer")]
+    public CVPixelBufferRef? NewPixelBuffer();
 }
 
 public extern objc class AVVideoCompositionRenderHint : NSObject
 {
-    [Selector("startCompositionTime")] public CMTime StartCompositionTime { get; }
-    [Selector("endCompositionTime")] public CMTime EndCompositionTime { get; }
+    [Selector("startCompositionTime")]
+    public CMTime StartCompositionTime { get; }
+    [Selector("endCompositionTime")]
+    public CMTime EndCompositionTime { get; }
 }
 
 public objc interface AVVideoCompositing : NSObjectProtocol
 {
-    [Selector("sourcePixelBufferAttributes")] NSDictionary? SourcePixelBufferAttributes { get; }
-    [Selector("requiredPixelBufferAttributesForRenderContext")] NSDictionary RequiredPixelBufferAttributesForRenderContext { get; }
-    [Optional] [Selector("supportsWideColorSourceFrames")] bool SupportsWideColorSourceFrames { get; }
-    [Optional] [Selector("supportsHDRSourceFrames")] bool SupportsHDRSourceFrames { get; }
+    [Selector("sourcePixelBufferAttributes")]
+    NSDictionary? SourcePixelBufferAttributes { get; }
+    [Selector("requiredPixelBufferAttributesForRenderContext")]
+    NSDictionary RequiredPixelBufferAttributesForRenderContext { get; }
+    [Optional]
+    [Selector("supportsWideColorSourceFrames")]
+    bool SupportsWideColorSourceFrames { get; }
+    [Optional]
+    [Selector("supportsHDRSourceFrames")]
+    bool SupportsHDRSourceFrames { get; }
     /// macOS 26.0 and later.
-    [Optional] [Selector("supportsSourceTaggedBuffers")] bool SupportsSourceTaggedBuffers { get; }
-    [Optional] [Selector("canConformColorOfSourceFrames")] bool CanConformColorOfSourceFrames { get; }
-    [Selector("renderContextChanged:")] void RenderContextChanged(AVVideoCompositionRenderContext newRenderContext);
-    [Selector("startVideoCompositionRequest:")] void StartVideoCompositionRequest(AVAsynchronousVideoCompositionRequest asyncVideoCompositionRequest);
-    [Optional] [Selector("cancelAllPendingVideoCompositionRequests")] void CancelAllPendingVideoCompositionRequests();
-    [Optional] [Selector("anticipateRenderingUsingHint:")] void AnticipateRenderingUsingHint(AVVideoCompositionRenderHint renderHint);
-    [Optional] [Selector("prerollForRenderingUsingHint:")] void PrerollForRenderingUsingHint(AVVideoCompositionRenderHint renderHint);
+    [Optional]
+    [Selector("supportsSourceTaggedBuffers")]
+    bool SupportsSourceTaggedBuffers { get; }
+    [Optional]
+    [Selector("canConformColorOfSourceFrames")]
+    bool CanConformColorOfSourceFrames { get; }
+    [Selector("renderContextChanged:")]
+    void RenderContextChanged(AVVideoCompositionRenderContext newRenderContext);
+    [Selector("startVideoCompositionRequest:")]
+    void StartVideoCompositionRequest(AVAsynchronousVideoCompositionRequest asyncVideoCompositionRequest);
+    [Optional]
+    [Selector("cancelAllPendingVideoCompositionRequests")]
+    void CancelAllPendingVideoCompositionRequests();
+    [Optional]
+    [Selector("anticipateRenderingUsingHint:")]
+    void AnticipateRenderingUsingHint(AVVideoCompositionRenderHint renderHint);
+    [Optional]
+    [Selector("prerollForRenderingUsingHint:")]
+    void PrerollForRenderingUsingHint(AVVideoCompositionRenderHint renderHint);
 }
 
 public extern objc class AVAsynchronousVideoCompositionRequest : NSObject, NSCopying
 {
-    [Selector("renderContext")] public AVVideoCompositionRenderContext RenderContext { get; }
-    [Selector("compositionTime")] public CMTime CompositionTime { get; }
-    [Selector("sourceTrackIDs")] public NSArray SourceTrackIDs { get; }
-    [Selector("sourceSampleDataTrackIDs")] public NSArray? SourceSampleDataTrackIDs { get; }
-    [Selector("videoCompositionInstruction")] public AVVideoCompositionInstructionProtocol VideoCompositionInstruction { get; }
-    [Selector("sourceFrameByTrackID:")] public CVPixelBufferRef? SourceFrameByTrackID(CMPersistentTrackID trackID);
-    [Selector("sourceSampleBufferByTrackID:")] public CMSampleBufferRef? SourceSampleBufferByTrackID(CMPersistentTrackID trackID);
-    [Selector("sourceTimedMetadataByTrackID:")] public AVTimedMetadataGroup? SourceTimedMetadataByTrackID(CMPersistentTrackID trackID);
-    [Selector("finishWithComposedVideoFrame:")] public void FinishWithComposedVideoFrame(CVPixelBufferRef composedVideoFrame);
-    [Selector("finishWithError:")] public void FinishWithError(NSError error);
-    [Selector("finishCancelledRequest")] public void FinishCancelledRequest();
+    [Selector("renderContext")]
+    public AVVideoCompositionRenderContext RenderContext { get; }
+    [Selector("compositionTime")]
+    public CMTime CompositionTime { get; }
+    [Selector("sourceTrackIDs")]
+    public NSArray SourceTrackIDs { get; }
+    [Selector("sourceSampleDataTrackIDs")]
+    public NSArray? SourceSampleDataTrackIDs { get; }
+    [Selector("videoCompositionInstruction")]
+    public AVVideoCompositionInstructionProtocol VideoCompositionInstruction { get; }
+    [Selector("sourceFrameByTrackID:")]
+    public CVPixelBufferRef? SourceFrameByTrackID(CMPersistentTrackID trackID);
+    [Selector("sourceSampleBufferByTrackID:")]
+    public CMSampleBufferRef? SourceSampleBufferByTrackID(CMPersistentTrackID trackID);
+    [Selector("sourceTimedMetadataByTrackID:")]
+    public AVTimedMetadataGroup? SourceTimedMetadataByTrackID(CMPersistentTrackID trackID);
+    [Selector("finishWithComposedVideoFrame:")]
+    public void FinishWithComposedVideoFrame(CVPixelBufferRef composedVideoFrame);
+    [Selector("finishWithError:")]
+    public void FinishWithError(NSError error);
+    [Selector("finishCancelledRequest")]
+    public void FinishCancelledRequest();
     /// macOS 26.0 and later.
-    [Selector("sourceTaggedBufferGroupByTrackID:")] public CMTaggedBufferGroupRef? SourceTaggedBufferGroupByTrackID(CMPersistentTrackID trackID);
+    [Selector("sourceTaggedBufferGroupByTrackID:")]
+    public CMTaggedBufferGroupRef? SourceTaggedBufferGroupByTrackID(CMPersistentTrackID trackID);
     /// macOS 26.0 and later.
-    [Selector("finishWithComposedTaggedBufferGroup:")] public void FinishWithComposedTaggedBufferGroup(CMTaggedBufferGroupRef taggedBufferGroup);
+    [Selector("finishWithComposedTaggedBufferGroup:")]
+    public void FinishWithComposedTaggedBufferGroup(CMTaggedBufferGroupRef taggedBufferGroup);
     /// macOS 26.0 and later.
-    [Selector("attachSpatialVideoConfiguration:toPixelBuffer:")] public void AttachSpatialVideoConfigurationToPixelBuffer(AVSpatialVideoConfiguration? spatialVideoConfiguration, CVPixelBufferRef pixelBuffer);
+    [Selector("attachSpatialVideoConfiguration:toPixelBuffer:")]
+    public void AttachSpatialVideoConfigurationToPixelBuffer(AVSpatialVideoConfiguration? spatialVideoConfiguration, CVPixelBufferRef pixelBuffer);
 }
 
 public extern objc class AVAsynchronousCIImageFilteringRequest : NSObject, NSCopying
 {
-    [Selector("renderSize")] public CGSize RenderSize { get; }
-    [Selector("compositionTime")] public CMTime CompositionTime { get; }
-    [Selector("sourceImage")] public CIImage SourceImage { get; }
-    [Selector("finishWithImage:context:")] public void FinishWithImageContext(CIImage filteredImage, CIContext? context);
-    [Selector("finishWithError:")] public void FinishWithError(NSError error);
+    [Selector("renderSize")]
+    public CGSize RenderSize { get; }
+    [Selector("compositionTime")]
+    public CMTime CompositionTime { get; }
+    [Selector("sourceImage")]
+    public CIImage SourceImage { get; }
+    [Selector("finishWithImage:context:")]
+    public void FinishWithImageContext(CIImage filteredImage, CIContext? context);
+    [Selector("finishWithError:")]
+    public void FinishWithError(NSError error);
 }
 
 [ObjCName("AVVideoCompositionInstruction")]
 public objc interface AVVideoCompositionInstructionProtocol : NSObjectProtocol
 {
-    [Selector("timeRange")] CMTimeRange TimeRange { get; }
-    [Selector("enablePostProcessing")] bool EnablePostProcessing { get; }
-    [Selector("containsTweening")] bool ContainsTweening { get; }
-    [Selector("requiredSourceTrackIDs")] NSArray? RequiredSourceTrackIDs { get; }
-    [Selector("passthroughTrackID")] CMPersistentTrackID PassthroughTrackID { get; }
-    [Optional] [Selector("requiredSourceSampleDataTrackIDs")] NSArray? RequiredSourceSampleDataTrackIDs { get; }
+    [Selector("timeRange")]
+    CMTimeRange TimeRange { get; }
+    [Selector("enablePostProcessing")]
+    bool EnablePostProcessing { get; }
+    [Selector("containsTweening")]
+    bool ContainsTweening { get; }
+    [Selector("requiredSourceTrackIDs")]
+    NSArray? RequiredSourceTrackIDs { get; }
+    [Selector("passthroughTrackID")]
+    CMPersistentTrackID PassthroughTrackID { get; }
+    [Optional]
+    [Selector("requiredSourceSampleDataTrackIDs")]
+    NSArray? RequiredSourceSampleDataTrackIDs { get; }
 }
 
 #endif

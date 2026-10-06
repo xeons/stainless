@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class SWPerson : NSObject, NSSecureCoding
 {
-    [Selector("initWithHandle:identity:displayName:thumbnailImageData:")] public Self InitWithHandleIdentityDisplayNameThumbnailImageData(NSString? handle, SWPersonIdentity? identity, NSString displayName, NSData? thumbnailImageData);
+    [Selector("initWithHandle:identity:displayName:thumbnailImageData:")]
+    public Self InitWithHandleIdentityDisplayNameThumbnailImageData(NSString? handle, SWPersonIdentity? identity, NSString displayName, NSData? thumbnailImageData);
 }
 
 #endif

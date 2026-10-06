@@ -193,7 +193,8 @@ public extern "C" OSErr GetNextProcess(ProcessSerialNumber* pPSN);
 public extern "C" OSErr GetProcessInformation(ProcessSerialNumber* PSN, ProcessInfoRec* info);
 
 /// Deprecated in macOS 10.9.
-[ReturnsRetained] public extern "C" CFDictionaryRef? ProcessInformationCopyDictionary(ProcessSerialNumber* PSN, UInt32 infoToReturn);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? ProcessInformationCopyDictionary(ProcessSerialNumber* PSN, UInt32 infoToReturn);
 
 /// Deprecated in macOS 10.9.
 public extern "C" OSErr SetFrontProcess(ProcessSerialNumber* pPSN);

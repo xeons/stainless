@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class PDFActionResetForm : PDFAction, NSCopying
 {
-    [Selector("fields", "setFields:")] public NSArray? Fields { get; set; }
-    [Selector("fieldsIncludedAreCleared", "setFieldsIncludedAreCleared:")] public bool FieldsIncludedAreCleared { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("fields", "setFields:")]
+    public NSArray? Fields { get; set; }
+    [Selector("fieldsIncludedAreCleared", "setFieldsIncludedAreCleared:")]
+    public bool FieldsIncludedAreCleared { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class NSNibControlConnector : NSNibConnector
 {
-    [Selector("establishConnection")] public void EstablishConnection();
+    [Selector("establishConnection")]
+    public void EstablishConnection();
 }
 
 #endif

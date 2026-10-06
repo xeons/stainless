@@ -39,51 +39,79 @@ public using NSSoundPlaybackDeviceIdentifier = NSString;
 
 public extern objc class NSSound : NSObject, NSCopying, NSSecureCoding, NSPasteboardReading, NSPasteboardWriting
 {
-    [Selector("name")] public NSSoundName? Name { get; }
-    [Selector("soundUnfilteredTypes")] public static NSArray? SoundUnfilteredTypes { get; }
-    [Selector("isPlaying")] public bool Playing { get; }
-    [Selector("delegate", "setDelegate:")] public NSSoundDelegate? Delegate { get; set; }
-    [Selector("duration")] public NSTimeInterval Duration { get; }
-    [Selector("volume", "setVolume:")] public float Volume { get; set; }
-    [Selector("currentTime", "setCurrentTime:")] public NSTimeInterval CurrentTime { get; set; }
-    [Selector("loops", "setLoops:")] public bool Loops { get; set; }
-    [Selector("playbackDeviceIdentifier", "setPlaybackDeviceIdentifier:")] public NSSoundPlaybackDeviceIdentifier? PlaybackDeviceIdentifier { get; set; }
-    [Selector("soundNamed:")] public static NSSound? SoundNamed(NSSoundName name);
-    [Selector("initWithContentsOfURL:byReference:")] public Self? InitWithContentsOfURLByReference(NSURL url, bool byRef);
-    [Selector("initWithContentsOfFile:byReference:")] public Self? InitWithContentsOfFileByReference(NSString path, bool byRef);
-    [Selector("initWithData:")] public Self? InitWithData(NSData data);
-    [Selector("setName:")] public bool SetName(NSSoundName? string);
-    [Selector("canInitWithPasteboard:")] public static bool CanInitWithPasteboard(NSPasteboard pasteboard);
-    [Selector("initWithPasteboard:")] public Self? InitWithPasteboard(NSPasteboard pasteboard);
-    [Selector("writeToPasteboard:")] public void WriteToPasteboard(NSPasteboard pasteboard);
-    [Selector("play")] public bool Play();
-    [Selector("pause")] public bool Pause();
-    [Selector("resume")] public bool Resume();
-    [Selector("stop")] public bool Stop();
+    [Selector("name")]
+    public NSSoundName? Name { get; }
+    [Selector("soundUnfilteredTypes")]
+    public static NSArray? SoundUnfilteredTypes { get; }
+    [Selector("isPlaying")]
+    public bool Playing { get; }
+    [Selector("delegate", "setDelegate:")]
+    public NSSoundDelegate? Delegate { get; set; }
+    [Selector("duration")]
+    public NSTimeInterval Duration { get; }
+    [Selector("volume", "setVolume:")]
+    public float Volume { get; set; }
+    [Selector("currentTime", "setCurrentTime:")]
+    public NSTimeInterval CurrentTime { get; set; }
+    [Selector("loops", "setLoops:")]
+    public bool Loops { get; set; }
+    [Selector("playbackDeviceIdentifier", "setPlaybackDeviceIdentifier:")]
+    public NSSoundPlaybackDeviceIdentifier? PlaybackDeviceIdentifier { get; set; }
+    [Selector("soundNamed:")]
+    public static NSSound? SoundNamed(NSSoundName name);
+    [Selector("initWithContentsOfURL:byReference:")]
+    public Self? InitWithContentsOfURLByReference(NSURL url, bool byRef);
+    [Selector("initWithContentsOfFile:byReference:")]
+    public Self? InitWithContentsOfFileByReference(NSString path, bool byRef);
+    [Selector("initWithData:")]
+    public Self? InitWithData(NSData data);
+    [Selector("setName:")]
+    public bool SetName(NSSoundName? string);
+    [Selector("canInitWithPasteboard:")]
+    public static bool CanInitWithPasteboard(NSPasteboard pasteboard);
+    [Selector("initWithPasteboard:")]
+    public Self? InitWithPasteboard(NSPasteboard pasteboard);
+    [Selector("writeToPasteboard:")]
+    public void WriteToPasteboard(NSPasteboard pasteboard);
+    [Selector("play")]
+    public bool Play();
+    [Selector("pause")]
+    public bool Pause();
+    [Selector("resume")]
+    public bool Resume();
+    [Selector("stop")]
+    public bool Stop();
     /// Deprecated in macOS 10.9.
-    [Selector("setChannelMapping:")] public void SetChannelMapping(NSArray? channelMapping);
+    [Selector("setChannelMapping:")]
+    public void SetChannelMapping(NSArray? channelMapping);
     /// Deprecated in macOS 10.9.
-    [Selector("channelMapping")] public NSArray? ChannelMapping();
+    [Selector("channelMapping")]
+    public NSArray? ChannelMapping();
 }
 
 /// NSDeprecated, a category of NSSound.
 public extern objc class NSSound
 {
     /// Deprecated in macOS 10.5.
-    [Selector("soundUnfilteredFileTypes")] public static NSArray? SoundUnfilteredFileTypes();
+    [Selector("soundUnfilteredFileTypes")]
+    public static NSArray? SoundUnfilteredFileTypes();
     /// Deprecated in macOS 10.5.
-    [Selector("soundUnfilteredPasteboardTypes")] public static NSArray? SoundUnfilteredPasteboardTypes();
+    [Selector("soundUnfilteredPasteboardTypes")]
+    public static NSArray? SoundUnfilteredPasteboardTypes();
 }
 
 public objc interface NSSoundDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("sound:didFinishPlaying:")] void SoundDidFinishPlaying(NSSound sound, bool flag);
+    [Optional]
+    [Selector("sound:didFinishPlaying:")]
+    void SoundDidFinishPlaying(NSSound sound, bool flag);
 }
 
 /// NSBundleSoundExtensions, a category of NSBundle.
 public extern objc class NSBundle
 {
-    [Selector("pathForSoundResource:")] public NSString? PathForSoundResource(NSSoundName name);
+    [Selector("pathForSoundResource:")]
+    public NSString? PathForSoundResource(NSSoundName name);
 }
 
 #endif

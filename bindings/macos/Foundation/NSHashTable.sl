@@ -34,29 +34,51 @@ public using NSHashTableOptions = NSUInteger;
 
 public extern objc class NSHashTable : NSObject, NSCopying, NSSecureCoding, NSFastEnumeration
 {
-    [Selector("pointerFunctions")] public NSPointerFunctions PointerFunctions { get; }
-    [Selector("count")] public NSUInteger Count { get; }
-    [Selector("allObjects")] public NSArray AllObjects { get; }
-    [Selector("anyObject")] public AnyObject? AnyObject { get; }
-    [Selector("setRepresentation")] public NSSet SetRepresentation { get; }
-    [Selector("initWithOptions:capacity:")] public Self InitWithOptionsCapacity(NSPointerFunctionsOptions options, NSUInteger initialCapacity);
-    [Selector("initWithPointerFunctions:capacity:")] public Self InitWithPointerFunctionsCapacity(NSPointerFunctions functions, NSUInteger initialCapacity);
-    [Selector("hashTableWithOptions:")] public static NSHashTable HashTableWithOptions(NSPointerFunctionsOptions options);
+    [Selector("pointerFunctions")]
+    public NSPointerFunctions PointerFunctions { get; }
+    [Selector("count")]
+    public NSUInteger Count { get; }
+    [Selector("allObjects")]
+    public NSArray AllObjects { get; }
+    [Selector("anyObject")]
+    public AnyObject? AnyObject { get; }
+    [Selector("setRepresentation")]
+    public NSSet SetRepresentation { get; }
+    [Selector("initWithOptions:capacity:")]
+    public Self InitWithOptionsCapacity(NSPointerFunctionsOptions options, NSUInteger initialCapacity);
+    [Selector("initWithPointerFunctions:capacity:")]
+    public Self InitWithPointerFunctionsCapacity(NSPointerFunctions functions, NSUInteger initialCapacity);
+    [Selector("hashTableWithOptions:")]
+    public static NSHashTable HashTableWithOptions(NSPointerFunctionsOptions options);
     /// Deprecated in macOS 10.8.
-    [Selector("hashTableWithWeakObjects")] public static AnyObject HashTableWithWeakObjects();
-    [Selector("weakObjectsHashTable")] public static NSHashTable WeakObjectsHashTable();
-    [Selector("member:")] public AnyObject? Member(AnyObject? object);
-    [Selector("objectEnumerator")] public NSEnumerator ObjectEnumerator();
-    [Selector("addObject:")] public void AddObject(AnyObject? object);
-    [Selector("removeObject:")] public void RemoveObject(AnyObject? object);
-    [Selector("removeAllObjects")] public void RemoveAllObjects();
-    [Selector("containsObject:")] public bool ContainsObject(AnyObject? anObject);
-    [Selector("intersectsHashTable:")] public bool IntersectsHashTable(NSHashTable other);
-    [Selector("isEqualToHashTable:")] public bool IsEqualToHashTable(NSHashTable other);
-    [Selector("isSubsetOfHashTable:")] public bool IsSubsetOfHashTable(NSHashTable other);
-    [Selector("intersectHashTable:")] public void IntersectHashTable(NSHashTable other);
-    [Selector("unionHashTable:")] public void UnionHashTable(NSHashTable other);
-    [Selector("minusHashTable:")] public void MinusHashTable(NSHashTable other);
+    [Selector("hashTableWithWeakObjects")]
+    public static AnyObject HashTableWithWeakObjects();
+    [Selector("weakObjectsHashTable")]
+    public static NSHashTable WeakObjectsHashTable();
+    [Selector("member:")]
+    public AnyObject? Member(AnyObject? object);
+    [Selector("objectEnumerator")]
+    public NSEnumerator ObjectEnumerator();
+    [Selector("addObject:")]
+    public void AddObject(AnyObject? object);
+    [Selector("removeObject:")]
+    public void RemoveObject(AnyObject? object);
+    [Selector("removeAllObjects")]
+    public void RemoveAllObjects();
+    [Selector("containsObject:")]
+    public bool ContainsObject(AnyObject? anObject);
+    [Selector("intersectsHashTable:")]
+    public bool IntersectsHashTable(NSHashTable other);
+    [Selector("isEqualToHashTable:")]
+    public bool IsEqualToHashTable(NSHashTable other);
+    [Selector("isSubsetOfHashTable:")]
+    public bool IsSubsetOfHashTable(NSHashTable other);
+    [Selector("intersectHashTable:")]
+    public void IntersectHashTable(NSHashTable other);
+    [Selector("unionHashTable:")]
+    public void UnionHashTable(NSHashTable other);
+    [Selector("minusHashTable:")]
+    public void MinusHashTable(NSHashTable other);
 }
 
 public struct NSHashEnumerator

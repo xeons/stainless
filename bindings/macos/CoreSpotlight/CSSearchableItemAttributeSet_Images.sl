@@ -33,37 +33,68 @@ import Standard.ObjC;
 /// CSImages, a category of CSSearchableItemAttributeSet.
 public extern objc class CSSearchableItemAttributeSet
 {
-    [Selector("pixelHeight", "setPixelHeight:")] public NSNumber? PixelHeight { get; set; }
-    [Selector("pixelWidth", "setPixelWidth:")] public NSNumber? PixelWidth { get; set; }
-    [Selector("pixelCount", "setPixelCount:")] public NSNumber? PixelCount { get; set; }
-    [Selector("colorSpace", "setColorSpace:")] public NSString? ColorSpace { get; set; }
-    [Selector("bitsPerSample", "setBitsPerSample:")] public NSNumber? BitsPerSample { get; set; }
-    [Selector("isFlashOn", "setFlashOn:")] public NSNumber? FlashOn { get; set; }
-    [Selector("focalLength", "setFocalLength:")] public NSNumber? FocalLength { get; set; }
-    [Selector("isFocalLength35mm", "setFocalLength35mm:")] public NSNumber? FocalLength35mm { get; set; }
-    [Selector("acquisitionMake", "setAcquisitionMake:")] public NSString? AcquisitionMake { get; set; }
-    [Selector("acquisitionModel", "setAcquisitionModel:")] public NSString? AcquisitionModel { get; set; }
-    [Selector("cameraOwner", "setCameraOwner:")] public NSString? CameraOwner { get; set; }
-    [Selector("lensModel", "setLensModel:")] public NSString? LensModel { get; set; }
-    [Selector("ISOSpeed", "setISOSpeed:")] public NSNumber? ISOSpeed { get; set; }
-    [Selector("orientation", "setOrientation:")] public NSNumber? Orientation { get; set; }
-    [Selector("layerNames", "setLayerNames:")] public NSArray? LayerNames { get; set; }
-    [Selector("whiteBalance", "setWhiteBalance:")] public NSNumber? WhiteBalance { get; set; }
-    [Selector("aperture", "setAperture:")] public NSNumber? Aperture { get; set; }
-    [Selector("profileName", "setProfileName:")] public NSString? ProfileName { get; set; }
-    [Selector("resolutionWidthDPI", "setResolutionWidthDPI:")] public NSNumber? ResolutionWidthDPI { get; set; }
-    [Selector("resolutionHeightDPI", "setResolutionHeightDPI:")] public NSNumber? ResolutionHeightDPI { get; set; }
-    [Selector("exposureMode", "setExposureMode:")] public NSNumber? ExposureMode { get; set; }
-    [Selector("exposureTime", "setExposureTime:")] public NSNumber? ExposureTime { get; set; }
-    [Selector("EXIFVersion", "setEXIFVersion:")] public NSString? EXIFVersion { get; set; }
-    [Selector("EXIFGPSVersion", "setEXIFGPSVersion:")] public NSString? EXIFGPSVersion { get; set; }
-    [Selector("hasAlphaChannel", "setHasAlphaChannel:")] public NSNumber? HasAlphaChannel { get; set; }
-    [Selector("isRedEyeOn", "setRedEyeOn:")] public NSNumber? RedEyeOn { get; set; }
-    [Selector("meteringMode", "setMeteringMode:")] public NSString? MeteringMode { get; set; }
-    [Selector("maxAperture", "setMaxAperture:")] public NSNumber? MaxAperture { get; set; }
-    [Selector("fNumber", "setFNumber:")] public NSNumber? FNumber { get; set; }
-    [Selector("exposureProgram", "setExposureProgram:")] public NSString? ExposureProgram { get; set; }
-    [Selector("exposureTimeString", "setExposureTimeString:")] public NSString? ExposureTimeString { get; set; }
+    [Selector("pixelHeight", "setPixelHeight:")]
+    public NSNumber? PixelHeight { get; set; }
+    [Selector("pixelWidth", "setPixelWidth:")]
+    public NSNumber? PixelWidth { get; set; }
+    [Selector("pixelCount", "setPixelCount:")]
+    public NSNumber? PixelCount { get; set; }
+    [Selector("colorSpace", "setColorSpace:")]
+    public NSString? ColorSpace { get; set; }
+    [Selector("bitsPerSample", "setBitsPerSample:")]
+    public NSNumber? BitsPerSample { get; set; }
+    [Selector("isFlashOn", "setFlashOn:")]
+    public NSNumber? FlashOn { get; set; }
+    [Selector("focalLength", "setFocalLength:")]
+    public NSNumber? FocalLength { get; set; }
+    [Selector("isFocalLength35mm", "setFocalLength35mm:")]
+    public NSNumber? FocalLength35mm { get; set; }
+    [Selector("acquisitionMake", "setAcquisitionMake:")]
+    public NSString? AcquisitionMake { get; set; }
+    [Selector("acquisitionModel", "setAcquisitionModel:")]
+    public NSString? AcquisitionModel { get; set; }
+    [Selector("cameraOwner", "setCameraOwner:")]
+    public NSString? CameraOwner { get; set; }
+    [Selector("lensModel", "setLensModel:")]
+    public NSString? LensModel { get; set; }
+    [Selector("ISOSpeed", "setISOSpeed:")]
+    public NSNumber? ISOSpeed { get; set; }
+    [Selector("orientation", "setOrientation:")]
+    public NSNumber? Orientation { get; set; }
+    [Selector("layerNames", "setLayerNames:")]
+    public NSArray? LayerNames { get; set; }
+    [Selector("whiteBalance", "setWhiteBalance:")]
+    public NSNumber? WhiteBalance { get; set; }
+    [Selector("aperture", "setAperture:")]
+    public NSNumber? Aperture { get; set; }
+    [Selector("profileName", "setProfileName:")]
+    public NSString? ProfileName { get; set; }
+    [Selector("resolutionWidthDPI", "setResolutionWidthDPI:")]
+    public NSNumber? ResolutionWidthDPI { get; set; }
+    [Selector("resolutionHeightDPI", "setResolutionHeightDPI:")]
+    public NSNumber? ResolutionHeightDPI { get; set; }
+    [Selector("exposureMode", "setExposureMode:")]
+    public NSNumber? ExposureMode { get; set; }
+    [Selector("exposureTime", "setExposureTime:")]
+    public NSNumber? ExposureTime { get; set; }
+    [Selector("EXIFVersion", "setEXIFVersion:")]
+    public NSString? EXIFVersion { get; set; }
+    [Selector("EXIFGPSVersion", "setEXIFGPSVersion:")]
+    public NSString? EXIFGPSVersion { get; set; }
+    [Selector("hasAlphaChannel", "setHasAlphaChannel:")]
+    public NSNumber? HasAlphaChannel { get; set; }
+    [Selector("isRedEyeOn", "setRedEyeOn:")]
+    public NSNumber? RedEyeOn { get; set; }
+    [Selector("meteringMode", "setMeteringMode:")]
+    public NSString? MeteringMode { get; set; }
+    [Selector("maxAperture", "setMaxAperture:")]
+    public NSNumber? MaxAperture { get; set; }
+    [Selector("fNumber", "setFNumber:")]
+    public NSNumber? FNumber { get; set; }
+    [Selector("exposureProgram", "setExposureProgram:")]
+    public NSString? ExposureProgram { get; set; }
+    [Selector("exposureTimeString", "setExposureTimeString:")]
+    public NSString? ExposureTimeString { get; set; }
 }
 
 #endif

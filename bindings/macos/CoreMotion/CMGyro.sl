@@ -38,7 +38,8 @@ public struct CMRotationRate
 
 public extern objc class CMGyroData : CMLogItem
 {
-    [Selector("rotationRate")] public CMRotationRate RotationRate { get; }
+    [Selector("rotationRate")]
+    public CMRotationRate RotationRate { get; }
 }
 
 #endif

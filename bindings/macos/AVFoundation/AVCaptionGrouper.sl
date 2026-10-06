@@ -34,8 +34,10 @@ import Standard.ObjC;
 
 public extern objc class AVCaptionGrouper : NSObject
 {
-    [Selector("addCaption:")] public void AddCaption(AVCaption input);
-    [Selector("flushAddedCaptionsIntoGroupsUpToTime:")] public NSArray FlushAddedCaptionsIntoGroupsUpToTime(CMTime upToTime);
+    [Selector("addCaption:")]
+    public void AddCaption(AVCaption input);
+    [Selector("flushAddedCaptionsIntoGroupsUpToTime:")]
+    public NSArray FlushAddedCaptionsIntoGroupsUpToTime(CMTime upToTime);
 }
 
 #endif

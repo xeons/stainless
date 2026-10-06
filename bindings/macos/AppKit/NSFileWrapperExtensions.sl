@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// NSExtensions, a category of NSFileWrapper.
 public extern objc class NSFileWrapper
 {
-    [Selector("icon", "setIcon:")] public NSImage? Icon { get; set; }
+    [Selector("icon", "setIcon:")]
+    public NSImage? Icon { get; set; }
 }
 
 #endif

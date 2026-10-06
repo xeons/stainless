@@ -42,26 +42,52 @@ public enum NSTokenStyle : ulong
 
 public extern objc class NSTokenFieldCell : NSTextFieldCell
 {
-    [Selector("tokenStyle", "setTokenStyle:")] public NSTokenStyle TokenStyle { get; set; }
-    [Selector("completionDelay", "setCompletionDelay:")] public NSTimeInterval CompletionDelay { get; set; }
-    [Selector("defaultCompletionDelay")] public static NSTimeInterval DefaultCompletionDelay { get; }
-    [Selector("tokenizingCharacterSet", "setTokenizingCharacterSet:")] public NSCharacterSet? TokenizingCharacterSet { get; set; }
-    [Selector("defaultTokenizingCharacterSet")] public static NSCharacterSet DefaultTokenizingCharacterSet { get; }
-    [Selector("delegate", "setDelegate:")] public NSTokenFieldCellDelegate? Delegate { get; set; }
+    [Selector("tokenStyle", "setTokenStyle:")]
+    public NSTokenStyle TokenStyle { get; set; }
+    [Selector("completionDelay", "setCompletionDelay:")]
+    public NSTimeInterval CompletionDelay { get; set; }
+    [Selector("defaultCompletionDelay")]
+    public static NSTimeInterval DefaultCompletionDelay { get; }
+    [Selector("tokenizingCharacterSet", "setTokenizingCharacterSet:")]
+    public NSCharacterSet? TokenizingCharacterSet { get; set; }
+    [Selector("defaultTokenizingCharacterSet")]
+    public static NSCharacterSet DefaultTokenizingCharacterSet { get; }
+    [Selector("delegate", "setDelegate:")]
+    public NSTokenFieldCellDelegate? Delegate { get; set; }
 }
 
 public objc interface NSTokenFieldCellDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("tokenFieldCell:completionsForSubstring:indexOfToken:indexOfSelectedItem:")] NSArray TokenFieldCellCompletionsForSubstringIndexOfTokenIndexOfSelectedItem(NSTokenFieldCell tokenFieldCell, NSString substring, NSInteger tokenIndex, NSInteger* selectedIndex);
-    [Optional] [Selector("tokenFieldCell:shouldAddObjects:atIndex:")] NSArray TokenFieldCellShouldAddObjectsAtIndex(NSTokenFieldCell tokenFieldCell, NSArray tokens, NSUInteger index);
-    [Optional] [Selector("tokenFieldCell:displayStringForRepresentedObject:")] NSString? TokenFieldCellDisplayStringForRepresentedObject(NSTokenFieldCell tokenFieldCell, AnyObject representedObject);
-    [Optional] [Selector("tokenFieldCell:editingStringForRepresentedObject:")] NSString? TokenFieldCellEditingStringForRepresentedObject(NSTokenFieldCell tokenFieldCell, AnyObject representedObject);
-    [Optional] [Selector("tokenFieldCell:representedObjectForEditingString:")] AnyObject? TokenFieldCellRepresentedObjectForEditingString(NSTokenFieldCell tokenFieldCell, NSString editingString);
-    [Optional] [Selector("tokenFieldCell:writeRepresentedObjects:toPasteboard:")] bool TokenFieldCellWriteRepresentedObjectsToPasteboard(NSTokenFieldCell tokenFieldCell, NSArray objects, NSPasteboard pboard);
-    [Optional] [Selector("tokenFieldCell:readFromPasteboard:")] NSArray? TokenFieldCellReadFromPasteboard(NSTokenFieldCell tokenFieldCell, NSPasteboard pboard);
-    [Optional] [Selector("tokenFieldCell:menuForRepresentedObject:")] NSMenu? TokenFieldCellMenuForRepresentedObject(NSTokenFieldCell tokenFieldCell, AnyObject representedObject);
-    [Optional] [Selector("tokenFieldCell:hasMenuForRepresentedObject:")] bool TokenFieldCellHasMenuForRepresentedObject(NSTokenFieldCell tokenFieldCell, AnyObject representedObject);
-    [Optional] [Selector("tokenFieldCell:styleForRepresentedObject:")] NSTokenStyle TokenFieldCellStyleForRepresentedObject(NSTokenFieldCell tokenFieldCell, AnyObject representedObject);
+    [Optional]
+    [Selector("tokenFieldCell:completionsForSubstring:indexOfToken:indexOfSelectedItem:")]
+    NSArray TokenFieldCellCompletionsForSubstringIndexOfTokenIndexOfSelectedItem(NSTokenFieldCell tokenFieldCell, NSString substring, NSInteger tokenIndex, NSInteger* selectedIndex);
+    [Optional]
+    [Selector("tokenFieldCell:shouldAddObjects:atIndex:")]
+    NSArray TokenFieldCellShouldAddObjectsAtIndex(NSTokenFieldCell tokenFieldCell, NSArray tokens, NSUInteger index);
+    [Optional]
+    [Selector("tokenFieldCell:displayStringForRepresentedObject:")]
+    NSString? TokenFieldCellDisplayStringForRepresentedObject(NSTokenFieldCell tokenFieldCell, AnyObject representedObject);
+    [Optional]
+    [Selector("tokenFieldCell:editingStringForRepresentedObject:")]
+    NSString? TokenFieldCellEditingStringForRepresentedObject(NSTokenFieldCell tokenFieldCell, AnyObject representedObject);
+    [Optional]
+    [Selector("tokenFieldCell:representedObjectForEditingString:")]
+    AnyObject? TokenFieldCellRepresentedObjectForEditingString(NSTokenFieldCell tokenFieldCell, NSString editingString);
+    [Optional]
+    [Selector("tokenFieldCell:writeRepresentedObjects:toPasteboard:")]
+    bool TokenFieldCellWriteRepresentedObjectsToPasteboard(NSTokenFieldCell tokenFieldCell, NSArray objects, NSPasteboard pboard);
+    [Optional]
+    [Selector("tokenFieldCell:readFromPasteboard:")]
+    NSArray? TokenFieldCellReadFromPasteboard(NSTokenFieldCell tokenFieldCell, NSPasteboard pboard);
+    [Optional]
+    [Selector("tokenFieldCell:menuForRepresentedObject:")]
+    NSMenu? TokenFieldCellMenuForRepresentedObject(NSTokenFieldCell tokenFieldCell, AnyObject representedObject);
+    [Optional]
+    [Selector("tokenFieldCell:hasMenuForRepresentedObject:")]
+    bool TokenFieldCellHasMenuForRepresentedObject(NSTokenFieldCell tokenFieldCell, AnyObject representedObject);
+    [Optional]
+    [Selector("tokenFieldCell:styleForRepresentedObject:")]
+    NSTokenStyle TokenFieldCellStyleForRepresentedObject(NSTokenFieldCell tokenFieldCell, AnyObject representedObject);
 }
 
 #endif

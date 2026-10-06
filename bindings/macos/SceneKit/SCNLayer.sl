@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class SCNLayer : CAOpenGLLayer, SCNSceneRenderer, SCNTechniqueSupport
 {
-    [Selector("scene", "setScene:")] public SCNScene? Scene { get; set; }
+    [Selector("scene", "setScene:")]
+    public SCNScene? Scene { get; set; }
 }
 
 #endif

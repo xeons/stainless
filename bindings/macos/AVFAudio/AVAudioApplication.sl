@@ -56,12 +56,18 @@ public objc closure void AVAudioApplicationRequestRecordPermissionWithCompletion
 
 public extern objc class AVAudioApplication : NSObject
 {
-    [Selector("sharedInstance")] public static AVAudioApplication? SharedInstance { get; }
-    [Selector("isInputMuted")] public bool InputMuted { get; }
-    [Selector("recordPermission")] public AVAudioApplicationRecordPermission RecordPermission { get; }
-    [Selector("setInputMuted:error:")] public bool SetInputMutedError(bool muted, out NSError? outError);
-    [Selector("setInputMuteStateChangeHandler:error:")] public bool SetInputMuteStateChangeHandlerError(AVAudioApplicationSetInputMuteStateChangeHandlerErrorInputMuteHandlerBlock? inputMuteHandler, out NSError? outError);
-    [Selector("requestRecordPermissionWithCompletionHandler:")] public static void RequestRecordPermissionWithCompletionHandler(AVAudioApplicationRequestRecordPermissionWithCompletionHandlerResponseBlock response);
+    [Selector("sharedInstance")]
+    public static AVAudioApplication? SharedInstance { get; }
+    [Selector("isInputMuted")]
+    public bool InputMuted { get; }
+    [Selector("recordPermission")]
+    public AVAudioApplicationRecordPermission RecordPermission { get; }
+    [Selector("setInputMuted:error:")]
+    public bool SetInputMutedError(bool muted, out NSError? outError);
+    [Selector("setInputMuteStateChangeHandler:error:")]
+    public bool SetInputMuteStateChangeHandlerError(AVAudioApplicationSetInputMuteStateChangeHandlerErrorInputMuteHandlerBlock? inputMuteHandler, out NSError? outError);
+    [Selector("requestRecordPermissionWithCompletionHandler:")]
+    public static void RequestRecordPermissionWithCompletionHandler(AVAudioApplicationRequestRecordPermissionWithCompletionHandlerResponseBlock response);
 }
 
 #endif

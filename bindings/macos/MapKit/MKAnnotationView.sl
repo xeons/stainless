@@ -56,35 +56,64 @@ public enum MKAnnotationViewCollisionMode : long
 
 public extern objc class MKAnnotationView : NSView
 {
-    [Selector("reuseIdentifier")] public NSString? ReuseIdentifier { get; }
-    [Selector("annotation", "setAnnotation:")] public MKAnnotation? Annotation { get; set; }
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("centerOffset", "setCenterOffset:")] public CGPoint CenterOffset { get; set; }
-    [Selector("accessoryOffset", "setAccessoryOffset:")] public CGPoint AccessoryOffset { get; set; }
-    [Selector("calloutOffset", "setCalloutOffset:")] public CGPoint CalloutOffset { get; set; }
-    [Selector("leftCalloutOffset", "setLeftCalloutOffset:")] public CGPoint LeftCalloutOffset { get; set; }
-    [Selector("rightCalloutOffset", "setRightCalloutOffset:")] public CGPoint RightCalloutOffset { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("isHighlighted", "setHighlighted:")] public bool Highlighted { get; set; }
-    [Selector("isSelected", "setSelected:")] public bool Selected { get; set; }
-    [Selector("canShowCallout", "setCanShowCallout:")] public bool CanShowCallout { get; set; }
-    [Selector("leftCalloutAccessoryView", "setLeftCalloutAccessoryView:")] public NSView? LeftCalloutAccessoryView { get; set; }
-    [Selector("rightCalloutAccessoryView", "setRightCalloutAccessoryView:")] public NSView? RightCalloutAccessoryView { get; set; }
-    [Selector("detailCalloutAccessoryView", "setDetailCalloutAccessoryView:")] public NSView? DetailCalloutAccessoryView { get; set; }
-    [Selector("isDraggable", "setDraggable:")] public bool Draggable { get; set; }
-    [Selector("dragState", "setDragState:")] public MKAnnotationViewDragState DragState { get; set; }
-    [Selector("clusteringIdentifier", "setClusteringIdentifier:")] public NSString? ClusteringIdentifier { get; set; }
-    [Selector("clusterAnnotationView")] public MKAnnotationView? ClusterAnnotationView { get; }
-    [Selector("displayPriority", "setDisplayPriority:")] public MKFeatureDisplayPriority DisplayPriority { get; set; }
-    [Selector("zPriority", "setZPriority:")] public MKAnnotationViewZPriority ZPriority { get; set; }
-    [Selector("selectedZPriority", "setSelectedZPriority:")] public MKAnnotationViewZPriority SelectedZPriority { get; set; }
-    [Selector("collisionMode", "setCollisionMode:")] public MKAnnotationViewCollisionMode CollisionMode { get; set; }
-    [Selector("initWithAnnotation:reuseIdentifier:")] public Self InitWithAnnotationReuseIdentifier(MKAnnotation? annotation, NSString? reuseIdentifier);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
-    [Selector("prepareForReuse")] public void PrepareForReuse();
-    [Selector("prepareForDisplay")] public void PrepareForDisplay();
-    [Selector("setSelected:animated:")] public void SetSelectedAnimated(bool selected, bool animated);
-    [Selector("setDragState:animated:")] public void SetDragStateAnimated(MKAnnotationViewDragState newDragState, bool animated);
+    [Selector("reuseIdentifier")]
+    public NSString? ReuseIdentifier { get; }
+    [Selector("annotation", "setAnnotation:")]
+    public MKAnnotation? Annotation { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("centerOffset", "setCenterOffset:")]
+    public CGPoint CenterOffset { get; set; }
+    [Selector("accessoryOffset", "setAccessoryOffset:")]
+    public CGPoint AccessoryOffset { get; set; }
+    [Selector("calloutOffset", "setCalloutOffset:")]
+    public CGPoint CalloutOffset { get; set; }
+    [Selector("leftCalloutOffset", "setLeftCalloutOffset:")]
+    public CGPoint LeftCalloutOffset { get; set; }
+    [Selector("rightCalloutOffset", "setRightCalloutOffset:")]
+    public CGPoint RightCalloutOffset { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("isHighlighted", "setHighlighted:")]
+    public bool Highlighted { get; set; }
+    [Selector("isSelected", "setSelected:")]
+    public bool Selected { get; set; }
+    [Selector("canShowCallout", "setCanShowCallout:")]
+    public bool CanShowCallout { get; set; }
+    [Selector("leftCalloutAccessoryView", "setLeftCalloutAccessoryView:")]
+    public NSView? LeftCalloutAccessoryView { get; set; }
+    [Selector("rightCalloutAccessoryView", "setRightCalloutAccessoryView:")]
+    public NSView? RightCalloutAccessoryView { get; set; }
+    [Selector("detailCalloutAccessoryView", "setDetailCalloutAccessoryView:")]
+    public NSView? DetailCalloutAccessoryView { get; set; }
+    [Selector("isDraggable", "setDraggable:")]
+    public bool Draggable { get; set; }
+    [Selector("dragState", "setDragState:")]
+    public MKAnnotationViewDragState DragState { get; set; }
+    [Selector("clusteringIdentifier", "setClusteringIdentifier:")]
+    public NSString? ClusteringIdentifier { get; set; }
+    [Selector("clusterAnnotationView")]
+    public MKAnnotationView? ClusterAnnotationView { get; }
+    [Selector("displayPriority", "setDisplayPriority:")]
+    public MKFeatureDisplayPriority DisplayPriority { get; set; }
+    [Selector("zPriority", "setZPriority:")]
+    public MKAnnotationViewZPriority ZPriority { get; set; }
+    [Selector("selectedZPriority", "setSelectedZPriority:")]
+    public MKAnnotationViewZPriority SelectedZPriority { get; set; }
+    [Selector("collisionMode", "setCollisionMode:")]
+    public MKAnnotationViewCollisionMode CollisionMode { get; set; }
+    [Selector("initWithAnnotation:reuseIdentifier:")]
+    public Self InitWithAnnotationReuseIdentifier(MKAnnotation? annotation, NSString? reuseIdentifier);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder aDecoder);
+    [Selector("prepareForReuse")]
+    public void PrepareForReuse();
+    [Selector("prepareForDisplay")]
+    public void PrepareForDisplay();
+    [Selector("setSelected:animated:")]
+    public void SetSelectedAnimated(bool selected, bool animated);
+    [Selector("setDragState:animated:")]
+    public void SetDragStateAnimated(MKAnnotationViewDragState newDragState, bool animated);
 }
 
 #endif

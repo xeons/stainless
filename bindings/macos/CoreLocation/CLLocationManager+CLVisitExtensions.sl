@@ -32,8 +32,10 @@ import Standard.ObjC;
 /// CLVisitExtensions, a category of CLLocationManager.
 public extern objc class CLLocationManager
 {
-    [Selector("startMonitoringVisits")] public void StartMonitoringVisits();
-    [Selector("stopMonitoringVisits")] public void StopMonitoringVisits();
+    [Selector("startMonitoringVisits")]
+    public void StartMonitoringVisits();
+    [Selector("stopMonitoringVisits")]
+    public void StopMonitoringVisits();
 }
 
 #endif

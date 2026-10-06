@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCReshapeLayer : MLCLayer
 {
-    [Selector("shape")] public NSArray? Shape { get; }
-    [Selector("layerWithShape:")] public static Self? LayerWithShape(NSArray shape);
+    [Selector("shape")]
+    public NSArray? Shape { get; }
+    [Selector("layerWithShape:")]
+    public static Self? LayerWithShape(NSArray shape);
 }
 
 #endif

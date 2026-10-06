@@ -37,38 +37,55 @@ public objc closure void VNRequestCompletionHandler(VNRequest arg0, NSError? arg
 
 public extern objc class VNRequest : NSObject, NSCopying
 {
-    [Selector("preferBackgroundProcessing", "setPreferBackgroundProcessing:")] public bool PreferBackgroundProcessing { get; set; }
+    [Selector("preferBackgroundProcessing", "setPreferBackgroundProcessing:")]
+    public bool PreferBackgroundProcessing { get; set; }
     /// Deprecated in macOS 14.0.
-    [Selector("usesCPUOnly", "setUsesCPUOnly:")] public bool UsesCPUOnly { get; set; }
-    [Selector("results")] public NSArray? Results { get; }
-    [Selector("completionHandler")] public VNRequestCompletionHandler? CompletionHandler { get; }
-    [Selector("revision", "setRevision:")] public NSUInteger Revision { get; set; }
-    [Selector("supportedRevisions")] public static NSIndexSet SupportedRevisions { get; }
-    [Selector("defaultRevision")] public static NSUInteger DefaultRevision { get; }
-    [Selector("currentRevision")] public static NSUInteger CurrentRevision { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCompletionHandler:")] public Self InitWithCompletionHandler(VNRequestCompletionHandler? completionHandler);
-    [Selector("cancel")] public void Cancel();
+    [Selector("usesCPUOnly", "setUsesCPUOnly:")]
+    public bool UsesCPUOnly { get; set; }
+    [Selector("results")]
+    public NSArray? Results { get; }
+    [Selector("completionHandler")]
+    public VNRequestCompletionHandler? CompletionHandler { get; }
+    [Selector("revision", "setRevision:")]
+    public NSUInteger Revision { get; set; }
+    [Selector("supportedRevisions")]
+    public static NSIndexSet SupportedRevisions { get; }
+    [Selector("defaultRevision")]
+    public static NSUInteger DefaultRevision { get; }
+    [Selector("currentRevision")]
+    public static NSUInteger CurrentRevision { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCompletionHandler:")]
+    public Self InitWithCompletionHandler(VNRequestCompletionHandler? completionHandler);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 public extern objc class VNRequest
 {
-    [Selector("supportedComputeStageDevicesAndReturnError:")] public NSDictionary? SupportedComputeStageDevicesAndReturnError(out NSError? error);
-    [Selector("computeDeviceForComputeStage:")] public MLComputeDeviceProtocol? ComputeDeviceForComputeStage(VNComputeStage computeStage);
-    [Selector("setComputeDevice:forComputeStage:")] public void SetComputeDeviceForComputeStage(MLComputeDeviceProtocol? computeDevice, VNComputeStage computeStage);
+    [Selector("supportedComputeStageDevicesAndReturnError:")]
+    public NSDictionary? SupportedComputeStageDevicesAndReturnError(out NSError? error);
+    [Selector("computeDeviceForComputeStage:")]
+    public MLComputeDeviceProtocol? ComputeDeviceForComputeStage(VNComputeStage computeStage);
+    [Selector("setComputeDevice:forComputeStage:")]
+    public void SetComputeDeviceForComputeStage(MLComputeDeviceProtocol? computeDevice, VNComputeStage computeStage);
 }
 
 public extern objc class VNImageBasedRequest : VNRequest
 {
-    [Selector("regionOfInterest", "setRegionOfInterest:")] public CGRect RegionOfInterest { get; set; }
+    [Selector("regionOfInterest", "setRegionOfInterest:")]
+    public CGRect RegionOfInterest { get; set; }
 }
 
 public objc closure void VNRequestProgressHandler(VNRequest arg0, double arg1, NSError? arg2);
 
 public objc interface VNRequestProgressProviding : NSObjectProtocol
 {
-    [Selector("progressHandler", "setProgressHandler:")] VNRequestProgressHandler ProgressHandler { get; set; }
-    [Selector("indeterminate")] bool Indeterminate { get; }
+    [Selector("progressHandler", "setProgressHandler:")]
+    VNRequestProgressHandler ProgressHandler { get; set; }
+    [Selector("indeterminate")]
+    bool Indeterminate { get; }
 }
 
 #endif

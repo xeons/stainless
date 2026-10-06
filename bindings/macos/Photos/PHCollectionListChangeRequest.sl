@@ -33,19 +33,32 @@ import Standard.ObjC;
 
 public extern objc class PHCollectionListChangeRequest : PHChangeRequest
 {
-    [Selector("placeholderForCreatedCollectionList")] public PHObjectPlaceholder PlaceholderForCreatedCollectionList { get; }
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("creationRequestForCollectionListWithTitle:")] public static Self CreationRequestForCollectionListWithTitle(NSString title);
-    [Selector("deleteCollectionLists:")] public static void DeleteCollectionLists(NSFastEnumeration collectionLists);
-    [Selector("changeRequestForCollectionList:")] public static Self? ChangeRequestForCollectionList(PHCollectionList collectionList);
-    [Selector("changeRequestForCollectionList:childCollections:")] public static Self? ChangeRequestForCollectionListChildCollections(PHCollectionList collectionList, PHFetchResult childCollections);
-    [Selector("changeRequestForTopLevelCollectionListUserCollections:")] public static Self? ChangeRequestForTopLevelCollectionListUserCollections(PHFetchResult childCollections);
-    [Selector("addChildCollections:")] public void AddChildCollections(NSFastEnumeration collections);
-    [Selector("insertChildCollections:atIndexes:")] public void InsertChildCollectionsAtIndexes(NSFastEnumeration collections, NSIndexSet indexes);
-    [Selector("removeChildCollections:")] public void RemoveChildCollections(NSFastEnumeration collections);
-    [Selector("removeChildCollectionsAtIndexes:")] public void RemoveChildCollectionsAtIndexes(NSIndexSet indexes);
-    [Selector("replaceChildCollectionsAtIndexes:withChildCollections:")] public void ReplaceChildCollectionsAtIndexesWithChildCollections(NSIndexSet indexes, NSFastEnumeration collections);
-    [Selector("moveChildCollectionsAtIndexes:toIndex:")] public void MoveChildCollectionsAtIndexesToIndex(NSIndexSet indexes, NSUInteger toIndex);
+    [Selector("placeholderForCreatedCollectionList")]
+    public PHObjectPlaceholder PlaceholderForCreatedCollectionList { get; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("creationRequestForCollectionListWithTitle:")]
+    public static Self CreationRequestForCollectionListWithTitle(NSString title);
+    [Selector("deleteCollectionLists:")]
+    public static void DeleteCollectionLists(NSFastEnumeration collectionLists);
+    [Selector("changeRequestForCollectionList:")]
+    public static Self? ChangeRequestForCollectionList(PHCollectionList collectionList);
+    [Selector("changeRequestForCollectionList:childCollections:")]
+    public static Self? ChangeRequestForCollectionListChildCollections(PHCollectionList collectionList, PHFetchResult childCollections);
+    [Selector("changeRequestForTopLevelCollectionListUserCollections:")]
+    public static Self? ChangeRequestForTopLevelCollectionListUserCollections(PHFetchResult childCollections);
+    [Selector("addChildCollections:")]
+    public void AddChildCollections(NSFastEnumeration collections);
+    [Selector("insertChildCollections:atIndexes:")]
+    public void InsertChildCollectionsAtIndexes(NSFastEnumeration collections, NSIndexSet indexes);
+    [Selector("removeChildCollections:")]
+    public void RemoveChildCollections(NSFastEnumeration collections);
+    [Selector("removeChildCollectionsAtIndexes:")]
+    public void RemoveChildCollectionsAtIndexes(NSIndexSet indexes);
+    [Selector("replaceChildCollectionsAtIndexes:withChildCollections:")]
+    public void ReplaceChildCollectionsAtIndexesWithChildCollections(NSIndexSet indexes, NSFastEnumeration collections);
+    [Selector("moveChildCollectionsAtIndexes:toIndex:")]
+    public void MoveChildCollectionsAtIndexesToIndex(NSIndexSet indexes, NSUInteger toIndex);
 }
 
 #endif

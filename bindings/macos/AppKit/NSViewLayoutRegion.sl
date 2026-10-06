@@ -42,19 +42,24 @@ public enum NSViewLayoutRegionAdaptivityAxis : long
 /// macOS 26.0 and later.
 public extern objc class NSViewLayoutRegion : NSObject
 {
-    [Selector("safeAreaLayoutRegionWithCornerAdaptation:")] public static NSViewLayoutRegion SafeAreaLayoutRegionWithCornerAdaptation(NSViewLayoutRegionAdaptivityAxis adaptivityAxis);
-    [Selector("marginsLayoutRegionWithCornerAdaptation:")] public static NSViewLayoutRegion MarginsLayoutRegionWithCornerAdaptation(NSViewLayoutRegionAdaptivityAxis adaptivityAxis);
+    [Selector("safeAreaLayoutRegionWithCornerAdaptation:")]
+    public static NSViewLayoutRegion SafeAreaLayoutRegionWithCornerAdaptation(NSViewLayoutRegionAdaptivityAxis adaptivityAxis);
+    [Selector("marginsLayoutRegionWithCornerAdaptation:")]
+    public static NSViewLayoutRegion MarginsLayoutRegionWithCornerAdaptation(NSViewLayoutRegionAdaptivityAxis adaptivityAxis);
 }
 
 /// LayoutRegions, a category of NSView.
 public extern objc class NSView
 {
     /// macOS 26.0 and later.
-    [Selector("layoutGuideForLayoutRegion:")] public NSLayoutGuide LayoutGuideForLayoutRegion(NSViewLayoutRegion layoutRegion);
+    [Selector("layoutGuideForLayoutRegion:")]
+    public NSLayoutGuide LayoutGuideForLayoutRegion(NSViewLayoutRegion layoutRegion);
     /// macOS 26.0 and later.
-    [Selector("edgeInsetsForLayoutRegion:")] public NSEdgeInsets EdgeInsetsForLayoutRegion(NSViewLayoutRegion layoutRegion);
+    [Selector("edgeInsetsForLayoutRegion:")]
+    public NSEdgeInsets EdgeInsetsForLayoutRegion(NSViewLayoutRegion layoutRegion);
     /// macOS 26.0 and later.
-    [Selector("rectForLayoutRegion:")] public NSRect RectForLayoutRegion(NSViewLayoutRegion layoutRegion);
+    [Selector("rectForLayoutRegion:")]
+    public NSRect RectForLayoutRegion(NSViewLayoutRegion layoutRegion);
 }
 
 #endif

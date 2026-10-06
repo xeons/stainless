@@ -71,72 +71,122 @@ public objc closure void CLLocationManagerRequestTemporaryFullAccuracyAuthorizat
 
 public extern objc class CLLocationManager : NSObject
 {
-    [Selector("authorizationStatus")] public CLAuthorizationStatus AuthorizationStatus { get; }
-    [Selector("accuracyAuthorization")] public CLAccuracyAuthorization AccuracyAuthorization { get; }
-    [Selector("isAuthorizedForWidgetUpdates")] public bool AuthorizedForWidgetUpdates { get; }
-    [Selector("delegate", "setDelegate:")] public CLLocationManagerDelegate? Delegate { get; set; }
+    [Selector("authorizationStatus")]
+    public CLAuthorizationStatus AuthorizationStatus { get; }
+    [Selector("accuracyAuthorization")]
+    public CLAccuracyAuthorization AccuracyAuthorization { get; }
+    [Selector("isAuthorizedForWidgetUpdates")]
+    public bool AuthorizedForWidgetUpdates { get; }
+    [Selector("delegate", "setDelegate:")]
+    public CLLocationManagerDelegate? Delegate { get; set; }
     /// Deprecated in macOS 10.15.
-    [Selector("locationServicesEnabled")] public bool LocationServicesEnabled { get; }
+    [Selector("locationServicesEnabled")]
+    public bool LocationServicesEnabled { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("purpose", "setPurpose:")] public NSString? Purpose { get; set; }
-    [Selector("activityType", "setActivityType:")] public CLActivityType ActivityType { get; set; }
-    [Selector("distanceFilter", "setDistanceFilter:")] public CLLocationDistance DistanceFilter { get; set; }
-    [Selector("desiredAccuracy", "setDesiredAccuracy:")] public CLLocationAccuracy DesiredAccuracy { get; set; }
-    [Selector("pausesLocationUpdatesAutomatically", "setPausesLocationUpdatesAutomatically:")] public bool PausesLocationUpdatesAutomatically { get; set; }
-    [Selector("allowsBackgroundLocationUpdates", "setAllowsBackgroundLocationUpdates:")] public bool AllowsBackgroundLocationUpdates { get; set; }
-    [Selector("location")] public CLLocation? Location { get; }
+    [Selector("purpose", "setPurpose:")]
+    public NSString? Purpose { get; set; }
+    [Selector("activityType", "setActivityType:")]
+    public CLActivityType ActivityType { get; set; }
+    [Selector("distanceFilter", "setDistanceFilter:")]
+    public CLLocationDistance DistanceFilter { get; set; }
+    [Selector("desiredAccuracy", "setDesiredAccuracy:")]
+    public CLLocationAccuracy DesiredAccuracy { get; set; }
+    [Selector("pausesLocationUpdatesAutomatically", "setPausesLocationUpdatesAutomatically:")]
+    public bool PausesLocationUpdatesAutomatically { get; set; }
+    [Selector("allowsBackgroundLocationUpdates", "setAllowsBackgroundLocationUpdates:")]
+    public bool AllowsBackgroundLocationUpdates { get; set; }
+    [Selector("location")]
+    public CLLocation? Location { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("headingAvailable")] public bool HeadingAvailable { get; }
-    [Selector("headingFilter", "setHeadingFilter:")] public CLLocationDegrees HeadingFilter { get; set; }
-    [Selector("headingOrientation", "setHeadingOrientation:")] public CLDeviceOrientation HeadingOrientation { get; set; }
-    [Selector("heading")] public CLHeading? Heading { get; }
-    [Selector("maximumRegionMonitoringDistance")] public CLLocationDistance MaximumRegionMonitoringDistance { get; }
-    [Selector("monitoredRegions")] public NSSet MonitoredRegions { get; }
+    [Selector("headingAvailable")]
+    public bool HeadingAvailable { get; }
+    [Selector("headingFilter", "setHeadingFilter:")]
+    public CLLocationDegrees HeadingFilter { get; set; }
+    [Selector("headingOrientation", "setHeadingOrientation:")]
+    public CLDeviceOrientation HeadingOrientation { get; set; }
+    [Selector("heading")]
+    public CLHeading? Heading { get; }
+    [Selector("maximumRegionMonitoringDistance")]
+    public CLLocationDistance MaximumRegionMonitoringDistance { get; }
+    [Selector("monitoredRegions")]
+    public NSSet MonitoredRegions { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("rangedRegions")] public NSSet RangedRegions { get; }
-    [Selector("rangedBeaconConstraints")] public NSSet RangedBeaconConstraints { get; }
-    [Selector("locationServicesEnabled")] public static bool ClassLocationServicesEnabled();
-    [Selector("headingAvailable")] public static bool ClassHeadingAvailable();
-    [Selector("significantLocationChangeMonitoringAvailable")] public static bool SignificantLocationChangeMonitoringAvailable();
-    [Selector("isMonitoringAvailableForClass:")] public static bool IsMonitoringAvailableForClass(Class regionClass);
+    [Selector("rangedRegions")]
+    public NSSet RangedRegions { get; }
+    [Selector("rangedBeaconConstraints")]
+    public NSSet RangedBeaconConstraints { get; }
+    [Selector("locationServicesEnabled")]
+    public static bool ClassLocationServicesEnabled();
+    [Selector("headingAvailable")]
+    public static bool ClassHeadingAvailable();
+    [Selector("significantLocationChangeMonitoringAvailable")]
+    public static bool SignificantLocationChangeMonitoringAvailable();
+    [Selector("isMonitoringAvailableForClass:")]
+    public static bool IsMonitoringAvailableForClass(Class regionClass);
     /// Deprecated in macOS 10.10.
-    [Selector("regionMonitoringAvailable")] public static bool RegionMonitoringAvailable();
+    [Selector("regionMonitoringAvailable")]
+    public static bool RegionMonitoringAvailable();
     /// Deprecated in macOS 10.10.
-    [Selector("regionMonitoringEnabled")] public static bool RegionMonitoringEnabled();
-    [Selector("isRangingAvailable")] public static bool IsRangingAvailable();
+    [Selector("regionMonitoringEnabled")]
+    public static bool RegionMonitoringEnabled();
+    [Selector("isRangingAvailable")]
+    public static bool IsRangingAvailable();
     /// Deprecated in macOS 11.0.
-    [Selector("authorizationStatus")] public static CLAuthorizationStatus ClassAuthorizationStatus();
-    [Selector("requestWhenInUseAuthorization")] public void RequestWhenInUseAuthorization();
-    [Selector("requestAlwaysAuthorization")] public void RequestAlwaysAuthorization();
-    [Selector("requestTemporaryFullAccuracyAuthorizationWithPurposeKey:completion:")] public void RequestTemporaryFullAccuracyAuthorizationWithPurposeKeyCompletion(NSString purposeKey, CLLocationManagerRequestTemporaryFullAccuracyAuthorizationWithPurposeKeyCompletionCompletionBlock? completion);
-    [Selector("requestTemporaryFullAccuracyAuthorizationWithPurposeKey:")] public void RequestTemporaryFullAccuracyAuthorizationWithPurposeKey(NSString purposeKey);
-    [Selector("startUpdatingLocation")] public void StartUpdatingLocation();
-    [Selector("stopUpdatingLocation")] public void StopUpdatingLocation();
-    [Selector("requestLocation")] public void RequestLocation();
-    [Selector("startUpdatingHeading")] public void StartUpdatingHeading();
-    [Selector("dismissHeadingCalibrationDisplay")] public void DismissHeadingCalibrationDisplay();
-    [Selector("startMonitoringSignificantLocationChanges")] public void StartMonitoringSignificantLocationChanges();
-    [Selector("stopMonitoringSignificantLocationChanges")] public void StopMonitoringSignificantLocationChanges();
+    [Selector("authorizationStatus")]
+    public static CLAuthorizationStatus ClassAuthorizationStatus();
+    [Selector("requestWhenInUseAuthorization")]
+    public void RequestWhenInUseAuthorization();
+    [Selector("requestAlwaysAuthorization")]
+    public void RequestAlwaysAuthorization();
+    [Selector("requestTemporaryFullAccuracyAuthorizationWithPurposeKey:completion:")]
+    public void RequestTemporaryFullAccuracyAuthorizationWithPurposeKeyCompletion(NSString purposeKey, CLLocationManagerRequestTemporaryFullAccuracyAuthorizationWithPurposeKeyCompletionCompletionBlock? completion);
+    [Selector("requestTemporaryFullAccuracyAuthorizationWithPurposeKey:")]
+    public void RequestTemporaryFullAccuracyAuthorizationWithPurposeKey(NSString purposeKey);
+    [Selector("startUpdatingLocation")]
+    public void StartUpdatingLocation();
+    [Selector("stopUpdatingLocation")]
+    public void StopUpdatingLocation();
+    [Selector("requestLocation")]
+    public void RequestLocation();
+    [Selector("startUpdatingHeading")]
+    public void StartUpdatingHeading();
+    [Selector("dismissHeadingCalibrationDisplay")]
+    public void DismissHeadingCalibrationDisplay();
+    [Selector("startMonitoringSignificantLocationChanges")]
+    public void StartMonitoringSignificantLocationChanges();
+    [Selector("stopMonitoringSignificantLocationChanges")]
+    public void StopMonitoringSignificantLocationChanges();
     /// Deprecated in macOS 10.15.
-    [Selector("startMonitoringForRegion:desiredAccuracy:")] public void StartMonitoringForRegionDesiredAccuracy(CLRegion region, CLLocationAccuracy accuracy);
+    [Selector("startMonitoringForRegion:desiredAccuracy:")]
+    public void StartMonitoringForRegionDesiredAccuracy(CLRegion region, CLLocationAccuracy accuracy);
     /// Deprecated in macOS 100000.
-    [Selector("stopMonitoringForRegion:")] public void StopMonitoringForRegion(CLRegion region);
+    [Selector("stopMonitoringForRegion:")]
+    public void StopMonitoringForRegion(CLRegion region);
     /// Deprecated in macOS 100000.
-    [Selector("startMonitoringForRegion:")] public void StartMonitoringForRegion(CLRegion region);
+    [Selector("startMonitoringForRegion:")]
+    public void StartMonitoringForRegion(CLRegion region);
     /// Deprecated in macOS 100000.
-    [Selector("requestStateForRegion:")] public void RequestStateForRegion(CLRegion region);
+    [Selector("requestStateForRegion:")]
+    public void RequestStateForRegion(CLRegion region);
     /// Deprecated in macOS 11.0.
-    [Selector("startRangingBeaconsInRegion:")] public void StartRangingBeaconsInRegion(CLBeaconRegion region);
+    [Selector("startRangingBeaconsInRegion:")]
+    public void StartRangingBeaconsInRegion(CLBeaconRegion region);
     /// Deprecated in macOS 11.0.
-    [Selector("stopRangingBeaconsInRegion:")] public void StopRangingBeaconsInRegion(CLBeaconRegion region);
-    [Selector("startRangingBeaconsSatisfyingConstraint:")] public void StartRangingBeaconsSatisfyingConstraint(CLBeaconIdentityConstraint constraint);
-    [Selector("stopRangingBeaconsSatisfyingConstraint:")] public void StopRangingBeaconsSatisfyingConstraint(CLBeaconIdentityConstraint constraint);
+    [Selector("stopRangingBeaconsInRegion:")]
+    public void StopRangingBeaconsInRegion(CLBeaconRegion region);
+    [Selector("startRangingBeaconsSatisfyingConstraint:")]
+    public void StartRangingBeaconsSatisfyingConstraint(CLBeaconIdentityConstraint constraint);
+    [Selector("stopRangingBeaconsSatisfyingConstraint:")]
+    public void StopRangingBeaconsSatisfyingConstraint(CLBeaconIdentityConstraint constraint);
     /// Deprecated in macOS 10.15.
-    [Selector("allowDeferredLocationUpdatesUntilTraveled:timeout:")] public void AllowDeferredLocationUpdatesUntilTraveledTimeout(CLLocationDistance distance, NSTimeInterval timeout);
+    [Selector("allowDeferredLocationUpdatesUntilTraveled:timeout:")]
+    public void AllowDeferredLocationUpdatesUntilTraveledTimeout(CLLocationDistance distance, NSTimeInterval timeout);
     /// Deprecated in macOS 10.15.
-    [Selector("disallowDeferredLocationUpdates")] public void DisallowDeferredLocationUpdates();
+    [Selector("disallowDeferredLocationUpdates")]
+    public void DisallowDeferredLocationUpdates();
     /// Deprecated in macOS 10.15.
-    [Selector("deferredLocationUpdatesAvailable")] public static bool DeferredLocationUpdatesAvailable();
+    [Selector("deferredLocationUpdatesAvailable")]
+    public static bool DeferredLocationUpdatesAvailable();
 }
 
 #endif

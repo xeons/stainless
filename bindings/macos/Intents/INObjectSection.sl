@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class INObjectSection : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("items")] public NSArray Items { get; }
-    [Selector("initWithTitle:items:")] public Self InitWithTitleItems(NSString? title, NSArray items);
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("items")]
+    public NSArray Items { get; }
+    [Selector("initWithTitle:items:")]
+    public Self InitWithTitleItems(NSString? title, NSArray items);
 }
 
 #endif

@@ -34,116 +34,178 @@ import Standard.ObjC;
 
 public extern objc class MPSNDArrayMultiaryBase : MPSKernel
 {
-    [Selector("destinationArrayAllocator", "setDestinationArrayAllocator:")] public MPSNDArrayAllocator DestinationArrayAllocator { get; set; }
+    [Selector("destinationArrayAllocator", "setDestinationArrayAllocator:")]
+    public MPSNDArrayAllocator DestinationArrayAllocator { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("offsetsAtSourceIndex:")] public MPSNDArrayOffsets OffsetsAtSourceIndex(NSUInteger sourceIndex);
+    [Selector("offsetsAtSourceIndex:")]
+    public MPSNDArrayOffsets OffsetsAtSourceIndex(NSUInteger sourceIndex);
     /// Deprecated in macOS 11.0.
-    [Selector("edgeModeAtSourceIndex:")] public MPSImageEdgeMode EdgeModeAtSourceIndex(NSUInteger sourceIndex);
+    [Selector("edgeModeAtSourceIndex:")]
+    public MPSImageEdgeMode EdgeModeAtSourceIndex(NSUInteger sourceIndex);
     /// Deprecated in macOS 11.0.
-    [Selector("kernelSizesForSourceIndex:")] public MPSNDArraySizes KernelSizesForSourceIndex(NSUInteger sourceIndex);
+    [Selector("kernelSizesForSourceIndex:")]
+    public MPSNDArraySizes KernelSizesForSourceIndex(NSUInteger sourceIndex);
     /// Deprecated in macOS 11.0.
-    [Selector("stridesForSourceIndex:")] public MPSNDArrayOffsets StridesForSourceIndex(NSUInteger sourceIndex);
+    [Selector("stridesForSourceIndex:")]
+    public MPSNDArrayOffsets StridesForSourceIndex(NSUInteger sourceIndex);
     /// Deprecated in macOS 11.0.
-    [Selector("dilationRatesForSourceIndex:")] public MPSNDArraySizes DilationRatesForSourceIndex(NSUInteger sourceIndex);
-    [Selector("initWithDevice:sourceCount:")] public Self InitWithDeviceSourceCount(MTLDevice device, NSUInteger count);
-    [Selector("initWithCoder:device:")] public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
-    [Selector("encodeWithCoder:")] public void EncodeWithCoder(NSCoder coder);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
-    [Selector("resultStateForSourceArrays:sourceStates:destinationArray:")] public MPSState? ResultStateForSourceArraysSourceStatesDestinationArray(NSArray sourceArrays, NSArray? sourceStates, MPSNDArray destinationArray);
-    [Selector("destinationArrayDescriptorForSourceArrays:sourceState:")] public MPSNDArrayDescriptor DestinationArrayDescriptorForSourceArraysSourceState(NSArray sources, MPSState? state);
+    [Selector("dilationRatesForSourceIndex:")]
+    public MPSNDArraySizes DilationRatesForSourceIndex(NSUInteger sourceIndex);
+    [Selector("initWithDevice:sourceCount:")]
+    public Self InitWithDeviceSourceCount(MTLDevice device, NSUInteger count);
+    [Selector("initWithCoder:device:")]
+    public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
+    [Selector("encodeWithCoder:")]
+    public void EncodeWithCoder(NSCoder coder);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("resultStateForSourceArrays:sourceStates:destinationArray:")]
+    public MPSState? ResultStateForSourceArraysSourceStatesDestinationArray(NSArray sourceArrays, NSArray? sourceStates, MPSNDArray destinationArray);
+    [Selector("destinationArrayDescriptorForSourceArrays:sourceState:")]
+    public MPSNDArrayDescriptor DestinationArrayDescriptorForSourceArraysSourceState(NSArray sources, MPSState? state);
 }
 
 public extern objc class MPSNDArrayMultiaryKernel : MPSNDArrayMultiaryBase
 {
-    [Selector("initWithDevice:sourceCount:")] public Self InitWithDeviceSourceCount(MTLDevice device, NSUInteger count);
-    [Selector("initWithCoder:device:")] public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:sourceArrays:")] public MPSNDArray EncodeToCommandBufferSourceArrays(MTLCommandBuffer cmdBuf, NSArray sourceArrays);
-    [Selector("encodeToCommandBuffer:sourceArrays:destinationArray:")] public void EncodeToCommandBufferSourceArraysDestinationArray(MTLCommandBuffer cmdBuf, NSArray sourceArrays, MPSNDArray destination);
-    [Selector("encodeToCommandBuffer:sourceArrays:resultState:outputStateIsTemporary:")] public MPSNDArray EncodeToCommandBufferSourceArraysResultStateOutputStateIsTemporary(MTLCommandBuffer cmdBuf, NSArray sourceArrays, out MPSState? outGradientState, bool outputStateIsTemporary);
-    [Selector("encodeToCommandBuffer:sourceArrays:resultState:destinationArray:")] public void EncodeToCommandBufferSourceArraysResultStateDestinationArray(MTLCommandBuffer cmdBuf, NSArray sourceArrays, MPSState? outGradientState, MPSNDArray destination);
-    [Selector("encodeToCommandEncoder:commandBuffer:sourceArrays:destinationArray:")] public void EncodeToCommandEncoderCommandBufferSourceArraysDestinationArray(MTLComputeCommandEncoder? encoder, MTLCommandBuffer commandBuffer, NSArray sourceArrays, MPSNDArray destination);
+    [Selector("initWithDevice:sourceCount:")]
+    public Self InitWithDeviceSourceCount(MTLDevice device, NSUInteger count);
+    [Selector("initWithCoder:device:")]
+    public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:sourceArrays:")]
+    public MPSNDArray EncodeToCommandBufferSourceArrays(MTLCommandBuffer cmdBuf, NSArray sourceArrays);
+    [Selector("encodeToCommandBuffer:sourceArrays:destinationArray:")]
+    public void EncodeToCommandBufferSourceArraysDestinationArray(MTLCommandBuffer cmdBuf, NSArray sourceArrays, MPSNDArray destination);
+    [Selector("encodeToCommandBuffer:sourceArrays:resultState:outputStateIsTemporary:")]
+    public MPSNDArray EncodeToCommandBufferSourceArraysResultStateOutputStateIsTemporary(MTLCommandBuffer cmdBuf, NSArray sourceArrays, out MPSState? outGradientState, bool outputStateIsTemporary);
+    [Selector("encodeToCommandBuffer:sourceArrays:resultState:destinationArray:")]
+    public void EncodeToCommandBufferSourceArraysResultStateDestinationArray(MTLCommandBuffer cmdBuf, NSArray sourceArrays, MPSState? outGradientState, MPSNDArray destination);
+    [Selector("encodeToCommandEncoder:commandBuffer:sourceArrays:destinationArray:")]
+    public void EncodeToCommandEncoderCommandBufferSourceArraysDestinationArray(MTLComputeCommandEncoder? encoder, MTLCommandBuffer commandBuffer, NSArray sourceArrays, MPSNDArray destination);
 }
 
 public extern objc class MPSNDArrayMultiaryGradientKernel : MPSNDArrayMultiaryBase
 {
-    [Selector("initWithCoder:device:")] public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
-    [Selector("initWithDevice:sourceCount:sourceGradientIndex:")] public Self InitWithDeviceSourceCountSourceGradientIndex(MTLDevice device, NSUInteger count, NSUInteger sourceGradientIndex);
-    [Selector("encodeToCommandBuffer:sourceArrays:sourceGradient:gradientState:")] public MPSNDArray EncodeToCommandBufferSourceArraysSourceGradientGradientState(MTLCommandBuffer cmdBuf, NSArray sources, MPSNDArray gradient, MPSState state);
-    [Selector("encodeToCommandBuffer:sourceArrays:sourceGradient:gradientState:destinationArray:")] public void EncodeToCommandBufferSourceArraysSourceGradientGradientStateDestinationArray(MTLCommandBuffer cmdBuf, NSArray sources, MPSNDArray gradient, MPSState state, MPSNDArray destination);
+    [Selector("initWithCoder:device:")]
+    public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
+    [Selector("initWithDevice:sourceCount:sourceGradientIndex:")]
+    public Self InitWithDeviceSourceCountSourceGradientIndex(MTLDevice device, NSUInteger count, NSUInteger sourceGradientIndex);
+    [Selector("encodeToCommandBuffer:sourceArrays:sourceGradient:gradientState:")]
+    public MPSNDArray EncodeToCommandBufferSourceArraysSourceGradientGradientState(MTLCommandBuffer cmdBuf, NSArray sources, MPSNDArray gradient, MPSState state);
+    [Selector("encodeToCommandBuffer:sourceArrays:sourceGradient:gradientState:destinationArray:")]
+    public void EncodeToCommandBufferSourceArraysSourceGradientGradientStateDestinationArray(MTLCommandBuffer cmdBuf, NSArray sources, MPSNDArray gradient, MPSState state, MPSNDArray destination);
 }
 
 public extern objc class MPSNDArrayUnaryKernel : MPSNDArrayMultiaryKernel
 {
     /// Deprecated in macOS 11.0.
-    [Selector("offsets")] public MPSNDArrayOffsets Offsets { get; }
+    [Selector("offsets")]
+    public MPSNDArrayOffsets Offsets { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("edgeMode")] public MPSImageEdgeMode EdgeMode { get; }
+    [Selector("edgeMode")]
+    public MPSImageEdgeMode EdgeMode { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("kernelSizes")] public MPSNDArraySizes KernelSizes { get; }
+    [Selector("kernelSizes")]
+    public MPSNDArraySizes KernelSizes { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("strides")] public MPSNDArrayOffsets Strides { get; }
+    [Selector("strides")]
+    public MPSNDArrayOffsets Strides { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("dilationRates")] public MPSNDArraySizes DilationRates { get; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:sourceArray:")] public MPSNDArray EncodeToCommandBufferSourceArray(MTLCommandBuffer cmdBuf, MPSNDArray sourceArray);
-    [Selector("encodeToCommandBuffer:sourceArray:destinationArray:")] public void EncodeToCommandBufferSourceArrayDestinationArray(MTLCommandBuffer cmdBuf, MPSNDArray sourceArray, MPSNDArray destination);
-    [Selector("encodeToCommandBuffer:sourceArray:resultState:outputStateIsTemporary:")] public MPSNDArray EncodeToCommandBufferSourceArrayResultStateOutputStateIsTemporary(MTLCommandBuffer cmdBuf, MPSNDArray sourceArray, out MPSState? outGradientState, bool outputStateIsTemporary);
-    [Selector("encodeToCommandBuffer:sourceArray:resultState:destinationArray:")] public void EncodeToCommandBufferSourceArrayResultStateDestinationArray(MTLCommandBuffer cmdBuf, MPSNDArray sourceArray, MPSState? outGradientState, MPSNDArray destination);
+    [Selector("dilationRates")]
+    public MPSNDArraySizes DilationRates { get; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:sourceArray:")]
+    public MPSNDArray EncodeToCommandBufferSourceArray(MTLCommandBuffer cmdBuf, MPSNDArray sourceArray);
+    [Selector("encodeToCommandBuffer:sourceArray:destinationArray:")]
+    public void EncodeToCommandBufferSourceArrayDestinationArray(MTLCommandBuffer cmdBuf, MPSNDArray sourceArray, MPSNDArray destination);
+    [Selector("encodeToCommandBuffer:sourceArray:resultState:outputStateIsTemporary:")]
+    public MPSNDArray EncodeToCommandBufferSourceArrayResultStateOutputStateIsTemporary(MTLCommandBuffer cmdBuf, MPSNDArray sourceArray, out MPSState? outGradientState, bool outputStateIsTemporary);
+    [Selector("encodeToCommandBuffer:sourceArray:resultState:destinationArray:")]
+    public void EncodeToCommandBufferSourceArrayResultStateDestinationArray(MTLCommandBuffer cmdBuf, MPSNDArray sourceArray, MPSState? outGradientState, MPSNDArray destination);
 }
 
 public extern objc class MPSNDArrayUnaryGradientKernel : MPSNDArrayMultiaryGradientKernel
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:sourceArray:sourceGradient:gradientState:")] public MPSNDArray EncodeToCommandBufferSourceArraySourceGradientGradientState(MTLCommandBuffer cmdBuf, MPSNDArray sourceArray, MPSNDArray gradient, MPSState state);
-    [Selector("encodeToCommandBuffer:sourceArray:sourceGradient:gradientState:destinationArray:")] public void EncodeToCommandBufferSourceArraySourceGradientGradientStateDestinationArray(MTLCommandBuffer cmdBuf, MPSNDArray sourceArray, MPSNDArray gradient, MPSState state, MPSNDArray destination);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:sourceArray:sourceGradient:gradientState:")]
+    public MPSNDArray EncodeToCommandBufferSourceArraySourceGradientGradientState(MTLCommandBuffer cmdBuf, MPSNDArray sourceArray, MPSNDArray gradient, MPSState state);
+    [Selector("encodeToCommandBuffer:sourceArray:sourceGradient:gradientState:destinationArray:")]
+    public void EncodeToCommandBufferSourceArraySourceGradientGradientStateDestinationArray(MTLCommandBuffer cmdBuf, MPSNDArray sourceArray, MPSNDArray gradient, MPSState state, MPSNDArray destination);
 }
 
 public extern objc class MPSNDArrayBinaryKernel : MPSNDArrayMultiaryKernel
 {
     /// Deprecated in macOS 11.0.
-    [Selector("primaryOffsets")] public MPSNDArrayOffsets PrimaryOffsets { get; }
+    [Selector("primaryOffsets")]
+    public MPSNDArrayOffsets PrimaryOffsets { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("primaryEdgeMode")] public MPSImageEdgeMode PrimaryEdgeMode { get; }
+    [Selector("primaryEdgeMode")]
+    public MPSImageEdgeMode PrimaryEdgeMode { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("primaryKernelSizes")] public MPSNDArraySizes PrimaryKernelSizes { get; }
+    [Selector("primaryKernelSizes")]
+    public MPSNDArraySizes PrimaryKernelSizes { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("primaryStrides")] public MPSNDArrayOffsets PrimaryStrides { get; }
+    [Selector("primaryStrides")]
+    public MPSNDArrayOffsets PrimaryStrides { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("primaryDilationRates")] public MPSNDArraySizes PrimaryDilationRates { get; }
+    [Selector("primaryDilationRates")]
+    public MPSNDArraySizes PrimaryDilationRates { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("secondaryOffsets")] public MPSNDArrayOffsets SecondaryOffsets { get; }
+    [Selector("secondaryOffsets")]
+    public MPSNDArrayOffsets SecondaryOffsets { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("secondaryEdgeMode")] public MPSImageEdgeMode SecondaryEdgeMode { get; }
+    [Selector("secondaryEdgeMode")]
+    public MPSImageEdgeMode SecondaryEdgeMode { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("secondaryKernelSizes")] public MPSNDArraySizes SecondaryKernelSizes { get; }
+    [Selector("secondaryKernelSizes")]
+    public MPSNDArraySizes SecondaryKernelSizes { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("secondaryStrides")] public MPSNDArrayOffsets SecondaryStrides { get; }
+    [Selector("secondaryStrides")]
+    public MPSNDArrayOffsets SecondaryStrides { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("secondaryDilationRates")] public MPSNDArraySizes SecondaryDilationRates { get; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:")] public MPSNDArray EncodeToCommandBufferPrimarySourceArraySecondarySourceArray(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray);
-    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:destinationArray:")] public void EncodeToCommandBufferPrimarySourceArraySecondarySourceArrayDestinationArray(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray, MPSNDArray destination);
-    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:resultState:outputStateIsTemporary:")] public MPSNDArray EncodeToCommandBufferPrimarySourceArraySecondarySourceArrayResultStateOutputStateIsTemporary(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray, out MPSState? outGradientState, bool outputStateIsTemporary);
-    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:resultState:destinationArray:")] public void EncodeToCommandBufferPrimarySourceArraySecondarySourceArrayResultStateDestinationArray(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray, MPSState? outGradientState, MPSNDArray destination);
+    [Selector("secondaryDilationRates")]
+    public MPSNDArraySizes SecondaryDilationRates { get; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:")]
+    public MPSNDArray EncodeToCommandBufferPrimarySourceArraySecondarySourceArray(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray);
+    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:destinationArray:")]
+    public void EncodeToCommandBufferPrimarySourceArraySecondarySourceArrayDestinationArray(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray, MPSNDArray destination);
+    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:resultState:outputStateIsTemporary:")]
+    public MPSNDArray EncodeToCommandBufferPrimarySourceArraySecondarySourceArrayResultStateOutputStateIsTemporary(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray, out MPSState? outGradientState, bool outputStateIsTemporary);
+    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:resultState:destinationArray:")]
+    public void EncodeToCommandBufferPrimarySourceArraySecondarySourceArrayResultStateDestinationArray(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray, MPSState? outGradientState, MPSNDArray destination);
 }
 
 public extern objc class MPSNDArrayBinaryPrimaryGradientKernel : MPSNDArrayMultiaryGradientKernel
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:sourceGradient:gradientState:")] public MPSNDArray EncodeToCommandBufferPrimarySourceArraySecondarySourceArraySourceGradientGradientState(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray, MPSNDArray gradient, MPSState state);
-    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:sourceGradient:gradientState:destinationArray:")] public void EncodeToCommandBufferPrimarySourceArraySecondarySourceArraySourceGradientGradientStateDestinationArray(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray, MPSNDArray gradient, MPSState state, MPSNDArray destination);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:sourceGradient:gradientState:")]
+    public MPSNDArray EncodeToCommandBufferPrimarySourceArraySecondarySourceArraySourceGradientGradientState(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray, MPSNDArray gradient, MPSState state);
+    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:sourceGradient:gradientState:destinationArray:")]
+    public void EncodeToCommandBufferPrimarySourceArraySecondarySourceArraySourceGradientGradientStateDestinationArray(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray, MPSNDArray gradient, MPSState state, MPSNDArray destination);
 }
 
 public extern objc class MPSNDArrayBinarySecondaryGradientKernel : MPSNDArrayMultiaryGradientKernel
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:sourceGradient:gradientState:")] public MPSNDArray EncodeToCommandBufferPrimarySourceArraySecondarySourceArraySourceGradientGradientState(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray, MPSNDArray gradient, MPSState state);
-    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:sourceGradient:gradientState:destinationArray:")] public void EncodeToCommandBufferPrimarySourceArraySecondarySourceArraySourceGradientGradientStateDestinationArray(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray, MPSNDArray gradient, MPSState state, MPSNDArray destination);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self InitWithCoderDevice(NSCoder coder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:sourceGradient:gradientState:")]
+    public MPSNDArray EncodeToCommandBufferPrimarySourceArraySecondarySourceArraySourceGradientGradientState(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray, MPSNDArray gradient, MPSState state);
+    [Selector("encodeToCommandBuffer:primarySourceArray:secondarySourceArray:sourceGradient:gradientState:destinationArray:")]
+    public void EncodeToCommandBufferPrimarySourceArraySecondarySourceArraySourceGradientGradientStateDestinationArray(MTLCommandBuffer cmdBuf, MPSNDArray primarySourceArray, MPSNDArray secondarySourceArray, MPSNDArray gradient, MPSState state, MPSNDArray destination);
 }
 
 #endif

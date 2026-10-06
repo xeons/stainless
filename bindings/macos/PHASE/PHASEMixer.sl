@@ -34,46 +34,66 @@ import Standard.ObjC;
 
 public extern objc class PHASEMixerDefinition : PHASEDefinition
 {
-    [Selector("gain", "setGain:")] public double Gain { get; set; }
-    [Selector("gainMetaParameterDefinition", "setGainMetaParameterDefinition:")] public PHASENumberMetaParameterDefinition? GainMetaParameterDefinition { get; set; }
+    [Selector("gain", "setGain:")]
+    public double Gain { get; set; }
+    [Selector("gainMetaParameterDefinition", "setGainMetaParameterDefinition:")]
+    public PHASENumberMetaParameterDefinition? GainMetaParameterDefinition { get; set; }
 }
 
 public extern objc class PHASESpatialMixerDefinition : PHASEMixerDefinition
 {
-    [Selector("spatialPipeline")] public PHASESpatialPipeline SpatialPipeline { get; }
-    [Selector("distanceModelParameters", "setDistanceModelParameters:")] public PHASEDistanceModelParameters? DistanceModelParameters { get; set; }
-    [Selector("listenerDirectivityModelParameters", "setListenerDirectivityModelParameters:")] public PHASEDirectivityModelParameters? ListenerDirectivityModelParameters { get; set; }
-    [Selector("sourceDirectivityModelParameters", "setSourceDirectivityModelParameters:")] public PHASEDirectivityModelParameters? SourceDirectivityModelParameters { get; set; }
-    [Selector("initWithSpatialPipeline:")] public Self InitWithSpatialPipeline(PHASESpatialPipeline spatialPipeline);
-    [Selector("initWithSpatialPipeline:identifier:")] public Self InitWithSpatialPipelineIdentifier(PHASESpatialPipeline spatialPipeline, NSString identifier);
+    [Selector("spatialPipeline")]
+    public PHASESpatialPipeline SpatialPipeline { get; }
+    [Selector("distanceModelParameters", "setDistanceModelParameters:")]
+    public PHASEDistanceModelParameters? DistanceModelParameters { get; set; }
+    [Selector("listenerDirectivityModelParameters", "setListenerDirectivityModelParameters:")]
+    public PHASEDirectivityModelParameters? ListenerDirectivityModelParameters { get; set; }
+    [Selector("sourceDirectivityModelParameters", "setSourceDirectivityModelParameters:")]
+    public PHASEDirectivityModelParameters? SourceDirectivityModelParameters { get; set; }
+    [Selector("initWithSpatialPipeline:")]
+    public Self InitWithSpatialPipeline(PHASESpatialPipeline spatialPipeline);
+    [Selector("initWithSpatialPipeline:identifier:")]
+    public Self InitWithSpatialPipelineIdentifier(PHASESpatialPipeline spatialPipeline, NSString identifier);
 }
 
 public extern objc class PHASEAmbientMixerDefinition : PHASEMixerDefinition
 {
-    [Selector("orientation")] public simd_quatf Orientation { get; }
-    [Selector("inputChannelLayout")] public AVAudioChannelLayout InputChannelLayout { get; }
-    [Selector("initWithChannelLayout:orientation:identifier:")] public Self InitWithChannelLayoutOrientationIdentifier(AVAudioChannelLayout layout, simd_quatf orientation, NSString identifier);
-    [Selector("initWithChannelLayout:orientation:")] public Self InitWithChannelLayoutOrientation(AVAudioChannelLayout layout, simd_quatf orientation);
+    [Selector("orientation")]
+    public simd_quatf Orientation { get; }
+    [Selector("inputChannelLayout")]
+    public AVAudioChannelLayout InputChannelLayout { get; }
+    [Selector("initWithChannelLayout:orientation:identifier:")]
+    public Self InitWithChannelLayoutOrientationIdentifier(AVAudioChannelLayout layout, simd_quatf orientation, NSString identifier);
+    [Selector("initWithChannelLayout:orientation:")]
+    public Self InitWithChannelLayoutOrientation(AVAudioChannelLayout layout, simd_quatf orientation);
 }
 
 public extern objc class PHASEChannelMixerDefinition : PHASEMixerDefinition
 {
-    [Selector("inputChannelLayout")] public AVAudioChannelLayout InputChannelLayout { get; }
-    [Selector("initWithChannelLayout:identifier:")] public Self InitWithChannelLayoutIdentifier(AVAudioChannelLayout layout, NSString identifier);
-    [Selector("initWithChannelLayout:")] public Self InitWithChannelLayout(AVAudioChannelLayout layout);
+    [Selector("inputChannelLayout")]
+    public AVAudioChannelLayout InputChannelLayout { get; }
+    [Selector("initWithChannelLayout:identifier:")]
+    public Self InitWithChannelLayoutIdentifier(AVAudioChannelLayout layout, NSString identifier);
+    [Selector("initWithChannelLayout:")]
+    public Self InitWithChannelLayout(AVAudioChannelLayout layout);
 }
 
 public extern objc class PHASEMixer : NSObject
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("gain")] public double Gain { get; }
-    [Selector("gainMetaParameter")] public PHASEMetaParameter? GainMetaParameter { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("gain")]
+    public double Gain { get; }
+    [Selector("gainMetaParameter")]
+    public PHASEMetaParameter? GainMetaParameter { get; }
 }
 
 public extern objc class PHASEMixerParameters : NSObject
 {
-    [Selector("addSpatialMixerParametersWithIdentifier:source:listener:")] public void AddSpatialMixerParametersWithIdentifierSourceListener(NSString identifier, PHASESource source, PHASEListener listener);
-    [Selector("addAmbientMixerParametersWithIdentifier:listener:")] public void AddAmbientMixerParametersWithIdentifierListener(NSString identifier, PHASEListener listener);
+    [Selector("addSpatialMixerParametersWithIdentifier:source:listener:")]
+    public void AddSpatialMixerParametersWithIdentifierSourceListener(NSString identifier, PHASESource source, PHASEListener listener);
+    [Selector("addAmbientMixerParametersWithIdentifier:listener:")]
+    public void AddAmbientMixerParametersWithIdentifierListener(NSString identifier, PHASEListener listener);
 }
 
 #endif

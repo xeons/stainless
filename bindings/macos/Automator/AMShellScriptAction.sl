@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class AMShellScriptAction : AMBundleAction
 {
-    [Selector("remapLineEndings")] public bool RemapLineEndings { get; }
-    [Selector("inputFieldSeparator")] public NSString InputFieldSeparator { get; }
-    [Selector("outputFieldSeparator")] public NSString OutputFieldSeparator { get; }
+    [Selector("remapLineEndings")]
+    public bool RemapLineEndings { get; }
+    [Selector("inputFieldSeparator")]
+    public NSString InputFieldSeparator { get; }
+    [Selector("outputFieldSeparator")]
+    public NSString OutputFieldSeparator { get; }
 }
 
 #endif

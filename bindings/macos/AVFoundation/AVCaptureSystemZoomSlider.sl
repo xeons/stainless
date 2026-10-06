@@ -34,8 +34,10 @@ public objc closure void AVCaptureSystemZoomSliderInitWithDeviceActionActionBloc
 
 public extern objc class AVCaptureSystemZoomSlider : AVCaptureControl
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(AVCaptureDevice device);
-    [Selector("initWithDevice:action:")] public Self InitWithDeviceAction(AVCaptureDevice device, AVCaptureSystemZoomSliderInitWithDeviceActionActionBlock action);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(AVCaptureDevice device);
+    [Selector("initWithDevice:action:")]
+    public Self InitWithDeviceAction(AVCaptureDevice device, AVCaptureSystemZoomSliderInitWithDeviceActionActionBlock action);
 }
 
 #endif

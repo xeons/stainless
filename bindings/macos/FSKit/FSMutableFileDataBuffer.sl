@@ -34,9 +34,11 @@ import Standard.ObjC;
 public extern objc class FSMutableFileDataBuffer : NSObject
 {
     /// macOS 15.4 and later.
-    [Selector("length")] public NSUInteger Length { get; }
+    [Selector("length")]
+    public NSUInteger Length { get; }
     /// macOS 15.4 and later.
-    [Selector("mutableBytes")] public void* MutableBytes();
+    [Selector("mutableBytes")]
+    public void* MutableBytes();
 }
 
 #endif

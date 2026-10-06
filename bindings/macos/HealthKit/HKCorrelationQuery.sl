@@ -34,9 +34,12 @@ public objc closure void HKCorrelationQueryInitWithTypePredicateSamplePredicates
 
 public extern objc class HKCorrelationQuery : HKQuery
 {
-    [Selector("correlationType")] public HKCorrelationType CorrelationType { get; }
-    [Selector("samplePredicates")] public NSDictionary? SamplePredicates { get; }
-    [Selector("initWithType:predicate:samplePredicates:completion:")] public Self InitWithTypePredicateSamplePredicatesCompletion(HKCorrelationType correlationType, NSPredicate? predicate, NSDictionary? samplePredicates, HKCorrelationQueryInitWithTypePredicateSamplePredicatesCompletionCompletionBlock completion);
+    [Selector("correlationType")]
+    public HKCorrelationType CorrelationType { get; }
+    [Selector("samplePredicates")]
+    public NSDictionary? SamplePredicates { get; }
+    [Selector("initWithType:predicate:samplePredicates:completion:")]
+    public Self InitWithTypePredicateSamplePredicatesCompletion(HKCorrelationType correlationType, NSPredicate? predicate, NSDictionary? samplePredicates, HKCorrelationQueryInitWithTypePredicateSamplePredicatesCompletionCompletionBlock completion);
 }
 
 #endif

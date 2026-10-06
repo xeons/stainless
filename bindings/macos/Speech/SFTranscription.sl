@@ -33,12 +33,16 @@ import Standard.ObjC;
 
 public extern objc class SFTranscription : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("formattedString")] public NSString FormattedString { get; }
-    [Selector("segments")] public NSArray Segments { get; }
+    [Selector("formattedString")]
+    public NSString FormattedString { get; }
+    [Selector("segments")]
+    public NSArray Segments { get; }
     /// Deprecated in macOS 11.3.
-    [Selector("speakingRate")] public double SpeakingRate { get; }
+    [Selector("speakingRate")]
+    public double SpeakingRate { get; }
     /// Deprecated in macOS 11.3.
-    [Selector("averagePauseDuration")] public NSTimeInterval AveragePauseDuration { get; }
+    [Selector("averagePauseDuration")]
+    public NSTimeInterval AveragePauseDuration { get; }
 }
 
 #endif

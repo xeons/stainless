@@ -70,61 +70,93 @@ public enum OSSystemExtensionRequestResult : long
 
 public extern objc class OSSystemExtensionRequest : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public OSSystemExtensionRequestDelegate? Delegate { get; set; }
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("activationRequestForExtension:queue:")] public static Self ActivationRequestForExtensionQueue(NSString identifier, dispatch_queue_t queue);
-    [Selector("deactivationRequestForExtension:queue:")] public static Self DeactivationRequestForExtensionQueue(NSString identifier, dispatch_queue_t queue);
-    [Selector("propertiesRequestForExtension:queue:")] public static Self PropertiesRequestForExtensionQueue(NSString identifier, dispatch_queue_t queue);
+    [Selector("delegate", "setDelegate:")]
+    public OSSystemExtensionRequestDelegate? Delegate { get; set; }
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("activationRequestForExtension:queue:")]
+    public static Self ActivationRequestForExtensionQueue(NSString identifier, dispatch_queue_t queue);
+    [Selector("deactivationRequestForExtension:queue:")]
+    public static Self DeactivationRequestForExtensionQueue(NSString identifier, dispatch_queue_t queue);
+    [Selector("propertiesRequestForExtension:queue:")]
+    public static Self PropertiesRequestForExtensionQueue(NSString identifier, dispatch_queue_t queue);
 }
 
 public extern objc class OSSystemExtensionProperties : NSObject
 {
-    [Selector("URL")] public NSURL? URL { get; }
-    [Selector("bundleIdentifier")] public NSString BundleIdentifier { get; }
-    [Selector("bundleVersion")] public NSString BundleVersion { get; }
-    [Selector("bundleShortVersion")] public NSString BundleShortVersion { get; }
-    [Selector("isEnabled")] public bool IsEnabled { get; }
-    [Selector("isAwaitingUserApproval")] public bool IsAwaitingUserApproval { get; }
-    [Selector("isUninstalling")] public bool IsUninstalling { get; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
+    [Selector("bundleIdentifier")]
+    public NSString BundleIdentifier { get; }
+    [Selector("bundleVersion")]
+    public NSString BundleVersion { get; }
+    [Selector("bundleShortVersion")]
+    public NSString BundleShortVersion { get; }
+    [Selector("isEnabled")]
+    public bool IsEnabled { get; }
+    [Selector("isAwaitingUserApproval")]
+    public bool IsAwaitingUserApproval { get; }
+    [Selector("isUninstalling")]
+    public bool IsUninstalling { get; }
 }
 
 public objc interface OSSystemExtensionRequestDelegate : NSObjectProtocol
 {
-    [Selector("request:actionForReplacingExtension:withExtension:")] OSSystemExtensionReplacementAction RequestActionForReplacingExtensionWithExtension(OSSystemExtensionRequest request, OSSystemExtensionProperties existing, OSSystemExtensionProperties ext);
-    [Selector("requestNeedsUserApproval:")] void RequestNeedsUserApproval(OSSystemExtensionRequest request);
-    [Selector("request:didFinishWithResult:")] void RequestDidFinishWithResult(OSSystemExtensionRequest request, OSSystemExtensionRequestResult result);
-    [Selector("request:didFailWithError:")] void RequestDidFailWithError(OSSystemExtensionRequest request, NSError error);
-    [Optional] [Selector("request:foundProperties:")] void RequestFoundProperties(OSSystemExtensionRequest request, NSArray properties);
+    [Selector("request:actionForReplacingExtension:withExtension:")]
+    OSSystemExtensionReplacementAction RequestActionForReplacingExtensionWithExtension(OSSystemExtensionRequest request, OSSystemExtensionProperties existing, OSSystemExtensionProperties ext);
+    [Selector("requestNeedsUserApproval:")]
+    void RequestNeedsUserApproval(OSSystemExtensionRequest request);
+    [Selector("request:didFinishWithResult:")]
+    void RequestDidFinishWithResult(OSSystemExtensionRequest request, OSSystemExtensionRequestResult result);
+    [Selector("request:didFailWithError:")]
+    void RequestDidFailWithError(OSSystemExtensionRequest request, NSError error);
+    [Optional]
+    [Selector("request:foundProperties:")]
+    void RequestFoundProperties(OSSystemExtensionRequest request, NSArray properties);
 }
 
 public extern objc class OSSystemExtensionManager : NSObject
 {
-    [Selector("sharedManager")] public static OSSystemExtensionManager? SharedManager { get; }
-    [Selector("submitRequest:")] public void SubmitRequest(OSSystemExtensionRequest request);
+    [Selector("sharedManager")]
+    public static OSSystemExtensionManager? SharedManager { get; }
+    [Selector("submitRequest:")]
+    public void SubmitRequest(OSSystemExtensionRequest request);
 }
 
 /// macOS 15.1 and later.
 public extern objc class OSSystemExtensionInfo : NSObject
 {
-    [Selector("bundleIdentifier")] public NSString BundleIdentifier { get; }
-    [Selector("bundleVersion")] public NSString BundleVersion { get; }
-    [Selector("bundleShortVersion")] public NSString BundleShortVersion { get; }
+    [Selector("bundleIdentifier")]
+    public NSString BundleIdentifier { get; }
+    [Selector("bundleVersion")]
+    public NSString BundleVersion { get; }
+    [Selector("bundleShortVersion")]
+    public NSString BundleShortVersion { get; }
 }
 
 /// macOS 15.1 and later.
 public objc interface OSSystemExtensionsWorkspaceObserver : NSObjectProtocol
 {
-    [Optional] [Selector("systemExtensionWillBecomeEnabled:")] void SystemExtensionWillBecomeEnabled(OSSystemExtensionInfo systemExtensionInfo);
-    [Optional] [Selector("systemExtensionWillBecomeDisabled:")] void SystemExtensionWillBecomeDisabled(OSSystemExtensionInfo systemExtensionInfo);
-    [Optional] [Selector("systemExtensionWillBecomeInactive:")] void SystemExtensionWillBecomeInactive(OSSystemExtensionInfo systemExtensionInfo);
+    [Optional]
+    [Selector("systemExtensionWillBecomeEnabled:")]
+    void SystemExtensionWillBecomeEnabled(OSSystemExtensionInfo systemExtensionInfo);
+    [Optional]
+    [Selector("systemExtensionWillBecomeDisabled:")]
+    void SystemExtensionWillBecomeDisabled(OSSystemExtensionInfo systemExtensionInfo);
+    [Optional]
+    [Selector("systemExtensionWillBecomeInactive:")]
+    void SystemExtensionWillBecomeInactive(OSSystemExtensionInfo systemExtensionInfo);
 }
 
 /// macOS 15.1 and later.
 public extern objc class OSSystemExtensionsWorkspace : NSObject
 {
-    [Selector("sharedWorkspace")] public static OSSystemExtensionsWorkspace SharedWorkspace { get; }
-    [Selector("addObserver:error:")] public bool AddObserverError(OSSystemExtensionsWorkspaceObserver observer, out NSError? error);
-    [Selector("removeObserver:")] public void RemoveObserver(OSSystemExtensionsWorkspaceObserver observer);
+    [Selector("sharedWorkspace")]
+    public static OSSystemExtensionsWorkspace SharedWorkspace { get; }
+    [Selector("addObserver:error:")]
+    public bool AddObserverError(OSSystemExtensionsWorkspaceObserver observer, out NSError? error);
+    [Selector("removeObserver:")]
+    public void RemoveObserver(OSSystemExtensionsWorkspaceObserver observer);
 }
 
 #endif

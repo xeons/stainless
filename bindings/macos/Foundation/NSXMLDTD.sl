@@ -32,22 +32,38 @@ import Standard.ObjC;
 
 public extern objc class NSXMLDTD : NSXMLNode
 {
-    [Selector("publicID", "setPublicID:")] public NSString? PublicID { get; set; }
-    [Selector("systemID", "setSystemID:")] public NSString? SystemID { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithContentsOfURL:options:error:")] public Self? InitWithContentsOfURLOptionsError(NSURL url, NSXMLNodeOptions mask, out NSError? error);
-    [Selector("initWithData:options:error:")] public Self? InitWithDataOptionsError(NSData data, NSXMLNodeOptions mask, out NSError? error);
-    [Selector("insertChild:atIndex:")] public void InsertChildAtIndex(NSXMLNode child, NSUInteger index);
-    [Selector("insertChildren:atIndex:")] public void InsertChildrenAtIndex(NSArray children, NSUInteger index);
-    [Selector("removeChildAtIndex:")] public void RemoveChildAtIndex(NSUInteger index);
-    [Selector("setChildren:")] public void SetChildren(NSArray? children);
-    [Selector("addChild:")] public void AddChild(NSXMLNode child);
-    [Selector("replaceChildAtIndex:withNode:")] public void ReplaceChildAtIndexWithNode(NSUInteger index, NSXMLNode node);
-    [Selector("entityDeclarationForName:")] public NSXMLDTDNode? EntityDeclarationForName(NSString name);
-    [Selector("notationDeclarationForName:")] public NSXMLDTDNode? NotationDeclarationForName(NSString name);
-    [Selector("elementDeclarationForName:")] public NSXMLDTDNode? ElementDeclarationForName(NSString name);
-    [Selector("attributeDeclarationForName:elementName:")] public NSXMLDTDNode? AttributeDeclarationForNameElementName(NSString name, NSString elementName);
-    [Selector("predefinedEntityDeclarationForName:")] public static NSXMLDTDNode? PredefinedEntityDeclarationForName(NSString name);
+    [Selector("publicID", "setPublicID:")]
+    public NSString? PublicID { get; set; }
+    [Selector("systemID", "setSystemID:")]
+    public NSString? SystemID { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithContentsOfURL:options:error:")]
+    public Self? InitWithContentsOfURLOptionsError(NSURL url, NSXMLNodeOptions mask, out NSError? error);
+    [Selector("initWithData:options:error:")]
+    public Self? InitWithDataOptionsError(NSData data, NSXMLNodeOptions mask, out NSError? error);
+    [Selector("insertChild:atIndex:")]
+    public void InsertChildAtIndex(NSXMLNode child, NSUInteger index);
+    [Selector("insertChildren:atIndex:")]
+    public void InsertChildrenAtIndex(NSArray children, NSUInteger index);
+    [Selector("removeChildAtIndex:")]
+    public void RemoveChildAtIndex(NSUInteger index);
+    [Selector("setChildren:")]
+    public void SetChildren(NSArray? children);
+    [Selector("addChild:")]
+    public void AddChild(NSXMLNode child);
+    [Selector("replaceChildAtIndex:withNode:")]
+    public void ReplaceChildAtIndexWithNode(NSUInteger index, NSXMLNode node);
+    [Selector("entityDeclarationForName:")]
+    public NSXMLDTDNode? EntityDeclarationForName(NSString name);
+    [Selector("notationDeclarationForName:")]
+    public NSXMLDTDNode? NotationDeclarationForName(NSString name);
+    [Selector("elementDeclarationForName:")]
+    public NSXMLDTDNode? ElementDeclarationForName(NSString name);
+    [Selector("attributeDeclarationForName:elementName:")]
+    public NSXMLDTDNode? AttributeDeclarationForNameElementName(NSString name, NSString elementName);
+    [Selector("predefinedEntityDeclarationForName:")]
+    public static NSXMLDTDNode? PredefinedEntityDeclarationForName(NSString name);
 }
 
 #endif

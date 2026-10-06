@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public objc interface DOMEventListener : NSObjectProtocol
 {
-    [Selector("handleEvent:")] void HandleEvent(DOMEvent? event);
+    [Selector("handleEvent:")]
+    void HandleEvent(DOMEvent? event);
 }
 
 #endif

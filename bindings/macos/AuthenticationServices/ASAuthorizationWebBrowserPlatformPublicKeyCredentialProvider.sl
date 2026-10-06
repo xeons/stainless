@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public objc interface ASAuthorizationWebBrowserPlatformPublicKeyCredentialProvider
 {
-    [Selector("createCredentialRegistrationRequestWithClientData:name:userID:")] ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithClientDataNameUserID(ASPublicKeyCredentialClientData clientData, NSString name, NSData userID);
-    [Selector("createCredentialRegistrationRequestWithClientData:name:userID:requestStyle:")] ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithClientDataNameUserIDRequestStyle(ASPublicKeyCredentialClientData clientData, NSString name, NSData userID, ASAuthorizationPlatformPublicKeyCredentialRegistrationRequestStyle requestStyle);
-    [Selector("createCredentialAssertionRequestWithClientData:")] ASAuthorizationPlatformPublicKeyCredentialAssertionRequest CreateCredentialAssertionRequestWithClientData(ASPublicKeyCredentialClientData clientData);
+    [Selector("createCredentialRegistrationRequestWithClientData:name:userID:")]
+    ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithClientDataNameUserID(ASPublicKeyCredentialClientData clientData, NSString name, NSData userID);
+    [Selector("createCredentialRegistrationRequestWithClientData:name:userID:requestStyle:")]
+    ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithClientDataNameUserIDRequestStyle(ASPublicKeyCredentialClientData clientData, NSString name, NSData userID, ASAuthorizationPlatformPublicKeyCredentialRegistrationRequestStyle requestStyle);
+    [Selector("createCredentialAssertionRequestWithClientData:")]
+    ASAuthorizationPlatformPublicKeyCredentialAssertionRequest CreateCredentialAssertionRequestWithClientData(ASPublicKeyCredentialClientData clientData);
 }
 
 #endif

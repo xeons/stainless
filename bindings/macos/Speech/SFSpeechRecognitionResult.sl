@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class SFSpeechRecognitionResult : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("bestTranscription")] public SFTranscription BestTranscription { get; }
-    [Selector("transcriptions")] public NSArray Transcriptions { get; }
-    [Selector("isFinal")] public bool Final { get; }
-    [Selector("speechRecognitionMetadata")] public SFSpeechRecognitionMetadata? SpeechRecognitionMetadata { get; }
+    [Selector("bestTranscription")]
+    public SFTranscription BestTranscription { get; }
+    [Selector("transcriptions")]
+    public NSArray Transcriptions { get; }
+    [Selector("isFinal")]
+    public bool Final { get; }
+    [Selector("speechRecognitionMetadata")]
+    public SFSpeechRecognitionMetadata? SpeechRecognitionMetadata { get; }
 }
 
 #endif

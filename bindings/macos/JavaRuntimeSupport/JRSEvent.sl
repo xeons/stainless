@@ -34,8 +34,10 @@ import Standard.ObjC;
 /// JavaRuntimeSupport, a category of NSEvent.
 public extern objc class NSEvent
 {
-    [Selector("deadKeyCharacter")] public unichar DeadKeyCharacter();
-    [Selector("willBeHandledByComplexInputMethod")] public bool WillBeHandledByComplexInputMethod();
+    [Selector("deadKeyCharacter")]
+    public unichar DeadKeyCharacter();
+    [Selector("willBeHandledByComplexInputMethod")]
+    public bool WillBeHandledByComplexInputMethod();
 }
 
 #endif

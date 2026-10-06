@@ -94,79 +94,141 @@ public extern "C" NSNotificationName AVSpeechSynthesisAvailableVoicesDidChangeNo
 
 public extern objc class AVSpeechSynthesisVoice : NSObject, NSSecureCoding
 {
-    [Selector("language")] public NSString Language { get; }
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("name")] public NSString Name { get; }
-    [Selector("quality")] public AVSpeechSynthesisVoiceQuality Quality { get; }
-    [Selector("gender")] public AVSpeechSynthesisVoiceGender Gender { get; }
-    [Selector("audioFileSettings")] public NSDictionary AudioFileSettings { get; }
-    [Selector("voiceTraits")] public AVSpeechSynthesisVoiceTraits VoiceTraits { get; }
-    [Selector("speechVoices")] public static NSArray SpeechVoices();
-    [Selector("currentLanguageCode")] public static NSString CurrentLanguageCode();
-    [Selector("voiceWithLanguage:")] public static AVSpeechSynthesisVoice? VoiceWithLanguage(NSString? languageCode);
-    [Selector("voiceWithIdentifier:")] public static AVSpeechSynthesisVoice? VoiceWithIdentifier(NSString identifier);
+    [Selector("language")]
+    public NSString Language { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("quality")]
+    public AVSpeechSynthesisVoiceQuality Quality { get; }
+    [Selector("gender")]
+    public AVSpeechSynthesisVoiceGender Gender { get; }
+    [Selector("audioFileSettings")]
+    public NSDictionary AudioFileSettings { get; }
+    [Selector("voiceTraits")]
+    public AVSpeechSynthesisVoiceTraits VoiceTraits { get; }
+    [Selector("speechVoices")]
+    public static NSArray SpeechVoices();
+    [Selector("currentLanguageCode")]
+    public static NSString CurrentLanguageCode();
+    [Selector("voiceWithLanguage:")]
+    public static AVSpeechSynthesisVoice? VoiceWithLanguage(NSString? languageCode);
+    [Selector("voiceWithIdentifier:")]
+    public static AVSpeechSynthesisVoice? VoiceWithIdentifier(NSString identifier);
 }
 
 public extern objc class AVSpeechUtterance : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("voice", "setVoice:")] public AVSpeechSynthesisVoice? Voice { get; set; }
-    [Selector("speechString")] public NSString SpeechString { get; }
-    [Selector("attributedSpeechString")] public NSAttributedString AttributedSpeechString { get; }
-    [Selector("rate", "setRate:")] public float Rate { get; set; }
-    [Selector("pitchMultiplier", "setPitchMultiplier:")] public float PitchMultiplier { get; set; }
-    [Selector("volume", "setVolume:")] public float Volume { get; set; }
-    [Selector("prefersAssistiveTechnologySettings", "setPrefersAssistiveTechnologySettings:")] public bool PrefersAssistiveTechnologySettings { get; set; }
-    [Selector("preUtteranceDelay", "setPreUtteranceDelay:")] public NSTimeInterval PreUtteranceDelay { get; set; }
-    [Selector("postUtteranceDelay", "setPostUtteranceDelay:")] public NSTimeInterval PostUtteranceDelay { get; set; }
-    [Selector("speechUtteranceWithString:")] public static Self SpeechUtteranceWithString(NSString string);
-    [Selector("speechUtteranceWithAttributedString:")] public static Self SpeechUtteranceWithAttributedString(NSAttributedString string);
-    [Selector("speechUtteranceWithSSMLRepresentation:")] public static Self? SpeechUtteranceWithSSMLRepresentation(NSString string);
-    [Selector("initWithString:")] public Self InitWithString(NSString string);
-    [Selector("initWithAttributedString:")] public Self InitWithAttributedString(NSAttributedString string);
-    [Selector("initWithSSMLRepresentation:")] public Self? InitWithSSMLRepresentation(NSString string);
+    [Selector("voice", "setVoice:")]
+    public AVSpeechSynthesisVoice? Voice { get; set; }
+    [Selector("speechString")]
+    public NSString SpeechString { get; }
+    [Selector("attributedSpeechString")]
+    public NSAttributedString AttributedSpeechString { get; }
+    [Selector("rate", "setRate:")]
+    public float Rate { get; set; }
+    [Selector("pitchMultiplier", "setPitchMultiplier:")]
+    public float PitchMultiplier { get; set; }
+    [Selector("volume", "setVolume:")]
+    public float Volume { get; set; }
+    [Selector("prefersAssistiveTechnologySettings", "setPrefersAssistiveTechnologySettings:")]
+    public bool PrefersAssistiveTechnologySettings { get; set; }
+    [Selector("preUtteranceDelay", "setPreUtteranceDelay:")]
+    public NSTimeInterval PreUtteranceDelay { get; set; }
+    [Selector("postUtteranceDelay", "setPostUtteranceDelay:")]
+    public NSTimeInterval PostUtteranceDelay { get; set; }
+    [Selector("speechUtteranceWithString:")]
+    public static Self SpeechUtteranceWithString(NSString string);
+    [Selector("speechUtteranceWithAttributedString:")]
+    public static Self SpeechUtteranceWithAttributedString(NSAttributedString string);
+    [Selector("speechUtteranceWithSSMLRepresentation:")]
+    public static Self? SpeechUtteranceWithSSMLRepresentation(NSString string);
+    [Selector("initWithString:")]
+    public Self InitWithString(NSString string);
+    [Selector("initWithAttributedString:")]
+    public Self InitWithAttributedString(NSAttributedString string);
+    [Selector("initWithSSMLRepresentation:")]
+    public Self? InitWithSSMLRepresentation(NSString string);
 }
 
 public objc closure void AVSpeechSynthesizerRequestPersonalVoiceAuthorizationWithCompletionHandlerHandlerBlock(AVSpeechSynthesisPersonalVoiceAuthorizationStatus arg0);
 
 public extern objc class AVSpeechSynthesizer : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public AVSpeechSynthesizerDelegate? Delegate { get; set; }
-    [Selector("isSpeaking")] public bool Speaking { get; }
-    [Selector("isPaused")] public bool Paused { get; }
-    [Selector("personalVoiceAuthorizationStatus")] public static AVSpeechSynthesisPersonalVoiceAuthorizationStatus PersonalVoiceAuthorizationStatus { get; }
-    [Selector("speakUtterance:")] public void SpeakUtterance(AVSpeechUtterance utterance);
-    [Selector("writeUtterance:toBufferCallback:")] public void WriteUtteranceToBufferCallback(AVSpeechUtterance utterance, AVSpeechSynthesizerBufferCallback bufferCallback);
-    [Selector("writeUtterance:toBufferCallback:toMarkerCallback:")] public void WriteUtteranceToBufferCallbackToMarkerCallback(AVSpeechUtterance utterance, AVSpeechSynthesizerBufferCallback bufferCallback, AVSpeechSynthesizerMarkerCallback markerCallback);
-    [Selector("stopSpeakingAtBoundary:")] public bool StopSpeakingAtBoundary(AVSpeechBoundary boundary);
-    [Selector("pauseSpeakingAtBoundary:")] public bool PauseSpeakingAtBoundary(AVSpeechBoundary boundary);
-    [Selector("continueSpeaking")] public bool ContinueSpeaking();
-    [Selector("requestPersonalVoiceAuthorizationWithCompletionHandler:")] public static void RequestPersonalVoiceAuthorizationWithCompletionHandler(AVSpeechSynthesizerRequestPersonalVoiceAuthorizationWithCompletionHandlerHandlerBlock handler);
+    [Selector("delegate", "setDelegate:")]
+    public AVSpeechSynthesizerDelegate? Delegate { get; set; }
+    [Selector("isSpeaking")]
+    public bool Speaking { get; }
+    [Selector("isPaused")]
+    public bool Paused { get; }
+    [Selector("personalVoiceAuthorizationStatus")]
+    public static AVSpeechSynthesisPersonalVoiceAuthorizationStatus PersonalVoiceAuthorizationStatus { get; }
+    [Selector("speakUtterance:")]
+    public void SpeakUtterance(AVSpeechUtterance utterance);
+    [Selector("writeUtterance:toBufferCallback:")]
+    public void WriteUtteranceToBufferCallback(AVSpeechUtterance utterance, AVSpeechSynthesizerBufferCallback bufferCallback);
+    [Selector("writeUtterance:toBufferCallback:toMarkerCallback:")]
+    public void WriteUtteranceToBufferCallbackToMarkerCallback(AVSpeechUtterance utterance, AVSpeechSynthesizerBufferCallback bufferCallback, AVSpeechSynthesizerMarkerCallback markerCallback);
+    [Selector("stopSpeakingAtBoundary:")]
+    public bool StopSpeakingAtBoundary(AVSpeechBoundary boundary);
+    [Selector("pauseSpeakingAtBoundary:")]
+    public bool PauseSpeakingAtBoundary(AVSpeechBoundary boundary);
+    [Selector("continueSpeaking")]
+    public bool ContinueSpeaking();
+    [Selector("requestPersonalVoiceAuthorizationWithCompletionHandler:")]
+    public static void RequestPersonalVoiceAuthorizationWithCompletionHandler(AVSpeechSynthesizerRequestPersonalVoiceAuthorizationWithCompletionHandlerHandlerBlock handler);
 }
 
 public objc interface AVSpeechSynthesizerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("speechSynthesizer:didStartSpeechUtterance:")] void SpeechSynthesizerDidStartSpeechUtterance(AVSpeechSynthesizer synthesizer, AVSpeechUtterance utterance);
-    [Optional] [Selector("speechSynthesizer:didFinishSpeechUtterance:")] void SpeechSynthesizerDidFinishSpeechUtterance(AVSpeechSynthesizer synthesizer, AVSpeechUtterance utterance);
-    [Optional] [Selector("speechSynthesizer:didPauseSpeechUtterance:")] void SpeechSynthesizerDidPauseSpeechUtterance(AVSpeechSynthesizer synthesizer, AVSpeechUtterance utterance);
-    [Optional] [Selector("speechSynthesizer:didContinueSpeechUtterance:")] void SpeechSynthesizerDidContinueSpeechUtterance(AVSpeechSynthesizer synthesizer, AVSpeechUtterance utterance);
-    [Optional] [Selector("speechSynthesizer:didCancelSpeechUtterance:")] void SpeechSynthesizerDidCancelSpeechUtterance(AVSpeechSynthesizer synthesizer, AVSpeechUtterance utterance);
-    [Optional] [Selector("speechSynthesizer:willSpeakRangeOfSpeechString:utterance:")] void SpeechSynthesizerWillSpeakRangeOfSpeechStringUtterance(AVSpeechSynthesizer synthesizer, NSRange characterRange, AVSpeechUtterance utterance);
-    [Optional] [Selector("speechSynthesizer:willSpeakMarker:utterance:")] void SpeechSynthesizerWillSpeakMarkerUtterance(AVSpeechSynthesizer synthesizer, AVSpeechSynthesisMarker marker, AVSpeechUtterance utterance);
+    [Optional]
+    [Selector("speechSynthesizer:didStartSpeechUtterance:")]
+    void SpeechSynthesizerDidStartSpeechUtterance(AVSpeechSynthesizer synthesizer, AVSpeechUtterance utterance);
+    [Optional]
+    [Selector("speechSynthesizer:didFinishSpeechUtterance:")]
+    void SpeechSynthesizerDidFinishSpeechUtterance(AVSpeechSynthesizer synthesizer, AVSpeechUtterance utterance);
+    [Optional]
+    [Selector("speechSynthesizer:didPauseSpeechUtterance:")]
+    void SpeechSynthesizerDidPauseSpeechUtterance(AVSpeechSynthesizer synthesizer, AVSpeechUtterance utterance);
+    [Optional]
+    [Selector("speechSynthesizer:didContinueSpeechUtterance:")]
+    void SpeechSynthesizerDidContinueSpeechUtterance(AVSpeechSynthesizer synthesizer, AVSpeechUtterance utterance);
+    [Optional]
+    [Selector("speechSynthesizer:didCancelSpeechUtterance:")]
+    void SpeechSynthesizerDidCancelSpeechUtterance(AVSpeechSynthesizer synthesizer, AVSpeechUtterance utterance);
+    [Optional]
+    [Selector("speechSynthesizer:willSpeakRangeOfSpeechString:utterance:")]
+    void SpeechSynthesizerWillSpeakRangeOfSpeechStringUtterance(AVSpeechSynthesizer synthesizer, NSRange characterRange, AVSpeechUtterance utterance);
+    [Optional]
+    [Selector("speechSynthesizer:willSpeakMarker:utterance:")]
+    void SpeechSynthesizerWillSpeakMarkerUtterance(AVSpeechSynthesizer synthesizer, AVSpeechSynthesisMarker marker, AVSpeechUtterance utterance);
 }
 
 public extern objc class AVSpeechSynthesisMarker : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("mark", "setMark:")] public AVSpeechSynthesisMarkerMark Mark { get; set; }
-    [Selector("byteSampleOffset", "setByteSampleOffset:")] public NSUInteger ByteSampleOffset { get; set; }
-    [Selector("textRange", "setTextRange:")] public NSRange TextRange { get; set; }
-    [Selector("bookmarkName", "setBookmarkName:")] public NSString? BookmarkName { get; set; }
-    [Selector("phoneme", "setPhoneme:")] public NSString? Phoneme { get; set; }
-    [Selector("initWithMarkerType:forTextRange:atByteSampleOffset:")] public Self InitWithMarkerTypeForTextRangeAtByteSampleOffset(AVSpeechSynthesisMarkerMark type, NSRange range, NSUInteger byteSampleOffset);
-    [Selector("initWithWordRange:atByteSampleOffset:")] public Self InitWithWordRangeAtByteSampleOffset(NSRange range, NSInteger byteSampleOffset);
-    [Selector("initWithSentenceRange:atByteSampleOffset:")] public Self InitWithSentenceRangeAtByteSampleOffset(NSRange range, NSInteger byteSampleOffset);
-    [Selector("initWithParagraphRange:atByteSampleOffset:")] public Self InitWithParagraphRangeAtByteSampleOffset(NSRange range, NSInteger byteSampleOffset);
-    [Selector("initWithPhonemeString:atByteSampleOffset:")] public Self InitWithPhonemeStringAtByteSampleOffset(NSString phoneme, NSInteger byteSampleOffset);
-    [Selector("initWithBookmarkName:atByteSampleOffset:")] public Self InitWithBookmarkNameAtByteSampleOffset(NSString mark, NSInteger byteSampleOffset);
+    [Selector("mark", "setMark:")]
+    public AVSpeechSynthesisMarkerMark Mark { get; set; }
+    [Selector("byteSampleOffset", "setByteSampleOffset:")]
+    public NSUInteger ByteSampleOffset { get; set; }
+    [Selector("textRange", "setTextRange:")]
+    public NSRange TextRange { get; set; }
+    [Selector("bookmarkName", "setBookmarkName:")]
+    public NSString? BookmarkName { get; set; }
+    [Selector("phoneme", "setPhoneme:")]
+    public NSString? Phoneme { get; set; }
+    [Selector("initWithMarkerType:forTextRange:atByteSampleOffset:")]
+    public Self InitWithMarkerTypeForTextRangeAtByteSampleOffset(AVSpeechSynthesisMarkerMark type, NSRange range, NSUInteger byteSampleOffset);
+    [Selector("initWithWordRange:atByteSampleOffset:")]
+    public Self InitWithWordRangeAtByteSampleOffset(NSRange range, NSInteger byteSampleOffset);
+    [Selector("initWithSentenceRange:atByteSampleOffset:")]
+    public Self InitWithSentenceRangeAtByteSampleOffset(NSRange range, NSInteger byteSampleOffset);
+    [Selector("initWithParagraphRange:atByteSampleOffset:")]
+    public Self InitWithParagraphRangeAtByteSampleOffset(NSRange range, NSInteger byteSampleOffset);
+    [Selector("initWithPhonemeString:atByteSampleOffset:")]
+    public Self InitWithPhonemeStringAtByteSampleOffset(NSString phoneme, NSInteger byteSampleOffset);
+    [Selector("initWithBookmarkName:atByteSampleOffset:")]
+    public Self InitWithBookmarkNameAtByteSampleOffset(NSString mark, NSInteger byteSampleOffset);
 }
 
 #endif

@@ -46,26 +46,38 @@ public enum OSLogEntryStoreCategory : long
 
 public extern objc class OSLogEntry : NSObject
 {
-    [Selector("composedMessage")] public NSString ComposedMessage { get; }
-    [Selector("date")] public NSDate Date { get; }
-    [Selector("storeCategory")] public OSLogEntryStoreCategory StoreCategory { get; }
+    [Selector("composedMessage")]
+    public NSString ComposedMessage { get; }
+    [Selector("date")]
+    public NSDate Date { get; }
+    [Selector("storeCategory")]
+    public OSLogEntryStoreCategory StoreCategory { get; }
 }
 
 public objc interface OSLogEntryFromProcess
 {
-    [Selector("activityIdentifier")] os_activity_id_t ActivityIdentifier { get; }
-    [Selector("process")] NSString Process { get; }
-    [Selector("processIdentifier")] pid_t ProcessIdentifier { get; }
-    [Selector("sender")] NSString Sender { get; }
-    [Selector("threadIdentifier")] ulong ThreadIdentifier { get; }
+    [Selector("activityIdentifier")]
+    os_activity_id_t ActivityIdentifier { get; }
+    [Selector("process")]
+    NSString Process { get; }
+    [Selector("processIdentifier")]
+    pid_t ProcessIdentifier { get; }
+    [Selector("sender")]
+    NSString Sender { get; }
+    [Selector("threadIdentifier")]
+    ulong ThreadIdentifier { get; }
 }
 
 public objc interface OSLogEntryWithPayload
 {
-    [Selector("category")] NSString Category { get; }
-    [Selector("components")] NSArray Components { get; }
-    [Selector("formatString")] NSString FormatString { get; }
-    [Selector("subsystem")] NSString Subsystem { get; }
+    [Selector("category")]
+    NSString Category { get; }
+    [Selector("components")]
+    NSArray Components { get; }
+    [Selector("formatString")]
+    NSString FormatString { get; }
+    [Selector("subsystem")]
+    NSString Subsystem { get; }
 }
 
 public extern objc class OSLogEntry : NSSecureCoding { }

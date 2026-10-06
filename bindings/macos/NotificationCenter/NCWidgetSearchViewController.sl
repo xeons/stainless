@@ -35,19 +35,27 @@ import Standard.ObjC;
 /// Deprecated in macOS 11.0.
 public extern objc class NCWidgetSearchViewController : NSViewController
 {
-    [Selector("delegate", "setDelegate:")] public NCWidgetSearchViewDelegate? Delegate { get; set; }
-    [Selector("searchResults", "setSearchResults:")] public NSArray? SearchResults { get; set; }
-    [Selector("searchDescription", "setSearchDescription:")] public NSString? SearchDescription { get; set; }
-    [Selector("searchResultsPlaceholderString", "setSearchResultsPlaceholderString:")] public NSString? SearchResultsPlaceholderString { get; set; }
-    [Selector("searchResultKeyPath", "setSearchResultKeyPath:")] public NSString? SearchResultKeyPath { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NCWidgetSearchViewDelegate? Delegate { get; set; }
+    [Selector("searchResults", "setSearchResults:")]
+    public NSArray? SearchResults { get; set; }
+    [Selector("searchDescription", "setSearchDescription:")]
+    public NSString? SearchDescription { get; set; }
+    [Selector("searchResultsPlaceholderString", "setSearchResultsPlaceholderString:")]
+    public NSString? SearchResultsPlaceholderString { get; set; }
+    [Selector("searchResultKeyPath", "setSearchResultKeyPath:")]
+    public NSString? SearchResultKeyPath { get; set; }
 }
 
 /// Deprecated in macOS 11.0.
 public objc interface NCWidgetSearchViewDelegate : NSObjectProtocol
 {
-    [Selector("widgetSearch:searchForTerm:maxResults:")] void WidgetSearchSearchForTermMaxResults(NCWidgetSearchViewController controller, NSString searchTerm, NSUInteger max);
-    [Selector("widgetSearchTermCleared:")] void WidgetSearchTermCleared(NCWidgetSearchViewController controller);
-    [Selector("widgetSearch:resultSelected:")] void WidgetSearchResultSelected(NCWidgetSearchViewController controller, AnyObject object);
+    [Selector("widgetSearch:searchForTerm:maxResults:")]
+    void WidgetSearchSearchForTermMaxResults(NCWidgetSearchViewController controller, NSString searchTerm, NSUInteger max);
+    [Selector("widgetSearchTermCleared:")]
+    void WidgetSearchTermCleared(NCWidgetSearchViewController controller);
+    [Selector("widgetSearch:resultSelected:")]
+    void WidgetSearchResultSelected(NCWidgetSearchViewController controller, AnyObject object);
 }
 
 #endif

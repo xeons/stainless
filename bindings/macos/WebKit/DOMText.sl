@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMText : DOMCharacterData
 {
-    [Selector("wholeText")] public NSString? WholeText { get; }
-    [Selector("splitText:")] public DOMText? SplitText(uint offset);
-    [Selector("replaceWholeText:")] public DOMText? ReplaceWholeText(NSString? content);
+    [Selector("wholeText")]
+    public NSString? WholeText { get; }
+    [Selector("splitText:")]
+    public DOMText? SplitText(uint offset);
+    [Selector("replaceWholeText:")]
+    public DOMText? ReplaceWholeText(NSString? content);
 }
 
 #endif

@@ -35,18 +35,27 @@ public objc closure void NSUserInterfaceItemSearchingSearchForItemsWithSearchStr
 
 public objc interface NSUserInterfaceItemSearching : NSObjectProtocol
 {
-    [Selector("searchForItemsWithSearchString:resultLimit:matchedItemHandler:")] void SearchForItemsWithSearchStringResultLimitMatchedItemHandler(NSString searchString, NSInteger resultLimit, NSUserInterfaceItemSearchingSearchForItemsWithSearchStringResultLimitMatchedItemHandlerHandleMatchedItemsBlock handleMatchedItems);
-    [Selector("localizedTitlesForItem:")] NSArray LocalizedTitlesForItem(AnyObject item);
-    [Optional] [Selector("performActionForItem:")] void PerformActionForItem(AnyObject item);
-    [Optional] [Selector("showAllHelpTopicsForSearchString:")] void ShowAllHelpTopicsForSearchString(NSString searchString);
+    [Selector("searchForItemsWithSearchString:resultLimit:matchedItemHandler:")]
+    void SearchForItemsWithSearchStringResultLimitMatchedItemHandler(NSString searchString, NSInteger resultLimit, NSUserInterfaceItemSearchingSearchForItemsWithSearchStringResultLimitMatchedItemHandlerHandleMatchedItemsBlock handleMatchedItems);
+    [Selector("localizedTitlesForItem:")]
+    NSArray LocalizedTitlesForItem(AnyObject item);
+    [Optional]
+    [Selector("performActionForItem:")]
+    void PerformActionForItem(AnyObject item);
+    [Optional]
+    [Selector("showAllHelpTopicsForSearchString:")]
+    void ShowAllHelpTopicsForSearchString(NSString searchString);
 }
 
 /// NSUserInterfaceItemSearching, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("registerUserInterfaceItemSearchHandler:")] public void RegisterUserInterfaceItemSearchHandler(NSUserInterfaceItemSearching handler);
-    [Selector("unregisterUserInterfaceItemSearchHandler:")] public void UnregisterUserInterfaceItemSearchHandler(NSUserInterfaceItemSearching handler);
-    [Selector("searchString:inUserInterfaceItemString:searchRange:foundRange:")] public bool SearchStringInUserInterfaceItemStringSearchRangeFoundRange(NSString searchString, NSString stringToSearch, NSRange searchRange, NSRange* foundRange);
+    [Selector("registerUserInterfaceItemSearchHandler:")]
+    public void RegisterUserInterfaceItemSearchHandler(NSUserInterfaceItemSearching handler);
+    [Selector("unregisterUserInterfaceItemSearchHandler:")]
+    public void UnregisterUserInterfaceItemSearchHandler(NSUserInterfaceItemSearching handler);
+    [Selector("searchString:inUserInterfaceItemString:searchRange:foundRange:")]
+    public bool SearchStringInUserInterfaceItemStringSearchRangeFoundRange(NSString searchString, NSString stringToSearch, NSRange searchRange, NSRange* foundRange);
 }
 
 #endif

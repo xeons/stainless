@@ -33,27 +33,48 @@ import Standard.ObjC;
 
 public extern objc class NSManagedObjectModel : NSObject, NSCoding, NSCopying, NSFastEnumeration
 {
-    [Selector("entitiesByName")] public NSDictionary EntitiesByName { get; }
-    [Selector("entities", "setEntities:")] public NSArray Entities { get; set; }
-    [Selector("configurations")] public NSArray Configurations { get; }
-    [Selector("localizationDictionary", "setLocalizationDictionary:")] public NSDictionary? LocalizationDictionary { get; set; }
-    [Selector("fetchRequestTemplatesByName")] public NSDictionary FetchRequestTemplatesByName { get; }
-    [Selector("versionIdentifiers", "setVersionIdentifiers:")] public NSSet VersionIdentifiers { get; set; }
-    [Selector("entityVersionHashesByName")] public NSDictionary EntityVersionHashesByName { get; }
-    [Selector("versionChecksum")] public NSString VersionChecksum { get; }
-    [Selector("mergedModelFromBundles:")] public static NSManagedObjectModel? MergedModelFromBundles(NSArray? bundles);
-    [Selector("modelByMergingModels:")] public static NSManagedObjectModel? ModelByMergingModels(NSArray? models);
-    [Selector("init")] public Self Init();
-    [Selector("initWithContentsOfURL:")] public Self? InitWithContentsOfURL(NSURL url);
-    [Selector("entitiesForConfiguration:")] public NSArray? EntitiesForConfiguration(NSString? configuration);
-    [Selector("setEntities:forConfiguration:")] public void SetEntitiesForConfiguration(NSArray entities, NSString configuration);
-    [Selector("setFetchRequestTemplate:forName:")] public void SetFetchRequestTemplateForName(NSFetchRequest? fetchRequestTemplate, NSString name);
-    [Selector("fetchRequestTemplateForName:")] public NSFetchRequest? FetchRequestTemplateForName(NSString name);
-    [Selector("fetchRequestFromTemplateWithName:substitutionVariables:")] public NSFetchRequest? FetchRequestFromTemplateWithNameSubstitutionVariables(NSString name, NSDictionary variables);
-    [Selector("mergedModelFromBundles:forStoreMetadata:")] public static NSManagedObjectModel? MergedModelFromBundlesForStoreMetadata(NSArray? bundles, NSDictionary metadata);
-    [Selector("modelByMergingModels:forStoreMetadata:")] public static NSManagedObjectModel? ModelByMergingModelsForStoreMetadata(NSArray models, NSDictionary metadata);
-    [Selector("isConfiguration:compatibleWithStoreMetadata:")] public bool IsConfigurationCompatibleWithStoreMetadata(NSString? configuration, NSDictionary metadata);
-    [Selector("checksumsForVersionedModelAtURL:error:")] public static NSDictionary? ChecksumsForVersionedModelAtURLError(NSURL modelURL, out NSError? error);
+    [Selector("entitiesByName")]
+    public NSDictionary EntitiesByName { get; }
+    [Selector("entities", "setEntities:")]
+    public NSArray Entities { get; set; }
+    [Selector("configurations")]
+    public NSArray Configurations { get; }
+    [Selector("localizationDictionary", "setLocalizationDictionary:")]
+    public NSDictionary? LocalizationDictionary { get; set; }
+    [Selector("fetchRequestTemplatesByName")]
+    public NSDictionary FetchRequestTemplatesByName { get; }
+    [Selector("versionIdentifiers", "setVersionIdentifiers:")]
+    public NSSet VersionIdentifiers { get; set; }
+    [Selector("entityVersionHashesByName")]
+    public NSDictionary EntityVersionHashesByName { get; }
+    [Selector("versionChecksum")]
+    public NSString VersionChecksum { get; }
+    [Selector("mergedModelFromBundles:")]
+    public static NSManagedObjectModel? MergedModelFromBundles(NSArray? bundles);
+    [Selector("modelByMergingModels:")]
+    public static NSManagedObjectModel? ModelByMergingModels(NSArray? models);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithContentsOfURL:")]
+    public Self? InitWithContentsOfURL(NSURL url);
+    [Selector("entitiesForConfiguration:")]
+    public NSArray? EntitiesForConfiguration(NSString? configuration);
+    [Selector("setEntities:forConfiguration:")]
+    public void SetEntitiesForConfiguration(NSArray entities, NSString configuration);
+    [Selector("setFetchRequestTemplate:forName:")]
+    public void SetFetchRequestTemplateForName(NSFetchRequest? fetchRequestTemplate, NSString name);
+    [Selector("fetchRequestTemplateForName:")]
+    public NSFetchRequest? FetchRequestTemplateForName(NSString name);
+    [Selector("fetchRequestFromTemplateWithName:substitutionVariables:")]
+    public NSFetchRequest? FetchRequestFromTemplateWithNameSubstitutionVariables(NSString name, NSDictionary variables);
+    [Selector("mergedModelFromBundles:forStoreMetadata:")]
+    public static NSManagedObjectModel? MergedModelFromBundlesForStoreMetadata(NSArray? bundles, NSDictionary metadata);
+    [Selector("modelByMergingModels:forStoreMetadata:")]
+    public static NSManagedObjectModel? ModelByMergingModelsForStoreMetadata(NSArray models, NSDictionary metadata);
+    [Selector("isConfiguration:compatibleWithStoreMetadata:")]
+    public bool IsConfigurationCompatibleWithStoreMetadata(NSString? configuration, NSDictionary metadata);
+    [Selector("checksumsForVersionedModelAtURL:error:")]
+    public static NSDictionary? ChecksumsForVersionedModelAtURLError(NSURL modelURL, out NSError? error);
 }
 
 #endif

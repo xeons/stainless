@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class MKCircleRenderer : MKOverlayPathRenderer
 {
-    [Selector("circle")] public MKCircle Circle { get; }
-    [Selector("strokeStart", "setStrokeStart:")] public CGFloat StrokeStart { get; set; }
-    [Selector("strokeEnd", "setStrokeEnd:")] public CGFloat StrokeEnd { get; set; }
-    [Selector("initWithCircle:")] public Self InitWithCircle(MKCircle circle);
+    [Selector("circle")]
+    public MKCircle Circle { get; }
+    [Selector("strokeStart", "setStrokeStart:")]
+    public CGFloat StrokeStart { get; set; }
+    [Selector("strokeEnd", "setStrokeEnd:")]
+    public CGFloat StrokeEnd { get; set; }
+    [Selector("initWithCircle:")]
+    public Self InitWithCircle(MKCircle circle);
 }
 
 #endif

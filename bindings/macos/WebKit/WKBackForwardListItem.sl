@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class WKBackForwardListItem : NSObject
 {
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("initialURL")] public NSURL InitialURL { get; }
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("initialURL")]
+    public NSURL InitialURL { get; }
 }
 
 #endif

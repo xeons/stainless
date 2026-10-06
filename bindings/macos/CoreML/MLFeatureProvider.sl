@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public objc interface MLFeatureProvider
 {
-    [Selector("featureNames")] NSSet FeatureNames { get; }
-    [Selector("featureValueForName:")] MLFeatureValue? FeatureValueForName(NSString featureName);
+    [Selector("featureNames")]
+    NSSet FeatureNames { get; }
+    [Selector("featureValueForName:")]
+    MLFeatureValue? FeatureValueForName(NSString featureName);
 }
 
 #endif

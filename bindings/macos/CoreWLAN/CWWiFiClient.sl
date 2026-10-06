@@ -33,32 +33,63 @@ import Standard.ObjC;
 
 public objc interface CWEventDelegate
 {
-    [Optional] [Selector("clientConnectionInterrupted")] void ClientConnectionInterrupted();
-    [Optional] [Selector("clientConnectionInvalidated")] void ClientConnectionInvalidated();
-    [Optional] [Selector("powerStateDidChangeForWiFiInterfaceWithName:")] void PowerStateDidChangeForWiFiInterfaceWithName(NSString interfaceName);
-    [Optional] [Selector("ssidDidChangeForWiFiInterfaceWithName:")] void SsidDidChangeForWiFiInterfaceWithName(NSString interfaceName);
-    [Optional] [Selector("bssidDidChangeForWiFiInterfaceWithName:")] void BssidDidChangeForWiFiInterfaceWithName(NSString interfaceName);
-    [Optional] [Selector("countryCodeDidChangeForWiFiInterfaceWithName:")] void CountryCodeDidChangeForWiFiInterfaceWithName(NSString interfaceName);
-    [Optional] [Selector("linkDidChangeForWiFiInterfaceWithName:")] void LinkDidChangeForWiFiInterfaceWithName(NSString interfaceName);
-    [Optional] [Selector("linkQualityDidChangeForWiFiInterfaceWithName:rssi:transmitRate:")] void LinkQualityDidChangeForWiFiInterfaceWithNameRssiTransmitRate(NSString interfaceName, NSInteger rssi, double transmitRate);
-    [Optional] [Selector("modeDidChangeForWiFiInterfaceWithName:")] void ModeDidChangeForWiFiInterfaceWithName(NSString interfaceName);
-    [Optional] [Selector("scanCacheUpdatedForWiFiInterfaceWithName:")] void ScanCacheUpdatedForWiFiInterfaceWithName(NSString interfaceName);
+    [Optional]
+    [Selector("clientConnectionInterrupted")]
+    void ClientConnectionInterrupted();
+    [Optional]
+    [Selector("clientConnectionInvalidated")]
+    void ClientConnectionInvalidated();
+    [Optional]
+    [Selector("powerStateDidChangeForWiFiInterfaceWithName:")]
+    void PowerStateDidChangeForWiFiInterfaceWithName(NSString interfaceName);
+    [Optional]
+    [Selector("ssidDidChangeForWiFiInterfaceWithName:")]
+    void SsidDidChangeForWiFiInterfaceWithName(NSString interfaceName);
+    [Optional]
+    [Selector("bssidDidChangeForWiFiInterfaceWithName:")]
+    void BssidDidChangeForWiFiInterfaceWithName(NSString interfaceName);
+    [Optional]
+    [Selector("countryCodeDidChangeForWiFiInterfaceWithName:")]
+    void CountryCodeDidChangeForWiFiInterfaceWithName(NSString interfaceName);
+    [Optional]
+    [Selector("linkDidChangeForWiFiInterfaceWithName:")]
+    void LinkDidChangeForWiFiInterfaceWithName(NSString interfaceName);
+    [Optional]
+    [Selector("linkQualityDidChangeForWiFiInterfaceWithName:rssi:transmitRate:")]
+    void LinkQualityDidChangeForWiFiInterfaceWithNameRssiTransmitRate(NSString interfaceName, NSInteger rssi, double transmitRate);
+    [Optional]
+    [Selector("modeDidChangeForWiFiInterfaceWithName:")]
+    void ModeDidChangeForWiFiInterfaceWithName(NSString interfaceName);
+    [Optional]
+    [Selector("scanCacheUpdatedForWiFiInterfaceWithName:")]
+    void ScanCacheUpdatedForWiFiInterfaceWithName(NSString interfaceName);
 }
 
 public extern objc class CWWiFiClient : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public AnyObject? Delegate { get; set; }
-    [Selector("sharedWiFiClient")] public static CWWiFiClient SharedWiFiClient();
-    [Selector("init")] public Self Init();
-    [Selector("interface")] public CWInterface? Interface();
-    [Selector("interfaceNames")] public NSArray? InterfaceNames();
+    [Selector("delegate", "setDelegate:")]
+    public AnyObject? Delegate { get; set; }
+    [Selector("sharedWiFiClient")]
+    public static CWWiFiClient SharedWiFiClient();
+    [Selector("init")]
+    public Self Init();
+    [Selector("interface")]
+    public CWInterface? Interface();
+    [Selector("interfaceNames")]
+    public NSArray? InterfaceNames();
     /// Deprecated in macOS 13.0.
-    [Selector("interfaceNames")] public static NSArray? ClassInterfaceNames();
-    [Selector("interfaceWithName:")] public CWInterface? InterfaceWithName(NSString? interfaceName);
-    [Selector("interfaces")] public NSArray? Interfaces();
-    [Selector("startMonitoringEventWithType:error:")] public bool StartMonitoringEventWithTypeError(CWEventType type, out NSError? error);
-    [Selector("stopMonitoringEventWithType:error:")] public bool StopMonitoringEventWithTypeError(CWEventType type, out NSError? error);
-    [Selector("stopMonitoringAllEventsAndReturnError:")] public bool StopMonitoringAllEventsAndReturnError(out NSError? error);
+    [Selector("interfaceNames")]
+    public static NSArray? ClassInterfaceNames();
+    [Selector("interfaceWithName:")]
+    public CWInterface? InterfaceWithName(NSString? interfaceName);
+    [Selector("interfaces")]
+    public NSArray? Interfaces();
+    [Selector("startMonitoringEventWithType:error:")]
+    public bool StartMonitoringEventWithTypeError(CWEventType type, out NSError? error);
+    [Selector("stopMonitoringEventWithType:error:")]
+    public bool StopMonitoringEventWithTypeError(CWEventType type, out NSError? error);
+    [Selector("stopMonitoringAllEventsAndReturnError:")]
+    public bool StopMonitoringAllEventsAndReturnError(out NSError? error);
 }
 
 #endif

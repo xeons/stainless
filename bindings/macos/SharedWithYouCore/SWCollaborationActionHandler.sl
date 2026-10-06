@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public objc interface SWCollaborationActionHandler : NSObjectProtocol
 {
-    [Selector("collaborationCoordinator:handleStartCollaborationAction:")] void CollaborationCoordinatorHandleStartCollaborationAction(SWCollaborationCoordinator coordinator, SWStartCollaborationAction action);
-    [Selector("collaborationCoordinator:handleUpdateCollaborationParticipantsAction:")] void CollaborationCoordinatorHandleUpdateCollaborationParticipantsAction(SWCollaborationCoordinator coordinator, SWUpdateCollaborationParticipantsAction action);
+    [Selector("collaborationCoordinator:handleStartCollaborationAction:")]
+    void CollaborationCoordinatorHandleStartCollaborationAction(SWCollaborationCoordinator coordinator, SWStartCollaborationAction action);
+    [Selector("collaborationCoordinator:handleUpdateCollaborationParticipantsAction:")]
+    void CollaborationCoordinatorHandleUpdateCollaborationParticipantsAction(SWCollaborationCoordinator coordinator, SWUpdateCollaborationParticipantsAction action);
 }
 
 #endif

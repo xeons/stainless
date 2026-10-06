@@ -32,13 +32,20 @@ import Standard.ObjC;
 
 public extern objc class NSPersonNameComponents : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("namePrefix", "setNamePrefix:")] public NSString? NamePrefix { get; set; }
-    [Selector("givenName", "setGivenName:")] public NSString? GivenName { get; set; }
-    [Selector("middleName", "setMiddleName:")] public NSString? MiddleName { get; set; }
-    [Selector("familyName", "setFamilyName:")] public NSString? FamilyName { get; set; }
-    [Selector("nameSuffix", "setNameSuffix:")] public NSString? NameSuffix { get; set; }
-    [Selector("nickname", "setNickname:")] public NSString? Nickname { get; set; }
-    [Selector("phoneticRepresentation", "setPhoneticRepresentation:")] public NSPersonNameComponents? PhoneticRepresentation { get; set; }
+    [Selector("namePrefix", "setNamePrefix:")]
+    public NSString? NamePrefix { get; set; }
+    [Selector("givenName", "setGivenName:")]
+    public NSString? GivenName { get; set; }
+    [Selector("middleName", "setMiddleName:")]
+    public NSString? MiddleName { get; set; }
+    [Selector("familyName", "setFamilyName:")]
+    public NSString? FamilyName { get; set; }
+    [Selector("nameSuffix", "setNameSuffix:")]
+    public NSString? NameSuffix { get; set; }
+    [Selector("nickname", "setNickname:")]
+    public NSString? Nickname { get; set; }
+    [Selector("phoneticRepresentation", "setPhoneticRepresentation:")]
+    public NSPersonNameComponents? PhoneticRepresentation { get; set; }
 }
 
 #endif

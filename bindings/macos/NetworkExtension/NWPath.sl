@@ -43,13 +43,17 @@ public enum NWPathStatus : long
 public extern objc class NWPath : NSObject
 {
     /// Deprecated in macOS 15.0.
-    [Selector("status")] public NWPathStatus Status { get; }
+    [Selector("status")]
+    public NWPathStatus Status { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("isExpensive")] public bool Expensive { get; }
+    [Selector("isExpensive")]
+    public bool Expensive { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("isConstrained")] public bool Constrained { get; }
+    [Selector("isConstrained")]
+    public bool Constrained { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("isEqualToPath:")] public bool IsEqualToPath(NWPath path);
+    [Selector("isEqualToPath:")]
+    public bool IsEqualToPath(NWPath path);
 }
 
 #endif

@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class VNGenerateImageFeaturePrintRequest : VNImageBasedRequest
 {
-    [Selector("imageCropAndScaleOption", "setImageCropAndScaleOption:")] public VNImageCropAndScaleOption ImageCropAndScaleOption { get; set; }
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("imageCropAndScaleOption", "setImageCropAndScaleOption:")]
+    public VNImageCropAndScaleOption ImageCropAndScaleOption { get; set; }
+    [Selector("results")]
+    public NSArray? Results { get; }
 }
 
 #endif

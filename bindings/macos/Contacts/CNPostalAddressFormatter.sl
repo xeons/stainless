@@ -37,11 +37,16 @@ public enum CNPostalAddressFormatterStyle : long
 
 public extern objc class CNPostalAddressFormatter : NSFormatter
 {
-    [Selector("style", "setStyle:")] public CNPostalAddressFormatterStyle Style { get; set; }
-    [Selector("stringFromPostalAddress:style:")] public static NSString StringFromPostalAddressStyle(CNPostalAddress postalAddress, CNPostalAddressFormatterStyle style);
-    [Selector("attributedStringFromPostalAddress:style:withDefaultAttributes:")] public static NSAttributedString AttributedStringFromPostalAddressStyleWithDefaultAttributes(CNPostalAddress postalAddress, CNPostalAddressFormatterStyle style, NSDictionary attributes);
-    [Selector("stringFromPostalAddress:")] public NSString StringFromPostalAddress(CNPostalAddress postalAddress);
-    [Selector("attributedStringFromPostalAddress:withDefaultAttributes:")] public NSAttributedString AttributedStringFromPostalAddressWithDefaultAttributes(CNPostalAddress postalAddress, NSDictionary attributes);
+    [Selector("style", "setStyle:")]
+    public CNPostalAddressFormatterStyle Style { get; set; }
+    [Selector("stringFromPostalAddress:style:")]
+    public static NSString StringFromPostalAddressStyle(CNPostalAddress postalAddress, CNPostalAddressFormatterStyle style);
+    [Selector("attributedStringFromPostalAddress:style:withDefaultAttributes:")]
+    public static NSAttributedString AttributedStringFromPostalAddressStyleWithDefaultAttributes(CNPostalAddress postalAddress, CNPostalAddressFormatterStyle style, NSDictionary attributes);
+    [Selector("stringFromPostalAddress:")]
+    public NSString StringFromPostalAddress(CNPostalAddress postalAddress);
+    [Selector("attributedStringFromPostalAddress:withDefaultAttributes:")]
+    public NSAttributedString AttributedStringFromPostalAddressWithDefaultAttributes(CNPostalAddress postalAddress, NSDictionary attributes);
 }
 
 public extern "C" NSString CNPostalAddressPropertyAttribute;

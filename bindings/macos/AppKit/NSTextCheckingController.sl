@@ -33,25 +33,44 @@ import Standard.ObjC;
 
 public extern objc class NSTextCheckingController : NSObject
 {
-    [Selector("client")] public NSTextCheckingClient Client { get; }
-    [Selector("spellCheckerDocumentTag", "setSpellCheckerDocumentTag:")] public NSInteger SpellCheckerDocumentTag { get; set; }
-    [Selector("initWithClient:")] public Self InitWithClient(NSTextCheckingClient client);
-    [Selector("invalidate")] public void Invalidate();
-    [Selector("didChangeTextInRange:")] public void DidChangeTextInRange(NSRange range);
-    [Selector("insertedTextInRange:")] public void InsertedTextInRange(NSRange range);
-    [Selector("didChangeSelectedRange")] public void DidChangeSelectedRange();
-    [Selector("considerTextCheckingForRange:")] public void ConsiderTextCheckingForRange(NSRange range);
-    [Selector("checkTextInRange:types:options:")] public void CheckTextInRangeTypesOptions(NSRange range, NSTextCheckingTypes checkingTypes, NSDictionary options);
-    [Selector("checkTextInSelection:")] public void CheckTextInSelection(AnyObject? sender);
-    [Selector("checkTextInDocument:")] public void CheckTextInDocument(AnyObject? sender);
-    [Selector("orderFrontSubstitutionsPanel:")] public void OrderFrontSubstitutionsPanel(AnyObject? sender);
-    [Selector("checkSpelling:")] public void CheckSpelling(AnyObject? sender);
-    [Selector("showGuessPanel:")] public void ShowGuessPanel(AnyObject? sender);
-    [Selector("changeSpelling:")] public void ChangeSpelling(AnyObject? sender);
-    [Selector("ignoreSpelling:")] public void IgnoreSpelling(AnyObject? sender);
-    [Selector("updateCandidates")] public void UpdateCandidates();
-    [Selector("validAnnotations")] public NSArray ValidAnnotations();
-    [Selector("menuAtIndex:clickedOnSelection:effectiveRange:")] public NSMenu? MenuAtIndexClickedOnSelectionEffectiveRange(NSUInteger location, bool clickedOnSelection, NSRangePointer effectiveRange);
+    [Selector("client")]
+    public NSTextCheckingClient Client { get; }
+    [Selector("spellCheckerDocumentTag", "setSpellCheckerDocumentTag:")]
+    public NSInteger SpellCheckerDocumentTag { get; set; }
+    [Selector("initWithClient:")]
+    public Self InitWithClient(NSTextCheckingClient client);
+    [Selector("invalidate")]
+    public void Invalidate();
+    [Selector("didChangeTextInRange:")]
+    public void DidChangeTextInRange(NSRange range);
+    [Selector("insertedTextInRange:")]
+    public void InsertedTextInRange(NSRange range);
+    [Selector("didChangeSelectedRange")]
+    public void DidChangeSelectedRange();
+    [Selector("considerTextCheckingForRange:")]
+    public void ConsiderTextCheckingForRange(NSRange range);
+    [Selector("checkTextInRange:types:options:")]
+    public void CheckTextInRangeTypesOptions(NSRange range, NSTextCheckingTypes checkingTypes, NSDictionary options);
+    [Selector("checkTextInSelection:")]
+    public void CheckTextInSelection(AnyObject? sender);
+    [Selector("checkTextInDocument:")]
+    public void CheckTextInDocument(AnyObject? sender);
+    [Selector("orderFrontSubstitutionsPanel:")]
+    public void OrderFrontSubstitutionsPanel(AnyObject? sender);
+    [Selector("checkSpelling:")]
+    public void CheckSpelling(AnyObject? sender);
+    [Selector("showGuessPanel:")]
+    public void ShowGuessPanel(AnyObject? sender);
+    [Selector("changeSpelling:")]
+    public void ChangeSpelling(AnyObject? sender);
+    [Selector("ignoreSpelling:")]
+    public void IgnoreSpelling(AnyObject? sender);
+    [Selector("updateCandidates")]
+    public void UpdateCandidates();
+    [Selector("validAnnotations")]
+    public NSArray ValidAnnotations();
+    [Selector("menuAtIndex:clickedOnSelection:effectiveRange:")]
+    public NSMenu? MenuAtIndexClickedOnSelectionEffectiveRange(NSUInteger location, bool clickedOnSelection, NSRangePointer effectiveRange);
 }
 
 #endif

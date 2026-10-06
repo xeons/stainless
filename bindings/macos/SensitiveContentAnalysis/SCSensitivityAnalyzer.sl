@@ -47,11 +47,16 @@ public objc closure void SCSensitivityAnalyzerAnalyzeVideoFileCompletionHandlerC
 
 public extern objc class SCSensitivityAnalyzer : NSObject
 {
-    [Selector("analysisPolicy")] public SCSensitivityAnalysisPolicy AnalysisPolicy { get; }
-    [Selector("init")] public Self Init();
-    [Selector("analyzeImageFile:completionHandler:")] public void AnalyzeImageFileCompletionHandler(NSURL fileURL, SCSensitivityAnalyzerAnalyzeImageFileCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("analyzeCGImage:completionHandler:")] public void AnalyzeCGImageCompletionHandler(CGImageRef image, SCSensitivityAnalyzerAnalyzeCGImageCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("analyzeVideoFile:completionHandler:")] public NSProgress AnalyzeVideoFileCompletionHandler(NSURL fileURL, SCSensitivityAnalyzerAnalyzeVideoFileCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("analysisPolicy")]
+    public SCSensitivityAnalysisPolicy AnalysisPolicy { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("analyzeImageFile:completionHandler:")]
+    public void AnalyzeImageFileCompletionHandler(NSURL fileURL, SCSensitivityAnalyzerAnalyzeImageFileCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("analyzeCGImage:completionHandler:")]
+    public void AnalyzeCGImageCompletionHandler(CGImageRef image, SCSensitivityAnalyzerAnalyzeCGImageCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("analyzeVideoFile:completionHandler:")]
+    public NSProgress AnalyzeVideoFileCompletionHandler(NSURL fileURL, SCSensitivityAnalyzerAnalyzeVideoFileCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

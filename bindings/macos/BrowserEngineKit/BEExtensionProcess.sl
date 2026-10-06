@@ -34,8 +34,10 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public objc interface BEExtensionProcess : NSObjectProtocol
 {
-    [Selector("invalidate")] void Invalidate();
-    [Selector("makeLibXPCConnectionError:")] xpc_connection_t? MakeLibXPCConnectionError(out NSError? error);
+    [Selector("invalidate")]
+    void Invalidate();
+    [Selector("makeLibXPCConnectionError:")]
+    xpc_connection_t? MakeLibXPCConnectionError(out NSError? error);
 }
 
 #endif

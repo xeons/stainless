@@ -34,10 +34,14 @@ import Standard.ObjC;
 
 public extern objc class ABPersonPicker : NSObject
 {
-    [Selector("properties", "setProperties:")] public NSArray? Properties { get; set; }
-    [Selector("delegate", "setDelegate:")] public ABPersonPickerDelegate? Delegate { get; set; }
-    [Selector("showRelativeToRect:ofView:preferredEdge:")] public void ShowRelativeToRectOfViewPreferredEdge(NSRect positioningRect, NSView? positioningView, NSRectEdge preferredEdge);
-    [Selector("close")] public void Close();
+    [Selector("properties", "setProperties:")]
+    public NSArray? Properties { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public ABPersonPickerDelegate? Delegate { get; set; }
+    [Selector("showRelativeToRect:ofView:preferredEdge:")]
+    public void ShowRelativeToRectOfViewPreferredEdge(NSRect positioningRect, NSView? positioningView, NSRectEdge preferredEdge);
+    [Selector("close")]
+    public void Close();
 }
 
 #endif

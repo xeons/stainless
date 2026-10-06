@@ -36,10 +36,14 @@ public objc closure void NSExtensionContextOpenURLCompletionHandlerCompletionHan
 
 public extern objc class NSExtensionContext : NSObject
 {
-    [Selector("inputItems")] public NSArray InputItems { get; }
-    [Selector("completeRequestReturningItems:completionHandler:")] public void CompleteRequestReturningItemsCompletionHandler(NSArray? items, NSExtensionContextCompleteRequestReturningItemsCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("cancelRequestWithError:")] public void CancelRequestWithError(NSError error);
-    [Selector("openURL:completionHandler:")] public void OpenURLCompletionHandler(NSURL URL, NSExtensionContextOpenURLCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("inputItems")]
+    public NSArray InputItems { get; }
+    [Selector("completeRequestReturningItems:completionHandler:")]
+    public void CompleteRequestReturningItemsCompletionHandler(NSArray? items, NSExtensionContextCompleteRequestReturningItemsCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("cancelRequestWithError:")]
+    public void CancelRequestWithError(NSError error);
+    [Selector("openURL:completionHandler:")]
+    public void OpenURLCompletionHandler(NSURL URL, NSExtensionContextOpenURLCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public extern "C" NSString? NSExtensionItemsAndErrorsKey;

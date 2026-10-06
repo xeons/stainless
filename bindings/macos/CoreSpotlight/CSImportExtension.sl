@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class CSImportExtension : NSObject, NSExtensionRequestHandling
 {
-    [Selector("updateAttributes:forFileAtURL:error:")] public bool UpdateAttributesForFileAtURLError(CSSearchableItemAttributeSet attributes, NSURL contentURL, out NSError? error);
+    [Selector("updateAttributes:forFileAtURL:error:")]
+    public bool UpdateAttributesForFileAtURLError(CSSearchableItemAttributeSet attributes, NSURL contentURL, out NSError? error);
 }
 
 #endif

@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class CSPerson : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("displayName")] public NSString? DisplayName { get; }
-    [Selector("handles")] public NSArray Handles { get; }
-    [Selector("handleIdentifier")] public NSString HandleIdentifier { get; }
-    [Selector("contactIdentifier", "setContactIdentifier:")] public NSString? ContactIdentifier { get; set; }
-    [Selector("initWithDisplayName:handles:handleIdentifier:")] public Self InitWithDisplayNameHandlesHandleIdentifier(NSString? displayName, NSArray handles, NSString handleIdentifier);
+    [Selector("displayName")]
+    public NSString? DisplayName { get; }
+    [Selector("handles")]
+    public NSArray Handles { get; }
+    [Selector("handleIdentifier")]
+    public NSString HandleIdentifier { get; }
+    [Selector("contactIdentifier", "setContactIdentifier:")]
+    public NSString? ContactIdentifier { get; set; }
+    [Selector("initWithDisplayName:handles:handleIdentifier:")]
+    public Self InitWithDisplayNameHandlesHandleIdentifier(NSString? displayName, NSArray handles, NSString handleIdentifier);
 }
 
 #endif

@@ -50,13 +50,20 @@ public objc closure void SFSafariApplicationDispatchMessageWithNameToExtensionWi
 
 public extern objc class SFSafariApplication : NSObject
 {
-    [Selector("getActiveWindowWithCompletionHandler:")] public static void GetActiveWindowWithCompletionHandler(SFSafariApplicationGetActiveWindowWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getAllWindowsWithCompletionHandler:")] public static void GetAllWindowsWithCompletionHandler(SFSafariApplicationGetAllWindowsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("openWindowWithURL:completionHandler:")] public static void OpenWindowWithURLCompletionHandler(NSURL url, SFSafariApplicationOpenWindowWithURLCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("setToolbarItemsNeedUpdate")] public static void SetToolbarItemsNeedUpdate();
-    [Selector("getHostApplicationWithCompletionHandler:")] public static void GetHostApplicationWithCompletionHandler(SFSafariApplicationGetHostApplicationWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("showPreferencesForExtensionWithIdentifier:completionHandler:")] public static void ShowPreferencesForExtensionWithIdentifierCompletionHandler(NSString identifier, SFSafariApplicationShowPreferencesForExtensionWithIdentifierCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("dispatchMessageWithName:toExtensionWithIdentifier:userInfo:completionHandler:")] public static void DispatchMessageWithNameToExtensionWithIdentifierUserInfoCompletionHandler(NSString messageName, NSString identifier, NSDictionary? userInfo, SFSafariApplicationDispatchMessageWithNameToExtensionWithIdentifierUserInfoCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("getActiveWindowWithCompletionHandler:")]
+    public static void GetActiveWindowWithCompletionHandler(SFSafariApplicationGetActiveWindowWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getAllWindowsWithCompletionHandler:")]
+    public static void GetAllWindowsWithCompletionHandler(SFSafariApplicationGetAllWindowsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("openWindowWithURL:completionHandler:")]
+    public static void OpenWindowWithURLCompletionHandler(NSURL url, SFSafariApplicationOpenWindowWithURLCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("setToolbarItemsNeedUpdate")]
+    public static void SetToolbarItemsNeedUpdate();
+    [Selector("getHostApplicationWithCompletionHandler:")]
+    public static void GetHostApplicationWithCompletionHandler(SFSafariApplicationGetHostApplicationWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("showPreferencesForExtensionWithIdentifier:completionHandler:")]
+    public static void ShowPreferencesForExtensionWithIdentifierCompletionHandler(NSString identifier, SFSafariApplicationShowPreferencesForExtensionWithIdentifierCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("dispatchMessageWithName:toExtensionWithIdentifier:userInfo:completionHandler:")]
+    public static void DispatchMessageWithNameToExtensionWithIdentifierUserInfoCompletionHandler(NSString messageName, NSString identifier, NSDictionary? userInfo, SFSafariApplicationDispatchMessageWithNameToExtensionWithIdentifierUserInfoCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 #endif

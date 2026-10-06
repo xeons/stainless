@@ -34,15 +34,22 @@ import Standard.ObjC;
 
 public extern objc class EXHostViewController : NSViewController
 {
-    [Selector("delegate", "setDelegate:")] public EXHostViewControllerDelegate? Delegate { get; set; }
-    [Selector("placeholderView", "setPlaceholderView:")] public NSView PlaceholderView { get; set; }
-    [Selector("makeXPCConnectionWithError:")] public NSXPCConnection? MakeXPCConnectionWithError(out NSError? error);
+    [Selector("delegate", "setDelegate:")]
+    public EXHostViewControllerDelegate? Delegate { get; set; }
+    [Selector("placeholderView", "setPlaceholderView:")]
+    public NSView PlaceholderView { get; set; }
+    [Selector("makeXPCConnectionWithError:")]
+    public NSXPCConnection? MakeXPCConnectionWithError(out NSError? error);
 }
 
 public objc interface EXHostViewControllerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("hostViewControllerDidActivate:")] void HostViewControllerDidActivate(EXHostViewController viewController);
-    [Optional] [Selector("hostViewControllerWillDeactivate:error:")] void HostViewControllerWillDeactivateError(EXHostViewController viewController, NSError? error);
+    [Optional]
+    [Selector("hostViewControllerDidActivate:")]
+    void HostViewControllerDidActivate(EXHostViewController viewController);
+    [Optional]
+    [Selector("hostViewControllerWillDeactivate:error:")]
+    void HostViewControllerWillDeactivateError(EXHostViewController viewController, NSError? error);
 }
 
 #endif

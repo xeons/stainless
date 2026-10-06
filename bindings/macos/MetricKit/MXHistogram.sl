@@ -33,15 +33,20 @@ import Standard.ObjC;
 
 public extern objc class MXHistogramBucket : NSObject, NSSecureCoding
 {
-    [Selector("bucketStart")] public NSMeasurement BucketStart { get; }
-    [Selector("bucketEnd")] public NSMeasurement BucketEnd { get; }
-    [Selector("bucketCount")] public NSUInteger BucketCount { get; }
+    [Selector("bucketStart")]
+    public NSMeasurement BucketStart { get; }
+    [Selector("bucketEnd")]
+    public NSMeasurement BucketEnd { get; }
+    [Selector("bucketCount")]
+    public NSUInteger BucketCount { get; }
 }
 
 public extern objc class MXHistogram : NSObject, NSSecureCoding
 {
-    [Selector("totalBucketCount")] public NSUInteger TotalBucketCount { get; }
-    [Selector("bucketEnumerator")] public NSEnumerator BucketEnumerator { get; }
+    [Selector("totalBucketCount")]
+    public NSUInteger TotalBucketCount { get; }
+    [Selector("bucketEnumerator")]
+    public NSEnumerator BucketEnumerator { get; }
 }
 
 #endif

@@ -32,12 +32,18 @@ import Standard.ObjC;
 
 public extern objc class NSDictionary : NSObject, NSCopying, NSMutableCopying, NSSecureCoding, NSFastEnumeration
 {
-    [Selector("count")] public NSUInteger Count { get; }
-    [Selector("objectForKey:")] public AnyObject? ObjectForKey(AnyObject aKey);
-    [Selector("keyEnumerator")] public NSEnumerator KeyEnumerator();
-    [Selector("init")] public Self Init();
-    [Selector("initWithObjects:forKeys:count:")] public Self InitWithObjectsForKeysCount(void** objects, void** keys, NSUInteger cnt);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("count")]
+    public NSUInteger Count { get; }
+    [Selector("objectForKey:")]
+    public AnyObject? ObjectForKey(AnyObject aKey);
+    [Selector("keyEnumerator")]
+    public NSEnumerator KeyEnumerator();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithObjects:forKeys:count:")]
+    public Self InitWithObjectsForKeysCount(void** objects, void** keys, NSUInteger cnt);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 public objc closure void NSDictionaryEnumerateKeysAndObjectsUsingBlockBlock(AnyObject arg0, AnyObject arg1, bool* arg2);
@@ -51,109 +57,166 @@ public objc closure bool NSDictionaryKeysOfEntriesWithOptionsPassingTestPredicat
 /// NSExtendedDictionary, a category of NSDictionary.
 public extern objc class NSDictionary
 {
-    [Selector("allKeys")] public NSArray AllKeys { get; }
-    [Selector("allValues")] public NSArray AllValues { get; }
-    [Selector("description")] public NSString Description { get; }
-    [Selector("descriptionInStringsFileFormat")] public NSString DescriptionInStringsFileFormat { get; }
-    [Selector("allKeysForObject:")] public NSArray AllKeysForObject(AnyObject anObject);
-    [Selector("descriptionWithLocale:")] public NSString DescriptionWithLocale(AnyObject? locale);
-    [Selector("descriptionWithLocale:indent:")] public NSString DescriptionWithLocaleIndent(AnyObject? locale, NSUInteger level);
-    [Selector("isEqualToDictionary:")] public bool IsEqualToDictionary(NSDictionary otherDictionary);
-    [Selector("objectEnumerator")] public NSEnumerator ObjectEnumerator();
-    [Selector("objectsForKeys:notFoundMarker:")] public NSArray ObjectsForKeysNotFoundMarker(NSArray keys, AnyObject marker);
-    [Selector("writeToURL:error:")] public bool WriteToURLError(NSURL url, out NSError? error);
-    [Selector("keysSortedByValueUsingSelector:")] public NSArray KeysSortedByValueUsingSelector(Selector comparator);
-    [Selector("getObjects:andKeys:count:")] public void GetObjectsAndKeysCount(void** objects, void** keys, NSUInteger count);
-    [Selector("objectForKeyedSubscript:")] public AnyObject? ObjectForKeyedSubscript(AnyObject key);
-    [Selector("enumerateKeysAndObjectsUsingBlock:")] public void EnumerateKeysAndObjectsUsingBlock(NSDictionaryEnumerateKeysAndObjectsUsingBlockBlock block);
-    [Selector("enumerateKeysAndObjectsWithOptions:usingBlock:")] public void EnumerateKeysAndObjectsWithOptionsUsingBlock(NSEnumerationOptions opts, NSDictionaryEnumerateKeysAndObjectsWithOptionsUsingBlockBlock block);
-    [Selector("keysSortedByValueUsingComparator:")] public NSArray KeysSortedByValueUsingComparator(NSComparator cmptr);
-    [Selector("keysSortedByValueWithOptions:usingComparator:")] public NSArray KeysSortedByValueWithOptionsUsingComparator(NSSortOptions opts, NSComparator cmptr);
-    [Selector("keysOfEntriesPassingTest:")] public NSSet KeysOfEntriesPassingTest(NSDictionaryKeysOfEntriesPassingTestPredicateBlock predicate);
-    [Selector("keysOfEntriesWithOptions:passingTest:")] public NSSet KeysOfEntriesWithOptionsPassingTest(NSEnumerationOptions opts, NSDictionaryKeysOfEntriesWithOptionsPassingTestPredicateBlock predicate);
+    [Selector("allKeys")]
+    public NSArray AllKeys { get; }
+    [Selector("allValues")]
+    public NSArray AllValues { get; }
+    [Selector("description")]
+    public NSString Description { get; }
+    [Selector("descriptionInStringsFileFormat")]
+    public NSString DescriptionInStringsFileFormat { get; }
+    [Selector("allKeysForObject:")]
+    public NSArray AllKeysForObject(AnyObject anObject);
+    [Selector("descriptionWithLocale:")]
+    public NSString DescriptionWithLocale(AnyObject? locale);
+    [Selector("descriptionWithLocale:indent:")]
+    public NSString DescriptionWithLocaleIndent(AnyObject? locale, NSUInteger level);
+    [Selector("isEqualToDictionary:")]
+    public bool IsEqualToDictionary(NSDictionary otherDictionary);
+    [Selector("objectEnumerator")]
+    public NSEnumerator ObjectEnumerator();
+    [Selector("objectsForKeys:notFoundMarker:")]
+    public NSArray ObjectsForKeysNotFoundMarker(NSArray keys, AnyObject marker);
+    [Selector("writeToURL:error:")]
+    public bool WriteToURLError(NSURL url, out NSError? error);
+    [Selector("keysSortedByValueUsingSelector:")]
+    public NSArray KeysSortedByValueUsingSelector(Selector comparator);
+    [Selector("getObjects:andKeys:count:")]
+    public void GetObjectsAndKeysCount(void** objects, void** keys, NSUInteger count);
+    [Selector("objectForKeyedSubscript:")]
+    public AnyObject? ObjectForKeyedSubscript(AnyObject key);
+    [Selector("enumerateKeysAndObjectsUsingBlock:")]
+    public void EnumerateKeysAndObjectsUsingBlock(NSDictionaryEnumerateKeysAndObjectsUsingBlockBlock block);
+    [Selector("enumerateKeysAndObjectsWithOptions:usingBlock:")]
+    public void EnumerateKeysAndObjectsWithOptionsUsingBlock(NSEnumerationOptions opts, NSDictionaryEnumerateKeysAndObjectsWithOptionsUsingBlockBlock block);
+    [Selector("keysSortedByValueUsingComparator:")]
+    public NSArray KeysSortedByValueUsingComparator(NSComparator cmptr);
+    [Selector("keysSortedByValueWithOptions:usingComparator:")]
+    public NSArray KeysSortedByValueWithOptionsUsingComparator(NSSortOptions opts, NSComparator cmptr);
+    [Selector("keysOfEntriesPassingTest:")]
+    public NSSet KeysOfEntriesPassingTest(NSDictionaryKeysOfEntriesPassingTestPredicateBlock predicate);
+    [Selector("keysOfEntriesWithOptions:passingTest:")]
+    public NSSet KeysOfEntriesWithOptionsPassingTest(NSEnumerationOptions opts, NSDictionaryKeysOfEntriesWithOptionsPassingTestPredicateBlock predicate);
 }
 
 /// NSDeprecated, a category of NSDictionary.
 public extern objc class NSDictionary
 {
     /// Deprecated in macOS 10.13.
-    [Selector("getObjects:andKeys:")] public void GetObjectsAndKeys(void** objects, void** keys);
+    [Selector("getObjects:andKeys:")]
+    public void GetObjectsAndKeys(void** objects, void** keys);
     /// Deprecated in macOS 100000.
-    [Selector("dictionaryWithContentsOfFile:")] public static NSDictionary? DictionaryWithContentsOfFile(NSString path);
+    [Selector("dictionaryWithContentsOfFile:")]
+    public static NSDictionary? DictionaryWithContentsOfFile(NSString path);
     /// Deprecated in macOS 100000.
-    [Selector("dictionaryWithContentsOfURL:")] public static NSDictionary? DictionaryWithContentsOfURL(NSURL url);
+    [Selector("dictionaryWithContentsOfURL:")]
+    public static NSDictionary? DictionaryWithContentsOfURL(NSURL url);
     /// Deprecated in macOS 100000.
-    [Selector("initWithContentsOfFile:")] public NSDictionary? InitWithContentsOfFile(NSString path);
+    [Selector("initWithContentsOfFile:")]
+    public NSDictionary? InitWithContentsOfFile(NSString path);
     /// Deprecated in macOS 100000.
-    [Selector("initWithContentsOfURL:")] public NSDictionary? InitWithContentsOfURL(NSURL url);
+    [Selector("initWithContentsOfURL:")]
+    public NSDictionary? InitWithContentsOfURL(NSURL url);
     /// Deprecated in macOS 100000.
-    [Selector("writeToFile:atomically:")] public bool WriteToFileAtomically(NSString path, bool useAuxiliaryFile);
+    [Selector("writeToFile:atomically:")]
+    public bool WriteToFileAtomically(NSString path, bool useAuxiliaryFile);
     /// Deprecated in macOS 100000.
-    [Selector("writeToURL:atomically:")] public bool WriteToURLAtomically(NSURL url, bool atomically);
+    [Selector("writeToURL:atomically:")]
+    public bool WriteToURLAtomically(NSURL url, bool atomically);
 }
 
 /// NSDictionaryCreation, a category of NSDictionary.
 public extern objc class NSDictionary
 {
-    [Selector("dictionary")] public static Self Dictionary();
-    [Selector("dictionaryWithObject:forKey:")] public static Self DictionaryWithObjectForKey(AnyObject object, NSCopying key);
-    [Selector("dictionaryWithObjects:forKeys:count:")] public static Self DictionaryWithObjectsForKeysCount(void** objects, void** keys, NSUInteger cnt);
-    [Selector("dictionaryWithObjectsAndKeys:")] public static Self DictionaryWithObjectsAndKeys(AnyObject firstObject, ...);
-    [Selector("dictionaryWithDictionary:")] public static Self DictionaryWithDictionary(NSDictionary dict);
-    [Selector("dictionaryWithObjects:forKeys:")] public static Self DictionaryWithObjectsForKeys(NSArray objects, NSArray keys);
-    [Selector("initWithObjectsAndKeys:")] public Self InitWithObjectsAndKeys(AnyObject firstObject, ...);
-    [Selector("initWithDictionary:")] public Self InitWithDictionary(NSDictionary otherDictionary);
-    [Selector("initWithDictionary:copyItems:")] public Self InitWithDictionaryCopyItems(NSDictionary otherDictionary, bool flag);
-    [Selector("initWithObjects:forKeys:")] public Self InitWithObjectsForKeys(NSArray objects, NSArray keys);
-    [Selector("initWithContentsOfURL:error:")] public NSDictionary? InitWithContentsOfURLError(NSURL url, out NSError? error);
-    [Selector("dictionaryWithContentsOfURL:error:")] public static NSDictionary? DictionaryWithContentsOfURLError(NSURL url, out NSError? error);
+    [Selector("dictionary")]
+    public static Self Dictionary();
+    [Selector("dictionaryWithObject:forKey:")]
+    public static Self DictionaryWithObjectForKey(AnyObject object, NSCopying key);
+    [Selector("dictionaryWithObjects:forKeys:count:")]
+    public static Self DictionaryWithObjectsForKeysCount(void** objects, void** keys, NSUInteger cnt);
+    [Selector("dictionaryWithObjectsAndKeys:")]
+    public static Self DictionaryWithObjectsAndKeys(AnyObject firstObject, ...);
+    [Selector("dictionaryWithDictionary:")]
+    public static Self DictionaryWithDictionary(NSDictionary dict);
+    [Selector("dictionaryWithObjects:forKeys:")]
+    public static Self DictionaryWithObjectsForKeys(NSArray objects, NSArray keys);
+    [Selector("initWithObjectsAndKeys:")]
+    public Self InitWithObjectsAndKeys(AnyObject firstObject, ...);
+    [Selector("initWithDictionary:")]
+    public Self InitWithDictionary(NSDictionary otherDictionary);
+    [Selector("initWithDictionary:copyItems:")]
+    public Self InitWithDictionaryCopyItems(NSDictionary otherDictionary, bool flag);
+    [Selector("initWithObjects:forKeys:")]
+    public Self InitWithObjectsForKeys(NSArray objects, NSArray keys);
+    [Selector("initWithContentsOfURL:error:")]
+    public NSDictionary? InitWithContentsOfURLError(NSURL url, out NSError? error);
+    [Selector("dictionaryWithContentsOfURL:error:")]
+    public static NSDictionary? DictionaryWithContentsOfURLError(NSURL url, out NSError? error);
 }
 
 public extern objc class NSMutableDictionary : NSDictionary
 {
-    [Selector("removeObjectForKey:")] public void RemoveObjectForKey(AnyObject aKey);
-    [Selector("setObject:forKey:")] public void SetObjectForKey(AnyObject anObject, NSCopying aKey);
-    [Selector("init")] public Self Init();
-    [Selector("initWithCapacity:")] public Self InitWithCapacity(NSUInteger numItems);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("removeObjectForKey:")]
+    public void RemoveObjectForKey(AnyObject aKey);
+    [Selector("setObject:forKey:")]
+    public void SetObjectForKey(AnyObject anObject, NSCopying aKey);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCapacity:")]
+    public Self InitWithCapacity(NSUInteger numItems);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 /// NSExtendedMutableDictionary, a category of NSMutableDictionary.
 public extern objc class NSMutableDictionary
 {
-    [Selector("addEntriesFromDictionary:")] public void AddEntriesFromDictionary(NSDictionary otherDictionary);
-    [Selector("removeAllObjects")] public void RemoveAllObjects();
-    [Selector("removeObjectsForKeys:")] public void RemoveObjectsForKeys(NSArray keyArray);
-    [Selector("setDictionary:")] public void SetDictionary(NSDictionary otherDictionary);
-    [Selector("setObject:forKeyedSubscript:")] public void SetObjectForKeyedSubscript(AnyObject? obj, NSCopying key);
+    [Selector("addEntriesFromDictionary:")]
+    public void AddEntriesFromDictionary(NSDictionary otherDictionary);
+    [Selector("removeAllObjects")]
+    public void RemoveAllObjects();
+    [Selector("removeObjectsForKeys:")]
+    public void RemoveObjectsForKeys(NSArray keyArray);
+    [Selector("setDictionary:")]
+    public void SetDictionary(NSDictionary otherDictionary);
+    [Selector("setObject:forKeyedSubscript:")]
+    public void SetObjectForKeyedSubscript(AnyObject? obj, NSCopying key);
 }
 
 /// NSMutableDictionaryCreation, a category of NSMutableDictionary.
 public extern objc class NSMutableDictionary
 {
-    [Selector("dictionaryWithCapacity:")] public static Self DictionaryWithCapacity(NSUInteger numItems);
-    [Selector("dictionaryWithContentsOfFile:")] public static NSMutableDictionary? DictionaryWithContentsOfFile(NSString path);
-    [Selector("dictionaryWithContentsOfURL:")] public static NSMutableDictionary? DictionaryWithContentsOfURL(NSURL url);
-    [Selector("initWithContentsOfFile:")] public NSMutableDictionary? InitWithContentsOfFile(NSString path);
-    [Selector("initWithContentsOfURL:")] public NSMutableDictionary? InitWithContentsOfURL(NSURL url);
+    [Selector("dictionaryWithCapacity:")]
+    public static Self DictionaryWithCapacity(NSUInteger numItems);
+    [Selector("dictionaryWithContentsOfFile:")]
+    public static NSMutableDictionary? DictionaryWithContentsOfFile(NSString path);
+    [Selector("dictionaryWithContentsOfURL:")]
+    public static NSMutableDictionary? DictionaryWithContentsOfURL(NSURL url);
+    [Selector("initWithContentsOfFile:")]
+    public NSMutableDictionary? InitWithContentsOfFile(NSString path);
+    [Selector("initWithContentsOfURL:")]
+    public NSMutableDictionary? InitWithContentsOfURL(NSURL url);
 }
 
 /// NSSharedKeySetDictionary, a category of NSDictionary.
 public extern objc class NSDictionary
 {
-    [Selector("sharedKeySetForKeys:")] public static AnyObject SharedKeySetForKeys(NSArray keys);
+    [Selector("sharedKeySetForKeys:")]
+    public static AnyObject SharedKeySetForKeys(NSArray keys);
 }
 
 /// NSSharedKeySetDictionary, a category of NSMutableDictionary.
 public extern objc class NSMutableDictionary
 {
-    [Selector("dictionaryWithSharedKeySet:")] public static NSMutableDictionary DictionaryWithSharedKeySet(AnyObject keyset);
+    [Selector("dictionaryWithSharedKeySet:")]
+    public static NSMutableDictionary DictionaryWithSharedKeySet(AnyObject keyset);
 }
 
 /// NSGenericFastEnumeration, a category of NSDictionary.
 public extern objc class NSDictionary
 {
-    [Selector("countByEnumeratingWithState:objects:count:")] public NSUInteger CountByEnumeratingWithStateObjectsCount(NSFastEnumerationState* state, void** buffer, NSUInteger len);
+    [Selector("countByEnumeratingWithState:objects:count:")]
+    public NSUInteger CountByEnumeratingWithStateObjectsCount(NSFastEnumerationState* state, void** buffer, NSUInteger len);
 }
 
 #endif

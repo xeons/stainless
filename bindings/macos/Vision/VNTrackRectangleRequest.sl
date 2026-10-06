@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class VNTrackRectangleRequest : VNTrackingRequest
 {
-    [Selector("initWithRectangleObservation:")] public Self InitWithRectangleObservation(VNRectangleObservation observation);
-    [Selector("initWithRectangleObservation:completionHandler:")] public Self InitWithRectangleObservationCompletionHandler(VNRectangleObservation observation, VNRequestCompletionHandler? completionHandler);
+    [Selector("initWithRectangleObservation:")]
+    public Self InitWithRectangleObservation(VNRectangleObservation observation);
+    [Selector("initWithRectangleObservation:completionHandler:")]
+    public Self InitWithRectangleObservationCompletionHandler(VNRectangleObservation observation, VNRequestCompletionHandler? completionHandler);
 }
 
 #endif

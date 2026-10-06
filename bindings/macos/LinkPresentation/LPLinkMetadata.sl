@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class LPLinkMetadata : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("originalURL", "setOriginalURL:")] public NSURL? OriginalURL { get; set; }
-    [Selector("URL", "setURL:")] public NSURL? URL { get; set; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("iconProvider", "setIconProvider:")] public NSItemProvider? IconProvider { get; set; }
-    [Selector("imageProvider", "setImageProvider:")] public NSItemProvider? ImageProvider { get; set; }
-    [Selector("videoProvider", "setVideoProvider:")] public NSItemProvider? VideoProvider { get; set; }
-    [Selector("remoteVideoURL", "setRemoteVideoURL:")] public NSURL? RemoteVideoURL { get; set; }
+    [Selector("originalURL", "setOriginalURL:")]
+    public NSURL? OriginalURL { get; set; }
+    [Selector("URL", "setURL:")]
+    public NSURL? URL { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("iconProvider", "setIconProvider:")]
+    public NSItemProvider? IconProvider { get; set; }
+    [Selector("imageProvider", "setImageProvider:")]
+    public NSItemProvider? ImageProvider { get; set; }
+    [Selector("videoProvider", "setVideoProvider:")]
+    public NSItemProvider? VideoProvider { get; set; }
+    [Selector("remoteVideoURL", "setRemoteVideoURL:")]
+    public NSURL? RemoteVideoURL { get; set; }
 }
 
 #endif

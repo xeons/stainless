@@ -35,17 +35,28 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.0.
 public extern objc class MPSPolygonBuffer : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("vertexBuffer", "setVertexBuffer:")] public MTLBuffer? VertexBuffer { get; set; }
-    [Selector("vertexBufferOffset", "setVertexBufferOffset:")] public NSUInteger VertexBufferOffset { get; set; }
-    [Selector("indexBuffer", "setIndexBuffer:")] public MTLBuffer? IndexBuffer { get; set; }
-    [Selector("indexBufferOffset", "setIndexBufferOffset:")] public NSUInteger IndexBufferOffset { get; set; }
-    [Selector("maskBuffer", "setMaskBuffer:")] public MTLBuffer? MaskBuffer { get; set; }
-    [Selector("maskBufferOffset", "setMaskBufferOffset:")] public NSUInteger MaskBufferOffset { get; set; }
-    [Selector("polygonCount", "setPolygonCount:")] public NSUInteger PolygonCount { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
-    [Selector("polygonBuffer")] public static Self PolygonBuffer();
-    [Selector("copyWithZone:")] public Self CopyWithZone(_NSZone* zone);
+    [Selector("vertexBuffer", "setVertexBuffer:")]
+    public MTLBuffer? VertexBuffer { get; set; }
+    [Selector("vertexBufferOffset", "setVertexBufferOffset:")]
+    public NSUInteger VertexBufferOffset { get; set; }
+    [Selector("indexBuffer", "setIndexBuffer:")]
+    public MTLBuffer? IndexBuffer { get; set; }
+    [Selector("indexBufferOffset", "setIndexBufferOffset:")]
+    public NSUInteger IndexBufferOffset { get; set; }
+    [Selector("maskBuffer", "setMaskBuffer:")]
+    public MTLBuffer? MaskBuffer { get; set; }
+    [Selector("maskBufferOffset", "setMaskBufferOffset:")]
+    public NSUInteger MaskBufferOffset { get; set; }
+    [Selector("polygonCount", "setPolygonCount:")]
+    public NSUInteger PolygonCount { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder aDecoder);
+    [Selector("polygonBuffer")]
+    public static Self PolygonBuffer();
+    [Selector("copyWithZone:")]
+    public Self CopyWithZone(_NSZone* zone);
 }
 
 #endif

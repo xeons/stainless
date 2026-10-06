@@ -33,17 +33,28 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLLinkElement : DOMHTMLElement
 {
-    [Selector("disabled", "setDisabled:")] public bool Disabled { get; set; }
-    [Selector("charset", "setCharset:")] public NSString? Charset { get; set; }
-    [Selector("href", "setHref:")] public NSString? Href { get; set; }
-    [Selector("hreflang", "setHreflang:")] public NSString? Hreflang { get; set; }
-    [Selector("media", "setMedia:")] public NSString? Media { get; set; }
-    [Selector("rel", "setRel:")] public NSString? Rel { get; set; }
-    [Selector("rev", "setRev:")] public NSString? Rev { get; set; }
-    [Selector("target", "setTarget:")] public NSString? Target { get; set; }
-    [Selector("type", "setType:")] public NSString? Type { get; set; }
-    [Selector("sheet")] public DOMStyleSheet? Sheet { get; }
-    [Selector("absoluteLinkURL")] public NSURL? AbsoluteLinkURL { get; }
+    [Selector("disabled", "setDisabled:")]
+    public bool Disabled { get; set; }
+    [Selector("charset", "setCharset:")]
+    public NSString? Charset { get; set; }
+    [Selector("href", "setHref:")]
+    public NSString? Href { get; set; }
+    [Selector("hreflang", "setHreflang:")]
+    public NSString? Hreflang { get; set; }
+    [Selector("media", "setMedia:")]
+    public NSString? Media { get; set; }
+    [Selector("rel", "setRel:")]
+    public NSString? Rel { get; set; }
+    [Selector("rev", "setRev:")]
+    public NSString? Rev { get; set; }
+    [Selector("target", "setTarget:")]
+    public NSString? Target { get; set; }
+    [Selector("type", "setType:")]
+    public NSString? Type { get; set; }
+    [Selector("sheet")]
+    public DOMStyleSheet? Sheet { get; }
+    [Selector("absoluteLinkURL")]
+    public NSURL? AbsoluteLinkURL { get; }
 }
 
 #endif

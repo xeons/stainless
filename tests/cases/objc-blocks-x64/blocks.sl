@@ -17,7 +17,8 @@ public struct Wide
 [ObjCRoot]
 public extern objc class NSObject
 {
-    [Selector("alloc")] public static Self Alloc();
+    [Selector("alloc")]
+    public static Self Alloc();
 }
 
 public objc closure void Seen(AnyObject item, bool flag);
@@ -25,15 +26,18 @@ public objc closure Wide Spread(long value);
 
 public extern objc class SLTaker : NSObject
 {
-    [Selector("take:")] public static void Take(Seen seen);
-    [Selector("takeWide:")] public static void TakeWide(Spread spread);
+    [Selector("take:")]
+    public static void Take(Seen seen);
+    [Selector("takeWide:")]
+    public static void TakeWide(Spread spread);
 }
 
 public objc class Holder : NSObject
 {
     Seen? _held;
 
-    [Selector("hold:")] public void Hold(Seen seen) => _held = seen;
+    [Selector("hold:")]
+    public void Hold(Seen seen) => _held = seen;
 }
 
 public class Counter

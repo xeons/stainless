@@ -33,23 +33,32 @@ import Standard.ObjC;
 
 public extern "C" CFTypeID CGEventGetTypeID();
 
-[ReturnsRetained] public extern "C" CGEventRef? CGEventCreate(CGEventSourceRef? source);
+[ReturnsRetained]
+public extern "C" CGEventRef? CGEventCreate(CGEventSourceRef? source);
 
-[ReturnsRetained] public extern "C" CFDataRef? CGEventCreateData(CFAllocatorRef? allocator, CGEventRef? event);
+[ReturnsRetained]
+public extern "C" CFDataRef? CGEventCreateData(CFAllocatorRef? allocator, CGEventRef? event);
 
-[ReturnsRetained] public extern "C" CGEventRef? CGEventCreateFromData(CFAllocatorRef? allocator, CFDataRef? data);
+[ReturnsRetained]
+public extern "C" CGEventRef? CGEventCreateFromData(CFAllocatorRef? allocator, CFDataRef? data);
 
-[ReturnsRetained] public extern "C" CGEventRef? CGEventCreateMouseEvent(CGEventSourceRef? source, CGEventType mouseType, CGPoint mouseCursorPosition, CGMouseButton mouseButton);
+[ReturnsRetained]
+public extern "C" CGEventRef? CGEventCreateMouseEvent(CGEventSourceRef? source, CGEventType mouseType, CGPoint mouseCursorPosition, CGMouseButton mouseButton);
 
-[ReturnsRetained] public extern "C" CGEventRef? CGEventCreateKeyboardEvent(CGEventSourceRef? source, CGKeyCode virtualKey, bool keyDown);
+[ReturnsRetained]
+public extern "C" CGEventRef? CGEventCreateKeyboardEvent(CGEventSourceRef? source, CGKeyCode virtualKey, bool keyDown);
 
-[ReturnsRetained] public extern "C" CGEventRef? CGEventCreateScrollWheelEvent(CGEventSourceRef? source, CGScrollEventUnit units, uint wheelCount, int wheel1, ...);
+[ReturnsRetained]
+public extern "C" CGEventRef? CGEventCreateScrollWheelEvent(CGEventSourceRef? source, CGScrollEventUnit units, uint wheelCount, int wheel1, ...);
 
-[ReturnsRetained] public extern "C" CGEventRef? CGEventCreateScrollWheelEvent2(CGEventSourceRef? source, CGScrollEventUnit units, uint wheelCount, int wheel1, int wheel2, int wheel3);
+[ReturnsRetained]
+public extern "C" CGEventRef? CGEventCreateScrollWheelEvent2(CGEventSourceRef? source, CGScrollEventUnit units, uint wheelCount, int wheel1, int wheel2, int wheel3);
 
-[ReturnsRetained] public extern "C" CGEventRef? CGEventCreateCopy(CGEventRef? event);
+[ReturnsRetained]
+public extern "C" CGEventRef? CGEventCreateCopy(CGEventRef? event);
 
-[ReturnsRetained] public extern "C" CGEventSourceRef? CGEventCreateSourceFromEvent(CGEventRef? event);
+[ReturnsRetained]
+public extern "C" CGEventSourceRef? CGEventCreateSourceFromEvent(CGEventRef? event);
 
 public extern "C" void CGEventSetSource(CGEventRef? event, CGEventSourceRef? source);
 
@@ -83,11 +92,14 @@ public extern "C" double CGEventGetDoubleValueField(CGEventRef? event, CGEventFi
 
 public extern "C" void CGEventSetDoubleValueField(CGEventRef? event, CGEventField field, double value);
 
-[ReturnsRetained] public extern "C" CFMachPortRef? CGEventTapCreate(CGEventTapLocation tap, CGEventTapPlacement place, CGEventTapOptions options, CGEventMask eventsOfInterest, CGEventTapCallBack callback, void* userInfo);
+[ReturnsRetained]
+public extern "C" CFMachPortRef? CGEventTapCreate(CGEventTapLocation tap, CGEventTapPlacement place, CGEventTapOptions options, CGEventMask eventsOfInterest, CGEventTapCallBack callback, void* userInfo);
 
-[ReturnsRetained] public extern "C" CFMachPortRef? CGEventTapCreateForPSN(void* processSerialNumber, CGEventTapPlacement place, CGEventTapOptions options, CGEventMask eventsOfInterest, CGEventTapCallBack callback, void* userInfo);
+[ReturnsRetained]
+public extern "C" CFMachPortRef? CGEventTapCreateForPSN(void* processSerialNumber, CGEventTapPlacement place, CGEventTapOptions options, CGEventMask eventsOfInterest, CGEventTapCallBack callback, void* userInfo);
 
-[ReturnsRetained] public extern "C" CFMachPortRef? CGEventTapCreateForPid(pid_t pid, CGEventTapPlacement place, CGEventTapOptions options, CGEventMask eventsOfInterest, CGEventTapCallBack callback, void* userInfo);
+[ReturnsRetained]
+public extern "C" CFMachPortRef? CGEventTapCreateForPid(pid_t pid, CGEventTapPlacement place, CGEventTapOptions options, CGEventMask eventsOfInterest, CGEventTapCallBack callback, void* userInfo);
 
 public extern "C" void CGEventTapEnable(CFMachPortRef tap, bool enable);
 

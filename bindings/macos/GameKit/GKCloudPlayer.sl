@@ -35,7 +35,8 @@ public objc closure void GKCloudPlayerGetCurrentSignedInPlayerForContainerComple
 /// Deprecated in macOS 10.14.
 public extern objc class GKCloudPlayer : GKBasePlayer
 {
-    [Selector("getCurrentSignedInPlayerForContainer:completionHandler:")] public static void GetCurrentSignedInPlayerForContainerCompletionHandler(NSString? containerName, GKCloudPlayerGetCurrentSignedInPlayerForContainerCompletionHandlerHandlerBlock handler);
+    [Selector("getCurrentSignedInPlayerForContainer:completionHandler:")]
+    public static void GetCurrentSignedInPlayerForContainerCompletionHandler(NSString? containerName, GKCloudPlayerGetCurrentSignedInPlayerForContainerCompletionHandlerHandlerBlock handler);
 }
 
 #endif

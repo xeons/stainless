@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class WKFindConfiguration : NSObject, NSCopying
 {
-    [Selector("backwards", "setBackwards:")] public bool Backwards { get; set; }
-    [Selector("caseSensitive", "setCaseSensitive:")] public bool CaseSensitive { get; set; }
-    [Selector("wraps", "setWraps:")] public bool Wraps { get; set; }
+    [Selector("backwards", "setBackwards:")]
+    public bool Backwards { get; set; }
+    [Selector("caseSensitive", "setCaseSensitive:")]
+    public bool CaseSensitive { get; set; }
+    [Selector("wraps", "setWraps:")]
+    public bool Wraps { get; set; }
 }
 
 #endif

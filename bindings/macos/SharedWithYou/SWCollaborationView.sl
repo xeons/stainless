@@ -34,28 +34,47 @@ import Standard.ObjC;
 
 public objc interface SWCollaborationViewDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("collaborationViewShouldPresentPopover:")] bool CollaborationViewShouldPresentPopover(SWCollaborationView collaborationView);
-    [Optional] [Selector("collaborationViewWillPresentPopover:")] void CollaborationViewWillPresentPopover(SWCollaborationView collaborationView);
-    [Optional] [Selector("collaborationViewDidDismissPopover:")] void CollaborationViewDidDismissPopover(SWCollaborationView collaborationView);
+    [Optional]
+    [Selector("collaborationViewShouldPresentPopover:")]
+    bool CollaborationViewShouldPresentPopover(SWCollaborationView collaborationView);
+    [Optional]
+    [Selector("collaborationViewWillPresentPopover:")]
+    void CollaborationViewWillPresentPopover(SWCollaborationView collaborationView);
+    [Optional]
+    [Selector("collaborationViewDidDismissPopover:")]
+    void CollaborationViewDidDismissPopover(SWCollaborationView collaborationView);
 }
 
 public objc closure void SWCollaborationViewDismissPopoverCompletionBlock();
 
 public extern objc class SWCollaborationView : NSView
 {
-    [Selector("cloudSharingDelegate", "setCloudSharingDelegate:")] public NSCloudSharingServiceDelegate? CloudSharingDelegate { get; set; }
-    [Selector("activeParticipantCount", "setActiveParticipantCount:")] public NSUInteger ActiveParticipantCount { get; set; }
-    [Selector("delegate", "setDelegate:")] public SWCollaborationViewDelegate? Delegate { get; set; }
-    [Selector("headerTitle", "setHeaderTitle:")] public NSString HeaderTitle { get; set; }
-    [Selector("headerSubtitle", "setHeaderSubtitle:")] public NSString HeaderSubtitle { get; set; }
-    [Selector("headerImage", "setHeaderImage:")] public NSImage HeaderImage { get; set; }
-    [Selector("menuFormRepresentation")] public NSMenuItem? MenuFormRepresentation { get; }
-    [Selector("cloudSharingServiceDelegate", "setCloudSharingServiceDelegate:")] public NSCloudSharingServiceDelegate? CloudSharingServiceDelegate { get; set; }
-    [Selector("manageButtonTitle", "setManageButtonTitle:")] public NSString ManageButtonTitle { get; set; }
-    [Selector("setContentView:")] public void SetContentView(NSView detailViewListContentView);
-    [Selector("initWithItemProvider:")] public Self InitWithItemProvider(NSItemProvider itemProvider);
-    [Selector("dismissPopover:")] public void DismissPopover(SWCollaborationViewDismissPopoverCompletionBlock? completion);
-    [Selector("setShowManageButton:")] public void SetShowManageButton(bool showManageButton);
+    [Selector("cloudSharingDelegate", "setCloudSharingDelegate:")]
+    public NSCloudSharingServiceDelegate? CloudSharingDelegate { get; set; }
+    [Selector("activeParticipantCount", "setActiveParticipantCount:")]
+    public NSUInteger ActiveParticipantCount { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public SWCollaborationViewDelegate? Delegate { get; set; }
+    [Selector("headerTitle", "setHeaderTitle:")]
+    public NSString HeaderTitle { get; set; }
+    [Selector("headerSubtitle", "setHeaderSubtitle:")]
+    public NSString HeaderSubtitle { get; set; }
+    [Selector("headerImage", "setHeaderImage:")]
+    public NSImage HeaderImage { get; set; }
+    [Selector("menuFormRepresentation")]
+    public NSMenuItem? MenuFormRepresentation { get; }
+    [Selector("cloudSharingServiceDelegate", "setCloudSharingServiceDelegate:")]
+    public NSCloudSharingServiceDelegate? CloudSharingServiceDelegate { get; set; }
+    [Selector("manageButtonTitle", "setManageButtonTitle:")]
+    public NSString ManageButtonTitle { get; set; }
+    [Selector("setContentView:")]
+    public void SetContentView(NSView detailViewListContentView);
+    [Selector("initWithItemProvider:")]
+    public Self InitWithItemProvider(NSItemProvider itemProvider);
+    [Selector("dismissPopover:")]
+    public void DismissPopover(SWCollaborationViewDismissPopoverCompletionBlock? completion);
+    [Selector("setShowManageButton:")]
+    public void SetShowManageButton(bool showManageButton);
 }
 
 #endif

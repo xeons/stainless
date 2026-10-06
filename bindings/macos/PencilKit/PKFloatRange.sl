@@ -34,9 +34,12 @@ import Standard.ObjC;
 
 public extern objc class PKFloatRange : NSObject, NSCopying
 {
-    [Selector("lowerBound")] public CGFloat LowerBound { get; }
-    [Selector("upperBound")] public CGFloat UpperBound { get; }
-    [Selector("initWithLowerBound:upperBound:")] public Self InitWithLowerBoundUpperBound(CGFloat lowerBound, CGFloat upperBound);
+    [Selector("lowerBound")]
+    public CGFloat LowerBound { get; }
+    [Selector("upperBound")]
+    public CGFloat UpperBound { get; }
+    [Selector("initWithLowerBound:upperBound:")]
+    public Self InitWithLowerBoundUpperBound(CGFloat lowerBound, CGFloat upperBound);
 }
 
 #endif

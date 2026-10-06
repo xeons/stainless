@@ -33,19 +33,30 @@ import Standard.ObjC;
 
 public extern objc class MCAdvertiserAssistant : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public MCAdvertiserAssistantDelegate? Delegate { get; set; }
-    [Selector("session")] public MCSession Session { get; }
-    [Selector("discoveryInfo")] public NSDictionary? DiscoveryInfo { get; }
-    [Selector("serviceType")] public NSString ServiceType { get; }
-    [Selector("initWithServiceType:discoveryInfo:session:")] public Self InitWithServiceTypeDiscoveryInfoSession(NSString serviceType, NSDictionary? info, MCSession session);
-    [Selector("start")] public void Start();
-    [Selector("stop")] public void Stop();
+    [Selector("delegate", "setDelegate:")]
+    public MCAdvertiserAssistantDelegate? Delegate { get; set; }
+    [Selector("session")]
+    public MCSession Session { get; }
+    [Selector("discoveryInfo")]
+    public NSDictionary? DiscoveryInfo { get; }
+    [Selector("serviceType")]
+    public NSString ServiceType { get; }
+    [Selector("initWithServiceType:discoveryInfo:session:")]
+    public Self InitWithServiceTypeDiscoveryInfoSession(NSString serviceType, NSDictionary? info, MCSession session);
+    [Selector("start")]
+    public void Start();
+    [Selector("stop")]
+    public void Stop();
 }
 
 public objc interface MCAdvertiserAssistantDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("advertiserAssistantWillPresentInvitation:")] void AdvertiserAssistantWillPresentInvitation(MCAdvertiserAssistant advertiserAssistant);
-    [Optional] [Selector("advertiserAssistantDidDismissInvitation:")] void AdvertiserAssistantDidDismissInvitation(MCAdvertiserAssistant advertiserAssistant);
+    [Optional]
+    [Selector("advertiserAssistantWillPresentInvitation:")]
+    void AdvertiserAssistantWillPresentInvitation(MCAdvertiserAssistant advertiserAssistant);
+    [Optional]
+    [Selector("advertiserAssistantDidDismissInvitation:")]
+    void AdvertiserAssistantDidDismissInvitation(MCAdvertiserAssistant advertiserAssistant);
 }
 
 #endif

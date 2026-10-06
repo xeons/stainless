@@ -40,7 +40,8 @@ public extern "C" HKHealthConceptDomain HKHealthConceptDomainMedication;
 /// macOS 26.0 and later.
 public extern objc class HKHealthConceptIdentifier : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("domain")] public HKHealthConceptDomain Domain { get; }
+    [Selector("domain")]
+    public HKHealthConceptDomain Domain { get; }
 }
 
 #endif

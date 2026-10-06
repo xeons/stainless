@@ -46,37 +46,50 @@ public objc closure void GKChallengeLoadReceivedChallengesWithCompletionHandlerC
 /// Deprecated in macOS 26.0.
 public extern objc class GKChallenge : NSObject, NSCoding, NSSecureCoding
 {
-    [Selector("issuingPlayer")] public GKPlayer? IssuingPlayer { get; }
-    [Selector("receivingPlayer")] public GKPlayer? ReceivingPlayer { get; }
-    [Selector("state")] public GKChallengeState State { get; }
-    [Selector("issueDate")] public NSDate IssueDate { get; }
-    [Selector("completionDate")] public NSDate? CompletionDate { get; }
-    [Selector("message")] public NSString? Message { get; }
-    [Selector("loadReceivedChallengesWithCompletionHandler:")] public static void LoadReceivedChallengesWithCompletionHandler(GKChallengeLoadReceivedChallengesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("decline")] public void Decline();
+    [Selector("issuingPlayer")]
+    public GKPlayer? IssuingPlayer { get; }
+    [Selector("receivingPlayer")]
+    public GKPlayer? ReceivingPlayer { get; }
+    [Selector("state")]
+    public GKChallengeState State { get; }
+    [Selector("issueDate")]
+    public NSDate IssueDate { get; }
+    [Selector("completionDate")]
+    public NSDate? CompletionDate { get; }
+    [Selector("message")]
+    public NSString? Message { get; }
+    [Selector("loadReceivedChallengesWithCompletionHandler:")]
+    public static void LoadReceivedChallengesWithCompletionHandler(GKChallengeLoadReceivedChallengesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("decline")]
+    public void Decline();
 }
 
 /// Obsoleted, a category of GKChallenge.
 public extern objc class GKChallenge
 {
     /// Deprecated in macOS 10.10.
-    [Selector("issuingPlayerID")] public NSString? IssuingPlayerID { get; }
+    [Selector("issuingPlayerID")]
+    public NSString? IssuingPlayerID { get; }
     /// Deprecated in macOS 10.10.
-    [Selector("receivingPlayerID")] public NSString? ReceivingPlayerID { get; }
+    [Selector("receivingPlayerID")]
+    public NSString? ReceivingPlayerID { get; }
 }
 
 /// Deprecated in macOS 26.0.
 public extern objc class GKScoreChallenge : GKChallenge
 {
     /// Deprecated in macOS 14.4.
-    [Selector("score")] public GKScore? Score { get; }
-    [Selector("leaderboardEntry")] public GKLeaderboardEntry? LeaderboardEntry { get; }
+    [Selector("score")]
+    public GKScore? Score { get; }
+    [Selector("leaderboardEntry")]
+    public GKLeaderboardEntry? LeaderboardEntry { get; }
 }
 
 /// Deprecated in macOS 26.0.
 public extern objc class GKAchievementChallenge : GKChallenge
 {
-    [Selector("achievement")] public GKAchievement? Achievement { get; }
+    [Selector("achievement")]
+    public GKAchievement? Achievement { get; }
 }
 
 public objc closure void GKScoreReportScoresWithEligibleChallengesWithCompletionHandlerCompletionHandlerBlock(NSError? arg0);
@@ -87,9 +100,11 @@ public objc closure void GKScoreReportLeaderboardScoresWithEligibleChallengesWit
 public extern objc class GKScore
 {
     /// Deprecated in macOS 11.0.
-    [Selector("reportScores:withEligibleChallenges:withCompletionHandler:")] public static void ReportScoresWithEligibleChallengesWithCompletionHandler(NSArray scores, NSArray challenges, GKScoreReportScoresWithEligibleChallengesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("reportScores:withEligibleChallenges:withCompletionHandler:")]
+    public static void ReportScoresWithEligibleChallengesWithCompletionHandler(NSArray scores, NSArray challenges, GKScoreReportScoresWithEligibleChallengesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 26.0.
-    [Selector("reportLeaderboardScores:withEligibleChallenges:withCompletionHandler:")] public static void ReportLeaderboardScoresWithEligibleChallengesWithCompletionHandler(NSArray scores, NSArray challenges, GKScoreReportLeaderboardScoresWithEligibleChallengesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("reportLeaderboardScores:withEligibleChallenges:withCompletionHandler:")]
+    public static void ReportLeaderboardScoresWithEligibleChallengesWithCompletionHandler(NSArray scores, NSArray challenges, GKScoreReportLeaderboardScoresWithEligibleChallengesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public objc closure void GKAchievementSelectChallengeablePlayersWithCompletionHandlerCompletionHandlerBlock(NSArray? arg0, NSError? arg1);
@@ -100,16 +115,19 @@ public objc closure void GKAchievementReportAchievementsWithEligibleChallengesWi
 public extern objc class GKAchievement
 {
     /// Deprecated in macOS 26.0.
-    [Selector("selectChallengeablePlayers:withCompletionHandler:")] public void SelectChallengeablePlayersWithCompletionHandler(NSArray players, GKAchievementSelectChallengeablePlayersWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("selectChallengeablePlayers:withCompletionHandler:")]
+    public void SelectChallengeablePlayersWithCompletionHandler(NSArray players, GKAchievementSelectChallengeablePlayersWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 26.0.
-    [Selector("reportAchievements:withEligibleChallenges:withCompletionHandler:")] public static void ReportAchievementsWithEligibleChallengesWithCompletionHandler(NSArray achievements, NSArray challenges, GKAchievementReportAchievementsWithEligibleChallengesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("reportAchievements:withEligibleChallenges:withCompletionHandler:")]
+    public static void ReportAchievementsWithEligibleChallengesWithCompletionHandler(NSArray achievements, NSArray challenges, GKAchievementReportAchievementsWithEligibleChallengesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 /// GKChallengeObsoleted, a category of GKScore.
 public extern objc class GKScore
 {
     /// Deprecated in macOS 10.10.
-    [Selector("issueChallengeToPlayers:message:")] public void IssueChallengeToPlayersMessage(NSArray? playerIDs, NSString? message);
+    [Selector("issueChallengeToPlayers:message:")]
+    public void IssueChallengeToPlayersMessage(NSArray? playerIDs, NSString? message);
 }
 
 public objc closure void GKAchievementSelectChallengeablePlayerIDsWithCompletionHandlerCompletionHandlerBlock(NSArray? arg0, NSError? arg1);
@@ -118,9 +136,11 @@ public objc closure void GKAchievementSelectChallengeablePlayerIDsWithCompletion
 public extern objc class GKAchievement
 {
     /// Deprecated in macOS 10.10.
-    [Selector("issueChallengeToPlayers:message:")] public void IssueChallengeToPlayersMessage(NSArray? playerIDs, NSString? message);
+    [Selector("issueChallengeToPlayers:message:")]
+    public void IssueChallengeToPlayersMessage(NSArray? playerIDs, NSString? message);
     /// Deprecated in macOS 10.10.
-    [Selector("selectChallengeablePlayerIDs:withCompletionHandler:")] public void SelectChallengeablePlayerIDsWithCompletionHandler(NSArray? playerIDs, GKAchievementSelectChallengeablePlayerIDsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("selectChallengeablePlayerIDs:withCompletionHandler:")]
+    public void SelectChallengeablePlayerIDsWithCompletionHandler(NSArray? playerIDs, GKAchievementSelectChallengeablePlayerIDsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 /// Deprecated in macOS 14.0.
@@ -133,27 +153,33 @@ public objc closure void GKChallengeComposeHandler(NSViewController arg0, bool a
 public extern objc class GKScore
 {
     /// Deprecated in macOS 14.0.
-    [Selector("challengeComposeControllerWithMessage:players:completionHandler:")] public NSViewController ChallengeComposeControllerWithMessagePlayersCompletionHandler(NSString? message, NSArray? players, GKChallengeComposeCompletionBlock? completionHandler);
+    [Selector("challengeComposeControllerWithMessage:players:completionHandler:")]
+    public NSViewController ChallengeComposeControllerWithMessagePlayersCompletionHandler(NSString? message, NSArray? players, GKChallengeComposeCompletionBlock? completionHandler);
     /// Deprecated in macOS 26.0.
-    [Selector("challengeComposeControllerWithMessage:players:completion:")] public NSViewController ChallengeComposeControllerWithMessagePlayersCompletion(NSString? message, NSArray? players, GKChallengeComposeHandler? completionHandler);
+    [Selector("challengeComposeControllerWithMessage:players:completion:")]
+    public NSViewController ChallengeComposeControllerWithMessagePlayersCompletion(NSString? message, NSArray? players, GKChallengeComposeHandler? completionHandler);
 }
 
 /// GKChallengeUI, a category of GKLeaderboardEntry.
 public extern objc class GKLeaderboardEntry
 {
     /// Deprecated in macOS 14.0.
-    [Selector("challengeComposeControllerWithMessage:players:completionHandler:")] public NSViewController ChallengeComposeControllerWithMessagePlayersCompletionHandler(NSString? message, NSArray? players, GKChallengeComposeCompletionBlock? completionHandler);
+    [Selector("challengeComposeControllerWithMessage:players:completionHandler:")]
+    public NSViewController ChallengeComposeControllerWithMessagePlayersCompletionHandler(NSString? message, NSArray? players, GKChallengeComposeCompletionBlock? completionHandler);
     /// Deprecated in macOS 26.0.
-    [Selector("challengeComposeControllerWithMessage:players:completion:")] public NSViewController ChallengeComposeControllerWithMessagePlayersCompletion(NSString? message, NSArray? players, GKChallengeComposeHandler? completionHandler);
+    [Selector("challengeComposeControllerWithMessage:players:completion:")]
+    public NSViewController ChallengeComposeControllerWithMessagePlayersCompletion(NSString? message, NSArray? players, GKChallengeComposeHandler? completionHandler);
 }
 
 /// GKChallengeUI, a category of GKAchievement.
 public extern objc class GKAchievement
 {
     /// Deprecated in macOS 14.0.
-    [Selector("challengeComposeControllerWithMessage:players:completionHandler:")] public NSViewController ChallengeComposeControllerWithMessagePlayersCompletionHandler(NSString? message, NSArray players, GKChallengeComposeCompletionBlock? completionHandler);
+    [Selector("challengeComposeControllerWithMessage:players:completionHandler:")]
+    public NSViewController ChallengeComposeControllerWithMessagePlayersCompletionHandler(NSString? message, NSArray players, GKChallengeComposeCompletionBlock? completionHandler);
     /// Deprecated in macOS 26.0.
-    [Selector("challengeComposeControllerWithMessage:players:completion:")] public NSViewController ChallengeComposeControllerWithMessagePlayersCompletion(NSString? message, NSArray players, GKChallengeComposeHandler? completionHandler);
+    [Selector("challengeComposeControllerWithMessage:players:completion:")]
+    public NSViewController ChallengeComposeControllerWithMessagePlayersCompletion(NSString? message, NSArray players, GKChallengeComposeHandler? completionHandler);
 }
 
 /// GKChallengeObsoletedUI, a category of GKScore.

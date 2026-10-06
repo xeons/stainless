@@ -34,8 +34,10 @@ public extern "C" ODSessionRef? kODSessionDefault;
 
 public extern "C" CFTypeID ODSessionGetTypeID();
 
-[ReturnsRetained] public extern "C" ODSessionRef? ODSessionCreate(CFAllocatorRef? allocator, CFDictionaryRef? options, __CFError** error);
+[ReturnsRetained]
+public extern "C" ODSessionRef? ODSessionCreate(CFAllocatorRef? allocator, CFDictionaryRef? options, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ODSessionCopyNodeNames(CFAllocatorRef? allocator, ODSessionRef? session, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ODSessionCopyNodeNames(CFAllocatorRef? allocator, ODSessionRef? session, __CFError** error);
 
 #endif

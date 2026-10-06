@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class PDFActionRemoteGoTo : PDFAction, NSCopying
 {
-    [Selector("pageIndex", "setPageIndex:")] public NSUInteger PageIndex { get; set; }
-    [Selector("point", "setPoint:")] public NSPoint Point { get; set; }
-    [Selector("URL", "setURL:")] public NSURL URL { get; set; }
-    [Selector("initWithPageIndex:atPoint:fileURL:")] public Self InitWithPageIndexAtPointFileURL(NSUInteger pageIndex, NSPoint point, NSURL url);
+    [Selector("pageIndex", "setPageIndex:")]
+    public NSUInteger PageIndex { get; set; }
+    [Selector("point", "setPoint:")]
+    public NSPoint Point { get; set; }
+    [Selector("URL", "setURL:")]
+    public NSURL URL { get; set; }
+    [Selector("initWithPageIndex:atPoint:fileURL:")]
+    public Self InitWithPageIndexAtPointFileURL(NSUInteger pageIndex, NSPoint point, NSURL url);
 }
 
 #endif

@@ -48,28 +48,43 @@ public enum MTLCaptureDestination : long
 
 public extern objc class MTLCaptureDescriptor : NSObject, NSCopying
 {
-    [Selector("captureObject", "setCaptureObject:")] public AnyObject? CaptureObject { get; set; }
-    [Selector("destination", "setDestination:")] public MTLCaptureDestination Destination { get; set; }
-    [Selector("outputURL", "setOutputURL:")] public NSURL? OutputURL { get; set; }
+    [Selector("captureObject", "setCaptureObject:")]
+    public AnyObject? CaptureObject { get; set; }
+    [Selector("destination", "setDestination:")]
+    public MTLCaptureDestination Destination { get; set; }
+    [Selector("outputURL", "setOutputURL:")]
+    public NSURL? OutputURL { get; set; }
 }
 
 public extern objc class MTLCaptureManager : NSObject
 {
-    [Selector("defaultCaptureScope", "setDefaultCaptureScope:")] public MTLCaptureScope? DefaultCaptureScope { get; set; }
-    [Selector("isCapturing")] public bool IsCapturing { get; }
-    [Selector("sharedCaptureManager")] public static MTLCaptureManager SharedCaptureManager();
-    [Selector("newCaptureScopeWithDevice:")] public MTLCaptureScope NewCaptureScopeWithDevice(MTLDevice device);
-    [Selector("newCaptureScopeWithCommandQueue:")] public MTLCaptureScope NewCaptureScopeWithCommandQueue(MTLCommandQueue commandQueue);
-    [Selector("newCaptureScopeWithMTL4CommandQueue:")] public MTLCaptureScope NewCaptureScopeWithMTL4CommandQueue(MTL4CommandQueue commandQueue);
-    [Selector("supportsDestination:")] public bool SupportsDestination(MTLCaptureDestination destination);
-    [Selector("startCaptureWithDescriptor:error:")] public bool StartCaptureWithDescriptorError(MTLCaptureDescriptor descriptor, out NSError? error);
+    [Selector("defaultCaptureScope", "setDefaultCaptureScope:")]
+    public MTLCaptureScope? DefaultCaptureScope { get; set; }
+    [Selector("isCapturing")]
+    public bool IsCapturing { get; }
+    [Selector("sharedCaptureManager")]
+    public static MTLCaptureManager SharedCaptureManager();
+    [Selector("newCaptureScopeWithDevice:")]
+    public MTLCaptureScope NewCaptureScopeWithDevice(MTLDevice device);
+    [Selector("newCaptureScopeWithCommandQueue:")]
+    public MTLCaptureScope NewCaptureScopeWithCommandQueue(MTLCommandQueue commandQueue);
+    [Selector("newCaptureScopeWithMTL4CommandQueue:")]
+    public MTLCaptureScope NewCaptureScopeWithMTL4CommandQueue(MTL4CommandQueue commandQueue);
+    [Selector("supportsDestination:")]
+    public bool SupportsDestination(MTLCaptureDestination destination);
+    [Selector("startCaptureWithDescriptor:error:")]
+    public bool StartCaptureWithDescriptorError(MTLCaptureDescriptor descriptor, out NSError? error);
     /// Deprecated in macOS 10.15.
-    [Selector("startCaptureWithDevice:")] public void StartCaptureWithDevice(MTLDevice device);
+    [Selector("startCaptureWithDevice:")]
+    public void StartCaptureWithDevice(MTLDevice device);
     /// Deprecated in macOS 10.15.
-    [Selector("startCaptureWithCommandQueue:")] public void StartCaptureWithCommandQueue(MTLCommandQueue commandQueue);
+    [Selector("startCaptureWithCommandQueue:")]
+    public void StartCaptureWithCommandQueue(MTLCommandQueue commandQueue);
     /// Deprecated in macOS 10.15.
-    [Selector("startCaptureWithScope:")] public void StartCaptureWithScope(MTLCaptureScope captureScope);
-    [Selector("stopCapture")] public void StopCapture();
+    [Selector("startCaptureWithScope:")]
+    public void StartCaptureWithScope(MTLCaptureScope captureScope);
+    [Selector("stopCapture")]
+    public void StopCapture();
 }
 
 #endif

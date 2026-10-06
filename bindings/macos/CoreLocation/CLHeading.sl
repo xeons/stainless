@@ -38,13 +38,20 @@ public extern "C" CLLocationDegrees kCLHeadingFilterNone;
 
 public extern objc class CLHeading : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("magneticHeading")] public CLLocationDirection MagneticHeading { get; }
-    [Selector("trueHeading")] public CLLocationDirection TrueHeading { get; }
-    [Selector("headingAccuracy")] public CLLocationDirection HeadingAccuracy { get; }
-    [Selector("x")] public CLHeadingComponentValue X { get; }
-    [Selector("y")] public CLHeadingComponentValue Y { get; }
-    [Selector("z")] public CLHeadingComponentValue Z { get; }
-    [Selector("timestamp")] public NSDate Timestamp { get; }
+    [Selector("magneticHeading")]
+    public CLLocationDirection MagneticHeading { get; }
+    [Selector("trueHeading")]
+    public CLLocationDirection TrueHeading { get; }
+    [Selector("headingAccuracy")]
+    public CLLocationDirection HeadingAccuracy { get; }
+    [Selector("x")]
+    public CLHeadingComponentValue X { get; }
+    [Selector("y")]
+    public CLHeadingComponentValue Y { get; }
+    [Selector("z")]
+    public CLHeadingComponentValue Z { get; }
+    [Selector("timestamp")]
+    public NSDate Timestamp { get; }
 }
 
 #endif

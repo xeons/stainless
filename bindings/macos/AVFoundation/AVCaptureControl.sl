@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class AVCaptureControl : NSObject
 {
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
 }
 
 #endif

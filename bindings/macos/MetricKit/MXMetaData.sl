@@ -33,18 +33,29 @@ import Standard.ObjC;
 
 public extern objc class MXMetaData : NSObject, NSSecureCoding
 {
-    [Selector("regionFormat")] public NSString RegionFormat { get; }
-    [Selector("osVersion")] public NSString OsVersion { get; }
-    [Selector("deviceType")] public NSString DeviceType { get; }
-    [Selector("applicationBuildVersion")] public NSString ApplicationBuildVersion { get; }
-    [Selector("platformArchitecture")] public NSString PlatformArchitecture { get; }
-    [Selector("lowPowerModeEnabled")] public bool LowPowerModeEnabled { get; }
-    [Selector("isTestFlightApp")] public bool IsTestFlightApp { get; }
-    [Selector("pid")] public pid_t Pid { get; }
+    [Selector("regionFormat")]
+    public NSString RegionFormat { get; }
+    [Selector("osVersion")]
+    public NSString OsVersion { get; }
+    [Selector("deviceType")]
+    public NSString DeviceType { get; }
+    [Selector("applicationBuildVersion")]
+    public NSString ApplicationBuildVersion { get; }
+    [Selector("platformArchitecture")]
+    public NSString PlatformArchitecture { get; }
+    [Selector("lowPowerModeEnabled")]
+    public bool LowPowerModeEnabled { get; }
+    [Selector("isTestFlightApp")]
+    public bool IsTestFlightApp { get; }
+    [Selector("pid")]
+    public pid_t Pid { get; }
     /// macOS 26.0 and later.
-    [Selector("bundleIdentifier")] public NSString BundleIdentifier { get; }
-    [Selector("JSONRepresentation")] public NSData JSONRepresentation();
-    [Selector("dictionaryRepresentation")] public NSDictionary DictionaryRepresentation();
+    [Selector("bundleIdentifier")]
+    public NSString BundleIdentifier { get; }
+    [Selector("JSONRepresentation")]
+    public NSData JSONRepresentation();
+    [Selector("dictionaryRepresentation")]
+    public NSDictionary DictionaryRepresentation();
 }
 
 #endif

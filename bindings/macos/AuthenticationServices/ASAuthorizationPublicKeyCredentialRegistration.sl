@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public objc interface ASAuthorizationPublicKeyCredentialRegistration : ASPublicKeyCredential
 {
-    [Selector("rawAttestationObject")] NSData? RawAttestationObject { get; }
+    [Selector("rawAttestationObject")]
+    NSData? RawAttestationObject { get; }
 }
 
 #endif

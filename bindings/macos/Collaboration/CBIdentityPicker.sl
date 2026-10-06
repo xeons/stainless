@@ -36,13 +36,19 @@ public objc closure void CBIdentityPickerRunModalForWindowCompletionHandlerCompl
 
 public extern objc class CBIdentityPicker : NSObject
 {
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("allowsMultipleSelection", "setAllowsMultipleSelection:")] public bool AllowsMultipleSelection { get; set; }
-    [Selector("identities")] public NSArray Identities { get; }
-    [Selector("runModal")] public NSInteger RunModal();
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("allowsMultipleSelection", "setAllowsMultipleSelection:")]
+    public bool AllowsMultipleSelection { get; set; }
+    [Selector("identities")]
+    public NSArray Identities { get; }
+    [Selector("runModal")]
+    public NSInteger RunModal();
     /// Deprecated in macOS 10.11.
-    [Selector("runModalForWindow:modalDelegate:didEndSelector:contextInfo:")] public void RunModalForWindowModalDelegateDidEndSelectorContextInfo(NSWindow window, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
-    [Selector("runModalForWindow:completionHandler:")] public void RunModalForWindowCompletionHandler(NSWindow window, CBIdentityPickerRunModalForWindowCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("runModalForWindow:modalDelegate:didEndSelector:contextInfo:")]
+    public void RunModalForWindowModalDelegateDidEndSelectorContextInfo(NSWindow window, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
+    [Selector("runModalForWindow:completionHandler:")]
+    public void RunModalForWindowCompletionHandler(NSWindow window, CBIdentityPickerRunModalForWindowCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 #endif

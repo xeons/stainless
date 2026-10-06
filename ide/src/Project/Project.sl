@@ -57,16 +57,24 @@ public class Dependency
     /// the entry rather than anything inside it.
     public String Name;
 
-    [JsonName("path")]         public String Path;
-    [JsonName("git")]          public String Git;
-    [JsonName("tag")]          public String Tag;
-    [JsonName("branch")]       public String Branch;
-    [JsonName("rev")]          public String Rev;
-    [JsonName("subdirectory")] public String Subdirectory;
-    [JsonName("version")]      public String Version;
+    [JsonName("path")]
+    public String Path;
+    [JsonName("git")]
+    public String Git;
+    [JsonName("tag")]
+    public String Tag;
+    [JsonName("branch")]
+    public String Branch;
+    [JsonName("rev")]
+    public String Rev;
+    [JsonName("subdirectory")]
+    public String Subdirectory;
+    [JsonName("version")]
+    public String Version;
 
     /// `"source"` or `"shared"`; empty means the default, which is source.
-    [JsonName("link")] public String Link;
+    [JsonName("link")]
+    public String Link;
 
     public Dependency()
     {
@@ -113,9 +121,12 @@ public class Dependency
 [Reflect]
 public class PlatformOverlay
 {
-    [JsonName("sources")]   public String[] Sources;
-    [JsonName("libraries")] public String[] Libraries;
-    [JsonName("defines")]   public String[] Defines;
+    [JsonName("sources")]
+    public String[] Sources;
+    [JsonName("libraries")]
+    public String[] Libraries;
+    [JsonName("defines")]
+    public String[] Defines;
 
     public PlatformOverlay()
     {
@@ -142,28 +153,43 @@ public class PlatformOverlay
 [Reflect]
 public class ProjectFile
 {
-    [JsonName("format")]          public int Format;
-    [JsonName("name")]            public String Name;
-    [JsonName("version")]         public String Version;
+    [JsonName("format")]
+    public int Format;
+    [JsonName("name")]
+    public String Name;
+    [JsonName("version")]
+    public String Version;
 
     /// `"executable"` or `"library"`.
-    [JsonName("kind")]            public String Kind;
+    [JsonName("kind")]
+    public String Kind;
 
-    [JsonName("sources")]         public String[] Sources;
-    [JsonName("output")]          public String Output;
-    [JsonName("buildDirectory")]  public String BuildDirectory;
-    [JsonName("objectDirectory")] public String ObjectDirectory;
-    [JsonName("header")]          public String Header;
-    [JsonName("libraries")]       public String[] Libraries;
-    [JsonName("defines")]         public String[] Defines;
-    [JsonName("optimize")]        public int Optimize;
-    [JsonName("debug")]           public bool Debug;
+    [JsonName("sources")]
+    public String[] Sources;
+    [JsonName("output")]
+    public String Output;
+    [JsonName("buildDirectory")]
+    public String BuildDirectory;
+    [JsonName("objectDirectory")]
+    public String ObjectDirectory;
+    [JsonName("header")]
+    public String Header;
+    [JsonName("libraries")]
+    public String[] Libraries;
+    [JsonName("defines")]
+    public String[] Defines;
+    [JsonName("optimize")]
+    public int Optimize;
+    [JsonName("debug")]
+    public bool Debug;
 
     /// `"microsoft"` or `"itanium"`; empty is the host's.
-    [JsonName("abi")]             public String Abi;
+    [JsonName("abi")]
+    public String Abi;
 
     /// `"shared"` or `"static"`; empty lets the build decide.
-    [JsonName("runtime")]         public String Runtime;
+    [JsonName("runtime")]
+    public String Runtime;
 
     /// What Windows, Linux and macOS each add.
     ///
@@ -175,9 +201,12 @@ public class ProjectFile
     /// naming no Windows section and one naming an empty Windows section mean
     /// the same thing, and there is nothing a reader could do with the
     /// difference.
-    [JsonIgnore] public PlatformOverlay Windows;
-    [JsonIgnore] public PlatformOverlay Linux;
-    [JsonIgnore] public PlatformOverlay Macos;
+    [JsonIgnore]
+    public PlatformOverlay Windows;
+    [JsonIgnore]
+    public PlatformOverlay Linux;
+    [JsonIgnore]
+    public PlatformOverlay Macos;
 
     /// What it depends on, by name.
     ///
@@ -187,10 +216,12 @@ public class ProjectFile
     /// there is no way to ask a `Type` for an instance, so nothing here could
     /// make one. It is thirty lines of walking a `JsonObject` rather than a
     /// reason to give up on reflection for the other fourteen fields.
-    [JsonIgnore] public List<Dependency> Dependencies;
+    [JsonIgnore]
+    public List<Dependency> Dependencies;
 
     /// The directory the file was read from. Not part of the document.
-    [JsonIgnore] public String Directory;
+    [JsonIgnore]
+    public String Directory;
 
     public ProjectFile()
     {

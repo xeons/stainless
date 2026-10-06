@@ -38,14 +38,22 @@ public enum NSComboButtonStyle : long
 
 public extern objc class NSComboButton : NSControl
 {
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("imageScaling", "setImageScaling:")] public NSImageScaling ImageScaling { get; set; }
-    [Selector("menu", "setMenu:")] public NSMenu Menu { get; set; }
-    [Selector("style", "setStyle:")] public NSComboButtonStyle Style { get; set; }
-    [Selector("comboButtonWithTitle:menu:target:action:")] public static Self ComboButtonWithTitleMenuTargetAction(NSString title, NSMenu? menu, AnyObject? target, Selector action);
-    [Selector("comboButtonWithImage:menu:target:action:")] public static Self ComboButtonWithImageMenuTargetAction(NSImage image, NSMenu? menu, AnyObject? target, Selector action);
-    [Selector("comboButtonWithTitle:image:menu:target:action:")] public static Self ComboButtonWithTitleImageMenuTargetAction(NSString title, NSImage image, NSMenu? menu, AnyObject? target, Selector action);
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("imageScaling", "setImageScaling:")]
+    public NSImageScaling ImageScaling { get; set; }
+    [Selector("menu", "setMenu:")]
+    public NSMenu Menu { get; set; }
+    [Selector("style", "setStyle:")]
+    public NSComboButtonStyle Style { get; set; }
+    [Selector("comboButtonWithTitle:menu:target:action:")]
+    public static Self ComboButtonWithTitleMenuTargetAction(NSString title, NSMenu? menu, AnyObject? target, Selector action);
+    [Selector("comboButtonWithImage:menu:target:action:")]
+    public static Self ComboButtonWithImageMenuTargetAction(NSImage image, NSMenu? menu, AnyObject? target, Selector action);
+    [Selector("comboButtonWithTitle:image:menu:target:action:")]
+    public static Self ComboButtonWithTitleImageMenuTargetAction(NSString title, NSImage image, NSMenu? menu, AnyObject? target, Selector action);
 }
 
 #endif

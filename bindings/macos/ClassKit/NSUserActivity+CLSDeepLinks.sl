@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// CLSDeepLinks, a category of NSUserActivity.
 public extern objc class NSUserActivity
 {
-    [Selector("isClassKitDeepLink")] public bool IsClassKitDeepLink { get; }
-    [Selector("contextIdentifierPath")] public NSArray? ContextIdentifierPath { get; }
+    [Selector("isClassKitDeepLink")]
+    public bool IsClassKitDeepLink { get; }
+    [Selector("contextIdentifierPath")]
+    public NSArray? ContextIdentifierPath { get; }
 }
 
 #endif

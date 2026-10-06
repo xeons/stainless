@@ -30,15 +30,20 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreServices")
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? MDSchemaCopyAttributesForContentType(CFStringRef? contentTypeUTI);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? MDSchemaCopyAttributesForContentType(CFStringRef? contentTypeUTI);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? MDSchemaCopyMetaAttributesForAttribute(CFStringRef? name);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? MDSchemaCopyMetaAttributesForAttribute(CFStringRef? name);
 
-[ReturnsRetained] public extern "C" CFArrayRef? MDSchemaCopyAllAttributes();
+[ReturnsRetained]
+public extern "C" CFArrayRef? MDSchemaCopyAllAttributes();
 
-[ReturnsRetained] public extern "C" CFStringRef? MDSchemaCopyDisplayNameForAttribute(CFStringRef? name);
+[ReturnsRetained]
+public extern "C" CFStringRef? MDSchemaCopyDisplayNameForAttribute(CFStringRef? name);
 
-[ReturnsRetained] public extern "C" CFStringRef? MDSchemaCopyDisplayDescriptionForAttribute(CFStringRef? name);
+[ReturnsRetained]
+public extern "C" CFStringRef? MDSchemaCopyDisplayDescriptionForAttribute(CFStringRef? name);
 
 public extern "C" CFStringRef? kMDAttributeDisplayValues;
 

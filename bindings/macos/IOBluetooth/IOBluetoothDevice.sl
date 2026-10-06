@@ -34,97 +34,170 @@ import Standard.ObjC;
 
 public objc interface IOBluetoothDeviceAsyncCallbacks
 {
-    [Selector("remoteNameRequestComplete:status:")] void RemoteNameRequestCompleteStatus(IOBluetoothDevice? device, IOReturn status);
-    [Selector("connectionComplete:status:")] void ConnectionCompleteStatus(IOBluetoothDevice? device, IOReturn status);
-    [Selector("sdpQueryComplete:status:")] void SdpQueryCompleteStatus(IOBluetoothDevice? device, IOReturn status);
+    [Selector("remoteNameRequestComplete:status:")]
+    void RemoteNameRequestCompleteStatus(IOBluetoothDevice? device, IOReturn status);
+    [Selector("connectionComplete:status:")]
+    void ConnectionCompleteStatus(IOBluetoothDevice? device, IOReturn status);
+    [Selector("sdpQueryComplete:status:")]
+    void SdpQueryCompleteStatus(IOBluetoothDevice? device, IOReturn status);
 }
 
 public extern objc class IOBluetoothDevice : IOBluetoothObject, NSCoding, NSSecureCoding
 {
-    [Selector("classOfDevice")] public BluetoothClassOfDevice ClassOfDevice { get; }
-    [Selector("serviceClassMajor")] public BluetoothServiceClassMajor ServiceClassMajor { get; }
-    [Selector("deviceClassMajor")] public BluetoothDeviceClassMajor DeviceClassMajor { get; }
-    [Selector("deviceClassMinor")] public BluetoothDeviceClassMinor DeviceClassMinor { get; }
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("nameOrAddress")] public NSString? NameOrAddress { get; }
-    [Selector("lastNameUpdate")] public NSDate? LastNameUpdate { get; }
-    [Selector("addressString")] public NSString? AddressString { get; }
-    [Selector("connectionHandle")] public BluetoothConnectionHandle ConnectionHandle { get; }
-    [Selector("services")] public NSArray? Services { get; }
-    [Selector("registerForConnectNotifications:selector:")] public static IOBluetoothUserNotification? RegisterForConnectNotificationsSelector(AnyObject? observer, Selector inSelector);
-    [Selector("registerForDisconnectNotification:selector:")] public IOBluetoothUserNotification? RegisterForDisconnectNotificationSelector(AnyObject? observer, Selector inSelector);
-    [Selector("deviceWithAddress:")] public static Self? DeviceWithAddress(BluetoothDeviceAddress* address);
+    [Selector("classOfDevice")]
+    public BluetoothClassOfDevice ClassOfDevice { get; }
+    [Selector("serviceClassMajor")]
+    public BluetoothServiceClassMajor ServiceClassMajor { get; }
+    [Selector("deviceClassMajor")]
+    public BluetoothDeviceClassMajor DeviceClassMajor { get; }
+    [Selector("deviceClassMinor")]
+    public BluetoothDeviceClassMinor DeviceClassMinor { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("nameOrAddress")]
+    public NSString? NameOrAddress { get; }
+    [Selector("lastNameUpdate")]
+    public NSDate? LastNameUpdate { get; }
+    [Selector("addressString")]
+    public NSString? AddressString { get; }
+    [Selector("connectionHandle")]
+    public BluetoothConnectionHandle ConnectionHandle { get; }
+    [Selector("services")]
+    public NSArray? Services { get; }
+    [Selector("registerForConnectNotifications:selector:")]
+    public static IOBluetoothUserNotification? RegisterForConnectNotificationsSelector(AnyObject? observer, Selector inSelector);
+    [Selector("registerForDisconnectNotification:selector:")]
+    public IOBluetoothUserNotification? RegisterForDisconnectNotificationSelector(AnyObject? observer, Selector inSelector);
+    [Selector("deviceWithAddress:")]
+    public static Self? DeviceWithAddress(BluetoothDeviceAddress* address);
     /// Deprecated in macOS 10.7.
-    [Selector("withAddress:")] public static Self? WithAddress(BluetoothDeviceAddress* address);
-    [Selector("deviceWithAddressString:")] public static Self? DeviceWithAddressString(NSString? address);
+    [Selector("withAddress:")]
+    public static Self? WithAddress(BluetoothDeviceAddress* address);
+    [Selector("deviceWithAddressString:")]
+    public static Self? DeviceWithAddressString(NSString? address);
     /// Deprecated in macOS 10.7.
-    [Selector("withDeviceRef:")] public static Self? WithDeviceRef(IOBluetoothDeviceRef deviceRef);
+    [Selector("withDeviceRef:")]
+    public static Self? WithDeviceRef(IOBluetoothDeviceRef deviceRef);
     /// Deprecated in macOS 10.7.
-    [Selector("getDeviceRef")] public IOBluetoothDeviceRef GetDeviceRef();
-    [Selector("openL2CAPChannelSync:withPSM:delegate:")] public IOReturn OpenL2CAPChannelSyncWithPSMDelegate(out IOBluetoothL2CAPChannel? newChannel, BluetoothL2CAPPSM psm, AnyObject? channelDelegate);
-    [Selector("openL2CAPChannelAsync:withPSM:delegate:")] public IOReturn OpenL2CAPChannelAsyncWithPSMDelegate(out IOBluetoothL2CAPChannel? newChannel, BluetoothL2CAPPSM psm, AnyObject? channelDelegate);
+    [Selector("getDeviceRef")]
+    public IOBluetoothDeviceRef GetDeviceRef();
+    [Selector("openL2CAPChannelSync:withPSM:delegate:")]
+    public IOReturn OpenL2CAPChannelSyncWithPSMDelegate(out IOBluetoothL2CAPChannel? newChannel, BluetoothL2CAPPSM psm, AnyObject? channelDelegate);
+    [Selector("openL2CAPChannelAsync:withPSM:delegate:")]
+    public IOReturn OpenL2CAPChannelAsyncWithPSMDelegate(out IOBluetoothL2CAPChannel? newChannel, BluetoothL2CAPPSM psm, AnyObject? channelDelegate);
     /// Deprecated in macOS 10.5.
-    [Selector("openL2CAPChannel:findExisting:newChannel:")] public IOReturn OpenL2CAPChannelFindExistingNewChannel(BluetoothL2CAPPSM psm, bool findExisting, out IOBluetoothL2CAPChannel? newChannel);
-    [Selector("sendL2CAPEchoRequest:length:")] public IOReturn SendL2CAPEchoRequestLength(void* data, UInt16 length);
+    [Selector("openL2CAPChannel:findExisting:newChannel:")]
+    public IOReturn OpenL2CAPChannelFindExistingNewChannel(BluetoothL2CAPPSM psm, bool findExisting, out IOBluetoothL2CAPChannel? newChannel);
+    [Selector("sendL2CAPEchoRequest:length:")]
+    public IOReturn SendL2CAPEchoRequestLength(void* data, UInt16 length);
     /// Deprecated in macOS 10.5.
-    [Selector("openRFCOMMChannel:channel:")] public IOReturn OpenRFCOMMChannelChannel(BluetoothRFCOMMChannelID channelID, out IOBluetoothRFCOMMChannel? rfcommChannel);
-    [Selector("openRFCOMMChannelSync:withChannelID:delegate:")] public IOReturn OpenRFCOMMChannelSyncWithChannelIDDelegate(out IOBluetoothRFCOMMChannel? rfcommChannel, BluetoothRFCOMMChannelID channelID, AnyObject? channelDelegate);
-    [Selector("openRFCOMMChannelAsync:withChannelID:delegate:")] public IOReturn OpenRFCOMMChannelAsyncWithChannelIDDelegate(out IOBluetoothRFCOMMChannel? rfcommChannel, BluetoothRFCOMMChannelID channelID, AnyObject? channelDelegate);
+    [Selector("openRFCOMMChannel:channel:")]
+    public IOReturn OpenRFCOMMChannelChannel(BluetoothRFCOMMChannelID channelID, out IOBluetoothRFCOMMChannel? rfcommChannel);
+    [Selector("openRFCOMMChannelSync:withChannelID:delegate:")]
+    public IOReturn OpenRFCOMMChannelSyncWithChannelIDDelegate(out IOBluetoothRFCOMMChannel? rfcommChannel, BluetoothRFCOMMChannelID channelID, AnyObject? channelDelegate);
+    [Selector("openRFCOMMChannelAsync:withChannelID:delegate:")]
+    public IOReturn OpenRFCOMMChannelAsyncWithChannelIDDelegate(out IOBluetoothRFCOMMChannel? rfcommChannel, BluetoothRFCOMMChannelID channelID, AnyObject? channelDelegate);
     /// Deprecated in macOS 10.7.
-    [Selector("getClassOfDevice")] public BluetoothClassOfDevice GetClassOfDevice();
+    [Selector("getClassOfDevice")]
+    public BluetoothClassOfDevice GetClassOfDevice();
     /// Deprecated in macOS 10.7.
-    [Selector("getServiceClassMajor")] public BluetoothServiceClassMajor GetServiceClassMajor();
+    [Selector("getServiceClassMajor")]
+    public BluetoothServiceClassMajor GetServiceClassMajor();
     /// Deprecated in macOS 10.7.
-    [Selector("getDeviceClassMajor")] public BluetoothDeviceClassMajor GetDeviceClassMajor();
+    [Selector("getDeviceClassMajor")]
+    public BluetoothDeviceClassMajor GetDeviceClassMajor();
     /// Deprecated in macOS 10.7.
-    [Selector("getDeviceClassMinor")] public BluetoothDeviceClassMinor GetDeviceClassMinor();
+    [Selector("getDeviceClassMinor")]
+    public BluetoothDeviceClassMinor GetDeviceClassMinor();
     /// Deprecated in macOS 10.6.
-    [Selector("getName")] public NSString? GetName();
+    [Selector("getName")]
+    public NSString? GetName();
     /// Deprecated in macOS 10.6.
-    [Selector("getNameOrAddress")] public NSString? GetNameOrAddress();
+    [Selector("getNameOrAddress")]
+    public NSString? GetNameOrAddress();
     /// Deprecated in macOS 10.7.
-    [Selector("getLastNameUpdate")] public NSDate? GetLastNameUpdate();
-    [Selector("getAddress")] public BluetoothDeviceAddress* GetAddress();
+    [Selector("getLastNameUpdate")]
+    public NSDate? GetLastNameUpdate();
+    [Selector("getAddress")]
+    public BluetoothDeviceAddress* GetAddress();
     /// Deprecated in macOS 10.7.
-    [Selector("getAddressString")] public NSString? GetAddressString();
-    [Selector("getPageScanRepetitionMode")] public BluetoothPageScanRepetitionMode GetPageScanRepetitionMode();
-    [Selector("getPageScanPeriodMode")] public BluetoothPageScanPeriodMode GetPageScanPeriodMode();
-    [Selector("getPageScanMode")] public BluetoothPageScanMode GetPageScanMode();
-    [Selector("getClockOffset")] public BluetoothClockOffset GetClockOffset();
-    [Selector("getLastInquiryUpdate")] public NSDate? GetLastInquiryUpdate();
-    [Selector("RSSI")] public BluetoothHCIRSSIValue RSSI();
-    [Selector("rawRSSI")] public BluetoothHCIRSSIValue RawRSSI();
-    [Selector("isConnected")] public bool IsConnected();
-    [Selector("openConnection")] public IOReturn OpenConnection();
-    [Selector("openConnection:")] public IOReturn OpenConnection(AnyObject? target);
-    [Selector("openConnection:withPageTimeout:authenticationRequired:")] public IOReturn OpenConnectionWithPageTimeoutAuthenticationRequired(AnyObject? target, BluetoothHCIPageTimeout pageTimeoutValue, bool authenticationRequired);
-    [Selector("closeConnection")] public IOReturn CloseConnection();
-    [Selector("remoteNameRequest:")] public IOReturn RemoteNameRequest(AnyObject? target);
-    [Selector("remoteNameRequest:withPageTimeout:")] public IOReturn RemoteNameRequestWithPageTimeout(AnyObject? target, BluetoothHCIPageTimeout pageTimeoutValue);
-    [Selector("requestAuthentication")] public IOReturn RequestAuthentication();
+    [Selector("getAddressString")]
+    public NSString? GetAddressString();
+    [Selector("getPageScanRepetitionMode")]
+    public BluetoothPageScanRepetitionMode GetPageScanRepetitionMode();
+    [Selector("getPageScanPeriodMode")]
+    public BluetoothPageScanPeriodMode GetPageScanPeriodMode();
+    [Selector("getPageScanMode")]
+    public BluetoothPageScanMode GetPageScanMode();
+    [Selector("getClockOffset")]
+    public BluetoothClockOffset GetClockOffset();
+    [Selector("getLastInquiryUpdate")]
+    public NSDate? GetLastInquiryUpdate();
+    [Selector("RSSI")]
+    public BluetoothHCIRSSIValue RSSI();
+    [Selector("rawRSSI")]
+    public BluetoothHCIRSSIValue RawRSSI();
+    [Selector("isConnected")]
+    public bool IsConnected();
+    [Selector("openConnection")]
+    public IOReturn OpenConnection();
+    [Selector("openConnection:")]
+    public IOReturn OpenConnection(AnyObject? target);
+    [Selector("openConnection:withPageTimeout:authenticationRequired:")]
+    public IOReturn OpenConnectionWithPageTimeoutAuthenticationRequired(AnyObject? target, BluetoothHCIPageTimeout pageTimeoutValue, bool authenticationRequired);
+    [Selector("closeConnection")]
+    public IOReturn CloseConnection();
+    [Selector("remoteNameRequest:")]
+    public IOReturn RemoteNameRequest(AnyObject? target);
+    [Selector("remoteNameRequest:withPageTimeout:")]
+    public IOReturn RemoteNameRequestWithPageTimeout(AnyObject? target, BluetoothHCIPageTimeout pageTimeoutValue);
+    [Selector("requestAuthentication")]
+    public IOReturn RequestAuthentication();
     /// Deprecated in macOS 10.7.
-    [Selector("getConnectionHandle")] public BluetoothConnectionHandle GetConnectionHandle();
-    [Selector("isIncoming")] public bool IsIncoming();
-    [Selector("getLinkType")] public BluetoothLinkType GetLinkType();
-    [Selector("getEncryptionMode")] public BluetoothHCIEncryptionMode GetEncryptionMode();
-    [Selector("performSDPQuery:")] public IOReturn PerformSDPQuery(AnyObject? target);
-    [Selector("performSDPQuery:uuids:")] public IOReturn PerformSDPQueryUuids(AnyObject? target, NSArray? uuidArray);
+    [Selector("getConnectionHandle")]
+    public BluetoothConnectionHandle GetConnectionHandle();
+    [Selector("isIncoming")]
+    public bool IsIncoming();
+    [Selector("getLinkType")]
+    public BluetoothLinkType GetLinkType();
+    [Selector("getEncryptionMode")]
+    public BluetoothHCIEncryptionMode GetEncryptionMode();
+    [Selector("performSDPQuery:")]
+    public IOReturn PerformSDPQuery(AnyObject? target);
+    [Selector("performSDPQuery:uuids:")]
+    public IOReturn PerformSDPQueryUuids(AnyObject? target, NSArray? uuidArray);
     /// Deprecated in macOS 10.7.
-    [Selector("getServices")] public NSArray? GetServices();
-    [Selector("getLastServicesUpdate")] public NSDate? GetLastServicesUpdate();
-    [Selector("getServiceRecordForUUID:")] public IOBluetoothSDPServiceRecord? GetServiceRecordForUUID(IOBluetoothSDPUUID? sdpUUID);
-    [Selector("favoriteDevices")] public static NSArray? FavoriteDevices();
-    [Selector("isFavorite")] public bool IsFavorite();
-    [Selector("addToFavorites")] public IOReturn AddToFavorites();
-    [Selector("removeFromFavorites")] public IOReturn RemoveFromFavorites();
-    [Selector("recentDevices:")] public static NSArray? RecentDevices(ulong numDevices);
-    [Selector("recentAccessDate")] public NSDate? RecentAccessDate();
-    [Selector("pairedDevices")] public static NSArray? PairedDevices();
-    [Selector("isPaired")] public bool IsPaired();
-    [Selector("setSupervisionTimeout:")] public IOReturn SetSupervisionTimeout(UInt16 timeout);
-    [Selector("openL2CAPChannelSync:withPSM:withConfiguration:delegate:")] public IOReturn OpenL2CAPChannelSyncWithPSMWithConfigurationDelegate(out IOBluetoothL2CAPChannel? newChannel, BluetoothL2CAPPSM psm, NSDictionary? channelConfiguration, AnyObject? channelDelegate);
-    [Selector("openL2CAPChannelAsync:withPSM:withConfiguration:delegate:")] public IOReturn OpenL2CAPChannelAsyncWithPSMWithConfigurationDelegate(out IOBluetoothL2CAPChannel? newChannel, BluetoothL2CAPPSM psm, NSDictionary? channelConfiguration, AnyObject? channelDelegate);
-    [ReturnsRetained] [Selector("awakeAfterUsingCoder:")] public AnyObject? AwakeAfterUsingCoder(NSCoder? coder);
+    [Selector("getServices")]
+    public NSArray? GetServices();
+    [Selector("getLastServicesUpdate")]
+    public NSDate? GetLastServicesUpdate();
+    [Selector("getServiceRecordForUUID:")]
+    public IOBluetoothSDPServiceRecord? GetServiceRecordForUUID(IOBluetoothSDPUUID? sdpUUID);
+    [Selector("favoriteDevices")]
+    public static NSArray? FavoriteDevices();
+    [Selector("isFavorite")]
+    public bool IsFavorite();
+    [Selector("addToFavorites")]
+    public IOReturn AddToFavorites();
+    [Selector("removeFromFavorites")]
+    public IOReturn RemoveFromFavorites();
+    [Selector("recentDevices:")]
+    public static NSArray? RecentDevices(ulong numDevices);
+    [Selector("recentAccessDate")]
+    public NSDate? RecentAccessDate();
+    [Selector("pairedDevices")]
+    public static NSArray? PairedDevices();
+    [Selector("isPaired")]
+    public bool IsPaired();
+    [Selector("setSupervisionTimeout:")]
+    public IOReturn SetSupervisionTimeout(UInt16 timeout);
+    [Selector("openL2CAPChannelSync:withPSM:withConfiguration:delegate:")]
+    public IOReturn OpenL2CAPChannelSyncWithPSMWithConfigurationDelegate(out IOBluetoothL2CAPChannel? newChannel, BluetoothL2CAPPSM psm, NSDictionary? channelConfiguration, AnyObject? channelDelegate);
+    [Selector("openL2CAPChannelAsync:withPSM:withConfiguration:delegate:")]
+    public IOReturn OpenL2CAPChannelAsyncWithPSMWithConfigurationDelegate(out IOBluetoothL2CAPChannel? newChannel, BluetoothL2CAPPSM psm, NSDictionary? channelConfiguration, AnyObject? channelDelegate);
+    [ReturnsRetained]
+    [Selector("awakeAfterUsingCoder:")]
+    public AnyObject? AwakeAfterUsingCoder(NSCoder? coder);
 }
 
 public const NSString kIOBluetoothDeviceNotificationNameConnected = "IOBluetoothDeviceConnected";

@@ -42,7 +42,8 @@ public extern "C" CFStringRef kCFPreferencesAnyUser;
 
 public extern "C" CFStringRef kCFPreferencesCurrentUser;
 
-[ReturnsRetained] public extern "C" CFPropertyListRef? CFPreferencesCopyAppValue(CFStringRef key, CFStringRef applicationID);
+[ReturnsRetained]
+public extern "C" CFPropertyListRef? CFPreferencesCopyAppValue(CFStringRef key, CFStringRef applicationID);
 
 public extern "C" Boolean CFPreferencesGetAppBooleanValue(CFStringRef key, CFStringRef applicationID, Boolean* keyExistsAndHasValidFormat);
 
@@ -56,9 +57,11 @@ public extern "C" void CFPreferencesRemoveSuitePreferencesFromApp(CFStringRef ap
 
 public extern "C" Boolean CFPreferencesAppSynchronize(CFStringRef applicationID);
 
-[ReturnsRetained] public extern "C" CFPropertyListRef? CFPreferencesCopyValue(CFStringRef key, CFStringRef applicationID, CFStringRef userName, CFStringRef hostName);
+[ReturnsRetained]
+public extern "C" CFPropertyListRef? CFPreferencesCopyValue(CFStringRef key, CFStringRef applicationID, CFStringRef userName, CFStringRef hostName);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef CFPreferencesCopyMultiple(CFArrayRef? keysToFetch, CFStringRef applicationID, CFStringRef userName, CFStringRef hostName);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef CFPreferencesCopyMultiple(CFArrayRef? keysToFetch, CFStringRef applicationID, CFStringRef userName, CFStringRef hostName);
 
 public extern "C" void CFPreferencesSetValue(CFStringRef key, CFPropertyListRef? value, CFStringRef applicationID, CFStringRef userName, CFStringRef hostName);
 
@@ -67,9 +70,11 @@ public extern "C" void CFPreferencesSetMultiple(CFDictionaryRef? keysToSet, CFAr
 public extern "C" Boolean CFPreferencesSynchronize(CFStringRef applicationID, CFStringRef userName, CFStringRef hostName);
 
 /// Deprecated in macOS 10.9.
-[ReturnsRetained] public extern "C" CFArrayRef? CFPreferencesCopyApplicationList(CFStringRef userName, CFStringRef hostName);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFPreferencesCopyApplicationList(CFStringRef userName, CFStringRef hostName);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFPreferencesCopyKeyList(CFStringRef applicationID, CFStringRef userName, CFStringRef hostName);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFPreferencesCopyKeyList(CFStringRef applicationID, CFStringRef userName, CFStringRef hostName);
 
 public extern "C" Boolean CFPreferencesAppValueIsForced(CFStringRef key, CFStringRef applicationID);
 

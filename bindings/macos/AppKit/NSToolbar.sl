@@ -60,39 +60,76 @@ public enum NSToolbarSizeMode : ulong
 
 public extern objc class NSToolbar : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public NSToolbarDelegate? Delegate { get; set; }
-    [Selector("isVisible", "setVisible:")] public bool Visible { get; set; }
-    [Selector("customizationPaletteIsRunning")] public bool CustomizationPaletteIsRunning { get; }
-    [Selector("displayMode", "setDisplayMode:")] public NSToolbarDisplayMode DisplayMode { get; set; }
-    [Selector("selectedItemIdentifier", "setSelectedItemIdentifier:")] public NSToolbarItemIdentifier? SelectedItemIdentifier { get; set; }
-    [Selector("allowsUserCustomization", "setAllowsUserCustomization:")] public bool AllowsUserCustomization { get; set; }
-    [Selector("allowsDisplayModeCustomization", "setAllowsDisplayModeCustomization:")] public bool AllowsDisplayModeCustomization { get; set; }
-    [Selector("identifier")] public NSToolbarIdentifier Identifier { get; }
-    [Selector("items")] public NSArray Items { get; }
-    [Selector("visibleItems")] public NSArray? VisibleItems { get; }
-    [Selector("itemIdentifiers", "setItemIdentifiers:")] public NSArray ItemIdentifiers { get; set; }
-    [Selector("centeredItemIdentifiers", "setCenteredItemIdentifiers:")] public NSSet CenteredItemIdentifiers { get; set; }
-    [Selector("autosavesConfiguration", "setAutosavesConfiguration:")] public bool AutosavesConfiguration { get; set; }
-    [Selector("allowsExtensionItems", "setAllowsExtensionItems:")] public bool AllowsExtensionItems { get; set; }
-    [Selector("initWithIdentifier:")] public Self InitWithIdentifier(NSToolbarIdentifier identifier);
-    [Selector("init")] public Self Init();
-    [Selector("insertItemWithItemIdentifier:atIndex:")] public void InsertItemWithItemIdentifierAtIndex(NSToolbarItemIdentifier itemIdentifier, NSInteger index);
-    [Selector("removeItemAtIndex:")] public void RemoveItemAtIndex(NSInteger index);
-    [Selector("removeItemWithItemIdentifier:")] public void RemoveItemWithItemIdentifier(NSToolbarItemIdentifier itemIdentifier);
-    [Selector("runCustomizationPalette:")] public void RunCustomizationPalette(AnyObject? sender);
-    [Selector("validateVisibleItems")] public void ValidateVisibleItems();
+    [Selector("delegate", "setDelegate:")]
+    public NSToolbarDelegate? Delegate { get; set; }
+    [Selector("isVisible", "setVisible:")]
+    public bool Visible { get; set; }
+    [Selector("customizationPaletteIsRunning")]
+    public bool CustomizationPaletteIsRunning { get; }
+    [Selector("displayMode", "setDisplayMode:")]
+    public NSToolbarDisplayMode DisplayMode { get; set; }
+    [Selector("selectedItemIdentifier", "setSelectedItemIdentifier:")]
+    public NSToolbarItemIdentifier? SelectedItemIdentifier { get; set; }
+    [Selector("allowsUserCustomization", "setAllowsUserCustomization:")]
+    public bool AllowsUserCustomization { get; set; }
+    [Selector("allowsDisplayModeCustomization", "setAllowsDisplayModeCustomization:")]
+    public bool AllowsDisplayModeCustomization { get; set; }
+    [Selector("identifier")]
+    public NSToolbarIdentifier Identifier { get; }
+    [Selector("items")]
+    public NSArray Items { get; }
+    [Selector("visibleItems")]
+    public NSArray? VisibleItems { get; }
+    [Selector("itemIdentifiers", "setItemIdentifiers:")]
+    public NSArray ItemIdentifiers { get; set; }
+    [Selector("centeredItemIdentifiers", "setCenteredItemIdentifiers:")]
+    public NSSet CenteredItemIdentifiers { get; set; }
+    [Selector("autosavesConfiguration", "setAutosavesConfiguration:")]
+    public bool AutosavesConfiguration { get; set; }
+    [Selector("allowsExtensionItems", "setAllowsExtensionItems:")]
+    public bool AllowsExtensionItems { get; set; }
+    [Selector("initWithIdentifier:")]
+    public Self InitWithIdentifier(NSToolbarIdentifier identifier);
+    [Selector("init")]
+    public Self Init();
+    [Selector("insertItemWithItemIdentifier:atIndex:")]
+    public void InsertItemWithItemIdentifierAtIndex(NSToolbarItemIdentifier itemIdentifier, NSInteger index);
+    [Selector("removeItemAtIndex:")]
+    public void RemoveItemAtIndex(NSInteger index);
+    [Selector("removeItemWithItemIdentifier:")]
+    public void RemoveItemWithItemIdentifier(NSToolbarItemIdentifier itemIdentifier);
+    [Selector("runCustomizationPalette:")]
+    public void RunCustomizationPalette(AnyObject? sender);
+    [Selector("validateVisibleItems")]
+    public void ValidateVisibleItems();
 }
 
 public objc interface NSToolbarDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("toolbar:itemForItemIdentifier:willBeInsertedIntoToolbar:")] NSToolbarItem? ToolbarItemForItemIdentifierWillBeInsertedIntoToolbar(NSToolbar toolbar, NSToolbarItemIdentifier itemIdentifier, bool flag);
-    [Optional] [Selector("toolbarDefaultItemIdentifiers:")] NSArray ToolbarDefaultItemIdentifiers(NSToolbar toolbar);
-    [Optional] [Selector("toolbarAllowedItemIdentifiers:")] NSArray ToolbarAllowedItemIdentifiers(NSToolbar toolbar);
-    [Optional] [Selector("toolbarSelectableItemIdentifiers:")] NSArray ToolbarSelectableItemIdentifiers(NSToolbar toolbar);
-    [Optional] [Selector("toolbarImmovableItemIdentifiers:")] NSSet ToolbarImmovableItemIdentifiers(NSToolbar toolbar);
-    [Optional] [Selector("toolbar:itemIdentifier:canBeInsertedAtIndex:")] bool ToolbarItemIdentifierCanBeInsertedAtIndex(NSToolbar toolbar, NSToolbarItemIdentifier itemIdentifier, NSInteger index);
-    [Optional] [Selector("toolbarWillAddItem:")] void ToolbarWillAddItem(NSNotification notification);
-    [Optional] [Selector("toolbarDidRemoveItem:")] void ToolbarDidRemoveItem(NSNotification notification);
+    [Optional]
+    [Selector("toolbar:itemForItemIdentifier:willBeInsertedIntoToolbar:")]
+    NSToolbarItem? ToolbarItemForItemIdentifierWillBeInsertedIntoToolbar(NSToolbar toolbar, NSToolbarItemIdentifier itemIdentifier, bool flag);
+    [Optional]
+    [Selector("toolbarDefaultItemIdentifiers:")]
+    NSArray ToolbarDefaultItemIdentifiers(NSToolbar toolbar);
+    [Optional]
+    [Selector("toolbarAllowedItemIdentifiers:")]
+    NSArray ToolbarAllowedItemIdentifiers(NSToolbar toolbar);
+    [Optional]
+    [Selector("toolbarSelectableItemIdentifiers:")]
+    NSArray ToolbarSelectableItemIdentifiers(NSToolbar toolbar);
+    [Optional]
+    [Selector("toolbarImmovableItemIdentifiers:")]
+    NSSet ToolbarImmovableItemIdentifiers(NSToolbar toolbar);
+    [Optional]
+    [Selector("toolbar:itemIdentifier:canBeInsertedAtIndex:")]
+    bool ToolbarItemIdentifierCanBeInsertedAtIndex(NSToolbar toolbar, NSToolbarItemIdentifier itemIdentifier, NSInteger index);
+    [Optional]
+    [Selector("toolbarWillAddItem:")]
+    void ToolbarWillAddItem(NSNotification notification);
+    [Optional]
+    [Selector("toolbarDidRemoveItem:")]
+    void ToolbarDidRemoveItem(NSNotification notification);
 }
 
 public extern "C" NSNotificationName? NSToolbarWillAddItemNotification;
@@ -103,21 +140,29 @@ public extern "C" NSNotificationName? NSToolbarDidRemoveItemNotification;
 public extern objc class NSToolbar
 {
     /// Deprecated in macOS 100000.
-    [Selector("sizeMode", "setSizeMode:")] public NSToolbarSizeMode SizeMode { get; set; }
+    [Selector("sizeMode", "setSizeMode:")]
+    public NSToolbarSizeMode SizeMode { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("centeredItemIdentifier", "setCenteredItemIdentifier:")] public NSToolbarItemIdentifier? CenteredItemIdentifier { get; set; }
+    [Selector("centeredItemIdentifier", "setCenteredItemIdentifier:")]
+    public NSToolbarItemIdentifier? CenteredItemIdentifier { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("fullScreenAccessoryView", "setFullScreenAccessoryView:")] public NSView? FullScreenAccessoryView { get; set; }
+    [Selector("fullScreenAccessoryView", "setFullScreenAccessoryView:")]
+    public NSView? FullScreenAccessoryView { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("fullScreenAccessoryViewMinHeight", "setFullScreenAccessoryViewMinHeight:")] public CGFloat FullScreenAccessoryViewMinHeight { get; set; }
+    [Selector("fullScreenAccessoryViewMinHeight", "setFullScreenAccessoryViewMinHeight:")]
+    public CGFloat FullScreenAccessoryViewMinHeight { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("fullScreenAccessoryViewMaxHeight", "setFullScreenAccessoryViewMaxHeight:")] public CGFloat FullScreenAccessoryViewMaxHeight { get; set; }
+    [Selector("fullScreenAccessoryViewMaxHeight", "setFullScreenAccessoryViewMaxHeight:")]
+    public CGFloat FullScreenAccessoryViewMaxHeight { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("showsBaselineSeparator", "setShowsBaselineSeparator:")] public bool ShowsBaselineSeparator { get; set; }
+    [Selector("showsBaselineSeparator", "setShowsBaselineSeparator:")]
+    public bool ShowsBaselineSeparator { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("configurationDictionary")] public NSDictionary? ConfigurationDictionary { get; }
+    [Selector("configurationDictionary")]
+    public NSDictionary? ConfigurationDictionary { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("setConfigurationFromDictionary:")] public void SetConfigurationFromDictionary(NSDictionary configDict);
+    [Selector("setConfigurationFromDictionary:")]
+    public void SetConfigurationFromDictionary(NSDictionary configDict);
 }
 
 #endif

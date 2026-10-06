@@ -34,19 +34,32 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCOptimizerDescriptor : NSObject, NSCopying
 {
-    [Selector("learningRate")] public float LearningRate { get; }
-    [Selector("gradientRescale")] public float GradientRescale { get; }
-    [Selector("appliesGradientClipping")] public bool AppliesGradientClipping { get; }
-    [Selector("gradientClipMax")] public float GradientClipMax { get; }
-    [Selector("gradientClipMin")] public float GradientClipMin { get; }
-    [Selector("regularizationScale")] public float RegularizationScale { get; }
-    [Selector("regularizationType")] public MLCRegularizationType RegularizationType { get; }
-    [Selector("gradientClippingType")] public MLCGradientClippingType GradientClippingType { get; }
-    [Selector("maximumClippingNorm")] public float MaximumClippingNorm { get; }
-    [Selector("customGlobalNorm")] public float CustomGlobalNorm { get; }
-    [Selector("descriptorWithLearningRate:gradientRescale:regularizationType:regularizationScale:")] public static Self DescriptorWithLearningRateGradientRescaleRegularizationTypeRegularizationScale(float learningRate, float gradientRescale, MLCRegularizationType regularizationType, float regularizationScale);
-    [Selector("descriptorWithLearningRate:gradientRescale:appliesGradientClipping:gradientClipMax:gradientClipMin:regularizationType:regularizationScale:")] public static Self DescriptorWithLearningRateGradientRescaleAppliesGradientClippingGradientClipMaxGradientClipMinRegularizationTypeRegularizationScale(float learningRate, float gradientRescale, bool appliesGradientClipping, float gradientClipMax, float gradientClipMin, MLCRegularizationType regularizationType, float regularizationScale);
-    [Selector("descriptorWithLearningRate:gradientRescale:appliesGradientClipping:gradientClippingType:gradientClipMax:gradientClipMin:maximumClippingNorm:customGlobalNorm:regularizationType:regularizationScale:")] public static Self DescriptorWithLearningRateGradientRescaleAppliesGradientClippingGradientClippingTypeGradientClipMaxGradientClipMinMaximumClippingNormCustomGlobalNormRegularizationTypeRegularizationScale(float learningRate, float gradientRescale, bool appliesGradientClipping, MLCGradientClippingType gradientClippingType, float gradientClipMax, float gradientClipMin, float maximumClippingNorm, float customGlobalNorm, MLCRegularizationType regularizationType, float regularizationScale);
+    [Selector("learningRate")]
+    public float LearningRate { get; }
+    [Selector("gradientRescale")]
+    public float GradientRescale { get; }
+    [Selector("appliesGradientClipping")]
+    public bool AppliesGradientClipping { get; }
+    [Selector("gradientClipMax")]
+    public float GradientClipMax { get; }
+    [Selector("gradientClipMin")]
+    public float GradientClipMin { get; }
+    [Selector("regularizationScale")]
+    public float RegularizationScale { get; }
+    [Selector("regularizationType")]
+    public MLCRegularizationType RegularizationType { get; }
+    [Selector("gradientClippingType")]
+    public MLCGradientClippingType GradientClippingType { get; }
+    [Selector("maximumClippingNorm")]
+    public float MaximumClippingNorm { get; }
+    [Selector("customGlobalNorm")]
+    public float CustomGlobalNorm { get; }
+    [Selector("descriptorWithLearningRate:gradientRescale:regularizationType:regularizationScale:")]
+    public static Self DescriptorWithLearningRateGradientRescaleRegularizationTypeRegularizationScale(float learningRate, float gradientRescale, MLCRegularizationType regularizationType, float regularizationScale);
+    [Selector("descriptorWithLearningRate:gradientRescale:appliesGradientClipping:gradientClipMax:gradientClipMin:regularizationType:regularizationScale:")]
+    public static Self DescriptorWithLearningRateGradientRescaleAppliesGradientClippingGradientClipMaxGradientClipMinRegularizationTypeRegularizationScale(float learningRate, float gradientRescale, bool appliesGradientClipping, float gradientClipMax, float gradientClipMin, MLCRegularizationType regularizationType, float regularizationScale);
+    [Selector("descriptorWithLearningRate:gradientRescale:appliesGradientClipping:gradientClippingType:gradientClipMax:gradientClipMin:maximumClippingNorm:customGlobalNorm:regularizationType:regularizationScale:")]
+    public static Self DescriptorWithLearningRateGradientRescaleAppliesGradientClippingGradientClippingTypeGradientClipMaxGradientClipMinMaximumClippingNormCustomGlobalNormRegularizationTypeRegularizationScale(float learningRate, float gradientRescale, bool appliesGradientClipping, MLCGradientClippingType gradientClippingType, float gradientClipMax, float gradientClipMin, float maximumClippingNorm, float customGlobalNorm, MLCRegularizationType regularizationType, float regularizationScale);
 }
 
 #endif

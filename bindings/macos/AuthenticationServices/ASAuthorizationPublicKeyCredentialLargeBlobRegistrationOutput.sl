@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationPublicKeyCredentialLargeBlobRegistrationOutput : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("isSupported")] public bool IsSupported { get; }
+    [Selector("isSupported")]
+    public bool IsSupported { get; }
 }
 
 #endif

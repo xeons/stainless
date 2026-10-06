@@ -35,18 +35,26 @@ import Standard.ObjC;
 
 public extern objc class AXBrailleMap : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("dimensions")] public CGSize Dimensions { get; }
-    [Selector("setHeight:atPoint:")] public void SetHeightAtPoint(float status, CGPoint point);
-    [Selector("heightAtPoint:")] public float HeightAtPoint(CGPoint point);
-    [Selector("presentImage:")] public void PresentImage(CGImageRef image);
+    [Selector("dimensions")]
+    public CGSize Dimensions { get; }
+    [Selector("setHeight:atPoint:")]
+    public void SetHeightAtPoint(float status, CGPoint point);
+    [Selector("heightAtPoint:")]
+    public float HeightAtPoint(CGPoint point);
+    [Selector("presentImage:")]
+    public void PresentImage(CGImageRef image);
 }
 
 public objc closure void AXBrailleMapRendererAccessibilityBrailleMapRendererBlock(AXBrailleMap arg0);
 
 public objc interface AXBrailleMapRenderer : NSObjectProtocol
 {
-    [Optional] [Selector("accessibilityBrailleMapRenderRegion", "setAccessibilityBrailleMapRenderRegion:")] CGRect AccessibilityBrailleMapRenderRegion { get; set; }
-    [Optional] [Selector("accessibilityBrailleMapRenderer", "setAccessibilityBrailleMapRenderer:")] AXBrailleMapRendererAccessibilityBrailleMapRendererBlock AccessibilityBrailleMapRenderer { get; set; }
+    [Optional]
+    [Selector("accessibilityBrailleMapRenderRegion", "setAccessibilityBrailleMapRenderRegion:")]
+    CGRect AccessibilityBrailleMapRenderRegion { get; set; }
+    [Optional]
+    [Selector("accessibilityBrailleMapRenderer", "setAccessibilityBrailleMapRenderer:")]
+    AXBrailleMapRendererAccessibilityBrailleMapRendererBlock AccessibilityBrailleMapRenderer { get; set; }
 }
 
 #endif

@@ -34,16 +34,26 @@ import Standard.ObjC;
 
 public extern objc class CIImageAccumulator : NSObject
 {
-    [Selector("extent")] public CGRect Extent { get; }
-    [Selector("format")] public CIFormat Format { get; }
-    [Selector("imageAccumulatorWithExtent:format:")] public static Self? ImageAccumulatorWithExtentFormat(CGRect extent, CIFormat format);
-    [Selector("imageAccumulatorWithExtent:format:colorSpace:")] public static Self? ImageAccumulatorWithExtentFormatColorSpace(CGRect extent, CIFormat format, CGColorSpaceRef colorSpace);
-    [Selector("initWithExtent:format:")] public Self? InitWithExtentFormat(CGRect extent, CIFormat format);
-    [Selector("initWithExtent:format:colorSpace:")] public Self? InitWithExtentFormatColorSpace(CGRect extent, CIFormat format, CGColorSpaceRef colorSpace);
-    [Selector("image")] public CIImage Image();
-    [Selector("setImage:")] public void SetImage(CIImage image);
-    [Selector("setImage:dirtyRect:")] public void SetImageDirtyRect(CIImage image, CGRect dirtyRect);
-    [Selector("clear")] public void Clear();
+    [Selector("extent")]
+    public CGRect Extent { get; }
+    [Selector("format")]
+    public CIFormat Format { get; }
+    [Selector("imageAccumulatorWithExtent:format:")]
+    public static Self? ImageAccumulatorWithExtentFormat(CGRect extent, CIFormat format);
+    [Selector("imageAccumulatorWithExtent:format:colorSpace:")]
+    public static Self? ImageAccumulatorWithExtentFormatColorSpace(CGRect extent, CIFormat format, CGColorSpaceRef colorSpace);
+    [Selector("initWithExtent:format:")]
+    public Self? InitWithExtentFormat(CGRect extent, CIFormat format);
+    [Selector("initWithExtent:format:colorSpace:")]
+    public Self? InitWithExtentFormatColorSpace(CGRect extent, CIFormat format, CGColorSpaceRef colorSpace);
+    [Selector("image")]
+    public CIImage Image();
+    [Selector("setImage:")]
+    public void SetImage(CIImage image);
+    [Selector("setImage:dirtyRect:")]
+    public void SetImageDirtyRect(CIImage image, CGRect dirtyRect);
+    [Selector("clear")]
+    public void Clear();
 }
 
 #endif

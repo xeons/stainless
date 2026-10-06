@@ -33,24 +33,37 @@ import Standard.ObjC;
 
 public extern objc class MPSGraphStencilOpDescriptor : MPSGraphObject, NSCopying
 {
-    [Selector("reductionMode", "setReductionMode:")] public MPSGraphReductionMode ReductionMode { get; set; }
-    [Selector("offsets", "setOffsets:")] public MPSShape Offsets { get; set; }
-    [Selector("strides", "setStrides:")] public MPSShape Strides { get; set; }
-    [Selector("dilationRates", "setDilationRates:")] public MPSShape DilationRates { get; set; }
-    [Selector("explicitPadding", "setExplicitPadding:")] public MPSShape ExplicitPadding { get; set; }
-    [Selector("boundaryMode", "setBoundaryMode:")] public MPSGraphPaddingMode BoundaryMode { get; set; }
-    [Selector("paddingStyle", "setPaddingStyle:")] public MPSGraphPaddingStyle PaddingStyle { get; set; }
-    [Selector("paddingConstant", "setPaddingConstant:")] public float PaddingConstant { get; set; }
-    [Selector("descriptorWithReductionMode:offsets:strides:dilationRates:explicitPadding:boundaryMode:paddingStyle:paddingConstant:")] public static Self? DescriptorWithReductionModeOffsetsStridesDilationRatesExplicitPaddingBoundaryModePaddingStylePaddingConstant(MPSGraphReductionMode reductionMode, MPSShape offsets, MPSShape strides, MPSShape dilationRates, MPSShape explicitPadding, MPSGraphPaddingMode boundaryMode, MPSGraphPaddingStyle paddingStyle, float paddingConstant);
-    [Selector("descriptorWithOffsets:explicitPadding:")] public static Self? DescriptorWithOffsetsExplicitPadding(MPSShape offsets, MPSShape explicitPadding);
-    [Selector("descriptorWithExplicitPadding:")] public static Self? DescriptorWithExplicitPadding(MPSShape explicitPadding);
-    [Selector("descriptorWithPaddingStyle:")] public static Self? DescriptorWithPaddingStyle(MPSGraphPaddingStyle paddingStyle);
+    [Selector("reductionMode", "setReductionMode:")]
+    public MPSGraphReductionMode ReductionMode { get; set; }
+    [Selector("offsets", "setOffsets:")]
+    public MPSShape Offsets { get; set; }
+    [Selector("strides", "setStrides:")]
+    public MPSShape Strides { get; set; }
+    [Selector("dilationRates", "setDilationRates:")]
+    public MPSShape DilationRates { get; set; }
+    [Selector("explicitPadding", "setExplicitPadding:")]
+    public MPSShape ExplicitPadding { get; set; }
+    [Selector("boundaryMode", "setBoundaryMode:")]
+    public MPSGraphPaddingMode BoundaryMode { get; set; }
+    [Selector("paddingStyle", "setPaddingStyle:")]
+    public MPSGraphPaddingStyle PaddingStyle { get; set; }
+    [Selector("paddingConstant", "setPaddingConstant:")]
+    public float PaddingConstant { get; set; }
+    [Selector("descriptorWithReductionMode:offsets:strides:dilationRates:explicitPadding:boundaryMode:paddingStyle:paddingConstant:")]
+    public static Self? DescriptorWithReductionModeOffsetsStridesDilationRatesExplicitPaddingBoundaryModePaddingStylePaddingConstant(MPSGraphReductionMode reductionMode, MPSShape offsets, MPSShape strides, MPSShape dilationRates, MPSShape explicitPadding, MPSGraphPaddingMode boundaryMode, MPSGraphPaddingStyle paddingStyle, float paddingConstant);
+    [Selector("descriptorWithOffsets:explicitPadding:")]
+    public static Self? DescriptorWithOffsetsExplicitPadding(MPSShape offsets, MPSShape explicitPadding);
+    [Selector("descriptorWithExplicitPadding:")]
+    public static Self? DescriptorWithExplicitPadding(MPSShape explicitPadding);
+    [Selector("descriptorWithPaddingStyle:")]
+    public static Self? DescriptorWithPaddingStyle(MPSGraphPaddingStyle paddingStyle);
 }
 
 /// MPSGraphStencilOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("stencilWithSourceTensor:weightsTensor:descriptor:name:")] public MPSGraphTensor StencilWithSourceTensorWeightsTensorDescriptorName(MPSGraphTensor source, MPSGraphTensor weights, MPSGraphStencilOpDescriptor descriptor, NSString? name);
+    [Selector("stencilWithSourceTensor:weightsTensor:descriptor:name:")]
+    public MPSGraphTensor StencilWithSourceTensorWeightsTensorDescriptorName(MPSGraphTensor source, MPSGraphTensor weights, MPSGraphStencilOpDescriptor descriptor, NSString? name);
 }
 
 #endif

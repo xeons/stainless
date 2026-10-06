@@ -11,13 +11,16 @@ import Standard.ObjC;
 [ObjCRoot]
 public extern objc class NSObject
 {
-    [Selector("alloc")] public static Self Alloc();
-    [Selector("init")] public Self Init();
+    [Selector("alloc")]
+    public static Self Alloc();
+    [Selector("init")]
+    public Self Init();
 }
 
 public objc class Greeter : NSObject
 {
-    [Selector("greet:")] public long Greet(NSObject other) => 1;
+    [Selector("greet:")]
+    public long Greet(NSObject other) => 1;
 }
 
 extern "C" long SLGreetNil(AnyObject greeter);

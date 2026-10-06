@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class HKDeletedObject : NSObject, NSSecureCoding
 {
-    [Selector("UUID")] public NSUUID UUID { get; }
-    [Selector("metadata")] public NSDictionary? Metadata { get; }
+    [Selector("UUID")]
+    public NSUUID UUID { get; }
+    [Selector("metadata")]
+    public NSDictionary? Metadata { get; }
 }
 
 #endif

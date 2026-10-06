@@ -34,9 +34,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.12.
 public extern objc class PDFAnnotationInk : PDFAnnotation, NSCopying, NSCoding
 {
-    [Selector("paths")] public NSArray? Paths();
-    [Selector("addBezierPath:")] public void AddBezierPath(NSBezierPath? path);
-    [Selector("removeBezierPath:")] public void RemoveBezierPath(NSBezierPath? path);
+    [Selector("paths")]
+    public NSArray? Paths();
+    [Selector("addBezierPath:")]
+    public void AddBezierPath(NSBezierPath? path);
+    [Selector("removeBezierPath:")]
+    public void RemoveBezierPath(NSBezierPath? path);
 }
 
 #endif

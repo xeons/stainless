@@ -55,6 +55,7 @@ public extern "C" CFStringRef? kSecEncodeLineLengthAttribute;
 public extern "C" CFStringRef? kSecCompressionRatio;
 
 /// Deprecated in macOS 13.0.
-[ReturnsRetained] public extern "C" SecTransformRef? SecEncodeTransformCreate(CFTypeRef encodeType, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecTransformRef? SecEncodeTransformCreate(CFTypeRef encodeType, __CFError** error);
 
 #endif

@@ -33,22 +33,38 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.10.
 public objc interface GKChallengeEventHandlerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("localPlayerDidSelectChallenge:")] void LocalPlayerDidSelectChallenge(GKChallenge? challenge);
-    [Optional] [Selector("shouldShowBannerForLocallyReceivedChallenge:")] bool ShouldShowBannerForLocallyReceivedChallenge(GKChallenge? challenge);
-    [Optional] [Selector("localPlayerDidReceiveChallenge:")] void LocalPlayerDidReceiveChallenge(GKChallenge? challenge);
-    [Optional] [Selector("shouldShowBannerForLocallyCompletedChallenge:")] bool ShouldShowBannerForLocallyCompletedChallenge(GKChallenge? challenge);
-    [Optional] [Selector("localPlayerDidCompleteChallenge:")] void LocalPlayerDidCompleteChallenge(GKChallenge? challenge);
-    [Optional] [Selector("shouldShowBannerForRemotelyCompletedChallenge:")] bool ShouldShowBannerForRemotelyCompletedChallenge(GKChallenge? challenge);
-    [Optional] [Selector("remotePlayerDidCompleteChallenge:")] void RemotePlayerDidCompleteChallenge(GKChallenge? challenge);
+    [Optional]
+    [Selector("localPlayerDidSelectChallenge:")]
+    void LocalPlayerDidSelectChallenge(GKChallenge? challenge);
+    [Optional]
+    [Selector("shouldShowBannerForLocallyReceivedChallenge:")]
+    bool ShouldShowBannerForLocallyReceivedChallenge(GKChallenge? challenge);
+    [Optional]
+    [Selector("localPlayerDidReceiveChallenge:")]
+    void LocalPlayerDidReceiveChallenge(GKChallenge? challenge);
+    [Optional]
+    [Selector("shouldShowBannerForLocallyCompletedChallenge:")]
+    bool ShouldShowBannerForLocallyCompletedChallenge(GKChallenge? challenge);
+    [Optional]
+    [Selector("localPlayerDidCompleteChallenge:")]
+    void LocalPlayerDidCompleteChallenge(GKChallenge? challenge);
+    [Optional]
+    [Selector("shouldShowBannerForRemotelyCompletedChallenge:")]
+    bool ShouldShowBannerForRemotelyCompletedChallenge(GKChallenge? challenge);
+    [Optional]
+    [Selector("remotePlayerDidCompleteChallenge:")]
+    void RemotePlayerDidCompleteChallenge(GKChallenge? challenge);
 }
 
 /// Deprecated in macOS 10.10.
 public extern objc class GKChallengeEventHandler : NSObject
 {
     /// Deprecated in macOS 10.10.
-    [Selector("delegate", "setDelegate:")] public GKChallengeEventHandlerDelegate? Delegate { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public GKChallengeEventHandlerDelegate? Delegate { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("challengeEventHandler")] public static GKChallengeEventHandler? ChallengeEventHandler();
+    [Selector("challengeEventHandler")]
+    public static GKChallengeEventHandler? ChallengeEventHandler();
 }
 
 #endif

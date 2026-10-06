@@ -31,13 +31,20 @@ import Standard.ObjC;
 
 public objc interface GCDirectionPadElement : GCPhysicalInputElement
 {
-    [Selector("xyAxes")] GCAxis2DInput XyAxes { get; }
-    [Selector("xAxis")] GCAxisInput XAxis { get; }
-    [Selector("yAxis")] GCAxisInput YAxis { get; }
-    [Selector("up")] GCLinearInput Up { get; }
-    [Selector("down")] GCLinearInput Down { get; }
-    [Selector("left")] GCLinearInput Left { get; }
-    [Selector("right")] GCLinearInput Right { get; }
+    [Selector("xyAxes")]
+    GCAxis2DInput XyAxes { get; }
+    [Selector("xAxis")]
+    GCAxisInput XAxis { get; }
+    [Selector("yAxis")]
+    GCAxisInput YAxis { get; }
+    [Selector("up")]
+    GCLinearInput Up { get; }
+    [Selector("down")]
+    GCLinearInput Down { get; }
+    [Selector("left")]
+    GCLinearInput Left { get; }
+    [Selector("right")]
+    GCLinearInput Right { get; }
 }
 
 #endif

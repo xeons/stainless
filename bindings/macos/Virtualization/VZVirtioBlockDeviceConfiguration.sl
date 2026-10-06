@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioBlockDeviceConfiguration : VZStorageDeviceConfiguration
 {
-    [Selector("blockDeviceIdentifier", "setBlockDeviceIdentifier:")] public NSString? BlockDeviceIdentifier { get; set; }
-    [Selector("initWithAttachment:")] public Self InitWithAttachment(VZStorageDeviceAttachment attachment);
-    [Selector("validateBlockDeviceIdentifier:error:")] public static bool ValidateBlockDeviceIdentifierError(NSString blockDeviceIdentifier, out NSError? error);
+    [Selector("blockDeviceIdentifier", "setBlockDeviceIdentifier:")]
+    public NSString? BlockDeviceIdentifier { get; set; }
+    [Selector("initWithAttachment:")]
+    public Self InitWithAttachment(VZStorageDeviceAttachment attachment);
+    [Selector("validateBlockDeviceIdentifier:error:")]
+    public static bool ValidateBlockDeviceIdentifierError(NSString blockDeviceIdentifier, out NSError? error);
 }
 
 #endif

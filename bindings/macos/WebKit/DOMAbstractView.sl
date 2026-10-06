@@ -32,7 +32,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMAbstractView : DOMObject
 {
-    [Selector("document")] public DOMDocument? Document { get; }
+    [Selector("document")]
+    public DOMDocument? Document { get; }
 }
 
 #endif

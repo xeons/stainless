@@ -44,13 +44,20 @@ public enum QLThumbnailGenerationRequestRepresentationTypes : ulong
 
 public extern objc class QLThumbnailGenerationRequest : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("contentType", "setContentType:")] public UTType? ContentType { get; set; }
-    [Selector("minimumDimension", "setMinimumDimension:")] public CGFloat MinimumDimension { get; set; }
-    [Selector("iconMode", "setIconMode:")] public bool IconMode { get; set; }
-    [Selector("size")] public CGSize Size { get; }
-    [Selector("scale")] public CGFloat Scale { get; }
-    [Selector("representationTypes")] public QLThumbnailGenerationRequestRepresentationTypes RepresentationTypes { get; }
-    [Selector("initWithFileAtURL:size:scale:representationTypes:")] public Self InitWithFileAtURLSizeScaleRepresentationTypes(NSURL url, CGSize size, CGFloat scale, QLThumbnailGenerationRequestRepresentationTypes representationTypes);
+    [Selector("contentType", "setContentType:")]
+    public UTType? ContentType { get; set; }
+    [Selector("minimumDimension", "setMinimumDimension:")]
+    public CGFloat MinimumDimension { get; set; }
+    [Selector("iconMode", "setIconMode:")]
+    public bool IconMode { get; set; }
+    [Selector("size")]
+    public CGSize Size { get; }
+    [Selector("scale")]
+    public CGFloat Scale { get; }
+    [Selector("representationTypes")]
+    public QLThumbnailGenerationRequestRepresentationTypes RepresentationTypes { get; }
+    [Selector("initWithFileAtURL:size:scale:representationTypes:")]
+    public Self InitWithFileAtURLSizeScaleRepresentationTypes(NSURL url, CGSize size, CGFloat scale, QLThumbnailGenerationRequestRepresentationTypes representationTypes);
 }
 
 #endif

@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class ASPasskeyCredentialRequestParameters : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("relyingPartyIdentifier")] public NSString RelyingPartyIdentifier { get; }
-    [Selector("clientDataHash")] public NSData ClientDataHash { get; }
-    [Selector("userVerificationPreference")] public ASAuthorizationPublicKeyCredentialUserVerificationPreference UserVerificationPreference { get; }
-    [Selector("allowedCredentials")] public NSArray AllowedCredentials { get; }
-    [Selector("extensionInput")] public ASPasskeyAssertionCredentialExtensionInput? ExtensionInput { get; }
+    [Selector("relyingPartyIdentifier")]
+    public NSString RelyingPartyIdentifier { get; }
+    [Selector("clientDataHash")]
+    public NSData ClientDataHash { get; }
+    [Selector("userVerificationPreference")]
+    public ASAuthorizationPublicKeyCredentialUserVerificationPreference UserVerificationPreference { get; }
+    [Selector("allowedCredentials")]
+    public NSArray AllowedCredentials { get; }
+    [Selector("extensionInput")]
+    public ASPasskeyAssertionCredentialExtensionInput? ExtensionInput { get; }
 }
 
 #endif

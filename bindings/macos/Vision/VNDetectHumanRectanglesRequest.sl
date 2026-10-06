@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class VNDetectHumanRectanglesRequest : VNImageBasedRequest
 {
-    [Selector("upperBodyOnly", "setUpperBodyOnly:")] public bool UpperBodyOnly { get; set; }
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("upperBodyOnly", "setUpperBodyOnly:")]
+    public bool UpperBodyOnly { get; set; }
+    [Selector("results")]
+    public NSArray? Results { get; }
 }
 
 #endif

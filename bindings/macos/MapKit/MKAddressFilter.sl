@@ -44,12 +44,18 @@ public enum MKAddressFilterOption : ulong
 
 public extern objc class MKAddressFilter : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("filterIncludingAll")] public static MKAddressFilter? FilterIncludingAll { get; }
-    [Selector("filterExcludingAll")] public static MKAddressFilter? FilterExcludingAll { get; }
-    [Selector("initIncludingOptions:")] public Self InitIncludingOptions(MKAddressFilterOption options);
-    [Selector("initExcludingOptions:")] public Self InitExcludingOptions(MKAddressFilterOption options);
-    [Selector("includesOptions:")] public bool IncludesOptions(MKAddressFilterOption options);
-    [Selector("excludesOptions:")] public bool ExcludesOptions(MKAddressFilterOption options);
+    [Selector("filterIncludingAll")]
+    public static MKAddressFilter? FilterIncludingAll { get; }
+    [Selector("filterExcludingAll")]
+    public static MKAddressFilter? FilterExcludingAll { get; }
+    [Selector("initIncludingOptions:")]
+    public Self InitIncludingOptions(MKAddressFilterOption options);
+    [Selector("initExcludingOptions:")]
+    public Self InitExcludingOptions(MKAddressFilterOption options);
+    [Selector("includesOptions:")]
+    public bool IncludesOptions(MKAddressFilterOption options);
+    [Selector("excludesOptions:")]
+    public bool ExcludesOptions(MKAddressFilterOption options);
 }
 
 #endif

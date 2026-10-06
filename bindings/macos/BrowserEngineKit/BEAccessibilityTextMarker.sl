@@ -36,24 +36,38 @@ public extern objc class BEAccessibilityTextMarker : NSObject, NSCopying, NSSecu
 
 public extern objc class BEAccessibilityTextMarkerRange : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("startMarker", "setStartMarker:")] public BEAccessibilityTextMarker StartMarker { get; set; }
-    [Selector("endMarker", "setEndMarker:")] public BEAccessibilityTextMarker EndMarker { get; set; }
+    [Selector("startMarker", "setStartMarker:")]
+    public BEAccessibilityTextMarker StartMarker { get; set; }
+    [Selector("endMarker", "setEndMarker:")]
+    public BEAccessibilityTextMarker EndMarker { get; set; }
 }
 
 public objc interface BEAccessibilityTextMarkerSupport : NSObjectProtocol
 {
-    [Selector("accessibilityBoundsForTextMarkerRange:")] CGRect AccessibilityBoundsForTextMarkerRange(BEAccessibilityTextMarkerRange range);
-    [Selector("accessibilityContentForTextMarkerRange:")] NSString? AccessibilityContentForTextMarkerRange(BEAccessibilityTextMarkerRange range);
-    [Selector("accessibilityTextMarkerRangeForCurrentSelection")] BEAccessibilityTextMarkerRange? AccessibilityTextMarkerRangeForCurrentSelection();
-    [Selector("accessibilityTextMarkerRange")] BEAccessibilityTextMarkerRange AccessibilityTextMarkerRange();
-    [Selector("accessibilityNextTextMarker:")] BEAccessibilityTextMarker? AccessibilityNextTextMarker(BEAccessibilityTextMarker marker);
-    [Selector("accessibilityPreviousTextMarker:")] BEAccessibilityTextMarker? AccessibilityPreviousTextMarker(BEAccessibilityTextMarker marker);
-    [Selector("accessibilityLineEndMarkerForMarker:")] BEAccessibilityTextMarker? AccessibilityLineEndMarkerForMarker(BEAccessibilityTextMarker marker);
-    [Selector("accessibilityLineStartMarkerForMarker:")] BEAccessibilityTextMarker? AccessibilityLineStartMarkerForMarker(BEAccessibilityTextMarker marker);
-    [Selector("accessibilityMarkerForPoint:")] BEAccessibilityTextMarker? AccessibilityMarkerForPoint(CGPoint point);
-    [Selector("accessibilityTextMarkerForPosition:")] BEAccessibilityTextMarker? AccessibilityTextMarkerForPosition(NSInteger position);
-    [Selector("accessibilityTextMarkerRangeForRange:")] BEAccessibilityTextMarkerRange? AccessibilityTextMarkerRangeForRange(NSRange range);
-    [Selector("accessibilityRangeForTextMarkerRange:")] NSRange AccessibilityRangeForTextMarkerRange(BEAccessibilityTextMarkerRange range);
+    [Selector("accessibilityBoundsForTextMarkerRange:")]
+    CGRect AccessibilityBoundsForTextMarkerRange(BEAccessibilityTextMarkerRange range);
+    [Selector("accessibilityContentForTextMarkerRange:")]
+    NSString? AccessibilityContentForTextMarkerRange(BEAccessibilityTextMarkerRange range);
+    [Selector("accessibilityTextMarkerRangeForCurrentSelection")]
+    BEAccessibilityTextMarkerRange? AccessibilityTextMarkerRangeForCurrentSelection();
+    [Selector("accessibilityTextMarkerRange")]
+    BEAccessibilityTextMarkerRange AccessibilityTextMarkerRange();
+    [Selector("accessibilityNextTextMarker:")]
+    BEAccessibilityTextMarker? AccessibilityNextTextMarker(BEAccessibilityTextMarker marker);
+    [Selector("accessibilityPreviousTextMarker:")]
+    BEAccessibilityTextMarker? AccessibilityPreviousTextMarker(BEAccessibilityTextMarker marker);
+    [Selector("accessibilityLineEndMarkerForMarker:")]
+    BEAccessibilityTextMarker? AccessibilityLineEndMarkerForMarker(BEAccessibilityTextMarker marker);
+    [Selector("accessibilityLineStartMarkerForMarker:")]
+    BEAccessibilityTextMarker? AccessibilityLineStartMarkerForMarker(BEAccessibilityTextMarker marker);
+    [Selector("accessibilityMarkerForPoint:")]
+    BEAccessibilityTextMarker? AccessibilityMarkerForPoint(CGPoint point);
+    [Selector("accessibilityTextMarkerForPosition:")]
+    BEAccessibilityTextMarker? AccessibilityTextMarkerForPosition(NSInteger position);
+    [Selector("accessibilityTextMarkerRangeForRange:")]
+    BEAccessibilityTextMarkerRange? AccessibilityTextMarkerRangeForRange(NSRange range);
+    [Selector("accessibilityRangeForTextMarkerRange:")]
+    NSRange AccessibilityRangeForTextMarkerRange(BEAccessibilityTextMarkerRange range);
 }
 
 #endif

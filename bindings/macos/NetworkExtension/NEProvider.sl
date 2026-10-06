@@ -60,16 +60,23 @@ public objc closure void NEProviderDisplayMessageCompletionHandlerCompletionHand
 public extern objc class NEProvider : NSObject
 {
     /// Deprecated in macOS 15.0.
-    [Selector("defaultPath")] public NWPath? DefaultPath { get; }
-    [Selector("sleepWithCompletionHandler:")] public void SleepWithCompletionHandler(NEProviderSleepWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("wake")] public void Wake();
+    [Selector("defaultPath")]
+    public NWPath? DefaultPath { get; }
+    [Selector("sleepWithCompletionHandler:")]
+    public void SleepWithCompletionHandler(NEProviderSleepWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("wake")]
+    public void Wake();
     /// Deprecated in macOS 15.0.
-    [Selector("createTCPConnectionToEndpoint:enableTLS:TLSParameters:delegate:")] public NWTCPConnection CreateTCPConnectionToEndpointEnableTLSTLSParametersDelegate(NWEndpoint remoteEndpoint, bool enableTLS, NWTLSParameters? TLSParameters, AnyObject? @delegate);
+    [Selector("createTCPConnectionToEndpoint:enableTLS:TLSParameters:delegate:")]
+    public NWTCPConnection CreateTCPConnectionToEndpointEnableTLSTLSParametersDelegate(NWEndpoint remoteEndpoint, bool enableTLS, NWTLSParameters? TLSParameters, AnyObject? @delegate);
     /// Deprecated in macOS 15.0.
-    [Selector("createUDPSessionToEndpoint:fromEndpoint:")] public NWUDPSession CreateUDPSessionToEndpointFromEndpoint(NWEndpoint remoteEndpoint, NWHostEndpoint? localEndpoint);
+    [Selector("createUDPSessionToEndpoint:fromEndpoint:")]
+    public NWUDPSession CreateUDPSessionToEndpointFromEndpoint(NWEndpoint remoteEndpoint, NWHostEndpoint? localEndpoint);
     /// Deprecated in macOS 10.14.
-    [Selector("displayMessage:completionHandler:")] public void DisplayMessageCompletionHandler(NSString message, NEProviderDisplayMessageCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("startSystemExtensionMode")] public static void StartSystemExtensionMode();
+    [Selector("displayMessage:completionHandler:")]
+    public void DisplayMessageCompletionHandler(NSString message, NEProviderDisplayMessageCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("startSystemExtensionMode")]
+    public static void StartSystemExtensionMode();
 }
 
 #endif

@@ -33,11 +33,16 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMMediaList : DOMObject
 {
-    [Selector("mediaText", "setMediaText:")] public NSString? MediaText { get; set; }
-    [Selector("length")] public uint Length { get; }
-    [Selector("item:")] public NSString? Item(uint index);
-    [Selector("deleteMedium:")] public void DeleteMedium(NSString? oldMedium);
-    [Selector("appendMedium:")] public void AppendMedium(NSString? newMedium);
+    [Selector("mediaText", "setMediaText:")]
+    public NSString? MediaText { get; set; }
+    [Selector("length")]
+    public uint Length { get; }
+    [Selector("item:")]
+    public NSString? Item(uint index);
+    [Selector("deleteMedium:")]
+    public void DeleteMedium(NSString? oldMedium);
+    [Selector("appendMedium:")]
+    public void AppendMedium(NSString? newMedium);
 }
 
 #endif

@@ -35,15 +35,24 @@ public objc interface GKSceneRootNodeType : NSObjectProtocol { }
 
 public extern objc class GKScene : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("entities")] public NSArray Entities { get; }
-    [Selector("rootNode", "setRootNode:")] public GKSceneRootNodeType? RootNode { get; set; }
-    [Selector("graphs")] public NSDictionary Graphs { get; }
-    [Selector("sceneWithFileNamed:")] public static Self? SceneWithFileNamed(NSString filename);
-    [Selector("sceneWithFileNamed:rootNode:")] public static Self? SceneWithFileNamedRootNode(NSString filename, GKSceneRootNodeType rootNode);
-    [Selector("addEntity:")] public void AddEntity(GKEntity entity);
-    [Selector("removeEntity:")] public void RemoveEntity(GKEntity entity);
-    [Selector("addGraph:name:")] public void AddGraphName(GKGraph graph, NSString name);
-    [Selector("removeGraph:")] public void RemoveGraph(NSString name);
+    [Selector("entities")]
+    public NSArray Entities { get; }
+    [Selector("rootNode", "setRootNode:")]
+    public GKSceneRootNodeType? RootNode { get; set; }
+    [Selector("graphs")]
+    public NSDictionary Graphs { get; }
+    [Selector("sceneWithFileNamed:")]
+    public static Self? SceneWithFileNamed(NSString filename);
+    [Selector("sceneWithFileNamed:rootNode:")]
+    public static Self? SceneWithFileNamedRootNode(NSString filename, GKSceneRootNodeType rootNode);
+    [Selector("addEntity:")]
+    public void AddEntity(GKEntity entity);
+    [Selector("removeEntity:")]
+    public void RemoveEntity(GKEntity entity);
+    [Selector("addGraph:name:")]
+    public void AddGraphName(GKGraph graph, NSString name);
+    [Selector("removeGraph:")]
+    public void RemoveGraph(NSString name);
 }
 
 #endif

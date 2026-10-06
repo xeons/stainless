@@ -33,26 +33,46 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLDocument : DOMDocument
 {
-    [Selector("embeds")] public DOMHTMLCollection? Embeds { get; }
-    [Selector("plugins")] public DOMHTMLCollection? Plugins { get; }
-    [Selector("scripts")] public DOMHTMLCollection? Scripts { get; }
-    [Selector("width")] public int Width { get; }
-    [Selector("height")] public int Height { get; }
-    [Selector("dir", "setDir:")] public NSString? Dir { get; set; }
-    [Selector("designMode", "setDesignMode:")] public NSString? DesignMode { get; set; }
-    [Selector("compatMode")] public NSString? CompatMode { get; }
-    [Selector("bgColor", "setBgColor:")] public NSString? BgColor { get; set; }
-    [Selector("fgColor", "setFgColor:")] public NSString? FgColor { get; set; }
-    [Selector("alinkColor", "setAlinkColor:")] public NSString? AlinkColor { get; set; }
-    [Selector("linkColor", "setLinkColor:")] public NSString? LinkColor { get; set; }
-    [Selector("vlinkColor", "setVlinkColor:")] public NSString? VlinkColor { get; set; }
-    [Selector("open")] public void Open();
-    [Selector("close")] public void Close();
-    [Selector("write:")] public void Write(NSString? text);
-    [Selector("writeln:")] public void Writeln(NSString? text);
-    [Selector("clear")] public void Clear();
-    [Selector("captureEvents")] public void CaptureEvents();
-    [Selector("releaseEvents")] public void ReleaseEvents();
+    [Selector("embeds")]
+    public DOMHTMLCollection? Embeds { get; }
+    [Selector("plugins")]
+    public DOMHTMLCollection? Plugins { get; }
+    [Selector("scripts")]
+    public DOMHTMLCollection? Scripts { get; }
+    [Selector("width")]
+    public int Width { get; }
+    [Selector("height")]
+    public int Height { get; }
+    [Selector("dir", "setDir:")]
+    public NSString? Dir { get; set; }
+    [Selector("designMode", "setDesignMode:")]
+    public NSString? DesignMode { get; set; }
+    [Selector("compatMode")]
+    public NSString? CompatMode { get; }
+    [Selector("bgColor", "setBgColor:")]
+    public NSString? BgColor { get; set; }
+    [Selector("fgColor", "setFgColor:")]
+    public NSString? FgColor { get; set; }
+    [Selector("alinkColor", "setAlinkColor:")]
+    public NSString? AlinkColor { get; set; }
+    [Selector("linkColor", "setLinkColor:")]
+    public NSString? LinkColor { get; set; }
+    [Selector("vlinkColor", "setVlinkColor:")]
+    public NSString? VlinkColor { get; set; }
+    [Selector("open")]
+    public void Open();
+    [Selector("close")]
+    public void Close();
+    [Selector("write:")]
+    public void Write(NSString? text);
+    [Selector("writeln:")]
+    public void Writeln(NSString? text);
+    [Selector("clear")]
+    public void Clear();
+    [Selector("captureEvents")]
+    public void CaptureEvents();
+    [Selector("releaseEvents")]
+    public void ReleaseEvents();
 }
 
 #endif

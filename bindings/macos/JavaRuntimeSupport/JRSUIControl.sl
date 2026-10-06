@@ -34,13 +34,15 @@ import Standard.ObjC;
 
 public using JRSUIRendererRef = CFTypeRef;
 
-[ReturnsRetained] public extern "C" JRSUIRendererRef? JRSUIRendererCreate();
+[ReturnsRetained]
+public extern "C" JRSUIRendererRef? JRSUIRendererCreate();
 
 public extern "C" void JRSUIRendererRelease(JRSUIRendererRef? renderer);
 
 public using JRSUIControlRef = CFTypeRef;
 
-[ReturnsRetained] public extern "C" JRSUIControlRef? JRSUIControlCreate(Boolean isFlipped);
+[ReturnsRetained]
+public extern "C" JRSUIControlRef? JRSUIControlCreate(Boolean isFlipped);
 
 public extern "C" void JRSUIControlRelease(JRSUIControlRef? control);
 

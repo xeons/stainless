@@ -33,36 +33,56 @@ import Standard.ObjC;
 
 public objc interface GKAgentDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("agentWillUpdate:")] void AgentWillUpdate(GKAgent agent);
-    [Optional] [Selector("agentDidUpdate:")] void AgentDidUpdate(GKAgent agent);
+    [Optional]
+    [Selector("agentWillUpdate:")]
+    void AgentWillUpdate(GKAgent agent);
+    [Optional]
+    [Selector("agentDidUpdate:")]
+    void AgentDidUpdate(GKAgent agent);
 }
 
 public extern objc class GKAgent : GKComponent, NSSecureCoding
 {
-    [Selector("delegate", "setDelegate:")] public GKAgentDelegate? Delegate { get; set; }
-    [Selector("behavior", "setBehavior:")] public GKBehavior? Behavior { get; set; }
-    [Selector("mass", "setMass:")] public float Mass { get; set; }
-    [Selector("radius", "setRadius:")] public float Radius { get; set; }
-    [Selector("speed", "setSpeed:")] public float Speed { get; set; }
-    [Selector("maxAcceleration", "setMaxAcceleration:")] public float MaxAcceleration { get; set; }
-    [Selector("maxSpeed", "setMaxSpeed:")] public float MaxSpeed { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public GKAgentDelegate? Delegate { get; set; }
+    [Selector("behavior", "setBehavior:")]
+    public GKBehavior? Behavior { get; set; }
+    [Selector("mass", "setMass:")]
+    public float Mass { get; set; }
+    [Selector("radius", "setRadius:")]
+    public float Radius { get; set; }
+    [Selector("speed", "setSpeed:")]
+    public float Speed { get; set; }
+    [Selector("maxAcceleration", "setMaxAcceleration:")]
+    public float MaxAcceleration { get; set; }
+    [Selector("maxSpeed", "setMaxSpeed:")]
+    public float MaxSpeed { get; set; }
 }
 
 public extern objc class GKAgent2D : GKAgent, NSSecureCoding
 {
-    [Selector("position", "setPosition:")] public vector_float2 Position { get; set; }
-    [Selector("velocity")] public vector_float2 Velocity { get; }
-    [Selector("rotation", "setRotation:")] public float Rotation { get; set; }
-    [Selector("updateWithDeltaTime:")] public void UpdateWithDeltaTime(NSTimeInterval seconds);
+    [Selector("position", "setPosition:")]
+    public vector_float2 Position { get; set; }
+    [Selector("velocity")]
+    public vector_float2 Velocity { get; }
+    [Selector("rotation", "setRotation:")]
+    public float Rotation { get; set; }
+    [Selector("updateWithDeltaTime:")]
+    public void UpdateWithDeltaTime(NSTimeInterval seconds);
 }
 
 public extern objc class GKAgent3D : GKAgent
 {
-    [Selector("position", "setPosition:")] public vector_float3 Position { get; set; }
-    [Selector("velocity")] public vector_float3 Velocity { get; }
-    [Selector("rightHanded", "setRightHanded:")] public bool RightHanded { get; set; }
-    [Selector("rotation", "setRotation:")] public matrix_float3x3 Rotation { get; set; }
-    [Selector("updateWithDeltaTime:")] public void UpdateWithDeltaTime(NSTimeInterval seconds);
+    [Selector("position", "setPosition:")]
+    public vector_float3 Position { get; set; }
+    [Selector("velocity")]
+    public vector_float3 Velocity { get; }
+    [Selector("rightHanded", "setRightHanded:")]
+    public bool RightHanded { get; set; }
+    [Selector("rotation", "setRotation:")]
+    public matrix_float3x3 Rotation { get; set; }
+    [Selector("updateWithDeltaTime:")]
+    public void UpdateWithDeltaTime(NSTimeInterval seconds);
 }
 
 #endif

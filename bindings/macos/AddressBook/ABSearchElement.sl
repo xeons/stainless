@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class ABSearchElement : NSObject
 {
-    [Selector("searchElementForConjunction:children:")] public static ABSearchElement? SearchElementForConjunctionChildren(ABSearchConjunction conjuction, NSArray? children);
-    [Selector("matchesRecord:")] public bool MatchesRecord(ABRecord? record);
+    [Selector("searchElementForConjunction:children:")]
+    public static ABSearchElement? SearchElementForConjunctionChildren(ABSearchConjunction conjuction, NSArray? children);
+    [Selector("matchesRecord:")]
+    public bool MatchesRecord(ABRecord? record);
 }
 
 #endif

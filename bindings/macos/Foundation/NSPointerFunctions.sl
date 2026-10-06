@@ -70,18 +70,28 @@ public delegate void* NSPointerFunctionsAcquireFunction(void* arg0, NSPointerFun
 
 public extern objc class NSPointerFunctions : NSObject, NSCopying
 {
-    [Selector("hashFunction", "setHashFunction:")] public NSPointerFunctionsHashFunction HashFunction { get; set; }
-    [Selector("isEqualFunction", "setIsEqualFunction:")] public NSPointerFunctionsIsEqualFunction IsEqualFunction { get; set; }
-    [Selector("sizeFunction", "setSizeFunction:")] public NSPointerFunctionsSizeFunction SizeFunction { get; set; }
-    [Selector("descriptionFunction", "setDescriptionFunction:")] public NSPointerFunctionsDescriptionFunction DescriptionFunction { get; set; }
-    [Selector("relinquishFunction", "setRelinquishFunction:")] public NSPointerFunctionsRelinquishFunction RelinquishFunction { get; set; }
-    [Selector("acquireFunction", "setAcquireFunction:")] public NSPointerFunctionsAcquireFunction AcquireFunction { get; set; }
+    [Selector("hashFunction", "setHashFunction:")]
+    public NSPointerFunctionsHashFunction HashFunction { get; set; }
+    [Selector("isEqualFunction", "setIsEqualFunction:")]
+    public NSPointerFunctionsIsEqualFunction IsEqualFunction { get; set; }
+    [Selector("sizeFunction", "setSizeFunction:")]
+    public NSPointerFunctionsSizeFunction SizeFunction { get; set; }
+    [Selector("descriptionFunction", "setDescriptionFunction:")]
+    public NSPointerFunctionsDescriptionFunction DescriptionFunction { get; set; }
+    [Selector("relinquishFunction", "setRelinquishFunction:")]
+    public NSPointerFunctionsRelinquishFunction RelinquishFunction { get; set; }
+    [Selector("acquireFunction", "setAcquireFunction:")]
+    public NSPointerFunctionsAcquireFunction AcquireFunction { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("usesStrongWriteBarrier", "setUsesStrongWriteBarrier:")] public bool UsesStrongWriteBarrier { get; set; }
+    [Selector("usesStrongWriteBarrier", "setUsesStrongWriteBarrier:")]
+    public bool UsesStrongWriteBarrier { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("usesWeakReadAndWriteBarriers", "setUsesWeakReadAndWriteBarriers:")] public bool UsesWeakReadAndWriteBarriers { get; set; }
-    [Selector("initWithOptions:")] public Self InitWithOptions(NSPointerFunctionsOptions options);
-    [Selector("pointerFunctionsWithOptions:")] public static NSPointerFunctions PointerFunctionsWithOptions(NSPointerFunctionsOptions options);
+    [Selector("usesWeakReadAndWriteBarriers", "setUsesWeakReadAndWriteBarriers:")]
+    public bool UsesWeakReadAndWriteBarriers { get; set; }
+    [Selector("initWithOptions:")]
+    public Self InitWithOptions(NSPointerFunctionsOptions options);
+    [Selector("pointerFunctionsWithOptions:")]
+    public static NSPointerFunctions PointerFunctionsWithOptions(NSPointerFunctionsOptions options);
 }
 
 #endif

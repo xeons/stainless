@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class ODRecordMap : NSObject
 {
-    [Selector("native", "setNative:")] public NSString? Native { get; set; }
-    [Selector("odPredicate", "setOdPredicate:")] public NSDictionary? OdPredicate { get; set; }
-    [Selector("attributes")] public NSDictionary? Attributes { get; }
-    [Selector("standardAttributeTypes")] public NSArray? StandardAttributeTypes { get; }
-    [Selector("recordMap")] public static Self? RecordMap();
-    [Selector("attributeMapForStandardAttribute:")] public ODAttributeMap? AttributeMapForStandardAttribute(NSString? standardAttribute);
-    [Selector("setAttributeMap:forStandardAttribute:")] public void SetAttributeMapForStandardAttribute(ODAttributeMap? attributeMap, NSString? standardAttribute);
+    [Selector("native", "setNative:")]
+    public NSString? Native { get; set; }
+    [Selector("odPredicate", "setOdPredicate:")]
+    public NSDictionary? OdPredicate { get; set; }
+    [Selector("attributes")]
+    public NSDictionary? Attributes { get; }
+    [Selector("standardAttributeTypes")]
+    public NSArray? StandardAttributeTypes { get; }
+    [Selector("recordMap")]
+    public static Self? RecordMap();
+    [Selector("attributeMapForStandardAttribute:")]
+    public ODAttributeMap? AttributeMapForStandardAttribute(NSString? standardAttribute);
+    [Selector("setAttributeMap:forStandardAttribute:")]
+    public void SetAttributeMapForStandardAttribute(ODAttributeMap? attributeMap, NSString? standardAttribute);
 }
 
 #endif

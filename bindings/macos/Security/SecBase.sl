@@ -117,7 +117,8 @@ public struct SecKeychainAttributeInfo
     public UInt32* format;
 }
 
-[ReturnsRetained] public extern "C" CFStringRef? SecCopyErrorMessageString(OSStatus status, void* reserved);
+[ReturnsRetained]
+public extern "C" CFStringRef? SecCopyErrorMessageString(OSStatus status, void* reserved);
 
 public const int errSecSuccess = 0;
 public const int errSecUnimplemented = -4;

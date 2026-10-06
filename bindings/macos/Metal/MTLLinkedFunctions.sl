@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class MTLLinkedFunctions : NSObject, NSCopying
 {
-    [Selector("functions", "setFunctions:")] public NSArray? Functions { get; set; }
-    [Selector("binaryFunctions", "setBinaryFunctions:")] public NSArray? BinaryFunctions { get; set; }
-    [Selector("groups", "setGroups:")] public NSDictionary? Groups { get; set; }
-    [Selector("privateFunctions", "setPrivateFunctions:")] public NSArray? PrivateFunctions { get; set; }
-    [Selector("linkedFunctions")] public static MTLLinkedFunctions LinkedFunctions();
+    [Selector("functions", "setFunctions:")]
+    public NSArray? Functions { get; set; }
+    [Selector("binaryFunctions", "setBinaryFunctions:")]
+    public NSArray? BinaryFunctions { get; set; }
+    [Selector("groups", "setGroups:")]
+    public NSDictionary? Groups { get; set; }
+    [Selector("privateFunctions", "setPrivateFunctions:")]
+    public NSArray? PrivateFunctions { get; set; }
+    [Selector("linkedFunctions")]
+    public static MTLLinkedFunctions LinkedFunctions();
 }
 
 #endif

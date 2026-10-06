@@ -33,13 +33,18 @@ import Standard.ObjC;
 
 public extern objc class MTRDeviceTypeRevision : NSObject, NSCopying
 {
-    [Selector("deviceTypeID")] public NSNumber DeviceTypeID { get; }
-    [Selector("deviceTypeRevision")] public NSNumber DeviceTypeRevision { get; }
+    [Selector("deviceTypeID")]
+    public NSNumber DeviceTypeID { get; }
+    [Selector("deviceTypeRevision")]
+    public NSNumber DeviceTypeRevision { get; }
     /// macOS 15.4 and later.
-    [Selector("typeInformation")] public MTRDeviceType? TypeInformation { get; }
-    [Selector("initWithDeviceTypeID:revision:")] public Self? InitWithDeviceTypeIDRevision(NSNumber deviceTypeID, NSNumber revision);
+    [Selector("typeInformation")]
+    public MTRDeviceType? TypeInformation { get; }
+    [Selector("initWithDeviceTypeID:revision:")]
+    public Self? InitWithDeviceTypeIDRevision(NSNumber deviceTypeID, NSNumber revision);
     /// macOS 15.4 and later.
-    [Selector("initWithDeviceTypeStruct:")] public Self? InitWithDeviceTypeStruct(MTRDescriptorClusterDeviceTypeStruct deviceTypeStruct);
+    [Selector("initWithDeviceTypeStruct:")]
+    public Self? InitWithDeviceTypeStruct(MTRDescriptorClusterDeviceTypeStruct deviceTypeStruct);
 }
 
 /// macOS 15.4 and later.

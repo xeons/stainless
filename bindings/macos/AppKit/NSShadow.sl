@@ -34,11 +34,16 @@ import Standard.ObjC;
 
 public extern objc class NSShadow : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("shadowOffset", "setShadowOffset:")] public NSSize ShadowOffset { get; set; }
-    [Selector("shadowBlurRadius", "setShadowBlurRadius:")] public CGFloat ShadowBlurRadius { get; set; }
-    [Selector("shadowColor", "setShadowColor:")] public NSColor? ShadowColor { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("set")] public void Set();
+    [Selector("shadowOffset", "setShadowOffset:")]
+    public NSSize ShadowOffset { get; set; }
+    [Selector("shadowBlurRadius", "setShadowBlurRadius:")]
+    public CGFloat ShadowBlurRadius { get; set; }
+    [Selector("shadowColor", "setShadowColor:")]
+    public NSColor? ShadowColor { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("set")]
+    public void Set();
 }
 
 #endif

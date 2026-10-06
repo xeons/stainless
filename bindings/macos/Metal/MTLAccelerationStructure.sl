@@ -67,19 +67,28 @@ public enum MTLMatrixLayout : long
 
 public extern objc class MTLAccelerationStructureDescriptor : NSObject, NSCopying
 {
-    [Selector("usage", "setUsage:")] public MTLAccelerationStructureUsage Usage { get; set; }
+    [Selector("usage", "setUsage:")]
+    public MTLAccelerationStructureUsage Usage { get; set; }
 }
 
 public extern objc class MTLAccelerationStructureGeometryDescriptor : NSObject, NSCopying
 {
-    [Selector("intersectionFunctionTableOffset", "setIntersectionFunctionTableOffset:")] public NSUInteger IntersectionFunctionTableOffset { get; set; }
-    [Selector("opaque", "setOpaque:")] public bool Opaque { get; set; }
-    [Selector("allowDuplicateIntersectionFunctionInvocation", "setAllowDuplicateIntersectionFunctionInvocation:")] public bool AllowDuplicateIntersectionFunctionInvocation { get; set; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("primitiveDataBuffer", "setPrimitiveDataBuffer:")] public MTLBuffer? PrimitiveDataBuffer { get; set; }
-    [Selector("primitiveDataBufferOffset", "setPrimitiveDataBufferOffset:")] public NSUInteger PrimitiveDataBufferOffset { get; set; }
-    [Selector("primitiveDataStride", "setPrimitiveDataStride:")] public NSUInteger PrimitiveDataStride { get; set; }
-    [Selector("primitiveDataElementSize", "setPrimitiveDataElementSize:")] public NSUInteger PrimitiveDataElementSize { get; set; }
+    [Selector("intersectionFunctionTableOffset", "setIntersectionFunctionTableOffset:")]
+    public NSUInteger IntersectionFunctionTableOffset { get; set; }
+    [Selector("opaque", "setOpaque:")]
+    public bool Opaque { get; set; }
+    [Selector("allowDuplicateIntersectionFunctionInvocation", "setAllowDuplicateIntersectionFunctionInvocation:")]
+    public bool AllowDuplicateIntersectionFunctionInvocation { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("primitiveDataBuffer", "setPrimitiveDataBuffer:")]
+    public MTLBuffer? PrimitiveDataBuffer { get; set; }
+    [Selector("primitiveDataBufferOffset", "setPrimitiveDataBufferOffset:")]
+    public NSUInteger PrimitiveDataBufferOffset { get; set; }
+    [Selector("primitiveDataStride", "setPrimitiveDataStride:")]
+    public NSUInteger PrimitiveDataStride { get; set; }
+    [Selector("primitiveDataElementSize", "setPrimitiveDataElementSize:")]
+    public NSUInteger PrimitiveDataElementSize { get; set; }
 }
 
 public enum MTLMotionBorderMode : uint
@@ -90,68 +99,110 @@ public enum MTLMotionBorderMode : uint
 
 public extern objc class MTLPrimitiveAccelerationStructureDescriptor : MTLAccelerationStructureDescriptor
 {
-    [Selector("geometryDescriptors", "setGeometryDescriptors:")] public NSArray? GeometryDescriptors { get; set; }
-    [Selector("motionStartBorderMode", "setMotionStartBorderMode:")] public MTLMotionBorderMode MotionStartBorderMode { get; set; }
-    [Selector("motionEndBorderMode", "setMotionEndBorderMode:")] public MTLMotionBorderMode MotionEndBorderMode { get; set; }
-    [Selector("motionStartTime", "setMotionStartTime:")] public float MotionStartTime { get; set; }
-    [Selector("motionEndTime", "setMotionEndTime:")] public float MotionEndTime { get; set; }
-    [Selector("motionKeyframeCount", "setMotionKeyframeCount:")] public NSUInteger MotionKeyframeCount { get; set; }
-    [Selector("descriptor")] public static Self Descriptor();
+    [Selector("geometryDescriptors", "setGeometryDescriptors:")]
+    public NSArray? GeometryDescriptors { get; set; }
+    [Selector("motionStartBorderMode", "setMotionStartBorderMode:")]
+    public MTLMotionBorderMode MotionStartBorderMode { get; set; }
+    [Selector("motionEndBorderMode", "setMotionEndBorderMode:")]
+    public MTLMotionBorderMode MotionEndBorderMode { get; set; }
+    [Selector("motionStartTime", "setMotionStartTime:")]
+    public float MotionStartTime { get; set; }
+    [Selector("motionEndTime", "setMotionEndTime:")]
+    public float MotionEndTime { get; set; }
+    [Selector("motionKeyframeCount", "setMotionKeyframeCount:")]
+    public NSUInteger MotionKeyframeCount { get; set; }
+    [Selector("descriptor")]
+    public static Self Descriptor();
 }
 
 public extern objc class MTLAccelerationStructureTriangleGeometryDescriptor : MTLAccelerationStructureGeometryDescriptor
 {
-    [Selector("vertexBuffer", "setVertexBuffer:")] public MTLBuffer? VertexBuffer { get; set; }
-    [Selector("vertexBufferOffset", "setVertexBufferOffset:")] public NSUInteger VertexBufferOffset { get; set; }
-    [Selector("vertexFormat", "setVertexFormat:")] public MTLAttributeFormat VertexFormat { get; set; }
-    [Selector("vertexStride", "setVertexStride:")] public NSUInteger VertexStride { get; set; }
-    [Selector("indexBuffer", "setIndexBuffer:")] public MTLBuffer? IndexBuffer { get; set; }
-    [Selector("indexBufferOffset", "setIndexBufferOffset:")] public NSUInteger IndexBufferOffset { get; set; }
-    [Selector("indexType", "setIndexType:")] public MTLIndexType IndexType { get; set; }
-    [Selector("triangleCount", "setTriangleCount:")] public NSUInteger TriangleCount { get; set; }
-    [Selector("transformationMatrixBuffer", "setTransformationMatrixBuffer:")] public MTLBuffer? TransformationMatrixBuffer { get; set; }
-    [Selector("transformationMatrixBufferOffset", "setTransformationMatrixBufferOffset:")] public NSUInteger TransformationMatrixBufferOffset { get; set; }
-    [Selector("transformationMatrixLayout", "setTransformationMatrixLayout:")] public MTLMatrixLayout TransformationMatrixLayout { get; set; }
-    [Selector("descriptor")] public static Self Descriptor();
+    [Selector("vertexBuffer", "setVertexBuffer:")]
+    public MTLBuffer? VertexBuffer { get; set; }
+    [Selector("vertexBufferOffset", "setVertexBufferOffset:")]
+    public NSUInteger VertexBufferOffset { get; set; }
+    [Selector("vertexFormat", "setVertexFormat:")]
+    public MTLAttributeFormat VertexFormat { get; set; }
+    [Selector("vertexStride", "setVertexStride:")]
+    public NSUInteger VertexStride { get; set; }
+    [Selector("indexBuffer", "setIndexBuffer:")]
+    public MTLBuffer? IndexBuffer { get; set; }
+    [Selector("indexBufferOffset", "setIndexBufferOffset:")]
+    public NSUInteger IndexBufferOffset { get; set; }
+    [Selector("indexType", "setIndexType:")]
+    public MTLIndexType IndexType { get; set; }
+    [Selector("triangleCount", "setTriangleCount:")]
+    public NSUInteger TriangleCount { get; set; }
+    [Selector("transformationMatrixBuffer", "setTransformationMatrixBuffer:")]
+    public MTLBuffer? TransformationMatrixBuffer { get; set; }
+    [Selector("transformationMatrixBufferOffset", "setTransformationMatrixBufferOffset:")]
+    public NSUInteger TransformationMatrixBufferOffset { get; set; }
+    [Selector("transformationMatrixLayout", "setTransformationMatrixLayout:")]
+    public MTLMatrixLayout TransformationMatrixLayout { get; set; }
+    [Selector("descriptor")]
+    public static Self Descriptor();
 }
 
 public extern objc class MTLAccelerationStructureBoundingBoxGeometryDescriptor : MTLAccelerationStructureGeometryDescriptor
 {
-    [Selector("boundingBoxBuffer", "setBoundingBoxBuffer:")] public MTLBuffer? BoundingBoxBuffer { get; set; }
-    [Selector("boundingBoxBufferOffset", "setBoundingBoxBufferOffset:")] public NSUInteger BoundingBoxBufferOffset { get; set; }
-    [Selector("boundingBoxStride", "setBoundingBoxStride:")] public NSUInteger BoundingBoxStride { get; set; }
-    [Selector("boundingBoxCount", "setBoundingBoxCount:")] public NSUInteger BoundingBoxCount { get; set; }
-    [Selector("descriptor")] public static Self Descriptor();
+    [Selector("boundingBoxBuffer", "setBoundingBoxBuffer:")]
+    public MTLBuffer? BoundingBoxBuffer { get; set; }
+    [Selector("boundingBoxBufferOffset", "setBoundingBoxBufferOffset:")]
+    public NSUInteger BoundingBoxBufferOffset { get; set; }
+    [Selector("boundingBoxStride", "setBoundingBoxStride:")]
+    public NSUInteger BoundingBoxStride { get; set; }
+    [Selector("boundingBoxCount", "setBoundingBoxCount:")]
+    public NSUInteger BoundingBoxCount { get; set; }
+    [Selector("descriptor")]
+    public static Self Descriptor();
 }
 
 public extern objc class MTLMotionKeyframeData : NSObject
 {
-    [Selector("buffer", "setBuffer:")] public MTLBuffer? Buffer { get; set; }
-    [Selector("offset", "setOffset:")] public NSUInteger Offset { get; set; }
-    [Selector("data")] public static Self Data();
+    [Selector("buffer", "setBuffer:")]
+    public MTLBuffer? Buffer { get; set; }
+    [Selector("offset", "setOffset:")]
+    public NSUInteger Offset { get; set; }
+    [Selector("data")]
+    public static Self Data();
 }
 
 public extern objc class MTLAccelerationStructureMotionTriangleGeometryDescriptor : MTLAccelerationStructureGeometryDescriptor
 {
-    [Selector("vertexBuffers", "setVertexBuffers:")] public NSArray VertexBuffers { get; set; }
-    [Selector("vertexFormat", "setVertexFormat:")] public MTLAttributeFormat VertexFormat { get; set; }
-    [Selector("vertexStride", "setVertexStride:")] public NSUInteger VertexStride { get; set; }
-    [Selector("indexBuffer", "setIndexBuffer:")] public MTLBuffer? IndexBuffer { get; set; }
-    [Selector("indexBufferOffset", "setIndexBufferOffset:")] public NSUInteger IndexBufferOffset { get; set; }
-    [Selector("indexType", "setIndexType:")] public MTLIndexType IndexType { get; set; }
-    [Selector("triangleCount", "setTriangleCount:")] public NSUInteger TriangleCount { get; set; }
-    [Selector("transformationMatrixBuffer", "setTransformationMatrixBuffer:")] public MTLBuffer? TransformationMatrixBuffer { get; set; }
-    [Selector("transformationMatrixBufferOffset", "setTransformationMatrixBufferOffset:")] public NSUInteger TransformationMatrixBufferOffset { get; set; }
-    [Selector("transformationMatrixLayout", "setTransformationMatrixLayout:")] public MTLMatrixLayout TransformationMatrixLayout { get; set; }
-    [Selector("descriptor")] public static Self Descriptor();
+    [Selector("vertexBuffers", "setVertexBuffers:")]
+    public NSArray VertexBuffers { get; set; }
+    [Selector("vertexFormat", "setVertexFormat:")]
+    public MTLAttributeFormat VertexFormat { get; set; }
+    [Selector("vertexStride", "setVertexStride:")]
+    public NSUInteger VertexStride { get; set; }
+    [Selector("indexBuffer", "setIndexBuffer:")]
+    public MTLBuffer? IndexBuffer { get; set; }
+    [Selector("indexBufferOffset", "setIndexBufferOffset:")]
+    public NSUInteger IndexBufferOffset { get; set; }
+    [Selector("indexType", "setIndexType:")]
+    public MTLIndexType IndexType { get; set; }
+    [Selector("triangleCount", "setTriangleCount:")]
+    public NSUInteger TriangleCount { get; set; }
+    [Selector("transformationMatrixBuffer", "setTransformationMatrixBuffer:")]
+    public MTLBuffer? TransformationMatrixBuffer { get; set; }
+    [Selector("transformationMatrixBufferOffset", "setTransformationMatrixBufferOffset:")]
+    public NSUInteger TransformationMatrixBufferOffset { get; set; }
+    [Selector("transformationMatrixLayout", "setTransformationMatrixLayout:")]
+    public MTLMatrixLayout TransformationMatrixLayout { get; set; }
+    [Selector("descriptor")]
+    public static Self Descriptor();
 }
 
 public extern objc class MTLAccelerationStructureMotionBoundingBoxGeometryDescriptor : MTLAccelerationStructureGeometryDescriptor
 {
-    [Selector("boundingBoxBuffers", "setBoundingBoxBuffers:")] public NSArray BoundingBoxBuffers { get; set; }
-    [Selector("boundingBoxStride", "setBoundingBoxStride:")] public NSUInteger BoundingBoxStride { get; set; }
-    [Selector("boundingBoxCount", "setBoundingBoxCount:")] public NSUInteger BoundingBoxCount { get; set; }
-    [Selector("descriptor")] public static Self Descriptor();
+    [Selector("boundingBoxBuffers", "setBoundingBoxBuffers:")]
+    public NSArray BoundingBoxBuffers { get; set; }
+    [Selector("boundingBoxStride", "setBoundingBoxStride:")]
+    public NSUInteger BoundingBoxStride { get; set; }
+    [Selector("boundingBoxCount", "setBoundingBoxCount:")]
+    public NSUInteger BoundingBoxCount { get; set; }
+    [Selector("descriptor")]
+    public static Self Descriptor();
 }
 
 public enum MTLCurveType : long
@@ -177,44 +228,78 @@ public enum MTLCurveEndCaps : long
 
 public extern objc class MTLAccelerationStructureCurveGeometryDescriptor : MTLAccelerationStructureGeometryDescriptor
 {
-    [Selector("controlPointBuffer", "setControlPointBuffer:")] public MTLBuffer? ControlPointBuffer { get; set; }
-    [Selector("controlPointBufferOffset", "setControlPointBufferOffset:")] public NSUInteger ControlPointBufferOffset { get; set; }
-    [Selector("controlPointCount", "setControlPointCount:")] public NSUInteger ControlPointCount { get; set; }
-    [Selector("controlPointStride", "setControlPointStride:")] public NSUInteger ControlPointStride { get; set; }
-    [Selector("controlPointFormat", "setControlPointFormat:")] public MTLAttributeFormat ControlPointFormat { get; set; }
-    [Selector("radiusBuffer", "setRadiusBuffer:")] public MTLBuffer? RadiusBuffer { get; set; }
-    [Selector("radiusBufferOffset", "setRadiusBufferOffset:")] public NSUInteger RadiusBufferOffset { get; set; }
-    [Selector("radiusFormat", "setRadiusFormat:")] public MTLAttributeFormat RadiusFormat { get; set; }
-    [Selector("radiusStride", "setRadiusStride:")] public NSUInteger RadiusStride { get; set; }
-    [Selector("indexBuffer", "setIndexBuffer:")] public MTLBuffer? IndexBuffer { get; set; }
-    [Selector("indexBufferOffset", "setIndexBufferOffset:")] public NSUInteger IndexBufferOffset { get; set; }
-    [Selector("indexType", "setIndexType:")] public MTLIndexType IndexType { get; set; }
-    [Selector("segmentCount", "setSegmentCount:")] public NSUInteger SegmentCount { get; set; }
-    [Selector("segmentControlPointCount", "setSegmentControlPointCount:")] public NSUInteger SegmentControlPointCount { get; set; }
-    [Selector("curveType", "setCurveType:")] public MTLCurveType CurveType { get; set; }
-    [Selector("curveBasis", "setCurveBasis:")] public MTLCurveBasis CurveBasis { get; set; }
-    [Selector("curveEndCaps", "setCurveEndCaps:")] public MTLCurveEndCaps CurveEndCaps { get; set; }
-    [Selector("descriptor")] public static Self Descriptor();
+    [Selector("controlPointBuffer", "setControlPointBuffer:")]
+    public MTLBuffer? ControlPointBuffer { get; set; }
+    [Selector("controlPointBufferOffset", "setControlPointBufferOffset:")]
+    public NSUInteger ControlPointBufferOffset { get; set; }
+    [Selector("controlPointCount", "setControlPointCount:")]
+    public NSUInteger ControlPointCount { get; set; }
+    [Selector("controlPointStride", "setControlPointStride:")]
+    public NSUInteger ControlPointStride { get; set; }
+    [Selector("controlPointFormat", "setControlPointFormat:")]
+    public MTLAttributeFormat ControlPointFormat { get; set; }
+    [Selector("radiusBuffer", "setRadiusBuffer:")]
+    public MTLBuffer? RadiusBuffer { get; set; }
+    [Selector("radiusBufferOffset", "setRadiusBufferOffset:")]
+    public NSUInteger RadiusBufferOffset { get; set; }
+    [Selector("radiusFormat", "setRadiusFormat:")]
+    public MTLAttributeFormat RadiusFormat { get; set; }
+    [Selector("radiusStride", "setRadiusStride:")]
+    public NSUInteger RadiusStride { get; set; }
+    [Selector("indexBuffer", "setIndexBuffer:")]
+    public MTLBuffer? IndexBuffer { get; set; }
+    [Selector("indexBufferOffset", "setIndexBufferOffset:")]
+    public NSUInteger IndexBufferOffset { get; set; }
+    [Selector("indexType", "setIndexType:")]
+    public MTLIndexType IndexType { get; set; }
+    [Selector("segmentCount", "setSegmentCount:")]
+    public NSUInteger SegmentCount { get; set; }
+    [Selector("segmentControlPointCount", "setSegmentControlPointCount:")]
+    public NSUInteger SegmentControlPointCount { get; set; }
+    [Selector("curveType", "setCurveType:")]
+    public MTLCurveType CurveType { get; set; }
+    [Selector("curveBasis", "setCurveBasis:")]
+    public MTLCurveBasis CurveBasis { get; set; }
+    [Selector("curveEndCaps", "setCurveEndCaps:")]
+    public MTLCurveEndCaps CurveEndCaps { get; set; }
+    [Selector("descriptor")]
+    public static Self Descriptor();
 }
 
 public extern objc class MTLAccelerationStructureMotionCurveGeometryDescriptor : MTLAccelerationStructureGeometryDescriptor
 {
-    [Selector("controlPointBuffers", "setControlPointBuffers:")] public NSArray ControlPointBuffers { get; set; }
-    [Selector("controlPointCount", "setControlPointCount:")] public NSUInteger ControlPointCount { get; set; }
-    [Selector("controlPointStride", "setControlPointStride:")] public NSUInteger ControlPointStride { get; set; }
-    [Selector("controlPointFormat", "setControlPointFormat:")] public MTLAttributeFormat ControlPointFormat { get; set; }
-    [Selector("radiusBuffers", "setRadiusBuffers:")] public NSArray RadiusBuffers { get; set; }
-    [Selector("radiusFormat", "setRadiusFormat:")] public MTLAttributeFormat RadiusFormat { get; set; }
-    [Selector("radiusStride", "setRadiusStride:")] public NSUInteger RadiusStride { get; set; }
-    [Selector("indexBuffer", "setIndexBuffer:")] public MTLBuffer? IndexBuffer { get; set; }
-    [Selector("indexBufferOffset", "setIndexBufferOffset:")] public NSUInteger IndexBufferOffset { get; set; }
-    [Selector("indexType", "setIndexType:")] public MTLIndexType IndexType { get; set; }
-    [Selector("segmentCount", "setSegmentCount:")] public NSUInteger SegmentCount { get; set; }
-    [Selector("segmentControlPointCount", "setSegmentControlPointCount:")] public NSUInteger SegmentControlPointCount { get; set; }
-    [Selector("curveType", "setCurveType:")] public MTLCurveType CurveType { get; set; }
-    [Selector("curveBasis", "setCurveBasis:")] public MTLCurveBasis CurveBasis { get; set; }
-    [Selector("curveEndCaps", "setCurveEndCaps:")] public MTLCurveEndCaps CurveEndCaps { get; set; }
-    [Selector("descriptor")] public static Self Descriptor();
+    [Selector("controlPointBuffers", "setControlPointBuffers:")]
+    public NSArray ControlPointBuffers { get; set; }
+    [Selector("controlPointCount", "setControlPointCount:")]
+    public NSUInteger ControlPointCount { get; set; }
+    [Selector("controlPointStride", "setControlPointStride:")]
+    public NSUInteger ControlPointStride { get; set; }
+    [Selector("controlPointFormat", "setControlPointFormat:")]
+    public MTLAttributeFormat ControlPointFormat { get; set; }
+    [Selector("radiusBuffers", "setRadiusBuffers:")]
+    public NSArray RadiusBuffers { get; set; }
+    [Selector("radiusFormat", "setRadiusFormat:")]
+    public MTLAttributeFormat RadiusFormat { get; set; }
+    [Selector("radiusStride", "setRadiusStride:")]
+    public NSUInteger RadiusStride { get; set; }
+    [Selector("indexBuffer", "setIndexBuffer:")]
+    public MTLBuffer? IndexBuffer { get; set; }
+    [Selector("indexBufferOffset", "setIndexBufferOffset:")]
+    public NSUInteger IndexBufferOffset { get; set; }
+    [Selector("indexType", "setIndexType:")]
+    public MTLIndexType IndexType { get; set; }
+    [Selector("segmentCount", "setSegmentCount:")]
+    public NSUInteger SegmentCount { get; set; }
+    [Selector("segmentControlPointCount", "setSegmentControlPointCount:")]
+    public NSUInteger SegmentControlPointCount { get; set; }
+    [Selector("curveType", "setCurveType:")]
+    public MTLCurveType CurveType { get; set; }
+    [Selector("curveBasis", "setCurveBasis:")]
+    public MTLCurveBasis CurveBasis { get; set; }
+    [Selector("curveEndCaps", "setCurveEndCaps:")]
+    public MTLCurveEndCaps CurveEndCaps { get; set; }
+    [Selector("descriptor")]
+    public static Self Descriptor();
 }
 
 public struct MTLAccelerationStructureInstanceDescriptor
@@ -293,45 +378,76 @@ public enum MTLTransformType : long
 
 public extern objc class MTLInstanceAccelerationStructureDescriptor : MTLAccelerationStructureDescriptor
 {
-    [Selector("instanceDescriptorBuffer", "setInstanceDescriptorBuffer:")] public MTLBuffer? InstanceDescriptorBuffer { get; set; }
-    [Selector("instanceDescriptorBufferOffset", "setInstanceDescriptorBufferOffset:")] public NSUInteger InstanceDescriptorBufferOffset { get; set; }
-    [Selector("instanceDescriptorStride", "setInstanceDescriptorStride:")] public NSUInteger InstanceDescriptorStride { get; set; }
-    [Selector("instanceCount", "setInstanceCount:")] public NSUInteger InstanceCount { get; set; }
-    [Selector("instancedAccelerationStructures", "setInstancedAccelerationStructures:")] public NSArray? InstancedAccelerationStructures { get; set; }
-    [Selector("instanceDescriptorType", "setInstanceDescriptorType:")] public MTLAccelerationStructureInstanceDescriptorType InstanceDescriptorType { get; set; }
-    [Selector("motionTransformBuffer", "setMotionTransformBuffer:")] public MTLBuffer? MotionTransformBuffer { get; set; }
-    [Selector("motionTransformBufferOffset", "setMotionTransformBufferOffset:")] public NSUInteger MotionTransformBufferOffset { get; set; }
-    [Selector("motionTransformCount", "setMotionTransformCount:")] public NSUInteger MotionTransformCount { get; set; }
-    [Selector("instanceTransformationMatrixLayout", "setInstanceTransformationMatrixLayout:")] public MTLMatrixLayout InstanceTransformationMatrixLayout { get; set; }
-    [Selector("motionTransformType", "setMotionTransformType:")] public MTLTransformType MotionTransformType { get; set; }
-    [Selector("motionTransformStride", "setMotionTransformStride:")] public NSUInteger MotionTransformStride { get; set; }
-    [Selector("descriptor")] public static Self Descriptor();
+    [Selector("instanceDescriptorBuffer", "setInstanceDescriptorBuffer:")]
+    public MTLBuffer? InstanceDescriptorBuffer { get; set; }
+    [Selector("instanceDescriptorBufferOffset", "setInstanceDescriptorBufferOffset:")]
+    public NSUInteger InstanceDescriptorBufferOffset { get; set; }
+    [Selector("instanceDescriptorStride", "setInstanceDescriptorStride:")]
+    public NSUInteger InstanceDescriptorStride { get; set; }
+    [Selector("instanceCount", "setInstanceCount:")]
+    public NSUInteger InstanceCount { get; set; }
+    [Selector("instancedAccelerationStructures", "setInstancedAccelerationStructures:")]
+    public NSArray? InstancedAccelerationStructures { get; set; }
+    [Selector("instanceDescriptorType", "setInstanceDescriptorType:")]
+    public MTLAccelerationStructureInstanceDescriptorType InstanceDescriptorType { get; set; }
+    [Selector("motionTransformBuffer", "setMotionTransformBuffer:")]
+    public MTLBuffer? MotionTransformBuffer { get; set; }
+    [Selector("motionTransformBufferOffset", "setMotionTransformBufferOffset:")]
+    public NSUInteger MotionTransformBufferOffset { get; set; }
+    [Selector("motionTransformCount", "setMotionTransformCount:")]
+    public NSUInteger MotionTransformCount { get; set; }
+    [Selector("instanceTransformationMatrixLayout", "setInstanceTransformationMatrixLayout:")]
+    public MTLMatrixLayout InstanceTransformationMatrixLayout { get; set; }
+    [Selector("motionTransformType", "setMotionTransformType:")]
+    public MTLTransformType MotionTransformType { get; set; }
+    [Selector("motionTransformStride", "setMotionTransformStride:")]
+    public NSUInteger MotionTransformStride { get; set; }
+    [Selector("descriptor")]
+    public static Self Descriptor();
 }
 
 public extern objc class MTLIndirectInstanceAccelerationStructureDescriptor : MTLAccelerationStructureDescriptor
 {
-    [Selector("instanceDescriptorBuffer", "setInstanceDescriptorBuffer:")] public MTLBuffer? InstanceDescriptorBuffer { get; set; }
-    [Selector("instanceDescriptorBufferOffset", "setInstanceDescriptorBufferOffset:")] public NSUInteger InstanceDescriptorBufferOffset { get; set; }
-    [Selector("instanceDescriptorStride", "setInstanceDescriptorStride:")] public NSUInteger InstanceDescriptorStride { get; set; }
-    [Selector("maxInstanceCount", "setMaxInstanceCount:")] public NSUInteger MaxInstanceCount { get; set; }
-    [Selector("instanceCountBuffer", "setInstanceCountBuffer:")] public MTLBuffer? InstanceCountBuffer { get; set; }
-    [Selector("instanceCountBufferOffset", "setInstanceCountBufferOffset:")] public NSUInteger InstanceCountBufferOffset { get; set; }
-    [Selector("instanceDescriptorType", "setInstanceDescriptorType:")] public MTLAccelerationStructureInstanceDescriptorType InstanceDescriptorType { get; set; }
-    [Selector("motionTransformBuffer", "setMotionTransformBuffer:")] public MTLBuffer? MotionTransformBuffer { get; set; }
-    [Selector("motionTransformBufferOffset", "setMotionTransformBufferOffset:")] public NSUInteger MotionTransformBufferOffset { get; set; }
-    [Selector("maxMotionTransformCount", "setMaxMotionTransformCount:")] public NSUInteger MaxMotionTransformCount { get; set; }
-    [Selector("motionTransformCountBuffer", "setMotionTransformCountBuffer:")] public MTLBuffer? MotionTransformCountBuffer { get; set; }
-    [Selector("motionTransformCountBufferOffset", "setMotionTransformCountBufferOffset:")] public NSUInteger MotionTransformCountBufferOffset { get; set; }
-    [Selector("instanceTransformationMatrixLayout", "setInstanceTransformationMatrixLayout:")] public MTLMatrixLayout InstanceTransformationMatrixLayout { get; set; }
-    [Selector("motionTransformType", "setMotionTransformType:")] public MTLTransformType MotionTransformType { get; set; }
-    [Selector("motionTransformStride", "setMotionTransformStride:")] public NSUInteger MotionTransformStride { get; set; }
-    [Selector("descriptor")] public static Self Descriptor();
+    [Selector("instanceDescriptorBuffer", "setInstanceDescriptorBuffer:")]
+    public MTLBuffer? InstanceDescriptorBuffer { get; set; }
+    [Selector("instanceDescriptorBufferOffset", "setInstanceDescriptorBufferOffset:")]
+    public NSUInteger InstanceDescriptorBufferOffset { get; set; }
+    [Selector("instanceDescriptorStride", "setInstanceDescriptorStride:")]
+    public NSUInteger InstanceDescriptorStride { get; set; }
+    [Selector("maxInstanceCount", "setMaxInstanceCount:")]
+    public NSUInteger MaxInstanceCount { get; set; }
+    [Selector("instanceCountBuffer", "setInstanceCountBuffer:")]
+    public MTLBuffer? InstanceCountBuffer { get; set; }
+    [Selector("instanceCountBufferOffset", "setInstanceCountBufferOffset:")]
+    public NSUInteger InstanceCountBufferOffset { get; set; }
+    [Selector("instanceDescriptorType", "setInstanceDescriptorType:")]
+    public MTLAccelerationStructureInstanceDescriptorType InstanceDescriptorType { get; set; }
+    [Selector("motionTransformBuffer", "setMotionTransformBuffer:")]
+    public MTLBuffer? MotionTransformBuffer { get; set; }
+    [Selector("motionTransformBufferOffset", "setMotionTransformBufferOffset:")]
+    public NSUInteger MotionTransformBufferOffset { get; set; }
+    [Selector("maxMotionTransformCount", "setMaxMotionTransformCount:")]
+    public NSUInteger MaxMotionTransformCount { get; set; }
+    [Selector("motionTransformCountBuffer", "setMotionTransformCountBuffer:")]
+    public MTLBuffer? MotionTransformCountBuffer { get; set; }
+    [Selector("motionTransformCountBufferOffset", "setMotionTransformCountBufferOffset:")]
+    public NSUInteger MotionTransformCountBufferOffset { get; set; }
+    [Selector("instanceTransformationMatrixLayout", "setInstanceTransformationMatrixLayout:")]
+    public MTLMatrixLayout InstanceTransformationMatrixLayout { get; set; }
+    [Selector("motionTransformType", "setMotionTransformType:")]
+    public MTLTransformType MotionTransformType { get; set; }
+    [Selector("motionTransformStride", "setMotionTransformStride:")]
+    public NSUInteger MotionTransformStride { get; set; }
+    [Selector("descriptor")]
+    public static Self Descriptor();
 }
 
 public objc interface MTLAccelerationStructure : MTLResource
 {
-    [Selector("size")] NSUInteger Size { get; }
-    [Selector("gpuResourceID")] MTLResourceID GpuResourceID { get; }
+    [Selector("size")]
+    NSUInteger Size { get; }
+    [Selector("gpuResourceID")]
+    MTLResourceID GpuResourceID { get; }
 }
 
 #endif

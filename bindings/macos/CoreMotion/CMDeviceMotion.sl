@@ -52,13 +52,20 @@ public struct CMCalibratedMagneticField
 
 public extern objc class CMDeviceMotion : CMLogItem
 {
-    [Selector("attitude")] public CMAttitude Attitude { get; }
-    [Selector("rotationRate")] public CMRotationRate RotationRate { get; }
-    [Selector("gravity")] public CMAcceleration Gravity { get; }
-    [Selector("userAcceleration")] public CMAcceleration UserAcceleration { get; }
-    [Selector("magneticField")] public CMCalibratedMagneticField MagneticField { get; }
-    [Selector("heading")] public double Heading { get; }
-    [Selector("sensorLocation")] public CMDeviceMotionSensorLocation SensorLocation { get; }
+    [Selector("attitude")]
+    public CMAttitude Attitude { get; }
+    [Selector("rotationRate")]
+    public CMRotationRate RotationRate { get; }
+    [Selector("gravity")]
+    public CMAcceleration Gravity { get; }
+    [Selector("userAcceleration")]
+    public CMAcceleration UserAcceleration { get; }
+    [Selector("magneticField")]
+    public CMCalibratedMagneticField MagneticField { get; }
+    [Selector("heading")]
+    public double Heading { get; }
+    [Selector("sensorLocation")]
+    public CMDeviceMotionSensorLocation SensorLocation { get; }
 }
 
 #endif

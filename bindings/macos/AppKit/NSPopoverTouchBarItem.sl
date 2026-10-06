@@ -32,16 +32,26 @@ import Standard.ObjC;
 
 public extern objc class NSPopoverTouchBarItem : NSTouchBarItem
 {
-    [Selector("popoverTouchBar", "setPopoverTouchBar:")] public NSTouchBar PopoverTouchBar { get; set; }
-    [Selector("customizationLabel", "setCustomizationLabel:")] public NSString? CustomizationLabel { get; set; }
-    [Selector("collapsedRepresentation", "setCollapsedRepresentation:")] public NSView? CollapsedRepresentation { get; set; }
-    [Selector("collapsedRepresentationImage", "setCollapsedRepresentationImage:")] public NSImage? CollapsedRepresentationImage { get; set; }
-    [Selector("collapsedRepresentationLabel", "setCollapsedRepresentationLabel:")] public NSString CollapsedRepresentationLabel { get; set; }
-    [Selector("pressAndHoldTouchBar", "setPressAndHoldTouchBar:")] public NSTouchBar? PressAndHoldTouchBar { get; set; }
-    [Selector("showsCloseButton", "setShowsCloseButton:")] public bool ShowsCloseButton { get; set; }
-    [Selector("showPopover:")] public void ShowPopover(AnyObject? sender);
-    [Selector("dismissPopover:")] public void DismissPopover(AnyObject? sender);
-    [Selector("makeStandardActivatePopoverGestureRecognizer")] public NSGestureRecognizer MakeStandardActivatePopoverGestureRecognizer();
+    [Selector("popoverTouchBar", "setPopoverTouchBar:")]
+    public NSTouchBar PopoverTouchBar { get; set; }
+    [Selector("customizationLabel", "setCustomizationLabel:")]
+    public NSString? CustomizationLabel { get; set; }
+    [Selector("collapsedRepresentation", "setCollapsedRepresentation:")]
+    public NSView? CollapsedRepresentation { get; set; }
+    [Selector("collapsedRepresentationImage", "setCollapsedRepresentationImage:")]
+    public NSImage? CollapsedRepresentationImage { get; set; }
+    [Selector("collapsedRepresentationLabel", "setCollapsedRepresentationLabel:")]
+    public NSString CollapsedRepresentationLabel { get; set; }
+    [Selector("pressAndHoldTouchBar", "setPressAndHoldTouchBar:")]
+    public NSTouchBar? PressAndHoldTouchBar { get; set; }
+    [Selector("showsCloseButton", "setShowsCloseButton:")]
+    public bool ShowsCloseButton { get; set; }
+    [Selector("showPopover:")]
+    public void ShowPopover(AnyObject? sender);
+    [Selector("dismissPopover:")]
+    public void DismissPopover(AnyObject? sender);
+    [Selector("makeStandardActivatePopoverGestureRecognizer")]
+    public NSGestureRecognizer MakeStandardActivatePopoverGestureRecognizer();
 }
 
 #endif

@@ -34,18 +34,30 @@ import Standard.ObjC;
 [ObjCName("NSTextAttachmentCell")]
 public objc interface NSTextAttachmentCellProtocol : NSObjectProtocol
 {
-    [Selector("attachment", "setAttachment:")] NSTextAttachment? Attachment { get; set; }
-    [Selector("drawWithFrame:inView:")] void DrawWithFrameInView(NSRect cellFrame, NSView? controlView);
-    [Selector("wantsToTrackMouse")] bool WantsToTrackMouse();
-    [Selector("highlight:withFrame:inView:")] void HighlightWithFrameInView(bool flag, NSRect cellFrame, NSView? controlView);
-    [Selector("trackMouse:inRect:ofView:untilMouseUp:")] bool TrackMouseInRectOfViewUntilMouseUp(NSEvent theEvent, NSRect cellFrame, NSView? controlView, bool flag);
-    [Selector("cellSize")] NSSize CellSize();
-    [Selector("cellBaselineOffset")] NSPoint CellBaselineOffset();
-    [Selector("drawWithFrame:inView:characterIndex:")] void DrawWithFrameInViewCharacterIndex(NSRect cellFrame, NSView? controlView, NSUInteger charIndex);
-    [Selector("drawWithFrame:inView:characterIndex:layoutManager:")] void DrawWithFrameInViewCharacterIndexLayoutManager(NSRect cellFrame, NSView? controlView, NSUInteger charIndex, NSLayoutManager layoutManager);
-    [Selector("wantsToTrackMouseForEvent:inRect:ofView:atCharacterIndex:")] bool WantsToTrackMouseForEventInRectOfViewAtCharacterIndex(NSEvent theEvent, NSRect cellFrame, NSView? controlView, NSUInteger charIndex);
-    [Selector("trackMouse:inRect:ofView:atCharacterIndex:untilMouseUp:")] bool TrackMouseInRectOfViewAtCharacterIndexUntilMouseUp(NSEvent theEvent, NSRect cellFrame, NSView? controlView, NSUInteger charIndex, bool flag);
-    [Selector("cellFrameForTextContainer:proposedLineFragment:glyphPosition:characterIndex:")] NSRect CellFrameForTextContainerProposedLineFragmentGlyphPositionCharacterIndex(NSTextContainer textContainer, NSRect lineFrag, NSPoint position, NSUInteger charIndex);
+    [Selector("attachment", "setAttachment:")]
+    NSTextAttachment? Attachment { get; set; }
+    [Selector("drawWithFrame:inView:")]
+    void DrawWithFrameInView(NSRect cellFrame, NSView? controlView);
+    [Selector("wantsToTrackMouse")]
+    bool WantsToTrackMouse();
+    [Selector("highlight:withFrame:inView:")]
+    void HighlightWithFrameInView(bool flag, NSRect cellFrame, NSView? controlView);
+    [Selector("trackMouse:inRect:ofView:untilMouseUp:")]
+    bool TrackMouseInRectOfViewUntilMouseUp(NSEvent theEvent, NSRect cellFrame, NSView? controlView, bool flag);
+    [Selector("cellSize")]
+    NSSize CellSize();
+    [Selector("cellBaselineOffset")]
+    NSPoint CellBaselineOffset();
+    [Selector("drawWithFrame:inView:characterIndex:")]
+    void DrawWithFrameInViewCharacterIndex(NSRect cellFrame, NSView? controlView, NSUInteger charIndex);
+    [Selector("drawWithFrame:inView:characterIndex:layoutManager:")]
+    void DrawWithFrameInViewCharacterIndexLayoutManager(NSRect cellFrame, NSView? controlView, NSUInteger charIndex, NSLayoutManager layoutManager);
+    [Selector("wantsToTrackMouseForEvent:inRect:ofView:atCharacterIndex:")]
+    bool WantsToTrackMouseForEventInRectOfViewAtCharacterIndex(NSEvent theEvent, NSRect cellFrame, NSView? controlView, NSUInteger charIndex);
+    [Selector("trackMouse:inRect:ofView:atCharacterIndex:untilMouseUp:")]
+    bool TrackMouseInRectOfViewAtCharacterIndexUntilMouseUp(NSEvent theEvent, NSRect cellFrame, NSView? controlView, NSUInteger charIndex, bool flag);
+    [Selector("cellFrameForTextContainer:proposedLineFragment:glyphPosition:characterIndex:")]
+    NSRect CellFrameForTextContainerProposedLineFragmentGlyphPositionCharacterIndex(NSTextContainer textContainer, NSRect lineFrag, NSPoint position, NSUInteger charIndex);
 }
 
 public extern objc class NSTextAttachmentCell : NSCell, NSTextAttachmentCellProtocol { }

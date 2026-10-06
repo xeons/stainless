@@ -34,7 +34,8 @@ public objc closure void HKSourceQueryInitWithSampleTypeSamplePredicateCompletio
 
 public extern objc class HKSourceQuery : HKQuery
 {
-    [Selector("initWithSampleType:samplePredicate:completionHandler:")] public Self InitWithSampleTypeSamplePredicateCompletionHandler(HKSampleType sampleType, NSPredicate? objectPredicate, HKSourceQueryInitWithSampleTypeSamplePredicateCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("initWithSampleType:samplePredicate:completionHandler:")]
+    public Self InitWithSampleTypeSamplePredicateCompletionHandler(HKSampleType sampleType, NSPredicate? objectPredicate, HKSourceQueryInitWithSampleTypeSamplePredicateCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

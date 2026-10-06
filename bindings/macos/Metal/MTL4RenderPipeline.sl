@@ -40,57 +40,93 @@ public enum MTL4LogicalToPhysicalColorAttachmentMappingState : long
 /// macOS 26.0 and later.
 public extern objc class MTL4RenderPipelineColorAttachmentDescriptor : NSObject, NSCopying
 {
-    [Selector("pixelFormat", "setPixelFormat:")] public MTLPixelFormat PixelFormat { get; set; }
-    [Selector("blendingState", "setBlendingState:")] public MTL4BlendState BlendingState { get; set; }
-    [Selector("sourceRGBBlendFactor", "setSourceRGBBlendFactor:")] public MTLBlendFactor SourceRGBBlendFactor { get; set; }
-    [Selector("destinationRGBBlendFactor", "setDestinationRGBBlendFactor:")] public MTLBlendFactor DestinationRGBBlendFactor { get; set; }
-    [Selector("rgbBlendOperation", "setRgbBlendOperation:")] public MTLBlendOperation RgbBlendOperation { get; set; }
-    [Selector("sourceAlphaBlendFactor", "setSourceAlphaBlendFactor:")] public MTLBlendFactor SourceAlphaBlendFactor { get; set; }
-    [Selector("destinationAlphaBlendFactor", "setDestinationAlphaBlendFactor:")] public MTLBlendFactor DestinationAlphaBlendFactor { get; set; }
-    [Selector("alphaBlendOperation", "setAlphaBlendOperation:")] public MTLBlendOperation AlphaBlendOperation { get; set; }
-    [Selector("writeMask", "setWriteMask:")] public MTLColorWriteMask WriteMask { get; set; }
-    [Selector("reset")] public void Reset();
+    [Selector("pixelFormat", "setPixelFormat:")]
+    public MTLPixelFormat PixelFormat { get; set; }
+    [Selector("blendingState", "setBlendingState:")]
+    public MTL4BlendState BlendingState { get; set; }
+    [Selector("sourceRGBBlendFactor", "setSourceRGBBlendFactor:")]
+    public MTLBlendFactor SourceRGBBlendFactor { get; set; }
+    [Selector("destinationRGBBlendFactor", "setDestinationRGBBlendFactor:")]
+    public MTLBlendFactor DestinationRGBBlendFactor { get; set; }
+    [Selector("rgbBlendOperation", "setRgbBlendOperation:")]
+    public MTLBlendOperation RgbBlendOperation { get; set; }
+    [Selector("sourceAlphaBlendFactor", "setSourceAlphaBlendFactor:")]
+    public MTLBlendFactor SourceAlphaBlendFactor { get; set; }
+    [Selector("destinationAlphaBlendFactor", "setDestinationAlphaBlendFactor:")]
+    public MTLBlendFactor DestinationAlphaBlendFactor { get; set; }
+    [Selector("alphaBlendOperation", "setAlphaBlendOperation:")]
+    public MTLBlendOperation AlphaBlendOperation { get; set; }
+    [Selector("writeMask", "setWriteMask:")]
+    public MTLColorWriteMask WriteMask { get; set; }
+    [Selector("reset")]
+    public void Reset();
 }
 
 /// macOS 26.0 and later.
 public extern objc class MTL4RenderPipelineColorAttachmentDescriptorArray : NSObject, NSCopying
 {
-    [Selector("objectAtIndexedSubscript:")] public MTL4RenderPipelineColorAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTL4RenderPipelineColorAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
-    [Selector("reset")] public void Reset();
+    [Selector("objectAtIndexedSubscript:")]
+    public MTL4RenderPipelineColorAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTL4RenderPipelineColorAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
+    [Selector("reset")]
+    public void Reset();
 }
 
 /// macOS 26.0 and later.
 public extern objc class MTL4RenderPipelineBinaryFunctionsDescriptor : NSObject, NSCopying
 {
-    [Selector("vertexAdditionalBinaryFunctions", "setVertexAdditionalBinaryFunctions:")] public NSArray? VertexAdditionalBinaryFunctions { get; set; }
-    [Selector("fragmentAdditionalBinaryFunctions", "setFragmentAdditionalBinaryFunctions:")] public NSArray? FragmentAdditionalBinaryFunctions { get; set; }
-    [Selector("tileAdditionalBinaryFunctions", "setTileAdditionalBinaryFunctions:")] public NSArray? TileAdditionalBinaryFunctions { get; set; }
-    [Selector("objectAdditionalBinaryFunctions", "setObjectAdditionalBinaryFunctions:")] public NSArray? ObjectAdditionalBinaryFunctions { get; set; }
-    [Selector("meshAdditionalBinaryFunctions", "setMeshAdditionalBinaryFunctions:")] public NSArray? MeshAdditionalBinaryFunctions { get; set; }
-    [Selector("reset")] public void Reset();
+    [Selector("vertexAdditionalBinaryFunctions", "setVertexAdditionalBinaryFunctions:")]
+    public NSArray? VertexAdditionalBinaryFunctions { get; set; }
+    [Selector("fragmentAdditionalBinaryFunctions", "setFragmentAdditionalBinaryFunctions:")]
+    public NSArray? FragmentAdditionalBinaryFunctions { get; set; }
+    [Selector("tileAdditionalBinaryFunctions", "setTileAdditionalBinaryFunctions:")]
+    public NSArray? TileAdditionalBinaryFunctions { get; set; }
+    [Selector("objectAdditionalBinaryFunctions", "setObjectAdditionalBinaryFunctions:")]
+    public NSArray? ObjectAdditionalBinaryFunctions { get; set; }
+    [Selector("meshAdditionalBinaryFunctions", "setMeshAdditionalBinaryFunctions:")]
+    public NSArray? MeshAdditionalBinaryFunctions { get; set; }
+    [Selector("reset")]
+    public void Reset();
 }
 
 /// macOS 26.0 and later.
 public extern objc class MTL4RenderPipelineDescriptor : MTL4PipelineDescriptor
 {
-    [Selector("vertexFunctionDescriptor", "setVertexFunctionDescriptor:")] public MTL4FunctionDescriptor? VertexFunctionDescriptor { get; set; }
-    [Selector("fragmentFunctionDescriptor", "setFragmentFunctionDescriptor:")] public MTL4FunctionDescriptor? FragmentFunctionDescriptor { get; set; }
-    [Selector("vertexDescriptor", "setVertexDescriptor:")] public MTLVertexDescriptor? VertexDescriptor { get; set; }
-    [Selector("rasterSampleCount", "setRasterSampleCount:")] public NSUInteger RasterSampleCount { get; set; }
-    [Selector("alphaToCoverageState", "setAlphaToCoverageState:")] public MTL4AlphaToCoverageState AlphaToCoverageState { get; set; }
-    [Selector("alphaToOneState", "setAlphaToOneState:")] public MTL4AlphaToOneState AlphaToOneState { get; set; }
-    [Selector("isRasterizationEnabled", "setRasterizationEnabled:")] public bool RasterizationEnabled { get; set; }
-    [Selector("maxVertexAmplificationCount", "setMaxVertexAmplificationCount:")] public NSUInteger MaxVertexAmplificationCount { get; set; }
-    [Selector("colorAttachments")] public MTL4RenderPipelineColorAttachmentDescriptorArray ColorAttachments { get; }
-    [Selector("inputPrimitiveTopology", "setInputPrimitiveTopology:")] public MTLPrimitiveTopologyClass InputPrimitiveTopology { get; set; }
-    [Selector("vertexStaticLinkingDescriptor", "setVertexStaticLinkingDescriptor:")] public MTL4StaticLinkingDescriptor? VertexStaticLinkingDescriptor { get; set; }
-    [Selector("fragmentStaticLinkingDescriptor", "setFragmentStaticLinkingDescriptor:")] public MTL4StaticLinkingDescriptor? FragmentStaticLinkingDescriptor { get; set; }
-    [Selector("supportVertexBinaryLinking", "setSupportVertexBinaryLinking:")] public bool SupportVertexBinaryLinking { get; set; }
-    [Selector("supportFragmentBinaryLinking", "setSupportFragmentBinaryLinking:")] public bool SupportFragmentBinaryLinking { get; set; }
-    [Selector("colorAttachmentMappingState", "setColorAttachmentMappingState:")] public MTL4LogicalToPhysicalColorAttachmentMappingState ColorAttachmentMappingState { get; set; }
-    [Selector("supportIndirectCommandBuffers", "setSupportIndirectCommandBuffers:")] public MTL4IndirectCommandBufferSupportState SupportIndirectCommandBuffers { get; set; }
-    [Selector("reset")] public void Reset();
+    [Selector("vertexFunctionDescriptor", "setVertexFunctionDescriptor:")]
+    public MTL4FunctionDescriptor? VertexFunctionDescriptor { get; set; }
+    [Selector("fragmentFunctionDescriptor", "setFragmentFunctionDescriptor:")]
+    public MTL4FunctionDescriptor? FragmentFunctionDescriptor { get; set; }
+    [Selector("vertexDescriptor", "setVertexDescriptor:")]
+    public MTLVertexDescriptor? VertexDescriptor { get; set; }
+    [Selector("rasterSampleCount", "setRasterSampleCount:")]
+    public NSUInteger RasterSampleCount { get; set; }
+    [Selector("alphaToCoverageState", "setAlphaToCoverageState:")]
+    public MTL4AlphaToCoverageState AlphaToCoverageState { get; set; }
+    [Selector("alphaToOneState", "setAlphaToOneState:")]
+    public MTL4AlphaToOneState AlphaToOneState { get; set; }
+    [Selector("isRasterizationEnabled", "setRasterizationEnabled:")]
+    public bool RasterizationEnabled { get; set; }
+    [Selector("maxVertexAmplificationCount", "setMaxVertexAmplificationCount:")]
+    public NSUInteger MaxVertexAmplificationCount { get; set; }
+    [Selector("colorAttachments")]
+    public MTL4RenderPipelineColorAttachmentDescriptorArray ColorAttachments { get; }
+    [Selector("inputPrimitiveTopology", "setInputPrimitiveTopology:")]
+    public MTLPrimitiveTopologyClass InputPrimitiveTopology { get; set; }
+    [Selector("vertexStaticLinkingDescriptor", "setVertexStaticLinkingDescriptor:")]
+    public MTL4StaticLinkingDescriptor? VertexStaticLinkingDescriptor { get; set; }
+    [Selector("fragmentStaticLinkingDescriptor", "setFragmentStaticLinkingDescriptor:")]
+    public MTL4StaticLinkingDescriptor? FragmentStaticLinkingDescriptor { get; set; }
+    [Selector("supportVertexBinaryLinking", "setSupportVertexBinaryLinking:")]
+    public bool SupportVertexBinaryLinking { get; set; }
+    [Selector("supportFragmentBinaryLinking", "setSupportFragmentBinaryLinking:")]
+    public bool SupportFragmentBinaryLinking { get; set; }
+    [Selector("colorAttachmentMappingState", "setColorAttachmentMappingState:")]
+    public MTL4LogicalToPhysicalColorAttachmentMappingState ColorAttachmentMappingState { get; set; }
+    [Selector("supportIndirectCommandBuffers", "setSupportIndirectCommandBuffers:")]
+    public MTL4IndirectCommandBufferSupportState SupportIndirectCommandBuffers { get; set; }
+    [Selector("reset")]
+    public void Reset();
 }
 
 #endif

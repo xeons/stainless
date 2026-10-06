@@ -32,17 +32,24 @@ import Standard.ObjC;
 
 public extern objc class CBService : CBAttribute
 {
-    [Selector("peripheral")] public CBPeripheral? Peripheral { get; }
-    [Selector("isPrimary")] public bool IsPrimary { get; }
-    [Selector("includedServices")] public NSArray? IncludedServices { get; }
-    [Selector("characteristics")] public NSArray? Characteristics { get; }
+    [Selector("peripheral")]
+    public CBPeripheral? Peripheral { get; }
+    [Selector("isPrimary")]
+    public bool IsPrimary { get; }
+    [Selector("includedServices")]
+    public NSArray? IncludedServices { get; }
+    [Selector("characteristics")]
+    public NSArray? Characteristics { get; }
 }
 
 public extern objc class CBMutableService : CBService
 {
-    [Selector("includedServices", "setIncludedServices:")] public NSArray? IncludedServices { get; set; }
-    [Selector("characteristics", "setCharacteristics:")] public NSArray? Characteristics { get; set; }
-    [Selector("initWithType:primary:")] public Self InitWithTypePrimary(CBUUID UUID, bool isPrimary);
+    [Selector("includedServices", "setIncludedServices:")]
+    public NSArray? IncludedServices { get; set; }
+    [Selector("characteristics", "setCharacteristics:")]
+    public NSArray? Characteristics { get; set; }
+    [Selector("initWithType:primary:")]
+    public Self InitWithTypePrimary(CBUUID UUID, bool isPrimary);
 }
 
 #endif

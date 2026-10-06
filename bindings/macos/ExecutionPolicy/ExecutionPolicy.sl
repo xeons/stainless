@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class EPExecutionPolicy : NSObject
 {
-    [Selector("init")] public Self Init();
-    [Selector("addPolicyExceptionForURL:error:")] public bool AddPolicyExceptionForURLError(NSURL url, out NSError? error);
+    [Selector("init")]
+    public Self Init();
+    [Selector("addPolicyExceptionForURL:error:")]
+    public bool AddPolicyExceptionForURLError(NSURL url, out NSError? error);
 }
 
 #endif

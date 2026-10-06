@@ -55,14 +55,29 @@ public objc closure void WKDownloadDelegateDownloadDidReceivePlaceholderURLCompl
 
 public objc interface WKDownloadDelegate : NSObjectProtocol
 {
-    [Selector("download:decideDestinationUsingResponse:suggestedFilename:completionHandler:")] void DownloadDecideDestinationUsingResponseSuggestedFilenameCompletionHandler(WKDownload download, NSURLResponse response, NSString suggestedFilename, WKDownloadDelegateDownloadDecideDestinationUsingResponseSuggestedFilenameCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("download:willPerformHTTPRedirection:newRequest:decisionHandler:")] void DownloadWillPerformHTTPRedirectionNewRequestDecisionHandler(WKDownload download, NSHTTPURLResponse response, NSURLRequest request, WKDownloadDelegateDownloadWillPerformHTTPRedirectionNewRequestDecisionHandlerDecisionHandlerBlock decisionHandler);
-    [Optional] [Selector("download:didReceiveAuthenticationChallenge:completionHandler:")] void DownloadDidReceiveAuthenticationChallengeCompletionHandler(WKDownload download, NSURLAuthenticationChallenge challenge, WKDownloadDelegateDownloadDidReceiveAuthenticationChallengeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("downloadDidFinish:")] void DownloadDidFinish(WKDownload download);
-    [Optional] [Selector("download:didFailWithError:resumeData:")] void DownloadDidFailWithErrorResumeData(WKDownload download, NSError error, NSData? resumeData);
-    [Optional] [Selector("download:decidePlaceholderPolicy:")] void DownloadDecidePlaceholderPolicy(WKDownload download, WKDownloadDelegateDownloadDecidePlaceholderPolicyCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("download:didReceivePlaceholderURL:completionHandler:")] void DownloadDidReceivePlaceholderURLCompletionHandler(WKDownload download, NSURL url, WKDownloadDelegateDownloadDidReceivePlaceholderURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("download:didReceiveFinalURL:")] void DownloadDidReceiveFinalURL(WKDownload download, NSURL url);
+    [Selector("download:decideDestinationUsingResponse:suggestedFilename:completionHandler:")]
+    void DownloadDecideDestinationUsingResponseSuggestedFilenameCompletionHandler(WKDownload download, NSURLResponse response, NSString suggestedFilename, WKDownloadDelegateDownloadDecideDestinationUsingResponseSuggestedFilenameCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("download:willPerformHTTPRedirection:newRequest:decisionHandler:")]
+    void DownloadWillPerformHTTPRedirectionNewRequestDecisionHandler(WKDownload download, NSHTTPURLResponse response, NSURLRequest request, WKDownloadDelegateDownloadWillPerformHTTPRedirectionNewRequestDecisionHandlerDecisionHandlerBlock decisionHandler);
+    [Optional]
+    [Selector("download:didReceiveAuthenticationChallenge:completionHandler:")]
+    void DownloadDidReceiveAuthenticationChallengeCompletionHandler(WKDownload download, NSURLAuthenticationChallenge challenge, WKDownloadDelegateDownloadDidReceiveAuthenticationChallengeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("downloadDidFinish:")]
+    void DownloadDidFinish(WKDownload download);
+    [Optional]
+    [Selector("download:didFailWithError:resumeData:")]
+    void DownloadDidFailWithErrorResumeData(WKDownload download, NSError error, NSData? resumeData);
+    [Optional]
+    [Selector("download:decidePlaceholderPolicy:")]
+    void DownloadDecidePlaceholderPolicy(WKDownload download, WKDownloadDelegateDownloadDecidePlaceholderPolicyCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("download:didReceivePlaceholderURL:completionHandler:")]
+    void DownloadDidReceivePlaceholderURLCompletionHandler(WKDownload download, NSURL url, WKDownloadDelegateDownloadDidReceivePlaceholderURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("download:didReceiveFinalURL:")]
+    void DownloadDidReceiveFinalURL(WKDownload download, NSURL url);
 }
 
 #endif

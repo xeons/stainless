@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class EASession : NSObject
 {
-    [Selector("accessory")] public EAAccessory? Accessory { get; }
-    [Selector("protocolString")] public NSString? ProtocolString { get; }
-    [Selector("inputStream")] public NSInputStream? InputStream { get; }
-    [Selector("outputStream")] public NSOutputStream? OutputStream { get; }
-    [Selector("initWithAccessory:forProtocol:")] public Self? InitWithAccessoryForProtocol(EAAccessory accessory, NSString protocolString);
+    [Selector("accessory")]
+    public EAAccessory? Accessory { get; }
+    [Selector("protocolString")]
+    public NSString? ProtocolString { get; }
+    [Selector("inputStream")]
+    public NSInputStream? InputStream { get; }
+    [Selector("outputStream")]
+    public NSOutputStream? OutputStream { get; }
+    [Selector("initWithAccessory:forProtocol:")]
+    public Self? InitWithAccessoryForProtocol(EAAccessory accessory, NSString protocolString);
 }
 
 #endif

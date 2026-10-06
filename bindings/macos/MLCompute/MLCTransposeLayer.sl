@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCTransposeLayer : MLCLayer
 {
-    [Selector("dimensions")] public NSArray? Dimensions { get; }
-    [Selector("layerWithDimensions:")] public static Self? LayerWithDimensions(NSArray dimensions);
+    [Selector("dimensions")]
+    public NSArray? Dimensions { get; }
+    [Selector("layerWithDimensions:")]
+    public static Self? LayerWithDimensions(NSArray dimensions);
 }
 
 #endif

@@ -33,23 +33,36 @@ import Standard.ObjC;
 
 public extern objc class PHASEGroupPresetSetting : NSObject
 {
-    [Selector("gain")] public double Gain { get; }
-    [Selector("rate")] public double Rate { get; }
-    [Selector("gainCurveType")] public PHASECurveType GainCurveType { get; }
-    [Selector("rateCurveType")] public PHASECurveType RateCurveType { get; }
-    [Selector("initWithGain:rate:gainCurveType:rateCurveType:")] public Self InitWithGainRateGainCurveTypeRateCurveType(double gain, double rate, PHASECurveType gainCurveType, PHASECurveType rateCurveType);
+    [Selector("gain")]
+    public double Gain { get; }
+    [Selector("rate")]
+    public double Rate { get; }
+    [Selector("gainCurveType")]
+    public PHASECurveType GainCurveType { get; }
+    [Selector("rateCurveType")]
+    public PHASECurveType RateCurveType { get; }
+    [Selector("initWithGain:rate:gainCurveType:rateCurveType:")]
+    public Self InitWithGainRateGainCurveTypeRateCurveType(double gain, double rate, PHASECurveType gainCurveType, PHASECurveType rateCurveType);
 }
 
 public extern objc class PHASEGroupPreset : NSObject
 {
-    [Selector("settings")] public NSDictionary Settings { get; }
-    [Selector("timeToTarget")] public double TimeToTarget { get; }
-    [Selector("timeToReset")] public double TimeToReset { get; }
-    [Selector("initWithEngine:settings:timeToTarget:timeToReset:")] public Self InitWithEngineSettingsTimeToTargetTimeToReset(PHASEEngine engine, NSDictionary settings, double timeToTarget, double timeToReset);
-    [Selector("activate")] public void Activate();
-    [Selector("activateWithTimeToTargetOverride:")] public void ActivateWithTimeToTargetOverride(double timeToTargetOverride);
-    [Selector("deactivate")] public void Deactivate();
-    [Selector("deactivateWithTimeToResetOverride:")] public void DeactivateWithTimeToResetOverride(double timeToResetOverride);
+    [Selector("settings")]
+    public NSDictionary Settings { get; }
+    [Selector("timeToTarget")]
+    public double TimeToTarget { get; }
+    [Selector("timeToReset")]
+    public double TimeToReset { get; }
+    [Selector("initWithEngine:settings:timeToTarget:timeToReset:")]
+    public Self InitWithEngineSettingsTimeToTargetTimeToReset(PHASEEngine engine, NSDictionary settings, double timeToTarget, double timeToReset);
+    [Selector("activate")]
+    public void Activate();
+    [Selector("activateWithTimeToTargetOverride:")]
+    public void ActivateWithTimeToTargetOverride(double timeToTargetOverride);
+    [Selector("deactivate")]
+    public void Deactivate();
+    [Selector("deactivateWithTimeToResetOverride:")]
+    public void DeactivateWithTimeToResetOverride(double timeToResetOverride);
 }
 
 #endif

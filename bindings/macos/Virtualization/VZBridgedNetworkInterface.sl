@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class VZBridgedNetworkInterface : NSObject
 {
-    [Selector("networkInterfaces")] public static NSArray NetworkInterfaces { get; }
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("localizedDisplayName")] public NSString? LocalizedDisplayName { get; }
+    [Selector("networkInterfaces")]
+    public static NSArray NetworkInterfaces { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("localizedDisplayName")]
+    public NSString? LocalizedDisplayName { get; }
 }
 
 #endif

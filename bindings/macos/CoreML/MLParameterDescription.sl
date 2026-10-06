@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class MLParameterDescription : NSObject, NSSecureCoding
 {
-    [Selector("key")] public MLParameterKey Key { get; }
-    [Selector("defaultValue")] public AnyObject DefaultValue { get; }
-    [Selector("numericConstraint")] public MLNumericConstraint? NumericConstraint { get; }
+    [Selector("key")]
+    public MLParameterKey Key { get; }
+    [Selector("defaultValue")]
+    public AnyObject DefaultValue { get; }
+    [Selector("numericConstraint")]
+    public MLNumericConstraint? NumericConstraint { get; }
 }
 
 #endif

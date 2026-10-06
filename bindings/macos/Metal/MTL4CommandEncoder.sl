@@ -43,17 +43,28 @@ public enum MTL4VisibilityOptions : ulong
 /// macOS 26.0 and later.
 public objc interface MTL4CommandEncoder : NSObjectProtocol
 {
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("commandBuffer")] MTL4CommandBuffer? CommandBuffer { get; }
-    [Selector("barrierAfterQueueStages:beforeStages:visibilityOptions:")] void BarrierAfterQueueStagesBeforeStagesVisibilityOptions(MTLStages afterQueueStages, MTLStages beforeStages, MTL4VisibilityOptions visibilityOptions);
-    [Selector("barrierAfterStages:beforeQueueStages:visibilityOptions:")] void BarrierAfterStagesBeforeQueueStagesVisibilityOptions(MTLStages afterStages, MTLStages beforeQueueStages, MTL4VisibilityOptions visibilityOptions);
-    [Selector("barrierAfterEncoderStages:beforeEncoderStages:visibilityOptions:")] void BarrierAfterEncoderStagesBeforeEncoderStagesVisibilityOptions(MTLStages afterEncoderStages, MTLStages beforeEncoderStages, MTL4VisibilityOptions visibilityOptions);
-    [Selector("updateFence:afterEncoderStages:")] void UpdateFenceAfterEncoderStages(MTLFence fence, MTLStages afterEncoderStages);
-    [Selector("waitForFence:beforeEncoderStages:")] void WaitForFenceBeforeEncoderStages(MTLFence fence, MTLStages beforeEncoderStages);
-    [Selector("insertDebugSignpost:")] void InsertDebugSignpost(NSString string);
-    [Selector("pushDebugGroup:")] void PushDebugGroup(NSString string);
-    [Selector("popDebugGroup")] void PopDebugGroup();
-    [Selector("endEncoding")] void EndEncoding();
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("commandBuffer")]
+    MTL4CommandBuffer? CommandBuffer { get; }
+    [Selector("barrierAfterQueueStages:beforeStages:visibilityOptions:")]
+    void BarrierAfterQueueStagesBeforeStagesVisibilityOptions(MTLStages afterQueueStages, MTLStages beforeStages, MTL4VisibilityOptions visibilityOptions);
+    [Selector("barrierAfterStages:beforeQueueStages:visibilityOptions:")]
+    void BarrierAfterStagesBeforeQueueStagesVisibilityOptions(MTLStages afterStages, MTLStages beforeQueueStages, MTL4VisibilityOptions visibilityOptions);
+    [Selector("barrierAfterEncoderStages:beforeEncoderStages:visibilityOptions:")]
+    void BarrierAfterEncoderStagesBeforeEncoderStagesVisibilityOptions(MTLStages afterEncoderStages, MTLStages beforeEncoderStages, MTL4VisibilityOptions visibilityOptions);
+    [Selector("updateFence:afterEncoderStages:")]
+    void UpdateFenceAfterEncoderStages(MTLFence fence, MTLStages afterEncoderStages);
+    [Selector("waitForFence:beforeEncoderStages:")]
+    void WaitForFenceBeforeEncoderStages(MTLFence fence, MTLStages beforeEncoderStages);
+    [Selector("insertDebugSignpost:")]
+    void InsertDebugSignpost(NSString string);
+    [Selector("pushDebugGroup:")]
+    void PushDebugGroup(NSString string);
+    [Selector("popDebugGroup")]
+    void PopDebugGroup();
+    [Selector("endEncoding")]
+    void EndEncoding();
 }
 
 #endif

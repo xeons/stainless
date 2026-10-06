@@ -65,116 +65,208 @@ public objc closure void SCNNodeEnumerateHierarchyUsingBlockBlock(SCNNode arg0, 
 
 public extern objc class SCNNode : NSObject, NSCopying, NSSecureCoding, SCNAnimatable, SCNActionable, SCNBoundingVolume
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("light", "setLight:")] public SCNLight? Light { get; set; }
-    [Selector("camera", "setCamera:")] public SCNCamera? Camera { get; set; }
-    [Selector("geometry", "setGeometry:")] public SCNGeometry? Geometry { get; set; }
-    [Selector("skinner", "setSkinner:")] public SCNSkinner? Skinner { get; set; }
-    [Selector("morpher", "setMorpher:")] public SCNMorpher? Morpher { get; set; }
-    [Selector("transform", "setTransform:")] public SCNMatrix4 Transform { get; set; }
-    [Selector("worldTransform")] public SCNMatrix4 WorldTransform { get; }
-    [Selector("position", "setPosition:")] public SCNVector3 Position { get; set; }
-    [Selector("worldPosition", "setWorldPosition:")] public SCNVector3 WorldPosition { get; set; }
-    [Selector("rotation", "setRotation:")] public SCNVector4 Rotation { get; set; }
-    [Selector("orientation", "setOrientation:")] public SCNQuaternion Orientation { get; set; }
-    [Selector("worldOrientation", "setWorldOrientation:")] public SCNQuaternion WorldOrientation { get; set; }
-    [Selector("eulerAngles", "setEulerAngles:")] public SCNVector3 EulerAngles { get; set; }
-    [Selector("scale", "setScale:")] public SCNVector3 Scale { get; set; }
-    [Selector("pivot", "setPivot:")] public SCNMatrix4 Pivot { get; set; }
-    [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
-    [Selector("opacity", "setOpacity:")] public CGFloat Opacity { get; set; }
-    [Selector("renderingOrder", "setRenderingOrder:")] public NSInteger RenderingOrder { get; set; }
-    [Selector("castsShadow", "setCastsShadow:")] public bool CastsShadow { get; set; }
-    [Selector("movabilityHint", "setMovabilityHint:")] public SCNMovabilityHint MovabilityHint { get; set; }
-    [Selector("parentNode")] public SCNNode? ParentNode { get; }
-    [Selector("childNodes")] public NSArray ChildNodes { get; }
-    [Selector("physicsBody", "setPhysicsBody:")] public SCNPhysicsBody? PhysicsBody { get; set; }
-    [Selector("physicsField", "setPhysicsField:")] public SCNPhysicsField? PhysicsField { get; set; }
-    [Selector("constraints", "setConstraints:")] public NSArray? Constraints { get; set; }
-    [Selector("filters", "setFilters:")] public NSArray? Filters { get; set; }
-    [Selector("presentationNode")] public SCNNode PresentationNode { get; }
-    [Selector("isPaused", "setPaused:")] public bool Paused { get; set; }
-    [Selector("rendererDelegate", "setRendererDelegate:")] public SCNNodeRendererDelegate? RendererDelegate { get; set; }
-    [Selector("categoryBitMask", "setCategoryBitMask:")] public NSUInteger CategoryBitMask { get; set; }
-    [Selector("node")] public static Self Node();
-    [Selector("nodeWithGeometry:")] public static SCNNode NodeWithGeometry(SCNGeometry? geometry);
-    [Selector("clone")] public Self Clone();
-    [Selector("flattenedClone")] public Self FlattenedClone();
-    [Selector("setWorldTransform:")] public void SetWorldTransform(SCNMatrix4 worldTransform);
-    [Selector("addChildNode:")] public void AddChildNode(SCNNode child);
-    [Selector("insertChildNode:atIndex:")] public void InsertChildNodeAtIndex(SCNNode child, NSUInteger index);
-    [Selector("removeFromParentNode")] public void RemoveFromParentNode();
-    [Selector("replaceChildNode:with:")] public void ReplaceChildNodeWith(SCNNode oldChild, SCNNode newChild);
-    [Selector("childNodeWithName:recursively:")] public SCNNode? ChildNodeWithNameRecursively(NSString name, bool recursively);
-    [Selector("childNodesPassingTest:")] public NSArray ChildNodesPassingTest(SCNNodeChildNodesPassingTestPredicateBlock predicate);
-    [Selector("enumerateChildNodesUsingBlock:")] public void EnumerateChildNodesUsingBlock(SCNNodeEnumerateChildNodesUsingBlockBlock block);
-    [Selector("enumerateHierarchyUsingBlock:")] public void EnumerateHierarchyUsingBlock(SCNNodeEnumerateHierarchyUsingBlockBlock block);
-    [Selector("convertPosition:toNode:")] public SCNVector3 ConvertPositionToNode(SCNVector3 position, SCNNode? node);
-    [Selector("convertPosition:fromNode:")] public SCNVector3 ConvertPositionFromNode(SCNVector3 position, SCNNode? node);
-    [Selector("convertVector:toNode:")] public SCNVector3 ConvertVectorToNode(SCNVector3 vector, SCNNode? node);
-    [Selector("convertVector:fromNode:")] public SCNVector3 ConvertVectorFromNode(SCNVector3 vector, SCNNode? node);
-    [Selector("convertTransform:toNode:")] public SCNMatrix4 ConvertTransformToNode(SCNMatrix4 transform, SCNNode? node);
-    [Selector("convertTransform:fromNode:")] public SCNMatrix4 ConvertTransformFromNode(SCNMatrix4 transform, SCNNode? node);
-    [Selector("hitTestWithSegmentFromPoint:toPoint:options:")] public NSArray HitTestWithSegmentFromPointToPointOptions(SCNVector3 pointA, SCNVector3 pointB, NSDictionary? options);
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("light", "setLight:")]
+    public SCNLight? Light { get; set; }
+    [Selector("camera", "setCamera:")]
+    public SCNCamera? Camera { get; set; }
+    [Selector("geometry", "setGeometry:")]
+    public SCNGeometry? Geometry { get; set; }
+    [Selector("skinner", "setSkinner:")]
+    public SCNSkinner? Skinner { get; set; }
+    [Selector("morpher", "setMorpher:")]
+    public SCNMorpher? Morpher { get; set; }
+    [Selector("transform", "setTransform:")]
+    public SCNMatrix4 Transform { get; set; }
+    [Selector("worldTransform")]
+    public SCNMatrix4 WorldTransform { get; }
+    [Selector("position", "setPosition:")]
+    public SCNVector3 Position { get; set; }
+    [Selector("worldPosition", "setWorldPosition:")]
+    public SCNVector3 WorldPosition { get; set; }
+    [Selector("rotation", "setRotation:")]
+    public SCNVector4 Rotation { get; set; }
+    [Selector("orientation", "setOrientation:")]
+    public SCNQuaternion Orientation { get; set; }
+    [Selector("worldOrientation", "setWorldOrientation:")]
+    public SCNQuaternion WorldOrientation { get; set; }
+    [Selector("eulerAngles", "setEulerAngles:")]
+    public SCNVector3 EulerAngles { get; set; }
+    [Selector("scale", "setScale:")]
+    public SCNVector3 Scale { get; set; }
+    [Selector("pivot", "setPivot:")]
+    public SCNMatrix4 Pivot { get; set; }
+    [Selector("isHidden", "setHidden:")]
+    public bool Hidden { get; set; }
+    [Selector("opacity", "setOpacity:")]
+    public CGFloat Opacity { get; set; }
+    [Selector("renderingOrder", "setRenderingOrder:")]
+    public NSInteger RenderingOrder { get; set; }
+    [Selector("castsShadow", "setCastsShadow:")]
+    public bool CastsShadow { get; set; }
+    [Selector("movabilityHint", "setMovabilityHint:")]
+    public SCNMovabilityHint MovabilityHint { get; set; }
+    [Selector("parentNode")]
+    public SCNNode? ParentNode { get; }
+    [Selector("childNodes")]
+    public NSArray ChildNodes { get; }
+    [Selector("physicsBody", "setPhysicsBody:")]
+    public SCNPhysicsBody? PhysicsBody { get; set; }
+    [Selector("physicsField", "setPhysicsField:")]
+    public SCNPhysicsField? PhysicsField { get; set; }
+    [Selector("constraints", "setConstraints:")]
+    public NSArray? Constraints { get; set; }
+    [Selector("filters", "setFilters:")]
+    public NSArray? Filters { get; set; }
+    [Selector("presentationNode")]
+    public SCNNode PresentationNode { get; }
+    [Selector("isPaused", "setPaused:")]
+    public bool Paused { get; set; }
+    [Selector("rendererDelegate", "setRendererDelegate:")]
+    public SCNNodeRendererDelegate? RendererDelegate { get; set; }
+    [Selector("categoryBitMask", "setCategoryBitMask:")]
+    public NSUInteger CategoryBitMask { get; set; }
+    [Selector("node")]
+    public static Self Node();
+    [Selector("nodeWithGeometry:")]
+    public static SCNNode NodeWithGeometry(SCNGeometry? geometry);
+    [Selector("clone")]
+    public Self Clone();
+    [Selector("flattenedClone")]
+    public Self FlattenedClone();
+    [Selector("setWorldTransform:")]
+    public void SetWorldTransform(SCNMatrix4 worldTransform);
+    [Selector("addChildNode:")]
+    public void AddChildNode(SCNNode child);
+    [Selector("insertChildNode:atIndex:")]
+    public void InsertChildNodeAtIndex(SCNNode child, NSUInteger index);
+    [Selector("removeFromParentNode")]
+    public void RemoveFromParentNode();
+    [Selector("replaceChildNode:with:")]
+    public void ReplaceChildNodeWith(SCNNode oldChild, SCNNode newChild);
+    [Selector("childNodeWithName:recursively:")]
+    public SCNNode? ChildNodeWithNameRecursively(NSString name, bool recursively);
+    [Selector("childNodesPassingTest:")]
+    public NSArray ChildNodesPassingTest(SCNNodeChildNodesPassingTestPredicateBlock predicate);
+    [Selector("enumerateChildNodesUsingBlock:")]
+    public void EnumerateChildNodesUsingBlock(SCNNodeEnumerateChildNodesUsingBlockBlock block);
+    [Selector("enumerateHierarchyUsingBlock:")]
+    public void EnumerateHierarchyUsingBlock(SCNNodeEnumerateHierarchyUsingBlockBlock block);
+    [Selector("convertPosition:toNode:")]
+    public SCNVector3 ConvertPositionToNode(SCNVector3 position, SCNNode? node);
+    [Selector("convertPosition:fromNode:")]
+    public SCNVector3 ConvertPositionFromNode(SCNVector3 position, SCNNode? node);
+    [Selector("convertVector:toNode:")]
+    public SCNVector3 ConvertVectorToNode(SCNVector3 vector, SCNNode? node);
+    [Selector("convertVector:fromNode:")]
+    public SCNVector3 ConvertVectorFromNode(SCNVector3 vector, SCNNode? node);
+    [Selector("convertTransform:toNode:")]
+    public SCNMatrix4 ConvertTransformToNode(SCNMatrix4 transform, SCNNode? node);
+    [Selector("convertTransform:fromNode:")]
+    public SCNMatrix4 ConvertTransformFromNode(SCNMatrix4 transform, SCNNode? node);
+    [Selector("hitTestWithSegmentFromPoint:toPoint:options:")]
+    public NSArray HitTestWithSegmentFromPointToPointOptions(SCNVector3 pointA, SCNVector3 pointB, NSDictionary? options);
 }
 
 /// Transforms, a category of SCNNode.
 public extern objc class SCNNode
 {
-    [Selector("localUp")] public static SCNVector3 LocalUp { get; }
-    [Selector("localRight")] public static SCNVector3 LocalRight { get; }
-    [Selector("localFront")] public static SCNVector3 LocalFront { get; }
-    [Selector("worldUp")] public SCNVector3 WorldUp { get; }
-    [Selector("worldRight")] public SCNVector3 WorldRight { get; }
-    [Selector("worldFront")] public SCNVector3 WorldFront { get; }
-    [Selector("lookAt:")] public void LookAt(SCNVector3 worldTarget);
-    [Selector("lookAt:up:localFront:")] public void LookAtUpLocalFront(SCNVector3 worldTarget, SCNVector3 worldUp, SCNVector3 localFront);
-    [Selector("localTranslateBy:")] public void LocalTranslateBy(SCNVector3 translation);
-    [Selector("localRotateBy:")] public void LocalRotateBy(SCNQuaternion rotation);
-    [Selector("rotateBy:aroundTarget:")] public void RotateByAroundTarget(SCNQuaternion worldRotation, SCNVector3 worldTarget);
+    [Selector("localUp")]
+    public static SCNVector3 LocalUp { get; }
+    [Selector("localRight")]
+    public static SCNVector3 LocalRight { get; }
+    [Selector("localFront")]
+    public static SCNVector3 LocalFront { get; }
+    [Selector("worldUp")]
+    public SCNVector3 WorldUp { get; }
+    [Selector("worldRight")]
+    public SCNVector3 WorldRight { get; }
+    [Selector("worldFront")]
+    public SCNVector3 WorldFront { get; }
+    [Selector("lookAt:")]
+    public void LookAt(SCNVector3 worldTarget);
+    [Selector("lookAt:up:localFront:")]
+    public void LookAtUpLocalFront(SCNVector3 worldTarget, SCNVector3 worldUp, SCNVector3 localFront);
+    [Selector("localTranslateBy:")]
+    public void LocalTranslateBy(SCNVector3 translation);
+    [Selector("localRotateBy:")]
+    public void LocalRotateBy(SCNQuaternion rotation);
+    [Selector("rotateBy:aroundTarget:")]
+    public void RotateByAroundTarget(SCNQuaternion worldRotation, SCNVector3 worldTarget);
 }
 
 public objc interface SCNNodeRendererDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("renderNode:renderer:arguments:")] void RenderNodeRendererArguments(SCNNode node, SCNRenderer renderer, NSDictionary arguments);
+    [Optional]
+    [Selector("renderNode:renderer:arguments:")]
+    void RenderNodeRendererArguments(SCNNode node, SCNRenderer renderer, NSDictionary arguments);
 }
 
 /// SIMD, a category of SCNNode.
 public extern objc class SCNNode
 {
-    [Selector("simdTransform", "setSimdTransform:")] public simd_float4x4 SimdTransform { get; set; }
-    [Selector("simdPosition", "setSimdPosition:")] public simd_float3 SimdPosition { get; set; }
-    [Selector("simdRotation", "setSimdRotation:")] public simd_float4 SimdRotation { get; set; }
-    [Selector("simdOrientation", "setSimdOrientation:")] public simd_quatf SimdOrientation { get; set; }
-    [Selector("simdEulerAngles", "setSimdEulerAngles:")] public simd_float3 SimdEulerAngles { get; set; }
-    [Selector("simdScale", "setSimdScale:")] public simd_float3 SimdScale { get; set; }
-    [Selector("simdPivot", "setSimdPivot:")] public simd_float4x4 SimdPivot { get; set; }
-    [Selector("simdWorldPosition", "setSimdWorldPosition:")] public simd_float3 SimdWorldPosition { get; set; }
-    [Selector("simdWorldOrientation", "setSimdWorldOrientation:")] public simd_quatf SimdWorldOrientation { get; set; }
-    [Selector("simdWorldTransform", "setSimdWorldTransform:")] public simd_float4x4 SimdWorldTransform { get; set; }
-    [Selector("simdLocalUp")] public static simd_float3 SimdLocalUp { get; }
-    [Selector("simdLocalRight")] public static simd_float3 SimdLocalRight { get; }
-    [Selector("simdLocalFront")] public static simd_float3 SimdLocalFront { get; }
-    [Selector("simdWorldUp")] public simd_float3 SimdWorldUp { get; }
-    [Selector("simdWorldRight")] public simd_float3 SimdWorldRight { get; }
-    [Selector("simdWorldFront")] public simd_float3 SimdWorldFront { get; }
-    [Selector("simdConvertPosition:toNode:")] public simd_float3 SimdConvertPositionToNode(simd_float3 position, SCNNode? node);
-    [Selector("simdConvertPosition:fromNode:")] public simd_float3 SimdConvertPositionFromNode(simd_float3 position, SCNNode? node);
-    [Selector("simdConvertVector:toNode:")] public simd_float3 SimdConvertVectorToNode(simd_float3 vector, SCNNode? node);
-    [Selector("simdConvertVector:fromNode:")] public simd_float3 SimdConvertVectorFromNode(simd_float3 vector, SCNNode? node);
-    [Selector("simdConvertTransform:toNode:")] public simd_float4x4 SimdConvertTransformToNode(simd_float4x4 transform, SCNNode? node);
-    [Selector("simdConvertTransform:fromNode:")] public simd_float4x4 SimdConvertTransformFromNode(simd_float4x4 transform, SCNNode? node);
-    [Selector("simdLookAt:")] public void SimdLookAt(simd_float3 worldTarget);
-    [Selector("simdLookAt:up:localFront:")] public void SimdLookAtUpLocalFront(simd_float3 worldTarget, simd_float3 worldUp, simd_float3 localFront);
-    [Selector("simdLocalTranslateBy:")] public void SimdLocalTranslateBy(simd_float3 translation);
-    [Selector("simdLocalRotateBy:")] public void SimdLocalRotateBy(simd_quatf rotation);
-    [Selector("simdRotateBy:aroundTarget:")] public void SimdRotateByAroundTarget(simd_quatf worldRotation, simd_float3 worldTarget);
+    [Selector("simdTransform", "setSimdTransform:")]
+    public simd_float4x4 SimdTransform { get; set; }
+    [Selector("simdPosition", "setSimdPosition:")]
+    public simd_float3 SimdPosition { get; set; }
+    [Selector("simdRotation", "setSimdRotation:")]
+    public simd_float4 SimdRotation { get; set; }
+    [Selector("simdOrientation", "setSimdOrientation:")]
+    public simd_quatf SimdOrientation { get; set; }
+    [Selector("simdEulerAngles", "setSimdEulerAngles:")]
+    public simd_float3 SimdEulerAngles { get; set; }
+    [Selector("simdScale", "setSimdScale:")]
+    public simd_float3 SimdScale { get; set; }
+    [Selector("simdPivot", "setSimdPivot:")]
+    public simd_float4x4 SimdPivot { get; set; }
+    [Selector("simdWorldPosition", "setSimdWorldPosition:")]
+    public simd_float3 SimdWorldPosition { get; set; }
+    [Selector("simdWorldOrientation", "setSimdWorldOrientation:")]
+    public simd_quatf SimdWorldOrientation { get; set; }
+    [Selector("simdWorldTransform", "setSimdWorldTransform:")]
+    public simd_float4x4 SimdWorldTransform { get; set; }
+    [Selector("simdLocalUp")]
+    public static simd_float3 SimdLocalUp { get; }
+    [Selector("simdLocalRight")]
+    public static simd_float3 SimdLocalRight { get; }
+    [Selector("simdLocalFront")]
+    public static simd_float3 SimdLocalFront { get; }
+    [Selector("simdWorldUp")]
+    public simd_float3 SimdWorldUp { get; }
+    [Selector("simdWorldRight")]
+    public simd_float3 SimdWorldRight { get; }
+    [Selector("simdWorldFront")]
+    public simd_float3 SimdWorldFront { get; }
+    [Selector("simdConvertPosition:toNode:")]
+    public simd_float3 SimdConvertPositionToNode(simd_float3 position, SCNNode? node);
+    [Selector("simdConvertPosition:fromNode:")]
+    public simd_float3 SimdConvertPositionFromNode(simd_float3 position, SCNNode? node);
+    [Selector("simdConvertVector:toNode:")]
+    public simd_float3 SimdConvertVectorToNode(simd_float3 vector, SCNNode? node);
+    [Selector("simdConvertVector:fromNode:")]
+    public simd_float3 SimdConvertVectorFromNode(simd_float3 vector, SCNNode? node);
+    [Selector("simdConvertTransform:toNode:")]
+    public simd_float4x4 SimdConvertTransformToNode(simd_float4x4 transform, SCNNode? node);
+    [Selector("simdConvertTransform:fromNode:")]
+    public simd_float4x4 SimdConvertTransformFromNode(simd_float4x4 transform, SCNNode? node);
+    [Selector("simdLookAt:")]
+    public void SimdLookAt(simd_float3 worldTarget);
+    [Selector("simdLookAt:up:localFront:")]
+    public void SimdLookAtUpLocalFront(simd_float3 worldTarget, simd_float3 worldUp, simd_float3 localFront);
+    [Selector("simdLocalTranslateBy:")]
+    public void SimdLocalTranslateBy(simd_float3 translation);
+    [Selector("simdLocalRotateBy:")]
+    public void SimdLocalRotateBy(simd_quatf rotation);
+    [Selector("simdRotateBy:aroundTarget:")]
+    public void SimdRotateByAroundTarget(simd_quatf worldRotation, simd_float3 worldTarget);
 }
 
 /// Focus, a category of SCNNode.
 public extern objc class SCNNode
 {
-    [Selector("focusBehavior", "setFocusBehavior:")] public SCNNodeFocusBehavior FocusBehavior { get; set; }
+    [Selector("focusBehavior", "setFocusBehavior:")]
+    public SCNNodeFocusBehavior FocusBehavior { get; set; }
 }
 
 #endif

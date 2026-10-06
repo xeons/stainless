@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INURLResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedURL:")] public static Self SuccessWithResolvedURL(NSURL resolvedURL);
-    [Selector("disambiguationWithURLsToDisambiguate:")] public static Self DisambiguationWithURLsToDisambiguate(NSArray urlsToDisambiguate);
-    [Selector("confirmationRequiredWithURLToConfirm:")] public static Self ConfirmationRequiredWithURLToConfirm(NSURL? urlToConfirm);
+    [Selector("successWithResolvedURL:")]
+    public static Self SuccessWithResolvedURL(NSURL resolvedURL);
+    [Selector("disambiguationWithURLsToDisambiguate:")]
+    public static Self DisambiguationWithURLsToDisambiguate(NSArray urlsToDisambiguate);
+    [Selector("confirmationRequiredWithURLToConfirm:")]
+    public static Self ConfirmationRequiredWithURLToConfirm(NSURL? urlToConfirm);
 }
 
 #endif

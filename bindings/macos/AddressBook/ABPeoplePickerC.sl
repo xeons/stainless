@@ -61,23 +61,30 @@ public extern "C" void ABPickerAddProperty(ABPickerRef inPicker, CFStringRef? in
 
 public extern "C" void ABPickerRemoveProperty(ABPickerRef inPicker, CFStringRef? inProperty);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ABPickerCopyProperties(ABPickerRef inPicker);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ABPickerCopyProperties(ABPickerRef inPicker);
 
 public extern "C" void ABPickerSetColumnTitle(ABPickerRef inPicker, CFStringRef? inTitle, CFStringRef? inProperty);
 
-[ReturnsRetained] public extern "C" CFStringRef? ABPickerCopyColumnTitle(ABPickerRef inPicker, CFStringRef? inProperty);
+[ReturnsRetained]
+public extern "C" CFStringRef? ABPickerCopyColumnTitle(ABPickerRef inPicker, CFStringRef? inProperty);
 
 public extern "C" void ABPickerSetDisplayedProperty(ABPickerRef inPicker, CFStringRef? inProperty);
 
-[ReturnsRetained] public extern "C" CFStringRef? ABPickerCopyDisplayedProperty(ABPickerRef inPicker);
+[ReturnsRetained]
+public extern "C" CFStringRef? ABPickerCopyDisplayedProperty(ABPickerRef inPicker);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ABPickerCopySelectedGroups(ABPickerRef inPicker);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ABPickerCopySelectedGroups(ABPickerRef inPicker);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ABPickerCopySelectedRecords(ABPickerRef inPicker);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ABPickerCopySelectedRecords(ABPickerRef inPicker);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ABPickerCopySelectedIdentifiers(ABPickerRef inPicker, ABPersonRef inPerson);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ABPickerCopySelectedIdentifiers(ABPickerRef inPicker, ABPersonRef inPerson);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ABPickerCopySelectedValues(ABPickerRef inPicker);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ABPickerCopySelectedValues(ABPickerRef inPicker);
 
 public extern "C" void ABPickerSelectGroup(ABPickerRef inPicker, ABGroupRef inGroup, bool inExtendSelection);
 

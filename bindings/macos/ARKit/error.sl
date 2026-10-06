@@ -46,6 +46,7 @@ public using ar_error_code_t = nint;
 public extern "C" ar_error_code_t ar_error_get_error_code(ar_error_t error);
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CFErrorRef ar_error_copy_cf_error(ar_error_t error);
+[ReturnsRetained]
+public extern "C" CFErrorRef ar_error_copy_cf_error(ar_error_t error);
 
 #endif

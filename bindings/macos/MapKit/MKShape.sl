@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MKShape : NSObject, MKAnnotation
 {
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("subtitle", "setSubtitle:")] public NSString? Subtitle { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("subtitle", "setSubtitle:")]
+    public NSString? Subtitle { get; set; }
 }
 
 #endif

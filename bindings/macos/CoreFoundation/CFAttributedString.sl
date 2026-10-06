@@ -40,11 +40,14 @@ public extern objc class CFMutableAttributedStringRef : CFAttributedStringRef { 
 
 public extern "C" CFTypeID CFAttributedStringGetTypeID();
 
-[ReturnsRetained] public extern "C" CFAttributedStringRef? CFAttributedStringCreate(CFAllocatorRef? alloc, CFStringRef? str, CFDictionaryRef? attributes);
+[ReturnsRetained]
+public extern "C" CFAttributedStringRef? CFAttributedStringCreate(CFAllocatorRef? alloc, CFStringRef? str, CFDictionaryRef? attributes);
 
-[ReturnsRetained] public extern "C" CFAttributedStringRef? CFAttributedStringCreateWithSubstring(CFAllocatorRef? alloc, CFAttributedStringRef? aStr, CFRange range);
+[ReturnsRetained]
+public extern "C" CFAttributedStringRef? CFAttributedStringCreateWithSubstring(CFAllocatorRef? alloc, CFAttributedStringRef? aStr, CFRange range);
 
-[ReturnsRetained] public extern "C" CFAttributedStringRef? CFAttributedStringCreateCopy(CFAllocatorRef? alloc, CFAttributedStringRef? aStr);
+[ReturnsRetained]
+public extern "C" CFAttributedStringRef? CFAttributedStringCreateCopy(CFAllocatorRef? alloc, CFAttributedStringRef? aStr);
 
 public extern "C" CFStringRef? CFAttributedStringGetString(CFAttributedStringRef? aStr);
 
@@ -58,9 +61,11 @@ public extern "C" CFDictionaryRef? CFAttributedStringGetAttributesAndLongestEffe
 
 public extern "C" CFTypeRef? CFAttributedStringGetAttributeAndLongestEffectiveRange(CFAttributedStringRef? aStr, CFIndex loc, CFStringRef? attrName, CFRange inRange, CFRange* longestEffectiveRange);
 
-[ReturnsRetained] public extern "C" CFMutableAttributedStringRef? CFAttributedStringCreateMutableCopy(CFAllocatorRef? alloc, CFIndex maxLength, CFAttributedStringRef? aStr);
+[ReturnsRetained]
+public extern "C" CFMutableAttributedStringRef? CFAttributedStringCreateMutableCopy(CFAllocatorRef? alloc, CFIndex maxLength, CFAttributedStringRef? aStr);
 
-[ReturnsRetained] public extern "C" CFMutableAttributedStringRef? CFAttributedStringCreateMutable(CFAllocatorRef? alloc, CFIndex maxLength);
+[ReturnsRetained]
+public extern "C" CFMutableAttributedStringRef? CFAttributedStringCreateMutable(CFAllocatorRef? alloc, CFIndex maxLength);
 
 public extern "C" void CFAttributedStringReplaceString(CFMutableAttributedStringRef? aStr, CFRange range, CFStringRef? replacement);
 

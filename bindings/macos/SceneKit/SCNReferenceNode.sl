@@ -38,14 +38,22 @@ public enum SCNReferenceLoadingPolicy : long
 
 public extern objc class SCNReferenceNode : SCNNode
 {
-    [Selector("referenceURL", "setReferenceURL:")] public NSURL ReferenceURL { get; set; }
-    [Selector("loadingPolicy", "setLoadingPolicy:")] public SCNReferenceLoadingPolicy LoadingPolicy { get; set; }
-    [Selector("isLoaded")] public bool Loaded { get; }
-    [Selector("initWithURL:")] public Self? InitWithURL(NSURL referenceURL);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
-    [Selector("referenceNodeWithURL:")] public static Self? ReferenceNodeWithURL(NSURL referenceURL);
-    [Selector("load")] public void Load();
-    [Selector("unload")] public void Unload();
+    [Selector("referenceURL", "setReferenceURL:")]
+    public NSURL ReferenceURL { get; set; }
+    [Selector("loadingPolicy", "setLoadingPolicy:")]
+    public SCNReferenceLoadingPolicy LoadingPolicy { get; set; }
+    [Selector("isLoaded")]
+    public bool Loaded { get; }
+    [Selector("initWithURL:")]
+    public Self? InitWithURL(NSURL referenceURL);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder aDecoder);
+    [Selector("referenceNodeWithURL:")]
+    public static Self? ReferenceNodeWithURL(NSURL referenceURL);
+    [Selector("load")]
+    public void Load();
+    [Selector("unload")]
+    public void Unload();
 }
 
 #endif

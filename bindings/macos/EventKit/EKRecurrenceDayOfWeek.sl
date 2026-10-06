@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class EKRecurrenceDayOfWeek : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("dayOfTheWeek")] public EKWeekday DayOfTheWeek { get; }
-    [Selector("weekNumber")] public NSInteger WeekNumber { get; }
-    [Selector("dayOfWeek:")] public static Self DayOfWeek(EKWeekday dayOfTheWeek);
-    [Selector("dayOfWeek:weekNumber:")] public static Self DayOfWeekWeekNumber(EKWeekday dayOfTheWeek, NSInteger weekNumber);
-    [Selector("initWithDayOfTheWeek:weekNumber:")] public AnyObject InitWithDayOfTheWeekWeekNumber(EKWeekday dayOfTheWeek, NSInteger weekNumber);
+    [Selector("dayOfTheWeek")]
+    public EKWeekday DayOfTheWeek { get; }
+    [Selector("weekNumber")]
+    public NSInteger WeekNumber { get; }
+    [Selector("dayOfWeek:")]
+    public static Self DayOfWeek(EKWeekday dayOfTheWeek);
+    [Selector("dayOfWeek:weekNumber:")]
+    public static Self DayOfWeekWeekNumber(EKWeekday dayOfTheWeek, NSInteger weekNumber);
+    [Selector("initWithDayOfTheWeek:weekNumber:")]
+    public AnyObject InitWithDayOfTheWeekWeekNumber(EKWeekday dayOfTheWeek, NSInteger weekNumber);
 }
 
 #endif

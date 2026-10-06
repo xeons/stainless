@@ -33,20 +33,32 @@ import Standard.ObjC;
 
 public extern objc class VZNetworkBlockDeviceStorageDeviceAttachment : VZStorageDeviceAttachment
 {
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("timeout")] public NSTimeInterval Timeout { get; }
-    [Selector("isForcedReadOnly")] public bool ForcedReadOnly { get; }
-    [Selector("synchronizationMode")] public VZDiskSynchronizationMode SynchronizationMode { get; }
-    [Selector("delegate", "setDelegate:")] public VZNetworkBlockDeviceStorageDeviceAttachmentDelegate? Delegate { get; set; }
-    [Selector("initWithURL:timeout:forcedReadOnly:synchronizationMode:error:")] public Self? InitWithURLTimeoutForcedReadOnlySynchronizationModeError(NSURL URL, NSTimeInterval timeout, bool forcedReadOnly, VZDiskSynchronizationMode synchronizationMode, out NSError? error);
-    [Selector("initWithURL:error:")] public Self? InitWithURLError(NSURL URL, out NSError? error);
-    [Selector("validateURL:error:")] public static bool ValidateURLError(NSURL URL, out NSError? error);
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("timeout")]
+    public NSTimeInterval Timeout { get; }
+    [Selector("isForcedReadOnly")]
+    public bool ForcedReadOnly { get; }
+    [Selector("synchronizationMode")]
+    public VZDiskSynchronizationMode SynchronizationMode { get; }
+    [Selector("delegate", "setDelegate:")]
+    public VZNetworkBlockDeviceStorageDeviceAttachmentDelegate? Delegate { get; set; }
+    [Selector("initWithURL:timeout:forcedReadOnly:synchronizationMode:error:")]
+    public Self? InitWithURLTimeoutForcedReadOnlySynchronizationModeError(NSURL URL, NSTimeInterval timeout, bool forcedReadOnly, VZDiskSynchronizationMode synchronizationMode, out NSError? error);
+    [Selector("initWithURL:error:")]
+    public Self? InitWithURLError(NSURL URL, out NSError? error);
+    [Selector("validateURL:error:")]
+    public static bool ValidateURLError(NSURL URL, out NSError? error);
 }
 
 public objc interface VZNetworkBlockDeviceStorageDeviceAttachmentDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("attachmentWasConnected:")] void AttachmentWasConnected(VZNetworkBlockDeviceStorageDeviceAttachment attachment);
-    [Optional] [Selector("attachment:didEncounterError:")] void AttachmentDidEncounterError(VZNetworkBlockDeviceStorageDeviceAttachment attachment, NSError error);
+    [Optional]
+    [Selector("attachmentWasConnected:")]
+    void AttachmentWasConnected(VZNetworkBlockDeviceStorageDeviceAttachment attachment);
+    [Optional]
+    [Selector("attachment:didEncounterError:")]
+    void AttachmentDidEncounterError(VZNetworkBlockDeviceStorageDeviceAttachment attachment, NSError error);
 }
 
 #endif

@@ -133,45 +133,69 @@ public enum HKWorkoutEventType : long
 
 public extern objc class HKWorkoutEvent : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("type")] public HKWorkoutEventType Type { get; }
-    [Selector("date")] public NSDate Date { get; }
-    [Selector("dateInterval")] public NSDateInterval DateInterval { get; }
-    [Selector("metadata")] public NSDictionary? Metadata { get; }
-    [Selector("workoutEventWithType:date:")] public static Self WorkoutEventWithTypeDate(HKWorkoutEventType type, NSDate date);
-    [Selector("workoutEventWithType:date:metadata:")] public static Self WorkoutEventWithTypeDateMetadata(HKWorkoutEventType type, NSDate date, NSDictionary metadata);
-    [Selector("workoutEventWithType:dateInterval:metadata:")] public static Self WorkoutEventWithTypeDateIntervalMetadata(HKWorkoutEventType type, NSDateInterval dateInterval, NSDictionary? metadata);
+    [Selector("type")]
+    public HKWorkoutEventType Type { get; }
+    [Selector("date")]
+    public NSDate Date { get; }
+    [Selector("dateInterval")]
+    public NSDateInterval DateInterval { get; }
+    [Selector("metadata")]
+    public NSDictionary? Metadata { get; }
+    [Selector("workoutEventWithType:date:")]
+    public static Self WorkoutEventWithTypeDate(HKWorkoutEventType type, NSDate date);
+    [Selector("workoutEventWithType:date:metadata:")]
+    public static Self WorkoutEventWithTypeDateMetadata(HKWorkoutEventType type, NSDate date, NSDictionary metadata);
+    [Selector("workoutEventWithType:dateInterval:metadata:")]
+    public static Self WorkoutEventWithTypeDateIntervalMetadata(HKWorkoutEventType type, NSDateInterval dateInterval, NSDictionary? metadata);
 }
 
 public extern objc class HKWorkout : HKSample
 {
-    [Selector("workoutActivityType")] public HKWorkoutActivityType WorkoutActivityType { get; }
-    [Selector("workoutEvents")] public NSArray? WorkoutEvents { get; }
-    [Selector("workoutActivities")] public NSArray WorkoutActivities { get; }
-    [Selector("duration")] public NSTimeInterval Duration { get; }
+    [Selector("workoutActivityType")]
+    public HKWorkoutActivityType WorkoutActivityType { get; }
+    [Selector("workoutEvents")]
+    public NSArray? WorkoutEvents { get; }
+    [Selector("workoutActivities")]
+    public NSArray WorkoutActivities { get; }
+    [Selector("duration")]
+    public NSTimeInterval Duration { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("totalEnergyBurned")] public HKQuantity? TotalEnergyBurned { get; }
+    [Selector("totalEnergyBurned")]
+    public HKQuantity? TotalEnergyBurned { get; }
     /// Deprecated in macOS 100000.
-    [Selector("totalDistance")] public HKQuantity? TotalDistance { get; }
+    [Selector("totalDistance")]
+    public HKQuantity? TotalDistance { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("totalSwimmingStrokeCount")] public HKQuantity? TotalSwimmingStrokeCount { get; }
+    [Selector("totalSwimmingStrokeCount")]
+    public HKQuantity? TotalSwimmingStrokeCount { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("totalFlightsClimbed")] public HKQuantity? TotalFlightsClimbed { get; }
-    [Selector("allStatistics")] public NSDictionary AllStatistics { get; }
-    [Selector("statisticsForType:")] public HKStatistics? StatisticsForType(HKQuantityType quantityType);
+    [Selector("totalFlightsClimbed")]
+    public HKQuantity? TotalFlightsClimbed { get; }
+    [Selector("allStatistics")]
+    public NSDictionary AllStatistics { get; }
+    [Selector("statisticsForType:")]
+    public HKStatistics? StatisticsForType(HKQuantityType quantityType);
     /// Deprecated in macOS 14.0.
-    [Selector("workoutWithActivityType:startDate:endDate:")] public static Self WorkoutWithActivityTypeStartDateEndDate(HKWorkoutActivityType workoutActivityType, NSDate startDate, NSDate endDate);
+    [Selector("workoutWithActivityType:startDate:endDate:")]
+    public static Self WorkoutWithActivityTypeStartDateEndDate(HKWorkoutActivityType workoutActivityType, NSDate startDate, NSDate endDate);
     /// Deprecated in macOS 14.0.
-    [Selector("workoutWithActivityType:startDate:endDate:workoutEvents:totalEnergyBurned:totalDistance:metadata:")] public static Self WorkoutWithActivityTypeStartDateEndDateWorkoutEventsTotalEnergyBurnedTotalDistanceMetadata(HKWorkoutActivityType workoutActivityType, NSDate startDate, NSDate endDate, NSArray? workoutEvents, HKQuantity? totalEnergyBurned, HKQuantity? totalDistance, NSDictionary? metadata);
+    [Selector("workoutWithActivityType:startDate:endDate:workoutEvents:totalEnergyBurned:totalDistance:metadata:")]
+    public static Self WorkoutWithActivityTypeStartDateEndDateWorkoutEventsTotalEnergyBurnedTotalDistanceMetadata(HKWorkoutActivityType workoutActivityType, NSDate startDate, NSDate endDate, NSArray? workoutEvents, HKQuantity? totalEnergyBurned, HKQuantity? totalDistance, NSDictionary? metadata);
     /// Deprecated in macOS 14.0.
-    [Selector("workoutWithActivityType:startDate:endDate:workoutEvents:totalEnergyBurned:totalDistance:device:metadata:")] public static Self WorkoutWithActivityTypeStartDateEndDateWorkoutEventsTotalEnergyBurnedTotalDistanceDeviceMetadata(HKWorkoutActivityType workoutActivityType, NSDate startDate, NSDate endDate, NSArray? workoutEvents, HKQuantity? totalEnergyBurned, HKQuantity? totalDistance, HKDevice? device, NSDictionary? metadata);
+    [Selector("workoutWithActivityType:startDate:endDate:workoutEvents:totalEnergyBurned:totalDistance:device:metadata:")]
+    public static Self WorkoutWithActivityTypeStartDateEndDateWorkoutEventsTotalEnergyBurnedTotalDistanceDeviceMetadata(HKWorkoutActivityType workoutActivityType, NSDate startDate, NSDate endDate, NSArray? workoutEvents, HKQuantity? totalEnergyBurned, HKQuantity? totalDistance, HKDevice? device, NSDictionary? metadata);
     /// Deprecated in macOS 14.0.
-    [Selector("workoutWithActivityType:startDate:endDate:duration:totalEnergyBurned:totalDistance:metadata:")] public static Self WorkoutWithActivityTypeStartDateEndDateDurationTotalEnergyBurnedTotalDistanceMetadata(HKWorkoutActivityType workoutActivityType, NSDate startDate, NSDate endDate, NSTimeInterval duration, HKQuantity? totalEnergyBurned, HKQuantity? totalDistance, NSDictionary? metadata);
+    [Selector("workoutWithActivityType:startDate:endDate:duration:totalEnergyBurned:totalDistance:metadata:")]
+    public static Self WorkoutWithActivityTypeStartDateEndDateDurationTotalEnergyBurnedTotalDistanceMetadata(HKWorkoutActivityType workoutActivityType, NSDate startDate, NSDate endDate, NSTimeInterval duration, HKQuantity? totalEnergyBurned, HKQuantity? totalDistance, NSDictionary? metadata);
     /// Deprecated in macOS 14.0.
-    [Selector("workoutWithActivityType:startDate:endDate:duration:totalEnergyBurned:totalDistance:device:metadata:")] public static Self WorkoutWithActivityTypeStartDateEndDateDurationTotalEnergyBurnedTotalDistanceDeviceMetadata(HKWorkoutActivityType workoutActivityType, NSDate startDate, NSDate endDate, NSTimeInterval duration, HKQuantity? totalEnergyBurned, HKQuantity? totalDistance, HKDevice? device, NSDictionary? metadata);
+    [Selector("workoutWithActivityType:startDate:endDate:duration:totalEnergyBurned:totalDistance:device:metadata:")]
+    public static Self WorkoutWithActivityTypeStartDateEndDateDurationTotalEnergyBurnedTotalDistanceDeviceMetadata(HKWorkoutActivityType workoutActivityType, NSDate startDate, NSDate endDate, NSTimeInterval duration, HKQuantity? totalEnergyBurned, HKQuantity? totalDistance, HKDevice? device, NSDictionary? metadata);
     /// Deprecated in macOS 14.0.
-    [Selector("workoutWithActivityType:startDate:endDate:workoutEvents:totalEnergyBurned:totalDistance:totalSwimmingStrokeCount:device:metadata:")] public static Self WorkoutWithActivityTypeStartDateEndDateWorkoutEventsTotalEnergyBurnedTotalDistanceTotalSwimmingStrokeCountDeviceMetadata(HKWorkoutActivityType workoutActivityType, NSDate startDate, NSDate endDate, NSArray? workoutEvents, HKQuantity? totalEnergyBurned, HKQuantity? totalDistance, HKQuantity? totalSwimmingStrokeCount, HKDevice? device, NSDictionary? metadata);
+    [Selector("workoutWithActivityType:startDate:endDate:workoutEvents:totalEnergyBurned:totalDistance:totalSwimmingStrokeCount:device:metadata:")]
+    public static Self WorkoutWithActivityTypeStartDateEndDateWorkoutEventsTotalEnergyBurnedTotalDistanceTotalSwimmingStrokeCountDeviceMetadata(HKWorkoutActivityType workoutActivityType, NSDate startDate, NSDate endDate, NSArray? workoutEvents, HKQuantity? totalEnergyBurned, HKQuantity? totalDistance, HKQuantity? totalSwimmingStrokeCount, HKDevice? device, NSDictionary? metadata);
     /// Deprecated in macOS 14.0.
-    [Selector("workoutWithActivityType:startDate:endDate:workoutEvents:totalEnergyBurned:totalDistance:totalFlightsClimbed:device:metadata:")] public static Self WorkoutWithActivityTypeStartDateEndDateWorkoutEventsTotalEnergyBurnedTotalDistanceTotalFlightsClimbedDeviceMetadata(HKWorkoutActivityType workoutActivityType, NSDate startDate, NSDate endDate, NSArray? workoutEvents, HKQuantity? totalEnergyBurned, HKQuantity? totalDistance, HKQuantity? totalFlightsClimbed, HKDevice? device, NSDictionary? metadata);
+    [Selector("workoutWithActivityType:startDate:endDate:workoutEvents:totalEnergyBurned:totalDistance:totalFlightsClimbed:device:metadata:")]
+    public static Self WorkoutWithActivityTypeStartDateEndDateWorkoutEventsTotalEnergyBurnedTotalDistanceTotalFlightsClimbedDeviceMetadata(HKWorkoutActivityType workoutActivityType, NSDate startDate, NSDate endDate, NSArray? workoutEvents, HKQuantity? totalEnergyBurned, HKQuantity? totalDistance, HKQuantity? totalFlightsClimbed, HKDevice? device, NSDictionary? metadata);
 }
 
 public extern "C" NSString HKPredicateKeyPathWorkoutDuration;

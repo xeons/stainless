@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCDropoutLayer : MLCLayer
 {
-    [Selector("rate")] public float Rate { get; }
-    [Selector("seed")] public NSUInteger Seed { get; }
-    [Selector("layerWithRate:seed:")] public static Self LayerWithRateSeed(float rate, NSUInteger seed);
+    [Selector("rate")]
+    public float Rate { get; }
+    [Selector("seed")]
+    public NSUInteger Seed { get; }
+    [Selector("layerWithRate:seed:")]
+    public static Self LayerWithRateSeed(float rate, NSUInteger seed);
 }
 
 #endif

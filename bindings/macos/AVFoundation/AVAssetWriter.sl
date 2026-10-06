@@ -46,71 +46,114 @@ public objc closure void AVAssetWriterFinishWritingWithCompletionHandlerHandlerB
 
 public extern objc class AVAssetWriter : NSObject
 {
-    [Selector("outputURL")] public NSURL OutputURL { get; }
-    [Selector("outputFileType")] public AVFileType OutputFileType { get; }
-    [Selector("availableMediaTypes")] public NSArray AvailableMediaTypes { get; }
-    [Selector("status")] public AVAssetWriterStatus Status { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("metadata", "setMetadata:")] public NSArray Metadata { get; set; }
-    [Selector("shouldOptimizeForNetworkUse", "setShouldOptimizeForNetworkUse:")] public bool ShouldOptimizeForNetworkUse { get; set; }
-    [Selector("directoryForTemporaryFiles", "setDirectoryForTemporaryFiles:")] public NSURL? DirectoryForTemporaryFiles { get; set; }
-    [Selector("inputs")] public NSArray Inputs { get; }
-    [Selector("assetWriterWithURL:fileType:error:")] public static Self? AssetWriterWithURLFileTypeError(NSURL outputURL, AVFileType outputFileType, out NSError? outError);
-    [Selector("initWithURL:fileType:error:")] public Self? InitWithURLFileTypeError(NSURL outputURL, AVFileType outputFileType, out NSError? outError);
-    [Selector("initWithContentType:")] public Self InitWithContentType(UTType outputContentType);
-    [Selector("canApplyOutputSettings:forMediaType:")] public bool CanApplyOutputSettingsForMediaType(NSDictionary? outputSettings, AVMediaType mediaType);
-    [Selector("canAddInput:")] public bool CanAddInput(AVAssetWriterInput input);
-    [Selector("addInput:")] public void AddInput(AVAssetWriterInput input);
-    [Selector("startWriting")] public bool StartWriting();
-    [Selector("startSessionAtSourceTime:")] public void StartSessionAtSourceTime(CMTime startTime);
-    [Selector("endSessionAtSourceTime:")] public void EndSessionAtSourceTime(CMTime endTime);
-    [Selector("cancelWriting")] public void CancelWriting();
+    [Selector("outputURL")]
+    public NSURL OutputURL { get; }
+    [Selector("outputFileType")]
+    public AVFileType OutputFileType { get; }
+    [Selector("availableMediaTypes")]
+    public NSArray AvailableMediaTypes { get; }
+    [Selector("status")]
+    public AVAssetWriterStatus Status { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("metadata", "setMetadata:")]
+    public NSArray Metadata { get; set; }
+    [Selector("shouldOptimizeForNetworkUse", "setShouldOptimizeForNetworkUse:")]
+    public bool ShouldOptimizeForNetworkUse { get; set; }
+    [Selector("directoryForTemporaryFiles", "setDirectoryForTemporaryFiles:")]
+    public NSURL? DirectoryForTemporaryFiles { get; set; }
+    [Selector("inputs")]
+    public NSArray Inputs { get; }
+    [Selector("assetWriterWithURL:fileType:error:")]
+    public static Self? AssetWriterWithURLFileTypeError(NSURL outputURL, AVFileType outputFileType, out NSError? outError);
+    [Selector("initWithURL:fileType:error:")]
+    public Self? InitWithURLFileTypeError(NSURL outputURL, AVFileType outputFileType, out NSError? outError);
+    [Selector("initWithContentType:")]
+    public Self InitWithContentType(UTType outputContentType);
+    [Selector("canApplyOutputSettings:forMediaType:")]
+    public bool CanApplyOutputSettingsForMediaType(NSDictionary? outputSettings, AVMediaType mediaType);
+    [Selector("canAddInput:")]
+    public bool CanAddInput(AVAssetWriterInput input);
+    [Selector("addInput:")]
+    public void AddInput(AVAssetWriterInput input);
+    [Selector("startWriting")]
+    public bool StartWriting();
+    [Selector("startSessionAtSourceTime:")]
+    public void StartSessionAtSourceTime(CMTime startTime);
+    [Selector("endSessionAtSourceTime:")]
+    public void EndSessionAtSourceTime(CMTime endTime);
+    [Selector("cancelWriting")]
+    public void CancelWriting();
     /// Deprecated in macOS 10.9.
-    [Selector("finishWriting")] public bool FinishWriting();
-    [Selector("finishWritingWithCompletionHandler:")] public void FinishWritingWithCompletionHandler(AVAssetWriterFinishWritingWithCompletionHandlerHandlerBlock handler);
+    [Selector("finishWriting")]
+    public bool FinishWriting();
+    [Selector("finishWritingWithCompletionHandler:")]
+    public void FinishWritingWithCompletionHandler(AVAssetWriterFinishWritingWithCompletionHandlerHandlerBlock handler);
 }
 
 /// AVAssetWriterFileTypeSpecificProperties, a category of AVAssetWriter.
 public extern objc class AVAssetWriter
 {
-    [Selector("movieFragmentInterval", "setMovieFragmentInterval:")] public CMTime MovieFragmentInterval { get; set; }
-    [Selector("initialMovieFragmentInterval", "setInitialMovieFragmentInterval:")] public CMTime InitialMovieFragmentInterval { get; set; }
-    [Selector("initialMovieFragmentSequenceNumber", "setInitialMovieFragmentSequenceNumber:")] public NSInteger InitialMovieFragmentSequenceNumber { get; set; }
-    [Selector("producesCombinableFragments", "setProducesCombinableFragments:")] public bool ProducesCombinableFragments { get; set; }
-    [Selector("overallDurationHint", "setOverallDurationHint:")] public CMTime OverallDurationHint { get; set; }
-    [Selector("movieTimeScale", "setMovieTimeScale:")] public CMTimeScale MovieTimeScale { get; set; }
+    [Selector("movieFragmentInterval", "setMovieFragmentInterval:")]
+    public CMTime MovieFragmentInterval { get; set; }
+    [Selector("initialMovieFragmentInterval", "setInitialMovieFragmentInterval:")]
+    public CMTime InitialMovieFragmentInterval { get; set; }
+    [Selector("initialMovieFragmentSequenceNumber", "setInitialMovieFragmentSequenceNumber:")]
+    public NSInteger InitialMovieFragmentSequenceNumber { get; set; }
+    [Selector("producesCombinableFragments", "setProducesCombinableFragments:")]
+    public bool ProducesCombinableFragments { get; set; }
+    [Selector("overallDurationHint", "setOverallDurationHint:")]
+    public CMTime OverallDurationHint { get; set; }
+    [Selector("movieTimeScale", "setMovieTimeScale:")]
+    public CMTimeScale MovieTimeScale { get; set; }
 }
 
 /// AVAssetWriterInputGroups, a category of AVAssetWriter.
 public extern objc class AVAssetWriter
 {
-    [Selector("inputGroups")] public NSArray? InputGroups { get; }
-    [Selector("canAddInputGroup:")] public bool CanAddInputGroup(AVAssetWriterInputGroup inputGroup);
-    [Selector("addInputGroup:")] public void AddInputGroup(AVAssetWriterInputGroup inputGroup);
+    [Selector("inputGroups")]
+    public NSArray? InputGroups { get; }
+    [Selector("canAddInputGroup:")]
+    public bool CanAddInputGroup(AVAssetWriterInputGroup inputGroup);
+    [Selector("addInputGroup:")]
+    public void AddInputGroup(AVAssetWriterInputGroup inputGroup);
 }
 
 public extern objc class AVAssetWriterInputGroup : AVMediaSelectionGroup
 {
-    [Selector("inputs")] public NSArray Inputs { get; }
-    [Selector("defaultInput")] public AVAssetWriterInput? DefaultInput { get; }
-    [Selector("assetWriterInputGroupWithInputs:defaultInput:")] public static Self AssetWriterInputGroupWithInputsDefaultInput(NSArray inputs, AVAssetWriterInput? defaultInput);
-    [Selector("initWithInputs:defaultInput:")] public Self InitWithInputsDefaultInput(NSArray inputs, AVAssetWriterInput? defaultInput);
+    [Selector("inputs")]
+    public NSArray Inputs { get; }
+    [Selector("defaultInput")]
+    public AVAssetWriterInput? DefaultInput { get; }
+    [Selector("assetWriterInputGroupWithInputs:defaultInput:")]
+    public static Self AssetWriterInputGroupWithInputsDefaultInput(NSArray inputs, AVAssetWriterInput? defaultInput);
+    [Selector("initWithInputs:defaultInput:")]
+    public Self InitWithInputsDefaultInput(NSArray inputs, AVAssetWriterInput? defaultInput);
 }
 
 /// AVAssetWriterSegmentation, a category of AVAssetWriter.
 public extern objc class AVAssetWriter
 {
-    [Selector("preferredOutputSegmentInterval", "setPreferredOutputSegmentInterval:")] public CMTime PreferredOutputSegmentInterval { get; set; }
-    [Selector("initialSegmentStartTime", "setInitialSegmentStartTime:")] public CMTime InitialSegmentStartTime { get; set; }
-    [Selector("outputFileTypeProfile", "setOutputFileTypeProfile:")] public AVFileTypeProfile? OutputFileTypeProfile { get; set; }
-    [Selector("delegate", "setDelegate:")] public AVAssetWriterDelegate? Delegate { get; set; }
-    [Selector("flushSegment")] public void FlushSegment();
+    [Selector("preferredOutputSegmentInterval", "setPreferredOutputSegmentInterval:")]
+    public CMTime PreferredOutputSegmentInterval { get; set; }
+    [Selector("initialSegmentStartTime", "setInitialSegmentStartTime:")]
+    public CMTime InitialSegmentStartTime { get; set; }
+    [Selector("outputFileTypeProfile", "setOutputFileTypeProfile:")]
+    public AVFileTypeProfile? OutputFileTypeProfile { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public AVAssetWriterDelegate? Delegate { get; set; }
+    [Selector("flushSegment")]
+    public void FlushSegment();
 }
 
 public objc interface AVAssetWriterDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("assetWriter:didOutputSegmentData:segmentType:segmentReport:")] void AssetWriterDidOutputSegmentDataSegmentTypeSegmentReport(AVAssetWriter writer, NSData segmentData, AVAssetSegmentType segmentType, AVAssetSegmentReport? segmentReport);
-    [Optional] [Selector("assetWriter:didOutputSegmentData:segmentType:")] void AssetWriterDidOutputSegmentDataSegmentType(AVAssetWriter writer, NSData segmentData, AVAssetSegmentType segmentType);
+    [Optional]
+    [Selector("assetWriter:didOutputSegmentData:segmentType:segmentReport:")]
+    void AssetWriterDidOutputSegmentDataSegmentTypeSegmentReport(AVAssetWriter writer, NSData segmentData, AVAssetSegmentType segmentType, AVAssetSegmentReport? segmentReport);
+    [Optional]
+    [Selector("assetWriter:didOutputSegmentData:segmentType:")]
+    void AssetWriterDidOutputSegmentDataSegmentType(AVAssetWriter writer, NSData segmentData, AVAssetSegmentType segmentType);
 }
 
 #endif

@@ -32,13 +32,20 @@ import Standard.ObjC;
 
 public extern objc class NSMethodSignature : NSObject
 {
-    [Selector("numberOfArguments")] public NSUInteger NumberOfArguments { get; }
-    [Selector("frameLength")] public NSUInteger FrameLength { get; }
-    [Selector("methodReturnType")] public byte* MethodReturnType { get; }
-    [Selector("methodReturnLength")] public NSUInteger MethodReturnLength { get; }
-    [Selector("signatureWithObjCTypes:")] public static NSMethodSignature? SignatureWithObjCTypes(byte* types);
-    [Selector("getArgumentTypeAtIndex:")] public byte* GetArgumentTypeAtIndex(NSUInteger idx);
-    [Selector("isOneway")] public bool IsOneway();
+    [Selector("numberOfArguments")]
+    public NSUInteger NumberOfArguments { get; }
+    [Selector("frameLength")]
+    public NSUInteger FrameLength { get; }
+    [Selector("methodReturnType")]
+    public byte* MethodReturnType { get; }
+    [Selector("methodReturnLength")]
+    public NSUInteger MethodReturnLength { get; }
+    [Selector("signatureWithObjCTypes:")]
+    public static NSMethodSignature? SignatureWithObjCTypes(byte* types);
+    [Selector("getArgumentTypeAtIndex:")]
+    public byte* GetArgumentTypeAtIndex(NSUInteger idx);
+    [Selector("isOneway")]
+    public bool IsOneway();
 }
 
 #endif

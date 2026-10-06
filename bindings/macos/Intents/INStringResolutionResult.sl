@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INStringResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedString:")] public static Self SuccessWithResolvedString(NSString resolvedString);
-    [Selector("disambiguationWithStringsToDisambiguate:")] public static Self DisambiguationWithStringsToDisambiguate(NSArray stringsToDisambiguate);
-    [Selector("confirmationRequiredWithStringToConfirm:")] public static Self ConfirmationRequiredWithStringToConfirm(NSString? stringToConfirm);
+    [Selector("successWithResolvedString:")]
+    public static Self SuccessWithResolvedString(NSString resolvedString);
+    [Selector("disambiguationWithStringsToDisambiguate:")]
+    public static Self DisambiguationWithStringsToDisambiguate(NSArray stringsToDisambiguate);
+    [Selector("confirmationRequiredWithStringToConfirm:")]
+    public static Self ConfirmationRequiredWithStringToConfirm(NSString? stringToConfirm);
 }
 
 #endif

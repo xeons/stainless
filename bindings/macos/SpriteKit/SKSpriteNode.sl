@@ -34,33 +34,60 @@ import Standard.ObjC;
 
 public extern objc class SKSpriteNode : SKNode, SKWarpable
 {
-    [Selector("texture", "setTexture:")] public SKTexture? Texture { get; set; }
-    [Selector("normalTexture", "setNormalTexture:")] public SKTexture? NormalTexture { get; set; }
-    [Selector("lightingBitMask", "setLightingBitMask:")] public uint LightingBitMask { get; set; }
-    [Selector("shadowCastBitMask", "setShadowCastBitMask:")] public uint ShadowCastBitMask { get; set; }
-    [Selector("shadowedBitMask", "setShadowedBitMask:")] public uint ShadowedBitMask { get; set; }
-    [Selector("centerRect", "setCenterRect:")] public CGRect CenterRect { get; set; }
-    [Selector("colorBlendFactor", "setColorBlendFactor:")] public CGFloat ColorBlendFactor { get; set; }
-    [Selector("color", "setColor:")] public NSColor Color { get; set; }
-    [Selector("blendMode", "setBlendMode:")] public SKBlendMode BlendMode { get; set; }
-    [Selector("anchorPoint", "setAnchorPoint:")] public CGPoint AnchorPoint { get; set; }
-    [Selector("size", "setSize:")] public CGSize Size { get; set; }
-    [Selector("shader", "setShader:")] public SKShader? Shader { get; set; }
-    [Selector("attributeValues", "setAttributeValues:")] public NSDictionary AttributeValues { get; set; }
-    [Selector("spriteNodeWithTexture:size:")] public static Self SpriteNodeWithTextureSize(SKTexture? texture, CGSize size);
-    [Selector("spriteNodeWithTexture:")] public static Self SpriteNodeWithTexture(SKTexture? texture);
-    [Selector("spriteNodeWithTexture:normalMap:")] public static Self SpriteNodeWithTextureNormalMap(SKTexture? texture, SKTexture? normalMap);
-    [Selector("spriteNodeWithImageNamed:")] public static Self SpriteNodeWithImageNamed(NSString name);
-    [Selector("spriteNodeWithImageNamed:normalMapped:")] public static Self SpriteNodeWithImageNamedNormalMapped(NSString name, bool generateNormalMap);
-    [Selector("spriteNodeWithColor:size:")] public static Self SpriteNodeWithColorSize(NSColor color, CGSize size);
-    [Selector("initWithTexture:color:size:")] public Self InitWithTextureColorSize(SKTexture? texture, NSColor color, CGSize size);
-    [Selector("initWithTexture:")] public Self InitWithTexture(SKTexture? texture);
-    [Selector("initWithImageNamed:")] public Self InitWithImageNamed(NSString name);
-    [Selector("initWithColor:size:")] public Self InitWithColorSize(NSColor color, CGSize size);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
-    [Selector("scaleToSize:")] public void ScaleToSize(CGSize size);
-    [Selector("valueForAttributeNamed:")] public SKAttributeValue? ValueForAttributeNamed(NSString key);
-    [Selector("setValue:forAttributeNamed:")] public void SetValueForAttributeNamed(SKAttributeValue value, NSString key);
+    [Selector("texture", "setTexture:")]
+    public SKTexture? Texture { get; set; }
+    [Selector("normalTexture", "setNormalTexture:")]
+    public SKTexture? NormalTexture { get; set; }
+    [Selector("lightingBitMask", "setLightingBitMask:")]
+    public uint LightingBitMask { get; set; }
+    [Selector("shadowCastBitMask", "setShadowCastBitMask:")]
+    public uint ShadowCastBitMask { get; set; }
+    [Selector("shadowedBitMask", "setShadowedBitMask:")]
+    public uint ShadowedBitMask { get; set; }
+    [Selector("centerRect", "setCenterRect:")]
+    public CGRect CenterRect { get; set; }
+    [Selector("colorBlendFactor", "setColorBlendFactor:")]
+    public CGFloat ColorBlendFactor { get; set; }
+    [Selector("color", "setColor:")]
+    public NSColor Color { get; set; }
+    [Selector("blendMode", "setBlendMode:")]
+    public SKBlendMode BlendMode { get; set; }
+    [Selector("anchorPoint", "setAnchorPoint:")]
+    public CGPoint AnchorPoint { get; set; }
+    [Selector("size", "setSize:")]
+    public CGSize Size { get; set; }
+    [Selector("shader", "setShader:")]
+    public SKShader? Shader { get; set; }
+    [Selector("attributeValues", "setAttributeValues:")]
+    public NSDictionary AttributeValues { get; set; }
+    [Selector("spriteNodeWithTexture:size:")]
+    public static Self SpriteNodeWithTextureSize(SKTexture? texture, CGSize size);
+    [Selector("spriteNodeWithTexture:")]
+    public static Self SpriteNodeWithTexture(SKTexture? texture);
+    [Selector("spriteNodeWithTexture:normalMap:")]
+    public static Self SpriteNodeWithTextureNormalMap(SKTexture? texture, SKTexture? normalMap);
+    [Selector("spriteNodeWithImageNamed:")]
+    public static Self SpriteNodeWithImageNamed(NSString name);
+    [Selector("spriteNodeWithImageNamed:normalMapped:")]
+    public static Self SpriteNodeWithImageNamedNormalMapped(NSString name, bool generateNormalMap);
+    [Selector("spriteNodeWithColor:size:")]
+    public static Self SpriteNodeWithColorSize(NSColor color, CGSize size);
+    [Selector("initWithTexture:color:size:")]
+    public Self InitWithTextureColorSize(SKTexture? texture, NSColor color, CGSize size);
+    [Selector("initWithTexture:")]
+    public Self InitWithTexture(SKTexture? texture);
+    [Selector("initWithImageNamed:")]
+    public Self InitWithImageNamed(NSString name);
+    [Selector("initWithColor:size:")]
+    public Self InitWithColorSize(NSColor color, CGSize size);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder aDecoder);
+    [Selector("scaleToSize:")]
+    public void ScaleToSize(CGSize size);
+    [Selector("valueForAttributeNamed:")]
+    public SKAttributeValue? ValueForAttributeNamed(NSString key);
+    [Selector("setValue:forAttributeNamed:")]
+    public void SetValueForAttributeNamed(SKAttributeValue value, NSString key);
 }
 
 #endif

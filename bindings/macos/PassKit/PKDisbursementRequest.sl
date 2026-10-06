@@ -33,19 +33,32 @@ import Standard.ObjC;
 
 public extern objc class PKDisbursementRequest : NSObject
 {
-    [Selector("merchantIdentifier", "setMerchantIdentifier:")] public NSString MerchantIdentifier { get; set; }
-    [Selector("regionCode", "setRegionCode:")] public NSString? RegionCode { get; set; }
-    [Selector("supportedNetworks", "setSupportedNetworks:")] public NSArray SupportedNetworks { get; set; }
-    [Selector("merchantCapabilities", "setMerchantCapabilities:")] public PKMerchantCapability MerchantCapabilities { get; set; }
-    [Selector("summaryItems", "setSummaryItems:")] public NSArray SummaryItems { get; set; }
-    [Selector("currencyCode", "setCurrencyCode:")] public NSString? CurrencyCode { get; set; }
-    [Selector("requiredRecipientContactFields", "setRequiredRecipientContactFields:")] public NSArray RequiredRecipientContactFields { get; set; }
-    [Selector("recipientContact", "setRecipientContact:")] public PKContact? RecipientContact { get; set; }
-    [Selector("supportedRegions", "setSupportedRegions:")] public NSArray? SupportedRegions { get; set; }
-    [Selector("applicationData", "setApplicationData:")] public NSData? ApplicationData { get; set; }
-    [Selector("initWithMerchantIdentifier:currencyCode:regionCode:supportedNetworks:merchantCapabilities:summaryItems:")] public Self InitWithMerchantIdentifierCurrencyCodeRegionCodeSupportedNetworksMerchantCapabilitiesSummaryItems(NSString merchantIdentifier, NSString currencyCode, NSString regionCode, NSArray supportedNetworks, PKMerchantCapability merchantCapabilities, NSArray summaryItems);
-    [Selector("disbursementContactInvalidErrorWithContactField:localizedDescription:")] public static NSError DisbursementContactInvalidErrorWithContactFieldLocalizedDescription(PKContactField field, NSString? localizedDescription);
-    [Selector("disbursementCardUnsupportedError")] public static NSError DisbursementCardUnsupportedError();
+    [Selector("merchantIdentifier", "setMerchantIdentifier:")]
+    public NSString MerchantIdentifier { get; set; }
+    [Selector("regionCode", "setRegionCode:")]
+    public NSString? RegionCode { get; set; }
+    [Selector("supportedNetworks", "setSupportedNetworks:")]
+    public NSArray SupportedNetworks { get; set; }
+    [Selector("merchantCapabilities", "setMerchantCapabilities:")]
+    public PKMerchantCapability MerchantCapabilities { get; set; }
+    [Selector("summaryItems", "setSummaryItems:")]
+    public NSArray SummaryItems { get; set; }
+    [Selector("currencyCode", "setCurrencyCode:")]
+    public NSString? CurrencyCode { get; set; }
+    [Selector("requiredRecipientContactFields", "setRequiredRecipientContactFields:")]
+    public NSArray RequiredRecipientContactFields { get; set; }
+    [Selector("recipientContact", "setRecipientContact:")]
+    public PKContact? RecipientContact { get; set; }
+    [Selector("supportedRegions", "setSupportedRegions:")]
+    public NSArray? SupportedRegions { get; set; }
+    [Selector("applicationData", "setApplicationData:")]
+    public NSData? ApplicationData { get; set; }
+    [Selector("initWithMerchantIdentifier:currencyCode:regionCode:supportedNetworks:merchantCapabilities:summaryItems:")]
+    public Self InitWithMerchantIdentifierCurrencyCodeRegionCodeSupportedNetworksMerchantCapabilitiesSummaryItems(NSString merchantIdentifier, NSString currencyCode, NSString regionCode, NSArray supportedNetworks, PKMerchantCapability merchantCapabilities, NSArray summaryItems);
+    [Selector("disbursementContactInvalidErrorWithContactField:localizedDescription:")]
+    public static NSError DisbursementContactInvalidErrorWithContactFieldLocalizedDescription(PKContactField field, NSString? localizedDescription);
+    [Selector("disbursementCardUnsupportedError")]
+    public static NSError DisbursementCardUnsupportedError();
 }
 
 #endif

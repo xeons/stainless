@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class NEPacket : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("data")] public NSData? Data { get; }
-    [Selector("protocolFamily")] public sa_family_t ProtocolFamily { get; }
-    [Selector("direction")] public NETrafficDirection Direction { get; }
-    [Selector("metadata")] public NEFlowMetaData? Metadata { get; }
-    [Selector("initWithData:protocolFamily:")] public Self InitWithDataProtocolFamily(NSData data, sa_family_t protocolFamily);
+    [Selector("data")]
+    public NSData? Data { get; }
+    [Selector("protocolFamily")]
+    public sa_family_t ProtocolFamily { get; }
+    [Selector("direction")]
+    public NETrafficDirection Direction { get; }
+    [Selector("metadata")]
+    public NEFlowMetaData? Metadata { get; }
+    [Selector("initWithData:protocolFamily:")]
+    public Self InitWithDataProtocolFamily(NSData data, sa_family_t protocolFamily);
 }
 
 #endif

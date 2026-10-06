@@ -34,7 +34,8 @@ public objc closure void NEAppProxyProviderManagerLoadAllFromPreferencesWithComp
 
 public extern objc class NEAppProxyProviderManager : NETunnelProviderManager
 {
-    [Selector("loadAllFromPreferencesWithCompletionHandler:")] public static void LoadAllFromPreferencesWithCompletionHandler(NEAppProxyProviderManagerLoadAllFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadAllFromPreferencesWithCompletionHandler:")]
+    public static void LoadAllFromPreferencesWithCompletionHandler(NEAppProxyProviderManagerLoadAllFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

@@ -170,27 +170,36 @@ public extern "C" CFStringRef? kColorSyncProfileUserDomain;
 
 public extern "C" CFTypeID ColorSyncProfileGetTypeID();
 
-[ReturnsRetained] public extern "C" ColorSyncProfileRef? ColorSyncProfileCreate(CFDataRef data, __CFError** error);
+[ReturnsRetained]
+public extern "C" ColorSyncProfileRef? ColorSyncProfileCreate(CFDataRef data, __CFError** error);
 
-[ReturnsRetained] public extern "C" ColorSyncProfileRef? ColorSyncProfileCreateWithURL(CFURLRef url, __CFError** error);
+[ReturnsRetained]
+public extern "C" ColorSyncProfileRef? ColorSyncProfileCreateWithURL(CFURLRef url, __CFError** error);
 
 /// macOS 26.1 and later.
 public extern "C" CFStringRef kColorSyncDoNotSubstituteProfiles;
 
 /// macOS 26.1 and later.
-[ReturnsRetained] public extern "C" ColorSyncProfileRef? ColorSyncProfileCreateWithURLAndOptions(CFURLRef url, CFDictionaryRef? options, __CFError** error);
+[ReturnsRetained]
+public extern "C" ColorSyncProfileRef? ColorSyncProfileCreateWithURLAndOptions(CFURLRef url, CFDictionaryRef? options, __CFError** error);
 
-[ReturnsRetained] public extern "C" ColorSyncProfileRef? ColorSyncProfileCreateWithName(CFStringRef name);
+[ReturnsRetained]
+public extern "C" ColorSyncProfileRef? ColorSyncProfileCreateWithName(CFStringRef name);
 
-[ReturnsRetained] public extern "C" ColorSyncProfileRef? ColorSyncProfileCreateWithDisplayID(uint displayID);
+[ReturnsRetained]
+public extern "C" ColorSyncProfileRef? ColorSyncProfileCreateWithDisplayID(uint displayID);
 
-[ReturnsRetained] public extern "C" ColorSyncProfileRef? ColorSyncProfileCreateDeviceProfile(CFStringRef deviceClass, CFUUIDRef deviceID, CFTypeRef profileID);
+[ReturnsRetained]
+public extern "C" ColorSyncProfileRef? ColorSyncProfileCreateDeviceProfile(CFStringRef deviceClass, CFUUIDRef deviceID, CFTypeRef profileID);
 
-[ReturnsRetained] public extern "C" ColorSyncMutableProfileRef? ColorSyncProfileCreateMutable();
+[ReturnsRetained]
+public extern "C" ColorSyncMutableProfileRef? ColorSyncProfileCreateMutable();
 
-[ReturnsRetained] public extern "C" ColorSyncMutableProfileRef? ColorSyncProfileCreateMutableCopy(ColorSyncProfileRef prof);
+[ReturnsRetained]
+public extern "C" ColorSyncMutableProfileRef? ColorSyncProfileCreateMutableCopy(ColorSyncProfileRef prof);
 
-[ReturnsRetained] public extern "C" ColorSyncProfileRef? ColorSyncProfileCreateLink(CFArrayRef profileInfo, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" ColorSyncProfileRef? ColorSyncProfileCreateLink(CFArrayRef profileInfo, CFDictionaryRef? options);
 
 public extern "C" bool ColorSyncProfileVerify(ColorSyncProfileRef prof, __CFError** errors, __CFError** warnings);
 
@@ -206,7 +215,8 @@ public extern "C" float ColorSyncProfileEstimateGammaWithDisplayID(int displayID
 
 public extern "C" bool ColorSyncProfileGetDisplayTransferFormulaFromVCGT(ColorSyncProfileRef profile, float* redMin, float* redMax, float* redGamma, float* greenMin, float* greenMax, float* greenGamma, float* blueMin, float* blueMax, float* blueGamma);
 
-[ReturnsRetained] public extern "C" CFDataRef? ColorSyncProfileCreateDisplayTransferTablesFromVCGT(ColorSyncProfileRef profile, nuint* nSamplesPerChannel);
+[ReturnsRetained]
+public extern "C" CFDataRef? ColorSyncProfileCreateDisplayTransferTablesFromVCGT(ColorSyncProfileRef profile, nuint* nSamplesPerChannel);
 
 public extern "C" float ColorSyncProfileEstimateGamma(ColorSyncProfileRef prof, __CFError** error);
 
@@ -217,21 +227,26 @@ public struct ColorSyncMD5
 
 public extern "C" ColorSyncMD5 ColorSyncProfileGetMD5(ColorSyncProfileRef prof);
 
-[ReturnsRetained] public extern "C" CFDataRef ColorSyncProfileCopyData(ColorSyncProfileRef prof, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDataRef ColorSyncProfileCopyData(ColorSyncProfileRef prof, __CFError** error);
 
 public extern "C" CFURLRef ColorSyncProfileGetURL(ColorSyncProfileRef prof, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFDataRef ColorSyncProfileCopyHeader(ColorSyncProfileRef prof);
+[ReturnsRetained]
+public extern "C" CFDataRef ColorSyncProfileCopyHeader(ColorSyncProfileRef prof);
 
 public extern "C" void ColorSyncProfileSetHeader(ColorSyncMutableProfileRef prof, CFDataRef header);
 
-[ReturnsRetained] public extern "C" CFStringRef? ColorSyncProfileCopyDescriptionString(ColorSyncProfileRef prof);
+[ReturnsRetained]
+public extern "C" CFStringRef? ColorSyncProfileCopyDescriptionString(ColorSyncProfileRef prof);
 
-[ReturnsRetained] public extern "C" CFArrayRef? ColorSyncProfileCopyTagSignatures(ColorSyncProfileRef prof);
+[ReturnsRetained]
+public extern "C" CFArrayRef? ColorSyncProfileCopyTagSignatures(ColorSyncProfileRef prof);
 
 public extern "C" bool ColorSyncProfileContainsTag(ColorSyncProfileRef prof, CFStringRef signature);
 
-[ReturnsRetained] public extern "C" CFDataRef? ColorSyncProfileCopyTag(ColorSyncProfileRef prof, CFStringRef signature);
+[ReturnsRetained]
+public extern "C" CFDataRef? ColorSyncProfileCopyTag(ColorSyncProfileRef prof, CFStringRef signature);
 
 public extern "C" void ColorSyncProfileSetTag(ColorSyncMutableProfileRef prof, CFStringRef signature, CFDataRef data);
 

@@ -32,33 +32,55 @@ import Standard.ObjC;
 
 public extern objc class NSTimeZone : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("data")] public NSData Data { get; }
-    [Selector("secondsFromGMTForDate:")] public NSInteger SecondsFromGMTForDate(NSDate aDate);
-    [Selector("abbreviationForDate:")] public NSString? AbbreviationForDate(NSDate aDate);
-    [Selector("isDaylightSavingTimeForDate:")] public bool IsDaylightSavingTimeForDate(NSDate aDate);
-    [Selector("daylightSavingTimeOffsetForDate:")] public NSTimeInterval DaylightSavingTimeOffsetForDate(NSDate aDate);
-    [Selector("nextDaylightSavingTimeTransitionAfterDate:")] public NSDate? NextDaylightSavingTimeTransitionAfterDate(NSDate aDate);
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("secondsFromGMTForDate:")]
+    public NSInteger SecondsFromGMTForDate(NSDate aDate);
+    [Selector("abbreviationForDate:")]
+    public NSString? AbbreviationForDate(NSDate aDate);
+    [Selector("isDaylightSavingTimeForDate:")]
+    public bool IsDaylightSavingTimeForDate(NSDate aDate);
+    [Selector("daylightSavingTimeOffsetForDate:")]
+    public NSTimeInterval DaylightSavingTimeOffsetForDate(NSDate aDate);
+    [Selector("nextDaylightSavingTimeTransitionAfterDate:")]
+    public NSDate? NextDaylightSavingTimeTransitionAfterDate(NSDate aDate);
 }
 
 /// NSExtendedTimeZone, a category of NSTimeZone.
 public extern objc class NSTimeZone
 {
-    [Selector("systemTimeZone")] public static NSTimeZone SystemTimeZone { get; }
-    [Selector("defaultTimeZone", "setDefaultTimeZone:")] public static NSTimeZone DefaultTimeZone { get; set; }
-    [Selector("localTimeZone")] public static NSTimeZone LocalTimeZone { get; }
-    [Selector("knownTimeZoneNames")] public static NSArray KnownTimeZoneNames { get; }
-    [Selector("abbreviationDictionary", "setAbbreviationDictionary:")] public static NSDictionary AbbreviationDictionary { get; set; }
-    [Selector("timeZoneDataVersion")] public static NSString TimeZoneDataVersion { get; }
-    [Selector("secondsFromGMT")] public NSInteger SecondsFromGMT { get; }
-    [Selector("abbreviation")] public NSString? Abbreviation { get; }
-    [Selector("isDaylightSavingTime")] public bool DaylightSavingTime { get; }
-    [Selector("daylightSavingTimeOffset")] public NSTimeInterval DaylightSavingTimeOffset { get; }
-    [Selector("nextDaylightSavingTimeTransition")] public NSDate? NextDaylightSavingTimeTransition { get; }
-    [Selector("description")] public NSString Description { get; }
-    [Selector("resetSystemTimeZone")] public static void ResetSystemTimeZone();
-    [Selector("isEqualToTimeZone:")] public bool IsEqualToTimeZone(NSTimeZone aTimeZone);
-    [Selector("localizedName:locale:")] public NSString? LocalizedNameLocale(NSTimeZoneNameStyle style, NSLocale? locale);
+    [Selector("systemTimeZone")]
+    public static NSTimeZone SystemTimeZone { get; }
+    [Selector("defaultTimeZone", "setDefaultTimeZone:")]
+    public static NSTimeZone DefaultTimeZone { get; set; }
+    [Selector("localTimeZone")]
+    public static NSTimeZone LocalTimeZone { get; }
+    [Selector("knownTimeZoneNames")]
+    public static NSArray KnownTimeZoneNames { get; }
+    [Selector("abbreviationDictionary", "setAbbreviationDictionary:")]
+    public static NSDictionary AbbreviationDictionary { get; set; }
+    [Selector("timeZoneDataVersion")]
+    public static NSString TimeZoneDataVersion { get; }
+    [Selector("secondsFromGMT")]
+    public NSInteger SecondsFromGMT { get; }
+    [Selector("abbreviation")]
+    public NSString? Abbreviation { get; }
+    [Selector("isDaylightSavingTime")]
+    public bool DaylightSavingTime { get; }
+    [Selector("daylightSavingTimeOffset")]
+    public NSTimeInterval DaylightSavingTimeOffset { get; }
+    [Selector("nextDaylightSavingTimeTransition")]
+    public NSDate? NextDaylightSavingTimeTransition { get; }
+    [Selector("description")]
+    public NSString Description { get; }
+    [Selector("resetSystemTimeZone")]
+    public static void ResetSystemTimeZone();
+    [Selector("isEqualToTimeZone:")]
+    public bool IsEqualToTimeZone(NSTimeZone aTimeZone);
+    [Selector("localizedName:locale:")]
+    public NSString? LocalizedNameLocale(NSTimeZoneNameStyle style, NSLocale? locale);
 }
 
 public enum NSTimeZoneNameStyle : long
@@ -74,12 +96,18 @@ public enum NSTimeZoneNameStyle : long
 /// NSTimeZoneCreation, a category of NSTimeZone.
 public extern objc class NSTimeZone
 {
-    [Selector("timeZoneWithName:")] public static Self? TimeZoneWithName(NSString tzName);
-    [Selector("timeZoneWithName:data:")] public static Self? TimeZoneWithNameData(NSString tzName, NSData? aData);
-    [Selector("initWithName:")] public Self? InitWithName(NSString tzName);
-    [Selector("initWithName:data:")] public Self? InitWithNameData(NSString tzName, NSData? aData);
-    [Selector("timeZoneForSecondsFromGMT:")] public static Self TimeZoneForSecondsFromGMT(NSInteger seconds);
-    [Selector("timeZoneWithAbbreviation:")] public static Self? TimeZoneWithAbbreviation(NSString abbreviation);
+    [Selector("timeZoneWithName:")]
+    public static Self? TimeZoneWithName(NSString tzName);
+    [Selector("timeZoneWithName:data:")]
+    public static Self? TimeZoneWithNameData(NSString tzName, NSData? aData);
+    [Selector("initWithName:")]
+    public Self? InitWithName(NSString tzName);
+    [Selector("initWithName:data:")]
+    public Self? InitWithNameData(NSString tzName, NSData? aData);
+    [Selector("timeZoneForSecondsFromGMT:")]
+    public static Self TimeZoneForSecondsFromGMT(NSInteger seconds);
+    [Selector("timeZoneWithAbbreviation:")]
+    public static Self? TimeZoneWithAbbreviation(NSString abbreviation);
 }
 
 public extern "C" NSNotificationName NSSystemTimeZoneDidChangeNotification;

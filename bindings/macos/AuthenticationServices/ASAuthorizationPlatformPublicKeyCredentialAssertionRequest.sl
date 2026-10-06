@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationPlatformPublicKeyCredentialAssertionRequest : ASAuthorizationRequest, ASAuthorizationPublicKeyCredentialAssertionRequest
 {
-    [Selector("allowedCredentials", "setAllowedCredentials:")] public NSArray AllowedCredentials { get; set; }
-    [Selector("largeBlob", "setLargeBlob:")] public ASAuthorizationPublicKeyCredentialLargeBlobAssertionInput? LargeBlob { get; set; }
-    [Selector("prf", "setPrf:")] public ASAuthorizationPublicKeyCredentialPRFAssertionInput? Prf { get; set; }
+    [Selector("allowedCredentials", "setAllowedCredentials:")]
+    public NSArray AllowedCredentials { get; set; }
+    [Selector("largeBlob", "setLargeBlob:")]
+    public ASAuthorizationPublicKeyCredentialLargeBlobAssertionInput? LargeBlob { get; set; }
+    [Selector("prf", "setPrf:")]
+    public ASAuthorizationPublicKeyCredentialPRFAssertionInput? Prf { get; set; }
 }
 
 public extern objc class ASAuthorizationPlatformPublicKeyCredentialAssertionRequest : ASAuthorizationWebBrowserExternallyAuthenticatableRequest { }

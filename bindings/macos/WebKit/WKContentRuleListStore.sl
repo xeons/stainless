@@ -41,12 +41,18 @@ public objc closure void WKContentRuleListStoreGetAvailableContentRuleListIdenti
 
 public extern objc class WKContentRuleListStore : NSObject
 {
-    [Selector("defaultStore")] public static Self? DefaultStore();
-    [Selector("storeWithURL:")] public static Self? StoreWithURL(NSURL? url);
-    [Selector("compileContentRuleListForIdentifier:encodedContentRuleList:completionHandler:")] public void CompileContentRuleListForIdentifierEncodedContentRuleListCompletionHandler(NSString? identifier, NSString? encodedContentRuleList, WKContentRuleListStoreCompileContentRuleListForIdentifierEncodedContentRuleListCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("lookUpContentRuleListForIdentifier:completionHandler:")] public void LookUpContentRuleListForIdentifierCompletionHandler(NSString? identifier, WKContentRuleListStoreLookUpContentRuleListForIdentifierCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("removeContentRuleListForIdentifier:completionHandler:")] public void RemoveContentRuleListForIdentifierCompletionHandler(NSString? identifier, WKContentRuleListStoreRemoveContentRuleListForIdentifierCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("getAvailableContentRuleListIdentifiers:")] public void GetAvailableContentRuleListIdentifiers(WKContentRuleListStoreGetAvailableContentRuleListIdentifiersCompletionHandlerBlock? completionHandler);
+    [Selector("defaultStore")]
+    public static Self? DefaultStore();
+    [Selector("storeWithURL:")]
+    public static Self? StoreWithURL(NSURL? url);
+    [Selector("compileContentRuleListForIdentifier:encodedContentRuleList:completionHandler:")]
+    public void CompileContentRuleListForIdentifierEncodedContentRuleListCompletionHandler(NSString? identifier, NSString? encodedContentRuleList, WKContentRuleListStoreCompileContentRuleListForIdentifierEncodedContentRuleListCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("lookUpContentRuleListForIdentifier:completionHandler:")]
+    public void LookUpContentRuleListForIdentifierCompletionHandler(NSString? identifier, WKContentRuleListStoreLookUpContentRuleListForIdentifierCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("removeContentRuleListForIdentifier:completionHandler:")]
+    public void RemoveContentRuleListForIdentifierCompletionHandler(NSString? identifier, WKContentRuleListStoreRemoveContentRuleListForIdentifierCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("getAvailableContentRuleListIdentifiers:")]
+    public void GetAvailableContentRuleListIdentifiers(WKContentRuleListStoreGetAvailableContentRuleListIdentifiersCompletionHandlerBlock? completionHandler);
 }
 
 #endif

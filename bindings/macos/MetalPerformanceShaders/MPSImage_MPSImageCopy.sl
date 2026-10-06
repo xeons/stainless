@@ -34,24 +34,38 @@ import Standard.ObjC;
 
 public extern objc class MPSImageCopyToMatrix : MPSKernel
 {
-    [Selector("destinationMatrixOrigin", "setDestinationMatrixOrigin:")] public MTLOrigin DestinationMatrixOrigin { get; set; }
-    [Selector("destinationMatrixBatchIndex", "setDestinationMatrixBatchIndex:")] public NSUInteger DestinationMatrixBatchIndex { get; set; }
-    [Selector("dataLayout")] public MPSDataLayout DataLayout { get; }
-    [Selector("initWithDevice:dataLayout:")] public Self InitWithDeviceDataLayout(MTLDevice device, MPSDataLayout dataLayout);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:sourceImage:destinationMatrix:")] public void EncodeToCommandBufferSourceImageDestinationMatrix(MTLCommandBuffer commandBuffer, MPSImage sourceImage, MPSMatrix destinationMatrix);
-    [Selector("encodeBatchToCommandBuffer:sourceImages:destinationMatrix:")] public void EncodeBatchToCommandBufferSourceImagesDestinationMatrix(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImages, MPSMatrix destinationMatrix);
+    [Selector("destinationMatrixOrigin", "setDestinationMatrixOrigin:")]
+    public MTLOrigin DestinationMatrixOrigin { get; set; }
+    [Selector("destinationMatrixBatchIndex", "setDestinationMatrixBatchIndex:")]
+    public NSUInteger DestinationMatrixBatchIndex { get; set; }
+    [Selector("dataLayout")]
+    public MPSDataLayout DataLayout { get; }
+    [Selector("initWithDevice:dataLayout:")]
+    public Self InitWithDeviceDataLayout(MTLDevice device, MPSDataLayout dataLayout);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:sourceImage:destinationMatrix:")]
+    public void EncodeToCommandBufferSourceImageDestinationMatrix(MTLCommandBuffer commandBuffer, MPSImage sourceImage, MPSMatrix destinationMatrix);
+    [Selector("encodeBatchToCommandBuffer:sourceImages:destinationMatrix:")]
+    public void EncodeBatchToCommandBufferSourceImagesDestinationMatrix(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImages, MPSMatrix destinationMatrix);
 }
 
 public extern objc class MPSMatrixCopyToImage : MPSKernel
 {
-    [Selector("sourceMatrixOrigin", "setSourceMatrixOrigin:")] public MTLOrigin SourceMatrixOrigin { get; set; }
-    [Selector("sourceMatrixBatchIndex", "setSourceMatrixBatchIndex:")] public NSUInteger SourceMatrixBatchIndex { get; set; }
-    [Selector("dataLayout")] public MPSDataLayout DataLayout { get; }
-    [Selector("initWithDevice:dataLayout:")] public Self InitWithDeviceDataLayout(MTLDevice device, MPSDataLayout dataLayout);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:sourceMatrix:destinationImage:")] public void EncodeToCommandBufferSourceMatrixDestinationImage(MTLCommandBuffer commandBuffer, MPSMatrix sourceMatrix, MPSImage destinationImage);
-    [Selector("encodeBatchToCommandBuffer:sourceMatrix:destinationImages:")] public void EncodeBatchToCommandBufferSourceMatrixDestinationImages(MTLCommandBuffer commandBuffer, MPSMatrix sourceMatrix, MPSImageBatch destinationImages);
+    [Selector("sourceMatrixOrigin", "setSourceMatrixOrigin:")]
+    public MTLOrigin SourceMatrixOrigin { get; set; }
+    [Selector("sourceMatrixBatchIndex", "setSourceMatrixBatchIndex:")]
+    public NSUInteger SourceMatrixBatchIndex { get; set; }
+    [Selector("dataLayout")]
+    public MPSDataLayout DataLayout { get; }
+    [Selector("initWithDevice:dataLayout:")]
+    public Self InitWithDeviceDataLayout(MTLDevice device, MPSDataLayout dataLayout);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:sourceMatrix:destinationImage:")]
+    public void EncodeToCommandBufferSourceMatrixDestinationImage(MTLCommandBuffer commandBuffer, MPSMatrix sourceMatrix, MPSImage destinationImage);
+    [Selector("encodeBatchToCommandBuffer:sourceMatrix:destinationImages:")]
+    public void EncodeBatchToCommandBufferSourceMatrixDestinationImages(MTLCommandBuffer commandBuffer, MPSMatrix sourceMatrix, MPSImageBatch destinationImages);
 }
 
 #endif

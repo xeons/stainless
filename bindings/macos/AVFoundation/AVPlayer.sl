@@ -41,13 +41,20 @@ public enum AVPlayerStatus : long
 
 public extern objc class AVPlayer : NSObject
 {
-    [Selector("status")] public AVPlayerStatus Status { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("init")] public Self Init();
-    [Selector("playerWithURL:")] public static Self PlayerWithURL(NSURL URL);
-    [Selector("playerWithPlayerItem:")] public static Self PlayerWithPlayerItem(AVPlayerItem? item);
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL URL);
-    [Selector("initWithPlayerItem:")] public Self InitWithPlayerItem(AVPlayerItem? item);
+    [Selector("status")]
+    public AVPlayerStatus Status { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("playerWithURL:")]
+    public static Self PlayerWithURL(NSURL URL);
+    [Selector("playerWithPlayerItem:")]
+    public static Self PlayerWithPlayerItem(AVPlayerItem? item);
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL URL);
+    [Selector("initWithPlayerItem:")]
+    public Self InitWithPlayerItem(AVPlayerItem? item);
 }
 
 public extern "C" NSNotificationName AVPlayerRateDidChangeNotification;
@@ -69,13 +76,20 @@ public extern "C" AVPlayerRateDidChangeReason? AVPlayerRateDidChangeReasonAppBac
 /// AVPlayerPlaybackControl, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("rate", "setRate:")] public float Rate { get; set; }
-    [Selector("defaultRate", "setDefaultRate:")] public float DefaultRate { get; set; }
-    [Selector("timeControlStatus")] public AVPlayerTimeControlStatus TimeControlStatus { get; }
-    [Selector("reasonForWaitingToPlay")] public AVPlayerWaitingReason? ReasonForWaitingToPlay { get; }
-    [Selector("play")] public void Play();
-    [Selector("pause")] public void Pause();
-    [Selector("playImmediatelyAtRate:")] public void PlayImmediatelyAtRate(float rate);
+    [Selector("rate", "setRate:")]
+    public float Rate { get; set; }
+    [Selector("defaultRate", "setDefaultRate:")]
+    public float DefaultRate { get; set; }
+    [Selector("timeControlStatus")]
+    public AVPlayerTimeControlStatus TimeControlStatus { get; }
+    [Selector("reasonForWaitingToPlay")]
+    public AVPlayerWaitingReason? ReasonForWaitingToPlay { get; }
+    [Selector("play")]
+    public void Play();
+    [Selector("pause")]
+    public void Pause();
+    [Selector("playImmediatelyAtRate:")]
+    public void PlayImmediatelyAtRate(float rate);
 }
 
 public enum AVPlayerTimeControlStatus : long
@@ -98,9 +112,12 @@ public extern "C" AVPlayerWaitingReason? AVPlayerWaitingForCoordinatedPlaybackRe
 /// AVPlayerItemControl, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("currentItem")] public AVPlayerItem? CurrentItem { get; }
-    [Selector("actionAtItemEnd", "setActionAtItemEnd:")] public AVPlayerActionAtItemEnd ActionAtItemEnd { get; set; }
-    [Selector("replaceCurrentItemWithPlayerItem:")] public void ReplaceCurrentItemWithPlayerItem(AVPlayerItem? item);
+    [Selector("currentItem")]
+    public AVPlayerItem? CurrentItem { get; }
+    [Selector("actionAtItemEnd", "setActionAtItemEnd:")]
+    public AVPlayerActionAtItemEnd ActionAtItemEnd { get; set; }
+    [Selector("replaceCurrentItemWithPlayerItem:")]
+    public void ReplaceCurrentItemWithPlayerItem(AVPlayerItem? item);
 }
 
 public enum AVPlayerActionAtItemEnd : long
@@ -119,13 +136,20 @@ public objc closure void AVPlayerSeekToTimeToleranceBeforeToleranceAfterCompleti
 /// AVPlayerTimeControl, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("currentTime")] public CMTime CurrentTime();
-    [Selector("seekToDate:")] public void SeekToDate(NSDate date);
-    [Selector("seekToDate:completionHandler:")] public void SeekToDateCompletionHandler(NSDate date, AVPlayerSeekToDateCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("seekToTime:")] public void SeekToTime(CMTime time);
-    [Selector("seekToTime:toleranceBefore:toleranceAfter:")] public void SeekToTimeToleranceBeforeToleranceAfter(CMTime time, CMTime toleranceBefore, CMTime toleranceAfter);
-    [Selector("seekToTime:completionHandler:")] public void SeekToTimeCompletionHandler(CMTime time, AVPlayerSeekToTimeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("seekToTime:toleranceBefore:toleranceAfter:completionHandler:")] public void SeekToTimeToleranceBeforeToleranceAfterCompletionHandler(CMTime time, CMTime toleranceBefore, CMTime toleranceAfter, AVPlayerSeekToTimeToleranceBeforeToleranceAfterCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("currentTime")]
+    public CMTime CurrentTime();
+    [Selector("seekToDate:")]
+    public void SeekToDate(NSDate date);
+    [Selector("seekToDate:completionHandler:")]
+    public void SeekToDateCompletionHandler(NSDate date, AVPlayerSeekToDateCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("seekToTime:")]
+    public void SeekToTime(CMTime time);
+    [Selector("seekToTime:toleranceBefore:toleranceAfter:")]
+    public void SeekToTimeToleranceBeforeToleranceAfter(CMTime time, CMTime toleranceBefore, CMTime toleranceAfter);
+    [Selector("seekToTime:completionHandler:")]
+    public void SeekToTimeCompletionHandler(CMTime time, AVPlayerSeekToTimeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("seekToTime:toleranceBefore:toleranceAfter:completionHandler:")]
+    public void SeekToTimeToleranceBeforeToleranceAfterCompletionHandler(CMTime time, CMTime toleranceBefore, CMTime toleranceAfter, AVPlayerSeekToTimeToleranceBeforeToleranceAfterCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void AVPlayerPrerollAtRateCompletionHandlerCompletionHandlerBlock(bool arg0);
@@ -133,11 +157,16 @@ public objc closure void AVPlayerPrerollAtRateCompletionHandlerCompletionHandler
 /// AVPlayerAdvancedRateControl, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("automaticallyWaitsToMinimizeStalling", "setAutomaticallyWaitsToMinimizeStalling:")] public bool AutomaticallyWaitsToMinimizeStalling { get; set; }
-    [Selector("sourceClock", "setSourceClock:")] public CMClockRef? SourceClock { get; set; }
-    [Selector("setRate:time:atHostTime:")] public void SetRateTimeAtHostTime(float rate, CMTime itemTime, CMTime hostClockTime);
-    [Selector("prerollAtRate:completionHandler:")] public void PrerollAtRateCompletionHandler(float rate, AVPlayerPrerollAtRateCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("cancelPendingPrerolls")] public void CancelPendingPrerolls();
+    [Selector("automaticallyWaitsToMinimizeStalling", "setAutomaticallyWaitsToMinimizeStalling:")]
+    public bool AutomaticallyWaitsToMinimizeStalling { get; set; }
+    [Selector("sourceClock", "setSourceClock:")]
+    public CMClockRef? SourceClock { get; set; }
+    [Selector("setRate:time:atHostTime:")]
+    public void SetRateTimeAtHostTime(float rate, CMTime itemTime, CMTime hostClockTime);
+    [Selector("prerollAtRate:completionHandler:")]
+    public void PrerollAtRateCompletionHandler(float rate, AVPlayerPrerollAtRateCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("cancelPendingPrerolls")]
+    public void CancelPendingPrerolls();
 }
 
 public objc closure void AVPlayerAddPeriodicTimeObserverForIntervalQueueUsingBlockBlock(CMTime arg0);
@@ -147,49 +176,62 @@ public objc closure void AVPlayerAddBoundaryTimeObserverForTimesQueueUsingBlockB
 /// AVPlayerTimeObservation, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("addPeriodicTimeObserverForInterval:queue:usingBlock:")] public AnyObject AddPeriodicTimeObserverForIntervalQueueUsingBlock(CMTime interval, dispatch_queue_t? queue, AVPlayerAddPeriodicTimeObserverForIntervalQueueUsingBlockBlock block);
-    [Selector("addBoundaryTimeObserverForTimes:queue:usingBlock:")] public AnyObject AddBoundaryTimeObserverForTimesQueueUsingBlock(NSArray times, dispatch_queue_t? queue, AVPlayerAddBoundaryTimeObserverForTimesQueueUsingBlockBlock block);
-    [Selector("removeTimeObserver:")] public void RemoveTimeObserver(AnyObject observer);
+    [Selector("addPeriodicTimeObserverForInterval:queue:usingBlock:")]
+    public AnyObject AddPeriodicTimeObserverForIntervalQueueUsingBlock(CMTime interval, dispatch_queue_t? queue, AVPlayerAddPeriodicTimeObserverForIntervalQueueUsingBlockBlock block);
+    [Selector("addBoundaryTimeObserverForTimes:queue:usingBlock:")]
+    public AnyObject AddBoundaryTimeObserverForTimesQueueUsingBlock(NSArray times, dispatch_queue_t? queue, AVPlayerAddBoundaryTimeObserverForTimesQueueUsingBlockBlock block);
+    [Selector("removeTimeObserver:")]
+    public void RemoveTimeObserver(AnyObject observer);
 }
 
 /// AVPlayerMediaControl, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("volume", "setVolume:")] public float Volume { get; set; }
-    [Selector("isMuted", "setMuted:")] public bool Muted { get; set; }
+    [Selector("volume", "setVolume:")]
+    public float Volume { get; set; }
+    [Selector("isMuted", "setMuted:")]
+    public bool Muted { get; set; }
 }
 
 /// AVPlayerAutomaticMediaSelection, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("appliesMediaSelectionCriteriaAutomatically", "setAppliesMediaSelectionCriteriaAutomatically:")] public bool AppliesMediaSelectionCriteriaAutomatically { get; set; }
-    [Selector("setMediaSelectionCriteria:forMediaCharacteristic:")] public void SetMediaSelectionCriteriaForMediaCharacteristic(AVPlayerMediaSelectionCriteria? criteria, AVMediaCharacteristic mediaCharacteristic);
-    [Selector("mediaSelectionCriteriaForMediaCharacteristic:")] public AVPlayerMediaSelectionCriteria? MediaSelectionCriteriaForMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("appliesMediaSelectionCriteriaAutomatically", "setAppliesMediaSelectionCriteriaAutomatically:")]
+    public bool AppliesMediaSelectionCriteriaAutomatically { get; set; }
+    [Selector("setMediaSelectionCriteria:forMediaCharacteristic:")]
+    public void SetMediaSelectionCriteriaForMediaCharacteristic(AVPlayerMediaSelectionCriteria? criteria, AVMediaCharacteristic mediaCharacteristic);
+    [Selector("mediaSelectionCriteriaForMediaCharacteristic:")]
+    public AVPlayerMediaSelectionCriteria? MediaSelectionCriteriaForMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
 }
 
 /// AVPlayerAudioDeviceSupport, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("audioOutputDeviceUniqueID", "setAudioOutputDeviceUniqueID:")] public NSString? AudioOutputDeviceUniqueID { get; set; }
+    [Selector("audioOutputDeviceUniqueID", "setAudioOutputDeviceUniqueID:")]
+    public NSString? AudioOutputDeviceUniqueID { get; set; }
 }
 
 /// AVPlayerExternalPlaybackSupport, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("allowsExternalPlayback", "setAllowsExternalPlayback:")] public bool AllowsExternalPlayback { get; set; }
-    [Selector("isExternalPlaybackActive")] public bool ExternalPlaybackActive { get; }
+    [Selector("allowsExternalPlayback", "setAllowsExternalPlayback:")]
+    public bool AllowsExternalPlayback { get; set; }
+    [Selector("isExternalPlaybackActive")]
+    public bool ExternalPlaybackActive { get; }
 }
 
 /// AVPlayerProtectedContent, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("outputObscuredDueToInsufficientExternalProtection")] public bool OutputObscuredDueToInsufficientExternalProtection { get; }
+    [Selector("outputObscuredDueToInsufficientExternalProtection")]
+    public bool OutputObscuredDueToInsufficientExternalProtection { get; }
 }
 
 /// AVPlayerPlaybackCapabilities, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("eligibleForHDRPlayback")] public static bool EligibleForHDRPlayback { get; }
+    [Selector("eligibleForHDRPlayback")]
+    public static bool EligibleForHDRPlayback { get; }
 }
 
 public extern "C" NSNotificationName AVPlayerEligibleForHDRPlaybackDidChangeNotification;
@@ -197,13 +239,15 @@ public extern "C" NSNotificationName AVPlayerEligibleForHDRPlaybackDidChangeNoti
 /// AVPlayerVideoDecoderGPUSupport, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("preferredVideoDecoderGPURegistryID", "setPreferredVideoDecoderGPURegistryID:")] public ulong PreferredVideoDecoderGPURegistryID { get; set; }
+    [Selector("preferredVideoDecoderGPURegistryID", "setPreferredVideoDecoderGPURegistryID:")]
+    public ulong PreferredVideoDecoderGPURegistryID { get; set; }
 }
 
 /// AVPlayerVideoDisplaySleepPrevention, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("preventsDisplaySleepDuringVideoPlayback", "setPreventsDisplaySleepDuringVideoPlayback:")] public bool PreventsDisplaySleepDuringVideoPlayback { get; set; }
+    [Selector("preventsDisplaySleepDuringVideoPlayback", "setPreventsDisplaySleepDuringVideoPlayback:")]
+    public bool PreventsDisplaySleepDuringVideoPlayback { get; set; }
 }
 
 /// AVPlayerAutomaticBackgroundPrevention, a category of AVPlayer.
@@ -212,7 +256,8 @@ public extern objc class AVPlayer { }
 /// AVPlayerBackgroundSupport, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("audiovisualBackgroundPlaybackPolicy", "setAudiovisualBackgroundPlaybackPolicy:")] public AVPlayerAudiovisualBackgroundPlaybackPolicy AudiovisualBackgroundPlaybackPolicy { get; set; }
+    [Selector("audiovisualBackgroundPlaybackPolicy", "setAudiovisualBackgroundPlaybackPolicy:")]
+    public AVPlayerAudiovisualBackgroundPlaybackPolicy AudiovisualBackgroundPlaybackPolicy { get; set; }
 }
 
 public enum AVPlayerAudiovisualBackgroundPlaybackPolicy : long
@@ -225,13 +270,15 @@ public enum AVPlayerAudiovisualBackgroundPlaybackPolicy : long
 /// PlaybackCoordination, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("playbackCoordinator")] public AVPlayerPlaybackCoordinator? PlaybackCoordinator { get; }
+    [Selector("playbackCoordinator")]
+    public AVPlayerPlaybackCoordinator? PlaybackCoordinator { get; }
 }
 
 /// AVPlayerOutputSupport, a category of AVPlayer.
 public extern objc class AVPlayer
 {
-    [Selector("videoOutput", "setVideoOutput:")] public AVPlayerVideoOutput? VideoOutput { get; set; }
+    [Selector("videoOutput", "setVideoOutput:")]
+    public AVPlayerVideoOutput? VideoOutput { get; set; }
 }
 
 /// macOS 26.0 and later.
@@ -246,7 +293,8 @@ public enum AVPlayerNetworkResourcePriority : long
 public extern objc class AVPlayer
 {
     /// macOS 26.0 and later.
-    [Selector("networkResourcePriority", "setNetworkResourcePriority:")] public AVPlayerNetworkResourcePriority NetworkResourcePriority { get; set; }
+    [Selector("networkResourcePriority", "setNetworkResourcePriority:")]
+    public AVPlayerNetworkResourcePriority NetworkResourcePriority { get; set; }
 }
 
 /// AVPlayerRoutingPlaybackArbitrationSupport, a category of AVPlayer.
@@ -256,28 +304,39 @@ public extern objc class AVPlayer { }
 public extern objc class AVPlayer
 {
     /// macOS 26.0 and later.
-    [Selector("isObservationEnabled", "setObservationEnabled:")] public static bool ObservationEnabled { get; set; }
+    [Selector("isObservationEnabled", "setObservationEnabled:")]
+    public static bool ObservationEnabled { get; set; }
 }
 
 /// AVPlayerDeprecated, a category of AVPlayer.
 public extern objc class AVPlayer
 {
     /// Deprecated in macOS 10.13.
-    [Selector("isClosedCaptionDisplayEnabled", "setClosedCaptionDisplayEnabled:")] public bool ClosedCaptionDisplayEnabled { get; set; }
+    [Selector("isClosedCaptionDisplayEnabled", "setClosedCaptionDisplayEnabled:")]
+    public bool ClosedCaptionDisplayEnabled { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("masterClock", "setMasterClock:")] public CMClockRef? MasterClock { get; set; }
+    [Selector("masterClock", "setMasterClock:")]
+    public CMClockRef? MasterClock { get; set; }
 }
 
 public extern objc class AVQueuePlayer : AVPlayer
 {
-    [Selector("queuePlayerWithItems:")] public static Self QueuePlayerWithItems(NSArray items);
-    [Selector("initWithItems:")] public Self InitWithItems(NSArray items);
-    [Selector("items")] public NSArray Items();
-    [Selector("advanceToNextItem")] public void AdvanceToNextItem();
-    [Selector("canInsertItem:afterItem:")] public bool CanInsertItemAfterItem(AVPlayerItem item, AVPlayerItem? afterItem);
-    [Selector("insertItem:afterItem:")] public void InsertItemAfterItem(AVPlayerItem item, AVPlayerItem? afterItem);
-    [Selector("removeItem:")] public void RemoveItem(AVPlayerItem item);
-    [Selector("removeAllItems")] public void RemoveAllItems();
+    [Selector("queuePlayerWithItems:")]
+    public static Self QueuePlayerWithItems(NSArray items);
+    [Selector("initWithItems:")]
+    public Self InitWithItems(NSArray items);
+    [Selector("items")]
+    public NSArray Items();
+    [Selector("advanceToNextItem")]
+    public void AdvanceToNextItem();
+    [Selector("canInsertItem:afterItem:")]
+    public bool CanInsertItemAfterItem(AVPlayerItem item, AVPlayerItem? afterItem);
+    [Selector("insertItem:afterItem:")]
+    public void InsertItemAfterItem(AVPlayerItem item, AVPlayerItem? afterItem);
+    [Selector("removeItem:")]
+    public void RemoveItem(AVPlayerItem item);
+    [Selector("removeAllItems")]
+    public void RemoveAllItems();
 }
 
 #endif

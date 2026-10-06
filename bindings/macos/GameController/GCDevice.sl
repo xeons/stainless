@@ -33,11 +33,15 @@ import Standard.ObjC;
 
 public objc interface GCDevice : NSObjectProtocol
 {
-    [Selector("handlerQueue", "setHandlerQueue:")] dispatch_queue_t HandlerQueue { get; set; }
-    [Selector("vendorName")] NSString? VendorName { get; }
-    [Selector("productCategory")] NSString ProductCategory { get; }
+    [Selector("handlerQueue", "setHandlerQueue:")]
+    dispatch_queue_t HandlerQueue { get; set; }
+    [Selector("vendorName")]
+    NSString? VendorName { get; }
+    [Selector("productCategory")]
+    NSString ProductCategory { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("physicalInputProfile")] GCPhysicalInputProfile PhysicalInputProfile { get; }
+    [Selector("physicalInputProfile")]
+    GCPhysicalInputProfile PhysicalInputProfile { get; }
 }
 
 #endif

@@ -37,6 +37,7 @@ public extern objc class DCSDictionaryRef : CFTypeRef { }
 
 public extern "C" CFRange DCSGetTermRangeInString(DCSDictionaryRef? dictionary, CFStringRef textString, CFIndex offset);
 
-[ReturnsRetained] public extern "C" CFStringRef? DCSCopyTextDefinition(DCSDictionaryRef? dictionary, CFStringRef textString, CFRange range);
+[ReturnsRetained]
+public extern "C" CFStringRef? DCSCopyTextDefinition(DCSDictionaryRef? dictionary, CFStringRef textString, CFRange range);
 
 #endif

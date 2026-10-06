@@ -39,9 +39,11 @@ public delegate void DRNotificationCallback(__DRNotificationCenter* arg0, void* 
 
 public extern "C" CFTypeID DRNotificationCenterGetTypeID();
 
-[ReturnsRetained] public extern "C" DRNotificationCenterRef? DRNotificationCenterCreate();
+[ReturnsRetained]
+public extern "C" DRNotificationCenterRef? DRNotificationCenterCreate();
 
-[ReturnsRetained] public extern "C" CFRunLoopSourceRef? DRNotificationCenterCreateRunLoopSource(DRNotificationCenterRef? center);
+[ReturnsRetained]
+public extern "C" CFRunLoopSourceRef? DRNotificationCenterCreateRunLoopSource(DRNotificationCenterRef? center);
 
 public extern "C" void DRNotificationCenterAddObserver(DRNotificationCenterRef? center, void* observer, DRNotificationCallback callback, CFStringRef? name, DRTypeRef? object);
 

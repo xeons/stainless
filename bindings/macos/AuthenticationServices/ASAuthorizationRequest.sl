@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationRequest : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("provider")] public ASAuthorizationProvider Provider { get; }
+    [Selector("provider")]
+    public ASAuthorizationProvider Provider { get; }
 }
 
 #endif

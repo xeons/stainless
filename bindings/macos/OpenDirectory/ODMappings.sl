@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class ODMappings : NSObject
 {
-    [Selector("comment", "setComment:")] public NSString? Comment { get; set; }
-    [Selector("templateName", "setTemplateName:")] public NSString? TemplateName { get; set; }
-    [Selector("identifier", "setIdentifier:")] public NSString? Identifier { get; set; }
-    [Selector("recordTypes")] public NSArray? RecordTypes { get; }
-    [Selector("function", "setFunction:")] public NSString? Function { get; set; }
-    [Selector("functionAttributes", "setFunctionAttributes:")] public NSArray? FunctionAttributes { get; set; }
-    [Selector("mappings")] public static Self? Mappings();
-    [Selector("recordMapForStandardRecordType:")] public ODRecordMap? RecordMapForStandardRecordType(NSString? stdType);
-    [Selector("setRecordMap:forStandardRecordType:")] public void SetRecordMapForStandardRecordType(ODRecordMap? map, NSString? stdType);
+    [Selector("comment", "setComment:")]
+    public NSString? Comment { get; set; }
+    [Selector("templateName", "setTemplateName:")]
+    public NSString? TemplateName { get; set; }
+    [Selector("identifier", "setIdentifier:")]
+    public NSString? Identifier { get; set; }
+    [Selector("recordTypes")]
+    public NSArray? RecordTypes { get; }
+    [Selector("function", "setFunction:")]
+    public NSString? Function { get; set; }
+    [Selector("functionAttributes", "setFunctionAttributes:")]
+    public NSArray? FunctionAttributes { get; set; }
+    [Selector("mappings")]
+    public static Self? Mappings();
+    [Selector("recordMapForStandardRecordType:")]
+    public ODRecordMap? RecordMapForStandardRecordType(NSString? stdType);
+    [Selector("setRecordMap:forStandardRecordType:")]
+    public void SetRecordMapForStandardRecordType(ODRecordMap? map, NSString? stdType);
 }
 
 #endif

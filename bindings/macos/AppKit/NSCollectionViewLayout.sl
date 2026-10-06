@@ -46,18 +46,30 @@ public extern "C" NSCollectionViewSupplementaryElementKind? NSCollectionElementK
 
 public extern objc class NSCollectionViewLayoutAttributes : NSObject, NSCopying
 {
-    [Selector("frame", "setFrame:")] public NSRect Frame { get; set; }
-    [Selector("size", "setSize:")] public NSSize Size { get; set; }
-    [Selector("alpha", "setAlpha:")] public CGFloat Alpha { get; set; }
-    [Selector("zIndex", "setZIndex:")] public NSInteger ZIndex { get; set; }
-    [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
-    [Selector("indexPath", "setIndexPath:")] public NSIndexPath? IndexPath { get; set; }
-    [Selector("representedElementCategory")] public NSCollectionElementCategory RepresentedElementCategory { get; }
-    [Selector("representedElementKind")] public NSString? RepresentedElementKind { get; }
-    [Selector("layoutAttributesForItemWithIndexPath:")] public static Self LayoutAttributesForItemWithIndexPath(NSIndexPath indexPath);
-    [Selector("layoutAttributesForInterItemGapBeforeIndexPath:")] public static Self LayoutAttributesForInterItemGapBeforeIndexPath(NSIndexPath indexPath);
-    [Selector("layoutAttributesForSupplementaryViewOfKind:withIndexPath:")] public static Self LayoutAttributesForSupplementaryViewOfKindWithIndexPath(NSCollectionViewSupplementaryElementKind elementKind, NSIndexPath indexPath);
-    [Selector("layoutAttributesForDecorationViewOfKind:withIndexPath:")] public static Self LayoutAttributesForDecorationViewOfKindWithIndexPath(NSCollectionViewDecorationElementKind decorationViewKind, NSIndexPath indexPath);
+    [Selector("frame", "setFrame:")]
+    public NSRect Frame { get; set; }
+    [Selector("size", "setSize:")]
+    public NSSize Size { get; set; }
+    [Selector("alpha", "setAlpha:")]
+    public CGFloat Alpha { get; set; }
+    [Selector("zIndex", "setZIndex:")]
+    public NSInteger ZIndex { get; set; }
+    [Selector("isHidden", "setHidden:")]
+    public bool Hidden { get; set; }
+    [Selector("indexPath", "setIndexPath:")]
+    public NSIndexPath? IndexPath { get; set; }
+    [Selector("representedElementCategory")]
+    public NSCollectionElementCategory RepresentedElementCategory { get; }
+    [Selector("representedElementKind")]
+    public NSString? RepresentedElementKind { get; }
+    [Selector("layoutAttributesForItemWithIndexPath:")]
+    public static Self LayoutAttributesForItemWithIndexPath(NSIndexPath indexPath);
+    [Selector("layoutAttributesForInterItemGapBeforeIndexPath:")]
+    public static Self LayoutAttributesForInterItemGapBeforeIndexPath(NSIndexPath indexPath);
+    [Selector("layoutAttributesForSupplementaryViewOfKind:withIndexPath:")]
+    public static Self LayoutAttributesForSupplementaryViewOfKindWithIndexPath(NSCollectionViewSupplementaryElementKind elementKind, NSIndexPath indexPath);
+    [Selector("layoutAttributesForDecorationViewOfKind:withIndexPath:")]
+    public static Self LayoutAttributesForDecorationViewOfKindWithIndexPath(NSCollectionViewDecorationElementKind decorationViewKind, NSIndexPath indexPath);
 }
 
 public enum NSCollectionUpdateAction : long
@@ -71,75 +83,126 @@ public enum NSCollectionUpdateAction : long
 
 public extern objc class NSCollectionViewUpdateItem : NSObject
 {
-    [Selector("indexPathBeforeUpdate")] public NSIndexPath? IndexPathBeforeUpdate { get; }
-    [Selector("indexPathAfterUpdate")] public NSIndexPath? IndexPathAfterUpdate { get; }
-    [Selector("updateAction")] public NSCollectionUpdateAction UpdateAction { get; }
+    [Selector("indexPathBeforeUpdate")]
+    public NSIndexPath? IndexPathBeforeUpdate { get; }
+    [Selector("indexPathAfterUpdate")]
+    public NSIndexPath? IndexPathAfterUpdate { get; }
+    [Selector("updateAction")]
+    public NSCollectionUpdateAction UpdateAction { get; }
 }
 
 public extern objc class NSCollectionViewLayoutInvalidationContext : NSObject
 {
-    [Selector("invalidateEverything")] public bool InvalidateEverything { get; }
-    [Selector("invalidateDataSourceCounts")] public bool InvalidateDataSourceCounts { get; }
-    [Selector("invalidatedItemIndexPaths")] public NSSet? InvalidatedItemIndexPaths { get; }
-    [Selector("invalidatedSupplementaryIndexPaths")] public NSDictionary? InvalidatedSupplementaryIndexPaths { get; }
-    [Selector("invalidatedDecorationIndexPaths")] public NSDictionary? InvalidatedDecorationIndexPaths { get; }
-    [Selector("contentOffsetAdjustment", "setContentOffsetAdjustment:")] public NSPoint ContentOffsetAdjustment { get; set; }
-    [Selector("contentSizeAdjustment", "setContentSizeAdjustment:")] public NSSize ContentSizeAdjustment { get; set; }
-    [Selector("invalidateItemsAtIndexPaths:")] public void InvalidateItemsAtIndexPaths(NSSet indexPaths);
-    [Selector("invalidateSupplementaryElementsOfKind:atIndexPaths:")] public void InvalidateSupplementaryElementsOfKindAtIndexPaths(NSCollectionViewSupplementaryElementKind elementKind, NSSet indexPaths);
-    [Selector("invalidateDecorationElementsOfKind:atIndexPaths:")] public void InvalidateDecorationElementsOfKindAtIndexPaths(NSCollectionViewDecorationElementKind elementKind, NSSet indexPaths);
+    [Selector("invalidateEverything")]
+    public bool InvalidateEverything { get; }
+    [Selector("invalidateDataSourceCounts")]
+    public bool InvalidateDataSourceCounts { get; }
+    [Selector("invalidatedItemIndexPaths")]
+    public NSSet? InvalidatedItemIndexPaths { get; }
+    [Selector("invalidatedSupplementaryIndexPaths")]
+    public NSDictionary? InvalidatedSupplementaryIndexPaths { get; }
+    [Selector("invalidatedDecorationIndexPaths")]
+    public NSDictionary? InvalidatedDecorationIndexPaths { get; }
+    [Selector("contentOffsetAdjustment", "setContentOffsetAdjustment:")]
+    public NSPoint ContentOffsetAdjustment { get; set; }
+    [Selector("contentSizeAdjustment", "setContentSizeAdjustment:")]
+    public NSSize ContentSizeAdjustment { get; set; }
+    [Selector("invalidateItemsAtIndexPaths:")]
+    public void InvalidateItemsAtIndexPaths(NSSet indexPaths);
+    [Selector("invalidateSupplementaryElementsOfKind:atIndexPaths:")]
+    public void InvalidateSupplementaryElementsOfKindAtIndexPaths(NSCollectionViewSupplementaryElementKind elementKind, NSSet indexPaths);
+    [Selector("invalidateDecorationElementsOfKind:atIndexPaths:")]
+    public void InvalidateDecorationElementsOfKindAtIndexPaths(NSCollectionViewDecorationElementKind elementKind, NSSet indexPaths);
 }
 
 public extern objc class NSCollectionViewLayout : NSObject, NSCoding
 {
-    [Selector("collectionView")] public NSCollectionView? CollectionView { get; }
-    [Selector("invalidateLayout")] public void InvalidateLayout();
-    [Selector("invalidateLayoutWithContext:")] public void InvalidateLayoutWithContext(NSCollectionViewLayoutInvalidationContext context);
-    [Selector("registerClass:forDecorationViewOfKind:")] public void RegisterClassForDecorationViewOfKind(Class viewClass, NSCollectionViewDecorationElementKind elementKind);
-    [Selector("registerNib:forDecorationViewOfKind:")] public void RegisterNibForDecorationViewOfKind(NSNib? nib, NSCollectionViewDecorationElementKind elementKind);
+    [Selector("collectionView")]
+    public NSCollectionView? CollectionView { get; }
+    [Selector("invalidateLayout")]
+    public void InvalidateLayout();
+    [Selector("invalidateLayoutWithContext:")]
+    public void InvalidateLayoutWithContext(NSCollectionViewLayoutInvalidationContext context);
+    [Selector("registerClass:forDecorationViewOfKind:")]
+    public void RegisterClassForDecorationViewOfKind(Class viewClass, NSCollectionViewDecorationElementKind elementKind);
+    [Selector("registerNib:forDecorationViewOfKind:")]
+    public void RegisterNibForDecorationViewOfKind(NSNib? nib, NSCollectionViewDecorationElementKind elementKind);
 }
 
 /// NSSubclassingHooks, a category of NSCollectionViewLayout.
 public extern objc class NSCollectionViewLayout
 {
-    [Selector("layoutAttributesClass")] public static Class LayoutAttributesClass { get; }
-    [Selector("invalidationContextClass")] public static Class InvalidationContextClass { get; }
-    [Selector("collectionViewContentSize")] public NSSize CollectionViewContentSize { get; }
-    [Selector("prepareLayout")] public void PrepareLayout();
-    [Selector("layoutAttributesForElementsInRect:")] public NSArray LayoutAttributesForElementsInRect(NSRect rect);
-    [Selector("layoutAttributesForItemAtIndexPath:")] public NSCollectionViewLayoutAttributes? LayoutAttributesForItemAtIndexPath(NSIndexPath indexPath);
-    [Selector("layoutAttributesForSupplementaryViewOfKind:atIndexPath:")] public NSCollectionViewLayoutAttributes? LayoutAttributesForSupplementaryViewOfKindAtIndexPath(NSCollectionViewSupplementaryElementKind elementKind, NSIndexPath indexPath);
-    [Selector("layoutAttributesForDecorationViewOfKind:atIndexPath:")] public NSCollectionViewLayoutAttributes? LayoutAttributesForDecorationViewOfKindAtIndexPath(NSCollectionViewDecorationElementKind elementKind, NSIndexPath indexPath);
-    [Selector("layoutAttributesForDropTargetAtPoint:")] public NSCollectionViewLayoutAttributes? LayoutAttributesForDropTargetAtPoint(NSPoint pointInCollectionView);
-    [Selector("layoutAttributesForInterItemGapBeforeIndexPath:")] public NSCollectionViewLayoutAttributes? LayoutAttributesForInterItemGapBeforeIndexPath(NSIndexPath indexPath);
-    [Selector("shouldInvalidateLayoutForBoundsChange:")] public bool ShouldInvalidateLayoutForBoundsChange(NSRect newBounds);
-    [Selector("invalidationContextForBoundsChange:")] public NSCollectionViewLayoutInvalidationContext InvalidationContextForBoundsChange(NSRect newBounds);
-    [Selector("shouldInvalidateLayoutForPreferredLayoutAttributes:withOriginalAttributes:")] public bool ShouldInvalidateLayoutForPreferredLayoutAttributesWithOriginalAttributes(NSCollectionViewLayoutAttributes preferredAttributes, NSCollectionViewLayoutAttributes originalAttributes);
-    [Selector("invalidationContextForPreferredLayoutAttributes:withOriginalAttributes:")] public NSCollectionViewLayoutInvalidationContext InvalidationContextForPreferredLayoutAttributesWithOriginalAttributes(NSCollectionViewLayoutAttributes preferredAttributes, NSCollectionViewLayoutAttributes originalAttributes);
-    [Selector("targetContentOffsetForProposedContentOffset:withScrollingVelocity:")] public NSPoint TargetContentOffsetForProposedContentOffsetWithScrollingVelocity(NSPoint proposedContentOffset, NSPoint velocity);
-    [Selector("targetContentOffsetForProposedContentOffset:")] public NSPoint TargetContentOffsetForProposedContentOffset(NSPoint proposedContentOffset);
+    [Selector("layoutAttributesClass")]
+    public static Class LayoutAttributesClass { get; }
+    [Selector("invalidationContextClass")]
+    public static Class InvalidationContextClass { get; }
+    [Selector("collectionViewContentSize")]
+    public NSSize CollectionViewContentSize { get; }
+    [Selector("prepareLayout")]
+    public void PrepareLayout();
+    [Selector("layoutAttributesForElementsInRect:")]
+    public NSArray LayoutAttributesForElementsInRect(NSRect rect);
+    [Selector("layoutAttributesForItemAtIndexPath:")]
+    public NSCollectionViewLayoutAttributes? LayoutAttributesForItemAtIndexPath(NSIndexPath indexPath);
+    [Selector("layoutAttributesForSupplementaryViewOfKind:atIndexPath:")]
+    public NSCollectionViewLayoutAttributes? LayoutAttributesForSupplementaryViewOfKindAtIndexPath(NSCollectionViewSupplementaryElementKind elementKind, NSIndexPath indexPath);
+    [Selector("layoutAttributesForDecorationViewOfKind:atIndexPath:")]
+    public NSCollectionViewLayoutAttributes? LayoutAttributesForDecorationViewOfKindAtIndexPath(NSCollectionViewDecorationElementKind elementKind, NSIndexPath indexPath);
+    [Selector("layoutAttributesForDropTargetAtPoint:")]
+    public NSCollectionViewLayoutAttributes? LayoutAttributesForDropTargetAtPoint(NSPoint pointInCollectionView);
+    [Selector("layoutAttributesForInterItemGapBeforeIndexPath:")]
+    public NSCollectionViewLayoutAttributes? LayoutAttributesForInterItemGapBeforeIndexPath(NSIndexPath indexPath);
+    [Selector("shouldInvalidateLayoutForBoundsChange:")]
+    public bool ShouldInvalidateLayoutForBoundsChange(NSRect newBounds);
+    [Selector("invalidationContextForBoundsChange:")]
+    public NSCollectionViewLayoutInvalidationContext InvalidationContextForBoundsChange(NSRect newBounds);
+    [Selector("shouldInvalidateLayoutForPreferredLayoutAttributes:withOriginalAttributes:")]
+    public bool ShouldInvalidateLayoutForPreferredLayoutAttributesWithOriginalAttributes(NSCollectionViewLayoutAttributes preferredAttributes, NSCollectionViewLayoutAttributes originalAttributes);
+    [Selector("invalidationContextForPreferredLayoutAttributes:withOriginalAttributes:")]
+    public NSCollectionViewLayoutInvalidationContext InvalidationContextForPreferredLayoutAttributesWithOriginalAttributes(NSCollectionViewLayoutAttributes preferredAttributes, NSCollectionViewLayoutAttributes originalAttributes);
+    [Selector("targetContentOffsetForProposedContentOffset:withScrollingVelocity:")]
+    public NSPoint TargetContentOffsetForProposedContentOffsetWithScrollingVelocity(NSPoint proposedContentOffset, NSPoint velocity);
+    [Selector("targetContentOffsetForProposedContentOffset:")]
+    public NSPoint TargetContentOffsetForProposedContentOffset(NSPoint proposedContentOffset);
 }
 
 /// NSUpdateSupportHooks, a category of NSCollectionViewLayout.
 public extern objc class NSCollectionViewLayout
 {
-    [Selector("prepareForCollectionViewUpdates:")] public void PrepareForCollectionViewUpdates(NSArray updateItems);
-    [Selector("finalizeCollectionViewUpdates")] public void FinalizeCollectionViewUpdates();
-    [Selector("prepareForAnimatedBoundsChange:")] public void PrepareForAnimatedBoundsChange(NSRect oldBounds);
-    [Selector("finalizeAnimatedBoundsChange")] public void FinalizeAnimatedBoundsChange();
-    [Selector("prepareForTransitionToLayout:")] public void PrepareForTransitionToLayout(NSCollectionViewLayout newLayout);
-    [Selector("prepareForTransitionFromLayout:")] public void PrepareForTransitionFromLayout(NSCollectionViewLayout oldLayout);
-    [Selector("finalizeLayoutTransition")] public void FinalizeLayoutTransition();
-    [Selector("initialLayoutAttributesForAppearingItemAtIndexPath:")] public NSCollectionViewLayoutAttributes? InitialLayoutAttributesForAppearingItemAtIndexPath(NSIndexPath itemIndexPath);
-    [Selector("finalLayoutAttributesForDisappearingItemAtIndexPath:")] public NSCollectionViewLayoutAttributes? FinalLayoutAttributesForDisappearingItemAtIndexPath(NSIndexPath itemIndexPath);
-    [Selector("initialLayoutAttributesForAppearingSupplementaryElementOfKind:atIndexPath:")] public NSCollectionViewLayoutAttributes? InitialLayoutAttributesForAppearingSupplementaryElementOfKindAtIndexPath(NSCollectionViewSupplementaryElementKind elementKind, NSIndexPath elementIndexPath);
-    [Selector("finalLayoutAttributesForDisappearingSupplementaryElementOfKind:atIndexPath:")] public NSCollectionViewLayoutAttributes? FinalLayoutAttributesForDisappearingSupplementaryElementOfKindAtIndexPath(NSCollectionViewSupplementaryElementKind elementKind, NSIndexPath elementIndexPath);
-    [Selector("initialLayoutAttributesForAppearingDecorationElementOfKind:atIndexPath:")] public NSCollectionViewLayoutAttributes? InitialLayoutAttributesForAppearingDecorationElementOfKindAtIndexPath(NSCollectionViewDecorationElementKind elementKind, NSIndexPath decorationIndexPath);
-    [Selector("finalLayoutAttributesForDisappearingDecorationElementOfKind:atIndexPath:")] public NSCollectionViewLayoutAttributes? FinalLayoutAttributesForDisappearingDecorationElementOfKindAtIndexPath(NSCollectionViewDecorationElementKind elementKind, NSIndexPath decorationIndexPath);
-    [Selector("indexPathsToDeleteForSupplementaryViewOfKind:")] public NSSet IndexPathsToDeleteForSupplementaryViewOfKind(NSCollectionViewSupplementaryElementKind elementKind);
-    [Selector("indexPathsToDeleteForDecorationViewOfKind:")] public NSSet IndexPathsToDeleteForDecorationViewOfKind(NSCollectionViewDecorationElementKind elementKind);
-    [Selector("indexPathsToInsertForSupplementaryViewOfKind:")] public NSSet IndexPathsToInsertForSupplementaryViewOfKind(NSCollectionViewSupplementaryElementKind elementKind);
-    [Selector("indexPathsToInsertForDecorationViewOfKind:")] public NSSet IndexPathsToInsertForDecorationViewOfKind(NSCollectionViewDecorationElementKind elementKind);
+    [Selector("prepareForCollectionViewUpdates:")]
+    public void PrepareForCollectionViewUpdates(NSArray updateItems);
+    [Selector("finalizeCollectionViewUpdates")]
+    public void FinalizeCollectionViewUpdates();
+    [Selector("prepareForAnimatedBoundsChange:")]
+    public void PrepareForAnimatedBoundsChange(NSRect oldBounds);
+    [Selector("finalizeAnimatedBoundsChange")]
+    public void FinalizeAnimatedBoundsChange();
+    [Selector("prepareForTransitionToLayout:")]
+    public void PrepareForTransitionToLayout(NSCollectionViewLayout newLayout);
+    [Selector("prepareForTransitionFromLayout:")]
+    public void PrepareForTransitionFromLayout(NSCollectionViewLayout oldLayout);
+    [Selector("finalizeLayoutTransition")]
+    public void FinalizeLayoutTransition();
+    [Selector("initialLayoutAttributesForAppearingItemAtIndexPath:")]
+    public NSCollectionViewLayoutAttributes? InitialLayoutAttributesForAppearingItemAtIndexPath(NSIndexPath itemIndexPath);
+    [Selector("finalLayoutAttributesForDisappearingItemAtIndexPath:")]
+    public NSCollectionViewLayoutAttributes? FinalLayoutAttributesForDisappearingItemAtIndexPath(NSIndexPath itemIndexPath);
+    [Selector("initialLayoutAttributesForAppearingSupplementaryElementOfKind:atIndexPath:")]
+    public NSCollectionViewLayoutAttributes? InitialLayoutAttributesForAppearingSupplementaryElementOfKindAtIndexPath(NSCollectionViewSupplementaryElementKind elementKind, NSIndexPath elementIndexPath);
+    [Selector("finalLayoutAttributesForDisappearingSupplementaryElementOfKind:atIndexPath:")]
+    public NSCollectionViewLayoutAttributes? FinalLayoutAttributesForDisappearingSupplementaryElementOfKindAtIndexPath(NSCollectionViewSupplementaryElementKind elementKind, NSIndexPath elementIndexPath);
+    [Selector("initialLayoutAttributesForAppearingDecorationElementOfKind:atIndexPath:")]
+    public NSCollectionViewLayoutAttributes? InitialLayoutAttributesForAppearingDecorationElementOfKindAtIndexPath(NSCollectionViewDecorationElementKind elementKind, NSIndexPath decorationIndexPath);
+    [Selector("finalLayoutAttributesForDisappearingDecorationElementOfKind:atIndexPath:")]
+    public NSCollectionViewLayoutAttributes? FinalLayoutAttributesForDisappearingDecorationElementOfKindAtIndexPath(NSCollectionViewDecorationElementKind elementKind, NSIndexPath decorationIndexPath);
+    [Selector("indexPathsToDeleteForSupplementaryViewOfKind:")]
+    public NSSet IndexPathsToDeleteForSupplementaryViewOfKind(NSCollectionViewSupplementaryElementKind elementKind);
+    [Selector("indexPathsToDeleteForDecorationViewOfKind:")]
+    public NSSet IndexPathsToDeleteForDecorationViewOfKind(NSCollectionViewDecorationElementKind elementKind);
+    [Selector("indexPathsToInsertForSupplementaryViewOfKind:")]
+    public NSSet IndexPathsToInsertForSupplementaryViewOfKind(NSCollectionViewSupplementaryElementKind elementKind);
+    [Selector("indexPathsToInsertForDecorationViewOfKind:")]
+    public NSSet IndexPathsToInsertForDecorationViewOfKind(NSCollectionViewDecorationElementKind elementKind);
 }
 
 #endif

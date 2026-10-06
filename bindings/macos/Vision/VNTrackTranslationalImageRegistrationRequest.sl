@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class VNTrackTranslationalImageRegistrationRequest : VNStatefulRequest
 {
-    [Selector("results")] public NSArray? Results { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCompletionHandler:")] public Self InitWithCompletionHandler(VNRequestCompletionHandler? completionHandler);
+    [Selector("results")]
+    public NSArray? Results { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCompletionHandler:")]
+    public Self InitWithCompletionHandler(VNRequestCompletionHandler? completionHandler);
 }
 
 #endif

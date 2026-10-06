@@ -40,11 +40,16 @@ public objc closure void LAPublicKeyVerifyDataSignatureSecKeyAlgorithmCompletion
 
 public extern objc class LAPublicKey : NSObject
 {
-    [Selector("exportBytesWithCompletion:")] public void ExportBytesWithCompletion(LAPublicKeyExportBytesWithCompletionHandlerBlock handler);
-    [Selector("encryptData:secKeyAlgorithm:completion:")] public void EncryptDataSecKeyAlgorithmCompletion(NSData data, SecKeyAlgorithm algorithm, LAPublicKeyEncryptDataSecKeyAlgorithmCompletionHandlerBlock handler);
-    [Selector("canEncryptUsingSecKeyAlgorithm:")] public bool CanEncryptUsingSecKeyAlgorithm(SecKeyAlgorithm algorithm);
-    [Selector("verifyData:signature:secKeyAlgorithm:completion:")] public void VerifyDataSignatureSecKeyAlgorithmCompletion(NSData signedData, NSData signature, SecKeyAlgorithm algorithm, LAPublicKeyVerifyDataSignatureSecKeyAlgorithmCompletionHandlerBlock handler);
-    [Selector("canVerifyUsingSecKeyAlgorithm:")] public bool CanVerifyUsingSecKeyAlgorithm(SecKeyAlgorithm algorithm);
+    [Selector("exportBytesWithCompletion:")]
+    public void ExportBytesWithCompletion(LAPublicKeyExportBytesWithCompletionHandlerBlock handler);
+    [Selector("encryptData:secKeyAlgorithm:completion:")]
+    public void EncryptDataSecKeyAlgorithmCompletion(NSData data, SecKeyAlgorithm algorithm, LAPublicKeyEncryptDataSecKeyAlgorithmCompletionHandlerBlock handler);
+    [Selector("canEncryptUsingSecKeyAlgorithm:")]
+    public bool CanEncryptUsingSecKeyAlgorithm(SecKeyAlgorithm algorithm);
+    [Selector("verifyData:signature:secKeyAlgorithm:completion:")]
+    public void VerifyDataSignatureSecKeyAlgorithmCompletion(NSData signedData, NSData signature, SecKeyAlgorithm algorithm, LAPublicKeyVerifyDataSignatureSecKeyAlgorithmCompletionHandlerBlock handler);
+    [Selector("canVerifyUsingSecKeyAlgorithm:")]
+    public bool CanVerifyUsingSecKeyAlgorithm(SecKeyAlgorithm algorithm);
 }
 
 #endif

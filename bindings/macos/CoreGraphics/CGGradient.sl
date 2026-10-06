@@ -44,12 +44,15 @@ public enum CGGradientDrawingOptions : uint
 
 public extern "C" CFTypeID CGGradientGetTypeID();
 
-[ReturnsRetained] public extern "C" CGGradientRef? CGGradientCreateWithColorComponents(CGColorSpaceRef? space, CGFloat* components, CGFloat* locations, nuint count);
+[ReturnsRetained]
+public extern "C" CGGradientRef? CGGradientCreateWithColorComponents(CGColorSpaceRef? space, CGFloat* components, CGFloat* locations, nuint count);
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CGGradientRef? CGGradientCreateWithContentHeadroom(float headroom, CGColorSpaceRef? space, CGFloat* components, CGFloat* locations, nuint count);
+[ReturnsRetained]
+public extern "C" CGGradientRef? CGGradientCreateWithContentHeadroom(float headroom, CGColorSpaceRef? space, CGFloat* components, CGFloat* locations, nuint count);
 
-[ReturnsRetained] public extern "C" CGGradientRef? CGGradientCreateWithColors(CGColorSpaceRef? space, CFArrayRef? colors, CGFloat* locations);
+[ReturnsRetained]
+public extern "C" CGGradientRef? CGGradientCreateWithColors(CGColorSpaceRef? space, CFArrayRef? colors, CGFloat* locations);
 
 /// macOS 26.0 and later.
 public extern "C" float CGGradientGetContentHeadroom(CGGradientRef? gradient);

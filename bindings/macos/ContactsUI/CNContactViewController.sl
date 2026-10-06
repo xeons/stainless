@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class CNContactViewController : NSViewController
 {
-    [Selector("contact", "setContact:")] public CNContact? Contact { get; set; }
-    [Selector("descriptorForRequiredKeys")] public static CNKeyDescriptor DescriptorForRequiredKeys();
+    [Selector("contact", "setContact:")]
+    public CNContact? Contact { get; set; }
+    [Selector("descriptorForRequiredKeys")]
+    public static CNKeyDescriptor DescriptorForRequiredKeys();
 }
 
 #endif

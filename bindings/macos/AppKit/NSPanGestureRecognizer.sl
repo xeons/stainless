@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class NSPanGestureRecognizer : NSGestureRecognizer, NSCoding
 {
-    [Selector("buttonMask", "setButtonMask:")] public NSUInteger ButtonMask { get; set; }
-    [Selector("numberOfTouchesRequired", "setNumberOfTouchesRequired:")] public NSInteger NumberOfTouchesRequired { get; set; }
-    [Selector("translationInView:")] public NSPoint TranslationInView(NSView? view);
-    [Selector("setTranslation:inView:")] public void SetTranslationInView(NSPoint translation, NSView? view);
-    [Selector("velocityInView:")] public NSPoint VelocityInView(NSView? view);
+    [Selector("buttonMask", "setButtonMask:")]
+    public NSUInteger ButtonMask { get; set; }
+    [Selector("numberOfTouchesRequired", "setNumberOfTouchesRequired:")]
+    public NSInteger NumberOfTouchesRequired { get; set; }
+    [Selector("translationInView:")]
+    public NSPoint TranslationInView(NSView? view);
+    [Selector("setTranslation:inView:")]
+    public void SetTranslationInView(NSPoint translation, NSView? view);
+    [Selector("velocityInView:")]
+    public NSPoint VelocityInView(NSView? view);
 }
 
 #endif

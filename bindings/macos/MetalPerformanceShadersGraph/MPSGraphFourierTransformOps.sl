@@ -39,21 +39,31 @@ public enum MPSGraphFFTScalingMode : ulong
 
 public extern objc class MPSGraphFFTDescriptor : MPSGraphObject, NSCopying
 {
-    [Selector("inverse", "setInverse:")] public bool Inverse { get; set; }
-    [Selector("scalingMode", "setScalingMode:")] public MPSGraphFFTScalingMode ScalingMode { get; set; }
-    [Selector("roundToOddHermitean", "setRoundToOddHermitean:")] public bool RoundToOddHermitean { get; set; }
-    [Selector("descriptor")] public static Self? Descriptor();
+    [Selector("inverse", "setInverse:")]
+    public bool Inverse { get; set; }
+    [Selector("scalingMode", "setScalingMode:")]
+    public MPSGraphFFTScalingMode ScalingMode { get; set; }
+    [Selector("roundToOddHermitean", "setRoundToOddHermitean:")]
+    public bool RoundToOddHermitean { get; set; }
+    [Selector("descriptor")]
+    public static Self? Descriptor();
 }
 
 /// MPSGraphFourierTransformOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("fastFourierTransformWithTensor:axes:descriptor:name:")] public MPSGraphTensor FastFourierTransformWithTensorAxesDescriptorName(MPSGraphTensor tensor, NSArray axes, MPSGraphFFTDescriptor descriptor, NSString? name);
-    [Selector("fastFourierTransformWithTensor:axesTensor:descriptor:name:")] public MPSGraphTensor FastFourierTransformWithTensorAxesTensorDescriptorName(MPSGraphTensor tensor, MPSGraphTensor axesTensor, MPSGraphFFTDescriptor descriptor, NSString? name);
-    [Selector("realToHermiteanFFTWithTensor:axes:descriptor:name:")] public MPSGraphTensor RealToHermiteanFFTWithTensorAxesDescriptorName(MPSGraphTensor tensor, NSArray axes, MPSGraphFFTDescriptor descriptor, NSString? name);
-    [Selector("realToHermiteanFFTWithTensor:axesTensor:descriptor:name:")] public MPSGraphTensor RealToHermiteanFFTWithTensorAxesTensorDescriptorName(MPSGraphTensor tensor, MPSGraphTensor axesTensor, MPSGraphFFTDescriptor descriptor, NSString? name);
-    [Selector("HermiteanToRealFFTWithTensor:axes:descriptor:name:")] public MPSGraphTensor HermiteanToRealFFTWithTensorAxesDescriptorName(MPSGraphTensor tensor, NSArray axes, MPSGraphFFTDescriptor descriptor, NSString? name);
-    [Selector("HermiteanToRealFFTWithTensor:axesTensor:descriptor:name:")] public MPSGraphTensor HermiteanToRealFFTWithTensorAxesTensorDescriptorName(MPSGraphTensor tensor, MPSGraphTensor axesTensor, MPSGraphFFTDescriptor descriptor, NSString? name);
+    [Selector("fastFourierTransformWithTensor:axes:descriptor:name:")]
+    public MPSGraphTensor FastFourierTransformWithTensorAxesDescriptorName(MPSGraphTensor tensor, NSArray axes, MPSGraphFFTDescriptor descriptor, NSString? name);
+    [Selector("fastFourierTransformWithTensor:axesTensor:descriptor:name:")]
+    public MPSGraphTensor FastFourierTransformWithTensorAxesTensorDescriptorName(MPSGraphTensor tensor, MPSGraphTensor axesTensor, MPSGraphFFTDescriptor descriptor, NSString? name);
+    [Selector("realToHermiteanFFTWithTensor:axes:descriptor:name:")]
+    public MPSGraphTensor RealToHermiteanFFTWithTensorAxesDescriptorName(MPSGraphTensor tensor, NSArray axes, MPSGraphFFTDescriptor descriptor, NSString? name);
+    [Selector("realToHermiteanFFTWithTensor:axesTensor:descriptor:name:")]
+    public MPSGraphTensor RealToHermiteanFFTWithTensorAxesTensorDescriptorName(MPSGraphTensor tensor, MPSGraphTensor axesTensor, MPSGraphFFTDescriptor descriptor, NSString? name);
+    [Selector("HermiteanToRealFFTWithTensor:axes:descriptor:name:")]
+    public MPSGraphTensor HermiteanToRealFFTWithTensorAxesDescriptorName(MPSGraphTensor tensor, NSArray axes, MPSGraphFFTDescriptor descriptor, NSString? name);
+    [Selector("HermiteanToRealFFTWithTensor:axesTensor:descriptor:name:")]
+    public MPSGraphTensor HermiteanToRealFFTWithTensorAxesTensorDescriptorName(MPSGraphTensor tensor, MPSGraphTensor axesTensor, MPSGraphFFTDescriptor descriptor, NSString? name);
 }
 
 #endif

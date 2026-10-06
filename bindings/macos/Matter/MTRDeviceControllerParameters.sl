@@ -33,25 +33,35 @@ import Standard.ObjC;
 
 public extern objc class MTRDeviceControllerAbstractParameters : NSObject
 {
-    [Selector("startSuspended", "setStartSuspended:")] public bool StartSuspended { get; set; }
+    [Selector("startSuspended", "setStartSuspended:")]
+    public bool StartSuspended { get; set; }
 }
 
 public extern objc class MTRDeviceControllerParameters : MTRDeviceControllerAbstractParameters
 {
-    [Selector("productAttestationAuthorityCertificates", "setProductAttestationAuthorityCertificates:")] public NSArray? ProductAttestationAuthorityCertificates { get; set; }
-    [Selector("certificationDeclarationCertificates", "setCertificationDeclarationCertificates:")] public NSArray? CertificationDeclarationCertificates { get; set; }
-    [Selector("shouldAdvertiseOperational", "setShouldAdvertiseOperational:")] public bool ShouldAdvertiseOperational { get; set; }
-    [Selector("concurrentSubscriptionEstablishmentsAllowedOnThread", "setConcurrentSubscriptionEstablishmentsAllowedOnThread:")] public NSUInteger ConcurrentSubscriptionEstablishmentsAllowedOnThread { get; set; }
-    [Selector("storageBehaviorConfiguration", "setStorageBehaviorConfiguration:")] public MTRDeviceStorageBehaviorConfiguration? StorageBehaviorConfiguration { get; set; }
-    [Selector("setOperationalCertificateIssuer:queue:")] public void SetOperationalCertificateIssuerQueue(MTROperationalCertificateIssuer operationalCertificateIssuer, dispatch_queue_t queue);
-    [Selector("setOTAProviderDelegate:queue:")] public void SetOTAProviderDelegateQueue(MTROTAProviderDelegate otaProviderDelegate, dispatch_queue_t queue);
+    [Selector("productAttestationAuthorityCertificates", "setProductAttestationAuthorityCertificates:")]
+    public NSArray? ProductAttestationAuthorityCertificates { get; set; }
+    [Selector("certificationDeclarationCertificates", "setCertificationDeclarationCertificates:")]
+    public NSArray? CertificationDeclarationCertificates { get; set; }
+    [Selector("shouldAdvertiseOperational", "setShouldAdvertiseOperational:")]
+    public bool ShouldAdvertiseOperational { get; set; }
+    [Selector("concurrentSubscriptionEstablishmentsAllowedOnThread", "setConcurrentSubscriptionEstablishmentsAllowedOnThread:")]
+    public NSUInteger ConcurrentSubscriptionEstablishmentsAllowedOnThread { get; set; }
+    [Selector("storageBehaviorConfiguration", "setStorageBehaviorConfiguration:")]
+    public MTRDeviceStorageBehaviorConfiguration? StorageBehaviorConfiguration { get; set; }
+    [Selector("setOperationalCertificateIssuer:queue:")]
+    public void SetOperationalCertificateIssuerQueue(MTROperationalCertificateIssuer operationalCertificateIssuer, dispatch_queue_t queue);
+    [Selector("setOTAProviderDelegate:queue:")]
+    public void SetOTAProviderDelegateQueue(MTROTAProviderDelegate otaProviderDelegate, dispatch_queue_t queue);
 }
 
 public extern objc class MTRDeviceControllerExternalCertificateParameters : MTRDeviceControllerParameters
 {
     /// macOS 15.2 and later.
-    [Selector("rootCertificate")] public MTRCertificateDERBytes RootCertificate { get; }
-    [Selector("initWithStorageDelegate:storageDelegateQueue:uniqueIdentifier:ipk:vendorID:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:")] public Self InitWithStorageDelegateStorageDelegateQueueUniqueIdentifierIpkVendorIDOperationalKeypairOperationalCertificateIntermediateCertificateRootCertificate(MTRDeviceControllerStorageDelegate storageDelegate, dispatch_queue_t storageDelegateQueue, NSUUID uniqueIdentifier, NSData ipk, NSNumber vendorID, MTRKeypair operationalKeypair, MTRCertificateDERBytes operationalCertificate, MTRCertificateDERBytes? intermediateCertificate, MTRCertificateDERBytes rootCertificate);
+    [Selector("rootCertificate")]
+    public MTRCertificateDERBytes RootCertificate { get; }
+    [Selector("initWithStorageDelegate:storageDelegateQueue:uniqueIdentifier:ipk:vendorID:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:")]
+    public Self InitWithStorageDelegateStorageDelegateQueueUniqueIdentifierIpkVendorIDOperationalKeypairOperationalCertificateIntermediateCertificateRootCertificate(MTRDeviceControllerStorageDelegate storageDelegate, dispatch_queue_t storageDelegateQueue, NSUUID uniqueIdentifier, NSData ipk, NSNumber vendorID, MTRKeypair operationalKeypair, MTRCertificateDERBytes operationalCertificate, MTRCertificateDERBytes? intermediateCertificate, MTRCertificateDERBytes rootCertificate);
 }
 
 public objc closure NSXPCConnection MTRXPCDeviceControllerParametersXpcConnectionBlock();
@@ -64,14 +74,18 @@ public objc closure NSXPCConnection MTRXPCDeviceControllerParametersInitWithXPCo
 public extern objc class MTRXPCDeviceControllerParameters : MTRDeviceControllerAbstractParameters
 {
     /// macOS 15.2 and later.
-    [Selector("uniqueIdentifier")] public NSUUID UniqueIdentifier { get; }
+    [Selector("uniqueIdentifier")]
+    public NSUUID UniqueIdentifier { get; }
     /// macOS 15.2 and later.
-    [Selector("xpcConnectionBlock")] public MTRXPCDeviceControllerParametersXpcConnectionBlock XpcConnectionBlock { get; }
+    [Selector("xpcConnectionBlock")]
+    public MTRXPCDeviceControllerParametersXpcConnectionBlock XpcConnectionBlock { get; }
     /// macOS 26.0 and later.
-    [Selector("initWithXPCConnectionBlock:uniqueIdentifier:")] public Self InitWithXPCConnectionBlockUniqueIdentifier(MTRXPCDeviceControllerParametersInitWithXPCConnectionBlockUniqueIdentifierXpcConnectionBlock xpcConnectionBlock, NSUUID uniqueIdentifier);
+    [Selector("initWithXPCConnectionBlock:uniqueIdentifier:")]
+    public Self InitWithXPCConnectionBlockUniqueIdentifier(MTRXPCDeviceControllerParametersInitWithXPCConnectionBlockUniqueIdentifierXpcConnectionBlock xpcConnectionBlock, NSUUID uniqueIdentifier);
     /// macOS 15.2 and later.
     /// Deprecated in macOS 26.0.
-    [Selector("initWithXPConnectionBlock:uniqueIdentifier:")] public Self InitWithXPConnectionBlockUniqueIdentifier(MTRXPCDeviceControllerParametersInitWithXPConnectionBlockUniqueIdentifierXpcConnectionBlock xpcConnectionBlock, NSUUID uniqueIdentifier);
+    [Selector("initWithXPConnectionBlock:uniqueIdentifier:")]
+    public Self InitWithXPConnectionBlockUniqueIdentifier(MTRXPCDeviceControllerParametersInitWithXPConnectionBlockUniqueIdentifierXpcConnectionBlock xpcConnectionBlock, NSUUID uniqueIdentifier);
 }
 
 #endif

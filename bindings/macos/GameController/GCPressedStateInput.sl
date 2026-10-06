@@ -35,11 +35,16 @@ public objc closure void GCPressedStateInputPressedDidChangeHandlerBlock(GCPhysi
 
 public objc interface GCPressedStateInput : NSObjectProtocol
 {
-    [Selector("pressedDidChangeHandler", "setPressedDidChangeHandler:")] GCPressedStateInputPressedDidChangeHandlerBlock? PressedDidChangeHandler { get; set; }
-    [Selector("isPressed")] bool Pressed { get; }
-    [Selector("lastPressedStateTimestamp")] NSTimeInterval LastPressedStateTimestamp { get; }
-    [Selector("lastPressedStateLatency")] NSTimeInterval LastPressedStateLatency { get; }
-    [Selector("sources")] NSSet Sources { get; }
+    [Selector("pressedDidChangeHandler", "setPressedDidChangeHandler:")]
+    GCPressedStateInputPressedDidChangeHandlerBlock? PressedDidChangeHandler { get; set; }
+    [Selector("isPressed")]
+    bool Pressed { get; }
+    [Selector("lastPressedStateTimestamp")]
+    NSTimeInterval LastPressedStateTimestamp { get; }
+    [Selector("lastPressedStateLatency")]
+    NSTimeInterval LastPressedStateLatency { get; }
+    [Selector("sources")]
+    NSSet Sources { get; }
 }
 
 #endif

@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public objc interface ASAuthorizationPublicKeyCredentialAssertion : ASPublicKeyCredential
 {
-    [Selector("rawAuthenticatorData")] NSData? RawAuthenticatorData { get; }
-    [Selector("userID")] NSData? UserID { get; }
-    [Selector("signature")] NSData? Signature { get; }
+    [Selector("rawAuthenticatorData")]
+    NSData? RawAuthenticatorData { get; }
+    [Selector("userID")]
+    NSData? UserID { get; }
+    [Selector("signature")]
+    NSData? Signature { get; }
 }
 
 #endif

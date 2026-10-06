@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class WKScriptMessage : NSObject
 {
-    [Selector("body")] public AnyObject Body { get; }
-    [Selector("webView")] public WKWebView? WebView { get; }
-    [Selector("frameInfo")] public WKFrameInfo FrameInfo { get; }
-    [Selector("name")] public NSString Name { get; }
-    [Selector("world")] public WKContentWorld World { get; }
+    [Selector("body")]
+    public AnyObject Body { get; }
+    [Selector("webView")]
+    public WKWebView? WebView { get; }
+    [Selector("frameInfo")]
+    public WKFrameInfo FrameInfo { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("world")]
+    public WKContentWorld World { get; }
 }
 
 #endif

@@ -743,20 +743,25 @@ import Standard.ObjC;
 [ObjCName("NSObject")]
 public objc interface NSObjectProtocol
 {
-    [Selector("isEqual:")] bool IsEqual(AnyObject? other);
+    [Selector("isEqual:")]
+    bool IsEqual(AnyObject? other);
 }
 
 [ObjCRoot]
 public extern objc class NSObject : NSObjectProtocol
 {
-    [Selector("alloc")] public static Self Alloc();
-    [Selector("init")] public Self Init();
+    [Selector("alloc")]
+    public static Self Alloc();
+    [Selector("init")]
+    public Self Init();
 }
 
 public extern objc class NSString : NSObject
 {
-    [Selector("stringWithUTF8String:")] public static Self FromUtf8(byte* text);
-    [Selector("length")] public nuint Length { get; }
+    [Selector("stringWithUTF8String:")]
+    public static Self FromUtf8(byte* text);
+    [Selector("length")]
+    public nuint Length { get; }
 }
 
 nuint Measure() => NSString.FromUtf8("hello").Length;     // 5
@@ -791,8 +796,10 @@ say. A property names both of its messages, or the getter's alone when it has
 no setter:
 
 ```csharp
-[Selector("frame", "setFrame:")] public CGRect Frame { get; set; }
-[Selector("window")] public NSWindow? Window { get; }
+[Selector("frame", "setFrame:")]
+public CGRect Frame { get; set; }
+[Selector("window")]
+public NSWindow? Window { get; }
 ```
 
 A selector carries one argument after each colon, so the colons and the
@@ -917,7 +924,8 @@ import FoundationStrings;           // declares NSString : NSObject
 
 public extern objc class NSString : NSPasteboardWriting
 {
-    [Selector("sizeWithAttributes:")] public CGSize SizeWithAttributes(NSDictionary? attributes);
+    [Selector("sizeWithAttributes:")]
+    public CGSize SizeWithAttributes(NSDictionary? attributes);
 }
 ```
 
@@ -937,11 +945,15 @@ one with `objc_retain` and `objc_release` as it counts any other, and one
 converts to `AnyObject` for nothing:
 
 ```csharp
-[CFType]                       public extern objc class CFTypeRef { }
-[CFType("CFStringGetTypeID")]  public extern objc class CFStringRef : CFTypeRef { }
-[CFType]                       public extern objc class CFMutableStringRef : CFStringRef { }
+[CFType]
+public extern objc class CFTypeRef { }
+[CFType("CFStringGetTypeID")]
+public extern objc class CFStringRef : CFTypeRef { }
+[CFType]
+public extern objc class CFMutableStringRef : CFStringRef { }
 
-[ReturnsRetained] extern "C" CFStringRef CFStringCreateWithCString(
+[ReturnsRetained]
+extern "C" CFStringRef CFStringCreateWithCString(
     CFAllocatorRef? allocator, byte* text, uint encoding);
 ```
 

@@ -33,20 +33,34 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCLSTMLayer : MLCLayer
 {
-    [Selector("descriptor")] public MLCLSTMDescriptor Descriptor { get; }
-    [Selector("gateActivations")] public NSArray GateActivations { get; }
-    [Selector("outputResultActivation")] public MLCActivationDescriptor OutputResultActivation { get; }
-    [Selector("inputWeights")] public NSArray InputWeights { get; }
-    [Selector("hiddenWeights")] public NSArray HiddenWeights { get; }
-    [Selector("peepholeWeights")] public NSArray? PeepholeWeights { get; }
-    [Selector("biases")] public NSArray? Biases { get; }
-    [Selector("inputWeightsParameters")] public NSArray InputWeightsParameters { get; }
-    [Selector("hiddenWeightsParameters")] public NSArray HiddenWeightsParameters { get; }
-    [Selector("peepholeWeightsParameters")] public NSArray? PeepholeWeightsParameters { get; }
-    [Selector("biasesParameters")] public NSArray? BiasesParameters { get; }
-    [Selector("layerWithDescriptor:inputWeights:hiddenWeights:biases:")] public static Self? LayerWithDescriptorInputWeightsHiddenWeightsBiases(MLCLSTMDescriptor descriptor, NSArray inputWeights, NSArray hiddenWeights, NSArray? biases);
-    [Selector("layerWithDescriptor:inputWeights:hiddenWeights:peepholeWeights:biases:")] public static Self? LayerWithDescriptorInputWeightsHiddenWeightsPeepholeWeightsBiases(MLCLSTMDescriptor descriptor, NSArray inputWeights, NSArray hiddenWeights, NSArray? peepholeWeights, NSArray? biases);
-    [Selector("layerWithDescriptor:inputWeights:hiddenWeights:peepholeWeights:biases:gateActivations:outputResultActivation:")] public static Self? LayerWithDescriptorInputWeightsHiddenWeightsPeepholeWeightsBiasesGateActivationsOutputResultActivation(MLCLSTMDescriptor descriptor, NSArray inputWeights, NSArray hiddenWeights, NSArray? peepholeWeights, NSArray? biases, NSArray gateActivations, MLCActivationDescriptor outputResultActivation);
+    [Selector("descriptor")]
+    public MLCLSTMDescriptor Descriptor { get; }
+    [Selector("gateActivations")]
+    public NSArray GateActivations { get; }
+    [Selector("outputResultActivation")]
+    public MLCActivationDescriptor OutputResultActivation { get; }
+    [Selector("inputWeights")]
+    public NSArray InputWeights { get; }
+    [Selector("hiddenWeights")]
+    public NSArray HiddenWeights { get; }
+    [Selector("peepholeWeights")]
+    public NSArray? PeepholeWeights { get; }
+    [Selector("biases")]
+    public NSArray? Biases { get; }
+    [Selector("inputWeightsParameters")]
+    public NSArray InputWeightsParameters { get; }
+    [Selector("hiddenWeightsParameters")]
+    public NSArray HiddenWeightsParameters { get; }
+    [Selector("peepholeWeightsParameters")]
+    public NSArray? PeepholeWeightsParameters { get; }
+    [Selector("biasesParameters")]
+    public NSArray? BiasesParameters { get; }
+    [Selector("layerWithDescriptor:inputWeights:hiddenWeights:biases:")]
+    public static Self? LayerWithDescriptorInputWeightsHiddenWeightsBiases(MLCLSTMDescriptor descriptor, NSArray inputWeights, NSArray hiddenWeights, NSArray? biases);
+    [Selector("layerWithDescriptor:inputWeights:hiddenWeights:peepholeWeights:biases:")]
+    public static Self? LayerWithDescriptorInputWeightsHiddenWeightsPeepholeWeightsBiases(MLCLSTMDescriptor descriptor, NSArray inputWeights, NSArray hiddenWeights, NSArray? peepholeWeights, NSArray? biases);
+    [Selector("layerWithDescriptor:inputWeights:hiddenWeights:peepholeWeights:biases:gateActivations:outputResultActivation:")]
+    public static Self? LayerWithDescriptorInputWeightsHiddenWeightsPeepholeWeightsBiasesGateActivationsOutputResultActivation(MLCLSTMDescriptor descriptor, NSArray inputWeights, NSArray hiddenWeights, NSArray? peepholeWeights, NSArray? biases, NSArray gateActivations, MLCActivationDescriptor outputResultActivation);
 }
 
 #endif

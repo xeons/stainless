@@ -32,47 +32,56 @@ import Standard.ObjC;
 
 public extern objc class MPSImageReduceUnary : MPSUnaryImageKernel
 {
-    [Selector("clipRectSource", "setClipRectSource:")] public MTLRegion ClipRectSource { get; set; }
+    [Selector("clipRectSource", "setClipRectSource:")]
+    public MTLRegion ClipRectSource { get; set; }
 }
 
 public extern objc class MPSImageReduceRowMin : MPSImageReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSImageReduceColumnMin : MPSImageReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSImageReduceRowMax : MPSImageReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSImageReduceColumnMax : MPSImageReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSImageReduceRowMean : MPSImageReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSImageReduceColumnMean : MPSImageReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSImageReduceRowSum : MPSImageReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSImageReduceColumnSum : MPSImageReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 #endif

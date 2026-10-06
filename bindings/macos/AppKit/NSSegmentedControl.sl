@@ -62,50 +62,88 @@ public enum NSSegmentDistribution : long
 
 public extern objc class NSSegmentedControl : NSControl, NSUserInterfaceCompression
 {
-    [Selector("segmentCount", "setSegmentCount:")] public NSInteger SegmentCount { get; set; }
-    [Selector("selectedSegment", "setSelectedSegment:")] public NSInteger SelectedSegment { get; set; }
-    [Selector("segmentStyle", "setSegmentStyle:")] public NSSegmentStyle SegmentStyle { get; set; }
-    [Selector("isSpringLoaded", "setSpringLoaded:")] public bool SpringLoaded { get; set; }
-    [Selector("trackingMode", "setTrackingMode:")] public NSSegmentSwitchTracking TrackingMode { get; set; }
-    [Selector("doubleValueForSelectedSegment")] public double DoubleValueForSelectedSegment { get; }
-    [Selector("selectedSegmentBezelColor", "setSelectedSegmentBezelColor:")] public NSColor? SelectedSegmentBezelColor { get; set; }
-    [Selector("indexOfSelectedItem")] public NSInteger IndexOfSelectedItem { get; }
-    [Selector("segmentDistribution", "setSegmentDistribution:")] public NSSegmentDistribution SegmentDistribution { get; set; }
-    [Selector("activeCompressionOptions")] public NSUserInterfaceCompressionOptions? ActiveCompressionOptions { get; }
+    [Selector("segmentCount", "setSegmentCount:")]
+    public NSInteger SegmentCount { get; set; }
+    [Selector("selectedSegment", "setSelectedSegment:")]
+    public NSInteger SelectedSegment { get; set; }
+    [Selector("segmentStyle", "setSegmentStyle:")]
+    public NSSegmentStyle SegmentStyle { get; set; }
+    [Selector("isSpringLoaded", "setSpringLoaded:")]
+    public bool SpringLoaded { get; set; }
+    [Selector("trackingMode", "setTrackingMode:")]
+    public NSSegmentSwitchTracking TrackingMode { get; set; }
+    [Selector("doubleValueForSelectedSegment")]
+    public double DoubleValueForSelectedSegment { get; }
+    [Selector("selectedSegmentBezelColor", "setSelectedSegmentBezelColor:")]
+    public NSColor? SelectedSegmentBezelColor { get; set; }
+    [Selector("indexOfSelectedItem")]
+    public NSInteger IndexOfSelectedItem { get; }
+    [Selector("segmentDistribution", "setSegmentDistribution:")]
+    public NSSegmentDistribution SegmentDistribution { get; set; }
+    [Selector("activeCompressionOptions")]
+    public NSUserInterfaceCompressionOptions? ActiveCompressionOptions { get; }
     /// macOS 26.0 and later.
-    [Selector("borderShape", "setBorderShape:")] public NSControlBorderShape BorderShape { get; set; }
-    [Selector("selectSegmentWithTag:")] public bool SelectSegmentWithTag(NSInteger tag);
-    [Selector("setWidth:forSegment:")] public void SetWidthForSegment(CGFloat width, NSInteger segment);
-    [Selector("widthForSegment:")] public CGFloat WidthForSegment(NSInteger segment);
-    [Selector("setImage:forSegment:")] public void SetImageForSegment(NSImage? image, NSInteger segment);
-    [Selector("imageForSegment:")] public NSImage? ImageForSegment(NSInteger segment);
-    [Selector("setImageScaling:forSegment:")] public void SetImageScalingForSegment(NSImageScaling scaling, NSInteger segment);
-    [Selector("imageScalingForSegment:")] public NSImageScaling ImageScalingForSegment(NSInteger segment);
-    [Selector("setLabel:forSegment:")] public void SetLabelForSegment(NSString label, NSInteger segment);
-    [Selector("labelForSegment:")] public NSString? LabelForSegment(NSInteger segment);
-    [Selector("setMenu:forSegment:")] public void SetMenuForSegment(NSMenu? menu, NSInteger segment);
-    [Selector("menuForSegment:")] public NSMenu? MenuForSegment(NSInteger segment);
-    [Selector("setSelected:forSegment:")] public void SetSelectedForSegment(bool selected, NSInteger segment);
-    [Selector("isSelectedForSegment:")] public bool IsSelectedForSegment(NSInteger segment);
-    [Selector("setEnabled:forSegment:")] public void SetEnabledForSegment(bool enabled, NSInteger segment);
-    [Selector("isEnabledForSegment:")] public bool IsEnabledForSegment(NSInteger segment);
-    [Selector("setToolTip:forSegment:")] public void SetToolTipForSegment(NSString? toolTip, NSInteger segment);
-    [Selector("toolTipForSegment:")] public NSString? ToolTipForSegment(NSInteger segment);
-    [Selector("setTag:forSegment:")] public void SetTagForSegment(NSInteger tag, NSInteger segment);
-    [Selector("tagForSegment:")] public NSInteger TagForSegment(NSInteger segment);
-    [Selector("setShowsMenuIndicator:forSegment:")] public void SetShowsMenuIndicatorForSegment(bool showsMenuIndicator, NSInteger segment);
-    [Selector("showsMenuIndicatorForSegment:")] public bool ShowsMenuIndicatorForSegment(NSInteger segment);
-    [Selector("setAlignment:forSegment:")] public void SetAlignmentForSegment(NSTextAlignment alignment, NSInteger segment);
-    [Selector("alignmentForSegment:")] public NSTextAlignment AlignmentForSegment(NSInteger segment);
-    [Selector("compressWithPrioritizedCompressionOptions:")] public void CompressWithPrioritizedCompressionOptions(NSArray prioritizedOptions);
-    [Selector("minimumSizeWithPrioritizedCompressionOptions:")] public NSSize MinimumSizeWithPrioritizedCompressionOptions(NSArray prioritizedOptions);
+    [Selector("borderShape", "setBorderShape:")]
+    public NSControlBorderShape BorderShape { get; set; }
+    [Selector("selectSegmentWithTag:")]
+    public bool SelectSegmentWithTag(NSInteger tag);
+    [Selector("setWidth:forSegment:")]
+    public void SetWidthForSegment(CGFloat width, NSInteger segment);
+    [Selector("widthForSegment:")]
+    public CGFloat WidthForSegment(NSInteger segment);
+    [Selector("setImage:forSegment:")]
+    public void SetImageForSegment(NSImage? image, NSInteger segment);
+    [Selector("imageForSegment:")]
+    public NSImage? ImageForSegment(NSInteger segment);
+    [Selector("setImageScaling:forSegment:")]
+    public void SetImageScalingForSegment(NSImageScaling scaling, NSInteger segment);
+    [Selector("imageScalingForSegment:")]
+    public NSImageScaling ImageScalingForSegment(NSInteger segment);
+    [Selector("setLabel:forSegment:")]
+    public void SetLabelForSegment(NSString label, NSInteger segment);
+    [Selector("labelForSegment:")]
+    public NSString? LabelForSegment(NSInteger segment);
+    [Selector("setMenu:forSegment:")]
+    public void SetMenuForSegment(NSMenu? menu, NSInteger segment);
+    [Selector("menuForSegment:")]
+    public NSMenu? MenuForSegment(NSInteger segment);
+    [Selector("setSelected:forSegment:")]
+    public void SetSelectedForSegment(bool selected, NSInteger segment);
+    [Selector("isSelectedForSegment:")]
+    public bool IsSelectedForSegment(NSInteger segment);
+    [Selector("setEnabled:forSegment:")]
+    public void SetEnabledForSegment(bool enabled, NSInteger segment);
+    [Selector("isEnabledForSegment:")]
+    public bool IsEnabledForSegment(NSInteger segment);
+    [Selector("setToolTip:forSegment:")]
+    public void SetToolTipForSegment(NSString? toolTip, NSInteger segment);
+    [Selector("toolTipForSegment:")]
+    public NSString? ToolTipForSegment(NSInteger segment);
+    [Selector("setTag:forSegment:")]
+    public void SetTagForSegment(NSInteger tag, NSInteger segment);
+    [Selector("tagForSegment:")]
+    public NSInteger TagForSegment(NSInteger segment);
+    [Selector("setShowsMenuIndicator:forSegment:")]
+    public void SetShowsMenuIndicatorForSegment(bool showsMenuIndicator, NSInteger segment);
+    [Selector("showsMenuIndicatorForSegment:")]
+    public bool ShowsMenuIndicatorForSegment(NSInteger segment);
+    [Selector("setAlignment:forSegment:")]
+    public void SetAlignmentForSegment(NSTextAlignment alignment, NSInteger segment);
+    [Selector("alignmentForSegment:")]
+    public NSTextAlignment AlignmentForSegment(NSInteger segment);
+    [Selector("compressWithPrioritizedCompressionOptions:")]
+    public void CompressWithPrioritizedCompressionOptions(NSArray prioritizedOptions);
+    [Selector("minimumSizeWithPrioritizedCompressionOptions:")]
+    public NSSize MinimumSizeWithPrioritizedCompressionOptions(NSArray prioritizedOptions);
 }
 
 /// NSSegmentedControlConvenience, a category of NSSegmentedControl.
 public extern objc class NSSegmentedControl
 {
-    [Selector("segmentedControlWithLabels:trackingMode:target:action:")] public static Self SegmentedControlWithLabelsTrackingModeTargetAction(NSArray labels, NSSegmentSwitchTracking trackingMode, AnyObject? target, Selector action);
-    [Selector("segmentedControlWithImages:trackingMode:target:action:")] public static Self SegmentedControlWithImagesTrackingModeTargetAction(NSArray images, NSSegmentSwitchTracking trackingMode, AnyObject? target, Selector action);
+    [Selector("segmentedControlWithLabels:trackingMode:target:action:")]
+    public static Self SegmentedControlWithLabelsTrackingModeTargetAction(NSArray labels, NSSegmentSwitchTracking trackingMode, AnyObject? target, Selector action);
+    [Selector("segmentedControlWithImages:trackingMode:target:action:")]
+    public static Self SegmentedControlWithImagesTrackingModeTargetAction(NSArray images, NSSegmentSwitchTracking trackingMode, AnyObject? target, Selector action);
 }
 
 #endif

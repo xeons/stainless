@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class MLMultiArrayConstraint : NSObject, NSSecureCoding
 {
-    [Selector("shape")] public NSArray Shape { get; }
-    [Selector("dataType")] public MLMultiArrayDataType DataType { get; }
-    [Selector("shapeConstraint")] public MLMultiArrayShapeConstraint ShapeConstraint { get; }
+    [Selector("shape")]
+    public NSArray Shape { get; }
+    [Selector("dataType")]
+    public MLMultiArrayDataType DataType { get; }
+    [Selector("shapeConstraint")]
+    public MLMultiArrayShapeConstraint ShapeConstraint { get; }
 }
 
 #endif

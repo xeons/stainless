@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public objc interface MTLCaptureScope : NSObjectProtocol
 {
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("commandQueue")] MTLCommandQueue? CommandQueue { get; }
-    [Selector("mtl4CommandQueue")] MTL4CommandQueue? Mtl4CommandQueue { get; }
-    [Selector("beginScope")] void BeginScope();
-    [Selector("endScope")] void EndScope();
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("commandQueue")]
+    MTLCommandQueue? CommandQueue { get; }
+    [Selector("mtl4CommandQueue")]
+    MTL4CommandQueue? Mtl4CommandQueue { get; }
+    [Selector("beginScope")]
+    void BeginScope();
+    [Selector("endScope")]
+    void EndScope();
 }
 
 #endif

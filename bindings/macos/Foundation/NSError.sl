@@ -74,27 +74,43 @@ public objc closure AnyObject? NSErrorUserInfoValueProviderForDomainResultBlock(
 
 public extern objc class NSError : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("domain")] public NSErrorDomain Domain { get; }
-    [Selector("code")] public NSInteger Code { get; }
-    [Selector("userInfo")] public NSDictionary UserInfo { get; }
-    [Selector("localizedDescription")] public NSString LocalizedDescription { get; }
-    [Selector("localizedFailureReason")] public NSString? LocalizedFailureReason { get; }
-    [Selector("localizedRecoverySuggestion")] public NSString? LocalizedRecoverySuggestion { get; }
-    [Selector("localizedRecoveryOptions")] public NSArray? LocalizedRecoveryOptions { get; }
-    [Selector("recoveryAttempter")] public AnyObject? RecoveryAttempter { get; }
-    [Selector("helpAnchor")] public NSString? HelpAnchor { get; }
-    [Selector("underlyingErrors")] public NSArray UnderlyingErrors { get; }
-    [Selector("initWithDomain:code:userInfo:")] public Self InitWithDomainCodeUserInfo(NSErrorDomain domain, NSInteger code, NSDictionary? dict);
-    [Selector("errorWithDomain:code:userInfo:")] public static Self ErrorWithDomainCodeUserInfo(NSErrorDomain domain, NSInteger code, NSDictionary? dict);
-    [Selector("setUserInfoValueProviderForDomain:provider:")] public static void SetUserInfoValueProviderForDomainProvider(NSErrorDomain errorDomain, NSErrorSetUserInfoValueProviderForDomainProviderProviderBlock? provider);
-    [Selector("userInfoValueProviderForDomain:")] public static NSErrorUserInfoValueProviderForDomainResultBlock? UserInfoValueProviderForDomain(NSErrorDomain errorDomain);
+    [Selector("domain")]
+    public NSErrorDomain Domain { get; }
+    [Selector("code")]
+    public NSInteger Code { get; }
+    [Selector("userInfo")]
+    public NSDictionary UserInfo { get; }
+    [Selector("localizedDescription")]
+    public NSString LocalizedDescription { get; }
+    [Selector("localizedFailureReason")]
+    public NSString? LocalizedFailureReason { get; }
+    [Selector("localizedRecoverySuggestion")]
+    public NSString? LocalizedRecoverySuggestion { get; }
+    [Selector("localizedRecoveryOptions")]
+    public NSArray? LocalizedRecoveryOptions { get; }
+    [Selector("recoveryAttempter")]
+    public AnyObject? RecoveryAttempter { get; }
+    [Selector("helpAnchor")]
+    public NSString? HelpAnchor { get; }
+    [Selector("underlyingErrors")]
+    public NSArray UnderlyingErrors { get; }
+    [Selector("initWithDomain:code:userInfo:")]
+    public Self InitWithDomainCodeUserInfo(NSErrorDomain domain, NSInteger code, NSDictionary? dict);
+    [Selector("errorWithDomain:code:userInfo:")]
+    public static Self ErrorWithDomainCodeUserInfo(NSErrorDomain domain, NSInteger code, NSDictionary? dict);
+    [Selector("setUserInfoValueProviderForDomain:provider:")]
+    public static void SetUserInfoValueProviderForDomainProvider(NSErrorDomain errorDomain, NSErrorSetUserInfoValueProviderForDomainProviderProviderBlock? provider);
+    [Selector("userInfoValueProviderForDomain:")]
+    public static NSErrorUserInfoValueProviderForDomainResultBlock? UserInfoValueProviderForDomain(NSErrorDomain errorDomain);
 }
 
 /// NSErrorRecoveryAttempting, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("attemptRecoveryFromError:optionIndex:delegate:didRecoverSelector:contextInfo:")] public void AttemptRecoveryFromErrorOptionIndexDelegateDidRecoverSelectorContextInfo(NSError error, NSUInteger recoveryOptionIndex, AnyObject? @delegate, Selector didRecoverSelector, void* contextInfo);
-    [Selector("attemptRecoveryFromError:optionIndex:")] public bool AttemptRecoveryFromErrorOptionIndex(NSError error, NSUInteger recoveryOptionIndex);
+    [Selector("attemptRecoveryFromError:optionIndex:delegate:didRecoverSelector:contextInfo:")]
+    public void AttemptRecoveryFromErrorOptionIndexDelegateDidRecoverSelectorContextInfo(NSError error, NSUInteger recoveryOptionIndex, AnyObject? @delegate, Selector didRecoverSelector, void* contextInfo);
+    [Selector("attemptRecoveryFromError:optionIndex:")]
+    public bool AttemptRecoveryFromErrorOptionIndex(NSError error, NSUInteger recoveryOptionIndex);
 }
 
 #endif

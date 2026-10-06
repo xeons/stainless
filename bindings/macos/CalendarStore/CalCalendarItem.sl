@@ -34,31 +34,44 @@ import Standard.ObjC;
 public extern objc class CalCalendarItem : NSObject, NSCopying
 {
     /// Deprecated in macOS 10.8.
-    [Selector("calendar", "setCalendar:")] public CalCalendar? Calendar { get; set; }
+    [Selector("calendar", "setCalendar:")]
+    public CalCalendar? Calendar { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("notes", "setNotes:")] public NSString? Notes { get; set; }
+    [Selector("notes", "setNotes:")]
+    public NSString? Notes { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("url", "setUrl:")] public NSURL? Url { get; set; }
+    [Selector("url", "setUrl:")]
+    public NSURL? Url { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("uid")] public NSString? Uid { get; }
+    [Selector("uid")]
+    public NSString? Uid { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("dateStamp")] public NSDate? DateStamp { get; }
+    [Selector("dateStamp")]
+    public NSDate? DateStamp { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("alarms", "setAlarms:")] public NSArray? Alarms { get; set; }
+    [Selector("alarms", "setAlarms:")]
+    public NSArray? Alarms { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("hasAlarm")] public bool HasAlarm();
+    [Selector("hasAlarm")]
+    public bool HasAlarm();
     /// Deprecated in macOS 10.8.
-    [Selector("nextAlarmDate")] public NSDate? NextAlarmDate();
+    [Selector("nextAlarmDate")]
+    public NSDate? NextAlarmDate();
     /// Deprecated in macOS 10.8.
-    [Selector("addAlarm:")] public void AddAlarm(CalAlarm? alarm);
+    [Selector("addAlarm:")]
+    public void AddAlarm(CalAlarm? alarm);
     /// Deprecated in macOS 10.8.
-    [Selector("addAlarms:")] public void AddAlarms(NSArray? alarms);
+    [Selector("addAlarms:")]
+    public void AddAlarms(NSArray? alarms);
     /// Deprecated in macOS 10.8.
-    [Selector("removeAlarm:")] public void RemoveAlarm(CalAlarm? alarm);
+    [Selector("removeAlarm:")]
+    public void RemoveAlarm(CalAlarm? alarm);
     /// Deprecated in macOS 10.8.
-    [Selector("removeAlarms:")] public void RemoveAlarms(NSArray? alarms);
+    [Selector("removeAlarms:")]
+    public void RemoveAlarms(NSArray? alarms);
 }
 
 #endif

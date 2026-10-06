@@ -43,47 +43,80 @@ public const int DOM_NODE_INSIDE = 3;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMRange : DOMObject
 {
-    [Selector("startContainer")] public DOMNode? StartContainer { get; }
-    [Selector("startOffset")] public int StartOffset { get; }
-    [Selector("endContainer")] public DOMNode? EndContainer { get; }
-    [Selector("endOffset")] public int EndOffset { get; }
-    [Selector("collapsed")] public bool Collapsed { get; }
-    [Selector("commonAncestorContainer")] public DOMNode? CommonAncestorContainer { get; }
-    [Selector("text")] public NSString? Text { get; }
-    [Selector("setStart:offset:")] public void SetStartOffset(DOMNode? refNode, int offset);
-    [Selector("setEnd:offset:")] public void SetEndOffset(DOMNode? refNode, int offset);
-    [Selector("setStartBefore:")] public void SetStartBefore(DOMNode? refNode);
-    [Selector("setStartAfter:")] public void SetStartAfter(DOMNode? refNode);
-    [Selector("setEndBefore:")] public void SetEndBefore(DOMNode? refNode);
-    [Selector("setEndAfter:")] public void SetEndAfter(DOMNode? refNode);
-    [Selector("collapse:")] public void Collapse(bool toStart);
-    [Selector("selectNode:")] public void SelectNode(DOMNode? refNode);
-    [Selector("selectNodeContents:")] public void SelectNodeContents(DOMNode? refNode);
-    [Selector("compareBoundaryPoints:sourceRange:")] public short CompareBoundaryPointsSourceRange(ushort how, DOMRange? sourceRange);
-    [Selector("deleteContents")] public void DeleteContents();
-    [Selector("extractContents")] public DOMDocumentFragment? ExtractContents();
-    [Selector("cloneContents")] public DOMDocumentFragment? CloneContents();
-    [Selector("insertNode:")] public void InsertNode(DOMNode? newNode);
-    [Selector("surroundContents:")] public void SurroundContents(DOMNode? newParent);
-    [Selector("cloneRange")] public DOMRange? CloneRange();
-    [Selector("toString")] public NSString? ToString();
-    [Selector("detach")] public void Detach();
-    [Selector("createContextualFragment:")] public DOMDocumentFragment? CreateContextualFragment(NSString? html);
-    [Selector("compareNode:")] public short CompareNode(DOMNode? refNode);
-    [Selector("intersectsNode:")] public bool IntersectsNode(DOMNode? refNode);
-    [Selector("comparePoint:offset:")] public short ComparePointOffset(DOMNode? refNode, int offset);
-    [Selector("isPointInRange:offset:")] public bool IsPointInRangeOffset(DOMNode? refNode, int offset);
+    [Selector("startContainer")]
+    public DOMNode? StartContainer { get; }
+    [Selector("startOffset")]
+    public int StartOffset { get; }
+    [Selector("endContainer")]
+    public DOMNode? EndContainer { get; }
+    [Selector("endOffset")]
+    public int EndOffset { get; }
+    [Selector("collapsed")]
+    public bool Collapsed { get; }
+    [Selector("commonAncestorContainer")]
+    public DOMNode? CommonAncestorContainer { get; }
+    [Selector("text")]
+    public NSString? Text { get; }
+    [Selector("setStart:offset:")]
+    public void SetStartOffset(DOMNode? refNode, int offset);
+    [Selector("setEnd:offset:")]
+    public void SetEndOffset(DOMNode? refNode, int offset);
+    [Selector("setStartBefore:")]
+    public void SetStartBefore(DOMNode? refNode);
+    [Selector("setStartAfter:")]
+    public void SetStartAfter(DOMNode? refNode);
+    [Selector("setEndBefore:")]
+    public void SetEndBefore(DOMNode? refNode);
+    [Selector("setEndAfter:")]
+    public void SetEndAfter(DOMNode? refNode);
+    [Selector("collapse:")]
+    public void Collapse(bool toStart);
+    [Selector("selectNode:")]
+    public void SelectNode(DOMNode? refNode);
+    [Selector("selectNodeContents:")]
+    public void SelectNodeContents(DOMNode? refNode);
+    [Selector("compareBoundaryPoints:sourceRange:")]
+    public short CompareBoundaryPointsSourceRange(ushort how, DOMRange? sourceRange);
+    [Selector("deleteContents")]
+    public void DeleteContents();
+    [Selector("extractContents")]
+    public DOMDocumentFragment? ExtractContents();
+    [Selector("cloneContents")]
+    public DOMDocumentFragment? CloneContents();
+    [Selector("insertNode:")]
+    public void InsertNode(DOMNode? newNode);
+    [Selector("surroundContents:")]
+    public void SurroundContents(DOMNode? newParent);
+    [Selector("cloneRange")]
+    public DOMRange? CloneRange();
+    [Selector("toString")]
+    public NSString? ToString();
+    [Selector("detach")]
+    public void Detach();
+    [Selector("createContextualFragment:")]
+    public DOMDocumentFragment? CreateContextualFragment(NSString? html);
+    [Selector("compareNode:")]
+    public short CompareNode(DOMNode? refNode);
+    [Selector("intersectsNode:")]
+    public bool IntersectsNode(DOMNode? refNode);
+    [Selector("comparePoint:offset:")]
+    public short ComparePointOffset(DOMNode? refNode, int offset);
+    [Selector("isPointInRange:offset:")]
+    public bool IsPointInRangeOffset(DOMNode? refNode, int offset);
 }
 
 /// DOMRangeDeprecated, a category of DOMRange.
 public extern objc class DOMRange
 {
     /// Deprecated in macOS 10.5.
-    [Selector("setStart::")] public void SetStart(DOMNode? refNode, int offset);
+    [Selector("setStart::")]
+    public void SetStart(DOMNode? refNode, int offset);
     /// Deprecated in macOS 10.5.
-    [Selector("setEnd::")] public void SetEnd(DOMNode? refNode, int offset);
+    [Selector("setEnd::")]
+    public void SetEnd(DOMNode? refNode, int offset);
     /// Deprecated in macOS 10.5.
-    [Selector("compareBoundaryPoints::")] public short CompareBoundaryPoints(ushort how, DOMRange? sourceRange);
+    [Selector("compareBoundaryPoints::")]
+    public short CompareBoundaryPoints(ushort how, DOMRange? sourceRange);
 }
 
 #endif

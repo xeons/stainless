@@ -37,8 +37,10 @@ public extern "C" CGRect AVMakeRectWithAspectRatioInsideRect(CGSize aspectRatio,
 /// NSValueCMVideoDimensionsExtensions, a category of NSValue.
 public extern objc class NSValue
 {
-    [Selector("CMVideoDimensionsValue")] public CMVideoDimensions CMVideoDimensionsValue { get; }
-    [Selector("valueWithCMVideoDimensions:")] public static NSValue? ValueWithCMVideoDimensions(CMVideoDimensions dimensions);
+    [Selector("CMVideoDimensionsValue")]
+    public CMVideoDimensions CMVideoDimensionsValue { get; }
+    [Selector("valueWithCMVideoDimensions:")]
+    public static NSValue? ValueWithCMVideoDimensions(CMVideoDimensions dimensions);
 }
 
 #endif

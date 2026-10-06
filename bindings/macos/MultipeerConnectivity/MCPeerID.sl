@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MCPeerID : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("displayName")] public NSString DisplayName { get; }
-    [Selector("initWithDisplayName:")] public Self InitWithDisplayName(NSString myDisplayName);
+    [Selector("displayName")]
+    public NSString DisplayName { get; }
+    [Selector("initWithDisplayName:")]
+    public Self InitWithDisplayName(NSString myDisplayName);
 }
 
 #endif

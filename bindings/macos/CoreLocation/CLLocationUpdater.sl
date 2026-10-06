@@ -42,18 +42,29 @@ public enum CLLiveUpdateConfiguration : long
 
 public extern objc class CLUpdate : NSObject
 {
-    [Selector("authorizationDenied")] public bool AuthorizationDenied { get; }
-    [Selector("authorizationDeniedGlobally")] public bool AuthorizationDeniedGlobally { get; }
-    [Selector("authorizationRestricted")] public bool AuthorizationRestricted { get; }
+    [Selector("authorizationDenied")]
+    public bool AuthorizationDenied { get; }
+    [Selector("authorizationDeniedGlobally")]
+    public bool AuthorizationDeniedGlobally { get; }
+    [Selector("authorizationRestricted")]
+    public bool AuthorizationRestricted { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("isStationary")] public bool IsStationary { get; }
-    [Selector("stationary")] public bool Stationary { get; }
-    [Selector("insufficientlyInUse")] public bool InsufficientlyInUse { get; }
-    [Selector("locationUnavailable")] public bool LocationUnavailable { get; }
-    [Selector("accuracyLimited")] public bool AccuracyLimited { get; }
-    [Selector("serviceSessionRequired")] public bool ServiceSessionRequired { get; }
-    [Selector("authorizationRequestInProgress")] public bool AuthorizationRequestInProgress { get; }
-    [Selector("location")] public CLLocation? Location { get; }
+    [Selector("isStationary")]
+    public bool IsStationary { get; }
+    [Selector("stationary")]
+    public bool Stationary { get; }
+    [Selector("insufficientlyInUse")]
+    public bool InsufficientlyInUse { get; }
+    [Selector("locationUnavailable")]
+    public bool LocationUnavailable { get; }
+    [Selector("accuracyLimited")]
+    public bool AccuracyLimited { get; }
+    [Selector("serviceSessionRequired")]
+    public bool ServiceSessionRequired { get; }
+    [Selector("authorizationRequestInProgress")]
+    public bool AuthorizationRequestInProgress { get; }
+    [Selector("location")]
+    public CLLocation? Location { get; }
 }
 
 public objc closure void CLLocationUpdaterLiveUpdaterWithQueueHandlerHandlerBlock(CLUpdate? arg0);
@@ -62,11 +73,16 @@ public objc closure void CLLocationUpdaterLiveUpdaterWithConfigurationQueueHandl
 
 public extern objc class CLLocationUpdater : NSObject
 {
-    [Selector("liveUpdaterWithQueue:handler:")] public static Self? LiveUpdaterWithQueueHandler(dispatch_queue_t queue, CLLocationUpdaterLiveUpdaterWithQueueHandlerHandlerBlock handler);
-    [Selector("liveUpdaterWithConfiguration:queue:handler:")] public static Self? LiveUpdaterWithConfigurationQueueHandler(CLLiveUpdateConfiguration configuration, dispatch_queue_t queue, CLLocationUpdaterLiveUpdaterWithConfigurationQueueHandlerHandlerBlock handler);
-    [Selector("resume")] public void Resume();
-    [Selector("pause")] public void Pause();
-    [Selector("invalidate")] public void Invalidate();
+    [Selector("liveUpdaterWithQueue:handler:")]
+    public static Self? LiveUpdaterWithQueueHandler(dispatch_queue_t queue, CLLocationUpdaterLiveUpdaterWithQueueHandlerHandlerBlock handler);
+    [Selector("liveUpdaterWithConfiguration:queue:handler:")]
+    public static Self? LiveUpdaterWithConfigurationQueueHandler(CLLiveUpdateConfiguration configuration, dispatch_queue_t queue, CLLocationUpdaterLiveUpdaterWithConfigurationQueueHandlerHandlerBlock handler);
+    [Selector("resume")]
+    public void Resume();
+    [Selector("pause")]
+    public void Pause();
+    [Selector("invalidate")]
+    public void Invalidate();
 }
 
 #endif

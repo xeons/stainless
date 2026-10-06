@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class AVAudioUnitDelay : AVAudioUnitEffect
 {
-    [Selector("delayTime", "setDelayTime:")] public NSTimeInterval DelayTime { get; set; }
-    [Selector("feedback", "setFeedback:")] public float Feedback { get; set; }
-    [Selector("lowPassCutoff", "setLowPassCutoff:")] public float LowPassCutoff { get; set; }
-    [Selector("wetDryMix", "setWetDryMix:")] public float WetDryMix { get; set; }
+    [Selector("delayTime", "setDelayTime:")]
+    public NSTimeInterval DelayTime { get; set; }
+    [Selector("feedback", "setFeedback:")]
+    public float Feedback { get; set; }
+    [Selector("lowPassCutoff", "setLowPassCutoff:")]
+    public float LowPassCutoff { get; set; }
+    [Selector("wetDryMix", "setWetDryMix:")]
+    public float WetDryMix { get; set; }
 }
 
 #endif

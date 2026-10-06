@@ -32,12 +32,14 @@ import Standard.ObjC;
 
 public extern objc class CMRotationRateData : CMLogItem
 {
-    [Selector("rotationRate")] public CMRotationRate RotationRate { get; }
+    [Selector("rotationRate")]
+    public CMRotationRate RotationRate { get; }
 }
 
 public extern objc class CMRecordedRotationRateData : CMRotationRateData
 {
-    [Selector("startDate")] public NSDate StartDate { get; }
+    [Selector("startDate")]
+    public NSDate StartDate { get; }
 }
 
 #endif

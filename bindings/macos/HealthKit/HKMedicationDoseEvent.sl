@@ -51,14 +51,22 @@ public enum HKMedicationDoseEventScheduleType : long
 /// macOS 26.0 and later.
 public extern objc class HKMedicationDoseEvent : HKSample, NSSecureCoding, NSCopying
 {
-    [Selector("medicationDoseEventType")] public HKMedicationDoseEventType MedicationDoseEventType { get; }
-    [Selector("scheduleType")] public HKMedicationDoseEventScheduleType ScheduleType { get; }
-    [Selector("medicationConceptIdentifier")] public HKHealthConceptIdentifier MedicationConceptIdentifier { get; }
-    [Selector("scheduledDate")] public NSDate? ScheduledDate { get; }
-    [Selector("scheduledDoseQuantity")] public NSNumber? ScheduledDoseQuantity { get; }
-    [Selector("doseQuantity")] public NSNumber? DoseQuantity { get; }
-    [Selector("logStatus")] public HKMedicationDoseEventLogStatus LogStatus { get; }
-    [Selector("unit")] public HKUnit Unit { get; }
+    [Selector("medicationDoseEventType")]
+    public HKMedicationDoseEventType MedicationDoseEventType { get; }
+    [Selector("scheduleType")]
+    public HKMedicationDoseEventScheduleType ScheduleType { get; }
+    [Selector("medicationConceptIdentifier")]
+    public HKHealthConceptIdentifier MedicationConceptIdentifier { get; }
+    [Selector("scheduledDate")]
+    public NSDate? ScheduledDate { get; }
+    [Selector("scheduledDoseQuantity")]
+    public NSNumber? ScheduledDoseQuantity { get; }
+    [Selector("doseQuantity")]
+    public NSNumber? DoseQuantity { get; }
+    [Selector("logStatus")]
+    public HKMedicationDoseEventLogStatus LogStatus { get; }
+    [Selector("unit")]
+    public HKUnit Unit { get; }
 }
 
 /// macOS 26.0 and later.

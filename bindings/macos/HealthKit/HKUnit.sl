@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class HKUnit : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("unitString")] public NSString UnitString { get; }
-    [Selector("unitFromString:")] public static Self UnitFromString(NSString string);
-    [Selector("unitFromMassFormatterUnit:")] public static Self UnitFromMassFormatterUnit(NSMassFormatterUnit massFormatterUnit);
-    [Selector("massFormatterUnitFromUnit:")] public static NSMassFormatterUnit MassFormatterUnitFromUnit(HKUnit unit);
-    [Selector("unitFromLengthFormatterUnit:")] public static Self UnitFromLengthFormatterUnit(NSLengthFormatterUnit lengthFormatterUnit);
-    [Selector("lengthFormatterUnitFromUnit:")] public static NSLengthFormatterUnit LengthFormatterUnitFromUnit(HKUnit unit);
-    [Selector("unitFromEnergyFormatterUnit:")] public static Self UnitFromEnergyFormatterUnit(NSEnergyFormatterUnit energyFormatterUnit);
-    [Selector("energyFormatterUnitFromUnit:")] public static NSEnergyFormatterUnit EnergyFormatterUnitFromUnit(HKUnit unit);
-    [Selector("isNull")] public bool IsNull();
+    [Selector("unitString")]
+    public NSString UnitString { get; }
+    [Selector("unitFromString:")]
+    public static Self UnitFromString(NSString string);
+    [Selector("unitFromMassFormatterUnit:")]
+    public static Self UnitFromMassFormatterUnit(NSMassFormatterUnit massFormatterUnit);
+    [Selector("massFormatterUnitFromUnit:")]
+    public static NSMassFormatterUnit MassFormatterUnitFromUnit(HKUnit unit);
+    [Selector("unitFromLengthFormatterUnit:")]
+    public static Self UnitFromLengthFormatterUnit(NSLengthFormatterUnit lengthFormatterUnit);
+    [Selector("lengthFormatterUnitFromUnit:")]
+    public static NSLengthFormatterUnit LengthFormatterUnitFromUnit(HKUnit unit);
+    [Selector("unitFromEnergyFormatterUnit:")]
+    public static Self UnitFromEnergyFormatterUnit(NSEnergyFormatterUnit energyFormatterUnit);
+    [Selector("energyFormatterUnitFromUnit:")]
+    public static NSEnergyFormatterUnit EnergyFormatterUnitFromUnit(HKUnit unit);
+    [Selector("isNull")]
+    public bool IsNull();
 }
 
 public enum HKMetricPrefix : long
@@ -65,162 +74,228 @@ public enum HKMetricPrefix : long
 /// Mass, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("gramUnitWithMetricPrefix:")] public static Self GramUnitWithMetricPrefix(HKMetricPrefix prefix);
-    [Selector("gramUnit")] public static Self GramUnit();
-    [Selector("ounceUnit")] public static Self OunceUnit();
-    [Selector("poundUnit")] public static Self PoundUnit();
-    [Selector("stoneUnit")] public static Self StoneUnit();
-    [Selector("moleUnitWithMetricPrefix:molarMass:")] public static Self MoleUnitWithMetricPrefixMolarMass(HKMetricPrefix prefix, double gramsPerMole);
-    [Selector("moleUnitWithMolarMass:")] public static Self MoleUnitWithMolarMass(double gramsPerMole);
+    [Selector("gramUnitWithMetricPrefix:")]
+    public static Self GramUnitWithMetricPrefix(HKMetricPrefix prefix);
+    [Selector("gramUnit")]
+    public static Self GramUnit();
+    [Selector("ounceUnit")]
+    public static Self OunceUnit();
+    [Selector("poundUnit")]
+    public static Self PoundUnit();
+    [Selector("stoneUnit")]
+    public static Self StoneUnit();
+    [Selector("moleUnitWithMetricPrefix:molarMass:")]
+    public static Self MoleUnitWithMetricPrefixMolarMass(HKMetricPrefix prefix, double gramsPerMole);
+    [Selector("moleUnitWithMolarMass:")]
+    public static Self MoleUnitWithMolarMass(double gramsPerMole);
 }
 
 /// Length, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("meterUnitWithMetricPrefix:")] public static Self MeterUnitWithMetricPrefix(HKMetricPrefix prefix);
-    [Selector("meterUnit")] public static Self MeterUnit();
-    [Selector("inchUnit")] public static Self InchUnit();
-    [Selector("footUnit")] public static Self FootUnit();
-    [Selector("yardUnit")] public static Self YardUnit();
-    [Selector("mileUnit")] public static Self MileUnit();
+    [Selector("meterUnitWithMetricPrefix:")]
+    public static Self MeterUnitWithMetricPrefix(HKMetricPrefix prefix);
+    [Selector("meterUnit")]
+    public static Self MeterUnit();
+    [Selector("inchUnit")]
+    public static Self InchUnit();
+    [Selector("footUnit")]
+    public static Self FootUnit();
+    [Selector("yardUnit")]
+    public static Self YardUnit();
+    [Selector("mileUnit")]
+    public static Self MileUnit();
 }
 
 /// Volume, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("literUnitWithMetricPrefix:")] public static Self LiterUnitWithMetricPrefix(HKMetricPrefix prefix);
-    [Selector("literUnit")] public static Self LiterUnit();
-    [Selector("fluidOunceUSUnit")] public static Self FluidOunceUSUnit();
-    [Selector("fluidOunceImperialUnit")] public static Self FluidOunceImperialUnit();
-    [Selector("pintUSUnit")] public static Self PintUSUnit();
-    [Selector("pintImperialUnit")] public static Self PintImperialUnit();
-    [Selector("cupUSUnit")] public static Self CupUSUnit();
-    [Selector("cupImperialUnit")] public static Self CupImperialUnit();
+    [Selector("literUnitWithMetricPrefix:")]
+    public static Self LiterUnitWithMetricPrefix(HKMetricPrefix prefix);
+    [Selector("literUnit")]
+    public static Self LiterUnit();
+    [Selector("fluidOunceUSUnit")]
+    public static Self FluidOunceUSUnit();
+    [Selector("fluidOunceImperialUnit")]
+    public static Self FluidOunceImperialUnit();
+    [Selector("pintUSUnit")]
+    public static Self PintUSUnit();
+    [Selector("pintImperialUnit")]
+    public static Self PintImperialUnit();
+    [Selector("cupUSUnit")]
+    public static Self CupUSUnit();
+    [Selector("cupImperialUnit")]
+    public static Self CupImperialUnit();
 }
 
 /// Pressure, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("pascalUnitWithMetricPrefix:")] public static Self PascalUnitWithMetricPrefix(HKMetricPrefix prefix);
-    [Selector("pascalUnit")] public static Self PascalUnit();
-    [Selector("millimeterOfMercuryUnit")] public static Self MillimeterOfMercuryUnit();
-    [Selector("centimeterOfWaterUnit")] public static Self CentimeterOfWaterUnit();
-    [Selector("atmosphereUnit")] public static Self AtmosphereUnit();
-    [Selector("decibelAWeightedSoundPressureLevelUnit")] public static Self DecibelAWeightedSoundPressureLevelUnit();
-    [Selector("inchesOfMercuryUnit")] public static Self InchesOfMercuryUnit();
+    [Selector("pascalUnitWithMetricPrefix:")]
+    public static Self PascalUnitWithMetricPrefix(HKMetricPrefix prefix);
+    [Selector("pascalUnit")]
+    public static Self PascalUnit();
+    [Selector("millimeterOfMercuryUnit")]
+    public static Self MillimeterOfMercuryUnit();
+    [Selector("centimeterOfWaterUnit")]
+    public static Self CentimeterOfWaterUnit();
+    [Selector("atmosphereUnit")]
+    public static Self AtmosphereUnit();
+    [Selector("decibelAWeightedSoundPressureLevelUnit")]
+    public static Self DecibelAWeightedSoundPressureLevelUnit();
+    [Selector("inchesOfMercuryUnit")]
+    public static Self InchesOfMercuryUnit();
 }
 
 /// Time, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("secondUnitWithMetricPrefix:")] public static Self SecondUnitWithMetricPrefix(HKMetricPrefix prefix);
-    [Selector("secondUnit")] public static Self SecondUnit();
-    [Selector("minuteUnit")] public static Self MinuteUnit();
-    [Selector("hourUnit")] public static Self HourUnit();
-    [Selector("dayUnit")] public static Self DayUnit();
+    [Selector("secondUnitWithMetricPrefix:")]
+    public static Self SecondUnitWithMetricPrefix(HKMetricPrefix prefix);
+    [Selector("secondUnit")]
+    public static Self SecondUnit();
+    [Selector("minuteUnit")]
+    public static Self MinuteUnit();
+    [Selector("hourUnit")]
+    public static Self HourUnit();
+    [Selector("dayUnit")]
+    public static Self DayUnit();
 }
 
 /// Energy, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("jouleUnitWithMetricPrefix:")] public static Self JouleUnitWithMetricPrefix(HKMetricPrefix prefix);
-    [Selector("jouleUnit")] public static Self JouleUnit();
-    [Selector("kilocalorieUnit")] public static Self KilocalorieUnit();
-    [Selector("smallCalorieUnit")] public static Self SmallCalorieUnit();
-    [Selector("largeCalorieUnit")] public static Self LargeCalorieUnit();
-    [Selector("calorieUnit")] public static Self CalorieUnit();
+    [Selector("jouleUnitWithMetricPrefix:")]
+    public static Self JouleUnitWithMetricPrefix(HKMetricPrefix prefix);
+    [Selector("jouleUnit")]
+    public static Self JouleUnit();
+    [Selector("kilocalorieUnit")]
+    public static Self KilocalorieUnit();
+    [Selector("smallCalorieUnit")]
+    public static Self SmallCalorieUnit();
+    [Selector("largeCalorieUnit")]
+    public static Self LargeCalorieUnit();
+    [Selector("calorieUnit")]
+    public static Self CalorieUnit();
 }
 
 /// Temperature, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("degreeCelsiusUnit")] public static Self DegreeCelsiusUnit();
-    [Selector("degreeFahrenheitUnit")] public static Self DegreeFahrenheitUnit();
-    [Selector("kelvinUnit")] public static Self KelvinUnit();
+    [Selector("degreeCelsiusUnit")]
+    public static Self DegreeCelsiusUnit();
+    [Selector("degreeFahrenheitUnit")]
+    public static Self DegreeFahrenheitUnit();
+    [Selector("kelvinUnit")]
+    public static Self KelvinUnit();
 }
 
 /// Conductance, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("siemenUnitWithMetricPrefix:")] public static Self SiemenUnitWithMetricPrefix(HKMetricPrefix prefix);
-    [Selector("siemenUnit")] public static Self SiemenUnit();
+    [Selector("siemenUnitWithMetricPrefix:")]
+    public static Self SiemenUnitWithMetricPrefix(HKMetricPrefix prefix);
+    [Selector("siemenUnit")]
+    public static Self SiemenUnit();
 }
 
 /// Pharmacology, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("internationalUnit")] public static Self InternationalUnit();
+    [Selector("internationalUnit")]
+    public static Self InternationalUnit();
 }
 
 /// Scalar, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("countUnit")] public static Self CountUnit();
-    [Selector("percentUnit")] public static Self PercentUnit();
+    [Selector("countUnit")]
+    public static Self CountUnit();
+    [Selector("percentUnit")]
+    public static Self PercentUnit();
 }
 
 /// HearingSensitivity, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("decibelHearingLevelUnit")] public static Self DecibelHearingLevelUnit();
+    [Selector("decibelHearingLevelUnit")]
+    public static Self DecibelHearingLevelUnit();
 }
 
 /// Math, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("unitMultipliedByUnit:")] public HKUnit UnitMultipliedByUnit(HKUnit unit);
-    [Selector("unitDividedByUnit:")] public HKUnit UnitDividedByUnit(HKUnit unit);
-    [Selector("unitRaisedToPower:")] public HKUnit UnitRaisedToPower(NSInteger power);
-    [Selector("reciprocalUnit")] public HKUnit ReciprocalUnit();
+    [Selector("unitMultipliedByUnit:")]
+    public HKUnit UnitMultipliedByUnit(HKUnit unit);
+    [Selector("unitDividedByUnit:")]
+    public HKUnit UnitDividedByUnit(HKUnit unit);
+    [Selector("unitRaisedToPower:")]
+    public HKUnit UnitRaisedToPower(NSInteger power);
+    [Selector("reciprocalUnit")]
+    public HKUnit ReciprocalUnit();
 }
 
 /// Frequency, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("hertzUnitWithMetricPrefix:")] public static Self HertzUnitWithMetricPrefix(HKMetricPrefix prefix);
-    [Selector("hertzUnit")] public static Self HertzUnit();
+    [Selector("hertzUnitWithMetricPrefix:")]
+    public static Self HertzUnitWithMetricPrefix(HKMetricPrefix prefix);
+    [Selector("hertzUnit")]
+    public static Self HertzUnit();
 }
 
 /// ElectricPotentialDifference, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("voltUnitWithMetricPrefix:")] public static Self VoltUnitWithMetricPrefix(HKMetricPrefix prefix);
-    [Selector("voltUnit")] public static Self VoltUnit();
+    [Selector("voltUnitWithMetricPrefix:")]
+    public static Self VoltUnitWithMetricPrefix(HKMetricPrefix prefix);
+    [Selector("voltUnit")]
+    public static Self VoltUnit();
 }
 
 /// Power, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("wattUnitWithMetricPrefix:")] public static Self WattUnitWithMetricPrefix(HKMetricPrefix prefix);
-    [Selector("wattUnit")] public static Self WattUnit();
+    [Selector("wattUnitWithMetricPrefix:")]
+    public static Self WattUnitWithMetricPrefix(HKMetricPrefix prefix);
+    [Selector("wattUnit")]
+    public static Self WattUnit();
 }
 
 /// OpticalPower, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("diopterUnit")] public static Self DiopterUnit();
-    [Selector("prismDiopterUnit")] public static Self PrismDiopterUnit();
+    [Selector("diopterUnit")]
+    public static Self DiopterUnit();
+    [Selector("prismDiopterUnit")]
+    public static Self PrismDiopterUnit();
 }
 
 /// Angle, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("radianAngleUnitWithMetricPrefix:")] public static Self RadianAngleUnitWithMetricPrefix(HKMetricPrefix prefix);
-    [Selector("radianAngleUnit")] public static Self RadianAngleUnit();
-    [Selector("degreeAngleUnit")] public static Self DegreeAngleUnit();
+    [Selector("radianAngleUnitWithMetricPrefix:")]
+    public static Self RadianAngleUnitWithMetricPrefix(HKMetricPrefix prefix);
+    [Selector("radianAngleUnit")]
+    public static Self RadianAngleUnit();
+    [Selector("degreeAngleUnit")]
+    public static Self DegreeAngleUnit();
 }
 
 /// Illuminance, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("luxUnitWithMetricPrefix:")] public static Self LuxUnitWithMetricPrefix(HKMetricPrefix prefix);
-    [Selector("luxUnit")] public static Self LuxUnit();
+    [Selector("luxUnitWithMetricPrefix:")]
+    public static Self LuxUnitWithMetricPrefix(HKMetricPrefix prefix);
+    [Selector("luxUnit")]
+    public static Self LuxUnit();
 }
 
 /// UnitLess, a category of HKUnit.
 public extern objc class HKUnit
 {
-    [Selector("appleEffortScoreUnit")] public static Self AppleEffortScoreUnit();
+    [Selector("appleEffortScoreUnit")]
+    public static Self AppleEffortScoreUnit();
 }
 
 public const double HKUnitMolarMassBloodGlucose = 180.15588000005408;

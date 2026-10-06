@@ -42,13 +42,20 @@ public objc closure void AVQueuedSampleBufferRenderingRequestMediaDataWhenReadyO
 
 public objc interface AVQueuedSampleBufferRendering : NSObjectProtocol
 {
-    [Selector("timebase")] CMTimebaseRef Timebase { get; }
-    [Selector("isReadyForMoreMediaData")] bool ReadyForMoreMediaData { get; }
-    [Selector("hasSufficientMediaDataForReliablePlaybackStart")] bool HasSufficientMediaDataForReliablePlaybackStart { get; }
-    [Selector("enqueueSampleBuffer:")] void EnqueueSampleBuffer(CMSampleBufferRef sampleBuffer);
-    [Selector("flush")] void Flush();
-    [Selector("requestMediaDataWhenReadyOnQueue:usingBlock:")] void RequestMediaDataWhenReadyOnQueueUsingBlock(dispatch_queue_t queue, AVQueuedSampleBufferRenderingRequestMediaDataWhenReadyOnQueueUsingBlockBlock block);
-    [Selector("stopRequestingMediaData")] void StopRequestingMediaData();
+    [Selector("timebase")]
+    CMTimebaseRef Timebase { get; }
+    [Selector("isReadyForMoreMediaData")]
+    bool ReadyForMoreMediaData { get; }
+    [Selector("hasSufficientMediaDataForReliablePlaybackStart")]
+    bool HasSufficientMediaDataForReliablePlaybackStart { get; }
+    [Selector("enqueueSampleBuffer:")]
+    void EnqueueSampleBuffer(CMSampleBufferRef sampleBuffer);
+    [Selector("flush")]
+    void Flush();
+    [Selector("requestMediaDataWhenReadyOnQueue:usingBlock:")]
+    void RequestMediaDataWhenReadyOnQueueUsingBlock(dispatch_queue_t queue, AVQueuedSampleBufferRenderingRequestMediaDataWhenReadyOnQueueUsingBlockBlock block);
+    [Selector("stopRequestingMediaData")]
+    void StopRequestingMediaData();
 }
 
 #endif

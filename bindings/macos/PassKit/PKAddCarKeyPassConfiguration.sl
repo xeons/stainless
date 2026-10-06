@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class PKAddCarKeyPassConfiguration : PKAddSecureElementPassConfiguration
 {
-    [Selector("password", "setPassword:")] public NSString Password { get; set; }
-    [Selector("supportedRadioTechnologies", "setSupportedRadioTechnologies:")] public PKRadioTechnology SupportedRadioTechnologies { get; set; }
-    [Selector("manufacturerIdentifier", "setManufacturerIdentifier:")] public NSString ManufacturerIdentifier { get; set; }
-    [Selector("provisioningTemplateIdentifier", "setProvisioningTemplateIdentifier:")] public NSString? ProvisioningTemplateIdentifier { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("password", "setPassword:")]
+    public NSString Password { get; set; }
+    [Selector("supportedRadioTechnologies", "setSupportedRadioTechnologies:")]
+    public PKRadioTechnology SupportedRadioTechnologies { get; set; }
+    [Selector("manufacturerIdentifier", "setManufacturerIdentifier:")]
+    public NSString ManufacturerIdentifier { get; set; }
+    [Selector("provisioningTemplateIdentifier", "setProvisioningTemplateIdentifier:")]
+    public NSString? ProvisioningTemplateIdentifier { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

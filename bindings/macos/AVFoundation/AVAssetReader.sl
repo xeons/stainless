@@ -43,17 +43,28 @@ public enum AVAssetReaderStatus : long
 
 public extern objc class AVAssetReader : NSObject
 {
-    [Selector("asset")] public AVAsset Asset { get; }
-    [Selector("status")] public AVAssetReaderStatus Status { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("timeRange", "setTimeRange:")] public CMTimeRange TimeRange { get; set; }
-    [Selector("outputs")] public NSArray Outputs { get; }
-    [Selector("assetReaderWithAsset:error:")] public static Self? AssetReaderWithAssetError(AVAsset asset, out NSError? outError);
-    [Selector("initWithAsset:error:")] public Self? InitWithAssetError(AVAsset asset, out NSError? outError);
-    [Selector("canAddOutput:")] public bool CanAddOutput(AVAssetReaderOutput output);
-    [Selector("addOutput:")] public void AddOutput(AVAssetReaderOutput output);
-    [Selector("startReading")] public bool StartReading();
-    [Selector("cancelReading")] public void CancelReading();
+    [Selector("asset")]
+    public AVAsset Asset { get; }
+    [Selector("status")]
+    public AVAssetReaderStatus Status { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("timeRange", "setTimeRange:")]
+    public CMTimeRange TimeRange { get; set; }
+    [Selector("outputs")]
+    public NSArray Outputs { get; }
+    [Selector("assetReaderWithAsset:error:")]
+    public static Self? AssetReaderWithAssetError(AVAsset asset, out NSError? outError);
+    [Selector("initWithAsset:error:")]
+    public Self? InitWithAssetError(AVAsset asset, out NSError? outError);
+    [Selector("canAddOutput:")]
+    public bool CanAddOutput(AVAssetReaderOutput output);
+    [Selector("addOutput:")]
+    public void AddOutput(AVAssetReaderOutput output);
+    [Selector("startReading")]
+    public bool StartReading();
+    [Selector("cancelReading")]
+    public void CancelReading();
 }
 
 #endif

@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public objc interface GCAxisElement : GCPhysicalInputElement
 {
-    [Selector("absoluteInput")] GCAxisInput? AbsoluteInput { get; }
-    [Selector("relativeInput")] GCRelativeInput RelativeInput { get; }
+    [Selector("absoluteInput")]
+    GCAxisInput? AbsoluteInput { get; }
+    [Selector("relativeInput")]
+    GCRelativeInput RelativeInput { get; }
 }
 
 #endif

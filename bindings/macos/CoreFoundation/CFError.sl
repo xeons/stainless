@@ -62,20 +62,26 @@ public extern "C" CFStringRef? kCFErrorURLKey;
 
 public extern "C" CFStringRef? kCFErrorFilePathKey;
 
-[ReturnsRetained] public extern "C" CFErrorRef? CFErrorCreate(CFAllocatorRef? allocator, CFErrorDomain? domain, CFIndex code, CFDictionaryRef? userInfo);
+[ReturnsRetained]
+public extern "C" CFErrorRef? CFErrorCreate(CFAllocatorRef? allocator, CFErrorDomain? domain, CFIndex code, CFDictionaryRef? userInfo);
 
-[ReturnsRetained] public extern "C" CFErrorRef? CFErrorCreateWithUserInfoKeysAndValues(CFAllocatorRef? allocator, CFErrorDomain? domain, CFIndex code, void** userInfoKeys, void** userInfoValues, CFIndex numUserInfoValues);
+[ReturnsRetained]
+public extern "C" CFErrorRef? CFErrorCreateWithUserInfoKeysAndValues(CFAllocatorRef? allocator, CFErrorDomain? domain, CFIndex code, void** userInfoKeys, void** userInfoValues, CFIndex numUserInfoValues);
 
 public extern "C" CFErrorDomain? CFErrorGetDomain(CFErrorRef? err);
 
 public extern "C" CFIndex CFErrorGetCode(CFErrorRef? err);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CFErrorCopyUserInfo(CFErrorRef? err);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CFErrorCopyUserInfo(CFErrorRef? err);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFErrorCopyDescription(CFErrorRef? err);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFErrorCopyDescription(CFErrorRef? err);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFErrorCopyFailureReason(CFErrorRef? err);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFErrorCopyFailureReason(CFErrorRef? err);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFErrorCopyRecoverySuggestion(CFErrorRef? err);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFErrorCopyRecoverySuggestion(CFErrorRef? err);
 
 #endif

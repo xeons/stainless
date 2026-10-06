@@ -77,13 +77,17 @@ public extern objc class CFMutableDictionaryRef : CFDictionaryRef { }
 
 public extern "C" CFTypeID CFDictionaryGetTypeID();
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CFDictionaryCreate(CFAllocatorRef? allocator, void** keys, void** values, CFIndex numValues, CFDictionaryKeyCallBacks* keyCallBacks, CFDictionaryValueCallBacks* valueCallBacks);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CFDictionaryCreate(CFAllocatorRef? allocator, void** keys, void** values, CFIndex numValues, CFDictionaryKeyCallBacks* keyCallBacks, CFDictionaryValueCallBacks* valueCallBacks);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CFDictionaryCreateCopy(CFAllocatorRef? allocator, CFDictionaryRef? theDict);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CFDictionaryCreateCopy(CFAllocatorRef? allocator, CFDictionaryRef? theDict);
 
-[ReturnsRetained] public extern "C" CFMutableDictionaryRef? CFDictionaryCreateMutable(CFAllocatorRef? allocator, CFIndex capacity, CFDictionaryKeyCallBacks* keyCallBacks, CFDictionaryValueCallBacks* valueCallBacks);
+[ReturnsRetained]
+public extern "C" CFMutableDictionaryRef? CFDictionaryCreateMutable(CFAllocatorRef? allocator, CFIndex capacity, CFDictionaryKeyCallBacks* keyCallBacks, CFDictionaryValueCallBacks* valueCallBacks);
 
-[ReturnsRetained] public extern "C" CFMutableDictionaryRef? CFDictionaryCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFDictionaryRef? theDict);
+[ReturnsRetained]
+public extern "C" CFMutableDictionaryRef? CFDictionaryCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFDictionaryRef? theDict);
 
 public extern "C" CFIndex CFDictionaryGetCount(CFDictionaryRef? theDict);
 

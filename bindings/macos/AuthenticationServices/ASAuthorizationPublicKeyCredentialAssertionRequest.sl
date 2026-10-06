@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public objc interface ASAuthorizationPublicKeyCredentialAssertionRequest : NSObjectProtocol, NSSecureCoding, NSCopying
 {
-    [Selector("challenge", "setChallenge:")] NSData Challenge { get; set; }
-    [Selector("relyingPartyIdentifier", "setRelyingPartyIdentifier:")] NSString RelyingPartyIdentifier { get; set; }
-    [Selector("allowedCredentials", "setAllowedCredentials:")] NSArray AllowedCredentials { get; set; }
-    [Selector("userVerificationPreference", "setUserVerificationPreference:")] ASAuthorizationPublicKeyCredentialUserVerificationPreference UserVerificationPreference { get; set; }
+    [Selector("challenge", "setChallenge:")]
+    NSData Challenge { get; set; }
+    [Selector("relyingPartyIdentifier", "setRelyingPartyIdentifier:")]
+    NSString RelyingPartyIdentifier { get; set; }
+    [Selector("allowedCredentials", "setAllowedCredentials:")]
+    NSArray AllowedCredentials { get; set; }
+    [Selector("userVerificationPreference", "setUserVerificationPreference:")]
+    ASAuthorizationPublicKeyCredentialUserVerificationPreference UserVerificationPreference { get; set; }
 }
 
 #endif

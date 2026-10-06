@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class AMBundleAction : AMAction, NSCopying, NSSecureCoding
 {
-    [Selector("hasView")] public bool HasView { get; }
-    [Selector("view")] public NSView? View { get; }
-    [Selector("bundle")] public NSBundle Bundle { get; }
-    [Selector("parameters", "setParameters:")] public NSMutableDictionary? Parameters { get; set; }
-    [Selector("awakeFromBundle")] public void AwakeFromBundle();
+    [Selector("hasView")]
+    public bool HasView { get; }
+    [Selector("view")]
+    public NSView? View { get; }
+    [Selector("bundle")]
+    public NSBundle Bundle { get; }
+    [Selector("parameters", "setParameters:")]
+    public NSMutableDictionary? Parameters { get; set; }
+    [Selector("awakeFromBundle")]
+    public void AwakeFromBundle();
 }
 
 #endif

@@ -35,44 +35,65 @@ public using NSTouchBarCustomizationIdentifier = NSString;
 
 public extern objc class NSTouchBar : NSObject, NSCoding
 {
-    [Selector("customizationIdentifier", "setCustomizationIdentifier:")] public NSTouchBarCustomizationIdentifier? CustomizationIdentifier { get; set; }
-    [Selector("customizationAllowedItemIdentifiers", "setCustomizationAllowedItemIdentifiers:")] public NSArray CustomizationAllowedItemIdentifiers { get; set; }
-    [Selector("customizationRequiredItemIdentifiers", "setCustomizationRequiredItemIdentifiers:")] public NSArray CustomizationRequiredItemIdentifiers { get; set; }
-    [Selector("defaultItemIdentifiers", "setDefaultItemIdentifiers:")] public NSArray DefaultItemIdentifiers { get; set; }
-    [Selector("itemIdentifiers")] public NSArray ItemIdentifiers { get; }
-    [Selector("principalItemIdentifier", "setPrincipalItemIdentifier:")] public NSTouchBarItemIdentifier? PrincipalItemIdentifier { get; set; }
-    [Selector("escapeKeyReplacementItemIdentifier", "setEscapeKeyReplacementItemIdentifier:")] public NSTouchBarItemIdentifier? EscapeKeyReplacementItemIdentifier { get; set; }
-    [Selector("templateItems", "setTemplateItems:")] public NSSet TemplateItems { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSTouchBarDelegate? Delegate { get; set; }
-    [Selector("isVisible")] public bool Visible { get; }
-    [Selector("isAutomaticCustomizeTouchBarMenuItemEnabled", "setAutomaticCustomizeTouchBarMenuItemEnabled:")] public static bool AutomaticCustomizeTouchBarMenuItemEnabled { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("itemForIdentifier:")] public NSTouchBarItem? ItemForIdentifier(NSTouchBarItemIdentifier identifier);
+    [Selector("customizationIdentifier", "setCustomizationIdentifier:")]
+    public NSTouchBarCustomizationIdentifier? CustomizationIdentifier { get; set; }
+    [Selector("customizationAllowedItemIdentifiers", "setCustomizationAllowedItemIdentifiers:")]
+    public NSArray CustomizationAllowedItemIdentifiers { get; set; }
+    [Selector("customizationRequiredItemIdentifiers", "setCustomizationRequiredItemIdentifiers:")]
+    public NSArray CustomizationRequiredItemIdentifiers { get; set; }
+    [Selector("defaultItemIdentifiers", "setDefaultItemIdentifiers:")]
+    public NSArray DefaultItemIdentifiers { get; set; }
+    [Selector("itemIdentifiers")]
+    public NSArray ItemIdentifiers { get; }
+    [Selector("principalItemIdentifier", "setPrincipalItemIdentifier:")]
+    public NSTouchBarItemIdentifier? PrincipalItemIdentifier { get; set; }
+    [Selector("escapeKeyReplacementItemIdentifier", "setEscapeKeyReplacementItemIdentifier:")]
+    public NSTouchBarItemIdentifier? EscapeKeyReplacementItemIdentifier { get; set; }
+    [Selector("templateItems", "setTemplateItems:")]
+    public NSSet TemplateItems { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSTouchBarDelegate? Delegate { get; set; }
+    [Selector("isVisible")]
+    public bool Visible { get; }
+    [Selector("isAutomaticCustomizeTouchBarMenuItemEnabled", "setAutomaticCustomizeTouchBarMenuItemEnabled:")]
+    public static bool AutomaticCustomizeTouchBarMenuItemEnabled { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("itemForIdentifier:")]
+    public NSTouchBarItem? ItemForIdentifier(NSTouchBarItemIdentifier identifier);
 }
 
 public objc interface NSTouchBarDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("touchBar:makeItemForIdentifier:")] NSTouchBarItem? TouchBarMakeItemForIdentifier(NSTouchBar touchBar, NSTouchBarItemIdentifier identifier);
+    [Optional]
+    [Selector("touchBar:makeItemForIdentifier:")]
+    NSTouchBarItem? TouchBarMakeItemForIdentifier(NSTouchBar touchBar, NSTouchBarItemIdentifier identifier);
 }
 
 public objc interface NSTouchBarProvider : NSObjectProtocol
 {
-    [Selector("touchBar")] NSTouchBar? TouchBar { get; }
+    [Selector("touchBar")]
+    NSTouchBar? TouchBar { get; }
 }
 
 /// NSTouchBarProvider, a category of NSResponder.
 public extern objc class NSResponder : NSTouchBarProvider
 {
-    [Selector("touchBar", "setTouchBar:")] public NSTouchBar? TouchBar { get; set; }
-    [Selector("makeTouchBar")] public NSTouchBar? MakeTouchBar();
+    [Selector("touchBar", "setTouchBar:")]
+    public NSTouchBar? TouchBar { get; set; }
+    [Selector("makeTouchBar")]
+    public NSTouchBar? MakeTouchBar();
 }
 
 /// NSTouchBarCustomization, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("isAutomaticCustomizeTouchBarMenuItemEnabled", "setAutomaticCustomizeTouchBarMenuItemEnabled:")] public bool AutomaticCustomizeTouchBarMenuItemEnabled { get; set; }
-    [Selector("toggleTouchBarCustomizationPalette:")] public void ToggleTouchBarCustomizationPalette(AnyObject? sender);
+    [Selector("isAutomaticCustomizeTouchBarMenuItemEnabled", "setAutomaticCustomizeTouchBarMenuItemEnabled:")]
+    public bool AutomaticCustomizeTouchBarMenuItemEnabled { get; set; }
+    [Selector("toggleTouchBarCustomizationPalette:")]
+    public void ToggleTouchBarCustomizationPalette(AnyObject? sender);
 }
 
 #endif

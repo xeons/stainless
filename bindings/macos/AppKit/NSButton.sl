@@ -33,55 +33,96 @@ import Standard.ObjC;
 
 public extern objc class NSButton : NSControl, NSUserInterfaceValidations, NSAccessibilityButton, NSUserInterfaceCompression
 {
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("attributedTitle", "setAttributedTitle:")] public NSAttributedString AttributedTitle { get; set; }
-    [Selector("alternateTitle", "setAlternateTitle:")] public NSString AlternateTitle { get; set; }
-    [Selector("attributedAlternateTitle", "setAttributedAlternateTitle:")] public NSAttributedString AttributedAlternateTitle { get; set; }
-    [Selector("hasDestructiveAction", "setHasDestructiveAction:")] public bool HasDestructiveAction { get; set; }
-    [Selector("sound", "setSound:")] public NSSound? Sound { get; set; }
-    [Selector("isSpringLoaded", "setSpringLoaded:")] public bool SpringLoaded { get; set; }
-    [Selector("maxAcceleratorLevel", "setMaxAcceleratorLevel:")] public NSInteger MaxAcceleratorLevel { get; set; }
-    [Selector("bezelStyle", "setBezelStyle:")] public NSBezelStyle BezelStyle { get; set; }
-    [Selector("isBordered", "setBordered:")] public bool Bordered { get; set; }
-    [Selector("isTransparent", "setTransparent:")] public bool Transparent { get; set; }
-    [Selector("showsBorderOnlyWhileMouseInside", "setShowsBorderOnlyWhileMouseInside:")] public bool ShowsBorderOnlyWhileMouseInside { get; set; }
-    [Selector("bezelColor", "setBezelColor:")] public NSColor? BezelColor { get; set; }
-    [Selector("contentTintColor", "setContentTintColor:")] public NSColor? ContentTintColor { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("attributedTitle", "setAttributedTitle:")]
+    public NSAttributedString AttributedTitle { get; set; }
+    [Selector("alternateTitle", "setAlternateTitle:")]
+    public NSString AlternateTitle { get; set; }
+    [Selector("attributedAlternateTitle", "setAttributedAlternateTitle:")]
+    public NSAttributedString AttributedAlternateTitle { get; set; }
+    [Selector("hasDestructiveAction", "setHasDestructiveAction:")]
+    public bool HasDestructiveAction { get; set; }
+    [Selector("sound", "setSound:")]
+    public NSSound? Sound { get; set; }
+    [Selector("isSpringLoaded", "setSpringLoaded:")]
+    public bool SpringLoaded { get; set; }
+    [Selector("maxAcceleratorLevel", "setMaxAcceleratorLevel:")]
+    public NSInteger MaxAcceleratorLevel { get; set; }
+    [Selector("bezelStyle", "setBezelStyle:")]
+    public NSBezelStyle BezelStyle { get; set; }
+    [Selector("isBordered", "setBordered:")]
+    public bool Bordered { get; set; }
+    [Selector("isTransparent", "setTransparent:")]
+    public bool Transparent { get; set; }
+    [Selector("showsBorderOnlyWhileMouseInside", "setShowsBorderOnlyWhileMouseInside:")]
+    public bool ShowsBorderOnlyWhileMouseInside { get; set; }
+    [Selector("bezelColor", "setBezelColor:")]
+    public NSColor? BezelColor { get; set; }
+    [Selector("contentTintColor", "setContentTintColor:")]
+    public NSColor? ContentTintColor { get; set; }
     /// macOS 26.0 and later.
-    [Selector("tintProminence", "setTintProminence:")] public NSTintProminence TintProminence { get; set; }
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("alternateImage", "setAlternateImage:")] public NSImage? AlternateImage { get; set; }
-    [Selector("imagePosition", "setImagePosition:")] public NSCellImagePosition ImagePosition { get; set; }
-    [Selector("imageScaling", "setImageScaling:")] public NSImageScaling ImageScaling { get; set; }
-    [Selector("imageHugsTitle", "setImageHugsTitle:")] public bool ImageHugsTitle { get; set; }
-    [Selector("symbolConfiguration", "setSymbolConfiguration:")] public NSImageSymbolConfiguration? SymbolConfiguration { get; set; }
-    [Selector("state", "setState:")] public NSControlStateValue State { get; set; }
-    [Selector("allowsMixedState", "setAllowsMixedState:")] public bool AllowsMixedState { get; set; }
-    [Selector("keyEquivalent", "setKeyEquivalent:")] public NSString KeyEquivalent { get; set; }
-    [Selector("keyEquivalentModifierMask", "setKeyEquivalentModifierMask:")] public NSEventModifierFlags KeyEquivalentModifierMask { get; set; }
-    [Selector("activeCompressionOptions")] public NSUserInterfaceCompressionOptions? ActiveCompressionOptions { get; }
+    [Selector("tintProminence", "setTintProminence:")]
+    public NSTintProminence TintProminence { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("alternateImage", "setAlternateImage:")]
+    public NSImage? AlternateImage { get; set; }
+    [Selector("imagePosition", "setImagePosition:")]
+    public NSCellImagePosition ImagePosition { get; set; }
+    [Selector("imageScaling", "setImageScaling:")]
+    public NSImageScaling ImageScaling { get; set; }
+    [Selector("imageHugsTitle", "setImageHugsTitle:")]
+    public bool ImageHugsTitle { get; set; }
+    [Selector("symbolConfiguration", "setSymbolConfiguration:")]
+    public NSImageSymbolConfiguration? SymbolConfiguration { get; set; }
+    [Selector("state", "setState:")]
+    public NSControlStateValue State { get; set; }
+    [Selector("allowsMixedState", "setAllowsMixedState:")]
+    public bool AllowsMixedState { get; set; }
+    [Selector("keyEquivalent", "setKeyEquivalent:")]
+    public NSString KeyEquivalent { get; set; }
+    [Selector("keyEquivalentModifierMask", "setKeyEquivalentModifierMask:")]
+    public NSEventModifierFlags KeyEquivalentModifierMask { get; set; }
+    [Selector("activeCompressionOptions")]
+    public NSUserInterfaceCompressionOptions? ActiveCompressionOptions { get; }
     /// macOS 26.0 and later.
-    [Selector("borderShape", "setBorderShape:")] public NSControlBorderShape BorderShape { get; set; }
-    [Selector("buttonWithTitle:image:target:action:")] public static Self ButtonWithTitleImageTargetAction(NSString title, NSImage image, AnyObject? target, Selector action);
-    [Selector("buttonWithTitle:target:action:")] public static Self ButtonWithTitleTargetAction(NSString title, AnyObject? target, Selector action);
-    [Selector("buttonWithImage:target:action:")] public static Self ButtonWithImageTargetAction(NSImage image, AnyObject? target, Selector action);
-    [Selector("checkboxWithTitle:target:action:")] public static Self CheckboxWithTitleTargetAction(NSString title, AnyObject? target, Selector action);
-    [Selector("radioButtonWithTitle:target:action:")] public static Self RadioButtonWithTitleTargetAction(NSString title, AnyObject? target, Selector action);
-    [Selector("setButtonType:")] public void SetButtonType(NSButtonType type);
-    [Selector("setPeriodicDelay:interval:")] public void SetPeriodicDelayInterval(float delay, float interval);
-    [Selector("getPeriodicDelay:interval:")] public void GetPeriodicDelayInterval(float* delay, float* interval);
-    [Selector("setNextState")] public void SetNextState();
-    [Selector("highlight:")] public void Highlight(bool flag);
-    [Selector("performKeyEquivalent:")] public bool PerformKeyEquivalent(NSEvent key);
-    [Selector("compressWithPrioritizedCompressionOptions:")] public void CompressWithPrioritizedCompressionOptions(NSArray prioritizedOptions);
-    [Selector("minimumSizeWithPrioritizedCompressionOptions:")] public NSSize MinimumSizeWithPrioritizedCompressionOptions(NSArray prioritizedOptions);
+    [Selector("borderShape", "setBorderShape:")]
+    public NSControlBorderShape BorderShape { get; set; }
+    [Selector("buttonWithTitle:image:target:action:")]
+    public static Self ButtonWithTitleImageTargetAction(NSString title, NSImage image, AnyObject? target, Selector action);
+    [Selector("buttonWithTitle:target:action:")]
+    public static Self ButtonWithTitleTargetAction(NSString title, AnyObject? target, Selector action);
+    [Selector("buttonWithImage:target:action:")]
+    public static Self ButtonWithImageTargetAction(NSImage image, AnyObject? target, Selector action);
+    [Selector("checkboxWithTitle:target:action:")]
+    public static Self CheckboxWithTitleTargetAction(NSString title, AnyObject? target, Selector action);
+    [Selector("radioButtonWithTitle:target:action:")]
+    public static Self RadioButtonWithTitleTargetAction(NSString title, AnyObject? target, Selector action);
+    [Selector("setButtonType:")]
+    public void SetButtonType(NSButtonType type);
+    [Selector("setPeriodicDelay:interval:")]
+    public void SetPeriodicDelayInterval(float delay, float interval);
+    [Selector("getPeriodicDelay:interval:")]
+    public void GetPeriodicDelayInterval(float* delay, float* interval);
+    [Selector("setNextState")]
+    public void SetNextState();
+    [Selector("highlight:")]
+    public void Highlight(bool flag);
+    [Selector("performKeyEquivalent:")]
+    public bool PerformKeyEquivalent(NSEvent key);
+    [Selector("compressWithPrioritizedCompressionOptions:")]
+    public void CompressWithPrioritizedCompressionOptions(NSArray prioritizedOptions);
+    [Selector("minimumSizeWithPrioritizedCompressionOptions:")]
+    public NSSize MinimumSizeWithPrioritizedCompressionOptions(NSArray prioritizedOptions);
 }
 
 /// NSButtonDeprecated, a category of NSButton.
 public extern objc class NSButton
 {
     /// Deprecated in macOS 10.8.
-    [Selector("setTitleWithMnemonic:")] public void SetTitleWithMnemonic(NSString? stringWithAmpersand);
+    [Selector("setTitleWithMnemonic:")]
+    public void SetTitleWithMnemonic(NSString? stringWithAmpersand);
 }
 
 #endif

@@ -36,29 +36,41 @@ import Standard.ObjC;
 public extern objc class MLMediaGroup : NSObject
 {
     /// Deprecated in macOS 10.15.
-    [Selector("mediaLibrary")] public MLMediaLibrary? MediaLibrary { get; }
+    [Selector("mediaLibrary")]
+    public MLMediaLibrary? MediaLibrary { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("parent")] public MLMediaGroup? Parent { get; }
+    [Selector("parent")]
+    public MLMediaGroup? Parent { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("mediaSourceIdentifier")] public NSString MediaSourceIdentifier { get; }
+    [Selector("mediaSourceIdentifier")]
+    public NSString MediaSourceIdentifier { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("name")] public NSString? Name { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("identifier")] public NSString Identifier { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("typeIdentifier")] public NSString TypeIdentifier { get; }
+    [Selector("typeIdentifier")]
+    public NSString TypeIdentifier { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("attributes")] public NSDictionary Attributes { get; }
+    [Selector("attributes")]
+    public NSDictionary Attributes { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("childGroups")] public NSArray? ChildGroups { get; }
+    [Selector("childGroups")]
+    public NSArray? ChildGroups { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("URL")] public NSURL? URL { get; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("modificationDate")] public NSDate? ModificationDate { get; }
+    [Selector("modificationDate")]
+    public NSDate? ModificationDate { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("iconImage")] public NSImage? IconImage { get; }
+    [Selector("iconImage")]
+    public NSImage? IconImage { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("mediaObjects")] public NSArray? MediaObjects { get; }
+    [Selector("mediaObjects")]
+    public NSArray? MediaObjects { get; }
 }
 
 #endif

@@ -48,8 +48,10 @@ public enum AVAudioUnitReverbPreset : long
 
 public extern objc class AVAudioUnitReverb : AVAudioUnitEffect
 {
-    [Selector("wetDryMix", "setWetDryMix:")] public float WetDryMix { get; set; }
-    [Selector("loadFactoryPreset:")] public void LoadFactoryPreset(AVAudioUnitReverbPreset preset);
+    [Selector("wetDryMix", "setWetDryMix:")]
+    public float WetDryMix { get; set; }
+    [Selector("loadFactoryPreset:")]
+    public void LoadFactoryPreset(AVAudioUnitReverbPreset preset);
 }
 
 #endif

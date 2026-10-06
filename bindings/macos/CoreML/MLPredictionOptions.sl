@@ -34,8 +34,10 @@ import Standard.ObjC;
 public extern objc class MLPredictionOptions : NSObject
 {
     /// Deprecated in macOS 12.0.
-    [Selector("usesCPUOnly", "setUsesCPUOnly:")] public bool UsesCPUOnly { get; set; }
-    [Selector("outputBackings", "setOutputBackings:")] public NSDictionary OutputBackings { get; set; }
+    [Selector("usesCPUOnly", "setUsesCPUOnly:")]
+    public bool UsesCPUOnly { get; set; }
+    [Selector("outputBackings", "setOutputBackings:")]
+    public NSDictionary OutputBackings { get; set; }
 }
 
 #endif

@@ -38,31 +38,50 @@ public objc closure void MKMapItemOpenMapsWithItemsLaunchOptionsCompletionHandle
 
 public extern objc class MKMapItem : NSObject
 {
-    [Selector("identifier")] public MKMapItemIdentifier? Identifier { get; }
-    [Selector("alternateIdentifiers")] public NSSet AlternateIdentifiers { get; }
+    [Selector("identifier")]
+    public MKMapItemIdentifier? Identifier { get; }
+    [Selector("alternateIdentifiers")]
+    public NSSet AlternateIdentifiers { get; }
     /// Deprecated in macOS 26.0.
-    [Selector("placemark")] public MKPlacemark Placemark { get; }
-    [Selector("isCurrentLocation")] public bool IsCurrentLocation { get; }
+    [Selector("placemark")]
+    public MKPlacemark Placemark { get; }
+    [Selector("isCurrentLocation")]
+    public bool IsCurrentLocation { get; }
     /// macOS 26.0 and later.
-    [Selector("location")] public CLLocation Location { get; }
+    [Selector("location")]
+    public CLLocation Location { get; }
     /// macOS 26.0 and later.
-    [Selector("address")] public MKAddress? Address { get; }
+    [Selector("address")]
+    public MKAddress? Address { get; }
     /// macOS 26.0 and later.
-    [Selector("addressRepresentations")] public MKAddressRepresentations? AddressRepresentations { get; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("phoneNumber", "setPhoneNumber:")] public NSString? PhoneNumber { get; set; }
-    [Selector("url", "setUrl:")] public NSURL? Url { get; set; }
-    [Selector("timeZone", "setTimeZone:")] public NSTimeZone? TimeZone { get; set; }
-    [Selector("pointOfInterestCategory", "setPointOfInterestCategory:")] public MKPointOfInterestCategory? PointOfInterestCategory { get; set; }
-    [Selector("mapItemForCurrentLocation")] public static MKMapItem MapItemForCurrentLocation();
+    [Selector("addressRepresentations")]
+    public MKAddressRepresentations? AddressRepresentations { get; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("phoneNumber", "setPhoneNumber:")]
+    public NSString? PhoneNumber { get; set; }
+    [Selector("url", "setUrl:")]
+    public NSURL? Url { get; set; }
+    [Selector("timeZone", "setTimeZone:")]
+    public NSTimeZone? TimeZone { get; set; }
+    [Selector("pointOfInterestCategory", "setPointOfInterestCategory:")]
+    public MKPointOfInterestCategory? PointOfInterestCategory { get; set; }
+    [Selector("mapItemForCurrentLocation")]
+    public static MKMapItem MapItemForCurrentLocation();
     /// Deprecated in macOS 26.0.
-    [Selector("initWithPlacemark:")] public Self InitWithPlacemark(MKPlacemark placemark);
+    [Selector("initWithPlacemark:")]
+    public Self InitWithPlacemark(MKPlacemark placemark);
     /// macOS 26.0 and later.
-    [Selector("initWithLocation:address:")] public Self InitWithLocationAddress(CLLocation location, MKAddress? address);
-    [Selector("openInMapsWithLaunchOptions:")] public bool OpenInMapsWithLaunchOptions(NSDictionary? launchOptions);
-    [Selector("openMapsWithItems:launchOptions:")] public static bool OpenMapsWithItemsLaunchOptions(NSArray mapItems, NSDictionary? launchOptions);
-    [Selector("openInMapsWithLaunchOptions:completionHandler:")] public void OpenInMapsWithLaunchOptionsCompletionHandler(NSDictionary? launchOptions, MKMapItemOpenInMapsWithLaunchOptionsCompletionHandlerCompletionBlock? completion);
-    [Selector("openMapsWithItems:launchOptions:completionHandler:")] public static void OpenMapsWithItemsLaunchOptionsCompletionHandler(NSArray mapItems, NSDictionary? launchOptions, MKMapItemOpenMapsWithItemsLaunchOptionsCompletionHandlerCompletionBlock? completion);
+    [Selector("initWithLocation:address:")]
+    public Self InitWithLocationAddress(CLLocation location, MKAddress? address);
+    [Selector("openInMapsWithLaunchOptions:")]
+    public bool OpenInMapsWithLaunchOptions(NSDictionary? launchOptions);
+    [Selector("openMapsWithItems:launchOptions:")]
+    public static bool OpenMapsWithItemsLaunchOptions(NSArray mapItems, NSDictionary? launchOptions);
+    [Selector("openInMapsWithLaunchOptions:completionHandler:")]
+    public void OpenInMapsWithLaunchOptionsCompletionHandler(NSDictionary? launchOptions, MKMapItemOpenInMapsWithLaunchOptionsCompletionHandlerCompletionBlock? completion);
+    [Selector("openMapsWithItems:launchOptions:completionHandler:")]
+    public static void OpenMapsWithItemsLaunchOptionsCompletionHandler(NSArray mapItems, NSDictionary? launchOptions, MKMapItemOpenMapsWithItemsLaunchOptionsCompletionHandlerCompletionBlock? completion);
 }
 
 public extern "C" NSString? MKLaunchOptionsDirectionsModeKey;

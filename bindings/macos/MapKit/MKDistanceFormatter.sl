@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class MKDistanceFormatter : NSFormatter
 {
-    [Selector("locale", "setLocale:")] public NSLocale? Locale { get; set; }
-    [Selector("units", "setUnits:")] public MKDistanceFormatterUnits Units { get; set; }
-    [Selector("unitStyle", "setUnitStyle:")] public MKDistanceFormatterUnitStyle UnitStyle { get; set; }
-    [Selector("stringFromDistance:")] public NSString StringFromDistance(CLLocationDistance distance);
-    [Selector("distanceFromString:")] public CLLocationDistance DistanceFromString(NSString distance);
+    [Selector("locale", "setLocale:")]
+    public NSLocale? Locale { get; set; }
+    [Selector("units", "setUnits:")]
+    public MKDistanceFormatterUnits Units { get; set; }
+    [Selector("unitStyle", "setUnitStyle:")]
+    public MKDistanceFormatterUnitStyle UnitStyle { get; set; }
+    [Selector("stringFromDistance:")]
+    public NSString StringFromDistance(CLLocationDistance distance);
+    [Selector("distanceFromString:")]
+    public CLLocationDistance DistanceFromString(NSString distance);
 }
 
 public enum MKDistanceFormatterUnits : ulong

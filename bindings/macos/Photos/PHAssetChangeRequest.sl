@@ -35,18 +35,30 @@ import Standard.ObjC;
 
 public extern objc class PHAssetChangeRequest : PHChangeRequest
 {
-    [Selector("placeholderForCreatedAsset")] public PHObjectPlaceholder? PlaceholderForCreatedAsset { get; }
-    [Selector("creationDate", "setCreationDate:")] public NSDate? CreationDate { get; set; }
-    [Selector("location", "setLocation:")] public CLLocation? Location { get; set; }
-    [Selector("isFavorite", "setFavorite:")] public bool Favorite { get; set; }
-    [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
-    [Selector("contentEditingOutput", "setContentEditingOutput:")] public PHContentEditingOutput? ContentEditingOutput { get; set; }
-    [Selector("creationRequestForAssetFromImage:")] public static Self CreationRequestForAssetFromImage(NSImage image);
-    [Selector("creationRequestForAssetFromImageAtFileURL:")] public static Self? CreationRequestForAssetFromImageAtFileURL(NSURL fileURL);
-    [Selector("creationRequestForAssetFromVideoAtFileURL:")] public static Self? CreationRequestForAssetFromVideoAtFileURL(NSURL fileURL);
-    [Selector("deleteAssets:")] public static void DeleteAssets(NSFastEnumeration assets);
-    [Selector("changeRequestForAsset:")] public static Self ChangeRequestForAsset(PHAsset asset);
-    [Selector("revertAssetContentToOriginal")] public void RevertAssetContentToOriginal();
+    [Selector("placeholderForCreatedAsset")]
+    public PHObjectPlaceholder? PlaceholderForCreatedAsset { get; }
+    [Selector("creationDate", "setCreationDate:")]
+    public NSDate? CreationDate { get; set; }
+    [Selector("location", "setLocation:")]
+    public CLLocation? Location { get; set; }
+    [Selector("isFavorite", "setFavorite:")]
+    public bool Favorite { get; set; }
+    [Selector("isHidden", "setHidden:")]
+    public bool Hidden { get; set; }
+    [Selector("contentEditingOutput", "setContentEditingOutput:")]
+    public PHContentEditingOutput? ContentEditingOutput { get; set; }
+    [Selector("creationRequestForAssetFromImage:")]
+    public static Self CreationRequestForAssetFromImage(NSImage image);
+    [Selector("creationRequestForAssetFromImageAtFileURL:")]
+    public static Self? CreationRequestForAssetFromImageAtFileURL(NSURL fileURL);
+    [Selector("creationRequestForAssetFromVideoAtFileURL:")]
+    public static Self? CreationRequestForAssetFromVideoAtFileURL(NSURL fileURL);
+    [Selector("deleteAssets:")]
+    public static void DeleteAssets(NSFastEnumeration assets);
+    [Selector("changeRequestForAsset:")]
+    public static Self ChangeRequestForAsset(PHAsset asset);
+    [Selector("revertAssetContentToOriginal")]
+    public void RevertAssetContentToOriginal();
 }
 
 public using PHContentEditingInputRequestID = NSUInteger;
@@ -57,9 +69,12 @@ public objc closure void PHContentEditingInputRequestOptionsProgressHandlerBlock
 
 public extern objc class PHContentEditingInputRequestOptions : NSObject
 {
-    [Selector("canHandleAdjustmentData", "setCanHandleAdjustmentData:")] public PHContentEditingInputRequestOptionsCanHandleAdjustmentDataBlock CanHandleAdjustmentData { get; set; }
-    [Selector("isNetworkAccessAllowed", "setNetworkAccessAllowed:")] public bool NetworkAccessAllowed { get; set; }
-    [Selector("progressHandler", "setProgressHandler:")] public PHContentEditingInputRequestOptionsProgressHandlerBlock? ProgressHandler { get; set; }
+    [Selector("canHandleAdjustmentData", "setCanHandleAdjustmentData:")]
+    public PHContentEditingInputRequestOptionsCanHandleAdjustmentDataBlock CanHandleAdjustmentData { get; set; }
+    [Selector("isNetworkAccessAllowed", "setNetworkAccessAllowed:")]
+    public bool NetworkAccessAllowed { get; set; }
+    [Selector("progressHandler", "setProgressHandler:")]
+    public PHContentEditingInputRequestOptionsProgressHandlerBlock? ProgressHandler { get; set; }
 }
 
 public objc closure void PHAssetRequestContentEditingInputWithOptionsCompletionHandlerCompletionHandlerBlock(PHContentEditingInput? arg0, NSDictionary arg1);
@@ -67,8 +82,10 @@ public objc closure void PHAssetRequestContentEditingInputWithOptionsCompletionH
 /// PHContentEditingInput, a category of PHAsset.
 public extern objc class PHAsset
 {
-    [Selector("requestContentEditingInputWithOptions:completionHandler:")] public PHContentEditingInputRequestID RequestContentEditingInputWithOptionsCompletionHandler(PHContentEditingInputRequestOptions? options, PHAssetRequestContentEditingInputWithOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("cancelContentEditingInputRequest:")] public void CancelContentEditingInputRequest(PHContentEditingInputRequestID requestID);
+    [Selector("requestContentEditingInputWithOptions:completionHandler:")]
+    public PHContentEditingInputRequestID RequestContentEditingInputWithOptionsCompletionHandler(PHContentEditingInputRequestOptions? options, PHAssetRequestContentEditingInputWithOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("cancelContentEditingInputRequest:")]
+    public void CancelContentEditingInputRequest(PHContentEditingInputRequestID requestID);
 }
 
 public extern "C" NSString PHContentEditingInputResultIsInCloudKey;
@@ -80,7 +97,8 @@ public extern "C" NSString PHContentEditingInputErrorKey;
 /// PHAssetChangeRequest, a category of PHContentEditingOutput.
 public extern objc class PHContentEditingOutput
 {
-    [Selector("initWithPlaceholderForCreatedAsset:")] public Self InitWithPlaceholderForCreatedAsset(PHObjectPlaceholder placeholderForCreatedAsset);
+    [Selector("initWithPlaceholderForCreatedAsset:")]
+    public Self InitWithPlaceholderForCreatedAsset(PHObjectPlaceholder placeholderForCreatedAsset);
 }
 
 #endif

@@ -40,20 +40,34 @@ public enum NSTabState : ulong
 
 public extern objc class NSTabViewItem : NSObject, NSCoding
 {
-    [Selector("identifier", "setIdentifier:")] public AnyObject? Identifier { get; set; }
-    [Selector("color", "setColor:")] public NSColor Color { get; set; }
-    [Selector("label", "setLabel:")] public NSString Label { get; set; }
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("view", "setView:")] public NSView? View { get; set; }
-    [Selector("viewController", "setViewController:")] public NSViewController? ViewController { get; set; }
-    [Selector("tabState")] public NSTabState TabState { get; }
-    [Selector("tabView")] public NSTabView? TabView { get; }
-    [Selector("initialFirstResponder", "setInitialFirstResponder:")] public NSView? InitialFirstResponder { get; set; }
-    [Selector("toolTip", "setToolTip:")] public NSString? ToolTip { get; set; }
-    [Selector("tabViewItemWithViewController:")] public static Self TabViewItemWithViewController(NSViewController viewController);
-    [Selector("initWithIdentifier:")] public Self InitWithIdentifier(AnyObject? identifier);
-    [Selector("drawLabel:inRect:")] public void DrawLabelInRect(bool shouldTruncateLabel, NSRect labelRect);
-    [Selector("sizeOfLabel:")] public NSSize SizeOfLabel(bool computeMin);
+    [Selector("identifier", "setIdentifier:")]
+    public AnyObject? Identifier { get; set; }
+    [Selector("color", "setColor:")]
+    public NSColor Color { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString Label { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("view", "setView:")]
+    public NSView? View { get; set; }
+    [Selector("viewController", "setViewController:")]
+    public NSViewController? ViewController { get; set; }
+    [Selector("tabState")]
+    public NSTabState TabState { get; }
+    [Selector("tabView")]
+    public NSTabView? TabView { get; }
+    [Selector("initialFirstResponder", "setInitialFirstResponder:")]
+    public NSView? InitialFirstResponder { get; set; }
+    [Selector("toolTip", "setToolTip:")]
+    public NSString? ToolTip { get; set; }
+    [Selector("tabViewItemWithViewController:")]
+    public static Self TabViewItemWithViewController(NSViewController viewController);
+    [Selector("initWithIdentifier:")]
+    public Self InitWithIdentifier(AnyObject? identifier);
+    [Selector("drawLabel:inRect:")]
+    public void DrawLabelInRect(bool shouldTruncateLabel, NSRect labelRect);
+    [Selector("sizeOfLabel:")]
+    public NSSize SizeOfLabel(bool computeMin);
 }
 
 #endif

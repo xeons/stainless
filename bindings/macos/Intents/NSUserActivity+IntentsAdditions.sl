@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// IntentsAdditions, a category of NSUserActivity.
 public extern objc class NSUserActivity
 {
-    [Selector("interaction")] public INInteraction? Interaction { get; }
-    [Selector("suggestedInvocationPhrase", "setSuggestedInvocationPhrase:")] public NSString? SuggestedInvocationPhrase { get; set; }
+    [Selector("interaction")]
+    public INInteraction? Interaction { get; }
+    [Selector("suggestedInvocationPhrase", "setSuggestedInvocationPhrase:")]
+    public NSString? SuggestedInvocationPhrase { get; set; }
 }
 
 #endif

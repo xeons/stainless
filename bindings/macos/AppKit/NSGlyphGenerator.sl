@@ -37,16 +37,22 @@ public const int NSWantsBidiLevels = 4;
 
 public objc interface NSGlyphStorage
 {
-    [Selector("insertGlyphs:length:forStartingGlyphAtIndex:characterIndex:")] void InsertGlyphsLengthForStartingGlyphAtIndexCharacterIndex(NSGlyph* glyphs, NSUInteger length, NSUInteger glyphIndex, NSUInteger charIndex);
-    [Selector("setIntAttribute:value:forGlyphAtIndex:")] void SetIntAttributeValueForGlyphAtIndex(NSInteger attributeTag, NSInteger val, NSUInteger glyphIndex);
-    [Selector("attributedString")] NSAttributedString AttributedString();
-    [Selector("layoutOptions")] NSUInteger LayoutOptions();
+    [Selector("insertGlyphs:length:forStartingGlyphAtIndex:characterIndex:")]
+    void InsertGlyphsLengthForStartingGlyphAtIndexCharacterIndex(NSGlyph* glyphs, NSUInteger length, NSUInteger glyphIndex, NSUInteger charIndex);
+    [Selector("setIntAttribute:value:forGlyphAtIndex:")]
+    void SetIntAttributeValueForGlyphAtIndex(NSInteger attributeTag, NSInteger val, NSUInteger glyphIndex);
+    [Selector("attributedString")]
+    NSAttributedString AttributedString();
+    [Selector("layoutOptions")]
+    NSUInteger LayoutOptions();
 }
 
 public extern objc class NSGlyphGenerator : NSObject
 {
-    [Selector("sharedGlyphGenerator")] public static NSGlyphGenerator SharedGlyphGenerator { get; }
-    [Selector("generateGlyphsForGlyphStorage:desiredNumberOfCharacters:glyphIndex:characterIndex:")] public void GenerateGlyphsForGlyphStorageDesiredNumberOfCharactersGlyphIndexCharacterIndex(NSGlyphStorage glyphStorage, NSUInteger nChars, NSUInteger* glyphIndex, NSUInteger* charIndex);
+    [Selector("sharedGlyphGenerator")]
+    public static NSGlyphGenerator SharedGlyphGenerator { get; }
+    [Selector("generateGlyphsForGlyphStorage:desiredNumberOfCharacters:glyphIndex:characterIndex:")]
+    public void GenerateGlyphsForGlyphStorageDesiredNumberOfCharactersGlyphIndexCharacterIndex(NSGlyphStorage glyphStorage, NSUInteger nChars, NSUInteger* glyphIndex, NSUInteger* charIndex);
 }
 
 #endif

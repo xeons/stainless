@@ -34,19 +34,31 @@ import Standard.ObjC;
 
 public extern objc class PKStrokePoint : NSObject, NSCopying
 {
-    [Selector("location")] public CGPoint Location { get; }
-    [Selector("timeOffset")] public NSTimeInterval TimeOffset { get; }
-    [Selector("size")] public CGSize Size { get; }
-    [Selector("opacity")] public CGFloat Opacity { get; }
-    [Selector("azimuth")] public CGFloat Azimuth { get; }
-    [Selector("force")] public CGFloat Force { get; }
-    [Selector("altitude")] public CGFloat Altitude { get; }
-    [Selector("secondaryScale")] public CGFloat SecondaryScale { get; }
+    [Selector("location")]
+    public CGPoint Location { get; }
+    [Selector("timeOffset")]
+    public NSTimeInterval TimeOffset { get; }
+    [Selector("size")]
+    public CGSize Size { get; }
+    [Selector("opacity")]
+    public CGFloat Opacity { get; }
+    [Selector("azimuth")]
+    public CGFloat Azimuth { get; }
+    [Selector("force")]
+    public CGFloat Force { get; }
+    [Selector("altitude")]
+    public CGFloat Altitude { get; }
+    [Selector("secondaryScale")]
+    public CGFloat SecondaryScale { get; }
     /// macOS 26.0 and later.
-    [Selector("threshold")] public CGFloat Threshold { get; }
-    [Selector("initWithLocation:timeOffset:size:opacity:force:azimuth:altitude:")] public Self InitWithLocationTimeOffsetSizeOpacityForceAzimuthAltitude(CGPoint location, NSTimeInterval timeOffset, CGSize size, CGFloat opacity, CGFloat force, CGFloat azimuth, CGFloat altitude);
-    [Selector("initWithLocation:timeOffset:size:opacity:force:azimuth:altitude:secondaryScale:")] public Self InitWithLocationTimeOffsetSizeOpacityForceAzimuthAltitudeSecondaryScale(CGPoint location, NSTimeInterval timeOffset, CGSize size, CGFloat opacity, CGFloat force, CGFloat azimuth, CGFloat altitude, CGFloat secondaryScale);
-    [Selector("initWithLocation:timeOffset:size:opacity:force:azimuth:altitude:secondaryScale:threshold:")] public Self InitWithLocationTimeOffsetSizeOpacityForceAzimuthAltitudeSecondaryScaleThreshold(CGPoint location, NSTimeInterval timeOffset, CGSize size, CGFloat opacity, CGFloat force, CGFloat azimuth, CGFloat altitude, CGFloat secondaryScale, CGFloat threshold);
+    [Selector("threshold")]
+    public CGFloat Threshold { get; }
+    [Selector("initWithLocation:timeOffset:size:opacity:force:azimuth:altitude:")]
+    public Self InitWithLocationTimeOffsetSizeOpacityForceAzimuthAltitude(CGPoint location, NSTimeInterval timeOffset, CGSize size, CGFloat opacity, CGFloat force, CGFloat azimuth, CGFloat altitude);
+    [Selector("initWithLocation:timeOffset:size:opacity:force:azimuth:altitude:secondaryScale:")]
+    public Self InitWithLocationTimeOffsetSizeOpacityForceAzimuthAltitudeSecondaryScale(CGPoint location, NSTimeInterval timeOffset, CGSize size, CGFloat opacity, CGFloat force, CGFloat azimuth, CGFloat altitude, CGFloat secondaryScale);
+    [Selector("initWithLocation:timeOffset:size:opacity:force:azimuth:altitude:secondaryScale:threshold:")]
+    public Self InitWithLocationTimeOffsetSizeOpacityForceAzimuthAltitudeSecondaryScaleThreshold(CGPoint location, NSTimeInterval timeOffset, CGSize size, CGFloat opacity, CGFloat force, CGFloat azimuth, CGFloat altitude, CGFloat secondaryScale, CGFloat threshold);
 }
 
 #endif

@@ -38,14 +38,18 @@ public objc closure void AVCaptureDeskViewApplicationPresentWithLaunchConfigurat
 
 public extern objc class AVCaptureDeskViewApplication : NSObject
 {
-    [Selector("presentWithCompletionHandler:")] public void PresentWithCompletionHandler(AVCaptureDeskViewApplicationPresentWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("presentWithLaunchConfiguration:completionHandler:")] public void PresentWithLaunchConfigurationCompletionHandler(AVCaptureDeskViewApplicationLaunchConfiguration launchConfiguration, AVCaptureDeskViewApplicationPresentWithLaunchConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("presentWithCompletionHandler:")]
+    public void PresentWithCompletionHandler(AVCaptureDeskViewApplicationPresentWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("presentWithLaunchConfiguration:completionHandler:")]
+    public void PresentWithLaunchConfigurationCompletionHandler(AVCaptureDeskViewApplicationLaunchConfiguration launchConfiguration, AVCaptureDeskViewApplicationPresentWithLaunchConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public extern objc class AVCaptureDeskViewApplicationLaunchConfiguration : NSObject
 {
-    [Selector("mainWindowFrame", "setMainWindowFrame:")] public CGRect MainWindowFrame { get; set; }
-    [Selector("requiresSetUpModeCompletion", "setRequiresSetUpModeCompletion:")] public bool RequiresSetUpModeCompletion { get; set; }
+    [Selector("mainWindowFrame", "setMainWindowFrame:")]
+    public CGRect MainWindowFrame { get; set; }
+    [Selector("requiresSetUpModeCompletion", "setRequiresSetUpModeCompletion:")]
+    public bool RequiresSetUpModeCompletion { get; set; }
 }
 
 #endif

@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class LAAuthenticationView : NSView
 {
-    [Selector("context")] public LAContext? Context { get; }
-    [Selector("controlSize")] public NSControlSize ControlSize { get; }
-    [Selector("initWithContext:")] public Self InitWithContext(LAContext context);
-    [Selector("initWithContext:controlSize:")] public Self InitWithContextControlSize(LAContext context, NSControlSize controlSize);
+    [Selector("context")]
+    public LAContext? Context { get; }
+    [Selector("controlSize")]
+    public NSControlSize ControlSize { get; }
+    [Selector("initWithContext:")]
+    public Self InitWithContext(LAContext context);
+    [Selector("initWithContext:controlSize:")]
+    public Self InitWithContextControlSize(LAContext context, NSControlSize controlSize);
 }
 
 #endif

@@ -33,13 +33,15 @@ import Standard.ObjC;
 
 public extern objc class MTRClusterStateCacheContainer : NSObject
 {
-    [Selector("readAttributesWithEndpointID:clusterID:attributeID:queue:completion:")] public void ReadAttributesWithEndpointIDClusterIDAttributeIDQueueCompletion(NSNumber? endpointID, NSNumber? clusterID, NSNumber? attributeID, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
+    [Selector("readAttributesWithEndpointID:clusterID:attributeID:queue:completion:")]
+    public void ReadAttributesWithEndpointIDClusterIDAttributeIDQueueCompletion(NSNumber? endpointID, NSNumber? clusterID, NSNumber? attributeID, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
 }
 
 /// Deprecated in macOS 13.3.
 public extern objc class MTRAttributeCacheContainer : NSObject
 {
-    [Selector("readAttributeWithEndpointId:clusterId:attributeId:clientQueue:completion:")] public void ReadAttributeWithEndpointIdClusterIdAttributeIdClientQueueCompletion(NSNumber? endpointId, NSNumber? clusterId, NSNumber? attributeId, dispatch_queue_t clientQueue, MTRDeviceResponseHandler completion);
+    [Selector("readAttributeWithEndpointId:clusterId:attributeId:clientQueue:completion:")]
+    public void ReadAttributeWithEndpointIdClusterIdAttributeIdClientQueueCompletion(NSNumber? endpointId, NSNumber? clusterId, NSNumber? attributeId, dispatch_queue_t clientQueue, MTRDeviceResponseHandler completion);
 }
 
 #endif

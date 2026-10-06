@@ -43,47 +43,90 @@ public enum NSSplitViewDividerStyle : long
 
 public extern objc class NSSplitView : NSView
 {
-    [Selector("isVertical", "setVertical:")] public bool Vertical { get; set; }
-    [Selector("dividerStyle", "setDividerStyle:")] public NSSplitViewDividerStyle DividerStyle { get; set; }
-    [Selector("autosaveName", "setAutosaveName:")] public NSSplitViewAutosaveName? AutosaveName { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSSplitViewDelegate? Delegate { get; set; }
-    [Selector("dividerColor")] public NSColor? DividerColor { get; }
-    [Selector("dividerThickness")] public CGFloat DividerThickness { get; }
-    [Selector("drawDividerInRect:")] public void DrawDividerInRect(NSRect rect);
-    [Selector("adjustSubviews")] public void AdjustSubviews();
-    [Selector("isSubviewCollapsed:")] public bool IsSubviewCollapsed(NSView subview);
-    [Selector("minPossiblePositionOfDividerAtIndex:")] public CGFloat MinPossiblePositionOfDividerAtIndex(NSInteger dividerIndex);
-    [Selector("maxPossiblePositionOfDividerAtIndex:")] public CGFloat MaxPossiblePositionOfDividerAtIndex(NSInteger dividerIndex);
-    [Selector("setPosition:ofDividerAtIndex:")] public void SetPositionOfDividerAtIndex(CGFloat position, NSInteger dividerIndex);
-    [Selector("holdingPriorityForSubviewAtIndex:")] public NSLayoutPriority HoldingPriorityForSubviewAtIndex(NSInteger subviewIndex);
-    [Selector("setHoldingPriority:forSubviewAtIndex:")] public void SetHoldingPriorityForSubviewAtIndex(NSLayoutPriority priority, NSInteger subviewIndex);
+    [Selector("isVertical", "setVertical:")]
+    public bool Vertical { get; set; }
+    [Selector("dividerStyle", "setDividerStyle:")]
+    public NSSplitViewDividerStyle DividerStyle { get; set; }
+    [Selector("autosaveName", "setAutosaveName:")]
+    public NSSplitViewAutosaveName? AutosaveName { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSSplitViewDelegate? Delegate { get; set; }
+    [Selector("dividerColor")]
+    public NSColor? DividerColor { get; }
+    [Selector("dividerThickness")]
+    public CGFloat DividerThickness { get; }
+    [Selector("drawDividerInRect:")]
+    public void DrawDividerInRect(NSRect rect);
+    [Selector("adjustSubviews")]
+    public void AdjustSubviews();
+    [Selector("isSubviewCollapsed:")]
+    public bool IsSubviewCollapsed(NSView subview);
+    [Selector("minPossiblePositionOfDividerAtIndex:")]
+    public CGFloat MinPossiblePositionOfDividerAtIndex(NSInteger dividerIndex);
+    [Selector("maxPossiblePositionOfDividerAtIndex:")]
+    public CGFloat MaxPossiblePositionOfDividerAtIndex(NSInteger dividerIndex);
+    [Selector("setPosition:ofDividerAtIndex:")]
+    public void SetPositionOfDividerAtIndex(CGFloat position, NSInteger dividerIndex);
+    [Selector("holdingPriorityForSubviewAtIndex:")]
+    public NSLayoutPriority HoldingPriorityForSubviewAtIndex(NSInteger subviewIndex);
+    [Selector("setHoldingPriority:forSubviewAtIndex:")]
+    public void SetHoldingPriorityForSubviewAtIndex(NSLayoutPriority priority, NSInteger subviewIndex);
 }
 
 /// NSSplitViewArrangedSubviews, a category of NSSplitView.
 public extern objc class NSSplitView
 {
-    [Selector("arrangesAllSubviews", "setArrangesAllSubviews:")] public bool ArrangesAllSubviews { get; set; }
-    [Selector("arrangedSubviews")] public NSArray? ArrangedSubviews { get; }
-    [Selector("addArrangedSubview:")] public void AddArrangedSubview(NSView view);
-    [Selector("insertArrangedSubview:atIndex:")] public void InsertArrangedSubviewAtIndex(NSView view, NSInteger index);
-    [Selector("removeArrangedSubview:")] public void RemoveArrangedSubview(NSView view);
+    [Selector("arrangesAllSubviews", "setArrangesAllSubviews:")]
+    public bool ArrangesAllSubviews { get; set; }
+    [Selector("arrangedSubviews")]
+    public NSArray? ArrangedSubviews { get; }
+    [Selector("addArrangedSubview:")]
+    public void AddArrangedSubview(NSView view);
+    [Selector("insertArrangedSubview:atIndex:")]
+    public void InsertArrangedSubviewAtIndex(NSView view, NSInteger index);
+    [Selector("removeArrangedSubview:")]
+    public void RemoveArrangedSubview(NSView view);
 }
 
 public objc interface NSSplitViewDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("splitView:canCollapseSubview:")] bool SplitViewCanCollapseSubview(NSSplitView splitView, NSView subview);
+    [Optional]
+    [Selector("splitView:canCollapseSubview:")]
+    bool SplitViewCanCollapseSubview(NSSplitView splitView, NSView subview);
     /// Deprecated in macOS 10.15.
-    [Optional] [Selector("splitView:shouldCollapseSubview:forDoubleClickOnDividerAtIndex:")] bool SplitViewShouldCollapseSubviewForDoubleClickOnDividerAtIndex(NSSplitView splitView, NSView subview, NSInteger dividerIndex);
-    [Optional] [Selector("splitView:constrainMinCoordinate:ofSubviewAt:")] CGFloat SplitViewConstrainMinCoordinateOfSubviewAt(NSSplitView splitView, CGFloat proposedMinimumPosition, NSInteger dividerIndex);
-    [Optional] [Selector("splitView:constrainMaxCoordinate:ofSubviewAt:")] CGFloat SplitViewConstrainMaxCoordinateOfSubviewAt(NSSplitView splitView, CGFloat proposedMaximumPosition, NSInteger dividerIndex);
-    [Optional] [Selector("splitView:constrainSplitPosition:ofSubviewAt:")] CGFloat SplitViewConstrainSplitPositionOfSubviewAt(NSSplitView splitView, CGFloat proposedPosition, NSInteger dividerIndex);
-    [Optional] [Selector("splitView:resizeSubviewsWithOldSize:")] void SplitViewResizeSubviewsWithOldSize(NSSplitView splitView, NSSize oldSize);
-    [Optional] [Selector("splitView:shouldAdjustSizeOfSubview:")] bool SplitViewShouldAdjustSizeOfSubview(NSSplitView splitView, NSView view);
-    [Optional] [Selector("splitView:shouldHideDividerAtIndex:")] bool SplitViewShouldHideDividerAtIndex(NSSplitView splitView, NSInteger dividerIndex);
-    [Optional] [Selector("splitView:effectiveRect:forDrawnRect:ofDividerAtIndex:")] NSRect SplitViewEffectiveRectForDrawnRectOfDividerAtIndex(NSSplitView splitView, NSRect proposedEffectiveRect, NSRect drawnRect, NSInteger dividerIndex);
-    [Optional] [Selector("splitView:additionalEffectiveRectOfDividerAtIndex:")] NSRect SplitViewAdditionalEffectiveRectOfDividerAtIndex(NSSplitView splitView, NSInteger dividerIndex);
-    [Optional] [Selector("splitViewWillResizeSubviews:")] void SplitViewWillResizeSubviews(NSNotification notification);
-    [Optional] [Selector("splitViewDidResizeSubviews:")] void SplitViewDidResizeSubviews(NSNotification notification);
+    [Optional]
+    [Selector("splitView:shouldCollapseSubview:forDoubleClickOnDividerAtIndex:")]
+    bool SplitViewShouldCollapseSubviewForDoubleClickOnDividerAtIndex(NSSplitView splitView, NSView subview, NSInteger dividerIndex);
+    [Optional]
+    [Selector("splitView:constrainMinCoordinate:ofSubviewAt:")]
+    CGFloat SplitViewConstrainMinCoordinateOfSubviewAt(NSSplitView splitView, CGFloat proposedMinimumPosition, NSInteger dividerIndex);
+    [Optional]
+    [Selector("splitView:constrainMaxCoordinate:ofSubviewAt:")]
+    CGFloat SplitViewConstrainMaxCoordinateOfSubviewAt(NSSplitView splitView, CGFloat proposedMaximumPosition, NSInteger dividerIndex);
+    [Optional]
+    [Selector("splitView:constrainSplitPosition:ofSubviewAt:")]
+    CGFloat SplitViewConstrainSplitPositionOfSubviewAt(NSSplitView splitView, CGFloat proposedPosition, NSInteger dividerIndex);
+    [Optional]
+    [Selector("splitView:resizeSubviewsWithOldSize:")]
+    void SplitViewResizeSubviewsWithOldSize(NSSplitView splitView, NSSize oldSize);
+    [Optional]
+    [Selector("splitView:shouldAdjustSizeOfSubview:")]
+    bool SplitViewShouldAdjustSizeOfSubview(NSSplitView splitView, NSView view);
+    [Optional]
+    [Selector("splitView:shouldHideDividerAtIndex:")]
+    bool SplitViewShouldHideDividerAtIndex(NSSplitView splitView, NSInteger dividerIndex);
+    [Optional]
+    [Selector("splitView:effectiveRect:forDrawnRect:ofDividerAtIndex:")]
+    NSRect SplitViewEffectiveRectForDrawnRectOfDividerAtIndex(NSSplitView splitView, NSRect proposedEffectiveRect, NSRect drawnRect, NSInteger dividerIndex);
+    [Optional]
+    [Selector("splitView:additionalEffectiveRectOfDividerAtIndex:")]
+    NSRect SplitViewAdditionalEffectiveRectOfDividerAtIndex(NSSplitView splitView, NSInteger dividerIndex);
+    [Optional]
+    [Selector("splitViewWillResizeSubviews:")]
+    void SplitViewWillResizeSubviews(NSNotification notification);
+    [Optional]
+    [Selector("splitViewDidResizeSubviews:")]
+    void SplitViewDidResizeSubviews(NSNotification notification);
 }
 
 public extern "C" NSNotificationName NSSplitViewWillResizeSubviewsNotification;
@@ -94,9 +137,11 @@ public extern "C" NSNotificationName NSSplitViewDidResizeSubviewsNotification;
 public extern objc class NSSplitView
 {
     /// Deprecated in macOS 10.6.
-    [Selector("setIsPaneSplitter:")] public void SetIsPaneSplitter(bool flag);
+    [Selector("setIsPaneSplitter:")]
+    public void SetIsPaneSplitter(bool flag);
     /// Deprecated in macOS 10.6.
-    [Selector("isPaneSplitter")] public bool IsPaneSplitter();
+    [Selector("isPaneSplitter")]
+    public bool IsPaneSplitter();
 }
 
 #endif

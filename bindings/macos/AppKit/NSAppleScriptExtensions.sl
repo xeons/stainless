@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// NSExtensions, a category of NSAppleScript.
 public extern objc class NSAppleScript
 {
-    [Selector("richTextSource")] public NSAttributedString? RichTextSource { get; }
+    [Selector("richTextSource")]
+    public NSAttributedString? RichTextSource { get; }
 }
 
 #endif

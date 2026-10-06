@@ -35,12 +35,24 @@ public objc closure void BADownloadManagerDelegateDownloadDidReceiveChallengeCom
 
 public objc interface BADownloadManagerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("downloadDidBegin:")] void DownloadDidBegin(BADownload download);
-    [Optional] [Selector("downloadDidPause:")] void DownloadDidPause(BADownload download);
-    [Optional] [Selector("download:didWriteBytes:totalBytesWritten:totalBytesExpectedToWrite:")] void DownloadDidWriteBytesTotalBytesWrittenTotalBytesExpectedToWrite(BADownload download, long bytesWritten, long totalBytesWritten, long totalExpectedBytes);
-    [Optional] [Selector("download:didReceiveChallenge:completionHandler:")] void DownloadDidReceiveChallengeCompletionHandler(BADownload download, NSURLAuthenticationChallenge challenge, BADownloadManagerDelegateDownloadDidReceiveChallengeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("download:failedWithError:")] void DownloadFailedWithError(BADownload download, NSError error);
-    [Optional] [Selector("download:finishedWithFileURL:")] void DownloadFinishedWithFileURL(BADownload download, NSURL fileURL);
+    [Optional]
+    [Selector("downloadDidBegin:")]
+    void DownloadDidBegin(BADownload download);
+    [Optional]
+    [Selector("downloadDidPause:")]
+    void DownloadDidPause(BADownload download);
+    [Optional]
+    [Selector("download:didWriteBytes:totalBytesWritten:totalBytesExpectedToWrite:")]
+    void DownloadDidWriteBytesTotalBytesWrittenTotalBytesExpectedToWrite(BADownload download, long bytesWritten, long totalBytesWritten, long totalExpectedBytes);
+    [Optional]
+    [Selector("download:didReceiveChallenge:completionHandler:")]
+    void DownloadDidReceiveChallengeCompletionHandler(BADownload download, NSURLAuthenticationChallenge challenge, BADownloadManagerDelegateDownloadDidReceiveChallengeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("download:failedWithError:")]
+    void DownloadFailedWithError(BADownload download, NSError error);
+    [Optional]
+    [Selector("download:finishedWithFileURL:")]
+    void DownloadFinishedWithFileURL(BADownload download, NSURL fileURL);
 }
 
 public objc closure void BADownloadManagerFetchCurrentDownloadsWithCompletionHandlerCompletionHandlerBlock(NSArray arg0, NSError? arg1);
@@ -51,15 +63,24 @@ public objc closure void BADownloadManagerPerformWithExclusiveControlBeforeDateP
 
 public extern objc class BADownloadManager : NSObject
 {
-    [Selector("sharedManager")] public static BADownloadManager? SharedManager { get; }
-    [Selector("delegate", "setDelegate:")] public BADownloadManagerDelegate? Delegate { get; set; }
-    [Selector("fetchCurrentDownloads:")] public NSArray? FetchCurrentDownloads(out NSError? error);
-    [Selector("fetchCurrentDownloadsWithCompletionHandler:")] public void FetchCurrentDownloadsWithCompletionHandler(BADownloadManagerFetchCurrentDownloadsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("scheduleDownload:error:")] public bool ScheduleDownloadError(BADownload download, out NSError? error);
-    [Selector("performWithExclusiveControl:")] public void PerformWithExclusiveControl(BADownloadManagerPerformWithExclusiveControlPerformHandlerBlock performHandler);
-    [Selector("performWithExclusiveControlBeforeDate:performHandler:")] public void PerformWithExclusiveControlBeforeDatePerformHandler(NSDate date, BADownloadManagerPerformWithExclusiveControlBeforeDatePerformHandlerPerformHandlerBlock performHandler);
-    [Selector("startForegroundDownload:error:")] public bool StartForegroundDownloadError(BADownload download, out NSError? error);
-    [Selector("cancelDownload:error:")] public bool CancelDownloadError(BADownload download, out NSError? error);
+    [Selector("sharedManager")]
+    public static BADownloadManager? SharedManager { get; }
+    [Selector("delegate", "setDelegate:")]
+    public BADownloadManagerDelegate? Delegate { get; set; }
+    [Selector("fetchCurrentDownloads:")]
+    public NSArray? FetchCurrentDownloads(out NSError? error);
+    [Selector("fetchCurrentDownloadsWithCompletionHandler:")]
+    public void FetchCurrentDownloadsWithCompletionHandler(BADownloadManagerFetchCurrentDownloadsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("scheduleDownload:error:")]
+    public bool ScheduleDownloadError(BADownload download, out NSError? error);
+    [Selector("performWithExclusiveControl:")]
+    public void PerformWithExclusiveControl(BADownloadManagerPerformWithExclusiveControlPerformHandlerBlock performHandler);
+    [Selector("performWithExclusiveControlBeforeDate:performHandler:")]
+    public void PerformWithExclusiveControlBeforeDatePerformHandler(NSDate date, BADownloadManagerPerformWithExclusiveControlBeforeDatePerformHandlerPerformHandlerBlock performHandler);
+    [Selector("startForegroundDownload:error:")]
+    public bool StartForegroundDownloadError(BADownload download, out NSError? error);
+    [Selector("cancelDownload:error:")]
+    public bool CancelDownloadError(BADownload download, out NSError? error);
 }
 
 #endif

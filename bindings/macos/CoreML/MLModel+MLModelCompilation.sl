@@ -36,8 +36,10 @@ public objc closure void MLModelCompileModelAtURLCompletionHandlerHandlerBlock(N
 public extern objc class MLModel
 {
     /// Deprecated in macOS 100000.
-    [Selector("compileModelAtURL:error:")] public static NSURL? CompileModelAtURLError(NSURL modelURL, out NSError? error);
-    [Selector("compileModelAtURL:completionHandler:")] public static void CompileModelAtURLCompletionHandler(NSURL modelURL, MLModelCompileModelAtURLCompletionHandlerHandlerBlock handler);
+    [Selector("compileModelAtURL:error:")]
+    public static NSURL? CompileModelAtURLError(NSURL modelURL, out NSError? error);
+    [Selector("compileModelAtURL:completionHandler:")]
+    public static void CompileModelAtURLCompletionHandler(NSURL modelURL, MLModelCompileModelAtURLCompletionHandlerHandlerBlock handler);
 }
 
 #endif

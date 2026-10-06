@@ -17,17 +17,24 @@ public struct Wide
 [ObjCRoot]
 public extern objc class NSObject
 {
-    [Selector("alloc")] public static Self Alloc();
+    [Selector("alloc")]
+    public static Self Alloc();
 }
 
 public extern objc class SLShapes : NSObject
 {
-    [Selector("shapesWithValue:")] public static SLShapes WithValue(long value);
-    [Selector("initWithValue:")] public SLShapes InitWithValue(long value);
-    [Selector("spread")] public Wide Spread { get; }
-    [Selector("isGreaterThan:flag:")] public bool IsGreaterThan(long other, bool flag);
-    [Selector("copyDoubled")] public SLShapes CopyDoubled();
-    [Selector("makeTwin:")] public bool MakeTwin(out SLShapes? twin);
+    [Selector("shapesWithValue:")]
+    public static SLShapes WithValue(long value);
+    [Selector("initWithValue:")]
+    public SLShapes InitWithValue(long value);
+    [Selector("spread")]
+    public Wide Spread { get; }
+    [Selector("isGreaterThan:flag:")]
+    public bool IsGreaterThan(long other, bool flag);
+    [Selector("copyDoubled")]
+    public SLShapes CopyDoubled();
+    [Selector("makeTwin:")]
+    public bool MakeTwin(out SLShapes? twin);
 }
 
 long Use()

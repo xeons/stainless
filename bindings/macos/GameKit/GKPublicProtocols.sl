@@ -34,16 +34,25 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.10.
 public objc interface GKSessionDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("session:peer:didChangeState:")] void SessionPeerDidChangeState(GKSession session, NSString peerID, GKPeerConnectionState state);
-    [Optional] [Selector("session:didReceiveConnectionRequestFromPeer:")] void SessionDidReceiveConnectionRequestFromPeer(GKSession session, NSString peerID);
-    [Optional] [Selector("session:connectionWithPeerFailed:withError:")] void SessionConnectionWithPeerFailedWithError(GKSession session, NSString peerID, NSError error);
-    [Optional] [Selector("session:didFailWithError:")] void SessionDidFailWithError(GKSession session, NSError error);
+    [Optional]
+    [Selector("session:peer:didChangeState:")]
+    void SessionPeerDidChangeState(GKSession session, NSString peerID, GKPeerConnectionState state);
+    [Optional]
+    [Selector("session:didReceiveConnectionRequestFromPeer:")]
+    void SessionDidReceiveConnectionRequestFromPeer(GKSession session, NSString peerID);
+    [Optional]
+    [Selector("session:connectionWithPeerFailed:withError:")]
+    void SessionConnectionWithPeerFailedWithError(GKSession session, NSString peerID, NSError error);
+    [Optional]
+    [Selector("session:didFailWithError:")]
+    void SessionDidFailWithError(GKSession session, NSError error);
 }
 
 /// Deprecated in macOS 10.8.
 public objc interface GKVoiceChatClient : NSObjectProtocol
 {
-    [Selector("participantID")] NSString ParticipantID();
+    [Selector("participantID")]
+    NSString ParticipantID();
 }
 
 #endif

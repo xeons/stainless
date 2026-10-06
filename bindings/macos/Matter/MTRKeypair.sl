@@ -35,11 +35,19 @@ import Standard.ObjC;
 public objc interface MTRKeypair : NSObjectProtocol
 {
     /// macOS 15.4 and later.
-    [Optional] [Selector("copyPublicKey")] SecKeyRef CopyPublicKey();
+    [Optional]
+    [Selector("copyPublicKey")]
+    SecKeyRef CopyPublicKey();
     /// Deprecated in macOS 15.4.
-    [Optional] [Selector("publicKey")] SecKeyRef PublicKey();
-    [Optional] [Selector("signMessageECDSA_RAW:")] NSData SignMessageECDSA_RAW(NSData message);
-    [Optional] [Selector("signMessageECDSA_DER:")] NSData SignMessageECDSA_DER(NSData message);
+    [Optional]
+    [Selector("publicKey")]
+    SecKeyRef PublicKey();
+    [Optional]
+    [Selector("signMessageECDSA_RAW:")]
+    NSData SignMessageECDSA_RAW(NSData message);
+    [Optional]
+    [Selector("signMessageECDSA_DER:")]
+    NSData SignMessageECDSA_DER(NSData message);
 }
 
 #endif

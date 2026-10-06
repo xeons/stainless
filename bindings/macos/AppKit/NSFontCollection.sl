@@ -51,34 +51,58 @@ public using NSFontCollectionName = NSString;
 
 public extern objc class NSFontCollection : NSObject, NSCopying, NSMutableCopying, NSCoding
 {
-    [Selector("fontCollectionWithAllAvailableDescriptors")] public static NSFontCollection FontCollectionWithAllAvailableDescriptors { get; }
-    [Selector("allFontCollectionNames")] public static NSArray AllFontCollectionNames { get; }
-    [Selector("queryDescriptors")] public NSArray? QueryDescriptors { get; }
-    [Selector("exclusionDescriptors")] public NSArray? ExclusionDescriptors { get; }
-    [Selector("matchingDescriptors")] public NSArray? MatchingDescriptors { get; }
-    [Selector("fontCollectionWithDescriptors:")] public static NSFontCollection FontCollectionWithDescriptors(NSArray queryDescriptors);
-    [Selector("fontCollectionWithLocale:")] public static NSFontCollection? FontCollectionWithLocale(NSLocale locale);
-    [Selector("showFontCollection:withName:visibility:error:")] public static bool ShowFontCollectionWithNameVisibilityError(NSFontCollection collection, NSFontCollectionName name, NSFontCollectionVisibility visibility, out NSError? error);
-    [Selector("hideFontCollectionWithName:visibility:error:")] public static bool HideFontCollectionWithNameVisibilityError(NSFontCollectionName name, NSFontCollectionVisibility visibility, out NSError? error);
-    [Selector("renameFontCollectionWithName:visibility:toName:error:")] public static bool RenameFontCollectionWithNameVisibilityToNameError(NSFontCollectionName oldName, NSFontCollectionVisibility visibility, NSFontCollectionName newName, out NSError? outError);
-    [Selector("fontCollectionWithName:")] public static NSFontCollection? FontCollectionWithName(NSFontCollectionName name);
-    [Selector("fontCollectionWithName:visibility:")] public static NSFontCollection? FontCollectionWithNameVisibility(NSFontCollectionName name, NSFontCollectionVisibility visibility);
-    [Selector("matchingDescriptorsWithOptions:")] public NSArray? MatchingDescriptorsWithOptions(NSDictionary? options);
-    [Selector("matchingDescriptorsForFamily:")] public NSArray? MatchingDescriptorsForFamily(NSString family);
-    [Selector("matchingDescriptorsForFamily:options:")] public NSArray? MatchingDescriptorsForFamilyOptions(NSString family, NSDictionary? options);
+    [Selector("fontCollectionWithAllAvailableDescriptors")]
+    public static NSFontCollection FontCollectionWithAllAvailableDescriptors { get; }
+    [Selector("allFontCollectionNames")]
+    public static NSArray AllFontCollectionNames { get; }
+    [Selector("queryDescriptors")]
+    public NSArray? QueryDescriptors { get; }
+    [Selector("exclusionDescriptors")]
+    public NSArray? ExclusionDescriptors { get; }
+    [Selector("matchingDescriptors")]
+    public NSArray? MatchingDescriptors { get; }
+    [Selector("fontCollectionWithDescriptors:")]
+    public static NSFontCollection FontCollectionWithDescriptors(NSArray queryDescriptors);
+    [Selector("fontCollectionWithLocale:")]
+    public static NSFontCollection? FontCollectionWithLocale(NSLocale locale);
+    [Selector("showFontCollection:withName:visibility:error:")]
+    public static bool ShowFontCollectionWithNameVisibilityError(NSFontCollection collection, NSFontCollectionName name, NSFontCollectionVisibility visibility, out NSError? error);
+    [Selector("hideFontCollectionWithName:visibility:error:")]
+    public static bool HideFontCollectionWithNameVisibilityError(NSFontCollectionName name, NSFontCollectionVisibility visibility, out NSError? error);
+    [Selector("renameFontCollectionWithName:visibility:toName:error:")]
+    public static bool RenameFontCollectionWithNameVisibilityToNameError(NSFontCollectionName oldName, NSFontCollectionVisibility visibility, NSFontCollectionName newName, out NSError? outError);
+    [Selector("fontCollectionWithName:")]
+    public static NSFontCollection? FontCollectionWithName(NSFontCollectionName name);
+    [Selector("fontCollectionWithName:visibility:")]
+    public static NSFontCollection? FontCollectionWithNameVisibility(NSFontCollectionName name, NSFontCollectionVisibility visibility);
+    [Selector("matchingDescriptorsWithOptions:")]
+    public NSArray? MatchingDescriptorsWithOptions(NSDictionary? options);
+    [Selector("matchingDescriptorsForFamily:")]
+    public NSArray? MatchingDescriptorsForFamily(NSString family);
+    [Selector("matchingDescriptorsForFamily:options:")]
+    public NSArray? MatchingDescriptorsForFamilyOptions(NSString family, NSDictionary? options);
 }
 
 public extern objc class NSMutableFontCollection : NSFontCollection
 {
-    [Selector("fontCollectionWithAllAvailableDescriptors")] public static NSMutableFontCollection FontCollectionWithAllAvailableDescriptors { get; }
-    [Selector("queryDescriptors", "setQueryDescriptors:")] public NSArray? QueryDescriptors { get; set; }
-    [Selector("exclusionDescriptors", "setExclusionDescriptors:")] public NSArray? ExclusionDescriptors { get; set; }
-    [Selector("fontCollectionWithDescriptors:")] public static NSMutableFontCollection FontCollectionWithDescriptors(NSArray queryDescriptors);
-    [Selector("fontCollectionWithLocale:")] public static NSMutableFontCollection FontCollectionWithLocale(NSLocale locale);
-    [Selector("fontCollectionWithName:")] public static NSMutableFontCollection? FontCollectionWithName(NSFontCollectionName name);
-    [Selector("fontCollectionWithName:visibility:")] public static NSMutableFontCollection? FontCollectionWithNameVisibility(NSFontCollectionName name, NSFontCollectionVisibility visibility);
-    [Selector("addQueryForDescriptors:")] public void AddQueryForDescriptors(NSArray descriptors);
-    [Selector("removeQueryForDescriptors:")] public void RemoveQueryForDescriptors(NSArray descriptors);
+    [Selector("fontCollectionWithAllAvailableDescriptors")]
+    public static NSMutableFontCollection FontCollectionWithAllAvailableDescriptors { get; }
+    [Selector("queryDescriptors", "setQueryDescriptors:")]
+    public NSArray? QueryDescriptors { get; set; }
+    [Selector("exclusionDescriptors", "setExclusionDescriptors:")]
+    public NSArray? ExclusionDescriptors { get; set; }
+    [Selector("fontCollectionWithDescriptors:")]
+    public static NSMutableFontCollection FontCollectionWithDescriptors(NSArray queryDescriptors);
+    [Selector("fontCollectionWithLocale:")]
+    public static NSMutableFontCollection FontCollectionWithLocale(NSLocale locale);
+    [Selector("fontCollectionWithName:")]
+    public static NSMutableFontCollection? FontCollectionWithName(NSFontCollectionName name);
+    [Selector("fontCollectionWithName:visibility:")]
+    public static NSMutableFontCollection? FontCollectionWithNameVisibility(NSFontCollectionName name, NSFontCollectionVisibility visibility);
+    [Selector("addQueryForDescriptors:")]
+    public void AddQueryForDescriptors(NSArray descriptors);
+    [Selector("removeQueryForDescriptors:")]
+    public void RemoveQueryForDescriptors(NSArray descriptors);
 }
 
 public extern "C" NSNotificationName? NSFontCollectionDidChangeNotification;

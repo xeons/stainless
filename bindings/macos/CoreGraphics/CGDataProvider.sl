@@ -70,21 +70,28 @@ public struct CGDataProviderDirectCallbacks
 
 public extern "C" CFTypeID CGDataProviderGetTypeID();
 
-[ReturnsRetained] public extern "C" CGDataProviderRef? CGDataProviderCreateSequential(void* info, CGDataProviderSequentialCallbacks* callbacks);
+[ReturnsRetained]
+public extern "C" CGDataProviderRef? CGDataProviderCreateSequential(void* info, CGDataProviderSequentialCallbacks* callbacks);
 
-[ReturnsRetained] public extern "C" CGDataProviderRef? CGDataProviderCreateDirect(void* info, off_t size, CGDataProviderDirectCallbacks* callbacks);
+[ReturnsRetained]
+public extern "C" CGDataProviderRef? CGDataProviderCreateDirect(void* info, off_t size, CGDataProviderDirectCallbacks* callbacks);
 
 public delegate void CGDataProviderReleaseDataCallback(void* arg0, void* arg1, nuint arg2);
 
-[ReturnsRetained] public extern "C" CGDataProviderRef? CGDataProviderCreateWithData(void* info, void* data, nuint size, CGDataProviderReleaseDataCallback releaseData);
+[ReturnsRetained]
+public extern "C" CGDataProviderRef? CGDataProviderCreateWithData(void* info, void* data, nuint size, CGDataProviderReleaseDataCallback releaseData);
 
-[ReturnsRetained] public extern "C" CGDataProviderRef? CGDataProviderCreateWithCFData(CFDataRef? data);
+[ReturnsRetained]
+public extern "C" CGDataProviderRef? CGDataProviderCreateWithCFData(CFDataRef? data);
 
-[ReturnsRetained] public extern "C" CGDataProviderRef? CGDataProviderCreateWithURL(CFURLRef? url);
+[ReturnsRetained]
+public extern "C" CGDataProviderRef? CGDataProviderCreateWithURL(CFURLRef? url);
 
-[ReturnsRetained] public extern "C" CGDataProviderRef? CGDataProviderCreateWithFilename(byte* filename);
+[ReturnsRetained]
+public extern "C" CGDataProviderRef? CGDataProviderCreateWithFilename(byte* filename);
 
-[ReturnsRetained] public extern "C" CFDataRef? CGDataProviderCopyData(CGDataProviderRef? provider);
+[ReturnsRetained]
+public extern "C" CFDataRef? CGDataProviderCopyData(CGDataProviderRef? provider);
 
 public extern "C" void* CGDataProviderGetInfo(CGDataProviderRef? provider);
 

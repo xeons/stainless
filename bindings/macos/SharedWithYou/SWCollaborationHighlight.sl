@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class SWCollaborationHighlight : SWHighlight, NSSecureCoding, NSCopying
 {
-    [Selector("collaborationIdentifier")] public NSString CollaborationIdentifier { get; }
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("creationDate")] public NSDate CreationDate { get; }
-    [Selector("contentType")] public UTType ContentType { get; }
+    [Selector("collaborationIdentifier")]
+    public NSString CollaborationIdentifier { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("creationDate")]
+    public NSDate CreationDate { get; }
+    [Selector("contentType")]
+    public UTType ContentType { get; }
 }
 
 #endif

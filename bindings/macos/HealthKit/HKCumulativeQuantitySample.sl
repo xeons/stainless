@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class HKCumulativeQuantitySample : HKQuantitySample
 {
-    [Selector("sumQuantity")] public HKQuantity SumQuantity { get; }
+    [Selector("sumQuantity")]
+    public HKQuantity SumQuantity { get; }
 }
 
 public extern "C" NSString HKPredicateKeyPathSum;

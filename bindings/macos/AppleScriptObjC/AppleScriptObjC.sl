@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// AppleScriptObjectiveC, a category of NSBundle.
 public extern objc class NSBundle
 {
-    [Selector("loadAppleScriptObjectiveCScripts")] public void LoadAppleScriptObjectiveCScripts();
+    [Selector("loadAppleScriptObjectiveCScripts")]
+    public void LoadAppleScriptObjectiveCScripts();
 }
 
 #endif

@@ -37,30 +37,54 @@ import Standard.ObjC;
 
 public extern objc class VNTargetedImageRequest : VNImageBasedRequest
 {
-    [Selector("initWithTargetedCVPixelBuffer:options:")] public Self InitWithTargetedCVPixelBufferOptions(CVPixelBufferRef pixelBuffer, NSDictionary options);
-    [Selector("initWithTargetedCVPixelBuffer:options:completionHandler:")] public Self InitWithTargetedCVPixelBufferOptionsCompletionHandler(CVPixelBufferRef pixelBuffer, NSDictionary options, VNRequestCompletionHandler? completionHandler);
-    [Selector("initWithTargetedCVPixelBuffer:orientation:options:")] public Self InitWithTargetedCVPixelBufferOrientationOptions(CVPixelBufferRef pixelBuffer, CGImagePropertyOrientation orientation, NSDictionary options);
-    [Selector("initWithTargetedCVPixelBuffer:orientation:options:completionHandler:")] public Self InitWithTargetedCVPixelBufferOrientationOptionsCompletionHandler(CVPixelBufferRef pixelBuffer, CGImagePropertyOrientation orientation, NSDictionary options, VNRequestCompletionHandler? completionHandler);
-    [Selector("initWithTargetedCGImage:options:")] public Self InitWithTargetedCGImageOptions(CGImageRef cgImage, NSDictionary options);
-    [Selector("initWithTargetedCGImage:options:completionHandler:")] public Self InitWithTargetedCGImageOptionsCompletionHandler(CGImageRef cgImage, NSDictionary options, VNRequestCompletionHandler? completionHandler);
-    [Selector("initWithTargetedCGImage:orientation:options:")] public Self InitWithTargetedCGImageOrientationOptions(CGImageRef cgImage, CGImagePropertyOrientation orientation, NSDictionary options);
-    [Selector("initWithTargetedCGImage:orientation:options:completionHandler:")] public Self InitWithTargetedCGImageOrientationOptionsCompletionHandler(CGImageRef cgImage, CGImagePropertyOrientation orientation, NSDictionary options, VNRequestCompletionHandler? completionHandler);
-    [Selector("initWithTargetedCIImage:options:")] public Self InitWithTargetedCIImageOptions(CIImage ciImage, NSDictionary options);
-    [Selector("initWithTargetedCIImage:options:completionHandler:")] public Self InitWithTargetedCIImageOptionsCompletionHandler(CIImage ciImage, NSDictionary options, VNRequestCompletionHandler? completionHandler);
-    [Selector("initWithTargetedCIImage:orientation:options:")] public Self InitWithTargetedCIImageOrientationOptions(CIImage ciImage, CGImagePropertyOrientation orientation, NSDictionary options);
-    [Selector("initWithTargetedCIImage:orientation:options:completionHandler:")] public Self InitWithTargetedCIImageOrientationOptionsCompletionHandler(CIImage ciImage, CGImagePropertyOrientation orientation, NSDictionary options, VNRequestCompletionHandler? completionHandler);
-    [Selector("initWithTargetedImageURL:options:")] public Self InitWithTargetedImageURLOptions(NSURL imageURL, NSDictionary options);
-    [Selector("initWithTargetedImageURL:options:completionHandler:")] public Self InitWithTargetedImageURLOptionsCompletionHandler(NSURL imageURL, NSDictionary options, VNRequestCompletionHandler? completionHandler);
-    [Selector("initWithTargetedImageURL:orientation:options:")] public Self InitWithTargetedImageURLOrientationOptions(NSURL imageURL, CGImagePropertyOrientation orientation, NSDictionary options);
-    [Selector("initWithTargetedImageURL:orientation:options:completionHandler:")] public Self InitWithTargetedImageURLOrientationOptionsCompletionHandler(NSURL imageURL, CGImagePropertyOrientation orientation, NSDictionary options, VNRequestCompletionHandler? completionHandler);
-    [Selector("initWithTargetedImageData:options:")] public Self InitWithTargetedImageDataOptions(NSData imageData, NSDictionary options);
-    [Selector("initWithTargetedImageData:options:completionHandler:")] public Self InitWithTargetedImageDataOptionsCompletionHandler(NSData imageData, NSDictionary options, VNRequestCompletionHandler? completionHandler);
-    [Selector("initWithTargetedImageData:orientation:options:")] public Self InitWithTargetedImageDataOrientationOptions(NSData imageData, CGImagePropertyOrientation orientation, NSDictionary options);
-    [Selector("initWithTargetedImageData:orientation:options:completionHandler:")] public Self InitWithTargetedImageDataOrientationOptionsCompletionHandler(NSData imageData, CGImagePropertyOrientation orientation, NSDictionary options, VNRequestCompletionHandler? completionHandler);
-    [Selector("initWithTargetedCMSampleBuffer:options:")] public Self InitWithTargetedCMSampleBufferOptions(CMSampleBufferRef sampleBuffer, NSDictionary options);
-    [Selector("initWithTargetedCMSampleBuffer:options:completionHandler:")] public Self InitWithTargetedCMSampleBufferOptionsCompletionHandler(CMSampleBufferRef sampleBuffer, NSDictionary options, VNRequestCompletionHandler? completionHandler);
-    [Selector("initWithTargetedCMSampleBuffer:orientation:options:")] public Self InitWithTargetedCMSampleBufferOrientationOptions(CMSampleBufferRef sampleBuffer, CGImagePropertyOrientation orientation, NSDictionary options);
-    [Selector("initWithTargetedCMSampleBuffer:orientation:options:completionHandler:")] public Self InitWithTargetedCMSampleBufferOrientationOptionsCompletionHandler(CMSampleBufferRef sampleBuffer, CGImagePropertyOrientation orientation, NSDictionary options, VNRequestCompletionHandler? completionHandler);
+    [Selector("initWithTargetedCVPixelBuffer:options:")]
+    public Self InitWithTargetedCVPixelBufferOptions(CVPixelBufferRef pixelBuffer, NSDictionary options);
+    [Selector("initWithTargetedCVPixelBuffer:options:completionHandler:")]
+    public Self InitWithTargetedCVPixelBufferOptionsCompletionHandler(CVPixelBufferRef pixelBuffer, NSDictionary options, VNRequestCompletionHandler? completionHandler);
+    [Selector("initWithTargetedCVPixelBuffer:orientation:options:")]
+    public Self InitWithTargetedCVPixelBufferOrientationOptions(CVPixelBufferRef pixelBuffer, CGImagePropertyOrientation orientation, NSDictionary options);
+    [Selector("initWithTargetedCVPixelBuffer:orientation:options:completionHandler:")]
+    public Self InitWithTargetedCVPixelBufferOrientationOptionsCompletionHandler(CVPixelBufferRef pixelBuffer, CGImagePropertyOrientation orientation, NSDictionary options, VNRequestCompletionHandler? completionHandler);
+    [Selector("initWithTargetedCGImage:options:")]
+    public Self InitWithTargetedCGImageOptions(CGImageRef cgImage, NSDictionary options);
+    [Selector("initWithTargetedCGImage:options:completionHandler:")]
+    public Self InitWithTargetedCGImageOptionsCompletionHandler(CGImageRef cgImage, NSDictionary options, VNRequestCompletionHandler? completionHandler);
+    [Selector("initWithTargetedCGImage:orientation:options:")]
+    public Self InitWithTargetedCGImageOrientationOptions(CGImageRef cgImage, CGImagePropertyOrientation orientation, NSDictionary options);
+    [Selector("initWithTargetedCGImage:orientation:options:completionHandler:")]
+    public Self InitWithTargetedCGImageOrientationOptionsCompletionHandler(CGImageRef cgImage, CGImagePropertyOrientation orientation, NSDictionary options, VNRequestCompletionHandler? completionHandler);
+    [Selector("initWithTargetedCIImage:options:")]
+    public Self InitWithTargetedCIImageOptions(CIImage ciImage, NSDictionary options);
+    [Selector("initWithTargetedCIImage:options:completionHandler:")]
+    public Self InitWithTargetedCIImageOptionsCompletionHandler(CIImage ciImage, NSDictionary options, VNRequestCompletionHandler? completionHandler);
+    [Selector("initWithTargetedCIImage:orientation:options:")]
+    public Self InitWithTargetedCIImageOrientationOptions(CIImage ciImage, CGImagePropertyOrientation orientation, NSDictionary options);
+    [Selector("initWithTargetedCIImage:orientation:options:completionHandler:")]
+    public Self InitWithTargetedCIImageOrientationOptionsCompletionHandler(CIImage ciImage, CGImagePropertyOrientation orientation, NSDictionary options, VNRequestCompletionHandler? completionHandler);
+    [Selector("initWithTargetedImageURL:options:")]
+    public Self InitWithTargetedImageURLOptions(NSURL imageURL, NSDictionary options);
+    [Selector("initWithTargetedImageURL:options:completionHandler:")]
+    public Self InitWithTargetedImageURLOptionsCompletionHandler(NSURL imageURL, NSDictionary options, VNRequestCompletionHandler? completionHandler);
+    [Selector("initWithTargetedImageURL:orientation:options:")]
+    public Self InitWithTargetedImageURLOrientationOptions(NSURL imageURL, CGImagePropertyOrientation orientation, NSDictionary options);
+    [Selector("initWithTargetedImageURL:orientation:options:completionHandler:")]
+    public Self InitWithTargetedImageURLOrientationOptionsCompletionHandler(NSURL imageURL, CGImagePropertyOrientation orientation, NSDictionary options, VNRequestCompletionHandler? completionHandler);
+    [Selector("initWithTargetedImageData:options:")]
+    public Self InitWithTargetedImageDataOptions(NSData imageData, NSDictionary options);
+    [Selector("initWithTargetedImageData:options:completionHandler:")]
+    public Self InitWithTargetedImageDataOptionsCompletionHandler(NSData imageData, NSDictionary options, VNRequestCompletionHandler? completionHandler);
+    [Selector("initWithTargetedImageData:orientation:options:")]
+    public Self InitWithTargetedImageDataOrientationOptions(NSData imageData, CGImagePropertyOrientation orientation, NSDictionary options);
+    [Selector("initWithTargetedImageData:orientation:options:completionHandler:")]
+    public Self InitWithTargetedImageDataOrientationOptionsCompletionHandler(NSData imageData, CGImagePropertyOrientation orientation, NSDictionary options, VNRequestCompletionHandler? completionHandler);
+    [Selector("initWithTargetedCMSampleBuffer:options:")]
+    public Self InitWithTargetedCMSampleBufferOptions(CMSampleBufferRef sampleBuffer, NSDictionary options);
+    [Selector("initWithTargetedCMSampleBuffer:options:completionHandler:")]
+    public Self InitWithTargetedCMSampleBufferOptionsCompletionHandler(CMSampleBufferRef sampleBuffer, NSDictionary options, VNRequestCompletionHandler? completionHandler);
+    [Selector("initWithTargetedCMSampleBuffer:orientation:options:")]
+    public Self InitWithTargetedCMSampleBufferOrientationOptions(CMSampleBufferRef sampleBuffer, CGImagePropertyOrientation orientation, NSDictionary options);
+    [Selector("initWithTargetedCMSampleBuffer:orientation:options:completionHandler:")]
+    public Self InitWithTargetedCMSampleBufferOrientationOptionsCompletionHandler(CMSampleBufferRef sampleBuffer, CGImagePropertyOrientation orientation, NSDictionary options, VNRequestCompletionHandler? completionHandler);
 }
 
 #endif

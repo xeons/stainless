@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class MDLMatrix4x4Array : NSObject, NSCopying
 {
-    [Selector("elementCount")] public NSUInteger ElementCount { get; }
-    [Selector("precision")] public MDLDataPrecision Precision { get; }
-    [Selector("clear")] public void Clear();
-    [Selector("initWithElementCount:")] public Self InitWithElementCount(NSUInteger arrayElementCount);
-    [Selector("setFloat4x4Array:count:")] public void SetFloat4x4ArrayCount(matrix_float4x4* valuesArray, NSUInteger count);
-    [Selector("setDouble4x4Array:count:")] public void SetDouble4x4ArrayCount(matrix_double4x4* valuesArray, NSUInteger count);
-    [Selector("getFloat4x4Array:maxCount:")] public NSUInteger GetFloat4x4ArrayMaxCount(matrix_float4x4* valuesArray, NSUInteger maxCount);
-    [Selector("getDouble4x4Array:maxCount:")] public NSUInteger GetDouble4x4ArrayMaxCount(matrix_double4x4* valuesArray, NSUInteger maxCount);
+    [Selector("elementCount")]
+    public NSUInteger ElementCount { get; }
+    [Selector("precision")]
+    public MDLDataPrecision Precision { get; }
+    [Selector("clear")]
+    public void Clear();
+    [Selector("initWithElementCount:")]
+    public Self InitWithElementCount(NSUInteger arrayElementCount);
+    [Selector("setFloat4x4Array:count:")]
+    public void SetFloat4x4ArrayCount(matrix_float4x4* valuesArray, NSUInteger count);
+    [Selector("setDouble4x4Array:count:")]
+    public void SetDouble4x4ArrayCount(matrix_double4x4* valuesArray, NSUInteger count);
+    [Selector("getFloat4x4Array:maxCount:")]
+    public NSUInteger GetFloat4x4ArrayMaxCount(matrix_float4x4* valuesArray, NSUInteger maxCount);
+    [Selector("getDouble4x4Array:maxCount:")]
+    public NSUInteger GetDouble4x4ArrayMaxCount(matrix_double4x4* valuesArray, NSUInteger maxCount);
 }
 
 #endif

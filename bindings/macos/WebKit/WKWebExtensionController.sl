@@ -40,31 +40,56 @@ public objc closure void WKWebExtensionControllerRemoveDataOfTypesFromDataRecord
 /// macOS 15.4 and later.
 public extern objc class WKWebExtensionController : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public WKWebExtensionControllerDelegate? Delegate { get; set; }
-    [Selector("configuration")] public WKWebExtensionControllerConfiguration Configuration { get; }
-    [Selector("extensions")] public NSSet Extensions { get; }
-    [Selector("extensionContexts")] public NSSet ExtensionContexts { get; }
-    [Selector("allExtensionDataTypes")] public static NSSet AllExtensionDataTypes { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithConfiguration:")] public Self InitWithConfiguration(WKWebExtensionControllerConfiguration configuration);
-    [Selector("loadExtensionContext:error:")] public bool LoadExtensionContextError(WKWebExtensionContext extensionContext, out NSError? error);
-    [Selector("unloadExtensionContext:error:")] public bool UnloadExtensionContextError(WKWebExtensionContext extensionContext, out NSError? error);
-    [Selector("extensionContextForExtension:")] public WKWebExtensionContext? ExtensionContextForExtension(WKWebExtension extension);
-    [Selector("extensionContextForURL:")] public WKWebExtensionContext? ExtensionContextForURL(NSURL URL);
-    [Selector("fetchDataRecordsOfTypes:completionHandler:")] public void FetchDataRecordsOfTypesCompletionHandler(NSSet dataTypes, WKWebExtensionControllerFetchDataRecordsOfTypesCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("fetchDataRecordOfTypes:forExtensionContext:completionHandler:")] public void FetchDataRecordOfTypesForExtensionContextCompletionHandler(NSSet dataTypes, WKWebExtensionContext extensionContext, WKWebExtensionControllerFetchDataRecordOfTypesForExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removeDataOfTypes:fromDataRecords:completionHandler:")] public void RemoveDataOfTypesFromDataRecordsCompletionHandler(NSSet dataTypes, NSArray dataRecords, WKWebExtensionControllerRemoveDataOfTypesFromDataRecordsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("didOpenWindow:")] public void DidOpenWindow(WKWebExtensionWindow newWindow);
-    [Selector("didCloseWindow:")] public void DidCloseWindow(WKWebExtensionWindow closedWindow);
-    [Selector("didFocusWindow:")] public void DidFocusWindow(WKWebExtensionWindow? focusedWindow);
-    [Selector("didOpenTab:")] public void DidOpenTab(WKWebExtensionTab newTab);
-    [Selector("didCloseTab:windowIsClosing:")] public void DidCloseTabWindowIsClosing(WKWebExtensionTab closedTab, bool windowIsClosing);
-    [Selector("didActivateTab:previousActiveTab:")] public void DidActivateTabPreviousActiveTab(WKWebExtensionTab activatedTab, WKWebExtensionTab? previousTab);
-    [Selector("didSelectTabs:")] public void DidSelectTabs(NSArray selectedTabs);
-    [Selector("didDeselectTabs:")] public void DidDeselectTabs(NSArray deselectedTabs);
-    [Selector("didMoveTab:fromIndex:inWindow:")] public void DidMoveTabFromIndexInWindow(WKWebExtensionTab movedTab, NSUInteger index, WKWebExtensionWindow? oldWindow);
-    [Selector("didReplaceTab:withTab:")] public void DidReplaceTabWithTab(WKWebExtensionTab oldTab, WKWebExtensionTab newTab);
-    [Selector("didChangeTabProperties:forTab:")] public void DidChangeTabPropertiesForTab(WKWebExtensionTabChangedProperties properties, WKWebExtensionTab changedTab);
+    [Selector("delegate", "setDelegate:")]
+    public WKWebExtensionControllerDelegate? Delegate { get; set; }
+    [Selector("configuration")]
+    public WKWebExtensionControllerConfiguration Configuration { get; }
+    [Selector("extensions")]
+    public NSSet Extensions { get; }
+    [Selector("extensionContexts")]
+    public NSSet ExtensionContexts { get; }
+    [Selector("allExtensionDataTypes")]
+    public static NSSet AllExtensionDataTypes { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithConfiguration:")]
+    public Self InitWithConfiguration(WKWebExtensionControllerConfiguration configuration);
+    [Selector("loadExtensionContext:error:")]
+    public bool LoadExtensionContextError(WKWebExtensionContext extensionContext, out NSError? error);
+    [Selector("unloadExtensionContext:error:")]
+    public bool UnloadExtensionContextError(WKWebExtensionContext extensionContext, out NSError? error);
+    [Selector("extensionContextForExtension:")]
+    public WKWebExtensionContext? ExtensionContextForExtension(WKWebExtension extension);
+    [Selector("extensionContextForURL:")]
+    public WKWebExtensionContext? ExtensionContextForURL(NSURL URL);
+    [Selector("fetchDataRecordsOfTypes:completionHandler:")]
+    public void FetchDataRecordsOfTypesCompletionHandler(NSSet dataTypes, WKWebExtensionControllerFetchDataRecordsOfTypesCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchDataRecordOfTypes:forExtensionContext:completionHandler:")]
+    public void FetchDataRecordOfTypesForExtensionContextCompletionHandler(NSSet dataTypes, WKWebExtensionContext extensionContext, WKWebExtensionControllerFetchDataRecordOfTypesForExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removeDataOfTypes:fromDataRecords:completionHandler:")]
+    public void RemoveDataOfTypesFromDataRecordsCompletionHandler(NSSet dataTypes, NSArray dataRecords, WKWebExtensionControllerRemoveDataOfTypesFromDataRecordsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("didOpenWindow:")]
+    public void DidOpenWindow(WKWebExtensionWindow newWindow);
+    [Selector("didCloseWindow:")]
+    public void DidCloseWindow(WKWebExtensionWindow closedWindow);
+    [Selector("didFocusWindow:")]
+    public void DidFocusWindow(WKWebExtensionWindow? focusedWindow);
+    [Selector("didOpenTab:")]
+    public void DidOpenTab(WKWebExtensionTab newTab);
+    [Selector("didCloseTab:windowIsClosing:")]
+    public void DidCloseTabWindowIsClosing(WKWebExtensionTab closedTab, bool windowIsClosing);
+    [Selector("didActivateTab:previousActiveTab:")]
+    public void DidActivateTabPreviousActiveTab(WKWebExtensionTab activatedTab, WKWebExtensionTab? previousTab);
+    [Selector("didSelectTabs:")]
+    public void DidSelectTabs(NSArray selectedTabs);
+    [Selector("didDeselectTabs:")]
+    public void DidDeselectTabs(NSArray deselectedTabs);
+    [Selector("didMoveTab:fromIndex:inWindow:")]
+    public void DidMoveTabFromIndexInWindow(WKWebExtensionTab movedTab, NSUInteger index, WKWebExtensionWindow? oldWindow);
+    [Selector("didReplaceTab:withTab:")]
+    public void DidReplaceTabWithTab(WKWebExtensionTab oldTab, WKWebExtensionTab newTab);
+    [Selector("didChangeTabProperties:forTab:")]
+    public void DidChangeTabPropertiesForTab(WKWebExtensionTabChangedProperties properties, WKWebExtensionTab changedTab);
 }
 
 #endif

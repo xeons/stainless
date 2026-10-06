@@ -155,46 +155,86 @@ public extern "C" PDFAnnotationHighlightingMode? PDFAnnotationHighlightingModePu
 /// PDFAnnotationUtilities, a category of PDFAnnotation.
 public extern objc class PDFAnnotation
 {
-    [Selector("font", "setFont:")] public NSFont? Font { get; set; }
-    [Selector("fontColor", "setFontColor:")] public NSColor? FontColor { get; set; }
-    [Selector("interiorColor", "setInteriorColor:")] public NSColor? InteriorColor { get; set; }
-    [Selector("alignment", "setAlignment:")] public NSTextAlignment Alignment { get; set; }
-    [Selector("startPoint", "setStartPoint:")] public NSPoint StartPoint { get; set; }
-    [Selector("endPoint", "setEndPoint:")] public NSPoint EndPoint { get; set; }
-    [Selector("startLineStyle", "setStartLineStyle:")] public PDFLineStyle StartLineStyle { get; set; }
-    [Selector("endLineStyle", "setEndLineStyle:")] public PDFLineStyle EndLineStyle { get; set; }
-    [Selector("iconType", "setIconType:")] public PDFTextAnnotationIconType IconType { get; set; }
-    [Selector("quadrilateralPoints", "setQuadrilateralPoints:")] public NSArray? QuadrilateralPoints { get; set; }
-    [Selector("markupType", "setMarkupType:")] public PDFMarkupType MarkupType { get; set; }
-    [Selector("widgetFieldType", "setWidgetFieldType:")] public PDFAnnotationWidgetSubtype WidgetFieldType { get; set; }
-    [Selector("widgetControlType", "setWidgetControlType:")] public PDFWidgetControlType WidgetControlType { get; set; }
-    [Selector("isMultiline", "setMultiline:")] public bool Multiline { get; set; }
-    [Selector("isActivatableTextField")] public bool ActivatableTextField { get; }
-    [Selector("isPasswordField")] public bool IsPasswordField { get; }
-    [Selector("hasComb", "setComb:")] public bool Comb { get; set; }
-    [Selector("maximumLength", "setMaximumLength:")] public NSInteger MaximumLength { get; set; }
-    [Selector("widgetStringValue", "setWidgetStringValue:")] public NSString? WidgetStringValue { get; set; }
-    [Selector("widgetDefaultStringValue", "setWidgetDefaultStringValue:")] public NSString? WidgetDefaultStringValue { get; set; }
-    [Selector("allowsToggleToOff", "setAllowsToggleToOff:")] public bool AllowsToggleToOff { get; set; }
-    [Selector("radiosInUnison", "setRadiosInUnison:")] public bool RadiosInUnison { get; set; }
-    [Selector("isReadOnly", "setReadOnly:")] public bool ReadOnly { get; set; }
-    [Selector("isListChoice", "setListChoice:")] public bool ListChoice { get; set; }
-    [Selector("choices", "setChoices:")] public NSArray? Choices { get; set; }
-    [Selector("values", "setValues:")] public NSArray? Values { get; set; }
-    [Selector("buttonWidgetState", "setButtonWidgetState:")] public PDFWidgetCellState ButtonWidgetState { get; set; }
-    [Selector("buttonWidgetStateString", "setButtonWidgetStateString:")] public NSString ButtonWidgetStateString { get; set; }
-    [Selector("isOpen", "setOpen:")] public bool Open { get; set; }
-    [Selector("paths")] public NSArray? Paths { get; }
-    [Selector("destination", "setDestination:")] public PDFDestination? Destination { get; set; }
-    [Selector("URL", "setURL:")] public NSURL? URL { get; set; }
-    [Selector("fieldName", "setFieldName:")] public NSString? FieldName { get; set; }
-    [Selector("caption", "setCaption:")] public NSString? Caption { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("stampName", "setStampName:")] public NSString? StampName { get; set; }
-    [Selector("lineStyleFromName:")] public static PDFLineStyle LineStyleFromName(NSString name);
-    [Selector("nameForLineStyle:")] public static NSString NameForLineStyle(PDFLineStyle style);
-    [Selector("addBezierPath:")] public void AddBezierPath(NSBezierPath path);
-    [Selector("removeBezierPath:")] public void RemoveBezierPath(NSBezierPath path);
+    [Selector("font", "setFont:")]
+    public NSFont? Font { get; set; }
+    [Selector("fontColor", "setFontColor:")]
+    public NSColor? FontColor { get; set; }
+    [Selector("interiorColor", "setInteriorColor:")]
+    public NSColor? InteriorColor { get; set; }
+    [Selector("alignment", "setAlignment:")]
+    public NSTextAlignment Alignment { get; set; }
+    [Selector("startPoint", "setStartPoint:")]
+    public NSPoint StartPoint { get; set; }
+    [Selector("endPoint", "setEndPoint:")]
+    public NSPoint EndPoint { get; set; }
+    [Selector("startLineStyle", "setStartLineStyle:")]
+    public PDFLineStyle StartLineStyle { get; set; }
+    [Selector("endLineStyle", "setEndLineStyle:")]
+    public PDFLineStyle EndLineStyle { get; set; }
+    [Selector("iconType", "setIconType:")]
+    public PDFTextAnnotationIconType IconType { get; set; }
+    [Selector("quadrilateralPoints", "setQuadrilateralPoints:")]
+    public NSArray? QuadrilateralPoints { get; set; }
+    [Selector("markupType", "setMarkupType:")]
+    public PDFMarkupType MarkupType { get; set; }
+    [Selector("widgetFieldType", "setWidgetFieldType:")]
+    public PDFAnnotationWidgetSubtype WidgetFieldType { get; set; }
+    [Selector("widgetControlType", "setWidgetControlType:")]
+    public PDFWidgetControlType WidgetControlType { get; set; }
+    [Selector("isMultiline", "setMultiline:")]
+    public bool Multiline { get; set; }
+    [Selector("isActivatableTextField")]
+    public bool ActivatableTextField { get; }
+    [Selector("isPasswordField")]
+    public bool IsPasswordField { get; }
+    [Selector("hasComb", "setComb:")]
+    public bool Comb { get; set; }
+    [Selector("maximumLength", "setMaximumLength:")]
+    public NSInteger MaximumLength { get; set; }
+    [Selector("widgetStringValue", "setWidgetStringValue:")]
+    public NSString? WidgetStringValue { get; set; }
+    [Selector("widgetDefaultStringValue", "setWidgetDefaultStringValue:")]
+    public NSString? WidgetDefaultStringValue { get; set; }
+    [Selector("allowsToggleToOff", "setAllowsToggleToOff:")]
+    public bool AllowsToggleToOff { get; set; }
+    [Selector("radiosInUnison", "setRadiosInUnison:")]
+    public bool RadiosInUnison { get; set; }
+    [Selector("isReadOnly", "setReadOnly:")]
+    public bool ReadOnly { get; set; }
+    [Selector("isListChoice", "setListChoice:")]
+    public bool ListChoice { get; set; }
+    [Selector("choices", "setChoices:")]
+    public NSArray? Choices { get; set; }
+    [Selector("values", "setValues:")]
+    public NSArray? Values { get; set; }
+    [Selector("buttonWidgetState", "setButtonWidgetState:")]
+    public PDFWidgetCellState ButtonWidgetState { get; set; }
+    [Selector("buttonWidgetStateString", "setButtonWidgetStateString:")]
+    public NSString ButtonWidgetStateString { get; set; }
+    [Selector("isOpen", "setOpen:")]
+    public bool Open { get; set; }
+    [Selector("paths")]
+    public NSArray? Paths { get; }
+    [Selector("destination", "setDestination:")]
+    public PDFDestination? Destination { get; set; }
+    [Selector("URL", "setURL:")]
+    public NSURL? URL { get; set; }
+    [Selector("fieldName", "setFieldName:")]
+    public NSString? FieldName { get; set; }
+    [Selector("caption", "setCaption:")]
+    public NSString? Caption { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("stampName", "setStampName:")]
+    public NSString? StampName { get; set; }
+    [Selector("lineStyleFromName:")]
+    public static PDFLineStyle LineStyleFromName(NSString name);
+    [Selector("nameForLineStyle:")]
+    public static NSString NameForLineStyle(PDFLineStyle style);
+    [Selector("addBezierPath:")]
+    public void AddBezierPath(NSBezierPath path);
+    [Selector("removeBezierPath:")]
+    public void RemoveBezierPath(NSBezierPath path);
 }
 
 #endif

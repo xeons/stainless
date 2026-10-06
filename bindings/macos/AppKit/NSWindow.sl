@@ -177,211 +177,415 @@ public objc closure void NSWindowRequestSharingOfWindowUsingPreviewTitleCompleti
 
 public extern objc class NSWindow : NSResponder, NSAnimatablePropertyContainer, NSMenuItemValidation, NSUserInterfaceValidations, NSUserInterfaceItemIdentification, NSAppearanceCustomization, NSAccessibilityElementProtocol, NSAccessibility
 {
-    [Selector("defaultDepthLimit")] public static NSWindowDepth DefaultDepthLimit { get; }
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("subtitle", "setSubtitle:")] public NSString? Subtitle { get; set; }
-    [Selector("titleVisibility", "setTitleVisibility:")] public NSWindowTitleVisibility TitleVisibility { get; set; }
-    [Selector("titlebarAppearsTransparent", "setTitlebarAppearsTransparent:")] public bool TitlebarAppearsTransparent { get; set; }
-    [Selector("toolbarStyle", "setToolbarStyle:")] public NSWindowToolbarStyle ToolbarStyle { get; set; }
-    [Selector("contentLayoutRect")] public NSRect ContentLayoutRect { get; }
-    [Selector("contentLayoutGuide")] public AnyObject? ContentLayoutGuide { get; }
-    [Selector("titlebarAccessoryViewControllers", "setTitlebarAccessoryViewControllers:")] public NSArray? TitlebarAccessoryViewControllers { get; set; }
-    [Selector("representedURL", "setRepresentedURL:")] public NSURL? RepresentedURL { get; set; }
-    [Selector("representedFilename", "setRepresentedFilename:")] public NSString RepresentedFilename { get; set; }
-    [Selector("isExcludedFromWindowsMenu", "setExcludedFromWindowsMenu:")] public bool ExcludedFromWindowsMenu { get; set; }
-    [Selector("contentView", "setContentView:")] public NSView? ContentView { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSWindowDelegate? Delegate { get; set; }
-    [Selector("windowNumber")] public NSInteger WindowNumber { get; }
-    [Selector("styleMask", "setStyleMask:")] public NSWindowStyleMask StyleMask { get; set; }
-    [Selector("cascadingReferenceFrame")] public NSRect CascadingReferenceFrame { get; }
-    [Selector("frame")] public NSRect Frame { get; }
-    [Selector("inLiveResize")] public bool InLiveResize { get; }
-    [Selector("resizeIncrements", "setResizeIncrements:")] public NSSize ResizeIncrements { get; set; }
-    [Selector("aspectRatio", "setAspectRatio:")] public NSSize AspectRatio { get; set; }
-    [Selector("contentResizeIncrements", "setContentResizeIncrements:")] public NSSize ContentResizeIncrements { get; set; }
-    [Selector("contentAspectRatio", "setContentAspectRatio:")] public NSSize ContentAspectRatio { get; set; }
-    [Selector("viewsNeedDisplay", "setViewsNeedDisplay:")] public bool ViewsNeedDisplay { get; set; }
-    [Selector("preservesContentDuringLiveResize", "setPreservesContentDuringLiveResize:")] public bool PreservesContentDuringLiveResize { get; set; }
-    [Selector("firstResponder")] public NSResponder? FirstResponder { get; }
-    [Selector("resizeFlags")] public NSEventModifierFlags ResizeFlags { get; }
-    [Selector("isReleasedWhenClosed", "setReleasedWhenClosed:")] public bool ReleasedWhenClosed { get; set; }
-    [Selector("isZoomed")] public bool Zoomed { get; }
-    [Selector("isMiniaturized")] public bool Miniaturized { get; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("isMovable", "setMovable:")] public bool Movable { get; set; }
-    [Selector("isMovableByWindowBackground", "setMovableByWindowBackground:")] public bool MovableByWindowBackground { get; set; }
-    [Selector("hidesOnDeactivate", "setHidesOnDeactivate:")] public bool HidesOnDeactivate { get; set; }
-    [Selector("canHide", "setCanHide:")] public bool CanHide { get; set; }
-    [Selector("miniwindowImage", "setMiniwindowImage:")] public NSImage? MiniwindowImage { get; set; }
-    [Selector("miniwindowTitle", "setMiniwindowTitle:")] public NSString? MiniwindowTitle { get; set; }
-    [Selector("dockTile")] public NSDockTile? DockTile { get; }
-    [Selector("isDocumentEdited", "setDocumentEdited:")] public bool DocumentEdited { get; set; }
-    [Selector("isVisible")] public bool Visible { get; }
-    [Selector("isKeyWindow")] public bool KeyWindow { get; }
-    [Selector("isMainWindow")] public bool MainWindow { get; }
-    [Selector("canBecomeKeyWindow")] public bool CanBecomeKeyWindow { get; }
-    [Selector("canBecomeMainWindow")] public bool CanBecomeMainWindow { get; }
-    [Selector("worksWhenModal")] public bool WorksWhenModal { get; }
-    [Selector("preventsApplicationTerminationWhenModal", "setPreventsApplicationTerminationWhenModal:")] public bool PreventsApplicationTerminationWhenModal { get; set; }
-    [Selector("backingScaleFactor")] public CGFloat BackingScaleFactor { get; }
-    [Selector("allowsToolTipsWhenApplicationIsInactive", "setAllowsToolTipsWhenApplicationIsInactive:")] public bool AllowsToolTipsWhenApplicationIsInactive { get; set; }
-    [Selector("backingType", "setBackingType:")] public NSBackingStoreType BackingType { get; set; }
-    [Selector("level", "setLevel:")] public NSWindowLevel Level { get; set; }
-    [Selector("depthLimit", "setDepthLimit:")] public NSWindowDepth DepthLimit { get; set; }
-    [Selector("hasDynamicDepthLimit")] public bool HasDynamicDepthLimit { get; }
-    [Selector("screen")] public NSScreen? Screen { get; }
-    [Selector("deepestScreen")] public NSScreen? DeepestScreen { get; }
-    [Selector("hasShadow", "setHasShadow:")] public bool HasShadow { get; set; }
-    [Selector("alphaValue", "setAlphaValue:")] public CGFloat AlphaValue { get; set; }
-    [Selector("isOpaque", "setOpaque:")] public bool Opaque { get; set; }
-    [Selector("sharingType", "setSharingType:")] public NSWindowSharingType SharingType { get; set; }
-    [Selector("allowsConcurrentViewDrawing", "setAllowsConcurrentViewDrawing:")] public bool AllowsConcurrentViewDrawing { get; set; }
-    [Selector("displaysWhenScreenProfileChanges", "setDisplaysWhenScreenProfileChanges:")] public bool DisplaysWhenScreenProfileChanges { get; set; }
-    [Selector("canBecomeVisibleWithoutLogin", "setCanBecomeVisibleWithoutLogin:")] public bool CanBecomeVisibleWithoutLogin { get; set; }
-    [Selector("collectionBehavior", "setCollectionBehavior:")] public NSWindowCollectionBehavior CollectionBehavior { get; set; }
-    [Selector("animationBehavior", "setAnimationBehavior:")] public NSWindowAnimationBehavior AnimationBehavior { get; set; }
-    [Selector("isOnActiveSpace")] public bool OnActiveSpace { get; }
-    [Selector("stringWithSavedFrame")] public NSWindowPersistableFrameDescriptor StringWithSavedFrame { get; }
-    [Selector("frameAutosaveName")] public NSWindowFrameAutosaveName FrameAutosaveName { get; }
-    [Selector("minSize", "setMinSize:")] public NSSize MinSize { get; set; }
-    [Selector("maxSize", "setMaxSize:")] public NSSize MaxSize { get; set; }
-    [Selector("contentMinSize", "setContentMinSize:")] public NSSize ContentMinSize { get; set; }
-    [Selector("contentMaxSize", "setContentMaxSize:")] public NSSize ContentMaxSize { get; set; }
-    [Selector("minFullScreenContentSize", "setMinFullScreenContentSize:")] public NSSize MinFullScreenContentSize { get; set; }
-    [Selector("maxFullScreenContentSize", "setMaxFullScreenContentSize:")] public NSSize MaxFullScreenContentSize { get; set; }
-    [Selector("deviceDescription")] public NSDictionary DeviceDescription { get; }
-    [Selector("windowController", "setWindowController:")] public NSWindowController? WindowController { get; set; }
-    [Selector("sheets")] public NSArray? Sheets { get; }
-    [Selector("attachedSheet")] public NSWindow? AttachedSheet { get; }
-    [Selector("isSheet")] public bool Sheet { get; }
-    [Selector("sheetParent")] public NSWindow? SheetParent { get; }
-    [Selector("childWindows")] public NSArray? ChildWindows { get; }
-    [Selector("parentWindow", "setParentWindow:")] public NSWindow? ParentWindow { get; set; }
-    [Selector("appearanceSource", "setAppearanceSource:")] public NSObject? AppearanceSource { get; set; }
-    [Selector("colorSpace", "setColorSpace:")] public NSColorSpace? ColorSpace { get; set; }
-    [Selector("occlusionState")] public NSWindowOcclusionState OcclusionState { get; }
-    [Selector("titlebarSeparatorStyle", "setTitlebarSeparatorStyle:")] public NSTitlebarSeparatorStyle TitlebarSeparatorStyle { get; set; }
-    [Selector("contentViewController", "setContentViewController:")] public NSViewController? ContentViewController { get; set; }
-    [Selector("initialFirstResponder", "setInitialFirstResponder:")] public NSView? InitialFirstResponder { get; set; }
-    [Selector("keyViewSelectionDirection")] public NSSelectionDirection KeyViewSelectionDirection { get; }
-    [Selector("defaultButtonCell", "setDefaultButtonCell:")] public NSButtonCell? DefaultButtonCell { get; set; }
-    [Selector("autorecalculatesKeyViewLoop", "setAutorecalculatesKeyViewLoop:")] public bool AutorecalculatesKeyViewLoop { get; set; }
-    [Selector("toolbar", "setToolbar:")] public NSToolbar? Toolbar { get; set; }
+    [Selector("defaultDepthLimit")]
+    public static NSWindowDepth DefaultDepthLimit { get; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("subtitle", "setSubtitle:")]
+    public NSString? Subtitle { get; set; }
+    [Selector("titleVisibility", "setTitleVisibility:")]
+    public NSWindowTitleVisibility TitleVisibility { get; set; }
+    [Selector("titlebarAppearsTransparent", "setTitlebarAppearsTransparent:")]
+    public bool TitlebarAppearsTransparent { get; set; }
+    [Selector("toolbarStyle", "setToolbarStyle:")]
+    public NSWindowToolbarStyle ToolbarStyle { get; set; }
+    [Selector("contentLayoutRect")]
+    public NSRect ContentLayoutRect { get; }
+    [Selector("contentLayoutGuide")]
+    public AnyObject? ContentLayoutGuide { get; }
+    [Selector("titlebarAccessoryViewControllers", "setTitlebarAccessoryViewControllers:")]
+    public NSArray? TitlebarAccessoryViewControllers { get; set; }
+    [Selector("representedURL", "setRepresentedURL:")]
+    public NSURL? RepresentedURL { get; set; }
+    [Selector("representedFilename", "setRepresentedFilename:")]
+    public NSString RepresentedFilename { get; set; }
+    [Selector("isExcludedFromWindowsMenu", "setExcludedFromWindowsMenu:")]
+    public bool ExcludedFromWindowsMenu { get; set; }
+    [Selector("contentView", "setContentView:")]
+    public NSView? ContentView { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSWindowDelegate? Delegate { get; set; }
+    [Selector("windowNumber")]
+    public NSInteger WindowNumber { get; }
+    [Selector("styleMask", "setStyleMask:")]
+    public NSWindowStyleMask StyleMask { get; set; }
+    [Selector("cascadingReferenceFrame")]
+    public NSRect CascadingReferenceFrame { get; }
+    [Selector("frame")]
+    public NSRect Frame { get; }
+    [Selector("inLiveResize")]
+    public bool InLiveResize { get; }
+    [Selector("resizeIncrements", "setResizeIncrements:")]
+    public NSSize ResizeIncrements { get; set; }
+    [Selector("aspectRatio", "setAspectRatio:")]
+    public NSSize AspectRatio { get; set; }
+    [Selector("contentResizeIncrements", "setContentResizeIncrements:")]
+    public NSSize ContentResizeIncrements { get; set; }
+    [Selector("contentAspectRatio", "setContentAspectRatio:")]
+    public NSSize ContentAspectRatio { get; set; }
+    [Selector("viewsNeedDisplay", "setViewsNeedDisplay:")]
+    public bool ViewsNeedDisplay { get; set; }
+    [Selector("preservesContentDuringLiveResize", "setPreservesContentDuringLiveResize:")]
+    public bool PreservesContentDuringLiveResize { get; set; }
+    [Selector("firstResponder")]
+    public NSResponder? FirstResponder { get; }
+    [Selector("resizeFlags")]
+    public NSEventModifierFlags ResizeFlags { get; }
+    [Selector("isReleasedWhenClosed", "setReleasedWhenClosed:")]
+    public bool ReleasedWhenClosed { get; set; }
+    [Selector("isZoomed")]
+    public bool Zoomed { get; }
+    [Selector("isMiniaturized")]
+    public bool Miniaturized { get; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("isMovable", "setMovable:")]
+    public bool Movable { get; set; }
+    [Selector("isMovableByWindowBackground", "setMovableByWindowBackground:")]
+    public bool MovableByWindowBackground { get; set; }
+    [Selector("hidesOnDeactivate", "setHidesOnDeactivate:")]
+    public bool HidesOnDeactivate { get; set; }
+    [Selector("canHide", "setCanHide:")]
+    public bool CanHide { get; set; }
+    [Selector("miniwindowImage", "setMiniwindowImage:")]
+    public NSImage? MiniwindowImage { get; set; }
+    [Selector("miniwindowTitle", "setMiniwindowTitle:")]
+    public NSString? MiniwindowTitle { get; set; }
+    [Selector("dockTile")]
+    public NSDockTile? DockTile { get; }
+    [Selector("isDocumentEdited", "setDocumentEdited:")]
+    public bool DocumentEdited { get; set; }
+    [Selector("isVisible")]
+    public bool Visible { get; }
+    [Selector("isKeyWindow")]
+    public bool KeyWindow { get; }
+    [Selector("isMainWindow")]
+    public bool MainWindow { get; }
+    [Selector("canBecomeKeyWindow")]
+    public bool CanBecomeKeyWindow { get; }
+    [Selector("canBecomeMainWindow")]
+    public bool CanBecomeMainWindow { get; }
+    [Selector("worksWhenModal")]
+    public bool WorksWhenModal { get; }
+    [Selector("preventsApplicationTerminationWhenModal", "setPreventsApplicationTerminationWhenModal:")]
+    public bool PreventsApplicationTerminationWhenModal { get; set; }
+    [Selector("backingScaleFactor")]
+    public CGFloat BackingScaleFactor { get; }
+    [Selector("allowsToolTipsWhenApplicationIsInactive", "setAllowsToolTipsWhenApplicationIsInactive:")]
+    public bool AllowsToolTipsWhenApplicationIsInactive { get; set; }
+    [Selector("backingType", "setBackingType:")]
+    public NSBackingStoreType BackingType { get; set; }
+    [Selector("level", "setLevel:")]
+    public NSWindowLevel Level { get; set; }
+    [Selector("depthLimit", "setDepthLimit:")]
+    public NSWindowDepth DepthLimit { get; set; }
+    [Selector("hasDynamicDepthLimit")]
+    public bool HasDynamicDepthLimit { get; }
+    [Selector("screen")]
+    public NSScreen? Screen { get; }
+    [Selector("deepestScreen")]
+    public NSScreen? DeepestScreen { get; }
+    [Selector("hasShadow", "setHasShadow:")]
+    public bool HasShadow { get; set; }
+    [Selector("alphaValue", "setAlphaValue:")]
+    public CGFloat AlphaValue { get; set; }
+    [Selector("isOpaque", "setOpaque:")]
+    public bool Opaque { get; set; }
+    [Selector("sharingType", "setSharingType:")]
+    public NSWindowSharingType SharingType { get; set; }
+    [Selector("allowsConcurrentViewDrawing", "setAllowsConcurrentViewDrawing:")]
+    public bool AllowsConcurrentViewDrawing { get; set; }
+    [Selector("displaysWhenScreenProfileChanges", "setDisplaysWhenScreenProfileChanges:")]
+    public bool DisplaysWhenScreenProfileChanges { get; set; }
+    [Selector("canBecomeVisibleWithoutLogin", "setCanBecomeVisibleWithoutLogin:")]
+    public bool CanBecomeVisibleWithoutLogin { get; set; }
+    [Selector("collectionBehavior", "setCollectionBehavior:")]
+    public NSWindowCollectionBehavior CollectionBehavior { get; set; }
+    [Selector("animationBehavior", "setAnimationBehavior:")]
+    public NSWindowAnimationBehavior AnimationBehavior { get; set; }
+    [Selector("isOnActiveSpace")]
+    public bool OnActiveSpace { get; }
+    [Selector("stringWithSavedFrame")]
+    public NSWindowPersistableFrameDescriptor StringWithSavedFrame { get; }
+    [Selector("frameAutosaveName")]
+    public NSWindowFrameAutosaveName FrameAutosaveName { get; }
+    [Selector("minSize", "setMinSize:")]
+    public NSSize MinSize { get; set; }
+    [Selector("maxSize", "setMaxSize:")]
+    public NSSize MaxSize { get; set; }
+    [Selector("contentMinSize", "setContentMinSize:")]
+    public NSSize ContentMinSize { get; set; }
+    [Selector("contentMaxSize", "setContentMaxSize:")]
+    public NSSize ContentMaxSize { get; set; }
+    [Selector("minFullScreenContentSize", "setMinFullScreenContentSize:")]
+    public NSSize MinFullScreenContentSize { get; set; }
+    [Selector("maxFullScreenContentSize", "setMaxFullScreenContentSize:")]
+    public NSSize MaxFullScreenContentSize { get; set; }
+    [Selector("deviceDescription")]
+    public NSDictionary DeviceDescription { get; }
+    [Selector("windowController", "setWindowController:")]
+    public NSWindowController? WindowController { get; set; }
+    [Selector("sheets")]
+    public NSArray? Sheets { get; }
+    [Selector("attachedSheet")]
+    public NSWindow? AttachedSheet { get; }
+    [Selector("isSheet")]
+    public bool Sheet { get; }
+    [Selector("sheetParent")]
+    public NSWindow? SheetParent { get; }
+    [Selector("childWindows")]
+    public NSArray? ChildWindows { get; }
+    [Selector("parentWindow", "setParentWindow:")]
+    public NSWindow? ParentWindow { get; set; }
+    [Selector("appearanceSource", "setAppearanceSource:")]
+    public NSObject? AppearanceSource { get; set; }
+    [Selector("colorSpace", "setColorSpace:")]
+    public NSColorSpace? ColorSpace { get; set; }
+    [Selector("occlusionState")]
+    public NSWindowOcclusionState OcclusionState { get; }
+    [Selector("titlebarSeparatorStyle", "setTitlebarSeparatorStyle:")]
+    public NSTitlebarSeparatorStyle TitlebarSeparatorStyle { get; set; }
+    [Selector("contentViewController", "setContentViewController:")]
+    public NSViewController? ContentViewController { get; set; }
+    [Selector("initialFirstResponder", "setInitialFirstResponder:")]
+    public NSView? InitialFirstResponder { get; set; }
+    [Selector("keyViewSelectionDirection")]
+    public NSSelectionDirection KeyViewSelectionDirection { get; }
+    [Selector("defaultButtonCell", "setDefaultButtonCell:")]
+    public NSButtonCell? DefaultButtonCell { get; set; }
+    [Selector("autorecalculatesKeyViewLoop", "setAutorecalculatesKeyViewLoop:")]
+    public bool AutorecalculatesKeyViewLoop { get; set; }
+    [Selector("toolbar", "setToolbar:")]
+    public NSToolbar? Toolbar { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("showsToolbarButton", "setShowsToolbarButton:")] public bool ShowsToolbarButton { get; set; }
-    [Selector("allowsAutomaticWindowTabbing", "setAllowsAutomaticWindowTabbing:")] public static bool AllowsAutomaticWindowTabbing { get; set; }
-    [Selector("userTabbingPreference")] public static NSWindowUserTabbingPreference UserTabbingPreference { get; }
-    [Selector("tabbingMode", "setTabbingMode:")] public NSWindowTabbingMode TabbingMode { get; set; }
-    [Selector("tabbingIdentifier", "setTabbingIdentifier:")] public NSWindowTabbingIdentifier? TabbingIdentifier { get; set; }
-    [Selector("tabbedWindows")] public NSArray? TabbedWindows { get; }
-    [Selector("tab")] public NSWindowTab? Tab { get; }
-    [Selector("tabGroup")] public NSWindowTabGroup? TabGroup { get; }
-    [Selector("hasActiveWindowSharingSession")] public bool HasActiveWindowSharingSession { get; }
-    [Selector("windowTitlebarLayoutDirection")] public NSUserInterfaceLayoutDirection WindowTitlebarLayoutDirection { get; }
-    [Selector("frameRectForContentRect:styleMask:")] public static NSRect FrameRectForContentRectStyleMask(NSRect cRect, NSWindowStyleMask style);
-    [Selector("contentRectForFrameRect:styleMask:")] public static NSRect ContentRectForFrameRectStyleMask(NSRect fRect, NSWindowStyleMask style);
-    [Selector("minFrameWidthWithTitle:styleMask:")] public static CGFloat MinFrameWidthWithTitleStyleMask(NSString title, NSWindowStyleMask style);
-    [Selector("frameRectForContentRect:")] public NSRect FrameRectForContentRect(NSRect contentRect);
-    [Selector("contentRectForFrameRect:")] public NSRect ContentRectForFrameRect(NSRect frameRect);
-    [Selector("initWithContentRect:styleMask:backing:defer:")] public Self InitWithContentRectStyleMaskBackingDefer(NSRect contentRect, NSWindowStyleMask style, NSBackingStoreType backingStoreType, bool flag);
-    [Selector("initWithContentRect:styleMask:backing:defer:screen:")] public Self InitWithContentRectStyleMaskBackingDeferScreen(NSRect contentRect, NSWindowStyleMask style, NSBackingStoreType backingStoreType, bool flag, NSScreen? screen);
-    [Selector("addTitlebarAccessoryViewController:")] public void AddTitlebarAccessoryViewController(NSTitlebarAccessoryViewController childViewController);
-    [Selector("insertTitlebarAccessoryViewController:atIndex:")] public void InsertTitlebarAccessoryViewControllerAtIndex(NSTitlebarAccessoryViewController childViewController, NSInteger index);
-    [Selector("removeTitlebarAccessoryViewControllerAtIndex:")] public void RemoveTitlebarAccessoryViewControllerAtIndex(NSInteger index);
-    [Selector("setTitleWithRepresentedFilename:")] public void SetTitleWithRepresentedFilename(NSString filename);
-    [Selector("fieldEditor:forObject:")] public NSText? FieldEditorForObject(bool createFlag, AnyObject? object);
-    [Selector("endEditingFor:")] public void EndEditingFor(AnyObject? object);
-    [Selector("constrainFrameRect:toScreen:")] public NSRect ConstrainFrameRectToScreen(NSRect frameRect, NSScreen? screen);
-    [Selector("setFrame:display:")] public void SetFrameDisplay(NSRect frameRect, bool flag);
-    [Selector("setContentSize:")] public void SetContentSize(NSSize size);
-    [Selector("setFrameOrigin:")] public void SetFrameOrigin(NSPoint point);
-    [Selector("setFrameTopLeftPoint:")] public void SetFrameTopLeftPoint(NSPoint point);
-    [Selector("cascadeTopLeftFromPoint:")] public NSPoint CascadeTopLeftFromPoint(NSPoint topLeftPoint);
-    [Selector("animationResizeTime:")] public NSTimeInterval AnimationResizeTime(NSRect newFrame);
-    [Selector("setFrame:display:animate:")] public void SetFrameDisplayAnimate(NSRect frameRect, bool displayFlag, bool animateFlag);
-    [Selector("displayIfNeeded")] public void DisplayIfNeeded();
-    [Selector("display")] public void Display();
-    [Selector("update")] public void Update();
-    [Selector("makeFirstResponder:")] public bool MakeFirstResponder(NSResponder? responder);
-    [Selector("close")] public void Close();
-    [Selector("miniaturize:")] public void Miniaturize(AnyObject? sender);
-    [Selector("deminiaturize:")] public void Deminiaturize(AnyObject? sender);
-    [Selector("zoom:")] public void Zoom(AnyObject? sender);
-    [Selector("tryToPerform:with:")] public bool TryToPerformWith(Selector action, AnyObject? object);
-    [Selector("validRequestorForSendType:returnType:")] public AnyObject? ValidRequestorForSendTypeReturnType(NSPasteboardType? sendType, NSPasteboardType? returnType);
-    [Selector("setContentBorderThickness:forEdge:")] public void SetContentBorderThicknessForEdge(CGFloat thickness, NSRectEdge edge);
-    [Selector("contentBorderThicknessForEdge:")] public CGFloat ContentBorderThicknessForEdge(NSRectEdge edge);
-    [Selector("setAutorecalculatesContentBorderThickness:forEdge:")] public void SetAutorecalculatesContentBorderThicknessForEdge(bool flag, NSRectEdge edge);
-    [Selector("autorecalculatesContentBorderThicknessForEdge:")] public bool AutorecalculatesContentBorderThicknessForEdge(NSRectEdge edge);
-    [Selector("center")] public void Center();
-    [Selector("makeKeyAndOrderFront:")] public void MakeKeyAndOrderFront(AnyObject? sender);
-    [Selector("orderFront:")] public void OrderFront(AnyObject? sender);
-    [Selector("orderBack:")] public void OrderBack(AnyObject? sender);
-    [Selector("orderOut:")] public void OrderOut(AnyObject? sender);
-    [Selector("orderWindow:relativeTo:")] public void OrderWindowRelativeTo(NSWindowOrderingMode place, NSInteger otherWin);
-    [Selector("orderFrontRegardless")] public void OrderFrontRegardless();
-    [Selector("makeKeyWindow")] public void MakeKeyWindow();
-    [Selector("makeMainWindow")] public void MakeMainWindow();
-    [Selector("becomeKeyWindow")] public void BecomeKeyWindow();
-    [Selector("resignKeyWindow")] public void ResignKeyWindow();
-    [Selector("becomeMainWindow")] public void BecomeMainWindow();
-    [Selector("resignMainWindow")] public void ResignMainWindow();
-    [Selector("convertRectToScreen:")] public NSRect ConvertRectToScreen(NSRect rect);
-    [Selector("convertRectFromScreen:")] public NSRect ConvertRectFromScreen(NSRect rect);
-    [Selector("convertPointToScreen:")] public NSPoint ConvertPointToScreen(NSPoint point);
-    [Selector("convertPointFromScreen:")] public NSPoint ConvertPointFromScreen(NSPoint point);
-    [Selector("convertRectToBacking:")] public NSRect ConvertRectToBacking(NSRect rect);
-    [Selector("convertRectFromBacking:")] public NSRect ConvertRectFromBacking(NSRect rect);
-    [Selector("convertPointToBacking:")] public NSPoint ConvertPointToBacking(NSPoint point);
-    [Selector("convertPointFromBacking:")] public NSPoint ConvertPointFromBacking(NSPoint point);
-    [Selector("backingAlignedRect:options:")] public NSRect BackingAlignedRectOptions(NSRect rect, NSAlignmentOptions options);
-    [Selector("performClose:")] public void PerformClose(AnyObject? sender);
-    [Selector("performMiniaturize:")] public void PerformMiniaturize(AnyObject? sender);
-    [Selector("performZoom:")] public void PerformZoom(AnyObject? sender);
-    [Selector("dataWithEPSInsideRect:")] public NSData DataWithEPSInsideRect(NSRect rect);
-    [Selector("dataWithPDFInsideRect:")] public NSData DataWithPDFInsideRect(NSRect rect);
-    [Selector("print:")] public void Print(AnyObject? sender);
-    [Selector("setDynamicDepthLimit:")] public void SetDynamicDepthLimit(bool flag);
-    [Selector("invalidateShadow")] public void InvalidateShadow();
-    [Selector("toggleFullScreen:")] public void ToggleFullScreen(AnyObject? sender);
-    [Selector("setFrameFromString:")] public void SetFrameFromString(NSWindowPersistableFrameDescriptor string);
-    [Selector("saveFrameUsingName:")] public void SaveFrameUsingName(NSWindowFrameAutosaveName name);
-    [Selector("setFrameUsingName:force:")] public bool SetFrameUsingNameForce(NSWindowFrameAutosaveName name, bool force);
-    [Selector("setFrameUsingName:")] public bool SetFrameUsingName(NSWindowFrameAutosaveName name);
-    [Selector("setFrameAutosaveName:")] public bool SetFrameAutosaveName(NSWindowFrameAutosaveName name);
-    [Selector("removeFrameUsingName:")] public static void RemoveFrameUsingName(NSWindowFrameAutosaveName name);
-    [Selector("beginSheet:completionHandler:")] public void BeginSheetCompletionHandler(NSWindow sheetWindow, NSWindowBeginSheetCompletionHandlerHandlerBlock? handler);
-    [Selector("beginCriticalSheet:completionHandler:")] public void BeginCriticalSheetCompletionHandler(NSWindow sheetWindow, NSWindowBeginCriticalSheetCompletionHandlerHandlerBlock? handler);
-    [Selector("endSheet:")] public void EndSheet(NSWindow sheetWindow);
-    [Selector("endSheet:returnCode:")] public void EndSheetReturnCode(NSWindow sheetWindow, NSModalResponse returnCode);
-    [Selector("standardWindowButton:forStyleMask:")] public static NSButton? StandardWindowButtonForStyleMask(NSWindowButton b, NSWindowStyleMask styleMask);
-    [Selector("standardWindowButton:")] public NSButton? StandardWindowButton(NSWindowButton b);
-    [Selector("addChildWindow:ordered:")] public void AddChildWindowOrdered(NSWindow childWin, NSWindowOrderingMode place);
-    [Selector("removeChildWindow:")] public void RemoveChildWindow(NSWindow childWin);
-    [Selector("canRepresentDisplayGamut:")] public bool CanRepresentDisplayGamut(NSDisplayGamut displayGamut);
-    [Selector("windowNumbersWithOptions:")] public static NSArray? WindowNumbersWithOptions(NSWindowNumberListOptions options);
-    [Selector("windowNumberAtPoint:belowWindowWithWindowNumber:")] public static NSInteger WindowNumberAtPointBelowWindowWithWindowNumber(NSPoint point, NSInteger windowNumber);
-    [Selector("windowWithContentViewController:")] public static Self WindowWithContentViewController(NSViewController contentViewController);
-    [Selector("performWindowDragWithEvent:")] public void PerformWindowDragWithEvent(NSEvent event);
-    [Selector("selectNextKeyView:")] public void SelectNextKeyView(AnyObject? sender);
-    [Selector("selectPreviousKeyView:")] public void SelectPreviousKeyView(AnyObject? sender);
-    [Selector("selectKeyViewFollowingView:")] public void SelectKeyViewFollowingView(NSView view);
-    [Selector("selectKeyViewPrecedingView:")] public void SelectKeyViewPrecedingView(NSView view);
-    [Selector("disableKeyEquivalentForDefaultButtonCell")] public void DisableKeyEquivalentForDefaultButtonCell();
-    [Selector("enableKeyEquivalentForDefaultButtonCell")] public void EnableKeyEquivalentForDefaultButtonCell();
-    [Selector("recalculateKeyViewLoop")] public void RecalculateKeyViewLoop();
-    [Selector("toggleToolbarShown:")] public void ToggleToolbarShown(AnyObject? sender);
-    [Selector("runToolbarCustomizationPalette:")] public void RunToolbarCustomizationPalette(AnyObject? sender);
-    [Selector("selectNextTab:")] public void SelectNextTab(AnyObject? sender);
-    [Selector("selectPreviousTab:")] public void SelectPreviousTab(AnyObject? sender);
-    [Selector("moveTabToNewWindow:")] public void MoveTabToNewWindow(AnyObject? sender);
-    [Selector("mergeAllWindows:")] public void MergeAllWindows(AnyObject? sender);
-    [Selector("toggleTabBar:")] public void ToggleTabBar(AnyObject? sender);
-    [Selector("toggleTabOverview:")] public void ToggleTabOverview(AnyObject? sender);
-    [Selector("addTabbedWindow:ordered:")] public void AddTabbedWindowOrdered(NSWindow window, NSWindowOrderingMode ordered);
-    [Selector("transferWindowSharingToWindow:completionHandler:")] public void TransferWindowSharingToWindowCompletionHandler(NSWindow window, NSWindowTransferWindowSharingToWindowCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("requestSharingOfWindow:completionHandler:")] public void RequestSharingOfWindowCompletionHandler(NSWindow window, NSWindowRequestSharingOfWindowCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("requestSharingOfWindowUsingPreview:title:completionHandler:")] public void RequestSharingOfWindowUsingPreviewTitleCompletionHandler(NSImage image, NSString title, NSWindowRequestSharingOfWindowUsingPreviewTitleCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("showsToolbarButton", "setShowsToolbarButton:")]
+    public bool ShowsToolbarButton { get; set; }
+    [Selector("allowsAutomaticWindowTabbing", "setAllowsAutomaticWindowTabbing:")]
+    public static bool AllowsAutomaticWindowTabbing { get; set; }
+    [Selector("userTabbingPreference")]
+    public static NSWindowUserTabbingPreference UserTabbingPreference { get; }
+    [Selector("tabbingMode", "setTabbingMode:")]
+    public NSWindowTabbingMode TabbingMode { get; set; }
+    [Selector("tabbingIdentifier", "setTabbingIdentifier:")]
+    public NSWindowTabbingIdentifier? TabbingIdentifier { get; set; }
+    [Selector("tabbedWindows")]
+    public NSArray? TabbedWindows { get; }
+    [Selector("tab")]
+    public NSWindowTab? Tab { get; }
+    [Selector("tabGroup")]
+    public NSWindowTabGroup? TabGroup { get; }
+    [Selector("hasActiveWindowSharingSession")]
+    public bool HasActiveWindowSharingSession { get; }
+    [Selector("windowTitlebarLayoutDirection")]
+    public NSUserInterfaceLayoutDirection WindowTitlebarLayoutDirection { get; }
+    [Selector("frameRectForContentRect:styleMask:")]
+    public static NSRect FrameRectForContentRectStyleMask(NSRect cRect, NSWindowStyleMask style);
+    [Selector("contentRectForFrameRect:styleMask:")]
+    public static NSRect ContentRectForFrameRectStyleMask(NSRect fRect, NSWindowStyleMask style);
+    [Selector("minFrameWidthWithTitle:styleMask:")]
+    public static CGFloat MinFrameWidthWithTitleStyleMask(NSString title, NSWindowStyleMask style);
+    [Selector("frameRectForContentRect:")]
+    public NSRect FrameRectForContentRect(NSRect contentRect);
+    [Selector("contentRectForFrameRect:")]
+    public NSRect ContentRectForFrameRect(NSRect frameRect);
+    [Selector("initWithContentRect:styleMask:backing:defer:")]
+    public Self InitWithContentRectStyleMaskBackingDefer(NSRect contentRect, NSWindowStyleMask style, NSBackingStoreType backingStoreType, bool flag);
+    [Selector("initWithContentRect:styleMask:backing:defer:screen:")]
+    public Self InitWithContentRectStyleMaskBackingDeferScreen(NSRect contentRect, NSWindowStyleMask style, NSBackingStoreType backingStoreType, bool flag, NSScreen? screen);
+    [Selector("addTitlebarAccessoryViewController:")]
+    public void AddTitlebarAccessoryViewController(NSTitlebarAccessoryViewController childViewController);
+    [Selector("insertTitlebarAccessoryViewController:atIndex:")]
+    public void InsertTitlebarAccessoryViewControllerAtIndex(NSTitlebarAccessoryViewController childViewController, NSInteger index);
+    [Selector("removeTitlebarAccessoryViewControllerAtIndex:")]
+    public void RemoveTitlebarAccessoryViewControllerAtIndex(NSInteger index);
+    [Selector("setTitleWithRepresentedFilename:")]
+    public void SetTitleWithRepresentedFilename(NSString filename);
+    [Selector("fieldEditor:forObject:")]
+    public NSText? FieldEditorForObject(bool createFlag, AnyObject? object);
+    [Selector("endEditingFor:")]
+    public void EndEditingFor(AnyObject? object);
+    [Selector("constrainFrameRect:toScreen:")]
+    public NSRect ConstrainFrameRectToScreen(NSRect frameRect, NSScreen? screen);
+    [Selector("setFrame:display:")]
+    public void SetFrameDisplay(NSRect frameRect, bool flag);
+    [Selector("setContentSize:")]
+    public void SetContentSize(NSSize size);
+    [Selector("setFrameOrigin:")]
+    public void SetFrameOrigin(NSPoint point);
+    [Selector("setFrameTopLeftPoint:")]
+    public void SetFrameTopLeftPoint(NSPoint point);
+    [Selector("cascadeTopLeftFromPoint:")]
+    public NSPoint CascadeTopLeftFromPoint(NSPoint topLeftPoint);
+    [Selector("animationResizeTime:")]
+    public NSTimeInterval AnimationResizeTime(NSRect newFrame);
+    [Selector("setFrame:display:animate:")]
+    public void SetFrameDisplayAnimate(NSRect frameRect, bool displayFlag, bool animateFlag);
+    [Selector("displayIfNeeded")]
+    public void DisplayIfNeeded();
+    [Selector("display")]
+    public void Display();
+    [Selector("update")]
+    public void Update();
+    [Selector("makeFirstResponder:")]
+    public bool MakeFirstResponder(NSResponder? responder);
+    [Selector("close")]
+    public void Close();
+    [Selector("miniaturize:")]
+    public void Miniaturize(AnyObject? sender);
+    [Selector("deminiaturize:")]
+    public void Deminiaturize(AnyObject? sender);
+    [Selector("zoom:")]
+    public void Zoom(AnyObject? sender);
+    [Selector("tryToPerform:with:")]
+    public bool TryToPerformWith(Selector action, AnyObject? object);
+    [Selector("validRequestorForSendType:returnType:")]
+    public AnyObject? ValidRequestorForSendTypeReturnType(NSPasteboardType? sendType, NSPasteboardType? returnType);
+    [Selector("setContentBorderThickness:forEdge:")]
+    public void SetContentBorderThicknessForEdge(CGFloat thickness, NSRectEdge edge);
+    [Selector("contentBorderThicknessForEdge:")]
+    public CGFloat ContentBorderThicknessForEdge(NSRectEdge edge);
+    [Selector("setAutorecalculatesContentBorderThickness:forEdge:")]
+    public void SetAutorecalculatesContentBorderThicknessForEdge(bool flag, NSRectEdge edge);
+    [Selector("autorecalculatesContentBorderThicknessForEdge:")]
+    public bool AutorecalculatesContentBorderThicknessForEdge(NSRectEdge edge);
+    [Selector("center")]
+    public void Center();
+    [Selector("makeKeyAndOrderFront:")]
+    public void MakeKeyAndOrderFront(AnyObject? sender);
+    [Selector("orderFront:")]
+    public void OrderFront(AnyObject? sender);
+    [Selector("orderBack:")]
+    public void OrderBack(AnyObject? sender);
+    [Selector("orderOut:")]
+    public void OrderOut(AnyObject? sender);
+    [Selector("orderWindow:relativeTo:")]
+    public void OrderWindowRelativeTo(NSWindowOrderingMode place, NSInteger otherWin);
+    [Selector("orderFrontRegardless")]
+    public void OrderFrontRegardless();
+    [Selector("makeKeyWindow")]
+    public void MakeKeyWindow();
+    [Selector("makeMainWindow")]
+    public void MakeMainWindow();
+    [Selector("becomeKeyWindow")]
+    public void BecomeKeyWindow();
+    [Selector("resignKeyWindow")]
+    public void ResignKeyWindow();
+    [Selector("becomeMainWindow")]
+    public void BecomeMainWindow();
+    [Selector("resignMainWindow")]
+    public void ResignMainWindow();
+    [Selector("convertRectToScreen:")]
+    public NSRect ConvertRectToScreen(NSRect rect);
+    [Selector("convertRectFromScreen:")]
+    public NSRect ConvertRectFromScreen(NSRect rect);
+    [Selector("convertPointToScreen:")]
+    public NSPoint ConvertPointToScreen(NSPoint point);
+    [Selector("convertPointFromScreen:")]
+    public NSPoint ConvertPointFromScreen(NSPoint point);
+    [Selector("convertRectToBacking:")]
+    public NSRect ConvertRectToBacking(NSRect rect);
+    [Selector("convertRectFromBacking:")]
+    public NSRect ConvertRectFromBacking(NSRect rect);
+    [Selector("convertPointToBacking:")]
+    public NSPoint ConvertPointToBacking(NSPoint point);
+    [Selector("convertPointFromBacking:")]
+    public NSPoint ConvertPointFromBacking(NSPoint point);
+    [Selector("backingAlignedRect:options:")]
+    public NSRect BackingAlignedRectOptions(NSRect rect, NSAlignmentOptions options);
+    [Selector("performClose:")]
+    public void PerformClose(AnyObject? sender);
+    [Selector("performMiniaturize:")]
+    public void PerformMiniaturize(AnyObject? sender);
+    [Selector("performZoom:")]
+    public void PerformZoom(AnyObject? sender);
+    [Selector("dataWithEPSInsideRect:")]
+    public NSData DataWithEPSInsideRect(NSRect rect);
+    [Selector("dataWithPDFInsideRect:")]
+    public NSData DataWithPDFInsideRect(NSRect rect);
+    [Selector("print:")]
+    public void Print(AnyObject? sender);
+    [Selector("setDynamicDepthLimit:")]
+    public void SetDynamicDepthLimit(bool flag);
+    [Selector("invalidateShadow")]
+    public void InvalidateShadow();
+    [Selector("toggleFullScreen:")]
+    public void ToggleFullScreen(AnyObject? sender);
+    [Selector("setFrameFromString:")]
+    public void SetFrameFromString(NSWindowPersistableFrameDescriptor string);
+    [Selector("saveFrameUsingName:")]
+    public void SaveFrameUsingName(NSWindowFrameAutosaveName name);
+    [Selector("setFrameUsingName:force:")]
+    public bool SetFrameUsingNameForce(NSWindowFrameAutosaveName name, bool force);
+    [Selector("setFrameUsingName:")]
+    public bool SetFrameUsingName(NSWindowFrameAutosaveName name);
+    [Selector("setFrameAutosaveName:")]
+    public bool SetFrameAutosaveName(NSWindowFrameAutosaveName name);
+    [Selector("removeFrameUsingName:")]
+    public static void RemoveFrameUsingName(NSWindowFrameAutosaveName name);
+    [Selector("beginSheet:completionHandler:")]
+    public void BeginSheetCompletionHandler(NSWindow sheetWindow, NSWindowBeginSheetCompletionHandlerHandlerBlock? handler);
+    [Selector("beginCriticalSheet:completionHandler:")]
+    public void BeginCriticalSheetCompletionHandler(NSWindow sheetWindow, NSWindowBeginCriticalSheetCompletionHandlerHandlerBlock? handler);
+    [Selector("endSheet:")]
+    public void EndSheet(NSWindow sheetWindow);
+    [Selector("endSheet:returnCode:")]
+    public void EndSheetReturnCode(NSWindow sheetWindow, NSModalResponse returnCode);
+    [Selector("standardWindowButton:forStyleMask:")]
+    public static NSButton? StandardWindowButtonForStyleMask(NSWindowButton b, NSWindowStyleMask styleMask);
+    [Selector("standardWindowButton:")]
+    public NSButton? StandardWindowButton(NSWindowButton b);
+    [Selector("addChildWindow:ordered:")]
+    public void AddChildWindowOrdered(NSWindow childWin, NSWindowOrderingMode place);
+    [Selector("removeChildWindow:")]
+    public void RemoveChildWindow(NSWindow childWin);
+    [Selector("canRepresentDisplayGamut:")]
+    public bool CanRepresentDisplayGamut(NSDisplayGamut displayGamut);
+    [Selector("windowNumbersWithOptions:")]
+    public static NSArray? WindowNumbersWithOptions(NSWindowNumberListOptions options);
+    [Selector("windowNumberAtPoint:belowWindowWithWindowNumber:")]
+    public static NSInteger WindowNumberAtPointBelowWindowWithWindowNumber(NSPoint point, NSInteger windowNumber);
+    [Selector("windowWithContentViewController:")]
+    public static Self WindowWithContentViewController(NSViewController contentViewController);
+    [Selector("performWindowDragWithEvent:")]
+    public void PerformWindowDragWithEvent(NSEvent event);
+    [Selector("selectNextKeyView:")]
+    public void SelectNextKeyView(AnyObject? sender);
+    [Selector("selectPreviousKeyView:")]
+    public void SelectPreviousKeyView(AnyObject? sender);
+    [Selector("selectKeyViewFollowingView:")]
+    public void SelectKeyViewFollowingView(NSView view);
+    [Selector("selectKeyViewPrecedingView:")]
+    public void SelectKeyViewPrecedingView(NSView view);
+    [Selector("disableKeyEquivalentForDefaultButtonCell")]
+    public void DisableKeyEquivalentForDefaultButtonCell();
+    [Selector("enableKeyEquivalentForDefaultButtonCell")]
+    public void EnableKeyEquivalentForDefaultButtonCell();
+    [Selector("recalculateKeyViewLoop")]
+    public void RecalculateKeyViewLoop();
+    [Selector("toggleToolbarShown:")]
+    public void ToggleToolbarShown(AnyObject? sender);
+    [Selector("runToolbarCustomizationPalette:")]
+    public void RunToolbarCustomizationPalette(AnyObject? sender);
+    [Selector("selectNextTab:")]
+    public void SelectNextTab(AnyObject? sender);
+    [Selector("selectPreviousTab:")]
+    public void SelectPreviousTab(AnyObject? sender);
+    [Selector("moveTabToNewWindow:")]
+    public void MoveTabToNewWindow(AnyObject? sender);
+    [Selector("mergeAllWindows:")]
+    public void MergeAllWindows(AnyObject? sender);
+    [Selector("toggleTabBar:")]
+    public void ToggleTabBar(AnyObject? sender);
+    [Selector("toggleTabOverview:")]
+    public void ToggleTabOverview(AnyObject? sender);
+    [Selector("addTabbedWindow:ordered:")]
+    public void AddTabbedWindowOrdered(NSWindow window, NSWindowOrderingMode ordered);
+    [Selector("transferWindowSharingToWindow:completionHandler:")]
+    public void TransferWindowSharingToWindowCompletionHandler(NSWindow window, NSWindowTransferWindowSharingToWindowCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("requestSharingOfWindow:completionHandler:")]
+    public void RequestSharingOfWindowCompletionHandler(NSWindow window, NSWindowRequestSharingOfWindowCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("requestSharingOfWindowUsingPreview:title:completionHandler:")]
+    public void RequestSharingOfWindowUsingPreviewTitleCompletionHandler(NSImage image, NSString title, NSWindowRequestSharingOfWindowUsingPreviewTitleCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void NSWindowTrackEventsMatchingMaskTimeoutModeHandlerTrackingHandlerBlock(NSEvent? arg0, bool* arg1);
@@ -389,100 +593,227 @@ public objc closure void NSWindowTrackEventsMatchingMaskTimeoutModeHandlerTracki
 /// NSEvent, a category of NSWindow.
 public extern objc class NSWindow
 {
-    [Selector("currentEvent")] public NSEvent? CurrentEvent { get; }
-    [Selector("acceptsMouseMovedEvents", "setAcceptsMouseMovedEvents:")] public bool AcceptsMouseMovedEvents { get; set; }
-    [Selector("ignoresMouseEvents", "setIgnoresMouseEvents:")] public bool IgnoresMouseEvents { get; set; }
-    [Selector("mouseLocationOutsideOfEventStream")] public NSPoint MouseLocationOutsideOfEventStream { get; }
-    [Selector("trackEventsMatchingMask:timeout:mode:handler:")] public void TrackEventsMatchingMaskTimeoutModeHandler(NSEventMask mask, NSTimeInterval timeout, NSRunLoopMode mode, NSWindowTrackEventsMatchingMaskTimeoutModeHandlerTrackingHandlerBlock trackingHandler);
-    [Selector("nextEventMatchingMask:")] public NSEvent? NextEventMatchingMask(NSEventMask mask);
-    [Selector("nextEventMatchingMask:untilDate:inMode:dequeue:")] public NSEvent? NextEventMatchingMaskUntilDateInModeDequeue(NSEventMask mask, NSDate? expiration, NSRunLoopMode mode, bool deqFlag);
-    [Selector("discardEventsMatchingMask:beforeEvent:")] public void DiscardEventsMatchingMaskBeforeEvent(NSEventMask mask, NSEvent? lastEvent);
-    [Selector("postEvent:atStart:")] public void PostEventAtStart(NSEvent event, bool flag);
-    [Selector("sendEvent:")] public void SendEvent(NSEvent event);
+    [Selector("currentEvent")]
+    public NSEvent? CurrentEvent { get; }
+    [Selector("acceptsMouseMovedEvents", "setAcceptsMouseMovedEvents:")]
+    public bool AcceptsMouseMovedEvents { get; set; }
+    [Selector("ignoresMouseEvents", "setIgnoresMouseEvents:")]
+    public bool IgnoresMouseEvents { get; set; }
+    [Selector("mouseLocationOutsideOfEventStream")]
+    public NSPoint MouseLocationOutsideOfEventStream { get; }
+    [Selector("trackEventsMatchingMask:timeout:mode:handler:")]
+    public void TrackEventsMatchingMaskTimeoutModeHandler(NSEventMask mask, NSTimeInterval timeout, NSRunLoopMode mode, NSWindowTrackEventsMatchingMaskTimeoutModeHandlerTrackingHandlerBlock trackingHandler);
+    [Selector("nextEventMatchingMask:")]
+    public NSEvent? NextEventMatchingMask(NSEventMask mask);
+    [Selector("nextEventMatchingMask:untilDate:inMode:dequeue:")]
+    public NSEvent? NextEventMatchingMaskUntilDateInModeDequeue(NSEventMask mask, NSDate? expiration, NSRunLoopMode mode, bool deqFlag);
+    [Selector("discardEventsMatchingMask:beforeEvent:")]
+    public void DiscardEventsMatchingMaskBeforeEvent(NSEventMask mask, NSEvent? lastEvent);
+    [Selector("postEvent:atStart:")]
+    public void PostEventAtStart(NSEvent event, bool flag);
+    [Selector("sendEvent:")]
+    public void SendEvent(NSEvent event);
 }
 
 /// NSCursorRect, a category of NSWindow.
 public extern objc class NSWindow
 {
-    [Selector("areCursorRectsEnabled")] public bool AreCursorRectsEnabled { get; }
-    [Selector("disableCursorRects")] public void DisableCursorRects();
-    [Selector("enableCursorRects")] public void EnableCursorRects();
-    [Selector("discardCursorRects")] public void DiscardCursorRects();
-    [Selector("invalidateCursorRectsForView:")] public void InvalidateCursorRectsForView(NSView view);
-    [Selector("resetCursorRects")] public void ResetCursorRects();
+    [Selector("areCursorRectsEnabled")]
+    public bool AreCursorRectsEnabled { get; }
+    [Selector("disableCursorRects")]
+    public void DisableCursorRects();
+    [Selector("enableCursorRects")]
+    public void EnableCursorRects();
+    [Selector("discardCursorRects")]
+    public void DiscardCursorRects();
+    [Selector("invalidateCursorRectsForView:")]
+    public void InvalidateCursorRectsForView(NSView view);
+    [Selector("resetCursorRects")]
+    public void ResetCursorRects();
 }
 
 /// NSDrag, a category of NSWindow.
 public extern objc class NSWindow
 {
-    [Selector("beginDraggingSessionWithItems:event:source:")] public NSDraggingSession BeginDraggingSessionWithItemsEventSource(NSArray items, NSEvent event, NSDraggingSource source);
+    [Selector("beginDraggingSessionWithItems:event:source:")]
+    public NSDraggingSession BeginDraggingSessionWithItemsEventSource(NSArray items, NSEvent event, NSDraggingSource source);
     /// Deprecated in macOS 100000.
-    [Selector("dragImage:at:offset:event:pasteboard:source:slideBack:")] public void DragImageAtOffsetEventPasteboardSourceSlideBack(NSImage image, NSPoint baseLocation, NSSize initialOffset, NSEvent event, NSPasteboard pboard, AnyObject sourceObj, bool slideFlag);
-    [Selector("registerForDraggedTypes:")] public void RegisterForDraggedTypes(NSArray newTypes);
-    [Selector("unregisterDraggedTypes")] public void UnregisterDraggedTypes();
+    [Selector("dragImage:at:offset:event:pasteboard:source:slideBack:")]
+    public void DragImageAtOffsetEventPasteboardSourceSlideBack(NSImage image, NSPoint baseLocation, NSSize initialOffset, NSEvent event, NSPasteboard pboard, AnyObject sourceObj, bool slideFlag);
+    [Selector("registerForDraggedTypes:")]
+    public void RegisterForDraggedTypes(NSArray newTypes);
+    [Selector("unregisterDraggedTypes")]
+    public void UnregisterDraggedTypes();
 }
 
 /// NSDisplayLink, a category of NSWindow.
 public extern objc class NSWindow
 {
-    [Selector("displayLinkWithTarget:selector:")] public CADisplayLink DisplayLinkWithTargetSelector(AnyObject target, Selector selector);
+    [Selector("displayLinkWithTarget:selector:")]
+    public CADisplayLink DisplayLinkWithTargetSelector(AnyObject target, Selector selector);
 }
 
 public objc interface NSWindowDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("windowShouldClose:")] bool WindowShouldClose(NSWindow sender);
-    [Optional] [Selector("windowWillReturnFieldEditor:toObject:")] AnyObject? WindowWillReturnFieldEditorToObject(NSWindow sender, AnyObject? client);
-    [Optional] [Selector("windowWillResize:toSize:")] NSSize WindowWillResizeToSize(NSWindow sender, NSSize frameSize);
-    [Optional] [Selector("windowWillUseStandardFrame:defaultFrame:")] NSRect WindowWillUseStandardFrameDefaultFrame(NSWindow window, NSRect newFrame);
-    [Optional] [Selector("windowShouldZoom:toFrame:")] bool WindowShouldZoomToFrame(NSWindow window, NSRect newFrame);
-    [Optional] [Selector("windowWillReturnUndoManager:")] NSUndoManager? WindowWillReturnUndoManager(NSWindow window);
-    [Optional] [Selector("window:willPositionSheet:usingRect:")] NSRect WindowWillPositionSheetUsingRect(NSWindow window, NSWindow sheet, NSRect rect);
-    [Optional] [Selector("window:shouldPopUpDocumentPathMenu:")] bool WindowShouldPopUpDocumentPathMenu(NSWindow window, NSMenu menu);
-    [Optional] [Selector("window:shouldDragDocumentWithEvent:from:withPasteboard:")] bool WindowShouldDragDocumentWithEventFromWithPasteboard(NSWindow window, NSEvent event, NSPoint dragImageLocation, NSPasteboard pasteboard);
-    [Optional] [Selector("window:willUseFullScreenContentSize:")] NSSize WindowWillUseFullScreenContentSize(NSWindow window, NSSize proposedSize);
-    [Optional] [Selector("window:willUseFullScreenPresentationOptions:")] NSApplicationPresentationOptions WindowWillUseFullScreenPresentationOptions(NSWindow window, NSApplicationPresentationOptions proposedOptions);
-    [Optional] [Selector("customWindowsToEnterFullScreenForWindow:")] NSArray? CustomWindowsToEnterFullScreenForWindow(NSWindow window);
-    [Optional] [Selector("window:startCustomAnimationToEnterFullScreenWithDuration:")] void WindowStartCustomAnimationToEnterFullScreenWithDuration(NSWindow window, NSTimeInterval duration);
-    [Optional] [Selector("windowDidFailToEnterFullScreen:")] void WindowDidFailToEnterFullScreen(NSWindow window);
-    [Optional] [Selector("customWindowsToExitFullScreenForWindow:")] NSArray? CustomWindowsToExitFullScreenForWindow(NSWindow window);
-    [Optional] [Selector("window:startCustomAnimationToExitFullScreenWithDuration:")] void WindowStartCustomAnimationToExitFullScreenWithDuration(NSWindow window, NSTimeInterval duration);
-    [Optional] [Selector("customWindowsToEnterFullScreenForWindow:onScreen:")] NSArray? CustomWindowsToEnterFullScreenForWindowOnScreen(NSWindow window, NSScreen screen);
-    [Optional] [Selector("window:startCustomAnimationToEnterFullScreenOnScreen:withDuration:")] void WindowStartCustomAnimationToEnterFullScreenOnScreenWithDuration(NSWindow window, NSScreen screen, NSTimeInterval duration);
-    [Optional] [Selector("windowDidFailToExitFullScreen:")] void WindowDidFailToExitFullScreen(NSWindow window);
-    [Optional] [Selector("window:willResizeForVersionBrowserWithMaxPreferredSize:maxAllowedSize:")] NSSize WindowWillResizeForVersionBrowserWithMaxPreferredSizeMaxAllowedSize(NSWindow window, NSSize maxPreferredFrameSize, NSSize maxAllowedFrameSize);
-    [Optional] [Selector("window:willEncodeRestorableState:")] void WindowWillEncodeRestorableState(NSWindow window, NSCoder state);
-    [Optional] [Selector("window:didDecodeRestorableState:")] void WindowDidDecodeRestorableState(NSWindow window, NSCoder state);
-    [Optional] [Selector("previewRepresentableActivityItemsForWindow:")] NSArray? PreviewRepresentableActivityItemsForWindow(NSWindow window);
-    [Optional] [Selector("windowForSharingRequestFromWindow:")] NSWindow? WindowForSharingRequestFromWindow(NSWindow window);
-    [Optional] [Selector("windowDidResize:")] void WindowDidResize(NSNotification notification);
-    [Optional] [Selector("windowDidExpose:")] void WindowDidExpose(NSNotification notification);
-    [Optional] [Selector("windowWillMove:")] void WindowWillMove(NSNotification notification);
-    [Optional] [Selector("windowDidMove:")] void WindowDidMove(NSNotification notification);
-    [Optional] [Selector("windowDidBecomeKey:")] void WindowDidBecomeKey(NSNotification notification);
-    [Optional] [Selector("windowDidResignKey:")] void WindowDidResignKey(NSNotification notification);
-    [Optional] [Selector("windowDidBecomeMain:")] void WindowDidBecomeMain(NSNotification notification);
-    [Optional] [Selector("windowDidResignMain:")] void WindowDidResignMain(NSNotification notification);
-    [Optional] [Selector("windowWillClose:")] void WindowWillClose(NSNotification notification);
-    [Optional] [Selector("windowWillMiniaturize:")] void WindowWillMiniaturize(NSNotification notification);
-    [Optional] [Selector("windowDidMiniaturize:")] void WindowDidMiniaturize(NSNotification notification);
-    [Optional] [Selector("windowDidDeminiaturize:")] void WindowDidDeminiaturize(NSNotification notification);
-    [Optional] [Selector("windowDidUpdate:")] void WindowDidUpdate(NSNotification notification);
-    [Optional] [Selector("windowDidChangeScreen:")] void WindowDidChangeScreen(NSNotification notification);
-    [Optional] [Selector("windowDidChangeScreenProfile:")] void WindowDidChangeScreenProfile(NSNotification notification);
-    [Optional] [Selector("windowDidChangeBackingProperties:")] void WindowDidChangeBackingProperties(NSNotification notification);
-    [Optional] [Selector("windowWillBeginSheet:")] void WindowWillBeginSheet(NSNotification notification);
-    [Optional] [Selector("windowDidEndSheet:")] void WindowDidEndSheet(NSNotification notification);
-    [Optional] [Selector("windowWillStartLiveResize:")] void WindowWillStartLiveResize(NSNotification notification);
-    [Optional] [Selector("windowDidEndLiveResize:")] void WindowDidEndLiveResize(NSNotification notification);
-    [Optional] [Selector("windowWillEnterFullScreen:")] void WindowWillEnterFullScreen(NSNotification notification);
-    [Optional] [Selector("windowDidEnterFullScreen:")] void WindowDidEnterFullScreen(NSNotification notification);
-    [Optional] [Selector("windowWillExitFullScreen:")] void WindowWillExitFullScreen(NSNotification notification);
-    [Optional] [Selector("windowDidExitFullScreen:")] void WindowDidExitFullScreen(NSNotification notification);
-    [Optional] [Selector("windowWillEnterVersionBrowser:")] void WindowWillEnterVersionBrowser(NSNotification notification);
-    [Optional] [Selector("windowDidEnterVersionBrowser:")] void WindowDidEnterVersionBrowser(NSNotification notification);
-    [Optional] [Selector("windowWillExitVersionBrowser:")] void WindowWillExitVersionBrowser(NSNotification notification);
-    [Optional] [Selector("windowDidExitVersionBrowser:")] void WindowDidExitVersionBrowser(NSNotification notification);
-    [Optional] [Selector("windowDidChangeOcclusionState:")] void WindowDidChangeOcclusionState(NSNotification notification);
+    [Optional]
+    [Selector("windowShouldClose:")]
+    bool WindowShouldClose(NSWindow sender);
+    [Optional]
+    [Selector("windowWillReturnFieldEditor:toObject:")]
+    AnyObject? WindowWillReturnFieldEditorToObject(NSWindow sender, AnyObject? client);
+    [Optional]
+    [Selector("windowWillResize:toSize:")]
+    NSSize WindowWillResizeToSize(NSWindow sender, NSSize frameSize);
+    [Optional]
+    [Selector("windowWillUseStandardFrame:defaultFrame:")]
+    NSRect WindowWillUseStandardFrameDefaultFrame(NSWindow window, NSRect newFrame);
+    [Optional]
+    [Selector("windowShouldZoom:toFrame:")]
+    bool WindowShouldZoomToFrame(NSWindow window, NSRect newFrame);
+    [Optional]
+    [Selector("windowWillReturnUndoManager:")]
+    NSUndoManager? WindowWillReturnUndoManager(NSWindow window);
+    [Optional]
+    [Selector("window:willPositionSheet:usingRect:")]
+    NSRect WindowWillPositionSheetUsingRect(NSWindow window, NSWindow sheet, NSRect rect);
+    [Optional]
+    [Selector("window:shouldPopUpDocumentPathMenu:")]
+    bool WindowShouldPopUpDocumentPathMenu(NSWindow window, NSMenu menu);
+    [Optional]
+    [Selector("window:shouldDragDocumentWithEvent:from:withPasteboard:")]
+    bool WindowShouldDragDocumentWithEventFromWithPasteboard(NSWindow window, NSEvent event, NSPoint dragImageLocation, NSPasteboard pasteboard);
+    [Optional]
+    [Selector("window:willUseFullScreenContentSize:")]
+    NSSize WindowWillUseFullScreenContentSize(NSWindow window, NSSize proposedSize);
+    [Optional]
+    [Selector("window:willUseFullScreenPresentationOptions:")]
+    NSApplicationPresentationOptions WindowWillUseFullScreenPresentationOptions(NSWindow window, NSApplicationPresentationOptions proposedOptions);
+    [Optional]
+    [Selector("customWindowsToEnterFullScreenForWindow:")]
+    NSArray? CustomWindowsToEnterFullScreenForWindow(NSWindow window);
+    [Optional]
+    [Selector("window:startCustomAnimationToEnterFullScreenWithDuration:")]
+    void WindowStartCustomAnimationToEnterFullScreenWithDuration(NSWindow window, NSTimeInterval duration);
+    [Optional]
+    [Selector("windowDidFailToEnterFullScreen:")]
+    void WindowDidFailToEnterFullScreen(NSWindow window);
+    [Optional]
+    [Selector("customWindowsToExitFullScreenForWindow:")]
+    NSArray? CustomWindowsToExitFullScreenForWindow(NSWindow window);
+    [Optional]
+    [Selector("window:startCustomAnimationToExitFullScreenWithDuration:")]
+    void WindowStartCustomAnimationToExitFullScreenWithDuration(NSWindow window, NSTimeInterval duration);
+    [Optional]
+    [Selector("customWindowsToEnterFullScreenForWindow:onScreen:")]
+    NSArray? CustomWindowsToEnterFullScreenForWindowOnScreen(NSWindow window, NSScreen screen);
+    [Optional]
+    [Selector("window:startCustomAnimationToEnterFullScreenOnScreen:withDuration:")]
+    void WindowStartCustomAnimationToEnterFullScreenOnScreenWithDuration(NSWindow window, NSScreen screen, NSTimeInterval duration);
+    [Optional]
+    [Selector("windowDidFailToExitFullScreen:")]
+    void WindowDidFailToExitFullScreen(NSWindow window);
+    [Optional]
+    [Selector("window:willResizeForVersionBrowserWithMaxPreferredSize:maxAllowedSize:")]
+    NSSize WindowWillResizeForVersionBrowserWithMaxPreferredSizeMaxAllowedSize(NSWindow window, NSSize maxPreferredFrameSize, NSSize maxAllowedFrameSize);
+    [Optional]
+    [Selector("window:willEncodeRestorableState:")]
+    void WindowWillEncodeRestorableState(NSWindow window, NSCoder state);
+    [Optional]
+    [Selector("window:didDecodeRestorableState:")]
+    void WindowDidDecodeRestorableState(NSWindow window, NSCoder state);
+    [Optional]
+    [Selector("previewRepresentableActivityItemsForWindow:")]
+    NSArray? PreviewRepresentableActivityItemsForWindow(NSWindow window);
+    [Optional]
+    [Selector("windowForSharingRequestFromWindow:")]
+    NSWindow? WindowForSharingRequestFromWindow(NSWindow window);
+    [Optional]
+    [Selector("windowDidResize:")]
+    void WindowDidResize(NSNotification notification);
+    [Optional]
+    [Selector("windowDidExpose:")]
+    void WindowDidExpose(NSNotification notification);
+    [Optional]
+    [Selector("windowWillMove:")]
+    void WindowWillMove(NSNotification notification);
+    [Optional]
+    [Selector("windowDidMove:")]
+    void WindowDidMove(NSNotification notification);
+    [Optional]
+    [Selector("windowDidBecomeKey:")]
+    void WindowDidBecomeKey(NSNotification notification);
+    [Optional]
+    [Selector("windowDidResignKey:")]
+    void WindowDidResignKey(NSNotification notification);
+    [Optional]
+    [Selector("windowDidBecomeMain:")]
+    void WindowDidBecomeMain(NSNotification notification);
+    [Optional]
+    [Selector("windowDidResignMain:")]
+    void WindowDidResignMain(NSNotification notification);
+    [Optional]
+    [Selector("windowWillClose:")]
+    void WindowWillClose(NSNotification notification);
+    [Optional]
+    [Selector("windowWillMiniaturize:")]
+    void WindowWillMiniaturize(NSNotification notification);
+    [Optional]
+    [Selector("windowDidMiniaturize:")]
+    void WindowDidMiniaturize(NSNotification notification);
+    [Optional]
+    [Selector("windowDidDeminiaturize:")]
+    void WindowDidDeminiaturize(NSNotification notification);
+    [Optional]
+    [Selector("windowDidUpdate:")]
+    void WindowDidUpdate(NSNotification notification);
+    [Optional]
+    [Selector("windowDidChangeScreen:")]
+    void WindowDidChangeScreen(NSNotification notification);
+    [Optional]
+    [Selector("windowDidChangeScreenProfile:")]
+    void WindowDidChangeScreenProfile(NSNotification notification);
+    [Optional]
+    [Selector("windowDidChangeBackingProperties:")]
+    void WindowDidChangeBackingProperties(NSNotification notification);
+    [Optional]
+    [Selector("windowWillBeginSheet:")]
+    void WindowWillBeginSheet(NSNotification notification);
+    [Optional]
+    [Selector("windowDidEndSheet:")]
+    void WindowDidEndSheet(NSNotification notification);
+    [Optional]
+    [Selector("windowWillStartLiveResize:")]
+    void WindowWillStartLiveResize(NSNotification notification);
+    [Optional]
+    [Selector("windowDidEndLiveResize:")]
+    void WindowDidEndLiveResize(NSNotification notification);
+    [Optional]
+    [Selector("windowWillEnterFullScreen:")]
+    void WindowWillEnterFullScreen(NSNotification notification);
+    [Optional]
+    [Selector("windowDidEnterFullScreen:")]
+    void WindowDidEnterFullScreen(NSNotification notification);
+    [Optional]
+    [Selector("windowWillExitFullScreen:")]
+    void WindowWillExitFullScreen(NSNotification notification);
+    [Optional]
+    [Selector("windowDidExitFullScreen:")]
+    void WindowDidExitFullScreen(NSNotification notification);
+    [Optional]
+    [Selector("windowWillEnterVersionBrowser:")]
+    void WindowWillEnterVersionBrowser(NSNotification notification);
+    [Optional]
+    [Selector("windowDidEnterVersionBrowser:")]
+    void WindowDidEnterVersionBrowser(NSNotification notification);
+    [Optional]
+    [Selector("windowWillExitVersionBrowser:")]
+    void WindowWillExitVersionBrowser(NSNotification notification);
+    [Optional]
+    [Selector("windowDidExitVersionBrowser:")]
+    void WindowDidExitVersionBrowser(NSNotification notification);
+    [Optional]
+    [Selector("windowDidChangeOcclusionState:")]
+    void WindowDidChangeOcclusionState(NSNotification notification);
 }
 
 public extern "C" NSNotificationName NSWindowDidBecomeKeyNotification;
@@ -551,53 +882,77 @@ public extern "C" NSNotificationName? NSWindowDidChangeOcclusionStateNotificatio
 public extern objc class NSWindow
 {
     /// Deprecated in macOS 10.14.
-    [Selector("isFlushWindowDisabled")] public bool FlushWindowDisabled { get; }
+    [Selector("isFlushWindowDisabled")]
+    public bool FlushWindowDisabled { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("isAutodisplay", "setAutodisplay:")] public bool Autodisplay { get; set; }
+    [Selector("isAutodisplay", "setAutodisplay:")]
+    public bool Autodisplay { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("graphicsContext")] public NSGraphicsContext? GraphicsContext { get; }
+    [Selector("graphicsContext")]
+    public NSGraphicsContext? GraphicsContext { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("isOneShot", "setOneShot:")] public bool OneShot { get; set; }
+    [Selector("isOneShot", "setOneShot:")]
+    public bool OneShot { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("preferredBackingLocation", "setPreferredBackingLocation:")] public NSWindowBackingLocation PreferredBackingLocation { get; set; }
+    [Selector("preferredBackingLocation", "setPreferredBackingLocation:")]
+    public NSWindowBackingLocation PreferredBackingLocation { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("backingLocation")] public NSWindowBackingLocation BackingLocation { get; }
+    [Selector("backingLocation")]
+    public NSWindowBackingLocation BackingLocation { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("showsResizeIndicator", "setShowsResizeIndicator:")] public bool ShowsResizeIndicator { get; set; }
+    [Selector("showsResizeIndicator", "setShowsResizeIndicator:")]
+    public bool ShowsResizeIndicator { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("windowRef")] public void* WindowRef { get; }
+    [Selector("windowRef")]
+    public void* WindowRef { get; }
     /// Deprecated in macOS 10.13.
-    [Selector("cacheImageInRect:")] public void CacheImageInRect(NSRect rect);
+    [Selector("cacheImageInRect:")]
+    public void CacheImageInRect(NSRect rect);
     /// Deprecated in macOS 10.13.
-    [Selector("restoreCachedImage")] public void RestoreCachedImage();
+    [Selector("restoreCachedImage")]
+    public void RestoreCachedImage();
     /// Deprecated in macOS 10.13.
-    [Selector("discardCachedImage")] public void DiscardCachedImage();
+    [Selector("discardCachedImage")]
+    public void DiscardCachedImage();
     /// Deprecated in macOS 10.11.
-    [Selector("menuChanged:")] public static void MenuChanged(NSMenu menu);
+    [Selector("menuChanged:")]
+    public static void MenuChanged(NSMenu menu);
     /// Deprecated in macOS 10.10.
-    [Selector("gState")] public NSInteger GState();
+    [Selector("gState")]
+    public NSInteger GState();
     /// Deprecated in macOS 10.7.
-    [Selector("convertBaseToScreen:")] public NSPoint ConvertBaseToScreen(NSPoint point);
+    [Selector("convertBaseToScreen:")]
+    public NSPoint ConvertBaseToScreen(NSPoint point);
     /// Deprecated in macOS 10.7.
-    [Selector("convertScreenToBase:")] public NSPoint ConvertScreenToBase(NSPoint point);
+    [Selector("convertScreenToBase:")]
+    public NSPoint ConvertScreenToBase(NSPoint point);
     /// Deprecated in macOS 10.7.
-    [Selector("userSpaceScaleFactor")] public CGFloat UserSpaceScaleFactor();
+    [Selector("userSpaceScaleFactor")]
+    public CGFloat UserSpaceScaleFactor();
     /// Deprecated in macOS 10.10.
-    [Selector("useOptimizedDrawing:")] public void UseOptimizedDrawing(bool flag);
+    [Selector("useOptimizedDrawing:")]
+    public void UseOptimizedDrawing(bool flag);
     /// Deprecated in macOS 10.10.
-    [Selector("canStoreColor")] public bool CanStoreColor();
+    [Selector("canStoreColor")]
+    public bool CanStoreColor();
     /// Deprecated in macOS 10.14.
-    [Selector("disableFlushWindow")] public void DisableFlushWindow();
+    [Selector("disableFlushWindow")]
+    public void DisableFlushWindow();
     /// Deprecated in macOS 10.14.
-    [Selector("enableFlushWindow")] public void EnableFlushWindow();
+    [Selector("enableFlushWindow")]
+    public void EnableFlushWindow();
     /// Deprecated in macOS 10.14.
-    [Selector("flushWindow")] public void FlushWindow();
+    [Selector("flushWindow")]
+    public void FlushWindow();
     /// Deprecated in macOS 10.14.
-    [Selector("flushWindowIfNeeded")] public void FlushWindowIfNeeded();
+    [Selector("flushWindowIfNeeded")]
+    public void FlushWindowIfNeeded();
     /// Deprecated in macOS 15.0.
-    [Selector("initWithWindowRef:")] public NSWindow? InitWithWindowRef(void* windowRef);
+    [Selector("initWithWindowRef:")]
+    public NSWindow? InitWithWindowRef(void* windowRef);
     /// Deprecated in macOS 15.0.
-    [Selector("disableScreenUpdatesUntilFlush")] public void DisableScreenUpdatesUntilFlush();
+    [Selector("disableScreenUpdatesUntilFlush")]
+    public void DisableScreenUpdatesUntilFlush();
 }
 
 /// Deprecated in macOS 10.14.

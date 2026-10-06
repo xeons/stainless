@@ -73,11 +73,14 @@ public const uint kDRDeviceCantWriteISRCErr = 2147615235u;
 public const uint kDRDeviceCantWriteSCMSErr = 2147615236u;
 public const uint kDRDevicePreGapLengthNotValidErr = 2147615237u;
 
-[ReturnsRetained] public extern "C" CFStringRef? DRCopyLocalizedStringForDiscRecordingError(OSStatus osError);
+[ReturnsRetained]
+public extern "C" CFStringRef? DRCopyLocalizedStringForDiscRecordingError(OSStatus osError);
 
-[ReturnsRetained] public extern "C" CFStringRef? DRCopyLocalizedStringForSenseCode(UInt8 senseCode);
+[ReturnsRetained]
+public extern "C" CFStringRef? DRCopyLocalizedStringForSenseCode(UInt8 senseCode);
 
-[ReturnsRetained] public extern "C" CFStringRef? DRCopyLocalizedStringForAdditionalSense(UInt8 ASC, UInt8 ASCQ);
+[ReturnsRetained]
+public extern "C" CFStringRef? DRCopyLocalizedStringForAdditionalSense(UInt8 ASC, UInt8 ASCQ);
 
 public extern "C" CFStringRef? kDRErrorStatusKey;
 

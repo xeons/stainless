@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class WKFrameInfo : NSObject, NSCopying
 {
-    [Selector("isMainFrame")] public bool MainFrame { get; }
-    [Selector("request")] public NSURLRequest Request { get; }
-    [Selector("securityOrigin")] public WKSecurityOrigin SecurityOrigin { get; }
-    [Selector("webView")] public WKWebView? WebView { get; }
+    [Selector("isMainFrame")]
+    public bool MainFrame { get; }
+    [Selector("request")]
+    public NSURLRequest Request { get; }
+    [Selector("securityOrigin")]
+    public WKSecurityOrigin SecurityOrigin { get; }
+    [Selector("webView")]
+    public WKWebView? WebView { get; }
 }
 
 #endif

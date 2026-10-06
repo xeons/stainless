@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class INFlight : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("airline")] public INAirline Airline { get; }
-    [Selector("flightNumber")] public NSString FlightNumber { get; }
-    [Selector("boardingTime")] public INDateComponentsRange? BoardingTime { get; }
-    [Selector("flightDuration")] public INDateComponentsRange FlightDuration { get; }
-    [Selector("departureAirportGate")] public INAirportGate DepartureAirportGate { get; }
-    [Selector("arrivalAirportGate")] public INAirportGate ArrivalAirportGate { get; }
-    [Selector("initWithAirline:flightNumber:boardingTime:flightDuration:departureAirportGate:arrivalAirportGate:")] public Self InitWithAirlineFlightNumberBoardingTimeFlightDurationDepartureAirportGateArrivalAirportGate(INAirline airline, NSString flightNumber, INDateComponentsRange? boardingTime, INDateComponentsRange flightDuration, INAirportGate departureAirportGate, INAirportGate arrivalAirportGate);
+    [Selector("airline")]
+    public INAirline Airline { get; }
+    [Selector("flightNumber")]
+    public NSString FlightNumber { get; }
+    [Selector("boardingTime")]
+    public INDateComponentsRange? BoardingTime { get; }
+    [Selector("flightDuration")]
+    public INDateComponentsRange FlightDuration { get; }
+    [Selector("departureAirportGate")]
+    public INAirportGate DepartureAirportGate { get; }
+    [Selector("arrivalAirportGate")]
+    public INAirportGate ArrivalAirportGate { get; }
+    [Selector("initWithAirline:flightNumber:boardingTime:flightDuration:departureAirportGate:arrivalAirportGate:")]
+    public Self InitWithAirlineFlightNumberBoardingTimeFlightDurationDepartureAirportGateArrivalAirportGate(INAirline airline, NSString flightNumber, INDateComponentsRange? boardingTime, INDateComponentsRange flightDuration, INAirportGate departureAirportGate, INAirportGate arrivalAirportGate);
 }
 
 #endif

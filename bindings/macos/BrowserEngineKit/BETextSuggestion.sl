@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class BETextSuggestion : NSObject
 {
-    [Selector("inputText")] public NSString InputText { get; }
-    [Selector("initWithInputText:")] public Self InitWithInputText(NSString inputText);
+    [Selector("inputText")]
+    public NSString InputText { get; }
+    [Selector("initWithInputText:")]
+    public Self InitWithInputText(NSString inputText);
 }
 
 #endif

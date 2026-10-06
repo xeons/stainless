@@ -46,46 +46,86 @@ public objc closure void NSProgressPerformAsCurrentWithPendingUnitCountUsingBloc
 
 public extern objc class NSProgress : NSObject
 {
-    [Selector("totalUnitCount", "setTotalUnitCount:")] public long TotalUnitCount { get; set; }
-    [Selector("completedUnitCount", "setCompletedUnitCount:")] public long CompletedUnitCount { get; set; }
-    [Selector("localizedDescription", "setLocalizedDescription:")] public NSString? LocalizedDescription { get; set; }
-    [Selector("localizedAdditionalDescription", "setLocalizedAdditionalDescription:")] public NSString? LocalizedAdditionalDescription { get; set; }
-    [Selector("isCancellable", "setCancellable:")] public bool Cancellable { get; set; }
-    [Selector("isPausable", "setPausable:")] public bool Pausable { get; set; }
-    [Selector("isCancelled")] public bool Cancelled { get; }
-    [Selector("isPaused")] public bool Paused { get; }
-    [Selector("cancellationHandler", "setCancellationHandler:")] public NSProgressCancellationHandlerBlock? CancellationHandler { get; set; }
-    [Selector("pausingHandler", "setPausingHandler:")] public NSProgressPausingHandlerBlock? PausingHandler { get; set; }
-    [Selector("resumingHandler", "setResumingHandler:")] public NSProgressResumingHandlerBlock? ResumingHandler { get; set; }
-    [Selector("isIndeterminate")] public bool Indeterminate { get; }
-    [Selector("fractionCompleted")] public double FractionCompleted { get; }
-    [Selector("isFinished")] public bool Finished { get; }
-    [Selector("userInfo")] public NSDictionary UserInfo { get; }
-    [Selector("kind", "setKind:")] public NSProgressKind? Kind { get; set; }
-    [Selector("estimatedTimeRemaining", "setEstimatedTimeRemaining:")] public NSNumber? EstimatedTimeRemaining { get; set; }
-    [Selector("throughput", "setThroughput:")] public NSNumber? Throughput { get; set; }
-    [Selector("fileOperationKind", "setFileOperationKind:")] public NSProgressFileOperationKind? FileOperationKind { get; set; }
-    [Selector("fileURL", "setFileURL:")] public NSURL? FileURL { get; set; }
-    [Selector("fileTotalCount", "setFileTotalCount:")] public NSNumber? FileTotalCount { get; set; }
-    [Selector("fileCompletedCount", "setFileCompletedCount:")] public NSNumber? FileCompletedCount { get; set; }
-    [Selector("isOld")] public bool Old { get; }
-    [Selector("currentProgress")] public static NSProgress? CurrentProgress();
-    [Selector("progressWithTotalUnitCount:")] public static NSProgress ProgressWithTotalUnitCount(long unitCount);
-    [Selector("discreteProgressWithTotalUnitCount:")] public static NSProgress DiscreteProgressWithTotalUnitCount(long unitCount);
-    [Selector("progressWithTotalUnitCount:parent:pendingUnitCount:")] public static NSProgress ProgressWithTotalUnitCountParentPendingUnitCount(long unitCount, NSProgress parent, long portionOfParentTotalUnitCount);
-    [Selector("initWithParent:userInfo:")] public Self InitWithParentUserInfo(NSProgress? parentProgressOrNil, NSDictionary? userInfoOrNil);
-    [Selector("becomeCurrentWithPendingUnitCount:")] public void BecomeCurrentWithPendingUnitCount(long unitCount);
-    [Selector("performAsCurrentWithPendingUnitCount:usingBlock:")] public void PerformAsCurrentWithPendingUnitCountUsingBlock(long unitCount, NSProgressPerformAsCurrentWithPendingUnitCountUsingBlockWorkBlock work);
-    [Selector("resignCurrent")] public void ResignCurrent();
-    [Selector("addChild:withPendingUnitCount:")] public void AddChildWithPendingUnitCount(NSProgress child, long inUnitCount);
-    [Selector("setUserInfoObject:forKey:")] public void SetUserInfoObjectForKey(AnyObject? objectOrNil, NSProgressUserInfoKey key);
-    [Selector("cancel")] public void Cancel();
-    [Selector("pause")] public void Pause();
-    [Selector("resume")] public void Resume();
-    [Selector("publish")] public void Publish();
-    [Selector("unpublish")] public void Unpublish();
-    [Selector("addSubscriberForFileURL:withPublishingHandler:")] public static AnyObject AddSubscriberForFileURLWithPublishingHandler(NSURL url, NSProgressPublishingHandler publishingHandler);
-    [Selector("removeSubscriber:")] public static void RemoveSubscriber(AnyObject subscriber);
+    [Selector("totalUnitCount", "setTotalUnitCount:")]
+    public long TotalUnitCount { get; set; }
+    [Selector("completedUnitCount", "setCompletedUnitCount:")]
+    public long CompletedUnitCount { get; set; }
+    [Selector("localizedDescription", "setLocalizedDescription:")]
+    public NSString? LocalizedDescription { get; set; }
+    [Selector("localizedAdditionalDescription", "setLocalizedAdditionalDescription:")]
+    public NSString? LocalizedAdditionalDescription { get; set; }
+    [Selector("isCancellable", "setCancellable:")]
+    public bool Cancellable { get; set; }
+    [Selector("isPausable", "setPausable:")]
+    public bool Pausable { get; set; }
+    [Selector("isCancelled")]
+    public bool Cancelled { get; }
+    [Selector("isPaused")]
+    public bool Paused { get; }
+    [Selector("cancellationHandler", "setCancellationHandler:")]
+    public NSProgressCancellationHandlerBlock? CancellationHandler { get; set; }
+    [Selector("pausingHandler", "setPausingHandler:")]
+    public NSProgressPausingHandlerBlock? PausingHandler { get; set; }
+    [Selector("resumingHandler", "setResumingHandler:")]
+    public NSProgressResumingHandlerBlock? ResumingHandler { get; set; }
+    [Selector("isIndeterminate")]
+    public bool Indeterminate { get; }
+    [Selector("fractionCompleted")]
+    public double FractionCompleted { get; }
+    [Selector("isFinished")]
+    public bool Finished { get; }
+    [Selector("userInfo")]
+    public NSDictionary UserInfo { get; }
+    [Selector("kind", "setKind:")]
+    public NSProgressKind? Kind { get; set; }
+    [Selector("estimatedTimeRemaining", "setEstimatedTimeRemaining:")]
+    public NSNumber? EstimatedTimeRemaining { get; set; }
+    [Selector("throughput", "setThroughput:")]
+    public NSNumber? Throughput { get; set; }
+    [Selector("fileOperationKind", "setFileOperationKind:")]
+    public NSProgressFileOperationKind? FileOperationKind { get; set; }
+    [Selector("fileURL", "setFileURL:")]
+    public NSURL? FileURL { get; set; }
+    [Selector("fileTotalCount", "setFileTotalCount:")]
+    public NSNumber? FileTotalCount { get; set; }
+    [Selector("fileCompletedCount", "setFileCompletedCount:")]
+    public NSNumber? FileCompletedCount { get; set; }
+    [Selector("isOld")]
+    public bool Old { get; }
+    [Selector("currentProgress")]
+    public static NSProgress? CurrentProgress();
+    [Selector("progressWithTotalUnitCount:")]
+    public static NSProgress ProgressWithTotalUnitCount(long unitCount);
+    [Selector("discreteProgressWithTotalUnitCount:")]
+    public static NSProgress DiscreteProgressWithTotalUnitCount(long unitCount);
+    [Selector("progressWithTotalUnitCount:parent:pendingUnitCount:")]
+    public static NSProgress ProgressWithTotalUnitCountParentPendingUnitCount(long unitCount, NSProgress parent, long portionOfParentTotalUnitCount);
+    [Selector("initWithParent:userInfo:")]
+    public Self InitWithParentUserInfo(NSProgress? parentProgressOrNil, NSDictionary? userInfoOrNil);
+    [Selector("becomeCurrentWithPendingUnitCount:")]
+    public void BecomeCurrentWithPendingUnitCount(long unitCount);
+    [Selector("performAsCurrentWithPendingUnitCount:usingBlock:")]
+    public void PerformAsCurrentWithPendingUnitCountUsingBlock(long unitCount, NSProgressPerformAsCurrentWithPendingUnitCountUsingBlockWorkBlock work);
+    [Selector("resignCurrent")]
+    public void ResignCurrent();
+    [Selector("addChild:withPendingUnitCount:")]
+    public void AddChildWithPendingUnitCount(NSProgress child, long inUnitCount);
+    [Selector("setUserInfoObject:forKey:")]
+    public void SetUserInfoObjectForKey(AnyObject? objectOrNil, NSProgressUserInfoKey key);
+    [Selector("cancel")]
+    public void Cancel();
+    [Selector("pause")]
+    public void Pause();
+    [Selector("resume")]
+    public void Resume();
+    [Selector("publish")]
+    public void Publish();
+    [Selector("unpublish")]
+    public void Unpublish();
+    [Selector("addSubscriberForFileURL:withPublishingHandler:")]
+    public static AnyObject AddSubscriberForFileURLWithPublishingHandler(NSURL url, NSProgressPublishingHandler publishingHandler);
+    [Selector("removeSubscriber:")]
+    public static void RemoveSubscriber(AnyObject subscriber);
 }
 
 public objc closure void NSProgressUnpublishingHandler();
@@ -94,7 +134,8 @@ public objc closure NSProgressUnpublishingHandler? NSProgressPublishingHandler(N
 
 public objc interface NSProgressReporting : NSObjectProtocol
 {
-    [Selector("progress")] NSProgress Progress { get; }
+    [Selector("progress")]
+    NSProgress Progress { get; }
 }
 
 public extern "C" NSProgressUserInfoKey NSProgressEstimatedTimeRemainingKey;

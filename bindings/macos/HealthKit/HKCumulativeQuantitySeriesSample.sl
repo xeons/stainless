@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class HKCumulativeQuantitySeriesSample : HKCumulativeQuantitySample
 {
-    [Selector("sum")] public HKQuantity Sum { get; }
+    [Selector("sum")]
+    public HKQuantity Sum { get; }
 }
 
 #endif

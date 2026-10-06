@@ -33,19 +33,28 @@ import Standard.ObjC;
 
 public extern objc class GKOctreeNode : NSObject
 {
-    [Selector("box")] public GKBox Box { get; }
+    [Selector("box")]
+    public GKBox Box { get; }
 }
 
 public extern objc class GKOctree : NSObject
 {
-    [Selector("octreeWithBoundingBox:minimumCellSize:")] public static Self OctreeWithBoundingBoxMinimumCellSize(GKBox box, float minCellSize);
-    [Selector("initWithBoundingBox:minimumCellSize:")] public Self InitWithBoundingBoxMinimumCellSize(GKBox box, float minCellSize);
-    [Selector("addElement:withPoint:")] public GKOctreeNode AddElementWithPoint(AnyObject element, vector_float3 point);
-    [Selector("addElement:withBox:")] public GKOctreeNode AddElementWithBox(AnyObject element, GKBox box);
-    [Selector("elementsAtPoint:")] public NSArray ElementsAtPoint(vector_float3 point);
-    [Selector("elementsInBox:")] public NSArray ElementsInBox(GKBox box);
-    [Selector("removeElement:")] public bool RemoveElement(AnyObject element);
-    [Selector("removeElement:withNode:")] public bool RemoveElementWithNode(AnyObject element, GKOctreeNode node);
+    [Selector("octreeWithBoundingBox:minimumCellSize:")]
+    public static Self OctreeWithBoundingBoxMinimumCellSize(GKBox box, float minCellSize);
+    [Selector("initWithBoundingBox:minimumCellSize:")]
+    public Self InitWithBoundingBoxMinimumCellSize(GKBox box, float minCellSize);
+    [Selector("addElement:withPoint:")]
+    public GKOctreeNode AddElementWithPoint(AnyObject element, vector_float3 point);
+    [Selector("addElement:withBox:")]
+    public GKOctreeNode AddElementWithBox(AnyObject element, GKBox box);
+    [Selector("elementsAtPoint:")]
+    public NSArray ElementsAtPoint(vector_float3 point);
+    [Selector("elementsInBox:")]
+    public NSArray ElementsInBox(GKBox box);
+    [Selector("removeElement:")]
+    public bool RemoveElement(AnyObject element);
+    [Selector("removeElement:withNode:")]
+    public bool RemoveElementWithNode(AnyObject element, GKOctreeNode node);
 }
 
 #endif

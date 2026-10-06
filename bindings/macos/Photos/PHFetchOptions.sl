@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class PHFetchOptions : NSObject, NSCopying
 {
-    [Selector("predicate", "setPredicate:")] public NSPredicate? Predicate { get; set; }
-    [Selector("sortDescriptors", "setSortDescriptors:")] public NSArray? SortDescriptors { get; set; }
-    [Selector("includeHiddenAssets", "setIncludeHiddenAssets:")] public bool IncludeHiddenAssets { get; set; }
-    [Selector("includeAllBurstAssets", "setIncludeAllBurstAssets:")] public bool IncludeAllBurstAssets { get; set; }
-    [Selector("includeAssetSourceTypes", "setIncludeAssetSourceTypes:")] public PHAssetSourceType IncludeAssetSourceTypes { get; set; }
-    [Selector("fetchLimit", "setFetchLimit:")] public NSUInteger FetchLimit { get; set; }
-    [Selector("wantsIncrementalChangeDetails", "setWantsIncrementalChangeDetails:")] public bool WantsIncrementalChangeDetails { get; set; }
+    [Selector("predicate", "setPredicate:")]
+    public NSPredicate? Predicate { get; set; }
+    [Selector("sortDescriptors", "setSortDescriptors:")]
+    public NSArray? SortDescriptors { get; set; }
+    [Selector("includeHiddenAssets", "setIncludeHiddenAssets:")]
+    public bool IncludeHiddenAssets { get; set; }
+    [Selector("includeAllBurstAssets", "setIncludeAllBurstAssets:")]
+    public bool IncludeAllBurstAssets { get; set; }
+    [Selector("includeAssetSourceTypes", "setIncludeAssetSourceTypes:")]
+    public PHAssetSourceType IncludeAssetSourceTypes { get; set; }
+    [Selector("fetchLimit", "setFetchLimit:")]
+    public NSUInteger FetchLimit { get; set; }
+    [Selector("wantsIncrementalChangeDetails", "setWantsIncrementalChangeDetails:")]
+    public bool WantsIncrementalChangeDetails { get; set; }
 }
 
 #endif

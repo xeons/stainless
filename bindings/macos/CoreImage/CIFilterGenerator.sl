@@ -39,19 +39,32 @@ public extern "C" NSString? kCIFilterGeneratorExportedKeyName;
 
 public extern objc class CIFilterGenerator : NSObject, NSSecureCoding, NSCopying, CIFilterConstructor
 {
-    [Selector("exportedKeys")] public NSDictionary ExportedKeys { get; }
-    [Selector("classAttributes", "setClassAttributes:")] public NSDictionary ClassAttributes { get; set; }
-    [Selector("filterGenerator")] public static CIFilterGenerator FilterGenerator();
-    [Selector("filterGeneratorWithContentsOfURL:")] public static CIFilterGenerator? FilterGeneratorWithContentsOfURL(NSURL aURL);
-    [Selector("initWithContentsOfURL:")] public AnyObject? InitWithContentsOfURL(NSURL aURL);
-    [Selector("connectObject:withKey:toObject:withKey:")] public void ConnectObjectWithKeyToObjectWithKey(AnyObject sourceObject, NSString? sourceKey, AnyObject targetObject, NSString targetKey);
-    [Selector("disconnectObject:withKey:toObject:withKey:")] public void DisconnectObjectWithKeyToObjectWithKey(AnyObject sourceObject, NSString sourceKey, AnyObject targetObject, NSString targetKey);
-    [Selector("exportKey:fromObject:withName:")] public void ExportKeyFromObjectWithName(NSString key, AnyObject targetObject, NSString? exportedKeyName);
-    [Selector("removeExportedKey:")] public void RemoveExportedKey(NSString exportedKeyName);
-    [Selector("setAttributes:forExportedKey:")] public void SetAttributesForExportedKey(NSDictionary attributes, NSString key);
-    [Selector("filter")] public CIFilter Filter();
-    [Selector("registerFilterName:")] public void RegisterFilterName(NSString name);
-    [Selector("writeToURL:atomically:")] public bool WriteToURLAtomically(NSURL aURL, bool flag);
+    [Selector("exportedKeys")]
+    public NSDictionary ExportedKeys { get; }
+    [Selector("classAttributes", "setClassAttributes:")]
+    public NSDictionary ClassAttributes { get; set; }
+    [Selector("filterGenerator")]
+    public static CIFilterGenerator FilterGenerator();
+    [Selector("filterGeneratorWithContentsOfURL:")]
+    public static CIFilterGenerator? FilterGeneratorWithContentsOfURL(NSURL aURL);
+    [Selector("initWithContentsOfURL:")]
+    public AnyObject? InitWithContentsOfURL(NSURL aURL);
+    [Selector("connectObject:withKey:toObject:withKey:")]
+    public void ConnectObjectWithKeyToObjectWithKey(AnyObject sourceObject, NSString? sourceKey, AnyObject targetObject, NSString targetKey);
+    [Selector("disconnectObject:withKey:toObject:withKey:")]
+    public void DisconnectObjectWithKeyToObjectWithKey(AnyObject sourceObject, NSString sourceKey, AnyObject targetObject, NSString targetKey);
+    [Selector("exportKey:fromObject:withName:")]
+    public void ExportKeyFromObjectWithName(NSString key, AnyObject targetObject, NSString? exportedKeyName);
+    [Selector("removeExportedKey:")]
+    public void RemoveExportedKey(NSString exportedKeyName);
+    [Selector("setAttributes:forExportedKey:")]
+    public void SetAttributesForExportedKey(NSDictionary attributes, NSString key);
+    [Selector("filter")]
+    public CIFilter Filter();
+    [Selector("registerFilterName:")]
+    public void RegisterFilterName(NSString name);
+    [Selector("writeToURL:atomically:")]
+    public bool WriteToURLAtomically(NSURL aURL, bool flag);
 }
 
 #endif

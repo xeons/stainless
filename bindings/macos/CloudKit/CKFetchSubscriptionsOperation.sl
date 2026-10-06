@@ -36,12 +36,18 @@ public objc closure void CKFetchSubscriptionsOperationFetchSubscriptionCompletio
 
 public extern objc class CKFetchSubscriptionsOperation : CKDatabaseOperation
 {
-    [Selector("subscriptionIDs", "setSubscriptionIDs:")] public NSArray? SubscriptionIDs { get; set; }
-    [Selector("perSubscriptionCompletionBlock", "setPerSubscriptionCompletionBlock:")] public CKFetchSubscriptionsOperationPerSubscriptionCompletionBlock? PerSubscriptionCompletionBlock { get; set; }
-    [Selector("fetchSubscriptionCompletionBlock", "setFetchSubscriptionCompletionBlock:")] public CKFetchSubscriptionsOperationFetchSubscriptionCompletionBlock? FetchSubscriptionCompletionBlock { get; set; }
-    [Selector("fetchAllSubscriptionsOperation")] public static Self FetchAllSubscriptionsOperation();
-    [Selector("init")] public Self Init();
-    [Selector("initWithSubscriptionIDs:")] public Self InitWithSubscriptionIDs(NSArray subscriptionIDs);
+    [Selector("subscriptionIDs", "setSubscriptionIDs:")]
+    public NSArray? SubscriptionIDs { get; set; }
+    [Selector("perSubscriptionCompletionBlock", "setPerSubscriptionCompletionBlock:")]
+    public CKFetchSubscriptionsOperationPerSubscriptionCompletionBlock? PerSubscriptionCompletionBlock { get; set; }
+    [Selector("fetchSubscriptionCompletionBlock", "setFetchSubscriptionCompletionBlock:")]
+    public CKFetchSubscriptionsOperationFetchSubscriptionCompletionBlock? FetchSubscriptionCompletionBlock { get; set; }
+    [Selector("fetchAllSubscriptionsOperation")]
+    public static Self FetchAllSubscriptionsOperation();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithSubscriptionIDs:")]
+    public Self InitWithSubscriptionIDs(NSArray subscriptionIDs);
 }
 
 #endif

@@ -34,129 +34,177 @@ import Standard.ObjC;
 
 public extern objc class MPSNNReduceUnary : MPSCNNKernel
 {
-    [Selector("clipRectSource", "setClipRectSource:")] public MTLRegion ClipRectSource { get; set; }
+    [Selector("clipRectSource", "setClipRectSource:")]
+    public MTLRegion ClipRectSource { get; set; }
     /// Deprecated in macOS 10.15.
-    [Selector("offset", "setOffset:")] public MPSOffset Offset { get; set; }
+    [Selector("offset", "setOffset:")]
+    public MPSOffset Offset { get; set; }
 }
 
 public extern objc class MPSNNReduceRowMin : MPSNNReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceColumnMin : MPSNNReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceFeatureChannelsMin : MPSNNReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceFeatureChannelsArgumentMin : MPSNNReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceRowMax : MPSNNReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceColumnMax : MPSNNReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceFeatureChannelsMax : MPSNNReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceFeatureChannelsArgumentMax : MPSNNReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceRowMean : MPSNNReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceColumnMean : MPSNNReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceFeatureChannelsMean : MPSNNReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceRowSum : MPSNNReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceColumnSum : MPSNNReduceUnary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceFeatureChannelsSum : MPSNNReduceUnary
 {
-    [Selector("weight", "setWeight:")] public float Weight { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("weight", "setWeight:")]
+    public float Weight { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceBinary : MPSCNNBinaryKernel
 {
-    [Selector("primarySourceClipRect", "setPrimarySourceClipRect:")] public MTLRegion PrimarySourceClipRect { get; set; }
-    [Selector("secondarySourceClipRect", "setSecondarySourceClipRect:")] public MTLRegion SecondarySourceClipRect { get; set; }
+    [Selector("primarySourceClipRect", "setPrimarySourceClipRect:")]
+    public MTLRegion PrimarySourceClipRect { get; set; }
+    [Selector("secondarySourceClipRect", "setSecondarySourceClipRect:")]
+    public MTLRegion SecondarySourceClipRect { get; set; }
     /// Deprecated in macOS 10.15.
-    [Selector("primaryOffset", "setPrimaryOffset:")] public MPSOffset PrimaryOffset { get; set; }
+    [Selector("primaryOffset", "setPrimaryOffset:")]
+    public MPSOffset PrimaryOffset { get; set; }
     /// Deprecated in macOS 10.15.
-    [Selector("secondaryOffset", "setSecondaryOffset:")] public MPSOffset SecondaryOffset { get; set; }
+    [Selector("secondaryOffset", "setSecondaryOffset:")]
+    public MPSOffset SecondaryOffset { get; set; }
 }
 
 public extern objc class MPSNNReduceFeatureChannelsAndWeightsMean : MPSNNReduceBinary
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNReduceFeatureChannelsAndWeightsSum : MPSNNReduceBinary
 {
-    [Selector("doWeightedSumByNonZeroWeights")] public bool DoWeightedSumByNonZeroWeights { get; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithDevice:doWeightedSumByNonZeroWeights:")] public Self InitWithDeviceDoWeightedSumByNonZeroWeights(MTLDevice device, bool doWeightedSumByNonZeroWeights);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("doWeightedSumByNonZeroWeights")]
+    public bool DoWeightedSumByNonZeroWeights { get; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:doWeightedSumByNonZeroWeights:")]
+    public Self InitWithDeviceDoWeightedSumByNonZeroWeights(MTLDevice device, bool doWeightedSumByNonZeroWeights);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNLocalCorrelation : MPSNNReduceBinary
 {
-    [Selector("windowInX", "setWindowInX:")] public NSUInteger WindowInX { get; set; }
-    [Selector("windowInY", "setWindowInY:")] public NSUInteger WindowInY { get; set; }
-    [Selector("strideInX", "setStrideInX:")] public NSUInteger StrideInX { get; set; }
-    [Selector("strideInY", "setStrideInY:")] public NSUInteger StrideInY { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithDevice:windowInX:windowInY:strideInX:strideInY:")] public Self InitWithDeviceWindowInXWindowInYStrideInXStrideInY(MTLDevice device, NSUInteger windowInX, NSUInteger windowInY, NSUInteger strideInX, NSUInteger strideInY);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("windowInX", "setWindowInX:")]
+    public NSUInteger WindowInX { get; set; }
+    [Selector("windowInY", "setWindowInY:")]
+    public NSUInteger WindowInY { get; set; }
+    [Selector("strideInX", "setStrideInX:")]
+    public NSUInteger StrideInX { get; set; }
+    [Selector("strideInY", "setStrideInY:")]
+    public NSUInteger StrideInY { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:windowInX:windowInY:strideInX:strideInY:")]
+    public Self InitWithDeviceWindowInXWindowInYStrideInXStrideInY(MTLDevice device, NSUInteger windowInX, NSUInteger windowInY, NSUInteger strideInX, NSUInteger strideInY);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 #endif

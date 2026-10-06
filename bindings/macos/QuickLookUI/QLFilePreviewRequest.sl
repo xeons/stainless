@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class QLFilePreviewRequest : NSObject
 {
-    [Selector("fileURL")] public NSURL FileURL { get; }
+    [Selector("fileURL")]
+    public NSURL FileURL { get; }
 }
 
 #endif

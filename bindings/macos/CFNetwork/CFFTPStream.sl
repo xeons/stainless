@@ -94,12 +94,14 @@ public extern "C" CFStringRef? kCFFTPResourceType;
 public extern "C" CFStringRef? kCFFTPResourceModDate;
 
 /// Deprecated in macOS 10.11.
-[ReturnsRetained] public extern "C" CFReadStreamRef CFReadStreamCreateWithFTPURL(CFAllocatorRef? alloc, CFURLRef ftpURL);
+[ReturnsRetained]
+public extern "C" CFReadStreamRef CFReadStreamCreateWithFTPURL(CFAllocatorRef? alloc, CFURLRef ftpURL);
 
 /// Deprecated in macOS 10.11.
 public extern "C" CFIndex CFFTPCreateParsedResourceListing(CFAllocatorRef? alloc, UInt8* buffer, CFIndex bufferLength, __CFDictionary** parsed);
 
 /// Deprecated in macOS 10.11.
-[ReturnsRetained] public extern "C" CFWriteStreamRef CFWriteStreamCreateWithFTPURL(CFAllocatorRef? alloc, CFURLRef ftpURL);
+[ReturnsRetained]
+public extern "C" CFWriteStreamRef CFWriteStreamCreateWithFTPURL(CFAllocatorRef? alloc, CFURLRef ftpURL);
 
 #endif

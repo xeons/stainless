@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class VSAppleSubscription : NSObject
 {
-    [Selector("customerID", "setCustomerID:")] public NSString CustomerID { get; set; }
-    [Selector("productCodes", "setProductCodes:")] public NSArray ProductCodes { get; set; }
-    [Selector("initWithCustomerID:productCodes:")] public Self InitWithCustomerIDProductCodes(NSString customerID, NSArray productCodes);
+    [Selector("customerID", "setCustomerID:")]
+    public NSString CustomerID { get; set; }
+    [Selector("productCodes", "setProductCodes:")]
+    public NSArray ProductCodes { get; set; }
+    [Selector("initWithCustomerID:productCodes:")]
+    public Self InitWithCustomerIDProductCodes(NSString customerID, NSArray productCodes);
 }
 
 #endif

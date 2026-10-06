@@ -51,10 +51,14 @@ public extern "C" NSString? EAAccessoryKey;
 
 public extern objc class EAAccessoryManager : NSObject
 {
-    [Selector("connectedAccessories")] public NSArray? ConnectedAccessories { get; }
-    [Selector("sharedAccessoryManager")] public static EAAccessoryManager SharedAccessoryManager();
-    [Selector("registerForLocalNotifications")] public void RegisterForLocalNotifications();
-    [Selector("unregisterForLocalNotifications")] public void UnregisterForLocalNotifications();
+    [Selector("connectedAccessories")]
+    public NSArray? ConnectedAccessories { get; }
+    [Selector("sharedAccessoryManager")]
+    public static EAAccessoryManager SharedAccessoryManager();
+    [Selector("registerForLocalNotifications")]
+    public void RegisterForLocalNotifications();
+    [Selector("unregisterForLocalNotifications")]
+    public void UnregisterForLocalNotifications();
 }
 
 #endif

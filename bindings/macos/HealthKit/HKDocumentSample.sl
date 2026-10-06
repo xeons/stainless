@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class HKDocumentSample : HKSample
 {
-    [Selector("documentType")] public HKDocumentType DocumentType { get; }
+    [Selector("documentType")]
+    public HKDocumentType DocumentType { get; }
 }
 
 #endif

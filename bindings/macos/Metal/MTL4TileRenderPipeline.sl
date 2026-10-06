@@ -33,15 +33,24 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTL4TileRenderPipelineDescriptor : MTL4PipelineDescriptor
 {
-    [Selector("tileFunctionDescriptor", "setTileFunctionDescriptor:")] public MTL4FunctionDescriptor? TileFunctionDescriptor { get; set; }
-    [Selector("rasterSampleCount", "setRasterSampleCount:")] public NSUInteger RasterSampleCount { get; set; }
-    [Selector("colorAttachments")] public MTLTileRenderPipelineColorAttachmentDescriptorArray ColorAttachments { get; }
-    [Selector("threadgroupSizeMatchesTileSize", "setThreadgroupSizeMatchesTileSize:")] public bool ThreadgroupSizeMatchesTileSize { get; set; }
-    [Selector("maxTotalThreadsPerThreadgroup", "setMaxTotalThreadsPerThreadgroup:")] public NSUInteger MaxTotalThreadsPerThreadgroup { get; set; }
-    [Selector("requiredThreadsPerThreadgroup", "setRequiredThreadsPerThreadgroup:")] public MTLSize RequiredThreadsPerThreadgroup { get; set; }
-    [Selector("staticLinkingDescriptor", "setStaticLinkingDescriptor:")] public MTL4StaticLinkingDescriptor? StaticLinkingDescriptor { get; set; }
-    [Selector("supportBinaryLinking", "setSupportBinaryLinking:")] public bool SupportBinaryLinking { get; set; }
-    [Selector("reset")] public void Reset();
+    [Selector("tileFunctionDescriptor", "setTileFunctionDescriptor:")]
+    public MTL4FunctionDescriptor? TileFunctionDescriptor { get; set; }
+    [Selector("rasterSampleCount", "setRasterSampleCount:")]
+    public NSUInteger RasterSampleCount { get; set; }
+    [Selector("colorAttachments")]
+    public MTLTileRenderPipelineColorAttachmentDescriptorArray ColorAttachments { get; }
+    [Selector("threadgroupSizeMatchesTileSize", "setThreadgroupSizeMatchesTileSize:")]
+    public bool ThreadgroupSizeMatchesTileSize { get; set; }
+    [Selector("maxTotalThreadsPerThreadgroup", "setMaxTotalThreadsPerThreadgroup:")]
+    public NSUInteger MaxTotalThreadsPerThreadgroup { get; set; }
+    [Selector("requiredThreadsPerThreadgroup", "setRequiredThreadsPerThreadgroup:")]
+    public MTLSize RequiredThreadsPerThreadgroup { get; set; }
+    [Selector("staticLinkingDescriptor", "setStaticLinkingDescriptor:")]
+    public MTL4StaticLinkingDescriptor? StaticLinkingDescriptor { get; set; }
+    [Selector("supportBinaryLinking", "setSupportBinaryLinking:")]
+    public bool SupportBinaryLinking { get; set; }
+    [Selector("reset")]
+    public void Reset();
 }
 
 #endif

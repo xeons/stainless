@@ -51,16 +51,26 @@ public objc closure void THClientIsPreferredNetworkAvailableWithCompletionComple
 
 public extern objc class THClient : NSObject
 {
-    [Selector("init")] public Self Init();
-    [Selector("retrieveAllCredentials:")] public void RetrieveAllCredentials(THClientRetrieveAllCredentialsCompletionBlock completion);
-    [Selector("retrieveAllActiveCredentials:")] public void RetrieveAllActiveCredentials(THClientRetrieveAllActiveCredentialsCompletionBlock completion);
-    [Selector("deleteCredentialsForBorderAgent:completion:")] public void DeleteCredentialsForBorderAgentCompletion(NSData borderAgentID, THClientDeleteCredentialsForBorderAgentCompletionCompletionBlock completion);
-    [Selector("retrieveCredentialsForBorderAgent:completion:")] public void RetrieveCredentialsForBorderAgentCompletion(NSData borderAgentID, THClientRetrieveCredentialsForBorderAgentCompletionCompletionBlock completion);
-    [Selector("storeCredentialsForBorderAgent:activeOperationalDataSet:completion:")] public void StoreCredentialsForBorderAgentActiveOperationalDataSetCompletion(NSData borderAgentID, NSData activeOperationalDataSet, THClientStoreCredentialsForBorderAgentActiveOperationalDataSetCompletionCompletionBlock completion);
-    [Selector("retrievePreferredCredentials:")] public void RetrievePreferredCredentials(THClientRetrievePreferredCredentialsCompletionBlock completion);
-    [Selector("retrieveCredentialsForExtendedPANID:completion:")] public void RetrieveCredentialsForExtendedPANIDCompletion(NSData extendedPANID, THClientRetrieveCredentialsForExtendedPANIDCompletionCompletionBlock completion);
-    [Selector("checkPreferredNetworkForActiveOperationalDataset:completion:")] public void CheckPreferredNetworkForActiveOperationalDatasetCompletion(NSData activeOperationalDataSet, THClientCheckPreferredNetworkForActiveOperationalDatasetCompletionCompletionBlock completion);
-    [Selector("isPreferredNetworkAvailableWithCompletion:")] public void IsPreferredNetworkAvailableWithCompletion(THClientIsPreferredNetworkAvailableWithCompletionCompletionBlock completion);
+    [Selector("init")]
+    public Self Init();
+    [Selector("retrieveAllCredentials:")]
+    public void RetrieveAllCredentials(THClientRetrieveAllCredentialsCompletionBlock completion);
+    [Selector("retrieveAllActiveCredentials:")]
+    public void RetrieveAllActiveCredentials(THClientRetrieveAllActiveCredentialsCompletionBlock completion);
+    [Selector("deleteCredentialsForBorderAgent:completion:")]
+    public void DeleteCredentialsForBorderAgentCompletion(NSData borderAgentID, THClientDeleteCredentialsForBorderAgentCompletionCompletionBlock completion);
+    [Selector("retrieveCredentialsForBorderAgent:completion:")]
+    public void RetrieveCredentialsForBorderAgentCompletion(NSData borderAgentID, THClientRetrieveCredentialsForBorderAgentCompletionCompletionBlock completion);
+    [Selector("storeCredentialsForBorderAgent:activeOperationalDataSet:completion:")]
+    public void StoreCredentialsForBorderAgentActiveOperationalDataSetCompletion(NSData borderAgentID, NSData activeOperationalDataSet, THClientStoreCredentialsForBorderAgentActiveOperationalDataSetCompletionCompletionBlock completion);
+    [Selector("retrievePreferredCredentials:")]
+    public void RetrievePreferredCredentials(THClientRetrievePreferredCredentialsCompletionBlock completion);
+    [Selector("retrieveCredentialsForExtendedPANID:completion:")]
+    public void RetrieveCredentialsForExtendedPANIDCompletion(NSData extendedPANID, THClientRetrieveCredentialsForExtendedPANIDCompletionCompletionBlock completion);
+    [Selector("checkPreferredNetworkForActiveOperationalDataset:completion:")]
+    public void CheckPreferredNetworkForActiveOperationalDatasetCompletion(NSData activeOperationalDataSet, THClientCheckPreferredNetworkForActiveOperationalDatasetCompletionCompletionBlock completion);
+    [Selector("isPreferredNetworkAvailableWithCompletion:")]
+    public void IsPreferredNetworkAvailableWithCompletion(THClientIsPreferredNetworkAvailableWithCompletionCompletionBlock completion);
 }
 
 #endif

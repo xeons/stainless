@@ -34,21 +34,36 @@ import Standard.ObjC;
 
 public extern objc class IOUSBHostControllerInterface : NSObject
 {
-    [Selector("queue")] public dispatch_queue_t Queue { get; }
-    [Selector("interruptRateHz", "setInterruptRateHz:")] public NSUInteger InterruptRateHz { get; set; }
-    [Selector("controllerStateMachine")] public IOUSBHostCIControllerStateMachine ControllerStateMachine { get; }
-    [Selector("capabilities")] public IOUSBHostCIMessage* Capabilities { get; }
-    [Selector("uuid")] public NSUUID Uuid { get; }
-    [Selector("initWithCapabilities:queue:interruptRateHz:error:commandHandler:doorbellHandler:interestHandler:")] public Self? InitWithCapabilitiesQueueInterruptRateHzErrorCommandHandlerDoorbellHandlerInterestHandler(NSData capabilities, dispatch_queue_t? queue, NSUInteger interruptRateHz, out NSError? error, IOUSBHostControllerInterfaceCommandHandler commandHandler, IOUSBHostControllerInterfaceDoorbellHandler doorbellHandler, IOServiceInterestCallback interestHandler);
-    [Selector("destroy")] public void Destroy();
-    [Selector("enqueueInterrupt:error:")] public bool EnqueueInterruptError(IOUSBHostCIMessage* interrupt, out NSError? error);
-    [Selector("enqueueInterrupt:expedite:error:")] public bool EnqueueInterruptExpediteError(IOUSBHostCIMessage* interrupt, bool expedite, out NSError? error);
-    [Selector("enqueueInterrupts:count:error:")] public bool EnqueueInterruptsCountError(IOUSBHostCIMessage* interrupts, NSUInteger count, out NSError? error);
-    [Selector("enqueueInterrupts:count:expedite:error:")] public bool EnqueueInterruptsCountExpediteError(IOUSBHostCIMessage* interrupts, NSUInteger count, bool expedite, out NSError? error);
-    [Selector("descriptionForMessage:")] public NSString DescriptionForMessage(IOUSBHostCIMessage* message);
-    [Selector("getPortStateMachineForCommand:error:")] public IOUSBHostCIPortStateMachine GetPortStateMachineForCommandError(IOUSBHostCIMessage* command, out NSError? error);
-    [Selector("getPortStateMachineForPort:error:")] public IOUSBHostCIPortStateMachine GetPortStateMachineForPortError(NSUInteger port, out NSError? error);
-    [Selector("capabilitiesForPort:")] public IOUSBHostCIMessage* CapabilitiesForPort(NSUInteger port);
+    [Selector("queue")]
+    public dispatch_queue_t Queue { get; }
+    [Selector("interruptRateHz", "setInterruptRateHz:")]
+    public NSUInteger InterruptRateHz { get; set; }
+    [Selector("controllerStateMachine")]
+    public IOUSBHostCIControllerStateMachine ControllerStateMachine { get; }
+    [Selector("capabilities")]
+    public IOUSBHostCIMessage* Capabilities { get; }
+    [Selector("uuid")]
+    public NSUUID Uuid { get; }
+    [Selector("initWithCapabilities:queue:interruptRateHz:error:commandHandler:doorbellHandler:interestHandler:")]
+    public Self? InitWithCapabilitiesQueueInterruptRateHzErrorCommandHandlerDoorbellHandlerInterestHandler(NSData capabilities, dispatch_queue_t? queue, NSUInteger interruptRateHz, out NSError? error, IOUSBHostControllerInterfaceCommandHandler commandHandler, IOUSBHostControllerInterfaceDoorbellHandler doorbellHandler, IOServiceInterestCallback interestHandler);
+    [Selector("destroy")]
+    public void Destroy();
+    [Selector("enqueueInterrupt:error:")]
+    public bool EnqueueInterruptError(IOUSBHostCIMessage* interrupt, out NSError? error);
+    [Selector("enqueueInterrupt:expedite:error:")]
+    public bool EnqueueInterruptExpediteError(IOUSBHostCIMessage* interrupt, bool expedite, out NSError? error);
+    [Selector("enqueueInterrupts:count:error:")]
+    public bool EnqueueInterruptsCountError(IOUSBHostCIMessage* interrupts, NSUInteger count, out NSError? error);
+    [Selector("enqueueInterrupts:count:expedite:error:")]
+    public bool EnqueueInterruptsCountExpediteError(IOUSBHostCIMessage* interrupts, NSUInteger count, bool expedite, out NSError? error);
+    [Selector("descriptionForMessage:")]
+    public NSString DescriptionForMessage(IOUSBHostCIMessage* message);
+    [Selector("getPortStateMachineForCommand:error:")]
+    public IOUSBHostCIPortStateMachine GetPortStateMachineForCommandError(IOUSBHostCIMessage* command, out NSError? error);
+    [Selector("getPortStateMachineForPort:error:")]
+    public IOUSBHostCIPortStateMachine GetPortStateMachineForPortError(NSUInteger port, out NSError? error);
+    [Selector("capabilitiesForPort:")]
+    public IOUSBHostCIMessage* CapabilitiesForPort(NSUInteger port);
 }
 
 public objc closure void IOUSBHostControllerInterfaceCommandHandler(IOUSBHostControllerInterface arg0, IOUSBHostCIMessage arg1);

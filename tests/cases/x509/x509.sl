@@ -12,43 +12,80 @@ import Standard.Time;
 import Standard.Security.Cryptography;
 import Standard.Security.Cryptography.X509Certificates;
 
-[Embed("root.pem")] static readonly byte[] RootPem;
-[Embed("rootb.pem")] static readonly byte[] RootBPem;
-[Embed("inter.pem")] static readonly byte[] InterPem;
-[Embed("intercross.pem")] static readonly byte[] InterCrossPem;
-[Embed("noca.pem")] static readonly byte[] NoCaPem;
-[Embed("sub.pem")] static readonly byte[] SubPem;
-[Embed("noku.pem")] static readonly byte[] NoKuPem;
-[Embed("nc.pem")] static readonly byte[] NcPem;
-[Embed("caa.pem")] static readonly byte[] CycleAPem;
-[Embed("cab.pem")] static readonly byte[] CycleBPem;
-[Embed("good.pem")] static readonly byte[] GoodPem;
-[Embed("good.der")] static readonly byte[] GoodDer;
-[Embed("expired.pem")] static readonly byte[] ExpiredPem;
-[Embed("notyet.pem")] static readonly byte[] NotYetPem;
-[Embed("wrongeku.pem")] static readonly byte[] WrongEkuPem;
-[Embed("badku.pem")] static readonly byte[] BadKuPem;
-[Embed("wildcard.pem")] static readonly byte[] WildcardPem;
-[Embed("ip.pem")] static readonly byte[] IpPem;
-[Embed("critical.pem")] static readonly byte[] CriticalPem;
-[Embed("undernoca.pem")] static readonly byte[] UnderNoCaPem;
-[Embed("undersub.pem")] static readonly byte[] UnderSubPem;
-[Embed("undernoku.pem")] static readonly byte[] UnderNoKuPem;
-[Embed("ncok.pem")] static readonly byte[] NcOkPem;
-[Embed("ncgood.pem")] static readonly byte[] NcWildcardPem;
-[Embed("ncother.pem")] static readonly byte[] NcOtherPem;
-[Embed("ncexcluded.pem")] static readonly byte[] NcExcludedPem;
-[Embed("ncip.pem")] static readonly byte[] NcIpPem;
-[Embed("cyclic.pem")] static readonly byte[] CyclicPem;
-[Embed("rsaroot.pem")] static readonly byte[] RsaRootPem;
-[Embed("rsaleaf.pem")] static readonly byte[] RsaLeafPem;
-[Embed("rsapss.pem")] static readonly byte[] RsaPssPem;
-[Embed("p256root.pem")] static readonly byte[] P256RootPem;
-[Embed("p256leaf.pem")] static readonly byte[] P256LeafPem;
-[Embed("isrgx1.pem")] static readonly byte[] IsrgX1Pem;
-[Embed("isrgx2.pem")] static readonly byte[] IsrgX2Pem;
-[Embed("r10.pem")] static readonly byte[] R10Pem;
-[Embed("e6.pem")] static readonly byte[] E6Pem;
+[Embed("root.pem")]
+static readonly byte[] RootPem;
+[Embed("rootb.pem")]
+static readonly byte[] RootBPem;
+[Embed("inter.pem")]
+static readonly byte[] InterPem;
+[Embed("intercross.pem")]
+static readonly byte[] InterCrossPem;
+[Embed("noca.pem")]
+static readonly byte[] NoCaPem;
+[Embed("sub.pem")]
+static readonly byte[] SubPem;
+[Embed("noku.pem")]
+static readonly byte[] NoKuPem;
+[Embed("nc.pem")]
+static readonly byte[] NcPem;
+[Embed("caa.pem")]
+static readonly byte[] CycleAPem;
+[Embed("cab.pem")]
+static readonly byte[] CycleBPem;
+[Embed("good.pem")]
+static readonly byte[] GoodPem;
+[Embed("good.der")]
+static readonly byte[] GoodDer;
+[Embed("expired.pem")]
+static readonly byte[] ExpiredPem;
+[Embed("notyet.pem")]
+static readonly byte[] NotYetPem;
+[Embed("wrongeku.pem")]
+static readonly byte[] WrongEkuPem;
+[Embed("badku.pem")]
+static readonly byte[] BadKuPem;
+[Embed("wildcard.pem")]
+static readonly byte[] WildcardPem;
+[Embed("ip.pem")]
+static readonly byte[] IpPem;
+[Embed("critical.pem")]
+static readonly byte[] CriticalPem;
+[Embed("undernoca.pem")]
+static readonly byte[] UnderNoCaPem;
+[Embed("undersub.pem")]
+static readonly byte[] UnderSubPem;
+[Embed("undernoku.pem")]
+static readonly byte[] UnderNoKuPem;
+[Embed("ncok.pem")]
+static readonly byte[] NcOkPem;
+[Embed("ncgood.pem")]
+static readonly byte[] NcWildcardPem;
+[Embed("ncother.pem")]
+static readonly byte[] NcOtherPem;
+[Embed("ncexcluded.pem")]
+static readonly byte[] NcExcludedPem;
+[Embed("ncip.pem")]
+static readonly byte[] NcIpPem;
+[Embed("cyclic.pem")]
+static readonly byte[] CyclicPem;
+[Embed("rsaroot.pem")]
+static readonly byte[] RsaRootPem;
+[Embed("rsaleaf.pem")]
+static readonly byte[] RsaLeafPem;
+[Embed("rsapss.pem")]
+static readonly byte[] RsaPssPem;
+[Embed("p256root.pem")]
+static readonly byte[] P256RootPem;
+[Embed("p256leaf.pem")]
+static readonly byte[] P256LeafPem;
+[Embed("isrgx1.pem")]
+static readonly byte[] IsrgX1Pem;
+[Embed("isrgx2.pem")]
+static readonly byte[] IsrgX2Pem;
+[Embed("r10.pem")]
+static readonly byte[] R10Pem;
+[Embed("e6.pem")]
+static readonly byte[] E6Pem;
 
 // 2026-10-01T00:00:00Z: inside every fixture's validity but the three made
 // to be outside it.

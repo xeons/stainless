@@ -34,9 +34,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.15.
 public extern objc class GCExtendedGamepadSnapshot : GCExtendedGamepad
 {
-    [Selector("snapshotData", "setSnapshotData:")] public NSData SnapshotData { get; set; }
-    [Selector("initWithSnapshotData:")] public Self InitWithSnapshotData(NSData data);
-    [Selector("initWithController:snapshotData:")] public Self InitWithControllerSnapshotData(GCController controller, NSData data);
+    [Selector("snapshotData", "setSnapshotData:")]
+    public NSData SnapshotData { get; set; }
+    [Selector("initWithSnapshotData:")]
+    public Self InitWithSnapshotData(NSData data);
+    [Selector("initWithController:snapshotData:")]
+    public Self InitWithControllerSnapshotData(GCController controller, NSData data);
 }
 
 /// Deprecated in macOS 10.15.

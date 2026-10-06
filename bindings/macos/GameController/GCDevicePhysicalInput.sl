@@ -36,13 +36,20 @@ public objc closure void GCDevicePhysicalInputInputStateAvailableHandlerBlock(GC
 
 public objc interface GCDevicePhysicalInput : GCDevicePhysicalInputState
 {
-    [Selector("device")] GCDevice? Device { get; }
-    [Selector("queue", "setQueue:")] dispatch_queue_t? Queue { get; set; }
-    [Selector("elementValueDidChangeHandler", "setElementValueDidChangeHandler:")] GCDevicePhysicalInputElementValueDidChangeHandlerBlock? ElementValueDidChangeHandler { get; set; }
-    [Selector("inputStateAvailableHandler", "setInputStateAvailableHandler:")] GCDevicePhysicalInputInputStateAvailableHandlerBlock? InputStateAvailableHandler { get; set; }
-    [Selector("inputStateQueueDepth", "setInputStateQueueDepth:")] NSInteger InputStateQueueDepth { get; set; }
-    [Selector("capture")] GCDevicePhysicalInputState Capture();
-    [Selector("nextInputState")] GCDevicePhysicalInputState? NextInputState();
+    [Selector("device")]
+    GCDevice? Device { get; }
+    [Selector("queue", "setQueue:")]
+    dispatch_queue_t? Queue { get; set; }
+    [Selector("elementValueDidChangeHandler", "setElementValueDidChangeHandler:")]
+    GCDevicePhysicalInputElementValueDidChangeHandlerBlock? ElementValueDidChangeHandler { get; set; }
+    [Selector("inputStateAvailableHandler", "setInputStateAvailableHandler:")]
+    GCDevicePhysicalInputInputStateAvailableHandlerBlock? InputStateAvailableHandler { get; set; }
+    [Selector("inputStateQueueDepth", "setInputStateQueueDepth:")]
+    NSInteger InputStateQueueDepth { get; set; }
+    [Selector("capture")]
+    GCDevicePhysicalInputState Capture();
+    [Selector("nextInputState")]
+    GCDevicePhysicalInputState? NextInputState();
 }
 
 #endif

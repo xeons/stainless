@@ -34,28 +34,48 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothSDPServiceRecord : NSObject, NSCoding, NSSecureCoding
 {
-    [Selector("device")] public IOBluetoothDevice? Device { get; }
-    [Selector("attributes")] public NSDictionary? Attributes { get; }
-    [Selector("sortedAttributes")] public NSArray? SortedAttributes { get; }
-    [Selector("publishedServiceRecordWithDictionary:")] public static Self? PublishedServiceRecordWithDictionary(NSDictionary? serviceDict);
-    [Selector("removeServiceRecord")] public IOReturn RemoveServiceRecord();
-    [Selector("withServiceDictionary:device:")] public static Self? WithServiceDictionaryDevice(NSDictionary? serviceDict, IOBluetoothDevice? device);
-    [Selector("initWithServiceDictionary:device:")] public Self? InitWithServiceDictionaryDevice(NSDictionary? serviceDict, IOBluetoothDevice? device);
-    [Selector("withSDPServiceRecordRef:")] public static Self? WithSDPServiceRecordRef(IOBluetoothSDPServiceRecordRef sdpServiceRecordRef);
-    [Selector("getSDPServiceRecordRef")] public IOBluetoothSDPServiceRecordRef GetSDPServiceRecordRef();
+    [Selector("device")]
+    public IOBluetoothDevice? Device { get; }
+    [Selector("attributes")]
+    public NSDictionary? Attributes { get; }
+    [Selector("sortedAttributes")]
+    public NSArray? SortedAttributes { get; }
+    [Selector("publishedServiceRecordWithDictionary:")]
+    public static Self? PublishedServiceRecordWithDictionary(NSDictionary? serviceDict);
+    [Selector("removeServiceRecord")]
+    public IOReturn RemoveServiceRecord();
+    [Selector("withServiceDictionary:device:")]
+    public static Self? WithServiceDictionaryDevice(NSDictionary? serviceDict, IOBluetoothDevice? device);
+    [Selector("initWithServiceDictionary:device:")]
+    public Self? InitWithServiceDictionaryDevice(NSDictionary? serviceDict, IOBluetoothDevice? device);
+    [Selector("withSDPServiceRecordRef:")]
+    public static Self? WithSDPServiceRecordRef(IOBluetoothSDPServiceRecordRef sdpServiceRecordRef);
+    [Selector("getSDPServiceRecordRef")]
+    public IOBluetoothSDPServiceRecordRef GetSDPServiceRecordRef();
     /// Deprecated in macOS 10.6.
-    [Selector("getDevice")] public IOBluetoothDevice? GetDevice();
+    [Selector("getDevice")]
+    public IOBluetoothDevice? GetDevice();
     /// Deprecated in macOS 10.6.
-    [Selector("getAttributes")] public NSDictionary? GetAttributes();
-    [Selector("getAttributeDataElement:")] public IOBluetoothSDPDataElement? GetAttributeDataElement(BluetoothSDPServiceAttributeID attributeID);
-    [Selector("getServiceName")] public NSString? GetServiceName();
-    [Selector("getRFCOMMChannelID:")] public IOReturn GetRFCOMMChannelID(BluetoothRFCOMMChannelID* rfcommChannelID);
-    [Selector("getL2CAPPSM:")] public IOReturn GetL2CAPPSM(BluetoothL2CAPPSM* outPSM);
-    [Selector("getServiceRecordHandle:")] public IOReturn GetServiceRecordHandle(BluetoothSDPServiceRecordHandle* outServiceRecordHandle);
-    [Selector("matchesUUID16:")] public bool MatchesUUID16(BluetoothSDPUUID16 uuid16);
-    [Selector("matchesUUIDArray:")] public bool MatchesUUIDArray(NSArray? uuidArray);
-    [Selector("matchesSearchArray:")] public bool MatchesSearchArray(NSArray? searchArray);
-    [Selector("hasServiceFromArray:")] public bool HasServiceFromArray(NSArray? array);
+    [Selector("getAttributes")]
+    public NSDictionary? GetAttributes();
+    [Selector("getAttributeDataElement:")]
+    public IOBluetoothSDPDataElement? GetAttributeDataElement(BluetoothSDPServiceAttributeID attributeID);
+    [Selector("getServiceName")]
+    public NSString? GetServiceName();
+    [Selector("getRFCOMMChannelID:")]
+    public IOReturn GetRFCOMMChannelID(BluetoothRFCOMMChannelID* rfcommChannelID);
+    [Selector("getL2CAPPSM:")]
+    public IOReturn GetL2CAPPSM(BluetoothL2CAPPSM* outPSM);
+    [Selector("getServiceRecordHandle:")]
+    public IOReturn GetServiceRecordHandle(BluetoothSDPServiceRecordHandle* outServiceRecordHandle);
+    [Selector("matchesUUID16:")]
+    public bool MatchesUUID16(BluetoothSDPUUID16 uuid16);
+    [Selector("matchesUUIDArray:")]
+    public bool MatchesUUIDArray(NSArray? uuidArray);
+    [Selector("matchesSearchArray:")]
+    public bool MatchesSearchArray(NSArray? searchArray);
+    [Selector("hasServiceFromArray:")]
+    public bool HasServiceFromArray(NSArray? array);
 }
 
 #endif

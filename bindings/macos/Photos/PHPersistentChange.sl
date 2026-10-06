@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class PHPersistentChange : NSObject
 {
-    [Selector("changeToken")] public PHPersistentChangeToken ChangeToken { get; }
-    [Selector("changeDetailsForObjectType:error:")] public PHPersistentObjectChangeDetails? ChangeDetailsForObjectTypeError(PHObjectType objectType, out NSError? error);
+    [Selector("changeToken")]
+    public PHPersistentChangeToken ChangeToken { get; }
+    [Selector("changeDetailsForObjectType:error:")]
+    public PHPersistentObjectChangeDetails? ChangeDetailsForObjectTypeError(PHObjectType objectType, out NSError? error);
 }
 
 #endif

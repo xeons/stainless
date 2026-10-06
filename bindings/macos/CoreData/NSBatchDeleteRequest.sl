@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class NSBatchDeleteRequest : NSPersistentStoreRequest
 {
-    [Selector("resultType", "setResultType:")] public NSBatchDeleteRequestResultType ResultType { get; set; }
-    [Selector("fetchRequest")] public NSFetchRequest FetchRequest { get; }
-    [Selector("initWithFetchRequest:")] public Self InitWithFetchRequest(NSFetchRequest fetch);
-    [Selector("initWithObjectIDs:")] public Self InitWithObjectIDs(NSArray objects);
+    [Selector("resultType", "setResultType:")]
+    public NSBatchDeleteRequestResultType ResultType { get; set; }
+    [Selector("fetchRequest")]
+    public NSFetchRequest FetchRequest { get; }
+    [Selector("initWithFetchRequest:")]
+    public Self InitWithFetchRequest(NSFetchRequest fetch);
+    [Selector("initWithObjectIDs:")]
+    public Self InitWithObjectIDs(NSArray objects);
 }
 
 #endif

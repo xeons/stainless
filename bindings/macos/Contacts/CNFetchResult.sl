@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class CNFetchResult : NSObject
 {
-    [Selector("value")] public AnyObject Value { get; }
-    [Selector("currentHistoryToken")] public NSData CurrentHistoryToken { get; }
+    [Selector("value")]
+    public AnyObject Value { get; }
+    [Selector("currentHistoryToken")]
+    public NSData CurrentHistoryToken { get; }
 }
 
 #endif

@@ -37,62 +37,118 @@ public extern "C" CGFloat* NSFontIdentityMatrix;
 
 public extern objc class NSFont : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("systemFontSize")] public static CGFloat SystemFontSize { get; }
-    [Selector("smallSystemFontSize")] public static CGFloat SmallSystemFontSize { get; }
-    [Selector("labelFontSize")] public static CGFloat LabelFontSize { get; }
-    [Selector("fontName")] public NSString FontName { get; }
-    [Selector("pointSize")] public CGFloat PointSize { get; }
-    [Selector("matrix")] public CGFloat* Matrix { get; }
-    [Selector("familyName")] public NSString? FamilyName { get; }
-    [Selector("displayName")] public NSString? DisplayName { get; }
-    [Selector("fontDescriptor")] public NSFontDescriptor FontDescriptor { get; }
-    [Selector("textTransform")] public NSAffineTransform TextTransform { get; }
-    [Selector("numberOfGlyphs")] public NSUInteger NumberOfGlyphs { get; }
-    [Selector("mostCompatibleStringEncoding")] public NSStringEncoding MostCompatibleStringEncoding { get; }
-    [Selector("coveredCharacterSet")] public NSCharacterSet CoveredCharacterSet { get; }
-    [Selector("boundingRectForFont")] public NSRect BoundingRectForFont { get; }
-    [Selector("maximumAdvancement")] public NSSize MaximumAdvancement { get; }
-    [Selector("ascender")] public CGFloat Ascender { get; }
-    [Selector("descender")] public CGFloat Descender { get; }
-    [Selector("leading")] public CGFloat Leading { get; }
-    [Selector("underlinePosition")] public CGFloat UnderlinePosition { get; }
-    [Selector("underlineThickness")] public CGFloat UnderlineThickness { get; }
-    [Selector("italicAngle")] public CGFloat ItalicAngle { get; }
-    [Selector("capHeight")] public CGFloat CapHeight { get; }
-    [Selector("xHeight")] public CGFloat XHeight { get; }
-    [Selector("isFixedPitch")] public bool FixedPitch { get; }
-    [Selector("verticalFont")] public NSFont? VerticalFont { get; }
-    [Selector("isVertical")] public bool Vertical { get; }
-    [Selector("fontWithName:size:")] public static NSFont? FontWithNameSize(NSString fontName, CGFloat fontSize);
-    [Selector("fontWithName:matrix:")] public static NSFont? FontWithNameMatrix(NSString fontName, CGFloat* fontMatrix);
-    [Selector("fontWithDescriptor:size:")] public static NSFont? FontWithDescriptorSize(NSFontDescriptor fontDescriptor, CGFloat fontSize);
-    [Selector("fontWithDescriptor:textTransform:")] public static NSFont? FontWithDescriptorTextTransform(NSFontDescriptor fontDescriptor, NSAffineTransform? textTransform);
-    [Selector("userFontOfSize:")] public static NSFont? UserFontOfSize(CGFloat fontSize);
-    [Selector("userFixedPitchFontOfSize:")] public static NSFont? UserFixedPitchFontOfSize(CGFloat fontSize);
-    [Selector("setUserFont:")] public static void SetUserFont(NSFont? font);
-    [Selector("setUserFixedPitchFont:")] public static void SetUserFixedPitchFont(NSFont? font);
-    [Selector("systemFontOfSize:")] public static NSFont SystemFontOfSize(CGFloat fontSize);
-    [Selector("boldSystemFontOfSize:")] public static NSFont BoldSystemFontOfSize(CGFloat fontSize);
-    [Selector("labelFontOfSize:")] public static NSFont LabelFontOfSize(CGFloat fontSize);
-    [Selector("titleBarFontOfSize:")] public static NSFont TitleBarFontOfSize(CGFloat fontSize);
-    [Selector("menuFontOfSize:")] public static NSFont MenuFontOfSize(CGFloat fontSize);
-    [Selector("menuBarFontOfSize:")] public static NSFont MenuBarFontOfSize(CGFloat fontSize);
-    [Selector("messageFontOfSize:")] public static NSFont MessageFontOfSize(CGFloat fontSize);
-    [Selector("paletteFontOfSize:")] public static NSFont PaletteFontOfSize(CGFloat fontSize);
-    [Selector("toolTipsFontOfSize:")] public static NSFont ToolTipsFontOfSize(CGFloat fontSize);
-    [Selector("controlContentFontOfSize:")] public static NSFont ControlContentFontOfSize(CGFloat fontSize);
-    [Selector("systemFontOfSize:weight:")] public static NSFont SystemFontOfSizeWeight(CGFloat fontSize, NSFontWeight weight);
-    [Selector("monospacedDigitSystemFontOfSize:weight:")] public static NSFont MonospacedDigitSystemFontOfSizeWeight(CGFloat fontSize, NSFontWeight weight);
-    [Selector("systemFontOfSize:weight:width:")] public static NSFont SystemFontOfSizeWeightWidth(CGFloat fontSize, NSFontWeight weight, NSFontWidth width);
-    [Selector("monospacedSystemFontOfSize:weight:")] public static NSFont MonospacedSystemFontOfSizeWeight(CGFloat fontSize, NSFontWeight weight);
-    [Selector("fontWithSize:")] public NSFont FontWithSize(CGFloat fontSize);
-    [Selector("systemFontSizeForControlSize:")] public static CGFloat SystemFontSizeForControlSize(NSControlSize controlSize);
-    [Selector("boundingRectForCGGlyph:")] public NSRect BoundingRectForCGGlyph(CGGlyph glyph);
-    [Selector("advancementForCGGlyph:")] public NSSize AdvancementForCGGlyph(CGGlyph glyph);
-    [Selector("getBoundingRects:forCGGlyphs:count:")] public void GetBoundingRectsForCGGlyphsCount(NSRectArray bounds, CGGlyph* glyphs, NSUInteger glyphCount);
-    [Selector("getAdvancements:forCGGlyphs:count:")] public void GetAdvancementsForCGGlyphsCount(NSSizeArray advancements, CGGlyph* glyphs, NSUInteger glyphCount);
-    [Selector("set")] public void Set();
-    [Selector("setInContext:")] public void SetInContext(NSGraphicsContext graphicsContext);
+    [Selector("systemFontSize")]
+    public static CGFloat SystemFontSize { get; }
+    [Selector("smallSystemFontSize")]
+    public static CGFloat SmallSystemFontSize { get; }
+    [Selector("labelFontSize")]
+    public static CGFloat LabelFontSize { get; }
+    [Selector("fontName")]
+    public NSString FontName { get; }
+    [Selector("pointSize")]
+    public CGFloat PointSize { get; }
+    [Selector("matrix")]
+    public CGFloat* Matrix { get; }
+    [Selector("familyName")]
+    public NSString? FamilyName { get; }
+    [Selector("displayName")]
+    public NSString? DisplayName { get; }
+    [Selector("fontDescriptor")]
+    public NSFontDescriptor FontDescriptor { get; }
+    [Selector("textTransform")]
+    public NSAffineTransform TextTransform { get; }
+    [Selector("numberOfGlyphs")]
+    public NSUInteger NumberOfGlyphs { get; }
+    [Selector("mostCompatibleStringEncoding")]
+    public NSStringEncoding MostCompatibleStringEncoding { get; }
+    [Selector("coveredCharacterSet")]
+    public NSCharacterSet CoveredCharacterSet { get; }
+    [Selector("boundingRectForFont")]
+    public NSRect BoundingRectForFont { get; }
+    [Selector("maximumAdvancement")]
+    public NSSize MaximumAdvancement { get; }
+    [Selector("ascender")]
+    public CGFloat Ascender { get; }
+    [Selector("descender")]
+    public CGFloat Descender { get; }
+    [Selector("leading")]
+    public CGFloat Leading { get; }
+    [Selector("underlinePosition")]
+    public CGFloat UnderlinePosition { get; }
+    [Selector("underlineThickness")]
+    public CGFloat UnderlineThickness { get; }
+    [Selector("italicAngle")]
+    public CGFloat ItalicAngle { get; }
+    [Selector("capHeight")]
+    public CGFloat CapHeight { get; }
+    [Selector("xHeight")]
+    public CGFloat XHeight { get; }
+    [Selector("isFixedPitch")]
+    public bool FixedPitch { get; }
+    [Selector("verticalFont")]
+    public NSFont? VerticalFont { get; }
+    [Selector("isVertical")]
+    public bool Vertical { get; }
+    [Selector("fontWithName:size:")]
+    public static NSFont? FontWithNameSize(NSString fontName, CGFloat fontSize);
+    [Selector("fontWithName:matrix:")]
+    public static NSFont? FontWithNameMatrix(NSString fontName, CGFloat* fontMatrix);
+    [Selector("fontWithDescriptor:size:")]
+    public static NSFont? FontWithDescriptorSize(NSFontDescriptor fontDescriptor, CGFloat fontSize);
+    [Selector("fontWithDescriptor:textTransform:")]
+    public static NSFont? FontWithDescriptorTextTransform(NSFontDescriptor fontDescriptor, NSAffineTransform? textTransform);
+    [Selector("userFontOfSize:")]
+    public static NSFont? UserFontOfSize(CGFloat fontSize);
+    [Selector("userFixedPitchFontOfSize:")]
+    public static NSFont? UserFixedPitchFontOfSize(CGFloat fontSize);
+    [Selector("setUserFont:")]
+    public static void SetUserFont(NSFont? font);
+    [Selector("setUserFixedPitchFont:")]
+    public static void SetUserFixedPitchFont(NSFont? font);
+    [Selector("systemFontOfSize:")]
+    public static NSFont SystemFontOfSize(CGFloat fontSize);
+    [Selector("boldSystemFontOfSize:")]
+    public static NSFont BoldSystemFontOfSize(CGFloat fontSize);
+    [Selector("labelFontOfSize:")]
+    public static NSFont LabelFontOfSize(CGFloat fontSize);
+    [Selector("titleBarFontOfSize:")]
+    public static NSFont TitleBarFontOfSize(CGFloat fontSize);
+    [Selector("menuFontOfSize:")]
+    public static NSFont MenuFontOfSize(CGFloat fontSize);
+    [Selector("menuBarFontOfSize:")]
+    public static NSFont MenuBarFontOfSize(CGFloat fontSize);
+    [Selector("messageFontOfSize:")]
+    public static NSFont MessageFontOfSize(CGFloat fontSize);
+    [Selector("paletteFontOfSize:")]
+    public static NSFont PaletteFontOfSize(CGFloat fontSize);
+    [Selector("toolTipsFontOfSize:")]
+    public static NSFont ToolTipsFontOfSize(CGFloat fontSize);
+    [Selector("controlContentFontOfSize:")]
+    public static NSFont ControlContentFontOfSize(CGFloat fontSize);
+    [Selector("systemFontOfSize:weight:")]
+    public static NSFont SystemFontOfSizeWeight(CGFloat fontSize, NSFontWeight weight);
+    [Selector("monospacedDigitSystemFontOfSize:weight:")]
+    public static NSFont MonospacedDigitSystemFontOfSizeWeight(CGFloat fontSize, NSFontWeight weight);
+    [Selector("systemFontOfSize:weight:width:")]
+    public static NSFont SystemFontOfSizeWeightWidth(CGFloat fontSize, NSFontWeight weight, NSFontWidth width);
+    [Selector("monospacedSystemFontOfSize:weight:")]
+    public static NSFont MonospacedSystemFontOfSizeWeight(CGFloat fontSize, NSFontWeight weight);
+    [Selector("fontWithSize:")]
+    public NSFont FontWithSize(CGFloat fontSize);
+    [Selector("systemFontSizeForControlSize:")]
+    public static CGFloat SystemFontSizeForControlSize(NSControlSize controlSize);
+    [Selector("boundingRectForCGGlyph:")]
+    public NSRect BoundingRectForCGGlyph(CGGlyph glyph);
+    [Selector("advancementForCGGlyph:")]
+    public NSSize AdvancementForCGGlyph(CGGlyph glyph);
+    [Selector("getBoundingRects:forCGGlyphs:count:")]
+    public void GetBoundingRectsForCGGlyphsCount(NSRectArray bounds, CGGlyph* glyphs, NSUInteger glyphCount);
+    [Selector("getAdvancements:forCGGlyphs:count:")]
+    public void GetAdvancementsForCGGlyphsCount(NSSizeArray advancements, CGGlyph* glyphs, NSUInteger glyphCount);
+    [Selector("set")]
+    public void Set();
+    [Selector("setInContext:")]
+    public void SetInContext(NSGraphicsContext graphicsContext);
 }
 
 public extern "C" NSNotificationName NSAntialiasThresholdChangedNotification;
@@ -124,22 +180,33 @@ public extern "C" NSInteger NSConvertGlyphsToPackedGlyphs(NSGlyph* glBuf, NSInte
 /// NSFont_Deprecated, a category of NSFont.
 public extern objc class NSFont
 {
-    [Selector("printerFont")] public NSFont PrinterFont { get; }
-    [Selector("screenFont")] public NSFont ScreenFont { get; }
-    [Selector("renderingMode")] public NSFontRenderingMode RenderingMode { get; }
-    [Selector("glyphWithName:")] public NSGlyph GlyphWithName(NSString name);
-    [Selector("boundingRectForGlyph:")] public NSRect BoundingRectForGlyph(NSGlyph glyph);
-    [Selector("advancementForGlyph:")] public NSSize AdvancementForGlyph(NSGlyph glyph);
-    [Selector("getBoundingRects:forGlyphs:count:")] public void GetBoundingRectsForGlyphsCount(NSRectArray bounds, NSGlyph* glyphs, NSUInteger glyphCount);
-    [Selector("getAdvancements:forGlyphs:count:")] public void GetAdvancementsForGlyphsCount(NSSizeArray advancements, NSGlyph* glyphs, NSUInteger glyphCount);
-    [Selector("getAdvancements:forPackedGlyphs:length:")] public void GetAdvancementsForPackedGlyphsLength(NSSizeArray advancements, void* packedGlyphs, NSUInteger length);
-    [Selector("screenFontWithRenderingMode:")] public NSFont ScreenFontWithRenderingMode(NSFontRenderingMode renderingMode);
+    [Selector("printerFont")]
+    public NSFont PrinterFont { get; }
+    [Selector("screenFont")]
+    public NSFont ScreenFont { get; }
+    [Selector("renderingMode")]
+    public NSFontRenderingMode RenderingMode { get; }
+    [Selector("glyphWithName:")]
+    public NSGlyph GlyphWithName(NSString name);
+    [Selector("boundingRectForGlyph:")]
+    public NSRect BoundingRectForGlyph(NSGlyph glyph);
+    [Selector("advancementForGlyph:")]
+    public NSSize AdvancementForGlyph(NSGlyph glyph);
+    [Selector("getBoundingRects:forGlyphs:count:")]
+    public void GetBoundingRectsForGlyphsCount(NSRectArray bounds, NSGlyph* glyphs, NSUInteger glyphCount);
+    [Selector("getAdvancements:forGlyphs:count:")]
+    public void GetAdvancementsForGlyphsCount(NSSizeArray advancements, NSGlyph* glyphs, NSUInteger glyphCount);
+    [Selector("getAdvancements:forPackedGlyphs:length:")]
+    public void GetAdvancementsForPackedGlyphsLength(NSSizeArray advancements, void* packedGlyphs, NSUInteger length);
+    [Selector("screenFontWithRenderingMode:")]
+    public NSFont ScreenFontWithRenderingMode(NSFontRenderingMode renderingMode);
 }
 
 /// NSFont_TextStyles, a category of NSFont.
 public extern objc class NSFont
 {
-    [Selector("preferredFontForTextStyle:options:")] public static NSFont PreferredFontForTextStyleOptions(NSFontTextStyle style, NSDictionary options);
+    [Selector("preferredFontForTextStyle:options:")]
+    public static NSFont PreferredFontForTextStyleOptions(NSFontTextStyle style, NSDictionary options);
 }
 
 #endif

@@ -56,20 +56,34 @@ public enum MPSAccelerationStructureStatus : ulong
 /// Deprecated in macOS 14.0.
 public extern objc class MPSAccelerationStructure : MPSKernel, NSSecureCoding, NSCopying
 {
-    [Selector("group")] public MPSAccelerationStructureGroup Group { get; }
-    [Selector("boundingBox")] public MPSAxisAlignedBoundingBox BoundingBox { get; }
-    [Selector("status")] public MPSAccelerationStructureStatus Status { get; }
-    [Selector("usage", "setUsage:")] public MPSAccelerationStructureUsage Usage { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("initWithGroup:")] public Self InitWithGroup(MPSAccelerationStructureGroup group);
-    [Selector("initWithCoder:group:")] public Self? InitWithCoderGroup(NSCoder aDecoder, MPSAccelerationStructureGroup group);
-    [Selector("rebuild")] public void Rebuild();
-    [Selector("rebuildWithCompletionHandler:")] public void RebuildWithCompletionHandler(MPSAccelerationStructureCompletionHandler completionHandler);
-    [Selector("encodeRefitToCommandBuffer:")] public void EncodeRefitToCommandBuffer(MTLCommandBuffer commandBuffer);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
-    [Selector("copyWithZone:group:")] public Self CopyWithZoneGroup(_NSZone* zone, MPSAccelerationStructureGroup group);
-    [Selector("encodeWithCoder:")] public void EncodeWithCoder(NSCoder coder);
+    [Selector("group")]
+    public MPSAccelerationStructureGroup Group { get; }
+    [Selector("boundingBox")]
+    public MPSAxisAlignedBoundingBox BoundingBox { get; }
+    [Selector("status")]
+    public MPSAccelerationStructureStatus Status { get; }
+    [Selector("usage", "setUsage:")]
+    public MPSAccelerationStructureUsage Usage { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithGroup:")]
+    public Self InitWithGroup(MPSAccelerationStructureGroup group);
+    [Selector("initWithCoder:group:")]
+    public Self? InitWithCoderGroup(NSCoder aDecoder, MPSAccelerationStructureGroup group);
+    [Selector("rebuild")]
+    public void Rebuild();
+    [Selector("rebuildWithCompletionHandler:")]
+    public void RebuildWithCompletionHandler(MPSAccelerationStructureCompletionHandler completionHandler);
+    [Selector("encodeRefitToCommandBuffer:")]
+    public void EncodeRefitToCommandBuffer(MTLCommandBuffer commandBuffer);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("copyWithZone:group:")]
+    public Self CopyWithZoneGroup(_NSZone* zone, MPSAccelerationStructureGroup group);
+    [Selector("encodeWithCoder:")]
+    public void EncodeWithCoder(NSCoder coder);
 }
 
 #endif

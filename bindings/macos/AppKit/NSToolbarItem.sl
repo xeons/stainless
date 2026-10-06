@@ -43,59 +43,90 @@ public using NSToolbarItemVisibilityPriority = NSInteger;
 
 public extern objc class NSToolbarItem : NSObject, NSCopying
 {
-    [Selector("itemIdentifier")] public NSToolbarItemIdentifier ItemIdentifier { get; }
-    [Selector("toolbar")] public NSToolbar? Toolbar { get; }
-    [Selector("label", "setLabel:")] public NSString Label { get; set; }
-    [Selector("paletteLabel", "setPaletteLabel:")] public NSString PaletteLabel { get; set; }
-    [Selector("possibleLabels", "setPossibleLabels:")] public NSSet? PossibleLabels { get; set; }
-    [Selector("toolTip", "setToolTip:")] public NSString? ToolTip { get; set; }
-    [Selector("menuFormRepresentation", "setMenuFormRepresentation:")] public NSMenuItem? MenuFormRepresentation { get; set; }
-    [Selector("tag", "setTag:")] public NSInteger Tag { get; set; }
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
-    [Selector("action", "setAction:")] public Selector Action { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("isBordered", "setBordered:")] public bool Bordered { get; set; }
+    [Selector("itemIdentifier")]
+    public NSToolbarItemIdentifier ItemIdentifier { get; }
+    [Selector("toolbar")]
+    public NSToolbar? Toolbar { get; }
+    [Selector("label", "setLabel:")]
+    public NSString Label { get; set; }
+    [Selector("paletteLabel", "setPaletteLabel:")]
+    public NSString PaletteLabel { get; set; }
+    [Selector("possibleLabels", "setPossibleLabels:")]
+    public NSSet? PossibleLabels { get; set; }
+    [Selector("toolTip", "setToolTip:")]
+    public NSString? ToolTip { get; set; }
+    [Selector("menuFormRepresentation", "setMenuFormRepresentation:")]
+    public NSMenuItem? MenuFormRepresentation { get; set; }
+    [Selector("tag", "setTag:")]
+    public NSInteger Tag { get; set; }
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
+    [Selector("action", "setAction:")]
+    public Selector Action { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("isBordered", "setBordered:")]
+    public bool Bordered { get; set; }
     /// macOS 26.0 and later.
-    [Selector("backgroundTintColor", "setBackgroundTintColor:")] public NSColor? BackgroundTintColor { get; set; }
+    [Selector("backgroundTintColor", "setBackgroundTintColor:")]
+    public NSColor? BackgroundTintColor { get; set; }
     /// macOS 26.0 and later.
-    [Selector("style", "setStyle:")] public NSToolbarItemStyle Style { get; set; }
-    [Selector("isNavigational", "setNavigational:")] public bool Navigational { get; set; }
-    [Selector("view", "setView:")] public NSView? View { get; set; }
-    [Selector("isVisible")] public bool Visible { get; }
-    [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
+    [Selector("style", "setStyle:")]
+    public NSToolbarItemStyle Style { get; set; }
+    [Selector("isNavigational", "setNavigational:")]
+    public bool Navigational { get; set; }
+    [Selector("view", "setView:")]
+    public NSView? View { get; set; }
+    [Selector("isVisible")]
+    public bool Visible { get; }
+    [Selector("isHidden", "setHidden:")]
+    public bool Hidden { get; set; }
     /// Deprecated in macOS 12.0.
-    [Selector("minSize", "setMinSize:")] public NSSize MinSize { get; set; }
+    [Selector("minSize", "setMinSize:")]
+    public NSSize MinSize { get; set; }
     /// Deprecated in macOS 12.0.
-    [Selector("maxSize", "setMaxSize:")] public NSSize MaxSize { get; set; }
-    [Selector("visibilityPriority", "setVisibilityPriority:")] public NSToolbarItemVisibilityPriority VisibilityPriority { get; set; }
+    [Selector("maxSize", "setMaxSize:")]
+    public NSSize MaxSize { get; set; }
+    [Selector("visibilityPriority", "setVisibilityPriority:")]
+    public NSToolbarItemVisibilityPriority VisibilityPriority { get; set; }
     /// macOS 26.0 and later.
-    [Selector("badge", "setBadge:")] public NSItemBadge? Badge { get; set; }
-    [Selector("autovalidates", "setAutovalidates:")] public bool Autovalidates { get; set; }
+    [Selector("badge", "setBadge:")]
+    public NSItemBadge? Badge { get; set; }
+    [Selector("autovalidates", "setAutovalidates:")]
+    public bool Autovalidates { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("allowsDuplicatesInToolbar")] public bool AllowsDuplicatesInToolbar { get; }
-    [Selector("initWithItemIdentifier:")] public Self InitWithItemIdentifier(NSToolbarItemIdentifier itemIdentifier);
-    [Selector("validate")] public void Validate();
+    [Selector("allowsDuplicatesInToolbar")]
+    public bool AllowsDuplicatesInToolbar { get; }
+    [Selector("initWithItemIdentifier:")]
+    public Self InitWithItemIdentifier(NSToolbarItemIdentifier itemIdentifier);
+    [Selector("validate")]
+    public void Validate();
 }
 
 public extern objc class NSToolbarItem : NSMenuItemValidation, NSValidatedUserInterfaceItem { }
 
 public objc interface NSToolbarItemValidation : NSObjectProtocol
 {
-    [Selector("validateToolbarItem:")] bool ValidateToolbarItem(NSToolbarItem item);
+    [Selector("validateToolbarItem:")]
+    bool ValidateToolbarItem(NSToolbarItem item);
 }
 
 /// NSToolbarItemValidation, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 11.0.
-    [Selector("validateToolbarItem:")] public bool ValidateToolbarItem(NSToolbarItem item);
+    [Selector("validateToolbarItem:")]
+    public bool ValidateToolbarItem(NSToolbarItem item);
 }
 
 public objc interface NSCloudSharingValidation : NSObjectProtocol
 {
-    [Selector("cloudShareForUserInterfaceItem:")] CKShare? CloudShareForUserInterfaceItem(NSValidatedUserInterfaceItem item);
+    [Selector("cloudShareForUserInterfaceItem:")]
+    CKShare? CloudShareForUserInterfaceItem(NSValidatedUserInterfaceItem item);
 }
 
 public extern "C" NSToolbarItemIdentifier? NSToolbarSpaceItemIdentifier;

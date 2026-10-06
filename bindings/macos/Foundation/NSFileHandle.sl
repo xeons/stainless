@@ -32,33 +32,55 @@ import Standard.ObjC;
 
 public extern objc class NSFileHandle : NSObject, NSSecureCoding
 {
-    [Selector("availableData")] public NSData AvailableData { get; }
-    [Selector("initWithFileDescriptor:closeOnDealloc:")] public Self InitWithFileDescriptorCloseOnDealloc(int fd, bool closeopt);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("readDataToEndOfFileAndReturnError:")] public NSData? ReadDataToEndOfFileAndReturnError(out NSError? error);
-    [Selector("readDataUpToLength:error:")] public NSData? ReadDataUpToLengthError(NSUInteger length, out NSError? error);
-    [Selector("writeData:error:")] public bool WriteDataError(NSData data, out NSError? error);
-    [Selector("getOffset:error:")] public bool GetOffsetError(ulong* offsetInFile, out NSError? error);
-    [Selector("seekToEndReturningOffset:error:")] public bool SeekToEndReturningOffsetError(ulong* offsetInFile, out NSError? error);
-    [Selector("seekToOffset:error:")] public bool SeekToOffsetError(ulong offset, out NSError? error);
-    [Selector("truncateAtOffset:error:")] public bool TruncateAtOffsetError(ulong offset, out NSError? error);
-    [Selector("synchronizeAndReturnError:")] public bool SynchronizeAndReturnError(out NSError? error);
-    [Selector("closeAndReturnError:")] public bool CloseAndReturnError(out NSError? error);
+    [Selector("availableData")]
+    public NSData AvailableData { get; }
+    [Selector("initWithFileDescriptor:closeOnDealloc:")]
+    public Self InitWithFileDescriptorCloseOnDealloc(int fd, bool closeopt);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("readDataToEndOfFileAndReturnError:")]
+    public NSData? ReadDataToEndOfFileAndReturnError(out NSError? error);
+    [Selector("readDataUpToLength:error:")]
+    public NSData? ReadDataUpToLengthError(NSUInteger length, out NSError? error);
+    [Selector("writeData:error:")]
+    public bool WriteDataError(NSData data, out NSError? error);
+    [Selector("getOffset:error:")]
+    public bool GetOffsetError(ulong* offsetInFile, out NSError? error);
+    [Selector("seekToEndReturningOffset:error:")]
+    public bool SeekToEndReturningOffsetError(ulong* offsetInFile, out NSError? error);
+    [Selector("seekToOffset:error:")]
+    public bool SeekToOffsetError(ulong offset, out NSError? error);
+    [Selector("truncateAtOffset:error:")]
+    public bool TruncateAtOffsetError(ulong offset, out NSError? error);
+    [Selector("synchronizeAndReturnError:")]
+    public bool SynchronizeAndReturnError(out NSError? error);
+    [Selector("closeAndReturnError:")]
+    public bool CloseAndReturnError(out NSError? error);
 }
 
 /// NSFileHandleCreation, a category of NSFileHandle.
 public extern objc class NSFileHandle
 {
-    [Selector("fileHandleWithStandardInput")] public static NSFileHandle FileHandleWithStandardInput { get; }
-    [Selector("fileHandleWithStandardOutput")] public static NSFileHandle FileHandleWithStandardOutput { get; }
-    [Selector("fileHandleWithStandardError")] public static NSFileHandle FileHandleWithStandardError { get; }
-    [Selector("fileHandleWithNullDevice")] public static NSFileHandle FileHandleWithNullDevice { get; }
-    [Selector("fileHandleForReadingAtPath:")] public static Self? FileHandleForReadingAtPath(NSString path);
-    [Selector("fileHandleForWritingAtPath:")] public static Self? FileHandleForWritingAtPath(NSString path);
-    [Selector("fileHandleForUpdatingAtPath:")] public static Self? FileHandleForUpdatingAtPath(NSString path);
-    [Selector("fileHandleForReadingFromURL:error:")] public static Self? FileHandleForReadingFromURLError(NSURL url, out NSError? error);
-    [Selector("fileHandleForWritingToURL:error:")] public static Self? FileHandleForWritingToURLError(NSURL url, out NSError? error);
-    [Selector("fileHandleForUpdatingURL:error:")] public static Self? FileHandleForUpdatingURLError(NSURL url, out NSError? error);
+    [Selector("fileHandleWithStandardInput")]
+    public static NSFileHandle FileHandleWithStandardInput { get; }
+    [Selector("fileHandleWithStandardOutput")]
+    public static NSFileHandle FileHandleWithStandardOutput { get; }
+    [Selector("fileHandleWithStandardError")]
+    public static NSFileHandle FileHandleWithStandardError { get; }
+    [Selector("fileHandleWithNullDevice")]
+    public static NSFileHandle FileHandleWithNullDevice { get; }
+    [Selector("fileHandleForReadingAtPath:")]
+    public static Self? FileHandleForReadingAtPath(NSString path);
+    [Selector("fileHandleForWritingAtPath:")]
+    public static Self? FileHandleForWritingAtPath(NSString path);
+    [Selector("fileHandleForUpdatingAtPath:")]
+    public static Self? FileHandleForUpdatingAtPath(NSString path);
+    [Selector("fileHandleForReadingFromURL:error:")]
+    public static Self? FileHandleForReadingFromURLError(NSURL url, out NSError? error);
+    [Selector("fileHandleForWritingToURL:error:")]
+    public static Self? FileHandleForWritingToURLError(NSURL url, out NSError? error);
+    [Selector("fileHandleForUpdatingURL:error:")]
+    public static Self? FileHandleForUpdatingURLError(NSURL url, out NSError? error);
 }
 
 public extern "C" NSExceptionName NSFileHandleOperationException;
@@ -85,52 +107,76 @@ public objc closure void NSFileHandleWriteabilityHandlerBlock(NSFileHandle arg0)
 /// NSFileHandleAsynchronousAccess, a category of NSFileHandle.
 public extern objc class NSFileHandle
 {
-    [Selector("readabilityHandler", "setReadabilityHandler:")] public NSFileHandleReadabilityHandlerBlock? ReadabilityHandler { get; set; }
-    [Selector("writeabilityHandler", "setWriteabilityHandler:")] public NSFileHandleWriteabilityHandlerBlock? WriteabilityHandler { get; set; }
-    [Selector("readInBackgroundAndNotifyForModes:")] public void ReadInBackgroundAndNotifyForModes(NSArray? modes);
-    [Selector("readInBackgroundAndNotify")] public void ReadInBackgroundAndNotify();
-    [Selector("readToEndOfFileInBackgroundAndNotifyForModes:")] public void ReadToEndOfFileInBackgroundAndNotifyForModes(NSArray? modes);
-    [Selector("readToEndOfFileInBackgroundAndNotify")] public void ReadToEndOfFileInBackgroundAndNotify();
-    [Selector("acceptConnectionInBackgroundAndNotifyForModes:")] public void AcceptConnectionInBackgroundAndNotifyForModes(NSArray? modes);
-    [Selector("acceptConnectionInBackgroundAndNotify")] public void AcceptConnectionInBackgroundAndNotify();
-    [Selector("waitForDataInBackgroundAndNotifyForModes:")] public void WaitForDataInBackgroundAndNotifyForModes(NSArray? modes);
-    [Selector("waitForDataInBackgroundAndNotify")] public void WaitForDataInBackgroundAndNotify();
+    [Selector("readabilityHandler", "setReadabilityHandler:")]
+    public NSFileHandleReadabilityHandlerBlock? ReadabilityHandler { get; set; }
+    [Selector("writeabilityHandler", "setWriteabilityHandler:")]
+    public NSFileHandleWriteabilityHandlerBlock? WriteabilityHandler { get; set; }
+    [Selector("readInBackgroundAndNotifyForModes:")]
+    public void ReadInBackgroundAndNotifyForModes(NSArray? modes);
+    [Selector("readInBackgroundAndNotify")]
+    public void ReadInBackgroundAndNotify();
+    [Selector("readToEndOfFileInBackgroundAndNotifyForModes:")]
+    public void ReadToEndOfFileInBackgroundAndNotifyForModes(NSArray? modes);
+    [Selector("readToEndOfFileInBackgroundAndNotify")]
+    public void ReadToEndOfFileInBackgroundAndNotify();
+    [Selector("acceptConnectionInBackgroundAndNotifyForModes:")]
+    public void AcceptConnectionInBackgroundAndNotifyForModes(NSArray? modes);
+    [Selector("acceptConnectionInBackgroundAndNotify")]
+    public void AcceptConnectionInBackgroundAndNotify();
+    [Selector("waitForDataInBackgroundAndNotifyForModes:")]
+    public void WaitForDataInBackgroundAndNotifyForModes(NSArray? modes);
+    [Selector("waitForDataInBackgroundAndNotify")]
+    public void WaitForDataInBackgroundAndNotify();
 }
 
 /// NSFileHandlePlatformSpecific, a category of NSFileHandle.
 public extern objc class NSFileHandle
 {
-    [Selector("fileDescriptor")] public int FileDescriptor { get; }
-    [Selector("initWithFileDescriptor:")] public Self InitWithFileDescriptor(int fd);
+    [Selector("fileDescriptor")]
+    public int FileDescriptor { get; }
+    [Selector("initWithFileDescriptor:")]
+    public Self InitWithFileDescriptor(int fd);
 }
 
 public extern objc class NSFileHandle
 {
     /// Deprecated in macOS 100000.
-    [Selector("offsetInFile")] public ulong OffsetInFile { get; }
+    [Selector("offsetInFile")]
+    public ulong OffsetInFile { get; }
     /// Deprecated in macOS 100000.
-    [Selector("readDataToEndOfFile")] public NSData ReadDataToEndOfFile();
+    [Selector("readDataToEndOfFile")]
+    public NSData ReadDataToEndOfFile();
     /// Deprecated in macOS 100000.
-    [Selector("readDataOfLength:")] public NSData ReadDataOfLength(NSUInteger length);
+    [Selector("readDataOfLength:")]
+    public NSData ReadDataOfLength(NSUInteger length);
     /// Deprecated in macOS 100000.
-    [Selector("writeData:")] public void WriteData(NSData data);
+    [Selector("writeData:")]
+    public void WriteData(NSData data);
     /// Deprecated in macOS 100000.
-    [Selector("seekToEndOfFile")] public ulong SeekToEndOfFile();
+    [Selector("seekToEndOfFile")]
+    public ulong SeekToEndOfFile();
     /// Deprecated in macOS 100000.
-    [Selector("seekToFileOffset:")] public void SeekToFileOffset(ulong offset);
+    [Selector("seekToFileOffset:")]
+    public void SeekToFileOffset(ulong offset);
     /// Deprecated in macOS 100000.
-    [Selector("truncateFileAtOffset:")] public void TruncateFileAtOffset(ulong offset);
+    [Selector("truncateFileAtOffset:")]
+    public void TruncateFileAtOffset(ulong offset);
     /// Deprecated in macOS 100000.
-    [Selector("synchronizeFile")] public void SynchronizeFile();
+    [Selector("synchronizeFile")]
+    public void SynchronizeFile();
     /// Deprecated in macOS 100000.
-    [Selector("closeFile")] public void CloseFile();
+    [Selector("closeFile")]
+    public void CloseFile();
 }
 
 public extern objc class NSPipe : NSObject
 {
-    [Selector("fileHandleForReading")] public NSFileHandle FileHandleForReading { get; }
-    [Selector("fileHandleForWriting")] public NSFileHandle FileHandleForWriting { get; }
-    [Selector("pipe")] public static NSPipe Pipe();
+    [Selector("fileHandleForReading")]
+    public NSFileHandle FileHandleForReading { get; }
+    [Selector("fileHandleForWriting")]
+    public NSFileHandle FileHandleForWriting { get; }
+    [Selector("pipe")]
+    public static NSPipe Pipe();
 }
 
 #endif

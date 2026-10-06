@@ -34,7 +34,8 @@ public objc closure void PHPersistentChangeFetchResultEnumerateChangesWithBlockB
 
 public extern objc class PHPersistentChangeFetchResult : NSObject
 {
-    [Selector("enumerateChangesWithBlock:")] public void EnumerateChangesWithBlock(PHPersistentChangeFetchResultEnumerateChangesWithBlockBlock block);
+    [Selector("enumerateChangesWithBlock:")]
+    public void EnumerateChangesWithBlock(PHPersistentChangeFetchResultEnumerateChangesWithBlockBlock block);
 }
 
 #endif

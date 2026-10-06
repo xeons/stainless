@@ -45,22 +45,33 @@ public enum NSFileProviderTestingOperationType : long
 
 public objc interface NSFileProviderTestingOperation : NSObjectProtocol
 {
-    [Selector("type")] NSFileProviderTestingOperationType Type { get; }
-    [Selector("asIngestion")] NSFileProviderTestingIngestion? AsIngestion();
-    [Selector("asLookup")] NSFileProviderTestingLookup? AsLookup();
-    [Selector("asCreation")] NSFileProviderTestingCreation? AsCreation();
-    [Selector("asModification")] NSFileProviderTestingModification? AsModification();
-    [Selector("asDeletion")] NSFileProviderTestingDeletion? AsDeletion();
-    [Selector("asContentFetch")] NSFileProviderTestingContentFetch? AsContentFetch();
-    [Selector("asChildrenEnumeration")] NSFileProviderTestingChildrenEnumeration? AsChildrenEnumeration();
-    [Selector("asCollisionResolution")] NSFileProviderTestingCollisionResolution? AsCollisionResolution();
+    [Selector("type")]
+    NSFileProviderTestingOperationType Type { get; }
+    [Selector("asIngestion")]
+    NSFileProviderTestingIngestion? AsIngestion();
+    [Selector("asLookup")]
+    NSFileProviderTestingLookup? AsLookup();
+    [Selector("asCreation")]
+    NSFileProviderTestingCreation? AsCreation();
+    [Selector("asModification")]
+    NSFileProviderTestingModification? AsModification();
+    [Selector("asDeletion")]
+    NSFileProviderTestingDeletion? AsDeletion();
+    [Selector("asContentFetch")]
+    NSFileProviderTestingContentFetch? AsContentFetch();
+    [Selector("asChildrenEnumeration")]
+    NSFileProviderTestingChildrenEnumeration? AsChildrenEnumeration();
+    [Selector("asCollisionResolution")]
+    NSFileProviderTestingCollisionResolution? AsCollisionResolution();
 }
 
 /// TestingModeInteractive, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    [Selector("listAvailableTestingOperationsWithError:")] public NSArray? ListAvailableTestingOperationsWithError(out NSError? error);
-    [Selector("runTestingOperations:error:")] public NSDictionary? RunTestingOperationsError(NSArray operations, out NSError? error);
+    [Selector("listAvailableTestingOperationsWithError:")]
+    public NSArray? ListAvailableTestingOperationsWithError(out NSError? error);
+    [Selector("runTestingOperations:error:")]
+    public NSDictionary? RunTestingOperationsError(NSArray operations, out NSError? error);
 }
 
 public enum NSFileProviderTestingOperationSide : ulong
@@ -71,59 +82,84 @@ public enum NSFileProviderTestingOperationSide : ulong
 
 public objc interface NSFileProviderTestingIngestion : NSFileProviderTestingOperation
 {
-    [Selector("side")] NSFileProviderTestingOperationSide Side { get; }
-    [Selector("itemIdentifier")] NSFileProviderItemIdentifier ItemIdentifier { get; }
-    [Selector("item")] NSFileProviderItem? Item { get; }
+    [Selector("side")]
+    NSFileProviderTestingOperationSide Side { get; }
+    [Selector("itemIdentifier")]
+    NSFileProviderItemIdentifier ItemIdentifier { get; }
+    [Selector("item")]
+    NSFileProviderItem? Item { get; }
 }
 
 public objc interface NSFileProviderTestingLookup : NSFileProviderTestingOperation
 {
-    [Selector("side")] NSFileProviderTestingOperationSide Side { get; }
-    [Selector("itemIdentifier")] NSFileProviderItemIdentifier ItemIdentifier { get; }
+    [Selector("side")]
+    NSFileProviderTestingOperationSide Side { get; }
+    [Selector("itemIdentifier")]
+    NSFileProviderItemIdentifier ItemIdentifier { get; }
 }
 
 public objc interface NSFileProviderTestingCreation : NSFileProviderTestingOperation
 {
-    [Selector("targetSide")] NSFileProviderTestingOperationSide TargetSide { get; }
-    [Selector("sourceItem")] NSFileProviderItem SourceItem { get; }
-    [Selector("domainVersion")] NSFileProviderDomainVersion? DomainVersion { get; }
+    [Selector("targetSide")]
+    NSFileProviderTestingOperationSide TargetSide { get; }
+    [Selector("sourceItem")]
+    NSFileProviderItem SourceItem { get; }
+    [Selector("domainVersion")]
+    NSFileProviderDomainVersion? DomainVersion { get; }
 }
 
 public objc interface NSFileProviderTestingModification : NSFileProviderTestingOperation
 {
-    [Selector("targetSide")] NSFileProviderTestingOperationSide TargetSide { get; }
-    [Selector("sourceItem")] NSFileProviderItem SourceItem { get; }
-    [Selector("targetItemIdentifier")] NSFileProviderItemIdentifier TargetItemIdentifier { get; }
-    [Selector("targetItemBaseVersion")] NSFileProviderItemVersion TargetItemBaseVersion { get; }
-    [Selector("changedFields")] NSFileProviderItemFields ChangedFields { get; }
-    [Selector("domainVersion")] NSFileProviderDomainVersion? DomainVersion { get; }
+    [Selector("targetSide")]
+    NSFileProviderTestingOperationSide TargetSide { get; }
+    [Selector("sourceItem")]
+    NSFileProviderItem SourceItem { get; }
+    [Selector("targetItemIdentifier")]
+    NSFileProviderItemIdentifier TargetItemIdentifier { get; }
+    [Selector("targetItemBaseVersion")]
+    NSFileProviderItemVersion TargetItemBaseVersion { get; }
+    [Selector("changedFields")]
+    NSFileProviderItemFields ChangedFields { get; }
+    [Selector("domainVersion")]
+    NSFileProviderDomainVersion? DomainVersion { get; }
 }
 
 public objc interface NSFileProviderTestingDeletion : NSFileProviderTestingOperation
 {
-    [Selector("targetSide")] NSFileProviderTestingOperationSide TargetSide { get; }
-    [Selector("sourceItemIdentifier")] NSFileProviderItemIdentifier SourceItemIdentifier { get; }
-    [Selector("targetItemIdentifier")] NSFileProviderItemIdentifier TargetItemIdentifier { get; }
-    [Selector("targetItemBaseVersion")] NSFileProviderItemVersion TargetItemBaseVersion { get; }
-    [Selector("domainVersion")] NSFileProviderDomainVersion? DomainVersion { get; }
+    [Selector("targetSide")]
+    NSFileProviderTestingOperationSide TargetSide { get; }
+    [Selector("sourceItemIdentifier")]
+    NSFileProviderItemIdentifier SourceItemIdentifier { get; }
+    [Selector("targetItemIdentifier")]
+    NSFileProviderItemIdentifier TargetItemIdentifier { get; }
+    [Selector("targetItemBaseVersion")]
+    NSFileProviderItemVersion TargetItemBaseVersion { get; }
+    [Selector("domainVersion")]
+    NSFileProviderDomainVersion? DomainVersion { get; }
 }
 
 public objc interface NSFileProviderTestingContentFetch : NSFileProviderTestingOperation
 {
-    [Selector("side")] NSFileProviderTestingOperationSide Side { get; }
-    [Selector("itemIdentifier")] NSFileProviderItemIdentifier ItemIdentifier { get; }
+    [Selector("side")]
+    NSFileProviderTestingOperationSide Side { get; }
+    [Selector("itemIdentifier")]
+    NSFileProviderItemIdentifier ItemIdentifier { get; }
 }
 
 public objc interface NSFileProviderTestingChildrenEnumeration : NSFileProviderTestingOperation
 {
-    [Selector("side")] NSFileProviderTestingOperationSide Side { get; }
-    [Selector("itemIdentifier")] NSFileProviderItemIdentifier ItemIdentifier { get; }
+    [Selector("side")]
+    NSFileProviderTestingOperationSide Side { get; }
+    [Selector("itemIdentifier")]
+    NSFileProviderItemIdentifier ItemIdentifier { get; }
 }
 
 public objc interface NSFileProviderTestingCollisionResolution : NSFileProviderTestingOperation
 {
-    [Selector("side")] NSFileProviderTestingOperationSide Side { get; }
-    [Selector("renamedItem")] NSFileProviderItem RenamedItem { get; }
+    [Selector("side")]
+    NSFileProviderTestingOperationSide Side { get; }
+    [Selector("renamedItem")]
+    NSFileProviderItem RenamedItem { get; }
 }
 
 #endif

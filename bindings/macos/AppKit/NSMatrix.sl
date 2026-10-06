@@ -43,90 +43,169 @@ public delegate NSInteger NSMatrixSortUsingFunctionContextCompareFunction(void* 
 
 public extern objc class NSMatrix : NSControl, NSUserInterfaceValidations, NSViewToolTipOwner
 {
-    [Selector("cellClass", "setCellClass:")] public Class CellClass { get; set; }
-    [Selector("prototype", "setPrototype:")] public NSCell? Prototype { get; set; }
-    [Selector("mode", "setMode:")] public NSMatrixMode Mode { get; set; }
-    [Selector("allowsEmptySelection", "setAllowsEmptySelection:")] public bool AllowsEmptySelection { get; set; }
-    [Selector("cells")] public NSArray Cells { get; }
-    [Selector("selectedCell")] public NSCell? SelectedCell { get; }
-    [Selector("selectedCells")] public NSArray SelectedCells { get; }
-    [Selector("selectedRow")] public NSInteger SelectedRow { get; }
-    [Selector("selectedColumn")] public NSInteger SelectedColumn { get; }
-    [Selector("isSelectionByRect", "setSelectionByRect:")] public bool SelectionByRect { get; set; }
-    [Selector("cellSize", "setCellSize:")] public NSSize CellSize { get; set; }
-    [Selector("intercellSpacing", "setIntercellSpacing:")] public NSSize IntercellSpacing { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor BackgroundColor { get; set; }
-    [Selector("cellBackgroundColor", "setCellBackgroundColor:")] public NSColor? CellBackgroundColor { get; set; }
-    [Selector("drawsCellBackground", "setDrawsCellBackground:")] public bool DrawsCellBackground { get; set; }
-    [Selector("drawsBackground", "setDrawsBackground:")] public bool DrawsBackground { get; set; }
-    [Selector("numberOfRows")] public NSInteger NumberOfRows { get; }
-    [Selector("numberOfColumns")] public NSInteger NumberOfColumns { get; }
-    [Selector("doubleAction", "setDoubleAction:")] public Selector DoubleAction { get; set; }
-    [Selector("autosizesCells", "setAutosizesCells:")] public bool AutosizesCells { get; set; }
-    [Selector("isAutoscroll", "setAutoscroll:")] public bool Autoscroll { get; set; }
-    [Selector("mouseDownFlags")] public NSInteger MouseDownFlags { get; }
-    [Selector("delegate", "setDelegate:")] public NSMatrixDelegate? Delegate { get; set; }
-    [Selector("autorecalculatesCellSize", "setAutorecalculatesCellSize:")] public bool AutorecalculatesCellSize { get; set; }
-    [Selector("initWithFrame:")] public Self InitWithFrame(NSRect frameRect);
-    [Selector("initWithFrame:mode:prototype:numberOfRows:numberOfColumns:")] public Self InitWithFrameModePrototypeNumberOfRowsNumberOfColumns(NSRect frameRect, NSMatrixMode mode, NSCell cell, NSInteger rowsHigh, NSInteger colsWide);
-    [Selector("initWithFrame:mode:cellClass:numberOfRows:numberOfColumns:")] public Self InitWithFrameModeCellClassNumberOfRowsNumberOfColumns(NSRect frameRect, NSMatrixMode mode, Class factoryId, NSInteger rowsHigh, NSInteger colsWide);
-    [Selector("makeCellAtRow:column:")] public NSCell MakeCellAtRowColumn(NSInteger row, NSInteger col);
-    [Selector("sendAction:to:forAllCells:")] public void SendActionToForAllCells(Selector selector, AnyObject object, bool flag);
-    [Selector("sortUsingSelector:")] public void SortUsingSelector(Selector comparator);
-    [Selector("sortUsingFunction:context:")] public void SortUsingFunctionContext(NSMatrixSortUsingFunctionContextCompareFunction compare, void* context);
-    [Selector("setSelectionFrom:to:anchor:highlight:")] public void SetSelectionFromToAnchorHighlight(NSInteger startPos, NSInteger endPos, NSInteger anchorPos, bool lit);
-    [Selector("deselectSelectedCell")] public void DeselectSelectedCell();
-    [Selector("deselectAllCells")] public void DeselectAllCells();
-    [Selector("selectCellAtRow:column:")] public void SelectCellAtRowColumn(NSInteger row, NSInteger col);
-    [Selector("selectAll:")] public void SelectAll(AnyObject? sender);
-    [Selector("selectCellWithTag:")] public bool SelectCellWithTag(NSInteger tag);
-    [Selector("setScrollable:")] public void SetScrollable(bool flag);
-    [Selector("setState:atRow:column:")] public void SetStateAtRowColumn(NSInteger value, NSInteger row, NSInteger col);
-    [Selector("getNumberOfRows:columns:")] public void GetNumberOfRowsColumns(NSInteger* rowCount, NSInteger* colCount);
-    [Selector("cellAtRow:column:")] public NSCell? CellAtRowColumn(NSInteger row, NSInteger col);
-    [Selector("cellFrameAtRow:column:")] public NSRect CellFrameAtRowColumn(NSInteger row, NSInteger col);
-    [Selector("getRow:column:ofCell:")] public bool GetRowColumnOfCell(NSInteger* row, NSInteger* col, NSCell cell);
-    [Selector("getRow:column:forPoint:")] public bool GetRowColumnForPoint(NSInteger* row, NSInteger* col, NSPoint point);
-    [Selector("renewRows:columns:")] public void RenewRowsColumns(NSInteger newRows, NSInteger newCols);
-    [Selector("putCell:atRow:column:")] public void PutCellAtRowColumn(NSCell newCell, NSInteger row, NSInteger col);
-    [Selector("addRow")] public void AddRow();
-    [Selector("addRowWithCells:")] public void AddRowWithCells(NSArray newCells);
-    [Selector("insertRow:")] public void InsertRow(NSInteger row);
-    [Selector("insertRow:withCells:")] public void InsertRowWithCells(NSInteger row, NSArray? newCells);
-    [Selector("removeRow:")] public void RemoveRow(NSInteger row);
-    [Selector("addColumn")] public void AddColumn();
-    [Selector("addColumnWithCells:")] public void AddColumnWithCells(NSArray newCells);
-    [Selector("insertColumn:")] public void InsertColumn(NSInteger column);
-    [Selector("insertColumn:withCells:")] public void InsertColumnWithCells(NSInteger column, NSArray? newCells);
-    [Selector("removeColumn:")] public void RemoveColumn(NSInteger col);
-    [Selector("cellWithTag:")] public NSCell? CellWithTag(NSInteger tag);
-    [Selector("sizeToCells")] public void SizeToCells();
-    [Selector("setValidateSize:")] public void SetValidateSize(bool flag);
-    [Selector("drawCellAtRow:column:")] public void DrawCellAtRowColumn(NSInteger row, NSInteger col);
-    [Selector("highlightCell:atRow:column:")] public void HighlightCellAtRowColumn(bool flag, NSInteger row, NSInteger col);
-    [Selector("scrollCellToVisibleAtRow:column:")] public void ScrollCellToVisibleAtRowColumn(NSInteger row, NSInteger col);
-    [Selector("mouseDown:")] public void MouseDown(NSEvent event);
-    [Selector("performKeyEquivalent:")] public bool PerformKeyEquivalent(NSEvent event);
-    [Selector("sendAction")] public bool SendAction();
-    [Selector("sendDoubleAction")] public void SendDoubleAction();
-    [Selector("textShouldBeginEditing:")] public bool TextShouldBeginEditing(NSText textObject);
-    [Selector("textShouldEndEditing:")] public bool TextShouldEndEditing(NSText textObject);
-    [Selector("textDidBeginEditing:")] public void TextDidBeginEditing(NSNotification notification);
-    [Selector("textDidEndEditing:")] public void TextDidEndEditing(NSNotification notification);
-    [Selector("textDidChange:")] public void TextDidChange(NSNotification notification);
-    [Selector("selectText:")] public void SelectText(AnyObject? sender);
-    [Selector("selectTextAtRow:column:")] public NSCell? SelectTextAtRowColumn(NSInteger row, NSInteger col);
-    [Selector("acceptsFirstMouse:")] public bool AcceptsFirstMouse(NSEvent? event);
-    [Selector("resetCursorRects")] public void ResetCursorRects();
-    [Selector("setToolTip:forCell:")] public void SetToolTipForCell(NSString? toolTipString, NSCell cell);
-    [Selector("toolTipForCell:")] public NSString? ToolTipForCell(NSCell cell);
+    [Selector("cellClass", "setCellClass:")]
+    public Class CellClass { get; set; }
+    [Selector("prototype", "setPrototype:")]
+    public NSCell? Prototype { get; set; }
+    [Selector("mode", "setMode:")]
+    public NSMatrixMode Mode { get; set; }
+    [Selector("allowsEmptySelection", "setAllowsEmptySelection:")]
+    public bool AllowsEmptySelection { get; set; }
+    [Selector("cells")]
+    public NSArray Cells { get; }
+    [Selector("selectedCell")]
+    public NSCell? SelectedCell { get; }
+    [Selector("selectedCells")]
+    public NSArray SelectedCells { get; }
+    [Selector("selectedRow")]
+    public NSInteger SelectedRow { get; }
+    [Selector("selectedColumn")]
+    public NSInteger SelectedColumn { get; }
+    [Selector("isSelectionByRect", "setSelectionByRect:")]
+    public bool SelectionByRect { get; set; }
+    [Selector("cellSize", "setCellSize:")]
+    public NSSize CellSize { get; set; }
+    [Selector("intercellSpacing", "setIntercellSpacing:")]
+    public NSSize IntercellSpacing { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor BackgroundColor { get; set; }
+    [Selector("cellBackgroundColor", "setCellBackgroundColor:")]
+    public NSColor? CellBackgroundColor { get; set; }
+    [Selector("drawsCellBackground", "setDrawsCellBackground:")]
+    public bool DrawsCellBackground { get; set; }
+    [Selector("drawsBackground", "setDrawsBackground:")]
+    public bool DrawsBackground { get; set; }
+    [Selector("numberOfRows")]
+    public NSInteger NumberOfRows { get; }
+    [Selector("numberOfColumns")]
+    public NSInteger NumberOfColumns { get; }
+    [Selector("doubleAction", "setDoubleAction:")]
+    public Selector DoubleAction { get; set; }
+    [Selector("autosizesCells", "setAutosizesCells:")]
+    public bool AutosizesCells { get; set; }
+    [Selector("isAutoscroll", "setAutoscroll:")]
+    public bool Autoscroll { get; set; }
+    [Selector("mouseDownFlags")]
+    public NSInteger MouseDownFlags { get; }
+    [Selector("delegate", "setDelegate:")]
+    public NSMatrixDelegate? Delegate { get; set; }
+    [Selector("autorecalculatesCellSize", "setAutorecalculatesCellSize:")]
+    public bool AutorecalculatesCellSize { get; set; }
+    [Selector("initWithFrame:")]
+    public Self InitWithFrame(NSRect frameRect);
+    [Selector("initWithFrame:mode:prototype:numberOfRows:numberOfColumns:")]
+    public Self InitWithFrameModePrototypeNumberOfRowsNumberOfColumns(NSRect frameRect, NSMatrixMode mode, NSCell cell, NSInteger rowsHigh, NSInteger colsWide);
+    [Selector("initWithFrame:mode:cellClass:numberOfRows:numberOfColumns:")]
+    public Self InitWithFrameModeCellClassNumberOfRowsNumberOfColumns(NSRect frameRect, NSMatrixMode mode, Class factoryId, NSInteger rowsHigh, NSInteger colsWide);
+    [Selector("makeCellAtRow:column:")]
+    public NSCell MakeCellAtRowColumn(NSInteger row, NSInteger col);
+    [Selector("sendAction:to:forAllCells:")]
+    public void SendActionToForAllCells(Selector selector, AnyObject object, bool flag);
+    [Selector("sortUsingSelector:")]
+    public void SortUsingSelector(Selector comparator);
+    [Selector("sortUsingFunction:context:")]
+    public void SortUsingFunctionContext(NSMatrixSortUsingFunctionContextCompareFunction compare, void* context);
+    [Selector("setSelectionFrom:to:anchor:highlight:")]
+    public void SetSelectionFromToAnchorHighlight(NSInteger startPos, NSInteger endPos, NSInteger anchorPos, bool lit);
+    [Selector("deselectSelectedCell")]
+    public void DeselectSelectedCell();
+    [Selector("deselectAllCells")]
+    public void DeselectAllCells();
+    [Selector("selectCellAtRow:column:")]
+    public void SelectCellAtRowColumn(NSInteger row, NSInteger col);
+    [Selector("selectAll:")]
+    public void SelectAll(AnyObject? sender);
+    [Selector("selectCellWithTag:")]
+    public bool SelectCellWithTag(NSInteger tag);
+    [Selector("setScrollable:")]
+    public void SetScrollable(bool flag);
+    [Selector("setState:atRow:column:")]
+    public void SetStateAtRowColumn(NSInteger value, NSInteger row, NSInteger col);
+    [Selector("getNumberOfRows:columns:")]
+    public void GetNumberOfRowsColumns(NSInteger* rowCount, NSInteger* colCount);
+    [Selector("cellAtRow:column:")]
+    public NSCell? CellAtRowColumn(NSInteger row, NSInteger col);
+    [Selector("cellFrameAtRow:column:")]
+    public NSRect CellFrameAtRowColumn(NSInteger row, NSInteger col);
+    [Selector("getRow:column:ofCell:")]
+    public bool GetRowColumnOfCell(NSInteger* row, NSInteger* col, NSCell cell);
+    [Selector("getRow:column:forPoint:")]
+    public bool GetRowColumnForPoint(NSInteger* row, NSInteger* col, NSPoint point);
+    [Selector("renewRows:columns:")]
+    public void RenewRowsColumns(NSInteger newRows, NSInteger newCols);
+    [Selector("putCell:atRow:column:")]
+    public void PutCellAtRowColumn(NSCell newCell, NSInteger row, NSInteger col);
+    [Selector("addRow")]
+    public void AddRow();
+    [Selector("addRowWithCells:")]
+    public void AddRowWithCells(NSArray newCells);
+    [Selector("insertRow:")]
+    public void InsertRow(NSInteger row);
+    [Selector("insertRow:withCells:")]
+    public void InsertRowWithCells(NSInteger row, NSArray? newCells);
+    [Selector("removeRow:")]
+    public void RemoveRow(NSInteger row);
+    [Selector("addColumn")]
+    public void AddColumn();
+    [Selector("addColumnWithCells:")]
+    public void AddColumnWithCells(NSArray newCells);
+    [Selector("insertColumn:")]
+    public void InsertColumn(NSInteger column);
+    [Selector("insertColumn:withCells:")]
+    public void InsertColumnWithCells(NSInteger column, NSArray? newCells);
+    [Selector("removeColumn:")]
+    public void RemoveColumn(NSInteger col);
+    [Selector("cellWithTag:")]
+    public NSCell? CellWithTag(NSInteger tag);
+    [Selector("sizeToCells")]
+    public void SizeToCells();
+    [Selector("setValidateSize:")]
+    public void SetValidateSize(bool flag);
+    [Selector("drawCellAtRow:column:")]
+    public void DrawCellAtRowColumn(NSInteger row, NSInteger col);
+    [Selector("highlightCell:atRow:column:")]
+    public void HighlightCellAtRowColumn(bool flag, NSInteger row, NSInteger col);
+    [Selector("scrollCellToVisibleAtRow:column:")]
+    public void ScrollCellToVisibleAtRowColumn(NSInteger row, NSInteger col);
+    [Selector("mouseDown:")]
+    public void MouseDown(NSEvent event);
+    [Selector("performKeyEquivalent:")]
+    public bool PerformKeyEquivalent(NSEvent event);
+    [Selector("sendAction")]
+    public bool SendAction();
+    [Selector("sendDoubleAction")]
+    public void SendDoubleAction();
+    [Selector("textShouldBeginEditing:")]
+    public bool TextShouldBeginEditing(NSText textObject);
+    [Selector("textShouldEndEditing:")]
+    public bool TextShouldEndEditing(NSText textObject);
+    [Selector("textDidBeginEditing:")]
+    public void TextDidBeginEditing(NSNotification notification);
+    [Selector("textDidEndEditing:")]
+    public void TextDidEndEditing(NSNotification notification);
+    [Selector("textDidChange:")]
+    public void TextDidChange(NSNotification notification);
+    [Selector("selectText:")]
+    public void SelectText(AnyObject? sender);
+    [Selector("selectTextAtRow:column:")]
+    public NSCell? SelectTextAtRowColumn(NSInteger row, NSInteger col);
+    [Selector("acceptsFirstMouse:")]
+    public bool AcceptsFirstMouse(NSEvent? event);
+    [Selector("resetCursorRects")]
+    public void ResetCursorRects();
+    [Selector("setToolTip:forCell:")]
+    public void SetToolTipForCell(NSString? toolTipString, NSCell cell);
+    [Selector("toolTipForCell:")]
+    public NSString? ToolTipForCell(NSCell cell);
 }
 
 /// NSKeyboardUI, a category of NSMatrix.
 public extern objc class NSMatrix
 {
-    [Selector("tabKeyTraversesCells", "setTabKeyTraversesCells:")] public bool TabKeyTraversesCells { get; set; }
-    [Selector("keyCell", "setKeyCell:")] public NSCell? KeyCell { get; set; }
+    [Selector("tabKeyTraversesCells", "setTabKeyTraversesCells:")]
+    public bool TabKeyTraversesCells { get; set; }
+    [Selector("keyCell", "setKeyCell:")]
+    public NSCell? KeyCell { get; set; }
 }
 
 public objc interface NSMatrixDelegate : NSControlTextEditingDelegate { }

@@ -40,111 +40,203 @@ import Standard.ObjC;
 
 public extern objc class CIImage : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("blackImage")] public static CIImage? BlackImage { get; }
-    [Selector("whiteImage")] public static CIImage? WhiteImage { get; }
-    [Selector("grayImage")] public static CIImage? GrayImage { get; }
-    [Selector("redImage")] public static CIImage? RedImage { get; }
-    [Selector("greenImage")] public static CIImage? GreenImage { get; }
-    [Selector("blueImage")] public static CIImage? BlueImage { get; }
-    [Selector("cyanImage")] public static CIImage? CyanImage { get; }
-    [Selector("magentaImage")] public static CIImage? MagentaImage { get; }
-    [Selector("yellowImage")] public static CIImage? YellowImage { get; }
-    [Selector("clearImage")] public static CIImage? ClearImage { get; }
-    [Selector("extent")] public CGRect Extent { get; }
-    [Selector("isOpaque")] public bool Opaque { get; }
-    [Selector("properties")] public NSDictionary? Properties { get; }
-    [Selector("definition")] public CIFilterShape? Definition { get; }
-    [Selector("url")] public NSURL? Url { get; }
-    [Selector("colorSpace")] public CGColorSpaceRef? ColorSpace { get; }
-    [Selector("contentHeadroom")] public float ContentHeadroom { get; }
+    [Selector("blackImage")]
+    public static CIImage? BlackImage { get; }
+    [Selector("whiteImage")]
+    public static CIImage? WhiteImage { get; }
+    [Selector("grayImage")]
+    public static CIImage? GrayImage { get; }
+    [Selector("redImage")]
+    public static CIImage? RedImage { get; }
+    [Selector("greenImage")]
+    public static CIImage? GreenImage { get; }
+    [Selector("blueImage")]
+    public static CIImage? BlueImage { get; }
+    [Selector("cyanImage")]
+    public static CIImage? CyanImage { get; }
+    [Selector("magentaImage")]
+    public static CIImage? MagentaImage { get; }
+    [Selector("yellowImage")]
+    public static CIImage? YellowImage { get; }
+    [Selector("clearImage")]
+    public static CIImage? ClearImage { get; }
+    [Selector("extent")]
+    public CGRect Extent { get; }
+    [Selector("isOpaque")]
+    public bool Opaque { get; }
+    [Selector("properties")]
+    public NSDictionary? Properties { get; }
+    [Selector("definition")]
+    public CIFilterShape? Definition { get; }
+    [Selector("url")]
+    public NSURL? Url { get; }
+    [Selector("colorSpace")]
+    public CGColorSpaceRef? ColorSpace { get; }
+    [Selector("contentHeadroom")]
+    public float ContentHeadroom { get; }
     /// macOS 26.0 and later.
-    [Selector("contentAverageLightLevel")] public float ContentAverageLightLevel { get; }
-    [Selector("pixelBuffer")] public CVPixelBufferRef? PixelBuffer { get; }
-    [Selector("CGImage")] public CGImageRef? CGImage { get; }
-    [Selector("metalTexture")] public MTLTexture? MetalTexture { get; }
-    [Selector("imageWithCGImage:")] public static CIImage ImageWithCGImage(CGImageRef image);
-    [Selector("imageWithCGImage:options:")] public static CIImage ImageWithCGImageOptions(CGImageRef image, NSDictionary? options);
-    [Selector("imageWithCGImageSource:index:options:")] public static CIImage ImageWithCGImageSourceIndexOptions(CGImageSourceRef source, nuint index, NSDictionary? dict);
+    [Selector("contentAverageLightLevel")]
+    public float ContentAverageLightLevel { get; }
+    [Selector("pixelBuffer")]
+    public CVPixelBufferRef? PixelBuffer { get; }
+    [Selector("CGImage")]
+    public CGImageRef? CGImage { get; }
+    [Selector("metalTexture")]
+    public MTLTexture? MetalTexture { get; }
+    [Selector("imageWithCGImage:")]
+    public static CIImage ImageWithCGImage(CGImageRef image);
+    [Selector("imageWithCGImage:options:")]
+    public static CIImage ImageWithCGImageOptions(CGImageRef image, NSDictionary? options);
+    [Selector("imageWithCGImageSource:index:options:")]
+    public static CIImage ImageWithCGImageSourceIndexOptions(CGImageSourceRef source, nuint index, NSDictionary? dict);
     /// Deprecated in macOS 10.11.
-    [Selector("imageWithCGLayer:")] public static CIImage ImageWithCGLayer(CGLayerRef layer);
+    [Selector("imageWithCGLayer:")]
+    public static CIImage ImageWithCGLayer(CGLayerRef layer);
     /// Deprecated in macOS 10.11.
-    [Selector("imageWithCGLayer:options:")] public static CIImage ImageWithCGLayerOptions(CGLayerRef layer, NSDictionary? options);
-    [Selector("imageWithBitmapData:bytesPerRow:size:format:colorSpace:")] public static CIImage ImageWithBitmapDataBytesPerRowSizeFormatColorSpace(NSData data, nuint bytesPerRow, CGSize size, CIFormat format, CGColorSpaceRef? colorSpace);
+    [Selector("imageWithCGLayer:options:")]
+    public static CIImage ImageWithCGLayerOptions(CGLayerRef layer, NSDictionary? options);
+    [Selector("imageWithBitmapData:bytesPerRow:size:format:colorSpace:")]
+    public static CIImage ImageWithBitmapDataBytesPerRowSizeFormatColorSpace(NSData data, nuint bytesPerRow, CGSize size, CIFormat format, CGColorSpaceRef? colorSpace);
     /// Deprecated in macOS 10.14.
-    [Selector("imageWithTexture:size:flipped:colorSpace:")] public static CIImage ImageWithTextureSizeFlippedColorSpace(uint name, CGSize size, bool flipped, CGColorSpaceRef? colorSpace);
+    [Selector("imageWithTexture:size:flipped:colorSpace:")]
+    public static CIImage ImageWithTextureSizeFlippedColorSpace(uint name, CGSize size, bool flipped, CGColorSpaceRef? colorSpace);
     /// Deprecated in macOS 10.14.
-    [Selector("imageWithTexture:size:flipped:options:")] public static CIImage ImageWithTextureSizeFlippedOptions(uint name, CGSize size, bool flipped, NSDictionary? options);
-    [Selector("imageWithMTLTexture:options:")] public static CIImage? ImageWithMTLTextureOptions(MTLTexture texture, NSDictionary? options);
-    [Selector("imageWithContentsOfURL:")] public static CIImage? ImageWithContentsOfURL(NSURL url);
-    [Selector("imageWithContentsOfURL:options:")] public static CIImage? ImageWithContentsOfURLOptions(NSURL url, NSDictionary? options);
-    [Selector("imageWithData:")] public static CIImage? ImageWithData(NSData data);
-    [Selector("imageWithData:options:")] public static CIImage? ImageWithDataOptions(NSData data, NSDictionary? options);
-    [Selector("imageWithCVImageBuffer:")] public static CIImage ImageWithCVImageBuffer(CVImageBufferRef imageBuffer);
-    [Selector("imageWithCVImageBuffer:options:")] public static CIImage ImageWithCVImageBufferOptions(CVImageBufferRef imageBuffer, NSDictionary? options);
-    [Selector("imageWithCVPixelBuffer:")] public static CIImage ImageWithCVPixelBuffer(CVPixelBufferRef pixelBuffer);
-    [Selector("imageWithCVPixelBuffer:options:")] public static CIImage ImageWithCVPixelBufferOptions(CVPixelBufferRef pixelBuffer, NSDictionary? options);
-    [Selector("imageWithIOSurface:")] public static CIImage ImageWithIOSurface(IOSurfaceRef surface);
-    [Selector("imageWithIOSurface:options:")] public static CIImage ImageWithIOSurfaceOptions(IOSurfaceRef surface, NSDictionary? options);
-    [Selector("imageWithColor:")] public static CIImage ImageWithColor(CIColor color);
-    [Selector("emptyImage")] public static CIImage EmptyImage();
-    [Selector("initWithCGImage:")] public Self InitWithCGImage(CGImageRef image);
-    [Selector("initWithCGImage:options:")] public Self InitWithCGImageOptions(CGImageRef image, NSDictionary? options);
-    [Selector("initWithCGImageSource:index:options:")] public Self InitWithCGImageSourceIndexOptions(CGImageSourceRef source, nuint index, NSDictionary? dict);
+    [Selector("imageWithTexture:size:flipped:options:")]
+    public static CIImage ImageWithTextureSizeFlippedOptions(uint name, CGSize size, bool flipped, NSDictionary? options);
+    [Selector("imageWithMTLTexture:options:")]
+    public static CIImage? ImageWithMTLTextureOptions(MTLTexture texture, NSDictionary? options);
+    [Selector("imageWithContentsOfURL:")]
+    public static CIImage? ImageWithContentsOfURL(NSURL url);
+    [Selector("imageWithContentsOfURL:options:")]
+    public static CIImage? ImageWithContentsOfURLOptions(NSURL url, NSDictionary? options);
+    [Selector("imageWithData:")]
+    public static CIImage? ImageWithData(NSData data);
+    [Selector("imageWithData:options:")]
+    public static CIImage? ImageWithDataOptions(NSData data, NSDictionary? options);
+    [Selector("imageWithCVImageBuffer:")]
+    public static CIImage ImageWithCVImageBuffer(CVImageBufferRef imageBuffer);
+    [Selector("imageWithCVImageBuffer:options:")]
+    public static CIImage ImageWithCVImageBufferOptions(CVImageBufferRef imageBuffer, NSDictionary? options);
+    [Selector("imageWithCVPixelBuffer:")]
+    public static CIImage ImageWithCVPixelBuffer(CVPixelBufferRef pixelBuffer);
+    [Selector("imageWithCVPixelBuffer:options:")]
+    public static CIImage ImageWithCVPixelBufferOptions(CVPixelBufferRef pixelBuffer, NSDictionary? options);
+    [Selector("imageWithIOSurface:")]
+    public static CIImage ImageWithIOSurface(IOSurfaceRef surface);
+    [Selector("imageWithIOSurface:options:")]
+    public static CIImage ImageWithIOSurfaceOptions(IOSurfaceRef surface, NSDictionary? options);
+    [Selector("imageWithColor:")]
+    public static CIImage ImageWithColor(CIColor color);
+    [Selector("emptyImage")]
+    public static CIImage EmptyImage();
+    [Selector("initWithCGImage:")]
+    public Self InitWithCGImage(CGImageRef image);
+    [Selector("initWithCGImage:options:")]
+    public Self InitWithCGImageOptions(CGImageRef image, NSDictionary? options);
+    [Selector("initWithCGImageSource:index:options:")]
+    public Self InitWithCGImageSourceIndexOptions(CGImageSourceRef source, nuint index, NSDictionary? dict);
     /// Deprecated in macOS 10.11.
-    [Selector("initWithCGLayer:")] public Self InitWithCGLayer(CGLayerRef layer);
+    [Selector("initWithCGLayer:")]
+    public Self InitWithCGLayer(CGLayerRef layer);
     /// Deprecated in macOS 10.11.
-    [Selector("initWithCGLayer:options:")] public Self InitWithCGLayerOptions(CGLayerRef layer, NSDictionary? options);
-    [Selector("initWithData:")] public Self? InitWithData(NSData data);
-    [Selector("initWithData:options:")] public Self? InitWithDataOptions(NSData data, NSDictionary? options);
-    [Selector("initWithBitmapData:bytesPerRow:size:format:colorSpace:")] public Self InitWithBitmapDataBytesPerRowSizeFormatColorSpace(NSData data, nuint bytesPerRow, CGSize size, CIFormat format, CGColorSpaceRef? colorSpace);
+    [Selector("initWithCGLayer:options:")]
+    public Self InitWithCGLayerOptions(CGLayerRef layer, NSDictionary? options);
+    [Selector("initWithData:")]
+    public Self? InitWithData(NSData data);
+    [Selector("initWithData:options:")]
+    public Self? InitWithDataOptions(NSData data, NSDictionary? options);
+    [Selector("initWithBitmapData:bytesPerRow:size:format:colorSpace:")]
+    public Self InitWithBitmapDataBytesPerRowSizeFormatColorSpace(NSData data, nuint bytesPerRow, CGSize size, CIFormat format, CGColorSpaceRef? colorSpace);
     /// Deprecated in macOS 10.14.
-    [Selector("initWithTexture:size:flipped:colorSpace:")] public Self InitWithTextureSizeFlippedColorSpace(uint name, CGSize size, bool flipped, CGColorSpaceRef? colorSpace);
+    [Selector("initWithTexture:size:flipped:colorSpace:")]
+    public Self InitWithTextureSizeFlippedColorSpace(uint name, CGSize size, bool flipped, CGColorSpaceRef? colorSpace);
     /// Deprecated in macOS 10.14.
-    [Selector("initWithTexture:size:flipped:options:")] public Self InitWithTextureSizeFlippedOptions(uint name, CGSize size, bool flipped, NSDictionary? options);
-    [Selector("initWithMTLTexture:options:")] public Self? InitWithMTLTextureOptions(MTLTexture texture, NSDictionary? options);
-    [Selector("initWithContentsOfURL:")] public Self? InitWithContentsOfURL(NSURL url);
-    [Selector("initWithContentsOfURL:options:")] public Self? InitWithContentsOfURLOptions(NSURL url, NSDictionary? options);
-    [Selector("initWithIOSurface:")] public Self InitWithIOSurface(IOSurfaceRef surface);
-    [Selector("initWithIOSurface:options:")] public Self InitWithIOSurfaceOptions(IOSurfaceRef surface, NSDictionary? options);
+    [Selector("initWithTexture:size:flipped:options:")]
+    public Self InitWithTextureSizeFlippedOptions(uint name, CGSize size, bool flipped, NSDictionary? options);
+    [Selector("initWithMTLTexture:options:")]
+    public Self? InitWithMTLTextureOptions(MTLTexture texture, NSDictionary? options);
+    [Selector("initWithContentsOfURL:")]
+    public Self? InitWithContentsOfURL(NSURL url);
+    [Selector("initWithContentsOfURL:options:")]
+    public Self? InitWithContentsOfURLOptions(NSURL url, NSDictionary? options);
+    [Selector("initWithIOSurface:")]
+    public Self InitWithIOSurface(IOSurfaceRef surface);
+    [Selector("initWithIOSurface:options:")]
+    public Self InitWithIOSurfaceOptions(IOSurfaceRef surface, NSDictionary? options);
     /// Deprecated in macOS 10.11.
-    [Selector("initWithIOSurface:plane:format:options:")] public Self InitWithIOSurfacePlaneFormatOptions(IOSurfaceRef surface, nuint plane, CIFormat format, NSDictionary? options);
-    [Selector("initWithCVImageBuffer:")] public Self InitWithCVImageBuffer(CVImageBufferRef imageBuffer);
-    [Selector("initWithCVImageBuffer:options:")] public Self InitWithCVImageBufferOptions(CVImageBufferRef imageBuffer, NSDictionary? options);
-    [Selector("initWithCVPixelBuffer:")] public Self InitWithCVPixelBuffer(CVPixelBufferRef pixelBuffer);
-    [Selector("initWithCVPixelBuffer:options:")] public Self InitWithCVPixelBufferOptions(CVPixelBufferRef pixelBuffer, NSDictionary? options);
-    [Selector("initWithColor:")] public Self InitWithColor(CIColor color);
-    [Selector("imageByApplyingTransform:")] public CIImage ImageByApplyingTransform(CGAffineTransform matrix);
-    [Selector("imageByApplyingTransform:highQualityDownsample:")] public CIImage ImageByApplyingTransformHighQualityDownsample(CGAffineTransform matrix, bool highQualityDownsample);
-    [Selector("imageByApplyingOrientation:")] public CIImage ImageByApplyingOrientation(int orientation);
-    [Selector("imageTransformForOrientation:")] public CGAffineTransform ImageTransformForOrientation(int orientation);
-    [Selector("imageByApplyingCGOrientation:")] public CIImage ImageByApplyingCGOrientation(CGImagePropertyOrientation orientation);
-    [Selector("imageTransformForCGOrientation:")] public CGAffineTransform ImageTransformForCGOrientation(CGImagePropertyOrientation orientation);
-    [Selector("imageByCompositingOverImage:")] public CIImage ImageByCompositingOverImage(CIImage dest);
-    [Selector("imageByCroppingToRect:")] public CIImage ImageByCroppingToRect(CGRect rect);
-    [Selector("imageByClampingToExtent")] public CIImage ImageByClampingToExtent();
-    [Selector("imageByClampingToRect:")] public CIImage ImageByClampingToRect(CGRect rect);
-    [Selector("imageByApplyingFilter:withInputParameters:")] public CIImage ImageByApplyingFilterWithInputParameters(NSString filterName, NSDictionary? params);
-    [Selector("imageByApplyingFilter:")] public CIImage ImageByApplyingFilter(NSString filterName);
-    [Selector("imageByColorMatchingColorSpaceToWorkingSpace:")] public CIImage? ImageByColorMatchingColorSpaceToWorkingSpace(CGColorSpaceRef colorSpace);
-    [Selector("imageByColorMatchingWorkingSpaceToColorSpace:")] public CIImage? ImageByColorMatchingWorkingSpaceToColorSpace(CGColorSpaceRef colorSpace);
-    [Selector("imageByPremultiplyingAlpha")] public CIImage ImageByPremultiplyingAlpha();
-    [Selector("imageByUnpremultiplyingAlpha")] public CIImage ImageByUnpremultiplyingAlpha();
-    [Selector("imageBySettingAlphaOneInExtent:")] public CIImage ImageBySettingAlphaOneInExtent(CGRect extent);
-    [Selector("imageByApplyingGaussianBlurWithSigma:")] public CIImage ImageByApplyingGaussianBlurWithSigma(double sigma);
-    [Selector("imageBySettingProperties:")] public CIImage ImageBySettingProperties(NSDictionary properties);
-    [Selector("imageBySamplingLinear")] public CIImage ImageBySamplingLinear();
-    [Selector("imageBySamplingNearest")] public CIImage ImageBySamplingNearest();
-    [Selector("imageByInsertingIntermediate")] public CIImage ImageByInsertingIntermediate();
-    [Selector("imageByInsertingIntermediate:")] public CIImage ImageByInsertingIntermediate(bool cache);
+    [Selector("initWithIOSurface:plane:format:options:")]
+    public Self InitWithIOSurfacePlaneFormatOptions(IOSurfaceRef surface, nuint plane, CIFormat format, NSDictionary? options);
+    [Selector("initWithCVImageBuffer:")]
+    public Self InitWithCVImageBuffer(CVImageBufferRef imageBuffer);
+    [Selector("initWithCVImageBuffer:options:")]
+    public Self InitWithCVImageBufferOptions(CVImageBufferRef imageBuffer, NSDictionary? options);
+    [Selector("initWithCVPixelBuffer:")]
+    public Self InitWithCVPixelBuffer(CVPixelBufferRef pixelBuffer);
+    [Selector("initWithCVPixelBuffer:options:")]
+    public Self InitWithCVPixelBufferOptions(CVPixelBufferRef pixelBuffer, NSDictionary? options);
+    [Selector("initWithColor:")]
+    public Self InitWithColor(CIColor color);
+    [Selector("imageByApplyingTransform:")]
+    public CIImage ImageByApplyingTransform(CGAffineTransform matrix);
+    [Selector("imageByApplyingTransform:highQualityDownsample:")]
+    public CIImage ImageByApplyingTransformHighQualityDownsample(CGAffineTransform matrix, bool highQualityDownsample);
+    [Selector("imageByApplyingOrientation:")]
+    public CIImage ImageByApplyingOrientation(int orientation);
+    [Selector("imageTransformForOrientation:")]
+    public CGAffineTransform ImageTransformForOrientation(int orientation);
+    [Selector("imageByApplyingCGOrientation:")]
+    public CIImage ImageByApplyingCGOrientation(CGImagePropertyOrientation orientation);
+    [Selector("imageTransformForCGOrientation:")]
+    public CGAffineTransform ImageTransformForCGOrientation(CGImagePropertyOrientation orientation);
+    [Selector("imageByCompositingOverImage:")]
+    public CIImage ImageByCompositingOverImage(CIImage dest);
+    [Selector("imageByCroppingToRect:")]
+    public CIImage ImageByCroppingToRect(CGRect rect);
+    [Selector("imageByClampingToExtent")]
+    public CIImage ImageByClampingToExtent();
+    [Selector("imageByClampingToRect:")]
+    public CIImage ImageByClampingToRect(CGRect rect);
+    [Selector("imageByApplyingFilter:withInputParameters:")]
+    public CIImage ImageByApplyingFilterWithInputParameters(NSString filterName, NSDictionary? params);
+    [Selector("imageByApplyingFilter:")]
+    public CIImage ImageByApplyingFilter(NSString filterName);
+    [Selector("imageByColorMatchingColorSpaceToWorkingSpace:")]
+    public CIImage? ImageByColorMatchingColorSpaceToWorkingSpace(CGColorSpaceRef colorSpace);
+    [Selector("imageByColorMatchingWorkingSpaceToColorSpace:")]
+    public CIImage? ImageByColorMatchingWorkingSpaceToColorSpace(CGColorSpaceRef colorSpace);
+    [Selector("imageByPremultiplyingAlpha")]
+    public CIImage ImageByPremultiplyingAlpha();
+    [Selector("imageByUnpremultiplyingAlpha")]
+    public CIImage ImageByUnpremultiplyingAlpha();
+    [Selector("imageBySettingAlphaOneInExtent:")]
+    public CIImage ImageBySettingAlphaOneInExtent(CGRect extent);
+    [Selector("imageByApplyingGaussianBlurWithSigma:")]
+    public CIImage ImageByApplyingGaussianBlurWithSigma(double sigma);
+    [Selector("imageBySettingProperties:")]
+    public CIImage ImageBySettingProperties(NSDictionary properties);
+    [Selector("imageBySamplingLinear")]
+    public CIImage ImageBySamplingLinear();
+    [Selector("imageBySamplingNearest")]
+    public CIImage ImageBySamplingNearest();
+    [Selector("imageByInsertingIntermediate")]
+    public CIImage ImageByInsertingIntermediate();
+    [Selector("imageByInsertingIntermediate:")]
+    public CIImage ImageByInsertingIntermediate(bool cache);
     /// macOS 26.0 and later.
-    [Selector("imageByInsertingTiledIntermediate")] public CIImage ImageByInsertingTiledIntermediate();
-    [Selector("imageByApplyingGainMap:")] public CIImage ImageByApplyingGainMap(CIImage gainmap);
-    [Selector("imageByApplyingGainMap:headroom:")] public CIImage ImageByApplyingGainMapHeadroom(CIImage gainmap, float headroom);
+    [Selector("imageByInsertingTiledIntermediate")]
+    public CIImage ImageByInsertingTiledIntermediate();
+    [Selector("imageByApplyingGainMap:")]
+    public CIImage ImageByApplyingGainMap(CIImage gainmap);
+    [Selector("imageByApplyingGainMap:headroom:")]
+    public CIImage ImageByApplyingGainMapHeadroom(CIImage gainmap, float headroom);
     /// macOS 26.0 and later.
-    [Selector("imageBySettingContentHeadroom:")] public CIImage ImageBySettingContentHeadroom(float headroom);
+    [Selector("imageBySettingContentHeadroom:")]
+    public CIImage ImageBySettingContentHeadroom(float headroom);
     /// macOS 26.0 and later.
-    [Selector("imageBySettingContentAverageLightLevel:")] public CIImage ImageBySettingContentAverageLightLevel(float average);
-    [Selector("regionOfInterestForImage:inRect:")] public CGRect RegionOfInterestForImageInRect(CIImage image, CGRect rect);
+    [Selector("imageBySettingContentAverageLightLevel:")]
+    public CIImage ImageBySettingContentAverageLightLevel(float average);
+    [Selector("regionOfInterestForImage:inRect:")]
+    public CGRect RegionOfInterestForImageInRect(CIImage image, CGRect rect);
 }
 
 public using CIFormat = int;
@@ -264,8 +356,10 @@ public extern "C" CIImageOption? kCIImageAuxiliaryHDRGainMap;
 /// AutoAdjustment, a category of CIImage.
 public extern objc class CIImage
 {
-    [Selector("autoAdjustmentFilters")] public NSArray AutoAdjustmentFilters();
-    [Selector("autoAdjustmentFiltersWithOptions:")] public NSArray AutoAdjustmentFiltersWithOptions(NSDictionary? options);
+    [Selector("autoAdjustmentFilters")]
+    public NSArray AutoAdjustmentFilters();
+    [Selector("autoAdjustmentFiltersWithOptions:")]
+    public NSArray AutoAdjustmentFiltersWithOptions(NSDictionary? options);
 }
 
 public using CIImageAutoAdjustmentOption = NSString;
@@ -283,38 +377,55 @@ public extern "C" CIImageAutoAdjustmentOption? kCIImageAutoAdjustLevel;
 /// LabConversion, a category of CIImage.
 public extern objc class CIImage
 {
-    [Selector("imageByConvertingWorkingSpaceToLab")] public CIImage ImageByConvertingWorkingSpaceToLab();
-    [Selector("imageByConvertingLabToWorkingSpace")] public CIImage ImageByConvertingLabToWorkingSpace();
+    [Selector("imageByConvertingWorkingSpaceToLab")]
+    public CIImage ImageByConvertingWorkingSpaceToLab();
+    [Selector("imageByConvertingLabToWorkingSpace")]
+    public CIImage ImageByConvertingLabToWorkingSpace();
 }
 
 /// AVDepthData, a category of CIImage.
 public extern objc class CIImage
 {
-    [Selector("depthData")] public AVDepthData? DepthData { get; }
-    [Selector("initWithDepthData:options:")] public Self? InitWithDepthDataOptions(AVDepthData data, NSDictionary? options);
-    [Selector("initWithDepthData:")] public Self? InitWithDepthData(AVDepthData data);
-    [Selector("imageWithDepthData:options:")] public static Self? ImageWithDepthDataOptions(AVDepthData data, NSDictionary? options);
-    [Selector("imageWithDepthData:")] public static Self? ImageWithDepthData(AVDepthData data);
+    [Selector("depthData")]
+    public AVDepthData? DepthData { get; }
+    [Selector("initWithDepthData:options:")]
+    public Self? InitWithDepthDataOptions(AVDepthData data, NSDictionary? options);
+    [Selector("initWithDepthData:")]
+    public Self? InitWithDepthData(AVDepthData data);
+    [Selector("imageWithDepthData:options:")]
+    public static Self? ImageWithDepthDataOptions(AVDepthData data, NSDictionary? options);
+    [Selector("imageWithDepthData:")]
+    public static Self? ImageWithDepthData(AVDepthData data);
 }
 
 /// AVPortraitEffectsMatte, a category of CIImage.
 public extern objc class CIImage
 {
-    [Selector("portraitEffectsMatte")] public AVPortraitEffectsMatte? PortraitEffectsMatte { get; }
-    [Selector("initWithPortaitEffectsMatte:options:")] public Self? InitWithPortaitEffectsMatteOptions(AVPortraitEffectsMatte matte, NSDictionary? options);
-    [Selector("initWithPortaitEffectsMatte:")] public Self? InitWithPortaitEffectsMatte(AVPortraitEffectsMatte matte);
-    [Selector("imageWithPortaitEffectsMatte:options:")] public static Self? ImageWithPortaitEffectsMatteOptions(AVPortraitEffectsMatte matte, NSDictionary? options);
-    [Selector("imageWithPortaitEffectsMatte:")] public static Self? ImageWithPortaitEffectsMatte(AVPortraitEffectsMatte matte);
+    [Selector("portraitEffectsMatte")]
+    public AVPortraitEffectsMatte? PortraitEffectsMatte { get; }
+    [Selector("initWithPortaitEffectsMatte:options:")]
+    public Self? InitWithPortaitEffectsMatteOptions(AVPortraitEffectsMatte matte, NSDictionary? options);
+    [Selector("initWithPortaitEffectsMatte:")]
+    public Self? InitWithPortaitEffectsMatte(AVPortraitEffectsMatte matte);
+    [Selector("imageWithPortaitEffectsMatte:options:")]
+    public static Self? ImageWithPortaitEffectsMatteOptions(AVPortraitEffectsMatte matte, NSDictionary? options);
+    [Selector("imageWithPortaitEffectsMatte:")]
+    public static Self? ImageWithPortaitEffectsMatte(AVPortraitEffectsMatte matte);
 }
 
 /// AVSemanticSegmentationMatte, a category of CIImage.
 public extern objc class CIImage
 {
-    [Selector("semanticSegmentationMatte")] public AVSemanticSegmentationMatte? SemanticSegmentationMatte { get; }
-    [Selector("initWithSemanticSegmentationMatte:options:")] public Self? InitWithSemanticSegmentationMatteOptions(AVSemanticSegmentationMatte matte, NSDictionary? options);
-    [Selector("initWithSemanticSegmentationMatte:")] public Self? InitWithSemanticSegmentationMatte(AVSemanticSegmentationMatte matte);
-    [Selector("imageWithSemanticSegmentationMatte:options:")] public static Self? ImageWithSemanticSegmentationMatteOptions(AVSemanticSegmentationMatte matte, NSDictionary? options);
-    [Selector("imageWithSemanticSegmentationMatte:")] public static Self? ImageWithSemanticSegmentationMatte(AVSemanticSegmentationMatte matte);
+    [Selector("semanticSegmentationMatte")]
+    public AVSemanticSegmentationMatte? SemanticSegmentationMatte { get; }
+    [Selector("initWithSemanticSegmentationMatte:options:")]
+    public Self? InitWithSemanticSegmentationMatteOptions(AVSemanticSegmentationMatte matte, NSDictionary? options);
+    [Selector("initWithSemanticSegmentationMatte:")]
+    public Self? InitWithSemanticSegmentationMatte(AVSemanticSegmentationMatte matte);
+    [Selector("imageWithSemanticSegmentationMatte:options:")]
+    public static Self? ImageWithSemanticSegmentationMatteOptions(AVSemanticSegmentationMatte matte, NSDictionary? options);
+    [Selector("imageWithSemanticSegmentationMatte:")]
+    public static Self? ImageWithSemanticSegmentationMatte(AVSemanticSegmentationMatte matte);
 }
 
 #endif

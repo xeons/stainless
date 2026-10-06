@@ -54,9 +54,12 @@ public enum NSImageFrameStyle : ulong
 
 public extern objc class NSImageCell : NSCell, NSCopying, NSCoding
 {
-    [Selector("imageAlignment", "setImageAlignment:")] public NSImageAlignment ImageAlignment { get; set; }
-    [Selector("imageScaling", "setImageScaling:")] public NSImageScaling ImageScaling { get; set; }
-    [Selector("imageFrameStyle", "setImageFrameStyle:")] public NSImageFrameStyle ImageFrameStyle { get; set; }
+    [Selector("imageAlignment", "setImageAlignment:")]
+    public NSImageAlignment ImageAlignment { get; set; }
+    [Selector("imageScaling", "setImageScaling:")]
+    public NSImageScaling ImageScaling { get; set; }
+    [Selector("imageFrameStyle", "setImageFrameStyle:")]
+    public NSImageFrameStyle ImageFrameStyle { get; set; }
 }
 
 #endif

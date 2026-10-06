@@ -34,71 +34,104 @@ import Standard.ObjC;
 
 public extern objc class MPSImageConvolution : MPSUnaryImageKernel
 {
-    [Selector("kernelHeight")] public NSUInteger KernelHeight { get; }
-    [Selector("kernelWidth")] public NSUInteger KernelWidth { get; }
-    [Selector("bias", "setBias:")] public float Bias { get; set; }
-    [Selector("initWithDevice:kernelWidth:kernelHeight:weights:")] public Self InitWithDeviceKernelWidthKernelHeightWeights(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, float* kernelWeights);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("kernelHeight")]
+    public NSUInteger KernelHeight { get; }
+    [Selector("kernelWidth")]
+    public NSUInteger KernelWidth { get; }
+    [Selector("bias", "setBias:")]
+    public float Bias { get; set; }
+    [Selector("initWithDevice:kernelWidth:kernelHeight:weights:")]
+    public Self InitWithDeviceKernelWidthKernelHeightWeights(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, float* kernelWeights);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSImageLaplacian : MPSUnaryImageKernel
 {
-    [Selector("bias", "setBias:")] public float Bias { get; set; }
+    [Selector("bias", "setBias:")]
+    public float Bias { get; set; }
 }
 
 public extern objc class MPSImageBox : MPSUnaryImageKernel
 {
-    [Selector("kernelHeight")] public NSUInteger KernelHeight { get; }
-    [Selector("kernelWidth")] public NSUInteger KernelWidth { get; }
-    [Selector("initWithDevice:kernelWidth:kernelHeight:")] public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("kernelHeight")]
+    public NSUInteger KernelHeight { get; }
+    [Selector("kernelWidth")]
+    public NSUInteger KernelWidth { get; }
+    [Selector("initWithDevice:kernelWidth:kernelHeight:")]
+    public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSImageTent : MPSImageBox { }
 
 public extern objc class MPSImageGaussianBlur : MPSUnaryImageKernel
 {
-    [Selector("sigma")] public float Sigma { get; }
-    [Selector("initWithDevice:sigma:")] public Self InitWithDeviceSigma(MTLDevice device, float sigma);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("sigma")]
+    public float Sigma { get; }
+    [Selector("initWithDevice:sigma:")]
+    public Self InitWithDeviceSigma(MTLDevice device, float sigma);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSImageSobel : MPSUnaryImageKernel
 {
-    [Selector("colorTransform")] public float* ColorTransform { get; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithDevice:linearGrayColorTransform:")] public Self InitWithDeviceLinearGrayColorTransform(MTLDevice device, float* transform);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("colorTransform")]
+    public float* ColorTransform { get; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:linearGrayColorTransform:")]
+    public Self InitWithDeviceLinearGrayColorTransform(MTLDevice device, float* transform);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSImageCanny : MPSUnaryImageKernel
 {
-    [Selector("colorTransform")] public float* ColorTransform { get; }
-    [Selector("sigma")] public float Sigma { get; }
-    [Selector("highThreshold", "setHighThreshold:")] public float HighThreshold { get; set; }
-    [Selector("lowThreshold", "setLowThreshold:")] public float LowThreshold { get; set; }
-    [Selector("useFastMode", "setUseFastMode:")] public bool UseFastMode { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithDevice:linearToGrayScaleTransform:sigma:")] public Self InitWithDeviceLinearToGrayScaleTransformSigma(MTLDevice device, float* transform, float sigma);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("colorTransform")]
+    public float* ColorTransform { get; }
+    [Selector("sigma")]
+    public float Sigma { get; }
+    [Selector("highThreshold", "setHighThreshold:")]
+    public float HighThreshold { get; set; }
+    [Selector("lowThreshold", "setLowThreshold:")]
+    public float LowThreshold { get; set; }
+    [Selector("useFastMode", "setUseFastMode:")]
+    public bool UseFastMode { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:linearToGrayScaleTransform:sigma:")]
+    public Self InitWithDeviceLinearToGrayScaleTransformSigma(MTLDevice device, float* transform, float sigma);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSImagePyramid : MPSUnaryImageKernel
 {
-    [Selector("kernelHeight")] public NSUInteger KernelHeight { get; }
-    [Selector("kernelWidth")] public NSUInteger KernelWidth { get; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithDevice:centerWeight:")] public Self InitWithDeviceCenterWeight(MTLDevice device, float centerWeight);
-    [Selector("initWithDevice:kernelWidth:kernelHeight:weights:")] public Self InitWithDeviceKernelWidthKernelHeightWeights(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, float* kernelWeights);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("kernelHeight")]
+    public NSUInteger KernelHeight { get; }
+    [Selector("kernelWidth")]
+    public NSUInteger KernelWidth { get; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:centerWeight:")]
+    public Self InitWithDeviceCenterWeight(MTLDevice device, float centerWeight);
+    [Selector("initWithDevice:kernelWidth:kernelHeight:weights:")]
+    public Self InitWithDeviceKernelWidthKernelHeightWeights(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, float* kernelWeights);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSImageGaussianPyramid : MPSImagePyramid { }
 
 public extern objc class MPSImageLaplacianPyramid : MPSImagePyramid
 {
-    [Selector("getLaplacianBias", "setLaplacianBias:")] public float LaplacianBias { get; set; }
-    [Selector("getLaplacianScale", "setLaplacianScale:")] public float LaplacianScale { get; set; }
+    [Selector("getLaplacianBias", "setLaplacianBias:")]
+    public float LaplacianBias { get; set; }
+    [Selector("getLaplacianScale", "setLaplacianScale:")]
+    public float LaplacianScale { get; set; }
 }
 
 public extern objc class MPSImageLaplacianPyramidSubtract : MPSImageLaplacianPyramid { }

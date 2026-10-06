@@ -41,20 +41,34 @@ public enum CLMonitoringState : ulong
 
 public extern objc class CLMonitoringEvent : NSObject, NSSecureCoding
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("refinement")] public CLCondition? Refinement { get; }
-    [Selector("state")] public CLMonitoringState State { get; }
-    [Selector("date")] public NSDate Date { get; }
-    [Selector("authorizationDenied")] public bool AuthorizationDenied { get; }
-    [Selector("authorizationDeniedGlobally")] public bool AuthorizationDeniedGlobally { get; }
-    [Selector("authorizationRestricted")] public bool AuthorizationRestricted { get; }
-    [Selector("insufficientlyInUse")] public bool InsufficientlyInUse { get; }
-    [Selector("accuracyLimited")] public bool AccuracyLimited { get; }
-    [Selector("conditionUnsupported")] public bool ConditionUnsupported { get; }
-    [Selector("conditionLimitExceeded")] public bool ConditionLimitExceeded { get; }
-    [Selector("persistenceUnavailable")] public bool PersistenceUnavailable { get; }
-    [Selector("serviceSessionRequired")] public bool ServiceSessionRequired { get; }
-    [Selector("authorizationRequestInProgress")] public bool AuthorizationRequestInProgress { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("refinement")]
+    public CLCondition? Refinement { get; }
+    [Selector("state")]
+    public CLMonitoringState State { get; }
+    [Selector("date")]
+    public NSDate Date { get; }
+    [Selector("authorizationDenied")]
+    public bool AuthorizationDenied { get; }
+    [Selector("authorizationDeniedGlobally")]
+    public bool AuthorizationDeniedGlobally { get; }
+    [Selector("authorizationRestricted")]
+    public bool AuthorizationRestricted { get; }
+    [Selector("insufficientlyInUse")]
+    public bool InsufficientlyInUse { get; }
+    [Selector("accuracyLimited")]
+    public bool AccuracyLimited { get; }
+    [Selector("conditionUnsupported")]
+    public bool ConditionUnsupported { get; }
+    [Selector("conditionLimitExceeded")]
+    public bool ConditionLimitExceeded { get; }
+    [Selector("persistenceUnavailable")]
+    public bool PersistenceUnavailable { get; }
+    [Selector("serviceSessionRequired")]
+    public bool ServiceSessionRequired { get; }
+    [Selector("authorizationRequestInProgress")]
+    public bool AuthorizationRequestInProgress { get; }
 }
 
 #endif

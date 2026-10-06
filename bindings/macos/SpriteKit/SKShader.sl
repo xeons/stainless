@@ -33,18 +33,30 @@ import Standard.ObjC;
 
 public extern objc class SKShader : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("source", "setSource:")] public NSString? Source { get; set; }
-    [Selector("uniforms", "setUniforms:")] public NSArray Uniforms { get; set; }
-    [Selector("attributes", "setAttributes:")] public NSArray Attributes { get; set; }
-    [Selector("initWithSource:")] public Self InitWithSource(NSString source);
-    [Selector("initWithSource:uniforms:")] public Self InitWithSourceUniforms(NSString source, NSArray uniforms);
-    [Selector("shader")] public static Self Shader();
-    [Selector("shaderWithSource:")] public static Self ShaderWithSource(NSString source);
-    [Selector("shaderWithSource:uniforms:")] public static Self ShaderWithSourceUniforms(NSString source, NSArray uniforms);
-    [Selector("shaderWithFileNamed:")] public static Self ShaderWithFileNamed(NSString name);
-    [Selector("addUniform:")] public void AddUniform(SKUniform uniform);
-    [Selector("uniformNamed:")] public SKUniform? UniformNamed(NSString name);
-    [Selector("removeUniformNamed:")] public void RemoveUniformNamed(NSString name);
+    [Selector("source", "setSource:")]
+    public NSString? Source { get; set; }
+    [Selector("uniforms", "setUniforms:")]
+    public NSArray Uniforms { get; set; }
+    [Selector("attributes", "setAttributes:")]
+    public NSArray Attributes { get; set; }
+    [Selector("initWithSource:")]
+    public Self InitWithSource(NSString source);
+    [Selector("initWithSource:uniforms:")]
+    public Self InitWithSourceUniforms(NSString source, NSArray uniforms);
+    [Selector("shader")]
+    public static Self Shader();
+    [Selector("shaderWithSource:")]
+    public static Self ShaderWithSource(NSString source);
+    [Selector("shaderWithSource:uniforms:")]
+    public static Self ShaderWithSourceUniforms(NSString source, NSArray uniforms);
+    [Selector("shaderWithFileNamed:")]
+    public static Self ShaderWithFileNamed(NSString name);
+    [Selector("addUniform:")]
+    public void AddUniform(SKUniform uniform);
+    [Selector("uniformNamed:")]
+    public SKUniform? UniformNamed(NSString name);
+    [Selector("removeUniformNamed:")]
+    public void RemoveUniformNamed(NSString name);
 }
 
 #endif

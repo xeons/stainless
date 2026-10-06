@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// Intents, a category of NSString.
 public extern objc class NSString
 {
-    [Selector("deferredLocalizedIntentsStringWithFormat:")] public static NSString DeferredLocalizedIntentsStringWithFormat(NSString format, ...);
-    [Selector("deferredLocalizedIntentsStringWithFormat:fromTable:")] public static NSString DeferredLocalizedIntentsStringWithFormatFromTable(NSString format, NSString? table, ...);
-    [Selector("deferredLocalizedIntentsStringWithFormat:fromTable:arguments:")] public static NSString DeferredLocalizedIntentsStringWithFormatFromTableArguments(NSString format, NSString? table, VaList arguments);
+    [Selector("deferredLocalizedIntentsStringWithFormat:")]
+    public static NSString DeferredLocalizedIntentsStringWithFormat(NSString format, ...);
+    [Selector("deferredLocalizedIntentsStringWithFormat:fromTable:")]
+    public static NSString DeferredLocalizedIntentsStringWithFormatFromTable(NSString format, NSString? table, ...);
+    [Selector("deferredLocalizedIntentsStringWithFormat:fromTable:arguments:")]
+    public static NSString DeferredLocalizedIntentsStringWithFormatFromTableArguments(NSString format, NSString? table, VaList arguments);
 }
 
 #endif

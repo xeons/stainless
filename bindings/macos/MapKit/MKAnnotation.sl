@@ -34,10 +34,17 @@ import Standard.ObjC;
 
 public objc interface MKAnnotation : NSObjectProtocol
 {
-    [Selector("coordinate")] CLLocationCoordinate2D Coordinate { get; }
-    [Optional] [Selector("title")] NSString? Title { get; }
-    [Optional] [Selector("subtitle")] NSString? Subtitle { get; }
-    [Optional] [Selector("setCoordinate:")] void SetCoordinate(CLLocationCoordinate2D newCoordinate);
+    [Selector("coordinate")]
+    CLLocationCoordinate2D Coordinate { get; }
+    [Optional]
+    [Selector("title")]
+    NSString? Title { get; }
+    [Optional]
+    [Selector("subtitle")]
+    NSString? Subtitle { get; }
+    [Optional]
+    [Selector("setCoordinate:")]
+    void SetCoordinate(CLLocationCoordinate2D newCoordinate);
 }
 
 #endif

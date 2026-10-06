@@ -39,20 +39,27 @@ public extern objc class GKFriendRequestComposeViewController : NSViewController
 public extern objc class GKFriendRequestComposeViewController
 {
     /// Deprecated in macOS 10.12.
-    [Selector("composeViewDelegate", "setComposeViewDelegate:")] public GKFriendRequestComposeViewControllerDelegate? ComposeViewDelegate { get; set; }
-    [Selector("maxNumberOfRecipients")] public static NSUInteger MaxNumberOfRecipients();
-    [Selector("setMessage:")] public void SetMessage(NSString? message);
-    [Selector("addRecipientPlayers:")] public void AddRecipientPlayers(NSArray players);
+    [Selector("composeViewDelegate", "setComposeViewDelegate:")]
+    public GKFriendRequestComposeViewControllerDelegate? ComposeViewDelegate { get; set; }
+    [Selector("maxNumberOfRecipients")]
+    public static NSUInteger MaxNumberOfRecipients();
+    [Selector("setMessage:")]
+    public void SetMessage(NSString? message);
+    [Selector("addRecipientPlayers:")]
+    public void AddRecipientPlayers(NSArray players);
     /// Deprecated in macOS 10.10.
-    [Selector("addRecipientsWithPlayerIDs:")] public void AddRecipientsWithPlayerIDs(NSArray playerIDs);
-    [Selector("addRecipientsWithEmailAddresses:")] public void AddRecipientsWithEmailAddresses(NSArray emailAddresses);
+    [Selector("addRecipientsWithPlayerIDs:")]
+    public void AddRecipientsWithPlayerIDs(NSArray playerIDs);
+    [Selector("addRecipientsWithEmailAddresses:")]
+    public void AddRecipientsWithEmailAddresses(NSArray emailAddresses);
 }
 
 /// Deprecated in macOS 10.12.
 public objc interface GKFriendRequestComposeViewControllerDelegate
 {
     /// Deprecated in macOS 10.12.
-    [Selector("friendRequestComposeViewControllerDidFinish:")] void FriendRequestComposeViewControllerDidFinish(GKFriendRequestComposeViewController viewController);
+    [Selector("friendRequestComposeViewControllerDidFinish:")]
+    void FriendRequestComposeViewControllerDidFinish(GKFriendRequestComposeViewController viewController);
 }
 
 #endif

@@ -43,13 +43,20 @@ public enum CKNotificationType : long
 
 public extern objc class CKNotification : NSObject
 {
-    [Selector("notificationType")] public CKNotificationType NotificationType { get; }
-    [Selector("notificationID")] public CKNotificationID? NotificationID { get; }
-    [Selector("containerIdentifier")] public NSString? ContainerIdentifier { get; }
-    [Selector("subscriptionOwnerUserRecordID")] public CKRecordID? SubscriptionOwnerUserRecordID { get; }
-    [Selector("isPruned")] public bool IsPruned { get; }
-    [Selector("subscriptionID")] public CKSubscriptionID? SubscriptionID { get; }
-    [Selector("notificationFromRemoteNotificationDictionary:")] public static Self? NotificationFromRemoteNotificationDictionary(NSDictionary notificationDictionary);
+    [Selector("notificationType")]
+    public CKNotificationType NotificationType { get; }
+    [Selector("notificationID")]
+    public CKNotificationID? NotificationID { get; }
+    [Selector("containerIdentifier")]
+    public NSString? ContainerIdentifier { get; }
+    [Selector("subscriptionOwnerUserRecordID")]
+    public CKRecordID? SubscriptionOwnerUserRecordID { get; }
+    [Selector("isPruned")]
+    public bool IsPruned { get; }
+    [Selector("subscriptionID")]
+    public CKSubscriptionID? SubscriptionID { get; }
+    [Selector("notificationFromRemoteNotificationDictionary:")]
+    public static Self? NotificationFromRemoteNotificationDictionary(NSDictionary notificationDictionary);
 }
 
 /// Deprecated in macOS 14.0.
@@ -57,26 +64,40 @@ public extern objc class CKNotification : NSObject
 public extern objc class CKNotification
 {
     /// Deprecated in macOS 14.0.
-    [Selector("alertBody")] public NSString? AlertBody { get; }
+    [Selector("alertBody")]
+    public NSString? AlertBody { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("alertLocalizationKey")] public NSString? AlertLocalizationKey { get; }
+    [Selector("alertLocalizationKey")]
+    public NSString? AlertLocalizationKey { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("alertLocalizationArgs")] public NSArray? AlertLocalizationArgs { get; }
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("titleLocalizationKey")] public NSString? TitleLocalizationKey { get; }
-    [Selector("titleLocalizationArgs")] public NSArray? TitleLocalizationArgs { get; }
-    [Selector("subtitle")] public NSString? Subtitle { get; }
-    [Selector("subtitleLocalizationKey")] public NSString? SubtitleLocalizationKey { get; }
-    [Selector("subtitleLocalizationArgs")] public NSArray? SubtitleLocalizationArgs { get; }
+    [Selector("alertLocalizationArgs")]
+    public NSArray? AlertLocalizationArgs { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("titleLocalizationKey")]
+    public NSString? TitleLocalizationKey { get; }
+    [Selector("titleLocalizationArgs")]
+    public NSArray? TitleLocalizationArgs { get; }
+    [Selector("subtitle")]
+    public NSString? Subtitle { get; }
+    [Selector("subtitleLocalizationKey")]
+    public NSString? SubtitleLocalizationKey { get; }
+    [Selector("subtitleLocalizationArgs")]
+    public NSArray? SubtitleLocalizationArgs { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("alertActionLocalizationKey")] public NSString? AlertActionLocalizationKey { get; }
+    [Selector("alertActionLocalizationKey")]
+    public NSString? AlertActionLocalizationKey { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("alertLaunchImage")] public NSString? AlertLaunchImage { get; }
+    [Selector("alertLaunchImage")]
+    public NSString? AlertLaunchImage { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("badge")] public NSNumber? Badge { get; }
+    [Selector("badge")]
+    public NSNumber? Badge { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("soundName")] public NSString? SoundName { get; }
-    [Selector("category")] public NSString? Category { get; }
+    [Selector("soundName")]
+    public NSString? SoundName { get; }
+    [Selector("category")]
+    public NSString? Category { get; }
 }
 
 public enum CKQueryNotificationReason : long
@@ -88,21 +109,28 @@ public enum CKQueryNotificationReason : long
 
 public extern objc class CKQueryNotification : CKNotification
 {
-    [Selector("queryNotificationReason")] public CKQueryNotificationReason QueryNotificationReason { get; }
-    [Selector("recordFields")] public NSDictionary? RecordFields { get; }
-    [Selector("recordID")] public CKRecordID? RecordID { get; }
-    [Selector("databaseScope")] public CKDatabaseScope DatabaseScope { get; }
+    [Selector("queryNotificationReason")]
+    public CKQueryNotificationReason QueryNotificationReason { get; }
+    [Selector("recordFields")]
+    public NSDictionary? RecordFields { get; }
+    [Selector("recordID")]
+    public CKRecordID? RecordID { get; }
+    [Selector("databaseScope")]
+    public CKDatabaseScope DatabaseScope { get; }
 }
 
 public extern objc class CKRecordZoneNotification : CKNotification
 {
-    [Selector("recordZoneID")] public CKRecordZoneID? RecordZoneID { get; }
-    [Selector("databaseScope")] public CKDatabaseScope DatabaseScope { get; }
+    [Selector("recordZoneID")]
+    public CKRecordZoneID? RecordZoneID { get; }
+    [Selector("databaseScope")]
+    public CKDatabaseScope DatabaseScope { get; }
 }
 
 public extern objc class CKDatabaseNotification : CKNotification
 {
-    [Selector("databaseScope")] public CKDatabaseScope DatabaseScope { get; }
+    [Selector("databaseScope")]
+    public CKDatabaseScope DatabaseScope { get; }
 }
 
 #endif

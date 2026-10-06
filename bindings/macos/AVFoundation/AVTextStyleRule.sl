@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class AVTextStyleRule : NSObject, NSCopying
 {
-    [Selector("textMarkupAttributes")] public NSDictionary TextMarkupAttributes { get; }
-    [Selector("textSelector")] public NSString? TextSelector { get; }
-    [Selector("propertyListForTextStyleRules:")] public static AnyObject PropertyListForTextStyleRules(NSArray textStyleRules);
-    [Selector("textStyleRulesFromPropertyList:")] public static NSArray? TextStyleRulesFromPropertyList(AnyObject plist);
-    [Selector("textStyleRuleWithTextMarkupAttributes:")] public static AVTextStyleRule? TextStyleRuleWithTextMarkupAttributes(NSDictionary textMarkupAttributes);
-    [Selector("textStyleRuleWithTextMarkupAttributes:textSelector:")] public static AVTextStyleRule? TextStyleRuleWithTextMarkupAttributesTextSelector(NSDictionary textMarkupAttributes, NSString? textSelector);
-    [Selector("initWithTextMarkupAttributes:")] public Self? InitWithTextMarkupAttributes(NSDictionary textMarkupAttributes);
-    [Selector("initWithTextMarkupAttributes:textSelector:")] public Self? InitWithTextMarkupAttributesTextSelector(NSDictionary textMarkupAttributes, NSString? textSelector);
+    [Selector("textMarkupAttributes")]
+    public NSDictionary TextMarkupAttributes { get; }
+    [Selector("textSelector")]
+    public NSString? TextSelector { get; }
+    [Selector("propertyListForTextStyleRules:")]
+    public static AnyObject PropertyListForTextStyleRules(NSArray textStyleRules);
+    [Selector("textStyleRulesFromPropertyList:")]
+    public static NSArray? TextStyleRulesFromPropertyList(AnyObject plist);
+    [Selector("textStyleRuleWithTextMarkupAttributes:")]
+    public static AVTextStyleRule? TextStyleRuleWithTextMarkupAttributes(NSDictionary textMarkupAttributes);
+    [Selector("textStyleRuleWithTextMarkupAttributes:textSelector:")]
+    public static AVTextStyleRule? TextStyleRuleWithTextMarkupAttributesTextSelector(NSDictionary textMarkupAttributes, NSString? textSelector);
+    [Selector("initWithTextMarkupAttributes:")]
+    public Self? InitWithTextMarkupAttributes(NSDictionary textMarkupAttributes);
+    [Selector("initWithTextMarkupAttributes:textSelector:")]
+    public Self? InitWithTextMarkupAttributesTextSelector(NSDictionary textMarkupAttributes, NSString? textSelector);
 }
 
 #endif

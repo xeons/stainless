@@ -49,14 +49,20 @@ public enum CKSharingParticipantPermissionOption : ulong
 
 public extern objc class CKAllowedSharingOptions : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("allowedParticipantPermissionOptions", "setAllowedParticipantPermissionOptions:")] public CKSharingParticipantPermissionOption AllowedParticipantPermissionOptions { get; set; }
-    [Selector("allowedParticipantAccessOptions", "setAllowedParticipantAccessOptions:")] public CKSharingParticipantAccessOption AllowedParticipantAccessOptions { get; set; }
+    [Selector("allowedParticipantPermissionOptions", "setAllowedParticipantPermissionOptions:")]
+    public CKSharingParticipantPermissionOption AllowedParticipantPermissionOptions { get; set; }
+    [Selector("allowedParticipantAccessOptions", "setAllowedParticipantAccessOptions:")]
+    public CKSharingParticipantAccessOption AllowedParticipantAccessOptions { get; set; }
     /// macOS 26.0 and later.
-    [Selector("allowsParticipantsToInviteOthers", "setAllowsParticipantsToInviteOthers:")] public bool AllowsParticipantsToInviteOthers { get; set; }
-    [Selector("standardOptions")] public static CKAllowedSharingOptions StandardOptions { get; }
+    [Selector("allowsParticipantsToInviteOthers", "setAllowsParticipantsToInviteOthers:")]
+    public bool AllowsParticipantsToInviteOthers { get; set; }
+    [Selector("standardOptions")]
+    public static CKAllowedSharingOptions StandardOptions { get; }
     /// macOS 26.0 and later.
-    [Selector("allowsAccessRequests", "setAllowsAccessRequests:")] public bool AllowsAccessRequests { get; set; }
-    [Selector("initWithAllowedParticipantPermissionOptions:allowedParticipantAccessOptions:")] public Self InitWithAllowedParticipantPermissionOptionsAllowedParticipantAccessOptions(CKSharingParticipantPermissionOption allowedParticipantPermissionOptions, CKSharingParticipantAccessOption allowedParticipantAccessOptions);
+    [Selector("allowsAccessRequests", "setAllowsAccessRequests:")]
+    public bool AllowsAccessRequests { get; set; }
+    [Selector("initWithAllowedParticipantPermissionOptions:allowedParticipantAccessOptions:")]
+    public Self InitWithAllowedParticipantPermissionOptionsAllowedParticipantAccessOptions(CKSharingParticipantPermissionOption allowedParticipantPermissionOptions, CKSharingParticipantAccessOption allowedParticipantAccessOptions);
 }
 
 #endif

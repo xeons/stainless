@@ -35,26 +35,46 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.12.
 public extern objc class PDFAnnotationTextWidget : PDFAnnotation, NSCopying
 {
-    [Selector("stringValue")] public NSString? StringValue();
-    [Selector("setStringValue:")] public void SetStringValue(NSString? value);
-    [Selector("attributedStringValue")] public NSAttributedString? AttributedStringValue();
-    [Selector("setAttributedStringValue:")] public void SetAttributedStringValue(NSAttributedString? value);
-    [Selector("backgroundColor")] public NSColor? BackgroundColor();
-    [Selector("setBackgroundColor:")] public void SetBackgroundColor(NSColor? color);
-    [Selector("rotation")] public NSInteger Rotation();
-    [Selector("setRotation:")] public void SetRotation(int rotation);
-    [Selector("font")] public NSFont? Font();
-    [Selector("setFont:")] public void SetFont(NSFont? font);
-    [Selector("fontColor")] public NSColor? FontColor();
-    [Selector("setFontColor:")] public void SetFontColor(NSColor? color);
-    [Selector("alignment")] public NSTextAlignment Alignment();
-    [Selector("setAlignment:")] public void SetAlignment(NSTextAlignment alignment);
-    [Selector("maximumLength")] public NSUInteger MaximumLength();
-    [Selector("setMaximumLength:")] public void SetMaximumLength(NSUInteger maxLen);
-    [Selector("fieldName")] public NSString? FieldName();
-    [Selector("setFieldName:")] public void SetFieldName(NSString? name);
-    [Selector("isMultiline")] public bool IsMultiline();
-    [Selector("setIsMultiline:")] public void SetIsMultiline(bool multiline);
+    [Selector("stringValue")]
+    public NSString? StringValue();
+    [Selector("setStringValue:")]
+    public void SetStringValue(NSString? value);
+    [Selector("attributedStringValue")]
+    public NSAttributedString? AttributedStringValue();
+    [Selector("setAttributedStringValue:")]
+    public void SetAttributedStringValue(NSAttributedString? value);
+    [Selector("backgroundColor")]
+    public NSColor? BackgroundColor();
+    [Selector("setBackgroundColor:")]
+    public void SetBackgroundColor(NSColor? color);
+    [Selector("rotation")]
+    public NSInteger Rotation();
+    [Selector("setRotation:")]
+    public void SetRotation(int rotation);
+    [Selector("font")]
+    public NSFont? Font();
+    [Selector("setFont:")]
+    public void SetFont(NSFont? font);
+    [Selector("fontColor")]
+    public NSColor? FontColor();
+    [Selector("setFontColor:")]
+    public void SetFontColor(NSColor? color);
+    [Selector("alignment")]
+    public NSTextAlignment Alignment();
+    [Selector("setAlignment:")]
+    public void SetAlignment(NSTextAlignment alignment);
+    [Selector("maximumLength")]
+    public NSUInteger MaximumLength();
+    [Selector("setMaximumLength:")]
+    public void SetMaximumLength(NSUInteger maxLen);
+    [Selector("fieldName")]
+    public NSString? FieldName();
+    [Selector("setFieldName:")]
+    public void SetFieldName(NSString? name);
+    [Selector("isMultiline")]
+    public bool IsMultiline();
+    [Selector("setIsMultiline:")]
+    public void SetIsMultiline(bool multiline);
 }
 
 #endif

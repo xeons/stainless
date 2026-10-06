@@ -171,9 +171,11 @@ public extern "C" CFComparisonResult CMTagCompare(CMTag tag1, CMTag tag2);
 
 public extern "C" CFHashCode CMTagHash(CMTag tag);
 
-[ReturnsRetained] public extern "C" CFStringRef? CMTagCopyDescription(CFAllocatorRef? allocator, CMTag tag);
+[ReturnsRetained]
+public extern "C" CFStringRef? CMTagCopyDescription(CFAllocatorRef? allocator, CMTag tag);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CMTagCopyAsDictionary(CMTag tag, CFAllocatorRef? allocator);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CMTagCopyAsDictionary(CMTag tag, CFAllocatorRef? allocator);
 
 public extern "C" CMTag CMTagMakeFromDictionary(CFDictionaryRef dict);
 

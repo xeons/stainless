@@ -34,15 +34,22 @@ import Standard.ObjC;
 
 public extern objc class AVCaptureOutput : NSObject
 {
-    [Selector("connections")] public NSArray? Connections { get; }
+    [Selector("connections")]
+    public NSArray? Connections { get; }
     /// macOS 26.0 and later.
-    [Selector("isDeferredStartSupported")] public bool DeferredStartSupported { get; }
+    [Selector("isDeferredStartSupported")]
+    public bool DeferredStartSupported { get; }
     /// macOS 26.0 and later.
-    [Selector("isDeferredStartEnabled", "setDeferredStartEnabled:")] public bool DeferredStartEnabled { get; set; }
-    [Selector("connectionWithMediaType:")] public AVCaptureConnection? ConnectionWithMediaType(AVMediaType mediaType);
-    [Selector("transformedMetadataObjectForMetadataObject:connection:")] public AVMetadataObject? TransformedMetadataObjectForMetadataObjectConnection(AVMetadataObject metadataObject, AVCaptureConnection connection);
-    [Selector("metadataOutputRectOfInterestForRect:")] public CGRect MetadataOutputRectOfInterestForRect(CGRect rectInOutputCoordinates);
-    [Selector("rectForMetadataOutputRectOfInterest:")] public CGRect RectForMetadataOutputRectOfInterest(CGRect rectInMetadataOutputCoordinates);
+    [Selector("isDeferredStartEnabled", "setDeferredStartEnabled:")]
+    public bool DeferredStartEnabled { get; set; }
+    [Selector("connectionWithMediaType:")]
+    public AVCaptureConnection? ConnectionWithMediaType(AVMediaType mediaType);
+    [Selector("transformedMetadataObjectForMetadataObject:connection:")]
+    public AVMetadataObject? TransformedMetadataObjectForMetadataObjectConnection(AVMetadataObject metadataObject, AVCaptureConnection connection);
+    [Selector("metadataOutputRectOfInterestForRect:")]
+    public CGRect MetadataOutputRectOfInterestForRect(CGRect rectInOutputCoordinates);
+    [Selector("rectForMetadataOutputRectOfInterest:")]
+    public CGRect RectForMetadataOutputRectOfInterest(CGRect rectInMetadataOutputCoordinates);
 }
 
 public enum AVCaptureOutputDataDroppedReason : long

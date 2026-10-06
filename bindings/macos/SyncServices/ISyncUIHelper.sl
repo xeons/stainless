@@ -35,9 +35,11 @@ import Standard.ObjC;
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.7.
-    [Selector("attributedStringForPropertiesWithNames:inRecord:comparisonRecords:defaultAttributes:")] public NSAttributedString? AttributedStringForPropertiesWithNamesInRecordComparisonRecordsDefaultAttributes(NSArray? propertyNames, NSDictionary? record, NSArray? comparisonRecords, NSDictionary? defaultAttributes);
+    [Selector("attributedStringForPropertiesWithNames:inRecord:comparisonRecords:defaultAttributes:")]
+    public NSAttributedString? AttributedStringForPropertiesWithNamesInRecordComparisonRecordsDefaultAttributes(NSArray? propertyNames, NSDictionary? record, NSArray? comparisonRecords, NSDictionary? defaultAttributes);
     /// Deprecated in macOS 10.7.
-    [Selector("attributedStringForIdentityPropertiesWithNames:inRecord:comparisonRecords:firstLineAttributes:secondLineAttributes:")] public NSAttributedString? AttributedStringForIdentityPropertiesWithNamesInRecordComparisonRecordsFirstLineAttributesSecondLineAttributes(NSArray? propertyNames, NSDictionary? record, NSArray? comparisonRecords, NSDictionary? firstLineAttributes, NSDictionary? secondLineAttributes);
+    [Selector("attributedStringForIdentityPropertiesWithNames:inRecord:comparisonRecords:firstLineAttributes:secondLineAttributes:")]
+    public NSAttributedString? AttributedStringForIdentityPropertiesWithNamesInRecordComparisonRecordsFirstLineAttributesSecondLineAttributes(NSArray? propertyNames, NSDictionary? record, NSArray? comparisonRecords, NSDictionary? firstLineAttributes, NSDictionary? secondLineAttributes);
 }
 
 #endif

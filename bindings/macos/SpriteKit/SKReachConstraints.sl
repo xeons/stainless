@@ -34,9 +34,12 @@ import Standard.ObjC;
 
 public extern objc class SKReachConstraints : NSObject, NSSecureCoding
 {
-    [Selector("lowerAngleLimit", "setLowerAngleLimit:")] public CGFloat LowerAngleLimit { get; set; }
-    [Selector("upperAngleLimit", "setUpperAngleLimit:")] public CGFloat UpperAngleLimit { get; set; }
-    [Selector("initWithLowerAngleLimit:upperAngleLimit:")] public Self? InitWithLowerAngleLimitUpperAngleLimit(CGFloat lowerAngleLimit, CGFloat upperAngleLimit);
+    [Selector("lowerAngleLimit", "setLowerAngleLimit:")]
+    public CGFloat LowerAngleLimit { get; set; }
+    [Selector("upperAngleLimit", "setUpperAngleLimit:")]
+    public CGFloat UpperAngleLimit { get; set; }
+    [Selector("initWithLowerAngleLimit:upperAngleLimit:")]
+    public Self? InitWithLowerAngleLimitUpperAngleLimit(CGFloat lowerAngleLimit, CGFloat upperAngleLimit);
 }
 
 #endif

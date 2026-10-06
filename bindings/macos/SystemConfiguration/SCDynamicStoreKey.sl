@@ -30,24 +30,34 @@ import Standard.ObjC;
 
 #pragma comment(framework, "SystemConfiguration")
 
-[ReturnsRetained] public extern "C" CFStringRef SCDynamicStoreKeyCreate(CFAllocatorRef? allocator, CFStringRef fmt, ...);
+[ReturnsRetained]
+public extern "C" CFStringRef SCDynamicStoreKeyCreate(CFAllocatorRef? allocator, CFStringRef fmt, ...);
 
-[ReturnsRetained] public extern "C" CFStringRef SCDynamicStoreKeyCreateNetworkGlobalEntity(CFAllocatorRef? allocator, CFStringRef domain, CFStringRef entity);
+[ReturnsRetained]
+public extern "C" CFStringRef SCDynamicStoreKeyCreateNetworkGlobalEntity(CFAllocatorRef? allocator, CFStringRef domain, CFStringRef entity);
 
-[ReturnsRetained] public extern "C" CFStringRef SCDynamicStoreKeyCreateNetworkInterface(CFAllocatorRef? allocator, CFStringRef domain);
+[ReturnsRetained]
+public extern "C" CFStringRef SCDynamicStoreKeyCreateNetworkInterface(CFAllocatorRef? allocator, CFStringRef domain);
 
-[ReturnsRetained] public extern "C" CFStringRef SCDynamicStoreKeyCreateNetworkInterfaceEntity(CFAllocatorRef? allocator, CFStringRef domain, CFStringRef ifname, CFStringRef? entity);
+[ReturnsRetained]
+public extern "C" CFStringRef SCDynamicStoreKeyCreateNetworkInterfaceEntity(CFAllocatorRef? allocator, CFStringRef domain, CFStringRef ifname, CFStringRef? entity);
 
-[ReturnsRetained] public extern "C" CFStringRef SCDynamicStoreKeyCreateNetworkServiceEntity(CFAllocatorRef? allocator, CFStringRef domain, CFStringRef serviceID, CFStringRef? entity);
+[ReturnsRetained]
+public extern "C" CFStringRef SCDynamicStoreKeyCreateNetworkServiceEntity(CFAllocatorRef? allocator, CFStringRef domain, CFStringRef serviceID, CFStringRef? entity);
 
-[ReturnsRetained] public extern "C" CFStringRef SCDynamicStoreKeyCreateComputerName(CFAllocatorRef? allocator);
+[ReturnsRetained]
+public extern "C" CFStringRef SCDynamicStoreKeyCreateComputerName(CFAllocatorRef? allocator);
 
-[ReturnsRetained] public extern "C" CFStringRef SCDynamicStoreKeyCreateConsoleUser(CFAllocatorRef? allocator);
+[ReturnsRetained]
+public extern "C" CFStringRef SCDynamicStoreKeyCreateConsoleUser(CFAllocatorRef? allocator);
 
-[ReturnsRetained] public extern "C" CFStringRef SCDynamicStoreKeyCreateHostNames(CFAllocatorRef? allocator);
+[ReturnsRetained]
+public extern "C" CFStringRef SCDynamicStoreKeyCreateHostNames(CFAllocatorRef? allocator);
 
-[ReturnsRetained] public extern "C" CFStringRef SCDynamicStoreKeyCreateLocation(CFAllocatorRef? allocator);
+[ReturnsRetained]
+public extern "C" CFStringRef SCDynamicStoreKeyCreateLocation(CFAllocatorRef? allocator);
 
-[ReturnsRetained] public extern "C" CFStringRef SCDynamicStoreKeyCreateProxies(CFAllocatorRef? allocator);
+[ReturnsRetained]
+public extern "C" CFStringRef SCDynamicStoreKeyCreateProxies(CFAllocatorRef? allocator);
 
 #endif

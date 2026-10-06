@@ -38,14 +38,22 @@ public enum NSCollectionChangeType : long
 
 public extern objc class NSOrderedCollectionChange : NSObject
 {
-    [Selector("object")] public AnyObject? Object { get; }
-    [Selector("changeType")] public NSCollectionChangeType ChangeType { get; }
-    [Selector("index")] public NSUInteger Index { get; }
-    [Selector("associatedIndex")] public NSUInteger AssociatedIndex { get; }
-    [Selector("changeWithObject:type:index:")] public static NSOrderedCollectionChange ChangeWithObjectTypeIndex(AnyObject? anObject, NSCollectionChangeType type, NSUInteger index);
-    [Selector("changeWithObject:type:index:associatedIndex:")] public static NSOrderedCollectionChange ChangeWithObjectTypeIndexAssociatedIndex(AnyObject? anObject, NSCollectionChangeType type, NSUInteger index, NSUInteger associatedIndex);
-    [Selector("initWithObject:type:index:")] public Self InitWithObjectTypeIndex(AnyObject? anObject, NSCollectionChangeType type, NSUInteger index);
-    [Selector("initWithObject:type:index:associatedIndex:")] public Self InitWithObjectTypeIndexAssociatedIndex(AnyObject? anObject, NSCollectionChangeType type, NSUInteger index, NSUInteger associatedIndex);
+    [Selector("object")]
+    public AnyObject? Object { get; }
+    [Selector("changeType")]
+    public NSCollectionChangeType ChangeType { get; }
+    [Selector("index")]
+    public NSUInteger Index { get; }
+    [Selector("associatedIndex")]
+    public NSUInteger AssociatedIndex { get; }
+    [Selector("changeWithObject:type:index:")]
+    public static NSOrderedCollectionChange ChangeWithObjectTypeIndex(AnyObject? anObject, NSCollectionChangeType type, NSUInteger index);
+    [Selector("changeWithObject:type:index:associatedIndex:")]
+    public static NSOrderedCollectionChange ChangeWithObjectTypeIndexAssociatedIndex(AnyObject? anObject, NSCollectionChangeType type, NSUInteger index, NSUInteger associatedIndex);
+    [Selector("initWithObject:type:index:")]
+    public Self InitWithObjectTypeIndex(AnyObject? anObject, NSCollectionChangeType type, NSUInteger index);
+    [Selector("initWithObject:type:index:associatedIndex:")]
+    public Self InitWithObjectTypeIndexAssociatedIndex(AnyObject? anObject, NSCollectionChangeType type, NSUInteger index, NSUInteger associatedIndex);
 }
 
 #endif

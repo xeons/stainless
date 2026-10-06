@@ -40,18 +40,30 @@ public using CAShapeLayerLineCap = NSString;
 
 public extern objc class CAShapeLayer : CALayer
 {
-    [Selector("path", "setPath:")] public CGPathRef? Path { get; set; }
-    [Selector("fillColor", "setFillColor:")] public CGColorRef? FillColor { get; set; }
-    [Selector("fillRule", "setFillRule:")] public CAShapeLayerFillRule FillRule { get; set; }
-    [Selector("strokeColor", "setStrokeColor:")] public CGColorRef? StrokeColor { get; set; }
-    [Selector("strokeStart", "setStrokeStart:")] public CGFloat StrokeStart { get; set; }
-    [Selector("strokeEnd", "setStrokeEnd:")] public CGFloat StrokeEnd { get; set; }
-    [Selector("lineWidth", "setLineWidth:")] public CGFloat LineWidth { get; set; }
-    [Selector("miterLimit", "setMiterLimit:")] public CGFloat MiterLimit { get; set; }
-    [Selector("lineCap", "setLineCap:")] public CAShapeLayerLineCap LineCap { get; set; }
-    [Selector("lineJoin", "setLineJoin:")] public CAShapeLayerLineJoin LineJoin { get; set; }
-    [Selector("lineDashPhase", "setLineDashPhase:")] public CGFloat LineDashPhase { get; set; }
-    [Selector("lineDashPattern", "setLineDashPattern:")] public NSArray? LineDashPattern { get; set; }
+    [Selector("path", "setPath:")]
+    public CGPathRef? Path { get; set; }
+    [Selector("fillColor", "setFillColor:")]
+    public CGColorRef? FillColor { get; set; }
+    [Selector("fillRule", "setFillRule:")]
+    public CAShapeLayerFillRule FillRule { get; set; }
+    [Selector("strokeColor", "setStrokeColor:")]
+    public CGColorRef? StrokeColor { get; set; }
+    [Selector("strokeStart", "setStrokeStart:")]
+    public CGFloat StrokeStart { get; set; }
+    [Selector("strokeEnd", "setStrokeEnd:")]
+    public CGFloat StrokeEnd { get; set; }
+    [Selector("lineWidth", "setLineWidth:")]
+    public CGFloat LineWidth { get; set; }
+    [Selector("miterLimit", "setMiterLimit:")]
+    public CGFloat MiterLimit { get; set; }
+    [Selector("lineCap", "setLineCap:")]
+    public CAShapeLayerLineCap LineCap { get; set; }
+    [Selector("lineJoin", "setLineJoin:")]
+    public CAShapeLayerLineJoin LineJoin { get; set; }
+    [Selector("lineDashPhase", "setLineDashPhase:")]
+    public CGFloat LineDashPhase { get; set; }
+    [Selector("lineDashPattern", "setLineDashPattern:")]
+    public NSArray? LineDashPattern { get; set; }
 }
 
 public extern "C" CAShapeLayerFillRule? kCAFillRuleNonZero;

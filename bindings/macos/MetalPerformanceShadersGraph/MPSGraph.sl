@@ -82,43 +82,70 @@ public using MPSGraphCallableMap = NSDictionary;
 
 public extern objc class MPSGraphCompilationDescriptor : MPSGraphObject, NSCopying
 {
-    [Selector("optimizationLevel", "setOptimizationLevel:")] public MPSGraphOptimization OptimizationLevel { get; set; }
-    [Selector("waitForCompilationCompletion", "setWaitForCompilationCompletion:")] public bool WaitForCompilationCompletion { get; set; }
-    [Selector("compilationCompletionHandler", "setCompilationCompletionHandler:")] public MPSGraphCompilationCompletionHandler CompilationCompletionHandler { get; set; }
-    [Selector("dispatchQueue", "setDispatchQueue:")] public dispatch_queue_t DispatchQueue { get; set; }
+    [Selector("optimizationLevel", "setOptimizationLevel:")]
+    public MPSGraphOptimization OptimizationLevel { get; set; }
+    [Selector("waitForCompilationCompletion", "setWaitForCompilationCompletion:")]
+    public bool WaitForCompilationCompletion { get; set; }
+    [Selector("compilationCompletionHandler", "setCompilationCompletionHandler:")]
+    public MPSGraphCompilationCompletionHandler CompilationCompletionHandler { get; set; }
+    [Selector("dispatchQueue", "setDispatchQueue:")]
+    public dispatch_queue_t DispatchQueue { get; set; }
     /// Deprecated in macOS 14.0.
-    [Selector("optimizationProfile", "setOptimizationProfile:")] public MPSGraphOptimizationProfile OptimizationProfile { get; set; }
-    [Selector("callables", "setCallables:")] public MPSGraphCallableMap? Callables { get; set; }
+    [Selector("optimizationProfile", "setOptimizationProfile:")]
+    public MPSGraphOptimizationProfile OptimizationProfile { get; set; }
+    [Selector("callables", "setCallables:")]
+    public MPSGraphCallableMap? Callables { get; set; }
     /// macOS 26.0 and later.
-    [Selector("reducedPrecisionFastMath", "setReducedPrecisionFastMath:")] public MPSGraphReducedPrecisionFastMath ReducedPrecisionFastMath { get; set; }
-    [Selector("disableTypeInference")] public void DisableTypeInference();
+    [Selector("reducedPrecisionFastMath", "setReducedPrecisionFastMath:")]
+    public MPSGraphReducedPrecisionFastMath ReducedPrecisionFastMath { get; set; }
+    [Selector("disableTypeInference")]
+    public void DisableTypeInference();
 }
 
 public extern objc class MPSGraphExecutionDescriptor : MPSGraphObject
 {
-    [Selector("scheduledHandler", "setScheduledHandler:")] public MPSGraphScheduledHandler ScheduledHandler { get; set; }
-    [Selector("completionHandler", "setCompletionHandler:")] public MPSGraphCompletionHandler CompletionHandler { get; set; }
-    [Selector("waitUntilCompleted", "setWaitUntilCompleted:")] public bool WaitUntilCompleted { get; set; }
-    [Selector("compilationDescriptor", "setCompilationDescriptor:")] public MPSGraphCompilationDescriptor? CompilationDescriptor { get; set; }
-    [Selector("waitForEvent:value:")] public void WaitForEventValue(MTLSharedEvent event, ulong value);
-    [Selector("signalEvent:atExecutionEvent:value:")] public void SignalEventAtExecutionEventValue(MTLSharedEvent event, MPSGraphExecutionStage executionStage, ulong value);
+    [Selector("scheduledHandler", "setScheduledHandler:")]
+    public MPSGraphScheduledHandler ScheduledHandler { get; set; }
+    [Selector("completionHandler", "setCompletionHandler:")]
+    public MPSGraphCompletionHandler CompletionHandler { get; set; }
+    [Selector("waitUntilCompleted", "setWaitUntilCompleted:")]
+    public bool WaitUntilCompleted { get; set; }
+    [Selector("compilationDescriptor", "setCompilationDescriptor:")]
+    public MPSGraphCompilationDescriptor? CompilationDescriptor { get; set; }
+    [Selector("waitForEvent:value:")]
+    public void WaitForEventValue(MTLSharedEvent event, ulong value);
+    [Selector("signalEvent:atExecutionEvent:value:")]
+    public void SignalEventAtExecutionEventValue(MTLSharedEvent event, MPSGraphExecutionStage executionStage, ulong value);
 }
 
 public extern objc class MPSGraph : MPSGraphObject
 {
-    [Selector("options", "setOptions:")] public MPSGraphOptions Options { get; set; }
-    [Selector("placeholderTensors")] public NSArray PlaceholderTensors { get; }
-    [Selector("new")] public static Self New();
-    [Selector("init")] public Self Init();
-    [Selector("compileWithDevice:feeds:targetTensors:targetOperations:compilationDescriptor:")] public MPSGraphExecutable CompileWithDeviceFeedsTargetTensorsTargetOperationsCompilationDescriptor(MPSGraphDevice? device, MPSGraphTensorShapedTypeDictionary feeds, NSArray targetTensors, NSArray? targetOperations, MPSGraphCompilationDescriptor? compilationDescriptor);
-    [Selector("runWithFeeds:targetTensors:targetOperations:")] public MPSGraphTensorDataDictionary RunWithFeedsTargetTensorsTargetOperations(MPSGraphTensorDataDictionary feeds, NSArray targetTensors, NSArray? targetOperations);
-    [Selector("runWithMTLCommandQueue:feeds:targetTensors:targetOperations:")] public MPSGraphTensorDataDictionary RunWithMTLCommandQueueFeedsTargetTensorsTargetOperations(MTLCommandQueue commandQueue, MPSGraphTensorDataDictionary feeds, NSArray targetTensors, NSArray? targetOperations);
-    [Selector("runWithMTLCommandQueue:feeds:targetOperations:resultsDictionary:")] public void RunWithMTLCommandQueueFeedsTargetOperationsResultsDictionary(MTLCommandQueue commandQueue, MPSGraphTensorDataDictionary feeds, NSArray? targetOperations, MPSGraphTensorDataDictionary resultsDictionary);
-    [Selector("runAsyncWithFeeds:targetTensors:targetOperations:executionDescriptor:")] public MPSGraphTensorDataDictionary RunAsyncWithFeedsTargetTensorsTargetOperationsExecutionDescriptor(MPSGraphTensorDataDictionary feeds, NSArray targetTensors, NSArray? targetOperations, MPSGraphExecutionDescriptor? executionDescriptor);
-    [Selector("runAsyncWithMTLCommandQueue:feeds:targetTensors:targetOperations:executionDescriptor:")] public MPSGraphTensorDataDictionary RunAsyncWithMTLCommandQueueFeedsTargetTensorsTargetOperationsExecutionDescriptor(MTLCommandQueue commandQueue, MPSGraphTensorDataDictionary feeds, NSArray targetTensors, NSArray? targetOperations, MPSGraphExecutionDescriptor? executionDescriptor);
-    [Selector("runAsyncWithMTLCommandQueue:feeds:targetOperations:resultsDictionary:executionDescriptor:")] public void RunAsyncWithMTLCommandQueueFeedsTargetOperationsResultsDictionaryExecutionDescriptor(MTLCommandQueue commandQueue, MPSGraphTensorDataDictionary feeds, NSArray? targetOperations, MPSGraphTensorDataDictionary resultsDictionary, MPSGraphExecutionDescriptor? executionDescriptor);
-    [Selector("encodeToCommandBuffer:feeds:targetTensors:targetOperations:executionDescriptor:")] public MPSGraphTensorDataDictionary EncodeToCommandBufferFeedsTargetTensorsTargetOperationsExecutionDescriptor(MPSCommandBuffer commandBuffer, MPSGraphTensorDataDictionary feeds, NSArray targetTensors, NSArray? targetOperations, MPSGraphExecutionDescriptor? executionDescriptor);
-    [Selector("encodeToCommandBuffer:feeds:targetOperations:resultsDictionary:executionDescriptor:")] public void EncodeToCommandBufferFeedsTargetOperationsResultsDictionaryExecutionDescriptor(MPSCommandBuffer commandBuffer, MPSGraphTensorDataDictionary feeds, NSArray? targetOperations, MPSGraphTensorDataDictionary resultsDictionary, MPSGraphExecutionDescriptor? executionDescriptor);
+    [Selector("options", "setOptions:")]
+    public MPSGraphOptions Options { get; set; }
+    [Selector("placeholderTensors")]
+    public NSArray PlaceholderTensors { get; }
+    [Selector("new")]
+    public static Self New();
+    [Selector("init")]
+    public Self Init();
+    [Selector("compileWithDevice:feeds:targetTensors:targetOperations:compilationDescriptor:")]
+    public MPSGraphExecutable CompileWithDeviceFeedsTargetTensorsTargetOperationsCompilationDescriptor(MPSGraphDevice? device, MPSGraphTensorShapedTypeDictionary feeds, NSArray targetTensors, NSArray? targetOperations, MPSGraphCompilationDescriptor? compilationDescriptor);
+    [Selector("runWithFeeds:targetTensors:targetOperations:")]
+    public MPSGraphTensorDataDictionary RunWithFeedsTargetTensorsTargetOperations(MPSGraphTensorDataDictionary feeds, NSArray targetTensors, NSArray? targetOperations);
+    [Selector("runWithMTLCommandQueue:feeds:targetTensors:targetOperations:")]
+    public MPSGraphTensorDataDictionary RunWithMTLCommandQueueFeedsTargetTensorsTargetOperations(MTLCommandQueue commandQueue, MPSGraphTensorDataDictionary feeds, NSArray targetTensors, NSArray? targetOperations);
+    [Selector("runWithMTLCommandQueue:feeds:targetOperations:resultsDictionary:")]
+    public void RunWithMTLCommandQueueFeedsTargetOperationsResultsDictionary(MTLCommandQueue commandQueue, MPSGraphTensorDataDictionary feeds, NSArray? targetOperations, MPSGraphTensorDataDictionary resultsDictionary);
+    [Selector("runAsyncWithFeeds:targetTensors:targetOperations:executionDescriptor:")]
+    public MPSGraphTensorDataDictionary RunAsyncWithFeedsTargetTensorsTargetOperationsExecutionDescriptor(MPSGraphTensorDataDictionary feeds, NSArray targetTensors, NSArray? targetOperations, MPSGraphExecutionDescriptor? executionDescriptor);
+    [Selector("runAsyncWithMTLCommandQueue:feeds:targetTensors:targetOperations:executionDescriptor:")]
+    public MPSGraphTensorDataDictionary RunAsyncWithMTLCommandQueueFeedsTargetTensorsTargetOperationsExecutionDescriptor(MTLCommandQueue commandQueue, MPSGraphTensorDataDictionary feeds, NSArray targetTensors, NSArray? targetOperations, MPSGraphExecutionDescriptor? executionDescriptor);
+    [Selector("runAsyncWithMTLCommandQueue:feeds:targetOperations:resultsDictionary:executionDescriptor:")]
+    public void RunAsyncWithMTLCommandQueueFeedsTargetOperationsResultsDictionaryExecutionDescriptor(MTLCommandQueue commandQueue, MPSGraphTensorDataDictionary feeds, NSArray? targetOperations, MPSGraphTensorDataDictionary resultsDictionary, MPSGraphExecutionDescriptor? executionDescriptor);
+    [Selector("encodeToCommandBuffer:feeds:targetTensors:targetOperations:executionDescriptor:")]
+    public MPSGraphTensorDataDictionary EncodeToCommandBufferFeedsTargetTensorsTargetOperationsExecutionDescriptor(MPSCommandBuffer commandBuffer, MPSGraphTensorDataDictionary feeds, NSArray targetTensors, NSArray? targetOperations, MPSGraphExecutionDescriptor? executionDescriptor);
+    [Selector("encodeToCommandBuffer:feeds:targetOperations:resultsDictionary:executionDescriptor:")]
+    public void EncodeToCommandBufferFeedsTargetOperationsResultsDictionaryExecutionDescriptor(MPSCommandBuffer commandBuffer, MPSGraphTensorDataDictionary feeds, NSArray? targetOperations, MPSGraphTensorDataDictionary resultsDictionary, MPSGraphExecutionDescriptor? executionDescriptor);
 }
 
 #endif

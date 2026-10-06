@@ -84,68 +84,124 @@ public objc closure void ICCameraDeviceRequestSendPTPCommandOutDataCompletionCom
 
 public extern objc class ICCameraDevice : ICDevice
 {
-    [Selector("contentCatalogPercentCompleted")] public NSUInteger ContentCatalogPercentCompleted { get; }
-    [Selector("contents")] public NSArray? Contents { get; }
-    [Selector("mediaFiles")] public NSArray? MediaFiles { get; }
-    [Selector("isEjectable")] public bool Ejectable { get; }
-    [Selector("isLocked")] public bool Locked { get; }
-    [Selector("isAccessRestrictedAppleDevice")] public bool AccessRestrictedAppleDevice { get; }
-    [Selector("iCloudPhotosEnabled")] public bool ICloudPhotosEnabled { get; }
-    [Selector("mountPoint")] public NSString? MountPoint { get; }
-    [Selector("mediaPresentation", "setMediaPresentation:")] public ICMediaPresentation MediaPresentation { get; set; }
-    [Selector("timeOffset")] public NSTimeInterval TimeOffset { get; }
-    [Selector("batteryLevelAvailable")] public bool BatteryLevelAvailable { get; }
-    [Selector("batteryLevel")] public NSUInteger BatteryLevel { get; }
-    [Selector("tetheredCaptureEnabled")] public bool TetheredCaptureEnabled { get; }
-    [Selector("ptpEventHandler", "setPtpEventHandler:")] public ICCameraDevicePtpEventHandlerBlock PtpEventHandler { get; set; }
-    [Selector("filesOfType:")] public NSArray? FilesOfType(NSString fileUTType);
-    [Selector("requestReadDataFromFile:atOffset:length:readDelegate:didReadDataSelector:contextInfo:")] public void RequestReadDataFromFileAtOffsetLengthReadDelegateDidReadDataSelectorContextInfo(ICCameraFile file, off_t offset, off_t length, AnyObject readDelegate, Selector selector, void* contextInfo);
-    [Selector("requestDownloadFile:options:downloadDelegate:didDownloadSelector:contextInfo:")] public void RequestDownloadFileOptionsDownloadDelegateDidDownloadSelectorContextInfo(ICCameraFile file, NSDictionary options, ICCameraDeviceDownloadDelegate downloadDelegate, Selector selector, void* contextInfo);
-    [Selector("cancelDownload")] public void CancelDownload();
-    [Selector("requestDeleteFiles:")] public void RequestDeleteFiles(NSArray files);
-    [Selector("requestDeleteFiles:deleteFailed:completion:")] public NSProgress? RequestDeleteFilesDeleteFailedCompletion(NSArray files, ICCameraDeviceRequestDeleteFilesDeleteFailedCompletionDeleteFailedBlock deleteFailed, ICCameraDeviceRequestDeleteFilesDeleteFailedCompletionCompletionBlock completion);
-    [Selector("cancelDelete")] public void CancelDelete();
-    [Selector("requestSyncClock")] public void RequestSyncClock();
+    [Selector("contentCatalogPercentCompleted")]
+    public NSUInteger ContentCatalogPercentCompleted { get; }
+    [Selector("contents")]
+    public NSArray? Contents { get; }
+    [Selector("mediaFiles")]
+    public NSArray? MediaFiles { get; }
+    [Selector("isEjectable")]
+    public bool Ejectable { get; }
+    [Selector("isLocked")]
+    public bool Locked { get; }
+    [Selector("isAccessRestrictedAppleDevice")]
+    public bool AccessRestrictedAppleDevice { get; }
+    [Selector("iCloudPhotosEnabled")]
+    public bool ICloudPhotosEnabled { get; }
+    [Selector("mountPoint")]
+    public NSString? MountPoint { get; }
+    [Selector("mediaPresentation", "setMediaPresentation:")]
+    public ICMediaPresentation MediaPresentation { get; set; }
+    [Selector("timeOffset")]
+    public NSTimeInterval TimeOffset { get; }
+    [Selector("batteryLevelAvailable")]
+    public bool BatteryLevelAvailable { get; }
+    [Selector("batteryLevel")]
+    public NSUInteger BatteryLevel { get; }
+    [Selector("tetheredCaptureEnabled")]
+    public bool TetheredCaptureEnabled { get; }
+    [Selector("ptpEventHandler", "setPtpEventHandler:")]
+    public ICCameraDevicePtpEventHandlerBlock PtpEventHandler { get; set; }
+    [Selector("filesOfType:")]
+    public NSArray? FilesOfType(NSString fileUTType);
+    [Selector("requestReadDataFromFile:atOffset:length:readDelegate:didReadDataSelector:contextInfo:")]
+    public void RequestReadDataFromFileAtOffsetLengthReadDelegateDidReadDataSelectorContextInfo(ICCameraFile file, off_t offset, off_t length, AnyObject readDelegate, Selector selector, void* contextInfo);
+    [Selector("requestDownloadFile:options:downloadDelegate:didDownloadSelector:contextInfo:")]
+    public void RequestDownloadFileOptionsDownloadDelegateDidDownloadSelectorContextInfo(ICCameraFile file, NSDictionary options, ICCameraDeviceDownloadDelegate downloadDelegate, Selector selector, void* contextInfo);
+    [Selector("cancelDownload")]
+    public void CancelDownload();
+    [Selector("requestDeleteFiles:")]
+    public void RequestDeleteFiles(NSArray files);
+    [Selector("requestDeleteFiles:deleteFailed:completion:")]
+    public NSProgress? RequestDeleteFilesDeleteFailedCompletion(NSArray files, ICCameraDeviceRequestDeleteFilesDeleteFailedCompletionDeleteFailedBlock deleteFailed, ICCameraDeviceRequestDeleteFilesDeleteFailedCompletionCompletionBlock completion);
+    [Selector("cancelDelete")]
+    public void CancelDelete();
+    [Selector("requestSyncClock")]
+    public void RequestSyncClock();
     /// Deprecated in macOS 14.0.
-    [Selector("requestUploadFile:options:uploadDelegate:didUploadSelector:contextInfo:")] public void RequestUploadFileOptionsUploadDelegateDidUploadSelectorContextInfo(NSURL fileURL, NSDictionary options, AnyObject uploadDelegate, Selector selector, void* contextInfo);
-    [Selector("requestTakePicture")] public void RequestTakePicture();
+    [Selector("requestUploadFile:options:uploadDelegate:didUploadSelector:contextInfo:")]
+    public void RequestUploadFileOptionsUploadDelegateDidUploadSelectorContextInfo(NSURL fileURL, NSDictionary options, AnyObject uploadDelegate, Selector selector, void* contextInfo);
+    [Selector("requestTakePicture")]
+    public void RequestTakePicture();
     /// Deprecated in macOS 14.0.
-    [Selector("requestEnableTethering")] public void RequestEnableTethering();
+    [Selector("requestEnableTethering")]
+    public void RequestEnableTethering();
     /// Deprecated in macOS 14.0.
-    [Selector("requestDisableTethering")] public void RequestDisableTethering();
-    [Selector("requestSendPTPCommand:outData:sendCommandDelegate:didSendCommandSelector:contextInfo:")] public void RequestSendPTPCommandOutDataSendCommandDelegateDidSendCommandSelectorContextInfo(NSData command, NSData? data, AnyObject sendCommandDelegate, Selector selector, void* contextInfo);
-    [Selector("requestSendPTPCommand:outData:completion:")] public void RequestSendPTPCommandOutDataCompletion(NSData ptpCommand, NSData? ptpData, ICCameraDeviceRequestSendPTPCommandOutDataCompletionCompletionBlock completion);
+    [Selector("requestDisableTethering")]
+    public void RequestDisableTethering();
+    [Selector("requestSendPTPCommand:outData:sendCommandDelegate:didSendCommandSelector:contextInfo:")]
+    public void RequestSendPTPCommandOutDataSendCommandDelegateDidSendCommandSelectorContextInfo(NSData command, NSData? data, AnyObject sendCommandDelegate, Selector selector, void* contextInfo);
+    [Selector("requestSendPTPCommand:outData:completion:")]
+    public void RequestSendPTPCommandOutDataCompletion(NSData ptpCommand, NSData? ptpData, ICCameraDeviceRequestSendPTPCommandOutDataCompletionCompletionBlock completion);
 }
 
 public objc interface ICCameraDeviceDelegate : ICDeviceDelegate
 {
-    [Selector("cameraDevice:didAddItems:")] void CameraDeviceDidAddItems(ICCameraDevice camera, NSArray items);
-    [Selector("cameraDevice:didRemoveItems:")] void CameraDeviceDidRemoveItems(ICCameraDevice camera, NSArray items);
-    [Selector("cameraDevice:didReceiveThumbnail:forItem:error:")] void CameraDeviceDidReceiveThumbnailForItemError(ICCameraDevice camera, CGImageRef? thumbnail, ICCameraItem item, NSError? error);
-    [Selector("cameraDevice:didReceiveMetadata:forItem:error:")] void CameraDeviceDidReceiveMetadataForItemError(ICCameraDevice camera, NSDictionary? metadata, ICCameraItem item, NSError? error);
-    [Selector("cameraDevice:didRenameItems:")] void CameraDeviceDidRenameItems(ICCameraDevice camera, NSArray items);
-    [Selector("cameraDeviceDidChangeCapability:")] void CameraDeviceDidChangeCapability(ICCameraDevice camera);
-    [Selector("cameraDevice:didReceivePTPEvent:")] void CameraDeviceDidReceivePTPEvent(ICCameraDevice camera, NSData eventData);
-    [Selector("deviceDidBecomeReadyWithCompleteContentCatalog:")] void DeviceDidBecomeReadyWithCompleteContentCatalog(ICCameraDevice device);
-    [Selector("cameraDeviceDidRemoveAccessRestriction:")] void CameraDeviceDidRemoveAccessRestriction(ICDevice device);
-    [Selector("cameraDeviceDidEnableAccessRestriction:")] void CameraDeviceDidEnableAccessRestriction(ICDevice device);
-    [Optional] [Selector("cameraDevice:shouldGetThumbnailOfItem:")] bool CameraDeviceShouldGetThumbnailOfItem(ICCameraDevice cameraDevice, ICCameraItem item);
-    [Optional] [Selector("cameraDevice:shouldGetMetadataOfItem:")] bool CameraDeviceShouldGetMetadataOfItem(ICCameraDevice cameraDevice, ICCameraItem item);
-    [Optional] [Selector("cameraDevice:didCompleteDeleteFilesWithError:")] void CameraDeviceDidCompleteDeleteFilesWithError(ICCameraDevice camera, NSError? error);
+    [Selector("cameraDevice:didAddItems:")]
+    void CameraDeviceDidAddItems(ICCameraDevice camera, NSArray items);
+    [Selector("cameraDevice:didRemoveItems:")]
+    void CameraDeviceDidRemoveItems(ICCameraDevice camera, NSArray items);
+    [Selector("cameraDevice:didReceiveThumbnail:forItem:error:")]
+    void CameraDeviceDidReceiveThumbnailForItemError(ICCameraDevice camera, CGImageRef? thumbnail, ICCameraItem item, NSError? error);
+    [Selector("cameraDevice:didReceiveMetadata:forItem:error:")]
+    void CameraDeviceDidReceiveMetadataForItemError(ICCameraDevice camera, NSDictionary? metadata, ICCameraItem item, NSError? error);
+    [Selector("cameraDevice:didRenameItems:")]
+    void CameraDeviceDidRenameItems(ICCameraDevice camera, NSArray items);
+    [Selector("cameraDeviceDidChangeCapability:")]
+    void CameraDeviceDidChangeCapability(ICCameraDevice camera);
+    [Selector("cameraDevice:didReceivePTPEvent:")]
+    void CameraDeviceDidReceivePTPEvent(ICCameraDevice camera, NSData eventData);
+    [Selector("deviceDidBecomeReadyWithCompleteContentCatalog:")]
+    void DeviceDidBecomeReadyWithCompleteContentCatalog(ICCameraDevice device);
+    [Selector("cameraDeviceDidRemoveAccessRestriction:")]
+    void CameraDeviceDidRemoveAccessRestriction(ICDevice device);
+    [Selector("cameraDeviceDidEnableAccessRestriction:")]
+    void CameraDeviceDidEnableAccessRestriction(ICDevice device);
+    [Optional]
+    [Selector("cameraDevice:shouldGetThumbnailOfItem:")]
+    bool CameraDeviceShouldGetThumbnailOfItem(ICCameraDevice cameraDevice, ICCameraItem item);
+    [Optional]
+    [Selector("cameraDevice:shouldGetMetadataOfItem:")]
+    bool CameraDeviceShouldGetMetadataOfItem(ICCameraDevice cameraDevice, ICCameraItem item);
+    [Optional]
+    [Selector("cameraDevice:didCompleteDeleteFilesWithError:")]
+    void CameraDeviceDidCompleteDeleteFilesWithError(ICCameraDevice camera, NSError? error);
     /// Deprecated in macOS 10.15.
-    [Optional] [Selector("cameraDevice:didAddItem:")] void CameraDeviceDidAddItem(ICCameraDevice camera, ICCameraItem item);
+    [Optional]
+    [Selector("cameraDevice:didAddItem:")]
+    void CameraDeviceDidAddItem(ICCameraDevice camera, ICCameraItem item);
     /// Deprecated in macOS 10.15.
-    [Optional] [Selector("cameraDevice:didRemoveItem:")] void CameraDeviceDidRemoveItem(ICCameraDevice camera, ICCameraItem item);
+    [Optional]
+    [Selector("cameraDevice:didRemoveItem:")]
+    void CameraDeviceDidRemoveItem(ICCameraDevice camera, ICCameraItem item);
     /// Deprecated in macOS 10.15.
-    [Optional] [Selector("cameraDevice:didReceiveThumbnailForItem:")] void CameraDeviceDidReceiveThumbnailForItem(ICCameraDevice camera, ICCameraItem item);
+    [Optional]
+    [Selector("cameraDevice:didReceiveThumbnailForItem:")]
+    void CameraDeviceDidReceiveThumbnailForItem(ICCameraDevice camera, ICCameraItem item);
     /// Deprecated in macOS 10.15.
-    [Optional] [Selector("cameraDevice:didReceiveMetadataForItem:")] void CameraDeviceDidReceiveMetadataForItem(ICCameraDevice camera, ICCameraItem item);
+    [Optional]
+    [Selector("cameraDevice:didReceiveMetadataForItem:")]
+    void CameraDeviceDidReceiveMetadataForItem(ICCameraDevice camera, ICCameraItem item);
 }
 
 public objc interface ICCameraDeviceDownloadDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("didDownloadFile:error:options:contextInfo:")] void DidDownloadFileErrorOptionsContextInfo(ICCameraFile file, NSError? error, NSDictionary options, void* contextInfo);
-    [Optional] [Selector("didReceiveDownloadProgressForFile:downloadedBytes:maxBytes:")] void DidReceiveDownloadProgressForFileDownloadedBytesMaxBytes(ICCameraFile file, off_t downloadedBytes, off_t maxBytes);
+    [Optional]
+    [Selector("didDownloadFile:error:options:contextInfo:")]
+    void DidDownloadFileErrorOptionsContextInfo(ICCameraFile file, NSError? error, NSDictionary options, void* contextInfo);
+    [Optional]
+    [Selector("didReceiveDownloadProgressForFile:downloadedBytes:maxBytes:")]
+    void DidReceiveDownloadProgressForFileDownloadedBytesMaxBytes(ICCameraFile file, off_t downloadedBytes, off_t maxBytes);
 }
 
 #endif

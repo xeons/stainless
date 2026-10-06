@@ -104,14 +104,17 @@ public struct CVFillExtendedPixelsCallBackData
 
 public extern "C" CFStringRef? kCVPixelFormatFillExtendedPixelsCallback;
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CVPixelFormatDescriptionCreateWithPixelFormatType(CFAllocatorRef? allocator, OSType pixelFormat);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CVPixelFormatDescriptionCreateWithPixelFormatType(CFAllocatorRef? allocator, OSType pixelFormat);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CVPixelFormatDescriptionArrayCreateWithAllPixelFormatTypes(CFAllocatorRef? allocator);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CVPixelFormatDescriptionArrayCreateWithAllPixelFormatTypes(CFAllocatorRef? allocator);
 
 public extern "C" void CVPixelFormatDescriptionRegisterDescriptionWithPixelFormatType(CFDictionaryRef description, OSType pixelFormat);
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CFStringRef CVPixelFormatTypeCopyFourCharCodeString(OSType pixelFormat);
+[ReturnsRetained]
+public extern "C" CFStringRef CVPixelFormatTypeCopyFourCharCodeString(OSType pixelFormat);
 
 public extern "C" Boolean CVIsCompressedPixelFormatAvailable(OSType pixelFormatType);
 

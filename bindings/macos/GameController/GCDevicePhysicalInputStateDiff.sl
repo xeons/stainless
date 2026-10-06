@@ -40,8 +40,10 @@ public enum GCDevicePhysicalInputElementChange : long
 
 public objc interface GCDevicePhysicalInputStateDiff : NSObjectProtocol
 {
-    [Selector("changeForElement:")] GCDevicePhysicalInputElementChange ChangeForElement(GCPhysicalInputElement element);
-    [Selector("changedElements")] NSEnumerator? ChangedElements();
+    [Selector("changeForElement:")]
+    GCDevicePhysicalInputElementChange ChangeForElement(GCPhysicalInputElement element);
+    [Selector("changedElements")]
+    NSEnumerator? ChangedElements();
 }
 
 #endif

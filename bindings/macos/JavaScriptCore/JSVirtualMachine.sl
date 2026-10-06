@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class JSVirtualMachine : NSObject
 {
-    [Selector("init")] public Self? Init();
-    [Selector("addManagedReference:withOwner:")] public void AddManagedReferenceWithOwner(AnyObject? object, AnyObject? owner);
-    [Selector("removeManagedReference:withOwner:")] public void RemoveManagedReferenceWithOwner(AnyObject? object, AnyObject? owner);
+    [Selector("init")]
+    public Self? Init();
+    [Selector("addManagedReference:withOwner:")]
+    public void AddManagedReferenceWithOwner(AnyObject? object, AnyObject? owner);
+    [Selector("removeManagedReference:withOwner:")]
+    public void RemoveManagedReferenceWithOwner(AnyObject? object, AnyObject? owner);
 }
 
 #endif

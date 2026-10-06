@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class NEFilterSettings : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("rules")] public NSArray? Rules { get; }
-    [Selector("defaultAction")] public NEFilterAction DefaultAction { get; }
-    [Selector("initWithRules:defaultAction:")] public Self InitWithRulesDefaultAction(NSArray rules, NEFilterAction defaultAction);
+    [Selector("rules")]
+    public NSArray? Rules { get; }
+    [Selector("defaultAction")]
+    public NEFilterAction DefaultAction { get; }
+    [Selector("initWithRules:defaultAction:")]
+    public Self InitWithRulesDefaultAction(NSArray rules, NEFilterAction defaultAction);
 }
 
 #endif

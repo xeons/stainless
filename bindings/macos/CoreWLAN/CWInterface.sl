@@ -35,47 +35,83 @@ import Standard.ObjC;
 
 public extern objc class CWInterface : NSObject
 {
-    [Selector("interfaceName")] public NSString? InterfaceName { get; }
-    [Selector("powerOn")] public bool PowerOn();
-    [Selector("supportedWLANChannels")] public NSSet? SupportedWLANChannels();
-    [Selector("wlanChannel")] public CWChannel? WlanChannel();
-    [Selector("activePHYMode")] public CWPHYMode ActivePHYMode();
-    [Selector("ssid")] public NSString? Ssid();
-    [Selector("ssidData")] public NSData? SsidData();
-    [Selector("bssid")] public NSString? Bssid();
-    [Selector("rssiValue")] public NSInteger RssiValue();
-    [Selector("noiseMeasurement")] public NSInteger NoiseMeasurement();
-    [Selector("security")] public CWSecurity Security();
-    [Selector("transmitRate")] public double TransmitRate();
-    [Selector("countryCode")] public NSString? CountryCode();
-    [Selector("interfaceMode")] public CWInterfaceMode InterfaceMode();
-    [Selector("transmitPower")] public NSInteger TransmitPower();
-    [Selector("hardwareAddress")] public NSString? HardwareAddress();
-    [Selector("serviceActive")] public bool ServiceActive();
-    [Selector("cachedScanResults")] public NSSet? CachedScanResults();
-    [Selector("configuration")] public CWConfiguration? Configuration();
+    [Selector("interfaceName")]
+    public NSString? InterfaceName { get; }
+    [Selector("powerOn")]
+    public bool PowerOn();
+    [Selector("supportedWLANChannels")]
+    public NSSet? SupportedWLANChannels();
+    [Selector("wlanChannel")]
+    public CWChannel? WlanChannel();
+    [Selector("activePHYMode")]
+    public CWPHYMode ActivePHYMode();
+    [Selector("ssid")]
+    public NSString? Ssid();
+    [Selector("ssidData")]
+    public NSData? SsidData();
+    [Selector("bssid")]
+    public NSString? Bssid();
+    [Selector("rssiValue")]
+    public NSInteger RssiValue();
+    [Selector("noiseMeasurement")]
+    public NSInteger NoiseMeasurement();
+    [Selector("security")]
+    public CWSecurity Security();
+    [Selector("transmitRate")]
+    public double TransmitRate();
+    [Selector("countryCode")]
+    public NSString? CountryCode();
+    [Selector("interfaceMode")]
+    public CWInterfaceMode InterfaceMode();
+    [Selector("transmitPower")]
+    public NSInteger TransmitPower();
+    [Selector("hardwareAddress")]
+    public NSString? HardwareAddress();
+    [Selector("serviceActive")]
+    public bool ServiceActive();
+    [Selector("cachedScanResults")]
+    public NSSet? CachedScanResults();
+    [Selector("configuration")]
+    public CWConfiguration? Configuration();
     /// Deprecated in macOS 10.10.
-    [Selector("interfaceNames")] public static NSSet? InterfaceNames();
+    [Selector("interfaceNames")]
+    public static NSSet? InterfaceNames();
     /// Deprecated in macOS 10.10.
-    [Selector("interface")] public static Self Interface();
+    [Selector("interface")]
+    public static Self Interface();
     /// Deprecated in macOS 10.10.
-    [Selector("interfaceWithName:")] public static Self InterfaceWithName(NSString? name);
+    [Selector("interfaceWithName:")]
+    public static Self InterfaceWithName(NSString? name);
     /// Deprecated in macOS 10.10.
-    [Selector("initWithInterfaceName:")] public Self InitWithInterfaceName(NSString? name);
-    [Selector("setPower:error:")] public bool SetPowerError(bool power, out NSError? error);
-    [Selector("setWLANChannel:error:")] public bool SetWLANChannelError(CWChannel channel, out NSError? error);
-    [Selector("setPairwiseMasterKey:error:")] public bool SetPairwiseMasterKeyError(NSData? key, out NSError? error);
-    [Selector("setWEPKey:flags:index:error:")] public bool SetWEPKeyFlagsIndexError(NSData? key, CWCipherKeyFlags flags, NSInteger index, out NSError? error);
-    [Selector("scanForNetworksWithSSID:error:")] public NSSet? ScanForNetworksWithSSIDError(NSData? ssid, out NSError? error);
-    [Selector("scanForNetworksWithSSID:includeHidden:error:")] public NSSet? ScanForNetworksWithSSIDIncludeHiddenError(NSData? ssid, bool includeHidden, out NSError? error);
-    [Selector("scanForNetworksWithName:error:")] public NSSet? ScanForNetworksWithNameError(NSString? networkName, out NSError? error);
-    [Selector("scanForNetworksWithName:includeHidden:error:")] public NSSet? ScanForNetworksWithNameIncludeHiddenError(NSString? networkName, bool includeHidden, out NSError? error);
-    [Selector("associateToNetwork:password:error:")] public bool AssociateToNetworkPasswordError(CWNetwork network, NSString? password, out NSError? error);
-    [Selector("disassociate")] public void Disassociate();
-    [Selector("associateToEnterpriseNetwork:identity:username:password:error:")] public bool AssociateToEnterpriseNetworkIdentityUsernamePasswordError(CWNetwork network, SecIdentityRef? identity, NSString? username, NSString? password, out NSError? error);
+    [Selector("initWithInterfaceName:")]
+    public Self InitWithInterfaceName(NSString? name);
+    [Selector("setPower:error:")]
+    public bool SetPowerError(bool power, out NSError? error);
+    [Selector("setWLANChannel:error:")]
+    public bool SetWLANChannelError(CWChannel channel, out NSError? error);
+    [Selector("setPairwiseMasterKey:error:")]
+    public bool SetPairwiseMasterKeyError(NSData? key, out NSError? error);
+    [Selector("setWEPKey:flags:index:error:")]
+    public bool SetWEPKeyFlagsIndexError(NSData? key, CWCipherKeyFlags flags, NSInteger index, out NSError? error);
+    [Selector("scanForNetworksWithSSID:error:")]
+    public NSSet? ScanForNetworksWithSSIDError(NSData? ssid, out NSError? error);
+    [Selector("scanForNetworksWithSSID:includeHidden:error:")]
+    public NSSet? ScanForNetworksWithSSIDIncludeHiddenError(NSData? ssid, bool includeHidden, out NSError? error);
+    [Selector("scanForNetworksWithName:error:")]
+    public NSSet? ScanForNetworksWithNameError(NSString? networkName, out NSError? error);
+    [Selector("scanForNetworksWithName:includeHidden:error:")]
+    public NSSet? ScanForNetworksWithNameIncludeHiddenError(NSString? networkName, bool includeHidden, out NSError? error);
+    [Selector("associateToNetwork:password:error:")]
+    public bool AssociateToNetworkPasswordError(CWNetwork network, NSString? password, out NSError? error);
+    [Selector("disassociate")]
+    public void Disassociate();
+    [Selector("associateToEnterpriseNetwork:identity:username:password:error:")]
+    public bool AssociateToEnterpriseNetworkIdentityUsernamePasswordError(CWNetwork network, SecIdentityRef? identity, NSString? username, NSString? password, out NSError? error);
     /// Deprecated in macOS 11.0.
-    [Selector("startIBSSModeWithSSID:security:channel:password:error:")] public bool StartIBSSModeWithSSIDSecurityChannelPasswordError(NSData ssidData, CWIBSSModeSecurity security, NSUInteger channel, NSString? password, out NSError? error);
-    [Selector("commitConfiguration:authorization:error:")] public bool CommitConfigurationAuthorizationError(CWConfiguration configuration, SFAuthorization? authorization, out NSError? error);
+    [Selector("startIBSSModeWithSSID:security:channel:password:error:")]
+    public bool StartIBSSModeWithSSIDSecurityChannelPasswordError(NSData ssidData, CWIBSSModeSecurity security, NSUInteger channel, NSString? password, out NSError? error);
+    [Selector("commitConfiguration:authorization:error:")]
+    public bool CommitConfigurationAuthorizationError(CWConfiguration configuration, SFAuthorization? authorization, out NSError? error);
 }
 
 #endif

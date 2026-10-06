@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class VZEFIBootLoader : VZBootLoader
 {
-    [Selector("variableStore", "setVariableStore:")] public VZEFIVariableStore? VariableStore { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("variableStore", "setVariableStore:")]
+    public VZEFIVariableStore? VariableStore { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

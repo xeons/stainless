@@ -35,62 +35,95 @@ import Standard.ObjC;
 public extern objc class SKPaymentQueue : NSObject
 {
     /// Deprecated in macOS 15.0.
-    [Selector("delegate", "setDelegate:")] public SKPaymentQueueDelegate? Delegate { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public SKPaymentQueueDelegate? Delegate { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("storefront")] public SKStorefront? Storefront { get; }
+    [Selector("storefront")]
+    public SKStorefront? Storefront { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("transactionObservers")] public NSArray TransactionObservers { get; }
+    [Selector("transactionObservers")]
+    public NSArray TransactionObservers { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("transactions")] public NSArray Transactions { get; }
-    [Selector("defaultQueue")] public static Self DefaultQueue();
+    [Selector("transactions")]
+    public NSArray Transactions { get; }
+    [Selector("defaultQueue")]
+    public static Self DefaultQueue();
     /// Deprecated in macOS 15.0.
-    [Selector("canMakePayments")] public static bool CanMakePayments();
+    [Selector("canMakePayments")]
+    public static bool CanMakePayments();
     /// Deprecated in macOS 15.0.
-    [Selector("addPayment:")] public void AddPayment(SKPayment payment);
+    [Selector("addPayment:")]
+    public void AddPayment(SKPayment payment);
     /// Deprecated in macOS 15.0.
-    [Selector("restoreCompletedTransactions")] public void RestoreCompletedTransactions();
+    [Selector("restoreCompletedTransactions")]
+    public void RestoreCompletedTransactions();
     /// Deprecated in macOS 15.0.
-    [Selector("restoreCompletedTransactionsWithApplicationUsername:")] public void RestoreCompletedTransactionsWithApplicationUsername(NSString? username);
+    [Selector("restoreCompletedTransactionsWithApplicationUsername:")]
+    public void RestoreCompletedTransactionsWithApplicationUsername(NSString? username);
     /// Deprecated in macOS 15.0.
-    [Selector("finishTransaction:")] public void FinishTransaction(SKPaymentTransaction transaction);
+    [Selector("finishTransaction:")]
+    public void FinishTransaction(SKPaymentTransaction transaction);
     /// Deprecated in macOS 13.0.
-    [Selector("startDownloads:")] public void StartDownloads(NSArray downloads);
+    [Selector("startDownloads:")]
+    public void StartDownloads(NSArray downloads);
     /// Deprecated in macOS 13.0.
-    [Selector("pauseDownloads:")] public void PauseDownloads(NSArray downloads);
+    [Selector("pauseDownloads:")]
+    public void PauseDownloads(NSArray downloads);
     /// Deprecated in macOS 13.0.
-    [Selector("resumeDownloads:")] public void ResumeDownloads(NSArray downloads);
+    [Selector("resumeDownloads:")]
+    public void ResumeDownloads(NSArray downloads);
     /// Deprecated in macOS 13.0.
-    [Selector("cancelDownloads:")] public void CancelDownloads(NSArray downloads);
+    [Selector("cancelDownloads:")]
+    public void CancelDownloads(NSArray downloads);
     /// Deprecated in macOS 15.0.
-    [Selector("addTransactionObserver:")] public void AddTransactionObserver(SKPaymentTransactionObserver observer);
+    [Selector("addTransactionObserver:")]
+    public void AddTransactionObserver(SKPaymentTransactionObserver observer);
     /// Deprecated in macOS 15.0.
-    [Selector("removeTransactionObserver:")] public void RemoveTransactionObserver(SKPaymentTransactionObserver observer);
+    [Selector("removeTransactionObserver:")]
+    public void RemoveTransactionObserver(SKPaymentTransactionObserver observer);
 }
 
 /// Deprecated in macOS 15.0.
 public objc interface SKPaymentQueueDelegate : NSObjectProtocol
 {
     /// Deprecated in macOS 15.0.
-    [Optional] [Selector("paymentQueue:shouldContinueTransaction:inStorefront:")] bool PaymentQueueShouldContinueTransactionInStorefront(SKPaymentQueue paymentQueue, SKPaymentTransaction transaction, SKStorefront newStorefront);
+    [Optional]
+    [Selector("paymentQueue:shouldContinueTransaction:inStorefront:")]
+    bool PaymentQueueShouldContinueTransactionInStorefront(SKPaymentQueue paymentQueue, SKPaymentTransaction transaction, SKStorefront newStorefront);
 }
 
 /// Deprecated in macOS 15.0.
 public objc interface SKPaymentTransactionObserver : NSObjectProtocol
 {
-    [Selector("paymentQueue:updatedTransactions:")] void PaymentQueueUpdatedTransactions(SKPaymentQueue queue, NSArray transactions);
-    [Optional] [Selector("paymentQueue:removedTransactions:")] void PaymentQueueRemovedTransactions(SKPaymentQueue queue, NSArray transactions);
+    [Selector("paymentQueue:updatedTransactions:")]
+    void PaymentQueueUpdatedTransactions(SKPaymentQueue queue, NSArray transactions);
+    [Optional]
+    [Selector("paymentQueue:removedTransactions:")]
+    void PaymentQueueRemovedTransactions(SKPaymentQueue queue, NSArray transactions);
     /// Deprecated in macOS 15.0.
-    [Optional] [Selector("paymentQueue:restoreCompletedTransactionsFailedWithError:")] void PaymentQueueRestoreCompletedTransactionsFailedWithError(SKPaymentQueue queue, NSError error);
+    [Optional]
+    [Selector("paymentQueue:restoreCompletedTransactionsFailedWithError:")]
+    void PaymentQueueRestoreCompletedTransactionsFailedWithError(SKPaymentQueue queue, NSError error);
     /// Deprecated in macOS 15.0.
-    [Optional] [Selector("paymentQueueRestoreCompletedTransactionsFinished:")] void PaymentQueueRestoreCompletedTransactionsFinished(SKPaymentQueue queue);
+    [Optional]
+    [Selector("paymentQueueRestoreCompletedTransactionsFinished:")]
+    void PaymentQueueRestoreCompletedTransactionsFinished(SKPaymentQueue queue);
     /// Deprecated in macOS 13.0.
-    [Optional] [Selector("paymentQueue:updatedDownloads:")] void PaymentQueueUpdatedDownloads(SKPaymentQueue queue, NSArray downloads);
+    [Optional]
+    [Selector("paymentQueue:updatedDownloads:")]
+    void PaymentQueueUpdatedDownloads(SKPaymentQueue queue, NSArray downloads);
     /// Deprecated in macOS 15.0.
-    [Optional] [Selector("paymentQueue:shouldAddStorePayment:forProduct:")] bool PaymentQueueShouldAddStorePaymentForProduct(SKPaymentQueue queue, SKPayment payment, SKProduct product);
+    [Optional]
+    [Selector("paymentQueue:shouldAddStorePayment:forProduct:")]
+    bool PaymentQueueShouldAddStorePaymentForProduct(SKPaymentQueue queue, SKPayment payment, SKProduct product);
     /// Deprecated in macOS 15.0.
-    [Optional] [Selector("paymentQueueDidChangeStorefront:")] void PaymentQueueDidChangeStorefront(SKPaymentQueue queue);
+    [Optional]
+    [Selector("paymentQueueDidChangeStorefront:")]
+    void PaymentQueueDidChangeStorefront(SKPaymentQueue queue);
     /// Deprecated in macOS 15.0.
-    [Optional] [Selector("paymentQueue:didRevokeEntitlementsForProductIdentifiers:")] void PaymentQueueDidRevokeEntitlementsForProductIdentifiers(SKPaymentQueue queue, NSArray productIdentifiers);
+    [Optional]
+    [Selector("paymentQueue:didRevokeEntitlementsForProductIdentifiers:")]
+    void PaymentQueueDidRevokeEntitlementsForProductIdentifiers(SKPaymentQueue queue, NSArray productIdentifiers);
 }
 
 #endif

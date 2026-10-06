@@ -33,30 +33,53 @@ import Standard.ObjC;
 
 public extern objc class NSEntityDescription : NSObject, NSCoding, NSCopying, NSFastEnumeration
 {
-    [Selector("managedObjectModel")] public NSManagedObjectModel ManagedObjectModel { get; }
-    [Selector("managedObjectClassName", "setManagedObjectClassName:")] public NSString? ManagedObjectClassName { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("isAbstract", "setAbstract:")] public bool Abstract { get; set; }
-    [Selector("subentitiesByName")] public NSDictionary SubentitiesByName { get; }
-    [Selector("subentities", "setSubentities:")] public NSArray Subentities { get; set; }
-    [Selector("superentity")] public NSEntityDescription? Superentity { get; }
-    [Selector("propertiesByName")] public NSDictionary PropertiesByName { get; }
-    [Selector("properties", "setProperties:")] public NSArray Properties { get; set; }
-    [Selector("userInfo", "setUserInfo:")] public NSDictionary? UserInfo { get; set; }
-    [Selector("attributesByName")] public NSDictionary AttributesByName { get; }
-    [Selector("relationshipsByName")] public NSDictionary RelationshipsByName { get; }
-    [Selector("versionHash")] public NSData VersionHash { get; }
-    [Selector("versionHashModifier", "setVersionHashModifier:")] public NSString? VersionHashModifier { get; set; }
-    [Selector("renamingIdentifier", "setRenamingIdentifier:")] public NSString? RenamingIdentifier { get; set; }
-    [Selector("indexes", "setIndexes:")] public NSArray Indexes { get; set; }
-    [Selector("uniquenessConstraints", "setUniquenessConstraints:")] public NSArray UniquenessConstraints { get; set; }
+    [Selector("managedObjectModel")]
+    public NSManagedObjectModel ManagedObjectModel { get; }
+    [Selector("managedObjectClassName", "setManagedObjectClassName:")]
+    public NSString? ManagedObjectClassName { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("isAbstract", "setAbstract:")]
+    public bool Abstract { get; set; }
+    [Selector("subentitiesByName")]
+    public NSDictionary SubentitiesByName { get; }
+    [Selector("subentities", "setSubentities:")]
+    public NSArray Subentities { get; set; }
+    [Selector("superentity")]
+    public NSEntityDescription? Superentity { get; }
+    [Selector("propertiesByName")]
+    public NSDictionary PropertiesByName { get; }
+    [Selector("properties", "setProperties:")]
+    public NSArray Properties { get; set; }
+    [Selector("userInfo", "setUserInfo:")]
+    public NSDictionary? UserInfo { get; set; }
+    [Selector("attributesByName")]
+    public NSDictionary AttributesByName { get; }
+    [Selector("relationshipsByName")]
+    public NSDictionary RelationshipsByName { get; }
+    [Selector("versionHash")]
+    public NSData VersionHash { get; }
+    [Selector("versionHashModifier", "setVersionHashModifier:")]
+    public NSString? VersionHashModifier { get; set; }
+    [Selector("renamingIdentifier", "setRenamingIdentifier:")]
+    public NSString? RenamingIdentifier { get; set; }
+    [Selector("indexes", "setIndexes:")]
+    public NSArray Indexes { get; set; }
+    [Selector("uniquenessConstraints", "setUniquenessConstraints:")]
+    public NSArray UniquenessConstraints { get; set; }
     /// Deprecated in macOS 10.13.
-    [Selector("compoundIndexes", "setCompoundIndexes:")] public NSArray CompoundIndexes { get; set; }
-    [Selector("coreSpotlightDisplayNameExpression", "setCoreSpotlightDisplayNameExpression:")] public NSExpression CoreSpotlightDisplayNameExpression { get; set; }
-    [Selector("entityForName:inManagedObjectContext:")] public static NSEntityDescription? EntityForNameInManagedObjectContext(NSString entityName, NSManagedObjectContext context);
-    [Selector("insertNewObjectForEntityForName:inManagedObjectContext:")] public static NSManagedObject InsertNewObjectForEntityForNameInManagedObjectContext(NSString entityName, NSManagedObjectContext context);
-    [Selector("relationshipsWithDestinationEntity:")] public NSArray RelationshipsWithDestinationEntity(NSEntityDescription entity);
-    [Selector("isKindOfEntity:")] public bool IsKindOfEntity(NSEntityDescription entity);
+    [Selector("compoundIndexes", "setCompoundIndexes:")]
+    public NSArray CompoundIndexes { get; set; }
+    [Selector("coreSpotlightDisplayNameExpression", "setCoreSpotlightDisplayNameExpression:")]
+    public NSExpression CoreSpotlightDisplayNameExpression { get; set; }
+    [Selector("entityForName:inManagedObjectContext:")]
+    public static NSEntityDescription? EntityForNameInManagedObjectContext(NSString entityName, NSManagedObjectContext context);
+    [Selector("insertNewObjectForEntityForName:inManagedObjectContext:")]
+    public static NSManagedObject InsertNewObjectForEntityForNameInManagedObjectContext(NSString entityName, NSManagedObjectContext context);
+    [Selector("relationshipsWithDestinationEntity:")]
+    public NSArray RelationshipsWithDestinationEntity(NSEntityDescription entity);
+    [Selector("isKindOfEntity:")]
+    public bool IsKindOfEntity(NSEntityDescription entity);
 }
 
 #endif

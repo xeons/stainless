@@ -37,16 +37,25 @@ public objc closure void NSAppearancePerformAsCurrentDrawingAppearanceBlock();
 
 public extern objc class NSAppearance : NSObject, NSSecureCoding
 {
-    [Selector("name")] public NSAppearanceName? Name { get; }
+    [Selector("name")]
+    public NSAppearanceName? Name { get; }
     /// Deprecated in macOS 12.0.
-    [Selector("currentAppearance", "setCurrentAppearance:")] public static NSAppearance? CurrentAppearance { get; set; }
-    [Selector("currentDrawingAppearance")] public static NSAppearance? CurrentDrawingAppearance { get; }
-    [Selector("allowsVibrancy")] public bool AllowsVibrancy { get; }
-    [Selector("performAsCurrentDrawingAppearance:")] public void PerformAsCurrentDrawingAppearance(NSAppearancePerformAsCurrentDrawingAppearanceBlock block);
-    [Selector("appearanceNamed:")] public static NSAppearance? AppearanceNamed(NSAppearanceName name);
-    [Selector("initWithAppearanceNamed:bundle:")] public Self? InitWithAppearanceNamedBundle(NSAppearanceName name, NSBundle? bundle);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("bestMatchFromAppearancesWithNames:")] public NSAppearanceName? BestMatchFromAppearancesWithNames(NSArray appearances);
+    [Selector("currentAppearance", "setCurrentAppearance:")]
+    public static NSAppearance? CurrentAppearance { get; set; }
+    [Selector("currentDrawingAppearance")]
+    public static NSAppearance? CurrentDrawingAppearance { get; }
+    [Selector("allowsVibrancy")]
+    public bool AllowsVibrancy { get; }
+    [Selector("performAsCurrentDrawingAppearance:")]
+    public void PerformAsCurrentDrawingAppearance(NSAppearancePerformAsCurrentDrawingAppearanceBlock block);
+    [Selector("appearanceNamed:")]
+    public static NSAppearance? AppearanceNamed(NSAppearanceName name);
+    [Selector("initWithAppearanceNamed:bundle:")]
+    public Self? InitWithAppearanceNamedBundle(NSAppearanceName name, NSBundle? bundle);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("bestMatchFromAppearancesWithNames:")]
+    public NSAppearanceName? BestMatchFromAppearancesWithNames(NSArray appearances);
 }
 
 public extern "C" NSAppearanceName? NSAppearanceNameAqua;
@@ -70,8 +79,10 @@ public extern "C" NSAppearanceName? NSAppearanceNameAccessibilityHighContrastVib
 
 public objc interface NSAppearanceCustomization : NSObjectProtocol
 {
-    [Selector("appearance", "setAppearance:")] NSAppearance? Appearance { get; set; }
-    [Selector("effectiveAppearance")] NSAppearance? EffectiveAppearance { get; }
+    [Selector("appearance", "setAppearance:")]
+    NSAppearance? Appearance { get; set; }
+    [Selector("effectiveAppearance")]
+    NSAppearance? EffectiveAppearance { get; }
 }
 
 #endif

@@ -32,8 +32,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMNodeList : DOMObject
 {
-    [Selector("length")] public uint Length { get; }
-    [Selector("item:")] public DOMNode? Item(uint index);
+    [Selector("length")]
+    public uint Length { get; }
+    [Selector("item:")]
+    public DOMNode? Item(uint index);
 }
 
 #endif

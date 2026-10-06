@@ -274,7 +274,8 @@ public extern "C" void CVPixelBufferGetExtendedPixels(CVPixelBufferRef pixelBuff
 
 public extern "C" CVReturn CVPixelBufferFillExtendedPixels(CVPixelBufferRef pixelBuffer);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef CVPixelBufferCopyCreationAttributes(CVPixelBufferRef pixelBuffer);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef CVPixelBufferCopyCreationAttributes(CVPixelBufferRef pixelBuffer);
 
 public extern "C" Boolean CVPixelBufferIsCompatibleWithAttributes(CVPixelBufferRef pixelBuffer, CFDictionaryRef? attributes);
 

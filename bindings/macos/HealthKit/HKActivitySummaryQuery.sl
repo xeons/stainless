@@ -36,8 +36,10 @@ public objc closure void HKActivitySummaryQueryInitWithPredicateResultsHandlerHa
 
 public extern objc class HKActivitySummaryQuery : HKQuery
 {
-    [Selector("updateHandler", "setUpdateHandler:")] public HKActivitySummaryQueryUpdateHandlerBlock? UpdateHandler { get; set; }
-    [Selector("initWithPredicate:resultsHandler:")] public Self InitWithPredicateResultsHandler(NSPredicate? predicate, HKActivitySummaryQueryInitWithPredicateResultsHandlerHandlerBlock handler);
+    [Selector("updateHandler", "setUpdateHandler:")]
+    public HKActivitySummaryQueryUpdateHandlerBlock? UpdateHandler { get; set; }
+    [Selector("initWithPredicate:resultsHandler:")]
+    public Self InitWithPredicateResultsHandler(NSPredicate? predicate, HKActivitySummaryQueryInitWithPredicateResultsHandlerHandlerBlock handler);
 }
 
 #endif

@@ -36,29 +36,43 @@ public extern "C" Boolean globalUpdateOK;
 
 public extern objc class QuartzFilterView : NSView
 {
-    [Selector("sizeToFit")] public void SizeToFit();
+    [Selector("sizeToFit")]
+    public void SizeToFit();
 }
 
 public extern objc class QuartzFilterManager : NSObject
 {
-    [Selector("filterManager")] public static QuartzFilterManager? FilterManager();
-    [Selector("filtersInDomains:")] public static NSArray? FiltersInDomains(NSArray? domains);
-    [Selector("filterPanel")] public NSPanel? FilterPanel();
-    [Selector("filterView")] public QuartzFilterView? FilterView();
-    [Selector("selectedFilter")] public QuartzFilter? SelectedFilter();
-    [Selector("selectFilter:")] public bool SelectFilter(QuartzFilter? filter);
-    [Selector("setDelegate:")] public void SetDelegate(AnyObject? aDelegate);
-    [Selector("delegate")] public AnyObject? Delegate();
-    [Selector("importFilter:")] public QuartzFilter? ImportFilter(NSDictionary? filterProperties);
+    [Selector("filterManager")]
+    public static QuartzFilterManager? FilterManager();
+    [Selector("filtersInDomains:")]
+    public static NSArray? FiltersInDomains(NSArray? domains);
+    [Selector("filterPanel")]
+    public NSPanel? FilterPanel();
+    [Selector("filterView")]
+    public QuartzFilterView? FilterView();
+    [Selector("selectedFilter")]
+    public QuartzFilter? SelectedFilter();
+    [Selector("selectFilter:")]
+    public bool SelectFilter(QuartzFilter? filter);
+    [Selector("setDelegate:")]
+    public void SetDelegate(AnyObject? aDelegate);
+    [Selector("delegate")]
+    public AnyObject? Delegate();
+    [Selector("importFilter:")]
+    public QuartzFilter? ImportFilter(NSDictionary? filterProperties);
 }
 
 /// QuartzFilterManagerDelegate, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("quartzFilterManager:didAddFilter:")] public void QuartzFilterManagerDidAddFilter(QuartzFilterManager? sender, QuartzFilter? filter);
-    [Selector("quartzFilterManager:didRemoveFilter:")] public void QuartzFilterManagerDidRemoveFilter(QuartzFilterManager? sender, QuartzFilter? filter);
-    [Selector("quartzFilterManager:didModifyFilter:")] public void QuartzFilterManagerDidModifyFilter(QuartzFilterManager? sender, QuartzFilter? filter);
-    [Selector("quartzFilterManager:didSelectFilter:")] public void QuartzFilterManagerDidSelectFilter(QuartzFilterManager? sender, QuartzFilter? filter);
+    [Selector("quartzFilterManager:didAddFilter:")]
+    public void QuartzFilterManagerDidAddFilter(QuartzFilterManager? sender, QuartzFilter? filter);
+    [Selector("quartzFilterManager:didRemoveFilter:")]
+    public void QuartzFilterManagerDidRemoveFilter(QuartzFilterManager? sender, QuartzFilter? filter);
+    [Selector("quartzFilterManager:didModifyFilter:")]
+    public void QuartzFilterManagerDidModifyFilter(QuartzFilterManager? sender, QuartzFilter? filter);
+    [Selector("quartzFilterManager:didSelectFilter:")]
+    public void QuartzFilterManagerDidSelectFilter(QuartzFilterManager? sender, QuartzFilter? filter);
 }
 
 public extern "C" NSString? kQuartzFilterApplicationDomain;

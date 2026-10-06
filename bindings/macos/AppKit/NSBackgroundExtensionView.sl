@@ -32,8 +32,10 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class NSBackgroundExtensionView : NSView
 {
-    [Selector("contentView", "setContentView:")] public NSView? ContentView { get; set; }
-    [Selector("automaticallyPlacesContentView", "setAutomaticallyPlacesContentView:")] public bool AutomaticallyPlacesContentView { get; set; }
+    [Selector("contentView", "setContentView:")]
+    public NSView? ContentView { get; set; }
+    [Selector("automaticallyPlacesContentView", "setAutomaticallyPlacesContentView:")]
+    public bool AutomaticallyPlacesContentView { get; set; }
 }
 
 #endif

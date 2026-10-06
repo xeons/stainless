@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public objc interface ASAuthorizationPublicKeyCredentialDescriptor : NSObjectProtocol, NSSecureCoding, NSCopying
 {
-    [Selector("credentialID", "setCredentialID:")] NSData CredentialID { get; set; }
+    [Selector("credentialID", "setCredentialID:")]
+    NSData CredentialID { get; set; }
 }
 
 #endif

@@ -51,7 +51,8 @@ public struct ICARawFileHeader
     public byte[64] colorSyncModeStr;
 }
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? ICDCreateColorSpace(UInt32 bitsPerPixel, UInt32 samplesPerPixel, ICAObject icaObject, CFStringRef? colorSyncMode, CFDataRef? abstractProfile, byte* tmpProfilePath);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? ICDCreateColorSpace(UInt32 bitsPerPixel, UInt32 samplesPerPixel, ICAObject icaObject, CFStringRef? colorSyncMode, CFDataRef? abstractProfile, byte* tmpProfilePath);
 
 public extern "C" ICAError ICDAddImageInfoToNotificationDictionary(CFMutableDictionaryRef? dict, UInt32 width, UInt32 height, UInt32 bytesPerRow, UInt32 dataStartRow, UInt32 dataNumberOfRows, UInt32 dataSize, void* dataBuffer);
 

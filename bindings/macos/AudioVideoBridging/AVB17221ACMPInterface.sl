@@ -34,19 +34,28 @@ public objc closure void AVB17221ACMPInterfaceCompletion(NSError? arg0, AVB17221
 
 public objc interface AVB17221ACMPClient
 {
-    [Selector("ACMPDidReceiveCommand:onInterface:")] bool ACMPDidReceiveCommandOnInterface(AVB17221ACMPMessage message, AVB17221ACMPInterface anInterface);
-    [Selector("ACMPDidReceiveResponse:onInterface:")] bool ACMPDidReceiveResponseOnInterface(AVB17221ACMPMessage message, AVB17221ACMPInterface anInterface);
+    [Selector("ACMPDidReceiveCommand:onInterface:")]
+    bool ACMPDidReceiveCommandOnInterface(AVB17221ACMPMessage message, AVB17221ACMPInterface anInterface);
+    [Selector("ACMPDidReceiveResponse:onInterface:")]
+    bool ACMPDidReceiveResponseOnInterface(AVB17221ACMPMessage message, AVB17221ACMPInterface anInterface);
 }
 
 public extern objc class AVB17221ACMPInterface : AVB1722ControlInterface
 {
-    [Selector("multicastDestinationAddress")] public AVBMACAddress MulticastDestinationAddress { get; }
-    [Selector("ACMPInterfaceWithInterface:")] public static AVB17221ACMPInterface ACMPInterfaceWithInterface(AVBInterface anInterface);
-    [Selector("ACMPInterfaceWithInterfaceNamed:")] public static AVB17221ACMPInterface ACMPInterfaceWithInterfaceNamed(NSString anInterfaceName);
-    [Selector("setHandler:forEntityID:")] public bool SetHandlerForEntityID(AVB17221ACMPClient handler, ulong targetEntityID);
-    [Selector("removeHandlerForEntityID:")] public void RemoveHandlerForEntityID(ulong targetEntityID);
-    [Selector("sendACMPResponseMessage:error:")] public bool SendACMPResponseMessageError(AVB17221ACMPMessage message, out NSError? error);
-    [Selector("sendACMPCommandMessage:completionHandler:")] public bool SendACMPCommandMessageCompletionHandler(AVB17221ACMPMessage message, AVB17221ACMPInterfaceCompletion completionHandler);
+    [Selector("multicastDestinationAddress")]
+    public AVBMACAddress MulticastDestinationAddress { get; }
+    [Selector("ACMPInterfaceWithInterface:")]
+    public static AVB17221ACMPInterface ACMPInterfaceWithInterface(AVBInterface anInterface);
+    [Selector("ACMPInterfaceWithInterfaceNamed:")]
+    public static AVB17221ACMPInterface ACMPInterfaceWithInterfaceNamed(NSString anInterfaceName);
+    [Selector("setHandler:forEntityID:")]
+    public bool SetHandlerForEntityID(AVB17221ACMPClient handler, ulong targetEntityID);
+    [Selector("removeHandlerForEntityID:")]
+    public void RemoveHandlerForEntityID(ulong targetEntityID);
+    [Selector("sendACMPResponseMessage:error:")]
+    public bool SendACMPResponseMessageError(AVB17221ACMPMessage message, out NSError? error);
+    [Selector("sendACMPCommandMessage:completionHandler:")]
+    public bool SendACMPCommandMessageCompletionHandler(AVB17221ACMPMessage message, AVB17221ACMPInterfaceCompletion completionHandler);
 }
 
 #endif

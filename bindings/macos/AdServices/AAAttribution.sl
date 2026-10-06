@@ -42,7 +42,8 @@ public enum AAAttributionErrorCode : long
 
 public extern objc class AAAttribution : NSObject
 {
-    [Selector("attributionTokenWithError:")] public static NSString? AttributionTokenWithError(out NSError? error);
+    [Selector("attributionTokenWithError:")]
+    public static NSString? AttributionTokenWithError(out NSError? error);
 }
 
 #endif

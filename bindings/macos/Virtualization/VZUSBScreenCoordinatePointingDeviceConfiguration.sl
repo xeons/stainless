@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class VZUSBScreenCoordinatePointingDeviceConfiguration : VZPointingDeviceConfiguration
 {
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

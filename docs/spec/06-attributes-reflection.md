@@ -20,7 +20,8 @@ It is written in brackets before a declaration, with **constant** arguments —
 they are stored in the binary, not evaluated (SL0344):
 
 ```csharp
-[JsonName("full_name")] public String Name;
+[JsonName("full_name")]
+public String Name;
 ```
 
 An attribute type is never a value: it cannot be instantiated, named as a type,
@@ -79,9 +80,12 @@ statics either — there is no instance to read one from.
 [Reflect]
 public class Person
 {
-    [JsonName("full_name")] public String Name;
-    [JsonName("age")]       public int    Years;
-    [JsonIgnore]            public int    Internal;
+    [JsonName("full_name")]
+    public String Name;
+    [JsonName("age")]
+    public int    Years;
+    [JsonIgnore]
+    public int    Internal;
 }
 ```
 

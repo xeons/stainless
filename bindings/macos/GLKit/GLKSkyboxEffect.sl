@@ -35,15 +35,24 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class GLKSkyboxEffect : NSObject, GLKNamedEffect
 {
-    [Selector("center", "setCenter:")] public GLKVector3 Center { get; set; }
-    [Selector("xSize", "setXSize:")] public GLfloat XSize { get; set; }
-    [Selector("ySize", "setYSize:")] public GLfloat YSize { get; set; }
-    [Selector("zSize", "setZSize:")] public GLfloat ZSize { get; set; }
-    [Selector("textureCubeMap")] public GLKEffectPropertyTexture TextureCubeMap { get; }
-    [Selector("transform")] public GLKEffectPropertyTransform Transform { get; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("prepareToDraw")] public void PrepareToDraw();
-    [Selector("draw")] public void Draw();
+    [Selector("center", "setCenter:")]
+    public GLKVector3 Center { get; set; }
+    [Selector("xSize", "setXSize:")]
+    public GLfloat XSize { get; set; }
+    [Selector("ySize", "setYSize:")]
+    public GLfloat YSize { get; set; }
+    [Selector("zSize", "setZSize:")]
+    public GLfloat ZSize { get; set; }
+    [Selector("textureCubeMap")]
+    public GLKEffectPropertyTexture TextureCubeMap { get; }
+    [Selector("transform")]
+    public GLKEffectPropertyTransform Transform { get; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("prepareToDraw")]
+    public void PrepareToDraw();
+    [Selector("draw")]
+    public void Draw();
 }
 
 #endif

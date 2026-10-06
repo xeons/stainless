@@ -32,17 +32,27 @@ import Standard.ObjC;
 
 public extern objc class EKAlarm : EKObject, NSCopying
 {
-    [Selector("relativeOffset", "setRelativeOffset:")] public NSTimeInterval RelativeOffset { get; set; }
-    [Selector("absoluteDate", "setAbsoluteDate:")] public NSDate? AbsoluteDate { get; set; }
-    [Selector("structuredLocation", "setStructuredLocation:")] public EKStructuredLocation? StructuredLocation { get; set; }
-    [Selector("proximity", "setProximity:")] public EKAlarmProximity Proximity { get; set; }
-    [Selector("type")] public EKAlarmType Type { get; }
-    [Selector("emailAddress", "setEmailAddress:")] public NSString? EmailAddress { get; set; }
-    [Selector("soundName", "setSoundName:")] public NSString? SoundName { get; set; }
+    [Selector("relativeOffset", "setRelativeOffset:")]
+    public NSTimeInterval RelativeOffset { get; set; }
+    [Selector("absoluteDate", "setAbsoluteDate:")]
+    public NSDate? AbsoluteDate { get; set; }
+    [Selector("structuredLocation", "setStructuredLocation:")]
+    public EKStructuredLocation? StructuredLocation { get; set; }
+    [Selector("proximity", "setProximity:")]
+    public EKAlarmProximity Proximity { get; set; }
+    [Selector("type")]
+    public EKAlarmType Type { get; }
+    [Selector("emailAddress", "setEmailAddress:")]
+    public NSString? EmailAddress { get; set; }
+    [Selector("soundName", "setSoundName:")]
+    public NSString? SoundName { get; set; }
     /// Deprecated in macOS 10.9.
-    [Selector("url", "setUrl:")] public NSURL? Url { get; set; }
-    [Selector("alarmWithAbsoluteDate:")] public static EKAlarm AlarmWithAbsoluteDate(NSDate date);
-    [Selector("alarmWithRelativeOffset:")] public static EKAlarm AlarmWithRelativeOffset(NSTimeInterval offset);
+    [Selector("url", "setUrl:")]
+    public NSURL? Url { get; set; }
+    [Selector("alarmWithAbsoluteDate:")]
+    public static EKAlarm AlarmWithAbsoluteDate(NSDate date);
+    [Selector("alarmWithRelativeOffset:")]
+    public static EKAlarm AlarmWithRelativeOffset(NSTimeInterval offset);
 }
 
 #endif

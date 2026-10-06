@@ -38,13 +38,15 @@ public extern objc class DRBurnRef : CFTypeRef { }
 
 public extern "C" CFTypeID DRBurnGetTypeID();
 
-[ReturnsRetained] public extern "C" DRBurnRef? DRBurnCreate(DRDeviceRef? device);
+[ReturnsRetained]
+public extern "C" DRBurnRef? DRBurnCreate(DRDeviceRef? device);
 
 public extern "C" OSStatus DRBurnWriteLayout(DRBurnRef? burn, CFTypeRef? layout);
 
 public extern "C" void DRBurnAbort(DRBurnRef? burn);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? DRBurnCopyStatus(DRBurnRef? burn);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? DRBurnCopyStatus(DRBurnRef? burn);
 
 public extern "C" DRDeviceRef? DRBurnGetDevice(DRBurnRef? burn);
 

@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// NSItemSourceInfo, a category of NSItemProvider.
 public extern objc class NSItemProvider
 {
-    [Selector("sourceFrame")] public NSRect SourceFrame { get; }
-    [Selector("containerFrame")] public NSRect ContainerFrame { get; }
-    [Selector("preferredPresentationSize")] public NSSize PreferredPresentationSize { get; }
+    [Selector("sourceFrame")]
+    public NSRect SourceFrame { get; }
+    [Selector("containerFrame")]
+    public NSRect ContainerFrame { get; }
+    [Selector("preferredPresentationSize")]
+    public NSSize PreferredPresentationSize { get; }
 }
 
 public extern "C" NSString? NSTypeIdentifierDateText;

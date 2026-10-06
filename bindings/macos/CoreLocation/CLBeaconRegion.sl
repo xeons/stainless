@@ -35,37 +35,59 @@ import Standard.ObjC;
 /// Deprecated in macOS 100000.
 public extern objc class CLBeaconRegion : CLRegion
 {
-    [Selector("beaconIdentityConstraint")] public CLBeaconIdentityConstraint BeaconIdentityConstraint { get; }
-    [Selector("UUID")] public NSUUID UUID { get; }
+    [Selector("beaconIdentityConstraint")]
+    public CLBeaconIdentityConstraint BeaconIdentityConstraint { get; }
+    [Selector("UUID")]
+    public NSUUID UUID { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("proximityUUID")] public NSUUID? ProximityUUID { get; }
-    [Selector("major")] public NSNumber? Major { get; }
-    [Selector("minor")] public NSNumber? Minor { get; }
-    [Selector("notifyEntryStateOnDisplay", "setNotifyEntryStateOnDisplay:")] public bool NotifyEntryStateOnDisplay { get; set; }
-    [Selector("initWithUUID:identifier:")] public Self InitWithUUIDIdentifier(NSUUID uuid, NSString identifier);
+    [Selector("proximityUUID")]
+    public NSUUID? ProximityUUID { get; }
+    [Selector("major")]
+    public NSNumber? Major { get; }
+    [Selector("minor")]
+    public NSNumber? Minor { get; }
+    [Selector("notifyEntryStateOnDisplay", "setNotifyEntryStateOnDisplay:")]
+    public bool NotifyEntryStateOnDisplay { get; set; }
+    [Selector("initWithUUID:identifier:")]
+    public Self InitWithUUIDIdentifier(NSUUID uuid, NSString identifier);
     /// Deprecated in macOS 10.15.
-    [Selector("initWithProximityUUID:identifier:")] public Self InitWithProximityUUIDIdentifier(NSUUID proximityUUID, NSString identifier);
-    [Selector("initWithUUID:major:identifier:")] public Self InitWithUUIDMajorIdentifier(NSUUID uuid, CLBeaconMajorValue major, NSString identifier);
+    [Selector("initWithProximityUUID:identifier:")]
+    public Self InitWithProximityUUIDIdentifier(NSUUID proximityUUID, NSString identifier);
+    [Selector("initWithUUID:major:identifier:")]
+    public Self InitWithUUIDMajorIdentifier(NSUUID uuid, CLBeaconMajorValue major, NSString identifier);
     /// Deprecated in macOS 10.15.
-    [Selector("initWithProximityUUID:major:identifier:")] public Self InitWithProximityUUIDMajorIdentifier(NSUUID proximityUUID, CLBeaconMajorValue major, NSString identifier);
-    [Selector("initWithUUID:major:minor:identifier:")] public Self InitWithUUIDMajorMinorIdentifier(NSUUID uuid, CLBeaconMajorValue major, CLBeaconMinorValue minor, NSString identifier);
+    [Selector("initWithProximityUUID:major:identifier:")]
+    public Self InitWithProximityUUIDMajorIdentifier(NSUUID proximityUUID, CLBeaconMajorValue major, NSString identifier);
+    [Selector("initWithUUID:major:minor:identifier:")]
+    public Self InitWithUUIDMajorMinorIdentifier(NSUUID uuid, CLBeaconMajorValue major, CLBeaconMinorValue minor, NSString identifier);
     /// Deprecated in macOS 10.15.
-    [Selector("initWithProximityUUID:major:minor:identifier:")] public Self InitWithProximityUUIDMajorMinorIdentifier(NSUUID proximityUUID, CLBeaconMajorValue major, CLBeaconMinorValue minor, NSString identifier);
-    [Selector("initWithBeaconIdentityConstraint:identifier:")] public Self InitWithBeaconIdentityConstraintIdentifier(CLBeaconIdentityConstraint beaconIdentityConstraint, NSString identifier);
-    [Selector("peripheralDataWithMeasuredPower:")] public NSMutableDictionary PeripheralDataWithMeasuredPower(NSNumber? measuredPower);
+    [Selector("initWithProximityUUID:major:minor:identifier:")]
+    public Self InitWithProximityUUIDMajorMinorIdentifier(NSUUID proximityUUID, CLBeaconMajorValue major, CLBeaconMinorValue minor, NSString identifier);
+    [Selector("initWithBeaconIdentityConstraint:identifier:")]
+    public Self InitWithBeaconIdentityConstraintIdentifier(CLBeaconIdentityConstraint beaconIdentityConstraint, NSString identifier);
+    [Selector("peripheralDataWithMeasuredPower:")]
+    public NSMutableDictionary PeripheralDataWithMeasuredPower(NSNumber? measuredPower);
 }
 
 public extern objc class CLBeacon : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("timestamp")] public NSDate Timestamp { get; }
-    [Selector("UUID")] public NSUUID UUID { get; }
+    [Selector("timestamp")]
+    public NSDate Timestamp { get; }
+    [Selector("UUID")]
+    public NSUUID UUID { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("proximityUUID")] public NSUUID? ProximityUUID { get; }
-    [Selector("major")] public NSNumber Major { get; }
-    [Selector("minor")] public NSNumber Minor { get; }
-    [Selector("proximity")] public CLProximity Proximity { get; }
-    [Selector("accuracy")] public CLLocationAccuracy Accuracy { get; }
-    [Selector("rssi")] public NSInteger Rssi { get; }
+    [Selector("proximityUUID")]
+    public NSUUID? ProximityUUID { get; }
+    [Selector("major")]
+    public NSNumber Major { get; }
+    [Selector("minor")]
+    public NSNumber Minor { get; }
+    [Selector("proximity")]
+    public CLProximity Proximity { get; }
+    [Selector("accuracy")]
+    public CLLocationAccuracy Accuracy { get; }
+    [Selector("rssi")]
+    public NSInteger Rssi { get; }
 }
 
 #endif

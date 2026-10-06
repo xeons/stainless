@@ -38,13 +38,17 @@ public using CIRAWFilterOption = NSString;
 public extern objc class CIFilter
 {
     /// Deprecated in macOS 100000.
-    [Selector("filterWithImageURL:options:")] public static CIFilter? FilterWithImageURLOptions(NSURL? url, NSDictionary? options);
+    [Selector("filterWithImageURL:options:")]
+    public static CIFilter? FilterWithImageURLOptions(NSURL? url, NSDictionary? options);
     /// Deprecated in macOS 100000.
-    [Selector("filterWithImageData:options:")] public static CIFilter? FilterWithImageDataOptions(NSData? data, NSDictionary? options);
+    [Selector("filterWithImageData:options:")]
+    public static CIFilter? FilterWithImageDataOptions(NSData? data, NSDictionary? options);
     /// Deprecated in macOS 100000.
-    [Selector("filterWithCVPixelBuffer:properties:options:")] public static CIFilter? FilterWithCVPixelBufferPropertiesOptions(CVPixelBufferRef? pixelBuffer, NSDictionary? properties, NSDictionary? options);
+    [Selector("filterWithCVPixelBuffer:properties:options:")]
+    public static CIFilter? FilterWithCVPixelBufferPropertiesOptions(CVPixelBufferRef? pixelBuffer, NSDictionary? properties, NSDictionary? options);
     /// Deprecated in macOS 100000.
-    [Selector("supportedRawCameraModels")] public static NSArray? SupportedRawCameraModels();
+    [Selector("supportedRawCameraModels")]
+    public static NSArray? SupportedRawCameraModels();
 }
 
 /// Deprecated in macOS 100000.

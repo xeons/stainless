@@ -35,7 +35,8 @@ public objc closure void QLThumbnailProviderProvideThumbnailForFileRequestComple
 
 public extern objc class QLThumbnailProvider : NSObject
 {
-    [Selector("provideThumbnailForFileRequest:completionHandler:")] public void ProvideThumbnailForFileRequestCompletionHandler(QLFileThumbnailRequest request, QLThumbnailProviderProvideThumbnailForFileRequestCompletionHandlerHandlerBlock handler);
+    [Selector("provideThumbnailForFileRequest:completionHandler:")]
+    public void ProvideThumbnailForFileRequestCompletionHandler(QLFileThumbnailRequest request, QLThumbnailProviderProvideThumbnailForFileRequestCompletionHandlerHandlerBlock handler);
 }
 
 #endif

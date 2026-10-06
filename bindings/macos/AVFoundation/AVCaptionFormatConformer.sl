@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class AVCaptionFormatConformer : NSObject
 {
-    [Selector("conformsCaptionsToTimeRange", "setConformsCaptionsToTimeRange:")] public bool ConformsCaptionsToTimeRange { get; set; }
-    [Selector("captionFormatConformerWithConversionSettings:")] public static Self CaptionFormatConformerWithConversionSettings(NSDictionary conversionSettings);
-    [Selector("initWithConversionSettings:")] public Self InitWithConversionSettings(NSDictionary conversionSettings);
-    [Selector("conformedCaptionForCaption:error:")] public AVCaption? ConformedCaptionForCaptionError(AVCaption caption, out NSError? outError);
+    [Selector("conformsCaptionsToTimeRange", "setConformsCaptionsToTimeRange:")]
+    public bool ConformsCaptionsToTimeRange { get; set; }
+    [Selector("captionFormatConformerWithConversionSettings:")]
+    public static Self CaptionFormatConformerWithConversionSettings(NSDictionary conversionSettings);
+    [Selector("initWithConversionSettings:")]
+    public Self InitWithConversionSettings(NSDictionary conversionSettings);
+    [Selector("conformedCaptionForCaption:error:")]
+    public AVCaption? ConformedCaptionForCaptionError(AVCaption caption, out NSError? outError);
 }
 
 #endif

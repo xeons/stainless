@@ -34,37 +34,56 @@ import Standard.ObjC;
 
 public extern objc class VNFaceLandmarkRegion : NSObject, NSCopying, NSSecureCoding, VNRequestRevisionProviding
 {
-    [Selector("pointCount")] public NSUInteger PointCount { get; }
+    [Selector("pointCount")]
+    public NSUInteger PointCount { get; }
 }
 
 public extern objc class VNFaceLandmarkRegion2D : VNFaceLandmarkRegion
 {
-    [Selector("normalizedPoints")] public CGPoint* NormalizedPoints { get; }
-    [Selector("precisionEstimatesPerPoint")] public NSArray? PrecisionEstimatesPerPoint { get; }
-    [Selector("pointsClassification")] public VNPointsClassification PointsClassification { get; }
-    [Selector("pointsInImageOfSize:")] public CGPoint* PointsInImageOfSize(CGSize imageSize);
+    [Selector("normalizedPoints")]
+    public CGPoint* NormalizedPoints { get; }
+    [Selector("precisionEstimatesPerPoint")]
+    public NSArray? PrecisionEstimatesPerPoint { get; }
+    [Selector("pointsClassification")]
+    public VNPointsClassification PointsClassification { get; }
+    [Selector("pointsInImageOfSize:")]
+    public CGPoint* PointsInImageOfSize(CGSize imageSize);
 }
 
 public extern objc class VNFaceLandmarks : NSObject, NSCopying, NSSecureCoding, VNRequestRevisionProviding
 {
-    [Selector("confidence")] public VNConfidence Confidence { get; }
+    [Selector("confidence")]
+    public VNConfidence Confidence { get; }
 }
 
 public extern objc class VNFaceLandmarks2D : VNFaceLandmarks
 {
-    [Selector("allPoints")] public VNFaceLandmarkRegion2D? AllPoints { get; }
-    [Selector("faceContour")] public VNFaceLandmarkRegion2D? FaceContour { get; }
-    [Selector("leftEye")] public VNFaceLandmarkRegion2D? LeftEye { get; }
-    [Selector("rightEye")] public VNFaceLandmarkRegion2D? RightEye { get; }
-    [Selector("leftEyebrow")] public VNFaceLandmarkRegion2D? LeftEyebrow { get; }
-    [Selector("rightEyebrow")] public VNFaceLandmarkRegion2D? RightEyebrow { get; }
-    [Selector("nose")] public VNFaceLandmarkRegion2D? Nose { get; }
-    [Selector("noseCrest")] public VNFaceLandmarkRegion2D? NoseCrest { get; }
-    [Selector("medianLine")] public VNFaceLandmarkRegion2D? MedianLine { get; }
-    [Selector("outerLips")] public VNFaceLandmarkRegion2D? OuterLips { get; }
-    [Selector("innerLips")] public VNFaceLandmarkRegion2D? InnerLips { get; }
-    [Selector("leftPupil")] public VNFaceLandmarkRegion2D? LeftPupil { get; }
-    [Selector("rightPupil")] public VNFaceLandmarkRegion2D? RightPupil { get; }
+    [Selector("allPoints")]
+    public VNFaceLandmarkRegion2D? AllPoints { get; }
+    [Selector("faceContour")]
+    public VNFaceLandmarkRegion2D? FaceContour { get; }
+    [Selector("leftEye")]
+    public VNFaceLandmarkRegion2D? LeftEye { get; }
+    [Selector("rightEye")]
+    public VNFaceLandmarkRegion2D? RightEye { get; }
+    [Selector("leftEyebrow")]
+    public VNFaceLandmarkRegion2D? LeftEyebrow { get; }
+    [Selector("rightEyebrow")]
+    public VNFaceLandmarkRegion2D? RightEyebrow { get; }
+    [Selector("nose")]
+    public VNFaceLandmarkRegion2D? Nose { get; }
+    [Selector("noseCrest")]
+    public VNFaceLandmarkRegion2D? NoseCrest { get; }
+    [Selector("medianLine")]
+    public VNFaceLandmarkRegion2D? MedianLine { get; }
+    [Selector("outerLips")]
+    public VNFaceLandmarkRegion2D? OuterLips { get; }
+    [Selector("innerLips")]
+    public VNFaceLandmarkRegion2D? InnerLips { get; }
+    [Selector("leftPupil")]
+    public VNFaceLandmarkRegion2D? LeftPupil { get; }
+    [Selector("rightPupil")]
+    public VNFaceLandmarkRegion2D? RightPupil { get; }
 }
 
 #endif

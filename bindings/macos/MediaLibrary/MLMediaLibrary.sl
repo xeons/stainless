@@ -35,9 +35,11 @@ import Standard.ObjC;
 public extern objc class MLMediaLibrary : NSObject
 {
     /// Deprecated in macOS 10.15.
-    [Selector("mediaSources")] public NSDictionary? MediaSources { get; }
+    [Selector("mediaSources")]
+    public NSDictionary? MediaSources { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("initWithOptions:")] public Self InitWithOptions(NSDictionary options);
+    [Selector("initWithOptions:")]
+    public Self InitWithOptions(NSDictionary options);
 }
 
 /// Deprecated in macOS 10.15.

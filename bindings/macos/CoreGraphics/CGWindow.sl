@@ -84,11 +84,14 @@ public enum CGWindowListOption : uint
     ExcludeDesktopElements = 16,
 }
 
-[ReturnsRetained] public extern "C" CFArrayRef? CGWindowListCopyWindowInfo(CGWindowListOption option, CGWindowID relativeToWindow);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CGWindowListCopyWindowInfo(CGWindowListOption option, CGWindowID relativeToWindow);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CGWindowListCreate(CGWindowListOption option, CGWindowID relativeToWindow);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CGWindowListCreate(CGWindowListOption option, CGWindowID relativeToWindow);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CGWindowListCreateDescriptionFromArray(CFArrayRef? windowArray);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CGWindowListCreateDescriptionFromArray(CFArrayRef? windowArray);
 
 [Flags]
 public enum CGWindowImageOption : uint

@@ -39,7 +39,8 @@ public extern "C" CFTypeID CTTextTabGetTypeID();
 
 public extern "C" CFStringRef kCTTabColumnTerminatorsAttributeName;
 
-[ReturnsRetained] public extern "C" CTTextTabRef CTTextTabCreate(CTTextAlignment alignment, double location, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CTTextTabRef CTTextTabCreate(CTTextAlignment alignment, double location, CFDictionaryRef? options);
 
 public extern "C" CTTextAlignment CTTextTabGetAlignment(CTTextTabRef tab);
 

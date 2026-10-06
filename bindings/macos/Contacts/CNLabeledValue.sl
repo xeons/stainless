@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class CNLabeledValue : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("label")] public NSString? Label { get; }
-    [Selector("value")] public AnyObject Value { get; }
-    [Selector("labeledValueWithLabel:value:")] public static Self LabeledValueWithLabelValue(NSString? label, AnyObject value);
-    [Selector("initWithLabel:value:")] public Self InitWithLabelValue(NSString? label, AnyObject value);
-    [Selector("labeledValueBySettingLabel:")] public Self LabeledValueBySettingLabel(NSString? label);
-    [Selector("labeledValueBySettingValue:")] public Self LabeledValueBySettingValue(AnyObject value);
-    [Selector("labeledValueBySettingLabel:value:")] public Self LabeledValueBySettingLabelValue(NSString? label, AnyObject value);
-    [Selector("localizedStringForLabel:")] public static NSString LocalizedStringForLabel(NSString label);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("label")]
+    public NSString? Label { get; }
+    [Selector("value")]
+    public AnyObject Value { get; }
+    [Selector("labeledValueWithLabel:value:")]
+    public static Self LabeledValueWithLabelValue(NSString? label, AnyObject value);
+    [Selector("initWithLabel:value:")]
+    public Self InitWithLabelValue(NSString? label, AnyObject value);
+    [Selector("labeledValueBySettingLabel:")]
+    public Self LabeledValueBySettingLabel(NSString? label);
+    [Selector("labeledValueBySettingValue:")]
+    public Self LabeledValueBySettingValue(AnyObject value);
+    [Selector("labeledValueBySettingLabel:value:")]
+    public Self LabeledValueBySettingLabelValue(NSString? label, AnyObject value);
+    [Selector("localizedStringForLabel:")]
+    public static NSString LocalizedStringForLabel(NSString label);
 }
 
 public extern "C" NSString? CNLabelHome;

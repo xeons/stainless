@@ -37,8 +37,10 @@ public objc closure void EKVirtualConferenceProviderFetchVirtualConferenceForIde
 
 public extern objc class EKVirtualConferenceProvider : NSObject, NSExtensionRequestHandling
 {
-    [Selector("fetchAvailableRoomTypesWithCompletionHandler:")] public void FetchAvailableRoomTypesWithCompletionHandler(EKVirtualConferenceProviderFetchAvailableRoomTypesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("fetchVirtualConferenceForIdentifier:completionHandler:")] public void FetchVirtualConferenceForIdentifierCompletionHandler(EKVirtualConferenceRoomTypeIdentifier identifier, EKVirtualConferenceProviderFetchVirtualConferenceForIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchAvailableRoomTypesWithCompletionHandler:")]
+    public void FetchAvailableRoomTypesWithCompletionHandler(EKVirtualConferenceProviderFetchAvailableRoomTypesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchVirtualConferenceForIdentifier:completionHandler:")]
+    public void FetchVirtualConferenceForIdentifierCompletionHandler(EKVirtualConferenceRoomTypeIdentifier identifier, EKVirtualConferenceProviderFetchVirtualConferenceForIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

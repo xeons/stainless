@@ -34,9 +34,12 @@ import Standard.ObjC;
 
 public extern objc class JRSAppKitAWT : NSObject
 {
-    [Selector("awtAppDelegate")] public static NSApplicationDelegate? AwtAppDelegate();
-    [Selector("registerAWTAppWithOptions:")] public static void RegisterAWTAppWithOptions(NSDictionary? options);
-    [Selector("markAppIsDaemon")] public static bool MarkAppIsDaemon();
+    [Selector("awtAppDelegate")]
+    public static NSApplicationDelegate? AwtAppDelegate();
+    [Selector("registerAWTAppWithOptions:")]
+    public static void RegisterAWTAppWithOptions(NSDictionary? options);
+    [Selector("markAppIsDaemon")]
+    public static bool MarkAppIsDaemon();
 }
 
 public const NSString JRSAppNameKey = "JRSAppNameKey";

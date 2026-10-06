@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class PHASESource : PHASEObject
 {
-    [Selector("gain", "setGain:")] public double Gain { get; set; }
-    [Selector("shapes")] public NSArray Shapes { get; }
-    [Selector("initWithEngine:")] public Self InitWithEngine(PHASEEngine engine);
-    [Selector("initWithEngine:shapes:")] public Self InitWithEngineShapes(PHASEEngine engine, NSArray shapes);
+    [Selector("gain", "setGain:")]
+    public double Gain { get; set; }
+    [Selector("shapes")]
+    public NSArray Shapes { get; }
+    [Selector("initWithEngine:")]
+    public Self InitWithEngine(PHASEEngine engine);
+    [Selector("initWithEngine:shapes:")]
+    public Self InitWithEngineShapes(PHASEEngine engine, NSArray shapes);
 }
 
 #endif

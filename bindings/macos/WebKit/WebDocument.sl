@@ -35,42 +35,63 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public objc interface WebDocumentView : NSObjectProtocol
 {
-    [Selector("setDataSource:")] void SetDataSource(WebDataSource? dataSource);
-    [Selector("dataSourceUpdated:")] void DataSourceUpdated(WebDataSource? dataSource);
-    [Selector("setNeedsLayout:")] void SetNeedsLayout(bool flag);
-    [Selector("layout")] void Layout();
-    [Selector("viewWillMoveToHostWindow:")] void ViewWillMoveToHostWindow(NSWindow? hostWindow);
-    [Selector("viewDidMoveToHostWindow")] void ViewDidMoveToHostWindow();
+    [Selector("setDataSource:")]
+    void SetDataSource(WebDataSource? dataSource);
+    [Selector("dataSourceUpdated:")]
+    void DataSourceUpdated(WebDataSource? dataSource);
+    [Selector("setNeedsLayout:")]
+    void SetNeedsLayout(bool flag);
+    [Selector("layout")]
+    void Layout();
+    [Selector("viewWillMoveToHostWindow:")]
+    void ViewWillMoveToHostWindow(NSWindow? hostWindow);
+    [Selector("viewDidMoveToHostWindow")]
+    void ViewDidMoveToHostWindow();
 }
 
 /// Deprecated in macOS 10.14.
 public objc interface WebDocumentSearching : NSObjectProtocol
 {
-    [Selector("searchFor:direction:caseSensitive:wrap:")] bool SearchForDirectionCaseSensitiveWrap(NSString? string, bool forward, bool caseFlag, bool wrapFlag);
+    [Selector("searchFor:direction:caseSensitive:wrap:")]
+    bool SearchForDirectionCaseSensitiveWrap(NSString? string, bool forward, bool caseFlag, bool wrapFlag);
 }
 
 /// Deprecated in macOS 10.14.
 public objc interface WebDocumentText : NSObjectProtocol
 {
-    [Selector("supportsTextEncoding")] bool SupportsTextEncoding();
-    [Selector("string")] NSString? String();
-    [Selector("attributedString")] NSAttributedString? AttributedString();
-    [Selector("selectedString")] NSString? SelectedString();
-    [Selector("selectedAttributedString")] NSAttributedString? SelectedAttributedString();
-    [Selector("selectAll")] void SelectAll();
-    [Selector("deselectAll")] void DeselectAll();
+    [Selector("supportsTextEncoding")]
+    bool SupportsTextEncoding();
+    [Selector("string")]
+    NSString? String();
+    [Selector("attributedString")]
+    NSAttributedString? AttributedString();
+    [Selector("selectedString")]
+    NSString? SelectedString();
+    [Selector("selectedAttributedString")]
+    NSAttributedString? SelectedAttributedString();
+    [Selector("selectAll")]
+    void SelectAll();
+    [Selector("deselectAll")]
+    void DeselectAll();
 }
 
 /// Deprecated in macOS 10.14.
 public objc interface WebDocumentRepresentation : NSObjectProtocol
 {
-    [Selector("setDataSource:")] void SetDataSource(WebDataSource? dataSource);
-    [Selector("receivedData:withDataSource:")] void ReceivedDataWithDataSource(NSData? data, WebDataSource? dataSource);
-    [Selector("receivedError:withDataSource:")] void ReceivedErrorWithDataSource(NSError? error, WebDataSource? dataSource);
-    [Selector("finishedLoadingWithDataSource:")] void FinishedLoadingWithDataSource(WebDataSource? dataSource);
-    [Selector("canProvideDocumentSource")] bool CanProvideDocumentSource();
-    [Selector("documentSource")] NSString? DocumentSource();
-    [Selector("title")] NSString? Title();
+    [Selector("setDataSource:")]
+    void SetDataSource(WebDataSource? dataSource);
+    [Selector("receivedData:withDataSource:")]
+    void ReceivedDataWithDataSource(NSData? data, WebDataSource? dataSource);
+    [Selector("receivedError:withDataSource:")]
+    void ReceivedErrorWithDataSource(NSError? error, WebDataSource? dataSource);
+    [Selector("finishedLoadingWithDataSource:")]
+    void FinishedLoadingWithDataSource(WebDataSource? dataSource);
+    [Selector("canProvideDocumentSource")]
+    bool CanProvideDocumentSource();
+    [Selector("documentSource")]
+    NSString? DocumentSource();
+    [Selector("title")]
+    NSString? Title();
 }
 
 #endif

@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationPublicKeyCredentialLargeBlobAssertionOutput : NSObject
 {
-    [Selector("readData")] public NSData? ReadData { get; }
-    [Selector("didWrite")] public bool DidWrite { get; }
+    [Selector("readData")]
+    public NSData? ReadData { get; }
+    [Selector("didWrite")]
+    public bool DidWrite { get; }
 }
 
 #endif

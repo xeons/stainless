@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class AVAssetTrackGroup : NSObject, NSCopying
 {
-    [Selector("trackIDs")] public NSArray TrackIDs { get; }
+    [Selector("trackIDs")]
+    public NSArray TrackIDs { get; }
 }
 
 #endif

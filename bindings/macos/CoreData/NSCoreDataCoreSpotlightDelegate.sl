@@ -42,18 +42,29 @@ public objc closure void NSCoreDataCoreSpotlightDelegateSearchableIndexReindexSe
 
 public extern objc class NSCoreDataCoreSpotlightDelegate : NSObject
 {
-    [Selector("isIndexingEnabled")] public bool IndexingEnabled { get; }
-    [Selector("domainIdentifier")] public NSString DomainIdentifier();
-    [Selector("indexName")] public NSString? IndexName();
-    [Selector("initForStoreWithDescription:coordinator:")] public Self InitForStoreWithDescriptionCoordinator(NSPersistentStoreDescription description, NSPersistentStoreCoordinator psc);
+    [Selector("isIndexingEnabled")]
+    public bool IndexingEnabled { get; }
+    [Selector("domainIdentifier")]
+    public NSString DomainIdentifier();
+    [Selector("indexName")]
+    public NSString? IndexName();
+    [Selector("initForStoreWithDescription:coordinator:")]
+    public Self InitForStoreWithDescriptionCoordinator(NSPersistentStoreDescription description, NSPersistentStoreCoordinator psc);
     /// Deprecated in macOS 12.0.
-    [Selector("initForStoreWithDescription:model:")] public Self InitForStoreWithDescriptionModel(NSPersistentStoreDescription description, NSManagedObjectModel model);
-    [Selector("startSpotlightIndexing")] public void StartSpotlightIndexing();
-    [Selector("stopSpotlightIndexing")] public void StopSpotlightIndexing();
-    [Selector("deleteSpotlightIndexWithCompletionHandler:")] public void DeleteSpotlightIndexWithCompletionHandler(NSCoreDataCoreSpotlightDelegateDeleteSpotlightIndexWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("attributeSetForObject:")] public CSSearchableItemAttributeSet? AttributeSetForObject(NSManagedObject object);
-    [Selector("searchableIndex:reindexAllSearchableItemsWithAcknowledgementHandler:")] public void SearchableIndexReindexAllSearchableItemsWithAcknowledgementHandler(CSSearchableIndex searchableIndex, NSCoreDataCoreSpotlightDelegateSearchableIndexReindexAllSearchableItemsWithAcknowledgementHandlerAcknowledgementHandlerBlock acknowledgementHandler);
-    [Selector("searchableIndex:reindexSearchableItemsWithIdentifiers:acknowledgementHandler:")] public void SearchableIndexReindexSearchableItemsWithIdentifiersAcknowledgementHandler(CSSearchableIndex searchableIndex, NSArray identifiers, NSCoreDataCoreSpotlightDelegateSearchableIndexReindexSearchableItemsWithIdentifiersAcknowledgementHandlerAcknowledgementHandlerBlock acknowledgementHandler);
+    [Selector("initForStoreWithDescription:model:")]
+    public Self InitForStoreWithDescriptionModel(NSPersistentStoreDescription description, NSManagedObjectModel model);
+    [Selector("startSpotlightIndexing")]
+    public void StartSpotlightIndexing();
+    [Selector("stopSpotlightIndexing")]
+    public void StopSpotlightIndexing();
+    [Selector("deleteSpotlightIndexWithCompletionHandler:")]
+    public void DeleteSpotlightIndexWithCompletionHandler(NSCoreDataCoreSpotlightDelegateDeleteSpotlightIndexWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("attributeSetForObject:")]
+    public CSSearchableItemAttributeSet? AttributeSetForObject(NSManagedObject object);
+    [Selector("searchableIndex:reindexAllSearchableItemsWithAcknowledgementHandler:")]
+    public void SearchableIndexReindexAllSearchableItemsWithAcknowledgementHandler(CSSearchableIndex searchableIndex, NSCoreDataCoreSpotlightDelegateSearchableIndexReindexAllSearchableItemsWithAcknowledgementHandlerAcknowledgementHandlerBlock acknowledgementHandler);
+    [Selector("searchableIndex:reindexSearchableItemsWithIdentifiers:acknowledgementHandler:")]
+    public void SearchableIndexReindexSearchableItemsWithIdentifiersAcknowledgementHandler(CSSearchableIndex searchableIndex, NSArray identifiers, NSCoreDataCoreSpotlightDelegateSearchableIndexReindexSearchableItemsWithIdentifiersAcknowledgementHandlerAcknowledgementHandlerBlock acknowledgementHandler);
 }
 
 #endif

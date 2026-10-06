@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class INObject : NSObject, INSpeakable, NSCopying, NSSecureCoding
 {
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("displayString")] public NSString DisplayString { get; }
-    [Selector("pronunciationHint")] public NSString? PronunciationHint { get; }
-    [Selector("subtitleString", "setSubtitleString:")] public NSString? SubtitleString { get; set; }
-    [Selector("displayImage", "setDisplayImage:")] public INImage? DisplayImage { get; set; }
-    [Selector("alternativeSpeakableMatches", "setAlternativeSpeakableMatches:")] public NSArray? AlternativeSpeakableMatches { get; set; }
-    [Selector("initWithIdentifier:displayString:pronunciationHint:")] public Self InitWithIdentifierDisplayStringPronunciationHint(NSString? identifier, NSString displayString, NSString? pronunciationHint);
-    [Selector("initWithIdentifier:displayString:")] public Self InitWithIdentifierDisplayString(NSString? identifier, NSString displayString);
-    [Selector("initWithIdentifier:displayString:subtitleString:displayImage:")] public Self InitWithIdentifierDisplayStringSubtitleStringDisplayImage(NSString? identifier, NSString displayString, NSString? subtitleString, INImage? displayImage);
-    [Selector("initWithIdentifier:displayString:pronunciationHint:subtitleString:displayImage:")] public Self InitWithIdentifierDisplayStringPronunciationHintSubtitleStringDisplayImage(NSString? identifier, NSString displayString, NSString? pronunciationHint, NSString? subtitleString, INImage? displayImage);
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("displayString")]
+    public NSString DisplayString { get; }
+    [Selector("pronunciationHint")]
+    public NSString? PronunciationHint { get; }
+    [Selector("subtitleString", "setSubtitleString:")]
+    public NSString? SubtitleString { get; set; }
+    [Selector("displayImage", "setDisplayImage:")]
+    public INImage? DisplayImage { get; set; }
+    [Selector("alternativeSpeakableMatches", "setAlternativeSpeakableMatches:")]
+    public NSArray? AlternativeSpeakableMatches { get; set; }
+    [Selector("initWithIdentifier:displayString:pronunciationHint:")]
+    public Self InitWithIdentifierDisplayStringPronunciationHint(NSString? identifier, NSString displayString, NSString? pronunciationHint);
+    [Selector("initWithIdentifier:displayString:")]
+    public Self InitWithIdentifierDisplayString(NSString? identifier, NSString displayString);
+    [Selector("initWithIdentifier:displayString:subtitleString:displayImage:")]
+    public Self InitWithIdentifierDisplayStringSubtitleStringDisplayImage(NSString? identifier, NSString displayString, NSString? subtitleString, INImage? displayImage);
+    [Selector("initWithIdentifier:displayString:pronunciationHint:subtitleString:displayImage:")]
+    public Self InitWithIdentifierDisplayStringPronunciationHintSubtitleStringDisplayImage(NSString? identifier, NSString displayString, NSString? pronunciationHint, NSString? subtitleString, INImage? displayImage);
 }
 
 #endif

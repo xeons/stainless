@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INLengthResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedLength:")] public static Self SuccessWithResolvedLength(NSMeasurement resolvedLength);
-    [Selector("disambiguationWithLengthsToDisambiguate:")] public static Self DisambiguationWithLengthsToDisambiguate(NSArray lengthsToDisambiguate);
-    [Selector("confirmationRequiredWithLengthToConfirm:")] public static Self ConfirmationRequiredWithLengthToConfirm(NSMeasurement? lengthToConfirm);
+    [Selector("successWithResolvedLength:")]
+    public static Self SuccessWithResolvedLength(NSMeasurement resolvedLength);
+    [Selector("disambiguationWithLengthsToDisambiguate:")]
+    public static Self DisambiguationWithLengthsToDisambiguate(NSArray lengthsToDisambiguate);
+    [Selector("confirmationRequiredWithLengthToConfirm:")]
+    public static Self ConfirmationRequiredWithLengthToConfirm(NSMeasurement? lengthToConfirm);
 }
 
 #endif

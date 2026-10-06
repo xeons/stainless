@@ -56,28 +56,50 @@ public objc interface CKRecordValue : NSObjectProtocol { }
 
 public extern objc class CKRecord : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("recordType")] public CKRecordType RecordType { get; }
-    [Selector("recordID")] public CKRecordID RecordID { get; }
-    [Selector("recordChangeTag")] public NSString? RecordChangeTag { get; }
-    [Selector("creatorUserRecordID")] public CKRecordID? CreatorUserRecordID { get; }
-    [Selector("creationDate")] public NSDate? CreationDate { get; }
-    [Selector("lastModifiedUserRecordID")] public CKRecordID? LastModifiedUserRecordID { get; }
-    [Selector("modificationDate")] public NSDate? ModificationDate { get; }
-    [Selector("share")] public CKReference? Share { get; }
-    [Selector("parent", "setParent:")] public CKReference? Parent { get; set; }
-    [Selector("initWithRecordType:")] public Self InitWithRecordType(CKRecordType recordType);
-    [Selector("initWithRecordType:recordID:")] public Self InitWithRecordTypeRecordID(CKRecordType recordType, CKRecordID recordID);
-    [Selector("initWithRecordType:zoneID:")] public Self InitWithRecordTypeZoneID(CKRecordType recordType, CKRecordZoneID zoneID);
-    [Selector("objectForKey:")] public CKRecordValue? ObjectForKey(CKRecordFieldKey key);
-    [Selector("setObject:forKey:")] public void SetObjectForKey(CKRecordValue? object, CKRecordFieldKey key);
-    [Selector("allKeys")] public NSArray AllKeys();
-    [Selector("allTokens")] public NSArray AllTokens();
-    [Selector("objectForKeyedSubscript:")] public CKRecordValue? ObjectForKeyedSubscript(CKRecordFieldKey key);
-    [Selector("setObject:forKeyedSubscript:")] public void SetObjectForKeyedSubscript(CKRecordValue? object, CKRecordFieldKey key);
-    [Selector("changedKeys")] public NSArray ChangedKeys();
-    [Selector("encodeSystemFieldsWithCoder:")] public void EncodeSystemFieldsWithCoder(NSCoder coder);
-    [Selector("setParentReferenceFromRecord:")] public void SetParentReferenceFromRecord(CKRecord? parentRecord);
-    [Selector("setParentReferenceFromRecordID:")] public void SetParentReferenceFromRecordID(CKRecordID? parentRecordID);
+    [Selector("recordType")]
+    public CKRecordType RecordType { get; }
+    [Selector("recordID")]
+    public CKRecordID RecordID { get; }
+    [Selector("recordChangeTag")]
+    public NSString? RecordChangeTag { get; }
+    [Selector("creatorUserRecordID")]
+    public CKRecordID? CreatorUserRecordID { get; }
+    [Selector("creationDate")]
+    public NSDate? CreationDate { get; }
+    [Selector("lastModifiedUserRecordID")]
+    public CKRecordID? LastModifiedUserRecordID { get; }
+    [Selector("modificationDate")]
+    public NSDate? ModificationDate { get; }
+    [Selector("share")]
+    public CKReference? Share { get; }
+    [Selector("parent", "setParent:")]
+    public CKReference? Parent { get; set; }
+    [Selector("initWithRecordType:")]
+    public Self InitWithRecordType(CKRecordType recordType);
+    [Selector("initWithRecordType:recordID:")]
+    public Self InitWithRecordTypeRecordID(CKRecordType recordType, CKRecordID recordID);
+    [Selector("initWithRecordType:zoneID:")]
+    public Self InitWithRecordTypeZoneID(CKRecordType recordType, CKRecordZoneID zoneID);
+    [Selector("objectForKey:")]
+    public CKRecordValue? ObjectForKey(CKRecordFieldKey key);
+    [Selector("setObject:forKey:")]
+    public void SetObjectForKey(CKRecordValue? object, CKRecordFieldKey key);
+    [Selector("allKeys")]
+    public NSArray AllKeys();
+    [Selector("allTokens")]
+    public NSArray AllTokens();
+    [Selector("objectForKeyedSubscript:")]
+    public CKRecordValue? ObjectForKeyedSubscript(CKRecordFieldKey key);
+    [Selector("setObject:forKeyedSubscript:")]
+    public void SetObjectForKeyedSubscript(CKRecordValue? object, CKRecordFieldKey key);
+    [Selector("changedKeys")]
+    public NSArray ChangedKeys();
+    [Selector("encodeSystemFieldsWithCoder:")]
+    public void EncodeSystemFieldsWithCoder(NSCoder coder);
+    [Selector("setParentReferenceFromRecord:")]
+    public void SetParentReferenceFromRecord(CKRecord? parentRecord);
+    [Selector("setParentReferenceFromRecordID:")]
+    public void SetParentReferenceFromRecordID(CKRecordID? parentRecordID);
 }
 
 /// CKRecordValue, a category of NSString.
@@ -106,18 +128,25 @@ public extern objc class CLLocation : CKRecordValue { }
 
 public objc interface CKRecordKeyValueSetting : NSObjectProtocol
 {
-    [Selector("objectForKey:")] CKRecordValue? ObjectForKey(CKRecordFieldKey key);
-    [Selector("setObject:forKey:")] void SetObjectForKey(CKRecordValue? object, CKRecordFieldKey key);
-    [Selector("objectForKeyedSubscript:")] CKRecordValue? ObjectForKeyedSubscript(CKRecordFieldKey key);
-    [Selector("setObject:forKeyedSubscript:")] void SetObjectForKeyedSubscript(CKRecordValue? object, CKRecordFieldKey key);
-    [Selector("allKeys")] NSArray AllKeys();
-    [Selector("changedKeys")] NSArray ChangedKeys();
+    [Selector("objectForKey:")]
+    CKRecordValue? ObjectForKey(CKRecordFieldKey key);
+    [Selector("setObject:forKey:")]
+    void SetObjectForKey(CKRecordValue? object, CKRecordFieldKey key);
+    [Selector("objectForKeyedSubscript:")]
+    CKRecordValue? ObjectForKeyedSubscript(CKRecordFieldKey key);
+    [Selector("setObject:forKeyedSubscript:")]
+    void SetObjectForKeyedSubscript(CKRecordValue? object, CKRecordFieldKey key);
+    [Selector("allKeys")]
+    NSArray AllKeys();
+    [Selector("changedKeys")]
+    NSArray ChangedKeys();
 }
 
 /// CKRecordKeyValueSettingConformance, a category of CKRecord.
 public extern objc class CKRecord : CKRecordKeyValueSetting
 {
-    [Selector("encryptedValues")] public CKRecordKeyValueSetting EncryptedValues { get; }
+    [Selector("encryptedValues")]
+    public CKRecordKeyValueSetting EncryptedValues { get; }
 }
 
 #endif

@@ -31,12 +31,14 @@ import Standard.ObjC;
 
 public objc interface NSChangeSpelling
 {
-    [Selector("changeSpelling:")] void ChangeSpelling(AnyObject? sender);
+    [Selector("changeSpelling:")]
+    void ChangeSpelling(AnyObject? sender);
 }
 
 public objc interface NSIgnoreMisspelledWords
 {
-    [Selector("ignoreSpelling:")] void IgnoreSpelling(AnyObject? sender);
+    [Selector("ignoreSpelling:")]
+    void IgnoreSpelling(AnyObject? sender);
 }
 
 #endif

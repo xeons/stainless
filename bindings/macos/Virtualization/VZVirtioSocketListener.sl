@@ -32,12 +32,15 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioSocketListener : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public VZVirtioSocketListenerDelegate? Delegate { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public VZVirtioSocketListenerDelegate? Delegate { get; set; }
 }
 
 public objc interface VZVirtioSocketListenerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("listener:shouldAcceptNewConnection:fromSocketDevice:")] bool ListenerShouldAcceptNewConnectionFromSocketDevice(VZVirtioSocketListener listener, VZVirtioSocketConnection connection, VZVirtioSocketDevice socketDevice);
+    [Optional]
+    [Selector("listener:shouldAcceptNewConnection:fromSocketDevice:")]
+    bool ListenerShouldAcceptNewConnectionFromSocketDevice(VZVirtioSocketListener listener, VZVirtioSocketConnection connection, VZVirtioSocketDevice socketDevice);
 }
 
 #endif

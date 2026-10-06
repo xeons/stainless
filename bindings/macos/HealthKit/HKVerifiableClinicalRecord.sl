@@ -48,16 +48,26 @@ public extern "C" HKVerifiableClinicalRecordCredentialType HKVerifiableClinicalR
 
 public extern objc class HKVerifiableClinicalRecord : HKSample
 {
-    [Selector("recordTypes")] public NSArray RecordTypes { get; }
-    [Selector("issuerIdentifier")] public NSString IssuerIdentifier { get; }
-    [Selector("subject")] public HKVerifiableClinicalRecordSubject Subject { get; }
-    [Selector("issuedDate")] public NSDate IssuedDate { get; }
-    [Selector("relevantDate")] public NSDate RelevantDate { get; }
-    [Selector("expirationDate")] public NSDate? ExpirationDate { get; }
-    [Selector("itemNames")] public NSArray ItemNames { get; }
-    [Selector("sourceType")] public HKVerifiableClinicalRecordSourceType? SourceType { get; }
-    [Selector("dataRepresentation")] public NSData DataRepresentation { get; }
-    [Selector("JWSRepresentation")] public NSData? JWSRepresentation { get; }
+    [Selector("recordTypes")]
+    public NSArray RecordTypes { get; }
+    [Selector("issuerIdentifier")]
+    public NSString IssuerIdentifier { get; }
+    [Selector("subject")]
+    public HKVerifiableClinicalRecordSubject Subject { get; }
+    [Selector("issuedDate")]
+    public NSDate IssuedDate { get; }
+    [Selector("relevantDate")]
+    public NSDate RelevantDate { get; }
+    [Selector("expirationDate")]
+    public NSDate? ExpirationDate { get; }
+    [Selector("itemNames")]
+    public NSArray ItemNames { get; }
+    [Selector("sourceType")]
+    public HKVerifiableClinicalRecordSourceType? SourceType { get; }
+    [Selector("dataRepresentation")]
+    public NSData DataRepresentation { get; }
+    [Selector("JWSRepresentation")]
+    public NSData? JWSRepresentation { get; }
 }
 
 #endif

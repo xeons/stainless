@@ -34,17 +34,28 @@ import Standard.ObjC;
 public extern objc class NEFilterProviderConfiguration : NSObject, NSSecureCoding, NSCopying
 {
     /// Deprecated in macOS 10.15.
-    [Selector("filterBrowsers", "setFilterBrowsers:")] public bool FilterBrowsers { get; set; }
-    [Selector("filterSockets", "setFilterSockets:")] public bool FilterSockets { get; set; }
-    [Selector("filterPackets", "setFilterPackets:")] public bool FilterPackets { get; set; }
-    [Selector("vendorConfiguration", "setVendorConfiguration:")] public NSDictionary? VendorConfiguration { get; set; }
-    [Selector("serverAddress", "setServerAddress:")] public NSString? ServerAddress { get; set; }
-    [Selector("username", "setUsername:")] public NSString? Username { get; set; }
-    [Selector("organization", "setOrganization:")] public NSString? Organization { get; set; }
-    [Selector("passwordReference", "setPasswordReference:")] public NSData? PasswordReference { get; set; }
-    [Selector("identityReference", "setIdentityReference:")] public NSData? IdentityReference { get; set; }
-    [Selector("filterDataProviderBundleIdentifier", "setFilterDataProviderBundleIdentifier:")] public NSString? FilterDataProviderBundleIdentifier { get; set; }
-    [Selector("filterPacketProviderBundleIdentifier", "setFilterPacketProviderBundleIdentifier:")] public NSString? FilterPacketProviderBundleIdentifier { get; set; }
+    [Selector("filterBrowsers", "setFilterBrowsers:")]
+    public bool FilterBrowsers { get; set; }
+    [Selector("filterSockets", "setFilterSockets:")]
+    public bool FilterSockets { get; set; }
+    [Selector("filterPackets", "setFilterPackets:")]
+    public bool FilterPackets { get; set; }
+    [Selector("vendorConfiguration", "setVendorConfiguration:")]
+    public NSDictionary? VendorConfiguration { get; set; }
+    [Selector("serverAddress", "setServerAddress:")]
+    public NSString? ServerAddress { get; set; }
+    [Selector("username", "setUsername:")]
+    public NSString? Username { get; set; }
+    [Selector("organization", "setOrganization:")]
+    public NSString? Organization { get; set; }
+    [Selector("passwordReference", "setPasswordReference:")]
+    public NSData? PasswordReference { get; set; }
+    [Selector("identityReference", "setIdentityReference:")]
+    public NSData? IdentityReference { get; set; }
+    [Selector("filterDataProviderBundleIdentifier", "setFilterDataProviderBundleIdentifier:")]
+    public NSString? FilterDataProviderBundleIdentifier { get; set; }
+    [Selector("filterPacketProviderBundleIdentifier", "setFilterPacketProviderBundleIdentifier:")]
+    public NSString? FilterPacketProviderBundleIdentifier { get; set; }
 }
 
 #endif

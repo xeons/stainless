@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationSingleSignOnCredential : NSObject, ASAuthorizationCredential
 {
-    [Selector("state")] public NSString? State { get; }
-    [Selector("accessToken")] public NSData? AccessToken { get; }
-    [Selector("identityToken")] public NSData? IdentityToken { get; }
-    [Selector("authorizedScopes")] public NSArray AuthorizedScopes { get; }
-    [Selector("authenticatedResponse")] public NSHTTPURLResponse? AuthenticatedResponse { get; }
-    [Selector("privateKeys")] public NSArray? PrivateKeys { get; }
+    [Selector("state")]
+    public NSString? State { get; }
+    [Selector("accessToken")]
+    public NSData? AccessToken { get; }
+    [Selector("identityToken")]
+    public NSData? IdentityToken { get; }
+    [Selector("authorizedScopes")]
+    public NSArray AuthorizedScopes { get; }
+    [Selector("authenticatedResponse")]
+    public NSHTTPURLResponse? AuthenticatedResponse { get; }
+    [Selector("privateKeys")]
+    public NSArray? PrivateKeys { get; }
 }
 
 #endif

@@ -33,14 +33,21 @@ import Standard.ObjC;
 
 public extern objc class STWebpageController : NSViewController
 {
-    [Selector("suppressUsageRecording", "setSuppressUsageRecording:")] public bool SuppressUsageRecording { get; set; }
-    [Selector("URL", "setURL:")] public NSURL? URL { get; set; }
-    [Selector("URLIsPlayingVideo", "setURLIsPlayingVideo:")] public bool URLIsPlayingVideo { get; set; }
-    [Selector("URLIsPictureInPicture", "setURLIsPictureInPicture:")] public bool URLIsPictureInPicture { get; set; }
-    [Selector("URLIsBlocked")] public bool URLIsBlocked { get; }
+    [Selector("suppressUsageRecording", "setSuppressUsageRecording:")]
+    public bool SuppressUsageRecording { get; set; }
+    [Selector("URL", "setURL:")]
+    public NSURL? URL { get; set; }
+    [Selector("URLIsPlayingVideo", "setURLIsPlayingVideo:")]
+    public bool URLIsPlayingVideo { get; set; }
+    [Selector("URLIsPictureInPicture", "setURLIsPictureInPicture:")]
+    public bool URLIsPictureInPicture { get; set; }
+    [Selector("URLIsBlocked")]
+    public bool URLIsBlocked { get; }
     /// macOS 15.4 and later.
-    [Selector("profileIdentifier", "setProfileIdentifier:")] public STWebHistoryProfileIdentifier? ProfileIdentifier { get; set; }
-    [Selector("setBundleIdentifier:error:")] public bool SetBundleIdentifierError(NSString bundleIdentifier, out NSError? error);
+    [Selector("profileIdentifier", "setProfileIdentifier:")]
+    public STWebHistoryProfileIdentifier? ProfileIdentifier { get; set; }
+    [Selector("setBundleIdentifier:error:")]
+    public bool SetBundleIdentifierError(NSString bundleIdentifier, out NSError? error);
 }
 
 #endif

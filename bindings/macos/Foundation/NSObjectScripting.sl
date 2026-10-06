@@ -33,10 +33,14 @@ import Standard.ObjC;
 /// NSScripting, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("scriptingProperties", "setScriptingProperties:")] public NSDictionary? ScriptingProperties { get; set; }
-    [Selector("scriptingValueForSpecifier:")] public AnyObject? ScriptingValueForSpecifier(NSScriptObjectSpecifier objectSpecifier);
-    [Selector("copyScriptingValue:forKey:withProperties:")] public AnyObject? CopyScriptingValueForKeyWithProperties(AnyObject value, NSString key, NSDictionary properties);
-    [Selector("newScriptingObjectOfClass:forValueForKey:withContentsValue:properties:")] public AnyObject? NewScriptingObjectOfClassForValueForKeyWithContentsValueProperties(Class objectClass, NSString key, AnyObject? contentsValue, NSDictionary properties);
+    [Selector("scriptingProperties", "setScriptingProperties:")]
+    public NSDictionary? ScriptingProperties { get; set; }
+    [Selector("scriptingValueForSpecifier:")]
+    public AnyObject? ScriptingValueForSpecifier(NSScriptObjectSpecifier objectSpecifier);
+    [Selector("copyScriptingValue:forKey:withProperties:")]
+    public AnyObject? CopyScriptingValueForKeyWithProperties(AnyObject value, NSString key, NSDictionary properties);
+    [Selector("newScriptingObjectOfClass:forValueForKey:withContentsValue:properties:")]
+    public AnyObject? NewScriptingObjectOfClassForValueForKeyWithContentsValueProperties(Class objectClass, NSString key, AnyObject? contentsValue, NSDictionary properties);
 }
 
 #endif

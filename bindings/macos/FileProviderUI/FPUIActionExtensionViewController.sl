@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class FPUIActionExtensionViewController : NSViewController
 {
-    [Selector("extensionContext")] public FPUIActionExtensionContext ExtensionContext { get; }
-    [Selector("prepareForError:")] public void PrepareForError(NSError error);
-    [Selector("prepareForActionWithIdentifier:itemIdentifiers:")] public void PrepareForActionWithIdentifierItemIdentifiers(NSString actionIdentifier, NSArray itemIdentifiers);
+    [Selector("extensionContext")]
+    public FPUIActionExtensionContext ExtensionContext { get; }
+    [Selector("prepareForError:")]
+    public void PrepareForError(NSError error);
+    [Selector("prepareForActionWithIdentifier:itemIdentifiers:")]
+    public void PrepareForActionWithIdentifierItemIdentifiers(NSString actionIdentifier, NSArray itemIdentifiers);
 }
 
 #endif

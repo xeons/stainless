@@ -43,21 +43,51 @@ public enum WebViewInsertAction : long
 /// Deprecated in macOS 10.14.
 public objc interface WebEditingDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("webView:shouldBeginEditingInDOMRange:")] bool WebViewShouldBeginEditingInDOMRange(WebView? webView, DOMRange? range);
-    [Optional] [Selector("webView:shouldEndEditingInDOMRange:")] bool WebViewShouldEndEditingInDOMRange(WebView? webView, DOMRange? range);
-    [Optional] [Selector("webView:shouldInsertNode:replacingDOMRange:givenAction:")] bool WebViewShouldInsertNodeReplacingDOMRangeGivenAction(WebView? webView, DOMNode? node, DOMRange? range, WebViewInsertAction action);
-    [Optional] [Selector("webView:shouldInsertText:replacingDOMRange:givenAction:")] bool WebViewShouldInsertTextReplacingDOMRangeGivenAction(WebView? webView, NSString? text, DOMRange? range, WebViewInsertAction action);
-    [Optional] [Selector("webView:shouldDeleteDOMRange:")] bool WebViewShouldDeleteDOMRange(WebView? webView, DOMRange? range);
-    [Optional] [Selector("webView:shouldChangeSelectedDOMRange:toDOMRange:affinity:stillSelecting:")] bool WebViewShouldChangeSelectedDOMRangeToDOMRangeAffinityStillSelecting(WebView? webView, DOMRange? currentRange, DOMRange? proposedRange, NSSelectionAffinity selectionAffinity, bool flag);
-    [Optional] [Selector("webView:shouldApplyStyle:toElementsInDOMRange:")] bool WebViewShouldApplyStyleToElementsInDOMRange(WebView? webView, DOMCSSStyleDeclaration? style, DOMRange? range);
-    [Optional] [Selector("webView:shouldChangeTypingStyle:toStyle:")] bool WebViewShouldChangeTypingStyleToStyle(WebView? webView, DOMCSSStyleDeclaration? currentStyle, DOMCSSStyleDeclaration? proposedStyle);
-    [Optional] [Selector("webView:doCommandBySelector:")] bool WebViewDoCommandBySelector(WebView? webView, Selector selector);
-    [Optional] [Selector("webViewDidBeginEditing:")] void WebViewDidBeginEditing(NSNotification? notification);
-    [Optional] [Selector("webViewDidChange:")] void WebViewDidChange(NSNotification? notification);
-    [Optional] [Selector("webViewDidEndEditing:")] void WebViewDidEndEditing(NSNotification? notification);
-    [Optional] [Selector("webViewDidChangeTypingStyle:")] void WebViewDidChangeTypingStyle(NSNotification? notification);
-    [Optional] [Selector("webViewDidChangeSelection:")] void WebViewDidChangeSelection(NSNotification? notification);
-    [Optional] [Selector("undoManagerForWebView:")] NSUndoManager? UndoManagerForWebView(WebView? webView);
+    [Optional]
+    [Selector("webView:shouldBeginEditingInDOMRange:")]
+    bool WebViewShouldBeginEditingInDOMRange(WebView? webView, DOMRange? range);
+    [Optional]
+    [Selector("webView:shouldEndEditingInDOMRange:")]
+    bool WebViewShouldEndEditingInDOMRange(WebView? webView, DOMRange? range);
+    [Optional]
+    [Selector("webView:shouldInsertNode:replacingDOMRange:givenAction:")]
+    bool WebViewShouldInsertNodeReplacingDOMRangeGivenAction(WebView? webView, DOMNode? node, DOMRange? range, WebViewInsertAction action);
+    [Optional]
+    [Selector("webView:shouldInsertText:replacingDOMRange:givenAction:")]
+    bool WebViewShouldInsertTextReplacingDOMRangeGivenAction(WebView? webView, NSString? text, DOMRange? range, WebViewInsertAction action);
+    [Optional]
+    [Selector("webView:shouldDeleteDOMRange:")]
+    bool WebViewShouldDeleteDOMRange(WebView? webView, DOMRange? range);
+    [Optional]
+    [Selector("webView:shouldChangeSelectedDOMRange:toDOMRange:affinity:stillSelecting:")]
+    bool WebViewShouldChangeSelectedDOMRangeToDOMRangeAffinityStillSelecting(WebView? webView, DOMRange? currentRange, DOMRange? proposedRange, NSSelectionAffinity selectionAffinity, bool flag);
+    [Optional]
+    [Selector("webView:shouldApplyStyle:toElementsInDOMRange:")]
+    bool WebViewShouldApplyStyleToElementsInDOMRange(WebView? webView, DOMCSSStyleDeclaration? style, DOMRange? range);
+    [Optional]
+    [Selector("webView:shouldChangeTypingStyle:toStyle:")]
+    bool WebViewShouldChangeTypingStyleToStyle(WebView? webView, DOMCSSStyleDeclaration? currentStyle, DOMCSSStyleDeclaration? proposedStyle);
+    [Optional]
+    [Selector("webView:doCommandBySelector:")]
+    bool WebViewDoCommandBySelector(WebView? webView, Selector selector);
+    [Optional]
+    [Selector("webViewDidBeginEditing:")]
+    void WebViewDidBeginEditing(NSNotification? notification);
+    [Optional]
+    [Selector("webViewDidChange:")]
+    void WebViewDidChange(NSNotification? notification);
+    [Optional]
+    [Selector("webViewDidEndEditing:")]
+    void WebViewDidEndEditing(NSNotification? notification);
+    [Optional]
+    [Selector("webViewDidChangeTypingStyle:")]
+    void WebViewDidChangeTypingStyle(NSNotification? notification);
+    [Optional]
+    [Selector("webViewDidChangeSelection:")]
+    void WebViewDidChangeSelection(NSNotification? notification);
+    [Optional]
+    [Selector("undoManagerForWebView:")]
+    NSUndoManager? UndoManagerForWebView(WebView? webView);
 }
 
 #endif

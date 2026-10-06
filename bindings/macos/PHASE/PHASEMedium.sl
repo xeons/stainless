@@ -37,7 +37,8 @@ public enum PHASEMediumPreset : long
 
 public extern objc class PHASEMedium : NSObject
 {
-    [Selector("initWithEngine:preset:")] public Self InitWithEnginePreset(PHASEEngine engine, PHASEMediumPreset preset);
+    [Selector("initWithEngine:preset:")]
+    public Self InitWithEnginePreset(PHASEEngine engine, PHASEMediumPreset preset);
 }
 
 #endif

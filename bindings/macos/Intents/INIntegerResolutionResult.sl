@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class INIntegerResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedValue:")] public static Self SuccessWithResolvedValue(NSInteger resolvedValue);
-    [Selector("confirmationRequiredWithValueToConfirm:")] public static Self ConfirmationRequiredWithValueToConfirm(NSNumber? valueToConfirm);
+    [Selector("successWithResolvedValue:")]
+    public static Self SuccessWithResolvedValue(NSInteger resolvedValue);
+    [Selector("confirmationRequiredWithValueToConfirm:")]
+    public static Self ConfirmationRequiredWithValueToConfirm(NSNumber? valueToConfirm);
 }
 
 #endif

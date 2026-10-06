@@ -33,26 +33,42 @@ import Standard.ObjC;
 
 public extern objc class NEProxyServer : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("address")] public NSString? Address { get; }
-    [Selector("port")] public NSInteger Port { get; }
-    [Selector("authenticationRequired", "setAuthenticationRequired:")] public bool AuthenticationRequired { get; set; }
-    [Selector("username", "setUsername:")] public NSString? Username { get; set; }
-    [Selector("password", "setPassword:")] public NSString? Password { get; set; }
-    [Selector("initWithAddress:port:")] public Self InitWithAddressPort(NSString address, NSInteger port);
+    [Selector("address")]
+    public NSString? Address { get; }
+    [Selector("port")]
+    public NSInteger Port { get; }
+    [Selector("authenticationRequired", "setAuthenticationRequired:")]
+    public bool AuthenticationRequired { get; set; }
+    [Selector("username", "setUsername:")]
+    public NSString? Username { get; set; }
+    [Selector("password", "setPassword:")]
+    public NSString? Password { get; set; }
+    [Selector("initWithAddress:port:")]
+    public Self InitWithAddressPort(NSString address, NSInteger port);
 }
 
 public extern objc class NEProxySettings : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("autoProxyConfigurationEnabled", "setAutoProxyConfigurationEnabled:")] public bool AutoProxyConfigurationEnabled { get; set; }
-    [Selector("proxyAutoConfigurationURL", "setProxyAutoConfigurationURL:")] public NSURL? ProxyAutoConfigurationURL { get; set; }
-    [Selector("proxyAutoConfigurationJavaScript", "setProxyAutoConfigurationJavaScript:")] public NSString? ProxyAutoConfigurationJavaScript { get; set; }
-    [Selector("HTTPEnabled", "setHTTPEnabled:")] public bool HTTPEnabled { get; set; }
-    [Selector("HTTPServer", "setHTTPServer:")] public NEProxyServer? HTTPServer { get; set; }
-    [Selector("HTTPSEnabled", "setHTTPSEnabled:")] public bool HTTPSEnabled { get; set; }
-    [Selector("HTTPSServer", "setHTTPSServer:")] public NEProxyServer? HTTPSServer { get; set; }
-    [Selector("excludeSimpleHostnames", "setExcludeSimpleHostnames:")] public bool ExcludeSimpleHostnames { get; set; }
-    [Selector("exceptionList", "setExceptionList:")] public NSArray? ExceptionList { get; set; }
-    [Selector("matchDomains", "setMatchDomains:")] public NSArray? MatchDomains { get; set; }
+    [Selector("autoProxyConfigurationEnabled", "setAutoProxyConfigurationEnabled:")]
+    public bool AutoProxyConfigurationEnabled { get; set; }
+    [Selector("proxyAutoConfigurationURL", "setProxyAutoConfigurationURL:")]
+    public NSURL? ProxyAutoConfigurationURL { get; set; }
+    [Selector("proxyAutoConfigurationJavaScript", "setProxyAutoConfigurationJavaScript:")]
+    public NSString? ProxyAutoConfigurationJavaScript { get; set; }
+    [Selector("HTTPEnabled", "setHTTPEnabled:")]
+    public bool HTTPEnabled { get; set; }
+    [Selector("HTTPServer", "setHTTPServer:")]
+    public NEProxyServer? HTTPServer { get; set; }
+    [Selector("HTTPSEnabled", "setHTTPSEnabled:")]
+    public bool HTTPSEnabled { get; set; }
+    [Selector("HTTPSServer", "setHTTPSServer:")]
+    public NEProxyServer? HTTPSServer { get; set; }
+    [Selector("excludeSimpleHostnames", "setExcludeSimpleHostnames:")]
+    public bool ExcludeSimpleHostnames { get; set; }
+    [Selector("exceptionList", "setExceptionList:")]
+    public NSArray? ExceptionList { get; set; }
+    [Selector("matchDomains", "setMatchDomains:")]
+    public NSArray? MatchDomains { get; set; }
 }
 
 #endif

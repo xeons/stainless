@@ -32,12 +32,18 @@ import Standard.ObjC;
 
 public extern objc class CKSyncEngineConfiguration : NSObject
 {
-    [Selector("database", "setDatabase:")] public CKDatabase Database { get; set; }
-    [Selector("stateSerialization", "setStateSerialization:")] public CKSyncEngineStateSerialization? StateSerialization { get; set; }
-    [Selector("delegate", "setDelegate:")] public CKSyncEngineDelegate? Delegate { get; set; }
-    [Selector("automaticallySync", "setAutomaticallySync:")] public bool AutomaticallySync { get; set; }
-    [Selector("subscriptionID", "setSubscriptionID:")] public CKSubscriptionID? SubscriptionID { get; set; }
-    [Selector("initWithDatabase:stateSerialization:delegate:")] public Self InitWithDatabaseStateSerializationDelegate(CKDatabase database, CKSyncEngineStateSerialization? stateSerialization, CKSyncEngineDelegate @delegate);
+    [Selector("database", "setDatabase:")]
+    public CKDatabase Database { get; set; }
+    [Selector("stateSerialization", "setStateSerialization:")]
+    public CKSyncEngineStateSerialization? StateSerialization { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public CKSyncEngineDelegate? Delegate { get; set; }
+    [Selector("automaticallySync", "setAutomaticallySync:")]
+    public bool AutomaticallySync { get; set; }
+    [Selector("subscriptionID", "setSubscriptionID:")]
+    public CKSubscriptionID? SubscriptionID { get; set; }
+    [Selector("initWithDatabase:stateSerialization:delegate:")]
+    public Self InitWithDatabaseStateSerializationDelegate(CKDatabase database, CKSyncEngineStateSerialization? stateSerialization, CKSyncEngineDelegate @delegate);
 }
 
 #endif

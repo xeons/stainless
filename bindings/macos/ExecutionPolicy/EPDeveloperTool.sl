@@ -42,9 +42,12 @@ public objc closure void EPDeveloperToolRequestDeveloperToolAccessWithCompletion
 
 public extern objc class EPDeveloperTool : NSObject
 {
-    [Selector("authorizationStatus")] public EPDeveloperToolStatus AuthorizationStatus { get; }
-    [Selector("init")] public Self Init();
-    [Selector("requestDeveloperToolAccessWithCompletionHandler:")] public void RequestDeveloperToolAccessWithCompletionHandler(EPDeveloperToolRequestDeveloperToolAccessWithCompletionHandlerHandlerBlock handler);
+    [Selector("authorizationStatus")]
+    public EPDeveloperToolStatus AuthorizationStatus { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("requestDeveloperToolAccessWithCompletionHandler:")]
+    public void RequestDeveloperToolAccessWithCompletionHandler(EPDeveloperToolRequestDeveloperToolAccessWithCompletionHandlerHandlerBlock handler);
 }
 
 #endif

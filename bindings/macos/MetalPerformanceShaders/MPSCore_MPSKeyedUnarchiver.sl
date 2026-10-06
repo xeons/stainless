@@ -33,20 +33,29 @@ import Standard.ObjC;
 
 public extern objc class MPSKeyedUnarchiver : NSKeyedUnarchiver, MPSDeviceProvider
 {
-    [Selector("unarchivedObjectOfClasses:fromData:device:error:")] public static AnyObject? UnarchivedObjectOfClassesFromDataDeviceError(NSSet classes, NSData data, MTLDevice device, out NSError? error);
-    [Selector("unarchivedObjectOfClass:fromData:device:error:")] public static AnyObject? UnarchivedObjectOfClassFromDataDeviceError(Class cls, NSData data, MTLDevice device, out NSError? error);
-    [Selector("initForReadingFromData:device:error:")] public Self InitForReadingFromDataDeviceError(NSData data, MTLDevice device, out NSError? error);
-    [Selector("mpsMTLDevice")] public MTLDevice MpsMTLDevice();
+    [Selector("unarchivedObjectOfClasses:fromData:device:error:")]
+    public static AnyObject? UnarchivedObjectOfClassesFromDataDeviceError(NSSet classes, NSData data, MTLDevice device, out NSError? error);
+    [Selector("unarchivedObjectOfClass:fromData:device:error:")]
+    public static AnyObject? UnarchivedObjectOfClassFromDataDeviceError(Class cls, NSData data, MTLDevice device, out NSError? error);
+    [Selector("initForReadingFromData:device:error:")]
+    public Self InitForReadingFromDataDeviceError(NSData data, MTLDevice device, out NSError? error);
+    [Selector("mpsMTLDevice")]
+    public MTLDevice MpsMTLDevice();
     /// Deprecated in macOS 10.14.
-    [Selector("unarchiveObjectWithData:device:")] public static AnyObject? UnarchiveObjectWithDataDevice(NSData data, MTLDevice device);
+    [Selector("unarchiveObjectWithData:device:")]
+    public static AnyObject? UnarchiveObjectWithDataDevice(NSData data, MTLDevice device);
     /// Deprecated in macOS 10.14.
-    [Selector("unarchiveTopLevelObjectWithData:device:error:")] public static AnyObject? UnarchiveTopLevelObjectWithDataDeviceError(NSData data, MTLDevice device, out NSError? error);
+    [Selector("unarchiveTopLevelObjectWithData:device:error:")]
+    public static AnyObject? UnarchiveTopLevelObjectWithDataDeviceError(NSData data, MTLDevice device, out NSError? error);
     /// Deprecated in macOS 10.14.
-    [Selector("unarchiveObjectWithFile:device:")] public static AnyObject? UnarchiveObjectWithFileDevice(NSString path, MTLDevice device);
+    [Selector("unarchiveObjectWithFile:device:")]
+    public static AnyObject? UnarchiveObjectWithFileDevice(NSString path, MTLDevice device);
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:")] public Self? InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self? InitWithDevice(MTLDevice device);
     /// Deprecated in macOS 10.14.
-    [Selector("initForReadingWithData:device:")] public Self InitForReadingWithDataDevice(NSData data, MTLDevice device);
+    [Selector("initForReadingWithData:device:")]
+    public Self InitForReadingWithDataDevice(NSData data, MTLDevice device);
 }
 
 #endif

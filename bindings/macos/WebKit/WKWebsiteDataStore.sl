@@ -47,23 +47,38 @@ public objc closure void WKWebsiteDataStoreFetchAllDataStoreIdentifiersCompletio
 
 public extern objc class WKWebsiteDataStore : NSObject, NSSecureCoding
 {
-    [Selector("isPersistent")] public bool Persistent { get; }
-    [Selector("httpCookieStore")] public WKHTTPCookieStore HttpCookieStore { get; }
-    [Selector("identifier")] public NSUUID? Identifier { get; }
-    [Selector("proxyConfigurations", "setProxyConfigurations:")] public NSArray? ProxyConfigurations { get; set; }
-    [Selector("defaultDataStore")] public static WKWebsiteDataStore DefaultDataStore();
-    [Selector("nonPersistentDataStore")] public static WKWebsiteDataStore NonPersistentDataStore();
-    [Selector("allWebsiteDataTypes")] public static NSSet AllWebsiteDataTypes();
-    [Selector("fetchDataRecordsOfTypes:completionHandler:")] public void FetchDataRecordsOfTypesCompletionHandler(NSSet dataTypes, WKWebsiteDataStoreFetchDataRecordsOfTypesCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removeDataOfTypes:forDataRecords:completionHandler:")] public void RemoveDataOfTypesForDataRecordsCompletionHandler(NSSet dataTypes, NSArray dataRecords, WKWebsiteDataStoreRemoveDataOfTypesForDataRecordsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removeDataOfTypes:modifiedSince:completionHandler:")] public void RemoveDataOfTypesModifiedSinceCompletionHandler(NSSet dataTypes, NSDate date, WKWebsiteDataStoreRemoveDataOfTypesModifiedSinceCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("isPersistent")]
+    public bool Persistent { get; }
+    [Selector("httpCookieStore")]
+    public WKHTTPCookieStore HttpCookieStore { get; }
+    [Selector("identifier")]
+    public NSUUID? Identifier { get; }
+    [Selector("proxyConfigurations", "setProxyConfigurations:")]
+    public NSArray? ProxyConfigurations { get; set; }
+    [Selector("defaultDataStore")]
+    public static WKWebsiteDataStore DefaultDataStore();
+    [Selector("nonPersistentDataStore")]
+    public static WKWebsiteDataStore NonPersistentDataStore();
+    [Selector("allWebsiteDataTypes")]
+    public static NSSet AllWebsiteDataTypes();
+    [Selector("fetchDataRecordsOfTypes:completionHandler:")]
+    public void FetchDataRecordsOfTypesCompletionHandler(NSSet dataTypes, WKWebsiteDataStoreFetchDataRecordsOfTypesCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removeDataOfTypes:forDataRecords:completionHandler:")]
+    public void RemoveDataOfTypesForDataRecordsCompletionHandler(NSSet dataTypes, NSArray dataRecords, WKWebsiteDataStoreRemoveDataOfTypesForDataRecordsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removeDataOfTypes:modifiedSince:completionHandler:")]
+    public void RemoveDataOfTypesModifiedSinceCompletionHandler(NSSet dataTypes, NSDate date, WKWebsiteDataStoreRemoveDataOfTypesModifiedSinceCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 26.0 and later.
-    [Selector("fetchDataOfTypes:completionHandler:")] public void FetchDataOfTypesCompletionHandler(NSSet dataTypes, WKWebsiteDataStoreFetchDataOfTypesCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchDataOfTypes:completionHandler:")]
+    public void FetchDataOfTypesCompletionHandler(NSSet dataTypes, WKWebsiteDataStoreFetchDataOfTypesCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 26.0 and later.
-    [Selector("restoreData:completionHandler:")] public void RestoreDataCompletionHandler(NSData data, WKWebsiteDataStoreRestoreDataCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("dataStoreForIdentifier:")] public static WKWebsiteDataStore DataStoreForIdentifier(NSUUID identifier);
-    [Selector("removeDataStoreForIdentifier:completionHandler:")] public static void RemoveDataStoreForIdentifierCompletionHandler(NSUUID identifier, WKWebsiteDataStoreRemoveDataStoreForIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("fetchAllDataStoreIdentifiers:")] public static void FetchAllDataStoreIdentifiers(WKWebsiteDataStoreFetchAllDataStoreIdentifiersCompletionHandlerBlock completionHandler);
+    [Selector("restoreData:completionHandler:")]
+    public void RestoreDataCompletionHandler(NSData data, WKWebsiteDataStoreRestoreDataCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("dataStoreForIdentifier:")]
+    public static WKWebsiteDataStore DataStoreForIdentifier(NSUUID identifier);
+    [Selector("removeDataStoreForIdentifier:completionHandler:")]
+    public static void RemoveDataStoreForIdentifierCompletionHandler(NSUUID identifier, WKWebsiteDataStoreRemoveDataStoreForIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchAllDataStoreIdentifiers:")]
+    public static void FetchAllDataStoreIdentifiers(WKWebsiteDataStoreFetchAllDataStoreIdentifiersCompletionHandlerBlock completionHandler);
 }
 
 #endif

@@ -34,10 +34,14 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCTensorParameter : NSObject
 {
-    [Selector("tensor")] public MLCTensor Tensor { get; }
-    [Selector("isUpdatable", "setIsUpdatable:")] public bool IsUpdatable { get; set; }
-    [Selector("parameterWithTensor:")] public static Self ParameterWithTensor(MLCTensor tensor);
-    [Selector("parameterWithTensor:optimizerData:")] public static Self ParameterWithTensorOptimizerData(MLCTensor tensor, NSArray? optimizerData);
+    [Selector("tensor")]
+    public MLCTensor Tensor { get; }
+    [Selector("isUpdatable", "setIsUpdatable:")]
+    public bool IsUpdatable { get; set; }
+    [Selector("parameterWithTensor:")]
+    public static Self ParameterWithTensor(MLCTensor tensor);
+    [Selector("parameterWithTensor:optimizerData:")]
+    public static Self ParameterWithTensorOptimizerData(MLCTensor tensor, NSArray? optimizerData);
 }
 
 #endif

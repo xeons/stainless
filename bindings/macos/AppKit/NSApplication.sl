@@ -84,61 +84,114 @@ public objc closure void NSApplicationEnumerateWindowsWithOptionsUsingBlockBlock
 
 public extern objc class NSApplication : NSResponder, NSUserInterfaceValidations, NSMenuItemValidation, NSAccessibilityElementProtocol, NSAccessibility
 {
-    [Selector("sharedApplication")] public static NSApplication SharedApplication { get; }
-    [Selector("delegate", "setDelegate:")] public NSApplicationDelegate? Delegate { get; set; }
-    [Selector("mainWindow")] public NSWindow? MainWindow { get; }
-    [Selector("keyWindow")] public NSWindow? KeyWindow { get; }
-    [Selector("isActive")] public bool Active { get; }
-    [Selector("isHidden")] public bool Hidden { get; }
-    [Selector("isRunning")] public bool Running { get; }
+    [Selector("sharedApplication")]
+    public static NSApplication SharedApplication { get; }
+    [Selector("delegate", "setDelegate:")]
+    public NSApplicationDelegate? Delegate { get; set; }
+    [Selector("mainWindow")]
+    public NSWindow? MainWindow { get; }
+    [Selector("keyWindow")]
+    public NSWindow? KeyWindow { get; }
+    [Selector("isActive")]
+    public bool Active { get; }
+    [Selector("isHidden")]
+    public bool Hidden { get; }
+    [Selector("isRunning")]
+    public bool Running { get; }
     /// macOS 26.0 and later.
-    [Selector("applicationShouldSuppressHighDynamicRangeContent")] public bool ApplicationShouldSuppressHighDynamicRangeContent { get; }
-    [Selector("modalWindow")] public NSWindow? ModalWindow { get; }
-    [Selector("windows")] public NSArray Windows { get; }
-    [Selector("mainMenu", "setMainMenu:")] public NSMenu? MainMenu { get; set; }
-    [Selector("helpMenu", "setHelpMenu:")] public NSMenu? HelpMenu { get; set; }
-    [Selector("applicationIconImage", "setApplicationIconImage:")] public NSImage? ApplicationIconImage { get; set; }
-    [Selector("dockTile")] public NSDockTile? DockTile { get; }
-    [Selector("presentationOptions", "setPresentationOptions:")] public NSApplicationPresentationOptions PresentationOptions { get; set; }
-    [Selector("currentSystemPresentationOptions")] public NSApplicationPresentationOptions CurrentSystemPresentationOptions { get; }
-    [Selector("occlusionState")] public NSApplicationOcclusionState OcclusionState { get; }
-    [Selector("isProtectedDataAvailable")] public bool ProtectedDataAvailable { get; }
-    [Selector("hide:")] public void Hide(AnyObject? sender);
-    [Selector("unhide:")] public void Unhide(AnyObject? sender);
-    [Selector("unhideWithoutActivation")] public void UnhideWithoutActivation();
-    [Selector("windowWithWindowNumber:")] public NSWindow? WindowWithWindowNumber(NSInteger windowNum);
-    [Selector("deactivate")] public void Deactivate();
+    [Selector("applicationShouldSuppressHighDynamicRangeContent")]
+    public bool ApplicationShouldSuppressHighDynamicRangeContent { get; }
+    [Selector("modalWindow")]
+    public NSWindow? ModalWindow { get; }
+    [Selector("windows")]
+    public NSArray Windows { get; }
+    [Selector("mainMenu", "setMainMenu:")]
+    public NSMenu? MainMenu { get; set; }
+    [Selector("helpMenu", "setHelpMenu:")]
+    public NSMenu? HelpMenu { get; set; }
+    [Selector("applicationIconImage", "setApplicationIconImage:")]
+    public NSImage? ApplicationIconImage { get; set; }
+    [Selector("dockTile")]
+    public NSDockTile? DockTile { get; }
+    [Selector("presentationOptions", "setPresentationOptions:")]
+    public NSApplicationPresentationOptions PresentationOptions { get; set; }
+    [Selector("currentSystemPresentationOptions")]
+    public NSApplicationPresentationOptions CurrentSystemPresentationOptions { get; }
+    [Selector("occlusionState")]
+    public NSApplicationOcclusionState OcclusionState { get; }
+    [Selector("isProtectedDataAvailable")]
+    public bool ProtectedDataAvailable { get; }
+    [Selector("hide:")]
+    public void Hide(AnyObject? sender);
+    [Selector("unhide:")]
+    public void Unhide(AnyObject? sender);
+    [Selector("unhideWithoutActivation")]
+    public void UnhideWithoutActivation();
+    [Selector("windowWithWindowNumber:")]
+    public NSWindow? WindowWithWindowNumber(NSInteger windowNum);
+    [Selector("deactivate")]
+    public void Deactivate();
     /// Deprecated in macOS 100000.
-    [Selector("activateIgnoringOtherApps:")] public void ActivateIgnoringOtherApps(bool ignoreOtherApps);
-    [Selector("activate")] public void Activate();
-    [Selector("yieldActivationToApplication:")] public void YieldActivationToApplication(NSRunningApplication application);
-    [Selector("yieldActivationToApplicationWithBundleIdentifier:")] public void YieldActivationToApplicationWithBundleIdentifier(NSString bundleIdentifier);
-    [Selector("hideOtherApplications:")] public void HideOtherApplications(AnyObject? sender);
-    [Selector("unhideAllApplications:")] public void UnhideAllApplications(AnyObject? sender);
-    [Selector("finishLaunching")] public void FinishLaunching();
-    [Selector("run")] public void Run();
-    [Selector("runModalForWindow:")] public NSModalResponse RunModalForWindow(NSWindow window);
-    [Selector("stop:")] public void Stop(AnyObject? sender);
-    [Selector("stopModal")] public void StopModal();
-    [Selector("stopModalWithCode:")] public void StopModalWithCode(NSModalResponse returnCode);
-    [Selector("abortModal")] public void AbortModal();
-    [Selector("beginModalSessionForWindow:")] public NSModalSession BeginModalSessionForWindow(NSWindow window);
-    [Selector("runModalSession:")] public NSModalResponse RunModalSession(NSModalSession session);
-    [Selector("endModalSession:")] public void EndModalSession(NSModalSession session);
-    [Selector("terminate:")] public void Terminate(AnyObject? sender);
-    [Selector("requestUserAttention:")] public NSInteger RequestUserAttention(NSRequestUserAttentionType requestType);
-    [Selector("cancelUserAttentionRequest:")] public void CancelUserAttentionRequest(NSInteger request);
-    [Selector("enumerateWindowsWithOptions:usingBlock:")] public void EnumerateWindowsWithOptionsUsingBlock(NSWindowListOptions options, NSApplicationEnumerateWindowsWithOptionsUsingBlockBlock block);
-    [Selector("preventWindowOrdering")] public void PreventWindowOrdering();
-    [Selector("setWindowsNeedUpdate:")] public void SetWindowsNeedUpdate(bool needUpdate);
-    [Selector("updateWindows")] public void UpdateWindows();
-    [Selector("activationPolicy")] public NSApplicationActivationPolicy ActivationPolicy();
-    [Selector("setActivationPolicy:")] public bool SetActivationPolicy(NSApplicationActivationPolicy activationPolicy);
-    [Selector("reportException:")] public void ReportException(NSException exception);
-    [Selector("detachDrawingThread:toTarget:withObject:")] public static void DetachDrawingThreadToTargetWithObject(Selector selector, AnyObject target, AnyObject? argument);
-    [Selector("replyToApplicationShouldTerminate:")] public void ReplyToApplicationShouldTerminate(bool shouldTerminate);
-    [Selector("replyToOpenOrPrint:")] public void ReplyToOpenOrPrint(NSApplicationDelegateReply reply);
-    [Selector("orderFrontCharacterPalette:")] public void OrderFrontCharacterPalette(AnyObject? sender);
+    [Selector("activateIgnoringOtherApps:")]
+    public void ActivateIgnoringOtherApps(bool ignoreOtherApps);
+    [Selector("activate")]
+    public void Activate();
+    [Selector("yieldActivationToApplication:")]
+    public void YieldActivationToApplication(NSRunningApplication application);
+    [Selector("yieldActivationToApplicationWithBundleIdentifier:")]
+    public void YieldActivationToApplicationWithBundleIdentifier(NSString bundleIdentifier);
+    [Selector("hideOtherApplications:")]
+    public void HideOtherApplications(AnyObject? sender);
+    [Selector("unhideAllApplications:")]
+    public void UnhideAllApplications(AnyObject? sender);
+    [Selector("finishLaunching")]
+    public void FinishLaunching();
+    [Selector("run")]
+    public void Run();
+    [Selector("runModalForWindow:")]
+    public NSModalResponse RunModalForWindow(NSWindow window);
+    [Selector("stop:")]
+    public void Stop(AnyObject? sender);
+    [Selector("stopModal")]
+    public void StopModal();
+    [Selector("stopModalWithCode:")]
+    public void StopModalWithCode(NSModalResponse returnCode);
+    [Selector("abortModal")]
+    public void AbortModal();
+    [Selector("beginModalSessionForWindow:")]
+    public NSModalSession BeginModalSessionForWindow(NSWindow window);
+    [Selector("runModalSession:")]
+    public NSModalResponse RunModalSession(NSModalSession session);
+    [Selector("endModalSession:")]
+    public void EndModalSession(NSModalSession session);
+    [Selector("terminate:")]
+    public void Terminate(AnyObject? sender);
+    [Selector("requestUserAttention:")]
+    public NSInteger RequestUserAttention(NSRequestUserAttentionType requestType);
+    [Selector("cancelUserAttentionRequest:")]
+    public void CancelUserAttentionRequest(NSInteger request);
+    [Selector("enumerateWindowsWithOptions:usingBlock:")]
+    public void EnumerateWindowsWithOptionsUsingBlock(NSWindowListOptions options, NSApplicationEnumerateWindowsWithOptionsUsingBlockBlock block);
+    [Selector("preventWindowOrdering")]
+    public void PreventWindowOrdering();
+    [Selector("setWindowsNeedUpdate:")]
+    public void SetWindowsNeedUpdate(bool needUpdate);
+    [Selector("updateWindows")]
+    public void UpdateWindows();
+    [Selector("activationPolicy")]
+    public NSApplicationActivationPolicy ActivationPolicy();
+    [Selector("setActivationPolicy:")]
+    public bool SetActivationPolicy(NSApplicationActivationPolicy activationPolicy);
+    [Selector("reportException:")]
+    public void ReportException(NSException exception);
+    [Selector("detachDrawingThread:toTarget:withObject:")]
+    public static void DetachDrawingThreadToTargetWithObject(Selector selector, AnyObject target, AnyObject? argument);
+    [Selector("replyToApplicationShouldTerminate:")]
+    public void ReplyToApplicationShouldTerminate(bool shouldTerminate);
+    [Selector("replyToOpenOrPrint:")]
+    public void ReplyToOpenOrPrint(NSApplicationDelegateReply reply);
+    [Selector("orderFrontCharacterPalette:")]
+    public void OrderFrontCharacterPalette(AnyObject? sender);
 }
 
 public extern "C" NSApplication? NSApp;
@@ -159,46 +212,66 @@ public enum NSApplicationDelegateReply : ulong
 /// NSAppearanceCustomization, a category of NSApplication.
 public extern objc class NSApplication : NSAppearanceCustomization
 {
-    [Selector("appearance", "setAppearance:")] public NSAppearance? Appearance { get; set; }
-    [Selector("effectiveAppearance")] public NSAppearance? EffectiveAppearance { get; }
+    [Selector("appearance", "setAppearance:")]
+    public NSAppearance? Appearance { get; set; }
+    [Selector("effectiveAppearance")]
+    public NSAppearance? EffectiveAppearance { get; }
 }
 
 /// NSEvent, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("currentEvent")] public NSEvent? CurrentEvent { get; }
-    [Selector("sendEvent:")] public void SendEvent(NSEvent event);
-    [Selector("postEvent:atStart:")] public void PostEventAtStart(NSEvent event, bool atStart);
-    [Selector("nextEventMatchingMask:untilDate:inMode:dequeue:")] public NSEvent? NextEventMatchingMaskUntilDateInModeDequeue(NSEventMask mask, NSDate? expiration, NSRunLoopMode mode, bool deqFlag);
-    [Selector("discardEventsMatchingMask:beforeEvent:")] public void DiscardEventsMatchingMaskBeforeEvent(NSEventMask mask, NSEvent? lastEvent);
+    [Selector("currentEvent")]
+    public NSEvent? CurrentEvent { get; }
+    [Selector("sendEvent:")]
+    public void SendEvent(NSEvent event);
+    [Selector("postEvent:atStart:")]
+    public void PostEventAtStart(NSEvent event, bool atStart);
+    [Selector("nextEventMatchingMask:untilDate:inMode:dequeue:")]
+    public NSEvent? NextEventMatchingMaskUntilDateInModeDequeue(NSEventMask mask, NSDate? expiration, NSRunLoopMode mode, bool deqFlag);
+    [Selector("discardEventsMatchingMask:beforeEvent:")]
+    public void DiscardEventsMatchingMaskBeforeEvent(NSEventMask mask, NSEvent? lastEvent);
 }
 
 /// NSResponder, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("sendAction:to:from:")] public bool SendActionToFrom(Selector action, AnyObject? target, AnyObject? sender);
-    [Selector("targetForAction:")] public AnyObject? TargetForAction(Selector action);
-    [Selector("targetForAction:to:from:")] public AnyObject? TargetForActionToFrom(Selector action, AnyObject? target, AnyObject? sender);
-    [Selector("tryToPerform:with:")] public bool TryToPerformWith(Selector action, AnyObject? object);
-    [Selector("validRequestorForSendType:returnType:")] public AnyObject? ValidRequestorForSendTypeReturnType(NSPasteboardType? sendType, NSPasteboardType? returnType);
+    [Selector("sendAction:to:from:")]
+    public bool SendActionToFrom(Selector action, AnyObject? target, AnyObject? sender);
+    [Selector("targetForAction:")]
+    public AnyObject? TargetForAction(Selector action);
+    [Selector("targetForAction:to:from:")]
+    public AnyObject? TargetForActionToFrom(Selector action, AnyObject? target, AnyObject? sender);
+    [Selector("tryToPerform:with:")]
+    public bool TryToPerformWith(Selector action, AnyObject? object);
+    [Selector("validRequestorForSendType:returnType:")]
+    public AnyObject? ValidRequestorForSendTypeReturnType(NSPasteboardType? sendType, NSPasteboardType? returnType);
 }
 
 /// NSWindowsMenu, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("windowsMenu", "setWindowsMenu:")] public NSMenu? WindowsMenu { get; set; }
-    [Selector("arrangeInFront:")] public void ArrangeInFront(AnyObject? sender);
-    [Selector("removeWindowsItem:")] public void RemoveWindowsItem(NSWindow win);
-    [Selector("addWindowsItem:title:filename:")] public void AddWindowsItemTitleFilename(NSWindow win, NSString string, bool isFilename);
-    [Selector("changeWindowsItem:title:filename:")] public void ChangeWindowsItemTitleFilename(NSWindow win, NSString string, bool isFilename);
-    [Selector("updateWindowsItem:")] public void UpdateWindowsItem(NSWindow win);
-    [Selector("miniaturizeAll:")] public void MiniaturizeAll(AnyObject? sender);
+    [Selector("windowsMenu", "setWindowsMenu:")]
+    public NSMenu? WindowsMenu { get; set; }
+    [Selector("arrangeInFront:")]
+    public void ArrangeInFront(AnyObject? sender);
+    [Selector("removeWindowsItem:")]
+    public void RemoveWindowsItem(NSWindow win);
+    [Selector("addWindowsItem:title:filename:")]
+    public void AddWindowsItemTitleFilename(NSWindow win, NSString string, bool isFilename);
+    [Selector("changeWindowsItem:title:filename:")]
+    public void ChangeWindowsItemTitleFilename(NSWindow win, NSString string, bool isFilename);
+    [Selector("updateWindowsItem:")]
+    public void UpdateWindowsItem(NSWindow win);
+    [Selector("miniaturizeAll:")]
+    public void MiniaturizeAll(AnyObject? sender);
 }
 
 /// NSFullKeyboardAccess, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("isFullKeyboardAccessEnabled")] public bool FullKeyboardAccessEnabled { get; }
+    [Selector("isFullKeyboardAccessEnabled")]
+    public bool FullKeyboardAccessEnabled { get; }
 }
 
 public enum NSApplicationTerminateReply : ulong
@@ -220,70 +293,167 @@ public objc closure void NSApplicationDelegateApplicationContinueUserActivityRes
 
 public objc interface NSApplicationDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("applicationShouldTerminate:")] NSApplicationTerminateReply ApplicationShouldTerminate(NSApplication sender);
-    [Optional] [Selector("application:openURLs:")] void ApplicationOpenURLs(NSApplication application, NSArray urls);
-    [Optional] [Selector("application:openFile:")] bool ApplicationOpenFile(NSApplication sender, NSString filename);
-    [Optional] [Selector("application:openFiles:")] void ApplicationOpenFiles(NSApplication sender, NSArray filenames);
-    [Optional] [Selector("application:openTempFile:")] bool ApplicationOpenTempFile(NSApplication sender, NSString filename);
-    [Optional] [Selector("applicationShouldOpenUntitledFile:")] bool ApplicationShouldOpenUntitledFile(NSApplication sender);
-    [Optional] [Selector("applicationOpenUntitledFile:")] bool ApplicationOpenUntitledFile(NSApplication sender);
-    [Optional] [Selector("application:openFileWithoutUI:")] bool ApplicationOpenFileWithoutUI(AnyObject sender, NSString filename);
-    [Optional] [Selector("application:printFile:")] bool ApplicationPrintFile(NSApplication sender, NSString filename);
-    [Optional] [Selector("application:printFiles:withSettings:showPrintPanels:")] NSApplicationPrintReply ApplicationPrintFilesWithSettingsShowPrintPanels(NSApplication application, NSArray fileNames, NSDictionary printSettings, bool showPrintPanels);
-    [Optional] [Selector("applicationShouldTerminateAfterLastWindowClosed:")] bool ApplicationShouldTerminateAfterLastWindowClosed(NSApplication sender);
-    [Optional] [Selector("applicationShouldHandleReopen:hasVisibleWindows:")] bool ApplicationShouldHandleReopenHasVisibleWindows(NSApplication sender, bool hasVisibleWindows);
-    [Optional] [Selector("applicationDockMenu:")] NSMenu? ApplicationDockMenu(NSApplication sender);
-    [Optional] [Selector("application:willPresentError:")] NSError ApplicationWillPresentError(NSApplication application, NSError error);
-    [Optional] [Selector("application:didRegisterForRemoteNotificationsWithDeviceToken:")] void ApplicationDidRegisterForRemoteNotificationsWithDeviceToken(NSApplication application, NSData deviceToken);
-    [Optional] [Selector("application:didFailToRegisterForRemoteNotificationsWithError:")] void ApplicationDidFailToRegisterForRemoteNotificationsWithError(NSApplication application, NSError error);
-    [Optional] [Selector("application:didReceiveRemoteNotification:")] void ApplicationDidReceiveRemoteNotification(NSApplication application, NSDictionary userInfo);
-    [Optional] [Selector("applicationSupportsSecureRestorableState:")] bool ApplicationSupportsSecureRestorableState(NSApplication app);
-    [Optional] [Selector("application:handlerForIntent:")] AnyObject? ApplicationHandlerForIntent(NSApplication application, INIntent intent);
-    [Optional] [Selector("application:willEncodeRestorableState:")] void ApplicationWillEncodeRestorableState(NSApplication app, NSCoder coder);
-    [Optional] [Selector("application:didDecodeRestorableState:")] void ApplicationDidDecodeRestorableState(NSApplication app, NSCoder coder);
-    [Optional] [Selector("application:willContinueUserActivityWithType:")] bool ApplicationWillContinueUserActivityWithType(NSApplication application, NSString userActivityType);
-    [Optional] [Selector("application:continueUserActivity:restorationHandler:")] bool ApplicationContinueUserActivityRestorationHandler(NSApplication application, NSUserActivity userActivity, NSApplicationDelegateApplicationContinueUserActivityRestorationHandlerRestorationHandlerBlock restorationHandler);
-    [Optional] [Selector("application:didFailToContinueUserActivityWithType:error:")] void ApplicationDidFailToContinueUserActivityWithTypeError(NSApplication application, NSString userActivityType, NSError error);
-    [Optional] [Selector("application:didUpdateUserActivity:")] void ApplicationDidUpdateUserActivity(NSApplication application, NSUserActivity userActivity);
-    [Optional] [Selector("application:userDidAcceptCloudKitShareWithMetadata:")] void ApplicationUserDidAcceptCloudKitShareWithMetadata(NSApplication application, CKShareMetadata metadata);
-    [Optional] [Selector("application:delegateHandlesKey:")] bool ApplicationDelegateHandlesKey(NSApplication sender, NSString key);
-    [Optional] [Selector("applicationShouldAutomaticallyLocalizeKeyEquivalents:")] bool ApplicationShouldAutomaticallyLocalizeKeyEquivalents(NSApplication application);
-    [Optional] [Selector("applicationWillFinishLaunching:")] void ApplicationWillFinishLaunching(NSNotification notification);
-    [Optional] [Selector("applicationDidFinishLaunching:")] void ApplicationDidFinishLaunching(NSNotification notification);
-    [Optional] [Selector("applicationWillHide:")] void ApplicationWillHide(NSNotification notification);
-    [Optional] [Selector("applicationDidHide:")] void ApplicationDidHide(NSNotification notification);
-    [Optional] [Selector("applicationWillUnhide:")] void ApplicationWillUnhide(NSNotification notification);
-    [Optional] [Selector("applicationDidUnhide:")] void ApplicationDidUnhide(NSNotification notification);
-    [Optional] [Selector("applicationWillBecomeActive:")] void ApplicationWillBecomeActive(NSNotification notification);
-    [Optional] [Selector("applicationDidBecomeActive:")] void ApplicationDidBecomeActive(NSNotification notification);
-    [Optional] [Selector("applicationWillResignActive:")] void ApplicationWillResignActive(NSNotification notification);
-    [Optional] [Selector("applicationDidResignActive:")] void ApplicationDidResignActive(NSNotification notification);
-    [Optional] [Selector("applicationWillUpdate:")] void ApplicationWillUpdate(NSNotification notification);
-    [Optional] [Selector("applicationDidUpdate:")] void ApplicationDidUpdate(NSNotification notification);
-    [Optional] [Selector("applicationWillTerminate:")] void ApplicationWillTerminate(NSNotification notification);
-    [Optional] [Selector("applicationDidChangeScreenParameters:")] void ApplicationDidChangeScreenParameters(NSNotification notification);
-    [Optional] [Selector("applicationDidChangeOcclusionState:")] void ApplicationDidChangeOcclusionState(NSNotification notification);
-    [Optional] [Selector("applicationProtectedDataWillBecomeUnavailable:")] void ApplicationProtectedDataWillBecomeUnavailable(NSNotification notification);
-    [Optional] [Selector("applicationProtectedDataDidBecomeAvailable:")] void ApplicationProtectedDataDidBecomeAvailable(NSNotification notification);
+    [Optional]
+    [Selector("applicationShouldTerminate:")]
+    NSApplicationTerminateReply ApplicationShouldTerminate(NSApplication sender);
+    [Optional]
+    [Selector("application:openURLs:")]
+    void ApplicationOpenURLs(NSApplication application, NSArray urls);
+    [Optional]
+    [Selector("application:openFile:")]
+    bool ApplicationOpenFile(NSApplication sender, NSString filename);
+    [Optional]
+    [Selector("application:openFiles:")]
+    void ApplicationOpenFiles(NSApplication sender, NSArray filenames);
+    [Optional]
+    [Selector("application:openTempFile:")]
+    bool ApplicationOpenTempFile(NSApplication sender, NSString filename);
+    [Optional]
+    [Selector("applicationShouldOpenUntitledFile:")]
+    bool ApplicationShouldOpenUntitledFile(NSApplication sender);
+    [Optional]
+    [Selector("applicationOpenUntitledFile:")]
+    bool ApplicationOpenUntitledFile(NSApplication sender);
+    [Optional]
+    [Selector("application:openFileWithoutUI:")]
+    bool ApplicationOpenFileWithoutUI(AnyObject sender, NSString filename);
+    [Optional]
+    [Selector("application:printFile:")]
+    bool ApplicationPrintFile(NSApplication sender, NSString filename);
+    [Optional]
+    [Selector("application:printFiles:withSettings:showPrintPanels:")]
+    NSApplicationPrintReply ApplicationPrintFilesWithSettingsShowPrintPanels(NSApplication application, NSArray fileNames, NSDictionary printSettings, bool showPrintPanels);
+    [Optional]
+    [Selector("applicationShouldTerminateAfterLastWindowClosed:")]
+    bool ApplicationShouldTerminateAfterLastWindowClosed(NSApplication sender);
+    [Optional]
+    [Selector("applicationShouldHandleReopen:hasVisibleWindows:")]
+    bool ApplicationShouldHandleReopenHasVisibleWindows(NSApplication sender, bool hasVisibleWindows);
+    [Optional]
+    [Selector("applicationDockMenu:")]
+    NSMenu? ApplicationDockMenu(NSApplication sender);
+    [Optional]
+    [Selector("application:willPresentError:")]
+    NSError ApplicationWillPresentError(NSApplication application, NSError error);
+    [Optional]
+    [Selector("application:didRegisterForRemoteNotificationsWithDeviceToken:")]
+    void ApplicationDidRegisterForRemoteNotificationsWithDeviceToken(NSApplication application, NSData deviceToken);
+    [Optional]
+    [Selector("application:didFailToRegisterForRemoteNotificationsWithError:")]
+    void ApplicationDidFailToRegisterForRemoteNotificationsWithError(NSApplication application, NSError error);
+    [Optional]
+    [Selector("application:didReceiveRemoteNotification:")]
+    void ApplicationDidReceiveRemoteNotification(NSApplication application, NSDictionary userInfo);
+    [Optional]
+    [Selector("applicationSupportsSecureRestorableState:")]
+    bool ApplicationSupportsSecureRestorableState(NSApplication app);
+    [Optional]
+    [Selector("application:handlerForIntent:")]
+    AnyObject? ApplicationHandlerForIntent(NSApplication application, INIntent intent);
+    [Optional]
+    [Selector("application:willEncodeRestorableState:")]
+    void ApplicationWillEncodeRestorableState(NSApplication app, NSCoder coder);
+    [Optional]
+    [Selector("application:didDecodeRestorableState:")]
+    void ApplicationDidDecodeRestorableState(NSApplication app, NSCoder coder);
+    [Optional]
+    [Selector("application:willContinueUserActivityWithType:")]
+    bool ApplicationWillContinueUserActivityWithType(NSApplication application, NSString userActivityType);
+    [Optional]
+    [Selector("application:continueUserActivity:restorationHandler:")]
+    bool ApplicationContinueUserActivityRestorationHandler(NSApplication application, NSUserActivity userActivity, NSApplicationDelegateApplicationContinueUserActivityRestorationHandlerRestorationHandlerBlock restorationHandler);
+    [Optional]
+    [Selector("application:didFailToContinueUserActivityWithType:error:")]
+    void ApplicationDidFailToContinueUserActivityWithTypeError(NSApplication application, NSString userActivityType, NSError error);
+    [Optional]
+    [Selector("application:didUpdateUserActivity:")]
+    void ApplicationDidUpdateUserActivity(NSApplication application, NSUserActivity userActivity);
+    [Optional]
+    [Selector("application:userDidAcceptCloudKitShareWithMetadata:")]
+    void ApplicationUserDidAcceptCloudKitShareWithMetadata(NSApplication application, CKShareMetadata metadata);
+    [Optional]
+    [Selector("application:delegateHandlesKey:")]
+    bool ApplicationDelegateHandlesKey(NSApplication sender, NSString key);
+    [Optional]
+    [Selector("applicationShouldAutomaticallyLocalizeKeyEquivalents:")]
+    bool ApplicationShouldAutomaticallyLocalizeKeyEquivalents(NSApplication application);
+    [Optional]
+    [Selector("applicationWillFinishLaunching:")]
+    void ApplicationWillFinishLaunching(NSNotification notification);
+    [Optional]
+    [Selector("applicationDidFinishLaunching:")]
+    void ApplicationDidFinishLaunching(NSNotification notification);
+    [Optional]
+    [Selector("applicationWillHide:")]
+    void ApplicationWillHide(NSNotification notification);
+    [Optional]
+    [Selector("applicationDidHide:")]
+    void ApplicationDidHide(NSNotification notification);
+    [Optional]
+    [Selector("applicationWillUnhide:")]
+    void ApplicationWillUnhide(NSNotification notification);
+    [Optional]
+    [Selector("applicationDidUnhide:")]
+    void ApplicationDidUnhide(NSNotification notification);
+    [Optional]
+    [Selector("applicationWillBecomeActive:")]
+    void ApplicationWillBecomeActive(NSNotification notification);
+    [Optional]
+    [Selector("applicationDidBecomeActive:")]
+    void ApplicationDidBecomeActive(NSNotification notification);
+    [Optional]
+    [Selector("applicationWillResignActive:")]
+    void ApplicationWillResignActive(NSNotification notification);
+    [Optional]
+    [Selector("applicationDidResignActive:")]
+    void ApplicationDidResignActive(NSNotification notification);
+    [Optional]
+    [Selector("applicationWillUpdate:")]
+    void ApplicationWillUpdate(NSNotification notification);
+    [Optional]
+    [Selector("applicationDidUpdate:")]
+    void ApplicationDidUpdate(NSNotification notification);
+    [Optional]
+    [Selector("applicationWillTerminate:")]
+    void ApplicationWillTerminate(NSNotification notification);
+    [Optional]
+    [Selector("applicationDidChangeScreenParameters:")]
+    void ApplicationDidChangeScreenParameters(NSNotification notification);
+    [Optional]
+    [Selector("applicationDidChangeOcclusionState:")]
+    void ApplicationDidChangeOcclusionState(NSNotification notification);
+    [Optional]
+    [Selector("applicationProtectedDataWillBecomeUnavailable:")]
+    void ApplicationProtectedDataWillBecomeUnavailable(NSNotification notification);
+    [Optional]
+    [Selector("applicationProtectedDataDidBecomeAvailable:")]
+    void ApplicationProtectedDataDidBecomeAvailable(NSNotification notification);
 }
 
 /// NSServicesMenu, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("servicesMenu", "setServicesMenu:")] public NSMenu? ServicesMenu { get; set; }
-    [Selector("registerServicesMenuSendTypes:returnTypes:")] public void RegisterServicesMenuSendTypesReturnTypes(NSArray sendTypes, NSArray returnTypes);
+    [Selector("servicesMenu", "setServicesMenu:")]
+    public NSMenu? ServicesMenu { get; set; }
+    [Selector("registerServicesMenuSendTypes:returnTypes:")]
+    public void RegisterServicesMenuSendTypesReturnTypes(NSArray sendTypes, NSArray returnTypes);
 }
 
 public objc interface NSServicesMenuRequestor : NSObjectProtocol
 {
-    [Optional] [Selector("writeSelectionToPasteboard:types:")] bool WriteSelectionToPasteboardTypes(NSPasteboard pboard, NSArray types);
-    [Optional] [Selector("readSelectionFromPasteboard:")] bool ReadSelectionFromPasteboard(NSPasteboard pboard);
+    [Optional]
+    [Selector("writeSelectionToPasteboard:types:")]
+    bool WriteSelectionToPasteboardTypes(NSPasteboard pboard, NSArray types);
+    [Optional]
+    [Selector("readSelectionFromPasteboard:")]
+    bool ReadSelectionFromPasteboard(NSPasteboard pboard);
 }
 
 /// NSServicesHandling, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("servicesProvider", "setServicesProvider:")] public AnyObject? ServicesProvider { get; set; }
+    [Selector("servicesProvider", "setServicesProvider:")]
+    public AnyObject? ServicesProvider { get; set; }
 }
 
 public using NSAboutPanelOptionKey = NSString;
@@ -301,21 +471,26 @@ public extern "C" NSAboutPanelOptionKey? NSAboutPanelOptionApplicationVersion;
 /// NSStandardAboutPanel, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("orderFrontStandardAboutPanel:")] public void OrderFrontStandardAboutPanel(AnyObject? sender);
-    [Selector("orderFrontStandardAboutPanelWithOptions:")] public void OrderFrontStandardAboutPanelWithOptions(NSDictionary optionsDictionary);
+    [Selector("orderFrontStandardAboutPanel:")]
+    public void OrderFrontStandardAboutPanel(AnyObject? sender);
+    [Selector("orderFrontStandardAboutPanelWithOptions:")]
+    public void OrderFrontStandardAboutPanelWithOptions(NSDictionary optionsDictionary);
 }
 
 /// NSApplicationLayoutDirection, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("userInterfaceLayoutDirection")] public NSUserInterfaceLayoutDirection UserInterfaceLayoutDirection { get; }
+    [Selector("userInterfaceLayoutDirection")]
+    public NSUserInterfaceLayoutDirection UserInterfaceLayoutDirection { get; }
 }
 
 /// NSRestorableUserInterface, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("disableRelaunchOnLogin")] public void DisableRelaunchOnLogin();
-    [Selector("enableRelaunchOnLogin")] public void EnableRelaunchOnLogin();
+    [Selector("disableRelaunchOnLogin")]
+    public void DisableRelaunchOnLogin();
+    [Selector("enableRelaunchOnLogin")]
+    public void EnableRelaunchOnLogin();
 }
 
 [Flags]
@@ -330,11 +505,16 @@ public enum NSRemoteNotificationType : ulong
 /// NSRemoteNotifications, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("isRegisteredForRemoteNotifications")] public bool RegisteredForRemoteNotifications { get; }
-    [Selector("enabledRemoteNotificationTypes")] public NSRemoteNotificationType EnabledRemoteNotificationTypes { get; }
-    [Selector("registerForRemoteNotifications")] public void RegisterForRemoteNotifications();
-    [Selector("unregisterForRemoteNotifications")] public void UnregisterForRemoteNotifications();
-    [Selector("registerForRemoteNotificationTypes:")] public void RegisterForRemoteNotificationTypes(NSRemoteNotificationType types);
+    [Selector("isRegisteredForRemoteNotifications")]
+    public bool RegisteredForRemoteNotifications { get; }
+    [Selector("enabledRemoteNotificationTypes")]
+    public NSRemoteNotificationType EnabledRemoteNotificationTypes { get; }
+    [Selector("registerForRemoteNotifications")]
+    public void RegisterForRemoteNotifications();
+    [Selector("unregisterForRemoteNotifications")]
+    public void UnregisterForRemoteNotifications();
+    [Selector("registerForRemoteNotificationTypes:")]
+    public void RegisterForRemoteNotificationTypes(NSRemoteNotificationType types);
 }
 
 public extern "C" int NSApplicationMain(int argc, byte** argv);
@@ -406,21 +586,29 @@ public extern "C" NSNotificationName? NSApplicationDidChangeOcclusionStateNotifi
 public extern objc class NSApplication
 {
     /// Deprecated in macOS 10.12.
-    [Selector("context")] public NSGraphicsContext? Context { get; }
+    [Selector("context")]
+    public NSGraphicsContext? Context { get; }
     /// Deprecated in macOS 10.0.
-    [Selector("runModalForWindow:relativeToWindow:")] public NSInteger RunModalForWindowRelativeToWindow(NSWindow? window, NSWindow? docWindow);
+    [Selector("runModalForWindow:relativeToWindow:")]
+    public NSInteger RunModalForWindowRelativeToWindow(NSWindow? window, NSWindow? docWindow);
     /// Deprecated in macOS 10.0.
-    [Selector("beginModalSessionForWindow:relativeToWindow:")] public NSModalSession BeginModalSessionForWindowRelativeToWindow(NSWindow? window, NSWindow? docWindow);
+    [Selector("beginModalSessionForWindow:relativeToWindow:")]
+    public NSModalSession BeginModalSessionForWindowRelativeToWindow(NSWindow? window, NSWindow? docWindow);
     /// Deprecated in macOS 10.4.
-    [Selector("application:printFiles:")] public void ApplicationPrintFiles(NSApplication? sender, NSArray? filenames);
+    [Selector("application:printFiles:")]
+    public void ApplicationPrintFiles(NSApplication? sender, NSArray? filenames);
     /// Deprecated in macOS 10.10.
-    [Selector("beginSheet:modalForWindow:modalDelegate:didEndSelector:contextInfo:")] public void BeginSheetModalForWindowModalDelegateDidEndSelectorContextInfo(NSWindow sheet, NSWindow docWindow, AnyObject? modalDelegate, Selector didEndSelector, void* contextInfo);
+    [Selector("beginSheet:modalForWindow:modalDelegate:didEndSelector:contextInfo:")]
+    public void BeginSheetModalForWindowModalDelegateDidEndSelectorContextInfo(NSWindow sheet, NSWindow docWindow, AnyObject? modalDelegate, Selector didEndSelector, void* contextInfo);
     /// Deprecated in macOS 10.10.
-    [Selector("endSheet:")] public void EndSheet(NSWindow sheet);
+    [Selector("endSheet:")]
+    public void EndSheet(NSWindow sheet);
     /// Deprecated in macOS 10.10.
-    [Selector("endSheet:returnCode:")] public void EndSheetReturnCode(NSWindow sheet, NSInteger returnCode);
+    [Selector("endSheet:returnCode:")]
+    public void EndSheetReturnCode(NSWindow sheet, NSInteger returnCode);
     /// Deprecated in macOS 10.14.
-    [Selector("makeWindowsPerform:inOrder:")] public NSWindow? MakeWindowsPerformInOrder(Selector selector, bool inOrder);
+    [Selector("makeWindowsPerform:inOrder:")]
+    public NSWindow? MakeWindowsPerformInOrder(Selector selector, bool inOrder);
 }
 
 public const int NSRunStoppedResponse = -1000;

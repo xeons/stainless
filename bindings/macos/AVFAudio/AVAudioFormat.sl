@@ -44,25 +44,44 @@ public enum AVAudioCommonFormat : ulong
 
 public extern objc class AVAudioFormat : NSObject, NSSecureCoding
 {
-    [Selector("isStandard")] public bool Standard { get; }
-    [Selector("commonFormat")] public AVAudioCommonFormat CommonFormat { get; }
-    [Selector("channelCount")] public AVAudioChannelCount ChannelCount { get; }
-    [Selector("sampleRate")] public double SampleRate { get; }
-    [Selector("isInterleaved")] public bool Interleaved { get; }
-    [Selector("streamDescription")] public AudioStreamBasicDescription* StreamDescription { get; }
-    [Selector("channelLayout")] public AVAudioChannelLayout? ChannelLayout { get; }
-    [Selector("magicCookie", "setMagicCookie:")] public NSData? MagicCookie { get; set; }
-    [Selector("settings")] public NSDictionary Settings { get; }
-    [Selector("formatDescription")] public CMAudioFormatDescriptionRef FormatDescription { get; }
-    [Selector("initWithStreamDescription:")] public Self? InitWithStreamDescription(AudioStreamBasicDescription* asbd);
-    [Selector("initWithStreamDescription:channelLayout:")] public Self? InitWithStreamDescriptionChannelLayout(AudioStreamBasicDescription* asbd, AVAudioChannelLayout? layout);
-    [Selector("initStandardFormatWithSampleRate:channels:")] public Self? InitStandardFormatWithSampleRateChannels(double sampleRate, AVAudioChannelCount channels);
-    [Selector("initStandardFormatWithSampleRate:channelLayout:")] public Self InitStandardFormatWithSampleRateChannelLayout(double sampleRate, AVAudioChannelLayout layout);
-    [Selector("initWithCommonFormat:sampleRate:channels:interleaved:")] public Self? InitWithCommonFormatSampleRateChannelsInterleaved(AVAudioCommonFormat format, double sampleRate, AVAudioChannelCount channels, bool interleaved);
-    [Selector("initWithCommonFormat:sampleRate:interleaved:channelLayout:")] public Self InitWithCommonFormatSampleRateInterleavedChannelLayout(AVAudioCommonFormat format, double sampleRate, bool interleaved, AVAudioChannelLayout layout);
-    [Selector("initWithSettings:")] public Self? InitWithSettings(NSDictionary settings);
-    [Selector("initWithCMAudioFormatDescription:")] public Self InitWithCMAudioFormatDescription(CMAudioFormatDescriptionRef formatDescription);
-    [Selector("isEqual:")] public bool IsEqual(AnyObject object);
+    [Selector("isStandard")]
+    public bool Standard { get; }
+    [Selector("commonFormat")]
+    public AVAudioCommonFormat CommonFormat { get; }
+    [Selector("channelCount")]
+    public AVAudioChannelCount ChannelCount { get; }
+    [Selector("sampleRate")]
+    public double SampleRate { get; }
+    [Selector("isInterleaved")]
+    public bool Interleaved { get; }
+    [Selector("streamDescription")]
+    public AudioStreamBasicDescription* StreamDescription { get; }
+    [Selector("channelLayout")]
+    public AVAudioChannelLayout? ChannelLayout { get; }
+    [Selector("magicCookie", "setMagicCookie:")]
+    public NSData? MagicCookie { get; set; }
+    [Selector("settings")]
+    public NSDictionary Settings { get; }
+    [Selector("formatDescription")]
+    public CMAudioFormatDescriptionRef FormatDescription { get; }
+    [Selector("initWithStreamDescription:")]
+    public Self? InitWithStreamDescription(AudioStreamBasicDescription* asbd);
+    [Selector("initWithStreamDescription:channelLayout:")]
+    public Self? InitWithStreamDescriptionChannelLayout(AudioStreamBasicDescription* asbd, AVAudioChannelLayout? layout);
+    [Selector("initStandardFormatWithSampleRate:channels:")]
+    public Self? InitStandardFormatWithSampleRateChannels(double sampleRate, AVAudioChannelCount channels);
+    [Selector("initStandardFormatWithSampleRate:channelLayout:")]
+    public Self InitStandardFormatWithSampleRateChannelLayout(double sampleRate, AVAudioChannelLayout layout);
+    [Selector("initWithCommonFormat:sampleRate:channels:interleaved:")]
+    public Self? InitWithCommonFormatSampleRateChannelsInterleaved(AVAudioCommonFormat format, double sampleRate, AVAudioChannelCount channels, bool interleaved);
+    [Selector("initWithCommonFormat:sampleRate:interleaved:channelLayout:")]
+    public Self InitWithCommonFormatSampleRateInterleavedChannelLayout(AVAudioCommonFormat format, double sampleRate, bool interleaved, AVAudioChannelLayout layout);
+    [Selector("initWithSettings:")]
+    public Self? InitWithSettings(NSDictionary settings);
+    [Selector("initWithCMAudioFormatDescription:")]
+    public Self InitWithCMAudioFormatDescription(CMAudioFormatDescriptionRef formatDescription);
+    [Selector("isEqual:")]
+    public bool IsEqual(AnyObject object);
 }
 
 public const int AVAUDIOFORMAT_HAVE_CMFORMATDESCRIPTION = 1;

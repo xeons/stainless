@@ -34,10 +34,14 @@ import Standard.ObjC;
 
 public extern objc class NSPressGestureRecognizer : NSGestureRecognizer, NSCoding
 {
-    [Selector("buttonMask", "setButtonMask:")] public NSUInteger ButtonMask { get; set; }
-    [Selector("minimumPressDuration", "setMinimumPressDuration:")] public NSTimeInterval MinimumPressDuration { get; set; }
-    [Selector("allowableMovement", "setAllowableMovement:")] public CGFloat AllowableMovement { get; set; }
-    [Selector("numberOfTouchesRequired", "setNumberOfTouchesRequired:")] public NSInteger NumberOfTouchesRequired { get; set; }
+    [Selector("buttonMask", "setButtonMask:")]
+    public NSUInteger ButtonMask { get; set; }
+    [Selector("minimumPressDuration", "setMinimumPressDuration:")]
+    public NSTimeInterval MinimumPressDuration { get; set; }
+    [Selector("allowableMovement", "setAllowableMovement:")]
+    public CGFloat AllowableMovement { get; set; }
+    [Selector("numberOfTouchesRequired", "setNumberOfTouchesRequired:")]
+    public NSInteger NumberOfTouchesRequired { get; set; }
 }
 
 #endif

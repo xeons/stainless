@@ -34,16 +34,26 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCMultiheadAttentionDescriptor : NSObject, NSCopying
 {
-    [Selector("modelDimension")] public NSUInteger ModelDimension { get; }
-    [Selector("keyDimension")] public NSUInteger KeyDimension { get; }
-    [Selector("valueDimension")] public NSUInteger ValueDimension { get; }
-    [Selector("headCount")] public NSUInteger HeadCount { get; }
-    [Selector("dropout")] public float Dropout { get; }
-    [Selector("hasBiases")] public bool HasBiases { get; }
-    [Selector("hasAttentionBiases")] public bool HasAttentionBiases { get; }
-    [Selector("addsZeroAttention")] public bool AddsZeroAttention { get; }
-    [Selector("descriptorWithModelDimension:keyDimension:valueDimension:headCount:dropout:hasBiases:hasAttentionBiases:addsZeroAttention:")] public static Self? DescriptorWithModelDimensionKeyDimensionValueDimensionHeadCountDropoutHasBiasesHasAttentionBiasesAddsZeroAttention(NSUInteger modelDimension, NSUInteger keyDimension, NSUInteger valueDimension, NSUInteger headCount, float dropout, bool hasBiases, bool hasAttentionBiases, bool addsZeroAttention);
-    [Selector("descriptorWithModelDimension:headCount:")] public static Self DescriptorWithModelDimensionHeadCount(NSUInteger modelDimension, NSUInteger headCount);
+    [Selector("modelDimension")]
+    public NSUInteger ModelDimension { get; }
+    [Selector("keyDimension")]
+    public NSUInteger KeyDimension { get; }
+    [Selector("valueDimension")]
+    public NSUInteger ValueDimension { get; }
+    [Selector("headCount")]
+    public NSUInteger HeadCount { get; }
+    [Selector("dropout")]
+    public float Dropout { get; }
+    [Selector("hasBiases")]
+    public bool HasBiases { get; }
+    [Selector("hasAttentionBiases")]
+    public bool HasAttentionBiases { get; }
+    [Selector("addsZeroAttention")]
+    public bool AddsZeroAttention { get; }
+    [Selector("descriptorWithModelDimension:keyDimension:valueDimension:headCount:dropout:hasBiases:hasAttentionBiases:addsZeroAttention:")]
+    public static Self? DescriptorWithModelDimensionKeyDimensionValueDimensionHeadCountDropoutHasBiasesHasAttentionBiasesAddsZeroAttention(NSUInteger modelDimension, NSUInteger keyDimension, NSUInteger valueDimension, NSUInteger headCount, float dropout, bool hasBiases, bool hasAttentionBiases, bool addsZeroAttention);
+    [Selector("descriptorWithModelDimension:headCount:")]
+    public static Self DescriptorWithModelDimensionHeadCount(NSUInteger modelDimension, NSUInteger headCount);
 }
 
 #endif

@@ -45,9 +45,12 @@ public objc closure void DDEventHandler(DDDeviceEvent arg0);
 
 public extern objc class DDDeviceEvent : NSObject
 {
-    [Selector("device")] public DDDevice Device { get; }
-    [Selector("eventType")] public DDEventType EventType { get; }
-    [Selector("initWithEventType:device:")] public Self InitWithEventTypeDevice(DDEventType type, DDDevice device);
+    [Selector("device")]
+    public DDDevice Device { get; }
+    [Selector("eventType")]
+    public DDEventType EventType { get; }
+    [Selector("initWithEventType:device:")]
+    public Self InitWithEventTypeDevice(DDEventType type, DDDevice device);
 }
 
 #endif

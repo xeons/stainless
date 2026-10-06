@@ -34,21 +34,35 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public objc interface GKGameSessionEventListener : NSObjectProtocol
 {
-    [Optional] [Selector("session:didAddPlayer:")] void SessionDidAddPlayer(GKGameSession session, GKCloudPlayer player);
-    [Optional] [Selector("session:didRemovePlayer:")] void SessionDidRemovePlayer(GKGameSession session, GKCloudPlayer player);
-    [Optional] [Selector("session:player:didChangeConnectionState:")] void SessionPlayerDidChangeConnectionState(GKGameSession session, GKCloudPlayer player, GKConnectionState newState);
-    [Optional] [Selector("session:player:didSaveData:")] void SessionPlayerDidSaveData(GKGameSession session, GKCloudPlayer player, NSData data);
-    [Optional] [Selector("session:didReceiveData:fromPlayer:")] void SessionDidReceiveDataFromPlayer(GKGameSession session, NSData data, GKCloudPlayer player);
-    [Optional] [Selector("session:didReceiveMessage:withData:fromPlayer:")] void SessionDidReceiveMessageWithDataFromPlayer(GKGameSession session, NSString message, NSData data, GKCloudPlayer player);
+    [Optional]
+    [Selector("session:didAddPlayer:")]
+    void SessionDidAddPlayer(GKGameSession session, GKCloudPlayer player);
+    [Optional]
+    [Selector("session:didRemovePlayer:")]
+    void SessionDidRemovePlayer(GKGameSession session, GKCloudPlayer player);
+    [Optional]
+    [Selector("session:player:didChangeConnectionState:")]
+    void SessionPlayerDidChangeConnectionState(GKGameSession session, GKCloudPlayer player, GKConnectionState newState);
+    [Optional]
+    [Selector("session:player:didSaveData:")]
+    void SessionPlayerDidSaveData(GKGameSession session, GKCloudPlayer player, NSData data);
+    [Optional]
+    [Selector("session:didReceiveData:fromPlayer:")]
+    void SessionDidReceiveDataFromPlayer(GKGameSession session, NSData data, GKCloudPlayer player);
+    [Optional]
+    [Selector("session:didReceiveMessage:withData:fromPlayer:")]
+    void SessionDidReceiveMessageWithDataFromPlayer(GKGameSession session, NSString message, NSData data, GKCloudPlayer player);
 }
 
 /// GKGameSessionEventListener, a category of GKGameSession.
 public extern objc class GKGameSession
 {
     /// Deprecated in macOS 10.14.
-    [Selector("addEventListener:")] public static void AddEventListener(NSObject listener);
+    [Selector("addEventListener:")]
+    public static void AddEventListener(NSObject listener);
     /// Deprecated in macOS 10.14.
-    [Selector("removeEventListener:")] public static void RemoveEventListener(NSObject listener);
+    [Selector("removeEventListener:")]
+    public static void RemoveEventListener(NSObject listener);
 }
 
 #endif

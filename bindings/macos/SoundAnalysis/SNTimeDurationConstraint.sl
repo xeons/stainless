@@ -40,11 +40,16 @@ public enum SNTimeDurationConstraintType : long
 
 public extern objc class SNTimeDurationConstraint : NSObject
 {
-    [Selector("type")] public SNTimeDurationConstraintType Type { get; }
-    [Selector("enumeratedDurations")] public NSArray EnumeratedDurations { get; }
-    [Selector("durationRange")] public CMTimeRange DurationRange { get; }
-    [Selector("initWithEnumeratedDurations:")] public Self InitWithEnumeratedDurations(NSArray enumeratedDurations);
-    [Selector("initWithDurationRange:")] public Self InitWithDurationRange(CMTimeRange durationRange);
+    [Selector("type")]
+    public SNTimeDurationConstraintType Type { get; }
+    [Selector("enumeratedDurations")]
+    public NSArray EnumeratedDurations { get; }
+    [Selector("durationRange")]
+    public CMTimeRange DurationRange { get; }
+    [Selector("initWithEnumeratedDurations:")]
+    public Self InitWithEnumeratedDurations(NSArray enumeratedDurations);
+    [Selector("initWithDurationRange:")]
+    public Self InitWithDurationRange(CMTimeRange durationRange);
 }
 
 #endif

@@ -32,12 +32,18 @@ import Standard.ObjC;
 
 public extern objc class NSOrderedSet : NSObject, NSCopying, NSMutableCopying, NSSecureCoding, NSFastEnumeration
 {
-    [Selector("count")] public NSUInteger Count { get; }
-    [Selector("objectAtIndex:")] public AnyObject ObjectAtIndex(NSUInteger idx);
-    [Selector("indexOfObject:")] public NSUInteger IndexOfObject(AnyObject object);
-    [Selector("init")] public Self Init();
-    [Selector("initWithObjects:count:")] public Self InitWithObjectsCount(void** objects, NSUInteger cnt);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("count")]
+    public NSUInteger Count { get; }
+    [Selector("objectAtIndex:")]
+    public AnyObject ObjectAtIndex(NSUInteger idx);
+    [Selector("indexOfObject:")]
+    public NSUInteger IndexOfObject(AnyObject object);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithObjects:count:")]
+    public Self InitWithObjectsCount(void** objects, NSUInteger cnt);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 public objc closure void NSOrderedSetEnumerateObjectsUsingBlockBlock(AnyObject arg0, NSUInteger arg1, bool* arg2);
@@ -61,62 +67,113 @@ public objc closure bool NSOrderedSetIndexesOfObjectsAtIndexesOptionsPassingTest
 /// NSExtendedOrderedSet, a category of NSOrderedSet.
 public extern objc class NSOrderedSet
 {
-    [Selector("firstObject")] public AnyObject? FirstObject { get; }
-    [Selector("lastObject")] public AnyObject? LastObject { get; }
-    [Selector("reversedOrderedSet")] public NSOrderedSet ReversedOrderedSet { get; }
-    [Selector("array")] public NSArray Array { get; }
-    [Selector("set")] public NSSet Set { get; }
-    [Selector("description")] public NSString Description { get; }
-    [Selector("getObjects:range:")] public void GetObjectsRange(void** objects, NSRange range);
-    [Selector("objectsAtIndexes:")] public NSArray ObjectsAtIndexes(NSIndexSet indexes);
-    [Selector("isEqualToOrderedSet:")] public bool IsEqualToOrderedSet(NSOrderedSet other);
-    [Selector("containsObject:")] public bool ContainsObject(AnyObject object);
-    [Selector("intersectsOrderedSet:")] public bool IntersectsOrderedSet(NSOrderedSet other);
-    [Selector("intersectsSet:")] public bool IntersectsSet(NSSet set);
-    [Selector("isSubsetOfOrderedSet:")] public bool IsSubsetOfOrderedSet(NSOrderedSet other);
-    [Selector("isSubsetOfSet:")] public bool IsSubsetOfSet(NSSet set);
-    [Selector("objectAtIndexedSubscript:")] public AnyObject ObjectAtIndexedSubscript(NSUInteger idx);
-    [Selector("objectEnumerator")] public NSEnumerator ObjectEnumerator();
-    [Selector("reverseObjectEnumerator")] public NSEnumerator ReverseObjectEnumerator();
-    [Selector("enumerateObjectsUsingBlock:")] public void EnumerateObjectsUsingBlock(NSOrderedSetEnumerateObjectsUsingBlockBlock block);
-    [Selector("enumerateObjectsWithOptions:usingBlock:")] public void EnumerateObjectsWithOptionsUsingBlock(NSEnumerationOptions opts, NSOrderedSetEnumerateObjectsWithOptionsUsingBlockBlock block);
-    [Selector("enumerateObjectsAtIndexes:options:usingBlock:")] public void EnumerateObjectsAtIndexesOptionsUsingBlock(NSIndexSet s, NSEnumerationOptions opts, NSOrderedSetEnumerateObjectsAtIndexesOptionsUsingBlockBlock block);
-    [Selector("indexOfObjectPassingTest:")] public NSUInteger IndexOfObjectPassingTest(NSOrderedSetIndexOfObjectPassingTestPredicateBlock predicate);
-    [Selector("indexOfObjectWithOptions:passingTest:")] public NSUInteger IndexOfObjectWithOptionsPassingTest(NSEnumerationOptions opts, NSOrderedSetIndexOfObjectWithOptionsPassingTestPredicateBlock predicate);
-    [Selector("indexOfObjectAtIndexes:options:passingTest:")] public NSUInteger IndexOfObjectAtIndexesOptionsPassingTest(NSIndexSet s, NSEnumerationOptions opts, NSOrderedSetIndexOfObjectAtIndexesOptionsPassingTestPredicateBlock predicate);
-    [Selector("indexesOfObjectsPassingTest:")] public NSIndexSet IndexesOfObjectsPassingTest(NSOrderedSetIndexesOfObjectsPassingTestPredicateBlock predicate);
-    [Selector("indexesOfObjectsWithOptions:passingTest:")] public NSIndexSet IndexesOfObjectsWithOptionsPassingTest(NSEnumerationOptions opts, NSOrderedSetIndexesOfObjectsWithOptionsPassingTestPredicateBlock predicate);
-    [Selector("indexesOfObjectsAtIndexes:options:passingTest:")] public NSIndexSet IndexesOfObjectsAtIndexesOptionsPassingTest(NSIndexSet s, NSEnumerationOptions opts, NSOrderedSetIndexesOfObjectsAtIndexesOptionsPassingTestPredicateBlock predicate);
-    [Selector("indexOfObject:inSortedRange:options:usingComparator:")] public NSUInteger IndexOfObjectInSortedRangeOptionsUsingComparator(AnyObject object, NSRange range, NSBinarySearchingOptions opts, NSComparator cmp);
-    [Selector("sortedArrayUsingComparator:")] public NSArray SortedArrayUsingComparator(NSComparator cmptr);
-    [Selector("sortedArrayWithOptions:usingComparator:")] public NSArray SortedArrayWithOptionsUsingComparator(NSSortOptions opts, NSComparator cmptr);
-    [Selector("descriptionWithLocale:")] public NSString DescriptionWithLocale(AnyObject? locale);
-    [Selector("descriptionWithLocale:indent:")] public NSString DescriptionWithLocaleIndent(AnyObject? locale, NSUInteger level);
+    [Selector("firstObject")]
+    public AnyObject? FirstObject { get; }
+    [Selector("lastObject")]
+    public AnyObject? LastObject { get; }
+    [Selector("reversedOrderedSet")]
+    public NSOrderedSet ReversedOrderedSet { get; }
+    [Selector("array")]
+    public NSArray Array { get; }
+    [Selector("set")]
+    public NSSet Set { get; }
+    [Selector("description")]
+    public NSString Description { get; }
+    [Selector("getObjects:range:")]
+    public void GetObjectsRange(void** objects, NSRange range);
+    [Selector("objectsAtIndexes:")]
+    public NSArray ObjectsAtIndexes(NSIndexSet indexes);
+    [Selector("isEqualToOrderedSet:")]
+    public bool IsEqualToOrderedSet(NSOrderedSet other);
+    [Selector("containsObject:")]
+    public bool ContainsObject(AnyObject object);
+    [Selector("intersectsOrderedSet:")]
+    public bool IntersectsOrderedSet(NSOrderedSet other);
+    [Selector("intersectsSet:")]
+    public bool IntersectsSet(NSSet set);
+    [Selector("isSubsetOfOrderedSet:")]
+    public bool IsSubsetOfOrderedSet(NSOrderedSet other);
+    [Selector("isSubsetOfSet:")]
+    public bool IsSubsetOfSet(NSSet set);
+    [Selector("objectAtIndexedSubscript:")]
+    public AnyObject ObjectAtIndexedSubscript(NSUInteger idx);
+    [Selector("objectEnumerator")]
+    public NSEnumerator ObjectEnumerator();
+    [Selector("reverseObjectEnumerator")]
+    public NSEnumerator ReverseObjectEnumerator();
+    [Selector("enumerateObjectsUsingBlock:")]
+    public void EnumerateObjectsUsingBlock(NSOrderedSetEnumerateObjectsUsingBlockBlock block);
+    [Selector("enumerateObjectsWithOptions:usingBlock:")]
+    public void EnumerateObjectsWithOptionsUsingBlock(NSEnumerationOptions opts, NSOrderedSetEnumerateObjectsWithOptionsUsingBlockBlock block);
+    [Selector("enumerateObjectsAtIndexes:options:usingBlock:")]
+    public void EnumerateObjectsAtIndexesOptionsUsingBlock(NSIndexSet s, NSEnumerationOptions opts, NSOrderedSetEnumerateObjectsAtIndexesOptionsUsingBlockBlock block);
+    [Selector("indexOfObjectPassingTest:")]
+    public NSUInteger IndexOfObjectPassingTest(NSOrderedSetIndexOfObjectPassingTestPredicateBlock predicate);
+    [Selector("indexOfObjectWithOptions:passingTest:")]
+    public NSUInteger IndexOfObjectWithOptionsPassingTest(NSEnumerationOptions opts, NSOrderedSetIndexOfObjectWithOptionsPassingTestPredicateBlock predicate);
+    [Selector("indexOfObjectAtIndexes:options:passingTest:")]
+    public NSUInteger IndexOfObjectAtIndexesOptionsPassingTest(NSIndexSet s, NSEnumerationOptions opts, NSOrderedSetIndexOfObjectAtIndexesOptionsPassingTestPredicateBlock predicate);
+    [Selector("indexesOfObjectsPassingTest:")]
+    public NSIndexSet IndexesOfObjectsPassingTest(NSOrderedSetIndexesOfObjectsPassingTestPredicateBlock predicate);
+    [Selector("indexesOfObjectsWithOptions:passingTest:")]
+    public NSIndexSet IndexesOfObjectsWithOptionsPassingTest(NSEnumerationOptions opts, NSOrderedSetIndexesOfObjectsWithOptionsPassingTestPredicateBlock predicate);
+    [Selector("indexesOfObjectsAtIndexes:options:passingTest:")]
+    public NSIndexSet IndexesOfObjectsAtIndexesOptionsPassingTest(NSIndexSet s, NSEnumerationOptions opts, NSOrderedSetIndexesOfObjectsAtIndexesOptionsPassingTestPredicateBlock predicate);
+    [Selector("indexOfObject:inSortedRange:options:usingComparator:")]
+    public NSUInteger IndexOfObjectInSortedRangeOptionsUsingComparator(AnyObject object, NSRange range, NSBinarySearchingOptions opts, NSComparator cmp);
+    [Selector("sortedArrayUsingComparator:")]
+    public NSArray SortedArrayUsingComparator(NSComparator cmptr);
+    [Selector("sortedArrayWithOptions:usingComparator:")]
+    public NSArray SortedArrayWithOptionsUsingComparator(NSSortOptions opts, NSComparator cmptr);
+    [Selector("descriptionWithLocale:")]
+    public NSString DescriptionWithLocale(AnyObject? locale);
+    [Selector("descriptionWithLocale:indent:")]
+    public NSString DescriptionWithLocaleIndent(AnyObject? locale, NSUInteger level);
 }
 
 /// NSOrderedSetCreation, a category of NSOrderedSet.
 public extern objc class NSOrderedSet
 {
-    [Selector("orderedSet")] public static Self OrderedSet();
-    [Selector("orderedSetWithObject:")] public static Self OrderedSetWithObject(AnyObject object);
-    [Selector("orderedSetWithObjects:count:")] public static Self OrderedSetWithObjectsCount(void** objects, NSUInteger cnt);
-    [Selector("orderedSetWithObjects:")] public static Self OrderedSetWithObjects(AnyObject firstObj, ...);
-    [Selector("orderedSetWithOrderedSet:")] public static Self OrderedSetWithOrderedSet(NSOrderedSet set);
-    [Selector("orderedSetWithOrderedSet:range:copyItems:")] public static Self OrderedSetWithOrderedSetRangeCopyItems(NSOrderedSet set, NSRange range, bool flag);
-    [Selector("orderedSetWithArray:")] public static Self OrderedSetWithArray(NSArray array);
-    [Selector("orderedSetWithArray:range:copyItems:")] public static Self OrderedSetWithArrayRangeCopyItems(NSArray array, NSRange range, bool flag);
-    [Selector("orderedSetWithSet:")] public static Self OrderedSetWithSet(NSSet set);
-    [Selector("orderedSetWithSet:copyItems:")] public static Self OrderedSetWithSetCopyItems(NSSet set, bool flag);
-    [Selector("initWithObject:")] public Self InitWithObject(AnyObject object);
-    [Selector("initWithObjects:")] public Self InitWithObjects(AnyObject firstObj, ...);
-    [Selector("initWithOrderedSet:")] public Self InitWithOrderedSet(NSOrderedSet set);
-    [Selector("initWithOrderedSet:copyItems:")] public Self InitWithOrderedSetCopyItems(NSOrderedSet set, bool flag);
-    [Selector("initWithOrderedSet:range:copyItems:")] public Self InitWithOrderedSetRangeCopyItems(NSOrderedSet set, NSRange range, bool flag);
-    [Selector("initWithArray:")] public Self InitWithArray(NSArray array);
-    [Selector("initWithArray:copyItems:")] public Self InitWithArrayCopyItems(NSArray set, bool flag);
-    [Selector("initWithArray:range:copyItems:")] public Self InitWithArrayRangeCopyItems(NSArray set, NSRange range, bool flag);
-    [Selector("initWithSet:")] public Self InitWithSet(NSSet set);
-    [Selector("initWithSet:copyItems:")] public Self InitWithSetCopyItems(NSSet set, bool flag);
+    [Selector("orderedSet")]
+    public static Self OrderedSet();
+    [Selector("orderedSetWithObject:")]
+    public static Self OrderedSetWithObject(AnyObject object);
+    [Selector("orderedSetWithObjects:count:")]
+    public static Self OrderedSetWithObjectsCount(void** objects, NSUInteger cnt);
+    [Selector("orderedSetWithObjects:")]
+    public static Self OrderedSetWithObjects(AnyObject firstObj, ...);
+    [Selector("orderedSetWithOrderedSet:")]
+    public static Self OrderedSetWithOrderedSet(NSOrderedSet set);
+    [Selector("orderedSetWithOrderedSet:range:copyItems:")]
+    public static Self OrderedSetWithOrderedSetRangeCopyItems(NSOrderedSet set, NSRange range, bool flag);
+    [Selector("orderedSetWithArray:")]
+    public static Self OrderedSetWithArray(NSArray array);
+    [Selector("orderedSetWithArray:range:copyItems:")]
+    public static Self OrderedSetWithArrayRangeCopyItems(NSArray array, NSRange range, bool flag);
+    [Selector("orderedSetWithSet:")]
+    public static Self OrderedSetWithSet(NSSet set);
+    [Selector("orderedSetWithSet:copyItems:")]
+    public static Self OrderedSetWithSetCopyItems(NSSet set, bool flag);
+    [Selector("initWithObject:")]
+    public Self InitWithObject(AnyObject object);
+    [Selector("initWithObjects:")]
+    public Self InitWithObjects(AnyObject firstObj, ...);
+    [Selector("initWithOrderedSet:")]
+    public Self InitWithOrderedSet(NSOrderedSet set);
+    [Selector("initWithOrderedSet:copyItems:")]
+    public Self InitWithOrderedSetCopyItems(NSOrderedSet set, bool flag);
+    [Selector("initWithOrderedSet:range:copyItems:")]
+    public Self InitWithOrderedSetRangeCopyItems(NSOrderedSet set, NSRange range, bool flag);
+    [Selector("initWithArray:")]
+    public Self InitWithArray(NSArray array);
+    [Selector("initWithArray:copyItems:")]
+    public Self InitWithArrayCopyItems(NSArray set, bool flag);
+    [Selector("initWithArray:range:copyItems:")]
+    public Self InitWithArrayRangeCopyItems(NSArray set, NSRange range, bool flag);
+    [Selector("initWithSet:")]
+    public Self InitWithSet(NSSet set);
+    [Selector("initWithSet:copyItems:")]
+    public Self InitWithSetCopyItems(NSSet set, bool flag);
 }
 
 public objc closure bool NSOrderedSetDifferenceFromOrderedSetWithOptionsUsingEquivalenceTestBlock(AnyObject arg0, AnyObject arg1);
@@ -124,61 +181,97 @@ public objc closure bool NSOrderedSetDifferenceFromOrderedSetWithOptionsUsingEqu
 /// NSOrderedSetDiffing, a category of NSOrderedSet.
 public extern objc class NSOrderedSet
 {
-    [Selector("differenceFromOrderedSet:withOptions:usingEquivalenceTest:")] public NSOrderedCollectionDifference DifferenceFromOrderedSetWithOptionsUsingEquivalenceTest(NSOrderedSet other, NSOrderedCollectionDifferenceCalculationOptions options, NSOrderedSetDifferenceFromOrderedSetWithOptionsUsingEquivalenceTestBlock block);
-    [Selector("differenceFromOrderedSet:withOptions:")] public NSOrderedCollectionDifference DifferenceFromOrderedSetWithOptions(NSOrderedSet other, NSOrderedCollectionDifferenceCalculationOptions options);
-    [Selector("differenceFromOrderedSet:")] public NSOrderedCollectionDifference DifferenceFromOrderedSet(NSOrderedSet other);
-    [Selector("orderedSetByApplyingDifference:")] public NSOrderedSet? OrderedSetByApplyingDifference(NSOrderedCollectionDifference difference);
+    [Selector("differenceFromOrderedSet:withOptions:usingEquivalenceTest:")]
+    public NSOrderedCollectionDifference DifferenceFromOrderedSetWithOptionsUsingEquivalenceTest(NSOrderedSet other, NSOrderedCollectionDifferenceCalculationOptions options, NSOrderedSetDifferenceFromOrderedSetWithOptionsUsingEquivalenceTestBlock block);
+    [Selector("differenceFromOrderedSet:withOptions:")]
+    public NSOrderedCollectionDifference DifferenceFromOrderedSetWithOptions(NSOrderedSet other, NSOrderedCollectionDifferenceCalculationOptions options);
+    [Selector("differenceFromOrderedSet:")]
+    public NSOrderedCollectionDifference DifferenceFromOrderedSet(NSOrderedSet other);
+    [Selector("orderedSetByApplyingDifference:")]
+    public NSOrderedSet? OrderedSetByApplyingDifference(NSOrderedCollectionDifference difference);
 }
 
 public extern objc class NSMutableOrderedSet : NSOrderedSet
 {
-    [Selector("insertObject:atIndex:")] public void InsertObjectAtIndex(AnyObject object, NSUInteger idx);
-    [Selector("removeObjectAtIndex:")] public void RemoveObjectAtIndex(NSUInteger idx);
-    [Selector("replaceObjectAtIndex:withObject:")] public void ReplaceObjectAtIndexWithObject(NSUInteger idx, AnyObject object);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("init")] public Self Init();
-    [Selector("initWithCapacity:")] public Self InitWithCapacity(NSUInteger numItems);
+    [Selector("insertObject:atIndex:")]
+    public void InsertObjectAtIndex(AnyObject object, NSUInteger idx);
+    [Selector("removeObjectAtIndex:")]
+    public void RemoveObjectAtIndex(NSUInteger idx);
+    [Selector("replaceObjectAtIndex:withObject:")]
+    public void ReplaceObjectAtIndexWithObject(NSUInteger idx, AnyObject object);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCapacity:")]
+    public Self InitWithCapacity(NSUInteger numItems);
 }
 
 /// NSExtendedMutableOrderedSet, a category of NSMutableOrderedSet.
 public extern objc class NSMutableOrderedSet
 {
-    [Selector("addObject:")] public void AddObject(AnyObject object);
-    [Selector("addObjects:count:")] public void AddObjectsCount(void** objects, NSUInteger count);
-    [Selector("addObjectsFromArray:")] public void AddObjectsFromArray(NSArray array);
-    [Selector("exchangeObjectAtIndex:withObjectAtIndex:")] public void ExchangeObjectAtIndexWithObjectAtIndex(NSUInteger idx1, NSUInteger idx2);
-    [Selector("moveObjectsAtIndexes:toIndex:")] public void MoveObjectsAtIndexesToIndex(NSIndexSet indexes, NSUInteger idx);
-    [Selector("insertObjects:atIndexes:")] public void InsertObjectsAtIndexes(NSArray objects, NSIndexSet indexes);
-    [Selector("setObject:atIndex:")] public void SetObjectAtIndex(AnyObject obj, NSUInteger idx);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(AnyObject obj, NSUInteger idx);
-    [Selector("replaceObjectsInRange:withObjects:count:")] public void ReplaceObjectsInRangeWithObjectsCount(NSRange range, void** objects, NSUInteger count);
-    [Selector("replaceObjectsAtIndexes:withObjects:")] public void ReplaceObjectsAtIndexesWithObjects(NSIndexSet indexes, NSArray objects);
-    [Selector("removeObjectsInRange:")] public void RemoveObjectsInRange(NSRange range);
-    [Selector("removeObjectsAtIndexes:")] public void RemoveObjectsAtIndexes(NSIndexSet indexes);
-    [Selector("removeAllObjects")] public void RemoveAllObjects();
-    [Selector("removeObject:")] public void RemoveObject(AnyObject object);
-    [Selector("removeObjectsInArray:")] public void RemoveObjectsInArray(NSArray array);
-    [Selector("intersectOrderedSet:")] public void IntersectOrderedSet(NSOrderedSet other);
-    [Selector("minusOrderedSet:")] public void MinusOrderedSet(NSOrderedSet other);
-    [Selector("unionOrderedSet:")] public void UnionOrderedSet(NSOrderedSet other);
-    [Selector("intersectSet:")] public void IntersectSet(NSSet other);
-    [Selector("minusSet:")] public void MinusSet(NSSet other);
-    [Selector("unionSet:")] public void UnionSet(NSSet other);
-    [Selector("sortUsingComparator:")] public void SortUsingComparator(NSComparator cmptr);
-    [Selector("sortWithOptions:usingComparator:")] public void SortWithOptionsUsingComparator(NSSortOptions opts, NSComparator cmptr);
-    [Selector("sortRange:options:usingComparator:")] public void SortRangeOptionsUsingComparator(NSRange range, NSSortOptions opts, NSComparator cmptr);
+    [Selector("addObject:")]
+    public void AddObject(AnyObject object);
+    [Selector("addObjects:count:")]
+    public void AddObjectsCount(void** objects, NSUInteger count);
+    [Selector("addObjectsFromArray:")]
+    public void AddObjectsFromArray(NSArray array);
+    [Selector("exchangeObjectAtIndex:withObjectAtIndex:")]
+    public void ExchangeObjectAtIndexWithObjectAtIndex(NSUInteger idx1, NSUInteger idx2);
+    [Selector("moveObjectsAtIndexes:toIndex:")]
+    public void MoveObjectsAtIndexesToIndex(NSIndexSet indexes, NSUInteger idx);
+    [Selector("insertObjects:atIndexes:")]
+    public void InsertObjectsAtIndexes(NSArray objects, NSIndexSet indexes);
+    [Selector("setObject:atIndex:")]
+    public void SetObjectAtIndex(AnyObject obj, NSUInteger idx);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(AnyObject obj, NSUInteger idx);
+    [Selector("replaceObjectsInRange:withObjects:count:")]
+    public void ReplaceObjectsInRangeWithObjectsCount(NSRange range, void** objects, NSUInteger count);
+    [Selector("replaceObjectsAtIndexes:withObjects:")]
+    public void ReplaceObjectsAtIndexesWithObjects(NSIndexSet indexes, NSArray objects);
+    [Selector("removeObjectsInRange:")]
+    public void RemoveObjectsInRange(NSRange range);
+    [Selector("removeObjectsAtIndexes:")]
+    public void RemoveObjectsAtIndexes(NSIndexSet indexes);
+    [Selector("removeAllObjects")]
+    public void RemoveAllObjects();
+    [Selector("removeObject:")]
+    public void RemoveObject(AnyObject object);
+    [Selector("removeObjectsInArray:")]
+    public void RemoveObjectsInArray(NSArray array);
+    [Selector("intersectOrderedSet:")]
+    public void IntersectOrderedSet(NSOrderedSet other);
+    [Selector("minusOrderedSet:")]
+    public void MinusOrderedSet(NSOrderedSet other);
+    [Selector("unionOrderedSet:")]
+    public void UnionOrderedSet(NSOrderedSet other);
+    [Selector("intersectSet:")]
+    public void IntersectSet(NSSet other);
+    [Selector("minusSet:")]
+    public void MinusSet(NSSet other);
+    [Selector("unionSet:")]
+    public void UnionSet(NSSet other);
+    [Selector("sortUsingComparator:")]
+    public void SortUsingComparator(NSComparator cmptr);
+    [Selector("sortWithOptions:usingComparator:")]
+    public void SortWithOptionsUsingComparator(NSSortOptions opts, NSComparator cmptr);
+    [Selector("sortRange:options:usingComparator:")]
+    public void SortRangeOptionsUsingComparator(NSRange range, NSSortOptions opts, NSComparator cmptr);
 }
 
 /// NSMutableOrderedSetCreation, a category of NSMutableOrderedSet.
 public extern objc class NSMutableOrderedSet
 {
-    [Selector("orderedSetWithCapacity:")] public static Self OrderedSetWithCapacity(NSUInteger numItems);
+    [Selector("orderedSetWithCapacity:")]
+    public static Self OrderedSetWithCapacity(NSUInteger numItems);
 }
 
 /// NSMutableOrderedSetDiffing, a category of NSMutableOrderedSet.
 public extern objc class NSMutableOrderedSet
 {
-    [Selector("applyDifference:")] public void ApplyDifference(NSOrderedCollectionDifference difference);
+    [Selector("applyDifference:")]
+    public void ApplyDifference(NSOrderedCollectionDifference difference);
 }
 
 #endif

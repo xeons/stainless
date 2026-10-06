@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class ASPasskeyRegistrationCredentialExtensionInput : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("largeBlob")] public ASAuthorizationPublicKeyCredentialLargeBlobRegistrationInput? LargeBlob { get; }
+    [Selector("largeBlob")]
+    public ASAuthorizationPublicKeyCredentialLargeBlobRegistrationInput? LargeBlob { get; }
 }
 
 #endif

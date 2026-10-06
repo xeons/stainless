@@ -34,11 +34,15 @@ import Standard.ObjC;
 /// macOS 15.4 and later.
 public extern objc class MTRCommissioneeInfo : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("productIdentity")] public MTRProductIdentity ProductIdentity { get; }
-    [Selector("endpointsById")] public NSDictionary? EndpointsById { get; }
-    [Selector("rootEndpoint")] public MTREndpointInfo? RootEndpoint { get; }
+    [Selector("productIdentity")]
+    public MTRProductIdentity ProductIdentity { get; }
+    [Selector("endpointsById")]
+    public NSDictionary? EndpointsById { get; }
+    [Selector("rootEndpoint")]
+    public MTREndpointInfo? RootEndpoint { get; }
     /// macOS 26.2 and later.
-    [Selector("attributes")] public NSDictionary? Attributes { get; }
+    [Selector("attributes")]
+    public NSDictionary? Attributes { get; }
 }
 
 #endif

@@ -36,19 +36,32 @@ import Standard.ObjC;
 /// macOS 15.4 and later.
 public extern objc class WKWebExtensionAction : NSObject
 {
-    [Selector("webExtensionContext")] public WKWebExtensionContext? WebExtensionContext { get; }
-    [Selector("associatedTab")] public WKWebExtensionTab? AssociatedTab { get; }
-    [Selector("label")] public NSString Label { get; }
-    [Selector("badgeText")] public NSString BadgeText { get; }
-    [Selector("hasUnreadBadgeText", "setHasUnreadBadgeText:")] public bool HasUnreadBadgeText { get; set; }
-    [Selector("inspectionName", "setInspectionName:")] public NSString? InspectionName { get; set; }
-    [Selector("isEnabled")] public bool Enabled { get; }
-    [Selector("menuItems")] public NSArray MenuItems { get; }
-    [Selector("presentsPopup")] public bool PresentsPopup { get; }
-    [Selector("popupPopover")] public NSPopover? PopupPopover { get; }
-    [Selector("popupWebView")] public WKWebView? PopupWebView { get; }
-    [Selector("iconForSize:")] public NSImage? IconForSize(CGSize size);
-    [Selector("closePopup")] public void ClosePopup();
+    [Selector("webExtensionContext")]
+    public WKWebExtensionContext? WebExtensionContext { get; }
+    [Selector("associatedTab")]
+    public WKWebExtensionTab? AssociatedTab { get; }
+    [Selector("label")]
+    public NSString Label { get; }
+    [Selector("badgeText")]
+    public NSString BadgeText { get; }
+    [Selector("hasUnreadBadgeText", "setHasUnreadBadgeText:")]
+    public bool HasUnreadBadgeText { get; set; }
+    [Selector("inspectionName", "setInspectionName:")]
+    public NSString? InspectionName { get; set; }
+    [Selector("isEnabled")]
+    public bool Enabled { get; }
+    [Selector("menuItems")]
+    public NSArray MenuItems { get; }
+    [Selector("presentsPopup")]
+    public bool PresentsPopup { get; }
+    [Selector("popupPopover")]
+    public NSPopover? PopupPopover { get; }
+    [Selector("popupWebView")]
+    public WKWebView? PopupWebView { get; }
+    [Selector("iconForSize:")]
+    public NSImage? IconForSize(CGSize size);
+    [Selector("closePopup")]
+    public void ClosePopup();
 }
 
 #endif

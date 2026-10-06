@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class NSAccessibilityElement : NSObject, NSAccessibility
 {
-    [Selector("accessibilityFrameInParentSpace", "setAccessibilityFrameInParentSpace:")] public NSRect AccessibilityFrameInParentSpace { get; set; }
-    [Selector("accessibilityElementWithRole:frame:label:parent:")] public static AnyObject AccessibilityElementWithRoleFrameLabelParent(NSAccessibilityRole role, NSRect frame, NSString? label, AnyObject? parent);
-    [Selector("accessibilityAddChildElement:")] public void AccessibilityAddChildElement(NSAccessibilityElement childElement);
+    [Selector("accessibilityFrameInParentSpace", "setAccessibilityFrameInParentSpace:")]
+    public NSRect AccessibilityFrameInParentSpace { get; set; }
+    [Selector("accessibilityElementWithRole:frame:label:parent:")]
+    public static AnyObject AccessibilityElementWithRoleFrameLabelParent(NSAccessibilityRole role, NSRect frame, NSString? label, AnyObject? parent);
+    [Selector("accessibilityAddChildElement:")]
+    public void AccessibilityAddChildElement(NSAccessibilityElement childElement);
 }
 
 #endif

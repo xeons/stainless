@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class INSpeakableString : NSObject, INSpeakable, NSCopying, NSSecureCoding
 {
-    [Selector("initWithVocabularyIdentifier:spokenPhrase:pronunciationHint:")] public Self InitWithVocabularyIdentifierSpokenPhrasePronunciationHint(NSString vocabularyIdentifier, NSString spokenPhrase, NSString? pronunciationHint);
-    [Selector("initWithSpokenPhrase:")] public Self InitWithSpokenPhrase(NSString spokenPhrase);
+    [Selector("initWithVocabularyIdentifier:spokenPhrase:pronunciationHint:")]
+    public Self InitWithVocabularyIdentifierSpokenPhrasePronunciationHint(NSString vocabularyIdentifier, NSString spokenPhrase, NSString? pronunciationHint);
+    [Selector("initWithSpokenPhrase:")]
+    public Self InitWithSpokenPhrase(NSString spokenPhrase);
 }
 
 #endif

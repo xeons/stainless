@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class VZFileSerialPortAttachment : VZSerialPortAttachment
 {
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("append")] public bool Append { get; }
-    [Selector("initWithURL:append:error:")] public Self? InitWithURLAppendError(NSURL url, bool shouldAppend, out NSError? error);
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("append")]
+    public bool Append { get; }
+    [Selector("initWithURL:append:error:")]
+    public Self? InitWithURLAppendError(NSURL url, bool shouldAppend, out NSError? error);
 }
 
 #endif

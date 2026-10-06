@@ -34,31 +34,46 @@ import Standard.ObjC;
 
 public extern objc class MPSCNNDropoutGradientState : MPSNNGradientState
 {
-    [Selector("maskData")] public NSData MaskData();
+    [Selector("maskData")]
+    public NSData MaskData();
 }
 
 public using MPSCNNDropoutGradientStateBatch = NSArray;
 
 public extern objc class MPSCNNDropout : MPSCNNKernel
 {
-    [Selector("keepProbability")] public float KeepProbability { get; }
-    [Selector("seed")] public NSUInteger Seed { get; }
-    [Selector("maskStrideInPixels")] public MTLSize MaskStrideInPixels { get; }
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("initWithDevice:keepProbability:seed:maskStrideInPixels:")] public Self InitWithDeviceKeepProbabilitySeedMaskStrideInPixels(MTLDevice device, float keepProbability, NSUInteger seed, MTLSize maskStrideInPixels);
-    [Selector("resultStateForSourceImage:sourceStates:destinationImage:")] public MPSCNNDropoutGradientState? ResultStateForSourceImageSourceStatesDestinationImage(MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
-    [Selector("resultStateBatchForSourceImage:sourceStates:destinationImage:")] public MPSCNNDropoutGradientState? ResultStateBatchForSourceImageSourceStatesDestinationImage(MPSImageBatch sourceImage, NSArray? sourceStates, MPSImageBatch destinationImage);
-    [Selector("temporaryResultStateForCommandBuffer:sourceImage:sourceStates:destinationImage:")] public MPSCNNDropoutGradientState? TemporaryResultStateForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
-    [Selector("temporaryResultStateBatchForCommandBuffer:sourceImage:sourceStates:destinationImage:")] public MPSCNNDropoutGradientStateBatch? TemporaryResultStateBatchForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImage, NSArray? sourceStates, MPSImageBatch destinationImage);
+    [Selector("keepProbability")]
+    public float KeepProbability { get; }
+    [Selector("seed")]
+    public NSUInteger Seed { get; }
+    [Selector("maskStrideInPixels")]
+    public MTLSize MaskStrideInPixels { get; }
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:keepProbability:seed:maskStrideInPixels:")]
+    public Self InitWithDeviceKeepProbabilitySeedMaskStrideInPixels(MTLDevice device, float keepProbability, NSUInteger seed, MTLSize maskStrideInPixels);
+    [Selector("resultStateForSourceImage:sourceStates:destinationImage:")]
+    public MPSCNNDropoutGradientState? ResultStateForSourceImageSourceStatesDestinationImage(MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
+    [Selector("resultStateBatchForSourceImage:sourceStates:destinationImage:")]
+    public MPSCNNDropoutGradientState? ResultStateBatchForSourceImageSourceStatesDestinationImage(MPSImageBatch sourceImage, NSArray? sourceStates, MPSImageBatch destinationImage);
+    [Selector("temporaryResultStateForCommandBuffer:sourceImage:sourceStates:destinationImage:")]
+    public MPSCNNDropoutGradientState? TemporaryResultStateForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
+    [Selector("temporaryResultStateBatchForCommandBuffer:sourceImage:sourceStates:destinationImage:")]
+    public MPSCNNDropoutGradientStateBatch? TemporaryResultStateBatchForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImage, NSArray? sourceStates, MPSImageBatch destinationImage);
 }
 
 public extern objc class MPSCNNDropoutGradient : MPSCNNGradientKernel
 {
-    [Selector("keepProbability")] public float KeepProbability { get; }
-    [Selector("seed")] public NSUInteger Seed { get; }
-    [Selector("maskStrideInPixels")] public MTLSize MaskStrideInPixels { get; }
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("initWithDevice:keepProbability:seed:maskStrideInPixels:")] public Self InitWithDeviceKeepProbabilitySeedMaskStrideInPixels(MTLDevice device, float keepProbability, NSUInteger seed, MTLSize maskStrideInPixels);
+    [Selector("keepProbability")]
+    public float KeepProbability { get; }
+    [Selector("seed")]
+    public NSUInteger Seed { get; }
+    [Selector("maskStrideInPixels")]
+    public MTLSize MaskStrideInPixels { get; }
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:keepProbability:seed:maskStrideInPixels:")]
+    public Self InitWithDeviceKeepProbabilitySeedMaskStrideInPixels(MTLDevice device, float keepProbability, NSUInteger seed, MTLSize maskStrideInPixels);
 }
 
 #endif

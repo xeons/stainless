@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLBaseFontElement : DOMHTMLElement
 {
-    [Selector("color", "setColor:")] public NSString? Color { get; set; }
-    [Selector("face", "setFace:")] public NSString? Face { get; set; }
-    [Selector("size", "setSize:")] public NSString? Size { get; set; }
+    [Selector("color", "setColor:")]
+    public NSString? Color { get; set; }
+    [Selector("face", "setFace:")]
+    public NSString? Face { get; set; }
+    [Selector("size", "setSize:")]
+    public NSString? Size { get; set; }
 }
 
 #endif

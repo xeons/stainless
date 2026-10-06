@@ -49,14 +49,17 @@ public extern "C" NSErrorDomain MTL4CommandQueueErrorDomain;
 /// macOS 26.0 and later.
 public extern objc class MTL4CommitOptions : NSObject
 {
-    [Selector("addFeedbackHandler:")] public void AddFeedbackHandler(MTL4CommitFeedbackHandler block);
+    [Selector("addFeedbackHandler:")]
+    public void AddFeedbackHandler(MTL4CommitFeedbackHandler block);
 }
 
 /// macOS 26.0 and later.
 public extern objc class MTL4CommandQueueDescriptor : NSObject, NSCopying
 {
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("feedbackQueue", "setFeedbackQueue:")] public dispatch_queue_t? FeedbackQueue { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("feedbackQueue", "setFeedbackQueue:")]
+    public dispatch_queue_t? FeedbackQueue { get; set; }
 }
 
 /// macOS 26.0 and later.
@@ -98,22 +101,38 @@ public struct MTL4CopySparseBufferMappingOperation
 /// macOS 26.0 and later.
 public objc interface MTL4CommandQueue : NSObjectProtocol
 {
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("label")] NSString? Label { get; }
-    [Selector("commit:count:")] void CommitCount(void** commandBuffers, NSUInteger count);
-    [Selector("commit:count:options:")] void CommitCountOptions(void** commandBuffers, NSUInteger count, MTL4CommitOptions options);
-    [Selector("signalEvent:value:")] void SignalEventValue(MTLEvent event, ulong value);
-    [Selector("waitForEvent:value:")] void WaitForEventValue(MTLEvent event, ulong value);
-    [Selector("signalDrawable:")] void SignalDrawable(MTLDrawable drawable);
-    [Selector("waitForDrawable:")] void WaitForDrawable(MTLDrawable drawable);
-    [Selector("addResidencySet:")] void AddResidencySet(MTLResidencySet residencySet);
-    [Selector("addResidencySets:count:")] void AddResidencySetsCount(void** residencySets, NSUInteger count);
-    [Selector("removeResidencySet:")] void RemoveResidencySet(MTLResidencySet residencySet);
-    [Selector("removeResidencySets:count:")] void RemoveResidencySetsCount(void** residencySets, NSUInteger count);
-    [Selector("updateTextureMappings:heap:operations:count:")] void UpdateTextureMappingsHeapOperationsCount(MTLTexture texture, MTLHeap? heap, MTL4UpdateSparseTextureMappingOperation* operations, NSUInteger count);
-    [Selector("copyTextureMappingsFromTexture:toTexture:operations:count:")] void CopyTextureMappingsFromTextureToTextureOperationsCount(MTLTexture sourceTexture, MTLTexture destinationTexture, MTL4CopySparseTextureMappingOperation* operations, NSUInteger count);
-    [Selector("updateBufferMappings:heap:operations:count:")] void UpdateBufferMappingsHeapOperationsCount(MTLBuffer buffer, MTLHeap? heap, MTL4UpdateSparseBufferMappingOperation* operations, NSUInteger count);
-    [Selector("copyBufferMappingsFromBuffer:toBuffer:operations:count:")] void CopyBufferMappingsFromBufferToBufferOperationsCount(MTLBuffer sourceBuffer, MTLBuffer destinationBuffer, MTL4CopySparseBufferMappingOperation* operations, NSUInteger count);
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("label")]
+    NSString? Label { get; }
+    [Selector("commit:count:")]
+    void CommitCount(void** commandBuffers, NSUInteger count);
+    [Selector("commit:count:options:")]
+    void CommitCountOptions(void** commandBuffers, NSUInteger count, MTL4CommitOptions options);
+    [Selector("signalEvent:value:")]
+    void SignalEventValue(MTLEvent event, ulong value);
+    [Selector("waitForEvent:value:")]
+    void WaitForEventValue(MTLEvent event, ulong value);
+    [Selector("signalDrawable:")]
+    void SignalDrawable(MTLDrawable drawable);
+    [Selector("waitForDrawable:")]
+    void WaitForDrawable(MTLDrawable drawable);
+    [Selector("addResidencySet:")]
+    void AddResidencySet(MTLResidencySet residencySet);
+    [Selector("addResidencySets:count:")]
+    void AddResidencySetsCount(void** residencySets, NSUInteger count);
+    [Selector("removeResidencySet:")]
+    void RemoveResidencySet(MTLResidencySet residencySet);
+    [Selector("removeResidencySets:count:")]
+    void RemoveResidencySetsCount(void** residencySets, NSUInteger count);
+    [Selector("updateTextureMappings:heap:operations:count:")]
+    void UpdateTextureMappingsHeapOperationsCount(MTLTexture texture, MTLHeap? heap, MTL4UpdateSparseTextureMappingOperation* operations, NSUInteger count);
+    [Selector("copyTextureMappingsFromTexture:toTexture:operations:count:")]
+    void CopyTextureMappingsFromTextureToTextureOperationsCount(MTLTexture sourceTexture, MTLTexture destinationTexture, MTL4CopySparseTextureMappingOperation* operations, NSUInteger count);
+    [Selector("updateBufferMappings:heap:operations:count:")]
+    void UpdateBufferMappingsHeapOperationsCount(MTLBuffer buffer, MTLHeap? heap, MTL4UpdateSparseBufferMappingOperation* operations, NSUInteger count);
+    [Selector("copyBufferMappingsFromBuffer:toBuffer:operations:count:")]
+    void CopyBufferMappingsFromBufferToBufferOperationsCount(MTLBuffer sourceBuffer, MTLBuffer destinationBuffer, MTL4CopySparseBufferMappingOperation* operations, NSUInteger count);
 }
 
 #endif

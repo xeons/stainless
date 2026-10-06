@@ -33,26 +33,36 @@ import Standard.ObjC;
 
 public extern objc class MLModelDescription : NSObject, NSSecureCoding
 {
-    [Selector("inputDescriptionsByName")] public NSDictionary InputDescriptionsByName { get; }
-    [Selector("outputDescriptionsByName")] public NSDictionary OutputDescriptionsByName { get; }
-    [Selector("stateDescriptionsByName")] public NSDictionary StateDescriptionsByName { get; }
-    [Selector("predictedFeatureName")] public NSString? PredictedFeatureName { get; }
-    [Selector("predictedProbabilitiesName")] public NSString? PredictedProbabilitiesName { get; }
-    [Selector("metadata")] public NSDictionary Metadata { get; }
-    [Selector("classLabels")] public NSArray? ClassLabels { get; }
+    [Selector("inputDescriptionsByName")]
+    public NSDictionary InputDescriptionsByName { get; }
+    [Selector("outputDescriptionsByName")]
+    public NSDictionary OutputDescriptionsByName { get; }
+    [Selector("stateDescriptionsByName")]
+    public NSDictionary StateDescriptionsByName { get; }
+    [Selector("predictedFeatureName")]
+    public NSString? PredictedFeatureName { get; }
+    [Selector("predictedProbabilitiesName")]
+    public NSString? PredictedProbabilitiesName { get; }
+    [Selector("metadata")]
+    public NSDictionary Metadata { get; }
+    [Selector("classLabels")]
+    public NSArray? ClassLabels { get; }
 }
 
 /// MLUpdateAdditions, a category of MLModelDescription.
 public extern objc class MLModelDescription
 {
-    [Selector("isUpdatable")] public bool IsUpdatable { get; }
-    [Selector("trainingInputDescriptionsByName")] public NSDictionary TrainingInputDescriptionsByName { get; }
+    [Selector("isUpdatable")]
+    public bool IsUpdatable { get; }
+    [Selector("trainingInputDescriptionsByName")]
+    public NSDictionary TrainingInputDescriptionsByName { get; }
 }
 
 /// MLParameters, a category of MLModelDescription.
 public extern objc class MLModelDescription
 {
-    [Selector("parameterDescriptionsByKey")] public NSDictionary ParameterDescriptionsByKey { get; }
+    [Selector("parameterDescriptionsByKey")]
+    public NSDictionary ParameterDescriptionsByKey { get; }
 }
 
 #endif

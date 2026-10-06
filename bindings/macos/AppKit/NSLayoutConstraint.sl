@@ -88,22 +88,38 @@ public enum NSLayoutFormatOptions : ulong
 
 public extern objc class NSLayoutConstraint : NSObject
 {
-    [Selector("priority", "setPriority:")] public NSLayoutPriority Priority { get; set; }
-    [Selector("shouldBeArchived", "setShouldBeArchived:")] public bool ShouldBeArchived { get; set; }
-    [Selector("firstItem")] public AnyObject? FirstItem { get; }
-    [Selector("secondItem")] public AnyObject? SecondItem { get; }
-    [Selector("firstAttribute")] public NSLayoutAttribute FirstAttribute { get; }
-    [Selector("secondAttribute")] public NSLayoutAttribute SecondAttribute { get; }
-    [Selector("firstAnchor")] public NSLayoutAnchor FirstAnchor { get; }
-    [Selector("secondAnchor")] public NSLayoutAnchor? SecondAnchor { get; }
-    [Selector("relation")] public NSLayoutRelation Relation { get; }
-    [Selector("multiplier")] public CGFloat Multiplier { get; }
-    [Selector("constant", "setConstant:")] public CGFloat Constant { get; set; }
-    [Selector("isActive", "setActive:")] public bool Active { get; set; }
-    [Selector("constraintsWithVisualFormat:options:metrics:views:")] public static NSArray ConstraintsWithVisualFormatOptionsMetricsViews(NSString format, NSLayoutFormatOptions opts, NSDictionary? metrics, NSDictionary views);
-    [Selector("constraintWithItem:attribute:relatedBy:toItem:attribute:multiplier:constant:")] public static Self ConstraintWithItemAttributeRelatedByToItemAttributeMultiplierConstant(AnyObject view1, NSLayoutAttribute attr1, NSLayoutRelation relation, AnyObject? view2, NSLayoutAttribute attr2, CGFloat multiplier, CGFloat c);
-    [Selector("activateConstraints:")] public static void ActivateConstraints(NSArray constraints);
-    [Selector("deactivateConstraints:")] public static void DeactivateConstraints(NSArray constraints);
+    [Selector("priority", "setPriority:")]
+    public NSLayoutPriority Priority { get; set; }
+    [Selector("shouldBeArchived", "setShouldBeArchived:")]
+    public bool ShouldBeArchived { get; set; }
+    [Selector("firstItem")]
+    public AnyObject? FirstItem { get; }
+    [Selector("secondItem")]
+    public AnyObject? SecondItem { get; }
+    [Selector("firstAttribute")]
+    public NSLayoutAttribute FirstAttribute { get; }
+    [Selector("secondAttribute")]
+    public NSLayoutAttribute SecondAttribute { get; }
+    [Selector("firstAnchor")]
+    public NSLayoutAnchor FirstAnchor { get; }
+    [Selector("secondAnchor")]
+    public NSLayoutAnchor? SecondAnchor { get; }
+    [Selector("relation")]
+    public NSLayoutRelation Relation { get; }
+    [Selector("multiplier")]
+    public CGFloat Multiplier { get; }
+    [Selector("constant", "setConstant:")]
+    public CGFloat Constant { get; set; }
+    [Selector("isActive", "setActive:")]
+    public bool Active { get; set; }
+    [Selector("constraintsWithVisualFormat:options:metrics:views:")]
+    public static NSArray ConstraintsWithVisualFormatOptionsMetricsViews(NSString format, NSLayoutFormatOptions opts, NSDictionary? metrics, NSDictionary views);
+    [Selector("constraintWithItem:attribute:relatedBy:toItem:attribute:multiplier:constant:")]
+    public static Self ConstraintWithItemAttributeRelatedByToItemAttributeMultiplierConstant(AnyObject view1, NSLayoutAttribute attr1, NSLayoutRelation relation, AnyObject? view2, NSLayoutAttribute attr2, CGFloat multiplier, CGFloat c);
+    [Selector("activateConstraints:")]
+    public static void ActivateConstraints(NSArray constraints);
+    [Selector("deactivateConstraints:")]
+    public static void DeactivateConstraints(NSArray constraints);
 }
 
 public extern "C" NSDictionary _NSDictionaryOfVariableBindings(NSString commaSeparatedKeysString, AnyObject? firstValue, ...);
@@ -111,7 +127,8 @@ public extern "C" NSDictionary _NSDictionaryOfVariableBindings(NSString commaSep
 /// NSIdentifier, a category of NSLayoutConstraint.
 public extern objc class NSLayoutConstraint
 {
-    [Selector("identifier", "setIdentifier:")] public NSString? Identifier { get; set; }
+    [Selector("identifier", "setIdentifier:")]
+    public NSString? Identifier { get; set; }
 }
 
 public extern objc class NSLayoutConstraint : NSAnimatablePropertyContainer { }
@@ -119,64 +136,102 @@ public extern objc class NSLayoutConstraint : NSAnimatablePropertyContainer { }
 /// NSConstraintBasedLayoutInstallingConstraints, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("leadingAnchor")] public NSLayoutXAxisAnchor? LeadingAnchor { get; }
-    [Selector("trailingAnchor")] public NSLayoutXAxisAnchor? TrailingAnchor { get; }
-    [Selector("leftAnchor")] public NSLayoutXAxisAnchor? LeftAnchor { get; }
-    [Selector("rightAnchor")] public NSLayoutXAxisAnchor? RightAnchor { get; }
-    [Selector("topAnchor")] public NSLayoutYAxisAnchor? TopAnchor { get; }
-    [Selector("bottomAnchor")] public NSLayoutYAxisAnchor? BottomAnchor { get; }
-    [Selector("widthAnchor")] public NSLayoutDimension? WidthAnchor { get; }
-    [Selector("heightAnchor")] public NSLayoutDimension? HeightAnchor { get; }
-    [Selector("centerXAnchor")] public NSLayoutXAxisAnchor? CenterXAnchor { get; }
-    [Selector("centerYAnchor")] public NSLayoutYAxisAnchor? CenterYAnchor { get; }
-    [Selector("firstBaselineAnchor")] public NSLayoutYAxisAnchor? FirstBaselineAnchor { get; }
-    [Selector("lastBaselineAnchor")] public NSLayoutYAxisAnchor? LastBaselineAnchor { get; }
-    [Selector("constraints")] public NSArray? Constraints { get; }
-    [Selector("addConstraint:")] public void AddConstraint(NSLayoutConstraint constraint);
-    [Selector("addConstraints:")] public void AddConstraints(NSArray constraints);
-    [Selector("removeConstraint:")] public void RemoveConstraint(NSLayoutConstraint constraint);
-    [Selector("removeConstraints:")] public void RemoveConstraints(NSArray constraints);
+    [Selector("leadingAnchor")]
+    public NSLayoutXAxisAnchor? LeadingAnchor { get; }
+    [Selector("trailingAnchor")]
+    public NSLayoutXAxisAnchor? TrailingAnchor { get; }
+    [Selector("leftAnchor")]
+    public NSLayoutXAxisAnchor? LeftAnchor { get; }
+    [Selector("rightAnchor")]
+    public NSLayoutXAxisAnchor? RightAnchor { get; }
+    [Selector("topAnchor")]
+    public NSLayoutYAxisAnchor? TopAnchor { get; }
+    [Selector("bottomAnchor")]
+    public NSLayoutYAxisAnchor? BottomAnchor { get; }
+    [Selector("widthAnchor")]
+    public NSLayoutDimension? WidthAnchor { get; }
+    [Selector("heightAnchor")]
+    public NSLayoutDimension? HeightAnchor { get; }
+    [Selector("centerXAnchor")]
+    public NSLayoutXAxisAnchor? CenterXAnchor { get; }
+    [Selector("centerYAnchor")]
+    public NSLayoutYAxisAnchor? CenterYAnchor { get; }
+    [Selector("firstBaselineAnchor")]
+    public NSLayoutYAxisAnchor? FirstBaselineAnchor { get; }
+    [Selector("lastBaselineAnchor")]
+    public NSLayoutYAxisAnchor? LastBaselineAnchor { get; }
+    [Selector("constraints")]
+    public NSArray? Constraints { get; }
+    [Selector("addConstraint:")]
+    public void AddConstraint(NSLayoutConstraint constraint);
+    [Selector("addConstraints:")]
+    public void AddConstraints(NSArray constraints);
+    [Selector("removeConstraint:")]
+    public void RemoveConstraint(NSLayoutConstraint constraint);
+    [Selector("removeConstraints:")]
+    public void RemoveConstraints(NSArray constraints);
 }
 
 /// NSConstraintBasedLayoutCoreMethods, a category of NSWindow.
 public extern objc class NSWindow
 {
-    [Selector("updateConstraintsIfNeeded")] public void UpdateConstraintsIfNeeded();
-    [Selector("layoutIfNeeded")] public void LayoutIfNeeded();
+    [Selector("updateConstraintsIfNeeded")]
+    public void UpdateConstraintsIfNeeded();
+    [Selector("layoutIfNeeded")]
+    public void LayoutIfNeeded();
 }
 
 /// NSConstraintBasedLayoutCoreMethods, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("needsUpdateConstraints", "setNeedsUpdateConstraints:")] public bool NeedsUpdateConstraints { get; set; }
-    [Selector("updateConstraintsForSubtreeIfNeeded")] public void UpdateConstraintsForSubtreeIfNeeded();
-    [Selector("updateConstraints")] public void UpdateConstraints();
+    [Selector("needsUpdateConstraints", "setNeedsUpdateConstraints:")]
+    public bool NeedsUpdateConstraints { get; set; }
+    [Selector("updateConstraintsForSubtreeIfNeeded")]
+    public void UpdateConstraintsForSubtreeIfNeeded();
+    [Selector("updateConstraints")]
+    public void UpdateConstraints();
 }
 
 /// NSConstraintBasedCompatibility, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("translatesAutoresizingMaskIntoConstraints", "setTranslatesAutoresizingMaskIntoConstraints:")] public bool TranslatesAutoresizingMaskIntoConstraints { get; set; }
-    [Selector("requiresConstraintBasedLayout")] public static bool RequiresConstraintBasedLayout { get; }
+    [Selector("translatesAutoresizingMaskIntoConstraints", "setTranslatesAutoresizingMaskIntoConstraints:")]
+    public bool TranslatesAutoresizingMaskIntoConstraints { get; set; }
+    [Selector("requiresConstraintBasedLayout")]
+    public static bool RequiresConstraintBasedLayout { get; }
 }
 
 /// NSConstraintBasedLayoutLayering, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("alignmentRectInsets")] public NSEdgeInsets AlignmentRectInsets { get; }
-    [Selector("firstBaselineOffsetFromTop")] public CGFloat FirstBaselineOffsetFromTop { get; }
-    [Selector("lastBaselineOffsetFromBottom")] public CGFloat LastBaselineOffsetFromBottom { get; }
-    [Selector("baselineOffsetFromBottom")] public CGFloat BaselineOffsetFromBottom { get; }
-    [Selector("intrinsicContentSize")] public NSSize IntrinsicContentSize { get; }
-    [Selector("isHorizontalContentSizeConstraintActive", "setHorizontalContentSizeConstraintActive:")] public bool HorizontalContentSizeConstraintActive { get; set; }
-    [Selector("isVerticalContentSizeConstraintActive", "setVerticalContentSizeConstraintActive:")] public bool VerticalContentSizeConstraintActive { get; set; }
-    [Selector("alignmentRectForFrame:")] public NSRect AlignmentRectForFrame(NSRect frame);
-    [Selector("frameForAlignmentRect:")] public NSRect FrameForAlignmentRect(NSRect alignmentRect);
-    [Selector("invalidateIntrinsicContentSize")] public void InvalidateIntrinsicContentSize();
-    [Selector("contentHuggingPriorityForOrientation:")] public NSLayoutPriority ContentHuggingPriorityForOrientation(NSLayoutConstraintOrientation orientation);
-    [Selector("setContentHuggingPriority:forOrientation:")] public void SetContentHuggingPriorityForOrientation(NSLayoutPriority priority, NSLayoutConstraintOrientation orientation);
-    [Selector("contentCompressionResistancePriorityForOrientation:")] public NSLayoutPriority ContentCompressionResistancePriorityForOrientation(NSLayoutConstraintOrientation orientation);
-    [Selector("setContentCompressionResistancePriority:forOrientation:")] public void SetContentCompressionResistancePriorityForOrientation(NSLayoutPriority priority, NSLayoutConstraintOrientation orientation);
+    [Selector("alignmentRectInsets")]
+    public NSEdgeInsets AlignmentRectInsets { get; }
+    [Selector("firstBaselineOffsetFromTop")]
+    public CGFloat FirstBaselineOffsetFromTop { get; }
+    [Selector("lastBaselineOffsetFromBottom")]
+    public CGFloat LastBaselineOffsetFromBottom { get; }
+    [Selector("baselineOffsetFromBottom")]
+    public CGFloat BaselineOffsetFromBottom { get; }
+    [Selector("intrinsicContentSize")]
+    public NSSize IntrinsicContentSize { get; }
+    [Selector("isHorizontalContentSizeConstraintActive", "setHorizontalContentSizeConstraintActive:")]
+    public bool HorizontalContentSizeConstraintActive { get; set; }
+    [Selector("isVerticalContentSizeConstraintActive", "setVerticalContentSizeConstraintActive:")]
+    public bool VerticalContentSizeConstraintActive { get; set; }
+    [Selector("alignmentRectForFrame:")]
+    public NSRect AlignmentRectForFrame(NSRect frame);
+    [Selector("frameForAlignmentRect:")]
+    public NSRect FrameForAlignmentRect(NSRect alignmentRect);
+    [Selector("invalidateIntrinsicContentSize")]
+    public void InvalidateIntrinsicContentSize();
+    [Selector("contentHuggingPriorityForOrientation:")]
+    public NSLayoutPriority ContentHuggingPriorityForOrientation(NSLayoutConstraintOrientation orientation);
+    [Selector("setContentHuggingPriority:forOrientation:")]
+    public void SetContentHuggingPriorityForOrientation(NSLayoutPriority priority, NSLayoutConstraintOrientation orientation);
+    [Selector("contentCompressionResistancePriorityForOrientation:")]
+    public NSLayoutPriority ContentCompressionResistancePriorityForOrientation(NSLayoutConstraintOrientation orientation);
+    [Selector("setContentCompressionResistancePriority:forOrientation:")]
+    public void SetContentCompressionResistancePriorityForOrientation(NSLayoutPriority priority, NSLayoutConstraintOrientation orientation);
 }
 
 /// Deprecated in macOS 10.14.
@@ -187,34 +242,42 @@ public extern "C" CGFloat NSViewNoIntrinsicMetric;
 /// NSConstraintBasedLayoutLayering, a category of NSControl.
 public extern objc class NSControl
 {
-    [Selector("invalidateIntrinsicContentSizeForCell:")] public void InvalidateIntrinsicContentSizeForCell(NSCell cell);
+    [Selector("invalidateIntrinsicContentSizeForCell:")]
+    public void InvalidateIntrinsicContentSizeForCell(NSCell cell);
 }
 
 /// NSConstraintBasedLayoutAnchoring, a category of NSWindow.
 public extern objc class NSWindow
 {
-    [Selector("anchorAttributeForOrientation:")] public NSLayoutAttribute AnchorAttributeForOrientation(NSLayoutConstraintOrientation orientation);
-    [Selector("setAnchorAttribute:forOrientation:")] public void SetAnchorAttributeForOrientation(NSLayoutAttribute attr, NSLayoutConstraintOrientation orientation);
+    [Selector("anchorAttributeForOrientation:")]
+    public NSLayoutAttribute AnchorAttributeForOrientation(NSLayoutConstraintOrientation orientation);
+    [Selector("setAnchorAttribute:forOrientation:")]
+    public void SetAnchorAttributeForOrientation(NSLayoutAttribute attr, NSLayoutConstraintOrientation orientation);
 }
 
 /// NSConstraintBasedLayoutFittingSize, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("fittingSize")] public NSSize FittingSize { get; }
+    [Selector("fittingSize")]
+    public NSSize FittingSize { get; }
 }
 
 /// NSConstraintBasedLayoutDebugging, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("hasAmbiguousLayout")] public bool HasAmbiguousLayout { get; }
-    [Selector("constraintsAffectingLayoutForOrientation:")] public NSArray ConstraintsAffectingLayoutForOrientation(NSLayoutConstraintOrientation orientation);
-    [Selector("exerciseAmbiguityInLayout")] public void ExerciseAmbiguityInLayout();
+    [Selector("hasAmbiguousLayout")]
+    public bool HasAmbiguousLayout { get; }
+    [Selector("constraintsAffectingLayoutForOrientation:")]
+    public NSArray ConstraintsAffectingLayoutForOrientation(NSLayoutConstraintOrientation orientation);
+    [Selector("exerciseAmbiguityInLayout")]
+    public void ExerciseAmbiguityInLayout();
 }
 
 /// NSConstraintBasedLayoutDebugging, a category of NSWindow.
 public extern objc class NSWindow
 {
-    [Selector("visualizeConstraints:")] public void VisualizeConstraints(NSArray? constraints);
+    [Selector("visualizeConstraints:")]
+    public void VisualizeConstraints(NSArray? constraints);
 }
 
 #endif

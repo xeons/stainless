@@ -35,9 +35,12 @@ import Standard.ObjC;
 
 public extern objc class MKMapSnapshot : NSObject
 {
-    [Selector("image")] public NSImage Image { get; }
-    [Selector("appearance")] public NSAppearance? Appearance { get; }
-    [Selector("pointForCoordinate:")] public NSPoint PointForCoordinate(CLLocationCoordinate2D coordinate);
+    [Selector("image")]
+    public NSImage Image { get; }
+    [Selector("appearance")]
+    public NSAppearance? Appearance { get; }
+    [Selector("pointForCoordinate:")]
+    public NSPoint PointForCoordinate(CLLocationCoordinate2D coordinate);
 }
 
 #endif

@@ -22,18 +22,30 @@ import Standard.Security.Cryptography;
 import Standard.Text;
 import Standard.Threading;
 
-[Embed("ed25519.crt.pem")] static readonly byte[] Ed25519Certificate;
-[Embed("ed25519.key.pem")] static readonly byte[] Ed25519Key;
-[Embed("p256.crt.pem")] static readonly byte[] P256Certificate;
-[Embed("p256.key.pem")] static readonly byte[] P256Key;
-[Embed("p384.crt.pem")] static readonly byte[] P384Certificate;
-[Embed("p384.key.pem")] static readonly byte[] P384Key;
-[Embed("rsa.crt.pem")] static readonly byte[] RsaCertificate;
-[Embed("rsa.key.pem")] static readonly byte[] RsaKey;
-[Embed("rsapss.crt.pem")] static readonly byte[] RsaPssCertificate;
-[Embed("rsapss.key.pem")] static readonly byte[] RsaPssKey;
-[Embed("client.crt.pem")] static readonly byte[] ClientCertificate;
-[Embed("client.key.pem")] static readonly byte[] ClientKey;
+[Embed("ed25519.crt.pem")]
+static readonly byte[] Ed25519Certificate;
+[Embed("ed25519.key.pem")]
+static readonly byte[] Ed25519Key;
+[Embed("p256.crt.pem")]
+static readonly byte[] P256Certificate;
+[Embed("p256.key.pem")]
+static readonly byte[] P256Key;
+[Embed("p384.crt.pem")]
+static readonly byte[] P384Certificate;
+[Embed("p384.key.pem")]
+static readonly byte[] P384Key;
+[Embed("rsa.crt.pem")]
+static readonly byte[] RsaCertificate;
+[Embed("rsa.key.pem")]
+static readonly byte[] RsaKey;
+[Embed("rsapss.crt.pem")]
+static readonly byte[] RsaPssCertificate;
+[Embed("rsapss.key.pem")]
+static readonly byte[] RsaPssKey;
+[Embed("client.crt.pem")]
+static readonly byte[] ClientCertificate;
+[Embed("client.key.pem")]
+static readonly byte[] ClientKey;
 
 String ConvertToText(byte[] bytes) => Text.FromBytes(&bytes[0u], bytes.Length);
 

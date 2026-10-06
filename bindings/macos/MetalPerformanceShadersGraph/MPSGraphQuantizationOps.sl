@@ -35,16 +35,26 @@ import Standard.ObjC;
 /// MPSGraphQuantizationOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("quantizeTensor:scale:zeroPoint:dataType:name:")] public MPSGraphTensor QuantizeTensorScaleZeroPointDataTypeName(MPSGraphTensor tensor, double scale, double zeroPoint, MPSDataType dataType, NSString? name);
-    [Selector("dequantizeTensor:scale:zeroPoint:dataType:name:")] public MPSGraphTensor DequantizeTensorScaleZeroPointDataTypeName(MPSGraphTensor tensor, double scale, double zeroPoint, MPSDataType dataType, NSString? name);
-    [Selector("quantizeTensor:scaleTensor:zeroPoint:dataType:axis:name:")] public MPSGraphTensor QuantizeTensorScaleTensorZeroPointDataTypeAxisName(MPSGraphTensor tensor, MPSGraphTensor scaleTensor, double zeroPoint, MPSDataType dataType, NSInteger axis, NSString? name);
-    [Selector("dequantizeTensor:scaleTensor:zeroPoint:dataType:axis:name:")] public MPSGraphTensor DequantizeTensorScaleTensorZeroPointDataTypeAxisName(MPSGraphTensor tensor, MPSGraphTensor scaleTensor, double zeroPoint, MPSDataType dataType, NSInteger axis, NSString? name);
-    [Selector("quantizeTensor:scaleTensor:zeroPointTensor:dataType:axis:name:")] public MPSGraphTensor QuantizeTensorScaleTensorZeroPointTensorDataTypeAxisName(MPSGraphTensor tensor, MPSGraphTensor scaleTensor, MPSGraphTensor zeroPointTensor, MPSDataType dataType, NSInteger axis, NSString? name);
-    [Selector("dequantizeTensor:scaleTensor:zeroPointTensor:dataType:axis:name:")] public MPSGraphTensor DequantizeTensorScaleTensorZeroPointTensorDataTypeAxisName(MPSGraphTensor tensor, MPSGraphTensor scaleTensor, MPSGraphTensor zeroPointTensor, MPSDataType dataType, NSInteger axis, NSString? name);
-    [Selector("dequantizeTensor:scaleTensor:zeroPointTensor:dataType:name:")] public MPSGraphTensor DequantizeTensorScaleTensorZeroPointTensorDataTypeName(MPSGraphTensor tensor, MPSGraphTensor scaleTensor, MPSGraphTensor zeroPointTensor, MPSDataType dataType, NSString? name);
-    [Selector("dequantizeTensor:scaleTensor:dataType:name:")] public MPSGraphTensor DequantizeTensorScaleTensorDataTypeName(MPSGraphTensor tensor, MPSGraphTensor scaleTensor, MPSDataType dataType, NSString? name);
-    [Selector("dequantizeTensor:LUTTensor:name:")] public MPSGraphTensor DequantizeTensorLUTTensorName(MPSGraphTensor tensor, MPSGraphTensor LUTTensor, NSString? name);
-    [Selector("dequantizeTensor:LUTTensor:axis:name:")] public MPSGraphTensor DequantizeTensorLUTTensorAxisName(MPSGraphTensor tensor, MPSGraphTensor LUTTensor, NSInteger axis, NSString? name);
+    [Selector("quantizeTensor:scale:zeroPoint:dataType:name:")]
+    public MPSGraphTensor QuantizeTensorScaleZeroPointDataTypeName(MPSGraphTensor tensor, double scale, double zeroPoint, MPSDataType dataType, NSString? name);
+    [Selector("dequantizeTensor:scale:zeroPoint:dataType:name:")]
+    public MPSGraphTensor DequantizeTensorScaleZeroPointDataTypeName(MPSGraphTensor tensor, double scale, double zeroPoint, MPSDataType dataType, NSString? name);
+    [Selector("quantizeTensor:scaleTensor:zeroPoint:dataType:axis:name:")]
+    public MPSGraphTensor QuantizeTensorScaleTensorZeroPointDataTypeAxisName(MPSGraphTensor tensor, MPSGraphTensor scaleTensor, double zeroPoint, MPSDataType dataType, NSInteger axis, NSString? name);
+    [Selector("dequantizeTensor:scaleTensor:zeroPoint:dataType:axis:name:")]
+    public MPSGraphTensor DequantizeTensorScaleTensorZeroPointDataTypeAxisName(MPSGraphTensor tensor, MPSGraphTensor scaleTensor, double zeroPoint, MPSDataType dataType, NSInteger axis, NSString? name);
+    [Selector("quantizeTensor:scaleTensor:zeroPointTensor:dataType:axis:name:")]
+    public MPSGraphTensor QuantizeTensorScaleTensorZeroPointTensorDataTypeAxisName(MPSGraphTensor tensor, MPSGraphTensor scaleTensor, MPSGraphTensor zeroPointTensor, MPSDataType dataType, NSInteger axis, NSString? name);
+    [Selector("dequantizeTensor:scaleTensor:zeroPointTensor:dataType:axis:name:")]
+    public MPSGraphTensor DequantizeTensorScaleTensorZeroPointTensorDataTypeAxisName(MPSGraphTensor tensor, MPSGraphTensor scaleTensor, MPSGraphTensor zeroPointTensor, MPSDataType dataType, NSInteger axis, NSString? name);
+    [Selector("dequantizeTensor:scaleTensor:zeroPointTensor:dataType:name:")]
+    public MPSGraphTensor DequantizeTensorScaleTensorZeroPointTensorDataTypeName(MPSGraphTensor tensor, MPSGraphTensor scaleTensor, MPSGraphTensor zeroPointTensor, MPSDataType dataType, NSString? name);
+    [Selector("dequantizeTensor:scaleTensor:dataType:name:")]
+    public MPSGraphTensor DequantizeTensorScaleTensorDataTypeName(MPSGraphTensor tensor, MPSGraphTensor scaleTensor, MPSDataType dataType, NSString? name);
+    [Selector("dequantizeTensor:LUTTensor:name:")]
+    public MPSGraphTensor DequantizeTensorLUTTensorName(MPSGraphTensor tensor, MPSGraphTensor LUTTensor, NSString? name);
+    [Selector("dequantizeTensor:LUTTensor:axis:name:")]
+    public MPSGraphTensor DequantizeTensorLUTTensorAxisName(MPSGraphTensor tensor, MPSGraphTensor LUTTensor, NSInteger axis, NSString? name);
 }
 
 #endif

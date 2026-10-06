@@ -34,24 +34,42 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCPoolingDescriptor : NSObject, NSCopying
 {
-    [Selector("poolingType")] public MLCPoolingType PoolingType { get; }
-    [Selector("kernelWidth")] public NSUInteger KernelWidth { get; }
-    [Selector("kernelHeight")] public NSUInteger KernelHeight { get; }
-    [Selector("strideInX")] public NSUInteger StrideInX { get; }
-    [Selector("strideInY")] public NSUInteger StrideInY { get; }
-    [Selector("dilationRateInX")] public NSUInteger DilationRateInX { get; }
-    [Selector("dilationRateInY")] public NSUInteger DilationRateInY { get; }
-    [Selector("paddingPolicy")] public MLCPaddingPolicy PaddingPolicy { get; }
-    [Selector("paddingSizeInX")] public NSUInteger PaddingSizeInX { get; }
-    [Selector("paddingSizeInY")] public NSUInteger PaddingSizeInY { get; }
-    [Selector("countIncludesPadding")] public bool CountIncludesPadding { get; }
-    [Selector("poolingDescriptorWithType:kernelSize:stride:")] public static Self PoolingDescriptorWithTypeKernelSizeStride(MLCPoolingType poolingType, NSUInteger kernelSize, NSUInteger stride);
-    [Selector("maxPoolingDescriptorWithKernelSizes:strides:paddingPolicy:paddingSizes:")] public static Self MaxPoolingDescriptorWithKernelSizesStridesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSArray strides, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
-    [Selector("maxPoolingDescriptorWithKernelSizes:strides:dilationRates:paddingPolicy:paddingSizes:")] public static Self MaxPoolingDescriptorWithKernelSizesStridesDilationRatesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSArray strides, NSArray dilationRates, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
-    [Selector("averagePoolingDescriptorWithKernelSizes:strides:paddingPolicy:paddingSizes:countIncludesPadding:")] public static Self AveragePoolingDescriptorWithKernelSizesStridesPaddingPolicyPaddingSizesCountIncludesPadding(NSArray kernelSizes, NSArray strides, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes, bool countIncludesPadding);
-    [Selector("averagePoolingDescriptorWithKernelSizes:strides:dilationRates:paddingPolicy:paddingSizes:countIncludesPadding:")] public static Self AveragePoolingDescriptorWithKernelSizesStridesDilationRatesPaddingPolicyPaddingSizesCountIncludesPadding(NSArray kernelSizes, NSArray strides, NSArray dilationRates, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes, bool countIncludesPadding);
-    [Selector("l2NormPoolingDescriptorWithKernelSizes:strides:paddingPolicy:paddingSizes:")] public static Self L2NormPoolingDescriptorWithKernelSizesStridesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSArray strides, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
-    [Selector("l2NormPoolingDescriptorWithKernelSizes:strides:dilationRates:paddingPolicy:paddingSizes:")] public static Self L2NormPoolingDescriptorWithKernelSizesStridesDilationRatesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSArray strides, NSArray dilationRates, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
+    [Selector("poolingType")]
+    public MLCPoolingType PoolingType { get; }
+    [Selector("kernelWidth")]
+    public NSUInteger KernelWidth { get; }
+    [Selector("kernelHeight")]
+    public NSUInteger KernelHeight { get; }
+    [Selector("strideInX")]
+    public NSUInteger StrideInX { get; }
+    [Selector("strideInY")]
+    public NSUInteger StrideInY { get; }
+    [Selector("dilationRateInX")]
+    public NSUInteger DilationRateInX { get; }
+    [Selector("dilationRateInY")]
+    public NSUInteger DilationRateInY { get; }
+    [Selector("paddingPolicy")]
+    public MLCPaddingPolicy PaddingPolicy { get; }
+    [Selector("paddingSizeInX")]
+    public NSUInteger PaddingSizeInX { get; }
+    [Selector("paddingSizeInY")]
+    public NSUInteger PaddingSizeInY { get; }
+    [Selector("countIncludesPadding")]
+    public bool CountIncludesPadding { get; }
+    [Selector("poolingDescriptorWithType:kernelSize:stride:")]
+    public static Self PoolingDescriptorWithTypeKernelSizeStride(MLCPoolingType poolingType, NSUInteger kernelSize, NSUInteger stride);
+    [Selector("maxPoolingDescriptorWithKernelSizes:strides:paddingPolicy:paddingSizes:")]
+    public static Self MaxPoolingDescriptorWithKernelSizesStridesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSArray strides, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
+    [Selector("maxPoolingDescriptorWithKernelSizes:strides:dilationRates:paddingPolicy:paddingSizes:")]
+    public static Self MaxPoolingDescriptorWithKernelSizesStridesDilationRatesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSArray strides, NSArray dilationRates, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
+    [Selector("averagePoolingDescriptorWithKernelSizes:strides:paddingPolicy:paddingSizes:countIncludesPadding:")]
+    public static Self AveragePoolingDescriptorWithKernelSizesStridesPaddingPolicyPaddingSizesCountIncludesPadding(NSArray kernelSizes, NSArray strides, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes, bool countIncludesPadding);
+    [Selector("averagePoolingDescriptorWithKernelSizes:strides:dilationRates:paddingPolicy:paddingSizes:countIncludesPadding:")]
+    public static Self AveragePoolingDescriptorWithKernelSizesStridesDilationRatesPaddingPolicyPaddingSizesCountIncludesPadding(NSArray kernelSizes, NSArray strides, NSArray dilationRates, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes, bool countIncludesPadding);
+    [Selector("l2NormPoolingDescriptorWithKernelSizes:strides:paddingPolicy:paddingSizes:")]
+    public static Self L2NormPoolingDescriptorWithKernelSizesStridesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSArray strides, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
+    [Selector("l2NormPoolingDescriptorWithKernelSizes:strides:dilationRates:paddingPolicy:paddingSizes:")]
+    public static Self L2NormPoolingDescriptorWithKernelSizesStridesDilationRatesPaddingPolicyPaddingSizes(NSArray kernelSizes, NSArray strides, NSArray dilationRates, MLCPaddingPolicy paddingPolicy, NSArray? paddingSizes);
 }
 
 #endif

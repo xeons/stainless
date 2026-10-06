@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// GameplayKit, a category of SCNNode.
 public extern objc class SCNNode
 {
-    [Selector("entity", "setEntity:")] public GKEntity? Entity { get; set; }
+    [Selector("entity", "setEntity:")]
+    public GKEntity? Entity { get; set; }
 }
 
 /// GameplayKit, a category of SCNScene.

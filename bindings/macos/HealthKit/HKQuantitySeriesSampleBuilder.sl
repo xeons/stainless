@@ -37,15 +37,24 @@ public objc closure void HKQuantitySeriesSampleBuilderFinishSeriesWithMetadataCo
 
 public extern objc class HKQuantitySeriesSampleBuilder : NSObject
 {
-    [Selector("quantityType")] public HKQuantityType QuantityType { get; }
-    [Selector("startDate")] public NSDate StartDate { get; }
-    [Selector("device")] public HKDevice? Device { get; }
-    [Selector("initWithHealthStore:quantityType:startDate:device:")] public Self InitWithHealthStoreQuantityTypeStartDateDevice(HKHealthStore healthStore, HKQuantityType quantityType, NSDate startDate, HKDevice? device);
-    [Selector("insertQuantity:dateInterval:error:")] public bool InsertQuantityDateIntervalError(HKQuantity quantity, NSDateInterval dateInterval, out NSError? error);
-    [Selector("insertQuantity:date:error:")] public bool InsertQuantityDateError(HKQuantity quantity, NSDate date, out NSError? error);
-    [Selector("finishSeriesWithMetadata:endDate:completion:")] public void FinishSeriesWithMetadataEndDateCompletion(NSDictionary? metadata, NSDate? endDate, HKQuantitySeriesSampleBuilderFinishSeriesWithMetadataEndDateCompletionCompletionBlock completion);
-    [Selector("finishSeriesWithMetadata:completion:")] public void FinishSeriesWithMetadataCompletion(NSDictionary? metadata, HKQuantitySeriesSampleBuilderFinishSeriesWithMetadataCompletionCompletionBlock completion);
-    [Selector("discard")] public void Discard();
+    [Selector("quantityType")]
+    public HKQuantityType QuantityType { get; }
+    [Selector("startDate")]
+    public NSDate StartDate { get; }
+    [Selector("device")]
+    public HKDevice? Device { get; }
+    [Selector("initWithHealthStore:quantityType:startDate:device:")]
+    public Self InitWithHealthStoreQuantityTypeStartDateDevice(HKHealthStore healthStore, HKQuantityType quantityType, NSDate startDate, HKDevice? device);
+    [Selector("insertQuantity:dateInterval:error:")]
+    public bool InsertQuantityDateIntervalError(HKQuantity quantity, NSDateInterval dateInterval, out NSError? error);
+    [Selector("insertQuantity:date:error:")]
+    public bool InsertQuantityDateError(HKQuantity quantity, NSDate date, out NSError? error);
+    [Selector("finishSeriesWithMetadata:endDate:completion:")]
+    public void FinishSeriesWithMetadataEndDateCompletion(NSDictionary? metadata, NSDate? endDate, HKQuantitySeriesSampleBuilderFinishSeriesWithMetadataEndDateCompletionCompletionBlock completion);
+    [Selector("finishSeriesWithMetadata:completion:")]
+    public void FinishSeriesWithMetadataCompletion(NSDictionary? metadata, HKQuantitySeriesSampleBuilderFinishSeriesWithMetadataCompletionCompletionBlock completion);
+    [Selector("discard")]
+    public void Discard();
 }
 
 #endif

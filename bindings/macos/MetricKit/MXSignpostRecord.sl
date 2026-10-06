@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class MXSignpostRecord : NSObject, NSSecureCoding
 {
-    [Selector("subsystem")] public NSString Subsystem { get; }
-    [Selector("category")] public NSString Category { get; }
-    [Selector("name")] public NSString Name { get; }
-    [Selector("beginTimeStamp")] public NSDate BeginTimeStamp { get; }
-    [Selector("endTimeStamp")] public NSDate? EndTimeStamp { get; }
-    [Selector("duration")] public NSMeasurement? Duration { get; }
-    [Selector("isInterval")] public bool IsInterval { get; }
-    [Selector("JSONRepresentation")] public NSData JSONRepresentation();
-    [Selector("dictionaryRepresentation")] public NSDictionary DictionaryRepresentation();
+    [Selector("subsystem")]
+    public NSString Subsystem { get; }
+    [Selector("category")]
+    public NSString Category { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("beginTimeStamp")]
+    public NSDate BeginTimeStamp { get; }
+    [Selector("endTimeStamp")]
+    public NSDate? EndTimeStamp { get; }
+    [Selector("duration")]
+    public NSMeasurement? Duration { get; }
+    [Selector("isInterval")]
+    public bool IsInterval { get; }
+    [Selector("JSONRepresentation")]
+    public NSData JSONRepresentation();
+    [Selector("dictionaryRepresentation")]
+    public NSDictionary DictionaryRepresentation();
 }
 
 #endif

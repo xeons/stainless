@@ -40,13 +40,20 @@ public objc closure void VTFrameProcessorProcessWithParametersFrameOutputHandler
 /// macOS 15.4 and later.
 public extern objc class VTFrameProcessor : NSObject
 {
-    [Selector("init")] public Self Init();
-    [Selector("startSessionWithConfiguration:error:")] public bool StartSessionWithConfigurationError(VTFrameProcessorConfiguration configuration, out NSError? error);
-    [Selector("processWithParameters:error:")] public bool ProcessWithParametersError(VTFrameProcessorParameters parameters, out NSError? error);
-    [Selector("processWithParameters:completionHandler:")] public void ProcessWithParametersCompletionHandler(VTFrameProcessorParameters parameters, VTFrameProcessorProcessWithParametersCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("processWithParameters:frameOutputHandler:")] public void ProcessWithParametersFrameOutputHandler(VTFrameProcessorParameters parameters, VTFrameProcessorProcessWithParametersFrameOutputHandlerFrameOutputHandlerBlock frameOutputHandler);
-    [Selector("processWithCommandBuffer:parameters:")] public void ProcessWithCommandBufferParameters(MTLCommandBuffer commandBuffer, VTFrameProcessorParameters parameters);
-    [Selector("endSession")] public void EndSession();
+    [Selector("init")]
+    public Self Init();
+    [Selector("startSessionWithConfiguration:error:")]
+    public bool StartSessionWithConfigurationError(VTFrameProcessorConfiguration configuration, out NSError? error);
+    [Selector("processWithParameters:error:")]
+    public bool ProcessWithParametersError(VTFrameProcessorParameters parameters, out NSError? error);
+    [Selector("processWithParameters:completionHandler:")]
+    public void ProcessWithParametersCompletionHandler(VTFrameProcessorParameters parameters, VTFrameProcessorProcessWithParametersCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("processWithParameters:frameOutputHandler:")]
+    public void ProcessWithParametersFrameOutputHandler(VTFrameProcessorParameters parameters, VTFrameProcessorProcessWithParametersFrameOutputHandlerFrameOutputHandlerBlock frameOutputHandler);
+    [Selector("processWithCommandBuffer:parameters:")]
+    public void ProcessWithCommandBufferParameters(MTLCommandBuffer commandBuffer, VTFrameProcessorParameters parameters);
+    [Selector("endSession")]
+    public void EndSession();
 }
 
 #endif

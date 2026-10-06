@@ -36,9 +36,13 @@ public objc closure void NSXPCProxyCreatingSynchronousRemoteObjectProxyWithError
 
 public objc interface NSXPCProxyCreating
 {
-    [Selector("remoteObjectProxy")] AnyObject RemoteObjectProxy();
-    [Selector("remoteObjectProxyWithErrorHandler:")] AnyObject RemoteObjectProxyWithErrorHandler(NSXPCProxyCreatingRemoteObjectProxyWithErrorHandlerHandlerBlock handler);
-    [Optional] [Selector("synchronousRemoteObjectProxyWithErrorHandler:")] AnyObject SynchronousRemoteObjectProxyWithErrorHandler(NSXPCProxyCreatingSynchronousRemoteObjectProxyWithErrorHandlerHandlerBlock handler);
+    [Selector("remoteObjectProxy")]
+    AnyObject RemoteObjectProxy();
+    [Selector("remoteObjectProxyWithErrorHandler:")]
+    AnyObject RemoteObjectProxyWithErrorHandler(NSXPCProxyCreatingRemoteObjectProxyWithErrorHandlerHandlerBlock handler);
+    [Optional]
+    [Selector("synchronousRemoteObjectProxyWithErrorHandler:")]
+    AnyObject SynchronousRemoteObjectProxyWithErrorHandler(NSXPCProxyCreatingSynchronousRemoteObjectProxyWithErrorHandlerHandlerBlock handler);
 }
 
 [Flags]
@@ -59,69 +63,115 @@ public objc closure void NSXPCConnectionScheduleSendBarrierBlockBlock();
 
 public extern objc class NSXPCConnection : NSObject, NSXPCProxyCreating
 {
-    [Selector("serviceName")] public NSString? ServiceName { get; }
-    [Selector("endpoint")] public NSXPCListenerEndpoint Endpoint { get; }
-    [Selector("exportedInterface", "setExportedInterface:")] public NSXPCInterface? ExportedInterface { get; set; }
-    [Selector("exportedObject", "setExportedObject:")] public AnyObject? ExportedObject { get; set; }
-    [Selector("remoteObjectInterface", "setRemoteObjectInterface:")] public NSXPCInterface? RemoteObjectInterface { get; set; }
-    [Selector("remoteObjectProxy")] public AnyObject RemoteObjectProxy { get; }
-    [Selector("interruptionHandler", "setInterruptionHandler:")] public NSXPCConnectionInterruptionHandlerBlock? InterruptionHandler { get; set; }
-    [Selector("invalidationHandler", "setInvalidationHandler:")] public NSXPCConnectionInvalidationHandlerBlock? InvalidationHandler { get; set; }
-    [Selector("auditSessionIdentifier")] public au_asid_t AuditSessionIdentifier { get; }
-    [Selector("processIdentifier")] public pid_t ProcessIdentifier { get; }
-    [Selector("effectiveUserIdentifier")] public uid_t EffectiveUserIdentifier { get; }
-    [Selector("effectiveGroupIdentifier")] public gid_t EffectiveGroupIdentifier { get; }
-    [Selector("initWithServiceName:")] public Self InitWithServiceName(NSString serviceName);
-    [Selector("initWithMachServiceName:options:")] public Self InitWithMachServiceNameOptions(NSString name, NSXPCConnectionOptions options);
-    [Selector("initWithListenerEndpoint:")] public Self InitWithListenerEndpoint(NSXPCListenerEndpoint endpoint);
-    [Selector("remoteObjectProxyWithErrorHandler:")] public AnyObject RemoteObjectProxyWithErrorHandler(NSXPCConnectionRemoteObjectProxyWithErrorHandlerHandlerBlock handler);
-    [Selector("synchronousRemoteObjectProxyWithErrorHandler:")] public AnyObject SynchronousRemoteObjectProxyWithErrorHandler(NSXPCConnectionSynchronousRemoteObjectProxyWithErrorHandlerHandlerBlock handler);
-    [Selector("resume")] public void Resume();
-    [Selector("suspend")] public void Suspend();
-    [Selector("activate")] public void Activate();
-    [Selector("invalidate")] public void Invalidate();
-    [Selector("currentConnection")] public static NSXPCConnection? CurrentConnection();
-    [Selector("scheduleSendBarrierBlock:")] public void ScheduleSendBarrierBlock(NSXPCConnectionScheduleSendBarrierBlockBlock block);
-    [Selector("setCodeSigningRequirement:")] public void SetCodeSigningRequirement(NSString requirement);
+    [Selector("serviceName")]
+    public NSString? ServiceName { get; }
+    [Selector("endpoint")]
+    public NSXPCListenerEndpoint Endpoint { get; }
+    [Selector("exportedInterface", "setExportedInterface:")]
+    public NSXPCInterface? ExportedInterface { get; set; }
+    [Selector("exportedObject", "setExportedObject:")]
+    public AnyObject? ExportedObject { get; set; }
+    [Selector("remoteObjectInterface", "setRemoteObjectInterface:")]
+    public NSXPCInterface? RemoteObjectInterface { get; set; }
+    [Selector("remoteObjectProxy")]
+    public AnyObject RemoteObjectProxy { get; }
+    [Selector("interruptionHandler", "setInterruptionHandler:")]
+    public NSXPCConnectionInterruptionHandlerBlock? InterruptionHandler { get; set; }
+    [Selector("invalidationHandler", "setInvalidationHandler:")]
+    public NSXPCConnectionInvalidationHandlerBlock? InvalidationHandler { get; set; }
+    [Selector("auditSessionIdentifier")]
+    public au_asid_t AuditSessionIdentifier { get; }
+    [Selector("processIdentifier")]
+    public pid_t ProcessIdentifier { get; }
+    [Selector("effectiveUserIdentifier")]
+    public uid_t EffectiveUserIdentifier { get; }
+    [Selector("effectiveGroupIdentifier")]
+    public gid_t EffectiveGroupIdentifier { get; }
+    [Selector("initWithServiceName:")]
+    public Self InitWithServiceName(NSString serviceName);
+    [Selector("initWithMachServiceName:options:")]
+    public Self InitWithMachServiceNameOptions(NSString name, NSXPCConnectionOptions options);
+    [Selector("initWithListenerEndpoint:")]
+    public Self InitWithListenerEndpoint(NSXPCListenerEndpoint endpoint);
+    [Selector("remoteObjectProxyWithErrorHandler:")]
+    public AnyObject RemoteObjectProxyWithErrorHandler(NSXPCConnectionRemoteObjectProxyWithErrorHandlerHandlerBlock handler);
+    [Selector("synchronousRemoteObjectProxyWithErrorHandler:")]
+    public AnyObject SynchronousRemoteObjectProxyWithErrorHandler(NSXPCConnectionSynchronousRemoteObjectProxyWithErrorHandlerHandlerBlock handler);
+    [Selector("resume")]
+    public void Resume();
+    [Selector("suspend")]
+    public void Suspend();
+    [Selector("activate")]
+    public void Activate();
+    [Selector("invalidate")]
+    public void Invalidate();
+    [Selector("currentConnection")]
+    public static NSXPCConnection? CurrentConnection();
+    [Selector("scheduleSendBarrierBlock:")]
+    public void ScheduleSendBarrierBlock(NSXPCConnectionScheduleSendBarrierBlockBlock block);
+    [Selector("setCodeSigningRequirement:")]
+    public void SetCodeSigningRequirement(NSString requirement);
 }
 
 public extern objc class NSXPCListener : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public NSXPCListenerDelegate? Delegate { get; set; }
-    [Selector("endpoint")] public NSXPCListenerEndpoint Endpoint { get; }
-    [Selector("serviceListener")] public static NSXPCListener ServiceListener();
-    [Selector("anonymousListener")] public static NSXPCListener AnonymousListener();
-    [Selector("initWithMachServiceName:")] public Self InitWithMachServiceName(NSString name);
-    [Selector("resume")] public void Resume();
-    [Selector("suspend")] public void Suspend();
-    [Selector("activate")] public void Activate();
-    [Selector("invalidate")] public void Invalidate();
-    [Selector("setConnectionCodeSigningRequirement:")] public void SetConnectionCodeSigningRequirement(NSString requirement);
+    [Selector("delegate", "setDelegate:")]
+    public NSXPCListenerDelegate? Delegate { get; set; }
+    [Selector("endpoint")]
+    public NSXPCListenerEndpoint Endpoint { get; }
+    [Selector("serviceListener")]
+    public static NSXPCListener ServiceListener();
+    [Selector("anonymousListener")]
+    public static NSXPCListener AnonymousListener();
+    [Selector("initWithMachServiceName:")]
+    public Self InitWithMachServiceName(NSString name);
+    [Selector("resume")]
+    public void Resume();
+    [Selector("suspend")]
+    public void Suspend();
+    [Selector("activate")]
+    public void Activate();
+    [Selector("invalidate")]
+    public void Invalidate();
+    [Selector("setConnectionCodeSigningRequirement:")]
+    public void SetConnectionCodeSigningRequirement(NSString requirement);
 }
 
 public objc interface NSXPCListenerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("listener:shouldAcceptNewConnection:")] bool ListenerShouldAcceptNewConnection(NSXPCListener listener, NSXPCConnection newConnection);
+    [Optional]
+    [Selector("listener:shouldAcceptNewConnection:")]
+    bool ListenerShouldAcceptNewConnection(NSXPCListener listener, NSXPCConnection newConnection);
 }
 
 public extern objc class NSXPCInterface : NSObject
 {
-    [Selector("setClasses:forSelector:argumentIndex:ofReply:")] public void SetClassesForSelectorArgumentIndexOfReply(NSSet classes, Selector sel, NSUInteger arg, bool ofReply);
-    [Selector("classesForSelector:argumentIndex:ofReply:")] public NSSet ClassesForSelectorArgumentIndexOfReply(Selector sel, NSUInteger arg, bool ofReply);
-    [Selector("setInterface:forSelector:argumentIndex:ofReply:")] public void SetInterfaceForSelectorArgumentIndexOfReply(NSXPCInterface ifc, Selector sel, NSUInteger arg, bool ofReply);
-    [Selector("interfaceForSelector:argumentIndex:ofReply:")] public NSXPCInterface? InterfaceForSelectorArgumentIndexOfReply(Selector sel, NSUInteger arg, bool ofReply);
-    [Selector("setXPCType:forSelector:argumentIndex:ofReply:")] public void SetXPCTypeForSelectorArgumentIndexOfReply(xpc_type_t type, Selector sel, NSUInteger arg, bool ofReply);
-    [Selector("XPCTypeForSelector:argumentIndex:ofReply:")] public xpc_type_t XPCTypeForSelectorArgumentIndexOfReply(Selector sel, NSUInteger arg, bool ofReply);
+    [Selector("setClasses:forSelector:argumentIndex:ofReply:")]
+    public void SetClassesForSelectorArgumentIndexOfReply(NSSet classes, Selector sel, NSUInteger arg, bool ofReply);
+    [Selector("classesForSelector:argumentIndex:ofReply:")]
+    public NSSet ClassesForSelectorArgumentIndexOfReply(Selector sel, NSUInteger arg, bool ofReply);
+    [Selector("setInterface:forSelector:argumentIndex:ofReply:")]
+    public void SetInterfaceForSelectorArgumentIndexOfReply(NSXPCInterface ifc, Selector sel, NSUInteger arg, bool ofReply);
+    [Selector("interfaceForSelector:argumentIndex:ofReply:")]
+    public NSXPCInterface? InterfaceForSelectorArgumentIndexOfReply(Selector sel, NSUInteger arg, bool ofReply);
+    [Selector("setXPCType:forSelector:argumentIndex:ofReply:")]
+    public void SetXPCTypeForSelectorArgumentIndexOfReply(xpc_type_t type, Selector sel, NSUInteger arg, bool ofReply);
+    [Selector("XPCTypeForSelector:argumentIndex:ofReply:")]
+    public xpc_type_t XPCTypeForSelectorArgumentIndexOfReply(Selector sel, NSUInteger arg, bool ofReply);
 }
 
 public extern objc class NSXPCListenerEndpoint : NSObject, NSSecureCoding { }
 
 public extern objc class NSXPCCoder : NSCoder
 {
-    [Selector("userInfo", "setUserInfo:")] public NSObjectProtocol? UserInfo { get; set; }
-    [Selector("connection")] public NSXPCConnection? Connection { get; }
-    [Selector("encodeXPCObject:forKey:")] public void EncodeXPCObjectForKey(xpc_object_t xpcObject, NSString key);
-    [Selector("decodeXPCObjectOfType:forKey:")] public xpc_object_t? DecodeXPCObjectOfTypeForKey(xpc_type_t type, NSString key);
+    [Selector("userInfo", "setUserInfo:")]
+    public NSObjectProtocol? UserInfo { get; set; }
+    [Selector("connection")]
+    public NSXPCConnection? Connection { get; }
+    [Selector("encodeXPCObject:forKey:")]
+    public void EncodeXPCObjectForKey(xpc_object_t xpcObject, NSString key);
+    [Selector("decodeXPCObjectOfType:forKey:")]
+    public xpc_object_t? DecodeXPCObjectOfTypeForKey(xpc_type_t type, NSString key);
 }
 
 #endif

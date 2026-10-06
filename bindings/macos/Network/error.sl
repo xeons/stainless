@@ -57,6 +57,7 @@ public extern "C" CFStringRef kNWErrorDomainTLS;
 /// macOS 26.0 and later.
 public extern "C" CFStringRef kNWErrorDomainWiFiAware;
 
-[ReturnsRetained] public extern "C" CFErrorRef nw_error_copy_cf_error(nw_error_t error);
+[ReturnsRetained]
+public extern "C" CFErrorRef nw_error_copy_cf_error(nw_error_t error);
 
 #endif

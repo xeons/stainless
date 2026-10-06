@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class AVExternalStorageDevice : NSObject
 {
-    [Selector("displayName")] public NSString? DisplayName { get; }
-    [Selector("freeSize")] public NSInteger FreeSize { get; }
-    [Selector("totalSize")] public NSInteger TotalSize { get; }
-    [Selector("isConnected")] public bool Connected { get; }
-    [Selector("uuid")] public NSUUID? Uuid { get; }
-    [Selector("isNotRecommendedForCaptureUse")] public bool NotRecommendedForCaptureUse { get; }
-    [Selector("nextAvailableURLsWithPathExtensions:error:")] public NSArray? NextAvailableURLsWithPathExtensionsError(NSArray extensionArray, out NSError? outError);
+    [Selector("displayName")]
+    public NSString? DisplayName { get; }
+    [Selector("freeSize")]
+    public NSInteger FreeSize { get; }
+    [Selector("totalSize")]
+    public NSInteger TotalSize { get; }
+    [Selector("isConnected")]
+    public bool Connected { get; }
+    [Selector("uuid")]
+    public NSUUID? Uuid { get; }
+    [Selector("isNotRecommendedForCaptureUse")]
+    public bool NotRecommendedForCaptureUse { get; }
+    [Selector("nextAvailableURLsWithPathExtensions:error:")]
+    public NSArray? NextAvailableURLsWithPathExtensionsError(NSArray extensionArray, out NSError? outError);
 }
 
 public objc closure void AVExternalStorageDeviceRequestAccessWithCompletionHandlerHandlerBlock(bool arg0);
@@ -47,15 +54,20 @@ public objc closure void AVExternalStorageDeviceRequestAccessWithCompletionHandl
 /// AVExternalStorageDeviceAuthorization, a category of AVExternalStorageDevice.
 public extern objc class AVExternalStorageDevice
 {
-    [Selector("authorizationStatus")] public static AVAuthorizationStatus AuthorizationStatus { get; }
-    [Selector("requestAccessWithCompletionHandler:")] public static void RequestAccessWithCompletionHandler(AVExternalStorageDeviceRequestAccessWithCompletionHandlerHandlerBlock handler);
+    [Selector("authorizationStatus")]
+    public static AVAuthorizationStatus AuthorizationStatus { get; }
+    [Selector("requestAccessWithCompletionHandler:")]
+    public static void RequestAccessWithCompletionHandler(AVExternalStorageDeviceRequestAccessWithCompletionHandlerHandlerBlock handler);
 }
 
 public extern objc class AVExternalStorageDeviceDiscoverySession : NSObject
 {
-    [Selector("sharedSession")] public static AVExternalStorageDeviceDiscoverySession? SharedSession { get; }
-    [Selector("externalStorageDevices")] public NSArray ExternalStorageDevices { get; }
-    [Selector("isSupported")] public static bool Supported { get; }
+    [Selector("sharedSession")]
+    public static AVExternalStorageDeviceDiscoverySession? SharedSession { get; }
+    [Selector("externalStorageDevices")]
+    public NSArray ExternalStorageDevices { get; }
+    [Selector("isSupported")]
+    public static bool Supported { get; }
 }
 
 #endif

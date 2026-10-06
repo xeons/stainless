@@ -47,10 +47,14 @@ public enum GLKTextureEnvMode : int
 /// Deprecated in macOS 10.14.
 public extern objc class GLKEffectPropertyTexture : GLKEffectProperty
 {
-    [Selector("enabled", "setEnabled:")] public GLboolean Enabled { get; set; }
-    [Selector("name", "setName:")] public GLuint Name { get; set; }
-    [Selector("target", "setTarget:")] public GLKTextureTarget Target { get; set; }
-    [Selector("envMode", "setEnvMode:")] public GLKTextureEnvMode EnvMode { get; set; }
+    [Selector("enabled", "setEnabled:")]
+    public GLboolean Enabled { get; set; }
+    [Selector("name", "setName:")]
+    public GLuint Name { get; set; }
+    [Selector("target", "setTarget:")]
+    public GLKTextureTarget Target { get; set; }
+    [Selector("envMode", "setEnvMode:")]
+    public GLKTextureEnvMode EnvMode { get; set; }
 }
 
 #endif

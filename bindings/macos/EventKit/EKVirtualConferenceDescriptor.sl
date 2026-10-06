@@ -35,24 +35,34 @@ public using EKVirtualConferenceRoomTypeIdentifier = NSString;
 
 public extern objc class EKVirtualConferenceRoomTypeDescriptor : NSObject
 {
-    [Selector("title")] public NSString Title { get; }
-    [Selector("identifier")] public EKVirtualConferenceRoomTypeIdentifier Identifier { get; }
-    [Selector("initWithTitle:identifier:")] public Self InitWithTitleIdentifier(NSString title, EKVirtualConferenceRoomTypeIdentifier identifier);
+    [Selector("title")]
+    public NSString Title { get; }
+    [Selector("identifier")]
+    public EKVirtualConferenceRoomTypeIdentifier Identifier { get; }
+    [Selector("initWithTitle:identifier:")]
+    public Self InitWithTitleIdentifier(NSString title, EKVirtualConferenceRoomTypeIdentifier identifier);
 }
 
 public extern objc class EKVirtualConferenceURLDescriptor : NSObject
 {
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("initWithTitle:URL:")] public Self InitWithTitleURL(NSString? title, NSURL URL);
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("initWithTitle:URL:")]
+    public Self InitWithTitleURL(NSString? title, NSURL URL);
 }
 
 public extern objc class EKVirtualConferenceDescriptor : NSObject
 {
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("URLDescriptors")] public NSArray URLDescriptors { get; }
-    [Selector("conferenceDetails")] public NSString? ConferenceDetails { get; }
-    [Selector("initWithTitle:URLDescriptors:conferenceDetails:")] public Self InitWithTitleURLDescriptorsConferenceDetails(NSString? title, NSArray URLDescriptors, NSString? conferenceDetails);
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("URLDescriptors")]
+    public NSArray URLDescriptors { get; }
+    [Selector("conferenceDetails")]
+    public NSString? ConferenceDetails { get; }
+    [Selector("initWithTitle:URLDescriptors:conferenceDetails:")]
+    public Self InitWithTitleURLDescriptorsConferenceDetails(NSString? title, NSArray URLDescriptors, NSString? conferenceDetails);
 }
 
 #endif

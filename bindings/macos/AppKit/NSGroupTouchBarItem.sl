@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class NSGroupTouchBarItem : NSTouchBarItem
 {
-    [Selector("groupTouchBar", "setGroupTouchBar:")] public NSTouchBar GroupTouchBar { get; set; }
-    [Selector("customizationLabel", "setCustomizationLabel:")] public NSString? CustomizationLabel { get; set; }
-    [Selector("groupUserInterfaceLayoutDirection", "setGroupUserInterfaceLayoutDirection:")] public NSUserInterfaceLayoutDirection GroupUserInterfaceLayoutDirection { get; set; }
-    [Selector("prefersEqualWidths", "setPrefersEqualWidths:")] public bool PrefersEqualWidths { get; set; }
-    [Selector("preferredItemWidth", "setPreferredItemWidth:")] public CGFloat PreferredItemWidth { get; set; }
-    [Selector("effectiveCompressionOptions")] public NSUserInterfaceCompressionOptions? EffectiveCompressionOptions { get; }
-    [Selector("prioritizedCompressionOptions", "setPrioritizedCompressionOptions:")] public NSArray? PrioritizedCompressionOptions { get; set; }
-    [Selector("groupItemWithIdentifier:items:")] public static Self GroupItemWithIdentifierItems(NSTouchBarItemIdentifier identifier, NSArray items);
-    [Selector("groupItemWithIdentifier:items:allowedCompressionOptions:")] public static Self GroupItemWithIdentifierItemsAllowedCompressionOptions(NSTouchBarItemIdentifier identifier, NSArray items, NSUserInterfaceCompressionOptions allowedCompressionOptions);
-    [Selector("alertStyleGroupItemWithIdentifier:")] public static Self AlertStyleGroupItemWithIdentifier(NSTouchBarItemIdentifier identifier);
+    [Selector("groupTouchBar", "setGroupTouchBar:")]
+    public NSTouchBar GroupTouchBar { get; set; }
+    [Selector("customizationLabel", "setCustomizationLabel:")]
+    public NSString? CustomizationLabel { get; set; }
+    [Selector("groupUserInterfaceLayoutDirection", "setGroupUserInterfaceLayoutDirection:")]
+    public NSUserInterfaceLayoutDirection GroupUserInterfaceLayoutDirection { get; set; }
+    [Selector("prefersEqualWidths", "setPrefersEqualWidths:")]
+    public bool PrefersEqualWidths { get; set; }
+    [Selector("preferredItemWidth", "setPreferredItemWidth:")]
+    public CGFloat PreferredItemWidth { get; set; }
+    [Selector("effectiveCompressionOptions")]
+    public NSUserInterfaceCompressionOptions? EffectiveCompressionOptions { get; }
+    [Selector("prioritizedCompressionOptions", "setPrioritizedCompressionOptions:")]
+    public NSArray? PrioritizedCompressionOptions { get; set; }
+    [Selector("groupItemWithIdentifier:items:")]
+    public static Self GroupItemWithIdentifierItems(NSTouchBarItemIdentifier identifier, NSArray items);
+    [Selector("groupItemWithIdentifier:items:allowedCompressionOptions:")]
+    public static Self GroupItemWithIdentifierItemsAllowedCompressionOptions(NSTouchBarItemIdentifier identifier, NSArray items, NSUserInterfaceCompressionOptions allowedCompressionOptions);
+    [Selector("alertStyleGroupItemWithIdentifier:")]
+    public static Self AlertStyleGroupItemWithIdentifier(NSTouchBarItemIdentifier identifier);
 }
 
 #endif

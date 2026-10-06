@@ -32,14 +32,17 @@ import Standard.ObjC;
 
 public extern objc class CARemoteLayerServer : NSObject
 {
-    [Selector("serverPort")] public mach_port_t ServerPort { get; }
-    [Selector("sharedServer")] public static CARemoteLayerServer SharedServer();
+    [Selector("serverPort")]
+    public mach_port_t ServerPort { get; }
+    [Selector("sharedServer")]
+    public static CARemoteLayerServer SharedServer();
 }
 
 /// CARemoteLayerServer, a category of CALayer.
 public extern objc class CALayer
 {
-    [Selector("layerWithRemoteClientId:")] public static CALayer LayerWithRemoteClientId(uint client_id);
+    [Selector("layerWithRemoteClientId:")]
+    public static CALayer LayerWithRemoteClientId(uint client_id);
 }
 
 #endif

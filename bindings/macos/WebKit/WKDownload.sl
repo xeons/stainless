@@ -35,14 +35,20 @@ public objc closure void WKDownloadCancelCompletionHandlerBlock(NSData? arg0);
 
 public extern objc class WKDownload : NSObject, NSProgressReporting
 {
-    [Selector("originalRequest")] public NSURLRequest? OriginalRequest { get; }
-    [Selector("webView")] public WKWebView? WebView { get; }
-    [Selector("delegate", "setDelegate:")] public WKDownloadDelegate? Delegate { get; set; }
+    [Selector("originalRequest")]
+    public NSURLRequest? OriginalRequest { get; }
+    [Selector("webView")]
+    public WKWebView? WebView { get; }
+    [Selector("delegate", "setDelegate:")]
+    public WKDownloadDelegate? Delegate { get; set; }
     /// macOS 15.2 and later.
-    [Selector("isUserInitiated")] public bool UserInitiated { get; }
+    [Selector("isUserInitiated")]
+    public bool UserInitiated { get; }
     /// macOS 15.2 and later.
-    [Selector("originatingFrame")] public WKFrameInfo OriginatingFrame { get; }
-    [Selector("cancel:")] public void Cancel(WKDownloadCancelCompletionHandlerBlock? completionHandler);
+    [Selector("originatingFrame")]
+    public WKFrameInfo OriginatingFrame { get; }
+    [Selector("cancel:")]
+    public void Cancel(WKDownloadCancelCompletionHandlerBlock? completionHandler);
 }
 
 #endif

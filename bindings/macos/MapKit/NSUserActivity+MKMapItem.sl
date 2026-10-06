@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// MKMapItem, a category of NSUserActivity.
 public extern objc class NSUserActivity
 {
-    [Selector("mapItem", "setMapItem:")] public MKMapItem? MapItem { get; set; }
+    [Selector("mapItem", "setMapItem:")]
+    public MKMapItem? MapItem { get; set; }
 }
 
 #endif

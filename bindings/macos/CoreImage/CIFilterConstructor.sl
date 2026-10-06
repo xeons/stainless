@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public objc interface CIFilterConstructor
 {
-    [Selector("filterWithName:")] CIFilter? FilterWithName(NSString name);
+    [Selector("filterWithName:")]
+    CIFilter? FilterWithName(NSString name);
 }
 
 #endif

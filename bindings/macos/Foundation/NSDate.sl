@@ -36,44 +36,71 @@ public using NSTimeInterval = double;
 
 public extern objc class NSDate : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("timeIntervalSinceReferenceDate")] public NSTimeInterval TimeIntervalSinceReferenceDate { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithTimeIntervalSinceReferenceDate:")] public Self InitWithTimeIntervalSinceReferenceDate(NSTimeInterval ti);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("timeIntervalSinceReferenceDate")]
+    public NSTimeInterval TimeIntervalSinceReferenceDate { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithTimeIntervalSinceReferenceDate:")]
+    public Self InitWithTimeIntervalSinceReferenceDate(NSTimeInterval ti);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 /// NSExtendedDate, a category of NSDate.
 public extern objc class NSDate
 {
-    [Selector("timeIntervalSinceNow")] public NSTimeInterval TimeIntervalSinceNow { get; }
-    [Selector("timeIntervalSince1970")] public NSTimeInterval TimeIntervalSince1970 { get; }
-    [Selector("description")] public NSString Description { get; }
-    [Selector("timeIntervalSinceReferenceDate")] public static NSTimeInterval ClassTimeIntervalSinceReferenceDate { get; }
-    [Selector("timeIntervalSinceDate:")] public NSTimeInterval TimeIntervalSinceDate(NSDate anotherDate);
+    [Selector("timeIntervalSinceNow")]
+    public NSTimeInterval TimeIntervalSinceNow { get; }
+    [Selector("timeIntervalSince1970")]
+    public NSTimeInterval TimeIntervalSince1970 { get; }
+    [Selector("description")]
+    public NSString Description { get; }
+    [Selector("timeIntervalSinceReferenceDate")]
+    public static NSTimeInterval ClassTimeIntervalSinceReferenceDate { get; }
+    [Selector("timeIntervalSinceDate:")]
+    public NSTimeInterval TimeIntervalSinceDate(NSDate anotherDate);
     /// Deprecated in macOS 10.6.
-    [Selector("addTimeInterval:")] public AnyObject AddTimeInterval(NSTimeInterval seconds);
-    [Selector("dateByAddingTimeInterval:")] public Self DateByAddingTimeInterval(NSTimeInterval ti);
-    [Selector("earlierDate:")] public NSDate EarlierDate(NSDate anotherDate);
-    [Selector("laterDate:")] public NSDate LaterDate(NSDate anotherDate);
-    [Selector("compare:")] public NSComparisonResult Compare(NSDate other);
-    [Selector("isEqualToDate:")] public bool IsEqualToDate(NSDate otherDate);
-    [Selector("descriptionWithLocale:")] public NSString DescriptionWithLocale(AnyObject? locale);
+    [Selector("addTimeInterval:")]
+    public AnyObject AddTimeInterval(NSTimeInterval seconds);
+    [Selector("dateByAddingTimeInterval:")]
+    public Self DateByAddingTimeInterval(NSTimeInterval ti);
+    [Selector("earlierDate:")]
+    public NSDate EarlierDate(NSDate anotherDate);
+    [Selector("laterDate:")]
+    public NSDate LaterDate(NSDate anotherDate);
+    [Selector("compare:")]
+    public NSComparisonResult Compare(NSDate other);
+    [Selector("isEqualToDate:")]
+    public bool IsEqualToDate(NSDate otherDate);
+    [Selector("descriptionWithLocale:")]
+    public NSString DescriptionWithLocale(AnyObject? locale);
 }
 
 /// NSDateCreation, a category of NSDate.
 public extern objc class NSDate
 {
-    [Selector("distantFuture")] public static NSDate DistantFuture { get; }
-    [Selector("distantPast")] public static NSDate DistantPast { get; }
-    [Selector("now")] public static NSDate Now { get; }
-    [Selector("date")] public static Self Date();
-    [Selector("dateWithTimeIntervalSinceNow:")] public static Self DateWithTimeIntervalSinceNow(NSTimeInterval secs);
-    [Selector("dateWithTimeIntervalSinceReferenceDate:")] public static Self DateWithTimeIntervalSinceReferenceDate(NSTimeInterval ti);
-    [Selector("dateWithTimeIntervalSince1970:")] public static Self DateWithTimeIntervalSince1970(NSTimeInterval secs);
-    [Selector("dateWithTimeInterval:sinceDate:")] public static Self DateWithTimeIntervalSinceDate(NSTimeInterval secsToBeAdded, NSDate date);
-    [Selector("initWithTimeIntervalSinceNow:")] public Self InitWithTimeIntervalSinceNow(NSTimeInterval secs);
-    [Selector("initWithTimeIntervalSince1970:")] public Self InitWithTimeIntervalSince1970(NSTimeInterval secs);
-    [Selector("initWithTimeInterval:sinceDate:")] public Self InitWithTimeIntervalSinceDate(NSTimeInterval secsToBeAdded, NSDate date);
+    [Selector("distantFuture")]
+    public static NSDate DistantFuture { get; }
+    [Selector("distantPast")]
+    public static NSDate DistantPast { get; }
+    [Selector("now")]
+    public static NSDate Now { get; }
+    [Selector("date")]
+    public static Self Date();
+    [Selector("dateWithTimeIntervalSinceNow:")]
+    public static Self DateWithTimeIntervalSinceNow(NSTimeInterval secs);
+    [Selector("dateWithTimeIntervalSinceReferenceDate:")]
+    public static Self DateWithTimeIntervalSinceReferenceDate(NSTimeInterval ti);
+    [Selector("dateWithTimeIntervalSince1970:")]
+    public static Self DateWithTimeIntervalSince1970(NSTimeInterval secs);
+    [Selector("dateWithTimeInterval:sinceDate:")]
+    public static Self DateWithTimeIntervalSinceDate(NSTimeInterval secsToBeAdded, NSDate date);
+    [Selector("initWithTimeIntervalSinceNow:")]
+    public Self InitWithTimeIntervalSinceNow(NSTimeInterval secs);
+    [Selector("initWithTimeIntervalSince1970:")]
+    public Self InitWithTimeIntervalSince1970(NSTimeInterval secs);
+    [Selector("initWithTimeInterval:sinceDate:")]
+    public Self InitWithTimeIntervalSinceDate(NSTimeInterval secsToBeAdded, NSDate date);
 }
 
 public const double NSTimeIntervalSince1970 = 978307200.0;

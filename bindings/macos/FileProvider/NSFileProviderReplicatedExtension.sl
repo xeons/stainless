@@ -59,7 +59,8 @@ public enum NSFileProviderFetchContentsOptions : ulong
 
 public objc interface NSFileProviderEnumerating : NSObjectProtocol
 {
-    [Selector("enumeratorForContainerItemIdentifier:request:error:")] NSFileProviderEnumerator? EnumeratorForContainerItemIdentifierRequestError(NSFileProviderItemIdentifier containerItemIdentifier, NSFileProviderRequest request, out NSError? error);
+    [Selector("enumeratorForContainerItemIdentifier:request:error:")]
+    NSFileProviderEnumerator? EnumeratorForContainerItemIdentifierRequestError(NSFileProviderItemIdentifier containerItemIdentifier, NSFileProviderRequest request, out NSError? error);
 }
 
 public objc closure void NSFileProviderReplicatedExtensionItemForIdentifierRequestCompletionHandlerCompletionHandlerBlock(NSFileProviderItem? arg0, NSError? arg1);
@@ -80,30 +81,45 @@ public objc closure void NSFileProviderReplicatedExtensionPendingItemsDidChangeW
 
 public objc interface NSFileProviderReplicatedExtension : NSObjectProtocol, NSFileProviderEnumerating
 {
-    [Selector("initWithDomain:")] Self InitWithDomain(NSFileProviderDomain domain);
-    [Selector("invalidate")] void Invalidate();
-    [Selector("itemForIdentifier:request:completionHandler:")] NSProgress ItemForIdentifierRequestCompletionHandler(NSFileProviderItemIdentifier identifier, NSFileProviderRequest request, NSFileProviderReplicatedExtensionItemForIdentifierRequestCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("fetchContentsForItemWithIdentifier:version:request:completionHandler:")] NSProgress FetchContentsForItemWithIdentifierVersionRequestCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderItemVersion? requestedVersion, NSFileProviderRequest request, NSFileProviderReplicatedExtensionFetchContentsForItemWithIdentifierVersionRequestCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("createItemBasedOnTemplate:fields:contents:options:request:completionHandler:")] NSProgress CreateItemBasedOnTemplateFieldsContentsOptionsRequestCompletionHandler(NSFileProviderItem itemTemplate, NSFileProviderItemFields fields, NSURL? url, NSFileProviderCreateItemOptions options, NSFileProviderRequest request, NSFileProviderReplicatedExtensionCreateItemBasedOnTemplateFieldsContentsOptionsRequestCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("modifyItem:baseVersion:changedFields:contents:options:request:completionHandler:")] NSProgress ModifyItemBaseVersionChangedFieldsContentsOptionsRequestCompletionHandler(NSFileProviderItem item, NSFileProviderItemVersion version, NSFileProviderItemFields changedFields, NSURL? newContents, NSFileProviderModifyItemOptions options, NSFileProviderRequest request, NSFileProviderReplicatedExtensionModifyItemBaseVersionChangedFieldsContentsOptionsRequestCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("deleteItemWithIdentifier:baseVersion:options:request:completionHandler:")] NSProgress DeleteItemWithIdentifierBaseVersionOptionsRequestCompletionHandler(NSFileProviderItemIdentifier identifier, NSFileProviderItemVersion version, NSFileProviderDeleteItemOptions options, NSFileProviderRequest request, NSFileProviderReplicatedExtensionDeleteItemWithIdentifierBaseVersionOptionsRequestCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("importDidFinishWithCompletionHandler:")] void ImportDidFinishWithCompletionHandler(NSFileProviderReplicatedExtensionImportDidFinishWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("materializedItemsDidChangeWithCompletionHandler:")] void MaterializedItemsDidChangeWithCompletionHandler(NSFileProviderReplicatedExtensionMaterializedItemsDidChangeWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("pendingItemsDidChangeWithCompletionHandler:")] void PendingItemsDidChangeWithCompletionHandler(NSFileProviderReplicatedExtensionPendingItemsDidChangeWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("initWithDomain:")]
+    Self InitWithDomain(NSFileProviderDomain domain);
+    [Selector("invalidate")]
+    void Invalidate();
+    [Selector("itemForIdentifier:request:completionHandler:")]
+    NSProgress ItemForIdentifierRequestCompletionHandler(NSFileProviderItemIdentifier identifier, NSFileProviderRequest request, NSFileProviderReplicatedExtensionItemForIdentifierRequestCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchContentsForItemWithIdentifier:version:request:completionHandler:")]
+    NSProgress FetchContentsForItemWithIdentifierVersionRequestCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderItemVersion? requestedVersion, NSFileProviderRequest request, NSFileProviderReplicatedExtensionFetchContentsForItemWithIdentifierVersionRequestCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("createItemBasedOnTemplate:fields:contents:options:request:completionHandler:")]
+    NSProgress CreateItemBasedOnTemplateFieldsContentsOptionsRequestCompletionHandler(NSFileProviderItem itemTemplate, NSFileProviderItemFields fields, NSURL? url, NSFileProviderCreateItemOptions options, NSFileProviderRequest request, NSFileProviderReplicatedExtensionCreateItemBasedOnTemplateFieldsContentsOptionsRequestCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("modifyItem:baseVersion:changedFields:contents:options:request:completionHandler:")]
+    NSProgress ModifyItemBaseVersionChangedFieldsContentsOptionsRequestCompletionHandler(NSFileProviderItem item, NSFileProviderItemVersion version, NSFileProviderItemFields changedFields, NSURL? newContents, NSFileProviderModifyItemOptions options, NSFileProviderRequest request, NSFileProviderReplicatedExtensionModifyItemBaseVersionChangedFieldsContentsOptionsRequestCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("deleteItemWithIdentifier:baseVersion:options:request:completionHandler:")]
+    NSProgress DeleteItemWithIdentifierBaseVersionOptionsRequestCompletionHandler(NSFileProviderItemIdentifier identifier, NSFileProviderItemVersion version, NSFileProviderDeleteItemOptions options, NSFileProviderRequest request, NSFileProviderReplicatedExtensionDeleteItemWithIdentifierBaseVersionOptionsRequestCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("importDidFinishWithCompletionHandler:")]
+    void ImportDidFinishWithCompletionHandler(NSFileProviderReplicatedExtensionImportDidFinishWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("materializedItemsDidChangeWithCompletionHandler:")]
+    void MaterializedItemsDidChangeWithCompletionHandler(NSFileProviderReplicatedExtensionMaterializedItemsDidChangeWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("pendingItemsDidChangeWithCompletionHandler:")]
+    void PendingItemsDidChangeWithCompletionHandler(NSFileProviderReplicatedExtensionPendingItemsDidChangeWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void NSFileProviderIncrementalContentFetchingFetchContentsForItemWithIdentifierVersionUsingExistingContentsAtURLExistingVersionRequestCompletionHandlerCompletionHandlerBlock(NSURL? arg0, NSFileProviderItem? arg1, NSError? arg2);
 
 public objc interface NSFileProviderIncrementalContentFetching : NSObjectProtocol
 {
-    [Selector("fetchContentsForItemWithIdentifier:version:usingExistingContentsAtURL:existingVersion:request:completionHandler:")] NSProgress FetchContentsForItemWithIdentifierVersionUsingExistingContentsAtURLExistingVersionRequestCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderItemVersion? requestedVersion, NSURL existingContents, NSFileProviderItemVersion existingVersion, NSFileProviderRequest request, NSFileProviderIncrementalContentFetchingFetchContentsForItemWithIdentifierVersionUsingExistingContentsAtURLExistingVersionRequestCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchContentsForItemWithIdentifier:version:usingExistingContentsAtURL:existingVersion:request:completionHandler:")]
+    NSProgress FetchContentsForItemWithIdentifierVersionUsingExistingContentsAtURLExistingVersionRequestCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderItemVersion? requestedVersion, NSURL existingContents, NSFileProviderItemVersion existingVersion, NSFileProviderRequest request, NSFileProviderIncrementalContentFetchingFetchContentsForItemWithIdentifierVersionUsingExistingContentsAtURLExistingVersionRequestCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void NSFileProviderServicingSupportedServiceSourcesForItemIdentifierCompletionHandlerCompletionHandlerBlock(NSArray? arg0, NSError? arg1);
 
 public objc interface NSFileProviderServicing : NSObjectProtocol
 {
-    [Selector("supportedServiceSourcesForItemIdentifier:completionHandler:")] NSProgress SupportedServiceSourcesForItemIdentifierCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderServicingSupportedServiceSourcesForItemIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("supportedServiceSourcesForItemIdentifier:completionHandler:")]
+    NSProgress SupportedServiceSourcesForItemIdentifierCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderServicingSupportedServiceSourcesForItemIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void NSFileProviderThumbnailingFetchThumbnailsForItemIdentifiersRequestedSizePerThumbnailCompletionHandlerCompletionHandlerPerThumbnailCompletionHandlerBlock(NSFileProviderItemIdentifier arg0, NSData? arg1, NSError? arg2);
@@ -112,40 +128,48 @@ public objc closure void NSFileProviderThumbnailingFetchThumbnailsForItemIdentif
 
 public objc interface NSFileProviderThumbnailing : NSObjectProtocol
 {
-    [Selector("fetchThumbnailsForItemIdentifiers:requestedSize:perThumbnailCompletionHandler:completionHandler:")] NSProgress FetchThumbnailsForItemIdentifiersRequestedSizePerThumbnailCompletionHandlerCompletionHandler(NSArray itemIdentifiers, CGSize size, NSFileProviderThumbnailingFetchThumbnailsForItemIdentifiersRequestedSizePerThumbnailCompletionHandlerCompletionHandlerPerThumbnailCompletionHandlerBlock perThumbnailCompletionHandler, NSFileProviderThumbnailingFetchThumbnailsForItemIdentifiersRequestedSizePerThumbnailCompletionHandlerCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchThumbnailsForItemIdentifiers:requestedSize:perThumbnailCompletionHandler:completionHandler:")]
+    NSProgress FetchThumbnailsForItemIdentifiersRequestedSizePerThumbnailCompletionHandlerCompletionHandler(NSArray itemIdentifiers, CGSize size, NSFileProviderThumbnailingFetchThumbnailsForItemIdentifiersRequestedSizePerThumbnailCompletionHandlerCompletionHandlerPerThumbnailCompletionHandlerBlock perThumbnailCompletionHandler, NSFileProviderThumbnailingFetchThumbnailsForItemIdentifiersRequestedSizePerThumbnailCompletionHandlerCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void NSFileProviderCustomActionPerformActionWithIdentifierOnItemsWithIdentifiersCompletionHandlerCompletionHandlerBlock(NSError? arg0);
 
 public objc interface NSFileProviderCustomAction : NSObjectProtocol
 {
-    [Selector("performActionWithIdentifier:onItemsWithIdentifiers:completionHandler:")] NSProgress PerformActionWithIdentifierOnItemsWithIdentifiersCompletionHandler(NSFileProviderExtensionActionIdentifier actionIdentifier, NSArray itemIdentifiers, NSFileProviderCustomActionPerformActionWithIdentifierOnItemsWithIdentifiersCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("performActionWithIdentifier:onItemsWithIdentifiers:completionHandler:")]
+    NSProgress PerformActionWithIdentifierOnItemsWithIdentifiersCompletionHandler(NSFileProviderExtensionActionIdentifier actionIdentifier, NSArray itemIdentifiers, NSFileProviderCustomActionPerformActionWithIdentifierOnItemsWithIdentifiersCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc interface NSFileProviderUserInteractionSuppressing : NSObjectProtocol
 {
-    [Selector("setInteractionSuppressed:forIdentifier:")] void SetInteractionSuppressedForIdentifier(bool suppression, NSString suppressionIdentifier);
-    [Selector("isInteractionSuppressedForIdentifier:")] bool IsInteractionSuppressedForIdentifier(NSString suppressionIdentifier);
+    [Selector("setInteractionSuppressed:forIdentifier:")]
+    void SetInteractionSuppressedForIdentifier(bool suppression, NSString suppressionIdentifier);
+    [Selector("isInteractionSuppressedForIdentifier:")]
+    bool IsInteractionSuppressedForIdentifier(NSString suppressionIdentifier);
 }
 
 public objc interface NSFileProviderDomainState : NSObjectProtocol
 {
-    [Selector("domainVersion")] NSFileProviderDomainVersion DomainVersion { get; }
-    [Selector("userInfo")] NSDictionary UserInfo { get; }
+    [Selector("domainVersion")]
+    NSFileProviderDomainVersion DomainVersion { get; }
+    [Selector("userInfo")]
+    NSDictionary UserInfo { get; }
 }
 
 public objc closure void NSFileProviderPartialContentFetchingFetchPartialContentsForItemWithIdentifierVersionRequestMinimalRangeAligningToOptionsCompletionHandlerCompletionHandlerBlock(NSURL? arg0, NSFileProviderItem? arg1, NSRange arg2, NSFileProviderMaterializationFlags arg3, NSError? arg4);
 
 public objc interface NSFileProviderPartialContentFetching : NSObjectProtocol
 {
-    [Selector("fetchPartialContentsForItemWithIdentifier:version:request:minimalRange:aligningTo:options:completionHandler:")] NSProgress FetchPartialContentsForItemWithIdentifierVersionRequestMinimalRangeAligningToOptionsCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderItemVersion requestedVersion, NSFileProviderRequest request, NSRange requestedRange, NSUInteger alignment, NSFileProviderFetchContentsOptions options, NSFileProviderPartialContentFetchingFetchPartialContentsForItemWithIdentifierVersionRequestMinimalRangeAligningToOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchPartialContentsForItemWithIdentifier:version:request:minimalRange:aligningTo:options:completionHandler:")]
+    NSProgress FetchPartialContentsForItemWithIdentifierVersionRequestMinimalRangeAligningToOptionsCompletionHandler(NSFileProviderItemIdentifier itemIdentifier, NSFileProviderItemVersion requestedVersion, NSFileProviderRequest request, NSRange requestedRange, NSUInteger alignment, NSFileProviderFetchContentsOptions options, NSFileProviderPartialContentFetchingFetchPartialContentsForItemWithIdentifierVersionRequestMinimalRangeAligningToOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void NSFileProviderExternalVolumeHandlingShouldConnectExternalDomainWithCompletionHandlerCompletionHandlerBlock(NSError? arg0);
 
 public objc interface NSFileProviderExternalVolumeHandling : NSObjectProtocol
 {
-    [Selector("shouldConnectExternalDomainWithCompletionHandler:")] void ShouldConnectExternalDomainWithCompletionHandler(NSFileProviderExternalVolumeHandlingShouldConnectExternalDomainWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("shouldConnectExternalDomainWithCompletionHandler:")]
+    void ShouldConnectExternalDomainWithCompletionHandler(NSFileProviderExternalVolumeHandlingShouldConnectExternalDomainWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

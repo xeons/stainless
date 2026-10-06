@@ -42,50 +42,94 @@ public extern "C" NSNotificationName NSComboBoxSelectionIsChangingNotification;
 
 public objc interface NSComboBoxDataSource : NSObjectProtocol
 {
-    [Optional] [Selector("numberOfItemsInComboBox:")] NSInteger NumberOfItemsInComboBox(NSComboBox comboBox);
-    [Optional] [Selector("comboBox:objectValueForItemAtIndex:")] AnyObject? ComboBoxObjectValueForItemAtIndex(NSComboBox comboBox, NSInteger index);
-    [Optional] [Selector("comboBox:indexOfItemWithStringValue:")] NSUInteger ComboBoxIndexOfItemWithStringValue(NSComboBox comboBox, NSString string);
-    [Optional] [Selector("comboBox:completedString:")] NSString? ComboBoxCompletedString(NSComboBox comboBox, NSString string);
+    [Optional]
+    [Selector("numberOfItemsInComboBox:")]
+    NSInteger NumberOfItemsInComboBox(NSComboBox comboBox);
+    [Optional]
+    [Selector("comboBox:objectValueForItemAtIndex:")]
+    AnyObject? ComboBoxObjectValueForItemAtIndex(NSComboBox comboBox, NSInteger index);
+    [Optional]
+    [Selector("comboBox:indexOfItemWithStringValue:")]
+    NSUInteger ComboBoxIndexOfItemWithStringValue(NSComboBox comboBox, NSString string);
+    [Optional]
+    [Selector("comboBox:completedString:")]
+    NSString? ComboBoxCompletedString(NSComboBox comboBox, NSString string);
 }
 
 public objc interface NSComboBoxDelegate : NSTextFieldDelegate
 {
-    [Optional] [Selector("comboBoxWillPopUp:")] void ComboBoxWillPopUp(NSNotification notification);
-    [Optional] [Selector("comboBoxWillDismiss:")] void ComboBoxWillDismiss(NSNotification notification);
-    [Optional] [Selector("comboBoxSelectionDidChange:")] void ComboBoxSelectionDidChange(NSNotification notification);
-    [Optional] [Selector("comboBoxSelectionIsChanging:")] void ComboBoxSelectionIsChanging(NSNotification notification);
+    [Optional]
+    [Selector("comboBoxWillPopUp:")]
+    void ComboBoxWillPopUp(NSNotification notification);
+    [Optional]
+    [Selector("comboBoxWillDismiss:")]
+    void ComboBoxWillDismiss(NSNotification notification);
+    [Optional]
+    [Selector("comboBoxSelectionDidChange:")]
+    void ComboBoxSelectionDidChange(NSNotification notification);
+    [Optional]
+    [Selector("comboBoxSelectionIsChanging:")]
+    void ComboBoxSelectionIsChanging(NSNotification notification);
 }
 
 public extern objc class NSComboBox : NSTextField
 {
-    [Selector("hasVerticalScroller", "setHasVerticalScroller:")] public bool HasVerticalScroller { get; set; }
-    [Selector("intercellSpacing", "setIntercellSpacing:")] public NSSize IntercellSpacing { get; set; }
-    [Selector("itemHeight", "setItemHeight:")] public CGFloat ItemHeight { get; set; }
-    [Selector("numberOfVisibleItems", "setNumberOfVisibleItems:")] public NSInteger NumberOfVisibleItems { get; set; }
-    [Selector("isButtonBordered", "setButtonBordered:")] public bool ButtonBordered { get; set; }
-    [Selector("usesDataSource", "setUsesDataSource:")] public bool UsesDataSource { get; set; }
-    [Selector("indexOfSelectedItem")] public NSInteger IndexOfSelectedItem { get; }
-    [Selector("numberOfItems")] public NSInteger NumberOfItems { get; }
-    [Selector("completes", "setCompletes:")] public bool Completes { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSComboBoxDelegate? Delegate { get; set; }
-    [Selector("dataSource", "setDataSource:")] public NSComboBoxDataSource? DataSource { get; set; }
-    [Selector("objectValueOfSelectedItem")] public AnyObject? ObjectValueOfSelectedItem { get; }
-    [Selector("objectValues")] public NSArray ObjectValues { get; }
-    [Selector("reloadData")] public void ReloadData();
-    [Selector("noteNumberOfItemsChanged")] public void NoteNumberOfItemsChanged();
-    [Selector("scrollItemAtIndexToTop:")] public void ScrollItemAtIndexToTop(NSInteger index);
-    [Selector("scrollItemAtIndexToVisible:")] public void ScrollItemAtIndexToVisible(NSInteger index);
-    [Selector("selectItemAtIndex:")] public void SelectItemAtIndex(NSInteger index);
-    [Selector("deselectItemAtIndex:")] public void DeselectItemAtIndex(NSInteger index);
-    [Selector("addItemWithObjectValue:")] public void AddItemWithObjectValue(AnyObject object);
-    [Selector("addItemsWithObjectValues:")] public void AddItemsWithObjectValues(NSArray objects);
-    [Selector("insertItemWithObjectValue:atIndex:")] public void InsertItemWithObjectValueAtIndex(AnyObject object, NSInteger index);
-    [Selector("removeItemWithObjectValue:")] public void RemoveItemWithObjectValue(AnyObject object);
-    [Selector("removeItemAtIndex:")] public void RemoveItemAtIndex(NSInteger index);
-    [Selector("removeAllItems")] public void RemoveAllItems();
-    [Selector("selectItemWithObjectValue:")] public void SelectItemWithObjectValue(AnyObject? object);
-    [Selector("itemObjectValueAtIndex:")] public AnyObject ItemObjectValueAtIndex(NSInteger index);
-    [Selector("indexOfItemWithObjectValue:")] public NSInteger IndexOfItemWithObjectValue(AnyObject object);
+    [Selector("hasVerticalScroller", "setHasVerticalScroller:")]
+    public bool HasVerticalScroller { get; set; }
+    [Selector("intercellSpacing", "setIntercellSpacing:")]
+    public NSSize IntercellSpacing { get; set; }
+    [Selector("itemHeight", "setItemHeight:")]
+    public CGFloat ItemHeight { get; set; }
+    [Selector("numberOfVisibleItems", "setNumberOfVisibleItems:")]
+    public NSInteger NumberOfVisibleItems { get; set; }
+    [Selector("isButtonBordered", "setButtonBordered:")]
+    public bool ButtonBordered { get; set; }
+    [Selector("usesDataSource", "setUsesDataSource:")]
+    public bool UsesDataSource { get; set; }
+    [Selector("indexOfSelectedItem")]
+    public NSInteger IndexOfSelectedItem { get; }
+    [Selector("numberOfItems")]
+    public NSInteger NumberOfItems { get; }
+    [Selector("completes", "setCompletes:")]
+    public bool Completes { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSComboBoxDelegate? Delegate { get; set; }
+    [Selector("dataSource", "setDataSource:")]
+    public NSComboBoxDataSource? DataSource { get; set; }
+    [Selector("objectValueOfSelectedItem")]
+    public AnyObject? ObjectValueOfSelectedItem { get; }
+    [Selector("objectValues")]
+    public NSArray ObjectValues { get; }
+    [Selector("reloadData")]
+    public void ReloadData();
+    [Selector("noteNumberOfItemsChanged")]
+    public void NoteNumberOfItemsChanged();
+    [Selector("scrollItemAtIndexToTop:")]
+    public void ScrollItemAtIndexToTop(NSInteger index);
+    [Selector("scrollItemAtIndexToVisible:")]
+    public void ScrollItemAtIndexToVisible(NSInteger index);
+    [Selector("selectItemAtIndex:")]
+    public void SelectItemAtIndex(NSInteger index);
+    [Selector("deselectItemAtIndex:")]
+    public void DeselectItemAtIndex(NSInteger index);
+    [Selector("addItemWithObjectValue:")]
+    public void AddItemWithObjectValue(AnyObject object);
+    [Selector("addItemsWithObjectValues:")]
+    public void AddItemsWithObjectValues(NSArray objects);
+    [Selector("insertItemWithObjectValue:atIndex:")]
+    public void InsertItemWithObjectValueAtIndex(AnyObject object, NSInteger index);
+    [Selector("removeItemWithObjectValue:")]
+    public void RemoveItemWithObjectValue(AnyObject object);
+    [Selector("removeItemAtIndex:")]
+    public void RemoveItemAtIndex(NSInteger index);
+    [Selector("removeAllItems")]
+    public void RemoveAllItems();
+    [Selector("selectItemWithObjectValue:")]
+    public void SelectItemWithObjectValue(AnyObject? object);
+    [Selector("itemObjectValueAtIndex:")]
+    public AnyObject ItemObjectValueAtIndex(NSInteger index);
+    [Selector("indexOfItemWithObjectValue:")]
+    public NSInteger IndexOfItemWithObjectValue(AnyObject object);
 }
 
 #endif

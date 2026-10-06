@@ -38,11 +38,16 @@ public extern objc class CAAnimation : SCNAnimationProtocol { }
 /// SceneKitAdditions, a category of CAAnimation.
 public extern objc class CAAnimation
 {
-    [Selector("usesSceneTimeBase", "setUsesSceneTimeBase:")] public bool UsesSceneTimeBase { get; set; }
-    [Selector("fadeInDuration", "setFadeInDuration:")] public CGFloat FadeInDuration { get; set; }
-    [Selector("fadeOutDuration", "setFadeOutDuration:")] public CGFloat FadeOutDuration { get; set; }
-    [Selector("animationEvents", "setAnimationEvents:")] public NSArray? AnimationEvents { get; set; }
-    [Selector("animationWithSCNAnimation:")] public static CAAnimation AnimationWithSCNAnimation(SCNAnimation animation);
+    [Selector("usesSceneTimeBase", "setUsesSceneTimeBase:")]
+    public bool UsesSceneTimeBase { get; set; }
+    [Selector("fadeInDuration", "setFadeInDuration:")]
+    public CGFloat FadeInDuration { get; set; }
+    [Selector("fadeOutDuration", "setFadeOutDuration:")]
+    public CGFloat FadeOutDuration { get; set; }
+    [Selector("animationEvents", "setAnimationEvents:")]
+    public NSArray? AnimationEvents { get; set; }
+    [Selector("animationWithSCNAnimation:")]
+    public static CAAnimation AnimationWithSCNAnimation(SCNAnimation animation);
 }
 
 #endif

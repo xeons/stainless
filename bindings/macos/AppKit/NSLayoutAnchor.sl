@@ -34,45 +34,72 @@ import Standard.ObjC;
 
 public extern objc class NSLayoutAnchor : NSObject, NSCopying, NSCoding
 {
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("item")] public AnyObject? Item { get; }
-    [Selector("hasAmbiguousLayout")] public bool HasAmbiguousLayout { get; }
-    [Selector("constraintsAffectingLayout")] public NSArray? ConstraintsAffectingLayout { get; }
-    [Selector("constraintEqualToAnchor:")] public NSLayoutConstraint ConstraintEqualToAnchor(NSLayoutAnchor anchor);
-    [Selector("constraintGreaterThanOrEqualToAnchor:")] public NSLayoutConstraint ConstraintGreaterThanOrEqualToAnchor(NSLayoutAnchor anchor);
-    [Selector("constraintLessThanOrEqualToAnchor:")] public NSLayoutConstraint ConstraintLessThanOrEqualToAnchor(NSLayoutAnchor anchor);
-    [Selector("constraintEqualToAnchor:constant:")] public NSLayoutConstraint ConstraintEqualToAnchorConstant(NSLayoutAnchor anchor, CGFloat c);
-    [Selector("constraintGreaterThanOrEqualToAnchor:constant:")] public NSLayoutConstraint ConstraintGreaterThanOrEqualToAnchorConstant(NSLayoutAnchor anchor, CGFloat c);
-    [Selector("constraintLessThanOrEqualToAnchor:constant:")] public NSLayoutConstraint ConstraintLessThanOrEqualToAnchorConstant(NSLayoutAnchor anchor, CGFloat c);
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("item")]
+    public AnyObject? Item { get; }
+    [Selector("hasAmbiguousLayout")]
+    public bool HasAmbiguousLayout { get; }
+    [Selector("constraintsAffectingLayout")]
+    public NSArray? ConstraintsAffectingLayout { get; }
+    [Selector("constraintEqualToAnchor:")]
+    public NSLayoutConstraint ConstraintEqualToAnchor(NSLayoutAnchor anchor);
+    [Selector("constraintGreaterThanOrEqualToAnchor:")]
+    public NSLayoutConstraint ConstraintGreaterThanOrEqualToAnchor(NSLayoutAnchor anchor);
+    [Selector("constraintLessThanOrEqualToAnchor:")]
+    public NSLayoutConstraint ConstraintLessThanOrEqualToAnchor(NSLayoutAnchor anchor);
+    [Selector("constraintEqualToAnchor:constant:")]
+    public NSLayoutConstraint ConstraintEqualToAnchorConstant(NSLayoutAnchor anchor, CGFloat c);
+    [Selector("constraintGreaterThanOrEqualToAnchor:constant:")]
+    public NSLayoutConstraint ConstraintGreaterThanOrEqualToAnchorConstant(NSLayoutAnchor anchor, CGFloat c);
+    [Selector("constraintLessThanOrEqualToAnchor:constant:")]
+    public NSLayoutConstraint ConstraintLessThanOrEqualToAnchorConstant(NSLayoutAnchor anchor, CGFloat c);
 }
 
 public extern objc class NSLayoutXAxisAnchor : NSLayoutAnchor
 {
-    [Selector("anchorWithOffsetToAnchor:")] public NSLayoutDimension AnchorWithOffsetToAnchor(NSLayoutXAxisAnchor otherAnchor);
-    [Selector("constraintEqualToSystemSpacingAfterAnchor:multiplier:")] public NSLayoutConstraint ConstraintEqualToSystemSpacingAfterAnchorMultiplier(NSLayoutXAxisAnchor anchor, CGFloat multiplier);
-    [Selector("constraintGreaterThanOrEqualToSystemSpacingAfterAnchor:multiplier:")] public NSLayoutConstraint ConstraintGreaterThanOrEqualToSystemSpacingAfterAnchorMultiplier(NSLayoutXAxisAnchor anchor, CGFloat multiplier);
-    [Selector("constraintLessThanOrEqualToSystemSpacingAfterAnchor:multiplier:")] public NSLayoutConstraint ConstraintLessThanOrEqualToSystemSpacingAfterAnchorMultiplier(NSLayoutXAxisAnchor anchor, CGFloat multiplier);
+    [Selector("anchorWithOffsetToAnchor:")]
+    public NSLayoutDimension AnchorWithOffsetToAnchor(NSLayoutXAxisAnchor otherAnchor);
+    [Selector("constraintEqualToSystemSpacingAfterAnchor:multiplier:")]
+    public NSLayoutConstraint ConstraintEqualToSystemSpacingAfterAnchorMultiplier(NSLayoutXAxisAnchor anchor, CGFloat multiplier);
+    [Selector("constraintGreaterThanOrEqualToSystemSpacingAfterAnchor:multiplier:")]
+    public NSLayoutConstraint ConstraintGreaterThanOrEqualToSystemSpacingAfterAnchorMultiplier(NSLayoutXAxisAnchor anchor, CGFloat multiplier);
+    [Selector("constraintLessThanOrEqualToSystemSpacingAfterAnchor:multiplier:")]
+    public NSLayoutConstraint ConstraintLessThanOrEqualToSystemSpacingAfterAnchorMultiplier(NSLayoutXAxisAnchor anchor, CGFloat multiplier);
 }
 
 public extern objc class NSLayoutYAxisAnchor : NSLayoutAnchor
 {
-    [Selector("anchorWithOffsetToAnchor:")] public NSLayoutDimension AnchorWithOffsetToAnchor(NSLayoutYAxisAnchor otherAnchor);
-    [Selector("constraintEqualToSystemSpacingBelowAnchor:multiplier:")] public NSLayoutConstraint ConstraintEqualToSystemSpacingBelowAnchorMultiplier(NSLayoutYAxisAnchor anchor, CGFloat multiplier);
-    [Selector("constraintGreaterThanOrEqualToSystemSpacingBelowAnchor:multiplier:")] public NSLayoutConstraint ConstraintGreaterThanOrEqualToSystemSpacingBelowAnchorMultiplier(NSLayoutYAxisAnchor anchor, CGFloat multiplier);
-    [Selector("constraintLessThanOrEqualToSystemSpacingBelowAnchor:multiplier:")] public NSLayoutConstraint ConstraintLessThanOrEqualToSystemSpacingBelowAnchorMultiplier(NSLayoutYAxisAnchor anchor, CGFloat multiplier);
+    [Selector("anchorWithOffsetToAnchor:")]
+    public NSLayoutDimension AnchorWithOffsetToAnchor(NSLayoutYAxisAnchor otherAnchor);
+    [Selector("constraintEqualToSystemSpacingBelowAnchor:multiplier:")]
+    public NSLayoutConstraint ConstraintEqualToSystemSpacingBelowAnchorMultiplier(NSLayoutYAxisAnchor anchor, CGFloat multiplier);
+    [Selector("constraintGreaterThanOrEqualToSystemSpacingBelowAnchor:multiplier:")]
+    public NSLayoutConstraint ConstraintGreaterThanOrEqualToSystemSpacingBelowAnchorMultiplier(NSLayoutYAxisAnchor anchor, CGFloat multiplier);
+    [Selector("constraintLessThanOrEqualToSystemSpacingBelowAnchor:multiplier:")]
+    public NSLayoutConstraint ConstraintLessThanOrEqualToSystemSpacingBelowAnchorMultiplier(NSLayoutYAxisAnchor anchor, CGFloat multiplier);
 }
 
 public extern objc class NSLayoutDimension : NSLayoutAnchor
 {
-    [Selector("constraintEqualToConstant:")] public NSLayoutConstraint ConstraintEqualToConstant(CGFloat c);
-    [Selector("constraintGreaterThanOrEqualToConstant:")] public NSLayoutConstraint ConstraintGreaterThanOrEqualToConstant(CGFloat c);
-    [Selector("constraintLessThanOrEqualToConstant:")] public NSLayoutConstraint ConstraintLessThanOrEqualToConstant(CGFloat c);
-    [Selector("constraintEqualToAnchor:multiplier:")] public NSLayoutConstraint ConstraintEqualToAnchorMultiplier(NSLayoutDimension anchor, CGFloat m);
-    [Selector("constraintGreaterThanOrEqualToAnchor:multiplier:")] public NSLayoutConstraint ConstraintGreaterThanOrEqualToAnchorMultiplier(NSLayoutDimension anchor, CGFloat m);
-    [Selector("constraintLessThanOrEqualToAnchor:multiplier:")] public NSLayoutConstraint ConstraintLessThanOrEqualToAnchorMultiplier(NSLayoutDimension anchor, CGFloat m);
-    [Selector("constraintEqualToAnchor:multiplier:constant:")] public NSLayoutConstraint ConstraintEqualToAnchorMultiplierConstant(NSLayoutDimension anchor, CGFloat m, CGFloat c);
-    [Selector("constraintGreaterThanOrEqualToAnchor:multiplier:constant:")] public NSLayoutConstraint ConstraintGreaterThanOrEqualToAnchorMultiplierConstant(NSLayoutDimension anchor, CGFloat m, CGFloat c);
-    [Selector("constraintLessThanOrEqualToAnchor:multiplier:constant:")] public NSLayoutConstraint ConstraintLessThanOrEqualToAnchorMultiplierConstant(NSLayoutDimension anchor, CGFloat m, CGFloat c);
+    [Selector("constraintEqualToConstant:")]
+    public NSLayoutConstraint ConstraintEqualToConstant(CGFloat c);
+    [Selector("constraintGreaterThanOrEqualToConstant:")]
+    public NSLayoutConstraint ConstraintGreaterThanOrEqualToConstant(CGFloat c);
+    [Selector("constraintLessThanOrEqualToConstant:")]
+    public NSLayoutConstraint ConstraintLessThanOrEqualToConstant(CGFloat c);
+    [Selector("constraintEqualToAnchor:multiplier:")]
+    public NSLayoutConstraint ConstraintEqualToAnchorMultiplier(NSLayoutDimension anchor, CGFloat m);
+    [Selector("constraintGreaterThanOrEqualToAnchor:multiplier:")]
+    public NSLayoutConstraint ConstraintGreaterThanOrEqualToAnchorMultiplier(NSLayoutDimension anchor, CGFloat m);
+    [Selector("constraintLessThanOrEqualToAnchor:multiplier:")]
+    public NSLayoutConstraint ConstraintLessThanOrEqualToAnchorMultiplier(NSLayoutDimension anchor, CGFloat m);
+    [Selector("constraintEqualToAnchor:multiplier:constant:")]
+    public NSLayoutConstraint ConstraintEqualToAnchorMultiplierConstant(NSLayoutDimension anchor, CGFloat m, CGFloat c);
+    [Selector("constraintGreaterThanOrEqualToAnchor:multiplier:constant:")]
+    public NSLayoutConstraint ConstraintGreaterThanOrEqualToAnchorMultiplierConstant(NSLayoutDimension anchor, CGFloat m, CGFloat c);
+    [Selector("constraintLessThanOrEqualToAnchor:multiplier:constant:")]
+    public NSLayoutConstraint ConstraintLessThanOrEqualToAnchorMultiplierConstant(NSLayoutDimension anchor, CGFloat m, CGFloat c);
 }
 
 #endif

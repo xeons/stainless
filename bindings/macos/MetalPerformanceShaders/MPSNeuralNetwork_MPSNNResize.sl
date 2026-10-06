@@ -34,21 +34,32 @@ import Standard.ObjC;
 
 public extern objc class MPSNNResizeBilinear : MPSCNNKernel
 {
-    [Selector("resizeWidth")] public NSUInteger ResizeWidth { get; }
-    [Selector("resizeHeight")] public NSUInteger ResizeHeight { get; }
-    [Selector("alignCorners")] public bool AlignCorners { get; }
-    [Selector("initWithDevice:resizeWidth:resizeHeight:alignCorners:")] public Self InitWithDeviceResizeWidthResizeHeightAlignCorners(MTLDevice device, NSUInteger resizeWidth, NSUInteger resizeHeight, bool alignCorners);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("resizeWidth")]
+    public NSUInteger ResizeWidth { get; }
+    [Selector("resizeHeight")]
+    public NSUInteger ResizeHeight { get; }
+    [Selector("alignCorners")]
+    public bool AlignCorners { get; }
+    [Selector("initWithDevice:resizeWidth:resizeHeight:alignCorners:")]
+    public Self InitWithDeviceResizeWidthResizeHeightAlignCorners(MTLDevice device, NSUInteger resizeWidth, NSUInteger resizeHeight, bool alignCorners);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNCropAndResizeBilinear : MPSCNNKernel
 {
-    [Selector("resizeWidth")] public NSUInteger ResizeWidth { get; }
-    [Selector("resizeHeight")] public NSUInteger ResizeHeight { get; }
-    [Selector("numberOfRegions")] public NSUInteger NumberOfRegions { get; }
-    [Selector("regions")] public MPSRegion* Regions { get; }
-    [Selector("initWithDevice:resizeWidth:resizeHeight:numberOfRegions:regions:")] public Self InitWithDeviceResizeWidthResizeHeightNumberOfRegionsRegions(MTLDevice device, NSUInteger resizeWidth, NSUInteger resizeHeight, NSUInteger numberOfRegions, MPSRegion* regions);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("resizeWidth")]
+    public NSUInteger ResizeWidth { get; }
+    [Selector("resizeHeight")]
+    public NSUInteger ResizeHeight { get; }
+    [Selector("numberOfRegions")]
+    public NSUInteger NumberOfRegions { get; }
+    [Selector("regions")]
+    public MPSRegion* Regions { get; }
+    [Selector("initWithDevice:resizeWidth:resizeHeight:numberOfRegions:regions:")]
+    public Self InitWithDeviceResizeWidthResizeHeightNumberOfRegionsRegions(MTLDevice device, NSUInteger resizeWidth, NSUInteger resizeHeight, NSUInteger numberOfRegions, MPSRegion* regions);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 #endif

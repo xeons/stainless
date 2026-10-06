@@ -35,56 +35,104 @@ import Standard.ObjC;
 
 public extern objc class CIRAWFilter : CIFilter
 {
-    [Selector("supportedCameraModels")] public static NSArray SupportedCameraModels { get; }
-    [Selector("supportedDecoderVersions")] public NSArray SupportedDecoderVersions { get; }
-    [Selector("nativeSize")] public CGSize NativeSize { get; }
-    [Selector("properties")] public NSDictionary Properties { get; }
-    [Selector("orientation", "setOrientation:")] public CGImagePropertyOrientation Orientation { get; set; }
-    [Selector("isDraftModeEnabled", "setDraftModeEnabled:")] public bool DraftModeEnabled { get; set; }
-    [Selector("decoderVersion", "setDecoderVersion:")] public CIRAWDecoderVersion DecoderVersion { get; set; }
-    [Selector("scaleFactor", "setScaleFactor:")] public float ScaleFactor { get; set; }
-    [Selector("exposure", "setExposure:")] public float Exposure { get; set; }
-    [Selector("baselineExposure", "setBaselineExposure:")] public float BaselineExposure { get; set; }
-    [Selector("shadowBias", "setShadowBias:")] public float ShadowBias { get; set; }
-    [Selector("boostAmount", "setBoostAmount:")] public float BoostAmount { get; set; }
-    [Selector("boostShadowAmount", "setBoostShadowAmount:")] public float BoostShadowAmount { get; set; }
+    [Selector("supportedCameraModels")]
+    public static NSArray SupportedCameraModels { get; }
+    [Selector("supportedDecoderVersions")]
+    public NSArray SupportedDecoderVersions { get; }
+    [Selector("nativeSize")]
+    public CGSize NativeSize { get; }
+    [Selector("properties")]
+    public NSDictionary Properties { get; }
+    [Selector("orientation", "setOrientation:")]
+    public CGImagePropertyOrientation Orientation { get; set; }
+    [Selector("isDraftModeEnabled", "setDraftModeEnabled:")]
+    public bool DraftModeEnabled { get; set; }
+    [Selector("decoderVersion", "setDecoderVersion:")]
+    public CIRAWDecoderVersion DecoderVersion { get; set; }
+    [Selector("scaleFactor", "setScaleFactor:")]
+    public float ScaleFactor { get; set; }
+    [Selector("exposure", "setExposure:")]
+    public float Exposure { get; set; }
+    [Selector("baselineExposure", "setBaselineExposure:")]
+    public float BaselineExposure { get; set; }
+    [Selector("shadowBias", "setShadowBias:")]
+    public float ShadowBias { get; set; }
+    [Selector("boostAmount", "setBoostAmount:")]
+    public float BoostAmount { get; set; }
+    [Selector("boostShadowAmount", "setBoostShadowAmount:")]
+    public float BoostShadowAmount { get; set; }
     /// macOS 26.0 and later.
-    [Selector("isHighlightRecoverySupported")] public bool HighlightRecoverySupported { get; }
+    [Selector("isHighlightRecoverySupported")]
+    public bool HighlightRecoverySupported { get; }
     /// macOS 26.0 and later.
-    [Selector("isHighlightRecoveryEnabled", "setHighlightRecoveryEnabled:")] public bool HighlightRecoveryEnabled { get; set; }
-    [Selector("isGamutMappingEnabled", "setGamutMappingEnabled:")] public bool GamutMappingEnabled { get; set; }
-    [Selector("isLensCorrectionSupported")] public bool LensCorrectionSupported { get; }
-    [Selector("isLensCorrectionEnabled", "setLensCorrectionEnabled:")] public bool LensCorrectionEnabled { get; set; }
-    [Selector("isLuminanceNoiseReductionSupported")] public bool LuminanceNoiseReductionSupported { get; }
-    [Selector("luminanceNoiseReductionAmount", "setLuminanceNoiseReductionAmount:")] public float LuminanceNoiseReductionAmount { get; set; }
-    [Selector("isColorNoiseReductionSupported")] public bool ColorNoiseReductionSupported { get; }
-    [Selector("colorNoiseReductionAmount", "setColorNoiseReductionAmount:")] public float ColorNoiseReductionAmount { get; set; }
-    [Selector("isSharpnessSupported")] public bool SharpnessSupported { get; }
-    [Selector("sharpnessAmount", "setSharpnessAmount:")] public float SharpnessAmount { get; set; }
-    [Selector("isContrastSupported")] public bool ContrastSupported { get; }
-    [Selector("contrastAmount", "setContrastAmount:")] public float ContrastAmount { get; set; }
-    [Selector("isDetailSupported")] public bool DetailSupported { get; }
-    [Selector("detailAmount", "setDetailAmount:")] public float DetailAmount { get; set; }
-    [Selector("isMoireReductionSupported")] public bool MoireReductionSupported { get; }
-    [Selector("moireReductionAmount", "setMoireReductionAmount:")] public float MoireReductionAmount { get; set; }
-    [Selector("isLocalToneMapSupported")] public bool LocalToneMapSupported { get; }
-    [Selector("localToneMapAmount", "setLocalToneMapAmount:")] public float LocalToneMapAmount { get; set; }
-    [Selector("extendedDynamicRangeAmount", "setExtendedDynamicRangeAmount:")] public float ExtendedDynamicRangeAmount { get; set; }
-    [Selector("neutralChromaticity", "setNeutralChromaticity:")] public CGPoint NeutralChromaticity { get; set; }
-    [Selector("neutralLocation", "setNeutralLocation:")] public CGPoint NeutralLocation { get; set; }
-    [Selector("neutralTemperature", "setNeutralTemperature:")] public float NeutralTemperature { get; set; }
-    [Selector("neutralTint", "setNeutralTint:")] public float NeutralTint { get; set; }
-    [Selector("linearSpaceFilter", "setLinearSpaceFilter:")] public CIFilter? LinearSpaceFilter { get; set; }
-    [Selector("previewImage")] public CIImage? PreviewImage { get; }
-    [Selector("portraitEffectsMatte")] public CIImage? PortraitEffectsMatte { get; }
-    [Selector("semanticSegmentationSkinMatte")] public CIImage? SemanticSegmentationSkinMatte { get; }
-    [Selector("semanticSegmentationHairMatte")] public CIImage? SemanticSegmentationHairMatte { get; }
-    [Selector("semanticSegmentationGlassesMatte")] public CIImage? SemanticSegmentationGlassesMatte { get; }
-    [Selector("semanticSegmentationSkyMatte")] public CIImage? SemanticSegmentationSkyMatte { get; }
-    [Selector("semanticSegmentationTeethMatte")] public CIImage? SemanticSegmentationTeethMatte { get; }
-    [Selector("filterWithImageURL:")] public static Self? FilterWithImageURL(NSURL url);
-    [Selector("filterWithImageData:identifierHint:")] public static Self? FilterWithImageDataIdentifierHint(NSData data, NSString? identifierHint);
-    [Selector("filterWithCVPixelBuffer:properties:")] public static Self? FilterWithCVPixelBufferProperties(CVPixelBufferRef buffer, NSDictionary properties);
+    [Selector("isHighlightRecoveryEnabled", "setHighlightRecoveryEnabled:")]
+    public bool HighlightRecoveryEnabled { get; set; }
+    [Selector("isGamutMappingEnabled", "setGamutMappingEnabled:")]
+    public bool GamutMappingEnabled { get; set; }
+    [Selector("isLensCorrectionSupported")]
+    public bool LensCorrectionSupported { get; }
+    [Selector("isLensCorrectionEnabled", "setLensCorrectionEnabled:")]
+    public bool LensCorrectionEnabled { get; set; }
+    [Selector("isLuminanceNoiseReductionSupported")]
+    public bool LuminanceNoiseReductionSupported { get; }
+    [Selector("luminanceNoiseReductionAmount", "setLuminanceNoiseReductionAmount:")]
+    public float LuminanceNoiseReductionAmount { get; set; }
+    [Selector("isColorNoiseReductionSupported")]
+    public bool ColorNoiseReductionSupported { get; }
+    [Selector("colorNoiseReductionAmount", "setColorNoiseReductionAmount:")]
+    public float ColorNoiseReductionAmount { get; set; }
+    [Selector("isSharpnessSupported")]
+    public bool SharpnessSupported { get; }
+    [Selector("sharpnessAmount", "setSharpnessAmount:")]
+    public float SharpnessAmount { get; set; }
+    [Selector("isContrastSupported")]
+    public bool ContrastSupported { get; }
+    [Selector("contrastAmount", "setContrastAmount:")]
+    public float ContrastAmount { get; set; }
+    [Selector("isDetailSupported")]
+    public bool DetailSupported { get; }
+    [Selector("detailAmount", "setDetailAmount:")]
+    public float DetailAmount { get; set; }
+    [Selector("isMoireReductionSupported")]
+    public bool MoireReductionSupported { get; }
+    [Selector("moireReductionAmount", "setMoireReductionAmount:")]
+    public float MoireReductionAmount { get; set; }
+    [Selector("isLocalToneMapSupported")]
+    public bool LocalToneMapSupported { get; }
+    [Selector("localToneMapAmount", "setLocalToneMapAmount:")]
+    public float LocalToneMapAmount { get; set; }
+    [Selector("extendedDynamicRangeAmount", "setExtendedDynamicRangeAmount:")]
+    public float ExtendedDynamicRangeAmount { get; set; }
+    [Selector("neutralChromaticity", "setNeutralChromaticity:")]
+    public CGPoint NeutralChromaticity { get; set; }
+    [Selector("neutralLocation", "setNeutralLocation:")]
+    public CGPoint NeutralLocation { get; set; }
+    [Selector("neutralTemperature", "setNeutralTemperature:")]
+    public float NeutralTemperature { get; set; }
+    [Selector("neutralTint", "setNeutralTint:")]
+    public float NeutralTint { get; set; }
+    [Selector("linearSpaceFilter", "setLinearSpaceFilter:")]
+    public CIFilter? LinearSpaceFilter { get; set; }
+    [Selector("previewImage")]
+    public CIImage? PreviewImage { get; }
+    [Selector("portraitEffectsMatte")]
+    public CIImage? PortraitEffectsMatte { get; }
+    [Selector("semanticSegmentationSkinMatte")]
+    public CIImage? SemanticSegmentationSkinMatte { get; }
+    [Selector("semanticSegmentationHairMatte")]
+    public CIImage? SemanticSegmentationHairMatte { get; }
+    [Selector("semanticSegmentationGlassesMatte")]
+    public CIImage? SemanticSegmentationGlassesMatte { get; }
+    [Selector("semanticSegmentationSkyMatte")]
+    public CIImage? SemanticSegmentationSkyMatte { get; }
+    [Selector("semanticSegmentationTeethMatte")]
+    public CIImage? SemanticSegmentationTeethMatte { get; }
+    [Selector("filterWithImageURL:")]
+    public static Self? FilterWithImageURL(NSURL url);
+    [Selector("filterWithImageData:identifierHint:")]
+    public static Self? FilterWithImageDataIdentifierHint(NSData data, NSString? identifierHint);
+    [Selector("filterWithCVPixelBuffer:properties:")]
+    public static Self? FilterWithCVPixelBufferProperties(CVPixelBufferRef buffer, NSDictionary properties);
 }
 
 public using CIRAWDecoderVersion = NSString;

@@ -39,27 +39,42 @@ public objc closure void NSPasteboardItemDetectMetadataForTypesCompletionHandler
 
 public extern objc class NSPasteboardItem : NSObject, NSPasteboardWriting, NSPasteboardReading
 {
-    [Selector("types")] public NSArray Types { get; }
-    [Selector("availableTypeFromArray:")] public NSPasteboardType? AvailableTypeFromArray(NSArray types);
-    [Selector("setDataProvider:forTypes:")] public bool SetDataProviderForTypes(NSPasteboardItemDataProvider dataProvider, NSArray types);
-    [Selector("setData:forType:")] public bool SetDataForType(NSData data, NSPasteboardType type);
-    [Selector("setString:forType:")] public bool SetStringForType(NSString string, NSPasteboardType type);
-    [Selector("setPropertyList:forType:")] public bool SetPropertyListForType(AnyObject propertyList, NSPasteboardType type);
-    [Selector("dataForType:")] public NSData? DataForType(NSPasteboardType type);
-    [Selector("stringForType:")] public NSString? StringForType(NSPasteboardType type);
-    [Selector("propertyListForType:")] public AnyObject? PropertyListForType(NSPasteboardType type);
+    [Selector("types")]
+    public NSArray Types { get; }
+    [Selector("availableTypeFromArray:")]
+    public NSPasteboardType? AvailableTypeFromArray(NSArray types);
+    [Selector("setDataProvider:forTypes:")]
+    public bool SetDataProviderForTypes(NSPasteboardItemDataProvider dataProvider, NSArray types);
+    [Selector("setData:forType:")]
+    public bool SetDataForType(NSData data, NSPasteboardType type);
+    [Selector("setString:forType:")]
+    public bool SetStringForType(NSString string, NSPasteboardType type);
+    [Selector("setPropertyList:forType:")]
+    public bool SetPropertyListForType(AnyObject propertyList, NSPasteboardType type);
+    [Selector("dataForType:")]
+    public NSData? DataForType(NSPasteboardType type);
+    [Selector("stringForType:")]
+    public NSString? StringForType(NSPasteboardType type);
+    [Selector("propertyListForType:")]
+    public AnyObject? PropertyListForType(NSPasteboardType type);
     /// macOS 15.4 and later.
-    [Selector("detectPatternsForPatterns:completionHandler:")] public void DetectPatternsForPatternsCompletionHandler(NSSet patterns, NSPasteboardItemDetectPatternsForPatternsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("detectPatternsForPatterns:completionHandler:")]
+    public void DetectPatternsForPatternsCompletionHandler(NSSet patterns, NSPasteboardItemDetectPatternsForPatternsCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 15.4 and later.
-    [Selector("detectValuesForPatterns:completionHandler:")] public void DetectValuesForPatternsCompletionHandler(NSSet patterns, NSPasteboardItemDetectValuesForPatternsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("detectValuesForPatterns:completionHandler:")]
+    public void DetectValuesForPatternsCompletionHandler(NSSet patterns, NSPasteboardItemDetectValuesForPatternsCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 15.4 and later.
-    [Selector("detectMetadataForTypes:completionHandler:")] public void DetectMetadataForTypesCompletionHandler(NSSet types, NSPasteboardItemDetectMetadataForTypesCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("detectMetadataForTypes:completionHandler:")]
+    public void DetectMetadataForTypesCompletionHandler(NSSet types, NSPasteboardItemDetectMetadataForTypesCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc interface NSPasteboardItemDataProvider : NSObjectProtocol
 {
-    [Selector("pasteboard:item:provideDataForType:")] void PasteboardItemProvideDataForType(NSPasteboard? pasteboard, NSPasteboardItem item, NSPasteboardType type);
-    [Optional] [Selector("pasteboardFinishedWithDataProvider:")] void PasteboardFinishedWithDataProvider(NSPasteboard pasteboard);
+    [Selector("pasteboard:item:provideDataForType:")]
+    void PasteboardItemProvideDataForType(NSPasteboard? pasteboard, NSPasteboardItem item, NSPasteboardType type);
+    [Optional]
+    [Selector("pasteboardFinishedWithDataProvider:")]
+    void PasteboardFinishedWithDataProvider(NSPasteboard pasteboard);
 }
 
 #endif

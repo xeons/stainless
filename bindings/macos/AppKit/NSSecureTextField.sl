@@ -33,7 +33,8 @@ public extern objc class NSSecureTextField : NSTextField { }
 
 public extern objc class NSSecureTextFieldCell : NSTextFieldCell
 {
-    [Selector("echosBullets", "setEchosBullets:")] public bool EchosBullets { get; set; }
+    [Selector("echosBullets", "setEchosBullets:")]
+    public bool EchosBullets { get; set; }
 }
 
 #endif

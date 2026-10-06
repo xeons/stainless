@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class VZFileHandleNetworkDeviceAttachment : VZNetworkDeviceAttachment
 {
-    [Selector("fileHandle")] public NSFileHandle FileHandle { get; }
-    [Selector("maximumTransmissionUnit", "setMaximumTransmissionUnit:")] public NSInteger MaximumTransmissionUnit { get; set; }
-    [Selector("initWithFileHandle:")] public Self InitWithFileHandle(NSFileHandle fileHandle);
+    [Selector("fileHandle")]
+    public NSFileHandle FileHandle { get; }
+    [Selector("maximumTransmissionUnit", "setMaximumTransmissionUnit:")]
+    public NSInteger MaximumTransmissionUnit { get; set; }
+    [Selector("initWithFileHandle:")]
+    public Self InitWithFileHandle(NSFileHandle fileHandle);
 }
 
 #endif

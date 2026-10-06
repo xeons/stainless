@@ -99,74 +99,142 @@ public objc closure void WKWebExtensionContextLoadBackgroundContentWithCompletio
 /// macOS 15.4 and later.
 public extern objc class WKWebExtensionContext : NSObject
 {
-    [Selector("webExtension")] public WKWebExtension WebExtension { get; }
-    [Selector("webExtensionController")] public WKWebExtensionController? WebExtensionController { get; }
-    [Selector("isLoaded")] public bool Loaded { get; }
-    [Selector("errors")] public NSArray Errors { get; }
-    [Selector("baseURL", "setBaseURL:")] public NSURL BaseURL { get; set; }
-    [Selector("uniqueIdentifier", "setUniqueIdentifier:")] public NSString UniqueIdentifier { get; set; }
-    [Selector("isInspectable", "setInspectable:")] public bool Inspectable { get; set; }
-    [Selector("inspectionName", "setInspectionName:")] public NSString? InspectionName { get; set; }
-    [Selector("unsupportedAPIs", "setUnsupportedAPIs:")] public NSSet? UnsupportedAPIs { get; set; }
-    [Selector("webViewConfiguration")] public WKWebViewConfiguration? WebViewConfiguration { get; }
-    [Selector("optionsPageURL")] public NSURL? OptionsPageURL { get; }
-    [Selector("overrideNewTabPageURL")] public NSURL? OverrideNewTabPageURL { get; }
-    [Selector("grantedPermissions", "setGrantedPermissions:")] public NSDictionary GrantedPermissions { get; set; }
-    [Selector("grantedPermissionMatchPatterns", "setGrantedPermissionMatchPatterns:")] public NSDictionary GrantedPermissionMatchPatterns { get; set; }
-    [Selector("deniedPermissions", "setDeniedPermissions:")] public NSDictionary DeniedPermissions { get; set; }
-    [Selector("deniedPermissionMatchPatterns", "setDeniedPermissionMatchPatterns:")] public NSDictionary DeniedPermissionMatchPatterns { get; set; }
-    [Selector("hasRequestedOptionalAccessToAllHosts", "setHasRequestedOptionalAccessToAllHosts:")] public bool HasRequestedOptionalAccessToAllHosts { get; set; }
-    [Selector("hasAccessToPrivateData", "setHasAccessToPrivateData:")] public bool HasAccessToPrivateData { get; set; }
-    [Selector("currentPermissions")] public NSSet CurrentPermissions { get; }
-    [Selector("currentPermissionMatchPatterns")] public NSSet CurrentPermissionMatchPatterns { get; }
-    [Selector("hasAccessToAllURLs")] public bool HasAccessToAllURLs { get; }
-    [Selector("hasAccessToAllHosts")] public bool HasAccessToAllHosts { get; }
-    [Selector("hasInjectedContent")] public bool HasInjectedContent { get; }
-    [Selector("hasContentModificationRules")] public bool HasContentModificationRules { get; }
-    [Selector("commands")] public NSArray Commands { get; }
-    [Selector("openWindows")] public NSArray OpenWindows { get; }
-    [Selector("focusedWindow")] public WKWebExtensionWindow? FocusedWindow { get; }
-    [Selector("openTabs")] public NSSet OpenTabs { get; }
-    [Selector("contextForExtension:")] public static Self ContextForExtension(WKWebExtension extension);
-    [Selector("initForExtension:")] public Self InitForExtension(WKWebExtension extension);
-    [Selector("hasPermission:")] public bool HasPermission(WKWebExtensionPermission permission);
-    [Selector("hasPermission:inTab:")] public bool HasPermissionInTab(WKWebExtensionPermission permission, WKWebExtensionTab? tab);
-    [Selector("hasAccessToURL:")] public bool HasAccessToURL(NSURL url);
-    [Selector("hasAccessToURL:inTab:")] public bool HasAccessToURLInTab(NSURL url, WKWebExtensionTab? tab);
-    [Selector("hasInjectedContentForURL:")] public bool HasInjectedContentForURL(NSURL url);
-    [Selector("permissionStatusForPermission:")] public WKWebExtensionContextPermissionStatus PermissionStatusForPermission(WKWebExtensionPermission permission);
-    [Selector("permissionStatusForPermission:inTab:")] public WKWebExtensionContextPermissionStatus PermissionStatusForPermissionInTab(WKWebExtensionPermission permission, WKWebExtensionTab? tab);
-    [Selector("setPermissionStatus:forPermission:")] public void SetPermissionStatusForPermission(WKWebExtensionContextPermissionStatus status, WKWebExtensionPermission permission);
-    [Selector("setPermissionStatus:forPermission:expirationDate:")] public void SetPermissionStatusForPermissionExpirationDate(WKWebExtensionContextPermissionStatus status, WKWebExtensionPermission permission, NSDate? expirationDate);
-    [Selector("permissionStatusForURL:")] public WKWebExtensionContextPermissionStatus PermissionStatusForURL(NSURL url);
-    [Selector("permissionStatusForURL:inTab:")] public WKWebExtensionContextPermissionStatus PermissionStatusForURLInTab(NSURL url, WKWebExtensionTab? tab);
-    [Selector("setPermissionStatus:forURL:")] public void SetPermissionStatusForURL(WKWebExtensionContextPermissionStatus status, NSURL url);
-    [Selector("setPermissionStatus:forURL:expirationDate:")] public void SetPermissionStatusForURLExpirationDate(WKWebExtensionContextPermissionStatus status, NSURL url, NSDate? expirationDate);
-    [Selector("permissionStatusForMatchPattern:")] public WKWebExtensionContextPermissionStatus PermissionStatusForMatchPattern(WKWebExtensionMatchPattern pattern);
-    [Selector("permissionStatusForMatchPattern:inTab:")] public WKWebExtensionContextPermissionStatus PermissionStatusForMatchPatternInTab(WKWebExtensionMatchPattern pattern, WKWebExtensionTab? tab);
-    [Selector("setPermissionStatus:forMatchPattern:")] public void SetPermissionStatusForMatchPattern(WKWebExtensionContextPermissionStatus status, WKWebExtensionMatchPattern pattern);
-    [Selector("setPermissionStatus:forMatchPattern:expirationDate:")] public void SetPermissionStatusForMatchPatternExpirationDate(WKWebExtensionContextPermissionStatus status, WKWebExtensionMatchPattern pattern, NSDate? expirationDate);
-    [Selector("loadBackgroundContentWithCompletionHandler:")] public void LoadBackgroundContentWithCompletionHandler(WKWebExtensionContextLoadBackgroundContentWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("actionForTab:")] public WKWebExtensionAction? ActionForTab(WKWebExtensionTab? tab);
-    [Selector("performActionForTab:")] public void PerformActionForTab(WKWebExtensionTab? tab);
-    [Selector("performCommand:")] public void PerformCommand(WKWebExtensionCommand command);
-    [Selector("performCommandForEvent:")] public bool PerformCommandForEvent(NSEvent event);
-    [Selector("commandForEvent:")] public WKWebExtensionCommand? CommandForEvent(NSEvent event);
-    [Selector("menuItemsForTab:")] public NSArray MenuItemsForTab(WKWebExtensionTab tab);
-    [Selector("userGesturePerformedInTab:")] public void UserGesturePerformedInTab(WKWebExtensionTab tab);
-    [Selector("hasActiveUserGestureInTab:")] public bool HasActiveUserGestureInTab(WKWebExtensionTab tab);
-    [Selector("clearUserGestureInTab:")] public void ClearUserGestureInTab(WKWebExtensionTab tab);
-    [Selector("didOpenWindow:")] public void DidOpenWindow(WKWebExtensionWindow newWindow);
-    [Selector("didCloseWindow:")] public void DidCloseWindow(WKWebExtensionWindow closedWindow);
-    [Selector("didFocusWindow:")] public void DidFocusWindow(WKWebExtensionWindow? focusedWindow);
-    [Selector("didOpenTab:")] public void DidOpenTab(WKWebExtensionTab newTab);
-    [Selector("didCloseTab:windowIsClosing:")] public void DidCloseTabWindowIsClosing(WKWebExtensionTab closedTab, bool windowIsClosing);
-    [Selector("didActivateTab:previousActiveTab:")] public void DidActivateTabPreviousActiveTab(WKWebExtensionTab activatedTab, WKWebExtensionTab? previousTab);
-    [Selector("didSelectTabs:")] public void DidSelectTabs(NSArray selectedTabs);
-    [Selector("didDeselectTabs:")] public void DidDeselectTabs(NSArray deselectedTabs);
-    [Selector("didMoveTab:fromIndex:inWindow:")] public void DidMoveTabFromIndexInWindow(WKWebExtensionTab movedTab, NSUInteger index, WKWebExtensionWindow? oldWindow);
-    [Selector("didReplaceTab:withTab:")] public void DidReplaceTabWithTab(WKWebExtensionTab oldTab, WKWebExtensionTab newTab);
-    [Selector("didChangeTabProperties:forTab:")] public void DidChangeTabPropertiesForTab(WKWebExtensionTabChangedProperties properties, WKWebExtensionTab changedTab);
+    [Selector("webExtension")]
+    public WKWebExtension WebExtension { get; }
+    [Selector("webExtensionController")]
+    public WKWebExtensionController? WebExtensionController { get; }
+    [Selector("isLoaded")]
+    public bool Loaded { get; }
+    [Selector("errors")]
+    public NSArray Errors { get; }
+    [Selector("baseURL", "setBaseURL:")]
+    public NSURL BaseURL { get; set; }
+    [Selector("uniqueIdentifier", "setUniqueIdentifier:")]
+    public NSString UniqueIdentifier { get; set; }
+    [Selector("isInspectable", "setInspectable:")]
+    public bool Inspectable { get; set; }
+    [Selector("inspectionName", "setInspectionName:")]
+    public NSString? InspectionName { get; set; }
+    [Selector("unsupportedAPIs", "setUnsupportedAPIs:")]
+    public NSSet? UnsupportedAPIs { get; set; }
+    [Selector("webViewConfiguration")]
+    public WKWebViewConfiguration? WebViewConfiguration { get; }
+    [Selector("optionsPageURL")]
+    public NSURL? OptionsPageURL { get; }
+    [Selector("overrideNewTabPageURL")]
+    public NSURL? OverrideNewTabPageURL { get; }
+    [Selector("grantedPermissions", "setGrantedPermissions:")]
+    public NSDictionary GrantedPermissions { get; set; }
+    [Selector("grantedPermissionMatchPatterns", "setGrantedPermissionMatchPatterns:")]
+    public NSDictionary GrantedPermissionMatchPatterns { get; set; }
+    [Selector("deniedPermissions", "setDeniedPermissions:")]
+    public NSDictionary DeniedPermissions { get; set; }
+    [Selector("deniedPermissionMatchPatterns", "setDeniedPermissionMatchPatterns:")]
+    public NSDictionary DeniedPermissionMatchPatterns { get; set; }
+    [Selector("hasRequestedOptionalAccessToAllHosts", "setHasRequestedOptionalAccessToAllHosts:")]
+    public bool HasRequestedOptionalAccessToAllHosts { get; set; }
+    [Selector("hasAccessToPrivateData", "setHasAccessToPrivateData:")]
+    public bool HasAccessToPrivateData { get; set; }
+    [Selector("currentPermissions")]
+    public NSSet CurrentPermissions { get; }
+    [Selector("currentPermissionMatchPatterns")]
+    public NSSet CurrentPermissionMatchPatterns { get; }
+    [Selector("hasAccessToAllURLs")]
+    public bool HasAccessToAllURLs { get; }
+    [Selector("hasAccessToAllHosts")]
+    public bool HasAccessToAllHosts { get; }
+    [Selector("hasInjectedContent")]
+    public bool HasInjectedContent { get; }
+    [Selector("hasContentModificationRules")]
+    public bool HasContentModificationRules { get; }
+    [Selector("commands")]
+    public NSArray Commands { get; }
+    [Selector("openWindows")]
+    public NSArray OpenWindows { get; }
+    [Selector("focusedWindow")]
+    public WKWebExtensionWindow? FocusedWindow { get; }
+    [Selector("openTabs")]
+    public NSSet OpenTabs { get; }
+    [Selector("contextForExtension:")]
+    public static Self ContextForExtension(WKWebExtension extension);
+    [Selector("initForExtension:")]
+    public Self InitForExtension(WKWebExtension extension);
+    [Selector("hasPermission:")]
+    public bool HasPermission(WKWebExtensionPermission permission);
+    [Selector("hasPermission:inTab:")]
+    public bool HasPermissionInTab(WKWebExtensionPermission permission, WKWebExtensionTab? tab);
+    [Selector("hasAccessToURL:")]
+    public bool HasAccessToURL(NSURL url);
+    [Selector("hasAccessToURL:inTab:")]
+    public bool HasAccessToURLInTab(NSURL url, WKWebExtensionTab? tab);
+    [Selector("hasInjectedContentForURL:")]
+    public bool HasInjectedContentForURL(NSURL url);
+    [Selector("permissionStatusForPermission:")]
+    public WKWebExtensionContextPermissionStatus PermissionStatusForPermission(WKWebExtensionPermission permission);
+    [Selector("permissionStatusForPermission:inTab:")]
+    public WKWebExtensionContextPermissionStatus PermissionStatusForPermissionInTab(WKWebExtensionPermission permission, WKWebExtensionTab? tab);
+    [Selector("setPermissionStatus:forPermission:")]
+    public void SetPermissionStatusForPermission(WKWebExtensionContextPermissionStatus status, WKWebExtensionPermission permission);
+    [Selector("setPermissionStatus:forPermission:expirationDate:")]
+    public void SetPermissionStatusForPermissionExpirationDate(WKWebExtensionContextPermissionStatus status, WKWebExtensionPermission permission, NSDate? expirationDate);
+    [Selector("permissionStatusForURL:")]
+    public WKWebExtensionContextPermissionStatus PermissionStatusForURL(NSURL url);
+    [Selector("permissionStatusForURL:inTab:")]
+    public WKWebExtensionContextPermissionStatus PermissionStatusForURLInTab(NSURL url, WKWebExtensionTab? tab);
+    [Selector("setPermissionStatus:forURL:")]
+    public void SetPermissionStatusForURL(WKWebExtensionContextPermissionStatus status, NSURL url);
+    [Selector("setPermissionStatus:forURL:expirationDate:")]
+    public void SetPermissionStatusForURLExpirationDate(WKWebExtensionContextPermissionStatus status, NSURL url, NSDate? expirationDate);
+    [Selector("permissionStatusForMatchPattern:")]
+    public WKWebExtensionContextPermissionStatus PermissionStatusForMatchPattern(WKWebExtensionMatchPattern pattern);
+    [Selector("permissionStatusForMatchPattern:inTab:")]
+    public WKWebExtensionContextPermissionStatus PermissionStatusForMatchPatternInTab(WKWebExtensionMatchPattern pattern, WKWebExtensionTab? tab);
+    [Selector("setPermissionStatus:forMatchPattern:")]
+    public void SetPermissionStatusForMatchPattern(WKWebExtensionContextPermissionStatus status, WKWebExtensionMatchPattern pattern);
+    [Selector("setPermissionStatus:forMatchPattern:expirationDate:")]
+    public void SetPermissionStatusForMatchPatternExpirationDate(WKWebExtensionContextPermissionStatus status, WKWebExtensionMatchPattern pattern, NSDate? expirationDate);
+    [Selector("loadBackgroundContentWithCompletionHandler:")]
+    public void LoadBackgroundContentWithCompletionHandler(WKWebExtensionContextLoadBackgroundContentWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("actionForTab:")]
+    public WKWebExtensionAction? ActionForTab(WKWebExtensionTab? tab);
+    [Selector("performActionForTab:")]
+    public void PerformActionForTab(WKWebExtensionTab? tab);
+    [Selector("performCommand:")]
+    public void PerformCommand(WKWebExtensionCommand command);
+    [Selector("performCommandForEvent:")]
+    public bool PerformCommandForEvent(NSEvent event);
+    [Selector("commandForEvent:")]
+    public WKWebExtensionCommand? CommandForEvent(NSEvent event);
+    [Selector("menuItemsForTab:")]
+    public NSArray MenuItemsForTab(WKWebExtensionTab tab);
+    [Selector("userGesturePerformedInTab:")]
+    public void UserGesturePerformedInTab(WKWebExtensionTab tab);
+    [Selector("hasActiveUserGestureInTab:")]
+    public bool HasActiveUserGestureInTab(WKWebExtensionTab tab);
+    [Selector("clearUserGestureInTab:")]
+    public void ClearUserGestureInTab(WKWebExtensionTab tab);
+    [Selector("didOpenWindow:")]
+    public void DidOpenWindow(WKWebExtensionWindow newWindow);
+    [Selector("didCloseWindow:")]
+    public void DidCloseWindow(WKWebExtensionWindow closedWindow);
+    [Selector("didFocusWindow:")]
+    public void DidFocusWindow(WKWebExtensionWindow? focusedWindow);
+    [Selector("didOpenTab:")]
+    public void DidOpenTab(WKWebExtensionTab newTab);
+    [Selector("didCloseTab:windowIsClosing:")]
+    public void DidCloseTabWindowIsClosing(WKWebExtensionTab closedTab, bool windowIsClosing);
+    [Selector("didActivateTab:previousActiveTab:")]
+    public void DidActivateTabPreviousActiveTab(WKWebExtensionTab activatedTab, WKWebExtensionTab? previousTab);
+    [Selector("didSelectTabs:")]
+    public void DidSelectTabs(NSArray selectedTabs);
+    [Selector("didDeselectTabs:")]
+    public void DidDeselectTabs(NSArray deselectedTabs);
+    [Selector("didMoveTab:fromIndex:inWindow:")]
+    public void DidMoveTabFromIndexInWindow(WKWebExtensionTab movedTab, NSUInteger index, WKWebExtensionWindow? oldWindow);
+    [Selector("didReplaceTab:withTab:")]
+    public void DidReplaceTabWithTab(WKWebExtensionTab oldTab, WKWebExtensionTab newTab);
+    [Selector("didChangeTabProperties:forTab:")]
+    public void DidChangeTabPropertiesForTab(WKWebExtensionTabChangedProperties properties, WKWebExtensionTab changedTab);
 }
 
 #endif

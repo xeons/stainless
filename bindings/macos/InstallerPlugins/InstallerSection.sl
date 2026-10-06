@@ -35,16 +35,26 @@ public struct InstallerSection_Private;
 
 public extern objc class InstallerSection : NSObject
 {
-    [Selector("bundle")] public NSBundle? Bundle { get; }
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("firstPane")] public InstallerPane? FirstPane { get; }
-    [Selector("shouldLoad")] public bool ShouldLoad { get; }
-    [Selector("installerState")] public InstallerState? InstallerState { get; }
-    [Selector("activePane")] public InstallerPane? ActivePane { get; }
-    [Selector("willLoadMainNib")] public void WillLoadMainNib();
-    [Selector("didLoadMainNib")] public void DidLoadMainNib();
-    [Selector("sharedDictionary")] public NSMutableDictionary? SharedDictionary();
-    [Selector("gotoPane:")] public bool GotoPane(InstallerPane? pane);
+    [Selector("bundle")]
+    public NSBundle? Bundle { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("firstPane")]
+    public InstallerPane? FirstPane { get; }
+    [Selector("shouldLoad")]
+    public bool ShouldLoad { get; }
+    [Selector("installerState")]
+    public InstallerState? InstallerState { get; }
+    [Selector("activePane")]
+    public InstallerPane? ActivePane { get; }
+    [Selector("willLoadMainNib")]
+    public void WillLoadMainNib();
+    [Selector("didLoadMainNib")]
+    public void DidLoadMainNib();
+    [Selector("sharedDictionary")]
+    public NSMutableDictionary? SharedDictionary();
+    [Selector("gotoPane:")]
+    public bool GotoPane(InstallerPane? pane);
 }
 
 #endif

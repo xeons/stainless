@@ -35,30 +35,49 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class VTTemporalNoiseFilterConfiguration : NSObject, VTFrameProcessorConfiguration
 {
-    [Selector("frameWidth")] public NSInteger FrameWidth { get; }
-    [Selector("frameHeight")] public NSInteger FrameHeight { get; }
-    [Selector("frameSupportedPixelFormats")] public NSArray? FrameSupportedPixelFormats { get; }
-    [Selector("sourcePixelBufferAttributes")] public NSDictionary SourcePixelBufferAttributes { get; }
-    [Selector("destinationPixelBufferAttributes")] public NSDictionary DestinationPixelBufferAttributes { get; }
-    [Selector("nextFrameCount")] public NSInteger NextFrameCount { get; }
-    [Selector("previousFrameCount")] public NSInteger PreviousFrameCount { get; }
-    [Selector("supportedSourcePixelFormats")] public static NSArray? SupportedSourcePixelFormats { get; }
-    [Selector("maximumDimensions")] public static CMVideoDimensions MaximumDimensions { get; }
-    [Selector("minimumDimensions")] public static CMVideoDimensions MinimumDimensions { get; }
-    [Selector("isSupported")] public static bool Supported { get; }
-    [Selector("initWithFrameWidth:frameHeight:sourcePixelFormat:")] public Self? InitWithFrameWidthFrameHeightSourcePixelFormat(NSInteger frameWidth, NSInteger frameHeight, OSType sourcePixelFormat);
+    [Selector("frameWidth")]
+    public NSInteger FrameWidth { get; }
+    [Selector("frameHeight")]
+    public NSInteger FrameHeight { get; }
+    [Selector("frameSupportedPixelFormats")]
+    public NSArray? FrameSupportedPixelFormats { get; }
+    [Selector("sourcePixelBufferAttributes")]
+    public NSDictionary SourcePixelBufferAttributes { get; }
+    [Selector("destinationPixelBufferAttributes")]
+    public NSDictionary DestinationPixelBufferAttributes { get; }
+    [Selector("nextFrameCount")]
+    public NSInteger NextFrameCount { get; }
+    [Selector("previousFrameCount")]
+    public NSInteger PreviousFrameCount { get; }
+    [Selector("supportedSourcePixelFormats")]
+    public static NSArray? SupportedSourcePixelFormats { get; }
+    [Selector("maximumDimensions")]
+    public static CMVideoDimensions MaximumDimensions { get; }
+    [Selector("minimumDimensions")]
+    public static CMVideoDimensions MinimumDimensions { get; }
+    [Selector("isSupported")]
+    public static bool Supported { get; }
+    [Selector("initWithFrameWidth:frameHeight:sourcePixelFormat:")]
+    public Self? InitWithFrameWidthFrameHeightSourcePixelFormat(NSInteger frameWidth, NSInteger frameHeight, OSType sourcePixelFormat);
 }
 
 /// macOS 26.0 and later.
 public extern objc class VTTemporalNoiseFilterParameters : NSObject, VTFrameProcessorParameters
 {
-    [Selector("sourceFrame")] public VTFrameProcessorFrame SourceFrame { get; }
-    [Selector("nextFrames")] public NSArray NextFrames { get; }
-    [Selector("previousFrames")] public NSArray PreviousFrames { get; }
-    [Selector("filterStrength", "setFilterStrength:")] public float FilterStrength { get; set; }
-    [Selector("hasDiscontinuity", "setHasDiscontinuity:")] public bool HasDiscontinuity { get; set; }
-    [Selector("destinationFrame")] public VTFrameProcessorFrame DestinationFrame { get; }
-    [Selector("initWithSourceFrame:nextFrames:previousFrames:destinationFrame:filterStrength:hasDiscontinuity:")] public Self? InitWithSourceFrameNextFramesPreviousFramesDestinationFrameFilterStrengthHasDiscontinuity(VTFrameProcessorFrame sourceFrame, NSArray nextFrames, NSArray previousFrames, VTFrameProcessorFrame destinationFrame, float filterStrength, Boolean hasDiscontinuity);
+    [Selector("sourceFrame")]
+    public VTFrameProcessorFrame SourceFrame { get; }
+    [Selector("nextFrames")]
+    public NSArray NextFrames { get; }
+    [Selector("previousFrames")]
+    public NSArray PreviousFrames { get; }
+    [Selector("filterStrength", "setFilterStrength:")]
+    public float FilterStrength { get; set; }
+    [Selector("hasDiscontinuity", "setHasDiscontinuity:")]
+    public bool HasDiscontinuity { get; set; }
+    [Selector("destinationFrame")]
+    public VTFrameProcessorFrame DestinationFrame { get; }
+    [Selector("initWithSourceFrame:nextFrames:previousFrames:destinationFrame:filterStrength:hasDiscontinuity:")]
+    public Self? InitWithSourceFrameNextFramesPreviousFramesDestinationFrameFilterStrengthHasDiscontinuity(VTFrameProcessorFrame sourceFrame, NSArray nextFrames, NSArray previousFrames, VTFrameProcessorFrame destinationFrame, float filterStrength, Boolean hasDiscontinuity);
 }
 
 #endif

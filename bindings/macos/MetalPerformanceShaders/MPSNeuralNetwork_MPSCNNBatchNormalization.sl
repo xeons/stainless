@@ -34,87 +34,152 @@ import Standard.ObjC;
 
 public extern objc class MPSCNNBatchNormalizationState : MPSNNGradientState
 {
-    [Selector("batchNormalization")] public MPSCNNBatchNormalization BatchNormalization { get; }
-    [Selector("reset")] public void Reset();
-    [Selector("gamma")] public MTLBuffer? Gamma();
-    [Selector("beta")] public MTLBuffer? Beta();
-    [Selector("mean")] public MTLBuffer? Mean();
-    [Selector("variance")] public MTLBuffer? Variance();
-    [Selector("gradientForGamma")] public MTLBuffer? GradientForGamma();
-    [Selector("gradientForBeta")] public MTLBuffer? GradientForBeta();
+    [Selector("batchNormalization")]
+    public MPSCNNBatchNormalization BatchNormalization { get; }
+    [Selector("reset")]
+    public void Reset();
+    [Selector("gamma")]
+    public MTLBuffer? Gamma();
+    [Selector("beta")]
+    public MTLBuffer? Beta();
+    [Selector("mean")]
+    public MTLBuffer? Mean();
+    [Selector("variance")]
+    public MTLBuffer? Variance();
+    [Selector("gradientForGamma")]
+    public MTLBuffer? GradientForGamma();
+    [Selector("gradientForBeta")]
+    public MTLBuffer? GradientForBeta();
 }
 
 public extern objc class MPSCNNNormalizationMeanAndVarianceState : MPSState
 {
-    [Selector("mean")] public MTLBuffer Mean { get; }
-    [Selector("variance")] public MTLBuffer Variance { get; }
-    [Selector("initWithMean:variance:")] public Self InitWithMeanVariance(MTLBuffer mean, MTLBuffer variance);
-    [Selector("temporaryStateWithCommandBuffer:numberOfFeatureChannels:")] public static Self TemporaryStateWithCommandBufferNumberOfFeatureChannels(MTLCommandBuffer commandBuffer, NSUInteger numberOfFeatureChannels);
+    [Selector("mean")]
+    public MTLBuffer Mean { get; }
+    [Selector("variance")]
+    public MTLBuffer Variance { get; }
+    [Selector("initWithMean:variance:")]
+    public Self InitWithMeanVariance(MTLBuffer mean, MTLBuffer variance);
+    [Selector("temporaryStateWithCommandBuffer:numberOfFeatureChannels:")]
+    public static Self TemporaryStateWithCommandBufferNumberOfFeatureChannels(MTLCommandBuffer commandBuffer, NSUInteger numberOfFeatureChannels);
 }
 
 public objc interface MPSCNNBatchNormalizationDataSource : NSObjectProtocol, NSCopying
 {
-    [Optional] [Selector("supportsSecureCoding")] static abstract bool SupportsSecureCoding { get; }
-    [Selector("numberOfFeatureChannels")] NSUInteger NumberOfFeatureChannels();
-    [Selector("gamma")] float* Gamma();
-    [Selector("beta")] float* Beta();
-    [Selector("mean")] float* Mean();
-    [Selector("variance")] float* Variance();
-    [Selector("load")] bool Load();
-    [Selector("purge")] void Purge();
-    [Selector("label")] NSString? Label();
-    [Optional] [Selector("updateGammaAndBetaWithCommandBuffer:batchNormalizationState:")] MPSCNNNormalizationGammaAndBetaState? UpdateGammaAndBetaWithCommandBufferBatchNormalizationState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationState);
-    [Optional] [Selector("updateMeanAndVarianceWithCommandBuffer:batchNormalizationState:")] MPSCNNNormalizationMeanAndVarianceState? UpdateMeanAndVarianceWithCommandBufferBatchNormalizationState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationState);
-    [Optional] [Selector("updateGammaAndBetaWithBatchNormalizationState:")] bool UpdateGammaAndBetaWithBatchNormalizationState(MPSCNNBatchNormalizationState batchNormalizationState);
-    [Optional] [Selector("updateMeanAndVarianceWithBatchNormalizationState:")] bool UpdateMeanAndVarianceWithBatchNormalizationState(MPSCNNBatchNormalizationState batchNormalizationState);
-    [Optional] [Selector("epsilon")] float Epsilon();
-    [Optional] [Selector("encodeWithCoder:")] void EncodeWithCoder(NSCoder aCoder);
-    [Optional] [Selector("initWithCoder:")] Self? InitWithCoder(NSCoder aDecoder);
-    [Optional] [Selector("copyWithZone:device:")] Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Optional]
+    [Selector("supportsSecureCoding")]
+    static abstract bool SupportsSecureCoding { get; }
+    [Selector("numberOfFeatureChannels")]
+    NSUInteger NumberOfFeatureChannels();
+    [Selector("gamma")]
+    float* Gamma();
+    [Selector("beta")]
+    float* Beta();
+    [Selector("mean")]
+    float* Mean();
+    [Selector("variance")]
+    float* Variance();
+    [Selector("load")]
+    bool Load();
+    [Selector("purge")]
+    void Purge();
+    [Selector("label")]
+    NSString? Label();
+    [Optional]
+    [Selector("updateGammaAndBetaWithCommandBuffer:batchNormalizationState:")]
+    MPSCNNNormalizationGammaAndBetaState? UpdateGammaAndBetaWithCommandBufferBatchNormalizationState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationState);
+    [Optional]
+    [Selector("updateMeanAndVarianceWithCommandBuffer:batchNormalizationState:")]
+    MPSCNNNormalizationMeanAndVarianceState? UpdateMeanAndVarianceWithCommandBufferBatchNormalizationState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationState);
+    [Optional]
+    [Selector("updateGammaAndBetaWithBatchNormalizationState:")]
+    bool UpdateGammaAndBetaWithBatchNormalizationState(MPSCNNBatchNormalizationState batchNormalizationState);
+    [Optional]
+    [Selector("updateMeanAndVarianceWithBatchNormalizationState:")]
+    bool UpdateMeanAndVarianceWithBatchNormalizationState(MPSCNNBatchNormalizationState batchNormalizationState);
+    [Optional]
+    [Selector("epsilon")]
+    float Epsilon();
+    [Optional]
+    [Selector("encodeWithCoder:")]
+    void EncodeWithCoder(NSCoder aCoder);
+    [Optional]
+    [Selector("initWithCoder:")]
+    Self? InitWithCoder(NSCoder aDecoder);
+    [Optional]
+    [Selector("copyWithZone:device:")]
+    Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
 }
 
 public extern objc class MPSCNNBatchNormalization : MPSCNNKernel
 {
-    [Selector("numberOfFeatureChannels")] public NSUInteger NumberOfFeatureChannels { get; }
-    [Selector("epsilon", "setEpsilon:")] public float Epsilon { get; set; }
-    [Selector("dataSource")] public MPSCNNBatchNormalizationDataSource DataSource { get; }
-    [Selector("initWithDevice:dataSource:")] public Self InitWithDeviceDataSource(MTLDevice device, MPSCNNBatchNormalizationDataSource dataSource);
-    [Selector("initWithDevice:dataSource:fusedNeuronDescriptor:")] public Self InitWithDeviceDataSourceFusedNeuronDescriptor(MTLDevice device, MPSCNNBatchNormalizationDataSource dataSource, MPSNNNeuronDescriptor? fusedNeuronDescriptor);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:sourceImage:batchNormalizationState:destinationImage:")] public void EncodeToCommandBufferSourceImageBatchNormalizationStateDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, MPSCNNBatchNormalizationState batchNormalizationState, MPSImage destinationImage);
-    [Selector("encodeBatchToCommandBuffer:sourceImages:batchNormalizationState:destinationImages:")] public void EncodeBatchToCommandBufferSourceImagesBatchNormalizationStateDestinationImages(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImages, MPSCNNBatchNormalizationState batchNormalizationState, MPSImageBatch destinationImages);
-    [Selector("resultStateForSourceImage:sourceStates:destinationImage:")] public MPSCNNBatchNormalizationState? ResultStateForSourceImageSourceStatesDestinationImage(MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
-    [Selector("temporaryResultStateForCommandBuffer:sourceImage:sourceStates:destinationImage:")] public MPSCNNBatchNormalizationState? TemporaryResultStateForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
+    [Selector("numberOfFeatureChannels")]
+    public NSUInteger NumberOfFeatureChannels { get; }
+    [Selector("epsilon", "setEpsilon:")]
+    public float Epsilon { get; set; }
+    [Selector("dataSource")]
+    public MPSCNNBatchNormalizationDataSource DataSource { get; }
+    [Selector("initWithDevice:dataSource:")]
+    public Self InitWithDeviceDataSource(MTLDevice device, MPSCNNBatchNormalizationDataSource dataSource);
+    [Selector("initWithDevice:dataSource:fusedNeuronDescriptor:")]
+    public Self InitWithDeviceDataSourceFusedNeuronDescriptor(MTLDevice device, MPSCNNBatchNormalizationDataSource dataSource, MPSNNNeuronDescriptor? fusedNeuronDescriptor);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:sourceImage:batchNormalizationState:destinationImage:")]
+    public void EncodeToCommandBufferSourceImageBatchNormalizationStateDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, MPSCNNBatchNormalizationState batchNormalizationState, MPSImage destinationImage);
+    [Selector("encodeBatchToCommandBuffer:sourceImages:batchNormalizationState:destinationImages:")]
+    public void EncodeBatchToCommandBufferSourceImagesBatchNormalizationStateDestinationImages(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImages, MPSCNNBatchNormalizationState batchNormalizationState, MPSImageBatch destinationImages);
+    [Selector("resultStateForSourceImage:sourceStates:destinationImage:")]
+    public MPSCNNBatchNormalizationState? ResultStateForSourceImageSourceStatesDestinationImage(MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
+    [Selector("temporaryResultStateForCommandBuffer:sourceImage:sourceStates:destinationImage:")]
+    public MPSCNNBatchNormalizationState? TemporaryResultStateForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
     /// Deprecated in macOS 10.14.
-    [Selector("reloadDataSource:")] public void ReloadDataSource(MPSCNNBatchNormalizationDataSource dataSource);
-    [Selector("reloadGammaAndBetaFromDataSource")] public void ReloadGammaAndBetaFromDataSource();
-    [Selector("reloadMeanAndVarianceFromDataSource")] public void ReloadMeanAndVarianceFromDataSource();
-    [Selector("reloadGammaAndBetaWithCommandBuffer:gammaAndBetaState:")] public void ReloadGammaAndBetaWithCommandBufferGammaAndBetaState(MTLCommandBuffer commandBuffer, MPSCNNNormalizationGammaAndBetaState gammaAndBetaState);
-    [Selector("reloadMeanAndVarianceWithCommandBuffer:meanAndVarianceState:")] public void ReloadMeanAndVarianceWithCommandBufferMeanAndVarianceState(MTLCommandBuffer commandBuffer, MPSCNNNormalizationMeanAndVarianceState meanAndVarianceState);
+    [Selector("reloadDataSource:")]
+    public void ReloadDataSource(MPSCNNBatchNormalizationDataSource dataSource);
+    [Selector("reloadGammaAndBetaFromDataSource")]
+    public void ReloadGammaAndBetaFromDataSource();
+    [Selector("reloadMeanAndVarianceFromDataSource")]
+    public void ReloadMeanAndVarianceFromDataSource();
+    [Selector("reloadGammaAndBetaWithCommandBuffer:gammaAndBetaState:")]
+    public void ReloadGammaAndBetaWithCommandBufferGammaAndBetaState(MTLCommandBuffer commandBuffer, MPSCNNNormalizationGammaAndBetaState gammaAndBetaState);
+    [Selector("reloadMeanAndVarianceWithCommandBuffer:meanAndVarianceState:")]
+    public void ReloadMeanAndVarianceWithCommandBufferMeanAndVarianceState(MTLCommandBuffer commandBuffer, MPSCNNNormalizationMeanAndVarianceState meanAndVarianceState);
 }
 
 public extern objc class MPSCNNBatchNormalizationStatistics : MPSCNNKernel
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeBatchToCommandBuffer:sourceImages:batchNormalizationState:")] public void EncodeBatchToCommandBufferSourceImagesBatchNormalizationState(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImages, MPSCNNBatchNormalizationState batchNormalizationState);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeBatchToCommandBuffer:sourceImages:batchNormalizationState:")]
+    public void EncodeBatchToCommandBufferSourceImagesBatchNormalizationState(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImages, MPSCNNBatchNormalizationState batchNormalizationState);
 }
 
 public extern objc class MPSCNNBatchNormalizationGradient : MPSCNNGradientKernel
 {
-    [Selector("initWithDevice:fusedNeuronDescriptor:")] public Self InitWithDeviceFusedNeuronDescriptor(MTLDevice device, MPSNNNeuronDescriptor? fusedNeuronDescriptor);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:sourceGradient:sourceImage:batchNormalizationState:destinationGradient:")] public void EncodeToCommandBufferSourceGradientSourceImageBatchNormalizationStateDestinationGradient(MTLCommandBuffer commandBuffer, MPSImage sourceGradient, MPSImage sourceImage, MPSCNNBatchNormalizationState batchNormalizationState, MPSImage destinationGradient);
-    [Selector("encodeBatchToCommandBuffer:sourceGradients:sourceImages:batchNormalizationState:destinationGradients:")] public void EncodeBatchToCommandBufferSourceGradientsSourceImagesBatchNormalizationStateDestinationGradients(MTLCommandBuffer commandBuffer, MPSImageBatch sourceGradients, MPSImageBatch sourceImages, MPSCNNBatchNormalizationState batchNormalizationState, MPSImageBatch destinationGradients);
-    [Selector("encodeToCommandBuffer:sourceGradient:sourceImage:batchNormalizationState:")] public MPSImage EncodeToCommandBufferSourceGradientSourceImageBatchNormalizationState(MTLCommandBuffer commandBuffer, MPSImage sourceGradient, MPSImage sourceImage, MPSCNNBatchNormalizationState batchNormalizationState);
-    [Selector("encodeBatchToCommandBuffer:sourceGradients:sourceImages:batchNormalizationState:")] public MPSImageBatch EncodeBatchToCommandBufferSourceGradientsSourceImagesBatchNormalizationState(MTLCommandBuffer commandBuffer, MPSImageBatch sourceGradients, MPSImageBatch sourceImages, MPSCNNBatchNormalizationState batchNormalizationState);
+    [Selector("initWithDevice:fusedNeuronDescriptor:")]
+    public Self InitWithDeviceFusedNeuronDescriptor(MTLDevice device, MPSNNNeuronDescriptor? fusedNeuronDescriptor);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:sourceGradient:sourceImage:batchNormalizationState:destinationGradient:")]
+    public void EncodeToCommandBufferSourceGradientSourceImageBatchNormalizationStateDestinationGradient(MTLCommandBuffer commandBuffer, MPSImage sourceGradient, MPSImage sourceImage, MPSCNNBatchNormalizationState batchNormalizationState, MPSImage destinationGradient);
+    [Selector("encodeBatchToCommandBuffer:sourceGradients:sourceImages:batchNormalizationState:destinationGradients:")]
+    public void EncodeBatchToCommandBufferSourceGradientsSourceImagesBatchNormalizationStateDestinationGradients(MTLCommandBuffer commandBuffer, MPSImageBatch sourceGradients, MPSImageBatch sourceImages, MPSCNNBatchNormalizationState batchNormalizationState, MPSImageBatch destinationGradients);
+    [Selector("encodeToCommandBuffer:sourceGradient:sourceImage:batchNormalizationState:")]
+    public MPSImage EncodeToCommandBufferSourceGradientSourceImageBatchNormalizationState(MTLCommandBuffer commandBuffer, MPSImage sourceGradient, MPSImage sourceImage, MPSCNNBatchNormalizationState batchNormalizationState);
+    [Selector("encodeBatchToCommandBuffer:sourceGradients:sourceImages:batchNormalizationState:")]
+    public MPSImageBatch EncodeBatchToCommandBufferSourceGradientsSourceImagesBatchNormalizationState(MTLCommandBuffer commandBuffer, MPSImageBatch sourceGradients, MPSImageBatch sourceImages, MPSCNNBatchNormalizationState batchNormalizationState);
 }
 
 public extern objc class MPSCNNBatchNormalizationStatisticsGradient : MPSCNNGradientKernel
 {
-    [Selector("initWithDevice:fusedNeuronDescriptor:")] public Self InitWithDeviceFusedNeuronDescriptor(MTLDevice device, MPSNNNeuronDescriptor? fusedNeuronDescriptor);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeBatchToCommandBuffer:sourceGradients:sourceImages:batchNormalizationState:")] public void EncodeBatchToCommandBufferSourceGradientsSourceImagesBatchNormalizationState(MTLCommandBuffer commandBuffer, MPSImageBatch sourceGradients, MPSImageBatch sourceImages, MPSCNNBatchNormalizationState batchNormalizationState);
+    [Selector("initWithDevice:fusedNeuronDescriptor:")]
+    public Self InitWithDeviceFusedNeuronDescriptor(MTLDevice device, MPSNNNeuronDescriptor? fusedNeuronDescriptor);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeBatchToCommandBuffer:sourceGradients:sourceImages:batchNormalizationState:")]
+    public void EncodeBatchToCommandBufferSourceGradientsSourceImagesBatchNormalizationState(MTLCommandBuffer commandBuffer, MPSImageBatch sourceGradients, MPSImageBatch sourceImages, MPSCNNBatchNormalizationState batchNormalizationState);
 }
 
 #endif

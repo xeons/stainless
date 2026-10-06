@@ -42,9 +42,15 @@ public objc closure void QLPreviewingControllerProvidePreviewForFileRequestCompl
 
 public objc interface QLPreviewingController : NSObjectProtocol
 {
-    [Optional] [Selector("preparePreviewOfSearchableItemWithIdentifier:queryString:completionHandler:")] void PreparePreviewOfSearchableItemWithIdentifierQueryStringCompletionHandler(NSString identifier, NSString? queryString, QLPreviewingControllerPreparePreviewOfSearchableItemWithIdentifierQueryStringCompletionHandlerHandlerBlock handler);
-    [Optional] [Selector("preparePreviewOfFileAtURL:completionHandler:")] void PreparePreviewOfFileAtURLCompletionHandler(NSURL url, QLPreviewingControllerPreparePreviewOfFileAtURLCompletionHandlerHandlerBlock handler);
-    [Optional] [Selector("providePreviewForFileRequest:completionHandler:")] void ProvidePreviewForFileRequestCompletionHandler(QLFilePreviewRequest request, QLPreviewingControllerProvidePreviewForFileRequestCompletionHandlerHandlerBlock handler);
+    [Optional]
+    [Selector("preparePreviewOfSearchableItemWithIdentifier:queryString:completionHandler:")]
+    void PreparePreviewOfSearchableItemWithIdentifierQueryStringCompletionHandler(NSString identifier, NSString? queryString, QLPreviewingControllerPreparePreviewOfSearchableItemWithIdentifierQueryStringCompletionHandlerHandlerBlock handler);
+    [Optional]
+    [Selector("preparePreviewOfFileAtURL:completionHandler:")]
+    void PreparePreviewOfFileAtURLCompletionHandler(NSURL url, QLPreviewingControllerPreparePreviewOfFileAtURLCompletionHandlerHandlerBlock handler);
+    [Optional]
+    [Selector("providePreviewForFileRequest:completionHandler:")]
+    void ProvidePreviewForFileRequestCompletionHandler(QLFilePreviewRequest request, QLPreviewingControllerProvidePreviewForFileRequestCompletionHandlerHandlerBlock handler);
 }
 
 #endif

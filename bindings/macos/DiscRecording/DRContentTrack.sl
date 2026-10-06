@@ -34,15 +34,18 @@ import Standard.ObjC;
 
 public using DRFilesystemTrackRef = DRTrackRef;
 
-[ReturnsRetained] public extern "C" DRFilesystemTrackRef? DRFilesystemTrackCreate(DRFolderRef? rootFolder);
+[ReturnsRetained]
+public extern "C" DRFilesystemTrackRef? DRFilesystemTrackCreate(DRFolderRef? rootFolder);
 
 public extern "C" UInt64 DRFilesystemTrackEstimateOverhead(UInt64 numBlocks, UInt32 blockSize, DRFilesystemMask fsMask);
 
 public using DRAudioTrackRef = DRTrackRef;
 
 /// Deprecated in macOS 10.14.
-[ReturnsRetained] public extern "C" DRAudioTrackRef? DRAudioTrackCreate(FSRef* audioFile);
+[ReturnsRetained]
+public extern "C" DRAudioTrackRef? DRAudioTrackCreate(FSRef* audioFile);
 
-[ReturnsRetained] public extern "C" DRAudioTrackRef? DRAudioTrackCreateWithURL(CFURLRef? audioFileURL);
+[ReturnsRetained]
+public extern "C" DRAudioTrackRef? DRAudioTrackCreateWithURL(CFURLRef? audioFileURL);
 
 #endif

@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class ASPasskeyAssertionCredential : NSObject, ASAuthorizationCredential
 {
-    [Selector("userHandle")] public NSData UserHandle { get; }
-    [Selector("relyingParty")] public NSString RelyingParty { get; }
-    [Selector("signature")] public NSData Signature { get; }
-    [Selector("clientDataHash")] public NSData ClientDataHash { get; }
-    [Selector("authenticatorData")] public NSData AuthenticatorData { get; }
-    [Selector("credentialID")] public NSData CredentialID { get; }
-    [Selector("extensionOutput", "setExtensionOutput:")] public ASPasskeyAssertionCredentialExtensionOutput? ExtensionOutput { get; set; }
-    [Selector("initWithUserHandle:relyingParty:signature:clientDataHash:authenticatorData:credentialID:")] public Self InitWithUserHandleRelyingPartySignatureClientDataHashAuthenticatorDataCredentialID(NSData userHandle, NSString relyingParty, NSData signature, NSData clientDataHash, NSData authenticatorData, NSData credentialID);
-    [Selector("initWithUserHandle:relyingParty:signature:clientDataHash:authenticatorData:credentialID:extensionOutput:")] public Self InitWithUserHandleRelyingPartySignatureClientDataHashAuthenticatorDataCredentialIDExtensionOutput(NSData userHandle, NSString relyingParty, NSData signature, NSData clientDataHash, NSData authenticatorData, NSData credentialID, ASPasskeyAssertionCredentialExtensionOutput? extensionOutput);
-    [Selector("credentialWithUserHandle:relyingParty:signature:clientDataHash:authenticatorData:credentialID:")] public static Self CredentialWithUserHandleRelyingPartySignatureClientDataHashAuthenticatorDataCredentialID(NSData userHandle, NSString relyingParty, NSData signature, NSData clientDataHash, NSData authenticatorData, NSData credentialID);
+    [Selector("userHandle")]
+    public NSData UserHandle { get; }
+    [Selector("relyingParty")]
+    public NSString RelyingParty { get; }
+    [Selector("signature")]
+    public NSData Signature { get; }
+    [Selector("clientDataHash")]
+    public NSData ClientDataHash { get; }
+    [Selector("authenticatorData")]
+    public NSData AuthenticatorData { get; }
+    [Selector("credentialID")]
+    public NSData CredentialID { get; }
+    [Selector("extensionOutput", "setExtensionOutput:")]
+    public ASPasskeyAssertionCredentialExtensionOutput? ExtensionOutput { get; set; }
+    [Selector("initWithUserHandle:relyingParty:signature:clientDataHash:authenticatorData:credentialID:")]
+    public Self InitWithUserHandleRelyingPartySignatureClientDataHashAuthenticatorDataCredentialID(NSData userHandle, NSString relyingParty, NSData signature, NSData clientDataHash, NSData authenticatorData, NSData credentialID);
+    [Selector("initWithUserHandle:relyingParty:signature:clientDataHash:authenticatorData:credentialID:extensionOutput:")]
+    public Self InitWithUserHandleRelyingPartySignatureClientDataHashAuthenticatorDataCredentialIDExtensionOutput(NSData userHandle, NSString relyingParty, NSData signature, NSData clientDataHash, NSData authenticatorData, NSData credentialID, ASPasskeyAssertionCredentialExtensionOutput? extensionOutput);
+    [Selector("credentialWithUserHandle:relyingParty:signature:clientDataHash:authenticatorData:credentialID:")]
+    public static Self CredentialWithUserHandleRelyingPartySignatureClientDataHashAuthenticatorDataCredentialID(NSData userHandle, NSString relyingParty, NSData signature, NSData clientDataHash, NSData authenticatorData, NSData credentialID);
 }
 
 #endif

@@ -44,12 +44,18 @@ public enum NSRegularExpressionOptions : ulong
 
 public extern objc class NSRegularExpression : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("pattern")] public NSString Pattern { get; }
-    [Selector("options")] public NSRegularExpressionOptions Options { get; }
-    [Selector("numberOfCaptureGroups")] public NSUInteger NumberOfCaptureGroups { get; }
-    [Selector("regularExpressionWithPattern:options:error:")] public static NSRegularExpression? RegularExpressionWithPatternOptionsError(NSString pattern, NSRegularExpressionOptions options, out NSError? error);
-    [Selector("initWithPattern:options:error:")] public Self? InitWithPatternOptionsError(NSString pattern, NSRegularExpressionOptions options, out NSError? error);
-    [Selector("escapedPatternForString:")] public static NSString EscapedPatternForString(NSString string);
+    [Selector("pattern")]
+    public NSString Pattern { get; }
+    [Selector("options")]
+    public NSRegularExpressionOptions Options { get; }
+    [Selector("numberOfCaptureGroups")]
+    public NSUInteger NumberOfCaptureGroups { get; }
+    [Selector("regularExpressionWithPattern:options:error:")]
+    public static NSRegularExpression? RegularExpressionWithPatternOptionsError(NSString pattern, NSRegularExpressionOptions options, out NSError? error);
+    [Selector("initWithPattern:options:error:")]
+    public Self? InitWithPatternOptionsError(NSString pattern, NSRegularExpressionOptions options, out NSError? error);
+    [Selector("escapedPatternForString:")]
+    public static NSString EscapedPatternForString(NSString string);
 }
 
 [Flags]
@@ -77,27 +83,39 @@ public objc closure void NSRegularExpressionEnumerateMatchesInStringOptionsRange
 /// NSMatching, a category of NSRegularExpression.
 public extern objc class NSRegularExpression
 {
-    [Selector("enumerateMatchesInString:options:range:usingBlock:")] public void EnumerateMatchesInStringOptionsRangeUsingBlock(NSString string, NSMatchingOptions options, NSRange range, NSRegularExpressionEnumerateMatchesInStringOptionsRangeUsingBlockBlock block);
-    [Selector("matchesInString:options:range:")] public NSArray MatchesInStringOptionsRange(NSString string, NSMatchingOptions options, NSRange range);
-    [Selector("numberOfMatchesInString:options:range:")] public NSUInteger NumberOfMatchesInStringOptionsRange(NSString string, NSMatchingOptions options, NSRange range);
-    [Selector("firstMatchInString:options:range:")] public NSTextCheckingResult? FirstMatchInStringOptionsRange(NSString string, NSMatchingOptions options, NSRange range);
-    [Selector("rangeOfFirstMatchInString:options:range:")] public NSRange RangeOfFirstMatchInStringOptionsRange(NSString string, NSMatchingOptions options, NSRange range);
+    [Selector("enumerateMatchesInString:options:range:usingBlock:")]
+    public void EnumerateMatchesInStringOptionsRangeUsingBlock(NSString string, NSMatchingOptions options, NSRange range, NSRegularExpressionEnumerateMatchesInStringOptionsRangeUsingBlockBlock block);
+    [Selector("matchesInString:options:range:")]
+    public NSArray MatchesInStringOptionsRange(NSString string, NSMatchingOptions options, NSRange range);
+    [Selector("numberOfMatchesInString:options:range:")]
+    public NSUInteger NumberOfMatchesInStringOptionsRange(NSString string, NSMatchingOptions options, NSRange range);
+    [Selector("firstMatchInString:options:range:")]
+    public NSTextCheckingResult? FirstMatchInStringOptionsRange(NSString string, NSMatchingOptions options, NSRange range);
+    [Selector("rangeOfFirstMatchInString:options:range:")]
+    public NSRange RangeOfFirstMatchInStringOptionsRange(NSString string, NSMatchingOptions options, NSRange range);
 }
 
 /// NSReplacement, a category of NSRegularExpression.
 public extern objc class NSRegularExpression
 {
-    [Selector("stringByReplacingMatchesInString:options:range:withTemplate:")] public NSString StringByReplacingMatchesInStringOptionsRangeWithTemplate(NSString string, NSMatchingOptions options, NSRange range, NSString templ);
-    [Selector("replaceMatchesInString:options:range:withTemplate:")] public NSUInteger ReplaceMatchesInStringOptionsRangeWithTemplate(NSMutableString string, NSMatchingOptions options, NSRange range, NSString templ);
-    [Selector("replacementStringForResult:inString:offset:template:")] public NSString ReplacementStringForResultInStringOffsetTemplate(NSTextCheckingResult result, NSString string, NSInteger offset, NSString templ);
-    [Selector("escapedTemplateForString:")] public static NSString EscapedTemplateForString(NSString string);
+    [Selector("stringByReplacingMatchesInString:options:range:withTemplate:")]
+    public NSString StringByReplacingMatchesInStringOptionsRangeWithTemplate(NSString string, NSMatchingOptions options, NSRange range, NSString templ);
+    [Selector("replaceMatchesInString:options:range:withTemplate:")]
+    public NSUInteger ReplaceMatchesInStringOptionsRangeWithTemplate(NSMutableString string, NSMatchingOptions options, NSRange range, NSString templ);
+    [Selector("replacementStringForResult:inString:offset:template:")]
+    public NSString ReplacementStringForResultInStringOffsetTemplate(NSTextCheckingResult result, NSString string, NSInteger offset, NSString templ);
+    [Selector("escapedTemplateForString:")]
+    public static NSString EscapedTemplateForString(NSString string);
 }
 
 public extern objc class NSDataDetector : NSRegularExpression
 {
-    [Selector("checkingTypes")] public NSTextCheckingTypes CheckingTypes { get; }
-    [Selector("dataDetectorWithTypes:error:")] public static NSDataDetector? DataDetectorWithTypesError(NSTextCheckingTypes checkingTypes, out NSError? error);
-    [Selector("initWithTypes:error:")] public Self? InitWithTypesError(NSTextCheckingTypes checkingTypes, out NSError? error);
+    [Selector("checkingTypes")]
+    public NSTextCheckingTypes CheckingTypes { get; }
+    [Selector("dataDetectorWithTypes:error:")]
+    public static NSDataDetector? DataDetectorWithTypesError(NSTextCheckingTypes checkingTypes, out NSError? error);
+    [Selector("initWithTypes:error:")]
+    public Self? InitWithTypesError(NSTextCheckingTypes checkingTypes, out NSError? error);
 }
 
 #endif

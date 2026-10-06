@@ -48,11 +48,16 @@ public enum NSTrackingAreaOptions : ulong
 
 public extern objc class NSTrackingArea : NSObject, NSCopying, NSCoding
 {
-    [Selector("rect")] public NSRect Rect { get; }
-    [Selector("options")] public NSTrackingAreaOptions Options { get; }
-    [Selector("owner")] public AnyObject? Owner { get; }
-    [Selector("userInfo")] public NSDictionary? UserInfo { get; }
-    [Selector("initWithRect:options:owner:userInfo:")] public Self InitWithRectOptionsOwnerUserInfo(NSRect rect, NSTrackingAreaOptions options, AnyObject? owner, NSDictionary? userInfo);
+    [Selector("rect")]
+    public NSRect Rect { get; }
+    [Selector("options")]
+    public NSTrackingAreaOptions Options { get; }
+    [Selector("owner")]
+    public AnyObject? Owner { get; }
+    [Selector("userInfo")]
+    public NSDictionary? UserInfo { get; }
+    [Selector("initWithRect:options:owner:userInfo:")]
+    public Self InitWithRectOptionsOwnerUserInfo(NSRect rect, NSTrackingAreaOptions options, AnyObject? owner, NSDictionary? userInfo);
 }
 
 #endif

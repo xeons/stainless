@@ -35,27 +35,48 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.10.
 public extern objc class NSForm : NSMatrix
 {
-    [Selector("indexOfSelectedItem")] public NSInteger IndexOfSelectedItem();
-    [Selector("setEntryWidth:")] public void SetEntryWidth(CGFloat width);
-    [Selector("setInterlineSpacing:")] public void SetInterlineSpacing(CGFloat spacing);
-    [Selector("setBordered:")] public void SetBordered(bool flag);
-    [Selector("setBezeled:")] public void SetBezeled(bool flag);
-    [Selector("setTitleAlignment:")] public void SetTitleAlignment(NSTextAlignment mode);
-    [Selector("setTextAlignment:")] public void SetTextAlignment(NSTextAlignment mode);
-    [Selector("setTitleFont:")] public void SetTitleFont(NSFont fontObj);
-    [Selector("setTextFont:")] public void SetTextFont(NSFont fontObj);
-    [Selector("cellAtIndex:")] public AnyObject? CellAtIndex(NSInteger index);
-    [Selector("drawCellAtIndex:")] public void DrawCellAtIndex(NSInteger index);
-    [Selector("addEntry:")] public NSFormCell AddEntry(NSString title);
-    [Selector("insertEntry:atIndex:")] public NSFormCell? InsertEntryAtIndex(NSString title, NSInteger index);
-    [Selector("removeEntryAtIndex:")] public void RemoveEntryAtIndex(NSInteger index);
-    [Selector("indexOfCellWithTag:")] public NSInteger IndexOfCellWithTag(NSInteger tag);
-    [Selector("selectTextAtIndex:")] public void SelectTextAtIndex(NSInteger index);
-    [Selector("setFrameSize:")] public void SetFrameSize(NSSize newSize);
-    [Selector("setTitleBaseWritingDirection:")] public void SetTitleBaseWritingDirection(NSWritingDirection writingDirection);
-    [Selector("setTextBaseWritingDirection:")] public void SetTextBaseWritingDirection(NSWritingDirection writingDirection);
-    [Selector("setPreferredTextFieldWidth:")] public void SetPreferredTextFieldWidth(CGFloat preferredWidth);
-    [Selector("preferredTextFieldWidth")] public CGFloat PreferredTextFieldWidth();
+    [Selector("indexOfSelectedItem")]
+    public NSInteger IndexOfSelectedItem();
+    [Selector("setEntryWidth:")]
+    public void SetEntryWidth(CGFloat width);
+    [Selector("setInterlineSpacing:")]
+    public void SetInterlineSpacing(CGFloat spacing);
+    [Selector("setBordered:")]
+    public void SetBordered(bool flag);
+    [Selector("setBezeled:")]
+    public void SetBezeled(bool flag);
+    [Selector("setTitleAlignment:")]
+    public void SetTitleAlignment(NSTextAlignment mode);
+    [Selector("setTextAlignment:")]
+    public void SetTextAlignment(NSTextAlignment mode);
+    [Selector("setTitleFont:")]
+    public void SetTitleFont(NSFont fontObj);
+    [Selector("setTextFont:")]
+    public void SetTextFont(NSFont fontObj);
+    [Selector("cellAtIndex:")]
+    public AnyObject? CellAtIndex(NSInteger index);
+    [Selector("drawCellAtIndex:")]
+    public void DrawCellAtIndex(NSInteger index);
+    [Selector("addEntry:")]
+    public NSFormCell AddEntry(NSString title);
+    [Selector("insertEntry:atIndex:")]
+    public NSFormCell? InsertEntryAtIndex(NSString title, NSInteger index);
+    [Selector("removeEntryAtIndex:")]
+    public void RemoveEntryAtIndex(NSInteger index);
+    [Selector("indexOfCellWithTag:")]
+    public NSInteger IndexOfCellWithTag(NSInteger tag);
+    [Selector("selectTextAtIndex:")]
+    public void SelectTextAtIndex(NSInteger index);
+    [Selector("setFrameSize:")]
+    public void SetFrameSize(NSSize newSize);
+    [Selector("setTitleBaseWritingDirection:")]
+    public void SetTitleBaseWritingDirection(NSWritingDirection writingDirection);
+    [Selector("setTextBaseWritingDirection:")]
+    public void SetTextBaseWritingDirection(NSWritingDirection writingDirection);
+    [Selector("setPreferredTextFieldWidth:")]
+    public void SetPreferredTextFieldWidth(CGFloat preferredWidth);
+    [Selector("preferredTextFieldWidth")]
+    public CGFloat PreferredTextFieldWidth();
 }
 
 #endif

@@ -25,14 +25,18 @@ public extern objc class NSObject { }
 
 public extern objc class NSString : NSObject
 {
-    [Selector("length")] public nuint Length { get; }
+    [Selector("length")]
+    public nuint Length { get; }
 }
 
-[ReturnsRetained] extern "C" CFStringRef CFStringCreateWithCString(void* allocator, byte* text, uint encoding);
-[ReturnsRetained] extern "C" CFMutableStringRef CFStringCreateMutable(void* allocator, long most);
+[ReturnsRetained]
+extern "C" CFStringRef CFStringCreateWithCString(void* allocator, byte* text, uint encoding);
+[ReturnsRetained]
+extern "C" CFMutableStringRef CFStringCreateMutable(void* allocator, long most);
 extern "C" void CFStringAppendCString(CFMutableStringRef text, byte* more, uint encoding);
 extern "C" long CFStringGetLength(CFStringRef text);
-[ReturnsRetained] extern "C" CFNumberRef CFNumberCreate(void* allocator, long type, void* value);
+[ReturnsRetained]
+extern "C" CFNumberRef CFNumberCreate(void* allocator, long type, void* value);
 extern "C" long CFGetRetainCount(CFTypeRef cf);
 
 const uint Utf8 = 0x08000100;

@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class HKWorkoutEffortRelationship : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("workout")] public HKWorkout Workout { get; }
-    [Selector("activity")] public HKWorkoutActivity? Activity { get; }
-    [Selector("samples")] public NSArray? Samples { get; }
+    [Selector("workout")]
+    public HKWorkout Workout { get; }
+    [Selector("activity")]
+    public HKWorkoutActivity? Activity { get; }
+    [Selector("samples")]
+    public NSArray? Samples { get; }
 }
 
 public enum HKWorkoutEffortRelationshipQueryOptions : long
@@ -48,7 +51,8 @@ public objc closure void HKWorkoutEffortRelationshipQueryInitWithPredicateAnchor
 
 public extern objc class HKWorkoutEffortRelationshipQuery : HKQuery
 {
-    [Selector("initWithPredicate:anchor:options:resultsHandler:")] public Self InitWithPredicateAnchorOptionsResultsHandler(NSPredicate? predicate, HKQueryAnchor? anchor, HKWorkoutEffortRelationshipQueryOptions options, HKWorkoutEffortRelationshipQueryInitWithPredicateAnchorOptionsResultsHandlerResultsHandlerBlock resultsHandler);
+    [Selector("initWithPredicate:anchor:options:resultsHandler:")]
+    public Self InitWithPredicateAnchorOptionsResultsHandler(NSPredicate? predicate, HKQueryAnchor? anchor, HKWorkoutEffortRelationshipQueryOptions options, HKWorkoutEffortRelationshipQueryInitWithPredicateAnchorOptionsResultsHandlerResultsHandlerBlock resultsHandler);
 }
 
 #endif

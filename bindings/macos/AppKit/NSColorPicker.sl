@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class NSColorPicker : NSObject, NSColorPickingDefault
 {
-    [Selector("colorPanel")] public NSColorPanel ColorPanel { get; }
-    [Selector("provideNewButtonImage")] public NSImage ProvideNewButtonImage { get; }
-    [Selector("buttonToolTip")] public NSString ButtonToolTip { get; }
-    [Selector("minContentSize")] public NSSize MinContentSize { get; }
-    [Selector("initWithPickerMask:colorPanel:")] public Self? InitWithPickerMaskColorPanel(NSUInteger mask, NSColorPanel owningColorPanel);
-    [Selector("insertNewButtonImage:in:")] public void InsertNewButtonImageIn(NSImage newButtonImage, NSButtonCell buttonCell);
-    [Selector("viewSizeChanged:")] public void ViewSizeChanged(AnyObject? sender);
-    [Selector("attachColorList:")] public void AttachColorList(NSColorList colorList);
-    [Selector("detachColorList:")] public void DetachColorList(NSColorList colorList);
-    [Selector("setMode:")] public void SetMode(NSColorPanelMode mode);
+    [Selector("colorPanel")]
+    public NSColorPanel ColorPanel { get; }
+    [Selector("provideNewButtonImage")]
+    public NSImage ProvideNewButtonImage { get; }
+    [Selector("buttonToolTip")]
+    public NSString ButtonToolTip { get; }
+    [Selector("minContentSize")]
+    public NSSize MinContentSize { get; }
+    [Selector("initWithPickerMask:colorPanel:")]
+    public Self? InitWithPickerMaskColorPanel(NSUInteger mask, NSColorPanel owningColorPanel);
+    [Selector("insertNewButtonImage:in:")]
+    public void InsertNewButtonImageIn(NSImage newButtonImage, NSButtonCell buttonCell);
+    [Selector("viewSizeChanged:")]
+    public void ViewSizeChanged(AnyObject? sender);
+    [Selector("attachColorList:")]
+    public void AttachColorList(NSColorList colorList);
+    [Selector("detachColorList:")]
+    public void DetachColorList(NSColorList colorList);
+    [Selector("setMode:")]
+    public void SetMode(NSColorPanelMode mode);
 }
 
 #endif

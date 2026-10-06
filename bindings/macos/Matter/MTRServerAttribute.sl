@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class MTRServerAttribute : NSObject
 {
-    [Selector("attributeID")] public NSNumber AttributeID { get; }
-    [Selector("value")] public NSDictionary Value { get; }
-    [Selector("requiredReadPrivilege")] public MTRAccessControlEntryPrivilege RequiredReadPrivilege { get; }
-    [Selector("isWritable")] public bool Writable { get; }
-    [Selector("initReadonlyAttributeWithID:initialValue:requiredPrivilege:")] public Self? InitReadonlyAttributeWithIDInitialValueRequiredPrivilege(NSNumber attributeID, NSDictionary value, MTRAccessControlEntryPrivilege requiredPrivilege);
-    [Selector("setValue:")] public bool SetValue(NSDictionary value);
-    [Selector("newFeatureMapAttributeWithInitialValue:")] public static MTRServerAttribute NewFeatureMapAttributeWithInitialValue(NSNumber value);
+    [Selector("attributeID")]
+    public NSNumber AttributeID { get; }
+    [Selector("value")]
+    public NSDictionary Value { get; }
+    [Selector("requiredReadPrivilege")]
+    public MTRAccessControlEntryPrivilege RequiredReadPrivilege { get; }
+    [Selector("isWritable")]
+    public bool Writable { get; }
+    [Selector("initReadonlyAttributeWithID:initialValue:requiredPrivilege:")]
+    public Self? InitReadonlyAttributeWithIDInitialValueRequiredPrivilege(NSNumber attributeID, NSDictionary value, MTRAccessControlEntryPrivilege requiredPrivilege);
+    [Selector("setValue:")]
+    public bool SetValue(NSDictionary value);
+    [Selector("newFeatureMapAttributeWithInitialValue:")]
+    public static MTRServerAttribute NewFeatureMapAttributeWithInitialValue(NSNumber value);
 }
 
 #endif

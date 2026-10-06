@@ -34,16 +34,24 @@ import Standard.ObjC;
 
 public extern objc class VNDetectTrajectoriesRequest : VNStatefulRequest
 {
-    [Selector("trajectoryLength")] public NSInteger TrajectoryLength { get; }
-    [Selector("objectMinimumNormalizedRadius", "setObjectMinimumNormalizedRadius:")] public float ObjectMinimumNormalizedRadius { get; set; }
+    [Selector("trajectoryLength")]
+    public NSInteger TrajectoryLength { get; }
+    [Selector("objectMinimumNormalizedRadius", "setObjectMinimumNormalizedRadius:")]
+    public float ObjectMinimumNormalizedRadius { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("minimumObjectSize", "setMinimumObjectSize:")] public float MinimumObjectSize { get; set; }
-    [Selector("objectMaximumNormalizedRadius", "setObjectMaximumNormalizedRadius:")] public float ObjectMaximumNormalizedRadius { get; set; }
+    [Selector("minimumObjectSize", "setMinimumObjectSize:")]
+    public float MinimumObjectSize { get; set; }
+    [Selector("objectMaximumNormalizedRadius", "setObjectMaximumNormalizedRadius:")]
+    public float ObjectMaximumNormalizedRadius { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("maximumObjectSize", "setMaximumObjectSize:")] public float MaximumObjectSize { get; set; }
-    [Selector("targetFrameTime", "setTargetFrameTime:")] public CMTime TargetFrameTime { get; set; }
-    [Selector("results")] public NSArray? Results { get; }
-    [Selector("initWithFrameAnalysisSpacing:trajectoryLength:completionHandler:")] public Self InitWithFrameAnalysisSpacingTrajectoryLengthCompletionHandler(CMTime frameAnalysisSpacing, NSInteger trajectoryLength, VNRequestCompletionHandler? completionHandler);
+    [Selector("maximumObjectSize", "setMaximumObjectSize:")]
+    public float MaximumObjectSize { get; set; }
+    [Selector("targetFrameTime", "setTargetFrameTime:")]
+    public CMTime TargetFrameTime { get; set; }
+    [Selector("results")]
+    public NSArray? Results { get; }
+    [Selector("initWithFrameAnalysisSpacing:trajectoryLength:completionHandler:")]
+    public Self InitWithFrameAnalysisSpacingTrajectoryLengthCompletionHandler(CMTime frameAnalysisSpacing, NSInteger trajectoryLength, VNRequestCompletionHandler? completionHandler);
 }
 
 #endif

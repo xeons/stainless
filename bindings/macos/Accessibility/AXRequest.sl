@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class AXRequest : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("currentRequest")] public static AXRequest? CurrentRequest { get; }
-    [Selector("technology")] public AXTechnology Technology { get; }
+    [Selector("currentRequest")]
+    public static AXRequest? CurrentRequest { get; }
+    [Selector("technology")]
+    public AXTechnology Technology { get; }
 }
 
 #endif

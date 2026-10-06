@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class DRMSFFormatter : NSFormatter
 {
-    [Selector("initWithFormat:")] public AnyObject? InitWithFormat(NSString? format);
-    [Selector("format")] public NSString? Format();
-    [Selector("setFormat:")] public void SetFormat(NSString? format);
+    [Selector("initWithFormat:")]
+    public AnyObject? InitWithFormat(NSString? format);
+    [Selector("format")]
+    public NSString? Format();
+    [Selector("setFormat:")]
+    public void SetFormat(NSString? format);
 }
 
 #endif

@@ -33,18 +33,30 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCInstanceNormalizationLayer : MLCLayer
 {
-    [Selector("featureChannelCount")] public NSUInteger FeatureChannelCount { get; }
-    [Selector("mean")] public MLCTensor? Mean { get; }
-    [Selector("variance")] public MLCTensor? Variance { get; }
-    [Selector("beta")] public MLCTensor? Beta { get; }
-    [Selector("gamma")] public MLCTensor? Gamma { get; }
-    [Selector("betaParameter")] public MLCTensorParameter? BetaParameter { get; }
-    [Selector("gammaParameter")] public MLCTensorParameter? GammaParameter { get; }
-    [Selector("varianceEpsilon")] public float VarianceEpsilon { get; }
-    [Selector("momentum")] public float Momentum { get; }
-    [Selector("layerWithFeatureChannelCount:beta:gamma:varianceEpsilon:")] public static Self? LayerWithFeatureChannelCountBetaGammaVarianceEpsilon(NSUInteger featureChannelCount, MLCTensor? beta, MLCTensor? gamma, float varianceEpsilon);
-    [Selector("layerWithFeatureChannelCount:beta:gamma:varianceEpsilon:momentum:")] public static Self? LayerWithFeatureChannelCountBetaGammaVarianceEpsilonMomentum(NSUInteger featureChannelCount, MLCTensor? beta, MLCTensor? gamma, float varianceEpsilon, float momentum);
-    [Selector("layerWithFeatureChannelCount:mean:variance:beta:gamma:varianceEpsilon:momentum:")] public static Self? LayerWithFeatureChannelCountMeanVarianceBetaGammaVarianceEpsilonMomentum(NSUInteger featureChannelCount, MLCTensor mean, MLCTensor variance, MLCTensor? beta, MLCTensor? gamma, float varianceEpsilon, float momentum);
+    [Selector("featureChannelCount")]
+    public NSUInteger FeatureChannelCount { get; }
+    [Selector("mean")]
+    public MLCTensor? Mean { get; }
+    [Selector("variance")]
+    public MLCTensor? Variance { get; }
+    [Selector("beta")]
+    public MLCTensor? Beta { get; }
+    [Selector("gamma")]
+    public MLCTensor? Gamma { get; }
+    [Selector("betaParameter")]
+    public MLCTensorParameter? BetaParameter { get; }
+    [Selector("gammaParameter")]
+    public MLCTensorParameter? GammaParameter { get; }
+    [Selector("varianceEpsilon")]
+    public float VarianceEpsilon { get; }
+    [Selector("momentum")]
+    public float Momentum { get; }
+    [Selector("layerWithFeatureChannelCount:beta:gamma:varianceEpsilon:")]
+    public static Self? LayerWithFeatureChannelCountBetaGammaVarianceEpsilon(NSUInteger featureChannelCount, MLCTensor? beta, MLCTensor? gamma, float varianceEpsilon);
+    [Selector("layerWithFeatureChannelCount:beta:gamma:varianceEpsilon:momentum:")]
+    public static Self? LayerWithFeatureChannelCountBetaGammaVarianceEpsilonMomentum(NSUInteger featureChannelCount, MLCTensor? beta, MLCTensor? gamma, float varianceEpsilon, float momentum);
+    [Selector("layerWithFeatureChannelCount:mean:variance:beta:gamma:varianceEpsilon:momentum:")]
+    public static Self? LayerWithFeatureChannelCountMeanVarianceBetaGammaVarianceEpsilonMomentum(NSUInteger featureChannelCount, MLCTensor mean, MLCTensor variance, MLCTensor? beta, MLCTensor? gamma, float varianceEpsilon, float momentum);
 }
 
 #endif

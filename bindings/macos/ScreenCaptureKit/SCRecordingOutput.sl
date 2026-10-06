@@ -35,25 +35,39 @@ import Standard.ObjC;
 
 public extern objc class SCRecordingOutputConfiguration : NSObject
 {
-    [Selector("outputURL", "setOutputURL:")] public NSURL OutputURL { get; set; }
-    [Selector("videoCodecType", "setVideoCodecType:")] public AVVideoCodecType VideoCodecType { get; set; }
-    [Selector("outputFileType", "setOutputFileType:")] public AVFileType OutputFileType { get; set; }
-    [Selector("availableVideoCodecTypes")] public NSArray AvailableVideoCodecTypes { get; }
-    [Selector("availableOutputFileTypes")] public NSArray AvailableOutputFileTypes { get; }
+    [Selector("outputURL", "setOutputURL:")]
+    public NSURL OutputURL { get; set; }
+    [Selector("videoCodecType", "setVideoCodecType:")]
+    public AVVideoCodecType VideoCodecType { get; set; }
+    [Selector("outputFileType", "setOutputFileType:")]
+    public AVFileType OutputFileType { get; set; }
+    [Selector("availableVideoCodecTypes")]
+    public NSArray AvailableVideoCodecTypes { get; }
+    [Selector("availableOutputFileTypes")]
+    public NSArray AvailableOutputFileTypes { get; }
 }
 
 public objc interface SCRecordingOutputDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("recordingOutputDidStartRecording:")] void RecordingOutputDidStartRecording(SCRecordingOutput recordingOutput);
-    [Optional] [Selector("recordingOutput:didFailWithError:")] void RecordingOutputDidFailWithError(SCRecordingOutput recordingOutput, NSError error);
-    [Optional] [Selector("recordingOutputDidFinishRecording:")] void RecordingOutputDidFinishRecording(SCRecordingOutput recordingOutput);
+    [Optional]
+    [Selector("recordingOutputDidStartRecording:")]
+    void RecordingOutputDidStartRecording(SCRecordingOutput recordingOutput);
+    [Optional]
+    [Selector("recordingOutput:didFailWithError:")]
+    void RecordingOutputDidFailWithError(SCRecordingOutput recordingOutput, NSError error);
+    [Optional]
+    [Selector("recordingOutputDidFinishRecording:")]
+    void RecordingOutputDidFinishRecording(SCRecordingOutput recordingOutput);
 }
 
 public extern objc class SCRecordingOutput : NSObject
 {
-    [Selector("recordedDuration")] public CMTime RecordedDuration { get; }
-    [Selector("recordedFileSize")] public NSInteger RecordedFileSize { get; }
-    [Selector("initWithConfiguration:delegate:")] public Self InitWithConfigurationDelegate(SCRecordingOutputConfiguration recordingOutputConfiguration, SCRecordingOutputDelegate @delegate);
+    [Selector("recordedDuration")]
+    public CMTime RecordedDuration { get; }
+    [Selector("recordedFileSize")]
+    public NSInteger RecordedFileSize { get; }
+    [Selector("initWithConfiguration:delegate:")]
+    public Self InitWithConfigurationDelegate(SCRecordingOutputConfiguration recordingOutputConfiguration, SCRecordingOutputDelegate @delegate);
 }
 
 #endif

@@ -44,13 +44,20 @@ public extern "C" NSString? NSPersistentCloudKitContainerEventUserInfoKey;
 
 public extern objc class NSPersistentCloudKitContainerEvent : NSObject, NSCopying
 {
-    [Selector("identifier")] public NSUUID Identifier { get; }
-    [Selector("storeIdentifier")] public NSString StoreIdentifier { get; }
-    [Selector("type")] public NSPersistentCloudKitContainerEventType Type { get; }
-    [Selector("startDate")] public NSDate StartDate { get; }
-    [Selector("endDate")] public NSDate? EndDate { get; }
-    [Selector("succeeded")] public bool Succeeded { get; }
-    [Selector("error")] public NSError? Error { get; }
+    [Selector("identifier")]
+    public NSUUID Identifier { get; }
+    [Selector("storeIdentifier")]
+    public NSString StoreIdentifier { get; }
+    [Selector("type")]
+    public NSPersistentCloudKitContainerEventType Type { get; }
+    [Selector("startDate")]
+    public NSDate StartDate { get; }
+    [Selector("endDate")]
+    public NSDate? EndDate { get; }
+    [Selector("succeeded")]
+    public bool Succeeded { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
 }
 
 #endif

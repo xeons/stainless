@@ -45,7 +45,8 @@ public extern "C" void CMRemoveAttachment(CMAttachmentBearerRef target, CFString
 
 public extern "C" void CMRemoveAllAttachments(CMAttachmentBearerRef target);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CMCopyDictionaryOfAttachments(CFAllocatorRef? allocator, CMAttachmentBearerRef target, CMAttachmentMode attachmentMode);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CMCopyDictionaryOfAttachments(CFAllocatorRef? allocator, CMAttachmentBearerRef target, CMAttachmentMode attachmentMode);
 
 public extern "C" void CMSetAttachments(CMAttachmentBearerRef target, CFDictionaryRef theAttachments, CMAttachmentMode attachmentMode);
 

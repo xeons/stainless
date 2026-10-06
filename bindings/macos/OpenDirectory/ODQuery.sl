@@ -33,19 +33,28 @@ import Standard.ObjC;
 
 public objc interface ODQueryDelegate : NSObjectProtocol
 {
-    [Selector("query:foundResults:error:")] void QueryFoundResultsError(ODQuery? inQuery, NSArray? inResults, NSError? inError);
+    [Selector("query:foundResults:error:")]
+    void QueryFoundResultsError(ODQuery? inQuery, NSArray? inResults, NSError? inError);
 }
 
 public extern objc class ODQuery : NSObject, NSCopying
 {
-    [Selector("delegate", "setDelegate:")] public ODQueryDelegate? Delegate { get; set; }
-    [Selector("operationQueue", "setOperationQueue:")] public NSOperationQueue? OperationQueue { get; set; }
-    [Selector("queryWithNode:forRecordTypes:attribute:matchType:queryValues:returnAttributes:maximumResults:error:")] public static ODQuery? QueryWithNodeForRecordTypesAttributeMatchTypeQueryValuesReturnAttributesMaximumResultsError(ODNode? inNode, AnyObject? inRecordTypeOrList, ODAttributeType? inAttribute, ODMatchType inMatchType, AnyObject? inQueryValueOrList, AnyObject? inReturnAttributeOrList, NSInteger inMaximumResults, out NSError? outError);
-    [Selector("initWithNode:forRecordTypes:attribute:matchType:queryValues:returnAttributes:maximumResults:error:")] public Self? InitWithNodeForRecordTypesAttributeMatchTypeQueryValuesReturnAttributesMaximumResultsError(ODNode? inNode, AnyObject? inRecordTypeOrList, ODAttributeType? inAttribute, ODMatchType inMatchType, AnyObject? inQueryValueOrList, AnyObject? inReturnAttributeOrList, NSInteger inMaximumResults, out NSError? outError);
-    [Selector("resultsAllowingPartial:error:")] public NSArray? ResultsAllowingPartialError(bool inAllowPartialResults, out NSError? outError);
-    [Selector("scheduleInRunLoop:forMode:")] public void ScheduleInRunLoopForMode(NSRunLoop? inRunLoop, NSString? inMode);
-    [Selector("removeFromRunLoop:forMode:")] public void RemoveFromRunLoopForMode(NSRunLoop? inRunLoop, NSString? inMode);
-    [Selector("synchronize")] public void Synchronize();
+    [Selector("delegate", "setDelegate:")]
+    public ODQueryDelegate? Delegate { get; set; }
+    [Selector("operationQueue", "setOperationQueue:")]
+    public NSOperationQueue? OperationQueue { get; set; }
+    [Selector("queryWithNode:forRecordTypes:attribute:matchType:queryValues:returnAttributes:maximumResults:error:")]
+    public static ODQuery? QueryWithNodeForRecordTypesAttributeMatchTypeQueryValuesReturnAttributesMaximumResultsError(ODNode? inNode, AnyObject? inRecordTypeOrList, ODAttributeType? inAttribute, ODMatchType inMatchType, AnyObject? inQueryValueOrList, AnyObject? inReturnAttributeOrList, NSInteger inMaximumResults, out NSError? outError);
+    [Selector("initWithNode:forRecordTypes:attribute:matchType:queryValues:returnAttributes:maximumResults:error:")]
+    public Self? InitWithNodeForRecordTypesAttributeMatchTypeQueryValuesReturnAttributesMaximumResultsError(ODNode? inNode, AnyObject? inRecordTypeOrList, ODAttributeType? inAttribute, ODMatchType inMatchType, AnyObject? inQueryValueOrList, AnyObject? inReturnAttributeOrList, NSInteger inMaximumResults, out NSError? outError);
+    [Selector("resultsAllowingPartial:error:")]
+    public NSArray? ResultsAllowingPartialError(bool inAllowPartialResults, out NSError? outError);
+    [Selector("scheduleInRunLoop:forMode:")]
+    public void ScheduleInRunLoopForMode(NSRunLoop? inRunLoop, NSString? inMode);
+    [Selector("removeFromRunLoop:forMode:")]
+    public void RemoveFromRunLoopForMode(NSRunLoop? inRunLoop, NSString? inMode);
+    [Selector("synchronize")]
+    public void Synchronize();
 }
 
 #endif

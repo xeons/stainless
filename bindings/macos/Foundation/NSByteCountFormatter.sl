@@ -55,20 +55,34 @@ public enum NSByteCountFormatterCountStyle : long
 
 public extern objc class NSByteCountFormatter : NSFormatter
 {
-    [Selector("allowedUnits", "setAllowedUnits:")] public NSByteCountFormatterUnits AllowedUnits { get; set; }
-    [Selector("countStyle", "setCountStyle:")] public NSByteCountFormatterCountStyle CountStyle { get; set; }
-    [Selector("allowsNonnumericFormatting", "setAllowsNonnumericFormatting:")] public bool AllowsNonnumericFormatting { get; set; }
-    [Selector("includesUnit", "setIncludesUnit:")] public bool IncludesUnit { get; set; }
-    [Selector("includesCount", "setIncludesCount:")] public bool IncludesCount { get; set; }
-    [Selector("includesActualByteCount", "setIncludesActualByteCount:")] public bool IncludesActualByteCount { get; set; }
-    [Selector("isAdaptive", "setAdaptive:")] public bool Adaptive { get; set; }
-    [Selector("zeroPadsFractionDigits", "setZeroPadsFractionDigits:")] public bool ZeroPadsFractionDigits { get; set; }
-    [Selector("formattingContext", "setFormattingContext:")] public NSFormattingContext FormattingContext { get; set; }
-    [Selector("stringFromByteCount:countStyle:")] public static NSString StringFromByteCountCountStyle(long byteCount, NSByteCountFormatterCountStyle countStyle);
-    [Selector("stringFromByteCount:")] public NSString StringFromByteCount(long byteCount);
-    [Selector("stringFromMeasurement:countStyle:")] public static NSString StringFromMeasurementCountStyle(NSMeasurement measurement, NSByteCountFormatterCountStyle countStyle);
-    [Selector("stringFromMeasurement:")] public NSString StringFromMeasurement(NSMeasurement measurement);
-    [Selector("stringForObjectValue:")] public NSString? StringForObjectValue(AnyObject? obj);
+    [Selector("allowedUnits", "setAllowedUnits:")]
+    public NSByteCountFormatterUnits AllowedUnits { get; set; }
+    [Selector("countStyle", "setCountStyle:")]
+    public NSByteCountFormatterCountStyle CountStyle { get; set; }
+    [Selector("allowsNonnumericFormatting", "setAllowsNonnumericFormatting:")]
+    public bool AllowsNonnumericFormatting { get; set; }
+    [Selector("includesUnit", "setIncludesUnit:")]
+    public bool IncludesUnit { get; set; }
+    [Selector("includesCount", "setIncludesCount:")]
+    public bool IncludesCount { get; set; }
+    [Selector("includesActualByteCount", "setIncludesActualByteCount:")]
+    public bool IncludesActualByteCount { get; set; }
+    [Selector("isAdaptive", "setAdaptive:")]
+    public bool Adaptive { get; set; }
+    [Selector("zeroPadsFractionDigits", "setZeroPadsFractionDigits:")]
+    public bool ZeroPadsFractionDigits { get; set; }
+    [Selector("formattingContext", "setFormattingContext:")]
+    public NSFormattingContext FormattingContext { get; set; }
+    [Selector("stringFromByteCount:countStyle:")]
+    public static NSString StringFromByteCountCountStyle(long byteCount, NSByteCountFormatterCountStyle countStyle);
+    [Selector("stringFromByteCount:")]
+    public NSString StringFromByteCount(long byteCount);
+    [Selector("stringFromMeasurement:countStyle:")]
+    public static NSString StringFromMeasurementCountStyle(NSMeasurement measurement, NSByteCountFormatterCountStyle countStyle);
+    [Selector("stringFromMeasurement:")]
+    public NSString StringFromMeasurement(NSMeasurement measurement);
+    [Selector("stringForObjectValue:")]
+    public NSString? StringForObjectValue(AnyObject? obj);
 }
 
 #endif

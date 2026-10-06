@@ -31,13 +31,20 @@ import Standard.ObjC;
 
 public extern objc class GCControllerButtonInput : GCControllerElement
 {
-    [Selector("valueChangedHandler", "setValueChangedHandler:")] public GCControllerButtonValueChangedHandler? ValueChangedHandler { get; set; }
-    [Selector("pressedChangedHandler", "setPressedChangedHandler:")] public GCControllerButtonValueChangedHandler? PressedChangedHandler { get; set; }
-    [Selector("touchedChangedHandler", "setTouchedChangedHandler:")] public GCControllerButtonTouchedChangedHandler? TouchedChangedHandler { get; set; }
-    [Selector("value")] public float Value { get; }
-    [Selector("isPressed")] public bool Pressed { get; }
-    [Selector("isTouched")] public bool Touched { get; }
-    [Selector("setValue:")] public void SetValue(float value);
+    [Selector("valueChangedHandler", "setValueChangedHandler:")]
+    public GCControllerButtonValueChangedHandler? ValueChangedHandler { get; set; }
+    [Selector("pressedChangedHandler", "setPressedChangedHandler:")]
+    public GCControllerButtonValueChangedHandler? PressedChangedHandler { get; set; }
+    [Selector("touchedChangedHandler", "setTouchedChangedHandler:")]
+    public GCControllerButtonTouchedChangedHandler? TouchedChangedHandler { get; set; }
+    [Selector("value")]
+    public float Value { get; }
+    [Selector("isPressed")]
+    public bool Pressed { get; }
+    [Selector("isTouched")]
+    public bool Touched { get; }
+    [Selector("setValue:")]
+    public void SetValue(float value);
 }
 
 public objc closure void GCControllerButtonValueChangedHandler(GCControllerButtonInput arg0, float arg1, bool arg2);

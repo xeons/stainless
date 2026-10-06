@@ -38,19 +38,32 @@ public enum NSProgressIndicatorStyle : ulong
 
 public extern objc class NSProgressIndicator : NSView, NSAccessibilityProgressIndicator
 {
-    [Selector("isIndeterminate", "setIndeterminate:")] public bool Indeterminate { get; set; }
-    [Selector("controlSize", "setControlSize:")] public NSControlSize ControlSize { get; set; }
-    [Selector("doubleValue", "setDoubleValue:")] public double DoubleValue { get; set; }
-    [Selector("minValue", "setMinValue:")] public double MinValue { get; set; }
-    [Selector("maxValue", "setMaxValue:")] public double MaxValue { get; set; }
-    [Selector("observedProgress", "setObservedProgress:")] public NSProgress? ObservedProgress { get; set; }
-    [Selector("usesThreadedAnimation", "setUsesThreadedAnimation:")] public bool UsesThreadedAnimation { get; set; }
-    [Selector("style", "setStyle:")] public NSProgressIndicatorStyle Style { get; set; }
-    [Selector("isDisplayedWhenStopped", "setDisplayedWhenStopped:")] public bool DisplayedWhenStopped { get; set; }
-    [Selector("incrementBy:")] public void IncrementBy(double delta);
-    [Selector("startAnimation:")] public void StartAnimation(AnyObject? sender);
-    [Selector("stopAnimation:")] public void StopAnimation(AnyObject? sender);
-    [Selector("sizeToFit")] public void SizeToFit();
+    [Selector("isIndeterminate", "setIndeterminate:")]
+    public bool Indeterminate { get; set; }
+    [Selector("controlSize", "setControlSize:")]
+    public NSControlSize ControlSize { get; set; }
+    [Selector("doubleValue", "setDoubleValue:")]
+    public double DoubleValue { get; set; }
+    [Selector("minValue", "setMinValue:")]
+    public double MinValue { get; set; }
+    [Selector("maxValue", "setMaxValue:")]
+    public double MaxValue { get; set; }
+    [Selector("observedProgress", "setObservedProgress:")]
+    public NSProgress? ObservedProgress { get; set; }
+    [Selector("usesThreadedAnimation", "setUsesThreadedAnimation:")]
+    public bool UsesThreadedAnimation { get; set; }
+    [Selector("style", "setStyle:")]
+    public NSProgressIndicatorStyle Style { get; set; }
+    [Selector("isDisplayedWhenStopped", "setDisplayedWhenStopped:")]
+    public bool DisplayedWhenStopped { get; set; }
+    [Selector("incrementBy:")]
+    public void IncrementBy(double delta);
+    [Selector("startAnimation:")]
+    public void StartAnimation(AnyObject? sender);
+    [Selector("stopAnimation:")]
+    public void StopAnimation(AnyObject? sender);
+    [Selector("sizeToFit")]
+    public void SizeToFit();
 }
 
 /// Deprecated in macOS 10.14.
@@ -66,15 +79,20 @@ public enum NSProgressIndicatorThickness : ulong
 public extern objc class NSProgressIndicator
 {
     /// Deprecated in macOS 14.0.
-    [Selector("isBezeled", "setBezeled:")] public bool Bezeled { get; set; }
+    [Selector("isBezeled", "setBezeled:")]
+    public bool Bezeled { get; set; }
     /// Deprecated in macOS 14.0.
-    [Selector("controlTint", "setControlTint:")] public NSControlTint ControlTint { get; set; }
+    [Selector("controlTint", "setControlTint:")]
+    public NSControlTint ControlTint { get; set; }
     /// Deprecated in macOS 10.6.
-    [Selector("animationDelay")] public NSTimeInterval AnimationDelay();
+    [Selector("animationDelay")]
+    public NSTimeInterval AnimationDelay();
     /// Deprecated in macOS 10.6.
-    [Selector("setAnimationDelay:")] public void SetAnimationDelay(NSTimeInterval delay);
+    [Selector("setAnimationDelay:")]
+    public void SetAnimationDelay(NSTimeInterval delay);
     /// Deprecated in macOS 10.6.
-    [Selector("animate:")] public void Animate(AnyObject? sender);
+    [Selector("animate:")]
+    public void Animate(AnyObject? sender);
 }
 
 #endif

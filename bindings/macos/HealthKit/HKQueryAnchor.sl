@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class HKQueryAnchor : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("anchorFromValue:")] public static Self AnchorFromValue(NSUInteger value);
+    [Selector("anchorFromValue:")]
+    public static Self AnchorFromValue(NSUInteger value);
 }
 
 #endif

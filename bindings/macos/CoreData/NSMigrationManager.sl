@@ -33,24 +33,42 @@ import Standard.ObjC;
 
 public extern objc class NSMigrationManager : NSObject
 {
-    [Selector("usesStoreSpecificMigrationManager", "setUsesStoreSpecificMigrationManager:")] public bool UsesStoreSpecificMigrationManager { get; set; }
-    [Selector("mappingModel")] public NSMappingModel MappingModel { get; }
-    [Selector("sourceModel")] public NSManagedObjectModel SourceModel { get; }
-    [Selector("destinationModel")] public NSManagedObjectModel DestinationModel { get; }
-    [Selector("sourceContext")] public NSManagedObjectContext SourceContext { get; }
-    [Selector("destinationContext")] public NSManagedObjectContext DestinationContext { get; }
-    [Selector("currentEntityMapping")] public NSEntityMapping CurrentEntityMapping { get; }
-    [Selector("migrationProgress")] public float MigrationProgress { get; }
-    [Selector("userInfo", "setUserInfo:")] public NSDictionary? UserInfo { get; set; }
-    [Selector("initWithSourceModel:destinationModel:")] public Self InitWithSourceModelDestinationModel(NSManagedObjectModel sourceModel, NSManagedObjectModel destinationModel);
-    [Selector("migrateStoreFromURL:type:options:withMappingModel:toDestinationURL:destinationType:destinationOptions:error:")] public bool MigrateStoreFromURLTypeOptionsWithMappingModelToDestinationURLDestinationTypeDestinationOptionsError(NSURL sourceURL, NSString sStoreType, NSDictionary? sOptions, NSMappingModel? mappings, NSURL dURL, NSString dStoreType, NSDictionary? dOptions, out NSError? error);
-    [Selector("reset")] public void Reset();
-    [Selector("sourceEntityForEntityMapping:")] public NSEntityDescription? SourceEntityForEntityMapping(NSEntityMapping mEntity);
-    [Selector("destinationEntityForEntityMapping:")] public NSEntityDescription? DestinationEntityForEntityMapping(NSEntityMapping mEntity);
-    [Selector("associateSourceInstance:withDestinationInstance:forEntityMapping:")] public void AssociateSourceInstanceWithDestinationInstanceForEntityMapping(NSManagedObject sourceInstance, NSManagedObject destinationInstance, NSEntityMapping entityMapping);
-    [Selector("destinationInstancesForEntityMappingNamed:sourceInstances:")] public NSArray DestinationInstancesForEntityMappingNamedSourceInstances(NSString mappingName, NSArray? sourceInstances);
-    [Selector("sourceInstancesForEntityMappingNamed:destinationInstances:")] public NSArray SourceInstancesForEntityMappingNamedDestinationInstances(NSString mappingName, NSArray? destinationInstances);
-    [Selector("cancelMigrationWithError:")] public void CancelMigrationWithError(NSError error);
+    [Selector("usesStoreSpecificMigrationManager", "setUsesStoreSpecificMigrationManager:")]
+    public bool UsesStoreSpecificMigrationManager { get; set; }
+    [Selector("mappingModel")]
+    public NSMappingModel MappingModel { get; }
+    [Selector("sourceModel")]
+    public NSManagedObjectModel SourceModel { get; }
+    [Selector("destinationModel")]
+    public NSManagedObjectModel DestinationModel { get; }
+    [Selector("sourceContext")]
+    public NSManagedObjectContext SourceContext { get; }
+    [Selector("destinationContext")]
+    public NSManagedObjectContext DestinationContext { get; }
+    [Selector("currentEntityMapping")]
+    public NSEntityMapping CurrentEntityMapping { get; }
+    [Selector("migrationProgress")]
+    public float MigrationProgress { get; }
+    [Selector("userInfo", "setUserInfo:")]
+    public NSDictionary? UserInfo { get; set; }
+    [Selector("initWithSourceModel:destinationModel:")]
+    public Self InitWithSourceModelDestinationModel(NSManagedObjectModel sourceModel, NSManagedObjectModel destinationModel);
+    [Selector("migrateStoreFromURL:type:options:withMappingModel:toDestinationURL:destinationType:destinationOptions:error:")]
+    public bool MigrateStoreFromURLTypeOptionsWithMappingModelToDestinationURLDestinationTypeDestinationOptionsError(NSURL sourceURL, NSString sStoreType, NSDictionary? sOptions, NSMappingModel? mappings, NSURL dURL, NSString dStoreType, NSDictionary? dOptions, out NSError? error);
+    [Selector("reset")]
+    public void Reset();
+    [Selector("sourceEntityForEntityMapping:")]
+    public NSEntityDescription? SourceEntityForEntityMapping(NSEntityMapping mEntity);
+    [Selector("destinationEntityForEntityMapping:")]
+    public NSEntityDescription? DestinationEntityForEntityMapping(NSEntityMapping mEntity);
+    [Selector("associateSourceInstance:withDestinationInstance:forEntityMapping:")]
+    public void AssociateSourceInstanceWithDestinationInstanceForEntityMapping(NSManagedObject sourceInstance, NSManagedObject destinationInstance, NSEntityMapping entityMapping);
+    [Selector("destinationInstancesForEntityMappingNamed:sourceInstances:")]
+    public NSArray DestinationInstancesForEntityMappingNamedSourceInstances(NSString mappingName, NSArray? sourceInstances);
+    [Selector("sourceInstancesForEntityMappingNamed:destinationInstances:")]
+    public NSArray SourceInstancesForEntityMappingNamedDestinationInstances(NSString mappingName, NSArray? destinationInstances);
+    [Selector("cancelMigrationWithError:")]
+    public void CancelMigrationWithError(NSError error);
 }
 
 #endif

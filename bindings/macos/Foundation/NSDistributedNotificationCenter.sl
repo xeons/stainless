@@ -50,16 +50,26 @@ public enum NSDistributedNotificationOptions : ulong
 
 public extern objc class NSDistributedNotificationCenter : NSNotificationCenter
 {
-    [Selector("suspended", "setSuspended:")] public bool Suspended { get; set; }
-    [Selector("notificationCenterForType:")] public static NSDistributedNotificationCenter NotificationCenterForType(NSDistributedNotificationCenterType notificationCenterType);
-    [Selector("defaultCenter")] public static NSDistributedNotificationCenter DefaultCenter();
-    [Selector("addObserver:selector:name:object:suspensionBehavior:")] public void AddObserverSelectorNameObjectSuspensionBehavior(AnyObject observer, Selector selector, NSNotificationName? name, NSString? object, NSNotificationSuspensionBehavior suspensionBehavior);
-    [Selector("postNotificationName:object:userInfo:deliverImmediately:")] public void PostNotificationNameObjectUserInfoDeliverImmediately(NSNotificationName name, NSString? object, NSDictionary? userInfo, bool deliverImmediately);
-    [Selector("postNotificationName:object:userInfo:options:")] public void PostNotificationNameObjectUserInfoOptions(NSNotificationName name, NSString? object, NSDictionary? userInfo, NSDistributedNotificationOptions options);
-    [Selector("addObserver:selector:name:object:")] public void AddObserverSelectorNameObject(AnyObject observer, Selector aSelector, NSNotificationName? aName, NSString? anObject);
-    [Selector("postNotificationName:object:")] public void PostNotificationNameObject(NSNotificationName aName, NSString? anObject);
-    [Selector("postNotificationName:object:userInfo:")] public void PostNotificationNameObjectUserInfo(NSNotificationName aName, NSString? anObject, NSDictionary? aUserInfo);
-    [Selector("removeObserver:name:object:")] public void RemoveObserverNameObject(AnyObject observer, NSNotificationName? aName, NSString? anObject);
+    [Selector("suspended", "setSuspended:")]
+    public bool Suspended { get; set; }
+    [Selector("notificationCenterForType:")]
+    public static NSDistributedNotificationCenter NotificationCenterForType(NSDistributedNotificationCenterType notificationCenterType);
+    [Selector("defaultCenter")]
+    public static NSDistributedNotificationCenter DefaultCenter();
+    [Selector("addObserver:selector:name:object:suspensionBehavior:")]
+    public void AddObserverSelectorNameObjectSuspensionBehavior(AnyObject observer, Selector selector, NSNotificationName? name, NSString? object, NSNotificationSuspensionBehavior suspensionBehavior);
+    [Selector("postNotificationName:object:userInfo:deliverImmediately:")]
+    public void PostNotificationNameObjectUserInfoDeliverImmediately(NSNotificationName name, NSString? object, NSDictionary? userInfo, bool deliverImmediately);
+    [Selector("postNotificationName:object:userInfo:options:")]
+    public void PostNotificationNameObjectUserInfoOptions(NSNotificationName name, NSString? object, NSDictionary? userInfo, NSDistributedNotificationOptions options);
+    [Selector("addObserver:selector:name:object:")]
+    public void AddObserverSelectorNameObject(AnyObject observer, Selector aSelector, NSNotificationName? aName, NSString? anObject);
+    [Selector("postNotificationName:object:")]
+    public void PostNotificationNameObject(NSNotificationName aName, NSString? anObject);
+    [Selector("postNotificationName:object:userInfo:")]
+    public void PostNotificationNameObjectUserInfo(NSNotificationName aName, NSString? anObject, NSDictionary? aUserInfo);
+    [Selector("removeObserver:name:object:")]
+    public void RemoveObserverNameObject(AnyObject observer, NSNotificationName? aName, NSString? anObject);
 }
 
 #endif

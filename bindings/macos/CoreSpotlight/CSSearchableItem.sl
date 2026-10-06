@@ -50,15 +50,23 @@ public enum CSSearchableItemUpdateListenerOptions : ulong
 
 public extern objc class CSSearchableItem : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("uniqueIdentifier", "setUniqueIdentifier:")] public NSString UniqueIdentifier { get; set; }
-    [Selector("domainIdentifier", "setDomainIdentifier:")] public NSString? DomainIdentifier { get; set; }
-    [Selector("expirationDate", "setExpirationDate:")] public NSDate? ExpirationDate { get; set; }
-    [Selector("attributeSet", "setAttributeSet:")] public CSSearchableItemAttributeSet AttributeSet { get; set; }
-    [Selector("isUpdate", "setIsUpdate:")] public bool IsUpdate { get; set; }
+    [Selector("uniqueIdentifier", "setUniqueIdentifier:")]
+    public NSString UniqueIdentifier { get; set; }
+    [Selector("domainIdentifier", "setDomainIdentifier:")]
+    public NSString? DomainIdentifier { get; set; }
+    [Selector("expirationDate", "setExpirationDate:")]
+    public NSDate? ExpirationDate { get; set; }
+    [Selector("attributeSet", "setAttributeSet:")]
+    public CSSearchableItemAttributeSet AttributeSet { get; set; }
+    [Selector("isUpdate", "setIsUpdate:")]
+    public bool IsUpdate { get; set; }
     /// macOS 15.4 and later.
-    [Selector("updateListenerOptions", "setUpdateListenerOptions:")] public CSSearchableItemUpdateListenerOptions UpdateListenerOptions { get; set; }
-    [Selector("initWithUniqueIdentifier:domainIdentifier:attributeSet:")] public Self InitWithUniqueIdentifierDomainIdentifierAttributeSet(NSString? uniqueIdentifier, NSString? domainIdentifier, CSSearchableItemAttributeSet attributeSet);
-    [Selector("compareByRank:")] public NSComparisonResult CompareByRank(CSSearchableItem other);
+    [Selector("updateListenerOptions", "setUpdateListenerOptions:")]
+    public CSSearchableItemUpdateListenerOptions UpdateListenerOptions { get; set; }
+    [Selector("initWithUniqueIdentifier:domainIdentifier:attributeSet:")]
+    public Self InitWithUniqueIdentifierDomainIdentifierAttributeSet(NSString? uniqueIdentifier, NSString? domainIdentifier, CSSearchableItemAttributeSet attributeSet);
+    [Selector("compareByRank:")]
+    public NSComparisonResult CompareByRank(CSSearchableItem other);
 }
 
 #endif

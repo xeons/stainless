@@ -35,35 +35,53 @@ public using NSSearchFieldRecentsAutosaveName = NSString;
 
 public objc interface NSSearchFieldDelegate : NSTextFieldDelegate
 {
-    [Optional] [Selector("searchFieldDidStartSearching:")] void SearchFieldDidStartSearching(NSSearchField sender);
-    [Optional] [Selector("searchFieldDidEndSearching:")] void SearchFieldDidEndSearching(NSSearchField sender);
+    [Optional]
+    [Selector("searchFieldDidStartSearching:")]
+    void SearchFieldDidStartSearching(NSSearchField sender);
+    [Optional]
+    [Selector("searchFieldDidEndSearching:")]
+    void SearchFieldDidEndSearching(NSSearchField sender);
 }
 
 public extern objc class NSSearchField : NSTextField
 {
-    [Selector("searchTextBounds")] public NSRect SearchTextBounds { get; }
-    [Selector("searchButtonBounds")] public NSRect SearchButtonBounds { get; }
-    [Selector("cancelButtonBounds")] public NSRect CancelButtonBounds { get; }
-    [Selector("recentSearches", "setRecentSearches:")] public NSArray RecentSearches { get; set; }
-    [Selector("recentsAutosaveName", "setRecentsAutosaveName:")] public NSSearchFieldRecentsAutosaveName? RecentsAutosaveName { get; set; }
-    [Selector("searchMenuTemplate", "setSearchMenuTemplate:")] public NSMenu? SearchMenuTemplate { get; set; }
-    [Selector("sendsWholeSearchString", "setSendsWholeSearchString:")] public bool SendsWholeSearchString { get; set; }
-    [Selector("maximumRecents", "setMaximumRecents:")] public NSInteger MaximumRecents { get; set; }
-    [Selector("sendsSearchStringImmediately", "setSendsSearchStringImmediately:")] public bool SendsSearchStringImmediately { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSSearchFieldDelegate? Delegate { get; set; }
+    [Selector("searchTextBounds")]
+    public NSRect SearchTextBounds { get; }
+    [Selector("searchButtonBounds")]
+    public NSRect SearchButtonBounds { get; }
+    [Selector("cancelButtonBounds")]
+    public NSRect CancelButtonBounds { get; }
+    [Selector("recentSearches", "setRecentSearches:")]
+    public NSArray RecentSearches { get; set; }
+    [Selector("recentsAutosaveName", "setRecentsAutosaveName:")]
+    public NSSearchFieldRecentsAutosaveName? RecentsAutosaveName { get; set; }
+    [Selector("searchMenuTemplate", "setSearchMenuTemplate:")]
+    public NSMenu? SearchMenuTemplate { get; set; }
+    [Selector("sendsWholeSearchString", "setSendsWholeSearchString:")]
+    public bool SendsWholeSearchString { get; set; }
+    [Selector("maximumRecents", "setMaximumRecents:")]
+    public NSInteger MaximumRecents { get; set; }
+    [Selector("sendsSearchStringImmediately", "setSendsSearchStringImmediately:")]
+    public bool SendsSearchStringImmediately { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSSearchFieldDelegate? Delegate { get; set; }
 }
 
 /// NSSearchField_Deprecated, a category of NSSearchField.
 public extern objc class NSSearchField
 {
     /// Deprecated in macOS 12.0.
-    [Selector("centersPlaceholder", "setCentersPlaceholder:")] public bool CentersPlaceholder { get; set; }
+    [Selector("centersPlaceholder", "setCentersPlaceholder:")]
+    public bool CentersPlaceholder { get; set; }
     /// Deprecated in macOS 12.0.
-    [Selector("rectForSearchTextWhenCentered:")] public NSRect RectForSearchTextWhenCentered(bool isCentered);
+    [Selector("rectForSearchTextWhenCentered:")]
+    public NSRect RectForSearchTextWhenCentered(bool isCentered);
     /// Deprecated in macOS 12.0.
-    [Selector("rectForSearchButtonWhenCentered:")] public NSRect RectForSearchButtonWhenCentered(bool isCentered);
+    [Selector("rectForSearchButtonWhenCentered:")]
+    public NSRect RectForSearchButtonWhenCentered(bool isCentered);
     /// Deprecated in macOS 12.0.
-    [Selector("rectForCancelButtonWhenCentered:")] public NSRect RectForCancelButtonWhenCentered(bool isCentered);
+    [Selector("rectForCancelButtonWhenCentered:")]
+    public NSRect RectForCancelButtonWhenCentered(bool isCentered);
 }
 
 #endif

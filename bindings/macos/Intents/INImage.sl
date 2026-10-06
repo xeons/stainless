@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class INImage : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("imageNamed:")] public static Self ImageNamed(NSString name);
-    [Selector("imageWithImageData:")] public static Self ImageWithImageData(NSData imageData);
-    [Selector("imageWithURL:")] public static Self? ImageWithURL(NSURL URL);
-    [Selector("imageWithURL:width:height:")] public static Self? ImageWithURLWidthHeight(NSURL URL, double width, double height);
+    [Selector("imageNamed:")]
+    public static Self ImageNamed(NSString name);
+    [Selector("imageWithImageData:")]
+    public static Self ImageWithImageData(NSData imageData);
+    [Selector("imageWithURL:")]
+    public static Self? ImageWithURL(NSURL URL);
+    [Selector("imageWithURL:width:height:")]
+    public static Self? ImageWithURLWidthHeight(NSURL URL, double width, double height);
 }
 
 #endif

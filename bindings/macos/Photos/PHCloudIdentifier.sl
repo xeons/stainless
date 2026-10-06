@@ -34,21 +34,28 @@ import Standard.ObjC;
 public extern objc class PHCloudIdentifier : NSObject, NSSecureCoding
 {
     /// Deprecated in macOS 12.
-    [Selector("notFoundIdentifier")] public static PHCloudIdentifier? NotFoundIdentifier { get; }
-    [Selector("stringValue")] public NSString StringValue { get; }
-    [Selector("initWithStringValue:")] public Self InitWithStringValue(NSString stringValue);
+    [Selector("notFoundIdentifier")]
+    public static PHCloudIdentifier? NotFoundIdentifier { get; }
+    [Selector("stringValue")]
+    public NSString StringValue { get; }
+    [Selector("initWithStringValue:")]
+    public Self InitWithStringValue(NSString stringValue);
 }
 
 public extern objc class PHCloudIdentifierMapping : NSObject
 {
-    [Selector("cloudIdentifier")] public PHCloudIdentifier? CloudIdentifier { get; }
-    [Selector("error")] public NSError? Error { get; }
+    [Selector("cloudIdentifier")]
+    public PHCloudIdentifier? CloudIdentifier { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
 }
 
 public extern objc class PHLocalIdentifierMapping : NSObject
 {
-    [Selector("localIdentifier")] public NSString? LocalIdentifier { get; }
-    [Selector("error")] public NSError? Error { get; }
+    [Selector("localIdentifier")]
+    public NSString? LocalIdentifier { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
 }
 
 public extern objc class PHCloudIdentifier : NSCopying { }
@@ -56,12 +63,16 @@ public extern objc class PHCloudIdentifier : NSCopying { }
 /// CloudIdentifiers, a category of PHPhotoLibrary.
 public extern objc class PHPhotoLibrary
 {
-    [Selector("localIdentifierMappingsForCloudIdentifiers:")] public NSDictionary LocalIdentifierMappingsForCloudIdentifiers(NSArray cloudIdentifiers);
-    [Selector("cloudIdentifierMappingsForLocalIdentifiers:")] public NSDictionary CloudIdentifierMappingsForLocalIdentifiers(NSArray localIdentifiers);
+    [Selector("localIdentifierMappingsForCloudIdentifiers:")]
+    public NSDictionary LocalIdentifierMappingsForCloudIdentifiers(NSArray cloudIdentifiers);
+    [Selector("cloudIdentifierMappingsForLocalIdentifiers:")]
+    public NSDictionary CloudIdentifierMappingsForLocalIdentifiers(NSArray localIdentifiers);
     /// Deprecated in macOS 12.
-    [Selector("localIdentifiersForCloudIdentifiers:")] public NSArray LocalIdentifiersForCloudIdentifiers(NSArray cloudIdentifiers);
+    [Selector("localIdentifiersForCloudIdentifiers:")]
+    public NSArray LocalIdentifiersForCloudIdentifiers(NSArray cloudIdentifiers);
     /// Deprecated in macOS 12.
-    [Selector("cloudIdentifiersForLocalIdentifiers:")] public NSArray CloudIdentifiersForLocalIdentifiers(NSArray localIdentifiers);
+    [Selector("cloudIdentifiersForLocalIdentifiers:")]
+    public NSArray CloudIdentifiersForLocalIdentifiers(NSArray localIdentifiers);
 }
 
 /// Deprecated in macOS 12.

@@ -40,17 +40,23 @@ public enum NSGlassEffectViewStyle : long
 /// macOS 26.0 and later.
 public extern objc class NSGlassEffectView : NSView
 {
-    [Selector("contentView", "setContentView:")] public NSView? ContentView { get; set; }
-    [Selector("cornerRadius", "setCornerRadius:")] public CGFloat CornerRadius { get; set; }
-    [Selector("tintColor", "setTintColor:")] public NSColor? TintColor { get; set; }
-    [Selector("style", "setStyle:")] public NSGlassEffectViewStyle Style { get; set; }
+    [Selector("contentView", "setContentView:")]
+    public NSView? ContentView { get; set; }
+    [Selector("cornerRadius", "setCornerRadius:")]
+    public CGFloat CornerRadius { get; set; }
+    [Selector("tintColor", "setTintColor:")]
+    public NSColor? TintColor { get; set; }
+    [Selector("style", "setStyle:")]
+    public NSGlassEffectViewStyle Style { get; set; }
 }
 
 /// macOS 26.0 and later.
 public extern objc class NSGlassEffectContainerView : NSView
 {
-    [Selector("contentView", "setContentView:")] public NSView? ContentView { get; set; }
-    [Selector("spacing", "setSpacing:")] public CGFloat Spacing { get; set; }
+    [Selector("contentView", "setContentView:")]
+    public NSView? ContentView { get; set; }
+    [Selector("spacing", "setSpacing:")]
+    public CGFloat Spacing { get; set; }
 }
 
 #endif

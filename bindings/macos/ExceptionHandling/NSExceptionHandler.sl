@@ -58,20 +58,29 @@ public const int NSHangOnOtherExceptionMask = 16;
 
 public extern objc class NSExceptionHandler : NSObject
 {
-    [Selector("defaultExceptionHandler")] public static NSExceptionHandler? DefaultExceptionHandler();
-    [Selector("setExceptionHandlingMask:")] public void SetExceptionHandlingMask(NSUInteger aMask);
-    [Selector("exceptionHandlingMask")] public NSUInteger ExceptionHandlingMask();
-    [Selector("setExceptionHangingMask:")] public void SetExceptionHangingMask(NSUInteger aMask);
-    [Selector("exceptionHangingMask")] public NSUInteger ExceptionHangingMask();
-    [Selector("setDelegate:")] public void SetDelegate(AnyObject? anObject);
-    [Selector("delegate")] public AnyObject? Delegate();
+    [Selector("defaultExceptionHandler")]
+    public static NSExceptionHandler? DefaultExceptionHandler();
+    [Selector("setExceptionHandlingMask:")]
+    public void SetExceptionHandlingMask(NSUInteger aMask);
+    [Selector("exceptionHandlingMask")]
+    public NSUInteger ExceptionHandlingMask();
+    [Selector("setExceptionHangingMask:")]
+    public void SetExceptionHangingMask(NSUInteger aMask);
+    [Selector("exceptionHangingMask")]
+    public NSUInteger ExceptionHangingMask();
+    [Selector("setDelegate:")]
+    public void SetDelegate(AnyObject? anObject);
+    [Selector("delegate")]
+    public AnyObject? Delegate();
 }
 
 /// NSExceptionHandlerDelegate, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("exceptionHandler:shouldLogException:mask:")] public bool ExceptionHandlerShouldLogExceptionMask(NSExceptionHandler? sender, NSException? exception, NSUInteger aMask);
-    [Selector("exceptionHandler:shouldHandleException:mask:")] public bool ExceptionHandlerShouldHandleExceptionMask(NSExceptionHandler? sender, NSException? exception, NSUInteger aMask);
+    [Selector("exceptionHandler:shouldLogException:mask:")]
+    public bool ExceptionHandlerShouldLogExceptionMask(NSExceptionHandler? sender, NSException? exception, NSUInteger aMask);
+    [Selector("exceptionHandler:shouldHandleException:mask:")]
+    public bool ExceptionHandlerShouldHandleExceptionMask(NSExceptionHandler? sender, NSException? exception, NSUInteger aMask);
 }
 
 public const int NSLogAndHandleEveryExceptionMask = 1023;

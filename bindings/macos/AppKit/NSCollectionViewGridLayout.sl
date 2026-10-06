@@ -34,14 +34,22 @@ import Standard.ObjC;
 
 public extern objc class NSCollectionViewGridLayout : NSCollectionViewLayout
 {
-    [Selector("margins", "setMargins:")] public NSEdgeInsets Margins { get; set; }
-    [Selector("minimumInteritemSpacing", "setMinimumInteritemSpacing:")] public CGFloat MinimumInteritemSpacing { get; set; }
-    [Selector("minimumLineSpacing", "setMinimumLineSpacing:")] public CGFloat MinimumLineSpacing { get; set; }
-    [Selector("maximumNumberOfRows", "setMaximumNumberOfRows:")] public NSUInteger MaximumNumberOfRows { get; set; }
-    [Selector("maximumNumberOfColumns", "setMaximumNumberOfColumns:")] public NSUInteger MaximumNumberOfColumns { get; set; }
-    [Selector("minimumItemSize", "setMinimumItemSize:")] public NSSize MinimumItemSize { get; set; }
-    [Selector("maximumItemSize", "setMaximumItemSize:")] public NSSize MaximumItemSize { get; set; }
-    [Selector("backgroundColors", "setBackgroundColors:")] public NSArray? BackgroundColors { get; set; }
+    [Selector("margins", "setMargins:")]
+    public NSEdgeInsets Margins { get; set; }
+    [Selector("minimumInteritemSpacing", "setMinimumInteritemSpacing:")]
+    public CGFloat MinimumInteritemSpacing { get; set; }
+    [Selector("minimumLineSpacing", "setMinimumLineSpacing:")]
+    public CGFloat MinimumLineSpacing { get; set; }
+    [Selector("maximumNumberOfRows", "setMaximumNumberOfRows:")]
+    public NSUInteger MaximumNumberOfRows { get; set; }
+    [Selector("maximumNumberOfColumns", "setMaximumNumberOfColumns:")]
+    public NSUInteger MaximumNumberOfColumns { get; set; }
+    [Selector("minimumItemSize", "setMinimumItemSize:")]
+    public NSSize MinimumItemSize { get; set; }
+    [Selector("maximumItemSize", "setMaximumItemSize:")]
+    public NSSize MaximumItemSize { get; set; }
+    [Selector("backgroundColors", "setBackgroundColors:")]
+    public NSArray? BackgroundColors { get; set; }
 }
 
 #endif

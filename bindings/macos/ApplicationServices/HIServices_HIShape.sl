@@ -55,21 +55,29 @@ public delegate OSStatus HIShapeEnumerateProcPtr(int arg0, __HIShape* arg1, CGRe
 
 public extern "C" CFTypeID HIShapeGetTypeID();
 
-[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateEmpty();
+[ReturnsRetained]
+public extern "C" HIShapeRef? HIShapeCreateEmpty();
 
-[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateWithQDRgn(RgnHandle inRgn);
+[ReturnsRetained]
+public extern "C" HIShapeRef? HIShapeCreateWithQDRgn(RgnHandle inRgn);
 
-[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateWithRect(CGRect* inRect);
+[ReturnsRetained]
+public extern "C" HIShapeRef? HIShapeCreateWithRect(CGRect* inRect);
 
-[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateCopy(HIShapeRef? inShape);
+[ReturnsRetained]
+public extern "C" HIShapeRef? HIShapeCreateCopy(HIShapeRef? inShape);
 
-[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateIntersection(HIShapeRef? inShape1, HIShapeRef? inShape2);
+[ReturnsRetained]
+public extern "C" HIShapeRef? HIShapeCreateIntersection(HIShapeRef? inShape1, HIShapeRef? inShape2);
 
-[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateDifference(HIShapeRef? inShape1, HIShapeRef? inShape2);
+[ReturnsRetained]
+public extern "C" HIShapeRef? HIShapeCreateDifference(HIShapeRef? inShape1, HIShapeRef? inShape2);
 
-[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateUnion(HIShapeRef? inShape1, HIShapeRef? inShape2);
+[ReturnsRetained]
+public extern "C" HIShapeRef? HIShapeCreateUnion(HIShapeRef? inShape1, HIShapeRef? inShape2);
 
-[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateXor(HIShapeRef? inShape1, HIShapeRef? inShape2);
+[ReturnsRetained]
+public extern "C" HIShapeRef? HIShapeCreateXor(HIShapeRef? inShape1, HIShapeRef? inShape2);
 
 public extern "C" Boolean HIShapeIsEmpty(HIShapeRef? inShape);
 
@@ -87,11 +95,14 @@ public extern "C" OSStatus HIShapeReplacePathInCGContext(HIShapeRef? inShape, CG
 
 public extern "C" OSStatus HIShapeEnumerate(HIShapeRef? inShape, OptionBits inOptions, HIShapeEnumerateProcPtr inProc, void* inRefcon);
 
-[ReturnsRetained] public extern "C" HIMutableShapeRef? HIShapeCreateMutable();
+[ReturnsRetained]
+public extern "C" HIMutableShapeRef? HIShapeCreateMutable();
 
-[ReturnsRetained] public extern "C" HIMutableShapeRef? HIShapeCreateMutableCopy(HIShapeRef? inOrig);
+[ReturnsRetained]
+public extern "C" HIMutableShapeRef? HIShapeCreateMutableCopy(HIShapeRef? inOrig);
 
-[ReturnsRetained] public extern "C" HIMutableShapeRef? HIShapeCreateMutableWithRect(CGRect* inRect);
+[ReturnsRetained]
+public extern "C" HIMutableShapeRef? HIShapeCreateMutableWithRect(CGRect* inRect);
 
 public extern "C" OSStatus HIShapeSetEmpty(HIMutableShapeRef? inShape);
 

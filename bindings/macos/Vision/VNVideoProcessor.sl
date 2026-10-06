@@ -37,32 +37,44 @@ public extern objc class VNVideoProcessorCadence : NSObject, NSCopying { }
 
 public extern objc class VNVideoProcessorFrameRateCadence : VNVideoProcessorCadence
 {
-    [Selector("frameRate")] public NSInteger FrameRate { get; }
-    [Selector("initWithFrameRate:")] public Self InitWithFrameRate(NSInteger frameRate);
+    [Selector("frameRate")]
+    public NSInteger FrameRate { get; }
+    [Selector("initWithFrameRate:")]
+    public Self InitWithFrameRate(NSInteger frameRate);
 }
 
 public extern objc class VNVideoProcessorTimeIntervalCadence : VNVideoProcessorCadence
 {
-    [Selector("timeInterval")] public CFTimeInterval TimeInterval { get; }
-    [Selector("initWithTimeInterval:")] public Self InitWithTimeInterval(CFTimeInterval timeInterval);
+    [Selector("timeInterval")]
+    public CFTimeInterval TimeInterval { get; }
+    [Selector("initWithTimeInterval:")]
+    public Self InitWithTimeInterval(CFTimeInterval timeInterval);
 }
 
 public extern objc class VNVideoProcessorRequestProcessingOptions : NSObject, NSCopying
 {
-    [Selector("cadence", "setCadence:")] public VNVideoProcessorCadence? Cadence { get; set; }
+    [Selector("cadence", "setCadence:")]
+    public VNVideoProcessorCadence? Cadence { get; set; }
 }
 
 public extern objc class VNVideoProcessor : NSObject
 {
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL videoURL);
-    [Selector("addRequest:processingOptions:error:")] public bool AddRequestProcessingOptionsError(VNRequest request, VNVideoProcessorRequestProcessingOptions processingOptions, out NSError? error);
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL videoURL);
+    [Selector("addRequest:processingOptions:error:")]
+    public bool AddRequestProcessingOptionsError(VNRequest request, VNVideoProcessorRequestProcessingOptions processingOptions, out NSError? error);
     /// Deprecated in macOS 11.0.
-    [Selector("addRequest:withProcessingOptions:error:")] public bool AddRequestWithProcessingOptionsError(VNRequest request, NSDictionary processingOptions, out NSError? error);
-    [Selector("removeRequest:error:")] public bool RemoveRequestError(VNRequest request, out NSError? error);
-    [Selector("analyzeTimeRange:error:")] public bool AnalyzeTimeRangeError(CMTimeRange timeRange, out NSError? error);
+    [Selector("addRequest:withProcessingOptions:error:")]
+    public bool AddRequestWithProcessingOptionsError(VNRequest request, NSDictionary processingOptions, out NSError? error);
+    [Selector("removeRequest:error:")]
+    public bool RemoveRequestError(VNRequest request, out NSError? error);
+    [Selector("analyzeTimeRange:error:")]
+    public bool AnalyzeTimeRangeError(CMTimeRange timeRange, out NSError? error);
     /// Deprecated in macOS 11.0.
-    [Selector("analyzeWithTimeRange:error:")] public bool AnalyzeWithTimeRangeError(CMTimeRange timeRange, out NSError? error);
-    [Selector("cancel")] public void Cancel();
+    [Selector("analyzeWithTimeRange:error:")]
+    public bool AnalyzeWithTimeRangeError(CMTimeRange timeRange, out NSError? error);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public objc interface AUCustomViewPersistentData
 {
-    [Selector("customViewPersistentData", "setCustomViewPersistentData:")] NSDictionary? CustomViewPersistentData { get; set; }
+    [Selector("customViewPersistentData", "setCustomViewPersistentData:")]
+    NSDictionary? CustomViewPersistentData { get; set; }
 }
 
 #endif

@@ -36,49 +36,74 @@ import Standard.ObjC;
 
 public extern objc class NSScreen : NSObject
 {
-    [Selector("screens")] public static NSArray Screens { get; }
-    [Selector("mainScreen")] public static NSScreen? MainScreen { get; }
-    [Selector("deepestScreen")] public static NSScreen? DeepestScreen { get; }
-    [Selector("screensHaveSeparateSpaces")] public static bool ScreensHaveSeparateSpaces { get; }
-    [Selector("depth")] public NSWindowDepth Depth { get; }
-    [Selector("frame")] public NSRect Frame { get; }
-    [Selector("visibleFrame")] public NSRect VisibleFrame { get; }
-    [Selector("deviceDescription")] public NSDictionary DeviceDescription { get; }
-    [Selector("colorSpace")] public NSColorSpace? ColorSpace { get; }
-    [Selector("supportedWindowDepths")] public NSWindowDepth* SupportedWindowDepths { get; }
-    [Selector("backingScaleFactor")] public CGFloat BackingScaleFactor { get; }
-    [Selector("localizedName")] public NSString? LocalizedName { get; }
-    [Selector("safeAreaInsets")] public NSEdgeInsets SafeAreaInsets { get; }
-    [Selector("auxiliaryTopLeftArea")] public NSRect AuxiliaryTopLeftArea { get; }
-    [Selector("auxiliaryTopRightArea")] public NSRect AuxiliaryTopRightArea { get; }
+    [Selector("screens")]
+    public static NSArray Screens { get; }
+    [Selector("mainScreen")]
+    public static NSScreen? MainScreen { get; }
+    [Selector("deepestScreen")]
+    public static NSScreen? DeepestScreen { get; }
+    [Selector("screensHaveSeparateSpaces")]
+    public static bool ScreensHaveSeparateSpaces { get; }
+    [Selector("depth")]
+    public NSWindowDepth Depth { get; }
+    [Selector("frame")]
+    public NSRect Frame { get; }
+    [Selector("visibleFrame")]
+    public NSRect VisibleFrame { get; }
+    [Selector("deviceDescription")]
+    public NSDictionary DeviceDescription { get; }
+    [Selector("colorSpace")]
+    public NSColorSpace? ColorSpace { get; }
+    [Selector("supportedWindowDepths")]
+    public NSWindowDepth* SupportedWindowDepths { get; }
+    [Selector("backingScaleFactor")]
+    public CGFloat BackingScaleFactor { get; }
+    [Selector("localizedName")]
+    public NSString? LocalizedName { get; }
+    [Selector("safeAreaInsets")]
+    public NSEdgeInsets SafeAreaInsets { get; }
+    [Selector("auxiliaryTopLeftArea")]
+    public NSRect AuxiliaryTopLeftArea { get; }
+    [Selector("auxiliaryTopRightArea")]
+    public NSRect AuxiliaryTopRightArea { get; }
     /// macOS 26.0 and later.
-    [Selector("CGDirectDisplayID")] public CGDirectDisplayID CGDirectDisplayID { get; }
-    [Selector("canRepresentDisplayGamut:")] public bool CanRepresentDisplayGamut(NSDisplayGamut displayGamut);
-    [Selector("convertRectToBacking:")] public NSRect ConvertRectToBacking(NSRect rect);
-    [Selector("convertRectFromBacking:")] public NSRect ConvertRectFromBacking(NSRect rect);
-    [Selector("backingAlignedRect:options:")] public NSRect BackingAlignedRectOptions(NSRect rect, NSAlignmentOptions options);
+    [Selector("CGDirectDisplayID")]
+    public CGDirectDisplayID CGDirectDisplayID { get; }
+    [Selector("canRepresentDisplayGamut:")]
+    public bool CanRepresentDisplayGamut(NSDisplayGamut displayGamut);
+    [Selector("convertRectToBacking:")]
+    public NSRect ConvertRectToBacking(NSRect rect);
+    [Selector("convertRectFromBacking:")]
+    public NSRect ConvertRectFromBacking(NSRect rect);
+    [Selector("backingAlignedRect:options:")]
+    public NSRect BackingAlignedRectOptions(NSRect rect, NSAlignmentOptions options);
 }
 
 public extern "C" NSNotificationName? NSScreenColorSpaceDidChangeNotification;
 
 public extern objc class NSScreen
 {
-    [Selector("maximumExtendedDynamicRangeColorComponentValue")] public CGFloat MaximumExtendedDynamicRangeColorComponentValue { get; }
-    [Selector("maximumPotentialExtendedDynamicRangeColorComponentValue")] public CGFloat MaximumPotentialExtendedDynamicRangeColorComponentValue { get; }
-    [Selector("maximumReferenceExtendedDynamicRangeColorComponentValue")] public CGFloat MaximumReferenceExtendedDynamicRangeColorComponentValue { get; }
+    [Selector("maximumExtendedDynamicRangeColorComponentValue")]
+    public CGFloat MaximumExtendedDynamicRangeColorComponentValue { get; }
+    [Selector("maximumPotentialExtendedDynamicRangeColorComponentValue")]
+    public CGFloat MaximumPotentialExtendedDynamicRangeColorComponentValue { get; }
+    [Selector("maximumReferenceExtendedDynamicRangeColorComponentValue")]
+    public CGFloat MaximumReferenceExtendedDynamicRangeColorComponentValue { get; }
 }
 
 /// NSDisplayLink, a category of NSScreen.
 public extern objc class NSScreen
 {
-    [Selector("displayLinkWithTarget:selector:")] public CADisplayLink DisplayLinkWithTargetSelector(AnyObject target, Selector selector);
+    [Selector("displayLinkWithTarget:selector:")]
+    public CADisplayLink DisplayLinkWithTargetSelector(AnyObject target, Selector selector);
 }
 
 /// NSDeprecated, a category of NSScreen.
 public extern objc class NSScreen
 {
     /// Deprecated in macOS 10.7.
-    [Selector("userSpaceScaleFactor")] public CGFloat UserSpaceScaleFactor();
+    [Selector("userSpaceScaleFactor")]
+    public CGFloat UserSpaceScaleFactor();
 }
 
 #endif

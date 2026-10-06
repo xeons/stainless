@@ -39,7 +39,8 @@ public extern objc class DRBurnSessionRef : CFTypeRef { }
 
 public extern "C" CFTypeID DRBurnSessionGetTypeID();
 
-[ReturnsRetained] public extern "C" DRBurnSessionRef? DRBurnSessionCreate();
+[ReturnsRetained]
+public extern "C" DRBurnSessionRef? DRBurnSessionCreate();
 
 public extern "C" void DRBurnSessionSetBurn(DRBurnSessionRef? burnSession, DRBurnRef? burn);
 

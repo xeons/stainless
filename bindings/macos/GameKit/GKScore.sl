@@ -36,23 +36,34 @@ public objc closure void GKScoreReportScoresWithCompletionHandlerCompletionHandl
 /// Deprecated in macOS 11.0.
 public extern objc class GKScore : NSObject, NSCoding, NSSecureCoding
 {
-    [Selector("value", "setValue:")] public long Value { get; set; }
-    [Selector("formattedValue")] public NSString? FormattedValue { get; }
+    [Selector("value", "setValue:")]
+    public long Value { get; set; }
+    [Selector("formattedValue")]
+    public NSString? FormattedValue { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("leaderboardIdentifier", "setLeaderboardIdentifier:")] public NSString LeaderboardIdentifier { get; set; }
+    [Selector("leaderboardIdentifier", "setLeaderboardIdentifier:")]
+    public NSString LeaderboardIdentifier { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("context", "setContext:")] public ulong Context { get; set; }
-    [Selector("date")] public NSDate Date { get; }
+    [Selector("context", "setContext:")]
+    public ulong Context { get; set; }
+    [Selector("date")]
+    public NSDate Date { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("player")] public GKPlayer? Player { get; }
-    [Selector("rank")] public NSInteger Rank { get; }
+    [Selector("player")]
+    public GKPlayer? Player { get; }
+    [Selector("rank")]
+    public NSInteger Rank { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("shouldSetDefaultLeaderboard", "setShouldSetDefaultLeaderboard:")] public bool ShouldSetDefaultLeaderboard { get; set; }
-    [Selector("initWithLeaderboardIdentifier:")] public Self InitWithLeaderboardIdentifier(NSString identifier);
+    [Selector("shouldSetDefaultLeaderboard", "setShouldSetDefaultLeaderboard:")]
+    public bool ShouldSetDefaultLeaderboard { get; set; }
+    [Selector("initWithLeaderboardIdentifier:")]
+    public Self InitWithLeaderboardIdentifier(NSString identifier);
     /// Deprecated in macOS 11.0.
-    [Selector("initWithLeaderboardIdentifier:player:")] public Self InitWithLeaderboardIdentifierPlayer(NSString identifier, GKPlayer player);
+    [Selector("initWithLeaderboardIdentifier:player:")]
+    public Self InitWithLeaderboardIdentifierPlayer(NSString identifier, GKPlayer player);
     /// Deprecated in macOS 11.0.
-    [Selector("reportScores:withCompletionHandler:")] public static void ReportScoresWithCompletionHandler(NSArray scores, GKScoreReportScoresWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("reportScores:withCompletionHandler:")]
+    public static void ReportScoresWithCompletionHandler(NSArray scores, GKScoreReportScoresWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public objc closure void GKScoreReportScoreWithCompletionHandlerCompletionHandlerBlock(NSError? arg0);
@@ -61,20 +72,25 @@ public objc closure void GKScoreReportScoreWithCompletionHandlerCompletionHandle
 public extern objc class GKScore
 {
     /// Deprecated in macOS 10.10.
-    [Selector("category", "setCategory:")] public NSString? Category { get; set; }
+    [Selector("category", "setCategory:")]
+    public NSString? Category { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("reportScoreWithCompletionHandler:")] public void ReportScoreWithCompletionHandler(GKScoreReportScoreWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("reportScoreWithCompletionHandler:")]
+    public void ReportScoreWithCompletionHandler(GKScoreReportScoreWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 10.10.
-    [Selector("initWithCategory:")] public Self InitWithCategory(NSString? category);
+    [Selector("initWithCategory:")]
+    public Self InitWithCategory(NSString? category);
 }
 
 /// Obsoleted, a category of GKScore.
 public extern objc class GKScore
 {
     /// Deprecated in macOS 10.10.
-    [Selector("playerID")] public NSString? PlayerID { get; }
+    [Selector("playerID")]
+    public NSString? PlayerID { get; }
     /// Deprecated in macOS 10.10.
-    [Selector("initWithLeaderboardIdentifier:forPlayer:")] public Self? InitWithLeaderboardIdentifierForPlayer(NSString identifier, NSString playerID);
+    [Selector("initWithLeaderboardIdentifier:forPlayer:")]
+    public Self? InitWithLeaderboardIdentifierForPlayer(NSString identifier, NSString playerID);
 }
 
 #endif

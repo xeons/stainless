@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class SWCollaborationOptionsPickerGroup : SWCollaborationOptionsGroup
 {
-    [Selector("selectedOptionIdentifier", "setSelectedOptionIdentifier:")] public NSString SelectedOptionIdentifier { get; set; }
+    [Selector("selectedOptionIdentifier", "setSelectedOptionIdentifier:")]
+    public NSString SelectedOptionIdentifier { get; set; }
 }
 
 #endif

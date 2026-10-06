@@ -35,13 +35,20 @@ import Standard.ObjC;
 /// macOS 15.4 and later.
 public extern objc class WKWebExtensionWindowConfiguration : NSObject
 {
-    [Selector("windowType")] public WKWebExtensionWindowType WindowType { get; }
-    [Selector("windowState")] public WKWebExtensionWindowState WindowState { get; }
-    [Selector("frame")] public CGRect Frame { get; }
-    [Selector("tabURLs")] public NSArray TabURLs { get; }
-    [Selector("tabs")] public NSArray Tabs { get; }
-    [Selector("shouldBeFocused")] public bool ShouldBeFocused { get; }
-    [Selector("shouldBePrivate")] public bool ShouldBePrivate { get; }
+    [Selector("windowType")]
+    public WKWebExtensionWindowType WindowType { get; }
+    [Selector("windowState")]
+    public WKWebExtensionWindowState WindowState { get; }
+    [Selector("frame")]
+    public CGRect Frame { get; }
+    [Selector("tabURLs")]
+    public NSArray TabURLs { get; }
+    [Selector("tabs")]
+    public NSArray Tabs { get; }
+    [Selector("shouldBeFocused")]
+    public bool ShouldBeFocused { get; }
+    [Selector("shouldBePrivate")]
+    public bool ShouldBePrivate { get; }
 }
 
 #endif

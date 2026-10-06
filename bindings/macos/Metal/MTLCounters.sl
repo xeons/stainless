@@ -100,29 +100,40 @@ public struct MTLCounterResultStatistic
 
 public objc interface MTLCounter : NSObjectProtocol
 {
-    [Selector("name")] NSString Name { get; }
+    [Selector("name")]
+    NSString Name { get; }
 }
 
 public objc interface MTLCounterSet : NSObjectProtocol
 {
-    [Selector("name")] NSString Name { get; }
-    [Selector("counters")] NSArray Counters { get; }
+    [Selector("name")]
+    NSString Name { get; }
+    [Selector("counters")]
+    NSArray Counters { get; }
 }
 
 public extern objc class MTLCounterSampleBufferDescriptor : NSObject, NSCopying
 {
-    [Selector("counterSet", "setCounterSet:")] public MTLCounterSet? CounterSet { get; set; }
-    [Selector("label", "setLabel:")] public NSString Label { get; set; }
-    [Selector("storageMode", "setStorageMode:")] public MTLStorageMode StorageMode { get; set; }
-    [Selector("sampleCount", "setSampleCount:")] public NSUInteger SampleCount { get; set; }
+    [Selector("counterSet", "setCounterSet:")]
+    public MTLCounterSet? CounterSet { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString Label { get; set; }
+    [Selector("storageMode", "setStorageMode:")]
+    public MTLStorageMode StorageMode { get; set; }
+    [Selector("sampleCount", "setSampleCount:")]
+    public NSUInteger SampleCount { get; set; }
 }
 
 public objc interface MTLCounterSampleBuffer : NSObjectProtocol
 {
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("label")] NSString Label { get; }
-    [Selector("sampleCount")] NSUInteger SampleCount { get; }
-    [Selector("resolveCounterRange:")] NSData? ResolveCounterRange(NSRange range);
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("label")]
+    NSString Label { get; }
+    [Selector("sampleCount")]
+    NSUInteger SampleCount { get; }
+    [Selector("resolveCounterRange:")]
+    NSData? ResolveCounterRange(NSRange range);
 }
 
 public extern "C" NSErrorDomain MTLCounterErrorDomain;

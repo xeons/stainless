@@ -42,9 +42,12 @@ public enum INGetReservationDetailsIntentResponseCode : long
 
 public extern objc class INGetReservationDetailsIntentResponse : INIntentResponse
 {
-    [Selector("code")] public INGetReservationDetailsIntentResponseCode Code { get; }
-    [Selector("reservations", "setReservations:")] public NSArray? Reservations { get; set; }
-    [Selector("initWithCode:userActivity:")] public Self InitWithCodeUserActivity(INGetReservationDetailsIntentResponseCode code, NSUserActivity? userActivity);
+    [Selector("code")]
+    public INGetReservationDetailsIntentResponseCode Code { get; }
+    [Selector("reservations", "setReservations:")]
+    public NSArray? Reservations { get; set; }
+    [Selector("initWithCode:userActivity:")]
+    public Self InitWithCodeUserActivity(INGetReservationDetailsIntentResponseCode code, NSUserActivity? userActivity);
 }
 
 #endif

@@ -41,21 +41,36 @@ public objc closure void GKGameActivityDefinitionLoadImageWithCompletionHandlerC
 /// macOS 26.0 and later.
 public extern objc class GKGameActivityDefinition : NSObject
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("groupIdentifier")] public NSString? GroupIdentifier { get; }
-    [Selector("title")] public NSString Title { get; }
-    [Selector("details")] public NSString? Details { get; }
-    [Selector("defaultProperties")] public NSDictionary DefaultProperties { get; }
-    [Selector("fallbackURL")] public NSURL? FallbackURL { get; }
-    [Selector("supportsPartyCode")] public bool SupportsPartyCode { get; }
-    [Selector("maxPlayers")] public NSNumber? MaxPlayers { get; }
-    [Selector("minPlayers")] public NSNumber? MinPlayers { get; }
-    [Selector("supportsUnlimitedPlayers")] public bool SupportsUnlimitedPlayers { get; }
-    [Selector("playStyle")] public GKGameActivityPlayStyle PlayStyle { get; }
-    [Selector("releaseState")] public GKReleaseState ReleaseState { get; }
-    [Selector("loadAchievementDescriptionsWithCompletionHandler:")] public void LoadAchievementDescriptionsWithCompletionHandler(GKGameActivityDefinitionLoadAchievementDescriptionsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadLeaderboardsWithCompletionHandler:")] public void LoadLeaderboardsWithCompletionHandler(GKGameActivityDefinitionLoadLeaderboardsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadImageWithCompletionHandler:")] public void LoadImageWithCompletionHandler(GKGameActivityDefinitionLoadImageWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("groupIdentifier")]
+    public NSString? GroupIdentifier { get; }
+    [Selector("title")]
+    public NSString Title { get; }
+    [Selector("details")]
+    public NSString? Details { get; }
+    [Selector("defaultProperties")]
+    public NSDictionary DefaultProperties { get; }
+    [Selector("fallbackURL")]
+    public NSURL? FallbackURL { get; }
+    [Selector("supportsPartyCode")]
+    public bool SupportsPartyCode { get; }
+    [Selector("maxPlayers")]
+    public NSNumber? MaxPlayers { get; }
+    [Selector("minPlayers")]
+    public NSNumber? MinPlayers { get; }
+    [Selector("supportsUnlimitedPlayers")]
+    public bool SupportsUnlimitedPlayers { get; }
+    [Selector("playStyle")]
+    public GKGameActivityPlayStyle PlayStyle { get; }
+    [Selector("releaseState")]
+    public GKReleaseState ReleaseState { get; }
+    [Selector("loadAchievementDescriptionsWithCompletionHandler:")]
+    public void LoadAchievementDescriptionsWithCompletionHandler(GKGameActivityDefinitionLoadAchievementDescriptionsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadLeaderboardsWithCompletionHandler:")]
+    public void LoadLeaderboardsWithCompletionHandler(GKGameActivityDefinitionLoadLeaderboardsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadImageWithCompletionHandler:")]
+    public void LoadImageWithCompletionHandler(GKGameActivityDefinitionLoadImageWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void GKGameActivityDefinitionLoadGameActivityDefinitionsWithCompletionHandlerCompletionHandlerBlock(NSArray? arg0, NSError? arg1);
@@ -66,8 +81,10 @@ public objc closure void GKGameActivityDefinitionLoadGameActivityDefinitionsWith
 /// State, a category of GKGameActivityDefinition.
 public extern objc class GKGameActivityDefinition
 {
-    [Selector("loadGameActivityDefinitionsWithCompletionHandler:")] public static void LoadGameActivityDefinitionsWithCompletionHandler(GKGameActivityDefinitionLoadGameActivityDefinitionsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadGameActivityDefinitionsWithIDs:completionHandler:")] public static void LoadGameActivityDefinitionsWithIDsCompletionHandler(NSArray? activityDefinitionIDs, GKGameActivityDefinitionLoadGameActivityDefinitionsWithIDsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadGameActivityDefinitionsWithCompletionHandler:")]
+    public static void LoadGameActivityDefinitionsWithCompletionHandler(GKGameActivityDefinitionLoadGameActivityDefinitionsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadGameActivityDefinitionsWithIDs:completionHandler:")]
+    public static void LoadGameActivityDefinitionsWithIDsCompletionHandler(NSArray? activityDefinitionIDs, GKGameActivityDefinitionLoadGameActivityDefinitionsWithIDsCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

@@ -111,7 +111,8 @@ public enum SSLProtocol : int
 
 public extern "C" sec_trust_t? sec_trust_create(SecTrustRef trust);
 
-[ReturnsRetained] public extern "C" SecTrustRef sec_trust_copy_ref(sec_trust_t trust);
+[ReturnsRetained]
+public extern "C" SecTrustRef sec_trust_copy_ref(sec_trust_t trust);
 
 public extern "C" sec_identity_t? sec_identity_create(SecIdentityRef identity);
 
@@ -121,12 +122,15 @@ public objc closure void sec_identity_access_certificatesHandlerBlock(sec_certif
 
 public extern "C" bool sec_identity_access_certificates(sec_identity_t identity, sec_identity_access_certificatesHandlerBlock handler);
 
-[ReturnsRetained] public extern "C" SecIdentityRef? sec_identity_copy_ref(sec_identity_t identity);
+[ReturnsRetained]
+public extern "C" SecIdentityRef? sec_identity_copy_ref(sec_identity_t identity);
 
-[ReturnsRetained] public extern "C" CFArrayRef? sec_identity_copy_certificates_ref(sec_identity_t identity);
+[ReturnsRetained]
+public extern "C" CFArrayRef? sec_identity_copy_certificates_ref(sec_identity_t identity);
 
 public extern "C" sec_certificate_t? sec_certificate_create(SecCertificateRef certificate);
 
-[ReturnsRetained] public extern "C" SecCertificateRef sec_certificate_copy_ref(sec_certificate_t certificate);
+[ReturnsRetained]
+public extern "C" SecCertificateRef sec_certificate_copy_ref(sec_certificate_t certificate);
 
 #endif

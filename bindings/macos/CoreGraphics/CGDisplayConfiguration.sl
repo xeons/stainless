@@ -123,7 +123,8 @@ public extern "C" CGSize CGDisplayScreenSize(CGDirectDisplayID display);
 
 public extern "C" double CGDisplayRotation(CGDirectDisplayID display);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef CGDisplayCopyColorSpace(CGDirectDisplayID display);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef CGDisplayCopyColorSpace(CGDirectDisplayID display);
 
 /// Deprecated in macOS 10.6.
 public extern "C" CGError CGConfigureDisplayMode(CGDisplayConfigRef config, CGDirectDisplayID display, CFDictionaryRef? mode);

@@ -46,7 +46,8 @@ public extern "C" BCParameterName BCParameterNameBody;
 public extern objc class BCChatAction : NSObject
 {
     /// Deprecated in macOS 13.0.
-    [Selector("openTranscript:intentParameters:")] public static void OpenTranscriptIntentParameters(NSString businessIdentifier, NSDictionary intentParameters);
+    [Selector("openTranscript:intentParameters:")]
+    public static void OpenTranscriptIntentParameters(NSString businessIdentifier, NSDictionary intentParameters);
 }
 
 #endif

@@ -42,10 +42,12 @@ public objc closure void CGRenderingBufferProviderCreateUnlockPointerBlock(void*
 public objc closure void CGRenderingBufferProviderCreateReleaseInfoBlock(void* arg0);
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CGRenderingBufferProviderRef? CGRenderingBufferProviderCreate(void* info, nuint size, CGRenderingBufferProviderCreateLockPointerBlock lockPointer, CGRenderingBufferProviderCreateUnlockPointerBlock? unlockPointer, CGRenderingBufferProviderCreateReleaseInfoBlock? releaseInfo);
+[ReturnsRetained]
+public extern "C" CGRenderingBufferProviderRef? CGRenderingBufferProviderCreate(void* info, nuint size, CGRenderingBufferProviderCreateLockPointerBlock lockPointer, CGRenderingBufferProviderCreateUnlockPointerBlock? unlockPointer, CGRenderingBufferProviderCreateReleaseInfoBlock? releaseInfo);
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CGRenderingBufferProviderRef? CGRenderingBufferProviderCreateWithCFData(CFMutableDataRef data);
+[ReturnsRetained]
+public extern "C" CGRenderingBufferProviderRef? CGRenderingBufferProviderCreateWithCFData(CFMutableDataRef data);
 
 /// macOS 26.0 and later.
 public extern "C" nuint CGRenderingBufferProviderGetSize(CGRenderingBufferProviderRef provider);

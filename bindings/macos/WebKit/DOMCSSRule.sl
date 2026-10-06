@@ -49,10 +49,14 @@ public const int DOM_WEBKIT_KEYFRAME_RULE = 8;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMCSSRule : DOMObject
 {
-    [Selector("type")] public ushort Type { get; }
-    [Selector("cssText", "setCssText:")] public NSString? CssText { get; set; }
-    [Selector("parentStyleSheet")] public DOMCSSStyleSheet? ParentStyleSheet { get; }
-    [Selector("parentRule")] public DOMCSSRule? ParentRule { get; }
+    [Selector("type")]
+    public ushort Type { get; }
+    [Selector("cssText", "setCssText:")]
+    public NSString? CssText { get; set; }
+    [Selector("parentStyleSheet")]
+    public DOMCSSStyleSheet? ParentStyleSheet { get; }
+    [Selector("parentRule")]
+    public DOMCSSRule? ParentRule { get; }
 }
 
 #endif

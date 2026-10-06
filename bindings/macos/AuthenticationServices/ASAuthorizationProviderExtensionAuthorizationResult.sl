@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationProviderExtensionAuthorizationResult : NSObject
 {
-    [Selector("httpAuthorizationHeaders", "setHttpAuthorizationHeaders:")] public NSDictionary? HttpAuthorizationHeaders { get; set; }
-    [Selector("httpResponse", "setHttpResponse:")] public NSHTTPURLResponse? HttpResponse { get; set; }
-    [Selector("httpBody", "setHttpBody:")] public NSData? HttpBody { get; set; }
-    [Selector("privateKeys", "setPrivateKeys:")] public NSArray? PrivateKeys { get; set; }
-    [Selector("initWithHTTPAuthorizationHeaders:")] public Self InitWithHTTPAuthorizationHeaders(NSDictionary httpAuthorizationHeaders);
-    [Selector("initWithHTTPResponse:httpBody:")] public Self InitWithHTTPResponseHttpBody(NSHTTPURLResponse httpResponse, NSData? httpBody);
+    [Selector("httpAuthorizationHeaders", "setHttpAuthorizationHeaders:")]
+    public NSDictionary? HttpAuthorizationHeaders { get; set; }
+    [Selector("httpResponse", "setHttpResponse:")]
+    public NSHTTPURLResponse? HttpResponse { get; set; }
+    [Selector("httpBody", "setHttpBody:")]
+    public NSData? HttpBody { get; set; }
+    [Selector("privateKeys", "setPrivateKeys:")]
+    public NSArray? PrivateKeys { get; set; }
+    [Selector("initWithHTTPAuthorizationHeaders:")]
+    public Self InitWithHTTPAuthorizationHeaders(NSDictionary httpAuthorizationHeaders);
+    [Selector("initWithHTTPResponse:httpBody:")]
+    public Self InitWithHTTPResponseHttpBody(NSHTTPURLResponse httpResponse, NSData? httpBody);
 }
 
 #endif

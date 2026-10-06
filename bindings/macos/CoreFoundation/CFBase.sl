@@ -134,7 +134,8 @@ public extern "C" void CFAllocatorSetDefault(CFAllocatorRef? allocator);
 
 public extern "C" CFAllocatorRef? CFAllocatorGetDefault();
 
-[ReturnsRetained] public extern "C" CFAllocatorRef? CFAllocatorCreate(CFAllocatorRef? allocator, CFAllocatorContext* context);
+[ReturnsRetained]
+public extern "C" CFAllocatorRef? CFAllocatorCreate(CFAllocatorRef? allocator, CFAllocatorContext* context);
 
 public extern "C" void* CFAllocatorAllocateTyped(CFAllocatorRef? allocator, CFIndex size, CFAllocatorTypeID descriptor, CFOptionFlags hint);
 
@@ -156,7 +157,8 @@ public extern "C" void CFAllocatorGetContext(CFAllocatorRef? allocator, CFAlloca
 
 public extern "C" CFTypeID CFGetTypeID(CFTypeRef? cf);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFCopyTypeIDDescription(CFTypeID type_id);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFCopyTypeIDDescription(CFTypeID type_id);
 
 public extern "C" CFIndex CFGetRetainCount(CFTypeRef? cf);
 
@@ -164,7 +166,8 @@ public extern "C" Boolean CFEqual(CFTypeRef? cf1, CFTypeRef? cf2);
 
 public extern "C" CFHashCode CFHash(CFTypeRef? cf);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFCopyDescription(CFTypeRef? cf);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFCopyDescription(CFTypeRef? cf);
 
 public extern "C" CFAllocatorRef? CFGetAllocator(CFTypeRef? cf);
 

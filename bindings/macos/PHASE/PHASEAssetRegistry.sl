@@ -34,14 +34,18 @@ import Standard.ObjC;
 
 public extern objc class PHASEAsset : NSObject
 {
-    [Selector("identifier")] public NSString Identifier { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
 }
 
 public extern objc class PHASESoundAsset : PHASEAsset
 {
-    [Selector("url")] public NSURL? Url { get; }
-    [Selector("data")] public NSData? Data { get; }
-    [Selector("type")] public PHASEAssetType Type { get; }
+    [Selector("url")]
+    public NSURL? Url { get; }
+    [Selector("data")]
+    public NSData? Data { get; }
+    [Selector("type")]
+    public PHASEAssetType Type { get; }
 }
 
 public extern objc class PHASESoundEventNodeAsset : PHASEAsset { }
@@ -52,13 +56,20 @@ public objc closure void PHASEAssetRegistryUnregisterAssetWithIdentifierCompleti
 
 public extern objc class PHASEAssetRegistry : NSObject
 {
-    [Selector("globalMetaParameters")] public NSDictionary GlobalMetaParameters { get; }
-    [Selector("registerGlobalMetaParameter:error:")] public PHASEGlobalMetaParameterAsset? RegisterGlobalMetaParameterError(PHASEMetaParameterDefinition metaParameterDefinition, out NSError? error);
-    [Selector("registerSoundEventAssetWithRootNode:identifier:error:")] public PHASESoundEventNodeAsset? RegisterSoundEventAssetWithRootNodeIdentifierError(PHASESoundEventNodeDefinition rootNode, NSString? identifier, out NSError? error);
-    [Selector("registerSoundAssetAtURL:identifier:assetType:channelLayout:normalizationMode:error:")] public PHASESoundAsset? RegisterSoundAssetAtURLIdentifierAssetTypeChannelLayoutNormalizationModeError(NSURL url, NSString? identifier, PHASEAssetType assetType, AVAudioChannelLayout? channelLayout, PHASENormalizationMode normalizationMode, out NSError? error);
-    [Selector("registerSoundAssetWithData:identifier:format:normalizationMode:error:")] public PHASESoundAsset? RegisterSoundAssetWithDataIdentifierFormatNormalizationModeError(NSData data, NSString? identifier, AVAudioFormat format, PHASENormalizationMode normalizationMode, out NSError? error);
-    [Selector("unregisterAssetWithIdentifier:completion:")] public void UnregisterAssetWithIdentifierCompletion(NSString identifier, PHASEAssetRegistryUnregisterAssetWithIdentifierCompletionHandlerBlock? handler);
-    [Selector("assetForIdentifier:")] public PHASEAsset? AssetForIdentifier(NSString identifier);
+    [Selector("globalMetaParameters")]
+    public NSDictionary GlobalMetaParameters { get; }
+    [Selector("registerGlobalMetaParameter:error:")]
+    public PHASEGlobalMetaParameterAsset? RegisterGlobalMetaParameterError(PHASEMetaParameterDefinition metaParameterDefinition, out NSError? error);
+    [Selector("registerSoundEventAssetWithRootNode:identifier:error:")]
+    public PHASESoundEventNodeAsset? RegisterSoundEventAssetWithRootNodeIdentifierError(PHASESoundEventNodeDefinition rootNode, NSString? identifier, out NSError? error);
+    [Selector("registerSoundAssetAtURL:identifier:assetType:channelLayout:normalizationMode:error:")]
+    public PHASESoundAsset? RegisterSoundAssetAtURLIdentifierAssetTypeChannelLayoutNormalizationModeError(NSURL url, NSString? identifier, PHASEAssetType assetType, AVAudioChannelLayout? channelLayout, PHASENormalizationMode normalizationMode, out NSError? error);
+    [Selector("registerSoundAssetWithData:identifier:format:normalizationMode:error:")]
+    public PHASESoundAsset? RegisterSoundAssetWithDataIdentifierFormatNormalizationModeError(NSData data, NSString? identifier, AVAudioFormat format, PHASENormalizationMode normalizationMode, out NSError? error);
+    [Selector("unregisterAssetWithIdentifier:completion:")]
+    public void UnregisterAssetWithIdentifierCompletion(NSString identifier, PHASEAssetRegistryUnregisterAssetWithIdentifierCompletionHandlerBlock? handler);
+    [Selector("assetForIdentifier:")]
+    public PHASEAsset? AssetForIdentifier(NSString identifier);
 }
 
 #endif

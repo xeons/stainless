@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class CKRecordID : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("recordName")] public NSString RecordName { get; }
-    [Selector("zoneID")] public CKRecordZoneID ZoneID { get; }
-    [Selector("initWithRecordName:")] public Self InitWithRecordName(NSString recordName);
-    [Selector("initWithRecordName:zoneID:")] public Self InitWithRecordNameZoneID(NSString recordName, CKRecordZoneID zoneID);
+    [Selector("recordName")]
+    public NSString RecordName { get; }
+    [Selector("zoneID")]
+    public CKRecordZoneID ZoneID { get; }
+    [Selector("initWithRecordName:")]
+    public Self InitWithRecordName(NSString recordName);
+    [Selector("initWithRecordName:zoneID:")]
+    public Self InitWithRecordNameZoneID(NSString recordName, CKRecordZoneID zoneID);
 }
 
 #endif

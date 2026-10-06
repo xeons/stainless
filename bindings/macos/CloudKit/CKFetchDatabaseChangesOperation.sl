@@ -45,17 +45,28 @@ public objc closure void CKFetchDatabaseChangesOperationFetchDatabaseChangesComp
 
 public extern objc class CKFetchDatabaseChangesOperation : CKDatabaseOperation
 {
-    [Selector("previousServerChangeToken", "setPreviousServerChangeToken:")] public CKServerChangeToken? PreviousServerChangeToken { get; set; }
-    [Selector("resultsLimit", "setResultsLimit:")] public NSUInteger ResultsLimit { get; set; }
-    [Selector("fetchAllChanges", "setFetchAllChanges:")] public bool FetchAllChanges { get; set; }
-    [Selector("recordZoneWithIDChangedBlock", "setRecordZoneWithIDChangedBlock:")] public CKFetchDatabaseChangesOperationRecordZoneWithIDChangedBlock? RecordZoneWithIDChangedBlock { get; set; }
-    [Selector("recordZoneWithIDWasDeletedBlock", "setRecordZoneWithIDWasDeletedBlock:")] public CKFetchDatabaseChangesOperationRecordZoneWithIDWasDeletedBlock? RecordZoneWithIDWasDeletedBlock { get; set; }
-    [Selector("recordZoneWithIDWasPurgedBlock", "setRecordZoneWithIDWasPurgedBlock:")] public CKFetchDatabaseChangesOperationRecordZoneWithIDWasPurgedBlock? RecordZoneWithIDWasPurgedBlock { get; set; }
-    [Selector("recordZoneWithIDWasDeletedDueToUserEncryptedDataResetBlock", "setRecordZoneWithIDWasDeletedDueToUserEncryptedDataResetBlock:")] public CKFetchDatabaseChangesOperationRecordZoneWithIDWasDeletedDueToUserEncryptedDataResetBlock? RecordZoneWithIDWasDeletedDueToUserEncryptedDataResetBlock { get; set; }
-    [Selector("changeTokenUpdatedBlock", "setChangeTokenUpdatedBlock:")] public CKFetchDatabaseChangesOperationChangeTokenUpdatedBlock? ChangeTokenUpdatedBlock { get; set; }
-    [Selector("fetchDatabaseChangesCompletionBlock", "setFetchDatabaseChangesCompletionBlock:")] public CKFetchDatabaseChangesOperationFetchDatabaseChangesCompletionBlock? FetchDatabaseChangesCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithPreviousServerChangeToken:")] public Self InitWithPreviousServerChangeToken(CKServerChangeToken? previousServerChangeToken);
+    [Selector("previousServerChangeToken", "setPreviousServerChangeToken:")]
+    public CKServerChangeToken? PreviousServerChangeToken { get; set; }
+    [Selector("resultsLimit", "setResultsLimit:")]
+    public NSUInteger ResultsLimit { get; set; }
+    [Selector("fetchAllChanges", "setFetchAllChanges:")]
+    public bool FetchAllChanges { get; set; }
+    [Selector("recordZoneWithIDChangedBlock", "setRecordZoneWithIDChangedBlock:")]
+    public CKFetchDatabaseChangesOperationRecordZoneWithIDChangedBlock? RecordZoneWithIDChangedBlock { get; set; }
+    [Selector("recordZoneWithIDWasDeletedBlock", "setRecordZoneWithIDWasDeletedBlock:")]
+    public CKFetchDatabaseChangesOperationRecordZoneWithIDWasDeletedBlock? RecordZoneWithIDWasDeletedBlock { get; set; }
+    [Selector("recordZoneWithIDWasPurgedBlock", "setRecordZoneWithIDWasPurgedBlock:")]
+    public CKFetchDatabaseChangesOperationRecordZoneWithIDWasPurgedBlock? RecordZoneWithIDWasPurgedBlock { get; set; }
+    [Selector("recordZoneWithIDWasDeletedDueToUserEncryptedDataResetBlock", "setRecordZoneWithIDWasDeletedDueToUserEncryptedDataResetBlock:")]
+    public CKFetchDatabaseChangesOperationRecordZoneWithIDWasDeletedDueToUserEncryptedDataResetBlock? RecordZoneWithIDWasDeletedDueToUserEncryptedDataResetBlock { get; set; }
+    [Selector("changeTokenUpdatedBlock", "setChangeTokenUpdatedBlock:")]
+    public CKFetchDatabaseChangesOperationChangeTokenUpdatedBlock? ChangeTokenUpdatedBlock { get; set; }
+    [Selector("fetchDatabaseChangesCompletionBlock", "setFetchDatabaseChangesCompletionBlock:")]
+    public CKFetchDatabaseChangesOperationFetchDatabaseChangesCompletionBlock? FetchDatabaseChangesCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithPreviousServerChangeToken:")]
+    public Self InitWithPreviousServerChangeToken(CKServerChangeToken? previousServerChangeToken);
 }
 
 #endif

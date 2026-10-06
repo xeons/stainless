@@ -42,9 +42,11 @@ public enum BCChatButtonStyle : long
 public extern objc class BCChatButton : NSControl
 {
     /// Deprecated in macOS 13.0.
-    [Selector("initWithStyle:")] public Self InitWithStyle(BCChatButtonStyle style);
+    [Selector("initWithStyle:")]
+    public Self InitWithStyle(BCChatButtonStyle style);
     /// Deprecated in macOS 13.0.
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 #endif

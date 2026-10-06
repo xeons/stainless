@@ -58,7 +58,8 @@ public using JRSSecurityExecutionPolicy = uint;
 /// Deprecated in macOS 11.0.
 public extern objc class JRSSecurity : NSObject
 {
-    [Selector("executionPolicyForExecutableCodeSignatureEvaluation:")] public static JRSSecurityExecutionPolicy ExecutionPolicyForExecutableCodeSignatureEvaluation(JRSSecurityExecutableCodeSignatureEvaluation evaluation);
+    [Selector("executionPolicyForExecutableCodeSignatureEvaluation:")]
+    public static JRSSecurityExecutionPolicy ExecutionPolicyForExecutableCodeSignatureEvaluation(JRSSecurityExecutableCodeSignatureEvaluation evaluation);
 }
 #endif
 

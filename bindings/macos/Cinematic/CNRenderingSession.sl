@@ -48,30 +48,46 @@ public objc closure void CNRenderingSessionAttributesLoadFromAssetCompletionHand
 
 public extern objc class CNRenderingSessionAttributes : NSObject
 {
-    [Selector("renderingVersion")] public NSInteger RenderingVersion { get; }
-    [Selector("loadFromAsset:completionHandler:")] public static void LoadFromAssetCompletionHandler(AVAsset asset, CNRenderingSessionAttributesLoadFromAssetCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("renderingVersion")]
+    public NSInteger RenderingVersion { get; }
+    [Selector("loadFromAsset:completionHandler:")]
+    public static void LoadFromAssetCompletionHandler(AVAsset asset, CNRenderingSessionAttributesLoadFromAssetCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public extern objc class CNRenderingSessionFrameAttributes : NSObject, NSCopying, NSMutableCopying
 {
-    [Selector("focusDisparity", "setFocusDisparity:")] public float FocusDisparity { get; set; }
-    [Selector("fNumber", "setFNumber:")] public float FNumber { get; set; }
-    [Selector("initWithSampleBuffer:sessionAttributes:")] public Self? InitWithSampleBufferSessionAttributes(CMSampleBufferRef sampleBuffer, CNRenderingSessionAttributes sessionAttributes);
-    [Selector("initWithTimedMetadataGroup:sessionAttributes:")] public Self? InitWithTimedMetadataGroupSessionAttributes(AVTimedMetadataGroup metadataGroup, CNRenderingSessionAttributes sessionAttributes);
+    [Selector("focusDisparity", "setFocusDisparity:")]
+    public float FocusDisparity { get; set; }
+    [Selector("fNumber", "setFNumber:")]
+    public float FNumber { get; set; }
+    [Selector("initWithSampleBuffer:sessionAttributes:")]
+    public Self? InitWithSampleBufferSessionAttributes(CMSampleBufferRef sampleBuffer, CNRenderingSessionAttributes sessionAttributes);
+    [Selector("initWithTimedMetadataGroup:sessionAttributes:")]
+    public Self? InitWithTimedMetadataGroupSessionAttributes(AVTimedMetadataGroup metadataGroup, CNRenderingSessionAttributes sessionAttributes);
 }
 
 public extern objc class CNRenderingSession : NSObject
 {
-    [Selector("commandQueue")] public MTLCommandQueue CommandQueue { get; }
-    [Selector("sessionAttributes")] public CNRenderingSessionAttributes SessionAttributes { get; }
-    [Selector("preferredTransform")] public CGAffineTransform PreferredTransform { get; }
-    [Selector("quality")] public CNRenderingQuality Quality { get; }
-    [Selector("sourcePixelFormatTypes")] public static NSArray SourcePixelFormatTypes { get; }
-    [Selector("destinationPixelFormatTypes")] public static NSArray DestinationPixelFormatTypes { get; }
-    [Selector("initWithCommandQueue:sessionAttributes:preferredTransform:quality:")] public Self InitWithCommandQueueSessionAttributesPreferredTransformQuality(MTLCommandQueue commandQueue, CNRenderingSessionAttributes sessionAttributes, CGAffineTransform preferredTransform, CNRenderingQuality quality);
-    [Selector("encodeRenderToCommandBuffer:frameAttributes:sourceImage:sourceDisparity:destinationImage:")] public bool EncodeRenderToCommandBufferFrameAttributesSourceImageSourceDisparityDestinationImage(MTLCommandBuffer commandBuffer, CNRenderingSessionFrameAttributes frameAttributes, CVPixelBufferRef sourceImage, CVPixelBufferRef sourceDisparity, CVPixelBufferRef destinationImage);
-    [Selector("encodeRenderToCommandBuffer:frameAttributes:sourceImage:sourceDisparity:destinationRGBA:")] public bool EncodeRenderToCommandBufferFrameAttributesSourceImageSourceDisparityDestinationRGBA(MTLCommandBuffer commandBuffer, CNRenderingSessionFrameAttributes frameAttributes, CVPixelBufferRef sourceImage, CVPixelBufferRef sourceDisparity, MTLTexture destinationRGBA);
-    [Selector("encodeRenderToCommandBuffer:frameAttributes:sourceImage:sourceDisparity:destinationLuma:destinationChroma:")] public bool EncodeRenderToCommandBufferFrameAttributesSourceImageSourceDisparityDestinationLumaDestinationChroma(MTLCommandBuffer commandBuffer, CNRenderingSessionFrameAttributes frameAttributes, CVPixelBufferRef sourceImage, CVPixelBufferRef sourceDisparity, MTLTexture destinationLuma, MTLTexture destinationChroma);
+    [Selector("commandQueue")]
+    public MTLCommandQueue CommandQueue { get; }
+    [Selector("sessionAttributes")]
+    public CNRenderingSessionAttributes SessionAttributes { get; }
+    [Selector("preferredTransform")]
+    public CGAffineTransform PreferredTransform { get; }
+    [Selector("quality")]
+    public CNRenderingQuality Quality { get; }
+    [Selector("sourcePixelFormatTypes")]
+    public static NSArray SourcePixelFormatTypes { get; }
+    [Selector("destinationPixelFormatTypes")]
+    public static NSArray DestinationPixelFormatTypes { get; }
+    [Selector("initWithCommandQueue:sessionAttributes:preferredTransform:quality:")]
+    public Self InitWithCommandQueueSessionAttributesPreferredTransformQuality(MTLCommandQueue commandQueue, CNRenderingSessionAttributes sessionAttributes, CGAffineTransform preferredTransform, CNRenderingQuality quality);
+    [Selector("encodeRenderToCommandBuffer:frameAttributes:sourceImage:sourceDisparity:destinationImage:")]
+    public bool EncodeRenderToCommandBufferFrameAttributesSourceImageSourceDisparityDestinationImage(MTLCommandBuffer commandBuffer, CNRenderingSessionFrameAttributes frameAttributes, CVPixelBufferRef sourceImage, CVPixelBufferRef sourceDisparity, CVPixelBufferRef destinationImage);
+    [Selector("encodeRenderToCommandBuffer:frameAttributes:sourceImage:sourceDisparity:destinationRGBA:")]
+    public bool EncodeRenderToCommandBufferFrameAttributesSourceImageSourceDisparityDestinationRGBA(MTLCommandBuffer commandBuffer, CNRenderingSessionFrameAttributes frameAttributes, CVPixelBufferRef sourceImage, CVPixelBufferRef sourceDisparity, MTLTexture destinationRGBA);
+    [Selector("encodeRenderToCommandBuffer:frameAttributes:sourceImage:sourceDisparity:destinationLuma:destinationChroma:")]
+    public bool EncodeRenderToCommandBufferFrameAttributesSourceImageSourceDisparityDestinationLumaDestinationChroma(MTLCommandBuffer commandBuffer, CNRenderingSessionFrameAttributes frameAttributes, CVPixelBufferRef sourceImage, CVPixelBufferRef sourceDisparity, MTLTexture destinationLuma, MTLTexture destinationChroma);
 }
 
 #endif

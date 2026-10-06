@@ -34,11 +34,16 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCReductionLayer : MLCLayer
 {
-    [Selector("reductionType")] public MLCReductionType ReductionType { get; }
-    [Selector("dimension")] public NSUInteger Dimension { get; }
-    [Selector("dimensions")] public NSArray? Dimensions { get; }
-    [Selector("layerWithReductionType:dimension:")] public static Self? LayerWithReductionTypeDimension(MLCReductionType reductionType, NSUInteger dimension);
-    [Selector("layerWithReductionType:dimensions:")] public static Self? LayerWithReductionTypeDimensions(MLCReductionType reductionType, NSArray dimensions);
+    [Selector("reductionType")]
+    public MLCReductionType ReductionType { get; }
+    [Selector("dimension")]
+    public NSUInteger Dimension { get; }
+    [Selector("dimensions")]
+    public NSArray? Dimensions { get; }
+    [Selector("layerWithReductionType:dimension:")]
+    public static Self? LayerWithReductionTypeDimension(MLCReductionType reductionType, NSUInteger dimension);
+    [Selector("layerWithReductionType:dimensions:")]
+    public static Self? LayerWithReductionTypeDimensions(MLCReductionType reductionType, NSArray dimensions);
 }
 
 #endif

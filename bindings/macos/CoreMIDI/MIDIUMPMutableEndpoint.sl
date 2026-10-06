@@ -32,12 +32,18 @@ import Standard.ObjC;
 
 public extern objc class MIDIUMPMutableEndpoint : MIDIUMPEndpoint
 {
-    [Selector("mutableFunctionBlocks", "setMutableFunctionBlocks:")] public NSArray MutableFunctionBlocks { get; set; }
-    [Selector("isEnabled")] public bool IsEnabled { get; }
-    [Selector("initWithName:deviceInfo:productInstanceID:MIDIProtocol:destinationCallback:")] public Self? InitWithNameDeviceInfoProductInstanceIDMIDIProtocolDestinationCallback(NSString name, MIDI2DeviceInfo deviceInfo, NSString productInstanceID, MIDIProtocolID MIDIProtocol, MIDIReceiveBlock destinationCallback);
-    [Selector("setName:error:")] public bool SetNameError(NSString name, out NSError? error);
-    [Selector("registerFunctionBlocks:markAsStatic:error:")] public bool RegisterFunctionBlocksMarkAsStaticError(NSArray functionBlocks, bool markAsStatic, out NSError? error);
-    [Selector("setEnabled:error:")] public bool SetEnabledError(bool isEnabled, out NSError? error);
+    [Selector("mutableFunctionBlocks", "setMutableFunctionBlocks:")]
+    public NSArray MutableFunctionBlocks { get; set; }
+    [Selector("isEnabled")]
+    public bool IsEnabled { get; }
+    [Selector("initWithName:deviceInfo:productInstanceID:MIDIProtocol:destinationCallback:")]
+    public Self? InitWithNameDeviceInfoProductInstanceIDMIDIProtocolDestinationCallback(NSString name, MIDI2DeviceInfo deviceInfo, NSString productInstanceID, MIDIProtocolID MIDIProtocol, MIDIReceiveBlock destinationCallback);
+    [Selector("setName:error:")]
+    public bool SetNameError(NSString name, out NSError? error);
+    [Selector("registerFunctionBlocks:markAsStatic:error:")]
+    public bool RegisterFunctionBlocksMarkAsStaticError(NSArray functionBlocks, bool markAsStatic, out NSError? error);
+    [Selector("setEnabled:error:")]
+    public bool SetEnabledError(bool isEnabled, out NSError? error);
 }
 
 #endif

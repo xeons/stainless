@@ -44,15 +44,24 @@ public objc closure void SLRequestHandler(NSData? arg0, NSHTTPURLResponse? arg1,
 
 public extern objc class SLRequest : NSObject
 {
-    [Selector("account", "setAccount:")] public ACAccount? Account { get; set; }
-    [Selector("requestMethod")] public SLRequestMethod RequestMethod { get; }
-    [Selector("URL")] public NSURL? URL { get; }
-    [Selector("parameters")] public NSDictionary? Parameters { get; }
-    [Selector("requestForServiceType:requestMethod:URL:parameters:")] public static SLRequest? RequestForServiceTypeRequestMethodURLParameters(NSString? serviceType, SLRequestMethod requestMethod, NSURL? url, NSDictionary? parameters);
-    [Selector("addMultipartData:withName:type:filename:")] public void AddMultipartDataWithNameTypeFilename(NSData? data, NSString? name, NSString? type, NSString? filename);
-    [Selector("addMultipartData:withName:type:")] public void AddMultipartDataWithNameType(NSData? data, NSString? name, NSString? type);
-    [Selector("preparedURLRequest")] public NSURLRequest? PreparedURLRequest();
-    [Selector("performRequestWithHandler:")] public void PerformRequestWithHandler(SLRequestHandler? handler);
+    [Selector("account", "setAccount:")]
+    public ACAccount? Account { get; set; }
+    [Selector("requestMethod")]
+    public SLRequestMethod RequestMethod { get; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
+    [Selector("parameters")]
+    public NSDictionary? Parameters { get; }
+    [Selector("requestForServiceType:requestMethod:URL:parameters:")]
+    public static SLRequest? RequestForServiceTypeRequestMethodURLParameters(NSString? serviceType, SLRequestMethod requestMethod, NSURL? url, NSDictionary? parameters);
+    [Selector("addMultipartData:withName:type:filename:")]
+    public void AddMultipartDataWithNameTypeFilename(NSData? data, NSString? name, NSString? type, NSString? filename);
+    [Selector("addMultipartData:withName:type:")]
+    public void AddMultipartDataWithNameType(NSData? data, NSString? name, NSString? type);
+    [Selector("preparedURLRequest")]
+    public NSURLRequest? PreparedURLRequest();
+    [Selector("performRequestWithHandler:")]
+    public void PerformRequestWithHandler(SLRequestHandler? handler);
 }
 
 #endif

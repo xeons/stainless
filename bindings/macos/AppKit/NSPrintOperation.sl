@@ -49,52 +49,87 @@ public extern "C" NSExceptionName NSPrintOperationExistsException;
 
 public extern objc class NSPrintOperation : NSObject
 {
-    [Selector("currentOperation", "setCurrentOperation:")] public static NSPrintOperation? CurrentOperation { get; set; }
-    [Selector("isCopyingOperation")] public bool CopyingOperation { get; }
-    [Selector("preferredRenderingQuality")] public NSPrintRenderingQuality PreferredRenderingQuality { get; }
-    [Selector("jobTitle", "setJobTitle:")] public NSString? JobTitle { get; set; }
-    [Selector("showsPrintPanel", "setShowsPrintPanel:")] public bool ShowsPrintPanel { get; set; }
-    [Selector("showsProgressPanel", "setShowsProgressPanel:")] public bool ShowsProgressPanel { get; set; }
-    [Selector("printPanel", "setPrintPanel:")] public NSPrintPanel PrintPanel { get; set; }
-    [Selector("PDFPanel", "setPDFPanel:")] public NSPDFPanel? PDFPanel { get; set; }
-    [Selector("canSpawnSeparateThread", "setCanSpawnSeparateThread:")] public bool CanSpawnSeparateThread { get; set; }
-    [Selector("pageOrder", "setPageOrder:")] public NSPrintingPageOrder PageOrder { get; set; }
-    [Selector("view")] public NSView? View { get; }
-    [Selector("printInfo", "setPrintInfo:")] public NSPrintInfo PrintInfo { get; set; }
-    [Selector("context")] public NSGraphicsContext? Context { get; }
-    [Selector("pageRange")] public NSRange PageRange { get; }
-    [Selector("currentPage")] public NSInteger CurrentPage { get; }
-    [Selector("printOperationWithView:printInfo:")] public static NSPrintOperation PrintOperationWithViewPrintInfo(NSView view, NSPrintInfo printInfo);
-    [Selector("PDFOperationWithView:insideRect:toData:printInfo:")] public static NSPrintOperation PDFOperationWithViewInsideRectToDataPrintInfo(NSView view, NSRect rect, NSMutableData data, NSPrintInfo printInfo);
-    [Selector("PDFOperationWithView:insideRect:toPath:printInfo:")] public static NSPrintOperation PDFOperationWithViewInsideRectToPathPrintInfo(NSView view, NSRect rect, NSString path, NSPrintInfo printInfo);
-    [Selector("EPSOperationWithView:insideRect:toData:printInfo:")] public static NSPrintOperation EPSOperationWithViewInsideRectToDataPrintInfo(NSView view, NSRect rect, NSMutableData data, NSPrintInfo printInfo);
-    [Selector("EPSOperationWithView:insideRect:toPath:printInfo:")] public static NSPrintOperation EPSOperationWithViewInsideRectToPathPrintInfo(NSView view, NSRect rect, NSString path, NSPrintInfo printInfo);
-    [Selector("printOperationWithView:")] public static NSPrintOperation PrintOperationWithView(NSView view);
-    [Selector("PDFOperationWithView:insideRect:toData:")] public static NSPrintOperation PDFOperationWithViewInsideRectToData(NSView view, NSRect rect, NSMutableData data);
-    [Selector("EPSOperationWithView:insideRect:toData:")] public static NSPrintOperation EPSOperationWithViewInsideRectToData(NSView view, NSRect rect, NSMutableData? data);
-    [Selector("runOperationModalForWindow:delegate:didRunSelector:contextInfo:")] public void RunOperationModalForWindowDelegateDidRunSelectorContextInfo(NSWindow docWindow, AnyObject? @delegate, Selector didRunSelector, void* contextInfo);
-    [Selector("runOperation")] public bool RunOperation();
-    [Selector("createContext")] public NSGraphicsContext? CreateContext();
-    [Selector("destroyContext")] public void DestroyContext();
-    [Selector("deliverResult")] public bool DeliverResult();
-    [Selector("cleanUpOperation")] public void CleanUpOperation();
+    [Selector("currentOperation", "setCurrentOperation:")]
+    public static NSPrintOperation? CurrentOperation { get; set; }
+    [Selector("isCopyingOperation")]
+    public bool CopyingOperation { get; }
+    [Selector("preferredRenderingQuality")]
+    public NSPrintRenderingQuality PreferredRenderingQuality { get; }
+    [Selector("jobTitle", "setJobTitle:")]
+    public NSString? JobTitle { get; set; }
+    [Selector("showsPrintPanel", "setShowsPrintPanel:")]
+    public bool ShowsPrintPanel { get; set; }
+    [Selector("showsProgressPanel", "setShowsProgressPanel:")]
+    public bool ShowsProgressPanel { get; set; }
+    [Selector("printPanel", "setPrintPanel:")]
+    public NSPrintPanel PrintPanel { get; set; }
+    [Selector("PDFPanel", "setPDFPanel:")]
+    public NSPDFPanel? PDFPanel { get; set; }
+    [Selector("canSpawnSeparateThread", "setCanSpawnSeparateThread:")]
+    public bool CanSpawnSeparateThread { get; set; }
+    [Selector("pageOrder", "setPageOrder:")]
+    public NSPrintingPageOrder PageOrder { get; set; }
+    [Selector("view")]
+    public NSView? View { get; }
+    [Selector("printInfo", "setPrintInfo:")]
+    public NSPrintInfo PrintInfo { get; set; }
+    [Selector("context")]
+    public NSGraphicsContext? Context { get; }
+    [Selector("pageRange")]
+    public NSRange PageRange { get; }
+    [Selector("currentPage")]
+    public NSInteger CurrentPage { get; }
+    [Selector("printOperationWithView:printInfo:")]
+    public static NSPrintOperation PrintOperationWithViewPrintInfo(NSView view, NSPrintInfo printInfo);
+    [Selector("PDFOperationWithView:insideRect:toData:printInfo:")]
+    public static NSPrintOperation PDFOperationWithViewInsideRectToDataPrintInfo(NSView view, NSRect rect, NSMutableData data, NSPrintInfo printInfo);
+    [Selector("PDFOperationWithView:insideRect:toPath:printInfo:")]
+    public static NSPrintOperation PDFOperationWithViewInsideRectToPathPrintInfo(NSView view, NSRect rect, NSString path, NSPrintInfo printInfo);
+    [Selector("EPSOperationWithView:insideRect:toData:printInfo:")]
+    public static NSPrintOperation EPSOperationWithViewInsideRectToDataPrintInfo(NSView view, NSRect rect, NSMutableData data, NSPrintInfo printInfo);
+    [Selector("EPSOperationWithView:insideRect:toPath:printInfo:")]
+    public static NSPrintOperation EPSOperationWithViewInsideRectToPathPrintInfo(NSView view, NSRect rect, NSString path, NSPrintInfo printInfo);
+    [Selector("printOperationWithView:")]
+    public static NSPrintOperation PrintOperationWithView(NSView view);
+    [Selector("PDFOperationWithView:insideRect:toData:")]
+    public static NSPrintOperation PDFOperationWithViewInsideRectToData(NSView view, NSRect rect, NSMutableData data);
+    [Selector("EPSOperationWithView:insideRect:toData:")]
+    public static NSPrintOperation EPSOperationWithViewInsideRectToData(NSView view, NSRect rect, NSMutableData? data);
+    [Selector("runOperationModalForWindow:delegate:didRunSelector:contextInfo:")]
+    public void RunOperationModalForWindowDelegateDidRunSelectorContextInfo(NSWindow docWindow, AnyObject? @delegate, Selector didRunSelector, void* contextInfo);
+    [Selector("runOperation")]
+    public bool RunOperation();
+    [Selector("createContext")]
+    public NSGraphicsContext? CreateContext();
+    [Selector("destroyContext")]
+    public void DestroyContext();
+    [Selector("deliverResult")]
+    public bool DeliverResult();
+    [Selector("cleanUpOperation")]
+    public void CleanUpOperation();
 }
 
 /// NSDeprecated, a category of NSPrintOperation.
 public extern objc class NSPrintOperation
 {
     /// Deprecated in macOS 10.5.
-    [Selector("setAccessoryView:")] public void SetAccessoryView(NSView? view);
+    [Selector("setAccessoryView:")]
+    public void SetAccessoryView(NSView? view);
     /// Deprecated in macOS 10.5.
-    [Selector("accessoryView")] public NSView? AccessoryView();
+    [Selector("accessoryView")]
+    public NSView? AccessoryView();
     /// Deprecated in macOS 10.5.
-    [Selector("setJobStyleHint:")] public void SetJobStyleHint(NSString? hint);
+    [Selector("setJobStyleHint:")]
+    public void SetJobStyleHint(NSString? hint);
     /// Deprecated in macOS 10.5.
-    [Selector("jobStyleHint")] public NSString? JobStyleHint();
+    [Selector("jobStyleHint")]
+    public NSString? JobStyleHint();
     /// Deprecated in macOS 10.4.
-    [Selector("setShowPanels:")] public void SetShowPanels(bool flag);
+    [Selector("setShowPanels:")]
+    public void SetShowPanels(bool flag);
     /// Deprecated in macOS 10.4.
-    [Selector("showPanels")] public bool ShowPanels();
+    [Selector("showPanels")]
+    public bool ShowPanels();
 }
 
 #endif

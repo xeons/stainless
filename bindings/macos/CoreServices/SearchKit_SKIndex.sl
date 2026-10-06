@@ -61,11 +61,13 @@ public enum SKDocumentIndexState : int
     DeletePending = 3,
 }
 
-[ReturnsRetained] public extern "C" SKIndexRef? SKIndexCreateWithURL(CFURLRef? inURL, CFStringRef? inIndexName, SKIndexType inIndexType, CFDictionaryRef? inAnalysisProperties);
+[ReturnsRetained]
+public extern "C" SKIndexRef? SKIndexCreateWithURL(CFURLRef? inURL, CFStringRef? inIndexName, SKIndexType inIndexType, CFDictionaryRef? inAnalysisProperties);
 
 public extern "C" SKIndexRef? SKIndexOpenWithURL(CFURLRef? inURL, CFStringRef? inIndexName, Boolean inWriteAccess);
 
-[ReturnsRetained] public extern "C" SKIndexRef? SKIndexCreateWithMutableData(CFMutableDataRef? inData, CFStringRef? inIndexName, SKIndexType inIndexType, CFDictionaryRef? inAnalysisProperties);
+[ReturnsRetained]
+public extern "C" SKIndexRef? SKIndexCreateWithMutableData(CFMutableDataRef? inData, CFStringRef? inIndexName, SKIndexType inIndexType, CFDictionaryRef? inAnalysisProperties);
 
 public extern "C" SKIndexRef? SKIndexOpenWithData(CFDataRef? inData, CFStringRef? inIndexName);
 
@@ -95,7 +97,8 @@ public extern "C" Boolean SKIndexAddDocument(SKIndexRef? inIndex, SKDocumentRef?
 
 public extern "C" Boolean SKIndexRemoveDocument(SKIndexRef? inIndex, SKDocumentRef? inDocument);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? SKIndexCopyDocumentProperties(SKIndexRef? inIndex, SKDocumentRef? inDocument);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? SKIndexCopyDocumentProperties(SKIndexRef? inIndex, SKDocumentRef? inDocument);
 
 public extern "C" void SKIndexSetDocumentProperties(SKIndexRef? inIndex, SKDocumentRef? inDocument, CFDictionaryRef? inProperties);
 
@@ -103,21 +106,25 @@ public extern "C" SKDocumentIndexState SKIndexGetDocumentState(SKIndexRef? inInd
 
 public extern "C" SKDocumentID SKIndexGetDocumentID(SKIndexRef? inIndex, SKDocumentRef? inDocument);
 
-[ReturnsRetained] public extern "C" SKDocumentRef? SKIndexCopyDocumentForDocumentID(SKIndexRef? inIndex, SKDocumentID inDocumentID);
+[ReturnsRetained]
+public extern "C" SKDocumentRef? SKIndexCopyDocumentForDocumentID(SKIndexRef? inIndex, SKDocumentID inDocumentID);
 
 public extern "C" Boolean SKIndexRenameDocument(SKIndexRef? inIndex, SKDocumentRef? inDocument, CFStringRef? inNewName);
 
 public extern "C" Boolean SKIndexMoveDocument(SKIndexRef? inIndex, SKDocumentRef? inDocument, SKDocumentRef? inNewParent);
 
-[ReturnsRetained] public extern "C" SKIndexDocumentIteratorRef? SKIndexDocumentIteratorCreate(SKIndexRef? inIndex, SKDocumentRef? inParentDocument);
+[ReturnsRetained]
+public extern "C" SKIndexDocumentIteratorRef? SKIndexDocumentIteratorCreate(SKIndexRef? inIndex, SKDocumentRef? inParentDocument);
 
-[ReturnsRetained] public extern "C" SKDocumentRef? SKIndexDocumentIteratorCopyNext(SKIndexDocumentIteratorRef? inIterator);
+[ReturnsRetained]
+public extern "C" SKDocumentRef? SKIndexDocumentIteratorCopyNext(SKIndexDocumentIteratorRef? inIterator);
 
 public extern "C" SKDocumentID SKIndexGetMaximumDocumentID(SKIndexRef? inIndex);
 
 public extern "C" CFIndex SKIndexGetDocumentTermCount(SKIndexRef? inIndex, SKDocumentID inDocumentID);
 
-[ReturnsRetained] public extern "C" CFArrayRef? SKIndexCopyTermIDArrayForDocumentID(SKIndexRef? inIndex, SKDocumentID inDocumentID);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SKIndexCopyTermIDArrayForDocumentID(SKIndexRef? inIndex, SKDocumentID inDocumentID);
 
 public extern "C" CFIndex SKIndexGetDocumentTermFrequency(SKIndexRef? inIndex, SKDocumentID inDocumentID, CFIndex inTermID);
 
@@ -125,9 +132,11 @@ public extern "C" CFIndex SKIndexGetMaximumTermID(SKIndexRef? inIndex);
 
 public extern "C" CFIndex SKIndexGetTermDocumentCount(SKIndexRef? inIndex, CFIndex inTermID);
 
-[ReturnsRetained] public extern "C" CFArrayRef? SKIndexCopyDocumentIDArrayForTermID(SKIndexRef? inIndex, CFIndex inTermID);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SKIndexCopyDocumentIDArrayForTermID(SKIndexRef? inIndex, CFIndex inTermID);
 
-[ReturnsRetained] public extern "C" CFStringRef? SKIndexCopyTermStringForTermID(SKIndexRef? inIndex, CFIndex inTermID);
+[ReturnsRetained]
+public extern "C" CFStringRef? SKIndexCopyTermStringForTermID(SKIndexRef? inIndex, CFIndex inTermID);
 
 public extern "C" CFIndex SKIndexGetTermIDForTermString(SKIndexRef? inIndex, CFStringRef? inTermString);
 

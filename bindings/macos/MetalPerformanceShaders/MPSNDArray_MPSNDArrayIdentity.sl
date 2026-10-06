@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class MPSNDArrayIdentity : MPSNDArrayUnaryKernel
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("reshapeWithCommandBuffer:sourceArray:shape:destinationArray:")] public MPSNDArray? ReshapeWithCommandBufferSourceArrayShapeDestinationArray(MTLCommandBuffer? cmdBuf, MPSNDArray sourceArray, MPSShape shape, MPSNDArray? destinationArray);
-    [Selector("reshapeWithCommandBuffer:sourceArray:dimensionCount:dimensionSizes:destinationArray:")] public MPSNDArray? ReshapeWithCommandBufferSourceArrayDimensionCountDimensionSizesDestinationArray(MTLCommandBuffer? cmdBuf, MPSNDArray sourceArray, NSUInteger numberOfDimensions, NSUInteger* dimensionSizes, MPSNDArray? destinationArray);
-    [Selector("reshapeWithCommandEncoder:commandBuffer:sourceArray:shape:destinationArray:")] public MPSNDArray? ReshapeWithCommandEncoderCommandBufferSourceArrayShapeDestinationArray(MTLComputeCommandEncoder? encoder, MTLCommandBuffer? cmdBuf, MPSNDArray sourceArray, MPSShape shape, MPSNDArray? destinationArray);
-    [Selector("reshapeWithCommandEncoder:commandBuffer:sourceArray:dimensionCount:dimensionSizes:destinationArray:")] public MPSNDArray? ReshapeWithCommandEncoderCommandBufferSourceArrayDimensionCountDimensionSizesDestinationArray(MTLComputeCommandEncoder? encoder, MTLCommandBuffer? cmdBuf, MPSNDArray sourceArray, NSUInteger numberOfDimensions, NSUInteger* dimensionSizes, MPSNDArray? destinationArray);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("reshapeWithCommandBuffer:sourceArray:shape:destinationArray:")]
+    public MPSNDArray? ReshapeWithCommandBufferSourceArrayShapeDestinationArray(MTLCommandBuffer? cmdBuf, MPSNDArray sourceArray, MPSShape shape, MPSNDArray? destinationArray);
+    [Selector("reshapeWithCommandBuffer:sourceArray:dimensionCount:dimensionSizes:destinationArray:")]
+    public MPSNDArray? ReshapeWithCommandBufferSourceArrayDimensionCountDimensionSizesDestinationArray(MTLCommandBuffer? cmdBuf, MPSNDArray sourceArray, NSUInteger numberOfDimensions, NSUInteger* dimensionSizes, MPSNDArray? destinationArray);
+    [Selector("reshapeWithCommandEncoder:commandBuffer:sourceArray:shape:destinationArray:")]
+    public MPSNDArray? ReshapeWithCommandEncoderCommandBufferSourceArrayShapeDestinationArray(MTLComputeCommandEncoder? encoder, MTLCommandBuffer? cmdBuf, MPSNDArray sourceArray, MPSShape shape, MPSNDArray? destinationArray);
+    [Selector("reshapeWithCommandEncoder:commandBuffer:sourceArray:dimensionCount:dimensionSizes:destinationArray:")]
+    public MPSNDArray? ReshapeWithCommandEncoderCommandBufferSourceArrayDimensionCountDimensionSizesDestinationArray(MTLComputeCommandEncoder? encoder, MTLCommandBuffer? cmdBuf, MPSNDArray sourceArray, NSUInteger numberOfDimensions, NSUInteger* dimensionSizes, MPSNDArray? destinationArray);
 }
 
 #endif

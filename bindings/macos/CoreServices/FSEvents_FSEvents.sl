@@ -102,11 +102,13 @@ public extern "C" FSEventStreamEventId FSEventStreamGetLatestEventId(ConstFSEven
 
 public extern "C" dev_t FSEventStreamGetDeviceBeingWatched(ConstFSEventStreamRef streamRef);
 
-[ReturnsRetained] public extern "C" CFArrayRef FSEventStreamCopyPathsBeingWatched(ConstFSEventStreamRef streamRef);
+[ReturnsRetained]
+public extern "C" CFArrayRef FSEventStreamCopyPathsBeingWatched(ConstFSEventStreamRef streamRef);
 
 public extern "C" FSEventStreamEventId FSEventsGetCurrentEventId();
 
-[ReturnsRetained] public extern "C" CFUUIDRef? FSEventsCopyUUIDForDevice(dev_t dev);
+[ReturnsRetained]
+public extern "C" CFUUIDRef? FSEventsCopyUUIDForDevice(dev_t dev);
 
 public extern "C" FSEventStreamEventId FSEventsGetLastEventIdForDeviceBeforeTime(dev_t dev, CFAbsoluteTime time);
 
@@ -136,7 +138,8 @@ public extern "C" void FSEventStreamStop(FSEventStreamRef streamRef);
 
 public extern "C" void FSEventStreamShow(ConstFSEventStreamRef streamRef);
 
-[ReturnsRetained] public extern "C" CFStringRef FSEventStreamCopyDescription(ConstFSEventStreamRef streamRef);
+[ReturnsRetained]
+public extern "C" CFStringRef FSEventStreamCopyDescription(ConstFSEventStreamRef streamRef);
 
 public extern "C" Boolean FSEventStreamSetExclusionPaths(FSEventStreamRef streamRef, CFArrayRef pathsToExclude);
 

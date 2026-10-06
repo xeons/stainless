@@ -37,12 +37,18 @@ public objc closure void MLComputePlanLoadModelAssetConfigurationCompletionHandl
 
 public extern objc class MLComputePlan : NSObject
 {
-    [Selector("modelStructure")] public MLModelStructure ModelStructure { get; }
-    [Selector("loadContentsOfURL:configuration:completionHandler:")] public static void LoadContentsOfURLConfigurationCompletionHandler(NSURL url, MLModelConfiguration configuration, MLComputePlanLoadContentsOfURLConfigurationCompletionHandlerHandlerBlock handler);
-    [Selector("loadModelAsset:configuration:completionHandler:")] public static void LoadModelAssetConfigurationCompletionHandler(MLModelAsset asset, MLModelConfiguration configuration, MLComputePlanLoadModelAssetConfigurationCompletionHandlerHandlerBlock handler);
-    [Selector("estimatedCostOfMLProgramOperation:")] public MLComputePlanCost? EstimatedCostOfMLProgramOperation(MLModelStructureProgramOperation operation);
-    [Selector("computeDeviceUsageForNeuralNetworkLayer:")] public MLComputePlanDeviceUsage? ComputeDeviceUsageForNeuralNetworkLayer(MLModelStructureNeuralNetworkLayer layer);
-    [Selector("computeDeviceUsageForMLProgramOperation:")] public MLComputePlanDeviceUsage? ComputeDeviceUsageForMLProgramOperation(MLModelStructureProgramOperation operation);
+    [Selector("modelStructure")]
+    public MLModelStructure ModelStructure { get; }
+    [Selector("loadContentsOfURL:configuration:completionHandler:")]
+    public static void LoadContentsOfURLConfigurationCompletionHandler(NSURL url, MLModelConfiguration configuration, MLComputePlanLoadContentsOfURLConfigurationCompletionHandlerHandlerBlock handler);
+    [Selector("loadModelAsset:configuration:completionHandler:")]
+    public static void LoadModelAssetConfigurationCompletionHandler(MLModelAsset asset, MLModelConfiguration configuration, MLComputePlanLoadModelAssetConfigurationCompletionHandlerHandlerBlock handler);
+    [Selector("estimatedCostOfMLProgramOperation:")]
+    public MLComputePlanCost? EstimatedCostOfMLProgramOperation(MLModelStructureProgramOperation operation);
+    [Selector("computeDeviceUsageForNeuralNetworkLayer:")]
+    public MLComputePlanDeviceUsage? ComputeDeviceUsageForNeuralNetworkLayer(MLModelStructureNeuralNetworkLayer layer);
+    [Selector("computeDeviceUsageForMLProgramOperation:")]
+    public MLComputePlanDeviceUsage? ComputeDeviceUsageForMLProgramOperation(MLModelStructureProgramOperation operation);
 }
 
 #endif

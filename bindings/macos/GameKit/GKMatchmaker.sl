@@ -56,24 +56,39 @@ public objc closure void GKMatchRequestInviteeResponseHandlerBlock(NSString arg0
 
 public extern objc class GKMatchRequest : NSObject
 {
-    [Selector("minPlayers", "setMinPlayers:")] public NSUInteger MinPlayers { get; set; }
-    [Selector("maxPlayers", "setMaxPlayers:")] public NSUInteger MaxPlayers { get; set; }
-    [Selector("playerGroup", "setPlayerGroup:")] public NSUInteger PlayerGroup { get; set; }
-    [Selector("playerAttributes", "setPlayerAttributes:")] public uint PlayerAttributes { get; set; }
-    [Selector("recipients", "setRecipients:")] public NSArray? Recipients { get; set; }
-    [Selector("inviteMessage", "setInviteMessage:")] public NSString? InviteMessage { get; set; }
-    [Selector("defaultNumberOfPlayers", "setDefaultNumberOfPlayers:")] public NSUInteger DefaultNumberOfPlayers { get; set; }
+    [Selector("minPlayers", "setMinPlayers:")]
+    public NSUInteger MinPlayers { get; set; }
+    [Selector("maxPlayers", "setMaxPlayers:")]
+    public NSUInteger MaxPlayers { get; set; }
+    [Selector("playerGroup", "setPlayerGroup:")]
+    public NSUInteger PlayerGroup { get; set; }
+    [Selector("playerAttributes", "setPlayerAttributes:")]
+    public uint PlayerAttributes { get; set; }
+    [Selector("recipients", "setRecipients:")]
+    public NSArray? Recipients { get; set; }
+    [Selector("inviteMessage", "setInviteMessage:")]
+    public NSString? InviteMessage { get; set; }
+    [Selector("defaultNumberOfPlayers", "setDefaultNumberOfPlayers:")]
+    public NSUInteger DefaultNumberOfPlayers { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("restrictToAutomatch", "setRestrictToAutomatch:")] public bool RestrictToAutomatch { get; set; }
-    [Selector("recipientResponseHandler", "setRecipientResponseHandler:")] public GKMatchRequestRecipientResponseHandlerBlock? RecipientResponseHandler { get; set; }
+    [Selector("restrictToAutomatch", "setRestrictToAutomatch:")]
+    public bool RestrictToAutomatch { get; set; }
+    [Selector("recipientResponseHandler", "setRecipientResponseHandler:")]
+    public GKMatchRequestRecipientResponseHandlerBlock? RecipientResponseHandler { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("inviteeResponseHandler", "setInviteeResponseHandler:")] public GKMatchRequestInviteeResponseHandlerBlock? InviteeResponseHandler { get; set; }
+    [Selector("inviteeResponseHandler", "setInviteeResponseHandler:")]
+    public GKMatchRequestInviteeResponseHandlerBlock? InviteeResponseHandler { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("playersToInvite", "setPlayersToInvite:")] public NSArray? PlayersToInvite { get; set; }
-    [Selector("queueName", "setQueueName:")] public NSString? QueueName { get; set; }
-    [Selector("properties", "setProperties:")] public GKMatchProperties? Properties { get; set; }
-    [Selector("recipientProperties", "setRecipientProperties:")] public NSDictionary? RecipientProperties { get; set; }
-    [Selector("maxPlayersAllowedForMatchOfType:")] public static NSUInteger MaxPlayersAllowedForMatchOfType(GKMatchType matchType);
+    [Selector("playersToInvite", "setPlayersToInvite:")]
+    public NSArray? PlayersToInvite { get; set; }
+    [Selector("queueName", "setQueueName:")]
+    public NSString? QueueName { get; set; }
+    [Selector("properties", "setProperties:")]
+    public GKMatchProperties? Properties { get; set; }
+    [Selector("recipientProperties", "setRecipientProperties:")]
+    public NSDictionary? RecipientProperties { get; set; }
+    [Selector("maxPlayersAllowedForMatchOfType:")]
+    public static NSUInteger MaxPlayersAllowedForMatchOfType(GKMatchType matchType);
 }
 
 public enum GKMatchType : ulong
@@ -85,27 +100,41 @@ public enum GKMatchType : ulong
 
 public extern objc class GKInvite : NSObject
 {
-    [Selector("sender")] public GKPlayer? Sender { get; }
-    [Selector("isHosted")] public bool Hosted { get; }
-    [Selector("playerGroup")] public NSUInteger PlayerGroup { get; }
-    [Selector("playerAttributes")] public uint PlayerAttributes { get; }
+    [Selector("sender")]
+    public GKPlayer? Sender { get; }
+    [Selector("isHosted")]
+    public bool Hosted { get; }
+    [Selector("playerGroup")]
+    public NSUInteger PlayerGroup { get; }
+    [Selector("playerAttributes")]
+    public uint PlayerAttributes { get; }
     /// Deprecated in macOS 10.10.
-    [Selector("inviter")] public NSString Inviter { get; }
+    [Selector("inviter")]
+    public NSString Inviter { get; }
 }
 
 public objc interface GKInviteEventListener
 {
-    [Optional] [Selector("player:didAcceptInvite:")] void PlayerDidAcceptInvite(GKPlayer player, GKInvite invite);
-    [Optional] [Selector("player:didRequestMatchWithRecipients:")] void PlayerDidRequestMatchWithRecipients(GKPlayer player, NSArray recipientPlayers);
+    [Optional]
+    [Selector("player:didAcceptInvite:")]
+    void PlayerDidAcceptInvite(GKPlayer player, GKInvite invite);
+    [Optional]
+    [Selector("player:didRequestMatchWithRecipients:")]
+    void PlayerDidRequestMatchWithRecipients(GKPlayer player, NSArray recipientPlayers);
     /// Deprecated in macOS 10.10.
-    [Optional] [Selector("player:didRequestMatchWithPlayers:")] void PlayerDidRequestMatchWithPlayers(GKPlayer player, NSArray playerIDsToInvite);
+    [Optional]
+    [Selector("player:didRequestMatchWithPlayers:")]
+    void PlayerDidRequestMatchWithPlayers(GKPlayer player, NSArray playerIDsToInvite);
 }
 
 public extern objc class GKMatchedPlayers : NSObject
 {
-    [Selector("properties")] public GKMatchProperties? Properties { get; }
-    [Selector("players")] public NSArray Players { get; }
-    [Selector("playerProperties")] public NSDictionary? PlayerProperties { get; }
+    [Selector("properties")]
+    public GKMatchProperties? Properties { get; }
+    [Selector("players")]
+    public NSArray Players { get; }
+    [Selector("playerProperties")]
+    public NSDictionary? PlayerProperties { get; }
 }
 
 public objc closure void GKMatchmakerMatchForInviteCompletionHandlerCompletionHandlerBlock(GKMatch? arg0, NSError? arg1);
@@ -130,22 +159,38 @@ public objc closure void GKMatchmakerStartGroupActivityWithPlayerHandlerHandlerB
 
 public extern objc class GKMatchmaker : NSObject
 {
-    [Selector("sharedMatchmaker")] public static GKMatchmaker SharedMatchmaker();
-    [Selector("matchForInvite:completionHandler:")] public void MatchForInviteCompletionHandler(GKInvite invite, GKMatchmakerMatchForInviteCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("findMatchForRequest:withCompletionHandler:")] public void FindMatchForRequestWithCompletionHandler(GKMatchRequest request, GKMatchmakerFindMatchForRequestWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("findPlayersForHostedRequest:withCompletionHandler:")] public void FindPlayersForHostedRequestWithCompletionHandler(GKMatchRequest request, GKMatchmakerFindPlayersForHostedRequestWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("findMatchedPlayers:withCompletionHandler:")] public void FindMatchedPlayersWithCompletionHandler(GKMatchRequest request, GKMatchmakerFindMatchedPlayersWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("addPlayersToMatch:matchRequest:completionHandler:")] public void AddPlayersToMatchMatchRequestCompletionHandler(GKMatch match, GKMatchRequest matchRequest, GKMatchmakerAddPlayersToMatchMatchRequestCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("cancel")] public void Cancel();
-    [Selector("cancelPendingInviteToPlayer:")] public void CancelPendingInviteToPlayer(GKPlayer player);
-    [Selector("finishMatchmakingForMatch:")] public void FinishMatchmakingForMatch(GKMatch match);
-    [Selector("queryPlayerGroupActivity:withCompletionHandler:")] public void QueryPlayerGroupActivityWithCompletionHandler(NSUInteger playerGroup, GKMatchmakerQueryPlayerGroupActivityWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("queryActivityWithCompletionHandler:")] public void QueryActivityWithCompletionHandler(GKMatchmakerQueryActivityWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("queryQueueActivity:withCompletionHandler:")] public void QueryQueueActivityWithCompletionHandler(NSString queueName, GKMatchmakerQueryQueueActivityWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("startBrowsingForNearbyPlayersWithHandler:")] public void StartBrowsingForNearbyPlayersWithHandler(GKMatchmakerStartBrowsingForNearbyPlayersWithHandlerReachableHandlerBlock? reachableHandler);
-    [Selector("stopBrowsingForNearbyPlayers")] public void StopBrowsingForNearbyPlayers();
-    [Selector("startGroupActivityWithPlayerHandler:")] public void StartGroupActivityWithPlayerHandler(GKMatchmakerStartGroupActivityWithPlayerHandlerHandlerBlock handler);
-    [Selector("stopGroupActivity")] public void StopGroupActivity();
+    [Selector("sharedMatchmaker")]
+    public static GKMatchmaker SharedMatchmaker();
+    [Selector("matchForInvite:completionHandler:")]
+    public void MatchForInviteCompletionHandler(GKInvite invite, GKMatchmakerMatchForInviteCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("findMatchForRequest:withCompletionHandler:")]
+    public void FindMatchForRequestWithCompletionHandler(GKMatchRequest request, GKMatchmakerFindMatchForRequestWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("findPlayersForHostedRequest:withCompletionHandler:")]
+    public void FindPlayersForHostedRequestWithCompletionHandler(GKMatchRequest request, GKMatchmakerFindPlayersForHostedRequestWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("findMatchedPlayers:withCompletionHandler:")]
+    public void FindMatchedPlayersWithCompletionHandler(GKMatchRequest request, GKMatchmakerFindMatchedPlayersWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("addPlayersToMatch:matchRequest:completionHandler:")]
+    public void AddPlayersToMatchMatchRequestCompletionHandler(GKMatch match, GKMatchRequest matchRequest, GKMatchmakerAddPlayersToMatchMatchRequestCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("cancel")]
+    public void Cancel();
+    [Selector("cancelPendingInviteToPlayer:")]
+    public void CancelPendingInviteToPlayer(GKPlayer player);
+    [Selector("finishMatchmakingForMatch:")]
+    public void FinishMatchmakingForMatch(GKMatch match);
+    [Selector("queryPlayerGroupActivity:withCompletionHandler:")]
+    public void QueryPlayerGroupActivityWithCompletionHandler(NSUInteger playerGroup, GKMatchmakerQueryPlayerGroupActivityWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("queryActivityWithCompletionHandler:")]
+    public void QueryActivityWithCompletionHandler(GKMatchmakerQueryActivityWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("queryQueueActivity:withCompletionHandler:")]
+    public void QueryQueueActivityWithCompletionHandler(NSString queueName, GKMatchmakerQueryQueueActivityWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("startBrowsingForNearbyPlayersWithHandler:")]
+    public void StartBrowsingForNearbyPlayersWithHandler(GKMatchmakerStartBrowsingForNearbyPlayersWithHandlerReachableHandlerBlock? reachableHandler);
+    [Selector("stopBrowsingForNearbyPlayers")]
+    public void StopBrowsingForNearbyPlayers();
+    [Selector("startGroupActivityWithPlayerHandler:")]
+    public void StartGroupActivityWithPlayerHandler(GKMatchmakerStartGroupActivityWithPlayerHandlerHandlerBlock handler);
+    [Selector("stopGroupActivity")]
+    public void StopGroupActivity();
 }
 
 public objc closure void GKMatchmakerInviteHandlerBlock(GKInvite arg0, NSArray? arg1);
@@ -154,7 +199,8 @@ public objc closure void GKMatchmakerInviteHandlerBlock(GKInvite arg0, NSArray? 
 public extern objc class GKMatchmaker
 {
     /// Deprecated in macOS 10.10.
-    [Selector("inviteHandler", "setInviteHandler:")] public GKMatchmakerInviteHandlerBlock? InviteHandler { get; set; }
+    [Selector("inviteHandler", "setInviteHandler:")]
+    public GKMatchmakerInviteHandlerBlock? InviteHandler { get; set; }
 }
 
 public objc closure void GKMatchmakerStartBrowsingForNearbyPlayersWithReachableHandlerReachableHandlerBlock(NSString arg0, bool arg1);
@@ -165,11 +211,14 @@ public objc closure void GKMatchmakerFindPlayersForHostedMatchRequestWithComplet
 public extern objc class GKMatchmaker
 {
     /// Deprecated in macOS 10.10.
-    [Selector("startBrowsingForNearbyPlayersWithReachableHandler:")] public void StartBrowsingForNearbyPlayersWithReachableHandler(GKMatchmakerStartBrowsingForNearbyPlayersWithReachableHandlerReachableHandlerBlock? reachableHandler);
+    [Selector("startBrowsingForNearbyPlayersWithReachableHandler:")]
+    public void StartBrowsingForNearbyPlayersWithReachableHandler(GKMatchmakerStartBrowsingForNearbyPlayersWithReachableHandlerReachableHandlerBlock? reachableHandler);
     /// Deprecated in macOS 10.10.
-    [Selector("cancelInviteToPlayer:")] public void CancelInviteToPlayer(NSString playerID);
+    [Selector("cancelInviteToPlayer:")]
+    public void CancelInviteToPlayer(NSString playerID);
     /// Deprecated in macOS 10.10.
-    [Selector("findPlayersForHostedMatchRequest:withCompletionHandler:")] public void FindPlayersForHostedMatchRequestWithCompletionHandler(GKMatchRequest request, GKMatchmakerFindPlayersForHostedMatchRequestWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("findPlayersForHostedMatchRequest:withCompletionHandler:")]
+    public void FindPlayersForHostedMatchRequestWithCompletionHandler(GKMatchRequest request, GKMatchmakerFindPlayersForHostedMatchRequestWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 #endif

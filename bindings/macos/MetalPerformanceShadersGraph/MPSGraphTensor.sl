@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class MPSGraphTensor : MPSGraphObject, NSCopying
 {
-    [Selector("shape")] public MPSShape? Shape { get; }
-    [Selector("dataType")] public MPSDataType DataType { get; }
-    [Selector("operation")] public MPSGraphOperation Operation { get; }
+    [Selector("shape")]
+    public MPSShape? Shape { get; }
+    [Selector("dataType")]
+    public MPSDataType DataType { get; }
+    [Selector("operation")]
+    public MPSGraphOperation Operation { get; }
 }
 
 #endif

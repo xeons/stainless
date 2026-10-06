@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class VNHumanBodyRecognizedPoint3D : VNRecognizedPoint3D
 {
-    [Selector("localPosition")] public simd_float4x4 LocalPosition { get; }
-    [Selector("parentJoint")] public VNHumanBodyPose3DObservationJointName ParentJoint { get; }
+    [Selector("localPosition")]
+    public simd_float4x4 LocalPosition { get; }
+    [Selector("parentJoint")]
+    public VNHumanBodyPose3DObservationJointName ParentJoint { get; }
 }
 
 #endif

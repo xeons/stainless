@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MLOptimizationHints : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("reshapeFrequency", "setReshapeFrequency:")] public MLReshapeFrequencyHint ReshapeFrequency { get; set; }
-    [Selector("specializationStrategy", "setSpecializationStrategy:")] public MLSpecializationStrategy SpecializationStrategy { get; set; }
+    [Selector("reshapeFrequency", "setReshapeFrequency:")]
+    public MLReshapeFrequencyHint ReshapeFrequency { get; set; }
+    [Selector("specializationStrategy", "setSpecializationStrategy:")]
+    public MLSpecializationStrategy SpecializationStrategy { get; set; }
 }
 
 #endif

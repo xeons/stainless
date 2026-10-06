@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioSocketDeviceConfiguration : VZSocketDeviceConfiguration
 {
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

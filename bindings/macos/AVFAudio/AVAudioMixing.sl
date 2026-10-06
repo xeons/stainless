@@ -32,13 +32,16 @@ import Standard.ObjC;
 
 public objc interface AVAudioMixing : AVAudioStereoMixing, AVAudio3DMixing
 {
-    [Selector("volume", "setVolume:")] float Volume { get; set; }
-    [Selector("destinationForMixer:bus:")] AVAudioMixingDestination? DestinationForMixerBus(AVAudioNode mixer, AVAudioNodeBus bus);
+    [Selector("volume", "setVolume:")]
+    float Volume { get; set; }
+    [Selector("destinationForMixer:bus:")]
+    AVAudioMixingDestination? DestinationForMixerBus(AVAudioNode mixer, AVAudioNodeBus bus);
 }
 
 public objc interface AVAudioStereoMixing : NSObjectProtocol
 {
-    [Selector("pan", "setPan:")] float Pan { get; set; }
+    [Selector("pan", "setPan:")]
+    float Pan { get; set; }
 }
 
 public enum AVAudio3DMixingRenderingAlgorithm : long
@@ -68,19 +71,28 @@ public enum AVAudio3DMixingPointSourceInHeadMode : long
 
 public objc interface AVAudio3DMixing : NSObjectProtocol
 {
-    [Selector("renderingAlgorithm", "setRenderingAlgorithm:")] AVAudio3DMixingRenderingAlgorithm RenderingAlgorithm { get; set; }
-    [Selector("sourceMode", "setSourceMode:")] AVAudio3DMixingSourceMode SourceMode { get; set; }
-    [Selector("pointSourceInHeadMode", "setPointSourceInHeadMode:")] AVAudio3DMixingPointSourceInHeadMode PointSourceInHeadMode { get; set; }
-    [Selector("rate", "setRate:")] float Rate { get; set; }
-    [Selector("reverbBlend", "setReverbBlend:")] float ReverbBlend { get; set; }
-    [Selector("obstruction", "setObstruction:")] float Obstruction { get; set; }
-    [Selector("occlusion", "setOcclusion:")] float Occlusion { get; set; }
-    [Selector("position", "setPosition:")] AVAudio3DPoint Position { get; set; }
+    [Selector("renderingAlgorithm", "setRenderingAlgorithm:")]
+    AVAudio3DMixingRenderingAlgorithm RenderingAlgorithm { get; set; }
+    [Selector("sourceMode", "setSourceMode:")]
+    AVAudio3DMixingSourceMode SourceMode { get; set; }
+    [Selector("pointSourceInHeadMode", "setPointSourceInHeadMode:")]
+    AVAudio3DMixingPointSourceInHeadMode PointSourceInHeadMode { get; set; }
+    [Selector("rate", "setRate:")]
+    float Rate { get; set; }
+    [Selector("reverbBlend", "setReverbBlend:")]
+    float ReverbBlend { get; set; }
+    [Selector("obstruction", "setObstruction:")]
+    float Obstruction { get; set; }
+    [Selector("occlusion", "setOcclusion:")]
+    float Occlusion { get; set; }
+    [Selector("position", "setPosition:")]
+    AVAudio3DPoint Position { get; set; }
 }
 
 public extern objc class AVAudioMixingDestination : NSObject, AVAudioMixing
 {
-    [Selector("connectionPoint")] public AVAudioConnectionPoint ConnectionPoint { get; }
+    [Selector("connectionPoint")]
+    public AVAudioConnectionPoint ConnectionPoint { get; }
 }
 
 #endif

@@ -35,44 +35,82 @@ import Standard.ObjC;
 
 public extern objc class CAEmitterCell : NSObject, NSSecureCoding, CAMediaTiming
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("birthRate", "setBirthRate:")] public float BirthRate { get; set; }
-    [Selector("lifetime", "setLifetime:")] public float Lifetime { get; set; }
-    [Selector("lifetimeRange", "setLifetimeRange:")] public float LifetimeRange { get; set; }
-    [Selector("emissionLatitude", "setEmissionLatitude:")] public CGFloat EmissionLatitude { get; set; }
-    [Selector("emissionLongitude", "setEmissionLongitude:")] public CGFloat EmissionLongitude { get; set; }
-    [Selector("emissionRange", "setEmissionRange:")] public CGFloat EmissionRange { get; set; }
-    [Selector("velocity", "setVelocity:")] public CGFloat Velocity { get; set; }
-    [Selector("velocityRange", "setVelocityRange:")] public CGFloat VelocityRange { get; set; }
-    [Selector("xAcceleration", "setXAcceleration:")] public CGFloat XAcceleration { get; set; }
-    [Selector("yAcceleration", "setYAcceleration:")] public CGFloat YAcceleration { get; set; }
-    [Selector("zAcceleration", "setZAcceleration:")] public CGFloat ZAcceleration { get; set; }
-    [Selector("scale", "setScale:")] public CGFloat Scale { get; set; }
-    [Selector("scaleRange", "setScaleRange:")] public CGFloat ScaleRange { get; set; }
-    [Selector("scaleSpeed", "setScaleSpeed:")] public CGFloat ScaleSpeed { get; set; }
-    [Selector("spin", "setSpin:")] public CGFloat Spin { get; set; }
-    [Selector("spinRange", "setSpinRange:")] public CGFloat SpinRange { get; set; }
-    [Selector("color", "setColor:")] public CGColorRef? Color { get; set; }
-    [Selector("redRange", "setRedRange:")] public float RedRange { get; set; }
-    [Selector("greenRange", "setGreenRange:")] public float GreenRange { get; set; }
-    [Selector("blueRange", "setBlueRange:")] public float BlueRange { get; set; }
-    [Selector("alphaRange", "setAlphaRange:")] public float AlphaRange { get; set; }
-    [Selector("redSpeed", "setRedSpeed:")] public float RedSpeed { get; set; }
-    [Selector("greenSpeed", "setGreenSpeed:")] public float GreenSpeed { get; set; }
-    [Selector("blueSpeed", "setBlueSpeed:")] public float BlueSpeed { get; set; }
-    [Selector("alphaSpeed", "setAlphaSpeed:")] public float AlphaSpeed { get; set; }
-    [Selector("contents", "setContents:")] public AnyObject? Contents { get; set; }
-    [Selector("contentsRect", "setContentsRect:")] public CGRect ContentsRect { get; set; }
-    [Selector("contentsScale", "setContentsScale:")] public CGFloat ContentsScale { get; set; }
-    [Selector("minificationFilter", "setMinificationFilter:")] public NSString MinificationFilter { get; set; }
-    [Selector("magnificationFilter", "setMagnificationFilter:")] public NSString MagnificationFilter { get; set; }
-    [Selector("minificationFilterBias", "setMinificationFilterBias:")] public float MinificationFilterBias { get; set; }
-    [Selector("emitterCells", "setEmitterCells:")] public NSArray? EmitterCells { get; set; }
-    [Selector("style", "setStyle:")] public NSDictionary? Style { get; set; }
-    [Selector("emitterCell")] public static Self EmitterCell();
-    [Selector("defaultValueForKey:")] public static AnyObject? DefaultValueForKey(NSString key);
-    [Selector("shouldArchiveValueForKey:")] public bool ShouldArchiveValueForKey(NSString key);
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("birthRate", "setBirthRate:")]
+    public float BirthRate { get; set; }
+    [Selector("lifetime", "setLifetime:")]
+    public float Lifetime { get; set; }
+    [Selector("lifetimeRange", "setLifetimeRange:")]
+    public float LifetimeRange { get; set; }
+    [Selector("emissionLatitude", "setEmissionLatitude:")]
+    public CGFloat EmissionLatitude { get; set; }
+    [Selector("emissionLongitude", "setEmissionLongitude:")]
+    public CGFloat EmissionLongitude { get; set; }
+    [Selector("emissionRange", "setEmissionRange:")]
+    public CGFloat EmissionRange { get; set; }
+    [Selector("velocity", "setVelocity:")]
+    public CGFloat Velocity { get; set; }
+    [Selector("velocityRange", "setVelocityRange:")]
+    public CGFloat VelocityRange { get; set; }
+    [Selector("xAcceleration", "setXAcceleration:")]
+    public CGFloat XAcceleration { get; set; }
+    [Selector("yAcceleration", "setYAcceleration:")]
+    public CGFloat YAcceleration { get; set; }
+    [Selector("zAcceleration", "setZAcceleration:")]
+    public CGFloat ZAcceleration { get; set; }
+    [Selector("scale", "setScale:")]
+    public CGFloat Scale { get; set; }
+    [Selector("scaleRange", "setScaleRange:")]
+    public CGFloat ScaleRange { get; set; }
+    [Selector("scaleSpeed", "setScaleSpeed:")]
+    public CGFloat ScaleSpeed { get; set; }
+    [Selector("spin", "setSpin:")]
+    public CGFloat Spin { get; set; }
+    [Selector("spinRange", "setSpinRange:")]
+    public CGFloat SpinRange { get; set; }
+    [Selector("color", "setColor:")]
+    public CGColorRef? Color { get; set; }
+    [Selector("redRange", "setRedRange:")]
+    public float RedRange { get; set; }
+    [Selector("greenRange", "setGreenRange:")]
+    public float GreenRange { get; set; }
+    [Selector("blueRange", "setBlueRange:")]
+    public float BlueRange { get; set; }
+    [Selector("alphaRange", "setAlphaRange:")]
+    public float AlphaRange { get; set; }
+    [Selector("redSpeed", "setRedSpeed:")]
+    public float RedSpeed { get; set; }
+    [Selector("greenSpeed", "setGreenSpeed:")]
+    public float GreenSpeed { get; set; }
+    [Selector("blueSpeed", "setBlueSpeed:")]
+    public float BlueSpeed { get; set; }
+    [Selector("alphaSpeed", "setAlphaSpeed:")]
+    public float AlphaSpeed { get; set; }
+    [Selector("contents", "setContents:")]
+    public AnyObject? Contents { get; set; }
+    [Selector("contentsRect", "setContentsRect:")]
+    public CGRect ContentsRect { get; set; }
+    [Selector("contentsScale", "setContentsScale:")]
+    public CGFloat ContentsScale { get; set; }
+    [Selector("minificationFilter", "setMinificationFilter:")]
+    public NSString MinificationFilter { get; set; }
+    [Selector("magnificationFilter", "setMagnificationFilter:")]
+    public NSString MagnificationFilter { get; set; }
+    [Selector("minificationFilterBias", "setMinificationFilterBias:")]
+    public float MinificationFilterBias { get; set; }
+    [Selector("emitterCells", "setEmitterCells:")]
+    public NSArray? EmitterCells { get; set; }
+    [Selector("style", "setStyle:")]
+    public NSDictionary? Style { get; set; }
+    [Selector("emitterCell")]
+    public static Self EmitterCell();
+    [Selector("defaultValueForKey:")]
+    public static AnyObject? DefaultValueForKey(NSString key);
+    [Selector("shouldArchiveValueForKey:")]
+    public bool ShouldArchiveValueForKey(NSString key);
 }
 
 #endif

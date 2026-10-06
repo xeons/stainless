@@ -44,27 +44,45 @@ public objc closure void PHASESoundEventSeekToTimeResumeAtEngineTimeCompletionHa
 
 public extern objc class PHASESoundEvent : NSObject
 {
-    [Selector("renderingState")] public PHASERenderingState RenderingState { get; }
-    [Selector("prepareState")] public PHASESoundEventPrepareState PrepareState { get; }
-    [Selector("metaParameters")] public NSDictionary MetaParameters { get; }
-    [Selector("mixers")] public NSDictionary Mixers { get; }
-    [Selector("pushStreamNodes")] public NSDictionary PushStreamNodes { get; }
-    [Selector("pullStreamNodes")] public NSDictionary? PullStreamNodes { get; }
-    [Selector("isIndefinite")] public bool Indefinite { get; }
-    [Selector("initWithEngine:assetIdentifier:mixerParameters:error:")] public Self? InitWithEngineAssetIdentifierMixerParametersError(PHASEEngine engine, NSString assetIdentifier, PHASEMixerParameters mixerParameters, out NSError? error);
-    [Selector("initWithEngine:assetIdentifier:error:")] public Self? InitWithEngineAssetIdentifierError(PHASEEngine engine, NSString assetIdentifier, out NSError? error);
-    [Selector("prepareWithCompletion:")] public void PrepareWithCompletion(PHASESoundEventPrepareWithCompletionHandlerBlock? handler);
-    [Selector("startWithCompletion:")] public void StartWithCompletion(PHASESoundEventStartWithCompletionHandlerBlock? handler);
+    [Selector("renderingState")]
+    public PHASERenderingState RenderingState { get; }
+    [Selector("prepareState")]
+    public PHASESoundEventPrepareState PrepareState { get; }
+    [Selector("metaParameters")]
+    public NSDictionary MetaParameters { get; }
+    [Selector("mixers")]
+    public NSDictionary Mixers { get; }
+    [Selector("pushStreamNodes")]
+    public NSDictionary PushStreamNodes { get; }
+    [Selector("pullStreamNodes")]
+    public NSDictionary? PullStreamNodes { get; }
+    [Selector("isIndefinite")]
+    public bool Indefinite { get; }
+    [Selector("initWithEngine:assetIdentifier:mixerParameters:error:")]
+    public Self? InitWithEngineAssetIdentifierMixerParametersError(PHASEEngine engine, NSString assetIdentifier, PHASEMixerParameters mixerParameters, out NSError? error);
+    [Selector("initWithEngine:assetIdentifier:error:")]
+    public Self? InitWithEngineAssetIdentifierError(PHASEEngine engine, NSString assetIdentifier, out NSError? error);
+    [Selector("prepareWithCompletion:")]
+    public void PrepareWithCompletion(PHASESoundEventPrepareWithCompletionHandlerBlock? handler);
+    [Selector("startWithCompletion:")]
+    public void StartWithCompletion(PHASESoundEventStartWithCompletionHandlerBlock? handler);
     /// macOS 26.0 and later.
-    [Selector("startAtTime:completion:")] public void StartAtTimeCompletion(AVAudioTime? when, PHASESoundEventStartAtTimeCompletionHandlerBlock? handler);
-    [Selector("seekToTime:completion:")] public void SeekToTimeCompletion(double time, PHASESoundEventSeekToTimeCompletionHandlerBlock? handler);
+    [Selector("startAtTime:completion:")]
+    public void StartAtTimeCompletion(AVAudioTime? when, PHASESoundEventStartAtTimeCompletionHandlerBlock? handler);
+    [Selector("seekToTime:completion:")]
+    public void SeekToTimeCompletion(double time, PHASESoundEventSeekToTimeCompletionHandlerBlock? handler);
     /// macOS 26.0 and later.
-    [Selector("seekToTime:resumeAtEngineTime:completion:")] public void SeekToTimeResumeAtEngineTimeCompletion(double time, AVAudioTime engineTime, PHASESoundEventSeekToTimeResumeAtEngineTimeCompletionHandlerBlock? handler);
-    [Selector("pause")] public void Pause();
-    [Selector("resume")] public void Resume();
+    [Selector("seekToTime:resumeAtEngineTime:completion:")]
+    public void SeekToTimeResumeAtEngineTimeCompletion(double time, AVAudioTime engineTime, PHASESoundEventSeekToTimeResumeAtEngineTimeCompletionHandlerBlock? handler);
+    [Selector("pause")]
+    public void Pause();
+    [Selector("resume")]
+    public void Resume();
     /// macOS 26.0 and later.
-    [Selector("resumeAtTime:")] public void ResumeAtTime(AVAudioTime? time);
-    [Selector("stopAndInvalidate")] public void StopAndInvalidate();
+    [Selector("resumeAtTime:")]
+    public void ResumeAtTime(AVAudioTime? time);
+    [Selector("stopAndInvalidate")]
+    public void StopAndInvalidate();
 }
 
 #endif

@@ -39,9 +39,12 @@ public extern "C" VSAccountProviderAuthenticationScheme? VSAccountProviderAuthen
 
 public extern objc class VSAccountProviderResponse : NSObject
 {
-    [Selector("authenticationScheme")] public VSAccountProviderAuthenticationScheme AuthenticationScheme { get; }
-    [Selector("status")] public NSString? Status { get; }
-    [Selector("body")] public NSString? Body { get; }
+    [Selector("authenticationScheme")]
+    public VSAccountProviderAuthenticationScheme AuthenticationScheme { get; }
+    [Selector("status")]
+    public NSString? Status { get; }
+    [Selector("body")]
+    public NSString? Body { get; }
 }
 
 #endif

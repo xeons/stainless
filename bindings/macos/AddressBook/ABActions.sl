@@ -34,10 +34,14 @@ import Standard.ObjC;
 /// ABActionDelegate, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("actionProperty")] public NSString? ActionProperty();
-    [Selector("titleForPerson:identifier:")] public NSString? TitleForPersonIdentifier(ABPerson? person, NSString? identifier);
-    [Selector("performActionForPerson:identifier:")] public void PerformActionForPersonIdentifier(ABPerson? person, NSString? identifier);
-    [Selector("shouldEnableActionForPerson:identifier:")] public bool ShouldEnableActionForPersonIdentifier(ABPerson? person, NSString? identifier);
+    [Selector("actionProperty")]
+    public NSString? ActionProperty();
+    [Selector("titleForPerson:identifier:")]
+    public NSString? TitleForPersonIdentifier(ABPerson? person, NSString? identifier);
+    [Selector("performActionForPerson:identifier:")]
+    public void PerformActionForPersonIdentifier(ABPerson? person, NSString? identifier);
+    [Selector("shouldEnableActionForPerson:identifier:")]
+    public bool ShouldEnableActionForPersonIdentifier(ABPerson? person, NSString? identifier);
 }
 
 #endif

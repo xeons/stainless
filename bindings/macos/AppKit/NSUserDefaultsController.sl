@@ -32,17 +32,28 @@ import Standard.ObjC;
 
 public extern objc class NSUserDefaultsController : NSController
 {
-    [Selector("sharedUserDefaultsController")] public static NSUserDefaultsController SharedUserDefaultsController { get; }
-    [Selector("defaults")] public NSUserDefaults Defaults { get; }
-    [Selector("initialValues", "setInitialValues:")] public NSDictionary? InitialValues { get; set; }
-    [Selector("appliesImmediately", "setAppliesImmediately:")] public bool AppliesImmediately { get; set; }
-    [Selector("hasUnappliedChanges")] public bool HasUnappliedChanges { get; }
-    [Selector("values")] public AnyObject Values { get; }
-    [Selector("initWithDefaults:initialValues:")] public Self InitWithDefaultsInitialValues(NSUserDefaults? defaults, NSDictionary? initialValues);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("revert:")] public void Revert(AnyObject? sender);
-    [Selector("save:")] public void Save(AnyObject? sender);
-    [Selector("revertToInitialValues:")] public void RevertToInitialValues(AnyObject? sender);
+    [Selector("sharedUserDefaultsController")]
+    public static NSUserDefaultsController SharedUserDefaultsController { get; }
+    [Selector("defaults")]
+    public NSUserDefaults Defaults { get; }
+    [Selector("initialValues", "setInitialValues:")]
+    public NSDictionary? InitialValues { get; set; }
+    [Selector("appliesImmediately", "setAppliesImmediately:")]
+    public bool AppliesImmediately { get; set; }
+    [Selector("hasUnappliedChanges")]
+    public bool HasUnappliedChanges { get; }
+    [Selector("values")]
+    public AnyObject Values { get; }
+    [Selector("initWithDefaults:initialValues:")]
+    public Self InitWithDefaultsInitialValues(NSUserDefaults? defaults, NSDictionary? initialValues);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("revert:")]
+    public void Revert(AnyObject? sender);
+    [Selector("save:")]
+    public void Save(AnyObject? sender);
+    [Selector("revertToInitialValues:")]
+    public void RevertToInitialValues(AnyObject? sender);
 }
 
 #endif

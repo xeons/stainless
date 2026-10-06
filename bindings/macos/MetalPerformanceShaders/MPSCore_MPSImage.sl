@@ -34,18 +34,30 @@ import Standard.ObjC;
 
 public extern objc class MPSImageDescriptor : NSObject, NSCopying
 {
-    [Selector("width", "setWidth:")] public NSUInteger Width { get; set; }
-    [Selector("height", "setHeight:")] public NSUInteger Height { get; set; }
-    [Selector("featureChannels", "setFeatureChannels:")] public NSUInteger FeatureChannels { get; set; }
-    [Selector("numberOfImages", "setNumberOfImages:")] public NSUInteger NumberOfImages { get; set; }
-    [Selector("pixelFormat")] public MTLPixelFormat PixelFormat { get; }
-    [Selector("channelFormat", "setChannelFormat:")] public MPSImageFeatureChannelFormat ChannelFormat { get; set; }
-    [Selector("cpuCacheMode", "setCpuCacheMode:")] public MTLCPUCacheMode CpuCacheMode { get; set; }
-    [Selector("storageMode", "setStorageMode:")] public MTLStorageMode StorageMode { get; set; }
-    [Selector("usage", "setUsage:")] public MTLTextureUsage Usage { get; set; }
-    [Selector("imageDescriptorWithChannelFormat:width:height:featureChannels:")] public static Self ImageDescriptorWithChannelFormatWidthHeightFeatureChannels(MPSImageFeatureChannelFormat channelFormat, NSUInteger width, NSUInteger height, NSUInteger featureChannels);
-    [Selector("imageDescriptorWithChannelFormat:width:height:featureChannels:numberOfImages:usage:")] public static Self ImageDescriptorWithChannelFormatWidthHeightFeatureChannelsNumberOfImagesUsage(MPSImageFeatureChannelFormat channelFormat, NSUInteger width, NSUInteger height, NSUInteger featureChannels, NSUInteger numberOfImages, MTLTextureUsage usage);
-    [Selector("copyWithZone:")] public Self CopyWithZone(_NSZone* zone);
+    [Selector("width", "setWidth:")]
+    public NSUInteger Width { get; set; }
+    [Selector("height", "setHeight:")]
+    public NSUInteger Height { get; set; }
+    [Selector("featureChannels", "setFeatureChannels:")]
+    public NSUInteger FeatureChannels { get; set; }
+    [Selector("numberOfImages", "setNumberOfImages:")]
+    public NSUInteger NumberOfImages { get; set; }
+    [Selector("pixelFormat")]
+    public MTLPixelFormat PixelFormat { get; }
+    [Selector("channelFormat", "setChannelFormat:")]
+    public MPSImageFeatureChannelFormat ChannelFormat { get; set; }
+    [Selector("cpuCacheMode", "setCpuCacheMode:")]
+    public MTLCPUCacheMode CpuCacheMode { get; set; }
+    [Selector("storageMode", "setStorageMode:")]
+    public MTLStorageMode StorageMode { get; set; }
+    [Selector("usage", "setUsage:")]
+    public MTLTextureUsage Usage { get; set; }
+    [Selector("imageDescriptorWithChannelFormat:width:height:featureChannels:")]
+    public static Self ImageDescriptorWithChannelFormatWidthHeightFeatureChannels(MPSImageFeatureChannelFormat channelFormat, NSUInteger width, NSUInteger height, NSUInteger featureChannels);
+    [Selector("imageDescriptorWithChannelFormat:width:height:featureChannels:numberOfImages:usage:")]
+    public static Self ImageDescriptorWithChannelFormatWidthHeightFeatureChannelsNumberOfImagesUsage(MPSImageFeatureChannelFormat channelFormat, NSUInteger width, NSUInteger height, NSUInteger featureChannels, NSUInteger numberOfImages, MTLTextureUsage usage);
+    [Selector("copyWithZone:")]
+    public Self CopyWithZone(_NSZone* zone);
 }
 
 public using MPSImageBatch = NSArray;
@@ -62,8 +74,11 @@ public extern "C" NSInteger MPSImageBatchIterate(MPSImageBatch batch, MPSImageBa
 
 public objc interface MPSImageAllocator : NSObjectProtocol, NSSecureCoding
 {
-    [Selector("imageForCommandBuffer:imageDescriptor:kernel:")] MPSImage ImageForCommandBufferImageDescriptorKernel(MTLCommandBuffer cmdBuf, MPSImageDescriptor descriptor, MPSKernel kernel);
-    [Optional] [Selector("imageBatchForCommandBuffer:imageDescriptor:kernel:count:")] MPSImageBatch ImageBatchForCommandBufferImageDescriptorKernelCount(MTLCommandBuffer cmdBuf, MPSImageDescriptor descriptor, MPSKernel kernel, NSUInteger count);
+    [Selector("imageForCommandBuffer:imageDescriptor:kernel:")]
+    MPSImage ImageForCommandBufferImageDescriptorKernel(MTLCommandBuffer cmdBuf, MPSImageDescriptor descriptor, MPSKernel kernel);
+    [Optional]
+    [Selector("imageBatchForCommandBuffer:imageDescriptor:kernel:count:")]
+    MPSImageBatch ImageBatchForCommandBufferImageDescriptorKernelCount(MTLCommandBuffer cmdBuf, MPSImageDescriptor descriptor, MPSKernel kernel, NSUInteger count);
 }
 
 public enum MPSPurgeableState : ulong
@@ -89,47 +104,84 @@ public struct MPSImageReadWriteParams
 
 public extern objc class MPSImage : NSObject
 {
-    [Selector("device")] public MTLDevice Device { get; }
-    [Selector("width")] public NSUInteger Width { get; }
-    [Selector("height")] public NSUInteger Height { get; }
-    [Selector("featureChannels")] public NSUInteger FeatureChannels { get; }
-    [Selector("numberOfImages")] public NSUInteger NumberOfImages { get; }
-    [Selector("textureType")] public MTLTextureType TextureType { get; }
-    [Selector("pixelFormat")] public MTLPixelFormat PixelFormat { get; }
-    [Selector("precision")] public NSUInteger Precision { get; }
-    [Selector("usage")] public MTLTextureUsage Usage { get; }
-    [Selector("featureChannelFormat")] public MPSImageFeatureChannelFormat FeatureChannelFormat { get; }
-    [Selector("pixelSize")] public nuint PixelSize { get; }
-    [Selector("texture")] public MTLTexture Texture { get; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("parent")] public MPSImage? Parent { get; }
-    [Selector("defaultAllocator")] public static MPSImageAllocator DefaultAllocator();
-    [Selector("initWithDevice:imageDescriptor:")] public Self InitWithDeviceImageDescriptor(MTLDevice device, MPSImageDescriptor imageDescriptor);
-    [Selector("initWithParentImage:sliceRange:featureChannels:")] public Self InitWithParentImageSliceRangeFeatureChannels(MPSImage parent, NSRange sliceRange, NSUInteger featureChannels);
-    [Selector("initWithTexture:featureChannels:")] public Self InitWithTextureFeatureChannels(MTLTexture texture, NSUInteger featureChannels);
-    [Selector("batchRepresentationWithSubRange:")] public MPSImageBatch BatchRepresentationWithSubRange(NSRange subRange);
-    [Selector("batchRepresentation")] public MPSImageBatch BatchRepresentation();
-    [Selector("subImageWithFeatureChannelRange:")] public MPSImage SubImageWithFeatureChannelRange(NSRange range);
-    [Selector("resourceSize")] public NSUInteger ResourceSize();
-    [Selector("setPurgeableState:")] public MPSPurgeableState SetPurgeableState(MPSPurgeableState state);
-    [Selector("readBytes:dataLayout:bytesPerRow:region:featureChannelInfo:imageIndex:")] public void ReadBytesDataLayoutBytesPerRowRegionFeatureChannelInfoImageIndex(void* dataBytes, MPSDataLayout dataLayout, NSUInteger bytesPerRow, MTLRegion region, MPSImageReadWriteParams featureChannelInfo, NSUInteger imageIndex);
-    [Selector("writeBytes:dataLayout:bytesPerRow:region:featureChannelInfo:imageIndex:")] public void WriteBytesDataLayoutBytesPerRowRegionFeatureChannelInfoImageIndex(void* dataBytes, MPSDataLayout dataLayout, NSUInteger bytesPerRow, MTLRegion region, MPSImageReadWriteParams featureChannelInfo, NSUInteger imageIndex);
-    [Selector("writeBytes:dataLayout:bytesPerColumn:bytesPerRow:bytesPerImage:region:featureChannelInfo:imageIndex:")] public void WriteBytesDataLayoutBytesPerColumnBytesPerRowBytesPerImageRegionFeatureChannelInfoImageIndex(void* dataBytes, MPSDataLayout dataLayout, NSUInteger bytesPerColumn, NSUInteger bytesPerRow, NSUInteger bytesPerImage, MTLRegion region, MPSImageReadWriteParams featureChannelInfo, NSUInteger imageIndex);
-    [Selector("readBytes:dataLayout:bytesPerRow:bytesPerImage:region:featureChannelInfo:imageIndex:")] public void ReadBytesDataLayoutBytesPerRowBytesPerImageRegionFeatureChannelInfoImageIndex(void* dataBytes, MPSDataLayout dataLayout, NSUInteger bytesPerRow, NSUInteger bytesPerImage, MTLRegion region, MPSImageReadWriteParams featureChannelInfo, NSUInteger imageIndex);
-    [Selector("writeBytes:dataLayout:bytesPerRow:bytesPerImage:region:featureChannelInfo:imageIndex:")] public void WriteBytesDataLayoutBytesPerRowBytesPerImageRegionFeatureChannelInfoImageIndex(void* dataBytes, MPSDataLayout dataLayout, NSUInteger bytesPerRow, NSUInteger bytesPerImage, MTLRegion region, MPSImageReadWriteParams featureChannelInfo, NSUInteger imageIndex);
-    [Selector("readBytes:dataLayout:imageIndex:")] public void ReadBytesDataLayoutImageIndex(void* dataBytes, MPSDataLayout dataLayout, NSUInteger imageIndex);
-    [Selector("writeBytes:dataLayout:imageIndex:")] public void WriteBytesDataLayoutImageIndex(void* dataBytes, MPSDataLayout dataLayout, NSUInteger imageIndex);
-    [Selector("synchronizeOnCommandBuffer:")] public void SynchronizeOnCommandBuffer(MTLCommandBuffer commandBuffer);
+    [Selector("device")]
+    public MTLDevice Device { get; }
+    [Selector("width")]
+    public NSUInteger Width { get; }
+    [Selector("height")]
+    public NSUInteger Height { get; }
+    [Selector("featureChannels")]
+    public NSUInteger FeatureChannels { get; }
+    [Selector("numberOfImages")]
+    public NSUInteger NumberOfImages { get; }
+    [Selector("textureType")]
+    public MTLTextureType TextureType { get; }
+    [Selector("pixelFormat")]
+    public MTLPixelFormat PixelFormat { get; }
+    [Selector("precision")]
+    public NSUInteger Precision { get; }
+    [Selector("usage")]
+    public MTLTextureUsage Usage { get; }
+    [Selector("featureChannelFormat")]
+    public MPSImageFeatureChannelFormat FeatureChannelFormat { get; }
+    [Selector("pixelSize")]
+    public nuint PixelSize { get; }
+    [Selector("texture")]
+    public MTLTexture Texture { get; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("parent")]
+    public MPSImage? Parent { get; }
+    [Selector("defaultAllocator")]
+    public static MPSImageAllocator DefaultAllocator();
+    [Selector("initWithDevice:imageDescriptor:")]
+    public Self InitWithDeviceImageDescriptor(MTLDevice device, MPSImageDescriptor imageDescriptor);
+    [Selector("initWithParentImage:sliceRange:featureChannels:")]
+    public Self InitWithParentImageSliceRangeFeatureChannels(MPSImage parent, NSRange sliceRange, NSUInteger featureChannels);
+    [Selector("initWithTexture:featureChannels:")]
+    public Self InitWithTextureFeatureChannels(MTLTexture texture, NSUInteger featureChannels);
+    [Selector("batchRepresentationWithSubRange:")]
+    public MPSImageBatch BatchRepresentationWithSubRange(NSRange subRange);
+    [Selector("batchRepresentation")]
+    public MPSImageBatch BatchRepresentation();
+    [Selector("subImageWithFeatureChannelRange:")]
+    public MPSImage SubImageWithFeatureChannelRange(NSRange range);
+    [Selector("resourceSize")]
+    public NSUInteger ResourceSize();
+    [Selector("setPurgeableState:")]
+    public MPSPurgeableState SetPurgeableState(MPSPurgeableState state);
+    [Selector("readBytes:dataLayout:bytesPerRow:region:featureChannelInfo:imageIndex:")]
+    public void ReadBytesDataLayoutBytesPerRowRegionFeatureChannelInfoImageIndex(void* dataBytes, MPSDataLayout dataLayout, NSUInteger bytesPerRow, MTLRegion region, MPSImageReadWriteParams featureChannelInfo, NSUInteger imageIndex);
+    [Selector("writeBytes:dataLayout:bytesPerRow:region:featureChannelInfo:imageIndex:")]
+    public void WriteBytesDataLayoutBytesPerRowRegionFeatureChannelInfoImageIndex(void* dataBytes, MPSDataLayout dataLayout, NSUInteger bytesPerRow, MTLRegion region, MPSImageReadWriteParams featureChannelInfo, NSUInteger imageIndex);
+    [Selector("writeBytes:dataLayout:bytesPerColumn:bytesPerRow:bytesPerImage:region:featureChannelInfo:imageIndex:")]
+    public void WriteBytesDataLayoutBytesPerColumnBytesPerRowBytesPerImageRegionFeatureChannelInfoImageIndex(void* dataBytes, MPSDataLayout dataLayout, NSUInteger bytesPerColumn, NSUInteger bytesPerRow, NSUInteger bytesPerImage, MTLRegion region, MPSImageReadWriteParams featureChannelInfo, NSUInteger imageIndex);
+    [Selector("readBytes:dataLayout:bytesPerRow:bytesPerImage:region:featureChannelInfo:imageIndex:")]
+    public void ReadBytesDataLayoutBytesPerRowBytesPerImageRegionFeatureChannelInfoImageIndex(void* dataBytes, MPSDataLayout dataLayout, NSUInteger bytesPerRow, NSUInteger bytesPerImage, MTLRegion region, MPSImageReadWriteParams featureChannelInfo, NSUInteger imageIndex);
+    [Selector("writeBytes:dataLayout:bytesPerRow:bytesPerImage:region:featureChannelInfo:imageIndex:")]
+    public void WriteBytesDataLayoutBytesPerRowBytesPerImageRegionFeatureChannelInfoImageIndex(void* dataBytes, MPSDataLayout dataLayout, NSUInteger bytesPerRow, NSUInteger bytesPerImage, MTLRegion region, MPSImageReadWriteParams featureChannelInfo, NSUInteger imageIndex);
+    [Selector("readBytes:dataLayout:imageIndex:")]
+    public void ReadBytesDataLayoutImageIndex(void* dataBytes, MPSDataLayout dataLayout, NSUInteger imageIndex);
+    [Selector("writeBytes:dataLayout:imageIndex:")]
+    public void WriteBytesDataLayoutImageIndex(void* dataBytes, MPSDataLayout dataLayout, NSUInteger imageIndex);
+    [Selector("synchronizeOnCommandBuffer:")]
+    public void SynchronizeOnCommandBuffer(MTLCommandBuffer commandBuffer);
 }
 
 public extern objc class MPSTemporaryImage : MPSImage
 {
-    [Selector("readCount", "setReadCount:")] public NSUInteger ReadCount { get; set; }
-    [Selector("defaultAllocator")] public static MPSImageAllocator DefaultAllocator();
-    [Selector("temporaryImageWithCommandBuffer:imageDescriptor:")] public static Self TemporaryImageWithCommandBufferImageDescriptor(MTLCommandBuffer commandBuffer, MPSImageDescriptor imageDescriptor);
-    [Selector("temporaryImageWithCommandBuffer:textureDescriptor:")] public static Self TemporaryImageWithCommandBufferTextureDescriptor(MTLCommandBuffer commandBuffer, MTLTextureDescriptor textureDescriptor);
-    [Selector("temporaryImageWithCommandBuffer:textureDescriptor:featureChannels:")] public static Self TemporaryImageWithCommandBufferTextureDescriptorFeatureChannels(MTLCommandBuffer commandBuffer, MTLTextureDescriptor textureDescriptor, NSUInteger featureChannels);
-    [Selector("prefetchStorageWithCommandBuffer:imageDescriptorList:")] public static void PrefetchStorageWithCommandBufferImageDescriptorList(MTLCommandBuffer commandBuffer, NSArray descriptorList);
+    [Selector("readCount", "setReadCount:")]
+    public NSUInteger ReadCount { get; set; }
+    [Selector("defaultAllocator")]
+    public static MPSImageAllocator DefaultAllocator();
+    [Selector("temporaryImageWithCommandBuffer:imageDescriptor:")]
+    public static Self TemporaryImageWithCommandBufferImageDescriptor(MTLCommandBuffer commandBuffer, MPSImageDescriptor imageDescriptor);
+    [Selector("temporaryImageWithCommandBuffer:textureDescriptor:")]
+    public static Self TemporaryImageWithCommandBufferTextureDescriptor(MTLCommandBuffer commandBuffer, MTLTextureDescriptor textureDescriptor);
+    [Selector("temporaryImageWithCommandBuffer:textureDescriptor:featureChannels:")]
+    public static Self TemporaryImageWithCommandBufferTextureDescriptorFeatureChannels(MTLCommandBuffer commandBuffer, MTLTextureDescriptor textureDescriptor, NSUInteger featureChannels);
+    [Selector("prefetchStorageWithCommandBuffer:imageDescriptorList:")]
+    public static void PrefetchStorageWithCommandBufferImageDescriptorList(MTLCommandBuffer commandBuffer, NSArray descriptorList);
 }
 
 #endif

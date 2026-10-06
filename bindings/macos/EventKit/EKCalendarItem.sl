@@ -32,27 +32,48 @@ import Standard.ObjC;
 
 public extern objc class EKCalendarItem : EKObject
 {
-    [Selector("calendar", "setCalendar:")] public EKCalendar? Calendar { get; set; }
-    [Selector("calendarItemIdentifier")] public NSString? CalendarItemIdentifier { get; }
-    [Selector("calendarItemExternalIdentifier")] public NSString? CalendarItemExternalIdentifier { get; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("location", "setLocation:")] public NSString? Location { get; set; }
-    [Selector("notes", "setNotes:")] public NSString? Notes { get; set; }
-    [Selector("URL", "setURL:")] public NSURL? URL { get; set; }
-    [Selector("lastModifiedDate")] public NSDate? LastModifiedDate { get; }
-    [Selector("creationDate")] public NSDate? CreationDate { get; }
-    [Selector("timeZone", "setTimeZone:")] public NSTimeZone? TimeZone { get; set; }
-    [Selector("hasAlarms")] public bool HasAlarms { get; }
-    [Selector("hasRecurrenceRules")] public bool HasRecurrenceRules { get; }
-    [Selector("hasAttendees")] public bool HasAttendees { get; }
-    [Selector("hasNotes")] public bool HasNotes { get; }
-    [Selector("attendees")] public NSArray? Attendees { get; }
-    [Selector("alarms", "setAlarms:")] public NSArray? Alarms { get; set; }
-    [Selector("recurrenceRules", "setRecurrenceRules:")] public NSArray? RecurrenceRules { get; set; }
-    [Selector("addAlarm:")] public void AddAlarm(EKAlarm alarm);
-    [Selector("removeAlarm:")] public void RemoveAlarm(EKAlarm alarm);
-    [Selector("addRecurrenceRule:")] public void AddRecurrenceRule(EKRecurrenceRule rule);
-    [Selector("removeRecurrenceRule:")] public void RemoveRecurrenceRule(EKRecurrenceRule rule);
+    [Selector("calendar", "setCalendar:")]
+    public EKCalendar? Calendar { get; set; }
+    [Selector("calendarItemIdentifier")]
+    public NSString? CalendarItemIdentifier { get; }
+    [Selector("calendarItemExternalIdentifier")]
+    public NSString? CalendarItemExternalIdentifier { get; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("location", "setLocation:")]
+    public NSString? Location { get; set; }
+    [Selector("notes", "setNotes:")]
+    public NSString? Notes { get; set; }
+    [Selector("URL", "setURL:")]
+    public NSURL? URL { get; set; }
+    [Selector("lastModifiedDate")]
+    public NSDate? LastModifiedDate { get; }
+    [Selector("creationDate")]
+    public NSDate? CreationDate { get; }
+    [Selector("timeZone", "setTimeZone:")]
+    public NSTimeZone? TimeZone { get; set; }
+    [Selector("hasAlarms")]
+    public bool HasAlarms { get; }
+    [Selector("hasRecurrenceRules")]
+    public bool HasRecurrenceRules { get; }
+    [Selector("hasAttendees")]
+    public bool HasAttendees { get; }
+    [Selector("hasNotes")]
+    public bool HasNotes { get; }
+    [Selector("attendees")]
+    public NSArray? Attendees { get; }
+    [Selector("alarms", "setAlarms:")]
+    public NSArray? Alarms { get; set; }
+    [Selector("recurrenceRules", "setRecurrenceRules:")]
+    public NSArray? RecurrenceRules { get; set; }
+    [Selector("addAlarm:")]
+    public void AddAlarm(EKAlarm alarm);
+    [Selector("removeAlarm:")]
+    public void RemoveAlarm(EKAlarm alarm);
+    [Selector("addRecurrenceRule:")]
+    public void AddRecurrenceRule(EKRecurrenceRule rule);
+    [Selector("removeRecurrenceRule:")]
+    public void RemoveRecurrenceRule(EKRecurrenceRule rule);
 }
 
 #endif

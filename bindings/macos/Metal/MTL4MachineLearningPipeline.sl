@@ -34,27 +34,38 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTL4MachineLearningPipelineDescriptor : MTL4PipelineDescriptor
 {
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("machineLearningFunctionDescriptor", "setMachineLearningFunctionDescriptor:")] public MTL4FunctionDescriptor? MachineLearningFunctionDescriptor { get; set; }
-    [Selector("setInputDimensions:atBufferIndex:")] public void SetInputDimensionsAtBufferIndex(MTLTensorExtents? dimensions, NSInteger bufferIndex);
-    [Selector("setInputDimensions:withRange:")] public void SetInputDimensionsWithRange(NSArray dimensions, NSRange range);
-    [Selector("inputDimensionsAtBufferIndex:")] public MTLTensorExtents? InputDimensionsAtBufferIndex(NSInteger bufferIndex);
-    [Selector("reset")] public void Reset();
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("machineLearningFunctionDescriptor", "setMachineLearningFunctionDescriptor:")]
+    public MTL4FunctionDescriptor? MachineLearningFunctionDescriptor { get; set; }
+    [Selector("setInputDimensions:atBufferIndex:")]
+    public void SetInputDimensionsAtBufferIndex(MTLTensorExtents? dimensions, NSInteger bufferIndex);
+    [Selector("setInputDimensions:withRange:")]
+    public void SetInputDimensionsWithRange(NSArray dimensions, NSRange range);
+    [Selector("inputDimensionsAtBufferIndex:")]
+    public MTLTensorExtents? InputDimensionsAtBufferIndex(NSInteger bufferIndex);
+    [Selector("reset")]
+    public void Reset();
 }
 
 /// macOS 26.0 and later.
 public extern objc class MTL4MachineLearningPipelineReflection : NSObject
 {
-    [Selector("bindings")] public NSArray Bindings { get; }
+    [Selector("bindings")]
+    public NSArray Bindings { get; }
 }
 
 /// macOS 26.0 and later.
 public objc interface MTL4MachineLearningPipelineState : MTLAllocation, NSObjectProtocol
 {
-    [Selector("label")] NSString? Label { get; }
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("reflection")] MTL4MachineLearningPipelineReflection? Reflection { get; }
-    [Selector("intermediatesHeapSize")] NSUInteger IntermediatesHeapSize { get; }
+    [Selector("label")]
+    NSString? Label { get; }
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("reflection")]
+    MTL4MachineLearningPipelineReflection? Reflection { get; }
+    [Selector("intermediatesHeapSize")]
+    NSUInteger IntermediatesHeapSize { get; }
 }
 
 #endif

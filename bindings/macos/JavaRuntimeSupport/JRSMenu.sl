@@ -37,16 +37,23 @@ public extern "C" NSString? JRSMenuDidReuseItemNotification;
 
 public objc interface JRSMenuDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("handleJavaMouseEvent:")] void HandleJavaMouseEvent(NSEvent? event);
-    [Optional] [Selector("handleJavaMenuItemTargetedAtIndex:rect:")] void HandleJavaMenuItemTargetedAtIndexRect(NSUInteger menuIndex, NSRect rect);
+    [Optional]
+    [Selector("handleJavaMouseEvent:")]
+    void HandleJavaMouseEvent(NSEvent? event);
+    [Optional]
+    [Selector("handleJavaMenuItemTargetedAtIndex:rect:")]
+    void HandleJavaMenuItemTargetedAtIndexRect(NSUInteger menuIndex, NSRect rect);
 }
 
 /// JavaRuntimeSupport, a category of NSMenu.
 public extern objc class NSMenu
 {
-    [Selector("javaMenuWithTitle:")] public static NSMenu? JavaMenuWithTitle(NSString? title);
-    [Selector("setJavaMenuDelegate:")] public void SetJavaMenuDelegate(JRSMenuDelegate? @delegate);
-    [Selector("isJavaMenu")] public bool IsJavaMenu();
+    [Selector("javaMenuWithTitle:")]
+    public static NSMenu? JavaMenuWithTitle(NSString? title);
+    [Selector("setJavaMenuDelegate:")]
+    public void SetJavaMenuDelegate(JRSMenuDelegate? @delegate);
+    [Selector("isJavaMenu")]
+    public bool IsJavaMenu();
 }
 
 #endif

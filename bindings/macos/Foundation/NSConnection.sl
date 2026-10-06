@@ -33,42 +33,77 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.13.
 public extern objc class NSConnection : NSObject
 {
-    [Selector("statistics")] public NSDictionary Statistics { get; }
-    [Selector("requestTimeout", "setRequestTimeout:")] public NSTimeInterval RequestTimeout { get; set; }
-    [Selector("replyTimeout", "setReplyTimeout:")] public NSTimeInterval ReplyTimeout { get; set; }
-    [Selector("rootObject", "setRootObject:")] public AnyObject? RootObject { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSConnectionDelegate? Delegate { get; set; }
-    [Selector("independentConversationQueueing", "setIndependentConversationQueueing:")] public bool IndependentConversationQueueing { get; set; }
-    [Selector("isValid")] public bool Valid { get; }
-    [Selector("rootProxy")] public NSDistantObject RootProxy { get; }
-    [Selector("requestModes")] public NSArray RequestModes { get; }
-    [Selector("sendPort")] public NSPort SendPort { get; }
-    [Selector("receivePort")] public NSPort ReceivePort { get; }
-    [Selector("multipleThreadsEnabled")] public bool MultipleThreadsEnabled { get; }
-    [Selector("remoteObjects")] public NSArray RemoteObjects { get; }
-    [Selector("localObjects")] public NSArray LocalObjects { get; }
-    [Selector("allConnections")] public static NSArray AllConnections();
+    [Selector("statistics")]
+    public NSDictionary Statistics { get; }
+    [Selector("requestTimeout", "setRequestTimeout:")]
+    public NSTimeInterval RequestTimeout { get; set; }
+    [Selector("replyTimeout", "setReplyTimeout:")]
+    public NSTimeInterval ReplyTimeout { get; set; }
+    [Selector("rootObject", "setRootObject:")]
+    public AnyObject? RootObject { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSConnectionDelegate? Delegate { get; set; }
+    [Selector("independentConversationQueueing", "setIndependentConversationQueueing:")]
+    public bool IndependentConversationQueueing { get; set; }
+    [Selector("isValid")]
+    public bool Valid { get; }
+    [Selector("rootProxy")]
+    public NSDistantObject RootProxy { get; }
+    [Selector("requestModes")]
+    public NSArray RequestModes { get; }
+    [Selector("sendPort")]
+    public NSPort SendPort { get; }
+    [Selector("receivePort")]
+    public NSPort ReceivePort { get; }
+    [Selector("multipleThreadsEnabled")]
+    public bool MultipleThreadsEnabled { get; }
+    [Selector("remoteObjects")]
+    public NSArray RemoteObjects { get; }
+    [Selector("localObjects")]
+    public NSArray LocalObjects { get; }
+    [Selector("allConnections")]
+    public static NSArray AllConnections();
     /// Deprecated in macOS 10.6.
-    [Selector("defaultConnection")] public static NSConnection DefaultConnection();
-    [Selector("connectionWithRegisteredName:host:")] public static Self? ConnectionWithRegisteredNameHost(NSString name, NSString? hostName);
-    [Selector("connectionWithRegisteredName:host:usingNameServer:")] public static Self? ConnectionWithRegisteredNameHostUsingNameServer(NSString name, NSString? hostName, NSPortNameServer server);
-    [Selector("rootProxyForConnectionWithRegisteredName:host:")] public static NSDistantObject? RootProxyForConnectionWithRegisteredNameHost(NSString name, NSString? hostName);
-    [Selector("rootProxyForConnectionWithRegisteredName:host:usingNameServer:")] public static NSDistantObject? RootProxyForConnectionWithRegisteredNameHostUsingNameServer(NSString name, NSString? hostName, NSPortNameServer server);
-    [Selector("serviceConnectionWithName:rootObject:usingNameServer:")] public static Self? ServiceConnectionWithNameRootObjectUsingNameServer(NSString name, AnyObject root, NSPortNameServer server);
-    [Selector("serviceConnectionWithName:rootObject:")] public static Self? ServiceConnectionWithNameRootObject(NSString name, AnyObject root);
-    [Selector("invalidate")] public void Invalidate();
-    [Selector("addRequestMode:")] public void AddRequestMode(NSString rmode);
-    [Selector("removeRequestMode:")] public void RemoveRequestMode(NSString rmode);
-    [Selector("registerName:")] public bool RegisterName(NSString? name);
-    [Selector("registerName:withNameServer:")] public bool RegisterNameWithNameServer(NSString? name, NSPortNameServer server);
-    [Selector("connectionWithReceivePort:sendPort:")] public static Self? ConnectionWithReceivePortSendPort(NSPort? receivePort, NSPort? sendPort);
-    [Selector("currentConversation")] public static AnyObject? CurrentConversation();
-    [Selector("initWithReceivePort:sendPort:")] public Self? InitWithReceivePortSendPort(NSPort? receivePort, NSPort? sendPort);
-    [Selector("enableMultipleThreads")] public void EnableMultipleThreads();
-    [Selector("addRunLoop:")] public void AddRunLoop(NSRunLoop runloop);
-    [Selector("removeRunLoop:")] public void RemoveRunLoop(NSRunLoop runloop);
-    [Selector("runInNewThread")] public void RunInNewThread();
-    [Selector("dispatchWithComponents:")] public void DispatchWithComponents(NSArray components);
+    [Selector("defaultConnection")]
+    public static NSConnection DefaultConnection();
+    [Selector("connectionWithRegisteredName:host:")]
+    public static Self? ConnectionWithRegisteredNameHost(NSString name, NSString? hostName);
+    [Selector("connectionWithRegisteredName:host:usingNameServer:")]
+    public static Self? ConnectionWithRegisteredNameHostUsingNameServer(NSString name, NSString? hostName, NSPortNameServer server);
+    [Selector("rootProxyForConnectionWithRegisteredName:host:")]
+    public static NSDistantObject? RootProxyForConnectionWithRegisteredNameHost(NSString name, NSString? hostName);
+    [Selector("rootProxyForConnectionWithRegisteredName:host:usingNameServer:")]
+    public static NSDistantObject? RootProxyForConnectionWithRegisteredNameHostUsingNameServer(NSString name, NSString? hostName, NSPortNameServer server);
+    [Selector("serviceConnectionWithName:rootObject:usingNameServer:")]
+    public static Self? ServiceConnectionWithNameRootObjectUsingNameServer(NSString name, AnyObject root, NSPortNameServer server);
+    [Selector("serviceConnectionWithName:rootObject:")]
+    public static Self? ServiceConnectionWithNameRootObject(NSString name, AnyObject root);
+    [Selector("invalidate")]
+    public void Invalidate();
+    [Selector("addRequestMode:")]
+    public void AddRequestMode(NSString rmode);
+    [Selector("removeRequestMode:")]
+    public void RemoveRequestMode(NSString rmode);
+    [Selector("registerName:")]
+    public bool RegisterName(NSString? name);
+    [Selector("registerName:withNameServer:")]
+    public bool RegisterNameWithNameServer(NSString? name, NSPortNameServer server);
+    [Selector("connectionWithReceivePort:sendPort:")]
+    public static Self? ConnectionWithReceivePortSendPort(NSPort? receivePort, NSPort? sendPort);
+    [Selector("currentConversation")]
+    public static AnyObject? CurrentConversation();
+    [Selector("initWithReceivePort:sendPort:")]
+    public Self? InitWithReceivePortSendPort(NSPort? receivePort, NSPort? sendPort);
+    [Selector("enableMultipleThreads")]
+    public void EnableMultipleThreads();
+    [Selector("addRunLoop:")]
+    public void AddRunLoop(NSRunLoop runloop);
+    [Selector("removeRunLoop:")]
+    public void RemoveRunLoop(NSRunLoop runloop);
+    [Selector("runInNewThread")]
+    public void RunInNewThread();
+    [Selector("dispatchWithComponents:")]
+    public void DispatchWithComponents(NSArray components);
 }
 
 /// Deprecated in macOS 10.13.
@@ -80,12 +115,24 @@ public extern "C" NSString? NSConnectionDidDieNotification;
 /// Deprecated in macOS 10.13.
 public objc interface NSConnectionDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("makeNewConnection:sender:")] bool MakeNewConnectionSender(NSConnection conn, NSConnection ancestor);
-    [Optional] [Selector("connection:shouldMakeNewConnection:")] bool ConnectionShouldMakeNewConnection(NSConnection ancestor, NSConnection conn);
-    [Optional] [Selector("authenticationDataForComponents:")] NSData AuthenticationDataForComponents(NSArray components);
-    [Optional] [Selector("authenticateComponents:withData:")] bool AuthenticateComponentsWithData(NSArray components, NSData signature);
-    [Optional] [Selector("createConversationForConnection:")] AnyObject CreateConversationForConnection(NSConnection conn);
-    [Optional] [Selector("connection:handleRequest:")] bool ConnectionHandleRequest(NSConnection connection, NSDistantObjectRequest doreq);
+    [Optional]
+    [Selector("makeNewConnection:sender:")]
+    bool MakeNewConnectionSender(NSConnection conn, NSConnection ancestor);
+    [Optional]
+    [Selector("connection:shouldMakeNewConnection:")]
+    bool ConnectionShouldMakeNewConnection(NSConnection ancestor, NSConnection conn);
+    [Optional]
+    [Selector("authenticationDataForComponents:")]
+    NSData AuthenticationDataForComponents(NSArray components);
+    [Optional]
+    [Selector("authenticateComponents:withData:")]
+    bool AuthenticateComponentsWithData(NSArray components, NSData signature);
+    [Optional]
+    [Selector("createConversationForConnection:")]
+    AnyObject CreateConversationForConnection(NSConnection conn);
+    [Optional]
+    [Selector("connection:handleRequest:")]
+    bool ConnectionHandleRequest(NSConnection connection, NSDistantObjectRequest doreq);
 }
 
 /// Deprecated in macOS 10.13.
@@ -97,10 +144,14 @@ public extern "C" NSString? NSConnectionDidInitializeNotification;
 /// Deprecated in macOS 10.13.
 public extern objc class NSDistantObjectRequest : NSObject
 {
-    [Selector("invocation")] public NSInvocation Invocation { get; }
-    [Selector("connection")] public NSConnection Connection { get; }
-    [Selector("conversation")] public AnyObject Conversation { get; }
-    [Selector("replyWithException:")] public void ReplyWithException(NSException? exception);
+    [Selector("invocation")]
+    public NSInvocation Invocation { get; }
+    [Selector("connection")]
+    public NSConnection Connection { get; }
+    [Selector("conversation")]
+    public AnyObject Conversation { get; }
+    [Selector("replyWithException:")]
+    public void ReplyWithException(NSException? exception);
 }
 
 #endif

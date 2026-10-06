@@ -33,13 +33,20 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMStyleSheet : DOMObject
 {
-    [Selector("type")] public NSString? Type { get; }
-    [Selector("disabled", "setDisabled:")] public bool Disabled { get; set; }
-    [Selector("ownerNode")] public DOMNode? OwnerNode { get; }
-    [Selector("parentStyleSheet")] public DOMStyleSheet? ParentStyleSheet { get; }
-    [Selector("href")] public NSString? Href { get; }
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("media")] public DOMMediaList? Media { get; }
+    [Selector("type")]
+    public NSString? Type { get; }
+    [Selector("disabled", "setDisabled:")]
+    public bool Disabled { get; set; }
+    [Selector("ownerNode")]
+    public DOMNode? OwnerNode { get; }
+    [Selector("parentStyleSheet")]
+    public DOMStyleSheet? ParentStyleSheet { get; }
+    [Selector("href")]
+    public NSString? Href { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("media")]
+    public DOMMediaList? Media { get; }
 }
 
 #endif

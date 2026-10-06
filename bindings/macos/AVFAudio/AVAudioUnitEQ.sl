@@ -48,18 +48,26 @@ public enum AVAudioUnitEQFilterType : long
 
 public extern objc class AVAudioUnitEQFilterParameters : NSObject
 {
-    [Selector("filterType", "setFilterType:")] public AVAudioUnitEQFilterType FilterType { get; set; }
-    [Selector("frequency", "setFrequency:")] public float Frequency { get; set; }
-    [Selector("bandwidth", "setBandwidth:")] public float Bandwidth { get; set; }
-    [Selector("gain", "setGain:")] public float Gain { get; set; }
-    [Selector("bypass", "setBypass:")] public bool Bypass { get; set; }
+    [Selector("filterType", "setFilterType:")]
+    public AVAudioUnitEQFilterType FilterType { get; set; }
+    [Selector("frequency", "setFrequency:")]
+    public float Frequency { get; set; }
+    [Selector("bandwidth", "setBandwidth:")]
+    public float Bandwidth { get; set; }
+    [Selector("gain", "setGain:")]
+    public float Gain { get; set; }
+    [Selector("bypass", "setBypass:")]
+    public bool Bypass { get; set; }
 }
 
 public extern objc class AVAudioUnitEQ : AVAudioUnitEffect
 {
-    [Selector("bands")] public NSArray Bands { get; }
-    [Selector("globalGain", "setGlobalGain:")] public float GlobalGain { get; set; }
-    [Selector("initWithNumberOfBands:")] public Self InitWithNumberOfBands(NSUInteger numberOfBands);
+    [Selector("bands")]
+    public NSArray Bands { get; }
+    [Selector("globalGain", "setGlobalGain:")]
+    public float GlobalGain { get; set; }
+    [Selector("initWithNumberOfBands:")]
+    public Self InitWithNumberOfBands(NSUInteger numberOfBands);
 }
 
 #endif

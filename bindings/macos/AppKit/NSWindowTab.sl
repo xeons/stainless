@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class NSWindowTab : NSObject
 {
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("attributedTitle", "setAttributedTitle:")] public NSAttributedString? AttributedTitle { get; set; }
-    [Selector("toolTip", "setToolTip:")] public NSString? ToolTip { get; set; }
-    [Selector("accessoryView", "setAccessoryView:")] public NSView? AccessoryView { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("attributedTitle", "setAttributedTitle:")]
+    public NSAttributedString? AttributedTitle { get; set; }
+    [Selector("toolTip", "setToolTip:")]
+    public NSString? ToolTip { get; set; }
+    [Selector("accessoryView", "setAccessoryView:")]
+    public NSView? AccessoryView { get; set; }
 }
 
 #endif

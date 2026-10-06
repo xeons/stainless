@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class AVCaptureAudioPreviewOutput : AVCaptureOutput
 {
-    [Selector("outputDeviceUniqueID", "setOutputDeviceUniqueID:")] public NSString? OutputDeviceUniqueID { get; set; }
-    [Selector("volume", "setVolume:")] public float Volume { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("new")] public static Self New();
+    [Selector("outputDeviceUniqueID", "setOutputDeviceUniqueID:")]
+    public NSString? OutputDeviceUniqueID { get; set; }
+    [Selector("volume", "setVolume:")]
+    public float Volume { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("new")]
+    public static Self New();
 }
 
 #endif

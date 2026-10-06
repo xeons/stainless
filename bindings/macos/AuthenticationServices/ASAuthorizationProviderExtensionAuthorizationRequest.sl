@@ -39,36 +39,61 @@ public extern "C" ASAuthorizationProviderAuthorizationOperation ASAuthorizationP
 
 public objc interface ASAuthorizationProviderExtensionAuthorizationRequestHandler : NSObjectProtocol
 {
-    [Selector("beginAuthorizationWithRequest:")] void BeginAuthorizationWithRequest(ASAuthorizationProviderExtensionAuthorizationRequest request);
-    [Optional] [Selector("cancelAuthorizationWithRequest:")] void CancelAuthorizationWithRequest(ASAuthorizationProviderExtensionAuthorizationRequest request);
+    [Selector("beginAuthorizationWithRequest:")]
+    void BeginAuthorizationWithRequest(ASAuthorizationProviderExtensionAuthorizationRequest request);
+    [Optional]
+    [Selector("cancelAuthorizationWithRequest:")]
+    void CancelAuthorizationWithRequest(ASAuthorizationProviderExtensionAuthorizationRequest request);
 }
 
 public objc closure void ASAuthorizationProviderExtensionAuthorizationRequestPresentAuthorizationViewControllerWithCompletionCompletionBlock(bool arg0, NSError? arg1);
 
 public extern objc class ASAuthorizationProviderExtensionAuthorizationRequest : NSObject
 {
-    [Selector("url")] public NSURL Url { get; }
-    [Selector("requestedOperation")] public ASAuthorizationProviderAuthorizationOperation RequestedOperation { get; }
-    [Selector("httpHeaders")] public NSDictionary HttpHeaders { get; }
-    [Selector("httpBody")] public NSData HttpBody { get; }
-    [Selector("realm")] public NSString Realm { get; }
-    [Selector("extensionData")] public NSDictionary ExtensionData { get; }
-    [Selector("callerBundleIdentifier")] public NSString CallerBundleIdentifier { get; }
-    [Selector("authorizationOptions")] public NSDictionary AuthorizationOptions { get; }
-    [Selector("isCallerManaged")] public bool CallerManaged { get; }
-    [Selector("callerTeamIdentifier")] public NSString CallerTeamIdentifier { get; }
-    [Selector("localizedCallerDisplayName")] public NSString LocalizedCallerDisplayName { get; }
-    [Selector("callerAuditToken")] public NSData CallerAuditToken { get; }
-    [Selector("isUserInterfaceEnabled")] public bool UserInterfaceEnabled { get; }
-    [Selector("loginManager")] public ASAuthorizationProviderExtensionLoginManager? LoginManager { get; }
-    [Selector("doNotHandle")] public void DoNotHandle();
-    [Selector("cancel")] public void Cancel();
-    [Selector("complete")] public void Complete();
-    [Selector("completeWithHTTPAuthorizationHeaders:")] public void CompleteWithHTTPAuthorizationHeaders(NSDictionary httpAuthorizationHeaders);
-    [Selector("completeWithHTTPResponse:httpBody:")] public void CompleteWithHTTPResponseHttpBody(NSHTTPURLResponse httpResponse, NSData? httpBody);
-    [Selector("completeWithAuthorizationResult:")] public void CompleteWithAuthorizationResult(ASAuthorizationProviderExtensionAuthorizationResult authorizationResult);
-    [Selector("completeWithError:")] public void CompleteWithError(NSError error);
-    [Selector("presentAuthorizationViewControllerWithCompletion:")] public void PresentAuthorizationViewControllerWithCompletion(ASAuthorizationProviderExtensionAuthorizationRequestPresentAuthorizationViewControllerWithCompletionCompletionBlock completion);
+    [Selector("url")]
+    public NSURL Url { get; }
+    [Selector("requestedOperation")]
+    public ASAuthorizationProviderAuthorizationOperation RequestedOperation { get; }
+    [Selector("httpHeaders")]
+    public NSDictionary HttpHeaders { get; }
+    [Selector("httpBody")]
+    public NSData HttpBody { get; }
+    [Selector("realm")]
+    public NSString Realm { get; }
+    [Selector("extensionData")]
+    public NSDictionary ExtensionData { get; }
+    [Selector("callerBundleIdentifier")]
+    public NSString CallerBundleIdentifier { get; }
+    [Selector("authorizationOptions")]
+    public NSDictionary AuthorizationOptions { get; }
+    [Selector("isCallerManaged")]
+    public bool CallerManaged { get; }
+    [Selector("callerTeamIdentifier")]
+    public NSString CallerTeamIdentifier { get; }
+    [Selector("localizedCallerDisplayName")]
+    public NSString LocalizedCallerDisplayName { get; }
+    [Selector("callerAuditToken")]
+    public NSData CallerAuditToken { get; }
+    [Selector("isUserInterfaceEnabled")]
+    public bool UserInterfaceEnabled { get; }
+    [Selector("loginManager")]
+    public ASAuthorizationProviderExtensionLoginManager? LoginManager { get; }
+    [Selector("doNotHandle")]
+    public void DoNotHandle();
+    [Selector("cancel")]
+    public void Cancel();
+    [Selector("complete")]
+    public void Complete();
+    [Selector("completeWithHTTPAuthorizationHeaders:")]
+    public void CompleteWithHTTPAuthorizationHeaders(NSDictionary httpAuthorizationHeaders);
+    [Selector("completeWithHTTPResponse:httpBody:")]
+    public void CompleteWithHTTPResponseHttpBody(NSHTTPURLResponse httpResponse, NSData? httpBody);
+    [Selector("completeWithAuthorizationResult:")]
+    public void CompleteWithAuthorizationResult(ASAuthorizationProviderExtensionAuthorizationResult authorizationResult);
+    [Selector("completeWithError:")]
+    public void CompleteWithError(NSError error);
+    [Selector("presentAuthorizationViewControllerWithCompletion:")]
+    public void PresentAuthorizationViewControllerWithCompletion(ASAuthorizationProviderExtensionAuthorizationRequestPresentAuthorizationViewControllerWithCompletionCompletionBlock completion);
 }
 
 #endif

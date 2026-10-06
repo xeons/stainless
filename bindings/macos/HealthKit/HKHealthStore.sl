@@ -53,29 +53,52 @@ public objc closure void HKHealthStoreSplitTotalEnergyStartDateEndDateResultsHan
 
 public extern objc class HKHealthStore : NSObject
 {
-    [Selector("isHealthDataAvailable")] public static bool IsHealthDataAvailable();
-    [Selector("supportsHealthRecords")] public bool SupportsHealthRecords();
-    [Selector("authorizationStatusForType:")] public HKAuthorizationStatus AuthorizationStatusForType(HKObjectType type);
-    [Selector("requestAuthorizationToShareTypes:readTypes:completion:")] public void RequestAuthorizationToShareTypesReadTypesCompletion(NSSet? typesToShare, NSSet? typesToRead, HKHealthStoreRequestAuthorizationToShareTypesReadTypesCompletionCompletionBlock completion);
-    [Selector("requestPerObjectReadAuthorizationForType:predicate:completion:")] public void RequestPerObjectReadAuthorizationForTypePredicateCompletion(HKObjectType objectType, NSPredicate? predicate, HKHealthStoreRequestPerObjectReadAuthorizationForTypePredicateCompletionCompletionBlock completion);
-    [Selector("getRequestStatusForAuthorizationToShareTypes:readTypes:completion:")] public void GetRequestStatusForAuthorizationToShareTypesReadTypesCompletion(NSSet typesToShare, NSSet typesToRead, HKHealthStoreGetRequestStatusForAuthorizationToShareTypesReadTypesCompletionCompletionBlock completion);
-    [Selector("handleAuthorizationForExtensionWithCompletion:")] public void HandleAuthorizationForExtensionWithCompletion(HKHealthStoreHandleAuthorizationForExtensionWithCompletionCompletionBlock completion);
-    [Selector("earliestPermittedSampleDate")] public NSDate EarliestPermittedSampleDate();
-    [Selector("saveObject:withCompletion:")] public void SaveObjectWithCompletion(HKObject object, HKHealthStoreSaveObjectWithCompletionCompletionBlock completion);
-    [Selector("saveObjects:withCompletion:")] public void SaveObjectsWithCompletion(NSArray objects, HKHealthStoreSaveObjectsWithCompletionCompletionBlock completion);
-    [Selector("deleteObject:withCompletion:")] public void DeleteObjectWithCompletion(HKObject object, HKHealthStoreDeleteObjectWithCompletionCompletionBlock completion);
-    [Selector("deleteObjects:withCompletion:")] public void DeleteObjectsWithCompletion(NSArray objects, HKHealthStoreDeleteObjectsWithCompletionCompletionBlock completion);
-    [Selector("deleteObjectsOfType:predicate:withCompletion:")] public void DeleteObjectsOfTypePredicateWithCompletion(HKObjectType objectType, NSPredicate predicate, HKHealthStoreDeleteObjectsOfTypePredicateWithCompletionCompletionBlock completion);
-    [Selector("executeQuery:")] public void ExecuteQuery(HKQuery query);
-    [Selector("stopQuery:")] public void StopQuery(HKQuery query);
-    [Selector("splitTotalEnergy:startDate:endDate:resultsHandler:")] public void SplitTotalEnergyStartDateEndDateResultsHandler(HKQuantity totalEnergy, NSDate startDate, NSDate endDate, HKHealthStoreSplitTotalEnergyStartDateEndDateResultsHandlerResultsHandlerBlock resultsHandler);
-    [Selector("dateOfBirthWithError:")] public NSDate? DateOfBirthWithError(out NSError? error);
-    [Selector("dateOfBirthComponentsWithError:")] public NSDateComponents? DateOfBirthComponentsWithError(out NSError? error);
-    [Selector("biologicalSexWithError:")] public HKBiologicalSexObject? BiologicalSexWithError(out NSError? error);
-    [Selector("bloodTypeWithError:")] public HKBloodTypeObject? BloodTypeWithError(out NSError? error);
-    [Selector("fitzpatrickSkinTypeWithError:")] public HKFitzpatrickSkinTypeObject? FitzpatrickSkinTypeWithError(out NSError? error);
-    [Selector("wheelchairUseWithError:")] public HKWheelchairUseObject? WheelchairUseWithError(out NSError? error);
-    [Selector("activityMoveModeWithError:")] public HKActivityMoveModeObject? ActivityMoveModeWithError(out NSError? error);
+    [Selector("isHealthDataAvailable")]
+    public static bool IsHealthDataAvailable();
+    [Selector("supportsHealthRecords")]
+    public bool SupportsHealthRecords();
+    [Selector("authorizationStatusForType:")]
+    public HKAuthorizationStatus AuthorizationStatusForType(HKObjectType type);
+    [Selector("requestAuthorizationToShareTypes:readTypes:completion:")]
+    public void RequestAuthorizationToShareTypesReadTypesCompletion(NSSet? typesToShare, NSSet? typesToRead, HKHealthStoreRequestAuthorizationToShareTypesReadTypesCompletionCompletionBlock completion);
+    [Selector("requestPerObjectReadAuthorizationForType:predicate:completion:")]
+    public void RequestPerObjectReadAuthorizationForTypePredicateCompletion(HKObjectType objectType, NSPredicate? predicate, HKHealthStoreRequestPerObjectReadAuthorizationForTypePredicateCompletionCompletionBlock completion);
+    [Selector("getRequestStatusForAuthorizationToShareTypes:readTypes:completion:")]
+    public void GetRequestStatusForAuthorizationToShareTypesReadTypesCompletion(NSSet typesToShare, NSSet typesToRead, HKHealthStoreGetRequestStatusForAuthorizationToShareTypesReadTypesCompletionCompletionBlock completion);
+    [Selector("handleAuthorizationForExtensionWithCompletion:")]
+    public void HandleAuthorizationForExtensionWithCompletion(HKHealthStoreHandleAuthorizationForExtensionWithCompletionCompletionBlock completion);
+    [Selector("earliestPermittedSampleDate")]
+    public NSDate EarliestPermittedSampleDate();
+    [Selector("saveObject:withCompletion:")]
+    public void SaveObjectWithCompletion(HKObject object, HKHealthStoreSaveObjectWithCompletionCompletionBlock completion);
+    [Selector("saveObjects:withCompletion:")]
+    public void SaveObjectsWithCompletion(NSArray objects, HKHealthStoreSaveObjectsWithCompletionCompletionBlock completion);
+    [Selector("deleteObject:withCompletion:")]
+    public void DeleteObjectWithCompletion(HKObject object, HKHealthStoreDeleteObjectWithCompletionCompletionBlock completion);
+    [Selector("deleteObjects:withCompletion:")]
+    public void DeleteObjectsWithCompletion(NSArray objects, HKHealthStoreDeleteObjectsWithCompletionCompletionBlock completion);
+    [Selector("deleteObjectsOfType:predicate:withCompletion:")]
+    public void DeleteObjectsOfTypePredicateWithCompletion(HKObjectType objectType, NSPredicate predicate, HKHealthStoreDeleteObjectsOfTypePredicateWithCompletionCompletionBlock completion);
+    [Selector("executeQuery:")]
+    public void ExecuteQuery(HKQuery query);
+    [Selector("stopQuery:")]
+    public void StopQuery(HKQuery query);
+    [Selector("splitTotalEnergy:startDate:endDate:resultsHandler:")]
+    public void SplitTotalEnergyStartDateEndDateResultsHandler(HKQuantity totalEnergy, NSDate startDate, NSDate endDate, HKHealthStoreSplitTotalEnergyStartDateEndDateResultsHandlerResultsHandlerBlock resultsHandler);
+    [Selector("dateOfBirthWithError:")]
+    public NSDate? DateOfBirthWithError(out NSError? error);
+    [Selector("dateOfBirthComponentsWithError:")]
+    public NSDateComponents? DateOfBirthComponentsWithError(out NSError? error);
+    [Selector("biologicalSexWithError:")]
+    public HKBiologicalSexObject? BiologicalSexWithError(out NSError? error);
+    [Selector("bloodTypeWithError:")]
+    public HKBloodTypeObject? BloodTypeWithError(out NSError? error);
+    [Selector("fitzpatrickSkinTypeWithError:")]
+    public HKFitzpatrickSkinTypeObject? FitzpatrickSkinTypeWithError(out NSError? error);
+    [Selector("wheelchairUseWithError:")]
+    public HKWheelchairUseObject? WheelchairUseWithError(out NSError? error);
+    [Selector("activityMoveModeWithError:")]
+    public HKActivityMoveModeObject? ActivityMoveModeWithError(out NSError? error);
 }
 
 public objc closure void HKHealthStoreWorkoutSessionMirroringStartHandlerBlock(HKWorkoutSession arg0);
@@ -87,12 +110,17 @@ public objc closure void HKHealthStoreStartWatchAppWithWorkoutConfigurationCompl
 /// HKWorkout, a category of HKHealthStore.
 public extern objc class HKHealthStore
 {
-    [Selector("workoutSessionMirroringStartHandler", "setWorkoutSessionMirroringStartHandler:")] public HKHealthStoreWorkoutSessionMirroringStartHandlerBlock? WorkoutSessionMirroringStartHandler { get; set; }
+    [Selector("workoutSessionMirroringStartHandler", "setWorkoutSessionMirroringStartHandler:")]
+    public HKHealthStoreWorkoutSessionMirroringStartHandlerBlock? WorkoutSessionMirroringStartHandler { get; set; }
     /// Deprecated in macOS 14.0.
-    [Selector("addSamples:toWorkout:completion:")] public void AddSamplesToWorkoutCompletion(NSArray samples, HKWorkout workout, HKHealthStoreAddSamplesToWorkoutCompletionCompletionBlock completion);
-    [Selector("pauseWorkoutSession:")] public void PauseWorkoutSession(HKWorkoutSession workoutSession);
-    [Selector("resumeWorkoutSession:")] public void ResumeWorkoutSession(HKWorkoutSession workoutSession);
-    [Selector("startWatchAppWithWorkoutConfiguration:completion:")] public void StartWatchAppWithWorkoutConfigurationCompletion(HKWorkoutConfiguration workoutConfiguration, HKHealthStoreStartWatchAppWithWorkoutConfigurationCompletionCompletionBlock completion);
+    [Selector("addSamples:toWorkout:completion:")]
+    public void AddSamplesToWorkoutCompletion(NSArray samples, HKWorkout workout, HKHealthStoreAddSamplesToWorkoutCompletionCompletionBlock completion);
+    [Selector("pauseWorkoutSession:")]
+    public void PauseWorkoutSession(HKWorkoutSession workoutSession);
+    [Selector("resumeWorkoutSession:")]
+    public void ResumeWorkoutSession(HKWorkoutSession workoutSession);
+    [Selector("startWatchAppWithWorkoutConfiguration:completion:")]
+    public void StartWatchAppWithWorkoutConfigurationCompletion(HKWorkoutConfiguration workoutConfiguration, HKHealthStoreStartWatchAppWithWorkoutConfigurationCompletionCompletionBlock completion);
 }
 
 public objc closure void HKHealthStoreEnableBackgroundDeliveryForTypeFrequencyWithCompletionCompletionBlock(bool arg0, NSError? arg1);
@@ -104,9 +132,12 @@ public objc closure void HKHealthStoreDisableAllBackgroundDeliveryWithCompletion
 /// HKBackgroundDelivery, a category of HKHealthStore.
 public extern objc class HKHealthStore
 {
-    [Selector("enableBackgroundDeliveryForType:frequency:withCompletion:")] public void EnableBackgroundDeliveryForTypeFrequencyWithCompletion(HKObjectType type, HKUpdateFrequency frequency, HKHealthStoreEnableBackgroundDeliveryForTypeFrequencyWithCompletionCompletionBlock completion);
-    [Selector("disableBackgroundDeliveryForType:withCompletion:")] public void DisableBackgroundDeliveryForTypeWithCompletion(HKObjectType type, HKHealthStoreDisableBackgroundDeliveryForTypeWithCompletionCompletionBlock completion);
-    [Selector("disableAllBackgroundDeliveryWithCompletion:")] public void DisableAllBackgroundDeliveryWithCompletion(HKHealthStoreDisableAllBackgroundDeliveryWithCompletionCompletionBlock completion);
+    [Selector("enableBackgroundDeliveryForType:frequency:withCompletion:")]
+    public void EnableBackgroundDeliveryForTypeFrequencyWithCompletion(HKObjectType type, HKUpdateFrequency frequency, HKHealthStoreEnableBackgroundDeliveryForTypeFrequencyWithCompletionCompletionBlock completion);
+    [Selector("disableBackgroundDeliveryForType:withCompletion:")]
+    public void DisableBackgroundDeliveryForTypeWithCompletion(HKObjectType type, HKHealthStoreDisableBackgroundDeliveryForTypeWithCompletionCompletionBlock completion);
+    [Selector("disableAllBackgroundDeliveryWithCompletion:")]
+    public void DisableAllBackgroundDeliveryWithCompletion(HKHealthStoreDisableAllBackgroundDeliveryWithCompletionCompletionBlock completion);
 }
 
 public extern "C" NSString HKUserPreferencesDidChangeNotification;
@@ -116,7 +147,8 @@ public objc closure void HKHealthStorePreferredUnitsForQuantityTypesCompletionCo
 /// HKUserPreferences, a category of HKHealthStore.
 public extern objc class HKHealthStore
 {
-    [Selector("preferredUnitsForQuantityTypes:completion:")] public void PreferredUnitsForQuantityTypesCompletion(NSSet quantityTypes, HKHealthStorePreferredUnitsForQuantityTypesCompletionCompletionBlock completion);
+    [Selector("preferredUnitsForQuantityTypes:completion:")]
+    public void PreferredUnitsForQuantityTypesCompletion(NSSet quantityTypes, HKHealthStorePreferredUnitsForQuantityTypesCompletionCompletionBlock completion);
 }
 
 public objc closure void HKHealthStoreRecalibrateEstimatesForSampleTypeAtDateCompletionCompletionBlock(bool arg0, NSError? arg1);
@@ -124,7 +156,8 @@ public objc closure void HKHealthStoreRecalibrateEstimatesForSampleTypeAtDateCom
 /// HKRecalibrateEstimates, a category of HKHealthStore.
 public extern objc class HKHealthStore
 {
-    [Selector("recalibrateEstimatesForSampleType:atDate:completion:")] public void RecalibrateEstimatesForSampleTypeAtDateCompletion(HKSampleType sampleType, NSDate date, HKHealthStoreRecalibrateEstimatesForSampleTypeAtDateCompletionCompletionBlock completion);
+    [Selector("recalibrateEstimatesForSampleType:atDate:completion:")]
+    public void RecalibrateEstimatesForSampleTypeAtDateCompletion(HKSampleType sampleType, NSDate date, HKHealthStoreRecalibrateEstimatesForSampleTypeAtDateCompletionCompletionBlock completion);
 }
 
 public objc closure void HKHealthStoreRelateWorkoutEffortSampleWithWorkoutActivityCompletionCompletionBlock(bool arg0, NSError? arg1);
@@ -134,8 +167,10 @@ public objc closure void HKHealthStoreUnrelateWorkoutEffortSampleFromWorkoutActi
 /// HKWorkoutRelationship, a category of HKHealthStore.
 public extern objc class HKHealthStore
 {
-    [Selector("relateWorkoutEffortSample:withWorkout:activity:completion:")] public void RelateWorkoutEffortSampleWithWorkoutActivityCompletion(HKSample sample, HKWorkout workout, HKWorkoutActivity? activity, HKHealthStoreRelateWorkoutEffortSampleWithWorkoutActivityCompletionCompletionBlock completion);
-    [Selector("unrelateWorkoutEffortSample:fromWorkout:activity:completion:")] public void UnrelateWorkoutEffortSampleFromWorkoutActivityCompletion(HKSample sample, HKWorkout workout, HKWorkoutActivity? activity, HKHealthStoreUnrelateWorkoutEffortSampleFromWorkoutActivityCompletionCompletionBlock completion);
+    [Selector("relateWorkoutEffortSample:withWorkout:activity:completion:")]
+    public void RelateWorkoutEffortSampleWithWorkoutActivityCompletion(HKSample sample, HKWorkout workout, HKWorkoutActivity? activity, HKHealthStoreRelateWorkoutEffortSampleWithWorkoutActivityCompletionCompletionBlock completion);
+    [Selector("unrelateWorkoutEffortSample:fromWorkout:activity:completion:")]
+    public void UnrelateWorkoutEffortSampleFromWorkoutActivityCompletion(HKSample sample, HKWorkout workout, HKWorkoutActivity? activity, HKHealthStoreUnrelateWorkoutEffortSampleFromWorkoutActivityCompletionCompletionBlock completion);
 }
 
 #endif

@@ -35,16 +35,22 @@ public extern objc class AVMusicEvent : NSObject { }
 
 public extern objc class AVMIDINoteEvent : AVMusicEvent
 {
-    [Selector("channel", "setChannel:")] public UInt32 Channel { get; set; }
-    [Selector("key", "setKey:")] public UInt32 Key { get; set; }
-    [Selector("velocity", "setVelocity:")] public UInt32 Velocity { get; set; }
-    [Selector("duration", "setDuration:")] public AVMusicTimeStamp Duration { get; set; }
-    [Selector("initWithChannel:key:velocity:duration:")] public Self InitWithChannelKeyVelocityDuration(UInt32 channel, UInt32 keyNum, UInt32 velocity, AVMusicTimeStamp duration);
+    [Selector("channel", "setChannel:")]
+    public UInt32 Channel { get; set; }
+    [Selector("key", "setKey:")]
+    public UInt32 Key { get; set; }
+    [Selector("velocity", "setVelocity:")]
+    public UInt32 Velocity { get; set; }
+    [Selector("duration", "setDuration:")]
+    public AVMusicTimeStamp Duration { get; set; }
+    [Selector("initWithChannel:key:velocity:duration:")]
+    public Self InitWithChannelKeyVelocityDuration(UInt32 channel, UInt32 keyNum, UInt32 velocity, AVMusicTimeStamp duration);
 }
 
 public extern objc class AVMIDIChannelEvent : AVMusicEvent
 {
-    [Selector("channel", "setChannel:")] public UInt32 Channel { get; set; }
+    [Selector("channel", "setChannel:")]
+    public UInt32 Channel { get; set; }
 }
 
 public enum AVMIDIControlChangeMessageType : long
@@ -88,40 +94,54 @@ public enum AVMIDIControlChangeMessageType : long
 
 public extern objc class AVMIDIControlChangeEvent : AVMIDIChannelEvent
 {
-    [Selector("messageType")] public AVMIDIControlChangeMessageType MessageType { get; }
-    [Selector("value")] public UInt32 Value { get; }
-    [Selector("initWithChannel:messageType:value:")] public Self InitWithChannelMessageTypeValue(UInt32 channel, AVMIDIControlChangeMessageType messageType, UInt32 value);
+    [Selector("messageType")]
+    public AVMIDIControlChangeMessageType MessageType { get; }
+    [Selector("value")]
+    public UInt32 Value { get; }
+    [Selector("initWithChannel:messageType:value:")]
+    public Self InitWithChannelMessageTypeValue(UInt32 channel, AVMIDIControlChangeMessageType messageType, UInt32 value);
 }
 
 public extern objc class AVMIDIPolyPressureEvent : AVMIDIChannelEvent
 {
-    [Selector("key", "setKey:")] public UInt32 Key { get; set; }
-    [Selector("pressure", "setPressure:")] public UInt32 Pressure { get; set; }
-    [Selector("initWithChannel:key:pressure:")] public Self InitWithChannelKeyPressure(UInt32 channel, UInt32 key, UInt32 pressure);
+    [Selector("key", "setKey:")]
+    public UInt32 Key { get; set; }
+    [Selector("pressure", "setPressure:")]
+    public UInt32 Pressure { get; set; }
+    [Selector("initWithChannel:key:pressure:")]
+    public Self InitWithChannelKeyPressure(UInt32 channel, UInt32 key, UInt32 pressure);
 }
 
 public extern objc class AVMIDIProgramChangeEvent : AVMIDIChannelEvent
 {
-    [Selector("programNumber", "setProgramNumber:")] public UInt32 ProgramNumber { get; set; }
-    [Selector("initWithChannel:programNumber:")] public Self InitWithChannelProgramNumber(UInt32 channel, UInt32 programNumber);
+    [Selector("programNumber", "setProgramNumber:")]
+    public UInt32 ProgramNumber { get; set; }
+    [Selector("initWithChannel:programNumber:")]
+    public Self InitWithChannelProgramNumber(UInt32 channel, UInt32 programNumber);
 }
 
 public extern objc class AVMIDIChannelPressureEvent : AVMIDIChannelEvent
 {
-    [Selector("pressure", "setPressure:")] public UInt32 Pressure { get; set; }
-    [Selector("initWithChannel:pressure:")] public Self InitWithChannelPressure(UInt32 channel, UInt32 pressure);
+    [Selector("pressure", "setPressure:")]
+    public UInt32 Pressure { get; set; }
+    [Selector("initWithChannel:pressure:")]
+    public Self InitWithChannelPressure(UInt32 channel, UInt32 pressure);
 }
 
 public extern objc class AVMIDIPitchBendEvent : AVMIDIChannelEvent
 {
-    [Selector("value", "setValue:")] public UInt32 Value { get; set; }
-    [Selector("initWithChannel:value:")] public Self InitWithChannelValue(UInt32 channel, UInt32 value);
+    [Selector("value", "setValue:")]
+    public UInt32 Value { get; set; }
+    [Selector("initWithChannel:value:")]
+    public Self InitWithChannelValue(UInt32 channel, UInt32 value);
 }
 
 public extern objc class AVMIDISysexEvent : AVMusicEvent
 {
-    [Selector("sizeInBytes")] public UInt32 SizeInBytes { get; }
-    [Selector("initWithData:")] public Self InitWithData(NSData data);
+    [Selector("sizeInBytes")]
+    public UInt32 SizeInBytes { get; }
+    [Selector("initWithData:")]
+    public Self InitWithData(NSData data);
 }
 
 public enum AVMIDIMetaEventType : long
@@ -146,50 +166,72 @@ public enum AVMIDIMetaEventType : long
 
 public extern objc class AVMIDIMetaEvent : AVMusicEvent
 {
-    [Selector("type")] public AVMIDIMetaEventType Type { get; }
-    [Selector("initWithType:data:")] public Self InitWithTypeData(AVMIDIMetaEventType type, NSData data);
+    [Selector("type")]
+    public AVMIDIMetaEventType Type { get; }
+    [Selector("initWithType:data:")]
+    public Self InitWithTypeData(AVMIDIMetaEventType type, NSData data);
 }
 
 public extern objc class AVMusicUserEvent : AVMusicEvent
 {
-    [Selector("sizeInBytes")] public UInt32 SizeInBytes { get; }
-    [Selector("initWithData:")] public Self InitWithData(NSData data);
+    [Selector("sizeInBytes")]
+    public UInt32 SizeInBytes { get; }
+    [Selector("initWithData:")]
+    public Self InitWithData(NSData data);
 }
 
 public extern "C" UInt32 AVExtendedNoteOnEventDefaultInstrument;
 
 public extern objc class AVExtendedNoteOnEvent : AVMusicEvent
 {
-    [Selector("midiNote", "setMidiNote:")] public float MidiNote { get; set; }
-    [Selector("velocity", "setVelocity:")] public float Velocity { get; set; }
-    [Selector("instrumentID", "setInstrumentID:")] public UInt32 InstrumentID { get; set; }
-    [Selector("groupID", "setGroupID:")] public UInt32 GroupID { get; set; }
-    [Selector("duration", "setDuration:")] public AVMusicTimeStamp Duration { get; set; }
-    [Selector("initWithMIDINote:velocity:groupID:duration:")] public Self InitWithMIDINoteVelocityGroupIDDuration(float midiNote, float velocity, UInt32 groupID, AVMusicTimeStamp duration);
-    [Selector("initWithMIDINote:velocity:instrumentID:groupID:duration:")] public Self InitWithMIDINoteVelocityInstrumentIDGroupIDDuration(float midiNote, float velocity, UInt32 instrumentID, UInt32 groupID, AVMusicTimeStamp duration);
+    [Selector("midiNote", "setMidiNote:")]
+    public float MidiNote { get; set; }
+    [Selector("velocity", "setVelocity:")]
+    public float Velocity { get; set; }
+    [Selector("instrumentID", "setInstrumentID:")]
+    public UInt32 InstrumentID { get; set; }
+    [Selector("groupID", "setGroupID:")]
+    public UInt32 GroupID { get; set; }
+    [Selector("duration", "setDuration:")]
+    public AVMusicTimeStamp Duration { get; set; }
+    [Selector("initWithMIDINote:velocity:groupID:duration:")]
+    public Self InitWithMIDINoteVelocityGroupIDDuration(float midiNote, float velocity, UInt32 groupID, AVMusicTimeStamp duration);
+    [Selector("initWithMIDINote:velocity:instrumentID:groupID:duration:")]
+    public Self InitWithMIDINoteVelocityInstrumentIDGroupIDDuration(float midiNote, float velocity, UInt32 instrumentID, UInt32 groupID, AVMusicTimeStamp duration);
 }
 
 public extern objc class AVParameterEvent : AVMusicEvent
 {
-    [Selector("parameterID", "setParameterID:")] public UInt32 ParameterID { get; set; }
-    [Selector("scope", "setScope:")] public UInt32 Scope { get; set; }
-    [Selector("element", "setElement:")] public UInt32 Element { get; set; }
-    [Selector("value", "setValue:")] public float Value { get; set; }
-    [Selector("initWithParameterID:scope:element:value:")] public Self InitWithParameterIDScopeElementValue(UInt32 parameterID, UInt32 scope, UInt32 element, float value);
+    [Selector("parameterID", "setParameterID:")]
+    public UInt32 ParameterID { get; set; }
+    [Selector("scope", "setScope:")]
+    public UInt32 Scope { get; set; }
+    [Selector("element", "setElement:")]
+    public UInt32 Element { get; set; }
+    [Selector("value", "setValue:")]
+    public float Value { get; set; }
+    [Selector("initWithParameterID:scope:element:value:")]
+    public Self InitWithParameterIDScopeElementValue(UInt32 parameterID, UInt32 scope, UInt32 element, float value);
 }
 
 public extern objc class AVAUPresetEvent : AVMusicEvent
 {
-    [Selector("scope", "setScope:")] public UInt32 Scope { get; set; }
-    [Selector("element", "setElement:")] public UInt32 Element { get; set; }
-    [Selector("presetDictionary")] public NSDictionary PresetDictionary { get; }
-    [Selector("initWithScope:element:dictionary:")] public Self InitWithScopeElementDictionary(UInt32 scope, UInt32 element, NSDictionary presetDictionary);
+    [Selector("scope", "setScope:")]
+    public UInt32 Scope { get; set; }
+    [Selector("element", "setElement:")]
+    public UInt32 Element { get; set; }
+    [Selector("presetDictionary")]
+    public NSDictionary PresetDictionary { get; }
+    [Selector("initWithScope:element:dictionary:")]
+    public Self InitWithScopeElementDictionary(UInt32 scope, UInt32 element, NSDictionary presetDictionary);
 }
 
 public extern objc class AVExtendedTempoEvent : AVMusicEvent
 {
-    [Selector("tempo", "setTempo:")] public double Tempo { get; set; }
-    [Selector("initWithTempo:")] public Self InitWithTempo(double tempo);
+    [Selector("tempo", "setTempo:")]
+    public double Tempo { get; set; }
+    [Selector("initWithTempo:")]
+    public Self InitWithTempo(double tempo);
 }
 
 #endif

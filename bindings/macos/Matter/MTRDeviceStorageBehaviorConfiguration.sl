@@ -33,17 +33,28 @@ import Standard.ObjC;
 
 public extern objc class MTRDeviceStorageBehaviorConfiguration : NSObject, NSCopying
 {
-    [Selector("disableStorageBehaviorOptimization", "setDisableStorageBehaviorOptimization:")] public bool DisableStorageBehaviorOptimization { get; set; }
-    [Selector("reportToPersistenceDelayTime", "setReportToPersistenceDelayTime:")] public NSTimeInterval ReportToPersistenceDelayTime { get; set; }
-    [Selector("reportToPersistenceDelayTimeMax", "setReportToPersistenceDelayTimeMax:")] public NSTimeInterval ReportToPersistenceDelayTimeMax { get; set; }
-    [Selector("recentReportTimesMaxCount", "setRecentReportTimesMaxCount:")] public NSUInteger RecentReportTimesMaxCount { get; set; }
-    [Selector("timeBetweenReportsTooShortThreshold", "setTimeBetweenReportsTooShortThreshold:")] public NSTimeInterval TimeBetweenReportsTooShortThreshold { get; set; }
-    [Selector("timeBetweenReportsTooShortMinThreshold", "setTimeBetweenReportsTooShortMinThreshold:")] public NSTimeInterval TimeBetweenReportsTooShortMinThreshold { get; set; }
-    [Selector("reportToPersistenceDelayMaxMultiplier", "setReportToPersistenceDelayMaxMultiplier:")] public double ReportToPersistenceDelayMaxMultiplier { get; set; }
-    [Selector("deviceReportingExcessivelyIntervalThreshold", "setDeviceReportingExcessivelyIntervalThreshold:")] public NSTimeInterval DeviceReportingExcessivelyIntervalThreshold { get; set; }
-    [Selector("configurationWithDefaultStorageBehavior")] public static Self ConfigurationWithDefaultStorageBehavior();
-    [Selector("configurationWithStorageBehaviorOptimizationDisabled")] public static Self ConfigurationWithStorageBehaviorOptimizationDisabled();
-    [Selector("configurationWithReportToPersistenceDelayTime:reportToPersistenceDelayTimeMax:recentReportTimesMaxCount:timeBetweenReportsTooShortThreshold:timeBetweenReportsTooShortMinThreshold:reportToPersistenceDelayMaxMultiplier:deviceReportingExcessivelyIntervalThreshold:")] public static Self ConfigurationWithReportToPersistenceDelayTimeReportToPersistenceDelayTimeMaxRecentReportTimesMaxCountTimeBetweenReportsTooShortThresholdTimeBetweenReportsTooShortMinThresholdReportToPersistenceDelayMaxMultiplierDeviceReportingExcessivelyIntervalThreshold(NSTimeInterval reportToPersistenceDelayTime, NSTimeInterval reportToPersistenceDelayTimeMax, NSUInteger recentReportTimesMaxCount, NSTimeInterval timeBetweenReportsTooShortThreshold, NSTimeInterval timeBetweenReportsTooShortMinThreshold, double reportToPersistenceDelayMaxMultiplier, NSTimeInterval deviceReportingExcessivelyIntervalThreshold);
+    [Selector("disableStorageBehaviorOptimization", "setDisableStorageBehaviorOptimization:")]
+    public bool DisableStorageBehaviorOptimization { get; set; }
+    [Selector("reportToPersistenceDelayTime", "setReportToPersistenceDelayTime:")]
+    public NSTimeInterval ReportToPersistenceDelayTime { get; set; }
+    [Selector("reportToPersistenceDelayTimeMax", "setReportToPersistenceDelayTimeMax:")]
+    public NSTimeInterval ReportToPersistenceDelayTimeMax { get; set; }
+    [Selector("recentReportTimesMaxCount", "setRecentReportTimesMaxCount:")]
+    public NSUInteger RecentReportTimesMaxCount { get; set; }
+    [Selector("timeBetweenReportsTooShortThreshold", "setTimeBetweenReportsTooShortThreshold:")]
+    public NSTimeInterval TimeBetweenReportsTooShortThreshold { get; set; }
+    [Selector("timeBetweenReportsTooShortMinThreshold", "setTimeBetweenReportsTooShortMinThreshold:")]
+    public NSTimeInterval TimeBetweenReportsTooShortMinThreshold { get; set; }
+    [Selector("reportToPersistenceDelayMaxMultiplier", "setReportToPersistenceDelayMaxMultiplier:")]
+    public double ReportToPersistenceDelayMaxMultiplier { get; set; }
+    [Selector("deviceReportingExcessivelyIntervalThreshold", "setDeviceReportingExcessivelyIntervalThreshold:")]
+    public NSTimeInterval DeviceReportingExcessivelyIntervalThreshold { get; set; }
+    [Selector("configurationWithDefaultStorageBehavior")]
+    public static Self ConfigurationWithDefaultStorageBehavior();
+    [Selector("configurationWithStorageBehaviorOptimizationDisabled")]
+    public static Self ConfigurationWithStorageBehaviorOptimizationDisabled();
+    [Selector("configurationWithReportToPersistenceDelayTime:reportToPersistenceDelayTimeMax:recentReportTimesMaxCount:timeBetweenReportsTooShortThreshold:timeBetweenReportsTooShortMinThreshold:reportToPersistenceDelayMaxMultiplier:deviceReportingExcessivelyIntervalThreshold:")]
+    public static Self ConfigurationWithReportToPersistenceDelayTimeReportToPersistenceDelayTimeMaxRecentReportTimesMaxCountTimeBetweenReportsTooShortThresholdTimeBetweenReportsTooShortMinThresholdReportToPersistenceDelayMaxMultiplierDeviceReportingExcessivelyIntervalThreshold(NSTimeInterval reportToPersistenceDelayTime, NSTimeInterval reportToPersistenceDelayTimeMax, NSUInteger recentReportTimesMaxCount, NSTimeInterval timeBetweenReportsTooShortThreshold, NSTimeInterval timeBetweenReportsTooShortMinThreshold, double reportToPersistenceDelayMaxMultiplier, NSTimeInterval deviceReportingExcessivelyIntervalThreshold);
 }
 
 #endif

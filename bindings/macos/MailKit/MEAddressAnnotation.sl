@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class MEAddressAnnotation : NSObject, NSSecureCoding
 {
-    [Selector("errorWithLocalizedDescription:")] public static MEAddressAnnotation ErrorWithLocalizedDescription(NSString localizedDescription);
-    [Selector("warningWithLocalizedDescription:")] public static MEAddressAnnotation WarningWithLocalizedDescription(NSString localizedDescription);
-    [Selector("successWithLocalizedDescription:")] public static MEAddressAnnotation SuccessWithLocalizedDescription(NSString localizedDescription);
+    [Selector("errorWithLocalizedDescription:")]
+    public static MEAddressAnnotation ErrorWithLocalizedDescription(NSString localizedDescription);
+    [Selector("warningWithLocalizedDescription:")]
+    public static MEAddressAnnotation WarningWithLocalizedDescription(NSString localizedDescription);
+    [Selector("successWithLocalizedDescription:")]
+    public static MEAddressAnnotation SuccessWithLocalizedDescription(NSString localizedDescription);
 }
 
 #endif

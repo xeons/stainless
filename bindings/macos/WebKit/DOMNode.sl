@@ -53,51 +53,88 @@ public const int DOM_DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMNode : DOMObject, DOMEventTarget
 {
-    [Selector("nodeName")] public NSString? NodeName { get; }
-    [Selector("nodeValue", "setNodeValue:")] public NSString? NodeValue { get; set; }
-    [Selector("nodeType")] public ushort NodeType { get; }
-    [Selector("parentNode")] public DOMNode? ParentNode { get; }
-    [Selector("childNodes")] public DOMNodeList? ChildNodes { get; }
-    [Selector("firstChild")] public DOMNode? FirstChild { get; }
-    [Selector("lastChild")] public DOMNode? LastChild { get; }
-    [Selector("previousSibling")] public DOMNode? PreviousSibling { get; }
-    [Selector("nextSibling")] public DOMNode? NextSibling { get; }
-    [Selector("ownerDocument")] public DOMDocument? OwnerDocument { get; }
-    [Selector("namespaceURI")] public NSString? NamespaceURI { get; }
-    [Selector("prefix", "setPrefix:")] public NSString? Prefix { get; set; }
-    [Selector("localName")] public NSString? LocalName { get; }
-    [Selector("attributes")] public DOMNamedNodeMap? Attributes { get; }
-    [Selector("baseURI")] public NSString? BaseURI { get; }
-    [Selector("textContent", "setTextContent:")] public NSString? TextContent { get; set; }
-    [Selector("parentElement")] public DOMElement? ParentElement { get; }
-    [Selector("isContentEditable")] public bool IsContentEditable { get; }
-    [Selector("insertBefore:refChild:")] public DOMNode? InsertBeforeRefChild(DOMNode? newChild, DOMNode? refChild);
-    [Selector("replaceChild:oldChild:")] public DOMNode? ReplaceChildOldChild(DOMNode? newChild, DOMNode? oldChild);
-    [Selector("removeChild:")] public DOMNode? RemoveChild(DOMNode? oldChild);
-    [Selector("appendChild:")] public DOMNode? AppendChild(DOMNode? newChild);
-    [Selector("hasChildNodes")] public bool HasChildNodes();
-    [Selector("cloneNode:")] public DOMNode? CloneNode(bool deep);
-    [Selector("normalize")] public void Normalize();
-    [Selector("isSupported:version:")] public bool IsSupportedVersion(NSString? feature, NSString? version);
-    [Selector("hasAttributes")] public bool HasAttributes();
-    [Selector("isSameNode:")] public bool IsSameNode(DOMNode? other);
-    [Selector("isEqualNode:")] public bool IsEqualNode(DOMNode? other);
-    [Selector("lookupPrefix:")] public NSString? LookupPrefix(NSString? namespaceURI);
-    [Selector("lookupNamespaceURI:")] public NSString? LookupNamespaceURI(NSString? prefix);
-    [Selector("isDefaultNamespace:")] public bool IsDefaultNamespace(NSString? namespaceURI);
-    [Selector("compareDocumentPosition:")] public ushort CompareDocumentPosition(DOMNode? other);
-    [Selector("contains:")] public bool Contains(DOMNode? other);
+    [Selector("nodeName")]
+    public NSString? NodeName { get; }
+    [Selector("nodeValue", "setNodeValue:")]
+    public NSString? NodeValue { get; set; }
+    [Selector("nodeType")]
+    public ushort NodeType { get; }
+    [Selector("parentNode")]
+    public DOMNode? ParentNode { get; }
+    [Selector("childNodes")]
+    public DOMNodeList? ChildNodes { get; }
+    [Selector("firstChild")]
+    public DOMNode? FirstChild { get; }
+    [Selector("lastChild")]
+    public DOMNode? LastChild { get; }
+    [Selector("previousSibling")]
+    public DOMNode? PreviousSibling { get; }
+    [Selector("nextSibling")]
+    public DOMNode? NextSibling { get; }
+    [Selector("ownerDocument")]
+    public DOMDocument? OwnerDocument { get; }
+    [Selector("namespaceURI")]
+    public NSString? NamespaceURI { get; }
+    [Selector("prefix", "setPrefix:")]
+    public NSString? Prefix { get; set; }
+    [Selector("localName")]
+    public NSString? LocalName { get; }
+    [Selector("attributes")]
+    public DOMNamedNodeMap? Attributes { get; }
+    [Selector("baseURI")]
+    public NSString? BaseURI { get; }
+    [Selector("textContent", "setTextContent:")]
+    public NSString? TextContent { get; set; }
+    [Selector("parentElement")]
+    public DOMElement? ParentElement { get; }
+    [Selector("isContentEditable")]
+    public bool IsContentEditable { get; }
+    [Selector("insertBefore:refChild:")]
+    public DOMNode? InsertBeforeRefChild(DOMNode? newChild, DOMNode? refChild);
+    [Selector("replaceChild:oldChild:")]
+    public DOMNode? ReplaceChildOldChild(DOMNode? newChild, DOMNode? oldChild);
+    [Selector("removeChild:")]
+    public DOMNode? RemoveChild(DOMNode? oldChild);
+    [Selector("appendChild:")]
+    public DOMNode? AppendChild(DOMNode? newChild);
+    [Selector("hasChildNodes")]
+    public bool HasChildNodes();
+    [Selector("cloneNode:")]
+    public DOMNode? CloneNode(bool deep);
+    [Selector("normalize")]
+    public void Normalize();
+    [Selector("isSupported:version:")]
+    public bool IsSupportedVersion(NSString? feature, NSString? version);
+    [Selector("hasAttributes")]
+    public bool HasAttributes();
+    [Selector("isSameNode:")]
+    public bool IsSameNode(DOMNode? other);
+    [Selector("isEqualNode:")]
+    public bool IsEqualNode(DOMNode? other);
+    [Selector("lookupPrefix:")]
+    public NSString? LookupPrefix(NSString? namespaceURI);
+    [Selector("lookupNamespaceURI:")]
+    public NSString? LookupNamespaceURI(NSString? prefix);
+    [Selector("isDefaultNamespace:")]
+    public bool IsDefaultNamespace(NSString? namespaceURI);
+    [Selector("compareDocumentPosition:")]
+    public ushort CompareDocumentPosition(DOMNode? other);
+    [Selector("contains:")]
+    public bool Contains(DOMNode? other);
 }
 
 /// DOMNodeDeprecated, a category of DOMNode.
 public extern objc class DOMNode
 {
     /// Deprecated in macOS 10.5.
-    [Selector("insertBefore::")] public DOMNode? InsertBefore(DOMNode? newChild, DOMNode? refChild);
+    [Selector("insertBefore::")]
+    public DOMNode? InsertBefore(DOMNode? newChild, DOMNode? refChild);
     /// Deprecated in macOS 10.5.
-    [Selector("replaceChild::")] public DOMNode? ReplaceChild(DOMNode? newChild, DOMNode? oldChild);
+    [Selector("replaceChild::")]
+    public DOMNode? ReplaceChild(DOMNode? newChild, DOMNode? oldChild);
     /// Deprecated in macOS 10.5.
-    [Selector("isSupported::")] public bool IsSupported(NSString? feature, NSString? version);
+    [Selector("isSupported::")]
+    public bool IsSupported(NSString? feature, NSString? version);
 }
 
 #endif

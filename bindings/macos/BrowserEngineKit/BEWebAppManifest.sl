@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class BEWebAppManifest : NSObject
 {
-    [Selector("jsonData")] public NSData JsonData { get; }
-    [Selector("manifestURL")] public NSURL ManifestURL { get; }
-    [Selector("initWithJSONData:manifestURL:")] public BEWebAppManifest? InitWithJSONDataManifestURL(NSData jsonData, NSURL manifestURL);
+    [Selector("jsonData")]
+    public NSData JsonData { get; }
+    [Selector("manifestURL")]
+    public NSURL ManifestURL { get; }
+    [Selector("initWithJSONData:manifestURL:")]
+    public BEWebAppManifest? InitWithJSONDataManifestURL(NSData jsonData, NSURL manifestURL);
 }
 
 #endif

@@ -136,7 +136,8 @@ public extern "C" OSStatus SetEventTime(EventRef inEvent, EventTime inTime);
 
 public extern "C" OSStatus CreateEventWithCGEvent(CFAllocatorRef? inAllocator, CGEventRef? inEvent, EventAttributes inAttributes, EventRef* outEvent);
 
-[ReturnsRetained] public extern "C" CGEventRef? CopyEventCGEvent(EventRef inEvent);
+[ReturnsRetained]
+public extern "C" CGEventRef? CopyEventCGEvent(EventRef inEvent);
 
 public struct OpaqueEventQueueRef;
 

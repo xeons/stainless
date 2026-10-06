@@ -35,87 +35,137 @@ import Standard.ObjC;
 
 public objc interface MERAWProcessorExtension : NSObjectProtocol
 {
-    [Selector("init")] Self Init();
-    [Selector("processorWithFormatDescription:extensionPixelBufferManager:error:")] MERAWProcessor? ProcessorWithFormatDescriptionExtensionPixelBufferManagerError(CMVideoFormatDescriptionRef formatDescription, MERAWProcessorPixelBufferManager extensionPixelBufferManager, out NSError? error);
+    [Selector("init")]
+    Self Init();
+    [Selector("processorWithFormatDescription:extensionPixelBufferManager:error:")]
+    MERAWProcessor? ProcessorWithFormatDescriptionExtensionPixelBufferManagerError(CMVideoFormatDescriptionRef formatDescription, MERAWProcessorPixelBufferManager extensionPixelBufferManager, out NSError? error);
 }
 
 public extern objc class MERAWProcessorPixelBufferManager : NSObject
 {
-    [Selector("pixelBufferAttributes", "setPixelBufferAttributes:")] public NSDictionary? PixelBufferAttributes { get; set; }
-    [ReturnsRetained] [Selector("createPixelBufferAndReturnError:")] public CVPixelBufferRef? CreatePixelBufferAndReturnError(out NSError? error);
+    [Selector("pixelBufferAttributes", "setPixelBufferAttributes:")]
+    public NSDictionary? PixelBufferAttributes { get; set; }
+    [ReturnsRetained]
+    [Selector("createPixelBufferAndReturnError:")]
+    public CVPixelBufferRef? CreatePixelBufferAndReturnError(out NSError? error);
 }
 
 public extern objc class MERAWProcessingParameter : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("key")] public NSString Key { get; }
-    [Selector("longDescription")] public NSString LongDescription { get; }
-    [Selector("enabled", "setEnabled:")] public bool Enabled { get; set; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("key")]
+    public NSString Key { get; }
+    [Selector("longDescription")]
+    public NSString LongDescription { get; }
+    [Selector("enabled", "setEnabled:")]
+    public bool Enabled { get; set; }
 }
 
 public extern objc class MERAWProcessingListElementParameter : MERAWProcessingParameter
 {
-    [Selector("listElementID")] public NSInteger ListElementID { get; }
-    [Selector("initWithName:description:elementID:")] public Self InitWithNameDescriptionElementID(NSString name, NSString description, NSInteger elementID);
+    [Selector("listElementID")]
+    public NSInteger ListElementID { get; }
+    [Selector("initWithName:description:elementID:")]
+    public Self InitWithNameDescriptionElementID(NSString name, NSString description, NSInteger elementID);
 }
 
 public extern objc class MERAWProcessingBooleanParameter : MERAWProcessingParameter
 {
-    [Selector("initialValue")] public bool InitialValue { get; }
-    [Selector("currentValue", "setCurrentValue:")] public bool CurrentValue { get; set; }
-    [Selector("initWithName:key:description:initialValue:")] public Self InitWithNameKeyDescriptionInitialValue(NSString name, NSString key, NSString description, bool initialValue);
-    [Selector("initWithName:key:description:initialValue:neutralValue:")] public Self InitWithNameKeyDescriptionInitialValueNeutralValue(NSString name, NSString key, NSString description, bool initialValue, bool neutralValue);
-    [Selector("initWithName:key:description:initialValue:cameraValue:")] public Self InitWithNameKeyDescriptionInitialValueCameraValue(NSString name, NSString key, NSString description, bool initialValue, bool cameraValue);
-    [Selector("initWithName:key:description:initialValue:neutralValue:cameraValue:")] public Self InitWithNameKeyDescriptionInitialValueNeutralValueCameraValue(NSString name, NSString key, NSString description, bool initialValue, bool neutralValue, bool cameraValue);
-    [Selector("hasNeutralValue:")] public bool HasNeutralValue(bool* outNeutralValue);
-    [Selector("hasCameraValue:")] public bool HasCameraValue(bool* outCameraValue);
+    [Selector("initialValue")]
+    public bool InitialValue { get; }
+    [Selector("currentValue", "setCurrentValue:")]
+    public bool CurrentValue { get; set; }
+    [Selector("initWithName:key:description:initialValue:")]
+    public Self InitWithNameKeyDescriptionInitialValue(NSString name, NSString key, NSString description, bool initialValue);
+    [Selector("initWithName:key:description:initialValue:neutralValue:")]
+    public Self InitWithNameKeyDescriptionInitialValueNeutralValue(NSString name, NSString key, NSString description, bool initialValue, bool neutralValue);
+    [Selector("initWithName:key:description:initialValue:cameraValue:")]
+    public Self InitWithNameKeyDescriptionInitialValueCameraValue(NSString name, NSString key, NSString description, bool initialValue, bool cameraValue);
+    [Selector("initWithName:key:description:initialValue:neutralValue:cameraValue:")]
+    public Self InitWithNameKeyDescriptionInitialValueNeutralValueCameraValue(NSString name, NSString key, NSString description, bool initialValue, bool neutralValue, bool cameraValue);
+    [Selector("hasNeutralValue:")]
+    public bool HasNeutralValue(bool* outNeutralValue);
+    [Selector("hasCameraValue:")]
+    public bool HasCameraValue(bool* outCameraValue);
 }
 
 public extern objc class MERAWProcessingIntegerParameter : MERAWProcessingParameter
 {
-    [Selector("maximumValue")] public NSInteger MaximumValue { get; }
-    [Selector("minimumValue")] public NSInteger MinimumValue { get; }
-    [Selector("initialValue")] public NSInteger InitialValue { get; }
-    [Selector("currentValue", "setCurrentValue:")] public NSInteger CurrentValue { get; set; }
-    [Selector("initWithName:key:description:initialValue:maximum:minimum:")] public Self InitWithNameKeyDescriptionInitialValueMaximumMinimum(NSString name, NSString key, NSString description, NSInteger initialValue, NSInteger maximum, NSInteger minimum);
-    [Selector("initWithName:key:description:initialValue:maximum:minimum:neutralValue:")] public Self InitWithNameKeyDescriptionInitialValueMaximumMinimumNeutralValue(NSString name, NSString key, NSString description, NSInteger initialValue, NSInteger maximum, NSInteger minimum, NSInteger neutralValue);
-    [Selector("initWithName:key:description:initialValue:maximum:minimum:cameraValue:")] public Self InitWithNameKeyDescriptionInitialValueMaximumMinimumCameraValue(NSString name, NSString key, NSString description, NSInteger initialValue, NSInteger maximum, NSInteger minimum, NSInteger cameraValue);
-    [Selector("initWithName:key:description:initialValue:maximum:minimum:neutralValue:cameraValue:")] public Self InitWithNameKeyDescriptionInitialValueMaximumMinimumNeutralValueCameraValue(NSString name, NSString key, NSString description, NSInteger initialValue, NSInteger maximum, NSInteger minimum, NSInteger neutralValue, NSInteger cameraValue);
-    [Selector("hasNeutralValue:")] public bool HasNeutralValue(NSInteger* outNeutralValue);
-    [Selector("hasCameraValue:")] public bool HasCameraValue(NSInteger* outCameraValue);
+    [Selector("maximumValue")]
+    public NSInteger MaximumValue { get; }
+    [Selector("minimumValue")]
+    public NSInteger MinimumValue { get; }
+    [Selector("initialValue")]
+    public NSInteger InitialValue { get; }
+    [Selector("currentValue", "setCurrentValue:")]
+    public NSInteger CurrentValue { get; set; }
+    [Selector("initWithName:key:description:initialValue:maximum:minimum:")]
+    public Self InitWithNameKeyDescriptionInitialValueMaximumMinimum(NSString name, NSString key, NSString description, NSInteger initialValue, NSInteger maximum, NSInteger minimum);
+    [Selector("initWithName:key:description:initialValue:maximum:minimum:neutralValue:")]
+    public Self InitWithNameKeyDescriptionInitialValueMaximumMinimumNeutralValue(NSString name, NSString key, NSString description, NSInteger initialValue, NSInteger maximum, NSInteger minimum, NSInteger neutralValue);
+    [Selector("initWithName:key:description:initialValue:maximum:minimum:cameraValue:")]
+    public Self InitWithNameKeyDescriptionInitialValueMaximumMinimumCameraValue(NSString name, NSString key, NSString description, NSInteger initialValue, NSInteger maximum, NSInteger minimum, NSInteger cameraValue);
+    [Selector("initWithName:key:description:initialValue:maximum:minimum:neutralValue:cameraValue:")]
+    public Self InitWithNameKeyDescriptionInitialValueMaximumMinimumNeutralValueCameraValue(NSString name, NSString key, NSString description, NSInteger initialValue, NSInteger maximum, NSInteger minimum, NSInteger neutralValue, NSInteger cameraValue);
+    [Selector("hasNeutralValue:")]
+    public bool HasNeutralValue(NSInteger* outNeutralValue);
+    [Selector("hasCameraValue:")]
+    public bool HasCameraValue(NSInteger* outCameraValue);
 }
 
 public extern objc class MERAWProcessingFloatParameter : MERAWProcessingParameter
 {
-    [Selector("maximumValue")] public float MaximumValue { get; }
-    [Selector("minimumValue")] public float MinimumValue { get; }
-    [Selector("initialValue")] public float InitialValue { get; }
-    [Selector("currentValue", "setCurrentValue:")] public float CurrentValue { get; set; }
-    [Selector("initWithName:key:description:initialValue:maximum:minimum:")] public Self InitWithNameKeyDescriptionInitialValueMaximumMinimum(NSString name, NSString key, NSString description, float initialValue, float maximum, float minimum);
-    [Selector("initWithName:key:description:initialValue:maximum:minimum:neutralValue:")] public Self InitWithNameKeyDescriptionInitialValueMaximumMinimumNeutralValue(NSString name, NSString key, NSString description, float initialValue, float maximum, float minimum, float neutralValue);
-    [Selector("initWithName:key:description:initialValue:maximum:minimum:cameraValue:")] public Self InitWithNameKeyDescriptionInitialValueMaximumMinimumCameraValue(NSString name, NSString key, NSString description, float initialValue, float maximum, float minimum, float cameraValue);
-    [Selector("initWithName:key:description:initialValue:maximum:minimum:neutralValue:cameraValue:")] public Self InitWithNameKeyDescriptionInitialValueMaximumMinimumNeutralValueCameraValue(NSString name, NSString key, NSString description, float initialValue, float maximum, float minimum, float neutralValue, float cameraValue);
-    [Selector("hasNeutralValue:")] public bool HasNeutralValue(float* outNeutralValue);
-    [Selector("hasCameraValue:")] public bool HasCameraValue(float* outCameraValue);
+    [Selector("maximumValue")]
+    public float MaximumValue { get; }
+    [Selector("minimumValue")]
+    public float MinimumValue { get; }
+    [Selector("initialValue")]
+    public float InitialValue { get; }
+    [Selector("currentValue", "setCurrentValue:")]
+    public float CurrentValue { get; set; }
+    [Selector("initWithName:key:description:initialValue:maximum:minimum:")]
+    public Self InitWithNameKeyDescriptionInitialValueMaximumMinimum(NSString name, NSString key, NSString description, float initialValue, float maximum, float minimum);
+    [Selector("initWithName:key:description:initialValue:maximum:minimum:neutralValue:")]
+    public Self InitWithNameKeyDescriptionInitialValueMaximumMinimumNeutralValue(NSString name, NSString key, NSString description, float initialValue, float maximum, float minimum, float neutralValue);
+    [Selector("initWithName:key:description:initialValue:maximum:minimum:cameraValue:")]
+    public Self InitWithNameKeyDescriptionInitialValueMaximumMinimumCameraValue(NSString name, NSString key, NSString description, float initialValue, float maximum, float minimum, float cameraValue);
+    [Selector("initWithName:key:description:initialValue:maximum:minimum:neutralValue:cameraValue:")]
+    public Self InitWithNameKeyDescriptionInitialValueMaximumMinimumNeutralValueCameraValue(NSString name, NSString key, NSString description, float initialValue, float maximum, float minimum, float neutralValue, float cameraValue);
+    [Selector("hasNeutralValue:")]
+    public bool HasNeutralValue(float* outNeutralValue);
+    [Selector("hasCameraValue:")]
+    public bool HasCameraValue(float* outCameraValue);
 }
 
 public extern objc class MERAWProcessingListParameter : MERAWProcessingParameter
 {
-    [Selector("listElements")] public NSArray ListElements { get; }
-    [Selector("initialValue")] public NSInteger InitialValue { get; }
-    [Selector("currentValue", "setCurrentValue:")] public NSInteger CurrentValue { get; set; }
-    [Selector("initWithName:key:description:list:initialValue:")] public Self InitWithNameKeyDescriptionListInitialValue(NSString name, NSString key, NSString description, NSArray listElements, NSInteger initialValue);
-    [Selector("initWithName:key:description:list:initialValue:neutralValue:")] public Self InitWithNameKeyDescriptionListInitialValueNeutralValue(NSString name, NSString key, NSString description, NSArray listElements, NSInteger initialValue, NSInteger neutralValue);
-    [Selector("initWithName:key:description:list:initialValue:cameraValue:")] public Self InitWithNameKeyDescriptionListInitialValueCameraValue(NSString name, NSString key, NSString description, NSArray listElements, NSInteger initialValue, NSInteger cameraValue);
-    [Selector("initWithName:key:description:list:initialValue:neutralValue:cameraValue:")] public Self InitWithNameKeyDescriptionListInitialValueNeutralValueCameraValue(NSString name, NSString key, NSString description, NSArray listElements, NSInteger initialValue, NSInteger neutralValue, NSInteger cameraValue);
-    [Selector("hasNeutralValue:")] public bool HasNeutralValue(NSInteger* outNeutralValue);
-    [Selector("hasCameraValue:")] public bool HasCameraValue(NSInteger* outCameraValue);
+    [Selector("listElements")]
+    public NSArray ListElements { get; }
+    [Selector("initialValue")]
+    public NSInteger InitialValue { get; }
+    [Selector("currentValue", "setCurrentValue:")]
+    public NSInteger CurrentValue { get; set; }
+    [Selector("initWithName:key:description:list:initialValue:")]
+    public Self InitWithNameKeyDescriptionListInitialValue(NSString name, NSString key, NSString description, NSArray listElements, NSInteger initialValue);
+    [Selector("initWithName:key:description:list:initialValue:neutralValue:")]
+    public Self InitWithNameKeyDescriptionListInitialValueNeutralValue(NSString name, NSString key, NSString description, NSArray listElements, NSInteger initialValue, NSInteger neutralValue);
+    [Selector("initWithName:key:description:list:initialValue:cameraValue:")]
+    public Self InitWithNameKeyDescriptionListInitialValueCameraValue(NSString name, NSString key, NSString description, NSArray listElements, NSInteger initialValue, NSInteger cameraValue);
+    [Selector("initWithName:key:description:list:initialValue:neutralValue:cameraValue:")]
+    public Self InitWithNameKeyDescriptionListInitialValueNeutralValueCameraValue(NSString name, NSString key, NSString description, NSArray listElements, NSInteger initialValue, NSInteger neutralValue, NSInteger cameraValue);
+    [Selector("hasNeutralValue:")]
+    public bool HasNeutralValue(NSInteger* outNeutralValue);
+    [Selector("hasCameraValue:")]
+    public bool HasCameraValue(NSInteger* outCameraValue);
 }
 
 public extern objc class MERAWProcessingSubGroupParameter : MERAWProcessingParameter
 {
-    [Selector("subGroupParameters")] public NSArray SubGroupParameters { get; }
-    [Selector("initWithName:description:parameters:")] public Self InitWithNameDescriptionParameters(NSString name, NSString description, NSArray parameters);
+    [Selector("subGroupParameters")]
+    public NSArray SubGroupParameters { get; }
+    [Selector("initWithName:description:parameters:")]
+    public Self InitWithNameDescriptionParameters(NSString name, NSString description, NSArray parameters);
 }
 
 public extern "C" NSNotificationName? MERAWProcessorValuesDidChangeNotification;
@@ -126,13 +176,22 @@ public objc closure void MERAWProcessorProcessFrameFromImageBufferCompletionHand
 
 public objc interface MERAWProcessor : NSObjectProtocol
 {
-    [Optional] [Selector("metalDeviceRegistryID", "setMetalDeviceRegistryID:")] ulong MetalDeviceRegistryID { get; set; }
-    [Optional] [Selector("outputColorAttachments")] NSDictionary OutputColorAttachments { get; }
+    [Optional]
+    [Selector("metalDeviceRegistryID", "setMetalDeviceRegistryID:")]
+    ulong MetalDeviceRegistryID { get; set; }
+    [Optional]
+    [Selector("outputColorAttachments")]
+    NSDictionary OutputColorAttachments { get; }
     /// macOS 26.0 and later.
-    [Optional] [Selector("metadataForSidecarFile")] NSData? MetadataForSidecarFile { get; }
-    [Selector("processingParameters")] NSArray ProcessingParameters { get; }
-    [Selector("isReadyForMoreMediaData")] bool ReadyForMoreMediaData { get; }
-    [Selector("processFrameFromImageBuffer:completionHandler:")] void ProcessFrameFromImageBufferCompletionHandler(CVPixelBufferRef inputFrame, MERAWProcessorProcessFrameFromImageBufferCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("metadataForSidecarFile")]
+    NSData? MetadataForSidecarFile { get; }
+    [Selector("processingParameters")]
+    NSArray ProcessingParameters { get; }
+    [Selector("isReadyForMoreMediaData")]
+    bool ReadyForMoreMediaData { get; }
+    [Selector("processFrameFromImageBuffer:completionHandler:")]
+    void ProcessFrameFromImageBufferCompletionHandler(CVPixelBufferRef inputFrame, MERAWProcessorProcessFrameFromImageBufferCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

@@ -34,62 +34,114 @@ public const int NSOpenStepUnicodeReservedBase = 62464;
 
 public extern objc class NSCharacterSet : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("controlCharacterSet")] public static NSCharacterSet ControlCharacterSet { get; }
-    [Selector("whitespaceCharacterSet")] public static NSCharacterSet WhitespaceCharacterSet { get; }
-    [Selector("whitespaceAndNewlineCharacterSet")] public static NSCharacterSet WhitespaceAndNewlineCharacterSet { get; }
-    [Selector("decimalDigitCharacterSet")] public static NSCharacterSet DecimalDigitCharacterSet { get; }
-    [Selector("letterCharacterSet")] public static NSCharacterSet LetterCharacterSet { get; }
-    [Selector("lowercaseLetterCharacterSet")] public static NSCharacterSet LowercaseLetterCharacterSet { get; }
-    [Selector("uppercaseLetterCharacterSet")] public static NSCharacterSet UppercaseLetterCharacterSet { get; }
-    [Selector("nonBaseCharacterSet")] public static NSCharacterSet NonBaseCharacterSet { get; }
-    [Selector("alphanumericCharacterSet")] public static NSCharacterSet AlphanumericCharacterSet { get; }
-    [Selector("decomposableCharacterSet")] public static NSCharacterSet DecomposableCharacterSet { get; }
-    [Selector("illegalCharacterSet")] public static NSCharacterSet IllegalCharacterSet { get; }
-    [Selector("punctuationCharacterSet")] public static NSCharacterSet PunctuationCharacterSet { get; }
-    [Selector("capitalizedLetterCharacterSet")] public static NSCharacterSet CapitalizedLetterCharacterSet { get; }
-    [Selector("symbolCharacterSet")] public static NSCharacterSet SymbolCharacterSet { get; }
-    [Selector("newlineCharacterSet")] public static NSCharacterSet NewlineCharacterSet { get; }
-    [Selector("bitmapRepresentation")] public NSData BitmapRepresentation { get; }
-    [Selector("invertedSet")] public NSCharacterSet InvertedSet { get; }
-    [Selector("characterSetWithRange:")] public static NSCharacterSet CharacterSetWithRange(NSRange aRange);
-    [Selector("characterSetWithCharactersInString:")] public static NSCharacterSet CharacterSetWithCharactersInString(NSString aString);
-    [Selector("characterSetWithBitmapRepresentation:")] public static NSCharacterSet CharacterSetWithBitmapRepresentation(NSData data);
-    [Selector("characterSetWithContentsOfFile:")] public static NSCharacterSet? CharacterSetWithContentsOfFile(NSString fName);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("characterIsMember:")] public bool CharacterIsMember(unichar aCharacter);
-    [Selector("longCharacterIsMember:")] public bool LongCharacterIsMember(UTF32Char theLongChar);
-    [Selector("isSupersetOfSet:")] public bool IsSupersetOfSet(NSCharacterSet theOtherSet);
-    [Selector("hasMemberInPlane:")] public bool HasMemberInPlane(byte thePlane);
+    [Selector("controlCharacterSet")]
+    public static NSCharacterSet ControlCharacterSet { get; }
+    [Selector("whitespaceCharacterSet")]
+    public static NSCharacterSet WhitespaceCharacterSet { get; }
+    [Selector("whitespaceAndNewlineCharacterSet")]
+    public static NSCharacterSet WhitespaceAndNewlineCharacterSet { get; }
+    [Selector("decimalDigitCharacterSet")]
+    public static NSCharacterSet DecimalDigitCharacterSet { get; }
+    [Selector("letterCharacterSet")]
+    public static NSCharacterSet LetterCharacterSet { get; }
+    [Selector("lowercaseLetterCharacterSet")]
+    public static NSCharacterSet LowercaseLetterCharacterSet { get; }
+    [Selector("uppercaseLetterCharacterSet")]
+    public static NSCharacterSet UppercaseLetterCharacterSet { get; }
+    [Selector("nonBaseCharacterSet")]
+    public static NSCharacterSet NonBaseCharacterSet { get; }
+    [Selector("alphanumericCharacterSet")]
+    public static NSCharacterSet AlphanumericCharacterSet { get; }
+    [Selector("decomposableCharacterSet")]
+    public static NSCharacterSet DecomposableCharacterSet { get; }
+    [Selector("illegalCharacterSet")]
+    public static NSCharacterSet IllegalCharacterSet { get; }
+    [Selector("punctuationCharacterSet")]
+    public static NSCharacterSet PunctuationCharacterSet { get; }
+    [Selector("capitalizedLetterCharacterSet")]
+    public static NSCharacterSet CapitalizedLetterCharacterSet { get; }
+    [Selector("symbolCharacterSet")]
+    public static NSCharacterSet SymbolCharacterSet { get; }
+    [Selector("newlineCharacterSet")]
+    public static NSCharacterSet NewlineCharacterSet { get; }
+    [Selector("bitmapRepresentation")]
+    public NSData BitmapRepresentation { get; }
+    [Selector("invertedSet")]
+    public NSCharacterSet InvertedSet { get; }
+    [Selector("characterSetWithRange:")]
+    public static NSCharacterSet CharacterSetWithRange(NSRange aRange);
+    [Selector("characterSetWithCharactersInString:")]
+    public static NSCharacterSet CharacterSetWithCharactersInString(NSString aString);
+    [Selector("characterSetWithBitmapRepresentation:")]
+    public static NSCharacterSet CharacterSetWithBitmapRepresentation(NSData data);
+    [Selector("characterSetWithContentsOfFile:")]
+    public static NSCharacterSet? CharacterSetWithContentsOfFile(NSString fName);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("characterIsMember:")]
+    public bool CharacterIsMember(unichar aCharacter);
+    [Selector("longCharacterIsMember:")]
+    public bool LongCharacterIsMember(UTF32Char theLongChar);
+    [Selector("isSupersetOfSet:")]
+    public bool IsSupersetOfSet(NSCharacterSet theOtherSet);
+    [Selector("hasMemberInPlane:")]
+    public bool HasMemberInPlane(byte thePlane);
 }
 
 public extern objc class NSMutableCharacterSet : NSCharacterSet, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("addCharactersInRange:")] public void AddCharactersInRange(NSRange aRange);
-    [Selector("removeCharactersInRange:")] public void RemoveCharactersInRange(NSRange aRange);
-    [Selector("addCharactersInString:")] public void AddCharactersInString(NSString aString);
-    [Selector("removeCharactersInString:")] public void RemoveCharactersInString(NSString aString);
-    [Selector("formUnionWithCharacterSet:")] public void FormUnionWithCharacterSet(NSCharacterSet otherSet);
-    [Selector("formIntersectionWithCharacterSet:")] public void FormIntersectionWithCharacterSet(NSCharacterSet otherSet);
-    [Selector("invert")] public void Invert();
-    [Selector("controlCharacterSet")] public static NSMutableCharacterSet ControlCharacterSet();
-    [Selector("whitespaceCharacterSet")] public static NSMutableCharacterSet WhitespaceCharacterSet();
-    [Selector("whitespaceAndNewlineCharacterSet")] public static NSMutableCharacterSet WhitespaceAndNewlineCharacterSet();
-    [Selector("decimalDigitCharacterSet")] public static NSMutableCharacterSet DecimalDigitCharacterSet();
-    [Selector("letterCharacterSet")] public static NSMutableCharacterSet LetterCharacterSet();
-    [Selector("lowercaseLetterCharacterSet")] public static NSMutableCharacterSet LowercaseLetterCharacterSet();
-    [Selector("uppercaseLetterCharacterSet")] public static NSMutableCharacterSet UppercaseLetterCharacterSet();
-    [Selector("nonBaseCharacterSet")] public static NSMutableCharacterSet NonBaseCharacterSet();
-    [Selector("alphanumericCharacterSet")] public static NSMutableCharacterSet AlphanumericCharacterSet();
-    [Selector("decomposableCharacterSet")] public static NSMutableCharacterSet DecomposableCharacterSet();
-    [Selector("illegalCharacterSet")] public static NSMutableCharacterSet IllegalCharacterSet();
-    [Selector("punctuationCharacterSet")] public static NSMutableCharacterSet PunctuationCharacterSet();
-    [Selector("capitalizedLetterCharacterSet")] public static NSMutableCharacterSet CapitalizedLetterCharacterSet();
-    [Selector("symbolCharacterSet")] public static NSMutableCharacterSet SymbolCharacterSet();
-    [Selector("newlineCharacterSet")] public static NSMutableCharacterSet NewlineCharacterSet();
-    [Selector("characterSetWithRange:")] public static NSMutableCharacterSet CharacterSetWithRange(NSRange aRange);
-    [Selector("characterSetWithCharactersInString:")] public static NSMutableCharacterSet CharacterSetWithCharactersInString(NSString aString);
-    [Selector("characterSetWithBitmapRepresentation:")] public static NSMutableCharacterSet CharacterSetWithBitmapRepresentation(NSData data);
-    [Selector("characterSetWithContentsOfFile:")] public static NSMutableCharacterSet? CharacterSetWithContentsOfFile(NSString fName);
+    [Selector("addCharactersInRange:")]
+    public void AddCharactersInRange(NSRange aRange);
+    [Selector("removeCharactersInRange:")]
+    public void RemoveCharactersInRange(NSRange aRange);
+    [Selector("addCharactersInString:")]
+    public void AddCharactersInString(NSString aString);
+    [Selector("removeCharactersInString:")]
+    public void RemoveCharactersInString(NSString aString);
+    [Selector("formUnionWithCharacterSet:")]
+    public void FormUnionWithCharacterSet(NSCharacterSet otherSet);
+    [Selector("formIntersectionWithCharacterSet:")]
+    public void FormIntersectionWithCharacterSet(NSCharacterSet otherSet);
+    [Selector("invert")]
+    public void Invert();
+    [Selector("controlCharacterSet")]
+    public static NSMutableCharacterSet ControlCharacterSet();
+    [Selector("whitespaceCharacterSet")]
+    public static NSMutableCharacterSet WhitespaceCharacterSet();
+    [Selector("whitespaceAndNewlineCharacterSet")]
+    public static NSMutableCharacterSet WhitespaceAndNewlineCharacterSet();
+    [Selector("decimalDigitCharacterSet")]
+    public static NSMutableCharacterSet DecimalDigitCharacterSet();
+    [Selector("letterCharacterSet")]
+    public static NSMutableCharacterSet LetterCharacterSet();
+    [Selector("lowercaseLetterCharacterSet")]
+    public static NSMutableCharacterSet LowercaseLetterCharacterSet();
+    [Selector("uppercaseLetterCharacterSet")]
+    public static NSMutableCharacterSet UppercaseLetterCharacterSet();
+    [Selector("nonBaseCharacterSet")]
+    public static NSMutableCharacterSet NonBaseCharacterSet();
+    [Selector("alphanumericCharacterSet")]
+    public static NSMutableCharacterSet AlphanumericCharacterSet();
+    [Selector("decomposableCharacterSet")]
+    public static NSMutableCharacterSet DecomposableCharacterSet();
+    [Selector("illegalCharacterSet")]
+    public static NSMutableCharacterSet IllegalCharacterSet();
+    [Selector("punctuationCharacterSet")]
+    public static NSMutableCharacterSet PunctuationCharacterSet();
+    [Selector("capitalizedLetterCharacterSet")]
+    public static NSMutableCharacterSet CapitalizedLetterCharacterSet();
+    [Selector("symbolCharacterSet")]
+    public static NSMutableCharacterSet SymbolCharacterSet();
+    [Selector("newlineCharacterSet")]
+    public static NSMutableCharacterSet NewlineCharacterSet();
+    [Selector("characterSetWithRange:")]
+    public static NSMutableCharacterSet CharacterSetWithRange(NSRange aRange);
+    [Selector("characterSetWithCharactersInString:")]
+    public static NSMutableCharacterSet CharacterSetWithCharactersInString(NSString aString);
+    [Selector("characterSetWithBitmapRepresentation:")]
+    public static NSMutableCharacterSet CharacterSetWithBitmapRepresentation(NSData data);
+    [Selector("characterSetWithContentsOfFile:")]
+    public static NSMutableCharacterSet? CharacterSetWithContentsOfFile(NSString fName);
 }
 
 #endif

@@ -35,12 +35,18 @@ import Standard.ObjC;
 
 public extern objc class AVPortraitEffectsMatte : NSObject
 {
-    [Selector("pixelFormatType")] public OSType PixelFormatType { get; }
-    [Selector("mattingImage")] public CVPixelBufferRef? MattingImage { get; }
-    [Selector("portraitEffectsMatteFromDictionaryRepresentation:error:")] public static Self? PortraitEffectsMatteFromDictionaryRepresentationError(NSDictionary imageSourceAuxDataInfoDictionary, out NSError? outError);
-    [Selector("portraitEffectsMatteByApplyingExifOrientation:")] public Self PortraitEffectsMatteByApplyingExifOrientation(CGImagePropertyOrientation exifOrientation);
-    [Selector("portraitEffectsMatteByReplacingPortraitEffectsMatteWithPixelBuffer:error:")] public Self? PortraitEffectsMatteByReplacingPortraitEffectsMatteWithPixelBufferError(CVPixelBufferRef pixelBuffer, out NSError? outError);
-    [Selector("dictionaryRepresentationForAuxiliaryDataType:")] public NSDictionary? DictionaryRepresentationForAuxiliaryDataType(out NSString? outAuxDataType);
+    [Selector("pixelFormatType")]
+    public OSType PixelFormatType { get; }
+    [Selector("mattingImage")]
+    public CVPixelBufferRef? MattingImage { get; }
+    [Selector("portraitEffectsMatteFromDictionaryRepresentation:error:")]
+    public static Self? PortraitEffectsMatteFromDictionaryRepresentationError(NSDictionary imageSourceAuxDataInfoDictionary, out NSError? outError);
+    [Selector("portraitEffectsMatteByApplyingExifOrientation:")]
+    public Self PortraitEffectsMatteByApplyingExifOrientation(CGImagePropertyOrientation exifOrientation);
+    [Selector("portraitEffectsMatteByReplacingPortraitEffectsMatteWithPixelBuffer:error:")]
+    public Self? PortraitEffectsMatteByReplacingPortraitEffectsMatteWithPixelBufferError(CVPixelBufferRef pixelBuffer, out NSError? outError);
+    [Selector("dictionaryRepresentationForAuxiliaryDataType:")]
+    public NSDictionary? DictionaryRepresentationForAuxiliaryDataType(out NSString? outAuxDataType);
 }
 
 #endif

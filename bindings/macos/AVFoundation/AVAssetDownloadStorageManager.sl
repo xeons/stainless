@@ -39,21 +39,28 @@ public extern "C" AVAssetDownloadedAssetEvictionPriority AVAssetDownloadedAssetE
 
 public extern objc class AVAssetDownloadStorageManager : NSObject
 {
-    [Selector("sharedDownloadStorageManager")] public static AVAssetDownloadStorageManager SharedDownloadStorageManager();
-    [Selector("setStorageManagementPolicy:forURL:")] public void SetStorageManagementPolicyForURL(AVAssetDownloadStorageManagementPolicy storageManagementPolicy, NSURL downloadStorageURL);
-    [Selector("storageManagementPolicyForURL:")] public AVAssetDownloadStorageManagementPolicy? StorageManagementPolicyForURL(NSURL downloadStorageURL);
+    [Selector("sharedDownloadStorageManager")]
+    public static AVAssetDownloadStorageManager SharedDownloadStorageManager();
+    [Selector("setStorageManagementPolicy:forURL:")]
+    public void SetStorageManagementPolicyForURL(AVAssetDownloadStorageManagementPolicy storageManagementPolicy, NSURL downloadStorageURL);
+    [Selector("storageManagementPolicyForURL:")]
+    public AVAssetDownloadStorageManagementPolicy? StorageManagementPolicyForURL(NSURL downloadStorageURL);
 }
 
 public extern objc class AVAssetDownloadStorageManagementPolicy : NSObject, NSCopying, NSMutableCopying
 {
-    [Selector("priority")] public AVAssetDownloadedAssetEvictionPriority Priority { get; }
-    [Selector("expirationDate")] public NSDate ExpirationDate { get; }
+    [Selector("priority")]
+    public AVAssetDownloadedAssetEvictionPriority Priority { get; }
+    [Selector("expirationDate")]
+    public NSDate ExpirationDate { get; }
 }
 
 public extern objc class AVMutableAssetDownloadStorageManagementPolicy : AVAssetDownloadStorageManagementPolicy
 {
-    [Selector("priority", "setPriority:")] public AVAssetDownloadedAssetEvictionPriority Priority { get; set; }
-    [Selector("expirationDate", "setExpirationDate:")] public NSDate ExpirationDate { get; set; }
+    [Selector("priority", "setPriority:")]
+    public AVAssetDownloadedAssetEvictionPriority Priority { get; set; }
+    [Selector("expirationDate", "setExpirationDate:")]
+    public NSDate ExpirationDate { get; set; }
 }
 
 #endif

@@ -35,25 +35,44 @@ public objc closure void GCPhysicalInputProfileValueDidChangeHandlerBlock(GCPhys
 
 public extern objc class GCPhysicalInputProfile : NSObject
 {
-    [Selector("device")] public GCDevice? Device { get; }
-    [Selector("lastEventTimestamp")] public NSTimeInterval LastEventTimestamp { get; }
-    [Selector("hasRemappedElements")] public bool HasRemappedElements { get; }
-    [Selector("valueDidChangeHandler", "setValueDidChangeHandler:")] public GCPhysicalInputProfileValueDidChangeHandlerBlock? ValueDidChangeHandler { get; set; }
-    [Selector("elements")] public NSDictionary Elements { get; }
-    [Selector("buttons")] public NSDictionary Buttons { get; }
-    [Selector("axes")] public NSDictionary Axes { get; }
-    [Selector("dpads")] public NSDictionary Dpads { get; }
-    [Selector("touchpads")] public NSDictionary Touchpads { get; }
-    [Selector("allElements")] public NSSet AllElements { get; }
-    [Selector("allButtons")] public NSSet AllButtons { get; }
-    [Selector("allAxes")] public NSSet AllAxes { get; }
-    [Selector("allDpads")] public NSSet AllDpads { get; }
-    [Selector("allTouchpads")] public NSSet AllTouchpads { get; }
-    [Selector("objectForKeyedSubscript:")] public GCControllerElement? ObjectForKeyedSubscript(NSString key);
-    [Selector("capture")] public Self Capture();
-    [Selector("setStateFromPhysicalInput:")] public void SetStateFromPhysicalInput(GCPhysicalInputProfile physicalInput);
-    [Selector("mappedElementAliasForPhysicalInputName:")] public NSString MappedElementAliasForPhysicalInputName(NSString inputName);
-    [Selector("mappedPhysicalInputNamesForElementAlias:")] public NSSet MappedPhysicalInputNamesForElementAlias(NSString elementAlias);
+    [Selector("device")]
+    public GCDevice? Device { get; }
+    [Selector("lastEventTimestamp")]
+    public NSTimeInterval LastEventTimestamp { get; }
+    [Selector("hasRemappedElements")]
+    public bool HasRemappedElements { get; }
+    [Selector("valueDidChangeHandler", "setValueDidChangeHandler:")]
+    public GCPhysicalInputProfileValueDidChangeHandlerBlock? ValueDidChangeHandler { get; set; }
+    [Selector("elements")]
+    public NSDictionary Elements { get; }
+    [Selector("buttons")]
+    public NSDictionary Buttons { get; }
+    [Selector("axes")]
+    public NSDictionary Axes { get; }
+    [Selector("dpads")]
+    public NSDictionary Dpads { get; }
+    [Selector("touchpads")]
+    public NSDictionary Touchpads { get; }
+    [Selector("allElements")]
+    public NSSet AllElements { get; }
+    [Selector("allButtons")]
+    public NSSet AllButtons { get; }
+    [Selector("allAxes")]
+    public NSSet AllAxes { get; }
+    [Selector("allDpads")]
+    public NSSet AllDpads { get; }
+    [Selector("allTouchpads")]
+    public NSSet AllTouchpads { get; }
+    [Selector("objectForKeyedSubscript:")]
+    public GCControllerElement? ObjectForKeyedSubscript(NSString key);
+    [Selector("capture")]
+    public Self Capture();
+    [Selector("setStateFromPhysicalInput:")]
+    public void SetStateFromPhysicalInput(GCPhysicalInputProfile physicalInput);
+    [Selector("mappedElementAliasForPhysicalInputName:")]
+    public NSString MappedElementAliasForPhysicalInputName(NSString inputName);
+    [Selector("mappedPhysicalInputNamesForElementAlias:")]
+    public NSSet MappedPhysicalInputNamesForElementAlias(NSString elementAlias);
 }
 
 #endif

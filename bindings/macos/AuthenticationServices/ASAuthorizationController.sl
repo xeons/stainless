@@ -33,13 +33,18 @@ import Standard.ObjC;
 
 public objc interface ASAuthorizationControllerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("authorizationController:didCompleteWithAuthorization:")] void AuthorizationControllerDidCompleteWithAuthorization(ASAuthorizationController controller, ASAuthorization authorization);
-    [Optional] [Selector("authorizationController:didCompleteWithError:")] void AuthorizationControllerDidCompleteWithError(ASAuthorizationController controller, NSError error);
+    [Optional]
+    [Selector("authorizationController:didCompleteWithAuthorization:")]
+    void AuthorizationControllerDidCompleteWithAuthorization(ASAuthorizationController controller, ASAuthorization authorization);
+    [Optional]
+    [Selector("authorizationController:didCompleteWithError:")]
+    void AuthorizationControllerDidCompleteWithError(ASAuthorizationController controller, NSError error);
 }
 
 public objc interface ASAuthorizationControllerPresentationContextProviding : NSObjectProtocol
 {
-    [Selector("presentationAnchorForAuthorizationController:")] ASPresentationAnchor PresentationAnchorForAuthorizationController(ASAuthorizationController controller);
+    [Selector("presentationAnchorForAuthorizationController:")]
+    ASPresentationAnchor PresentationAnchorForAuthorizationController(ASAuthorizationController controller);
 }
 
 [Flags]
@@ -50,13 +55,20 @@ public enum ASAuthorizationControllerRequestOptions : ulong
 
 public extern objc class ASAuthorizationController : NSObject
 {
-    [Selector("authorizationRequests")] public NSArray AuthorizationRequests { get; }
-    [Selector("delegate", "setDelegate:")] public ASAuthorizationControllerDelegate? Delegate { get; set; }
-    [Selector("presentationContextProvider", "setPresentationContextProvider:")] public ASAuthorizationControllerPresentationContextProviding? PresentationContextProvider { get; set; }
-    [Selector("initWithAuthorizationRequests:")] public Self InitWithAuthorizationRequests(NSArray authorizationRequests);
-    [Selector("performRequests")] public void PerformRequests();
-    [Selector("performRequestsWithOptions:")] public void PerformRequestsWithOptions(ASAuthorizationControllerRequestOptions options);
-    [Selector("cancel")] public void Cancel();
+    [Selector("authorizationRequests")]
+    public NSArray AuthorizationRequests { get; }
+    [Selector("delegate", "setDelegate:")]
+    public ASAuthorizationControllerDelegate? Delegate { get; set; }
+    [Selector("presentationContextProvider", "setPresentationContextProvider:")]
+    public ASAuthorizationControllerPresentationContextProviding? PresentationContextProvider { get; set; }
+    [Selector("initWithAuthorizationRequests:")]
+    public Self InitWithAuthorizationRequests(NSArray authorizationRequests);
+    [Selector("performRequests")]
+    public void PerformRequests();
+    [Selector("performRequestsWithOptions:")]
+    public void PerformRequestsWithOptions(ASAuthorizationControllerRequestOptions options);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

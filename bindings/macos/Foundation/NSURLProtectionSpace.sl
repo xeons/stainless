@@ -65,28 +65,40 @@ public extern "C" NSString NSURLAuthenticationMethodServerTrust;
 
 public extern objc class NSURLProtectionSpace : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("realm")] public NSString? Realm { get; }
-    [Selector("receivesCredentialSecurely")] public bool ReceivesCredentialSecurely { get; }
-    [Selector("isProxy")] public bool IsProxy { get; }
-    [Selector("host")] public NSString Host { get; }
-    [Selector("port")] public NSInteger Port { get; }
-    [Selector("proxyType")] public NSString? ProxyType { get; }
-    [Selector("protocol")] public NSString? Protocol { get; }
-    [Selector("authenticationMethod")] public NSString AuthenticationMethod { get; }
-    [Selector("initWithHost:port:protocol:realm:authenticationMethod:")] public Self InitWithHostPortProtocolRealmAuthenticationMethod(NSString host, NSInteger port, NSString? protocol, NSString? realm, NSString? authenticationMethod);
-    [Selector("initWithProxyHost:port:type:realm:authenticationMethod:")] public Self InitWithProxyHostPortTypeRealmAuthenticationMethod(NSString host, NSInteger port, NSString? type, NSString? realm, NSString? authenticationMethod);
+    [Selector("realm")]
+    public NSString? Realm { get; }
+    [Selector("receivesCredentialSecurely")]
+    public bool ReceivesCredentialSecurely { get; }
+    [Selector("isProxy")]
+    public bool IsProxy { get; }
+    [Selector("host")]
+    public NSString Host { get; }
+    [Selector("port")]
+    public NSInteger Port { get; }
+    [Selector("proxyType")]
+    public NSString? ProxyType { get; }
+    [Selector("protocol")]
+    public NSString? Protocol { get; }
+    [Selector("authenticationMethod")]
+    public NSString AuthenticationMethod { get; }
+    [Selector("initWithHost:port:protocol:realm:authenticationMethod:")]
+    public Self InitWithHostPortProtocolRealmAuthenticationMethod(NSString host, NSInteger port, NSString? protocol, NSString? realm, NSString? authenticationMethod);
+    [Selector("initWithProxyHost:port:type:realm:authenticationMethod:")]
+    public Self InitWithProxyHostPortTypeRealmAuthenticationMethod(NSString host, NSInteger port, NSString? type, NSString? realm, NSString? authenticationMethod);
 }
 
 /// NSClientCertificateSpace, a category of NSURLProtectionSpace.
 public extern objc class NSURLProtectionSpace
 {
-    [Selector("distinguishedNames")] public NSArray? DistinguishedNames { get; }
+    [Selector("distinguishedNames")]
+    public NSArray? DistinguishedNames { get; }
 }
 
 /// NSServerTrustValidationSpace, a category of NSURLProtectionSpace.
 public extern objc class NSURLProtectionSpace
 {
-    [Selector("serverTrust")] public SecTrustRef? ServerTrust { get; }
+    [Selector("serverTrust")]
+    public SecTrustRef? ServerTrust { get; }
 }
 
 #endif

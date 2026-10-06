@@ -71,23 +71,39 @@ public objc closure void NERelayManagerLoadAllManagersFromPreferencesWithComplet
 
 public extern objc class NERelayManager : NSObject
 {
-    [Selector("localizedDescription", "setLocalizedDescription:")] public NSString? LocalizedDescription { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("isUIToggleEnabled", "setUIToggleEnabled:")] public bool UIToggleEnabled { get; set; }
+    [Selector("localizedDescription", "setLocalizedDescription:")]
+    public NSString? LocalizedDescription { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("isUIToggleEnabled", "setUIToggleEnabled:")]
+    public bool UIToggleEnabled { get; set; }
     /// macOS 26.0 and later.
-    [Selector("isDNSFailoverAllowed", "setAllowDNSFailover:")] public bool AllowDNSFailover { get; set; }
-    [Selector("relays", "setRelays:")] public NSArray? Relays { get; set; }
-    [Selector("matchDomains", "setMatchDomains:")] public NSArray? MatchDomains { get; set; }
-    [Selector("matchFQDNs", "setMatchFQDNs:")] public NSArray? MatchFQDNs { get; set; }
-    [Selector("excludedDomains", "setExcludedDomains:")] public NSArray? ExcludedDomains { get; set; }
-    [Selector("excludedFQDNs", "setExcludedFQDNs:")] public NSArray? ExcludedFQDNs { get; set; }
-    [Selector("onDemandRules", "setOnDemandRules:")] public NSArray? OnDemandRules { get; set; }
-    [Selector("sharedManager")] public static NERelayManager SharedManager();
-    [Selector("loadFromPreferencesWithCompletionHandler:")] public void LoadFromPreferencesWithCompletionHandler(NERelayManagerLoadFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removeFromPreferencesWithCompletionHandler:")] public void RemoveFromPreferencesWithCompletionHandler(NERelayManagerRemoveFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("saveToPreferencesWithCompletionHandler:")] public void SaveToPreferencesWithCompletionHandler(NERelayManagerSaveToPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getLastClientErrors:completionHandler:")] public void GetLastClientErrorsCompletionHandler(NSTimeInterval seconds, NERelayManagerGetLastClientErrorsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadAllManagersFromPreferencesWithCompletionHandler:")] public static void LoadAllManagersFromPreferencesWithCompletionHandler(NERelayManagerLoadAllManagersFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("isDNSFailoverAllowed", "setAllowDNSFailover:")]
+    public bool AllowDNSFailover { get; set; }
+    [Selector("relays", "setRelays:")]
+    public NSArray? Relays { get; set; }
+    [Selector("matchDomains", "setMatchDomains:")]
+    public NSArray? MatchDomains { get; set; }
+    [Selector("matchFQDNs", "setMatchFQDNs:")]
+    public NSArray? MatchFQDNs { get; set; }
+    [Selector("excludedDomains", "setExcludedDomains:")]
+    public NSArray? ExcludedDomains { get; set; }
+    [Selector("excludedFQDNs", "setExcludedFQDNs:")]
+    public NSArray? ExcludedFQDNs { get; set; }
+    [Selector("onDemandRules", "setOnDemandRules:")]
+    public NSArray? OnDemandRules { get; set; }
+    [Selector("sharedManager")]
+    public static NERelayManager SharedManager();
+    [Selector("loadFromPreferencesWithCompletionHandler:")]
+    public void LoadFromPreferencesWithCompletionHandler(NERelayManagerLoadFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removeFromPreferencesWithCompletionHandler:")]
+    public void RemoveFromPreferencesWithCompletionHandler(NERelayManagerRemoveFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("saveToPreferencesWithCompletionHandler:")]
+    public void SaveToPreferencesWithCompletionHandler(NERelayManagerSaveToPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getLastClientErrors:completionHandler:")]
+    public void GetLastClientErrorsCompletionHandler(NSTimeInterval seconds, NERelayManagerGetLastClientErrorsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadAllManagersFromPreferencesWithCompletionHandler:")]
+    public static void LoadAllManagersFromPreferencesWithCompletionHandler(NERelayManagerLoadAllManagersFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

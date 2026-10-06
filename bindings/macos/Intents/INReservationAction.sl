@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class INReservationAction : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("type")] public INReservationActionType Type { get; }
-    [Selector("validDuration")] public INDateComponentsRange ValidDuration { get; }
-    [Selector("userActivity")] public NSUserActivity UserActivity { get; }
-    [Selector("initWithType:validDuration:userActivity:")] public Self InitWithTypeValidDurationUserActivity(INReservationActionType type, INDateComponentsRange validDuration, NSUserActivity userActivity);
+    [Selector("type")]
+    public INReservationActionType Type { get; }
+    [Selector("validDuration")]
+    public INDateComponentsRange ValidDuration { get; }
+    [Selector("userActivity")]
+    public NSUserActivity UserActivity { get; }
+    [Selector("initWithType:validDuration:userActivity:")]
+    public Self InitWithTypeValidDurationUserActivity(INReservationActionType type, INDateComponentsRange validDuration, NSUserActivity userActivity);
 }
 
 #endif

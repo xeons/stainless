@@ -34,23 +34,30 @@ import Standard.ObjC;
 public extern objc class CalRecurrenceEnd : NSObject, NSCopying
 {
     /// Deprecated in macOS 10.8.
-    [Selector("usesEndDate")] public bool UsesEndDate { get; }
+    [Selector("usesEndDate")]
+    public bool UsesEndDate { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("endDate")] public NSDate? EndDate { get; }
+    [Selector("endDate")]
+    public NSDate? EndDate { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("occurrenceCount")] public NSUInteger OccurrenceCount { get; }
+    [Selector("occurrenceCount")]
+    public NSUInteger OccurrenceCount { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("recurrenceEndWithEndDate:")] public static AnyObject? RecurrenceEndWithEndDate(NSDate? endDate);
+    [Selector("recurrenceEndWithEndDate:")]
+    public static AnyObject? RecurrenceEndWithEndDate(NSDate? endDate);
     /// Deprecated in macOS 10.8.
-    [Selector("recurrenceEndWithOccurrenceCount:")] public static AnyObject? RecurrenceEndWithOccurrenceCount(NSUInteger occurrenceCount);
+    [Selector("recurrenceEndWithOccurrenceCount:")]
+    public static AnyObject? RecurrenceEndWithOccurrenceCount(NSUInteger occurrenceCount);
 }
 
 public extern objc class CalNthWeekDay : NSObject, NSCopying
 {
     /// Deprecated in macOS 10.8.
-    [Selector("dayOfTheWeek")] public NSUInteger DayOfTheWeek { get; }
+    [Selector("dayOfTheWeek")]
+    public NSUInteger DayOfTheWeek { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("weekNumber")] public NSInteger WeekNumber { get; }
+    [Selector("weekNumber")]
+    public NSInteger WeekNumber { get; }
 }
 
 public enum CalRecurrenceType : int
@@ -67,39 +74,56 @@ public extern "C" NSUInteger CalDefaultRecurrenceInterval;
 public extern objc class CalRecurrenceRule : NSObject, NSCopying
 {
     /// Deprecated in macOS 10.8.
-    [Selector("recurrenceEnd")] public CalRecurrenceEnd? RecurrenceEnd { get; }
+    [Selector("recurrenceEnd")]
+    public CalRecurrenceEnd? RecurrenceEnd { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("recurrenceType")] public CalRecurrenceType RecurrenceType { get; }
+    [Selector("recurrenceType")]
+    public CalRecurrenceType RecurrenceType { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("recurrenceInterval")] public NSUInteger RecurrenceInterval { get; }
+    [Selector("recurrenceInterval")]
+    public NSUInteger RecurrenceInterval { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("firstDayOfTheWeek")] public NSUInteger FirstDayOfTheWeek { get; }
+    [Selector("firstDayOfTheWeek")]
+    public NSUInteger FirstDayOfTheWeek { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("daysOfTheWeek")] public NSArray? DaysOfTheWeek { get; }
+    [Selector("daysOfTheWeek")]
+    public NSArray? DaysOfTheWeek { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("daysOfTheMonth")] public NSArray? DaysOfTheMonth { get; }
+    [Selector("daysOfTheMonth")]
+    public NSArray? DaysOfTheMonth { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("nthWeekDaysOfTheMonth")] public NSArray? NthWeekDaysOfTheMonth { get; }
+    [Selector("nthWeekDaysOfTheMonth")]
+    public NSArray? NthWeekDaysOfTheMonth { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("monthsOfTheYear")] public NSArray? MonthsOfTheYear { get; }
+    [Selector("monthsOfTheYear")]
+    public NSArray? MonthsOfTheYear { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("initDailyRecurrenceWithInterval:end:")] public AnyObject? InitDailyRecurrenceWithIntervalEnd(NSUInteger interval, CalRecurrenceEnd? end);
+    [Selector("initDailyRecurrenceWithInterval:end:")]
+    public AnyObject? InitDailyRecurrenceWithIntervalEnd(NSUInteger interval, CalRecurrenceEnd? end);
     /// Deprecated in macOS 10.8.
-    [Selector("initWeeklyRecurrenceWithInterval:end:")] public AnyObject? InitWeeklyRecurrenceWithIntervalEnd(NSUInteger interval, CalRecurrenceEnd? end);
+    [Selector("initWeeklyRecurrenceWithInterval:end:")]
+    public AnyObject? InitWeeklyRecurrenceWithIntervalEnd(NSUInteger interval, CalRecurrenceEnd? end);
     /// Deprecated in macOS 10.8.
-    [Selector("initWeeklyRecurrenceWithInterval:forDaysOfTheWeek:end:")] public AnyObject? InitWeeklyRecurrenceWithIntervalForDaysOfTheWeekEnd(NSUInteger interval, NSArray? days, CalRecurrenceEnd? end);
+    [Selector("initWeeklyRecurrenceWithInterval:forDaysOfTheWeek:end:")]
+    public AnyObject? InitWeeklyRecurrenceWithIntervalForDaysOfTheWeekEnd(NSUInteger interval, NSArray? days, CalRecurrenceEnd? end);
     /// Deprecated in macOS 10.8.
-    [Selector("initMonthlyRecurrenceWithInterval:end:")] public AnyObject? InitMonthlyRecurrenceWithIntervalEnd(NSUInteger interval, CalRecurrenceEnd? end);
+    [Selector("initMonthlyRecurrenceWithInterval:end:")]
+    public AnyObject? InitMonthlyRecurrenceWithIntervalEnd(NSUInteger interval, CalRecurrenceEnd? end);
     /// Deprecated in macOS 10.8.
-    [Selector("initMonthlyRecurrenceWithInterval:forDaysOfTheMonth:end:")] public AnyObject? InitMonthlyRecurrenceWithIntervalForDaysOfTheMonthEnd(NSUInteger interval, NSArray? monthDays, CalRecurrenceEnd? end);
+    [Selector("initMonthlyRecurrenceWithInterval:forDaysOfTheMonth:end:")]
+    public AnyObject? InitMonthlyRecurrenceWithIntervalForDaysOfTheMonthEnd(NSUInteger interval, NSArray? monthDays, CalRecurrenceEnd? end);
     /// Deprecated in macOS 10.8.
-    [Selector("initMonthlyRecurrenceWithInterval:forDayOfTheWeek:forWeekOfTheMonth:end:")] public AnyObject? InitMonthlyRecurrenceWithIntervalForDayOfTheWeekForWeekOfTheMonthEnd(NSUInteger interval, NSUInteger weekDay, NSInteger monthWeek, CalRecurrenceEnd? end);
+    [Selector("initMonthlyRecurrenceWithInterval:forDayOfTheWeek:forWeekOfTheMonth:end:")]
+    public AnyObject? InitMonthlyRecurrenceWithIntervalForDayOfTheWeekForWeekOfTheMonthEnd(NSUInteger interval, NSUInteger weekDay, NSInteger monthWeek, CalRecurrenceEnd? end);
     /// Deprecated in macOS 10.8.
-    [Selector("initYearlyRecurrenceWithInterval:end:")] public AnyObject? InitYearlyRecurrenceWithIntervalEnd(NSUInteger interval, CalRecurrenceEnd? end);
+    [Selector("initYearlyRecurrenceWithInterval:end:")]
+    public AnyObject? InitYearlyRecurrenceWithIntervalEnd(NSUInteger interval, CalRecurrenceEnd? end);
     /// Deprecated in macOS 10.8.
-    [Selector("initYearlyRecurrenceWithInterval:forMonthsOfTheYear:end:")] public AnyObject? InitYearlyRecurrenceWithIntervalForMonthsOfTheYearEnd(NSUInteger interval, NSArray? months, CalRecurrenceEnd? end);
+    [Selector("initYearlyRecurrenceWithInterval:forMonthsOfTheYear:end:")]
+    public AnyObject? InitYearlyRecurrenceWithIntervalForMonthsOfTheYearEnd(NSUInteger interval, NSArray? months, CalRecurrenceEnd? end);
     /// Deprecated in macOS 10.8.
-    [Selector("initYearlyRecurrenceWithInterval:forDayOfTheWeek:forWeekOfTheMonth:forMonthsOfTheYear:end:")] public AnyObject? InitYearlyRecurrenceWithIntervalForDayOfTheWeekForWeekOfTheMonthForMonthsOfTheYearEnd(NSUInteger interval, NSUInteger weekDay, NSInteger monthWeek, NSArray? months, CalRecurrenceEnd? end);
+    [Selector("initYearlyRecurrenceWithInterval:forDayOfTheWeek:forWeekOfTheMonth:forMonthsOfTheYear:end:")]
+    public AnyObject? InitYearlyRecurrenceWithIntervalForDayOfTheWeekForWeekOfTheMonthForMonthsOfTheYearEnd(NSUInteger interval, NSUInteger weekDay, NSInteger monthWeek, NSArray? months, CalRecurrenceEnd? end);
 }
 
 #endif

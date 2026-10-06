@@ -33,11 +33,16 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMAttr : DOMNode
 {
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("specified")] public bool Specified { get; }
-    [Selector("value", "setValue:")] public NSString? Value { get; set; }
-    [Selector("ownerElement")] public DOMElement? OwnerElement { get; }
-    [Selector("style")] public DOMCSSStyleDeclaration? Style { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("specified")]
+    public bool Specified { get; }
+    [Selector("value", "setValue:")]
+    public NSString? Value { get; set; }
+    [Selector("ownerElement")]
+    public DOMElement? OwnerElement { get; }
+    [Selector("style")]
+    public DOMCSSStyleDeclaration? Style { get; }
 }
 
 #endif

@@ -34,31 +34,48 @@ import Standard.ObjC;
 
 public extern objc class AVSpeechSynthesisProviderVoice : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("primaryLanguages")] public NSArray PrimaryLanguages { get; }
-    [Selector("supportedLanguages")] public NSArray SupportedLanguages { get; }
-    [Selector("voiceSize", "setVoiceSize:")] public long VoiceSize { get; set; }
-    [Selector("version", "setVersion:")] public NSString Version { get; set; }
-    [Selector("gender", "setGender:")] public AVSpeechSynthesisVoiceGender Gender { get; set; }
-    [Selector("age", "setAge:")] public NSInteger Age { get; set; }
-    [Selector("initWithName:identifier:primaryLanguages:supportedLanguages:")] public Self InitWithNameIdentifierPrimaryLanguagesSupportedLanguages(NSString name, NSString identifier, NSArray primaryLanguages, NSArray supportedLanguages);
-    [Selector("updateSpeechVoices")] public static void UpdateSpeechVoices();
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("primaryLanguages")]
+    public NSArray PrimaryLanguages { get; }
+    [Selector("supportedLanguages")]
+    public NSArray SupportedLanguages { get; }
+    [Selector("voiceSize", "setVoiceSize:")]
+    public long VoiceSize { get; set; }
+    [Selector("version", "setVersion:")]
+    public NSString Version { get; set; }
+    [Selector("gender", "setGender:")]
+    public AVSpeechSynthesisVoiceGender Gender { get; set; }
+    [Selector("age", "setAge:")]
+    public NSInteger Age { get; set; }
+    [Selector("initWithName:identifier:primaryLanguages:supportedLanguages:")]
+    public Self InitWithNameIdentifierPrimaryLanguagesSupportedLanguages(NSString name, NSString identifier, NSArray primaryLanguages, NSArray supportedLanguages);
+    [Selector("updateSpeechVoices")]
+    public static void UpdateSpeechVoices();
 }
 
 public extern objc class AVSpeechSynthesisProviderRequest : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("ssmlRepresentation")] public NSString SsmlRepresentation { get; }
-    [Selector("voice")] public AVSpeechSynthesisProviderVoice Voice { get; }
-    [Selector("initWithSSMLRepresentation:voice:")] public Self InitWithSSMLRepresentationVoice(NSString text, AVSpeechSynthesisProviderVoice voice);
+    [Selector("ssmlRepresentation")]
+    public NSString SsmlRepresentation { get; }
+    [Selector("voice")]
+    public AVSpeechSynthesisProviderVoice Voice { get; }
+    [Selector("initWithSSMLRepresentation:voice:")]
+    public Self InitWithSSMLRepresentationVoice(NSString text, AVSpeechSynthesisProviderVoice voice);
 }
 
 public extern objc class AVSpeechSynthesisProviderAudioUnit : AUAudioUnit
 {
-    [Selector("speechVoices", "setSpeechVoices:")] public NSArray SpeechVoices { get; set; }
-    [Selector("speechSynthesisOutputMetadataBlock", "setSpeechSynthesisOutputMetadataBlock:")] public AVSpeechSynthesisProviderOutputBlock? SpeechSynthesisOutputMetadataBlock { get; set; }
-    [Selector("synthesizeSpeechRequest:")] public void SynthesizeSpeechRequest(AVSpeechSynthesisProviderRequest speechRequest);
-    [Selector("cancelSpeechRequest")] public void CancelSpeechRequest();
+    [Selector("speechVoices", "setSpeechVoices:")]
+    public NSArray SpeechVoices { get; set; }
+    [Selector("speechSynthesisOutputMetadataBlock", "setSpeechSynthesisOutputMetadataBlock:")]
+    public AVSpeechSynthesisProviderOutputBlock? SpeechSynthesisOutputMetadataBlock { get; set; }
+    [Selector("synthesizeSpeechRequest:")]
+    public void SynthesizeSpeechRequest(AVSpeechSynthesisProviderRequest speechRequest);
+    [Selector("cancelSpeechRequest")]
+    public void CancelSpeechRequest();
 }
 
 public objc closure void AVSpeechSynthesisProviderOutputBlock(NSArray arg0, AVSpeechSynthesisProviderRequest arg1);

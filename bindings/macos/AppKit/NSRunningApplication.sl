@@ -47,36 +47,61 @@ public enum NSApplicationActivationPolicy : long
 
 public extern objc class NSRunningApplication : NSObject
 {
-    [Selector("isTerminated")] public bool Terminated { get; }
-    [Selector("isFinishedLaunching")] public bool FinishedLaunching { get; }
-    [Selector("isHidden")] public bool Hidden { get; }
-    [Selector("isActive")] public bool Active { get; }
-    [Selector("ownsMenuBar")] public bool OwnsMenuBar { get; }
-    [Selector("activationPolicy")] public NSApplicationActivationPolicy ActivationPolicy { get; }
-    [Selector("localizedName")] public NSString? LocalizedName { get; }
-    [Selector("bundleIdentifier")] public NSString? BundleIdentifier { get; }
-    [Selector("bundleURL")] public NSURL? BundleURL { get; }
-    [Selector("executableURL")] public NSURL? ExecutableURL { get; }
-    [Selector("processIdentifier")] public pid_t ProcessIdentifier { get; }
-    [Selector("launchDate")] public NSDate? LaunchDate { get; }
-    [Selector("icon")] public NSImage? Icon { get; }
-    [Selector("executableArchitecture")] public NSInteger ExecutableArchitecture { get; }
-    [Selector("currentApplication")] public static NSRunningApplication CurrentApplication { get; }
-    [Selector("hide")] public bool Hide();
-    [Selector("unhide")] public bool Unhide();
-    [Selector("activateFromApplication:options:")] public bool ActivateFromApplicationOptions(NSRunningApplication application, NSApplicationActivationOptions options);
-    [Selector("activateWithOptions:")] public bool ActivateWithOptions(NSApplicationActivationOptions options);
-    [Selector("terminate")] public bool Terminate();
-    [Selector("forceTerminate")] public bool ForceTerminate();
-    [Selector("runningApplicationsWithBundleIdentifier:")] public static NSArray RunningApplicationsWithBundleIdentifier(NSString bundleIdentifier);
-    [Selector("runningApplicationWithProcessIdentifier:")] public static Self? RunningApplicationWithProcessIdentifier(pid_t pid);
-    [Selector("terminateAutomaticallyTerminableApplications")] public static void TerminateAutomaticallyTerminableApplications();
+    [Selector("isTerminated")]
+    public bool Terminated { get; }
+    [Selector("isFinishedLaunching")]
+    public bool FinishedLaunching { get; }
+    [Selector("isHidden")]
+    public bool Hidden { get; }
+    [Selector("isActive")]
+    public bool Active { get; }
+    [Selector("ownsMenuBar")]
+    public bool OwnsMenuBar { get; }
+    [Selector("activationPolicy")]
+    public NSApplicationActivationPolicy ActivationPolicy { get; }
+    [Selector("localizedName")]
+    public NSString? LocalizedName { get; }
+    [Selector("bundleIdentifier")]
+    public NSString? BundleIdentifier { get; }
+    [Selector("bundleURL")]
+    public NSURL? BundleURL { get; }
+    [Selector("executableURL")]
+    public NSURL? ExecutableURL { get; }
+    [Selector("processIdentifier")]
+    public pid_t ProcessIdentifier { get; }
+    [Selector("launchDate")]
+    public NSDate? LaunchDate { get; }
+    [Selector("icon")]
+    public NSImage? Icon { get; }
+    [Selector("executableArchitecture")]
+    public NSInteger ExecutableArchitecture { get; }
+    [Selector("currentApplication")]
+    public static NSRunningApplication CurrentApplication { get; }
+    [Selector("hide")]
+    public bool Hide();
+    [Selector("unhide")]
+    public bool Unhide();
+    [Selector("activateFromApplication:options:")]
+    public bool ActivateFromApplicationOptions(NSRunningApplication application, NSApplicationActivationOptions options);
+    [Selector("activateWithOptions:")]
+    public bool ActivateWithOptions(NSApplicationActivationOptions options);
+    [Selector("terminate")]
+    public bool Terminate();
+    [Selector("forceTerminate")]
+    public bool ForceTerminate();
+    [Selector("runningApplicationsWithBundleIdentifier:")]
+    public static NSArray RunningApplicationsWithBundleIdentifier(NSString bundleIdentifier);
+    [Selector("runningApplicationWithProcessIdentifier:")]
+    public static Self? RunningApplicationWithProcessIdentifier(pid_t pid);
+    [Selector("terminateAutomaticallyTerminableApplications")]
+    public static void TerminateAutomaticallyTerminableApplications();
 }
 
 /// NSWorkspaceRunningApplications, a category of NSWorkspace.
 public extern objc class NSWorkspace
 {
-    [Selector("runningApplications")] public NSArray? RunningApplications { get; }
+    [Selector("runningApplications")]
+    public NSArray? RunningApplications { get; }
 }
 
 #endif

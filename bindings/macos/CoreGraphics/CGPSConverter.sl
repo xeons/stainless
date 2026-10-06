@@ -61,7 +61,8 @@ public struct CGPSConverterCallbacks
     public CGPSConverterReleaseInfoCallback releaseInfo;
 }
 
-[ReturnsRetained] public extern "C" CGPSConverterRef? CGPSConverterCreate(void* info, CGPSConverterCallbacks* callbacks, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGPSConverterRef? CGPSConverterCreate(void* info, CGPSConverterCallbacks* callbacks, CFDictionaryRef? options);
 
 public extern "C" bool CGPSConverterConvert(CGPSConverterRef converter, CGDataProviderRef provider, CGDataConsumerRef consumer, CFDictionaryRef? options);
 

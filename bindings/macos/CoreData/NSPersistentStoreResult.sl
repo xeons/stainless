@@ -66,40 +66,54 @@ public extern objc class NSPersistentStoreResult : NSObject { }
 
 public extern objc class NSPersistentStoreAsynchronousResult : NSPersistentStoreResult
 {
-    [Selector("managedObjectContext")] public NSManagedObjectContext ManagedObjectContext { get; }
-    [Selector("operationError")] public NSError? OperationError { get; }
-    [Selector("progress")] public NSProgress? Progress { get; }
-    [Selector("cancel")] public void Cancel();
+    [Selector("managedObjectContext")]
+    public NSManagedObjectContext ManagedObjectContext { get; }
+    [Selector("operationError")]
+    public NSError? OperationError { get; }
+    [Selector("progress")]
+    public NSProgress? Progress { get; }
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 public extern objc class NSAsynchronousFetchResult : NSPersistentStoreAsynchronousResult
 {
-    [Selector("fetchRequest")] public NSAsynchronousFetchRequest FetchRequest { get; }
-    [Selector("finalResult")] public NSArray? FinalResult { get; }
+    [Selector("fetchRequest")]
+    public NSAsynchronousFetchRequest FetchRequest { get; }
+    [Selector("finalResult")]
+    public NSArray? FinalResult { get; }
 }
 
 public extern objc class NSBatchInsertResult : NSPersistentStoreResult
 {
-    [Selector("result")] public AnyObject? Result { get; }
-    [Selector("resultType")] public NSBatchInsertRequestResultType ResultType { get; }
+    [Selector("result")]
+    public AnyObject? Result { get; }
+    [Selector("resultType")]
+    public NSBatchInsertRequestResultType ResultType { get; }
 }
 
 public extern objc class NSBatchUpdateResult : NSPersistentStoreResult
 {
-    [Selector("result")] public AnyObject? Result { get; }
-    [Selector("resultType")] public NSBatchUpdateRequestResultType ResultType { get; }
+    [Selector("result")]
+    public AnyObject? Result { get; }
+    [Selector("resultType")]
+    public NSBatchUpdateRequestResultType ResultType { get; }
 }
 
 public extern objc class NSBatchDeleteResult : NSPersistentStoreResult
 {
-    [Selector("result")] public AnyObject? Result { get; }
-    [Selector("resultType")] public NSBatchDeleteRequestResultType ResultType { get; }
+    [Selector("result")]
+    public AnyObject? Result { get; }
+    [Selector("resultType")]
+    public NSBatchDeleteRequestResultType ResultType { get; }
 }
 
 public extern objc class NSPersistentHistoryResult : NSPersistentStoreResult
 {
-    [Selector("result")] public AnyObject? Result { get; }
-    [Selector("resultType")] public NSPersistentHistoryResultType ResultType { get; }
+    [Selector("result")]
+    public AnyObject? Result { get; }
+    [Selector("resultType")]
+    public NSPersistentHistoryResultType ResultType { get; }
 }
 
 public enum NSPersistentCloudKitContainerEventResultType : long
@@ -110,8 +124,10 @@ public enum NSPersistentCloudKitContainerEventResultType : long
 
 public extern objc class NSPersistentCloudKitContainerEventResult : NSPersistentStoreResult
 {
-    [Selector("result")] public AnyObject? Result { get; }
-    [Selector("resultType")] public NSPersistentCloudKitContainerEventResultType ResultType { get; }
+    [Selector("result")]
+    public AnyObject? Result { get; }
+    [Selector("resultType")]
+    public NSPersistentCloudKitContainerEventResultType ResultType { get; }
 }
 
 #endif

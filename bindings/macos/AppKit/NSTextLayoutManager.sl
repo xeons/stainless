@@ -60,46 +60,84 @@ public objc closure bool NSTextLayoutManagerEnumerateTextSegmentsInRangeTypeOpti
 
 public extern objc class NSTextLayoutManager : NSObject, NSSecureCoding, NSTextSelectionDataSource
 {
-    [Selector("delegate", "setDelegate:")] public NSTextLayoutManagerDelegate? Delegate { get; set; }
-    [Selector("usesFontLeading", "setUsesFontLeading:")] public bool UsesFontLeading { get; set; }
-    [Selector("limitsLayoutForSuspiciousContents", "setLimitsLayoutForSuspiciousContents:")] public bool LimitsLayoutForSuspiciousContents { get; set; }
-    [Selector("usesHyphenation", "setUsesHyphenation:")] public bool UsesHyphenation { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSTextLayoutManagerDelegate? Delegate { get; set; }
+    [Selector("usesFontLeading", "setUsesFontLeading:")]
+    public bool UsesFontLeading { get; set; }
+    [Selector("limitsLayoutForSuspiciousContents", "setLimitsLayoutForSuspiciousContents:")]
+    public bool LimitsLayoutForSuspiciousContents { get; set; }
+    [Selector("usesHyphenation", "setUsesHyphenation:")]
+    public bool UsesHyphenation { get; set; }
     /// macOS 26.0 and later.
-    [Selector("resolvesNaturalAlignmentWithBaseWritingDirection", "setResolvesNaturalAlignmentWithBaseWritingDirection:")] public bool ResolvesNaturalAlignmentWithBaseWritingDirection { get; set; }
-    [Selector("textContentManager")] public NSTextContentManager? TextContentManager { get; }
-    [Selector("textContainer", "setTextContainer:")] public NSTextContainer? TextContainer { get; set; }
-    [Selector("usageBoundsForTextContainer")] public CGRect UsageBoundsForTextContainer { get; }
-    [Selector("textViewportLayoutController")] public NSTextViewportLayoutController TextViewportLayoutController { get; }
-    [Selector("layoutQueue", "setLayoutQueue:")] public NSOperationQueue? LayoutQueue { get; set; }
-    [Selector("textSelections", "setTextSelections:")] public NSArray TextSelections { get; set; }
-    [Selector("textSelectionNavigation", "setTextSelectionNavigation:")] public NSTextSelectionNavigation TextSelectionNavigation { get; set; }
-    [Selector("renderingAttributesValidator", "setRenderingAttributesValidator:")] public NSTextLayoutManagerRenderingAttributesValidatorBlock? RenderingAttributesValidator { get; set; }
-    [Selector("linkRenderingAttributes")] public static NSDictionary LinkRenderingAttributes { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("replaceTextContentManager:")] public void ReplaceTextContentManager(NSTextContentManager textContentManager);
-    [Selector("ensureLayoutForRange:")] public void EnsureLayoutForRange(NSTextRange range);
-    [Selector("ensureLayoutForBounds:")] public void EnsureLayoutForBounds(CGRect bounds);
-    [Selector("invalidateLayoutForRange:")] public void InvalidateLayoutForRange(NSTextRange range);
-    [Selector("textLayoutFragmentForPosition:")] public NSTextLayoutFragment? TextLayoutFragmentForPosition(CGPoint position);
-    [Selector("textLayoutFragmentForLocation:")] public NSTextLayoutFragment? TextLayoutFragmentForLocation(NSTextLocation location);
-    [Selector("enumerateTextLayoutFragmentsFromLocation:options:usingBlock:")] public NSTextLocation? EnumerateTextLayoutFragmentsFromLocationOptionsUsingBlock(NSTextLocation? location, NSTextLayoutFragmentEnumerationOptions options, NSTextLayoutManagerEnumerateTextLayoutFragmentsFromLocationOptionsUsingBlockBlock block);
-    [Selector("enumerateRenderingAttributesFromLocation:reverse:usingBlock:")] public void EnumerateRenderingAttributesFromLocationReverseUsingBlock(NSTextLocation location, bool reverse, NSTextLayoutManagerEnumerateRenderingAttributesFromLocationReverseUsingBlockBlock block);
-    [Selector("setRenderingAttributes:forTextRange:")] public void SetRenderingAttributesForTextRange(NSDictionary renderingAttributes, NSTextRange textRange);
-    [Selector("addRenderingAttribute:value:forTextRange:")] public void AddRenderingAttributeValueForTextRange(NSAttributedStringKey renderingAttribute, AnyObject? value, NSTextRange textRange);
-    [Selector("removeRenderingAttribute:forTextRange:")] public void RemoveRenderingAttributeForTextRange(NSAttributedStringKey renderingAttribute, NSTextRange textRange);
-    [Selector("invalidateRenderingAttributesForTextRange:")] public void InvalidateRenderingAttributesForTextRange(NSTextRange textRange);
-    [Selector("renderingAttributesForLink:atLocation:")] public NSDictionary RenderingAttributesForLinkAtLocation(AnyObject link, NSTextLocation location);
-    [Selector("enumerateTextSegmentsInRange:type:options:usingBlock:")] public void EnumerateTextSegmentsInRangeTypeOptionsUsingBlock(NSTextRange textRange, NSTextLayoutManagerSegmentType type, NSTextLayoutManagerSegmentOptions options, NSTextLayoutManagerEnumerateTextSegmentsInRangeTypeOptionsUsingBlockBlock block);
-    [Selector("replaceContentsInRange:withTextElements:")] public void ReplaceContentsInRangeWithTextElements(NSTextRange range, NSArray textElements);
-    [Selector("replaceContentsInRange:withAttributedString:")] public void ReplaceContentsInRangeWithAttributedString(NSTextRange range, NSAttributedString attributedString);
+    [Selector("resolvesNaturalAlignmentWithBaseWritingDirection", "setResolvesNaturalAlignmentWithBaseWritingDirection:")]
+    public bool ResolvesNaturalAlignmentWithBaseWritingDirection { get; set; }
+    [Selector("textContentManager")]
+    public NSTextContentManager? TextContentManager { get; }
+    [Selector("textContainer", "setTextContainer:")]
+    public NSTextContainer? TextContainer { get; set; }
+    [Selector("usageBoundsForTextContainer")]
+    public CGRect UsageBoundsForTextContainer { get; }
+    [Selector("textViewportLayoutController")]
+    public NSTextViewportLayoutController TextViewportLayoutController { get; }
+    [Selector("layoutQueue", "setLayoutQueue:")]
+    public NSOperationQueue? LayoutQueue { get; set; }
+    [Selector("textSelections", "setTextSelections:")]
+    public NSArray TextSelections { get; set; }
+    [Selector("textSelectionNavigation", "setTextSelectionNavigation:")]
+    public NSTextSelectionNavigation TextSelectionNavigation { get; set; }
+    [Selector("renderingAttributesValidator", "setRenderingAttributesValidator:")]
+    public NSTextLayoutManagerRenderingAttributesValidatorBlock? RenderingAttributesValidator { get; set; }
+    [Selector("linkRenderingAttributes")]
+    public static NSDictionary LinkRenderingAttributes { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("replaceTextContentManager:")]
+    public void ReplaceTextContentManager(NSTextContentManager textContentManager);
+    [Selector("ensureLayoutForRange:")]
+    public void EnsureLayoutForRange(NSTextRange range);
+    [Selector("ensureLayoutForBounds:")]
+    public void EnsureLayoutForBounds(CGRect bounds);
+    [Selector("invalidateLayoutForRange:")]
+    public void InvalidateLayoutForRange(NSTextRange range);
+    [Selector("textLayoutFragmentForPosition:")]
+    public NSTextLayoutFragment? TextLayoutFragmentForPosition(CGPoint position);
+    [Selector("textLayoutFragmentForLocation:")]
+    public NSTextLayoutFragment? TextLayoutFragmentForLocation(NSTextLocation location);
+    [Selector("enumerateTextLayoutFragmentsFromLocation:options:usingBlock:")]
+    public NSTextLocation? EnumerateTextLayoutFragmentsFromLocationOptionsUsingBlock(NSTextLocation? location, NSTextLayoutFragmentEnumerationOptions options, NSTextLayoutManagerEnumerateTextLayoutFragmentsFromLocationOptionsUsingBlockBlock block);
+    [Selector("enumerateRenderingAttributesFromLocation:reverse:usingBlock:")]
+    public void EnumerateRenderingAttributesFromLocationReverseUsingBlock(NSTextLocation location, bool reverse, NSTextLayoutManagerEnumerateRenderingAttributesFromLocationReverseUsingBlockBlock block);
+    [Selector("setRenderingAttributes:forTextRange:")]
+    public void SetRenderingAttributesForTextRange(NSDictionary renderingAttributes, NSTextRange textRange);
+    [Selector("addRenderingAttribute:value:forTextRange:")]
+    public void AddRenderingAttributeValueForTextRange(NSAttributedStringKey renderingAttribute, AnyObject? value, NSTextRange textRange);
+    [Selector("removeRenderingAttribute:forTextRange:")]
+    public void RemoveRenderingAttributeForTextRange(NSAttributedStringKey renderingAttribute, NSTextRange textRange);
+    [Selector("invalidateRenderingAttributesForTextRange:")]
+    public void InvalidateRenderingAttributesForTextRange(NSTextRange textRange);
+    [Selector("renderingAttributesForLink:atLocation:")]
+    public NSDictionary RenderingAttributesForLinkAtLocation(AnyObject link, NSTextLocation location);
+    [Selector("enumerateTextSegmentsInRange:type:options:usingBlock:")]
+    public void EnumerateTextSegmentsInRangeTypeOptionsUsingBlock(NSTextRange textRange, NSTextLayoutManagerSegmentType type, NSTextLayoutManagerSegmentOptions options, NSTextLayoutManagerEnumerateTextSegmentsInRangeTypeOptionsUsingBlockBlock block);
+    [Selector("replaceContentsInRange:withTextElements:")]
+    public void ReplaceContentsInRangeWithTextElements(NSTextRange range, NSArray textElements);
+    [Selector("replaceContentsInRange:withAttributedString:")]
+    public void ReplaceContentsInRangeWithAttributedString(NSTextRange range, NSAttributedString attributedString);
 }
 
 public objc interface NSTextLayoutManagerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("textLayoutManager:textLayoutFragmentForLocation:inTextElement:")] NSTextLayoutFragment TextLayoutManagerTextLayoutFragmentForLocationInTextElement(NSTextLayoutManager textLayoutManager, NSTextLocation location, NSTextElement textElement);
-    [Optional] [Selector("textLayoutManager:shouldBreakLineBeforeLocation:hyphenating:")] bool TextLayoutManagerShouldBreakLineBeforeLocationHyphenating(NSTextLayoutManager textLayoutManager, NSTextLocation location, bool hyphenating);
-    [Optional] [Selector("textLayoutManager:renderingAttributesForLink:atLocation:defaultAttributes:")] NSDictionary? TextLayoutManagerRenderingAttributesForLinkAtLocationDefaultAttributes(NSTextLayoutManager textLayoutManager, AnyObject link, NSTextLocation location, NSDictionary renderingAttributes);
+    [Optional]
+    [Selector("textLayoutManager:textLayoutFragmentForLocation:inTextElement:")]
+    NSTextLayoutFragment TextLayoutManagerTextLayoutFragmentForLocationInTextElement(NSTextLayoutManager textLayoutManager, NSTextLocation location, NSTextElement textElement);
+    [Optional]
+    [Selector("textLayoutManager:shouldBreakLineBeforeLocation:hyphenating:")]
+    bool TextLayoutManagerShouldBreakLineBeforeLocationHyphenating(NSTextLayoutManager textLayoutManager, NSTextLocation location, bool hyphenating);
+    [Optional]
+    [Selector("textLayoutManager:renderingAttributesForLink:atLocation:defaultAttributes:")]
+    NSDictionary? TextLayoutManagerRenderingAttributesForLinkAtLocationDefaultAttributes(NSTextLayoutManager textLayoutManager, AnyObject link, NSTextLocation location, NSDictionary renderingAttributes);
 }
 
 #endif

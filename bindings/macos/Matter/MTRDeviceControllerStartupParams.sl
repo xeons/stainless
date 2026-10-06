@@ -33,35 +33,54 @@ import Standard.ObjC;
 
 public extern objc class MTRDeviceControllerStartupParams : NSObject
 {
-    [Selector("nocSigner")] public MTRKeypair? NocSigner { get; }
-    [Selector("fabricID")] public NSNumber FabricID { get; }
-    [Selector("ipk")] public NSData Ipk { get; }
-    [Selector("vendorID", "setVendorID:")] public NSNumber? VendorID { get; set; }
-    [Selector("nodeID", "setNodeID:")] public NSNumber? NodeID { get; set; }
-    [Selector("caseAuthenticatedTags", "setCaseAuthenticatedTags:")] public NSSet? CaseAuthenticatedTags { get; set; }
-    [Selector("rootCertificate", "setRootCertificate:")] public MTRCertificateDERBytes? RootCertificate { get; set; }
-    [Selector("intermediateCertificate", "setIntermediateCertificate:")] public MTRCertificateDERBytes? IntermediateCertificate { get; set; }
-    [Selector("operationalCertificate")] public MTRCertificateDERBytes? OperationalCertificate { get; }
-    [Selector("operationalKeypair", "setOperationalKeypair:")] public MTRKeypair? OperationalKeypair { get; set; }
-    [Selector("operationalCertificateIssuer", "setOperationalCertificateIssuer:")] public MTROperationalCertificateIssuer? OperationalCertificateIssuer { get; set; }
-    [Selector("operationalCertificateIssuerQueue", "setOperationalCertificateIssuerQueue:")] public dispatch_queue_t? OperationalCertificateIssuerQueue { get; set; }
-    [Selector("initWithIPK:fabricID:nocSigner:")] public Self InitWithIPKFabricIDNocSigner(NSData ipk, NSNumber fabricID, MTRKeypair nocSigner);
-    [Selector("initWithIPK:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:")] public Self InitWithIPKOperationalKeypairOperationalCertificateIntermediateCertificateRootCertificate(NSData ipk, MTRKeypair operationalKeypair, MTRCertificateDERBytes operationalCertificate, MTRCertificateDERBytes? intermediateCertificate, MTRCertificateDERBytes rootCertificate);
+    [Selector("nocSigner")]
+    public MTRKeypair? NocSigner { get; }
+    [Selector("fabricID")]
+    public NSNumber FabricID { get; }
+    [Selector("ipk")]
+    public NSData Ipk { get; }
+    [Selector("vendorID", "setVendorID:")]
+    public NSNumber? VendorID { get; set; }
+    [Selector("nodeID", "setNodeID:")]
+    public NSNumber? NodeID { get; set; }
+    [Selector("caseAuthenticatedTags", "setCaseAuthenticatedTags:")]
+    public NSSet? CaseAuthenticatedTags { get; set; }
+    [Selector("rootCertificate", "setRootCertificate:")]
+    public MTRCertificateDERBytes? RootCertificate { get; set; }
+    [Selector("intermediateCertificate", "setIntermediateCertificate:")]
+    public MTRCertificateDERBytes? IntermediateCertificate { get; set; }
+    [Selector("operationalCertificate")]
+    public MTRCertificateDERBytes? OperationalCertificate { get; }
+    [Selector("operationalKeypair", "setOperationalKeypair:")]
+    public MTRKeypair? OperationalKeypair { get; set; }
+    [Selector("operationalCertificateIssuer", "setOperationalCertificateIssuer:")]
+    public MTROperationalCertificateIssuer? OperationalCertificateIssuer { get; set; }
+    [Selector("operationalCertificateIssuerQueue", "setOperationalCertificateIssuerQueue:")]
+    public dispatch_queue_t? OperationalCertificateIssuerQueue { get; set; }
+    [Selector("initWithIPK:fabricID:nocSigner:")]
+    public Self InitWithIPKFabricIDNocSigner(NSData ipk, NSNumber fabricID, MTRKeypair nocSigner);
+    [Selector("initWithIPK:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:")]
+    public Self InitWithIPKOperationalKeypairOperationalCertificateIntermediateCertificateRootCertificate(NSData ipk, MTRKeypair operationalKeypair, MTRCertificateDERBytes operationalCertificate, MTRCertificateDERBytes? intermediateCertificate, MTRCertificateDERBytes rootCertificate);
 }
 
 /// Deprecated, a category of MTRDeviceControllerStartupParams.
 public extern objc class MTRDeviceControllerStartupParams
 {
     /// Deprecated in macOS 13.3.
-    [Selector("fabricId")] public ulong FabricId { get; }
+    [Selector("fabricId")]
+    public ulong FabricId { get; }
     /// Deprecated in macOS 13.3.
-    [Selector("vendorId", "setVendorId:")] public NSNumber? VendorId { get; set; }
+    [Selector("vendorId", "setVendorId:")]
+    public NSNumber? VendorId { get; set; }
     /// Deprecated in macOS 13.3.
-    [Selector("nodeId", "setNodeId:")] public NSNumber? NodeId { get; set; }
+    [Selector("nodeId", "setNodeId:")]
+    public NSNumber? NodeId { get; set; }
     /// Deprecated in macOS 13.3.
-    [Selector("initWithSigningKeypair:fabricId:ipk:")] public Self InitWithSigningKeypairFabricIdIpk(MTRKeypair nocSigner, ulong fabricId, NSData ipk);
+    [Selector("initWithSigningKeypair:fabricId:ipk:")]
+    public Self InitWithSigningKeypairFabricIdIpk(MTRKeypair nocSigner, ulong fabricId, NSData ipk);
     /// Deprecated in macOS 13.3.
-    [Selector("initWithOperationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:ipk:")] public Self InitWithOperationalKeypairOperationalCertificateIntermediateCertificateRootCertificateIpk(MTRKeypair operationalKeypair, MTRCertificateDERBytes operationalCertificate, MTRCertificateDERBytes? intermediateCertificate, MTRCertificateDERBytes rootCertificate, NSData ipk);
+    [Selector("initWithOperationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:ipk:")]
+    public Self InitWithOperationalKeypairOperationalCertificateIntermediateCertificateRootCertificateIpk(MTRKeypair operationalKeypair, MTRCertificateDERBytes operationalCertificate, MTRCertificateDERBytes? intermediateCertificate, MTRCertificateDERBytes rootCertificate, NSData ipk);
 }
 
 #endif

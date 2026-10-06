@@ -34,17 +34,28 @@ import Standard.ObjC;
 
 public extern objc class MPSImageEDLines : MPSKernel
 {
-    [Selector("clipRectSource", "setClipRectSource:")] public MTLRegion ClipRectSource { get; set; }
-    [Selector("gaussianSigma")] public float GaussianSigma { get; }
-    [Selector("minLineLength", "setMinLineLength:")] public ushort MinLineLength { get; set; }
-    [Selector("maxLines", "setMaxLines:")] public NSUInteger MaxLines { get; set; }
-    [Selector("detailRatio", "setDetailRatio:")] public ushort DetailRatio { get; set; }
-    [Selector("gradientThreshold", "setGradientThreshold:")] public float GradientThreshold { get; set; }
-    [Selector("lineErrorThreshold", "setLineErrorThreshold:")] public float LineErrorThreshold { get; set; }
-    [Selector("mergeLocalityThreshold", "setMergeLocalityThreshold:")] public float MergeLocalityThreshold { get; set; }
-    [Selector("initWithDevice:gaussianSigma:minLineLength:maxLines:detailRatio:gradientThreshold:lineErrorThreshold:mergeLocalityThreshold:")] public Self InitWithDeviceGaussianSigmaMinLineLengthMaxLinesDetailRatioGradientThresholdLineErrorThresholdMergeLocalityThreshold(MTLDevice device, float gaussianSigma, ushort minLineLength, NSUInteger maxLines, ushort detailRatio, float gradientThreshold, float lineErrorThreshold, float mergeLocalityThreshold);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:sourceTexture:destinationTexture:endpointBuffer:endpointOffset:")] public void EncodeToCommandBufferSourceTextureDestinationTextureEndpointBufferEndpointOffset(MTLCommandBuffer commandBuffer, MTLTexture source, MTLTexture? dest, MTLBuffer endpointBuffer, NSUInteger endpointOffset);
+    [Selector("clipRectSource", "setClipRectSource:")]
+    public MTLRegion ClipRectSource { get; set; }
+    [Selector("gaussianSigma")]
+    public float GaussianSigma { get; }
+    [Selector("minLineLength", "setMinLineLength:")]
+    public ushort MinLineLength { get; set; }
+    [Selector("maxLines", "setMaxLines:")]
+    public NSUInteger MaxLines { get; set; }
+    [Selector("detailRatio", "setDetailRatio:")]
+    public ushort DetailRatio { get; set; }
+    [Selector("gradientThreshold", "setGradientThreshold:")]
+    public float GradientThreshold { get; set; }
+    [Selector("lineErrorThreshold", "setLineErrorThreshold:")]
+    public float LineErrorThreshold { get; set; }
+    [Selector("mergeLocalityThreshold", "setMergeLocalityThreshold:")]
+    public float MergeLocalityThreshold { get; set; }
+    [Selector("initWithDevice:gaussianSigma:minLineLength:maxLines:detailRatio:gradientThreshold:lineErrorThreshold:mergeLocalityThreshold:")]
+    public Self InitWithDeviceGaussianSigmaMinLineLengthMaxLinesDetailRatioGradientThresholdLineErrorThresholdMergeLocalityThreshold(MTLDevice device, float gaussianSigma, ushort minLineLength, NSUInteger maxLines, ushort detailRatio, float gradientThreshold, float lineErrorThreshold, float mergeLocalityThreshold);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:sourceTexture:destinationTexture:endpointBuffer:endpointOffset:")]
+    public void EncodeToCommandBufferSourceTextureDestinationTextureEndpointBufferEndpointOffset(MTLCommandBuffer commandBuffer, MTLTexture source, MTLTexture? dest, MTLBuffer endpointBuffer, NSUInteger endpointOffset);
 }
 
 #endif

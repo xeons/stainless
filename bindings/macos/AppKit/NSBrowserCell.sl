@@ -32,18 +32,30 @@ import Standard.ObjC;
 
 public extern objc class NSBrowserCell : NSCell
 {
-    [Selector("branchImage")] public static NSImage? BranchImage { get; }
-    [Selector("highlightedBranchImage")] public static NSImage? HighlightedBranchImage { get; }
-    [Selector("isLeaf", "setLeaf:")] public bool Leaf { get; set; }
-    [Selector("isLoaded", "setLoaded:")] public bool Loaded { get; set; }
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("alternateImage", "setAlternateImage:")] public NSImage? AlternateImage { get; set; }
-    [Selector("initTextCell:")] public Self InitTextCell(NSString string);
-    [Selector("initImageCell:")] public Self InitImageCell(NSImage? image);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("highlightColorInView:")] public NSColor? HighlightColorInView(NSView controlView);
-    [Selector("reset")] public void Reset();
-    [Selector("set")] public void Set();
+    [Selector("branchImage")]
+    public static NSImage? BranchImage { get; }
+    [Selector("highlightedBranchImage")]
+    public static NSImage? HighlightedBranchImage { get; }
+    [Selector("isLeaf", "setLeaf:")]
+    public bool Leaf { get; set; }
+    [Selector("isLoaded", "setLoaded:")]
+    public bool Loaded { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("alternateImage", "setAlternateImage:")]
+    public NSImage? AlternateImage { get; set; }
+    [Selector("initTextCell:")]
+    public Self InitTextCell(NSString string);
+    [Selector("initImageCell:")]
+    public Self InitImageCell(NSImage? image);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("highlightColorInView:")]
+    public NSColor? HighlightColorInView(NSView controlView);
+    [Selector("reset")]
+    public void Reset();
+    [Selector("set")]
+    public void Set();
 }
 
 #endif

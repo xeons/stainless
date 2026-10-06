@@ -34,10 +34,14 @@ public objc closure void SKMutableTextureModifyPixelDataWithBlockBlock(void* arg
 
 public extern objc class SKMutableTexture : SKTexture
 {
-    [Selector("initWithSize:")] public Self? InitWithSize(CGSize size);
-    [Selector("mutableTextureWithSize:")] public static Self? MutableTextureWithSize(CGSize size);
-    [Selector("initWithSize:pixelFormat:")] public Self? InitWithSizePixelFormat(CGSize size, int format);
-    [Selector("modifyPixelDataWithBlock:")] public void ModifyPixelDataWithBlock(SKMutableTextureModifyPixelDataWithBlockBlock? block);
+    [Selector("initWithSize:")]
+    public Self? InitWithSize(CGSize size);
+    [Selector("mutableTextureWithSize:")]
+    public static Self? MutableTextureWithSize(CGSize size);
+    [Selector("initWithSize:pixelFormat:")]
+    public Self? InitWithSizePixelFormat(CGSize size, int format);
+    [Selector("modifyPixelDataWithBlock:")]
+    public void ModifyPixelDataWithBlock(SKMutableTextureModifyPixelDataWithBlockBlock? block);
 }
 
 #endif

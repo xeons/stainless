@@ -35,11 +35,16 @@ import Standard.ObjC;
 
 public extern objc class MKUserLocation : NSObject, MKAnnotation
 {
-    [Selector("isUpdating")] public bool Updating { get; }
-    [Selector("location")] public CLLocation? Location { get; }
-    [Selector("heading")] public CLHeading? Heading { get; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("subtitle", "setSubtitle:")] public NSString? Subtitle { get; set; }
+    [Selector("isUpdating")]
+    public bool Updating { get; }
+    [Selector("location")]
+    public CLLocation? Location { get; }
+    [Selector("heading")]
+    public CLHeading? Heading { get; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("subtitle", "setSubtitle:")]
+    public NSString? Subtitle { get; set; }
 }
 
 #endif

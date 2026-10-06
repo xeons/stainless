@@ -36,102 +36,243 @@ public const int NSOutlineViewDropOnItemIndex = -1;
 
 public extern objc class NSOutlineView : NSTableView, NSAccessibilityOutline
 {
-    [Selector("delegate", "setDelegate:")] public NSOutlineViewDelegate? Delegate { get; set; }
-    [Selector("dataSource", "setDataSource:")] public NSOutlineViewDataSource? DataSource { get; set; }
-    [Selector("outlineTableColumn", "setOutlineTableColumn:")] public NSTableColumn? OutlineTableColumn { get; set; }
-    [Selector("indentationPerLevel", "setIndentationPerLevel:")] public CGFloat IndentationPerLevel { get; set; }
-    [Selector("indentationMarkerFollowsCell", "setIndentationMarkerFollowsCell:")] public bool IndentationMarkerFollowsCell { get; set; }
-    [Selector("autoresizesOutlineColumn", "setAutoresizesOutlineColumn:")] public bool AutoresizesOutlineColumn { get; set; }
-    [Selector("autosaveExpandedItems", "setAutosaveExpandedItems:")] public bool AutosaveExpandedItems { get; set; }
-    [Selector("userInterfaceLayoutDirection", "setUserInterfaceLayoutDirection:")] public NSUserInterfaceLayoutDirection UserInterfaceLayoutDirection { get; set; }
-    [Selector("stronglyReferencesItems", "setStronglyReferencesItems:")] public bool StronglyReferencesItems { get; set; }
-    [Selector("isExpandable:")] public bool IsExpandable(AnyObject? item);
-    [Selector("numberOfChildrenOfItem:")] public NSInteger NumberOfChildrenOfItem(AnyObject? item);
-    [Selector("child:ofItem:")] public AnyObject? ChildOfItem(NSInteger index, AnyObject? item);
-    [Selector("expandItem:expandChildren:")] public void ExpandItemExpandChildren(AnyObject? item, bool expandChildren);
-    [Selector("expandItem:")] public void ExpandItem(AnyObject? item);
-    [Selector("collapseItem:collapseChildren:")] public void CollapseItemCollapseChildren(AnyObject? item, bool collapseChildren);
-    [Selector("collapseItem:")] public void CollapseItem(AnyObject? item);
-    [Selector("reloadItem:reloadChildren:")] public void ReloadItemReloadChildren(AnyObject? item, bool reloadChildren);
-    [Selector("reloadItem:")] public void ReloadItem(AnyObject? item);
-    [Selector("parentForItem:")] public AnyObject? ParentForItem(AnyObject? item);
-    [Selector("childIndexForItem:")] public NSInteger ChildIndexForItem(AnyObject item);
-    [Selector("itemAtRow:")] public AnyObject? ItemAtRow(NSInteger row);
-    [Selector("rowForItem:")] public NSInteger RowForItem(AnyObject? item);
-    [Selector("levelForItem:")] public NSInteger LevelForItem(AnyObject? item);
-    [Selector("levelForRow:")] public NSInteger LevelForRow(NSInteger row);
-    [Selector("isItemExpanded:")] public bool IsItemExpanded(AnyObject? item);
-    [Selector("frameOfOutlineCellAtRow:")] public NSRect FrameOfOutlineCellAtRow(NSInteger row);
-    [Selector("setDropItem:dropChildIndex:")] public void SetDropItemDropChildIndex(AnyObject? item, NSInteger index);
-    [Selector("shouldCollapseAutoExpandedItemsForDeposited:")] public bool ShouldCollapseAutoExpandedItemsForDeposited(bool deposited);
-    [Selector("insertItemsAtIndexes:inParent:withAnimation:")] public void InsertItemsAtIndexesInParentWithAnimation(NSIndexSet indexes, AnyObject? parent, NSTableViewAnimationOptions animationOptions);
-    [Selector("removeItemsAtIndexes:inParent:withAnimation:")] public void RemoveItemsAtIndexesInParentWithAnimation(NSIndexSet indexes, AnyObject? parent, NSTableViewAnimationOptions animationOptions);
-    [Selector("moveItemAtIndex:inParent:toIndex:inParent:")] public void MoveItemAtIndexInParentToIndexInParent(NSInteger fromIndex, AnyObject? oldParent, NSInteger toIndex, AnyObject? newParent);
+    [Selector("delegate", "setDelegate:")]
+    public NSOutlineViewDelegate? Delegate { get; set; }
+    [Selector("dataSource", "setDataSource:")]
+    public NSOutlineViewDataSource? DataSource { get; set; }
+    [Selector("outlineTableColumn", "setOutlineTableColumn:")]
+    public NSTableColumn? OutlineTableColumn { get; set; }
+    [Selector("indentationPerLevel", "setIndentationPerLevel:")]
+    public CGFloat IndentationPerLevel { get; set; }
+    [Selector("indentationMarkerFollowsCell", "setIndentationMarkerFollowsCell:")]
+    public bool IndentationMarkerFollowsCell { get; set; }
+    [Selector("autoresizesOutlineColumn", "setAutoresizesOutlineColumn:")]
+    public bool AutoresizesOutlineColumn { get; set; }
+    [Selector("autosaveExpandedItems", "setAutosaveExpandedItems:")]
+    public bool AutosaveExpandedItems { get; set; }
+    [Selector("userInterfaceLayoutDirection", "setUserInterfaceLayoutDirection:")]
+    public NSUserInterfaceLayoutDirection UserInterfaceLayoutDirection { get; set; }
+    [Selector("stronglyReferencesItems", "setStronglyReferencesItems:")]
+    public bool StronglyReferencesItems { get; set; }
+    [Selector("isExpandable:")]
+    public bool IsExpandable(AnyObject? item);
+    [Selector("numberOfChildrenOfItem:")]
+    public NSInteger NumberOfChildrenOfItem(AnyObject? item);
+    [Selector("child:ofItem:")]
+    public AnyObject? ChildOfItem(NSInteger index, AnyObject? item);
+    [Selector("expandItem:expandChildren:")]
+    public void ExpandItemExpandChildren(AnyObject? item, bool expandChildren);
+    [Selector("expandItem:")]
+    public void ExpandItem(AnyObject? item);
+    [Selector("collapseItem:collapseChildren:")]
+    public void CollapseItemCollapseChildren(AnyObject? item, bool collapseChildren);
+    [Selector("collapseItem:")]
+    public void CollapseItem(AnyObject? item);
+    [Selector("reloadItem:reloadChildren:")]
+    public void ReloadItemReloadChildren(AnyObject? item, bool reloadChildren);
+    [Selector("reloadItem:")]
+    public void ReloadItem(AnyObject? item);
+    [Selector("parentForItem:")]
+    public AnyObject? ParentForItem(AnyObject? item);
+    [Selector("childIndexForItem:")]
+    public NSInteger ChildIndexForItem(AnyObject item);
+    [Selector("itemAtRow:")]
+    public AnyObject? ItemAtRow(NSInteger row);
+    [Selector("rowForItem:")]
+    public NSInteger RowForItem(AnyObject? item);
+    [Selector("levelForItem:")]
+    public NSInteger LevelForItem(AnyObject? item);
+    [Selector("levelForRow:")]
+    public NSInteger LevelForRow(NSInteger row);
+    [Selector("isItemExpanded:")]
+    public bool IsItemExpanded(AnyObject? item);
+    [Selector("frameOfOutlineCellAtRow:")]
+    public NSRect FrameOfOutlineCellAtRow(NSInteger row);
+    [Selector("setDropItem:dropChildIndex:")]
+    public void SetDropItemDropChildIndex(AnyObject? item, NSInteger index);
+    [Selector("shouldCollapseAutoExpandedItemsForDeposited:")]
+    public bool ShouldCollapseAutoExpandedItemsForDeposited(bool deposited);
+    [Selector("insertItemsAtIndexes:inParent:withAnimation:")]
+    public void InsertItemsAtIndexesInParentWithAnimation(NSIndexSet indexes, AnyObject? parent, NSTableViewAnimationOptions animationOptions);
+    [Selector("removeItemsAtIndexes:inParent:withAnimation:")]
+    public void RemoveItemsAtIndexesInParentWithAnimation(NSIndexSet indexes, AnyObject? parent, NSTableViewAnimationOptions animationOptions);
+    [Selector("moveItemAtIndex:inParent:toIndex:inParent:")]
+    public void MoveItemAtIndexInParentToIndexInParent(NSInteger fromIndex, AnyObject? oldParent, NSInteger toIndex, AnyObject? newParent);
 }
 
 public objc interface NSOutlineViewDataSource : NSObjectProtocol
 {
-    [Optional] [Selector("outlineView:numberOfChildrenOfItem:")] NSInteger OutlineViewNumberOfChildrenOfItem(NSOutlineView outlineView, AnyObject? item);
-    [Optional] [Selector("outlineView:child:ofItem:")] AnyObject OutlineViewChildOfItem(NSOutlineView outlineView, NSInteger index, AnyObject? item);
-    [Optional] [Selector("outlineView:isItemExpandable:")] bool OutlineViewIsItemExpandable(NSOutlineView outlineView, AnyObject item);
-    [Optional] [Selector("outlineView:objectValueForTableColumn:byItem:")] AnyObject? OutlineViewObjectValueForTableColumnByItem(NSOutlineView outlineView, NSTableColumn? tableColumn, AnyObject? item);
-    [Optional] [Selector("outlineView:setObjectValue:forTableColumn:byItem:")] void OutlineViewSetObjectValueForTableColumnByItem(NSOutlineView outlineView, AnyObject? object, NSTableColumn? tableColumn, AnyObject? item);
-    [Optional] [Selector("outlineView:itemForPersistentObject:")] AnyObject? OutlineViewItemForPersistentObject(NSOutlineView outlineView, AnyObject object);
-    [Optional] [Selector("outlineView:persistentObjectForItem:")] AnyObject? OutlineViewPersistentObjectForItem(NSOutlineView outlineView, AnyObject? item);
-    [Optional] [Selector("outlineView:sortDescriptorsDidChange:")] void OutlineViewSortDescriptorsDidChange(NSOutlineView outlineView, NSArray oldDescriptors);
-    [Optional] [Selector("outlineView:pasteboardWriterForItem:")] NSPasteboardWriting? OutlineViewPasteboardWriterForItem(NSOutlineView outlineView, AnyObject item);
-    [Optional] [Selector("outlineView:draggingSession:willBeginAtPoint:forItems:")] void OutlineViewDraggingSessionWillBeginAtPointForItems(NSOutlineView outlineView, NSDraggingSession session, NSPoint screenPoint, NSArray draggedItems);
-    [Optional] [Selector("outlineView:draggingSession:endedAtPoint:operation:")] void OutlineViewDraggingSessionEndedAtPointOperation(NSOutlineView outlineView, NSDraggingSession session, NSPoint screenPoint, NSDragOperation operation);
+    [Optional]
+    [Selector("outlineView:numberOfChildrenOfItem:")]
+    NSInteger OutlineViewNumberOfChildrenOfItem(NSOutlineView outlineView, AnyObject? item);
+    [Optional]
+    [Selector("outlineView:child:ofItem:")]
+    AnyObject OutlineViewChildOfItem(NSOutlineView outlineView, NSInteger index, AnyObject? item);
+    [Optional]
+    [Selector("outlineView:isItemExpandable:")]
+    bool OutlineViewIsItemExpandable(NSOutlineView outlineView, AnyObject item);
+    [Optional]
+    [Selector("outlineView:objectValueForTableColumn:byItem:")]
+    AnyObject? OutlineViewObjectValueForTableColumnByItem(NSOutlineView outlineView, NSTableColumn? tableColumn, AnyObject? item);
+    [Optional]
+    [Selector("outlineView:setObjectValue:forTableColumn:byItem:")]
+    void OutlineViewSetObjectValueForTableColumnByItem(NSOutlineView outlineView, AnyObject? object, NSTableColumn? tableColumn, AnyObject? item);
+    [Optional]
+    [Selector("outlineView:itemForPersistentObject:")]
+    AnyObject? OutlineViewItemForPersistentObject(NSOutlineView outlineView, AnyObject object);
+    [Optional]
+    [Selector("outlineView:persistentObjectForItem:")]
+    AnyObject? OutlineViewPersistentObjectForItem(NSOutlineView outlineView, AnyObject? item);
+    [Optional]
+    [Selector("outlineView:sortDescriptorsDidChange:")]
+    void OutlineViewSortDescriptorsDidChange(NSOutlineView outlineView, NSArray oldDescriptors);
+    [Optional]
+    [Selector("outlineView:pasteboardWriterForItem:")]
+    NSPasteboardWriting? OutlineViewPasteboardWriterForItem(NSOutlineView outlineView, AnyObject item);
+    [Optional]
+    [Selector("outlineView:draggingSession:willBeginAtPoint:forItems:")]
+    void OutlineViewDraggingSessionWillBeginAtPointForItems(NSOutlineView outlineView, NSDraggingSession session, NSPoint screenPoint, NSArray draggedItems);
+    [Optional]
+    [Selector("outlineView:draggingSession:endedAtPoint:operation:")]
+    void OutlineViewDraggingSessionEndedAtPointOperation(NSOutlineView outlineView, NSDraggingSession session, NSPoint screenPoint, NSDragOperation operation);
     /// Deprecated in macOS 10.15.
-    [Optional] [Selector("outlineView:writeItems:toPasteboard:")] bool OutlineViewWriteItemsToPasteboard(NSOutlineView outlineView, NSArray items, NSPasteboard pasteboard);
-    [Optional] [Selector("outlineView:updateDraggingItemsForDrag:")] void OutlineViewUpdateDraggingItemsForDrag(NSOutlineView outlineView, NSDraggingInfo draggingInfo);
-    [Optional] [Selector("outlineView:validateDrop:proposedItem:proposedChildIndex:")] NSDragOperation OutlineViewValidateDropProposedItemProposedChildIndex(NSOutlineView outlineView, NSDraggingInfo info, AnyObject? item, NSInteger index);
-    [Optional] [Selector("outlineView:acceptDrop:item:childIndex:")] bool OutlineViewAcceptDropItemChildIndex(NSOutlineView outlineView, NSDraggingInfo info, AnyObject? item, NSInteger index);
+    [Optional]
+    [Selector("outlineView:writeItems:toPasteboard:")]
+    bool OutlineViewWriteItemsToPasteboard(NSOutlineView outlineView, NSArray items, NSPasteboard pasteboard);
+    [Optional]
+    [Selector("outlineView:updateDraggingItemsForDrag:")]
+    void OutlineViewUpdateDraggingItemsForDrag(NSOutlineView outlineView, NSDraggingInfo draggingInfo);
+    [Optional]
+    [Selector("outlineView:validateDrop:proposedItem:proposedChildIndex:")]
+    NSDragOperation OutlineViewValidateDropProposedItemProposedChildIndex(NSOutlineView outlineView, NSDraggingInfo info, AnyObject? item, NSInteger index);
+    [Optional]
+    [Selector("outlineView:acceptDrop:item:childIndex:")]
+    bool OutlineViewAcceptDropItemChildIndex(NSOutlineView outlineView, NSDraggingInfo info, AnyObject? item, NSInteger index);
     /// Deprecated in macOS 10.13.
-    [Optional] [Selector("outlineView:namesOfPromisedFilesDroppedAtDestination:forDraggedItems:")] NSArray OutlineViewNamesOfPromisedFilesDroppedAtDestinationForDraggedItems(NSOutlineView outlineView, NSURL dropDestination, NSArray items);
+    [Optional]
+    [Selector("outlineView:namesOfPromisedFilesDroppedAtDestination:forDraggedItems:")]
+    NSArray OutlineViewNamesOfPromisedFilesDroppedAtDestinationForDraggedItems(NSOutlineView outlineView, NSURL dropDestination, NSArray items);
 }
 
 public objc interface NSOutlineViewDelegate : NSControlTextEditingDelegate
 {
-    [Optional] [Selector("outlineView:viewForTableColumn:item:")] NSView? OutlineViewViewForTableColumnItem(NSOutlineView outlineView, NSTableColumn? tableColumn, AnyObject item);
-    [Optional] [Selector("outlineView:rowViewForItem:")] NSTableRowView? OutlineViewRowViewForItem(NSOutlineView outlineView, AnyObject item);
-    [Optional] [Selector("outlineView:didAddRowView:forRow:")] void OutlineViewDidAddRowViewForRow(NSOutlineView outlineView, NSTableRowView rowView, NSInteger row);
-    [Optional] [Selector("outlineView:didRemoveRowView:forRow:")] void OutlineViewDidRemoveRowViewForRow(NSOutlineView outlineView, NSTableRowView rowView, NSInteger row);
-    [Optional] [Selector("outlineView:willDisplayCell:forTableColumn:item:")] void OutlineViewWillDisplayCellForTableColumnItem(NSOutlineView outlineView, AnyObject cell, NSTableColumn? tableColumn, AnyObject item);
-    [Optional] [Selector("outlineView:shouldEditTableColumn:item:")] bool OutlineViewShouldEditTableColumnItem(NSOutlineView outlineView, NSTableColumn? tableColumn, AnyObject item);
-    [Optional] [Selector("selectionShouldChangeInOutlineView:")] bool SelectionShouldChangeInOutlineView(NSOutlineView outlineView);
-    [Optional] [Selector("outlineView:shouldSelectItem:")] bool OutlineViewShouldSelectItem(NSOutlineView outlineView, AnyObject item);
-    [Optional] [Selector("outlineView:selectionIndexesForProposedSelection:")] NSIndexSet OutlineViewSelectionIndexesForProposedSelection(NSOutlineView outlineView, NSIndexSet proposedSelectionIndexes);
-    [Optional] [Selector("outlineView:shouldSelectTableColumn:")] bool OutlineViewShouldSelectTableColumn(NSOutlineView outlineView, NSTableColumn? tableColumn);
-    [Optional] [Selector("outlineView:mouseDownInHeaderOfTableColumn:")] void OutlineViewMouseDownInHeaderOfTableColumn(NSOutlineView outlineView, NSTableColumn tableColumn);
-    [Optional] [Selector("outlineView:didClickTableColumn:")] void OutlineViewDidClickTableColumn(NSOutlineView outlineView, NSTableColumn tableColumn);
-    [Optional] [Selector("outlineView:didDragTableColumn:")] void OutlineViewDidDragTableColumn(NSOutlineView outlineView, NSTableColumn tableColumn);
-    [Optional] [Selector("outlineView:toolTipForCell:rect:tableColumn:item:mouseLocation:")] NSString OutlineViewToolTipForCellRectTableColumnItemMouseLocation(NSOutlineView outlineView, NSCell cell, NSRectPointer rect, NSTableColumn? tableColumn, AnyObject item, NSPoint mouseLocation);
-    [Optional] [Selector("outlineView:heightOfRowByItem:")] CGFloat OutlineViewHeightOfRowByItem(NSOutlineView outlineView, AnyObject item);
-    [Optional] [Selector("outlineView:tintConfigurationForItem:")] NSTintConfiguration? OutlineViewTintConfigurationForItem(NSOutlineView outlineView, AnyObject item);
-    [Optional] [Selector("outlineView:typeSelectStringForTableColumn:item:")] NSString? OutlineViewTypeSelectStringForTableColumnItem(NSOutlineView outlineView, NSTableColumn? tableColumn, AnyObject item);
-    [Optional] [Selector("outlineView:nextTypeSelectMatchFromItem:toItem:forString:")] AnyObject? OutlineViewNextTypeSelectMatchFromItemToItemForString(NSOutlineView outlineView, AnyObject startItem, AnyObject endItem, NSString searchString);
-    [Optional] [Selector("outlineView:shouldTypeSelectForEvent:withCurrentSearchString:")] bool OutlineViewShouldTypeSelectForEventWithCurrentSearchString(NSOutlineView outlineView, NSEvent event, NSString? searchString);
-    [Optional] [Selector("outlineView:shouldShowCellExpansionForTableColumn:item:")] bool OutlineViewShouldShowCellExpansionForTableColumnItem(NSOutlineView outlineView, NSTableColumn? tableColumn, AnyObject item);
-    [Optional] [Selector("outlineView:shouldTrackCell:forTableColumn:item:")] bool OutlineViewShouldTrackCellForTableColumnItem(NSOutlineView outlineView, NSCell cell, NSTableColumn? tableColumn, AnyObject item);
-    [Optional] [Selector("outlineView:dataCellForTableColumn:item:")] NSCell? OutlineViewDataCellForTableColumnItem(NSOutlineView outlineView, NSTableColumn? tableColumn, AnyObject item);
-    [Optional] [Selector("outlineView:isGroupItem:")] bool OutlineViewIsGroupItem(NSOutlineView outlineView, AnyObject item);
-    [Optional] [Selector("outlineView:shouldExpandItem:")] bool OutlineViewShouldExpandItem(NSOutlineView outlineView, AnyObject item);
-    [Optional] [Selector("outlineView:shouldCollapseItem:")] bool OutlineViewShouldCollapseItem(NSOutlineView outlineView, AnyObject item);
-    [Optional] [Selector("outlineView:willDisplayOutlineCell:forTableColumn:item:")] void OutlineViewWillDisplayOutlineCellForTableColumnItem(NSOutlineView outlineView, AnyObject cell, NSTableColumn? tableColumn, AnyObject item);
-    [Optional] [Selector("outlineView:sizeToFitWidthOfColumn:")] CGFloat OutlineViewSizeToFitWidthOfColumn(NSOutlineView outlineView, NSInteger column);
-    [Optional] [Selector("outlineView:shouldReorderColumn:toColumn:")] bool OutlineViewShouldReorderColumnToColumn(NSOutlineView outlineView, NSInteger columnIndex, NSInteger newColumnIndex);
-    [Optional] [Selector("outlineView:shouldShowOutlineCellForItem:")] bool OutlineViewShouldShowOutlineCellForItem(NSOutlineView outlineView, AnyObject item);
-    [Optional] [Selector("outlineView:userCanChangeVisibilityOfTableColumn:")] bool OutlineViewUserCanChangeVisibilityOfTableColumn(NSOutlineView outlineView, NSTableColumn column);
-    [Optional] [Selector("outlineView:userDidChangeVisibilityOfTableColumns:")] void OutlineViewUserDidChangeVisibilityOfTableColumns(NSOutlineView outlineView, NSArray columns);
-    [Optional] [Selector("outlineViewSelectionDidChange:")] void OutlineViewSelectionDidChange(NSNotification notification);
-    [Optional] [Selector("outlineViewColumnDidMove:")] void OutlineViewColumnDidMove(NSNotification notification);
-    [Optional] [Selector("outlineViewColumnDidResize:")] void OutlineViewColumnDidResize(NSNotification notification);
-    [Optional] [Selector("outlineViewSelectionIsChanging:")] void OutlineViewSelectionIsChanging(NSNotification notification);
-    [Optional] [Selector("outlineViewItemWillExpand:")] void OutlineViewItemWillExpand(NSNotification notification);
-    [Optional] [Selector("outlineViewItemDidExpand:")] void OutlineViewItemDidExpand(NSNotification notification);
-    [Optional] [Selector("outlineViewItemWillCollapse:")] void OutlineViewItemWillCollapse(NSNotification notification);
-    [Optional] [Selector("outlineViewItemDidCollapse:")] void OutlineViewItemDidCollapse(NSNotification notification);
+    [Optional]
+    [Selector("outlineView:viewForTableColumn:item:")]
+    NSView? OutlineViewViewForTableColumnItem(NSOutlineView outlineView, NSTableColumn? tableColumn, AnyObject item);
+    [Optional]
+    [Selector("outlineView:rowViewForItem:")]
+    NSTableRowView? OutlineViewRowViewForItem(NSOutlineView outlineView, AnyObject item);
+    [Optional]
+    [Selector("outlineView:didAddRowView:forRow:")]
+    void OutlineViewDidAddRowViewForRow(NSOutlineView outlineView, NSTableRowView rowView, NSInteger row);
+    [Optional]
+    [Selector("outlineView:didRemoveRowView:forRow:")]
+    void OutlineViewDidRemoveRowViewForRow(NSOutlineView outlineView, NSTableRowView rowView, NSInteger row);
+    [Optional]
+    [Selector("outlineView:willDisplayCell:forTableColumn:item:")]
+    void OutlineViewWillDisplayCellForTableColumnItem(NSOutlineView outlineView, AnyObject cell, NSTableColumn? tableColumn, AnyObject item);
+    [Optional]
+    [Selector("outlineView:shouldEditTableColumn:item:")]
+    bool OutlineViewShouldEditTableColumnItem(NSOutlineView outlineView, NSTableColumn? tableColumn, AnyObject item);
+    [Optional]
+    [Selector("selectionShouldChangeInOutlineView:")]
+    bool SelectionShouldChangeInOutlineView(NSOutlineView outlineView);
+    [Optional]
+    [Selector("outlineView:shouldSelectItem:")]
+    bool OutlineViewShouldSelectItem(NSOutlineView outlineView, AnyObject item);
+    [Optional]
+    [Selector("outlineView:selectionIndexesForProposedSelection:")]
+    NSIndexSet OutlineViewSelectionIndexesForProposedSelection(NSOutlineView outlineView, NSIndexSet proposedSelectionIndexes);
+    [Optional]
+    [Selector("outlineView:shouldSelectTableColumn:")]
+    bool OutlineViewShouldSelectTableColumn(NSOutlineView outlineView, NSTableColumn? tableColumn);
+    [Optional]
+    [Selector("outlineView:mouseDownInHeaderOfTableColumn:")]
+    void OutlineViewMouseDownInHeaderOfTableColumn(NSOutlineView outlineView, NSTableColumn tableColumn);
+    [Optional]
+    [Selector("outlineView:didClickTableColumn:")]
+    void OutlineViewDidClickTableColumn(NSOutlineView outlineView, NSTableColumn tableColumn);
+    [Optional]
+    [Selector("outlineView:didDragTableColumn:")]
+    void OutlineViewDidDragTableColumn(NSOutlineView outlineView, NSTableColumn tableColumn);
+    [Optional]
+    [Selector("outlineView:toolTipForCell:rect:tableColumn:item:mouseLocation:")]
+    NSString OutlineViewToolTipForCellRectTableColumnItemMouseLocation(NSOutlineView outlineView, NSCell cell, NSRectPointer rect, NSTableColumn? tableColumn, AnyObject item, NSPoint mouseLocation);
+    [Optional]
+    [Selector("outlineView:heightOfRowByItem:")]
+    CGFloat OutlineViewHeightOfRowByItem(NSOutlineView outlineView, AnyObject item);
+    [Optional]
+    [Selector("outlineView:tintConfigurationForItem:")]
+    NSTintConfiguration? OutlineViewTintConfigurationForItem(NSOutlineView outlineView, AnyObject item);
+    [Optional]
+    [Selector("outlineView:typeSelectStringForTableColumn:item:")]
+    NSString? OutlineViewTypeSelectStringForTableColumnItem(NSOutlineView outlineView, NSTableColumn? tableColumn, AnyObject item);
+    [Optional]
+    [Selector("outlineView:nextTypeSelectMatchFromItem:toItem:forString:")]
+    AnyObject? OutlineViewNextTypeSelectMatchFromItemToItemForString(NSOutlineView outlineView, AnyObject startItem, AnyObject endItem, NSString searchString);
+    [Optional]
+    [Selector("outlineView:shouldTypeSelectForEvent:withCurrentSearchString:")]
+    bool OutlineViewShouldTypeSelectForEventWithCurrentSearchString(NSOutlineView outlineView, NSEvent event, NSString? searchString);
+    [Optional]
+    [Selector("outlineView:shouldShowCellExpansionForTableColumn:item:")]
+    bool OutlineViewShouldShowCellExpansionForTableColumnItem(NSOutlineView outlineView, NSTableColumn? tableColumn, AnyObject item);
+    [Optional]
+    [Selector("outlineView:shouldTrackCell:forTableColumn:item:")]
+    bool OutlineViewShouldTrackCellForTableColumnItem(NSOutlineView outlineView, NSCell cell, NSTableColumn? tableColumn, AnyObject item);
+    [Optional]
+    [Selector("outlineView:dataCellForTableColumn:item:")]
+    NSCell? OutlineViewDataCellForTableColumnItem(NSOutlineView outlineView, NSTableColumn? tableColumn, AnyObject item);
+    [Optional]
+    [Selector("outlineView:isGroupItem:")]
+    bool OutlineViewIsGroupItem(NSOutlineView outlineView, AnyObject item);
+    [Optional]
+    [Selector("outlineView:shouldExpandItem:")]
+    bool OutlineViewShouldExpandItem(NSOutlineView outlineView, AnyObject item);
+    [Optional]
+    [Selector("outlineView:shouldCollapseItem:")]
+    bool OutlineViewShouldCollapseItem(NSOutlineView outlineView, AnyObject item);
+    [Optional]
+    [Selector("outlineView:willDisplayOutlineCell:forTableColumn:item:")]
+    void OutlineViewWillDisplayOutlineCellForTableColumnItem(NSOutlineView outlineView, AnyObject cell, NSTableColumn? tableColumn, AnyObject item);
+    [Optional]
+    [Selector("outlineView:sizeToFitWidthOfColumn:")]
+    CGFloat OutlineViewSizeToFitWidthOfColumn(NSOutlineView outlineView, NSInteger column);
+    [Optional]
+    [Selector("outlineView:shouldReorderColumn:toColumn:")]
+    bool OutlineViewShouldReorderColumnToColumn(NSOutlineView outlineView, NSInteger columnIndex, NSInteger newColumnIndex);
+    [Optional]
+    [Selector("outlineView:shouldShowOutlineCellForItem:")]
+    bool OutlineViewShouldShowOutlineCellForItem(NSOutlineView outlineView, AnyObject item);
+    [Optional]
+    [Selector("outlineView:userCanChangeVisibilityOfTableColumn:")]
+    bool OutlineViewUserCanChangeVisibilityOfTableColumn(NSOutlineView outlineView, NSTableColumn column);
+    [Optional]
+    [Selector("outlineView:userDidChangeVisibilityOfTableColumns:")]
+    void OutlineViewUserDidChangeVisibilityOfTableColumns(NSOutlineView outlineView, NSArray columns);
+    [Optional]
+    [Selector("outlineViewSelectionDidChange:")]
+    void OutlineViewSelectionDidChange(NSNotification notification);
+    [Optional]
+    [Selector("outlineViewColumnDidMove:")]
+    void OutlineViewColumnDidMove(NSNotification notification);
+    [Optional]
+    [Selector("outlineViewColumnDidResize:")]
+    void OutlineViewColumnDidResize(NSNotification notification);
+    [Optional]
+    [Selector("outlineViewSelectionIsChanging:")]
+    void OutlineViewSelectionIsChanging(NSNotification notification);
+    [Optional]
+    [Selector("outlineViewItemWillExpand:")]
+    void OutlineViewItemWillExpand(NSNotification notification);
+    [Optional]
+    [Selector("outlineViewItemDidExpand:")]
+    void OutlineViewItemDidExpand(NSNotification notification);
+    [Optional]
+    [Selector("outlineViewItemWillCollapse:")]
+    void OutlineViewItemWillCollapse(NSNotification notification);
+    [Optional]
+    [Selector("outlineViewItemDidCollapse:")]
+    void OutlineViewItemDidCollapse(NSNotification notification);
 }
 
 public extern "C" NSUserInterfaceItemIdentifier? NSOutlineViewDisclosureButtonKey;

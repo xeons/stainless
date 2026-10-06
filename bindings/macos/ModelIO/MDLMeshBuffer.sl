@@ -42,49 +42,70 @@ public objc closure void MDLMeshBufferMapInitWithBytesDeallocatorDeallocatorBloc
 
 public extern objc class MDLMeshBufferMap : NSObject
 {
-    [Selector("bytes")] public void* Bytes { get; }
-    [Selector("initWithBytes:deallocator:")] public Self InitWithBytesDeallocator(void* bytes, MDLMeshBufferMapInitWithBytesDeallocatorDeallocatorBlock? deallocator);
+    [Selector("bytes")]
+    public void* Bytes { get; }
+    [Selector("initWithBytes:deallocator:")]
+    public Self InitWithBytesDeallocator(void* bytes, MDLMeshBufferMapInitWithBytesDeallocatorDeallocatorBlock? deallocator);
 }
 
 public objc interface MDLMeshBuffer : NSObjectProtocol, NSCopying
 {
-    [Selector("length")] NSUInteger Length { get; }
-    [Selector("allocator")] MDLMeshBufferAllocator Allocator { get; }
-    [Selector("zone")] MDLMeshBufferZone Zone { get; }
-    [Selector("type")] MDLMeshBufferType Type { get; }
-    [Selector("fillData:offset:")] void FillDataOffset(NSData data, NSUInteger offset);
-    [Selector("map")] MDLMeshBufferMap Map();
+    [Selector("length")]
+    NSUInteger Length { get; }
+    [Selector("allocator")]
+    MDLMeshBufferAllocator Allocator { get; }
+    [Selector("zone")]
+    MDLMeshBufferZone Zone { get; }
+    [Selector("type")]
+    MDLMeshBufferType Type { get; }
+    [Selector("fillData:offset:")]
+    void FillDataOffset(NSData data, NSUInteger offset);
+    [Selector("map")]
+    MDLMeshBufferMap Map();
 }
 
 public extern objc class MDLMeshBufferData : NSObject, MDLMeshBuffer
 {
-    [Selector("data")] public NSData Data { get; }
-    [Selector("initWithType:length:")] public Self InitWithTypeLength(MDLMeshBufferType type, NSUInteger length);
-    [Selector("initWithType:data:")] public Self InitWithTypeData(MDLMeshBufferType type, NSData? data);
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("initWithType:length:")]
+    public Self InitWithTypeLength(MDLMeshBufferType type, NSUInteger length);
+    [Selector("initWithType:data:")]
+    public Self InitWithTypeData(MDLMeshBufferType type, NSData? data);
 }
 
 public objc interface MDLMeshBufferZone : NSObjectProtocol
 {
-    [Selector("capacity")] NSUInteger Capacity { get; }
-    [Selector("allocator")] MDLMeshBufferAllocator Allocator { get; }
+    [Selector("capacity")]
+    NSUInteger Capacity { get; }
+    [Selector("allocator")]
+    MDLMeshBufferAllocator Allocator { get; }
 }
 
 public objc interface MDLMeshBufferAllocator : NSObjectProtocol
 {
-    [Selector("newZone:")] MDLMeshBufferZone NewZone(NSUInteger capacity);
-    [Selector("newZoneForBuffersWithSize:andType:")] MDLMeshBufferZone NewZoneForBuffersWithSizeAndType(NSArray sizes, NSArray types);
-    [Selector("newBuffer:type:")] MDLMeshBuffer NewBufferType(NSUInteger length, MDLMeshBufferType type);
-    [Selector("newBufferWithData:type:")] MDLMeshBuffer NewBufferWithDataType(NSData data, MDLMeshBufferType type);
-    [Selector("newBufferFromZone:length:type:")] MDLMeshBuffer? NewBufferFromZoneLengthType(MDLMeshBufferZone? zone, NSUInteger length, MDLMeshBufferType type);
-    [Selector("newBufferFromZone:data:type:")] MDLMeshBuffer? NewBufferFromZoneDataType(MDLMeshBufferZone? zone, NSData data, MDLMeshBufferType type);
+    [Selector("newZone:")]
+    MDLMeshBufferZone NewZone(NSUInteger capacity);
+    [Selector("newZoneForBuffersWithSize:andType:")]
+    MDLMeshBufferZone NewZoneForBuffersWithSizeAndType(NSArray sizes, NSArray types);
+    [Selector("newBuffer:type:")]
+    MDLMeshBuffer NewBufferType(NSUInteger length, MDLMeshBufferType type);
+    [Selector("newBufferWithData:type:")]
+    MDLMeshBuffer NewBufferWithDataType(NSData data, MDLMeshBufferType type);
+    [Selector("newBufferFromZone:length:type:")]
+    MDLMeshBuffer? NewBufferFromZoneLengthType(MDLMeshBufferZone? zone, NSUInteger length, MDLMeshBufferType type);
+    [Selector("newBufferFromZone:data:type:")]
+    MDLMeshBuffer? NewBufferFromZoneDataType(MDLMeshBufferZone? zone, NSData data, MDLMeshBufferType type);
 }
 
 public extern objc class MDLMeshBufferDataAllocator : NSObject, MDLMeshBufferAllocator { }
 
 public extern objc class MDLMeshBufferZoneDefault : NSObject, MDLMeshBufferZone
 {
-    [Selector("capacity")] public NSUInteger Capacity { get; }
-    [Selector("allocator")] public MDLMeshBufferAllocator Allocator { get; }
+    [Selector("capacity")]
+    public NSUInteger Capacity { get; }
+    [Selector("allocator")]
+    public MDLMeshBufferAllocator Allocator { get; }
 }
 
 #endif

@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class MXNetworkTransferMetric : MXMetric
 {
-    [Selector("cumulativeWifiUpload")] public NSMeasurement CumulativeWifiUpload { get; }
-    [Selector("cumulativeWifiDownload")] public NSMeasurement CumulativeWifiDownload { get; }
-    [Selector("cumulativeCellularUpload")] public NSMeasurement CumulativeCellularUpload { get; }
-    [Selector("cumulativeCellularDownload")] public NSMeasurement CumulativeCellularDownload { get; }
+    [Selector("cumulativeWifiUpload")]
+    public NSMeasurement CumulativeWifiUpload { get; }
+    [Selector("cumulativeWifiDownload")]
+    public NSMeasurement CumulativeWifiDownload { get; }
+    [Selector("cumulativeCellularUpload")]
+    public NSMeasurement CumulativeCellularUpload { get; }
+    [Selector("cumulativeCellularDownload")]
+    public NSMeasurement CumulativeCellularDownload { get; }
 }
 
 #endif

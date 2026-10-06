@@ -95,21 +95,36 @@ public extern "C" AVAudioSequencerInfoDictionaryKey? AVAudioSequencerInfoDiction
 
 public extern objc class AVAudioSequencer : NSObject
 {
-    [Selector("tracks")] public NSArray Tracks { get; }
-    [Selector("tempoTrack")] public AVMusicTrack TempoTrack { get; }
-    [Selector("userInfo")] public NSDictionary UserInfo { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithAudioEngine:")] public Self InitWithAudioEngine(AVAudioEngine engine);
-    [Selector("loadFromURL:options:error:")] public bool LoadFromURLOptionsError(NSURL fileURL, AVMusicSequenceLoadOptions options, out NSError? outError);
-    [Selector("loadFromData:options:error:")] public bool LoadFromDataOptionsError(NSData data, AVMusicSequenceLoadOptions options, out NSError? outError);
-    [Selector("writeToURL:SMPTEResolution:replaceExisting:error:")] public bool WriteToURLSMPTEResolutionReplaceExistingError(NSURL fileURL, NSInteger resolution, bool replace, out NSError? outError);
-    [Selector("dataWithSMPTEResolution:error:")] public NSData DataWithSMPTEResolutionError(NSInteger SMPTEResolution, out NSError? outError);
-    [Selector("secondsForBeats:")] public NSTimeInterval SecondsForBeats(AVMusicTimeStamp beats);
-    [Selector("beatsForSeconds:")] public AVMusicTimeStamp BeatsForSeconds(NSTimeInterval seconds);
-    [Selector("reverseEvents")] public void ReverseEvents();
-    [Selector("createAndAppendTrack")] public AVMusicTrack CreateAndAppendTrack();
-    [Selector("removeTrack:")] public bool RemoveTrack(AVMusicTrack track);
-    [Selector("setUserCallback:")] public void SetUserCallback(AVAudioSequencerUserCallback? userCallback);
+    [Selector("tracks")]
+    public NSArray Tracks { get; }
+    [Selector("tempoTrack")]
+    public AVMusicTrack TempoTrack { get; }
+    [Selector("userInfo")]
+    public NSDictionary UserInfo { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithAudioEngine:")]
+    public Self InitWithAudioEngine(AVAudioEngine engine);
+    [Selector("loadFromURL:options:error:")]
+    public bool LoadFromURLOptionsError(NSURL fileURL, AVMusicSequenceLoadOptions options, out NSError? outError);
+    [Selector("loadFromData:options:error:")]
+    public bool LoadFromDataOptionsError(NSData data, AVMusicSequenceLoadOptions options, out NSError? outError);
+    [Selector("writeToURL:SMPTEResolution:replaceExisting:error:")]
+    public bool WriteToURLSMPTEResolutionReplaceExistingError(NSURL fileURL, NSInteger resolution, bool replace, out NSError? outError);
+    [Selector("dataWithSMPTEResolution:error:")]
+    public NSData DataWithSMPTEResolutionError(NSInteger SMPTEResolution, out NSError? outError);
+    [Selector("secondsForBeats:")]
+    public NSTimeInterval SecondsForBeats(AVMusicTimeStamp beats);
+    [Selector("beatsForSeconds:")]
+    public AVMusicTimeStamp BeatsForSeconds(NSTimeInterval seconds);
+    [Selector("reverseEvents")]
+    public void ReverseEvents();
+    [Selector("createAndAppendTrack")]
+    public AVMusicTrack CreateAndAppendTrack();
+    [Selector("removeTrack:")]
+    public bool RemoveTrack(AVMusicTrack track);
+    [Selector("setUserCallback:")]
+    public void SetUserCallback(AVAudioSequencerUserCallback? userCallback);
 }
 
 public objc closure void AVAudioSequencerUserCallback(AVMusicTrack arg0, NSData arg1, AVMusicTimeStamp arg2);
@@ -117,30 +132,50 @@ public objc closure void AVAudioSequencerUserCallback(AVMusicTrack arg0, NSData 
 /// AVAudioSequencer_Player, a category of AVAudioSequencer.
 public extern objc class AVAudioSequencer
 {
-    [Selector("currentPositionInSeconds", "setCurrentPositionInSeconds:")] public NSTimeInterval CurrentPositionInSeconds { get; set; }
-    [Selector("currentPositionInBeats", "setCurrentPositionInBeats:")] public NSTimeInterval CurrentPositionInBeats { get; set; }
-    [Selector("isPlaying")] public bool Playing { get; }
-    [Selector("rate", "setRate:")] public float Rate { get; set; }
-    [Selector("hostTimeForBeats:error:")] public UInt64 HostTimeForBeatsError(AVMusicTimeStamp inBeats, out NSError? outError);
-    [Selector("beatsForHostTime:error:")] public AVMusicTimeStamp BeatsForHostTimeError(UInt64 inHostTime, out NSError? outError);
-    [Selector("prepareToPlay")] public void PrepareToPlay();
-    [Selector("startAndReturnError:")] public bool StartAndReturnError(out NSError? outError);
-    [Selector("stop")] public void Stop();
+    [Selector("currentPositionInSeconds", "setCurrentPositionInSeconds:")]
+    public NSTimeInterval CurrentPositionInSeconds { get; set; }
+    [Selector("currentPositionInBeats", "setCurrentPositionInBeats:")]
+    public NSTimeInterval CurrentPositionInBeats { get; set; }
+    [Selector("isPlaying")]
+    public bool Playing { get; }
+    [Selector("rate", "setRate:")]
+    public float Rate { get; set; }
+    [Selector("hostTimeForBeats:error:")]
+    public UInt64 HostTimeForBeatsError(AVMusicTimeStamp inBeats, out NSError? outError);
+    [Selector("beatsForHostTime:error:")]
+    public AVMusicTimeStamp BeatsForHostTimeError(UInt64 inHostTime, out NSError? outError);
+    [Selector("prepareToPlay")]
+    public void PrepareToPlay();
+    [Selector("startAndReturnError:")]
+    public bool StartAndReturnError(out NSError? outError);
+    [Selector("stop")]
+    public void Stop();
 }
 
 public extern objc class AVMusicTrack : NSObject
 {
-    [Selector("destinationAudioUnit", "setDestinationAudioUnit:")] public AVAudioUnit? DestinationAudioUnit { get; set; }
-    [Selector("destinationMIDIEndpoint", "setDestinationMIDIEndpoint:")] public MIDIEndpointRef DestinationMIDIEndpoint { get; set; }
-    [Selector("loopRange", "setLoopRange:")] public AVBeatRange LoopRange { get; set; }
-    [Selector("isLoopingEnabled", "setLoopingEnabled:")] public bool LoopingEnabled { get; set; }
-    [Selector("numberOfLoops", "setNumberOfLoops:")] public NSInteger NumberOfLoops { get; set; }
-    [Selector("offsetTime", "setOffsetTime:")] public AVMusicTimeStamp OffsetTime { get; set; }
-    [Selector("isMuted", "setMuted:")] public bool Muted { get; set; }
-    [Selector("isSoloed", "setSoloed:")] public bool Soloed { get; set; }
-    [Selector("lengthInBeats", "setLengthInBeats:")] public AVMusicTimeStamp LengthInBeats { get; set; }
-    [Selector("lengthInSeconds", "setLengthInSeconds:")] public NSTimeInterval LengthInSeconds { get; set; }
-    [Selector("timeResolution")] public NSUInteger TimeResolution { get; }
+    [Selector("destinationAudioUnit", "setDestinationAudioUnit:")]
+    public AVAudioUnit? DestinationAudioUnit { get; set; }
+    [Selector("destinationMIDIEndpoint", "setDestinationMIDIEndpoint:")]
+    public MIDIEndpointRef DestinationMIDIEndpoint { get; set; }
+    [Selector("loopRange", "setLoopRange:")]
+    public AVBeatRange LoopRange { get; set; }
+    [Selector("isLoopingEnabled", "setLoopingEnabled:")]
+    public bool LoopingEnabled { get; set; }
+    [Selector("numberOfLoops", "setNumberOfLoops:")]
+    public NSInteger NumberOfLoops { get; set; }
+    [Selector("offsetTime", "setOffsetTime:")]
+    public AVMusicTimeStamp OffsetTime { get; set; }
+    [Selector("isMuted", "setMuted:")]
+    public bool Muted { get; set; }
+    [Selector("isSoloed", "setSoloed:")]
+    public bool Soloed { get; set; }
+    [Selector("lengthInBeats", "setLengthInBeats:")]
+    public AVMusicTimeStamp LengthInBeats { get; set; }
+    [Selector("lengthInSeconds", "setLengthInSeconds:")]
+    public NSTimeInterval LengthInSeconds { get; set; }
+    [Selector("timeResolution")]
+    public NSUInteger TimeResolution { get; }
 }
 
 public enum AVMusicTrackLoopCount : long
@@ -151,14 +186,22 @@ public enum AVMusicTrackLoopCount : long
 /// AVMusicTrackEditor, a category of AVMusicTrack.
 public extern objc class AVMusicTrack
 {
-    [Selector("usesAutomatedParameters", "setUsesAutomatedParameters:")] public bool UsesAutomatedParameters { get; set; }
-    [Selector("addEvent:atBeat:")] public void AddEventAtBeat(AVMusicEvent event, AVMusicTimeStamp beat);
-    [Selector("moveEventsInRange:byAmount:")] public void MoveEventsInRangeByAmount(AVBeatRange range, AVMusicTimeStamp beatAmount);
-    [Selector("clearEventsInRange:")] public void ClearEventsInRange(AVBeatRange range);
-    [Selector("cutEventsInRange:")] public void CutEventsInRange(AVBeatRange range);
-    [Selector("copyEventsInRange:fromTrack:insertAtBeat:")] public void CopyEventsInRangeFromTrackInsertAtBeat(AVBeatRange range, AVMusicTrack sourceTrack, AVMusicTimeStamp insertStartBeat);
-    [Selector("copyAndMergeEventsInRange:fromTrack:mergeAtBeat:")] public void CopyAndMergeEventsInRangeFromTrackMergeAtBeat(AVBeatRange range, AVMusicTrack sourceTrack, AVMusicTimeStamp mergeStartBeat);
-    [Selector("enumerateEventsInRange:usingBlock:")] public void EnumerateEventsInRangeUsingBlock(AVBeatRange range, AVMusicEventEnumerationBlock block);
+    [Selector("usesAutomatedParameters", "setUsesAutomatedParameters:")]
+    public bool UsesAutomatedParameters { get; set; }
+    [Selector("addEvent:atBeat:")]
+    public void AddEventAtBeat(AVMusicEvent event, AVMusicTimeStamp beat);
+    [Selector("moveEventsInRange:byAmount:")]
+    public void MoveEventsInRangeByAmount(AVBeatRange range, AVMusicTimeStamp beatAmount);
+    [Selector("clearEventsInRange:")]
+    public void ClearEventsInRange(AVBeatRange range);
+    [Selector("cutEventsInRange:")]
+    public void CutEventsInRange(AVBeatRange range);
+    [Selector("copyEventsInRange:fromTrack:insertAtBeat:")]
+    public void CopyEventsInRangeFromTrackInsertAtBeat(AVBeatRange range, AVMusicTrack sourceTrack, AVMusicTimeStamp insertStartBeat);
+    [Selector("copyAndMergeEventsInRange:fromTrack:mergeAtBeat:")]
+    public void CopyAndMergeEventsInRangeFromTrackMergeAtBeat(AVBeatRange range, AVMusicTrack sourceTrack, AVMusicTimeStamp mergeStartBeat);
+    [Selector("enumerateEventsInRange:usingBlock:")]
+    public void EnumerateEventsInRangeUsingBlock(AVBeatRange range, AVMusicEventEnumerationBlock block);
 }
 
 public objc closure void AVMusicEventEnumerationBlock(AVMusicEvent arg0, AVMusicTimeStamp* arg1, bool* arg2);

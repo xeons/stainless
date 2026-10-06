@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class MLModelStructureProgramArgument : NSObject
 {
-    [Selector("bindings")] public NSArray Bindings { get; }
+    [Selector("bindings")]
+    public NSArray Bindings { get; }
 }
 
 #endif

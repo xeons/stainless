@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class INCallGroup : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("groupName")] public NSString? GroupName { get; }
-    [Selector("groupId")] public NSString? GroupId { get; }
-    [Selector("initWithGroupName:groupId:")] public Self InitWithGroupNameGroupId(NSString? groupName, NSString? groupId);
+    [Selector("groupName")]
+    public NSString? GroupName { get; }
+    [Selector("groupId")]
+    public NSString? GroupId { get; }
+    [Selector("initWithGroupName:groupId:")]
+    public Self InitWithGroupNameGroupId(NSString? groupName, NSString? groupId);
 }
 
 #endif

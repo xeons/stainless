@@ -34,20 +34,34 @@ import Standard.ObjC;
 
 public extern objc class NSRulerMarker : NSObject, NSCopying, NSCoding
 {
-    [Selector("ruler")] public NSRulerView? Ruler { get; }
-    [Selector("markerLocation", "setMarkerLocation:")] public CGFloat MarkerLocation { get; set; }
-    [Selector("image", "setImage:")] public NSImage Image { get; set; }
-    [Selector("imageOrigin", "setImageOrigin:")] public NSPoint ImageOrigin { get; set; }
-    [Selector("isMovable", "setMovable:")] public bool Movable { get; set; }
-    [Selector("isRemovable", "setRemovable:")] public bool Removable { get; set; }
-    [Selector("isDragging")] public bool Dragging { get; }
-    [Selector("representedObject", "setRepresentedObject:")] public NSCopying? RepresentedObject { get; set; }
-    [Selector("imageRectInRuler")] public NSRect ImageRectInRuler { get; }
-    [Selector("thicknessRequiredInRuler")] public CGFloat ThicknessRequiredInRuler { get; }
-    [Selector("initWithRulerView:markerLocation:image:imageOrigin:")] public Self InitWithRulerViewMarkerLocationImageImageOrigin(NSRulerView ruler, CGFloat location, NSImage image, NSPoint imageOrigin);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("drawRect:")] public void DrawRect(NSRect rect);
-    [Selector("trackMouse:adding:")] public bool TrackMouseAdding(NSEvent mouseDownEvent, bool isAdding);
+    [Selector("ruler")]
+    public NSRulerView? Ruler { get; }
+    [Selector("markerLocation", "setMarkerLocation:")]
+    public CGFloat MarkerLocation { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage Image { get; set; }
+    [Selector("imageOrigin", "setImageOrigin:")]
+    public NSPoint ImageOrigin { get; set; }
+    [Selector("isMovable", "setMovable:")]
+    public bool Movable { get; set; }
+    [Selector("isRemovable", "setRemovable:")]
+    public bool Removable { get; set; }
+    [Selector("isDragging")]
+    public bool Dragging { get; }
+    [Selector("representedObject", "setRepresentedObject:")]
+    public NSCopying? RepresentedObject { get; set; }
+    [Selector("imageRectInRuler")]
+    public NSRect ImageRectInRuler { get; }
+    [Selector("thicknessRequiredInRuler")]
+    public CGFloat ThicknessRequiredInRuler { get; }
+    [Selector("initWithRulerView:markerLocation:image:imageOrigin:")]
+    public Self InitWithRulerViewMarkerLocationImageImageOrigin(NSRulerView ruler, CGFloat location, NSImage image, NSPoint imageOrigin);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("drawRect:")]
+    public void DrawRect(NSRect rect);
+    [Selector("trackMouse:adding:")]
+    public bool TrackMouseAdding(NSEvent mouseDownEvent, bool isAdding);
 }
 
 #endif

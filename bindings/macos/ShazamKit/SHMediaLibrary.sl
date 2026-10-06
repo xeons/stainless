@@ -36,8 +36,10 @@ public objc closure void SHMediaLibraryAddMediaItemsCompletionHandlerCompletionH
 /// Deprecated in macOS 15.0.
 public extern objc class SHMediaLibrary : NSObject
 {
-    [Selector("defaultLibrary")] public static SHMediaLibrary DefaultLibrary { get; }
-    [Selector("addMediaItems:completionHandler:")] public void AddMediaItemsCompletionHandler(NSArray mediaItems, SHMediaLibraryAddMediaItemsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("defaultLibrary")]
+    public static SHMediaLibrary DefaultLibrary { get; }
+    [Selector("addMediaItems:completionHandler:")]
+    public void AddMediaItemsCompletionHandler(NSArray mediaItems, SHMediaLibraryAddMediaItemsCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

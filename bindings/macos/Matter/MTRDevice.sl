@@ -44,39 +44,64 @@ public objc closure void MTRDeviceWaitForAttributeValuesTimeoutQueueCompletionCo
 
 public extern objc class MTRDevice : NSObject
 {
-    [Selector("state")] public MTRDeviceState State { get; }
-    [Selector("deviceCachePrimed")] public bool DeviceCachePrimed { get; }
-    [Selector("estimatedStartTime")] public NSDate? EstimatedStartTime { get; }
-    [Selector("deviceController")] public MTRDeviceController? DeviceController { get; }
-    [Selector("nodeID")] public NSNumber? NodeID { get; }
-    [Selector("estimatedSubscriptionLatency")] public NSNumber? EstimatedSubscriptionLatency { get; }
+    [Selector("state")]
+    public MTRDeviceState State { get; }
+    [Selector("deviceCachePrimed")]
+    public bool DeviceCachePrimed { get; }
+    [Selector("estimatedStartTime")]
+    public NSDate? EstimatedStartTime { get; }
+    [Selector("deviceController")]
+    public MTRDeviceController? DeviceController { get; }
+    [Selector("nodeID")]
+    public NSNumber? NodeID { get; }
+    [Selector("estimatedSubscriptionLatency")]
+    public NSNumber? EstimatedSubscriptionLatency { get; }
     /// macOS 15.3 and later.
-    [Selector("vendorID")] public NSNumber? VendorID { get; }
+    [Selector("vendorID")]
+    public NSNumber? VendorID { get; }
     /// macOS 15.3 and later.
-    [Selector("productID")] public NSNumber? ProductID { get; }
+    [Selector("productID")]
+    public NSNumber? ProductID { get; }
     /// macOS 15.4 and later.
-    [Selector("networkCommissioningFeatures")] public MTRNetworkCommissioningFeature NetworkCommissioningFeatures { get; }
-    [Selector("deviceWithNodeID:controller:")] public static MTRDevice DeviceWithNodeIDController(NSNumber nodeID, MTRDeviceController controller);
+    [Selector("networkCommissioningFeatures")]
+    public MTRNetworkCommissioningFeature NetworkCommissioningFeatures { get; }
+    [Selector("deviceWithNodeID:controller:")]
+    public static MTRDevice DeviceWithNodeIDController(NSNumber nodeID, MTRDeviceController controller);
     /// Deprecated in macOS 15.0.
-    [Selector("setDelegate:queue:")] public void SetDelegateQueue(MTRDeviceDelegate @delegate, dispatch_queue_t queue);
-    [Selector("addDelegate:queue:")] public void AddDelegateQueue(MTRDeviceDelegate @delegate, dispatch_queue_t queue);
-    [Selector("addDelegate:queue:interestedPathsForAttributes:interestedPathsForEvents:")] public void AddDelegateQueueInterestedPathsForAttributesInterestedPathsForEvents(MTRDeviceDelegate @delegate, dispatch_queue_t queue, NSArray? interestedPathsForAttributes, NSArray? interestedPathsForEvents);
-    [Selector("removeDelegate:")] public void RemoveDelegate(MTRDeviceDelegate @delegate);
-    [Selector("readAttributeWithEndpointID:clusterID:attributeID:params:")] public NSDictionary? ReadAttributeWithEndpointIDClusterIDAttributeIDParams(NSNumber endpointID, NSNumber clusterID, NSNumber attributeID, MTRReadParams? params);
-    [Selector("writeAttributeWithEndpointID:clusterID:attributeID:value:expectedValueInterval:timedWriteTimeout:")] public void WriteAttributeWithEndpointIDClusterIDAttributeIDValueExpectedValueIntervalTimedWriteTimeout(NSNumber endpointID, NSNumber clusterID, NSNumber attributeID, AnyObject value, NSNumber expectedValueInterval, NSNumber? timeout);
+    [Selector("setDelegate:queue:")]
+    public void SetDelegateQueue(MTRDeviceDelegate @delegate, dispatch_queue_t queue);
+    [Selector("addDelegate:queue:")]
+    public void AddDelegateQueue(MTRDeviceDelegate @delegate, dispatch_queue_t queue);
+    [Selector("addDelegate:queue:interestedPathsForAttributes:interestedPathsForEvents:")]
+    public void AddDelegateQueueInterestedPathsForAttributesInterestedPathsForEvents(MTRDeviceDelegate @delegate, dispatch_queue_t queue, NSArray? interestedPathsForAttributes, NSArray? interestedPathsForEvents);
+    [Selector("removeDelegate:")]
+    public void RemoveDelegate(MTRDeviceDelegate @delegate);
+    [Selector("readAttributeWithEndpointID:clusterID:attributeID:params:")]
+    public NSDictionary? ReadAttributeWithEndpointIDClusterIDAttributeIDParams(NSNumber endpointID, NSNumber clusterID, NSNumber attributeID, MTRReadParams? params);
+    [Selector("writeAttributeWithEndpointID:clusterID:attributeID:value:expectedValueInterval:timedWriteTimeout:")]
+    public void WriteAttributeWithEndpointIDClusterIDAttributeIDValueExpectedValueIntervalTimedWriteTimeout(NSNumber endpointID, NSNumber clusterID, NSNumber attributeID, AnyObject value, NSNumber expectedValueInterval, NSNumber? timeout);
     /// macOS 15.2 and later.
-    [Selector("readAttributePaths:")] public NSArray ReadAttributePaths(NSArray attributePaths);
+    [Selector("readAttributePaths:")]
+    public NSArray ReadAttributePaths(NSArray attributePaths);
     /// macOS 15.4 and later.
-    [Selector("descriptorClusters")] public NSDictionary DescriptorClusters();
-    [Selector("invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:queue:completion:")] public void InvokeCommandWithEndpointIDClusterIDCommandIDCommandFieldsExpectedValuesExpectedValueIntervalQueueCompletion(NSNumber endpointID, NSNumber clusterID, NSNumber commandID, NSDictionary? commandFields, NSArray? expectedValues, NSNumber? expectedValueInterval, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
-    [Selector("invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:queue:completion:")] public void InvokeCommandWithEndpointIDClusterIDCommandIDCommandFieldsExpectedValuesExpectedValueIntervalTimedInvokeTimeoutQueueCompletion(NSNumber endpointID, NSNumber clusterID, NSNumber commandID, AnyObject commandFields, NSArray? expectedValues, NSNumber? expectedValueInterval, NSNumber? timeout, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
+    [Selector("descriptorClusters")]
+    public NSDictionary DescriptorClusters();
+    [Selector("invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:queue:completion:")]
+    public void InvokeCommandWithEndpointIDClusterIDCommandIDCommandFieldsExpectedValuesExpectedValueIntervalQueueCompletion(NSNumber endpointID, NSNumber clusterID, NSNumber commandID, NSDictionary? commandFields, NSArray? expectedValues, NSNumber? expectedValueInterval, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
+    [Selector("invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:queue:completion:")]
+    public void InvokeCommandWithEndpointIDClusterIDCommandIDCommandFieldsExpectedValuesExpectedValueIntervalTimedInvokeTimeoutQueueCompletion(NSNumber endpointID, NSNumber clusterID, NSNumber commandID, AnyObject commandFields, NSArray? expectedValues, NSNumber? expectedValueInterval, NSNumber? timeout, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
     /// macOS 15.4 and later.
-    [Selector("invokeCommands:queue:completion:")] public void InvokeCommandsQueueCompletion(NSArray commands, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
-    [Selector("openCommissioningWindowWithSetupPasscode:discriminator:duration:queue:completion:")] public void OpenCommissioningWindowWithSetupPasscodeDiscriminatorDurationQueueCompletion(NSNumber setupPasscode, NSNumber discriminator, NSNumber duration, dispatch_queue_t queue, MTRDeviceOpenCommissioningWindowHandler completion);
-    [Selector("openCommissioningWindowWithDiscriminator:duration:queue:completion:")] public void OpenCommissioningWindowWithDiscriminatorDurationQueueCompletion(NSNumber discriminator, NSNumber duration, dispatch_queue_t queue, MTRDeviceOpenCommissioningWindowHandler completion);
-    [Selector("downloadLogOfType:timeout:queue:completion:")] public void DownloadLogOfTypeTimeoutQueueCompletion(MTRDiagnosticLogType type, NSTimeInterval timeout, dispatch_queue_t queue, MTRDeviceDownloadLogOfTypeTimeoutQueueCompletionCompletionBlock completion);
+    [Selector("invokeCommands:queue:completion:")]
+    public void InvokeCommandsQueueCompletion(NSArray commands, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
+    [Selector("openCommissioningWindowWithSetupPasscode:discriminator:duration:queue:completion:")]
+    public void OpenCommissioningWindowWithSetupPasscodeDiscriminatorDurationQueueCompletion(NSNumber setupPasscode, NSNumber discriminator, NSNumber duration, dispatch_queue_t queue, MTRDeviceOpenCommissioningWindowHandler completion);
+    [Selector("openCommissioningWindowWithDiscriminator:duration:queue:completion:")]
+    public void OpenCommissioningWindowWithDiscriminatorDurationQueueCompletion(NSNumber discriminator, NSNumber duration, dispatch_queue_t queue, MTRDeviceOpenCommissioningWindowHandler completion);
+    [Selector("downloadLogOfType:timeout:queue:completion:")]
+    public void DownloadLogOfTypeTimeoutQueueCompletion(MTRDiagnosticLogType type, NSTimeInterval timeout, dispatch_queue_t queue, MTRDeviceDownloadLogOfTypeTimeoutQueueCompletionCompletionBlock completion);
     /// macOS 15.3 and later.
-    [Selector("waitForAttributeValues:timeout:queue:completion:")] public MTRAttributeValueWaiter WaitForAttributeValuesTimeoutQueueCompletion(NSDictionary values, NSTimeInterval timeout, dispatch_queue_t queue, MTRDeviceWaitForAttributeValuesTimeoutQueueCompletionCompletionBlock completion);
+    [Selector("waitForAttributeValues:timeout:queue:completion:")]
+    public MTRAttributeValueWaiter WaitForAttributeValuesTimeoutQueueCompletion(NSDictionary values, NSTimeInterval timeout, dispatch_queue_t queue, MTRDeviceWaitForAttributeValuesTimeoutQueueCompletionCompletionBlock completion);
 }
 
 public extern "C" NSString MTRPreviousDataKey;
@@ -85,21 +110,32 @@ public extern "C" NSString MTRDataVersionKey;
 
 public objc interface MTRDeviceDelegate : NSObjectProtocol
 {
-    [Selector("device:stateChanged:")] void DeviceStateChanged(MTRDevice device, MTRDeviceState state);
-    [Selector("device:receivedAttributeReport:")] void DeviceReceivedAttributeReport(MTRDevice device, NSArray attributeReport);
-    [Selector("device:receivedEventReport:")] void DeviceReceivedEventReport(MTRDevice device, NSArray eventReport);
-    [Optional] [Selector("deviceBecameActive:")] void DeviceBecameActive(MTRDevice device);
-    [Optional] [Selector("deviceCachePrimed:")] void DeviceCachePrimed(MTRDevice device);
-    [Optional] [Selector("deviceConfigurationChanged:")] void DeviceConfigurationChanged(MTRDevice device);
+    [Selector("device:stateChanged:")]
+    void DeviceStateChanged(MTRDevice device, MTRDeviceState state);
+    [Selector("device:receivedAttributeReport:")]
+    void DeviceReceivedAttributeReport(MTRDevice device, NSArray attributeReport);
+    [Selector("device:receivedEventReport:")]
+    void DeviceReceivedEventReport(MTRDevice device, NSArray eventReport);
+    [Optional]
+    [Selector("deviceBecameActive:")]
+    void DeviceBecameActive(MTRDevice device);
+    [Optional]
+    [Selector("deviceCachePrimed:")]
+    void DeviceCachePrimed(MTRDevice device);
+    [Optional]
+    [Selector("deviceConfigurationChanged:")]
+    void DeviceConfigurationChanged(MTRDevice device);
 }
 
 /// Deprecated, a category of MTRDevice.
 public extern objc class MTRDevice
 {
     /// Deprecated in macOS 13.3.
-    [Selector("deviceWithNodeID:deviceController:")] public static MTRDevice DeviceWithNodeIDDeviceController(ulong nodeID, MTRDeviceController deviceController);
+    [Selector("deviceWithNodeID:deviceController:")]
+    public static MTRDevice DeviceWithNodeIDDeviceController(ulong nodeID, MTRDeviceController deviceController);
     /// Deprecated in macOS 13.3.
-    [Selector("invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:clientQueue:completion:")] public void InvokeCommandWithEndpointIDClusterIDCommandIDCommandFieldsExpectedValuesExpectedValueIntervalTimedInvokeTimeoutClientQueueCompletion(NSNumber endpointID, NSNumber clusterID, NSNumber commandID, AnyObject commandFields, NSArray? expectedValues, NSNumber? expectedValueInterval, NSNumber? timeout, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
+    [Selector("invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:clientQueue:completion:")]
+    public void InvokeCommandWithEndpointIDClusterIDCommandIDCommandFieldsExpectedValuesExpectedValueIntervalTimedInvokeTimeoutClientQueueCompletion(NSNumber endpointID, NSNumber clusterID, NSNumber commandID, AnyObject commandFields, NSArray? expectedValues, NSNumber? expectedValueInterval, NSNumber? timeout, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
 }
 
 #endif

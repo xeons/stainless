@@ -48,29 +48,50 @@ public struct NSOperatingSystemVersion
 
 public extern objc class NSProcessInfo : NSObject
 {
-    [Selector("processInfo")] public static NSProcessInfo ProcessInfo { get; }
-    [Selector("environment")] public NSDictionary Environment { get; }
-    [Selector("arguments")] public NSArray Arguments { get; }
-    [Selector("hostName")] public NSString HostName { get; }
-    [Selector("processName", "setProcessName:")] public NSString ProcessName { get; set; }
-    [Selector("processIdentifier")] public int ProcessIdentifier { get; }
-    [Selector("globallyUniqueString")] public NSString GloballyUniqueString { get; }
-    [Selector("operatingSystemVersionString")] public NSString OperatingSystemVersionString { get; }
-    [Selector("operatingSystemVersion")] public NSOperatingSystemVersion OperatingSystemVersion { get; }
-    [Selector("processorCount")] public NSUInteger ProcessorCount { get; }
-    [Selector("activeProcessorCount")] public NSUInteger ActiveProcessorCount { get; }
-    [Selector("physicalMemory")] public ulong PhysicalMemory { get; }
-    [Selector("systemUptime")] public NSTimeInterval SystemUptime { get; }
-    [Selector("automaticTerminationSupportEnabled", "setAutomaticTerminationSupportEnabled:")] public bool AutomaticTerminationSupportEnabled { get; set; }
+    [Selector("processInfo")]
+    public static NSProcessInfo ProcessInfo { get; }
+    [Selector("environment")]
+    public NSDictionary Environment { get; }
+    [Selector("arguments")]
+    public NSArray Arguments { get; }
+    [Selector("hostName")]
+    public NSString HostName { get; }
+    [Selector("processName", "setProcessName:")]
+    public NSString ProcessName { get; set; }
+    [Selector("processIdentifier")]
+    public int ProcessIdentifier { get; }
+    [Selector("globallyUniqueString")]
+    public NSString GloballyUniqueString { get; }
+    [Selector("operatingSystemVersionString")]
+    public NSString OperatingSystemVersionString { get; }
+    [Selector("operatingSystemVersion")]
+    public NSOperatingSystemVersion OperatingSystemVersion { get; }
+    [Selector("processorCount")]
+    public NSUInteger ProcessorCount { get; }
+    [Selector("activeProcessorCount")]
+    public NSUInteger ActiveProcessorCount { get; }
+    [Selector("physicalMemory")]
+    public ulong PhysicalMemory { get; }
+    [Selector("systemUptime")]
+    public NSTimeInterval SystemUptime { get; }
+    [Selector("automaticTerminationSupportEnabled", "setAutomaticTerminationSupportEnabled:")]
+    public bool AutomaticTerminationSupportEnabled { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("operatingSystem")] public NSUInteger OperatingSystem();
+    [Selector("operatingSystem")]
+    public NSUInteger OperatingSystem();
     /// Deprecated in macOS 10.10.
-    [Selector("operatingSystemName")] public NSString OperatingSystemName();
-    [Selector("isOperatingSystemAtLeastVersion:")] public bool IsOperatingSystemAtLeastVersion(NSOperatingSystemVersion version);
-    [Selector("disableSuddenTermination")] public void DisableSuddenTermination();
-    [Selector("enableSuddenTermination")] public void EnableSuddenTermination();
-    [Selector("disableAutomaticTermination:")] public void DisableAutomaticTermination(NSString reason);
-    [Selector("enableAutomaticTermination:")] public void EnableAutomaticTermination(NSString reason);
+    [Selector("operatingSystemName")]
+    public NSString OperatingSystemName();
+    [Selector("isOperatingSystemAtLeastVersion:")]
+    public bool IsOperatingSystemAtLeastVersion(NSOperatingSystemVersion version);
+    [Selector("disableSuddenTermination")]
+    public void DisableSuddenTermination();
+    [Selector("enableSuddenTermination")]
+    public void EnableSuddenTermination();
+    [Selector("disableAutomaticTermination:")]
+    public void DisableAutomaticTermination(NSString reason);
+    [Selector("enableAutomaticTermination:")]
+    public void EnableAutomaticTermination(NSString reason);
 }
 
 [Flags]
@@ -94,16 +115,21 @@ public objc closure void NSProcessInfoPerformActivityWithOptionsReasonUsingBlock
 /// NSProcessInfoActivity, a category of NSProcessInfo.
 public extern objc class NSProcessInfo
 {
-    [Selector("beginActivityWithOptions:reason:")] public NSObjectProtocol BeginActivityWithOptionsReason(NSActivityOptions options, NSString reason);
-    [Selector("endActivity:")] public void EndActivity(NSObjectProtocol activity);
-    [Selector("performActivityWithOptions:reason:usingBlock:")] public void PerformActivityWithOptionsReasonUsingBlock(NSActivityOptions options, NSString reason, NSProcessInfoPerformActivityWithOptionsReasonUsingBlockBlock block);
+    [Selector("beginActivityWithOptions:reason:")]
+    public NSObjectProtocol BeginActivityWithOptionsReason(NSActivityOptions options, NSString reason);
+    [Selector("endActivity:")]
+    public void EndActivity(NSObjectProtocol activity);
+    [Selector("performActivityWithOptions:reason:usingBlock:")]
+    public void PerformActivityWithOptionsReasonUsingBlock(NSActivityOptions options, NSString reason, NSProcessInfoPerformActivityWithOptionsReasonUsingBlockBlock block);
 }
 
 /// NSUserInformation, a category of NSProcessInfo.
 public extern objc class NSProcessInfo
 {
-    [Selector("userName")] public NSString? UserName { get; }
-    [Selector("fullUserName")] public NSString? FullUserName { get; }
+    [Selector("userName")]
+    public NSString? UserName { get; }
+    [Selector("fullUserName")]
+    public NSString? FullUserName { get; }
 }
 
 public enum NSProcessInfoThermalState : long
@@ -117,13 +143,15 @@ public enum NSProcessInfoThermalState : long
 /// NSProcessInfoThermalState, a category of NSProcessInfo.
 public extern objc class NSProcessInfo
 {
-    [Selector("thermalState")] public NSProcessInfoThermalState ThermalState { get; }
+    [Selector("thermalState")]
+    public NSProcessInfoThermalState ThermalState { get; }
 }
 
 /// NSProcessInfoPowerState, a category of NSProcessInfo.
 public extern objc class NSProcessInfo
 {
-    [Selector("isLowPowerModeEnabled")] public bool LowPowerModeEnabled { get; }
+    [Selector("isLowPowerModeEnabled")]
+    public bool LowPowerModeEnabled { get; }
 }
 
 public extern "C" NSNotificationName NSProcessInfoThermalStateDidChangeNotification;
@@ -133,10 +161,13 @@ public extern "C" NSNotificationName NSProcessInfoPowerStateDidChangeNotificatio
 /// NSProcessInfoPlatform, a category of NSProcessInfo.
 public extern objc class NSProcessInfo
 {
-    [Selector("isMacCatalystApp")] public bool MacCatalystApp { get; }
-    [Selector("isiOSAppOnMac")] public bool IOSAppOnMac { get; }
+    [Selector("isMacCatalystApp")]
+    public bool MacCatalystApp { get; }
+    [Selector("isiOSAppOnMac")]
+    public bool IOSAppOnMac { get; }
     /// macOS 26.1 and later.
-    [Selector("isiOSAppOnVision")] public bool IOSAppOnVision { get; }
+    [Selector("isiOSAppOnVision")]
+    public bool IOSAppOnVision { get; }
 }
 
 #endif

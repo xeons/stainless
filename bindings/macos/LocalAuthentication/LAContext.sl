@@ -50,23 +50,38 @@ public objc closure void LAContextEvaluateAccessControlOperationLocalizedReasonR
 
 public extern objc class LAContext : NSObject
 {
-    [Selector("localizedFallbackTitle", "setLocalizedFallbackTitle:")] public NSString? LocalizedFallbackTitle { get; set; }
+    [Selector("localizedFallbackTitle", "setLocalizedFallbackTitle:")]
+    public NSString? LocalizedFallbackTitle { get; set; }
     /// Deprecated in macOS 10.11.
-    [Selector("maxBiometryFailures", "setMaxBiometryFailures:")] public NSNumber? MaxBiometryFailures { get; set; }
-    [Selector("localizedCancelTitle", "setLocalizedCancelTitle:")] public NSString? LocalizedCancelTitle { get; set; }
-    [Selector("touchIDAuthenticationAllowableReuseDuration", "setTouchIDAuthenticationAllowableReuseDuration:")] public NSTimeInterval TouchIDAuthenticationAllowableReuseDuration { get; set; }
-    [Selector("localizedReason", "setLocalizedReason:")] public NSString LocalizedReason { get; set; }
-    [Selector("interactionNotAllowed", "setInteractionNotAllowed:")] public bool InteractionNotAllowed { get; set; }
-    [Selector("biometryType")] public LABiometryType BiometryType { get; }
+    [Selector("maxBiometryFailures", "setMaxBiometryFailures:")]
+    public NSNumber? MaxBiometryFailures { get; set; }
+    [Selector("localizedCancelTitle", "setLocalizedCancelTitle:")]
+    public NSString? LocalizedCancelTitle { get; set; }
+    [Selector("touchIDAuthenticationAllowableReuseDuration", "setTouchIDAuthenticationAllowableReuseDuration:")]
+    public NSTimeInterval TouchIDAuthenticationAllowableReuseDuration { get; set; }
+    [Selector("localizedReason", "setLocalizedReason:")]
+    public NSString LocalizedReason { get; set; }
+    [Selector("interactionNotAllowed", "setInteractionNotAllowed:")]
+    public bool InteractionNotAllowed { get; set; }
+    [Selector("biometryType")]
+    public LABiometryType BiometryType { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("evaluatedPolicyDomainState")] public NSData? EvaluatedPolicyDomainState { get; }
-    [Selector("domainState")] public LADomainState DomainState { get; }
-    [Selector("canEvaluatePolicy:error:")] public bool CanEvaluatePolicyError(LAPolicy policy, out NSError? error);
-    [Selector("evaluatePolicy:localizedReason:reply:")] public void EvaluatePolicyLocalizedReasonReply(LAPolicy policy, NSString localizedReason, LAContextEvaluatePolicyLocalizedReasonReplyReplyBlock reply);
-    [Selector("invalidate")] public void Invalidate();
-    [Selector("setCredential:type:")] public bool SetCredentialType(NSData? credential, LACredentialType type);
-    [Selector("isCredentialSet:")] public bool IsCredentialSet(LACredentialType type);
-    [Selector("evaluateAccessControl:operation:localizedReason:reply:")] public void EvaluateAccessControlOperationLocalizedReasonReply(SecAccessControlRef accessControl, LAAccessControlOperation operation, NSString localizedReason, LAContextEvaluateAccessControlOperationLocalizedReasonReplyReplyBlock reply);
+    [Selector("evaluatedPolicyDomainState")]
+    public NSData? EvaluatedPolicyDomainState { get; }
+    [Selector("domainState")]
+    public LADomainState DomainState { get; }
+    [Selector("canEvaluatePolicy:error:")]
+    public bool CanEvaluatePolicyError(LAPolicy policy, out NSError? error);
+    [Selector("evaluatePolicy:localizedReason:reply:")]
+    public void EvaluatePolicyLocalizedReasonReply(LAPolicy policy, NSString localizedReason, LAContextEvaluatePolicyLocalizedReasonReplyReplyBlock reply);
+    [Selector("invalidate")]
+    public void Invalidate();
+    [Selector("setCredential:type:")]
+    public bool SetCredentialType(NSData? credential, LACredentialType type);
+    [Selector("isCredentialSet:")]
+    public bool IsCredentialSet(LACredentialType type);
+    [Selector("evaluateAccessControl:operation:localizedReason:reply:")]
+    public void EvaluateAccessControlOperationLocalizedReasonReply(SecAccessControlRef accessControl, LAAccessControlOperation operation, NSString localizedReason, LAContextEvaluateAccessControlOperationLocalizedReasonReplyReplyBlock reply);
 }
 
 public enum LACredentialType : long

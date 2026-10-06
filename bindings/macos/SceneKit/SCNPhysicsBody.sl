@@ -49,41 +49,76 @@ public enum SCNPhysicsCollisionCategory : ulong
 
 public extern objc class SCNPhysicsBody : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("type", "setType:")] public SCNPhysicsBodyType Type { get; set; }
-    [Selector("mass", "setMass:")] public CGFloat Mass { get; set; }
-    [Selector("momentOfInertia", "setMomentOfInertia:")] public SCNVector3 MomentOfInertia { get; set; }
-    [Selector("usesDefaultMomentOfInertia", "setUsesDefaultMomentOfInertia:")] public bool UsesDefaultMomentOfInertia { get; set; }
-    [Selector("charge", "setCharge:")] public CGFloat Charge { get; set; }
-    [Selector("friction", "setFriction:")] public CGFloat Friction { get; set; }
-    [Selector("restitution", "setRestitution:")] public CGFloat Restitution { get; set; }
-    [Selector("rollingFriction", "setRollingFriction:")] public CGFloat RollingFriction { get; set; }
-    [Selector("physicsShape", "setPhysicsShape:")] public SCNPhysicsShape? PhysicsShape { get; set; }
-    [Selector("isResting")] public bool IsResting { get; }
-    [Selector("allowsResting", "setAllowsResting:")] public bool AllowsResting { get; set; }
-    [Selector("velocity", "setVelocity:")] public SCNVector3 Velocity { get; set; }
-    [Selector("angularVelocity", "setAngularVelocity:")] public SCNVector4 AngularVelocity { get; set; }
-    [Selector("damping", "setDamping:")] public CGFloat Damping { get; set; }
-    [Selector("angularDamping", "setAngularDamping:")] public CGFloat AngularDamping { get; set; }
-    [Selector("velocityFactor", "setVelocityFactor:")] public SCNVector3 VelocityFactor { get; set; }
-    [Selector("angularVelocityFactor", "setAngularVelocityFactor:")] public SCNVector3 AngularVelocityFactor { get; set; }
-    [Selector("categoryBitMask", "setCategoryBitMask:")] public NSUInteger CategoryBitMask { get; set; }
-    [Selector("collisionBitMask", "setCollisionBitMask:")] public NSUInteger CollisionBitMask { get; set; }
-    [Selector("contactTestBitMask", "setContactTestBitMask:")] public NSUInteger ContactTestBitMask { get; set; }
-    [Selector("isAffectedByGravity", "setAffectedByGravity:")] public bool AffectedByGravity { get; set; }
-    [Selector("continuousCollisionDetectionThreshold", "setContinuousCollisionDetectionThreshold:")] public CGFloat ContinuousCollisionDetectionThreshold { get; set; }
-    [Selector("centerOfMassOffset", "setCenterOfMassOffset:")] public SCNVector3 CenterOfMassOffset { get; set; }
-    [Selector("linearRestingThreshold", "setLinearRestingThreshold:")] public CGFloat LinearRestingThreshold { get; set; }
-    [Selector("angularRestingThreshold", "setAngularRestingThreshold:")] public CGFloat AngularRestingThreshold { get; set; }
-    [Selector("staticBody")] public static Self StaticBody();
-    [Selector("dynamicBody")] public static Self DynamicBody();
-    [Selector("kinematicBody")] public static Self KinematicBody();
-    [Selector("bodyWithType:shape:")] public static Self BodyWithTypeShape(SCNPhysicsBodyType type, SCNPhysicsShape? shape);
-    [Selector("applyForce:impulse:")] public void ApplyForceImpulse(SCNVector3 direction, bool impulse);
-    [Selector("applyForce:atPosition:impulse:")] public void ApplyForceAtPositionImpulse(SCNVector3 direction, SCNVector3 position, bool impulse);
-    [Selector("applyTorque:impulse:")] public void ApplyTorqueImpulse(SCNVector4 torque, bool impulse);
-    [Selector("clearAllForces")] public void ClearAllForces();
-    [Selector("resetTransform")] public void ResetTransform();
-    [Selector("setResting:")] public void SetResting(bool resting);
+    [Selector("type", "setType:")]
+    public SCNPhysicsBodyType Type { get; set; }
+    [Selector("mass", "setMass:")]
+    public CGFloat Mass { get; set; }
+    [Selector("momentOfInertia", "setMomentOfInertia:")]
+    public SCNVector3 MomentOfInertia { get; set; }
+    [Selector("usesDefaultMomentOfInertia", "setUsesDefaultMomentOfInertia:")]
+    public bool UsesDefaultMomentOfInertia { get; set; }
+    [Selector("charge", "setCharge:")]
+    public CGFloat Charge { get; set; }
+    [Selector("friction", "setFriction:")]
+    public CGFloat Friction { get; set; }
+    [Selector("restitution", "setRestitution:")]
+    public CGFloat Restitution { get; set; }
+    [Selector("rollingFriction", "setRollingFriction:")]
+    public CGFloat RollingFriction { get; set; }
+    [Selector("physicsShape", "setPhysicsShape:")]
+    public SCNPhysicsShape? PhysicsShape { get; set; }
+    [Selector("isResting")]
+    public bool IsResting { get; }
+    [Selector("allowsResting", "setAllowsResting:")]
+    public bool AllowsResting { get; set; }
+    [Selector("velocity", "setVelocity:")]
+    public SCNVector3 Velocity { get; set; }
+    [Selector("angularVelocity", "setAngularVelocity:")]
+    public SCNVector4 AngularVelocity { get; set; }
+    [Selector("damping", "setDamping:")]
+    public CGFloat Damping { get; set; }
+    [Selector("angularDamping", "setAngularDamping:")]
+    public CGFloat AngularDamping { get; set; }
+    [Selector("velocityFactor", "setVelocityFactor:")]
+    public SCNVector3 VelocityFactor { get; set; }
+    [Selector("angularVelocityFactor", "setAngularVelocityFactor:")]
+    public SCNVector3 AngularVelocityFactor { get; set; }
+    [Selector("categoryBitMask", "setCategoryBitMask:")]
+    public NSUInteger CategoryBitMask { get; set; }
+    [Selector("collisionBitMask", "setCollisionBitMask:")]
+    public NSUInteger CollisionBitMask { get; set; }
+    [Selector("contactTestBitMask", "setContactTestBitMask:")]
+    public NSUInteger ContactTestBitMask { get; set; }
+    [Selector("isAffectedByGravity", "setAffectedByGravity:")]
+    public bool AffectedByGravity { get; set; }
+    [Selector("continuousCollisionDetectionThreshold", "setContinuousCollisionDetectionThreshold:")]
+    public CGFloat ContinuousCollisionDetectionThreshold { get; set; }
+    [Selector("centerOfMassOffset", "setCenterOfMassOffset:")]
+    public SCNVector3 CenterOfMassOffset { get; set; }
+    [Selector("linearRestingThreshold", "setLinearRestingThreshold:")]
+    public CGFloat LinearRestingThreshold { get; set; }
+    [Selector("angularRestingThreshold", "setAngularRestingThreshold:")]
+    public CGFloat AngularRestingThreshold { get; set; }
+    [Selector("staticBody")]
+    public static Self StaticBody();
+    [Selector("dynamicBody")]
+    public static Self DynamicBody();
+    [Selector("kinematicBody")]
+    public static Self KinematicBody();
+    [Selector("bodyWithType:shape:")]
+    public static Self BodyWithTypeShape(SCNPhysicsBodyType type, SCNPhysicsShape? shape);
+    [Selector("applyForce:impulse:")]
+    public void ApplyForceImpulse(SCNVector3 direction, bool impulse);
+    [Selector("applyForce:atPosition:impulse:")]
+    public void ApplyForceAtPositionImpulse(SCNVector3 direction, SCNVector3 position, bool impulse);
+    [Selector("applyTorque:impulse:")]
+    public void ApplyTorqueImpulse(SCNVector4 torque, bool impulse);
+    [Selector("clearAllForces")]
+    public void ClearAllForces();
+    [Selector("resetTransform")]
+    public void ResetTransform();
+    [Selector("setResting:")]
+    public void SetResting(bool resting);
 }
 
 #endif

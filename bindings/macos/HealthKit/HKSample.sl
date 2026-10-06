@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class HKSample : HKObject
 {
-    [Selector("sampleType")] public HKSampleType SampleType { get; }
-    [Selector("startDate")] public NSDate StartDate { get; }
-    [Selector("endDate")] public NSDate EndDate { get; }
-    [Selector("hasUndeterminedDuration")] public bool HasUndeterminedDuration { get; }
+    [Selector("sampleType")]
+    public HKSampleType SampleType { get; }
+    [Selector("startDate")]
+    public NSDate StartDate { get; }
+    [Selector("endDate")]
+    public NSDate EndDate { get; }
+    [Selector("hasUndeterminedDuration")]
+    public bool HasUndeterminedDuration { get; }
 }
 
 public extern "C" NSString HKSampleSortIdentifierStartDate;

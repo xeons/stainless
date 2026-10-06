@@ -34,12 +34,18 @@ import Standard.ObjC;
 
 public extern objc class OSALanguageInstance : NSObject
 {
-    [Selector("language")] public OSALanguage Language { get; }
-    [Selector("componentInstance")] public ComponentInstance ComponentInstance { get; }
-    [Selector("defaultTarget", "setDefaultTarget:")] public NSAppleEventDescriptor? DefaultTarget { get; set; }
-    [Selector("languageInstanceWithLanguage:")] public static Self LanguageInstanceWithLanguage(OSALanguage language);
-    [Selector("initWithLanguage:")] public Self InitWithLanguage(OSALanguage language);
-    [Selector("richTextFromDescriptor:")] public NSAttributedString? RichTextFromDescriptor(NSAppleEventDescriptor descriptor);
+    [Selector("language")]
+    public OSALanguage Language { get; }
+    [Selector("componentInstance")]
+    public ComponentInstance ComponentInstance { get; }
+    [Selector("defaultTarget", "setDefaultTarget:")]
+    public NSAppleEventDescriptor? DefaultTarget { get; set; }
+    [Selector("languageInstanceWithLanguage:")]
+    public static Self LanguageInstanceWithLanguage(OSALanguage language);
+    [Selector("initWithLanguage:")]
+    public Self InitWithLanguage(OSALanguage language);
+    [Selector("richTextFromDescriptor:")]
+    public NSAttributedString? RichTextFromDescriptor(NSAppleEventDescriptor descriptor);
 }
 
 #endif

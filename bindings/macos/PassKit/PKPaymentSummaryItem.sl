@@ -39,11 +39,16 @@ public enum PKPaymentSummaryItemType : ulong
 
 public extern objc class PKPaymentSummaryItem : NSObject
 {
-    [Selector("label", "setLabel:")] public NSString Label { get; set; }
-    [Selector("amount", "setAmount:")] public NSDecimalNumber Amount { get; set; }
-    [Selector("type", "setType:")] public PKPaymentSummaryItemType Type { get; set; }
-    [Selector("summaryItemWithLabel:amount:")] public static Self SummaryItemWithLabelAmount(NSString label, NSDecimalNumber amount);
-    [Selector("summaryItemWithLabel:amount:type:")] public static Self SummaryItemWithLabelAmountType(NSString label, NSDecimalNumber amount, PKPaymentSummaryItemType type);
+    [Selector("label", "setLabel:")]
+    public NSString Label { get; set; }
+    [Selector("amount", "setAmount:")]
+    public NSDecimalNumber Amount { get; set; }
+    [Selector("type", "setType:")]
+    public PKPaymentSummaryItemType Type { get; set; }
+    [Selector("summaryItemWithLabel:amount:")]
+    public static Self SummaryItemWithLabelAmount(NSString label, NSDecimalNumber amount);
+    [Selector("summaryItemWithLabel:amount:type:")]
+    public static Self SummaryItemWithLabelAmountType(NSString label, NSDecimalNumber amount, PKPaymentSummaryItemType type);
 }
 
 #endif

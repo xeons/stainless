@@ -33,250 +33,494 @@ import Standard.ObjC;
 /// DOMCSS2Properties, a category of DOMCSSStyleDeclaration.
 public extern objc class DOMCSSStyleDeclaration
 {
-    [Selector("azimuth")] public NSString? Azimuth();
-    [Selector("setAzimuth:")] public void SetAzimuth(NSString? azimuth);
-    [Selector("background")] public NSString? Background();
-    [Selector("setBackground:")] public void SetBackground(NSString? background);
-    [Selector("backgroundAttachment")] public NSString? BackgroundAttachment();
-    [Selector("setBackgroundAttachment:")] public void SetBackgroundAttachment(NSString? backgroundAttachment);
-    [Selector("backgroundColor")] public NSString? BackgroundColor();
-    [Selector("setBackgroundColor:")] public void SetBackgroundColor(NSString? backgroundColor);
-    [Selector("backgroundImage")] public NSString? BackgroundImage();
-    [Selector("setBackgroundImage:")] public void SetBackgroundImage(NSString? backgroundImage);
-    [Selector("backgroundPosition")] public NSString? BackgroundPosition();
-    [Selector("setBackgroundPosition:")] public void SetBackgroundPosition(NSString? backgroundPosition);
-    [Selector("backgroundRepeat")] public NSString? BackgroundRepeat();
-    [Selector("setBackgroundRepeat:")] public void SetBackgroundRepeat(NSString? backgroundRepeat);
-    [Selector("border")] public NSString? Border();
-    [Selector("setBorder:")] public void SetBorder(NSString? border);
-    [Selector("borderCollapse")] public NSString? BorderCollapse();
-    [Selector("setBorderCollapse:")] public void SetBorderCollapse(NSString? borderCollapse);
-    [Selector("borderColor")] public NSString? BorderColor();
-    [Selector("setBorderColor:")] public void SetBorderColor(NSString? borderColor);
-    [Selector("borderSpacing")] public NSString? BorderSpacing();
-    [Selector("setBorderSpacing:")] public void SetBorderSpacing(NSString? borderSpacing);
-    [Selector("borderStyle")] public NSString? BorderStyle();
-    [Selector("setBorderStyle:")] public void SetBorderStyle(NSString? borderStyle);
-    [Selector("borderTop")] public NSString? BorderTop();
-    [Selector("setBorderTop:")] public void SetBorderTop(NSString? borderTop);
-    [Selector("borderRight")] public NSString? BorderRight();
-    [Selector("setBorderRight:")] public void SetBorderRight(NSString? borderRight);
-    [Selector("borderBottom")] public NSString? BorderBottom();
-    [Selector("setBorderBottom:")] public void SetBorderBottom(NSString? borderBottom);
-    [Selector("borderLeft")] public NSString? BorderLeft();
-    [Selector("setBorderLeft:")] public void SetBorderLeft(NSString? borderLeft);
-    [Selector("borderTopColor")] public NSString? BorderTopColor();
-    [Selector("setBorderTopColor:")] public void SetBorderTopColor(NSString? borderTopColor);
-    [Selector("borderRightColor")] public NSString? BorderRightColor();
-    [Selector("setBorderRightColor:")] public void SetBorderRightColor(NSString? borderRightColor);
-    [Selector("borderBottomColor")] public NSString? BorderBottomColor();
-    [Selector("setBorderBottomColor:")] public void SetBorderBottomColor(NSString? borderBottomColor);
-    [Selector("borderLeftColor")] public NSString? BorderLeftColor();
-    [Selector("setBorderLeftColor:")] public void SetBorderLeftColor(NSString? borderLeftColor);
-    [Selector("borderTopStyle")] public NSString? BorderTopStyle();
-    [Selector("setBorderTopStyle:")] public void SetBorderTopStyle(NSString? borderTopStyle);
-    [Selector("borderRightStyle")] public NSString? BorderRightStyle();
-    [Selector("setBorderRightStyle:")] public void SetBorderRightStyle(NSString? borderRightStyle);
-    [Selector("borderBottomStyle")] public NSString? BorderBottomStyle();
-    [Selector("setBorderBottomStyle:")] public void SetBorderBottomStyle(NSString? borderBottomStyle);
-    [Selector("borderLeftStyle")] public NSString? BorderLeftStyle();
-    [Selector("setBorderLeftStyle:")] public void SetBorderLeftStyle(NSString? borderLeftStyle);
-    [Selector("borderTopWidth")] public NSString? BorderTopWidth();
-    [Selector("setBorderTopWidth:")] public void SetBorderTopWidth(NSString? borderTopWidth);
-    [Selector("borderRightWidth")] public NSString? BorderRightWidth();
-    [Selector("setBorderRightWidth:")] public void SetBorderRightWidth(NSString? borderRightWidth);
-    [Selector("borderBottomWidth")] public NSString? BorderBottomWidth();
-    [Selector("setBorderBottomWidth:")] public void SetBorderBottomWidth(NSString? borderBottomWidth);
-    [Selector("borderLeftWidth")] public NSString? BorderLeftWidth();
-    [Selector("setBorderLeftWidth:")] public void SetBorderLeftWidth(NSString? borderLeftWidth);
-    [Selector("borderWidth")] public NSString? BorderWidth();
-    [Selector("setBorderWidth:")] public void SetBorderWidth(NSString? borderWidth);
-    [Selector("bottom")] public NSString? Bottom();
-    [Selector("setBottom:")] public void SetBottom(NSString? bottom);
-    [Selector("captionSide")] public NSString? CaptionSide();
-    [Selector("setCaptionSide:")] public void SetCaptionSide(NSString? captionSide);
-    [Selector("clear")] public NSString? Clear();
-    [Selector("setClear:")] public void SetClear(NSString? clear);
-    [Selector("clip")] public NSString? Clip();
-    [Selector("setClip:")] public void SetClip(NSString? clip);
-    [Selector("color")] public NSString? Color();
-    [Selector("setColor:")] public void SetColor(NSString? color);
-    [Selector("content")] public NSString? Content();
-    [Selector("setContent:")] public void SetContent(NSString? content);
-    [Selector("counterIncrement")] public NSString? CounterIncrement();
-    [Selector("setCounterIncrement:")] public void SetCounterIncrement(NSString? counterIncrement);
-    [Selector("counterReset")] public NSString? CounterReset();
-    [Selector("setCounterReset:")] public void SetCounterReset(NSString? counterReset);
-    [Selector("cue")] public NSString? Cue();
-    [Selector("setCue:")] public void SetCue(NSString? cue);
-    [Selector("cueAfter")] public NSString? CueAfter();
-    [Selector("setCueAfter:")] public void SetCueAfter(NSString? cueAfter);
-    [Selector("cueBefore")] public NSString? CueBefore();
-    [Selector("setCueBefore:")] public void SetCueBefore(NSString? cueBefore);
-    [Selector("cursor")] public NSString? Cursor();
-    [Selector("setCursor:")] public void SetCursor(NSString? cursor);
-    [Selector("direction")] public NSString? Direction();
-    [Selector("setDirection:")] public void SetDirection(NSString? direction);
-    [Selector("display")] public NSString? Display();
-    [Selector("setDisplay:")] public void SetDisplay(NSString? display);
-    [Selector("elevation")] public NSString? Elevation();
-    [Selector("setElevation:")] public void SetElevation(NSString? elevation);
-    [Selector("emptyCells")] public NSString? EmptyCells();
-    [Selector("setEmptyCells:")] public void SetEmptyCells(NSString? emptyCells);
-    [Selector("cssFloat")] public NSString? CssFloat();
-    [Selector("setCssFloat:")] public void SetCssFloat(NSString? cssFloat);
-    [Selector("font")] public NSString? Font();
-    [Selector("setFont:")] public void SetFont(NSString? font);
-    [Selector("fontFamily")] public NSString? FontFamily();
-    [Selector("setFontFamily:")] public void SetFontFamily(NSString? fontFamily);
-    [Selector("fontSize")] public NSString? FontSize();
-    [Selector("setFontSize:")] public void SetFontSize(NSString? fontSize);
-    [Selector("fontSizeAdjust")] public NSString? FontSizeAdjust();
-    [Selector("setFontSizeAdjust:")] public void SetFontSizeAdjust(NSString? fontSizeAdjust);
-    [Selector("fontStretch")] public NSString? FontStretch();
-    [Selector("setFontStretch:")] public void SetFontStretch(NSString? fontStretch);
-    [Selector("fontStyle")] public NSString? FontStyle();
-    [Selector("setFontStyle:")] public void SetFontStyle(NSString? fontStyle);
-    [Selector("fontVariant")] public NSString? FontVariant();
-    [Selector("setFontVariant:")] public void SetFontVariant(NSString? fontVariant);
-    [Selector("fontWeight")] public NSString? FontWeight();
-    [Selector("setFontWeight:")] public void SetFontWeight(NSString? fontWeight);
-    [Selector("height")] public NSString? Height();
-    [Selector("setHeight:")] public void SetHeight(NSString? height);
-    [Selector("left")] public NSString? Left();
-    [Selector("setLeft:")] public void SetLeft(NSString? left);
-    [Selector("letterSpacing")] public NSString? LetterSpacing();
-    [Selector("setLetterSpacing:")] public void SetLetterSpacing(NSString? letterSpacing);
-    [Selector("lineHeight")] public NSString? LineHeight();
-    [Selector("setLineHeight:")] public void SetLineHeight(NSString? lineHeight);
-    [Selector("listStyle")] public NSString? ListStyle();
-    [Selector("setListStyle:")] public void SetListStyle(NSString? listStyle);
-    [Selector("listStyleImage")] public NSString? ListStyleImage();
-    [Selector("setListStyleImage:")] public void SetListStyleImage(NSString? listStyleImage);
-    [Selector("listStylePosition")] public NSString? ListStylePosition();
-    [Selector("setListStylePosition:")] public void SetListStylePosition(NSString? listStylePosition);
-    [Selector("listStyleType")] public NSString? ListStyleType();
-    [Selector("setListStyleType:")] public void SetListStyleType(NSString? listStyleType);
-    [Selector("margin")] public NSString? Margin();
-    [Selector("setMargin:")] public void SetMargin(NSString? margin);
-    [Selector("marginTop")] public NSString? MarginTop();
-    [Selector("setMarginTop:")] public void SetMarginTop(NSString? marginTop);
-    [Selector("marginRight")] public NSString? MarginRight();
-    [Selector("setMarginRight:")] public void SetMarginRight(NSString? marginRight);
-    [Selector("marginBottom")] public NSString? MarginBottom();
-    [Selector("setMarginBottom:")] public void SetMarginBottom(NSString? marginBottom);
-    [Selector("marginLeft")] public NSString? MarginLeft();
-    [Selector("setMarginLeft:")] public void SetMarginLeft(NSString? marginLeft);
-    [Selector("markerOffset")] public NSString? MarkerOffset();
-    [Selector("setMarkerOffset:")] public void SetMarkerOffset(NSString? markerOffset);
-    [Selector("marks")] public NSString? Marks();
-    [Selector("setMarks:")] public void SetMarks(NSString? marks);
-    [Selector("maxHeight")] public NSString? MaxHeight();
-    [Selector("setMaxHeight:")] public void SetMaxHeight(NSString? maxHeight);
-    [Selector("maxWidth")] public NSString? MaxWidth();
-    [Selector("setMaxWidth:")] public void SetMaxWidth(NSString? maxWidth);
-    [Selector("minHeight")] public NSString? MinHeight();
-    [Selector("setMinHeight:")] public void SetMinHeight(NSString? minHeight);
-    [Selector("minWidth")] public NSString? MinWidth();
-    [Selector("setMinWidth:")] public void SetMinWidth(NSString? minWidth);
-    [Selector("orphans")] public NSString? Orphans();
-    [Selector("setOrphans:")] public void SetOrphans(NSString? orphans);
-    [Selector("outline")] public NSString? Outline();
-    [Selector("setOutline:")] public void SetOutline(NSString? outline);
-    [Selector("outlineColor")] public NSString? OutlineColor();
-    [Selector("setOutlineColor:")] public void SetOutlineColor(NSString? outlineColor);
-    [Selector("outlineStyle")] public NSString? OutlineStyle();
-    [Selector("setOutlineStyle:")] public void SetOutlineStyle(NSString? outlineStyle);
-    [Selector("outlineWidth")] public NSString? OutlineWidth();
-    [Selector("setOutlineWidth:")] public void SetOutlineWidth(NSString? outlineWidth);
-    [Selector("overflow")] public NSString? Overflow();
-    [Selector("setOverflow:")] public void SetOverflow(NSString? overflow);
-    [Selector("padding")] public NSString? Padding();
-    [Selector("setPadding:")] public void SetPadding(NSString? padding);
-    [Selector("paddingTop")] public NSString? PaddingTop();
-    [Selector("setPaddingTop:")] public void SetPaddingTop(NSString? paddingTop);
-    [Selector("paddingRight")] public NSString? PaddingRight();
-    [Selector("setPaddingRight:")] public void SetPaddingRight(NSString? paddingRight);
-    [Selector("paddingBottom")] public NSString? PaddingBottom();
-    [Selector("setPaddingBottom:")] public void SetPaddingBottom(NSString? paddingBottom);
-    [Selector("paddingLeft")] public NSString? PaddingLeft();
-    [Selector("setPaddingLeft:")] public void SetPaddingLeft(NSString? paddingLeft);
-    [Selector("page")] public NSString? Page();
-    [Selector("setPage:")] public void SetPage(NSString? page);
-    [Selector("pageBreakAfter")] public NSString? PageBreakAfter();
-    [Selector("setPageBreakAfter:")] public void SetPageBreakAfter(NSString? pageBreakAfter);
-    [Selector("pageBreakBefore")] public NSString? PageBreakBefore();
-    [Selector("setPageBreakBefore:")] public void SetPageBreakBefore(NSString? pageBreakBefore);
-    [Selector("pageBreakInside")] public NSString? PageBreakInside();
-    [Selector("setPageBreakInside:")] public void SetPageBreakInside(NSString? pageBreakInside);
-    [Selector("pause")] public NSString? Pause();
-    [Selector("setPause:")] public void SetPause(NSString? pause);
-    [Selector("pauseAfter")] public NSString? PauseAfter();
-    [Selector("setPauseAfter:")] public void SetPauseAfter(NSString? pauseAfter);
-    [Selector("pauseBefore")] public NSString? PauseBefore();
-    [Selector("setPauseBefore:")] public void SetPauseBefore(NSString? pauseBefore);
-    [Selector("pitch")] public NSString? Pitch();
-    [Selector("setPitch:")] public void SetPitch(NSString? pitch);
-    [Selector("pitchRange")] public NSString? PitchRange();
-    [Selector("setPitchRange:")] public void SetPitchRange(NSString? pitchRange);
-    [Selector("playDuring")] public NSString? PlayDuring();
-    [Selector("setPlayDuring:")] public void SetPlayDuring(NSString? playDuring);
-    [Selector("position")] public NSString? Position();
-    [Selector("setPosition:")] public void SetPosition(NSString? position);
-    [Selector("quotes")] public NSString? Quotes();
-    [Selector("setQuotes:")] public void SetQuotes(NSString? quotes);
-    [Selector("richness")] public NSString? Richness();
-    [Selector("setRichness:")] public void SetRichness(NSString? richness);
-    [Selector("right")] public NSString? Right();
-    [Selector("setRight:")] public void SetRight(NSString? right);
-    [Selector("size")] public NSString? Size();
-    [Selector("setSize:")] public void SetSize(NSString? size);
-    [Selector("speak")] public NSString? Speak();
-    [Selector("setSpeak:")] public void SetSpeak(NSString? speak);
-    [Selector("speakHeader")] public NSString? SpeakHeader();
-    [Selector("setSpeakHeader:")] public void SetSpeakHeader(NSString? speakHeader);
-    [Selector("speakNumeral")] public NSString? SpeakNumeral();
-    [Selector("setSpeakNumeral:")] public void SetSpeakNumeral(NSString? speakNumeral);
-    [Selector("speakPunctuation")] public NSString? SpeakPunctuation();
-    [Selector("setSpeakPunctuation:")] public void SetSpeakPunctuation(NSString? speakPunctuation);
-    [Selector("speechRate")] public NSString? SpeechRate();
-    [Selector("setSpeechRate:")] public void SetSpeechRate(NSString? speechRate);
-    [Selector("stress")] public NSString? Stress();
-    [Selector("setStress:")] public void SetStress(NSString? stress);
-    [Selector("tableLayout")] public NSString? TableLayout();
-    [Selector("setTableLayout:")] public void SetTableLayout(NSString? tableLayout);
-    [Selector("textAlign")] public NSString? TextAlign();
-    [Selector("setTextAlign:")] public void SetTextAlign(NSString? textAlign);
-    [Selector("textDecoration")] public NSString? TextDecoration();
-    [Selector("setTextDecoration:")] public void SetTextDecoration(NSString? textDecoration);
-    [Selector("textIndent")] public NSString? TextIndent();
-    [Selector("setTextIndent:")] public void SetTextIndent(NSString? textIndent);
-    [Selector("textShadow")] public NSString? TextShadow();
-    [Selector("setTextShadow:")] public void SetTextShadow(NSString? textShadow);
-    [Selector("textTransform")] public NSString? TextTransform();
-    [Selector("setTextTransform:")] public void SetTextTransform(NSString? textTransform);
-    [Selector("top")] public NSString? Top();
-    [Selector("setTop:")] public void SetTop(NSString? top);
-    [Selector("unicodeBidi")] public NSString? UnicodeBidi();
-    [Selector("setUnicodeBidi:")] public void SetUnicodeBidi(NSString? unicodeBidi);
-    [Selector("verticalAlign")] public NSString? VerticalAlign();
-    [Selector("setVerticalAlign:")] public void SetVerticalAlign(NSString? verticalAlign);
-    [Selector("visibility")] public NSString? Visibility();
-    [Selector("setVisibility:")] public void SetVisibility(NSString? visibility);
-    [Selector("voiceFamily")] public NSString? VoiceFamily();
-    [Selector("setVoiceFamily:")] public void SetVoiceFamily(NSString? voiceFamily);
-    [Selector("volume")] public NSString? Volume();
-    [Selector("setVolume:")] public void SetVolume(NSString? volume);
-    [Selector("whiteSpace")] public NSString? WhiteSpace();
-    [Selector("setWhiteSpace:")] public void SetWhiteSpace(NSString? whiteSpace);
-    [Selector("widows")] public NSString? Widows();
-    [Selector("setWidows:")] public void SetWidows(NSString? widows);
-    [Selector("width")] public NSString? Width();
-    [Selector("setWidth:")] public void SetWidth(NSString? width);
-    [Selector("wordSpacing")] public NSString? WordSpacing();
-    [Selector("setWordSpacing:")] public void SetWordSpacing(NSString? wordSpacing);
-    [Selector("zIndex")] public NSString? ZIndex();
-    [Selector("setZIndex:")] public void SetZIndex(NSString? zIndex);
+    [Selector("azimuth")]
+    public NSString? Azimuth();
+    [Selector("setAzimuth:")]
+    public void SetAzimuth(NSString? azimuth);
+    [Selector("background")]
+    public NSString? Background();
+    [Selector("setBackground:")]
+    public void SetBackground(NSString? background);
+    [Selector("backgroundAttachment")]
+    public NSString? BackgroundAttachment();
+    [Selector("setBackgroundAttachment:")]
+    public void SetBackgroundAttachment(NSString? backgroundAttachment);
+    [Selector("backgroundColor")]
+    public NSString? BackgroundColor();
+    [Selector("setBackgroundColor:")]
+    public void SetBackgroundColor(NSString? backgroundColor);
+    [Selector("backgroundImage")]
+    public NSString? BackgroundImage();
+    [Selector("setBackgroundImage:")]
+    public void SetBackgroundImage(NSString? backgroundImage);
+    [Selector("backgroundPosition")]
+    public NSString? BackgroundPosition();
+    [Selector("setBackgroundPosition:")]
+    public void SetBackgroundPosition(NSString? backgroundPosition);
+    [Selector("backgroundRepeat")]
+    public NSString? BackgroundRepeat();
+    [Selector("setBackgroundRepeat:")]
+    public void SetBackgroundRepeat(NSString? backgroundRepeat);
+    [Selector("border")]
+    public NSString? Border();
+    [Selector("setBorder:")]
+    public void SetBorder(NSString? border);
+    [Selector("borderCollapse")]
+    public NSString? BorderCollapse();
+    [Selector("setBorderCollapse:")]
+    public void SetBorderCollapse(NSString? borderCollapse);
+    [Selector("borderColor")]
+    public NSString? BorderColor();
+    [Selector("setBorderColor:")]
+    public void SetBorderColor(NSString? borderColor);
+    [Selector("borderSpacing")]
+    public NSString? BorderSpacing();
+    [Selector("setBorderSpacing:")]
+    public void SetBorderSpacing(NSString? borderSpacing);
+    [Selector("borderStyle")]
+    public NSString? BorderStyle();
+    [Selector("setBorderStyle:")]
+    public void SetBorderStyle(NSString? borderStyle);
+    [Selector("borderTop")]
+    public NSString? BorderTop();
+    [Selector("setBorderTop:")]
+    public void SetBorderTop(NSString? borderTop);
+    [Selector("borderRight")]
+    public NSString? BorderRight();
+    [Selector("setBorderRight:")]
+    public void SetBorderRight(NSString? borderRight);
+    [Selector("borderBottom")]
+    public NSString? BorderBottom();
+    [Selector("setBorderBottom:")]
+    public void SetBorderBottom(NSString? borderBottom);
+    [Selector("borderLeft")]
+    public NSString? BorderLeft();
+    [Selector("setBorderLeft:")]
+    public void SetBorderLeft(NSString? borderLeft);
+    [Selector("borderTopColor")]
+    public NSString? BorderTopColor();
+    [Selector("setBorderTopColor:")]
+    public void SetBorderTopColor(NSString? borderTopColor);
+    [Selector("borderRightColor")]
+    public NSString? BorderRightColor();
+    [Selector("setBorderRightColor:")]
+    public void SetBorderRightColor(NSString? borderRightColor);
+    [Selector("borderBottomColor")]
+    public NSString? BorderBottomColor();
+    [Selector("setBorderBottomColor:")]
+    public void SetBorderBottomColor(NSString? borderBottomColor);
+    [Selector("borderLeftColor")]
+    public NSString? BorderLeftColor();
+    [Selector("setBorderLeftColor:")]
+    public void SetBorderLeftColor(NSString? borderLeftColor);
+    [Selector("borderTopStyle")]
+    public NSString? BorderTopStyle();
+    [Selector("setBorderTopStyle:")]
+    public void SetBorderTopStyle(NSString? borderTopStyle);
+    [Selector("borderRightStyle")]
+    public NSString? BorderRightStyle();
+    [Selector("setBorderRightStyle:")]
+    public void SetBorderRightStyle(NSString? borderRightStyle);
+    [Selector("borderBottomStyle")]
+    public NSString? BorderBottomStyle();
+    [Selector("setBorderBottomStyle:")]
+    public void SetBorderBottomStyle(NSString? borderBottomStyle);
+    [Selector("borderLeftStyle")]
+    public NSString? BorderLeftStyle();
+    [Selector("setBorderLeftStyle:")]
+    public void SetBorderLeftStyle(NSString? borderLeftStyle);
+    [Selector("borderTopWidth")]
+    public NSString? BorderTopWidth();
+    [Selector("setBorderTopWidth:")]
+    public void SetBorderTopWidth(NSString? borderTopWidth);
+    [Selector("borderRightWidth")]
+    public NSString? BorderRightWidth();
+    [Selector("setBorderRightWidth:")]
+    public void SetBorderRightWidth(NSString? borderRightWidth);
+    [Selector("borderBottomWidth")]
+    public NSString? BorderBottomWidth();
+    [Selector("setBorderBottomWidth:")]
+    public void SetBorderBottomWidth(NSString? borderBottomWidth);
+    [Selector("borderLeftWidth")]
+    public NSString? BorderLeftWidth();
+    [Selector("setBorderLeftWidth:")]
+    public void SetBorderLeftWidth(NSString? borderLeftWidth);
+    [Selector("borderWidth")]
+    public NSString? BorderWidth();
+    [Selector("setBorderWidth:")]
+    public void SetBorderWidth(NSString? borderWidth);
+    [Selector("bottom")]
+    public NSString? Bottom();
+    [Selector("setBottom:")]
+    public void SetBottom(NSString? bottom);
+    [Selector("captionSide")]
+    public NSString? CaptionSide();
+    [Selector("setCaptionSide:")]
+    public void SetCaptionSide(NSString? captionSide);
+    [Selector("clear")]
+    public NSString? Clear();
+    [Selector("setClear:")]
+    public void SetClear(NSString? clear);
+    [Selector("clip")]
+    public NSString? Clip();
+    [Selector("setClip:")]
+    public void SetClip(NSString? clip);
+    [Selector("color")]
+    public NSString? Color();
+    [Selector("setColor:")]
+    public void SetColor(NSString? color);
+    [Selector("content")]
+    public NSString? Content();
+    [Selector("setContent:")]
+    public void SetContent(NSString? content);
+    [Selector("counterIncrement")]
+    public NSString? CounterIncrement();
+    [Selector("setCounterIncrement:")]
+    public void SetCounterIncrement(NSString? counterIncrement);
+    [Selector("counterReset")]
+    public NSString? CounterReset();
+    [Selector("setCounterReset:")]
+    public void SetCounterReset(NSString? counterReset);
+    [Selector("cue")]
+    public NSString? Cue();
+    [Selector("setCue:")]
+    public void SetCue(NSString? cue);
+    [Selector("cueAfter")]
+    public NSString? CueAfter();
+    [Selector("setCueAfter:")]
+    public void SetCueAfter(NSString? cueAfter);
+    [Selector("cueBefore")]
+    public NSString? CueBefore();
+    [Selector("setCueBefore:")]
+    public void SetCueBefore(NSString? cueBefore);
+    [Selector("cursor")]
+    public NSString? Cursor();
+    [Selector("setCursor:")]
+    public void SetCursor(NSString? cursor);
+    [Selector("direction")]
+    public NSString? Direction();
+    [Selector("setDirection:")]
+    public void SetDirection(NSString? direction);
+    [Selector("display")]
+    public NSString? Display();
+    [Selector("setDisplay:")]
+    public void SetDisplay(NSString? display);
+    [Selector("elevation")]
+    public NSString? Elevation();
+    [Selector("setElevation:")]
+    public void SetElevation(NSString? elevation);
+    [Selector("emptyCells")]
+    public NSString? EmptyCells();
+    [Selector("setEmptyCells:")]
+    public void SetEmptyCells(NSString? emptyCells);
+    [Selector("cssFloat")]
+    public NSString? CssFloat();
+    [Selector("setCssFloat:")]
+    public void SetCssFloat(NSString? cssFloat);
+    [Selector("font")]
+    public NSString? Font();
+    [Selector("setFont:")]
+    public void SetFont(NSString? font);
+    [Selector("fontFamily")]
+    public NSString? FontFamily();
+    [Selector("setFontFamily:")]
+    public void SetFontFamily(NSString? fontFamily);
+    [Selector("fontSize")]
+    public NSString? FontSize();
+    [Selector("setFontSize:")]
+    public void SetFontSize(NSString? fontSize);
+    [Selector("fontSizeAdjust")]
+    public NSString? FontSizeAdjust();
+    [Selector("setFontSizeAdjust:")]
+    public void SetFontSizeAdjust(NSString? fontSizeAdjust);
+    [Selector("fontStretch")]
+    public NSString? FontStretch();
+    [Selector("setFontStretch:")]
+    public void SetFontStretch(NSString? fontStretch);
+    [Selector("fontStyle")]
+    public NSString? FontStyle();
+    [Selector("setFontStyle:")]
+    public void SetFontStyle(NSString? fontStyle);
+    [Selector("fontVariant")]
+    public NSString? FontVariant();
+    [Selector("setFontVariant:")]
+    public void SetFontVariant(NSString? fontVariant);
+    [Selector("fontWeight")]
+    public NSString? FontWeight();
+    [Selector("setFontWeight:")]
+    public void SetFontWeight(NSString? fontWeight);
+    [Selector("height")]
+    public NSString? Height();
+    [Selector("setHeight:")]
+    public void SetHeight(NSString? height);
+    [Selector("left")]
+    public NSString? Left();
+    [Selector("setLeft:")]
+    public void SetLeft(NSString? left);
+    [Selector("letterSpacing")]
+    public NSString? LetterSpacing();
+    [Selector("setLetterSpacing:")]
+    public void SetLetterSpacing(NSString? letterSpacing);
+    [Selector("lineHeight")]
+    public NSString? LineHeight();
+    [Selector("setLineHeight:")]
+    public void SetLineHeight(NSString? lineHeight);
+    [Selector("listStyle")]
+    public NSString? ListStyle();
+    [Selector("setListStyle:")]
+    public void SetListStyle(NSString? listStyle);
+    [Selector("listStyleImage")]
+    public NSString? ListStyleImage();
+    [Selector("setListStyleImage:")]
+    public void SetListStyleImage(NSString? listStyleImage);
+    [Selector("listStylePosition")]
+    public NSString? ListStylePosition();
+    [Selector("setListStylePosition:")]
+    public void SetListStylePosition(NSString? listStylePosition);
+    [Selector("listStyleType")]
+    public NSString? ListStyleType();
+    [Selector("setListStyleType:")]
+    public void SetListStyleType(NSString? listStyleType);
+    [Selector("margin")]
+    public NSString? Margin();
+    [Selector("setMargin:")]
+    public void SetMargin(NSString? margin);
+    [Selector("marginTop")]
+    public NSString? MarginTop();
+    [Selector("setMarginTop:")]
+    public void SetMarginTop(NSString? marginTop);
+    [Selector("marginRight")]
+    public NSString? MarginRight();
+    [Selector("setMarginRight:")]
+    public void SetMarginRight(NSString? marginRight);
+    [Selector("marginBottom")]
+    public NSString? MarginBottom();
+    [Selector("setMarginBottom:")]
+    public void SetMarginBottom(NSString? marginBottom);
+    [Selector("marginLeft")]
+    public NSString? MarginLeft();
+    [Selector("setMarginLeft:")]
+    public void SetMarginLeft(NSString? marginLeft);
+    [Selector("markerOffset")]
+    public NSString? MarkerOffset();
+    [Selector("setMarkerOffset:")]
+    public void SetMarkerOffset(NSString? markerOffset);
+    [Selector("marks")]
+    public NSString? Marks();
+    [Selector("setMarks:")]
+    public void SetMarks(NSString? marks);
+    [Selector("maxHeight")]
+    public NSString? MaxHeight();
+    [Selector("setMaxHeight:")]
+    public void SetMaxHeight(NSString? maxHeight);
+    [Selector("maxWidth")]
+    public NSString? MaxWidth();
+    [Selector("setMaxWidth:")]
+    public void SetMaxWidth(NSString? maxWidth);
+    [Selector("minHeight")]
+    public NSString? MinHeight();
+    [Selector("setMinHeight:")]
+    public void SetMinHeight(NSString? minHeight);
+    [Selector("minWidth")]
+    public NSString? MinWidth();
+    [Selector("setMinWidth:")]
+    public void SetMinWidth(NSString? minWidth);
+    [Selector("orphans")]
+    public NSString? Orphans();
+    [Selector("setOrphans:")]
+    public void SetOrphans(NSString? orphans);
+    [Selector("outline")]
+    public NSString? Outline();
+    [Selector("setOutline:")]
+    public void SetOutline(NSString? outline);
+    [Selector("outlineColor")]
+    public NSString? OutlineColor();
+    [Selector("setOutlineColor:")]
+    public void SetOutlineColor(NSString? outlineColor);
+    [Selector("outlineStyle")]
+    public NSString? OutlineStyle();
+    [Selector("setOutlineStyle:")]
+    public void SetOutlineStyle(NSString? outlineStyle);
+    [Selector("outlineWidth")]
+    public NSString? OutlineWidth();
+    [Selector("setOutlineWidth:")]
+    public void SetOutlineWidth(NSString? outlineWidth);
+    [Selector("overflow")]
+    public NSString? Overflow();
+    [Selector("setOverflow:")]
+    public void SetOverflow(NSString? overflow);
+    [Selector("padding")]
+    public NSString? Padding();
+    [Selector("setPadding:")]
+    public void SetPadding(NSString? padding);
+    [Selector("paddingTop")]
+    public NSString? PaddingTop();
+    [Selector("setPaddingTop:")]
+    public void SetPaddingTop(NSString? paddingTop);
+    [Selector("paddingRight")]
+    public NSString? PaddingRight();
+    [Selector("setPaddingRight:")]
+    public void SetPaddingRight(NSString? paddingRight);
+    [Selector("paddingBottom")]
+    public NSString? PaddingBottom();
+    [Selector("setPaddingBottom:")]
+    public void SetPaddingBottom(NSString? paddingBottom);
+    [Selector("paddingLeft")]
+    public NSString? PaddingLeft();
+    [Selector("setPaddingLeft:")]
+    public void SetPaddingLeft(NSString? paddingLeft);
+    [Selector("page")]
+    public NSString? Page();
+    [Selector("setPage:")]
+    public void SetPage(NSString? page);
+    [Selector("pageBreakAfter")]
+    public NSString? PageBreakAfter();
+    [Selector("setPageBreakAfter:")]
+    public void SetPageBreakAfter(NSString? pageBreakAfter);
+    [Selector("pageBreakBefore")]
+    public NSString? PageBreakBefore();
+    [Selector("setPageBreakBefore:")]
+    public void SetPageBreakBefore(NSString? pageBreakBefore);
+    [Selector("pageBreakInside")]
+    public NSString? PageBreakInside();
+    [Selector("setPageBreakInside:")]
+    public void SetPageBreakInside(NSString? pageBreakInside);
+    [Selector("pause")]
+    public NSString? Pause();
+    [Selector("setPause:")]
+    public void SetPause(NSString? pause);
+    [Selector("pauseAfter")]
+    public NSString? PauseAfter();
+    [Selector("setPauseAfter:")]
+    public void SetPauseAfter(NSString? pauseAfter);
+    [Selector("pauseBefore")]
+    public NSString? PauseBefore();
+    [Selector("setPauseBefore:")]
+    public void SetPauseBefore(NSString? pauseBefore);
+    [Selector("pitch")]
+    public NSString? Pitch();
+    [Selector("setPitch:")]
+    public void SetPitch(NSString? pitch);
+    [Selector("pitchRange")]
+    public NSString? PitchRange();
+    [Selector("setPitchRange:")]
+    public void SetPitchRange(NSString? pitchRange);
+    [Selector("playDuring")]
+    public NSString? PlayDuring();
+    [Selector("setPlayDuring:")]
+    public void SetPlayDuring(NSString? playDuring);
+    [Selector("position")]
+    public NSString? Position();
+    [Selector("setPosition:")]
+    public void SetPosition(NSString? position);
+    [Selector("quotes")]
+    public NSString? Quotes();
+    [Selector("setQuotes:")]
+    public void SetQuotes(NSString? quotes);
+    [Selector("richness")]
+    public NSString? Richness();
+    [Selector("setRichness:")]
+    public void SetRichness(NSString? richness);
+    [Selector("right")]
+    public NSString? Right();
+    [Selector("setRight:")]
+    public void SetRight(NSString? right);
+    [Selector("size")]
+    public NSString? Size();
+    [Selector("setSize:")]
+    public void SetSize(NSString? size);
+    [Selector("speak")]
+    public NSString? Speak();
+    [Selector("setSpeak:")]
+    public void SetSpeak(NSString? speak);
+    [Selector("speakHeader")]
+    public NSString? SpeakHeader();
+    [Selector("setSpeakHeader:")]
+    public void SetSpeakHeader(NSString? speakHeader);
+    [Selector("speakNumeral")]
+    public NSString? SpeakNumeral();
+    [Selector("setSpeakNumeral:")]
+    public void SetSpeakNumeral(NSString? speakNumeral);
+    [Selector("speakPunctuation")]
+    public NSString? SpeakPunctuation();
+    [Selector("setSpeakPunctuation:")]
+    public void SetSpeakPunctuation(NSString? speakPunctuation);
+    [Selector("speechRate")]
+    public NSString? SpeechRate();
+    [Selector("setSpeechRate:")]
+    public void SetSpeechRate(NSString? speechRate);
+    [Selector("stress")]
+    public NSString? Stress();
+    [Selector("setStress:")]
+    public void SetStress(NSString? stress);
+    [Selector("tableLayout")]
+    public NSString? TableLayout();
+    [Selector("setTableLayout:")]
+    public void SetTableLayout(NSString? tableLayout);
+    [Selector("textAlign")]
+    public NSString? TextAlign();
+    [Selector("setTextAlign:")]
+    public void SetTextAlign(NSString? textAlign);
+    [Selector("textDecoration")]
+    public NSString? TextDecoration();
+    [Selector("setTextDecoration:")]
+    public void SetTextDecoration(NSString? textDecoration);
+    [Selector("textIndent")]
+    public NSString? TextIndent();
+    [Selector("setTextIndent:")]
+    public void SetTextIndent(NSString? textIndent);
+    [Selector("textShadow")]
+    public NSString? TextShadow();
+    [Selector("setTextShadow:")]
+    public void SetTextShadow(NSString? textShadow);
+    [Selector("textTransform")]
+    public NSString? TextTransform();
+    [Selector("setTextTransform:")]
+    public void SetTextTransform(NSString? textTransform);
+    [Selector("top")]
+    public NSString? Top();
+    [Selector("setTop:")]
+    public void SetTop(NSString? top);
+    [Selector("unicodeBidi")]
+    public NSString? UnicodeBidi();
+    [Selector("setUnicodeBidi:")]
+    public void SetUnicodeBidi(NSString? unicodeBidi);
+    [Selector("verticalAlign")]
+    public NSString? VerticalAlign();
+    [Selector("setVerticalAlign:")]
+    public void SetVerticalAlign(NSString? verticalAlign);
+    [Selector("visibility")]
+    public NSString? Visibility();
+    [Selector("setVisibility:")]
+    public void SetVisibility(NSString? visibility);
+    [Selector("voiceFamily")]
+    public NSString? VoiceFamily();
+    [Selector("setVoiceFamily:")]
+    public void SetVoiceFamily(NSString? voiceFamily);
+    [Selector("volume")]
+    public NSString? Volume();
+    [Selector("setVolume:")]
+    public void SetVolume(NSString? volume);
+    [Selector("whiteSpace")]
+    public NSString? WhiteSpace();
+    [Selector("setWhiteSpace:")]
+    public void SetWhiteSpace(NSString? whiteSpace);
+    [Selector("widows")]
+    public NSString? Widows();
+    [Selector("setWidows:")]
+    public void SetWidows(NSString? widows);
+    [Selector("width")]
+    public NSString? Width();
+    [Selector("setWidth:")]
+    public void SetWidth(NSString? width);
+    [Selector("wordSpacing")]
+    public NSString? WordSpacing();
+    [Selector("setWordSpacing:")]
+    public void SetWordSpacing(NSString? wordSpacing);
+    [Selector("zIndex")]
+    public NSString? ZIndex();
+    [Selector("setZIndex:")]
+    public void SetZIndex(NSString? zIndex);
 }
 
 #endif

@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class UNNotificationAttachment : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("type")] public NSString Type { get; }
-    [Selector("attachmentWithIdentifier:URL:options:error:")] public static Self? AttachmentWithIdentifierURLOptionsError(NSString identifier, NSURL URL, NSDictionary? options, out NSError? error);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("type")]
+    public NSString Type { get; }
+    [Selector("attachmentWithIdentifier:URL:options:error:")]
+    public static Self? AttachmentWithIdentifierURLOptionsError(NSString identifier, NSURL URL, NSDictionary? options, out NSError? error);
 }
 
 public extern "C" NSString? UNNotificationAttachmentOptionsTypeHintKey;

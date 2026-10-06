@@ -41,77 +41,132 @@ public enum MPSNNRegularizationType : ulong
 
 public extern objc class MPSNNOptimizerDescriptor : NSObject
 {
-    [Selector("learningRate", "setLearningRate:")] public float LearningRate { get; set; }
-    [Selector("gradientRescale", "setGradientRescale:")] public float GradientRescale { get; set; }
-    [Selector("applyGradientClipping", "setApplyGradientClipping:")] public bool ApplyGradientClipping { get; set; }
-    [Selector("gradientClipMax", "setGradientClipMax:")] public float GradientClipMax { get; set; }
-    [Selector("gradientClipMin", "setGradientClipMin:")] public float GradientClipMin { get; set; }
-    [Selector("regularizationScale", "setRegularizationScale:")] public float RegularizationScale { get; set; }
-    [Selector("regularizationType", "setRegularizationType:")] public MPSNNRegularizationType RegularizationType { get; set; }
-    [Selector("initWithLearningRate:gradientRescale:regularizationType:regularizationScale:")] public Self InitWithLearningRateGradientRescaleRegularizationTypeRegularizationScale(float learningRate, float gradientRescale, MPSNNRegularizationType regularizationType, float regularizationScale);
-    [Selector("initWithLearningRate:gradientRescale:applyGradientClipping:gradientClipMax:gradientClipMin:regularizationType:regularizationScale:")] public Self InitWithLearningRateGradientRescaleApplyGradientClippingGradientClipMaxGradientClipMinRegularizationTypeRegularizationScale(float learningRate, float gradientRescale, bool applyGradientClipping, float gradientClipMax, float gradientClipMin, MPSNNRegularizationType regularizationType, float regularizationScale);
-    [Selector("optimizerDescriptorWithLearningRate:gradientRescale:regularizationType:regularizationScale:")] public static Self OptimizerDescriptorWithLearningRateGradientRescaleRegularizationTypeRegularizationScale(float learningRate, float gradientRescale, MPSNNRegularizationType regularizationType, float regularizationScale);
-    [Selector("optimizerDescriptorWithLearningRate:gradientRescale:applyGradientClipping:gradientClipMax:gradientClipMin:regularizationType:regularizationScale:")] public static Self OptimizerDescriptorWithLearningRateGradientRescaleApplyGradientClippingGradientClipMaxGradientClipMinRegularizationTypeRegularizationScale(float learningRate, float gradientRescale, bool applyGradientClipping, float gradientClipMax, float gradientClipMin, MPSNNRegularizationType regularizationType, float regularizationScale);
+    [Selector("learningRate", "setLearningRate:")]
+    public float LearningRate { get; set; }
+    [Selector("gradientRescale", "setGradientRescale:")]
+    public float GradientRescale { get; set; }
+    [Selector("applyGradientClipping", "setApplyGradientClipping:")]
+    public bool ApplyGradientClipping { get; set; }
+    [Selector("gradientClipMax", "setGradientClipMax:")]
+    public float GradientClipMax { get; set; }
+    [Selector("gradientClipMin", "setGradientClipMin:")]
+    public float GradientClipMin { get; set; }
+    [Selector("regularizationScale", "setRegularizationScale:")]
+    public float RegularizationScale { get; set; }
+    [Selector("regularizationType", "setRegularizationType:")]
+    public MPSNNRegularizationType RegularizationType { get; set; }
+    [Selector("initWithLearningRate:gradientRescale:regularizationType:regularizationScale:")]
+    public Self InitWithLearningRateGradientRescaleRegularizationTypeRegularizationScale(float learningRate, float gradientRescale, MPSNNRegularizationType regularizationType, float regularizationScale);
+    [Selector("initWithLearningRate:gradientRescale:applyGradientClipping:gradientClipMax:gradientClipMin:regularizationType:regularizationScale:")]
+    public Self InitWithLearningRateGradientRescaleApplyGradientClippingGradientClipMaxGradientClipMinRegularizationTypeRegularizationScale(float learningRate, float gradientRescale, bool applyGradientClipping, float gradientClipMax, float gradientClipMin, MPSNNRegularizationType regularizationType, float regularizationScale);
+    [Selector("optimizerDescriptorWithLearningRate:gradientRescale:regularizationType:regularizationScale:")]
+    public static Self OptimizerDescriptorWithLearningRateGradientRescaleRegularizationTypeRegularizationScale(float learningRate, float gradientRescale, MPSNNRegularizationType regularizationType, float regularizationScale);
+    [Selector("optimizerDescriptorWithLearningRate:gradientRescale:applyGradientClipping:gradientClipMax:gradientClipMin:regularizationType:regularizationScale:")]
+    public static Self OptimizerDescriptorWithLearningRateGradientRescaleApplyGradientClippingGradientClipMaxGradientClipMinRegularizationTypeRegularizationScale(float learningRate, float gradientRescale, bool applyGradientClipping, float gradientClipMax, float gradientClipMin, MPSNNRegularizationType regularizationType, float regularizationScale);
 }
 
 public extern objc class MPSNNOptimizer : MPSKernel
 {
-    [Selector("learningRate")] public float LearningRate { get; }
-    [Selector("gradientRescale")] public float GradientRescale { get; }
-    [Selector("applyGradientClipping", "setApplyGradientClipping:")] public bool ApplyGradientClipping { get; set; }
-    [Selector("gradientClipMax")] public float GradientClipMax { get; }
-    [Selector("gradientClipMin")] public float GradientClipMin { get; }
-    [Selector("regularizationScale")] public float RegularizationScale { get; }
-    [Selector("regularizationType")] public MPSNNRegularizationType RegularizationType { get; }
-    [Selector("setLearningRate:")] public void SetLearningRate(float newLearningRate);
+    [Selector("learningRate")]
+    public float LearningRate { get; }
+    [Selector("gradientRescale")]
+    public float GradientRescale { get; }
+    [Selector("applyGradientClipping", "setApplyGradientClipping:")]
+    public bool ApplyGradientClipping { get; set; }
+    [Selector("gradientClipMax")]
+    public float GradientClipMax { get; }
+    [Selector("gradientClipMin")]
+    public float GradientClipMin { get; }
+    [Selector("regularizationScale")]
+    public float RegularizationScale { get; }
+    [Selector("regularizationType")]
+    public MPSNNRegularizationType RegularizationType { get; }
+    [Selector("setLearningRate:")]
+    public void SetLearningRate(float newLearningRate);
 }
 
 public extern objc class MPSNNOptimizerStochasticGradientDescent : MPSNNOptimizer
 {
-    [Selector("momentumScale")] public float MomentumScale { get; }
-    [Selector("useNesterovMomentum")] public bool UseNesterovMomentum { get; }
-    [Selector("useNestrovMomentum")] public bool UseNestrovMomentum { get; }
-    [Selector("initWithDevice:learningRate:")] public Self InitWithDeviceLearningRate(MTLDevice device, float learningRate);
-    [Selector("initWithDevice:momentumScale:useNesterovMomentum:optimizerDescriptor:")] public Self InitWithDeviceMomentumScaleUseNesterovMomentumOptimizerDescriptor(MTLDevice device, float momentumScale, bool useNesterovMomentum, MPSNNOptimizerDescriptor optimizerDescriptor);
-    [Selector("initWithDevice:momentumScale:useNestrovMomentum:optimizerDescriptor:")] public Self InitWithDeviceMomentumScaleUseNestrovMomentumOptimizerDescriptor(MTLDevice device, float momentumScale, bool useNestrovMomentum, MPSNNOptimizerDescriptor optimizerDescriptor);
-    [Selector("encodeToCommandBuffer:inputGradientVector:inputValuesVector:inputMomentumVector:resultValuesVector:")] public void EncodeToCommandBufferInputGradientVectorInputValuesVectorInputMomentumVectorResultValuesVector(MTLCommandBuffer commandBuffer, MPSVector inputGradientVector, MPSVector inputValuesVector, MPSVector? inputMomentumVector, MPSVector resultValuesVector);
-    [Selector("encodeToCommandBuffer:inputGradientMatrix:inputValuesMatrix:inputMomentumMatrix:resultValuesMatrix:")] public void EncodeToCommandBufferInputGradientMatrixInputValuesMatrixInputMomentumMatrixResultValuesMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputGradientMatrix, MPSMatrix inputValuesMatrix, MPSMatrix? inputMomentumMatrix, MPSMatrix resultValuesMatrix);
-    [Selector("encodeToCommandBuffer:convolutionGradientState:convolutionSourceState:inputMomentumVectors:resultState:")] public void EncodeToCommandBufferConvolutionGradientStateConvolutionSourceStateInputMomentumVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionGradientState convolutionGradientState, MPSCNNConvolutionWeightsAndBiasesState convolutionSourceState, NSArray? inputMomentumVectors, MPSCNNConvolutionWeightsAndBiasesState resultState);
-    [Selector("encodeToCommandBuffer:batchNormalizationState:inputMomentumVectors:resultState:")] public void EncodeToCommandBufferBatchNormalizationStateInputMomentumVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationState, NSArray? inputMomentumVectors, MPSCNNNormalizationGammaAndBetaState resultState);
-    [Selector("encodeToCommandBuffer:batchNormalizationGradientState:batchNormalizationSourceState:inputMomentumVectors:resultState:")] public void EncodeToCommandBufferBatchNormalizationGradientStateBatchNormalizationSourceStateInputMomentumVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationGradientState, MPSCNNBatchNormalizationState batchNormalizationSourceState, NSArray? inputMomentumVectors, MPSCNNNormalizationGammaAndBetaState resultState);
+    [Selector("momentumScale")]
+    public float MomentumScale { get; }
+    [Selector("useNesterovMomentum")]
+    public bool UseNesterovMomentum { get; }
+    [Selector("useNestrovMomentum")]
+    public bool UseNestrovMomentum { get; }
+    [Selector("initWithDevice:learningRate:")]
+    public Self InitWithDeviceLearningRate(MTLDevice device, float learningRate);
+    [Selector("initWithDevice:momentumScale:useNesterovMomentum:optimizerDescriptor:")]
+    public Self InitWithDeviceMomentumScaleUseNesterovMomentumOptimizerDescriptor(MTLDevice device, float momentumScale, bool useNesterovMomentum, MPSNNOptimizerDescriptor optimizerDescriptor);
+    [Selector("initWithDevice:momentumScale:useNestrovMomentum:optimizerDescriptor:")]
+    public Self InitWithDeviceMomentumScaleUseNestrovMomentumOptimizerDescriptor(MTLDevice device, float momentumScale, bool useNestrovMomentum, MPSNNOptimizerDescriptor optimizerDescriptor);
+    [Selector("encodeToCommandBuffer:inputGradientVector:inputValuesVector:inputMomentumVector:resultValuesVector:")]
+    public void EncodeToCommandBufferInputGradientVectorInputValuesVectorInputMomentumVectorResultValuesVector(MTLCommandBuffer commandBuffer, MPSVector inputGradientVector, MPSVector inputValuesVector, MPSVector? inputMomentumVector, MPSVector resultValuesVector);
+    [Selector("encodeToCommandBuffer:inputGradientMatrix:inputValuesMatrix:inputMomentumMatrix:resultValuesMatrix:")]
+    public void EncodeToCommandBufferInputGradientMatrixInputValuesMatrixInputMomentumMatrixResultValuesMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputGradientMatrix, MPSMatrix inputValuesMatrix, MPSMatrix? inputMomentumMatrix, MPSMatrix resultValuesMatrix);
+    [Selector("encodeToCommandBuffer:convolutionGradientState:convolutionSourceState:inputMomentumVectors:resultState:")]
+    public void EncodeToCommandBufferConvolutionGradientStateConvolutionSourceStateInputMomentumVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionGradientState convolutionGradientState, MPSCNNConvolutionWeightsAndBiasesState convolutionSourceState, NSArray? inputMomentumVectors, MPSCNNConvolutionWeightsAndBiasesState resultState);
+    [Selector("encodeToCommandBuffer:batchNormalizationState:inputMomentumVectors:resultState:")]
+    public void EncodeToCommandBufferBatchNormalizationStateInputMomentumVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationState, NSArray? inputMomentumVectors, MPSCNNNormalizationGammaAndBetaState resultState);
+    [Selector("encodeToCommandBuffer:batchNormalizationGradientState:batchNormalizationSourceState:inputMomentumVectors:resultState:")]
+    public void EncodeToCommandBufferBatchNormalizationGradientStateBatchNormalizationSourceStateInputMomentumVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationGradientState, MPSCNNBatchNormalizationState batchNormalizationSourceState, NSArray? inputMomentumVectors, MPSCNNNormalizationGammaAndBetaState resultState);
 }
 
 public extern objc class MPSNNOptimizerRMSProp : MPSNNOptimizer
 {
-    [Selector("decay")] public double Decay { get; }
-    [Selector("epsilon")] public float Epsilon { get; }
-    [Selector("initWithDevice:learningRate:")] public Self InitWithDeviceLearningRate(MTLDevice device, float learningRate);
-    [Selector("initWithDevice:decay:epsilon:optimizerDescriptor:")] public Self InitWithDeviceDecayEpsilonOptimizerDescriptor(MTLDevice device, double decay, float epsilon, MPSNNOptimizerDescriptor optimizerDescriptor);
-    [Selector("encodeToCommandBuffer:inputGradientVector:inputValuesVector:inputSumOfSquaresVector:resultValuesVector:")] public void EncodeToCommandBufferInputGradientVectorInputValuesVectorInputSumOfSquaresVectorResultValuesVector(MTLCommandBuffer commandBuffer, MPSVector inputGradientVector, MPSVector inputValuesVector, MPSVector inputSumOfSquaresVector, MPSVector resultValuesVector);
-    [Selector("encodeToCommandBuffer:inputGradientMatrix:inputValuesMatrix:inputSumOfSquaresMatrix:resultValuesMatrix:")] public void EncodeToCommandBufferInputGradientMatrixInputValuesMatrixInputSumOfSquaresMatrixResultValuesMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputGradientMatrix, MPSMatrix inputValuesMatrix, MPSMatrix inputSumOfSquaresMatrix, MPSMatrix resultValuesMatrix);
-    [Selector("encodeToCommandBuffer:convolutionGradientState:convolutionSourceState:inputSumOfSquaresVectors:resultState:")] public void EncodeToCommandBufferConvolutionGradientStateConvolutionSourceStateInputSumOfSquaresVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionGradientState convolutionGradientState, MPSCNNConvolutionWeightsAndBiasesState convolutionSourceState, NSArray? inputSumOfSquaresVectors, MPSCNNConvolutionWeightsAndBiasesState resultState);
-    [Selector("encodeToCommandBuffer:batchNormalizationState:inputSumOfSquaresVectors:resultState:")] public void EncodeToCommandBufferBatchNormalizationStateInputSumOfSquaresVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationState, NSArray? inputSumOfSquaresVectors, MPSCNNNormalizationGammaAndBetaState resultState);
-    [Selector("encodeToCommandBuffer:batchNormalizationGradientState:batchNormalizationSourceState:inputSumOfSquaresVectors:resultState:")] public void EncodeToCommandBufferBatchNormalizationGradientStateBatchNormalizationSourceStateInputSumOfSquaresVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationGradientState, MPSCNNBatchNormalizationState batchNormalizationSourceState, NSArray? inputSumOfSquaresVectors, MPSCNNNormalizationGammaAndBetaState resultState);
+    [Selector("decay")]
+    public double Decay { get; }
+    [Selector("epsilon")]
+    public float Epsilon { get; }
+    [Selector("initWithDevice:learningRate:")]
+    public Self InitWithDeviceLearningRate(MTLDevice device, float learningRate);
+    [Selector("initWithDevice:decay:epsilon:optimizerDescriptor:")]
+    public Self InitWithDeviceDecayEpsilonOptimizerDescriptor(MTLDevice device, double decay, float epsilon, MPSNNOptimizerDescriptor optimizerDescriptor);
+    [Selector("encodeToCommandBuffer:inputGradientVector:inputValuesVector:inputSumOfSquaresVector:resultValuesVector:")]
+    public void EncodeToCommandBufferInputGradientVectorInputValuesVectorInputSumOfSquaresVectorResultValuesVector(MTLCommandBuffer commandBuffer, MPSVector inputGradientVector, MPSVector inputValuesVector, MPSVector inputSumOfSquaresVector, MPSVector resultValuesVector);
+    [Selector("encodeToCommandBuffer:inputGradientMatrix:inputValuesMatrix:inputSumOfSquaresMatrix:resultValuesMatrix:")]
+    public void EncodeToCommandBufferInputGradientMatrixInputValuesMatrixInputSumOfSquaresMatrixResultValuesMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputGradientMatrix, MPSMatrix inputValuesMatrix, MPSMatrix inputSumOfSquaresMatrix, MPSMatrix resultValuesMatrix);
+    [Selector("encodeToCommandBuffer:convolutionGradientState:convolutionSourceState:inputSumOfSquaresVectors:resultState:")]
+    public void EncodeToCommandBufferConvolutionGradientStateConvolutionSourceStateInputSumOfSquaresVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionGradientState convolutionGradientState, MPSCNNConvolutionWeightsAndBiasesState convolutionSourceState, NSArray? inputSumOfSquaresVectors, MPSCNNConvolutionWeightsAndBiasesState resultState);
+    [Selector("encodeToCommandBuffer:batchNormalizationState:inputSumOfSquaresVectors:resultState:")]
+    public void EncodeToCommandBufferBatchNormalizationStateInputSumOfSquaresVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationState, NSArray? inputSumOfSquaresVectors, MPSCNNNormalizationGammaAndBetaState resultState);
+    [Selector("encodeToCommandBuffer:batchNormalizationGradientState:batchNormalizationSourceState:inputSumOfSquaresVectors:resultState:")]
+    public void EncodeToCommandBufferBatchNormalizationGradientStateBatchNormalizationSourceStateInputSumOfSquaresVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationGradientState, MPSCNNBatchNormalizationState batchNormalizationSourceState, NSArray? inputSumOfSquaresVectors, MPSCNNNormalizationGammaAndBetaState resultState);
 }
 
 public extern objc class MPSNNOptimizerAdam : MPSNNOptimizer
 {
-    [Selector("beta1")] public double Beta1 { get; }
-    [Selector("beta2")] public double Beta2 { get; }
-    [Selector("epsilon")] public float Epsilon { get; }
-    [Selector("timeStep", "setTimeStep:")] public NSUInteger TimeStep { get; set; }
-    [Selector("initWithDevice:learningRate:")] public Self InitWithDeviceLearningRate(MTLDevice device, float learningRate);
-    [Selector("initWithDevice:beta1:beta2:epsilon:timeStep:optimizerDescriptor:")] public Self InitWithDeviceBeta1Beta2EpsilonTimeStepOptimizerDescriptor(MTLDevice device, double beta1, double beta2, float epsilon, NSUInteger timeStep, MPSNNOptimizerDescriptor optimizerDescriptor);
-    [Selector("encodeToCommandBuffer:inputGradientVector:inputValuesVector:inputMomentumVector:inputVelocityVector:resultValuesVector:")] public void EncodeToCommandBufferInputGradientVectorInputValuesVectorInputMomentumVectorInputVelocityVectorResultValuesVector(MTLCommandBuffer commandBuffer, MPSVector inputGradientVector, MPSVector inputValuesVector, MPSVector inputMomentumVector, MPSVector inputVelocityVector, MPSVector resultValuesVector);
-    [Selector("encodeToCommandBuffer:inputGradientMatrix:inputValuesMatrix:inputMomentumMatrix:inputVelocityMatrix:resultValuesMatrix:")] public void EncodeToCommandBufferInputGradientMatrixInputValuesMatrixInputMomentumMatrixInputVelocityMatrixResultValuesMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputGradientMatrix, MPSMatrix inputValuesMatrix, MPSMatrix inputMomentumMatrix, MPSMatrix inputVelocityMatrix, MPSMatrix resultValuesMatrix);
-    [Selector("encodeToCommandBuffer:inputGradientVector:inputValuesVector:inputMomentumVector:inputVelocityVector:maximumVelocityVector:resultValuesVector:")] public void EncodeToCommandBufferInputGradientVectorInputValuesVectorInputMomentumVectorInputVelocityVectorMaximumVelocityVectorResultValuesVector(MTLCommandBuffer commandBuffer, MPSVector inputGradientVector, MPSVector inputValuesVector, MPSVector inputMomentumVector, MPSVector inputVelocityVector, MPSVector? maximumVelocityVector, MPSVector resultValuesVector);
-    [Selector("encodeToCommandBuffer:inputGradientMatrix:inputValuesMatrix:inputMomentumMatrix:inputVelocityMatrix:maximumVelocityMatrix:resultValuesMatrix:")] public void EncodeToCommandBufferInputGradientMatrixInputValuesMatrixInputMomentumMatrixInputVelocityMatrixMaximumVelocityMatrixResultValuesMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputGradientMatrix, MPSMatrix inputValuesMatrix, MPSMatrix inputMomentumMatrix, MPSMatrix inputVelocityMatrix, MPSMatrix? maximumVelocityMatrix, MPSMatrix resultValuesMatrix);
-    [Selector("encodeToCommandBuffer:convolutionGradientState:convolutionSourceState:inputMomentumVectors:inputVelocityVectors:resultState:")] public void EncodeToCommandBufferConvolutionGradientStateConvolutionSourceStateInputMomentumVectorsInputVelocityVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionGradientState convolutionGradientState, MPSCNNConvolutionWeightsAndBiasesState convolutionSourceState, NSArray? inputMomentumVectors, NSArray? inputVelocityVectors, MPSCNNConvolutionWeightsAndBiasesState resultState);
-    [Selector("encodeToCommandBuffer:convolutionGradientState:convolutionSourceState:inputMomentumVectors:inputVelocityVectors:maximumVelocityVectors:resultState:")] public void EncodeToCommandBufferConvolutionGradientStateConvolutionSourceStateInputMomentumVectorsInputVelocityVectorsMaximumVelocityVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionGradientState convolutionGradientState, MPSCNNConvolutionWeightsAndBiasesState convolutionSourceState, NSArray inputMomentumVectors, NSArray inputVelocityVectors, NSArray? maximumVelocityVectors, MPSCNNConvolutionWeightsAndBiasesState resultState);
-    [Selector("encodeToCommandBuffer:batchNormalizationState:inputMomentumVectors:inputVelocityVectors:resultState:")] public void EncodeToCommandBufferBatchNormalizationStateInputMomentumVectorsInputVelocityVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationState, NSArray? inputMomentumVectors, NSArray? inputVelocityVectors, MPSCNNNormalizationGammaAndBetaState resultState);
-    [Selector("encodeToCommandBuffer:batchNormalizationState:inputMomentumVectors:inputVelocityVectors:maximumVelocityVectors:resultState:")] public void EncodeToCommandBufferBatchNormalizationStateInputMomentumVectorsInputVelocityVectorsMaximumVelocityVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationState, NSArray inputMomentumVectors, NSArray inputVelocityVectors, NSArray? maximumVelocityVectors, MPSCNNNormalizationGammaAndBetaState resultState);
-    [Selector("encodeToCommandBuffer:batchNormalizationGradientState:batchNormalizationSourceState:inputMomentumVectors:inputVelocityVectors:resultState:")] public void EncodeToCommandBufferBatchNormalizationGradientStateBatchNormalizationSourceStateInputMomentumVectorsInputVelocityVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationGradientState, MPSCNNBatchNormalizationState batchNormalizationSourceState, NSArray? inputMomentumVectors, NSArray? inputVelocityVectors, MPSCNNNormalizationGammaAndBetaState resultState);
-    [Selector("encodeToCommandBuffer:batchNormalizationGradientState:batchNormalizationSourceState:inputMomentumVectors:inputVelocityVectors:maximumVelocityVectors:resultState:")] public void EncodeToCommandBufferBatchNormalizationGradientStateBatchNormalizationSourceStateInputMomentumVectorsInputVelocityVectorsMaximumVelocityVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationGradientState, MPSCNNBatchNormalizationState batchNormalizationSourceState, NSArray inputMomentumVectors, NSArray inputVelocityVectors, NSArray? maximumVelocityVectors, MPSCNNNormalizationGammaAndBetaState resultState);
+    [Selector("beta1")]
+    public double Beta1 { get; }
+    [Selector("beta2")]
+    public double Beta2 { get; }
+    [Selector("epsilon")]
+    public float Epsilon { get; }
+    [Selector("timeStep", "setTimeStep:")]
+    public NSUInteger TimeStep { get; set; }
+    [Selector("initWithDevice:learningRate:")]
+    public Self InitWithDeviceLearningRate(MTLDevice device, float learningRate);
+    [Selector("initWithDevice:beta1:beta2:epsilon:timeStep:optimizerDescriptor:")]
+    public Self InitWithDeviceBeta1Beta2EpsilonTimeStepOptimizerDescriptor(MTLDevice device, double beta1, double beta2, float epsilon, NSUInteger timeStep, MPSNNOptimizerDescriptor optimizerDescriptor);
+    [Selector("encodeToCommandBuffer:inputGradientVector:inputValuesVector:inputMomentumVector:inputVelocityVector:resultValuesVector:")]
+    public void EncodeToCommandBufferInputGradientVectorInputValuesVectorInputMomentumVectorInputVelocityVectorResultValuesVector(MTLCommandBuffer commandBuffer, MPSVector inputGradientVector, MPSVector inputValuesVector, MPSVector inputMomentumVector, MPSVector inputVelocityVector, MPSVector resultValuesVector);
+    [Selector("encodeToCommandBuffer:inputGradientMatrix:inputValuesMatrix:inputMomentumMatrix:inputVelocityMatrix:resultValuesMatrix:")]
+    public void EncodeToCommandBufferInputGradientMatrixInputValuesMatrixInputMomentumMatrixInputVelocityMatrixResultValuesMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputGradientMatrix, MPSMatrix inputValuesMatrix, MPSMatrix inputMomentumMatrix, MPSMatrix inputVelocityMatrix, MPSMatrix resultValuesMatrix);
+    [Selector("encodeToCommandBuffer:inputGradientVector:inputValuesVector:inputMomentumVector:inputVelocityVector:maximumVelocityVector:resultValuesVector:")]
+    public void EncodeToCommandBufferInputGradientVectorInputValuesVectorInputMomentumVectorInputVelocityVectorMaximumVelocityVectorResultValuesVector(MTLCommandBuffer commandBuffer, MPSVector inputGradientVector, MPSVector inputValuesVector, MPSVector inputMomentumVector, MPSVector inputVelocityVector, MPSVector? maximumVelocityVector, MPSVector resultValuesVector);
+    [Selector("encodeToCommandBuffer:inputGradientMatrix:inputValuesMatrix:inputMomentumMatrix:inputVelocityMatrix:maximumVelocityMatrix:resultValuesMatrix:")]
+    public void EncodeToCommandBufferInputGradientMatrixInputValuesMatrixInputMomentumMatrixInputVelocityMatrixMaximumVelocityMatrixResultValuesMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputGradientMatrix, MPSMatrix inputValuesMatrix, MPSMatrix inputMomentumMatrix, MPSMatrix inputVelocityMatrix, MPSMatrix? maximumVelocityMatrix, MPSMatrix resultValuesMatrix);
+    [Selector("encodeToCommandBuffer:convolutionGradientState:convolutionSourceState:inputMomentumVectors:inputVelocityVectors:resultState:")]
+    public void EncodeToCommandBufferConvolutionGradientStateConvolutionSourceStateInputMomentumVectorsInputVelocityVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionGradientState convolutionGradientState, MPSCNNConvolutionWeightsAndBiasesState convolutionSourceState, NSArray? inputMomentumVectors, NSArray? inputVelocityVectors, MPSCNNConvolutionWeightsAndBiasesState resultState);
+    [Selector("encodeToCommandBuffer:convolutionGradientState:convolutionSourceState:inputMomentumVectors:inputVelocityVectors:maximumVelocityVectors:resultState:")]
+    public void EncodeToCommandBufferConvolutionGradientStateConvolutionSourceStateInputMomentumVectorsInputVelocityVectorsMaximumVelocityVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionGradientState convolutionGradientState, MPSCNNConvolutionWeightsAndBiasesState convolutionSourceState, NSArray inputMomentumVectors, NSArray inputVelocityVectors, NSArray? maximumVelocityVectors, MPSCNNConvolutionWeightsAndBiasesState resultState);
+    [Selector("encodeToCommandBuffer:batchNormalizationState:inputMomentumVectors:inputVelocityVectors:resultState:")]
+    public void EncodeToCommandBufferBatchNormalizationStateInputMomentumVectorsInputVelocityVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationState, NSArray? inputMomentumVectors, NSArray? inputVelocityVectors, MPSCNNNormalizationGammaAndBetaState resultState);
+    [Selector("encodeToCommandBuffer:batchNormalizationState:inputMomentumVectors:inputVelocityVectors:maximumVelocityVectors:resultState:")]
+    public void EncodeToCommandBufferBatchNormalizationStateInputMomentumVectorsInputVelocityVectorsMaximumVelocityVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationState, NSArray inputMomentumVectors, NSArray inputVelocityVectors, NSArray? maximumVelocityVectors, MPSCNNNormalizationGammaAndBetaState resultState);
+    [Selector("encodeToCommandBuffer:batchNormalizationGradientState:batchNormalizationSourceState:inputMomentumVectors:inputVelocityVectors:resultState:")]
+    public void EncodeToCommandBufferBatchNormalizationGradientStateBatchNormalizationSourceStateInputMomentumVectorsInputVelocityVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationGradientState, MPSCNNBatchNormalizationState batchNormalizationSourceState, NSArray? inputMomentumVectors, NSArray? inputVelocityVectors, MPSCNNNormalizationGammaAndBetaState resultState);
+    [Selector("encodeToCommandBuffer:batchNormalizationGradientState:batchNormalizationSourceState:inputMomentumVectors:inputVelocityVectors:maximumVelocityVectors:resultState:")]
+    public void EncodeToCommandBufferBatchNormalizationGradientStateBatchNormalizationSourceStateInputMomentumVectorsInputVelocityVectorsMaximumVelocityVectorsResultState(MTLCommandBuffer commandBuffer, MPSCNNBatchNormalizationState batchNormalizationGradientState, MPSCNNBatchNormalizationState batchNormalizationSourceState, NSArray inputMomentumVectors, NSArray inputVelocityVectors, NSArray? maximumVelocityVectors, MPSCNNNormalizationGammaAndBetaState resultState);
 }
 
 #endif

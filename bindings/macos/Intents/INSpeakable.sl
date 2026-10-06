@@ -33,11 +33,17 @@ import Standard.ObjC;
 
 public objc interface INSpeakable : NSObjectProtocol
 {
-    [Selector("spokenPhrase")] NSString SpokenPhrase { get; }
-    [Selector("pronunciationHint")] NSString? PronunciationHint { get; }
-    [Selector("vocabularyIdentifier")] NSString? VocabularyIdentifier { get; }
-    [Selector("alternativeSpeakableMatches")] NSArray? AlternativeSpeakableMatches { get; }
-    [Optional] [Selector("identifier")] NSString? Identifier { get; }
+    [Selector("spokenPhrase")]
+    NSString SpokenPhrase { get; }
+    [Selector("pronunciationHint")]
+    NSString? PronunciationHint { get; }
+    [Selector("vocabularyIdentifier")]
+    NSString? VocabularyIdentifier { get; }
+    [Selector("alternativeSpeakableMatches")]
+    NSArray? AlternativeSpeakableMatches { get; }
+    [Optional]
+    [Selector("identifier")]
+    NSString? Identifier { get; }
 }
 
 #endif

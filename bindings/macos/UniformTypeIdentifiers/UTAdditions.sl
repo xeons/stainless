@@ -33,15 +33,19 @@ import Standard.ObjC;
 /// UTAdditions, a category of NSString.
 public extern objc class NSString
 {
-    [Selector("stringByAppendingPathComponent:conformingToType:")] public NSString StringByAppendingPathComponentConformingToType(NSString partialName, UTType contentType);
-    [Selector("stringByAppendingPathExtensionForType:")] public NSString StringByAppendingPathExtensionForType(UTType contentType);
+    [Selector("stringByAppendingPathComponent:conformingToType:")]
+    public NSString StringByAppendingPathComponentConformingToType(NSString partialName, UTType contentType);
+    [Selector("stringByAppendingPathExtensionForType:")]
+    public NSString StringByAppendingPathExtensionForType(UTType contentType);
 }
 
 /// UTAdditions, a category of NSURL.
 public extern objc class NSURL
 {
-    [Selector("URLByAppendingPathComponent:conformingToType:")] public NSURL URLByAppendingPathComponentConformingToType(NSString partialName, UTType contentType);
-    [Selector("URLByAppendingPathExtensionForType:")] public NSURL URLByAppendingPathExtensionForType(UTType contentType);
+    [Selector("URLByAppendingPathComponent:conformingToType:")]
+    public NSURL URLByAppendingPathComponentConformingToType(NSString partialName, UTType contentType);
+    [Selector("URLByAppendingPathExtensionForType:")]
+    public NSURL URLByAppendingPathExtensionForType(UTType contentType);
 }
 
 #endif

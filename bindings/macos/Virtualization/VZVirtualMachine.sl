@@ -63,32 +63,58 @@ public objc closure void VZVirtualMachineSaveMachineStateToURLCompletionHandlerC
 public extern objc class VZVirtualMachine : NSObject
 {
     /// macOS 26.0 and later.
-    [Selector("queue")] public dispatch_queue_t? Queue { get; }
-    [Selector("isSupported")] public static bool Supported { get; }
-    [Selector("state")] public VZVirtualMachineState State { get; }
-    [Selector("delegate", "setDelegate:")] public VZVirtualMachineDelegate? Delegate { get; set; }
-    [Selector("canStart")] public bool CanStart { get; }
-    [Selector("canStop")] public bool CanStop { get; }
-    [Selector("canPause")] public bool CanPause { get; }
-    [Selector("canResume")] public bool CanResume { get; }
-    [Selector("canRequestStop")] public bool CanRequestStop { get; }
-    [Selector("consoleDevices")] public NSArray? ConsoleDevices { get; }
-    [Selector("directorySharingDevices")] public NSArray? DirectorySharingDevices { get; }
-    [Selector("graphicsDevices")] public NSArray? GraphicsDevices { get; }
-    [Selector("memoryBalloonDevices")] public NSArray MemoryBalloonDevices { get; }
-    [Selector("networkDevices")] public NSArray? NetworkDevices { get; }
-    [Selector("socketDevices")] public NSArray SocketDevices { get; }
-    [Selector("usbControllers")] public NSArray? UsbControllers { get; }
-    [Selector("initWithConfiguration:")] public Self InitWithConfiguration(VZVirtualMachineConfiguration configuration);
-    [Selector("initWithConfiguration:queue:")] public Self InitWithConfigurationQueue(VZVirtualMachineConfiguration configuration, dispatch_queue_t queue);
-    [Selector("startWithCompletionHandler:")] public void StartWithCompletionHandler(VZVirtualMachineStartWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("startWithOptions:completionHandler:")] public void StartWithOptionsCompletionHandler(VZVirtualMachineStartOptions options, VZVirtualMachineStartWithOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("stopWithCompletionHandler:")] public void StopWithCompletionHandler(VZVirtualMachineStopWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("pauseWithCompletionHandler:")] public void PauseWithCompletionHandler(VZVirtualMachinePauseWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("resumeWithCompletionHandler:")] public void ResumeWithCompletionHandler(VZVirtualMachineResumeWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("restoreMachineStateFromURL:completionHandler:")] public void RestoreMachineStateFromURLCompletionHandler(NSURL saveFileURL, VZVirtualMachineRestoreMachineStateFromURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("saveMachineStateToURL:completionHandler:")] public void SaveMachineStateToURLCompletionHandler(NSURL saveFileURL, VZVirtualMachineSaveMachineStateToURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("requestStopWithError:")] public bool RequestStopWithError(out NSError? error);
+    [Selector("queue")]
+    public dispatch_queue_t? Queue { get; }
+    [Selector("isSupported")]
+    public static bool Supported { get; }
+    [Selector("state")]
+    public VZVirtualMachineState State { get; }
+    [Selector("delegate", "setDelegate:")]
+    public VZVirtualMachineDelegate? Delegate { get; set; }
+    [Selector("canStart")]
+    public bool CanStart { get; }
+    [Selector("canStop")]
+    public bool CanStop { get; }
+    [Selector("canPause")]
+    public bool CanPause { get; }
+    [Selector("canResume")]
+    public bool CanResume { get; }
+    [Selector("canRequestStop")]
+    public bool CanRequestStop { get; }
+    [Selector("consoleDevices")]
+    public NSArray? ConsoleDevices { get; }
+    [Selector("directorySharingDevices")]
+    public NSArray? DirectorySharingDevices { get; }
+    [Selector("graphicsDevices")]
+    public NSArray? GraphicsDevices { get; }
+    [Selector("memoryBalloonDevices")]
+    public NSArray MemoryBalloonDevices { get; }
+    [Selector("networkDevices")]
+    public NSArray? NetworkDevices { get; }
+    [Selector("socketDevices")]
+    public NSArray SocketDevices { get; }
+    [Selector("usbControllers")]
+    public NSArray? UsbControllers { get; }
+    [Selector("initWithConfiguration:")]
+    public Self InitWithConfiguration(VZVirtualMachineConfiguration configuration);
+    [Selector("initWithConfiguration:queue:")]
+    public Self InitWithConfigurationQueue(VZVirtualMachineConfiguration configuration, dispatch_queue_t queue);
+    [Selector("startWithCompletionHandler:")]
+    public void StartWithCompletionHandler(VZVirtualMachineStartWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("startWithOptions:completionHandler:")]
+    public void StartWithOptionsCompletionHandler(VZVirtualMachineStartOptions options, VZVirtualMachineStartWithOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("stopWithCompletionHandler:")]
+    public void StopWithCompletionHandler(VZVirtualMachineStopWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("pauseWithCompletionHandler:")]
+    public void PauseWithCompletionHandler(VZVirtualMachinePauseWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("resumeWithCompletionHandler:")]
+    public void ResumeWithCompletionHandler(VZVirtualMachineResumeWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("restoreMachineStateFromURL:completionHandler:")]
+    public void RestoreMachineStateFromURLCompletionHandler(NSURL saveFileURL, VZVirtualMachineRestoreMachineStateFromURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("saveMachineStateToURL:completionHandler:")]
+    public void SaveMachineStateToURLCompletionHandler(NSURL saveFileURL, VZVirtualMachineSaveMachineStateToURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("requestStopWithError:")]
+    public bool RequestStopWithError(out NSError? error);
 }
 #else
 public objc closure void VZVirtualMachineStartWithCompletionHandlerCompletionHandlerBlock(NSError? arg0);
@@ -104,30 +130,54 @@ public objc closure void VZVirtualMachineResumeWithCompletionHandlerCompletionHa
 public extern objc class VZVirtualMachine : NSObject
 {
     /// macOS 26.0 and later.
-    [Selector("queue")] public dispatch_queue_t? Queue { get; }
-    [Selector("isSupported")] public static bool Supported { get; }
-    [Selector("state")] public VZVirtualMachineState State { get; }
-    [Selector("delegate", "setDelegate:")] public VZVirtualMachineDelegate? Delegate { get; set; }
-    [Selector("canStart")] public bool CanStart { get; }
-    [Selector("canStop")] public bool CanStop { get; }
-    [Selector("canPause")] public bool CanPause { get; }
-    [Selector("canResume")] public bool CanResume { get; }
-    [Selector("canRequestStop")] public bool CanRequestStop { get; }
-    [Selector("consoleDevices")] public NSArray? ConsoleDevices { get; }
-    [Selector("directorySharingDevices")] public NSArray? DirectorySharingDevices { get; }
-    [Selector("graphicsDevices")] public NSArray? GraphicsDevices { get; }
-    [Selector("memoryBalloonDevices")] public NSArray MemoryBalloonDevices { get; }
-    [Selector("networkDevices")] public NSArray? NetworkDevices { get; }
-    [Selector("socketDevices")] public NSArray SocketDevices { get; }
-    [Selector("usbControllers")] public NSArray? UsbControllers { get; }
-    [Selector("initWithConfiguration:")] public Self InitWithConfiguration(VZVirtualMachineConfiguration configuration);
-    [Selector("initWithConfiguration:queue:")] public Self InitWithConfigurationQueue(VZVirtualMachineConfiguration configuration, dispatch_queue_t queue);
-    [Selector("startWithCompletionHandler:")] public void StartWithCompletionHandler(VZVirtualMachineStartWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("startWithOptions:completionHandler:")] public void StartWithOptionsCompletionHandler(VZVirtualMachineStartOptions options, VZVirtualMachineStartWithOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("stopWithCompletionHandler:")] public void StopWithCompletionHandler(VZVirtualMachineStopWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("pauseWithCompletionHandler:")] public void PauseWithCompletionHandler(VZVirtualMachinePauseWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("resumeWithCompletionHandler:")] public void ResumeWithCompletionHandler(VZVirtualMachineResumeWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("requestStopWithError:")] public bool RequestStopWithError(out NSError? error);
+    [Selector("queue")]
+    public dispatch_queue_t? Queue { get; }
+    [Selector("isSupported")]
+    public static bool Supported { get; }
+    [Selector("state")]
+    public VZVirtualMachineState State { get; }
+    [Selector("delegate", "setDelegate:")]
+    public VZVirtualMachineDelegate? Delegate { get; set; }
+    [Selector("canStart")]
+    public bool CanStart { get; }
+    [Selector("canStop")]
+    public bool CanStop { get; }
+    [Selector("canPause")]
+    public bool CanPause { get; }
+    [Selector("canResume")]
+    public bool CanResume { get; }
+    [Selector("canRequestStop")]
+    public bool CanRequestStop { get; }
+    [Selector("consoleDevices")]
+    public NSArray? ConsoleDevices { get; }
+    [Selector("directorySharingDevices")]
+    public NSArray? DirectorySharingDevices { get; }
+    [Selector("graphicsDevices")]
+    public NSArray? GraphicsDevices { get; }
+    [Selector("memoryBalloonDevices")]
+    public NSArray MemoryBalloonDevices { get; }
+    [Selector("networkDevices")]
+    public NSArray? NetworkDevices { get; }
+    [Selector("socketDevices")]
+    public NSArray SocketDevices { get; }
+    [Selector("usbControllers")]
+    public NSArray? UsbControllers { get; }
+    [Selector("initWithConfiguration:")]
+    public Self InitWithConfiguration(VZVirtualMachineConfiguration configuration);
+    [Selector("initWithConfiguration:queue:")]
+    public Self InitWithConfigurationQueue(VZVirtualMachineConfiguration configuration, dispatch_queue_t queue);
+    [Selector("startWithCompletionHandler:")]
+    public void StartWithCompletionHandler(VZVirtualMachineStartWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("startWithOptions:completionHandler:")]
+    public void StartWithOptionsCompletionHandler(VZVirtualMachineStartOptions options, VZVirtualMachineStartWithOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("stopWithCompletionHandler:")]
+    public void StopWithCompletionHandler(VZVirtualMachineStopWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("pauseWithCompletionHandler:")]
+    public void PauseWithCompletionHandler(VZVirtualMachinePauseWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("resumeWithCompletionHandler:")]
+    public void ResumeWithCompletionHandler(VZVirtualMachineResumeWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("requestStopWithError:")]
+    public bool RequestStopWithError(out NSError? error);
 }
 #endif
 

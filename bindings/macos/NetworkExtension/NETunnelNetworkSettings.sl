@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class NETunnelNetworkSettings : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("tunnelRemoteAddress")] public NSString? TunnelRemoteAddress { get; }
-    [Selector("DNSSettings", "setDNSSettings:")] public NEDNSSettings? DNSSettings { get; set; }
-    [Selector("proxySettings", "setProxySettings:")] public NEProxySettings? ProxySettings { get; set; }
-    [Selector("initWithTunnelRemoteAddress:")] public Self InitWithTunnelRemoteAddress(NSString address);
+    [Selector("tunnelRemoteAddress")]
+    public NSString? TunnelRemoteAddress { get; }
+    [Selector("DNSSettings", "setDNSSettings:")]
+    public NEDNSSettings? DNSSettings { get; set; }
+    [Selector("proxySettings", "setProxySettings:")]
+    public NEProxySettings? ProxySettings { get; set; }
+    [Selector("initWithTunnelRemoteAddress:")]
+    public Self InitWithTunnelRemoteAddress(NSString address);
 }
 
 #endif

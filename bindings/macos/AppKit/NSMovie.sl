@@ -34,9 +34,11 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.5.
 public extern objc class NSMovie : NSObject, NSCoding
 {
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
     /// Deprecated in macOS 10.5.
-    [Selector("init")] public Self? Init();
+    [Selector("init")]
+    public Self? Init();
 }
 
 #endif

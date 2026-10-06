@@ -83,137 +83,211 @@ public using MTLArgumentAccess = MTLBindingAccess;
 
 public extern objc class MTLType : NSObject
 {
-    [Selector("dataType")] public MTLDataType DataType { get; }
+    [Selector("dataType")]
+    public MTLDataType DataType { get; }
 }
 
 public extern objc class MTLStructMember : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("offset")] public NSUInteger Offset { get; }
-    [Selector("dataType")] public MTLDataType DataType { get; }
-    [Selector("argumentIndex")] public NSUInteger ArgumentIndex { get; }
-    [Selector("structType")] public MTLStructType? StructType();
-    [Selector("arrayType")] public MTLArrayType? ArrayType();
-    [Selector("textureReferenceType")] public MTLTextureReferenceType? TextureReferenceType();
-    [Selector("pointerType")] public MTLPointerType? PointerType();
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("offset")]
+    public NSUInteger Offset { get; }
+    [Selector("dataType")]
+    public MTLDataType DataType { get; }
+    [Selector("argumentIndex")]
+    public NSUInteger ArgumentIndex { get; }
+    [Selector("structType")]
+    public MTLStructType? StructType();
+    [Selector("arrayType")]
+    public MTLArrayType? ArrayType();
+    [Selector("textureReferenceType")]
+    public MTLTextureReferenceType? TextureReferenceType();
+    [Selector("pointerType")]
+    public MTLPointerType? PointerType();
     /// macOS 26.0 and later.
-    [Selector("tensorReferenceType")] public MTLTensorReferenceType? TensorReferenceType();
+    [Selector("tensorReferenceType")]
+    public MTLTensorReferenceType? TensorReferenceType();
 }
 
 public extern objc class MTLStructType : MTLType
 {
-    [Selector("members")] public NSArray Members { get; }
-    [Selector("memberByName:")] public MTLStructMember? MemberByName(NSString name);
+    [Selector("members")]
+    public NSArray Members { get; }
+    [Selector("memberByName:")]
+    public MTLStructMember? MemberByName(NSString name);
 }
 
 public extern objc class MTLArrayType : MTLType
 {
-    [Selector("elementType")] public MTLDataType ElementType { get; }
-    [Selector("arrayLength")] public NSUInteger ArrayLength { get; }
-    [Selector("stride")] public NSUInteger Stride { get; }
-    [Selector("argumentIndexStride")] public NSUInteger ArgumentIndexStride { get; }
-    [Selector("elementStructType")] public MTLStructType? ElementStructType();
-    [Selector("elementArrayType")] public MTLArrayType? ElementArrayType();
-    [Selector("elementTextureReferenceType")] public MTLTextureReferenceType? ElementTextureReferenceType();
-    [Selector("elementPointerType")] public MTLPointerType? ElementPointerType();
+    [Selector("elementType")]
+    public MTLDataType ElementType { get; }
+    [Selector("arrayLength")]
+    public NSUInteger ArrayLength { get; }
+    [Selector("stride")]
+    public NSUInteger Stride { get; }
+    [Selector("argumentIndexStride")]
+    public NSUInteger ArgumentIndexStride { get; }
+    [Selector("elementStructType")]
+    public MTLStructType? ElementStructType();
+    [Selector("elementArrayType")]
+    public MTLArrayType? ElementArrayType();
+    [Selector("elementTextureReferenceType")]
+    public MTLTextureReferenceType? ElementTextureReferenceType();
+    [Selector("elementPointerType")]
+    public MTLPointerType? ElementPointerType();
     /// macOS 26.0 and later.
-    [Selector("elementTensorReferenceType")] public MTLTensorReferenceType? ElementTensorReferenceType();
+    [Selector("elementTensorReferenceType")]
+    public MTLTensorReferenceType? ElementTensorReferenceType();
 }
 
 public extern objc class MTLPointerType : MTLType
 {
-    [Selector("elementType")] public MTLDataType ElementType { get; }
-    [Selector("access")] public MTLBindingAccess Access { get; }
-    [Selector("alignment")] public NSUInteger Alignment { get; }
-    [Selector("dataSize")] public NSUInteger DataSize { get; }
-    [Selector("elementIsArgumentBuffer")] public bool ElementIsArgumentBuffer { get; }
-    [Selector("elementStructType")] public MTLStructType? ElementStructType();
-    [Selector("elementArrayType")] public MTLArrayType? ElementArrayType();
+    [Selector("elementType")]
+    public MTLDataType ElementType { get; }
+    [Selector("access")]
+    public MTLBindingAccess Access { get; }
+    [Selector("alignment")]
+    public NSUInteger Alignment { get; }
+    [Selector("dataSize")]
+    public NSUInteger DataSize { get; }
+    [Selector("elementIsArgumentBuffer")]
+    public bool ElementIsArgumentBuffer { get; }
+    [Selector("elementStructType")]
+    public MTLStructType? ElementStructType();
+    [Selector("elementArrayType")]
+    public MTLArrayType? ElementArrayType();
 }
 
 public extern objc class MTLTextureReferenceType : MTLType
 {
-    [Selector("textureDataType")] public MTLDataType TextureDataType { get; }
-    [Selector("textureType")] public MTLTextureType TextureType { get; }
-    [Selector("access")] public MTLBindingAccess Access { get; }
-    [Selector("isDepthTexture")] public bool IsDepthTexture { get; }
+    [Selector("textureDataType")]
+    public MTLDataType TextureDataType { get; }
+    [Selector("textureType")]
+    public MTLTextureType TextureType { get; }
+    [Selector("access")]
+    public MTLBindingAccess Access { get; }
+    [Selector("isDepthTexture")]
+    public bool IsDepthTexture { get; }
 }
 
 /// macOS 26.0 and later.
 public extern objc class MTLTensorReferenceType : MTLType
 {
-    [Selector("tensorDataType")] public MTLTensorDataType TensorDataType { get; }
-    [Selector("indexType")] public MTLDataType IndexType { get; }
-    [Selector("dimensions")] public MTLTensorExtents? Dimensions { get; }
-    [Selector("access")] public MTLBindingAccess Access { get; }
+    [Selector("tensorDataType")]
+    public MTLTensorDataType TensorDataType { get; }
+    [Selector("indexType")]
+    public MTLDataType IndexType { get; }
+    [Selector("dimensions")]
+    public MTLTensorExtents? Dimensions { get; }
+    [Selector("access")]
+    public MTLBindingAccess Access { get; }
 }
 
 /// Deprecated in macOS 13.0.
 public extern objc class MTLArgument : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("type")] public MTLArgumentType Type { get; }
-    [Selector("access")] public MTLBindingAccess Access { get; }
-    [Selector("index")] public NSUInteger Index { get; }
-    [Selector("isActive")] public bool Active { get; }
-    [Selector("bufferAlignment")] public NSUInteger BufferAlignment { get; }
-    [Selector("bufferDataSize")] public NSUInteger BufferDataSize { get; }
-    [Selector("bufferDataType")] public MTLDataType BufferDataType { get; }
-    [Selector("bufferStructType")] public MTLStructType? BufferStructType { get; }
-    [Selector("bufferPointerType")] public MTLPointerType? BufferPointerType { get; }
-    [Selector("threadgroupMemoryAlignment")] public NSUInteger ThreadgroupMemoryAlignment { get; }
-    [Selector("threadgroupMemoryDataSize")] public NSUInteger ThreadgroupMemoryDataSize { get; }
-    [Selector("textureType")] public MTLTextureType TextureType { get; }
-    [Selector("textureDataType")] public MTLDataType TextureDataType { get; }
-    [Selector("isDepthTexture")] public bool IsDepthTexture { get; }
-    [Selector("arrayLength")] public NSUInteger ArrayLength { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("type")]
+    public MTLArgumentType Type { get; }
+    [Selector("access")]
+    public MTLBindingAccess Access { get; }
+    [Selector("index")]
+    public NSUInteger Index { get; }
+    [Selector("isActive")]
+    public bool Active { get; }
+    [Selector("bufferAlignment")]
+    public NSUInteger BufferAlignment { get; }
+    [Selector("bufferDataSize")]
+    public NSUInteger BufferDataSize { get; }
+    [Selector("bufferDataType")]
+    public MTLDataType BufferDataType { get; }
+    [Selector("bufferStructType")]
+    public MTLStructType? BufferStructType { get; }
+    [Selector("bufferPointerType")]
+    public MTLPointerType? BufferPointerType { get; }
+    [Selector("threadgroupMemoryAlignment")]
+    public NSUInteger ThreadgroupMemoryAlignment { get; }
+    [Selector("threadgroupMemoryDataSize")]
+    public NSUInteger ThreadgroupMemoryDataSize { get; }
+    [Selector("textureType")]
+    public MTLTextureType TextureType { get; }
+    [Selector("textureDataType")]
+    public MTLDataType TextureDataType { get; }
+    [Selector("isDepthTexture")]
+    public bool IsDepthTexture { get; }
+    [Selector("arrayLength")]
+    public NSUInteger ArrayLength { get; }
 }
 
 public objc interface MTLBinding : NSObjectProtocol
 {
-    [Selector("name")] NSString Name { get; }
-    [Selector("type")] MTLBindingType Type { get; }
-    [Selector("access")] MTLBindingAccess Access { get; }
-    [Selector("index")] NSUInteger Index { get; }
-    [Selector("isUsed")] bool Used { get; }
-    [Selector("isArgument")] bool Argument { get; }
+    [Selector("name")]
+    NSString Name { get; }
+    [Selector("type")]
+    MTLBindingType Type { get; }
+    [Selector("access")]
+    MTLBindingAccess Access { get; }
+    [Selector("index")]
+    NSUInteger Index { get; }
+    [Selector("isUsed")]
+    bool Used { get; }
+    [Selector("isArgument")]
+    bool Argument { get; }
 }
 
 public objc interface MTLBufferBinding : MTLBinding
 {
-    [Selector("bufferAlignment")] NSUInteger BufferAlignment { get; }
-    [Selector("bufferDataSize")] NSUInteger BufferDataSize { get; }
-    [Selector("bufferDataType")] MTLDataType BufferDataType { get; }
-    [Selector("bufferStructType")] MTLStructType? BufferStructType { get; }
-    [Selector("bufferPointerType")] MTLPointerType? BufferPointerType { get; }
+    [Selector("bufferAlignment")]
+    NSUInteger BufferAlignment { get; }
+    [Selector("bufferDataSize")]
+    NSUInteger BufferDataSize { get; }
+    [Selector("bufferDataType")]
+    MTLDataType BufferDataType { get; }
+    [Selector("bufferStructType")]
+    MTLStructType? BufferStructType { get; }
+    [Selector("bufferPointerType")]
+    MTLPointerType? BufferPointerType { get; }
 }
 
 public objc interface MTLThreadgroupBinding : MTLBinding
 {
-    [Selector("threadgroupMemoryAlignment")] NSUInteger ThreadgroupMemoryAlignment { get; }
-    [Selector("threadgroupMemoryDataSize")] NSUInteger ThreadgroupMemoryDataSize { get; }
+    [Selector("threadgroupMemoryAlignment")]
+    NSUInteger ThreadgroupMemoryAlignment { get; }
+    [Selector("threadgroupMemoryDataSize")]
+    NSUInteger ThreadgroupMemoryDataSize { get; }
 }
 
 public objc interface MTLTextureBinding : MTLBinding
 {
-    [Selector("textureType")] MTLTextureType TextureType { get; }
-    [Selector("textureDataType")] MTLDataType TextureDataType { get; }
-    [Selector("isDepthTexture")] bool DepthTexture { get; }
-    [Selector("arrayLength")] NSUInteger ArrayLength { get; }
+    [Selector("textureType")]
+    MTLTextureType TextureType { get; }
+    [Selector("textureDataType")]
+    MTLDataType TextureDataType { get; }
+    [Selector("isDepthTexture")]
+    bool DepthTexture { get; }
+    [Selector("arrayLength")]
+    NSUInteger ArrayLength { get; }
 }
 
 public objc interface MTLObjectPayloadBinding : MTLBinding
 {
-    [Selector("objectPayloadAlignment")] NSUInteger ObjectPayloadAlignment { get; }
-    [Selector("objectPayloadDataSize")] NSUInteger ObjectPayloadDataSize { get; }
+    [Selector("objectPayloadAlignment")]
+    NSUInteger ObjectPayloadAlignment { get; }
+    [Selector("objectPayloadDataSize")]
+    NSUInteger ObjectPayloadDataSize { get; }
 }
 
 /// macOS 26.0 and later.
 public objc interface MTLTensorBinding : MTLBinding
 {
-    [Selector("tensorDataType")] MTLTensorDataType TensorDataType { get; }
-    [Selector("indexType")] MTLDataType IndexType { get; }
-    [Selector("dimensions")] MTLTensorExtents? Dimensions { get; }
+    [Selector("tensorDataType")]
+    MTLTensorDataType TensorDataType { get; }
+    [Selector("indexType")]
+    MTLDataType IndexType { get; }
+    [Selector("dimensions")]
+    MTLTensorExtents? Dimensions { get; }
 }
 
 #endif

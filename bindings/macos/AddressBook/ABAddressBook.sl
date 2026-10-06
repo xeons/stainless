@@ -43,25 +43,44 @@ public extern "C" NSString? ABMultiValueIdentifiersErrorKey;
 
 public extern objc class ABAddressBook : NSObject
 {
-    [Selector("sharedAddressBook")] public static ABAddressBook? SharedAddressBook();
-    [Selector("addressBook")] public static ABAddressBook? AddressBook();
-    [Selector("recordsMatchingSearchElement:")] public NSArray? RecordsMatchingSearchElement(ABSearchElement? search);
-    [Selector("save")] public bool Save();
-    [Selector("saveAndReturnError:")] public bool SaveAndReturnError(out NSError? error);
-    [Selector("hasUnsavedChanges")] public bool HasUnsavedChanges();
-    [Selector("me")] public ABPerson? Me();
-    [Selector("setMe:")] public void SetMe(ABPerson? moi);
-    [Selector("recordForUniqueId:")] public ABRecord? RecordForUniqueId(NSString? uniqueId);
-    [Selector("addRecord:error:")] public bool AddRecordError(ABRecord? record, out NSError? error);
-    [Selector("addRecord:")] public bool AddRecord(ABRecord? record);
-    [Selector("removeRecord:error:")] public bool RemoveRecordError(ABRecord? record, out NSError? error);
-    [Selector("removeRecord:")] public bool RemoveRecord(ABRecord? record);
-    [Selector("people")] public NSArray? People();
-    [Selector("groups")] public NSArray? Groups();
-    [Selector("recordClassFromUniqueId:")] public NSString? RecordClassFromUniqueId(NSString? uniqueId);
-    [Selector("formattedAddressFromDictionary:")] public NSAttributedString? FormattedAddressFromDictionary(NSDictionary? address);
-    [Selector("defaultCountryCode")] public NSString? DefaultCountryCode();
-    [Selector("defaultNameOrdering")] public NSInteger DefaultNameOrdering();
+    [Selector("sharedAddressBook")]
+    public static ABAddressBook? SharedAddressBook();
+    [Selector("addressBook")]
+    public static ABAddressBook? AddressBook();
+    [Selector("recordsMatchingSearchElement:")]
+    public NSArray? RecordsMatchingSearchElement(ABSearchElement? search);
+    [Selector("save")]
+    public bool Save();
+    [Selector("saveAndReturnError:")]
+    public bool SaveAndReturnError(out NSError? error);
+    [Selector("hasUnsavedChanges")]
+    public bool HasUnsavedChanges();
+    [Selector("me")]
+    public ABPerson? Me();
+    [Selector("setMe:")]
+    public void SetMe(ABPerson? moi);
+    [Selector("recordForUniqueId:")]
+    public ABRecord? RecordForUniqueId(NSString? uniqueId);
+    [Selector("addRecord:error:")]
+    public bool AddRecordError(ABRecord? record, out NSError? error);
+    [Selector("addRecord:")]
+    public bool AddRecord(ABRecord? record);
+    [Selector("removeRecord:error:")]
+    public bool RemoveRecordError(ABRecord? record, out NSError? error);
+    [Selector("removeRecord:")]
+    public bool RemoveRecord(ABRecord? record);
+    [Selector("people")]
+    public NSArray? People();
+    [Selector("groups")]
+    public NSArray? Groups();
+    [Selector("recordClassFromUniqueId:")]
+    public NSString? RecordClassFromUniqueId(NSString? uniqueId);
+    [Selector("formattedAddressFromDictionary:")]
+    public NSAttributedString? FormattedAddressFromDictionary(NSDictionary? address);
+    [Selector("defaultCountryCode")]
+    public NSString? DefaultCountryCode();
+    [Selector("defaultNameOrdering")]
+    public NSInteger DefaultNameOrdering();
 }
 
 #endif

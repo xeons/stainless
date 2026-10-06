@@ -36,21 +36,29 @@ import Standard.ObjC;
 
 public objc interface MEVideoDecoderExtension : NSObjectProtocol
 {
-    [Selector("init")] Self Init();
-    [Selector("videoDecoderWithCodecType:videoFormatDescription:videoDecoderSpecifications:extensionDecoderPixelBufferManager:error:")] MEVideoDecoder? VideoDecoderWithCodecTypeVideoFormatDescriptionVideoDecoderSpecificationsExtensionDecoderPixelBufferManagerError(CMVideoCodecType codecType, CMVideoFormatDescriptionRef videoFormatDescription, NSDictionary videoDecoderSpecifications, MEVideoDecoderPixelBufferManager extensionDecoderPixelBufferManager, out NSError? error);
+    [Selector("init")]
+    Self Init();
+    [Selector("videoDecoderWithCodecType:videoFormatDescription:videoDecoderSpecifications:extensionDecoderPixelBufferManager:error:")]
+    MEVideoDecoder? VideoDecoderWithCodecTypeVideoFormatDescriptionVideoDecoderSpecificationsExtensionDecoderPixelBufferManagerError(CMVideoCodecType codecType, CMVideoFormatDescriptionRef videoFormatDescription, NSDictionary videoDecoderSpecifications, MEVideoDecoderPixelBufferManager extensionDecoderPixelBufferManager, out NSError? error);
 }
 
 public extern objc class MEVideoDecoderPixelBufferManager : NSObject
 {
-    [Selector("pixelBufferAttributes", "setPixelBufferAttributes:")] public NSDictionary PixelBufferAttributes { get; set; }
-    [ReturnsRetained] [Selector("createPixelBufferAndReturnError:")] public CVPixelBufferRef? CreatePixelBufferAndReturnError(out NSError? error);
-    [Selector("registerCustomPixelFormat:")] public void RegisterCustomPixelFormat(NSDictionary customPixelFormat);
+    [Selector("pixelBufferAttributes", "setPixelBufferAttributes:")]
+    public NSDictionary PixelBufferAttributes { get; set; }
+    [ReturnsRetained]
+    [Selector("createPixelBufferAndReturnError:")]
+    public CVPixelBufferRef? CreatePixelBufferAndReturnError(out NSError? error);
+    [Selector("registerCustomPixelFormat:")]
+    public void RegisterCustomPixelFormat(NSDictionary customPixelFormat);
 }
 
 public extern objc class MEDecodeFrameOptions : NSObject
 {
-    [Selector("doNotOutputFrame", "setDoNotOutputFrame:")] public bool DoNotOutputFrame { get; set; }
-    [Selector("realTimePlayback", "setRealTimePlayback:")] public bool RealTimePlayback { get; set; }
+    [Selector("doNotOutputFrame", "setDoNotOutputFrame:")]
+    public bool DoNotOutputFrame { get; set; }
+    [Selector("realTimePlayback", "setRealTimePlayback:")]
+    public bool RealTimePlayback { get; set; }
 }
 
 public extern "C" NSNotificationName? MEVideoDecoderReadyForMoreMediaDataDidChangeNotification;
@@ -66,16 +74,34 @@ public objc closure void MEVideoDecoderDecodeFrameFromSampleBufferOptionsComplet
 
 public objc interface MEVideoDecoder : NSObjectProtocol
 {
-    [Optional] [Selector("producesRAWOutput")] bool ProducesRAWOutput { get; }
-    [Optional] [Selector("contentHasInterframeDependencies")] bool ContentHasInterframeDependencies { get; }
-    [Optional] [Selector("recommendedThreadCount", "setRecommendedThreadCount:")] NSInteger RecommendedThreadCount { get; set; }
-    [Optional] [Selector("actualThreadCount")] NSInteger ActualThreadCount { get; }
-    [Optional] [Selector("supportedPixelFormatsOrderedByQuality")] NSArray SupportedPixelFormatsOrderedByQuality { get; }
-    [Optional] [Selector("reducedResolution", "setReducedResolution:")] CGSize ReducedResolution { get; set; }
-    [Optional] [Selector("pixelFormatsWithReducedResolutionDecodeSupport")] NSArray PixelFormatsWithReducedResolutionDecodeSupport { get; }
-    [Selector("isReadyForMoreMediaData")] bool ReadyForMoreMediaData { get; }
-    [Selector("decodeFrameFromSampleBuffer:options:completionHandler:")] void DecodeFrameFromSampleBufferOptionsCompletionHandler(CMSampleBufferRef sampleBuffer, MEDecodeFrameOptions options, MEVideoDecoderDecodeFrameFromSampleBufferOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("canAcceptFormatDescription:")] bool CanAcceptFormatDescription(CMFormatDescriptionRef formatDescription);
+    [Optional]
+    [Selector("producesRAWOutput")]
+    bool ProducesRAWOutput { get; }
+    [Optional]
+    [Selector("contentHasInterframeDependencies")]
+    bool ContentHasInterframeDependencies { get; }
+    [Optional]
+    [Selector("recommendedThreadCount", "setRecommendedThreadCount:")]
+    NSInteger RecommendedThreadCount { get; set; }
+    [Optional]
+    [Selector("actualThreadCount")]
+    NSInteger ActualThreadCount { get; }
+    [Optional]
+    [Selector("supportedPixelFormatsOrderedByQuality")]
+    NSArray SupportedPixelFormatsOrderedByQuality { get; }
+    [Optional]
+    [Selector("reducedResolution", "setReducedResolution:")]
+    CGSize ReducedResolution { get; set; }
+    [Optional]
+    [Selector("pixelFormatsWithReducedResolutionDecodeSupport")]
+    NSArray PixelFormatsWithReducedResolutionDecodeSupport { get; }
+    [Selector("isReadyForMoreMediaData")]
+    bool ReadyForMoreMediaData { get; }
+    [Selector("decodeFrameFromSampleBuffer:options:completionHandler:")]
+    void DecodeFrameFromSampleBufferOptionsCompletionHandler(CMSampleBufferRef sampleBuffer, MEDecodeFrameOptions options, MEVideoDecoderDecodeFrameFromSampleBufferOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("canAcceptFormatDescription:")]
+    bool CanAcceptFormatDescription(CMFormatDescriptionRef formatDescription);
 }
 
 #endif

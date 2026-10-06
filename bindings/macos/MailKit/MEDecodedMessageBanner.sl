@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class MEDecodedMessageBanner : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("title")] public NSString Title { get; }
-    [Selector("primaryActionTitle")] public NSString PrimaryActionTitle { get; }
-    [Selector("isDismissable")] public bool Dismissable { get; }
-    [Selector("initWithTitle:primaryActionTitle:dismissable:")] public Self InitWithTitlePrimaryActionTitleDismissable(NSString title, NSString primaryActionTitle, bool dismissable);
+    [Selector("title")]
+    public NSString Title { get; }
+    [Selector("primaryActionTitle")]
+    public NSString PrimaryActionTitle { get; }
+    [Selector("isDismissable")]
+    public bool Dismissable { get; }
+    [Selector("initWithTitle:primaryActionTitle:dismissable:")]
+    public Self InitWithTitlePrimaryActionTitleDismissable(NSString title, NSString primaryActionTitle, bool dismissable);
 }
 
 #endif

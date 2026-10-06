@@ -33,37 +33,68 @@ import Standard.ObjC;
 
 public extern objc class NSCursor : NSObject, NSSecureCoding
 {
-    [Selector("image")] public NSImage Image { get; }
-    [Selector("hotSpot")] public NSPoint HotSpot { get; }
-    [Selector("currentCursor")] public static NSCursor CurrentCursor { get; }
-    [Selector("arrowCursor")] public static NSCursor ArrowCursor { get; }
-    [Selector("crosshairCursor")] public static NSCursor CrosshairCursor { get; }
-    [Selector("disappearingItemCursor")] public static NSCursor DisappearingItemCursor { get; }
-    [Selector("operationNotAllowedCursor")] public static NSCursor? OperationNotAllowedCursor { get; }
-    [Selector("dragLinkCursor")] public static NSCursor? DragLinkCursor { get; }
-    [Selector("dragCopyCursor")] public static NSCursor? DragCopyCursor { get; }
-    [Selector("contextualMenuCursor")] public static NSCursor? ContextualMenuCursor { get; }
-    [Selector("pointingHandCursor")] public static NSCursor PointingHandCursor { get; }
-    [Selector("closedHandCursor")] public static NSCursor ClosedHandCursor { get; }
-    [Selector("openHandCursor")] public static NSCursor OpenHandCursor { get; }
-    [Selector("IBeamCursor")] public static NSCursor IBeamCursor { get; }
-    [Selector("IBeamCursorForVerticalLayout")] public static NSCursor? IBeamCursorForVerticalLayout { get; }
-    [Selector("zoomInCursor")] public static NSCursor? ZoomInCursor { get; }
-    [Selector("zoomOutCursor")] public static NSCursor? ZoomOutCursor { get; }
-    [Selector("columnResizeCursor")] public static NSCursor? ColumnResizeCursor { get; }
-    [Selector("rowResizeCursor")] public static NSCursor? RowResizeCursor { get; }
-    [Selector("initWithImage:hotSpot:")] public Self InitWithImageHotSpot(NSImage newImage, NSPoint point);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("hide")] public static void Hide();
-    [Selector("unhide")] public static void Unhide();
-    [Selector("setHiddenUntilMouseMoves:")] public static void SetHiddenUntilMouseMoves(bool flag);
-    [Selector("pop")] public static void Pop();
-    [Selector("pop")] public void PopMethod();
-    [Selector("push")] public void Push();
-    [Selector("set")] public void Set();
-    [Selector("columnResizeCursorInDirections:")] public static NSCursor ColumnResizeCursorInDirections(NSHorizontalDirections directions);
-    [Selector("rowResizeCursorInDirections:")] public static NSCursor RowResizeCursorInDirections(NSVerticalDirections directions);
-    [Selector("frameResizeCursorFromPosition:inDirections:")] public static NSCursor FrameResizeCursorFromPositionInDirections(NSCursorFrameResizePosition position, NSCursorFrameResizeDirections directions);
+    [Selector("image")]
+    public NSImage Image { get; }
+    [Selector("hotSpot")]
+    public NSPoint HotSpot { get; }
+    [Selector("currentCursor")]
+    public static NSCursor CurrentCursor { get; }
+    [Selector("arrowCursor")]
+    public static NSCursor ArrowCursor { get; }
+    [Selector("crosshairCursor")]
+    public static NSCursor CrosshairCursor { get; }
+    [Selector("disappearingItemCursor")]
+    public static NSCursor DisappearingItemCursor { get; }
+    [Selector("operationNotAllowedCursor")]
+    public static NSCursor? OperationNotAllowedCursor { get; }
+    [Selector("dragLinkCursor")]
+    public static NSCursor? DragLinkCursor { get; }
+    [Selector("dragCopyCursor")]
+    public static NSCursor? DragCopyCursor { get; }
+    [Selector("contextualMenuCursor")]
+    public static NSCursor? ContextualMenuCursor { get; }
+    [Selector("pointingHandCursor")]
+    public static NSCursor PointingHandCursor { get; }
+    [Selector("closedHandCursor")]
+    public static NSCursor ClosedHandCursor { get; }
+    [Selector("openHandCursor")]
+    public static NSCursor OpenHandCursor { get; }
+    [Selector("IBeamCursor")]
+    public static NSCursor IBeamCursor { get; }
+    [Selector("IBeamCursorForVerticalLayout")]
+    public static NSCursor? IBeamCursorForVerticalLayout { get; }
+    [Selector("zoomInCursor")]
+    public static NSCursor? ZoomInCursor { get; }
+    [Selector("zoomOutCursor")]
+    public static NSCursor? ZoomOutCursor { get; }
+    [Selector("columnResizeCursor")]
+    public static NSCursor? ColumnResizeCursor { get; }
+    [Selector("rowResizeCursor")]
+    public static NSCursor? RowResizeCursor { get; }
+    [Selector("initWithImage:hotSpot:")]
+    public Self InitWithImageHotSpot(NSImage newImage, NSPoint point);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("hide")]
+    public static void Hide();
+    [Selector("unhide")]
+    public static void Unhide();
+    [Selector("setHiddenUntilMouseMoves:")]
+    public static void SetHiddenUntilMouseMoves(bool flag);
+    [Selector("pop")]
+    public static void Pop();
+    [Selector("pop")]
+    public void PopMethod();
+    [Selector("push")]
+    public void Push();
+    [Selector("set")]
+    public void Set();
+    [Selector("columnResizeCursorInDirections:")]
+    public static NSCursor ColumnResizeCursorInDirections(NSHorizontalDirections directions);
+    [Selector("rowResizeCursorInDirections:")]
+    public static NSCursor RowResizeCursorInDirections(NSVerticalDirections directions);
+    [Selector("frameResizeCursorFromPosition:inDirections:")]
+    public static NSCursor FrameResizeCursorFromPositionInDirections(NSCursorFrameResizePosition position, NSCursorFrameResizeDirections directions);
 }
 
 public enum NSCursorFrameResizePosition : ulong
@@ -90,38 +121,52 @@ public enum NSCursorFrameResizeDirections : ulong
 public extern objc class NSCursor
 {
     /// Deprecated in macOS 100000.
-    [Selector("currentSystemCursor")] public static NSCursor? CurrentSystemCursor { get; }
+    [Selector("currentSystemCursor")]
+    public static NSCursor? CurrentSystemCursor { get; }
     /// Deprecated in macOS 100000.
-    [Selector("resizeLeftCursor")] public static NSCursor? ResizeLeftCursor { get; }
+    [Selector("resizeLeftCursor")]
+    public static NSCursor? ResizeLeftCursor { get; }
     /// Deprecated in macOS 100000.
-    [Selector("resizeRightCursor")] public static NSCursor? ResizeRightCursor { get; }
+    [Selector("resizeRightCursor")]
+    public static NSCursor? ResizeRightCursor { get; }
     /// Deprecated in macOS 100000.
-    [Selector("resizeLeftRightCursor")] public static NSCursor? ResizeLeftRightCursor { get; }
+    [Selector("resizeLeftRightCursor")]
+    public static NSCursor? ResizeLeftRightCursor { get; }
     /// Deprecated in macOS 100000.
-    [Selector("resizeUpCursor")] public static NSCursor? ResizeUpCursor { get; }
+    [Selector("resizeUpCursor")]
+    public static NSCursor? ResizeUpCursor { get; }
     /// Deprecated in macOS 100000.
-    [Selector("resizeDownCursor")] public static NSCursor? ResizeDownCursor { get; }
+    [Selector("resizeDownCursor")]
+    public static NSCursor? ResizeDownCursor { get; }
     /// Deprecated in macOS 100000.
-    [Selector("resizeUpDownCursor")] public static NSCursor? ResizeUpDownCursor { get; }
+    [Selector("resizeUpDownCursor")]
+    public static NSCursor? ResizeUpDownCursor { get; }
 }
 
 /// NSDeprecated, a category of NSCursor.
 public extern objc class NSCursor
 {
     /// Deprecated in macOS 10.13.
-    [Selector("isSetOnMouseExited")] public bool SetOnMouseExited { get; }
+    [Selector("isSetOnMouseExited")]
+    public bool SetOnMouseExited { get; }
     /// Deprecated in macOS 10.13.
-    [Selector("isSetOnMouseEntered")] public bool SetOnMouseEntered { get; }
+    [Selector("isSetOnMouseEntered")]
+    public bool SetOnMouseEntered { get; }
     /// Deprecated in macOS 10.12.
-    [Selector("initWithImage:foregroundColorHint:backgroundColorHint:hotSpot:")] public Self InitWithImageForegroundColorHintBackgroundColorHintHotSpot(NSImage newImage, NSColor? fg, NSColor? bg, NSPoint hotSpot);
+    [Selector("initWithImage:foregroundColorHint:backgroundColorHint:hotSpot:")]
+    public Self InitWithImageForegroundColorHintBackgroundColorHintHotSpot(NSImage newImage, NSColor? fg, NSColor? bg, NSPoint hotSpot);
     /// Deprecated in macOS 10.13.
-    [Selector("setOnMouseExited:")] public void SetOnMouseExitedMethod(bool flag);
+    [Selector("setOnMouseExited:")]
+    public void SetOnMouseExitedMethod(bool flag);
     /// Deprecated in macOS 10.13.
-    [Selector("setOnMouseEntered:")] public void SetOnMouseEnteredMethod(bool flag);
+    [Selector("setOnMouseEntered:")]
+    public void SetOnMouseEnteredMethod(bool flag);
     /// Deprecated in macOS 10.13.
-    [Selector("mouseEntered:")] public void MouseEntered(NSEvent event);
+    [Selector("mouseEntered:")]
+    public void MouseEntered(NSEvent event);
     /// Deprecated in macOS 10.13.
-    [Selector("mouseExited:")] public void MouseExited(NSEvent event);
+    [Selector("mouseExited:")]
+    public void MouseExited(NSEvent event);
 }
 
 #endif

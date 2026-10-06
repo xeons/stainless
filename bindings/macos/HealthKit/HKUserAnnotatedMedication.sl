@@ -34,10 +34,14 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class HKUserAnnotatedMedication : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("nickname")] public NSString? Nickname { get; }
-    [Selector("isArchived")] public bool IsArchived { get; }
-    [Selector("hasSchedule")] public bool HasSchedule { get; }
-    [Selector("medication")] public HKMedicationConcept Medication { get; }
+    [Selector("nickname")]
+    public NSString? Nickname { get; }
+    [Selector("isArchived")]
+    public bool IsArchived { get; }
+    [Selector("hasSchedule")]
+    public bool HasSchedule { get; }
+    [Selector("medication")]
+    public HKMedicationConcept Medication { get; }
 }
 
 /// macOS 26.0 and later.

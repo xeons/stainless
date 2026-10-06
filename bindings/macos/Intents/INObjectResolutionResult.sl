@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INObjectResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedObject:")] public static Self SuccessWithResolvedObject(INObject resolvedObject);
-    [Selector("disambiguationWithObjectsToDisambiguate:")] public static Self DisambiguationWithObjectsToDisambiguate(NSArray objectsToDisambiguate);
-    [Selector("confirmationRequiredWithObjectToConfirm:")] public static Self ConfirmationRequiredWithObjectToConfirm(INObject? objectToConfirm);
+    [Selector("successWithResolvedObject:")]
+    public static Self SuccessWithResolvedObject(INObject resolvedObject);
+    [Selector("disambiguationWithObjectsToDisambiguate:")]
+    public static Self DisambiguationWithObjectsToDisambiguate(NSArray objectsToDisambiguate);
+    [Selector("confirmationRequiredWithObjectToConfirm:")]
+    public static Self ConfirmationRequiredWithObjectToConfirm(INObject? objectToConfirm);
 }
 
 #endif

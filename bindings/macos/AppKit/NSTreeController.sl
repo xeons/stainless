@@ -32,42 +32,78 @@ import Standard.ObjC;
 
 public extern objc class NSTreeController : NSObjectController
 {
-    [Selector("arrangedObjects")] public NSTreeNode ArrangedObjects { get; }
-    [Selector("childrenKeyPath", "setChildrenKeyPath:")] public NSString? ChildrenKeyPath { get; set; }
-    [Selector("countKeyPath", "setCountKeyPath:")] public NSString? CountKeyPath { get; set; }
-    [Selector("leafKeyPath", "setLeafKeyPath:")] public NSString? LeafKeyPath { get; set; }
-    [Selector("sortDescriptors", "setSortDescriptors:")] public NSArray SortDescriptors { get; set; }
-    [Selector("content", "setContent:")] public AnyObject? Content { get; set; }
-    [Selector("canInsert")] public bool CanInsert { get; }
-    [Selector("canInsertChild")] public bool CanInsertChild { get; }
-    [Selector("canAddChild")] public bool CanAddChild { get; }
-    [Selector("avoidsEmptySelection", "setAvoidsEmptySelection:")] public bool AvoidsEmptySelection { get; set; }
-    [Selector("preservesSelection", "setPreservesSelection:")] public bool PreservesSelection { get; set; }
-    [Selector("selectsInsertedObjects", "setSelectsInsertedObjects:")] public bool SelectsInsertedObjects { get; set; }
-    [Selector("alwaysUsesMultipleValuesMarker", "setAlwaysUsesMultipleValuesMarker:")] public bool AlwaysUsesMultipleValuesMarker { get; set; }
-    [Selector("selectedObjects")] public NSArray SelectedObjects { get; }
-    [Selector("selectionIndexPaths")] public NSArray SelectionIndexPaths { get; }
-    [Selector("selectionIndexPath")] public NSIndexPath? SelectionIndexPath { get; }
-    [Selector("selectedNodes")] public NSArray? SelectedNodes { get; }
-    [Selector("rearrangeObjects")] public void RearrangeObjects();
-    [Selector("add:")] public void Add(AnyObject? sender);
-    [Selector("remove:")] public void Remove(AnyObject? sender);
-    [Selector("addChild:")] public void AddChild(AnyObject? sender);
-    [Selector("insert:")] public void Insert(AnyObject? sender);
-    [Selector("insertChild:")] public void InsertChild(AnyObject? sender);
-    [Selector("insertObject:atArrangedObjectIndexPath:")] public void InsertObjectAtArrangedObjectIndexPath(AnyObject? object, NSIndexPath indexPath);
-    [Selector("insertObjects:atArrangedObjectIndexPaths:")] public void InsertObjectsAtArrangedObjectIndexPaths(NSArray objects, NSArray indexPaths);
-    [Selector("removeObjectAtArrangedObjectIndexPath:")] public void RemoveObjectAtArrangedObjectIndexPath(NSIndexPath indexPath);
-    [Selector("removeObjectsAtArrangedObjectIndexPaths:")] public void RemoveObjectsAtArrangedObjectIndexPaths(NSArray indexPaths);
-    [Selector("setSelectionIndexPaths:")] public bool SetSelectionIndexPaths(NSArray indexPaths);
-    [Selector("setSelectionIndexPath:")] public bool SetSelectionIndexPath(NSIndexPath? indexPath);
-    [Selector("addSelectionIndexPaths:")] public bool AddSelectionIndexPaths(NSArray indexPaths);
-    [Selector("removeSelectionIndexPaths:")] public bool RemoveSelectionIndexPaths(NSArray indexPaths);
-    [Selector("moveNode:toIndexPath:")] public void MoveNodeToIndexPath(NSTreeNode node, NSIndexPath indexPath);
-    [Selector("moveNodes:toIndexPath:")] public void MoveNodesToIndexPath(NSArray nodes, NSIndexPath startingIndexPath);
-    [Selector("childrenKeyPathForNode:")] public NSString? ChildrenKeyPathForNode(NSTreeNode node);
-    [Selector("countKeyPathForNode:")] public NSString? CountKeyPathForNode(NSTreeNode node);
-    [Selector("leafKeyPathForNode:")] public NSString? LeafKeyPathForNode(NSTreeNode node);
+    [Selector("arrangedObjects")]
+    public NSTreeNode ArrangedObjects { get; }
+    [Selector("childrenKeyPath", "setChildrenKeyPath:")]
+    public NSString? ChildrenKeyPath { get; set; }
+    [Selector("countKeyPath", "setCountKeyPath:")]
+    public NSString? CountKeyPath { get; set; }
+    [Selector("leafKeyPath", "setLeafKeyPath:")]
+    public NSString? LeafKeyPath { get; set; }
+    [Selector("sortDescriptors", "setSortDescriptors:")]
+    public NSArray SortDescriptors { get; set; }
+    [Selector("content", "setContent:")]
+    public AnyObject? Content { get; set; }
+    [Selector("canInsert")]
+    public bool CanInsert { get; }
+    [Selector("canInsertChild")]
+    public bool CanInsertChild { get; }
+    [Selector("canAddChild")]
+    public bool CanAddChild { get; }
+    [Selector("avoidsEmptySelection", "setAvoidsEmptySelection:")]
+    public bool AvoidsEmptySelection { get; set; }
+    [Selector("preservesSelection", "setPreservesSelection:")]
+    public bool PreservesSelection { get; set; }
+    [Selector("selectsInsertedObjects", "setSelectsInsertedObjects:")]
+    public bool SelectsInsertedObjects { get; set; }
+    [Selector("alwaysUsesMultipleValuesMarker", "setAlwaysUsesMultipleValuesMarker:")]
+    public bool AlwaysUsesMultipleValuesMarker { get; set; }
+    [Selector("selectedObjects")]
+    public NSArray SelectedObjects { get; }
+    [Selector("selectionIndexPaths")]
+    public NSArray SelectionIndexPaths { get; }
+    [Selector("selectionIndexPath")]
+    public NSIndexPath? SelectionIndexPath { get; }
+    [Selector("selectedNodes")]
+    public NSArray? SelectedNodes { get; }
+    [Selector("rearrangeObjects")]
+    public void RearrangeObjects();
+    [Selector("add:")]
+    public void Add(AnyObject? sender);
+    [Selector("remove:")]
+    public void Remove(AnyObject? sender);
+    [Selector("addChild:")]
+    public void AddChild(AnyObject? sender);
+    [Selector("insert:")]
+    public void Insert(AnyObject? sender);
+    [Selector("insertChild:")]
+    public void InsertChild(AnyObject? sender);
+    [Selector("insertObject:atArrangedObjectIndexPath:")]
+    public void InsertObjectAtArrangedObjectIndexPath(AnyObject? object, NSIndexPath indexPath);
+    [Selector("insertObjects:atArrangedObjectIndexPaths:")]
+    public void InsertObjectsAtArrangedObjectIndexPaths(NSArray objects, NSArray indexPaths);
+    [Selector("removeObjectAtArrangedObjectIndexPath:")]
+    public void RemoveObjectAtArrangedObjectIndexPath(NSIndexPath indexPath);
+    [Selector("removeObjectsAtArrangedObjectIndexPaths:")]
+    public void RemoveObjectsAtArrangedObjectIndexPaths(NSArray indexPaths);
+    [Selector("setSelectionIndexPaths:")]
+    public bool SetSelectionIndexPaths(NSArray indexPaths);
+    [Selector("setSelectionIndexPath:")]
+    public bool SetSelectionIndexPath(NSIndexPath? indexPath);
+    [Selector("addSelectionIndexPaths:")]
+    public bool AddSelectionIndexPaths(NSArray indexPaths);
+    [Selector("removeSelectionIndexPaths:")]
+    public bool RemoveSelectionIndexPaths(NSArray indexPaths);
+    [Selector("moveNode:toIndexPath:")]
+    public void MoveNodeToIndexPath(NSTreeNode node, NSIndexPath indexPath);
+    [Selector("moveNodes:toIndexPath:")]
+    public void MoveNodesToIndexPath(NSArray nodes, NSIndexPath startingIndexPath);
+    [Selector("childrenKeyPathForNode:")]
+    public NSString? ChildrenKeyPathForNode(NSTreeNode node);
+    [Selector("countKeyPathForNode:")]
+    public NSString? CountKeyPathForNode(NSTreeNode node);
+    [Selector("leafKeyPathForNode:")]
+    public NSString? LeafKeyPathForNode(NSTreeNode node);
 }
 
 #endif

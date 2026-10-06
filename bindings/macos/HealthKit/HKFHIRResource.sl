@@ -59,11 +59,16 @@ public extern "C" HKFHIRResourceType? HKFHIRResourceTypeProcedure;
 
 public extern objc class HKFHIRResource : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("FHIRVersion")] public HKFHIRVersion? FHIRVersion { get; }
-    [Selector("resourceType")] public HKFHIRResourceType ResourceType { get; }
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("data")] public NSData Data { get; }
-    [Selector("sourceURL")] public NSURL? SourceURL { get; }
+    [Selector("FHIRVersion")]
+    public HKFHIRVersion? FHIRVersion { get; }
+    [Selector("resourceType")]
+    public HKFHIRResourceType ResourceType { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("sourceURL")]
+    public NSURL? SourceURL { get; }
 }
 
 #endif

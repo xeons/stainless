@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INMassResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedMass:")] public static Self SuccessWithResolvedMass(NSMeasurement resolvedMass);
-    [Selector("disambiguationWithMassToDisambiguate:")] public static Self DisambiguationWithMassToDisambiguate(NSArray massToDisambiguate);
-    [Selector("confirmationRequiredWithMassToConfirm:")] public static Self ConfirmationRequiredWithMassToConfirm(NSMeasurement? massToConfirm);
+    [Selector("successWithResolvedMass:")]
+    public static Self SuccessWithResolvedMass(NSMeasurement resolvedMass);
+    [Selector("disambiguationWithMassToDisambiguate:")]
+    public static Self DisambiguationWithMassToDisambiguate(NSArray massToDisambiguate);
+    [Selector("confirmationRequiredWithMassToConfirm:")]
+    public static Self ConfirmationRequiredWithMassToConfirm(NSMeasurement? massToConfirm);
 }
 
 #endif

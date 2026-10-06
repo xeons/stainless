@@ -44,50 +44,94 @@ public enum NSSnapshotEventType : ulong
 
 public extern objc class NSManagedObject : NSObject
 {
-    [Selector("contextShouldIgnoreUnmodeledPropertyChanges")] public static bool ContextShouldIgnoreUnmodeledPropertyChanges { get; }
-    [Selector("managedObjectContext")] public NSManagedObjectContext? ManagedObjectContext { get; }
-    [Selector("entity")] public NSEntityDescription Entity { get; }
-    [Selector("objectID")] public NSManagedObjectID ObjectID { get; }
-    [Selector("isInserted")] public bool Inserted { get; }
-    [Selector("isUpdated")] public bool Updated { get; }
-    [Selector("isDeleted")] public bool Deleted { get; }
-    [Selector("hasChanges")] public bool HasChanges { get; }
-    [Selector("hasPersistentChangedValues")] public bool HasPersistentChangedValues { get; }
-    [Selector("isFault")] public bool Fault { get; }
-    [Selector("faultingState")] public NSUInteger FaultingState { get; }
-    [Selector("entity")] public static NSEntityDescription ClassEntity();
-    [Selector("fetchRequest")] public static NSFetchRequest FetchRequest();
-    [Selector("initWithEntity:insertIntoManagedObjectContext:")] public NSManagedObject InitWithEntityInsertIntoManagedObjectContext(NSEntityDescription entity, NSManagedObjectContext? context);
-    [Selector("initWithContext:")] public Self InitWithContext(NSManagedObjectContext moc);
-    [Selector("hasFaultForRelationshipNamed:")] public bool HasFaultForRelationshipNamed(NSString key);
-    [Selector("objectIDsForRelationshipNamed:")] public NSArray ObjectIDsForRelationshipNamed(NSString key);
-    [Selector("willAccessValueForKey:")] public void WillAccessValueForKey(NSString? key);
-    [Selector("didAccessValueForKey:")] public void DidAccessValueForKey(NSString? key);
-    [Selector("willChangeValueForKey:")] public void WillChangeValueForKey(NSString key);
-    [Selector("didChangeValueForKey:")] public void DidChangeValueForKey(NSString key);
-    [Selector("willChangeValueForKey:withSetMutation:usingObjects:")] public void WillChangeValueForKeyWithSetMutationUsingObjects(NSString inKey, NSKeyValueSetMutationKind inMutationKind, NSSet inObjects);
-    [Selector("didChangeValueForKey:withSetMutation:usingObjects:")] public void DidChangeValueForKeyWithSetMutationUsingObjects(NSString inKey, NSKeyValueSetMutationKind inMutationKind, NSSet inObjects);
-    [Selector("awakeFromFetch")] public void AwakeFromFetch();
-    [Selector("awakeFromInsert")] public void AwakeFromInsert();
-    [Selector("awakeFromSnapshotEvents:")] public void AwakeFromSnapshotEvents(NSSnapshotEventType flags);
-    [Selector("prepareForDeletion")] public void PrepareForDeletion();
-    [Selector("willSave")] public void WillSave();
-    [Selector("didSave")] public void DidSave();
-    [Selector("willTurnIntoFault")] public void WillTurnIntoFault();
-    [Selector("didTurnIntoFault")] public void DidTurnIntoFault();
-    [Selector("valueForKey:")] public AnyObject? ValueForKey(NSString key);
-    [Selector("setValue:forKey:")] public void SetValueForKey(AnyObject? value, NSString key);
-    [Selector("primitiveValueForKey:")] public AnyObject? PrimitiveValueForKey(NSString key);
-    [Selector("setPrimitiveValue:forKey:")] public void SetPrimitiveValueForKey(AnyObject? value, NSString key);
-    [Selector("committedValuesForKeys:")] public NSDictionary CommittedValuesForKeys(NSArray? keys);
-    [Selector("changedValues")] public NSDictionary ChangedValues();
-    [Selector("changedValuesForCurrentEvent")] public NSDictionary ChangedValuesForCurrentEvent();
-    [Selector("validateValue:forKey:error:")] public bool ValidateValueForKeyError(out AnyObject? value, NSString key, out NSError? error);
-    [Selector("validateForDelete:")] public bool ValidateForDelete(out NSError? error);
-    [Selector("validateForInsert:")] public bool ValidateForInsert(out NSError? error);
-    [Selector("validateForUpdate:")] public bool ValidateForUpdate(out NSError? error);
-    [Selector("setObservationInfo:")] public void SetObservationInfo(void* inObservationInfo);
-    [Selector("observationInfo")] public void* ObservationInfo();
+    [Selector("contextShouldIgnoreUnmodeledPropertyChanges")]
+    public static bool ContextShouldIgnoreUnmodeledPropertyChanges { get; }
+    [Selector("managedObjectContext")]
+    public NSManagedObjectContext? ManagedObjectContext { get; }
+    [Selector("entity")]
+    public NSEntityDescription Entity { get; }
+    [Selector("objectID")]
+    public NSManagedObjectID ObjectID { get; }
+    [Selector("isInserted")]
+    public bool Inserted { get; }
+    [Selector("isUpdated")]
+    public bool Updated { get; }
+    [Selector("isDeleted")]
+    public bool Deleted { get; }
+    [Selector("hasChanges")]
+    public bool HasChanges { get; }
+    [Selector("hasPersistentChangedValues")]
+    public bool HasPersistentChangedValues { get; }
+    [Selector("isFault")]
+    public bool Fault { get; }
+    [Selector("faultingState")]
+    public NSUInteger FaultingState { get; }
+    [Selector("entity")]
+    public static NSEntityDescription ClassEntity();
+    [Selector("fetchRequest")]
+    public static NSFetchRequest FetchRequest();
+    [Selector("initWithEntity:insertIntoManagedObjectContext:")]
+    public NSManagedObject InitWithEntityInsertIntoManagedObjectContext(NSEntityDescription entity, NSManagedObjectContext? context);
+    [Selector("initWithContext:")]
+    public Self InitWithContext(NSManagedObjectContext moc);
+    [Selector("hasFaultForRelationshipNamed:")]
+    public bool HasFaultForRelationshipNamed(NSString key);
+    [Selector("objectIDsForRelationshipNamed:")]
+    public NSArray ObjectIDsForRelationshipNamed(NSString key);
+    [Selector("willAccessValueForKey:")]
+    public void WillAccessValueForKey(NSString? key);
+    [Selector("didAccessValueForKey:")]
+    public void DidAccessValueForKey(NSString? key);
+    [Selector("willChangeValueForKey:")]
+    public void WillChangeValueForKey(NSString key);
+    [Selector("didChangeValueForKey:")]
+    public void DidChangeValueForKey(NSString key);
+    [Selector("willChangeValueForKey:withSetMutation:usingObjects:")]
+    public void WillChangeValueForKeyWithSetMutationUsingObjects(NSString inKey, NSKeyValueSetMutationKind inMutationKind, NSSet inObjects);
+    [Selector("didChangeValueForKey:withSetMutation:usingObjects:")]
+    public void DidChangeValueForKeyWithSetMutationUsingObjects(NSString inKey, NSKeyValueSetMutationKind inMutationKind, NSSet inObjects);
+    [Selector("awakeFromFetch")]
+    public void AwakeFromFetch();
+    [Selector("awakeFromInsert")]
+    public void AwakeFromInsert();
+    [Selector("awakeFromSnapshotEvents:")]
+    public void AwakeFromSnapshotEvents(NSSnapshotEventType flags);
+    [Selector("prepareForDeletion")]
+    public void PrepareForDeletion();
+    [Selector("willSave")]
+    public void WillSave();
+    [Selector("didSave")]
+    public void DidSave();
+    [Selector("willTurnIntoFault")]
+    public void WillTurnIntoFault();
+    [Selector("didTurnIntoFault")]
+    public void DidTurnIntoFault();
+    [Selector("valueForKey:")]
+    public AnyObject? ValueForKey(NSString key);
+    [Selector("setValue:forKey:")]
+    public void SetValueForKey(AnyObject? value, NSString key);
+    [Selector("primitiveValueForKey:")]
+    public AnyObject? PrimitiveValueForKey(NSString key);
+    [Selector("setPrimitiveValue:forKey:")]
+    public void SetPrimitiveValueForKey(AnyObject? value, NSString key);
+    [Selector("committedValuesForKeys:")]
+    public NSDictionary CommittedValuesForKeys(NSArray? keys);
+    [Selector("changedValues")]
+    public NSDictionary ChangedValues();
+    [Selector("changedValuesForCurrentEvent")]
+    public NSDictionary ChangedValuesForCurrentEvent();
+    [Selector("validateValue:forKey:error:")]
+    public bool ValidateValueForKeyError(out AnyObject? value, NSString key, out NSError? error);
+    [Selector("validateForDelete:")]
+    public bool ValidateForDelete(out NSError? error);
+    [Selector("validateForInsert:")]
+    public bool ValidateForInsert(out NSError? error);
+    [Selector("validateForUpdate:")]
+    public bool ValidateForUpdate(out NSError? error);
+    [Selector("setObservationInfo:")]
+    public void SetObservationInfo(void* inObservationInfo);
+    [Selector("observationInfo")]
+    public void* ObservationInfo();
 }
 
 #endif

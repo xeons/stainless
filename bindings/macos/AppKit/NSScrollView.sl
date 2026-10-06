@@ -40,53 +40,98 @@ public enum NSScrollElasticity : long
 
 public extern objc class NSScrollView : NSView, NSTextFinderBarContainer
 {
-    [Selector("documentVisibleRect")] public NSRect DocumentVisibleRect { get; }
-    [Selector("contentSize")] public NSSize ContentSize { get; }
-    [Selector("documentView", "setDocumentView:")] public NSView? DocumentView { get; set; }
-    [Selector("contentView", "setContentView:")] public NSClipView ContentView { get; set; }
-    [Selector("documentCursor", "setDocumentCursor:")] public NSCursor? DocumentCursor { get; set; }
-    [Selector("borderType", "setBorderType:")] public NSBorderType BorderType { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor BackgroundColor { get; set; }
-    [Selector("drawsBackground", "setDrawsBackground:")] public bool DrawsBackground { get; set; }
-    [Selector("hasVerticalScroller", "setHasVerticalScroller:")] public bool HasVerticalScroller { get; set; }
-    [Selector("hasHorizontalScroller", "setHasHorizontalScroller:")] public bool HasHorizontalScroller { get; set; }
-    [Selector("verticalScroller", "setVerticalScroller:")] public NSScroller? VerticalScroller { get; set; }
-    [Selector("horizontalScroller", "setHorizontalScroller:")] public NSScroller? HorizontalScroller { get; set; }
-    [Selector("autohidesScrollers", "setAutohidesScrollers:")] public bool AutohidesScrollers { get; set; }
-    [Selector("horizontalLineScroll", "setHorizontalLineScroll:")] public CGFloat HorizontalLineScroll { get; set; }
-    [Selector("verticalLineScroll", "setVerticalLineScroll:")] public CGFloat VerticalLineScroll { get; set; }
-    [Selector("lineScroll", "setLineScroll:")] public CGFloat LineScroll { get; set; }
-    [Selector("horizontalPageScroll", "setHorizontalPageScroll:")] public CGFloat HorizontalPageScroll { get; set; }
-    [Selector("verticalPageScroll", "setVerticalPageScroll:")] public CGFloat VerticalPageScroll { get; set; }
-    [Selector("pageScroll", "setPageScroll:")] public CGFloat PageScroll { get; set; }
-    [Selector("scrollsDynamically", "setScrollsDynamically:")] public bool ScrollsDynamically { get; set; }
-    [Selector("scrollerStyle", "setScrollerStyle:")] public NSScrollerStyle ScrollerStyle { get; set; }
-    [Selector("scrollerKnobStyle", "setScrollerKnobStyle:")] public NSScrollerKnobStyle ScrollerKnobStyle { get; set; }
-    [Selector("horizontalScrollElasticity", "setHorizontalScrollElasticity:")] public NSScrollElasticity HorizontalScrollElasticity { get; set; }
-    [Selector("verticalScrollElasticity", "setVerticalScrollElasticity:")] public NSScrollElasticity VerticalScrollElasticity { get; set; }
-    [Selector("usesPredominantAxisScrolling", "setUsesPredominantAxisScrolling:")] public bool UsesPredominantAxisScrolling { get; set; }
-    [Selector("allowsMagnification", "setAllowsMagnification:")] public bool AllowsMagnification { get; set; }
-    [Selector("magnification", "setMagnification:")] public CGFloat Magnification { get; set; }
-    [Selector("maxMagnification", "setMaxMagnification:")] public CGFloat MaxMagnification { get; set; }
-    [Selector("minMagnification", "setMinMagnification:")] public CGFloat MinMagnification { get; set; }
-    [Selector("automaticallyAdjustsContentInsets", "setAutomaticallyAdjustsContentInsets:")] public bool AutomaticallyAdjustsContentInsets { get; set; }
-    [Selector("contentInsets", "setContentInsets:")] public NSEdgeInsets ContentInsets { get; set; }
-    [Selector("scrollerInsets", "setScrollerInsets:")] public NSEdgeInsets ScrollerInsets { get; set; }
-    [Selector("initWithFrame:")] public Self InitWithFrame(NSRect frameRect);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("frameSizeForContentSize:horizontalScrollerClass:verticalScrollerClass:borderType:controlSize:scrollerStyle:")] public static NSSize FrameSizeForContentSizeHorizontalScrollerClassVerticalScrollerClassBorderTypeControlSizeScrollerStyle(NSSize cSize, Class horizontalScrollerClass, Class verticalScrollerClass, NSBorderType type, NSControlSize controlSize, NSScrollerStyle scrollerStyle);
-    [Selector("contentSizeForFrameSize:horizontalScrollerClass:verticalScrollerClass:borderType:controlSize:scrollerStyle:")] public static NSSize ContentSizeForFrameSizeHorizontalScrollerClassVerticalScrollerClassBorderTypeControlSizeScrollerStyle(NSSize fSize, Class horizontalScrollerClass, Class verticalScrollerClass, NSBorderType type, NSControlSize controlSize, NSScrollerStyle scrollerStyle);
+    [Selector("documentVisibleRect")]
+    public NSRect DocumentVisibleRect { get; }
+    [Selector("contentSize")]
+    public NSSize ContentSize { get; }
+    [Selector("documentView", "setDocumentView:")]
+    public NSView? DocumentView { get; set; }
+    [Selector("contentView", "setContentView:")]
+    public NSClipView ContentView { get; set; }
+    [Selector("documentCursor", "setDocumentCursor:")]
+    public NSCursor? DocumentCursor { get; set; }
+    [Selector("borderType", "setBorderType:")]
+    public NSBorderType BorderType { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor BackgroundColor { get; set; }
+    [Selector("drawsBackground", "setDrawsBackground:")]
+    public bool DrawsBackground { get; set; }
+    [Selector("hasVerticalScroller", "setHasVerticalScroller:")]
+    public bool HasVerticalScroller { get; set; }
+    [Selector("hasHorizontalScroller", "setHasHorizontalScroller:")]
+    public bool HasHorizontalScroller { get; set; }
+    [Selector("verticalScroller", "setVerticalScroller:")]
+    public NSScroller? VerticalScroller { get; set; }
+    [Selector("horizontalScroller", "setHorizontalScroller:")]
+    public NSScroller? HorizontalScroller { get; set; }
+    [Selector("autohidesScrollers", "setAutohidesScrollers:")]
+    public bool AutohidesScrollers { get; set; }
+    [Selector("horizontalLineScroll", "setHorizontalLineScroll:")]
+    public CGFloat HorizontalLineScroll { get; set; }
+    [Selector("verticalLineScroll", "setVerticalLineScroll:")]
+    public CGFloat VerticalLineScroll { get; set; }
+    [Selector("lineScroll", "setLineScroll:")]
+    public CGFloat LineScroll { get; set; }
+    [Selector("horizontalPageScroll", "setHorizontalPageScroll:")]
+    public CGFloat HorizontalPageScroll { get; set; }
+    [Selector("verticalPageScroll", "setVerticalPageScroll:")]
+    public CGFloat VerticalPageScroll { get; set; }
+    [Selector("pageScroll", "setPageScroll:")]
+    public CGFloat PageScroll { get; set; }
+    [Selector("scrollsDynamically", "setScrollsDynamically:")]
+    public bool ScrollsDynamically { get; set; }
+    [Selector("scrollerStyle", "setScrollerStyle:")]
+    public NSScrollerStyle ScrollerStyle { get; set; }
+    [Selector("scrollerKnobStyle", "setScrollerKnobStyle:")]
+    public NSScrollerKnobStyle ScrollerKnobStyle { get; set; }
+    [Selector("horizontalScrollElasticity", "setHorizontalScrollElasticity:")]
+    public NSScrollElasticity HorizontalScrollElasticity { get; set; }
+    [Selector("verticalScrollElasticity", "setVerticalScrollElasticity:")]
+    public NSScrollElasticity VerticalScrollElasticity { get; set; }
+    [Selector("usesPredominantAxisScrolling", "setUsesPredominantAxisScrolling:")]
+    public bool UsesPredominantAxisScrolling { get; set; }
+    [Selector("allowsMagnification", "setAllowsMagnification:")]
+    public bool AllowsMagnification { get; set; }
+    [Selector("magnification", "setMagnification:")]
+    public CGFloat Magnification { get; set; }
+    [Selector("maxMagnification", "setMaxMagnification:")]
+    public CGFloat MaxMagnification { get; set; }
+    [Selector("minMagnification", "setMinMagnification:")]
+    public CGFloat MinMagnification { get; set; }
+    [Selector("automaticallyAdjustsContentInsets", "setAutomaticallyAdjustsContentInsets:")]
+    public bool AutomaticallyAdjustsContentInsets { get; set; }
+    [Selector("contentInsets", "setContentInsets:")]
+    public NSEdgeInsets ContentInsets { get; set; }
+    [Selector("scrollerInsets", "setScrollerInsets:")]
+    public NSEdgeInsets ScrollerInsets { get; set; }
+    [Selector("initWithFrame:")]
+    public Self InitWithFrame(NSRect frameRect);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("frameSizeForContentSize:horizontalScrollerClass:verticalScrollerClass:borderType:controlSize:scrollerStyle:")]
+    public static NSSize FrameSizeForContentSizeHorizontalScrollerClassVerticalScrollerClassBorderTypeControlSizeScrollerStyle(NSSize cSize, Class horizontalScrollerClass, Class verticalScrollerClass, NSBorderType type, NSControlSize controlSize, NSScrollerStyle scrollerStyle);
+    [Selector("contentSizeForFrameSize:horizontalScrollerClass:verticalScrollerClass:borderType:controlSize:scrollerStyle:")]
+    public static NSSize ContentSizeForFrameSizeHorizontalScrollerClassVerticalScrollerClassBorderTypeControlSizeScrollerStyle(NSSize fSize, Class horizontalScrollerClass, Class verticalScrollerClass, NSBorderType type, NSControlSize controlSize, NSScrollerStyle scrollerStyle);
     /// Deprecated in macOS 10.7.
-    [Selector("frameSizeForContentSize:hasHorizontalScroller:hasVerticalScroller:borderType:")] public static NSSize FrameSizeForContentSizeHasHorizontalScrollerHasVerticalScrollerBorderType(NSSize cSize, bool hFlag, bool vFlag, NSBorderType type);
+    [Selector("frameSizeForContentSize:hasHorizontalScroller:hasVerticalScroller:borderType:")]
+    public static NSSize FrameSizeForContentSizeHasHorizontalScrollerHasVerticalScrollerBorderType(NSSize cSize, bool hFlag, bool vFlag, NSBorderType type);
     /// Deprecated in macOS 10.7.
-    [Selector("contentSizeForFrameSize:hasHorizontalScroller:hasVerticalScroller:borderType:")] public static NSSize ContentSizeForFrameSizeHasHorizontalScrollerHasVerticalScrollerBorderType(NSSize fSize, bool hFlag, bool vFlag, NSBorderType type);
-    [Selector("tile")] public void Tile();
-    [Selector("reflectScrolledClipView:")] public void ReflectScrolledClipView(NSClipView cView);
-    [Selector("scrollWheel:")] public void ScrollWheel(NSEvent event);
-    [Selector("flashScrollers")] public void FlashScrollers();
-    [Selector("magnifyToFitRect:")] public void MagnifyToFitRect(NSRect rect);
-    [Selector("setMagnification:centeredAtPoint:")] public void SetMagnificationCenteredAtPoint(CGFloat magnification, NSPoint point);
-    [Selector("addFloatingSubview:forAxis:")] public void AddFloatingSubviewForAxis(NSView view, NSEventGestureAxis axis);
+    [Selector("contentSizeForFrameSize:hasHorizontalScroller:hasVerticalScroller:borderType:")]
+    public static NSSize ContentSizeForFrameSizeHasHorizontalScrollerHasVerticalScrollerBorderType(NSSize fSize, bool hFlag, bool vFlag, NSBorderType type);
+    [Selector("tile")]
+    public void Tile();
+    [Selector("reflectScrolledClipView:")]
+    public void ReflectScrolledClipView(NSClipView cView);
+    [Selector("scrollWheel:")]
+    public void ScrollWheel(NSEvent event);
+    [Selector("flashScrollers")]
+    public void FlashScrollers();
+    [Selector("magnifyToFitRect:")]
+    public void MagnifyToFitRect(NSRect rect);
+    [Selector("setMagnification:centeredAtPoint:")]
+    public void SetMagnificationCenteredAtPoint(CGFloat magnification, NSPoint point);
+    [Selector("addFloatingSubview:forAxis:")]
+    public void AddFloatingSubviewForAxis(NSView view, NSEventGestureAxis axis);
 }
 
 public extern "C" NSNotificationName? NSScrollViewWillStartLiveMagnifyNotification;
@@ -102,12 +147,18 @@ public extern "C" NSNotificationName? NSScrollViewDidEndLiveScrollNotification;
 /// NSRulerSupport, a category of NSScrollView.
 public extern objc class NSScrollView
 {
-    [Selector("rulerViewClass", "setRulerViewClass:")] public static Class RulerViewClass { get; set; }
-    [Selector("rulersVisible", "setRulersVisible:")] public bool RulersVisible { get; set; }
-    [Selector("hasHorizontalRuler", "setHasHorizontalRuler:")] public bool HasHorizontalRuler { get; set; }
-    [Selector("hasVerticalRuler", "setHasVerticalRuler:")] public bool HasVerticalRuler { get; set; }
-    [Selector("horizontalRulerView", "setHorizontalRulerView:")] public NSRulerView? HorizontalRulerView { get; set; }
-    [Selector("verticalRulerView", "setVerticalRulerView:")] public NSRulerView? VerticalRulerView { get; set; }
+    [Selector("rulerViewClass", "setRulerViewClass:")]
+    public static Class RulerViewClass { get; set; }
+    [Selector("rulersVisible", "setRulersVisible:")]
+    public bool RulersVisible { get; set; }
+    [Selector("hasHorizontalRuler", "setHasHorizontalRuler:")]
+    public bool HasHorizontalRuler { get; set; }
+    [Selector("hasVerticalRuler", "setHasVerticalRuler:")]
+    public bool HasVerticalRuler { get; set; }
+    [Selector("horizontalRulerView", "setHorizontalRulerView:")]
+    public NSRulerView? HorizontalRulerView { get; set; }
+    [Selector("verticalRulerView", "setVerticalRulerView:")]
+    public NSRulerView? VerticalRulerView { get; set; }
 }
 
 public enum NSScrollViewFindBarPosition : long
@@ -120,7 +171,8 @@ public enum NSScrollViewFindBarPosition : long
 /// NSFindBarSupport, a category of NSScrollView.
 public extern objc class NSScrollView
 {
-    [Selector("findBarPosition", "setFindBarPosition:")] public NSScrollViewFindBarPosition FindBarPosition { get; set; }
+    [Selector("findBarPosition", "setFindBarPosition:")]
+    public NSScrollViewFindBarPosition FindBarPosition { get; set; }
 }
 
 #endif

@@ -39,11 +39,15 @@ public extern "C" SHMediaItemProperty SHMediaItemConfidence;
 
 public extern objc class SHMatchedMediaItem : SHMediaItem, NSSecureCoding
 {
-    [Selector("frequencySkew")] public float FrequencySkew { get; }
-    [Selector("matchOffset")] public NSTimeInterval MatchOffset { get; }
-    [Selector("predictedCurrentMatchOffset")] public NSTimeInterval PredictedCurrentMatchOffset { get; }
+    [Selector("frequencySkew")]
+    public float FrequencySkew { get; }
+    [Selector("matchOffset")]
+    public NSTimeInterval MatchOffset { get; }
+    [Selector("predictedCurrentMatchOffset")]
+    public NSTimeInterval PredictedCurrentMatchOffset { get; }
     /// macOS 15.4 and later.
-    [Selector("confidence")] public float Confidence { get; }
+    [Selector("confidence")]
+    public float Confidence { get; }
 }
 
 #endif

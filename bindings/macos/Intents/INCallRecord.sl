@@ -33,18 +33,30 @@ import Standard.ObjC;
 
 public extern objc class INCallRecord : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("dateCreated")] public NSDate? DateCreated { get; }
-    [Selector("callRecordType")] public INCallRecordType CallRecordType { get; }
-    [Selector("callDuration")] public NSNumber? CallDuration { get; }
-    [Selector("unseen")] public NSNumber? Unseen { get; }
-    [Selector("callCapability")] public INCallCapability CallCapability { get; }
-    [Selector("numberOfCalls")] public NSNumber? NumberOfCalls { get; }
-    [Selector("isCallerIdBlocked")] public NSNumber? IsCallerIdBlocked { get; }
-    [Selector("participants")] public NSArray? Participants { get; }
-    [Selector("initWithIdentifier:dateCreated:callRecordType:callCapability:callDuration:unseen:participants:numberOfCalls:isCallerIdBlocked:")] public Self InitWithIdentifierDateCreatedCallRecordTypeCallCapabilityCallDurationUnseenParticipantsNumberOfCallsIsCallerIdBlocked(NSString identifier, NSDate? dateCreated, INCallRecordType callRecordType, INCallCapability callCapability, NSNumber? callDuration, NSNumber? unseen, NSArray? participants, NSNumber? numberOfCalls, NSNumber? isCallerIdBlocked);
-    [Selector("initWithIdentifier:dateCreated:callRecordType:callCapability:callDuration:unseen:")] public Self InitWithIdentifierDateCreatedCallRecordTypeCallCapabilityCallDurationUnseen(NSString identifier, NSDate? dateCreated, INCallRecordType callRecordType, INCallCapability callCapability, NSNumber? callDuration, NSNumber? unseen);
-    [Selector("initWithIdentifier:dateCreated:callRecordType:callCapability:callDuration:unseen:numberOfCalls:")] public Self InitWithIdentifierDateCreatedCallRecordTypeCallCapabilityCallDurationUnseenNumberOfCalls(NSString identifier, NSDate? dateCreated, INCallRecordType callRecordType, INCallCapability callCapability, NSNumber? callDuration, NSNumber? unseen, NSNumber? numberOfCalls);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("dateCreated")]
+    public NSDate? DateCreated { get; }
+    [Selector("callRecordType")]
+    public INCallRecordType CallRecordType { get; }
+    [Selector("callDuration")]
+    public NSNumber? CallDuration { get; }
+    [Selector("unseen")]
+    public NSNumber? Unseen { get; }
+    [Selector("callCapability")]
+    public INCallCapability CallCapability { get; }
+    [Selector("numberOfCalls")]
+    public NSNumber? NumberOfCalls { get; }
+    [Selector("isCallerIdBlocked")]
+    public NSNumber? IsCallerIdBlocked { get; }
+    [Selector("participants")]
+    public NSArray? Participants { get; }
+    [Selector("initWithIdentifier:dateCreated:callRecordType:callCapability:callDuration:unseen:participants:numberOfCalls:isCallerIdBlocked:")]
+    public Self InitWithIdentifierDateCreatedCallRecordTypeCallCapabilityCallDurationUnseenParticipantsNumberOfCallsIsCallerIdBlocked(NSString identifier, NSDate? dateCreated, INCallRecordType callRecordType, INCallCapability callCapability, NSNumber? callDuration, NSNumber? unseen, NSArray? participants, NSNumber? numberOfCalls, NSNumber? isCallerIdBlocked);
+    [Selector("initWithIdentifier:dateCreated:callRecordType:callCapability:callDuration:unseen:")]
+    public Self InitWithIdentifierDateCreatedCallRecordTypeCallCapabilityCallDurationUnseen(NSString identifier, NSDate? dateCreated, INCallRecordType callRecordType, INCallCapability callCapability, NSNumber? callDuration, NSNumber? unseen);
+    [Selector("initWithIdentifier:dateCreated:callRecordType:callCapability:callDuration:unseen:numberOfCalls:")]
+    public Self InitWithIdentifierDateCreatedCallRecordTypeCallCapabilityCallDurationUnseenNumberOfCalls(NSString identifier, NSDate? dateCreated, INCallRecordType callRecordType, INCallCapability callCapability, NSNumber? callDuration, NSNumber? unseen, NSNumber? numberOfCalls);
 }
 
 #endif

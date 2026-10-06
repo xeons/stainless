@@ -48,19 +48,26 @@ public enum PKVehicleConnectionSessionConnectionState : long
 
 public objc interface PKVehicleConnectionDelegate : NSObjectProtocol
 {
-    [Selector("sessionDidChangeConnectionState:")] void SessionDidChangeConnectionState(PKVehicleConnectionSessionConnectionState newState);
-    [Selector("sessionDidReceiveData:")] void SessionDidReceiveData(NSData data);
+    [Selector("sessionDidChangeConnectionState:")]
+    void SessionDidChangeConnectionState(PKVehicleConnectionSessionConnectionState newState);
+    [Selector("sessionDidReceiveData:")]
+    void SessionDidReceiveData(NSData data);
 }
 
 public objc closure void PKVehicleConnectionSessionSessionForPassDelegateCompletionCompletionBlock(PKVehicleConnectionSession? arg0, NSError? arg1);
 
 public extern objc class PKVehicleConnectionSession : NSObject
 {
-    [Selector("delegate")] public PKVehicleConnectionDelegate? Delegate { get; }
-    [Selector("connectionStatus")] public PKVehicleConnectionSessionConnectionState ConnectionStatus { get; }
-    [Selector("sessionForPass:delegate:completion:")] public static void SessionForPassDelegateCompletion(PKSecureElementPass pass, PKVehicleConnectionDelegate @delegate, PKVehicleConnectionSessionSessionForPassDelegateCompletionCompletionBlock completion);
-    [Selector("sendData:error:")] public bool SendDataError(NSData message, out NSError? error);
-    [Selector("invalidate")] public void Invalidate();
+    [Selector("delegate")]
+    public PKVehicleConnectionDelegate? Delegate { get; }
+    [Selector("connectionStatus")]
+    public PKVehicleConnectionSessionConnectionState ConnectionStatus { get; }
+    [Selector("sessionForPass:delegate:completion:")]
+    public static void SessionForPassDelegateCompletion(PKSecureElementPass pass, PKVehicleConnectionDelegate @delegate, PKVehicleConnectionSessionSessionForPassDelegateCompletionCompletionBlock completion);
+    [Selector("sendData:error:")]
+    public bool SendDataError(NSData message, out NSError? error);
+    [Selector("invalidate")]
+    public void Invalidate();
 }
 
 #endif

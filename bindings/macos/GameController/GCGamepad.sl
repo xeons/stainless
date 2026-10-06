@@ -32,16 +32,26 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.12.
 public extern objc class GCGamepad : GCPhysicalInputProfile
 {
-    [Selector("controller")] public GCController? Controller { get; }
-    [Selector("valueChangedHandler", "setValueChangedHandler:")] public GCGamepadValueChangedHandler? ValueChangedHandler { get; set; }
-    [Selector("dpad")] public GCControllerDirectionPad Dpad { get; }
-    [Selector("buttonA")] public GCControllerButtonInput ButtonA { get; }
-    [Selector("buttonB")] public GCControllerButtonInput ButtonB { get; }
-    [Selector("buttonX")] public GCControllerButtonInput ButtonX { get; }
-    [Selector("buttonY")] public GCControllerButtonInput ButtonY { get; }
-    [Selector("leftShoulder")] public GCControllerButtonInput LeftShoulder { get; }
-    [Selector("rightShoulder")] public GCControllerButtonInput RightShoulder { get; }
-    [Selector("saveSnapshot")] public GCGamepadSnapshot SaveSnapshot();
+    [Selector("controller")]
+    public GCController? Controller { get; }
+    [Selector("valueChangedHandler", "setValueChangedHandler:")]
+    public GCGamepadValueChangedHandler? ValueChangedHandler { get; set; }
+    [Selector("dpad")]
+    public GCControllerDirectionPad Dpad { get; }
+    [Selector("buttonA")]
+    public GCControllerButtonInput ButtonA { get; }
+    [Selector("buttonB")]
+    public GCControllerButtonInput ButtonB { get; }
+    [Selector("buttonX")]
+    public GCControllerButtonInput ButtonX { get; }
+    [Selector("buttonY")]
+    public GCControllerButtonInput ButtonY { get; }
+    [Selector("leftShoulder")]
+    public GCControllerButtonInput LeftShoulder { get; }
+    [Selector("rightShoulder")]
+    public GCControllerButtonInput RightShoulder { get; }
+    [Selector("saveSnapshot")]
+    public GCGamepadSnapshot SaveSnapshot();
 }
 
 public objc closure void GCGamepadValueChangedHandler(GCGamepad arg0, GCControllerElement arg1);

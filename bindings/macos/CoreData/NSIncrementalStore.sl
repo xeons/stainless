@@ -32,16 +32,26 @@ import Standard.ObjC;
 
 public extern objc class NSIncrementalStore : NSPersistentStore
 {
-    [Selector("loadMetadata:")] public bool LoadMetadata(out NSError? error);
-    [Selector("executeRequest:withContext:error:")] public AnyObject? ExecuteRequestWithContextError(NSPersistentStoreRequest request, NSManagedObjectContext? context, out NSError? error);
-    [Selector("newValuesForObjectWithID:withContext:error:")] public NSIncrementalStoreNode? NewValuesForObjectWithIDWithContextError(NSManagedObjectID objectID, NSManagedObjectContext context, out NSError? error);
-    [Selector("newValueForRelationship:forObjectWithID:withContext:error:")] public AnyObject? NewValueForRelationshipForObjectWithIDWithContextError(NSRelationshipDescription relationship, NSManagedObjectID objectID, NSManagedObjectContext? context, out NSError? error);
-    [Selector("identifierForNewStoreAtURL:")] public static AnyObject IdentifierForNewStoreAtURL(NSURL storeURL);
-    [Selector("obtainPermanentIDsForObjects:error:")] public NSArray? ObtainPermanentIDsForObjectsError(NSArray array, out NSError? error);
-    [Selector("managedObjectContextDidRegisterObjectsWithIDs:")] public void ManagedObjectContextDidRegisterObjectsWithIDs(NSArray objectIDs);
-    [Selector("managedObjectContextDidUnregisterObjectsWithIDs:")] public void ManagedObjectContextDidUnregisterObjectsWithIDs(NSArray objectIDs);
-    [Selector("newObjectIDForEntity:referenceObject:")] public NSManagedObjectID NewObjectIDForEntityReferenceObject(NSEntityDescription entity, AnyObject data);
-    [Selector("referenceObjectForObjectID:")] public AnyObject ReferenceObjectForObjectID(NSManagedObjectID objectID);
+    [Selector("loadMetadata:")]
+    public bool LoadMetadata(out NSError? error);
+    [Selector("executeRequest:withContext:error:")]
+    public AnyObject? ExecuteRequestWithContextError(NSPersistentStoreRequest request, NSManagedObjectContext? context, out NSError? error);
+    [Selector("newValuesForObjectWithID:withContext:error:")]
+    public NSIncrementalStoreNode? NewValuesForObjectWithIDWithContextError(NSManagedObjectID objectID, NSManagedObjectContext context, out NSError? error);
+    [Selector("newValueForRelationship:forObjectWithID:withContext:error:")]
+    public AnyObject? NewValueForRelationshipForObjectWithIDWithContextError(NSRelationshipDescription relationship, NSManagedObjectID objectID, NSManagedObjectContext? context, out NSError? error);
+    [Selector("identifierForNewStoreAtURL:")]
+    public static AnyObject IdentifierForNewStoreAtURL(NSURL storeURL);
+    [Selector("obtainPermanentIDsForObjects:error:")]
+    public NSArray? ObtainPermanentIDsForObjectsError(NSArray array, out NSError? error);
+    [Selector("managedObjectContextDidRegisterObjectsWithIDs:")]
+    public void ManagedObjectContextDidRegisterObjectsWithIDs(NSArray objectIDs);
+    [Selector("managedObjectContextDidUnregisterObjectsWithIDs:")]
+    public void ManagedObjectContextDidUnregisterObjectsWithIDs(NSArray objectIDs);
+    [Selector("newObjectIDForEntity:referenceObject:")]
+    public NSManagedObjectID NewObjectIDForEntityReferenceObject(NSEntityDescription entity, AnyObject data);
+    [Selector("referenceObjectForObjectID:")]
+    public AnyObject ReferenceObjectForObjectID(NSManagedObjectID objectID);
 }
 
 #endif

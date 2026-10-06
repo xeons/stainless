@@ -40,18 +40,26 @@ public objc interface MTLLogContainer : NSObjectProtocol, NSFastEnumeration { }
 
 public objc interface MTLFunctionLogDebugLocation : NSObjectProtocol
 {
-    [Selector("functionName")] NSString? FunctionName { get; }
-    [Selector("URL")] NSURL? URL { get; }
-    [Selector("line")] NSUInteger Line { get; }
-    [Selector("column")] NSUInteger Column { get; }
+    [Selector("functionName")]
+    NSString? FunctionName { get; }
+    [Selector("URL")]
+    NSURL? URL { get; }
+    [Selector("line")]
+    NSUInteger Line { get; }
+    [Selector("column")]
+    NSUInteger Column { get; }
 }
 
 public objc interface MTLFunctionLog : NSObjectProtocol
 {
-    [Selector("type")] MTLFunctionLogType Type { get; }
-    [Selector("encoderLabel")] NSString? EncoderLabel { get; }
-    [Selector("function")] MTLFunction? Function { get; }
-    [Selector("debugLocation")] MTLFunctionLogDebugLocation? DebugLocation { get; }
+    [Selector("type")]
+    MTLFunctionLogType Type { get; }
+    [Selector("encoderLabel")]
+    NSString? EncoderLabel { get; }
+    [Selector("function")]
+    MTLFunction? Function { get; }
+    [Selector("debugLocation")]
+    MTLFunctionLogDebugLocation? DebugLocation { get; }
 }
 
 #endif

@@ -34,9 +34,12 @@ import Standard.ObjC;
 #if ARM64
 public extern objc class VZMacMachineIdentifier : NSObject, NSCopying
 {
-    [Selector("dataRepresentation")] public NSData DataRepresentation { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithDataRepresentation:")] public Self? InitWithDataRepresentation(NSData dataRepresentation);
+    [Selector("dataRepresentation")]
+    public NSData DataRepresentation { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithDataRepresentation:")]
+    public Self? InitWithDataRepresentation(NSData dataRepresentation);
 }
 #endif
 

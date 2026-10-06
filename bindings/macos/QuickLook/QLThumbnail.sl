@@ -41,22 +41,26 @@ public extern objc class QLThumbnailRef : CFTypeRef { }
 public extern "C" CFTypeID QLThumbnailGetTypeID();
 
 /// Deprecated in macOS 15.0.
-[ReturnsRetained] public extern "C" QLThumbnailRef? QLThumbnailCreate(CFAllocatorRef? allocator, CFURLRef? url, CGSize maxThumbnailSize, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" QLThumbnailRef? QLThumbnailCreate(CFAllocatorRef? allocator, CFURLRef? url, CGSize maxThumbnailSize, CFDictionaryRef? options);
 
 /// Deprecated in macOS 15.0.
-[ReturnsRetained] public extern "C" CFURLRef? QLThumbnailCopyDocumentURL(QLThumbnailRef? thumbnail);
+[ReturnsRetained]
+public extern "C" CFURLRef? QLThumbnailCopyDocumentURL(QLThumbnailRef? thumbnail);
 
 /// Deprecated in macOS 15.0.
 public extern "C" CGSize QLThumbnailGetMaximumSize(QLThumbnailRef? thumbnail);
 
 /// Deprecated in macOS 15.0.
-[ReturnsRetained] public extern "C" CFDictionaryRef? QLThumbnailCopyOptions(QLThumbnailRef? thumbnail);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? QLThumbnailCopyOptions(QLThumbnailRef? thumbnail);
 
 /// Deprecated in macOS 15.0.
 public extern "C" void QLThumbnailDispatchAsync(QLThumbnailRef? thumbnail, dispatch_queue_t? queue, dispatch_block_t? completion);
 
 /// Deprecated in macOS 15.0.
-[ReturnsRetained] public extern "C" CGImageRef? QLThumbnailCopyImage(QLThumbnailRef? thumbnail);
+[ReturnsRetained]
+public extern "C" CGImageRef? QLThumbnailCopyImage(QLThumbnailRef? thumbnail);
 
 /// Deprecated in macOS 15.0.
 public extern "C" CGRect QLThumbnailGetContentRect(QLThumbnailRef? thumbnail);

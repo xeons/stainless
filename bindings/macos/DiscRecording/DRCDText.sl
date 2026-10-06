@@ -65,23 +65,35 @@ public const int DRCDTextGenreCodeWorldMusic = 28;
 
 public extern objc class DRCDTextBlock : NSObject
 {
-    [Selector("arrayOfCDTextBlocksFromPacks:")] public static NSArray? ArrayOfCDTextBlocksFromPacks(NSData? packs);
-    [Selector("cdTextBlockWithLanguage:encoding:")] public static DRCDTextBlock? CdTextBlockWithLanguageEncoding(NSString? lang, NSStringEncoding enc);
-    [Selector("initWithLanguage:encoding:")] public AnyObject? InitWithLanguageEncoding(NSString? lang, NSStringEncoding enc);
-    [Selector("properties")] public NSDictionary? Properties();
-    [Selector("setProperties:")] public void SetProperties(NSDictionary? properties);
-    [Selector("trackDictionaries")] public NSArray? TrackDictionaries();
-    [Selector("setTrackDictionaries:")] public void SetTrackDictionaries(NSArray? tracks);
-    [Selector("objectForKey:ofTrack:")] public AnyObject? ObjectForKeyOfTrack(NSString? key, NSUInteger trackIndex);
-    [Selector("setObject:forKey:ofTrack:")] public void SetObjectForKeyOfTrack(AnyObject? value, NSString? key, NSUInteger trackIndex);
-    [Selector("flatten")] public NSUInteger Flatten();
+    [Selector("arrayOfCDTextBlocksFromPacks:")]
+    public static NSArray? ArrayOfCDTextBlocksFromPacks(NSData? packs);
+    [Selector("cdTextBlockWithLanguage:encoding:")]
+    public static DRCDTextBlock? CdTextBlockWithLanguageEncoding(NSString? lang, NSStringEncoding enc);
+    [Selector("initWithLanguage:encoding:")]
+    public AnyObject? InitWithLanguageEncoding(NSString? lang, NSStringEncoding enc);
+    [Selector("properties")]
+    public NSDictionary? Properties();
+    [Selector("setProperties:")]
+    public void SetProperties(NSDictionary? properties);
+    [Selector("trackDictionaries")]
+    public NSArray? TrackDictionaries();
+    [Selector("setTrackDictionaries:")]
+    public void SetTrackDictionaries(NSArray? tracks);
+    [Selector("objectForKey:ofTrack:")]
+    public AnyObject? ObjectForKeyOfTrack(NSString? key, NSUInteger trackIndex);
+    [Selector("setObject:forKey:ofTrack:")]
+    public void SetObjectForKeyOfTrack(AnyObject? value, NSString? key, NSUInteger trackIndex);
+    [Selector("flatten")]
+    public NSUInteger Flatten();
 }
 
 /// PropertyConvenienceMethods, a category of DRCDTextBlock.
 public extern objc class DRCDTextBlock
 {
-    [Selector("language")] public NSString? Language();
-    [Selector("encoding")] public NSStringEncoding Encoding();
+    [Selector("language")]
+    public NSString? Language();
+    [Selector("encoding")]
+    public NSStringEncoding Encoding();
 }
 
 public extern "C" NSString? DRCDTextLanguageKey;

@@ -47,11 +47,18 @@ public enum MTRStorageSharingType : ulong
 
 public objc interface MTRDeviceControllerStorageDelegate : NSObjectProtocol
 {
-    [Selector("controller:valueForKey:securityLevel:sharingType:")] NSSecureCoding? ControllerValueForKeySecurityLevelSharingType(MTRDeviceController controller, NSString key, MTRStorageSecurityLevel securityLevel, MTRStorageSharingType sharingType);
-    [Selector("controller:storeValue:forKey:securityLevel:sharingType:")] bool ControllerStoreValueForKeySecurityLevelSharingType(MTRDeviceController controller, NSSecureCoding value, NSString key, MTRStorageSecurityLevel securityLevel, MTRStorageSharingType sharingType);
-    [Selector("controller:removeValueForKey:securityLevel:sharingType:")] bool ControllerRemoveValueForKeySecurityLevelSharingType(MTRDeviceController controller, NSString key, MTRStorageSecurityLevel securityLevel, MTRStorageSharingType sharingType);
-    [Optional] [Selector("valuesForController:securityLevel:sharingType:")] NSDictionary? ValuesForControllerSecurityLevelSharingType(MTRDeviceController controller, MTRStorageSecurityLevel securityLevel, MTRStorageSharingType sharingType);
-    [Optional] [Selector("controller:storeValues:securityLevel:sharingType:")] bool ControllerStoreValuesSecurityLevelSharingType(MTRDeviceController controller, NSDictionary values, MTRStorageSecurityLevel securityLevel, MTRStorageSharingType sharingType);
+    [Selector("controller:valueForKey:securityLevel:sharingType:")]
+    NSSecureCoding? ControllerValueForKeySecurityLevelSharingType(MTRDeviceController controller, NSString key, MTRStorageSecurityLevel securityLevel, MTRStorageSharingType sharingType);
+    [Selector("controller:storeValue:forKey:securityLevel:sharingType:")]
+    bool ControllerStoreValueForKeySecurityLevelSharingType(MTRDeviceController controller, NSSecureCoding value, NSString key, MTRStorageSecurityLevel securityLevel, MTRStorageSharingType sharingType);
+    [Selector("controller:removeValueForKey:securityLevel:sharingType:")]
+    bool ControllerRemoveValueForKeySecurityLevelSharingType(MTRDeviceController controller, NSString key, MTRStorageSecurityLevel securityLevel, MTRStorageSharingType sharingType);
+    [Optional]
+    [Selector("valuesForController:securityLevel:sharingType:")]
+    NSDictionary? ValuesForControllerSecurityLevelSharingType(MTRDeviceController controller, MTRStorageSecurityLevel securityLevel, MTRStorageSharingType sharingType);
+    [Optional]
+    [Selector("controller:storeValues:securityLevel:sharingType:")]
+    bool ControllerStoreValuesSecurityLevelSharingType(MTRDeviceController controller, NSDictionary values, MTRStorageSecurityLevel securityLevel, MTRStorageSharingType sharingType);
 }
 
 public extern "C" NSSet MTRDeviceControllerStorageClasses();

@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class HKObject : NSObject, NSSecureCoding
 {
-    [Selector("UUID")] public NSUUID UUID { get; }
-    [Selector("source")] public HKSource? Source { get; }
-    [Selector("sourceRevision")] public HKSourceRevision SourceRevision { get; }
-    [Selector("device")] public HKDevice? Device { get; }
-    [Selector("metadata")] public NSDictionary? Metadata { get; }
+    [Selector("UUID")]
+    public NSUUID UUID { get; }
+    [Selector("source")]
+    public HKSource? Source { get; }
+    [Selector("sourceRevision")]
+    public HKSourceRevision SourceRevision { get; }
+    [Selector("device")]
+    public HKDevice? Device { get; }
+    [Selector("metadata")]
+    public NSDictionary? Metadata { get; }
 }
 
 public extern "C" NSString HKPredicateKeyPathUUID;

@@ -33,16 +33,21 @@ import Standard.ObjC;
 
 public objc interface ABImageClient : NSObjectProtocol
 {
-    [Selector("consumeImageData:forTag:")] void ConsumeImageDataForTag(NSData? data, NSInteger tag);
+    [Selector("consumeImageData:forTag:")]
+    void ConsumeImageDataForTag(NSData? data, NSInteger tag);
 }
 
 /// ABPersonImageAdditions, a category of ABPerson.
 public extern objc class ABPerson
 {
-    [Selector("setImageData:")] public bool SetImageData(NSData? data);
-    [Selector("imageData")] public NSData? ImageData();
-    [Selector("beginLoadingImageDataForClient:")] public NSInteger BeginLoadingImageDataForClient(ABImageClient? client);
-    [Selector("cancelLoadingImageDataForTag:")] public static void CancelLoadingImageDataForTag(NSInteger tag);
+    [Selector("setImageData:")]
+    public bool SetImageData(NSData? data);
+    [Selector("imageData")]
+    public NSData? ImageData();
+    [Selector("beginLoadingImageDataForClient:")]
+    public NSInteger BeginLoadingImageDataForClient(ABImageClient? client);
+    [Selector("cancelLoadingImageDataForTag:")]
+    public static void CancelLoadingImageDataForTag(NSInteger tag);
 }
 
 #endif

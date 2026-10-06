@@ -36,17 +36,24 @@ import Standard.ObjC;
 
 public extern objc class AVCaptionRenderer : NSObject
 {
-    [Selector("captions", "setCaptions:")] public NSArray Captions { get; set; }
-    [Selector("bounds", "setBounds:")] public CGRect Bounds { get; set; }
-    [Selector("captionSceneChangesInRange:")] public NSArray CaptionSceneChangesInRange(CMTimeRange consideredTimeRange);
-    [Selector("renderInContext:forTime:")] public void RenderInContextForTime(CGContextRef ctx, CMTime time);
+    [Selector("captions", "setCaptions:")]
+    public NSArray Captions { get; set; }
+    [Selector("bounds", "setBounds:")]
+    public CGRect Bounds { get; set; }
+    [Selector("captionSceneChangesInRange:")]
+    public NSArray CaptionSceneChangesInRange(CMTimeRange consideredTimeRange);
+    [Selector("renderInContext:forTime:")]
+    public void RenderInContextForTime(CGContextRef ctx, CMTime time);
 }
 
 public extern objc class AVCaptionRendererScene : NSObject, NSCopying
 {
-    [Selector("timeRange")] public CMTimeRange TimeRange { get; }
-    [Selector("hasActiveCaptions")] public bool HasActiveCaptions { get; }
-    [Selector("needsPeriodicRefresh")] public bool NeedsPeriodicRefresh { get; }
+    [Selector("timeRange")]
+    public CMTimeRange TimeRange { get; }
+    [Selector("hasActiveCaptions")]
+    public bool HasActiveCaptions { get; }
+    [Selector("needsPeriodicRefresh")]
+    public bool NeedsPeriodicRefresh { get; }
 }
 
 #endif

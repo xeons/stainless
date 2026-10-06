@@ -33,6 +33,7 @@ import Standard.ObjC;
 public extern "C" CFStringRef kSecDecodeTypeAttribute;
 
 /// Deprecated in macOS 13.0.
-[ReturnsRetained] public extern "C" SecTransformRef? SecDecodeTransformCreate(CFTypeRef DecodeType, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecTransformRef? SecDecodeTransformCreate(CFTypeRef DecodeType, __CFError** error);
 
 #endif

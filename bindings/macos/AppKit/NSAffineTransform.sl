@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// NSAppKitAdditions, a category of NSAffineTransform.
 public extern objc class NSAffineTransform
 {
-    [Selector("transformBezierPath:")] public NSBezierPath TransformBezierPath(NSBezierPath path);
-    [Selector("set")] public void Set();
-    [Selector("concat")] public void Concat();
+    [Selector("transformBezierPath:")]
+    public NSBezierPath TransformBezierPath(NSBezierPath path);
+    [Selector("set")]
+    public void Set();
+    [Selector("concat")]
+    public void Concat();
 }
 
 #endif

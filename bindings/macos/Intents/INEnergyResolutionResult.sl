@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INEnergyResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedEnergy:")] public static Self SuccessWithResolvedEnergy(NSMeasurement resolvedEnergy);
-    [Selector("disambiguationWithEnergyToDisambiguate:")] public static Self DisambiguationWithEnergyToDisambiguate(NSArray energyToDisambiguate);
-    [Selector("confirmationRequiredWithEnergyToConfirm:")] public static Self ConfirmationRequiredWithEnergyToConfirm(NSMeasurement? energyToConfirm);
+    [Selector("successWithResolvedEnergy:")]
+    public static Self SuccessWithResolvedEnergy(NSMeasurement resolvedEnergy);
+    [Selector("disambiguationWithEnergyToDisambiguate:")]
+    public static Self DisambiguationWithEnergyToDisambiguate(NSArray energyToDisambiguate);
+    [Selector("confirmationRequiredWithEnergyToConfirm:")]
+    public static Self ConfirmationRequiredWithEnergyToConfirm(NSMeasurement? energyToConfirm);
 }
 
 #endif

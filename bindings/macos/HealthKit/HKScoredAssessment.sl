@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class HKScoredAssessment : HKSample, NSSecureCoding, NSCopying
 {
-    [Selector("score")] public NSInteger Score { get; }
+    [Selector("score")]
+    public NSInteger Score { get; }
 }
 
 #endif

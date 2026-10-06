@@ -46,12 +46,14 @@ public enum NSHapticFeedbackPerformanceTime : ulong
 
 public objc interface NSHapticFeedbackPerformer : NSObjectProtocol
 {
-    [Selector("performFeedbackPattern:performanceTime:")] void PerformFeedbackPatternPerformanceTime(NSHapticFeedbackPattern pattern, NSHapticFeedbackPerformanceTime performanceTime);
+    [Selector("performFeedbackPattern:performanceTime:")]
+    void PerformFeedbackPatternPerformanceTime(NSHapticFeedbackPattern pattern, NSHapticFeedbackPerformanceTime performanceTime);
 }
 
 public extern objc class NSHapticFeedbackManager : NSObject
 {
-    [Selector("defaultPerformer")] public static NSHapticFeedbackPerformer DefaultPerformer { get; }
+    [Selector("defaultPerformer")]
+    public static NSHapticFeedbackPerformer DefaultPerformer { get; }
 }
 
 #endif

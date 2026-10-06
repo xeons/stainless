@@ -45,9 +45,12 @@ public extern "C" NSNotificationName? AVSampleBufferDisplayLayerReadyForDisplayD
 
 public extern objc class AVSampleBufferDisplayLayer : CALayer
 {
-    [Selector("controlTimebase", "setControlTimebase:")] public CMTimebaseRef? ControlTimebase { get; set; }
-    [Selector("videoGravity", "setVideoGravity:")] public AVLayerVideoGravity VideoGravity { get; set; }
-    [Selector("isReadyForDisplay")] public bool ReadyForDisplay { get; }
+    [Selector("controlTimebase", "setControlTimebase:")]
+    public CMTimebaseRef? ControlTimebase { get; set; }
+    [Selector("videoGravity", "setVideoGravity:")]
+    public AVLayerVideoGravity VideoGravity { get; set; }
+    [Selector("isReadyForDisplay")]
+    public bool ReadyForDisplay { get; }
 }
 
 public objc closure void AVSampleBufferDisplayLayerRequestMediaDataWhenReadyOnQueueUsingBlockBlock();
@@ -56,51 +59,66 @@ public objc closure void AVSampleBufferDisplayLayerRequestMediaDataWhenReadyOnQu
 public extern objc class AVSampleBufferDisplayLayer : AVQueuedSampleBufferRendering
 {
     /// Deprecated in macOS 15.0.
-    [Selector("timebase")] public CMTimebaseRef? Timebase { get; }
+    [Selector("timebase")]
+    public CMTimebaseRef? Timebase { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("status")] public AVQueuedSampleBufferRenderingStatus Status { get; }
+    [Selector("status")]
+    public AVQueuedSampleBufferRenderingStatus Status { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("error")] public NSError? Error { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("requiresFlushToResumeDecoding")] public bool RequiresFlushToResumeDecoding { get; }
+    [Selector("requiresFlushToResumeDecoding")]
+    public bool RequiresFlushToResumeDecoding { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("isReadyForMoreMediaData")] public bool ReadyForMoreMediaData { get; }
+    [Selector("isReadyForMoreMediaData")]
+    public bool ReadyForMoreMediaData { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("hasSufficientMediaDataForReliablePlaybackStart")] public bool HasSufficientMediaDataForReliablePlaybackStart { get; }
+    [Selector("hasSufficientMediaDataForReliablePlaybackStart")]
+    public bool HasSufficientMediaDataForReliablePlaybackStart { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("enqueueSampleBuffer:")] public void EnqueueSampleBuffer(CMSampleBufferRef sampleBuffer);
+    [Selector("enqueueSampleBuffer:")]
+    public void EnqueueSampleBuffer(CMSampleBufferRef sampleBuffer);
     /// Deprecated in macOS 15.0.
-    [Selector("flush")] public void Flush();
+    [Selector("flush")]
+    public void Flush();
     /// Deprecated in macOS 15.0.
-    [Selector("flushAndRemoveImage")] public void FlushAndRemoveImage();
+    [Selector("flushAndRemoveImage")]
+    public void FlushAndRemoveImage();
     /// Deprecated in macOS 15.0.
-    [Selector("requestMediaDataWhenReadyOnQueue:usingBlock:")] public void RequestMediaDataWhenReadyOnQueueUsingBlock(dispatch_queue_t queue, AVSampleBufferDisplayLayerRequestMediaDataWhenReadyOnQueueUsingBlockBlock block);
+    [Selector("requestMediaDataWhenReadyOnQueue:usingBlock:")]
+    public void RequestMediaDataWhenReadyOnQueueUsingBlock(dispatch_queue_t queue, AVSampleBufferDisplayLayerRequestMediaDataWhenReadyOnQueueUsingBlockBlock block);
     /// Deprecated in macOS 15.0.
-    [Selector("stopRequestingMediaData")] public void StopRequestingMediaData();
+    [Selector("stopRequestingMediaData")]
+    public void StopRequestingMediaData();
 }
 
 /// AVSampleBufferDisplayLayerImageProtection, a category of AVSampleBufferDisplayLayer.
 public extern objc class AVSampleBufferDisplayLayer
 {
-    [Selector("preventsCapture", "setPreventsCapture:")] public bool PreventsCapture { get; set; }
+    [Selector("preventsCapture", "setPreventsCapture:")]
+    public bool PreventsCapture { get; set; }
 }
 
 /// AVSampleBufferDisplayLayerVideoDisplaySleepPrevention, a category of AVSampleBufferDisplayLayer.
 public extern objc class AVSampleBufferDisplayLayer
 {
-    [Selector("preventsDisplaySleepDuringVideoPlayback", "setPreventsDisplaySleepDuringVideoPlayback:")] public bool PreventsDisplaySleepDuringVideoPlayback { get; set; }
+    [Selector("preventsDisplaySleepDuringVideoPlayback", "setPreventsDisplaySleepDuringVideoPlayback:")]
+    public bool PreventsDisplaySleepDuringVideoPlayback { get; set; }
 }
 
 /// ProtectedContent, a category of AVSampleBufferDisplayLayer.
 public extern objc class AVSampleBufferDisplayLayer
 {
-    [Selector("outputObscuredDueToInsufficientExternalProtection")] public bool OutputObscuredDueToInsufficientExternalProtection { get; }
+    [Selector("outputObscuredDueToInsufficientExternalProtection")]
+    public bool OutputObscuredDueToInsufficientExternalProtection { get; }
 }
 
 /// AVSampleBufferDisplayLayerRenderer, a category of AVSampleBufferDisplayLayer.
 public extern objc class AVSampleBufferDisplayLayer
 {
-    [Selector("sampleBufferRenderer")] public AVSampleBufferVideoRenderer? SampleBufferRenderer { get; }
+    [Selector("sampleBufferRenderer")]
+    public AVSampleBufferVideoRenderer? SampleBufferRenderer { get; }
 }
 
 #endif

@@ -36,12 +36,18 @@ public extern "C" CLLocationDistance MKPointsOfInterestRequestMaxRadius;
 
 public extern objc class MKLocalPointsOfInterestRequest : NSObject, NSCopying
 {
-    [Selector("coordinate")] public CLLocationCoordinate2D Coordinate { get; }
-    [Selector("radius")] public CLLocationDistance Radius { get; }
-    [Selector("region")] public MKCoordinateRegion Region { get; }
-    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")] public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
-    [Selector("initWithCenterCoordinate:radius:")] public Self InitWithCenterCoordinateRadius(CLLocationCoordinate2D coordinate, CLLocationDistance radius);
-    [Selector("initWithCoordinateRegion:")] public Self InitWithCoordinateRegion(MKCoordinateRegion region);
+    [Selector("coordinate")]
+    public CLLocationCoordinate2D Coordinate { get; }
+    [Selector("radius")]
+    public CLLocationDistance Radius { get; }
+    [Selector("region")]
+    public MKCoordinateRegion Region { get; }
+    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")]
+    public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
+    [Selector("initWithCenterCoordinate:radius:")]
+    public Self InitWithCenterCoordinateRadius(CLLocationCoordinate2D coordinate, CLLocationDistance radius);
+    [Selector("initWithCoordinateRegion:")]
+    public Self InitWithCoordinateRegion(MKCoordinateRegion region);
 }
 
 #endif

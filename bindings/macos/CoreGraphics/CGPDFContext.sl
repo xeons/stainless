@@ -30,9 +30,11 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreGraphics")
 
-[ReturnsRetained] public extern "C" CGContextRef? CGPDFContextCreate(CGDataConsumerRef? consumer, CGRect* mediaBox, CFDictionaryRef? auxiliaryInfo);
+[ReturnsRetained]
+public extern "C" CGContextRef? CGPDFContextCreate(CGDataConsumerRef? consumer, CGRect* mediaBox, CFDictionaryRef? auxiliaryInfo);
 
-[ReturnsRetained] public extern "C" CGContextRef? CGPDFContextCreateWithURL(CFURLRef? url, CGRect* mediaBox, CFDictionaryRef? auxiliaryInfo);
+[ReturnsRetained]
+public extern "C" CGContextRef? CGPDFContextCreateWithURL(CFURLRef? url, CGRect* mediaBox, CFDictionaryRef? auxiliaryInfo);
 
 public extern "C" void CGPDFContextClose(CGContextRef? context);
 

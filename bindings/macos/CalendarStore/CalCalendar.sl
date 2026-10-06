@@ -53,19 +53,26 @@ public extern "C" NSString? CalCalendarTypeExchange;
 public extern objc class CalCalendar : NSObject, NSCopying
 {
     /// Deprecated in macOS 10.8.
-    [Selector("color", "setColor:")] public NSColor? Color { get; set; }
+    [Selector("color", "setColor:")]
+    public NSColor? Color { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("notes", "setNotes:")] public NSString? Notes { get; set; }
+    [Selector("notes", "setNotes:")]
+    public NSString? Notes { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("type")] public NSString? Type { get; }
+    [Selector("type")]
+    public NSString? Type { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("uid")] public NSString? Uid { get; }
+    [Selector("uid")]
+    public NSString? Uid { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("isEditable")] public bool IsEditable { get; }
+    [Selector("isEditable")]
+    public bool IsEditable { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("calendar")] public static AnyObject? Calendar();
+    [Selector("calendar")]
+    public static AnyObject? Calendar();
 }
 
 #endif

@@ -35,12 +35,18 @@ import Standard.ObjC;
 /// macOS 15.4 and later.
 public extern objc class WKWebExtensionCommand : NSObject
 {
-    [Selector("webExtensionContext")] public WKWebExtensionContext? WebExtensionContext { get; }
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("title")] public NSString Title { get; }
-    [Selector("activationKey", "setActivationKey:")] public NSString? ActivationKey { get; set; }
-    [Selector("modifierFlags", "setModifierFlags:")] public NSEventModifierFlags ModifierFlags { get; set; }
-    [Selector("menuItem")] public NSMenuItem MenuItem { get; }
+    [Selector("webExtensionContext")]
+    public WKWebExtensionContext? WebExtensionContext { get; }
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("title")]
+    public NSString Title { get; }
+    [Selector("activationKey", "setActivationKey:")]
+    public NSString? ActivationKey { get; set; }
+    [Selector("modifierFlags", "setModifierFlags:")]
+    public NSEventModifierFlags ModifierFlags { get; set; }
+    [Selector("menuItem")]
+    public NSMenuItem MenuItem { get; }
 }
 
 #endif

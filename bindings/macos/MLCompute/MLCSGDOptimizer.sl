@@ -33,10 +33,14 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCSGDOptimizer : MLCOptimizer, NSCopying
 {
-    [Selector("momentumScale")] public float MomentumScale { get; }
-    [Selector("usesNesterovMomentum")] public bool UsesNesterovMomentum { get; }
-    [Selector("optimizerWithDescriptor:")] public static Self OptimizerWithDescriptor(MLCOptimizerDescriptor optimizerDescriptor);
-    [Selector("optimizerWithDescriptor:momentumScale:usesNesterovMomentum:")] public static Self OptimizerWithDescriptorMomentumScaleUsesNesterovMomentum(MLCOptimizerDescriptor optimizerDescriptor, float momentumScale, bool usesNesterovMomentum);
+    [Selector("momentumScale")]
+    public float MomentumScale { get; }
+    [Selector("usesNesterovMomentum")]
+    public bool UsesNesterovMomentum { get; }
+    [Selector("optimizerWithDescriptor:")]
+    public static Self OptimizerWithDescriptor(MLCOptimizerDescriptor optimizerDescriptor);
+    [Selector("optimizerWithDescriptor:momentumScale:usesNesterovMomentum:")]
+    public static Self OptimizerWithDescriptorMomentumScaleUsesNesterovMomentum(MLCOptimizerDescriptor optimizerDescriptor, float momentumScale, bool usesNesterovMomentum);
 }
 
 #endif

@@ -33,12 +33,17 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.0.
 public extern objc class NSEPSImageRep : NSImageRep
 {
-    [Selector("boundingBox")] public NSRect BoundingBox { get; }
-    [Selector("EPSRepresentation")] public NSData EPSRepresentation { get; }
-    [Selector("imageRepWithData:")] public static Self? ImageRepWithData(NSData epsData);
-    [Selector("initWithData:")] public Self? InitWithData(NSData epsData);
+    [Selector("boundingBox")]
+    public NSRect BoundingBox { get; }
+    [Selector("EPSRepresentation")]
+    public NSData EPSRepresentation { get; }
+    [Selector("imageRepWithData:")]
+    public static Self? ImageRepWithData(NSData epsData);
+    [Selector("initWithData:")]
+    public Self? InitWithData(NSData epsData);
     /// Deprecated in macOS 10.10.
-    [Selector("prepareGState")] public void PrepareGState();
+    [Selector("prepareGState")]
+    public void PrepareGState();
 }
 
 #endif

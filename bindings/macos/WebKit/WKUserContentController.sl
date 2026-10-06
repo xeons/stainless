@@ -33,19 +33,32 @@ import Standard.ObjC;
 
 public extern objc class WKUserContentController : NSObject, NSSecureCoding
 {
-    [Selector("userScripts")] public NSArray UserScripts { get; }
-    [Selector("addUserScript:")] public void AddUserScript(WKUserScript userScript);
-    [Selector("removeAllUserScripts")] public void RemoveAllUserScripts();
-    [Selector("addScriptMessageHandler:contentWorld:name:")] public void AddScriptMessageHandlerContentWorldName(WKScriptMessageHandler scriptMessageHandler, WKContentWorld world, NSString name);
-    [Selector("addScriptMessageHandlerWithReply:contentWorld:name:")] public void AddScriptMessageHandlerWithReplyContentWorldName(WKScriptMessageHandlerWithReply scriptMessageHandlerWithReply, WKContentWorld contentWorld, NSString name);
-    [Selector("addScriptMessageHandler:name:")] public void AddScriptMessageHandlerName(WKScriptMessageHandler scriptMessageHandler, NSString name);
-    [Selector("removeScriptMessageHandlerForName:contentWorld:")] public void RemoveScriptMessageHandlerForNameContentWorld(NSString name, WKContentWorld contentWorld);
-    [Selector("removeScriptMessageHandlerForName:")] public void RemoveScriptMessageHandlerForName(NSString name);
-    [Selector("removeAllScriptMessageHandlersFromContentWorld:")] public void RemoveAllScriptMessageHandlersFromContentWorld(WKContentWorld contentWorld);
-    [Selector("removeAllScriptMessageHandlers")] public void RemoveAllScriptMessageHandlers();
-    [Selector("addContentRuleList:")] public void AddContentRuleList(WKContentRuleList contentRuleList);
-    [Selector("removeContentRuleList:")] public void RemoveContentRuleList(WKContentRuleList contentRuleList);
-    [Selector("removeAllContentRuleLists")] public void RemoveAllContentRuleLists();
+    [Selector("userScripts")]
+    public NSArray UserScripts { get; }
+    [Selector("addUserScript:")]
+    public void AddUserScript(WKUserScript userScript);
+    [Selector("removeAllUserScripts")]
+    public void RemoveAllUserScripts();
+    [Selector("addScriptMessageHandler:contentWorld:name:")]
+    public void AddScriptMessageHandlerContentWorldName(WKScriptMessageHandler scriptMessageHandler, WKContentWorld world, NSString name);
+    [Selector("addScriptMessageHandlerWithReply:contentWorld:name:")]
+    public void AddScriptMessageHandlerWithReplyContentWorldName(WKScriptMessageHandlerWithReply scriptMessageHandlerWithReply, WKContentWorld contentWorld, NSString name);
+    [Selector("addScriptMessageHandler:name:")]
+    public void AddScriptMessageHandlerName(WKScriptMessageHandler scriptMessageHandler, NSString name);
+    [Selector("removeScriptMessageHandlerForName:contentWorld:")]
+    public void RemoveScriptMessageHandlerForNameContentWorld(NSString name, WKContentWorld contentWorld);
+    [Selector("removeScriptMessageHandlerForName:")]
+    public void RemoveScriptMessageHandlerForName(NSString name);
+    [Selector("removeAllScriptMessageHandlersFromContentWorld:")]
+    public void RemoveAllScriptMessageHandlersFromContentWorld(WKContentWorld contentWorld);
+    [Selector("removeAllScriptMessageHandlers")]
+    public void RemoveAllScriptMessageHandlers();
+    [Selector("addContentRuleList:")]
+    public void AddContentRuleList(WKContentRuleList contentRuleList);
+    [Selector("removeContentRuleList:")]
+    public void RemoveContentRuleList(WKContentRuleList contentRuleList);
+    [Selector("removeAllContentRuleLists")]
+    public void RemoveAllContentRuleLists();
 }
 
 #endif

@@ -40,35 +40,59 @@ public enum NSImageDynamicRange : long
 
 public extern objc class NSImageView : NSControl, NSAccessibilityImage, NSMenuItemValidation
 {
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("isEditable", "setEditable:")] public bool Editable { get; set; }
-    [Selector("imageAlignment", "setImageAlignment:")] public NSImageAlignment ImageAlignment { get; set; }
-    [Selector("imageScaling", "setImageScaling:")] public NSImageScaling ImageScaling { get; set; }
-    [Selector("imageFrameStyle", "setImageFrameStyle:")] public NSImageFrameStyle ImageFrameStyle { get; set; }
-    [Selector("symbolConfiguration", "setSymbolConfiguration:")] public NSImageSymbolConfiguration? SymbolConfiguration { get; set; }
-    [Selector("contentTintColor", "setContentTintColor:")] public NSColor? ContentTintColor { get; set; }
-    [Selector("animates", "setAnimates:")] public bool Animates { get; set; }
-    [Selector("allowsCutCopyPaste", "setAllowsCutCopyPaste:")] public bool AllowsCutCopyPaste { get; set; }
-    [Selector("defaultPreferredImageDynamicRange", "setDefaultPreferredImageDynamicRange:")] public static NSImageDynamicRange DefaultPreferredImageDynamicRange { get; set; }
-    [Selector("preferredImageDynamicRange", "setPreferredImageDynamicRange:")] public NSImageDynamicRange PreferredImageDynamicRange { get; set; }
-    [Selector("imageDynamicRange")] public NSImageDynamicRange ImageDynamicRange { get; }
-    [Selector("imageViewWithImage:")] public static Self ImageViewWithImage(NSImage image);
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("isEditable", "setEditable:")]
+    public bool Editable { get; set; }
+    [Selector("imageAlignment", "setImageAlignment:")]
+    public NSImageAlignment ImageAlignment { get; set; }
+    [Selector("imageScaling", "setImageScaling:")]
+    public NSImageScaling ImageScaling { get; set; }
+    [Selector("imageFrameStyle", "setImageFrameStyle:")]
+    public NSImageFrameStyle ImageFrameStyle { get; set; }
+    [Selector("symbolConfiguration", "setSymbolConfiguration:")]
+    public NSImageSymbolConfiguration? SymbolConfiguration { get; set; }
+    [Selector("contentTintColor", "setContentTintColor:")]
+    public NSColor? ContentTintColor { get; set; }
+    [Selector("animates", "setAnimates:")]
+    public bool Animates { get; set; }
+    [Selector("allowsCutCopyPaste", "setAllowsCutCopyPaste:")]
+    public bool AllowsCutCopyPaste { get; set; }
+    [Selector("defaultPreferredImageDynamicRange", "setDefaultPreferredImageDynamicRange:")]
+    public static NSImageDynamicRange DefaultPreferredImageDynamicRange { get; set; }
+    [Selector("preferredImageDynamicRange", "setPreferredImageDynamicRange:")]
+    public NSImageDynamicRange PreferredImageDynamicRange { get; set; }
+    [Selector("imageDynamicRange")]
+    public NSImageDynamicRange ImageDynamicRange { get; }
+    [Selector("imageViewWithImage:")]
+    public static Self ImageViewWithImage(NSImage image);
 }
 
 /// NSSymbolEffect, a category of NSImageView.
 public extern objc class NSImageView
 {
-    [Selector("addSymbolEffect:")] public void AddSymbolEffect(NSSymbolEffect symbolEffect);
-    [Selector("addSymbolEffect:options:")] public void AddSymbolEffectOptions(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options);
-    [Selector("addSymbolEffect:options:animated:")] public void AddSymbolEffectOptionsAnimated(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options, bool animated);
-    [Selector("removeSymbolEffectOfType:")] public void RemoveSymbolEffectOfType(NSSymbolEffect symbolEffect);
-    [Selector("removeSymbolEffectOfType:options:")] public void RemoveSymbolEffectOfTypeOptions(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options);
-    [Selector("removeSymbolEffectOfType:options:animated:")] public void RemoveSymbolEffectOfTypeOptionsAnimated(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options, bool animated);
-    [Selector("removeAllSymbolEffects")] public void RemoveAllSymbolEffects();
-    [Selector("removeAllSymbolEffectsWithOptions:")] public void RemoveAllSymbolEffectsWithOptions(NSSymbolEffectOptions options);
-    [Selector("removeAllSymbolEffectsWithOptions:animated:")] public void RemoveAllSymbolEffectsWithOptionsAnimated(NSSymbolEffectOptions options, bool animated);
-    [Selector("setSymbolImage:withContentTransition:")] public void SetSymbolImageWithContentTransition(NSImage symbolImage, NSSymbolContentTransition transition);
-    [Selector("setSymbolImage:withContentTransition:options:")] public void SetSymbolImageWithContentTransitionOptions(NSImage symbolImage, NSSymbolContentTransition transition, NSSymbolEffectOptions options);
+    [Selector("addSymbolEffect:")]
+    public void AddSymbolEffect(NSSymbolEffect symbolEffect);
+    [Selector("addSymbolEffect:options:")]
+    public void AddSymbolEffectOptions(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options);
+    [Selector("addSymbolEffect:options:animated:")]
+    public void AddSymbolEffectOptionsAnimated(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options, bool animated);
+    [Selector("removeSymbolEffectOfType:")]
+    public void RemoveSymbolEffectOfType(NSSymbolEffect symbolEffect);
+    [Selector("removeSymbolEffectOfType:options:")]
+    public void RemoveSymbolEffectOfTypeOptions(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options);
+    [Selector("removeSymbolEffectOfType:options:animated:")]
+    public void RemoveSymbolEffectOfTypeOptionsAnimated(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options, bool animated);
+    [Selector("removeAllSymbolEffects")]
+    public void RemoveAllSymbolEffects();
+    [Selector("removeAllSymbolEffectsWithOptions:")]
+    public void RemoveAllSymbolEffectsWithOptions(NSSymbolEffectOptions options);
+    [Selector("removeAllSymbolEffectsWithOptions:animated:")]
+    public void RemoveAllSymbolEffectsWithOptionsAnimated(NSSymbolEffectOptions options, bool animated);
+    [Selector("setSymbolImage:withContentTransition:")]
+    public void SetSymbolImageWithContentTransition(NSImage symbolImage, NSSymbolContentTransition transition);
+    [Selector("setSymbolImage:withContentTransition:options:")]
+    public void SetSymbolImageWithContentTransitionOptions(NSImage symbolImage, NSSymbolContentTransition transition, NSSymbolEffectOptions options);
 }
 
 #endif

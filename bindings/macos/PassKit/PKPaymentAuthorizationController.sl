@@ -54,19 +54,43 @@ public objc closure void PKPaymentAuthorizationControllerDelegatePaymentAuthoriz
 
 public objc interface PKPaymentAuthorizationControllerDelegate : NSObjectProtocol
 {
-    [Selector("paymentAuthorizationControllerDidFinish:")] void PaymentAuthorizationControllerDidFinish(PKPaymentAuthorizationController controller);
-    [Optional] [Selector("paymentAuthorizationController:didAuthorizePayment:handler:")] void PaymentAuthorizationControllerDidAuthorizePaymentHandler(PKPaymentAuthorizationController controller, PKPayment payment, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidAuthorizePaymentHandlerCompletionBlock completion);
-    [Optional] [Selector("paymentAuthorizationController:didAuthorizePayment:completion:")] void PaymentAuthorizationControllerDidAuthorizePaymentCompletion(PKPaymentAuthorizationController controller, PKPayment payment, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidAuthorizePaymentCompletionCompletionBlock completion);
-    [Optional] [Selector("paymentAuthorizationControllerWillAuthorizePayment:")] void PaymentAuthorizationControllerWillAuthorizePayment(PKPaymentAuthorizationController controller);
-    [Optional] [Selector("paymentAuthorizationController:didRequestMerchantSessionUpdate:")] void PaymentAuthorizationControllerDidRequestMerchantSessionUpdate(PKPaymentAuthorizationController controller, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidRequestMerchantSessionUpdateHandlerBlock handler);
-    [Optional] [Selector("paymentAuthorizationController:didChangeCouponCode:handler:")] void PaymentAuthorizationControllerDidChangeCouponCodeHandler(PKPaymentAuthorizationController controller, NSString couponCode, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidChangeCouponCodeHandlerCompletionBlock completion);
-    [Optional] [Selector("paymentAuthorizationController:didSelectShippingMethod:handler:")] void PaymentAuthorizationControllerDidSelectShippingMethodHandler(PKPaymentAuthorizationController controller, PKShippingMethod shippingMethod, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidSelectShippingMethodHandlerCompletionBlock completion);
-    [Optional] [Selector("paymentAuthorizationController:didSelectShippingContact:handler:")] void PaymentAuthorizationControllerDidSelectShippingContactHandler(PKPaymentAuthorizationController controller, PKContact contact, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidSelectShippingContactHandlerCompletionBlock completion);
-    [Optional] [Selector("paymentAuthorizationController:didSelectPaymentMethod:handler:")] void PaymentAuthorizationControllerDidSelectPaymentMethodHandler(PKPaymentAuthorizationController controller, PKPaymentMethod paymentMethod, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidSelectPaymentMethodHandlerCompletionBlock completion);
-    [Optional] [Selector("paymentAuthorizationController:didSelectShippingMethod:completion:")] void PaymentAuthorizationControllerDidSelectShippingMethodCompletion(PKPaymentAuthorizationController controller, PKShippingMethod shippingMethod, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidSelectShippingMethodCompletionCompletionBlock completion);
-    [Optional] [Selector("paymentAuthorizationController:didSelectShippingContact:completion:")] void PaymentAuthorizationControllerDidSelectShippingContactCompletion(PKPaymentAuthorizationController controller, PKContact contact, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidSelectShippingContactCompletionCompletionBlock completion);
-    [Optional] [Selector("paymentAuthorizationController:didSelectPaymentMethod:completion:")] void PaymentAuthorizationControllerDidSelectPaymentMethodCompletion(PKPaymentAuthorizationController controller, PKPaymentMethod paymentMethod, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidSelectPaymentMethodCompletionCompletionBlock completion);
-    [Selector("presentationWindowForPaymentAuthorizationController:")] NSWindow? PresentationWindowForPaymentAuthorizationController(PKPaymentAuthorizationController controller);
+    [Selector("paymentAuthorizationControllerDidFinish:")]
+    void PaymentAuthorizationControllerDidFinish(PKPaymentAuthorizationController controller);
+    [Optional]
+    [Selector("paymentAuthorizationController:didAuthorizePayment:handler:")]
+    void PaymentAuthorizationControllerDidAuthorizePaymentHandler(PKPaymentAuthorizationController controller, PKPayment payment, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidAuthorizePaymentHandlerCompletionBlock completion);
+    [Optional]
+    [Selector("paymentAuthorizationController:didAuthorizePayment:completion:")]
+    void PaymentAuthorizationControllerDidAuthorizePaymentCompletion(PKPaymentAuthorizationController controller, PKPayment payment, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidAuthorizePaymentCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("paymentAuthorizationControllerWillAuthorizePayment:")]
+    void PaymentAuthorizationControllerWillAuthorizePayment(PKPaymentAuthorizationController controller);
+    [Optional]
+    [Selector("paymentAuthorizationController:didRequestMerchantSessionUpdate:")]
+    void PaymentAuthorizationControllerDidRequestMerchantSessionUpdate(PKPaymentAuthorizationController controller, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidRequestMerchantSessionUpdateHandlerBlock handler);
+    [Optional]
+    [Selector("paymentAuthorizationController:didChangeCouponCode:handler:")]
+    void PaymentAuthorizationControllerDidChangeCouponCodeHandler(PKPaymentAuthorizationController controller, NSString couponCode, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidChangeCouponCodeHandlerCompletionBlock completion);
+    [Optional]
+    [Selector("paymentAuthorizationController:didSelectShippingMethod:handler:")]
+    void PaymentAuthorizationControllerDidSelectShippingMethodHandler(PKPaymentAuthorizationController controller, PKShippingMethod shippingMethod, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidSelectShippingMethodHandlerCompletionBlock completion);
+    [Optional]
+    [Selector("paymentAuthorizationController:didSelectShippingContact:handler:")]
+    void PaymentAuthorizationControllerDidSelectShippingContactHandler(PKPaymentAuthorizationController controller, PKContact contact, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidSelectShippingContactHandlerCompletionBlock completion);
+    [Optional]
+    [Selector("paymentAuthorizationController:didSelectPaymentMethod:handler:")]
+    void PaymentAuthorizationControllerDidSelectPaymentMethodHandler(PKPaymentAuthorizationController controller, PKPaymentMethod paymentMethod, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidSelectPaymentMethodHandlerCompletionBlock completion);
+    [Optional]
+    [Selector("paymentAuthorizationController:didSelectShippingMethod:completion:")]
+    void PaymentAuthorizationControllerDidSelectShippingMethodCompletion(PKPaymentAuthorizationController controller, PKShippingMethod shippingMethod, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidSelectShippingMethodCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("paymentAuthorizationController:didSelectShippingContact:completion:")]
+    void PaymentAuthorizationControllerDidSelectShippingContactCompletion(PKPaymentAuthorizationController controller, PKContact contact, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidSelectShippingContactCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("paymentAuthorizationController:didSelectPaymentMethod:completion:")]
+    void PaymentAuthorizationControllerDidSelectPaymentMethodCompletion(PKPaymentAuthorizationController controller, PKPaymentMethod paymentMethod, PKPaymentAuthorizationControllerDelegatePaymentAuthorizationControllerDidSelectPaymentMethodCompletionCompletionBlock completion);
+    [Selector("presentationWindowForPaymentAuthorizationController:")]
+    NSWindow? PresentationWindowForPaymentAuthorizationController(PKPaymentAuthorizationController controller);
 }
 
 public objc closure void PKPaymentAuthorizationControllerPresentWithCompletionCompletionBlock(bool arg0);
@@ -75,17 +99,28 @@ public objc closure void PKPaymentAuthorizationControllerDismissWithCompletionCo
 
 public extern objc class PKPaymentAuthorizationController : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public PKPaymentAuthorizationControllerDelegate? Delegate { get; set; }
-    [Selector("canMakePayments")] public static bool CanMakePayments();
-    [Selector("canMakePaymentsUsingNetworks:")] public static bool CanMakePaymentsUsingNetworks(NSArray supportedNetworks);
-    [Selector("canMakePaymentsUsingNetworks:capabilities:")] public static bool CanMakePaymentsUsingNetworksCapabilities(NSArray supportedNetworks, PKMerchantCapability capabilties);
-    [Selector("initWithPaymentRequest:")] public Self InitWithPaymentRequest(PKPaymentRequest request);
-    [Selector("presentWithCompletion:")] public void PresentWithCompletion(PKPaymentAuthorizationControllerPresentWithCompletionCompletionBlock? completion);
-    [Selector("dismissWithCompletion:")] public void DismissWithCompletion(PKPaymentAuthorizationControllerDismissWithCompletionCompletionBlock? completion);
-    [Selector("supportsDisbursements")] public static bool SupportsDisbursements();
-    [Selector("supportsDisbursementsUsingNetworks:")] public static bool SupportsDisbursementsUsingNetworks(NSArray supportedNetworks);
-    [Selector("supportsDisbursementsUsingNetworks:capabilities:")] public static bool SupportsDisbursementsUsingNetworksCapabilities(NSArray supportedNetworks, PKMerchantCapability capabilties);
-    [Selector("initWithDisbursementRequest:")] public Self InitWithDisbursementRequest(PKDisbursementRequest request);
+    [Selector("delegate", "setDelegate:")]
+    public PKPaymentAuthorizationControllerDelegate? Delegate { get; set; }
+    [Selector("canMakePayments")]
+    public static bool CanMakePayments();
+    [Selector("canMakePaymentsUsingNetworks:")]
+    public static bool CanMakePaymentsUsingNetworks(NSArray supportedNetworks);
+    [Selector("canMakePaymentsUsingNetworks:capabilities:")]
+    public static bool CanMakePaymentsUsingNetworksCapabilities(NSArray supportedNetworks, PKMerchantCapability capabilties);
+    [Selector("initWithPaymentRequest:")]
+    public Self InitWithPaymentRequest(PKPaymentRequest request);
+    [Selector("presentWithCompletion:")]
+    public void PresentWithCompletion(PKPaymentAuthorizationControllerPresentWithCompletionCompletionBlock? completion);
+    [Selector("dismissWithCompletion:")]
+    public void DismissWithCompletion(PKPaymentAuthorizationControllerDismissWithCompletionCompletionBlock? completion);
+    [Selector("supportsDisbursements")]
+    public static bool SupportsDisbursements();
+    [Selector("supportsDisbursementsUsingNetworks:")]
+    public static bool SupportsDisbursementsUsingNetworks(NSArray supportedNetworks);
+    [Selector("supportsDisbursementsUsingNetworks:capabilities:")]
+    public static bool SupportsDisbursementsUsingNetworksCapabilities(NSArray supportedNetworks, PKMerchantCapability capabilties);
+    [Selector("initWithDisbursementRequest:")]
+    public Self InitWithDisbursementRequest(PKDisbursementRequest request);
 }
 
 #endif

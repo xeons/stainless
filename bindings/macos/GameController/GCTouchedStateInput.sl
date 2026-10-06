@@ -35,11 +35,16 @@ public objc closure void GCTouchedStateInputTouchedDidChangeHandlerBlock(GCPhysi
 
 public objc interface GCTouchedStateInput : NSObjectProtocol
 {
-    [Selector("touchedDidChangeHandler", "setTouchedDidChangeHandler:")] GCTouchedStateInputTouchedDidChangeHandlerBlock? TouchedDidChangeHandler { get; set; }
-    [Selector("isTouched")] bool Touched { get; }
-    [Selector("lastTouchedStateTimestamp")] NSTimeInterval LastTouchedStateTimestamp { get; }
-    [Selector("lastTouchedStateLatency")] NSTimeInterval LastTouchedStateLatency { get; }
-    [Selector("sources")] NSSet Sources { get; }
+    [Selector("touchedDidChangeHandler", "setTouchedDidChangeHandler:")]
+    GCTouchedStateInputTouchedDidChangeHandlerBlock? TouchedDidChangeHandler { get; set; }
+    [Selector("isTouched")]
+    bool Touched { get; }
+    [Selector("lastTouchedStateTimestamp")]
+    NSTimeInterval LastTouchedStateTimestamp { get; }
+    [Selector("lastTouchedStateLatency")]
+    NSTimeInterval LastTouchedStateLatency { get; }
+    [Selector("sources")]
+    NSSet Sources { get; }
 }
 
 #endif

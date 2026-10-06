@@ -48,27 +48,40 @@ public enum NSFontPanelModeMask : ulong
 
 public objc interface NSFontChanging : NSObjectProtocol
 {
-    [Optional] [Selector("changeFont:")] void ChangeFont(NSFontManager? sender);
-    [Optional] [Selector("validModesForFontPanel:")] NSFontPanelModeMask ValidModesForFontPanel(NSFontPanel fontPanel);
+    [Optional]
+    [Selector("changeFont:")]
+    void ChangeFont(NSFontManager? sender);
+    [Optional]
+    [Selector("validModesForFontPanel:")]
+    NSFontPanelModeMask ValidModesForFontPanel(NSFontPanel fontPanel);
 }
 
 /// NSFontPanelValidationAdditions, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 11.0.
-    [Selector("validModesForFontPanel:")] public NSFontPanelModeMask ValidModesForFontPanel(NSFontPanel fontPanel);
+    [Selector("validModesForFontPanel:")]
+    public NSFontPanelModeMask ValidModesForFontPanel(NSFontPanel fontPanel);
 }
 
 public extern objc class NSFontPanel : NSPanel
 {
-    [Selector("sharedFontPanel")] public static NSFontPanel SharedFontPanel { get; }
-    [Selector("sharedFontPanelExists")] public static bool SharedFontPanelExists { get; }
-    [Selector("accessoryView", "setAccessoryView:")] public NSView? AccessoryView { get; set; }
-    [Selector("worksWhenModal", "setWorksWhenModal:")] public bool WorksWhenModal { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("setPanelFont:isMultiple:")] public void SetPanelFontIsMultiple(NSFont fontObj, bool flag);
-    [Selector("panelConvertFont:")] public NSFont PanelConvertFont(NSFont fontObj);
-    [Selector("reloadDefaultFontFamilies")] public void ReloadDefaultFontFamilies();
+    [Selector("sharedFontPanel")]
+    public static NSFontPanel SharedFontPanel { get; }
+    [Selector("sharedFontPanelExists")]
+    public static bool SharedFontPanelExists { get; }
+    [Selector("accessoryView", "setAccessoryView:")]
+    public NSView? AccessoryView { get; set; }
+    [Selector("worksWhenModal", "setWorksWhenModal:")]
+    public bool WorksWhenModal { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("setPanelFont:isMultiple:")]
+    public void SetPanelFontIsMultiple(NSFont fontObj, bool flag);
+    [Selector("panelConvertFont:")]
+    public NSFont PanelConvertFont(NSFont fontObj);
+    [Selector("reloadDefaultFontFamilies")]
+    public void ReloadDefaultFontFamilies();
 }
 
 public const uint NSFontPanelFaceModeMask = 1;

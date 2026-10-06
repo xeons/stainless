@@ -33,9 +33,14 @@ import Standard.ObjC;
 
 public objc interface QLPreviewItem : NSObjectProtocol
 {
-    [Selector("previewItemURL")] NSURL? PreviewItemURL { get; }
-    [Optional] [Selector("previewItemTitle")] NSString? PreviewItemTitle { get; }
-    [Optional] [Selector("previewItemDisplayState")] AnyObject? PreviewItemDisplayState { get; }
+    [Selector("previewItemURL")]
+    NSURL? PreviewItemURL { get; }
+    [Optional]
+    [Selector("previewItemTitle")]
+    NSString? PreviewItemTitle { get; }
+    [Optional]
+    [Selector("previewItemDisplayState")]
+    AnyObject? PreviewItemDisplayState { get; }
 }
 
 /// QLPreviewConvenienceAdditions, a category of NSURL.

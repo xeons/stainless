@@ -49,29 +49,41 @@ public extern "C" NSTimeInterval SKDownloadTimeRemainingUnknown;
 public extern objc class SKDownload : NSObject
 {
     /// Deprecated in macOS 13.0.
-    [Selector("state")] public SKDownloadState State { get; }
+    [Selector("state")]
+    public SKDownloadState State { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("contentLength")] public NSNumber? ContentLength { get; }
+    [Selector("contentLength")]
+    public NSNumber? ContentLength { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("expectedContentLength")] public long ExpectedContentLength { get; }
+    [Selector("expectedContentLength")]
+    public long ExpectedContentLength { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("contentIdentifier")] public NSString? ContentIdentifier { get; }
+    [Selector("contentIdentifier")]
+    public NSString? ContentIdentifier { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("contentURL")] public NSURL? ContentURL { get; }
+    [Selector("contentURL")]
+    public NSURL? ContentURL { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("contentVersion")] public NSString? ContentVersion { get; }
+    [Selector("contentVersion")]
+    public NSString? ContentVersion { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("error")] public NSError? Error { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("progress")] public float Progress { get; }
+    [Selector("progress")]
+    public float Progress { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("timeRemaining")] public NSTimeInterval TimeRemaining { get; }
+    [Selector("timeRemaining")]
+    public NSTimeInterval TimeRemaining { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("transaction")] public SKPaymentTransaction? Transaction { get; }
+    [Selector("transaction")]
+    public SKPaymentTransaction? Transaction { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("contentURLForProductID:")] public static NSURL? ContentURLForProductID(NSString productID);
+    [Selector("contentURLForProductID:")]
+    public static NSURL? ContentURLForProductID(NSString productID);
     /// Deprecated in macOS 13.0.
-    [Selector("deleteContentForProductID:")] public static void DeleteContentForProductID(NSString productID);
+    [Selector("deleteContentForProductID:")]
+    public static void DeleteContentForProductID(NSString productID);
 }
 
 #endif

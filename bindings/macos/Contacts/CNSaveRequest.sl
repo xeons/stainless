@@ -33,18 +33,30 @@ import Standard.ObjC;
 
 public extern objc class CNSaveRequest : NSObject
 {
-    [Selector("transactionAuthor", "setTransactionAuthor:")] public NSString? TransactionAuthor { get; set; }
-    [Selector("shouldRefetchContacts", "setShouldRefetchContacts:")] public bool ShouldRefetchContacts { get; set; }
-    [Selector("addContact:toContainerWithIdentifier:")] public void AddContactToContainerWithIdentifier(CNMutableContact contact, NSString? identifier);
-    [Selector("updateContact:")] public void UpdateContact(CNMutableContact contact);
-    [Selector("deleteContact:")] public void DeleteContact(CNMutableContact contact);
-    [Selector("addGroup:toContainerWithIdentifier:")] public void AddGroupToContainerWithIdentifier(CNMutableGroup group, NSString? identifier);
-    [Selector("updateGroup:")] public void UpdateGroup(CNMutableGroup group);
-    [Selector("deleteGroup:")] public void DeleteGroup(CNMutableGroup group);
-    [Selector("addSubgroup:toGroup:")] public void AddSubgroupToGroup(CNGroup subgroup, CNGroup group);
-    [Selector("removeSubgroup:fromGroup:")] public void RemoveSubgroupFromGroup(CNGroup subgroup, CNGroup group);
-    [Selector("addMember:toGroup:")] public void AddMemberToGroup(CNContact contact, CNGroup group);
-    [Selector("removeMember:fromGroup:")] public void RemoveMemberFromGroup(CNContact contact, CNGroup group);
+    [Selector("transactionAuthor", "setTransactionAuthor:")]
+    public NSString? TransactionAuthor { get; set; }
+    [Selector("shouldRefetchContacts", "setShouldRefetchContacts:")]
+    public bool ShouldRefetchContacts { get; set; }
+    [Selector("addContact:toContainerWithIdentifier:")]
+    public void AddContactToContainerWithIdentifier(CNMutableContact contact, NSString? identifier);
+    [Selector("updateContact:")]
+    public void UpdateContact(CNMutableContact contact);
+    [Selector("deleteContact:")]
+    public void DeleteContact(CNMutableContact contact);
+    [Selector("addGroup:toContainerWithIdentifier:")]
+    public void AddGroupToContainerWithIdentifier(CNMutableGroup group, NSString? identifier);
+    [Selector("updateGroup:")]
+    public void UpdateGroup(CNMutableGroup group);
+    [Selector("deleteGroup:")]
+    public void DeleteGroup(CNMutableGroup group);
+    [Selector("addSubgroup:toGroup:")]
+    public void AddSubgroupToGroup(CNGroup subgroup, CNGroup group);
+    [Selector("removeSubgroup:fromGroup:")]
+    public void RemoveSubgroupFromGroup(CNGroup subgroup, CNGroup group);
+    [Selector("addMember:toGroup:")]
+    public void AddMemberToGroup(CNContact contact, CNGroup group);
+    [Selector("removeMember:fromGroup:")]
+    public void RemoveMemberFromGroup(CNContact contact, CNGroup group);
 }
 
 #endif

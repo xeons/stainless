@@ -34,10 +34,14 @@ import Standard.ObjC;
 /// macOS 26.2 and later.
 public extern objc class MTRCommissioningOperation : NSObject
 {
-    [Selector("matchedPayload")] public MTRSetupPayload? MatchedPayload { get; }
-    [Selector("initWithParameters:setupPayload:delegate:queue:")] public Self? InitWithParametersSetupPayloadDelegateQueue(MTRCommissioningParameters parameters, NSString payload, MTRCommissioningDelegate @delegate, dispatch_queue_t queue);
-    [Selector("startWithController:")] public void StartWithController(MTRDeviceController controller);
-    [Selector("stop")] public bool Stop();
+    [Selector("matchedPayload")]
+    public MTRSetupPayload? MatchedPayload { get; }
+    [Selector("initWithParameters:setupPayload:delegate:queue:")]
+    public Self? InitWithParametersSetupPayloadDelegateQueue(MTRCommissioningParameters parameters, NSString payload, MTRCommissioningDelegate @delegate, dispatch_queue_t queue);
+    [Selector("startWithController:")]
+    public void StartWithController(MTRDeviceController controller);
+    [Selector("stop")]
+    public bool Stop();
 }
 
 #endif

@@ -36,24 +36,41 @@ import Standard.ObjC;
 
 public extern objc class AVPlayerView : NSView
 {
-    [Selector("player", "setPlayer:")] public AVPlayer? Player { get; set; }
-    [Selector("controlsStyle", "setControlsStyle:")] public AVPlayerViewControlsStyle ControlsStyle { get; set; }
-    [Selector("videoGravity", "setVideoGravity:")] public AVLayerVideoGravity? VideoGravity { get; set; }
-    [Selector("isReadyForDisplay")] public bool ReadyForDisplay { get; }
-    [Selector("videoBounds")] public NSRect VideoBounds { get; }
-    [Selector("contentOverlayView")] public NSView? ContentOverlayView { get; }
-    [Selector("updatesNowPlayingInfoCenter", "setUpdatesNowPlayingInfoCenter:")] public bool UpdatesNowPlayingInfoCenter { get; set; }
-    [Selector("delegate", "setDelegate:")] public AVPlayerViewDelegate? Delegate { get; set; }
-    [Selector("speeds", "setSpeeds:")] public NSArray? Speeds { get; set; }
-    [Selector("selectedSpeed")] public AVPlaybackSpeed? SelectedSpeed { get; }
-    [Selector("allowsVideoFrameAnalysis", "setAllowsVideoFrameAnalysis:")] public bool AllowsVideoFrameAnalysis { get; set; }
-    [Selector("videoFrameAnalysisTypes", "setVideoFrameAnalysisTypes:")] public AVVideoFrameAnalysisType VideoFrameAnalysisTypes { get; set; }
-    [Selector("allowsMagnification", "setAllowsMagnification:")] public bool AllowsMagnification { get; set; }
-    [Selector("magnification", "setMagnification:")] public CGFloat Magnification { get; set; }
+    [Selector("player", "setPlayer:")]
+    public AVPlayer? Player { get; set; }
+    [Selector("controlsStyle", "setControlsStyle:")]
+    public AVPlayerViewControlsStyle ControlsStyle { get; set; }
+    [Selector("videoGravity", "setVideoGravity:")]
+    public AVLayerVideoGravity? VideoGravity { get; set; }
+    [Selector("isReadyForDisplay")]
+    public bool ReadyForDisplay { get; }
+    [Selector("videoBounds")]
+    public NSRect VideoBounds { get; }
+    [Selector("contentOverlayView")]
+    public NSView? ContentOverlayView { get; }
+    [Selector("updatesNowPlayingInfoCenter", "setUpdatesNowPlayingInfoCenter:")]
+    public bool UpdatesNowPlayingInfoCenter { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public AVPlayerViewDelegate? Delegate { get; set; }
+    [Selector("speeds", "setSpeeds:")]
+    public NSArray? Speeds { get; set; }
+    [Selector("selectedSpeed")]
+    public AVPlaybackSpeed? SelectedSpeed { get; }
+    [Selector("allowsVideoFrameAnalysis", "setAllowsVideoFrameAnalysis:")]
+    public bool AllowsVideoFrameAnalysis { get; set; }
+    [Selector("videoFrameAnalysisTypes", "setVideoFrameAnalysisTypes:")]
+    public AVVideoFrameAnalysisType VideoFrameAnalysisTypes { get; set; }
+    [Selector("allowsMagnification", "setAllowsMagnification:")]
+    public bool AllowsMagnification { get; set; }
+    [Selector("magnification", "setMagnification:")]
+    public CGFloat Magnification { get; set; }
     /// macOS 26.0 and later.
-    [Selector("preferredDisplayDynamicRange", "setPreferredDisplayDynamicRange:")] public AVDisplayDynamicRange PreferredDisplayDynamicRange { get; set; }
-    [Selector("selectSpeed:")] public void SelectSpeed(AVPlaybackSpeed speed);
-    [Selector("setMagnification:centeredAtPoint:")] public void SetMagnificationCenteredAtPoint(CGFloat magnification, CGPoint point);
+    [Selector("preferredDisplayDynamicRange", "setPreferredDisplayDynamicRange:")]
+    public AVDisplayDynamicRange PreferredDisplayDynamicRange { get; set; }
+    [Selector("selectSpeed:")]
+    public void SelectSpeed(AVPlaybackSpeed speed);
+    [Selector("setMagnification:centeredAtPoint:")]
+    public void SetMagnificationCenteredAtPoint(CGFloat magnification, CGPoint point);
 }
 
 public enum AVPlayerViewControlsStyle : long
@@ -68,11 +85,16 @@ public enum AVPlayerViewControlsStyle : long
 /// AVPlayerViewCustomization, a category of AVPlayerView.
 public extern objc class AVPlayerView
 {
-    [Selector("showsFrameSteppingButtons", "setShowsFrameSteppingButtons:")] public bool ShowsFrameSteppingButtons { get; set; }
-    [Selector("showsSharingServiceButton", "setShowsSharingServiceButton:")] public bool ShowsSharingServiceButton { get; set; }
-    [Selector("actionPopUpButtonMenu", "setActionPopUpButtonMenu:")] public NSMenu? ActionPopUpButtonMenu { get; set; }
-    [Selector("showsFullScreenToggleButton", "setShowsFullScreenToggleButton:")] public bool ShowsFullScreenToggleButton { get; set; }
-    [Selector("showsTimecodes", "setShowsTimecodes:")] public bool ShowsTimecodes { get; set; }
+    [Selector("showsFrameSteppingButtons", "setShowsFrameSteppingButtons:")]
+    public bool ShowsFrameSteppingButtons { get; set; }
+    [Selector("showsSharingServiceButton", "setShowsSharingServiceButton:")]
+    public bool ShowsSharingServiceButton { get; set; }
+    [Selector("actionPopUpButtonMenu", "setActionPopUpButtonMenu:")]
+    public NSMenu? ActionPopUpButtonMenu { get; set; }
+    [Selector("showsFullScreenToggleButton", "setShowsFullScreenToggleButton:")]
+    public bool ShowsFullScreenToggleButton { get; set; }
+    [Selector("showsTimecodes", "setShowsTimecodes:")]
+    public bool ShowsTimecodes { get; set; }
 }
 
 public objc closure void AVPlayerViewBeginTrimmingWithCompletionHandlerHandlerBlock(AVPlayerViewTrimResult arg0);
@@ -80,8 +102,10 @@ public objc closure void AVPlayerViewBeginTrimmingWithCompletionHandlerHandlerBl
 /// AVPlayerViewTrimming, a category of AVPlayerView.
 public extern objc class AVPlayerView
 {
-    [Selector("canBeginTrimming")] public bool CanBeginTrimming { get; }
-    [Selector("beginTrimmingWithCompletionHandler:")] public void BeginTrimmingWithCompletionHandler(AVPlayerViewBeginTrimmingWithCompletionHandlerHandlerBlock? handler);
+    [Selector("canBeginTrimming")]
+    public bool CanBeginTrimming { get; }
+    [Selector("beginTrimmingWithCompletionHandler:")]
+    public void BeginTrimmingWithCompletionHandler(AVPlayerViewBeginTrimmingWithCompletionHandlerHandlerBlock? handler);
 }
 
 public enum AVPlayerViewTrimResult : long
@@ -93,38 +117,65 @@ public enum AVPlayerViewTrimResult : long
 /// AVPlayerViewChapterIndicator, a category of AVPlayerView.
 public extern objc class AVPlayerView
 {
-    [Selector("flashChapterNumber:chapterTitle:")] public void FlashChapterNumberChapterTitle(NSUInteger chapterNumber, NSString? chapterTitle);
+    [Selector("flashChapterNumber:chapterTitle:")]
+    public void FlashChapterNumberChapterTitle(NSUInteger chapterNumber, NSString? chapterTitle);
 }
 
 /// AVPlayerViewPictureInPictureSupport, a category of AVPlayerView.
 public extern objc class AVPlayerView
 {
-    [Selector("allowsPictureInPicturePlayback", "setAllowsPictureInPicturePlayback:")] public bool AllowsPictureInPicturePlayback { get; set; }
-    [Selector("pictureInPictureDelegate", "setPictureInPictureDelegate:")] public AVPlayerViewPictureInPictureDelegate? PictureInPictureDelegate { get; set; }
+    [Selector("allowsPictureInPicturePlayback", "setAllowsPictureInPicturePlayback:")]
+    public bool AllowsPictureInPicturePlayback { get; set; }
+    [Selector("pictureInPictureDelegate", "setPictureInPictureDelegate:")]
+    public AVPlayerViewPictureInPictureDelegate? PictureInPictureDelegate { get; set; }
 }
 
 public objc closure void AVPlayerViewDelegatePlayerViewRestoreUserInterfaceForFullScreenExitWithCompletionHandlerCompletionHandlerBlock(bool arg0);
 
 public objc interface AVPlayerViewDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("playerViewWillEnterFullScreen:")] void PlayerViewWillEnterFullScreen(AVPlayerView playerView);
-    [Optional] [Selector("playerViewDidEnterFullScreen:")] void PlayerViewDidEnterFullScreen(AVPlayerView playerView);
-    [Optional] [Selector("playerViewWillExitFullScreen:")] void PlayerViewWillExitFullScreen(AVPlayerView playerView);
-    [Optional] [Selector("playerViewDidExitFullScreen:")] void PlayerViewDidExitFullScreen(AVPlayerView playerView);
-    [Optional] [Selector("playerView:restoreUserInterfaceForFullScreenExitWithCompletionHandler:")] void PlayerViewRestoreUserInterfaceForFullScreenExitWithCompletionHandler(AVPlayerView playerView, AVPlayerViewDelegatePlayerViewRestoreUserInterfaceForFullScreenExitWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("playerViewWillEnterFullScreen:")]
+    void PlayerViewWillEnterFullScreen(AVPlayerView playerView);
+    [Optional]
+    [Selector("playerViewDidEnterFullScreen:")]
+    void PlayerViewDidEnterFullScreen(AVPlayerView playerView);
+    [Optional]
+    [Selector("playerViewWillExitFullScreen:")]
+    void PlayerViewWillExitFullScreen(AVPlayerView playerView);
+    [Optional]
+    [Selector("playerViewDidExitFullScreen:")]
+    void PlayerViewDidExitFullScreen(AVPlayerView playerView);
+    [Optional]
+    [Selector("playerView:restoreUserInterfaceForFullScreenExitWithCompletionHandler:")]
+    void PlayerViewRestoreUserInterfaceForFullScreenExitWithCompletionHandler(AVPlayerView playerView, AVPlayerViewDelegatePlayerViewRestoreUserInterfaceForFullScreenExitWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void AVPlayerViewPictureInPictureDelegatePlayerViewRestoreUserInterfaceForPictureInPictureStopWithCompletionHandlerCompletionHandlerBlock(bool arg0);
 
 public objc interface AVPlayerViewPictureInPictureDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("playerViewWillStartPictureInPicture:")] void PlayerViewWillStartPictureInPicture(AVPlayerView playerView);
-    [Optional] [Selector("playerViewDidStartPictureInPicture:")] void PlayerViewDidStartPictureInPicture(AVPlayerView playerView);
-    [Optional] [Selector("playerView:failedToStartPictureInPictureWithError:")] void PlayerViewFailedToStartPictureInPictureWithError(AVPlayerView playerView, NSError error);
-    [Optional] [Selector("playerViewWillStopPictureInPicture:")] void PlayerViewWillStopPictureInPicture(AVPlayerView playerView);
-    [Optional] [Selector("playerViewDidStopPictureInPicture:")] void PlayerViewDidStopPictureInPicture(AVPlayerView playerView);
-    [Optional] [Selector("playerView:restoreUserInterfaceForPictureInPictureStopWithCompletionHandler:")] void PlayerViewRestoreUserInterfaceForPictureInPictureStopWithCompletionHandler(AVPlayerView playerView, AVPlayerViewPictureInPictureDelegatePlayerViewRestoreUserInterfaceForPictureInPictureStopWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("playerViewShouldAutomaticallyDismissAtPictureInPictureStart:")] bool PlayerViewShouldAutomaticallyDismissAtPictureInPictureStart(AVPlayerView playerView);
+    [Optional]
+    [Selector("playerViewWillStartPictureInPicture:")]
+    void PlayerViewWillStartPictureInPicture(AVPlayerView playerView);
+    [Optional]
+    [Selector("playerViewDidStartPictureInPicture:")]
+    void PlayerViewDidStartPictureInPicture(AVPlayerView playerView);
+    [Optional]
+    [Selector("playerView:failedToStartPictureInPictureWithError:")]
+    void PlayerViewFailedToStartPictureInPictureWithError(AVPlayerView playerView, NSError error);
+    [Optional]
+    [Selector("playerViewWillStopPictureInPicture:")]
+    void PlayerViewWillStopPictureInPicture(AVPlayerView playerView);
+    [Optional]
+    [Selector("playerViewDidStopPictureInPicture:")]
+    void PlayerViewDidStopPictureInPicture(AVPlayerView playerView);
+    [Optional]
+    [Selector("playerView:restoreUserInterfaceForPictureInPictureStopWithCompletionHandler:")]
+    void PlayerViewRestoreUserInterfaceForPictureInPictureStopWithCompletionHandler(AVPlayerView playerView, AVPlayerViewPictureInPictureDelegatePlayerViewRestoreUserInterfaceForPictureInPictureStopWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("playerViewShouldAutomaticallyDismissAtPictureInPictureStart:")]
+    bool PlayerViewShouldAutomaticallyDismissAtPictureInPictureStart(AVPlayerView playerView);
 }
 
 #endif

@@ -43,23 +43,40 @@ public struct InstallerPane_Private;
 
 public extern objc class InstallerPane : NSObject
 {
-    [Selector("contentView", "setContentView:")] public NSView? ContentView { get; set; }
-    [Selector("initialKeyView", "setInitialKeyView:")] public NSView? InitialKeyView { get; set; }
-    [Selector("firstKeyView", "setFirstKeyView:")] public NSView? FirstKeyView { get; set; }
-    [Selector("lastKeyView", "setLastKeyView:")] public NSView? LastKeyView { get; set; }
-    [Selector("nextPane", "setNextPane:")] public InstallerPane? NextPane { get; set; }
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("section")] public InstallerSection? Section { get; }
-    [Selector("nextEnabled", "setNextEnabled:")] public bool NextEnabled { get; set; }
-    [Selector("previousEnabled", "setPreviousEnabled:")] public bool PreviousEnabled { get; set; }
-    [Selector("gotoNextPane")] public bool GotoNextPane { get; }
-    [Selector("gotoPreviousPane")] public bool GotoPreviousPane { get; }
-    [Selector("initWithSection:")] public Self? InitWithSection(AnyObject? parent);
-    [Selector("willEnterPane:")] public void WillEnterPane(InstallerSectionDirection dir);
-    [Selector("didEnterPane:")] public void DidEnterPane(InstallerSectionDirection dir);
-    [Selector("shouldExitPane:")] public bool ShouldExitPane(InstallerSectionDirection dir);
-    [Selector("willExitPane:")] public void WillExitPane(InstallerSectionDirection dir);
-    [Selector("didExitPane:")] public void DidExitPane(InstallerSectionDirection dir);
+    [Selector("contentView", "setContentView:")]
+    public NSView? ContentView { get; set; }
+    [Selector("initialKeyView", "setInitialKeyView:")]
+    public NSView? InitialKeyView { get; set; }
+    [Selector("firstKeyView", "setFirstKeyView:")]
+    public NSView? FirstKeyView { get; set; }
+    [Selector("lastKeyView", "setLastKeyView:")]
+    public NSView? LastKeyView { get; set; }
+    [Selector("nextPane", "setNextPane:")]
+    public InstallerPane? NextPane { get; set; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("section")]
+    public InstallerSection? Section { get; }
+    [Selector("nextEnabled", "setNextEnabled:")]
+    public bool NextEnabled { get; set; }
+    [Selector("previousEnabled", "setPreviousEnabled:")]
+    public bool PreviousEnabled { get; set; }
+    [Selector("gotoNextPane")]
+    public bool GotoNextPane { get; }
+    [Selector("gotoPreviousPane")]
+    public bool GotoPreviousPane { get; }
+    [Selector("initWithSection:")]
+    public Self? InitWithSection(AnyObject? parent);
+    [Selector("willEnterPane:")]
+    public void WillEnterPane(InstallerSectionDirection dir);
+    [Selector("didEnterPane:")]
+    public void DidEnterPane(InstallerSectionDirection dir);
+    [Selector("shouldExitPane:")]
+    public bool ShouldExitPane(InstallerSectionDirection dir);
+    [Selector("willExitPane:")]
+    public void WillExitPane(InstallerSectionDirection dir);
+    [Selector("didExitPane:")]
+    public void DidExitPane(InstallerSectionDirection dir);
 }
 
 #endif

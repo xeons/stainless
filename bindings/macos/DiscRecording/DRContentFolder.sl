@@ -35,11 +35,14 @@ import Standard.ObjC;
 public extern "C" CFTypeID DRFolderGetTypeID();
 
 /// Deprecated in macOS 10.14.
-[ReturnsRetained] public extern "C" DRFolderRef? DRFolderCreateReal(FSRef* fsRef);
+[ReturnsRetained]
+public extern "C" DRFolderRef? DRFolderCreateReal(FSRef* fsRef);
 
-[ReturnsRetained] public extern "C" DRFolderRef? DRFolderCreateRealWithURL(CFURLRef? urlRef);
+[ReturnsRetained]
+public extern "C" DRFolderRef? DRFolderCreateRealWithURL(CFURLRef? urlRef);
 
-[ReturnsRetained] public extern "C" DRFolderRef? DRFolderCreateVirtual(CFStringRef? baseName);
+[ReturnsRetained]
+public extern "C" DRFolderRef? DRFolderCreateVirtual(CFStringRef? baseName);
 
 public extern "C" void DRFolderConvertRealToVirtual(DRFolderRef? realFolder);
 
@@ -49,6 +52,7 @@ public extern "C" void DRFolderRemoveChild(DRFolderRef? parent, DRFSObjectRef? c
 
 public extern "C" UInt32 DRFolderCountChildren(DRFolderRef? folder);
 
-[ReturnsRetained] public extern "C" CFArrayRef? DRFolderCopyChildren(DRFolderRef? folder);
+[ReturnsRetained]
+public extern "C" CFArrayRef? DRFolderCopyChildren(DRFolderRef? folder);
 
 #endif

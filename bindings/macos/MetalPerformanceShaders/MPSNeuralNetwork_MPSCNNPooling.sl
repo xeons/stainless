@@ -34,71 +34,100 @@ import Standard.ObjC;
 
 public extern objc class MPSCNNPooling : MPSCNNKernel
 {
-    [Selector("initWithDevice:kernelWidth:kernelHeight:")] public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
-    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")] public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:kernelWidth:kernelHeight:")]
+    public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
+    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")]
+    public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNPoolingMax : MPSCNNPooling
 {
-    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")] public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")]
+    public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNPoolingAverage : MPSCNNPooling
 {
-    [Selector("zeroPadSizeX", "setZeroPadSizeX:")] public NSUInteger ZeroPadSizeX { get; set; }
-    [Selector("zeroPadSizeY", "setZeroPadSizeY:")] public NSUInteger ZeroPadSizeY { get; set; }
-    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")] public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("zeroPadSizeX", "setZeroPadSizeX:")]
+    public NSUInteger ZeroPadSizeX { get; set; }
+    [Selector("zeroPadSizeY", "setZeroPadSizeY:")]
+    public NSUInteger ZeroPadSizeY { get; set; }
+    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")]
+    public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNPoolingL2Norm : MPSCNNPooling
 {
-    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")] public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")]
+    public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNDilatedPoolingMax : MPSCNNPooling
 {
-    [Selector("dilationRateX")] public NSUInteger DilationRateX { get; }
-    [Selector("dilationRateY")] public NSUInteger DilationRateY { get; }
-    [Selector("initWithDevice:kernelWidth:kernelHeight:dilationRateX:dilationRateY:strideInPixelsX:strideInPixelsY:")] public Self InitWithDeviceKernelWidthKernelHeightDilationRateXDilationRateYStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger dilationRateX, NSUInteger dilationRateY, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("dilationRateX")]
+    public NSUInteger DilationRateX { get; }
+    [Selector("dilationRateY")]
+    public NSUInteger DilationRateY { get; }
+    [Selector("initWithDevice:kernelWidth:kernelHeight:dilationRateX:dilationRateY:strideInPixelsX:strideInPixelsY:")]
+    public Self InitWithDeviceKernelWidthKernelHeightDilationRateXDilationRateYStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger dilationRateX, NSUInteger dilationRateY, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNPoolingGradient : MPSCNNGradientKernel
 {
-    [Selector("sourceSize", "setSourceSize:")] public MTLSize SourceSize { get; set; }
-    [Selector("initWithDevice:kernelWidth:kernelHeight:")] public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
-    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")] public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("sourceSize", "setSourceSize:")]
+    public MTLSize SourceSize { get; set; }
+    [Selector("initWithDevice:kernelWidth:kernelHeight:")]
+    public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
+    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")]
+    public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNPoolingAverageGradient : MPSCNNPoolingGradient
 {
-    [Selector("zeroPadSizeX", "setZeroPadSizeX:")] public NSUInteger ZeroPadSizeX { get; set; }
-    [Selector("zeroPadSizeY", "setZeroPadSizeY:")] public NSUInteger ZeroPadSizeY { get; set; }
-    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")] public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("zeroPadSizeX", "setZeroPadSizeX:")]
+    public NSUInteger ZeroPadSizeX { get; set; }
+    [Selector("zeroPadSizeY", "setZeroPadSizeY:")]
+    public NSUInteger ZeroPadSizeY { get; set; }
+    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")]
+    public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNPoolingMaxGradient : MPSCNNPoolingGradient
 {
-    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")] public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")]
+    public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNPoolingL2NormGradient : MPSCNNPoolingGradient
 {
-    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")] public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:kernelWidth:kernelHeight:strideInPixelsX:strideInPixelsY:")]
+    public Self InitWithDeviceKernelWidthKernelHeightStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNDilatedPoolingMaxGradient : MPSCNNPoolingGradient
 {
-    [Selector("initWithDevice:kernelWidth:kernelHeight:dilationRateX:dilationRateY:strideInPixelsX:strideInPixelsY:")] public Self InitWithDeviceKernelWidthKernelHeightDilationRateXDilationRateYStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger dilationRateX, NSUInteger dilationRateY, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:kernelWidth:kernelHeight:dilationRateX:dilationRateY:strideInPixelsX:strideInPixelsY:")]
+    public Self InitWithDeviceKernelWidthKernelHeightDilationRateXDilationRateYStrideInPixelsXStrideInPixelsY(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, NSUInteger dilationRateX, NSUInteger dilationRateY, NSUInteger strideInPixelsX, NSUInteger strideInPixelsY);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 #endif

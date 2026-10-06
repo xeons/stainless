@@ -49,15 +49,20 @@ public enum PHASESpatialPipelineFlags : ulong
 
 public extern objc class PHASESpatialPipelineEntry : NSObject
 {
-    [Selector("sendLevel", "setSendLevel:")] public double SendLevel { get; set; }
-    [Selector("sendLevelMetaParameterDefinition", "setSendLevelMetaParameterDefinition:")] public PHASENumberMetaParameterDefinition? SendLevelMetaParameterDefinition { get; set; }
+    [Selector("sendLevel", "setSendLevel:")]
+    public double SendLevel { get; set; }
+    [Selector("sendLevelMetaParameterDefinition", "setSendLevelMetaParameterDefinition:")]
+    public PHASENumberMetaParameterDefinition? SendLevelMetaParameterDefinition { get; set; }
 }
 
 public extern objc class PHASESpatialPipeline : NSObject
 {
-    [Selector("flags")] public PHASESpatialPipelineFlags Flags { get; }
-    [Selector("entries")] public NSDictionary Entries { get; }
-    [Selector("initWithFlags:")] public Self? InitWithFlags(PHASESpatialPipelineFlags flags);
+    [Selector("flags")]
+    public PHASESpatialPipelineFlags Flags { get; }
+    [Selector("entries")]
+    public NSDictionary Entries { get; }
+    [Selector("initWithFlags:")]
+    public Self? InitWithFlags(PHASESpatialPipelineFlags flags);
 }
 
 #endif

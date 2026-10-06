@@ -34,34 +34,62 @@ import Standard.ObjC;
 
 public extern objc class CIVector : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("count")] public nuint Count { get; }
-    [Selector("X")] public CGFloat X { get; }
-    [Selector("Y")] public CGFloat Y { get; }
-    [Selector("Z")] public CGFloat Z { get; }
-    [Selector("W")] public CGFloat W { get; }
-    [Selector("CGPointValue")] public CGPoint CGPointValue { get; }
-    [Selector("CGRectValue")] public CGRect CGRectValue { get; }
-    [Selector("CGAffineTransformValue")] public CGAffineTransform CGAffineTransformValue { get; }
-    [Selector("stringRepresentation")] public NSString StringRepresentation { get; }
-    [Selector("vectorWithValues:count:")] public static Self VectorWithValuesCount(CGFloat* values, nuint count);
-    [Selector("vectorWithX:")] public static Self VectorWithX(CGFloat x);
-    [Selector("vectorWithX:Y:")] public static Self VectorWithXY(CGFloat x, CGFloat y);
-    [Selector("vectorWithX:Y:Z:")] public static Self VectorWithXYZ(CGFloat x, CGFloat y, CGFloat z);
-    [Selector("vectorWithX:Y:Z:W:")] public static Self VectorWithXYZW(CGFloat x, CGFloat y, CGFloat z, CGFloat w);
-    [Selector("vectorWithCGPoint:")] public static Self VectorWithCGPoint(CGPoint p);
-    [Selector("vectorWithCGRect:")] public static Self VectorWithCGRect(CGRect r);
-    [Selector("vectorWithCGAffineTransform:")] public static Self VectorWithCGAffineTransform(CGAffineTransform t);
-    [Selector("vectorWithString:")] public static Self VectorWithString(NSString representation);
-    [Selector("initWithValues:count:")] public Self InitWithValuesCount(CGFloat* values, nuint count);
-    [Selector("initWithX:")] public Self InitWithX(CGFloat x);
-    [Selector("initWithX:Y:")] public Self InitWithXY(CGFloat x, CGFloat y);
-    [Selector("initWithX:Y:Z:")] public Self InitWithXYZ(CGFloat x, CGFloat y, CGFloat z);
-    [Selector("initWithX:Y:Z:W:")] public Self InitWithXYZW(CGFloat x, CGFloat y, CGFloat z, CGFloat w);
-    [Selector("initWithCGPoint:")] public Self InitWithCGPoint(CGPoint p);
-    [Selector("initWithCGRect:")] public Self InitWithCGRect(CGRect r);
-    [Selector("initWithCGAffineTransform:")] public Self InitWithCGAffineTransform(CGAffineTransform t);
-    [Selector("initWithString:")] public Self InitWithString(NSString representation);
-    [Selector("valueAtIndex:")] public CGFloat ValueAtIndex(nuint index);
+    [Selector("count")]
+    public nuint Count { get; }
+    [Selector("X")]
+    public CGFloat X { get; }
+    [Selector("Y")]
+    public CGFloat Y { get; }
+    [Selector("Z")]
+    public CGFloat Z { get; }
+    [Selector("W")]
+    public CGFloat W { get; }
+    [Selector("CGPointValue")]
+    public CGPoint CGPointValue { get; }
+    [Selector("CGRectValue")]
+    public CGRect CGRectValue { get; }
+    [Selector("CGAffineTransformValue")]
+    public CGAffineTransform CGAffineTransformValue { get; }
+    [Selector("stringRepresentation")]
+    public NSString StringRepresentation { get; }
+    [Selector("vectorWithValues:count:")]
+    public static Self VectorWithValuesCount(CGFloat* values, nuint count);
+    [Selector("vectorWithX:")]
+    public static Self VectorWithX(CGFloat x);
+    [Selector("vectorWithX:Y:")]
+    public static Self VectorWithXY(CGFloat x, CGFloat y);
+    [Selector("vectorWithX:Y:Z:")]
+    public static Self VectorWithXYZ(CGFloat x, CGFloat y, CGFloat z);
+    [Selector("vectorWithX:Y:Z:W:")]
+    public static Self VectorWithXYZW(CGFloat x, CGFloat y, CGFloat z, CGFloat w);
+    [Selector("vectorWithCGPoint:")]
+    public static Self VectorWithCGPoint(CGPoint p);
+    [Selector("vectorWithCGRect:")]
+    public static Self VectorWithCGRect(CGRect r);
+    [Selector("vectorWithCGAffineTransform:")]
+    public static Self VectorWithCGAffineTransform(CGAffineTransform t);
+    [Selector("vectorWithString:")]
+    public static Self VectorWithString(NSString representation);
+    [Selector("initWithValues:count:")]
+    public Self InitWithValuesCount(CGFloat* values, nuint count);
+    [Selector("initWithX:")]
+    public Self InitWithX(CGFloat x);
+    [Selector("initWithX:Y:")]
+    public Self InitWithXY(CGFloat x, CGFloat y);
+    [Selector("initWithX:Y:Z:")]
+    public Self InitWithXYZ(CGFloat x, CGFloat y, CGFloat z);
+    [Selector("initWithX:Y:Z:W:")]
+    public Self InitWithXYZW(CGFloat x, CGFloat y, CGFloat z, CGFloat w);
+    [Selector("initWithCGPoint:")]
+    public Self InitWithCGPoint(CGPoint p);
+    [Selector("initWithCGRect:")]
+    public Self InitWithCGRect(CGRect r);
+    [Selector("initWithCGAffineTransform:")]
+    public Self InitWithCGAffineTransform(CGAffineTransform t);
+    [Selector("initWithString:")]
+    public Self InitWithString(NSString representation);
+    [Selector("valueAtIndex:")]
+    public CGFloat ValueAtIndex(nuint index);
 }
 
 #endif

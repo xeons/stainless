@@ -81,13 +81,17 @@ public extern "C" OSStatus CMTimebaseCreateWithSourceClock(CFAllocatorRef? alloc
 
 public extern "C" OSStatus CMTimebaseCreateWithSourceTimebase(CFAllocatorRef? allocator, CMTimebaseRef sourceTimebase, OpaqueCMTimebase** timebaseOut);
 
-[ReturnsRetained] public extern "C" CMTimebaseRef? CMTimebaseCopySourceTimebase(CMTimebaseRef timebase);
+[ReturnsRetained]
+public extern "C" CMTimebaseRef? CMTimebaseCopySourceTimebase(CMTimebaseRef timebase);
 
-[ReturnsRetained] public extern "C" CMClockRef? CMTimebaseCopySourceClock(CMTimebaseRef timebase);
+[ReturnsRetained]
+public extern "C" CMClockRef? CMTimebaseCopySourceClock(CMTimebaseRef timebase);
 
-[ReturnsRetained] public extern "C" CMClockOrTimebaseRef CMTimebaseCopySource(CMTimebaseRef timebase);
+[ReturnsRetained]
+public extern "C" CMClockOrTimebaseRef CMTimebaseCopySource(CMTimebaseRef timebase);
 
-[ReturnsRetained] public extern "C" CMClockRef CMTimebaseCopyUltimateSourceClock(CMTimebaseRef timebase);
+[ReturnsRetained]
+public extern "C" CMClockRef CMTimebaseCopyUltimateSourceClock(CMTimebaseRef timebase);
 
 /// Deprecated in macOS 10.11.
 public extern "C" CMTimebaseRef? CMTimebaseGetMasterTimebase(CMTimebaseRef timebase);

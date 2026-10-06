@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class MKGradientPolylineRenderer : MKPolylineRenderer
 {
-    [Selector("locations")] public NSArray? Locations { get; }
-    [Selector("colors")] public NSArray Colors { get; }
-    [Selector("setColors:atLocations:")] public void SetColorsAtLocations(NSArray colors, NSArray locations);
+    [Selector("locations")]
+    public NSArray? Locations { get; }
+    [Selector("colors")]
+    public NSArray Colors { get; }
+    [Selector("setColors:atLocations:")]
+    public void SetColorsAtLocations(NSArray colors, NSArray locations);
 }
 
 #endif

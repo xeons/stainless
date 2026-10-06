@@ -658,7 +658,8 @@ public sealed partial class Binder
     /// </summary>
     private bool CanOverride(
         ClassTypeSymbol classType, FunctionSymbol method,
-        [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] FunctionSymbol? inherited)
+        [System.Diagnostics.CodeAnalysis.NotNullWhen(true)]
+        FunctionSymbol? inherited)
     {
         // A setter of a property whose type was narrowed takes a different
         // parameter, so nothing matched it. That is the narrowing's fault.

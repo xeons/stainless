@@ -62,16 +62,20 @@ public extern "C" CFStringRef? kUTTagClassNSPboardType;
 public extern "C" CFStringRef? kUTTagClassOSType;
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFStringRef? UTTypeCreatePreferredIdentifierForTag(CFStringRef inTagClass, CFStringRef inTag, CFStringRef? inConformingToUTI);
+[ReturnsRetained]
+public extern "C" CFStringRef? UTTypeCreatePreferredIdentifierForTag(CFStringRef inTagClass, CFStringRef inTag, CFStringRef? inConformingToUTI);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFArrayRef? UTTypeCreateAllIdentifiersForTag(CFStringRef inTagClass, CFStringRef inTag, CFStringRef? inConformingToUTI);
+[ReturnsRetained]
+public extern "C" CFArrayRef? UTTypeCreateAllIdentifiersForTag(CFStringRef inTagClass, CFStringRef inTag, CFStringRef? inConformingToUTI);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFStringRef? UTTypeCopyPreferredTagWithClass(CFStringRef inUTI, CFStringRef inTagClass);
+[ReturnsRetained]
+public extern "C" CFStringRef? UTTypeCopyPreferredTagWithClass(CFStringRef inUTI, CFStringRef inTagClass);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFArrayRef? UTTypeCopyAllTagsWithClass(CFStringRef inUTI, CFStringRef inTagClass);
+[ReturnsRetained]
+public extern "C" CFArrayRef? UTTypeCopyAllTagsWithClass(CFStringRef inUTI, CFStringRef inTagClass);
 
 /// Deprecated in macOS 12.0.
 public extern "C" Boolean UTTypeEqual(CFStringRef inUTI1, CFStringRef inUTI2);
@@ -80,7 +84,8 @@ public extern "C" Boolean UTTypeEqual(CFStringRef inUTI1, CFStringRef inUTI2);
 public extern "C" Boolean UTTypeConformsTo(CFStringRef inUTI, CFStringRef inConformsToUTI);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFStringRef? UTTypeCopyDescription(CFStringRef inUTI);
+[ReturnsRetained]
+public extern "C" CFStringRef? UTTypeCopyDescription(CFStringRef inUTI);
 
 /// Deprecated in macOS 12.0.
 public extern "C" Boolean UTTypeIsDeclared(CFStringRef inUTI);
@@ -89,13 +94,16 @@ public extern "C" Boolean UTTypeIsDeclared(CFStringRef inUTI);
 public extern "C" Boolean UTTypeIsDynamic(CFStringRef inUTI);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFDictionaryRef? UTTypeCopyDeclaration(CFStringRef inUTI);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? UTTypeCopyDeclaration(CFStringRef inUTI);
 
 /// Deprecated in macOS 11.0.
-[ReturnsRetained] public extern "C" CFURLRef? UTTypeCopyDeclaringBundleURL(CFStringRef inUTI);
+[ReturnsRetained]
+public extern "C" CFURLRef? UTTypeCopyDeclaringBundleURL(CFStringRef inUTI);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFStringRef UTCreateStringForOSType(OSType inOSType);
+[ReturnsRetained]
+public extern "C" CFStringRef UTCreateStringForOSType(OSType inOSType);
 
 /// Deprecated in macOS 12.0.
 public extern "C" OSType UTGetOSTypeFromString(CFStringRef inString);

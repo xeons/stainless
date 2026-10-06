@@ -60,22 +60,38 @@ public enum BEAccessibilityContainerType : ulong
 /// BEAccessibility, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("browserAccessibilityCurrentStatus", "setBrowserAccessibilityCurrentStatus:")] public NSString? BrowserAccessibilityCurrentStatus { get; set; }
-    [Selector("browserAccessibilitySortDirection", "setBrowserAccessibilitySortDirection:")] public NSString? BrowserAccessibilitySortDirection { get; set; }
-    [Selector("browserAccessibilityRoleDescription", "setBrowserAccessibilityRoleDescription:")] public NSString? BrowserAccessibilityRoleDescription { get; set; }
-    [Selector("browserAccessibilityIsRequired", "setBrowserAccessibilityIsRequired:")] public bool BrowserAccessibilityIsRequired { get; set; }
-    [Selector("browserAccessibilityPressedState", "setBrowserAccessibilityPressedState:")] public BEAccessibilityPressedState BrowserAccessibilityPressedState { get; set; }
-    [Selector("browserAccessibilityHasDOMFocus", "setBrowserAccessibilityHasDOMFocus:")] public bool BrowserAccessibilityHasDOMFocus { get; set; }
-    [Selector("browserAccessibilityContainerType", "setBrowserAccessibilityContainerType:")] public BEAccessibilityContainerType BrowserAccessibilityContainerType { get; set; }
-    [Selector("browserAccessibilitySelectedTextRange")] public NSRange BrowserAccessibilitySelectedTextRange();
-    [Selector("browserAccessibilitySetSelectedTextRange:")] public void BrowserAccessibilitySetSelectedTextRange(NSRange range);
-    [Selector("browserAccessibilityValueInRange:")] public NSString BrowserAccessibilityValueInRange(NSRange range);
-    [Selector("browserAccessibilityAttributedValueInRange:")] public NSAttributedString BrowserAccessibilityAttributedValueInRange(NSRange range);
-    [Selector("browserAccessibilityInsertTextAtCursor:")] public void BrowserAccessibilityInsertTextAtCursor(NSString text);
-    [Selector("browserAccessibilityDeleteTextAtCursor:")] public void BrowserAccessibilityDeleteTextAtCursor(NSInteger numberOfCharacters);
-    [Selector("accessibilityLineEndPositionFromCurrentSelection")] public NSInteger AccessibilityLineEndPositionFromCurrentSelection();
-    [Selector("accessibilityLineStartPositionFromCurrentSelection")] public NSInteger AccessibilityLineStartPositionFromCurrentSelection();
-    [Selector("accessibilityLineRangeForPosition:")] public NSRange AccessibilityLineRangeForPosition(NSInteger position);
+    [Selector("browserAccessibilityCurrentStatus", "setBrowserAccessibilityCurrentStatus:")]
+    public NSString? BrowserAccessibilityCurrentStatus { get; set; }
+    [Selector("browserAccessibilitySortDirection", "setBrowserAccessibilitySortDirection:")]
+    public NSString? BrowserAccessibilitySortDirection { get; set; }
+    [Selector("browserAccessibilityRoleDescription", "setBrowserAccessibilityRoleDescription:")]
+    public NSString? BrowserAccessibilityRoleDescription { get; set; }
+    [Selector("browserAccessibilityIsRequired", "setBrowserAccessibilityIsRequired:")]
+    public bool BrowserAccessibilityIsRequired { get; set; }
+    [Selector("browserAccessibilityPressedState", "setBrowserAccessibilityPressedState:")]
+    public BEAccessibilityPressedState BrowserAccessibilityPressedState { get; set; }
+    [Selector("browserAccessibilityHasDOMFocus", "setBrowserAccessibilityHasDOMFocus:")]
+    public bool BrowserAccessibilityHasDOMFocus { get; set; }
+    [Selector("browserAccessibilityContainerType", "setBrowserAccessibilityContainerType:")]
+    public BEAccessibilityContainerType BrowserAccessibilityContainerType { get; set; }
+    [Selector("browserAccessibilitySelectedTextRange")]
+    public NSRange BrowserAccessibilitySelectedTextRange();
+    [Selector("browserAccessibilitySetSelectedTextRange:")]
+    public void BrowserAccessibilitySetSelectedTextRange(NSRange range);
+    [Selector("browserAccessibilityValueInRange:")]
+    public NSString BrowserAccessibilityValueInRange(NSRange range);
+    [Selector("browserAccessibilityAttributedValueInRange:")]
+    public NSAttributedString BrowserAccessibilityAttributedValueInRange(NSRange range);
+    [Selector("browserAccessibilityInsertTextAtCursor:")]
+    public void BrowserAccessibilityInsertTextAtCursor(NSString text);
+    [Selector("browserAccessibilityDeleteTextAtCursor:")]
+    public void BrowserAccessibilityDeleteTextAtCursor(NSInteger numberOfCharacters);
+    [Selector("accessibilityLineEndPositionFromCurrentSelection")]
+    public NSInteger AccessibilityLineEndPositionFromCurrentSelection();
+    [Selector("accessibilityLineStartPositionFromCurrentSelection")]
+    public NSInteger AccessibilityLineStartPositionFromCurrentSelection();
+    [Selector("accessibilityLineRangeForPosition:")]
+    public NSRange AccessibilityLineRangeForPosition(NSInteger position);
 }
 
 #endif

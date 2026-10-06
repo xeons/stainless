@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class SKPhysicsContact : NSObject
 {
-    [Selector("bodyA")] public SKPhysicsBody BodyA { get; }
-    [Selector("bodyB")] public SKPhysicsBody BodyB { get; }
-    [Selector("contactPoint")] public CGPoint ContactPoint { get; }
-    [Selector("contactNormal")] public CGVector ContactNormal { get; }
-    [Selector("collisionImpulse")] public CGFloat CollisionImpulse { get; }
+    [Selector("bodyA")]
+    public SKPhysicsBody BodyA { get; }
+    [Selector("bodyB")]
+    public SKPhysicsBody BodyB { get; }
+    [Selector("contactPoint")]
+    public CGPoint ContactPoint { get; }
+    [Selector("contactNormal")]
+    public CGVector ContactNormal { get; }
+    [Selector("collisionImpulse")]
+    public CGFloat CollisionImpulse { get; }
 }
 
 #endif

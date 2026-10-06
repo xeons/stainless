@@ -34,78 +34,112 @@ import Standard.ObjC;
 public extern objc class NSCalendarDate : NSDate
 {
     /// Deprecated in macOS 10.10.
-    [Selector("calendarDate")] public static AnyObject CalendarDate();
+    [Selector("calendarDate")]
+    public static AnyObject CalendarDate();
     /// Deprecated in macOS 10.10.
-    [Selector("dateWithString:calendarFormat:locale:")] public static AnyObject? DateWithStringCalendarFormatLocale(NSString description, NSString format, AnyObject? locale);
+    [Selector("dateWithString:calendarFormat:locale:")]
+    public static AnyObject? DateWithStringCalendarFormatLocale(NSString description, NSString format, AnyObject? locale);
     /// Deprecated in macOS 10.10.
-    [Selector("dateWithString:calendarFormat:")] public static AnyObject? DateWithStringCalendarFormat(NSString description, NSString format);
+    [Selector("dateWithString:calendarFormat:")]
+    public static AnyObject? DateWithStringCalendarFormat(NSString description, NSString format);
     /// Deprecated in macOS 10.10.
-    [Selector("dateWithYear:month:day:hour:minute:second:timeZone:")] public static AnyObject DateWithYearMonthDayHourMinuteSecondTimeZone(NSInteger year, NSUInteger month, NSUInteger day, NSUInteger hour, NSUInteger minute, NSUInteger second, NSTimeZone? aTimeZone);
+    [Selector("dateWithYear:month:day:hour:minute:second:timeZone:")]
+    public static AnyObject DateWithYearMonthDayHourMinuteSecondTimeZone(NSInteger year, NSUInteger month, NSUInteger day, NSUInteger hour, NSUInteger minute, NSUInteger second, NSTimeZone? aTimeZone);
     /// Deprecated in macOS 10.10.
-    [Selector("dateByAddingYears:months:days:hours:minutes:seconds:")] public NSCalendarDate DateByAddingYearsMonthsDaysHoursMinutesSeconds(NSInteger year, NSInteger month, NSInteger day, NSInteger hour, NSInteger minute, NSInteger second);
+    [Selector("dateByAddingYears:months:days:hours:minutes:seconds:")]
+    public NSCalendarDate DateByAddingYearsMonthsDaysHoursMinutesSeconds(NSInteger year, NSInteger month, NSInteger day, NSInteger hour, NSInteger minute, NSInteger second);
     /// Deprecated in macOS 10.10.
-    [Selector("dayOfCommonEra")] public NSInteger DayOfCommonEra();
+    [Selector("dayOfCommonEra")]
+    public NSInteger DayOfCommonEra();
     /// Deprecated in macOS 10.10.
-    [Selector("dayOfMonth")] public NSInteger DayOfMonth();
+    [Selector("dayOfMonth")]
+    public NSInteger DayOfMonth();
     /// Deprecated in macOS 10.10.
-    [Selector("dayOfWeek")] public NSInteger DayOfWeek();
+    [Selector("dayOfWeek")]
+    public NSInteger DayOfWeek();
     /// Deprecated in macOS 10.10.
-    [Selector("dayOfYear")] public NSInteger DayOfYear();
+    [Selector("dayOfYear")]
+    public NSInteger DayOfYear();
     /// Deprecated in macOS 10.10.
-    [Selector("hourOfDay")] public NSInteger HourOfDay();
+    [Selector("hourOfDay")]
+    public NSInteger HourOfDay();
     /// Deprecated in macOS 10.10.
-    [Selector("minuteOfHour")] public NSInteger MinuteOfHour();
+    [Selector("minuteOfHour")]
+    public NSInteger MinuteOfHour();
     /// Deprecated in macOS 10.10.
-    [Selector("monthOfYear")] public NSInteger MonthOfYear();
+    [Selector("monthOfYear")]
+    public NSInteger MonthOfYear();
     /// Deprecated in macOS 10.10.
-    [Selector("secondOfMinute")] public NSInteger SecondOfMinute();
+    [Selector("secondOfMinute")]
+    public NSInteger SecondOfMinute();
     /// Deprecated in macOS 10.10.
-    [Selector("yearOfCommonEra")] public NSInteger YearOfCommonEra();
+    [Selector("yearOfCommonEra")]
+    public NSInteger YearOfCommonEra();
     /// Deprecated in macOS 10.10.
-    [Selector("calendarFormat")] public NSString CalendarFormat();
+    [Selector("calendarFormat")]
+    public NSString CalendarFormat();
     /// Deprecated in macOS 10.10.
-    [Selector("descriptionWithCalendarFormat:locale:")] public NSString DescriptionWithCalendarFormatLocale(NSString format, AnyObject? locale);
+    [Selector("descriptionWithCalendarFormat:locale:")]
+    public NSString DescriptionWithCalendarFormatLocale(NSString format, AnyObject? locale);
     /// Deprecated in macOS 10.10.
-    [Selector("descriptionWithCalendarFormat:")] public NSString DescriptionWithCalendarFormat(NSString format);
+    [Selector("descriptionWithCalendarFormat:")]
+    public NSString DescriptionWithCalendarFormat(NSString format);
     /// Deprecated in macOS 10.10.
-    [Selector("descriptionWithLocale:")] public NSString DescriptionWithLocale(AnyObject? locale);
+    [Selector("descriptionWithLocale:")]
+    public NSString DescriptionWithLocale(AnyObject? locale);
     /// Deprecated in macOS 10.10.
-    [Selector("timeZone")] public NSTimeZone TimeZone();
+    [Selector("timeZone")]
+    public NSTimeZone TimeZone();
     /// Deprecated in macOS 10.10.
-    [Selector("initWithString:calendarFormat:locale:")] public AnyObject? InitWithStringCalendarFormatLocale(NSString description, NSString format, AnyObject? locale);
+    [Selector("initWithString:calendarFormat:locale:")]
+    public AnyObject? InitWithStringCalendarFormatLocale(NSString description, NSString format, AnyObject? locale);
     /// Deprecated in macOS 10.10.
-    [Selector("initWithString:calendarFormat:")] public AnyObject? InitWithStringCalendarFormat(NSString description, NSString format);
+    [Selector("initWithString:calendarFormat:")]
+    public AnyObject? InitWithStringCalendarFormat(NSString description, NSString format);
     /// Deprecated in macOS 10.10.
-    [Selector("initWithString:")] public AnyObject? InitWithString(NSString description);
+    [Selector("initWithString:")]
+    public AnyObject? InitWithString(NSString description);
     /// Deprecated in macOS 10.10.
-    [Selector("initWithYear:month:day:hour:minute:second:timeZone:")] public AnyObject InitWithYearMonthDayHourMinuteSecondTimeZone(NSInteger year, NSUInteger month, NSUInteger day, NSUInteger hour, NSUInteger minute, NSUInteger second, NSTimeZone? aTimeZone);
+    [Selector("initWithYear:month:day:hour:minute:second:timeZone:")]
+    public AnyObject InitWithYearMonthDayHourMinuteSecondTimeZone(NSInteger year, NSUInteger month, NSUInteger day, NSUInteger hour, NSUInteger minute, NSUInteger second, NSTimeZone? aTimeZone);
     /// Deprecated in macOS 10.10.
-    [Selector("setCalendarFormat:")] public void SetCalendarFormat(NSString? format);
+    [Selector("setCalendarFormat:")]
+    public void SetCalendarFormat(NSString? format);
     /// Deprecated in macOS 10.10.
-    [Selector("setTimeZone:")] public void SetTimeZone(NSTimeZone? aTimeZone);
+    [Selector("setTimeZone:")]
+    public void SetTimeZone(NSTimeZone? aTimeZone);
     /// Deprecated in macOS 10.10.
-    [Selector("years:months:days:hours:minutes:seconds:sinceDate:")] public void YearsMonthsDaysHoursMinutesSecondsSinceDate(NSInteger* yp, NSInteger* mop, NSInteger* dp, NSInteger* hp, NSInteger* mip, NSInteger* sp, NSCalendarDate date);
+    [Selector("years:months:days:hours:minutes:seconds:sinceDate:")]
+    public void YearsMonthsDaysHoursMinutesSecondsSinceDate(NSInteger* yp, NSInteger* mop, NSInteger* dp, NSInteger* hp, NSInteger* mip, NSInteger* sp, NSCalendarDate date);
     /// Deprecated in macOS 10.10.
-    [Selector("distantFuture")] public static Self DistantFuture();
+    [Selector("distantFuture")]
+    public static Self DistantFuture();
     /// Deprecated in macOS 10.10.
-    [Selector("distantPast")] public static Self DistantPast();
+    [Selector("distantPast")]
+    public static Self DistantPast();
 }
 
 /// NSCalendarDateExtras, a category of NSDate.
 public extern objc class NSDate
 {
     /// Deprecated in macOS 10.10.
-    [Selector("dateWithNaturalLanguageString:locale:")] public static AnyObject? DateWithNaturalLanguageStringLocale(NSString string, AnyObject? locale);
+    [Selector("dateWithNaturalLanguageString:locale:")]
+    public static AnyObject? DateWithNaturalLanguageStringLocale(NSString string, AnyObject? locale);
     /// Deprecated in macOS 10.10.
-    [Selector("dateWithNaturalLanguageString:")] public static AnyObject? DateWithNaturalLanguageString(NSString string);
+    [Selector("dateWithNaturalLanguageString:")]
+    public static AnyObject? DateWithNaturalLanguageString(NSString string);
     /// Deprecated in macOS 10.10.
-    [Selector("dateWithString:")] public static AnyObject DateWithString(NSString aString);
+    [Selector("dateWithString:")]
+    public static AnyObject DateWithString(NSString aString);
     /// Deprecated in macOS 10.10.
-    [Selector("dateWithCalendarFormat:timeZone:")] public NSCalendarDate DateWithCalendarFormatTimeZone(NSString? format, NSTimeZone? aTimeZone);
+    [Selector("dateWithCalendarFormat:timeZone:")]
+    public NSCalendarDate DateWithCalendarFormatTimeZone(NSString? format, NSTimeZone? aTimeZone);
     /// Deprecated in macOS 10.10.
-    [Selector("descriptionWithCalendarFormat:timeZone:locale:")] public NSString? DescriptionWithCalendarFormatTimeZoneLocale(NSString? format, NSTimeZone? aTimeZone, AnyObject? locale);
+    [Selector("descriptionWithCalendarFormat:timeZone:locale:")]
+    public NSString? DescriptionWithCalendarFormatTimeZoneLocale(NSString? format, NSTimeZone? aTimeZone, AnyObject? locale);
     /// Deprecated in macOS 10.10.
-    [Selector("initWithString:")] public AnyObject? InitWithString(NSString description);
+    [Selector("initWithString:")]
+    public AnyObject? InitWithString(NSString description);
 }
 
 #endif

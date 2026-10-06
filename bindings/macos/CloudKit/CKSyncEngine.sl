@@ -43,57 +43,89 @@ public objc closure void CKSyncEngineCancelOperationsWithCompletionHandlerComple
 
 public extern objc class CKSyncEngine : NSObject
 {
-    [Selector("database")] public CKDatabase Database { get; }
-    [Selector("state")] public CKSyncEngineState State { get; }
-    [Selector("initWithConfiguration:")] public Self InitWithConfiguration(CKSyncEngineConfiguration configuration);
-    [Selector("fetchChangesWithCompletionHandler:")] public void FetchChangesWithCompletionHandler(CKSyncEngineFetchChangesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("fetchChangesWithOptions:completionHandler:")] public void FetchChangesWithOptionsCompletionHandler(CKSyncEngineFetchChangesOptions options, CKSyncEngineFetchChangesWithOptionsCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("sendChangesWithCompletionHandler:")] public void SendChangesWithCompletionHandler(CKSyncEngineSendChangesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("sendChangesWithOptions:completionHandler:")] public void SendChangesWithOptionsCompletionHandler(CKSyncEngineSendChangesOptions options, CKSyncEngineSendChangesWithOptionsCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("cancelOperationsWithCompletionHandler:")] public void CancelOperationsWithCompletionHandler(CKSyncEngineCancelOperationsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("database")]
+    public CKDatabase Database { get; }
+    [Selector("state")]
+    public CKSyncEngineState State { get; }
+    [Selector("initWithConfiguration:")]
+    public Self InitWithConfiguration(CKSyncEngineConfiguration configuration);
+    [Selector("fetchChangesWithCompletionHandler:")]
+    public void FetchChangesWithCompletionHandler(CKSyncEngineFetchChangesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("fetchChangesWithOptions:completionHandler:")]
+    public void FetchChangesWithOptionsCompletionHandler(CKSyncEngineFetchChangesOptions options, CKSyncEngineFetchChangesWithOptionsCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("sendChangesWithCompletionHandler:")]
+    public void SendChangesWithCompletionHandler(CKSyncEngineSendChangesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("sendChangesWithOptions:completionHandler:")]
+    public void SendChangesWithOptionsCompletionHandler(CKSyncEngineSendChangesOptions options, CKSyncEngineSendChangesWithOptionsCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("cancelOperationsWithCompletionHandler:")]
+    public void CancelOperationsWithCompletionHandler(CKSyncEngineCancelOperationsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public objc interface CKSyncEngineDelegate : NSObjectProtocol
 {
-    [Selector("syncEngine:handleEvent:")] void SyncEngineHandleEvent(CKSyncEngine syncEngine, CKSyncEngineEvent event);
-    [Selector("syncEngine:nextRecordZoneChangeBatchForContext:")] CKSyncEngineRecordZoneChangeBatch? SyncEngineNextRecordZoneChangeBatchForContext(CKSyncEngine syncEngine, CKSyncEngineSendChangesContext context);
-    [Optional] [Selector("syncEngine:nextFetchChangesOptionsForContext:")] CKSyncEngineFetchChangesOptions SyncEngineNextFetchChangesOptionsForContext(CKSyncEngine syncEngine, CKSyncEngineFetchChangesContext context);
+    [Selector("syncEngine:handleEvent:")]
+    void SyncEngineHandleEvent(CKSyncEngine syncEngine, CKSyncEngineEvent event);
+    [Selector("syncEngine:nextRecordZoneChangeBatchForContext:")]
+    CKSyncEngineRecordZoneChangeBatch? SyncEngineNextRecordZoneChangeBatchForContext(CKSyncEngine syncEngine, CKSyncEngineSendChangesContext context);
+    [Optional]
+    [Selector("syncEngine:nextFetchChangesOptionsForContext:")]
+    CKSyncEngineFetchChangesOptions SyncEngineNextFetchChangesOptionsForContext(CKSyncEngine syncEngine, CKSyncEngineFetchChangesContext context);
 }
 
 public extern objc class CKSyncEngineFetchChangesOptions : NSObject, NSCopying
 {
-    [Selector("scope", "setScope:")] public CKSyncEngineFetchChangesScope Scope { get; set; }
-    [Selector("operationGroup", "setOperationGroup:")] public CKOperationGroup OperationGroup { get; set; }
-    [Selector("prioritizedZoneIDs", "setPrioritizedZoneIDs:")] public NSArray PrioritizedZoneIDs { get; set; }
-    [Selector("initWithScope:")] public Self InitWithScope(CKSyncEngineFetchChangesScope? scope);
+    [Selector("scope", "setScope:")]
+    public CKSyncEngineFetchChangesScope Scope { get; set; }
+    [Selector("operationGroup", "setOperationGroup:")]
+    public CKOperationGroup OperationGroup { get; set; }
+    [Selector("prioritizedZoneIDs", "setPrioritizedZoneIDs:")]
+    public NSArray PrioritizedZoneIDs { get; set; }
+    [Selector("initWithScope:")]
+    public Self InitWithScope(CKSyncEngineFetchChangesScope? scope);
 }
 
 public extern objc class CKSyncEngineFetchChangesScope : NSObject, NSCopying
 {
-    [Selector("zoneIDs")] public NSSet? ZoneIDs { get; }
-    [Selector("excludedZoneIDs")] public NSSet ExcludedZoneIDs { get; }
-    [Selector("initWithZoneIDs:")] public Self InitWithZoneIDs(NSSet? zoneIDs);
-    [Selector("initWithExcludedZoneIDs:")] public Self InitWithExcludedZoneIDs(NSSet zoneIDs);
-    [Selector("containsZoneID:")] public bool ContainsZoneID(CKRecordZoneID zoneID);
+    [Selector("zoneIDs")]
+    public NSSet? ZoneIDs { get; }
+    [Selector("excludedZoneIDs")]
+    public NSSet ExcludedZoneIDs { get; }
+    [Selector("initWithZoneIDs:")]
+    public Self InitWithZoneIDs(NSSet? zoneIDs);
+    [Selector("initWithExcludedZoneIDs:")]
+    public Self InitWithExcludedZoneIDs(NSSet zoneIDs);
+    [Selector("containsZoneID:")]
+    public bool ContainsZoneID(CKRecordZoneID zoneID);
 }
 
 public extern objc class CKSyncEngineSendChangesOptions : NSObject, NSCopying
 {
-    [Selector("scope", "setScope:")] public CKSyncEngineSendChangesScope Scope { get; set; }
-    [Selector("operationGroup", "setOperationGroup:")] public CKOperationGroup OperationGroup { get; set; }
-    [Selector("initWithScope:")] public Self InitWithScope(CKSyncEngineSendChangesScope? scope);
+    [Selector("scope", "setScope:")]
+    public CKSyncEngineSendChangesScope Scope { get; set; }
+    [Selector("operationGroup", "setOperationGroup:")]
+    public CKOperationGroup OperationGroup { get; set; }
+    [Selector("initWithScope:")]
+    public Self InitWithScope(CKSyncEngineSendChangesScope? scope);
 }
 
 public extern objc class CKSyncEngineSendChangesScope : NSObject, NSCopying
 {
-    [Selector("zoneIDs")] public NSSet? ZoneIDs { get; }
-    [Selector("excludedZoneIDs")] public NSSet ExcludedZoneIDs { get; }
-    [Selector("recordIDs")] public NSSet? RecordIDs { get; }
-    [Selector("initWithZoneIDs:")] public Self InitWithZoneIDs(NSSet? zoneIDs);
-    [Selector("initWithExcludedZoneIDs:")] public Self InitWithExcludedZoneIDs(NSSet excludedZoneIDs);
-    [Selector("initWithRecordIDs:")] public Self InitWithRecordIDs(NSSet? recordIDs);
-    [Selector("containsRecordID:")] public bool ContainsRecordID(CKRecordID recordID);
-    [Selector("containsPendingRecordZoneChange:")] public bool ContainsPendingRecordZoneChange(CKSyncEnginePendingRecordZoneChange pendingRecordZoneChange);
+    [Selector("zoneIDs")]
+    public NSSet? ZoneIDs { get; }
+    [Selector("excludedZoneIDs")]
+    public NSSet ExcludedZoneIDs { get; }
+    [Selector("recordIDs")]
+    public NSSet? RecordIDs { get; }
+    [Selector("initWithZoneIDs:")]
+    public Self InitWithZoneIDs(NSSet? zoneIDs);
+    [Selector("initWithExcludedZoneIDs:")]
+    public Self InitWithExcludedZoneIDs(NSSet excludedZoneIDs);
+    [Selector("initWithRecordIDs:")]
+    public Self InitWithRecordIDs(NSSet? recordIDs);
+    [Selector("containsRecordID:")]
+    public bool ContainsRecordID(CKRecordID recordID);
+    [Selector("containsPendingRecordZoneChange:")]
+    public bool ContainsPendingRecordZoneChange(CKSyncEnginePendingRecordZoneChange pendingRecordZoneChange);
 }
 
 public enum CKSyncEngineSyncReason : long
@@ -104,14 +136,18 @@ public enum CKSyncEngineSyncReason : long
 
 public extern objc class CKSyncEngineFetchChangesContext : NSObject
 {
-    [Selector("reason")] public CKSyncEngineSyncReason Reason { get; }
-    [Selector("options")] public CKSyncEngineFetchChangesOptions Options { get; }
+    [Selector("reason")]
+    public CKSyncEngineSyncReason Reason { get; }
+    [Selector("options")]
+    public CKSyncEngineFetchChangesOptions Options { get; }
 }
 
 public extern objc class CKSyncEngineSendChangesContext : NSObject
 {
-    [Selector("reason")] public CKSyncEngineSyncReason Reason { get; }
-    [Selector("options")] public CKSyncEngineSendChangesOptions Options { get; }
+    [Selector("reason")]
+    public CKSyncEngineSyncReason Reason { get; }
+    [Selector("options")]
+    public CKSyncEngineSendChangesOptions Options { get; }
 }
 
 #endif

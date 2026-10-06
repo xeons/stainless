@@ -38,10 +38,14 @@ public extern objc class MPSGraphType : MPSGraphObject, NSCopying { }
 
 public extern objc class MPSGraphShapedType : MPSGraphType
 {
-    [Selector("shape", "setShape:")] public MPSShape? Shape { get; set; }
-    [Selector("dataType", "setDataType:")] public MPSDataType DataType { get; set; }
-    [Selector("initWithShape:dataType:")] public Self InitWithShapeDataType(MPSShape? shape, MPSDataType dataType);
-    [Selector("isEqualTo:")] public bool IsEqualTo(MPSGraphShapedType? object);
+    [Selector("shape", "setShape:")]
+    public MPSShape? Shape { get; set; }
+    [Selector("dataType", "setDataType:")]
+    public MPSDataType DataType { get; set; }
+    [Selector("initWithShape:dataType:")]
+    public Self InitWithShapeDataType(MPSShape? shape, MPSDataType dataType);
+    [Selector("isEqualTo:")]
+    public bool IsEqualTo(MPSGraphShapedType? object);
 }
 
 public enum MPSGraphTensorNamedDataLayout : ulong

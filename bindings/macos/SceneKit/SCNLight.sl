@@ -75,50 +75,94 @@ public enum SCNLightAreaType : long
 
 public extern objc class SCNLight : NSObject, SCNAnimatable, NSCopying, NSSecureCoding
 {
-    [Selector("type", "setType:")] public SCNLightType Type { get; set; }
-    [Selector("color", "setColor:")] public AnyObject Color { get; set; }
-    [Selector("temperature", "setTemperature:")] public CGFloat Temperature { get; set; }
-    [Selector("intensity", "setIntensity:")] public CGFloat Intensity { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("castsShadow", "setCastsShadow:")] public bool CastsShadow { get; set; }
-    [Selector("shadowColor", "setShadowColor:")] public AnyObject ShadowColor { get; set; }
-    [Selector("shadowRadius", "setShadowRadius:")] public CGFloat ShadowRadius { get; set; }
-    [Selector("shadowMapSize", "setShadowMapSize:")] public CGSize ShadowMapSize { get; set; }
-    [Selector("shadowSampleCount", "setShadowSampleCount:")] public NSUInteger ShadowSampleCount { get; set; }
-    [Selector("shadowMode", "setShadowMode:")] public SCNShadowMode ShadowMode { get; set; }
-    [Selector("shadowBias", "setShadowBias:")] public CGFloat ShadowBias { get; set; }
-    [Selector("automaticallyAdjustsShadowProjection", "setAutomaticallyAdjustsShadowProjection:")] public bool AutomaticallyAdjustsShadowProjection { get; set; }
-    [Selector("maximumShadowDistance", "setMaximumShadowDistance:")] public CGFloat MaximumShadowDistance { get; set; }
-    [Selector("forcesBackFaceCasters", "setForcesBackFaceCasters:")] public bool ForcesBackFaceCasters { get; set; }
-    [Selector("sampleDistributedShadowMaps", "setSampleDistributedShadowMaps:")] public bool SampleDistributedShadowMaps { get; set; }
-    [Selector("shadowCascadeCount", "setShadowCascadeCount:")] public NSUInteger ShadowCascadeCount { get; set; }
-    [Selector("shadowCascadeSplittingFactor", "setShadowCascadeSplittingFactor:")] public CGFloat ShadowCascadeSplittingFactor { get; set; }
-    [Selector("orthographicScale", "setOrthographicScale:")] public CGFloat OrthographicScale { get; set; }
-    [Selector("zNear", "setZNear:")] public CGFloat ZNear { get; set; }
-    [Selector("zFar", "setZFar:")] public CGFloat ZFar { get; set; }
-    [Selector("attenuationStartDistance", "setAttenuationStartDistance:")] public CGFloat AttenuationStartDistance { get; set; }
-    [Selector("attenuationEndDistance", "setAttenuationEndDistance:")] public CGFloat AttenuationEndDistance { get; set; }
-    [Selector("attenuationFalloffExponent", "setAttenuationFalloffExponent:")] public CGFloat AttenuationFalloffExponent { get; set; }
-    [Selector("spotInnerAngle", "setSpotInnerAngle:")] public CGFloat SpotInnerAngle { get; set; }
-    [Selector("spotOuterAngle", "setSpotOuterAngle:")] public CGFloat SpotOuterAngle { get; set; }
-    [Selector("IESProfileURL", "setIESProfileURL:")] public NSURL? IESProfileURL { get; set; }
-    [Selector("sphericalHarmonicsCoefficients")] public NSData SphericalHarmonicsCoefficients { get; }
-    [Selector("probeType", "setProbeType:")] public SCNLightProbeType ProbeType { get; set; }
-    [Selector("probeUpdateType", "setProbeUpdateType:")] public SCNLightProbeUpdateType ProbeUpdateType { get; set; }
-    [Selector("probeExtents", "setProbeExtents:")] public simd_float3 ProbeExtents { get; set; }
-    [Selector("probeOffset", "setProbeOffset:")] public simd_float3 ProbeOffset { get; set; }
-    [Selector("parallaxCorrectionEnabled", "setParallaxCorrectionEnabled:")] public bool ParallaxCorrectionEnabled { get; set; }
-    [Selector("parallaxExtentsFactor", "setParallaxExtentsFactor:")] public simd_float3 ParallaxExtentsFactor { get; set; }
-    [Selector("parallaxCenterOffset", "setParallaxCenterOffset:")] public simd_float3 ParallaxCenterOffset { get; set; }
-    [Selector("probeEnvironment")] public SCNMaterialProperty? ProbeEnvironment { get; }
-    [Selector("areaType", "setAreaType:")] public SCNLightAreaType AreaType { get; set; }
-    [Selector("areaExtents", "setAreaExtents:")] public simd_float3 AreaExtents { get; set; }
-    [Selector("areaPolygonVertices", "setAreaPolygonVertices:")] public NSArray? AreaPolygonVertices { get; set; }
-    [Selector("drawsArea", "setDrawsArea:")] public bool DrawsArea { get; set; }
-    [Selector("doubleSided", "setDoubleSided:")] public bool DoubleSided { get; set; }
-    [Selector("gobo")] public SCNMaterialProperty? Gobo { get; }
-    [Selector("categoryBitMask", "setCategoryBitMask:")] public NSUInteger CategoryBitMask { get; set; }
-    [Selector("light")] public static Self Light();
+    [Selector("type", "setType:")]
+    public SCNLightType Type { get; set; }
+    [Selector("color", "setColor:")]
+    public AnyObject Color { get; set; }
+    [Selector("temperature", "setTemperature:")]
+    public CGFloat Temperature { get; set; }
+    [Selector("intensity", "setIntensity:")]
+    public CGFloat Intensity { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("castsShadow", "setCastsShadow:")]
+    public bool CastsShadow { get; set; }
+    [Selector("shadowColor", "setShadowColor:")]
+    public AnyObject ShadowColor { get; set; }
+    [Selector("shadowRadius", "setShadowRadius:")]
+    public CGFloat ShadowRadius { get; set; }
+    [Selector("shadowMapSize", "setShadowMapSize:")]
+    public CGSize ShadowMapSize { get; set; }
+    [Selector("shadowSampleCount", "setShadowSampleCount:")]
+    public NSUInteger ShadowSampleCount { get; set; }
+    [Selector("shadowMode", "setShadowMode:")]
+    public SCNShadowMode ShadowMode { get; set; }
+    [Selector("shadowBias", "setShadowBias:")]
+    public CGFloat ShadowBias { get; set; }
+    [Selector("automaticallyAdjustsShadowProjection", "setAutomaticallyAdjustsShadowProjection:")]
+    public bool AutomaticallyAdjustsShadowProjection { get; set; }
+    [Selector("maximumShadowDistance", "setMaximumShadowDistance:")]
+    public CGFloat MaximumShadowDistance { get; set; }
+    [Selector("forcesBackFaceCasters", "setForcesBackFaceCasters:")]
+    public bool ForcesBackFaceCasters { get; set; }
+    [Selector("sampleDistributedShadowMaps", "setSampleDistributedShadowMaps:")]
+    public bool SampleDistributedShadowMaps { get; set; }
+    [Selector("shadowCascadeCount", "setShadowCascadeCount:")]
+    public NSUInteger ShadowCascadeCount { get; set; }
+    [Selector("shadowCascadeSplittingFactor", "setShadowCascadeSplittingFactor:")]
+    public CGFloat ShadowCascadeSplittingFactor { get; set; }
+    [Selector("orthographicScale", "setOrthographicScale:")]
+    public CGFloat OrthographicScale { get; set; }
+    [Selector("zNear", "setZNear:")]
+    public CGFloat ZNear { get; set; }
+    [Selector("zFar", "setZFar:")]
+    public CGFloat ZFar { get; set; }
+    [Selector("attenuationStartDistance", "setAttenuationStartDistance:")]
+    public CGFloat AttenuationStartDistance { get; set; }
+    [Selector("attenuationEndDistance", "setAttenuationEndDistance:")]
+    public CGFloat AttenuationEndDistance { get; set; }
+    [Selector("attenuationFalloffExponent", "setAttenuationFalloffExponent:")]
+    public CGFloat AttenuationFalloffExponent { get; set; }
+    [Selector("spotInnerAngle", "setSpotInnerAngle:")]
+    public CGFloat SpotInnerAngle { get; set; }
+    [Selector("spotOuterAngle", "setSpotOuterAngle:")]
+    public CGFloat SpotOuterAngle { get; set; }
+    [Selector("IESProfileURL", "setIESProfileURL:")]
+    public NSURL? IESProfileURL { get; set; }
+    [Selector("sphericalHarmonicsCoefficients")]
+    public NSData SphericalHarmonicsCoefficients { get; }
+    [Selector("probeType", "setProbeType:")]
+    public SCNLightProbeType ProbeType { get; set; }
+    [Selector("probeUpdateType", "setProbeUpdateType:")]
+    public SCNLightProbeUpdateType ProbeUpdateType { get; set; }
+    [Selector("probeExtents", "setProbeExtents:")]
+    public simd_float3 ProbeExtents { get; set; }
+    [Selector("probeOffset", "setProbeOffset:")]
+    public simd_float3 ProbeOffset { get; set; }
+    [Selector("parallaxCorrectionEnabled", "setParallaxCorrectionEnabled:")]
+    public bool ParallaxCorrectionEnabled { get; set; }
+    [Selector("parallaxExtentsFactor", "setParallaxExtentsFactor:")]
+    public simd_float3 ParallaxExtentsFactor { get; set; }
+    [Selector("parallaxCenterOffset", "setParallaxCenterOffset:")]
+    public simd_float3 ParallaxCenterOffset { get; set; }
+    [Selector("probeEnvironment")]
+    public SCNMaterialProperty? ProbeEnvironment { get; }
+    [Selector("areaType", "setAreaType:")]
+    public SCNLightAreaType AreaType { get; set; }
+    [Selector("areaExtents", "setAreaExtents:")]
+    public simd_float3 AreaExtents { get; set; }
+    [Selector("areaPolygonVertices", "setAreaPolygonVertices:")]
+    public NSArray? AreaPolygonVertices { get; set; }
+    [Selector("drawsArea", "setDrawsArea:")]
+    public bool DrawsArea { get; set; }
+    [Selector("doubleSided", "setDoubleSided:")]
+    public bool DoubleSided { get; set; }
+    [Selector("gobo")]
+    public SCNMaterialProperty? Gobo { get; }
+    [Selector("categoryBitMask", "setCategoryBitMask:")]
+    public NSUInteger CategoryBitMask { get; set; }
+    [Selector("light")]
+    public static Self Light();
 }
 
 #endif

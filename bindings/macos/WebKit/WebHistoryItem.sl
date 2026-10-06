@@ -38,13 +38,20 @@ public extern "C" NSString? WebHistoryItemChangedNotification;
 /// Deprecated in macOS 10.14.
 public extern objc class WebHistoryItem : NSObject, NSCopying
 {
-    [Selector("originalURLString")] public NSString? OriginalURLString { get; }
-    [Selector("URLString")] public NSString? URLString { get; }
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("lastVisitedTimeInterval")] public NSTimeInterval LastVisitedTimeInterval { get; }
-    [Selector("alternateTitle", "setAlternateTitle:")] public NSString? AlternateTitle { get; set; }
-    [Selector("icon")] public NSImage? Icon { get; }
-    [Selector("initWithURLString:title:lastVisitedTimeInterval:")] public Self? InitWithURLStringTitleLastVisitedTimeInterval(NSString? URLString, NSString? title, NSTimeInterval time);
+    [Selector("originalURLString")]
+    public NSString? OriginalURLString { get; }
+    [Selector("URLString")]
+    public NSString? URLString { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("lastVisitedTimeInterval")]
+    public NSTimeInterval LastVisitedTimeInterval { get; }
+    [Selector("alternateTitle", "setAlternateTitle:")]
+    public NSString? AlternateTitle { get; set; }
+    [Selector("icon")]
+    public NSImage? Icon { get; }
+    [Selector("initWithURLString:title:lastVisitedTimeInterval:")]
+    public Self? InitWithURLStringTitleLastVisitedTimeInterval(NSString? URLString, NSString? title, NSTimeInterval time);
 }
 
 #endif

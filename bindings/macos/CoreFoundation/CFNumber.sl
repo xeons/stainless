@@ -77,7 +77,8 @@ public extern "C" CFNumberRef? kCFNumberNaN;
 
 public extern "C" CFTypeID CFNumberGetTypeID();
 
-[ReturnsRetained] public extern "C" CFNumberRef? CFNumberCreate(CFAllocatorRef? allocator, CFNumberType theType, void* valuePtr);
+[ReturnsRetained]
+public extern "C" CFNumberRef? CFNumberCreate(CFAllocatorRef? allocator, CFNumberType theType, void* valuePtr);
 
 public extern "C" CFNumberType CFNumberGetType(CFNumberRef? number);
 

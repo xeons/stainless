@@ -34,32 +34,54 @@ import Standard.ObjC;
 
 public extern objc class MPSMatrixFullyConnected : MPSMatrixBinaryKernel
 {
-    [Selector("sourceNumberOfFeatureVectors", "setSourceNumberOfFeatureVectors:")] public NSUInteger SourceNumberOfFeatureVectors { get; set; }
-    [Selector("sourceInputFeatureChannels", "setSourceInputFeatureChannels:")] public NSUInteger SourceInputFeatureChannels { get; set; }
-    [Selector("sourceOutputFeatureChannels", "setSourceOutputFeatureChannels:")] public NSUInteger SourceOutputFeatureChannels { get; set; }
-    [Selector("alpha", "setAlpha:")] public double Alpha { get; set; }
-    [Selector("setNeuronType:parameterA:parameterB:parameterC:")] public void SetNeuronTypeParameterAParameterBParameterC(MPSCNNNeuronType neuronType, float parameterA, float parameterB, float parameterC);
-    [Selector("neuronType")] public MPSCNNNeuronType NeuronType();
-    [Selector("neuronParameterA")] public float NeuronParameterA();
-    [Selector("neuronParameterB")] public float NeuronParameterB();
-    [Selector("neuronParameterC")] public float NeuronParameterC();
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("encodeToCommandBuffer:inputMatrix:weightMatrix:biasVector:resultMatrix:")] public void EncodeToCommandBufferInputMatrixWeightMatrixBiasVectorResultMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputMatrix, MPSMatrix weightMatrix, MPSVector? biasVector, MPSMatrix resultMatrix);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("sourceNumberOfFeatureVectors", "setSourceNumberOfFeatureVectors:")]
+    public NSUInteger SourceNumberOfFeatureVectors { get; set; }
+    [Selector("sourceInputFeatureChannels", "setSourceInputFeatureChannels:")]
+    public NSUInteger SourceInputFeatureChannels { get; set; }
+    [Selector("sourceOutputFeatureChannels", "setSourceOutputFeatureChannels:")]
+    public NSUInteger SourceOutputFeatureChannels { get; set; }
+    [Selector("alpha", "setAlpha:")]
+    public double Alpha { get; set; }
+    [Selector("setNeuronType:parameterA:parameterB:parameterC:")]
+    public void SetNeuronTypeParameterAParameterBParameterC(MPSCNNNeuronType neuronType, float parameterA, float parameterB, float parameterC);
+    [Selector("neuronType")]
+    public MPSCNNNeuronType NeuronType();
+    [Selector("neuronParameterA")]
+    public float NeuronParameterA();
+    [Selector("neuronParameterB")]
+    public float NeuronParameterB();
+    [Selector("neuronParameterC")]
+    public float NeuronParameterC();
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("encodeToCommandBuffer:inputMatrix:weightMatrix:biasVector:resultMatrix:")]
+    public void EncodeToCommandBufferInputMatrixWeightMatrixBiasVectorResultMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputMatrix, MPSMatrix weightMatrix, MPSVector? biasVector, MPSMatrix resultMatrix);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
 }
 
 public extern objc class MPSMatrixFullyConnectedGradient : MPSMatrixBinaryKernel
 {
-    [Selector("sourceNumberOfFeatureVectors", "setSourceNumberOfFeatureVectors:")] public NSUInteger SourceNumberOfFeatureVectors { get; set; }
-    [Selector("sourceOutputFeatureChannels", "setSourceOutputFeatureChannels:")] public NSUInteger SourceOutputFeatureChannels { get; set; }
-    [Selector("sourceInputFeatureChannels", "setSourceInputFeatureChannels:")] public NSUInteger SourceInputFeatureChannels { get; set; }
-    [Selector("alpha", "setAlpha:")] public double Alpha { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("encodeGradientForDataToCommandBuffer:gradientMatrix:weightMatrix:resultGradientForDataMatrix:")] public void EncodeGradientForDataToCommandBufferGradientMatrixWeightMatrixResultGradientForDataMatrix(MTLCommandBuffer commandBuffer, MPSMatrix gradientMatrix, MPSMatrix weightMatrix, MPSMatrix resultGradientForDataMatrix);
-    [Selector("encodeGradientForWeightsAndBiasToCommandBuffer:gradientMatrix:inputMatrix:resultGradientForWeightMatrix:resultGradientForBiasVector:")] public void EncodeGradientForWeightsAndBiasToCommandBufferGradientMatrixInputMatrixResultGradientForWeightMatrixResultGradientForBiasVector(MTLCommandBuffer commandBuffer, MPSMatrix gradientMatrix, MPSMatrix inputMatrix, MPSMatrix resultGradientForWeightMatrix, MPSVector? resultGradientForBiasVector);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("sourceNumberOfFeatureVectors", "setSourceNumberOfFeatureVectors:")]
+    public NSUInteger SourceNumberOfFeatureVectors { get; set; }
+    [Selector("sourceOutputFeatureChannels", "setSourceOutputFeatureChannels:")]
+    public NSUInteger SourceOutputFeatureChannels { get; set; }
+    [Selector("sourceInputFeatureChannels", "setSourceInputFeatureChannels:")]
+    public NSUInteger SourceInputFeatureChannels { get; set; }
+    [Selector("alpha", "setAlpha:")]
+    public double Alpha { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("encodeGradientForDataToCommandBuffer:gradientMatrix:weightMatrix:resultGradientForDataMatrix:")]
+    public void EncodeGradientForDataToCommandBufferGradientMatrixWeightMatrixResultGradientForDataMatrix(MTLCommandBuffer commandBuffer, MPSMatrix gradientMatrix, MPSMatrix weightMatrix, MPSMatrix resultGradientForDataMatrix);
+    [Selector("encodeGradientForWeightsAndBiasToCommandBuffer:gradientMatrix:inputMatrix:resultGradientForWeightMatrix:resultGradientForBiasVector:")]
+    public void EncodeGradientForWeightsAndBiasToCommandBufferGradientMatrixInputMatrixResultGradientForWeightMatrixResultGradientForBiasVector(MTLCommandBuffer commandBuffer, MPSMatrix gradientMatrix, MPSMatrix inputMatrix, MPSMatrix resultGradientForWeightMatrix, MPSVector? resultGradientForBiasVector);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
 }
 
 #endif

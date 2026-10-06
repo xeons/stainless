@@ -76,9 +76,12 @@ public extern "C" NSString? ACTencentWeiboAppIdKey;
 /// Deprecated in macOS 12.0.
 public extern objc class ACAccountType : NSObject
 {
-    [Selector("accountTypeDescription")] public NSString? AccountTypeDescription { get; }
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("accessGranted")] public bool AccessGranted { get; }
+    [Selector("accountTypeDescription")]
+    public NSString? AccountTypeDescription { get; }
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("accessGranted")]
+    public bool AccessGranted { get; }
 }
 
 #endif

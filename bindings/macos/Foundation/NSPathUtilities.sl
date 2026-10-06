@@ -33,29 +33,47 @@ import Standard.ObjC;
 /// NSStringPathExtensions, a category of NSString.
 public extern objc class NSString
 {
-    [Selector("pathComponents")] public NSArray PathComponents { get; }
-    [Selector("isAbsolutePath")] public bool AbsolutePath { get; }
-    [Selector("lastPathComponent")] public NSString LastPathComponent { get; }
-    [Selector("stringByDeletingLastPathComponent")] public NSString StringByDeletingLastPathComponent { get; }
-    [Selector("pathExtension")] public NSString PathExtension { get; }
-    [Selector("stringByDeletingPathExtension")] public NSString StringByDeletingPathExtension { get; }
-    [Selector("stringByAbbreviatingWithTildeInPath")] public NSString StringByAbbreviatingWithTildeInPath { get; }
-    [Selector("stringByExpandingTildeInPath")] public NSString StringByExpandingTildeInPath { get; }
-    [Selector("stringByStandardizingPath")] public NSString StringByStandardizingPath { get; }
-    [Selector("stringByResolvingSymlinksInPath")] public NSString StringByResolvingSymlinksInPath { get; }
-    [Selector("fileSystemRepresentation")] public byte* FileSystemRepresentation { get; }
-    [Selector("pathWithComponents:")] public static NSString PathWithComponents(NSArray components);
-    [Selector("stringByAppendingPathComponent:")] public NSString StringByAppendingPathComponent(NSString str);
-    [Selector("stringByAppendingPathExtension:")] public NSString? StringByAppendingPathExtension(NSString str);
-    [Selector("stringsByAppendingPaths:")] public NSArray StringsByAppendingPaths(NSArray paths);
-    [Selector("completePathIntoString:caseSensitive:matchesIntoArray:filterTypes:")] public NSUInteger CompletePathIntoStringCaseSensitiveMatchesIntoArrayFilterTypes(out NSString? outputName, bool flag, out NSArray? outputArray, NSArray? filterTypes);
-    [Selector("getFileSystemRepresentation:maxLength:")] public bool GetFileSystemRepresentationMaxLength(byte* cname, NSUInteger max);
+    [Selector("pathComponents")]
+    public NSArray PathComponents { get; }
+    [Selector("isAbsolutePath")]
+    public bool AbsolutePath { get; }
+    [Selector("lastPathComponent")]
+    public NSString LastPathComponent { get; }
+    [Selector("stringByDeletingLastPathComponent")]
+    public NSString StringByDeletingLastPathComponent { get; }
+    [Selector("pathExtension")]
+    public NSString PathExtension { get; }
+    [Selector("stringByDeletingPathExtension")]
+    public NSString StringByDeletingPathExtension { get; }
+    [Selector("stringByAbbreviatingWithTildeInPath")]
+    public NSString StringByAbbreviatingWithTildeInPath { get; }
+    [Selector("stringByExpandingTildeInPath")]
+    public NSString StringByExpandingTildeInPath { get; }
+    [Selector("stringByStandardizingPath")]
+    public NSString StringByStandardizingPath { get; }
+    [Selector("stringByResolvingSymlinksInPath")]
+    public NSString StringByResolvingSymlinksInPath { get; }
+    [Selector("fileSystemRepresentation")]
+    public byte* FileSystemRepresentation { get; }
+    [Selector("pathWithComponents:")]
+    public static NSString PathWithComponents(NSArray components);
+    [Selector("stringByAppendingPathComponent:")]
+    public NSString StringByAppendingPathComponent(NSString str);
+    [Selector("stringByAppendingPathExtension:")]
+    public NSString? StringByAppendingPathExtension(NSString str);
+    [Selector("stringsByAppendingPaths:")]
+    public NSArray StringsByAppendingPaths(NSArray paths);
+    [Selector("completePathIntoString:caseSensitive:matchesIntoArray:filterTypes:")]
+    public NSUInteger CompletePathIntoStringCaseSensitiveMatchesIntoArrayFilterTypes(out NSString? outputName, bool flag, out NSArray? outputArray, NSArray? filterTypes);
+    [Selector("getFileSystemRepresentation:maxLength:")]
+    public bool GetFileSystemRepresentationMaxLength(byte* cname, NSUInteger max);
 }
 
 /// NSArrayPathExtensions, a category of NSArray.
 public extern objc class NSArray
 {
-    [Selector("pathsMatchingExtensions:")] public NSArray PathsMatchingExtensions(NSArray filterTypes);
+    [Selector("pathsMatchingExtensions:")]
+    public NSArray PathsMatchingExtensions(NSArray filterTypes);
 }
 
 public extern "C" NSString NSUserName();

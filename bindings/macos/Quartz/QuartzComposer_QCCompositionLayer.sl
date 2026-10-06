@@ -34,11 +34,16 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class QCCompositionLayer : CAOpenGLLayer, QCCompositionRenderer
 {
-    [Selector("compositionLayerWithFile:")] public static QCCompositionLayer? CompositionLayerWithFile(NSString? path);
-    [Selector("compositionLayerWithComposition:")] public static QCCompositionLayer? CompositionLayerWithComposition(QCComposition? composition);
-    [Selector("initWithFile:")] public AnyObject? InitWithFile(NSString? path);
-    [Selector("initWithComposition:")] public AnyObject? InitWithComposition(QCComposition? composition);
-    [Selector("composition")] public QCComposition? Composition();
+    [Selector("compositionLayerWithFile:")]
+    public static QCCompositionLayer? CompositionLayerWithFile(NSString? path);
+    [Selector("compositionLayerWithComposition:")]
+    public static QCCompositionLayer? CompositionLayerWithComposition(QCComposition? composition);
+    [Selector("initWithFile:")]
+    public AnyObject? InitWithFile(NSString? path);
+    [Selector("initWithComposition:")]
+    public AnyObject? InitWithComposition(QCComposition? composition);
+    [Selector("composition")]
+    public QCComposition? Composition();
 }
 
 #endif

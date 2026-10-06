@@ -40,54 +40,90 @@ public extern "C" NSString? kIMKCommandClientName;
 /// IMKServerInput, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("inputText:key:modifiers:client:")] public bool InputTextKeyModifiersClient(NSString? string, NSInteger keyCode, NSUInteger flags, AnyObject? sender);
-    [Selector("inputText:client:")] public bool InputTextClient(NSString? string, AnyObject? sender);
-    [Selector("handleEvent:client:")] public bool HandleEventClient(NSEvent? event, AnyObject? sender);
-    [Selector("didCommandBySelector:client:")] public bool DidCommandBySelectorClient(Selector aSelector, AnyObject? sender);
-    [Selector("composedString:")] public AnyObject? ComposedString(AnyObject? sender);
-    [Selector("originalString:")] public NSAttributedString? OriginalString(AnyObject? sender);
-    [Selector("commitComposition:")] public void CommitComposition(AnyObject? sender);
-    [Selector("candidates:")] public NSArray? Candidates(AnyObject? sender);
+    [Selector("inputText:key:modifiers:client:")]
+    public bool InputTextKeyModifiersClient(NSString? string, NSInteger keyCode, NSUInteger flags, AnyObject? sender);
+    [Selector("inputText:client:")]
+    public bool InputTextClient(NSString? string, AnyObject? sender);
+    [Selector("handleEvent:client:")]
+    public bool HandleEventClient(NSEvent? event, AnyObject? sender);
+    [Selector("didCommandBySelector:client:")]
+    public bool DidCommandBySelectorClient(Selector aSelector, AnyObject? sender);
+    [Selector("composedString:")]
+    public AnyObject? ComposedString(AnyObject? sender);
+    [Selector("originalString:")]
+    public NSAttributedString? OriginalString(AnyObject? sender);
+    [Selector("commitComposition:")]
+    public void CommitComposition(AnyObject? sender);
+    [Selector("candidates:")]
+    public NSArray? Candidates(AnyObject? sender);
 }
 
 public objc interface IMKStateSetting
 {
-    [Selector("activateServer:")] void ActivateServer(AnyObject? sender);
-    [Selector("deactivateServer:")] void DeactivateServer(AnyObject? sender);
-    [Selector("valueForTag:client:")] AnyObject? ValueForTagClient(long tag, AnyObject? sender);
-    [Selector("setValue:forTag:client:")] void SetValueForTagClient(AnyObject? value, long tag, AnyObject? sender);
-    [Selector("modes:")] NSDictionary? Modes(AnyObject? sender);
-    [Selector("recognizedEvents:")] NSUInteger RecognizedEvents(AnyObject? sender);
-    [Selector("showPreferences:")] void ShowPreferences(AnyObject? sender);
+    [Selector("activateServer:")]
+    void ActivateServer(AnyObject? sender);
+    [Selector("deactivateServer:")]
+    void DeactivateServer(AnyObject? sender);
+    [Selector("valueForTag:client:")]
+    AnyObject? ValueForTagClient(long tag, AnyObject? sender);
+    [Selector("setValue:forTag:client:")]
+    void SetValueForTagClient(AnyObject? value, long tag, AnyObject? sender);
+    [Selector("modes:")]
+    NSDictionary? Modes(AnyObject? sender);
+    [Selector("recognizedEvents:")]
+    NSUInteger RecognizedEvents(AnyObject? sender);
+    [Selector("showPreferences:")]
+    void ShowPreferences(AnyObject? sender);
 }
 
 public objc interface IMKMouseHandling
 {
-    [Selector("mouseDownOnCharacterIndex:coordinate:withModifier:continueTracking:client:")] bool MouseDownOnCharacterIndexCoordinateWithModifierContinueTrackingClient(NSUInteger index, NSPoint point, NSUInteger flags, bool* keepTracking, AnyObject? sender);
-    [Selector("mouseUpOnCharacterIndex:coordinate:withModifier:client:")] bool MouseUpOnCharacterIndexCoordinateWithModifierClient(NSUInteger index, NSPoint point, NSUInteger flags, AnyObject? sender);
-    [Selector("mouseMovedOnCharacterIndex:coordinate:withModifier:client:")] bool MouseMovedOnCharacterIndexCoordinateWithModifierClient(NSUInteger index, NSPoint point, NSUInteger flags, AnyObject? sender);
+    [Selector("mouseDownOnCharacterIndex:coordinate:withModifier:continueTracking:client:")]
+    bool MouseDownOnCharacterIndexCoordinateWithModifierContinueTrackingClient(NSUInteger index, NSPoint point, NSUInteger flags, bool* keepTracking, AnyObject? sender);
+    [Selector("mouseUpOnCharacterIndex:coordinate:withModifier:client:")]
+    bool MouseUpOnCharacterIndexCoordinateWithModifierClient(NSUInteger index, NSPoint point, NSUInteger flags, AnyObject? sender);
+    [Selector("mouseMovedOnCharacterIndex:coordinate:withModifier:client:")]
+    bool MouseMovedOnCharacterIndexCoordinateWithModifierClient(NSUInteger index, NSPoint point, NSUInteger flags, AnyObject? sender);
 }
 
 public extern objc class IMKInputController : NSObject, IMKStateSetting, IMKMouseHandling
 {
-    [Selector("initWithServer:delegate:client:")] public AnyObject? InitWithServerDelegateClient(IMKServer? server, AnyObject? @delegate, AnyObject? inputClient);
-    [Selector("updateComposition")] public void UpdateComposition();
-    [Selector("cancelComposition")] public void CancelComposition();
-    [Selector("compositionAttributesAtRange:")] public NSMutableDictionary? CompositionAttributesAtRange(NSRange range);
-    [Selector("selectionRange")] public NSRange SelectionRange();
-    [Selector("replacementRange")] public NSRange ReplacementRange();
-    [Selector("markForStyle:atRange:")] public NSDictionary? MarkForStyleAtRange(NSInteger style, NSRange range);
-    [Selector("doCommandBySelector:commandDictionary:")] public void DoCommandBySelectorCommandDictionary(Selector aSelector, NSDictionary? infoDictionary);
-    [Selector("hidePalettes")] public void HidePalettes();
-    [Selector("menu")] public NSMenu? Menu();
-    [Selector("delegate")] public AnyObject? Delegate();
-    [Selector("setDelegate:")] public void SetDelegate(AnyObject? newDelegate);
-    [Selector("server")] public IMKServer? Server();
-    [Selector("client")] public IMKTextInput? Client();
-    [Selector("inputControllerWillClose")] public void InputControllerWillClose();
-    [Selector("annotationSelected:forCandidate:")] public void AnnotationSelectedForCandidate(NSAttributedString? annotationString, NSAttributedString? candidateString);
-    [Selector("candidateSelectionChanged:")] public void CandidateSelectionChanged(NSAttributedString? candidateString);
-    [Selector("candidateSelected:")] public void CandidateSelected(NSAttributedString? candidateString);
+    [Selector("initWithServer:delegate:client:")]
+    public AnyObject? InitWithServerDelegateClient(IMKServer? server, AnyObject? @delegate, AnyObject? inputClient);
+    [Selector("updateComposition")]
+    public void UpdateComposition();
+    [Selector("cancelComposition")]
+    public void CancelComposition();
+    [Selector("compositionAttributesAtRange:")]
+    public NSMutableDictionary? CompositionAttributesAtRange(NSRange range);
+    [Selector("selectionRange")]
+    public NSRange SelectionRange();
+    [Selector("replacementRange")]
+    public NSRange ReplacementRange();
+    [Selector("markForStyle:atRange:")]
+    public NSDictionary? MarkForStyleAtRange(NSInteger style, NSRange range);
+    [Selector("doCommandBySelector:commandDictionary:")]
+    public void DoCommandBySelectorCommandDictionary(Selector aSelector, NSDictionary? infoDictionary);
+    [Selector("hidePalettes")]
+    public void HidePalettes();
+    [Selector("menu")]
+    public NSMenu? Menu();
+    [Selector("delegate")]
+    public AnyObject? Delegate();
+    [Selector("setDelegate:")]
+    public void SetDelegate(AnyObject? newDelegate);
+    [Selector("server")]
+    public IMKServer? Server();
+    [Selector("client")]
+    public IMKTextInput? Client();
+    [Selector("inputControllerWillClose")]
+    public void InputControllerWillClose();
+    [Selector("annotationSelected:forCandidate:")]
+    public void AnnotationSelectedForCandidate(NSAttributedString? annotationString, NSAttributedString? candidateString);
+    [Selector("candidateSelectionChanged:")]
+    public void CandidateSelectionChanged(NSAttributedString? candidateString);
+    [Selector("candidateSelected:")]
+    public void CandidateSelected(NSAttributedString? candidateString);
 }
 
 #endif

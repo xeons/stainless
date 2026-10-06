@@ -40,41 +40,72 @@ public objc closure void NSUserActivityDeleteAllSavedUserActivitiesWithCompletio
 
 public extern objc class NSUserActivity : NSObject
 {
-    [Selector("activityType")] public NSString ActivityType { get; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("userInfo", "setUserInfo:")] public NSDictionary? UserInfo { get; set; }
-    [Selector("requiredUserInfoKeys", "setRequiredUserInfoKeys:")] public NSSet? RequiredUserInfoKeys { get; set; }
-    [Selector("needsSave", "setNeedsSave:")] public bool NeedsSave { get; set; }
-    [Selector("webpageURL", "setWebpageURL:")] public NSURL? WebpageURL { get; set; }
-    [Selector("referrerURL", "setReferrerURL:")] public NSURL? ReferrerURL { get; set; }
-    [Selector("expirationDate", "setExpirationDate:")] public NSDate? ExpirationDate { get; set; }
-    [Selector("keywords", "setKeywords:")] public NSSet Keywords { get; set; }
-    [Selector("supportsContinuationStreams", "setSupportsContinuationStreams:")] public bool SupportsContinuationStreams { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSUserActivityDelegate? Delegate { get; set; }
-    [Selector("targetContentIdentifier", "setTargetContentIdentifier:")] public NSString? TargetContentIdentifier { get; set; }
-    [Selector("isEligibleForHandoff", "setEligibleForHandoff:")] public bool EligibleForHandoff { get; set; }
-    [Selector("isEligibleForSearch", "setEligibleForSearch:")] public bool EligibleForSearch { get; set; }
-    [Selector("isEligibleForPublicIndexing", "setEligibleForPublicIndexing:")] public bool EligibleForPublicIndexing { get; set; }
-    [Selector("persistentIdentifier", "setPersistentIdentifier:")] public NSUserActivityPersistentIdentifier? PersistentIdentifier { get; set; }
-    [Selector("initWithActivityType:")] public Self InitWithActivityType(NSString activityType);
+    [Selector("activityType")]
+    public NSString ActivityType { get; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("userInfo", "setUserInfo:")]
+    public NSDictionary? UserInfo { get; set; }
+    [Selector("requiredUserInfoKeys", "setRequiredUserInfoKeys:")]
+    public NSSet? RequiredUserInfoKeys { get; set; }
+    [Selector("needsSave", "setNeedsSave:")]
+    public bool NeedsSave { get; set; }
+    [Selector("webpageURL", "setWebpageURL:")]
+    public NSURL? WebpageURL { get; set; }
+    [Selector("referrerURL", "setReferrerURL:")]
+    public NSURL? ReferrerURL { get; set; }
+    [Selector("expirationDate", "setExpirationDate:")]
+    public NSDate? ExpirationDate { get; set; }
+    [Selector("keywords", "setKeywords:")]
+    public NSSet Keywords { get; set; }
+    [Selector("supportsContinuationStreams", "setSupportsContinuationStreams:")]
+    public bool SupportsContinuationStreams { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSUserActivityDelegate? Delegate { get; set; }
+    [Selector("targetContentIdentifier", "setTargetContentIdentifier:")]
+    public NSString? TargetContentIdentifier { get; set; }
+    [Selector("isEligibleForHandoff", "setEligibleForHandoff:")]
+    public bool EligibleForHandoff { get; set; }
+    [Selector("isEligibleForSearch", "setEligibleForSearch:")]
+    public bool EligibleForSearch { get; set; }
+    [Selector("isEligibleForPublicIndexing", "setEligibleForPublicIndexing:")]
+    public bool EligibleForPublicIndexing { get; set; }
+    [Selector("persistentIdentifier", "setPersistentIdentifier:")]
+    public NSUserActivityPersistentIdentifier? PersistentIdentifier { get; set; }
+    [Selector("initWithActivityType:")]
+    public Self InitWithActivityType(NSString activityType);
     /// Deprecated in macOS 10.12.
-    [Selector("init")] public Self Init();
-    [Selector("addUserInfoEntriesFromDictionary:")] public void AddUserInfoEntriesFromDictionary(NSDictionary otherDictionary);
-    [Selector("becomeCurrent")] public void BecomeCurrent();
-    [Selector("resignCurrent")] public void ResignCurrent();
-    [Selector("invalidate")] public void Invalidate();
-    [Selector("getContinuationStreamsWithCompletionHandler:")] public void GetContinuationStreamsWithCompletionHandler(NSUserActivityGetContinuationStreamsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("deleteSavedUserActivitiesWithPersistentIdentifiers:completionHandler:")] public static void DeleteSavedUserActivitiesWithPersistentIdentifiersCompletionHandler(NSArray persistentIdentifiers, NSUserActivityDeleteSavedUserActivitiesWithPersistentIdentifiersCompletionHandlerHandlerBlock handler);
-    [Selector("deleteAllSavedUserActivitiesWithCompletionHandler:")] public static void DeleteAllSavedUserActivitiesWithCompletionHandler(NSUserActivityDeleteAllSavedUserActivitiesWithCompletionHandlerHandlerBlock handler);
+    [Selector("init")]
+    public Self Init();
+    [Selector("addUserInfoEntriesFromDictionary:")]
+    public void AddUserInfoEntriesFromDictionary(NSDictionary otherDictionary);
+    [Selector("becomeCurrent")]
+    public void BecomeCurrent();
+    [Selector("resignCurrent")]
+    public void ResignCurrent();
+    [Selector("invalidate")]
+    public void Invalidate();
+    [Selector("getContinuationStreamsWithCompletionHandler:")]
+    public void GetContinuationStreamsWithCompletionHandler(NSUserActivityGetContinuationStreamsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("deleteSavedUserActivitiesWithPersistentIdentifiers:completionHandler:")]
+    public static void DeleteSavedUserActivitiesWithPersistentIdentifiersCompletionHandler(NSArray persistentIdentifiers, NSUserActivityDeleteSavedUserActivitiesWithPersistentIdentifiersCompletionHandlerHandlerBlock handler);
+    [Selector("deleteAllSavedUserActivitiesWithCompletionHandler:")]
+    public static void DeleteAllSavedUserActivitiesWithCompletionHandler(NSUserActivityDeleteAllSavedUserActivitiesWithCompletionHandlerHandlerBlock handler);
 }
 
 public extern "C" NSString NSUserActivityTypeBrowsingWeb;
 
 public objc interface NSUserActivityDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("userActivityWillSave:")] void UserActivityWillSave(NSUserActivity userActivity);
-    [Optional] [Selector("userActivityWasContinued:")] void UserActivityWasContinued(NSUserActivity userActivity);
-    [Optional] [Selector("userActivity:didReceiveInputStream:outputStream:")] void UserActivityDidReceiveInputStreamOutputStream(NSUserActivity userActivity, NSInputStream inputStream, NSOutputStream outputStream);
+    [Optional]
+    [Selector("userActivityWillSave:")]
+    void UserActivityWillSave(NSUserActivity userActivity);
+    [Optional]
+    [Selector("userActivityWasContinued:")]
+    void UserActivityWasContinued(NSUserActivity userActivity);
+    [Optional]
+    [Selector("userActivity:didReceiveInputStream:outputStream:")]
+    void UserActivityDidReceiveInputStreamOutputStream(NSUserActivity userActivity, NSInputStream inputStream, NSOutputStream outputStream);
 }
 
 #endif

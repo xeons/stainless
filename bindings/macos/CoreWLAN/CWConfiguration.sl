@@ -33,26 +33,41 @@ import Standard.ObjC;
 
 public extern objc class CWConfiguration : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("networkProfiles")] public NSOrderedSet? NetworkProfiles { get; }
-    [Selector("requireAdministratorForAssociation")] public bool RequireAdministratorForAssociation { get; }
-    [Selector("requireAdministratorForPower")] public bool RequireAdministratorForPower { get; }
-    [Selector("requireAdministratorForIBSSMode")] public bool RequireAdministratorForIBSSMode { get; }
-    [Selector("rememberJoinedNetworks")] public bool RememberJoinedNetworks { get; }
-    [Selector("configuration")] public static Self Configuration();
-    [Selector("init")] public Self Init();
-    [Selector("initWithConfiguration:")] public Self InitWithConfiguration(CWConfiguration configuration);
-    [Selector("configurationWithConfiguration:")] public static Self ConfigurationWithConfiguration(CWConfiguration configuration);
-    [Selector("isEqualToConfiguration:")] public bool IsEqualToConfiguration(CWConfiguration configuration);
+    [Selector("networkProfiles")]
+    public NSOrderedSet? NetworkProfiles { get; }
+    [Selector("requireAdministratorForAssociation")]
+    public bool RequireAdministratorForAssociation { get; }
+    [Selector("requireAdministratorForPower")]
+    public bool RequireAdministratorForPower { get; }
+    [Selector("requireAdministratorForIBSSMode")]
+    public bool RequireAdministratorForIBSSMode { get; }
+    [Selector("rememberJoinedNetworks")]
+    public bool RememberJoinedNetworks { get; }
+    [Selector("configuration")]
+    public static Self Configuration();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithConfiguration:")]
+    public Self InitWithConfiguration(CWConfiguration configuration);
+    [Selector("configurationWithConfiguration:")]
+    public static Self ConfigurationWithConfiguration(CWConfiguration configuration);
+    [Selector("isEqualToConfiguration:")]
+    public bool IsEqualToConfiguration(CWConfiguration configuration);
 }
 
 public extern objc class CWMutableConfiguration : CWConfiguration
 {
-    [Selector("networkProfiles", "setNetworkProfiles:")] public NSOrderedSet? NetworkProfiles { get; set; }
-    [Selector("requireAdministratorForAssociation", "setRequireAdministratorForAssociation:")] public bool RequireAdministratorForAssociation { get; set; }
-    [Selector("requireAdministratorForPower", "setRequireAdministratorForPower:")] public bool RequireAdministratorForPower { get; set; }
+    [Selector("networkProfiles", "setNetworkProfiles:")]
+    public NSOrderedSet? NetworkProfiles { get; set; }
+    [Selector("requireAdministratorForAssociation", "setRequireAdministratorForAssociation:")]
+    public bool RequireAdministratorForAssociation { get; set; }
+    [Selector("requireAdministratorForPower", "setRequireAdministratorForPower:")]
+    public bool RequireAdministratorForPower { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("requireAdministratorForIBSSMode", "setRequireAdministratorForIBSSMode:")] public bool RequireAdministratorForIBSSMode { get; set; }
-    [Selector("rememberJoinedNetworks", "setRememberJoinedNetworks:")] public bool RememberJoinedNetworks { get; set; }
+    [Selector("requireAdministratorForIBSSMode", "setRequireAdministratorForIBSSMode:")]
+    public bool RequireAdministratorForIBSSMode { get; set; }
+    [Selector("rememberJoinedNetworks", "setRememberJoinedNetworks:")]
+    public bool RememberJoinedNetworks { get; set; }
 }
 
 #endif

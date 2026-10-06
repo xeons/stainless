@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class CMPedometerData : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("startDate")] public NSDate StartDate { get; }
-    [Selector("endDate")] public NSDate EndDate { get; }
-    [Selector("numberOfSteps")] public NSNumber NumberOfSteps { get; }
-    [Selector("distance")] public NSNumber? Distance { get; }
-    [Selector("floorsAscended")] public NSNumber? FloorsAscended { get; }
-    [Selector("floorsDescended")] public NSNumber? FloorsDescended { get; }
-    [Selector("currentPace")] public NSNumber? CurrentPace { get; }
-    [Selector("currentCadence")] public NSNumber? CurrentCadence { get; }
-    [Selector("averageActivePace")] public NSNumber? AverageActivePace { get; }
+    [Selector("startDate")]
+    public NSDate StartDate { get; }
+    [Selector("endDate")]
+    public NSDate EndDate { get; }
+    [Selector("numberOfSteps")]
+    public NSNumber NumberOfSteps { get; }
+    [Selector("distance")]
+    public NSNumber? Distance { get; }
+    [Selector("floorsAscended")]
+    public NSNumber? FloorsAscended { get; }
+    [Selector("floorsDescended")]
+    public NSNumber? FloorsDescended { get; }
+    [Selector("currentPace")]
+    public NSNumber? CurrentPace { get; }
+    [Selector("currentCadence")]
+    public NSNumber? CurrentCadence { get; }
+    [Selector("averageActivePace")]
+    public NSNumber? AverageActivePace { get; }
 }
 
 public enum CMPedometerEventType : long
@@ -52,8 +61,10 @@ public enum CMPedometerEventType : long
 
 public extern objc class CMPedometerEvent : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("date")] public NSDate Date { get; }
-    [Selector("type")] public CMPedometerEventType Type { get; }
+    [Selector("date")]
+    public NSDate Date { get; }
+    [Selector("type")]
+    public CMPedometerEventType Type { get; }
 }
 
 public objc closure void CMPedometerHandler(CMPedometerData? arg0, NSError? arg1);
@@ -62,13 +73,20 @@ public objc closure void CMPedometerEventHandler(CMPedometerEvent? arg0, NSError
 
 public extern objc class CMPedometer : NSObject
 {
-    [Selector("isStepCountingAvailable")] public static bool IsStepCountingAvailable();
-    [Selector("isDistanceAvailable")] public static bool IsDistanceAvailable();
-    [Selector("isFloorCountingAvailable")] public static bool IsFloorCountingAvailable();
-    [Selector("isPaceAvailable")] public static bool IsPaceAvailable();
-    [Selector("queryPedometerDataFromDate:toDate:withHandler:")] public void QueryPedometerDataFromDateToDateWithHandler(NSDate start, NSDate end, CMPedometerHandler handler);
-    [Selector("startPedometerUpdatesFromDate:withHandler:")] public void StartPedometerUpdatesFromDateWithHandler(NSDate start, CMPedometerHandler handler);
-    [Selector("stopPedometerUpdates")] public void StopPedometerUpdates();
+    [Selector("isStepCountingAvailable")]
+    public static bool IsStepCountingAvailable();
+    [Selector("isDistanceAvailable")]
+    public static bool IsDistanceAvailable();
+    [Selector("isFloorCountingAvailable")]
+    public static bool IsFloorCountingAvailable();
+    [Selector("isPaceAvailable")]
+    public static bool IsPaceAvailable();
+    [Selector("queryPedometerDataFromDate:toDate:withHandler:")]
+    public void QueryPedometerDataFromDateToDateWithHandler(NSDate start, NSDate end, CMPedometerHandler handler);
+    [Selector("startPedometerUpdatesFromDate:withHandler:")]
+    public void StartPedometerUpdatesFromDateWithHandler(NSDate start, CMPedometerHandler handler);
+    [Selector("stopPedometerUpdates")]
+    public void StopPedometerUpdates();
 }
 
 #endif

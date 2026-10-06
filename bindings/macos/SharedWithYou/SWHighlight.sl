@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class SWHighlight : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("identifier")] public NSSecureCoding Identifier { get; }
-    [Selector("URL")] public NSURL URL { get; }
+    [Selector("identifier")]
+    public NSSecureCoding Identifier { get; }
+    [Selector("URL")]
+    public NSURL URL { get; }
 }
 
 #endif

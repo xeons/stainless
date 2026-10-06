@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class AEAssessmentApplication : NSObject, NSCopying
 {
-    [Selector("bundleIdentifier")] public NSString BundleIdentifier { get; }
-    [Selector("teamIdentifier")] public NSString? TeamIdentifier { get; }
-    [Selector("requiresSignatureValidation", "setRequiresSignatureValidation:")] public bool RequiresSignatureValidation { get; set; }
-    [Selector("initWithBundleIdentifier:")] public Self InitWithBundleIdentifier(NSString bundleIdentifier);
-    [Selector("initWithBundleIdentifier:teamIdentifier:")] public Self InitWithBundleIdentifierTeamIdentifier(NSString bundleIdentifier, NSString? teamIdentifier);
+    [Selector("bundleIdentifier")]
+    public NSString BundleIdentifier { get; }
+    [Selector("teamIdentifier")]
+    public NSString? TeamIdentifier { get; }
+    [Selector("requiresSignatureValidation", "setRequiresSignatureValidation:")]
+    public bool RequiresSignatureValidation { get; set; }
+    [Selector("initWithBundleIdentifier:")]
+    public Self InitWithBundleIdentifier(NSString bundleIdentifier);
+    [Selector("initWithBundleIdentifier:teamIdentifier:")]
+    public Self InitWithBundleIdentifierTeamIdentifier(NSString bundleIdentifier, NSString? teamIdentifier);
 }
 
 #endif

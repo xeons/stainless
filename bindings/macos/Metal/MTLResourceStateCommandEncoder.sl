@@ -50,12 +50,24 @@ public struct MTLMapIndirectArguments
 
 public objc interface MTLResourceStateCommandEncoder : MTLCommandEncoder
 {
-    [Optional] [Selector("updateTextureMappings:mode:regions:mipLevels:slices:numRegions:")] void UpdateTextureMappingsModeRegionsMipLevelsSlicesNumRegions(MTLTexture texture, MTLSparseTextureMappingMode mode, MTLRegion* regions, NSUInteger* mipLevels, NSUInteger* slices, NSUInteger numRegions);
-    [Optional] [Selector("updateTextureMapping:mode:region:mipLevel:slice:")] void UpdateTextureMappingModeRegionMipLevelSlice(MTLTexture texture, MTLSparseTextureMappingMode mode, MTLRegion region, NSUInteger mipLevel, NSUInteger slice);
-    [Optional] [Selector("updateTextureMapping:mode:indirectBuffer:indirectBufferOffset:")] void UpdateTextureMappingModeIndirectBufferIndirectBufferOffset(MTLTexture texture, MTLSparseTextureMappingMode mode, MTLBuffer indirectBuffer, NSUInteger indirectBufferOffset);
-    [Optional] [Selector("updateFence:")] void UpdateFence(MTLFence fence);
-    [Optional] [Selector("waitForFence:")] void WaitForFence(MTLFence fence);
-    [Optional] [Selector("moveTextureMappingsFromTexture:sourceSlice:sourceLevel:sourceOrigin:sourceSize:toTexture:destinationSlice:destinationLevel:destinationOrigin:")] void MoveTextureMappingsFromTextureSourceSliceSourceLevelSourceOriginSourceSizeToTextureDestinationSliceDestinationLevelDestinationOrigin(MTLTexture sourceTexture, NSUInteger sourceSlice, NSUInteger sourceLevel, MTLOrigin sourceOrigin, MTLSize sourceSize, MTLTexture destinationTexture, NSUInteger destinationSlice, NSUInteger destinationLevel, MTLOrigin destinationOrigin);
+    [Optional]
+    [Selector("updateTextureMappings:mode:regions:mipLevels:slices:numRegions:")]
+    void UpdateTextureMappingsModeRegionsMipLevelsSlicesNumRegions(MTLTexture texture, MTLSparseTextureMappingMode mode, MTLRegion* regions, NSUInteger* mipLevels, NSUInteger* slices, NSUInteger numRegions);
+    [Optional]
+    [Selector("updateTextureMapping:mode:region:mipLevel:slice:")]
+    void UpdateTextureMappingModeRegionMipLevelSlice(MTLTexture texture, MTLSparseTextureMappingMode mode, MTLRegion region, NSUInteger mipLevel, NSUInteger slice);
+    [Optional]
+    [Selector("updateTextureMapping:mode:indirectBuffer:indirectBufferOffset:")]
+    void UpdateTextureMappingModeIndirectBufferIndirectBufferOffset(MTLTexture texture, MTLSparseTextureMappingMode mode, MTLBuffer indirectBuffer, NSUInteger indirectBufferOffset);
+    [Optional]
+    [Selector("updateFence:")]
+    void UpdateFence(MTLFence fence);
+    [Optional]
+    [Selector("waitForFence:")]
+    void WaitForFence(MTLFence fence);
+    [Optional]
+    [Selector("moveTextureMappingsFromTexture:sourceSlice:sourceLevel:sourceOrigin:sourceSize:toTexture:destinationSlice:destinationLevel:destinationOrigin:")]
+    void MoveTextureMappingsFromTextureSourceSliceSourceLevelSourceOriginSourceSizeToTextureDestinationSliceDestinationLevelDestinationOrigin(MTLTexture sourceTexture, NSUInteger sourceSlice, NSUInteger sourceLevel, MTLOrigin sourceOrigin, MTLSize sourceSize, MTLTexture destinationTexture, NSUInteger destinationSlice, NSUInteger destinationLevel, MTLOrigin destinationOrigin);
 }
 
 #endif

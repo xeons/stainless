@@ -35,11 +35,16 @@ public using CAGradientLayerType = NSString;
 
 public extern objc class CAGradientLayer : CALayer
 {
-    [Selector("colors", "setColors:")] public NSArray? Colors { get; set; }
-    [Selector("locations", "setLocations:")] public NSArray? Locations { get; set; }
-    [Selector("startPoint", "setStartPoint:")] public CGPoint StartPoint { get; set; }
-    [Selector("endPoint", "setEndPoint:")] public CGPoint EndPoint { get; set; }
-    [Selector("type", "setType:")] public CAGradientLayerType Type { get; set; }
+    [Selector("colors", "setColors:")]
+    public NSArray? Colors { get; set; }
+    [Selector("locations", "setLocations:")]
+    public NSArray? Locations { get; set; }
+    [Selector("startPoint", "setStartPoint:")]
+    public CGPoint StartPoint { get; set; }
+    [Selector("endPoint", "setEndPoint:")]
+    public CGPoint EndPoint { get; set; }
+    [Selector("type", "setType:")]
+    public CAGradientLayerType Type { get; set; }
 }
 
 public extern "C" CAGradientLayerType? kCAGradientLayerAxial;

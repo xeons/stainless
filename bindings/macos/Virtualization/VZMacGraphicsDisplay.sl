@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class VZMacGraphicsDisplay : VZGraphicsDisplay
 {
-    [Selector("pixelsPerInch")] public NSInteger PixelsPerInch { get; }
+    [Selector("pixelsPerInch")]
+    public NSInteger PixelsPerInch { get; }
 }
 
 #endif

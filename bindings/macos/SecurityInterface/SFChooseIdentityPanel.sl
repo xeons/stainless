@@ -35,28 +35,45 @@ import Standard.ObjC;
 
 public extern objc class SFChooseIdentityPanel : NSPanel
 {
-    [Selector("sharedChooseIdentityPanel")] public static SFChooseIdentityPanel? SharedChooseIdentityPanel();
-    [Selector("runModalForIdentities:message:")] public NSInteger RunModalForIdentitiesMessage(NSArray? identities, NSString? message);
-    [Selector("beginSheetForWindow:modalDelegate:didEndSelector:contextInfo:identities:message:")] public void BeginSheetForWindowModalDelegateDidEndSelectorContextInfoIdentitiesMessage(NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo, NSArray? identities, NSString? message);
-    [Selector("identity")] public SecIdentityRef? Identity();
-    [Selector("setPolicies:")] public void SetPolicies(AnyObject? policies);
-    [Selector("policies")] public NSArray? Policies();
-    [Selector("setDefaultButtonTitle:")] public void SetDefaultButtonTitle(NSString? title);
-    [Selector("setAlternateButtonTitle:")] public void SetAlternateButtonTitle(NSString? title);
-    [Selector("setShowsHelp:")] public void SetShowsHelp(bool showsHelp);
-    [Selector("showsHelp")] public bool ShowsHelp();
-    [Selector("setHelpAnchor:")] public void SetHelpAnchor(NSString? anchor);
-    [Selector("helpAnchor")] public NSString? HelpAnchor();
-    [Selector("setInformativeText:")] public void SetInformativeText(NSString? informativeText);
-    [Selector("informativeText")] public NSString? InformativeText();
-    [Selector("setDomain:")] public void SetDomain(NSString? domainString);
-    [Selector("domain")] public NSString? Domain();
+    [Selector("sharedChooseIdentityPanel")]
+    public static SFChooseIdentityPanel? SharedChooseIdentityPanel();
+    [Selector("runModalForIdentities:message:")]
+    public NSInteger RunModalForIdentitiesMessage(NSArray? identities, NSString? message);
+    [Selector("beginSheetForWindow:modalDelegate:didEndSelector:contextInfo:identities:message:")]
+    public void BeginSheetForWindowModalDelegateDidEndSelectorContextInfoIdentitiesMessage(NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo, NSArray? identities, NSString? message);
+    [Selector("identity")]
+    public SecIdentityRef? Identity();
+    [Selector("setPolicies:")]
+    public void SetPolicies(AnyObject? policies);
+    [Selector("policies")]
+    public NSArray? Policies();
+    [Selector("setDefaultButtonTitle:")]
+    public void SetDefaultButtonTitle(NSString? title);
+    [Selector("setAlternateButtonTitle:")]
+    public void SetAlternateButtonTitle(NSString? title);
+    [Selector("setShowsHelp:")]
+    public void SetShowsHelp(bool showsHelp);
+    [Selector("showsHelp")]
+    public bool ShowsHelp();
+    [Selector("setHelpAnchor:")]
+    public void SetHelpAnchor(NSString? anchor);
+    [Selector("helpAnchor")]
+    public NSString? HelpAnchor();
+    [Selector("setInformativeText:")]
+    public void SetInformativeText(NSString? informativeText);
+    [Selector("informativeText")]
+    public NSString? InformativeText();
+    [Selector("setDomain:")]
+    public void SetDomain(NSString? domainString);
+    [Selector("domain")]
+    public NSString? Domain();
 }
 
 /// SFChooseIdentityPanelDelegate, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("chooseIdentityPanelShowHelp:")] public bool ChooseIdentityPanelShowHelp(SFChooseIdentityPanel? sender);
+    [Selector("chooseIdentityPanelShowHelp:")]
+    public bool ChooseIdentityPanelShowHelp(SFChooseIdentityPanel? sender);
 }
 
 #endif

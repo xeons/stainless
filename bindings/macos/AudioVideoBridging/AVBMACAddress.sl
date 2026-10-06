@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class AVBMACAddress : NSObject, NSCopying
 {
-    [Selector("bytes")] public byte* Bytes { get; }
-    [Selector("dataRepresentation", "setDataRepresentation:")] public NSData DataRepresentation { get; set; }
-    [Selector("stringRepresentation", "setStringRepresentation:")] public NSString StringRepresentation { get; set; }
-    [Selector("isMulticast", "setMulticast:")] public bool Multicast { get; set; }
-    [Selector("initWithBytes:")] public Self InitWithBytes(byte* bytes);
+    [Selector("bytes")]
+    public byte* Bytes { get; }
+    [Selector("dataRepresentation", "setDataRepresentation:")]
+    public NSData DataRepresentation { get; set; }
+    [Selector("stringRepresentation", "setStringRepresentation:")]
+    public NSString StringRepresentation { get; set; }
+    [Selector("isMulticast", "setMulticast:")]
+    public bool Multicast { get; set; }
+    [Selector("initWithBytes:")]
+    public Self InitWithBytes(byte* bytes);
 }
 
 #endif

@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class MXDiagnostic : NSObject, NSSecureCoding
 {
-    [Selector("metaData")] public MXMetaData MetaData { get; }
-    [Selector("applicationVersion")] public NSString ApplicationVersion { get; }
-    [Selector("signpostData")] public NSArray? SignpostData { get; }
-    [Selector("JSONRepresentation")] public NSData JSONRepresentation();
-    [Selector("dictionaryRepresentation")] public NSDictionary DictionaryRepresentation();
+    [Selector("metaData")]
+    public MXMetaData MetaData { get; }
+    [Selector("applicationVersion")]
+    public NSString ApplicationVersion { get; }
+    [Selector("signpostData")]
+    public NSArray? SignpostData { get; }
+    [Selector("JSONRepresentation")]
+    public NSData JSONRepresentation();
+    [Selector("dictionaryRepresentation")]
+    public NSDictionary DictionaryRepresentation();
 }
 
 #endif

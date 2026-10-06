@@ -50,12 +50,18 @@ public enum NSISO8601DateFormatOptions : ulong
 
 public extern objc class NSISO8601DateFormatter : NSFormatter, NSSecureCoding
 {
-    [Selector("timeZone", "setTimeZone:")] public NSTimeZone? TimeZone { get; set; }
-    [Selector("formatOptions", "setFormatOptions:")] public NSISO8601DateFormatOptions FormatOptions { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("stringFromDate:")] public NSString StringFromDate(NSDate date);
-    [Selector("dateFromString:")] public NSDate? DateFromString(NSString string);
-    [Selector("stringFromDate:timeZone:formatOptions:")] public static NSString StringFromDateTimeZoneFormatOptions(NSDate date, NSTimeZone timeZone, NSISO8601DateFormatOptions formatOptions);
+    [Selector("timeZone", "setTimeZone:")]
+    public NSTimeZone? TimeZone { get; set; }
+    [Selector("formatOptions", "setFormatOptions:")]
+    public NSISO8601DateFormatOptions FormatOptions { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("stringFromDate:")]
+    public NSString StringFromDate(NSDate date);
+    [Selector("dateFromString:")]
+    public NSDate? DateFromString(NSString string);
+    [Selector("stringFromDate:timeZone:formatOptions:")]
+    public static NSString StringFromDateTimeZoneFormatOptions(NSDate date, NSTimeZone timeZone, NSISO8601DateFormatOptions formatOptions);
 }
 
 #endif

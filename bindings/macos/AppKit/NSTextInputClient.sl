@@ -47,27 +47,58 @@ public enum NSTextCursorAccessoryPlacement : long
 
 public objc interface NSTextInputClient
 {
-    [Optional] [Selector("unionRectInVisibleSelectedRange")] NSRect UnionRectInVisibleSelectedRange { get; }
-    [Optional] [Selector("documentVisibleRect")] NSRect DocumentVisibleRect { get; }
-    [Optional] [Selector("supportsAdaptiveImageGlyph")] bool SupportsAdaptiveImageGlyph { get; }
-    [Selector("insertText:replacementRange:")] void InsertTextReplacementRange(AnyObject string, NSRange replacementRange);
-    [Selector("doCommandBySelector:")] void DoCommandBySelector(Selector selector);
-    [Selector("setMarkedText:selectedRange:replacementRange:")] void SetMarkedTextSelectedRangeReplacementRange(AnyObject string, NSRange selectedRange, NSRange replacementRange);
-    [Selector("unmarkText")] void UnmarkText();
-    [Selector("selectedRange")] NSRange SelectedRange();
-    [Selector("markedRange")] NSRange MarkedRange();
-    [Selector("hasMarkedText")] bool HasMarkedText();
-    [Selector("attributedSubstringForProposedRange:actualRange:")] NSAttributedString? AttributedSubstringForProposedRangeActualRange(NSRange range, NSRangePointer actualRange);
-    [Selector("validAttributesForMarkedText")] NSArray ValidAttributesForMarkedText();
-    [Selector("firstRectForCharacterRange:actualRange:")] NSRect FirstRectForCharacterRangeActualRange(NSRange range, NSRangePointer actualRange);
-    [Selector("characterIndexForPoint:")] NSUInteger CharacterIndexForPoint(NSPoint point);
-    [Optional] [Selector("attributedString")] NSAttributedString AttributedString();
-    [Optional] [Selector("fractionOfDistanceThroughGlyphForPoint:")] CGFloat FractionOfDistanceThroughGlyphForPoint(NSPoint point);
-    [Optional] [Selector("baselineDeltaForCharacterAtIndex:")] CGFloat BaselineDeltaForCharacterAtIndex(NSUInteger anIndex);
-    [Optional] [Selector("windowLevel")] NSInteger WindowLevel();
-    [Optional] [Selector("drawsVerticallyForCharacterAtIndex:")] bool DrawsVerticallyForCharacterAtIndex(NSUInteger charIndex);
-    [Optional] [Selector("preferredTextAccessoryPlacement")] NSTextCursorAccessoryPlacement PreferredTextAccessoryPlacement();
-    [Optional] [Selector("insertAdaptiveImageGlyph:replacementRange:")] void InsertAdaptiveImageGlyphReplacementRange(NSAdaptiveImageGlyph adaptiveImageGlyph, NSRange replacementRange);
+    [Optional]
+    [Selector("unionRectInVisibleSelectedRange")]
+    NSRect UnionRectInVisibleSelectedRange { get; }
+    [Optional]
+    [Selector("documentVisibleRect")]
+    NSRect DocumentVisibleRect { get; }
+    [Optional]
+    [Selector("supportsAdaptiveImageGlyph")]
+    bool SupportsAdaptiveImageGlyph { get; }
+    [Selector("insertText:replacementRange:")]
+    void InsertTextReplacementRange(AnyObject string, NSRange replacementRange);
+    [Selector("doCommandBySelector:")]
+    void DoCommandBySelector(Selector selector);
+    [Selector("setMarkedText:selectedRange:replacementRange:")]
+    void SetMarkedTextSelectedRangeReplacementRange(AnyObject string, NSRange selectedRange, NSRange replacementRange);
+    [Selector("unmarkText")]
+    void UnmarkText();
+    [Selector("selectedRange")]
+    NSRange SelectedRange();
+    [Selector("markedRange")]
+    NSRange MarkedRange();
+    [Selector("hasMarkedText")]
+    bool HasMarkedText();
+    [Selector("attributedSubstringForProposedRange:actualRange:")]
+    NSAttributedString? AttributedSubstringForProposedRangeActualRange(NSRange range, NSRangePointer actualRange);
+    [Selector("validAttributesForMarkedText")]
+    NSArray ValidAttributesForMarkedText();
+    [Selector("firstRectForCharacterRange:actualRange:")]
+    NSRect FirstRectForCharacterRangeActualRange(NSRange range, NSRangePointer actualRange);
+    [Selector("characterIndexForPoint:")]
+    NSUInteger CharacterIndexForPoint(NSPoint point);
+    [Optional]
+    [Selector("attributedString")]
+    NSAttributedString AttributedString();
+    [Optional]
+    [Selector("fractionOfDistanceThroughGlyphForPoint:")]
+    CGFloat FractionOfDistanceThroughGlyphForPoint(NSPoint point);
+    [Optional]
+    [Selector("baselineDeltaForCharacterAtIndex:")]
+    CGFloat BaselineDeltaForCharacterAtIndex(NSUInteger anIndex);
+    [Optional]
+    [Selector("windowLevel")]
+    NSInteger WindowLevel();
+    [Optional]
+    [Selector("drawsVerticallyForCharacterAtIndex:")]
+    bool DrawsVerticallyForCharacterAtIndex(NSUInteger charIndex);
+    [Optional]
+    [Selector("preferredTextAccessoryPlacement")]
+    NSTextCursorAccessoryPlacement PreferredTextAccessoryPlacement();
+    [Optional]
+    [Selector("insertAdaptiveImageGlyph:replacementRange:")]
+    void InsertAdaptiveImageGlyphReplacementRange(NSAdaptiveImageGlyph adaptiveImageGlyph, NSRange replacementRange);
 }
 
 #endif

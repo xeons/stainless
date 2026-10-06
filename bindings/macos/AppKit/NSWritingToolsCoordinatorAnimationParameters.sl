@@ -38,10 +38,14 @@ public objc closure void NSWritingToolsCoordinatorAnimationParametersCompletionH
 /// macOS 15.2 and later.
 public extern objc class NSWritingToolsCoordinatorAnimationParameters : NSObject
 {
-    [Selector("duration")] public CGFloat Duration { get; }
-    [Selector("delay")] public CGFloat Delay { get; }
-    [Selector("progressHandler", "setProgressHandler:")] public NSWritingToolsCoordinatorAnimationParametersProgressHandlerBlock? ProgressHandler { get; set; }
-    [Selector("completionHandler", "setCompletionHandler:")] public NSWritingToolsCoordinatorAnimationParametersCompletionHandlerBlock? CompletionHandler { get; set; }
+    [Selector("duration")]
+    public CGFloat Duration { get; }
+    [Selector("delay")]
+    public CGFloat Delay { get; }
+    [Selector("progressHandler", "setProgressHandler:")]
+    public NSWritingToolsCoordinatorAnimationParametersProgressHandlerBlock? ProgressHandler { get; set; }
+    [Selector("completionHandler", "setCompletionHandler:")]
+    public NSWritingToolsCoordinatorAnimationParametersCompletionHandlerBlock? CompletionHandler { get; set; }
 }
 
 #endif

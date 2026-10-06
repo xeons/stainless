@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class HKContactsLensSpecification : HKLensSpecification, NSSecureCoding, NSCopying
 {
-    [Selector("baseCurve")] public HKQuantity? BaseCurve { get; }
-    [Selector("diameter")] public HKQuantity? Diameter { get; }
-    [Selector("initWithSphere:cylinder:axis:addPower:baseCurve:diameter:")] public Self InitWithSphereCylinderAxisAddPowerBaseCurveDiameter(HKQuantity sphere, HKQuantity? cylinder, HKQuantity? axis, HKQuantity? addPower, HKQuantity? baseCurve, HKQuantity? diameter);
+    [Selector("baseCurve")]
+    public HKQuantity? BaseCurve { get; }
+    [Selector("diameter")]
+    public HKQuantity? Diameter { get; }
+    [Selector("initWithSphere:cylinder:axis:addPower:baseCurve:diameter:")]
+    public Self InitWithSphereCylinderAxisAddPowerBaseCurveDiameter(HKQuantity sphere, HKQuantity? cylinder, HKQuantity? axis, HKQuantity? addPower, HKQuantity? baseCurve, HKQuantity? diameter);
 }
 
 #endif

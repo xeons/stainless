@@ -33,20 +33,34 @@ import Standard.ObjC;
 
 public extern objc class NEVPNProtocol : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("serverAddress", "setServerAddress:")] public NSString? ServerAddress { get; set; }
-    [Selector("username", "setUsername:")] public NSString? Username { get; set; }
-    [Selector("passwordReference", "setPasswordReference:")] public NSData? PasswordReference { get; set; }
-    [Selector("identityReference", "setIdentityReference:")] public NSData? IdentityReference { get; set; }
-    [Selector("identityData", "setIdentityData:")] public NSData? IdentityData { get; set; }
-    [Selector("identityDataPassword", "setIdentityDataPassword:")] public NSString? IdentityDataPassword { get; set; }
-    [Selector("disconnectOnSleep", "setDisconnectOnSleep:")] public bool DisconnectOnSleep { get; set; }
-    [Selector("proxySettings", "setProxySettings:")] public NEProxySettings? ProxySettings { get; set; }
-    [Selector("includeAllNetworks", "setIncludeAllNetworks:")] public bool IncludeAllNetworks { get; set; }
-    [Selector("excludeLocalNetworks", "setExcludeLocalNetworks:")] public bool ExcludeLocalNetworks { get; set; }
-    [Selector("excludeCellularServices", "setExcludeCellularServices:")] public bool ExcludeCellularServices { get; set; }
-    [Selector("excludeAPNs", "setExcludeAPNs:")] public bool ExcludeAPNs { get; set; }
-    [Selector("excludeDeviceCommunication", "setExcludeDeviceCommunication:")] public bool ExcludeDeviceCommunication { get; set; }
-    [Selector("enforceRoutes", "setEnforceRoutes:")] public bool EnforceRoutes { get; set; }
+    [Selector("serverAddress", "setServerAddress:")]
+    public NSString? ServerAddress { get; set; }
+    [Selector("username", "setUsername:")]
+    public NSString? Username { get; set; }
+    [Selector("passwordReference", "setPasswordReference:")]
+    public NSData? PasswordReference { get; set; }
+    [Selector("identityReference", "setIdentityReference:")]
+    public NSData? IdentityReference { get; set; }
+    [Selector("identityData", "setIdentityData:")]
+    public NSData? IdentityData { get; set; }
+    [Selector("identityDataPassword", "setIdentityDataPassword:")]
+    public NSString? IdentityDataPassword { get; set; }
+    [Selector("disconnectOnSleep", "setDisconnectOnSleep:")]
+    public bool DisconnectOnSleep { get; set; }
+    [Selector("proxySettings", "setProxySettings:")]
+    public NEProxySettings? ProxySettings { get; set; }
+    [Selector("includeAllNetworks", "setIncludeAllNetworks:")]
+    public bool IncludeAllNetworks { get; set; }
+    [Selector("excludeLocalNetworks", "setExcludeLocalNetworks:")]
+    public bool ExcludeLocalNetworks { get; set; }
+    [Selector("excludeCellularServices", "setExcludeCellularServices:")]
+    public bool ExcludeCellularServices { get; set; }
+    [Selector("excludeAPNs", "setExcludeAPNs:")]
+    public bool ExcludeAPNs { get; set; }
+    [Selector("excludeDeviceCommunication", "setExcludeDeviceCommunication:")]
+    public bool ExcludeDeviceCommunication { get; set; }
+    [Selector("enforceRoutes", "setEnforceRoutes:")]
+    public bool EnforceRoutes { get; set; }
 }
 
 #endif

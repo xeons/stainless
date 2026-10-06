@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// ImageContentCreation, a category of DRBurn.
 public extern objc class DRBurn
 {
-    [Selector("layoutForImageFile:")] public static AnyObject? LayoutForImageFile(NSString? path);
+    [Selector("layoutForImageFile:")]
+    public static AnyObject? LayoutForImageFile(NSString? path);
 }
 
 #endif

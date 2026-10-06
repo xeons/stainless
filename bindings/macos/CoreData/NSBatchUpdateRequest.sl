@@ -32,15 +32,24 @@ import Standard.ObjC;
 
 public extern objc class NSBatchUpdateRequest : NSPersistentStoreRequest
 {
-    [Selector("entityName")] public NSString EntityName { get; }
-    [Selector("entity")] public NSEntityDescription Entity { get; }
-    [Selector("predicate", "setPredicate:")] public NSPredicate? Predicate { get; set; }
-    [Selector("includesSubentities", "setIncludesSubentities:")] public bool IncludesSubentities { get; set; }
-    [Selector("resultType", "setResultType:")] public NSBatchUpdateRequestResultType ResultType { get; set; }
-    [Selector("propertiesToUpdate", "setPropertiesToUpdate:")] public NSDictionary? PropertiesToUpdate { get; set; }
-    [Selector("batchUpdateRequestWithEntityName:")] public static Self BatchUpdateRequestWithEntityName(NSString entityName);
-    [Selector("initWithEntityName:")] public Self InitWithEntityName(NSString entityName);
-    [Selector("initWithEntity:")] public Self InitWithEntity(NSEntityDescription entity);
+    [Selector("entityName")]
+    public NSString EntityName { get; }
+    [Selector("entity")]
+    public NSEntityDescription Entity { get; }
+    [Selector("predicate", "setPredicate:")]
+    public NSPredicate? Predicate { get; set; }
+    [Selector("includesSubentities", "setIncludesSubentities:")]
+    public bool IncludesSubentities { get; set; }
+    [Selector("resultType", "setResultType:")]
+    public NSBatchUpdateRequestResultType ResultType { get; set; }
+    [Selector("propertiesToUpdate", "setPropertiesToUpdate:")]
+    public NSDictionary? PropertiesToUpdate { get; set; }
+    [Selector("batchUpdateRequestWithEntityName:")]
+    public static Self BatchUpdateRequestWithEntityName(NSString entityName);
+    [Selector("initWithEntityName:")]
+    public Self InitWithEntityName(NSString entityName);
+    [Selector("initWithEntity:")]
+    public Self InitWithEntity(NSEntityDescription entity);
 }
 
 #endif

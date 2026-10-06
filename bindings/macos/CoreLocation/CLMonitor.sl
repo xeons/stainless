@@ -35,13 +35,20 @@ public objc closure void CLMonitorRequestMonitorWithConfigurationCompletionCompl
 
 public extern objc class CLMonitor : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("monitoredIdentifiers")] public NSArray MonitoredIdentifiers { get; }
-    [Selector("requestMonitorWithConfiguration:completion:")] public static void RequestMonitorWithConfigurationCompletion(CLMonitorConfiguration config, CLMonitorRequestMonitorWithConfigurationCompletionCompletionHandlerBlock completionHandler);
-    [Selector("addConditionForMonitoring:identifier:")] public void AddConditionForMonitoringIdentifier(CLCondition condition, NSString identifier);
-    [Selector("addConditionForMonitoring:identifier:assumedState:")] public void AddConditionForMonitoringIdentifierAssumedState(CLCondition condition, NSString identifier, CLMonitoringState state);
-    [Selector("removeConditionFromMonitoringWithIdentifier:")] public void RemoveConditionFromMonitoringWithIdentifier(NSString identifier);
-    [Selector("monitoringRecordForIdentifier:")] public CLMonitoringRecord? MonitoringRecordForIdentifier(NSString identifier);
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("monitoredIdentifiers")]
+    public NSArray MonitoredIdentifiers { get; }
+    [Selector("requestMonitorWithConfiguration:completion:")]
+    public static void RequestMonitorWithConfigurationCompletion(CLMonitorConfiguration config, CLMonitorRequestMonitorWithConfigurationCompletionCompletionHandlerBlock completionHandler);
+    [Selector("addConditionForMonitoring:identifier:")]
+    public void AddConditionForMonitoringIdentifier(CLCondition condition, NSString identifier);
+    [Selector("addConditionForMonitoring:identifier:assumedState:")]
+    public void AddConditionForMonitoringIdentifierAssumedState(CLCondition condition, NSString identifier, CLMonitoringState state);
+    [Selector("removeConditionFromMonitoringWithIdentifier:")]
+    public void RemoveConditionFromMonitoringWithIdentifier(NSString identifier);
+    [Selector("monitoringRecordForIdentifier:")]
+    public CLMonitoringRecord? MonitoringRecordForIdentifier(NSString identifier);
 }
 
 #endif

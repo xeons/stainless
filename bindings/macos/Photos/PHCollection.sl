@@ -34,44 +34,73 @@ import Standard.ObjC;
 
 public extern objc class PHCollection : PHObject
 {
-    [Selector("canContainAssets")] public bool CanContainAssets { get; }
-    [Selector("canContainCollections")] public bool CanContainCollections { get; }
-    [Selector("localizedTitle")] public NSString? LocalizedTitle { get; }
-    [Selector("canPerformEditOperation:")] public bool CanPerformEditOperation(PHCollectionEditOperation anOperation);
-    [Selector("fetchCollectionsInCollectionList:options:")] public static PHFetchResult FetchCollectionsInCollectionListOptions(PHCollectionList collectionList, PHFetchOptions? options);
-    [Selector("fetchTopLevelUserCollectionsWithOptions:")] public static PHFetchResult FetchTopLevelUserCollectionsWithOptions(PHFetchOptions? options);
+    [Selector("canContainAssets")]
+    public bool CanContainAssets { get; }
+    [Selector("canContainCollections")]
+    public bool CanContainCollections { get; }
+    [Selector("localizedTitle")]
+    public NSString? LocalizedTitle { get; }
+    [Selector("canPerformEditOperation:")]
+    public bool CanPerformEditOperation(PHCollectionEditOperation anOperation);
+    [Selector("fetchCollectionsInCollectionList:options:")]
+    public static PHFetchResult FetchCollectionsInCollectionListOptions(PHCollectionList collectionList, PHFetchOptions? options);
+    [Selector("fetchTopLevelUserCollectionsWithOptions:")]
+    public static PHFetchResult FetchTopLevelUserCollectionsWithOptions(PHFetchOptions? options);
 }
 
 public extern objc class PHAssetCollection : PHCollection
 {
-    [Selector("assetCollectionType")] public PHAssetCollectionType AssetCollectionType { get; }
-    [Selector("assetCollectionSubtype")] public PHAssetCollectionSubtype AssetCollectionSubtype { get; }
-    [Selector("estimatedAssetCount")] public NSUInteger EstimatedAssetCount { get; }
-    [Selector("startDate")] public NSDate? StartDate { get; }
-    [Selector("endDate")] public NSDate? EndDate { get; }
-    [Selector("approximateLocation")] public CLLocation? ApproximateLocation { get; }
-    [Selector("localizedLocationNames")] public NSArray LocalizedLocationNames { get; }
-    [Selector("fetchAssetCollectionsWithLocalIdentifiers:options:")] public static PHFetchResult FetchAssetCollectionsWithLocalIdentifiersOptions(NSArray identifiers, PHFetchOptions? options);
-    [Selector("fetchAssetCollectionsWithType:subtype:options:")] public static PHFetchResult FetchAssetCollectionsWithTypeSubtypeOptions(PHAssetCollectionType type, PHAssetCollectionSubtype subtype, PHFetchOptions? options);
-    [Selector("fetchAssetCollectionsContainingAsset:withType:options:")] public static PHFetchResult FetchAssetCollectionsContainingAssetWithTypeOptions(PHAsset asset, PHAssetCollectionType type, PHFetchOptions? options);
+    [Selector("assetCollectionType")]
+    public PHAssetCollectionType AssetCollectionType { get; }
+    [Selector("assetCollectionSubtype")]
+    public PHAssetCollectionSubtype AssetCollectionSubtype { get; }
+    [Selector("estimatedAssetCount")]
+    public NSUInteger EstimatedAssetCount { get; }
+    [Selector("startDate")]
+    public NSDate? StartDate { get; }
+    [Selector("endDate")]
+    public NSDate? EndDate { get; }
+    [Selector("approximateLocation")]
+    public CLLocation? ApproximateLocation { get; }
+    [Selector("localizedLocationNames")]
+    public NSArray LocalizedLocationNames { get; }
+    [Selector("fetchAssetCollectionsWithLocalIdentifiers:options:")]
+    public static PHFetchResult FetchAssetCollectionsWithLocalIdentifiersOptions(NSArray identifiers, PHFetchOptions? options);
+    [Selector("fetchAssetCollectionsWithType:subtype:options:")]
+    public static PHFetchResult FetchAssetCollectionsWithTypeSubtypeOptions(PHAssetCollectionType type, PHAssetCollectionSubtype subtype, PHFetchOptions? options);
+    [Selector("fetchAssetCollectionsContainingAsset:withType:options:")]
+    public static PHFetchResult FetchAssetCollectionsContainingAssetWithTypeOptions(PHAsset asset, PHAssetCollectionType type, PHFetchOptions? options);
     /// Deprecated in macOS 13.
-    [Selector("fetchAssetCollectionsWithALAssetGroupURLs:options:")] public static PHFetchResult FetchAssetCollectionsWithALAssetGroupURLsOptions(NSArray assetGroupURLs, PHFetchOptions? options);
-    [Selector("transientAssetCollectionWithAssets:title:")] public static PHAssetCollection TransientAssetCollectionWithAssetsTitle(NSArray assets, NSString? title);
-    [Selector("transientAssetCollectionWithAssetFetchResult:title:")] public static PHAssetCollection TransientAssetCollectionWithAssetFetchResultTitle(PHFetchResult fetchResult, NSString? title);
+    [Selector("fetchAssetCollectionsWithALAssetGroupURLs:options:")]
+    public static PHFetchResult FetchAssetCollectionsWithALAssetGroupURLsOptions(NSArray assetGroupURLs, PHFetchOptions? options);
+    [Selector("transientAssetCollectionWithAssets:title:")]
+    public static PHAssetCollection TransientAssetCollectionWithAssetsTitle(NSArray assets, NSString? title);
+    [Selector("transientAssetCollectionWithAssetFetchResult:title:")]
+    public static PHAssetCollection TransientAssetCollectionWithAssetFetchResultTitle(PHFetchResult fetchResult, NSString? title);
 }
 
 public extern objc class PHCollectionList : PHCollection
 {
-    [Selector("collectionListType")] public PHCollectionListType CollectionListType { get; }
-    [Selector("collectionListSubtype")] public PHCollectionListSubtype CollectionListSubtype { get; }
-    [Selector("startDate")] public NSDate? StartDate { get; }
-    [Selector("endDate")] public NSDate? EndDate { get; }
-    [Selector("localizedLocationNames")] public NSArray LocalizedLocationNames { get; }
-    [Selector("fetchCollectionListsContainingCollection:options:")] public static PHFetchResult FetchCollectionListsContainingCollectionOptions(PHCollection collection, PHFetchOptions? options);
-    [Selector("fetchCollectionListsWithLocalIdentifiers:options:")] public static PHFetchResult FetchCollectionListsWithLocalIdentifiersOptions(NSArray identifiers, PHFetchOptions? options);
-    [Selector("fetchCollectionListsWithType:subtype:options:")] public static PHFetchResult FetchCollectionListsWithTypeSubtypeOptions(PHCollectionListType collectionListType, PHCollectionListSubtype subtype, PHFetchOptions? options);
-    [Selector("transientCollectionListWithCollections:title:")] public static PHCollectionList TransientCollectionListWithCollectionsTitle(NSArray collections, NSString? title);
-    [Selector("transientCollectionListWithCollectionsFetchResult:title:")] public static PHCollectionList TransientCollectionListWithCollectionsFetchResultTitle(PHFetchResult fetchResult, NSString? title);
+    [Selector("collectionListType")]
+    public PHCollectionListType CollectionListType { get; }
+    [Selector("collectionListSubtype")]
+    public PHCollectionListSubtype CollectionListSubtype { get; }
+    [Selector("startDate")]
+    public NSDate? StartDate { get; }
+    [Selector("endDate")]
+    public NSDate? EndDate { get; }
+    [Selector("localizedLocationNames")]
+    public NSArray LocalizedLocationNames { get; }
+    [Selector("fetchCollectionListsContainingCollection:options:")]
+    public static PHFetchResult FetchCollectionListsContainingCollectionOptions(PHCollection collection, PHFetchOptions? options);
+    [Selector("fetchCollectionListsWithLocalIdentifiers:options:")]
+    public static PHFetchResult FetchCollectionListsWithLocalIdentifiersOptions(NSArray identifiers, PHFetchOptions? options);
+    [Selector("fetchCollectionListsWithType:subtype:options:")]
+    public static PHFetchResult FetchCollectionListsWithTypeSubtypeOptions(PHCollectionListType collectionListType, PHCollectionListSubtype subtype, PHFetchOptions? options);
+    [Selector("transientCollectionListWithCollections:title:")]
+    public static PHCollectionList TransientCollectionListWithCollectionsTitle(NSArray collections, NSString? title);
+    [Selector("transientCollectionListWithCollectionsFetchResult:title:")]
+    public static PHCollectionList TransientCollectionListWithCollectionsFetchResultTitle(PHFetchResult fetchResult, NSString? title);
 }
 
 #endif

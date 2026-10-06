@@ -34,16 +34,21 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTL4CommandAllocatorDescriptor : NSObject, NSCopying
 {
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
 }
 
 /// macOS 26.0 and later.
 public objc interface MTL4CommandAllocator : NSObjectProtocol
 {
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("label")] NSString? Label { get; }
-    [Selector("allocatedSize")] ulong AllocatedSize();
-    [Selector("reset")] void Reset();
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("label")]
+    NSString? Label { get; }
+    [Selector("allocatedSize")]
+    ulong AllocatedSize();
+    [Selector("reset")]
+    void Reset();
 }
 
 #endif

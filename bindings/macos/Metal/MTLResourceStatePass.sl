@@ -33,21 +33,28 @@ import Standard.ObjC;
 
 public extern objc class MTLResourceStatePassSampleBufferAttachmentDescriptor : NSObject, NSCopying
 {
-    [Selector("sampleBuffer", "setSampleBuffer:")] public MTLCounterSampleBuffer? SampleBuffer { get; set; }
-    [Selector("startOfEncoderSampleIndex", "setStartOfEncoderSampleIndex:")] public NSUInteger StartOfEncoderSampleIndex { get; set; }
-    [Selector("endOfEncoderSampleIndex", "setEndOfEncoderSampleIndex:")] public NSUInteger EndOfEncoderSampleIndex { get; set; }
+    [Selector("sampleBuffer", "setSampleBuffer:")]
+    public MTLCounterSampleBuffer? SampleBuffer { get; set; }
+    [Selector("startOfEncoderSampleIndex", "setStartOfEncoderSampleIndex:")]
+    public NSUInteger StartOfEncoderSampleIndex { get; set; }
+    [Selector("endOfEncoderSampleIndex", "setEndOfEncoderSampleIndex:")]
+    public NSUInteger EndOfEncoderSampleIndex { get; set; }
 }
 
 public extern objc class MTLResourceStatePassSampleBufferAttachmentDescriptorArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public MTLResourceStatePassSampleBufferAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTLResourceStatePassSampleBufferAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
+    [Selector("objectAtIndexedSubscript:")]
+    public MTLResourceStatePassSampleBufferAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTLResourceStatePassSampleBufferAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
 }
 
 public extern objc class MTLResourceStatePassDescriptor : NSObject, NSCopying
 {
-    [Selector("sampleBufferAttachments")] public MTLResourceStatePassSampleBufferAttachmentDescriptorArray SampleBufferAttachments { get; }
-    [Selector("resourceStatePassDescriptor")] public static MTLResourceStatePassDescriptor ResourceStatePassDescriptor();
+    [Selector("sampleBufferAttachments")]
+    public MTLResourceStatePassSampleBufferAttachmentDescriptorArray SampleBufferAttachments { get; }
+    [Selector("resourceStatePassDescriptor")]
+    public static MTLResourceStatePassDescriptor ResourceStatePassDescriptor();
 }
 
 #endif

@@ -34,19 +34,32 @@ import Standard.ObjC;
 
 public extern objc class MKOverlayRenderer : NSObject
 {
-    [Selector("overlay")] public MKOverlay Overlay { get; }
-    [Selector("alpha", "setAlpha:")] public CGFloat Alpha { get; set; }
-    [Selector("contentScaleFactor")] public CGFloat ContentScaleFactor { get; }
-    [Selector("initWithOverlay:")] public Self InitWithOverlay(MKOverlay overlay);
-    [Selector("pointForMapPoint:")] public CGPoint PointForMapPoint(MKMapPoint mapPoint);
-    [Selector("mapPointForPoint:")] public MKMapPoint MapPointForPoint(CGPoint point);
-    [Selector("rectForMapRect:")] public CGRect RectForMapRect(MKMapRect mapRect);
-    [Selector("mapRectForRect:")] public MKMapRect MapRectForRect(CGRect rect);
-    [Selector("canDrawMapRect:zoomScale:")] public bool CanDrawMapRectZoomScale(MKMapRect mapRect, MKZoomScale zoomScale);
-    [Selector("drawMapRect:zoomScale:inContext:")] public void DrawMapRectZoomScaleInContext(MKMapRect mapRect, MKZoomScale zoomScale, CGContextRef context);
-    [Selector("setNeedsDisplay")] public void SetNeedsDisplay();
-    [Selector("setNeedsDisplayInMapRect:")] public void SetNeedsDisplayInMapRect(MKMapRect mapRect);
-    [Selector("setNeedsDisplayInMapRect:zoomScale:")] public void SetNeedsDisplayInMapRectZoomScale(MKMapRect mapRect, MKZoomScale zoomScale);
+    [Selector("overlay")]
+    public MKOverlay Overlay { get; }
+    [Selector("alpha", "setAlpha:")]
+    public CGFloat Alpha { get; set; }
+    [Selector("contentScaleFactor")]
+    public CGFloat ContentScaleFactor { get; }
+    [Selector("initWithOverlay:")]
+    public Self InitWithOverlay(MKOverlay overlay);
+    [Selector("pointForMapPoint:")]
+    public CGPoint PointForMapPoint(MKMapPoint mapPoint);
+    [Selector("mapPointForPoint:")]
+    public MKMapPoint MapPointForPoint(CGPoint point);
+    [Selector("rectForMapRect:")]
+    public CGRect RectForMapRect(MKMapRect mapRect);
+    [Selector("mapRectForRect:")]
+    public MKMapRect MapRectForRect(CGRect rect);
+    [Selector("canDrawMapRect:zoomScale:")]
+    public bool CanDrawMapRectZoomScale(MKMapRect mapRect, MKZoomScale zoomScale);
+    [Selector("drawMapRect:zoomScale:inContext:")]
+    public void DrawMapRectZoomScaleInContext(MKMapRect mapRect, MKZoomScale zoomScale, CGContextRef context);
+    [Selector("setNeedsDisplay")]
+    public void SetNeedsDisplay();
+    [Selector("setNeedsDisplayInMapRect:")]
+    public void SetNeedsDisplayInMapRect(MKMapRect mapRect);
+    [Selector("setNeedsDisplayInMapRect:zoomScale:")]
+    public void SetNeedsDisplayInMapRectZoomScale(MKMapRect mapRect, MKZoomScale zoomScale);
 }
 
 public extern "C" CGFloat MKRoadWidthAtZoomScale(MKZoomScale zoomScale);

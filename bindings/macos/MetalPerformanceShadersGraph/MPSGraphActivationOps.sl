@@ -34,15 +34,24 @@ import Standard.ObjC;
 /// MPSGraphActivationOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("reLUWithTensor:name:")] public MPSGraphTensor ReLUWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("reLUGradientWithIncomingGradient:sourceTensor:name:")] public MPSGraphTensor ReLUGradientWithIncomingGradientSourceTensorName(MPSGraphTensor gradient, MPSGraphTensor source, NSString? name);
-    [Selector("sigmoidWithTensor:name:")] public MPSGraphTensor SigmoidWithTensorName(MPSGraphTensor tensor, NSString? name);
-    [Selector("sigmoidGradientWithIncomingGradient:sourceTensor:name:")] public MPSGraphTensor SigmoidGradientWithIncomingGradientSourceTensorName(MPSGraphTensor gradient, MPSGraphTensor source, NSString? name);
-    [Selector("softMaxWithTensor:axis:name:")] public MPSGraphTensor SoftMaxWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("softMaxGradientWithIncomingGradient:sourceTensor:axis:name:")] public MPSGraphTensor SoftMaxGradientWithIncomingGradientSourceTensorAxisName(MPSGraphTensor gradient, MPSGraphTensor source, NSInteger axis, NSString? name);
-    [Selector("leakyReLUWithTensor:alpha:name:")] public MPSGraphTensor LeakyReLUWithTensorAlphaName(MPSGraphTensor tensor, double alpha, NSString? name);
-    [Selector("leakyReLUWithTensor:alphaTensor:name:")] public MPSGraphTensor LeakyReLUWithTensorAlphaTensorName(MPSGraphTensor tensor, MPSGraphTensor alphaTensor, NSString? name);
-    [Selector("leakyReLUGradientWithIncomingGradient:sourceTensor:alphaTensor:name:")] public MPSGraphTensor LeakyReLUGradientWithIncomingGradientSourceTensorAlphaTensorName(MPSGraphTensor gradient, MPSGraphTensor source, MPSGraphTensor alphaTensor, NSString? name);
+    [Selector("reLUWithTensor:name:")]
+    public MPSGraphTensor ReLUWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("reLUGradientWithIncomingGradient:sourceTensor:name:")]
+    public MPSGraphTensor ReLUGradientWithIncomingGradientSourceTensorName(MPSGraphTensor gradient, MPSGraphTensor source, NSString? name);
+    [Selector("sigmoidWithTensor:name:")]
+    public MPSGraphTensor SigmoidWithTensorName(MPSGraphTensor tensor, NSString? name);
+    [Selector("sigmoidGradientWithIncomingGradient:sourceTensor:name:")]
+    public MPSGraphTensor SigmoidGradientWithIncomingGradientSourceTensorName(MPSGraphTensor gradient, MPSGraphTensor source, NSString? name);
+    [Selector("softMaxWithTensor:axis:name:")]
+    public MPSGraphTensor SoftMaxWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("softMaxGradientWithIncomingGradient:sourceTensor:axis:name:")]
+    public MPSGraphTensor SoftMaxGradientWithIncomingGradientSourceTensorAxisName(MPSGraphTensor gradient, MPSGraphTensor source, NSInteger axis, NSString? name);
+    [Selector("leakyReLUWithTensor:alpha:name:")]
+    public MPSGraphTensor LeakyReLUWithTensorAlphaName(MPSGraphTensor tensor, double alpha, NSString? name);
+    [Selector("leakyReLUWithTensor:alphaTensor:name:")]
+    public MPSGraphTensor LeakyReLUWithTensorAlphaTensorName(MPSGraphTensor tensor, MPSGraphTensor alphaTensor, NSString? name);
+    [Selector("leakyReLUGradientWithIncomingGradient:sourceTensor:alphaTensor:name:")]
+    public MPSGraphTensor LeakyReLUGradientWithIncomingGradientSourceTensorAlphaTensorName(MPSGraphTensor gradient, MPSGraphTensor source, MPSGraphTensor alphaTensor, NSString? name);
 }
 
 #endif

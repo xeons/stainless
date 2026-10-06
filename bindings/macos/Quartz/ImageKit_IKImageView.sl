@@ -59,44 +59,82 @@ public extern "C" NSString? IKOverlayTypeImage;
 
 public extern objc class IKImageView : NSView
 {
-    [Selector("delegate", "setDelegate:")] public AnyObject? Delegate { get; set; }
-    [Selector("zoomFactor", "setZoomFactor:")] public CGFloat ZoomFactor { get; set; }
-    [Selector("rotationAngle", "setRotationAngle:")] public CGFloat RotationAngle { get; set; }
-    [Selector("currentToolMode", "setCurrentToolMode:")] public NSString? CurrentToolMode { get; set; }
-    [Selector("autoresizes", "setAutoresizes:")] public bool Autoresizes { get; set; }
-    [Selector("hasHorizontalScroller", "setHasHorizontalScroller:")] public bool HasHorizontalScroller { get; set; }
-    [Selector("hasVerticalScroller", "setHasVerticalScroller:")] public bool HasVerticalScroller { get; set; }
-    [Selector("autohidesScrollers", "setAutohidesScrollers:")] public bool AutohidesScrollers { get; set; }
-    [Selector("supportsDragAndDrop", "setSupportsDragAndDrop:")] public bool SupportsDragAndDrop { get; set; }
-    [Selector("editable", "setEditable:")] public bool Editable { get; set; }
-    [Selector("doubleClickOpensImageEditPanel", "setDoubleClickOpensImageEditPanel:")] public bool DoubleClickOpensImageEditPanel { get; set; }
-    [Selector("imageCorrection", "setImageCorrection:")] public CIFilter? ImageCorrection { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("setImage:imageProperties:")] public void SetImageImageProperties(CGImageRef? image, NSDictionary? metaData);
-    [Selector("setImageWithURL:")] public void SetImageWithURL(NSURL? url);
-    [Selector("image")] public CGImageRef? Image();
-    [Selector("imageSize")] public NSSize ImageSize();
-    [Selector("imageProperties")] public NSDictionary? ImageProperties();
-    [Selector("setRotationAngle:centerPoint:")] public void SetRotationAngleCenterPoint(CGFloat rotationAngle, NSPoint centerPoint);
-    [Selector("rotateImageLeft:")] public void RotateImageLeft(AnyObject? sender);
-    [Selector("rotateImageRight:")] public void RotateImageRight(AnyObject? sender);
-    [Selector("setImageZoomFactor:centerPoint:")] public void SetImageZoomFactorCenterPoint(CGFloat zoomFactor, NSPoint centerPoint);
-    [Selector("zoomImageToRect:")] public void ZoomImageToRect(NSRect rect);
-    [Selector("zoomImageToFit:")] public void ZoomImageToFit(AnyObject? sender);
-    [Selector("zoomImageToActualSize:")] public void ZoomImageToActualSize(AnyObject? sender);
-    [Selector("zoomIn:")] public void ZoomIn(AnyObject? sender);
-    [Selector("zoomOut:")] public void ZoomOut(AnyObject? sender);
-    [Selector("flipImageHorizontal:")] public void FlipImageHorizontal(AnyObject? sender);
-    [Selector("flipImageVertical:")] public void FlipImageVertical(AnyObject? sender);
-    [Selector("crop:")] public void Crop(AnyObject? sender);
-    [Selector("setOverlay:forType:")] public void SetOverlayForType(CALayer? layer, NSString? layerType);
-    [Selector("overlayForType:")] public CALayer? OverlayForType(NSString? layerType);
-    [Selector("scrollToPoint:")] public void ScrollToPoint(NSPoint point);
-    [Selector("scrollToRect:")] public void ScrollToRect(NSRect rect);
-    [Selector("convertViewPointToImagePoint:")] public NSPoint ConvertViewPointToImagePoint(NSPoint viewPoint);
-    [Selector("convertViewRectToImageRect:")] public NSRect ConvertViewRectToImageRect(NSRect viewRect);
-    [Selector("convertImagePointToViewPoint:")] public NSPoint ConvertImagePointToViewPoint(NSPoint imagePoint);
-    [Selector("convertImageRectToViewRect:")] public NSRect ConvertImageRectToViewRect(NSRect imageRect);
+    [Selector("delegate", "setDelegate:")]
+    public AnyObject? Delegate { get; set; }
+    [Selector("zoomFactor", "setZoomFactor:")]
+    public CGFloat ZoomFactor { get; set; }
+    [Selector("rotationAngle", "setRotationAngle:")]
+    public CGFloat RotationAngle { get; set; }
+    [Selector("currentToolMode", "setCurrentToolMode:")]
+    public NSString? CurrentToolMode { get; set; }
+    [Selector("autoresizes", "setAutoresizes:")]
+    public bool Autoresizes { get; set; }
+    [Selector("hasHorizontalScroller", "setHasHorizontalScroller:")]
+    public bool HasHorizontalScroller { get; set; }
+    [Selector("hasVerticalScroller", "setHasVerticalScroller:")]
+    public bool HasVerticalScroller { get; set; }
+    [Selector("autohidesScrollers", "setAutohidesScrollers:")]
+    public bool AutohidesScrollers { get; set; }
+    [Selector("supportsDragAndDrop", "setSupportsDragAndDrop:")]
+    public bool SupportsDragAndDrop { get; set; }
+    [Selector("editable", "setEditable:")]
+    public bool Editable { get; set; }
+    [Selector("doubleClickOpensImageEditPanel", "setDoubleClickOpensImageEditPanel:")]
+    public bool DoubleClickOpensImageEditPanel { get; set; }
+    [Selector("imageCorrection", "setImageCorrection:")]
+    public CIFilter? ImageCorrection { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("setImage:imageProperties:")]
+    public void SetImageImageProperties(CGImageRef? image, NSDictionary? metaData);
+    [Selector("setImageWithURL:")]
+    public void SetImageWithURL(NSURL? url);
+    [Selector("image")]
+    public CGImageRef? Image();
+    [Selector("imageSize")]
+    public NSSize ImageSize();
+    [Selector("imageProperties")]
+    public NSDictionary? ImageProperties();
+    [Selector("setRotationAngle:centerPoint:")]
+    public void SetRotationAngleCenterPoint(CGFloat rotationAngle, NSPoint centerPoint);
+    [Selector("rotateImageLeft:")]
+    public void RotateImageLeft(AnyObject? sender);
+    [Selector("rotateImageRight:")]
+    public void RotateImageRight(AnyObject? sender);
+    [Selector("setImageZoomFactor:centerPoint:")]
+    public void SetImageZoomFactorCenterPoint(CGFloat zoomFactor, NSPoint centerPoint);
+    [Selector("zoomImageToRect:")]
+    public void ZoomImageToRect(NSRect rect);
+    [Selector("zoomImageToFit:")]
+    public void ZoomImageToFit(AnyObject? sender);
+    [Selector("zoomImageToActualSize:")]
+    public void ZoomImageToActualSize(AnyObject? sender);
+    [Selector("zoomIn:")]
+    public void ZoomIn(AnyObject? sender);
+    [Selector("zoomOut:")]
+    public void ZoomOut(AnyObject? sender);
+    [Selector("flipImageHorizontal:")]
+    public void FlipImageHorizontal(AnyObject? sender);
+    [Selector("flipImageVertical:")]
+    public void FlipImageVertical(AnyObject? sender);
+    [Selector("crop:")]
+    public void Crop(AnyObject? sender);
+    [Selector("setOverlay:forType:")]
+    public void SetOverlayForType(CALayer? layer, NSString? layerType);
+    [Selector("overlayForType:")]
+    public CALayer? OverlayForType(NSString? layerType);
+    [Selector("scrollToPoint:")]
+    public void ScrollToPoint(NSPoint point);
+    [Selector("scrollToRect:")]
+    public void ScrollToRect(NSRect rect);
+    [Selector("convertViewPointToImagePoint:")]
+    public NSPoint ConvertViewPointToImagePoint(NSPoint viewPoint);
+    [Selector("convertViewRectToImageRect:")]
+    public NSRect ConvertViewRectToImageRect(NSRect viewRect);
+    [Selector("convertImagePointToViewPoint:")]
+    public NSPoint ConvertImagePointToViewPoint(NSPoint imagePoint);
+    [Selector("convertImageRectToViewRect:")]
+    public NSRect ConvertImageRectToViewRect(NSRect imageRect);
 }
 
 #endif

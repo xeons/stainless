@@ -77,79 +77,147 @@ public extern "C" NSString? WebViewProgressFinishedNotification;
 /// Deprecated in macOS 10.14.
 public extern objc class WebView : NSView
 {
-    [Selector("shouldCloseWithWindow", "setShouldCloseWithWindow:")] public bool ShouldCloseWithWindow { get; set; }
-    [Selector("UIDelegate", "setUIDelegate:")] public WebUIDelegate? UIDelegate { get; set; }
-    [Selector("resourceLoadDelegate", "setResourceLoadDelegate:")] public WebResourceLoadDelegate? ResourceLoadDelegate { get; set; }
-    [Selector("downloadDelegate", "setDownloadDelegate:")] public WebDownloadDelegate? DownloadDelegate { get; set; }
-    [Selector("frameLoadDelegate", "setFrameLoadDelegate:")] public WebFrameLoadDelegate? FrameLoadDelegate { get; set; }
-    [Selector("policyDelegate", "setPolicyDelegate:")] public WebPolicyDelegate? PolicyDelegate { get; set; }
-    [Selector("mainFrame")] public WebFrame? MainFrame { get; }
-    [Selector("selectedFrame")] public WebFrame? SelectedFrame { get; }
-    [Selector("backForwardList")] public WebBackForwardList? BackForwardList { get; }
-    [Selector("textSizeMultiplier", "setTextSizeMultiplier:")] public float TextSizeMultiplier { get; set; }
-    [Selector("applicationNameForUserAgent", "setApplicationNameForUserAgent:")] public NSString? ApplicationNameForUserAgent { get; set; }
-    [Selector("customUserAgent", "setCustomUserAgent:")] public NSString? CustomUserAgent { get; set; }
-    [Selector("supportsTextEncoding")] public bool SupportsTextEncoding { get; }
-    [Selector("customTextEncodingName", "setCustomTextEncodingName:")] public NSString? CustomTextEncodingName { get; set; }
-    [Selector("mediaStyle", "setMediaStyle:")] public NSString? MediaStyle { get; set; }
-    [Selector("windowScriptObject")] public WebScriptObject? WindowScriptObject { get; }
-    [Selector("preferences", "setPreferences:")] public WebPreferences? Preferences { get; set; }
-    [Selector("preferencesIdentifier", "setPreferencesIdentifier:")] public NSString? PreferencesIdentifier { get; set; }
-    [Selector("hostWindow", "setHostWindow:")] public NSWindow? HostWindow { get; set; }
-    [Selector("groupName", "setGroupName:")] public NSString? GroupName { get; set; }
-    [Selector("estimatedProgress")] public double EstimatedProgress { get; }
-    [Selector("isLoading")] public bool Loading { get; }
-    [Selector("pasteboardTypesForSelection")] public NSArray? PasteboardTypesForSelection { get; }
-    [Selector("drawsBackground", "setDrawsBackground:")] public bool DrawsBackground { get; set; }
-    [Selector("shouldUpdateWhileOffscreen", "setShouldUpdateWhileOffscreen:")] public bool ShouldUpdateWhileOffscreen { get; set; }
-    [Selector("mainFrameURL", "setMainFrameURL:")] public NSString? MainFrameURL { get; set; }
-    [Selector("mainFrameDocument")] public DOMDocument? MainFrameDocument { get; }
-    [Selector("mainFrameTitle")] public NSString? MainFrameTitle { get; }
-    [Selector("mainFrameIcon")] public NSImage? MainFrameIcon { get; }
-    [Selector("canShowMIMEType:")] public static bool CanShowMIMEType(NSString? MIMEType);
-    [Selector("canShowMIMETypeAsHTML:")] public static bool CanShowMIMETypeAsHTML(NSString? MIMEType);
-    [Selector("MIMETypesShownAsHTML")] public static NSArray? MIMETypesShownAsHTML();
-    [Selector("setMIMETypesShownAsHTML:")] public static void SetMIMETypesShownAsHTML(NSArray? MIMETypes);
-    [Selector("URLFromPasteboard:")] public static NSURL? URLFromPasteboard(NSPasteboard? pasteboard);
-    [Selector("URLTitleFromPasteboard:")] public static NSString? URLTitleFromPasteboard(NSPasteboard? pasteboard);
-    [Selector("registerURLSchemeAsLocal:")] public static void RegisterURLSchemeAsLocal(NSString? scheme);
-    [Selector("initWithFrame:frameName:groupName:")] public Self? InitWithFrameFrameNameGroupName(NSRect frame, NSString? frameName, NSString? groupName);
-    [Selector("close")] public void Close();
-    [Selector("setMaintainsBackForwardList:")] public void SetMaintainsBackForwardList(bool flag);
-    [Selector("goBack")] public bool GoBack();
-    [Selector("goForward")] public bool GoForward();
-    [Selector("goToBackForwardItem:")] public bool GoToBackForwardItem(WebHistoryItem? item);
-    [Selector("userAgentForURL:")] public NSString? UserAgentForURL(NSURL? URL);
-    [Selector("stringByEvaluatingJavaScriptFromString:")] public NSString? StringByEvaluatingJavaScriptFromString(NSString? script);
-    [Selector("searchFor:direction:caseSensitive:wrap:")] public bool SearchForDirectionCaseSensitiveWrap(NSString? string, bool forward, bool caseFlag, bool wrapFlag);
-    [Selector("registerViewClass:representationClass:forMIMEType:")] public static void RegisterViewClassRepresentationClassForMIMEType(Class viewClass, Class representationClass, NSString? MIMEType);
-    [Selector("elementAtPoint:")] public NSDictionary? ElementAtPoint(NSPoint point);
-    [Selector("writeSelectionWithPasteboardTypes:toPasteboard:")] public void WriteSelectionWithPasteboardTypesToPasteboard(NSArray? types, NSPasteboard? pasteboard);
-    [Selector("pasteboardTypesForElement:")] public NSArray? PasteboardTypesForElement(NSDictionary? element);
-    [Selector("writeElement:withPasteboardTypes:toPasteboard:")] public void WriteElementWithPasteboardTypesToPasteboard(NSDictionary? element, NSArray? types, NSPasteboard? pasteboard);
-    [Selector("moveDragCaretToPoint:")] public void MoveDragCaretToPoint(NSPoint point);
-    [Selector("removeDragCaret")] public void RemoveDragCaret();
+    [Selector("shouldCloseWithWindow", "setShouldCloseWithWindow:")]
+    public bool ShouldCloseWithWindow { get; set; }
+    [Selector("UIDelegate", "setUIDelegate:")]
+    public WebUIDelegate? UIDelegate { get; set; }
+    [Selector("resourceLoadDelegate", "setResourceLoadDelegate:")]
+    public WebResourceLoadDelegate? ResourceLoadDelegate { get; set; }
+    [Selector("downloadDelegate", "setDownloadDelegate:")]
+    public WebDownloadDelegate? DownloadDelegate { get; set; }
+    [Selector("frameLoadDelegate", "setFrameLoadDelegate:")]
+    public WebFrameLoadDelegate? FrameLoadDelegate { get; set; }
+    [Selector("policyDelegate", "setPolicyDelegate:")]
+    public WebPolicyDelegate? PolicyDelegate { get; set; }
+    [Selector("mainFrame")]
+    public WebFrame? MainFrame { get; }
+    [Selector("selectedFrame")]
+    public WebFrame? SelectedFrame { get; }
+    [Selector("backForwardList")]
+    public WebBackForwardList? BackForwardList { get; }
+    [Selector("textSizeMultiplier", "setTextSizeMultiplier:")]
+    public float TextSizeMultiplier { get; set; }
+    [Selector("applicationNameForUserAgent", "setApplicationNameForUserAgent:")]
+    public NSString? ApplicationNameForUserAgent { get; set; }
+    [Selector("customUserAgent", "setCustomUserAgent:")]
+    public NSString? CustomUserAgent { get; set; }
+    [Selector("supportsTextEncoding")]
+    public bool SupportsTextEncoding { get; }
+    [Selector("customTextEncodingName", "setCustomTextEncodingName:")]
+    public NSString? CustomTextEncodingName { get; set; }
+    [Selector("mediaStyle", "setMediaStyle:")]
+    public NSString? MediaStyle { get; set; }
+    [Selector("windowScriptObject")]
+    public WebScriptObject? WindowScriptObject { get; }
+    [Selector("preferences", "setPreferences:")]
+    public WebPreferences? Preferences { get; set; }
+    [Selector("preferencesIdentifier", "setPreferencesIdentifier:")]
+    public NSString? PreferencesIdentifier { get; set; }
+    [Selector("hostWindow", "setHostWindow:")]
+    public NSWindow? HostWindow { get; set; }
+    [Selector("groupName", "setGroupName:")]
+    public NSString? GroupName { get; set; }
+    [Selector("estimatedProgress")]
+    public double EstimatedProgress { get; }
+    [Selector("isLoading")]
+    public bool Loading { get; }
+    [Selector("pasteboardTypesForSelection")]
+    public NSArray? PasteboardTypesForSelection { get; }
+    [Selector("drawsBackground", "setDrawsBackground:")]
+    public bool DrawsBackground { get; set; }
+    [Selector("shouldUpdateWhileOffscreen", "setShouldUpdateWhileOffscreen:")]
+    public bool ShouldUpdateWhileOffscreen { get; set; }
+    [Selector("mainFrameURL", "setMainFrameURL:")]
+    public NSString? MainFrameURL { get; set; }
+    [Selector("mainFrameDocument")]
+    public DOMDocument? MainFrameDocument { get; }
+    [Selector("mainFrameTitle")]
+    public NSString? MainFrameTitle { get; }
+    [Selector("mainFrameIcon")]
+    public NSImage? MainFrameIcon { get; }
+    [Selector("canShowMIMEType:")]
+    public static bool CanShowMIMEType(NSString? MIMEType);
+    [Selector("canShowMIMETypeAsHTML:")]
+    public static bool CanShowMIMETypeAsHTML(NSString? MIMEType);
+    [Selector("MIMETypesShownAsHTML")]
+    public static NSArray? MIMETypesShownAsHTML();
+    [Selector("setMIMETypesShownAsHTML:")]
+    public static void SetMIMETypesShownAsHTML(NSArray? MIMETypes);
+    [Selector("URLFromPasteboard:")]
+    public static NSURL? URLFromPasteboard(NSPasteboard? pasteboard);
+    [Selector("URLTitleFromPasteboard:")]
+    public static NSString? URLTitleFromPasteboard(NSPasteboard? pasteboard);
+    [Selector("registerURLSchemeAsLocal:")]
+    public static void RegisterURLSchemeAsLocal(NSString? scheme);
+    [Selector("initWithFrame:frameName:groupName:")]
+    public Self? InitWithFrameFrameNameGroupName(NSRect frame, NSString? frameName, NSString? groupName);
+    [Selector("close")]
+    public void Close();
+    [Selector("setMaintainsBackForwardList:")]
+    public void SetMaintainsBackForwardList(bool flag);
+    [Selector("goBack")]
+    public bool GoBack();
+    [Selector("goForward")]
+    public bool GoForward();
+    [Selector("goToBackForwardItem:")]
+    public bool GoToBackForwardItem(WebHistoryItem? item);
+    [Selector("userAgentForURL:")]
+    public NSString? UserAgentForURL(NSURL? URL);
+    [Selector("stringByEvaluatingJavaScriptFromString:")]
+    public NSString? StringByEvaluatingJavaScriptFromString(NSString? script);
+    [Selector("searchFor:direction:caseSensitive:wrap:")]
+    public bool SearchForDirectionCaseSensitiveWrap(NSString? string, bool forward, bool caseFlag, bool wrapFlag);
+    [Selector("registerViewClass:representationClass:forMIMEType:")]
+    public static void RegisterViewClassRepresentationClassForMIMEType(Class viewClass, Class representationClass, NSString? MIMEType);
+    [Selector("elementAtPoint:")]
+    public NSDictionary? ElementAtPoint(NSPoint point);
+    [Selector("writeSelectionWithPasteboardTypes:toPasteboard:")]
+    public void WriteSelectionWithPasteboardTypesToPasteboard(NSArray? types, NSPasteboard? pasteboard);
+    [Selector("pasteboardTypesForElement:")]
+    public NSArray? PasteboardTypesForElement(NSDictionary? element);
+    [Selector("writeElement:withPasteboardTypes:toPasteboard:")]
+    public void WriteElementWithPasteboardTypesToPasteboard(NSDictionary? element, NSArray? types, NSPasteboard? pasteboard);
+    [Selector("moveDragCaretToPoint:")]
+    public void MoveDragCaretToPoint(NSPoint point);
+    [Selector("removeDragCaret")]
+    public void RemoveDragCaret();
 }
 
 /// WebIBActions, a category of WebView.
 public extern objc class WebView : NSUserInterfaceValidations
 {
-    [Selector("canGoBack")] public bool CanGoBack { get; }
-    [Selector("canGoForward")] public bool CanGoForward { get; }
-    [Selector("canMakeTextLarger")] public bool CanMakeTextLarger { get; }
-    [Selector("canMakeTextSmaller")] public bool CanMakeTextSmaller { get; }
-    [Selector("canMakeTextStandardSize")] public bool CanMakeTextStandardSize { get; }
-    [Selector("takeStringURLFrom:")] public void TakeStringURLFrom(AnyObject? sender);
-    [Selector("stopLoading:")] public void StopLoading(AnyObject? sender);
-    [Selector("reload:")] public void Reload(AnyObject? sender);
-    [Selector("reloadFromOrigin:")] public void ReloadFromOrigin(AnyObject? sender);
-    [Selector("goBack:")] public void GoBack(AnyObject? sender);
-    [Selector("goForward:")] public void GoForward(AnyObject? sender);
-    [Selector("makeTextLarger:")] public void MakeTextLarger(AnyObject? sender);
-    [Selector("makeTextSmaller:")] public void MakeTextSmaller(AnyObject? sender);
-    [Selector("makeTextStandardSize:")] public void MakeTextStandardSize(AnyObject? sender);
-    [Selector("toggleContinuousSpellChecking:")] public void ToggleContinuousSpellChecking(AnyObject? sender);
-    [Selector("toggleSmartInsertDelete:")] public void ToggleSmartInsertDelete(AnyObject? sender);
+    [Selector("canGoBack")]
+    public bool CanGoBack { get; }
+    [Selector("canGoForward")]
+    public bool CanGoForward { get; }
+    [Selector("canMakeTextLarger")]
+    public bool CanMakeTextLarger { get; }
+    [Selector("canMakeTextSmaller")]
+    public bool CanMakeTextSmaller { get; }
+    [Selector("canMakeTextStandardSize")]
+    public bool CanMakeTextStandardSize { get; }
+    [Selector("takeStringURLFrom:")]
+    public void TakeStringURLFrom(AnyObject? sender);
+    [Selector("stopLoading:")]
+    public void StopLoading(AnyObject? sender);
+    [Selector("reload:")]
+    public void Reload(AnyObject? sender);
+    [Selector("reloadFromOrigin:")]
+    public void ReloadFromOrigin(AnyObject? sender);
+    [Selector("goBack:")]
+    public void GoBack(AnyObject? sender);
+    [Selector("goForward:")]
+    public void GoForward(AnyObject? sender);
+    [Selector("makeTextLarger:")]
+    public void MakeTextLarger(AnyObject? sender);
+    [Selector("makeTextSmaller:")]
+    public void MakeTextSmaller(AnyObject? sender);
+    [Selector("makeTextStandardSize:")]
+    public void MakeTextStandardSize(AnyObject? sender);
+    [Selector("toggleContinuousSpellChecking:")]
+    public void ToggleContinuousSpellChecking(AnyObject? sender);
+    [Selector("toggleSmartInsertDelete:")]
+    public void ToggleSmartInsertDelete(AnyObject? sender);
 }
 
 /// Deprecated in macOS 10.14.
@@ -170,68 +238,115 @@ public extern "C" NSString? WebViewDidChangeSelectionNotification;
 /// WebViewCSS, a category of WebView.
 public extern objc class WebView
 {
-    [Selector("computedStyleForElement:pseudoElement:")] public DOMCSSStyleDeclaration? ComputedStyleForElementPseudoElement(DOMElement? element, NSString? pseudoElement);
+    [Selector("computedStyleForElement:pseudoElement:")]
+    public DOMCSSStyleDeclaration? ComputedStyleForElementPseudoElement(DOMElement? element, NSString? pseudoElement);
 }
 
 /// WebViewEditing, a category of WebView.
 public extern objc class WebView
 {
-    [Selector("selectedDOMRange")] public DOMRange? SelectedDOMRange { get; }
-    [Selector("selectionAffinity")] public NSSelectionAffinity SelectionAffinity { get; }
-    [Selector("maintainsInactiveSelection")] public bool MaintainsInactiveSelection { get; }
-    [Selector("isEditable", "setEditable:")] public bool Editable { get; set; }
-    [Selector("typingStyle", "setTypingStyle:")] public DOMCSSStyleDeclaration? TypingStyle { get; set; }
-    [Selector("smartInsertDeleteEnabled", "setSmartInsertDeleteEnabled:")] public bool SmartInsertDeleteEnabled { get; set; }
-    [Selector("isContinuousSpellCheckingEnabled", "setContinuousSpellCheckingEnabled:")] public bool ContinuousSpellCheckingEnabled { get; set; }
-    [Selector("spellCheckerDocumentTag")] public NSInteger SpellCheckerDocumentTag { get; }
-    [Selector("undoManager")] public NSUndoManager? UndoManager { get; }
-    [Selector("editingDelegate", "setEditingDelegate:")] public WebEditingDelegate? EditingDelegate { get; set; }
-    [Selector("editableDOMRangeForPoint:")] public DOMRange? EditableDOMRangeForPoint(NSPoint point);
-    [Selector("setSelectedDOMRange:affinity:")] public void SetSelectedDOMRangeAffinity(DOMRange? range, NSSelectionAffinity selectionAffinity);
-    [Selector("styleDeclarationWithText:")] public DOMCSSStyleDeclaration? StyleDeclarationWithText(NSString? text);
+    [Selector("selectedDOMRange")]
+    public DOMRange? SelectedDOMRange { get; }
+    [Selector("selectionAffinity")]
+    public NSSelectionAffinity SelectionAffinity { get; }
+    [Selector("maintainsInactiveSelection")]
+    public bool MaintainsInactiveSelection { get; }
+    [Selector("isEditable", "setEditable:")]
+    public bool Editable { get; set; }
+    [Selector("typingStyle", "setTypingStyle:")]
+    public DOMCSSStyleDeclaration? TypingStyle { get; set; }
+    [Selector("smartInsertDeleteEnabled", "setSmartInsertDeleteEnabled:")]
+    public bool SmartInsertDeleteEnabled { get; set; }
+    [Selector("isContinuousSpellCheckingEnabled", "setContinuousSpellCheckingEnabled:")]
+    public bool ContinuousSpellCheckingEnabled { get; set; }
+    [Selector("spellCheckerDocumentTag")]
+    public NSInteger SpellCheckerDocumentTag { get; }
+    [Selector("undoManager")]
+    public NSUndoManager? UndoManager { get; }
+    [Selector("editingDelegate", "setEditingDelegate:")]
+    public WebEditingDelegate? EditingDelegate { get; set; }
+    [Selector("editableDOMRangeForPoint:")]
+    public DOMRange? EditableDOMRangeForPoint(NSPoint point);
+    [Selector("setSelectedDOMRange:affinity:")]
+    public void SetSelectedDOMRangeAffinity(DOMRange? range, NSSelectionAffinity selectionAffinity);
+    [Selector("styleDeclarationWithText:")]
+    public DOMCSSStyleDeclaration? StyleDeclarationWithText(NSString? text);
 }
 
 /// WebViewUndoableEditing, a category of WebView.
 public extern objc class WebView
 {
-    [Selector("replaceSelectionWithNode:")] public void ReplaceSelectionWithNode(DOMNode? node);
-    [Selector("replaceSelectionWithText:")] public void ReplaceSelectionWithText(NSString? text);
-    [Selector("replaceSelectionWithMarkupString:")] public void ReplaceSelectionWithMarkupString(NSString? markupString);
-    [Selector("replaceSelectionWithArchive:")] public void ReplaceSelectionWithArchive(WebArchive? archive);
-    [Selector("deleteSelection")] public void DeleteSelection();
-    [Selector("applyStyle:")] public void ApplyStyle(DOMCSSStyleDeclaration? style);
+    [Selector("replaceSelectionWithNode:")]
+    public void ReplaceSelectionWithNode(DOMNode? node);
+    [Selector("replaceSelectionWithText:")]
+    public void ReplaceSelectionWithText(NSString? text);
+    [Selector("replaceSelectionWithMarkupString:")]
+    public void ReplaceSelectionWithMarkupString(NSString? markupString);
+    [Selector("replaceSelectionWithArchive:")]
+    public void ReplaceSelectionWithArchive(WebArchive? archive);
+    [Selector("deleteSelection")]
+    public void DeleteSelection();
+    [Selector("applyStyle:")]
+    public void ApplyStyle(DOMCSSStyleDeclaration? style);
 }
 
 /// WebViewEditingActions, a category of WebView.
 public extern objc class WebView
 {
-    [Selector("copy:")] public void Copy(AnyObject? sender);
-    [Selector("cut:")] public void Cut(AnyObject? sender);
-    [Selector("paste:")] public void Paste(AnyObject? sender);
-    [Selector("copyFont:")] public void CopyFont(AnyObject? sender);
-    [Selector("pasteFont:")] public void PasteFont(AnyObject? sender);
-    [Selector("delete:")] public void Delete(AnyObject? sender);
-    [Selector("pasteAsPlainText:")] public void PasteAsPlainText(AnyObject? sender);
-    [Selector("pasteAsRichText:")] public void PasteAsRichText(AnyObject? sender);
-    [Selector("changeFont:")] public void ChangeFont(AnyObject? sender);
-    [Selector("changeAttributes:")] public void ChangeAttributes(AnyObject? sender);
-    [Selector("changeDocumentBackgroundColor:")] public void ChangeDocumentBackgroundColor(AnyObject? sender);
-    [Selector("changeColor:")] public void ChangeColor(AnyObject? sender);
-    [Selector("alignCenter:")] public void AlignCenter(AnyObject? sender);
-    [Selector("alignJustified:")] public void AlignJustified(AnyObject? sender);
-    [Selector("alignLeft:")] public void AlignLeft(AnyObject? sender);
-    [Selector("alignRight:")] public void AlignRight(AnyObject? sender);
-    [Selector("checkSpelling:")] public void CheckSpelling(AnyObject? sender);
-    [Selector("showGuessPanel:")] public void ShowGuessPanel(AnyObject? sender);
-    [Selector("performFindPanelAction:")] public void PerformFindPanelAction(AnyObject? sender);
-    [Selector("startSpeaking:")] public void StartSpeaking(AnyObject? sender);
-    [Selector("stopSpeaking:")] public void StopSpeaking(AnyObject? sender);
-    [Selector("moveToBeginningOfSentence:")] public void MoveToBeginningOfSentence(AnyObject? sender);
-    [Selector("moveToBeginningOfSentenceAndModifySelection:")] public void MoveToBeginningOfSentenceAndModifySelection(AnyObject? sender);
-    [Selector("moveToEndOfSentence:")] public void MoveToEndOfSentence(AnyObject? sender);
-    [Selector("moveToEndOfSentenceAndModifySelection:")] public void MoveToEndOfSentenceAndModifySelection(AnyObject? sender);
-    [Selector("selectSentence:")] public void SelectSentence(AnyObject? sender);
-    [Selector("overWrite:")] public void OverWrite(AnyObject? sender);
+    [Selector("copy:")]
+    public void Copy(AnyObject? sender);
+    [Selector("cut:")]
+    public void Cut(AnyObject? sender);
+    [Selector("paste:")]
+    public void Paste(AnyObject? sender);
+    [Selector("copyFont:")]
+    public void CopyFont(AnyObject? sender);
+    [Selector("pasteFont:")]
+    public void PasteFont(AnyObject? sender);
+    [Selector("delete:")]
+    public void Delete(AnyObject? sender);
+    [Selector("pasteAsPlainText:")]
+    public void PasteAsPlainText(AnyObject? sender);
+    [Selector("pasteAsRichText:")]
+    public void PasteAsRichText(AnyObject? sender);
+    [Selector("changeFont:")]
+    public void ChangeFont(AnyObject? sender);
+    [Selector("changeAttributes:")]
+    public void ChangeAttributes(AnyObject? sender);
+    [Selector("changeDocumentBackgroundColor:")]
+    public void ChangeDocumentBackgroundColor(AnyObject? sender);
+    [Selector("changeColor:")]
+    public void ChangeColor(AnyObject? sender);
+    [Selector("alignCenter:")]
+    public void AlignCenter(AnyObject? sender);
+    [Selector("alignJustified:")]
+    public void AlignJustified(AnyObject? sender);
+    [Selector("alignLeft:")]
+    public void AlignLeft(AnyObject? sender);
+    [Selector("alignRight:")]
+    public void AlignRight(AnyObject? sender);
+    [Selector("checkSpelling:")]
+    public void CheckSpelling(AnyObject? sender);
+    [Selector("showGuessPanel:")]
+    public void ShowGuessPanel(AnyObject? sender);
+    [Selector("performFindPanelAction:")]
+    public void PerformFindPanelAction(AnyObject? sender);
+    [Selector("startSpeaking:")]
+    public void StartSpeaking(AnyObject? sender);
+    [Selector("stopSpeaking:")]
+    public void StopSpeaking(AnyObject? sender);
+    [Selector("moveToBeginningOfSentence:")]
+    public void MoveToBeginningOfSentence(AnyObject? sender);
+    [Selector("moveToBeginningOfSentenceAndModifySelection:")]
+    public void MoveToBeginningOfSentenceAndModifySelection(AnyObject? sender);
+    [Selector("moveToEndOfSentence:")]
+    public void MoveToEndOfSentence(AnyObject? sender);
+    [Selector("moveToEndOfSentenceAndModifySelection:")]
+    public void MoveToEndOfSentenceAndModifySelection(AnyObject? sender);
+    [Selector("selectSentence:")]
+    public void SelectSentence(AnyObject? sender);
+    [Selector("overWrite:")]
+    public void OverWrite(AnyObject? sender);
 }
 
 #endif

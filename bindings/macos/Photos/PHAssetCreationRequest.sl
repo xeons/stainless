@@ -34,20 +34,28 @@ import Standard.ObjC;
 
 public extern objc class PHAssetResourceCreationOptions : NSObject, NSCopying
 {
-    [Selector("originalFilename", "setOriginalFilename:")] public NSString? OriginalFilename { get; set; }
+    [Selector("originalFilename", "setOriginalFilename:")]
+    public NSString? OriginalFilename { get; set; }
     /// macOS 26.0 and later.
-    [Selector("contentType", "setContentType:")] public UTType? ContentType { get; set; }
+    [Selector("contentType", "setContentType:")]
+    public UTType? ContentType { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("uniformTypeIdentifier", "setUniformTypeIdentifier:")] public NSString? UniformTypeIdentifier { get; set; }
-    [Selector("shouldMoveFile", "setShouldMoveFile:")] public bool ShouldMoveFile { get; set; }
+    [Selector("uniformTypeIdentifier", "setUniformTypeIdentifier:")]
+    public NSString? UniformTypeIdentifier { get; set; }
+    [Selector("shouldMoveFile", "setShouldMoveFile:")]
+    public bool ShouldMoveFile { get; set; }
 }
 
 public extern objc class PHAssetCreationRequest : PHAssetChangeRequest
 {
-    [Selector("creationRequestForAsset")] public static Self CreationRequestForAsset();
-    [Selector("supportsAssetResourceTypes:")] public static bool SupportsAssetResourceTypes(NSArray types);
-    [Selector("addResourceWithType:fileURL:options:")] public void AddResourceWithTypeFileURLOptions(PHAssetResourceType type, NSURL fileURL, PHAssetResourceCreationOptions? options);
-    [Selector("addResourceWithType:data:options:")] public void AddResourceWithTypeDataOptions(PHAssetResourceType type, NSData data, PHAssetResourceCreationOptions? options);
+    [Selector("creationRequestForAsset")]
+    public static Self CreationRequestForAsset();
+    [Selector("supportsAssetResourceTypes:")]
+    public static bool SupportsAssetResourceTypes(NSArray types);
+    [Selector("addResourceWithType:fileURL:options:")]
+    public void AddResourceWithTypeFileURLOptions(PHAssetResourceType type, NSURL fileURL, PHAssetResourceCreationOptions? options);
+    [Selector("addResourceWithType:data:options:")]
+    public void AddResourceWithTypeDataOptions(PHAssetResourceType type, NSData data, PHAssetResourceCreationOptions? options);
 }
 
 #endif

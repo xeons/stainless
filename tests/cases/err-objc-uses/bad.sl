@@ -7,12 +7,14 @@ import Standard.ObjC;
 [ObjCRoot]
 public extern objc class NSObject
 {
-    [Selector("hash")] public nuint Hash();
+    [Selector("hash")]
+    public nuint Hash();
 }
 
 public objc interface Coding
 {
-    [Selector("supportsCoding")] static abstract bool SupportsCoding { get; }
+    [Selector("supportsCoding")]
+    static abstract bool SupportsCoding { get; }
 }
 
 public closure nuint Hasher();
@@ -24,7 +26,8 @@ extern "C++" NSObject? MakeObject();
 extern "C" NSObject NSApp;
 
 // Ownership said of a call that hands back no object.
-[ReturnsRetained] extern "C" int CountObjects();
+[ReturnsRetained]
+extern "C" int CountObjects();
 
 void Uses(NSObject held)
 {

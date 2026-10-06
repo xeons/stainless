@@ -45,25 +45,49 @@ public objc closure void MTROTAProviderDelegateHandleBDXQueryForNodeIDController
 
 public objc interface MTROTAProviderDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("handleQueryImageForNodeID:controller:params:completion:")] void HandleQueryImageForNodeIDControllerParamsCompletion(NSNumber nodeID, MTRDeviceController controller, MTROTASoftwareUpdateProviderClusterQueryImageParams params, MTROTAProviderDelegateHandleQueryImageForNodeIDControllerParamsCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("handleQueryImageForNodeID:controller:params:completion:")]
+    void HandleQueryImageForNodeIDControllerParamsCompletion(NSNumber nodeID, MTRDeviceController controller, MTROTASoftwareUpdateProviderClusterQueryImageParams params, MTROTAProviderDelegateHandleQueryImageForNodeIDControllerParamsCompletionCompletionBlock completion);
     /// Deprecated in macOS 13.3.
-    [Optional] [Selector("handleQueryImageForNodeID:controller:params:completionHandler:")] void HandleQueryImageForNodeIDControllerParamsCompletionHandler(NSNumber nodeID, MTRDeviceController controller, MTROtaSoftwareUpdateProviderClusterQueryImageParams params, MTROTAProviderDelegateHandleQueryImageForNodeIDControllerParamsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("handleApplyUpdateRequestForNodeID:controller:params:completion:")] void HandleApplyUpdateRequestForNodeIDControllerParamsCompletion(NSNumber nodeID, MTRDeviceController controller, MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams params, MTROTAProviderDelegateHandleApplyUpdateRequestForNodeIDControllerParamsCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("handleQueryImageForNodeID:controller:params:completionHandler:")]
+    void HandleQueryImageForNodeIDControllerParamsCompletionHandler(NSNumber nodeID, MTRDeviceController controller, MTROtaSoftwareUpdateProviderClusterQueryImageParams params, MTROTAProviderDelegateHandleQueryImageForNodeIDControllerParamsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("handleApplyUpdateRequestForNodeID:controller:params:completion:")]
+    void HandleApplyUpdateRequestForNodeIDControllerParamsCompletion(NSNumber nodeID, MTRDeviceController controller, MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams params, MTROTAProviderDelegateHandleApplyUpdateRequestForNodeIDControllerParamsCompletionCompletionBlock completion);
     /// Deprecated in macOS 13.3.
-    [Optional] [Selector("handleApplyUpdateRequestForNodeID:controller:params:completionHandler:")] void HandleApplyUpdateRequestForNodeIDControllerParamsCompletionHandler(NSNumber nodeID, MTRDeviceController controller, MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams params, MTROTAProviderDelegateHandleApplyUpdateRequestForNodeIDControllerParamsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("handleNotifyUpdateAppliedForNodeID:controller:params:completion:")] void HandleNotifyUpdateAppliedForNodeIDControllerParamsCompletion(NSNumber nodeID, MTRDeviceController controller, MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams params, MTRStatusCompletion completion);
+    [Optional]
+    [Selector("handleApplyUpdateRequestForNodeID:controller:params:completionHandler:")]
+    void HandleApplyUpdateRequestForNodeIDControllerParamsCompletionHandler(NSNumber nodeID, MTRDeviceController controller, MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams params, MTROTAProviderDelegateHandleApplyUpdateRequestForNodeIDControllerParamsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("handleNotifyUpdateAppliedForNodeID:controller:params:completion:")]
+    void HandleNotifyUpdateAppliedForNodeIDControllerParamsCompletion(NSNumber nodeID, MTRDeviceController controller, MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams params, MTRStatusCompletion completion);
     /// Deprecated in macOS 13.3.
-    [Optional] [Selector("handleNotifyUpdateAppliedForNodeID:controller:params:completionHandler:")] void HandleNotifyUpdateAppliedForNodeIDControllerParamsCompletionHandler(NSNumber nodeID, MTRDeviceController controller, MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams params, StatusCompletion completionHandler);
-    [Optional] [Selector("handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:")] void HandleBDXTransferSessionBeginForNodeIDControllerFileDesignatorOffsetCompletion(NSNumber nodeID, MTRDeviceController controller, NSString fileDesignator, NSNumber offset, MTRStatusCompletion completion);
+    [Optional]
+    [Selector("handleNotifyUpdateAppliedForNodeID:controller:params:completionHandler:")]
+    void HandleNotifyUpdateAppliedForNodeIDControllerParamsCompletionHandler(NSNumber nodeID, MTRDeviceController controller, MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams params, StatusCompletion completionHandler);
+    [Optional]
+    [Selector("handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:")]
+    void HandleBDXTransferSessionBeginForNodeIDControllerFileDesignatorOffsetCompletion(NSNumber nodeID, MTRDeviceController controller, NSString fileDesignator, NSNumber offset, MTRStatusCompletion completion);
     /// Deprecated in macOS 13.3.
-    [Optional] [Selector("handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completionHandler:")] void HandleBDXTransferSessionBeginForNodeIDControllerFileDesignatorOffsetCompletionHandler(NSNumber nodeID, MTRDeviceController controller, NSString fileDesignator, NSNumber offset, StatusCompletion completionHandler);
+    [Optional]
+    [Selector("handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completionHandler:")]
+    void HandleBDXTransferSessionBeginForNodeIDControllerFileDesignatorOffsetCompletionHandler(NSNumber nodeID, MTRDeviceController controller, NSString fileDesignator, NSNumber offset, StatusCompletion completionHandler);
     /// macOS 26.1 and later.
-    [Optional] [Selector("handleBDXTransferSessionEndForNodeID:controller:metrics:error:")] void HandleBDXTransferSessionEndForNodeIDControllerMetricsError(NSNumber nodeID, MTRDeviceController controller, MTRMetrics metrics, NSError? error);
+    [Optional]
+    [Selector("handleBDXTransferSessionEndForNodeID:controller:metrics:error:")]
+    void HandleBDXTransferSessionEndForNodeIDControllerMetricsError(NSNumber nodeID, MTRDeviceController controller, MTRMetrics metrics, NSError? error);
     /// Deprecated in macOS 26.1.
-    [Optional] [Selector("handleBDXTransferSessionEndForNodeID:controller:error:")] void HandleBDXTransferSessionEndForNodeIDControllerError(NSNumber nodeID, MTRDeviceController controller, NSError? error);
-    [Optional] [Selector("handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:")] void HandleBDXQueryForNodeIDControllerBlockSizeBlockIndexBytesToSkipCompletion(NSNumber nodeID, MTRDeviceController controller, NSNumber blockSize, NSNumber blockIndex, NSNumber bytesToSkip, MTROTAProviderDelegateHandleBDXQueryForNodeIDControllerBlockSizeBlockIndexBytesToSkipCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("handleBDXTransferSessionEndForNodeID:controller:error:")]
+    void HandleBDXTransferSessionEndForNodeIDControllerError(NSNumber nodeID, MTRDeviceController controller, NSError? error);
+    [Optional]
+    [Selector("handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:")]
+    void HandleBDXQueryForNodeIDControllerBlockSizeBlockIndexBytesToSkipCompletion(NSNumber nodeID, MTRDeviceController controller, NSNumber blockSize, NSNumber blockIndex, NSNumber bytesToSkip, MTROTAProviderDelegateHandleBDXQueryForNodeIDControllerBlockSizeBlockIndexBytesToSkipCompletionCompletionBlock completion);
     /// Deprecated in macOS 13.3.
-    [Optional] [Selector("handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completionHandler:")] void HandleBDXQueryForNodeIDControllerBlockSizeBlockIndexBytesToSkipCompletionHandler(NSNumber nodeID, MTRDeviceController controller, NSNumber blockSize, NSNumber blockIndex, NSNumber bytesToSkip, MTROTAProviderDelegateHandleBDXQueryForNodeIDControllerBlockSizeBlockIndexBytesToSkipCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completionHandler:")]
+    void HandleBDXQueryForNodeIDControllerBlockSizeBlockIndexBytesToSkipCompletionHandler(NSNumber nodeID, MTRDeviceController controller, NSNumber blockSize, NSNumber blockIndex, NSNumber bytesToSkip, MTROTAProviderDelegateHandleBDXQueryForNodeIDControllerBlockSizeBlockIndexBytesToSkipCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

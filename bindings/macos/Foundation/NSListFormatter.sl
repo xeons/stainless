@@ -31,11 +31,16 @@ import Standard.ObjC;
 
 public extern objc class NSListFormatter : NSFormatter
 {
-    [Selector("locale", "setLocale:")] public NSLocale? Locale { get; set; }
-    [Selector("itemFormatter", "setItemFormatter:")] public NSFormatter? ItemFormatter { get; set; }
-    [Selector("localizedStringByJoiningStrings:")] public static NSString LocalizedStringByJoiningStrings(NSArray strings);
-    [Selector("stringFromItems:")] public NSString? StringFromItems(NSArray items);
-    [Selector("stringForObjectValue:")] public NSString? StringForObjectValue(AnyObject? obj);
+    [Selector("locale", "setLocale:")]
+    public NSLocale? Locale { get; set; }
+    [Selector("itemFormatter", "setItemFormatter:")]
+    public NSFormatter? ItemFormatter { get; set; }
+    [Selector("localizedStringByJoiningStrings:")]
+    public static NSString LocalizedStringByJoiningStrings(NSArray strings);
+    [Selector("stringFromItems:")]
+    public NSString? StringFromItems(NSArray items);
+    [Selector("stringForObjectValue:")]
+    public NSString? StringForObjectValue(AnyObject? obj);
 }
 
 #endif

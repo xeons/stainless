@@ -34,22 +34,38 @@ import Standard.ObjC;
 
 public extern objc class NSPredicateEditorRowTemplate : NSObject, NSCoding, NSCopying
 {
-    [Selector("templateViews")] public NSArray TemplateViews { get; }
-    [Selector("leftExpressions")] public NSArray? LeftExpressions { get; }
-    [Selector("rightExpressions")] public NSArray? RightExpressions { get; }
-    [Selector("rightExpressionAttributeType")] public NSAttributeType RightExpressionAttributeType { get; }
-    [Selector("modifier")] public NSComparisonPredicateModifier Modifier { get; }
-    [Selector("operators")] public NSArray? Operators { get; }
-    [Selector("options")] public NSUInteger Options { get; }
-    [Selector("compoundTypes")] public NSArray? CompoundTypes { get; }
-    [Selector("matchForPredicate:")] public double MatchForPredicate(NSPredicate predicate);
-    [Selector("setPredicate:")] public void SetPredicate(NSPredicate predicate);
-    [Selector("predicateWithSubpredicates:")] public NSPredicate PredicateWithSubpredicates(NSArray? subpredicates);
-    [Selector("displayableSubpredicatesOfPredicate:")] public NSArray? DisplayableSubpredicatesOfPredicate(NSPredicate predicate);
-    [Selector("initWithLeftExpressions:rightExpressions:modifier:operators:options:")] public Self InitWithLeftExpressionsRightExpressionsModifierOperatorsOptions(NSArray leftExpressions, NSArray rightExpressions, NSComparisonPredicateModifier modifier, NSArray operators, NSUInteger options);
-    [Selector("initWithLeftExpressions:rightExpressionAttributeType:modifier:operators:options:")] public Self InitWithLeftExpressionsRightExpressionAttributeTypeModifierOperatorsOptions(NSArray leftExpressions, NSAttributeType attributeType, NSComparisonPredicateModifier modifier, NSArray operators, NSUInteger options);
-    [Selector("initWithCompoundTypes:")] public Self InitWithCompoundTypes(NSArray compoundTypes);
-    [Selector("templatesWithAttributeKeyPaths:inEntityDescription:")] public static NSArray TemplatesWithAttributeKeyPathsInEntityDescription(NSArray keyPaths, NSEntityDescription entityDescription);
+    [Selector("templateViews")]
+    public NSArray TemplateViews { get; }
+    [Selector("leftExpressions")]
+    public NSArray? LeftExpressions { get; }
+    [Selector("rightExpressions")]
+    public NSArray? RightExpressions { get; }
+    [Selector("rightExpressionAttributeType")]
+    public NSAttributeType RightExpressionAttributeType { get; }
+    [Selector("modifier")]
+    public NSComparisonPredicateModifier Modifier { get; }
+    [Selector("operators")]
+    public NSArray? Operators { get; }
+    [Selector("options")]
+    public NSUInteger Options { get; }
+    [Selector("compoundTypes")]
+    public NSArray? CompoundTypes { get; }
+    [Selector("matchForPredicate:")]
+    public double MatchForPredicate(NSPredicate predicate);
+    [Selector("setPredicate:")]
+    public void SetPredicate(NSPredicate predicate);
+    [Selector("predicateWithSubpredicates:")]
+    public NSPredicate PredicateWithSubpredicates(NSArray? subpredicates);
+    [Selector("displayableSubpredicatesOfPredicate:")]
+    public NSArray? DisplayableSubpredicatesOfPredicate(NSPredicate predicate);
+    [Selector("initWithLeftExpressions:rightExpressions:modifier:operators:options:")]
+    public Self InitWithLeftExpressionsRightExpressionsModifierOperatorsOptions(NSArray leftExpressions, NSArray rightExpressions, NSComparisonPredicateModifier modifier, NSArray operators, NSUInteger options);
+    [Selector("initWithLeftExpressions:rightExpressionAttributeType:modifier:operators:options:")]
+    public Self InitWithLeftExpressionsRightExpressionAttributeTypeModifierOperatorsOptions(NSArray leftExpressions, NSAttributeType attributeType, NSComparisonPredicateModifier modifier, NSArray operators, NSUInteger options);
+    [Selector("initWithCompoundTypes:")]
+    public Self InitWithCompoundTypes(NSArray compoundTypes);
+    [Selector("templatesWithAttributeKeyPaths:inEntityDescription:")]
+    public static NSArray TemplatesWithAttributeKeyPathsInEntityDescription(NSArray keyPaths, NSEntityDescription entityDescription);
 }
 
 #endif

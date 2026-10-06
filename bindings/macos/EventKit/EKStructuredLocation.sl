@@ -34,11 +34,16 @@ import Standard.ObjC;
 
 public extern objc class EKStructuredLocation : EKObject, NSCopying
 {
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("geoLocation", "setGeoLocation:")] public CLLocation? GeoLocation { get; set; }
-    [Selector("radius", "setRadius:")] public double Radius { get; set; }
-    [Selector("locationWithTitle:")] public static Self LocationWithTitle(NSString title);
-    [Selector("locationWithMapItem:")] public static Self LocationWithMapItem(MKMapItem mapItem);
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("geoLocation", "setGeoLocation:")]
+    public CLLocation? GeoLocation { get; set; }
+    [Selector("radius", "setRadius:")]
+    public double Radius { get; set; }
+    [Selector("locationWithTitle:")]
+    public static Self LocationWithTitle(NSString title);
+    [Selector("locationWithMapItem:")]
+    public static Self LocationWithMapItem(MKMapItem mapItem);
 }
 
 #endif

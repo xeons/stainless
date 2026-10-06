@@ -34,62 +34,106 @@ import Standard.ObjC;
 
 public extern objc class MPSNDArrayDescriptor : NSObject
 {
-    [Selector("dataType", "setDataType:")] public MPSDataType DataType { get; set; }
-    [Selector("numberOfDimensions", "setNumberOfDimensions:")] public NSUInteger NumberOfDimensions { get; set; }
-    [Selector("preferPackedRows", "setPreferPackedRows:")] public bool PreferPackedRows { get; set; }
-    [Selector("lengthOfDimension:")] public NSUInteger LengthOfDimension(NSUInteger dimensionIndex);
-    [Selector("sliceRangeForDimension:")] public MPSDimensionSlice SliceRangeForDimension(NSUInteger dimensionIndex);
-    [Selector("sliceDimension:withSubrange:")] public void SliceDimensionWithSubrange(NSUInteger dimensionIndex, MPSDimensionSlice subRange);
-    [Selector("transposeDimension:withDimension:")] public void TransposeDimensionWithDimension(NSUInteger dimensionIndex, NSUInteger dimensionIndex2);
-    [Selector("permuteWithDimensionOrder:")] public void PermuteWithDimensionOrder(NSUInteger* dimensionOrder);
-    [Selector("dimensionOrder")] public vector_uchar16 DimensionOrder();
-    [Selector("getShape")] public NSArray GetShape();
-    [Selector("descriptorWithDataType:dimensionCount:dimensionSizes:")] public static Self DescriptorWithDataTypeDimensionCountDimensionSizes(MPSDataType dataType, NSUInteger numberOfDimensions, NSUInteger* dimensionSizes);
-    [Selector("descriptorWithDataType:shape:")] public static Self DescriptorWithDataTypeShape(MPSDataType dataType, NSArray shape);
-    [Selector("descriptorWithDataType:dimensionSizes:")] public static Self DescriptorWithDataTypeDimensionSizes(MPSDataType dataType, NSUInteger dimension0, ...);
-    [Selector("reshapeWithDimensionCount:dimensionSizes:")] public void ReshapeWithDimensionCountDimensionSizes(NSUInteger numberOfDimensions, NSUInteger* dimensionSizes);
-    [Selector("reshapeWithShape:")] public void ReshapeWithShape(NSArray shape);
+    [Selector("dataType", "setDataType:")]
+    public MPSDataType DataType { get; set; }
+    [Selector("numberOfDimensions", "setNumberOfDimensions:")]
+    public NSUInteger NumberOfDimensions { get; set; }
+    [Selector("preferPackedRows", "setPreferPackedRows:")]
+    public bool PreferPackedRows { get; set; }
+    [Selector("lengthOfDimension:")]
+    public NSUInteger LengthOfDimension(NSUInteger dimensionIndex);
+    [Selector("sliceRangeForDimension:")]
+    public MPSDimensionSlice SliceRangeForDimension(NSUInteger dimensionIndex);
+    [Selector("sliceDimension:withSubrange:")]
+    public void SliceDimensionWithSubrange(NSUInteger dimensionIndex, MPSDimensionSlice subRange);
+    [Selector("transposeDimension:withDimension:")]
+    public void TransposeDimensionWithDimension(NSUInteger dimensionIndex, NSUInteger dimensionIndex2);
+    [Selector("permuteWithDimensionOrder:")]
+    public void PermuteWithDimensionOrder(NSUInteger* dimensionOrder);
+    [Selector("dimensionOrder")]
+    public vector_uchar16 DimensionOrder();
+    [Selector("getShape")]
+    public NSArray GetShape();
+    [Selector("descriptorWithDataType:dimensionCount:dimensionSizes:")]
+    public static Self DescriptorWithDataTypeDimensionCountDimensionSizes(MPSDataType dataType, NSUInteger numberOfDimensions, NSUInteger* dimensionSizes);
+    [Selector("descriptorWithDataType:shape:")]
+    public static Self DescriptorWithDataTypeShape(MPSDataType dataType, NSArray shape);
+    [Selector("descriptorWithDataType:dimensionSizes:")]
+    public static Self DescriptorWithDataTypeDimensionSizes(MPSDataType dataType, NSUInteger dimension0, ...);
+    [Selector("reshapeWithDimensionCount:dimensionSizes:")]
+    public void ReshapeWithDimensionCountDimensionSizes(NSUInteger numberOfDimensions, NSUInteger* dimensionSizes);
+    [Selector("reshapeWithShape:")]
+    public void ReshapeWithShape(NSArray shape);
 }
 
 public objc interface MPSNDArrayAllocator : NSObjectProtocol, NSSecureCoding, NSCopying
 {
-    [Selector("arrayForCommandBuffer:arrayDescriptor:kernel:")] MPSNDArray ArrayForCommandBufferArrayDescriptorKernel(MTLCommandBuffer cmdBuf, MPSNDArrayDescriptor descriptor, MPSKernel kernel);
+    [Selector("arrayForCommandBuffer:arrayDescriptor:kernel:")]
+    MPSNDArray ArrayForCommandBufferArrayDescriptorKernel(MTLCommandBuffer cmdBuf, MPSNDArrayDescriptor descriptor, MPSKernel kernel);
 }
 
 public extern objc class MPSNDArray : NSObject
 {
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("dataType")] public MPSDataType DataType { get; }
-    [Selector("dataTypeSize")] public nuint DataTypeSize { get; }
-    [Selector("numberOfDimensions")] public NSUInteger NumberOfDimensions { get; }
-    [Selector("device")] public MTLDevice Device { get; }
-    [Selector("parent")] public MPSNDArray? Parent { get; }
-    [Selector("defaultAllocator")] public static MPSNDArrayAllocator DefaultAllocator();
-    [Selector("lengthOfDimension:")] public NSUInteger LengthOfDimension(NSUInteger dimensionIndex);
-    [Selector("descriptor")] public MPSNDArrayDescriptor Descriptor();
-    [Selector("initWithDevice:descriptor:")] public Self InitWithDeviceDescriptor(MTLDevice device, MPSNDArrayDescriptor descriptor);
-    [Selector("initWithDevice:scalar:")] public Self InitWithDeviceScalar(MTLDevice device, double value);
-    [Selector("initWithBuffer:offset:descriptor:")] public Self InitWithBufferOffsetDescriptor(MTLBuffer buffer, NSUInteger offset, MPSNDArrayDescriptor descriptor);
-    [Selector("userBuffer")] public MTLBuffer? UserBuffer();
-    [Selector("resourceSize")] public NSUInteger ResourceSize();
-    [Selector("arrayViewWithCommandBuffer:descriptor:aliasing:")] public MPSNDArray? ArrayViewWithCommandBufferDescriptorAliasing(MTLCommandBuffer cmdBuf, MPSNDArrayDescriptor descriptor, MPSAliasingStrategy aliasing);
-    [Selector("arrayViewWithDescriptor:")] public MPSNDArray? ArrayViewWithDescriptor(MPSNDArrayDescriptor descriptor);
-    [Selector("arrayViewWithShape:strides:")] public MPSNDArray? ArrayViewWithShapeStrides(MPSShape? shape, MPSShape strides);
-    [Selector("arrayViewWithDimensionCount:dimensionSizes:strides:")] public MPSNDArray? ArrayViewWithDimensionCountDimensionSizesStrides(NSUInteger numberOfDimensions, NSUInteger* dimensionSizes, NSUInteger* dimStrides);
-    [Selector("exportDataWithCommandBuffer:toBuffer:destinationDataType:offset:rowStrides:")] public void ExportDataWithCommandBufferToBufferDestinationDataTypeOffsetRowStrides(MTLCommandBuffer cmdBuf, MTLBuffer buffer, MPSDataType destinationDataType, NSUInteger offset, NSInteger* rowStrides);
-    [Selector("importDataWithCommandBuffer:fromBuffer:sourceDataType:offset:rowStrides:")] public void ImportDataWithCommandBufferFromBufferSourceDataTypeOffsetRowStrides(MTLCommandBuffer cmdBuf, MTLBuffer buffer, MPSDataType sourceDataType, NSUInteger offset, NSInteger* rowStrides);
-    [Selector("exportDataWithCommandBuffer:toImages:offset:")] public void ExportDataWithCommandBufferToImagesOffset(MTLCommandBuffer cmdBuf, MPSImageBatch images, MPSImageCoordinate offset);
-    [Selector("importDataWithCommandBuffer:fromImages:offset:")] public void ImportDataWithCommandBufferFromImagesOffset(MTLCommandBuffer cmdBuf, MPSImageBatch images, MPSImageCoordinate offset);
-    [Selector("readBytes:strideBytes:")] public void ReadBytesStrideBytes(void* buffer, NSInteger* strideBytesPerDimension);
-    [Selector("writeBytes:strideBytes:")] public void WriteBytesStrideBytes(void* buffer, NSInteger* strideBytesPerDimension);
-    [Selector("synchronizeOnCommandBuffer:")] public void SynchronizeOnCommandBuffer(MTLCommandBuffer commandBuffer);
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("dataType")]
+    public MPSDataType DataType { get; }
+    [Selector("dataTypeSize")]
+    public nuint DataTypeSize { get; }
+    [Selector("numberOfDimensions")]
+    public NSUInteger NumberOfDimensions { get; }
+    [Selector("device")]
+    public MTLDevice Device { get; }
+    [Selector("parent")]
+    public MPSNDArray? Parent { get; }
+    [Selector("defaultAllocator")]
+    public static MPSNDArrayAllocator DefaultAllocator();
+    [Selector("lengthOfDimension:")]
+    public NSUInteger LengthOfDimension(NSUInteger dimensionIndex);
+    [Selector("descriptor")]
+    public MPSNDArrayDescriptor Descriptor();
+    [Selector("initWithDevice:descriptor:")]
+    public Self InitWithDeviceDescriptor(MTLDevice device, MPSNDArrayDescriptor descriptor);
+    [Selector("initWithDevice:scalar:")]
+    public Self InitWithDeviceScalar(MTLDevice device, double value);
+    [Selector("initWithBuffer:offset:descriptor:")]
+    public Self InitWithBufferOffsetDescriptor(MTLBuffer buffer, NSUInteger offset, MPSNDArrayDescriptor descriptor);
+    [Selector("userBuffer")]
+    public MTLBuffer? UserBuffer();
+    [Selector("resourceSize")]
+    public NSUInteger ResourceSize();
+    [Selector("arrayViewWithCommandBuffer:descriptor:aliasing:")]
+    public MPSNDArray? ArrayViewWithCommandBufferDescriptorAliasing(MTLCommandBuffer cmdBuf, MPSNDArrayDescriptor descriptor, MPSAliasingStrategy aliasing);
+    [Selector("arrayViewWithDescriptor:")]
+    public MPSNDArray? ArrayViewWithDescriptor(MPSNDArrayDescriptor descriptor);
+    [Selector("arrayViewWithShape:strides:")]
+    public MPSNDArray? ArrayViewWithShapeStrides(MPSShape? shape, MPSShape strides);
+    [Selector("arrayViewWithDimensionCount:dimensionSizes:strides:")]
+    public MPSNDArray? ArrayViewWithDimensionCountDimensionSizesStrides(NSUInteger numberOfDimensions, NSUInteger* dimensionSizes, NSUInteger* dimStrides);
+    [Selector("exportDataWithCommandBuffer:toBuffer:destinationDataType:offset:rowStrides:")]
+    public void ExportDataWithCommandBufferToBufferDestinationDataTypeOffsetRowStrides(MTLCommandBuffer cmdBuf, MTLBuffer buffer, MPSDataType destinationDataType, NSUInteger offset, NSInteger* rowStrides);
+    [Selector("importDataWithCommandBuffer:fromBuffer:sourceDataType:offset:rowStrides:")]
+    public void ImportDataWithCommandBufferFromBufferSourceDataTypeOffsetRowStrides(MTLCommandBuffer cmdBuf, MTLBuffer buffer, MPSDataType sourceDataType, NSUInteger offset, NSInteger* rowStrides);
+    [Selector("exportDataWithCommandBuffer:toImages:offset:")]
+    public void ExportDataWithCommandBufferToImagesOffset(MTLCommandBuffer cmdBuf, MPSImageBatch images, MPSImageCoordinate offset);
+    [Selector("importDataWithCommandBuffer:fromImages:offset:")]
+    public void ImportDataWithCommandBufferFromImagesOffset(MTLCommandBuffer cmdBuf, MPSImageBatch images, MPSImageCoordinate offset);
+    [Selector("readBytes:strideBytes:")]
+    public void ReadBytesStrideBytes(void* buffer, NSInteger* strideBytesPerDimension);
+    [Selector("writeBytes:strideBytes:")]
+    public void WriteBytesStrideBytes(void* buffer, NSInteger* strideBytesPerDimension);
+    [Selector("synchronizeOnCommandBuffer:")]
+    public void SynchronizeOnCommandBuffer(MTLCommandBuffer commandBuffer);
 }
 
 public extern objc class MPSTemporaryNDArray : MPSNDArray
 {
-    [Selector("readCount", "setReadCount:")] public NSUInteger ReadCount { get; set; }
-    [Selector("defaultAllocator")] public static MPSNDArrayAllocator DefaultAllocator();
-    [Selector("temporaryNDArrayWithCommandBuffer:descriptor:")] public static Self TemporaryNDArrayWithCommandBufferDescriptor(MTLCommandBuffer commandBuffer, MPSNDArrayDescriptor descriptor);
+    [Selector("readCount", "setReadCount:")]
+    public NSUInteger ReadCount { get; set; }
+    [Selector("defaultAllocator")]
+    public static MPSNDArrayAllocator DefaultAllocator();
+    [Selector("temporaryNDArrayWithCommandBuffer:descriptor:")]
+    public static Self TemporaryNDArrayWithCommandBufferDescriptor(MTLCommandBuffer commandBuffer, MPSNDArrayDescriptor descriptor);
 }
 
 #endif

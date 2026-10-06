@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class NSQueryGenerationToken : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("currentQueryGenerationToken")] public static NSQueryGenerationToken CurrentQueryGenerationToken { get; }
+    [Selector("currentQueryGenerationToken")]
+    public static NSQueryGenerationToken CurrentQueryGenerationToken { get; }
 }
 
 #endif

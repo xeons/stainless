@@ -37,16 +37,26 @@ public objc closure void AVCaptureIndexPickerSetActionQueueActionActionBlock(NSI
 
 public extern objc class AVCaptureIndexPicker : AVCaptureControl
 {
-    [Selector("selectedIndex", "setSelectedIndex:")] public NSInteger SelectedIndex { get; set; }
-    [Selector("localizedTitle")] public NSString LocalizedTitle { get; }
-    [Selector("symbolName")] public NSString SymbolName { get; }
-    [Selector("numberOfIndexes")] public NSInteger NumberOfIndexes { get; }
-    [Selector("localizedIndexTitles")] public NSArray LocalizedIndexTitles { get; }
-    [Selector("accessibilityIdentifier", "setAccessibilityIdentifier:")] public NSString? AccessibilityIdentifier { get; set; }
-    [Selector("initWithLocalizedTitle:symbolName:numberOfIndexes:")] public Self InitWithLocalizedTitleSymbolNameNumberOfIndexes(NSString localizedTitle, NSString symbolName, NSInteger numberOfIndexes);
-    [Selector("initWithLocalizedTitle:symbolName:numberOfIndexes:localizedTitleTransform:")] public Self InitWithLocalizedTitleSymbolNameNumberOfIndexesLocalizedTitleTransform(NSString localizedTitle, NSString symbolName, NSInteger numberOfIndexes, AVCaptureIndexPickerInitWithLocalizedTitleSymbolNameNumberOfIndexesLocalizedTitleTransformLocalizedTitleTransformBlock localizedTitleTransform);
-    [Selector("initWithLocalizedTitle:symbolName:localizedIndexTitles:")] public Self InitWithLocalizedTitleSymbolNameLocalizedIndexTitles(NSString localizedTitle, NSString symbolName, NSArray localizedIndexTitles);
-    [Selector("setActionQueue:action:")] public void SetActionQueueAction(dispatch_queue_t actionQueue, AVCaptureIndexPickerSetActionQueueActionActionBlock action);
+    [Selector("selectedIndex", "setSelectedIndex:")]
+    public NSInteger SelectedIndex { get; set; }
+    [Selector("localizedTitle")]
+    public NSString LocalizedTitle { get; }
+    [Selector("symbolName")]
+    public NSString SymbolName { get; }
+    [Selector("numberOfIndexes")]
+    public NSInteger NumberOfIndexes { get; }
+    [Selector("localizedIndexTitles")]
+    public NSArray LocalizedIndexTitles { get; }
+    [Selector("accessibilityIdentifier", "setAccessibilityIdentifier:")]
+    public NSString? AccessibilityIdentifier { get; set; }
+    [Selector("initWithLocalizedTitle:symbolName:numberOfIndexes:")]
+    public Self InitWithLocalizedTitleSymbolNameNumberOfIndexes(NSString localizedTitle, NSString symbolName, NSInteger numberOfIndexes);
+    [Selector("initWithLocalizedTitle:symbolName:numberOfIndexes:localizedTitleTransform:")]
+    public Self InitWithLocalizedTitleSymbolNameNumberOfIndexesLocalizedTitleTransform(NSString localizedTitle, NSString symbolName, NSInteger numberOfIndexes, AVCaptureIndexPickerInitWithLocalizedTitleSymbolNameNumberOfIndexesLocalizedTitleTransformLocalizedTitleTransformBlock localizedTitleTransform);
+    [Selector("initWithLocalizedTitle:symbolName:localizedIndexTitles:")]
+    public Self InitWithLocalizedTitleSymbolNameLocalizedIndexTitles(NSString localizedTitle, NSString symbolName, NSArray localizedIndexTitles);
+    [Selector("setActionQueue:action:")]
+    public void SetActionQueueAction(dispatch_queue_t actionQueue, AVCaptureIndexPickerSetActionQueueActionActionBlock action);
 }
 
 #endif

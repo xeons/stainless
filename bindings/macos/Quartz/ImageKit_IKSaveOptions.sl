@@ -35,19 +35,28 @@ import Standard.ObjC;
 /// IKSaveOptionsDelegate, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("saveOptions:shouldShowUTType:")] public bool SaveOptionsShouldShowUTType(IKSaveOptions? saveOptions, NSString? utType);
+    [Selector("saveOptions:shouldShowUTType:")]
+    public bool SaveOptionsShouldShowUTType(IKSaveOptions? saveOptions, NSString? utType);
 }
 
 public extern objc class IKSaveOptions : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public AnyObject? Delegate { get; set; }
-    [Selector("imageProperties")] public NSDictionary? ImageProperties { get; }
-    [Selector("imageUTType")] public NSString? ImageUTType { get; }
-    [Selector("userSelection")] public NSDictionary? UserSelection { get; }
-    [Selector("rememberLastSetting", "setRememberLastSetting:")] public bool RememberLastSetting { get; set; }
-    [Selector("initWithImageProperties:imageUTType:")] public Self? InitWithImagePropertiesImageUTType(NSDictionary? imageProperties, NSString? imageUTType);
-    [Selector("addSaveOptionsAccessoryViewToSavePanel:")] public void AddSaveOptionsAccessoryViewToSavePanel(NSSavePanel? savePanel);
-    [Selector("addSaveOptionsToView:")] public void AddSaveOptionsToView(NSView? view);
+    [Selector("delegate", "setDelegate:")]
+    public AnyObject? Delegate { get; set; }
+    [Selector("imageProperties")]
+    public NSDictionary? ImageProperties { get; }
+    [Selector("imageUTType")]
+    public NSString? ImageUTType { get; }
+    [Selector("userSelection")]
+    public NSDictionary? UserSelection { get; }
+    [Selector("rememberLastSetting", "setRememberLastSetting:")]
+    public bool RememberLastSetting { get; set; }
+    [Selector("initWithImageProperties:imageUTType:")]
+    public Self? InitWithImagePropertiesImageUTType(NSDictionary? imageProperties, NSString? imageUTType);
+    [Selector("addSaveOptionsAccessoryViewToSavePanel:")]
+    public void AddSaveOptionsAccessoryViewToSavePanel(NSSavePanel? savePanel);
+    [Selector("addSaveOptionsToView:")]
+    public void AddSaveOptionsToView(NSView? view);
 }
 
 #endif

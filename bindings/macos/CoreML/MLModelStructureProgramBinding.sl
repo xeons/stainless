@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MLModelStructureProgramBinding : NSObject
 {
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("value")] public MLModelStructureProgramValue? Value { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("value")]
+    public MLModelStructureProgramValue? Value { get; }
 }
 
 #endif

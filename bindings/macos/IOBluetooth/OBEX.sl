@@ -488,10 +488,12 @@ public extern "C" OBEXError OBEXSessionSetPathResponse(OBEXSessionRef inSessionR
 public extern "C" OBEXError OBEXSessionSetServerCallback(OBEXSessionRef inSessionRef, OBEXSessionEventCallback inCallback, void* inUserRefCon);
 
 /// Deprecated in macOS 10.6.
-[ReturnsRetained] public extern "C" CFDataRef? OBEXCreateVCard(void* inFirstName, uint inFirstNameLength, void* inLastName, uint inLastNameLength, void* inFriendlyName, uint inFriendlyNameLength, void* inNameCharset, uint inNameCharsetLength, void* inHomePhone, uint inHomePhoneLength, void* inWorkPhone, uint inWorkPhoneLength, void* inCellPhone, uint inCellPhoneLength, void* inFaxPhone, uint inFaxPhoneLength, void* inEMailAddress, uint inEMailAddressLength, void* inEMailAddressCharset, uint inEMailAddressCharsetLength, void* inOrganization, uint inOrganizationLength, void* inOrganizationCharset, uint inOrganizationCharsetLength, void* inTitle, uint inTitleLength, void* inTitleCharset, uint inTitleCharsetLength);
+[ReturnsRetained]
+public extern "C" CFDataRef? OBEXCreateVCard(void* inFirstName, uint inFirstNameLength, void* inLastName, uint inLastNameLength, void* inFriendlyName, uint inFriendlyNameLength, void* inNameCharset, uint inNameCharsetLength, void* inHomePhone, uint inHomePhoneLength, void* inWorkPhone, uint inWorkPhoneLength, void* inCellPhone, uint inCellPhoneLength, void* inFaxPhone, uint inFaxPhoneLength, void* inEMailAddress, uint inEMailAddressLength, void* inEMailAddressCharset, uint inEMailAddressCharsetLength, void* inOrganization, uint inOrganizationLength, void* inOrganizationCharset, uint inOrganizationCharsetLength, void* inTitle, uint inTitleLength, void* inTitleCharset, uint inTitleCharsetLength);
 
 /// Deprecated in macOS 10.6.
-[ReturnsRetained] public extern "C" CFDataRef? OBEXCreateVEvent(byte* inCharset, uint inCharsetLength, byte* inEncoding, uint inEncodingLength, byte* inEventStartDate, uint inEventStartDateLength, byte* inEventEndDate, uint inEventEndDateLength, byte* inAlarmDate, uint inAlarmDateLength, byte* inCategory, uint inCategoryLength, byte* inSummary, uint inSummaryLength, byte* inLocation, uint inLocationLength, byte* inXIRMCLUID, uint inXIRMCLUIDLength);
+[ReturnsRetained]
+public extern "C" CFDataRef? OBEXCreateVEvent(byte* inCharset, uint inCharsetLength, byte* inEncoding, uint inEncodingLength, byte* inEventStartDate, uint inEventStartDateLength, byte* inEventEndDate, uint inEventEndDateLength, byte* inAlarmDate, uint inAlarmDateLength, byte* inCategory, uint inCategoryLength, byte* inSummary, uint inSummaryLength, byte* inLocation, uint inLocationLength, byte* inXIRMCLUID, uint inXIRMCLUIDLength);
 
 public extern "C" CFStringRef? kOBEXHeaderIDKeyName;
 
@@ -539,7 +541,8 @@ public extern "C" CFStringRef? kOBEXHeaderIDKeyUnknown4ByteQuantity;
 
 public extern "C" CFStringRef? kOBEXHeaderIDKeyUserDefined;
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? OBEXGetHeaders(void* inData, nuint inDataSize);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? OBEXGetHeaders(void* inData, nuint inDataSize);
 
 public extern "C" CFMutableDataRef? OBEXHeadersToBytes(CFDictionaryRef? dictionaryOfHeaders);
 

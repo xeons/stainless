@@ -36,16 +36,20 @@ import Standard.ObjC;
 /// CIImageProvider, a category of CIImage.
 public extern objc class CIImage
 {
-    [Selector("imageWithImageProvider:size::format:colorSpace:options:")] public static CIImage ImageWithImageProviderSizeFormatColorSpaceOptions(AnyObject provider, nuint width, nuint height, CIFormat format, CGColorSpaceRef? colorSpace, NSDictionary? options);
-    [Selector("initWithImageProvider:size::format:colorSpace:options:")] public Self InitWithImageProviderSizeFormatColorSpaceOptions(AnyObject provider, nuint width, nuint height, CIFormat format, CGColorSpaceRef? colorSpace, NSDictionary? options);
+    [Selector("imageWithImageProvider:size::format:colorSpace:options:")]
+    public static CIImage ImageWithImageProviderSizeFormatColorSpaceOptions(AnyObject provider, nuint width, nuint height, CIFormat format, CGColorSpaceRef? colorSpace, NSDictionary? options);
+    [Selector("initWithImageProvider:size::format:colorSpace:options:")]
+    public Self InitWithImageProviderSizeFormatColorSpaceOptions(AnyObject provider, nuint width, nuint height, CIFormat format, CGColorSpaceRef? colorSpace, NSDictionary? options);
 }
 
 /// CIImageProvider, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("provideImageData:bytesPerRow:origin::size::userInfo:")] public void ProvideImageDataBytesPerRowOriginSizeUserInfo(void* data, nuint rowbytes, nuint originx, nuint originy, nuint width, nuint height, AnyObject? info);
+    [Selector("provideImageData:bytesPerRow:origin::size::userInfo:")]
+    public void ProvideImageDataBytesPerRowOriginSizeUserInfo(void* data, nuint rowbytes, nuint originx, nuint originy, nuint width, nuint height, AnyObject? info);
     /// macOS 26.0 and later.
-    [Selector("provideImageToMTLTexture:commandBuffer:originx:originy:width:height:userInfo:")] public void ProvideImageToMTLTextureCommandBufferOriginxOriginyWidthHeightUserInfo(MTLTexture texture, MTLCommandBuffer commandBuffer, nuint originx, nuint originy, nuint width, nuint height, AnyObject? info);
+    [Selector("provideImageToMTLTexture:commandBuffer:originx:originy:width:height:userInfo:")]
+    public void ProvideImageToMTLTextureCommandBufferOriginxOriginyWidthHeightUserInfo(MTLTexture texture, MTLCommandBuffer commandBuffer, nuint originx, nuint originy, nuint width, nuint height, AnyObject? info);
 }
 
 public extern "C" CIImageOption? kCIImageProviderTileSize;

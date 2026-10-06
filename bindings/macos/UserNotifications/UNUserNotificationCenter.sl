@@ -60,21 +60,36 @@ public objc closure void UNUserNotificationCenterSetBadgeCountWithCompletionHand
 
 public extern objc class UNUserNotificationCenter : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public UNUserNotificationCenterDelegate? Delegate { get; set; }
-    [Selector("supportsContentExtensions")] public bool SupportsContentExtensions { get; }
-    [Selector("currentNotificationCenter")] public static UNUserNotificationCenter CurrentNotificationCenter();
-    [Selector("requestAuthorizationWithOptions:completionHandler:")] public void RequestAuthorizationWithOptionsCompletionHandler(UNAuthorizationOptions options, UNUserNotificationCenterRequestAuthorizationWithOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("setNotificationCategories:")] public void SetNotificationCategories(NSSet categories);
-    [Selector("getNotificationCategoriesWithCompletionHandler:")] public void GetNotificationCategoriesWithCompletionHandler(UNUserNotificationCenterGetNotificationCategoriesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getNotificationSettingsWithCompletionHandler:")] public void GetNotificationSettingsWithCompletionHandler(UNUserNotificationCenterGetNotificationSettingsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("addNotificationRequest:withCompletionHandler:")] public void AddNotificationRequestWithCompletionHandler(UNNotificationRequest request, UNUserNotificationCenterAddNotificationRequestWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("getPendingNotificationRequestsWithCompletionHandler:")] public void GetPendingNotificationRequestsWithCompletionHandler(UNUserNotificationCenterGetPendingNotificationRequestsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removePendingNotificationRequestsWithIdentifiers:")] public void RemovePendingNotificationRequestsWithIdentifiers(NSArray identifiers);
-    [Selector("removeAllPendingNotificationRequests")] public void RemoveAllPendingNotificationRequests();
-    [Selector("getDeliveredNotificationsWithCompletionHandler:")] public void GetDeliveredNotificationsWithCompletionHandler(UNUserNotificationCenterGetDeliveredNotificationsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removeDeliveredNotificationsWithIdentifiers:")] public void RemoveDeliveredNotificationsWithIdentifiers(NSArray identifiers);
-    [Selector("removeAllDeliveredNotifications")] public void RemoveAllDeliveredNotifications();
-    [Selector("setBadgeCount:withCompletionHandler:")] public void SetBadgeCountWithCompletionHandler(NSInteger newBadgeCount, UNUserNotificationCenterSetBadgeCountWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("delegate", "setDelegate:")]
+    public UNUserNotificationCenterDelegate? Delegate { get; set; }
+    [Selector("supportsContentExtensions")]
+    public bool SupportsContentExtensions { get; }
+    [Selector("currentNotificationCenter")]
+    public static UNUserNotificationCenter CurrentNotificationCenter();
+    [Selector("requestAuthorizationWithOptions:completionHandler:")]
+    public void RequestAuthorizationWithOptionsCompletionHandler(UNAuthorizationOptions options, UNUserNotificationCenterRequestAuthorizationWithOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("setNotificationCategories:")]
+    public void SetNotificationCategories(NSSet categories);
+    [Selector("getNotificationCategoriesWithCompletionHandler:")]
+    public void GetNotificationCategoriesWithCompletionHandler(UNUserNotificationCenterGetNotificationCategoriesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getNotificationSettingsWithCompletionHandler:")]
+    public void GetNotificationSettingsWithCompletionHandler(UNUserNotificationCenterGetNotificationSettingsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("addNotificationRequest:withCompletionHandler:")]
+    public void AddNotificationRequestWithCompletionHandler(UNNotificationRequest request, UNUserNotificationCenterAddNotificationRequestWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("getPendingNotificationRequestsWithCompletionHandler:")]
+    public void GetPendingNotificationRequestsWithCompletionHandler(UNUserNotificationCenterGetPendingNotificationRequestsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removePendingNotificationRequestsWithIdentifiers:")]
+    public void RemovePendingNotificationRequestsWithIdentifiers(NSArray identifiers);
+    [Selector("removeAllPendingNotificationRequests")]
+    public void RemoveAllPendingNotificationRequests();
+    [Selector("getDeliveredNotificationsWithCompletionHandler:")]
+    public void GetDeliveredNotificationsWithCompletionHandler(UNUserNotificationCenterGetDeliveredNotificationsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removeDeliveredNotificationsWithIdentifiers:")]
+    public void RemoveDeliveredNotificationsWithIdentifiers(NSArray identifiers);
+    [Selector("removeAllDeliveredNotifications")]
+    public void RemoveAllDeliveredNotifications();
+    [Selector("setBadgeCount:withCompletionHandler:")]
+    public void SetBadgeCountWithCompletionHandler(NSInteger newBadgeCount, UNUserNotificationCenterSetBadgeCountWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 [Flags]
@@ -93,9 +108,15 @@ public objc closure void UNUserNotificationCenterDelegateUserNotificationCenterD
 
 public objc interface UNUserNotificationCenterDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("userNotificationCenter:willPresentNotification:withCompletionHandler:")] void UserNotificationCenterWillPresentNotificationWithCompletionHandler(UNUserNotificationCenter center, UNNotification notification, UNUserNotificationCenterDelegateUserNotificationCenterWillPresentNotificationWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:")] void UserNotificationCenterDidReceiveNotificationResponseWithCompletionHandler(UNUserNotificationCenter center, UNNotificationResponse response, UNUserNotificationCenterDelegateUserNotificationCenterDidReceiveNotificationResponseWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("userNotificationCenter:openSettingsForNotification:")] void UserNotificationCenterOpenSettingsForNotification(UNUserNotificationCenter center, UNNotification? notification);
+    [Optional]
+    [Selector("userNotificationCenter:willPresentNotification:withCompletionHandler:")]
+    void UserNotificationCenterWillPresentNotificationWithCompletionHandler(UNUserNotificationCenter center, UNNotification notification, UNUserNotificationCenterDelegateUserNotificationCenterWillPresentNotificationWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:")]
+    void UserNotificationCenterDidReceiveNotificationResponseWithCompletionHandler(UNUserNotificationCenter center, UNNotificationResponse response, UNUserNotificationCenterDelegateUserNotificationCenterDidReceiveNotificationResponseWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("userNotificationCenter:openSettingsForNotification:")]
+    void UserNotificationCenterOpenSettingsForNotification(UNUserNotificationCenter center, UNNotification? notification);
 }
 
 #endif

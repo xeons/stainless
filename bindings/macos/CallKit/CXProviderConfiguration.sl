@@ -34,18 +34,29 @@ import Standard.ObjC;
 public extern objc class CXProviderConfiguration : NSObject, NSCopying
 {
     /// Deprecated in macOS 11.0.
-    [Selector("localizedName")] public NSString? LocalizedName { get; }
-    [Selector("ringtoneSound", "setRingtoneSound:")] public NSString? RingtoneSound { get; set; }
-    [Selector("iconTemplateImageData", "setIconTemplateImageData:")] public NSData? IconTemplateImageData { get; set; }
-    [Selector("maximumCallGroups", "setMaximumCallGroups:")] public NSUInteger MaximumCallGroups { get; set; }
-    [Selector("maximumCallsPerCallGroup", "setMaximumCallsPerCallGroup:")] public NSUInteger MaximumCallsPerCallGroup { get; set; }
-    [Selector("includesCallsInRecents", "setIncludesCallsInRecents:")] public bool IncludesCallsInRecents { get; set; }
-    [Selector("supportsVideo", "setSupportsVideo:")] public bool SupportsVideo { get; set; }
-    [Selector("supportsAudioTranslation", "setSupportsAudioTranslation:")] public bool SupportsAudioTranslation { get; set; }
-    [Selector("supportedHandleTypes", "setSupportedHandleTypes:")] public NSSet SupportedHandleTypes { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("localizedName")]
+    public NSString? LocalizedName { get; }
+    [Selector("ringtoneSound", "setRingtoneSound:")]
+    public NSString? RingtoneSound { get; set; }
+    [Selector("iconTemplateImageData", "setIconTemplateImageData:")]
+    public NSData? IconTemplateImageData { get; set; }
+    [Selector("maximumCallGroups", "setMaximumCallGroups:")]
+    public NSUInteger MaximumCallGroups { get; set; }
+    [Selector("maximumCallsPerCallGroup", "setMaximumCallsPerCallGroup:")]
+    public NSUInteger MaximumCallsPerCallGroup { get; set; }
+    [Selector("includesCallsInRecents", "setIncludesCallsInRecents:")]
+    public bool IncludesCallsInRecents { get; set; }
+    [Selector("supportsVideo", "setSupportsVideo:")]
+    public bool SupportsVideo { get; set; }
+    [Selector("supportsAudioTranslation", "setSupportsAudioTranslation:")]
+    public bool SupportsAudioTranslation { get; set; }
+    [Selector("supportedHandleTypes", "setSupportedHandleTypes:")]
+    public NSSet SupportedHandleTypes { get; set; }
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 11.0.
-    [Selector("initWithLocalizedName:")] public Self InitWithLocalizedName(NSString localizedName);
+    [Selector("initWithLocalizedName:")]
+    public Self InitWithLocalizedName(NSString localizedName);
 }
 
 #endif

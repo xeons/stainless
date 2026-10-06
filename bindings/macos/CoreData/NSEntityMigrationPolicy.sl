@@ -45,13 +45,20 @@ public extern "C" NSString NSMigrationEntityPolicyKey;
 
 public extern objc class NSEntityMigrationPolicy : NSObject
 {
-    [Selector("beginEntityMapping:manager:error:")] public bool BeginEntityMappingManagerError(NSEntityMapping mapping, NSMigrationManager manager, out NSError? error);
-    [Selector("createDestinationInstancesForSourceInstance:entityMapping:manager:error:")] public bool CreateDestinationInstancesForSourceInstanceEntityMappingManagerError(NSManagedObject sInstance, NSEntityMapping mapping, NSMigrationManager manager, out NSError? error);
-    [Selector("endInstanceCreationForEntityMapping:manager:error:")] public bool EndInstanceCreationForEntityMappingManagerError(NSEntityMapping mapping, NSMigrationManager manager, out NSError? error);
-    [Selector("createRelationshipsForDestinationInstance:entityMapping:manager:error:")] public bool CreateRelationshipsForDestinationInstanceEntityMappingManagerError(NSManagedObject dInstance, NSEntityMapping mapping, NSMigrationManager manager, out NSError? error);
-    [Selector("endRelationshipCreationForEntityMapping:manager:error:")] public bool EndRelationshipCreationForEntityMappingManagerError(NSEntityMapping mapping, NSMigrationManager manager, out NSError? error);
-    [Selector("performCustomValidationForEntityMapping:manager:error:")] public bool PerformCustomValidationForEntityMappingManagerError(NSEntityMapping mapping, NSMigrationManager manager, out NSError? error);
-    [Selector("endEntityMapping:manager:error:")] public bool EndEntityMappingManagerError(NSEntityMapping mapping, NSMigrationManager manager, out NSError? error);
+    [Selector("beginEntityMapping:manager:error:")]
+    public bool BeginEntityMappingManagerError(NSEntityMapping mapping, NSMigrationManager manager, out NSError? error);
+    [Selector("createDestinationInstancesForSourceInstance:entityMapping:manager:error:")]
+    public bool CreateDestinationInstancesForSourceInstanceEntityMappingManagerError(NSManagedObject sInstance, NSEntityMapping mapping, NSMigrationManager manager, out NSError? error);
+    [Selector("endInstanceCreationForEntityMapping:manager:error:")]
+    public bool EndInstanceCreationForEntityMappingManagerError(NSEntityMapping mapping, NSMigrationManager manager, out NSError? error);
+    [Selector("createRelationshipsForDestinationInstance:entityMapping:manager:error:")]
+    public bool CreateRelationshipsForDestinationInstanceEntityMappingManagerError(NSManagedObject dInstance, NSEntityMapping mapping, NSMigrationManager manager, out NSError? error);
+    [Selector("endRelationshipCreationForEntityMapping:manager:error:")]
+    public bool EndRelationshipCreationForEntityMappingManagerError(NSEntityMapping mapping, NSMigrationManager manager, out NSError? error);
+    [Selector("performCustomValidationForEntityMapping:manager:error:")]
+    public bool PerformCustomValidationForEntityMappingManagerError(NSEntityMapping mapping, NSMigrationManager manager, out NSError? error);
+    [Selector("endEntityMapping:manager:error:")]
+    public bool EndEntityMappingManagerError(NSEntityMapping mapping, NSMigrationManager manager, out NSError? error);
 }
 
 #endif

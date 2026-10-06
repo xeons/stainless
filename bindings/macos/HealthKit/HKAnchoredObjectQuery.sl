@@ -41,10 +41,14 @@ public objc closure void HKAnchoredObjectQueryInitWithQueryDescriptorsAnchorLimi
 
 public extern objc class HKAnchoredObjectQuery : HKQuery
 {
-    [Selector("updateHandler", "setUpdateHandler:")] public HKAnchoredObjectQueryUpdateHandlerBlock? UpdateHandler { get; set; }
-    [Selector("initWithType:predicate:anchor:limit:resultsHandler:")] public Self InitWithTypePredicateAnchorLimitResultsHandler(HKSampleType type, NSPredicate? predicate, HKQueryAnchor? anchor, NSUInteger limit, HKAnchoredObjectQueryInitWithTypePredicateAnchorLimitResultsHandlerHandlerBlock handler);
-    [Selector("initWithType:predicate:anchor:limit:completionHandler:")] public Self InitWithTypePredicateAnchorLimitCompletionHandler(HKSampleType type, NSPredicate? predicate, NSUInteger anchor, NSUInteger limit, HKAnchoredObjectQueryInitWithTypePredicateAnchorLimitCompletionHandlerHandlerBlock handler);
-    [Selector("initWithQueryDescriptors:anchor:limit:resultsHandler:")] public Self InitWithQueryDescriptorsAnchorLimitResultsHandler(NSArray queryDescriptors, HKQueryAnchor? anchor, NSInteger limit, HKAnchoredObjectQueryInitWithQueryDescriptorsAnchorLimitResultsHandlerHandlerBlock handler);
+    [Selector("updateHandler", "setUpdateHandler:")]
+    public HKAnchoredObjectQueryUpdateHandlerBlock? UpdateHandler { get; set; }
+    [Selector("initWithType:predicate:anchor:limit:resultsHandler:")]
+    public Self InitWithTypePredicateAnchorLimitResultsHandler(HKSampleType type, NSPredicate? predicate, HKQueryAnchor? anchor, NSUInteger limit, HKAnchoredObjectQueryInitWithTypePredicateAnchorLimitResultsHandlerHandlerBlock handler);
+    [Selector("initWithType:predicate:anchor:limit:completionHandler:")]
+    public Self InitWithTypePredicateAnchorLimitCompletionHandler(HKSampleType type, NSPredicate? predicate, NSUInteger anchor, NSUInteger limit, HKAnchoredObjectQueryInitWithTypePredicateAnchorLimitCompletionHandlerHandlerBlock handler);
+    [Selector("initWithQueryDescriptors:anchor:limit:resultsHandler:")]
+    public Self InitWithQueryDescriptorsAnchorLimitResultsHandler(NSArray queryDescriptors, HKQueryAnchor? anchor, NSInteger limit, HKAnchoredObjectQueryInitWithQueryDescriptorsAnchorLimitResultsHandlerHandlerBlock handler);
 }
 
 public const int HKAnchoredObjectQueryNoAnchor = 0;

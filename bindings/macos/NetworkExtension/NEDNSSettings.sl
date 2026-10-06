@@ -40,27 +40,39 @@ public enum NEDNSProtocol : long
 
 public extern objc class NEDNSSettings : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("dnsProtocol")] public NEDNSProtocol DnsProtocol { get; }
-    [Selector("servers")] public NSArray? Servers { get; }
-    [Selector("searchDomains", "setSearchDomains:")] public NSArray? SearchDomains { get; set; }
-    [Selector("domainName", "setDomainName:")] public NSString? DomainName { get; set; }
-    [Selector("matchDomains", "setMatchDomains:")] public NSArray? MatchDomains { get; set; }
-    [Selector("matchDomainsNoSearch", "setMatchDomainsNoSearch:")] public bool MatchDomainsNoSearch { get; set; }
+    [Selector("dnsProtocol")]
+    public NEDNSProtocol DnsProtocol { get; }
+    [Selector("servers")]
+    public NSArray? Servers { get; }
+    [Selector("searchDomains", "setSearchDomains:")]
+    public NSArray? SearchDomains { get; set; }
+    [Selector("domainName", "setDomainName:")]
+    public NSString? DomainName { get; set; }
+    [Selector("matchDomains", "setMatchDomains:")]
+    public NSArray? MatchDomains { get; set; }
+    [Selector("matchDomainsNoSearch", "setMatchDomainsNoSearch:")]
+    public bool MatchDomainsNoSearch { get; set; }
     /// macOS 26.0 and later.
-    [Selector("allowFailover", "setAllowFailover:")] public bool AllowFailover { get; set; }
-    [Selector("initWithServers:")] public Self InitWithServers(NSArray servers);
+    [Selector("allowFailover", "setAllowFailover:")]
+    public bool AllowFailover { get; set; }
+    [Selector("initWithServers:")]
+    public Self InitWithServers(NSArray servers);
 }
 
 public extern objc class NEDNSOverTLSSettings : NEDNSSettings
 {
-    [Selector("serverName", "setServerName:")] public NSString? ServerName { get; set; }
-    [Selector("identityReference", "setIdentityReference:")] public NSData? IdentityReference { get; set; }
+    [Selector("serverName", "setServerName:")]
+    public NSString? ServerName { get; set; }
+    [Selector("identityReference", "setIdentityReference:")]
+    public NSData? IdentityReference { get; set; }
 }
 
 public extern objc class NEDNSOverHTTPSSettings : NEDNSSettings
 {
-    [Selector("serverURL", "setServerURL:")] public NSURL? ServerURL { get; set; }
-    [Selector("identityReference", "setIdentityReference:")] public NSData? IdentityReference { get; set; }
+    [Selector("serverURL", "setServerURL:")]
+    public NSURL? ServerURL { get; set; }
+    [Selector("identityReference", "setIdentityReference:")]
+    public NSData? IdentityReference { get; set; }
 }
 
 #endif

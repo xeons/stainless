@@ -40,28 +40,48 @@ public enum NSPathStyle : long
 
 public extern objc class NSPathCell : NSActionCell, NSMenuItemValidation, NSOpenSavePanelDelegate
 {
-    [Selector("pathStyle", "setPathStyle:")] public NSPathStyle PathStyle { get; set; }
-    [Selector("URL", "setURL:")] public NSURL? URL { get; set; }
-    [Selector("allowedTypes", "setAllowedTypes:")] public NSArray? AllowedTypes { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSPathCellDelegate? Delegate { get; set; }
-    [Selector("pathComponentCellClass")] public static Class PathComponentCellClass { get; }
-    [Selector("pathComponentCells", "setPathComponentCells:")] public NSArray PathComponentCells { get; set; }
-    [Selector("clickedPathComponentCell")] public NSPathComponentCell? ClickedPathComponentCell { get; }
-    [Selector("doubleAction", "setDoubleAction:")] public Selector DoubleAction { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("placeholderString", "setPlaceholderString:")] public NSString? PlaceholderString { get; set; }
-    [Selector("placeholderAttributedString", "setPlaceholderAttributedString:")] public NSAttributedString? PlaceholderAttributedString { get; set; }
-    [Selector("setObjectValue:")] public void SetObjectValue(NSCopying? obj);
-    [Selector("rectOfPathComponentCell:withFrame:inView:")] public NSRect RectOfPathComponentCellWithFrameInView(NSPathComponentCell cell, NSRect frame, NSView view);
-    [Selector("pathComponentCellAtPoint:withFrame:inView:")] public NSPathComponentCell? PathComponentCellAtPointWithFrameInView(NSPoint point, NSRect frame, NSView view);
-    [Selector("mouseEntered:withFrame:inView:")] public void MouseEnteredWithFrameInView(NSEvent event, NSRect frame, NSView view);
-    [Selector("mouseExited:withFrame:inView:")] public void MouseExitedWithFrameInView(NSEvent event, NSRect frame, NSView view);
+    [Selector("pathStyle", "setPathStyle:")]
+    public NSPathStyle PathStyle { get; set; }
+    [Selector("URL", "setURL:")]
+    public NSURL? URL { get; set; }
+    [Selector("allowedTypes", "setAllowedTypes:")]
+    public NSArray? AllowedTypes { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSPathCellDelegate? Delegate { get; set; }
+    [Selector("pathComponentCellClass")]
+    public static Class PathComponentCellClass { get; }
+    [Selector("pathComponentCells", "setPathComponentCells:")]
+    public NSArray PathComponentCells { get; set; }
+    [Selector("clickedPathComponentCell")]
+    public NSPathComponentCell? ClickedPathComponentCell { get; }
+    [Selector("doubleAction", "setDoubleAction:")]
+    public Selector DoubleAction { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("placeholderString", "setPlaceholderString:")]
+    public NSString? PlaceholderString { get; set; }
+    [Selector("placeholderAttributedString", "setPlaceholderAttributedString:")]
+    public NSAttributedString? PlaceholderAttributedString { get; set; }
+    [Selector("setObjectValue:")]
+    public void SetObjectValue(NSCopying? obj);
+    [Selector("rectOfPathComponentCell:withFrame:inView:")]
+    public NSRect RectOfPathComponentCellWithFrameInView(NSPathComponentCell cell, NSRect frame, NSView view);
+    [Selector("pathComponentCellAtPoint:withFrame:inView:")]
+    public NSPathComponentCell? PathComponentCellAtPointWithFrameInView(NSPoint point, NSRect frame, NSView view);
+    [Selector("mouseEntered:withFrame:inView:")]
+    public void MouseEnteredWithFrameInView(NSEvent event, NSRect frame, NSView view);
+    [Selector("mouseExited:withFrame:inView:")]
+    public void MouseExitedWithFrameInView(NSEvent event, NSRect frame, NSView view);
 }
 
 public objc interface NSPathCellDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("pathCell:willDisplayOpenPanel:")] void PathCellWillDisplayOpenPanel(NSPathCell pathCell, NSOpenPanel openPanel);
-    [Optional] [Selector("pathCell:willPopUpMenu:")] void PathCellWillPopUpMenu(NSPathCell pathCell, NSMenu menu);
+    [Optional]
+    [Selector("pathCell:willDisplayOpenPanel:")]
+    void PathCellWillDisplayOpenPanel(NSPathCell pathCell, NSOpenPanel openPanel);
+    [Optional]
+    [Selector("pathCell:willPopUpMenu:")]
+    void PathCellWillPopUpMenu(NSPathCell pathCell, NSMenu menu);
 }
 
 #endif

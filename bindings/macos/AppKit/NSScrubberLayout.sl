@@ -34,47 +34,73 @@ import Standard.ObjC;
 
 public extern objc class NSScrubberLayoutAttributes : NSObject, NSCopying
 {
-    [Selector("itemIndex", "setItemIndex:")] public NSInteger ItemIndex { get; set; }
-    [Selector("frame", "setFrame:")] public NSRect Frame { get; set; }
-    [Selector("alpha", "setAlpha:")] public CGFloat Alpha { get; set; }
-    [Selector("layoutAttributesForItemAtIndex:")] public static Self LayoutAttributesForItemAtIndex(NSInteger index);
+    [Selector("itemIndex", "setItemIndex:")]
+    public NSInteger ItemIndex { get; set; }
+    [Selector("frame", "setFrame:")]
+    public NSRect Frame { get; set; }
+    [Selector("alpha", "setAlpha:")]
+    public CGFloat Alpha { get; set; }
+    [Selector("layoutAttributesForItemAtIndex:")]
+    public static Self LayoutAttributesForItemAtIndex(NSInteger index);
 }
 
 public extern objc class NSScrubberLayout : NSObject, NSCoding
 {
-    [Selector("layoutAttributesClass")] public static Class LayoutAttributesClass { get; }
-    [Selector("scrubber")] public NSScrubber? Scrubber { get; }
-    [Selector("visibleRect")] public NSRect VisibleRect { get; }
-    [Selector("scrubberContentSize")] public NSSize ScrubberContentSize { get; }
-    [Selector("shouldInvalidateLayoutForSelectionChange")] public bool ShouldInvalidateLayoutForSelectionChange { get; }
-    [Selector("shouldInvalidateLayoutForHighlightChange")] public bool ShouldInvalidateLayoutForHighlightChange { get; }
-    [Selector("automaticallyMirrorsInRightToLeftLayout")] public bool AutomaticallyMirrorsInRightToLeftLayout { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("invalidateLayout")] public void InvalidateLayout();
-    [Selector("prepareLayout")] public void PrepareLayout();
-    [Selector("layoutAttributesForItemAtIndex:")] public NSScrubberLayoutAttributes? LayoutAttributesForItemAtIndex(NSInteger index);
-    [Selector("layoutAttributesForItemsInRect:")] public NSSet LayoutAttributesForItemsInRect(NSRect rect);
-    [Selector("shouldInvalidateLayoutForChangeFromVisibleRect:toVisibleRect:")] public bool ShouldInvalidateLayoutForChangeFromVisibleRectToVisibleRect(NSRect fromVisibleRect, NSRect toVisibleRect);
+    [Selector("layoutAttributesClass")]
+    public static Class LayoutAttributesClass { get; }
+    [Selector("scrubber")]
+    public NSScrubber? Scrubber { get; }
+    [Selector("visibleRect")]
+    public NSRect VisibleRect { get; }
+    [Selector("scrubberContentSize")]
+    public NSSize ScrubberContentSize { get; }
+    [Selector("shouldInvalidateLayoutForSelectionChange")]
+    public bool ShouldInvalidateLayoutForSelectionChange { get; }
+    [Selector("shouldInvalidateLayoutForHighlightChange")]
+    public bool ShouldInvalidateLayoutForHighlightChange { get; }
+    [Selector("automaticallyMirrorsInRightToLeftLayout")]
+    public bool AutomaticallyMirrorsInRightToLeftLayout { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("invalidateLayout")]
+    public void InvalidateLayout();
+    [Selector("prepareLayout")]
+    public void PrepareLayout();
+    [Selector("layoutAttributesForItemAtIndex:")]
+    public NSScrubberLayoutAttributes? LayoutAttributesForItemAtIndex(NSInteger index);
+    [Selector("layoutAttributesForItemsInRect:")]
+    public NSSet LayoutAttributesForItemsInRect(NSRect rect);
+    [Selector("shouldInvalidateLayoutForChangeFromVisibleRect:toVisibleRect:")]
+    public bool ShouldInvalidateLayoutForChangeFromVisibleRectToVisibleRect(NSRect fromVisibleRect, NSRect toVisibleRect);
 }
 
 public objc interface NSScrubberFlowLayoutDelegate : NSScrubberDelegate
 {
-    [Optional] [Selector("scrubber:layout:sizeForItemAtIndex:")] NSSize ScrubberLayoutSizeForItemAtIndex(NSScrubber scrubber, NSScrubberFlowLayout layout, NSInteger itemIndex);
+    [Optional]
+    [Selector("scrubber:layout:sizeForItemAtIndex:")]
+    NSSize ScrubberLayoutSizeForItemAtIndex(NSScrubber scrubber, NSScrubberFlowLayout layout, NSInteger itemIndex);
 }
 
 public extern objc class NSScrubberFlowLayout : NSScrubberLayout
 {
-    [Selector("itemSpacing", "setItemSpacing:")] public CGFloat ItemSpacing { get; set; }
-    [Selector("itemSize", "setItemSize:")] public NSSize ItemSize { get; set; }
-    [Selector("invalidateLayoutForItemsAtIndexes:")] public void InvalidateLayoutForItemsAtIndexes(NSIndexSet invalidItemIndexes);
+    [Selector("itemSpacing", "setItemSpacing:")]
+    public CGFloat ItemSpacing { get; set; }
+    [Selector("itemSize", "setItemSize:")]
+    public NSSize ItemSize { get; set; }
+    [Selector("invalidateLayoutForItemsAtIndexes:")]
+    public void InvalidateLayoutForItemsAtIndexes(NSIndexSet invalidItemIndexes);
 }
 
 public extern objc class NSScrubberProportionalLayout : NSScrubberLayout
 {
-    [Selector("numberOfVisibleItems", "setNumberOfVisibleItems:")] public NSInteger NumberOfVisibleItems { get; set; }
-    [Selector("initWithNumberOfVisibleItems:")] public Self InitWithNumberOfVisibleItems(NSInteger numberOfVisibleItems);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
+    [Selector("numberOfVisibleItems", "setNumberOfVisibleItems:")]
+    public NSInteger NumberOfVisibleItems { get; set; }
+    [Selector("initWithNumberOfVisibleItems:")]
+    public Self InitWithNumberOfVisibleItems(NSInteger numberOfVisibleItems);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
 }
 
 #endif

@@ -33,20 +33,34 @@ import Standard.ObjC;
 
 public extern objc class AMWorkflow : NSObject, NSCopying
 {
-    [Selector("fileURL")] public NSURL? FileURL { get; }
-    [Selector("actions")] public NSArray Actions { get; }
-    [Selector("input", "setInput:")] public AnyObject? Input { get; set; }
-    [Selector("output")] public AnyObject? Output { get; }
-    [Selector("runWorkflowAtURL:withInput:error:")] public static AnyObject? RunWorkflowAtURLWithInputError(NSURL fileURL, AnyObject? input, out NSError? error);
-    [Selector("init")] public Self Init();
-    [Selector("initWithContentsOfURL:error:")] public Self? InitWithContentsOfURLError(NSURL fileURL, out NSError? outError);
-    [Selector("writeToURL:error:")] public bool WriteToURLError(NSURL fileURL, out NSError? outError);
-    [Selector("setValue:forVariableWithName:")] public bool SetValueForVariableWithName(AnyObject? value, NSString variableName);
-    [Selector("valueForVariableWithName:")] public AnyObject? ValueForVariableWithName(NSString variableName);
-    [Selector("addAction:")] public void AddAction(AMAction action);
-    [Selector("removeAction:")] public void RemoveAction(AMAction action);
-    [Selector("insertAction:atIndex:")] public void InsertActionAtIndex(AMAction action, NSUInteger index);
-    [Selector("moveActionAtIndex:toIndex:")] public void MoveActionAtIndexToIndex(NSUInteger startIndex, NSUInteger endIndex);
+    [Selector("fileURL")]
+    public NSURL? FileURL { get; }
+    [Selector("actions")]
+    public NSArray Actions { get; }
+    [Selector("input", "setInput:")]
+    public AnyObject? Input { get; set; }
+    [Selector("output")]
+    public AnyObject? Output { get; }
+    [Selector("runWorkflowAtURL:withInput:error:")]
+    public static AnyObject? RunWorkflowAtURLWithInputError(NSURL fileURL, AnyObject? input, out NSError? error);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithContentsOfURL:error:")]
+    public Self? InitWithContentsOfURLError(NSURL fileURL, out NSError? outError);
+    [Selector("writeToURL:error:")]
+    public bool WriteToURLError(NSURL fileURL, out NSError? outError);
+    [Selector("setValue:forVariableWithName:")]
+    public bool SetValueForVariableWithName(AnyObject? value, NSString variableName);
+    [Selector("valueForVariableWithName:")]
+    public AnyObject? ValueForVariableWithName(NSString variableName);
+    [Selector("addAction:")]
+    public void AddAction(AMAction action);
+    [Selector("removeAction:")]
+    public void RemoveAction(AMAction action);
+    [Selector("insertAction:atIndex:")]
+    public void InsertActionAtIndex(AMAction action, NSUInteger index);
+    [Selector("moveActionAtIndex:toIndex:")]
+    public void MoveActionAtIndexToIndex(NSUInteger startIndex, NSUInteger endIndex);
 }
 
 #endif

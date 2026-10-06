@@ -47,37 +47,63 @@ public enum MPSGraphRandomNormalSamplingMethod : ulong
 
 public extern objc class MPSGraphRandomOpDescriptor : MPSGraphObject, NSCopying
 {
-    [Selector("distribution", "setDistribution:")] public MPSGraphRandomDistribution Distribution { get; set; }
-    [Selector("dataType", "setDataType:")] public MPSDataType DataType { get; set; }
-    [Selector("min", "setMin:")] public float Min { get; set; }
-    [Selector("max", "setMax:")] public float Max { get; set; }
-    [Selector("minInteger", "setMinInteger:")] public NSInteger MinInteger { get; set; }
-    [Selector("maxInteger", "setMaxInteger:")] public NSInteger MaxInteger { get; set; }
-    [Selector("mean", "setMean:")] public float Mean { get; set; }
-    [Selector("standardDeviation", "setStandardDeviation:")] public float StandardDeviation { get; set; }
-    [Selector("samplingMethod", "setSamplingMethod:")] public MPSGraphRandomNormalSamplingMethod SamplingMethod { get; set; }
-    [Selector("descriptorWithDistribution:dataType:")] public static Self? DescriptorWithDistributionDataType(MPSGraphRandomDistribution distribution, MPSDataType dataType);
+    [Selector("distribution", "setDistribution:")]
+    public MPSGraphRandomDistribution Distribution { get; set; }
+    [Selector("dataType", "setDataType:")]
+    public MPSDataType DataType { get; set; }
+    [Selector("min", "setMin:")]
+    public float Min { get; set; }
+    [Selector("max", "setMax:")]
+    public float Max { get; set; }
+    [Selector("minInteger", "setMinInteger:")]
+    public NSInteger MinInteger { get; set; }
+    [Selector("maxInteger", "setMaxInteger:")]
+    public NSInteger MaxInteger { get; set; }
+    [Selector("mean", "setMean:")]
+    public float Mean { get; set; }
+    [Selector("standardDeviation", "setStandardDeviation:")]
+    public float StandardDeviation { get; set; }
+    [Selector("samplingMethod", "setSamplingMethod:")]
+    public MPSGraphRandomNormalSamplingMethod SamplingMethod { get; set; }
+    [Selector("descriptorWithDistribution:dataType:")]
+    public static Self? DescriptorWithDistributionDataType(MPSGraphRandomDistribution distribution, MPSDataType dataType);
 }
 
 /// MPSGraphRandomOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("randomPhiloxStateTensorWithSeed:name:")] public MPSGraphTensor RandomPhiloxStateTensorWithSeedName(NSUInteger seed, NSString? name);
-    [Selector("randomPhiloxStateTensorWithCounterLow:counterHigh:key:name:")] public MPSGraphTensor RandomPhiloxStateTensorWithCounterLowCounterHighKeyName(NSUInteger counterLow, NSUInteger counterHigh, NSUInteger key, NSString? name);
-    [Selector("randomTensorWithShape:descriptor:name:")] public MPSGraphTensor RandomTensorWithShapeDescriptorName(MPSShape shape, MPSGraphRandomOpDescriptor descriptor, NSString? name);
-    [Selector("randomTensorWithShapeTensor:descriptor:name:")] public MPSGraphTensor RandomTensorWithShapeTensorDescriptorName(MPSGraphTensor shapeTensor, MPSGraphRandomOpDescriptor descriptor, NSString? name);
-    [Selector("randomTensorWithShape:descriptor:seed:name:")] public MPSGraphTensor RandomTensorWithShapeDescriptorSeedName(MPSShape shape, MPSGraphRandomOpDescriptor descriptor, NSUInteger seed, NSString? name);
-    [Selector("randomTensorWithShapeTensor:descriptor:seed:name:")] public MPSGraphTensor RandomTensorWithShapeTensorDescriptorSeedName(MPSGraphTensor shapeTensor, MPSGraphRandomOpDescriptor descriptor, NSUInteger seed, NSString? name);
-    [Selector("randomTensorWithShape:descriptor:stateTensor:name:")] public NSArray RandomTensorWithShapeDescriptorStateTensorName(MPSShape shape, MPSGraphRandomOpDescriptor descriptor, MPSGraphTensor state, NSString? name);
-    [Selector("randomTensorWithShapeTensor:descriptor:stateTensor:name:")] public NSArray RandomTensorWithShapeTensorDescriptorStateTensorName(MPSGraphTensor shapeTensor, MPSGraphRandomOpDescriptor descriptor, MPSGraphTensor state, NSString? name);
-    [Selector("randomUniformTensorWithShape:name:")] public MPSGraphTensor RandomUniformTensorWithShapeName(MPSShape shape, NSString? name);
-    [Selector("randomUniformTensorWithShapeTensor:name:")] public MPSGraphTensor RandomUniformTensorWithShapeTensorName(MPSGraphTensor shapeTensor, NSString? name);
-    [Selector("randomUniformTensorWithShape:seed:name:")] public MPSGraphTensor RandomUniformTensorWithShapeSeedName(MPSShape shape, NSUInteger seed, NSString? name);
-    [Selector("randomUniformTensorWithShapeTensor:seed:name:")] public MPSGraphTensor RandomUniformTensorWithShapeTensorSeedName(MPSGraphTensor shapeTensor, NSUInteger seed, NSString? name);
-    [Selector("randomUniformTensorWithShape:stateTensor:name:")] public NSArray RandomUniformTensorWithShapeStateTensorName(MPSShape shape, MPSGraphTensor state, NSString? name);
-    [Selector("randomUniformTensorWithShapeTensor:stateTensor:name:")] public NSArray RandomUniformTensorWithShapeTensorStateTensorName(MPSGraphTensor shapeTensor, MPSGraphTensor state, NSString? name);
-    [Selector("dropoutTensor:rate:name:")] public MPSGraphTensor DropoutTensorRateName(MPSGraphTensor tensor, double rate, NSString? name);
-    [Selector("dropoutTensor:rateTensor:name:")] public MPSGraphTensor DropoutTensorRateTensorName(MPSGraphTensor tensor, MPSGraphTensor rate, NSString? name);
+    [Selector("randomPhiloxStateTensorWithSeed:name:")]
+    public MPSGraphTensor RandomPhiloxStateTensorWithSeedName(NSUInteger seed, NSString? name);
+    [Selector("randomPhiloxStateTensorWithCounterLow:counterHigh:key:name:")]
+    public MPSGraphTensor RandomPhiloxStateTensorWithCounterLowCounterHighKeyName(NSUInteger counterLow, NSUInteger counterHigh, NSUInteger key, NSString? name);
+    [Selector("randomTensorWithShape:descriptor:name:")]
+    public MPSGraphTensor RandomTensorWithShapeDescriptorName(MPSShape shape, MPSGraphRandomOpDescriptor descriptor, NSString? name);
+    [Selector("randomTensorWithShapeTensor:descriptor:name:")]
+    public MPSGraphTensor RandomTensorWithShapeTensorDescriptorName(MPSGraphTensor shapeTensor, MPSGraphRandomOpDescriptor descriptor, NSString? name);
+    [Selector("randomTensorWithShape:descriptor:seed:name:")]
+    public MPSGraphTensor RandomTensorWithShapeDescriptorSeedName(MPSShape shape, MPSGraphRandomOpDescriptor descriptor, NSUInteger seed, NSString? name);
+    [Selector("randomTensorWithShapeTensor:descriptor:seed:name:")]
+    public MPSGraphTensor RandomTensorWithShapeTensorDescriptorSeedName(MPSGraphTensor shapeTensor, MPSGraphRandomOpDescriptor descriptor, NSUInteger seed, NSString? name);
+    [Selector("randomTensorWithShape:descriptor:stateTensor:name:")]
+    public NSArray RandomTensorWithShapeDescriptorStateTensorName(MPSShape shape, MPSGraphRandomOpDescriptor descriptor, MPSGraphTensor state, NSString? name);
+    [Selector("randomTensorWithShapeTensor:descriptor:stateTensor:name:")]
+    public NSArray RandomTensorWithShapeTensorDescriptorStateTensorName(MPSGraphTensor shapeTensor, MPSGraphRandomOpDescriptor descriptor, MPSGraphTensor state, NSString? name);
+    [Selector("randomUniformTensorWithShape:name:")]
+    public MPSGraphTensor RandomUniformTensorWithShapeName(MPSShape shape, NSString? name);
+    [Selector("randomUniformTensorWithShapeTensor:name:")]
+    public MPSGraphTensor RandomUniformTensorWithShapeTensorName(MPSGraphTensor shapeTensor, NSString? name);
+    [Selector("randomUniformTensorWithShape:seed:name:")]
+    public MPSGraphTensor RandomUniformTensorWithShapeSeedName(MPSShape shape, NSUInteger seed, NSString? name);
+    [Selector("randomUniformTensorWithShapeTensor:seed:name:")]
+    public MPSGraphTensor RandomUniformTensorWithShapeTensorSeedName(MPSGraphTensor shapeTensor, NSUInteger seed, NSString? name);
+    [Selector("randomUniformTensorWithShape:stateTensor:name:")]
+    public NSArray RandomUniformTensorWithShapeStateTensorName(MPSShape shape, MPSGraphTensor state, NSString? name);
+    [Selector("randomUniformTensorWithShapeTensor:stateTensor:name:")]
+    public NSArray RandomUniformTensorWithShapeTensorStateTensorName(MPSGraphTensor shapeTensor, MPSGraphTensor state, NSString? name);
+    [Selector("dropoutTensor:rate:name:")]
+    public MPSGraphTensor DropoutTensorRateName(MPSGraphTensor tensor, double rate, NSString? name);
+    [Selector("dropoutTensor:rateTensor:name:")]
+    public MPSGraphTensor DropoutTensorRateTensorName(MPSGraphTensor tensor, MPSGraphTensor rate, NSString? name);
 }
 
 #endif

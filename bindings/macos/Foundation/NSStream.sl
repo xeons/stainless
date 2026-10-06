@@ -57,72 +57,105 @@ public enum NSStreamEvent : ulong
 
 public extern objc class NSStream : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public NSStreamDelegate? Delegate { get; set; }
-    [Selector("streamStatus")] public NSStreamStatus StreamStatus { get; }
-    [Selector("streamError")] public NSError? StreamError { get; }
-    [Selector("open")] public void Open();
-    [Selector("close")] public void Close();
-    [Selector("propertyForKey:")] public AnyObject? PropertyForKey(NSStreamPropertyKey key);
-    [Selector("setProperty:forKey:")] public bool SetPropertyForKey(AnyObject? property, NSStreamPropertyKey key);
-    [Selector("scheduleInRunLoop:forMode:")] public void ScheduleInRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
-    [Selector("removeFromRunLoop:forMode:")] public void RemoveFromRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
+    [Selector("delegate", "setDelegate:")]
+    public NSStreamDelegate? Delegate { get; set; }
+    [Selector("streamStatus")]
+    public NSStreamStatus StreamStatus { get; }
+    [Selector("streamError")]
+    public NSError? StreamError { get; }
+    [Selector("open")]
+    public void Open();
+    [Selector("close")]
+    public void Close();
+    [Selector("propertyForKey:")]
+    public AnyObject? PropertyForKey(NSStreamPropertyKey key);
+    [Selector("setProperty:forKey:")]
+    public bool SetPropertyForKey(AnyObject? property, NSStreamPropertyKey key);
+    [Selector("scheduleInRunLoop:forMode:")]
+    public void ScheduleInRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
+    [Selector("removeFromRunLoop:forMode:")]
+    public void RemoveFromRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
 }
 
 public extern objc class NSInputStream : NSStream
 {
-    [Selector("hasBytesAvailable")] public bool HasBytesAvailable { get; }
-    [Selector("read:maxLength:")] public NSInteger ReadMaxLength(byte* buffer, NSUInteger len);
-    [Selector("getBuffer:length:")] public bool GetBufferLength(byte** buffer, NSUInteger* len);
-    [Selector("initWithData:")] public Self InitWithData(NSData data);
-    [Selector("initWithURL:")] public Self? InitWithURL(NSURL url);
+    [Selector("hasBytesAvailable")]
+    public bool HasBytesAvailable { get; }
+    [Selector("read:maxLength:")]
+    public NSInteger ReadMaxLength(byte* buffer, NSUInteger len);
+    [Selector("getBuffer:length:")]
+    public bool GetBufferLength(byte** buffer, NSUInteger* len);
+    [Selector("initWithData:")]
+    public Self InitWithData(NSData data);
+    [Selector("initWithURL:")]
+    public Self? InitWithURL(NSURL url);
 }
 
 public extern objc class NSOutputStream : NSStream
 {
-    [Selector("hasSpaceAvailable")] public bool HasSpaceAvailable { get; }
-    [Selector("write:maxLength:")] public NSInteger WriteMaxLength(byte* buffer, NSUInteger len);
-    [Selector("initToMemory")] public Self InitToMemory();
-    [Selector("initToBuffer:capacity:")] public Self InitToBufferCapacity(byte* buffer, NSUInteger capacity);
-    [Selector("initWithURL:append:")] public Self? InitWithURLAppend(NSURL url, bool shouldAppend);
+    [Selector("hasSpaceAvailable")]
+    public bool HasSpaceAvailable { get; }
+    [Selector("write:maxLength:")]
+    public NSInteger WriteMaxLength(byte* buffer, NSUInteger len);
+    [Selector("initToMemory")]
+    public Self InitToMemory();
+    [Selector("initToBuffer:capacity:")]
+    public Self InitToBufferCapacity(byte* buffer, NSUInteger capacity);
+    [Selector("initWithURL:append:")]
+    public Self? InitWithURLAppend(NSURL url, bool shouldAppend);
 }
 
 /// NSSocketStreamCreationExtensions, a category of NSStream.
 public extern objc class NSStream
 {
     /// Deprecated in macOS 100000.
-    [Selector("getStreamsToHostWithName:port:inputStream:outputStream:")] public static void GetStreamsToHostWithNamePortInputStreamOutputStream(NSString hostname, NSInteger port, out NSInputStream? inputStream, out NSOutputStream? outputStream);
+    [Selector("getStreamsToHostWithName:port:inputStream:outputStream:")]
+    public static void GetStreamsToHostWithNamePortInputStreamOutputStream(NSString hostname, NSInteger port, out NSInputStream? inputStream, out NSOutputStream? outputStream);
     /// Deprecated in macOS 10.10.
-    [Selector("getStreamsToHost:port:inputStream:outputStream:")] public static void GetStreamsToHostPortInputStreamOutputStream(NSHost host, NSInteger port, out NSInputStream? inputStream, out NSOutputStream? outputStream);
+    [Selector("getStreamsToHost:port:inputStream:outputStream:")]
+    public static void GetStreamsToHostPortInputStreamOutputStream(NSHost host, NSInteger port, out NSInputStream? inputStream, out NSOutputStream? outputStream);
 }
 
 /// NSStreamBoundPairCreationExtensions, a category of NSStream.
 public extern objc class NSStream
 {
-    [Selector("getBoundStreamsWithBufferSize:inputStream:outputStream:")] public static void GetBoundStreamsWithBufferSizeInputStreamOutputStream(NSUInteger bufferSize, out NSInputStream? inputStream, out NSOutputStream? outputStream);
+    [Selector("getBoundStreamsWithBufferSize:inputStream:outputStream:")]
+    public static void GetBoundStreamsWithBufferSizeInputStreamOutputStream(NSUInteger bufferSize, out NSInputStream? inputStream, out NSOutputStream? outputStream);
 }
 
 /// NSInputStreamExtensions, a category of NSInputStream.
 public extern objc class NSInputStream
 {
-    [Selector("initWithFileAtPath:")] public Self? InitWithFileAtPath(NSString path);
-    [Selector("inputStreamWithData:")] public static Self? InputStreamWithData(NSData data);
-    [Selector("inputStreamWithFileAtPath:")] public static Self? InputStreamWithFileAtPath(NSString path);
-    [Selector("inputStreamWithURL:")] public static Self? InputStreamWithURL(NSURL url);
+    [Selector("initWithFileAtPath:")]
+    public Self? InitWithFileAtPath(NSString path);
+    [Selector("inputStreamWithData:")]
+    public static Self? InputStreamWithData(NSData data);
+    [Selector("inputStreamWithFileAtPath:")]
+    public static Self? InputStreamWithFileAtPath(NSString path);
+    [Selector("inputStreamWithURL:")]
+    public static Self? InputStreamWithURL(NSURL url);
 }
 
 /// NSOutputStreamExtensions, a category of NSOutputStream.
 public extern objc class NSOutputStream
 {
-    [Selector("initToFileAtPath:append:")] public Self? InitToFileAtPathAppend(NSString path, bool shouldAppend);
-    [Selector("outputStreamToMemory")] public static Self OutputStreamToMemory();
-    [Selector("outputStreamToBuffer:capacity:")] public static Self OutputStreamToBufferCapacity(byte* buffer, NSUInteger capacity);
-    [Selector("outputStreamToFileAtPath:append:")] public static Self OutputStreamToFileAtPathAppend(NSString path, bool shouldAppend);
-    [Selector("outputStreamWithURL:append:")] public static Self? OutputStreamWithURLAppend(NSURL url, bool shouldAppend);
+    [Selector("initToFileAtPath:append:")]
+    public Self? InitToFileAtPathAppend(NSString path, bool shouldAppend);
+    [Selector("outputStreamToMemory")]
+    public static Self OutputStreamToMemory();
+    [Selector("outputStreamToBuffer:capacity:")]
+    public static Self OutputStreamToBufferCapacity(byte* buffer, NSUInteger capacity);
+    [Selector("outputStreamToFileAtPath:append:")]
+    public static Self OutputStreamToFileAtPathAppend(NSString path, bool shouldAppend);
+    [Selector("outputStreamWithURL:append:")]
+    public static Self? OutputStreamWithURLAppend(NSURL url, bool shouldAppend);
 }
 
 public objc interface NSStreamDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("stream:handleEvent:")] void StreamHandleEvent(NSStream aStream, NSStreamEvent eventCode);
+    [Optional]
+    [Selector("stream:handleEvent:")]
+    void StreamHandleEvent(NSStream aStream, NSStreamEvent eventCode);
 }
 
 public extern "C" NSStreamPropertyKey NSStreamSocketSecurityLevelKey;

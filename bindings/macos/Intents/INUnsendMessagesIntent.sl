@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class INUnsendMessagesIntent : INIntent
 {
-    [Selector("messageIdentifiers")] public NSArray? MessageIdentifiers { get; }
-    [Selector("initWithMessageIdentifiers:")] public Self InitWithMessageIdentifiers(NSArray? messageIdentifiers);
+    [Selector("messageIdentifiers")]
+    public NSArray? MessageIdentifiers { get; }
+    [Selector("initWithMessageIdentifiers:")]
+    public Self InitWithMessageIdentifiers(NSArray? messageIdentifiers);
 }
 
 public objc closure void INUnsendMessagesIntentHandlingHandleUnsendMessagesCompletionCompletionBlock(INUnsendMessagesIntentResponse arg0);
@@ -43,8 +45,11 @@ public objc closure void INUnsendMessagesIntentHandlingConfirmUnsendMessagesComp
 
 public objc interface INUnsendMessagesIntentHandling : NSObjectProtocol
 {
-    [Selector("handleUnsendMessages:completion:")] void HandleUnsendMessagesCompletion(INUnsendMessagesIntent intent, INUnsendMessagesIntentHandlingHandleUnsendMessagesCompletionCompletionBlock completion);
-    [Optional] [Selector("confirmUnsendMessages:completion:")] void ConfirmUnsendMessagesCompletion(INUnsendMessagesIntent intent, INUnsendMessagesIntentHandlingConfirmUnsendMessagesCompletionCompletionBlock completion);
+    [Selector("handleUnsendMessages:completion:")]
+    void HandleUnsendMessagesCompletion(INUnsendMessagesIntent intent, INUnsendMessagesIntentHandlingHandleUnsendMessagesCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("confirmUnsendMessages:completion:")]
+    void ConfirmUnsendMessagesCompletion(INUnsendMessagesIntent intent, INUnsendMessagesIntentHandlingConfirmUnsendMessagesCompletionCompletionBlock completion);
 }
 
 #endif

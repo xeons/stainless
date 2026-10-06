@@ -34,14 +34,18 @@ import Standard.ObjC;
 
 public extern objc class PHASEShapeElement : NSObject
 {
-    [Selector("material", "setMaterial:")] public PHASEMaterial? Material { get; set; }
+    [Selector("material", "setMaterial:")]
+    public PHASEMaterial? Material { get; set; }
 }
 
 public extern objc class PHASEShape : NSObject, NSCopying
 {
-    [Selector("elements")] public NSArray Elements { get; }
-    [Selector("initWithEngine:mesh:")] public Self InitWithEngineMesh(PHASEEngine engine, MDLMesh mesh);
-    [Selector("initWithEngine:mesh:materials:")] public Self InitWithEngineMeshMaterials(PHASEEngine engine, MDLMesh mesh, NSArray materials);
+    [Selector("elements")]
+    public NSArray Elements { get; }
+    [Selector("initWithEngine:mesh:")]
+    public Self InitWithEngineMesh(PHASEEngine engine, MDLMesh mesh);
+    [Selector("initWithEngine:mesh:materials:")]
+    public Self InitWithEngineMeshMaterials(PHASEEngine engine, MDLMesh mesh, NSArray materials);
 }
 
 #endif

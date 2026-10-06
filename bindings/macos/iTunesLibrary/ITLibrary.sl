@@ -46,22 +46,38 @@ public extern "C" NSNotificationName? ITLibraryDidChangeNotification;
 
 public extern objc class ITLibrary : NSObject
 {
-    [Selector("applicationVersion")] public NSString ApplicationVersion { get; }
-    [Selector("features")] public ITLibExportFeature Features { get; }
-    [Selector("apiMajorVersion")] public NSUInteger ApiMajorVersion { get; }
-    [Selector("apiMinorVersion")] public NSUInteger ApiMinorVersion { get; }
-    [Selector("mediaFolderLocation")] public NSURL? MediaFolderLocation { get; }
-    [Selector("musicFolderLocation")] public NSURL? MusicFolderLocation { get; }
-    [Selector("shouldShowContentRating")] public bool ShowContentRating { get; }
-    [Selector("allMediaItems")] public NSArray AllMediaItems { get; }
-    [Selector("allPlaylists")] public NSArray AllPlaylists { get; }
-    [Selector("libraryWithAPIVersion:error:")] public static Self? LibraryWithAPIVersionError(NSString requestedAPIVersion, out NSError? error);
-    [Selector("libraryWithAPIVersion:options:error:")] public static Self? LibraryWithAPIVersionOptionsError(NSString requestedAPIVersion, ITLibInitOptions options, out NSError? error);
-    [Selector("initWithAPIVersion:error:")] public Self? InitWithAPIVersionError(NSString requestedAPIVersion, out NSError? error);
-    [Selector("initWithAPIVersion:options:error:")] public Self? InitWithAPIVersionOptionsError(NSString requestedAPIVersion, ITLibInitOptions options, out NSError? error);
-    [Selector("artworkForMediaFile:")] public ITLibArtwork? ArtworkForMediaFile(NSURL mediaFileURL);
-    [Selector("reloadData")] public bool ReloadData();
-    [Selector("unloadData")] public void UnloadData();
+    [Selector("applicationVersion")]
+    public NSString ApplicationVersion { get; }
+    [Selector("features")]
+    public ITLibExportFeature Features { get; }
+    [Selector("apiMajorVersion")]
+    public NSUInteger ApiMajorVersion { get; }
+    [Selector("apiMinorVersion")]
+    public NSUInteger ApiMinorVersion { get; }
+    [Selector("mediaFolderLocation")]
+    public NSURL? MediaFolderLocation { get; }
+    [Selector("musicFolderLocation")]
+    public NSURL? MusicFolderLocation { get; }
+    [Selector("shouldShowContentRating")]
+    public bool ShowContentRating { get; }
+    [Selector("allMediaItems")]
+    public NSArray AllMediaItems { get; }
+    [Selector("allPlaylists")]
+    public NSArray AllPlaylists { get; }
+    [Selector("libraryWithAPIVersion:error:")]
+    public static Self? LibraryWithAPIVersionError(NSString requestedAPIVersion, out NSError? error);
+    [Selector("libraryWithAPIVersion:options:error:")]
+    public static Self? LibraryWithAPIVersionOptionsError(NSString requestedAPIVersion, ITLibInitOptions options, out NSError? error);
+    [Selector("initWithAPIVersion:error:")]
+    public Self? InitWithAPIVersionError(NSString requestedAPIVersion, out NSError? error);
+    [Selector("initWithAPIVersion:options:error:")]
+    public Self? InitWithAPIVersionOptionsError(NSString requestedAPIVersion, ITLibInitOptions options, out NSError? error);
+    [Selector("artworkForMediaFile:")]
+    public ITLibArtwork? ArtworkForMediaFile(NSURL mediaFileURL);
+    [Selector("reloadData")]
+    public bool ReloadData();
+    [Selector("unloadData")]
+    public void UnloadData();
 }
 
 #endif

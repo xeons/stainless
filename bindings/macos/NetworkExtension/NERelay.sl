@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class NERelay : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("HTTP3RelayURL", "setHTTP3RelayURL:")] public NSURL? HTTP3RelayURL { get; set; }
-    [Selector("HTTP2RelayURL", "setHTTP2RelayURL:")] public NSURL? HTTP2RelayURL { get; set; }
-    [Selector("dnsOverHTTPSURL", "setDnsOverHTTPSURL:")] public NSURL? DnsOverHTTPSURL { get; set; }
-    [Selector("syntheticDNSAnswerIPv4Prefix", "setSyntheticDNSAnswerIPv4Prefix:")] public NSString? SyntheticDNSAnswerIPv4Prefix { get; set; }
-    [Selector("syntheticDNSAnswerIPv6Prefix", "setSyntheticDNSAnswerIPv6Prefix:")] public NSString? SyntheticDNSAnswerIPv6Prefix { get; set; }
-    [Selector("additionalHTTPHeaderFields", "setAdditionalHTTPHeaderFields:")] public NSDictionary AdditionalHTTPHeaderFields { get; set; }
-    [Selector("rawPublicKeys", "setRawPublicKeys:")] public NSArray? RawPublicKeys { get; set; }
-    [Selector("identityData", "setIdentityData:")] public NSData? IdentityData { get; set; }
-    [Selector("identityDataPassword", "setIdentityDataPassword:")] public NSString? IdentityDataPassword { get; set; }
+    [Selector("HTTP3RelayURL", "setHTTP3RelayURL:")]
+    public NSURL? HTTP3RelayURL { get; set; }
+    [Selector("HTTP2RelayURL", "setHTTP2RelayURL:")]
+    public NSURL? HTTP2RelayURL { get; set; }
+    [Selector("dnsOverHTTPSURL", "setDnsOverHTTPSURL:")]
+    public NSURL? DnsOverHTTPSURL { get; set; }
+    [Selector("syntheticDNSAnswerIPv4Prefix", "setSyntheticDNSAnswerIPv4Prefix:")]
+    public NSString? SyntheticDNSAnswerIPv4Prefix { get; set; }
+    [Selector("syntheticDNSAnswerIPv6Prefix", "setSyntheticDNSAnswerIPv6Prefix:")]
+    public NSString? SyntheticDNSAnswerIPv6Prefix { get; set; }
+    [Selector("additionalHTTPHeaderFields", "setAdditionalHTTPHeaderFields:")]
+    public NSDictionary AdditionalHTTPHeaderFields { get; set; }
+    [Selector("rawPublicKeys", "setRawPublicKeys:")]
+    public NSArray? RawPublicKeys { get; set; }
+    [Selector("identityData", "setIdentityData:")]
+    public NSData? IdentityData { get; set; }
+    [Selector("identityDataPassword", "setIdentityDataPassword:")]
+    public NSString? IdentityDataPassword { get; set; }
 }
 
 #endif

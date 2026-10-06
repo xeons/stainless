@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MLKey : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("scope")] public NSString? Scope { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("scope")]
+    public NSString? Scope { get; }
 }
 
 #endif

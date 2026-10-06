@@ -34,13 +34,20 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationProviderExtensionKerberosMapping : NSObject
 {
-    [Selector("ticketKeyPath", "setTicketKeyPath:")] public NSString? TicketKeyPath { get; set; }
-    [Selector("messageBufferKeyName", "setMessageBufferKeyName:")] public NSString? MessageBufferKeyName { get; set; }
-    [Selector("realmKeyName", "setRealmKeyName:")] public NSString? RealmKeyName { get; set; }
-    [Selector("serviceNameKeyName", "setServiceNameKeyName:")] public NSString? ServiceNameKeyName { get; set; }
-    [Selector("clientNameKeyName", "setClientNameKeyName:")] public NSString? ClientNameKeyName { get; set; }
-    [Selector("encryptionKeyTypeKeyName", "setEncryptionKeyTypeKeyName:")] public NSString? EncryptionKeyTypeKeyName { get; set; }
-    [Selector("sessionKeyKeyName", "setSessionKeyKeyName:")] public NSString? SessionKeyKeyName { get; set; }
+    [Selector("ticketKeyPath", "setTicketKeyPath:")]
+    public NSString? TicketKeyPath { get; set; }
+    [Selector("messageBufferKeyName", "setMessageBufferKeyName:")]
+    public NSString? MessageBufferKeyName { get; set; }
+    [Selector("realmKeyName", "setRealmKeyName:")]
+    public NSString? RealmKeyName { get; set; }
+    [Selector("serviceNameKeyName", "setServiceNameKeyName:")]
+    public NSString? ServiceNameKeyName { get; set; }
+    [Selector("clientNameKeyName", "setClientNameKeyName:")]
+    public NSString? ClientNameKeyName { get; set; }
+    [Selector("encryptionKeyTypeKeyName", "setEncryptionKeyTypeKeyName:")]
+    public NSString? EncryptionKeyTypeKeyName { get; set; }
+    [Selector("sessionKeyKeyName", "setSessionKeyKeyName:")]
+    public NSString? SessionKeyKeyName { get; set; }
 }
 
 public enum ASAuthorizationProviderExtensionFederationType : long
@@ -82,62 +89,118 @@ public objc closure void ASAuthorizationProviderExtensionLoginConfigurationConfi
 
 public extern objc class ASAuthorizationProviderExtensionLoginConfiguration : NSObject
 {
-    [Selector("invalidCredentialPredicate", "setInvalidCredentialPredicate:")] public NSString? InvalidCredentialPredicate { get; set; }
-    [Selector("accountDisplayName", "setAccountDisplayName:")] public NSString? AccountDisplayName { get; set; }
-    [Selector("clientID")] public NSString ClientID { get; }
-    [Selector("issuer")] public NSString Issuer { get; }
-    [Selector("audience", "setAudience:")] public NSString Audience { get; set; }
-    [Selector("tokenEndpointURL", "setTokenEndpointURL:")] public NSURL TokenEndpointURL { get; set; }
-    [Selector("jwksEndpointURL", "setJwksEndpointURL:")] public NSURL JwksEndpointURL { get; set; }
-    [Selector("jwksTrustedRootCertificates", "setJwksTrustedRootCertificates:")] public NSArray? JwksTrustedRootCertificates { get; set; }
-    [Selector("deviceContext", "setDeviceContext:")] public NSData? DeviceContext { get; set; }
-    [Selector("userSecureEnclaveKeyBiometricPolicy", "setUserSecureEnclaveKeyBiometricPolicy:")] public ASAuthorizationProviderExtensionUserSecureEnclaveKeyBiometricPolicy UserSecureEnclaveKeyBiometricPolicy { get; set; }
-    [Selector("nonceEndpointURL", "setNonceEndpointURL:")] public NSURL NonceEndpointURL { get; set; }
-    [Selector("nonceResponseKeypath", "setNonceResponseKeypath:")] public NSString NonceResponseKeypath { get; set; }
-    [Selector("serverNonceClaimName", "setServerNonceClaimName:")] public NSString ServerNonceClaimName { get; set; }
-    [Selector("customNonceRequestValues", "setCustomNonceRequestValues:")] public NSArray CustomNonceRequestValues { get; set; }
-    [Selector("additionalScopes", "setAdditionalScopes:")] public NSString AdditionalScopes { get; set; }
-    [Selector("additionalAuthorizationScopes", "setAdditionalAuthorizationScopes:")] public NSString? AdditionalAuthorizationScopes { get; set; }
-    [Selector("includePreviousRefreshTokenInLoginRequest", "setIncludePreviousRefreshTokenInLoginRequest:")] public bool IncludePreviousRefreshTokenInLoginRequest { get; set; }
-    [Selector("previousRefreshTokenClaimName", "setPreviousRefreshTokenClaimName:")] public NSString PreviousRefreshTokenClaimName { get; set; }
-    [Selector("customRequestJWTParameterName", "setCustomRequestJWTParameterName:")] public NSString? CustomRequestJWTParameterName { get; set; }
-    [Selector("customLoginRequestValues", "setCustomLoginRequestValues:")] public NSArray CustomLoginRequestValues { get; set; }
-    [Selector("uniqueIdentifierClaimName", "setUniqueIdentifierClaimName:")] public NSString? UniqueIdentifierClaimName { get; set; }
-    [Selector("groupRequestClaimName", "setGroupRequestClaimName:")] public NSString? GroupRequestClaimName { get; set; }
-    [Selector("groupResponseClaimName", "setGroupResponseClaimName:")] public NSString? GroupResponseClaimName { get; set; }
-    [Selector("kerberosTicketMappings", "setKerberosTicketMappings:")] public NSArray KerberosTicketMappings { get; set; }
-    [Selector("refreshEndpointURL", "setRefreshEndpointURL:")] public NSURL? RefreshEndpointURL { get; set; }
-    [Selector("customRefreshRequestValues", "setCustomRefreshRequestValues:")] public NSArray? CustomRefreshRequestValues { get; set; }
-    [Selector("federationType", "setFederationType:")] public ASAuthorizationProviderExtensionFederationType FederationType { get; set; }
-    [Selector("federationRequestURN", "setFederationRequestURN:")] public NSString? FederationRequestURN { get; set; }
-    [Selector("federationMEXURL", "setFederationMEXURL:")] public NSURL? FederationMEXURL { get; set; }
-    [Selector("federationUserPreauthenticationURL", "setFederationUserPreauthenticationURL:")] public NSURL? FederationUserPreauthenticationURL { get; set; }
-    [Selector("federationMEXURLKeypath", "setFederationMEXURLKeypath:")] public NSString? FederationMEXURLKeypath { get; set; }
-    [Selector("federationPredicate", "setFederationPredicate:")] public NSString? FederationPredicate { get; set; }
-    [Selector("customFederationUserPreauthenticationRequestValues", "setCustomFederationUserPreauthenticationRequestValues:")] public NSArray? CustomFederationUserPreauthenticationRequestValues { get; set; }
-    [Selector("loginRequestEncryptionPublicKey", "setLoginRequestEncryptionPublicKey:")] public SecKeyRef? LoginRequestEncryptionPublicKey { get; set; }
-    [Selector("loginRequestEncryptionAPVPrefix", "setLoginRequestEncryptionAPVPrefix:")] public NSData? LoginRequestEncryptionAPVPrefix { get; set; }
-    [Selector("loginRequestEncryptionAlgorithm", "setLoginRequestEncryptionAlgorithm:")] public ASAuthorizationProviderExtensionEncryptionAlgorithm? LoginRequestEncryptionAlgorithm { get; set; }
-    [Selector("loginRequestHPKEPreSharedKey", "setLoginRequestHPKEPreSharedKey:")] public NSData? LoginRequestHPKEPreSharedKey { get; set; }
-    [Selector("loginRequestHPKEPreSharedKeyID", "setLoginRequestHPKEPreSharedKeyID:")] public NSData? LoginRequestHPKEPreSharedKeyID { get; set; }
-    [Selector("keyEndpointURL", "setKeyEndpointURL:")] public NSURL? KeyEndpointURL { get; set; }
-    [Selector("customKeyExchangeRequestValues", "setCustomKeyExchangeRequestValues:")] public NSArray? CustomKeyExchangeRequestValues { get; set; }
-    [Selector("customKeyRequestValues", "setCustomKeyRequestValues:")] public NSArray? CustomKeyRequestValues { get; set; }
-    [Selector("hpkePreSharedKey", "setHpkePreSharedKey:")] public NSData? HpkePreSharedKey { get; set; }
-    [Selector("hpkePreSharedKeyID", "setHpkePreSharedKeyID:")] public NSData? HpkePreSharedKeyID { get; set; }
-    [Selector("hpkeAuthPublicKey", "setHpkeAuthPublicKey:")] public SecKeyRef? HpkeAuthPublicKey { get; set; }
-    [Selector("initWithClientID:issuer:tokenEndpointURL:jwksEndpointURL:audience:")] public Self InitWithClientIDIssuerTokenEndpointURLJwksEndpointURLAudience(NSString clientID, NSString issuer, NSURL tokenEndpointURL, NSURL jwksEndpointURL, NSString? audience);
-    [Selector("configurationWithOpenIDConfigurationURL:clientID:issuer:completion:")] public static void ConfigurationWithOpenIDConfigurationURLClientIDIssuerCompletion(NSURL openIDConfigurationURL, NSString clientID, NSString? issuer, ASAuthorizationProviderExtensionLoginConfigurationConfigurationWithOpenIDConfigurationURLClientIDIssuerCompletionCompletionBlock completion);
-    [Selector("setCustomAssertionRequestHeaderClaims:returningError:")] public bool SetCustomAssertionRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
-    [Selector("setCustomAssertionRequestBodyClaims:returningError:")] public bool SetCustomAssertionRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
-    [Selector("setCustomLoginRequestHeaderClaims:returningError:")] public bool SetCustomLoginRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
-    [Selector("setCustomLoginRequestBodyClaims:returningError:")] public bool SetCustomLoginRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
-    [Selector("setCustomRefreshRequestHeaderClaims:returningError:")] public bool SetCustomRefreshRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
-    [Selector("setCustomRefreshRequestBodyClaims:returningError:")] public bool SetCustomRefreshRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
-    [Selector("setCustomKeyExchangeRequestHeaderClaims:returningError:")] public bool SetCustomKeyExchangeRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
-    [Selector("setCustomKeyExchangeRequestBodyClaims:returningError:")] public bool SetCustomKeyExchangeRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
-    [Selector("setCustomKeyRequestHeaderClaims:returningError:")] public bool SetCustomKeyRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
-    [Selector("setCustomKeyRequestBodyClaims:returningError:")] public bool SetCustomKeyRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
+    [Selector("invalidCredentialPredicate", "setInvalidCredentialPredicate:")]
+    public NSString? InvalidCredentialPredicate { get; set; }
+    [Selector("accountDisplayName", "setAccountDisplayName:")]
+    public NSString? AccountDisplayName { get; set; }
+    [Selector("clientID")]
+    public NSString ClientID { get; }
+    [Selector("issuer")]
+    public NSString Issuer { get; }
+    [Selector("audience", "setAudience:")]
+    public NSString Audience { get; set; }
+    [Selector("tokenEndpointURL", "setTokenEndpointURL:")]
+    public NSURL TokenEndpointURL { get; set; }
+    [Selector("jwksEndpointURL", "setJwksEndpointURL:")]
+    public NSURL JwksEndpointURL { get; set; }
+    [Selector("jwksTrustedRootCertificates", "setJwksTrustedRootCertificates:")]
+    public NSArray? JwksTrustedRootCertificates { get; set; }
+    [Selector("deviceContext", "setDeviceContext:")]
+    public NSData? DeviceContext { get; set; }
+    [Selector("userSecureEnclaveKeyBiometricPolicy", "setUserSecureEnclaveKeyBiometricPolicy:")]
+    public ASAuthorizationProviderExtensionUserSecureEnclaveKeyBiometricPolicy UserSecureEnclaveKeyBiometricPolicy { get; set; }
+    [Selector("nonceEndpointURL", "setNonceEndpointURL:")]
+    public NSURL NonceEndpointURL { get; set; }
+    [Selector("nonceResponseKeypath", "setNonceResponseKeypath:")]
+    public NSString NonceResponseKeypath { get; set; }
+    [Selector("serverNonceClaimName", "setServerNonceClaimName:")]
+    public NSString ServerNonceClaimName { get; set; }
+    [Selector("customNonceRequestValues", "setCustomNonceRequestValues:")]
+    public NSArray CustomNonceRequestValues { get; set; }
+    [Selector("additionalScopes", "setAdditionalScopes:")]
+    public NSString AdditionalScopes { get; set; }
+    [Selector("additionalAuthorizationScopes", "setAdditionalAuthorizationScopes:")]
+    public NSString? AdditionalAuthorizationScopes { get; set; }
+    [Selector("includePreviousRefreshTokenInLoginRequest", "setIncludePreviousRefreshTokenInLoginRequest:")]
+    public bool IncludePreviousRefreshTokenInLoginRequest { get; set; }
+    [Selector("previousRefreshTokenClaimName", "setPreviousRefreshTokenClaimName:")]
+    public NSString PreviousRefreshTokenClaimName { get; set; }
+    [Selector("customRequestJWTParameterName", "setCustomRequestJWTParameterName:")]
+    public NSString? CustomRequestJWTParameterName { get; set; }
+    [Selector("customLoginRequestValues", "setCustomLoginRequestValues:")]
+    public NSArray CustomLoginRequestValues { get; set; }
+    [Selector("uniqueIdentifierClaimName", "setUniqueIdentifierClaimName:")]
+    public NSString? UniqueIdentifierClaimName { get; set; }
+    [Selector("groupRequestClaimName", "setGroupRequestClaimName:")]
+    public NSString? GroupRequestClaimName { get; set; }
+    [Selector("groupResponseClaimName", "setGroupResponseClaimName:")]
+    public NSString? GroupResponseClaimName { get; set; }
+    [Selector("kerberosTicketMappings", "setKerberosTicketMappings:")]
+    public NSArray KerberosTicketMappings { get; set; }
+    [Selector("refreshEndpointURL", "setRefreshEndpointURL:")]
+    public NSURL? RefreshEndpointURL { get; set; }
+    [Selector("customRefreshRequestValues", "setCustomRefreshRequestValues:")]
+    public NSArray? CustomRefreshRequestValues { get; set; }
+    [Selector("federationType", "setFederationType:")]
+    public ASAuthorizationProviderExtensionFederationType FederationType { get; set; }
+    [Selector("federationRequestURN", "setFederationRequestURN:")]
+    public NSString? FederationRequestURN { get; set; }
+    [Selector("federationMEXURL", "setFederationMEXURL:")]
+    public NSURL? FederationMEXURL { get; set; }
+    [Selector("federationUserPreauthenticationURL", "setFederationUserPreauthenticationURL:")]
+    public NSURL? FederationUserPreauthenticationURL { get; set; }
+    [Selector("federationMEXURLKeypath", "setFederationMEXURLKeypath:")]
+    public NSString? FederationMEXURLKeypath { get; set; }
+    [Selector("federationPredicate", "setFederationPredicate:")]
+    public NSString? FederationPredicate { get; set; }
+    [Selector("customFederationUserPreauthenticationRequestValues", "setCustomFederationUserPreauthenticationRequestValues:")]
+    public NSArray? CustomFederationUserPreauthenticationRequestValues { get; set; }
+    [Selector("loginRequestEncryptionPublicKey", "setLoginRequestEncryptionPublicKey:")]
+    public SecKeyRef? LoginRequestEncryptionPublicKey { get; set; }
+    [Selector("loginRequestEncryptionAPVPrefix", "setLoginRequestEncryptionAPVPrefix:")]
+    public NSData? LoginRequestEncryptionAPVPrefix { get; set; }
+    [Selector("loginRequestEncryptionAlgorithm", "setLoginRequestEncryptionAlgorithm:")]
+    public ASAuthorizationProviderExtensionEncryptionAlgorithm? LoginRequestEncryptionAlgorithm { get; set; }
+    [Selector("loginRequestHPKEPreSharedKey", "setLoginRequestHPKEPreSharedKey:")]
+    public NSData? LoginRequestHPKEPreSharedKey { get; set; }
+    [Selector("loginRequestHPKEPreSharedKeyID", "setLoginRequestHPKEPreSharedKeyID:")]
+    public NSData? LoginRequestHPKEPreSharedKeyID { get; set; }
+    [Selector("keyEndpointURL", "setKeyEndpointURL:")]
+    public NSURL? KeyEndpointURL { get; set; }
+    [Selector("customKeyExchangeRequestValues", "setCustomKeyExchangeRequestValues:")]
+    public NSArray? CustomKeyExchangeRequestValues { get; set; }
+    [Selector("customKeyRequestValues", "setCustomKeyRequestValues:")]
+    public NSArray? CustomKeyRequestValues { get; set; }
+    [Selector("hpkePreSharedKey", "setHpkePreSharedKey:")]
+    public NSData? HpkePreSharedKey { get; set; }
+    [Selector("hpkePreSharedKeyID", "setHpkePreSharedKeyID:")]
+    public NSData? HpkePreSharedKeyID { get; set; }
+    [Selector("hpkeAuthPublicKey", "setHpkeAuthPublicKey:")]
+    public SecKeyRef? HpkeAuthPublicKey { get; set; }
+    [Selector("initWithClientID:issuer:tokenEndpointURL:jwksEndpointURL:audience:")]
+    public Self InitWithClientIDIssuerTokenEndpointURLJwksEndpointURLAudience(NSString clientID, NSString issuer, NSURL tokenEndpointURL, NSURL jwksEndpointURL, NSString? audience);
+    [Selector("configurationWithOpenIDConfigurationURL:clientID:issuer:completion:")]
+    public static void ConfigurationWithOpenIDConfigurationURLClientIDIssuerCompletion(NSURL openIDConfigurationURL, NSString clientID, NSString? issuer, ASAuthorizationProviderExtensionLoginConfigurationConfigurationWithOpenIDConfigurationURLClientIDIssuerCompletionCompletionBlock completion);
+    [Selector("setCustomAssertionRequestHeaderClaims:returningError:")]
+    public bool SetCustomAssertionRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
+    [Selector("setCustomAssertionRequestBodyClaims:returningError:")]
+    public bool SetCustomAssertionRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
+    [Selector("setCustomLoginRequestHeaderClaims:returningError:")]
+    public bool SetCustomLoginRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
+    [Selector("setCustomLoginRequestBodyClaims:returningError:")]
+    public bool SetCustomLoginRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
+    [Selector("setCustomRefreshRequestHeaderClaims:returningError:")]
+    public bool SetCustomRefreshRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
+    [Selector("setCustomRefreshRequestBodyClaims:returningError:")]
+    public bool SetCustomRefreshRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
+    [Selector("setCustomKeyExchangeRequestHeaderClaims:returningError:")]
+    public bool SetCustomKeyExchangeRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
+    [Selector("setCustomKeyExchangeRequestBodyClaims:returningError:")]
+    public bool SetCustomKeyExchangeRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
+    [Selector("setCustomKeyRequestHeaderClaims:returningError:")]
+    public bool SetCustomKeyRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
+    [Selector("setCustomKeyRequestBodyClaims:returningError:")]
+    public bool SetCustomKeyRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
 }
 
 #endif

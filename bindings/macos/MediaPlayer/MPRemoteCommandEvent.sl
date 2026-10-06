@@ -33,13 +33,16 @@ import Standard.ObjC;
 
 public extern objc class MPRemoteCommandEvent : NSObject
 {
-    [Selector("command")] public MPRemoteCommand Command { get; }
-    [Selector("timestamp")] public NSTimeInterval Timestamp { get; }
+    [Selector("command")]
+    public MPRemoteCommand Command { get; }
+    [Selector("timestamp")]
+    public NSTimeInterval Timestamp { get; }
 }
 
 public extern objc class MPSkipIntervalCommandEvent : MPRemoteCommandEvent
 {
-    [Selector("interval")] public NSTimeInterval Interval { get; }
+    [Selector("interval")]
+    public NSTimeInterval Interval { get; }
 }
 
 public enum MPSeekCommandEventType : ulong
@@ -50,45 +53,56 @@ public enum MPSeekCommandEventType : ulong
 
 public extern objc class MPSeekCommandEvent : MPRemoteCommandEvent
 {
-    [Selector("type")] public MPSeekCommandEventType Type { get; }
+    [Selector("type")]
+    public MPSeekCommandEventType Type { get; }
 }
 
 public extern objc class MPRatingCommandEvent : MPRemoteCommandEvent
 {
-    [Selector("rating")] public float Rating { get; }
+    [Selector("rating")]
+    public float Rating { get; }
 }
 
 public extern objc class MPChangePlaybackRateCommandEvent : MPRemoteCommandEvent
 {
-    [Selector("playbackRate")] public float PlaybackRate { get; }
+    [Selector("playbackRate")]
+    public float PlaybackRate { get; }
 }
 
 public extern objc class MPFeedbackCommandEvent : MPRemoteCommandEvent
 {
-    [Selector("isNegative")] public bool Negative { get; }
+    [Selector("isNegative")]
+    public bool Negative { get; }
 }
 
 public extern objc class MPChangeLanguageOptionCommandEvent : MPRemoteCommandEvent
 {
-    [Selector("languageOption")] public MPNowPlayingInfoLanguageOption LanguageOption { get; }
-    [Selector("setting")] public MPChangeLanguageOptionSetting Setting { get; }
+    [Selector("languageOption")]
+    public MPNowPlayingInfoLanguageOption LanguageOption { get; }
+    [Selector("setting")]
+    public MPChangeLanguageOptionSetting Setting { get; }
 }
 
 public extern objc class MPChangePlaybackPositionCommandEvent : MPRemoteCommandEvent
 {
-    [Selector("positionTime")] public NSTimeInterval PositionTime { get; }
+    [Selector("positionTime")]
+    public NSTimeInterval PositionTime { get; }
 }
 
 public extern objc class MPChangeShuffleModeCommandEvent : MPRemoteCommandEvent
 {
-    [Selector("shuffleType")] public MPShuffleType ShuffleType { get; }
-    [Selector("preservesShuffleMode")] public bool PreservesShuffleMode { get; }
+    [Selector("shuffleType")]
+    public MPShuffleType ShuffleType { get; }
+    [Selector("preservesShuffleMode")]
+    public bool PreservesShuffleMode { get; }
 }
 
 public extern objc class MPChangeRepeatModeCommandEvent : MPRemoteCommandEvent
 {
-    [Selector("repeatType")] public MPRepeatType RepeatType { get; }
-    [Selector("preservesRepeatMode")] public bool PreservesRepeatMode { get; }
+    [Selector("repeatType")]
+    public MPRepeatType RepeatType { get; }
+    [Selector("preservesRepeatMode")]
+    public bool PreservesRepeatMode { get; }
 }
 
 #endif

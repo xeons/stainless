@@ -40,57 +40,108 @@ public enum SCNCameraProjectionDirection : long
 
 public extern objc class SCNCamera : NSObject, SCNAnimatable, SCNTechniqueSupport, NSCopying, NSSecureCoding
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("fieldOfView", "setFieldOfView:")] public CGFloat FieldOfView { get; set; }
-    [Selector("projectionDirection", "setProjectionDirection:")] public SCNCameraProjectionDirection ProjectionDirection { get; set; }
-    [Selector("focalLength", "setFocalLength:")] public CGFloat FocalLength { get; set; }
-    [Selector("sensorHeight", "setSensorHeight:")] public CGFloat SensorHeight { get; set; }
-    [Selector("zNear", "setZNear:")] public double ZNear { get; set; }
-    [Selector("zFar", "setZFar:")] public double ZFar { get; set; }
-    [Selector("automaticallyAdjustsZRange", "setAutomaticallyAdjustsZRange:")] public bool AutomaticallyAdjustsZRange { get; set; }
-    [Selector("usesOrthographicProjection", "setUsesOrthographicProjection:")] public bool UsesOrthographicProjection { get; set; }
-    [Selector("orthographicScale", "setOrthographicScale:")] public double OrthographicScale { get; set; }
-    [Selector("projectionTransform", "setProjectionTransform:")] public SCNMatrix4 ProjectionTransform { get; set; }
-    [Selector("wantsDepthOfField", "setWantsDepthOfField:")] public bool WantsDepthOfField { get; set; }
-    [Selector("focusDistance", "setFocusDistance:")] public CGFloat FocusDistance { get; set; }
-    [Selector("focalBlurSampleCount", "setFocalBlurSampleCount:")] public NSInteger FocalBlurSampleCount { get; set; }
-    [Selector("fStop", "setFStop:")] public CGFloat FStop { get; set; }
-    [Selector("apertureBladeCount", "setApertureBladeCount:")] public NSInteger ApertureBladeCount { get; set; }
-    [Selector("motionBlurIntensity", "setMotionBlurIntensity:")] public CGFloat MotionBlurIntensity { get; set; }
-    [Selector("screenSpaceAmbientOcclusionIntensity", "setScreenSpaceAmbientOcclusionIntensity:")] public CGFloat ScreenSpaceAmbientOcclusionIntensity { get; set; }
-    [Selector("screenSpaceAmbientOcclusionRadius", "setScreenSpaceAmbientOcclusionRadius:")] public CGFloat ScreenSpaceAmbientOcclusionRadius { get; set; }
-    [Selector("screenSpaceAmbientOcclusionBias", "setScreenSpaceAmbientOcclusionBias:")] public CGFloat ScreenSpaceAmbientOcclusionBias { get; set; }
-    [Selector("screenSpaceAmbientOcclusionDepthThreshold", "setScreenSpaceAmbientOcclusionDepthThreshold:")] public CGFloat ScreenSpaceAmbientOcclusionDepthThreshold { get; set; }
-    [Selector("screenSpaceAmbientOcclusionNormalThreshold", "setScreenSpaceAmbientOcclusionNormalThreshold:")] public CGFloat ScreenSpaceAmbientOcclusionNormalThreshold { get; set; }
-    [Selector("wantsHDR", "setWantsHDR:")] public bool WantsHDR { get; set; }
-    [Selector("exposureOffset", "setExposureOffset:")] public CGFloat ExposureOffset { get; set; }
-    [Selector("averageGray", "setAverageGray:")] public CGFloat AverageGray { get; set; }
-    [Selector("whitePoint", "setWhitePoint:")] public CGFloat WhitePoint { get; set; }
-    [Selector("wantsExposureAdaptation", "setWantsExposureAdaptation:")] public bool WantsExposureAdaptation { get; set; }
-    [Selector("exposureAdaptationBrighteningSpeedFactor", "setExposureAdaptationBrighteningSpeedFactor:")] public CGFloat ExposureAdaptationBrighteningSpeedFactor { get; set; }
-    [Selector("exposureAdaptationDarkeningSpeedFactor", "setExposureAdaptationDarkeningSpeedFactor:")] public CGFloat ExposureAdaptationDarkeningSpeedFactor { get; set; }
-    [Selector("minimumExposure", "setMinimumExposure:")] public CGFloat MinimumExposure { get; set; }
-    [Selector("maximumExposure", "setMaximumExposure:")] public CGFloat MaximumExposure { get; set; }
-    [Selector("bloomThreshold", "setBloomThreshold:")] public CGFloat BloomThreshold { get; set; }
-    [Selector("bloomIterationCount", "setBloomIterationCount:")] public NSInteger BloomIterationCount { get; set; }
-    [Selector("bloomIterationSpread", "setBloomIterationSpread:")] public CGFloat BloomIterationSpread { get; set; }
-    [Selector("bloomIntensity", "setBloomIntensity:")] public CGFloat BloomIntensity { get; set; }
-    [Selector("bloomBlurRadius", "setBloomBlurRadius:")] public CGFloat BloomBlurRadius { get; set; }
-    [Selector("vignettingPower", "setVignettingPower:")] public CGFloat VignettingPower { get; set; }
-    [Selector("vignettingIntensity", "setVignettingIntensity:")] public CGFloat VignettingIntensity { get; set; }
-    [Selector("colorFringeStrength", "setColorFringeStrength:")] public CGFloat ColorFringeStrength { get; set; }
-    [Selector("colorFringeIntensity", "setColorFringeIntensity:")] public CGFloat ColorFringeIntensity { get; set; }
-    [Selector("saturation", "setSaturation:")] public CGFloat Saturation { get; set; }
-    [Selector("contrast", "setContrast:")] public CGFloat Contrast { get; set; }
-    [Selector("grainIntensity", "setGrainIntensity:")] public CGFloat GrainIntensity { get; set; }
-    [Selector("grainScale", "setGrainScale:")] public CGFloat GrainScale { get; set; }
-    [Selector("grainIsColored", "setGrainIsColored:")] public bool GrainIsColored { get; set; }
-    [Selector("whiteBalanceTemperature", "setWhiteBalanceTemperature:")] public CGFloat WhiteBalanceTemperature { get; set; }
-    [Selector("whiteBalanceTint", "setWhiteBalanceTint:")] public CGFloat WhiteBalanceTint { get; set; }
-    [Selector("colorGrading")] public SCNMaterialProperty ColorGrading { get; }
-    [Selector("categoryBitMask", "setCategoryBitMask:")] public NSUInteger CategoryBitMask { get; set; }
-    [Selector("camera")] public static Self Camera();
-    [Selector("projectionTransformWithViewportSize:")] public SCNMatrix4 ProjectionTransformWithViewportSize(CGSize viewportSize);
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("fieldOfView", "setFieldOfView:")]
+    public CGFloat FieldOfView { get; set; }
+    [Selector("projectionDirection", "setProjectionDirection:")]
+    public SCNCameraProjectionDirection ProjectionDirection { get; set; }
+    [Selector("focalLength", "setFocalLength:")]
+    public CGFloat FocalLength { get; set; }
+    [Selector("sensorHeight", "setSensorHeight:")]
+    public CGFloat SensorHeight { get; set; }
+    [Selector("zNear", "setZNear:")]
+    public double ZNear { get; set; }
+    [Selector("zFar", "setZFar:")]
+    public double ZFar { get; set; }
+    [Selector("automaticallyAdjustsZRange", "setAutomaticallyAdjustsZRange:")]
+    public bool AutomaticallyAdjustsZRange { get; set; }
+    [Selector("usesOrthographicProjection", "setUsesOrthographicProjection:")]
+    public bool UsesOrthographicProjection { get; set; }
+    [Selector("orthographicScale", "setOrthographicScale:")]
+    public double OrthographicScale { get; set; }
+    [Selector("projectionTransform", "setProjectionTransform:")]
+    public SCNMatrix4 ProjectionTransform { get; set; }
+    [Selector("wantsDepthOfField", "setWantsDepthOfField:")]
+    public bool WantsDepthOfField { get; set; }
+    [Selector("focusDistance", "setFocusDistance:")]
+    public CGFloat FocusDistance { get; set; }
+    [Selector("focalBlurSampleCount", "setFocalBlurSampleCount:")]
+    public NSInteger FocalBlurSampleCount { get; set; }
+    [Selector("fStop", "setFStop:")]
+    public CGFloat FStop { get; set; }
+    [Selector("apertureBladeCount", "setApertureBladeCount:")]
+    public NSInteger ApertureBladeCount { get; set; }
+    [Selector("motionBlurIntensity", "setMotionBlurIntensity:")]
+    public CGFloat MotionBlurIntensity { get; set; }
+    [Selector("screenSpaceAmbientOcclusionIntensity", "setScreenSpaceAmbientOcclusionIntensity:")]
+    public CGFloat ScreenSpaceAmbientOcclusionIntensity { get; set; }
+    [Selector("screenSpaceAmbientOcclusionRadius", "setScreenSpaceAmbientOcclusionRadius:")]
+    public CGFloat ScreenSpaceAmbientOcclusionRadius { get; set; }
+    [Selector("screenSpaceAmbientOcclusionBias", "setScreenSpaceAmbientOcclusionBias:")]
+    public CGFloat ScreenSpaceAmbientOcclusionBias { get; set; }
+    [Selector("screenSpaceAmbientOcclusionDepthThreshold", "setScreenSpaceAmbientOcclusionDepthThreshold:")]
+    public CGFloat ScreenSpaceAmbientOcclusionDepthThreshold { get; set; }
+    [Selector("screenSpaceAmbientOcclusionNormalThreshold", "setScreenSpaceAmbientOcclusionNormalThreshold:")]
+    public CGFloat ScreenSpaceAmbientOcclusionNormalThreshold { get; set; }
+    [Selector("wantsHDR", "setWantsHDR:")]
+    public bool WantsHDR { get; set; }
+    [Selector("exposureOffset", "setExposureOffset:")]
+    public CGFloat ExposureOffset { get; set; }
+    [Selector("averageGray", "setAverageGray:")]
+    public CGFloat AverageGray { get; set; }
+    [Selector("whitePoint", "setWhitePoint:")]
+    public CGFloat WhitePoint { get; set; }
+    [Selector("wantsExposureAdaptation", "setWantsExposureAdaptation:")]
+    public bool WantsExposureAdaptation { get; set; }
+    [Selector("exposureAdaptationBrighteningSpeedFactor", "setExposureAdaptationBrighteningSpeedFactor:")]
+    public CGFloat ExposureAdaptationBrighteningSpeedFactor { get; set; }
+    [Selector("exposureAdaptationDarkeningSpeedFactor", "setExposureAdaptationDarkeningSpeedFactor:")]
+    public CGFloat ExposureAdaptationDarkeningSpeedFactor { get; set; }
+    [Selector("minimumExposure", "setMinimumExposure:")]
+    public CGFloat MinimumExposure { get; set; }
+    [Selector("maximumExposure", "setMaximumExposure:")]
+    public CGFloat MaximumExposure { get; set; }
+    [Selector("bloomThreshold", "setBloomThreshold:")]
+    public CGFloat BloomThreshold { get; set; }
+    [Selector("bloomIterationCount", "setBloomIterationCount:")]
+    public NSInteger BloomIterationCount { get; set; }
+    [Selector("bloomIterationSpread", "setBloomIterationSpread:")]
+    public CGFloat BloomIterationSpread { get; set; }
+    [Selector("bloomIntensity", "setBloomIntensity:")]
+    public CGFloat BloomIntensity { get; set; }
+    [Selector("bloomBlurRadius", "setBloomBlurRadius:")]
+    public CGFloat BloomBlurRadius { get; set; }
+    [Selector("vignettingPower", "setVignettingPower:")]
+    public CGFloat VignettingPower { get; set; }
+    [Selector("vignettingIntensity", "setVignettingIntensity:")]
+    public CGFloat VignettingIntensity { get; set; }
+    [Selector("colorFringeStrength", "setColorFringeStrength:")]
+    public CGFloat ColorFringeStrength { get; set; }
+    [Selector("colorFringeIntensity", "setColorFringeIntensity:")]
+    public CGFloat ColorFringeIntensity { get; set; }
+    [Selector("saturation", "setSaturation:")]
+    public CGFloat Saturation { get; set; }
+    [Selector("contrast", "setContrast:")]
+    public CGFloat Contrast { get; set; }
+    [Selector("grainIntensity", "setGrainIntensity:")]
+    public CGFloat GrainIntensity { get; set; }
+    [Selector("grainScale", "setGrainScale:")]
+    public CGFloat GrainScale { get; set; }
+    [Selector("grainIsColored", "setGrainIsColored:")]
+    public bool GrainIsColored { get; set; }
+    [Selector("whiteBalanceTemperature", "setWhiteBalanceTemperature:")]
+    public CGFloat WhiteBalanceTemperature { get; set; }
+    [Selector("whiteBalanceTint", "setWhiteBalanceTint:")]
+    public CGFloat WhiteBalanceTint { get; set; }
+    [Selector("colorGrading")]
+    public SCNMaterialProperty ColorGrading { get; }
+    [Selector("categoryBitMask", "setCategoryBitMask:")]
+    public NSUInteger CategoryBitMask { get; set; }
+    [Selector("camera")]
+    public static Self Camera();
+    [Selector("projectionTransformWithViewportSize:")]
+    public SCNMatrix4 ProjectionTransformWithViewportSize(CGSize viewportSize);
 }
 
 #endif

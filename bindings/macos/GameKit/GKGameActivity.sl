@@ -34,36 +34,66 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class GKGameActivity : NSObject
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("activityDefinition")] public GKGameActivityDefinition ActivityDefinition { get; }
-    [Selector("properties", "setProperties:")] public NSDictionary Properties { get; set; }
-    [Selector("state")] public GKGameActivityState State { get; }
-    [Selector("partyCode")] public NSString? PartyCode { get; }
-    [Selector("partyURL")] public NSURL? PartyURL { get; }
-    [Selector("creationDate")] public NSDate CreationDate { get; }
-    [Selector("startDate")] public NSDate? StartDate { get; }
-    [Selector("lastResumeDate")] public NSDate? LastResumeDate { get; }
-    [Selector("endDate")] public NSDate? EndDate { get; }
-    [Selector("duration")] public NSTimeInterval Duration { get; }
-    [Selector("achievements")] public NSSet Achievements { get; }
-    [Selector("leaderboardScores")] public NSSet LeaderboardScores { get; }
-    [Selector("validPartyCodeAlphabet")] public static NSArray ValidPartyCodeAlphabet { get; }
-    [Selector("startWithDefinition:partyCode:error:")] public static GKGameActivity? StartWithDefinitionPartyCodeError(GKGameActivityDefinition activityDefinition, NSString partyCode, out NSError? error);
-    [Selector("startWithDefinition:error:")] public static GKGameActivity? StartWithDefinitionError(GKGameActivityDefinition activityDefinition, out NSError? error);
-    [Selector("isValidPartyCode:")] public static bool IsValidPartyCode(NSString partyCode);
-    [Selector("initWithDefinition:")] public Self InitWithDefinition(GKGameActivityDefinition activityDefinition);
-    [Selector("start")] public void Start();
-    [Selector("pause")] public void Pause();
-    [Selector("resume")] public void Resume();
-    [Selector("end")] public void End();
-    [Selector("setScoreOnLeaderboard:toScore:context:")] public void SetScoreOnLeaderboardToScoreContext(GKLeaderboard leaderboard, NSInteger score, NSUInteger context);
-    [Selector("setScoreOnLeaderboard:toScore:")] public void SetScoreOnLeaderboardToScore(GKLeaderboard leaderboard, NSInteger score);
-    [Selector("getScoreOnLeaderboard:")] public GKLeaderboardScore? GetScoreOnLeaderboard(GKLeaderboard leaderboard);
-    [Selector("removeScoresFromLeaderboards:")] public void RemoveScoresFromLeaderboards(NSArray leaderboards);
-    [Selector("setProgressOnAchievement:toPercentComplete:")] public void SetProgressOnAchievementToPercentComplete(GKAchievement achievement, double percentComplete);
-    [Selector("setAchievementCompleted:")] public void SetAchievementCompleted(GKAchievement achievement);
-    [Selector("getProgressOnAchievement:")] public double GetProgressOnAchievement(GKAchievement achievement);
-    [Selector("removeAchievements:")] public void RemoveAchievements(NSArray achievements);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("activityDefinition")]
+    public GKGameActivityDefinition ActivityDefinition { get; }
+    [Selector("properties", "setProperties:")]
+    public NSDictionary Properties { get; set; }
+    [Selector("state")]
+    public GKGameActivityState State { get; }
+    [Selector("partyCode")]
+    public NSString? PartyCode { get; }
+    [Selector("partyURL")]
+    public NSURL? PartyURL { get; }
+    [Selector("creationDate")]
+    public NSDate CreationDate { get; }
+    [Selector("startDate")]
+    public NSDate? StartDate { get; }
+    [Selector("lastResumeDate")]
+    public NSDate? LastResumeDate { get; }
+    [Selector("endDate")]
+    public NSDate? EndDate { get; }
+    [Selector("duration")]
+    public NSTimeInterval Duration { get; }
+    [Selector("achievements")]
+    public NSSet Achievements { get; }
+    [Selector("leaderboardScores")]
+    public NSSet LeaderboardScores { get; }
+    [Selector("validPartyCodeAlphabet")]
+    public static NSArray ValidPartyCodeAlphabet { get; }
+    [Selector("startWithDefinition:partyCode:error:")]
+    public static GKGameActivity? StartWithDefinitionPartyCodeError(GKGameActivityDefinition activityDefinition, NSString partyCode, out NSError? error);
+    [Selector("startWithDefinition:error:")]
+    public static GKGameActivity? StartWithDefinitionError(GKGameActivityDefinition activityDefinition, out NSError? error);
+    [Selector("isValidPartyCode:")]
+    public static bool IsValidPartyCode(NSString partyCode);
+    [Selector("initWithDefinition:")]
+    public Self InitWithDefinition(GKGameActivityDefinition activityDefinition);
+    [Selector("start")]
+    public void Start();
+    [Selector("pause")]
+    public void Pause();
+    [Selector("resume")]
+    public void Resume();
+    [Selector("end")]
+    public void End();
+    [Selector("setScoreOnLeaderboard:toScore:context:")]
+    public void SetScoreOnLeaderboardToScoreContext(GKLeaderboard leaderboard, NSInteger score, NSUInteger context);
+    [Selector("setScoreOnLeaderboard:toScore:")]
+    public void SetScoreOnLeaderboardToScore(GKLeaderboard leaderboard, NSInteger score);
+    [Selector("getScoreOnLeaderboard:")]
+    public GKLeaderboardScore? GetScoreOnLeaderboard(GKLeaderboard leaderboard);
+    [Selector("removeScoresFromLeaderboards:")]
+    public void RemoveScoresFromLeaderboards(NSArray leaderboards);
+    [Selector("setProgressOnAchievement:toPercentComplete:")]
+    public void SetProgressOnAchievementToPercentComplete(GKAchievement achievement, double percentComplete);
+    [Selector("setAchievementCompleted:")]
+    public void SetAchievementCompleted(GKAchievement achievement);
+    [Selector("getProgressOnAchievement:")]
+    public double GetProgressOnAchievement(GKAchievement achievement);
+    [Selector("removeAchievements:")]
+    public void RemoveAchievements(NSArray achievements);
 }
 
 public objc closure void GKGameActivityFindMatchWithCompletionHandlerCompletionHandlerBlock(GKMatch? arg0, NSError? arg1);
@@ -74,9 +104,12 @@ public objc closure void GKGameActivityFindPlayersForHostedMatchWithCompletionHa
 /// Multiplayer, a category of GKGameActivity.
 public extern objc class GKGameActivity
 {
-    [Selector("makeMatchRequest")] public GKMatchRequest? MakeMatchRequest();
-    [Selector("findMatchWithCompletionHandler:")] public void FindMatchWithCompletionHandler(GKGameActivityFindMatchWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("findPlayersForHostedMatchWithCompletionHandler:")] public void FindPlayersForHostedMatchWithCompletionHandler(GKGameActivityFindPlayersForHostedMatchWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("makeMatchRequest")]
+    public GKMatchRequest? MakeMatchRequest();
+    [Selector("findMatchWithCompletionHandler:")]
+    public void FindMatchWithCompletionHandler(GKGameActivityFindMatchWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("findPlayersForHostedMatchWithCompletionHandler:")]
+    public void FindPlayersForHostedMatchWithCompletionHandler(GKGameActivityFindPlayersForHostedMatchWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void GKGameActivityCheckPendingGameActivityExistenceWithCompletionHandlerCompletionHandlerBlock(bool arg0);
@@ -85,7 +118,8 @@ public objc closure void GKGameActivityCheckPendingGameActivityExistenceWithComp
 /// State, a category of GKGameActivity.
 public extern objc class GKGameActivity
 {
-    [Selector("checkPendingGameActivityExistenceWithCompletionHandler:")] public static void CheckPendingGameActivityExistenceWithCompletionHandler(GKGameActivityCheckPendingGameActivityExistenceWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("checkPendingGameActivityExistenceWithCompletionHandler:")]
+    public static void CheckPendingGameActivityExistenceWithCompletionHandler(GKGameActivityCheckPendingGameActivityExistenceWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

@@ -56,29 +56,52 @@ public extern objc class NSManagedObjectID : NSFetchRequestResult { }
 
 public extern objc class NSFetchRequest : NSPersistentStoreRequest, NSCoding, NSCopying
 {
-    [Selector("entity", "setEntity:")] public NSEntityDescription? Entity { get; set; }
-    [Selector("entityName")] public NSString? EntityName { get; }
-    [Selector("predicate", "setPredicate:")] public NSPredicate? Predicate { get; set; }
-    [Selector("sortDescriptors", "setSortDescriptors:")] public NSArray? SortDescriptors { get; set; }
-    [Selector("fetchLimit", "setFetchLimit:")] public NSUInteger FetchLimit { get; set; }
-    [Selector("affectedStores", "setAffectedStores:")] public NSArray? AffectedStores { get; set; }
-    [Selector("resultType", "setResultType:")] public NSFetchRequestResultType ResultType { get; set; }
-    [Selector("includesSubentities", "setIncludesSubentities:")] public bool IncludesSubentities { get; set; }
-    [Selector("includesPropertyValues", "setIncludesPropertyValues:")] public bool IncludesPropertyValues { get; set; }
-    [Selector("returnsObjectsAsFaults", "setReturnsObjectsAsFaults:")] public bool ReturnsObjectsAsFaults { get; set; }
-    [Selector("relationshipKeyPathsForPrefetching", "setRelationshipKeyPathsForPrefetching:")] public NSArray? RelationshipKeyPathsForPrefetching { get; set; }
-    [Selector("includesPendingChanges", "setIncludesPendingChanges:")] public bool IncludesPendingChanges { get; set; }
-    [Selector("returnsDistinctResults", "setReturnsDistinctResults:")] public bool ReturnsDistinctResults { get; set; }
-    [Selector("propertiesToFetch", "setPropertiesToFetch:")] public NSArray? PropertiesToFetch { get; set; }
-    [Selector("fetchOffset", "setFetchOffset:")] public NSUInteger FetchOffset { get; set; }
-    [Selector("fetchBatchSize", "setFetchBatchSize:")] public NSUInteger FetchBatchSize { get; set; }
-    [Selector("shouldRefreshRefetchedObjects", "setShouldRefreshRefetchedObjects:")] public bool ShouldRefreshRefetchedObjects { get; set; }
-    [Selector("propertiesToGroupBy", "setPropertiesToGroupBy:")] public NSArray? PropertiesToGroupBy { get; set; }
-    [Selector("havingPredicate", "setHavingPredicate:")] public NSPredicate? HavingPredicate { get; set; }
-    [Selector("fetchRequestWithEntityName:")] public static Self FetchRequestWithEntityName(NSString entityName);
-    [Selector("init")] public Self Init();
-    [Selector("initWithEntityName:")] public Self InitWithEntityName(NSString entityName);
-    [Selector("execute:")] public NSArray? Execute(out NSError? error);
+    [Selector("entity", "setEntity:")]
+    public NSEntityDescription? Entity { get; set; }
+    [Selector("entityName")]
+    public NSString? EntityName { get; }
+    [Selector("predicate", "setPredicate:")]
+    public NSPredicate? Predicate { get; set; }
+    [Selector("sortDescriptors", "setSortDescriptors:")]
+    public NSArray? SortDescriptors { get; set; }
+    [Selector("fetchLimit", "setFetchLimit:")]
+    public NSUInteger FetchLimit { get; set; }
+    [Selector("affectedStores", "setAffectedStores:")]
+    public NSArray? AffectedStores { get; set; }
+    [Selector("resultType", "setResultType:")]
+    public NSFetchRequestResultType ResultType { get; set; }
+    [Selector("includesSubentities", "setIncludesSubentities:")]
+    public bool IncludesSubentities { get; set; }
+    [Selector("includesPropertyValues", "setIncludesPropertyValues:")]
+    public bool IncludesPropertyValues { get; set; }
+    [Selector("returnsObjectsAsFaults", "setReturnsObjectsAsFaults:")]
+    public bool ReturnsObjectsAsFaults { get; set; }
+    [Selector("relationshipKeyPathsForPrefetching", "setRelationshipKeyPathsForPrefetching:")]
+    public NSArray? RelationshipKeyPathsForPrefetching { get; set; }
+    [Selector("includesPendingChanges", "setIncludesPendingChanges:")]
+    public bool IncludesPendingChanges { get; set; }
+    [Selector("returnsDistinctResults", "setReturnsDistinctResults:")]
+    public bool ReturnsDistinctResults { get; set; }
+    [Selector("propertiesToFetch", "setPropertiesToFetch:")]
+    public NSArray? PropertiesToFetch { get; set; }
+    [Selector("fetchOffset", "setFetchOffset:")]
+    public NSUInteger FetchOffset { get; set; }
+    [Selector("fetchBatchSize", "setFetchBatchSize:")]
+    public NSUInteger FetchBatchSize { get; set; }
+    [Selector("shouldRefreshRefetchedObjects", "setShouldRefreshRefetchedObjects:")]
+    public bool ShouldRefreshRefetchedObjects { get; set; }
+    [Selector("propertiesToGroupBy", "setPropertiesToGroupBy:")]
+    public NSArray? PropertiesToGroupBy { get; set; }
+    [Selector("havingPredicate", "setHavingPredicate:")]
+    public NSPredicate? HavingPredicate { get; set; }
+    [Selector("fetchRequestWithEntityName:")]
+    public static Self FetchRequestWithEntityName(NSString entityName);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithEntityName:")]
+    public Self InitWithEntityName(NSString entityName);
+    [Selector("execute:")]
+    public NSArray? Execute(out NSError? error);
 }
 
 public objc closure void NSPersistentStoreAsynchronousFetchResultCompletionBlock(NSAsynchronousFetchResult arg0);
@@ -87,10 +110,14 @@ public objc closure void NSAsynchronousFetchRequestInitWithFetchRequestCompletio
 
 public extern objc class NSAsynchronousFetchRequest : NSPersistentStoreRequest
 {
-    [Selector("fetchRequest")] public NSFetchRequest FetchRequest { get; }
-    [Selector("completionBlock")] public NSPersistentStoreAsynchronousFetchResultCompletionBlock? CompletionBlock { get; }
-    [Selector("estimatedResultCount", "setEstimatedResultCount:")] public NSInteger EstimatedResultCount { get; set; }
-    [Selector("initWithFetchRequest:completionBlock:")] public Self InitWithFetchRequestCompletionBlock(NSFetchRequest request, NSAsynchronousFetchRequestInitWithFetchRequestCompletionBlockBlkBlock? blk);
+    [Selector("fetchRequest")]
+    public NSFetchRequest FetchRequest { get; }
+    [Selector("completionBlock")]
+    public NSPersistentStoreAsynchronousFetchResultCompletionBlock? CompletionBlock { get; }
+    [Selector("estimatedResultCount", "setEstimatedResultCount:")]
+    public NSInteger EstimatedResultCount { get; set; }
+    [Selector("initWithFetchRequest:completionBlock:")]
+    public Self InitWithFetchRequestCompletionBlock(NSFetchRequest request, NSAsynchronousFetchRequestInitWithFetchRequestCompletionBlockBlkBlock? blk);
 }
 
 #endif

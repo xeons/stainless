@@ -57,69 +57,134 @@ public enum NSNetServiceOptions : ulong
 /// Deprecated in macOS 100000.
 public extern objc class NSNetService : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public NSNetServiceDelegate? Delegate { get; set; }
-    [Selector("includesPeerToPeer", "setIncludesPeerToPeer:")] public bool IncludesPeerToPeer { get; set; }
-    [Selector("name")] public NSString Name { get; }
-    [Selector("type")] public NSString Type { get; }
-    [Selector("domain")] public NSString Domain { get; }
-    [Selector("hostName")] public NSString? HostName { get; }
-    [Selector("addresses")] public NSArray? Addresses { get; }
-    [Selector("port")] public NSInteger Port { get; }
-    [Selector("initWithDomain:type:name:port:")] public Self InitWithDomainTypeNamePort(NSString domain, NSString type, NSString name, int port);
-    [Selector("initWithDomain:type:name:")] public Self InitWithDomainTypeName(NSString domain, NSString type, NSString name);
-    [Selector("scheduleInRunLoop:forMode:")] public void ScheduleInRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
-    [Selector("removeFromRunLoop:forMode:")] public void RemoveFromRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
-    [Selector("publish")] public void Publish();
-    [Selector("publishWithOptions:")] public void PublishWithOptions(NSNetServiceOptions options);
+    [Selector("delegate", "setDelegate:")]
+    public NSNetServiceDelegate? Delegate { get; set; }
+    [Selector("includesPeerToPeer", "setIncludesPeerToPeer:")]
+    public bool IncludesPeerToPeer { get; set; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("type")]
+    public NSString Type { get; }
+    [Selector("domain")]
+    public NSString Domain { get; }
+    [Selector("hostName")]
+    public NSString? HostName { get; }
+    [Selector("addresses")]
+    public NSArray? Addresses { get; }
+    [Selector("port")]
+    public NSInteger Port { get; }
+    [Selector("initWithDomain:type:name:port:")]
+    public Self InitWithDomainTypeNamePort(NSString domain, NSString type, NSString name, int port);
+    [Selector("initWithDomain:type:name:")]
+    public Self InitWithDomainTypeName(NSString domain, NSString type, NSString name);
+    [Selector("scheduleInRunLoop:forMode:")]
+    public void ScheduleInRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
+    [Selector("removeFromRunLoop:forMode:")]
+    public void RemoveFromRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
+    [Selector("publish")]
+    public void Publish();
+    [Selector("publishWithOptions:")]
+    public void PublishWithOptions(NSNetServiceOptions options);
     /// Deprecated in macOS 10.4.
-    [Selector("resolve")] public void Resolve();
-    [Selector("stop")] public void Stop();
-    [Selector("dictionaryFromTXTRecordData:")] public static NSDictionary DictionaryFromTXTRecordData(NSData txtData);
-    [Selector("dataFromTXTRecordDictionary:")] public static NSData DataFromTXTRecordDictionary(NSDictionary txtDictionary);
-    [Selector("resolveWithTimeout:")] public void ResolveWithTimeout(NSTimeInterval timeout);
-    [Selector("getInputStream:outputStream:")] public bool GetInputStreamOutputStream(void** inputStream, void** outputStream);
-    [Selector("setTXTRecordData:")] public bool SetTXTRecordData(NSData? recordData);
-    [Selector("TXTRecordData")] public NSData? TXTRecordData();
-    [Selector("startMonitoring")] public void StartMonitoring();
-    [Selector("stopMonitoring")] public void StopMonitoring();
+    [Selector("resolve")]
+    public void Resolve();
+    [Selector("stop")]
+    public void Stop();
+    [Selector("dictionaryFromTXTRecordData:")]
+    public static NSDictionary DictionaryFromTXTRecordData(NSData txtData);
+    [Selector("dataFromTXTRecordDictionary:")]
+    public static NSData DataFromTXTRecordDictionary(NSDictionary txtDictionary);
+    [Selector("resolveWithTimeout:")]
+    public void ResolveWithTimeout(NSTimeInterval timeout);
+    [Selector("getInputStream:outputStream:")]
+    public bool GetInputStreamOutputStream(void** inputStream, void** outputStream);
+    [Selector("setTXTRecordData:")]
+    public bool SetTXTRecordData(NSData? recordData);
+    [Selector("TXTRecordData")]
+    public NSData? TXTRecordData();
+    [Selector("startMonitoring")]
+    public void StartMonitoring();
+    [Selector("stopMonitoring")]
+    public void StopMonitoring();
 }
 
 /// Deprecated in macOS 100000.
 public extern objc class NSNetServiceBrowser : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public NSNetServiceBrowserDelegate? Delegate { get; set; }
-    [Selector("includesPeerToPeer", "setIncludesPeerToPeer:")] public bool IncludesPeerToPeer { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("scheduleInRunLoop:forMode:")] public void ScheduleInRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
-    [Selector("removeFromRunLoop:forMode:")] public void RemoveFromRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
-    [Selector("searchForBrowsableDomains")] public void SearchForBrowsableDomains();
-    [Selector("searchForRegistrationDomains")] public void SearchForRegistrationDomains();
-    [Selector("searchForServicesOfType:inDomain:")] public void SearchForServicesOfTypeInDomain(NSString type, NSString domainString);
-    [Selector("stop")] public void Stop();
+    [Selector("delegate", "setDelegate:")]
+    public NSNetServiceBrowserDelegate? Delegate { get; set; }
+    [Selector("includesPeerToPeer", "setIncludesPeerToPeer:")]
+    public bool IncludesPeerToPeer { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("scheduleInRunLoop:forMode:")]
+    public void ScheduleInRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
+    [Selector("removeFromRunLoop:forMode:")]
+    public void RemoveFromRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
+    [Selector("searchForBrowsableDomains")]
+    public void SearchForBrowsableDomains();
+    [Selector("searchForRegistrationDomains")]
+    public void SearchForRegistrationDomains();
+    [Selector("searchForServicesOfType:inDomain:")]
+    public void SearchForServicesOfTypeInDomain(NSString type, NSString domainString);
+    [Selector("stop")]
+    public void Stop();
 }
 
 public objc interface NSNetServiceDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("netServiceWillPublish:")] void NetServiceWillPublish(NSNetService sender);
-    [Optional] [Selector("netServiceDidPublish:")] void NetServiceDidPublish(NSNetService sender);
-    [Optional] [Selector("netService:didNotPublish:")] void NetServiceDidNotPublish(NSNetService sender, NSDictionary errorDict);
-    [Optional] [Selector("netServiceWillResolve:")] void NetServiceWillResolve(NSNetService sender);
-    [Optional] [Selector("netServiceDidResolveAddress:")] void NetServiceDidResolveAddress(NSNetService sender);
-    [Optional] [Selector("netService:didNotResolve:")] void NetServiceDidNotResolve(NSNetService sender, NSDictionary errorDict);
-    [Optional] [Selector("netServiceDidStop:")] void NetServiceDidStop(NSNetService sender);
-    [Optional] [Selector("netService:didUpdateTXTRecordData:")] void NetServiceDidUpdateTXTRecordData(NSNetService sender, NSData data);
-    [Optional] [Selector("netService:didAcceptConnectionWithInputStream:outputStream:")] void NetServiceDidAcceptConnectionWithInputStreamOutputStream(NSNetService sender, NSInputStream inputStream, NSOutputStream outputStream);
+    [Optional]
+    [Selector("netServiceWillPublish:")]
+    void NetServiceWillPublish(NSNetService sender);
+    [Optional]
+    [Selector("netServiceDidPublish:")]
+    void NetServiceDidPublish(NSNetService sender);
+    [Optional]
+    [Selector("netService:didNotPublish:")]
+    void NetServiceDidNotPublish(NSNetService sender, NSDictionary errorDict);
+    [Optional]
+    [Selector("netServiceWillResolve:")]
+    void NetServiceWillResolve(NSNetService sender);
+    [Optional]
+    [Selector("netServiceDidResolveAddress:")]
+    void NetServiceDidResolveAddress(NSNetService sender);
+    [Optional]
+    [Selector("netService:didNotResolve:")]
+    void NetServiceDidNotResolve(NSNetService sender, NSDictionary errorDict);
+    [Optional]
+    [Selector("netServiceDidStop:")]
+    void NetServiceDidStop(NSNetService sender);
+    [Optional]
+    [Selector("netService:didUpdateTXTRecordData:")]
+    void NetServiceDidUpdateTXTRecordData(NSNetService sender, NSData data);
+    [Optional]
+    [Selector("netService:didAcceptConnectionWithInputStream:outputStream:")]
+    void NetServiceDidAcceptConnectionWithInputStreamOutputStream(NSNetService sender, NSInputStream inputStream, NSOutputStream outputStream);
 }
 
 public objc interface NSNetServiceBrowserDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("netServiceBrowserWillSearch:")] void NetServiceBrowserWillSearch(NSNetServiceBrowser browser);
-    [Optional] [Selector("netServiceBrowserDidStopSearch:")] void NetServiceBrowserDidStopSearch(NSNetServiceBrowser browser);
-    [Optional] [Selector("netServiceBrowser:didNotSearch:")] void NetServiceBrowserDidNotSearch(NSNetServiceBrowser browser, NSDictionary errorDict);
-    [Optional] [Selector("netServiceBrowser:didFindDomain:moreComing:")] void NetServiceBrowserDidFindDomainMoreComing(NSNetServiceBrowser browser, NSString domainString, bool moreComing);
-    [Optional] [Selector("netServiceBrowser:didFindService:moreComing:")] void NetServiceBrowserDidFindServiceMoreComing(NSNetServiceBrowser browser, NSNetService service, bool moreComing);
-    [Optional] [Selector("netServiceBrowser:didRemoveDomain:moreComing:")] void NetServiceBrowserDidRemoveDomainMoreComing(NSNetServiceBrowser browser, NSString domainString, bool moreComing);
-    [Optional] [Selector("netServiceBrowser:didRemoveService:moreComing:")] void NetServiceBrowserDidRemoveServiceMoreComing(NSNetServiceBrowser browser, NSNetService service, bool moreComing);
+    [Optional]
+    [Selector("netServiceBrowserWillSearch:")]
+    void NetServiceBrowserWillSearch(NSNetServiceBrowser browser);
+    [Optional]
+    [Selector("netServiceBrowserDidStopSearch:")]
+    void NetServiceBrowserDidStopSearch(NSNetServiceBrowser browser);
+    [Optional]
+    [Selector("netServiceBrowser:didNotSearch:")]
+    void NetServiceBrowserDidNotSearch(NSNetServiceBrowser browser, NSDictionary errorDict);
+    [Optional]
+    [Selector("netServiceBrowser:didFindDomain:moreComing:")]
+    void NetServiceBrowserDidFindDomainMoreComing(NSNetServiceBrowser browser, NSString domainString, bool moreComing);
+    [Optional]
+    [Selector("netServiceBrowser:didFindService:moreComing:")]
+    void NetServiceBrowserDidFindServiceMoreComing(NSNetServiceBrowser browser, NSNetService service, bool moreComing);
+    [Optional]
+    [Selector("netServiceBrowser:didRemoveDomain:moreComing:")]
+    void NetServiceBrowserDidRemoveDomainMoreComing(NSNetServiceBrowser browser, NSString domainString, bool moreComing);
+    [Optional]
+    [Selector("netServiceBrowser:didRemoveService:moreComing:")]
+    void NetServiceBrowserDidRemoveServiceMoreComing(NSNetServiceBrowser browser, NSNetService service, bool moreComing);
 }
 
 #endif

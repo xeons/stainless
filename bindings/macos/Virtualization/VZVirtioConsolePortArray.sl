@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioConsolePortArray : NSObject
 {
-    [Selector("maximumPortCount")] public uint MaximumPortCount { get; }
-    [Selector("objectAtIndexedSubscript:")] public VZVirtioConsolePort? ObjectAtIndexedSubscript(NSUInteger portIndex);
+    [Selector("maximumPortCount")]
+    public uint MaximumPortCount { get; }
+    [Selector("objectAtIndexedSubscript:")]
+    public VZVirtioConsolePort? ObjectAtIndexedSubscript(NSUInteger portIndex);
 }
 
 #endif

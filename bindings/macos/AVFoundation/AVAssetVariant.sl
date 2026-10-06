@@ -35,64 +35,96 @@ import Standard.ObjC;
 
 public extern objc class AVAssetVariant : NSObject
 {
-    [Selector("peakBitRate")] public double PeakBitRate { get; }
-    [Selector("averageBitRate")] public double AverageBitRate { get; }
-    [Selector("videoAttributes")] public AVAssetVariantVideoAttributes? VideoAttributes { get; }
-    [Selector("audioAttributes")] public AVAssetVariantAudioAttributes? AudioAttributes { get; }
+    [Selector("peakBitRate")]
+    public double PeakBitRate { get; }
+    [Selector("averageBitRate")]
+    public double AverageBitRate { get; }
+    [Selector("videoAttributes")]
+    public AVAssetVariantVideoAttributes? VideoAttributes { get; }
+    [Selector("audioAttributes")]
+    public AVAssetVariantAudioAttributes? AudioAttributes { get; }
     /// macOS 26.0 and later.
-    [Selector("URL")] public NSURL URL { get; }
+    [Selector("URL")]
+    public NSURL URL { get; }
 }
 
 public extern objc class AVAssetVariantVideoAttributes : NSObject
 {
-    [Selector("videoRange")] public AVVideoRange VideoRange { get; }
-    [Selector("codecTypes")] public NSArray CodecTypes { get; }
-    [Selector("presentationSize")] public CGSize PresentationSize { get; }
-    [Selector("nominalFrameRate")] public double NominalFrameRate { get; }
-    [Selector("videoLayoutAttributes")] public NSArray VideoLayoutAttributes { get; }
+    [Selector("videoRange")]
+    public AVVideoRange VideoRange { get; }
+    [Selector("codecTypes")]
+    public NSArray CodecTypes { get; }
+    [Selector("presentationSize")]
+    public CGSize PresentationSize { get; }
+    [Selector("nominalFrameRate")]
+    public double NominalFrameRate { get; }
+    [Selector("videoLayoutAttributes")]
+    public NSArray VideoLayoutAttributes { get; }
 }
 
 public extern objc class AVAssetVariantVideoLayoutAttributes : NSObject
 {
-    [Selector("stereoViewComponents")] public CMStereoViewComponents StereoViewComponents { get; }
-    [Selector("projectionType")] public CMProjectionType ProjectionType { get; }
+    [Selector("stereoViewComponents")]
+    public CMStereoViewComponents StereoViewComponents { get; }
+    [Selector("projectionType")]
+    public CMProjectionType ProjectionType { get; }
 }
 
 public extern objc class AVAssetVariantAudioAttributes : NSObject
 {
-    [Selector("formatIDs")] public NSArray FormatIDs { get; }
-    [Selector("renditionSpecificAttributesForMediaOption:")] public AVAssetVariantAudioRenditionSpecificAttributes? RenditionSpecificAttributesForMediaOption(AVMediaSelectionOption mediaSelectionOption);
+    [Selector("formatIDs")]
+    public NSArray FormatIDs { get; }
+    [Selector("renditionSpecificAttributesForMediaOption:")]
+    public AVAssetVariantAudioRenditionSpecificAttributes? RenditionSpecificAttributesForMediaOption(AVMediaSelectionOption mediaSelectionOption);
 }
 
 public extern objc class AVAssetVariantAudioRenditionSpecificAttributes : NSObject
 {
-    [Selector("channelCount")] public NSInteger ChannelCount { get; }
-    [Selector("isBinaural")] public bool Binaural { get; }
-    [Selector("isImmersive")] public bool Immersive { get; }
-    [Selector("isDownmix")] public bool Downmix { get; }
+    [Selector("channelCount")]
+    public NSInteger ChannelCount { get; }
+    [Selector("isBinaural")]
+    public bool Binaural { get; }
+    [Selector("isImmersive")]
+    public bool Immersive { get; }
+    [Selector("isDownmix")]
+    public bool Downmix { get; }
 }
 
 public extern objc class AVAssetVariantQualifier : NSObject, NSCopying
 {
-    [Selector("assetVariantQualifierWithPredicate:")] public static Self AssetVariantQualifierWithPredicate(NSPredicate predicate);
-    [Selector("assetVariantQualifierWithVariant:")] public static Self AssetVariantQualifierWithVariant(AVAssetVariant @variant);
-    [Selector("predicateForChannelCount:mediaSelectionOption:operatorType:")] public static NSPredicate PredicateForChannelCountMediaSelectionOptionOperatorType(NSInteger channelCount, AVMediaSelectionOption? mediaSelectionOption, NSPredicateOperatorType operatorType);
-    [Selector("predicateForBinauralAudio:mediaSelectionOption:")] public static NSPredicate PredicateForBinauralAudioMediaSelectionOption(bool isBinauralAudio, AVMediaSelectionOption? mediaSelectionOption);
-    [Selector("predicateForImmersiveAudio:mediaSelectionOption:")] public static NSPredicate PredicateForImmersiveAudioMediaSelectionOption(bool isImmersiveAudio, AVMediaSelectionOption? mediaSelectionOption);
-    [Selector("predicateForDownmixAudio:mediaSelectionOption:")] public static NSPredicate PredicateForDownmixAudioMediaSelectionOption(bool isDownmixAudio, AVMediaSelectionOption? mediaSelectionOption);
-    [Selector("predicateForPresentationWidth:operatorType:")] public static NSPredicate PredicateForPresentationWidthOperatorType(CGFloat width, NSPredicateOperatorType operatorType);
-    [Selector("predicateForPresentationHeight:operatorType:")] public static NSPredicate PredicateForPresentationHeightOperatorType(CGFloat height, NSPredicateOperatorType operatorType);
-    [Selector("predicateForAudioSampleRate:mediaSelectionOption:operatorType:")] public static NSPredicate PredicateForAudioSampleRateMediaSelectionOptionOperatorType(double sampleRate, AVMediaSelectionOption? mediaSelectionOption, NSPredicateOperatorType operatorType);
+    [Selector("assetVariantQualifierWithPredicate:")]
+    public static Self AssetVariantQualifierWithPredicate(NSPredicate predicate);
+    [Selector("assetVariantQualifierWithVariant:")]
+    public static Self AssetVariantQualifierWithVariant(AVAssetVariant @variant);
+    [Selector("predicateForChannelCount:mediaSelectionOption:operatorType:")]
+    public static NSPredicate PredicateForChannelCountMediaSelectionOptionOperatorType(NSInteger channelCount, AVMediaSelectionOption? mediaSelectionOption, NSPredicateOperatorType operatorType);
+    [Selector("predicateForBinauralAudio:mediaSelectionOption:")]
+    public static NSPredicate PredicateForBinauralAudioMediaSelectionOption(bool isBinauralAudio, AVMediaSelectionOption? mediaSelectionOption);
+    [Selector("predicateForImmersiveAudio:mediaSelectionOption:")]
+    public static NSPredicate PredicateForImmersiveAudioMediaSelectionOption(bool isImmersiveAudio, AVMediaSelectionOption? mediaSelectionOption);
+    [Selector("predicateForDownmixAudio:mediaSelectionOption:")]
+    public static NSPredicate PredicateForDownmixAudioMediaSelectionOption(bool isDownmixAudio, AVMediaSelectionOption? mediaSelectionOption);
+    [Selector("predicateForPresentationWidth:operatorType:")]
+    public static NSPredicate PredicateForPresentationWidthOperatorType(CGFloat width, NSPredicateOperatorType operatorType);
+    [Selector("predicateForPresentationHeight:operatorType:")]
+    public static NSPredicate PredicateForPresentationHeightOperatorType(CGFloat height, NSPredicateOperatorType operatorType);
+    [Selector("predicateForAudioSampleRate:mediaSelectionOption:operatorType:")]
+    public static NSPredicate PredicateForAudioSampleRateMediaSelectionOptionOperatorType(double sampleRate, AVMediaSelectionOption? mediaSelectionOption, NSPredicateOperatorType operatorType);
     /// macOS 15.5 and later.
-    [Selector("predicateForChannelCount:operatorType:")] public static NSPredicate PredicateForChannelCountOperatorType(NSInteger channelCount, NSPredicateOperatorType operatorType);
+    [Selector("predicateForChannelCount:operatorType:")]
+    public static NSPredicate PredicateForChannelCountOperatorType(NSInteger channelCount, NSPredicateOperatorType operatorType);
     /// macOS 15.5 and later.
-    [Selector("predicateForBinauralAudio:")] public static NSPredicate PredicateForBinauralAudio(bool isBinauralAudio);
+    [Selector("predicateForBinauralAudio:")]
+    public static NSPredicate PredicateForBinauralAudio(bool isBinauralAudio);
     /// macOS 15.5 and later.
-    [Selector("predicateForImmersiveAudio:")] public static NSPredicate PredicateForImmersiveAudio(bool isImmersiveAudio);
+    [Selector("predicateForImmersiveAudio:")]
+    public static NSPredicate PredicateForImmersiveAudio(bool isImmersiveAudio);
     /// macOS 15.5 and later.
-    [Selector("predicateForDownmixAudio:")] public static NSPredicate PredicateForDownmixAudio(bool isDownmixAudio);
+    [Selector("predicateForDownmixAudio:")]
+    public static NSPredicate PredicateForDownmixAudio(bool isDownmixAudio);
     /// macOS 15.5 and later.
-    [Selector("predicateForAudioSampleRate:operatorType:")] public static NSPredicate PredicateForAudioSampleRateOperatorType(double sampleRate, NSPredicateOperatorType operatorType);
+    [Selector("predicateForAudioSampleRate:operatorType:")]
+    public static NSPredicate PredicateForAudioSampleRateOperatorType(double sampleRate, NSPredicateOperatorType operatorType);
 }
 
 #endif

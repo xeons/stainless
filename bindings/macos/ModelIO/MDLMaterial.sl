@@ -98,54 +98,90 @@ public enum MDLMaterialMipMapFilterMode : ulong
 
 public extern objc class MDLTextureFilter : NSObject
 {
-    [Selector("sWrapMode", "setSWrapMode:")] public MDLMaterialTextureWrapMode SWrapMode { get; set; }
-    [Selector("tWrapMode", "setTWrapMode:")] public MDLMaterialTextureWrapMode TWrapMode { get; set; }
-    [Selector("rWrapMode", "setRWrapMode:")] public MDLMaterialTextureWrapMode RWrapMode { get; set; }
-    [Selector("minFilter", "setMinFilter:")] public MDLMaterialTextureFilterMode MinFilter { get; set; }
-    [Selector("magFilter", "setMagFilter:")] public MDLMaterialTextureFilterMode MagFilter { get; set; }
-    [Selector("mipFilter", "setMipFilter:")] public MDLMaterialMipMapFilterMode MipFilter { get; set; }
+    [Selector("sWrapMode", "setSWrapMode:")]
+    public MDLMaterialTextureWrapMode SWrapMode { get; set; }
+    [Selector("tWrapMode", "setTWrapMode:")]
+    public MDLMaterialTextureWrapMode TWrapMode { get; set; }
+    [Selector("rWrapMode", "setRWrapMode:")]
+    public MDLMaterialTextureWrapMode RWrapMode { get; set; }
+    [Selector("minFilter", "setMinFilter:")]
+    public MDLMaterialTextureFilterMode MinFilter { get; set; }
+    [Selector("magFilter", "setMagFilter:")]
+    public MDLMaterialTextureFilterMode MagFilter { get; set; }
+    [Selector("mipFilter", "setMipFilter:")]
+    public MDLMaterialMipMapFilterMode MipFilter { get; set; }
 }
 
 public extern objc class MDLTextureSampler : NSObject
 {
-    [Selector("texture", "setTexture:")] public MDLTexture? Texture { get; set; }
-    [Selector("hardwareFilter", "setHardwareFilter:")] public MDLTextureFilter? HardwareFilter { get; set; }
-    [Selector("transform", "setTransform:")] public MDLTransform? Transform { get; set; }
+    [Selector("texture", "setTexture:")]
+    public MDLTexture? Texture { get; set; }
+    [Selector("hardwareFilter", "setHardwareFilter:")]
+    public MDLTextureFilter? HardwareFilter { get; set; }
+    [Selector("transform", "setTransform:")]
+    public MDLTransform? Transform { get; set; }
 }
 
 public extern objc class MDLMaterialProperty : NSObject, MDLNamed, NSCopying
 {
-    [Selector("semantic", "setSemantic:")] public MDLMaterialSemantic Semantic { get; set; }
-    [Selector("type", "setType:")] public MDLMaterialPropertyType Type { get; set; }
-    [Selector("name", "setName:")] public NSString Name { get; set; }
-    [Selector("stringValue", "setStringValue:")] public NSString? StringValue { get; set; }
-    [Selector("URLValue", "setURLValue:")] public NSURL? URLValue { get; set; }
-    [Selector("textureSamplerValue", "setTextureSamplerValue:")] public MDLTextureSampler? TextureSamplerValue { get; set; }
-    [Selector("color", "setColor:")] public CGColorRef? Color { get; set; }
-    [Selector("floatValue", "setFloatValue:")] public float FloatValue { get; set; }
-    [Selector("float2Value", "setFloat2Value:")] public vector_float2 Float2Value { get; set; }
-    [Selector("float3Value", "setFloat3Value:")] public vector_float3 Float3Value { get; set; }
-    [Selector("float4Value", "setFloat4Value:")] public vector_float4 Float4Value { get; set; }
-    [Selector("matrix4x4", "setMatrix4x4:")] public matrix_float4x4 Matrix4x4 { get; set; }
-    [Selector("luminance", "setLuminance:")] public float Luminance { get; set; }
-    [Selector("initWithName:semantic:")] public Self InitWithNameSemantic(NSString name, MDLMaterialSemantic semantic);
-    [Selector("initWithName:semantic:float:")] public Self InitWithNameSemanticFloat(NSString name, MDLMaterialSemantic semantic, float value);
-    [Selector("initWithName:semantic:float2:")] public Self InitWithNameSemanticFloat2(NSString name, MDLMaterialSemantic semantic, vector_float2 value);
-    [Selector("initWithName:semantic:float3:")] public Self InitWithNameSemanticFloat3(NSString name, MDLMaterialSemantic semantic, vector_float3 value);
-    [Selector("initWithName:semantic:float4:")] public Self InitWithNameSemanticFloat4(NSString name, MDLMaterialSemantic semantic, vector_float4 value);
-    [Selector("initWithName:semantic:matrix4x4:")] public Self InitWithNameSemanticMatrix4x4(NSString name, MDLMaterialSemantic semantic, matrix_float4x4 value);
-    [Selector("initWithName:semantic:URL:")] public Self InitWithNameSemanticURL(NSString name, MDLMaterialSemantic semantic, NSURL? URL);
-    [Selector("initWithName:semantic:string:")] public Self InitWithNameSemanticString(NSString name, MDLMaterialSemantic semantic, NSString? string);
-    [Selector("initWithName:semantic:textureSampler:")] public Self InitWithNameSemanticTextureSampler(NSString name, MDLMaterialSemantic semantic, MDLTextureSampler? textureSampler);
-    [Selector("initWithName:semantic:color:")] public Self InitWithNameSemanticColor(NSString name, MDLMaterialSemantic semantic, CGColorRef color);
-    [Selector("setProperties:")] public void SetProperties(MDLMaterialProperty property);
+    [Selector("semantic", "setSemantic:")]
+    public MDLMaterialSemantic Semantic { get; set; }
+    [Selector("type", "setType:")]
+    public MDLMaterialPropertyType Type { get; set; }
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
+    [Selector("stringValue", "setStringValue:")]
+    public NSString? StringValue { get; set; }
+    [Selector("URLValue", "setURLValue:")]
+    public NSURL? URLValue { get; set; }
+    [Selector("textureSamplerValue", "setTextureSamplerValue:")]
+    public MDLTextureSampler? TextureSamplerValue { get; set; }
+    [Selector("color", "setColor:")]
+    public CGColorRef? Color { get; set; }
+    [Selector("floatValue", "setFloatValue:")]
+    public float FloatValue { get; set; }
+    [Selector("float2Value", "setFloat2Value:")]
+    public vector_float2 Float2Value { get; set; }
+    [Selector("float3Value", "setFloat3Value:")]
+    public vector_float3 Float3Value { get; set; }
+    [Selector("float4Value", "setFloat4Value:")]
+    public vector_float4 Float4Value { get; set; }
+    [Selector("matrix4x4", "setMatrix4x4:")]
+    public matrix_float4x4 Matrix4x4 { get; set; }
+    [Selector("luminance", "setLuminance:")]
+    public float Luminance { get; set; }
+    [Selector("initWithName:semantic:")]
+    public Self InitWithNameSemantic(NSString name, MDLMaterialSemantic semantic);
+    [Selector("initWithName:semantic:float:")]
+    public Self InitWithNameSemanticFloat(NSString name, MDLMaterialSemantic semantic, float value);
+    [Selector("initWithName:semantic:float2:")]
+    public Self InitWithNameSemanticFloat2(NSString name, MDLMaterialSemantic semantic, vector_float2 value);
+    [Selector("initWithName:semantic:float3:")]
+    public Self InitWithNameSemanticFloat3(NSString name, MDLMaterialSemantic semantic, vector_float3 value);
+    [Selector("initWithName:semantic:float4:")]
+    public Self InitWithNameSemanticFloat4(NSString name, MDLMaterialSemantic semantic, vector_float4 value);
+    [Selector("initWithName:semantic:matrix4x4:")]
+    public Self InitWithNameSemanticMatrix4x4(NSString name, MDLMaterialSemantic semantic, matrix_float4x4 value);
+    [Selector("initWithName:semantic:URL:")]
+    public Self InitWithNameSemanticURL(NSString name, MDLMaterialSemantic semantic, NSURL? URL);
+    [Selector("initWithName:semantic:string:")]
+    public Self InitWithNameSemanticString(NSString name, MDLMaterialSemantic semantic, NSString? string);
+    [Selector("initWithName:semantic:textureSampler:")]
+    public Self InitWithNameSemanticTextureSampler(NSString name, MDLMaterialSemantic semantic, MDLTextureSampler? textureSampler);
+    [Selector("initWithName:semantic:color:")]
+    public Self InitWithNameSemanticColor(NSString name, MDLMaterialSemantic semantic, CGColorRef color);
+    [Selector("setProperties:")]
+    public void SetProperties(MDLMaterialProperty property);
 }
 
 public extern objc class MDLMaterialPropertyConnection : NSObject, MDLNamed
 {
-    [Selector("output")] public MDLMaterialProperty? Output { get; }
-    [Selector("input")] public MDLMaterialProperty? Input { get; }
-    [Selector("initWithOutput:input:")] public Self InitWithOutputInput(MDLMaterialProperty output, MDLMaterialProperty input);
+    [Selector("output")]
+    public MDLMaterialProperty? Output { get; }
+    [Selector("input")]
+    public MDLMaterialProperty? Input { get; }
+    [Selector("initWithOutput:input:")]
+    public Self InitWithOutputInput(MDLMaterialProperty output, MDLMaterialProperty input);
 }
 
 public objc closure void MDLMaterialPropertyNodeEvaluationFunctionBlock(MDLMaterialPropertyNode arg0);
@@ -154,47 +190,76 @@ public objc closure void MDLMaterialPropertyNodeInitWithInputsOutputsEvaluationF
 
 public extern objc class MDLMaterialPropertyNode : NSObject, MDLNamed
 {
-    [Selector("evaluationFunction", "setEvaluationFunction:")] public MDLMaterialPropertyNodeEvaluationFunctionBlock EvaluationFunction { get; set; }
-    [Selector("inputs")] public NSArray Inputs { get; }
-    [Selector("outputs")] public NSArray Outputs { get; }
-    [Selector("initWithInputs:outputs:evaluationFunction:")] public Self InitWithInputsOutputsEvaluationFunction(NSArray inputs, NSArray outputs, MDLMaterialPropertyNodeInitWithInputsOutputsEvaluationFunctionFunctionBlock function);
+    [Selector("evaluationFunction", "setEvaluationFunction:")]
+    public MDLMaterialPropertyNodeEvaluationFunctionBlock EvaluationFunction { get; set; }
+    [Selector("inputs")]
+    public NSArray Inputs { get; }
+    [Selector("outputs")]
+    public NSArray Outputs { get; }
+    [Selector("initWithInputs:outputs:evaluationFunction:")]
+    public Self InitWithInputsOutputsEvaluationFunction(NSArray inputs, NSArray outputs, MDLMaterialPropertyNodeInitWithInputsOutputsEvaluationFunctionFunctionBlock function);
 }
 
 public extern objc class MDLMaterialPropertyGraph : MDLMaterialPropertyNode
 {
-    [Selector("nodes")] public NSArray Nodes { get; }
-    [Selector("connections")] public NSArray Connections { get; }
-    [Selector("initWithNodes:connections:")] public Self InitWithNodesConnections(NSArray nodes, NSArray connections);
-    [Selector("evaluate")] public void Evaluate();
+    [Selector("nodes")]
+    public NSArray Nodes { get; }
+    [Selector("connections")]
+    public NSArray Connections { get; }
+    [Selector("initWithNodes:connections:")]
+    public Self InitWithNodesConnections(NSArray nodes, NSArray connections);
+    [Selector("evaluate")]
+    public void Evaluate();
 }
 
 public extern objc class MDLScatteringFunction : NSObject, MDLNamed
 {
-    [Selector("name", "setName:")] public NSString Name { get; set; }
-    [Selector("baseColor")] public MDLMaterialProperty BaseColor { get; }
-    [Selector("emission")] public MDLMaterialProperty Emission { get; }
-    [Selector("specular")] public MDLMaterialProperty Specular { get; }
-    [Selector("materialIndexOfRefraction")] public MDLMaterialProperty MaterialIndexOfRefraction { get; }
-    [Selector("interfaceIndexOfRefraction")] public MDLMaterialProperty InterfaceIndexOfRefraction { get; }
-    [Selector("normal")] public MDLMaterialProperty Normal { get; }
-    [Selector("ambientOcclusion")] public MDLMaterialProperty AmbientOcclusion { get; }
-    [Selector("ambientOcclusionScale")] public MDLMaterialProperty AmbientOcclusionScale { get; }
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
+    [Selector("baseColor")]
+    public MDLMaterialProperty BaseColor { get; }
+    [Selector("emission")]
+    public MDLMaterialProperty Emission { get; }
+    [Selector("specular")]
+    public MDLMaterialProperty Specular { get; }
+    [Selector("materialIndexOfRefraction")]
+    public MDLMaterialProperty MaterialIndexOfRefraction { get; }
+    [Selector("interfaceIndexOfRefraction")]
+    public MDLMaterialProperty InterfaceIndexOfRefraction { get; }
+    [Selector("normal")]
+    public MDLMaterialProperty Normal { get; }
+    [Selector("ambientOcclusion")]
+    public MDLMaterialProperty AmbientOcclusion { get; }
+    [Selector("ambientOcclusionScale")]
+    public MDLMaterialProperty AmbientOcclusionScale { get; }
 }
 
 public extern objc class MDLPhysicallyPlausibleScatteringFunction : MDLScatteringFunction
 {
-    [Selector("version")] public NSInteger Version { get; }
-    [Selector("subsurface")] public MDLMaterialProperty Subsurface { get; }
-    [Selector("metallic")] public MDLMaterialProperty Metallic { get; }
-    [Selector("specularAmount")] public MDLMaterialProperty SpecularAmount { get; }
-    [Selector("specularTint")] public MDLMaterialProperty SpecularTint { get; }
-    [Selector("roughness")] public MDLMaterialProperty Roughness { get; }
-    [Selector("anisotropic")] public MDLMaterialProperty Anisotropic { get; }
-    [Selector("anisotropicRotation")] public MDLMaterialProperty AnisotropicRotation { get; }
-    [Selector("sheen")] public MDLMaterialProperty Sheen { get; }
-    [Selector("sheenTint")] public MDLMaterialProperty SheenTint { get; }
-    [Selector("clearcoat")] public MDLMaterialProperty Clearcoat { get; }
-    [Selector("clearcoatGloss")] public MDLMaterialProperty ClearcoatGloss { get; }
+    [Selector("version")]
+    public NSInteger Version { get; }
+    [Selector("subsurface")]
+    public MDLMaterialProperty Subsurface { get; }
+    [Selector("metallic")]
+    public MDLMaterialProperty Metallic { get; }
+    [Selector("specularAmount")]
+    public MDLMaterialProperty SpecularAmount { get; }
+    [Selector("specularTint")]
+    public MDLMaterialProperty SpecularTint { get; }
+    [Selector("roughness")]
+    public MDLMaterialProperty Roughness { get; }
+    [Selector("anisotropic")]
+    public MDLMaterialProperty Anisotropic { get; }
+    [Selector("anisotropicRotation")]
+    public MDLMaterialProperty AnisotropicRotation { get; }
+    [Selector("sheen")]
+    public MDLMaterialProperty Sheen { get; }
+    [Selector("sheenTint")]
+    public MDLMaterialProperty SheenTint { get; }
+    [Selector("clearcoat")]
+    public MDLMaterialProperty Clearcoat { get; }
+    [Selector("clearcoatGloss")]
+    public MDLMaterialProperty ClearcoatGloss { get; }
 }
 
 public enum MDLMaterialFace : ulong
@@ -206,22 +271,38 @@ public enum MDLMaterialFace : ulong
 
 public extern objc class MDLMaterial : NSObject, MDLNamed, NSFastEnumeration
 {
-    [Selector("scatteringFunction")] public MDLScatteringFunction ScatteringFunction { get; }
-    [Selector("name", "setName:")] public NSString Name { get; set; }
-    [Selector("baseMaterial", "setBaseMaterial:")] public MDLMaterial? BaseMaterial { get; set; }
-    [Selector("count")] public NSUInteger Count { get; }
-    [Selector("materialFace", "setMaterialFace:")] public MDLMaterialFace MaterialFace { get; set; }
-    [Selector("initWithName:scatteringFunction:")] public Self InitWithNameScatteringFunction(NSString name, MDLScatteringFunction scatteringFunction);
-    [Selector("setProperty:")] public void SetProperty(MDLMaterialProperty property);
-    [Selector("removeProperty:")] public void RemoveProperty(MDLMaterialProperty property);
-    [Selector("propertyNamed:")] public MDLMaterialProperty? PropertyNamed(NSString name);
-    [Selector("propertyWithSemantic:")] public MDLMaterialProperty? PropertyWithSemantic(MDLMaterialSemantic semantic);
-    [Selector("propertiesWithSemantic:")] public NSArray PropertiesWithSemantic(MDLMaterialSemantic semantic);
-    [Selector("removeAllProperties")] public void RemoveAllProperties();
-    [Selector("resolveTexturesWithResolver:")] public void ResolveTexturesWithResolver(MDLAssetResolver resolver);
-    [Selector("loadTexturesUsingResolver:")] public void LoadTexturesUsingResolver(MDLAssetResolver resolver);
-    [Selector("objectAtIndexedSubscript:")] public MDLMaterialProperty? ObjectAtIndexedSubscript(NSUInteger idx);
-    [Selector("objectForKeyedSubscript:")] public MDLMaterialProperty? ObjectForKeyedSubscript(NSString name);
+    [Selector("scatteringFunction")]
+    public MDLScatteringFunction ScatteringFunction { get; }
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
+    [Selector("baseMaterial", "setBaseMaterial:")]
+    public MDLMaterial? BaseMaterial { get; set; }
+    [Selector("count")]
+    public NSUInteger Count { get; }
+    [Selector("materialFace", "setMaterialFace:")]
+    public MDLMaterialFace MaterialFace { get; set; }
+    [Selector("initWithName:scatteringFunction:")]
+    public Self InitWithNameScatteringFunction(NSString name, MDLScatteringFunction scatteringFunction);
+    [Selector("setProperty:")]
+    public void SetProperty(MDLMaterialProperty property);
+    [Selector("removeProperty:")]
+    public void RemoveProperty(MDLMaterialProperty property);
+    [Selector("propertyNamed:")]
+    public MDLMaterialProperty? PropertyNamed(NSString name);
+    [Selector("propertyWithSemantic:")]
+    public MDLMaterialProperty? PropertyWithSemantic(MDLMaterialSemantic semantic);
+    [Selector("propertiesWithSemantic:")]
+    public NSArray PropertiesWithSemantic(MDLMaterialSemantic semantic);
+    [Selector("removeAllProperties")]
+    public void RemoveAllProperties();
+    [Selector("resolveTexturesWithResolver:")]
+    public void ResolveTexturesWithResolver(MDLAssetResolver resolver);
+    [Selector("loadTexturesUsingResolver:")]
+    public void LoadTexturesUsingResolver(MDLAssetResolver resolver);
+    [Selector("objectAtIndexedSubscript:")]
+    public MDLMaterialProperty? ObjectAtIndexedSubscript(NSUInteger idx);
+    [Selector("objectForKeyedSubscript:")]
+    public MDLMaterialProperty? ObjectForKeyedSubscript(NSString name);
 }
 
 #endif

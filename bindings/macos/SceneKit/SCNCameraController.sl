@@ -45,37 +45,66 @@ public enum SCNInteractionMode : long
 
 public objc interface SCNCameraControllerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("cameraInertiaWillStartForController:")] void CameraInertiaWillStartForController(SCNCameraController cameraController);
-    [Optional] [Selector("cameraInertiaDidEndForController:")] void CameraInertiaDidEndForController(SCNCameraController cameraController);
+    [Optional]
+    [Selector("cameraInertiaWillStartForController:")]
+    void CameraInertiaWillStartForController(SCNCameraController cameraController);
+    [Optional]
+    [Selector("cameraInertiaDidEndForController:")]
+    void CameraInertiaDidEndForController(SCNCameraController cameraController);
 }
 
 public extern objc class SCNCameraController : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public SCNCameraControllerDelegate? Delegate { get; set; }
-    [Selector("pointOfView", "setPointOfView:")] public SCNNode? PointOfView { get; set; }
-    [Selector("interactionMode", "setInteractionMode:")] public SCNInteractionMode InteractionMode { get; set; }
-    [Selector("target", "setTarget:")] public SCNVector3 Target { get; set; }
-    [Selector("automaticTarget", "setAutomaticTarget:")] public bool AutomaticTarget { get; set; }
-    [Selector("worldUp", "setWorldUp:")] public SCNVector3 WorldUp { get; set; }
-    [Selector("inertiaEnabled", "setInertiaEnabled:")] public bool InertiaEnabled { get; set; }
-    [Selector("inertiaFriction", "setInertiaFriction:")] public float InertiaFriction { get; set; }
-    [Selector("isInertiaRunning")] public bool InertiaRunning { get; }
-    [Selector("minimumVerticalAngle", "setMinimumVerticalAngle:")] public float MinimumVerticalAngle { get; set; }
-    [Selector("maximumVerticalAngle", "setMaximumVerticalAngle:")] public float MaximumVerticalAngle { get; set; }
-    [Selector("minimumHorizontalAngle", "setMinimumHorizontalAngle:")] public float MinimumHorizontalAngle { get; set; }
-    [Selector("maximumHorizontalAngle", "setMaximumHorizontalAngle:")] public float MaximumHorizontalAngle { get; set; }
-    [Selector("translateInCameraSpaceByX:Y:Z:")] public void TranslateInCameraSpaceByXYZ(float deltaX, float deltaY, float deltaZ);
-    [Selector("frameNodes:")] public void FrameNodes(NSArray nodes);
-    [Selector("rotateByX:Y:")] public void RotateByXY(float deltaX, float deltaY);
-    [Selector("rollBy:aroundScreenPoint:viewport:")] public void RollByAroundScreenPointViewport(float delta, CGPoint point, CGSize viewport);
-    [Selector("dollyBy:onScreenPoint:viewport:")] public void DollyByOnScreenPointViewport(float delta, CGPoint point, CGSize viewport);
-    [Selector("rollAroundTarget:")] public void RollAroundTarget(float delta);
-    [Selector("dollyToTarget:")] public void DollyToTarget(float delta);
-    [Selector("clearRoll")] public void ClearRoll();
-    [Selector("stopInertia")] public void StopInertia();
-    [Selector("beginInteraction:withViewport:")] public void BeginInteractionWithViewport(CGPoint location, CGSize viewport);
-    [Selector("continueInteraction:withViewport:sensitivity:")] public void ContinueInteractionWithViewportSensitivity(CGPoint location, CGSize viewport, CGFloat sensitivity);
-    [Selector("endInteraction:withViewport:velocity:")] public void EndInteractionWithViewportVelocity(CGPoint location, CGSize viewport, CGPoint velocity);
+    [Selector("delegate", "setDelegate:")]
+    public SCNCameraControllerDelegate? Delegate { get; set; }
+    [Selector("pointOfView", "setPointOfView:")]
+    public SCNNode? PointOfView { get; set; }
+    [Selector("interactionMode", "setInteractionMode:")]
+    public SCNInteractionMode InteractionMode { get; set; }
+    [Selector("target", "setTarget:")]
+    public SCNVector3 Target { get; set; }
+    [Selector("automaticTarget", "setAutomaticTarget:")]
+    public bool AutomaticTarget { get; set; }
+    [Selector("worldUp", "setWorldUp:")]
+    public SCNVector3 WorldUp { get; set; }
+    [Selector("inertiaEnabled", "setInertiaEnabled:")]
+    public bool InertiaEnabled { get; set; }
+    [Selector("inertiaFriction", "setInertiaFriction:")]
+    public float InertiaFriction { get; set; }
+    [Selector("isInertiaRunning")]
+    public bool InertiaRunning { get; }
+    [Selector("minimumVerticalAngle", "setMinimumVerticalAngle:")]
+    public float MinimumVerticalAngle { get; set; }
+    [Selector("maximumVerticalAngle", "setMaximumVerticalAngle:")]
+    public float MaximumVerticalAngle { get; set; }
+    [Selector("minimumHorizontalAngle", "setMinimumHorizontalAngle:")]
+    public float MinimumHorizontalAngle { get; set; }
+    [Selector("maximumHorizontalAngle", "setMaximumHorizontalAngle:")]
+    public float MaximumHorizontalAngle { get; set; }
+    [Selector("translateInCameraSpaceByX:Y:Z:")]
+    public void TranslateInCameraSpaceByXYZ(float deltaX, float deltaY, float deltaZ);
+    [Selector("frameNodes:")]
+    public void FrameNodes(NSArray nodes);
+    [Selector("rotateByX:Y:")]
+    public void RotateByXY(float deltaX, float deltaY);
+    [Selector("rollBy:aroundScreenPoint:viewport:")]
+    public void RollByAroundScreenPointViewport(float delta, CGPoint point, CGSize viewport);
+    [Selector("dollyBy:onScreenPoint:viewport:")]
+    public void DollyByOnScreenPointViewport(float delta, CGPoint point, CGSize viewport);
+    [Selector("rollAroundTarget:")]
+    public void RollAroundTarget(float delta);
+    [Selector("dollyToTarget:")]
+    public void DollyToTarget(float delta);
+    [Selector("clearRoll")]
+    public void ClearRoll();
+    [Selector("stopInertia")]
+    public void StopInertia();
+    [Selector("beginInteraction:withViewport:")]
+    public void BeginInteractionWithViewport(CGPoint location, CGSize viewport);
+    [Selector("continueInteraction:withViewport:sensitivity:")]
+    public void ContinueInteractionWithViewportSensitivity(CGPoint location, CGSize viewport, CGFloat sensitivity);
+    [Selector("endInteraction:withViewport:velocity:")]
+    public void EndInteractionWithViewportVelocity(CGPoint location, CGSize viewport, CGPoint velocity);
 }
 
 #endif

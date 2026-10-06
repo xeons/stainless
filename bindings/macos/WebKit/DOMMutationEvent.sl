@@ -38,19 +38,26 @@ public const int DOM_REMOVAL = 3;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMMutationEvent : DOMEvent
 {
-    [Selector("relatedNode")] public DOMNode? RelatedNode { get; }
-    [Selector("prevValue")] public NSString? PrevValue { get; }
-    [Selector("newValue")] public NSString? NewValue { get; }
-    [Selector("attrName")] public NSString? AttrName { get; }
-    [Selector("attrChange")] public ushort AttrChange { get; }
-    [Selector("initMutationEvent:canBubble:cancelable:relatedNode:prevValue:newValue:attrName:attrChange:")] public void InitMutationEventCanBubbleCancelableRelatedNodePrevValueNewValueAttrNameAttrChange(NSString? type, bool canBubble, bool cancelable, DOMNode? relatedNode, NSString? prevValue, NSString? newValue, NSString? attrName, ushort attrChange);
+    [Selector("relatedNode")]
+    public DOMNode? RelatedNode { get; }
+    [Selector("prevValue")]
+    public NSString? PrevValue { get; }
+    [Selector("newValue")]
+    public NSString? NewValue { get; }
+    [Selector("attrName")]
+    public NSString? AttrName { get; }
+    [Selector("attrChange")]
+    public ushort AttrChange { get; }
+    [Selector("initMutationEvent:canBubble:cancelable:relatedNode:prevValue:newValue:attrName:attrChange:")]
+    public void InitMutationEventCanBubbleCancelableRelatedNodePrevValueNewValueAttrNameAttrChange(NSString? type, bool canBubble, bool cancelable, DOMNode? relatedNode, NSString? prevValue, NSString? newValue, NSString? attrName, ushort attrChange);
 }
 
 /// DOMMutationEventDeprecated, a category of DOMMutationEvent.
 public extern objc class DOMMutationEvent
 {
     /// Deprecated in macOS 10.5.
-    [Selector("initMutationEvent::::::::")] public void InitMutationEvent(NSString? type, bool canBubble, bool cancelable, DOMNode? relatedNode, NSString? prevValue, NSString? newValue, NSString? attrName, ushort attrChange);
+    [Selector("initMutationEvent::::::::")]
+    public void InitMutationEvent(NSString? type, bool canBubble, bool cancelable, DOMNode? relatedNode, NSString? prevValue, NSString? newValue, NSString? attrName, ushort attrChange);
 }
 
 #endif

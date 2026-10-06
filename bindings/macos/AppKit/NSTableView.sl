@@ -102,113 +102,220 @@ public objc closure void NSTableViewEnumerateAvailableRowViewsUsingBlockHandlerB
 
 public extern objc class NSTableView : NSControl, NSUserInterfaceValidations, NSTextViewDelegate, NSDraggingSource, NSAccessibilityTable
 {
-    [Selector("dataSource", "setDataSource:")] public NSTableViewDataSource? DataSource { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSTableViewDelegate? Delegate { get; set; }
-    [Selector("headerView", "setHeaderView:")] public NSTableHeaderView? HeaderView { get; set; }
-    [Selector("cornerView", "setCornerView:")] public NSView? CornerView { get; set; }
-    [Selector("allowsColumnReordering", "setAllowsColumnReordering:")] public bool AllowsColumnReordering { get; set; }
-    [Selector("allowsColumnResizing", "setAllowsColumnResizing:")] public bool AllowsColumnResizing { get; set; }
-    [Selector("columnAutoresizingStyle", "setColumnAutoresizingStyle:")] public NSTableViewColumnAutoresizingStyle ColumnAutoresizingStyle { get; set; }
-    [Selector("gridStyleMask", "setGridStyleMask:")] public NSTableViewGridLineStyle GridStyleMask { get; set; }
-    [Selector("intercellSpacing", "setIntercellSpacing:")] public NSSize IntercellSpacing { get; set; }
-    [Selector("usesAlternatingRowBackgroundColors", "setUsesAlternatingRowBackgroundColors:")] public bool UsesAlternatingRowBackgroundColors { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor BackgroundColor { get; set; }
-    [Selector("gridColor", "setGridColor:")] public NSColor GridColor { get; set; }
-    [Selector("rowSizeStyle", "setRowSizeStyle:")] public NSTableViewRowSizeStyle RowSizeStyle { get; set; }
-    [Selector("effectiveRowSizeStyle")] public NSTableViewRowSizeStyle EffectiveRowSizeStyle { get; }
-    [Selector("rowHeight", "setRowHeight:")] public CGFloat RowHeight { get; set; }
-    [Selector("tableColumns")] public NSArray TableColumns { get; }
-    [Selector("numberOfColumns")] public NSInteger NumberOfColumns { get; }
-    [Selector("numberOfRows")] public NSInteger NumberOfRows { get; }
-    [Selector("editedColumn")] public NSInteger EditedColumn { get; }
-    [Selector("editedRow")] public NSInteger EditedRow { get; }
-    [Selector("clickedColumn")] public NSInteger ClickedColumn { get; }
-    [Selector("clickedRow")] public NSInteger ClickedRow { get; }
-    [Selector("doubleAction", "setDoubleAction:")] public Selector DoubleAction { get; set; }
-    [Selector("sortDescriptors", "setSortDescriptors:")] public NSArray SortDescriptors { get; set; }
-    [Selector("highlightedTableColumn", "setHighlightedTableColumn:")] public NSTableColumn? HighlightedTableColumn { get; set; }
-    [Selector("verticalMotionCanBeginDrag", "setVerticalMotionCanBeginDrag:")] public bool VerticalMotionCanBeginDrag { get; set; }
-    [Selector("allowsMultipleSelection", "setAllowsMultipleSelection:")] public bool AllowsMultipleSelection { get; set; }
-    [Selector("allowsEmptySelection", "setAllowsEmptySelection:")] public bool AllowsEmptySelection { get; set; }
-    [Selector("allowsColumnSelection", "setAllowsColumnSelection:")] public bool AllowsColumnSelection { get; set; }
-    [Selector("selectedColumnIndexes")] public NSIndexSet SelectedColumnIndexes { get; }
-    [Selector("selectedRowIndexes")] public NSIndexSet SelectedRowIndexes { get; }
-    [Selector("selectedColumn")] public NSInteger SelectedColumn { get; }
-    [Selector("selectedRow")] public NSInteger SelectedRow { get; }
-    [Selector("numberOfSelectedColumns")] public NSInteger NumberOfSelectedColumns { get; }
-    [Selector("numberOfSelectedRows")] public NSInteger NumberOfSelectedRows { get; }
-    [Selector("allowsTypeSelect", "setAllowsTypeSelect:")] public bool AllowsTypeSelect { get; set; }
-    [Selector("style", "setStyle:")] public NSTableViewStyle Style { get; set; }
-    [Selector("effectiveStyle")] public NSTableViewStyle EffectiveStyle { get; }
-    [Selector("selectionHighlightStyle", "setSelectionHighlightStyle:")] public NSTableViewSelectionHighlightStyle SelectionHighlightStyle { get; set; }
-    [Selector("draggingDestinationFeedbackStyle", "setDraggingDestinationFeedbackStyle:")] public NSTableViewDraggingDestinationFeedbackStyle DraggingDestinationFeedbackStyle { get; set; }
-    [Selector("autosaveName", "setAutosaveName:")] public NSTableViewAutosaveName? AutosaveName { get; set; }
-    [Selector("autosaveTableColumns", "setAutosaveTableColumns:")] public bool AutosaveTableColumns { get; set; }
-    [Selector("floatsGroupRows", "setFloatsGroupRows:")] public bool FloatsGroupRows { get; set; }
-    [Selector("rowActionsVisible", "setRowActionsVisible:")] public bool RowActionsVisible { get; set; }
-    [Selector("hiddenRowIndexes")] public NSIndexSet? HiddenRowIndexes { get; }
-    [Selector("registeredNibsByIdentifier")] public NSDictionary? RegisteredNibsByIdentifier { get; }
-    [Selector("usesStaticContents", "setUsesStaticContents:")] public bool UsesStaticContents { get; set; }
-    [Selector("userInterfaceLayoutDirection", "setUserInterfaceLayoutDirection:")] public NSUserInterfaceLayoutDirection UserInterfaceLayoutDirection { get; set; }
-    [Selector("usesAutomaticRowHeights", "setUsesAutomaticRowHeights:")] public bool UsesAutomaticRowHeights { get; set; }
-    [Selector("initWithFrame:")] public Self InitWithFrame(NSRect frameRect);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("noteHeightOfRowsWithIndexesChanged:")] public void NoteHeightOfRowsWithIndexesChanged(NSIndexSet indexSet);
-    [Selector("addTableColumn:")] public void AddTableColumn(NSTableColumn tableColumn);
-    [Selector("removeTableColumn:")] public void RemoveTableColumn(NSTableColumn tableColumn);
-    [Selector("moveColumn:toColumn:")] public void MoveColumnToColumn(NSInteger oldIndex, NSInteger newIndex);
-    [Selector("columnWithIdentifier:")] public NSInteger ColumnWithIdentifier(NSUserInterfaceItemIdentifier identifier);
-    [Selector("tableColumnWithIdentifier:")] public NSTableColumn? TableColumnWithIdentifier(NSUserInterfaceItemIdentifier identifier);
-    [Selector("tile")] public void Tile();
-    [Selector("sizeToFit")] public void SizeToFit();
-    [Selector("sizeLastColumnToFit")] public void SizeLastColumnToFit();
-    [Selector("scrollRowToVisible:")] public void ScrollRowToVisible(NSInteger row);
-    [Selector("scrollColumnToVisible:")] public void ScrollColumnToVisible(NSInteger column);
-    [Selector("reloadData")] public void ReloadData();
-    [Selector("noteNumberOfRowsChanged")] public void NoteNumberOfRowsChanged();
-    [Selector("reloadDataForRowIndexes:columnIndexes:")] public void ReloadDataForRowIndexesColumnIndexes(NSIndexSet rowIndexes, NSIndexSet columnIndexes);
-    [Selector("setIndicatorImage:inTableColumn:")] public void SetIndicatorImageInTableColumn(NSImage? image, NSTableColumn tableColumn);
-    [Selector("indicatorImageInTableColumn:")] public NSImage? IndicatorImageInTableColumn(NSTableColumn tableColumn);
-    [Selector("canDragRowsWithIndexes:atPoint:")] public bool CanDragRowsWithIndexesAtPoint(NSIndexSet rowIndexes, NSPoint mouseDownPoint);
-    [Selector("dragImageForRowsWithIndexes:tableColumns:event:offset:")] public NSImage DragImageForRowsWithIndexesTableColumnsEventOffset(NSIndexSet dragRows, NSArray tableColumns, NSEvent dragEvent, NSPointPointer dragImageOffset);
-    [Selector("setDraggingSourceOperationMask:forLocal:")] public void SetDraggingSourceOperationMaskForLocal(NSDragOperation mask, bool isLocal);
-    [Selector("setDropRow:dropOperation:")] public void SetDropRowDropOperation(NSInteger row, NSTableViewDropOperation dropOperation);
-    [Selector("selectAll:")] public void SelectAll(AnyObject? sender);
-    [Selector("deselectAll:")] public void DeselectAll(AnyObject? sender);
-    [Selector("selectColumnIndexes:byExtendingSelection:")] public void SelectColumnIndexesByExtendingSelection(NSIndexSet indexes, bool extend);
-    [Selector("selectRowIndexes:byExtendingSelection:")] public void SelectRowIndexesByExtendingSelection(NSIndexSet indexes, bool extend);
-    [Selector("deselectColumn:")] public void DeselectColumn(NSInteger column);
-    [Selector("deselectRow:")] public void DeselectRow(NSInteger row);
-    [Selector("isColumnSelected:")] public bool IsColumnSelected(NSInteger column);
-    [Selector("isRowSelected:")] public bool IsRowSelected(NSInteger row);
-    [Selector("rectOfColumn:")] public NSRect RectOfColumn(NSInteger column);
-    [Selector("rectOfRow:")] public NSRect RectOfRow(NSInteger row);
-    [Selector("columnIndexesInRect:")] public NSIndexSet ColumnIndexesInRect(NSRect rect);
-    [Selector("rowsInRect:")] public NSRange RowsInRect(NSRect rect);
-    [Selector("columnAtPoint:")] public NSInteger ColumnAtPoint(NSPoint point);
-    [Selector("rowAtPoint:")] public NSInteger RowAtPoint(NSPoint point);
-    [Selector("frameOfCellAtColumn:row:")] public NSRect FrameOfCellAtColumnRow(NSInteger column, NSInteger row);
-    [Selector("editColumn:row:withEvent:select:")] public void EditColumnRowWithEventSelect(NSInteger column, NSInteger row, NSEvent? event, bool select);
-    [Selector("drawRow:clipRect:")] public void DrawRowClipRect(NSInteger row, NSRect clipRect);
-    [Selector("highlightSelectionInClipRect:")] public void HighlightSelectionInClipRect(NSRect clipRect);
-    [Selector("drawGridInClipRect:")] public void DrawGridInClipRect(NSRect clipRect);
-    [Selector("drawBackgroundInClipRect:")] public void DrawBackgroundInClipRect(NSRect clipRect);
-    [Selector("viewAtColumn:row:makeIfNecessary:")] public NSView? ViewAtColumnRowMakeIfNecessary(NSInteger column, NSInteger row, bool makeIfNecessary);
-    [Selector("rowViewAtRow:makeIfNecessary:")] public NSTableRowView? RowViewAtRowMakeIfNecessary(NSInteger row, bool makeIfNecessary);
-    [Selector("rowForView:")] public NSInteger RowForView(NSView view);
-    [Selector("columnForView:")] public NSInteger ColumnForView(NSView view);
-    [Selector("makeViewWithIdentifier:owner:")] public NSView? MakeViewWithIdentifierOwner(NSUserInterfaceItemIdentifier identifier, AnyObject? owner);
-    [Selector("enumerateAvailableRowViewsUsingBlock:")] public void EnumerateAvailableRowViewsUsingBlock(NSTableViewEnumerateAvailableRowViewsUsingBlockHandlerBlock handler);
-    [Selector("beginUpdates")] public void BeginUpdates();
-    [Selector("endUpdates")] public void EndUpdates();
-    [Selector("insertRowsAtIndexes:withAnimation:")] public void InsertRowsAtIndexesWithAnimation(NSIndexSet indexes, NSTableViewAnimationOptions animationOptions);
-    [Selector("removeRowsAtIndexes:withAnimation:")] public void RemoveRowsAtIndexesWithAnimation(NSIndexSet indexes, NSTableViewAnimationOptions animationOptions);
-    [Selector("moveRowAtIndex:toIndex:")] public void MoveRowAtIndexToIndex(NSInteger oldIndex, NSInteger newIndex);
-    [Selector("hideRowsAtIndexes:withAnimation:")] public void HideRowsAtIndexesWithAnimation(NSIndexSet indexes, NSTableViewAnimationOptions rowAnimation);
-    [Selector("unhideRowsAtIndexes:withAnimation:")] public void UnhideRowsAtIndexesWithAnimation(NSIndexSet indexes, NSTableViewAnimationOptions rowAnimation);
-    [Selector("registerNib:forIdentifier:")] public void RegisterNibForIdentifier(NSNib? nib, NSUserInterfaceItemIdentifier identifier);
-    [Selector("didAddRowView:forRow:")] public void DidAddRowViewForRow(NSTableRowView rowView, NSInteger row);
-    [Selector("didRemoveRowView:forRow:")] public void DidRemoveRowViewForRow(NSTableRowView rowView, NSInteger row);
+    [Selector("dataSource", "setDataSource:")]
+    public NSTableViewDataSource? DataSource { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSTableViewDelegate? Delegate { get; set; }
+    [Selector("headerView", "setHeaderView:")]
+    public NSTableHeaderView? HeaderView { get; set; }
+    [Selector("cornerView", "setCornerView:")]
+    public NSView? CornerView { get; set; }
+    [Selector("allowsColumnReordering", "setAllowsColumnReordering:")]
+    public bool AllowsColumnReordering { get; set; }
+    [Selector("allowsColumnResizing", "setAllowsColumnResizing:")]
+    public bool AllowsColumnResizing { get; set; }
+    [Selector("columnAutoresizingStyle", "setColumnAutoresizingStyle:")]
+    public NSTableViewColumnAutoresizingStyle ColumnAutoresizingStyle { get; set; }
+    [Selector("gridStyleMask", "setGridStyleMask:")]
+    public NSTableViewGridLineStyle GridStyleMask { get; set; }
+    [Selector("intercellSpacing", "setIntercellSpacing:")]
+    public NSSize IntercellSpacing { get; set; }
+    [Selector("usesAlternatingRowBackgroundColors", "setUsesAlternatingRowBackgroundColors:")]
+    public bool UsesAlternatingRowBackgroundColors { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor BackgroundColor { get; set; }
+    [Selector("gridColor", "setGridColor:")]
+    public NSColor GridColor { get; set; }
+    [Selector("rowSizeStyle", "setRowSizeStyle:")]
+    public NSTableViewRowSizeStyle RowSizeStyle { get; set; }
+    [Selector("effectiveRowSizeStyle")]
+    public NSTableViewRowSizeStyle EffectiveRowSizeStyle { get; }
+    [Selector("rowHeight", "setRowHeight:")]
+    public CGFloat RowHeight { get; set; }
+    [Selector("tableColumns")]
+    public NSArray TableColumns { get; }
+    [Selector("numberOfColumns")]
+    public NSInteger NumberOfColumns { get; }
+    [Selector("numberOfRows")]
+    public NSInteger NumberOfRows { get; }
+    [Selector("editedColumn")]
+    public NSInteger EditedColumn { get; }
+    [Selector("editedRow")]
+    public NSInteger EditedRow { get; }
+    [Selector("clickedColumn")]
+    public NSInteger ClickedColumn { get; }
+    [Selector("clickedRow")]
+    public NSInteger ClickedRow { get; }
+    [Selector("doubleAction", "setDoubleAction:")]
+    public Selector DoubleAction { get; set; }
+    [Selector("sortDescriptors", "setSortDescriptors:")]
+    public NSArray SortDescriptors { get; set; }
+    [Selector("highlightedTableColumn", "setHighlightedTableColumn:")]
+    public NSTableColumn? HighlightedTableColumn { get; set; }
+    [Selector("verticalMotionCanBeginDrag", "setVerticalMotionCanBeginDrag:")]
+    public bool VerticalMotionCanBeginDrag { get; set; }
+    [Selector("allowsMultipleSelection", "setAllowsMultipleSelection:")]
+    public bool AllowsMultipleSelection { get; set; }
+    [Selector("allowsEmptySelection", "setAllowsEmptySelection:")]
+    public bool AllowsEmptySelection { get; set; }
+    [Selector("allowsColumnSelection", "setAllowsColumnSelection:")]
+    public bool AllowsColumnSelection { get; set; }
+    [Selector("selectedColumnIndexes")]
+    public NSIndexSet SelectedColumnIndexes { get; }
+    [Selector("selectedRowIndexes")]
+    public NSIndexSet SelectedRowIndexes { get; }
+    [Selector("selectedColumn")]
+    public NSInteger SelectedColumn { get; }
+    [Selector("selectedRow")]
+    public NSInteger SelectedRow { get; }
+    [Selector("numberOfSelectedColumns")]
+    public NSInteger NumberOfSelectedColumns { get; }
+    [Selector("numberOfSelectedRows")]
+    public NSInteger NumberOfSelectedRows { get; }
+    [Selector("allowsTypeSelect", "setAllowsTypeSelect:")]
+    public bool AllowsTypeSelect { get; set; }
+    [Selector("style", "setStyle:")]
+    public NSTableViewStyle Style { get; set; }
+    [Selector("effectiveStyle")]
+    public NSTableViewStyle EffectiveStyle { get; }
+    [Selector("selectionHighlightStyle", "setSelectionHighlightStyle:")]
+    public NSTableViewSelectionHighlightStyle SelectionHighlightStyle { get; set; }
+    [Selector("draggingDestinationFeedbackStyle", "setDraggingDestinationFeedbackStyle:")]
+    public NSTableViewDraggingDestinationFeedbackStyle DraggingDestinationFeedbackStyle { get; set; }
+    [Selector("autosaveName", "setAutosaveName:")]
+    public NSTableViewAutosaveName? AutosaveName { get; set; }
+    [Selector("autosaveTableColumns", "setAutosaveTableColumns:")]
+    public bool AutosaveTableColumns { get; set; }
+    [Selector("floatsGroupRows", "setFloatsGroupRows:")]
+    public bool FloatsGroupRows { get; set; }
+    [Selector("rowActionsVisible", "setRowActionsVisible:")]
+    public bool RowActionsVisible { get; set; }
+    [Selector("hiddenRowIndexes")]
+    public NSIndexSet? HiddenRowIndexes { get; }
+    [Selector("registeredNibsByIdentifier")]
+    public NSDictionary? RegisteredNibsByIdentifier { get; }
+    [Selector("usesStaticContents", "setUsesStaticContents:")]
+    public bool UsesStaticContents { get; set; }
+    [Selector("userInterfaceLayoutDirection", "setUserInterfaceLayoutDirection:")]
+    public NSUserInterfaceLayoutDirection UserInterfaceLayoutDirection { get; set; }
+    [Selector("usesAutomaticRowHeights", "setUsesAutomaticRowHeights:")]
+    public bool UsesAutomaticRowHeights { get; set; }
+    [Selector("initWithFrame:")]
+    public Self InitWithFrame(NSRect frameRect);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("noteHeightOfRowsWithIndexesChanged:")]
+    public void NoteHeightOfRowsWithIndexesChanged(NSIndexSet indexSet);
+    [Selector("addTableColumn:")]
+    public void AddTableColumn(NSTableColumn tableColumn);
+    [Selector("removeTableColumn:")]
+    public void RemoveTableColumn(NSTableColumn tableColumn);
+    [Selector("moveColumn:toColumn:")]
+    public void MoveColumnToColumn(NSInteger oldIndex, NSInteger newIndex);
+    [Selector("columnWithIdentifier:")]
+    public NSInteger ColumnWithIdentifier(NSUserInterfaceItemIdentifier identifier);
+    [Selector("tableColumnWithIdentifier:")]
+    public NSTableColumn? TableColumnWithIdentifier(NSUserInterfaceItemIdentifier identifier);
+    [Selector("tile")]
+    public void Tile();
+    [Selector("sizeToFit")]
+    public void SizeToFit();
+    [Selector("sizeLastColumnToFit")]
+    public void SizeLastColumnToFit();
+    [Selector("scrollRowToVisible:")]
+    public void ScrollRowToVisible(NSInteger row);
+    [Selector("scrollColumnToVisible:")]
+    public void ScrollColumnToVisible(NSInteger column);
+    [Selector("reloadData")]
+    public void ReloadData();
+    [Selector("noteNumberOfRowsChanged")]
+    public void NoteNumberOfRowsChanged();
+    [Selector("reloadDataForRowIndexes:columnIndexes:")]
+    public void ReloadDataForRowIndexesColumnIndexes(NSIndexSet rowIndexes, NSIndexSet columnIndexes);
+    [Selector("setIndicatorImage:inTableColumn:")]
+    public void SetIndicatorImageInTableColumn(NSImage? image, NSTableColumn tableColumn);
+    [Selector("indicatorImageInTableColumn:")]
+    public NSImage? IndicatorImageInTableColumn(NSTableColumn tableColumn);
+    [Selector("canDragRowsWithIndexes:atPoint:")]
+    public bool CanDragRowsWithIndexesAtPoint(NSIndexSet rowIndexes, NSPoint mouseDownPoint);
+    [Selector("dragImageForRowsWithIndexes:tableColumns:event:offset:")]
+    public NSImage DragImageForRowsWithIndexesTableColumnsEventOffset(NSIndexSet dragRows, NSArray tableColumns, NSEvent dragEvent, NSPointPointer dragImageOffset);
+    [Selector("setDraggingSourceOperationMask:forLocal:")]
+    public void SetDraggingSourceOperationMaskForLocal(NSDragOperation mask, bool isLocal);
+    [Selector("setDropRow:dropOperation:")]
+    public void SetDropRowDropOperation(NSInteger row, NSTableViewDropOperation dropOperation);
+    [Selector("selectAll:")]
+    public void SelectAll(AnyObject? sender);
+    [Selector("deselectAll:")]
+    public void DeselectAll(AnyObject? sender);
+    [Selector("selectColumnIndexes:byExtendingSelection:")]
+    public void SelectColumnIndexesByExtendingSelection(NSIndexSet indexes, bool extend);
+    [Selector("selectRowIndexes:byExtendingSelection:")]
+    public void SelectRowIndexesByExtendingSelection(NSIndexSet indexes, bool extend);
+    [Selector("deselectColumn:")]
+    public void DeselectColumn(NSInteger column);
+    [Selector("deselectRow:")]
+    public void DeselectRow(NSInteger row);
+    [Selector("isColumnSelected:")]
+    public bool IsColumnSelected(NSInteger column);
+    [Selector("isRowSelected:")]
+    public bool IsRowSelected(NSInteger row);
+    [Selector("rectOfColumn:")]
+    public NSRect RectOfColumn(NSInteger column);
+    [Selector("rectOfRow:")]
+    public NSRect RectOfRow(NSInteger row);
+    [Selector("columnIndexesInRect:")]
+    public NSIndexSet ColumnIndexesInRect(NSRect rect);
+    [Selector("rowsInRect:")]
+    public NSRange RowsInRect(NSRect rect);
+    [Selector("columnAtPoint:")]
+    public NSInteger ColumnAtPoint(NSPoint point);
+    [Selector("rowAtPoint:")]
+    public NSInteger RowAtPoint(NSPoint point);
+    [Selector("frameOfCellAtColumn:row:")]
+    public NSRect FrameOfCellAtColumnRow(NSInteger column, NSInteger row);
+    [Selector("editColumn:row:withEvent:select:")]
+    public void EditColumnRowWithEventSelect(NSInteger column, NSInteger row, NSEvent? event, bool select);
+    [Selector("drawRow:clipRect:")]
+    public void DrawRowClipRect(NSInteger row, NSRect clipRect);
+    [Selector("highlightSelectionInClipRect:")]
+    public void HighlightSelectionInClipRect(NSRect clipRect);
+    [Selector("drawGridInClipRect:")]
+    public void DrawGridInClipRect(NSRect clipRect);
+    [Selector("drawBackgroundInClipRect:")]
+    public void DrawBackgroundInClipRect(NSRect clipRect);
+    [Selector("viewAtColumn:row:makeIfNecessary:")]
+    public NSView? ViewAtColumnRowMakeIfNecessary(NSInteger column, NSInteger row, bool makeIfNecessary);
+    [Selector("rowViewAtRow:makeIfNecessary:")]
+    public NSTableRowView? RowViewAtRowMakeIfNecessary(NSInteger row, bool makeIfNecessary);
+    [Selector("rowForView:")]
+    public NSInteger RowForView(NSView view);
+    [Selector("columnForView:")]
+    public NSInteger ColumnForView(NSView view);
+    [Selector("makeViewWithIdentifier:owner:")]
+    public NSView? MakeViewWithIdentifierOwner(NSUserInterfaceItemIdentifier identifier, AnyObject? owner);
+    [Selector("enumerateAvailableRowViewsUsingBlock:")]
+    public void EnumerateAvailableRowViewsUsingBlock(NSTableViewEnumerateAvailableRowViewsUsingBlockHandlerBlock handler);
+    [Selector("beginUpdates")]
+    public void BeginUpdates();
+    [Selector("endUpdates")]
+    public void EndUpdates();
+    [Selector("insertRowsAtIndexes:withAnimation:")]
+    public void InsertRowsAtIndexesWithAnimation(NSIndexSet indexes, NSTableViewAnimationOptions animationOptions);
+    [Selector("removeRowsAtIndexes:withAnimation:")]
+    public void RemoveRowsAtIndexesWithAnimation(NSIndexSet indexes, NSTableViewAnimationOptions animationOptions);
+    [Selector("moveRowAtIndex:toIndex:")]
+    public void MoveRowAtIndexToIndex(NSInteger oldIndex, NSInteger newIndex);
+    [Selector("hideRowsAtIndexes:withAnimation:")]
+    public void HideRowsAtIndexesWithAnimation(NSIndexSet indexes, NSTableViewAnimationOptions rowAnimation);
+    [Selector("unhideRowsAtIndexes:withAnimation:")]
+    public void UnhideRowsAtIndexesWithAnimation(NSIndexSet indexes, NSTableViewAnimationOptions rowAnimation);
+    [Selector("registerNib:forIdentifier:")]
+    public void RegisterNibForIdentifier(NSNib? nib, NSUserInterfaceItemIdentifier identifier);
+    [Selector("didAddRowView:forRow:")]
+    public void DidAddRowViewForRow(NSTableRowView rowView, NSInteger row);
+    [Selector("didRemoveRowView:forRow:")]
+    public void DidRemoveRowViewForRow(NSTableRowView rowView, NSInteger row);
 }
 
 [Flags]
@@ -225,37 +332,99 @@ public enum NSTableViewAnimationOptions : ulong
 
 public objc interface NSTableViewDelegate : NSControlTextEditingDelegate
 {
-    [Optional] [Selector("tableView:viewForTableColumn:row:")] NSView? TableViewViewForTableColumnRow(NSTableView tableView, NSTableColumn? tableColumn, NSInteger row);
-    [Optional] [Selector("tableView:rowViewForRow:")] NSTableRowView? TableViewRowViewForRow(NSTableView tableView, NSInteger row);
-    [Optional] [Selector("tableView:didAddRowView:forRow:")] void TableViewDidAddRowViewForRow(NSTableView tableView, NSTableRowView rowView, NSInteger row);
-    [Optional] [Selector("tableView:didRemoveRowView:forRow:")] void TableViewDidRemoveRowViewForRow(NSTableView tableView, NSTableRowView rowView, NSInteger row);
-    [Optional] [Selector("tableView:willDisplayCell:forTableColumn:row:")] void TableViewWillDisplayCellForTableColumnRow(NSTableView tableView, AnyObject cell, NSTableColumn? tableColumn, NSInteger row);
-    [Optional] [Selector("tableView:shouldEditTableColumn:row:")] bool TableViewShouldEditTableColumnRow(NSTableView tableView, NSTableColumn? tableColumn, NSInteger row);
-    [Optional] [Selector("tableView:toolTipForCell:rect:tableColumn:row:mouseLocation:")] NSString TableViewToolTipForCellRectTableColumnRowMouseLocation(NSTableView tableView, NSCell cell, NSRectPointer rect, NSTableColumn? tableColumn, NSInteger row, NSPoint mouseLocation);
-    [Optional] [Selector("tableView:shouldShowCellExpansionForTableColumn:row:")] bool TableViewShouldShowCellExpansionForTableColumnRow(NSTableView tableView, NSTableColumn? tableColumn, NSInteger row);
-    [Optional] [Selector("tableView:shouldTrackCell:forTableColumn:row:")] bool TableViewShouldTrackCellForTableColumnRow(NSTableView tableView, NSCell cell, NSTableColumn? tableColumn, NSInteger row);
-    [Optional] [Selector("tableView:dataCellForTableColumn:row:")] NSCell? TableViewDataCellForTableColumnRow(NSTableView tableView, NSTableColumn? tableColumn, NSInteger row);
-    [Optional] [Selector("selectionShouldChangeInTableView:")] bool SelectionShouldChangeInTableView(NSTableView tableView);
-    [Optional] [Selector("tableView:shouldSelectRow:")] bool TableViewShouldSelectRow(NSTableView tableView, NSInteger row);
-    [Optional] [Selector("tableView:selectionIndexesForProposedSelection:")] NSIndexSet TableViewSelectionIndexesForProposedSelection(NSTableView tableView, NSIndexSet proposedSelectionIndexes);
-    [Optional] [Selector("tableView:shouldSelectTableColumn:")] bool TableViewShouldSelectTableColumn(NSTableView tableView, NSTableColumn? tableColumn);
-    [Optional] [Selector("tableView:mouseDownInHeaderOfTableColumn:")] void TableViewMouseDownInHeaderOfTableColumn(NSTableView tableView, NSTableColumn tableColumn);
-    [Optional] [Selector("tableView:didClickTableColumn:")] void TableViewDidClickTableColumn(NSTableView tableView, NSTableColumn tableColumn);
-    [Optional] [Selector("tableView:didDragTableColumn:")] void TableViewDidDragTableColumn(NSTableView tableView, NSTableColumn tableColumn);
-    [Optional] [Selector("tableView:heightOfRow:")] CGFloat TableViewHeightOfRow(NSTableView tableView, NSInteger row);
-    [Optional] [Selector("tableView:typeSelectStringForTableColumn:row:")] NSString? TableViewTypeSelectStringForTableColumnRow(NSTableView tableView, NSTableColumn? tableColumn, NSInteger row);
-    [Optional] [Selector("tableView:nextTypeSelectMatchFromRow:toRow:forString:")] NSInteger TableViewNextTypeSelectMatchFromRowToRowForString(NSTableView tableView, NSInteger startRow, NSInteger endRow, NSString searchString);
-    [Optional] [Selector("tableView:shouldTypeSelectForEvent:withCurrentSearchString:")] bool TableViewShouldTypeSelectForEventWithCurrentSearchString(NSTableView tableView, NSEvent event, NSString? searchString);
-    [Optional] [Selector("tableView:isGroupRow:")] bool TableViewIsGroupRow(NSTableView tableView, NSInteger row);
-    [Optional] [Selector("tableView:sizeToFitWidthOfColumn:")] CGFloat TableViewSizeToFitWidthOfColumn(NSTableView tableView, NSInteger column);
-    [Optional] [Selector("tableView:shouldReorderColumn:toColumn:")] bool TableViewShouldReorderColumnToColumn(NSTableView tableView, NSInteger columnIndex, NSInteger newColumnIndex);
-    [Optional] [Selector("tableView:rowActionsForRow:edge:")] NSArray TableViewRowActionsForRowEdge(NSTableView tableView, NSInteger row, NSTableRowActionEdge edge);
-    [Optional] [Selector("tableView:userCanChangeVisibilityOfTableColumn:")] bool TableViewUserCanChangeVisibilityOfTableColumn(NSTableView tableView, NSTableColumn column);
-    [Optional] [Selector("tableView:userDidChangeVisibilityOfTableColumns:")] void TableViewUserDidChangeVisibilityOfTableColumns(NSTableView tableView, NSArray columns);
-    [Optional] [Selector("tableViewSelectionDidChange:")] void TableViewSelectionDidChange(NSNotification notification);
-    [Optional] [Selector("tableViewColumnDidMove:")] void TableViewColumnDidMove(NSNotification notification);
-    [Optional] [Selector("tableViewColumnDidResize:")] void TableViewColumnDidResize(NSNotification notification);
-    [Optional] [Selector("tableViewSelectionIsChanging:")] void TableViewSelectionIsChanging(NSNotification notification);
+    [Optional]
+    [Selector("tableView:viewForTableColumn:row:")]
+    NSView? TableViewViewForTableColumnRow(NSTableView tableView, NSTableColumn? tableColumn, NSInteger row);
+    [Optional]
+    [Selector("tableView:rowViewForRow:")]
+    NSTableRowView? TableViewRowViewForRow(NSTableView tableView, NSInteger row);
+    [Optional]
+    [Selector("tableView:didAddRowView:forRow:")]
+    void TableViewDidAddRowViewForRow(NSTableView tableView, NSTableRowView rowView, NSInteger row);
+    [Optional]
+    [Selector("tableView:didRemoveRowView:forRow:")]
+    void TableViewDidRemoveRowViewForRow(NSTableView tableView, NSTableRowView rowView, NSInteger row);
+    [Optional]
+    [Selector("tableView:willDisplayCell:forTableColumn:row:")]
+    void TableViewWillDisplayCellForTableColumnRow(NSTableView tableView, AnyObject cell, NSTableColumn? tableColumn, NSInteger row);
+    [Optional]
+    [Selector("tableView:shouldEditTableColumn:row:")]
+    bool TableViewShouldEditTableColumnRow(NSTableView tableView, NSTableColumn? tableColumn, NSInteger row);
+    [Optional]
+    [Selector("tableView:toolTipForCell:rect:tableColumn:row:mouseLocation:")]
+    NSString TableViewToolTipForCellRectTableColumnRowMouseLocation(NSTableView tableView, NSCell cell, NSRectPointer rect, NSTableColumn? tableColumn, NSInteger row, NSPoint mouseLocation);
+    [Optional]
+    [Selector("tableView:shouldShowCellExpansionForTableColumn:row:")]
+    bool TableViewShouldShowCellExpansionForTableColumnRow(NSTableView tableView, NSTableColumn? tableColumn, NSInteger row);
+    [Optional]
+    [Selector("tableView:shouldTrackCell:forTableColumn:row:")]
+    bool TableViewShouldTrackCellForTableColumnRow(NSTableView tableView, NSCell cell, NSTableColumn? tableColumn, NSInteger row);
+    [Optional]
+    [Selector("tableView:dataCellForTableColumn:row:")]
+    NSCell? TableViewDataCellForTableColumnRow(NSTableView tableView, NSTableColumn? tableColumn, NSInteger row);
+    [Optional]
+    [Selector("selectionShouldChangeInTableView:")]
+    bool SelectionShouldChangeInTableView(NSTableView tableView);
+    [Optional]
+    [Selector("tableView:shouldSelectRow:")]
+    bool TableViewShouldSelectRow(NSTableView tableView, NSInteger row);
+    [Optional]
+    [Selector("tableView:selectionIndexesForProposedSelection:")]
+    NSIndexSet TableViewSelectionIndexesForProposedSelection(NSTableView tableView, NSIndexSet proposedSelectionIndexes);
+    [Optional]
+    [Selector("tableView:shouldSelectTableColumn:")]
+    bool TableViewShouldSelectTableColumn(NSTableView tableView, NSTableColumn? tableColumn);
+    [Optional]
+    [Selector("tableView:mouseDownInHeaderOfTableColumn:")]
+    void TableViewMouseDownInHeaderOfTableColumn(NSTableView tableView, NSTableColumn tableColumn);
+    [Optional]
+    [Selector("tableView:didClickTableColumn:")]
+    void TableViewDidClickTableColumn(NSTableView tableView, NSTableColumn tableColumn);
+    [Optional]
+    [Selector("tableView:didDragTableColumn:")]
+    void TableViewDidDragTableColumn(NSTableView tableView, NSTableColumn tableColumn);
+    [Optional]
+    [Selector("tableView:heightOfRow:")]
+    CGFloat TableViewHeightOfRow(NSTableView tableView, NSInteger row);
+    [Optional]
+    [Selector("tableView:typeSelectStringForTableColumn:row:")]
+    NSString? TableViewTypeSelectStringForTableColumnRow(NSTableView tableView, NSTableColumn? tableColumn, NSInteger row);
+    [Optional]
+    [Selector("tableView:nextTypeSelectMatchFromRow:toRow:forString:")]
+    NSInteger TableViewNextTypeSelectMatchFromRowToRowForString(NSTableView tableView, NSInteger startRow, NSInteger endRow, NSString searchString);
+    [Optional]
+    [Selector("tableView:shouldTypeSelectForEvent:withCurrentSearchString:")]
+    bool TableViewShouldTypeSelectForEventWithCurrentSearchString(NSTableView tableView, NSEvent event, NSString? searchString);
+    [Optional]
+    [Selector("tableView:isGroupRow:")]
+    bool TableViewIsGroupRow(NSTableView tableView, NSInteger row);
+    [Optional]
+    [Selector("tableView:sizeToFitWidthOfColumn:")]
+    CGFloat TableViewSizeToFitWidthOfColumn(NSTableView tableView, NSInteger column);
+    [Optional]
+    [Selector("tableView:shouldReorderColumn:toColumn:")]
+    bool TableViewShouldReorderColumnToColumn(NSTableView tableView, NSInteger columnIndex, NSInteger newColumnIndex);
+    [Optional]
+    [Selector("tableView:rowActionsForRow:edge:")]
+    NSArray TableViewRowActionsForRowEdge(NSTableView tableView, NSInteger row, NSTableRowActionEdge edge);
+    [Optional]
+    [Selector("tableView:userCanChangeVisibilityOfTableColumn:")]
+    bool TableViewUserCanChangeVisibilityOfTableColumn(NSTableView tableView, NSTableColumn column);
+    [Optional]
+    [Selector("tableView:userDidChangeVisibilityOfTableColumns:")]
+    void TableViewUserDidChangeVisibilityOfTableColumns(NSTableView tableView, NSArray columns);
+    [Optional]
+    [Selector("tableViewSelectionDidChange:")]
+    void TableViewSelectionDidChange(NSNotification notification);
+    [Optional]
+    [Selector("tableViewColumnDidMove:")]
+    void TableViewColumnDidMove(NSNotification notification);
+    [Optional]
+    [Selector("tableViewColumnDidResize:")]
+    void TableViewColumnDidResize(NSNotification notification);
+    [Optional]
+    [Selector("tableViewSelectionIsChanging:")]
+    void TableViewSelectionIsChanging(NSNotification notification);
 }
 
 public extern "C" NSNotificationName NSTableViewSelectionDidChangeNotification;
@@ -270,72 +439,117 @@ public extern "C" NSUserInterfaceItemIdentifier? NSTableViewRowViewKey;
 
 public objc interface NSTableViewDataSource : NSObjectProtocol
 {
-    [Optional] [Selector("numberOfRowsInTableView:")] NSInteger NumberOfRowsInTableView(NSTableView tableView);
-    [Optional] [Selector("tableView:objectValueForTableColumn:row:")] AnyObject? TableViewObjectValueForTableColumnRow(NSTableView tableView, NSTableColumn? tableColumn, NSInteger row);
-    [Optional] [Selector("tableView:setObjectValue:forTableColumn:row:")] void TableViewSetObjectValueForTableColumnRow(NSTableView tableView, AnyObject? object, NSTableColumn? tableColumn, NSInteger row);
-    [Optional] [Selector("tableView:sortDescriptorsDidChange:")] void TableViewSortDescriptorsDidChange(NSTableView tableView, NSArray oldDescriptors);
-    [Optional] [Selector("tableView:pasteboardWriterForRow:")] NSPasteboardWriting? TableViewPasteboardWriterForRow(NSTableView tableView, NSInteger row);
-    [Optional] [Selector("tableView:draggingSession:willBeginAtPoint:forRowIndexes:")] void TableViewDraggingSessionWillBeginAtPointForRowIndexes(NSTableView tableView, NSDraggingSession session, NSPoint screenPoint, NSIndexSet rowIndexes);
-    [Optional] [Selector("tableView:draggingSession:endedAtPoint:operation:")] void TableViewDraggingSessionEndedAtPointOperation(NSTableView tableView, NSDraggingSession session, NSPoint screenPoint, NSDragOperation operation);
-    [Optional] [Selector("tableView:updateDraggingItemsForDrag:")] void TableViewUpdateDraggingItemsForDrag(NSTableView tableView, NSDraggingInfo draggingInfo);
+    [Optional]
+    [Selector("numberOfRowsInTableView:")]
+    NSInteger NumberOfRowsInTableView(NSTableView tableView);
+    [Optional]
+    [Selector("tableView:objectValueForTableColumn:row:")]
+    AnyObject? TableViewObjectValueForTableColumnRow(NSTableView tableView, NSTableColumn? tableColumn, NSInteger row);
+    [Optional]
+    [Selector("tableView:setObjectValue:forTableColumn:row:")]
+    void TableViewSetObjectValueForTableColumnRow(NSTableView tableView, AnyObject? object, NSTableColumn? tableColumn, NSInteger row);
+    [Optional]
+    [Selector("tableView:sortDescriptorsDidChange:")]
+    void TableViewSortDescriptorsDidChange(NSTableView tableView, NSArray oldDescriptors);
+    [Optional]
+    [Selector("tableView:pasteboardWriterForRow:")]
+    NSPasteboardWriting? TableViewPasteboardWriterForRow(NSTableView tableView, NSInteger row);
+    [Optional]
+    [Selector("tableView:draggingSession:willBeginAtPoint:forRowIndexes:")]
+    void TableViewDraggingSessionWillBeginAtPointForRowIndexes(NSTableView tableView, NSDraggingSession session, NSPoint screenPoint, NSIndexSet rowIndexes);
+    [Optional]
+    [Selector("tableView:draggingSession:endedAtPoint:operation:")]
+    void TableViewDraggingSessionEndedAtPointOperation(NSTableView tableView, NSDraggingSession session, NSPoint screenPoint, NSDragOperation operation);
+    [Optional]
+    [Selector("tableView:updateDraggingItemsForDrag:")]
+    void TableViewUpdateDraggingItemsForDrag(NSTableView tableView, NSDraggingInfo draggingInfo);
     /// Deprecated in macOS 10.15.
-    [Optional] [Selector("tableView:writeRowsWithIndexes:toPasteboard:")] bool TableViewWriteRowsWithIndexesToPasteboard(NSTableView tableView, NSIndexSet rowIndexes, NSPasteboard pboard);
-    [Optional] [Selector("tableView:validateDrop:proposedRow:proposedDropOperation:")] NSDragOperation TableViewValidateDropProposedRowProposedDropOperation(NSTableView tableView, NSDraggingInfo info, NSInteger row, NSTableViewDropOperation dropOperation);
-    [Optional] [Selector("tableView:acceptDrop:row:dropOperation:")] bool TableViewAcceptDropRowDropOperation(NSTableView tableView, NSDraggingInfo info, NSInteger row, NSTableViewDropOperation dropOperation);
+    [Optional]
+    [Selector("tableView:writeRowsWithIndexes:toPasteboard:")]
+    bool TableViewWriteRowsWithIndexesToPasteboard(NSTableView tableView, NSIndexSet rowIndexes, NSPasteboard pboard);
+    [Optional]
+    [Selector("tableView:validateDrop:proposedRow:proposedDropOperation:")]
+    NSDragOperation TableViewValidateDropProposedRowProposedDropOperation(NSTableView tableView, NSDraggingInfo info, NSInteger row, NSTableViewDropOperation dropOperation);
+    [Optional]
+    [Selector("tableView:acceptDrop:row:dropOperation:")]
+    bool TableViewAcceptDropRowDropOperation(NSTableView tableView, NSDraggingInfo info, NSInteger row, NSTableViewDropOperation dropOperation);
     /// Deprecated in macOS 10.13.
-    [Optional] [Selector("tableView:namesOfPromisedFilesDroppedAtDestination:forDraggedRowsWithIndexes:")] NSArray TableViewNamesOfPromisedFilesDroppedAtDestinationForDraggedRowsWithIndexes(NSTableView tableView, NSURL dropDestination, NSIndexSet indexSet);
+    [Optional]
+    [Selector("tableView:namesOfPromisedFilesDroppedAtDestination:forDraggedRowsWithIndexes:")]
+    NSArray TableViewNamesOfPromisedFilesDroppedAtDestinationForDraggedRowsWithIndexes(NSTableView tableView, NSURL dropDestination, NSIndexSet indexSet);
 }
 
 /// NSTableViewDataSourceDeprecated, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.4.
-    [Selector("tableView:writeRows:toPasteboard:")] public bool TableViewWriteRowsToPasteboard(NSTableView tableView, NSArray rows, NSPasteboard pboard);
+    [Selector("tableView:writeRows:toPasteboard:")]
+    public bool TableViewWriteRowsToPasteboard(NSTableView tableView, NSArray rows, NSPasteboard pboard);
 }
 
 /// NSDeprecated, a category of NSTableView.
 public extern objc class NSTableView
 {
     /// Deprecated in macOS 10.3.
-    [Selector("setDrawsGrid:")] public void SetDrawsGrid(bool flag);
+    [Selector("setDrawsGrid:")]
+    public void SetDrawsGrid(bool flag);
     /// Deprecated in macOS 10.3.
-    [Selector("drawsGrid")] public bool DrawsGrid();
+    [Selector("drawsGrid")]
+    public bool DrawsGrid();
     /// Deprecated in macOS 10.3.
-    [Selector("selectColumn:byExtendingSelection:")] public void SelectColumnByExtendingSelection(NSInteger column, bool extend);
+    [Selector("selectColumn:byExtendingSelection:")]
+    public void SelectColumnByExtendingSelection(NSInteger column, bool extend);
     /// Deprecated in macOS 10.3.
-    [Selector("selectRow:byExtendingSelection:")] public void SelectRowByExtendingSelection(NSInteger row, bool extend);
+    [Selector("selectRow:byExtendingSelection:")]
+    public void SelectRowByExtendingSelection(NSInteger row, bool extend);
     /// Deprecated in macOS 10.3.
-    [Selector("selectedColumnEnumerator")] public NSEnumerator SelectedColumnEnumerator();
+    [Selector("selectedColumnEnumerator")]
+    public NSEnumerator SelectedColumnEnumerator();
     /// Deprecated in macOS 10.3.
-    [Selector("selectedRowEnumerator")] public NSEnumerator SelectedRowEnumerator();
+    [Selector("selectedRowEnumerator")]
+    public NSEnumerator SelectedRowEnumerator();
     /// Deprecated in macOS 10.4.
-    [Selector("dragImageForRows:event:dragImageOffset:")] public NSImage? DragImageForRowsEventDragImageOffset(NSArray dragRows, NSEvent dragEvent, NSPointPointer dragImageOffset);
+    [Selector("dragImageForRows:event:dragImageOffset:")]
+    public NSImage? DragImageForRowsEventDragImageOffset(NSArray dragRows, NSEvent dragEvent, NSPointPointer dragImageOffset);
     /// Deprecated in macOS 10.4.
-    [Selector("setAutoresizesAllColumnsToFit:")] public void SetAutoresizesAllColumnsToFit(bool flag);
+    [Selector("setAutoresizesAllColumnsToFit:")]
+    public void SetAutoresizesAllColumnsToFit(bool flag);
     /// Deprecated in macOS 10.4.
-    [Selector("autoresizesAllColumnsToFit")] public bool AutoresizesAllColumnsToFit();
+    [Selector("autoresizesAllColumnsToFit")]
+    public bool AutoresizesAllColumnsToFit();
     /// Deprecated in macOS 10.5.
-    [Selector("columnsInRect:")] public NSRange ColumnsInRect(NSRect rect);
+    [Selector("columnsInRect:")]
+    public NSRange ColumnsInRect(NSRect rect);
     /// Deprecated in macOS 10.10.
-    [Selector("preparedCellAtColumn:row:")] public NSCell? PreparedCellAtColumnRow(NSInteger column, NSInteger row);
+    [Selector("preparedCellAtColumn:row:")]
+    public NSCell? PreparedCellAtColumnRow(NSInteger column, NSInteger row);
     /// Deprecated in macOS 10.10.
-    [Selector("textShouldBeginEditing:")] public bool TextShouldBeginEditing(NSText textObject);
+    [Selector("textShouldBeginEditing:")]
+    public bool TextShouldBeginEditing(NSText textObject);
     /// Deprecated in macOS 10.10.
-    [Selector("textShouldEndEditing:")] public bool TextShouldEndEditing(NSText textObject);
+    [Selector("textShouldEndEditing:")]
+    public bool TextShouldEndEditing(NSText textObject);
     /// Deprecated in macOS 10.10.
-    [Selector("textDidBeginEditing:")] public void TextDidBeginEditing(NSNotification notification);
+    [Selector("textDidBeginEditing:")]
+    public void TextDidBeginEditing(NSNotification notification);
     /// Deprecated in macOS 10.10.
-    [Selector("textDidEndEditing:")] public void TextDidEndEditing(NSNotification notification);
+    [Selector("textDidEndEditing:")]
+    public void TextDidEndEditing(NSNotification notification);
     /// Deprecated in macOS 10.10.
-    [Selector("textDidChange:")] public void TextDidChange(NSNotification notification);
+    [Selector("textDidChange:")]
+    public void TextDidChange(NSNotification notification);
     /// Deprecated in macOS 10.10.
-    [Selector("shouldFocusCell:atColumn:row:")] public bool ShouldFocusCellAtColumnRow(NSCell cell, NSInteger column, NSInteger row);
+    [Selector("shouldFocusCell:atColumn:row:")]
+    public bool ShouldFocusCellAtColumnRow(NSCell cell, NSInteger column, NSInteger row);
     /// Deprecated in macOS 10.10.
-    [Selector("focusedColumn")] public NSInteger FocusedColumn();
+    [Selector("focusedColumn")]
+    public NSInteger FocusedColumn();
     /// Deprecated in macOS 10.10.
-    [Selector("setFocusedColumn:")] public void SetFocusedColumn(NSInteger focusedColumn);
+    [Selector("setFocusedColumn:")]
+    public void SetFocusedColumn(NSInteger focusedColumn);
     /// Deprecated in macOS 10.10.
-    [Selector("performClickOnCellAtColumn:row:")] public void PerformClickOnCellAtColumnRow(NSInteger column, NSInteger row);
+    [Selector("performClickOnCellAtColumn:row:")]
+    public void PerformClickOnCellAtColumnRow(NSInteger column, NSInteger row);
 }
 
 #endif

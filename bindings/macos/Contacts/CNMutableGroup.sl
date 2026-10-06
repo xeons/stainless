@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class CNMutableGroup : CNGroup
 {
-    [Selector("name", "setName:")] public NSString Name { get; set; }
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
 }
 
 #endif

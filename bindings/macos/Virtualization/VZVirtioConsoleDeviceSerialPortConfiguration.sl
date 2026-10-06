@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioConsoleDeviceSerialPortConfiguration : VZSerialPortConfiguration
 {
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

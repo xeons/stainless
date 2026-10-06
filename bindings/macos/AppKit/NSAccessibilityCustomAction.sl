@@ -37,12 +37,18 @@ public objc closure bool NSAccessibilityCustomActionInitWithNameHandlerHandlerBl
 
 public extern objc class NSAccessibilityCustomAction : NSObject
 {
-    [Selector("name", "setName:")] public NSString Name { get; set; }
-    [Selector("handler", "setHandler:")] public NSAccessibilityCustomActionHandlerBlock? Handler { get; set; }
-    [Selector("target", "setTarget:")] public NSObjectProtocol? Target { get; set; }
-    [Selector("selector", "setSelector:")] public Selector Selector { get; set; }
-    [Selector("initWithName:handler:")] public Self InitWithNameHandler(NSString name, NSAccessibilityCustomActionInitWithNameHandlerHandlerBlock? handler);
-    [Selector("initWithName:target:selector:")] public Self InitWithNameTargetSelector(NSString name, NSObjectProtocol target, Selector selector);
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
+    [Selector("handler", "setHandler:")]
+    public NSAccessibilityCustomActionHandlerBlock? Handler { get; set; }
+    [Selector("target", "setTarget:")]
+    public NSObjectProtocol? Target { get; set; }
+    [Selector("selector", "setSelector:")]
+    public Selector Selector { get; set; }
+    [Selector("initWithName:handler:")]
+    public Self InitWithNameHandler(NSString name, NSAccessibilityCustomActionInitWithNameHandlerHandlerBlock? handler);
+    [Selector("initWithName:target:selector:")]
+    public Self InitWithNameTargetSelector(NSString name, NSObjectProtocol target, Selector selector);
 }
 
 #endif

@@ -124,28 +124,34 @@ public extern objc class WSMethodInvocationRef : CFTypeRef { }
 public extern "C" CFTypeID WSMethodInvocationGetTypeID();
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" WSMethodInvocationRef? WSMethodInvocationCreate(CFURLRef? url, CFStringRef? methodName, CFStringRef? protocol);
+[ReturnsRetained]
+public extern "C" WSMethodInvocationRef? WSMethodInvocationCreate(CFURLRef? url, CFStringRef? methodName, CFStringRef? protocol);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" WSMethodInvocationRef? WSMethodInvocationCreateFromSerialization(CFDataRef? contract);
+[ReturnsRetained]
+public extern "C" WSMethodInvocationRef? WSMethodInvocationCreateFromSerialization(CFDataRef? contract);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFDataRef? WSMethodInvocationCopySerialization(WSMethodInvocationRef? invocation);
+[ReturnsRetained]
+public extern "C" CFDataRef? WSMethodInvocationCopySerialization(WSMethodInvocationRef? invocation);
 
 /// Deprecated in macOS 10.8.
 public extern "C" void WSMethodInvocationSetParameters(WSMethodInvocationRef? invocation, CFDictionaryRef? parameters, CFArrayRef? parameterOrder);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFDictionaryRef? WSMethodInvocationCopyParameters(WSMethodInvocationRef? invocation, __CFArray** parameterOrder);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? WSMethodInvocationCopyParameters(WSMethodInvocationRef? invocation, __CFArray** parameterOrder);
 
 /// Deprecated in macOS 10.8.
 public extern "C" void WSMethodInvocationSetProperty(WSMethodInvocationRef? invocation, CFStringRef? propertyName, CFTypeRef? propertyValue);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFTypeRef? WSMethodInvocationCopyProperty(WSMethodInvocationRef? invocation, CFStringRef? propertyName);
+[ReturnsRetained]
+public extern "C" CFTypeRef? WSMethodInvocationCopyProperty(WSMethodInvocationRef? invocation, CFStringRef? propertyName);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFDictionaryRef? WSMethodInvocationInvoke(WSMethodInvocationRef? invocation);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? WSMethodInvocationInvoke(WSMethodInvocationRef? invocation);
 
 /// Deprecated in macOS 10.8.
 public delegate void WSMethodInvocationCallBackProcPtr(OpaqueWSMethodInvocationRef* arg0, void* arg1, __CFDictionary* arg2);

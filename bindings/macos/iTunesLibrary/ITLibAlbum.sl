@@ -33,19 +33,32 @@ import Standard.ObjC;
 
 public extern objc class ITLibAlbum : NSObject
 {
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("sortTitle")] public NSString? SortTitle { get; }
-    [Selector("isCompilation")] public bool Compilation { get; }
-    [Selector("artist")] public ITLibArtist? Artist { get; }
-    [Selector("discCount")] public NSUInteger DiscCount { get; }
-    [Selector("discNumber")] public NSUInteger DiscNumber { get; }
-    [Selector("rating")] public NSInteger Rating { get; }
-    [Selector("isRatingComputed")] public bool RatingComputed { get; }
-    [Selector("isGapless")] public bool Gapless { get; }
-    [Selector("trackCount")] public NSUInteger TrackCount { get; }
-    [Selector("albumArtist")] public NSString? AlbumArtist { get; }
-    [Selector("sortAlbumArtist")] public NSString? SortAlbumArtist { get; }
-    [Selector("persistentID")] public NSNumber PersistentID { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("sortTitle")]
+    public NSString? SortTitle { get; }
+    [Selector("isCompilation")]
+    public bool Compilation { get; }
+    [Selector("artist")]
+    public ITLibArtist? Artist { get; }
+    [Selector("discCount")]
+    public NSUInteger DiscCount { get; }
+    [Selector("discNumber")]
+    public NSUInteger DiscNumber { get; }
+    [Selector("rating")]
+    public NSInteger Rating { get; }
+    [Selector("isRatingComputed")]
+    public bool RatingComputed { get; }
+    [Selector("isGapless")]
+    public bool Gapless { get; }
+    [Selector("trackCount")]
+    public NSUInteger TrackCount { get; }
+    [Selector("albumArtist")]
+    public NSString? AlbumArtist { get; }
+    [Selector("sortAlbumArtist")]
+    public NSString? SortAlbumArtist { get; }
+    [Selector("persistentID")]
+    public NSNumber PersistentID { get; }
 }
 
 #endif

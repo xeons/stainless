@@ -32,8 +32,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLPreElement : DOMHTMLElement
 {
-    [Selector("width", "setWidth:")] public int Width { get; set; }
-    [Selector("wrap", "setWrap:")] public bool Wrap { get; set; }
+    [Selector("width", "setWidth:")]
+    public int Width { get; set; }
+    [Selector("wrap", "setWrap:")]
+    public bool Wrap { get; set; }
 }
 
 #endif

@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class WKNavigation : NSObject
 {
-    [Selector("effectiveContentMode")] public WKContentMode EffectiveContentMode { get; }
+    [Selector("effectiveContentMode")]
+    public WKContentMode EffectiveContentMode { get; }
 }
 
 #endif

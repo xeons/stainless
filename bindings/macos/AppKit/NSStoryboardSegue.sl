@@ -37,19 +37,31 @@ public objc closure void NSStoryboardSegueSegueWithIdentifierSourceDestinationPe
 
 public extern objc class NSStoryboardSegue : NSObject
 {
-    [Selector("identifier")] public NSStoryboardSegueIdentifier? Identifier { get; }
-    [Selector("sourceController")] public AnyObject SourceController { get; }
-    [Selector("destinationController")] public AnyObject DestinationController { get; }
-    [Selector("segueWithIdentifier:source:destination:performHandler:")] public static Self SegueWithIdentifierSourceDestinationPerformHandler(NSStoryboardSegueIdentifier identifier, AnyObject sourceController, AnyObject destinationController, NSStoryboardSegueSegueWithIdentifierSourceDestinationPerformHandlerPerformHandlerBlock performHandler);
-    [Selector("initWithIdentifier:source:destination:")] public Self InitWithIdentifierSourceDestination(NSStoryboardSegueIdentifier identifier, AnyObject sourceController, AnyObject destinationController);
-    [Selector("perform")] public void Perform();
+    [Selector("identifier")]
+    public NSStoryboardSegueIdentifier? Identifier { get; }
+    [Selector("sourceController")]
+    public AnyObject SourceController { get; }
+    [Selector("destinationController")]
+    public AnyObject DestinationController { get; }
+    [Selector("segueWithIdentifier:source:destination:performHandler:")]
+    public static Self SegueWithIdentifierSourceDestinationPerformHandler(NSStoryboardSegueIdentifier identifier, AnyObject sourceController, AnyObject destinationController, NSStoryboardSegueSegueWithIdentifierSourceDestinationPerformHandlerPerformHandlerBlock performHandler);
+    [Selector("initWithIdentifier:source:destination:")]
+    public Self InitWithIdentifierSourceDestination(NSStoryboardSegueIdentifier identifier, AnyObject sourceController, AnyObject destinationController);
+    [Selector("perform")]
+    public void Perform();
 }
 
 public objc interface NSSeguePerforming : NSObjectProtocol
 {
-    [Optional] [Selector("prepareForSegue:sender:")] void PrepareForSegueSender(NSStoryboardSegue segue, AnyObject? sender);
-    [Optional] [Selector("performSegueWithIdentifier:sender:")] void PerformSegueWithIdentifierSender(NSStoryboardSegueIdentifier identifier, AnyObject? sender);
-    [Optional] [Selector("shouldPerformSegueWithIdentifier:sender:")] bool ShouldPerformSegueWithIdentifierSender(NSStoryboardSegueIdentifier identifier, AnyObject? sender);
+    [Optional]
+    [Selector("prepareForSegue:sender:")]
+    void PrepareForSegueSender(NSStoryboardSegue segue, AnyObject? sender);
+    [Optional]
+    [Selector("performSegueWithIdentifier:sender:")]
+    void PerformSegueWithIdentifierSender(NSStoryboardSegueIdentifier identifier, AnyObject? sender);
+    [Optional]
+    [Selector("shouldPerformSegueWithIdentifier:sender:")]
+    bool ShouldPerformSegueWithIdentifierSender(NSStoryboardSegueIdentifier identifier, AnyObject? sender);
 }
 
 #endif

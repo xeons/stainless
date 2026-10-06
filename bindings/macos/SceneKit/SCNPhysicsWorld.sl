@@ -50,26 +50,45 @@ public extern "C" SCNPhysicsTestSearchMode? SCNPhysicsTestSearchModeAll;
 
 public objc interface SCNPhysicsContactDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("physicsWorld:didBeginContact:")] void PhysicsWorldDidBeginContact(SCNPhysicsWorld world, SCNPhysicsContact contact);
-    [Optional] [Selector("physicsWorld:didUpdateContact:")] void PhysicsWorldDidUpdateContact(SCNPhysicsWorld world, SCNPhysicsContact contact);
-    [Optional] [Selector("physicsWorld:didEndContact:")] void PhysicsWorldDidEndContact(SCNPhysicsWorld world, SCNPhysicsContact contact);
+    [Optional]
+    [Selector("physicsWorld:didBeginContact:")]
+    void PhysicsWorldDidBeginContact(SCNPhysicsWorld world, SCNPhysicsContact contact);
+    [Optional]
+    [Selector("physicsWorld:didUpdateContact:")]
+    void PhysicsWorldDidUpdateContact(SCNPhysicsWorld world, SCNPhysicsContact contact);
+    [Optional]
+    [Selector("physicsWorld:didEndContact:")]
+    void PhysicsWorldDidEndContact(SCNPhysicsWorld world, SCNPhysicsContact contact);
 }
 
 public extern objc class SCNPhysicsWorld : NSObject, NSSecureCoding
 {
-    [Selector("gravity", "setGravity:")] public SCNVector3 Gravity { get; set; }
-    [Selector("speed", "setSpeed:")] public CGFloat Speed { get; set; }
-    [Selector("timeStep", "setTimeStep:")] public NSTimeInterval TimeStep { get; set; }
-    [Selector("contactDelegate", "setContactDelegate:")] public SCNPhysicsContactDelegate? ContactDelegate { get; set; }
-    [Selector("allBehaviors")] public NSArray AllBehaviors { get; }
-    [Selector("addBehavior:")] public void AddBehavior(SCNPhysicsBehavior behavior);
-    [Selector("removeBehavior:")] public void RemoveBehavior(SCNPhysicsBehavior behavior);
-    [Selector("removeAllBehaviors")] public void RemoveAllBehaviors();
-    [Selector("rayTestWithSegmentFromPoint:toPoint:options:")] public NSArray RayTestWithSegmentFromPointToPointOptions(SCNVector3 origin, SCNVector3 dest, NSDictionary? options);
-    [Selector("contactTestBetweenBody:andBody:options:")] public NSArray ContactTestBetweenBodyAndBodyOptions(SCNPhysicsBody bodyA, SCNPhysicsBody bodyB, NSDictionary? options);
-    [Selector("contactTestWithBody:options:")] public NSArray ContactTestWithBodyOptions(SCNPhysicsBody body, NSDictionary? options);
-    [Selector("convexSweepTestWithShape:fromTransform:toTransform:options:")] public NSArray ConvexSweepTestWithShapeFromTransformToTransformOptions(SCNPhysicsShape shape, SCNMatrix4 from, SCNMatrix4 to, NSDictionary? options);
-    [Selector("updateCollisionPairs")] public void UpdateCollisionPairs();
+    [Selector("gravity", "setGravity:")]
+    public SCNVector3 Gravity { get; set; }
+    [Selector("speed", "setSpeed:")]
+    public CGFloat Speed { get; set; }
+    [Selector("timeStep", "setTimeStep:")]
+    public NSTimeInterval TimeStep { get; set; }
+    [Selector("contactDelegate", "setContactDelegate:")]
+    public SCNPhysicsContactDelegate? ContactDelegate { get; set; }
+    [Selector("allBehaviors")]
+    public NSArray AllBehaviors { get; }
+    [Selector("addBehavior:")]
+    public void AddBehavior(SCNPhysicsBehavior behavior);
+    [Selector("removeBehavior:")]
+    public void RemoveBehavior(SCNPhysicsBehavior behavior);
+    [Selector("removeAllBehaviors")]
+    public void RemoveAllBehaviors();
+    [Selector("rayTestWithSegmentFromPoint:toPoint:options:")]
+    public NSArray RayTestWithSegmentFromPointToPointOptions(SCNVector3 origin, SCNVector3 dest, NSDictionary? options);
+    [Selector("contactTestBetweenBody:andBody:options:")]
+    public NSArray ContactTestBetweenBodyAndBodyOptions(SCNPhysicsBody bodyA, SCNPhysicsBody bodyB, NSDictionary? options);
+    [Selector("contactTestWithBody:options:")]
+    public NSArray ContactTestWithBodyOptions(SCNPhysicsBody body, NSDictionary? options);
+    [Selector("convexSweepTestWithShape:fromTransform:toTransform:options:")]
+    public NSArray ConvexSweepTestWithShapeFromTransformToTransformOptions(SCNPhysicsShape shape, SCNMatrix4 from, SCNMatrix4 to, NSDictionary? options);
+    [Selector("updateCollisionPairs")]
+    public void UpdateCollisionPairs();
 }
 
 #endif

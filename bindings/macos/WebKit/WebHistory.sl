@@ -52,18 +52,30 @@ public extern "C" NSString? WebHistoryItemsKey;
 /// Deprecated in macOS 10.14.
 public extern objc class WebHistory : NSObject
 {
-    [Selector("orderedLastVisitedDays")] public NSArray? OrderedLastVisitedDays { get; }
-    [Selector("historyItemLimit", "setHistoryItemLimit:")] public int HistoryItemLimit { get; set; }
-    [Selector("historyAgeInDaysLimit", "setHistoryAgeInDaysLimit:")] public int HistoryAgeInDaysLimit { get; set; }
-    [Selector("optionalSharedHistory")] public static WebHistory? OptionalSharedHistory();
-    [Selector("setOptionalSharedHistory:")] public static void SetOptionalSharedHistory(WebHistory? history);
-    [Selector("loadFromURL:error:")] public bool LoadFromURLError(NSURL? URL, out NSError? error);
-    [Selector("saveToURL:error:")] public bool SaveToURLError(NSURL? URL, out NSError? error);
-    [Selector("addItems:")] public void AddItems(NSArray? newItems);
-    [Selector("removeItems:")] public void RemoveItems(NSArray? items);
-    [Selector("removeAllItems")] public void RemoveAllItems();
-    [Selector("orderedItemsLastVisitedOnDay:")] public NSArray? OrderedItemsLastVisitedOnDay(NSCalendarDate? calendarDate);
-    [Selector("itemForURL:")] public WebHistoryItem? ItemForURL(NSURL? URL);
+    [Selector("orderedLastVisitedDays")]
+    public NSArray? OrderedLastVisitedDays { get; }
+    [Selector("historyItemLimit", "setHistoryItemLimit:")]
+    public int HistoryItemLimit { get; set; }
+    [Selector("historyAgeInDaysLimit", "setHistoryAgeInDaysLimit:")]
+    public int HistoryAgeInDaysLimit { get; set; }
+    [Selector("optionalSharedHistory")]
+    public static WebHistory? OptionalSharedHistory();
+    [Selector("setOptionalSharedHistory:")]
+    public static void SetOptionalSharedHistory(WebHistory? history);
+    [Selector("loadFromURL:error:")]
+    public bool LoadFromURLError(NSURL? URL, out NSError? error);
+    [Selector("saveToURL:error:")]
+    public bool SaveToURLError(NSURL? URL, out NSError? error);
+    [Selector("addItems:")]
+    public void AddItems(NSArray? newItems);
+    [Selector("removeItems:")]
+    public void RemoveItems(NSArray? items);
+    [Selector("removeAllItems")]
+    public void RemoveAllItems();
+    [Selector("orderedItemsLastVisitedOnDay:")]
+    public NSArray? OrderedItemsLastVisitedOnDay(NSCalendarDate? calendarDate);
+    [Selector("itemForURL:")]
+    public WebHistoryItem? ItemForURL(NSURL? URL);
 }
 
 #endif

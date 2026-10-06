@@ -109,54 +109,100 @@ public objc closure void ICDeviceRequestEjectWithCompletionCompletionBlock(NSErr
 
 public extern objc class ICDevice : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public ICDeviceDelegate? Delegate { get; set; }
-    [Selector("type")] public ICDeviceType Type { get; }
-    [Selector("capabilities")] public NSArray Capabilities { get; }
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("productKind")] public NSString? ProductKind { get; }
-    [Selector("icon")] public CGImageRef? Icon { get; }
-    [Selector("systemSymbolName")] public NSString? SystemSymbolName { get; }
-    [Selector("transportType")] public NSString? TransportType { get; }
-    [Selector("UUIDString")] public NSString? UUIDString { get; }
-    [Selector("locationDescription")] public NSString? LocationDescription { get; }
-    [Selector("hasOpenSession")] public bool HasOpenSession { get; }
-    [Selector("userData")] public NSMutableDictionary? UserData { get; }
-    [Selector("modulePath")] public NSString? ModulePath { get; }
-    [Selector("moduleVersion")] public NSString? ModuleVersion { get; }
-    [Selector("serialNumberString")] public NSString? SerialNumberString { get; }
-    [Selector("usbLocationID")] public int UsbLocationID { get; }
-    [Selector("usbProductID")] public int UsbProductID { get; }
-    [Selector("usbVendorID")] public int UsbVendorID { get; }
-    [Selector("autolaunchApplicationPath", "setAutolaunchApplicationPath:")] public NSString? AutolaunchApplicationPath { get; set; }
-    [Selector("isRemote")] public bool Remote { get; }
-    [Selector("persistentIDString")] public NSString? PersistentIDString { get; }
+    [Selector("delegate", "setDelegate:")]
+    public ICDeviceDelegate? Delegate { get; set; }
+    [Selector("type")]
+    public ICDeviceType Type { get; }
+    [Selector("capabilities")]
+    public NSArray Capabilities { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("productKind")]
+    public NSString? ProductKind { get; }
+    [Selector("icon")]
+    public CGImageRef? Icon { get; }
+    [Selector("systemSymbolName")]
+    public NSString? SystemSymbolName { get; }
+    [Selector("transportType")]
+    public NSString? TransportType { get; }
+    [Selector("UUIDString")]
+    public NSString? UUIDString { get; }
+    [Selector("locationDescription")]
+    public NSString? LocationDescription { get; }
+    [Selector("hasOpenSession")]
+    public bool HasOpenSession { get; }
+    [Selector("userData")]
+    public NSMutableDictionary? UserData { get; }
+    [Selector("modulePath")]
+    public NSString? ModulePath { get; }
+    [Selector("moduleVersion")]
+    public NSString? ModuleVersion { get; }
+    [Selector("serialNumberString")]
+    public NSString? SerialNumberString { get; }
+    [Selector("usbLocationID")]
+    public int UsbLocationID { get; }
+    [Selector("usbProductID")]
+    public int UsbProductID { get; }
+    [Selector("usbVendorID")]
+    public int UsbVendorID { get; }
+    [Selector("autolaunchApplicationPath", "setAutolaunchApplicationPath:")]
+    public NSString? AutolaunchApplicationPath { get; set; }
+    [Selector("isRemote")]
+    public bool Remote { get; }
+    [Selector("persistentIDString")]
+    public NSString? PersistentIDString { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("moduleExecutableArchitecture")] public int ModuleExecutableArchitecture { get; }
-    [Selector("requestOpenSession")] public void RequestOpenSession();
-    [Selector("requestCloseSession")] public void RequestCloseSession();
-    [Selector("requestEject")] public void RequestEject();
-    [Selector("requestOpenSessionWithOptions:completion:")] public void RequestOpenSessionWithOptionsCompletion(NSDictionary? options, ICDeviceRequestOpenSessionWithOptionsCompletionCompletionBlock completion);
-    [Selector("requestCloseSessionWithOptions:completion:")] public void RequestCloseSessionWithOptionsCompletion(NSDictionary? options, ICDeviceRequestCloseSessionWithOptionsCompletionCompletionBlock completion);
-    [Selector("requestEjectWithCompletion:")] public void RequestEjectWithCompletion(ICDeviceRequestEjectWithCompletionCompletionBlock completion);
-    [Selector("requestSendMessage:outData:maxReturnedDataSize:sendMessageDelegate:didSendMessageSelector:contextInfo:")] public void RequestSendMessageOutDataMaxReturnedDataSizeSendMessageDelegateDidSendMessageSelectorContextInfo(uint messageCode, NSData data, uint maxReturnedDataSize, AnyObject sendMessageDelegate, Selector selector, void* contextInfo);
+    [Selector("moduleExecutableArchitecture")]
+    public int ModuleExecutableArchitecture { get; }
+    [Selector("requestOpenSession")]
+    public void RequestOpenSession();
+    [Selector("requestCloseSession")]
+    public void RequestCloseSession();
+    [Selector("requestEject")]
+    public void RequestEject();
+    [Selector("requestOpenSessionWithOptions:completion:")]
+    public void RequestOpenSessionWithOptionsCompletion(NSDictionary? options, ICDeviceRequestOpenSessionWithOptionsCompletionCompletionBlock completion);
+    [Selector("requestCloseSessionWithOptions:completion:")]
+    public void RequestCloseSessionWithOptionsCompletion(NSDictionary? options, ICDeviceRequestCloseSessionWithOptionsCompletionCompletionBlock completion);
+    [Selector("requestEjectWithCompletion:")]
+    public void RequestEjectWithCompletion(ICDeviceRequestEjectWithCompletionCompletionBlock completion);
+    [Selector("requestSendMessage:outData:maxReturnedDataSize:sendMessageDelegate:didSendMessageSelector:contextInfo:")]
+    public void RequestSendMessageOutDataMaxReturnedDataSizeSendMessageDelegateDidSendMessageSelectorContextInfo(uint messageCode, NSData data, uint maxReturnedDataSize, AnyObject sendMessageDelegate, Selector selector, void* contextInfo);
     /// Deprecated in macOS 10.15.
-    [Selector("requestEjectOrDisconnect")] public void RequestEjectOrDisconnect();
+    [Selector("requestEjectOrDisconnect")]
+    public void RequestEjectOrDisconnect();
     /// Deprecated in macOS 10.15.
-    [Selector("requestYield")] public void RequestYield();
+    [Selector("requestYield")]
+    public void RequestYield();
 }
 
 public objc interface ICDeviceDelegate : NSObjectProtocol
 {
-    [Selector("device:didCloseSessionWithError:")] void DeviceDidCloseSessionWithError(ICDevice device, NSError? error);
-    [Selector("didRemoveDevice:")] void DidRemoveDevice(ICDevice device);
-    [Selector("device:didOpenSessionWithError:")] void DeviceDidOpenSessionWithError(ICDevice device, NSError? error);
-    [Optional] [Selector("deviceDidBecomeReady:")] void DeviceDidBecomeReady(ICDevice device);
-    [Optional] [Selector("deviceDidChangeName:")] void DeviceDidChangeName(ICDevice device);
-    [Optional] [Selector("device:didReceiveStatusInformation:")] void DeviceDidReceiveStatusInformation(ICDevice device, NSDictionary status);
-    [Optional] [Selector("device:didEncounterError:")] void DeviceDidEncounterError(ICDevice device, NSError? error);
-    [Optional] [Selector("device:didEjectWithError:")] void DeviceDidEjectWithError(ICDevice device, NSError? error);
+    [Selector("device:didCloseSessionWithError:")]
+    void DeviceDidCloseSessionWithError(ICDevice device, NSError? error);
+    [Selector("didRemoveDevice:")]
+    void DidRemoveDevice(ICDevice device);
+    [Selector("device:didOpenSessionWithError:")]
+    void DeviceDidOpenSessionWithError(ICDevice device, NSError? error);
+    [Optional]
+    [Selector("deviceDidBecomeReady:")]
+    void DeviceDidBecomeReady(ICDevice device);
+    [Optional]
+    [Selector("deviceDidChangeName:")]
+    void DeviceDidChangeName(ICDevice device);
+    [Optional]
+    [Selector("device:didReceiveStatusInformation:")]
+    void DeviceDidReceiveStatusInformation(ICDevice device, NSDictionary status);
+    [Optional]
+    [Selector("device:didEncounterError:")]
+    void DeviceDidEncounterError(ICDevice device, NSError? error);
+    [Optional]
+    [Selector("device:didEjectWithError:")]
+    void DeviceDidEjectWithError(ICDevice device, NSError? error);
     /// Deprecated in macOS 10.15.
-    [Optional] [Selector("deviceDidChangeSharingState:")] void DeviceDidChangeSharingState(ICDevice device);
+    [Optional]
+    [Selector("deviceDidChangeSharingState:")]
+    void DeviceDidChangeSharingState(ICDevice device);
 }
 
 #endif

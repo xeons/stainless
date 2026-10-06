@@ -35,42 +35,58 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public objc interface NSFileProviderSearchResult
 {
-    [Selector("itemIdentifier")] NSFileProviderItemIdentifier ItemIdentifier { get; }
-    [Selector("filename")] NSString Filename { get; }
-    [Selector("creationDate")] NSDate? CreationDate { get; }
-    [Selector("contentModificationDate")] NSDate? ContentModificationDate { get; }
-    [Selector("lastUsedDate")] NSDate? LastUsedDate { get; }
-    [Selector("contentType")] UTType ContentType { get; }
-    [Selector("documentSize")] NSNumber? DocumentSize { get; }
+    [Selector("itemIdentifier")]
+    NSFileProviderItemIdentifier ItemIdentifier { get; }
+    [Selector("filename")]
+    NSString Filename { get; }
+    [Selector("creationDate")]
+    NSDate? CreationDate { get; }
+    [Selector("contentModificationDate")]
+    NSDate? ContentModificationDate { get; }
+    [Selector("lastUsedDate")]
+    NSDate? LastUsedDate { get; }
+    [Selector("contentType")]
+    UTType ContentType { get; }
+    [Selector("documentSize")]
+    NSNumber? DocumentSize { get; }
 }
 
 /// macOS 26.0 and later.
 public objc interface NSFileProviderSearchEnumerationObserver : NSObjectProtocol
 {
-    [Selector("maximumNumberOfResultsPerPage")] NSInteger MaximumNumberOfResultsPerPage { get; }
-    [Selector("didEnumerateSearchResults:")] void DidEnumerateSearchResults(NSArray searchResults);
-    [Selector("finishEnumeratingUpToPage:")] void FinishEnumeratingUpToPage(NSFileProviderPage? nextPage);
-    [Selector("finishEnumeratingWithError:")] void FinishEnumeratingWithError(NSError error);
+    [Selector("maximumNumberOfResultsPerPage")]
+    NSInteger MaximumNumberOfResultsPerPage { get; }
+    [Selector("didEnumerateSearchResults:")]
+    void DidEnumerateSearchResults(NSArray searchResults);
+    [Selector("finishEnumeratingUpToPage:")]
+    void FinishEnumeratingUpToPage(NSFileProviderPage? nextPage);
+    [Selector("finishEnumeratingWithError:")]
+    void FinishEnumeratingWithError(NSError error);
 }
 
 /// macOS 26.0 and later.
 public objc interface NSFileProviderSearchEnumerator : NSObjectProtocol
 {
-    [Selector("invalidate")] void Invalidate();
-    [Selector("enumerateSearchResultsForObserver:startingAtPage:")] void EnumerateSearchResultsForObserverStartingAtPage(NSFileProviderSearchEnumerationObserver observer, NSFileProviderPage? page);
+    [Selector("invalidate")]
+    void Invalidate();
+    [Selector("enumerateSearchResultsForObserver:startingAtPage:")]
+    void EnumerateSearchResultsForObserverStartingAtPage(NSFileProviderSearchEnumerationObserver observer, NSFileProviderPage? page);
 }
 
 /// macOS 26.0 and later.
 public extern objc class NSFileProviderStringSearchRequest : NSObject
 {
-    [Selector("query")] public NSString Query { get; }
-    [Selector("desiredNumberOfResults")] public NSInteger DesiredNumberOfResults { get; }
+    [Selector("query")]
+    public NSString Query { get; }
+    [Selector("desiredNumberOfResults")]
+    public NSInteger DesiredNumberOfResults { get; }
 }
 
 /// macOS 26.0 and later.
 public objc interface NSFileProviderSearching : NSObjectProtocol
 {
-    [Selector("searchEnumeratorForStringSearchRequest:")] NSFileProviderSearchEnumerator SearchEnumeratorForStringSearchRequest(NSFileProviderStringSearchRequest request);
+    [Selector("searchEnumeratorForStringSearchRequest:")]
+    NSFileProviderSearchEnumerator SearchEnumeratorForStringSearchRequest(NSFileProviderStringSearchRequest request);
 }
 
 #endif

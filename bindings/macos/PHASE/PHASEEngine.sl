@@ -34,25 +34,43 @@ import Standard.ObjC;
 
 public extern objc class PHASEEngine : NSObject
 {
-    [Selector("outputSpatializationMode", "setOutputSpatializationMode:")] public PHASESpatializationMode OutputSpatializationMode { get; set; }
-    [Selector("renderingState")] public PHASERenderingState RenderingState { get; }
-    [Selector("rootObject")] public PHASEObject RootObject { get; }
-    [Selector("defaultMedium", "setDefaultMedium:")] public PHASEMedium DefaultMedium { get; set; }
-    [Selector("defaultReverbPreset", "setDefaultReverbPreset:")] public PHASEReverbPreset DefaultReverbPreset { get; set; }
-    [Selector("unitsPerSecond", "setUnitsPerSecond:")] public double UnitsPerSecond { get; set; }
-    [Selector("unitsPerMeter", "setUnitsPerMeter:")] public double UnitsPerMeter { get; set; }
-    [Selector("assetRegistry")] public PHASEAssetRegistry AssetRegistry { get; }
-    [Selector("soundEvents")] public NSArray SoundEvents { get; }
-    [Selector("groups")] public NSDictionary Groups { get; }
-    [Selector("duckers")] public NSArray Duckers { get; }
-    [Selector("activeGroupPreset")] public PHASEGroupPreset? ActiveGroupPreset { get; }
+    [Selector("outputSpatializationMode", "setOutputSpatializationMode:")]
+    public PHASESpatializationMode OutputSpatializationMode { get; set; }
+    [Selector("renderingState")]
+    public PHASERenderingState RenderingState { get; }
+    [Selector("rootObject")]
+    public PHASEObject RootObject { get; }
+    [Selector("defaultMedium", "setDefaultMedium:")]
+    public PHASEMedium DefaultMedium { get; set; }
+    [Selector("defaultReverbPreset", "setDefaultReverbPreset:")]
+    public PHASEReverbPreset DefaultReverbPreset { get; set; }
+    [Selector("unitsPerSecond", "setUnitsPerSecond:")]
+    public double UnitsPerSecond { get; set; }
+    [Selector("unitsPerMeter", "setUnitsPerMeter:")]
+    public double UnitsPerMeter { get; set; }
+    [Selector("assetRegistry")]
+    public PHASEAssetRegistry AssetRegistry { get; }
+    [Selector("soundEvents")]
+    public NSArray SoundEvents { get; }
+    [Selector("groups")]
+    public NSDictionary Groups { get; }
+    [Selector("duckers")]
+    public NSArray Duckers { get; }
+    [Selector("activeGroupPreset")]
+    public PHASEGroupPreset? ActiveGroupPreset { get; }
     /// macOS 26.0 and later.
-    [Selector("lastRenderTime")] public AVAudioTime? LastRenderTime { get; }
-    [Selector("initWithUpdateMode:")] public Self InitWithUpdateMode(PHASEUpdateMode updateMode);
-    [Selector("startAndReturnError:")] public bool StartAndReturnError(out NSError? error);
-    [Selector("pause")] public void Pause();
-    [Selector("stop")] public void Stop();
-    [Selector("update")] public void Update();
+    [Selector("lastRenderTime")]
+    public AVAudioTime? LastRenderTime { get; }
+    [Selector("initWithUpdateMode:")]
+    public Self InitWithUpdateMode(PHASEUpdateMode updateMode);
+    [Selector("startAndReturnError:")]
+    public bool StartAndReturnError(out NSError? error);
+    [Selector("pause")]
+    public void Pause();
+    [Selector("stop")]
+    public void Stop();
+    [Selector("update")]
+    public void Update();
 }
 
 #endif

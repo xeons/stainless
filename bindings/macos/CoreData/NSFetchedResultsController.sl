@@ -34,29 +34,48 @@ import Standard.ObjC;
 
 public extern objc class NSFetchedResultsController : NSObject
 {
-    [Selector("fetchRequest")] public NSFetchRequest FetchRequest { get; }
-    [Selector("managedObjectContext")] public NSManagedObjectContext ManagedObjectContext { get; }
-    [Selector("sectionNameKeyPath")] public NSString? SectionNameKeyPath { get; }
-    [Selector("cacheName")] public NSString? CacheName { get; }
-    [Selector("delegate", "setDelegate:")] public NSFetchedResultsControllerDelegate? Delegate { get; set; }
-    [Selector("fetchedObjects")] public NSArray? FetchedObjects { get; }
-    [Selector("sectionIndexTitles")] public NSArray SectionIndexTitles { get; }
-    [Selector("sections")] public NSArray? Sections { get; }
-    [Selector("initWithFetchRequest:managedObjectContext:sectionNameKeyPath:cacheName:")] public Self InitWithFetchRequestManagedObjectContextSectionNameKeyPathCacheName(NSFetchRequest fetchRequest, NSManagedObjectContext context, NSString? sectionNameKeyPath, NSString? name);
-    [Selector("performFetch:")] public bool PerformFetch(out NSError? error);
-    [Selector("deleteCacheWithName:")] public static void DeleteCacheWithName(NSString? name);
-    [Selector("objectAtIndexPath:")] public AnyObject ObjectAtIndexPath(NSIndexPath indexPath);
-    [Selector("indexPathForObject:")] public NSIndexPath? IndexPathForObject(AnyObject object);
-    [Selector("sectionIndexTitleForSectionName:")] public NSString? SectionIndexTitleForSectionName(NSString sectionName);
-    [Selector("sectionForSectionIndexTitle:atIndex:")] public NSInteger SectionForSectionIndexTitleAtIndex(NSString title, NSInteger sectionIndex);
+    [Selector("fetchRequest")]
+    public NSFetchRequest FetchRequest { get; }
+    [Selector("managedObjectContext")]
+    public NSManagedObjectContext ManagedObjectContext { get; }
+    [Selector("sectionNameKeyPath")]
+    public NSString? SectionNameKeyPath { get; }
+    [Selector("cacheName")]
+    public NSString? CacheName { get; }
+    [Selector("delegate", "setDelegate:")]
+    public NSFetchedResultsControllerDelegate? Delegate { get; set; }
+    [Selector("fetchedObjects")]
+    public NSArray? FetchedObjects { get; }
+    [Selector("sectionIndexTitles")]
+    public NSArray SectionIndexTitles { get; }
+    [Selector("sections")]
+    public NSArray? Sections { get; }
+    [Selector("initWithFetchRequest:managedObjectContext:sectionNameKeyPath:cacheName:")]
+    public Self InitWithFetchRequestManagedObjectContextSectionNameKeyPathCacheName(NSFetchRequest fetchRequest, NSManagedObjectContext context, NSString? sectionNameKeyPath, NSString? name);
+    [Selector("performFetch:")]
+    public bool PerformFetch(out NSError? error);
+    [Selector("deleteCacheWithName:")]
+    public static void DeleteCacheWithName(NSString? name);
+    [Selector("objectAtIndexPath:")]
+    public AnyObject ObjectAtIndexPath(NSIndexPath indexPath);
+    [Selector("indexPathForObject:")]
+    public NSIndexPath? IndexPathForObject(AnyObject object);
+    [Selector("sectionIndexTitleForSectionName:")]
+    public NSString? SectionIndexTitleForSectionName(NSString sectionName);
+    [Selector("sectionForSectionIndexTitle:atIndex:")]
+    public NSInteger SectionForSectionIndexTitleAtIndex(NSString title, NSInteger sectionIndex);
 }
 
 public objc interface NSFetchedResultsSectionInfo
 {
-    [Selector("name")] NSString Name { get; }
-    [Selector("indexTitle")] NSString? IndexTitle { get; }
-    [Selector("numberOfObjects")] NSUInteger NumberOfObjects { get; }
-    [Selector("objects")] NSArray? Objects { get; }
+    [Selector("name")]
+    NSString Name { get; }
+    [Selector("indexTitle")]
+    NSString? IndexTitle { get; }
+    [Selector("numberOfObjects")]
+    NSUInteger NumberOfObjects { get; }
+    [Selector("objects")]
+    NSArray? Objects { get; }
 }
 
 public enum NSFetchedResultsChangeType : ulong
@@ -69,13 +88,27 @@ public enum NSFetchedResultsChangeType : ulong
 
 public objc interface NSFetchedResultsControllerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("controller:didChangeContentWithSnapshot:")] void ControllerDidChangeContentWithSnapshot(NSFetchedResultsController controller, NSDiffableDataSourceSnapshot snapshot);
-    [Optional] [Selector("controller:didChangeContentWithDifference:")] void ControllerDidChangeContentWithDifference(NSFetchedResultsController controller, NSOrderedCollectionDifference diff);
-    [Optional] [Selector("controller:didChangeObject:atIndexPath:forChangeType:newIndexPath:")] void ControllerDidChangeObjectAtIndexPathForChangeTypeNewIndexPath(NSFetchedResultsController controller, AnyObject anObject, NSIndexPath? indexPath, NSFetchedResultsChangeType type, NSIndexPath? newIndexPath);
-    [Optional] [Selector("controller:didChangeSection:atIndex:forChangeType:")] void ControllerDidChangeSectionAtIndexForChangeType(NSFetchedResultsController controller, NSFetchedResultsSectionInfo sectionInfo, NSUInteger sectionIndex, NSFetchedResultsChangeType type);
-    [Optional] [Selector("controllerWillChangeContent:")] void ControllerWillChangeContent(NSFetchedResultsController controller);
-    [Optional] [Selector("controllerDidChangeContent:")] void ControllerDidChangeContent(NSFetchedResultsController controller);
-    [Optional] [Selector("controller:sectionIndexTitleForSectionName:")] NSString? ControllerSectionIndexTitleForSectionName(NSFetchedResultsController controller, NSString sectionName);
+    [Optional]
+    [Selector("controller:didChangeContentWithSnapshot:")]
+    void ControllerDidChangeContentWithSnapshot(NSFetchedResultsController controller, NSDiffableDataSourceSnapshot snapshot);
+    [Optional]
+    [Selector("controller:didChangeContentWithDifference:")]
+    void ControllerDidChangeContentWithDifference(NSFetchedResultsController controller, NSOrderedCollectionDifference diff);
+    [Optional]
+    [Selector("controller:didChangeObject:atIndexPath:forChangeType:newIndexPath:")]
+    void ControllerDidChangeObjectAtIndexPathForChangeTypeNewIndexPath(NSFetchedResultsController controller, AnyObject anObject, NSIndexPath? indexPath, NSFetchedResultsChangeType type, NSIndexPath? newIndexPath);
+    [Optional]
+    [Selector("controller:didChangeSection:atIndex:forChangeType:")]
+    void ControllerDidChangeSectionAtIndexForChangeType(NSFetchedResultsController controller, NSFetchedResultsSectionInfo sectionInfo, NSUInteger sectionIndex, NSFetchedResultsChangeType type);
+    [Optional]
+    [Selector("controllerWillChangeContent:")]
+    void ControllerWillChangeContent(NSFetchedResultsController controller);
+    [Optional]
+    [Selector("controllerDidChangeContent:")]
+    void ControllerDidChangeContent(NSFetchedResultsController controller);
+    [Optional]
+    [Selector("controller:sectionIndexTitleForSectionName:")]
+    NSString? ControllerSectionIndexTitleForSectionName(NSFetchedResultsController controller, NSString sectionName);
 }
 
 #endif

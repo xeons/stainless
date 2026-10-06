@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class PDFAction : NSObject, NSCopying
 {
-    [Selector("type")] public NSString Type { get; }
+    [Selector("type")]
+    public NSString Type { get; }
 }
 
 #endif

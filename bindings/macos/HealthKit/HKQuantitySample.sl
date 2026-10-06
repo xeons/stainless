@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class HKQuantitySample : HKSample
 {
-    [Selector("quantityType")] public HKQuantityType QuantityType { get; }
-    [Selector("quantity")] public HKQuantity Quantity { get; }
-    [Selector("count")] public NSInteger Count { get; }
-    [Selector("quantitySampleWithType:quantity:startDate:endDate:")] public static Self QuantitySampleWithTypeQuantityStartDateEndDate(HKQuantityType quantityType, HKQuantity quantity, NSDate startDate, NSDate endDate);
-    [Selector("quantitySampleWithType:quantity:startDate:endDate:metadata:")] public static Self QuantitySampleWithTypeQuantityStartDateEndDateMetadata(HKQuantityType quantityType, HKQuantity quantity, NSDate startDate, NSDate endDate, NSDictionary? metadata);
-    [Selector("quantitySampleWithType:quantity:startDate:endDate:device:metadata:")] public static Self QuantitySampleWithTypeQuantityStartDateEndDateDeviceMetadata(HKQuantityType quantityType, HKQuantity quantity, NSDate startDate, NSDate endDate, HKDevice? device, NSDictionary? metadata);
+    [Selector("quantityType")]
+    public HKQuantityType QuantityType { get; }
+    [Selector("quantity")]
+    public HKQuantity Quantity { get; }
+    [Selector("count")]
+    public NSInteger Count { get; }
+    [Selector("quantitySampleWithType:quantity:startDate:endDate:")]
+    public static Self QuantitySampleWithTypeQuantityStartDateEndDate(HKQuantityType quantityType, HKQuantity quantity, NSDate startDate, NSDate endDate);
+    [Selector("quantitySampleWithType:quantity:startDate:endDate:metadata:")]
+    public static Self QuantitySampleWithTypeQuantityStartDateEndDateMetadata(HKQuantityType quantityType, HKQuantity quantity, NSDate startDate, NSDate endDate, NSDictionary? metadata);
+    [Selector("quantitySampleWithType:quantity:startDate:endDate:device:metadata:")]
+    public static Self QuantitySampleWithTypeQuantityStartDateEndDateDeviceMetadata(HKQuantityType quantityType, HKQuantity quantity, NSDate startDate, NSDate endDate, HKDevice? device, NSDictionary? metadata);
 }
 
 public extern "C" NSString HKPredicateKeyPathQuantity;

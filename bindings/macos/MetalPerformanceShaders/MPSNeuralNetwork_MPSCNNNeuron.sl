@@ -34,122 +34,160 @@ import Standard.ObjC;
 
 public extern objc class MPSNNNeuronDescriptor : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("neuronType", "setNeuronType:")] public MPSCNNNeuronType NeuronType { get; set; }
-    [Selector("a", "setA:")] public float A { get; set; }
-    [Selector("b", "setB:")] public float B { get; set; }
-    [Selector("c", "setC:")] public float C { get; set; }
-    [Selector("data", "setData:")] public NSData? Data { get; set; }
-    [Selector("cnnNeuronDescriptorWithType:")] public static MPSNNNeuronDescriptor CnnNeuronDescriptorWithType(MPSCNNNeuronType neuronType);
-    [Selector("cnnNeuronDescriptorWithType:a:")] public static MPSNNNeuronDescriptor CnnNeuronDescriptorWithTypeA(MPSCNNNeuronType neuronType, float a);
-    [Selector("cnnNeuronDescriptorWithType:a:b:")] public static MPSNNNeuronDescriptor CnnNeuronDescriptorWithTypeAB(MPSCNNNeuronType neuronType, float a, float b);
-    [Selector("cnnNeuronDescriptorWithType:a:b:c:")] public static MPSNNNeuronDescriptor CnnNeuronDescriptorWithTypeABC(MPSCNNNeuronType neuronType, float a, float b, float c);
-    [Selector("cnnNeuronPReLUDescriptorWithData:noCopy:")] public static MPSNNNeuronDescriptor CnnNeuronPReLUDescriptorWithDataNoCopy(NSData data, bool noCopy);
+    [Selector("neuronType", "setNeuronType:")]
+    public MPSCNNNeuronType NeuronType { get; set; }
+    [Selector("a", "setA:")]
+    public float A { get; set; }
+    [Selector("b", "setB:")]
+    public float B { get; set; }
+    [Selector("c", "setC:")]
+    public float C { get; set; }
+    [Selector("data", "setData:")]
+    public NSData? Data { get; set; }
+    [Selector("cnnNeuronDescriptorWithType:")]
+    public static MPSNNNeuronDescriptor CnnNeuronDescriptorWithType(MPSCNNNeuronType neuronType);
+    [Selector("cnnNeuronDescriptorWithType:a:")]
+    public static MPSNNNeuronDescriptor CnnNeuronDescriptorWithTypeA(MPSCNNNeuronType neuronType, float a);
+    [Selector("cnnNeuronDescriptorWithType:a:b:")]
+    public static MPSNNNeuronDescriptor CnnNeuronDescriptorWithTypeAB(MPSCNNNeuronType neuronType, float a, float b);
+    [Selector("cnnNeuronDescriptorWithType:a:b:c:")]
+    public static MPSNNNeuronDescriptor CnnNeuronDescriptorWithTypeABC(MPSCNNNeuronType neuronType, float a, float b, float c);
+    [Selector("cnnNeuronPReLUDescriptorWithData:noCopy:")]
+    public static MPSNNNeuronDescriptor CnnNeuronPReLUDescriptorWithDataNoCopy(NSData data, bool noCopy);
 }
 
 public extern objc class MPSCNNNeuron : MPSCNNKernel
 {
-    [Selector("neuronType")] public MPSCNNNeuronType NeuronType { get; }
-    [Selector("a")] public float A { get; }
-    [Selector("b")] public float B { get; }
-    [Selector("c")] public float C { get; }
-    [Selector("data")] public NSData? Data { get; }
-    [Selector("initWithDevice:neuronDescriptor:")] public Self InitWithDeviceNeuronDescriptor(MTLDevice device, MPSNNNeuronDescriptor neuronDescriptor);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("neuronType")]
+    public MPSCNNNeuronType NeuronType { get; }
+    [Selector("a")]
+    public float A { get; }
+    [Selector("b")]
+    public float B { get; }
+    [Selector("c")]
+    public float C { get; }
+    [Selector("data")]
+    public NSData? Data { get; }
+    [Selector("initWithDevice:neuronDescriptor:")]
+    public Self InitWithDeviceNeuronDescriptor(MTLDevice device, MPSNNNeuronDescriptor neuronDescriptor);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNNeuronGradient : MPSCNNGradientKernel
 {
-    [Selector("neuronType")] public MPSCNNNeuronType NeuronType { get; }
-    [Selector("a")] public float A { get; }
-    [Selector("b")] public float B { get; }
-    [Selector("c")] public float C { get; }
-    [Selector("data")] public NSData? Data { get; }
-    [Selector("initWithDevice:neuronDescriptor:")] public Self InitWithDeviceNeuronDescriptor(MTLDevice device, MPSNNNeuronDescriptor neuronDescriptor);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("neuronType")]
+    public MPSCNNNeuronType NeuronType { get; }
+    [Selector("a")]
+    public float A { get; }
+    [Selector("b")]
+    public float B { get; }
+    [Selector("c")]
+    public float C { get; }
+    [Selector("data")]
+    public NSData? Data { get; }
+    [Selector("initWithDevice:neuronDescriptor:")]
+    public Self InitWithDeviceNeuronDescriptor(MTLDevice device, MPSNNNeuronDescriptor neuronDescriptor);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNNeuronLinear : MPSCNNNeuron
 {
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:a:b:")] public Self InitWithDeviceAB(MTLDevice device, float a, float b);
+    [Selector("initWithDevice:a:b:")]
+    public Self InitWithDeviceAB(MTLDevice device, float a, float b);
 }
 
 public extern objc class MPSCNNNeuronReLU : MPSCNNNeuron
 {
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:a:")] public Self InitWithDeviceA(MTLDevice device, float a);
+    [Selector("initWithDevice:a:")]
+    public Self InitWithDeviceA(MTLDevice device, float a);
 }
 
 public extern objc class MPSCNNNeuronPReLU : MPSCNNNeuron
 {
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:a:count:")] public Self InitWithDeviceACount(MTLDevice device, float* a, NSUInteger count);
+    [Selector("initWithDevice:a:count:")]
+    public Self InitWithDeviceACount(MTLDevice device, float* a, NSUInteger count);
 }
 
 public extern objc class MPSCNNNeuronSigmoid : MPSCNNNeuron
 {
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSCNNNeuronHardSigmoid : MPSCNNNeuron
 {
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:a:b:")] public Self InitWithDeviceAB(MTLDevice device, float a, float b);
+    [Selector("initWithDevice:a:b:")]
+    public Self InitWithDeviceAB(MTLDevice device, float a, float b);
 }
 
 public extern objc class MPSCNNNeuronTanH : MPSCNNNeuron
 {
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:a:b:")] public Self InitWithDeviceAB(MTLDevice device, float a, float b);
+    [Selector("initWithDevice:a:b:")]
+    public Self InitWithDeviceAB(MTLDevice device, float a, float b);
 }
 
 public extern objc class MPSCNNNeuronAbsolute : MPSCNNNeuron
 {
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSCNNNeuronSoftPlus : MPSCNNNeuron
 {
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:a:b:")] public Self InitWithDeviceAB(MTLDevice device, float a, float b);
+    [Selector("initWithDevice:a:b:")]
+    public Self InitWithDeviceAB(MTLDevice device, float a, float b);
 }
 
 public extern objc class MPSCNNNeuronSoftSign : MPSCNNNeuron
 {
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSCNNNeuronELU : MPSCNNNeuron
 {
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:a:")] public Self InitWithDeviceA(MTLDevice device, float a);
+    [Selector("initWithDevice:a:")]
+    public Self InitWithDeviceA(MTLDevice device, float a);
 }
 
 public extern objc class MPSCNNNeuronReLUN : MPSCNNNeuron
 {
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:a:b:")] public Self InitWithDeviceAB(MTLDevice device, float a, float b);
+    [Selector("initWithDevice:a:b:")]
+    public Self InitWithDeviceAB(MTLDevice device, float a, float b);
 }
 
 public extern objc class MPSCNNNeuronPower : MPSCNNNeuron
 {
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:a:b:c:")] public Self InitWithDeviceABC(MTLDevice device, float a, float b, float c);
+    [Selector("initWithDevice:a:b:c:")]
+    public Self InitWithDeviceABC(MTLDevice device, float a, float b, float c);
 }
 
 public extern objc class MPSCNNNeuronExponential : MPSCNNNeuron
 {
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:a:b:c:")] public Self InitWithDeviceABC(MTLDevice device, float a, float b, float c);
+    [Selector("initWithDevice:a:b:c:")]
+    public Self InitWithDeviceABC(MTLDevice device, float a, float b, float c);
 }
 
 public extern objc class MPSCNNNeuronLogarithm : MPSCNNNeuron
 {
     /// Deprecated in macOS 10.14.
-    [Selector("initWithDevice:a:b:c:")] public Self InitWithDeviceABC(MTLDevice device, float a, float b, float c);
+    [Selector("initWithDevice:a:b:c:")]
+    public Self InitWithDeviceABC(MTLDevice device, float a, float b, float c);
 }
 
 #endif

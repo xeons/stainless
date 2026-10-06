@@ -32,13 +32,20 @@ import Standard.ObjC;
 
 public extern objc class SKReferenceNode : SKNode
 {
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL? url);
-    [Selector("initWithFileNamed:")] public Self InitWithFileNamed(NSString? fileName);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
-    [Selector("referenceNodeWithFileNamed:")] public static Self ReferenceNodeWithFileNamed(NSString fileName);
-    [Selector("referenceNodeWithURL:")] public static Self ReferenceNodeWithURL(NSURL referenceURL);
-    [Selector("didLoadReferenceNode:")] public void DidLoadReferenceNode(SKNode? node);
-    [Selector("resolveReferenceNode")] public void ResolveReferenceNode();
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL? url);
+    [Selector("initWithFileNamed:")]
+    public Self InitWithFileNamed(NSString? fileName);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder aDecoder);
+    [Selector("referenceNodeWithFileNamed:")]
+    public static Self ReferenceNodeWithFileNamed(NSString fileName);
+    [Selector("referenceNodeWithURL:")]
+    public static Self ReferenceNodeWithURL(NSURL referenceURL);
+    [Selector("didLoadReferenceNode:")]
+    public void DidLoadReferenceNode(SKNode? node);
+    [Selector("resolveReferenceNode")]
+    public void ResolveReferenceNode();
 }
 
 #endif

@@ -44,14 +44,22 @@ public objc closure void AVCaptionConversionValidatorValidateCaptionConversionWi
 
 public extern objc class AVCaptionConversionValidator : NSObject
 {
-    [Selector("status")] public AVCaptionConversionValidatorStatus Status { get; }
-    [Selector("captions")] public NSArray Captions { get; }
-    [Selector("timeRange")] public CMTimeRange TimeRange { get; }
-    [Selector("warnings")] public NSArray Warnings { get; }
-    [Selector("captionConversionValidatorWithCaptions:timeRange:conversionSettings:")] public static Self CaptionConversionValidatorWithCaptionsTimeRangeConversionSettings(NSArray captions, CMTimeRange timeRange, NSDictionary conversionSettings);
-    [Selector("initWithCaptions:timeRange:conversionSettings:")] public Self InitWithCaptionsTimeRangeConversionSettings(NSArray captions, CMTimeRange timeRange, NSDictionary conversionSettings);
-    [Selector("validateCaptionConversionWithWarningHandler:")] public void ValidateCaptionConversionWithWarningHandler(AVCaptionConversionValidatorValidateCaptionConversionWithWarningHandlerHandlerBlock handler);
-    [Selector("stopValidating")] public void StopValidating();
+    [Selector("status")]
+    public AVCaptionConversionValidatorStatus Status { get; }
+    [Selector("captions")]
+    public NSArray Captions { get; }
+    [Selector("timeRange")]
+    public CMTimeRange TimeRange { get; }
+    [Selector("warnings")]
+    public NSArray Warnings { get; }
+    [Selector("captionConversionValidatorWithCaptions:timeRange:conversionSettings:")]
+    public static Self CaptionConversionValidatorWithCaptionsTimeRangeConversionSettings(NSArray captions, CMTimeRange timeRange, NSDictionary conversionSettings);
+    [Selector("initWithCaptions:timeRange:conversionSettings:")]
+    public Self InitWithCaptionsTimeRangeConversionSettings(NSArray captions, CMTimeRange timeRange, NSDictionary conversionSettings);
+    [Selector("validateCaptionConversionWithWarningHandler:")]
+    public void ValidateCaptionConversionWithWarningHandler(AVCaptionConversionValidatorValidateCaptionConversionWithWarningHandlerHandlerBlock handler);
+    [Selector("stopValidating")]
+    public void StopValidating();
 }
 
 public using AVCaptionConversionWarningType = NSString;
@@ -60,9 +68,12 @@ public extern "C" AVCaptionConversionWarningType AVCaptionConversionWarningTypeE
 
 public extern objc class AVCaptionConversionWarning : NSObject
 {
-    [Selector("warningType")] public AVCaptionConversionWarningType WarningType { get; }
-    [Selector("rangeOfCaptions")] public NSRange RangeOfCaptions { get; }
-    [Selector("adjustment")] public AVCaptionConversionAdjustment? Adjustment { get; }
+    [Selector("warningType")]
+    public AVCaptionConversionWarningType WarningType { get; }
+    [Selector("rangeOfCaptions")]
+    public NSRange RangeOfCaptions { get; }
+    [Selector("adjustment")]
+    public AVCaptionConversionAdjustment? Adjustment { get; }
 }
 
 public using AVCaptionConversionAdjustmentType = NSString;
@@ -71,13 +82,16 @@ public extern "C" AVCaptionConversionAdjustmentType AVCaptionConversionAdjustmen
 
 public extern objc class AVCaptionConversionAdjustment : NSObject
 {
-    [Selector("adjustmentType")] public AVCaptionConversionAdjustmentType AdjustmentType { get; }
+    [Selector("adjustmentType")]
+    public AVCaptionConversionAdjustmentType AdjustmentType { get; }
 }
 
 public extern objc class AVCaptionConversionTimeRangeAdjustment : AVCaptionConversionAdjustment
 {
-    [Selector("startTimeOffset")] public CMTime StartTimeOffset { get; }
-    [Selector("durationOffset")] public CMTime DurationOffset { get; }
+    [Selector("startTimeOffset")]
+    public CMTime StartTimeOffset { get; }
+    [Selector("durationOffset")]
+    public CMTime DurationOffset { get; }
 }
 
 #endif

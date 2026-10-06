@@ -35,12 +35,18 @@ public objc closure void MTLDrawablePresentedHandler(MTLDrawable arg0);
 
 public objc interface MTLDrawable : NSObjectProtocol
 {
-    [Selector("presentedTime")] CFTimeInterval PresentedTime { get; }
-    [Selector("drawableID")] NSUInteger DrawableID { get; }
-    [Selector("present")] void Present();
-    [Selector("presentAtTime:")] void PresentAtTime(CFTimeInterval presentationTime);
-    [Selector("presentAfterMinimumDuration:")] void PresentAfterMinimumDuration(CFTimeInterval duration);
-    [Selector("addPresentedHandler:")] void AddPresentedHandler(MTLDrawablePresentedHandler block);
+    [Selector("presentedTime")]
+    CFTimeInterval PresentedTime { get; }
+    [Selector("drawableID")]
+    NSUInteger DrawableID { get; }
+    [Selector("present")]
+    void Present();
+    [Selector("presentAtTime:")]
+    void PresentAtTime(CFTimeInterval presentationTime);
+    [Selector("presentAfterMinimumDuration:")]
+    void PresentAfterMinimumDuration(CFTimeInterval duration);
+    [Selector("addPresentedHandler:")]
+    void AddPresentedHandler(MTLDrawablePresentedHandler block);
 }
 
 #endif

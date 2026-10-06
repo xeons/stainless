@@ -64,13 +64,27 @@ public objc closure void WKUIDelegateWebViewRunOpenPanelWithParametersInitiatedB
 
 public objc interface WKUIDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:")] WKWebView? WebViewCreateWebViewWithConfigurationForNavigationActionWindowFeatures(WKWebView webView, WKWebViewConfiguration configuration, WKNavigationAction navigationAction, WKWindowFeatures windowFeatures);
-    [Optional] [Selector("webViewDidClose:")] void WebViewDidClose(WKWebView webView);
-    [Optional] [Selector("webView:runJavaScriptAlertPanelWithMessage:initiatedByFrame:completionHandler:")] void WebViewRunJavaScriptAlertPanelWithMessageInitiatedByFrameCompletionHandler(WKWebView webView, NSString message, WKFrameInfo frame, WKUIDelegateWebViewRunJavaScriptAlertPanelWithMessageInitiatedByFrameCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:completionHandler:")] void WebViewRunJavaScriptConfirmPanelWithMessageInitiatedByFrameCompletionHandler(WKWebView webView, NSString message, WKFrameInfo frame, WKUIDelegateWebViewRunJavaScriptConfirmPanelWithMessageInitiatedByFrameCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:completionHandler:")] void WebViewRunJavaScriptTextInputPanelWithPromptDefaultTextInitiatedByFrameCompletionHandler(WKWebView webView, NSString prompt, NSString? defaultText, WKFrameInfo frame, WKUIDelegateWebViewRunJavaScriptTextInputPanelWithPromptDefaultTextInitiatedByFrameCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:decisionHandler:")] void WebViewRequestMediaCapturePermissionForOriginInitiatedByFrameTypeDecisionHandler(WKWebView webView, WKSecurityOrigin origin, WKFrameInfo frame, WKMediaCaptureType type, WKUIDelegateWebViewRequestMediaCapturePermissionForOriginInitiatedByFrameTypeDecisionHandlerDecisionHandlerBlock decisionHandler);
-    [Optional] [Selector("webView:runOpenPanelWithParameters:initiatedByFrame:completionHandler:")] void WebViewRunOpenPanelWithParametersInitiatedByFrameCompletionHandler(WKWebView webView, WKOpenPanelParameters parameters, WKFrameInfo frame, WKUIDelegateWebViewRunOpenPanelWithParametersInitiatedByFrameCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:")]
+    WKWebView? WebViewCreateWebViewWithConfigurationForNavigationActionWindowFeatures(WKWebView webView, WKWebViewConfiguration configuration, WKNavigationAction navigationAction, WKWindowFeatures windowFeatures);
+    [Optional]
+    [Selector("webViewDidClose:")]
+    void WebViewDidClose(WKWebView webView);
+    [Optional]
+    [Selector("webView:runJavaScriptAlertPanelWithMessage:initiatedByFrame:completionHandler:")]
+    void WebViewRunJavaScriptAlertPanelWithMessageInitiatedByFrameCompletionHandler(WKWebView webView, NSString message, WKFrameInfo frame, WKUIDelegateWebViewRunJavaScriptAlertPanelWithMessageInitiatedByFrameCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:completionHandler:")]
+    void WebViewRunJavaScriptConfirmPanelWithMessageInitiatedByFrameCompletionHandler(WKWebView webView, NSString message, WKFrameInfo frame, WKUIDelegateWebViewRunJavaScriptConfirmPanelWithMessageInitiatedByFrameCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:completionHandler:")]
+    void WebViewRunJavaScriptTextInputPanelWithPromptDefaultTextInitiatedByFrameCompletionHandler(WKWebView webView, NSString prompt, NSString? defaultText, WKFrameInfo frame, WKUIDelegateWebViewRunJavaScriptTextInputPanelWithPromptDefaultTextInitiatedByFrameCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:decisionHandler:")]
+    void WebViewRequestMediaCapturePermissionForOriginInitiatedByFrameTypeDecisionHandler(WKWebView webView, WKSecurityOrigin origin, WKFrameInfo frame, WKMediaCaptureType type, WKUIDelegateWebViewRequestMediaCapturePermissionForOriginInitiatedByFrameTypeDecisionHandlerDecisionHandlerBlock decisionHandler);
+    [Optional]
+    [Selector("webView:runOpenPanelWithParameters:initiatedByFrame:completionHandler:")]
+    void WebViewRunOpenPanelWithParametersInitiatedByFrameCompletionHandler(WKWebView webView, WKOpenPanelParameters parameters, WKFrameInfo frame, WKUIDelegateWebViewRunOpenPanelWithParametersInitiatedByFrameCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

@@ -33,23 +33,40 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothOBEXSession : OBEXSession, IOBluetoothRFCOMMChannelDelegate
 {
-    [Selector("withSDPServiceRecord:")] public static Self? WithSDPServiceRecord(IOBluetoothSDPServiceRecord? inSDPServiceRecord);
-    [Selector("withDevice:channelID:")] public static Self? WithDeviceChannelID(IOBluetoothDevice? inDevice, BluetoothRFCOMMChannelID inRFCOMMChannelID);
-    [Selector("withIncomingRFCOMMChannel:eventSelector:selectorTarget:refCon:")] public static Self? WithIncomingRFCOMMChannelEventSelectorSelectorTargetRefCon(IOBluetoothRFCOMMChannel? inChannel, Selector inEventSelector, AnyObject? inEventSelectorTarget, void* inUserRefCon);
-    [Selector("initWithSDPServiceRecord:")] public Self? InitWithSDPServiceRecord(IOBluetoothSDPServiceRecord? inSDPServiceRecord);
-    [Selector("initWithDevice:channelID:")] public Self? InitWithDeviceChannelID(IOBluetoothDevice? inDevice, BluetoothRFCOMMChannelID inChannelID);
-    [Selector("initWithIncomingRFCOMMChannel:eventSelector:selectorTarget:refCon:")] public Self? InitWithIncomingRFCOMMChannelEventSelectorSelectorTargetRefCon(IOBluetoothRFCOMMChannel? inChannel, Selector inEventSelector, AnyObject? inEventSelectorTarget, void* inUserRefCon);
-    [Selector("getRFCOMMChannel")] public IOBluetoothRFCOMMChannel? GetRFCOMMChannel();
-    [Selector("getDevice")] public IOBluetoothDevice? GetDevice();
-    [Selector("sendBufferTroughChannel")] public IOReturn SendBufferTroughChannel();
-    [Selector("restartTransmission")] public void RestartTransmission();
-    [Selector("isSessionTargetAMac")] public bool IsSessionTargetAMac();
-    [Selector("openTransportConnection:selectorTarget:refCon:")] public OBEXError OpenTransportConnectionSelectorTargetRefCon(Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
-    [Selector("hasOpenTransportConnection")] public Boolean HasOpenTransportConnection();
-    [Selector("closeTransportConnection")] public OBEXError CloseTransportConnection();
-    [Selector("sendDataToTransport:dataLength:")] public OBEXError SendDataToTransportDataLength(void* inDataToSend, nuint inDataLength);
-    [Selector("setOpenTransportConnectionAsyncSelector:target:refCon:")] public void SetOpenTransportConnectionAsyncSelectorTargetRefCon(Selector inSelector, AnyObject? inSelectorTarget, void* inUserRefCon);
-    [Selector("setOBEXSessionOpenConnectionCallback:refCon:")] public void SetOBEXSessionOpenConnectionCallbackRefCon(IOBluetoothOBEXSessionOpenConnectionCallback inCallback, void* inUserRefCon);
+    [Selector("withSDPServiceRecord:")]
+    public static Self? WithSDPServiceRecord(IOBluetoothSDPServiceRecord? inSDPServiceRecord);
+    [Selector("withDevice:channelID:")]
+    public static Self? WithDeviceChannelID(IOBluetoothDevice? inDevice, BluetoothRFCOMMChannelID inRFCOMMChannelID);
+    [Selector("withIncomingRFCOMMChannel:eventSelector:selectorTarget:refCon:")]
+    public static Self? WithIncomingRFCOMMChannelEventSelectorSelectorTargetRefCon(IOBluetoothRFCOMMChannel? inChannel, Selector inEventSelector, AnyObject? inEventSelectorTarget, void* inUserRefCon);
+    [Selector("initWithSDPServiceRecord:")]
+    public Self? InitWithSDPServiceRecord(IOBluetoothSDPServiceRecord? inSDPServiceRecord);
+    [Selector("initWithDevice:channelID:")]
+    public Self? InitWithDeviceChannelID(IOBluetoothDevice? inDevice, BluetoothRFCOMMChannelID inChannelID);
+    [Selector("initWithIncomingRFCOMMChannel:eventSelector:selectorTarget:refCon:")]
+    public Self? InitWithIncomingRFCOMMChannelEventSelectorSelectorTargetRefCon(IOBluetoothRFCOMMChannel? inChannel, Selector inEventSelector, AnyObject? inEventSelectorTarget, void* inUserRefCon);
+    [Selector("getRFCOMMChannel")]
+    public IOBluetoothRFCOMMChannel? GetRFCOMMChannel();
+    [Selector("getDevice")]
+    public IOBluetoothDevice? GetDevice();
+    [Selector("sendBufferTroughChannel")]
+    public IOReturn SendBufferTroughChannel();
+    [Selector("restartTransmission")]
+    public void RestartTransmission();
+    [Selector("isSessionTargetAMac")]
+    public bool IsSessionTargetAMac();
+    [Selector("openTransportConnection:selectorTarget:refCon:")]
+    public OBEXError OpenTransportConnectionSelectorTargetRefCon(Selector inSelector, AnyObject? inTarget, void* inUserRefCon);
+    [Selector("hasOpenTransportConnection")]
+    public Boolean HasOpenTransportConnection();
+    [Selector("closeTransportConnection")]
+    public OBEXError CloseTransportConnection();
+    [Selector("sendDataToTransport:dataLength:")]
+    public OBEXError SendDataToTransportDataLength(void* inDataToSend, nuint inDataLength);
+    [Selector("setOpenTransportConnectionAsyncSelector:target:refCon:")]
+    public void SetOpenTransportConnectionAsyncSelectorTargetRefCon(Selector inSelector, AnyObject? inSelectorTarget, void* inUserRefCon);
+    [Selector("setOBEXSessionOpenConnectionCallback:refCon:")]
+    public void SetOBEXSessionOpenConnectionCallbackRefCon(IOBluetoothOBEXSessionOpenConnectionCallback inCallback, void* inUserRefCon);
 }
 
 #endif

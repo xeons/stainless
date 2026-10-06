@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class GCEventViewController : NSViewController
 {
-    [Selector("controllerUserInteractionEnabled", "setControllerUserInteractionEnabled:")] public bool ControllerUserInteractionEnabled { get; set; }
+    [Selector("controllerUserInteractionEnabled", "setControllerUserInteractionEnabled:")]
+    public bool ControllerUserInteractionEnabled { get; set; }
 }
 
 #endif

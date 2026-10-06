@@ -33,47 +33,67 @@ import Standard.ObjC;
 
 public objc interface GKRandom
 {
-    [Selector("nextInt")] NSInteger NextInt();
-    [Selector("nextIntWithUpperBound:")] NSUInteger NextIntWithUpperBound(NSUInteger upperBound);
-    [Selector("nextUniform")] float NextUniform();
-    [Selector("nextBool")] bool NextBool();
+    [Selector("nextInt")]
+    NSInteger NextInt();
+    [Selector("nextIntWithUpperBound:")]
+    NSUInteger NextIntWithUpperBound(NSUInteger upperBound);
+    [Selector("nextUniform")]
+    float NextUniform();
+    [Selector("nextBool")]
+    bool NextBool();
 }
 
 public extern objc class GKRandomSource : NSObject, GKRandom, NSSecureCoding, NSCopying
 {
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder aDecoder);
-    [Selector("sharedRandom")] public static GKRandomSource SharedRandom();
-    [Selector("arrayByShufflingObjectsInArray:")] public NSArray ArrayByShufflingObjectsInArray(NSArray array);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder aDecoder);
+    [Selector("sharedRandom")]
+    public static GKRandomSource SharedRandom();
+    [Selector("arrayByShufflingObjectsInArray:")]
+    public NSArray ArrayByShufflingObjectsInArray(NSArray array);
 }
 
 /// GameplayKit, a category of NSArray.
 public extern objc class NSArray
 {
-    [Selector("shuffledArrayWithRandomSource:")] public NSArray ShuffledArrayWithRandomSource(GKRandomSource randomSource);
-    [Selector("shuffledArray")] public NSArray ShuffledArray();
+    [Selector("shuffledArrayWithRandomSource:")]
+    public NSArray ShuffledArrayWithRandomSource(GKRandomSource randomSource);
+    [Selector("shuffledArray")]
+    public NSArray ShuffledArray();
 }
 
 public extern objc class GKARC4RandomSource : GKRandomSource
 {
-    [Selector("seed", "setSeed:")] public NSData Seed { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithSeed:")] public Self InitWithSeed(NSData seed);
-    [Selector("dropValuesWithCount:")] public void DropValuesWithCount(NSUInteger count);
+    [Selector("seed", "setSeed:")]
+    public NSData Seed { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithSeed:")]
+    public Self InitWithSeed(NSData seed);
+    [Selector("dropValuesWithCount:")]
+    public void DropValuesWithCount(NSUInteger count);
 }
 
 public extern objc class GKLinearCongruentialRandomSource : GKRandomSource
 {
-    [Selector("seed", "setSeed:")] public ulong Seed { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithSeed:")] public Self InitWithSeed(ulong seed);
+    [Selector("seed", "setSeed:")]
+    public ulong Seed { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithSeed:")]
+    public Self InitWithSeed(ulong seed);
 }
 
 public extern objc class GKMersenneTwisterRandomSource : GKRandomSource
 {
-    [Selector("seed", "setSeed:")] public ulong Seed { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithSeed:")] public Self InitWithSeed(ulong seed);
+    [Selector("seed", "setSeed:")]
+    public ulong Seed { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithSeed:")]
+    public Self InitWithSeed(ulong seed);
 }
 
 #endif

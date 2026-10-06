@@ -39,9 +39,12 @@ public enum ASAuthorizationPublicKeyCredentialLargeBlobAssertionOperation : long
 
 public extern objc class ASAuthorizationPublicKeyCredentialLargeBlobAssertionInput : NSObject
 {
-    [Selector("operation")] public ASAuthorizationPublicKeyCredentialLargeBlobAssertionOperation Operation { get; }
-    [Selector("dataToWrite", "setDataToWrite:")] public NSData? DataToWrite { get; set; }
-    [Selector("initWithOperation:")] public Self InitWithOperation(ASAuthorizationPublicKeyCredentialLargeBlobAssertionOperation operation);
+    [Selector("operation")]
+    public ASAuthorizationPublicKeyCredentialLargeBlobAssertionOperation Operation { get; }
+    [Selector("dataToWrite", "setDataToWrite:")]
+    public NSData? DataToWrite { get; set; }
+    [Selector("initWithOperation:")]
+    public Self InitWithOperation(ASAuthorizationPublicKeyCredentialLargeBlobAssertionOperation operation);
 }
 
 #endif

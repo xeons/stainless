@@ -56,23 +56,36 @@ public enum MTLIntersectionFunctionSignature : ulong
 
 public extern objc class MTLIntersectionFunctionTableDescriptor : NSObject, NSCopying
 {
-    [Selector("functionCount", "setFunctionCount:")] public NSUInteger FunctionCount { get; set; }
-    [Selector("intersectionFunctionTableDescriptor")] public static MTLIntersectionFunctionTableDescriptor IntersectionFunctionTableDescriptor();
+    [Selector("functionCount", "setFunctionCount:")]
+    public NSUInteger FunctionCount { get; set; }
+    [Selector("intersectionFunctionTableDescriptor")]
+    public static MTLIntersectionFunctionTableDescriptor IntersectionFunctionTableDescriptor();
 }
 
 public objc interface MTLIntersectionFunctionTable : MTLResource
 {
-    [Selector("gpuResourceID")] MTLResourceID GpuResourceID { get; }
-    [Selector("setBuffer:offset:atIndex:")] void SetBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
-    [Selector("setBuffers:offsets:withRange:")] void SetBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
-    [Selector("setFunction:atIndex:")] void SetFunctionAtIndex(MTLFunctionHandle? function, NSUInteger index);
-    [Selector("setFunctions:withRange:")] void SetFunctionsWithRange(void** functions, NSRange range);
-    [Selector("setOpaqueTriangleIntersectionFunctionWithSignature:atIndex:")] void SetOpaqueTriangleIntersectionFunctionWithSignatureAtIndex(MTLIntersectionFunctionSignature signature, NSUInteger index);
-    [Selector("setOpaqueTriangleIntersectionFunctionWithSignature:withRange:")] void SetOpaqueTriangleIntersectionFunctionWithSignatureWithRange(MTLIntersectionFunctionSignature signature, NSRange range);
-    [Selector("setOpaqueCurveIntersectionFunctionWithSignature:atIndex:")] void SetOpaqueCurveIntersectionFunctionWithSignatureAtIndex(MTLIntersectionFunctionSignature signature, NSUInteger index);
-    [Selector("setOpaqueCurveIntersectionFunctionWithSignature:withRange:")] void SetOpaqueCurveIntersectionFunctionWithSignatureWithRange(MTLIntersectionFunctionSignature signature, NSRange range);
-    [Selector("setVisibleFunctionTable:atBufferIndex:")] void SetVisibleFunctionTableAtBufferIndex(MTLVisibleFunctionTable? functionTable, NSUInteger bufferIndex);
-    [Selector("setVisibleFunctionTables:withBufferRange:")] void SetVisibleFunctionTablesWithBufferRange(void** functionTables, NSRange bufferRange);
+    [Selector("gpuResourceID")]
+    MTLResourceID GpuResourceID { get; }
+    [Selector("setBuffer:offset:atIndex:")]
+    void SetBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
+    [Selector("setBuffers:offsets:withRange:")]
+    void SetBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
+    [Selector("setFunction:atIndex:")]
+    void SetFunctionAtIndex(MTLFunctionHandle? function, NSUInteger index);
+    [Selector("setFunctions:withRange:")]
+    void SetFunctionsWithRange(void** functions, NSRange range);
+    [Selector("setOpaqueTriangleIntersectionFunctionWithSignature:atIndex:")]
+    void SetOpaqueTriangleIntersectionFunctionWithSignatureAtIndex(MTLIntersectionFunctionSignature signature, NSUInteger index);
+    [Selector("setOpaqueTriangleIntersectionFunctionWithSignature:withRange:")]
+    void SetOpaqueTriangleIntersectionFunctionWithSignatureWithRange(MTLIntersectionFunctionSignature signature, NSRange range);
+    [Selector("setOpaqueCurveIntersectionFunctionWithSignature:atIndex:")]
+    void SetOpaqueCurveIntersectionFunctionWithSignatureAtIndex(MTLIntersectionFunctionSignature signature, NSUInteger index);
+    [Selector("setOpaqueCurveIntersectionFunctionWithSignature:withRange:")]
+    void SetOpaqueCurveIntersectionFunctionWithSignatureWithRange(MTLIntersectionFunctionSignature signature, NSRange range);
+    [Selector("setVisibleFunctionTable:atBufferIndex:")]
+    void SetVisibleFunctionTableAtBufferIndex(MTLVisibleFunctionTable? functionTable, NSUInteger bufferIndex);
+    [Selector("setVisibleFunctionTables:withBufferRange:")]
+    void SetVisibleFunctionTablesWithBufferRange(void** functionTables, NSRange bufferRange);
 }
 
 #endif

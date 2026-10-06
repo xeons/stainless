@@ -84,21 +84,26 @@ public extern "C" CFTypeID SCNetworkConnectionGetTypeID();
 
 public extern "C" Boolean SCNetworkConnectionCopyUserPreferences(CFDictionaryRef? selectionOptions, __CFString** serviceID, __CFDictionary** userOptions);
 
-[ReturnsRetained] public extern "C" SCNetworkConnectionRef? SCNetworkConnectionCreateWithServiceID(CFAllocatorRef? allocator, CFStringRef serviceID, SCNetworkConnectionCallBack callout, SCNetworkConnectionContext* context);
+[ReturnsRetained]
+public extern "C" SCNetworkConnectionRef? SCNetworkConnectionCreateWithServiceID(CFAllocatorRef? allocator, CFStringRef serviceID, SCNetworkConnectionCallBack callout, SCNetworkConnectionContext* context);
 
-[ReturnsRetained] public extern "C" CFStringRef? SCNetworkConnectionCopyServiceID(SCNetworkConnectionRef connection);
+[ReturnsRetained]
+public extern "C" CFStringRef? SCNetworkConnectionCopyServiceID(SCNetworkConnectionRef connection);
 
 public extern "C" SCNetworkConnectionStatus SCNetworkConnectionGetStatus(SCNetworkConnectionRef connection);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? SCNetworkConnectionCopyExtendedStatus(SCNetworkConnectionRef connection);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? SCNetworkConnectionCopyExtendedStatus(SCNetworkConnectionRef connection);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? SCNetworkConnectionCopyStatistics(SCNetworkConnectionRef connection);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? SCNetworkConnectionCopyStatistics(SCNetworkConnectionRef connection);
 
 public extern "C" Boolean SCNetworkConnectionStart(SCNetworkConnectionRef connection, CFDictionaryRef? userOptions, Boolean linger);
 
 public extern "C" Boolean SCNetworkConnectionStop(SCNetworkConnectionRef connection, Boolean forceDisconnect);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? SCNetworkConnectionCopyUserOptions(SCNetworkConnectionRef connection);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? SCNetworkConnectionCopyUserOptions(SCNetworkConnectionRef connection);
 
 public extern "C" Boolean SCNetworkConnectionScheduleWithRunLoop(SCNetworkConnectionRef connection, CFRunLoopRef runLoop, CFStringRef runLoopMode);
 

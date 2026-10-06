@@ -35,16 +35,26 @@ import Standard.ObjC;
 
 public extern objc class SKRegion : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("path")] public CGPathRef? Path { get; }
-    [Selector("infiniteRegion")] public static Self InfiniteRegion();
-    [Selector("initWithRadius:")] public Self InitWithRadius(float radius);
-    [Selector("initWithSize:")] public Self InitWithSize(CGSize size);
-    [Selector("initWithPath:")] public Self InitWithPath(CGPathRef path);
-    [Selector("inverseRegion")] public Self InverseRegion();
-    [Selector("regionByUnionWithRegion:")] public Self RegionByUnionWithRegion(SKRegion region);
-    [Selector("regionByDifferenceFromRegion:")] public Self RegionByDifferenceFromRegion(SKRegion region);
-    [Selector("regionByIntersectionWithRegion:")] public Self RegionByIntersectionWithRegion(SKRegion region);
-    [Selector("containsPoint:")] public bool ContainsPoint(CGPoint point);
+    [Selector("path")]
+    public CGPathRef? Path { get; }
+    [Selector("infiniteRegion")]
+    public static Self InfiniteRegion();
+    [Selector("initWithRadius:")]
+    public Self InitWithRadius(float radius);
+    [Selector("initWithSize:")]
+    public Self InitWithSize(CGSize size);
+    [Selector("initWithPath:")]
+    public Self InitWithPath(CGPathRef path);
+    [Selector("inverseRegion")]
+    public Self InverseRegion();
+    [Selector("regionByUnionWithRegion:")]
+    public Self RegionByUnionWithRegion(SKRegion region);
+    [Selector("regionByDifferenceFromRegion:")]
+    public Self RegionByDifferenceFromRegion(SKRegion region);
+    [Selector("regionByIntersectionWithRegion:")]
+    public Self RegionByIntersectionWithRegion(SKRegion region);
+    [Selector("containsPoint:")]
+    public bool ContainsPoint(CGPoint point);
 }
 
 #endif

@@ -32,7 +32,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLFieldSetElement : DOMHTMLElement
 {
-    [Selector("form")] public DOMHTMLFormElement? Form { get; }
+    [Selector("form")]
+    public DOMHTMLFormElement? Form { get; }
 }
 
 #endif

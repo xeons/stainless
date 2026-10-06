@@ -59,22 +59,34 @@ public enum MPNowPlayingInfoLanguageOptionType : ulong
 
 public extern objc class MPNowPlayingInfoLanguageOption : NSObject
 {
-    [Selector("languageOptionType")] public MPNowPlayingInfoLanguageOptionType LanguageOptionType { get; }
-    [Selector("languageTag")] public NSString? LanguageTag { get; }
-    [Selector("languageOptionCharacteristics")] public NSArray? LanguageOptionCharacteristics { get; }
-    [Selector("displayName")] public NSString? DisplayName { get; }
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("initWithType:languageTag:characteristics:displayName:identifier:")] public Self InitWithTypeLanguageTagCharacteristicsDisplayNameIdentifier(MPNowPlayingInfoLanguageOptionType languageOptionType, NSString languageTag, NSArray? languageOptionCharacteristics, NSString displayName, NSString identifier);
-    [Selector("isAutomaticLegibleLanguageOption")] public bool IsAutomaticLegibleLanguageOption();
-    [Selector("isAutomaticAudibleLanguageOption")] public bool IsAutomaticAudibleLanguageOption();
+    [Selector("languageOptionType")]
+    public MPNowPlayingInfoLanguageOptionType LanguageOptionType { get; }
+    [Selector("languageTag")]
+    public NSString? LanguageTag { get; }
+    [Selector("languageOptionCharacteristics")]
+    public NSArray? LanguageOptionCharacteristics { get; }
+    [Selector("displayName")]
+    public NSString? DisplayName { get; }
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("initWithType:languageTag:characteristics:displayName:identifier:")]
+    public Self InitWithTypeLanguageTagCharacteristicsDisplayNameIdentifier(MPNowPlayingInfoLanguageOptionType languageOptionType, NSString languageTag, NSArray? languageOptionCharacteristics, NSString displayName, NSString identifier);
+    [Selector("isAutomaticLegibleLanguageOption")]
+    public bool IsAutomaticLegibleLanguageOption();
+    [Selector("isAutomaticAudibleLanguageOption")]
+    public bool IsAutomaticAudibleLanguageOption();
 }
 
 public extern objc class MPNowPlayingInfoLanguageOptionGroup : NSObject
 {
-    [Selector("languageOptions")] public NSArray LanguageOptions { get; }
-    [Selector("defaultLanguageOption")] public MPNowPlayingInfoLanguageOption? DefaultLanguageOption { get; }
-    [Selector("allowEmptySelection")] public bool AllowEmptySelection { get; }
-    [Selector("initWithLanguageOptions:defaultLanguageOption:allowEmptySelection:")] public Self InitWithLanguageOptionsDefaultLanguageOptionAllowEmptySelection(NSArray languageOptions, MPNowPlayingInfoLanguageOption? defaultLanguageOption, bool allowEmptySelection);
+    [Selector("languageOptions")]
+    public NSArray LanguageOptions { get; }
+    [Selector("defaultLanguageOption")]
+    public MPNowPlayingInfoLanguageOption? DefaultLanguageOption { get; }
+    [Selector("allowEmptySelection")]
+    public bool AllowEmptySelection { get; }
+    [Selector("initWithLanguageOptions:defaultLanguageOption:allowEmptySelection:")]
+    public Self InitWithLanguageOptionsDefaultLanguageOptionAllowEmptySelection(NSArray languageOptions, MPNowPlayingInfoLanguageOption? defaultLanguageOption, bool allowEmptySelection);
 }
 
 #endif

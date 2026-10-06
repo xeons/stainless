@@ -63,7 +63,8 @@ public const int kDRCDTextGenreCodeSoundtrack = 26;
 public const int kDRCDTextGenreCodeSpokenWord = 27;
 public const int kDRCDTextGenreCodeWorldMusic = 28;
 
-[ReturnsRetained] public extern "C" CFArrayRef? DRCDTextBlockCreateArrayFromPackList(CFDataRef? packs);
+[ReturnsRetained]
+public extern "C" CFArrayRef? DRCDTextBlockCreateArrayFromPackList(CFDataRef? packs);
 
 public struct __DRCDTextBlock;
 
@@ -72,7 +73,8 @@ public extern objc class DRCDTextBlockRef : CFTypeRef { }
 
 public extern "C" CFTypeID DRCDTextBlockGetTypeID();
 
-[ReturnsRetained] public extern "C" DRCDTextBlockRef? DRCDTextBlockCreate(CFStringRef? language, CFStringEncoding encoding);
+[ReturnsRetained]
+public extern "C" DRCDTextBlockRef? DRCDTextBlockCreate(CFStringRef? language, CFStringEncoding encoding);
 
 public extern "C" CFDictionaryRef? DRCDTextBlockGetProperties(DRCDTextBlockRef? block);
 

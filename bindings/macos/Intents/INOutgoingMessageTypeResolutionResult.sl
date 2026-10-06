@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class INOutgoingMessageTypeResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedOutgoingMessageType:")] public static Self SuccessWithResolvedOutgoingMessageType(INOutgoingMessageType resolvedOutgoingMessageType);
-    [Selector("confirmationRequiredWithOutgoingMessageTypeToConfirm:")] public static Self ConfirmationRequiredWithOutgoingMessageTypeToConfirm(INOutgoingMessageType outgoingMessageTypeToConfirm);
+    [Selector("successWithResolvedOutgoingMessageType:")]
+    public static Self SuccessWithResolvedOutgoingMessageType(INOutgoingMessageType resolvedOutgoingMessageType);
+    [Selector("confirmationRequiredWithOutgoingMessageTypeToConfirm:")]
+    public static Self ConfirmationRequiredWithOutgoingMessageTypeToConfirm(INOutgoingMessageType outgoingMessageTypeToConfirm);
 }
 
 #endif

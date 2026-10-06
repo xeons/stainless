@@ -35,13 +35,20 @@ public objc closure void GCAxisInputValueDidChangeHandlerBlock(GCPhysicalInputEl
 
 public objc interface GCAxisInput : NSObjectProtocol
 {
-    [Selector("valueDidChangeHandler", "setValueDidChangeHandler:")] GCAxisInputValueDidChangeHandlerBlock? ValueDidChangeHandler { get; set; }
-    [Selector("value")] float Value { get; }
-    [Selector("isAnalog")] bool Analog { get; }
-    [Selector("canWrap")] bool CanWrap { get; }
-    [Selector("lastValueTimestamp")] NSTimeInterval LastValueTimestamp { get; }
-    [Selector("lastValueLatency")] NSTimeInterval LastValueLatency { get; }
-    [Selector("sources")] NSSet Sources { get; }
+    [Selector("valueDidChangeHandler", "setValueDidChangeHandler:")]
+    GCAxisInputValueDidChangeHandlerBlock? ValueDidChangeHandler { get; set; }
+    [Selector("value")]
+    float Value { get; }
+    [Selector("isAnalog")]
+    bool Analog { get; }
+    [Selector("canWrap")]
+    bool CanWrap { get; }
+    [Selector("lastValueTimestamp")]
+    NSTimeInterval LastValueTimestamp { get; }
+    [Selector("lastValueLatency")]
+    NSTimeInterval LastValueLatency { get; }
+    [Selector("sources")]
+    NSSet Sources { get; }
 }
 
 #endif

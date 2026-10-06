@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// JavaRuntimeSupport, a category of NSWindow.
 public extern objc class NSWindow
 {
-    [Selector("javaAddToOrderingGroup:")] public void JavaAddToOrderingGroup(NSWindow? ownedWindow);
-    [Selector("javaRemoveFromOrderingGroup:")] public void JavaRemoveFromOrderingGroup(NSWindow? ownedWindow);
+    [Selector("javaAddToOrderingGroup:")]
+    public void JavaAddToOrderingGroup(NSWindow? ownedWindow);
+    [Selector("javaRemoveFromOrderingGroup:")]
+    public void JavaRemoveFromOrderingGroup(NSWindow? ownedWindow);
 }
 
 #endif

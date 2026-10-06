@@ -34,31 +34,51 @@ import Standard.ObjC;
 
 public extern objc class AVCaptureVideoDataOutput : AVCaptureOutput
 {
-    [Selector("sampleBufferDelegate")] public AVCaptureVideoDataOutputSampleBufferDelegate? SampleBufferDelegate { get; }
-    [Selector("sampleBufferCallbackQueue")] public dispatch_queue_t? SampleBufferCallbackQueue { get; }
-    [Selector("videoSettings", "setVideoSettings:")] public NSDictionary? VideoSettings { get; set; }
+    [Selector("sampleBufferDelegate")]
+    public AVCaptureVideoDataOutputSampleBufferDelegate? SampleBufferDelegate { get; }
+    [Selector("sampleBufferCallbackQueue")]
+    public dispatch_queue_t? SampleBufferCallbackQueue { get; }
+    [Selector("videoSettings", "setVideoSettings:")]
+    public NSDictionary? VideoSettings { get; set; }
     /// macOS 26.0 and later.
-    [Selector("recommendedMediaTimeScaleForAssetWriter")] public CMTimeScale RecommendedMediaTimeScaleForAssetWriter { get; }
-    [Selector("availableVideoCVPixelFormatTypes")] public NSArray AvailableVideoCVPixelFormatTypes { get; }
-    [Selector("availableVideoCodecTypes")] public NSArray? AvailableVideoCodecTypes { get; }
-    [Selector("alwaysDiscardsLateVideoFrames", "setAlwaysDiscardsLateVideoFrames:")] public bool AlwaysDiscardsLateVideoFrames { get; set; }
+    [Selector("recommendedMediaTimeScaleForAssetWriter")]
+    public CMTimeScale RecommendedMediaTimeScaleForAssetWriter { get; }
+    [Selector("availableVideoCVPixelFormatTypes")]
+    public NSArray AvailableVideoCVPixelFormatTypes { get; }
+    [Selector("availableVideoCodecTypes")]
+    public NSArray? AvailableVideoCodecTypes { get; }
+    [Selector("alwaysDiscardsLateVideoFrames", "setAlwaysDiscardsLateVideoFrames:")]
+    public bool AlwaysDiscardsLateVideoFrames { get; set; }
     /// macOS 26.0 and later.
-    [Selector("preservesDynamicHDRMetadata", "setPreservesDynamicHDRMetadata:")] public bool PreservesDynamicHDRMetadata { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("new")] public static Self New();
-    [Selector("setSampleBufferDelegate:queue:")] public void SetSampleBufferDelegateQueue(AVCaptureVideoDataOutputSampleBufferDelegate? sampleBufferDelegate, dispatch_queue_t? sampleBufferCallbackQueue);
-    [Selector("recommendedVideoSettingsForAssetWriterWithOutputFileType:")] public NSDictionary? RecommendedVideoSettingsForAssetWriterWithOutputFileType(AVFileType outputFileType);
-    [Selector("availableVideoCodecTypesForAssetWriterWithOutputFileType:")] public NSArray AvailableVideoCodecTypesForAssetWriterWithOutputFileType(AVFileType outputFileType);
-    [Selector("recommendedVideoSettingsForVideoCodecType:assetWriterOutputFileType:")] public NSDictionary? RecommendedVideoSettingsForVideoCodecTypeAssetWriterOutputFileType(AVVideoCodecType videoCodecType, AVFileType outputFileType);
-    [Selector("recommendedVideoSettingsForVideoCodecType:assetWriterOutputFileType:outputFileURL:")] public NSDictionary? RecommendedVideoSettingsForVideoCodecTypeAssetWriterOutputFileTypeOutputFileURL(AVVideoCodecType videoCodecType, AVFileType outputFileType, NSURL? outputFileURL);
+    [Selector("preservesDynamicHDRMetadata", "setPreservesDynamicHDRMetadata:")]
+    public bool PreservesDynamicHDRMetadata { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("new")]
+    public static Self New();
+    [Selector("setSampleBufferDelegate:queue:")]
+    public void SetSampleBufferDelegateQueue(AVCaptureVideoDataOutputSampleBufferDelegate? sampleBufferDelegate, dispatch_queue_t? sampleBufferCallbackQueue);
+    [Selector("recommendedVideoSettingsForAssetWriterWithOutputFileType:")]
+    public NSDictionary? RecommendedVideoSettingsForAssetWriterWithOutputFileType(AVFileType outputFileType);
+    [Selector("availableVideoCodecTypesForAssetWriterWithOutputFileType:")]
+    public NSArray AvailableVideoCodecTypesForAssetWriterWithOutputFileType(AVFileType outputFileType);
+    [Selector("recommendedVideoSettingsForVideoCodecType:assetWriterOutputFileType:")]
+    public NSDictionary? RecommendedVideoSettingsForVideoCodecTypeAssetWriterOutputFileType(AVVideoCodecType videoCodecType, AVFileType outputFileType);
+    [Selector("recommendedVideoSettingsForVideoCodecType:assetWriterOutputFileType:outputFileURL:")]
+    public NSDictionary? RecommendedVideoSettingsForVideoCodecTypeAssetWriterOutputFileTypeOutputFileURL(AVVideoCodecType videoCodecType, AVFileType outputFileType, NSURL? outputFileURL);
     /// macOS 26.0 and later.
-    [Selector("recommendedMovieMetadataForVideoCodecType:assetWriterOutputFileType:")] public NSArray? RecommendedMovieMetadataForVideoCodecTypeAssetWriterOutputFileType(AVVideoCodecType videoCodecType, AVFileType outputFileType);
+    [Selector("recommendedMovieMetadataForVideoCodecType:assetWriterOutputFileType:")]
+    public NSArray? RecommendedMovieMetadataForVideoCodecTypeAssetWriterOutputFileType(AVVideoCodecType videoCodecType, AVFileType outputFileType);
 }
 
 public objc interface AVCaptureVideoDataOutputSampleBufferDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("captureOutput:didOutputSampleBuffer:fromConnection:")] void CaptureOutputDidOutputSampleBufferFromConnection(AVCaptureOutput output, CMSampleBufferRef sampleBuffer, AVCaptureConnection connection);
-    [Optional] [Selector("captureOutput:didDropSampleBuffer:fromConnection:")] void CaptureOutputDidDropSampleBufferFromConnection(AVCaptureOutput output, CMSampleBufferRef sampleBuffer, AVCaptureConnection connection);
+    [Optional]
+    [Selector("captureOutput:didOutputSampleBuffer:fromConnection:")]
+    void CaptureOutputDidOutputSampleBufferFromConnection(AVCaptureOutput output, CMSampleBufferRef sampleBuffer, AVCaptureConnection connection);
+    [Optional]
+    [Selector("captureOutput:didDropSampleBuffer:fromConnection:")]
+    void CaptureOutputDidDropSampleBufferFromConnection(AVCaptureOutput output, CMSampleBufferRef sampleBuffer, AVCaptureConnection connection);
 }
 
 #endif

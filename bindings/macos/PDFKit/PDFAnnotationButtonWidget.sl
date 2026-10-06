@@ -35,24 +35,42 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.12.
 public extern objc class PDFAnnotationButtonWidget : PDFAnnotation, NSCopying
 {
-    [Selector("controlType")] public PDFWidgetControlType ControlType();
-    [Selector("setControlType:")] public void SetControlType(PDFWidgetControlType type);
-    [Selector("state")] public NSInteger State();
-    [Selector("setState:")] public void SetState(NSInteger value);
-    [Selector("backgroundColor")] public NSColor? BackgroundColor();
-    [Selector("setBackgroundColor:")] public void SetBackgroundColor(NSColor? color);
-    [Selector("allowsToggleToOff")] public bool AllowsToggleToOff();
-    [Selector("setAllowsToggleToOff:")] public void SetAllowsToggleToOff(bool allowOff);
-    [Selector("font")] public NSFont? Font();
-    [Selector("setFont:")] public void SetFont(NSFont? font);
-    [Selector("fontColor")] public NSColor? FontColor();
-    [Selector("setFontColor:")] public void SetFontColor(NSColor? color);
-    [Selector("caption")] public NSString? Caption();
-    [Selector("setCaption:")] public void SetCaption(NSString? name);
-    [Selector("fieldName")] public NSString? FieldName();
-    [Selector("setFieldName:")] public void SetFieldName(NSString? name);
-    [Selector("onStateValue")] public NSString? OnStateValue();
-    [Selector("setOnStateValue:")] public void SetOnStateValue(NSString? name);
+    [Selector("controlType")]
+    public PDFWidgetControlType ControlType();
+    [Selector("setControlType:")]
+    public void SetControlType(PDFWidgetControlType type);
+    [Selector("state")]
+    public NSInteger State();
+    [Selector("setState:")]
+    public void SetState(NSInteger value);
+    [Selector("backgroundColor")]
+    public NSColor? BackgroundColor();
+    [Selector("setBackgroundColor:")]
+    public void SetBackgroundColor(NSColor? color);
+    [Selector("allowsToggleToOff")]
+    public bool AllowsToggleToOff();
+    [Selector("setAllowsToggleToOff:")]
+    public void SetAllowsToggleToOff(bool allowOff);
+    [Selector("font")]
+    public NSFont? Font();
+    [Selector("setFont:")]
+    public void SetFont(NSFont? font);
+    [Selector("fontColor")]
+    public NSColor? FontColor();
+    [Selector("setFontColor:")]
+    public void SetFontColor(NSColor? color);
+    [Selector("caption")]
+    public NSString? Caption();
+    [Selector("setCaption:")]
+    public void SetCaption(NSString? name);
+    [Selector("fieldName")]
+    public NSString? FieldName();
+    [Selector("setFieldName:")]
+    public void SetFieldName(NSString? name);
+    [Selector("onStateValue")]
+    public NSString? OnStateValue();
+    [Selector("setOnStateValue:")]
+    public void SetOnStateValue(NSString? name);
 }
 
 #endif

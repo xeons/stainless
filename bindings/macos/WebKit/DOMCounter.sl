@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMCounter : DOMObject
 {
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("listStyle")] public NSString? ListStyle { get; }
-    [Selector("separator")] public NSString? Separator { get; }
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("listStyle")]
+    public NSString? ListStyle { get; }
+    [Selector("separator")]
+    public NSString? Separator { get; }
 }
 
 #endif

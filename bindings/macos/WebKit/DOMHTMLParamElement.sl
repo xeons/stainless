@@ -33,10 +33,14 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLParamElement : DOMHTMLElement
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("type", "setType:")] public NSString? Type { get; set; }
-    [Selector("value", "setValue:")] public NSString? Value { get; set; }
-    [Selector("valueType", "setValueType:")] public NSString? ValueType { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("type", "setType:")]
+    public NSString? Type { get; set; }
+    [Selector("value", "setValue:")]
+    public NSString? Value { get; set; }
+    [Selector("valueType", "setValueType:")]
+    public NSString? ValueType { get; set; }
 }
 
 #endif

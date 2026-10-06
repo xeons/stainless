@@ -32,21 +32,36 @@ import Standard.ObjC;
 
 public extern objc class NSScriptCommandDescription : NSObject, NSCoding
 {
-    [Selector("suiteName")] public NSString SuiteName { get; }
-    [Selector("commandName")] public NSString CommandName { get; }
-    [Selector("appleEventClassCode")] public FourCharCode AppleEventClassCode { get; }
-    [Selector("appleEventCode")] public FourCharCode AppleEventCode { get; }
-    [Selector("commandClassName")] public NSString CommandClassName { get; }
-    [Selector("returnType")] public NSString? ReturnType { get; }
-    [Selector("appleEventCodeForReturnType")] public FourCharCode AppleEventCodeForReturnType { get; }
-    [Selector("argumentNames")] public NSArray ArgumentNames { get; }
-    [Selector("initWithSuiteName:commandName:dictionary:")] public Self? InitWithSuiteNameCommandNameDictionary(NSString suiteName, NSString commandName, NSDictionary? commandDeclaration);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder inCoder);
-    [Selector("typeForArgumentWithName:")] public NSString? TypeForArgumentWithName(NSString argumentName);
-    [Selector("appleEventCodeForArgumentWithName:")] public FourCharCode AppleEventCodeForArgumentWithName(NSString argumentName);
-    [Selector("isOptionalArgumentWithName:")] public bool IsOptionalArgumentWithName(NSString argumentName);
-    [Selector("createCommandInstance")] public NSScriptCommand CreateCommandInstance();
-    [Selector("createCommandInstanceWithZone:")] public NSScriptCommand CreateCommandInstanceWithZone(_NSZone* zone);
+    [Selector("suiteName")]
+    public NSString SuiteName { get; }
+    [Selector("commandName")]
+    public NSString CommandName { get; }
+    [Selector("appleEventClassCode")]
+    public FourCharCode AppleEventClassCode { get; }
+    [Selector("appleEventCode")]
+    public FourCharCode AppleEventCode { get; }
+    [Selector("commandClassName")]
+    public NSString CommandClassName { get; }
+    [Selector("returnType")]
+    public NSString? ReturnType { get; }
+    [Selector("appleEventCodeForReturnType")]
+    public FourCharCode AppleEventCodeForReturnType { get; }
+    [Selector("argumentNames")]
+    public NSArray ArgumentNames { get; }
+    [Selector("initWithSuiteName:commandName:dictionary:")]
+    public Self? InitWithSuiteNameCommandNameDictionary(NSString suiteName, NSString commandName, NSDictionary? commandDeclaration);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder inCoder);
+    [Selector("typeForArgumentWithName:")]
+    public NSString? TypeForArgumentWithName(NSString argumentName);
+    [Selector("appleEventCodeForArgumentWithName:")]
+    public FourCharCode AppleEventCodeForArgumentWithName(NSString argumentName);
+    [Selector("isOptionalArgumentWithName:")]
+    public bool IsOptionalArgumentWithName(NSString argumentName);
+    [Selector("createCommandInstance")]
+    public NSScriptCommand CreateCommandInstance();
+    [Selector("createCommandInstanceWithZone:")]
+    public NSScriptCommand CreateCommandInstanceWithZone(_NSZone* zone);
 }
 
 #endif

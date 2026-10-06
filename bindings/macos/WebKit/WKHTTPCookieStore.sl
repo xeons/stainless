@@ -39,7 +39,9 @@ public enum WKCookiePolicy : long
 
 public objc interface WKHTTPCookieStoreObserver : NSObjectProtocol
 {
-    [Optional] [Selector("cookiesDidChangeInCookieStore:")] void CookiesDidChangeInCookieStore(WKHTTPCookieStore cookieStore);
+    [Optional]
+    [Selector("cookiesDidChangeInCookieStore:")]
+    void CookiesDidChangeInCookieStore(WKHTTPCookieStore cookieStore);
 }
 
 public objc closure void WKHTTPCookieStoreGetAllCookiesCompletionHandlerBlock(NSArray arg0);
@@ -56,15 +58,23 @@ public objc closure void WKHTTPCookieStoreGetCookiePolicyCompletionHandlerBlock(
 
 public extern objc class WKHTTPCookieStore : NSObject
 {
-    [Selector("getAllCookies:")] public void GetAllCookies(WKHTTPCookieStoreGetAllCookiesCompletionHandlerBlock completionHandler);
-    [Selector("setCookie:completionHandler:")] public void SetCookieCompletionHandler(NSHTTPCookie cookie, WKHTTPCookieStoreSetCookieCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("getAllCookies:")]
+    public void GetAllCookies(WKHTTPCookieStoreGetAllCookiesCompletionHandlerBlock completionHandler);
+    [Selector("setCookie:completionHandler:")]
+    public void SetCookieCompletionHandler(NSHTTPCookie cookie, WKHTTPCookieStoreSetCookieCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// macOS 26.0 and later.
-    [Selector("setCookies:completionHandler:")] public void SetCookiesCompletionHandler(NSArray cookies, WKHTTPCookieStoreSetCookiesCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("deleteCookie:completionHandler:")] public void DeleteCookieCompletionHandler(NSHTTPCookie cookie, WKHTTPCookieStoreDeleteCookieCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("addObserver:")] public void AddObserver(WKHTTPCookieStoreObserver observer);
-    [Selector("removeObserver:")] public void RemoveObserver(WKHTTPCookieStoreObserver observer);
-    [Selector("setCookiePolicy:completionHandler:")] public void SetCookiePolicyCompletionHandler(WKCookiePolicy policy, WKHTTPCookieStoreSetCookiePolicyCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("getCookiePolicy:")] public void GetCookiePolicy(WKHTTPCookieStoreGetCookiePolicyCompletionHandlerBlock completionHandler);
+    [Selector("setCookies:completionHandler:")]
+    public void SetCookiesCompletionHandler(NSArray cookies, WKHTTPCookieStoreSetCookiesCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("deleteCookie:completionHandler:")]
+    public void DeleteCookieCompletionHandler(NSHTTPCookie cookie, WKHTTPCookieStoreDeleteCookieCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("addObserver:")]
+    public void AddObserver(WKHTTPCookieStoreObserver observer);
+    [Selector("removeObserver:")]
+    public void RemoveObserver(WKHTTPCookieStoreObserver observer);
+    [Selector("setCookiePolicy:completionHandler:")]
+    public void SetCookiePolicyCompletionHandler(WKCookiePolicy policy, WKHTTPCookieStoreSetCookiePolicyCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("getCookiePolicy:")]
+    public void GetCookiePolicy(WKHTTPCookieStoreGetCookiePolicyCompletionHandlerBlock completionHandler);
 }
 
 #endif

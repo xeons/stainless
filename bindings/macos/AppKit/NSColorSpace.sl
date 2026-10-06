@@ -46,28 +46,50 @@ public enum NSColorSpaceModel : long
 
 public extern objc class NSColorSpace : NSObject, NSSecureCoding
 {
-    [Selector("ICCProfileData")] public NSData? ICCProfileData { get; }
-    [Selector("colorSyncProfile")] public void* ColorSyncProfile { get; }
-    [Selector("CGColorSpace")] public CGColorSpaceRef? CGColorSpace { get; }
-    [Selector("numberOfColorComponents")] public NSInteger NumberOfColorComponents { get; }
-    [Selector("colorSpaceModel")] public NSColorSpaceModel ColorSpaceModel { get; }
-    [Selector("localizedName")] public NSString? LocalizedName { get; }
-    [Selector("sRGBColorSpace")] public static NSColorSpace? SRGBColorSpace { get; }
-    [Selector("genericGamma22GrayColorSpace")] public static NSColorSpace? GenericGamma22GrayColorSpace { get; }
-    [Selector("extendedSRGBColorSpace")] public static NSColorSpace? ExtendedSRGBColorSpace { get; }
-    [Selector("extendedGenericGamma22GrayColorSpace")] public static NSColorSpace? ExtendedGenericGamma22GrayColorSpace { get; }
-    [Selector("displayP3ColorSpace")] public static NSColorSpace? DisplayP3ColorSpace { get; }
-    [Selector("adobeRGB1998ColorSpace")] public static NSColorSpace? AdobeRGB1998ColorSpace { get; }
-    [Selector("genericRGBColorSpace")] public static NSColorSpace GenericRGBColorSpace { get; }
-    [Selector("genericGrayColorSpace")] public static NSColorSpace GenericGrayColorSpace { get; }
-    [Selector("genericCMYKColorSpace")] public static NSColorSpace GenericCMYKColorSpace { get; }
-    [Selector("deviceRGBColorSpace")] public static NSColorSpace DeviceRGBColorSpace { get; }
-    [Selector("deviceGrayColorSpace")] public static NSColorSpace DeviceGrayColorSpace { get; }
-    [Selector("deviceCMYKColorSpace")] public static NSColorSpace DeviceCMYKColorSpace { get; }
-    [Selector("initWithICCProfileData:")] public Self? InitWithICCProfileData(NSData iccData);
-    [Selector("initWithColorSyncProfile:")] public Self? InitWithColorSyncProfile(void* prof);
-    [Selector("initWithCGColorSpace:")] public Self? InitWithCGColorSpace(CGColorSpaceRef cgColorSpace);
-    [Selector("availableColorSpacesWithModel:")] public static NSArray AvailableColorSpacesWithModel(NSColorSpaceModel model);
+    [Selector("ICCProfileData")]
+    public NSData? ICCProfileData { get; }
+    [Selector("colorSyncProfile")]
+    public void* ColorSyncProfile { get; }
+    [Selector("CGColorSpace")]
+    public CGColorSpaceRef? CGColorSpace { get; }
+    [Selector("numberOfColorComponents")]
+    public NSInteger NumberOfColorComponents { get; }
+    [Selector("colorSpaceModel")]
+    public NSColorSpaceModel ColorSpaceModel { get; }
+    [Selector("localizedName")]
+    public NSString? LocalizedName { get; }
+    [Selector("sRGBColorSpace")]
+    public static NSColorSpace? SRGBColorSpace { get; }
+    [Selector("genericGamma22GrayColorSpace")]
+    public static NSColorSpace? GenericGamma22GrayColorSpace { get; }
+    [Selector("extendedSRGBColorSpace")]
+    public static NSColorSpace? ExtendedSRGBColorSpace { get; }
+    [Selector("extendedGenericGamma22GrayColorSpace")]
+    public static NSColorSpace? ExtendedGenericGamma22GrayColorSpace { get; }
+    [Selector("displayP3ColorSpace")]
+    public static NSColorSpace? DisplayP3ColorSpace { get; }
+    [Selector("adobeRGB1998ColorSpace")]
+    public static NSColorSpace? AdobeRGB1998ColorSpace { get; }
+    [Selector("genericRGBColorSpace")]
+    public static NSColorSpace GenericRGBColorSpace { get; }
+    [Selector("genericGrayColorSpace")]
+    public static NSColorSpace GenericGrayColorSpace { get; }
+    [Selector("genericCMYKColorSpace")]
+    public static NSColorSpace GenericCMYKColorSpace { get; }
+    [Selector("deviceRGBColorSpace")]
+    public static NSColorSpace DeviceRGBColorSpace { get; }
+    [Selector("deviceGrayColorSpace")]
+    public static NSColorSpace DeviceGrayColorSpace { get; }
+    [Selector("deviceCMYKColorSpace")]
+    public static NSColorSpace DeviceCMYKColorSpace { get; }
+    [Selector("initWithICCProfileData:")]
+    public Self? InitWithICCProfileData(NSData iccData);
+    [Selector("initWithColorSyncProfile:")]
+    public Self? InitWithColorSyncProfile(void* prof);
+    [Selector("initWithCGColorSpace:")]
+    public Self? InitWithCGColorSpace(CGColorSpaceRef cgColorSpace);
+    [Selector("availableColorSpacesWithModel:")]
+    public static NSArray AvailableColorSpacesWithModel(NSColorSpaceModel model);
 }
 
 #endif

@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class CBAttribute : NSObject
 {
-    [Selector("UUID")] public CBUUID UUID { get; }
+    [Selector("UUID")]
+    public CBUUID UUID { get; }
 }
 
 #endif

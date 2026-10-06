@@ -34,8 +34,10 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class PKToolPickerItem : NSObject, NSCopying
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("tool")] public PKTool? Tool { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("tool")]
+    public PKTool? Tool { get; }
 }
 
 #endif

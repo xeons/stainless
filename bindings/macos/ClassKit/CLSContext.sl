@@ -74,27 +74,48 @@ public extern "C" CLSContextTopic CLSContextTopicHealthAndFitness;
 
 public extern objc class CLSContext : CLSObject
 {
-    [Selector("identifierPath")] public NSArray IdentifierPath { get; }
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("universalLinkURL", "setUniversalLinkURL:")] public NSURL? UniversalLinkURL { get; set; }
-    [Selector("type")] public CLSContextType Type { get; }
-    [Selector("customTypeName", "setCustomTypeName:")] public NSString? CustomTypeName { get; set; }
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("displayOrder", "setDisplayOrder:")] public NSInteger DisplayOrder { get; set; }
-    [Selector("topic", "setTopic:")] public CLSContextTopic? Topic { get; set; }
-    [Selector("isAssignable", "setAssignable:")] public bool Assignable { get; set; }
-    [Selector("suggestedAge", "setSuggestedAge:")] public NSRange SuggestedAge { get; set; }
-    [Selector("suggestedCompletionTime", "setSuggestedCompletionTime:")] public NSRange SuggestedCompletionTime { get; set; }
-    [Selector("progressReportingCapabilities")] public NSSet ProgressReportingCapabilities { get; }
-    [Selector("summary", "setSummary:")] public NSString? Summary { get; set; }
-    [Selector("thumbnail", "setThumbnail:")] public CGImageRef? Thumbnail { get; set; }
-    [Selector("isActive")] public bool Active { get; }
-    [Selector("initWithType:identifier:title:")] public Self InitWithTypeIdentifierTitle(CLSContextType type, NSString identifier, NSString title);
-    [Selector("becomeActive")] public void BecomeActive();
-    [Selector("resignActive")] public void ResignActive();
-    [Selector("setType:")] public void SetType(CLSContextType type);
-    [Selector("addProgressReportingCapabilities:")] public void AddProgressReportingCapabilities(NSSet capabilities);
-    [Selector("resetProgressReportingCapabilities")] public void ResetProgressReportingCapabilities();
+    [Selector("identifierPath")]
+    public NSArray IdentifierPath { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("universalLinkURL", "setUniversalLinkURL:")]
+    public NSURL? UniversalLinkURL { get; set; }
+    [Selector("type")]
+    public CLSContextType Type { get; }
+    [Selector("customTypeName", "setCustomTypeName:")]
+    public NSString? CustomTypeName { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("displayOrder", "setDisplayOrder:")]
+    public NSInteger DisplayOrder { get; set; }
+    [Selector("topic", "setTopic:")]
+    public CLSContextTopic? Topic { get; set; }
+    [Selector("isAssignable", "setAssignable:")]
+    public bool Assignable { get; set; }
+    [Selector("suggestedAge", "setSuggestedAge:")]
+    public NSRange SuggestedAge { get; set; }
+    [Selector("suggestedCompletionTime", "setSuggestedCompletionTime:")]
+    public NSRange SuggestedCompletionTime { get; set; }
+    [Selector("progressReportingCapabilities")]
+    public NSSet ProgressReportingCapabilities { get; }
+    [Selector("summary", "setSummary:")]
+    public NSString? Summary { get; set; }
+    [Selector("thumbnail", "setThumbnail:")]
+    public CGImageRef? Thumbnail { get; set; }
+    [Selector("isActive")]
+    public bool Active { get; }
+    [Selector("initWithType:identifier:title:")]
+    public Self InitWithTypeIdentifierTitle(CLSContextType type, NSString identifier, NSString title);
+    [Selector("becomeActive")]
+    public void BecomeActive();
+    [Selector("resignActive")]
+    public void ResignActive();
+    [Selector("setType:")]
+    public void SetType(CLSContextType type);
+    [Selector("addProgressReportingCapabilities:")]
+    public void AddProgressReportingCapabilities(NSSet capabilities);
+    [Selector("resetProgressReportingCapabilities")]
+    public void ResetProgressReportingCapabilities();
 }
 
 public objc closure void CLSContextDescendantMatchingIdentifierPathCompletionCompletionBlock(CLSContext? arg0, NSError? arg1);
@@ -102,13 +123,20 @@ public objc closure void CLSContextDescendantMatchingIdentifierPathCompletionCom
 /// Hierarchy, a category of CLSContext.
 public extern objc class CLSContext
 {
-    [Selector("parent")] public CLSContext? Parent { get; }
-    [Selector("navigationChildContexts")] public NSArray NavigationChildContexts { get; }
-    [Selector("removeFromParent")] public void RemoveFromParent();
-    [Selector("addChildContext:")] public void AddChildContext(CLSContext child);
-    [Selector("descendantMatchingIdentifierPath:completion:")] public void DescendantMatchingIdentifierPathCompletion(NSArray identifierPath, CLSContextDescendantMatchingIdentifierPathCompletionCompletionBlock completion);
-    [Selector("addNavigationChildContext:")] public void AddNavigationChildContext(CLSContext child);
-    [Selector("removeNavigationChildContext:")] public void RemoveNavigationChildContext(CLSContext child);
+    [Selector("parent")]
+    public CLSContext? Parent { get; }
+    [Selector("navigationChildContexts")]
+    public NSArray NavigationChildContexts { get; }
+    [Selector("removeFromParent")]
+    public void RemoveFromParent();
+    [Selector("addChildContext:")]
+    public void AddChildContext(CLSContext child);
+    [Selector("descendantMatchingIdentifierPath:completion:")]
+    public void DescendantMatchingIdentifierPathCompletion(NSArray identifierPath, CLSContextDescendantMatchingIdentifierPathCompletionCompletionBlock completion);
+    [Selector("addNavigationChildContext:")]
+    public void AddNavigationChildContext(CLSContext child);
+    [Selector("removeNavigationChildContext:")]
+    public void RemoveNavigationChildContext(CLSContext child);
 }
 
 #endif

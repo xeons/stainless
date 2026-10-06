@@ -54,13 +54,20 @@ public enum PHProjectCreationSource : long
 
 public extern objc class PHProjectInfo : NSObject, NSSecureCoding
 {
-    [Selector("creationSource")] public PHProjectCreationSource CreationSource { get; }
-    [Selector("projectType")] public PHProjectType ProjectType { get; }
-    [Selector("sections")] public NSArray Sections { get; }
-    [Selector("brandingEnabled")] public bool BrandingEnabled { get; }
-    [Selector("pageNumbersEnabled")] public bool PageNumbersEnabled { get; }
-    [Selector("productIdentifier")] public NSString? ProductIdentifier { get; }
-    [Selector("themeIdentifier")] public NSString? ThemeIdentifier { get; }
+    [Selector("creationSource")]
+    public PHProjectCreationSource CreationSource { get; }
+    [Selector("projectType")]
+    public PHProjectType ProjectType { get; }
+    [Selector("sections")]
+    public NSArray Sections { get; }
+    [Selector("brandingEnabled")]
+    public bool BrandingEnabled { get; }
+    [Selector("pageNumbersEnabled")]
+    public bool PageNumbersEnabled { get; }
+    [Selector("productIdentifier")]
+    public NSString? ProductIdentifier { get; }
+    [Selector("themeIdentifier")]
+    public NSString? ThemeIdentifier { get; }
 }
 
 public enum PHProjectSectionType : long
@@ -73,44 +80,64 @@ public enum PHProjectSectionType : long
 
 public extern objc class PHProjectSection : NSObject, NSSecureCoding
 {
-    [Selector("sectionContents")] public NSArray SectionContents { get; }
-    [Selector("sectionType")] public PHProjectSectionType SectionType { get; }
-    [Selector("title")] public NSString Title { get; }
+    [Selector("sectionContents")]
+    public NSArray SectionContents { get; }
+    [Selector("sectionType")]
+    public PHProjectSectionType SectionType { get; }
+    [Selector("title")]
+    public NSString Title { get; }
 }
 
 public extern objc class PHProjectSectionContent : NSObject, NSSecureCoding
 {
-    [Selector("elements")] public NSArray Elements { get; }
-    [Selector("numberOfColumns")] public NSInteger NumberOfColumns { get; }
-    [Selector("aspectRatio")] public double AspectRatio { get; }
-    [Selector("cloudAssetIdentifiers")] public NSArray CloudAssetIdentifiers { get; }
-    [Selector("backgroundColor")] public NSColor? BackgroundColor { get; }
+    [Selector("elements")]
+    public NSArray Elements { get; }
+    [Selector("numberOfColumns")]
+    public NSInteger NumberOfColumns { get; }
+    [Selector("aspectRatio")]
+    public double AspectRatio { get; }
+    [Selector("cloudAssetIdentifiers")]
+    public NSArray CloudAssetIdentifiers { get; }
+    [Selector("backgroundColor")]
+    public NSColor? BackgroundColor { get; }
 }
 
 public extern objc class PHProjectElement : NSObject, NSSecureCoding
 {
-    [Selector("weight")] public double Weight { get; }
-    [Selector("placement")] public CGRect Placement { get; }
+    [Selector("weight")]
+    public double Weight { get; }
+    [Selector("placement")]
+    public CGRect Placement { get; }
 }
 
 public using PHProjectRegionOfInterestIdentifier = NSString;
 
 public extern objc class PHProjectRegionOfInterest : NSObject, NSSecureCoding
 {
-    [Selector("rect")] public CGRect Rect { get; }
-    [Selector("weight")] public double Weight { get; }
-    [Selector("quality")] public double Quality { get; }
-    [Selector("identifier")] public PHProjectRegionOfInterestIdentifier Identifier { get; }
+    [Selector("rect")]
+    public CGRect Rect { get; }
+    [Selector("weight")]
+    public double Weight { get; }
+    [Selector("quality")]
+    public double Quality { get; }
+    [Selector("identifier")]
+    public PHProjectRegionOfInterestIdentifier Identifier { get; }
 }
 
 public extern objc class PHProjectAssetElement : PHProjectElement, NSSecureCoding
 {
-    [Selector("cloudAssetIdentifier")] public PHCloudIdentifier CloudAssetIdentifier { get; }
-    [Selector("annotation")] public NSString Annotation { get; }
-    [Selector("cropRect")] public CGRect CropRect { get; }
-    [Selector("regionsOfInterest")] public NSArray RegionsOfInterest { get; }
-    [Selector("horizontallyFlipped")] public bool HorizontallyFlipped { get; }
-    [Selector("verticallyFlipped")] public bool VerticallyFlipped { get; }
+    [Selector("cloudAssetIdentifier")]
+    public PHCloudIdentifier CloudAssetIdentifier { get; }
+    [Selector("annotation")]
+    public NSString Annotation { get; }
+    [Selector("cropRect")]
+    public CGRect CropRect { get; }
+    [Selector("regionsOfInterest")]
+    public NSArray RegionsOfInterest { get; }
+    [Selector("horizontallyFlipped")]
+    public bool HorizontallyFlipped { get; }
+    [Selector("verticallyFlipped")]
+    public bool VerticallyFlipped { get; }
 }
 
 public enum PHProjectTextElementType : long
@@ -122,26 +149,38 @@ public enum PHProjectTextElementType : long
 
 public extern objc class PHProjectTextElement : PHProjectElement, NSSecureCoding
 {
-    [Selector("text")] public NSString Text { get; }
-    [Selector("attributedText")] public NSAttributedString? AttributedText { get; }
-    [Selector("textElementType")] public PHProjectTextElementType TextElementType { get; }
+    [Selector("text")]
+    public NSString Text { get; }
+    [Selector("attributedText")]
+    public NSAttributedString? AttributedText { get; }
+    [Selector("textElementType")]
+    public PHProjectTextElementType TextElementType { get; }
 }
 
 public extern objc class PHProjectJournalEntryElement : PHProjectElement, NSSecureCoding
 {
-    [Selector("date")] public NSDate Date { get; }
-    [Selector("assetElement")] public PHProjectAssetElement? AssetElement { get; }
-    [Selector("textElement")] public PHProjectTextElement? TextElement { get; }
+    [Selector("date")]
+    public NSDate Date { get; }
+    [Selector("assetElement")]
+    public PHProjectAssetElement? AssetElement { get; }
+    [Selector("textElement")]
+    public PHProjectTextElement? TextElement { get; }
 }
 
 public extern objc class PHProjectMapElement : PHProjectElement, NSSecureCoding
 {
-    [Selector("mapType")] public MKMapType MapType { get; }
-    [Selector("centerCoordinate")] public CLLocationCoordinate2D CenterCoordinate { get; }
-    [Selector("heading")] public CLLocationDirection Heading { get; }
-    [Selector("pitch")] public CGFloat Pitch { get; }
-    [Selector("altitude")] public CLLocationDistance Altitude { get; }
-    [Selector("annotations")] public NSArray Annotations { get; }
+    [Selector("mapType")]
+    public MKMapType MapType { get; }
+    [Selector("centerCoordinate")]
+    public CLLocationCoordinate2D CenterCoordinate { get; }
+    [Selector("heading")]
+    public CLLocationDirection Heading { get; }
+    [Selector("pitch")]
+    public CGFloat Pitch { get; }
+    [Selector("altitude")]
+    public CLLocationDistance Altitude { get; }
+    [Selector("annotations")]
+    public NSArray Annotations { get; }
 }
 
 #endif

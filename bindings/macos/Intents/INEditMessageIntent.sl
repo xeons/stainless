@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class INEditMessageIntent : INIntent
 {
-    [Selector("messageIdentifier")] public NSString? MessageIdentifier { get; }
-    [Selector("editedContent")] public NSString? EditedContent { get; }
-    [Selector("initWithMessageIdentifier:editedContent:")] public Self InitWithMessageIdentifierEditedContent(NSString? messageIdentifier, NSString? editedContent);
+    [Selector("messageIdentifier")]
+    public NSString? MessageIdentifier { get; }
+    [Selector("editedContent")]
+    public NSString? EditedContent { get; }
+    [Selector("initWithMessageIdentifier:editedContent:")]
+    public Self InitWithMessageIdentifierEditedContent(NSString? messageIdentifier, NSString? editedContent);
 }
 
 public objc closure void INEditMessageIntentHandlingHandleEditMessageCompletionCompletionBlock(INEditMessageIntentResponse arg0);
@@ -46,9 +49,14 @@ public objc closure void INEditMessageIntentHandlingResolveEditedContentForEditM
 
 public objc interface INEditMessageIntentHandling : NSObjectProtocol
 {
-    [Selector("handleEditMessage:completion:")] void HandleEditMessageCompletion(INEditMessageIntent intent, INEditMessageIntentHandlingHandleEditMessageCompletionCompletionBlock completion);
-    [Optional] [Selector("confirmEditMessage:completion:")] void ConfirmEditMessageCompletion(INEditMessageIntent intent, INEditMessageIntentHandlingConfirmEditMessageCompletionCompletionBlock completion);
-    [Optional] [Selector("resolveEditedContentForEditMessage:withCompletion:")] void ResolveEditedContentForEditMessageWithCompletion(INEditMessageIntent intent, INEditMessageIntentHandlingResolveEditedContentForEditMessageWithCompletionCompletionBlock completion);
+    [Selector("handleEditMessage:completion:")]
+    void HandleEditMessageCompletion(INEditMessageIntent intent, INEditMessageIntentHandlingHandleEditMessageCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("confirmEditMessage:completion:")]
+    void ConfirmEditMessageCompletion(INEditMessageIntent intent, INEditMessageIntentHandlingConfirmEditMessageCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("resolveEditedContentForEditMessage:withCompletion:")]
+    void ResolveEditedContentForEditMessageWithCompletion(INEditMessageIntent intent, INEditMessageIntentHandlingResolveEditedContentForEditMessageWithCompletionCompletionBlock completion);
 }
 
 #endif

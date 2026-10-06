@@ -34,20 +34,29 @@ import Standard.ObjC;
 /// macOS 15.2 and later.
 public objc interface MTRXPCClientProtocol_MTRDevice : NSObjectProtocol
 {
-    [Selector("device:stateChanged:")] void DeviceStateChanged(NSNumber nodeID, MTRDeviceState state);
-    [Selector("device:receivedAttributeReport:")] void DeviceReceivedAttributeReport(NSNumber nodeID, NSArray attributeReport);
-    [Selector("device:receivedEventReport:")] void DeviceReceivedEventReport(NSNumber nodeID, NSArray eventReport);
-    [Selector("deviceBecameActive:")] void DeviceBecameActive(NSNumber nodeID);
-    [Selector("deviceCachePrimed:")] void DeviceCachePrimed(NSNumber nodeID);
-    [Selector("deviceConfigurationChanged:")] void DeviceConfigurationChanged(NSNumber nodeID);
-    [Selector("device:internalStateUpdated:")] void DeviceInternalStateUpdated(NSNumber nodeID, NSDictionary dictionary);
+    [Selector("device:stateChanged:")]
+    void DeviceStateChanged(NSNumber nodeID, MTRDeviceState state);
+    [Selector("device:receivedAttributeReport:")]
+    void DeviceReceivedAttributeReport(NSNumber nodeID, NSArray attributeReport);
+    [Selector("device:receivedEventReport:")]
+    void DeviceReceivedEventReport(NSNumber nodeID, NSArray eventReport);
+    [Selector("deviceBecameActive:")]
+    void DeviceBecameActive(NSNumber nodeID);
+    [Selector("deviceCachePrimed:")]
+    void DeviceCachePrimed(NSNumber nodeID);
+    [Selector("deviceConfigurationChanged:")]
+    void DeviceConfigurationChanged(NSNumber nodeID);
+    [Selector("device:internalStateUpdated:")]
+    void DeviceInternalStateUpdated(NSNumber nodeID, NSDictionary dictionary);
 }
 
 /// macOS 15.2 and later.
 public objc interface MTRXPCClientProtocol_MTRDeviceController : NSObjectProtocol
 {
     /// macOS 15.3 and later.
-    [Optional] [Selector("controller:controllerConfigurationUpdated:")] void ControllerControllerConfigurationUpdated(NSUUID controller, NSDictionary configuration);
+    [Optional]
+    [Selector("controller:controllerConfigurationUpdated:")]
+    void ControllerControllerConfigurationUpdated(NSUUID controller, NSDictionary configuration);
 }
 
 /// macOS 15.2 and later.

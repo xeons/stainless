@@ -38,7 +38,8 @@ public struct CMMagneticField
 
 public extern objc class CMMagnetometerData : CMLogItem
 {
-    [Selector("magneticField")] public CMMagneticField MagneticField { get; }
+    [Selector("magneticField")]
+    public CMMagneticField MagneticField { get; }
 }
 
 #endif

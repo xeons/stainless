@@ -34,7 +34,8 @@ public objc closure void HKStatisticsQueryInitWithQuantityTypeQuantitySamplePred
 
 public extern objc class HKStatisticsQuery : HKQuery
 {
-    [Selector("initWithQuantityType:quantitySamplePredicate:options:completionHandler:")] public Self InitWithQuantityTypeQuantitySamplePredicateOptionsCompletionHandler(HKQuantityType quantityType, NSPredicate? quantitySamplePredicate, HKStatisticsOptions options, HKStatisticsQueryInitWithQuantityTypeQuantitySamplePredicateOptionsCompletionHandlerHandlerBlock handler);
+    [Selector("initWithQuantityType:quantitySamplePredicate:options:completionHandler:")]
+    public Self InitWithQuantityTypeQuantitySamplePredicateOptionsCompletionHandler(HKQuantityType quantityType, NSPredicate? quantitySamplePredicate, HKStatisticsOptions options, HKStatisticsQueryInitWithQuantityTypeQuantitySamplePredicateOptionsCompletionHandlerHandlerBlock handler);
 }
 
 #endif

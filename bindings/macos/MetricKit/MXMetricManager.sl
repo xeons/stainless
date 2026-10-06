@@ -35,20 +35,32 @@ public using MXLaunchTaskID = NSString;
 
 public extern objc class MXMetricManager : NSObject
 {
-    [Selector("pastPayloads")] public NSArray PastPayloads { get; }
-    [Selector("pastDiagnosticPayloads")] public NSArray PastDiagnosticPayloads { get; }
-    [Selector("sharedManager")] public static MXMetricManager SharedManager { get; }
-    [Selector("makeLogHandleWithCategory:")] public static os_log_t MakeLogHandleWithCategory(NSString category);
-    [Selector("addSubscriber:")] public void AddSubscriber(MXMetricManagerSubscriber subscriber);
-    [Selector("removeSubscriber:")] public void RemoveSubscriber(MXMetricManagerSubscriber subscriber);
-    [Selector("extendLaunchMeasurementForTaskID:error:")] public static bool ExtendLaunchMeasurementForTaskIDError(MXLaunchTaskID taskID, out NSError? error);
-    [Selector("finishExtendedLaunchMeasurementForTaskID:error:")] public static bool FinishExtendedLaunchMeasurementForTaskIDError(MXLaunchTaskID taskID, out NSError? error);
+    [Selector("pastPayloads")]
+    public NSArray PastPayloads { get; }
+    [Selector("pastDiagnosticPayloads")]
+    public NSArray PastDiagnosticPayloads { get; }
+    [Selector("sharedManager")]
+    public static MXMetricManager SharedManager { get; }
+    [Selector("makeLogHandleWithCategory:")]
+    public static os_log_t MakeLogHandleWithCategory(NSString category);
+    [Selector("addSubscriber:")]
+    public void AddSubscriber(MXMetricManagerSubscriber subscriber);
+    [Selector("removeSubscriber:")]
+    public void RemoveSubscriber(MXMetricManagerSubscriber subscriber);
+    [Selector("extendLaunchMeasurementForTaskID:error:")]
+    public static bool ExtendLaunchMeasurementForTaskIDError(MXLaunchTaskID taskID, out NSError? error);
+    [Selector("finishExtendedLaunchMeasurementForTaskID:error:")]
+    public static bool FinishExtendedLaunchMeasurementForTaskIDError(MXLaunchTaskID taskID, out NSError? error);
 }
 
 public objc interface MXMetricManagerSubscriber : NSObjectProtocol
 {
-    [Optional] [Selector("didReceiveMetricPayloads:")] void DidReceiveMetricPayloads(NSArray payloads);
-    [Optional] [Selector("didReceiveDiagnosticPayloads:")] void DidReceiveDiagnosticPayloads(NSArray payloads);
+    [Optional]
+    [Selector("didReceiveMetricPayloads:")]
+    void DidReceiveMetricPayloads(NSArray payloads);
+    [Optional]
+    [Selector("didReceiveDiagnosticPayloads:")]
+    void DidReceiveDiagnosticPayloads(NSArray payloads);
 }
 
 #endif

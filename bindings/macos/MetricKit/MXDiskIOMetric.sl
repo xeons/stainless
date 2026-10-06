@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class MXDiskIOMetric : MXMetric
 {
-    [Selector("cumulativeLogicalWrites")] public NSMeasurement CumulativeLogicalWrites { get; }
+    [Selector("cumulativeLogicalWrites")]
+    public NSMeasurement CumulativeLogicalWrites { get; }
 }
 
 #endif

@@ -48,13 +48,17 @@ public extern "C" CFStringRef kCGImageDestinationOptimizeColorForSharing;
 
 public extern "C" CFTypeID CGImageDestinationGetTypeID();
 
-[ReturnsRetained] public extern "C" CFArrayRef CGImageDestinationCopyTypeIdentifiers();
+[ReturnsRetained]
+public extern "C" CFArrayRef CGImageDestinationCopyTypeIdentifiers();
 
-[ReturnsRetained] public extern "C" CGImageDestinationRef? CGImageDestinationCreateWithDataConsumer(CGDataConsumerRef consumer, CFStringRef type, nuint count, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGImageDestinationRef? CGImageDestinationCreateWithDataConsumer(CGDataConsumerRef consumer, CFStringRef type, nuint count, CFDictionaryRef? options);
 
-[ReturnsRetained] public extern "C" CGImageDestinationRef? CGImageDestinationCreateWithData(CFMutableDataRef data, CFStringRef type, nuint count, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGImageDestinationRef? CGImageDestinationCreateWithData(CFMutableDataRef data, CFStringRef type, nuint count, CFDictionaryRef? options);
 
-[ReturnsRetained] public extern "C" CGImageDestinationRef? CGImageDestinationCreateWithURL(CFURLRef url, CFStringRef type, nuint count, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGImageDestinationRef? CGImageDestinationCreateWithURL(CFURLRef url, CFStringRef type, nuint count, CFDictionaryRef? options);
 
 public extern "C" void CGImageDestinationSetProperties(CGImageDestinationRef idst, CFDictionaryRef? properties);
 

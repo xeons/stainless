@@ -33,69 +33,133 @@ import Standard.ObjC;
 
 public extern objc class NSControl : NSView
 {
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
-    [Selector("action", "setAction:")] public Selector Action { get; set; }
-    [Selector("tag", "setTag:")] public NSInteger Tag { get; set; }
-    [Selector("ignoresMultiClick", "setIgnoresMultiClick:")] public bool IgnoresMultiClick { get; set; }
-    [Selector("isContinuous", "setContinuous:")] public bool Continuous { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("refusesFirstResponder", "setRefusesFirstResponder:")] public bool RefusesFirstResponder { get; set; }
-    [Selector("isHighlighted", "setHighlighted:")] public bool Highlighted { get; set; }
-    [Selector("controlSize", "setControlSize:")] public NSControlSize ControlSize { get; set; }
-    [Selector("formatter", "setFormatter:")] public NSFormatter? Formatter { get; set; }
-    [Selector("objectValue", "setObjectValue:")] public AnyObject? ObjectValue { get; set; }
-    [Selector("stringValue", "setStringValue:")] public NSString StringValue { get; set; }
-    [Selector("attributedStringValue", "setAttributedStringValue:")] public NSAttributedString AttributedStringValue { get; set; }
-    [Selector("intValue", "setIntValue:")] public int IntValue { get; set; }
-    [Selector("integerValue", "setIntegerValue:")] public NSInteger IntegerValue { get; set; }
-    [Selector("floatValue", "setFloatValue:")] public float FloatValue { get; set; }
-    [Selector("doubleValue", "setDoubleValue:")] public double DoubleValue { get; set; }
-    [Selector("font", "setFont:")] public NSFont? Font { get; set; }
-    [Selector("usesSingleLineMode", "setUsesSingleLineMode:")] public bool UsesSingleLineMode { get; set; }
-    [Selector("lineBreakMode", "setLineBreakMode:")] public NSLineBreakMode LineBreakMode { get; set; }
-    [Selector("alignment", "setAlignment:")] public NSTextAlignment Alignment { get; set; }
-    [Selector("baseWritingDirection", "setBaseWritingDirection:")] public NSWritingDirection BaseWritingDirection { get; set; }
-    [Selector("allowsExpansionToolTips", "setAllowsExpansionToolTips:")] public bool AllowsExpansionToolTips { get; set; }
-    [Selector("initWithFrame:")] public Self InitWithFrame(NSRect frameRect);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("sizeThatFits:")] public NSSize SizeThatFits(NSSize size);
-    [Selector("sizeToFit")] public void SizeToFit();
-    [Selector("sendActionOn:")] public NSInteger SendActionOn(NSEventMask mask);
-    [Selector("sendAction:to:")] public bool SendActionTo(Selector action, AnyObject? target);
-    [Selector("takeIntValueFrom:")] public void TakeIntValueFrom(AnyObject? sender);
-    [Selector("takeFloatValueFrom:")] public void TakeFloatValueFrom(AnyObject? sender);
-    [Selector("takeDoubleValueFrom:")] public void TakeDoubleValueFrom(AnyObject? sender);
-    [Selector("takeStringValueFrom:")] public void TakeStringValueFrom(AnyObject? sender);
-    [Selector("takeObjectValueFrom:")] public void TakeObjectValueFrom(AnyObject? sender);
-    [Selector("takeIntegerValueFrom:")] public void TakeIntegerValueFrom(AnyObject? sender);
-    [Selector("performClick:")] public void PerformClick(AnyObject? sender);
-    [Selector("expansionFrameWithFrame:")] public NSRect ExpansionFrameWithFrame(NSRect contentFrame);
-    [Selector("drawWithExpansionFrame:inView:")] public void DrawWithExpansionFrameInView(NSRect contentFrame, NSView view);
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
+    [Selector("action", "setAction:")]
+    public Selector Action { get; set; }
+    [Selector("tag", "setTag:")]
+    public NSInteger Tag { get; set; }
+    [Selector("ignoresMultiClick", "setIgnoresMultiClick:")]
+    public bool IgnoresMultiClick { get; set; }
+    [Selector("isContinuous", "setContinuous:")]
+    public bool Continuous { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("refusesFirstResponder", "setRefusesFirstResponder:")]
+    public bool RefusesFirstResponder { get; set; }
+    [Selector("isHighlighted", "setHighlighted:")]
+    public bool Highlighted { get; set; }
+    [Selector("controlSize", "setControlSize:")]
+    public NSControlSize ControlSize { get; set; }
+    [Selector("formatter", "setFormatter:")]
+    public NSFormatter? Formatter { get; set; }
+    [Selector("objectValue", "setObjectValue:")]
+    public AnyObject? ObjectValue { get; set; }
+    [Selector("stringValue", "setStringValue:")]
+    public NSString StringValue { get; set; }
+    [Selector("attributedStringValue", "setAttributedStringValue:")]
+    public NSAttributedString AttributedStringValue { get; set; }
+    [Selector("intValue", "setIntValue:")]
+    public int IntValue { get; set; }
+    [Selector("integerValue", "setIntegerValue:")]
+    public NSInteger IntegerValue { get; set; }
+    [Selector("floatValue", "setFloatValue:")]
+    public float FloatValue { get; set; }
+    [Selector("doubleValue", "setDoubleValue:")]
+    public double DoubleValue { get; set; }
+    [Selector("font", "setFont:")]
+    public NSFont? Font { get; set; }
+    [Selector("usesSingleLineMode", "setUsesSingleLineMode:")]
+    public bool UsesSingleLineMode { get; set; }
+    [Selector("lineBreakMode", "setLineBreakMode:")]
+    public NSLineBreakMode LineBreakMode { get; set; }
+    [Selector("alignment", "setAlignment:")]
+    public NSTextAlignment Alignment { get; set; }
+    [Selector("baseWritingDirection", "setBaseWritingDirection:")]
+    public NSWritingDirection BaseWritingDirection { get; set; }
+    [Selector("allowsExpansionToolTips", "setAllowsExpansionToolTips:")]
+    public bool AllowsExpansionToolTips { get; set; }
+    [Selector("initWithFrame:")]
+    public Self InitWithFrame(NSRect frameRect);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("sizeThatFits:")]
+    public NSSize SizeThatFits(NSSize size);
+    [Selector("sizeToFit")]
+    public void SizeToFit();
+    [Selector("sendActionOn:")]
+    public NSInteger SendActionOn(NSEventMask mask);
+    [Selector("sendAction:to:")]
+    public bool SendActionTo(Selector action, AnyObject? target);
+    [Selector("takeIntValueFrom:")]
+    public void TakeIntValueFrom(AnyObject? sender);
+    [Selector("takeFloatValueFrom:")]
+    public void TakeFloatValueFrom(AnyObject? sender);
+    [Selector("takeDoubleValueFrom:")]
+    public void TakeDoubleValueFrom(AnyObject? sender);
+    [Selector("takeStringValueFrom:")]
+    public void TakeStringValueFrom(AnyObject? sender);
+    [Selector("takeObjectValueFrom:")]
+    public void TakeObjectValueFrom(AnyObject? sender);
+    [Selector("takeIntegerValueFrom:")]
+    public void TakeIntegerValueFrom(AnyObject? sender);
+    [Selector("performClick:")]
+    public void PerformClick(AnyObject? sender);
+    [Selector("expansionFrameWithFrame:")]
+    public NSRect ExpansionFrameWithFrame(NSRect contentFrame);
+    [Selector("drawWithExpansionFrame:inView:")]
+    public void DrawWithExpansionFrameInView(NSRect contentFrame, NSView view);
 }
 
 /// NSControlEditableTextMethods, a category of NSControl.
 public extern objc class NSControl
 {
-    [Selector("currentEditor")] public NSText? CurrentEditor();
-    [Selector("abortEditing")] public bool AbortEditing();
-    [Selector("validateEditing")] public void ValidateEditing();
-    [Selector("editWithFrame:editor:delegate:event:")] public void EditWithFrameEditorDelegateEvent(NSRect rect, NSText textObj, AnyObject? @delegate, NSEvent event);
-    [Selector("selectWithFrame:editor:delegate:start:length:")] public void SelectWithFrameEditorDelegateStartLength(NSRect rect, NSText textObj, AnyObject? @delegate, NSInteger selStart, NSInteger selLength);
-    [Selector("endEditing:")] public void EndEditing(NSText textObj);
+    [Selector("currentEditor")]
+    public NSText? CurrentEditor();
+    [Selector("abortEditing")]
+    public bool AbortEditing();
+    [Selector("validateEditing")]
+    public void ValidateEditing();
+    [Selector("editWithFrame:editor:delegate:event:")]
+    public void EditWithFrameEditorDelegateEvent(NSRect rect, NSText textObj, AnyObject? @delegate, NSEvent event);
+    [Selector("selectWithFrame:editor:delegate:start:length:")]
+    public void SelectWithFrameEditorDelegateStartLength(NSRect rect, NSText textObj, AnyObject? @delegate, NSInteger selStart, NSInteger selLength);
+    [Selector("endEditing:")]
+    public void EndEditing(NSText textObj);
 }
 
 public objc interface NSControlTextEditingDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("controlTextDidBeginEditing:")] void ControlTextDidBeginEditing(NSNotification obj);
-    [Optional] [Selector("controlTextDidEndEditing:")] void ControlTextDidEndEditing(NSNotification obj);
-    [Optional] [Selector("controlTextDidChange:")] void ControlTextDidChange(NSNotification obj);
-    [Optional] [Selector("control:textShouldBeginEditing:")] bool ControlTextShouldBeginEditing(NSControl control, NSText fieldEditor);
-    [Optional] [Selector("control:textShouldEndEditing:")] bool ControlTextShouldEndEditing(NSControl control, NSText fieldEditor);
-    [Optional] [Selector("control:didFailToFormatString:errorDescription:")] bool ControlDidFailToFormatStringErrorDescription(NSControl control, NSString string, NSString? error);
-    [Optional] [Selector("control:didFailToValidatePartialString:errorDescription:")] void ControlDidFailToValidatePartialStringErrorDescription(NSControl control, NSString string, NSString? error);
-    [Optional] [Selector("control:isValidObject:")] bool ControlIsValidObject(NSControl control, AnyObject? obj);
-    [Optional] [Selector("control:textView:doCommandBySelector:")] bool ControlTextViewDoCommandBySelector(NSControl control, NSTextView textView, Selector commandSelector);
-    [Optional] [Selector("control:textView:completions:forPartialWordRange:indexOfSelectedItem:")] NSArray ControlTextViewCompletionsForPartialWordRangeIndexOfSelectedItem(NSControl control, NSTextView textView, NSArray words, NSRange charRange, NSInteger* index);
+    [Optional]
+    [Selector("controlTextDidBeginEditing:")]
+    void ControlTextDidBeginEditing(NSNotification obj);
+    [Optional]
+    [Selector("controlTextDidEndEditing:")]
+    void ControlTextDidEndEditing(NSNotification obj);
+    [Optional]
+    [Selector("controlTextDidChange:")]
+    void ControlTextDidChange(NSNotification obj);
+    [Optional]
+    [Selector("control:textShouldBeginEditing:")]
+    bool ControlTextShouldBeginEditing(NSControl control, NSText fieldEditor);
+    [Optional]
+    [Selector("control:textShouldEndEditing:")]
+    bool ControlTextShouldEndEditing(NSControl control, NSText fieldEditor);
+    [Optional]
+    [Selector("control:didFailToFormatString:errorDescription:")]
+    bool ControlDidFailToFormatStringErrorDescription(NSControl control, NSString string, NSString? error);
+    [Optional]
+    [Selector("control:didFailToValidatePartialString:errorDescription:")]
+    void ControlDidFailToValidatePartialStringErrorDescription(NSControl control, NSString string, NSString? error);
+    [Optional]
+    [Selector("control:isValidObject:")]
+    bool ControlIsValidObject(NSControl control, AnyObject? obj);
+    [Optional]
+    [Selector("control:textView:doCommandBySelector:")]
+    bool ControlTextViewDoCommandBySelector(NSControl control, NSTextView textView, Selector commandSelector);
+    [Optional]
+    [Selector("control:textView:completions:forPartialWordRange:indexOfSelectedItem:")]
+    NSArray ControlTextViewCompletionsForPartialWordRangeIndexOfSelectedItem(NSControl control, NSTextView textView, NSArray words, NSRange charRange, NSInteger* index);
 }
 
 public extern "C" NSNotificationName NSControlTextDidBeginEditingNotification;
@@ -107,32 +171,47 @@ public extern "C" NSNotificationName NSControlTextDidChangeNotification;
 /// NSDeprecated, a category of NSControl.
 public extern objc class NSControl
 {
-    [Selector("cellClass", "setCellClass:")] public static Class CellClass { get; set; }
-    [Selector("cell", "setCell:")] public NSCell? Cell { get; set; }
+    [Selector("cellClass", "setCellClass:")]
+    public static Class CellClass { get; set; }
+    [Selector("cell", "setCell:")]
+    public NSCell? Cell { get; set; }
     /// Deprecated in macOS 10.0.
-    [Selector("setFloatingPointFormat:left:right:")] public void SetFloatingPointFormatLeftRight(bool autoRange, NSUInteger leftDigits, NSUInteger rightDigits);
-    [Selector("selectedCell")] public NSCell? SelectedCell();
-    [Selector("selectedTag")] public NSInteger SelectedTag();
+    [Selector("setFloatingPointFormat:left:right:")]
+    public void SetFloatingPointFormatLeftRight(bool autoRange, NSUInteger leftDigits, NSUInteger rightDigits);
+    [Selector("selectedCell")]
+    public NSCell? SelectedCell();
+    [Selector("selectedTag")]
+    public NSInteger SelectedTag();
     /// Deprecated in macOS 10.14.
-    [Selector("setNeedsDisplay")] public void SetNeedsDisplay();
+    [Selector("setNeedsDisplay")]
+    public void SetNeedsDisplay();
     /// Deprecated in macOS 10.14.
-    [Selector("calcSize")] public void CalcSize();
-    [Selector("updateCell:")] public void UpdateCell(NSCell cell);
-    [Selector("updateCellInside:")] public void UpdateCellInside(NSCell cell);
-    [Selector("drawCellInside:")] public void DrawCellInside(NSCell cell);
-    [Selector("drawCell:")] public void DrawCell(NSCell cell);
-    [Selector("selectCell:")] public void SelectCell(NSCell cell);
+    [Selector("calcSize")]
+    public void CalcSize();
+    [Selector("updateCell:")]
+    public void UpdateCell(NSCell cell);
+    [Selector("updateCellInside:")]
+    public void UpdateCellInside(NSCell cell);
+    [Selector("drawCellInside:")]
+    public void DrawCellInside(NSCell cell);
+    [Selector("drawCell:")]
+    public void DrawCell(NSCell cell);
+    [Selector("selectCell:")]
+    public void SelectCell(NSCell cell);
 }
 
 /// NSControlSubclassNotifications, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 11.0.
-    [Selector("controlTextDidBeginEditing:")] public void ControlTextDidBeginEditing(NSNotification obj);
+    [Selector("controlTextDidBeginEditing:")]
+    public void ControlTextDidBeginEditing(NSNotification obj);
     /// Deprecated in macOS 11.0.
-    [Selector("controlTextDidEndEditing:")] public void ControlTextDidEndEditing(NSNotification obj);
+    [Selector("controlTextDidEndEditing:")]
+    public void ControlTextDidEndEditing(NSNotification obj);
     /// Deprecated in macOS 11.0.
-    [Selector("controlTextDidChange:")] public void ControlTextDidChange(NSNotification obj);
+    [Selector("controlTextDidChange:")]
+    public void ControlTextDidChange(NSNotification obj);
 }
 
 /// macOS 26.0 and later.

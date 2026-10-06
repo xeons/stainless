@@ -36,18 +36,29 @@ import Standard.ObjC;
 
 public extern objc class CARenderer : NSObject
 {
-    [Selector("layer", "setLayer:")] public CALayer? Layer { get; set; }
-    [Selector("bounds", "setBounds:")] public CGRect Bounds { get; set; }
+    [Selector("layer", "setLayer:")]
+    public CALayer? Layer { get; set; }
+    [Selector("bounds", "setBounds:")]
+    public CGRect Bounds { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("rendererWithCGLContext:options:")] public static CARenderer RendererWithCGLContextOptions(void* ctx, NSDictionary? dict);
-    [Selector("rendererWithMTLTexture:options:")] public static CARenderer RendererWithMTLTextureOptions(MTLTexture tex, NSDictionary? dict);
-    [Selector("beginFrameAtTime:timeStamp:")] public void BeginFrameAtTimeTimeStamp(CFTimeInterval t, CVTimeStamp* ts);
-    [Selector("updateBounds")] public CGRect UpdateBounds();
-    [Selector("addUpdateRect:")] public void AddUpdateRect(CGRect r);
-    [Selector("render")] public void Render();
-    [Selector("nextFrameTime")] public CFTimeInterval NextFrameTime();
-    [Selector("endFrame")] public void EndFrame();
-    [Selector("setDestination:")] public void SetDestination(MTLTexture tex);
+    [Selector("rendererWithCGLContext:options:")]
+    public static CARenderer RendererWithCGLContextOptions(void* ctx, NSDictionary? dict);
+    [Selector("rendererWithMTLTexture:options:")]
+    public static CARenderer RendererWithMTLTextureOptions(MTLTexture tex, NSDictionary? dict);
+    [Selector("beginFrameAtTime:timeStamp:")]
+    public void BeginFrameAtTimeTimeStamp(CFTimeInterval t, CVTimeStamp* ts);
+    [Selector("updateBounds")]
+    public CGRect UpdateBounds();
+    [Selector("addUpdateRect:")]
+    public void AddUpdateRect(CGRect r);
+    [Selector("render")]
+    public void Render();
+    [Selector("nextFrameTime")]
+    public CFTimeInterval NextFrameTime();
+    [Selector("endFrame")]
+    public void EndFrame();
+    [Selector("setDestination:")]
+    public void SetDestination(MTLTexture tex);
 }
 
 public extern "C" NSString? kCARendererColorSpace;

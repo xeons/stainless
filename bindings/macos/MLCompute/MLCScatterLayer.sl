@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCScatterLayer : MLCLayer
 {
-    [Selector("dimension")] public NSUInteger Dimension { get; }
-    [Selector("reductionType")] public MLCReductionType ReductionType { get; }
-    [Selector("layerWithDimension:reductionType:")] public static Self? LayerWithDimensionReductionType(NSUInteger dimension, MLCReductionType reductionType);
+    [Selector("dimension")]
+    public NSUInteger Dimension { get; }
+    [Selector("reductionType")]
+    public MLCReductionType ReductionType { get; }
+    [Selector("layerWithDimension:reductionType:")]
+    public static Self? LayerWithDimensionReductionType(NSUInteger dimension, MLCReductionType reductionType);
 }
 
 #endif

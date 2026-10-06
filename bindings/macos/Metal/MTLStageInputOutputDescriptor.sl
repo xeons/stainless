@@ -104,38 +104,54 @@ public enum MTLStepFunction : ulong
 
 public extern objc class MTLBufferLayoutDescriptor : NSObject, NSCopying
 {
-    [Selector("stride", "setStride:")] public NSUInteger Stride { get; set; }
-    [Selector("stepFunction", "setStepFunction:")] public MTLStepFunction StepFunction { get; set; }
-    [Selector("stepRate", "setStepRate:")] public NSUInteger StepRate { get; set; }
+    [Selector("stride", "setStride:")]
+    public NSUInteger Stride { get; set; }
+    [Selector("stepFunction", "setStepFunction:")]
+    public MTLStepFunction StepFunction { get; set; }
+    [Selector("stepRate", "setStepRate:")]
+    public NSUInteger StepRate { get; set; }
 }
 
 public extern objc class MTLBufferLayoutDescriptorArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public MTLBufferLayoutDescriptor ObjectAtIndexedSubscript(NSUInteger index);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTLBufferLayoutDescriptor? bufferDesc, NSUInteger index);
+    [Selector("objectAtIndexedSubscript:")]
+    public MTLBufferLayoutDescriptor ObjectAtIndexedSubscript(NSUInteger index);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTLBufferLayoutDescriptor? bufferDesc, NSUInteger index);
 }
 
 public extern objc class MTLAttributeDescriptor : NSObject, NSCopying
 {
-    [Selector("format", "setFormat:")] public MTLAttributeFormat Format { get; set; }
-    [Selector("offset", "setOffset:")] public NSUInteger Offset { get; set; }
-    [Selector("bufferIndex", "setBufferIndex:")] public NSUInteger BufferIndex { get; set; }
+    [Selector("format", "setFormat:")]
+    public MTLAttributeFormat Format { get; set; }
+    [Selector("offset", "setOffset:")]
+    public NSUInteger Offset { get; set; }
+    [Selector("bufferIndex", "setBufferIndex:")]
+    public NSUInteger BufferIndex { get; set; }
 }
 
 public extern objc class MTLAttributeDescriptorArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public MTLAttributeDescriptor ObjectAtIndexedSubscript(NSUInteger index);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTLAttributeDescriptor? attributeDesc, NSUInteger index);
+    [Selector("objectAtIndexedSubscript:")]
+    public MTLAttributeDescriptor ObjectAtIndexedSubscript(NSUInteger index);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTLAttributeDescriptor? attributeDesc, NSUInteger index);
 }
 
 public extern objc class MTLStageInputOutputDescriptor : NSObject, NSCopying
 {
-    [Selector("layouts")] public MTLBufferLayoutDescriptorArray Layouts { get; }
-    [Selector("attributes")] public MTLAttributeDescriptorArray Attributes { get; }
-    [Selector("indexType", "setIndexType:")] public MTLIndexType IndexType { get; set; }
-    [Selector("indexBufferIndex", "setIndexBufferIndex:")] public NSUInteger IndexBufferIndex { get; set; }
-    [Selector("stageInputOutputDescriptor")] public static MTLStageInputOutputDescriptor StageInputOutputDescriptor();
-    [Selector("reset")] public void Reset();
+    [Selector("layouts")]
+    public MTLBufferLayoutDescriptorArray Layouts { get; }
+    [Selector("attributes")]
+    public MTLAttributeDescriptorArray Attributes { get; }
+    [Selector("indexType", "setIndexType:")]
+    public MTLIndexType IndexType { get; set; }
+    [Selector("indexBufferIndex", "setIndexBufferIndex:")]
+    public NSUInteger IndexBufferIndex { get; set; }
+    [Selector("stageInputOutputDescriptor")]
+    public static MTLStageInputOutputDescriptor StageInputOutputDescriptor();
+    [Selector("reset")]
+    public void Reset();
 }
 
 #endif

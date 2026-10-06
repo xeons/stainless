@@ -40,9 +40,12 @@ public enum VNRequestFaceLandmarksConstellation : ulong
 
 public extern objc class VNDetectFaceLandmarksRequest : VNImageBasedRequest, VNFaceObservationAccepting
 {
-    [Selector("constellation", "setConstellation:")] public VNRequestFaceLandmarksConstellation Constellation { get; set; }
-    [Selector("results")] public NSArray? Results { get; }
-    [Selector("revision:supportsConstellation:")] public static bool RevisionSupportsConstellation(NSUInteger requestRevision, VNRequestFaceLandmarksConstellation constellation);
+    [Selector("constellation", "setConstellation:")]
+    public VNRequestFaceLandmarksConstellation Constellation { get; set; }
+    [Selector("results")]
+    public NSArray? Results { get; }
+    [Selector("revision:supportsConstellation:")]
+    public static bool RevisionSupportsConstellation(NSUInteger requestRevision, VNRequestFaceLandmarksConstellation constellation);
 }
 
 #endif

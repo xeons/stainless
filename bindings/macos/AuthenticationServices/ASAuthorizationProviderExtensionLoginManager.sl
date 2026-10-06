@@ -54,36 +54,63 @@ public objc closure void ASAuthorizationProviderExtensionLoginManagerPresentRegi
 
 public extern objc class ASAuthorizationProviderExtensionLoginManager : NSObject
 {
-    [Selector("isDeviceRegistered")] public bool DeviceRegistered { get; }
-    [Selector("isUserRegistered")] public bool UserRegistered { get; }
-    [Selector("registrationToken")] public NSString? RegistrationToken { get; }
+    [Selector("isDeviceRegistered")]
+    public bool DeviceRegistered { get; }
+    [Selector("isUserRegistered")]
+    public bool UserRegistered { get; }
+    [Selector("registrationToken")]
+    public NSString? RegistrationToken { get; }
     /// macOS 26.0 and later.
-    [Selector("authenticationMethod")] public ASAuthorizationProviderExtensionAuthenticationMethod AuthenticationMethod { get; }
-    [Selector("extensionData")] public NSDictionary? ExtensionData { get; }
+    [Selector("authenticationMethod")]
+    public ASAuthorizationProviderExtensionAuthenticationMethod AuthenticationMethod { get; }
+    [Selector("extensionData")]
+    public NSDictionary? ExtensionData { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("loginUserName", "setLoginUserName:")] public NSString? LoginUserName { get; set; }
-    [Selector("userLoginConfiguration")] public ASAuthorizationProviderExtensionUserLoginConfiguration? UserLoginConfiguration { get; }
-    [Selector("ssoTokens", "setSsoTokens:")] public NSDictionary? SsoTokens { get; set; }
-    [Selector("loginConfiguration")] public ASAuthorizationProviderExtensionLoginConfiguration? LoginConfiguration { get; }
-    [Selector("saveUserLoginConfiguration:error:")] public bool SaveUserLoginConfigurationError(ASAuthorizationProviderExtensionUserLoginConfiguration userLoginConfiguration, out NSError? error);
-    [Selector("saveLoginConfiguration:error:")] public bool SaveLoginConfigurationError(ASAuthorizationProviderExtensionLoginConfiguration loginConfiguration, out NSError? error);
-    [Selector("saveCertificate:keyType:")] public void SaveCertificateKeyType(SecCertificateRef certificate, ASAuthorizationProviderExtensionKeyType keyType);
-    [Selector("copyKeyForKeyType:")] public SecKeyRef? CopyKeyForKeyType(ASAuthorizationProviderExtensionKeyType keyType);
-    [Selector("copyIdentityForKeyType:")] public SecIdentityRef? CopyIdentityForKeyType(ASAuthorizationProviderExtensionKeyType keyType);
-    [ReturnsRetained] [Selector("beginKeyRotationForKeyType:")] public SecKeyRef? BeginKeyRotationForKeyType(ASAuthorizationProviderExtensionKeyType keyType);
-    [Selector("completeKeyRotationForKeyType:")] public void CompleteKeyRotationForKeyType(ASAuthorizationProviderExtensionKeyType keyType);
-    [Selector("userNeedsReauthenticationWithCompletion:")] public void UserNeedsReauthenticationWithCompletion(ASAuthorizationProviderExtensionLoginManagerUserNeedsReauthenticationWithCompletionCompletionBlock completion);
-    [Selector("deviceRegistrationsNeedsRepair")] public void DeviceRegistrationsNeedsRepair();
-    [Selector("userRegistrationsNeedsRepair")] public void UserRegistrationsNeedsRepair();
-    [Selector("decryptionKeysNeedRepair")] public void DecryptionKeysNeedRepair();
-    [Selector("resetKeys")] public void ResetKeys();
-    [Selector("resetDeviceKeys")] public void ResetDeviceKeys();
-    [Selector("resetUserSecureEnclaveKey")] public void ResetUserSecureEnclaveKey();
+    [Selector("loginUserName", "setLoginUserName:")]
+    public NSString? LoginUserName { get; set; }
+    [Selector("userLoginConfiguration")]
+    public ASAuthorizationProviderExtensionUserLoginConfiguration? UserLoginConfiguration { get; }
+    [Selector("ssoTokens", "setSsoTokens:")]
+    public NSDictionary? SsoTokens { get; set; }
+    [Selector("loginConfiguration")]
+    public ASAuthorizationProviderExtensionLoginConfiguration? LoginConfiguration { get; }
+    [Selector("saveUserLoginConfiguration:error:")]
+    public bool SaveUserLoginConfigurationError(ASAuthorizationProviderExtensionUserLoginConfiguration userLoginConfiguration, out NSError? error);
+    [Selector("saveLoginConfiguration:error:")]
+    public bool SaveLoginConfigurationError(ASAuthorizationProviderExtensionLoginConfiguration loginConfiguration, out NSError? error);
+    [Selector("saveCertificate:keyType:")]
+    public void SaveCertificateKeyType(SecCertificateRef certificate, ASAuthorizationProviderExtensionKeyType keyType);
+    [Selector("copyKeyForKeyType:")]
+    public SecKeyRef? CopyKeyForKeyType(ASAuthorizationProviderExtensionKeyType keyType);
+    [Selector("copyIdentityForKeyType:")]
+    public SecIdentityRef? CopyIdentityForKeyType(ASAuthorizationProviderExtensionKeyType keyType);
+    [ReturnsRetained]
+    [Selector("beginKeyRotationForKeyType:")]
+    public SecKeyRef? BeginKeyRotationForKeyType(ASAuthorizationProviderExtensionKeyType keyType);
+    [Selector("completeKeyRotationForKeyType:")]
+    public void CompleteKeyRotationForKeyType(ASAuthorizationProviderExtensionKeyType keyType);
+    [Selector("userNeedsReauthenticationWithCompletion:")]
+    public void UserNeedsReauthenticationWithCompletion(ASAuthorizationProviderExtensionLoginManagerUserNeedsReauthenticationWithCompletionCompletionBlock completion);
+    [Selector("deviceRegistrationsNeedsRepair")]
+    public void DeviceRegistrationsNeedsRepair();
+    [Selector("userRegistrationsNeedsRepair")]
+    public void UserRegistrationsNeedsRepair();
+    [Selector("decryptionKeysNeedRepair")]
+    public void DecryptionKeysNeedRepair();
+    [Selector("resetKeys")]
+    public void ResetKeys();
+    [Selector("resetDeviceKeys")]
+    public void ResetDeviceKeys();
+    [Selector("resetUserSecureEnclaveKey")]
+    public void ResetUserSecureEnclaveKey();
     /// macOS 15.4 and later.
-    [Selector("attestKey:clientDataHash:completion:")] public void AttestKeyClientDataHashCompletion(ASAuthorizationProviderExtensionKeyType keyType, NSData clientDataHash, ASAuthorizationProviderExtensionLoginManagerAttestKeyClientDataHashCompletionCompletionBlock completion);
+    [Selector("attestKey:clientDataHash:completion:")]
+    public void AttestKeyClientDataHashCompletion(ASAuthorizationProviderExtensionKeyType keyType, NSData clientDataHash, ASAuthorizationProviderExtensionLoginManagerAttestKeyClientDataHashCompletionCompletionBlock completion);
     /// macOS 15.4 and later.
-    [Selector("attestPendingKey:clientDataHash:completion:")] public void AttestPendingKeyClientDataHashCompletion(ASAuthorizationProviderExtensionKeyType keyType, NSData clientDataHash, ASAuthorizationProviderExtensionLoginManagerAttestPendingKeyClientDataHashCompletionCompletionBlock completion);
-    [Selector("presentRegistrationViewControllerWithCompletion:")] public void PresentRegistrationViewControllerWithCompletion(ASAuthorizationProviderExtensionLoginManagerPresentRegistrationViewControllerWithCompletionCompletionBlock completion);
+    [Selector("attestPendingKey:clientDataHash:completion:")]
+    public void AttestPendingKeyClientDataHashCompletion(ASAuthorizationProviderExtensionKeyType keyType, NSData clientDataHash, ASAuthorizationProviderExtensionLoginManagerAttestPendingKeyClientDataHashCompletionCompletionBlock completion);
+    [Selector("presentRegistrationViewControllerWithCompletion:")]
+    public void PresentRegistrationViewControllerWithCompletion(ASAuthorizationProviderExtensionLoginManagerPresentRegistrationViewControllerWithCompletionCompletionBlock completion);
 }
 
 #endif

@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class AVAudioUnitTimeEffect : AVAudioUnit
 {
-    [Selector("bypass", "setBypass:")] public bool Bypass { get; set; }
-    [Selector("initWithAudioComponentDescription:")] public Self InitWithAudioComponentDescription(AudioComponentDescription audioComponentDescription);
+    [Selector("bypass", "setBypass:")]
+    public bool Bypass { get; set; }
+    [Selector("initWithAudioComponentDescription:")]
+    public Self InitWithAudioComponentDescription(AudioComponentDescription audioComponentDescription);
 }
 
 #endif

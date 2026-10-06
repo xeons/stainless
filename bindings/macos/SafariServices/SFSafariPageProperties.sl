@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class SFSafariPageProperties : NSObject
 {
-    [Selector("url")] public NSURL? Url { get; }
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("usesPrivateBrowsing")] public bool UsesPrivateBrowsing { get; }
-    [Selector("isActive")] public bool Active { get; }
+    [Selector("url")]
+    public NSURL? Url { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("usesPrivateBrowsing")]
+    public bool UsesPrivateBrowsing { get; }
+    [Selector("isActive")]
+    public bool Active { get; }
 }
 
 #endif

@@ -32,21 +32,34 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothSDPUUID : NSData
 {
-    [Selector("uuidWithBytes:length:")] public static Self? UuidWithBytesLength(void* bytes, uint length);
-    [Selector("uuidWithData:")] public static Self? UuidWithData(NSData? data);
-    [Selector("uuid16:")] public static Self? Uuid16(BluetoothSDPUUID16 uuid16);
-    [Selector("uuid32:")] public static Self? Uuid32(BluetoothSDPUUID32 uuid32);
+    [Selector("uuidWithBytes:length:")]
+    public static Self? UuidWithBytesLength(void* bytes, uint length);
+    [Selector("uuidWithData:")]
+    public static Self? UuidWithData(NSData? data);
+    [Selector("uuid16:")]
+    public static Self? Uuid16(BluetoothSDPUUID16 uuid16);
+    [Selector("uuid32:")]
+    public static Self? Uuid32(BluetoothSDPUUID32 uuid32);
     /// Deprecated in macOS 10.7.
-    [Selector("withSDPUUIDRef:")] public static Self? WithSDPUUIDRef(IOBluetoothSDPUUIDRef sdpUUIDRef);
-    [Selector("initWithUUID16:")] public Self? InitWithUUID16(BluetoothSDPUUID16 uuid16);
-    [Selector("initWithUUID32:")] public Self? InitWithUUID32(BluetoothSDPUUID32 uuid32);
+    [Selector("withSDPUUIDRef:")]
+    public static Self? WithSDPUUIDRef(IOBluetoothSDPUUIDRef sdpUUIDRef);
+    [Selector("initWithUUID16:")]
+    public Self? InitWithUUID16(BluetoothSDPUUID16 uuid16);
+    [Selector("initWithUUID32:")]
+    public Self? InitWithUUID32(BluetoothSDPUUID32 uuid32);
     /// Deprecated in macOS 10.7.
-    [Selector("getSDPUUIDRef")] public IOBluetoothSDPUUIDRef GetSDPUUIDRef();
-    [Selector("getUUIDWithLength:")] public Self? GetUUIDWithLength(uint newLength);
-    [Selector("isEqualToUUID:")] public bool IsEqualToUUID(IOBluetoothSDPUUID? otherUUID);
-    [Selector("classForCoder")] public Class ClassForCoder();
-    [Selector("classForArchiver")] public Class ClassForArchiver();
-    [Selector("classForPortCoder")] public Class ClassForPortCoder();
+    [Selector("getSDPUUIDRef")]
+    public IOBluetoothSDPUUIDRef GetSDPUUIDRef();
+    [Selector("getUUIDWithLength:")]
+    public Self? GetUUIDWithLength(uint newLength);
+    [Selector("isEqualToUUID:")]
+    public bool IsEqualToUUID(IOBluetoothSDPUUID? otherUUID);
+    [Selector("classForCoder")]
+    public Class ClassForCoder();
+    [Selector("classForArchiver")]
+    public Class ClassForArchiver();
+    [Selector("classForPortCoder")]
+    public Class ClassForPortCoder();
 }
 
 #endif

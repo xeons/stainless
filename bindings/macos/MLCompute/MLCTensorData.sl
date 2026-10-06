@@ -35,11 +35,16 @@ public objc closure void MLCTensorDataDataWithBytesNoCopyLengthDeallocatorDeallo
 /// Deprecated in macOS 14.3.
 public extern objc class MLCTensorData : NSObject
 {
-    [Selector("bytes")] public void* Bytes { get; }
-    [Selector("length")] public NSUInteger Length { get; }
-    [Selector("dataWithBytesNoCopy:length:")] public static Self DataWithBytesNoCopyLength(void* bytes, NSUInteger length);
-    [Selector("dataWithImmutableBytesNoCopy:length:")] public static Self DataWithImmutableBytesNoCopyLength(void* bytes, NSUInteger length);
-    [Selector("dataWithBytesNoCopy:length:deallocator:")] public static Self DataWithBytesNoCopyLengthDeallocator(void* bytes, NSUInteger length, MLCTensorDataDataWithBytesNoCopyLengthDeallocatorDeallocatorBlock deallocator);
+    [Selector("bytes")]
+    public void* Bytes { get; }
+    [Selector("length")]
+    public NSUInteger Length { get; }
+    [Selector("dataWithBytesNoCopy:length:")]
+    public static Self DataWithBytesNoCopyLength(void* bytes, NSUInteger length);
+    [Selector("dataWithImmutableBytesNoCopy:length:")]
+    public static Self DataWithImmutableBytesNoCopyLength(void* bytes, NSUInteger length);
+    [Selector("dataWithBytesNoCopy:length:deallocator:")]
+    public static Self DataWithBytesNoCopyLengthDeallocator(void* bytes, NSUInteger length, MLCTensorDataDataWithBytesNoCopyLengthDeallocatorDeallocatorBlock deallocator);
 }
 
 #endif

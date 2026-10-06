@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class HKSource : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("bundleIdentifier")] public NSString BundleIdentifier { get; }
-    [Selector("defaultSource")] public static HKSource DefaultSource();
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("bundleIdentifier")]
+    public NSString BundleIdentifier { get; }
+    [Selector("defaultSource")]
+    public static HKSource DefaultSource();
 }
 
 #endif

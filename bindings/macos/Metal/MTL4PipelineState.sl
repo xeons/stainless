@@ -72,15 +72,19 @@ public enum MTL4IndirectCommandBufferSupportState : long
 /// macOS 26.0 and later.
 public extern objc class MTL4PipelineOptions : NSObject, NSCopying
 {
-    [Selector("shaderValidation", "setShaderValidation:")] public MTLShaderValidation ShaderValidation { get; set; }
-    [Selector("shaderReflection", "setShaderReflection:")] public MTL4ShaderReflection ShaderReflection { get; set; }
+    [Selector("shaderValidation", "setShaderValidation:")]
+    public MTLShaderValidation ShaderValidation { get; set; }
+    [Selector("shaderReflection", "setShaderReflection:")]
+    public MTL4ShaderReflection ShaderReflection { get; set; }
 }
 
 /// macOS 26.0 and later.
 public extern objc class MTL4PipelineDescriptor : NSObject, NSCopying
 {
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("options", "setOptions:")] public MTL4PipelineOptions? Options { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("options", "setOptions:")]
+    public MTL4PipelineOptions? Options { get; set; }
 }
 
 #endif

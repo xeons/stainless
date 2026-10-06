@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class VNRecognizedPoint3D : VNPoint3D
 {
-    [Selector("identifier")] public VNRecognizedPointKey Identifier { get; }
+    [Selector("identifier")]
+    public VNRecognizedPointKey Identifier { get; }
 }
 
 #endif

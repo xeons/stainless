@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLHtmlElement : DOMHTMLElement
 {
-    [Selector("version", "setVersion:")] public NSString? Version { get; set; }
+    [Selector("version", "setVersion:")]
+    public NSString? Version { get; set; }
 }
 
 #endif

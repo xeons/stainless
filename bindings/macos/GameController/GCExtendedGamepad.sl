@@ -31,27 +31,47 @@ import Standard.ObjC;
 
 public extern objc class GCExtendedGamepad : GCPhysicalInputProfile
 {
-    [Selector("controller")] public GCController? Controller { get; }
-    [Selector("valueChangedHandler", "setValueChangedHandler:")] public GCExtendedGamepadValueChangedHandler? ValueChangedHandler { get; set; }
-    [Selector("dpad")] public GCControllerDirectionPad Dpad { get; }
-    [Selector("buttonA")] public GCControllerButtonInput ButtonA { get; }
-    [Selector("buttonB")] public GCControllerButtonInput ButtonB { get; }
-    [Selector("buttonX")] public GCControllerButtonInput ButtonX { get; }
-    [Selector("buttonY")] public GCControllerButtonInput ButtonY { get; }
-    [Selector("buttonMenu")] public GCControllerButtonInput ButtonMenu { get; }
-    [Selector("buttonOptions")] public GCControllerButtonInput? ButtonOptions { get; }
-    [Selector("buttonHome")] public GCControllerButtonInput? ButtonHome { get; }
-    [Selector("leftThumbstick")] public GCControllerDirectionPad LeftThumbstick { get; }
-    [Selector("rightThumbstick")] public GCControllerDirectionPad RightThumbstick { get; }
-    [Selector("leftShoulder")] public GCControllerButtonInput LeftShoulder { get; }
-    [Selector("rightShoulder")] public GCControllerButtonInput RightShoulder { get; }
-    [Selector("leftTrigger")] public GCControllerButtonInput LeftTrigger { get; }
-    [Selector("rightTrigger")] public GCControllerButtonInput RightTrigger { get; }
-    [Selector("leftThumbstickButton")] public GCControllerButtonInput? LeftThumbstickButton { get; }
-    [Selector("rightThumbstickButton")] public GCControllerButtonInput? RightThumbstickButton { get; }
+    [Selector("controller")]
+    public GCController? Controller { get; }
+    [Selector("valueChangedHandler", "setValueChangedHandler:")]
+    public GCExtendedGamepadValueChangedHandler? ValueChangedHandler { get; set; }
+    [Selector("dpad")]
+    public GCControllerDirectionPad Dpad { get; }
+    [Selector("buttonA")]
+    public GCControllerButtonInput ButtonA { get; }
+    [Selector("buttonB")]
+    public GCControllerButtonInput ButtonB { get; }
+    [Selector("buttonX")]
+    public GCControllerButtonInput ButtonX { get; }
+    [Selector("buttonY")]
+    public GCControllerButtonInput ButtonY { get; }
+    [Selector("buttonMenu")]
+    public GCControllerButtonInput ButtonMenu { get; }
+    [Selector("buttonOptions")]
+    public GCControllerButtonInput? ButtonOptions { get; }
+    [Selector("buttonHome")]
+    public GCControllerButtonInput? ButtonHome { get; }
+    [Selector("leftThumbstick")]
+    public GCControllerDirectionPad LeftThumbstick { get; }
+    [Selector("rightThumbstick")]
+    public GCControllerDirectionPad RightThumbstick { get; }
+    [Selector("leftShoulder")]
+    public GCControllerButtonInput LeftShoulder { get; }
+    [Selector("rightShoulder")]
+    public GCControllerButtonInput RightShoulder { get; }
+    [Selector("leftTrigger")]
+    public GCControllerButtonInput LeftTrigger { get; }
+    [Selector("rightTrigger")]
+    public GCControllerButtonInput RightTrigger { get; }
+    [Selector("leftThumbstickButton")]
+    public GCControllerButtonInput? LeftThumbstickButton { get; }
+    [Selector("rightThumbstickButton")]
+    public GCControllerButtonInput? RightThumbstickButton { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("saveSnapshot")] public GCExtendedGamepadSnapshot SaveSnapshot();
-    [Selector("setStateFromExtendedGamepad:")] public void SetStateFromExtendedGamepad(GCExtendedGamepad extendedGamepad);
+    [Selector("saveSnapshot")]
+    public GCExtendedGamepadSnapshot SaveSnapshot();
+    [Selector("setStateFromExtendedGamepad:")]
+    public void SetStateFromExtendedGamepad(GCExtendedGamepad extendedGamepad);
 }
 
 public objc closure void GCExtendedGamepadValueChangedHandler(GCExtendedGamepad arg0, GCControllerElement arg1);

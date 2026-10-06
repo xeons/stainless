@@ -32,10 +32,14 @@ import Standard.ObjC;
 #if ARM64
 public extern objc class VZMacPlatformConfiguration : VZPlatformConfiguration
 {
-    [Selector("hardwareModel", "setHardwareModel:")] public VZMacHardwareModel HardwareModel { get; set; }
-    [Selector("machineIdentifier", "setMachineIdentifier:")] public VZMacMachineIdentifier MachineIdentifier { get; set; }
-    [Selector("auxiliaryStorage", "setAuxiliaryStorage:")] public VZMacAuxiliaryStorage? AuxiliaryStorage { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("hardwareModel", "setHardwareModel:")]
+    public VZMacHardwareModel HardwareModel { get; set; }
+    [Selector("machineIdentifier", "setMachineIdentifier:")]
+    public VZMacMachineIdentifier MachineIdentifier { get; set; }
+    [Selector("auxiliaryStorage", "setAuxiliaryStorage:")]
+    public VZMacAuxiliaryStorage? AuxiliaryStorage { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 #endif
 

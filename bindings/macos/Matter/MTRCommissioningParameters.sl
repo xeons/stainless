@@ -33,32 +33,47 @@ import Standard.ObjC;
 
 public extern objc class MTRCommissioningParameters : NSObject
 {
-    [Selector("csrNonce", "setCsrNonce:")] public NSData? CsrNonce { get; set; }
-    [Selector("attestationNonce", "setAttestationNonce:")] public NSData? AttestationNonce { get; set; }
-    [Selector("wifiSSID", "setWifiSSID:")] public NSData? WifiSSID { get; set; }
-    [Selector("wifiCredentials", "setWifiCredentials:")] public NSData? WifiCredentials { get; set; }
-    [Selector("threadOperationalDataset", "setThreadOperationalDataset:")] public NSData? ThreadOperationalDataset { get; set; }
-    [Selector("deviceAttestationDelegate", "setDeviceAttestationDelegate:")] public MTRDeviceAttestationDelegate? DeviceAttestationDelegate { get; set; }
-    [Selector("failSafeTimeout", "setFailSafeTimeout:")] public NSNumber? FailSafeTimeout { get; set; }
-    [Selector("skipCommissioningComplete", "setSkipCommissioningComplete:")] public bool SkipCommissioningComplete { get; set; }
-    [Selector("countryCode", "setCountryCode:")] public NSString? CountryCode { get; set; }
+    [Selector("csrNonce", "setCsrNonce:")]
+    public NSData? CsrNonce { get; set; }
+    [Selector("attestationNonce", "setAttestationNonce:")]
+    public NSData? AttestationNonce { get; set; }
+    [Selector("wifiSSID", "setWifiSSID:")]
+    public NSData? WifiSSID { get; set; }
+    [Selector("wifiCredentials", "setWifiCredentials:")]
+    public NSData? WifiCredentials { get; set; }
+    [Selector("threadOperationalDataset", "setThreadOperationalDataset:")]
+    public NSData? ThreadOperationalDataset { get; set; }
+    [Selector("deviceAttestationDelegate", "setDeviceAttestationDelegate:")]
+    public MTRDeviceAttestationDelegate? DeviceAttestationDelegate { get; set; }
+    [Selector("failSafeTimeout", "setFailSafeTimeout:")]
+    public NSNumber? FailSafeTimeout { get; set; }
+    [Selector("skipCommissioningComplete", "setSkipCommissioningComplete:")]
+    public bool SkipCommissioningComplete { get; set; }
+    [Selector("countryCode", "setCountryCode:")]
+    public NSString? CountryCode { get; set; }
     /// macOS 15.4 and later.
-    [Selector("readEndpointInformation", "setReadEndpointInformation:")] public bool ReadEndpointInformation { get; set; }
+    [Selector("readEndpointInformation", "setReadEndpointInformation:")]
+    public bool ReadEndpointInformation { get; set; }
     /// macOS 26.2 and later.
-    [Selector("extraAttributesToRead", "setExtraAttributesToRead:")] public NSArray? ExtraAttributesToRead { get; set; }
+    [Selector("extraAttributesToRead", "setExtraAttributesToRead:")]
+    public NSArray? ExtraAttributesToRead { get; set; }
     /// macOS 26.2 and later.
-    [Selector("forceWiFiScan", "setForceWiFiScan:")] public bool ForceWiFiScan { get; set; }
+    [Selector("forceWiFiScan", "setForceWiFiScan:")]
+    public bool ForceWiFiScan { get; set; }
     /// macOS 26.2 and later.
-    [Selector("forceThreadScan", "setForceThreadScan:")] public bool ForceThreadScan { get; set; }
+    [Selector("forceThreadScan", "setForceThreadScan:")]
+    public bool ForceThreadScan { get; set; }
 }
 
 /// Deprecated, a category of MTRCommissioningParameters.
 public extern objc class MTRCommissioningParameters
 {
     /// Deprecated in macOS 13.3.
-    [Selector("CSRNonce", "setCSRNonce:")] public NSData? CSRNonce { get; set; }
+    [Selector("CSRNonce", "setCSRNonce:")]
+    public NSData? CSRNonce { get; set; }
     /// Deprecated in macOS 13.3.
-    [Selector("failSafeExpiryTimeoutSecs", "setFailSafeExpiryTimeoutSecs:")] public NSNumber? FailSafeExpiryTimeoutSecs { get; set; }
+    [Selector("failSafeExpiryTimeoutSecs", "setFailSafeExpiryTimeoutSecs:")]
+    public NSNumber? FailSafeExpiryTimeoutSecs { get; set; }
 }
 
 #endif

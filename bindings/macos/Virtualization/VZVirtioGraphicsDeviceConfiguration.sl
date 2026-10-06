@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioGraphicsDeviceConfiguration : VZGraphicsDeviceConfiguration
 {
-    [Selector("scanouts", "setScanouts:")] public NSArray Scanouts { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("scanouts", "setScanouts:")]
+    public NSArray Scanouts { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

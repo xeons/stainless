@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class NSScriptExecutionContext : NSObject
 {
-    [Selector("topLevelObject", "setTopLevelObject:")] public AnyObject? TopLevelObject { get; set; }
-    [Selector("objectBeingTested", "setObjectBeingTested:")] public AnyObject? ObjectBeingTested { get; set; }
-    [Selector("rangeContainerObject", "setRangeContainerObject:")] public AnyObject? RangeContainerObject { get; set; }
-    [Selector("sharedScriptExecutionContext")] public static NSScriptExecutionContext SharedScriptExecutionContext();
+    [Selector("topLevelObject", "setTopLevelObject:")]
+    public AnyObject? TopLevelObject { get; set; }
+    [Selector("objectBeingTested", "setObjectBeingTested:")]
+    public AnyObject? ObjectBeingTested { get; set; }
+    [Selector("rangeContainerObject", "setRangeContainerObject:")]
+    public AnyObject? RangeContainerObject { get; set; }
+    [Selector("sharedScriptExecutionContext")]
+    public static NSScriptExecutionContext SharedScriptExecutionContext();
 }
 
 #endif

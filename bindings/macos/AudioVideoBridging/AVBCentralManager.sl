@@ -34,14 +34,22 @@ public extern "C" ulong AVBNullEUI64;
 
 public extern objc class AVBCentralManager : NSObject
 {
-    [Selector("startControllerMatching")] public void StartControllerMatching();
-    [Selector("didAddInterface:")] public void DidAddInterface(AVBInterface @interface);
-    [Selector("didRemoveInterface:")] public void DidRemoveInterface(AVBInterface @interface);
-    [Selector("streamingEnabledInterfacesOnly")] public bool StreamingEnabledInterfacesOnly();
-    [Selector("nextAvailableDynamicEntityID")] public static ulong NextAvailableDynamicEntityID();
-    [Selector("releaseDynamicEntityID:")] public static void ReleaseDynamicEntityID(ulong entityID);
-    [Selector("nextAvailableDynamicEntityModelID")] public static ulong NextAvailableDynamicEntityModelID();
-    [Selector("releaseDynamicEntityModelID:")] public static void ReleaseDynamicEntityModelID(ulong entityModelID);
+    [Selector("startControllerMatching")]
+    public void StartControllerMatching();
+    [Selector("didAddInterface:")]
+    public void DidAddInterface(AVBInterface @interface);
+    [Selector("didRemoveInterface:")]
+    public void DidRemoveInterface(AVBInterface @interface);
+    [Selector("streamingEnabledInterfacesOnly")]
+    public bool StreamingEnabledInterfacesOnly();
+    [Selector("nextAvailableDynamicEntityID")]
+    public static ulong NextAvailableDynamicEntityID();
+    [Selector("releaseDynamicEntityID:")]
+    public static void ReleaseDynamicEntityID(ulong entityID);
+    [Selector("nextAvailableDynamicEntityModelID")]
+    public static ulong NextAvailableDynamicEntityModelID();
+    [Selector("releaseDynamicEntityModelID:")]
+    public static void ReleaseDynamicEntityModelID(ulong entityModelID);
 }
 
 #endif

@@ -137,9 +137,11 @@ public extern "C" CFStringRef kIOSurfaceSubsampling;
 
 public extern "C" CFTypeID IOSurfaceGetTypeID();
 
-[ReturnsRetained] public extern "C" IOSurfaceRef? IOSurfaceCreate(CFDictionaryRef properties);
+[ReturnsRetained]
+public extern "C" IOSurfaceRef? IOSurfaceCreate(CFDictionaryRef properties);
 
-[ReturnsRetained] public extern "C" IOSurfaceRef? IOSurfaceLookup(IOSurfaceID csid);
+[ReturnsRetained]
+public extern "C" IOSurfaceRef? IOSurfaceLookup(IOSurfaceID csid);
 
 public extern "C" IOSurfaceID IOSurfaceGetID(IOSurfaceRef buffer);
 
@@ -205,19 +207,22 @@ public extern "C" CFStringRef kIOSurfaceContentHeadroom;
 
 public extern "C" void IOSurfaceSetValue(IOSurfaceRef buffer, CFStringRef key, CFTypeRef value);
 
-[ReturnsRetained] public extern "C" CFTypeRef? IOSurfaceCopyValue(IOSurfaceRef buffer, CFStringRef key);
+[ReturnsRetained]
+public extern "C" CFTypeRef? IOSurfaceCopyValue(IOSurfaceRef buffer, CFStringRef key);
 
 public extern "C" void IOSurfaceRemoveValue(IOSurfaceRef buffer, CFStringRef key);
 
 public extern "C" void IOSurfaceSetValues(IOSurfaceRef buffer, CFDictionaryRef keysAndValues);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? IOSurfaceCopyAllValues(IOSurfaceRef buffer);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? IOSurfaceCopyAllValues(IOSurfaceRef buffer);
 
 public extern "C" void IOSurfaceRemoveAllValues(IOSurfaceRef buffer);
 
 public extern "C" mach_port_t IOSurfaceCreateMachPort(IOSurfaceRef buffer);
 
-[ReturnsRetained] public extern "C" IOSurfaceRef? IOSurfaceLookupFromMachPort(mach_port_t port);
+[ReturnsRetained]
+public extern "C" IOSurfaceRef? IOSurfaceLookupFromMachPort(mach_port_t port);
 
 public extern "C" nuint IOSurfaceGetPropertyMaximum(CFStringRef property);
 

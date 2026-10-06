@@ -36,14 +36,22 @@ public objc closure void MKLookAroundSceneRequestGetSceneWithCompletionHandlerCo
 
 public extern objc class MKLookAroundSceneRequest : NSObject
 {
-    [Selector("coordinate")] public CLLocationCoordinate2D Coordinate { get; }
-    [Selector("mapItem")] public MKMapItem? MapItem { get; }
-    [Selector("isCancelled")] public bool Cancelled { get; }
-    [Selector("isLoading")] public bool Loading { get; }
-    [Selector("initWithCoordinate:")] public Self InitWithCoordinate(CLLocationCoordinate2D coordinate);
-    [Selector("initWithMapItem:")] public Self InitWithMapItem(MKMapItem mapItem);
-    [Selector("getSceneWithCompletionHandler:")] public void GetSceneWithCompletionHandler(MKLookAroundSceneRequestGetSceneWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("cancel")] public void Cancel();
+    [Selector("coordinate")]
+    public CLLocationCoordinate2D Coordinate { get; }
+    [Selector("mapItem")]
+    public MKMapItem? MapItem { get; }
+    [Selector("isCancelled")]
+    public bool Cancelled { get; }
+    [Selector("isLoading")]
+    public bool Loading { get; }
+    [Selector("initWithCoordinate:")]
+    public Self InitWithCoordinate(CLLocationCoordinate2D coordinate);
+    [Selector("initWithMapItem:")]
+    public Self InitWithMapItem(MKMapItem mapItem);
+    [Selector("getSceneWithCompletionHandler:")]
+    public void GetSceneWithCompletionHandler(MKLookAroundSceneRequestGetSceneWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

@@ -34,9 +34,12 @@ import Standard.ObjC;
 /// macOS 15.1 and later.
 public extern objc class HKAudiogramSensitivityPointClampingRange : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("lowerBound")] public HKQuantity? LowerBound { get; }
-    [Selector("upperBound")] public HKQuantity? UpperBound { get; }
-    [Selector("clampingRangeWithLowerBound:upperBound:error:")] public static Self? ClampingRangeWithLowerBoundUpperBoundError(NSNumber? lowerBound, NSNumber? upperBound, out NSError? errorOut);
+    [Selector("lowerBound")]
+    public HKQuantity? LowerBound { get; }
+    [Selector("upperBound")]
+    public HKQuantity? UpperBound { get; }
+    [Selector("clampingRangeWithLowerBound:upperBound:error:")]
+    public static Self? ClampingRangeWithLowerBoundUpperBoundError(NSNumber? lowerBound, NSNumber? upperBound, out NSError? errorOut);
 }
 
 #endif

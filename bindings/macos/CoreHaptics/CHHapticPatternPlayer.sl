@@ -33,26 +33,40 @@ import Standard.ObjC;
 
 public objc interface CHHapticPatternPlayer : NSObjectProtocol
 {
-    [Selector("isMuted", "setIsMuted:")] bool IsMuted { get; set; }
-    [Selector("startAtTime:error:")] bool StartAtTimeError(NSTimeInterval time, out NSError? outError);
-    [Selector("stopAtTime:error:")] bool StopAtTimeError(NSTimeInterval time, out NSError? outError);
-    [Selector("sendParameters:atTime:error:")] bool SendParametersAtTimeError(NSArray parameters, NSTimeInterval time, out NSError? outError);
-    [Selector("scheduleParameterCurve:atTime:error:")] bool ScheduleParameterCurveAtTimeError(CHHapticParameterCurve parameterCurve, NSTimeInterval time, out NSError? outError);
-    [Selector("cancelAndReturnError:")] bool CancelAndReturnError(out NSError? outError);
+    [Selector("isMuted", "setIsMuted:")]
+    bool IsMuted { get; set; }
+    [Selector("startAtTime:error:")]
+    bool StartAtTimeError(NSTimeInterval time, out NSError? outError);
+    [Selector("stopAtTime:error:")]
+    bool StopAtTimeError(NSTimeInterval time, out NSError? outError);
+    [Selector("sendParameters:atTime:error:")]
+    bool SendParametersAtTimeError(NSArray parameters, NSTimeInterval time, out NSError? outError);
+    [Selector("scheduleParameterCurve:atTime:error:")]
+    bool ScheduleParameterCurveAtTimeError(CHHapticParameterCurve parameterCurve, NSTimeInterval time, out NSError? outError);
+    [Selector("cancelAndReturnError:")]
+    bool CancelAndReturnError(out NSError? outError);
 }
 
 public objc closure void CHHapticAdvancedPatternPlayerCompletionHandler(NSError? arg0);
 
 public objc interface CHHapticAdvancedPatternPlayer : CHHapticPatternPlayer
 {
-    [Selector("loopEnabled", "setLoopEnabled:")] bool LoopEnabled { get; set; }
-    [Selector("loopEnd", "setLoopEnd:")] NSTimeInterval LoopEnd { get; set; }
-    [Selector("playbackRate", "setPlaybackRate:")] float PlaybackRate { get; set; }
-    [Selector("isMuted", "setIsMuted:")] bool IsMuted { get; set; }
-    [Selector("completionHandler", "setCompletionHandler:")] CHHapticAdvancedPatternPlayerCompletionHandler CompletionHandler { get; set; }
-    [Selector("pauseAtTime:error:")] bool PauseAtTimeError(NSTimeInterval time, out NSError? outError);
-    [Selector("resumeAtTime:error:")] bool ResumeAtTimeError(NSTimeInterval time, out NSError? outError);
-    [Selector("seekToOffset:error:")] bool SeekToOffsetError(NSTimeInterval offsetTime, out NSError? outError);
+    [Selector("loopEnabled", "setLoopEnabled:")]
+    bool LoopEnabled { get; set; }
+    [Selector("loopEnd", "setLoopEnd:")]
+    NSTimeInterval LoopEnd { get; set; }
+    [Selector("playbackRate", "setPlaybackRate:")]
+    float PlaybackRate { get; set; }
+    [Selector("isMuted", "setIsMuted:")]
+    bool IsMuted { get; set; }
+    [Selector("completionHandler", "setCompletionHandler:")]
+    CHHapticAdvancedPatternPlayerCompletionHandler CompletionHandler { get; set; }
+    [Selector("pauseAtTime:error:")]
+    bool PauseAtTimeError(NSTimeInterval time, out NSError? outError);
+    [Selector("resumeAtTime:error:")]
+    bool ResumeAtTimeError(NSTimeInterval time, out NSError? outError);
+    [Selector("seekToOffset:error:")]
+    bool SeekToOffsetError(NSTimeInterval offsetTime, out NSError? outError);
 }
 
 #endif

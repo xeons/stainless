@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class SCNPhysicsContact : NSObject
 {
-    [Selector("nodeA")] public SCNNode NodeA { get; }
-    [Selector("nodeB")] public SCNNode NodeB { get; }
-    [Selector("contactPoint")] public SCNVector3 ContactPoint { get; }
-    [Selector("contactNormal")] public SCNVector3 ContactNormal { get; }
-    [Selector("collisionImpulse")] public CGFloat CollisionImpulse { get; }
-    [Selector("penetrationDistance")] public CGFloat PenetrationDistance { get; }
-    [Selector("sweepTestFraction")] public CGFloat SweepTestFraction { get; }
+    [Selector("nodeA")]
+    public SCNNode NodeA { get; }
+    [Selector("nodeB")]
+    public SCNNode NodeB { get; }
+    [Selector("contactPoint")]
+    public SCNVector3 ContactPoint { get; }
+    [Selector("contactNormal")]
+    public SCNVector3 ContactNormal { get; }
+    [Selector("collisionImpulse")]
+    public CGFloat CollisionImpulse { get; }
+    [Selector("penetrationDistance")]
+    public CGFloat PenetrationDistance { get; }
+    [Selector("sweepTestFraction")]
+    public CGFloat SweepTestFraction { get; }
 }
 
 #endif

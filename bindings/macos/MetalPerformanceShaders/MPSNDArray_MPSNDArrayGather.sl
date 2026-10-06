@@ -34,7 +34,8 @@ public extern objc class MPSNDArrayGatherGradientState : MPSNDArrayGradientState
 
 public extern objc class MPSNDArrayGather : MPSNDArrayBinaryKernel
 {
-    [Selector("axis", "setAxis:")] public NSUInteger Axis { get; set; }
+    [Selector("axis", "setAxis:")]
+    public NSUInteger Axis { get; set; }
 }
 
 public extern objc class MPSNDArrayGatherGradient : MPSNDArrayBinaryPrimaryGradientKernel { }

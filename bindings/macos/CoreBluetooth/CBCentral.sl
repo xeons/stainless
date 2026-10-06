@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class CBCentral : CBPeer
 {
-    [Selector("maximumUpdateValueLength")] public NSUInteger MaximumUpdateValueLength { get; }
+    [Selector("maximumUpdateValueLength")]
+    public NSUInteger MaximumUpdateValueLength { get; }
 }
 
 #endif

@@ -49,14 +49,22 @@ public objc closure void ACAccountStoreCredentialRenewalHandler(ACAccountCredent
 /// Deprecated in macOS 12.0.
 public extern objc class ACAccountStore : NSObject
 {
-    [Selector("accounts")] public NSArray? Accounts { get; }
-    [Selector("accountWithIdentifier:")] public ACAccount? AccountWithIdentifier(NSString? identifier);
-    [Selector("accountTypeWithAccountTypeIdentifier:")] public ACAccountType? AccountTypeWithAccountTypeIdentifier(NSString? typeIdentifier);
-    [Selector("accountsWithAccountType:")] public NSArray? AccountsWithAccountType(ACAccountType? accountType);
-    [Selector("saveAccount:withCompletionHandler:")] public void SaveAccountWithCompletionHandler(ACAccount? account, ACAccountStoreSaveCompletionHandler? completionHandler);
-    [Selector("requestAccessToAccountsWithType:options:completion:")] public void RequestAccessToAccountsWithTypeOptionsCompletion(ACAccountType? accountType, NSDictionary? options, ACAccountStoreRequestAccessCompletionHandler? completion);
-    [Selector("renewCredentialsForAccount:completion:")] public void RenewCredentialsForAccountCompletion(ACAccount? account, ACAccountStoreCredentialRenewalHandler? completionHandler);
-    [Selector("removeAccount:withCompletionHandler:")] public void RemoveAccountWithCompletionHandler(ACAccount? account, ACAccountStoreRemoveCompletionHandler? completionHandler);
+    [Selector("accounts")]
+    public NSArray? Accounts { get; }
+    [Selector("accountWithIdentifier:")]
+    public ACAccount? AccountWithIdentifier(NSString? identifier);
+    [Selector("accountTypeWithAccountTypeIdentifier:")]
+    public ACAccountType? AccountTypeWithAccountTypeIdentifier(NSString? typeIdentifier);
+    [Selector("accountsWithAccountType:")]
+    public NSArray? AccountsWithAccountType(ACAccountType? accountType);
+    [Selector("saveAccount:withCompletionHandler:")]
+    public void SaveAccountWithCompletionHandler(ACAccount? account, ACAccountStoreSaveCompletionHandler? completionHandler);
+    [Selector("requestAccessToAccountsWithType:options:completion:")]
+    public void RequestAccessToAccountsWithTypeOptionsCompletion(ACAccountType? accountType, NSDictionary? options, ACAccountStoreRequestAccessCompletionHandler? completion);
+    [Selector("renewCredentialsForAccount:completion:")]
+    public void RenewCredentialsForAccountCompletion(ACAccount? account, ACAccountStoreCredentialRenewalHandler? completionHandler);
+    [Selector("removeAccount:withCompletionHandler:")]
+    public void RemoveAccountWithCompletionHandler(ACAccount? account, ACAccountStoreRemoveCompletionHandler? completionHandler);
 }
 
 /// Deprecated in macOS 11.0.

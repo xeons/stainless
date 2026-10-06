@@ -34,10 +34,14 @@ import Standard.ObjC;
 
 public extern objc class AVCaptionGroup : NSObject
 {
-    [Selector("timeRange")] public CMTimeRange TimeRange { get; }
-    [Selector("captions")] public NSArray Captions { get; }
-    [Selector("initWithCaptions:timeRange:")] public Self InitWithCaptionsTimeRange(NSArray captions, CMTimeRange timeRange);
-    [Selector("initWithTimeRange:")] public Self InitWithTimeRange(CMTimeRange timeRange);
+    [Selector("timeRange")]
+    public CMTimeRange TimeRange { get; }
+    [Selector("captions")]
+    public NSArray Captions { get; }
+    [Selector("initWithCaptions:timeRange:")]
+    public Self InitWithCaptionsTimeRange(NSArray captions, CMTimeRange timeRange);
+    [Selector("initWithTimeRange:")]
+    public Self InitWithTimeRange(CMTimeRange timeRange);
 }
 
 #endif

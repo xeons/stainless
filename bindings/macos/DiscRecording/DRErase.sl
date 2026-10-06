@@ -33,20 +33,29 @@ import Standard.ObjC;
 
 public extern objc class DRErase : NSObject
 {
-    [Selector("eraseForDevice:")] public static DRErase? EraseForDevice(DRDevice? device);
-    [Selector("initWithDevice:")] public AnyObject? InitWithDevice(DRDevice? device);
-    [Selector("start")] public void Start();
-    [Selector("status")] public NSDictionary? Status();
-    [Selector("properties")] public NSDictionary? Properties();
-    [Selector("setProperties:")] public void SetProperties(NSDictionary? properties);
-    [Selector("device")] public DRDevice? Device();
+    [Selector("eraseForDevice:")]
+    public static DRErase? EraseForDevice(DRDevice? device);
+    [Selector("initWithDevice:")]
+    public AnyObject? InitWithDevice(DRDevice? device);
+    [Selector("start")]
+    public void Start();
+    [Selector("status")]
+    public NSDictionary? Status();
+    [Selector("properties")]
+    public NSDictionary? Properties();
+    [Selector("setProperties:")]
+    public void SetProperties(NSDictionary? properties);
+    [Selector("device")]
+    public DRDevice? Device();
 }
 
 /// PropertyConvenienceMethods, a category of DRErase.
 public extern objc class DRErase
 {
-    [Selector("eraseType")] public NSString? EraseType();
-    [Selector("setEraseType:")] public void SetEraseType(NSString? type);
+    [Selector("eraseType")]
+    public NSString? EraseType();
+    [Selector("setEraseType:")]
+    public void SetEraseType(NSString? type);
 }
 
 public extern "C" NSString? DREraseTypeKey;

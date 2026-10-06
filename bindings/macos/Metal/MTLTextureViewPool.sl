@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public objc interface MTLTextureViewPool : MTLResourceViewPool
 {
-    [Selector("setTextureView:atIndex:")] MTLResourceID SetTextureViewAtIndex(MTLTexture texture, NSUInteger index);
-    [Selector("setTextureView:descriptor:atIndex:")] MTLResourceID SetTextureViewDescriptorAtIndex(MTLTexture texture, MTLTextureViewDescriptor descriptor, NSUInteger index);
-    [Selector("setTextureViewFromBuffer:descriptor:offset:bytesPerRow:atIndex:")] MTLResourceID SetTextureViewFromBufferDescriptorOffsetBytesPerRowAtIndex(MTLBuffer buffer, MTLTextureDescriptor descriptor, NSUInteger offset, NSUInteger bytesPerRow, NSUInteger index);
+    [Selector("setTextureView:atIndex:")]
+    MTLResourceID SetTextureViewAtIndex(MTLTexture texture, NSUInteger index);
+    [Selector("setTextureView:descriptor:atIndex:")]
+    MTLResourceID SetTextureViewDescriptorAtIndex(MTLTexture texture, MTLTextureViewDescriptor descriptor, NSUInteger index);
+    [Selector("setTextureViewFromBuffer:descriptor:offset:bytesPerRow:atIndex:")]
+    MTLResourceID SetTextureViewFromBufferDescriptorOffsetBytesPerRowAtIndex(MTLBuffer buffer, MTLTextureDescriptor descriptor, NSUInteger offset, NSUInteger bytesPerRow, NSUInteger index);
 }
 
 #endif

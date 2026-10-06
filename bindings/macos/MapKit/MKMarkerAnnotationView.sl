@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class MKMarkerAnnotationView : MKAnnotationView
 {
-    [Selector("titleVisibility", "setTitleVisibility:")] public MKFeatureVisibility TitleVisibility { get; set; }
-    [Selector("subtitleVisibility", "setSubtitleVisibility:")] public MKFeatureVisibility SubtitleVisibility { get; set; }
-    [Selector("markerTintColor", "setMarkerTintColor:")] public NSColor? MarkerTintColor { get; set; }
-    [Selector("glyphTintColor", "setGlyphTintColor:")] public NSColor? GlyphTintColor { get; set; }
-    [Selector("glyphText", "setGlyphText:")] public NSString? GlyphText { get; set; }
-    [Selector("glyphImage", "setGlyphImage:")] public NSImage? GlyphImage { get; set; }
-    [Selector("selectedGlyphImage", "setSelectedGlyphImage:")] public NSImage? SelectedGlyphImage { get; set; }
-    [Selector("animatesWhenAdded", "setAnimatesWhenAdded:")] public bool AnimatesWhenAdded { get; set; }
+    [Selector("titleVisibility", "setTitleVisibility:")]
+    public MKFeatureVisibility TitleVisibility { get; set; }
+    [Selector("subtitleVisibility", "setSubtitleVisibility:")]
+    public MKFeatureVisibility SubtitleVisibility { get; set; }
+    [Selector("markerTintColor", "setMarkerTintColor:")]
+    public NSColor? MarkerTintColor { get; set; }
+    [Selector("glyphTintColor", "setGlyphTintColor:")]
+    public NSColor? GlyphTintColor { get; set; }
+    [Selector("glyphText", "setGlyphText:")]
+    public NSString? GlyphText { get; set; }
+    [Selector("glyphImage", "setGlyphImage:")]
+    public NSImage? GlyphImage { get; set; }
+    [Selector("selectedGlyphImage", "setSelectedGlyphImage:")]
+    public NSImage? SelectedGlyphImage { get; set; }
+    [Selector("animatesWhenAdded", "setAnimatesWhenAdded:")]
+    public bool AnimatesWhenAdded { get; set; }
 }
 
 #endif

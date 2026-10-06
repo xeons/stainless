@@ -33,21 +33,36 @@ import Standard.ObjC;
 
 public extern objc class NSSearchFieldCell : NSTextFieldCell
 {
-    [Selector("searchButtonCell", "setSearchButtonCell:")] public NSButtonCell? SearchButtonCell { get; set; }
-    [Selector("cancelButtonCell", "setCancelButtonCell:")] public NSButtonCell? CancelButtonCell { get; set; }
-    [Selector("searchMenuTemplate", "setSearchMenuTemplate:")] public NSMenu? SearchMenuTemplate { get; set; }
-    [Selector("sendsWholeSearchString", "setSendsWholeSearchString:")] public bool SendsWholeSearchString { get; set; }
-    [Selector("maximumRecents", "setMaximumRecents:")] public NSInteger MaximumRecents { get; set; }
-    [Selector("recentSearches", "setRecentSearches:")] public NSArray? RecentSearches { get; set; }
-    [Selector("recentsAutosaveName", "setRecentsAutosaveName:")] public NSSearchFieldRecentsAutosaveName? RecentsAutosaveName { get; set; }
-    [Selector("sendsSearchStringImmediately", "setSendsSearchStringImmediately:")] public bool SendsSearchStringImmediately { get; set; }
-    [Selector("initTextCell:")] public Self InitTextCell(NSString string);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("resetSearchButtonCell")] public void ResetSearchButtonCell();
-    [Selector("resetCancelButtonCell")] public void ResetCancelButtonCell();
-    [Selector("searchTextRectForBounds:")] public NSRect SearchTextRectForBounds(NSRect rect);
-    [Selector("searchButtonRectForBounds:")] public NSRect SearchButtonRectForBounds(NSRect rect);
-    [Selector("cancelButtonRectForBounds:")] public NSRect CancelButtonRectForBounds(NSRect rect);
+    [Selector("searchButtonCell", "setSearchButtonCell:")]
+    public NSButtonCell? SearchButtonCell { get; set; }
+    [Selector("cancelButtonCell", "setCancelButtonCell:")]
+    public NSButtonCell? CancelButtonCell { get; set; }
+    [Selector("searchMenuTemplate", "setSearchMenuTemplate:")]
+    public NSMenu? SearchMenuTemplate { get; set; }
+    [Selector("sendsWholeSearchString", "setSendsWholeSearchString:")]
+    public bool SendsWholeSearchString { get; set; }
+    [Selector("maximumRecents", "setMaximumRecents:")]
+    public NSInteger MaximumRecents { get; set; }
+    [Selector("recentSearches", "setRecentSearches:")]
+    public NSArray? RecentSearches { get; set; }
+    [Selector("recentsAutosaveName", "setRecentsAutosaveName:")]
+    public NSSearchFieldRecentsAutosaveName? RecentsAutosaveName { get; set; }
+    [Selector("sendsSearchStringImmediately", "setSendsSearchStringImmediately:")]
+    public bool SendsSearchStringImmediately { get; set; }
+    [Selector("initTextCell:")]
+    public Self InitTextCell(NSString string);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("resetSearchButtonCell")]
+    public void ResetSearchButtonCell();
+    [Selector("resetCancelButtonCell")]
+    public void ResetCancelButtonCell();
+    [Selector("searchTextRectForBounds:")]
+    public NSRect SearchTextRectForBounds(NSRect rect);
+    [Selector("searchButtonRectForBounds:")]
+    public NSRect SearchButtonRectForBounds(NSRect rect);
+    [Selector("cancelButtonRectForBounds:")]
+    public NSRect CancelButtonRectForBounds(NSRect rect);
 }
 
 #endif

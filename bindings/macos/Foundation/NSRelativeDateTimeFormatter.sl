@@ -45,15 +45,24 @@ public enum NSRelativeDateTimeFormatterUnitsStyle : long
 
 public extern objc class NSRelativeDateTimeFormatter : NSFormatter
 {
-    [Selector("dateTimeStyle", "setDateTimeStyle:")] public NSRelativeDateTimeFormatterStyle DateTimeStyle { get; set; }
-    [Selector("unitsStyle", "setUnitsStyle:")] public NSRelativeDateTimeFormatterUnitsStyle UnitsStyle { get; set; }
-    [Selector("formattingContext", "setFormattingContext:")] public NSFormattingContext FormattingContext { get; set; }
-    [Selector("calendar", "setCalendar:")] public NSCalendar? Calendar { get; set; }
-    [Selector("locale", "setLocale:")] public NSLocale? Locale { get; set; }
-    [Selector("localizedStringFromDateComponents:")] public NSString LocalizedStringFromDateComponents(NSDateComponents dateComponents);
-    [Selector("localizedStringFromTimeInterval:")] public NSString LocalizedStringFromTimeInterval(NSTimeInterval timeInterval);
-    [Selector("localizedStringForDate:relativeToDate:")] public NSString LocalizedStringForDateRelativeToDate(NSDate date, NSDate referenceDate);
-    [Selector("stringForObjectValue:")] public NSString? StringForObjectValue(AnyObject? obj);
+    [Selector("dateTimeStyle", "setDateTimeStyle:")]
+    public NSRelativeDateTimeFormatterStyle DateTimeStyle { get; set; }
+    [Selector("unitsStyle", "setUnitsStyle:")]
+    public NSRelativeDateTimeFormatterUnitsStyle UnitsStyle { get; set; }
+    [Selector("formattingContext", "setFormattingContext:")]
+    public NSFormattingContext FormattingContext { get; set; }
+    [Selector("calendar", "setCalendar:")]
+    public NSCalendar? Calendar { get; set; }
+    [Selector("locale", "setLocale:")]
+    public NSLocale? Locale { get; set; }
+    [Selector("localizedStringFromDateComponents:")]
+    public NSString LocalizedStringFromDateComponents(NSDateComponents dateComponents);
+    [Selector("localizedStringFromTimeInterval:")]
+    public NSString LocalizedStringFromTimeInterval(NSTimeInterval timeInterval);
+    [Selector("localizedStringForDate:relativeToDate:")]
+    public NSString LocalizedStringForDateRelativeToDate(NSDate date, NSDate referenceDate);
+    [Selector("stringForObjectValue:")]
+    public NSString? StringForObjectValue(AnyObject? obj);
 }
 
 #endif

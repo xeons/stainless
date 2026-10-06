@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class TKTokenWatcherTokenInfo : NSObject
 {
-    [Selector("tokenID")] public NSString TokenID { get; }
-    [Selector("slotName")] public NSString? SlotName { get; }
-    [Selector("driverName")] public NSString? DriverName { get; }
+    [Selector("tokenID")]
+    public NSString TokenID { get; }
+    [Selector("slotName")]
+    public NSString? SlotName { get; }
+    [Selector("driverName")]
+    public NSString? DriverName { get; }
 }
 
 public objc closure void TKTokenWatcherInitWithInsertionHandlerInsertionHandlerBlock(NSString arg0);
@@ -46,13 +49,19 @@ public objc closure void TKTokenWatcherAddRemovalHandlerForTokenIDRemovalHandler
 
 public extern objc class TKTokenWatcher : NSObject
 {
-    [Selector("tokenIDs")] public NSArray TokenIDs { get; }
-    [Selector("init")] public Self Init();
+    [Selector("tokenIDs")]
+    public NSArray TokenIDs { get; }
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 10.13.
-    [Selector("initWithInsertionHandler:")] public Self InitWithInsertionHandler(TKTokenWatcherInitWithInsertionHandlerInsertionHandlerBlock insertionHandler);
-    [Selector("setInsertionHandler:")] public void SetInsertionHandler(TKTokenWatcherSetInsertionHandlerInsertionHandlerBlock insertionHandler);
-    [Selector("addRemovalHandler:forTokenID:")] public void AddRemovalHandlerForTokenID(TKTokenWatcherAddRemovalHandlerForTokenIDRemovalHandlerBlock removalHandler, NSString tokenID);
-    [Selector("tokenInfoForTokenID:")] public TKTokenWatcherTokenInfo? TokenInfoForTokenID(NSString tokenID);
+    [Selector("initWithInsertionHandler:")]
+    public Self InitWithInsertionHandler(TKTokenWatcherInitWithInsertionHandlerInsertionHandlerBlock insertionHandler);
+    [Selector("setInsertionHandler:")]
+    public void SetInsertionHandler(TKTokenWatcherSetInsertionHandlerInsertionHandlerBlock insertionHandler);
+    [Selector("addRemovalHandler:forTokenID:")]
+    public void AddRemovalHandlerForTokenID(TKTokenWatcherAddRemovalHandlerForTokenIDRemovalHandlerBlock removalHandler, NSString tokenID);
+    [Selector("tokenInfoForTokenID:")]
+    public TKTokenWatcherTokenInfo? TokenInfoForTokenID(NSString tokenID);
 }
 
 #endif

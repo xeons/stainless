@@ -34,9 +34,12 @@ import Standard.ObjC;
 
 public extern objc class NSGlyphInfo : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("glyphID")] public CGGlyph GlyphID { get; }
-    [Selector("baseString")] public NSString BaseString { get; }
-    [Selector("glyphInfoWithCGGlyph:forFont:baseString:")] public static NSGlyphInfo? GlyphInfoWithCGGlyphForFontBaseString(CGGlyph glyph, NSFont font, NSString string);
+    [Selector("glyphID")]
+    public CGGlyph GlyphID { get; }
+    [Selector("baseString")]
+    public NSString BaseString { get; }
+    [Selector("glyphInfoWithCGGlyph:forFont:baseString:")]
+    public static NSGlyphInfo? GlyphInfoWithCGGlyphForFontBaseString(CGGlyph glyph, NSFont font, NSString string);
 }
 
 public enum NSCharacterCollection : ulong
@@ -52,12 +55,18 @@ public enum NSCharacterCollection : ulong
 /// NSGlyphInfo_Deprecated, a category of NSGlyphInfo.
 public extern objc class NSGlyphInfo
 {
-    [Selector("glyphName")] public NSString? GlyphName { get; }
-    [Selector("characterIdentifier")] public NSUInteger CharacterIdentifier { get; }
-    [Selector("characterCollection")] public NSCharacterCollection CharacterCollection { get; }
-    [Selector("glyphInfoWithGlyphName:forFont:baseString:")] public static NSGlyphInfo? GlyphInfoWithGlyphNameForFontBaseString(NSString glyphName, NSFont font, NSString string);
-    [Selector("glyphInfoWithGlyph:forFont:baseString:")] public static NSGlyphInfo? GlyphInfoWithGlyphForFontBaseString(NSGlyph glyph, NSFont font, NSString string);
-    [Selector("glyphInfoWithCharacterIdentifier:collection:baseString:")] public static NSGlyphInfo? GlyphInfoWithCharacterIdentifierCollectionBaseString(NSUInteger cid, NSCharacterCollection characterCollection, NSString string);
+    [Selector("glyphName")]
+    public NSString? GlyphName { get; }
+    [Selector("characterIdentifier")]
+    public NSUInteger CharacterIdentifier { get; }
+    [Selector("characterCollection")]
+    public NSCharacterCollection CharacterCollection { get; }
+    [Selector("glyphInfoWithGlyphName:forFont:baseString:")]
+    public static NSGlyphInfo? GlyphInfoWithGlyphNameForFontBaseString(NSString glyphName, NSFont font, NSString string);
+    [Selector("glyphInfoWithGlyph:forFont:baseString:")]
+    public static NSGlyphInfo? GlyphInfoWithGlyphForFontBaseString(NSGlyph glyph, NSFont font, NSString string);
+    [Selector("glyphInfoWithCharacterIdentifier:collection:baseString:")]
+    public static NSGlyphInfo? GlyphInfoWithCharacterIdentifierCollectionBaseString(NSUInteger cid, NSCharacterCollection characterCollection, NSString string);
 }
 
 #endif

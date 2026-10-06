@@ -32,16 +32,26 @@ import Standard.ObjC;
 
 public extern objc class NSButtonTouchBarItem : NSTouchBarItem
 {
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("bezelColor", "setBezelColor:")] public NSColor? BezelColor { get; set; }
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
-    [Selector("action", "setAction:")] public Selector Action { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("customizationLabel", "setCustomizationLabel:")] public NSString? CustomizationLabel { get; set; }
-    [Selector("buttonTouchBarItemWithIdentifier:title:target:action:")] public static Self ButtonTouchBarItemWithIdentifierTitleTargetAction(NSTouchBarItemIdentifier identifier, NSString title, AnyObject? target, Selector action);
-    [Selector("buttonTouchBarItemWithIdentifier:image:target:action:")] public static Self ButtonTouchBarItemWithIdentifierImageTargetAction(NSTouchBarItemIdentifier identifier, NSImage image, AnyObject? target, Selector action);
-    [Selector("buttonTouchBarItemWithIdentifier:title:image:target:action:")] public static Self ButtonTouchBarItemWithIdentifierTitleImageTargetAction(NSTouchBarItemIdentifier identifier, NSString title, NSImage image, AnyObject? target, Selector action);
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("bezelColor", "setBezelColor:")]
+    public NSColor? BezelColor { get; set; }
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
+    [Selector("action", "setAction:")]
+    public Selector Action { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("customizationLabel", "setCustomizationLabel:")]
+    public NSString? CustomizationLabel { get; set; }
+    [Selector("buttonTouchBarItemWithIdentifier:title:target:action:")]
+    public static Self ButtonTouchBarItemWithIdentifierTitleTargetAction(NSTouchBarItemIdentifier identifier, NSString title, AnyObject? target, Selector action);
+    [Selector("buttonTouchBarItemWithIdentifier:image:target:action:")]
+    public static Self ButtonTouchBarItemWithIdentifierImageTargetAction(NSTouchBarItemIdentifier identifier, NSImage image, AnyObject? target, Selector action);
+    [Selector("buttonTouchBarItemWithIdentifier:title:image:target:action:")]
+    public static Self ButtonTouchBarItemWithIdentifierTitleImageTargetAction(NSTouchBarItemIdentifier identifier, NSString title, NSImage image, AnyObject? target, Selector action);
 }
 
 #endif

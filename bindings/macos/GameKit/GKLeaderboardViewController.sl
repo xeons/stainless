@@ -36,15 +36,19 @@ public extern objc class GKLeaderboardViewController : GKGameCenterViewControlle
 
 public extern objc class GKLeaderboardViewController
 {
-    [Selector("timeScope", "setTimeScope:")] public GKLeaderboardTimeScope TimeScope { get; set; }
-    [Selector("category", "setCategory:")] public NSString? Category { get; set; }
-    [Selector("leaderboardDelegate", "setLeaderboardDelegate:")] public GKLeaderboardViewControllerDelegate? LeaderboardDelegate { get; set; }
+    [Selector("timeScope", "setTimeScope:")]
+    public GKLeaderboardTimeScope TimeScope { get; set; }
+    [Selector("category", "setCategory:")]
+    public NSString? Category { get; set; }
+    [Selector("leaderboardDelegate", "setLeaderboardDelegate:")]
+    public GKLeaderboardViewControllerDelegate? LeaderboardDelegate { get; set; }
 }
 
 /// Deprecated in macOS 10.10.
 public objc interface GKLeaderboardViewControllerDelegate : NSObjectProtocol
 {
-    [Selector("leaderboardViewControllerDidFinish:")] void LeaderboardViewControllerDidFinish(GKLeaderboardViewController? viewController);
+    [Selector("leaderboardViewControllerDidFinish:")]
+    void LeaderboardViewControllerDidFinish(GKLeaderboardViewController? viewController);
 }
 
 #endif

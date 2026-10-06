@@ -33,26 +33,41 @@ import Standard.ObjC;
 
 public extern objc class NSPersistentStoreDescription : NSObject, NSCopying
 {
-    [Selector("type", "setType:")] public NSString Type { get; set; }
-    [Selector("configuration", "setConfiguration:")] public NSString? Configuration { get; set; }
-    [Selector("URL", "setURL:")] public NSURL? URL { get; set; }
-    [Selector("options")] public NSDictionary Options { get; }
-    [Selector("isReadOnly", "setReadOnly:")] public bool ReadOnly { get; set; }
-    [Selector("timeout", "setTimeout:")] public NSTimeInterval Timeout { get; set; }
-    [Selector("sqlitePragmas")] public NSDictionary SqlitePragmas { get; }
-    [Selector("shouldAddStoreAsynchronously", "setShouldAddStoreAsynchronously:")] public bool ShouldAddStoreAsynchronously { get; set; }
-    [Selector("shouldMigrateStoreAutomatically", "setShouldMigrateStoreAutomatically:")] public bool ShouldMigrateStoreAutomatically { get; set; }
-    [Selector("shouldInferMappingModelAutomatically", "setShouldInferMappingModelAutomatically:")] public bool ShouldInferMappingModelAutomatically { get; set; }
-    [Selector("persistentStoreDescriptionWithURL:")] public static Self PersistentStoreDescriptionWithURL(NSURL URL);
-    [Selector("setOption:forKey:")] public void SetOptionForKey(NSObject? option, NSString key);
-    [Selector("setValue:forPragmaNamed:")] public void SetValueForPragmaNamed(NSObject? value, NSString name);
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL url);
+    [Selector("type", "setType:")]
+    public NSString Type { get; set; }
+    [Selector("configuration", "setConfiguration:")]
+    public NSString? Configuration { get; set; }
+    [Selector("URL", "setURL:")]
+    public NSURL? URL { get; set; }
+    [Selector("options")]
+    public NSDictionary Options { get; }
+    [Selector("isReadOnly", "setReadOnly:")]
+    public bool ReadOnly { get; set; }
+    [Selector("timeout", "setTimeout:")]
+    public NSTimeInterval Timeout { get; set; }
+    [Selector("sqlitePragmas")]
+    public NSDictionary SqlitePragmas { get; }
+    [Selector("shouldAddStoreAsynchronously", "setShouldAddStoreAsynchronously:")]
+    public bool ShouldAddStoreAsynchronously { get; set; }
+    [Selector("shouldMigrateStoreAutomatically", "setShouldMigrateStoreAutomatically:")]
+    public bool ShouldMigrateStoreAutomatically { get; set; }
+    [Selector("shouldInferMappingModelAutomatically", "setShouldInferMappingModelAutomatically:")]
+    public bool ShouldInferMappingModelAutomatically { get; set; }
+    [Selector("persistentStoreDescriptionWithURL:")]
+    public static Self PersistentStoreDescriptionWithURL(NSURL URL);
+    [Selector("setOption:forKey:")]
+    public void SetOptionForKey(NSObject? option, NSString key);
+    [Selector("setValue:forPragmaNamed:")]
+    public void SetValueForPragmaNamed(NSObject? value, NSString name);
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL url);
 }
 
 /// NSPersistentCloudKitContainerAdditions, a category of NSPersistentStoreDescription.
 public extern objc class NSPersistentStoreDescription
 {
-    [Selector("cloudKitContainerOptions", "setCloudKitContainerOptions:")] public NSPersistentCloudKitContainerOptions? CloudKitContainerOptions { get; set; }
+    [Selector("cloudKitContainerOptions", "setCloudKitContainerOptions:")]
+    public NSPersistentCloudKitContainerOptions? CloudKitContainerOptions { get; set; }
 }
 
 #endif

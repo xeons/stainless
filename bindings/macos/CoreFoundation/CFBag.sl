@@ -66,13 +66,17 @@ public extern objc class CFMutableBagRef : CFBagRef { }
 
 public extern "C" CFTypeID CFBagGetTypeID();
 
-[ReturnsRetained] public extern "C" CFBagRef? CFBagCreate(CFAllocatorRef? allocator, void** values, CFIndex numValues, CFBagCallBacks* callBacks);
+[ReturnsRetained]
+public extern "C" CFBagRef? CFBagCreate(CFAllocatorRef? allocator, void** values, CFIndex numValues, CFBagCallBacks* callBacks);
 
-[ReturnsRetained] public extern "C" CFBagRef? CFBagCreateCopy(CFAllocatorRef? allocator, CFBagRef? theBag);
+[ReturnsRetained]
+public extern "C" CFBagRef? CFBagCreateCopy(CFAllocatorRef? allocator, CFBagRef? theBag);
 
-[ReturnsRetained] public extern "C" CFMutableBagRef? CFBagCreateMutable(CFAllocatorRef? allocator, CFIndex capacity, CFBagCallBacks* callBacks);
+[ReturnsRetained]
+public extern "C" CFMutableBagRef? CFBagCreateMutable(CFAllocatorRef? allocator, CFIndex capacity, CFBagCallBacks* callBacks);
 
-[ReturnsRetained] public extern "C" CFMutableBagRef? CFBagCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFBagRef? theBag);
+[ReturnsRetained]
+public extern "C" CFMutableBagRef? CFBagCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFBagRef? theBag);
 
 public extern "C" CFIndex CFBagGetCount(CFBagRef? theBag);
 

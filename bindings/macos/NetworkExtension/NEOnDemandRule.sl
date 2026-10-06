@@ -48,12 +48,18 @@ public enum NEOnDemandRuleInterfaceType : long
 
 public extern objc class NEOnDemandRule : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("action")] public NEOnDemandRuleAction Action { get; }
-    [Selector("DNSSearchDomainMatch", "setDNSSearchDomainMatch:")] public NSArray? DNSSearchDomainMatch { get; set; }
-    [Selector("DNSServerAddressMatch", "setDNSServerAddressMatch:")] public NSArray? DNSServerAddressMatch { get; set; }
-    [Selector("interfaceTypeMatch", "setInterfaceTypeMatch:")] public NEOnDemandRuleInterfaceType InterfaceTypeMatch { get; set; }
-    [Selector("SSIDMatch", "setSSIDMatch:")] public NSArray? SSIDMatch { get; set; }
-    [Selector("probeURL", "setProbeURL:")] public NSURL? ProbeURL { get; set; }
+    [Selector("action")]
+    public NEOnDemandRuleAction Action { get; }
+    [Selector("DNSSearchDomainMatch", "setDNSSearchDomainMatch:")]
+    public NSArray? DNSSearchDomainMatch { get; set; }
+    [Selector("DNSServerAddressMatch", "setDNSServerAddressMatch:")]
+    public NSArray? DNSServerAddressMatch { get; set; }
+    [Selector("interfaceTypeMatch", "setInterfaceTypeMatch:")]
+    public NEOnDemandRuleInterfaceType InterfaceTypeMatch { get; set; }
+    [Selector("SSIDMatch", "setSSIDMatch:")]
+    public NSArray? SSIDMatch { get; set; }
+    [Selector("probeURL", "setProbeURL:")]
+    public NSURL? ProbeURL { get; set; }
 }
 
 public extern objc class NEOnDemandRuleConnect : NEOnDemandRule { }
@@ -64,7 +70,8 @@ public extern objc class NEOnDemandRuleIgnore : NEOnDemandRule { }
 
 public extern objc class NEOnDemandRuleEvaluateConnection : NEOnDemandRule
 {
-    [Selector("connectionRules", "setConnectionRules:")] public NSArray? ConnectionRules { get; set; }
+    [Selector("connectionRules", "setConnectionRules:")]
+    public NSArray? ConnectionRules { get; set; }
 }
 
 public enum NEEvaluateConnectionRuleAction : long
@@ -75,11 +82,16 @@ public enum NEEvaluateConnectionRuleAction : long
 
 public extern objc class NEEvaluateConnectionRule : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("action")] public NEEvaluateConnectionRuleAction Action { get; }
-    [Selector("matchDomains")] public NSArray? MatchDomains { get; }
-    [Selector("useDNSServers", "setUseDNSServers:")] public NSArray? UseDNSServers { get; set; }
-    [Selector("probeURL", "setProbeURL:")] public NSURL? ProbeURL { get; set; }
-    [Selector("initWithMatchDomains:andAction:")] public Self InitWithMatchDomainsAndAction(NSArray domains, NEEvaluateConnectionRuleAction action);
+    [Selector("action")]
+    public NEEvaluateConnectionRuleAction Action { get; }
+    [Selector("matchDomains")]
+    public NSArray? MatchDomains { get; }
+    [Selector("useDNSServers", "setUseDNSServers:")]
+    public NSArray? UseDNSServers { get; set; }
+    [Selector("probeURL", "setProbeURL:")]
+    public NSURL? ProbeURL { get; set; }
+    [Selector("initWithMatchDomains:andAction:")]
+    public Self InitWithMatchDomainsAndAction(NSArray domains, NEEvaluateConnectionRuleAction action);
 }
 
 #endif

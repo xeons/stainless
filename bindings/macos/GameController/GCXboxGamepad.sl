@@ -31,11 +31,16 @@ import Standard.ObjC;
 
 public extern objc class GCXboxGamepad : GCExtendedGamepad
 {
-    [Selector("paddleButton1")] public GCControllerButtonInput? PaddleButton1 { get; }
-    [Selector("paddleButton2")] public GCControllerButtonInput? PaddleButton2 { get; }
-    [Selector("paddleButton3")] public GCControllerButtonInput? PaddleButton3 { get; }
-    [Selector("paddleButton4")] public GCControllerButtonInput? PaddleButton4 { get; }
-    [Selector("buttonShare")] public GCControllerButtonInput? ButtonShare { get; }
+    [Selector("paddleButton1")]
+    public GCControllerButtonInput? PaddleButton1 { get; }
+    [Selector("paddleButton2")]
+    public GCControllerButtonInput? PaddleButton2 { get; }
+    [Selector("paddleButton3")]
+    public GCControllerButtonInput? PaddleButton3 { get; }
+    [Selector("paddleButton4")]
+    public GCControllerButtonInput? PaddleButton4 { get; }
+    [Selector("buttonShare")]
+    public GCControllerButtonInput? ButtonShare { get; }
 }
 
 #endif

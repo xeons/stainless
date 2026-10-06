@@ -34,11 +34,16 @@ import Standard.ObjC;
 /// macOS 15.2 and later.
 public extern objc class NSWritingToolsCoordinatorContext : NSObject
 {
-    [Selector("attributedString")] public NSAttributedString AttributedString { get; }
-    [Selector("range")] public NSRange Range { get; }
-    [Selector("identifier")] public NSUUID Identifier { get; }
-    [Selector("resolvedRange")] public NSRange ResolvedRange { get; }
-    [Selector("initWithAttributedString:range:")] public Self InitWithAttributedStringRange(NSAttributedString attributedString, NSRange range);
+    [Selector("attributedString")]
+    public NSAttributedString AttributedString { get; }
+    [Selector("range")]
+    public NSRange Range { get; }
+    [Selector("identifier")]
+    public NSUUID Identifier { get; }
+    [Selector("resolvedRange")]
+    public NSRange ResolvedRange { get; }
+    [Selector("initWithAttributedString:range:")]
+    public Self InitWithAttributedStringRange(NSAttributedString attributedString, NSRange range);
 }
 
 #endif

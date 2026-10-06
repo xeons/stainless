@@ -39,24 +39,39 @@ public const int DOM_KEY_LOCATION_NUMPAD = 3;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMKeyboardEvent : DOMUIEvent
 {
-    [Selector("keyIdentifier")] public NSString? KeyIdentifier { get; }
-    [Selector("location")] public uint Location { get; }
+    [Selector("keyIdentifier")]
+    public NSString? KeyIdentifier { get; }
+    [Selector("location")]
+    public uint Location { get; }
     /// Deprecated in macOS 10.5.
-    [Selector("keyLocation")] public uint KeyLocation { get; }
-    [Selector("ctrlKey")] public bool CtrlKey { get; }
-    [Selector("shiftKey")] public bool ShiftKey { get; }
-    [Selector("altKey")] public bool AltKey { get; }
-    [Selector("metaKey")] public bool MetaKey { get; }
-    [Selector("altGraphKey")] public bool AltGraphKey { get; }
-    [Selector("keyCode")] public int KeyCode { get; }
-    [Selector("charCode")] public int CharCode { get; }
-    [Selector("getModifierState:")] public bool GetModifierState(NSString? keyIdentifierArg);
-    [Selector("initKeyboardEvent:canBubble:cancelable:view:keyIdentifier:location:ctrlKey:altKey:shiftKey:metaKey:altGraphKey:")] public void InitKeyboardEventCanBubbleCancelableViewKeyIdentifierLocationCtrlKeyAltKeyShiftKeyMetaKeyAltGraphKey(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, NSString? keyIdentifier, uint location, bool ctrlKey, bool altKey, bool shiftKey, bool metaKey, bool altGraphKey);
-    [Selector("initKeyboardEvent:canBubble:cancelable:view:keyIdentifier:location:ctrlKey:altKey:shiftKey:metaKey:")] public void InitKeyboardEventCanBubbleCancelableViewKeyIdentifierLocationCtrlKeyAltKeyShiftKeyMetaKey(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, NSString? keyIdentifier, uint location, bool ctrlKey, bool altKey, bool shiftKey, bool metaKey);
+    [Selector("keyLocation")]
+    public uint KeyLocation { get; }
+    [Selector("ctrlKey")]
+    public bool CtrlKey { get; }
+    [Selector("shiftKey")]
+    public bool ShiftKey { get; }
+    [Selector("altKey")]
+    public bool AltKey { get; }
+    [Selector("metaKey")]
+    public bool MetaKey { get; }
+    [Selector("altGraphKey")]
+    public bool AltGraphKey { get; }
+    [Selector("keyCode")]
+    public int KeyCode { get; }
+    [Selector("charCode")]
+    public int CharCode { get; }
+    [Selector("getModifierState:")]
+    public bool GetModifierState(NSString? keyIdentifierArg);
+    [Selector("initKeyboardEvent:canBubble:cancelable:view:keyIdentifier:location:ctrlKey:altKey:shiftKey:metaKey:altGraphKey:")]
+    public void InitKeyboardEventCanBubbleCancelableViewKeyIdentifierLocationCtrlKeyAltKeyShiftKeyMetaKeyAltGraphKey(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, NSString? keyIdentifier, uint location, bool ctrlKey, bool altKey, bool shiftKey, bool metaKey, bool altGraphKey);
+    [Selector("initKeyboardEvent:canBubble:cancelable:view:keyIdentifier:location:ctrlKey:altKey:shiftKey:metaKey:")]
+    public void InitKeyboardEventCanBubbleCancelableViewKeyIdentifierLocationCtrlKeyAltKeyShiftKeyMetaKey(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, NSString? keyIdentifier, uint location, bool ctrlKey, bool altKey, bool shiftKey, bool metaKey);
     /// Deprecated in macOS 10.5.
-    [Selector("initKeyboardEvent:canBubble:cancelable:view:keyIdentifier:keyLocation:ctrlKey:altKey:shiftKey:metaKey:altGraphKey:")] public void InitKeyboardEventCanBubbleCancelableViewKeyIdentifierKeyLocationCtrlKeyAltKeyShiftKeyMetaKeyAltGraphKey(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, NSString? keyIdentifier, uint keyLocation, bool ctrlKey, bool altKey, bool shiftKey, bool metaKey, bool altGraphKey);
+    [Selector("initKeyboardEvent:canBubble:cancelable:view:keyIdentifier:keyLocation:ctrlKey:altKey:shiftKey:metaKey:altGraphKey:")]
+    public void InitKeyboardEventCanBubbleCancelableViewKeyIdentifierKeyLocationCtrlKeyAltKeyShiftKeyMetaKeyAltGraphKey(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, NSString? keyIdentifier, uint keyLocation, bool ctrlKey, bool altKey, bool shiftKey, bool metaKey, bool altGraphKey);
     /// Deprecated in macOS 10.5.
-    [Selector("initKeyboardEvent:canBubble:cancelable:view:keyIdentifier:keyLocation:ctrlKey:altKey:shiftKey:metaKey:")] public void InitKeyboardEventCanBubbleCancelableViewKeyIdentifierKeyLocationCtrlKeyAltKeyShiftKeyMetaKey(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, NSString? keyIdentifier, uint keyLocation, bool ctrlKey, bool altKey, bool shiftKey, bool metaKey);
+    [Selector("initKeyboardEvent:canBubble:cancelable:view:keyIdentifier:keyLocation:ctrlKey:altKey:shiftKey:metaKey:")]
+    public void InitKeyboardEventCanBubbleCancelableViewKeyIdentifierKeyLocationCtrlKeyAltKeyShiftKeyMetaKey(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, NSString? keyIdentifier, uint keyLocation, bool ctrlKey, bool altKey, bool shiftKey, bool metaKey);
 }
 
 #endif

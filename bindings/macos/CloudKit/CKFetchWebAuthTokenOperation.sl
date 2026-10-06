@@ -34,10 +34,14 @@ public objc closure void CKFetchWebAuthTokenOperationFetchWebAuthTokenCompletion
 
 public extern objc class CKFetchWebAuthTokenOperation : CKDatabaseOperation
 {
-    [Selector("APIToken", "setAPIToken:")] public NSString? APIToken { get; set; }
-    [Selector("fetchWebAuthTokenCompletionBlock", "setFetchWebAuthTokenCompletionBlock:")] public CKFetchWebAuthTokenOperationFetchWebAuthTokenCompletionBlock? FetchWebAuthTokenCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithAPIToken:")] public Self InitWithAPIToken(NSString APIToken);
+    [Selector("APIToken", "setAPIToken:")]
+    public NSString? APIToken { get; set; }
+    [Selector("fetchWebAuthTokenCompletionBlock", "setFetchWebAuthTokenCompletionBlock:")]
+    public CKFetchWebAuthTokenOperationFetchWebAuthTokenCompletionBlock? FetchWebAuthTokenCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithAPIToken:")]
+    public Self InitWithAPIToken(NSString APIToken);
 }
 
 #endif

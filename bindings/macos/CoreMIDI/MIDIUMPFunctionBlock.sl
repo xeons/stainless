@@ -33,17 +33,28 @@ import Standard.ObjC;
 
 public extern objc class MIDIUMPFunctionBlock : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("functionBlockID")] public MIDIUMPFunctionBlockID FunctionBlockID { get; }
-    [Selector("direction")] public MIDIUMPFunctionBlockDirection Direction { get; }
-    [Selector("firstGroup")] public MIDIUMPGroupNumber FirstGroup { get; }
-    [Selector("totalGroupsSpanned")] public MIDIUInteger7 TotalGroupsSpanned { get; }
-    [Selector("maxSysEx8Streams")] public UInt8 MaxSysEx8Streams { get; }
-    [Selector("MIDI1Info")] public MIDIUMPFunctionBlockMIDI1Info MIDI1Info { get; }
-    [Selector("UIHint")] public MIDIUMPFunctionBlockUIHint UIHint { get; }
-    [Selector("UMPEndpoint")] public MIDIUMPEndpoint? UMPEndpoint { get; }
-    [Selector("midiCIDevice")] public MIDICIDevice? MidiCIDevice { get; }
-    [Selector("isEnabled")] public bool IsEnabled { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("functionBlockID")]
+    public MIDIUMPFunctionBlockID FunctionBlockID { get; }
+    [Selector("direction")]
+    public MIDIUMPFunctionBlockDirection Direction { get; }
+    [Selector("firstGroup")]
+    public MIDIUMPGroupNumber FirstGroup { get; }
+    [Selector("totalGroupsSpanned")]
+    public MIDIUInteger7 TotalGroupsSpanned { get; }
+    [Selector("maxSysEx8Streams")]
+    public UInt8 MaxSysEx8Streams { get; }
+    [Selector("MIDI1Info")]
+    public MIDIUMPFunctionBlockMIDI1Info MIDI1Info { get; }
+    [Selector("UIHint")]
+    public MIDIUMPFunctionBlockUIHint UIHint { get; }
+    [Selector("UMPEndpoint")]
+    public MIDIUMPEndpoint? UMPEndpoint { get; }
+    [Selector("midiCIDevice")]
+    public MIDICIDevice? MidiCIDevice { get; }
+    [Selector("isEnabled")]
+    public bool IsEnabled { get; }
 }
 
 #endif

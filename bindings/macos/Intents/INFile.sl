@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class INFile : NSObject, NSSecureCoding
 {
-    [Selector("data")] public NSData Data { get; }
-    [Selector("filename", "setFilename:")] public NSString Filename { get; set; }
-    [Selector("typeIdentifier")] public NSString? TypeIdentifier { get; }
-    [Selector("fileURL")] public NSURL? FileURL { get; }
-    [Selector("removedOnCompletion", "setRemovedOnCompletion:")] public bool RemovedOnCompletion { get; set; }
-    [Selector("fileWithData:filename:typeIdentifier:")] public static INFile FileWithDataFilenameTypeIdentifier(NSData data, NSString filename, NSString? typeIdentifier);
-    [Selector("fileWithFileURL:filename:typeIdentifier:")] public static INFile FileWithFileURLFilenameTypeIdentifier(NSURL fileURL, NSString? filename, NSString? typeIdentifier);
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("filename", "setFilename:")]
+    public NSString Filename { get; set; }
+    [Selector("typeIdentifier")]
+    public NSString? TypeIdentifier { get; }
+    [Selector("fileURL")]
+    public NSURL? FileURL { get; }
+    [Selector("removedOnCompletion", "setRemovedOnCompletion:")]
+    public bool RemovedOnCompletion { get; set; }
+    [Selector("fileWithData:filename:typeIdentifier:")]
+    public static INFile FileWithDataFilenameTypeIdentifier(NSData data, NSString filename, NSString? typeIdentifier);
+    [Selector("fileWithFileURL:filename:typeIdentifier:")]
+    public static INFile FileWithFileURLFilenameTypeIdentifier(NSURL fileURL, NSString? filename, NSString? typeIdentifier);
 }
 
 #endif

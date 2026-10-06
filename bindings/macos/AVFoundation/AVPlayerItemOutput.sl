@@ -36,48 +36,70 @@ import Standard.ObjC;
 
 public extern objc class AVPlayerItemOutput : NSObject
 {
-    [Selector("suppressesPlayerRendering", "setSuppressesPlayerRendering:")] public bool SuppressesPlayerRendering { get; set; }
-    [Selector("itemTimeForHostTime:")] public CMTime ItemTimeForHostTime(CFTimeInterval hostTimeInSeconds);
-    [Selector("itemTimeForMachAbsoluteTime:")] public CMTime ItemTimeForMachAbsoluteTime(long machAbsoluteTime);
-    [Selector("itemTimeForCVTimeStamp:")] public CMTime ItemTimeForCVTimeStamp(CVTimeStamp timestamp);
+    [Selector("suppressesPlayerRendering", "setSuppressesPlayerRendering:")]
+    public bool SuppressesPlayerRendering { get; set; }
+    [Selector("itemTimeForHostTime:")]
+    public CMTime ItemTimeForHostTime(CFTimeInterval hostTimeInSeconds);
+    [Selector("itemTimeForMachAbsoluteTime:")]
+    public CMTime ItemTimeForMachAbsoluteTime(long machAbsoluteTime);
+    [Selector("itemTimeForCVTimeStamp:")]
+    public CMTime ItemTimeForCVTimeStamp(CVTimeStamp timestamp);
 }
 
 public extern objc class AVPlayerItemVideoOutput : AVPlayerItemOutput
 {
-    [Selector("delegate")] public AVPlayerItemOutputPullDelegate? Delegate { get; }
-    [Selector("delegateQueue")] public dispatch_queue_t? DelegateQueue { get; }
-    [Selector("initWithPixelBufferAttributes:")] public Self InitWithPixelBufferAttributes(NSDictionary? pixelBufferAttributes);
-    [Selector("initWithOutputSettings:")] public Self InitWithOutputSettings(NSDictionary? outputSettings);
-    [Selector("hasNewPixelBufferForItemTime:")] public bool HasNewPixelBufferForItemTime(CMTime itemTime);
-    [Selector("copyPixelBufferForItemTime:itemTimeForDisplay:")] public CVPixelBufferRef? CopyPixelBufferForItemTimeItemTimeForDisplay(CMTime itemTime, CMTime* outItemTimeForDisplay);
-    [Selector("setDelegate:queue:")] public void SetDelegateQueue(AVPlayerItemOutputPullDelegate? @delegate, dispatch_queue_t? delegateQueue);
-    [Selector("requestNotificationOfMediaDataChangeWithAdvanceInterval:")] public void RequestNotificationOfMediaDataChangeWithAdvanceInterval(NSTimeInterval interval);
+    [Selector("delegate")]
+    public AVPlayerItemOutputPullDelegate? Delegate { get; }
+    [Selector("delegateQueue")]
+    public dispatch_queue_t? DelegateQueue { get; }
+    [Selector("initWithPixelBufferAttributes:")]
+    public Self InitWithPixelBufferAttributes(NSDictionary? pixelBufferAttributes);
+    [Selector("initWithOutputSettings:")]
+    public Self InitWithOutputSettings(NSDictionary? outputSettings);
+    [Selector("hasNewPixelBufferForItemTime:")]
+    public bool HasNewPixelBufferForItemTime(CMTime itemTime);
+    [Selector("copyPixelBufferForItemTime:itemTimeForDisplay:")]
+    public CVPixelBufferRef? CopyPixelBufferForItemTimeItemTimeForDisplay(CMTime itemTime, CMTime* outItemTimeForDisplay);
+    [Selector("setDelegate:queue:")]
+    public void SetDelegateQueue(AVPlayerItemOutputPullDelegate? @delegate, dispatch_queue_t? delegateQueue);
+    [Selector("requestNotificationOfMediaDataChangeWithAdvanceInterval:")]
+    public void RequestNotificationOfMediaDataChangeWithAdvanceInterval(NSTimeInterval interval);
 }
 
 public objc interface AVPlayerItemOutputPullDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("outputMediaDataWillChange:")] void OutputMediaDataWillChange(AVPlayerItemOutput sender);
-    [Optional] [Selector("outputSequenceWasFlushed:")] void OutputSequenceWasFlushed(AVPlayerItemOutput output);
+    [Optional]
+    [Selector("outputMediaDataWillChange:")]
+    void OutputMediaDataWillChange(AVPlayerItemOutput sender);
+    [Optional]
+    [Selector("outputSequenceWasFlushed:")]
+    void OutputSequenceWasFlushed(AVPlayerItemOutput output);
 }
 
 public extern objc class AVPlayerItemLegibleOutput : AVPlayerItemOutput
 {
-    [Selector("delegate")] public AVPlayerItemLegibleOutputPushDelegate? Delegate { get; }
-    [Selector("delegateQueue")] public dispatch_queue_t? DelegateQueue { get; }
-    [Selector("advanceIntervalForDelegateInvocation", "setAdvanceIntervalForDelegateInvocation:")] public NSTimeInterval AdvanceIntervalForDelegateInvocation { get; set; }
-    [Selector("setDelegate:queue:")] public void SetDelegateQueue(AVPlayerItemLegibleOutputPushDelegate? @delegate, dispatch_queue_t? delegateQueue);
+    [Selector("delegate")]
+    public AVPlayerItemLegibleOutputPushDelegate? Delegate { get; }
+    [Selector("delegateQueue")]
+    public dispatch_queue_t? DelegateQueue { get; }
+    [Selector("advanceIntervalForDelegateInvocation", "setAdvanceIntervalForDelegateInvocation:")]
+    public NSTimeInterval AdvanceIntervalForDelegateInvocation { get; set; }
+    [Selector("setDelegate:queue:")]
+    public void SetDelegateQueue(AVPlayerItemLegibleOutputPushDelegate? @delegate, dispatch_queue_t? delegateQueue);
 }
 
 /// AVPlayerItemLegibleOutput_NativeRepresentation, a category of AVPlayerItemLegibleOutput.
 public extern objc class AVPlayerItemLegibleOutput
 {
-    [Selector("initWithMediaSubtypesForNativeRepresentation:")] public Self InitWithMediaSubtypesForNativeRepresentation(NSArray subtypes);
+    [Selector("initWithMediaSubtypesForNativeRepresentation:")]
+    public Self InitWithMediaSubtypesForNativeRepresentation(NSArray subtypes);
 }
 
 /// AVPlayerItemLegibleOutput_TextStylingResolution, a category of AVPlayerItemLegibleOutput.
 public extern objc class AVPlayerItemLegibleOutput
 {
-    [Selector("textStylingResolution", "setTextStylingResolution:")] public AVPlayerItemLegibleOutputTextStylingResolution TextStylingResolution { get; set; }
+    [Selector("textStylingResolution", "setTextStylingResolution:")]
+    public AVPlayerItemLegibleOutputTextStylingResolution TextStylingResolution { get; set; }
 }
 
 public using AVPlayerItemLegibleOutputTextStylingResolution = NSString;
@@ -88,41 +110,60 @@ public extern "C" AVPlayerItemLegibleOutputTextStylingResolution? AVPlayerItemLe
 
 public objc interface AVPlayerItemLegibleOutputPushDelegate : AVPlayerItemOutputPushDelegate
 {
-    [Optional] [Selector("legibleOutput:didOutputAttributedStrings:nativeSampleBuffers:forItemTime:")] void LegibleOutputDidOutputAttributedStringsNativeSampleBuffersForItemTime(AVPlayerItemLegibleOutput output, NSArray strings, NSArray nativeSamples, CMTime itemTime);
+    [Optional]
+    [Selector("legibleOutput:didOutputAttributedStrings:nativeSampleBuffers:forItemTime:")]
+    void LegibleOutputDidOutputAttributedStringsNativeSampleBuffersForItemTime(AVPlayerItemLegibleOutput output, NSArray strings, NSArray nativeSamples, CMTime itemTime);
 }
 
 public objc interface AVPlayerItemOutputPushDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("outputSequenceWasFlushed:")] void OutputSequenceWasFlushed(AVPlayerItemOutput output);
+    [Optional]
+    [Selector("outputSequenceWasFlushed:")]
+    void OutputSequenceWasFlushed(AVPlayerItemOutput output);
 }
 
 public extern objc class AVPlayerItemMetadataOutput : AVPlayerItemOutput
 {
-    [Selector("delegate")] public AVPlayerItemMetadataOutputPushDelegate? Delegate { get; }
-    [Selector("delegateQueue")] public dispatch_queue_t? DelegateQueue { get; }
-    [Selector("advanceIntervalForDelegateInvocation", "setAdvanceIntervalForDelegateInvocation:")] public NSTimeInterval AdvanceIntervalForDelegateInvocation { get; set; }
-    [Selector("initWithIdentifiers:")] public Self InitWithIdentifiers(NSArray? identifiers);
-    [Selector("setDelegate:queue:")] public void SetDelegateQueue(AVPlayerItemMetadataOutputPushDelegate? @delegate, dispatch_queue_t? delegateQueue);
+    [Selector("delegate")]
+    public AVPlayerItemMetadataOutputPushDelegate? Delegate { get; }
+    [Selector("delegateQueue")]
+    public dispatch_queue_t? DelegateQueue { get; }
+    [Selector("advanceIntervalForDelegateInvocation", "setAdvanceIntervalForDelegateInvocation:")]
+    public NSTimeInterval AdvanceIntervalForDelegateInvocation { get; set; }
+    [Selector("initWithIdentifiers:")]
+    public Self InitWithIdentifiers(NSArray? identifiers);
+    [Selector("setDelegate:queue:")]
+    public void SetDelegateQueue(AVPlayerItemMetadataOutputPushDelegate? @delegate, dispatch_queue_t? delegateQueue);
 }
 
 public objc interface AVPlayerItemMetadataOutputPushDelegate : AVPlayerItemOutputPushDelegate
 {
-    [Optional] [Selector("metadataOutput:didOutputTimedMetadataGroups:fromPlayerItemTrack:")] void MetadataOutputDidOutputTimedMetadataGroupsFromPlayerItemTrack(AVPlayerItemMetadataOutput output, NSArray groups, AVPlayerItemTrack? track);
+    [Optional]
+    [Selector("metadataOutput:didOutputTimedMetadataGroups:fromPlayerItemTrack:")]
+    void MetadataOutputDidOutputTimedMetadataGroupsFromPlayerItemTrack(AVPlayerItemMetadataOutput output, NSArray groups, AVPlayerItemTrack? track);
 }
 
 public extern objc class AVPlayerItemRenderedLegibleOutput : AVPlayerItemOutput
 {
-    [Selector("delegate")] public AVPlayerItemRenderedLegibleOutputPushDelegate? Delegate { get; }
-    [Selector("delegateQueue")] public dispatch_queue_t? DelegateQueue { get; }
-    [Selector("advanceIntervalForDelegateInvocation", "setAdvanceIntervalForDelegateInvocation:")] public NSTimeInterval AdvanceIntervalForDelegateInvocation { get; set; }
-    [Selector("videoDisplaySize", "setVideoDisplaySize:")] public CGSize VideoDisplaySize { get; set; }
-    [Selector("initWithVideoDisplaySize:")] public Self InitWithVideoDisplaySize(CGSize videoDisplaySize);
-    [Selector("setDelegate:queue:")] public void SetDelegateQueue(AVPlayerItemRenderedLegibleOutputPushDelegate? @delegate, dispatch_queue_t? delegateQueue);
+    [Selector("delegate")]
+    public AVPlayerItemRenderedLegibleOutputPushDelegate? Delegate { get; }
+    [Selector("delegateQueue")]
+    public dispatch_queue_t? DelegateQueue { get; }
+    [Selector("advanceIntervalForDelegateInvocation", "setAdvanceIntervalForDelegateInvocation:")]
+    public NSTimeInterval AdvanceIntervalForDelegateInvocation { get; set; }
+    [Selector("videoDisplaySize", "setVideoDisplaySize:")]
+    public CGSize VideoDisplaySize { get; set; }
+    [Selector("initWithVideoDisplaySize:")]
+    public Self InitWithVideoDisplaySize(CGSize videoDisplaySize);
+    [Selector("setDelegate:queue:")]
+    public void SetDelegateQueue(AVPlayerItemRenderedLegibleOutputPushDelegate? @delegate, dispatch_queue_t? delegateQueue);
 }
 
 public objc interface AVPlayerItemRenderedLegibleOutputPushDelegate : AVPlayerItemOutputPushDelegate
 {
-    [Optional] [Selector("renderedLegibleOutput:didOutputRenderedCaptionImages:forItemTime:")] void RenderedLegibleOutputDidOutputRenderedCaptionImagesForItemTime(AVPlayerItemRenderedLegibleOutput output, NSArray captionImages, CMTime itemTime);
+    [Optional]
+    [Selector("renderedLegibleOutput:didOutputRenderedCaptionImages:forItemTime:")]
+    void RenderedLegibleOutputDidOutputRenderedCaptionImagesForItemTime(AVPlayerItemRenderedLegibleOutput output, NSArray captionImages, CMTime itemTime);
 }
 
 #endif

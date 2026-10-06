@@ -33,21 +33,36 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLTableCellElement : DOMHTMLElement
 {
-    [Selector("cellIndex")] public int CellIndex { get; }
-    [Selector("align", "setAlign:")] public NSString? Align { get; set; }
-    [Selector("axis", "setAxis:")] public NSString? Axis { get; set; }
-    [Selector("bgColor", "setBgColor:")] public NSString? BgColor { get; set; }
-    [Selector("ch", "setCh:")] public NSString? Ch { get; set; }
-    [Selector("chOff", "setChOff:")] public NSString? ChOff { get; set; }
-    [Selector("colSpan", "setColSpan:")] public int ColSpan { get; set; }
-    [Selector("rowSpan", "setRowSpan:")] public int RowSpan { get; set; }
-    [Selector("headers", "setHeaders:")] public NSString? Headers { get; set; }
-    [Selector("height", "setHeight:")] public NSString? Height { get; set; }
-    [Selector("noWrap", "setNoWrap:")] public bool NoWrap { get; set; }
-    [Selector("vAlign", "setVAlign:")] public NSString? VAlign { get; set; }
-    [Selector("width", "setWidth:")] public NSString? Width { get; set; }
-    [Selector("abbr", "setAbbr:")] public NSString? Abbr { get; set; }
-    [Selector("scope", "setScope:")] public NSString? Scope { get; set; }
+    [Selector("cellIndex")]
+    public int CellIndex { get; }
+    [Selector("align", "setAlign:")]
+    public NSString? Align { get; set; }
+    [Selector("axis", "setAxis:")]
+    public NSString? Axis { get; set; }
+    [Selector("bgColor", "setBgColor:")]
+    public NSString? BgColor { get; set; }
+    [Selector("ch", "setCh:")]
+    public NSString? Ch { get; set; }
+    [Selector("chOff", "setChOff:")]
+    public NSString? ChOff { get; set; }
+    [Selector("colSpan", "setColSpan:")]
+    public int ColSpan { get; set; }
+    [Selector("rowSpan", "setRowSpan:")]
+    public int RowSpan { get; set; }
+    [Selector("headers", "setHeaders:")]
+    public NSString? Headers { get; set; }
+    [Selector("height", "setHeight:")]
+    public NSString? Height { get; set; }
+    [Selector("noWrap", "setNoWrap:")]
+    public bool NoWrap { get; set; }
+    [Selector("vAlign", "setVAlign:")]
+    public NSString? VAlign { get; set; }
+    [Selector("width", "setWidth:")]
+    public NSString? Width { get; set; }
+    [Selector("abbr", "setAbbr:")]
+    public NSString? Abbr { get; set; }
+    [Selector("scope", "setScope:")]
+    public NSString? Scope { get; set; }
 }
 
 #endif

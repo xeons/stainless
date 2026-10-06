@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class WebResource : NSObject, NSCoding, NSCopying
 {
-    [Selector("data")] public NSData? Data { get; }
-    [Selector("URL")] public NSURL? URL { get; }
-    [Selector("MIMEType")] public NSString? MIMEType { get; }
-    [Selector("textEncodingName")] public NSString? TextEncodingName { get; }
-    [Selector("frameName")] public NSString? FrameName { get; }
-    [Selector("initWithData:URL:MIMEType:textEncodingName:frameName:")] public Self? InitWithDataURLMIMETypeTextEncodingNameFrameName(NSData? data, NSURL? URL, NSString? MIMEType, NSString? textEncodingName, NSString? frameName);
+    [Selector("data")]
+    public NSData? Data { get; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
+    [Selector("MIMEType")]
+    public NSString? MIMEType { get; }
+    [Selector("textEncodingName")]
+    public NSString? TextEncodingName { get; }
+    [Selector("frameName")]
+    public NSString? FrameName { get; }
+    [Selector("initWithData:URL:MIMEType:textEncodingName:frameName:")]
+    public Self? InitWithDataURLMIMETypeTextEncodingNameFrameName(NSData? data, NSURL? URL, NSString? MIMEType, NSString? textEncodingName, NSString? frameName);
 }
 
 #endif

@@ -268,6 +268,7 @@ public extern "C" OSStatus PMCopyLocalizedPPD(CFURLRef ppd, __CFURL** localizedP
 
 public extern "C" OSStatus PMCopyPPDData(CFURLRef ppd, __CFData** data);
 
-[ReturnsRetained] public extern "C" CGImageRef? PMCGImageCreateWithEPSDataProvider(CGDataProviderRef? epsDataProvider, CGImageRef epsPreview);
+[ReturnsRetained]
+public extern "C" CGImageRef? PMCGImageCreateWithEPSDataProvider(CGDataProviderRef? epsDataProvider, CGImageRef epsPreview);
 
 #endif

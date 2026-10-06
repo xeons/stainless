@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public objc interface NSAccessibilityColor
 {
-    [Selector("accessibilityName")] NSString AccessibilityName { get; }
+    [Selector("accessibilityName")]
+    NSString AccessibilityName { get; }
 }
 
 /// NSAccessibilityColorConformance, a category of NSColor.

@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class PHProject : PHAssetCollection
 {
-    [Selector("projectExtensionData")] public NSData ProjectExtensionData { get; }
-    [Selector("hasProjectPreview")] public bool HasProjectPreview { get; }
+    [Selector("projectExtensionData")]
+    public NSData ProjectExtensionData { get; }
+    [Selector("hasProjectPreview")]
+    public bool HasProjectPreview { get; }
 }
 
 #endif

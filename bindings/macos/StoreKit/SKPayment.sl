@@ -34,34 +34,47 @@ import Standard.ObjC;
 /// Deprecated in macOS 15.0.
 public extern objc class SKPayment : NSObject, NSCopying, NSMutableCopying
 {
-    [Selector("productIdentifier")] public NSString ProductIdentifier { get; }
+    [Selector("productIdentifier")]
+    public NSString ProductIdentifier { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("requestData")] public NSData? RequestData { get; }
+    [Selector("requestData")]
+    public NSData? RequestData { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("quantity")] public NSInteger Quantity { get; }
+    [Selector("quantity")]
+    public NSInteger Quantity { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("applicationUsername")] public NSString? ApplicationUsername { get; }
+    [Selector("applicationUsername")]
+    public NSString? ApplicationUsername { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("simulatesAskToBuyInSandbox")] public bool SimulatesAskToBuyInSandbox { get; }
+    [Selector("simulatesAskToBuyInSandbox")]
+    public bool SimulatesAskToBuyInSandbox { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("paymentDiscount")] public SKPaymentDiscount? PaymentDiscount { get; }
-    [Selector("paymentWithProduct:")] public static Self PaymentWithProduct(SKProduct product);
+    [Selector("paymentDiscount")]
+    public SKPaymentDiscount? PaymentDiscount { get; }
+    [Selector("paymentWithProduct:")]
+    public static Self PaymentWithProduct(SKProduct product);
 }
 
 /// Deprecated in macOS 15.0.
 public extern objc class SKMutablePayment : SKPayment
 {
     /// Deprecated in macOS 15.0.
-    [Selector("applicationUsername", "setApplicationUsername:")] public NSString? ApplicationUsername { get; set; }
+    [Selector("applicationUsername", "setApplicationUsername:")]
+    public NSString? ApplicationUsername { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("paymentDiscount", "setPaymentDiscount:")] public SKPaymentDiscount? PaymentDiscount { get; set; }
-    [Selector("productIdentifier", "setProductIdentifier:")] public NSString ProductIdentifier { get; set; }
+    [Selector("paymentDiscount", "setPaymentDiscount:")]
+    public SKPaymentDiscount? PaymentDiscount { get; set; }
+    [Selector("productIdentifier", "setProductIdentifier:")]
+    public NSString ProductIdentifier { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("quantity", "setQuantity:")] public NSInteger Quantity { get; set; }
+    [Selector("quantity", "setQuantity:")]
+    public NSInteger Quantity { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("requestData", "setRequestData:")] public NSData? RequestData { get; set; }
+    [Selector("requestData", "setRequestData:")]
+    public NSData? RequestData { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("simulatesAskToBuyInSandbox", "setSimulatesAskToBuyInSandbox:")] public bool SimulatesAskToBuyInSandbox { get; set; }
+    [Selector("simulatesAskToBuyInSandbox", "setSimulatesAskToBuyInSandbox:")]
+    public bool SimulatesAskToBuyInSandbox { get; set; }
 }
 
 #endif

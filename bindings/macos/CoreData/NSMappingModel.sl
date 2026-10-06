@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class NSMappingModel : NSObject
 {
-    [Selector("entityMappings", "setEntityMappings:")] public NSArray? EntityMappings { get; set; }
-    [Selector("entityMappingsByName")] public NSDictionary EntityMappingsByName { get; }
-    [Selector("mappingModelFromBundles:forSourceModel:destinationModel:")] public static NSMappingModel? MappingModelFromBundlesForSourceModelDestinationModel(NSArray? bundles, NSManagedObjectModel? sourceModel, NSManagedObjectModel? destinationModel);
-    [Selector("inferredMappingModelForSourceModel:destinationModel:error:")] public static NSMappingModel? InferredMappingModelForSourceModelDestinationModelError(NSManagedObjectModel sourceModel, NSManagedObjectModel destinationModel, out NSError? error);
-    [Selector("initWithContentsOfURL:")] public Self? InitWithContentsOfURL(NSURL? url);
+    [Selector("entityMappings", "setEntityMappings:")]
+    public NSArray? EntityMappings { get; set; }
+    [Selector("entityMappingsByName")]
+    public NSDictionary EntityMappingsByName { get; }
+    [Selector("mappingModelFromBundles:forSourceModel:destinationModel:")]
+    public static NSMappingModel? MappingModelFromBundlesForSourceModelDestinationModel(NSArray? bundles, NSManagedObjectModel? sourceModel, NSManagedObjectModel? destinationModel);
+    [Selector("inferredMappingModelForSourceModel:destinationModel:error:")]
+    public static NSMappingModel? InferredMappingModelForSourceModelDestinationModelError(NSManagedObjectModel sourceModel, NSManagedObjectModel destinationModel, out NSError? error);
+    [Selector("initWithContentsOfURL:")]
+    public Self? InitWithContentsOfURL(NSURL? url);
 }
 
 #endif

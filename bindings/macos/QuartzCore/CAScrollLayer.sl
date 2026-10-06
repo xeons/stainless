@@ -35,17 +35,23 @@ public using CAScrollLayerScrollMode = NSString;
 
 public extern objc class CAScrollLayer : CALayer
 {
-    [Selector("scrollMode", "setScrollMode:")] public CAScrollLayerScrollMode ScrollMode { get; set; }
-    [Selector("scrollToPoint:")] public void ScrollToPoint(CGPoint p);
-    [Selector("scrollToRect:")] public void ScrollToRect(CGRect r);
+    [Selector("scrollMode", "setScrollMode:")]
+    public CAScrollLayerScrollMode ScrollMode { get; set; }
+    [Selector("scrollToPoint:")]
+    public void ScrollToPoint(CGPoint p);
+    [Selector("scrollToRect:")]
+    public void ScrollToRect(CGRect r);
 }
 
 /// CALayerScrolling, a category of CALayer.
 public extern objc class CALayer
 {
-    [Selector("visibleRect")] public CGRect VisibleRect { get; }
-    [Selector("scrollPoint:")] public void ScrollPoint(CGPoint p);
-    [Selector("scrollRectToVisible:")] public void ScrollRectToVisible(CGRect r);
+    [Selector("visibleRect")]
+    public CGRect VisibleRect { get; }
+    [Selector("scrollPoint:")]
+    public void ScrollPoint(CGPoint p);
+    [Selector("scrollRectToVisible:")]
+    public void ScrollRectToVisible(CGRect r);
 }
 
 public extern "C" CAScrollLayerScrollMode? kCAScrollNone;

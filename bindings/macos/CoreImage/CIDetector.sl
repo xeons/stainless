@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class CIDetector : NSObject
 {
-    [Selector("detectorOfType:context:options:")] public static CIDetector? DetectorOfTypeContextOptions(NSString type, CIContext? context, NSDictionary? options);
-    [Selector("featuresInImage:")] public NSArray FeaturesInImage(CIImage image);
-    [Selector("featuresInImage:options:")] public NSArray FeaturesInImageOptions(CIImage image, NSDictionary? options);
+    [Selector("detectorOfType:context:options:")]
+    public static CIDetector? DetectorOfTypeContextOptions(NSString type, CIContext? context, NSDictionary? options);
+    [Selector("featuresInImage:")]
+    public NSArray FeaturesInImage(CIImage image);
+    [Selector("featuresInImage:options:")]
+    public NSArray FeaturesInImageOptions(CIImage image, NSDictionary? options);
 }
 
 public extern "C" NSString? CIDetectorTypeFace;

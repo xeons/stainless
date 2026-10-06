@@ -32,8 +32,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMCSSValueList : DOMCSSValue
 {
-    [Selector("length")] public uint Length { get; }
-    [Selector("item:")] public DOMCSSValue? Item(uint index);
+    [Selector("length")]
+    public uint Length { get; }
+    [Selector("item:")]
+    public DOMCSSValue? Item(uint index);
 }
 
 #endif

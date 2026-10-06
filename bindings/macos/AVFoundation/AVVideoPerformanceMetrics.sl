@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class AVVideoPerformanceMetrics : NSObject
 {
-    [Selector("totalNumberOfFrames")] public NSInteger TotalNumberOfFrames { get; }
-    [Selector("numberOfDroppedFrames")] public NSInteger NumberOfDroppedFrames { get; }
-    [Selector("numberOfCorruptedFrames")] public NSInteger NumberOfCorruptedFrames { get; }
-    [Selector("numberOfFramesDisplayedUsingOptimizedCompositing")] public NSInteger NumberOfFramesDisplayedUsingOptimizedCompositing { get; }
-    [Selector("totalAccumulatedFrameDelay")] public NSTimeInterval TotalAccumulatedFrameDelay { get; }
+    [Selector("totalNumberOfFrames")]
+    public NSInteger TotalNumberOfFrames { get; }
+    [Selector("numberOfDroppedFrames")]
+    public NSInteger NumberOfDroppedFrames { get; }
+    [Selector("numberOfCorruptedFrames")]
+    public NSInteger NumberOfCorruptedFrames { get; }
+    [Selector("numberOfFramesDisplayedUsingOptimizedCompositing")]
+    public NSInteger NumberOfFramesDisplayedUsingOptimizedCompositing { get; }
+    [Selector("totalAccumulatedFrameDelay")]
+    public NSTimeInterval TotalAccumulatedFrameDelay { get; }
 }
 
 #endif

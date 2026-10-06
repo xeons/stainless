@@ -34,38 +34,59 @@ import Standard.ObjC;
 
 public extern objc class AVAudioBuffer : NSObject, NSCopying, NSMutableCopying
 {
-    [Selector("format")] public AVAudioFormat Format { get; }
-    [Selector("audioBufferList")] public AudioBufferList* AudioBufferList { get; }
-    [Selector("mutableAudioBufferList")] public AudioBufferList* MutableAudioBufferList { get; }
+    [Selector("format")]
+    public AVAudioFormat Format { get; }
+    [Selector("audioBufferList")]
+    public AudioBufferList* AudioBufferList { get; }
+    [Selector("mutableAudioBufferList")]
+    public AudioBufferList* MutableAudioBufferList { get; }
 }
 
 public objc closure void AVAudioPCMBufferInitWithPCMFormatBufferListNoCopyDeallocatorDeallocatorBlock(AudioBufferList* arg0);
 
 public extern objc class AVAudioPCMBuffer : AVAudioBuffer
 {
-    [Selector("frameCapacity")] public AVAudioFrameCount FrameCapacity { get; }
-    [Selector("frameLength", "setFrameLength:")] public AVAudioFrameCount FrameLength { get; set; }
-    [Selector("stride")] public NSUInteger Stride { get; }
-    [Selector("floatChannelData")] public float** FloatChannelData { get; }
-    [Selector("int16ChannelData")] public short** Int16ChannelData { get; }
-    [Selector("int32ChannelData")] public int** Int32ChannelData { get; }
-    [Selector("initWithPCMFormat:frameCapacity:")] public Self? InitWithPCMFormatFrameCapacity(AVAudioFormat format, AVAudioFrameCount frameCapacity);
-    [Selector("initWithPCMFormat:bufferListNoCopy:deallocator:")] public Self? InitWithPCMFormatBufferListNoCopyDeallocator(AVAudioFormat format, AudioBufferList* bufferList, AVAudioPCMBufferInitWithPCMFormatBufferListNoCopyDeallocatorDeallocatorBlock? deallocator);
+    [Selector("frameCapacity")]
+    public AVAudioFrameCount FrameCapacity { get; }
+    [Selector("frameLength", "setFrameLength:")]
+    public AVAudioFrameCount FrameLength { get; set; }
+    [Selector("stride")]
+    public NSUInteger Stride { get; }
+    [Selector("floatChannelData")]
+    public float** FloatChannelData { get; }
+    [Selector("int16ChannelData")]
+    public short** Int16ChannelData { get; }
+    [Selector("int32ChannelData")]
+    public int** Int32ChannelData { get; }
+    [Selector("initWithPCMFormat:frameCapacity:")]
+    public Self? InitWithPCMFormatFrameCapacity(AVAudioFormat format, AVAudioFrameCount frameCapacity);
+    [Selector("initWithPCMFormat:bufferListNoCopy:deallocator:")]
+    public Self? InitWithPCMFormatBufferListNoCopyDeallocator(AVAudioFormat format, AudioBufferList* bufferList, AVAudioPCMBufferInitWithPCMFormatBufferListNoCopyDeallocatorDeallocatorBlock? deallocator);
 }
 
 public extern objc class AVAudioCompressedBuffer : AVAudioBuffer
 {
-    [Selector("packetCapacity")] public AVAudioPacketCount PacketCapacity { get; }
-    [Selector("packetCount", "setPacketCount:")] public AVAudioPacketCount PacketCount { get; set; }
-    [Selector("maximumPacketSize")] public NSInteger MaximumPacketSize { get; }
-    [Selector("data")] public void* Data { get; }
-    [Selector("byteCapacity")] public uint ByteCapacity { get; }
-    [Selector("byteLength", "setByteLength:")] public uint ByteLength { get; set; }
-    [Selector("packetDescriptions")] public AudioStreamPacketDescription* PacketDescriptions { get; }
+    [Selector("packetCapacity")]
+    public AVAudioPacketCount PacketCapacity { get; }
+    [Selector("packetCount", "setPacketCount:")]
+    public AVAudioPacketCount PacketCount { get; set; }
+    [Selector("maximumPacketSize")]
+    public NSInteger MaximumPacketSize { get; }
+    [Selector("data")]
+    public void* Data { get; }
+    [Selector("byteCapacity")]
+    public uint ByteCapacity { get; }
+    [Selector("byteLength", "setByteLength:")]
+    public uint ByteLength { get; set; }
+    [Selector("packetDescriptions")]
+    public AudioStreamPacketDescription* PacketDescriptions { get; }
     /// macOS 26.0 and later.
-    [Selector("packetDependencies")] public AudioStreamPacketDependencyDescription* PacketDependencies { get; }
-    [Selector("initWithFormat:packetCapacity:maximumPacketSize:")] public Self InitWithFormatPacketCapacityMaximumPacketSize(AVAudioFormat format, AVAudioPacketCount packetCapacity, NSInteger maximumPacketSize);
-    [Selector("initWithFormat:packetCapacity:")] public Self InitWithFormatPacketCapacity(AVAudioFormat format, AVAudioPacketCount packetCapacity);
+    [Selector("packetDependencies")]
+    public AudioStreamPacketDependencyDescription* PacketDependencies { get; }
+    [Selector("initWithFormat:packetCapacity:maximumPacketSize:")]
+    public Self InitWithFormatPacketCapacityMaximumPacketSize(AVAudioFormat format, AVAudioPacketCount packetCapacity, NSInteger maximumPacketSize);
+    [Selector("initWithFormat:packetCapacity:")]
+    public Self InitWithFormatPacketCapacity(AVAudioFormat format, AVAudioPacketCount packetCapacity);
 }
 
 #endif

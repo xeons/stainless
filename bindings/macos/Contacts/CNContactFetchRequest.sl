@@ -32,12 +32,18 @@ import Standard.ObjC;
 
 public extern objc class CNContactFetchRequest : CNFetchRequest, NSSecureCoding
 {
-    [Selector("predicate", "setPredicate:")] public NSPredicate? Predicate { get; set; }
-    [Selector("keysToFetch", "setKeysToFetch:")] public NSArray KeysToFetch { get; set; }
-    [Selector("mutableObjects", "setMutableObjects:")] public bool MutableObjects { get; set; }
-    [Selector("unifyResults", "setUnifyResults:")] public bool UnifyResults { get; set; }
-    [Selector("sortOrder", "setSortOrder:")] public CNContactSortOrder SortOrder { get; set; }
-    [Selector("initWithKeysToFetch:")] public Self InitWithKeysToFetch(NSArray keysToFetch);
+    [Selector("predicate", "setPredicate:")]
+    public NSPredicate? Predicate { get; set; }
+    [Selector("keysToFetch", "setKeysToFetch:")]
+    public NSArray KeysToFetch { get; set; }
+    [Selector("mutableObjects", "setMutableObjects:")]
+    public bool MutableObjects { get; set; }
+    [Selector("unifyResults", "setUnifyResults:")]
+    public bool UnifyResults { get; set; }
+    [Selector("sortOrder", "setSortOrder:")]
+    public CNContactSortOrder SortOrder { get; set; }
+    [Selector("initWithKeysToFetch:")]
+    public Self InitWithKeysToFetch(NSArray keysToFetch);
 }
 
 #endif

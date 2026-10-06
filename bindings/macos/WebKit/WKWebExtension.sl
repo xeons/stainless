@@ -57,33 +57,60 @@ public objc closure void WKWebExtensionExtensionWithResourceBaseURLCompletionHan
 /// macOS 15.4 and later.
 public extern objc class WKWebExtension : NSObject
 {
-    [Selector("errors")] public NSArray Errors { get; }
-    [Selector("manifest")] public NSDictionary Manifest { get; }
-    [Selector("manifestVersion")] public double ManifestVersion { get; }
-    [Selector("defaultLocale")] public NSLocale? DefaultLocale { get; }
-    [Selector("displayName")] public NSString? DisplayName { get; }
-    [Selector("displayShortName")] public NSString? DisplayShortName { get; }
-    [Selector("displayVersion")] public NSString? DisplayVersion { get; }
-    [Selector("displayDescription")] public NSString? DisplayDescription { get; }
-    [Selector("displayActionLabel")] public NSString? DisplayActionLabel { get; }
-    [Selector("version")] public NSString? Version { get; }
-    [Selector("requestedPermissions")] public NSSet RequestedPermissions { get; }
-    [Selector("optionalPermissions")] public NSSet OptionalPermissions { get; }
-    [Selector("requestedPermissionMatchPatterns")] public NSSet RequestedPermissionMatchPatterns { get; }
-    [Selector("optionalPermissionMatchPatterns")] public NSSet OptionalPermissionMatchPatterns { get; }
-    [Selector("allRequestedMatchPatterns")] public NSSet AllRequestedMatchPatterns { get; }
-    [Selector("hasBackgroundContent")] public bool HasBackgroundContent { get; }
-    [Selector("hasPersistentBackgroundContent")] public bool HasPersistentBackgroundContent { get; }
-    [Selector("hasInjectedContent")] public bool HasInjectedContent { get; }
-    [Selector("hasOptionsPage")] public bool HasOptionsPage { get; }
-    [Selector("hasOverrideNewTabPage")] public bool HasOverrideNewTabPage { get; }
-    [Selector("hasCommands")] public bool HasCommands { get; }
-    [Selector("hasContentModificationRules")] public bool HasContentModificationRules { get; }
-    [Selector("extensionWithAppExtensionBundle:completionHandler:")] public static void ExtensionWithAppExtensionBundleCompletionHandler(NSBundle appExtensionBundle, WKWebExtensionExtensionWithAppExtensionBundleCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("extensionWithResourceBaseURL:completionHandler:")] public static void ExtensionWithResourceBaseURLCompletionHandler(NSURL resourceBaseURL, WKWebExtensionExtensionWithResourceBaseURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("supportsManifestVersion:")] public bool SupportsManifestVersion(double manifestVersion);
-    [Selector("iconForSize:")] public NSImage? IconForSize(CGSize size);
-    [Selector("actionIconForSize:")] public NSImage? ActionIconForSize(CGSize size);
+    [Selector("errors")]
+    public NSArray Errors { get; }
+    [Selector("manifest")]
+    public NSDictionary Manifest { get; }
+    [Selector("manifestVersion")]
+    public double ManifestVersion { get; }
+    [Selector("defaultLocale")]
+    public NSLocale? DefaultLocale { get; }
+    [Selector("displayName")]
+    public NSString? DisplayName { get; }
+    [Selector("displayShortName")]
+    public NSString? DisplayShortName { get; }
+    [Selector("displayVersion")]
+    public NSString? DisplayVersion { get; }
+    [Selector("displayDescription")]
+    public NSString? DisplayDescription { get; }
+    [Selector("displayActionLabel")]
+    public NSString? DisplayActionLabel { get; }
+    [Selector("version")]
+    public NSString? Version { get; }
+    [Selector("requestedPermissions")]
+    public NSSet RequestedPermissions { get; }
+    [Selector("optionalPermissions")]
+    public NSSet OptionalPermissions { get; }
+    [Selector("requestedPermissionMatchPatterns")]
+    public NSSet RequestedPermissionMatchPatterns { get; }
+    [Selector("optionalPermissionMatchPatterns")]
+    public NSSet OptionalPermissionMatchPatterns { get; }
+    [Selector("allRequestedMatchPatterns")]
+    public NSSet AllRequestedMatchPatterns { get; }
+    [Selector("hasBackgroundContent")]
+    public bool HasBackgroundContent { get; }
+    [Selector("hasPersistentBackgroundContent")]
+    public bool HasPersistentBackgroundContent { get; }
+    [Selector("hasInjectedContent")]
+    public bool HasInjectedContent { get; }
+    [Selector("hasOptionsPage")]
+    public bool HasOptionsPage { get; }
+    [Selector("hasOverrideNewTabPage")]
+    public bool HasOverrideNewTabPage { get; }
+    [Selector("hasCommands")]
+    public bool HasCommands { get; }
+    [Selector("hasContentModificationRules")]
+    public bool HasContentModificationRules { get; }
+    [Selector("extensionWithAppExtensionBundle:completionHandler:")]
+    public static void ExtensionWithAppExtensionBundleCompletionHandler(NSBundle appExtensionBundle, WKWebExtensionExtensionWithAppExtensionBundleCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("extensionWithResourceBaseURL:completionHandler:")]
+    public static void ExtensionWithResourceBaseURLCompletionHandler(NSURL resourceBaseURL, WKWebExtensionExtensionWithResourceBaseURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("supportsManifestVersion:")]
+    public bool SupportsManifestVersion(double manifestVersion);
+    [Selector("iconForSize:")]
+    public NSImage? IconForSize(CGSize size);
+    [Selector("actionIconForSize:")]
+    public NSImage? ActionIconForSize(CGSize size);
 }
 
 #endif

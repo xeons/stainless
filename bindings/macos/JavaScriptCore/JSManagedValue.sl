@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class JSManagedValue : NSObject
 {
-    [Selector("value")] public JSValue? Value { get; }
-    [Selector("managedValueWithValue:")] public static JSManagedValue? ManagedValueWithValue(JSValue? value);
-    [Selector("managedValueWithValue:andOwner:")] public static JSManagedValue? ManagedValueWithValueAndOwner(JSValue? value, AnyObject? owner);
-    [Selector("initWithValue:")] public Self? InitWithValue(JSValue? value);
+    [Selector("value")]
+    public JSValue? Value { get; }
+    [Selector("managedValueWithValue:")]
+    public static JSManagedValue? ManagedValueWithValue(JSValue? value);
+    [Selector("managedValueWithValue:andOwner:")]
+    public static JSManagedValue? ManagedValueWithValueAndOwner(JSValue? value, AnyObject? owner);
+    [Selector("initWithValue:")]
+    public Self? InitWithValue(JSValue? value);
 }
 
 #endif

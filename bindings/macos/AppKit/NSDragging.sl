@@ -79,46 +79,89 @@ public objc closure void NSDraggingInfoEnumerateDraggingItemsWithOptionsForViewC
 
 public objc interface NSDraggingInfo : NSObjectProtocol
 {
-    [Selector("draggingDestinationWindow")] NSWindow? DraggingDestinationWindow { get; }
-    [Selector("draggingSourceOperationMask")] NSDragOperation DraggingSourceOperationMask { get; }
-    [Selector("draggingLocation")] NSPoint DraggingLocation { get; }
-    [Selector("draggedImageLocation")] NSPoint DraggedImageLocation { get; }
+    [Selector("draggingDestinationWindow")]
+    NSWindow? DraggingDestinationWindow { get; }
+    [Selector("draggingSourceOperationMask")]
+    NSDragOperation DraggingSourceOperationMask { get; }
+    [Selector("draggingLocation")]
+    NSPoint DraggingLocation { get; }
+    [Selector("draggedImageLocation")]
+    NSPoint DraggedImageLocation { get; }
     /// Deprecated in macOS 11.0.
-    [Selector("draggedImage")] NSImage? DraggedImage { get; }
-    [Selector("draggingPasteboard")] NSPasteboard? DraggingPasteboard { get; }
-    [Selector("draggingSource")] AnyObject? DraggingSource { get; }
-    [Selector("draggingSequenceNumber")] NSInteger DraggingSequenceNumber { get; }
-    [Selector("draggingFormation", "setDraggingFormation:")] NSDraggingFormation DraggingFormation { get; set; }
-    [Selector("animatesToDestination", "setAnimatesToDestination:")] bool AnimatesToDestination { get; set; }
-    [Selector("numberOfValidItemsForDrop", "setNumberOfValidItemsForDrop:")] NSInteger NumberOfValidItemsForDrop { get; set; }
-    [Selector("springLoadingHighlight")] NSSpringLoadingHighlight SpringLoadingHighlight { get; }
-    [Selector("slideDraggedImageTo:")] void SlideDraggedImageTo(NSPoint screenPoint);
+    [Selector("draggedImage")]
+    NSImage? DraggedImage { get; }
+    [Selector("draggingPasteboard")]
+    NSPasteboard? DraggingPasteboard { get; }
+    [Selector("draggingSource")]
+    AnyObject? DraggingSource { get; }
+    [Selector("draggingSequenceNumber")]
+    NSInteger DraggingSequenceNumber { get; }
+    [Selector("draggingFormation", "setDraggingFormation:")]
+    NSDraggingFormation DraggingFormation { get; set; }
+    [Selector("animatesToDestination", "setAnimatesToDestination:")]
+    bool AnimatesToDestination { get; set; }
+    [Selector("numberOfValidItemsForDrop", "setNumberOfValidItemsForDrop:")]
+    NSInteger NumberOfValidItemsForDrop { get; set; }
+    [Selector("springLoadingHighlight")]
+    NSSpringLoadingHighlight SpringLoadingHighlight { get; }
+    [Selector("slideDraggedImageTo:")]
+    void SlideDraggedImageTo(NSPoint screenPoint);
     /// Deprecated in macOS 10.13.
-    [Selector("namesOfPromisedFilesDroppedAtDestination:")] NSArray? NamesOfPromisedFilesDroppedAtDestination(NSURL dropDestination);
-    [Selector("enumerateDraggingItemsWithOptions:forView:classes:searchOptions:usingBlock:")] void EnumerateDraggingItemsWithOptionsForViewClassesSearchOptionsUsingBlock(NSDraggingItemEnumerationOptions enumOpts, NSView? view, NSArray classArray, NSDictionary searchOptions, NSDraggingInfoEnumerateDraggingItemsWithOptionsForViewClassesSearchOptionsUsingBlockBlock block);
-    [Selector("resetSpringLoading")] void ResetSpringLoading();
+    [Selector("namesOfPromisedFilesDroppedAtDestination:")]
+    NSArray? NamesOfPromisedFilesDroppedAtDestination(NSURL dropDestination);
+    [Selector("enumerateDraggingItemsWithOptions:forView:classes:searchOptions:usingBlock:")]
+    void EnumerateDraggingItemsWithOptionsForViewClassesSearchOptionsUsingBlock(NSDraggingItemEnumerationOptions enumOpts, NSView? view, NSArray classArray, NSDictionary searchOptions, NSDraggingInfoEnumerateDraggingItemsWithOptionsForViewClassesSearchOptionsUsingBlockBlock block);
+    [Selector("resetSpringLoading")]
+    void ResetSpringLoading();
 }
 
 public objc interface NSDraggingDestination : NSObjectProtocol
 {
-    [Optional] [Selector("draggingEntered:")] NSDragOperation DraggingEntered(NSDraggingInfo sender);
-    [Optional] [Selector("draggingUpdated:")] NSDragOperation DraggingUpdated(NSDraggingInfo sender);
-    [Optional] [Selector("draggingExited:")] void DraggingExited(NSDraggingInfo? sender);
-    [Optional] [Selector("prepareForDragOperation:")] bool PrepareForDragOperation(NSDraggingInfo sender);
-    [Optional] [Selector("performDragOperation:")] bool PerformDragOperation(NSDraggingInfo sender);
-    [Optional] [Selector("concludeDragOperation:")] void ConcludeDragOperation(NSDraggingInfo? sender);
-    [Optional] [Selector("draggingEnded:")] void DraggingEnded(NSDraggingInfo sender);
-    [Optional] [Selector("wantsPeriodicDraggingUpdates")] bool WantsPeriodicDraggingUpdates();
-    [Optional] [Selector("updateDraggingItemsForDrag:")] void UpdateDraggingItemsForDrag(NSDraggingInfo? sender);
+    [Optional]
+    [Selector("draggingEntered:")]
+    NSDragOperation DraggingEntered(NSDraggingInfo sender);
+    [Optional]
+    [Selector("draggingUpdated:")]
+    NSDragOperation DraggingUpdated(NSDraggingInfo sender);
+    [Optional]
+    [Selector("draggingExited:")]
+    void DraggingExited(NSDraggingInfo? sender);
+    [Optional]
+    [Selector("prepareForDragOperation:")]
+    bool PrepareForDragOperation(NSDraggingInfo sender);
+    [Optional]
+    [Selector("performDragOperation:")]
+    bool PerformDragOperation(NSDraggingInfo sender);
+    [Optional]
+    [Selector("concludeDragOperation:")]
+    void ConcludeDragOperation(NSDraggingInfo? sender);
+    [Optional]
+    [Selector("draggingEnded:")]
+    void DraggingEnded(NSDraggingInfo sender);
+    [Optional]
+    [Selector("wantsPeriodicDraggingUpdates")]
+    bool WantsPeriodicDraggingUpdates();
+    [Optional]
+    [Selector("updateDraggingItemsForDrag:")]
+    void UpdateDraggingItemsForDrag(NSDraggingInfo? sender);
 }
 
 public objc interface NSDraggingSource : NSObjectProtocol
 {
-    [Selector("draggingSession:sourceOperationMaskForDraggingContext:")] NSDragOperation DraggingSessionSourceOperationMaskForDraggingContext(NSDraggingSession session, NSDraggingContext context);
-    [Optional] [Selector("draggingSession:willBeginAtPoint:")] void DraggingSessionWillBeginAtPoint(NSDraggingSession session, NSPoint screenPoint);
-    [Optional] [Selector("draggingSession:movedToPoint:")] void DraggingSessionMovedToPoint(NSDraggingSession session, NSPoint screenPoint);
-    [Optional] [Selector("draggingSession:endedAtPoint:operation:")] void DraggingSessionEndedAtPointOperation(NSDraggingSession session, NSPoint screenPoint, NSDragOperation operation);
-    [Optional] [Selector("ignoreModifierKeysForDraggingSession:")] bool IgnoreModifierKeysForDraggingSession(NSDraggingSession session);
+    [Selector("draggingSession:sourceOperationMaskForDraggingContext:")]
+    NSDragOperation DraggingSessionSourceOperationMaskForDraggingContext(NSDraggingSession session, NSDraggingContext context);
+    [Optional]
+    [Selector("draggingSession:willBeginAtPoint:")]
+    void DraggingSessionWillBeginAtPoint(NSDraggingSession session, NSPoint screenPoint);
+    [Optional]
+    [Selector("draggingSession:movedToPoint:")]
+    void DraggingSessionMovedToPoint(NSDraggingSession session, NSPoint screenPoint);
+    [Optional]
+    [Selector("draggingSession:endedAtPoint:operation:")]
+    void DraggingSessionEndedAtPointOperation(NSDraggingSession session, NSPoint screenPoint, NSDragOperation operation);
+    [Optional]
+    [Selector("ignoreModifierKeysForDraggingSession:")]
+    bool IgnoreModifierKeysForDraggingSession(NSDraggingSession session);
 }
 
 [Flags]
@@ -132,31 +175,48 @@ public enum NSSpringLoadingOptions : ulong
 
 public objc interface NSSpringLoadingDestination : NSObjectProtocol
 {
-    [Selector("springLoadingActivated:draggingInfo:")] void SpringLoadingActivatedDraggingInfo(bool activated, NSDraggingInfo draggingInfo);
-    [Selector("springLoadingHighlightChanged:")] void SpringLoadingHighlightChanged(NSDraggingInfo draggingInfo);
-    [Optional] [Selector("springLoadingEntered:")] NSSpringLoadingOptions SpringLoadingEntered(NSDraggingInfo draggingInfo);
-    [Optional] [Selector("springLoadingUpdated:")] NSSpringLoadingOptions SpringLoadingUpdated(NSDraggingInfo draggingInfo);
-    [Optional] [Selector("springLoadingExited:")] void SpringLoadingExited(NSDraggingInfo draggingInfo);
-    [Optional] [Selector("draggingEnded:")] void DraggingEnded(NSDraggingInfo draggingInfo);
+    [Selector("springLoadingActivated:draggingInfo:")]
+    void SpringLoadingActivatedDraggingInfo(bool activated, NSDraggingInfo draggingInfo);
+    [Selector("springLoadingHighlightChanged:")]
+    void SpringLoadingHighlightChanged(NSDraggingInfo draggingInfo);
+    [Optional]
+    [Selector("springLoadingEntered:")]
+    NSSpringLoadingOptions SpringLoadingEntered(NSDraggingInfo draggingInfo);
+    [Optional]
+    [Selector("springLoadingUpdated:")]
+    NSSpringLoadingOptions SpringLoadingUpdated(NSDraggingInfo draggingInfo);
+    [Optional]
+    [Selector("springLoadingExited:")]
+    void SpringLoadingExited(NSDraggingInfo draggingInfo);
+    [Optional]
+    [Selector("draggingEnded:")]
+    void DraggingEnded(NSDraggingInfo draggingInfo);
 }
 
 /// NSDraggingSourceDeprecated, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.13.
-    [Selector("namesOfPromisedFilesDroppedAtDestination:")] public NSArray? NamesOfPromisedFilesDroppedAtDestination(NSURL dropDestination);
+    [Selector("namesOfPromisedFilesDroppedAtDestination:")]
+    public NSArray? NamesOfPromisedFilesDroppedAtDestination(NSURL dropDestination);
     /// Deprecated in macOS 10.7.
-    [Selector("draggingSourceOperationMaskForLocal:")] public NSDragOperation DraggingSourceOperationMaskForLocal(bool flag);
+    [Selector("draggingSourceOperationMaskForLocal:")]
+    public NSDragOperation DraggingSourceOperationMaskForLocal(bool flag);
     /// Deprecated in macOS 10.7.
-    [Selector("draggedImage:beganAt:")] public void DraggedImageBeganAt(NSImage? image, NSPoint screenPoint);
+    [Selector("draggedImage:beganAt:")]
+    public void DraggedImageBeganAt(NSImage? image, NSPoint screenPoint);
     /// Deprecated in macOS 10.7.
-    [Selector("draggedImage:endedAt:operation:")] public void DraggedImageEndedAtOperation(NSImage? image, NSPoint screenPoint, NSDragOperation operation);
+    [Selector("draggedImage:endedAt:operation:")]
+    public void DraggedImageEndedAtOperation(NSImage? image, NSPoint screenPoint, NSDragOperation operation);
     /// Deprecated in macOS 10.7.
-    [Selector("draggedImage:movedTo:")] public void DraggedImageMovedTo(NSImage? image, NSPoint screenPoint);
+    [Selector("draggedImage:movedTo:")]
+    public void DraggedImageMovedTo(NSImage? image, NSPoint screenPoint);
     /// Deprecated in macOS 10.7.
-    [Selector("ignoreModifierKeysWhileDragging")] public bool IgnoreModifierKeysWhileDragging();
+    [Selector("ignoreModifierKeysWhileDragging")]
+    public bool IgnoreModifierKeysWhileDragging();
     /// Deprecated in macOS 10.1.
-    [Selector("draggedImage:endedAt:deposited:")] public void DraggedImageEndedAtDeposited(NSImage? image, NSPoint screenPoint, bool flag);
+    [Selector("draggedImage:endedAt:deposited:")]
+    public void DraggedImageEndedAtDeposited(NSImage? image, NSPoint screenPoint, bool flag);
 }
 
 #endif

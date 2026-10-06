@@ -33,58 +33,94 @@ import Standard.ObjC;
 
 public extern objc class MTLComputePipelineReflection : NSObject
 {
-    [Selector("bindings")] public NSArray Bindings { get; }
+    [Selector("bindings")]
+    public NSArray Bindings { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("arguments")] public NSArray Arguments { get; }
+    [Selector("arguments")]
+    public NSArray Arguments { get; }
 }
 
 public extern objc class MTLComputePipelineDescriptor : NSObject, NSCopying
 {
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("computeFunction", "setComputeFunction:")] public MTLFunction? ComputeFunction { get; set; }
-    [Selector("threadGroupSizeIsMultipleOfThreadExecutionWidth", "setThreadGroupSizeIsMultipleOfThreadExecutionWidth:")] public bool ThreadGroupSizeIsMultipleOfThreadExecutionWidth { get; set; }
-    [Selector("maxTotalThreadsPerThreadgroup", "setMaxTotalThreadsPerThreadgroup:")] public NSUInteger MaxTotalThreadsPerThreadgroup { get; set; }
-    [Selector("stageInputDescriptor", "setStageInputDescriptor:")] public MTLStageInputOutputDescriptor? StageInputDescriptor { get; set; }
-    [Selector("buffers")] public MTLPipelineBufferDescriptorArray Buffers { get; }
-    [Selector("supportIndirectCommandBuffers", "setSupportIndirectCommandBuffers:")] public bool SupportIndirectCommandBuffers { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("computeFunction", "setComputeFunction:")]
+    public MTLFunction? ComputeFunction { get; set; }
+    [Selector("threadGroupSizeIsMultipleOfThreadExecutionWidth", "setThreadGroupSizeIsMultipleOfThreadExecutionWidth:")]
+    public bool ThreadGroupSizeIsMultipleOfThreadExecutionWidth { get; set; }
+    [Selector("maxTotalThreadsPerThreadgroup", "setMaxTotalThreadsPerThreadgroup:")]
+    public NSUInteger MaxTotalThreadsPerThreadgroup { get; set; }
+    [Selector("stageInputDescriptor", "setStageInputDescriptor:")]
+    public MTLStageInputOutputDescriptor? StageInputDescriptor { get; set; }
+    [Selector("buffers")]
+    public MTLPipelineBufferDescriptorArray Buffers { get; }
+    [Selector("supportIndirectCommandBuffers", "setSupportIndirectCommandBuffers:")]
+    public bool SupportIndirectCommandBuffers { get; set; }
     /// Deprecated in macOS 12.0.
-    [Selector("insertLibraries", "setInsertLibraries:")] public NSArray? InsertLibraries { get; set; }
-    [Selector("preloadedLibraries", "setPreloadedLibraries:")] public NSArray PreloadedLibraries { get; set; }
-    [Selector("binaryArchives", "setBinaryArchives:")] public NSArray? BinaryArchives { get; set; }
-    [Selector("linkedFunctions", "setLinkedFunctions:")] public MTLLinkedFunctions? LinkedFunctions { get; set; }
-    [Selector("supportAddingBinaryFunctions", "setSupportAddingBinaryFunctions:")] public bool SupportAddingBinaryFunctions { get; set; }
-    [Selector("maxCallStackDepth", "setMaxCallStackDepth:")] public NSUInteger MaxCallStackDepth { get; set; }
-    [Selector("shaderValidation", "setShaderValidation:")] public MTLShaderValidation ShaderValidation { get; set; }
+    [Selector("insertLibraries", "setInsertLibraries:")]
+    public NSArray? InsertLibraries { get; set; }
+    [Selector("preloadedLibraries", "setPreloadedLibraries:")]
+    public NSArray PreloadedLibraries { get; set; }
+    [Selector("binaryArchives", "setBinaryArchives:")]
+    public NSArray? BinaryArchives { get; set; }
+    [Selector("linkedFunctions", "setLinkedFunctions:")]
+    public MTLLinkedFunctions? LinkedFunctions { get; set; }
+    [Selector("supportAddingBinaryFunctions", "setSupportAddingBinaryFunctions:")]
+    public bool SupportAddingBinaryFunctions { get; set; }
+    [Selector("maxCallStackDepth", "setMaxCallStackDepth:")]
+    public NSUInteger MaxCallStackDepth { get; set; }
+    [Selector("shaderValidation", "setShaderValidation:")]
+    public MTLShaderValidation ShaderValidation { get; set; }
     /// macOS 26.0 and later.
-    [Selector("requiredThreadsPerThreadgroup", "setRequiredThreadsPerThreadgroup:")] public MTLSize RequiredThreadsPerThreadgroup { get; set; }
-    [Selector("reset")] public void Reset();
+    [Selector("requiredThreadsPerThreadgroup", "setRequiredThreadsPerThreadgroup:")]
+    public MTLSize RequiredThreadsPerThreadgroup { get; set; }
+    [Selector("reset")]
+    public void Reset();
 }
 
 public objc interface MTLComputePipelineState : MTLAllocation, NSObjectProtocol
 {
-    [Selector("label")] NSString? Label { get; }
+    [Selector("label")]
+    NSString? Label { get; }
     /// macOS 26.0 and later.
-    [Selector("reflection")] MTLComputePipelineReflection? Reflection { get; }
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("maxTotalThreadsPerThreadgroup")] NSUInteger MaxTotalThreadsPerThreadgroup { get; }
-    [Selector("threadExecutionWidth")] NSUInteger ThreadExecutionWidth { get; }
-    [Selector("staticThreadgroupMemoryLength")] NSUInteger StaticThreadgroupMemoryLength { get; }
-    [Selector("supportIndirectCommandBuffers")] bool SupportIndirectCommandBuffers { get; }
-    [Selector("gpuResourceID")] MTLResourceID GpuResourceID { get; }
-    [Selector("shaderValidation")] MTLShaderValidation ShaderValidation { get; }
+    [Selector("reflection")]
+    MTLComputePipelineReflection? Reflection { get; }
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("maxTotalThreadsPerThreadgroup")]
+    NSUInteger MaxTotalThreadsPerThreadgroup { get; }
+    [Selector("threadExecutionWidth")]
+    NSUInteger ThreadExecutionWidth { get; }
+    [Selector("staticThreadgroupMemoryLength")]
+    NSUInteger StaticThreadgroupMemoryLength { get; }
+    [Selector("supportIndirectCommandBuffers")]
+    bool SupportIndirectCommandBuffers { get; }
+    [Selector("gpuResourceID")]
+    MTLResourceID GpuResourceID { get; }
+    [Selector("shaderValidation")]
+    MTLShaderValidation ShaderValidation { get; }
     /// macOS 26.0 and later.
-    [Selector("requiredThreadsPerThreadgroup")] MTLSize RequiredThreadsPerThreadgroup { get; }
+    [Selector("requiredThreadsPerThreadgroup")]
+    MTLSize RequiredThreadsPerThreadgroup { get; }
     /// macOS 26.0 and later.
-    [Selector("functionHandleWithName:")] MTLFunctionHandle? FunctionHandleWithName(NSString name);
+    [Selector("functionHandleWithName:")]
+    MTLFunctionHandle? FunctionHandleWithName(NSString name);
     /// macOS 26.0 and later.
-    [Selector("functionHandleWithBinaryFunction:")] MTLFunctionHandle? FunctionHandleWithBinaryFunction(MTL4BinaryFunctionProtocol function);
+    [Selector("functionHandleWithBinaryFunction:")]
+    MTLFunctionHandle? FunctionHandleWithBinaryFunction(MTL4BinaryFunctionProtocol function);
     /// macOS 26.0 and later.
-    [Selector("newComputePipelineStateWithBinaryFunctions:error:")] MTLComputePipelineState? NewComputePipelineStateWithBinaryFunctionsError(NSArray additionalBinaryFunctions, out NSError? error);
-    [Selector("imageblockMemoryLengthForDimensions:")] NSUInteger ImageblockMemoryLengthForDimensions(MTLSize imageblockDimensions);
-    [Selector("functionHandleWithFunction:")] MTLFunctionHandle? FunctionHandleWithFunction(MTLFunction function);
-    [Selector("newComputePipelineStateWithAdditionalBinaryFunctions:error:")] MTLComputePipelineState? NewComputePipelineStateWithAdditionalBinaryFunctionsError(NSArray functions, out NSError? error);
-    [Selector("newVisibleFunctionTableWithDescriptor:")] MTLVisibleFunctionTable? NewVisibleFunctionTableWithDescriptor(MTLVisibleFunctionTableDescriptor descriptor);
-    [Selector("newIntersectionFunctionTableWithDescriptor:")] MTLIntersectionFunctionTable? NewIntersectionFunctionTableWithDescriptor(MTLIntersectionFunctionTableDescriptor descriptor);
+    [Selector("newComputePipelineStateWithBinaryFunctions:error:")]
+    MTLComputePipelineState? NewComputePipelineStateWithBinaryFunctionsError(NSArray additionalBinaryFunctions, out NSError? error);
+    [Selector("imageblockMemoryLengthForDimensions:")]
+    NSUInteger ImageblockMemoryLengthForDimensions(MTLSize imageblockDimensions);
+    [Selector("functionHandleWithFunction:")]
+    MTLFunctionHandle? FunctionHandleWithFunction(MTLFunction function);
+    [Selector("newComputePipelineStateWithAdditionalBinaryFunctions:error:")]
+    MTLComputePipelineState? NewComputePipelineStateWithAdditionalBinaryFunctionsError(NSArray functions, out NSError? error);
+    [Selector("newVisibleFunctionTableWithDescriptor:")]
+    MTLVisibleFunctionTable? NewVisibleFunctionTableWithDescriptor(MTLVisibleFunctionTableDescriptor descriptor);
+    [Selector("newIntersectionFunctionTableWithDescriptor:")]
+    MTLIntersectionFunctionTable? NewIntersectionFunctionTableWithDescriptor(MTLIntersectionFunctionTableDescriptor descriptor);
 }
 
 #endif

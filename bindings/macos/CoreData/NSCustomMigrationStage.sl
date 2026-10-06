@@ -35,11 +35,16 @@ public objc closure bool NSCustomMigrationStageDidMigrateHandlerBlock(NSStagedMi
 
 public extern objc class NSCustomMigrationStage : NSMigrationStage
 {
-    [Selector("currentModel")] public NSManagedObjectModelReference CurrentModel { get; }
-    [Selector("nextModel")] public NSManagedObjectModelReference NextModel { get; }
-    [Selector("willMigrateHandler", "setWillMigrateHandler:")] public NSCustomMigrationStageWillMigrateHandlerBlock? WillMigrateHandler { get; set; }
-    [Selector("didMigrateHandler", "setDidMigrateHandler:")] public NSCustomMigrationStageDidMigrateHandlerBlock? DidMigrateHandler { get; set; }
-    [Selector("initWithCurrentModelReference:nextModelReference:")] public Self InitWithCurrentModelReferenceNextModelReference(NSManagedObjectModelReference currentModel, NSManagedObjectModelReference nextModel);
+    [Selector("currentModel")]
+    public NSManagedObjectModelReference CurrentModel { get; }
+    [Selector("nextModel")]
+    public NSManagedObjectModelReference NextModel { get; }
+    [Selector("willMigrateHandler", "setWillMigrateHandler:")]
+    public NSCustomMigrationStageWillMigrateHandlerBlock? WillMigrateHandler { get; set; }
+    [Selector("didMigrateHandler", "setDidMigrateHandler:")]
+    public NSCustomMigrationStageDidMigrateHandlerBlock? DidMigrateHandler { get; set; }
+    [Selector("initWithCurrentModelReference:nextModelReference:")]
+    public Self InitWithCurrentModelReferenceNextModelReference(NSManagedObjectModelReference currentModel, NSManagedObjectModelReference nextModel);
 }
 
 #endif

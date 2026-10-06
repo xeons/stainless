@@ -34,52 +34,71 @@ import Standard.ObjC;
 public objc interface NSInputServiceProvider
 {
     /// Deprecated in macOS 10.6.
-    [Selector("insertText:client:")] void InsertTextClient(AnyObject? string, AnyObject? sender);
+    [Selector("insertText:client:")]
+    void InsertTextClient(AnyObject? string, AnyObject? sender);
     /// Deprecated in macOS 10.6.
-    [Selector("doCommandBySelector:client:")] void DoCommandBySelectorClient(Selector selector, AnyObject? sender);
+    [Selector("doCommandBySelector:client:")]
+    void DoCommandBySelectorClient(Selector selector, AnyObject? sender);
     /// Deprecated in macOS 10.6.
-    [Selector("markedTextAbandoned:")] void MarkedTextAbandoned(AnyObject? sender);
+    [Selector("markedTextAbandoned:")]
+    void MarkedTextAbandoned(AnyObject? sender);
     /// Deprecated in macOS 10.6.
-    [Selector("markedTextSelectionChanged:client:")] void MarkedTextSelectionChangedClient(NSRange newSel, AnyObject? sender);
+    [Selector("markedTextSelectionChanged:client:")]
+    void MarkedTextSelectionChangedClient(NSRange newSel, AnyObject? sender);
     /// Deprecated in macOS 10.6.
-    [Selector("terminate:")] void Terminate(AnyObject? sender);
+    [Selector("terminate:")]
+    void Terminate(AnyObject? sender);
     /// Deprecated in macOS 10.6.
-    [Selector("canBeDisabled")] bool CanBeDisabled();
+    [Selector("canBeDisabled")]
+    bool CanBeDisabled();
     /// Deprecated in macOS 10.6.
-    [Selector("wantsToInterpretAllKeystrokes")] bool WantsToInterpretAllKeystrokes();
+    [Selector("wantsToInterpretAllKeystrokes")]
+    bool WantsToInterpretAllKeystrokes();
     /// Deprecated in macOS 10.6.
-    [Selector("wantsToHandleMouseEvents")] bool WantsToHandleMouseEvents();
+    [Selector("wantsToHandleMouseEvents")]
+    bool WantsToHandleMouseEvents();
     /// Deprecated in macOS 10.6.
-    [Selector("wantsToDelayTextChangeNotifications")] bool WantsToDelayTextChangeNotifications();
+    [Selector("wantsToDelayTextChangeNotifications")]
+    bool WantsToDelayTextChangeNotifications();
     /// Deprecated in macOS 10.6.
-    [Selector("inputClientBecomeActive:")] void InputClientBecomeActive(AnyObject? sender);
+    [Selector("inputClientBecomeActive:")]
+    void InputClientBecomeActive(AnyObject? sender);
     /// Deprecated in macOS 10.6.
-    [Selector("inputClientResignActive:")] void InputClientResignActive(AnyObject? sender);
+    [Selector("inputClientResignActive:")]
+    void InputClientResignActive(AnyObject? sender);
     /// Deprecated in macOS 10.6.
-    [Selector("inputClientEnabled:")] void InputClientEnabled(AnyObject? sender);
+    [Selector("inputClientEnabled:")]
+    void InputClientEnabled(AnyObject? sender);
     /// Deprecated in macOS 10.6.
-    [Selector("inputClientDisabled:")] void InputClientDisabled(AnyObject? sender);
+    [Selector("inputClientDisabled:")]
+    void InputClientDisabled(AnyObject? sender);
     /// Deprecated in macOS 10.6.
-    [Selector("activeConversationWillChange:fromOldConversation:")] void ActiveConversationWillChangeFromOldConversation(AnyObject? sender, NSInteger oldConversation);
+    [Selector("activeConversationWillChange:fromOldConversation:")]
+    void ActiveConversationWillChangeFromOldConversation(AnyObject? sender, NSInteger oldConversation);
     /// Deprecated in macOS 10.6.
-    [Selector("activeConversationChanged:toNewConversation:")] void ActiveConversationChangedToNewConversation(AnyObject? sender, NSInteger newConversation);
+    [Selector("activeConversationChanged:toNewConversation:")]
+    void ActiveConversationChangedToNewConversation(AnyObject? sender, NSInteger newConversation);
 }
 
 public objc interface NSInputServerMouseTracker
 {
     /// Deprecated in macOS 10.6.
-    [Selector("mouseDownOnCharacterIndex:atCoordinate:withModifier:client:")] bool MouseDownOnCharacterIndexAtCoordinateWithModifierClient(NSUInteger index, NSPoint point, NSUInteger flags, AnyObject? sender);
+    [Selector("mouseDownOnCharacterIndex:atCoordinate:withModifier:client:")]
+    bool MouseDownOnCharacterIndexAtCoordinateWithModifierClient(NSUInteger index, NSPoint point, NSUInteger flags, AnyObject? sender);
     /// Deprecated in macOS 10.6.
-    [Selector("mouseDraggedOnCharacterIndex:atCoordinate:withModifier:client:")] bool MouseDraggedOnCharacterIndexAtCoordinateWithModifierClient(NSUInteger index, NSPoint point, NSUInteger flags, AnyObject? sender);
+    [Selector("mouseDraggedOnCharacterIndex:atCoordinate:withModifier:client:")]
+    bool MouseDraggedOnCharacterIndexAtCoordinateWithModifierClient(NSUInteger index, NSPoint point, NSUInteger flags, AnyObject? sender);
     /// Deprecated in macOS 10.6.
-    [Selector("mouseUpOnCharacterIndex:atCoordinate:withModifier:client:")] void MouseUpOnCharacterIndexAtCoordinateWithModifierClient(NSUInteger index, NSPoint point, NSUInteger flags, AnyObject? sender);
+    [Selector("mouseUpOnCharacterIndex:atCoordinate:withModifier:client:")]
+    void MouseUpOnCharacterIndexAtCoordinateWithModifierClient(NSUInteger index, NSPoint point, NSUInteger flags, AnyObject? sender);
 }
 
 /// Deprecated in macOS 10.6.
 public extern objc class NSInputServer : NSObject, NSInputServiceProvider, NSInputServerMouseTracker
 {
     /// Deprecated in macOS 10.6.
-    [Selector("initWithDelegate:name:")] public Self InitWithDelegateName(AnyObject? @delegate, NSString? name);
+    [Selector("initWithDelegate:name:")]
+    public Self InitWithDelegateName(AnyObject? @delegate, NSString? name);
 }
 
 #endif

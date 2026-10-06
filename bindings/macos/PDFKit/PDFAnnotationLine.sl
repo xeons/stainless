@@ -34,16 +34,26 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.12.
 public extern objc class PDFAnnotationLine : PDFAnnotation, NSCopying, NSCoding
 {
-    [Selector("startPoint")] public NSPoint StartPoint();
-    [Selector("setStartPoint:")] public void SetStartPoint(NSPoint point);
-    [Selector("endPoint")] public NSPoint EndPoint();
-    [Selector("setEndPoint:")] public void SetEndPoint(NSPoint point);
-    [Selector("startLineStyle")] public PDFLineStyle StartLineStyle();
-    [Selector("setStartLineStyle:")] public void SetStartLineStyle(PDFLineStyle style);
-    [Selector("endLineStyle")] public PDFLineStyle EndLineStyle();
-    [Selector("setEndLineStyle:")] public void SetEndLineStyle(PDFLineStyle style);
-    [Selector("interiorColor")] public NSColor? InteriorColor();
-    [Selector("setInteriorColor:")] public void SetInteriorColor(NSColor? color);
+    [Selector("startPoint")]
+    public NSPoint StartPoint();
+    [Selector("setStartPoint:")]
+    public void SetStartPoint(NSPoint point);
+    [Selector("endPoint")]
+    public NSPoint EndPoint();
+    [Selector("setEndPoint:")]
+    public void SetEndPoint(NSPoint point);
+    [Selector("startLineStyle")]
+    public PDFLineStyle StartLineStyle();
+    [Selector("setStartLineStyle:")]
+    public void SetStartLineStyle(PDFLineStyle style);
+    [Selector("endLineStyle")]
+    public PDFLineStyle EndLineStyle();
+    [Selector("setEndLineStyle:")]
+    public void SetEndLineStyle(PDFLineStyle style);
+    [Selector("interiorColor")]
+    public NSColor? InteriorColor();
+    [Selector("setInteriorColor:")]
+    public void SetInteriorColor(NSColor? color);
 }
 
 #endif

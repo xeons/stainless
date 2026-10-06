@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMEntity : DOMNode
 {
-    [Selector("publicId")] public NSString? PublicId { get; }
-    [Selector("systemId")] public NSString? SystemId { get; }
-    [Selector("notationName")] public NSString? NotationName { get; }
+    [Selector("publicId")]
+    public NSString? PublicId { get; }
+    [Selector("systemId")]
+    public NSString? SystemId { get; }
+    [Selector("notationName")]
+    public NSString? NotationName { get; }
 }
 
 #endif

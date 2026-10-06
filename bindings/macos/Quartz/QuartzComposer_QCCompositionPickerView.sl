@@ -38,42 +38,72 @@ public extern "C" NSString? QCCompositionPickerViewDidSelectCompositionNotificat
 /// Deprecated in macOS 10.15.
 public extern objc class QCCompositionPickerView : NSView
 {
-    [Selector("setCompositionsFromRepositoryWithProtocol:andAttributes:")] public void SetCompositionsFromRepositoryWithProtocolAndAttributes(NSString? protocol, NSDictionary? attributes);
-    [Selector("compositions")] public NSArray? Compositions();
-    [Selector("setDelegate:")] public void SetDelegate(AnyObject? @delegate);
-    [Selector("delegate")] public AnyObject? Delegate();
-    [Selector("setShowsCompositionNames:")] public void SetShowsCompositionNames(bool flag);
-    [Selector("showsCompositionNames")] public bool ShowsCompositionNames();
-    [Selector("setAllowsEmptySelection:")] public void SetAllowsEmptySelection(bool flag);
-    [Selector("allowsEmptySelection")] public bool AllowsEmptySelection();
-    [Selector("setCompositionAspectRatio:")] public void SetCompositionAspectRatio(NSSize ratio);
-    [Selector("compositionAspectRatio")] public NSSize CompositionAspectRatio();
-    [Selector("setDefaultValue:forInputKey:")] public void SetDefaultValueForInputKey(AnyObject? value, NSString? key);
-    [Selector("resetDefaultInputValues")] public void ResetDefaultInputValues();
-    [Selector("setSelectedComposition:")] public void SetSelectedComposition(QCComposition? composition);
-    [Selector("selectedComposition")] public QCComposition? SelectedComposition();
-    [Selector("startAnimation:")] public void StartAnimation(AnyObject? sender);
-    [Selector("stopAnimation:")] public void StopAnimation(AnyObject? sender);
-    [Selector("isAnimating")] public bool IsAnimating();
-    [Selector("setMaxAnimationFrameRate:")] public void SetMaxAnimationFrameRate(float maxFPS);
-    [Selector("maxAnimationFrameRate")] public float MaxAnimationFrameRate();
-    [Selector("setBackgroundColor:")] public void SetBackgroundColor(NSColor? color);
-    [Selector("backgroundColor")] public NSColor? BackgroundColor();
-    [Selector("setDrawsBackground:")] public void SetDrawsBackground(bool flag);
-    [Selector("drawsBackground")] public bool DrawsBackground();
-    [Selector("numberOfColumns")] public NSUInteger NumberOfColumns();
-    [Selector("setNumberOfColumns:")] public void SetNumberOfColumns(NSUInteger columns);
-    [Selector("numberOfRows")] public NSUInteger NumberOfRows();
-    [Selector("setNumberOfRows:")] public void SetNumberOfRows(NSUInteger rows);
+    [Selector("setCompositionsFromRepositoryWithProtocol:andAttributes:")]
+    public void SetCompositionsFromRepositoryWithProtocolAndAttributes(NSString? protocol, NSDictionary? attributes);
+    [Selector("compositions")]
+    public NSArray? Compositions();
+    [Selector("setDelegate:")]
+    public void SetDelegate(AnyObject? @delegate);
+    [Selector("delegate")]
+    public AnyObject? Delegate();
+    [Selector("setShowsCompositionNames:")]
+    public void SetShowsCompositionNames(bool flag);
+    [Selector("showsCompositionNames")]
+    public bool ShowsCompositionNames();
+    [Selector("setAllowsEmptySelection:")]
+    public void SetAllowsEmptySelection(bool flag);
+    [Selector("allowsEmptySelection")]
+    public bool AllowsEmptySelection();
+    [Selector("setCompositionAspectRatio:")]
+    public void SetCompositionAspectRatio(NSSize ratio);
+    [Selector("compositionAspectRatio")]
+    public NSSize CompositionAspectRatio();
+    [Selector("setDefaultValue:forInputKey:")]
+    public void SetDefaultValueForInputKey(AnyObject? value, NSString? key);
+    [Selector("resetDefaultInputValues")]
+    public void ResetDefaultInputValues();
+    [Selector("setSelectedComposition:")]
+    public void SetSelectedComposition(QCComposition? composition);
+    [Selector("selectedComposition")]
+    public QCComposition? SelectedComposition();
+    [Selector("startAnimation:")]
+    public void StartAnimation(AnyObject? sender);
+    [Selector("stopAnimation:")]
+    public void StopAnimation(AnyObject? sender);
+    [Selector("isAnimating")]
+    public bool IsAnimating();
+    [Selector("setMaxAnimationFrameRate:")]
+    public void SetMaxAnimationFrameRate(float maxFPS);
+    [Selector("maxAnimationFrameRate")]
+    public float MaxAnimationFrameRate();
+    [Selector("setBackgroundColor:")]
+    public void SetBackgroundColor(NSColor? color);
+    [Selector("backgroundColor")]
+    public NSColor? BackgroundColor();
+    [Selector("setDrawsBackground:")]
+    public void SetDrawsBackground(bool flag);
+    [Selector("drawsBackground")]
+    public bool DrawsBackground();
+    [Selector("numberOfColumns")]
+    public NSUInteger NumberOfColumns();
+    [Selector("setNumberOfColumns:")]
+    public void SetNumberOfColumns(NSUInteger columns);
+    [Selector("numberOfRows")]
+    public NSUInteger NumberOfRows();
+    [Selector("setNumberOfRows:")]
+    public void SetNumberOfRows(NSUInteger rows);
 }
 
 /// Deprecated in macOS 10.15.
 /// QCCompositionPickerViewDelegate, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("compositionPickerView:didSelectComposition:")] public void CompositionPickerViewDidSelectComposition(QCCompositionPickerView? pickerView, QCComposition? composition);
-    [Selector("compositionPickerViewDidStartAnimating:")] public void CompositionPickerViewDidStartAnimating(QCCompositionPickerView? pickerView);
-    [Selector("compositionPickerViewWillStopAnimating:")] public void CompositionPickerViewWillStopAnimating(QCCompositionPickerView? pickerView);
+    [Selector("compositionPickerView:didSelectComposition:")]
+    public void CompositionPickerViewDidSelectComposition(QCCompositionPickerView? pickerView, QCComposition? composition);
+    [Selector("compositionPickerViewDidStartAnimating:")]
+    public void CompositionPickerViewDidStartAnimating(QCCompositionPickerView? pickerView);
+    [Selector("compositionPickerViewWillStopAnimating:")]
+    public void CompositionPickerViewWillStopAnimating(QCCompositionPickerView? pickerView);
 }
 
 #endif

@@ -34,49 +34,66 @@ import Standard.ObjC;
 
 public extern objc class AVMetadataGroup : NSObject
 {
-    [Selector("items")] public NSArray Items { get; }
+    [Selector("items")]
+    public NSArray Items { get; }
 }
 
 /// AVMetadataGroupIdentification, a category of AVMetadataGroup.
 public extern objc class AVMetadataGroup
 {
-    [Selector("classifyingLabel")] public NSString? ClassifyingLabel { get; }
-    [Selector("uniqueID")] public NSString? UniqueID { get; }
+    [Selector("classifyingLabel")]
+    public NSString? ClassifyingLabel { get; }
+    [Selector("uniqueID")]
+    public NSString? UniqueID { get; }
 }
 
 public extern objc class AVTimedMetadataGroup : AVMetadataGroup, NSCopying, NSMutableCopying
 {
-    [Selector("timeRange")] public CMTimeRange TimeRange { get; }
-    [Selector("items")] public NSArray Items { get; }
-    [Selector("initWithItems:timeRange:")] public Self InitWithItemsTimeRange(NSArray items, CMTimeRange timeRange);
-    [Selector("initWithSampleBuffer:")] public Self? InitWithSampleBuffer(CMSampleBufferRef sampleBuffer);
+    [Selector("timeRange")]
+    public CMTimeRange TimeRange { get; }
+    [Selector("items")]
+    public NSArray Items { get; }
+    [Selector("initWithItems:timeRange:")]
+    public Self InitWithItemsTimeRange(NSArray items, CMTimeRange timeRange);
+    [Selector("initWithSampleBuffer:")]
+    public Self? InitWithSampleBuffer(CMSampleBufferRef sampleBuffer);
 }
 
 /// AVTimedMetadataGroupSerializationSupport, a category of AVTimedMetadataGroup.
 public extern objc class AVTimedMetadataGroup
 {
-    [Selector("copyFormatDescription")] public CMMetadataFormatDescriptionRef? CopyFormatDescription();
+    [Selector("copyFormatDescription")]
+    public CMMetadataFormatDescriptionRef? CopyFormatDescription();
 }
 
 public extern objc class AVMutableTimedMetadataGroup : AVTimedMetadataGroup
 {
-    [Selector("timeRange", "setTimeRange:")] public CMTimeRange TimeRange { get; set; }
-    [Selector("items", "setItems:")] public NSArray Items { get; set; }
+    [Selector("timeRange", "setTimeRange:")]
+    public CMTimeRange TimeRange { get; set; }
+    [Selector("items", "setItems:")]
+    public NSArray Items { get; set; }
 }
 
 public extern objc class AVDateRangeMetadataGroup : AVMetadataGroup, NSCopying, NSMutableCopying
 {
-    [Selector("startDate")] public NSDate StartDate { get; }
-    [Selector("endDate")] public NSDate? EndDate { get; }
-    [Selector("items")] public NSArray Items { get; }
-    [Selector("initWithItems:startDate:endDate:")] public Self InitWithItemsStartDateEndDate(NSArray items, NSDate startDate, NSDate? endDate);
+    [Selector("startDate")]
+    public NSDate StartDate { get; }
+    [Selector("endDate")]
+    public NSDate? EndDate { get; }
+    [Selector("items")]
+    public NSArray Items { get; }
+    [Selector("initWithItems:startDate:endDate:")]
+    public Self InitWithItemsStartDateEndDate(NSArray items, NSDate startDate, NSDate? endDate);
 }
 
 public extern objc class AVMutableDateRangeMetadataGroup : AVDateRangeMetadataGroup
 {
-    [Selector("startDate", "setStartDate:")] public NSDate StartDate { get; set; }
-    [Selector("endDate", "setEndDate:")] public NSDate? EndDate { get; set; }
-    [Selector("items", "setItems:")] public NSArray Items { get; set; }
+    [Selector("startDate", "setStartDate:")]
+    public NSDate StartDate { get; set; }
+    [Selector("endDate", "setEndDate:")]
+    public NSDate? EndDate { get; set; }
+    [Selector("items", "setItems:")]
+    public NSArray Items { get; set; }
 }
 
 #endif

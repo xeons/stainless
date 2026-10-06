@@ -20,7 +20,8 @@ public extern objc class NSObject { }
 [CFType("CFArrayGetTypeID")]
 public extern objc class CFArrayRef : CFTypeRef
 {
-    [Selector("count")] public nuint Count { get; }
+    [Selector("count")]
+    public nuint Count { get; }
 }
 
 // An Objective-C class has no CF type to be built on.

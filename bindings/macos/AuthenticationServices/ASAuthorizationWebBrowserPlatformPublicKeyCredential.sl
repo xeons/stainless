@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationWebBrowserPlatformPublicKeyCredential : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("customTitle")] public NSString? CustomTitle { get; }
-    [Selector("relyingParty")] public NSString RelyingParty { get; }
-    [Selector("credentialID")] public NSData CredentialID { get; }
-    [Selector("userHandle")] public NSData UserHandle { get; }
-    [Selector("providerName")] public NSString ProviderName { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("customTitle")]
+    public NSString? CustomTitle { get; }
+    [Selector("relyingParty")]
+    public NSString RelyingParty { get; }
+    [Selector("credentialID")]
+    public NSData CredentialID { get; }
+    [Selector("userHandle")]
+    public NSData UserHandle { get; }
+    [Selector("providerName")]
+    public NSString ProviderName { get; }
 }
 
 #endif

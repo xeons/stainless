@@ -37,11 +37,16 @@ public objc closure void MLModelStructureLoadModelAssetCompletionHandlerHandlerB
 
 public extern objc class MLModelStructure : NSObject
 {
-    [Selector("neuralNetwork")] public MLModelStructureNeuralNetwork? NeuralNetwork { get; }
-    [Selector("program")] public MLModelStructureProgram? Program { get; }
-    [Selector("pipeline")] public MLModelStructurePipeline? Pipeline { get; }
-    [Selector("loadContentsOfURL:completionHandler:")] public static void LoadContentsOfURLCompletionHandler(NSURL url, MLModelStructureLoadContentsOfURLCompletionHandlerHandlerBlock handler);
-    [Selector("loadModelAsset:completionHandler:")] public static void LoadModelAssetCompletionHandler(MLModelAsset asset, MLModelStructureLoadModelAssetCompletionHandlerHandlerBlock handler);
+    [Selector("neuralNetwork")]
+    public MLModelStructureNeuralNetwork? NeuralNetwork { get; }
+    [Selector("program")]
+    public MLModelStructureProgram? Program { get; }
+    [Selector("pipeline")]
+    public MLModelStructurePipeline? Pipeline { get; }
+    [Selector("loadContentsOfURL:completionHandler:")]
+    public static void LoadContentsOfURLCompletionHandler(NSURL url, MLModelStructureLoadContentsOfURLCompletionHandlerHandlerBlock handler);
+    [Selector("loadModelAsset:completionHandler:")]
+    public static void LoadModelAssetCompletionHandler(MLModelAsset asset, MLModelStructureLoadModelAssetCompletionHandlerHandlerBlock handler);
 }
 
 #endif

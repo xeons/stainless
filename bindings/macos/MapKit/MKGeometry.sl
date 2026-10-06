@@ -108,10 +108,14 @@ public extern "C" MKMapRect MKMapRectRemainder(MKMapRect rect);
 /// NSValueMapKitGeometryExtensions, a category of NSValue.
 public extern objc class NSValue
 {
-    [Selector("MKCoordinateValue")] public CLLocationCoordinate2D MKCoordinateValue { get; }
-    [Selector("MKCoordinateSpanValue")] public MKCoordinateSpan MKCoordinateSpanValue { get; }
-    [Selector("valueWithMKCoordinate:")] public static NSValue ValueWithMKCoordinate(CLLocationCoordinate2D coordinate);
-    [Selector("valueWithMKCoordinateSpan:")] public static NSValue ValueWithMKCoordinateSpan(MKCoordinateSpan span);
+    [Selector("MKCoordinateValue")]
+    public CLLocationCoordinate2D MKCoordinateValue { get; }
+    [Selector("MKCoordinateSpanValue")]
+    public MKCoordinateSpan MKCoordinateSpanValue { get; }
+    [Selector("valueWithMKCoordinate:")]
+    public static NSValue ValueWithMKCoordinate(CLLocationCoordinate2D coordinate);
+    [Selector("valueWithMKCoordinateSpan:")]
+    public static NSValue ValueWithMKCoordinateSpan(MKCoordinateSpan span);
 }
 
 #endif

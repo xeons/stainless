@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class VZGraphicsDevice : NSObject
 {
-    [Selector("displays")] public NSArray Displays { get; }
+    [Selector("displays")]
+    public NSArray Displays { get; }
 }
 
 #endif

@@ -37,8 +37,10 @@ public extern "C" NSString GCKeyboardDidDisconnectNotification;
 
 public extern objc class GCKeyboard : NSObject, GCDevice
 {
-    [Selector("keyboardInput")] public GCKeyboardInput? KeyboardInput { get; }
-    [Selector("coalescedKeyboard")] public static GCKeyboard? CoalescedKeyboard { get; }
+    [Selector("keyboardInput")]
+    public GCKeyboardInput? KeyboardInput { get; }
+    [Selector("coalescedKeyboard")]
+    public static GCKeyboard? CoalescedKeyboard { get; }
 }
 
 #endif

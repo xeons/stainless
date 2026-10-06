@@ -84,39 +84,70 @@ public objc closure void PKPassLibraryRequestAuthorizationForCapabilityCompletio
 
 public extern objc class PKPassLibrary : NSObject
 {
-    [Selector("isSecureElementPassActivationAvailable")] public bool SecureElementPassActivationAvailable { get; }
-    [Selector("remoteSecureElementPasses")] public NSArray? RemoteSecureElementPasses { get; }
-    [Selector("isPassLibraryAvailable")] public static bool IsPassLibraryAvailable();
-    [Selector("requestAutomaticPassPresentationSuppressionWithResponseHandler:")] public static PKSuppressionRequestToken RequestAutomaticPassPresentationSuppressionWithResponseHandler(PKPassLibraryRequestAutomaticPassPresentationSuppressionWithResponseHandlerResponseHandlerBlock responseHandler);
-    [Selector("endAutomaticPassPresentationSuppressionWithRequestToken:")] public static void EndAutomaticPassPresentationSuppressionWithRequestToken(PKSuppressionRequestToken requestToken);
-    [Selector("isSuppressingAutomaticPassPresentation")] public static bool IsSuppressingAutomaticPassPresentation();
-    [Selector("isPaymentPassActivationAvailable")] public static bool IsPaymentPassActivationAvailable();
-    [Selector("isPaymentPassActivationAvailable")] public bool IsPaymentPassActivationAvailableMethod();
-    [Selector("passes")] public NSArray Passes();
-    [Selector("passWithPassTypeIdentifier:serialNumber:")] public PKPass? PassWithPassTypeIdentifierSerialNumber(NSString identifier, NSString serialNumber);
-    [Selector("passesWithReaderIdentifier:")] public NSSet PassesWithReaderIdentifier(NSString readerIdentifier);
-    [Selector("passesOfType:")] public NSArray PassesOfType(PKPassType passType);
-    [Selector("remotePaymentPasses")] public NSArray RemotePaymentPasses();
-    [Selector("removePass:")] public void RemovePass(PKPass pass);
-    [Selector("containsPass:")] public bool ContainsPass(PKPass pass);
-    [Selector("replacePassWithPass:")] public bool ReplacePassWithPass(PKPass pass);
-    [Selector("addPasses:withCompletionHandler:")] public void AddPassesWithCompletionHandler(NSArray passes, PKPassLibraryAddPassesWithCompletionHandlerCompletionBlock? completion);
-    [Selector("openPaymentSetup")] public void OpenPaymentSetup();
-    [Selector("presentPaymentPass:")] public void PresentPaymentPass(PKPaymentPass pass);
-    [Selector("presentSecureElementPass:")] public void PresentSecureElementPass(PKSecureElementPass pass);
-    [Selector("canAddPaymentPassWithPrimaryAccountIdentifier:")] public bool CanAddPaymentPassWithPrimaryAccountIdentifier(NSString primaryAccountIdentifier);
-    [Selector("canAddSecureElementPassWithPrimaryAccountIdentifier:")] public bool CanAddSecureElementPassWithPrimaryAccountIdentifier(NSString primaryAccountIdentifier);
-    [Selector("canAddFelicaPass")] public bool CanAddFelicaPass();
-    [Selector("activatePaymentPass:withActivationData:completion:")] public void ActivatePaymentPassWithActivationDataCompletion(PKPaymentPass paymentPass, NSData activationData, PKPassLibraryActivatePaymentPassWithActivationDataCompletionCompletionBlock? completion);
-    [Selector("activatePaymentPass:withActivationCode:completion:")] public void ActivatePaymentPassWithActivationCodeCompletion(PKPaymentPass paymentPass, NSString activationCode, PKPassLibraryActivatePaymentPassWithActivationCodeCompletionCompletionBlock? completion);
-    [Selector("activateSecureElementPass:withActivationData:completion:")] public void ActivateSecureElementPassWithActivationDataCompletion(PKSecureElementPass secureElementPass, NSData activationData, PKPassLibraryActivateSecureElementPassWithActivationDataCompletionCompletionBlock? completion);
-    [Selector("signData:withSecureElementPass:completion:")] public void SignDataWithSecureElementPassCompletion(NSData signData, PKSecureElementPass secureElementPass, PKPassLibrarySignDataWithSecureElementPassCompletionCompletionBlock completion);
-    [Selector("encryptedServiceProviderDataForSecureElementPass:completion:")] public void EncryptedServiceProviderDataForSecureElementPassCompletion(PKSecureElementPass secureElementPass, PKPassLibraryEncryptedServiceProviderDataForSecureElementPassCompletionCompletionBlock completion);
-    [Selector("serviceProviderDataForSecureElementPass:completion:")] public void ServiceProviderDataForSecureElementPassCompletion(PKSecureElementPass secureElementPass, PKPassLibraryServiceProviderDataForSecureElementPassCompletionCompletionBlock completion);
+    [Selector("isSecureElementPassActivationAvailable")]
+    public bool SecureElementPassActivationAvailable { get; }
+    [Selector("remoteSecureElementPasses")]
+    public NSArray? RemoteSecureElementPasses { get; }
+    [Selector("isPassLibraryAvailable")]
+    public static bool IsPassLibraryAvailable();
+    [Selector("requestAutomaticPassPresentationSuppressionWithResponseHandler:")]
+    public static PKSuppressionRequestToken RequestAutomaticPassPresentationSuppressionWithResponseHandler(PKPassLibraryRequestAutomaticPassPresentationSuppressionWithResponseHandlerResponseHandlerBlock responseHandler);
+    [Selector("endAutomaticPassPresentationSuppressionWithRequestToken:")]
+    public static void EndAutomaticPassPresentationSuppressionWithRequestToken(PKSuppressionRequestToken requestToken);
+    [Selector("isSuppressingAutomaticPassPresentation")]
+    public static bool IsSuppressingAutomaticPassPresentation();
+    [Selector("isPaymentPassActivationAvailable")]
+    public static bool IsPaymentPassActivationAvailable();
+    [Selector("isPaymentPassActivationAvailable")]
+    public bool IsPaymentPassActivationAvailableMethod();
+    [Selector("passes")]
+    public NSArray Passes();
+    [Selector("passWithPassTypeIdentifier:serialNumber:")]
+    public PKPass? PassWithPassTypeIdentifierSerialNumber(NSString identifier, NSString serialNumber);
+    [Selector("passesWithReaderIdentifier:")]
+    public NSSet PassesWithReaderIdentifier(NSString readerIdentifier);
+    [Selector("passesOfType:")]
+    public NSArray PassesOfType(PKPassType passType);
+    [Selector("remotePaymentPasses")]
+    public NSArray RemotePaymentPasses();
+    [Selector("removePass:")]
+    public void RemovePass(PKPass pass);
+    [Selector("containsPass:")]
+    public bool ContainsPass(PKPass pass);
+    [Selector("replacePassWithPass:")]
+    public bool ReplacePassWithPass(PKPass pass);
+    [Selector("addPasses:withCompletionHandler:")]
+    public void AddPassesWithCompletionHandler(NSArray passes, PKPassLibraryAddPassesWithCompletionHandlerCompletionBlock? completion);
+    [Selector("openPaymentSetup")]
+    public void OpenPaymentSetup();
+    [Selector("presentPaymentPass:")]
+    public void PresentPaymentPass(PKPaymentPass pass);
+    [Selector("presentSecureElementPass:")]
+    public void PresentSecureElementPass(PKSecureElementPass pass);
+    [Selector("canAddPaymentPassWithPrimaryAccountIdentifier:")]
+    public bool CanAddPaymentPassWithPrimaryAccountIdentifier(NSString primaryAccountIdentifier);
+    [Selector("canAddSecureElementPassWithPrimaryAccountIdentifier:")]
+    public bool CanAddSecureElementPassWithPrimaryAccountIdentifier(NSString primaryAccountIdentifier);
+    [Selector("canAddFelicaPass")]
+    public bool CanAddFelicaPass();
+    [Selector("activatePaymentPass:withActivationData:completion:")]
+    public void ActivatePaymentPassWithActivationDataCompletion(PKPaymentPass paymentPass, NSData activationData, PKPassLibraryActivatePaymentPassWithActivationDataCompletionCompletionBlock? completion);
+    [Selector("activatePaymentPass:withActivationCode:completion:")]
+    public void ActivatePaymentPassWithActivationCodeCompletion(PKPaymentPass paymentPass, NSString activationCode, PKPassLibraryActivatePaymentPassWithActivationCodeCompletionCompletionBlock? completion);
+    [Selector("activateSecureElementPass:withActivationData:completion:")]
+    public void ActivateSecureElementPassWithActivationDataCompletion(PKSecureElementPass secureElementPass, NSData activationData, PKPassLibraryActivateSecureElementPassWithActivationDataCompletionCompletionBlock? completion);
+    [Selector("signData:withSecureElementPass:completion:")]
+    public void SignDataWithSecureElementPassCompletion(NSData signData, PKSecureElementPass secureElementPass, PKPassLibrarySignDataWithSecureElementPassCompletionCompletionBlock completion);
+    [Selector("encryptedServiceProviderDataForSecureElementPass:completion:")]
+    public void EncryptedServiceProviderDataForSecureElementPassCompletion(PKSecureElementPass secureElementPass, PKPassLibraryEncryptedServiceProviderDataForSecureElementPassCompletionCompletionBlock completion);
+    [Selector("serviceProviderDataForSecureElementPass:completion:")]
+    public void ServiceProviderDataForSecureElementPassCompletion(PKSecureElementPass secureElementPass, PKPassLibraryServiceProviderDataForSecureElementPassCompletionCompletionBlock completion);
     /// macOS 26.0 and later.
-    [Selector("authorizationStatusForCapability:")] public PKPassLibraryAuthorizationStatus AuthorizationStatusForCapability(PKPassLibraryCapability capability);
+    [Selector("authorizationStatusForCapability:")]
+    public PKPassLibraryAuthorizationStatus AuthorizationStatusForCapability(PKPassLibraryCapability capability);
     /// macOS 26.0 and later.
-    [Selector("requestAuthorizationForCapability:completion:")] public void RequestAuthorizationForCapabilityCompletion(PKPassLibraryCapability capability, PKPassLibraryRequestAuthorizationForCapabilityCompletionCompletionBlock completion);
+    [Selector("requestAuthorizationForCapability:completion:")]
+    public void RequestAuthorizationForCapabilityCompletion(PKPassLibraryCapability capability, PKPassLibraryRequestAuthorizationForCapabilityCompletionCompletionBlock completion);
 }
 
 public using PKPassLibraryNotificationName = NSString;

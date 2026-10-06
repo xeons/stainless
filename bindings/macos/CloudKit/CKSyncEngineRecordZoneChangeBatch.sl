@@ -35,11 +35,16 @@ public objc closure CKRecord? CKSyncEngineRecordZoneChangeBatchInitWithPendingCh
 
 public extern objc class CKSyncEngineRecordZoneChangeBatch : NSObject
 {
-    [Selector("recordsToSave")] public NSArray RecordsToSave { get; }
-    [Selector("recordIDsToDelete")] public NSArray RecordIDsToDelete { get; }
-    [Selector("atomicByZone", "setAtomicByZone:")] public bool AtomicByZone { get; set; }
-    [Selector("initWithPendingChanges:recordProvider:")] public Self? InitWithPendingChangesRecordProvider(NSArray pendingChanges, CKSyncEngineRecordZoneChangeBatchInitWithPendingChangesRecordProviderRecordProviderBlock recordProvider);
-    [Selector("initWithRecordsToSave:recordIDsToDelete:atomicByZone:")] public Self InitWithRecordsToSaveRecordIDsToDeleteAtomicByZone(NSArray? recordsToSave, NSArray? recordIDsToDelete, bool atomicByZone);
+    [Selector("recordsToSave")]
+    public NSArray RecordsToSave { get; }
+    [Selector("recordIDsToDelete")]
+    public NSArray RecordIDsToDelete { get; }
+    [Selector("atomicByZone", "setAtomicByZone:")]
+    public bool AtomicByZone { get; set; }
+    [Selector("initWithPendingChanges:recordProvider:")]
+    public Self? InitWithPendingChangesRecordProvider(NSArray pendingChanges, CKSyncEngineRecordZoneChangeBatchInitWithPendingChangesRecordProviderRecordProviderBlock recordProvider);
+    [Selector("initWithRecordsToSave:recordIDsToDelete:atomicByZone:")]
+    public Self InitWithRecordsToSaveRecordIDsToDeleteAtomicByZone(NSArray? recordsToSave, NSArray? recordIDsToDelete, bool atomicByZone);
 }
 
 #endif

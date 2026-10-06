@@ -33,17 +33,21 @@ import Standard.ObjC;
 
 public extern objc class AVAssetCache : NSObject
 {
-    [Selector("isPlayableOffline")] public bool PlayableOffline { get; }
-    [Selector("mediaSelectionOptionsInMediaSelectionGroup:")] public NSArray MediaSelectionOptionsInMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("isPlayableOffline")]
+    public bool PlayableOffline { get; }
+    [Selector("mediaSelectionOptionsInMediaSelectionGroup:")]
+    public NSArray MediaSelectionOptionsInMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
 }
 
 /// AVAssetCacheCustomMediaSelectionScheme, a category of AVAssetCache.
 public extern objc class AVAssetCache
 {
     /// macOS 26.0 and later.
-    [Selector("mediaPresentationSettingsForMediaSelectionGroup:")] public NSDictionary MediaPresentationSettingsForMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("mediaPresentationSettingsForMediaSelectionGroup:")]
+    public NSDictionary MediaPresentationSettingsForMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
     /// macOS 26.0 and later.
-    [Selector("mediaPresentationLanguagesForMediaSelectionGroup:")] public NSArray MediaPresentationLanguagesForMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("mediaPresentationLanguagesForMediaSelectionGroup:")]
+    public NSArray MediaPresentationLanguagesForMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
 }
 
 #endif

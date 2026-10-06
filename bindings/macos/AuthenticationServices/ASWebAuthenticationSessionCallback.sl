@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class ASWebAuthenticationSessionCallback : NSObject
 {
-    [Selector("callbackWithCustomScheme:")] public static Self CallbackWithCustomScheme(NSString customScheme);
-    [Selector("callbackWithHTTPSHost:path:")] public static Self CallbackWithHTTPSHostPath(NSString host, NSString path);
-    [Selector("matchesURL:")] public bool MatchesURL(NSURL url);
+    [Selector("callbackWithCustomScheme:")]
+    public static Self CallbackWithCustomScheme(NSString customScheme);
+    [Selector("callbackWithHTTPSHost:path:")]
+    public static Self CallbackWithHTTPSHostPath(NSString host, NSString path);
+    [Selector("matchesURL:")]
+    public bool MatchesURL(NSURL url);
 }
 
 #endif

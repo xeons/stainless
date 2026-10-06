@@ -48,23 +48,40 @@ public objc closure void AVAudioPlayerNodeCompletionHandler(AVAudioPlayerNodeCom
 
 public extern objc class AVAudioPlayerNode : AVAudioNode, AVAudioMixing
 {
-    [Selector("isPlaying")] public bool Playing { get; }
-    [Selector("init")] public Self Init();
-    [Selector("scheduleBuffer:completionHandler:")] public void ScheduleBufferCompletionHandler(AVAudioPCMBuffer buffer, AVAudioNodeCompletionHandler? completionHandler);
-    [Selector("scheduleBuffer:completionCallbackType:completionHandler:")] public void ScheduleBufferCompletionCallbackTypeCompletionHandler(AVAudioPCMBuffer buffer, AVAudioPlayerNodeCompletionCallbackType callbackType, AVAudioPlayerNodeCompletionHandler? completionHandler);
-    [Selector("scheduleBuffer:atTime:options:completionHandler:")] public void ScheduleBufferAtTimeOptionsCompletionHandler(AVAudioPCMBuffer buffer, AVAudioTime? when, AVAudioPlayerNodeBufferOptions options, AVAudioNodeCompletionHandler? completionHandler);
-    [Selector("scheduleBuffer:atTime:options:completionCallbackType:completionHandler:")] public void ScheduleBufferAtTimeOptionsCompletionCallbackTypeCompletionHandler(AVAudioPCMBuffer buffer, AVAudioTime? when, AVAudioPlayerNodeBufferOptions options, AVAudioPlayerNodeCompletionCallbackType callbackType, AVAudioPlayerNodeCompletionHandler? completionHandler);
-    [Selector("scheduleFile:atTime:completionHandler:")] public void ScheduleFileAtTimeCompletionHandler(AVAudioFile file, AVAudioTime? when, AVAudioNodeCompletionHandler? completionHandler);
-    [Selector("scheduleFile:atTime:completionCallbackType:completionHandler:")] public void ScheduleFileAtTimeCompletionCallbackTypeCompletionHandler(AVAudioFile file, AVAudioTime? when, AVAudioPlayerNodeCompletionCallbackType callbackType, AVAudioPlayerNodeCompletionHandler? completionHandler);
-    [Selector("scheduleSegment:startingFrame:frameCount:atTime:completionHandler:")] public void ScheduleSegmentStartingFrameFrameCountAtTimeCompletionHandler(AVAudioFile file, AVAudioFramePosition startFrame, AVAudioFrameCount numberFrames, AVAudioTime? when, AVAudioNodeCompletionHandler? completionHandler);
-    [Selector("scheduleSegment:startingFrame:frameCount:atTime:completionCallbackType:completionHandler:")] public void ScheduleSegmentStartingFrameFrameCountAtTimeCompletionCallbackTypeCompletionHandler(AVAudioFile file, AVAudioFramePosition startFrame, AVAudioFrameCount numberFrames, AVAudioTime? when, AVAudioPlayerNodeCompletionCallbackType callbackType, AVAudioPlayerNodeCompletionHandler? completionHandler);
-    [Selector("stop")] public void Stop();
-    [Selector("prepareWithFrameCount:")] public void PrepareWithFrameCount(AVAudioFrameCount frameCount);
-    [Selector("play")] public void Play();
-    [Selector("playAtTime:")] public void PlayAtTime(AVAudioTime? when);
-    [Selector("pause")] public void Pause();
-    [Selector("nodeTimeForPlayerTime:")] public AVAudioTime? NodeTimeForPlayerTime(AVAudioTime playerTime);
-    [Selector("playerTimeForNodeTime:")] public AVAudioTime? PlayerTimeForNodeTime(AVAudioTime nodeTime);
+    [Selector("isPlaying")]
+    public bool Playing { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("scheduleBuffer:completionHandler:")]
+    public void ScheduleBufferCompletionHandler(AVAudioPCMBuffer buffer, AVAudioNodeCompletionHandler? completionHandler);
+    [Selector("scheduleBuffer:completionCallbackType:completionHandler:")]
+    public void ScheduleBufferCompletionCallbackTypeCompletionHandler(AVAudioPCMBuffer buffer, AVAudioPlayerNodeCompletionCallbackType callbackType, AVAudioPlayerNodeCompletionHandler? completionHandler);
+    [Selector("scheduleBuffer:atTime:options:completionHandler:")]
+    public void ScheduleBufferAtTimeOptionsCompletionHandler(AVAudioPCMBuffer buffer, AVAudioTime? when, AVAudioPlayerNodeBufferOptions options, AVAudioNodeCompletionHandler? completionHandler);
+    [Selector("scheduleBuffer:atTime:options:completionCallbackType:completionHandler:")]
+    public void ScheduleBufferAtTimeOptionsCompletionCallbackTypeCompletionHandler(AVAudioPCMBuffer buffer, AVAudioTime? when, AVAudioPlayerNodeBufferOptions options, AVAudioPlayerNodeCompletionCallbackType callbackType, AVAudioPlayerNodeCompletionHandler? completionHandler);
+    [Selector("scheduleFile:atTime:completionHandler:")]
+    public void ScheduleFileAtTimeCompletionHandler(AVAudioFile file, AVAudioTime? when, AVAudioNodeCompletionHandler? completionHandler);
+    [Selector("scheduleFile:atTime:completionCallbackType:completionHandler:")]
+    public void ScheduleFileAtTimeCompletionCallbackTypeCompletionHandler(AVAudioFile file, AVAudioTime? when, AVAudioPlayerNodeCompletionCallbackType callbackType, AVAudioPlayerNodeCompletionHandler? completionHandler);
+    [Selector("scheduleSegment:startingFrame:frameCount:atTime:completionHandler:")]
+    public void ScheduleSegmentStartingFrameFrameCountAtTimeCompletionHandler(AVAudioFile file, AVAudioFramePosition startFrame, AVAudioFrameCount numberFrames, AVAudioTime? when, AVAudioNodeCompletionHandler? completionHandler);
+    [Selector("scheduleSegment:startingFrame:frameCount:atTime:completionCallbackType:completionHandler:")]
+    public void ScheduleSegmentStartingFrameFrameCountAtTimeCompletionCallbackTypeCompletionHandler(AVAudioFile file, AVAudioFramePosition startFrame, AVAudioFrameCount numberFrames, AVAudioTime? when, AVAudioPlayerNodeCompletionCallbackType callbackType, AVAudioPlayerNodeCompletionHandler? completionHandler);
+    [Selector("stop")]
+    public void Stop();
+    [Selector("prepareWithFrameCount:")]
+    public void PrepareWithFrameCount(AVAudioFrameCount frameCount);
+    [Selector("play")]
+    public void Play();
+    [Selector("playAtTime:")]
+    public void PlayAtTime(AVAudioTime? when);
+    [Selector("pause")]
+    public void Pause();
+    [Selector("nodeTimeForPlayerTime:")]
+    public AVAudioTime? NodeTimeForPlayerTime(AVAudioTime playerTime);
+    [Selector("playerTimeForNodeTime:")]
+    public AVAudioTime? PlayerTimeForNodeTime(AVAudioTime nodeTime);
 }
 
 #endif

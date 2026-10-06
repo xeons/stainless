@@ -34,26 +34,46 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCGraph : NSObject
 {
-    [Selector("device")] public MLCDevice? Device { get; }
-    [Selector("layers")] public NSArray Layers { get; }
-    [Selector("summarizedDOTDescription")] public NSString SummarizedDOTDescription { get; }
-    [Selector("graph")] public static Self Graph();
-    [Selector("nodeWithLayer:source:")] public MLCTensor? NodeWithLayerSource(MLCLayer layer, MLCTensor source);
-    [Selector("nodeWithLayer:sources:")] public MLCTensor? NodeWithLayerSources(MLCLayer layer, NSArray sources);
-    [Selector("nodeWithLayer:sources:disableUpdate:")] public MLCTensor? NodeWithLayerSourcesDisableUpdate(MLCLayer layer, NSArray sources, bool disableUpdate);
-    [Selector("nodeWithLayer:sources:lossLabels:")] public MLCTensor? NodeWithLayerSourcesLossLabels(MLCLayer layer, NSArray sources, NSArray lossLabels);
-    [Selector("splitWithSource:splitCount:dimension:")] public NSArray? SplitWithSourceSplitCountDimension(MLCTensor source, NSUInteger splitCount, NSUInteger dimension);
-    [Selector("splitWithSource:splitSectionLengths:dimension:")] public NSArray? SplitWithSourceSplitSectionLengthsDimension(MLCTensor source, NSArray splitSectionLengths, NSUInteger dimension);
-    [Selector("concatenateWithSources:dimension:")] public MLCTensor? ConcatenateWithSourcesDimension(NSArray sources, NSUInteger dimension);
-    [Selector("reshapeWithShape:source:")] public MLCTensor? ReshapeWithShapeSource(NSArray shape, MLCTensor source);
-    [Selector("transposeWithDimensions:source:")] public MLCTensor? TransposeWithDimensionsSource(NSArray dimensions, MLCTensor source);
-    [Selector("selectWithSources:condition:")] public MLCTensor? SelectWithSourcesCondition(NSArray sources, MLCTensor condition);
-    [Selector("scatterWithDimension:source:indices:copyFrom:reductionType:")] public MLCTensor? ScatterWithDimensionSourceIndicesCopyFromReductionType(NSUInteger dimension, MLCTensor source, MLCTensor indices, MLCTensor copyFrom, MLCReductionType reductionType);
-    [Selector("gatherWithDimension:source:indices:")] public MLCTensor? GatherWithDimensionSourceIndices(NSUInteger dimension, MLCTensor source, MLCTensor indices);
-    [Selector("bindAndWriteData:forInputs:toDevice:batchSize:synchronous:")] public bool BindAndWriteDataForInputsToDeviceBatchSizeSynchronous(NSDictionary inputsData, NSDictionary inputTensors, MLCDevice device, NSUInteger batchSize, bool synchronous);
-    [Selector("bindAndWriteData:forInputs:toDevice:synchronous:")] public bool BindAndWriteDataForInputsToDeviceSynchronous(NSDictionary inputsData, NSDictionary inputTensors, MLCDevice device, bool synchronous);
-    [Selector("sourceTensorsForLayer:")] public NSArray SourceTensorsForLayer(MLCLayer layer);
-    [Selector("resultTensorsForLayer:")] public NSArray ResultTensorsForLayer(MLCLayer layer);
+    [Selector("device")]
+    public MLCDevice? Device { get; }
+    [Selector("layers")]
+    public NSArray Layers { get; }
+    [Selector("summarizedDOTDescription")]
+    public NSString SummarizedDOTDescription { get; }
+    [Selector("graph")]
+    public static Self Graph();
+    [Selector("nodeWithLayer:source:")]
+    public MLCTensor? NodeWithLayerSource(MLCLayer layer, MLCTensor source);
+    [Selector("nodeWithLayer:sources:")]
+    public MLCTensor? NodeWithLayerSources(MLCLayer layer, NSArray sources);
+    [Selector("nodeWithLayer:sources:disableUpdate:")]
+    public MLCTensor? NodeWithLayerSourcesDisableUpdate(MLCLayer layer, NSArray sources, bool disableUpdate);
+    [Selector("nodeWithLayer:sources:lossLabels:")]
+    public MLCTensor? NodeWithLayerSourcesLossLabels(MLCLayer layer, NSArray sources, NSArray lossLabels);
+    [Selector("splitWithSource:splitCount:dimension:")]
+    public NSArray? SplitWithSourceSplitCountDimension(MLCTensor source, NSUInteger splitCount, NSUInteger dimension);
+    [Selector("splitWithSource:splitSectionLengths:dimension:")]
+    public NSArray? SplitWithSourceSplitSectionLengthsDimension(MLCTensor source, NSArray splitSectionLengths, NSUInteger dimension);
+    [Selector("concatenateWithSources:dimension:")]
+    public MLCTensor? ConcatenateWithSourcesDimension(NSArray sources, NSUInteger dimension);
+    [Selector("reshapeWithShape:source:")]
+    public MLCTensor? ReshapeWithShapeSource(NSArray shape, MLCTensor source);
+    [Selector("transposeWithDimensions:source:")]
+    public MLCTensor? TransposeWithDimensionsSource(NSArray dimensions, MLCTensor source);
+    [Selector("selectWithSources:condition:")]
+    public MLCTensor? SelectWithSourcesCondition(NSArray sources, MLCTensor condition);
+    [Selector("scatterWithDimension:source:indices:copyFrom:reductionType:")]
+    public MLCTensor? ScatterWithDimensionSourceIndicesCopyFromReductionType(NSUInteger dimension, MLCTensor source, MLCTensor indices, MLCTensor copyFrom, MLCReductionType reductionType);
+    [Selector("gatherWithDimension:source:indices:")]
+    public MLCTensor? GatherWithDimensionSourceIndices(NSUInteger dimension, MLCTensor source, MLCTensor indices);
+    [Selector("bindAndWriteData:forInputs:toDevice:batchSize:synchronous:")]
+    public bool BindAndWriteDataForInputsToDeviceBatchSizeSynchronous(NSDictionary inputsData, NSDictionary inputTensors, MLCDevice device, NSUInteger batchSize, bool synchronous);
+    [Selector("bindAndWriteData:forInputs:toDevice:synchronous:")]
+    public bool BindAndWriteDataForInputsToDeviceSynchronous(NSDictionary inputsData, NSDictionary inputTensors, MLCDevice device, bool synchronous);
+    [Selector("sourceTensorsForLayer:")]
+    public NSArray SourceTensorsForLayer(MLCLayer layer);
+    [Selector("resultTensorsForLayer:")]
+    public NSArray ResultTensorsForLayer(MLCLayer layer);
 }
 
 #endif

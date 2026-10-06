@@ -32,16 +32,22 @@ import Standard.ObjC;
 
 public extern objc class LAAuthenticationRequirement : NSObject
 {
-    [Selector("defaultRequirement")] public static LAAuthenticationRequirement DefaultRequirement { get; }
-    [Selector("biometryRequirement")] public static LAAuthenticationRequirement BiometryRequirement { get; }
-    [Selector("biometryCurrentSetRequirement")] public static LAAuthenticationRequirement BiometryCurrentSetRequirement { get; }
-    [Selector("biometryRequirementWithFallback:")] public static Self BiometryRequirementWithFallback(LABiometryFallbackRequirement fallback);
+    [Selector("defaultRequirement")]
+    public static LAAuthenticationRequirement DefaultRequirement { get; }
+    [Selector("biometryRequirement")]
+    public static LAAuthenticationRequirement BiometryRequirement { get; }
+    [Selector("biometryCurrentSetRequirement")]
+    public static LAAuthenticationRequirement BiometryCurrentSetRequirement { get; }
+    [Selector("biometryRequirementWithFallback:")]
+    public static Self BiometryRequirementWithFallback(LABiometryFallbackRequirement fallback);
 }
 
 public extern objc class LABiometryFallbackRequirement : NSObject
 {
-    [Selector("defaultRequirement")] public static LABiometryFallbackRequirement DefaultRequirement { get; }
-    [Selector("devicePasscodeRequirement")] public static LABiometryFallbackRequirement DevicePasscodeRequirement { get; }
+    [Selector("defaultRequirement")]
+    public static LABiometryFallbackRequirement DefaultRequirement { get; }
+    [Selector("devicePasscodeRequirement")]
+    public static LABiometryFallbackRequirement DevicePasscodeRequirement { get; }
 }
 
 #endif

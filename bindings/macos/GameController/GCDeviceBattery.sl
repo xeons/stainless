@@ -40,8 +40,10 @@ public enum GCDeviceBatteryState : long
 
 public extern objc class GCDeviceBattery : NSObject
 {
-    [Selector("batteryLevel")] public float BatteryLevel { get; }
-    [Selector("batteryState")] public GCDeviceBatteryState BatteryState { get; }
+    [Selector("batteryLevel")]
+    public float BatteryLevel { get; }
+    [Selector("batteryState")]
+    public GCDeviceBatteryState BatteryState { get; }
 }
 
 #endif

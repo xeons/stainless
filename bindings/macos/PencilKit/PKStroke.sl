@@ -35,16 +35,26 @@ import Standard.ObjC;
 
 public extern objc class PKStroke : NSObject, NSCopying
 {
-    [Selector("ink")] public PKInk Ink { get; }
-    [Selector("transform")] public CGAffineTransform Transform { get; }
-    [Selector("path")] public PKStrokePath Path { get; }
-    [Selector("mask")] public NSBezierPath? Mask { get; }
-    [Selector("renderBounds")] public CGRect RenderBounds { get; }
-    [Selector("maskedPathRanges")] public NSArray MaskedPathRanges { get; }
-    [Selector("randomSeed")] public uint RandomSeed { get; }
-    [Selector("requiredContentVersion")] public PKContentVersion RequiredContentVersion { get; }
-    [Selector("initWithInk:strokePath:transform:mask:")] public Self InitWithInkStrokePathTransformMask(PKInk ink, PKStrokePath strokePath, CGAffineTransform transform, NSBezierPath? mask);
-    [Selector("initWithInk:strokePath:transform:mask:randomSeed:")] public Self InitWithInkStrokePathTransformMaskRandomSeed(PKInk ink, PKStrokePath strokePath, CGAffineTransform transform, NSBezierPath? mask, uint randomSeed);
+    [Selector("ink")]
+    public PKInk Ink { get; }
+    [Selector("transform")]
+    public CGAffineTransform Transform { get; }
+    [Selector("path")]
+    public PKStrokePath Path { get; }
+    [Selector("mask")]
+    public NSBezierPath? Mask { get; }
+    [Selector("renderBounds")]
+    public CGRect RenderBounds { get; }
+    [Selector("maskedPathRanges")]
+    public NSArray MaskedPathRanges { get; }
+    [Selector("randomSeed")]
+    public uint RandomSeed { get; }
+    [Selector("requiredContentVersion")]
+    public PKContentVersion RequiredContentVersion { get; }
+    [Selector("initWithInk:strokePath:transform:mask:")]
+    public Self InitWithInkStrokePathTransformMask(PKInk ink, PKStrokePath strokePath, CGAffineTransform transform, NSBezierPath? mask);
+    [Selector("initWithInk:strokePath:transform:mask:randomSeed:")]
+    public Self InitWithInkStrokePathTransformMaskRandomSeed(PKInk ink, PKStrokePath strokePath, CGAffineTransform transform, NSBezierPath? mask, uint randomSeed);
 }
 
 #endif

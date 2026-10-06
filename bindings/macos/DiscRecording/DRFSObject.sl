@@ -40,24 +40,42 @@ public const int DRFilesystemInclusionMaskHFSPlus = 8;
 
 public extern objc class DRFSObject : NSObject
 {
-    [Selector("isVirtual")] public bool IsVirtual();
-    [Selector("sourcePath")] public NSString? SourcePath();
-    [Selector("parent")] public DRFolder? Parent();
-    [Selector("baseName")] public NSString? BaseName();
-    [Selector("setBaseName:")] public void SetBaseName(NSString? baseName);
-    [Selector("specificNameForFilesystem:")] public NSString? SpecificNameForFilesystem(NSString? filesystem);
-    [Selector("specificNames")] public NSDictionary? SpecificNames();
-    [Selector("setSpecificName:forFilesystem:")] public void SetSpecificNameForFilesystem(NSString? name, NSString? filesystem);
-    [Selector("setSpecificNames:")] public void SetSpecificNames(NSDictionary? specificNames);
-    [Selector("mangledNameForFilesystem:")] public NSString? MangledNameForFilesystem(NSString? filesystem);
-    [Selector("mangledNames")] public NSDictionary? MangledNames();
-    [Selector("propertyForKey:inFilesystem:mergeWithOtherFilesystems:")] public AnyObject? PropertyForKeyInFilesystemMergeWithOtherFilesystems(NSString? key, NSString? filesystem, bool merge);
-    [Selector("propertiesForFilesystem:mergeWithOtherFilesystems:")] public NSDictionary? PropertiesForFilesystemMergeWithOtherFilesystems(NSString? filesystem, bool merge);
-    [Selector("setProperty:forKey:inFilesystem:")] public void SetPropertyForKeyInFilesystem(AnyObject? property, NSString? key, NSString? filesystem);
-    [Selector("setProperties:inFilesystem:")] public void SetPropertiesInFilesystem(NSDictionary? properties, NSString? filesystem);
-    [Selector("explicitFilesystemMask")] public DRFilesystemInclusionMask ExplicitFilesystemMask();
-    [Selector("setExplicitFilesystemMask:")] public void SetExplicitFilesystemMask(DRFilesystemInclusionMask mask);
-    [Selector("effectiveFilesystemMask")] public DRFilesystemInclusionMask EffectiveFilesystemMask();
+    [Selector("isVirtual")]
+    public bool IsVirtual();
+    [Selector("sourcePath")]
+    public NSString? SourcePath();
+    [Selector("parent")]
+    public DRFolder? Parent();
+    [Selector("baseName")]
+    public NSString? BaseName();
+    [Selector("setBaseName:")]
+    public void SetBaseName(NSString? baseName);
+    [Selector("specificNameForFilesystem:")]
+    public NSString? SpecificNameForFilesystem(NSString? filesystem);
+    [Selector("specificNames")]
+    public NSDictionary? SpecificNames();
+    [Selector("setSpecificName:forFilesystem:")]
+    public void SetSpecificNameForFilesystem(NSString? name, NSString? filesystem);
+    [Selector("setSpecificNames:")]
+    public void SetSpecificNames(NSDictionary? specificNames);
+    [Selector("mangledNameForFilesystem:")]
+    public NSString? MangledNameForFilesystem(NSString? filesystem);
+    [Selector("mangledNames")]
+    public NSDictionary? MangledNames();
+    [Selector("propertyForKey:inFilesystem:mergeWithOtherFilesystems:")]
+    public AnyObject? PropertyForKeyInFilesystemMergeWithOtherFilesystems(NSString? key, NSString? filesystem, bool merge);
+    [Selector("propertiesForFilesystem:mergeWithOtherFilesystems:")]
+    public NSDictionary? PropertiesForFilesystemMergeWithOtherFilesystems(NSString? filesystem, bool merge);
+    [Selector("setProperty:forKey:inFilesystem:")]
+    public void SetPropertyForKeyInFilesystem(AnyObject? property, NSString? key, NSString? filesystem);
+    [Selector("setProperties:inFilesystem:")]
+    public void SetPropertiesInFilesystem(NSDictionary? properties, NSString? filesystem);
+    [Selector("explicitFilesystemMask")]
+    public DRFilesystemInclusionMask ExplicitFilesystemMask();
+    [Selector("setExplicitFilesystemMask:")]
+    public void SetExplicitFilesystemMask(DRFilesystemInclusionMask mask);
+    [Selector("effectiveFilesystemMask")]
+    public DRFilesystemInclusionMask EffectiveFilesystemMask();
 }
 
 public extern "C" NSString? DRAllFilesystems;

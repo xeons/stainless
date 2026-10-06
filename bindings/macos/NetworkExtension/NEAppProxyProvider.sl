@@ -37,13 +37,19 @@ public objc closure void NEAppProxyProviderStopProxyWithReasonCompletionHandlerC
 
 public extern objc class NEAppProxyProvider : NETunnelProvider
 {
-    [Selector("startProxyWithOptions:completionHandler:")] public void StartProxyWithOptionsCompletionHandler(NSDictionary? options, NEAppProxyProviderStartProxyWithOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("stopProxyWithReason:completionHandler:")] public void StopProxyWithReasonCompletionHandler(NEProviderStopReason reason, NEAppProxyProviderStopProxyWithReasonCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("cancelProxyWithError:")] public void CancelProxyWithError(NSError? error);
-    [Selector("handleNewFlow:")] public bool HandleNewFlow(NEAppProxyFlow flow);
-    [Selector("handleNewUDPFlow:initialRemoteFlowEndpoint:")] public bool HandleNewUDPFlowInitialRemoteFlowEndpoint(NEAppProxyUDPFlow flow, nw_endpoint_t remoteEndpoint);
+    [Selector("startProxyWithOptions:completionHandler:")]
+    public void StartProxyWithOptionsCompletionHandler(NSDictionary? options, NEAppProxyProviderStartProxyWithOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("stopProxyWithReason:completionHandler:")]
+    public void StopProxyWithReasonCompletionHandler(NEProviderStopReason reason, NEAppProxyProviderStopProxyWithReasonCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("cancelProxyWithError:")]
+    public void CancelProxyWithError(NSError? error);
+    [Selector("handleNewFlow:")]
+    public bool HandleNewFlow(NEAppProxyFlow flow);
+    [Selector("handleNewUDPFlow:initialRemoteFlowEndpoint:")]
+    public bool HandleNewUDPFlowInitialRemoteFlowEndpoint(NEAppProxyUDPFlow flow, nw_endpoint_t remoteEndpoint);
     /// Deprecated in macOS 15.0.
-    [Selector("handleNewUDPFlow:initialRemoteEndpoint:")] public bool HandleNewUDPFlowInitialRemoteEndpoint(NEAppProxyUDPFlow flow, NWEndpoint remoteEndpoint);
+    [Selector("handleNewUDPFlow:initialRemoteEndpoint:")]
+    public bool HandleNewUDPFlowInitialRemoteEndpoint(NEAppProxyUDPFlow flow, NWEndpoint remoteEndpoint);
 }
 
 #endif

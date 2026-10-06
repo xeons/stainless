@@ -42,26 +42,46 @@ public enum SKTileDefinitionRotation : ulong
 
 public extern objc class SKTileDefinition : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("textures", "setTextures:")] public NSArray Textures { get; set; }
-    [Selector("normalTextures", "setNormalTextures:")] public NSArray NormalTextures { get; set; }
-    [Selector("userData", "setUserData:")] public NSMutableDictionary? UserData { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("size", "setSize:")] public CGSize Size { get; set; }
-    [Selector("timePerFrame", "setTimePerFrame:")] public CGFloat TimePerFrame { get; set; }
-    [Selector("placementWeight", "setPlacementWeight:")] public NSUInteger PlacementWeight { get; set; }
-    [Selector("rotation", "setRotation:")] public SKTileDefinitionRotation Rotation { get; set; }
-    [Selector("flipVertically", "setFlipVertically:")] public bool FlipVertically { get; set; }
-    [Selector("flipHorizontally", "setFlipHorizontally:")] public bool FlipHorizontally { get; set; }
-    [Selector("tileDefinitionWithTexture:")] public static Self TileDefinitionWithTexture(SKTexture texture);
-    [Selector("tileDefinitionWithTexture:size:")] public static Self TileDefinitionWithTextureSize(SKTexture texture, CGSize size);
-    [Selector("tileDefinitionWithTexture:normalTexture:size:")] public static Self TileDefinitionWithTextureNormalTextureSize(SKTexture texture, SKTexture normalTexture, CGSize size);
-    [Selector("tileDefinitionWithTextures:size:timePerFrame:")] public static Self TileDefinitionWithTexturesSizeTimePerFrame(NSArray textures, CGSize size, CGFloat timePerFrame);
-    [Selector("tileDefinitionWithTextures:normalTextures:size:timePerFrame:")] public static Self TileDefinitionWithTexturesNormalTexturesSizeTimePerFrame(NSArray textures, NSArray normalTextures, CGSize size, CGFloat timePerFrame);
-    [Selector("initWithTexture:")] public Self InitWithTexture(SKTexture texture);
-    [Selector("initWithTexture:size:")] public Self InitWithTextureSize(SKTexture texture, CGSize size);
-    [Selector("initWithTexture:normalTexture:size:")] public Self InitWithTextureNormalTextureSize(SKTexture texture, SKTexture normalTexture, CGSize size);
-    [Selector("initWithTextures:size:timePerFrame:")] public Self InitWithTexturesSizeTimePerFrame(NSArray textures, CGSize size, CGFloat timePerFrame);
-    [Selector("initWithTextures:normalTextures:size:timePerFrame:")] public Self InitWithTexturesNormalTexturesSizeTimePerFrame(NSArray textures, NSArray normalTextures, CGSize size, CGFloat timePerFrame);
+    [Selector("textures", "setTextures:")]
+    public NSArray Textures { get; set; }
+    [Selector("normalTextures", "setNormalTextures:")]
+    public NSArray NormalTextures { get; set; }
+    [Selector("userData", "setUserData:")]
+    public NSMutableDictionary? UserData { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("size", "setSize:")]
+    public CGSize Size { get; set; }
+    [Selector("timePerFrame", "setTimePerFrame:")]
+    public CGFloat TimePerFrame { get; set; }
+    [Selector("placementWeight", "setPlacementWeight:")]
+    public NSUInteger PlacementWeight { get; set; }
+    [Selector("rotation", "setRotation:")]
+    public SKTileDefinitionRotation Rotation { get; set; }
+    [Selector("flipVertically", "setFlipVertically:")]
+    public bool FlipVertically { get; set; }
+    [Selector("flipHorizontally", "setFlipHorizontally:")]
+    public bool FlipHorizontally { get; set; }
+    [Selector("tileDefinitionWithTexture:")]
+    public static Self TileDefinitionWithTexture(SKTexture texture);
+    [Selector("tileDefinitionWithTexture:size:")]
+    public static Self TileDefinitionWithTextureSize(SKTexture texture, CGSize size);
+    [Selector("tileDefinitionWithTexture:normalTexture:size:")]
+    public static Self TileDefinitionWithTextureNormalTextureSize(SKTexture texture, SKTexture normalTexture, CGSize size);
+    [Selector("tileDefinitionWithTextures:size:timePerFrame:")]
+    public static Self TileDefinitionWithTexturesSizeTimePerFrame(NSArray textures, CGSize size, CGFloat timePerFrame);
+    [Selector("tileDefinitionWithTextures:normalTextures:size:timePerFrame:")]
+    public static Self TileDefinitionWithTexturesNormalTexturesSizeTimePerFrame(NSArray textures, NSArray normalTextures, CGSize size, CGFloat timePerFrame);
+    [Selector("initWithTexture:")]
+    public Self InitWithTexture(SKTexture texture);
+    [Selector("initWithTexture:size:")]
+    public Self InitWithTextureSize(SKTexture texture, CGSize size);
+    [Selector("initWithTexture:normalTexture:size:")]
+    public Self InitWithTextureNormalTextureSize(SKTexture texture, SKTexture normalTexture, CGSize size);
+    [Selector("initWithTextures:size:timePerFrame:")]
+    public Self InitWithTexturesSizeTimePerFrame(NSArray textures, CGSize size, CGFloat timePerFrame);
+    [Selector("initWithTextures:normalTextures:size:timePerFrame:")]
+    public Self InitWithTexturesNormalTexturesSizeTimePerFrame(NSArray textures, NSArray normalTextures, CGSize size, CGFloat timePerFrame);
 }
 
 #endif

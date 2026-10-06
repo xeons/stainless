@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class EKReminder : EKCalendarItem
 {
-    [Selector("startDateComponents", "setStartDateComponents:")] public NSDateComponents? StartDateComponents { get; set; }
-    [Selector("dueDateComponents", "setDueDateComponents:")] public NSDateComponents? DueDateComponents { get; set; }
-    [Selector("isCompleted", "setCompleted:")] public bool Completed { get; set; }
-    [Selector("completionDate", "setCompletionDate:")] public NSDate? CompletionDate { get; set; }
-    [Selector("priority", "setPriority:")] public NSUInteger Priority { get; set; }
-    [Selector("reminderWithEventStore:")] public static EKReminder ReminderWithEventStore(EKEventStore eventStore);
+    [Selector("startDateComponents", "setStartDateComponents:")]
+    public NSDateComponents? StartDateComponents { get; set; }
+    [Selector("dueDateComponents", "setDueDateComponents:")]
+    public NSDateComponents? DueDateComponents { get; set; }
+    [Selector("isCompleted", "setCompleted:")]
+    public bool Completed { get; set; }
+    [Selector("completionDate", "setCompletionDate:")]
+    public NSDate? CompletionDate { get; set; }
+    [Selector("priority", "setPriority:")]
+    public NSUInteger Priority { get; set; }
+    [Selector("reminderWithEventStore:")]
+    public static EKReminder ReminderWithEventStore(EKEventStore eventStore);
 }
 
 #endif

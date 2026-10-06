@@ -35,7 +35,8 @@ public struct _GLKMatrixStack;
 [CFType("GLKMatrixStackGetTypeID")]
 public extern objc class GLKMatrixStackRef : CFTypeRef { }
 
-[ReturnsRetained] public extern "C" GLKMatrixStackRef? GLKMatrixStackCreate(CFAllocatorRef? alloc);
+[ReturnsRetained]
+public extern "C" GLKMatrixStackRef? GLKMatrixStackCreate(CFAllocatorRef? alloc);
 
 public extern "C" CFTypeID GLKMatrixStackGetTypeID();
 

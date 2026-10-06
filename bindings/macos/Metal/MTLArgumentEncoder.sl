@@ -33,35 +33,62 @@ import Standard.ObjC;
 
 public objc interface MTLArgumentEncoder : NSObjectProtocol
 {
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("encodedLength")] NSUInteger EncodedLength { get; }
-    [Selector("alignment")] NSUInteger Alignment { get; }
-    [Selector("setArgumentBuffer:offset:")] void SetArgumentBufferOffset(MTLBuffer? argumentBuffer, NSUInteger offset);
-    [Selector("setArgumentBuffer:startOffset:arrayElement:")] void SetArgumentBufferStartOffsetArrayElement(MTLBuffer? argumentBuffer, NSUInteger startOffset, NSUInteger arrayElement);
-    [Selector("setBuffer:offset:atIndex:")] void SetBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
-    [Selector("setBuffers:offsets:withRange:")] void SetBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
-    [Selector("setTexture:atIndex:")] void SetTextureAtIndex(MTLTexture? texture, NSUInteger index);
-    [Selector("setTextures:withRange:")] void SetTexturesWithRange(void** textures, NSRange range);
-    [Selector("setSamplerState:atIndex:")] void SetSamplerStateAtIndex(MTLSamplerState? sampler, NSUInteger index);
-    [Selector("setSamplerStates:withRange:")] void SetSamplerStatesWithRange(void** samplers, NSRange range);
-    [Selector("constantDataAtIndex:")] void* ConstantDataAtIndex(NSUInteger index);
-    [Selector("setRenderPipelineState:atIndex:")] void SetRenderPipelineStateAtIndex(MTLRenderPipelineState? pipeline, NSUInteger index);
-    [Selector("setRenderPipelineStates:withRange:")] void SetRenderPipelineStatesWithRange(void** pipelines, NSRange range);
-    [Selector("setComputePipelineState:atIndex:")] void SetComputePipelineStateAtIndex(MTLComputePipelineState? pipeline, NSUInteger index);
-    [Selector("setComputePipelineStates:withRange:")] void SetComputePipelineStatesWithRange(void** pipelines, NSRange range);
-    [Selector("setIndirectCommandBuffer:atIndex:")] void SetIndirectCommandBufferAtIndex(MTLIndirectCommandBuffer? indirectCommandBuffer, NSUInteger index);
-    [Selector("setIndirectCommandBuffers:withRange:")] void SetIndirectCommandBuffersWithRange(void** buffers, NSRange range);
-    [Selector("setAccelerationStructure:atIndex:")] void SetAccelerationStructureAtIndex(MTLAccelerationStructure? accelerationStructure, NSUInteger index);
-    [Selector("newArgumentEncoderForBufferAtIndex:")] MTLArgumentEncoder? NewArgumentEncoderForBufferAtIndex(NSUInteger index);
-    [Selector("setVisibleFunctionTable:atIndex:")] void SetVisibleFunctionTableAtIndex(MTLVisibleFunctionTable? visibleFunctionTable, NSUInteger index);
-    [Selector("setVisibleFunctionTables:withRange:")] void SetVisibleFunctionTablesWithRange(void** visibleFunctionTables, NSRange range);
-    [Selector("setIntersectionFunctionTable:atIndex:")] void SetIntersectionFunctionTableAtIndex(MTLIntersectionFunctionTable? intersectionFunctionTable, NSUInteger index);
-    [Selector("setIntersectionFunctionTables:withRange:")] void SetIntersectionFunctionTablesWithRange(void** intersectionFunctionTables, NSRange range);
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("encodedLength")]
+    NSUInteger EncodedLength { get; }
+    [Selector("alignment")]
+    NSUInteger Alignment { get; }
+    [Selector("setArgumentBuffer:offset:")]
+    void SetArgumentBufferOffset(MTLBuffer? argumentBuffer, NSUInteger offset);
+    [Selector("setArgumentBuffer:startOffset:arrayElement:")]
+    void SetArgumentBufferStartOffsetArrayElement(MTLBuffer? argumentBuffer, NSUInteger startOffset, NSUInteger arrayElement);
+    [Selector("setBuffer:offset:atIndex:")]
+    void SetBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
+    [Selector("setBuffers:offsets:withRange:")]
+    void SetBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
+    [Selector("setTexture:atIndex:")]
+    void SetTextureAtIndex(MTLTexture? texture, NSUInteger index);
+    [Selector("setTextures:withRange:")]
+    void SetTexturesWithRange(void** textures, NSRange range);
+    [Selector("setSamplerState:atIndex:")]
+    void SetSamplerStateAtIndex(MTLSamplerState? sampler, NSUInteger index);
+    [Selector("setSamplerStates:withRange:")]
+    void SetSamplerStatesWithRange(void** samplers, NSRange range);
+    [Selector("constantDataAtIndex:")]
+    void* ConstantDataAtIndex(NSUInteger index);
+    [Selector("setRenderPipelineState:atIndex:")]
+    void SetRenderPipelineStateAtIndex(MTLRenderPipelineState? pipeline, NSUInteger index);
+    [Selector("setRenderPipelineStates:withRange:")]
+    void SetRenderPipelineStatesWithRange(void** pipelines, NSRange range);
+    [Selector("setComputePipelineState:atIndex:")]
+    void SetComputePipelineStateAtIndex(MTLComputePipelineState? pipeline, NSUInteger index);
+    [Selector("setComputePipelineStates:withRange:")]
+    void SetComputePipelineStatesWithRange(void** pipelines, NSRange range);
+    [Selector("setIndirectCommandBuffer:atIndex:")]
+    void SetIndirectCommandBufferAtIndex(MTLIndirectCommandBuffer? indirectCommandBuffer, NSUInteger index);
+    [Selector("setIndirectCommandBuffers:withRange:")]
+    void SetIndirectCommandBuffersWithRange(void** buffers, NSRange range);
+    [Selector("setAccelerationStructure:atIndex:")]
+    void SetAccelerationStructureAtIndex(MTLAccelerationStructure? accelerationStructure, NSUInteger index);
+    [Selector("newArgumentEncoderForBufferAtIndex:")]
+    MTLArgumentEncoder? NewArgumentEncoderForBufferAtIndex(NSUInteger index);
+    [Selector("setVisibleFunctionTable:atIndex:")]
+    void SetVisibleFunctionTableAtIndex(MTLVisibleFunctionTable? visibleFunctionTable, NSUInteger index);
+    [Selector("setVisibleFunctionTables:withRange:")]
+    void SetVisibleFunctionTablesWithRange(void** visibleFunctionTables, NSRange range);
+    [Selector("setIntersectionFunctionTable:atIndex:")]
+    void SetIntersectionFunctionTableAtIndex(MTLIntersectionFunctionTable? intersectionFunctionTable, NSUInteger index);
+    [Selector("setIntersectionFunctionTables:withRange:")]
+    void SetIntersectionFunctionTablesWithRange(void** intersectionFunctionTables, NSRange range);
     /// macOS 26.0 and later.
-    [Selector("setDepthStencilState:atIndex:")] void SetDepthStencilStateAtIndex(MTLDepthStencilState? depthStencilState, NSUInteger index);
+    [Selector("setDepthStencilState:atIndex:")]
+    void SetDepthStencilStateAtIndex(MTLDepthStencilState? depthStencilState, NSUInteger index);
     /// macOS 26.0 and later.
-    [Selector("setDepthStencilStates:withRange:")] void SetDepthStencilStatesWithRange(void** depthStencilStates, NSRange range);
+    [Selector("setDepthStencilStates:withRange:")]
+    void SetDepthStencilStatesWithRange(void** depthStencilStates, NSRange range);
 }
 
 #endif

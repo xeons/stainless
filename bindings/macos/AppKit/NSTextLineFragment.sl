@@ -35,17 +35,28 @@ import Standard.ObjC;
 
 public extern objc class NSTextLineFragment : NSObject, NSSecureCoding
 {
-    [Selector("attributedString")] public NSAttributedString AttributedString { get; }
-    [Selector("characterRange")] public NSRange CharacterRange { get; }
-    [Selector("typographicBounds")] public CGRect TypographicBounds { get; }
-    [Selector("glyphOrigin")] public CGPoint GlyphOrigin { get; }
-    [Selector("initWithAttributedString:range:")] public Self InitWithAttributedStringRange(NSAttributedString attributedString, NSRange range);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
-    [Selector("initWithString:attributes:range:")] public Self InitWithStringAttributesRange(NSString string, NSDictionary attributes, NSRange range);
-    [Selector("drawAtPoint:inContext:")] public void DrawAtPointInContext(CGPoint point, CGContextRef context);
-    [Selector("locationForCharacterAtIndex:")] public CGPoint LocationForCharacterAtIndex(NSInteger index);
-    [Selector("characterIndexForPoint:")] public NSInteger CharacterIndexForPoint(CGPoint point);
-    [Selector("fractionOfDistanceThroughGlyphForPoint:")] public CGFloat FractionOfDistanceThroughGlyphForPoint(CGPoint point);
+    [Selector("attributedString")]
+    public NSAttributedString AttributedString { get; }
+    [Selector("characterRange")]
+    public NSRange CharacterRange { get; }
+    [Selector("typographicBounds")]
+    public CGRect TypographicBounds { get; }
+    [Selector("glyphOrigin")]
+    public CGPoint GlyphOrigin { get; }
+    [Selector("initWithAttributedString:range:")]
+    public Self InitWithAttributedStringRange(NSAttributedString attributedString, NSRange range);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder aDecoder);
+    [Selector("initWithString:attributes:range:")]
+    public Self InitWithStringAttributesRange(NSString string, NSDictionary attributes, NSRange range);
+    [Selector("drawAtPoint:inContext:")]
+    public void DrawAtPointInContext(CGPoint point, CGContextRef context);
+    [Selector("locationForCharacterAtIndex:")]
+    public CGPoint LocationForCharacterAtIndex(NSInteger index);
+    [Selector("characterIndexForPoint:")]
+    public NSInteger CharacterIndexForPoint(CGPoint point);
+    [Selector("fractionOfDistanceThroughGlyphForPoint:")]
+    public CGFloat FractionOfDistanceThroughGlyphForPoint(CGPoint point);
 }
 
 #endif

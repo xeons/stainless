@@ -43,19 +43,26 @@ public const int kCSIdentityQueryStringBeginsWith = 2;
 
 public using CSIdentityQueryStringComparisonMethod = CFIndex;
 
-[ReturnsRetained] public extern "C" CSIdentityQueryRef? CSIdentityQueryCreate(CFAllocatorRef? allocator, CSIdentityClass identityClass, CSIdentityAuthorityRef? authority);
+[ReturnsRetained]
+public extern "C" CSIdentityQueryRef? CSIdentityQueryCreate(CFAllocatorRef? allocator, CSIdentityClass identityClass, CSIdentityAuthorityRef? authority);
 
-[ReturnsRetained] public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForName(CFAllocatorRef? allocator, CFStringRef? name, CSIdentityQueryStringComparisonMethod comparisonMethod, CSIdentityClass identityClass, CSIdentityAuthorityRef? authority);
+[ReturnsRetained]
+public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForName(CFAllocatorRef? allocator, CFStringRef? name, CSIdentityQueryStringComparisonMethod comparisonMethod, CSIdentityClass identityClass, CSIdentityAuthorityRef? authority);
 
-[ReturnsRetained] public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForUUID(CFAllocatorRef? allocator, CFUUIDRef? uuid, CSIdentityAuthorityRef? authority);
+[ReturnsRetained]
+public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForUUID(CFAllocatorRef? allocator, CFUUIDRef? uuid, CSIdentityAuthorityRef? authority);
 
-[ReturnsRetained] public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForPosixID(CFAllocatorRef? allocator, id_t posixID, CSIdentityClass identityClass, CSIdentityAuthorityRef? authority);
+[ReturnsRetained]
+public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForPosixID(CFAllocatorRef? allocator, id_t posixID, CSIdentityClass identityClass, CSIdentityAuthorityRef? authority);
 
-[ReturnsRetained] public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForPersistentReference(CFAllocatorRef? allocator, CFDataRef? referenceData);
+[ReturnsRetained]
+public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForPersistentReference(CFAllocatorRef? allocator, CFDataRef? referenceData);
 
-[ReturnsRetained] public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForCurrentUser(CFAllocatorRef? allocator);
+[ReturnsRetained]
+public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForCurrentUser(CFAllocatorRef? allocator);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CSIdentityQueryCopyResults(CSIdentityQueryRef? query);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CSIdentityQueryCopyResults(CSIdentityQueryRef? query);
 
 public extern "C" Boolean CSIdentityQueryExecute(CSIdentityQueryRef? query, CSIdentityQueryFlags flags, __CFError** error);
 

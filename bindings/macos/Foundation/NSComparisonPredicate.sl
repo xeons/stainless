@@ -64,17 +64,28 @@ public enum NSPredicateOperatorType : ulong
 
 public extern objc class NSComparisonPredicate : NSPredicate
 {
-    [Selector("predicateOperatorType")] public NSPredicateOperatorType PredicateOperatorType { get; }
-    [Selector("comparisonPredicateModifier")] public NSComparisonPredicateModifier ComparisonPredicateModifier { get; }
-    [Selector("leftExpression")] public NSExpression LeftExpression { get; }
-    [Selector("rightExpression")] public NSExpression RightExpression { get; }
-    [Selector("customSelector")] public Selector CustomSelector { get; }
-    [Selector("options")] public NSComparisonPredicateOptions Options { get; }
-    [Selector("predicateWithLeftExpression:rightExpression:modifier:type:options:")] public static NSComparisonPredicate PredicateWithLeftExpressionRightExpressionModifierTypeOptions(NSExpression lhs, NSExpression rhs, NSComparisonPredicateModifier modifier, NSPredicateOperatorType type, NSComparisonPredicateOptions options);
-    [Selector("predicateWithLeftExpression:rightExpression:customSelector:")] public static NSComparisonPredicate PredicateWithLeftExpressionRightExpressionCustomSelector(NSExpression lhs, NSExpression rhs, Selector selector);
-    [Selector("initWithLeftExpression:rightExpression:modifier:type:options:")] public Self InitWithLeftExpressionRightExpressionModifierTypeOptions(NSExpression lhs, NSExpression rhs, NSComparisonPredicateModifier modifier, NSPredicateOperatorType type, NSComparisonPredicateOptions options);
-    [Selector("initWithLeftExpression:rightExpression:customSelector:")] public Self InitWithLeftExpressionRightExpressionCustomSelector(NSExpression lhs, NSExpression rhs, Selector selector);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("predicateOperatorType")]
+    public NSPredicateOperatorType PredicateOperatorType { get; }
+    [Selector("comparisonPredicateModifier")]
+    public NSComparisonPredicateModifier ComparisonPredicateModifier { get; }
+    [Selector("leftExpression")]
+    public NSExpression LeftExpression { get; }
+    [Selector("rightExpression")]
+    public NSExpression RightExpression { get; }
+    [Selector("customSelector")]
+    public Selector CustomSelector { get; }
+    [Selector("options")]
+    public NSComparisonPredicateOptions Options { get; }
+    [Selector("predicateWithLeftExpression:rightExpression:modifier:type:options:")]
+    public static NSComparisonPredicate PredicateWithLeftExpressionRightExpressionModifierTypeOptions(NSExpression lhs, NSExpression rhs, NSComparisonPredicateModifier modifier, NSPredicateOperatorType type, NSComparisonPredicateOptions options);
+    [Selector("predicateWithLeftExpression:rightExpression:customSelector:")]
+    public static NSComparisonPredicate PredicateWithLeftExpressionRightExpressionCustomSelector(NSExpression lhs, NSExpression rhs, Selector selector);
+    [Selector("initWithLeftExpression:rightExpression:modifier:type:options:")]
+    public Self InitWithLeftExpressionRightExpressionModifierTypeOptions(NSExpression lhs, NSExpression rhs, NSComparisonPredicateModifier modifier, NSPredicateOperatorType type, NSComparisonPredicateOptions options);
+    [Selector("initWithLeftExpression:rightExpression:customSelector:")]
+    public Self InitWithLeftExpressionRightExpressionCustomSelector(NSExpression lhs, NSExpression rhs, Selector selector);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 #endif

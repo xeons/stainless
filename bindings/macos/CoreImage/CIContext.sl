@@ -40,33 +40,57 @@ import Standard.ObjC;
 
 public extern objc class CIContext : NSObject
 {
-    [Selector("workingColorSpace")] public CGColorSpaceRef? WorkingColorSpace { get; }
-    [Selector("workingFormat")] public CIFormat WorkingFormat { get; }
+    [Selector("workingColorSpace")]
+    public CGColorSpaceRef? WorkingColorSpace { get; }
+    [Selector("workingFormat")]
+    public CIFormat WorkingFormat { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("contextWithCGLContext:pixelFormat:colorSpace:options:")] public static CIContext ContextWithCGLContextPixelFormatColorSpaceOptions(CGLContextObj cglctx, CGLPixelFormatObj pixelFormat, CGColorSpaceRef? colorSpace, NSDictionary? options);
+    [Selector("contextWithCGLContext:pixelFormat:colorSpace:options:")]
+    public static CIContext ContextWithCGLContextPixelFormatColorSpaceOptions(CGLContextObj cglctx, CGLPixelFormatObj pixelFormat, CGColorSpaceRef? colorSpace, NSDictionary? options);
     /// Deprecated in macOS 10.6.
-    [Selector("contextWithCGLContext:pixelFormat:options:")] public static CIContext ContextWithCGLContextPixelFormatOptions(CGLContextObj cglctx, CGLPixelFormatObj pixelFormat, NSDictionary? options);
-    [Selector("contextWithCGContext:options:")] public static CIContext ContextWithCGContextOptions(CGContextRef cgctx, NSDictionary? options);
-    [Selector("contextWithOptions:")] public static CIContext ContextWithOptions(NSDictionary? options);
-    [Selector("context")] public static CIContext Context();
-    [Selector("initWithOptions:")] public Self InitWithOptions(NSDictionary? options);
-    [Selector("init")] public Self Init();
-    [Selector("contextWithMTLDevice:")] public static CIContext ContextWithMTLDevice(MTLDevice device);
-    [Selector("contextWithMTLDevice:options:")] public static CIContext ContextWithMTLDeviceOptions(MTLDevice device, NSDictionary? options);
-    [Selector("contextWithMTLCommandQueue:")] public static CIContext ContextWithMTLCommandQueue(MTLCommandQueue commandQueue);
-    [Selector("contextWithMTLCommandQueue:options:")] public static CIContext ContextWithMTLCommandQueueOptions(MTLCommandQueue commandQueue, NSDictionary? options);
+    [Selector("contextWithCGLContext:pixelFormat:options:")]
+    public static CIContext ContextWithCGLContextPixelFormatOptions(CGLContextObj cglctx, CGLPixelFormatObj pixelFormat, NSDictionary? options);
+    [Selector("contextWithCGContext:options:")]
+    public static CIContext ContextWithCGContextOptions(CGContextRef cgctx, NSDictionary? options);
+    [Selector("contextWithOptions:")]
+    public static CIContext ContextWithOptions(NSDictionary? options);
+    [Selector("context")]
+    public static CIContext Context();
+    [Selector("initWithOptions:")]
+    public Self InitWithOptions(NSDictionary? options);
+    [Selector("init")]
+    public Self Init();
+    [Selector("contextWithMTLDevice:")]
+    public static CIContext ContextWithMTLDevice(MTLDevice device);
+    [Selector("contextWithMTLDevice:options:")]
+    public static CIContext ContextWithMTLDeviceOptions(MTLDevice device, NSDictionary? options);
+    [Selector("contextWithMTLCommandQueue:")]
+    public static CIContext ContextWithMTLCommandQueue(MTLCommandQueue commandQueue);
+    [Selector("contextWithMTLCommandQueue:options:")]
+    public static CIContext ContextWithMTLCommandQueueOptions(MTLCommandQueue commandQueue, NSDictionary? options);
     /// Deprecated in macOS 10.8.
-    [Selector("drawImage:atPoint:fromRect:")] public void DrawImageAtPointFromRect(CIImage image, CGPoint atPoint, CGRect fromRect);
-    [Selector("drawImage:inRect:fromRect:")] public void DrawImageInRectFromRect(CIImage image, CGRect inRect, CGRect fromRect);
+    [Selector("drawImage:atPoint:fromRect:")]
+    public void DrawImageAtPointFromRect(CIImage image, CGPoint atPoint, CGRect fromRect);
+    [Selector("drawImage:inRect:fromRect:")]
+    public void DrawImageInRectFromRect(CIImage image, CGRect inRect, CGRect fromRect);
     /// Deprecated in macOS 10.11.
-    [ReturnsRetained] [Selector("createCGLayerWithSize:info:")] public CGLayerRef? CreateCGLayerWithSizeInfo(CGSize size, CFDictionaryRef? info);
-    [Selector("render:toBitmap:rowBytes:bounds:format:colorSpace:")] public void RenderToBitmapRowBytesBoundsFormatColorSpace(CIImage image, void* data, nint rowBytes, CGRect bounds, CIFormat format, CGColorSpaceRef? colorSpace);
-    [Selector("render:toIOSurface:bounds:colorSpace:")] public void RenderToIOSurfaceBoundsColorSpace(CIImage image, IOSurfaceRef surface, CGRect bounds, CGColorSpaceRef? colorSpace);
-    [Selector("render:toCVPixelBuffer:")] public void RenderToCVPixelBuffer(CIImage image, CVPixelBufferRef buffer);
-    [Selector("render:toCVPixelBuffer:bounds:colorSpace:")] public void RenderToCVPixelBufferBoundsColorSpace(CIImage image, CVPixelBufferRef buffer, CGRect bounds, CGColorSpaceRef? colorSpace);
-    [Selector("render:toMTLTexture:commandBuffer:bounds:colorSpace:")] public void RenderToMTLTextureCommandBufferBoundsColorSpace(CIImage image, MTLTexture texture, MTLCommandBuffer? commandBuffer, CGRect bounds, CGColorSpaceRef colorSpace);
-    [Selector("reclaimResources")] public void ReclaimResources();
-    [Selector("clearCaches")] public void ClearCaches();
+    [ReturnsRetained]
+    [Selector("createCGLayerWithSize:info:")]
+    public CGLayerRef? CreateCGLayerWithSizeInfo(CGSize size, CFDictionaryRef? info);
+    [Selector("render:toBitmap:rowBytes:bounds:format:colorSpace:")]
+    public void RenderToBitmapRowBytesBoundsFormatColorSpace(CIImage image, void* data, nint rowBytes, CGRect bounds, CIFormat format, CGColorSpaceRef? colorSpace);
+    [Selector("render:toIOSurface:bounds:colorSpace:")]
+    public void RenderToIOSurfaceBoundsColorSpace(CIImage image, IOSurfaceRef surface, CGRect bounds, CGColorSpaceRef? colorSpace);
+    [Selector("render:toCVPixelBuffer:")]
+    public void RenderToCVPixelBuffer(CIImage image, CVPixelBufferRef buffer);
+    [Selector("render:toCVPixelBuffer:bounds:colorSpace:")]
+    public void RenderToCVPixelBufferBoundsColorSpace(CIImage image, CVPixelBufferRef buffer, CGRect bounds, CGColorSpaceRef? colorSpace);
+    [Selector("render:toMTLTexture:commandBuffer:bounds:colorSpace:")]
+    public void RenderToMTLTextureCommandBufferBoundsColorSpace(CIImage image, MTLTexture texture, MTLCommandBuffer? commandBuffer, CGRect bounds, CGColorSpaceRef colorSpace);
+    [Selector("reclaimResources")]
+    public void ReclaimResources();
+    [Selector("clearCaches")]
+    public void ClearCaches();
 }
 
 public using CIContextOption = NSString;
@@ -99,34 +123,50 @@ public extern "C" CIContextOption? kCIContextMemoryLimit;
 /// createCGImage, a category of CIContext.
 public extern objc class CIContext
 {
-    [ReturnsRetained] [Selector("createCGImage:fromRect:")] public CGImageRef? CreateCGImageFromRect(CIImage image, CGRect fromRect);
-    [ReturnsRetained] [Selector("createCGImage:fromRect:format:colorSpace:")] public CGImageRef? CreateCGImageFromRectFormatColorSpace(CIImage image, CGRect fromRect, CIFormat format, CGColorSpaceRef? colorSpace);
-    [ReturnsRetained] [Selector("createCGImage:fromRect:format:colorSpace:deferred:")] public CGImageRef? CreateCGImageFromRectFormatColorSpaceDeferred(CIImage image, CGRect fromRect, CIFormat format, CGColorSpaceRef? colorSpace, bool deferred);
+    [ReturnsRetained]
+    [Selector("createCGImage:fromRect:")]
+    public CGImageRef? CreateCGImageFromRect(CIImage image, CGRect fromRect);
+    [ReturnsRetained]
+    [Selector("createCGImage:fromRect:format:colorSpace:")]
+    public CGImageRef? CreateCGImageFromRectFormatColorSpace(CIImage image, CGRect fromRect, CIFormat format, CGColorSpaceRef? colorSpace);
+    [ReturnsRetained]
+    [Selector("createCGImage:fromRect:format:colorSpace:deferred:")]
+    public CGImageRef? CreateCGImageFromRectFormatColorSpaceDeferred(CIImage image, CGRect fromRect, CIFormat format, CGColorSpaceRef? colorSpace, bool deferred);
     /// macOS 26.0 and later.
-    [ReturnsRetained] [Selector("createCGImage:fromRect:format:colorSpace:deferred:calculateHDRStats:")] public CGImageRef? CreateCGImageFromRectFormatColorSpaceDeferredCalculateHDRStats(CIImage image, CGRect fromRect, CIFormat format, CGColorSpaceRef? colorSpace, bool deferred, bool calculateHDRStats);
+    [ReturnsRetained]
+    [Selector("createCGImage:fromRect:format:colorSpace:deferred:calculateHDRStats:")]
+    public CGImageRef? CreateCGImageFromRectFormatColorSpaceDeferredCalculateHDRStats(CIImage image, CGRect fromRect, CIFormat format, CGColorSpaceRef? colorSpace, bool deferred, bool calculateHDRStats);
 }
 
 /// CalculateHDRStats, a category of CIContext.
 public extern objc class CIContext
 {
     /// macOS 26.0 and later.
-    [Selector("calculateHDRStatsForIOSurface:")] public void CalculateHDRStatsForIOSurface(IOSurfaceRef surface);
+    [Selector("calculateHDRStatsForIOSurface:")]
+    public void CalculateHDRStatsForIOSurface(IOSurfaceRef surface);
     /// macOS 26.0 and later.
-    [Selector("calculateHDRStatsForCVPixelBuffer:")] public void CalculateHDRStatsForCVPixelBuffer(CVPixelBufferRef buffer);
+    [Selector("calculateHDRStatsForCVPixelBuffer:")]
+    public void CalculateHDRStatsForCVPixelBuffer(CVPixelBufferRef buffer);
     /// macOS 26.0 and later.
-    [ReturnsRetained] [Selector("calculateHDRStatsForCGImage:")] public CGImageRef CalculateHDRStatsForCGImage(CGImageRef cgimage);
+    [ReturnsRetained]
+    [Selector("calculateHDRStatsForCGImage:")]
+    public CGImageRef CalculateHDRStatsForCGImage(CGImageRef cgimage);
     /// macOS 26.0 and later.
-    [Selector("calculateHDRStatsForImage:")] public CIImage? CalculateHDRStatsForImage(CIImage image);
+    [Selector("calculateHDRStatsForImage:")]
+    public CIImage? CalculateHDRStatsForImage(CIImage image);
 }
 
 /// OfflineGPUSupport, a category of CIContext.
 public extern objc class CIContext
 {
-    [Selector("offlineGPUCount")] public static uint OfflineGPUCount();
+    [Selector("offlineGPUCount")]
+    public static uint OfflineGPUCount();
     /// Deprecated in macOS 10.14.
-    [Selector("contextForOfflineGPUAtIndex:")] public static CIContext? ContextForOfflineGPUAtIndex(uint index);
+    [Selector("contextForOfflineGPUAtIndex:")]
+    public static CIContext? ContextForOfflineGPUAtIndex(uint index);
     /// Deprecated in macOS 10.14.
-    [Selector("contextForOfflineGPUAtIndex:colorSpace:options:sharedContext:")] public static CIContext? ContextForOfflineGPUAtIndexColorSpaceOptionsSharedContext(uint index, CGColorSpaceRef? colorSpace, NSDictionary? options, CGLContextObj sharedContext);
+    [Selector("contextForOfflineGPUAtIndex:colorSpace:options:sharedContext:")]
+    public static CIContext? ContextForOfflineGPUAtIndexColorSpaceOptionsSharedContext(uint index, CGColorSpaceRef? colorSpace, NSDictionary? options, CGLContextObj sharedContext);
 }
 
 public using CIImageRepresentationOption = NSString;
@@ -134,18 +174,30 @@ public using CIImageRepresentationOption = NSString;
 /// ImageRepresentation, a category of CIContext.
 public extern objc class CIContext
 {
-    [Selector("TIFFRepresentationOfImage:format:colorSpace:options:")] public NSData? TIFFRepresentationOfImageFormatColorSpaceOptions(CIImage image, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options);
-    [Selector("JPEGRepresentationOfImage:colorSpace:options:")] public NSData? JPEGRepresentationOfImageColorSpaceOptions(CIImage image, CGColorSpaceRef colorSpace, NSDictionary options);
-    [Selector("HEIFRepresentationOfImage:format:colorSpace:options:")] public NSData? HEIFRepresentationOfImageFormatColorSpaceOptions(CIImage image, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options);
-    [Selector("HEIF10RepresentationOfImage:colorSpace:options:error:")] public NSData? HEIF10RepresentationOfImageColorSpaceOptionsError(CIImage image, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
-    [Selector("PNGRepresentationOfImage:format:colorSpace:options:")] public NSData? PNGRepresentationOfImageFormatColorSpaceOptions(CIImage image, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options);
-    [Selector("OpenEXRRepresentationOfImage:options:error:")] public NSData? OpenEXRRepresentationOfImageOptionsError(CIImage image, NSDictionary options, out NSError? errorPtr);
-    [Selector("writeTIFFRepresentationOfImage:toURL:format:colorSpace:options:error:")] public bool WriteTIFFRepresentationOfImageToURLFormatColorSpaceOptionsError(CIImage image, NSURL url, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
-    [Selector("writePNGRepresentationOfImage:toURL:format:colorSpace:options:error:")] public bool WritePNGRepresentationOfImageToURLFormatColorSpaceOptionsError(CIImage image, NSURL url, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
-    [Selector("writeJPEGRepresentationOfImage:toURL:colorSpace:options:error:")] public bool WriteJPEGRepresentationOfImageToURLColorSpaceOptionsError(CIImage image, NSURL url, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
-    [Selector("writeHEIFRepresentationOfImage:toURL:format:colorSpace:options:error:")] public bool WriteHEIFRepresentationOfImageToURLFormatColorSpaceOptionsError(CIImage image, NSURL url, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
-    [Selector("writeHEIF10RepresentationOfImage:toURL:colorSpace:options:error:")] public bool WriteHEIF10RepresentationOfImageToURLColorSpaceOptionsError(CIImage image, NSURL url, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
-    [Selector("writeOpenEXRRepresentationOfImage:toURL:options:error:")] public bool WriteOpenEXRRepresentationOfImageToURLOptionsError(CIImage image, NSURL url, NSDictionary options, out NSError? errorPtr);
+    [Selector("TIFFRepresentationOfImage:format:colorSpace:options:")]
+    public NSData? TIFFRepresentationOfImageFormatColorSpaceOptions(CIImage image, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options);
+    [Selector("JPEGRepresentationOfImage:colorSpace:options:")]
+    public NSData? JPEGRepresentationOfImageColorSpaceOptions(CIImage image, CGColorSpaceRef colorSpace, NSDictionary options);
+    [Selector("HEIFRepresentationOfImage:format:colorSpace:options:")]
+    public NSData? HEIFRepresentationOfImageFormatColorSpaceOptions(CIImage image, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options);
+    [Selector("HEIF10RepresentationOfImage:colorSpace:options:error:")]
+    public NSData? HEIF10RepresentationOfImageColorSpaceOptionsError(CIImage image, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
+    [Selector("PNGRepresentationOfImage:format:colorSpace:options:")]
+    public NSData? PNGRepresentationOfImageFormatColorSpaceOptions(CIImage image, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options);
+    [Selector("OpenEXRRepresentationOfImage:options:error:")]
+    public NSData? OpenEXRRepresentationOfImageOptionsError(CIImage image, NSDictionary options, out NSError? errorPtr);
+    [Selector("writeTIFFRepresentationOfImage:toURL:format:colorSpace:options:error:")]
+    public bool WriteTIFFRepresentationOfImageToURLFormatColorSpaceOptionsError(CIImage image, NSURL url, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
+    [Selector("writePNGRepresentationOfImage:toURL:format:colorSpace:options:error:")]
+    public bool WritePNGRepresentationOfImageToURLFormatColorSpaceOptionsError(CIImage image, NSURL url, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
+    [Selector("writeJPEGRepresentationOfImage:toURL:colorSpace:options:error:")]
+    public bool WriteJPEGRepresentationOfImageToURLColorSpaceOptionsError(CIImage image, NSURL url, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
+    [Selector("writeHEIFRepresentationOfImage:toURL:format:colorSpace:options:error:")]
+    public bool WriteHEIFRepresentationOfImageToURLFormatColorSpaceOptionsError(CIImage image, NSURL url, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
+    [Selector("writeHEIF10RepresentationOfImage:toURL:colorSpace:options:error:")]
+    public bool WriteHEIF10RepresentationOfImageToURLColorSpaceOptionsError(CIImage image, NSURL url, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
+    [Selector("writeOpenEXRRepresentationOfImage:toURL:options:error:")]
+    public bool WriteOpenEXRRepresentationOfImageToURLOptionsError(CIImage image, NSURL url, NSDictionary options, out NSError? errorPtr);
 }
 
 public extern "C" CIImageRepresentationOption? kCIImageRepresentationAVDepthData;
@@ -179,11 +231,16 @@ public extern "C" CIImageRepresentationOption? kCIImageRepresentationHDRGainMapA
 /// CIDepthBlurEffect, a category of CIContext.
 public extern objc class CIContext
 {
-    [Selector("depthBlurEffectFilterForImageURL:options:")] public CIFilter? DepthBlurEffectFilterForImageURLOptions(NSURL url, NSDictionary? options);
-    [Selector("depthBlurEffectFilterForImageData:options:")] public CIFilter? DepthBlurEffectFilterForImageDataOptions(NSData data, NSDictionary? options);
-    [Selector("depthBlurEffectFilterForImage:disparityImage:portraitEffectsMatte:orientation:options:")] public CIFilter? DepthBlurEffectFilterForImageDisparityImagePortraitEffectsMatteOrientationOptions(CIImage image, CIImage disparityImage, CIImage? portraitEffectsMatte, CGImagePropertyOrientation orientation, NSDictionary? options);
-    [Selector("depthBlurEffectFilterForImage:disparityImage:portraitEffectsMatte:hairSemanticSegmentation:orientation:options:")] public CIFilter? DepthBlurEffectFilterForImageDisparityImagePortraitEffectsMatteHairSemanticSegmentationOrientationOptions(CIImage image, CIImage disparityImage, CIImage? portraitEffectsMatte, CIImage? hairSemanticSegmentation, CGImagePropertyOrientation orientation, NSDictionary? options);
-    [Selector("depthBlurEffectFilterForImage:disparityImage:portraitEffectsMatte:hairSemanticSegmentation:glassesMatte:gainMap:orientation:options:")] public CIFilter? DepthBlurEffectFilterForImageDisparityImagePortraitEffectsMatteHairSemanticSegmentationGlassesMatteGainMapOrientationOptions(CIImage image, CIImage disparityImage, CIImage? portraitEffectsMatte, CIImage? hairSemanticSegmentation, CIImage? glassesMatte, CIImage? gainMap, CGImagePropertyOrientation orientation, NSDictionary? options);
+    [Selector("depthBlurEffectFilterForImageURL:options:")]
+    public CIFilter? DepthBlurEffectFilterForImageURLOptions(NSURL url, NSDictionary? options);
+    [Selector("depthBlurEffectFilterForImageData:options:")]
+    public CIFilter? DepthBlurEffectFilterForImageDataOptions(NSData data, NSDictionary? options);
+    [Selector("depthBlurEffectFilterForImage:disparityImage:portraitEffectsMatte:orientation:options:")]
+    public CIFilter? DepthBlurEffectFilterForImageDisparityImagePortraitEffectsMatteOrientationOptions(CIImage image, CIImage disparityImage, CIImage? portraitEffectsMatte, CGImagePropertyOrientation orientation, NSDictionary? options);
+    [Selector("depthBlurEffectFilterForImage:disparityImage:portraitEffectsMatte:hairSemanticSegmentation:orientation:options:")]
+    public CIFilter? DepthBlurEffectFilterForImageDisparityImagePortraitEffectsMatteHairSemanticSegmentationOrientationOptions(CIImage image, CIImage disparityImage, CIImage? portraitEffectsMatte, CIImage? hairSemanticSegmentation, CGImagePropertyOrientation orientation, NSDictionary? options);
+    [Selector("depthBlurEffectFilterForImage:disparityImage:portraitEffectsMatte:hairSemanticSegmentation:glassesMatte:gainMap:orientation:options:")]
+    public CIFilter? DepthBlurEffectFilterForImageDisparityImagePortraitEffectsMatteHairSemanticSegmentationGlassesMatteGainMapOrientationOptions(CIImage image, CIImage disparityImage, CIImage? portraitEffectsMatte, CIImage? hairSemanticSegmentation, CIImage? glassesMatte, CIImage? gainMap, CGImagePropertyOrientation orientation, NSDictionary? options);
 }
 
 public const int COREIMAGE_SUPPORTS_OPENGLES = 0;

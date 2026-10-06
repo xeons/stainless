@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INFileResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedFile:")] public static Self SuccessWithResolvedFile(INFile resolvedFile);
-    [Selector("disambiguationWithFilesToDisambiguate:")] public static Self DisambiguationWithFilesToDisambiguate(NSArray filesToDisambiguate);
-    [Selector("confirmationRequiredWithFileToConfirm:")] public static Self ConfirmationRequiredWithFileToConfirm(INFile? fileToConfirm);
+    [Selector("successWithResolvedFile:")]
+    public static Self SuccessWithResolvedFile(INFile resolvedFile);
+    [Selector("disambiguationWithFilesToDisambiguate:")]
+    public static Self DisambiguationWithFilesToDisambiguate(NSArray filesToDisambiguate);
+    [Selector("confirmationRequiredWithFileToConfirm:")]
+    public static Self ConfirmationRequiredWithFileToConfirm(INFile? fileToConfirm);
 }
 
 #endif

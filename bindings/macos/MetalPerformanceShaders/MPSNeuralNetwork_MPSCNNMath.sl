@@ -38,35 +38,48 @@ public using MPSCNNArithmeticGradientStateBatch = NSArray;
 
 public extern objc class MPSCNNArithmetic : MPSCNNBinaryKernel
 {
-    [Selector("primaryScale", "setPrimaryScale:")] public float PrimaryScale { get; set; }
-    [Selector("secondaryScale", "setSecondaryScale:")] public float SecondaryScale { get; set; }
-    [Selector("bias", "setBias:")] public float Bias { get; set; }
-    [Selector("primaryStrideInFeatureChannels", "setPrimaryStrideInFeatureChannels:")] public NSUInteger PrimaryStrideInFeatureChannels { get; set; }
-    [Selector("secondaryStrideInFeatureChannels", "setSecondaryStrideInFeatureChannels:")] public NSUInteger SecondaryStrideInFeatureChannels { get; set; }
-    [Selector("minimumValue", "setMinimumValue:")] public float MinimumValue { get; set; }
-    [Selector("maximumValue", "setMaximumValue:")] public float MaximumValue { get; set; }
-    [Selector("encodeToCommandBuffer:primaryImage:secondaryImage:destinationState:destinationImage:")] public void EncodeToCommandBufferPrimaryImageSecondaryImageDestinationStateDestinationImage(MTLCommandBuffer commandBuffer, MPSImage primaryImage, MPSImage secondaryImage, MPSCNNArithmeticGradientState destinationState, MPSImage destinationImage);
-    [Selector("encodeBatchToCommandBuffer:primaryImages:secondaryImages:destinationStates:destinationImages:")] public void EncodeBatchToCommandBufferPrimaryImagesSecondaryImagesDestinationStatesDestinationImages(MTLCommandBuffer commandBuffer, MPSImageBatch primaryImages, MPSImageBatch secondaryImages, MPSCNNArithmeticGradientStateBatch destinationStates, MPSImageBatch destinationImages);
+    [Selector("primaryScale", "setPrimaryScale:")]
+    public float PrimaryScale { get; set; }
+    [Selector("secondaryScale", "setSecondaryScale:")]
+    public float SecondaryScale { get; set; }
+    [Selector("bias", "setBias:")]
+    public float Bias { get; set; }
+    [Selector("primaryStrideInFeatureChannels", "setPrimaryStrideInFeatureChannels:")]
+    public NSUInteger PrimaryStrideInFeatureChannels { get; set; }
+    [Selector("secondaryStrideInFeatureChannels", "setSecondaryStrideInFeatureChannels:")]
+    public NSUInteger SecondaryStrideInFeatureChannels { get; set; }
+    [Selector("minimumValue", "setMinimumValue:")]
+    public float MinimumValue { get; set; }
+    [Selector("maximumValue", "setMaximumValue:")]
+    public float MaximumValue { get; set; }
+    [Selector("encodeToCommandBuffer:primaryImage:secondaryImage:destinationState:destinationImage:")]
+    public void EncodeToCommandBufferPrimaryImageSecondaryImageDestinationStateDestinationImage(MTLCommandBuffer commandBuffer, MPSImage primaryImage, MPSImage secondaryImage, MPSCNNArithmeticGradientState destinationState, MPSImage destinationImage);
+    [Selector("encodeBatchToCommandBuffer:primaryImages:secondaryImages:destinationStates:destinationImages:")]
+    public void EncodeBatchToCommandBufferPrimaryImagesSecondaryImagesDestinationStatesDestinationImages(MTLCommandBuffer commandBuffer, MPSImageBatch primaryImages, MPSImageBatch secondaryImages, MPSCNNArithmeticGradientStateBatch destinationStates, MPSImageBatch destinationImages);
 }
 
 public extern objc class MPSCNNAdd : MPSCNNArithmetic
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSCNNSubtract : MPSCNNArithmetic
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSCNNMultiply : MPSCNNArithmetic
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSCNNDivide : MPSCNNArithmetic
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 [Flags]
@@ -82,35 +95,48 @@ public enum MPSNNComparisonType : ulong
 
 public extern objc class MPSNNCompare : MPSCNNArithmetic
 {
-    [Selector("comparisonType", "setComparisonType:")] public MPSNNComparisonType ComparisonType { get; set; }
-    [Selector("threshold", "setThreshold:")] public float Threshold { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("comparisonType", "setComparisonType:")]
+    public MPSNNComparisonType ComparisonType { get; set; }
+    [Selector("threshold", "setThreshold:")]
+    public float Threshold { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSCNNArithmeticGradient : MPSCNNGradientKernel
 {
-    [Selector("primaryScale", "setPrimaryScale:")] public float PrimaryScale { get; set; }
-    [Selector("secondaryScale", "setSecondaryScale:")] public float SecondaryScale { get; set; }
-    [Selector("bias", "setBias:")] public float Bias { get; set; }
-    [Selector("secondaryStrideInFeatureChannels", "setSecondaryStrideInFeatureChannels:")] public NSUInteger SecondaryStrideInFeatureChannels { get; set; }
-    [Selector("minimumValue", "setMinimumValue:")] public float MinimumValue { get; set; }
-    [Selector("maximumValue", "setMaximumValue:")] public float MaximumValue { get; set; }
-    [Selector("isSecondarySourceFilter")] public bool IsSecondarySourceFilter { get; }
+    [Selector("primaryScale", "setPrimaryScale:")]
+    public float PrimaryScale { get; set; }
+    [Selector("secondaryScale", "setSecondaryScale:")]
+    public float SecondaryScale { get; set; }
+    [Selector("bias", "setBias:")]
+    public float Bias { get; set; }
+    [Selector("secondaryStrideInFeatureChannels", "setSecondaryStrideInFeatureChannels:")]
+    public NSUInteger SecondaryStrideInFeatureChannels { get; set; }
+    [Selector("minimumValue", "setMinimumValue:")]
+    public float MinimumValue { get; set; }
+    [Selector("maximumValue", "setMaximumValue:")]
+    public float MaximumValue { get; set; }
+    [Selector("isSecondarySourceFilter")]
+    public bool IsSecondarySourceFilter { get; }
 }
 
 public extern objc class MPSCNNAddGradient : MPSCNNArithmeticGradient
 {
-    [Selector("initWithDevice:isSecondarySourceFilter:")] public Self InitWithDeviceIsSecondarySourceFilter(MTLDevice device, bool isSecondarySourceFilter);
+    [Selector("initWithDevice:isSecondarySourceFilter:")]
+    public Self InitWithDeviceIsSecondarySourceFilter(MTLDevice device, bool isSecondarySourceFilter);
 }
 
 public extern objc class MPSCNNSubtractGradient : MPSCNNArithmeticGradient
 {
-    [Selector("initWithDevice:isSecondarySourceFilter:")] public Self InitWithDeviceIsSecondarySourceFilter(MTLDevice device, bool isSecondarySourceFilter);
+    [Selector("initWithDevice:isSecondarySourceFilter:")]
+    public Self InitWithDeviceIsSecondarySourceFilter(MTLDevice device, bool isSecondarySourceFilter);
 }
 
 public extern objc class MPSCNNMultiplyGradient : MPSCNNArithmeticGradient
 {
-    [Selector("initWithDevice:isSecondarySourceFilter:")] public Self InitWithDeviceIsSecondarySourceFilter(MTLDevice device, bool isSecondarySourceFilter);
+    [Selector("initWithDevice:isSecondarySourceFilter:")]
+    public Self InitWithDeviceIsSecondarySourceFilter(MTLDevice device, bool isSecondarySourceFilter);
 }
 
 #endif

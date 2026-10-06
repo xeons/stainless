@@ -57,25 +57,44 @@ public extern "C" NSString NSPrefPaneHelpMenuAnchorKey;
 
 public extern objc class NSPreferencePane : NSObject
 {
-    [Selector("bundle")] public NSBundle Bundle { get; }
-    [Selector("mainNibName")] public NSString MainNibName { get; }
-    [Selector("shouldUnselect")] public NSPreferencePaneUnselectReply ShouldUnselect { get; }
-    [Selector("mainView", "setMainView:")] public NSView MainView { get; set; }
-    [Selector("initialKeyView", "setInitialKeyView:")] public NSView? InitialKeyView { get; set; }
-    [Selector("firstKeyView", "setFirstKeyView:")] public NSView? FirstKeyView { get; set; }
-    [Selector("lastKeyView", "setLastKeyView:")] public NSView? LastKeyView { get; set; }
-    [Selector("autoSaveTextFields")] public bool AutoSaveTextFields { get; }
-    [Selector("isSelected")] public bool Selected { get; }
-    [Selector("initWithBundle:")] public Self InitWithBundle(NSBundle bundle);
-    [Selector("loadMainView")] public NSView LoadMainView();
-    [Selector("mainViewDidLoad")] public void MainViewDidLoad();
-    [Selector("assignMainView")] public void AssignMainView();
-    [Selector("willSelect")] public void WillSelect();
-    [Selector("didSelect")] public void DidSelect();
-    [Selector("replyToShouldUnselect:")] public void ReplyToShouldUnselect(bool shouldUnselect);
-    [Selector("willUnselect")] public void WillUnselect();
-    [Selector("didUnselect")] public void DidUnselect();
-    [Selector("updateHelpMenuWithArray:")] public void UpdateHelpMenuWithArray(NSArray? inArrayOfMenuItems);
+    [Selector("bundle")]
+    public NSBundle Bundle { get; }
+    [Selector("mainNibName")]
+    public NSString MainNibName { get; }
+    [Selector("shouldUnselect")]
+    public NSPreferencePaneUnselectReply ShouldUnselect { get; }
+    [Selector("mainView", "setMainView:")]
+    public NSView MainView { get; set; }
+    [Selector("initialKeyView", "setInitialKeyView:")]
+    public NSView? InitialKeyView { get; set; }
+    [Selector("firstKeyView", "setFirstKeyView:")]
+    public NSView? FirstKeyView { get; set; }
+    [Selector("lastKeyView", "setLastKeyView:")]
+    public NSView? LastKeyView { get; set; }
+    [Selector("autoSaveTextFields")]
+    public bool AutoSaveTextFields { get; }
+    [Selector("isSelected")]
+    public bool Selected { get; }
+    [Selector("initWithBundle:")]
+    public Self InitWithBundle(NSBundle bundle);
+    [Selector("loadMainView")]
+    public NSView LoadMainView();
+    [Selector("mainViewDidLoad")]
+    public void MainViewDidLoad();
+    [Selector("assignMainView")]
+    public void AssignMainView();
+    [Selector("willSelect")]
+    public void WillSelect();
+    [Selector("didSelect")]
+    public void DidSelect();
+    [Selector("replyToShouldUnselect:")]
+    public void ReplyToShouldUnselect(bool shouldUnselect);
+    [Selector("willUnselect")]
+    public void WillUnselect();
+    [Selector("didUnselect")]
+    public void DidUnselect();
+    [Selector("updateHelpMenuWithArray:")]
+    public void UpdateHelpMenuWithArray(NSArray? inArrayOfMenuItems);
 }
 
 #endif

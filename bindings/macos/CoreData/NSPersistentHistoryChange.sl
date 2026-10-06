@@ -40,15 +40,24 @@ public enum NSPersistentHistoryChangeType : long
 
 public extern objc class NSPersistentHistoryChange : NSObject, NSCopying
 {
-    [Selector("entityDescription")] public static NSEntityDescription? EntityDescription { get; }
-    [Selector("fetchRequest")] public static NSFetchRequest? FetchRequest { get; }
-    [Selector("changeID")] public long ChangeID { get; }
-    [Selector("changedObjectID")] public NSManagedObjectID ChangedObjectID { get; }
-    [Selector("changeType")] public NSPersistentHistoryChangeType ChangeType { get; }
-    [Selector("tombstone")] public NSDictionary? Tombstone { get; }
-    [Selector("transaction")] public NSPersistentHistoryTransaction? Transaction { get; }
-    [Selector("updatedProperties")] public NSSet? UpdatedProperties { get; }
-    [Selector("entityDescriptionWithContext:")] public static NSEntityDescription? EntityDescriptionWithContext(NSManagedObjectContext context);
+    [Selector("entityDescription")]
+    public static NSEntityDescription? EntityDescription { get; }
+    [Selector("fetchRequest")]
+    public static NSFetchRequest? FetchRequest { get; }
+    [Selector("changeID")]
+    public long ChangeID { get; }
+    [Selector("changedObjectID")]
+    public NSManagedObjectID ChangedObjectID { get; }
+    [Selector("changeType")]
+    public NSPersistentHistoryChangeType ChangeType { get; }
+    [Selector("tombstone")]
+    public NSDictionary? Tombstone { get; }
+    [Selector("transaction")]
+    public NSPersistentHistoryTransaction? Transaction { get; }
+    [Selector("updatedProperties")]
+    public NSSet? UpdatedProperties { get; }
+    [Selector("entityDescriptionWithContext:")]
+    public static NSEntityDescription? EntityDescriptionWithContext(NSManagedObjectContext context);
 }
 
 #endif

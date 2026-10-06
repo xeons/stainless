@@ -32,12 +32,18 @@ import Standard.ObjC;
 
 public extern objc class MXLocationActivityMetric : MXMetric
 {
-    [Selector("cumulativeBestAccuracyTime")] public NSMeasurement CumulativeBestAccuracyTime { get; }
-    [Selector("cumulativeBestAccuracyForNavigationTime")] public NSMeasurement CumulativeBestAccuracyForNavigationTime { get; }
-    [Selector("cumulativeNearestTenMetersAccuracyTime")] public NSMeasurement CumulativeNearestTenMetersAccuracyTime { get; }
-    [Selector("cumulativeHundredMetersAccuracyTime")] public NSMeasurement CumulativeHundredMetersAccuracyTime { get; }
-    [Selector("cumulativeKilometerAccuracyTime")] public NSMeasurement CumulativeKilometerAccuracyTime { get; }
-    [Selector("cumulativeThreeKilometersAccuracyTime")] public NSMeasurement CumulativeThreeKilometersAccuracyTime { get; }
+    [Selector("cumulativeBestAccuracyTime")]
+    public NSMeasurement CumulativeBestAccuracyTime { get; }
+    [Selector("cumulativeBestAccuracyForNavigationTime")]
+    public NSMeasurement CumulativeBestAccuracyForNavigationTime { get; }
+    [Selector("cumulativeNearestTenMetersAccuracyTime")]
+    public NSMeasurement CumulativeNearestTenMetersAccuracyTime { get; }
+    [Selector("cumulativeHundredMetersAccuracyTime")]
+    public NSMeasurement CumulativeHundredMetersAccuracyTime { get; }
+    [Selector("cumulativeKilometerAccuracyTime")]
+    public NSMeasurement CumulativeKilometerAccuracyTime { get; }
+    [Selector("cumulativeThreeKilometersAccuracyTime")]
+    public NSMeasurement CumulativeThreeKilometersAccuracyTime { get; }
 }
 
 #endif

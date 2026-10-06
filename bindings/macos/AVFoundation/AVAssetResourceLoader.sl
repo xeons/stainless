@@ -33,70 +33,107 @@ import Standard.ObjC;
 
 public extern objc class AVAssetResourceLoader : NSObject
 {
-    [Selector("delegate")] public AVAssetResourceLoaderDelegate? Delegate { get; }
-    [Selector("delegateQueue")] public dispatch_queue_t? DelegateQueue { get; }
-    [Selector("setDelegate:queue:")] public void SetDelegateQueue(AVAssetResourceLoaderDelegate? @delegate, dispatch_queue_t? delegateQueue);
+    [Selector("delegate")]
+    public AVAssetResourceLoaderDelegate? Delegate { get; }
+    [Selector("delegateQueue")]
+    public dispatch_queue_t? DelegateQueue { get; }
+    [Selector("setDelegate:queue:")]
+    public void SetDelegateQueue(AVAssetResourceLoaderDelegate? @delegate, dispatch_queue_t? delegateQueue);
 }
 
 public objc interface AVAssetResourceLoaderDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("resourceLoader:shouldWaitForLoadingOfRequestedResource:")] bool ResourceLoaderShouldWaitForLoadingOfRequestedResource(AVAssetResourceLoader resourceLoader, AVAssetResourceLoadingRequest loadingRequest);
-    [Optional] [Selector("resourceLoader:shouldWaitForRenewalOfRequestedResource:")] bool ResourceLoaderShouldWaitForRenewalOfRequestedResource(AVAssetResourceLoader resourceLoader, AVAssetResourceRenewalRequest renewalRequest);
-    [Optional] [Selector("resourceLoader:didCancelLoadingRequest:")] void ResourceLoaderDidCancelLoadingRequest(AVAssetResourceLoader resourceLoader, AVAssetResourceLoadingRequest loadingRequest);
-    [Optional] [Selector("resourceLoader:shouldWaitForResponseToAuthenticationChallenge:")] bool ResourceLoaderShouldWaitForResponseToAuthenticationChallenge(AVAssetResourceLoader resourceLoader, NSURLAuthenticationChallenge authenticationChallenge);
-    [Optional] [Selector("resourceLoader:didCancelAuthenticationChallenge:")] void ResourceLoaderDidCancelAuthenticationChallenge(AVAssetResourceLoader resourceLoader, NSURLAuthenticationChallenge authenticationChallenge);
+    [Optional]
+    [Selector("resourceLoader:shouldWaitForLoadingOfRequestedResource:")]
+    bool ResourceLoaderShouldWaitForLoadingOfRequestedResource(AVAssetResourceLoader resourceLoader, AVAssetResourceLoadingRequest loadingRequest);
+    [Optional]
+    [Selector("resourceLoader:shouldWaitForRenewalOfRequestedResource:")]
+    bool ResourceLoaderShouldWaitForRenewalOfRequestedResource(AVAssetResourceLoader resourceLoader, AVAssetResourceRenewalRequest renewalRequest);
+    [Optional]
+    [Selector("resourceLoader:didCancelLoadingRequest:")]
+    void ResourceLoaderDidCancelLoadingRequest(AVAssetResourceLoader resourceLoader, AVAssetResourceLoadingRequest loadingRequest);
+    [Optional]
+    [Selector("resourceLoader:shouldWaitForResponseToAuthenticationChallenge:")]
+    bool ResourceLoaderShouldWaitForResponseToAuthenticationChallenge(AVAssetResourceLoader resourceLoader, NSURLAuthenticationChallenge authenticationChallenge);
+    [Optional]
+    [Selector("resourceLoader:didCancelAuthenticationChallenge:")]
+    void ResourceLoaderDidCancelAuthenticationChallenge(AVAssetResourceLoader resourceLoader, NSURLAuthenticationChallenge authenticationChallenge);
 }
 
 public extern objc class AVAssetResourceLoadingRequestor : NSObject
 {
-    [Selector("providesExpiredSessionReports")] public bool ProvidesExpiredSessionReports { get; }
+    [Selector("providesExpiredSessionReports")]
+    public bool ProvidesExpiredSessionReports { get; }
 }
 
 public extern objc class AVAssetResourceLoadingRequest : NSObject
 {
-    [Selector("request")] public NSURLRequest Request { get; }
-    [Selector("isFinished")] public bool Finished { get; }
-    [Selector("isCancelled")] public bool Cancelled { get; }
-    [Selector("contentInformationRequest")] public AVAssetResourceLoadingContentInformationRequest? ContentInformationRequest { get; }
-    [Selector("dataRequest")] public AVAssetResourceLoadingDataRequest? DataRequest { get; }
-    [Selector("response", "setResponse:")] public NSURLResponse? Response { get; set; }
-    [Selector("redirect", "setRedirect:")] public NSURLRequest? Redirect { get; set; }
-    [Selector("requestor")] public AVAssetResourceLoadingRequestor? Requestor { get; }
-    [Selector("finishLoading")] public void FinishLoading();
-    [Selector("finishLoadingWithError:")] public void FinishLoadingWithError(NSError? error);
+    [Selector("request")]
+    public NSURLRequest Request { get; }
+    [Selector("isFinished")]
+    public bool Finished { get; }
+    [Selector("isCancelled")]
+    public bool Cancelled { get; }
+    [Selector("contentInformationRequest")]
+    public AVAssetResourceLoadingContentInformationRequest? ContentInformationRequest { get; }
+    [Selector("dataRequest")]
+    public AVAssetResourceLoadingDataRequest? DataRequest { get; }
+    [Selector("response", "setResponse:")]
+    public NSURLResponse? Response { get; set; }
+    [Selector("redirect", "setRedirect:")]
+    public NSURLRequest? Redirect { get; set; }
+    [Selector("requestor")]
+    public AVAssetResourceLoadingRequestor? Requestor { get; }
+    [Selector("finishLoading")]
+    public void FinishLoading();
+    [Selector("finishLoadingWithError:")]
+    public void FinishLoadingWithError(NSError? error);
 }
 
 public extern objc class AVAssetResourceRenewalRequest : AVAssetResourceLoadingRequest { }
 
 public extern objc class AVAssetResourceLoadingContentInformationRequest : NSObject
 {
-    [Selector("contentType", "setContentType:")] public NSString? ContentType { get; set; }
-    [Selector("allowedContentTypes")] public NSArray? AllowedContentTypes { get; }
-    [Selector("contentLength", "setContentLength:")] public long ContentLength { get; set; }
-    [Selector("isByteRangeAccessSupported", "setByteRangeAccessSupported:")] public bool ByteRangeAccessSupported { get; set; }
-    [Selector("renewalDate", "setRenewalDate:")] public NSDate? RenewalDate { get; set; }
-    [Selector("isEntireLengthAvailableOnDemand", "setEntireLengthAvailableOnDemand:")] public bool EntireLengthAvailableOnDemand { get; set; }
+    [Selector("contentType", "setContentType:")]
+    public NSString? ContentType { get; set; }
+    [Selector("allowedContentTypes")]
+    public NSArray? AllowedContentTypes { get; }
+    [Selector("contentLength", "setContentLength:")]
+    public long ContentLength { get; set; }
+    [Selector("isByteRangeAccessSupported", "setByteRangeAccessSupported:")]
+    public bool ByteRangeAccessSupported { get; set; }
+    [Selector("renewalDate", "setRenewalDate:")]
+    public NSDate? RenewalDate { get; set; }
+    [Selector("isEntireLengthAvailableOnDemand", "setEntireLengthAvailableOnDemand:")]
+    public bool EntireLengthAvailableOnDemand { get; set; }
 }
 
 public extern objc class AVAssetResourceLoadingDataRequest : NSObject
 {
-    [Selector("requestedOffset")] public long RequestedOffset { get; }
-    [Selector("requestedLength")] public NSInteger RequestedLength { get; }
-    [Selector("requestsAllDataToEndOfResource")] public bool RequestsAllDataToEndOfResource { get; }
-    [Selector("currentOffset")] public long CurrentOffset { get; }
-    [Selector("respondWithData:")] public void RespondWithData(NSData data);
+    [Selector("requestedOffset")]
+    public long RequestedOffset { get; }
+    [Selector("requestedLength")]
+    public NSInteger RequestedLength { get; }
+    [Selector("requestsAllDataToEndOfResource")]
+    public bool RequestsAllDataToEndOfResource { get; }
+    [Selector("currentOffset")]
+    public long CurrentOffset { get; }
+    [Selector("respondWithData:")]
+    public void RespondWithData(NSData data);
 }
 
 /// AVAssetResourceLoaderContentKeySupport, a category of AVAssetResourceLoader.
 public extern objc class AVAssetResourceLoader
 {
-    [Selector("preloadsEligibleContentKeys", "setPreloadsEligibleContentKeys:")] public bool PreloadsEligibleContentKeys { get; set; }
+    [Selector("preloadsEligibleContentKeys", "setPreloadsEligibleContentKeys:")]
+    public bool PreloadsEligibleContentKeys { get; set; }
 }
 
 /// AVAssetResourceLoaderCommonMediaClientDataSupport, a category of AVAssetResourceLoader.
 public extern objc class AVAssetResourceLoader
 {
-    [Selector("sendsCommonMediaClientDataAsHTTPHeaders", "setSendsCommonMediaClientDataAsHTTPHeaders:")] public bool SendsCommonMediaClientDataAsHTTPHeaders { get; set; }
+    [Selector("sendsCommonMediaClientDataAsHTTPHeaders", "setSendsCommonMediaClientDataAsHTTPHeaders:")]
+    public bool SendsCommonMediaClientDataAsHTTPHeaders { get; set; }
 }
 
 /// Deprecated in macOS 15.0.
@@ -104,9 +141,11 @@ public extern objc class AVAssetResourceLoader
 public extern objc class AVAssetResourceLoadingRequest
 {
     /// Deprecated in macOS 15.0.
-    [Selector("streamingContentKeyRequestDataForApp:contentIdentifier:options:error:")] public NSData? StreamingContentKeyRequestDataForAppContentIdentifierOptionsError(NSData appIdentifier, NSData contentIdentifier, NSDictionary? options, out NSError? outError);
+    [Selector("streamingContentKeyRequestDataForApp:contentIdentifier:options:error:")]
+    public NSData? StreamingContentKeyRequestDataForAppContentIdentifierOptionsError(NSData appIdentifier, NSData contentIdentifier, NSDictionary? options, out NSError? outError);
     /// Deprecated in macOS 15.0.
-    [Selector("persistentContentKeyFromKeyVendorResponse:options:error:")] public NSData? PersistentContentKeyFromKeyVendorResponseOptionsError(NSData keyVendorResponse, NSDictionary? options, out NSError? outError);
+    [Selector("persistentContentKeyFromKeyVendorResponse:options:error:")]
+    public NSData? PersistentContentKeyFromKeyVendorResponseOptionsError(NSData keyVendorResponse, NSDictionary? options, out NSError? outError);
 }
 
 /// Deprecated in macOS 15.0.
@@ -116,7 +155,8 @@ public extern "C" NSString AVAssetResourceLoadingRequestStreamingContentKeyReque
 public extern objc class AVAssetResourceLoadingRequest
 {
     /// Deprecated in macOS 10.15.
-    [Selector("finishLoadingWithResponse:data:redirect:")] public void FinishLoadingWithResponseDataRedirect(NSURLResponse? response, NSData? data, NSURLRequest? redirect);
+    [Selector("finishLoadingWithResponse:data:redirect:")]
+    public void FinishLoadingWithResponseDataRedirect(NSURLResponse? response, NSData? data, NSURLRequest? redirect);
 }
 
 #endif

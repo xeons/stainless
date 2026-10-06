@@ -41,15 +41,24 @@ public enum UNNotificationCategoryOptions : ulong
 
 public extern objc class UNNotificationCategory : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("actions")] public NSArray Actions { get; }
-    [Selector("intentIdentifiers")] public NSArray IntentIdentifiers { get; }
-    [Selector("options")] public UNNotificationCategoryOptions Options { get; }
-    [Selector("hiddenPreviewsBodyPlaceholder")] public NSString? HiddenPreviewsBodyPlaceholder { get; }
-    [Selector("categorySummaryFormat")] public NSString? CategorySummaryFormat { get; }
-    [Selector("categoryWithIdentifier:actions:intentIdentifiers:options:")] public static Self CategoryWithIdentifierActionsIntentIdentifiersOptions(NSString identifier, NSArray actions, NSArray intentIdentifiers, UNNotificationCategoryOptions options);
-    [Selector("categoryWithIdentifier:actions:intentIdentifiers:hiddenPreviewsBodyPlaceholder:options:")] public static Self CategoryWithIdentifierActionsIntentIdentifiersHiddenPreviewsBodyPlaceholderOptions(NSString identifier, NSArray actions, NSArray intentIdentifiers, NSString hiddenPreviewsBodyPlaceholder, UNNotificationCategoryOptions options);
-    [Selector("categoryWithIdentifier:actions:intentIdentifiers:hiddenPreviewsBodyPlaceholder:categorySummaryFormat:options:")] public static Self CategoryWithIdentifierActionsIntentIdentifiersHiddenPreviewsBodyPlaceholderCategorySummaryFormatOptions(NSString identifier, NSArray actions, NSArray intentIdentifiers, NSString? hiddenPreviewsBodyPlaceholder, NSString? categorySummaryFormat, UNNotificationCategoryOptions options);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("actions")]
+    public NSArray Actions { get; }
+    [Selector("intentIdentifiers")]
+    public NSArray IntentIdentifiers { get; }
+    [Selector("options")]
+    public UNNotificationCategoryOptions Options { get; }
+    [Selector("hiddenPreviewsBodyPlaceholder")]
+    public NSString? HiddenPreviewsBodyPlaceholder { get; }
+    [Selector("categorySummaryFormat")]
+    public NSString? CategorySummaryFormat { get; }
+    [Selector("categoryWithIdentifier:actions:intentIdentifiers:options:")]
+    public static Self CategoryWithIdentifierActionsIntentIdentifiersOptions(NSString identifier, NSArray actions, NSArray intentIdentifiers, UNNotificationCategoryOptions options);
+    [Selector("categoryWithIdentifier:actions:intentIdentifiers:hiddenPreviewsBodyPlaceholder:options:")]
+    public static Self CategoryWithIdentifierActionsIntentIdentifiersHiddenPreviewsBodyPlaceholderOptions(NSString identifier, NSArray actions, NSArray intentIdentifiers, NSString hiddenPreviewsBodyPlaceholder, UNNotificationCategoryOptions options);
+    [Selector("categoryWithIdentifier:actions:intentIdentifiers:hiddenPreviewsBodyPlaceholder:categorySummaryFormat:options:")]
+    public static Self CategoryWithIdentifierActionsIntentIdentifiersHiddenPreviewsBodyPlaceholderCategorySummaryFormatOptions(NSString identifier, NSArray actions, NSArray intentIdentifiers, NSString? hiddenPreviewsBodyPlaceholder, NSString? categorySummaryFormat, UNNotificationCategoryOptions options);
 }
 
 #endif

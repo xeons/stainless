@@ -42,61 +42,114 @@ public enum SKParticleRenderOrder : ulong
 
 public extern objc class SKEmitterNode : SKNode
 {
-    [Selector("particleTexture", "setParticleTexture:")] public SKTexture? ParticleTexture { get; set; }
-    [Selector("particleBlendMode", "setParticleBlendMode:")] public SKBlendMode ParticleBlendMode { get; set; }
-    [Selector("particleColor", "setParticleColor:")] public NSColor ParticleColor { get; set; }
-    [Selector("particleColorRedRange", "setParticleColorRedRange:")] public CGFloat ParticleColorRedRange { get; set; }
-    [Selector("particleColorGreenRange", "setParticleColorGreenRange:")] public CGFloat ParticleColorGreenRange { get; set; }
-    [Selector("particleColorBlueRange", "setParticleColorBlueRange:")] public CGFloat ParticleColorBlueRange { get; set; }
-    [Selector("particleColorAlphaRange", "setParticleColorAlphaRange:")] public CGFloat ParticleColorAlphaRange { get; set; }
-    [Selector("particleColorRedSpeed", "setParticleColorRedSpeed:")] public CGFloat ParticleColorRedSpeed { get; set; }
-    [Selector("particleColorGreenSpeed", "setParticleColorGreenSpeed:")] public CGFloat ParticleColorGreenSpeed { get; set; }
-    [Selector("particleColorBlueSpeed", "setParticleColorBlueSpeed:")] public CGFloat ParticleColorBlueSpeed { get; set; }
-    [Selector("particleColorAlphaSpeed", "setParticleColorAlphaSpeed:")] public CGFloat ParticleColorAlphaSpeed { get; set; }
-    [Selector("particleColorSequence", "setParticleColorSequence:")] public SKKeyframeSequence? ParticleColorSequence { get; set; }
-    [Selector("particleColorBlendFactor", "setParticleColorBlendFactor:")] public CGFloat ParticleColorBlendFactor { get; set; }
-    [Selector("particleColorBlendFactorRange", "setParticleColorBlendFactorRange:")] public CGFloat ParticleColorBlendFactorRange { get; set; }
-    [Selector("particleColorBlendFactorSpeed", "setParticleColorBlendFactorSpeed:")] public CGFloat ParticleColorBlendFactorSpeed { get; set; }
-    [Selector("particleColorBlendFactorSequence", "setParticleColorBlendFactorSequence:")] public SKKeyframeSequence? ParticleColorBlendFactorSequence { get; set; }
-    [Selector("particlePosition", "setParticlePosition:")] public CGPoint ParticlePosition { get; set; }
-    [Selector("particlePositionRange", "setParticlePositionRange:")] public CGVector ParticlePositionRange { get; set; }
-    [Selector("particleSpeed", "setParticleSpeed:")] public CGFloat ParticleSpeed { get; set; }
-    [Selector("particleSpeedRange", "setParticleSpeedRange:")] public CGFloat ParticleSpeedRange { get; set; }
-    [Selector("emissionAngle", "setEmissionAngle:")] public CGFloat EmissionAngle { get; set; }
-    [Selector("emissionAngleRange", "setEmissionAngleRange:")] public CGFloat EmissionAngleRange { get; set; }
-    [Selector("xAcceleration", "setXAcceleration:")] public CGFloat XAcceleration { get; set; }
-    [Selector("yAcceleration", "setYAcceleration:")] public CGFloat YAcceleration { get; set; }
-    [Selector("particleBirthRate", "setParticleBirthRate:")] public CGFloat ParticleBirthRate { get; set; }
-    [Selector("numParticlesToEmit", "setNumParticlesToEmit:")] public NSUInteger NumParticlesToEmit { get; set; }
-    [Selector("particleLifetime", "setParticleLifetime:")] public CGFloat ParticleLifetime { get; set; }
-    [Selector("particleLifetimeRange", "setParticleLifetimeRange:")] public CGFloat ParticleLifetimeRange { get; set; }
-    [Selector("particleRotation", "setParticleRotation:")] public CGFloat ParticleRotation { get; set; }
-    [Selector("particleRotationRange", "setParticleRotationRange:")] public CGFloat ParticleRotationRange { get; set; }
-    [Selector("particleRotationSpeed", "setParticleRotationSpeed:")] public CGFloat ParticleRotationSpeed { get; set; }
-    [Selector("particleSize", "setParticleSize:")] public CGSize ParticleSize { get; set; }
-    [Selector("particleScale", "setParticleScale:")] public CGFloat ParticleScale { get; set; }
-    [Selector("particleScaleRange", "setParticleScaleRange:")] public CGFloat ParticleScaleRange { get; set; }
-    [Selector("particleScaleSpeed", "setParticleScaleSpeed:")] public CGFloat ParticleScaleSpeed { get; set; }
-    [Selector("particleScaleSequence", "setParticleScaleSequence:")] public SKKeyframeSequence? ParticleScaleSequence { get; set; }
-    [Selector("particleAlpha", "setParticleAlpha:")] public CGFloat ParticleAlpha { get; set; }
-    [Selector("particleAlphaRange", "setParticleAlphaRange:")] public CGFloat ParticleAlphaRange { get; set; }
-    [Selector("particleAlphaSpeed", "setParticleAlphaSpeed:")] public CGFloat ParticleAlphaSpeed { get; set; }
-    [Selector("particleAlphaSequence", "setParticleAlphaSequence:")] public SKKeyframeSequence? ParticleAlphaSequence { get; set; }
-    [Selector("particleAction", "setParticleAction:")] public SKAction? ParticleAction { get; set; }
-    [Selector("fieldBitMask", "setFieldBitMask:")] public uint FieldBitMask { get; set; }
-    [Selector("targetNode", "setTargetNode:")] public SKNode? TargetNode { get; set; }
-    [Selector("shader", "setShader:")] public SKShader? Shader { get; set; }
-    [Selector("attributeValues", "setAttributeValues:")] public NSDictionary AttributeValues { get; set; }
-    [Selector("particleZPosition", "setParticleZPosition:")] public CGFloat ParticleZPosition { get; set; }
-    [Selector("particleRenderOrder", "setParticleRenderOrder:")] public SKParticleRenderOrder ParticleRenderOrder { get; set; }
+    [Selector("particleTexture", "setParticleTexture:")]
+    public SKTexture? ParticleTexture { get; set; }
+    [Selector("particleBlendMode", "setParticleBlendMode:")]
+    public SKBlendMode ParticleBlendMode { get; set; }
+    [Selector("particleColor", "setParticleColor:")]
+    public NSColor ParticleColor { get; set; }
+    [Selector("particleColorRedRange", "setParticleColorRedRange:")]
+    public CGFloat ParticleColorRedRange { get; set; }
+    [Selector("particleColorGreenRange", "setParticleColorGreenRange:")]
+    public CGFloat ParticleColorGreenRange { get; set; }
+    [Selector("particleColorBlueRange", "setParticleColorBlueRange:")]
+    public CGFloat ParticleColorBlueRange { get; set; }
+    [Selector("particleColorAlphaRange", "setParticleColorAlphaRange:")]
+    public CGFloat ParticleColorAlphaRange { get; set; }
+    [Selector("particleColorRedSpeed", "setParticleColorRedSpeed:")]
+    public CGFloat ParticleColorRedSpeed { get; set; }
+    [Selector("particleColorGreenSpeed", "setParticleColorGreenSpeed:")]
+    public CGFloat ParticleColorGreenSpeed { get; set; }
+    [Selector("particleColorBlueSpeed", "setParticleColorBlueSpeed:")]
+    public CGFloat ParticleColorBlueSpeed { get; set; }
+    [Selector("particleColorAlphaSpeed", "setParticleColorAlphaSpeed:")]
+    public CGFloat ParticleColorAlphaSpeed { get; set; }
+    [Selector("particleColorSequence", "setParticleColorSequence:")]
+    public SKKeyframeSequence? ParticleColorSequence { get; set; }
+    [Selector("particleColorBlendFactor", "setParticleColorBlendFactor:")]
+    public CGFloat ParticleColorBlendFactor { get; set; }
+    [Selector("particleColorBlendFactorRange", "setParticleColorBlendFactorRange:")]
+    public CGFloat ParticleColorBlendFactorRange { get; set; }
+    [Selector("particleColorBlendFactorSpeed", "setParticleColorBlendFactorSpeed:")]
+    public CGFloat ParticleColorBlendFactorSpeed { get; set; }
+    [Selector("particleColorBlendFactorSequence", "setParticleColorBlendFactorSequence:")]
+    public SKKeyframeSequence? ParticleColorBlendFactorSequence { get; set; }
+    [Selector("particlePosition", "setParticlePosition:")]
+    public CGPoint ParticlePosition { get; set; }
+    [Selector("particlePositionRange", "setParticlePositionRange:")]
+    public CGVector ParticlePositionRange { get; set; }
+    [Selector("particleSpeed", "setParticleSpeed:")]
+    public CGFloat ParticleSpeed { get; set; }
+    [Selector("particleSpeedRange", "setParticleSpeedRange:")]
+    public CGFloat ParticleSpeedRange { get; set; }
+    [Selector("emissionAngle", "setEmissionAngle:")]
+    public CGFloat EmissionAngle { get; set; }
+    [Selector("emissionAngleRange", "setEmissionAngleRange:")]
+    public CGFloat EmissionAngleRange { get; set; }
+    [Selector("xAcceleration", "setXAcceleration:")]
+    public CGFloat XAcceleration { get; set; }
+    [Selector("yAcceleration", "setYAcceleration:")]
+    public CGFloat YAcceleration { get; set; }
+    [Selector("particleBirthRate", "setParticleBirthRate:")]
+    public CGFloat ParticleBirthRate { get; set; }
+    [Selector("numParticlesToEmit", "setNumParticlesToEmit:")]
+    public NSUInteger NumParticlesToEmit { get; set; }
+    [Selector("particleLifetime", "setParticleLifetime:")]
+    public CGFloat ParticleLifetime { get; set; }
+    [Selector("particleLifetimeRange", "setParticleLifetimeRange:")]
+    public CGFloat ParticleLifetimeRange { get; set; }
+    [Selector("particleRotation", "setParticleRotation:")]
+    public CGFloat ParticleRotation { get; set; }
+    [Selector("particleRotationRange", "setParticleRotationRange:")]
+    public CGFloat ParticleRotationRange { get; set; }
+    [Selector("particleRotationSpeed", "setParticleRotationSpeed:")]
+    public CGFloat ParticleRotationSpeed { get; set; }
+    [Selector("particleSize", "setParticleSize:")]
+    public CGSize ParticleSize { get; set; }
+    [Selector("particleScale", "setParticleScale:")]
+    public CGFloat ParticleScale { get; set; }
+    [Selector("particleScaleRange", "setParticleScaleRange:")]
+    public CGFloat ParticleScaleRange { get; set; }
+    [Selector("particleScaleSpeed", "setParticleScaleSpeed:")]
+    public CGFloat ParticleScaleSpeed { get; set; }
+    [Selector("particleScaleSequence", "setParticleScaleSequence:")]
+    public SKKeyframeSequence? ParticleScaleSequence { get; set; }
+    [Selector("particleAlpha", "setParticleAlpha:")]
+    public CGFloat ParticleAlpha { get; set; }
+    [Selector("particleAlphaRange", "setParticleAlphaRange:")]
+    public CGFloat ParticleAlphaRange { get; set; }
+    [Selector("particleAlphaSpeed", "setParticleAlphaSpeed:")]
+    public CGFloat ParticleAlphaSpeed { get; set; }
+    [Selector("particleAlphaSequence", "setParticleAlphaSequence:")]
+    public SKKeyframeSequence? ParticleAlphaSequence { get; set; }
+    [Selector("particleAction", "setParticleAction:")]
+    public SKAction? ParticleAction { get; set; }
+    [Selector("fieldBitMask", "setFieldBitMask:")]
+    public uint FieldBitMask { get; set; }
+    [Selector("targetNode", "setTargetNode:")]
+    public SKNode? TargetNode { get; set; }
+    [Selector("shader", "setShader:")]
+    public SKShader? Shader { get; set; }
+    [Selector("attributeValues", "setAttributeValues:")]
+    public NSDictionary AttributeValues { get; set; }
+    [Selector("particleZPosition", "setParticleZPosition:")]
+    public CGFloat ParticleZPosition { get; set; }
+    [Selector("particleRenderOrder", "setParticleRenderOrder:")]
+    public SKParticleRenderOrder ParticleRenderOrder { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("particleZPositionRange", "setParticleZPositionRange:")] public CGFloat ParticleZPositionRange { get; set; }
+    [Selector("particleZPositionRange", "setParticleZPositionRange:")]
+    public CGFloat ParticleZPositionRange { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("particleZPositionSpeed", "setParticleZPositionSpeed:")] public CGFloat ParticleZPositionSpeed { get; set; }
-    [Selector("advanceSimulationTime:")] public void AdvanceSimulationTime(NSTimeInterval sec);
-    [Selector("resetSimulation")] public void ResetSimulation();
-    [Selector("valueForAttributeNamed:")] public SKAttributeValue? ValueForAttributeNamed(NSString key);
-    [Selector("setValue:forAttributeNamed:")] public void SetValueForAttributeNamed(SKAttributeValue value, NSString key);
+    [Selector("particleZPositionSpeed", "setParticleZPositionSpeed:")]
+    public CGFloat ParticleZPositionSpeed { get; set; }
+    [Selector("advanceSimulationTime:")]
+    public void AdvanceSimulationTime(NSTimeInterval sec);
+    [Selector("resetSimulation")]
+    public void ResetSimulation();
+    [Selector("valueForAttributeNamed:")]
+    public SKAttributeValue? ValueForAttributeNamed(NSString key);
+    [Selector("setValue:forAttributeNamed:")]
+    public void SetValueForAttributeNamed(SKAttributeValue value, NSString key);
 }
 
 #endif

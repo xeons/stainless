@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class MXMemoryMetric : MXMetric
 {
-    [Selector("peakMemoryUsage")] public NSMeasurement PeakMemoryUsage { get; }
-    [Selector("averageSuspendedMemory")] public MXAverage AverageSuspendedMemory { get; }
+    [Selector("peakMemoryUsage")]
+    public NSMeasurement PeakMemoryUsage { get; }
+    [Selector("averageSuspendedMemory")]
+    public MXAverage AverageSuspendedMemory { get; }
 }
 
 #endif

@@ -82,37 +82,60 @@ public enum SKTileAdjacencyMask : ulong
 
 public extern objc class SKTileSet : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("tileGroups", "setTileGroups:")] public NSArray TileGroups { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("type", "setType:")] public SKTileSetType Type { get; set; }
-    [Selector("defaultTileGroup", "setDefaultTileGroup:")] public SKTileGroup? DefaultTileGroup { get; set; }
-    [Selector("defaultTileSize", "setDefaultTileSize:")] public CGSize DefaultTileSize { get; set; }
-    [Selector("tileSetWithTileGroups:")] public static Self TileSetWithTileGroups(NSArray tileGroups);
-    [Selector("tileSetWithTileGroups:tileSetType:")] public static Self TileSetWithTileGroupsTileSetType(NSArray tileGroups, SKTileSetType tileSetType);
-    [Selector("initWithTileGroups:")] public Self InitWithTileGroups(NSArray tileGroups);
-    [Selector("initWithTileGroups:tileSetType:")] public Self InitWithTileGroupsTileSetType(NSArray tileGroups, SKTileSetType tileSetType);
-    [Selector("tileSetNamed:")] public static Self? TileSetNamed(NSString name);
-    [Selector("tileSetFromURL:")] public static Self? TileSetFromURL(NSURL url);
+    [Selector("tileGroups", "setTileGroups:")]
+    public NSArray TileGroups { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("type", "setType:")]
+    public SKTileSetType Type { get; set; }
+    [Selector("defaultTileGroup", "setDefaultTileGroup:")]
+    public SKTileGroup? DefaultTileGroup { get; set; }
+    [Selector("defaultTileSize", "setDefaultTileSize:")]
+    public CGSize DefaultTileSize { get; set; }
+    [Selector("tileSetWithTileGroups:")]
+    public static Self TileSetWithTileGroups(NSArray tileGroups);
+    [Selector("tileSetWithTileGroups:tileSetType:")]
+    public static Self TileSetWithTileGroupsTileSetType(NSArray tileGroups, SKTileSetType tileSetType);
+    [Selector("initWithTileGroups:")]
+    public Self InitWithTileGroups(NSArray tileGroups);
+    [Selector("initWithTileGroups:tileSetType:")]
+    public Self InitWithTileGroupsTileSetType(NSArray tileGroups, SKTileSetType tileSetType);
+    [Selector("tileSetNamed:")]
+    public static Self? TileSetNamed(NSString name);
+    [Selector("tileSetFromURL:")]
+    public static Self? TileSetFromURL(NSURL url);
 }
 
 public extern objc class SKTileGroup : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("rules", "setRules:")] public NSArray Rules { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("tileGroupWithTileDefinition:")] public static Self TileGroupWithTileDefinition(SKTileDefinition tileDefinition);
-    [Selector("tileGroupWithRules:")] public static Self TileGroupWithRules(NSArray rules);
-    [Selector("emptyTileGroup")] public static Self EmptyTileGroup();
-    [Selector("initWithTileDefinition:")] public Self InitWithTileDefinition(SKTileDefinition tileDefinition);
-    [Selector("initWithRules:")] public Self InitWithRules(NSArray rules);
+    [Selector("rules", "setRules:")]
+    public NSArray Rules { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("tileGroupWithTileDefinition:")]
+    public static Self TileGroupWithTileDefinition(SKTileDefinition tileDefinition);
+    [Selector("tileGroupWithRules:")]
+    public static Self TileGroupWithRules(NSArray rules);
+    [Selector("emptyTileGroup")]
+    public static Self EmptyTileGroup();
+    [Selector("initWithTileDefinition:")]
+    public Self InitWithTileDefinition(SKTileDefinition tileDefinition);
+    [Selector("initWithRules:")]
+    public Self InitWithRules(NSArray rules);
 }
 
 public extern objc class SKTileGroupRule : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("adjacency", "setAdjacency:")] public SKTileAdjacencyMask Adjacency { get; set; }
-    [Selector("tileDefinitions", "setTileDefinitions:")] public NSArray TileDefinitions { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("tileGroupRuleWithAdjacency:tileDefinitions:")] public static Self TileGroupRuleWithAdjacencyTileDefinitions(SKTileAdjacencyMask adjacency, NSArray tileDefinitions);
-    [Selector("initWithAdjacency:tileDefinitions:")] public Self InitWithAdjacencyTileDefinitions(SKTileAdjacencyMask adjacency, NSArray tileDefinitions);
+    [Selector("adjacency", "setAdjacency:")]
+    public SKTileAdjacencyMask Adjacency { get; set; }
+    [Selector("tileDefinitions", "setTileDefinitions:")]
+    public NSArray TileDefinitions { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("tileGroupRuleWithAdjacency:tileDefinitions:")]
+    public static Self TileGroupRuleWithAdjacencyTileDefinitions(SKTileAdjacencyMask adjacency, NSArray tileDefinitions);
+    [Selector("initWithAdjacency:tileDefinitions:")]
+    public Self InitWithAdjacencyTileDefinitions(SKTileAdjacencyMask adjacency, NSArray tileDefinitions);
 }
 
 #endif

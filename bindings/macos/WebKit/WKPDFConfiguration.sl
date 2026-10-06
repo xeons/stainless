@@ -34,8 +34,10 @@ import Standard.ObjC;
 
 public extern objc class WKPDFConfiguration : NSObject, NSCopying
 {
-    [Selector("rect", "setRect:")] public CGRect Rect { get; set; }
-    [Selector("allowTransparentBackground", "setAllowTransparentBackground:")] public bool AllowTransparentBackground { get; set; }
+    [Selector("rect", "setRect:")]
+    public CGRect Rect { get; set; }
+    [Selector("allowTransparentBackground", "setAllowTransparentBackground:")]
+    public bool AllowTransparentBackground { get; set; }
 }
 
 #endif

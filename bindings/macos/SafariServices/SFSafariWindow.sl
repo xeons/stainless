@@ -41,11 +41,16 @@ public objc closure void SFSafariWindowGetToolbarItemWithCompletionHandlerComple
 
 public extern objc class SFSafariWindow : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("getActiveTabWithCompletionHandler:")] public void GetActiveTabWithCompletionHandler(SFSafariWindowGetActiveTabWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getAllTabsWithCompletionHandler:")] public void GetAllTabsWithCompletionHandler(SFSafariWindowGetAllTabsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("openTabWithURL:makeActiveIfPossible:completionHandler:")] public void OpenTabWithURLMakeActiveIfPossibleCompletionHandler(NSURL url, bool activateTab, SFSafariWindowOpenTabWithURLMakeActiveIfPossibleCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("getToolbarItemWithCompletionHandler:")] public void GetToolbarItemWithCompletionHandler(SFSafariWindowGetToolbarItemWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("close")] public void Close();
+    [Selector("getActiveTabWithCompletionHandler:")]
+    public void GetActiveTabWithCompletionHandler(SFSafariWindowGetActiveTabWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getAllTabsWithCompletionHandler:")]
+    public void GetAllTabsWithCompletionHandler(SFSafariWindowGetAllTabsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("openTabWithURL:makeActiveIfPossible:completionHandler:")]
+    public void OpenTabWithURLMakeActiveIfPossibleCompletionHandler(NSURL url, bool activateTab, SFSafariWindowOpenTabWithURLMakeActiveIfPossibleCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("getToolbarItemWithCompletionHandler:")]
+    public void GetToolbarItemWithCompletionHandler(SFSafariWindowGetToolbarItemWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("close")]
+    public void Close();
 }
 
 #endif

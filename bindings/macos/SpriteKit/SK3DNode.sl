@@ -34,19 +34,32 @@ import Standard.ObjC;
 
 public extern objc class SK3DNode : SKNode
 {
-    [Selector("viewportSize", "setViewportSize:")] public CGSize ViewportSize { get; set; }
-    [Selector("scnScene", "setScnScene:")] public SCNScene? ScnScene { get; set; }
-    [Selector("sceneTime", "setSceneTime:")] public NSTimeInterval SceneTime { get; set; }
-    [Selector("isPlaying", "setPlaying:")] public bool Playing { get; set; }
-    [Selector("loops", "setLoops:")] public bool Loops { get; set; }
-    [Selector("pointOfView", "setPointOfView:")] public SCNNode? PointOfView { get; set; }
-    [Selector("autoenablesDefaultLighting", "setAutoenablesDefaultLighting:")] public bool AutoenablesDefaultLighting { get; set; }
-    [Selector("initWithViewportSize:")] public Self InitWithViewportSize(CGSize viewportSize);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
-    [Selector("nodeWithViewportSize:")] public static Self NodeWithViewportSize(CGSize viewportSize);
-    [Selector("hitTest:options:")] public NSArray HitTestOptions(CGPoint point, NSDictionary? options);
-    [Selector("projectPoint:")] public vector_float3 ProjectPoint(vector_float3 point);
-    [Selector("unprojectPoint:")] public vector_float3 UnprojectPoint(vector_float3 point);
+    [Selector("viewportSize", "setViewportSize:")]
+    public CGSize ViewportSize { get; set; }
+    [Selector("scnScene", "setScnScene:")]
+    public SCNScene? ScnScene { get; set; }
+    [Selector("sceneTime", "setSceneTime:")]
+    public NSTimeInterval SceneTime { get; set; }
+    [Selector("isPlaying", "setPlaying:")]
+    public bool Playing { get; set; }
+    [Selector("loops", "setLoops:")]
+    public bool Loops { get; set; }
+    [Selector("pointOfView", "setPointOfView:")]
+    public SCNNode? PointOfView { get; set; }
+    [Selector("autoenablesDefaultLighting", "setAutoenablesDefaultLighting:")]
+    public bool AutoenablesDefaultLighting { get; set; }
+    [Selector("initWithViewportSize:")]
+    public Self InitWithViewportSize(CGSize viewportSize);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder aDecoder);
+    [Selector("nodeWithViewportSize:")]
+    public static Self NodeWithViewportSize(CGSize viewportSize);
+    [Selector("hitTest:options:")]
+    public NSArray HitTestOptions(CGPoint point, NSDictionary? options);
+    [Selector("projectPoint:")]
+    public vector_float3 ProjectPoint(vector_float3 point);
+    [Selector("unprojectPoint:")]
+    public vector_float3 UnprojectPoint(vector_float3 point);
 }
 
 #endif

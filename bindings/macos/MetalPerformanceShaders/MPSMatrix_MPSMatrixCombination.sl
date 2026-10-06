@@ -42,22 +42,34 @@ public struct MPSMatrixCopyOffsets
 
 public extern objc class MPSMatrixCopyDescriptor : NSObject
 {
-    [Selector("descriptorWithSourceMatrix:destinationMatrix:offsets:")] public static Self DescriptorWithSourceMatrixDestinationMatrixOffsets(MPSMatrix sourceMatrix, MPSMatrix destinationMatrix, MPSMatrixCopyOffsets offsets);
-    [Selector("initWithDevice:count:")] public Self InitWithDeviceCount(MTLDevice device, NSUInteger count);
-    [Selector("setCopyOperationAtIndex:sourceMatrix:destinationMatrix:offsets:")] public void SetCopyOperationAtIndexSourceMatrixDestinationMatrixOffsets(NSUInteger index, MPSMatrix sourceMatrix, MPSMatrix destinationMatrix, MPSMatrixCopyOffsets offsets);
-    [Selector("initWithSourceMatrices:destinationMatrices:offsetVector:offset:")] public Self InitWithSourceMatricesDestinationMatricesOffsetVectorOffset(NSArray sourceMatrices, NSArray destinationMatrices, MPSVector? offsets, NSUInteger byteOffset);
+    [Selector("descriptorWithSourceMatrix:destinationMatrix:offsets:")]
+    public static Self DescriptorWithSourceMatrixDestinationMatrixOffsets(MPSMatrix sourceMatrix, MPSMatrix destinationMatrix, MPSMatrixCopyOffsets offsets);
+    [Selector("initWithDevice:count:")]
+    public Self InitWithDeviceCount(MTLDevice device, NSUInteger count);
+    [Selector("setCopyOperationAtIndex:sourceMatrix:destinationMatrix:offsets:")]
+    public void SetCopyOperationAtIndexSourceMatrixDestinationMatrixOffsets(NSUInteger index, MPSMatrix sourceMatrix, MPSMatrix destinationMatrix, MPSMatrixCopyOffsets offsets);
+    [Selector("initWithSourceMatrices:destinationMatrices:offsetVector:offset:")]
+    public Self InitWithSourceMatricesDestinationMatricesOffsetVectorOffset(NSArray sourceMatrices, NSArray destinationMatrices, MPSVector? offsets, NSUInteger byteOffset);
 }
 
 public extern objc class MPSMatrixCopy : MPSKernel
 {
-    [Selector("copyRows")] public NSUInteger CopyRows { get; }
-    [Selector("copyColumns")] public NSUInteger CopyColumns { get; }
-    [Selector("sourcesAreTransposed")] public bool SourcesAreTransposed { get; }
-    [Selector("destinationsAreTransposed")] public bool DestinationsAreTransposed { get; }
-    [Selector("initWithDevice:copyRows:copyColumns:sourcesAreTransposed:destinationsAreTransposed:")] public Self InitWithDeviceCopyRowsCopyColumnsSourcesAreTransposedDestinationsAreTransposed(MTLDevice device, NSUInteger copyRows, NSUInteger copyColumns, bool sourcesAreTransposed, bool destinationsAreTransposed);
-    [Selector("encodeToCommandBuffer:copyDescriptor:")] public void EncodeToCommandBufferCopyDescriptor(MTLCommandBuffer commandBuffer, MPSMatrixCopyDescriptor copyDescriptor);
-    [Selector("encodeToCommandBuffer:copyDescriptor:rowPermuteIndices:rowPermuteOffset:columnPermuteIndices:columnPermuteOffset:")] public void EncodeToCommandBufferCopyDescriptorRowPermuteIndicesRowPermuteOffsetColumnPermuteIndicesColumnPermuteOffset(MTLCommandBuffer commandBuffer, MPSMatrixCopyDescriptor copyDescriptor, MPSVector? rowPermuteIndices, NSUInteger rowPermuteOffset, MPSVector? columnPermuteIndices, NSUInteger columnPermuteOffset);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("copyRows")]
+    public NSUInteger CopyRows { get; }
+    [Selector("copyColumns")]
+    public NSUInteger CopyColumns { get; }
+    [Selector("sourcesAreTransposed")]
+    public bool SourcesAreTransposed { get; }
+    [Selector("destinationsAreTransposed")]
+    public bool DestinationsAreTransposed { get; }
+    [Selector("initWithDevice:copyRows:copyColumns:sourcesAreTransposed:destinationsAreTransposed:")]
+    public Self InitWithDeviceCopyRowsCopyColumnsSourcesAreTransposedDestinationsAreTransposed(MTLDevice device, NSUInteger copyRows, NSUInteger copyColumns, bool sourcesAreTransposed, bool destinationsAreTransposed);
+    [Selector("encodeToCommandBuffer:copyDescriptor:")]
+    public void EncodeToCommandBufferCopyDescriptor(MTLCommandBuffer commandBuffer, MPSMatrixCopyDescriptor copyDescriptor);
+    [Selector("encodeToCommandBuffer:copyDescriptor:rowPermuteIndices:rowPermuteOffset:columnPermuteIndices:columnPermuteOffset:")]
+    public void EncodeToCommandBufferCopyDescriptorRowPermuteIndicesRowPermuteOffsetColumnPermuteIndicesColumnPermuteOffset(MTLCommandBuffer commandBuffer, MPSMatrixCopyDescriptor copyDescriptor, MPSVector? rowPermuteIndices, NSUInteger rowPermuteOffset, MPSVector? columnPermuteIndices, NSUInteger columnPermuteOffset);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 #endif

@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class CNContactsUserDefaults : NSObject
 {
-    [Selector("sortOrder")] public CNContactSortOrder SortOrder { get; }
-    [Selector("countryCode")] public NSString CountryCode { get; }
-    [Selector("sharedDefaults")] public static Self SharedDefaults();
+    [Selector("sortOrder")]
+    public CNContactSortOrder SortOrder { get; }
+    [Selector("countryCode")]
+    public NSString CountryCode { get; }
+    [Selector("sharedDefaults")]
+    public static Self SharedDefaults();
 }
 
 #endif

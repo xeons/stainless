@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class CLSQuantityItem : CLSActivityItem
 {
-    [Selector("quantity", "setQuantity:")] public double Quantity { get; set; }
-    [Selector("initWithIdentifier:title:")] public Self InitWithIdentifierTitle(NSString identifier, NSString title);
+    [Selector("quantity", "setQuantity:")]
+    public double Quantity { get; set; }
+    [Selector("initWithIdentifier:title:")]
+    public Self InitWithIdentifierTitle(NSString identifier, NSString title);
 }
 
 #endif

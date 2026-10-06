@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class MKMultiPolylineRenderer : MKOverlayPathRenderer
 {
-    [Selector("multiPolyline")] public MKMultiPolyline MultiPolyline { get; }
-    [Selector("initWithMultiPolyline:")] public Self InitWithMultiPolyline(MKMultiPolyline multiPolyline);
+    [Selector("multiPolyline")]
+    public MKMultiPolyline MultiPolyline { get; }
+    [Selector("initWithMultiPolyline:")]
+    public Self InitWithMultiPolyline(MKMultiPolyline multiPolyline);
 }
 
 #endif

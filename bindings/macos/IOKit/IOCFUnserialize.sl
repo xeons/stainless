@@ -30,10 +30,13 @@ import Standard.ObjC;
 
 #pragma comment(framework, "IOKit")
 
-[ReturnsRetained] public extern "C" CFTypeRef? IOCFUnserialize(byte* buffer, CFAllocatorRef? allocator, CFOptionFlags options, __CFString** errorString);
+[ReturnsRetained]
+public extern "C" CFTypeRef? IOCFUnserialize(byte* buffer, CFAllocatorRef? allocator, CFOptionFlags options, __CFString** errorString);
 
-[ReturnsRetained] public extern "C" CFTypeRef? IOCFUnserializeBinary(byte* buffer, nuint bufferSize, CFAllocatorRef? allocator, CFOptionFlags options, __CFString** errorString);
+[ReturnsRetained]
+public extern "C" CFTypeRef? IOCFUnserializeBinary(byte* buffer, nuint bufferSize, CFAllocatorRef? allocator, CFOptionFlags options, __CFString** errorString);
 
-[ReturnsRetained] public extern "C" CFTypeRef? IOCFUnserializeWithSize(byte* buffer, nuint bufferSize, CFAllocatorRef? allocator, CFOptionFlags options, __CFString** errorString);
+[ReturnsRetained]
+public extern "C" CFTypeRef? IOCFUnserializeWithSize(byte* buffer, nuint bufferSize, CFAllocatorRef? allocator, CFOptionFlags options, __CFString** errorString);
 
 #endif

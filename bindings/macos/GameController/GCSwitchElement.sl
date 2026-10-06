@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public objc interface GCSwitchElement : GCPhysicalInputElement
 {
-    [Selector("positionInput")] GCSwitchPositionInput PositionInput { get; }
+    [Selector("positionInput")]
+    GCSwitchPositionInput PositionInput { get; }
 }
 
 #endif

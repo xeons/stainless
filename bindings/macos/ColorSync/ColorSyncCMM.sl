@@ -37,13 +37,16 @@ public extern objc class ColorSyncCMMRef : CFTypeRef { }
 
 public extern "C" CFTypeID ColorSyncCMMGetTypeID();
 
-[ReturnsRetained] public extern "C" ColorSyncCMMRef? ColorSyncCMMCreate(CFBundleRef cmmBundle);
+[ReturnsRetained]
+public extern "C" ColorSyncCMMRef? ColorSyncCMMCreate(CFBundleRef cmmBundle);
 
 public extern "C" CFBundleRef? ColorSyncCMMGetBundle(ColorSyncCMMRef arg0);
 
-[ReturnsRetained] public extern "C" CFStringRef? ColorSyncCMMCopyLocalizedName(ColorSyncCMMRef arg0);
+[ReturnsRetained]
+public extern "C" CFStringRef? ColorSyncCMMCopyLocalizedName(ColorSyncCMMRef arg0);
 
-[ReturnsRetained] public extern "C" CFStringRef? ColorSyncCMMCopyCMMIdentifier(ColorSyncCMMRef arg0);
+[ReturnsRetained]
+public extern "C" CFStringRef? ColorSyncCMMCopyCMMIdentifier(ColorSyncCMMRef arg0);
 
 public delegate bool ColorSyncCMMIterateCallback(ColorSyncCMM* arg0, void* arg1);
 

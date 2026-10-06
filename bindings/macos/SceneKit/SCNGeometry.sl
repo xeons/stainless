@@ -64,63 +64,112 @@ public extern "C" SCNGeometrySourceSemantic? SCNGeometrySourceSemanticBoneIndice
 
 public extern objc class SCNGeometry : NSObject, SCNAnimatable, SCNBoundingVolume, SCNShadable, NSCopying, NSSecureCoding
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("materials", "setMaterials:")] public NSArray Materials { get; set; }
-    [Selector("firstMaterial", "setFirstMaterial:")] public SCNMaterial? FirstMaterial { get; set; }
-    [Selector("geometrySources")] public NSArray? GeometrySources { get; }
-    [Selector("geometryElements")] public NSArray? GeometryElements { get; }
-    [Selector("geometryElementCount")] public NSInteger GeometryElementCount { get; }
-    [Selector("geometrySourceChannels")] public NSArray? GeometrySourceChannels { get; }
-    [Selector("levelsOfDetail", "setLevelsOfDetail:")] public NSArray? LevelsOfDetail { get; set; }
-    [Selector("tessellator", "setTessellator:")] public SCNGeometryTessellator? Tessellator { get; set; }
-    [Selector("subdivisionLevel", "setSubdivisionLevel:")] public NSUInteger SubdivisionLevel { get; set; }
-    [Selector("wantsAdaptiveSubdivision", "setWantsAdaptiveSubdivision:")] public bool WantsAdaptiveSubdivision { get; set; }
-    [Selector("edgeCreasesElement", "setEdgeCreasesElement:")] public SCNGeometryElement? EdgeCreasesElement { get; set; }
-    [Selector("edgeCreasesSource", "setEdgeCreasesSource:")] public SCNGeometrySource? EdgeCreasesSource { get; set; }
-    [Selector("geometry")] public static Self Geometry();
-    [Selector("insertMaterial:atIndex:")] public void InsertMaterialAtIndex(SCNMaterial material, NSUInteger index);
-    [Selector("removeMaterialAtIndex:")] public void RemoveMaterialAtIndex(NSUInteger index);
-    [Selector("replaceMaterialAtIndex:withMaterial:")] public void ReplaceMaterialAtIndexWithMaterial(NSUInteger index, SCNMaterial material);
-    [Selector("materialWithName:")] public SCNMaterial? MaterialWithName(NSString name);
-    [Selector("geometryWithSources:elements:")] public static Self GeometryWithSourcesElements(NSArray sources, NSArray? elements);
-    [Selector("geometryWithSources:elements:sourceChannels:")] public static Self GeometryWithSourcesElementsSourceChannels(NSArray sources, NSArray? elements, NSArray? sourceChannels);
-    [Selector("geometrySourcesForSemantic:")] public NSArray GeometrySourcesForSemantic(SCNGeometrySourceSemantic semantic);
-    [Selector("geometryElementAtIndex:")] public SCNGeometryElement GeometryElementAtIndex(NSInteger elementIndex);
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("materials", "setMaterials:")]
+    public NSArray Materials { get; set; }
+    [Selector("firstMaterial", "setFirstMaterial:")]
+    public SCNMaterial? FirstMaterial { get; set; }
+    [Selector("geometrySources")]
+    public NSArray? GeometrySources { get; }
+    [Selector("geometryElements")]
+    public NSArray? GeometryElements { get; }
+    [Selector("geometryElementCount")]
+    public NSInteger GeometryElementCount { get; }
+    [Selector("geometrySourceChannels")]
+    public NSArray? GeometrySourceChannels { get; }
+    [Selector("levelsOfDetail", "setLevelsOfDetail:")]
+    public NSArray? LevelsOfDetail { get; set; }
+    [Selector("tessellator", "setTessellator:")]
+    public SCNGeometryTessellator? Tessellator { get; set; }
+    [Selector("subdivisionLevel", "setSubdivisionLevel:")]
+    public NSUInteger SubdivisionLevel { get; set; }
+    [Selector("wantsAdaptiveSubdivision", "setWantsAdaptiveSubdivision:")]
+    public bool WantsAdaptiveSubdivision { get; set; }
+    [Selector("edgeCreasesElement", "setEdgeCreasesElement:")]
+    public SCNGeometryElement? EdgeCreasesElement { get; set; }
+    [Selector("edgeCreasesSource", "setEdgeCreasesSource:")]
+    public SCNGeometrySource? EdgeCreasesSource { get; set; }
+    [Selector("geometry")]
+    public static Self Geometry();
+    [Selector("insertMaterial:atIndex:")]
+    public void InsertMaterialAtIndex(SCNMaterial material, NSUInteger index);
+    [Selector("removeMaterialAtIndex:")]
+    public void RemoveMaterialAtIndex(NSUInteger index);
+    [Selector("replaceMaterialAtIndex:withMaterial:")]
+    public void ReplaceMaterialAtIndexWithMaterial(NSUInteger index, SCNMaterial material);
+    [Selector("materialWithName:")]
+    public SCNMaterial? MaterialWithName(NSString name);
+    [Selector("geometryWithSources:elements:")]
+    public static Self GeometryWithSourcesElements(NSArray sources, NSArray? elements);
+    [Selector("geometryWithSources:elements:sourceChannels:")]
+    public static Self GeometryWithSourcesElementsSourceChannels(NSArray sources, NSArray? elements, NSArray? sourceChannels);
+    [Selector("geometrySourcesForSemantic:")]
+    public NSArray GeometrySourcesForSemantic(SCNGeometrySourceSemantic semantic);
+    [Selector("geometryElementAtIndex:")]
+    public SCNGeometryElement GeometryElementAtIndex(NSInteger elementIndex);
 }
 
 public extern objc class SCNGeometrySource : NSObject, NSSecureCoding
 {
-    [Selector("data")] public NSData Data { get; }
-    [Selector("semantic")] public SCNGeometrySourceSemantic Semantic { get; }
-    [Selector("vectorCount")] public NSInteger VectorCount { get; }
-    [Selector("floatComponents")] public bool FloatComponents { get; }
-    [Selector("componentsPerVector")] public NSInteger ComponentsPerVector { get; }
-    [Selector("bytesPerComponent")] public NSInteger BytesPerComponent { get; }
-    [Selector("dataOffset")] public NSInteger DataOffset { get; }
-    [Selector("dataStride")] public NSInteger DataStride { get; }
-    [Selector("geometrySourceWithData:semantic:vectorCount:floatComponents:componentsPerVector:bytesPerComponent:dataOffset:dataStride:")] public static Self GeometrySourceWithDataSemanticVectorCountFloatComponentsComponentsPerVectorBytesPerComponentDataOffsetDataStride(NSData data, SCNGeometrySourceSemantic semantic, NSInteger vectorCount, bool floatComponents, NSInteger componentsPerVector, NSInteger bytesPerComponent, NSInteger offset, NSInteger stride);
-    [Selector("geometrySourceWithVertices:count:")] public static Self GeometrySourceWithVerticesCount(SCNVector3* vertices, NSInteger count);
-    [Selector("geometrySourceWithNormals:count:")] public static Self GeometrySourceWithNormalsCount(SCNVector3* normals, NSInteger count);
-    [Selector("geometrySourceWithTextureCoordinates:count:")] public static Self GeometrySourceWithTextureCoordinatesCount(CGPoint* texcoord, NSInteger count);
-    [Selector("geometrySourceWithBuffer:vertexFormat:semantic:vertexCount:dataOffset:dataStride:")] public static Self GeometrySourceWithBufferVertexFormatSemanticVertexCountDataOffsetDataStride(MTLBuffer buffer, MTLVertexFormat vertexFormat, SCNGeometrySourceSemantic semantic, NSInteger vertexCount, NSInteger offset, NSInteger stride);
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("semantic")]
+    public SCNGeometrySourceSemantic Semantic { get; }
+    [Selector("vectorCount")]
+    public NSInteger VectorCount { get; }
+    [Selector("floatComponents")]
+    public bool FloatComponents { get; }
+    [Selector("componentsPerVector")]
+    public NSInteger ComponentsPerVector { get; }
+    [Selector("bytesPerComponent")]
+    public NSInteger BytesPerComponent { get; }
+    [Selector("dataOffset")]
+    public NSInteger DataOffset { get; }
+    [Selector("dataStride")]
+    public NSInteger DataStride { get; }
+    [Selector("geometrySourceWithData:semantic:vectorCount:floatComponents:componentsPerVector:bytesPerComponent:dataOffset:dataStride:")]
+    public static Self GeometrySourceWithDataSemanticVectorCountFloatComponentsComponentsPerVectorBytesPerComponentDataOffsetDataStride(NSData data, SCNGeometrySourceSemantic semantic, NSInteger vectorCount, bool floatComponents, NSInteger componentsPerVector, NSInteger bytesPerComponent, NSInteger offset, NSInteger stride);
+    [Selector("geometrySourceWithVertices:count:")]
+    public static Self GeometrySourceWithVerticesCount(SCNVector3* vertices, NSInteger count);
+    [Selector("geometrySourceWithNormals:count:")]
+    public static Self GeometrySourceWithNormalsCount(SCNVector3* normals, NSInteger count);
+    [Selector("geometrySourceWithTextureCoordinates:count:")]
+    public static Self GeometrySourceWithTextureCoordinatesCount(CGPoint* texcoord, NSInteger count);
+    [Selector("geometrySourceWithBuffer:vertexFormat:semantic:vertexCount:dataOffset:dataStride:")]
+    public static Self GeometrySourceWithBufferVertexFormatSemanticVertexCountDataOffsetDataStride(MTLBuffer buffer, MTLVertexFormat vertexFormat, SCNGeometrySourceSemantic semantic, NSInteger vertexCount, NSInteger offset, NSInteger stride);
 }
 
 public extern objc class SCNGeometryElement : NSObject, NSSecureCoding
 {
-    [Selector("data")] public NSData Data { get; }
-    [Selector("primitiveType")] public SCNGeometryPrimitiveType PrimitiveType { get; }
-    [Selector("primitiveCount")] public NSInteger PrimitiveCount { get; }
-    [Selector("hasInterleavedIndicesChannels")] public bool InterleavedIndicesChannels { get; }
-    [Selector("indicesChannelCount")] public NSInteger IndicesChannelCount { get; }
-    [Selector("bytesPerIndex")] public NSInteger BytesPerIndex { get; }
-    [Selector("primitiveRange", "setPrimitiveRange:")] public NSRange PrimitiveRange { get; set; }
-    [Selector("pointSize", "setPointSize:")] public CGFloat PointSize { get; set; }
-    [Selector("minimumPointScreenSpaceRadius", "setMinimumPointScreenSpaceRadius:")] public CGFloat MinimumPointScreenSpaceRadius { get; set; }
-    [Selector("maximumPointScreenSpaceRadius", "setMaximumPointScreenSpaceRadius:")] public CGFloat MaximumPointScreenSpaceRadius { get; set; }
-    [Selector("geometryElementWithData:primitiveType:primitiveCount:bytesPerIndex:")] public static Self GeometryElementWithDataPrimitiveTypePrimitiveCountBytesPerIndex(NSData? data, SCNGeometryPrimitiveType primitiveType, NSInteger primitiveCount, NSInteger bytesPerIndex);
-    [Selector("geometryElementWithData:primitiveType:primitiveCount:indicesChannelCount:interleavedIndicesChannels:bytesPerIndex:")] public static Self GeometryElementWithDataPrimitiveTypePrimitiveCountIndicesChannelCountInterleavedIndicesChannelsBytesPerIndex(NSData? data, SCNGeometryPrimitiveType primitiveType, NSInteger primitiveCount, NSInteger indicesChannelCount, bool interleavedIndicesChannels, NSInteger bytesPerIndex);
-    [Selector("geometryElementWithBuffer:primitiveType:primitiveCount:bytesPerIndex:")] public static Self GeometryElementWithBufferPrimitiveTypePrimitiveCountBytesPerIndex(MTLBuffer buffer, SCNGeometryPrimitiveType primitiveType, NSInteger primitiveCount, NSInteger bytesPerIndex);
-    [Selector("geometryElementWithBuffer:primitiveType:primitiveCount:indicesChannelCount:interleavedIndicesChannels:bytesPerIndex:")] public static Self GeometryElementWithBufferPrimitiveTypePrimitiveCountIndicesChannelCountInterleavedIndicesChannelsBytesPerIndex(MTLBuffer buffer, SCNGeometryPrimitiveType primitiveType, NSInteger primitiveCount, NSInteger indicesChannelCount, bool interleavedIndicesChannels, NSInteger bytesPerIndex);
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("primitiveType")]
+    public SCNGeometryPrimitiveType PrimitiveType { get; }
+    [Selector("primitiveCount")]
+    public NSInteger PrimitiveCount { get; }
+    [Selector("hasInterleavedIndicesChannels")]
+    public bool InterleavedIndicesChannels { get; }
+    [Selector("indicesChannelCount")]
+    public NSInteger IndicesChannelCount { get; }
+    [Selector("bytesPerIndex")]
+    public NSInteger BytesPerIndex { get; }
+    [Selector("primitiveRange", "setPrimitiveRange:")]
+    public NSRange PrimitiveRange { get; set; }
+    [Selector("pointSize", "setPointSize:")]
+    public CGFloat PointSize { get; set; }
+    [Selector("minimumPointScreenSpaceRadius", "setMinimumPointScreenSpaceRadius:")]
+    public CGFloat MinimumPointScreenSpaceRadius { get; set; }
+    [Selector("maximumPointScreenSpaceRadius", "setMaximumPointScreenSpaceRadius:")]
+    public CGFloat MaximumPointScreenSpaceRadius { get; set; }
+    [Selector("geometryElementWithData:primitiveType:primitiveCount:bytesPerIndex:")]
+    public static Self GeometryElementWithDataPrimitiveTypePrimitiveCountBytesPerIndex(NSData? data, SCNGeometryPrimitiveType primitiveType, NSInteger primitiveCount, NSInteger bytesPerIndex);
+    [Selector("geometryElementWithData:primitiveType:primitiveCount:indicesChannelCount:interleavedIndicesChannels:bytesPerIndex:")]
+    public static Self GeometryElementWithDataPrimitiveTypePrimitiveCountIndicesChannelCountInterleavedIndicesChannelsBytesPerIndex(NSData? data, SCNGeometryPrimitiveType primitiveType, NSInteger primitiveCount, NSInteger indicesChannelCount, bool interleavedIndicesChannels, NSInteger bytesPerIndex);
+    [Selector("geometryElementWithBuffer:primitiveType:primitiveCount:bytesPerIndex:")]
+    public static Self GeometryElementWithBufferPrimitiveTypePrimitiveCountBytesPerIndex(MTLBuffer buffer, SCNGeometryPrimitiveType primitiveType, NSInteger primitiveCount, NSInteger bytesPerIndex);
+    [Selector("geometryElementWithBuffer:primitiveType:primitiveCount:indicesChannelCount:interleavedIndicesChannels:bytesPerIndex:")]
+    public static Self GeometryElementWithBufferPrimitiveTypePrimitiveCountIndicesChannelCountInterleavedIndicesChannelsBytesPerIndex(MTLBuffer buffer, SCNGeometryPrimitiveType primitiveType, NSInteger primitiveCount, NSInteger indicesChannelCount, bool interleavedIndicesChannels, NSInteger bytesPerIndex);
 }
 
 public enum SCNTessellationSmoothingMode : long
@@ -132,14 +181,22 @@ public enum SCNTessellationSmoothingMode : long
 
 public extern objc class SCNGeometryTessellator : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("tessellationFactorScale", "setTessellationFactorScale:")] public CGFloat TessellationFactorScale { get; set; }
-    [Selector("tessellationPartitionMode", "setTessellationPartitionMode:")] public MTLTessellationPartitionMode TessellationPartitionMode { get; set; }
-    [Selector("isAdaptive", "setAdaptive:")] public bool Adaptive { get; set; }
-    [Selector("isScreenSpace", "setScreenSpace:")] public bool ScreenSpace { get; set; }
-    [Selector("edgeTessellationFactor", "setEdgeTessellationFactor:")] public CGFloat EdgeTessellationFactor { get; set; }
-    [Selector("insideTessellationFactor", "setInsideTessellationFactor:")] public CGFloat InsideTessellationFactor { get; set; }
-    [Selector("maximumEdgeLength", "setMaximumEdgeLength:")] public CGFloat MaximumEdgeLength { get; set; }
-    [Selector("smoothingMode", "setSmoothingMode:")] public SCNTessellationSmoothingMode SmoothingMode { get; set; }
+    [Selector("tessellationFactorScale", "setTessellationFactorScale:")]
+    public CGFloat TessellationFactorScale { get; set; }
+    [Selector("tessellationPartitionMode", "setTessellationPartitionMode:")]
+    public MTLTessellationPartitionMode TessellationPartitionMode { get; set; }
+    [Selector("isAdaptive", "setAdaptive:")]
+    public bool Adaptive { get; set; }
+    [Selector("isScreenSpace", "setScreenSpace:")]
+    public bool ScreenSpace { get; set; }
+    [Selector("edgeTessellationFactor", "setEdgeTessellationFactor:")]
+    public CGFloat EdgeTessellationFactor { get; set; }
+    [Selector("insideTessellationFactor", "setInsideTessellationFactor:")]
+    public CGFloat InsideTessellationFactor { get; set; }
+    [Selector("maximumEdgeLength", "setMaximumEdgeLength:")]
+    public CGFloat MaximumEdgeLength { get; set; }
+    [Selector("smoothingMode", "setSmoothingMode:")]
+    public SCNTessellationSmoothingMode SmoothingMode { get; set; }
 }
 
 #endif

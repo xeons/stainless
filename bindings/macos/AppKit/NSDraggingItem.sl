@@ -39,23 +39,34 @@ public extern "C" NSDraggingImageComponentKey? NSDraggingImageComponentLabelKey;
 
 public extern objc class NSDraggingImageComponent : NSObject
 {
-    [Selector("key", "setKey:")] public NSDraggingImageComponentKey Key { get; set; }
-    [Selector("contents", "setContents:")] public AnyObject? Contents { get; set; }
-    [Selector("frame", "setFrame:")] public NSRect Frame { get; set; }
-    [Selector("draggingImageComponentWithKey:")] public static NSDraggingImageComponent DraggingImageComponentWithKey(NSDraggingImageComponentKey key);
-    [Selector("initWithKey:")] public Self InitWithKey(NSDraggingImageComponentKey key);
+    [Selector("key", "setKey:")]
+    public NSDraggingImageComponentKey Key { get; set; }
+    [Selector("contents", "setContents:")]
+    public AnyObject? Contents { get; set; }
+    [Selector("frame", "setFrame:")]
+    public NSRect Frame { get; set; }
+    [Selector("draggingImageComponentWithKey:")]
+    public static NSDraggingImageComponent DraggingImageComponentWithKey(NSDraggingImageComponentKey key);
+    [Selector("initWithKey:")]
+    public Self InitWithKey(NSDraggingImageComponentKey key);
 }
 
 public objc closure NSArray NSDraggingItemImageComponentsProviderBlock();
 
 public extern objc class NSDraggingItem : NSObject
 {
-    [Selector("item")] public AnyObject Item { get; }
-    [Selector("draggingFrame", "setDraggingFrame:")] public NSRect DraggingFrame { get; set; }
-    [Selector("imageComponentsProvider", "setImageComponentsProvider:")] public NSDraggingItemImageComponentsProviderBlock? ImageComponentsProvider { get; set; }
-    [Selector("imageComponents")] public NSArray? ImageComponents { get; }
-    [Selector("initWithPasteboardWriter:")] public Self InitWithPasteboardWriter(NSPasteboardWriting pasteboardWriter);
-    [Selector("setDraggingFrame:contents:")] public void SetDraggingFrameContents(NSRect frame, AnyObject? contents);
+    [Selector("item")]
+    public AnyObject Item { get; }
+    [Selector("draggingFrame", "setDraggingFrame:")]
+    public NSRect DraggingFrame { get; set; }
+    [Selector("imageComponentsProvider", "setImageComponentsProvider:")]
+    public NSDraggingItemImageComponentsProviderBlock? ImageComponentsProvider { get; set; }
+    [Selector("imageComponents")]
+    public NSArray? ImageComponents { get; }
+    [Selector("initWithPasteboardWriter:")]
+    public Self InitWithPasteboardWriter(NSPasteboardWriting pasteboardWriter);
+    [Selector("setDraggingFrame:contents:")]
+    public void SetDraggingFrameContents(NSRect frame, AnyObject? contents);
 }
 
 #endif

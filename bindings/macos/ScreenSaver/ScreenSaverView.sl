@@ -33,18 +33,30 @@ import Standard.ObjC;
 
 public extern objc class ScreenSaverView : NSView
 {
-    [Selector("animationTimeInterval", "setAnimationTimeInterval:")] public NSTimeInterval AnimationTimeInterval { get; set; }
-    [Selector("isAnimating")] public bool Animating { get; }
-    [Selector("hasConfigureSheet")] public bool HasConfigureSheet { get; }
-    [Selector("configureSheet")] public NSWindow? ConfigureSheet { get; }
-    [Selector("isPreview")] public bool Preview { get; }
-    [Selector("backingStoreType")] public static NSBackingStoreType BackingStoreType();
-    [Selector("performGammaFade")] public static bool PerformGammaFade();
-    [Selector("initWithFrame:isPreview:")] public Self? InitWithFrameIsPreview(NSRect frame, bool isPreview);
-    [Selector("startAnimation")] public void StartAnimation();
-    [Selector("stopAnimation")] public void StopAnimation();
-    [Selector("drawRect:")] public void DrawRect(NSRect rect);
-    [Selector("animateOneFrame")] public void AnimateOneFrame();
+    [Selector("animationTimeInterval", "setAnimationTimeInterval:")]
+    public NSTimeInterval AnimationTimeInterval { get; set; }
+    [Selector("isAnimating")]
+    public bool Animating { get; }
+    [Selector("hasConfigureSheet")]
+    public bool HasConfigureSheet { get; }
+    [Selector("configureSheet")]
+    public NSWindow? ConfigureSheet { get; }
+    [Selector("isPreview")]
+    public bool Preview { get; }
+    [Selector("backingStoreType")]
+    public static NSBackingStoreType BackingStoreType();
+    [Selector("performGammaFade")]
+    public static bool PerformGammaFade();
+    [Selector("initWithFrame:isPreview:")]
+    public Self? InitWithFrameIsPreview(NSRect frame, bool isPreview);
+    [Selector("startAnimation")]
+    public void StartAnimation();
+    [Selector("stopAnimation")]
+    public void StopAnimation();
+    [Selector("drawRect:")]
+    public void DrawRect(NSRect rect);
+    [Selector("animateOneFrame")]
+    public void AnimateOneFrame();
 }
 
 #endif

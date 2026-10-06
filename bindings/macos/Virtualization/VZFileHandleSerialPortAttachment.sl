@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class VZFileHandleSerialPortAttachment : VZSerialPortAttachment
 {
-    [Selector("fileHandleForReading")] public NSFileHandle? FileHandleForReading { get; }
-    [Selector("fileHandleForWriting")] public NSFileHandle? FileHandleForWriting { get; }
-    [Selector("initWithFileHandleForReading:fileHandleForWriting:")] public Self InitWithFileHandleForReadingFileHandleForWriting(NSFileHandle? fileHandleForReading, NSFileHandle? fileHandleForWriting);
+    [Selector("fileHandleForReading")]
+    public NSFileHandle? FileHandleForReading { get; }
+    [Selector("fileHandleForWriting")]
+    public NSFileHandle? FileHandleForWriting { get; }
+    [Selector("initWithFileHandleForReading:fileHandleForWriting:")]
+    public Self InitWithFileHandleForReadingFileHandleForWriting(NSFileHandle? fileHandleForReading, NSFileHandle? fileHandleForWriting);
 }
 
 #endif

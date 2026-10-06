@@ -35,7 +35,8 @@ public objc closure void SFSafariExtensionManagerGetStateOfSafariExtensionWithId
 
 public extern objc class SFSafariExtensionManager : NSObject
 {
-    [Selector("getStateOfSafariExtensionWithIdentifier:completionHandler:")] public static void GetStateOfSafariExtensionWithIdentifierCompletionHandler(NSString identifier, SFSafariExtensionManagerGetStateOfSafariExtensionWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getStateOfSafariExtensionWithIdentifier:completionHandler:")]
+    public static void GetStateOfSafariExtensionWithIdentifierCompletionHandler(NSString identifier, SFSafariExtensionManagerGetStateOfSafariExtensionWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

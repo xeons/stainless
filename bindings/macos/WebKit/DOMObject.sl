@@ -40,7 +40,8 @@ public extern objc class DOMObject : WebScriptObject, NSCopying { }
 /// DOMLinkStyle, a category of DOMObject.
 public extern objc class DOMObject
 {
-    [Selector("sheet")] public DOMStyleSheet? Sheet { get; }
+    [Selector("sheet")]
+    public DOMStyleSheet? Sheet { get; }
 }
 
 #endif

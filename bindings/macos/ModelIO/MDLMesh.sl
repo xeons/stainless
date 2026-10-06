@@ -33,81 +33,136 @@ import Standard.ObjC;
 
 public extern objc class MDLVertexAttributeData : NSObject
 {
-    [Selector("map", "setMap:")] public MDLMeshBufferMap Map { get; set; }
-    [Selector("dataStart", "setDataStart:")] public void* DataStart { get; set; }
-    [Selector("stride", "setStride:")] public NSUInteger Stride { get; set; }
-    [Selector("format", "setFormat:")] public MDLVertexFormat Format { get; set; }
-    [Selector("bufferSize", "setBufferSize:")] public NSUInteger BufferSize { get; set; }
+    [Selector("map", "setMap:")]
+    public MDLMeshBufferMap Map { get; set; }
+    [Selector("dataStart", "setDataStart:")]
+    public void* DataStart { get; set; }
+    [Selector("stride", "setStride:")]
+    public NSUInteger Stride { get; set; }
+    [Selector("format", "setFormat:")]
+    public MDLVertexFormat Format { get; set; }
+    [Selector("bufferSize", "setBufferSize:")]
+    public NSUInteger BufferSize { get; set; }
 }
 
 public extern objc class MDLMesh : MDLObject
 {
-    [Selector("boundingBox")] public MDLAxisAlignedBoundingBox BoundingBox { get; }
-    [Selector("vertexDescriptor", "setVertexDescriptor:")] public MDLVertexDescriptor VertexDescriptor { get; set; }
-    [Selector("vertexCount", "setVertexCount:")] public NSUInteger VertexCount { get; set; }
-    [Selector("vertexBuffers", "setVertexBuffers:")] public NSArray VertexBuffers { get; set; }
-    [Selector("submeshes", "setSubmeshes:")] public NSMutableArray? Submeshes { get; set; }
-    [Selector("allocator")] public MDLMeshBufferAllocator Allocator { get; }
-    [Selector("initWithBufferAllocator:")] public Self InitWithBufferAllocator(MDLMeshBufferAllocator? bufferAllocator);
-    [Selector("initWithVertexBuffer:vertexCount:descriptor:submeshes:")] public Self InitWithVertexBufferVertexCountDescriptorSubmeshes(MDLMeshBuffer vertexBuffer, NSUInteger vertexCount, MDLVertexDescriptor descriptor, NSArray submeshes);
-    [Selector("initWithVertexBuffers:vertexCount:descriptor:submeshes:")] public Self InitWithVertexBuffersVertexCountDescriptorSubmeshes(NSArray vertexBuffers, NSUInteger vertexCount, MDLVertexDescriptor descriptor, NSArray submeshes);
-    [Selector("vertexAttributeDataForAttributeNamed:")] public MDLVertexAttributeData? VertexAttributeDataForAttributeNamed(NSString name);
-    [Selector("vertexAttributeDataForAttributeNamed:asFormat:")] public MDLVertexAttributeData? VertexAttributeDataForAttributeNamedAsFormat(NSString name, MDLVertexFormat format);
+    [Selector("boundingBox")]
+    public MDLAxisAlignedBoundingBox BoundingBox { get; }
+    [Selector("vertexDescriptor", "setVertexDescriptor:")]
+    public MDLVertexDescriptor VertexDescriptor { get; set; }
+    [Selector("vertexCount", "setVertexCount:")]
+    public NSUInteger VertexCount { get; set; }
+    [Selector("vertexBuffers", "setVertexBuffers:")]
+    public NSArray VertexBuffers { get; set; }
+    [Selector("submeshes", "setSubmeshes:")]
+    public NSMutableArray? Submeshes { get; set; }
+    [Selector("allocator")]
+    public MDLMeshBufferAllocator Allocator { get; }
+    [Selector("initWithBufferAllocator:")]
+    public Self InitWithBufferAllocator(MDLMeshBufferAllocator? bufferAllocator);
+    [Selector("initWithVertexBuffer:vertexCount:descriptor:submeshes:")]
+    public Self InitWithVertexBufferVertexCountDescriptorSubmeshes(MDLMeshBuffer vertexBuffer, NSUInteger vertexCount, MDLVertexDescriptor descriptor, NSArray submeshes);
+    [Selector("initWithVertexBuffers:vertexCount:descriptor:submeshes:")]
+    public Self InitWithVertexBuffersVertexCountDescriptorSubmeshes(NSArray vertexBuffers, NSUInteger vertexCount, MDLVertexDescriptor descriptor, NSArray submeshes);
+    [Selector("vertexAttributeDataForAttributeNamed:")]
+    public MDLVertexAttributeData? VertexAttributeDataForAttributeNamed(NSString name);
+    [Selector("vertexAttributeDataForAttributeNamed:asFormat:")]
+    public MDLVertexAttributeData? VertexAttributeDataForAttributeNamedAsFormat(NSString name, MDLVertexFormat format);
 }
 
 /// Modifiers, a category of MDLMesh.
 public extern objc class MDLMesh
 {
-    [Selector("addAttributeWithName:format:")] public void AddAttributeWithNameFormat(NSString name, MDLVertexFormat format);
-    [Selector("addAttributeWithName:format:type:data:stride:")] public void AddAttributeWithNameFormatTypeDataStride(NSString name, MDLVertexFormat format, NSString type, NSData data, NSInteger stride);
-    [Selector("addAttributeWithName:format:type:data:stride:time:")] public void AddAttributeWithNameFormatTypeDataStrideTime(NSString name, MDLVertexFormat format, NSString type, NSData data, NSInteger stride, NSTimeInterval time);
-    [Selector("addNormalsWithAttributeNamed:creaseThreshold:")] public void AddNormalsWithAttributeNamedCreaseThreshold(NSString? attributeName, float creaseThreshold);
-    [Selector("addTangentBasisForTextureCoordinateAttributeNamed:tangentAttributeNamed:bitangentAttributeNamed:")] public void AddTangentBasisForTextureCoordinateAttributeNamedTangentAttributeNamedBitangentAttributeNamed(NSString textureCoordinateAttributeName, NSString tangentAttributeName, NSString? bitangentAttributeName);
-    [Selector("addTangentBasisForTextureCoordinateAttributeNamed:normalAttributeNamed:tangentAttributeNamed:")] public void AddTangentBasisForTextureCoordinateAttributeNamedNormalAttributeNamedTangentAttributeNamed(NSString textureCoordinateAttributeName, NSString normalAttributeName, NSString tangentAttributeName);
-    [Selector("addOrthTanBasisForTextureCoordinateAttributeNamed:normalAttributeNamed:tangentAttributeNamed:")] public void AddOrthTanBasisForTextureCoordinateAttributeNamedNormalAttributeNamedTangentAttributeNamed(NSString textureCoordinateAttributeName, NSString normalAttributeName, NSString tangentAttributeName);
-    [Selector("addUnwrappedTextureCoordinatesForAttributeNamed:")] public void AddUnwrappedTextureCoordinatesForAttributeNamed(NSString textureCoordinateAttributeName);
-    [Selector("flipTextureCoordinatesInAttributeNamed:")] public void FlipTextureCoordinatesInAttributeNamed(NSString textureCoordinateAttributeName);
+    [Selector("addAttributeWithName:format:")]
+    public void AddAttributeWithNameFormat(NSString name, MDLVertexFormat format);
+    [Selector("addAttributeWithName:format:type:data:stride:")]
+    public void AddAttributeWithNameFormatTypeDataStride(NSString name, MDLVertexFormat format, NSString type, NSData data, NSInteger stride);
+    [Selector("addAttributeWithName:format:type:data:stride:time:")]
+    public void AddAttributeWithNameFormatTypeDataStrideTime(NSString name, MDLVertexFormat format, NSString type, NSData data, NSInteger stride, NSTimeInterval time);
+    [Selector("addNormalsWithAttributeNamed:creaseThreshold:")]
+    public void AddNormalsWithAttributeNamedCreaseThreshold(NSString? attributeName, float creaseThreshold);
+    [Selector("addTangentBasisForTextureCoordinateAttributeNamed:tangentAttributeNamed:bitangentAttributeNamed:")]
+    public void AddTangentBasisForTextureCoordinateAttributeNamedTangentAttributeNamedBitangentAttributeNamed(NSString textureCoordinateAttributeName, NSString tangentAttributeName, NSString? bitangentAttributeName);
+    [Selector("addTangentBasisForTextureCoordinateAttributeNamed:normalAttributeNamed:tangentAttributeNamed:")]
+    public void AddTangentBasisForTextureCoordinateAttributeNamedNormalAttributeNamedTangentAttributeNamed(NSString textureCoordinateAttributeName, NSString normalAttributeName, NSString tangentAttributeName);
+    [Selector("addOrthTanBasisForTextureCoordinateAttributeNamed:normalAttributeNamed:tangentAttributeNamed:")]
+    public void AddOrthTanBasisForTextureCoordinateAttributeNamedNormalAttributeNamedTangentAttributeNamed(NSString textureCoordinateAttributeName, NSString normalAttributeName, NSString tangentAttributeName);
+    [Selector("addUnwrappedTextureCoordinatesForAttributeNamed:")]
+    public void AddUnwrappedTextureCoordinatesForAttributeNamed(NSString textureCoordinateAttributeName);
+    [Selector("flipTextureCoordinatesInAttributeNamed:")]
+    public void FlipTextureCoordinatesInAttributeNamed(NSString textureCoordinateAttributeName);
     /// Deprecated in macOS 10.13.
-    [Selector("makeVerticesUnique")] public void MakeVerticesUnique();
-    [Selector("makeVerticesUniqueAndReturnError:")] public bool MakeVerticesUniqueAndReturnError(out NSError? error);
-    [Selector("replaceAttributeNamed:withData:")] public void ReplaceAttributeNamedWithData(NSString name, MDLVertexAttributeData newData);
-    [Selector("updateAttributeNamed:withData:")] public void UpdateAttributeNamedWithData(NSString name, MDLVertexAttributeData newData);
-    [Selector("removeAttributeNamed:")] public void RemoveAttributeNamed(NSString name);
+    [Selector("makeVerticesUnique")]
+    public void MakeVerticesUnique();
+    [Selector("makeVerticesUniqueAndReturnError:")]
+    public bool MakeVerticesUniqueAndReturnError(out NSError? error);
+    [Selector("replaceAttributeNamed:withData:")]
+    public void ReplaceAttributeNamedWithData(NSString name, MDLVertexAttributeData newData);
+    [Selector("updateAttributeNamed:withData:")]
+    public void UpdateAttributeNamedWithData(NSString name, MDLVertexAttributeData newData);
+    [Selector("removeAttributeNamed:")]
+    public void RemoveAttributeNamed(NSString name);
 }
 
 /// Generators, a category of MDLMesh.
 public extern objc class MDLMesh
 {
-    [Selector("initBoxWithExtent:segments:inwardNormals:geometryType:allocator:")] public Self InitBoxWithExtentSegmentsInwardNormalsGeometryTypeAllocator(vector_float3 extent, vector_uint3 segments, bool inwardNormals, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
-    [Selector("initSphereWithExtent:segments:inwardNormals:geometryType:allocator:")] public Self InitSphereWithExtentSegmentsInwardNormalsGeometryTypeAllocator(vector_float3 extent, vector_uint2 segments, bool inwardNormals, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
-    [Selector("initHemisphereWithExtent:segments:inwardNormals:cap:geometryType:allocator:")] public Self InitHemisphereWithExtentSegmentsInwardNormalsCapGeometryTypeAllocator(vector_float3 extent, vector_uint2 segments, bool inwardNormals, bool cap, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
-    [Selector("initCylinderWithExtent:segments:inwardNormals:topCap:bottomCap:geometryType:allocator:")] public Self InitCylinderWithExtentSegmentsInwardNormalsTopCapBottomCapGeometryTypeAllocator(vector_float3 extent, vector_uint2 segments, bool inwardNormals, bool topCap, bool bottomCap, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
-    [Selector("initCapsuleWithExtent:cylinderSegments:hemisphereSegments:inwardNormals:geometryType:allocator:")] public Self InitCapsuleWithExtentCylinderSegmentsHemisphereSegmentsInwardNormalsGeometryTypeAllocator(vector_float3 extent, vector_uint2 segments, int hemisphereSegments, bool inwardNormals, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
-    [Selector("initConeWithExtent:segments:inwardNormals:cap:geometryType:allocator:")] public Self InitConeWithExtentSegmentsInwardNormalsCapGeometryTypeAllocator(vector_float3 extent, vector_uint2 segments, bool inwardNormals, bool cap, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
-    [Selector("initPlaneWithExtent:segments:geometryType:allocator:")] public Self InitPlaneWithExtentSegmentsGeometryTypeAllocator(vector_float3 extent, vector_uint2 segments, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
-    [Selector("initIcosahedronWithExtent:inwardNormals:geometryType:allocator:")] public Self InitIcosahedronWithExtentInwardNormalsGeometryTypeAllocator(vector_float3 extent, bool inwardNormals, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
-    [Selector("initMeshBySubdividingMesh:submeshIndex:subdivisionLevels:allocator:")] public Self InitMeshBySubdividingMeshSubmeshIndexSubdivisionLevelsAllocator(MDLMesh mesh, int submeshIndex, uint subdivisionLevels, MDLMeshBufferAllocator? allocator);
-    [Selector("newBoxWithDimensions:segments:geometryType:inwardNormals:allocator:")] public static Self NewBoxWithDimensionsSegmentsGeometryTypeInwardNormalsAllocator(vector_float3 dimensions, vector_uint3 segments, MDLGeometryType geometryType, bool inwardNormals, MDLMeshBufferAllocator? allocator);
-    [Selector("newEllipsoidWithRadii:radialSegments:verticalSegments:geometryType:inwardNormals:hemisphere:allocator:")] public static Self NewEllipsoidWithRadiiRadialSegmentsVerticalSegmentsGeometryTypeInwardNormalsHemisphereAllocator(vector_float3 radii, NSUInteger radialSegments, NSUInteger verticalSegments, MDLGeometryType geometryType, bool inwardNormals, bool hemisphere, MDLMeshBufferAllocator? allocator);
-    [Selector("newCylinderWithHeight:radii:radialSegments:verticalSegments:geometryType:inwardNormals:allocator:")] public static Self NewCylinderWithHeightRadiiRadialSegmentsVerticalSegmentsGeometryTypeInwardNormalsAllocator(float height, vector_float2 radii, NSUInteger radialSegments, NSUInteger verticalSegments, MDLGeometryType geometryType, bool inwardNormals, MDLMeshBufferAllocator? allocator);
-    [Selector("newCapsuleWithHeight:radii:radialSegments:verticalSegments:hemisphereSegments:geometryType:inwardNormals:allocator:")] public static Self NewCapsuleWithHeightRadiiRadialSegmentsVerticalSegmentsHemisphereSegmentsGeometryTypeInwardNormalsAllocator(float height, vector_float2 radii, NSUInteger radialSegments, NSUInteger verticalSegments, NSUInteger hemisphereSegments, MDLGeometryType geometryType, bool inwardNormals, MDLMeshBufferAllocator? allocator);
-    [Selector("newEllipticalConeWithHeight:radii:radialSegments:verticalSegments:geometryType:inwardNormals:allocator:")] public static Self NewEllipticalConeWithHeightRadiiRadialSegmentsVerticalSegmentsGeometryTypeInwardNormalsAllocator(float height, vector_float2 radii, NSUInteger radialSegments, NSUInteger verticalSegments, MDLGeometryType geometryType, bool inwardNormals, MDLMeshBufferAllocator? allocator);
-    [Selector("newPlaneWithDimensions:segments:geometryType:allocator:")] public static Self NewPlaneWithDimensionsSegmentsGeometryTypeAllocator(vector_float2 dimensions, vector_uint2 segments, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
-    [Selector("newIcosahedronWithRadius:inwardNormals:geometryType:allocator:")] public static Self NewIcosahedronWithRadiusInwardNormalsGeometryTypeAllocator(float radius, bool inwardNormals, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
-    [Selector("newIcosahedronWithRadius:inwardNormals:allocator:")] public static Self NewIcosahedronWithRadiusInwardNormalsAllocator(float radius, bool inwardNormals, MDLMeshBufferAllocator? allocator);
-    [Selector("newSubdividedMesh:submeshIndex:subdivisionLevels:")] public static Self? NewSubdividedMeshSubmeshIndexSubdivisionLevels(MDLMesh mesh, NSUInteger submeshIndex, NSUInteger subdivisionLevels);
+    [Selector("initBoxWithExtent:segments:inwardNormals:geometryType:allocator:")]
+    public Self InitBoxWithExtentSegmentsInwardNormalsGeometryTypeAllocator(vector_float3 extent, vector_uint3 segments, bool inwardNormals, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
+    [Selector("initSphereWithExtent:segments:inwardNormals:geometryType:allocator:")]
+    public Self InitSphereWithExtentSegmentsInwardNormalsGeometryTypeAllocator(vector_float3 extent, vector_uint2 segments, bool inwardNormals, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
+    [Selector("initHemisphereWithExtent:segments:inwardNormals:cap:geometryType:allocator:")]
+    public Self InitHemisphereWithExtentSegmentsInwardNormalsCapGeometryTypeAllocator(vector_float3 extent, vector_uint2 segments, bool inwardNormals, bool cap, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
+    [Selector("initCylinderWithExtent:segments:inwardNormals:topCap:bottomCap:geometryType:allocator:")]
+    public Self InitCylinderWithExtentSegmentsInwardNormalsTopCapBottomCapGeometryTypeAllocator(vector_float3 extent, vector_uint2 segments, bool inwardNormals, bool topCap, bool bottomCap, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
+    [Selector("initCapsuleWithExtent:cylinderSegments:hemisphereSegments:inwardNormals:geometryType:allocator:")]
+    public Self InitCapsuleWithExtentCylinderSegmentsHemisphereSegmentsInwardNormalsGeometryTypeAllocator(vector_float3 extent, vector_uint2 segments, int hemisphereSegments, bool inwardNormals, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
+    [Selector("initConeWithExtent:segments:inwardNormals:cap:geometryType:allocator:")]
+    public Self InitConeWithExtentSegmentsInwardNormalsCapGeometryTypeAllocator(vector_float3 extent, vector_uint2 segments, bool inwardNormals, bool cap, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
+    [Selector("initPlaneWithExtent:segments:geometryType:allocator:")]
+    public Self InitPlaneWithExtentSegmentsGeometryTypeAllocator(vector_float3 extent, vector_uint2 segments, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
+    [Selector("initIcosahedronWithExtent:inwardNormals:geometryType:allocator:")]
+    public Self InitIcosahedronWithExtentInwardNormalsGeometryTypeAllocator(vector_float3 extent, bool inwardNormals, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
+    [Selector("initMeshBySubdividingMesh:submeshIndex:subdivisionLevels:allocator:")]
+    public Self InitMeshBySubdividingMeshSubmeshIndexSubdivisionLevelsAllocator(MDLMesh mesh, int submeshIndex, uint subdivisionLevels, MDLMeshBufferAllocator? allocator);
+    [Selector("newBoxWithDimensions:segments:geometryType:inwardNormals:allocator:")]
+    public static Self NewBoxWithDimensionsSegmentsGeometryTypeInwardNormalsAllocator(vector_float3 dimensions, vector_uint3 segments, MDLGeometryType geometryType, bool inwardNormals, MDLMeshBufferAllocator? allocator);
+    [Selector("newEllipsoidWithRadii:radialSegments:verticalSegments:geometryType:inwardNormals:hemisphere:allocator:")]
+    public static Self NewEllipsoidWithRadiiRadialSegmentsVerticalSegmentsGeometryTypeInwardNormalsHemisphereAllocator(vector_float3 radii, NSUInteger radialSegments, NSUInteger verticalSegments, MDLGeometryType geometryType, bool inwardNormals, bool hemisphere, MDLMeshBufferAllocator? allocator);
+    [Selector("newCylinderWithHeight:radii:radialSegments:verticalSegments:geometryType:inwardNormals:allocator:")]
+    public static Self NewCylinderWithHeightRadiiRadialSegmentsVerticalSegmentsGeometryTypeInwardNormalsAllocator(float height, vector_float2 radii, NSUInteger radialSegments, NSUInteger verticalSegments, MDLGeometryType geometryType, bool inwardNormals, MDLMeshBufferAllocator? allocator);
+    [Selector("newCapsuleWithHeight:radii:radialSegments:verticalSegments:hemisphereSegments:geometryType:inwardNormals:allocator:")]
+    public static Self NewCapsuleWithHeightRadiiRadialSegmentsVerticalSegmentsHemisphereSegmentsGeometryTypeInwardNormalsAllocator(float height, vector_float2 radii, NSUInteger radialSegments, NSUInteger verticalSegments, NSUInteger hemisphereSegments, MDLGeometryType geometryType, bool inwardNormals, MDLMeshBufferAllocator? allocator);
+    [Selector("newEllipticalConeWithHeight:radii:radialSegments:verticalSegments:geometryType:inwardNormals:allocator:")]
+    public static Self NewEllipticalConeWithHeightRadiiRadialSegmentsVerticalSegmentsGeometryTypeInwardNormalsAllocator(float height, vector_float2 radii, NSUInteger radialSegments, NSUInteger verticalSegments, MDLGeometryType geometryType, bool inwardNormals, MDLMeshBufferAllocator? allocator);
+    [Selector("newPlaneWithDimensions:segments:geometryType:allocator:")]
+    public static Self NewPlaneWithDimensionsSegmentsGeometryTypeAllocator(vector_float2 dimensions, vector_uint2 segments, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
+    [Selector("newIcosahedronWithRadius:inwardNormals:geometryType:allocator:")]
+    public static Self NewIcosahedronWithRadiusInwardNormalsGeometryTypeAllocator(float radius, bool inwardNormals, MDLGeometryType geometryType, MDLMeshBufferAllocator? allocator);
+    [Selector("newIcosahedronWithRadius:inwardNormals:allocator:")]
+    public static Self NewIcosahedronWithRadiusInwardNormalsAllocator(float radius, bool inwardNormals, MDLMeshBufferAllocator? allocator);
+    [Selector("newSubdividedMesh:submeshIndex:subdivisionLevels:")]
+    public static Self? NewSubdividedMeshSubmeshIndexSubdivisionLevels(MDLMesh mesh, NSUInteger submeshIndex, NSUInteger subdivisionLevels);
 }
 
 /// MDLLightBaking, a category of MDLMesh.
 public extern objc class MDLMesh
 {
-    [Selector("generateAmbientOcclusionTextureWithSize:raysPerSample:attenuationFactor:objectsToConsider:vertexAttributeNamed:materialPropertyNamed:")] public bool GenerateAmbientOcclusionTextureWithSizeRaysPerSampleAttenuationFactorObjectsToConsiderVertexAttributeNamedMaterialPropertyNamed(vector_int2 textureSize, NSInteger raysPerSample, float attenuationFactor, NSArray objectsToConsider, NSString vertexAttributeName, NSString materialPropertyName);
-    [Selector("generateAmbientOcclusionTextureWithQuality:attenuationFactor:objectsToConsider:vertexAttributeNamed:materialPropertyNamed:")] public bool GenerateAmbientOcclusionTextureWithQualityAttenuationFactorObjectsToConsiderVertexAttributeNamedMaterialPropertyNamed(float bakeQuality, float attenuationFactor, NSArray objectsToConsider, NSString vertexAttributeName, NSString materialPropertyName);
-    [Selector("generateAmbientOcclusionVertexColorsWithRaysPerSample:attenuationFactor:objectsToConsider:vertexAttributeNamed:")] public bool GenerateAmbientOcclusionVertexColorsWithRaysPerSampleAttenuationFactorObjectsToConsiderVertexAttributeNamed(NSInteger raysPerSample, float attenuationFactor, NSArray objectsToConsider, NSString vertexAttributeName);
-    [Selector("generateAmbientOcclusionVertexColorsWithQuality:attenuationFactor:objectsToConsider:vertexAttributeNamed:")] public bool GenerateAmbientOcclusionVertexColorsWithQualityAttenuationFactorObjectsToConsiderVertexAttributeNamed(float bakeQuality, float attenuationFactor, NSArray objectsToConsider, NSString vertexAttributeName);
-    [Selector("generateLightMapTextureWithTextureSize:lightsToConsider:objectsToConsider:vertexAttributeNamed:materialPropertyNamed:")] public bool GenerateLightMapTextureWithTextureSizeLightsToConsiderObjectsToConsiderVertexAttributeNamedMaterialPropertyNamed(vector_int2 textureSize, NSArray lightsToConsider, NSArray objectsToConsider, NSString vertexAttributeName, NSString materialPropertyName);
-    [Selector("generateLightMapTextureWithQuality:lightsToConsider:objectsToConsider:vertexAttributeNamed:materialPropertyNamed:")] public bool GenerateLightMapTextureWithQualityLightsToConsiderObjectsToConsiderVertexAttributeNamedMaterialPropertyNamed(float bakeQuality, NSArray lightsToConsider, NSArray objectsToConsider, NSString vertexAttributeName, NSString materialPropertyName);
-    [Selector("generateLightMapVertexColorsWithLightsToConsider:objectsToConsider:vertexAttributeNamed:")] public bool GenerateLightMapVertexColorsWithLightsToConsiderObjectsToConsiderVertexAttributeNamed(NSArray lightsToConsider, NSArray objectsToConsider, NSString vertexAttributeName);
+    [Selector("generateAmbientOcclusionTextureWithSize:raysPerSample:attenuationFactor:objectsToConsider:vertexAttributeNamed:materialPropertyNamed:")]
+    public bool GenerateAmbientOcclusionTextureWithSizeRaysPerSampleAttenuationFactorObjectsToConsiderVertexAttributeNamedMaterialPropertyNamed(vector_int2 textureSize, NSInteger raysPerSample, float attenuationFactor, NSArray objectsToConsider, NSString vertexAttributeName, NSString materialPropertyName);
+    [Selector("generateAmbientOcclusionTextureWithQuality:attenuationFactor:objectsToConsider:vertexAttributeNamed:materialPropertyNamed:")]
+    public bool GenerateAmbientOcclusionTextureWithQualityAttenuationFactorObjectsToConsiderVertexAttributeNamedMaterialPropertyNamed(float bakeQuality, float attenuationFactor, NSArray objectsToConsider, NSString vertexAttributeName, NSString materialPropertyName);
+    [Selector("generateAmbientOcclusionVertexColorsWithRaysPerSample:attenuationFactor:objectsToConsider:vertexAttributeNamed:")]
+    public bool GenerateAmbientOcclusionVertexColorsWithRaysPerSampleAttenuationFactorObjectsToConsiderVertexAttributeNamed(NSInteger raysPerSample, float attenuationFactor, NSArray objectsToConsider, NSString vertexAttributeName);
+    [Selector("generateAmbientOcclusionVertexColorsWithQuality:attenuationFactor:objectsToConsider:vertexAttributeNamed:")]
+    public bool GenerateAmbientOcclusionVertexColorsWithQualityAttenuationFactorObjectsToConsiderVertexAttributeNamed(float bakeQuality, float attenuationFactor, NSArray objectsToConsider, NSString vertexAttributeName);
+    [Selector("generateLightMapTextureWithTextureSize:lightsToConsider:objectsToConsider:vertexAttributeNamed:materialPropertyNamed:")]
+    public bool GenerateLightMapTextureWithTextureSizeLightsToConsiderObjectsToConsiderVertexAttributeNamedMaterialPropertyNamed(vector_int2 textureSize, NSArray lightsToConsider, NSArray objectsToConsider, NSString vertexAttributeName, NSString materialPropertyName);
+    [Selector("generateLightMapTextureWithQuality:lightsToConsider:objectsToConsider:vertexAttributeNamed:materialPropertyNamed:")]
+    public bool GenerateLightMapTextureWithQualityLightsToConsiderObjectsToConsiderVertexAttributeNamedMaterialPropertyNamed(float bakeQuality, NSArray lightsToConsider, NSArray objectsToConsider, NSString vertexAttributeName, NSString materialPropertyName);
+    [Selector("generateLightMapVertexColorsWithLightsToConsider:objectsToConsider:vertexAttributeNamed:")]
+    public bool GenerateLightMapVertexColorsWithLightsToConsiderObjectsToConsiderVertexAttributeNamed(NSArray lightsToConsider, NSArray objectsToConsider, NSString vertexAttributeName);
 }
 
 #endif

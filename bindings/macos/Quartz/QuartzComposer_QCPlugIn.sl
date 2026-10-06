@@ -133,114 +133,185 @@ public delegate void QCPlugInTextureReleaseCallback(CGLContextObj arg0, GLuint a
 /// Deprecated in macOS 10.15.
 public objc interface QCPlugInContext
 {
-    [Selector("compositionURL")] NSURL? CompositionURL();
-    [Selector("logMessage:")] void LogMessage(NSString? format, ...);
-    [Selector("userInfo")] NSMutableDictionary? UserInfo();
-    [Selector("colorSpace")] CGColorSpaceRef? ColorSpace();
-    [Selector("bounds")] NSRect Bounds();
+    [Selector("compositionURL")]
+    NSURL? CompositionURL();
+    [Selector("logMessage:")]
+    void LogMessage(NSString? format, ...);
+    [Selector("userInfo")]
+    NSMutableDictionary? UserInfo();
+    [Selector("colorSpace")]
+    CGColorSpaceRef? ColorSpace();
+    [Selector("bounds")]
+    NSRect Bounds();
     /// Deprecated in macOS 10.14.
-    [Selector("CGLContextObj")] CGLContextObj CGLContextObj();
-    [Selector("outputImageProviderFromBufferWithPixelFormat:pixelsWide:pixelsHigh:baseAddress:bytesPerRow:releaseCallback:releaseContext:colorSpace:shouldColorMatch:")] AnyObject? OutputImageProviderFromBufferWithPixelFormatPixelsWidePixelsHighBaseAddressBytesPerRowReleaseCallbackReleaseContextColorSpaceShouldColorMatch(NSString? format, NSUInteger width, NSUInteger height, void* baseAddress, NSUInteger rowBytes, QCPlugInBufferReleaseCallback callback, void* context, CGColorSpaceRef? colorSpace, bool colorMatch);
+    [Selector("CGLContextObj")]
+    CGLContextObj CGLContextObj();
+    [Selector("outputImageProviderFromBufferWithPixelFormat:pixelsWide:pixelsHigh:baseAddress:bytesPerRow:releaseCallback:releaseContext:colorSpace:shouldColorMatch:")]
+    AnyObject? OutputImageProviderFromBufferWithPixelFormatPixelsWidePixelsHighBaseAddressBytesPerRowReleaseCallbackReleaseContextColorSpaceShouldColorMatch(NSString? format, NSUInteger width, NSUInteger height, void* baseAddress, NSUInteger rowBytes, QCPlugInBufferReleaseCallback callback, void* context, CGColorSpaceRef? colorSpace, bool colorMatch);
     /// Deprecated in macOS 10.14.
-    [Selector("outputImageProviderFromTextureWithPixelFormat:pixelsWide:pixelsHigh:name:flipped:releaseCallback:releaseContext:colorSpace:shouldColorMatch:")] AnyObject? OutputImageProviderFromTextureWithPixelFormatPixelsWidePixelsHighNameFlippedReleaseCallbackReleaseContextColorSpaceShouldColorMatch(NSString? format, NSUInteger width, NSUInteger height, GLuint name, bool flipped, QCPlugInTextureReleaseCallback callback, void* context, CGColorSpaceRef? colorSpace, bool colorMatch);
+    [Selector("outputImageProviderFromTextureWithPixelFormat:pixelsWide:pixelsHigh:name:flipped:releaseCallback:releaseContext:colorSpace:shouldColorMatch:")]
+    AnyObject? OutputImageProviderFromTextureWithPixelFormatPixelsWidePixelsHighNameFlippedReleaseCallbackReleaseContextColorSpaceShouldColorMatch(NSString? format, NSUInteger width, NSUInteger height, GLuint name, bool flipped, QCPlugInTextureReleaseCallback callback, void* context, CGColorSpaceRef? colorSpace, bool colorMatch);
 }
 
 /// Deprecated in macOS 10.15.
 public objc interface QCPlugInInputImageSource
 {
-    [Selector("imageBounds")] NSRect ImageBounds();
-    [Selector("imageColorSpace")] CGColorSpaceRef? ImageColorSpace();
-    [Selector("shouldColorMatch")] bool ShouldColorMatch();
-    [Selector("lockBufferRepresentationWithPixelFormat:colorSpace:forBounds:")] bool LockBufferRepresentationWithPixelFormatColorSpaceForBounds(NSString? format, CGColorSpaceRef? colorSpace, NSRect bounds);
-    [Selector("bufferPixelsWide")] NSUInteger BufferPixelsWide();
-    [Selector("bufferPixelsHigh")] NSUInteger BufferPixelsHigh();
-    [Selector("bufferPixelFormat")] NSString? BufferPixelFormat();
-    [Selector("bufferColorSpace")] CGColorSpaceRef? BufferColorSpace();
-    [Selector("bufferBaseAddress")] void* BufferBaseAddress();
-    [Selector("bufferBytesPerRow")] NSUInteger BufferBytesPerRow();
-    [Selector("unlockBufferRepresentation")] void UnlockBufferRepresentation();
+    [Selector("imageBounds")]
+    NSRect ImageBounds();
+    [Selector("imageColorSpace")]
+    CGColorSpaceRef? ImageColorSpace();
+    [Selector("shouldColorMatch")]
+    bool ShouldColorMatch();
+    [Selector("lockBufferRepresentationWithPixelFormat:colorSpace:forBounds:")]
+    bool LockBufferRepresentationWithPixelFormatColorSpaceForBounds(NSString? format, CGColorSpaceRef? colorSpace, NSRect bounds);
+    [Selector("bufferPixelsWide")]
+    NSUInteger BufferPixelsWide();
+    [Selector("bufferPixelsHigh")]
+    NSUInteger BufferPixelsHigh();
+    [Selector("bufferPixelFormat")]
+    NSString? BufferPixelFormat();
+    [Selector("bufferColorSpace")]
+    CGColorSpaceRef? BufferColorSpace();
+    [Selector("bufferBaseAddress")]
+    void* BufferBaseAddress();
+    [Selector("bufferBytesPerRow")]
+    NSUInteger BufferBytesPerRow();
+    [Selector("unlockBufferRepresentation")]
+    void UnlockBufferRepresentation();
     /// Deprecated in macOS 10.14.
-    [Selector("lockTextureRepresentationWithColorSpace:forBounds:")] bool LockTextureRepresentationWithColorSpaceForBounds(CGColorSpaceRef? colorSpace, NSRect bounds);
+    [Selector("lockTextureRepresentationWithColorSpace:forBounds:")]
+    bool LockTextureRepresentationWithColorSpaceForBounds(CGColorSpaceRef? colorSpace, NSRect bounds);
     /// Deprecated in macOS 10.14.
-    [Selector("texturePixelsWide")] NSUInteger TexturePixelsWide();
+    [Selector("texturePixelsWide")]
+    NSUInteger TexturePixelsWide();
     /// Deprecated in macOS 10.14.
-    [Selector("texturePixelsHigh")] NSUInteger TexturePixelsHigh();
+    [Selector("texturePixelsHigh")]
+    NSUInteger TexturePixelsHigh();
     /// Deprecated in macOS 10.14.
-    [Selector("textureTarget")] GLenum TextureTarget();
+    [Selector("textureTarget")]
+    GLenum TextureTarget();
     /// Deprecated in macOS 10.14.
-    [Selector("textureName")] GLuint TextureName();
+    [Selector("textureName")]
+    GLuint TextureName();
     /// Deprecated in macOS 10.14.
-    [Selector("textureColorSpace")] CGColorSpaceRef? TextureColorSpace();
+    [Selector("textureColorSpace")]
+    CGColorSpaceRef? TextureColorSpace();
     /// Deprecated in macOS 10.14.
-    [Selector("textureFlipped")] bool TextureFlipped();
+    [Selector("textureFlipped")]
+    bool TextureFlipped();
     /// Deprecated in macOS 10.14.
-    [Selector("textureMatrix")] GLfloat* TextureMatrix();
+    [Selector("textureMatrix")]
+    GLfloat* TextureMatrix();
     /// Deprecated in macOS 10.14.
-    [Selector("bindTextureRepresentationToCGLContext:textureUnit:normalizeCoordinates:")] void BindTextureRepresentationToCGLContextTextureUnitNormalizeCoordinates(CGLContextObj cgl_ctx, GLenum unit, bool flag);
+    [Selector("bindTextureRepresentationToCGLContext:textureUnit:normalizeCoordinates:")]
+    void BindTextureRepresentationToCGLContextTextureUnitNormalizeCoordinates(CGLContextObj cgl_ctx, GLenum unit, bool flag);
     /// Deprecated in macOS 10.14.
-    [Selector("unbindTextureRepresentationFromCGLContext:textureUnit:")] void UnbindTextureRepresentationFromCGLContextTextureUnit(CGLContextObj cgl_ctx, GLenum unit);
+    [Selector("unbindTextureRepresentationFromCGLContext:textureUnit:")]
+    void UnbindTextureRepresentationFromCGLContextTextureUnit(CGLContextObj cgl_ctx, GLenum unit);
     /// Deprecated in macOS 10.14.
-    [Selector("unlockTextureRepresentation")] void UnlockTextureRepresentation();
+    [Selector("unlockTextureRepresentation")]
+    void UnlockTextureRepresentation();
 }
 
 /// Deprecated in macOS 10.15.
 public objc interface QCPlugInOutputImageProvider
 {
-    [Selector("imageBounds")] NSRect ImageBounds();
-    [Selector("imageColorSpace")] CGColorSpaceRef? ImageColorSpace();
-    [Optional] [Selector("shouldColorMatch")] bool ShouldColorMatch();
-    [Optional] [Selector("supportedBufferPixelFormats")] NSArray? SupportedBufferPixelFormats();
-    [Optional] [Selector("renderToBuffer:withBytesPerRow:pixelFormat:forBounds:")] bool RenderToBufferWithBytesPerRowPixelFormatForBounds(void* baseAddress, NSUInteger rowBytes, NSString? format, NSRect bounds);
+    [Selector("imageBounds")]
+    NSRect ImageBounds();
+    [Selector("imageColorSpace")]
+    CGColorSpaceRef? ImageColorSpace();
+    [Optional]
+    [Selector("shouldColorMatch")]
+    bool ShouldColorMatch();
+    [Optional]
+    [Selector("supportedBufferPixelFormats")]
+    NSArray? SupportedBufferPixelFormats();
+    [Optional]
+    [Selector("renderToBuffer:withBytesPerRow:pixelFormat:forBounds:")]
+    bool RenderToBufferWithBytesPerRowPixelFormatForBounds(void* baseAddress, NSUInteger rowBytes, NSString? format, NSRect bounds);
     /// Deprecated in macOS 10.14.
-    [Optional] [Selector("supportedRenderedTexturePixelFormats")] NSArray? SupportedRenderedTexturePixelFormats();
+    [Optional]
+    [Selector("supportedRenderedTexturePixelFormats")]
+    NSArray? SupportedRenderedTexturePixelFormats();
     /// Deprecated in macOS 10.14.
-    [Optional] [Selector("copyRenderedTextureForCGLContext:pixelFormat:bounds:isFlipped:")] GLuint CopyRenderedTextureForCGLContextPixelFormatBoundsIsFlipped(CGLContextObj cgl_ctx, NSString? format, NSRect bounds, bool* flipped);
+    [Optional]
+    [Selector("copyRenderedTextureForCGLContext:pixelFormat:bounds:isFlipped:")]
+    GLuint CopyRenderedTextureForCGLContextPixelFormatBoundsIsFlipped(CGLContextObj cgl_ctx, NSString? format, NSRect bounds, bool* flipped);
     /// Deprecated in macOS 10.14.
-    [Optional] [Selector("releaseRenderedTexture:forCGLContext:")] void ReleaseRenderedTextureForCGLContext(GLuint name, CGLContextObj cgl_ctx);
+    [Optional]
+    [Selector("releaseRenderedTexture:forCGLContext:")]
+    void ReleaseRenderedTextureForCGLContext(GLuint name, CGLContextObj cgl_ctx);
     /// Deprecated in macOS 10.14.
-    [Optional] [Selector("canRenderWithCGLContext:")] bool CanRenderWithCGLContext(CGLContextObj cgl_ctx);
+    [Optional]
+    [Selector("canRenderWithCGLContext:")]
+    bool CanRenderWithCGLContext(CGLContextObj cgl_ctx);
     /// Deprecated in macOS 10.14.
-    [Optional] [Selector("renderWithCGLContext:forBounds:")] bool RenderWithCGLContextForBounds(CGLContextObj cgl_ctx, NSRect bounds);
+    [Optional]
+    [Selector("renderWithCGLContext:forBounds:")]
+    bool RenderWithCGLContextForBounds(CGLContextObj cgl_ctx, NSRect bounds);
 }
 
 /// Deprecated in macOS 10.15.
 public extern objc class QCPlugIn : NSObject
 {
-    [Selector("attributes")] public static NSDictionary? Attributes();
-    [Selector("attributesForPropertyPortWithKey:")] public static NSDictionary? AttributesForPropertyPortWithKey(NSString? key);
-    [Selector("sortedPropertyPortKeys")] public static NSArray? SortedPropertyPortKeys();
-    [Selector("executionMode")] public static QCPlugInExecutionMode ExecutionMode();
-    [Selector("timeMode")] public static QCPlugInTimeMode TimeMode();
-    [Selector("plugInKeys")] public static NSArray? PlugInKeys();
-    [Selector("startExecution:")] public bool StartExecution(QCPlugInContext? context);
-    [Selector("enableExecution:")] public void EnableExecution(QCPlugInContext? context);
-    [Selector("executionTimeForContext:atTime:withArguments:")] public NSTimeInterval ExecutionTimeForContextAtTimeWithArguments(QCPlugInContext? context, NSTimeInterval time, NSDictionary? arguments);
-    [Selector("execute:atTime:withArguments:")] public bool ExecuteAtTimeWithArguments(QCPlugInContext? context, NSTimeInterval time, NSDictionary? arguments);
-    [Selector("disableExecution:")] public void DisableExecution(QCPlugInContext? context);
-    [Selector("stopExecution:")] public void StopExecution(QCPlugInContext? context);
-    [Selector("serializedValueForKey:")] public AnyObject? SerializedValueForKey(NSString? key);
-    [Selector("setSerializedValue:forKey:")] public void SetSerializedValueForKey(AnyObject? serializedValue, NSString? key);
+    [Selector("attributes")]
+    public static NSDictionary? Attributes();
+    [Selector("attributesForPropertyPortWithKey:")]
+    public static NSDictionary? AttributesForPropertyPortWithKey(NSString? key);
+    [Selector("sortedPropertyPortKeys")]
+    public static NSArray? SortedPropertyPortKeys();
+    [Selector("executionMode")]
+    public static QCPlugInExecutionMode ExecutionMode();
+    [Selector("timeMode")]
+    public static QCPlugInTimeMode TimeMode();
+    [Selector("plugInKeys")]
+    public static NSArray? PlugInKeys();
+    [Selector("startExecution:")]
+    public bool StartExecution(QCPlugInContext? context);
+    [Selector("enableExecution:")]
+    public void EnableExecution(QCPlugInContext? context);
+    [Selector("executionTimeForContext:atTime:withArguments:")]
+    public NSTimeInterval ExecutionTimeForContextAtTimeWithArguments(QCPlugInContext? context, NSTimeInterval time, NSDictionary? arguments);
+    [Selector("execute:atTime:withArguments:")]
+    public bool ExecuteAtTimeWithArguments(QCPlugInContext? context, NSTimeInterval time, NSDictionary? arguments);
+    [Selector("disableExecution:")]
+    public void DisableExecution(QCPlugInContext? context);
+    [Selector("stopExecution:")]
+    public void StopExecution(QCPlugInContext? context);
+    [Selector("serializedValueForKey:")]
+    public AnyObject? SerializedValueForKey(NSString? key);
+    [Selector("setSerializedValue:forKey:")]
+    public void SetSerializedValueForKey(AnyObject? serializedValue, NSString? key);
 }
 
 /// Deprecated in macOS 10.15.
 /// Ports, a category of QCPlugIn.
 public extern objc class QCPlugIn
 {
-    [Selector("didValueForInputKeyChange:")] public bool DidValueForInputKeyChange(NSString? key);
-    [Selector("valueForInputKey:")] public AnyObject? ValueForInputKey(NSString? key);
-    [Selector("setValue:forOutputKey:")] public bool SetValueForOutputKey(AnyObject? value, NSString? key);
-    [Selector("addInputPortWithType:forKey:withAttributes:")] public void AddInputPortWithTypeForKeyWithAttributes(NSString? type, NSString? key, NSDictionary? attributes);
-    [Selector("removeInputPortForKey:")] public void RemoveInputPortForKey(NSString? key);
-    [Selector("addOutputPortWithType:forKey:withAttributes:")] public void AddOutputPortWithTypeForKeyWithAttributes(NSString? type, NSString? key, NSDictionary? attributes);
-    [Selector("removeOutputPortForKey:")] public void RemoveOutputPortForKey(NSString? key);
+    [Selector("didValueForInputKeyChange:")]
+    public bool DidValueForInputKeyChange(NSString? key);
+    [Selector("valueForInputKey:")]
+    public AnyObject? ValueForInputKey(NSString? key);
+    [Selector("setValue:forOutputKey:")]
+    public bool SetValueForOutputKey(AnyObject? value, NSString? key);
+    [Selector("addInputPortWithType:forKey:withAttributes:")]
+    public void AddInputPortWithTypeForKeyWithAttributes(NSString? type, NSString? key, NSDictionary? attributes);
+    [Selector("removeInputPortForKey:")]
+    public void RemoveInputPortForKey(NSString? key);
+    [Selector("addOutputPortWithType:forKey:withAttributes:")]
+    public void AddOutputPortWithTypeForKeyWithAttributes(NSString? type, NSString? key, NSDictionary? attributes);
+    [Selector("removeOutputPortForKey:")]
+    public void RemoveOutputPortForKey(NSString? key);
 }
 
 /// Deprecated in macOS 10.15.
 /// Registry, a category of QCPlugIn.
 public extern objc class QCPlugIn
 {
-    [Selector("loadPlugInAtPath:")] public static bool LoadPlugInAtPath(NSString? path);
-    [Selector("registerPlugInClass:")] public static void RegisterPlugInClass(Class aClass);
+    [Selector("loadPlugInAtPath:")]
+    public static bool LoadPlugInAtPath(NSString? path);
+    [Selector("registerPlugInClass:")]
+    public static void RegisterPlugInClass(Class aClass);
 }
 
 #endif

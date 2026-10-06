@@ -52,12 +52,18 @@ public objc closure void NETunnelProviderSetTunnelNetworkSettingsCompletionHandl
 
 public extern objc class NETunnelProvider : NEProvider
 {
-    [Selector("protocolConfiguration")] public NEVPNProtocol? ProtocolConfiguration { get; }
-    [Selector("appRules")] public NSArray? AppRules { get; }
-    [Selector("routingMethod")] public NETunnelProviderRoutingMethod RoutingMethod { get; }
-    [Selector("reasserting", "setReasserting:")] public bool Reasserting { get; set; }
-    [Selector("handleAppMessage:completionHandler:")] public void HandleAppMessageCompletionHandler(NSData messageData, NETunnelProviderHandleAppMessageCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("setTunnelNetworkSettings:completionHandler:")] public void SetTunnelNetworkSettingsCompletionHandler(NETunnelNetworkSettings? tunnelNetworkSettings, NETunnelProviderSetTunnelNetworkSettingsCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("protocolConfiguration")]
+    public NEVPNProtocol? ProtocolConfiguration { get; }
+    [Selector("appRules")]
+    public NSArray? AppRules { get; }
+    [Selector("routingMethod")]
+    public NETunnelProviderRoutingMethod RoutingMethod { get; }
+    [Selector("reasserting", "setReasserting:")]
+    public bool Reasserting { get; set; }
+    [Selector("handleAppMessage:completionHandler:")]
+    public void HandleAppMessageCompletionHandler(NSData messageData, NETunnelProviderHandleAppMessageCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("setTunnelNetworkSettings:completionHandler:")]
+    public void SetTunnelNetworkSettingsCompletionHandler(NETunnelNetworkSettings? tunnelNetworkSettings, NETunnelProviderSetTunnelNetworkSettingsCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 #endif

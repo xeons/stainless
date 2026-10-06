@@ -33,25 +33,36 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMUIEvent : DOMEvent
 {
-    [Selector("view")] public DOMAbstractView? View { get; }
-    [Selector("detail")] public int Detail { get; }
-    [Selector("keyCode")] public int KeyCode { get; }
-    [Selector("charCode")] public int CharCode { get; }
+    [Selector("view")]
+    public DOMAbstractView? View { get; }
+    [Selector("detail")]
+    public int Detail { get; }
+    [Selector("keyCode")]
+    public int KeyCode { get; }
+    [Selector("charCode")]
+    public int CharCode { get; }
     /// Deprecated in macOS 10.5.
-    [Selector("layerX")] public int LayerX { get; }
+    [Selector("layerX")]
+    public int LayerX { get; }
     /// Deprecated in macOS 10.5.
-    [Selector("layerY")] public int LayerY { get; }
-    [Selector("pageX")] public int PageX { get; }
-    [Selector("pageY")] public int PageY { get; }
-    [Selector("which")] public int Which { get; }
-    [Selector("initUIEvent:canBubble:cancelable:view:detail:")] public void InitUIEventCanBubbleCancelableViewDetail(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, int detail);
+    [Selector("layerY")]
+    public int LayerY { get; }
+    [Selector("pageX")]
+    public int PageX { get; }
+    [Selector("pageY")]
+    public int PageY { get; }
+    [Selector("which")]
+    public int Which { get; }
+    [Selector("initUIEvent:canBubble:cancelable:view:detail:")]
+    public void InitUIEventCanBubbleCancelableViewDetail(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, int detail);
 }
 
 /// DOMUIEventDeprecated, a category of DOMUIEvent.
 public extern objc class DOMUIEvent
 {
     /// Deprecated in macOS 10.5.
-    [Selector("initUIEvent:::::")] public void InitUIEvent(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, int detail);
+    [Selector("initUIEvent:::::")]
+    public void InitUIEvent(NSString? type, bool canBubble, bool cancelable, DOMAbstractView? view, int detail);
 }
 
 #endif

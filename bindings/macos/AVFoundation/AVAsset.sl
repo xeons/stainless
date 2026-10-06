@@ -35,27 +35,37 @@ import Standard.ObjC;
 
 public extern objc class AVAsset : NSObject, NSCopying, AVAsynchronousKeyValueLoading
 {
-    [Selector("duration")] public CMTime Duration { get; }
-    [Selector("preferredRate")] public float PreferredRate { get; }
-    [Selector("preferredVolume")] public float PreferredVolume { get; }
-    [Selector("preferredTransform")] public CGAffineTransform PreferredTransform { get; }
+    [Selector("duration")]
+    public CMTime Duration { get; }
+    [Selector("preferredRate")]
+    public float PreferredRate { get; }
+    [Selector("preferredVolume")]
+    public float PreferredVolume { get; }
+    [Selector("preferredTransform")]
+    public CGAffineTransform PreferredTransform { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("naturalSize")] public CGSize NaturalSize { get; }
-    [Selector("minimumTimeOffsetFromLive")] public CMTime MinimumTimeOffsetFromLive { get; }
-    [Selector("assetWithURL:")] public static Self AssetWithURL(NSURL URL);
+    [Selector("naturalSize")]
+    public CGSize NaturalSize { get; }
+    [Selector("minimumTimeOffsetFromLive")]
+    public CMTime MinimumTimeOffsetFromLive { get; }
+    [Selector("assetWithURL:")]
+    public static Self AssetWithURL(NSURL URL);
 }
 
 /// AVAssetAsynchronousLoading, a category of AVAsset.
 public extern objc class AVAsset
 {
-    [Selector("providesPreciseDurationAndTiming")] public bool ProvidesPreciseDurationAndTiming { get; }
-    [Selector("cancelLoading")] public void CancelLoading();
+    [Selector("providesPreciseDurationAndTiming")]
+    public bool ProvidesPreciseDurationAndTiming { get; }
+    [Selector("cancelLoading")]
+    public void CancelLoading();
 }
 
 /// AVAssetReferenceRestrictions, a category of AVAsset.
 public extern objc class AVAsset
 {
-    [Selector("referenceRestrictions")] public AVAssetReferenceRestrictions ReferenceRestrictions { get; }
+    [Selector("referenceRestrictions")]
+    public AVAssetReferenceRestrictions ReferenceRestrictions { get; }
 }
 
 [Flags]
@@ -79,17 +89,25 @@ public objc closure void AVAssetLoadTracksWithMediaCharacteristicCompletionHandl
 /// AVAssetTrackInspection, a category of AVAsset.
 public extern objc class AVAsset
 {
-    [Selector("tracks")] public NSArray Tracks { get; }
-    [Selector("trackGroups")] public NSArray TrackGroups { get; }
+    [Selector("tracks")]
+    public NSArray Tracks { get; }
+    [Selector("trackGroups")]
+    public NSArray TrackGroups { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("trackWithTrackID:")] public AVAssetTrack? TrackWithTrackID(CMPersistentTrackID trackID);
-    [Selector("loadTrackWithTrackID:completionHandler:")] public void LoadTrackWithTrackIDCompletionHandler(CMPersistentTrackID trackID, AVAssetLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("trackWithTrackID:")]
+    public AVAssetTrack? TrackWithTrackID(CMPersistentTrackID trackID);
+    [Selector("loadTrackWithTrackID:completionHandler:")]
+    public void LoadTrackWithTrackIDCompletionHandler(CMPersistentTrackID trackID, AVAssetLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("tracksWithMediaType:")] public NSArray TracksWithMediaType(AVMediaType mediaType);
-    [Selector("loadTracksWithMediaType:completionHandler:")] public void LoadTracksWithMediaTypeCompletionHandler(AVMediaType mediaType, AVAssetLoadTracksWithMediaTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tracksWithMediaType:")]
+    public NSArray TracksWithMediaType(AVMediaType mediaType);
+    [Selector("loadTracksWithMediaType:completionHandler:")]
+    public void LoadTracksWithMediaTypeCompletionHandler(AVMediaType mediaType, AVAssetLoadTracksWithMediaTypeCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("tracksWithMediaCharacteristic:")] public NSArray TracksWithMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
-    [Selector("loadTracksWithMediaCharacteristic:completionHandler:")] public void LoadTracksWithMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVAssetLoadTracksWithMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tracksWithMediaCharacteristic:")]
+    public NSArray TracksWithMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("loadTracksWithMediaCharacteristic:completionHandler:")]
+    public void LoadTracksWithMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVAssetLoadTracksWithMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void AVAssetLoadMetadataForFormatCompletionHandlerCompletionHandlerBlock(NSArray? arg0, NSError? arg1);
@@ -97,14 +115,21 @@ public objc closure void AVAssetLoadMetadataForFormatCompletionHandlerCompletion
 /// AVAssetMetadataReading, a category of AVAsset.
 public extern objc class AVAsset
 {
-    [Selector("creationDate")] public AVMetadataItem? CreationDate { get; }
-    [Selector("lyrics")] public NSString? Lyrics { get; }
-    [Selector("commonMetadata")] public NSArray CommonMetadata { get; }
-    [Selector("metadata")] public NSArray Metadata { get; }
-    [Selector("availableMetadataFormats")] public NSArray AvailableMetadataFormats { get; }
+    [Selector("creationDate")]
+    public AVMetadataItem? CreationDate { get; }
+    [Selector("lyrics")]
+    public NSString? Lyrics { get; }
+    [Selector("commonMetadata")]
+    public NSArray CommonMetadata { get; }
+    [Selector("metadata")]
+    public NSArray Metadata { get; }
+    [Selector("availableMetadataFormats")]
+    public NSArray AvailableMetadataFormats { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("metadataForFormat:")] public NSArray MetadataForFormat(AVMetadataFormat format);
-    [Selector("loadMetadataForFormat:completionHandler:")] public void LoadMetadataForFormatCompletionHandler(AVMetadataFormat format, AVAssetLoadMetadataForFormatCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("metadataForFormat:")]
+    public NSArray MetadataForFormat(AVMetadataFormat format);
+    [Selector("loadMetadataForFormat:completionHandler:")]
+    public void LoadMetadataForFormatCompletionHandler(AVMetadataFormat format, AVAssetLoadMetadataForFormatCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void AVAssetLoadChapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeysCompletionHandlerCompletionHandlerBlock(NSArray? arg0, NSError? arg1);
@@ -114,13 +139,18 @@ public objc closure void AVAssetLoadChapterMetadataGroupsBestMatchingPreferredLa
 /// AVAssetChapterInspection, a category of AVAsset.
 public extern objc class AVAsset
 {
-    [Selector("availableChapterLocales")] public NSArray AvailableChapterLocales { get; }
+    [Selector("availableChapterLocales")]
+    public NSArray AvailableChapterLocales { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("chapterMetadataGroupsWithTitleLocale:containingItemsWithCommonKeys:")] public NSArray ChapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeys(NSLocale locale, NSArray? commonKeys);
-    [Selector("loadChapterMetadataGroupsWithTitleLocale:containingItemsWithCommonKeys:completionHandler:")] public void LoadChapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeysCompletionHandler(NSLocale locale, NSArray commonKeys, AVAssetLoadChapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeysCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("chapterMetadataGroupsWithTitleLocale:containingItemsWithCommonKeys:")]
+    public NSArray ChapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeys(NSLocale locale, NSArray? commonKeys);
+    [Selector("loadChapterMetadataGroupsWithTitleLocale:containingItemsWithCommonKeys:completionHandler:")]
+    public void LoadChapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeysCompletionHandler(NSLocale locale, NSArray commonKeys, AVAssetLoadChapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeysCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("chapterMetadataGroupsBestMatchingPreferredLanguages:")] public NSArray ChapterMetadataGroupsBestMatchingPreferredLanguages(NSArray preferredLanguages);
-    [Selector("loadChapterMetadataGroupsBestMatchingPreferredLanguages:completionHandler:")] public void LoadChapterMetadataGroupsBestMatchingPreferredLanguagesCompletionHandler(NSArray preferredLanguages, AVAssetLoadChapterMetadataGroupsBestMatchingPreferredLanguagesCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("chapterMetadataGroupsBestMatchingPreferredLanguages:")]
+    public NSArray ChapterMetadataGroupsBestMatchingPreferredLanguages(NSArray preferredLanguages);
+    [Selector("loadChapterMetadataGroupsBestMatchingPreferredLanguages:completionHandler:")]
+    public void LoadChapterMetadataGroupsBestMatchingPreferredLanguagesCompletionHandler(NSArray preferredLanguages, AVAssetLoadChapterMetadataGroupsBestMatchingPreferredLanguagesCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void AVAssetLoadMediaSelectionGroupForMediaCharacteristicCompletionHandlerCompletionHandlerBlock(AVMediaSelectionGroup? arg0, NSError? arg1);
@@ -128,36 +158,50 @@ public objc closure void AVAssetLoadMediaSelectionGroupForMediaCharacteristicCom
 /// AVAssetMediaSelection, a category of AVAsset.
 public extern objc class AVAsset
 {
-    [Selector("availableMediaCharacteristicsWithMediaSelectionOptions")] public NSArray AvailableMediaCharacteristicsWithMediaSelectionOptions { get; }
-    [Selector("preferredMediaSelection")] public AVMediaSelection PreferredMediaSelection { get; }
-    [Selector("allMediaSelections")] public NSArray AllMediaSelections { get; }
+    [Selector("availableMediaCharacteristicsWithMediaSelectionOptions")]
+    public NSArray AvailableMediaCharacteristicsWithMediaSelectionOptions { get; }
+    [Selector("preferredMediaSelection")]
+    public AVMediaSelection PreferredMediaSelection { get; }
+    [Selector("allMediaSelections")]
+    public NSArray AllMediaSelections { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("mediaSelectionGroupForMediaCharacteristic:")] public AVMediaSelectionGroup? MediaSelectionGroupForMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
-    [Selector("loadMediaSelectionGroupForMediaCharacteristic:completionHandler:")] public void LoadMediaSelectionGroupForMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVAssetLoadMediaSelectionGroupForMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("mediaSelectionGroupForMediaCharacteristic:")]
+    public AVMediaSelectionGroup? MediaSelectionGroupForMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("loadMediaSelectionGroupForMediaCharacteristic:completionHandler:")]
+    public void LoadMediaSelectionGroupForMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVAssetLoadMediaSelectionGroupForMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 /// AVAssetProtectedContent, a category of AVAsset.
 public extern objc class AVAsset
 {
-    [Selector("hasProtectedContent")] public bool HasProtectedContent { get; }
+    [Selector("hasProtectedContent")]
+    public bool HasProtectedContent { get; }
 }
 
 /// AVAssetFragments, a category of AVAsset.
 public extern objc class AVAsset
 {
-    [Selector("canContainFragments")] public bool CanContainFragments { get; }
-    [Selector("containsFragments")] public bool ContainsFragments { get; }
-    [Selector("overallDurationHint")] public CMTime OverallDurationHint { get; }
+    [Selector("canContainFragments")]
+    public bool CanContainFragments { get; }
+    [Selector("containsFragments")]
+    public bool ContainsFragments { get; }
+    [Selector("overallDurationHint")]
+    public CMTime OverallDurationHint { get; }
 }
 
 /// AVAssetUsability, a category of AVAsset.
 public extern objc class AVAsset
 {
-    [Selector("isPlayable")] public bool Playable { get; }
-    [Selector("isExportable")] public bool Exportable { get; }
-    [Selector("isReadable")] public bool Readable { get; }
-    [Selector("isComposable")] public bool Composable { get; }
-    [Selector("isCompatibleWithAirPlayVideo")] public bool CompatibleWithAirPlayVideo { get; }
+    [Selector("isPlayable")]
+    public bool Playable { get; }
+    [Selector("isExportable")]
+    public bool Exportable { get; }
+    [Selector("isReadable")]
+    public bool Readable { get; }
+    [Selector("isComposable")]
+    public bool Composable { get; }
+    [Selector("isCompatibleWithAirPlayVideo")]
+    public bool CompatibleWithAirPlayVideo { get; }
 }
 
 public extern "C" NSString AVURLAssetPreferPreciseDurationAndTimingKey;
@@ -188,27 +232,37 @@ public extern "C" NSString AVURLAssetShouldParseExternalSphericalTagsKey;
 public extern objc class AVURLAsset : AVAsset
 {
     /// macOS 26.0 and later.
-    [Selector("audiovisualContentTypes")] public static NSArray AudiovisualContentTypes { get; }
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("httpSessionIdentifier")] public NSUUID HttpSessionIdentifier { get; }
+    [Selector("audiovisualContentTypes")]
+    public static NSArray AudiovisualContentTypes { get; }
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("httpSessionIdentifier")]
+    public NSUUID HttpSessionIdentifier { get; }
     /// Deprecated in macOS 100000.
-    [Selector("audiovisualTypes")] public static NSArray AudiovisualTypes();
-    [Selector("audiovisualMIMETypes")] public static NSArray AudiovisualMIMETypes();
-    [Selector("isPlayableExtendedMIMEType:")] public static bool IsPlayableExtendedMIMEType(NSString extendedMIMEType);
-    [Selector("URLAssetWithURL:options:")] public static Self URLAssetWithURLOptions(NSURL URL, NSDictionary? options);
-    [Selector("initWithURL:options:")] public Self InitWithURLOptions(NSURL URL, NSDictionary? options);
+    [Selector("audiovisualTypes")]
+    public static NSArray AudiovisualTypes();
+    [Selector("audiovisualMIMETypes")]
+    public static NSArray AudiovisualMIMETypes();
+    [Selector("isPlayableExtendedMIMEType:")]
+    public static bool IsPlayableExtendedMIMEType(NSString extendedMIMEType);
+    [Selector("URLAssetWithURL:options:")]
+    public static Self URLAssetWithURLOptions(NSURL URL, NSDictionary? options);
+    [Selector("initWithURL:options:")]
+    public Self InitWithURLOptions(NSURL URL, NSDictionary? options);
 }
 
 /// AVURLAssetURLHandling, a category of AVURLAsset.
 public extern objc class AVURLAsset
 {
-    [Selector("resourceLoader")] public AVAssetResourceLoader? ResourceLoader { get; }
+    [Selector("resourceLoader")]
+    public AVAssetResourceLoader? ResourceLoader { get; }
 }
 
 /// AVURLAssetCache, a category of AVURLAsset.
 public extern objc class AVURLAsset
 {
-    [Selector("assetCache")] public AVAssetCache? AssetCache { get; }
+    [Selector("assetCache")]
+    public AVAssetCache? AssetCache { get; }
 }
 
 public objc closure void AVURLAssetFindCompatibleTrackForCompositionTrackCompletionHandlerCompletionHandlerBlock(AVAssetTrack? arg0, NSError? arg1);
@@ -217,14 +271,17 @@ public objc closure void AVURLAssetFindCompatibleTrackForCompositionTrackComplet
 public extern objc class AVURLAsset
 {
     /// Deprecated in macOS 15.0.
-    [Selector("compatibleTrackForCompositionTrack:")] public AVAssetTrack? CompatibleTrackForCompositionTrack(AVCompositionTrack compositionTrack);
-    [Selector("findCompatibleTrackForCompositionTrack:completionHandler:")] public void FindCompatibleTrackForCompositionTrackCompletionHandler(AVCompositionTrack compositionTrack, AVURLAssetFindCompatibleTrackForCompositionTrackCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("compatibleTrackForCompositionTrack:")]
+    public AVAssetTrack? CompatibleTrackForCompositionTrack(AVCompositionTrack compositionTrack);
+    [Selector("findCompatibleTrackForCompositionTrack:completionHandler:")]
+    public void FindCompatibleTrackForCompositionTrackCompletionHandler(AVCompositionTrack compositionTrack, AVURLAssetFindCompatibleTrackForCompositionTrackCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 /// AVAssetVariantInspection, a category of AVURLAsset.
 public extern objc class AVURLAsset
 {
-    [Selector("variants")] public NSArray Variants { get; }
+    [Selector("variants")]
+    public NSArray Variants { get; }
 }
 
 /// AVURLAssetNSItemProvider, a category of AVURLAsset.
@@ -232,19 +289,26 @@ public extern objc class AVURLAsset : NSItemProviderReading, NSItemProviderWriti
 
 public extern objc class AVMediaExtensionProperties : NSObject, NSCopying
 {
-    [Selector("extensionIdentifier")] public NSString ExtensionIdentifier { get; }
-    [Selector("extensionName")] public NSString ExtensionName { get; }
-    [Selector("containingBundleName")] public NSString ContainingBundleName { get; }
-    [Selector("extensionURL")] public NSURL ExtensionURL { get; }
-    [Selector("containingBundleURL")] public NSURL ContainingBundleURL { get; }
+    [Selector("extensionIdentifier")]
+    public NSString ExtensionIdentifier { get; }
+    [Selector("extensionName")]
+    public NSString ExtensionName { get; }
+    [Selector("containingBundleName")]
+    public NSString ContainingBundleName { get; }
+    [Selector("extensionURL")]
+    public NSURL ExtensionURL { get; }
+    [Selector("containingBundleURL")]
+    public NSURL ContainingBundleURL { get; }
 }
 
 /// AVMediaExtension, a category of AVURLAsset.
 public extern objc class AVURLAsset
 {
-    [Selector("mediaExtensionProperties")] public AVMediaExtensionProperties? MediaExtensionProperties { get; }
+    [Selector("mediaExtensionProperties")]
+    public AVMediaExtensionProperties? MediaExtensionProperties { get; }
     /// macOS 26.0 and later.
-    [Selector("sidecarURL")] public NSURL? SidecarURL { get; }
+    [Selector("sidecarURL")]
+    public NSURL? SidecarURL { get; }
 }
 
 public extern "C" NSString AVAssetDurationDidChangeNotification;
@@ -259,13 +323,16 @@ public extern "C" NSString AVAssetMediaSelectionGroupsDidChangeNotification;
 
 public objc interface AVFragmentMinding
 {
-    [Selector("isAssociatedWithFragmentMinder")] bool AssociatedWithFragmentMinder { get; }
+    [Selector("isAssociatedWithFragmentMinder")]
+    bool AssociatedWithFragmentMinder { get; }
 }
 
 public extern objc class AVFragmentedAsset : AVURLAsset, AVFragmentMinding
 {
-    [Selector("tracks")] public NSArray Tracks { get; }
-    [Selector("fragmentedAssetWithURL:options:")] public static Self FragmentedAssetWithURLOptions(NSURL URL, NSDictionary? options);
+    [Selector("tracks")]
+    public NSArray Tracks { get; }
+    [Selector("fragmentedAssetWithURL:options:")]
+    public static Self FragmentedAssetWithURLOptions(NSURL URL, NSDictionary? options);
 }
 
 public objc closure void AVFragmentedAssetLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock(AVFragmentedAssetTrack? arg0, NSError? arg1);
@@ -278,30 +345,43 @@ public objc closure void AVFragmentedAssetLoadTracksWithMediaCharacteristicCompl
 public extern objc class AVFragmentedAsset
 {
     /// Deprecated in macOS 15.0.
-    [Selector("trackWithTrackID:")] public AVFragmentedAssetTrack? TrackWithTrackID(CMPersistentTrackID trackID);
-    [Selector("loadTrackWithTrackID:completionHandler:")] public void LoadTrackWithTrackIDCompletionHandler(CMPersistentTrackID trackID, AVFragmentedAssetLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("trackWithTrackID:")]
+    public AVFragmentedAssetTrack? TrackWithTrackID(CMPersistentTrackID trackID);
+    [Selector("loadTrackWithTrackID:completionHandler:")]
+    public void LoadTrackWithTrackIDCompletionHandler(CMPersistentTrackID trackID, AVFragmentedAssetLoadTrackWithTrackIDCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("tracksWithMediaType:")] public NSArray TracksWithMediaType(AVMediaType mediaType);
-    [Selector("loadTracksWithMediaType:completionHandler:")] public void LoadTracksWithMediaTypeCompletionHandler(AVMediaType mediaType, AVFragmentedAssetLoadTracksWithMediaTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tracksWithMediaType:")]
+    public NSArray TracksWithMediaType(AVMediaType mediaType);
+    [Selector("loadTracksWithMediaType:completionHandler:")]
+    public void LoadTracksWithMediaTypeCompletionHandler(AVMediaType mediaType, AVFragmentedAssetLoadTracksWithMediaTypeCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("tracksWithMediaCharacteristic:")] public NSArray TracksWithMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
-    [Selector("loadTracksWithMediaCharacteristic:completionHandler:")] public void LoadTracksWithMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVFragmentedAssetLoadTracksWithMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tracksWithMediaCharacteristic:")]
+    public NSArray TracksWithMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("loadTracksWithMediaCharacteristic:completionHandler:")]
+    public void LoadTracksWithMediaCharacteristicCompletionHandler(AVMediaCharacteristic mediaCharacteristic, AVFragmentedAssetLoadTracksWithMediaCharacteristicCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public extern objc class AVFragmentedAssetMinder : NSObject
 {
-    [Selector("mindingInterval", "setMindingInterval:")] public NSTimeInterval MindingInterval { get; set; }
-    [Selector("assets")] public NSArray Assets { get; }
-    [Selector("fragmentedAssetMinderWithAsset:mindingInterval:")] public static Self FragmentedAssetMinderWithAssetMindingInterval(AVAsset asset, NSTimeInterval mindingInterval);
-    [Selector("initWithAsset:mindingInterval:")] public Self InitWithAssetMindingInterval(AVAsset asset, NSTimeInterval mindingInterval);
-    [Selector("addFragmentedAsset:")] public void AddFragmentedAsset(AVAsset asset);
-    [Selector("removeFragmentedAsset:")] public void RemoveFragmentedAsset(AVAsset asset);
+    [Selector("mindingInterval", "setMindingInterval:")]
+    public NSTimeInterval MindingInterval { get; set; }
+    [Selector("assets")]
+    public NSArray Assets { get; }
+    [Selector("fragmentedAssetMinderWithAsset:mindingInterval:")]
+    public static Self FragmentedAssetMinderWithAssetMindingInterval(AVAsset asset, NSTimeInterval mindingInterval);
+    [Selector("initWithAsset:mindingInterval:")]
+    public Self InitWithAssetMindingInterval(AVAsset asset, NSTimeInterval mindingInterval);
+    [Selector("addFragmentedAsset:")]
+    public void AddFragmentedAsset(AVAsset asset);
+    [Selector("removeFragmentedAsset:")]
+    public void RemoveFragmentedAsset(AVAsset asset);
 }
 
 /// AVURLAssetContentKeyEligibility, a category of AVURLAsset.
 public extern objc class AVURLAsset : AVContentKeyRecipient
 {
-    [Selector("mayRequireContentKeysForMediaDataProcessing")] public bool MayRequireContentKeysForMediaDataProcessing { get; }
+    [Selector("mayRequireContentKeysForMediaDataProcessing")]
+    public bool MayRequireContentKeysForMediaDataProcessing { get; }
 }
 
 #endif

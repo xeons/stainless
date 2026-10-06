@@ -56,49 +56,82 @@ public enum CMIOExtensionStreamDiscontinuityFlags : uint
 
 public extern objc class CMIOExtensionStreamProperties : NSObject
 {
-    [Selector("activeFormatIndex", "setActiveFormatIndex:")] public NSNumber? ActiveFormatIndex { get; set; }
-    [Selector("frameDuration", "setFrameDuration:")] public NSDictionary? FrameDuration { get; set; }
-    [Selector("maxFrameDuration", "setMaxFrameDuration:")] public NSDictionary? MaxFrameDuration { get; set; }
-    [Selector("sinkBufferQueueSize", "setSinkBufferQueueSize:")] public NSNumber? SinkBufferQueueSize { get; set; }
-    [Selector("sinkBuffersRequiredForStartup", "setSinkBuffersRequiredForStartup:")] public NSNumber? SinkBuffersRequiredForStartup { get; set; }
-    [Selector("sinkBufferUnderrunCount", "setSinkBufferUnderrunCount:")] public NSNumber? SinkBufferUnderrunCount { get; set; }
-    [Selector("sinkEndOfData", "setSinkEndOfData:")] public NSNumber? SinkEndOfData { get; set; }
-    [Selector("propertiesDictionary", "setPropertiesDictionary:")] public NSDictionary PropertiesDictionary { get; set; }
-    [Selector("streamPropertiesWithDictionary:")] public static Self StreamPropertiesWithDictionary(NSDictionary propertiesDictionary);
-    [Selector("initWithDictionary:")] public Self InitWithDictionary(NSDictionary propertiesDictionary);
-    [Selector("setPropertyState:forProperty:")] public void SetPropertyStateForProperty(CMIOExtensionPropertyState? propertyState, CMIOExtensionProperty property);
+    [Selector("activeFormatIndex", "setActiveFormatIndex:")]
+    public NSNumber? ActiveFormatIndex { get; set; }
+    [Selector("frameDuration", "setFrameDuration:")]
+    public NSDictionary? FrameDuration { get; set; }
+    [Selector("maxFrameDuration", "setMaxFrameDuration:")]
+    public NSDictionary? MaxFrameDuration { get; set; }
+    [Selector("sinkBufferQueueSize", "setSinkBufferQueueSize:")]
+    public NSNumber? SinkBufferQueueSize { get; set; }
+    [Selector("sinkBuffersRequiredForStartup", "setSinkBuffersRequiredForStartup:")]
+    public NSNumber? SinkBuffersRequiredForStartup { get; set; }
+    [Selector("sinkBufferUnderrunCount", "setSinkBufferUnderrunCount:")]
+    public NSNumber? SinkBufferUnderrunCount { get; set; }
+    [Selector("sinkEndOfData", "setSinkEndOfData:")]
+    public NSNumber? SinkEndOfData { get; set; }
+    [Selector("propertiesDictionary", "setPropertiesDictionary:")]
+    public NSDictionary PropertiesDictionary { get; set; }
+    [Selector("streamPropertiesWithDictionary:")]
+    public static Self StreamPropertiesWithDictionary(NSDictionary propertiesDictionary);
+    [Selector("initWithDictionary:")]
+    public Self InitWithDictionary(NSDictionary propertiesDictionary);
+    [Selector("setPropertyState:forProperty:")]
+    public void SetPropertyStateForProperty(CMIOExtensionPropertyState? propertyState, CMIOExtensionProperty property);
 }
 
 public objc interface CMIOExtensionStreamSource : NSObjectProtocol
 {
-    [Selector("formats")] NSArray Formats { get; }
-    [Selector("availableProperties")] NSSet AvailableProperties { get; }
-    [Selector("streamPropertiesForProperties:error:")] CMIOExtensionStreamProperties? StreamPropertiesForPropertiesError(NSSet properties, out NSError? outError);
-    [Selector("setStreamProperties:error:")] bool SetStreamPropertiesError(CMIOExtensionStreamProperties streamProperties, out NSError? outError);
-    [Selector("authorizedToStartStreamForClient:")] bool AuthorizedToStartStreamForClient(CMIOExtensionClient client);
-    [Selector("startStreamAndReturnError:")] bool StartStreamAndReturnError(out NSError? outError);
-    [Selector("stopStreamAndReturnError:")] bool StopStreamAndReturnError(out NSError? outError);
+    [Selector("formats")]
+    NSArray Formats { get; }
+    [Selector("availableProperties")]
+    NSSet AvailableProperties { get; }
+    [Selector("streamPropertiesForProperties:error:")]
+    CMIOExtensionStreamProperties? StreamPropertiesForPropertiesError(NSSet properties, out NSError? outError);
+    [Selector("setStreamProperties:error:")]
+    bool SetStreamPropertiesError(CMIOExtensionStreamProperties streamProperties, out NSError? outError);
+    [Selector("authorizedToStartStreamForClient:")]
+    bool AuthorizedToStartStreamForClient(CMIOExtensionClient client);
+    [Selector("startStreamAndReturnError:")]
+    bool StartStreamAndReturnError(out NSError? outError);
+    [Selector("stopStreamAndReturnError:")]
+    bool StopStreamAndReturnError(out NSError? outError);
 }
 
 public objc closure void CMIOExtensionStreamConsumeSampleBufferFromClientCompletionHandlerCompletionHandlerBlock(CMSampleBufferRef? arg0, ulong arg1, CMIOExtensionStreamDiscontinuityFlags arg2, bool arg3, NSError? arg4);
 
 public extern objc class CMIOExtensionStream : NSObject
 {
-    [Selector("localizedName")] public NSString LocalizedName { get; }
-    [Selector("streamID")] public NSUUID StreamID { get; }
-    [Selector("direction")] public CMIOExtensionStreamDirection Direction { get; }
-    [Selector("clockType")] public CMIOExtensionStreamClockType ClockType { get; }
-    [Selector("customClockConfiguration")] public CMIOExtensionStreamCustomClockConfiguration? CustomClockConfiguration { get; }
-    [Selector("source")] public CMIOExtensionStreamSource? Source { get; }
-    [Selector("streamingClients")] public NSArray StreamingClients { get; }
-    [Selector("streamWithLocalizedName:streamID:direction:clockType:source:")] public static Self StreamWithLocalizedNameStreamIDDirectionClockTypeSource(NSString localizedName, NSUUID streamID, CMIOExtensionStreamDirection direction, CMIOExtensionStreamClockType clockType, CMIOExtensionStreamSource source);
-    [Selector("streamWithLocalizedName:streamID:direction:customClockConfiguration:source:")] public static Self StreamWithLocalizedNameStreamIDDirectionCustomClockConfigurationSource(NSString localizedName, NSUUID streamID, CMIOExtensionStreamDirection direction, CMIOExtensionStreamCustomClockConfiguration customClockConfiguration, CMIOExtensionStreamSource source);
-    [Selector("initWithLocalizedName:streamID:direction:clockType:source:")] public Self InitWithLocalizedNameStreamIDDirectionClockTypeSource(NSString localizedName, NSUUID streamID, CMIOExtensionStreamDirection direction, CMIOExtensionStreamClockType clockType, CMIOExtensionStreamSource source);
-    [Selector("initWithLocalizedName:streamID:direction:customClockConfiguration:source:")] public Self InitWithLocalizedNameStreamIDDirectionCustomClockConfigurationSource(NSString localizedName, NSUUID streamID, CMIOExtensionStreamDirection direction, CMIOExtensionStreamCustomClockConfiguration customClockConfiguration, CMIOExtensionStreamSource source);
-    [Selector("notifyPropertiesChanged:")] public void NotifyPropertiesChanged(NSDictionary propertyStates);
-    [Selector("sendSampleBuffer:discontinuity:hostTimeInNanoseconds:")] public void SendSampleBufferDiscontinuityHostTimeInNanoseconds(CMSampleBufferRef sampleBuffer, CMIOExtensionStreamDiscontinuityFlags discontinuity, ulong hostTimeInNanoseconds);
-    [Selector("consumeSampleBufferFromClient:completionHandler:")] public void ConsumeSampleBufferFromClientCompletionHandler(CMIOExtensionClient client, CMIOExtensionStreamConsumeSampleBufferFromClientCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("notifyScheduledOutputChanged:")] public void NotifyScheduledOutputChanged(CMIOExtensionScheduledOutput scheduledOutput);
+    [Selector("localizedName")]
+    public NSString LocalizedName { get; }
+    [Selector("streamID")]
+    public NSUUID StreamID { get; }
+    [Selector("direction")]
+    public CMIOExtensionStreamDirection Direction { get; }
+    [Selector("clockType")]
+    public CMIOExtensionStreamClockType ClockType { get; }
+    [Selector("customClockConfiguration")]
+    public CMIOExtensionStreamCustomClockConfiguration? CustomClockConfiguration { get; }
+    [Selector("source")]
+    public CMIOExtensionStreamSource? Source { get; }
+    [Selector("streamingClients")]
+    public NSArray StreamingClients { get; }
+    [Selector("streamWithLocalizedName:streamID:direction:clockType:source:")]
+    public static Self StreamWithLocalizedNameStreamIDDirectionClockTypeSource(NSString localizedName, NSUUID streamID, CMIOExtensionStreamDirection direction, CMIOExtensionStreamClockType clockType, CMIOExtensionStreamSource source);
+    [Selector("streamWithLocalizedName:streamID:direction:customClockConfiguration:source:")]
+    public static Self StreamWithLocalizedNameStreamIDDirectionCustomClockConfigurationSource(NSString localizedName, NSUUID streamID, CMIOExtensionStreamDirection direction, CMIOExtensionStreamCustomClockConfiguration customClockConfiguration, CMIOExtensionStreamSource source);
+    [Selector("initWithLocalizedName:streamID:direction:clockType:source:")]
+    public Self InitWithLocalizedNameStreamIDDirectionClockTypeSource(NSString localizedName, NSUUID streamID, CMIOExtensionStreamDirection direction, CMIOExtensionStreamClockType clockType, CMIOExtensionStreamSource source);
+    [Selector("initWithLocalizedName:streamID:direction:customClockConfiguration:source:")]
+    public Self InitWithLocalizedNameStreamIDDirectionCustomClockConfigurationSource(NSString localizedName, NSUUID streamID, CMIOExtensionStreamDirection direction, CMIOExtensionStreamCustomClockConfiguration customClockConfiguration, CMIOExtensionStreamSource source);
+    [Selector("notifyPropertiesChanged:")]
+    public void NotifyPropertiesChanged(NSDictionary propertyStates);
+    [Selector("sendSampleBuffer:discontinuity:hostTimeInNanoseconds:")]
+    public void SendSampleBufferDiscontinuityHostTimeInNanoseconds(CMSampleBufferRef sampleBuffer, CMIOExtensionStreamDiscontinuityFlags discontinuity, ulong hostTimeInNanoseconds);
+    [Selector("consumeSampleBufferFromClient:completionHandler:")]
+    public void ConsumeSampleBufferFromClientCompletionHandler(CMIOExtensionClient client, CMIOExtensionStreamConsumeSampleBufferFromClientCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("notifyScheduledOutputChanged:")]
+    public void NotifyScheduledOutputChanged(CMIOExtensionScheduledOutput scheduledOutput);
 }
 
 #endif

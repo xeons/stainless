@@ -38,14 +38,19 @@ public extern objc class SecTaskRef : CFTypeRef { }
 
 public extern "C" CFTypeID SecTaskGetTypeID();
 
-[ReturnsRetained] public extern "C" SecTaskRef? SecTaskCreateWithAuditToken(CFAllocatorRef? allocator, audit_token_t token);
+[ReturnsRetained]
+public extern "C" SecTaskRef? SecTaskCreateWithAuditToken(CFAllocatorRef? allocator, audit_token_t token);
 
-[ReturnsRetained] public extern "C" SecTaskRef? SecTaskCreateFromSelf(CFAllocatorRef? allocator);
+[ReturnsRetained]
+public extern "C" SecTaskRef? SecTaskCreateFromSelf(CFAllocatorRef? allocator);
 
-[ReturnsRetained] public extern "C" CFTypeRef? SecTaskCopyValueForEntitlement(SecTaskRef task, CFStringRef entitlement, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFTypeRef? SecTaskCopyValueForEntitlement(SecTaskRef task, CFStringRef entitlement, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? SecTaskCopyValuesForEntitlements(SecTaskRef task, CFArrayRef entitlements, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? SecTaskCopyValuesForEntitlements(SecTaskRef task, CFArrayRef entitlements, __CFError** error);
 
-[ReturnsRetained] public extern "C" CFStringRef? SecTaskCopySigningIdentifier(SecTaskRef task, __CFError** error);
+[ReturnsRetained]
+public extern "C" CFStringRef? SecTaskCopySigningIdentifier(SecTaskRef task, __CFError** error);
 
 #endif

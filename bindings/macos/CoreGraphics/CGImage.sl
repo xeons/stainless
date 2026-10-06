@@ -94,27 +94,38 @@ public enum CGBitmapInfo : uint
 
 public extern "C" CFTypeID CGImageGetTypeID();
 
-[ReturnsRetained] public extern "C" CGImageRef? CGImageCreate(nuint width, nuint height, nuint bitsPerComponent, nuint bitsPerPixel, nuint bytesPerRow, CGColorSpaceRef? space, CGBitmapInfo bitmapInfo, CGDataProviderRef? provider, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageCreate(nuint width, nuint height, nuint bitsPerComponent, nuint bitsPerPixel, nuint bytesPerRow, CGColorSpaceRef? space, CGBitmapInfo bitmapInfo, CGDataProviderRef? provider, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
 
-[ReturnsRetained] public extern "C" CGImageRef? CGImageMaskCreate(nuint width, nuint height, nuint bitsPerComponent, nuint bitsPerPixel, nuint bytesPerRow, CGDataProviderRef? provider, CGFloat* decode, bool shouldInterpolate);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageMaskCreate(nuint width, nuint height, nuint bitsPerComponent, nuint bitsPerPixel, nuint bytesPerRow, CGDataProviderRef? provider, CGFloat* decode, bool shouldInterpolate);
 
-[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateCopy(CGImageRef? image);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageCreateCopy(CGImageRef? image);
 
-[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateWithJPEGDataProvider(CGDataProviderRef? source, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageCreateWithJPEGDataProvider(CGDataProviderRef? source, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
 
-[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateWithPNGDataProvider(CGDataProviderRef? source, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageCreateWithPNGDataProvider(CGDataProviderRef? source, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
 
-[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateWithImageInRect(CGImageRef? image, CGRect rect);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageCreateWithImageInRect(CGImageRef? image, CGRect rect);
 
-[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateWithMask(CGImageRef? image, CGImageRef? mask);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageCreateWithMask(CGImageRef? image, CGImageRef? mask);
 
-[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateWithMaskingColors(CGImageRef? image, CGFloat* components);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageCreateWithMaskingColors(CGImageRef? image, CGFloat* components);
 
-[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateCopyWithColorSpace(CGImageRef? image, CGColorSpaceRef? space);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageCreateCopyWithColorSpace(CGImageRef? image, CGColorSpaceRef? space);
 
-[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateWithContentHeadroom(float headroom, nuint width, nuint height, nuint bitsPerComponent, nuint bitsPerPixel, nuint bytesPerRow, CGColorSpaceRef? space, CGBitmapInfo bitmapInfo, CGDataProviderRef? provider, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageCreateWithContentHeadroom(float headroom, nuint width, nuint height, nuint bitsPerComponent, nuint bitsPerPixel, nuint bytesPerRow, CGColorSpaceRef? space, CGBitmapInfo bitmapInfo, CGDataProviderRef? provider, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
 
-[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateCopyWithContentHeadroom(float headroom, CGImageRef? image);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageCreateCopyWithContentHeadroom(float headroom, CGImageRef? image);
 
 public extern "C" float kCGDefaultHDRImageContentHeadroom;
 
@@ -130,10 +141,12 @@ public extern "C" float CGImageGetContentAverageLightLevel(CGImageRef? image);
 public extern "C" float CGImageCalculateContentAverageLightLevel(CGImageRef? image);
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateCopyWithContentAverageLightLevel(CGImageRef? image, float avll);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageCreateCopyWithContentAverageLightLevel(CGImageRef? image, float avll);
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateCopyWithCalculatedHDRStats(CGImageRef? image);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGImageCreateCopyWithCalculatedHDRStats(CGImageRef? image);
 
 public extern "C" bool CGImageIsMask(CGImageRef? image);
 

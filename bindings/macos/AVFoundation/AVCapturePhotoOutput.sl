@@ -36,30 +36,53 @@ import Standard.ObjC;
 
 public extern objc class AVCapturePhotoOutput : AVCaptureOutput
 {
-    [Selector("availablePhotoPixelFormatTypes")] public NSArray AvailablePhotoPixelFormatTypes { get; }
-    [Selector("availablePhotoCodecTypes")] public NSArray AvailablePhotoCodecTypes { get; }
-    [Selector("availablePhotoFileTypes")] public NSArray? AvailablePhotoFileTypes { get; }
-    [Selector("maxPhotoQualityPrioritization", "setMaxPhotoQualityPrioritization:")] public AVCapturePhotoQualityPrioritization MaxPhotoQualityPrioritization { get; set; }
-    [Selector("isFastCapturePrioritizationSupported", "setFastCapturePrioritizationSupported:")] public bool FastCapturePrioritizationSupported { get; set; }
-    [Selector("isFastCapturePrioritizationEnabled", "setFastCapturePrioritizationEnabled:")] public bool FastCapturePrioritizationEnabled { get; set; }
-    [Selector("supportedFlashModes")] public NSArray SupportedFlashModes { get; }
+    [Selector("availablePhotoPixelFormatTypes")]
+    public NSArray AvailablePhotoPixelFormatTypes { get; }
+    [Selector("availablePhotoCodecTypes")]
+    public NSArray AvailablePhotoCodecTypes { get; }
+    [Selector("availablePhotoFileTypes")]
+    public NSArray? AvailablePhotoFileTypes { get; }
+    [Selector("maxPhotoQualityPrioritization", "setMaxPhotoQualityPrioritization:")]
+    public AVCapturePhotoQualityPrioritization MaxPhotoQualityPrioritization { get; set; }
+    [Selector("isFastCapturePrioritizationSupported", "setFastCapturePrioritizationSupported:")]
+    public bool FastCapturePrioritizationSupported { get; set; }
+    [Selector("isFastCapturePrioritizationEnabled", "setFastCapturePrioritizationEnabled:")]
+    public bool FastCapturePrioritizationEnabled { get; set; }
+    [Selector("supportedFlashModes")]
+    public NSArray SupportedFlashModes { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("isHighResolutionCaptureEnabled", "setHighResolutionCaptureEnabled:")] public bool HighResolutionCaptureEnabled { get; set; }
-    [Selector("maxPhotoDimensions", "setMaxPhotoDimensions:")] public CMVideoDimensions MaxPhotoDimensions { get; set; }
-    [Selector("preservesLivePhotoCaptureSuspendedOnSessionStop", "setPreservesLivePhotoCaptureSuspendedOnSessionStop:")] public bool PreservesLivePhotoCaptureSuspendedOnSessionStop { get; set; }
-    [Selector("isZeroShutterLagSupported")] public bool ZeroShutterLagSupported { get; }
-    [Selector("isZeroShutterLagEnabled", "setZeroShutterLagEnabled:")] public bool ZeroShutterLagEnabled { get; set; }
-    [Selector("isResponsiveCaptureSupported")] public bool ResponsiveCaptureSupported { get; }
-    [Selector("isResponsiveCaptureEnabled", "setResponsiveCaptureEnabled:")] public bool ResponsiveCaptureEnabled { get; set; }
-    [Selector("captureReadiness")] public AVCapturePhotoOutputCaptureReadiness CaptureReadiness { get; }
-    [Selector("isConstantColorSupported")] public bool ConstantColorSupported { get; }
-    [Selector("isConstantColorEnabled", "setConstantColorEnabled:")] public bool ConstantColorEnabled { get; set; }
-    [Selector("isShutterSoundSuppressionSupported")] public bool ShutterSoundSuppressionSupported { get; }
-    [Selector("init")] public Self Init();
-    [Selector("new")] public static Self New();
-    [Selector("capturePhotoWithSettings:delegate:")] public void CapturePhotoWithSettingsDelegate(AVCapturePhotoSettings settings, AVCapturePhotoCaptureDelegate @delegate);
-    [Selector("supportedPhotoPixelFormatTypesForFileType:")] public NSArray SupportedPhotoPixelFormatTypesForFileType(AVFileType fileType);
-    [Selector("supportedPhotoCodecTypesForFileType:")] public NSArray SupportedPhotoCodecTypesForFileType(AVFileType fileType);
+    [Selector("isHighResolutionCaptureEnabled", "setHighResolutionCaptureEnabled:")]
+    public bool HighResolutionCaptureEnabled { get; set; }
+    [Selector("maxPhotoDimensions", "setMaxPhotoDimensions:")]
+    public CMVideoDimensions MaxPhotoDimensions { get; set; }
+    [Selector("preservesLivePhotoCaptureSuspendedOnSessionStop", "setPreservesLivePhotoCaptureSuspendedOnSessionStop:")]
+    public bool PreservesLivePhotoCaptureSuspendedOnSessionStop { get; set; }
+    [Selector("isZeroShutterLagSupported")]
+    public bool ZeroShutterLagSupported { get; }
+    [Selector("isZeroShutterLagEnabled", "setZeroShutterLagEnabled:")]
+    public bool ZeroShutterLagEnabled { get; set; }
+    [Selector("isResponsiveCaptureSupported")]
+    public bool ResponsiveCaptureSupported { get; }
+    [Selector("isResponsiveCaptureEnabled", "setResponsiveCaptureEnabled:")]
+    public bool ResponsiveCaptureEnabled { get; set; }
+    [Selector("captureReadiness")]
+    public AVCapturePhotoOutputCaptureReadiness CaptureReadiness { get; }
+    [Selector("isConstantColorSupported")]
+    public bool ConstantColorSupported { get; }
+    [Selector("isConstantColorEnabled", "setConstantColorEnabled:")]
+    public bool ConstantColorEnabled { get; set; }
+    [Selector("isShutterSoundSuppressionSupported")]
+    public bool ShutterSoundSuppressionSupported { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("new")]
+    public static Self New();
+    [Selector("capturePhotoWithSettings:delegate:")]
+    public void CapturePhotoWithSettingsDelegate(AVCapturePhotoSettings settings, AVCapturePhotoCaptureDelegate @delegate);
+    [Selector("supportedPhotoPixelFormatTypesForFileType:")]
+    public NSArray SupportedPhotoPixelFormatTypesForFileType(AVFileType fileType);
+    [Selector("supportedPhotoCodecTypesForFileType:")]
+    public NSArray SupportedPhotoCodecTypesForFileType(AVFileType fileType);
 }
 
 public enum AVCapturePhotoQualityPrioritization : long
@@ -80,16 +103,23 @@ public enum AVCapturePhotoOutputCaptureReadiness : long
 
 public extern objc class AVCapturePhotoOutputReadinessCoordinator : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public AVCapturePhotoOutputReadinessCoordinatorDelegate? Delegate { get; set; }
-    [Selector("captureReadiness")] public AVCapturePhotoOutputCaptureReadiness CaptureReadiness { get; }
-    [Selector("initWithPhotoOutput:")] public Self InitWithPhotoOutput(AVCapturePhotoOutput photoOutput);
-    [Selector("startTrackingCaptureRequestUsingPhotoSettings:")] public void StartTrackingCaptureRequestUsingPhotoSettings(AVCapturePhotoSettings settings);
-    [Selector("stopTrackingCaptureRequestUsingPhotoSettingsUniqueID:")] public void StopTrackingCaptureRequestUsingPhotoSettingsUniqueID(long settingsUniqueID);
+    [Selector("delegate", "setDelegate:")]
+    public AVCapturePhotoOutputReadinessCoordinatorDelegate? Delegate { get; set; }
+    [Selector("captureReadiness")]
+    public AVCapturePhotoOutputCaptureReadiness CaptureReadiness { get; }
+    [Selector("initWithPhotoOutput:")]
+    public Self InitWithPhotoOutput(AVCapturePhotoOutput photoOutput);
+    [Selector("startTrackingCaptureRequestUsingPhotoSettings:")]
+    public void StartTrackingCaptureRequestUsingPhotoSettings(AVCapturePhotoSettings settings);
+    [Selector("stopTrackingCaptureRequestUsingPhotoSettingsUniqueID:")]
+    public void StopTrackingCaptureRequestUsingPhotoSettingsUniqueID(long settingsUniqueID);
 }
 
 public objc interface AVCapturePhotoOutputReadinessCoordinatorDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("readinessCoordinator:captureReadinessDidChange:")] void ReadinessCoordinatorCaptureReadinessDidChange(AVCapturePhotoOutputReadinessCoordinator coordinator, AVCapturePhotoOutputCaptureReadiness captureReadiness);
+    [Optional]
+    [Selector("readinessCoordinator:captureReadinessDidChange:")]
+    void ReadinessCoordinatorCaptureReadinessDidChange(AVCapturePhotoOutputReadinessCoordinator coordinator, AVCapturePhotoOutputCaptureReadiness captureReadiness);
 }
 
 /// AVCapturePhotoOutputDepthDataDeliverySupport, a category of AVCapturePhotoOutput.
@@ -97,55 +127,91 @@ public extern objc class AVCapturePhotoOutput { }
 
 public objc interface AVCapturePhotoCaptureDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("captureOutput:willBeginCaptureForResolvedSettings:")] void CaptureOutputWillBeginCaptureForResolvedSettings(AVCapturePhotoOutput output, AVCaptureResolvedPhotoSettings resolvedSettings);
-    [Optional] [Selector("captureOutput:willCapturePhotoForResolvedSettings:")] void CaptureOutputWillCapturePhotoForResolvedSettings(AVCapturePhotoOutput output, AVCaptureResolvedPhotoSettings resolvedSettings);
-    [Optional] [Selector("captureOutput:didCapturePhotoForResolvedSettings:")] void CaptureOutputDidCapturePhotoForResolvedSettings(AVCapturePhotoOutput output, AVCaptureResolvedPhotoSettings resolvedSettings);
-    [Optional] [Selector("captureOutput:didFinishProcessingPhoto:error:")] void CaptureOutputDidFinishProcessingPhotoError(AVCapturePhotoOutput output, AVCapturePhoto photo, NSError? error);
-    [Optional] [Selector("captureOutput:didFinishCaptureForResolvedSettings:error:")] void CaptureOutputDidFinishCaptureForResolvedSettingsError(AVCapturePhotoOutput output, AVCaptureResolvedPhotoSettings resolvedSettings, NSError? error);
+    [Optional]
+    [Selector("captureOutput:willBeginCaptureForResolvedSettings:")]
+    void CaptureOutputWillBeginCaptureForResolvedSettings(AVCapturePhotoOutput output, AVCaptureResolvedPhotoSettings resolvedSettings);
+    [Optional]
+    [Selector("captureOutput:willCapturePhotoForResolvedSettings:")]
+    void CaptureOutputWillCapturePhotoForResolvedSettings(AVCapturePhotoOutput output, AVCaptureResolvedPhotoSettings resolvedSettings);
+    [Optional]
+    [Selector("captureOutput:didCapturePhotoForResolvedSettings:")]
+    void CaptureOutputDidCapturePhotoForResolvedSettings(AVCapturePhotoOutput output, AVCaptureResolvedPhotoSettings resolvedSettings);
+    [Optional]
+    [Selector("captureOutput:didFinishProcessingPhoto:error:")]
+    void CaptureOutputDidFinishProcessingPhotoError(AVCapturePhotoOutput output, AVCapturePhoto photo, NSError? error);
+    [Optional]
+    [Selector("captureOutput:didFinishCaptureForResolvedSettings:error:")]
+    void CaptureOutputDidFinishCaptureForResolvedSettingsError(AVCapturePhotoOutput output, AVCaptureResolvedPhotoSettings resolvedSettings, NSError? error);
 }
 
 public extern objc class AVCapturePhotoSettings : NSObject, NSCopying
 {
-    [Selector("uniqueID")] public long UniqueID { get; }
-    [Selector("format")] public NSDictionary? Format { get; }
-    [Selector("processedFileType")] public AVFileType? ProcessedFileType { get; }
-    [Selector("flashMode", "setFlashMode:")] public AVCaptureFlashMode FlashMode { get; set; }
-    [Selector("photoQualityPrioritization", "setPhotoQualityPrioritization:")] public AVCapturePhotoQualityPrioritization PhotoQualityPrioritization { get; set; }
+    [Selector("uniqueID")]
+    public long UniqueID { get; }
+    [Selector("format")]
+    public NSDictionary? Format { get; }
+    [Selector("processedFileType")]
+    public AVFileType? ProcessedFileType { get; }
+    [Selector("flashMode", "setFlashMode:")]
+    public AVCaptureFlashMode FlashMode { get; set; }
+    [Selector("photoQualityPrioritization", "setPhotoQualityPrioritization:")]
+    public AVCapturePhotoQualityPrioritization PhotoQualityPrioritization { get; set; }
     /// Deprecated in macOS 13.0.
-    [Selector("isHighResolutionPhotoEnabled", "setHighResolutionPhotoEnabled:")] public bool HighResolutionPhotoEnabled { get; set; }
-    [Selector("maxPhotoDimensions", "setMaxPhotoDimensions:")] public CMVideoDimensions MaxPhotoDimensions { get; set; }
-    [Selector("isConstantColorEnabled", "setConstantColorEnabled:")] public bool ConstantColorEnabled { get; set; }
-    [Selector("isConstantColorFallbackPhotoDeliveryEnabled", "setConstantColorFallbackPhotoDeliveryEnabled:")] public bool ConstantColorFallbackPhotoDeliveryEnabled { get; set; }
-    [Selector("isShutterSoundSuppressionEnabled", "setShutterSoundSuppressionEnabled:")] public bool ShutterSoundSuppressionEnabled { get; set; }
-    [Selector("photoSettings")] public static Self PhotoSettings();
-    [Selector("photoSettingsWithFormat:")] public static Self PhotoSettingsWithFormat(NSDictionary? format);
-    [Selector("photoSettingsFromPhotoSettings:")] public static Self PhotoSettingsFromPhotoSettings(AVCapturePhotoSettings photoSettings);
+    [Selector("isHighResolutionPhotoEnabled", "setHighResolutionPhotoEnabled:")]
+    public bool HighResolutionPhotoEnabled { get; set; }
+    [Selector("maxPhotoDimensions", "setMaxPhotoDimensions:")]
+    public CMVideoDimensions MaxPhotoDimensions { get; set; }
+    [Selector("isConstantColorEnabled", "setConstantColorEnabled:")]
+    public bool ConstantColorEnabled { get; set; }
+    [Selector("isConstantColorFallbackPhotoDeliveryEnabled", "setConstantColorFallbackPhotoDeliveryEnabled:")]
+    public bool ConstantColorFallbackPhotoDeliveryEnabled { get; set; }
+    [Selector("isShutterSoundSuppressionEnabled", "setShutterSoundSuppressionEnabled:")]
+    public bool ShutterSoundSuppressionEnabled { get; set; }
+    [Selector("photoSettings")]
+    public static Self PhotoSettings();
+    [Selector("photoSettingsWithFormat:")]
+    public static Self PhotoSettingsWithFormat(NSDictionary? format);
+    [Selector("photoSettingsFromPhotoSettings:")]
+    public static Self PhotoSettingsFromPhotoSettings(AVCapturePhotoSettings photoSettings);
 }
 
 public extern objc class AVCaptureResolvedPhotoSettings : NSObject
 {
-    [Selector("uniqueID")] public long UniqueID { get; }
-    [Selector("photoDimensions")] public CMVideoDimensions PhotoDimensions { get; }
-    [Selector("expectedPhotoCount")] public NSUInteger ExpectedPhotoCount { get; }
-    [Selector("isFastCapturePrioritizationEnabled")] public bool FastCapturePrioritizationEnabled { get; }
+    [Selector("uniqueID")]
+    public long UniqueID { get; }
+    [Selector("photoDimensions")]
+    public CMVideoDimensions PhotoDimensions { get; }
+    [Selector("expectedPhotoCount")]
+    public NSUInteger ExpectedPhotoCount { get; }
+    [Selector("isFastCapturePrioritizationEnabled")]
+    public bool FastCapturePrioritizationEnabled { get; }
 }
 
 public extern objc class AVCapturePhoto : NSObject
 {
-    [Selector("timestamp")] public CMTime Timestamp { get; }
-    [Selector("pixelBuffer")] public CVPixelBufferRef? PixelBuffer { get; }
-    [Selector("resolvedSettings")] public AVCaptureResolvedPhotoSettings ResolvedSettings { get; }
-    [Selector("photoCount")] public NSInteger PhotoCount { get; }
-    [Selector("constantColorConfidenceMap")] public CVPixelBufferRef? ConstantColorConfidenceMap { get; }
-    [Selector("constantColorCenterWeightedMeanConfidenceLevel")] public float ConstantColorCenterWeightedMeanConfidenceLevel { get; }
-    [Selector("isConstantColorFallbackPhoto")] public bool ConstantColorFallbackPhoto { get; }
+    [Selector("timestamp")]
+    public CMTime Timestamp { get; }
+    [Selector("pixelBuffer")]
+    public CVPixelBufferRef? PixelBuffer { get; }
+    [Selector("resolvedSettings")]
+    public AVCaptureResolvedPhotoSettings ResolvedSettings { get; }
+    [Selector("photoCount")]
+    public NSInteger PhotoCount { get; }
+    [Selector("constantColorConfidenceMap")]
+    public CVPixelBufferRef? ConstantColorConfidenceMap { get; }
+    [Selector("constantColorCenterWeightedMeanConfidenceLevel")]
+    public float ConstantColorCenterWeightedMeanConfidenceLevel { get; }
+    [Selector("isConstantColorFallbackPhoto")]
+    public bool ConstantColorFallbackPhoto { get; }
 }
 
 /// AVCapturePhotoConversions, a category of AVCapturePhoto.
 public extern objc class AVCapturePhoto
 {
-    [Selector("fileDataRepresentation")] public NSData? FileDataRepresentation();
-    [Selector("CGImageRepresentation")] public CGImageRef? CGImageRepresentation();
+    [Selector("fileDataRepresentation")]
+    public NSData? FileDataRepresentation();
+    [Selector("CGImageRepresentation")]
+    public CGImageRef? CGImageRepresentation();
 }
 
 /// AVCapturePhotoBracketedCapture, a category of AVCapturePhoto.

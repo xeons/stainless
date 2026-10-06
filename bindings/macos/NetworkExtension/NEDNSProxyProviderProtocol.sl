@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class NEDNSProxyProviderProtocol : NEVPNProtocol
 {
-    [Selector("providerConfiguration", "setProviderConfiguration:")] public NSDictionary? ProviderConfiguration { get; set; }
-    [Selector("providerBundleIdentifier", "setProviderBundleIdentifier:")] public NSString? ProviderBundleIdentifier { get; set; }
+    [Selector("providerConfiguration", "setProviderConfiguration:")]
+    public NSDictionary? ProviderConfiguration { get; set; }
+    [Selector("providerBundleIdentifier", "setProviderBundleIdentifier:")]
+    public NSString? ProviderBundleIdentifier { get; set; }
 }
 
 #endif

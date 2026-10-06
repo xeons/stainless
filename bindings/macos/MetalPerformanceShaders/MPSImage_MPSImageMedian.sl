@@ -34,11 +34,16 @@ import Standard.ObjC;
 
 public extern objc class MPSImageMedian : MPSUnaryImageKernel
 {
-    [Selector("kernelDiameter")] public NSUInteger KernelDiameter { get; }
-    [Selector("initWithDevice:kernelDiameter:")] public Self InitWithDeviceKernelDiameter(MTLDevice device, NSUInteger kernelDiameter);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("maxKernelDiameter")] public static NSUInteger MaxKernelDiameter();
-    [Selector("minKernelDiameter")] public static NSUInteger MinKernelDiameter();
+    [Selector("kernelDiameter")]
+    public NSUInteger KernelDiameter { get; }
+    [Selector("initWithDevice:kernelDiameter:")]
+    public Self InitWithDeviceKernelDiameter(MTLDevice device, NSUInteger kernelDiameter);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("maxKernelDiameter")]
+    public static NSUInteger MaxKernelDiameter();
+    [Selector("minKernelDiameter")]
+    public static NSUInteger MinKernelDiameter();
 }
 
 #endif

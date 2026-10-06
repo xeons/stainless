@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class PKDateComponentsRange : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("startDateComponents")] public NSDateComponents StartDateComponents { get; }
-    [Selector("endDateComponents")] public NSDateComponents EndDateComponents { get; }
-    [Selector("initWithStartDateComponents:endDateComponents:")] public Self? InitWithStartDateComponentsEndDateComponents(NSDateComponents startDateComponents, NSDateComponents endDateComponents);
+    [Selector("startDateComponents")]
+    public NSDateComponents StartDateComponents { get; }
+    [Selector("endDateComponents")]
+    public NSDateComponents EndDateComponents { get; }
+    [Selector("initWithStartDateComponents:endDateComponents:")]
+    public Self? InitWithStartDateComponentsEndDateComponents(NSDateComponents startDateComponents, NSDateComponents endDateComponents);
 }
 
 #endif

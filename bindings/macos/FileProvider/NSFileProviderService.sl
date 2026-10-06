@@ -32,9 +32,13 @@ import Standard.ObjC;
 
 public objc interface NSFileProviderServiceSource
 {
-    [Selector("serviceName")] NSFileProviderServiceName ServiceName { get; }
-    [Optional] [Selector("isRestricted")] bool Restricted { get; }
-    [Selector("makeListenerEndpointAndReturnError:")] NSXPCListenerEndpoint? MakeListenerEndpointAndReturnError(out NSError? error);
+    [Selector("serviceName")]
+    NSFileProviderServiceName ServiceName { get; }
+    [Optional]
+    [Selector("isRestricted")]
+    bool Restricted { get; }
+    [Selector("makeListenerEndpointAndReturnError:")]
+    NSXPCListenerEndpoint? MakeListenerEndpointAndReturnError(out NSError? error);
 }
 
 public objc closure void NSFileProviderManagerGetServiceWithNameItemIdentifierCompletionHandlerCompletionHandlerBlock(NSFileProviderService? arg0, NSError? arg1);
@@ -42,7 +46,8 @@ public objc closure void NSFileProviderManagerGetServiceWithNameItemIdentifierCo
 /// NSFileProviderService, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    [Selector("getServiceWithName:itemIdentifier:completionHandler:")] public void GetServiceWithNameItemIdentifierCompletionHandler(NSFileProviderServiceName serviceName, NSFileProviderItemIdentifier itemIdentifier, NSFileProviderManagerGetServiceWithNameItemIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getServiceWithName:itemIdentifier:completionHandler:")]
+    public void GetServiceWithNameItemIdentifierCompletionHandler(NSFileProviderServiceName serviceName, NSFileProviderItemIdentifier itemIdentifier, NSFileProviderManagerGetServiceWithNameItemIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

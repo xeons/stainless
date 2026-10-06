@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class INAnswerCallIntent : INIntent
 {
-    [Selector("audioRoute")] public INCallAudioRoute AudioRoute { get; }
-    [Selector("callIdentifier")] public NSString? CallIdentifier { get; }
-    [Selector("initWithAudioRoute:callIdentifier:")] public Self InitWithAudioRouteCallIdentifier(INCallAudioRoute audioRoute, NSString? callIdentifier);
+    [Selector("audioRoute")]
+    public INCallAudioRoute AudioRoute { get; }
+    [Selector("callIdentifier")]
+    public NSString? CallIdentifier { get; }
+    [Selector("initWithAudioRoute:callIdentifier:")]
+    public Self InitWithAudioRouteCallIdentifier(INCallAudioRoute audioRoute, NSString? callIdentifier);
 }
 
 public objc closure void INAnswerCallIntentHandlingHandleAnswerCallCompletionCompletionBlock(INAnswerCallIntentResponse arg0);
@@ -44,8 +47,11 @@ public objc closure void INAnswerCallIntentHandlingConfirmAnswerCallCompletionCo
 
 public objc interface INAnswerCallIntentHandling : NSObjectProtocol
 {
-    [Selector("handleAnswerCall:completion:")] void HandleAnswerCallCompletion(INAnswerCallIntent intent, INAnswerCallIntentHandlingHandleAnswerCallCompletionCompletionBlock completion);
-    [Optional] [Selector("confirmAnswerCall:completion:")] void ConfirmAnswerCallCompletion(INAnswerCallIntent intent, INAnswerCallIntentHandlingConfirmAnswerCallCompletionCompletionBlock completion);
+    [Selector("handleAnswerCall:completion:")]
+    void HandleAnswerCallCompletion(INAnswerCallIntent intent, INAnswerCallIntentHandlingHandleAnswerCallCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("confirmAnswerCall:completion:")]
+    void ConfirmAnswerCallCompletion(INAnswerCallIntent intent, INAnswerCallIntentHandlingConfirmAnswerCallCompletionCompletionBlock completion);
 }
 
 #endif

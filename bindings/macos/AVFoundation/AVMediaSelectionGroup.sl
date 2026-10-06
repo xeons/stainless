@@ -33,68 +33,100 @@ import Standard.ObjC;
 
 public extern objc class AVMediaSelectionGroup : NSObject, NSCopying
 {
-    [Selector("options")] public NSArray Options { get; }
-    [Selector("defaultOption")] public AVMediaSelectionOption? DefaultOption { get; }
-    [Selector("allowsEmptySelection")] public bool AllowsEmptySelection { get; }
-    [Selector("mediaSelectionOptionWithPropertyList:")] public AVMediaSelectionOption? MediaSelectionOptionWithPropertyList(AnyObject plist);
+    [Selector("options")]
+    public NSArray Options { get; }
+    [Selector("defaultOption")]
+    public AVMediaSelectionOption? DefaultOption { get; }
+    [Selector("allowsEmptySelection")]
+    public bool AllowsEmptySelection { get; }
+    [Selector("mediaSelectionOptionWithPropertyList:")]
+    public AVMediaSelectionOption? MediaSelectionOptionWithPropertyList(AnyObject plist);
 }
 
 /// AVMediaSelectionOptionFiltering, a category of AVMediaSelectionGroup.
 public extern objc class AVMediaSelectionGroup
 {
-    [Selector("playableMediaSelectionOptionsFromArray:")] public static NSArray PlayableMediaSelectionOptionsFromArray(NSArray mediaSelectionOptions);
-    [Selector("mediaSelectionOptionsFromArray:filteredAndSortedAccordingToPreferredLanguages:")] public static NSArray MediaSelectionOptionsFromArrayFilteredAndSortedAccordingToPreferredLanguages(NSArray mediaSelectionOptions, NSArray preferredLanguages);
-    [Selector("mediaSelectionOptionsFromArray:withLocale:")] public static NSArray MediaSelectionOptionsFromArrayWithLocale(NSArray mediaSelectionOptions, NSLocale locale);
-    [Selector("mediaSelectionOptionsFromArray:withMediaCharacteristics:")] public static NSArray MediaSelectionOptionsFromArrayWithMediaCharacteristics(NSArray mediaSelectionOptions, NSArray mediaCharacteristics);
-    [Selector("mediaSelectionOptionsFromArray:withoutMediaCharacteristics:")] public static NSArray MediaSelectionOptionsFromArrayWithoutMediaCharacteristics(NSArray mediaSelectionOptions, NSArray mediaCharacteristics);
+    [Selector("playableMediaSelectionOptionsFromArray:")]
+    public static NSArray PlayableMediaSelectionOptionsFromArray(NSArray mediaSelectionOptions);
+    [Selector("mediaSelectionOptionsFromArray:filteredAndSortedAccordingToPreferredLanguages:")]
+    public static NSArray MediaSelectionOptionsFromArrayFilteredAndSortedAccordingToPreferredLanguages(NSArray mediaSelectionOptions, NSArray preferredLanguages);
+    [Selector("mediaSelectionOptionsFromArray:withLocale:")]
+    public static NSArray MediaSelectionOptionsFromArrayWithLocale(NSArray mediaSelectionOptions, NSLocale locale);
+    [Selector("mediaSelectionOptionsFromArray:withMediaCharacteristics:")]
+    public static NSArray MediaSelectionOptionsFromArrayWithMediaCharacteristics(NSArray mediaSelectionOptions, NSArray mediaCharacteristics);
+    [Selector("mediaSelectionOptionsFromArray:withoutMediaCharacteristics:")]
+    public static NSArray MediaSelectionOptionsFromArrayWithoutMediaCharacteristics(NSArray mediaSelectionOptions, NSArray mediaCharacteristics);
 }
 
 public extern objc class AVMediaSelectionOption : NSObject, NSCopying
 {
-    [Selector("mediaType")] public AVMediaType MediaType { get; }
-    [Selector("mediaSubTypes")] public NSArray MediaSubTypes { get; }
-    [Selector("isPlayable")] public bool Playable { get; }
-    [Selector("extendedLanguageTag")] public NSString? ExtendedLanguageTag { get; }
-    [Selector("locale")] public NSLocale? Locale { get; }
-    [Selector("commonMetadata")] public NSArray CommonMetadata { get; }
-    [Selector("availableMetadataFormats")] public NSArray AvailableMetadataFormats { get; }
-    [Selector("displayName")] public NSString DisplayName { get; }
-    [Selector("hasMediaCharacteristic:")] public bool HasMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
-    [Selector("metadataForFormat:")] public NSArray MetadataForFormat(NSString format);
-    [Selector("associatedMediaSelectionOptionInMediaSelectionGroup:")] public AVMediaSelectionOption? AssociatedMediaSelectionOptionInMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
-    [Selector("propertyList")] public AnyObject PropertyList();
-    [Selector("displayNameWithLocale:")] public NSString DisplayNameWithLocale(NSLocale locale);
+    [Selector("mediaType")]
+    public AVMediaType MediaType { get; }
+    [Selector("mediaSubTypes")]
+    public NSArray MediaSubTypes { get; }
+    [Selector("isPlayable")]
+    public bool Playable { get; }
+    [Selector("extendedLanguageTag")]
+    public NSString? ExtendedLanguageTag { get; }
+    [Selector("locale")]
+    public NSLocale? Locale { get; }
+    [Selector("commonMetadata")]
+    public NSArray CommonMetadata { get; }
+    [Selector("availableMetadataFormats")]
+    public NSArray AvailableMetadataFormats { get; }
+    [Selector("displayName")]
+    public NSString DisplayName { get; }
+    [Selector("hasMediaCharacteristic:")]
+    public bool HasMediaCharacteristic(AVMediaCharacteristic mediaCharacteristic);
+    [Selector("metadataForFormat:")]
+    public NSArray MetadataForFormat(NSString format);
+    [Selector("associatedMediaSelectionOptionInMediaSelectionGroup:")]
+    public AVMediaSelectionOption? AssociatedMediaSelectionOptionInMediaSelectionGroup(AVMediaSelectionGroup mediaSelectionGroup);
+    [Selector("propertyList")]
+    public AnyObject PropertyList();
+    [Selector("displayNameWithLocale:")]
+    public NSString DisplayNameWithLocale(NSLocale locale);
 }
 
 /// AVMediaSelectionGroupCustomMediaSelectionScheme, a category of AVMediaSelectionGroup.
 public extern objc class AVMediaSelectionGroup
 {
     /// macOS 26.0 and later.
-    [Selector("customMediaSelectionScheme")] public AVCustomMediaSelectionScheme? CustomMediaSelectionScheme { get; }
+    [Selector("customMediaSelectionScheme")]
+    public AVCustomMediaSelectionScheme? CustomMediaSelectionScheme { get; }
 }
 
 /// macOS 26.0 and later.
 public extern objc class AVCustomMediaSelectionScheme : NSObject, NSCopying
 {
-    [Selector("shouldOfferLanguageSelection")] public bool ShouldOfferLanguageSelection { get; }
-    [Selector("availableLanguages")] public NSArray AvailableLanguages { get; }
-    [Selector("selectors")] public NSArray Selectors { get; }
-    [Selector("mediaPresentationSettingsForSelector:complementaryToLanguage:settings:")] public NSArray MediaPresentationSettingsForSelectorComplementaryToLanguageSettings(AVMediaPresentationSelector selector, NSString? language, NSArray settings);
+    [Selector("shouldOfferLanguageSelection")]
+    public bool ShouldOfferLanguageSelection { get; }
+    [Selector("availableLanguages")]
+    public NSArray AvailableLanguages { get; }
+    [Selector("selectors")]
+    public NSArray Selectors { get; }
+    [Selector("mediaPresentationSettingsForSelector:complementaryToLanguage:settings:")]
+    public NSArray MediaPresentationSettingsForSelectorComplementaryToLanguageSettings(AVMediaPresentationSelector selector, NSString? language, NSArray settings);
 }
 
 /// macOS 26.0 and later.
 public extern objc class AVMediaPresentationSelector : NSObject, NSCopying
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("settings")] public NSArray Settings { get; }
-    [Selector("displayNameForLocaleIdentifier:")] public NSString DisplayNameForLocaleIdentifier(NSString localeIdentifier);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("settings")]
+    public NSArray Settings { get; }
+    [Selector("displayNameForLocaleIdentifier:")]
+    public NSString DisplayNameForLocaleIdentifier(NSString localeIdentifier);
 }
 
 /// macOS 26.0 and later.
 public extern objc class AVMediaPresentationSetting : NSObject, NSCopying
 {
-    [Selector("mediaCharacteristic")] public AVMediaCharacteristic MediaCharacteristic { get; }
-    [Selector("displayNameForLocaleIdentifier:")] public NSString DisplayNameForLocaleIdentifier(NSString localeIdentifier);
+    [Selector("mediaCharacteristic")]
+    public AVMediaCharacteristic MediaCharacteristic { get; }
+    [Selector("displayNameForLocaleIdentifier:")]
+    public NSString DisplayNameForLocaleIdentifier(NSString localeIdentifier);
 }
 
 #endif

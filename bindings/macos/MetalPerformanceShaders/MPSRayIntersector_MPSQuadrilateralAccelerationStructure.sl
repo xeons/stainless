@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.0.
 public extern objc class MPSQuadrilateralAccelerationStructure : MPSPolygonAccelerationStructure
 {
-    [Selector("quadrilateralCount", "setQuadrilateralCount:")] public NSUInteger QuadrilateralCount { get; set; }
+    [Selector("quadrilateralCount", "setQuadrilateralCount:")]
+    public NSUInteger QuadrilateralCount { get; set; }
 }
 
 #endif

@@ -41,19 +41,32 @@ public objc closure void MLModelLoadModelAssetConfigurationCompletionHandlerHand
 
 public extern objc class MLModel : NSObject
 {
-    [Selector("modelDescription")] public MLModelDescription ModelDescription { get; }
-    [Selector("configuration")] public MLModelConfiguration Configuration { get; }
-    [Selector("modelWithContentsOfURL:error:")] public static Self? ModelWithContentsOfURLError(NSURL url, out NSError? error);
-    [Selector("modelWithContentsOfURL:configuration:error:")] public static Self? ModelWithContentsOfURLConfigurationError(NSURL url, MLModelConfiguration configuration, out NSError? error);
-    [Selector("loadContentsOfURL:configuration:completionHandler:")] public static void LoadContentsOfURLConfigurationCompletionHandler(NSURL url, MLModelConfiguration configuration, MLModelLoadContentsOfURLConfigurationCompletionHandlerHandlerBlock handler);
-    [Selector("predictionFromFeatures:error:")] public MLFeatureProvider? PredictionFromFeaturesError(MLFeatureProvider input, out NSError? error);
-    [Selector("predictionFromFeatures:options:error:")] public MLFeatureProvider? PredictionFromFeaturesOptionsError(MLFeatureProvider input, MLPredictionOptions options, out NSError? error);
-    [Selector("predictionFromFeatures:completionHandler:")] public void PredictionFromFeaturesCompletionHandler(MLFeatureProvider input, MLModelPredictionFromFeaturesCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("predictionFromFeatures:options:completionHandler:")] public void PredictionFromFeaturesOptionsCompletionHandler(MLFeatureProvider input, MLPredictionOptions options, MLModelPredictionFromFeaturesOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("predictionsFromBatch:error:")] public MLBatchProvider? PredictionsFromBatchError(MLBatchProvider inputBatch, out NSError? error);
-    [Selector("predictionsFromBatch:options:error:")] public MLBatchProvider? PredictionsFromBatchOptionsError(MLBatchProvider inputBatch, MLPredictionOptions options, out NSError? error);
-    [Selector("parameterValueForKey:error:")] public AnyObject? ParameterValueForKeyError(MLParameterKey key, out NSError? error);
-    [Selector("loadModelAsset:configuration:completionHandler:")] public static void LoadModelAssetConfigurationCompletionHandler(MLModelAsset asset, MLModelConfiguration configuration, MLModelLoadModelAssetConfigurationCompletionHandlerHandlerBlock handler);
+    [Selector("modelDescription")]
+    public MLModelDescription ModelDescription { get; }
+    [Selector("configuration")]
+    public MLModelConfiguration Configuration { get; }
+    [Selector("modelWithContentsOfURL:error:")]
+    public static Self? ModelWithContentsOfURLError(NSURL url, out NSError? error);
+    [Selector("modelWithContentsOfURL:configuration:error:")]
+    public static Self? ModelWithContentsOfURLConfigurationError(NSURL url, MLModelConfiguration configuration, out NSError? error);
+    [Selector("loadContentsOfURL:configuration:completionHandler:")]
+    public static void LoadContentsOfURLConfigurationCompletionHandler(NSURL url, MLModelConfiguration configuration, MLModelLoadContentsOfURLConfigurationCompletionHandlerHandlerBlock handler);
+    [Selector("predictionFromFeatures:error:")]
+    public MLFeatureProvider? PredictionFromFeaturesError(MLFeatureProvider input, out NSError? error);
+    [Selector("predictionFromFeatures:options:error:")]
+    public MLFeatureProvider? PredictionFromFeaturesOptionsError(MLFeatureProvider input, MLPredictionOptions options, out NSError? error);
+    [Selector("predictionFromFeatures:completionHandler:")]
+    public void PredictionFromFeaturesCompletionHandler(MLFeatureProvider input, MLModelPredictionFromFeaturesCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("predictionFromFeatures:options:completionHandler:")]
+    public void PredictionFromFeaturesOptionsCompletionHandler(MLFeatureProvider input, MLPredictionOptions options, MLModelPredictionFromFeaturesOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("predictionsFromBatch:error:")]
+    public MLBatchProvider? PredictionsFromBatchError(MLBatchProvider inputBatch, out NSError? error);
+    [Selector("predictionsFromBatch:options:error:")]
+    public MLBatchProvider? PredictionsFromBatchOptionsError(MLBatchProvider inputBatch, MLPredictionOptions options, out NSError? error);
+    [Selector("parameterValueForKey:error:")]
+    public AnyObject? ParameterValueForKeyError(MLParameterKey key, out NSError? error);
+    [Selector("loadModelAsset:configuration:completionHandler:")]
+    public static void LoadModelAssetConfigurationCompletionHandler(MLModelAsset asset, MLModelConfiguration configuration, MLModelLoadModelAssetConfigurationCompletionHandlerHandlerBlock handler);
 }
 
 #endif

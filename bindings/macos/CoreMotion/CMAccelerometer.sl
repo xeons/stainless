@@ -38,7 +38,8 @@ public struct CMAcceleration
 
 public extern objc class CMAccelerometerData : CMLogItem
 {
-    [Selector("acceleration")] public CMAcceleration Acceleration { get; }
+    [Selector("acceleration")]
+    public CMAcceleration Acceleration { get; }
 }
 
 #endif

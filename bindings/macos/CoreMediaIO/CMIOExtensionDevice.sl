@@ -33,35 +33,56 @@ import Standard.ObjC;
 
 public extern objc class CMIOExtensionDeviceProperties : NSObject
 {
-    [Selector("model", "setModel:")] public NSString? Model { get; set; }
-    [Selector("suspended", "setSuspended:")] public NSNumber? Suspended { get; set; }
-    [Selector("transportType", "setTransportType:")] public NSNumber? TransportType { get; set; }
-    [Selector("linkedCoreAudioDeviceUID", "setLinkedCoreAudioDeviceUID:")] public NSString? LinkedCoreAudioDeviceUID { get; set; }
-    [Selector("propertiesDictionary", "setPropertiesDictionary:")] public NSDictionary PropertiesDictionary { get; set; }
-    [Selector("devicePropertiesWithDictionary:")] public static Self DevicePropertiesWithDictionary(NSDictionary propertiesDictionary);
-    [Selector("initWithDictionary:")] public Self InitWithDictionary(NSDictionary propertiesDictionary);
-    [Selector("setPropertyState:forProperty:")] public void SetPropertyStateForProperty(CMIOExtensionPropertyState? propertyState, CMIOExtensionProperty property);
+    [Selector("model", "setModel:")]
+    public NSString? Model { get; set; }
+    [Selector("suspended", "setSuspended:")]
+    public NSNumber? Suspended { get; set; }
+    [Selector("transportType", "setTransportType:")]
+    public NSNumber? TransportType { get; set; }
+    [Selector("linkedCoreAudioDeviceUID", "setLinkedCoreAudioDeviceUID:")]
+    public NSString? LinkedCoreAudioDeviceUID { get; set; }
+    [Selector("propertiesDictionary", "setPropertiesDictionary:")]
+    public NSDictionary PropertiesDictionary { get; set; }
+    [Selector("devicePropertiesWithDictionary:")]
+    public static Self DevicePropertiesWithDictionary(NSDictionary propertiesDictionary);
+    [Selector("initWithDictionary:")]
+    public Self InitWithDictionary(NSDictionary propertiesDictionary);
+    [Selector("setPropertyState:forProperty:")]
+    public void SetPropertyStateForProperty(CMIOExtensionPropertyState? propertyState, CMIOExtensionProperty property);
 }
 
 public objc interface CMIOExtensionDeviceSource : NSObjectProtocol
 {
-    [Selector("availableProperties")] NSSet AvailableProperties { get; }
-    [Selector("devicePropertiesForProperties:error:")] CMIOExtensionDeviceProperties? DevicePropertiesForPropertiesError(NSSet properties, out NSError? outError);
-    [Selector("setDeviceProperties:error:")] bool SetDevicePropertiesError(CMIOExtensionDeviceProperties deviceProperties, out NSError? outError);
+    [Selector("availableProperties")]
+    NSSet AvailableProperties { get; }
+    [Selector("devicePropertiesForProperties:error:")]
+    CMIOExtensionDeviceProperties? DevicePropertiesForPropertiesError(NSSet properties, out NSError? outError);
+    [Selector("setDeviceProperties:error:")]
+    bool SetDevicePropertiesError(CMIOExtensionDeviceProperties deviceProperties, out NSError? outError);
 }
 
 public extern objc class CMIOExtensionDevice : NSObject
 {
-    [Selector("localizedName")] public NSString LocalizedName { get; }
-    [Selector("deviceID")] public NSUUID DeviceID { get; }
-    [Selector("legacyDeviceID")] public NSString LegacyDeviceID { get; }
-    [Selector("source")] public CMIOExtensionDeviceSource? Source { get; }
-    [Selector("streams")] public NSArray Streams { get; }
-    [Selector("deviceWithLocalizedName:deviceID:legacyDeviceID:source:")] public static Self DeviceWithLocalizedNameDeviceIDLegacyDeviceIDSource(NSString localizedName, NSUUID deviceID, NSString? legacyDeviceID, CMIOExtensionDeviceSource source);
-    [Selector("initWithLocalizedName:deviceID:legacyDeviceID:source:")] public Self InitWithLocalizedNameDeviceIDLegacyDeviceIDSource(NSString localizedName, NSUUID deviceID, NSString? legacyDeviceID, CMIOExtensionDeviceSource source);
-    [Selector("addStream:error:")] public bool AddStreamError(CMIOExtensionStream stream, out NSError? outError);
-    [Selector("removeStream:error:")] public bool RemoveStreamError(CMIOExtensionStream stream, out NSError? outError);
-    [Selector("notifyPropertiesChanged:")] public void NotifyPropertiesChanged(NSDictionary propertyStates);
+    [Selector("localizedName")]
+    public NSString LocalizedName { get; }
+    [Selector("deviceID")]
+    public NSUUID DeviceID { get; }
+    [Selector("legacyDeviceID")]
+    public NSString LegacyDeviceID { get; }
+    [Selector("source")]
+    public CMIOExtensionDeviceSource? Source { get; }
+    [Selector("streams")]
+    public NSArray Streams { get; }
+    [Selector("deviceWithLocalizedName:deviceID:legacyDeviceID:source:")]
+    public static Self DeviceWithLocalizedNameDeviceIDLegacyDeviceIDSource(NSString localizedName, NSUUID deviceID, NSString? legacyDeviceID, CMIOExtensionDeviceSource source);
+    [Selector("initWithLocalizedName:deviceID:legacyDeviceID:source:")]
+    public Self InitWithLocalizedNameDeviceIDLegacyDeviceIDSource(NSString localizedName, NSUUID deviceID, NSString? legacyDeviceID, CMIOExtensionDeviceSource source);
+    [Selector("addStream:error:")]
+    public bool AddStreamError(CMIOExtensionStream stream, out NSError? outError);
+    [Selector("removeStream:error:")]
+    public bool RemoveStreamError(CMIOExtensionStream stream, out NSError? outError);
+    [Selector("notifyPropertiesChanged:")]
+    public void NotifyPropertiesChanged(NSDictionary propertyStates);
 }
 
 #endif

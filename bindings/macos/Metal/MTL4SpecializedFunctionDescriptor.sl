@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTL4SpecializedFunctionDescriptor : MTL4FunctionDescriptor
 {
-    [Selector("functionDescriptor", "setFunctionDescriptor:")] public MTL4FunctionDescriptor? FunctionDescriptor { get; set; }
-    [Selector("specializedName", "setSpecializedName:")] public NSString? SpecializedName { get; set; }
-    [Selector("constantValues", "setConstantValues:")] public MTLFunctionConstantValues? ConstantValues { get; set; }
+    [Selector("functionDescriptor", "setFunctionDescriptor:")]
+    public MTL4FunctionDescriptor? FunctionDescriptor { get; set; }
+    [Selector("specializedName", "setSpecializedName:")]
+    public NSString? SpecializedName { get; set; }
+    [Selector("constantValues", "setConstantValues:")]
+    public MTLFunctionConstantValues? ConstantValues { get; set; }
 }
 
 #endif

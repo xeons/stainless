@@ -32,8 +32,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCYOLOLossLayer : MLCLossLayer
 {
-    [Selector("yoloLossDescriptor")] public MLCYOLOLossDescriptor YoloLossDescriptor { get; }
-    [Selector("layerWithDescriptor:")] public static Self LayerWithDescriptor(MLCYOLOLossDescriptor lossDescriptor);
+    [Selector("yoloLossDescriptor")]
+    public MLCYOLOLossDescriptor YoloLossDescriptor { get; }
+    [Selector("layerWithDescriptor:")]
+    public static Self LayerWithDescriptor(MLCYOLOLossDescriptor lossDescriptor);
 }
 
 #endif

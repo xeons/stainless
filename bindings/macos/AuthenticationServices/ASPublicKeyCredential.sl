@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public objc interface ASPublicKeyCredential : ASAuthorizationCredential
 {
-    [Selector("rawClientDataJSON")] NSData RawClientDataJSON { get; }
-    [Selector("credentialID")] NSData CredentialID { get; }
+    [Selector("rawClientDataJSON")]
+    NSData RawClientDataJSON { get; }
+    [Selector("credentialID")]
+    NSData CredentialID { get; }
 }
 
 #endif

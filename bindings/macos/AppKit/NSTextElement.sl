@@ -33,20 +33,30 @@ import Standard.ObjC;
 
 public extern objc class NSTextElement : NSObject
 {
-    [Selector("textContentManager", "setTextContentManager:")] public NSTextContentManager? TextContentManager { get; set; }
-    [Selector("elementRange", "setElementRange:")] public NSTextRange? ElementRange { get; set; }
-    [Selector("childElements")] public NSArray? ChildElements { get; }
-    [Selector("parentElement")] public NSTextElement? ParentElement { get; }
-    [Selector("isRepresentedElement")] public bool IsRepresentedElement { get; }
-    [Selector("initWithTextContentManager:")] public Self InitWithTextContentManager(NSTextContentManager? textContentManager);
+    [Selector("textContentManager", "setTextContentManager:")]
+    public NSTextContentManager? TextContentManager { get; set; }
+    [Selector("elementRange", "setElementRange:")]
+    public NSTextRange? ElementRange { get; set; }
+    [Selector("childElements")]
+    public NSArray? ChildElements { get; }
+    [Selector("parentElement")]
+    public NSTextElement? ParentElement { get; }
+    [Selector("isRepresentedElement")]
+    public bool IsRepresentedElement { get; }
+    [Selector("initWithTextContentManager:")]
+    public Self InitWithTextContentManager(NSTextContentManager? textContentManager);
 }
 
 public extern objc class NSTextParagraph : NSTextElement
 {
-    [Selector("attributedString")] public NSAttributedString AttributedString { get; }
-    [Selector("paragraphContentRange")] public NSTextRange? ParagraphContentRange { get; }
-    [Selector("paragraphSeparatorRange")] public NSTextRange? ParagraphSeparatorRange { get; }
-    [Selector("initWithAttributedString:")] public Self InitWithAttributedString(NSAttributedString? attributedString);
+    [Selector("attributedString")]
+    public NSAttributedString AttributedString { get; }
+    [Selector("paragraphContentRange")]
+    public NSTextRange? ParagraphContentRange { get; }
+    [Selector("paragraphSeparatorRange")]
+    public NSTextRange? ParagraphSeparatorRange { get; }
+    [Selector("initWithAttributedString:")]
+    public Self InitWithAttributedString(NSAttributedString? attributedString);
 }
 
 #endif

@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class NSProtocolChecker : NSProxy
 {
-    [Selector("target")] public NSObject? Target { get; }
+    [Selector("target")]
+    public NSObject? Target { get; }
 }
 
 /// NSProtocolCheckerCreation, a category of NSProtocolChecker.

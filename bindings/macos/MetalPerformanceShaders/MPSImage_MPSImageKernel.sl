@@ -35,32 +35,54 @@ public objc closure MTLTexture? MPSCopyAllocator(MPSKernel arg0, MTLCommandBuffe
 
 public extern objc class MPSUnaryImageKernel : MPSKernel
 {
-    [Selector("offset", "setOffset:")] public MPSOffset Offset { get; set; }
-    [Selector("clipRect", "setClipRect:")] public MTLRegion ClipRect { get; set; }
-    [Selector("edgeMode", "setEdgeMode:")] public MPSImageEdgeMode EdgeMode { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:inPlaceTexture:fallbackCopyAllocator:")] public bool EncodeToCommandBufferInPlaceTextureFallbackCopyAllocator(MTLCommandBuffer commandBuffer, void** texture, MPSCopyAllocator? copyAllocator);
-    [Selector("encodeToCommandBuffer:sourceTexture:destinationTexture:")] public void EncodeToCommandBufferSourceTextureDestinationTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture destinationTexture);
-    [Selector("encodeToCommandBuffer:sourceImage:destinationImage:")] public void EncodeToCommandBufferSourceImageDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, MPSImage destinationImage);
-    [Selector("sourceRegionForDestinationSize:")] public MPSRegion SourceRegionForDestinationSize(MTLSize destinationSize);
+    [Selector("offset", "setOffset:")]
+    public MPSOffset Offset { get; set; }
+    [Selector("clipRect", "setClipRect:")]
+    public MTLRegion ClipRect { get; set; }
+    [Selector("edgeMode", "setEdgeMode:")]
+    public MPSImageEdgeMode EdgeMode { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:inPlaceTexture:fallbackCopyAllocator:")]
+    public bool EncodeToCommandBufferInPlaceTextureFallbackCopyAllocator(MTLCommandBuffer commandBuffer, void** texture, MPSCopyAllocator? copyAllocator);
+    [Selector("encodeToCommandBuffer:sourceTexture:destinationTexture:")]
+    public void EncodeToCommandBufferSourceTextureDestinationTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture destinationTexture);
+    [Selector("encodeToCommandBuffer:sourceImage:destinationImage:")]
+    public void EncodeToCommandBufferSourceImageDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, MPSImage destinationImage);
+    [Selector("sourceRegionForDestinationSize:")]
+    public MPSRegion SourceRegionForDestinationSize(MTLSize destinationSize);
 }
 
 public extern objc class MPSBinaryImageKernel : MPSKernel
 {
-    [Selector("primaryOffset", "setPrimaryOffset:")] public MPSOffset PrimaryOffset { get; set; }
-    [Selector("secondaryOffset", "setSecondaryOffset:")] public MPSOffset SecondaryOffset { get; set; }
-    [Selector("primaryEdgeMode", "setPrimaryEdgeMode:")] public MPSImageEdgeMode PrimaryEdgeMode { get; set; }
-    [Selector("secondaryEdgeMode", "setSecondaryEdgeMode:")] public MPSImageEdgeMode SecondaryEdgeMode { get; set; }
-    [Selector("clipRect", "setClipRect:")] public MTLRegion ClipRect { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:primaryTexture:inPlaceSecondaryTexture:fallbackCopyAllocator:")] public bool EncodeToCommandBufferPrimaryTextureInPlaceSecondaryTextureFallbackCopyAllocator(MTLCommandBuffer commandBuffer, MTLTexture primaryTexture, void** inPlaceSecondaryTexture, MPSCopyAllocator? copyAllocator);
-    [Selector("encodeToCommandBuffer:inPlacePrimaryTexture:secondaryTexture:fallbackCopyAllocator:")] public bool EncodeToCommandBufferInPlacePrimaryTextureSecondaryTextureFallbackCopyAllocator(MTLCommandBuffer commandBuffer, void** inPlacePrimaryTexture, MTLTexture secondaryTexture, MPSCopyAllocator? copyAllocator);
-    [Selector("encodeToCommandBuffer:primaryTexture:secondaryTexture:destinationTexture:")] public void EncodeToCommandBufferPrimaryTextureSecondaryTextureDestinationTexture(MTLCommandBuffer commandBuffer, MTLTexture primaryTexture, MTLTexture secondaryTexture, MTLTexture destinationTexture);
-    [Selector("encodeToCommandBuffer:primaryImage:secondaryImage:destinationImage:")] public void EncodeToCommandBufferPrimaryImageSecondaryImageDestinationImage(MTLCommandBuffer commandBuffer, MPSImage primaryImage, MPSImage secondaryImage, MPSImage destinationImage);
-    [Selector("primarySourceRegionForDestinationSize:")] public MPSRegion PrimarySourceRegionForDestinationSize(MTLSize destinationSize);
-    [Selector("secondarySourceRegionForDestinationSize:")] public MPSRegion SecondarySourceRegionForDestinationSize(MTLSize destinationSize);
+    [Selector("primaryOffset", "setPrimaryOffset:")]
+    public MPSOffset PrimaryOffset { get; set; }
+    [Selector("secondaryOffset", "setSecondaryOffset:")]
+    public MPSOffset SecondaryOffset { get; set; }
+    [Selector("primaryEdgeMode", "setPrimaryEdgeMode:")]
+    public MPSImageEdgeMode PrimaryEdgeMode { get; set; }
+    [Selector("secondaryEdgeMode", "setSecondaryEdgeMode:")]
+    public MPSImageEdgeMode SecondaryEdgeMode { get; set; }
+    [Selector("clipRect", "setClipRect:")]
+    public MTLRegion ClipRect { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:primaryTexture:inPlaceSecondaryTexture:fallbackCopyAllocator:")]
+    public bool EncodeToCommandBufferPrimaryTextureInPlaceSecondaryTextureFallbackCopyAllocator(MTLCommandBuffer commandBuffer, MTLTexture primaryTexture, void** inPlaceSecondaryTexture, MPSCopyAllocator? copyAllocator);
+    [Selector("encodeToCommandBuffer:inPlacePrimaryTexture:secondaryTexture:fallbackCopyAllocator:")]
+    public bool EncodeToCommandBufferInPlacePrimaryTextureSecondaryTextureFallbackCopyAllocator(MTLCommandBuffer commandBuffer, void** inPlacePrimaryTexture, MTLTexture secondaryTexture, MPSCopyAllocator? copyAllocator);
+    [Selector("encodeToCommandBuffer:primaryTexture:secondaryTexture:destinationTexture:")]
+    public void EncodeToCommandBufferPrimaryTextureSecondaryTextureDestinationTexture(MTLCommandBuffer commandBuffer, MTLTexture primaryTexture, MTLTexture secondaryTexture, MTLTexture destinationTexture);
+    [Selector("encodeToCommandBuffer:primaryImage:secondaryImage:destinationImage:")]
+    public void EncodeToCommandBufferPrimaryImageSecondaryImageDestinationImage(MTLCommandBuffer commandBuffer, MPSImage primaryImage, MPSImage secondaryImage, MPSImage destinationImage);
+    [Selector("primarySourceRegionForDestinationSize:")]
+    public MPSRegion PrimarySourceRegionForDestinationSize(MTLSize destinationSize);
+    [Selector("secondarySourceRegionForDestinationSize:")]
+    public MPSRegion SecondarySourceRegionForDestinationSize(MTLSize destinationSize);
 }
 
 #endif

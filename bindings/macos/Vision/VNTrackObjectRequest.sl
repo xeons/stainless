@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class VNTrackObjectRequest : VNTrackingRequest
 {
-    [Selector("initWithDetectedObjectObservation:")] public Self InitWithDetectedObjectObservation(VNDetectedObjectObservation observation);
-    [Selector("initWithDetectedObjectObservation:completionHandler:")] public Self InitWithDetectedObjectObservationCompletionHandler(VNDetectedObjectObservation observation, VNRequestCompletionHandler? completionHandler);
+    [Selector("initWithDetectedObjectObservation:")]
+    public Self InitWithDetectedObjectObservation(VNDetectedObjectObservation observation);
+    [Selector("initWithDetectedObjectObservation:completionHandler:")]
+    public Self InitWithDetectedObjectObservationCompletionHandler(VNDetectedObjectObservation observation, VNRequestCompletionHandler? completionHandler);
 }
 
 #endif

@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class VNDetectAnimalBodyPoseRequest : VNImageBasedRequest
 {
-    [Selector("results")] public NSArray? Results { get; }
-    [Selector("supportedJointNamesAndReturnError:")] public NSArray? SupportedJointNamesAndReturnError(out NSError? error);
-    [Selector("supportedJointsGroupNamesAndReturnError:")] public NSArray? SupportedJointsGroupNamesAndReturnError(out NSError? error);
+    [Selector("results")]
+    public NSArray? Results { get; }
+    [Selector("supportedJointNamesAndReturnError:")]
+    public NSArray? SupportedJointNamesAndReturnError(out NSError? error);
+    [Selector("supportedJointsGroupNamesAndReturnError:")]
+    public NSArray? SupportedJointsGroupNamesAndReturnError(out NSError? error);
 }
 
 #endif

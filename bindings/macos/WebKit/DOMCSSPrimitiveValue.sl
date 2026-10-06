@@ -65,23 +65,33 @@ public const int DOM_CSS_VMAX = 29;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMCSSPrimitiveValue : DOMCSSValue
 {
-    [Selector("primitiveType")] public ushort PrimitiveType { get; }
-    [Selector("setFloatValue:floatValue:")] public void SetFloatValueFloatValue(ushort unitType, float floatValue);
-    [Selector("getFloatValue:")] public float GetFloatValue(ushort unitType);
-    [Selector("setStringValue:stringValue:")] public void SetStringValueStringValue(ushort stringType, NSString? stringValue);
-    [Selector("getStringValue")] public NSString? GetStringValue();
-    [Selector("getCounterValue")] public DOMCounter? GetCounterValue();
-    [Selector("getRectValue")] public DOMRect? GetRectValue();
-    [Selector("getRGBColorValue")] public DOMRGBColor? GetRGBColorValue();
+    [Selector("primitiveType")]
+    public ushort PrimitiveType { get; }
+    [Selector("setFloatValue:floatValue:")]
+    public void SetFloatValueFloatValue(ushort unitType, float floatValue);
+    [Selector("getFloatValue:")]
+    public float GetFloatValue(ushort unitType);
+    [Selector("setStringValue:stringValue:")]
+    public void SetStringValueStringValue(ushort stringType, NSString? stringValue);
+    [Selector("getStringValue")]
+    public NSString? GetStringValue();
+    [Selector("getCounterValue")]
+    public DOMCounter? GetCounterValue();
+    [Selector("getRectValue")]
+    public DOMRect? GetRectValue();
+    [Selector("getRGBColorValue")]
+    public DOMRGBColor? GetRGBColorValue();
 }
 
 /// DOMCSSPrimitiveValueDeprecated, a category of DOMCSSPrimitiveValue.
 public extern objc class DOMCSSPrimitiveValue
 {
     /// Deprecated in macOS 10.5.
-    [Selector("setFloatValue::")] public void SetFloatValue(ushort unitType, float floatValue);
+    [Selector("setFloatValue::")]
+    public void SetFloatValue(ushort unitType, float floatValue);
     /// Deprecated in macOS 10.5.
-    [Selector("setStringValue::")] public void SetStringValue(ushort stringType, NSString? stringValue);
+    [Selector("setStringValue::")]
+    public void SetStringValue(ushort stringType, NSString? stringValue);
 }
 
 #endif

@@ -42,42 +42,66 @@ public enum MPSMatrixRandomDistribution : ulong
 
 public extern objc class MPSMatrixRandomDistributionDescriptor : NSObject, NSCopying
 {
-    [Selector("distributionType", "setDistributionType:")] public MPSMatrixRandomDistribution DistributionType { get; set; }
-    [Selector("minimum", "setMinimum:")] public float Minimum { get; set; }
-    [Selector("maximum", "setMaximum:")] public float Maximum { get; set; }
-    [Selector("mean", "setMean:")] public float Mean { get; set; }
-    [Selector("standardDeviation", "setStandardDeviation:")] public float StandardDeviation { get; set; }
-    [Selector("uniformDistributionDescriptorWithMinimum:maximum:")] public static MPSMatrixRandomDistributionDescriptor UniformDistributionDescriptorWithMinimumMaximum(float minimum, float maximum);
-    [Selector("normalDistributionDescriptorWithMean:standardDeviation:")] public static MPSMatrixRandomDistributionDescriptor NormalDistributionDescriptorWithMeanStandardDeviation(float mean, float standardDeviation);
-    [Selector("normalDistributionDescriptorWithMean:standardDeviation:minimum:maximum:")] public static MPSMatrixRandomDistributionDescriptor NormalDistributionDescriptorWithMeanStandardDeviationMinimumMaximum(float mean, float standardDeviation, float minimum, float maximum);
-    [Selector("defaultDistributionDescriptor")] public static MPSMatrixRandomDistributionDescriptor DefaultDistributionDescriptor();
+    [Selector("distributionType", "setDistributionType:")]
+    public MPSMatrixRandomDistribution DistributionType { get; set; }
+    [Selector("minimum", "setMinimum:")]
+    public float Minimum { get; set; }
+    [Selector("maximum", "setMaximum:")]
+    public float Maximum { get; set; }
+    [Selector("mean", "setMean:")]
+    public float Mean { get; set; }
+    [Selector("standardDeviation", "setStandardDeviation:")]
+    public float StandardDeviation { get; set; }
+    [Selector("uniformDistributionDescriptorWithMinimum:maximum:")]
+    public static MPSMatrixRandomDistributionDescriptor UniformDistributionDescriptorWithMinimumMaximum(float minimum, float maximum);
+    [Selector("normalDistributionDescriptorWithMean:standardDeviation:")]
+    public static MPSMatrixRandomDistributionDescriptor NormalDistributionDescriptorWithMeanStandardDeviation(float mean, float standardDeviation);
+    [Selector("normalDistributionDescriptorWithMean:standardDeviation:minimum:maximum:")]
+    public static MPSMatrixRandomDistributionDescriptor NormalDistributionDescriptorWithMeanStandardDeviationMinimumMaximum(float mean, float standardDeviation, float minimum, float maximum);
+    [Selector("defaultDistributionDescriptor")]
+    public static MPSMatrixRandomDistributionDescriptor DefaultDistributionDescriptor();
 }
 
 public extern objc class MPSMatrixRandom : MPSKernel
 {
-    [Selector("destinationDataType")] public MPSDataType DestinationDataType { get; }
-    [Selector("distributionType")] public MPSMatrixRandomDistribution DistributionType { get; }
-    [Selector("batchStart", "setBatchStart:")] public NSUInteger BatchStart { get; set; }
-    [Selector("batchSize", "setBatchSize:")] public NSUInteger BatchSize { get; set; }
-    [Selector("encodeToCommandBuffer:destinationVector:")] public void EncodeToCommandBufferDestinationVector(MTLCommandBuffer commandBuffer, MPSVector destinationVector);
-    [Selector("encodeToCommandBuffer:destinationMatrix:")] public void EncodeToCommandBufferDestinationMatrix(MTLCommandBuffer commandBuffer, MPSMatrix destinationMatrix);
+    [Selector("destinationDataType")]
+    public MPSDataType DestinationDataType { get; }
+    [Selector("distributionType")]
+    public MPSMatrixRandomDistribution DistributionType { get; }
+    [Selector("batchStart", "setBatchStart:")]
+    public NSUInteger BatchStart { get; set; }
+    [Selector("batchSize", "setBatchSize:")]
+    public NSUInteger BatchSize { get; set; }
+    [Selector("encodeToCommandBuffer:destinationVector:")]
+    public void EncodeToCommandBufferDestinationVector(MTLCommandBuffer commandBuffer, MPSVector destinationVector);
+    [Selector("encodeToCommandBuffer:destinationMatrix:")]
+    public void EncodeToCommandBufferDestinationMatrix(MTLCommandBuffer commandBuffer, MPSMatrix destinationMatrix);
 }
 
 public extern objc class MPSMatrixRandomMTGP32 : MPSMatrixRandom
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithDevice:destinationDataType:seed:distributionDescriptor:")] public Self InitWithDeviceDestinationDataTypeSeedDistributionDescriptor(MTLDevice device, MPSDataType destinationDataType, NSUInteger seed, MPSMatrixRandomDistributionDescriptor distributionDescriptor);
-    [Selector("synchronizeStateOnCommandBuffer:")] public void SynchronizeStateOnCommandBuffer(MTLCommandBuffer commandBuffer);
-    [Selector("initWithDevice:destinationDataType:seed:")] public Self InitWithDeviceDestinationDataTypeSeed(MTLDevice device, MPSDataType destinationDataType, NSUInteger seed);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:destinationDataType:seed:distributionDescriptor:")]
+    public Self InitWithDeviceDestinationDataTypeSeedDistributionDescriptor(MTLDevice device, MPSDataType destinationDataType, NSUInteger seed, MPSMatrixRandomDistributionDescriptor distributionDescriptor);
+    [Selector("synchronizeStateOnCommandBuffer:")]
+    public void SynchronizeStateOnCommandBuffer(MTLCommandBuffer commandBuffer);
+    [Selector("initWithDevice:destinationDataType:seed:")]
+    public Self InitWithDeviceDestinationDataTypeSeed(MTLDevice device, MPSDataType destinationDataType, NSUInteger seed);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSMatrixRandomPhilox : MPSMatrixRandom
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithDevice:destinationDataType:seed:distributionDescriptor:")] public Self InitWithDeviceDestinationDataTypeSeedDistributionDescriptor(MTLDevice device, MPSDataType destinationDataType, NSUInteger seed, MPSMatrixRandomDistributionDescriptor distributionDescriptor);
-    [Selector("initWithDevice:destinationDataType:seed:")] public Self InitWithDeviceDestinationDataTypeSeed(MTLDevice device, MPSDataType destinationDataType, NSUInteger seed);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:destinationDataType:seed:distributionDescriptor:")]
+    public Self InitWithDeviceDestinationDataTypeSeedDistributionDescriptor(MTLDevice device, MPSDataType destinationDataType, NSUInteger seed, MPSMatrixRandomDistributionDescriptor distributionDescriptor);
+    [Selector("initWithDevice:destinationDataType:seed:")]
+    public Self InitWithDeviceDestinationDataTypeSeed(MTLDevice device, MPSDataType destinationDataType, NSUInteger seed);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 #endif

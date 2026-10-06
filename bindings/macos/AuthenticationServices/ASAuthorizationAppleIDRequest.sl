@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationAppleIDRequest : ASAuthorizationOpenIDRequest
 {
-    [Selector("user", "setUser:")] public NSString? User { get; set; }
+    [Selector("user", "setUser:")]
+    public NSString? User { get; set; }
 }
 
 #endif

@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class INShortcut : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("intent")] public INIntent? Intent { get; }
-    [Selector("userActivity")] public NSUserActivity? UserActivity { get; }
-    [Selector("initWithIntent:")] public Self? InitWithIntent(INIntent intent);
-    [Selector("initWithUserActivity:")] public Self InitWithUserActivity(NSUserActivity userActivity);
+    [Selector("intent")]
+    public INIntent? Intent { get; }
+    [Selector("userActivity")]
+    public NSUserActivity? UserActivity { get; }
+    [Selector("initWithIntent:")]
+    public Self? InitWithIntent(INIntent intent);
+    [Selector("initWithUserActivity:")]
+    public Self InitWithUserActivity(NSUserActivity userActivity);
 }
 
 #endif

@@ -47,99 +47,164 @@ public enum MPSRNNBidirectionalCombineMode : ulong
 
 public extern objc class MPSRNNDescriptor : NSObject
 {
-    [Selector("inputFeatureChannels", "setInputFeatureChannels:")] public NSUInteger InputFeatureChannels { get; set; }
-    [Selector("outputFeatureChannels", "setOutputFeatureChannels:")] public NSUInteger OutputFeatureChannels { get; set; }
-    [Selector("useLayerInputUnitTransformMode", "setUseLayerInputUnitTransformMode:")] public bool UseLayerInputUnitTransformMode { get; set; }
-    [Selector("useFloat32Weights", "setUseFloat32Weights:")] public bool UseFloat32Weights { get; set; }
-    [Selector("layerSequenceDirection", "setLayerSequenceDirection:")] public MPSRNNSequenceDirection LayerSequenceDirection { get; set; }
+    [Selector("inputFeatureChannels", "setInputFeatureChannels:")]
+    public NSUInteger InputFeatureChannels { get; set; }
+    [Selector("outputFeatureChannels", "setOutputFeatureChannels:")]
+    public NSUInteger OutputFeatureChannels { get; set; }
+    [Selector("useLayerInputUnitTransformMode", "setUseLayerInputUnitTransformMode:")]
+    public bool UseLayerInputUnitTransformMode { get; set; }
+    [Selector("useFloat32Weights", "setUseFloat32Weights:")]
+    public bool UseFloat32Weights { get; set; }
+    [Selector("layerSequenceDirection", "setLayerSequenceDirection:")]
+    public MPSRNNSequenceDirection LayerSequenceDirection { get; set; }
 }
 
 public extern objc class MPSRNNSingleGateDescriptor : MPSRNNDescriptor
 {
-    [Selector("inputWeights", "setInputWeights:")] public MPSCNNConvolutionDataSource? InputWeights { get; set; }
-    [Selector("recurrentWeights", "setRecurrentWeights:")] public MPSCNNConvolutionDataSource? RecurrentWeights { get; set; }
-    [Selector("createRNNSingleGateDescriptorWithInputFeatureChannels:outputFeatureChannels:")] public static Self CreateRNNSingleGateDescriptorWithInputFeatureChannelsOutputFeatureChannels(NSUInteger inputFeatureChannels, NSUInteger outputFeatureChannels);
+    [Selector("inputWeights", "setInputWeights:")]
+    public MPSCNNConvolutionDataSource? InputWeights { get; set; }
+    [Selector("recurrentWeights", "setRecurrentWeights:")]
+    public MPSCNNConvolutionDataSource? RecurrentWeights { get; set; }
+    [Selector("createRNNSingleGateDescriptorWithInputFeatureChannels:outputFeatureChannels:")]
+    public static Self CreateRNNSingleGateDescriptorWithInputFeatureChannelsOutputFeatureChannels(NSUInteger inputFeatureChannels, NSUInteger outputFeatureChannels);
 }
 
 public extern objc class MPSGRUDescriptor : MPSRNNDescriptor
 {
-    [Selector("inputGateInputWeights", "setInputGateInputWeights:")] public MPSCNNConvolutionDataSource? InputGateInputWeights { get; set; }
-    [Selector("inputGateRecurrentWeights", "setInputGateRecurrentWeights:")] public MPSCNNConvolutionDataSource? InputGateRecurrentWeights { get; set; }
-    [Selector("recurrentGateInputWeights", "setRecurrentGateInputWeights:")] public MPSCNNConvolutionDataSource? RecurrentGateInputWeights { get; set; }
-    [Selector("recurrentGateRecurrentWeights", "setRecurrentGateRecurrentWeights:")] public MPSCNNConvolutionDataSource? RecurrentGateRecurrentWeights { get; set; }
-    [Selector("outputGateInputWeights", "setOutputGateInputWeights:")] public MPSCNNConvolutionDataSource? OutputGateInputWeights { get; set; }
-    [Selector("outputGateRecurrentWeights", "setOutputGateRecurrentWeights:")] public MPSCNNConvolutionDataSource? OutputGateRecurrentWeights { get; set; }
-    [Selector("outputGateInputGateWeights", "setOutputGateInputGateWeights:")] public MPSCNNConvolutionDataSource? OutputGateInputGateWeights { get; set; }
-    [Selector("gatePnormValue", "setGatePnormValue:")] public float GatePnormValue { get; set; }
-    [Selector("flipOutputGates", "setFlipOutputGates:")] public bool FlipOutputGates { get; set; }
-    [Selector("createGRUDescriptorWithInputFeatureChannels:outputFeatureChannels:")] public static Self CreateGRUDescriptorWithInputFeatureChannelsOutputFeatureChannels(NSUInteger inputFeatureChannels, NSUInteger outputFeatureChannels);
+    [Selector("inputGateInputWeights", "setInputGateInputWeights:")]
+    public MPSCNNConvolutionDataSource? InputGateInputWeights { get; set; }
+    [Selector("inputGateRecurrentWeights", "setInputGateRecurrentWeights:")]
+    public MPSCNNConvolutionDataSource? InputGateRecurrentWeights { get; set; }
+    [Selector("recurrentGateInputWeights", "setRecurrentGateInputWeights:")]
+    public MPSCNNConvolutionDataSource? RecurrentGateInputWeights { get; set; }
+    [Selector("recurrentGateRecurrentWeights", "setRecurrentGateRecurrentWeights:")]
+    public MPSCNNConvolutionDataSource? RecurrentGateRecurrentWeights { get; set; }
+    [Selector("outputGateInputWeights", "setOutputGateInputWeights:")]
+    public MPSCNNConvolutionDataSource? OutputGateInputWeights { get; set; }
+    [Selector("outputGateRecurrentWeights", "setOutputGateRecurrentWeights:")]
+    public MPSCNNConvolutionDataSource? OutputGateRecurrentWeights { get; set; }
+    [Selector("outputGateInputGateWeights", "setOutputGateInputGateWeights:")]
+    public MPSCNNConvolutionDataSource? OutputGateInputGateWeights { get; set; }
+    [Selector("gatePnormValue", "setGatePnormValue:")]
+    public float GatePnormValue { get; set; }
+    [Selector("flipOutputGates", "setFlipOutputGates:")]
+    public bool FlipOutputGates { get; set; }
+    [Selector("createGRUDescriptorWithInputFeatureChannels:outputFeatureChannels:")]
+    public static Self CreateGRUDescriptorWithInputFeatureChannelsOutputFeatureChannels(NSUInteger inputFeatureChannels, NSUInteger outputFeatureChannels);
 }
 
 public extern objc class MPSLSTMDescriptor : MPSRNNDescriptor
 {
-    [Selector("memoryWeightsAreDiagonal", "setMemoryWeightsAreDiagonal:")] public bool MemoryWeightsAreDiagonal { get; set; }
-    [Selector("inputGateInputWeights", "setInputGateInputWeights:")] public MPSCNNConvolutionDataSource? InputGateInputWeights { get; set; }
-    [Selector("inputGateRecurrentWeights", "setInputGateRecurrentWeights:")] public MPSCNNConvolutionDataSource? InputGateRecurrentWeights { get; set; }
-    [Selector("inputGateMemoryWeights", "setInputGateMemoryWeights:")] public MPSCNNConvolutionDataSource? InputGateMemoryWeights { get; set; }
-    [Selector("forgetGateInputWeights", "setForgetGateInputWeights:")] public MPSCNNConvolutionDataSource? ForgetGateInputWeights { get; set; }
-    [Selector("forgetGateRecurrentWeights", "setForgetGateRecurrentWeights:")] public MPSCNNConvolutionDataSource? ForgetGateRecurrentWeights { get; set; }
-    [Selector("forgetGateMemoryWeights", "setForgetGateMemoryWeights:")] public MPSCNNConvolutionDataSource? ForgetGateMemoryWeights { get; set; }
-    [Selector("outputGateInputWeights", "setOutputGateInputWeights:")] public MPSCNNConvolutionDataSource? OutputGateInputWeights { get; set; }
-    [Selector("outputGateRecurrentWeights", "setOutputGateRecurrentWeights:")] public MPSCNNConvolutionDataSource? OutputGateRecurrentWeights { get; set; }
-    [Selector("outputGateMemoryWeights", "setOutputGateMemoryWeights:")] public MPSCNNConvolutionDataSource? OutputGateMemoryWeights { get; set; }
-    [Selector("cellGateInputWeights", "setCellGateInputWeights:")] public MPSCNNConvolutionDataSource? CellGateInputWeights { get; set; }
-    [Selector("cellGateRecurrentWeights", "setCellGateRecurrentWeights:")] public MPSCNNConvolutionDataSource? CellGateRecurrentWeights { get; set; }
-    [Selector("cellGateMemoryWeights", "setCellGateMemoryWeights:")] public MPSCNNConvolutionDataSource? CellGateMemoryWeights { get; set; }
-    [Selector("cellToOutputNeuronType", "setCellToOutputNeuronType:")] public MPSCNNNeuronType CellToOutputNeuronType { get; set; }
-    [Selector("cellToOutputNeuronParamA", "setCellToOutputNeuronParamA:")] public float CellToOutputNeuronParamA { get; set; }
-    [Selector("cellToOutputNeuronParamB", "setCellToOutputNeuronParamB:")] public float CellToOutputNeuronParamB { get; set; }
-    [Selector("cellToOutputNeuronParamC", "setCellToOutputNeuronParamC:")] public float CellToOutputNeuronParamC { get; set; }
-    [Selector("createLSTMDescriptorWithInputFeatureChannels:outputFeatureChannels:")] public static Self CreateLSTMDescriptorWithInputFeatureChannelsOutputFeatureChannels(NSUInteger inputFeatureChannels, NSUInteger outputFeatureChannels);
+    [Selector("memoryWeightsAreDiagonal", "setMemoryWeightsAreDiagonal:")]
+    public bool MemoryWeightsAreDiagonal { get; set; }
+    [Selector("inputGateInputWeights", "setInputGateInputWeights:")]
+    public MPSCNNConvolutionDataSource? InputGateInputWeights { get; set; }
+    [Selector("inputGateRecurrentWeights", "setInputGateRecurrentWeights:")]
+    public MPSCNNConvolutionDataSource? InputGateRecurrentWeights { get; set; }
+    [Selector("inputGateMemoryWeights", "setInputGateMemoryWeights:")]
+    public MPSCNNConvolutionDataSource? InputGateMemoryWeights { get; set; }
+    [Selector("forgetGateInputWeights", "setForgetGateInputWeights:")]
+    public MPSCNNConvolutionDataSource? ForgetGateInputWeights { get; set; }
+    [Selector("forgetGateRecurrentWeights", "setForgetGateRecurrentWeights:")]
+    public MPSCNNConvolutionDataSource? ForgetGateRecurrentWeights { get; set; }
+    [Selector("forgetGateMemoryWeights", "setForgetGateMemoryWeights:")]
+    public MPSCNNConvolutionDataSource? ForgetGateMemoryWeights { get; set; }
+    [Selector("outputGateInputWeights", "setOutputGateInputWeights:")]
+    public MPSCNNConvolutionDataSource? OutputGateInputWeights { get; set; }
+    [Selector("outputGateRecurrentWeights", "setOutputGateRecurrentWeights:")]
+    public MPSCNNConvolutionDataSource? OutputGateRecurrentWeights { get; set; }
+    [Selector("outputGateMemoryWeights", "setOutputGateMemoryWeights:")]
+    public MPSCNNConvolutionDataSource? OutputGateMemoryWeights { get; set; }
+    [Selector("cellGateInputWeights", "setCellGateInputWeights:")]
+    public MPSCNNConvolutionDataSource? CellGateInputWeights { get; set; }
+    [Selector("cellGateRecurrentWeights", "setCellGateRecurrentWeights:")]
+    public MPSCNNConvolutionDataSource? CellGateRecurrentWeights { get; set; }
+    [Selector("cellGateMemoryWeights", "setCellGateMemoryWeights:")]
+    public MPSCNNConvolutionDataSource? CellGateMemoryWeights { get; set; }
+    [Selector("cellToOutputNeuronType", "setCellToOutputNeuronType:")]
+    public MPSCNNNeuronType CellToOutputNeuronType { get; set; }
+    [Selector("cellToOutputNeuronParamA", "setCellToOutputNeuronParamA:")]
+    public float CellToOutputNeuronParamA { get; set; }
+    [Selector("cellToOutputNeuronParamB", "setCellToOutputNeuronParamB:")]
+    public float CellToOutputNeuronParamB { get; set; }
+    [Selector("cellToOutputNeuronParamC", "setCellToOutputNeuronParamC:")]
+    public float CellToOutputNeuronParamC { get; set; }
+    [Selector("createLSTMDescriptorWithInputFeatureChannels:outputFeatureChannels:")]
+    public static Self CreateLSTMDescriptorWithInputFeatureChannelsOutputFeatureChannels(NSUInteger inputFeatureChannels, NSUInteger outputFeatureChannels);
 }
 
 public extern objc class MPSRNNRecurrentImageState : MPSState
 {
-    [Selector("getRecurrentOutputImageForLayerIndex:")] public MPSImage? GetRecurrentOutputImageForLayerIndex(NSUInteger layerIndex);
-    [Selector("getMemoryCellImageForLayerIndex:")] public MPSImage? GetMemoryCellImageForLayerIndex(NSUInteger layerIndex);
+    [Selector("getRecurrentOutputImageForLayerIndex:")]
+    public MPSImage? GetRecurrentOutputImageForLayerIndex(NSUInteger layerIndex);
+    [Selector("getMemoryCellImageForLayerIndex:")]
+    public MPSImage? GetMemoryCellImageForLayerIndex(NSUInteger layerIndex);
 }
 
 public extern objc class MPSRNNImageInferenceLayer : MPSCNNKernel
 {
-    [Selector("inputFeatureChannels")] public NSUInteger InputFeatureChannels { get; }
-    [Selector("outputFeatureChannels")] public NSUInteger OutputFeatureChannels { get; }
-    [Selector("numberOfLayers")] public NSUInteger NumberOfLayers { get; }
-    [Selector("recurrentOutputIsTemporary", "setRecurrentOutputIsTemporary:")] public bool RecurrentOutputIsTemporary { get; set; }
-    [Selector("storeAllIntermediateStates", "setStoreAllIntermediateStates:")] public bool StoreAllIntermediateStates { get; set; }
-    [Selector("bidirectionalCombineMode", "setBidirectionalCombineMode:")] public MPSRNNBidirectionalCombineMode BidirectionalCombineMode { get; set; }
-    [Selector("initWithDevice:rnnDescriptor:")] public Self InitWithDeviceRnnDescriptor(MTLDevice device, MPSRNNDescriptor rnnDescriptor);
-    [Selector("initWithDevice:rnnDescriptors:")] public Self InitWithDeviceRnnDescriptors(MTLDevice device, NSArray rnnDescriptors);
-    [Selector("encodeSequenceToCommandBuffer:sourceImages:destinationImages:recurrentInputState:recurrentOutputStates:")] public void EncodeSequenceToCommandBufferSourceImagesDestinationImagesRecurrentInputStateRecurrentOutputStates(MTLCommandBuffer commandBuffer, NSArray sourceImages, NSArray destinationImages, MPSRNNRecurrentImageState? recurrentInputState, NSMutableArray? recurrentOutputStates);
-    [Selector("encodeBidirectionalSequenceToCommandBuffer:sourceSequence:destinationForwardImages:destinationBackwardImages:")] public void EncodeBidirectionalSequenceToCommandBufferSourceSequenceDestinationForwardImagesDestinationBackwardImages(MTLCommandBuffer commandBuffer, NSArray sourceSequence, NSArray destinationForwardImages, NSArray? destinationBackwardImages);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("inputFeatureChannels")]
+    public NSUInteger InputFeatureChannels { get; }
+    [Selector("outputFeatureChannels")]
+    public NSUInteger OutputFeatureChannels { get; }
+    [Selector("numberOfLayers")]
+    public NSUInteger NumberOfLayers { get; }
+    [Selector("recurrentOutputIsTemporary", "setRecurrentOutputIsTemporary:")]
+    public bool RecurrentOutputIsTemporary { get; set; }
+    [Selector("storeAllIntermediateStates", "setStoreAllIntermediateStates:")]
+    public bool StoreAllIntermediateStates { get; set; }
+    [Selector("bidirectionalCombineMode", "setBidirectionalCombineMode:")]
+    public MPSRNNBidirectionalCombineMode BidirectionalCombineMode { get; set; }
+    [Selector("initWithDevice:rnnDescriptor:")]
+    public Self InitWithDeviceRnnDescriptor(MTLDevice device, MPSRNNDescriptor rnnDescriptor);
+    [Selector("initWithDevice:rnnDescriptors:")]
+    public Self InitWithDeviceRnnDescriptors(MTLDevice device, NSArray rnnDescriptors);
+    [Selector("encodeSequenceToCommandBuffer:sourceImages:destinationImages:recurrentInputState:recurrentOutputStates:")]
+    public void EncodeSequenceToCommandBufferSourceImagesDestinationImagesRecurrentInputStateRecurrentOutputStates(MTLCommandBuffer commandBuffer, NSArray sourceImages, NSArray destinationImages, MPSRNNRecurrentImageState? recurrentInputState, NSMutableArray? recurrentOutputStates);
+    [Selector("encodeBidirectionalSequenceToCommandBuffer:sourceSequence:destinationForwardImages:destinationBackwardImages:")]
+    public void EncodeBidirectionalSequenceToCommandBufferSourceSequenceDestinationForwardImagesDestinationBackwardImages(MTLCommandBuffer commandBuffer, NSArray sourceSequence, NSArray destinationForwardImages, NSArray? destinationBackwardImages);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
 }
 
 public extern objc class MPSRNNRecurrentMatrixState : MPSState
 {
-    [Selector("getRecurrentOutputMatrixForLayerIndex:")] public MPSMatrix? GetRecurrentOutputMatrixForLayerIndex(NSUInteger layerIndex);
-    [Selector("getMemoryCellMatrixForLayerIndex:")] public MPSMatrix? GetMemoryCellMatrixForLayerIndex(NSUInteger layerIndex);
+    [Selector("getRecurrentOutputMatrixForLayerIndex:")]
+    public MPSMatrix? GetRecurrentOutputMatrixForLayerIndex(NSUInteger layerIndex);
+    [Selector("getMemoryCellMatrixForLayerIndex:")]
+    public MPSMatrix? GetMemoryCellMatrixForLayerIndex(NSUInteger layerIndex);
 }
 
 public extern objc class MPSRNNMatrixInferenceLayer : MPSKernel
 {
-    [Selector("inputFeatureChannels")] public NSUInteger InputFeatureChannels { get; }
-    [Selector("outputFeatureChannels")] public NSUInteger OutputFeatureChannels { get; }
-    [Selector("numberOfLayers")] public NSUInteger NumberOfLayers { get; }
-    [Selector("recurrentOutputIsTemporary", "setRecurrentOutputIsTemporary:")] public bool RecurrentOutputIsTemporary { get; set; }
-    [Selector("storeAllIntermediateStates", "setStoreAllIntermediateStates:")] public bool StoreAllIntermediateStates { get; set; }
-    [Selector("bidirectionalCombineMode", "setBidirectionalCombineMode:")] public MPSRNNBidirectionalCombineMode BidirectionalCombineMode { get; set; }
-    [Selector("initWithDevice:rnnDescriptor:")] public Self InitWithDeviceRnnDescriptor(MTLDevice device, MPSRNNDescriptor rnnDescriptor);
-    [Selector("initWithDevice:rnnDescriptors:")] public Self InitWithDeviceRnnDescriptors(MTLDevice device, NSArray rnnDescriptors);
-    [Selector("encodeSequenceToCommandBuffer:sourceMatrices:sourceOffsets:destinationMatrices:destinationOffsets:recurrentInputState:recurrentOutputStates:")] public void EncodeSequenceToCommandBufferSourceMatricesSourceOffsetsDestinationMatricesDestinationOffsetsRecurrentInputStateRecurrentOutputStates(MTLCommandBuffer commandBuffer, NSArray sourceMatrices, NSUInteger* sourceOffsets, NSArray destinationMatrices, NSUInteger* destinationOffsets, MPSRNNRecurrentMatrixState? recurrentInputState, NSMutableArray? recurrentOutputStates);
-    [Selector("encodeSequenceToCommandBuffer:sourceMatrices:destinationMatrices:recurrentInputState:recurrentOutputStates:")] public void EncodeSequenceToCommandBufferSourceMatricesDestinationMatricesRecurrentInputStateRecurrentOutputStates(MTLCommandBuffer commandBuffer, NSArray sourceMatrices, NSArray destinationMatrices, MPSRNNRecurrentMatrixState? recurrentInputState, NSMutableArray? recurrentOutputStates);
-    [Selector("encodeBidirectionalSequenceToCommandBuffer:sourceSequence:destinationForwardMatrices:destinationBackwardMatrices:")] public void EncodeBidirectionalSequenceToCommandBufferSourceSequenceDestinationForwardMatricesDestinationBackwardMatrices(MTLCommandBuffer commandBuffer, NSArray sourceSequence, NSArray destinationForwardMatrices, NSArray? destinationBackwardMatrices);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("inputFeatureChannels")]
+    public NSUInteger InputFeatureChannels { get; }
+    [Selector("outputFeatureChannels")]
+    public NSUInteger OutputFeatureChannels { get; }
+    [Selector("numberOfLayers")]
+    public NSUInteger NumberOfLayers { get; }
+    [Selector("recurrentOutputIsTemporary", "setRecurrentOutputIsTemporary:")]
+    public bool RecurrentOutputIsTemporary { get; set; }
+    [Selector("storeAllIntermediateStates", "setStoreAllIntermediateStates:")]
+    public bool StoreAllIntermediateStates { get; set; }
+    [Selector("bidirectionalCombineMode", "setBidirectionalCombineMode:")]
+    public MPSRNNBidirectionalCombineMode BidirectionalCombineMode { get; set; }
+    [Selector("initWithDevice:rnnDescriptor:")]
+    public Self InitWithDeviceRnnDescriptor(MTLDevice device, MPSRNNDescriptor rnnDescriptor);
+    [Selector("initWithDevice:rnnDescriptors:")]
+    public Self InitWithDeviceRnnDescriptors(MTLDevice device, NSArray rnnDescriptors);
+    [Selector("encodeSequenceToCommandBuffer:sourceMatrices:sourceOffsets:destinationMatrices:destinationOffsets:recurrentInputState:recurrentOutputStates:")]
+    public void EncodeSequenceToCommandBufferSourceMatricesSourceOffsetsDestinationMatricesDestinationOffsetsRecurrentInputStateRecurrentOutputStates(MTLCommandBuffer commandBuffer, NSArray sourceMatrices, NSUInteger* sourceOffsets, NSArray destinationMatrices, NSUInteger* destinationOffsets, MPSRNNRecurrentMatrixState? recurrentInputState, NSMutableArray? recurrentOutputStates);
+    [Selector("encodeSequenceToCommandBuffer:sourceMatrices:destinationMatrices:recurrentInputState:recurrentOutputStates:")]
+    public void EncodeSequenceToCommandBufferSourceMatricesDestinationMatricesRecurrentInputStateRecurrentOutputStates(MTLCommandBuffer commandBuffer, NSArray sourceMatrices, NSArray destinationMatrices, MPSRNNRecurrentMatrixState? recurrentInputState, NSMutableArray? recurrentOutputStates);
+    [Selector("encodeBidirectionalSequenceToCommandBuffer:sourceSequence:destinationForwardMatrices:destinationBackwardMatrices:")]
+    public void EncodeBidirectionalSequenceToCommandBufferSourceSequenceDestinationForwardMatricesDestinationBackwardMatrices(MTLCommandBuffer commandBuffer, NSArray sourceSequence, NSArray destinationForwardMatrices, NSArray? destinationBackwardMatrices);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
 }
 
 public extern objc class MPSRNNMatrixTrainingState : MPSState { }
@@ -180,23 +245,40 @@ public enum MPSRNNMatrixId : ulong
 
 public extern objc class MPSRNNMatrixTrainingLayer : MPSKernel
 {
-    [Selector("inputFeatureChannels")] public NSUInteger InputFeatureChannels { get; }
-    [Selector("outputFeatureChannels")] public NSUInteger OutputFeatureChannels { get; }
-    [Selector("storeAllIntermediateStates", "setStoreAllIntermediateStates:")] public bool StoreAllIntermediateStates { get; set; }
-    [Selector("recurrentOutputIsTemporary", "setRecurrentOutputIsTemporary:")] public bool RecurrentOutputIsTemporary { get; set; }
-    [Selector("trainingStateIsTemporary", "setTrainingStateIsTemporary:")] public bool TrainingStateIsTemporary { get; set; }
-    [Selector("accumulateWeightGradients", "setAccumulateWeightGradients:")] public bool AccumulateWeightGradients { get; set; }
-    [Selector("initWithDevice:rnnDescriptor:trainableWeights:")] public Self InitWithDeviceRnnDescriptorTrainableWeights(MTLDevice device, MPSRNNDescriptor rnnDescriptor, NSMutableArray trainableWeights);
-    [Selector("createWeightGradientMatrices:dataType:")] public void CreateWeightGradientMatricesDataType(NSMutableArray matricesOut, MPSDataType dataType);
-    [Selector("createTemporaryWeightGradientMatrices:dataType:commandBuffer:")] public void CreateTemporaryWeightGradientMatricesDataTypeCommandBuffer(NSMutableArray matricesOut, MPSDataType dataType, MTLCommandBuffer commandBuffer);
-    [Selector("createWeightMatrices:")] public void CreateWeightMatrices(NSMutableArray matricesOut);
-    [Selector("encodeCopyWeightsToCommandBuffer:weights:matrixId:matrix:copyFromWeightsToMatrix:matrixOffset:")] public void EncodeCopyWeightsToCommandBufferWeightsMatrixIdMatrixCopyFromWeightsToMatrixMatrixOffset(MTLCommandBuffer commandBuffer, NSArray weights, MPSRNNMatrixId matrixId, MPSMatrix matrix, bool copyFromWeightsToMatrix, MTLOrigin matrixOffset);
-    [Selector("encodeForwardSequenceToCommandBuffer:sourceMatrices:sourceOffsets:destinationMatrices:destinationOffsets:trainingStates:recurrentInputState:recurrentOutputStates:weights:")] public void EncodeForwardSequenceToCommandBufferSourceMatricesSourceOffsetsDestinationMatricesDestinationOffsetsTrainingStatesRecurrentInputStateRecurrentOutputStatesWeights(MTLCommandBuffer commandBuffer, NSArray sourceMatrices, NSUInteger* sourceOffsets, NSArray destinationMatrices, NSUInteger* destinationOffsets, NSMutableArray trainingStates, MPSRNNRecurrentMatrixState? recurrentInputState, NSMutableArray? recurrentOutputStates, NSArray weights);
-    [Selector("encodeForwardSequenceToCommandBuffer:sourceMatrices:destinationMatrices:trainingStates:weights:")] public void EncodeForwardSequenceToCommandBufferSourceMatricesDestinationMatricesTrainingStatesWeights(MTLCommandBuffer commandBuffer, NSArray sourceMatrices, NSArray destinationMatrices, NSMutableArray trainingStates, NSArray weights);
-    [Selector("encodeGradientSequenceToCommandBuffer:forwardSources:forwardSourceOffsets:sourceGradients:sourceGradientOffsets:destinationGradients:destinationOffsets:weightGradients:trainingStates:recurrentInputState:recurrentOutputStates:weights:")] public void EncodeGradientSequenceToCommandBufferForwardSourcesForwardSourceOffsetsSourceGradientsSourceGradientOffsetsDestinationGradientsDestinationOffsetsWeightGradientsTrainingStatesRecurrentInputStateRecurrentOutputStatesWeights(MTLCommandBuffer commandBuffer, NSArray forwardSources, NSUInteger* forwardSourceOffsets, NSArray sourceGradients, NSUInteger* sourceGradientOffsets, NSArray? destinationGradients, NSUInteger* destinationOffsets, NSArray? weightGradients, NSArray trainingStates, MPSRNNRecurrentMatrixState? recurrentInputState, NSMutableArray? recurrentOutputStates, NSArray weights);
-    [Selector("encodeGradientSequenceToCommandBuffer:forwardSources:sourceGradients:destinationGradients:weightGradients:trainingStates:weights:")] public void EncodeGradientSequenceToCommandBufferForwardSourcesSourceGradientsDestinationGradientsWeightGradientsTrainingStatesWeights(MTLCommandBuffer commandBuffer, NSArray forwardSources, NSArray sourceGradients, NSArray? destinationGradients, NSArray? weightGradients, NSArray trainingStates, NSArray weights);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("inputFeatureChannels")]
+    public NSUInteger InputFeatureChannels { get; }
+    [Selector("outputFeatureChannels")]
+    public NSUInteger OutputFeatureChannels { get; }
+    [Selector("storeAllIntermediateStates", "setStoreAllIntermediateStates:")]
+    public bool StoreAllIntermediateStates { get; set; }
+    [Selector("recurrentOutputIsTemporary", "setRecurrentOutputIsTemporary:")]
+    public bool RecurrentOutputIsTemporary { get; set; }
+    [Selector("trainingStateIsTemporary", "setTrainingStateIsTemporary:")]
+    public bool TrainingStateIsTemporary { get; set; }
+    [Selector("accumulateWeightGradients", "setAccumulateWeightGradients:")]
+    public bool AccumulateWeightGradients { get; set; }
+    [Selector("initWithDevice:rnnDescriptor:trainableWeights:")]
+    public Self InitWithDeviceRnnDescriptorTrainableWeights(MTLDevice device, MPSRNNDescriptor rnnDescriptor, NSMutableArray trainableWeights);
+    [Selector("createWeightGradientMatrices:dataType:")]
+    public void CreateWeightGradientMatricesDataType(NSMutableArray matricesOut, MPSDataType dataType);
+    [Selector("createTemporaryWeightGradientMatrices:dataType:commandBuffer:")]
+    public void CreateTemporaryWeightGradientMatricesDataTypeCommandBuffer(NSMutableArray matricesOut, MPSDataType dataType, MTLCommandBuffer commandBuffer);
+    [Selector("createWeightMatrices:")]
+    public void CreateWeightMatrices(NSMutableArray matricesOut);
+    [Selector("encodeCopyWeightsToCommandBuffer:weights:matrixId:matrix:copyFromWeightsToMatrix:matrixOffset:")]
+    public void EncodeCopyWeightsToCommandBufferWeightsMatrixIdMatrixCopyFromWeightsToMatrixMatrixOffset(MTLCommandBuffer commandBuffer, NSArray weights, MPSRNNMatrixId matrixId, MPSMatrix matrix, bool copyFromWeightsToMatrix, MTLOrigin matrixOffset);
+    [Selector("encodeForwardSequenceToCommandBuffer:sourceMatrices:sourceOffsets:destinationMatrices:destinationOffsets:trainingStates:recurrentInputState:recurrentOutputStates:weights:")]
+    public void EncodeForwardSequenceToCommandBufferSourceMatricesSourceOffsetsDestinationMatricesDestinationOffsetsTrainingStatesRecurrentInputStateRecurrentOutputStatesWeights(MTLCommandBuffer commandBuffer, NSArray sourceMatrices, NSUInteger* sourceOffsets, NSArray destinationMatrices, NSUInteger* destinationOffsets, NSMutableArray trainingStates, MPSRNNRecurrentMatrixState? recurrentInputState, NSMutableArray? recurrentOutputStates, NSArray weights);
+    [Selector("encodeForwardSequenceToCommandBuffer:sourceMatrices:destinationMatrices:trainingStates:weights:")]
+    public void EncodeForwardSequenceToCommandBufferSourceMatricesDestinationMatricesTrainingStatesWeights(MTLCommandBuffer commandBuffer, NSArray sourceMatrices, NSArray destinationMatrices, NSMutableArray trainingStates, NSArray weights);
+    [Selector("encodeGradientSequenceToCommandBuffer:forwardSources:forwardSourceOffsets:sourceGradients:sourceGradientOffsets:destinationGradients:destinationOffsets:weightGradients:trainingStates:recurrentInputState:recurrentOutputStates:weights:")]
+    public void EncodeGradientSequenceToCommandBufferForwardSourcesForwardSourceOffsetsSourceGradientsSourceGradientOffsetsDestinationGradientsDestinationOffsetsWeightGradientsTrainingStatesRecurrentInputStateRecurrentOutputStatesWeights(MTLCommandBuffer commandBuffer, NSArray forwardSources, NSUInteger* forwardSourceOffsets, NSArray sourceGradients, NSUInteger* sourceGradientOffsets, NSArray? destinationGradients, NSUInteger* destinationOffsets, NSArray? weightGradients, NSArray trainingStates, MPSRNNRecurrentMatrixState? recurrentInputState, NSMutableArray? recurrentOutputStates, NSArray weights);
+    [Selector("encodeGradientSequenceToCommandBuffer:forwardSources:sourceGradients:destinationGradients:weightGradients:trainingStates:weights:")]
+    public void EncodeGradientSequenceToCommandBufferForwardSourcesSourceGradientsDestinationGradientsWeightGradientsTrainingStatesWeights(MTLCommandBuffer commandBuffer, NSArray forwardSources, NSArray sourceGradients, NSArray? destinationGradients, NSArray? weightGradients, NSArray trainingStates, NSArray weights);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
 }
 
 #endif

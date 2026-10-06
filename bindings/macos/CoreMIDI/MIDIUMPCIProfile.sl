@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class MIDIUMPCIProfile : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("profileID")] public MIDICIProfileID ProfileID { get; }
-    [Selector("profileType")] public MIDICIProfileType ProfileType { get; }
-    [Selector("groupOffset")] public MIDIUMPGroupNumber GroupOffset { get; }
-    [Selector("firstChannel")] public MIDIChannelNumber FirstChannel { get; }
-    [Selector("enabledChannelCount")] public MIDIUInteger14 EnabledChannelCount { get; }
-    [Selector("totalChannelCount")] public MIDIUInteger14 TotalChannelCount { get; }
-    [Selector("isEnabled")] public bool IsEnabled { get; }
-    [Selector("setProfileState:enabledChannelCount:error:")] public bool SetProfileStateEnabledChannelCountError(bool isEnabled, MIDIUInteger14 enabledChannelCount, out NSError? error);
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("profileID")]
+    public MIDICIProfileID ProfileID { get; }
+    [Selector("profileType")]
+    public MIDICIProfileType ProfileType { get; }
+    [Selector("groupOffset")]
+    public MIDIUMPGroupNumber GroupOffset { get; }
+    [Selector("firstChannel")]
+    public MIDIChannelNumber FirstChannel { get; }
+    [Selector("enabledChannelCount")]
+    public MIDIUInteger14 EnabledChannelCount { get; }
+    [Selector("totalChannelCount")]
+    public MIDIUInteger14 TotalChannelCount { get; }
+    [Selector("isEnabled")]
+    public bool IsEnabled { get; }
+    [Selector("setProfileState:enabledChannelCount:error:")]
+    public bool SetProfileStateEnabledChannelCountError(bool isEnabled, MIDIUInteger14 enabledChannelCount, out NSError? error);
 }
 
 #endif

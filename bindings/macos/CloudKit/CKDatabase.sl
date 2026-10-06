@@ -40,8 +40,10 @@ public enum CKDatabaseScope : long
 
 public extern objc class CKDatabase : NSObject
 {
-    [Selector("databaseScope")] public CKDatabaseScope DatabaseScope { get; }
-    [Selector("addOperation:")] public void AddOperation(CKDatabaseOperation operation);
+    [Selector("databaseScope")]
+    public CKDatabaseScope DatabaseScope { get; }
+    [Selector("addOperation:")]
+    public void AddOperation(CKDatabaseOperation operation);
 }
 
 public objc closure void CKDatabaseFetchRecordWithIDCompletionHandlerCompletionHandlerBlock(CKRecord? arg0, NSError? arg1);
@@ -71,18 +73,30 @@ public objc closure void CKDatabaseDeleteSubscriptionWithIDCompletionHandlerComp
 /// ConvenienceMethods, a category of CKDatabase.
 public extern objc class CKDatabase
 {
-    [Selector("fetchRecordWithID:completionHandler:")] public void FetchRecordWithIDCompletionHandler(CKRecordID recordID, CKDatabaseFetchRecordWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("saveRecord:completionHandler:")] public void SaveRecordCompletionHandler(CKRecord record, CKDatabaseSaveRecordCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("deleteRecordWithID:completionHandler:")] public void DeleteRecordWithIDCompletionHandler(CKRecordID recordID, CKDatabaseDeleteRecordWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("performQuery:inZoneWithID:completionHandler:")] public void PerformQueryInZoneWithIDCompletionHandler(CKQuery query, CKRecordZoneID? zoneID, CKDatabasePerformQueryInZoneWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("fetchAllRecordZonesWithCompletionHandler:")] public void FetchAllRecordZonesWithCompletionHandler(CKDatabaseFetchAllRecordZonesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("fetchRecordZoneWithID:completionHandler:")] public void FetchRecordZoneWithIDCompletionHandler(CKRecordZoneID zoneID, CKDatabaseFetchRecordZoneWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("saveRecordZone:completionHandler:")] public void SaveRecordZoneCompletionHandler(CKRecordZone zone, CKDatabaseSaveRecordZoneCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("deleteRecordZoneWithID:completionHandler:")] public void DeleteRecordZoneWithIDCompletionHandler(CKRecordZoneID zoneID, CKDatabaseDeleteRecordZoneWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("fetchSubscriptionWithID:completionHandler:")] public void FetchSubscriptionWithIDCompletionHandler(CKSubscriptionID subscriptionID, CKDatabaseFetchSubscriptionWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("fetchAllSubscriptionsWithCompletionHandler:")] public void FetchAllSubscriptionsWithCompletionHandler(CKDatabaseFetchAllSubscriptionsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("saveSubscription:completionHandler:")] public void SaveSubscriptionCompletionHandler(CKSubscription subscription, CKDatabaseSaveSubscriptionCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("deleteSubscriptionWithID:completionHandler:")] public void DeleteSubscriptionWithIDCompletionHandler(CKSubscriptionID subscriptionID, CKDatabaseDeleteSubscriptionWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchRecordWithID:completionHandler:")]
+    public void FetchRecordWithIDCompletionHandler(CKRecordID recordID, CKDatabaseFetchRecordWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("saveRecord:completionHandler:")]
+    public void SaveRecordCompletionHandler(CKRecord record, CKDatabaseSaveRecordCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("deleteRecordWithID:completionHandler:")]
+    public void DeleteRecordWithIDCompletionHandler(CKRecordID recordID, CKDatabaseDeleteRecordWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("performQuery:inZoneWithID:completionHandler:")]
+    public void PerformQueryInZoneWithIDCompletionHandler(CKQuery query, CKRecordZoneID? zoneID, CKDatabasePerformQueryInZoneWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchAllRecordZonesWithCompletionHandler:")]
+    public void FetchAllRecordZonesWithCompletionHandler(CKDatabaseFetchAllRecordZonesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchRecordZoneWithID:completionHandler:")]
+    public void FetchRecordZoneWithIDCompletionHandler(CKRecordZoneID zoneID, CKDatabaseFetchRecordZoneWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("saveRecordZone:completionHandler:")]
+    public void SaveRecordZoneCompletionHandler(CKRecordZone zone, CKDatabaseSaveRecordZoneCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("deleteRecordZoneWithID:completionHandler:")]
+    public void DeleteRecordZoneWithIDCompletionHandler(CKRecordZoneID zoneID, CKDatabaseDeleteRecordZoneWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchSubscriptionWithID:completionHandler:")]
+    public void FetchSubscriptionWithIDCompletionHandler(CKSubscriptionID subscriptionID, CKDatabaseFetchSubscriptionWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchAllSubscriptionsWithCompletionHandler:")]
+    public void FetchAllSubscriptionsWithCompletionHandler(CKDatabaseFetchAllSubscriptionsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("saveSubscription:completionHandler:")]
+    public void SaveSubscriptionCompletionHandler(CKSubscription subscription, CKDatabaseSaveSubscriptionCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("deleteSubscriptionWithID:completionHandler:")]
+    public void DeleteSubscriptionWithIDCompletionHandler(CKSubscriptionID subscriptionID, CKDatabaseDeleteSubscriptionWithIDCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

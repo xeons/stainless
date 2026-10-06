@@ -47,15 +47,24 @@ public enum ASUserAgeRange : long
 
 public extern objc class ASAuthorizationAppleIDCredential : NSObject, ASAuthorizationCredential
 {
-    [Selector("user")] public NSString User { get; }
-    [Selector("state")] public NSString? State { get; }
-    [Selector("authorizedScopes")] public NSArray AuthorizedScopes { get; }
-    [Selector("authorizationCode")] public NSData? AuthorizationCode { get; }
-    [Selector("identityToken")] public NSData? IdentityToken { get; }
-    [Selector("email")] public NSString? Email { get; }
-    [Selector("fullName")] public NSPersonNameComponents? FullName { get; }
-    [Selector("realUserStatus")] public ASUserDetectionStatus RealUserStatus { get; }
-    [Selector("userAgeRange")] public ASUserAgeRange UserAgeRange { get; }
+    [Selector("user")]
+    public NSString User { get; }
+    [Selector("state")]
+    public NSString? State { get; }
+    [Selector("authorizedScopes")]
+    public NSArray AuthorizedScopes { get; }
+    [Selector("authorizationCode")]
+    public NSData? AuthorizationCode { get; }
+    [Selector("identityToken")]
+    public NSData? IdentityToken { get; }
+    [Selector("email")]
+    public NSString? Email { get; }
+    [Selector("fullName")]
+    public NSPersonNameComponents? FullName { get; }
+    [Selector("realUserStatus")]
+    public ASUserDetectionStatus RealUserStatus { get; }
+    [Selector("userAgeRange")]
+    public ASUserAgeRange UserAgeRange { get; }
 }
 
 #endif

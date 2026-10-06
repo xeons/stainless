@@ -44,13 +44,23 @@ public objc closure void NSTextElementProviderSynchronizeToBackingStoreCompletio
 
 public objc interface NSTextElementProvider : NSObjectProtocol
 {
-    [Selector("documentRange")] NSTextRange DocumentRange { get; }
-    [Selector("enumerateTextElementsFromLocation:options:usingBlock:")] NSTextLocation? EnumerateTextElementsFromLocationOptionsUsingBlock(NSTextLocation? textLocation, NSTextContentManagerEnumerationOptions options, NSTextElementProviderEnumerateTextElementsFromLocationOptionsUsingBlockBlock block);
-    [Selector("replaceContentsInRange:withTextElements:")] void ReplaceContentsInRangeWithTextElements(NSTextRange range, NSArray? textElements);
-    [Selector("synchronizeToBackingStore:")] void SynchronizeToBackingStore(NSTextElementProviderSynchronizeToBackingStoreCompletionHandlerBlock? completionHandler);
-    [Optional] [Selector("locationFromLocation:withOffset:")] NSTextLocation? LocationFromLocationWithOffset(NSTextLocation location, NSInteger offset);
-    [Optional] [Selector("offsetFromLocation:toLocation:")] NSInteger OffsetFromLocationToLocation(NSTextLocation from, NSTextLocation to);
-    [Optional] [Selector("adjustedRangeFromRange:forEditingTextSelection:")] NSTextRange? AdjustedRangeFromRangeForEditingTextSelection(NSTextRange textRange, bool forEditingTextSelection);
+    [Selector("documentRange")]
+    NSTextRange DocumentRange { get; }
+    [Selector("enumerateTextElementsFromLocation:options:usingBlock:")]
+    NSTextLocation? EnumerateTextElementsFromLocationOptionsUsingBlock(NSTextLocation? textLocation, NSTextContentManagerEnumerationOptions options, NSTextElementProviderEnumerateTextElementsFromLocationOptionsUsingBlockBlock block);
+    [Selector("replaceContentsInRange:withTextElements:")]
+    void ReplaceContentsInRangeWithTextElements(NSTextRange range, NSArray? textElements);
+    [Selector("synchronizeToBackingStore:")]
+    void SynchronizeToBackingStore(NSTextElementProviderSynchronizeToBackingStoreCompletionHandlerBlock? completionHandler);
+    [Optional]
+    [Selector("locationFromLocation:withOffset:")]
+    NSTextLocation? LocationFromLocationWithOffset(NSTextLocation location, NSInteger offset);
+    [Optional]
+    [Selector("offsetFromLocation:toLocation:")]
+    NSInteger OffsetFromLocationToLocation(NSTextLocation from, NSTextLocation to);
+    [Optional]
+    [Selector("adjustedRangeFromRange:forEditingTextSelection:")]
+    NSTextRange? AdjustedRangeFromRangeForEditingTextSelection(NSTextRange textRange, bool forEditingTextSelection);
 }
 
 public objc closure void NSTextContentManagerSynchronizeTextLayoutManagersCompletionHandlerBlock(NSError? arg0);
@@ -59,44 +69,72 @@ public objc closure void NSTextContentManagerPerformEditingTransactionUsingBlock
 
 public extern objc class NSTextContentManager : NSObject, NSTextElementProvider, NSSecureCoding
 {
-    [Selector("delegate", "setDelegate:")] public NSTextContentManagerDelegate? Delegate { get; set; }
-    [Selector("textLayoutManagers")] public NSArray TextLayoutManagers { get; }
-    [Selector("primaryTextLayoutManager", "setPrimaryTextLayoutManager:")] public NSTextLayoutManager? PrimaryTextLayoutManager { get; set; }
-    [Selector("hasEditingTransaction")] public bool HasEditingTransaction { get; }
-    [Selector("automaticallySynchronizesTextLayoutManagers", "setAutomaticallySynchronizesTextLayoutManagers:")] public bool AutomaticallySynchronizesTextLayoutManagers { get; set; }
-    [Selector("automaticallySynchronizesToBackingStore", "setAutomaticallySynchronizesToBackingStore:")] public bool AutomaticallySynchronizesToBackingStore { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("addTextLayoutManager:")] public void AddTextLayoutManager(NSTextLayoutManager textLayoutManager);
-    [Selector("removeTextLayoutManager:")] public void RemoveTextLayoutManager(NSTextLayoutManager textLayoutManager);
-    [Selector("synchronizeTextLayoutManagers:")] public void SynchronizeTextLayoutManagers(NSTextContentManagerSynchronizeTextLayoutManagersCompletionHandlerBlock? completionHandler);
-    [Selector("textElementsForRange:")] public NSArray TextElementsForRange(NSTextRange range);
-    [Selector("performEditingTransactionUsingBlock:")] public void PerformEditingTransactionUsingBlock(NSTextContentManagerPerformEditingTransactionUsingBlockTransactionBlock transaction);
-    [Selector("recordEditActionInRange:newTextRange:")] public void RecordEditActionInRangeNewTextRange(NSTextRange originalTextRange, NSTextRange newTextRange);
+    [Selector("delegate", "setDelegate:")]
+    public NSTextContentManagerDelegate? Delegate { get; set; }
+    [Selector("textLayoutManagers")]
+    public NSArray TextLayoutManagers { get; }
+    [Selector("primaryTextLayoutManager", "setPrimaryTextLayoutManager:")]
+    public NSTextLayoutManager? PrimaryTextLayoutManager { get; set; }
+    [Selector("hasEditingTransaction")]
+    public bool HasEditingTransaction { get; }
+    [Selector("automaticallySynchronizesTextLayoutManagers", "setAutomaticallySynchronizesTextLayoutManagers:")]
+    public bool AutomaticallySynchronizesTextLayoutManagers { get; set; }
+    [Selector("automaticallySynchronizesToBackingStore", "setAutomaticallySynchronizesToBackingStore:")]
+    public bool AutomaticallySynchronizesToBackingStore { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("addTextLayoutManager:")]
+    public void AddTextLayoutManager(NSTextLayoutManager textLayoutManager);
+    [Selector("removeTextLayoutManager:")]
+    public void RemoveTextLayoutManager(NSTextLayoutManager textLayoutManager);
+    [Selector("synchronizeTextLayoutManagers:")]
+    public void SynchronizeTextLayoutManagers(NSTextContentManagerSynchronizeTextLayoutManagersCompletionHandlerBlock? completionHandler);
+    [Selector("textElementsForRange:")]
+    public NSArray TextElementsForRange(NSTextRange range);
+    [Selector("performEditingTransactionUsingBlock:")]
+    public void PerformEditingTransactionUsingBlock(NSTextContentManagerPerformEditingTransactionUsingBlockTransactionBlock transaction);
+    [Selector("recordEditActionInRange:newTextRange:")]
+    public void RecordEditActionInRangeNewTextRange(NSTextRange originalTextRange, NSTextRange newTextRange);
 }
 
 public objc interface NSTextContentManagerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("textContentManager:textElementAtLocation:")] NSTextElement? TextContentManagerTextElementAtLocation(NSTextContentManager textContentManager, NSTextLocation location);
-    [Optional] [Selector("textContentManager:shouldEnumerateTextElement:options:")] bool TextContentManagerShouldEnumerateTextElementOptions(NSTextContentManager textContentManager, NSTextElement textElement, NSTextContentManagerEnumerationOptions options);
+    [Optional]
+    [Selector("textContentManager:textElementAtLocation:")]
+    NSTextElement? TextContentManagerTextElementAtLocation(NSTextContentManager textContentManager, NSTextLocation location);
+    [Optional]
+    [Selector("textContentManager:shouldEnumerateTextElement:options:")]
+    bool TextContentManagerShouldEnumerateTextElementOptions(NSTextContentManager textContentManager, NSTextElement textElement, NSTextContentManagerEnumerationOptions options);
 }
 
 public objc interface NSTextContentStorageDelegate : NSTextContentManagerDelegate
 {
-    [Optional] [Selector("textContentStorage:textParagraphWithRange:")] NSTextParagraph? TextContentStorageTextParagraphWithRange(NSTextContentStorage textContentStorage, NSRange range);
+    [Optional]
+    [Selector("textContentStorage:textParagraphWithRange:")]
+    NSTextParagraph? TextContentStorageTextParagraphWithRange(NSTextContentStorage textContentStorage, NSRange range);
 }
 
 public extern objc class NSTextContentStorage : NSTextContentManager, NSTextStorageObserving
 {
-    [Selector("delegate", "setDelegate:")] public NSTextContentStorageDelegate? Delegate { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSTextContentStorageDelegate? Delegate { get; set; }
     /// macOS 26.0 and later.
-    [Selector("includesTextListMarkers", "setIncludesTextListMarkers:")] public bool IncludesTextListMarkers { get; set; }
-    [Selector("attributedString", "setAttributedString:")] public NSAttributedString? AttributedString { get; set; }
-    [Selector("attributedStringForTextElement:")] public NSAttributedString? AttributedStringForTextElement(NSTextElement textElement);
-    [Selector("textElementForAttributedString:")] public NSTextElement? TextElementForAttributedString(NSAttributedString attributedString);
-    [Selector("locationFromLocation:withOffset:")] public NSTextLocation? LocationFromLocationWithOffset(NSTextLocation location, NSInteger offset);
-    [Selector("offsetFromLocation:toLocation:")] public NSInteger OffsetFromLocationToLocation(NSTextLocation from, NSTextLocation to);
-    [Selector("adjustedRangeFromRange:forEditingTextSelection:")] public NSTextRange? AdjustedRangeFromRangeForEditingTextSelection(NSTextRange textRange, bool forEditingTextSelection);
+    [Selector("includesTextListMarkers", "setIncludesTextListMarkers:")]
+    public bool IncludesTextListMarkers { get; set; }
+    [Selector("attributedString", "setAttributedString:")]
+    public NSAttributedString? AttributedString { get; set; }
+    [Selector("attributedStringForTextElement:")]
+    public NSAttributedString? AttributedStringForTextElement(NSTextElement textElement);
+    [Selector("textElementForAttributedString:")]
+    public NSTextElement? TextElementForAttributedString(NSAttributedString attributedString);
+    [Selector("locationFromLocation:withOffset:")]
+    public NSTextLocation? LocationFromLocationWithOffset(NSTextLocation location, NSInteger offset);
+    [Selector("offsetFromLocation:toLocation:")]
+    public NSInteger OffsetFromLocationToLocation(NSTextLocation from, NSTextLocation to);
+    [Selector("adjustedRangeFromRange:forEditingTextSelection:")]
+    public NSTextRange? AdjustedRangeFromRangeForEditingTextSelection(NSTextRange textRange, bool forEditingTextSelection);
 }
 
 public extern "C" NSNotificationName? NSTextContentStorageUnsupportedAttributeAddedNotification;

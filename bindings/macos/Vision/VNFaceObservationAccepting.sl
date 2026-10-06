@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public objc interface VNFaceObservationAccepting : NSObjectProtocol
 {
-    [Selector("inputFaceObservations", "setInputFaceObservations:")] NSArray? InputFaceObservations { get; set; }
+    [Selector("inputFaceObservations", "setInputFaceObservations:")]
+    NSArray? InputFaceObservations { get; set; }
 }
 
 #endif

@@ -41,24 +41,42 @@ public enum NSTabViewControllerTabStyle : long
 
 public extern objc class NSTabViewController : NSViewController, NSTabViewDelegate, NSToolbarDelegate
 {
-    [Selector("tabStyle", "setTabStyle:")] public NSTabViewControllerTabStyle TabStyle { get; set; }
-    [Selector("tabView", "setTabView:")] public NSTabView TabView { get; set; }
-    [Selector("transitionOptions", "setTransitionOptions:")] public NSViewControllerTransitionOptions TransitionOptions { get; set; }
-    [Selector("canPropagateSelectedChildViewControllerTitle", "setCanPropagateSelectedChildViewControllerTitle:")] public bool CanPropagateSelectedChildViewControllerTitle { get; set; }
-    [Selector("tabViewItems", "setTabViewItems:")] public NSArray TabViewItems { get; set; }
-    [Selector("selectedTabViewItemIndex", "setSelectedTabViewItemIndex:")] public NSInteger SelectedTabViewItemIndex { get; set; }
-    [Selector("addTabViewItem:")] public void AddTabViewItem(NSTabViewItem tabViewItem);
-    [Selector("insertTabViewItem:atIndex:")] public void InsertTabViewItemAtIndex(NSTabViewItem tabViewItem, NSInteger index);
-    [Selector("removeTabViewItem:")] public void RemoveTabViewItem(NSTabViewItem tabViewItem);
-    [Selector("tabViewItemForViewController:")] public NSTabViewItem? TabViewItemForViewController(NSViewController viewController);
-    [Selector("viewDidLoad")] public void ViewDidLoad();
-    [Selector("tabView:willSelectTabViewItem:")] public void TabViewWillSelectTabViewItem(NSTabView tabView, NSTabViewItem? tabViewItem);
-    [Selector("tabView:didSelectTabViewItem:")] public void TabViewDidSelectTabViewItem(NSTabView tabView, NSTabViewItem? tabViewItem);
-    [Selector("tabView:shouldSelectTabViewItem:")] public bool TabViewShouldSelectTabViewItem(NSTabView tabView, NSTabViewItem? tabViewItem);
-    [Selector("toolbar:itemForItemIdentifier:willBeInsertedIntoToolbar:")] public NSToolbarItem? ToolbarItemForItemIdentifierWillBeInsertedIntoToolbar(NSToolbar toolbar, NSToolbarItemIdentifier itemIdentifier, bool flag);
-    [Selector("toolbarDefaultItemIdentifiers:")] public NSArray ToolbarDefaultItemIdentifiers(NSToolbar toolbar);
-    [Selector("toolbarAllowedItemIdentifiers:")] public NSArray ToolbarAllowedItemIdentifiers(NSToolbar toolbar);
-    [Selector("toolbarSelectableItemIdentifiers:")] public NSArray ToolbarSelectableItemIdentifiers(NSToolbar toolbar);
+    [Selector("tabStyle", "setTabStyle:")]
+    public NSTabViewControllerTabStyle TabStyle { get; set; }
+    [Selector("tabView", "setTabView:")]
+    public NSTabView TabView { get; set; }
+    [Selector("transitionOptions", "setTransitionOptions:")]
+    public NSViewControllerTransitionOptions TransitionOptions { get; set; }
+    [Selector("canPropagateSelectedChildViewControllerTitle", "setCanPropagateSelectedChildViewControllerTitle:")]
+    public bool CanPropagateSelectedChildViewControllerTitle { get; set; }
+    [Selector("tabViewItems", "setTabViewItems:")]
+    public NSArray TabViewItems { get; set; }
+    [Selector("selectedTabViewItemIndex", "setSelectedTabViewItemIndex:")]
+    public NSInteger SelectedTabViewItemIndex { get; set; }
+    [Selector("addTabViewItem:")]
+    public void AddTabViewItem(NSTabViewItem tabViewItem);
+    [Selector("insertTabViewItem:atIndex:")]
+    public void InsertTabViewItemAtIndex(NSTabViewItem tabViewItem, NSInteger index);
+    [Selector("removeTabViewItem:")]
+    public void RemoveTabViewItem(NSTabViewItem tabViewItem);
+    [Selector("tabViewItemForViewController:")]
+    public NSTabViewItem? TabViewItemForViewController(NSViewController viewController);
+    [Selector("viewDidLoad")]
+    public void ViewDidLoad();
+    [Selector("tabView:willSelectTabViewItem:")]
+    public void TabViewWillSelectTabViewItem(NSTabView tabView, NSTabViewItem? tabViewItem);
+    [Selector("tabView:didSelectTabViewItem:")]
+    public void TabViewDidSelectTabViewItem(NSTabView tabView, NSTabViewItem? tabViewItem);
+    [Selector("tabView:shouldSelectTabViewItem:")]
+    public bool TabViewShouldSelectTabViewItem(NSTabView tabView, NSTabViewItem? tabViewItem);
+    [Selector("toolbar:itemForItemIdentifier:willBeInsertedIntoToolbar:")]
+    public NSToolbarItem? ToolbarItemForItemIdentifierWillBeInsertedIntoToolbar(NSToolbar toolbar, NSToolbarItemIdentifier itemIdentifier, bool flag);
+    [Selector("toolbarDefaultItemIdentifiers:")]
+    public NSArray ToolbarDefaultItemIdentifiers(NSToolbar toolbar);
+    [Selector("toolbarAllowedItemIdentifiers:")]
+    public NSArray ToolbarAllowedItemIdentifiers(NSToolbar toolbar);
+    [Selector("toolbarSelectableItemIdentifiers:")]
+    public NSArray ToolbarSelectableItemIdentifiers(NSToolbar toolbar);
 }
 
 #endif

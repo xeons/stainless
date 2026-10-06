@@ -41,10 +41,14 @@ public enum AUGenericViewDisplayFlags : uint
 
 public extern objc class AUGenericView : NSView, AUCustomViewPersistentData
 {
-    [Selector("audioUnit")] public AudioUnit AudioUnit { get; }
-    [Selector("showsExpertParameters", "setShowsExpertParameters:")] public bool ShowsExpertParameters { get; set; }
-    [Selector("initWithAudioUnit:")] public AUGenericView InitWithAudioUnit(AudioUnit au);
-    [Selector("initWithAudioUnit:displayFlags:")] public AUGenericView InitWithAudioUnitDisplayFlags(AudioUnit inAudioUnit, AUGenericViewDisplayFlags inFlags);
+    [Selector("audioUnit")]
+    public AudioUnit AudioUnit { get; }
+    [Selector("showsExpertParameters", "setShowsExpertParameters:")]
+    public bool ShowsExpertParameters { get; set; }
+    [Selector("initWithAudioUnit:")]
+    public AUGenericView InitWithAudioUnit(AudioUnit au);
+    [Selector("initWithAudioUnit:displayFlags:")]
+    public AUGenericView InitWithAudioUnitDisplayFlags(AudioUnit inAudioUnit, AUGenericViewDisplayFlags inFlags);
 }
 
 #endif

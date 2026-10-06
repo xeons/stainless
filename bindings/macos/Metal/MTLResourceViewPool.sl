@@ -34,18 +34,25 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTLResourceViewPoolDescriptor : NSObject, NSCopying
 {
-    [Selector("resourceViewCount", "setResourceViewCount:")] public NSUInteger ResourceViewCount { get; set; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
+    [Selector("resourceViewCount", "setResourceViewCount:")]
+    public NSUInteger ResourceViewCount { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
 }
 
 /// macOS 26.0 and later.
 public objc interface MTLResourceViewPool : NSObjectProtocol
 {
-    [Selector("baseResourceID")] MTLResourceID BaseResourceID { get; }
-    [Selector("resourceViewCount")] NSUInteger ResourceViewCount { get; }
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("label")] NSString? Label { get; }
-    [Selector("copyResourceViewsFromPool:sourceRange:destinationIndex:")] MTLResourceID CopyResourceViewsFromPoolSourceRangeDestinationIndex(MTLResourceViewPool sourcePool, NSRange sourceRange, NSUInteger destinationIndex);
+    [Selector("baseResourceID")]
+    MTLResourceID BaseResourceID { get; }
+    [Selector("resourceViewCount")]
+    NSUInteger ResourceViewCount { get; }
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("label")]
+    NSString? Label { get; }
+    [Selector("copyResourceViewsFromPool:sourceRange:destinationIndex:")]
+    MTLResourceID CopyResourceViewsFromPoolSourceRangeDestinationIndex(MTLResourceViewPool sourcePool, NSRange sourceRange, NSUInteger destinationIndex);
 }
 
 #endif

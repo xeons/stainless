@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public objc interface ASAuthorizationWebBrowserPlatformPublicKeyCredentialRegistrationRequest
 {
-    [Selector("clientData")] ASPublicKeyCredentialClientData? ClientData { get; }
-    [Selector("excludedCredentials", "setExcludedCredentials:")] NSArray? ExcludedCredentials { get; set; }
-    [Selector("shouldShowHybridTransport", "setShouldShowHybridTransport:")] bool ShouldShowHybridTransport { get; set; }
+    [Selector("clientData")]
+    ASPublicKeyCredentialClientData? ClientData { get; }
+    [Selector("excludedCredentials", "setExcludedCredentials:")]
+    NSArray? ExcludedCredentials { get; set; }
+    [Selector("shouldShowHybridTransport", "setShouldShowHybridTransport:")]
+    bool ShouldShowHybridTransport { get; set; }
 }
 
 #endif

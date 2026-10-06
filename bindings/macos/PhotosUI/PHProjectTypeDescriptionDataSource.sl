@@ -33,16 +33,23 @@ import Standard.ObjC;
 
 public objc interface PHProjectTypeDescriptionDataSource : NSObjectProtocol
 {
-    [Selector("subtypesForProjectType:")] NSArray SubtypesForProjectType(PHProjectType projectType);
-    [Selector("typeDescriptionForProjectType:")] PHProjectTypeDescription? TypeDescriptionForProjectType(PHProjectType projectType);
-    [Selector("footerTextForSubtypesOfProjectType:")] NSAttributedString? FooterTextForSubtypesOfProjectType(PHProjectType projectType);
-    [Optional] [Selector("extensionWillDiscardDataSource")] void ExtensionWillDiscardDataSource();
+    [Selector("subtypesForProjectType:")]
+    NSArray SubtypesForProjectType(PHProjectType projectType);
+    [Selector("typeDescriptionForProjectType:")]
+    PHProjectTypeDescription? TypeDescriptionForProjectType(PHProjectType projectType);
+    [Selector("footerTextForSubtypesOfProjectType:")]
+    NSAttributedString? FooterTextForSubtypesOfProjectType(PHProjectType projectType);
+    [Optional]
+    [Selector("extensionWillDiscardDataSource")]
+    void ExtensionWillDiscardDataSource();
 }
 
 public objc interface PHProjectTypeDescriptionInvalidator : NSObjectProtocol
 {
-    [Selector("invalidateTypeDescriptionForProjectType:")] void InvalidateTypeDescriptionForProjectType(PHProjectType projectType);
-    [Selector("invalidateFooterTextForSubtypesOfProjectType:")] void InvalidateFooterTextForSubtypesOfProjectType(PHProjectType projectType);
+    [Selector("invalidateTypeDescriptionForProjectType:")]
+    void InvalidateTypeDescriptionForProjectType(PHProjectType projectType);
+    [Selector("invalidateFooterTextForSubtypesOfProjectType:")]
+    void InvalidateFooterTextForSubtypesOfProjectType(PHProjectType projectType);
 }
 
 #endif

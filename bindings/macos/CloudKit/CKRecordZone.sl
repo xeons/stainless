@@ -50,14 +50,21 @@ public extern "C" NSString CKRecordZoneDefaultName;
 
 public extern objc class CKRecordZone : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("zoneID")] public CKRecordZoneID ZoneID { get; }
-    [Selector("capabilities")] public CKRecordZoneCapabilities Capabilities { get; }
-    [Selector("share")] public CKReference? Share { get; }
+    [Selector("zoneID")]
+    public CKRecordZoneID ZoneID { get; }
+    [Selector("capabilities")]
+    public CKRecordZoneCapabilities Capabilities { get; }
+    [Selector("share")]
+    public CKReference? Share { get; }
     /// macOS 26.0 and later.
-    [Selector("encryptionScope", "setEncryptionScope:")] public CKRecordZoneEncryptionScope EncryptionScope { get; set; }
-    [Selector("defaultRecordZone")] public static CKRecordZone DefaultRecordZone();
-    [Selector("initWithZoneName:")] public Self InitWithZoneName(NSString zoneName);
-    [Selector("initWithZoneID:")] public Self InitWithZoneID(CKRecordZoneID zoneID);
+    [Selector("encryptionScope", "setEncryptionScope:")]
+    public CKRecordZoneEncryptionScope EncryptionScope { get; set; }
+    [Selector("defaultRecordZone")]
+    public static CKRecordZone DefaultRecordZone();
+    [Selector("initWithZoneName:")]
+    public Self InitWithZoneName(NSString zoneName);
+    [Selector("initWithZoneID:")]
+    public Self InitWithZoneID(CKRecordZoneID zoneID);
 }
 
 #endif

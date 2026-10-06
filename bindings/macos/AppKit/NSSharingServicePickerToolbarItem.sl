@@ -32,12 +32,14 @@ import Standard.ObjC;
 
 public extern objc class NSSharingServicePickerToolbarItem : NSToolbarItem
 {
-    [Selector("delegate", "setDelegate:")] public NSSharingServicePickerToolbarItemDelegate? Delegate { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSSharingServicePickerToolbarItemDelegate? Delegate { get; set; }
 }
 
 public objc interface NSSharingServicePickerToolbarItemDelegate : NSSharingServicePickerDelegate
 {
-    [Selector("itemsForSharingServicePickerToolbarItem:")] NSArray ItemsForSharingServicePickerToolbarItem(NSSharingServicePickerToolbarItem pickerToolbarItem);
+    [Selector("itemsForSharingServicePickerToolbarItem:")]
+    NSArray ItemsForSharingServicePickerToolbarItem(NSSharingServicePickerToolbarItem pickerToolbarItem);
 }
 
 #endif

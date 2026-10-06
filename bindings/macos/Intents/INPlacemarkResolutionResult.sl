@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class INPlacemarkResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedPlacemark:")] public static Self SuccessWithResolvedPlacemark(CLPlacemark resolvedPlacemark);
-    [Selector("disambiguationWithPlacemarksToDisambiguate:")] public static Self DisambiguationWithPlacemarksToDisambiguate(NSArray placemarksToDisambiguate);
-    [Selector("confirmationRequiredWithPlacemarkToConfirm:")] public static Self ConfirmationRequiredWithPlacemarkToConfirm(CLPlacemark? placemarkToConfirm);
+    [Selector("successWithResolvedPlacemark:")]
+    public static Self SuccessWithResolvedPlacemark(CLPlacemark resolvedPlacemark);
+    [Selector("disambiguationWithPlacemarksToDisambiguate:")]
+    public static Self DisambiguationWithPlacemarksToDisambiguate(NSArray placemarksToDisambiguate);
+    [Selector("confirmationRequiredWithPlacemarkToConfirm:")]
+    public static Self ConfirmationRequiredWithPlacemarkToConfirm(CLPlacemark? placemarkToConfirm);
 }
 
 #endif

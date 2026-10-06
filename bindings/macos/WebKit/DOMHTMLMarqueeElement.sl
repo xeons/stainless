@@ -32,8 +32,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLMarqueeElement : DOMHTMLElement
 {
-    [Selector("start")] public void Start();
-    [Selector("stop")] public void Stop();
+    [Selector("start")]
+    public void Start();
+    [Selector("stop")]
+    public void Stop();
 }
 
 #endif

@@ -125,7 +125,8 @@ public extern "C" CFStringRef kSSLSessionConfig_TLSv1_3DES_fallback;
 public extern "C" CFTypeID SSLContextGetTypeID();
 
 /// Deprecated in macOS 10.15.
-[ReturnsRetained] public extern "C" SSLContextRef? SSLCreateContext(CFAllocatorRef? alloc, SSLProtocolSide protocolSide, SSLConnectionType connectionType);
+[ReturnsRetained]
+public extern "C" SSLContextRef? SSLCreateContext(CFAllocatorRef? alloc, SSLProtocolSide protocolSide, SSLConnectionType connectionType);
 
 /// Deprecated in macOS 10.9.
 public extern "C" OSStatus SSLNewContext(Boolean isServer, SSLContext** contextPtr);

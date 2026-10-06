@@ -100,36 +100,50 @@ public enum MTLVertexStepFunction : ulong
 
 public extern objc class MTLVertexBufferLayoutDescriptor : NSObject, NSCopying
 {
-    [Selector("stride", "setStride:")] public NSUInteger Stride { get; set; }
-    [Selector("stepFunction", "setStepFunction:")] public MTLVertexStepFunction StepFunction { get; set; }
-    [Selector("stepRate", "setStepRate:")] public NSUInteger StepRate { get; set; }
+    [Selector("stride", "setStride:")]
+    public NSUInteger Stride { get; set; }
+    [Selector("stepFunction", "setStepFunction:")]
+    public MTLVertexStepFunction StepFunction { get; set; }
+    [Selector("stepRate", "setStepRate:")]
+    public NSUInteger StepRate { get; set; }
 }
 
 public extern objc class MTLVertexBufferLayoutDescriptorArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public MTLVertexBufferLayoutDescriptor ObjectAtIndexedSubscript(NSUInteger index);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTLVertexBufferLayoutDescriptor? bufferDesc, NSUInteger index);
+    [Selector("objectAtIndexedSubscript:")]
+    public MTLVertexBufferLayoutDescriptor ObjectAtIndexedSubscript(NSUInteger index);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTLVertexBufferLayoutDescriptor? bufferDesc, NSUInteger index);
 }
 
 public extern objc class MTLVertexAttributeDescriptor : NSObject, NSCopying
 {
-    [Selector("format", "setFormat:")] public MTLVertexFormat Format { get; set; }
-    [Selector("offset", "setOffset:")] public NSUInteger Offset { get; set; }
-    [Selector("bufferIndex", "setBufferIndex:")] public NSUInteger BufferIndex { get; set; }
+    [Selector("format", "setFormat:")]
+    public MTLVertexFormat Format { get; set; }
+    [Selector("offset", "setOffset:")]
+    public NSUInteger Offset { get; set; }
+    [Selector("bufferIndex", "setBufferIndex:")]
+    public NSUInteger BufferIndex { get; set; }
 }
 
 public extern objc class MTLVertexAttributeDescriptorArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public MTLVertexAttributeDescriptor ObjectAtIndexedSubscript(NSUInteger index);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTLVertexAttributeDescriptor? attributeDesc, NSUInteger index);
+    [Selector("objectAtIndexedSubscript:")]
+    public MTLVertexAttributeDescriptor ObjectAtIndexedSubscript(NSUInteger index);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTLVertexAttributeDescriptor? attributeDesc, NSUInteger index);
 }
 
 public extern objc class MTLVertexDescriptor : NSObject, NSCopying
 {
-    [Selector("layouts")] public MTLVertexBufferLayoutDescriptorArray Layouts { get; }
-    [Selector("attributes")] public MTLVertexAttributeDescriptorArray Attributes { get; }
-    [Selector("vertexDescriptor")] public static MTLVertexDescriptor VertexDescriptor();
-    [Selector("reset")] public void Reset();
+    [Selector("layouts")]
+    public MTLVertexBufferLayoutDescriptorArray Layouts { get; }
+    [Selector("attributes")]
+    public MTLVertexAttributeDescriptorArray Attributes { get; }
+    [Selector("vertexDescriptor")]
+    public static MTLVertexDescriptor VertexDescriptor();
+    [Selector("reset")]
+    public void Reset();
 }
 
 #endif

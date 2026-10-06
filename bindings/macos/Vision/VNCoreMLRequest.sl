@@ -34,17 +34,24 @@ import Standard.ObjC;
 
 public extern objc class VNCoreMLModel : NSObject
 {
-    [Selector("inputImageFeatureName", "setInputImageFeatureName:")] public NSString InputImageFeatureName { get; set; }
-    [Selector("featureProvider", "setFeatureProvider:")] public MLFeatureProvider? FeatureProvider { get; set; }
-    [Selector("modelForMLModel:error:")] public static Self? ModelForMLModelError(MLModel model, out NSError? error);
+    [Selector("inputImageFeatureName", "setInputImageFeatureName:")]
+    public NSString InputImageFeatureName { get; set; }
+    [Selector("featureProvider", "setFeatureProvider:")]
+    public MLFeatureProvider? FeatureProvider { get; set; }
+    [Selector("modelForMLModel:error:")]
+    public static Self? ModelForMLModelError(MLModel model, out NSError? error);
 }
 
 public extern objc class VNCoreMLRequest : VNImageBasedRequest
 {
-    [Selector("model")] public VNCoreMLModel Model { get; }
-    [Selector("imageCropAndScaleOption", "setImageCropAndScaleOption:")] public VNImageCropAndScaleOption ImageCropAndScaleOption { get; set; }
-    [Selector("initWithModel:")] public Self InitWithModel(VNCoreMLModel model);
-    [Selector("initWithModel:completionHandler:")] public Self InitWithModelCompletionHandler(VNCoreMLModel model, VNRequestCompletionHandler? completionHandler);
+    [Selector("model")]
+    public VNCoreMLModel Model { get; }
+    [Selector("imageCropAndScaleOption", "setImageCropAndScaleOption:")]
+    public VNImageCropAndScaleOption ImageCropAndScaleOption { get; set; }
+    [Selector("initWithModel:")]
+    public Self InitWithModel(VNCoreMLModel model);
+    [Selector("initWithModel:completionHandler:")]
+    public Self InitWithModelCompletionHandler(VNCoreMLModel model, VNRequestCompletionHandler? completionHandler);
 }
 
 #endif

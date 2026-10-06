@@ -37,13 +37,20 @@ public objc closure void MKReverseGeocodingRequestGetMapItemsWithCompletionHandl
 /// macOS 26.0 and later.
 public extern objc class MKReverseGeocodingRequest : NSObject
 {
-    [Selector("isCancelled")] public bool Cancelled { get; }
-    [Selector("isLoading")] public bool Loading { get; }
-    [Selector("location")] public CLLocation Location { get; }
-    [Selector("preferredLocale", "setPreferredLocale:")] public NSLocale? PreferredLocale { get; set; }
-    [Selector("initWithLocation:")] public Self? InitWithLocation(CLLocation location);
-    [Selector("getMapItemsWithCompletionHandler:")] public void GetMapItemsWithCompletionHandler(MKReverseGeocodingRequestGetMapItemsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("cancel")] public void Cancel();
+    [Selector("isCancelled")]
+    public bool Cancelled { get; }
+    [Selector("isLoading")]
+    public bool Loading { get; }
+    [Selector("location")]
+    public CLLocation Location { get; }
+    [Selector("preferredLocale", "setPreferredLocale:")]
+    public NSLocale? PreferredLocale { get; set; }
+    [Selector("initWithLocation:")]
+    public Self? InitWithLocation(CLLocation location);
+    [Selector("getMapItemsWithCompletionHandler:")]
+    public void GetMapItemsWithCompletionHandler(MKReverseGeocodingRequestGetMapItemsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

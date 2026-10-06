@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLOptGroupElement : DOMHTMLElement
 {
-    [Selector("disabled", "setDisabled:")] public bool Disabled { get; set; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
+    [Selector("disabled", "setDisabled:")]
+    public bool Disabled { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
 }
 
 #endif

@@ -51,9 +51,12 @@ public enum NSFileCoordinatorWritingOptions : ulong
 
 public extern objc class NSFileAccessIntent : NSObject
 {
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("readingIntentWithURL:options:")] public static Self ReadingIntentWithURLOptions(NSURL url, NSFileCoordinatorReadingOptions options);
-    [Selector("writingIntentWithURL:options:")] public static Self WritingIntentWithURLOptions(NSURL url, NSFileCoordinatorWritingOptions options);
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("readingIntentWithURL:options:")]
+    public static Self ReadingIntentWithURLOptions(NSURL url, NSFileCoordinatorReadingOptions options);
+    [Selector("writingIntentWithURL:options:")]
+    public static Self WritingIntentWithURLOptions(NSURL url, NSFileCoordinatorWritingOptions options);
 }
 
 public objc closure void NSFileCoordinatorCoordinateAccessWithIntentsQueueByAccessorAccessorBlock(NSError? arg0);
@@ -72,21 +75,36 @@ public objc closure void NSFileCoordinatorPrepareForReadingItemsAtURLsOptionsWri
 
 public extern objc class NSFileCoordinator : NSObject
 {
-    [Selector("filePresenters")] public static NSArray FilePresenters { get; }
-    [Selector("purposeIdentifier", "setPurposeIdentifier:")] public NSString PurposeIdentifier { get; set; }
-    [Selector("addFilePresenter:")] public static void AddFilePresenter(NSFilePresenter filePresenter);
-    [Selector("removeFilePresenter:")] public static void RemoveFilePresenter(NSFilePresenter filePresenter);
-    [Selector("initWithFilePresenter:")] public Self InitWithFilePresenter(NSFilePresenter? filePresenterOrNil);
-    [Selector("coordinateAccessWithIntents:queue:byAccessor:")] public void CoordinateAccessWithIntentsQueueByAccessor(NSArray intents, NSOperationQueue queue, NSFileCoordinatorCoordinateAccessWithIntentsQueueByAccessorAccessorBlock accessor);
-    [Selector("coordinateReadingItemAtURL:options:error:byAccessor:")] public void CoordinateReadingItemAtURLOptionsErrorByAccessor(NSURL url, NSFileCoordinatorReadingOptions options, out NSError? outError, NSFileCoordinatorCoordinateReadingItemAtURLOptionsErrorByAccessorReaderBlock reader);
-    [Selector("coordinateWritingItemAtURL:options:error:byAccessor:")] public void CoordinateWritingItemAtURLOptionsErrorByAccessor(NSURL url, NSFileCoordinatorWritingOptions options, out NSError? outError, NSFileCoordinatorCoordinateWritingItemAtURLOptionsErrorByAccessorWriterBlock writer);
-    [Selector("coordinateReadingItemAtURL:options:writingItemAtURL:options:error:byAccessor:")] public void CoordinateReadingItemAtURLOptionsWritingItemAtURLOptionsErrorByAccessor(NSURL readingURL, NSFileCoordinatorReadingOptions readingOptions, NSURL writingURL, NSFileCoordinatorWritingOptions writingOptions, out NSError? outError, NSFileCoordinatorCoordinateReadingItemAtURLOptionsWritingItemAtURLOptionsErrorByAccessorReaderWriterBlock readerWriter);
-    [Selector("coordinateWritingItemAtURL:options:writingItemAtURL:options:error:byAccessor:")] public void CoordinateWritingItemAtURLOptionsWritingItemAtURLOptionsErrorByAccessor(NSURL url1, NSFileCoordinatorWritingOptions options1, NSURL url2, NSFileCoordinatorWritingOptions options2, out NSError? outError, NSFileCoordinatorCoordinateWritingItemAtURLOptionsWritingItemAtURLOptionsErrorByAccessorWriterBlock writer);
-    [Selector("prepareForReadingItemsAtURLs:options:writingItemsAtURLs:options:error:byAccessor:")] public void PrepareForReadingItemsAtURLsOptionsWritingItemsAtURLsOptionsErrorByAccessor(NSArray readingURLs, NSFileCoordinatorReadingOptions readingOptions, NSArray writingURLs, NSFileCoordinatorWritingOptions writingOptions, out NSError? outError, NSFileCoordinatorPrepareForReadingItemsAtURLsOptionsWritingItemsAtURLsOptionsErrorByAccessorBatchAccessorBlock batchAccessor);
-    [Selector("itemAtURL:willMoveToURL:")] public void ItemAtURLWillMoveToURL(NSURL oldURL, NSURL newURL);
-    [Selector("itemAtURL:didMoveToURL:")] public void ItemAtURLDidMoveToURL(NSURL oldURL, NSURL newURL);
-    [Selector("itemAtURL:didChangeUbiquityAttributes:")] public void ItemAtURLDidChangeUbiquityAttributes(NSURL url, NSSet attributes);
-    [Selector("cancel")] public void Cancel();
+    [Selector("filePresenters")]
+    public static NSArray FilePresenters { get; }
+    [Selector("purposeIdentifier", "setPurposeIdentifier:")]
+    public NSString PurposeIdentifier { get; set; }
+    [Selector("addFilePresenter:")]
+    public static void AddFilePresenter(NSFilePresenter filePresenter);
+    [Selector("removeFilePresenter:")]
+    public static void RemoveFilePresenter(NSFilePresenter filePresenter);
+    [Selector("initWithFilePresenter:")]
+    public Self InitWithFilePresenter(NSFilePresenter? filePresenterOrNil);
+    [Selector("coordinateAccessWithIntents:queue:byAccessor:")]
+    public void CoordinateAccessWithIntentsQueueByAccessor(NSArray intents, NSOperationQueue queue, NSFileCoordinatorCoordinateAccessWithIntentsQueueByAccessorAccessorBlock accessor);
+    [Selector("coordinateReadingItemAtURL:options:error:byAccessor:")]
+    public void CoordinateReadingItemAtURLOptionsErrorByAccessor(NSURL url, NSFileCoordinatorReadingOptions options, out NSError? outError, NSFileCoordinatorCoordinateReadingItemAtURLOptionsErrorByAccessorReaderBlock reader);
+    [Selector("coordinateWritingItemAtURL:options:error:byAccessor:")]
+    public void CoordinateWritingItemAtURLOptionsErrorByAccessor(NSURL url, NSFileCoordinatorWritingOptions options, out NSError? outError, NSFileCoordinatorCoordinateWritingItemAtURLOptionsErrorByAccessorWriterBlock writer);
+    [Selector("coordinateReadingItemAtURL:options:writingItemAtURL:options:error:byAccessor:")]
+    public void CoordinateReadingItemAtURLOptionsWritingItemAtURLOptionsErrorByAccessor(NSURL readingURL, NSFileCoordinatorReadingOptions readingOptions, NSURL writingURL, NSFileCoordinatorWritingOptions writingOptions, out NSError? outError, NSFileCoordinatorCoordinateReadingItemAtURLOptionsWritingItemAtURLOptionsErrorByAccessorReaderWriterBlock readerWriter);
+    [Selector("coordinateWritingItemAtURL:options:writingItemAtURL:options:error:byAccessor:")]
+    public void CoordinateWritingItemAtURLOptionsWritingItemAtURLOptionsErrorByAccessor(NSURL url1, NSFileCoordinatorWritingOptions options1, NSURL url2, NSFileCoordinatorWritingOptions options2, out NSError? outError, NSFileCoordinatorCoordinateWritingItemAtURLOptionsWritingItemAtURLOptionsErrorByAccessorWriterBlock writer);
+    [Selector("prepareForReadingItemsAtURLs:options:writingItemsAtURLs:options:error:byAccessor:")]
+    public void PrepareForReadingItemsAtURLsOptionsWritingItemsAtURLsOptionsErrorByAccessor(NSArray readingURLs, NSFileCoordinatorReadingOptions readingOptions, NSArray writingURLs, NSFileCoordinatorWritingOptions writingOptions, out NSError? outError, NSFileCoordinatorPrepareForReadingItemsAtURLsOptionsWritingItemsAtURLsOptionsErrorByAccessorBatchAccessorBlock batchAccessor);
+    [Selector("itemAtURL:willMoveToURL:")]
+    public void ItemAtURLWillMoveToURL(NSURL oldURL, NSURL newURL);
+    [Selector("itemAtURL:didMoveToURL:")]
+    public void ItemAtURLDidMoveToURL(NSURL oldURL, NSURL newURL);
+    [Selector("itemAtURL:didChangeUbiquityAttributes:")]
+    public void ItemAtURLDidChangeUbiquityAttributes(NSURL url, NSSet attributes);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

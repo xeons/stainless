@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class SCSensitivityAnalysis : NSObject
 {
-    [Selector("isSensitive")] public bool Sensitive { get; }
+    [Selector("isSensitive")]
+    public bool Sensitive { get; }
 }
 
 #endif

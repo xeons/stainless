@@ -48,20 +48,34 @@ public objc closure void AVContentKeySessionInvalidateAllPersistableContentKeysF
 
 public extern objc class AVContentKeySession : NSObject
 {
-    [Selector("delegate")] public AVContentKeySessionDelegate? Delegate { get; }
-    [Selector("delegateQueue")] public dispatch_queue_t? DelegateQueue { get; }
-    [Selector("storageURL")] public NSURL? StorageURL { get; }
-    [Selector("keySystem")] public AVContentKeySystem KeySystem { get; }
-    [Selector("contentProtectionSessionIdentifier")] public NSData? ContentProtectionSessionIdentifier { get; }
-    [Selector("contentKeySessionWithKeySystem:")] public static Self ContentKeySessionWithKeySystem(AVContentKeySystem keySystem);
-    [Selector("contentKeySessionWithKeySystem:storageDirectoryAtURL:")] public static Self ContentKeySessionWithKeySystemStorageDirectoryAtURL(AVContentKeySystem keySystem, NSURL storageURL);
-    [Selector("setDelegate:queue:")] public void SetDelegateQueue(AVContentKeySessionDelegate? @delegate, dispatch_queue_t? delegateQueue);
-    [Selector("expire")] public void Expire();
-    [Selector("processContentKeyRequestWithIdentifier:initializationData:options:")] public void ProcessContentKeyRequestWithIdentifierInitializationDataOptions(AnyObject? identifier, NSData? initializationData, NSDictionary? options);
-    [Selector("renewExpiringResponseDataForContentKeyRequest:")] public void RenewExpiringResponseDataForContentKeyRequest(AVContentKeyRequest contentKeyRequest);
-    [Selector("makeSecureTokenForExpirationDateOfPersistableContentKey:completionHandler:")] public void MakeSecureTokenForExpirationDateOfPersistableContentKeyCompletionHandler(NSData persistableContentKeyData, AVContentKeySessionMakeSecureTokenForExpirationDateOfPersistableContentKeyCompletionHandlerHandlerBlock handler);
-    [Selector("invalidatePersistableContentKey:options:completionHandler:")] public void InvalidatePersistableContentKeyOptionsCompletionHandler(NSData persistableContentKeyData, NSDictionary? options, AVContentKeySessionInvalidatePersistableContentKeyOptionsCompletionHandlerHandlerBlock handler);
-    [Selector("invalidateAllPersistableContentKeysForApp:options:completionHandler:")] public void InvalidateAllPersistableContentKeysForAppOptionsCompletionHandler(NSData appIdentifier, NSDictionary? options, AVContentKeySessionInvalidateAllPersistableContentKeysForAppOptionsCompletionHandlerHandlerBlock handler);
+    [Selector("delegate")]
+    public AVContentKeySessionDelegate? Delegate { get; }
+    [Selector("delegateQueue")]
+    public dispatch_queue_t? DelegateQueue { get; }
+    [Selector("storageURL")]
+    public NSURL? StorageURL { get; }
+    [Selector("keySystem")]
+    public AVContentKeySystem KeySystem { get; }
+    [Selector("contentProtectionSessionIdentifier")]
+    public NSData? ContentProtectionSessionIdentifier { get; }
+    [Selector("contentKeySessionWithKeySystem:")]
+    public static Self ContentKeySessionWithKeySystem(AVContentKeySystem keySystem);
+    [Selector("contentKeySessionWithKeySystem:storageDirectoryAtURL:")]
+    public static Self ContentKeySessionWithKeySystemStorageDirectoryAtURL(AVContentKeySystem keySystem, NSURL storageURL);
+    [Selector("setDelegate:queue:")]
+    public void SetDelegateQueue(AVContentKeySessionDelegate? @delegate, dispatch_queue_t? delegateQueue);
+    [Selector("expire")]
+    public void Expire();
+    [Selector("processContentKeyRequestWithIdentifier:initializationData:options:")]
+    public void ProcessContentKeyRequestWithIdentifierInitializationDataOptions(AnyObject? identifier, NSData? initializationData, NSDictionary? options);
+    [Selector("renewExpiringResponseDataForContentKeyRequest:")]
+    public void RenewExpiringResponseDataForContentKeyRequest(AVContentKeyRequest contentKeyRequest);
+    [Selector("makeSecureTokenForExpirationDateOfPersistableContentKey:completionHandler:")]
+    public void MakeSecureTokenForExpirationDateOfPersistableContentKeyCompletionHandler(NSData persistableContentKeyData, AVContentKeySessionMakeSecureTokenForExpirationDateOfPersistableContentKeyCompletionHandlerHandlerBlock handler);
+    [Selector("invalidatePersistableContentKey:options:completionHandler:")]
+    public void InvalidatePersistableContentKeyOptionsCompletionHandler(NSData persistableContentKeyData, NSDictionary? options, AVContentKeySessionInvalidatePersistableContentKeyOptionsCompletionHandlerHandlerBlock handler);
+    [Selector("invalidateAllPersistableContentKeysForApp:options:completionHandler:")]
+    public void InvalidateAllPersistableContentKeysForAppOptionsCompletionHandler(NSData appIdentifier, NSDictionary? options, AVContentKeySessionInvalidateAllPersistableContentKeysForAppOptionsCompletionHandlerHandlerBlock handler);
 }
 
 public using AVContentKeySessionServerPlaybackContextOption = NSString;
@@ -73,16 +87,21 @@ public extern "C" AVContentKeySessionServerPlaybackContextOption AVContentKeySes
 /// AVContentKeyRecipients, a category of AVContentKeySession.
 public extern objc class AVContentKeySession
 {
-    [Selector("contentKeyRecipients")] public NSArray ContentKeyRecipients { get; }
-    [Selector("addContentKeyRecipient:")] public void AddContentKeyRecipient(AVContentKeyRecipient recipient);
-    [Selector("removeContentKeyRecipient:")] public void RemoveContentKeyRecipient(AVContentKeyRecipient recipient);
+    [Selector("contentKeyRecipients")]
+    public NSArray ContentKeyRecipients { get; }
+    [Selector("addContentKeyRecipient:")]
+    public void AddContentKeyRecipient(AVContentKeyRecipient recipient);
+    [Selector("removeContentKeyRecipient:")]
+    public void RemoveContentKeyRecipient(AVContentKeyRecipient recipient);
 }
 
 /// AVContentKeySessionPendingExpiredSessionReports, a category of AVContentKeySession.
 public extern objc class AVContentKeySession
 {
-    [Selector("pendingExpiredSessionReportsWithAppIdentifier:storageDirectoryAtURL:")] public static NSArray PendingExpiredSessionReportsWithAppIdentifierStorageDirectoryAtURL(NSData appIdentifier, NSURL storageURL);
-    [Selector("removePendingExpiredSessionReports:withAppIdentifier:storageDirectoryAtURL:")] public static void RemovePendingExpiredSessionReportsWithAppIdentifierStorageDirectoryAtURL(NSArray expiredSessionReports, NSData appIdentifier, NSURL storageURL);
+    [Selector("pendingExpiredSessionReportsWithAppIdentifier:storageDirectoryAtURL:")]
+    public static NSArray PendingExpiredSessionReportsWithAppIdentifierStorageDirectoryAtURL(NSData appIdentifier, NSURL storageURL);
+    [Selector("removePendingExpiredSessionReports:withAppIdentifier:storageDirectoryAtURL:")]
+    public static void RemovePendingExpiredSessionReportsWithAppIdentifierStorageDirectoryAtURL(NSArray expiredSessionReports, NSData appIdentifier, NSURL storageURL);
 }
 
 public using AVContentKeyRequestRetryReason = NSString;
@@ -95,17 +114,38 @@ public extern "C" AVContentKeyRequestRetryReason AVContentKeyRequestRetryReasonR
 
 public objc interface AVContentKeySessionDelegate : NSObjectProtocol
 {
-    [Selector("contentKeySession:didProvideContentKeyRequest:")] void ContentKeySessionDidProvideContentKeyRequest(AVContentKeySession session, AVContentKeyRequest keyRequest);
-    [Optional] [Selector("contentKeySession:didProvideRenewingContentKeyRequest:")] void ContentKeySessionDidProvideRenewingContentKeyRequest(AVContentKeySession session, AVContentKeyRequest keyRequest);
-    [Optional] [Selector("contentKeySession:didProvidePersistableContentKeyRequest:")] void ContentKeySessionDidProvidePersistableContentKeyRequest(AVContentKeySession session, AVPersistableContentKeyRequest keyRequest);
-    [Optional] [Selector("contentKeySession:didUpdatePersistableContentKey:forContentKeyIdentifier:")] void ContentKeySessionDidUpdatePersistableContentKeyForContentKeyIdentifier(AVContentKeySession session, NSData persistableContentKey, AnyObject keyIdentifier);
-    [Optional] [Selector("contentKeySession:contentKeyRequest:didFailWithError:")] void ContentKeySessionContentKeyRequestDidFailWithError(AVContentKeySession session, AVContentKeyRequest keyRequest, NSError err);
-    [Optional] [Selector("contentKeySession:shouldRetryContentKeyRequest:reason:")] bool ContentKeySessionShouldRetryContentKeyRequestReason(AVContentKeySession session, AVContentKeyRequest keyRequest, AVContentKeyRequestRetryReason retryReason);
-    [Optional] [Selector("contentKeySession:contentKeyRequestDidSucceed:")] void ContentKeySessionContentKeyRequestDidSucceed(AVContentKeySession session, AVContentKeyRequest keyRequest);
-    [Optional] [Selector("contentKeySessionContentProtectionSessionIdentifierDidChange:")] void ContentKeySessionContentProtectionSessionIdentifierDidChange(AVContentKeySession session);
-    [Optional] [Selector("contentKeySessionDidGenerateExpiredSessionReport:")] void ContentKeySessionDidGenerateExpiredSessionReport(AVContentKeySession session);
-    [Optional] [Selector("contentKeySession:externalProtectionStatusDidChangeForContentKey:")] void ContentKeySessionExternalProtectionStatusDidChangeForContentKey(AVContentKeySession session, AVContentKey contentKey);
-    [Optional] [Selector("contentKeySession:didProvideContentKeyRequests:forInitializationData:")] void ContentKeySessionDidProvideContentKeyRequestsForInitializationData(AVContentKeySession session, NSArray keyRequests, NSData? initializationData);
+    [Selector("contentKeySession:didProvideContentKeyRequest:")]
+    void ContentKeySessionDidProvideContentKeyRequest(AVContentKeySession session, AVContentKeyRequest keyRequest);
+    [Optional]
+    [Selector("contentKeySession:didProvideRenewingContentKeyRequest:")]
+    void ContentKeySessionDidProvideRenewingContentKeyRequest(AVContentKeySession session, AVContentKeyRequest keyRequest);
+    [Optional]
+    [Selector("contentKeySession:didProvidePersistableContentKeyRequest:")]
+    void ContentKeySessionDidProvidePersistableContentKeyRequest(AVContentKeySession session, AVPersistableContentKeyRequest keyRequest);
+    [Optional]
+    [Selector("contentKeySession:didUpdatePersistableContentKey:forContentKeyIdentifier:")]
+    void ContentKeySessionDidUpdatePersistableContentKeyForContentKeyIdentifier(AVContentKeySession session, NSData persistableContentKey, AnyObject keyIdentifier);
+    [Optional]
+    [Selector("contentKeySession:contentKeyRequest:didFailWithError:")]
+    void ContentKeySessionContentKeyRequestDidFailWithError(AVContentKeySession session, AVContentKeyRequest keyRequest, NSError err);
+    [Optional]
+    [Selector("contentKeySession:shouldRetryContentKeyRequest:reason:")]
+    bool ContentKeySessionShouldRetryContentKeyRequestReason(AVContentKeySession session, AVContentKeyRequest keyRequest, AVContentKeyRequestRetryReason retryReason);
+    [Optional]
+    [Selector("contentKeySession:contentKeyRequestDidSucceed:")]
+    void ContentKeySessionContentKeyRequestDidSucceed(AVContentKeySession session, AVContentKeyRequest keyRequest);
+    [Optional]
+    [Selector("contentKeySessionContentProtectionSessionIdentifierDidChange:")]
+    void ContentKeySessionContentProtectionSessionIdentifierDidChange(AVContentKeySession session);
+    [Optional]
+    [Selector("contentKeySessionDidGenerateExpiredSessionReport:")]
+    void ContentKeySessionDidGenerateExpiredSessionReport(AVContentKeySession session);
+    [Optional]
+    [Selector("contentKeySession:externalProtectionStatusDidChangeForContentKey:")]
+    void ContentKeySessionExternalProtectionStatusDidChangeForContentKey(AVContentKeySession session, AVContentKey contentKey);
+    [Optional]
+    [Selector("contentKeySession:didProvideContentKeyRequests:forInitializationData:")]
+    void ContentKeySessionDidProvideContentKeyRequestsForInitializationData(AVContentKeySession session, NSArray keyRequests, NSData? initializationData);
 }
 
 public enum AVContentKeyRequestStatus : long
@@ -122,40 +162,58 @@ public objc closure void AVContentKeyRequestMakeStreamingContentKeyRequestDataFo
 
 public extern objc class AVContentKeyRequest : NSObject
 {
-    [Selector("status")] public AVContentKeyRequestStatus Status { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("identifier")] public AnyObject? Identifier { get; }
-    [Selector("initializationData")] public NSData? InitializationData { get; }
-    [Selector("options")] public NSDictionary Options { get; }
-    [Selector("canProvidePersistableContentKey")] public bool CanProvidePersistableContentKey { get; }
-    [Selector("contentKeySpecifier")] public AVContentKeySpecifier ContentKeySpecifier { get; }
-    [Selector("contentKey")] public AVContentKey? ContentKey { get; }
+    [Selector("status")]
+    public AVContentKeyRequestStatus Status { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("identifier")]
+    public AnyObject? Identifier { get; }
+    [Selector("initializationData")]
+    public NSData? InitializationData { get; }
+    [Selector("options")]
+    public NSDictionary Options { get; }
+    [Selector("canProvidePersistableContentKey")]
+    public bool CanProvidePersistableContentKey { get; }
+    [Selector("contentKeySpecifier")]
+    public AVContentKeySpecifier ContentKeySpecifier { get; }
+    [Selector("contentKey")]
+    public AVContentKey? ContentKey { get; }
     /// macOS 15.4 and later.
-    [Selector("originatingRecipient")] public AVContentKeyRecipient? OriginatingRecipient { get; }
-    [Selector("makeStreamingContentKeyRequestDataForApp:contentIdentifier:options:completionHandler:")] public void MakeStreamingContentKeyRequestDataForAppContentIdentifierOptionsCompletionHandler(NSData appIdentifier, NSData? contentIdentifier, NSDictionary? options, AVContentKeyRequestMakeStreamingContentKeyRequestDataForAppContentIdentifierOptionsCompletionHandlerHandlerBlock handler);
-    [Selector("processContentKeyResponse:")] public void ProcessContentKeyResponse(AVContentKeyResponse keyResponse);
-    [Selector("processContentKeyResponseError:")] public void ProcessContentKeyResponseError(NSError error);
-    [Selector("respondByRequestingPersistableContentKeyRequestAndReturnError:")] public bool RespondByRequestingPersistableContentKeyRequestAndReturnError(out NSError? outError);
+    [Selector("originatingRecipient")]
+    public AVContentKeyRecipient? OriginatingRecipient { get; }
+    [Selector("makeStreamingContentKeyRequestDataForApp:contentIdentifier:options:completionHandler:")]
+    public void MakeStreamingContentKeyRequestDataForAppContentIdentifierOptionsCompletionHandler(NSData appIdentifier, NSData? contentIdentifier, NSDictionary? options, AVContentKeyRequestMakeStreamingContentKeyRequestDataForAppContentIdentifierOptionsCompletionHandlerHandlerBlock handler);
+    [Selector("processContentKeyResponse:")]
+    public void ProcessContentKeyResponse(AVContentKeyResponse keyResponse);
+    [Selector("processContentKeyResponseError:")]
+    public void ProcessContentKeyResponseError(NSError error);
+    [Selector("respondByRequestingPersistableContentKeyRequestAndReturnError:")]
+    public bool RespondByRequestingPersistableContentKeyRequestAndReturnError(out NSError? outError);
 }
 
 public extern "C" NSString AVContentKeyRequestRequiresValidationDataInSecureTokenKey;
 
 public extern objc class AVPersistableContentKeyRequest : AVContentKeyRequest
 {
-    [Selector("persistableContentKeyFromKeyVendorResponse:options:error:")] public NSData? PersistableContentKeyFromKeyVendorResponseOptionsError(NSData keyVendorResponse, NSDictionary? options, out NSError? outError);
+    [Selector("persistableContentKeyFromKeyVendorResponse:options:error:")]
+    public NSData? PersistableContentKeyFromKeyVendorResponseOptionsError(NSData keyVendorResponse, NSDictionary? options, out NSError? outError);
 }
 
 /// AVContentKeyRequestRenewal, a category of AVContentKeyRequest.
 public extern objc class AVContentKeyRequest
 {
-    [Selector("renewsExpiringResponseData")] public bool RenewsExpiringResponseData { get; }
+    [Selector("renewsExpiringResponseData")]
+    public bool RenewsExpiringResponseData { get; }
 }
 
 public extern objc class AVContentKeyResponse : NSObject
 {
-    [Selector("contentKeyResponseWithFairPlayStreamingKeyResponseData:")] public static Self ContentKeyResponseWithFairPlayStreamingKeyResponseData(NSData keyResponseData);
-    [Selector("contentKeyResponseWithClearKeyData:initializationVector:")] public static Self ContentKeyResponseWithClearKeyDataInitializationVector(NSData keyData, NSData? initializationVector);
-    [Selector("contentKeyResponseWithAuthorizationTokenData:")] public static Self ContentKeyResponseWithAuthorizationTokenData(NSData authorizationTokenData);
+    [Selector("contentKeyResponseWithFairPlayStreamingKeyResponseData:")]
+    public static Self ContentKeyResponseWithFairPlayStreamingKeyResponseData(NSData keyResponseData);
+    [Selector("contentKeyResponseWithClearKeyData:initializationVector:")]
+    public static Self ContentKeyResponseWithClearKeyDataInitializationVector(NSData keyData, NSData? initializationVector);
+    [Selector("contentKeyResponseWithAuthorizationTokenData:")]
+    public static Self ContentKeyResponseWithAuthorizationTokenData(NSData authorizationTokenData);
 }
 
 public extern "C" NSString AVContentKeyRequestProtocolVersionsKey;
@@ -168,17 +226,25 @@ public extern "C" NSString AVContentKeyRequestRandomDeviceIdentifierSeedKey;
 
 public objc interface AVContentKeyRecipient
 {
-    [Selector("mayRequireContentKeysForMediaDataProcessing")] bool MayRequireContentKeysForMediaDataProcessing { get; }
-    [Optional] [Selector("contentKeySession:didProvideContentKey:")] void ContentKeySessionDidProvideContentKey(AVContentKeySession contentKeySession, AVContentKey contentKey);
+    [Selector("mayRequireContentKeysForMediaDataProcessing")]
+    bool MayRequireContentKeysForMediaDataProcessing { get; }
+    [Optional]
+    [Selector("contentKeySession:didProvideContentKey:")]
+    void ContentKeySessionDidProvideContentKey(AVContentKeySession contentKeySession, AVContentKey contentKey);
 }
 
 public extern objc class AVContentKeySpecifier : NSObject
 {
-    [Selector("keySystem")] public AVContentKeySystem KeySystem { get; }
-    [Selector("identifier")] public AnyObject Identifier { get; }
-    [Selector("options")] public NSDictionary Options { get; }
-    [Selector("contentKeySpecifierForKeySystem:identifier:options:")] public static Self ContentKeySpecifierForKeySystemIdentifierOptions(AVContentKeySystem keySystem, AnyObject contentKeyIdentifier, NSDictionary options);
-    [Selector("initForKeySystem:identifier:options:")] public Self InitForKeySystemIdentifierOptions(AVContentKeySystem keySystem, AnyObject contentKeyIdentifier, NSDictionary options);
+    [Selector("keySystem")]
+    public AVContentKeySystem KeySystem { get; }
+    [Selector("identifier")]
+    public AnyObject Identifier { get; }
+    [Selector("options")]
+    public NSDictionary Options { get; }
+    [Selector("contentKeySpecifierForKeySystem:identifier:options:")]
+    public static Self ContentKeySpecifierForKeySystemIdentifierOptions(AVContentKeySystem keySystem, AnyObject contentKeyIdentifier, NSDictionary options);
+    [Selector("initForKeySystem:identifier:options:")]
+    public Self InitForKeySystemIdentifierOptions(AVContentKeySystem keySystem, AnyObject contentKeyIdentifier, NSDictionary options);
 }
 
 public enum AVExternalContentProtectionStatus : long
@@ -190,9 +256,12 @@ public enum AVExternalContentProtectionStatus : long
 
 public extern objc class AVContentKey : NSObject
 {
-    [Selector("contentKeySpecifier")] public AVContentKeySpecifier ContentKeySpecifier { get; }
-    [Selector("externalContentProtectionStatus")] public AVExternalContentProtectionStatus ExternalContentProtectionStatus { get; }
-    [Selector("revoke")] public void Revoke();
+    [Selector("contentKeySpecifier")]
+    public AVContentKeySpecifier ContentKeySpecifier { get; }
+    [Selector("externalContentProtectionStatus")]
+    public AVExternalContentProtectionStatus ExternalContentProtectionStatus { get; }
+    [Selector("revoke")]
+    public void Revoke();
 }
 
 public extern "C" BOOL AVSampleBufferAttachContentKey(CMSampleBufferRef sbuf, AVContentKey contentKey, void** outError);

@@ -39,16 +39,26 @@ public enum NSHTTPCookieAcceptPolicy : ulong
 
 public extern objc class NSHTTPCookieStorage : NSObject
 {
-    [Selector("sharedHTTPCookieStorage")] public static NSHTTPCookieStorage SharedHTTPCookieStorage { get; }
-    [Selector("cookies")] public NSArray? Cookies { get; }
-    [Selector("cookieAcceptPolicy", "setCookieAcceptPolicy:")] public NSHTTPCookieAcceptPolicy CookieAcceptPolicy { get; set; }
-    [Selector("sharedCookieStorageForGroupContainerIdentifier:")] public static NSHTTPCookieStorage SharedCookieStorageForGroupContainerIdentifier(NSString identifier);
-    [Selector("setCookie:")] public void SetCookie(NSHTTPCookie cookie);
-    [Selector("deleteCookie:")] public void DeleteCookie(NSHTTPCookie cookie);
-    [Selector("removeCookiesSinceDate:")] public void RemoveCookiesSinceDate(NSDate date);
-    [Selector("cookiesForURL:")] public NSArray? CookiesForURL(NSURL URL);
-    [Selector("setCookies:forURL:mainDocumentURL:")] public void SetCookiesForURLMainDocumentURL(NSArray cookies, NSURL? URL, NSURL? mainDocumentURL);
-    [Selector("sortedCookiesUsingDescriptors:")] public NSArray SortedCookiesUsingDescriptors(NSArray sortOrder);
+    [Selector("sharedHTTPCookieStorage")]
+    public static NSHTTPCookieStorage SharedHTTPCookieStorage { get; }
+    [Selector("cookies")]
+    public NSArray? Cookies { get; }
+    [Selector("cookieAcceptPolicy", "setCookieAcceptPolicy:")]
+    public NSHTTPCookieAcceptPolicy CookieAcceptPolicy { get; set; }
+    [Selector("sharedCookieStorageForGroupContainerIdentifier:")]
+    public static NSHTTPCookieStorage SharedCookieStorageForGroupContainerIdentifier(NSString identifier);
+    [Selector("setCookie:")]
+    public void SetCookie(NSHTTPCookie cookie);
+    [Selector("deleteCookie:")]
+    public void DeleteCookie(NSHTTPCookie cookie);
+    [Selector("removeCookiesSinceDate:")]
+    public void RemoveCookiesSinceDate(NSDate date);
+    [Selector("cookiesForURL:")]
+    public NSArray? CookiesForURL(NSURL URL);
+    [Selector("setCookies:forURL:mainDocumentURL:")]
+    public void SetCookiesForURLMainDocumentURL(NSArray cookies, NSURL? URL, NSURL? mainDocumentURL);
+    [Selector("sortedCookiesUsingDescriptors:")]
+    public NSArray SortedCookiesUsingDescriptors(NSArray sortOrder);
 }
 
 public objc closure void NSHTTPCookieStorageGetCookiesForTaskCompletionHandlerCompletionHandlerBlock(NSArray? arg0);
@@ -56,8 +66,10 @@ public objc closure void NSHTTPCookieStorageGetCookiesForTaskCompletionHandlerCo
 /// NSURLSessionTaskAdditions, a category of NSHTTPCookieStorage.
 public extern objc class NSHTTPCookieStorage
 {
-    [Selector("storeCookies:forTask:")] public void StoreCookiesForTask(NSArray cookies, NSURLSessionTask task);
-    [Selector("getCookiesForTask:completionHandler:")] public void GetCookiesForTaskCompletionHandler(NSURLSessionTask task, NSHTTPCookieStorageGetCookiesForTaskCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("storeCookies:forTask:")]
+    public void StoreCookiesForTask(NSArray cookies, NSURLSessionTask task);
+    [Selector("getCookiesForTask:completionHandler:")]
+    public void GetCookiesForTaskCompletionHandler(NSURLSessionTask task, NSHTTPCookieStorageGetCookiesForTaskCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 /// Deprecated in macOS 10.11.

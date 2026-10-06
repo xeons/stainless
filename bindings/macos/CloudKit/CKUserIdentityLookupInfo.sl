@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class CKUserIdentityLookupInfo : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("emailAddress")] public NSString? EmailAddress { get; }
-    [Selector("phoneNumber")] public NSString? PhoneNumber { get; }
-    [Selector("userRecordID")] public CKRecordID? UserRecordID { get; }
-    [Selector("initWithEmailAddress:")] public Self InitWithEmailAddress(NSString emailAddress);
-    [Selector("initWithPhoneNumber:")] public Self InitWithPhoneNumber(NSString phoneNumber);
-    [Selector("initWithUserRecordID:")] public Self InitWithUserRecordID(CKRecordID userRecordID);
-    [Selector("lookupInfosWithEmails:")] public static NSArray LookupInfosWithEmails(NSArray emails);
-    [Selector("lookupInfosWithPhoneNumbers:")] public static NSArray LookupInfosWithPhoneNumbers(NSArray phoneNumbers);
-    [Selector("lookupInfosWithRecordIDs:")] public static NSArray LookupInfosWithRecordIDs(NSArray recordIDs);
+    [Selector("emailAddress")]
+    public NSString? EmailAddress { get; }
+    [Selector("phoneNumber")]
+    public NSString? PhoneNumber { get; }
+    [Selector("userRecordID")]
+    public CKRecordID? UserRecordID { get; }
+    [Selector("initWithEmailAddress:")]
+    public Self InitWithEmailAddress(NSString emailAddress);
+    [Selector("initWithPhoneNumber:")]
+    public Self InitWithPhoneNumber(NSString phoneNumber);
+    [Selector("initWithUserRecordID:")]
+    public Self InitWithUserRecordID(CKRecordID userRecordID);
+    [Selector("lookupInfosWithEmails:")]
+    public static NSArray LookupInfosWithEmails(NSArray emails);
+    [Selector("lookupInfosWithPhoneNumbers:")]
+    public static NSArray LookupInfosWithPhoneNumbers(NSArray phoneNumbers);
+    [Selector("lookupInfosWithRecordIDs:")]
+    public static NSArray LookupInfosWithRecordIDs(NSArray recordIDs);
 }
 
 #endif

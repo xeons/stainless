@@ -42,32 +42,51 @@ public enum NSTableColumnResizingOptions : ulong
 
 public extern objc class NSTableColumn : NSObject, NSCoding, NSUserInterfaceItemIdentification
 {
-    [Selector("identifier", "setIdentifier:")] public NSUserInterfaceItemIdentifier Identifier { get; set; }
-    [Selector("tableView", "setTableView:")] public NSTableView? TableView { get; set; }
-    [Selector("width", "setWidth:")] public CGFloat Width { get; set; }
-    [Selector("minWidth", "setMinWidth:")] public CGFloat MinWidth { get; set; }
-    [Selector("maxWidth", "setMaxWidth:")] public CGFloat MaxWidth { get; set; }
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("headerCell", "setHeaderCell:")] public NSTableHeaderCell HeaderCell { get; set; }
-    [Selector("isEditable", "setEditable:")] public bool Editable { get; set; }
-    [Selector("sortDescriptorPrototype", "setSortDescriptorPrototype:")] public NSSortDescriptor? SortDescriptorPrototype { get; set; }
-    [Selector("resizingMask", "setResizingMask:")] public NSTableColumnResizingOptions ResizingMask { get; set; }
-    [Selector("headerToolTip", "setHeaderToolTip:")] public NSString? HeaderToolTip { get; set; }
-    [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
-    [Selector("initWithIdentifier:")] public Self InitWithIdentifier(NSUserInterfaceItemIdentifier identifier);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("sizeToFit")] public void SizeToFit();
+    [Selector("identifier", "setIdentifier:")]
+    public NSUserInterfaceItemIdentifier Identifier { get; set; }
+    [Selector("tableView", "setTableView:")]
+    public NSTableView? TableView { get; set; }
+    [Selector("width", "setWidth:")]
+    public CGFloat Width { get; set; }
+    [Selector("minWidth", "setMinWidth:")]
+    public CGFloat MinWidth { get; set; }
+    [Selector("maxWidth", "setMaxWidth:")]
+    public CGFloat MaxWidth { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("headerCell", "setHeaderCell:")]
+    public NSTableHeaderCell HeaderCell { get; set; }
+    [Selector("isEditable", "setEditable:")]
+    public bool Editable { get; set; }
+    [Selector("sortDescriptorPrototype", "setSortDescriptorPrototype:")]
+    public NSSortDescriptor? SortDescriptorPrototype { get; set; }
+    [Selector("resizingMask", "setResizingMask:")]
+    public NSTableColumnResizingOptions ResizingMask { get; set; }
+    [Selector("headerToolTip", "setHeaderToolTip:")]
+    public NSString? HeaderToolTip { get; set; }
+    [Selector("isHidden", "setHidden:")]
+    public bool Hidden { get; set; }
+    [Selector("initWithIdentifier:")]
+    public Self InitWithIdentifier(NSUserInterfaceItemIdentifier identifier);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("sizeToFit")]
+    public void SizeToFit();
 }
 
 /// NSDeprecated, a category of NSTableColumn.
 public extern objc class NSTableColumn
 {
-    [Selector("dataCell", "setDataCell:")] public AnyObject DataCell { get; set; }
+    [Selector("dataCell", "setDataCell:")]
+    public AnyObject DataCell { get; set; }
     /// Deprecated in macOS 10.4.
-    [Selector("setResizable:")] public void SetResizable(bool flag);
+    [Selector("setResizable:")]
+    public void SetResizable(bool flag);
     /// Deprecated in macOS 10.4.
-    [Selector("isResizable")] public bool IsResizable();
-    [Selector("dataCellForRow:")] public AnyObject DataCellForRow(NSInteger row);
+    [Selector("isResizable")]
+    public bool IsResizable();
+    [Selector("dataCellForRow:")]
+    public AnyObject DataCellForRow(NSInteger row);
 }
 
 #endif

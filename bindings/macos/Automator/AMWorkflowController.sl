@@ -34,47 +34,79 @@ import Standard.ObjC;
 
 public extern objc class AMWorkflowController : NSController
 {
-    [Selector("workflow", "setWorkflow:")] public AMWorkflow? Workflow { get; set; }
-    [Selector("workflowView", "setWorkflowView:")] public AMWorkflowView? WorkflowView { get; set; }
-    [Selector("delegate", "setDelegate:")] public AMWorkflowControllerDelegate? Delegate { get; set; }
-    [Selector("canRun")] public bool CanRun { get; }
-    [Selector("isRunning")] public bool Running { get; }
-    [Selector("isPaused")] public bool Paused { get; }
-    [Selector("run:")] public void Run(AnyObject sender);
-    [Selector("stop:")] public void Stop(AnyObject sender);
-    [Selector("pause:")] public void Pause(AnyObject sender);
-    [Selector("step:")] public void Step(AnyObject sender);
-    [Selector("reset:")] public void Reset(AnyObject sender);
+    [Selector("workflow", "setWorkflow:")]
+    public AMWorkflow? Workflow { get; set; }
+    [Selector("workflowView", "setWorkflowView:")]
+    public AMWorkflowView? WorkflowView { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public AMWorkflowControllerDelegate? Delegate { get; set; }
+    [Selector("canRun")]
+    public bool CanRun { get; }
+    [Selector("isRunning")]
+    public bool Running { get; }
+    [Selector("isPaused")]
+    public bool Paused { get; }
+    [Selector("run:")]
+    public void Run(AnyObject sender);
+    [Selector("stop:")]
+    public void Stop(AnyObject sender);
+    [Selector("pause:")]
+    public void Pause(AnyObject sender);
+    [Selector("step:")]
+    public void Step(AnyObject sender);
+    [Selector("reset:")]
+    public void Reset(AnyObject sender);
 }
 
 public objc interface AMWorkflowControllerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("workflowControllerWillRun:")] void WorkflowControllerWillRun(AMWorkflowController controller);
-    [Optional] [Selector("workflowControllerWillStop:")] void WorkflowControllerWillStop(AMWorkflowController controller);
-    [Optional] [Selector("workflowControllerDidRun:")] void WorkflowControllerDidRun(AMWorkflowController controller);
-    [Optional] [Selector("workflowControllerDidStop:")] void WorkflowControllerDidStop(AMWorkflowController controller);
-    [Optional] [Selector("workflowController:willRunAction:")] void WorkflowControllerWillRunAction(AMWorkflowController controller, AMAction action);
-    [Optional] [Selector("workflowController:didRunAction:")] void WorkflowControllerDidRunAction(AMWorkflowController controller, AMAction action);
-    [Optional] [Selector("workflowController:didError:")] void WorkflowControllerDidError(AMWorkflowController controller, NSError error);
+    [Optional]
+    [Selector("workflowControllerWillRun:")]
+    void WorkflowControllerWillRun(AMWorkflowController controller);
+    [Optional]
+    [Selector("workflowControllerWillStop:")]
+    void WorkflowControllerWillStop(AMWorkflowController controller);
+    [Optional]
+    [Selector("workflowControllerDidRun:")]
+    void WorkflowControllerDidRun(AMWorkflowController controller);
+    [Optional]
+    [Selector("workflowControllerDidStop:")]
+    void WorkflowControllerDidStop(AMWorkflowController controller);
+    [Optional]
+    [Selector("workflowController:willRunAction:")]
+    void WorkflowControllerWillRunAction(AMWorkflowController controller, AMAction action);
+    [Optional]
+    [Selector("workflowController:didRunAction:")]
+    void WorkflowControllerDidRunAction(AMWorkflowController controller, AMAction action);
+    [Optional]
+    [Selector("workflowController:didError:")]
+    void WorkflowControllerDidError(AMWorkflowController controller, NSError error);
 }
 
 /// AMWorkflowControllerDelegate, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.13.
-    [Selector("workflowControllerWillRun:")] public void WorkflowControllerWillRun(AMWorkflowController controller);
+    [Selector("workflowControllerWillRun:")]
+    public void WorkflowControllerWillRun(AMWorkflowController controller);
     /// Deprecated in macOS 10.13.
-    [Selector("workflowControllerWillStop:")] public void WorkflowControllerWillStop(AMWorkflowController controller);
+    [Selector("workflowControllerWillStop:")]
+    public void WorkflowControllerWillStop(AMWorkflowController controller);
     /// Deprecated in macOS 10.13.
-    [Selector("workflowControllerDidRun:")] public void WorkflowControllerDidRun(AMWorkflowController controller);
+    [Selector("workflowControllerDidRun:")]
+    public void WorkflowControllerDidRun(AMWorkflowController controller);
     /// Deprecated in macOS 10.13.
-    [Selector("workflowControllerDidStop:")] public void WorkflowControllerDidStop(AMWorkflowController controller);
+    [Selector("workflowControllerDidStop:")]
+    public void WorkflowControllerDidStop(AMWorkflowController controller);
     /// Deprecated in macOS 10.13.
-    [Selector("workflowController:willRunAction:")] public void WorkflowControllerWillRunAction(AMWorkflowController controller, AMAction action);
+    [Selector("workflowController:willRunAction:")]
+    public void WorkflowControllerWillRunAction(AMWorkflowController controller, AMAction action);
     /// Deprecated in macOS 10.13.
-    [Selector("workflowController:didRunAction:")] public void WorkflowControllerDidRunAction(AMWorkflowController controller, AMAction action);
+    [Selector("workflowController:didRunAction:")]
+    public void WorkflowControllerDidRunAction(AMWorkflowController controller, AMAction action);
     /// Deprecated in macOS 10.13.
-    [Selector("workflowController:didError:")] public void WorkflowControllerDidError(AMWorkflowController controller, NSError error);
+    [Selector("workflowController:didError:")]
+    public void WorkflowControllerDidError(AMWorkflowController controller, NSError error);
 }
 
 #endif

@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class MLImageSizeConstraint : NSObject, NSSecureCoding
 {
-    [Selector("type")] public MLImageSizeConstraintType Type { get; }
-    [Selector("pixelsWideRange")] public NSRange PixelsWideRange { get; }
-    [Selector("pixelsHighRange")] public NSRange PixelsHighRange { get; }
-    [Selector("enumeratedImageSizes")] public NSArray EnumeratedImageSizes { get; }
+    [Selector("type")]
+    public MLImageSizeConstraintType Type { get; }
+    [Selector("pixelsWideRange")]
+    public NSRange PixelsWideRange { get; }
+    [Selector("pixelsHighRange")]
+    public NSRange PixelsHighRange { get; }
+    [Selector("enumeratedImageSizes")]
+    public NSArray EnumeratedImageSizes { get; }
 }
 
 #endif

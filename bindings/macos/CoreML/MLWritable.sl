@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public objc interface MLWritable : NSObjectProtocol
 {
-    [Selector("writeToURL:error:")] bool WriteToURLError(NSURL url, out NSError? error);
+    [Selector("writeToURL:error:")]
+    bool WriteToURLError(NSURL url, out NSError? error);
 }
 
 #endif

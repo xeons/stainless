@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class CLSScoreItem : CLSActivityItem
 {
-    [Selector("score", "setScore:")] public double Score { get; set; }
-    [Selector("maxScore", "setMaxScore:")] public double MaxScore { get; set; }
-    [Selector("initWithIdentifier:title:score:maxScore:")] public Self InitWithIdentifierTitleScoreMaxScore(NSString identifier, NSString title, double score, double maxScore);
+    [Selector("score", "setScore:")]
+    public double Score { get; set; }
+    [Selector("maxScore", "setMaxScore:")]
+    public double MaxScore { get; set; }
+    [Selector("initWithIdentifier:title:score:maxScore:")]
+    public Self InitWithIdentifierTitleScoreMaxScore(NSString identifier, NSString title, double score, double maxScore);
 }
 
 #endif

@@ -41,10 +41,14 @@ public enum VNGenerateOpticalFlowRequestComputationAccuracy : ulong
 
 public extern objc class VNGenerateOpticalFlowRequest : VNTargetedImageRequest
 {
-    [Selector("computationAccuracy", "setComputationAccuracy:")] public VNGenerateOpticalFlowRequestComputationAccuracy ComputationAccuracy { get; set; }
-    [Selector("outputPixelFormat", "setOutputPixelFormat:")] public OSType OutputPixelFormat { get; set; }
-    [Selector("keepNetworkOutput", "setKeepNetworkOutput:")] public bool KeepNetworkOutput { get; set; }
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("computationAccuracy", "setComputationAccuracy:")]
+    public VNGenerateOpticalFlowRequestComputationAccuracy ComputationAccuracy { get; set; }
+    [Selector("outputPixelFormat", "setOutputPixelFormat:")]
+    public OSType OutputPixelFormat { get; set; }
+    [Selector("keepNetworkOutput", "setKeepNetworkOutput:")]
+    public bool KeepNetworkOutput { get; set; }
+    [Selector("results")]
+    public NSArray? Results { get; }
 }
 
 #endif

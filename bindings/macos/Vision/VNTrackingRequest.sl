@@ -39,10 +39,14 @@ public enum VNRequestTrackingLevel : ulong
 
 public extern objc class VNTrackingRequest : VNImageBasedRequest
 {
-    [Selector("inputObservation", "setInputObservation:")] public VNDetectedObjectObservation InputObservation { get; set; }
-    [Selector("trackingLevel", "setTrackingLevel:")] public VNRequestTrackingLevel TrackingLevel { get; set; }
-    [Selector("isLastFrame", "setLastFrame:")] public bool LastFrame { get; set; }
-    [Selector("supportedNumberOfTrackersAndReturnError:")] public NSUInteger SupportedNumberOfTrackersAndReturnError(out NSError? error);
+    [Selector("inputObservation", "setInputObservation:")]
+    public VNDetectedObjectObservation InputObservation { get; set; }
+    [Selector("trackingLevel", "setTrackingLevel:")]
+    public VNRequestTrackingLevel TrackingLevel { get; set; }
+    [Selector("isLastFrame", "setLastFrame:")]
+    public bool LastFrame { get; set; }
+    [Selector("supportedNumberOfTrackersAndReturnError:")]
+    public NSUInteger SupportedNumberOfTrackersAndReturnError(out NSError? error);
 }
 
 #endif

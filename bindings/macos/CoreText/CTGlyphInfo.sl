@@ -54,11 +54,14 @@ public enum CTCharacterCollection : ushort
     AdobeKorea1CharacterCollection = 5,
 }
 
-[ReturnsRetained] public extern "C" CTGlyphInfoRef? CTGlyphInfoCreateWithGlyphName(CFStringRef glyphName, CTFontRef font, CFStringRef baseString);
+[ReturnsRetained]
+public extern "C" CTGlyphInfoRef? CTGlyphInfoCreateWithGlyphName(CFStringRef glyphName, CTFontRef font, CFStringRef baseString);
 
-[ReturnsRetained] public extern "C" CTGlyphInfoRef? CTGlyphInfoCreateWithGlyph(CGGlyph glyph, CTFontRef font, CFStringRef baseString);
+[ReturnsRetained]
+public extern "C" CTGlyphInfoRef? CTGlyphInfoCreateWithGlyph(CGGlyph glyph, CTFontRef font, CFStringRef baseString);
 
-[ReturnsRetained] public extern "C" CTGlyphInfoRef? CTGlyphInfoCreateWithCharacterIdentifier(CGFontIndex cid, CTCharacterCollection collection, CFStringRef baseString);
+[ReturnsRetained]
+public extern "C" CTGlyphInfoRef? CTGlyphInfoCreateWithCharacterIdentifier(CGFontIndex cid, CTCharacterCollection collection, CFStringRef baseString);
 
 public extern "C" CFStringRef? CTGlyphInfoGetGlyphName(CTGlyphInfoRef glyphInfo);
 

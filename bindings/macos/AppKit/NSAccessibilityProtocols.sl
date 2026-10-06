@@ -34,101 +34,163 @@ import Standard.ObjC;
 [ObjCName("NSAccessibilityElement")]
 public objc interface NSAccessibilityElementProtocol : NSObjectProtocol
 {
-    [Selector("accessibilityFrame")] NSRect AccessibilityFrame();
-    [Selector("accessibilityParent")] AnyObject? AccessibilityParent();
-    [Optional] [Selector("isAccessibilityFocused")] bool IsAccessibilityFocused();
-    [Optional] [Selector("accessibilityIdentifier")] NSString AccessibilityIdentifier();
+    [Selector("accessibilityFrame")]
+    NSRect AccessibilityFrame();
+    [Selector("accessibilityParent")]
+    AnyObject? AccessibilityParent();
+    [Optional]
+    [Selector("isAccessibilityFocused")]
+    bool IsAccessibilityFocused();
+    [Optional]
+    [Selector("accessibilityIdentifier")]
+    NSString AccessibilityIdentifier();
 }
 
 public objc interface NSAccessibilityGroup : NSAccessibilityElementProtocol { }
 
 public objc interface NSAccessibilityButton : NSAccessibilityElementProtocol
 {
-    [Selector("accessibilityLabel")] NSString? AccessibilityLabel();
-    [Selector("accessibilityPerformPress")] bool AccessibilityPerformPress();
+    [Selector("accessibilityLabel")]
+    NSString? AccessibilityLabel();
+    [Selector("accessibilityPerformPress")]
+    bool AccessibilityPerformPress();
 }
 
 public objc interface NSAccessibilitySwitch : NSAccessibilityButton
 {
-    [Selector("accessibilityValue")] NSString? AccessibilityValue();
-    [Optional] [Selector("accessibilityPerformIncrement")] bool AccessibilityPerformIncrement();
-    [Optional] [Selector("accessibilityPerformDecrement")] bool AccessibilityPerformDecrement();
+    [Selector("accessibilityValue")]
+    NSString? AccessibilityValue();
+    [Optional]
+    [Selector("accessibilityPerformIncrement")]
+    bool AccessibilityPerformIncrement();
+    [Optional]
+    [Selector("accessibilityPerformDecrement")]
+    bool AccessibilityPerformDecrement();
 }
 
 public objc interface NSAccessibilityRadioButton : NSAccessibilityButton
 {
-    [Selector("accessibilityValue")] NSNumber? AccessibilityValue();
+    [Selector("accessibilityValue")]
+    NSNumber? AccessibilityValue();
 }
 
 public objc interface NSAccessibilityCheckBox : NSAccessibilityButton
 {
-    [Selector("accessibilityValue")] NSNumber? AccessibilityValue();
+    [Selector("accessibilityValue")]
+    NSNumber? AccessibilityValue();
 }
 
 public objc interface NSAccessibilityStaticText : NSAccessibilityElementProtocol
 {
-    [Selector("accessibilityValue")] NSString? AccessibilityValue();
-    [Optional] [Selector("accessibilityAttributedStringForRange:")] NSAttributedString? AccessibilityAttributedStringForRange(NSRange range);
-    [Optional] [Selector("accessibilityVisibleCharacterRange")] NSRange AccessibilityVisibleCharacterRange();
+    [Selector("accessibilityValue")]
+    NSString? AccessibilityValue();
+    [Optional]
+    [Selector("accessibilityAttributedStringForRange:")]
+    NSAttributedString? AccessibilityAttributedStringForRange(NSRange range);
+    [Optional]
+    [Selector("accessibilityVisibleCharacterRange")]
+    NSRange AccessibilityVisibleCharacterRange();
 }
 
 public objc interface NSAccessibilityNavigableStaticText : NSAccessibilityStaticText
 {
-    [Selector("accessibilityStringForRange:")] NSString? AccessibilityStringForRange(NSRange range);
-    [Selector("accessibilityLineForIndex:")] NSInteger AccessibilityLineForIndex(NSInteger index);
-    [Selector("accessibilityRangeForLine:")] NSRange AccessibilityRangeForLine(NSInteger lineNumber);
-    [Selector("accessibilityFrameForRange:")] NSRect AccessibilityFrameForRange(NSRange range);
+    [Selector("accessibilityStringForRange:")]
+    NSString? AccessibilityStringForRange(NSRange range);
+    [Selector("accessibilityLineForIndex:")]
+    NSInteger AccessibilityLineForIndex(NSInteger index);
+    [Selector("accessibilityRangeForLine:")]
+    NSRange AccessibilityRangeForLine(NSInteger lineNumber);
+    [Selector("accessibilityFrameForRange:")]
+    NSRect AccessibilityFrameForRange(NSRange range);
 }
 
 public objc interface NSAccessibilityProgressIndicator : NSAccessibilityGroup
 {
-    [Selector("accessibilityValue")] NSNumber? AccessibilityValue();
+    [Selector("accessibilityValue")]
+    NSNumber? AccessibilityValue();
 }
 
 public objc interface NSAccessibilityStepper : NSAccessibilityElementProtocol
 {
-    [Selector("accessibilityLabel")] NSString? AccessibilityLabel();
-    [Selector("accessibilityPerformIncrement")] bool AccessibilityPerformIncrement();
-    [Selector("accessibilityPerformDecrement")] bool AccessibilityPerformDecrement();
-    [Optional] [Selector("accessibilityValue")] AnyObject? AccessibilityValue();
+    [Selector("accessibilityLabel")]
+    NSString? AccessibilityLabel();
+    [Selector("accessibilityPerformIncrement")]
+    bool AccessibilityPerformIncrement();
+    [Selector("accessibilityPerformDecrement")]
+    bool AccessibilityPerformDecrement();
+    [Optional]
+    [Selector("accessibilityValue")]
+    AnyObject? AccessibilityValue();
 }
 
 public objc interface NSAccessibilitySlider : NSAccessibilityElementProtocol
 {
-    [Selector("accessibilityLabel")] NSString? AccessibilityLabel();
-    [Selector("accessibilityValue")] AnyObject? AccessibilityValue();
-    [Selector("accessibilityPerformIncrement")] bool AccessibilityPerformIncrement();
-    [Selector("accessibilityPerformDecrement")] bool AccessibilityPerformDecrement();
+    [Selector("accessibilityLabel")]
+    NSString? AccessibilityLabel();
+    [Selector("accessibilityValue")]
+    AnyObject? AccessibilityValue();
+    [Selector("accessibilityPerformIncrement")]
+    bool AccessibilityPerformIncrement();
+    [Selector("accessibilityPerformDecrement")]
+    bool AccessibilityPerformDecrement();
 }
 
 public objc interface NSAccessibilityImage : NSAccessibilityElementProtocol
 {
-    [Selector("accessibilityLabel")] NSString? AccessibilityLabel();
+    [Selector("accessibilityLabel")]
+    NSString? AccessibilityLabel();
 }
 
 public objc interface NSAccessibilityContainsTransientUI : NSAccessibilityElementProtocol
 {
-    [Selector("accessibilityPerformShowAlternateUI")] bool AccessibilityPerformShowAlternateUI();
-    [Selector("accessibilityPerformShowDefaultUI")] bool AccessibilityPerformShowDefaultUI();
-    [Selector("isAccessibilityAlternateUIVisible")] bool IsAccessibilityAlternateUIVisible();
+    [Selector("accessibilityPerformShowAlternateUI")]
+    bool AccessibilityPerformShowAlternateUI();
+    [Selector("accessibilityPerformShowDefaultUI")]
+    bool AccessibilityPerformShowDefaultUI();
+    [Selector("isAccessibilityAlternateUIVisible")]
+    bool IsAccessibilityAlternateUIVisible();
 }
 
 public objc interface NSAccessibilityTable : NSAccessibilityGroup
 {
-    [Selector("accessibilityLabel")] NSString? AccessibilityLabel();
-    [Selector("accessibilityRows")] NSArray? AccessibilityRows();
-    [Optional] [Selector("accessibilitySelectedRows")] NSArray? AccessibilitySelectedRows();
-    [Optional] [Selector("setAccessibilitySelectedRows:")] void SetAccessibilitySelectedRows(NSArray selectedRows);
-    [Optional] [Selector("accessibilityVisibleRows")] NSArray? AccessibilityVisibleRows();
-    [Optional] [Selector("accessibilityColumns")] NSArray? AccessibilityColumns();
-    [Optional] [Selector("accessibilityVisibleColumns")] NSArray? AccessibilityVisibleColumns();
-    [Optional] [Selector("accessibilitySelectedColumns")] NSArray? AccessibilitySelectedColumns();
+    [Selector("accessibilityLabel")]
+    NSString? AccessibilityLabel();
+    [Selector("accessibilityRows")]
+    NSArray? AccessibilityRows();
+    [Optional]
+    [Selector("accessibilitySelectedRows")]
+    NSArray? AccessibilitySelectedRows();
+    [Optional]
+    [Selector("setAccessibilitySelectedRows:")]
+    void SetAccessibilitySelectedRows(NSArray selectedRows);
+    [Optional]
+    [Selector("accessibilityVisibleRows")]
+    NSArray? AccessibilityVisibleRows();
+    [Optional]
+    [Selector("accessibilityColumns")]
+    NSArray? AccessibilityColumns();
+    [Optional]
+    [Selector("accessibilityVisibleColumns")]
+    NSArray? AccessibilityVisibleColumns();
+    [Optional]
+    [Selector("accessibilitySelectedColumns")]
+    NSArray? AccessibilitySelectedColumns();
     /// Deprecated in macOS 10.14.
-    [Optional] [Selector("accessibilityHeaderGroup")] NSString? AccessibilityHeaderGroup();
-    [Optional] [Selector("accessibilitySelectedCells")] NSArray? AccessibilitySelectedCells();
-    [Optional] [Selector("accessibilityVisibleCells")] NSArray? AccessibilityVisibleCells();
-    [Optional] [Selector("accessibilityRowHeaderUIElements")] NSArray? AccessibilityRowHeaderUIElements();
-    [Optional] [Selector("accessibilityColumnHeaderUIElements")] NSArray? AccessibilityColumnHeaderUIElements();
+    [Optional]
+    [Selector("accessibilityHeaderGroup")]
+    NSString? AccessibilityHeaderGroup();
+    [Optional]
+    [Selector("accessibilitySelectedCells")]
+    NSArray? AccessibilitySelectedCells();
+    [Optional]
+    [Selector("accessibilityVisibleCells")]
+    NSArray? AccessibilityVisibleCells();
+    [Optional]
+    [Selector("accessibilityRowHeaderUIElements")]
+    NSArray? AccessibilityRowHeaderUIElements();
+    [Optional]
+    [Selector("accessibilityColumnHeaderUIElements")]
+    NSArray? AccessibilityColumnHeaderUIElements();
 }
 
 public objc interface NSAccessibilityOutline : NSAccessibilityTable { }
@@ -137,181 +199,343 @@ public objc interface NSAccessibilityList : NSAccessibilityTable { }
 
 public objc interface NSAccessibilityRow : NSAccessibilityGroup
 {
-    [Selector("accessibilityIndex")] NSInteger AccessibilityIndex();
-    [Optional] [Selector("accessibilityDisclosureLevel")] NSInteger AccessibilityDisclosureLevel();
+    [Selector("accessibilityIndex")]
+    NSInteger AccessibilityIndex();
+    [Optional]
+    [Selector("accessibilityDisclosureLevel")]
+    NSInteger AccessibilityDisclosureLevel();
 }
 
 public objc interface NSAccessibilityLayoutArea : NSAccessibilityGroup
 {
-    [Selector("accessibilityFocusedUIElement")] AnyObject AccessibilityFocusedUIElement { get; }
-    [Selector("accessibilityLabel")] NSString AccessibilityLabel();
-    [Selector("accessibilityChildren")] NSArray? AccessibilityChildren();
-    [Selector("accessibilitySelectedChildren")] NSArray? AccessibilitySelectedChildren();
+    [Selector("accessibilityFocusedUIElement")]
+    AnyObject AccessibilityFocusedUIElement { get; }
+    [Selector("accessibilityLabel")]
+    NSString AccessibilityLabel();
+    [Selector("accessibilityChildren")]
+    NSArray? AccessibilityChildren();
+    [Selector("accessibilitySelectedChildren")]
+    NSArray? AccessibilitySelectedChildren();
 }
 
 public objc interface NSAccessibilityLayoutItem : NSAccessibilityGroup
 {
-    [Optional] [Selector("setAccessibilityFrame:")] void SetAccessibilityFrame(NSRect frame);
+    [Optional]
+    [Selector("setAccessibilityFrame:")]
+    void SetAccessibilityFrame(NSRect frame);
 }
 
 public objc interface NSAccessibilityElementLoading : NSObjectProtocol
 {
-    [Selector("accessibilityElementWithToken:")] NSAccessibilityElementProtocol? AccessibilityElementWithToken(NSAccessibilityLoadingToken token);
-    [Optional] [Selector("accessibilityRangeInTargetElementWithToken:")] NSRange AccessibilityRangeInTargetElementWithToken(NSAccessibilityLoadingToken token);
+    [Selector("accessibilityElementWithToken:")]
+    NSAccessibilityElementProtocol? AccessibilityElementWithToken(NSAccessibilityLoadingToken token);
+    [Optional]
+    [Selector("accessibilityRangeInTargetElementWithToken:")]
+    NSRange AccessibilityRangeInTargetElementWithToken(NSAccessibilityLoadingToken token);
 }
 
 public objc interface NSAccessibility : NSObjectProtocol
 {
-    [Selector("isAccessibilityElement", "setAccessibilityElement:")] bool AccessibilityElement { get; set; }
-    [Selector("accessibilityFrame", "setAccessibilityFrame:")] NSRect AccessibilityFrame { get; set; }
-    [Selector("isAccessibilityFocused", "setAccessibilityFocused:")] bool AccessibilityFocused { get; set; }
-    [Selector("accessibilityActivationPoint", "setAccessibilityActivationPoint:")] NSPoint AccessibilityActivationPoint { get; set; }
-    [Selector("accessibilityTopLevelUIElement", "setAccessibilityTopLevelUIElement:")] AnyObject? AccessibilityTopLevelUIElement { get; set; }
-    [Selector("accessibilityURL", "setAccessibilityURL:")] NSURL? AccessibilityURL { get; set; }
-    [Selector("accessibilityValue", "setAccessibilityValue:")] AnyObject? AccessibilityValue { get; set; }
-    [Selector("accessibilityValueDescription", "setAccessibilityValueDescription:")] NSString? AccessibilityValueDescription { get; set; }
-    [Selector("accessibilityVisibleChildren", "setAccessibilityVisibleChildren:")] NSArray? AccessibilityVisibleChildren { get; set; }
-    [Selector("accessibilitySubrole", "setAccessibilitySubrole:")] NSAccessibilitySubrole? AccessibilitySubrole { get; set; }
-    [Selector("accessibilityTitle", "setAccessibilityTitle:")] NSString? AccessibilityTitle { get; set; }
-    [Selector("accessibilityTitleUIElement", "setAccessibilityTitleUIElement:")] AnyObject? AccessibilityTitleUIElement { get; set; }
-    [Selector("accessibilityNextContents", "setAccessibilityNextContents:")] NSArray? AccessibilityNextContents { get; set; }
-    [Selector("accessibilityOrientation", "setAccessibilityOrientation:")] NSAccessibilityOrientation AccessibilityOrientation { get; set; }
-    [Selector("accessibilityOverflowButton", "setAccessibilityOverflowButton:")] AnyObject? AccessibilityOverflowButton { get; set; }
-    [Selector("accessibilityParent", "setAccessibilityParent:")] AnyObject? AccessibilityParent { get; set; }
-    [Selector("accessibilityPlaceholderValue", "setAccessibilityPlaceholderValue:")] NSString? AccessibilityPlaceholderValue { get; set; }
-    [Selector("accessibilityPreviousContents", "setAccessibilityPreviousContents:")] NSArray? AccessibilityPreviousContents { get; set; }
-    [Selector("accessibilityRole", "setAccessibilityRole:")] NSAccessibilityRole? AccessibilityRole { get; set; }
-    [Selector("accessibilityRoleDescription", "setAccessibilityRoleDescription:")] NSString? AccessibilityRoleDescription { get; set; }
-    [Selector("accessibilitySearchButton", "setAccessibilitySearchButton:")] AnyObject? AccessibilitySearchButton { get; set; }
-    [Selector("accessibilitySearchMenu", "setAccessibilitySearchMenu:")] AnyObject? AccessibilitySearchMenu { get; set; }
-    [Selector("isAccessibilitySelected", "setAccessibilitySelected:")] bool AccessibilitySelected { get; set; }
-    [Selector("accessibilitySelectedChildren", "setAccessibilitySelectedChildren:")] NSArray? AccessibilitySelectedChildren { get; set; }
-    [Selector("accessibilityServesAsTitleForUIElements", "setAccessibilityServesAsTitleForUIElements:")] NSArray? AccessibilityServesAsTitleForUIElements { get; set; }
-    [Selector("accessibilityShownMenu", "setAccessibilityShownMenu:")] AnyObject? AccessibilityShownMenu { get; set; }
-    [Selector("accessibilityMinValue", "setAccessibilityMinValue:")] AnyObject? AccessibilityMinValue { get; set; }
-    [Selector("accessibilityMaxValue", "setAccessibilityMaxValue:")] AnyObject? AccessibilityMaxValue { get; set; }
-    [Selector("accessibilityLinkedUIElements", "setAccessibilityLinkedUIElements:")] NSArray? AccessibilityLinkedUIElements { get; set; }
-    [Selector("accessibilityWindow", "setAccessibilityWindow:")] AnyObject? AccessibilityWindow { get; set; }
-    [Selector("accessibilityIdentifier", "setAccessibilityIdentifier:")] NSString? AccessibilityIdentifier { get; set; }
-    [Selector("accessibilityHelp", "setAccessibilityHelp:")] NSString? AccessibilityHelp { get; set; }
-    [Selector("accessibilityFilename", "setAccessibilityFilename:")] NSString? AccessibilityFilename { get; set; }
-    [Selector("isAccessibilityExpanded", "setAccessibilityExpanded:")] bool AccessibilityExpanded { get; set; }
-    [Selector("isAccessibilityEdited", "setAccessibilityEdited:")] bool AccessibilityEdited { get; set; }
-    [Selector("isAccessibilityEnabled", "setAccessibilityEnabled:")] bool AccessibilityEnabled { get; set; }
-    [Selector("accessibilityChildren", "setAccessibilityChildren:")] NSArray? AccessibilityChildren { get; set; }
-    [Selector("accessibilityChildrenInNavigationOrder", "setAccessibilityChildrenInNavigationOrder:")] NSArray? AccessibilityChildrenInNavigationOrder { get; set; }
-    [Selector("accessibilityClearButton", "setAccessibilityClearButton:")] AnyObject? AccessibilityClearButton { get; set; }
-    [Selector("accessibilityCancelButton", "setAccessibilityCancelButton:")] AnyObject? AccessibilityCancelButton { get; set; }
-    [Selector("isAccessibilityProtectedContent", "setAccessibilityProtectedContent:")] bool AccessibilityProtectedContent { get; set; }
-    [Selector("accessibilityContents", "setAccessibilityContents:")] NSArray? AccessibilityContents { get; set; }
-    [Selector("accessibilityLabel", "setAccessibilityLabel:")] NSString? AccessibilityLabel { get; set; }
-    [Selector("isAccessibilityAlternateUIVisible", "setAccessibilityAlternateUIVisible:")] bool AccessibilityAlternateUIVisible { get; set; }
-    [Selector("accessibilitySharedFocusElements", "setAccessibilitySharedFocusElements:")] NSArray? AccessibilitySharedFocusElements { get; set; }
-    [Selector("isAccessibilityRequired", "setAccessibilityRequired:")] bool AccessibilityRequired { get; set; }
-    [Selector("accessibilityCustomRotors", "setAccessibilityCustomRotors:")] NSArray? AccessibilityCustomRotors { get; set; }
-    [Selector("accessibilityUserInputLabels", "setAccessibilityUserInputLabels:")] NSArray? AccessibilityUserInputLabels { get; set; }
-    [Selector("accessibilityAttributedUserInputLabels", "setAccessibilityAttributedUserInputLabels:")] NSArray? AccessibilityAttributedUserInputLabels { get; set; }
-    [Selector("accessibilityApplicationFocusedUIElement", "setAccessibilityApplicationFocusedUIElement:")] AnyObject? AccessibilityApplicationFocusedUIElement { get; set; }
-    [Selector("accessibilityMainWindow", "setAccessibilityMainWindow:")] AnyObject? AccessibilityMainWindow { get; set; }
-    [Selector("isAccessibilityHidden", "setAccessibilityHidden:")] bool AccessibilityHidden { get; set; }
-    [Selector("isAccessibilityFrontmost", "setAccessibilityFrontmost:")] bool AccessibilityFrontmost { get; set; }
-    [Selector("accessibilityFocusedWindow", "setAccessibilityFocusedWindow:")] AnyObject? AccessibilityFocusedWindow { get; set; }
-    [Selector("accessibilityWindows", "setAccessibilityWindows:")] NSArray? AccessibilityWindows { get; set; }
-    [Selector("accessibilityExtrasMenuBar", "setAccessibilityExtrasMenuBar:")] AnyObject? AccessibilityExtrasMenuBar { get; set; }
-    [Selector("accessibilityMenuBar", "setAccessibilityMenuBar:")] AnyObject? AccessibilityMenuBar { get; set; }
-    [Selector("accessibilityColumnTitles", "setAccessibilityColumnTitles:")] NSArray? AccessibilityColumnTitles { get; set; }
-    [Selector("isAccessibilityOrderedByRow", "setAccessibilityOrderedByRow:")] bool AccessibilityOrderedByRow { get; set; }
-    [Selector("accessibilityHorizontalUnits", "setAccessibilityHorizontalUnits:")] NSAccessibilityUnits AccessibilityHorizontalUnits { get; set; }
-    [Selector("accessibilityVerticalUnits", "setAccessibilityVerticalUnits:")] NSAccessibilityUnits AccessibilityVerticalUnits { get; set; }
-    [Selector("accessibilityHorizontalUnitDescription", "setAccessibilityHorizontalUnitDescription:")] NSString? AccessibilityHorizontalUnitDescription { get; set; }
-    [Selector("accessibilityVerticalUnitDescription", "setAccessibilityVerticalUnitDescription:")] NSString? AccessibilityVerticalUnitDescription { get; set; }
-    [Selector("accessibilityHandles", "setAccessibilityHandles:")] NSArray? AccessibilityHandles { get; set; }
-    [Selector("accessibilityWarningValue", "setAccessibilityWarningValue:")] AnyObject? AccessibilityWarningValue { get; set; }
-    [Selector("accessibilityCriticalValue", "setAccessibilityCriticalValue:")] AnyObject? AccessibilityCriticalValue { get; set; }
-    [Selector("isAccessibilityDisclosed", "setAccessibilityDisclosed:")] bool AccessibilityDisclosed { get; set; }
-    [Selector("accessibilityDisclosedByRow", "setAccessibilityDisclosedByRow:")] AnyObject? AccessibilityDisclosedByRow { get; set; }
-    [Selector("accessibilityDisclosedRows", "setAccessibilityDisclosedRows:")] AnyObject? AccessibilityDisclosedRows { get; set; }
-    [Selector("accessibilityDisclosureLevel", "setAccessibilityDisclosureLevel:")] NSInteger AccessibilityDisclosureLevel { get; set; }
-    [Selector("accessibilityMarkerUIElements", "setAccessibilityMarkerUIElements:")] NSArray? AccessibilityMarkerUIElements { get; set; }
-    [Selector("accessibilityMarkerValues", "setAccessibilityMarkerValues:")] AnyObject? AccessibilityMarkerValues { get; set; }
-    [Selector("accessibilityMarkerGroupUIElement", "setAccessibilityMarkerGroupUIElement:")] AnyObject? AccessibilityMarkerGroupUIElement { get; set; }
-    [Selector("accessibilityUnits", "setAccessibilityUnits:")] NSAccessibilityUnits AccessibilityUnits { get; set; }
-    [Selector("accessibilityUnitDescription", "setAccessibilityUnitDescription:")] NSString? AccessibilityUnitDescription { get; set; }
-    [Selector("accessibilityRulerMarkerType", "setAccessibilityRulerMarkerType:")] NSAccessibilityRulerMarkerType AccessibilityRulerMarkerType { get; set; }
-    [Selector("accessibilityMarkerTypeDescription", "setAccessibilityMarkerTypeDescription:")] NSString? AccessibilityMarkerTypeDescription { get; set; }
-    [Selector("accessibilityHorizontalScrollBar", "setAccessibilityHorizontalScrollBar:")] AnyObject? AccessibilityHorizontalScrollBar { get; set; }
-    [Selector("accessibilityVerticalScrollBar", "setAccessibilityVerticalScrollBar:")] AnyObject? AccessibilityVerticalScrollBar { get; set; }
-    [Selector("accessibilityAllowedValues", "setAccessibilityAllowedValues:")] NSArray? AccessibilityAllowedValues { get; set; }
-    [Selector("accessibilityLabelUIElements", "setAccessibilityLabelUIElements:")] NSArray? AccessibilityLabelUIElements { get; set; }
-    [Selector("accessibilityLabelValue", "setAccessibilityLabelValue:")] float AccessibilityLabelValue { get; set; }
-    [Selector("accessibilitySplitters", "setAccessibilitySplitters:")] NSArray? AccessibilitySplitters { get; set; }
-    [Selector("accessibilityDecrementButton", "setAccessibilityDecrementButton:")] AnyObject? AccessibilityDecrementButton { get; set; }
-    [Selector("accessibilityIncrementButton", "setAccessibilityIncrementButton:")] AnyObject? AccessibilityIncrementButton { get; set; }
-    [Selector("accessibilityTabs", "setAccessibilityTabs:")] NSArray? AccessibilityTabs { get; set; }
-    [Selector("accessibilityHeader", "setAccessibilityHeader:")] AnyObject? AccessibilityHeader { get; set; }
-    [Selector("accessibilityColumnCount", "setAccessibilityColumnCount:")] NSInteger AccessibilityColumnCount { get; set; }
-    [Selector("accessibilityRowCount", "setAccessibilityRowCount:")] NSInteger AccessibilityRowCount { get; set; }
-    [Selector("accessibilityIndex", "setAccessibilityIndex:")] NSInteger AccessibilityIndex { get; set; }
-    [Selector("accessibilityColumns", "setAccessibilityColumns:")] NSArray? AccessibilityColumns { get; set; }
-    [Selector("accessibilityRows", "setAccessibilityRows:")] NSArray? AccessibilityRows { get; set; }
-    [Selector("accessibilityVisibleRows", "setAccessibilityVisibleRows:")] NSArray? AccessibilityVisibleRows { get; set; }
-    [Selector("accessibilitySelectedRows", "setAccessibilitySelectedRows:")] NSArray? AccessibilitySelectedRows { get; set; }
-    [Selector("accessibilityVisibleColumns", "setAccessibilityVisibleColumns:")] NSArray? AccessibilityVisibleColumns { get; set; }
-    [Selector("accessibilitySelectedColumns", "setAccessibilitySelectedColumns:")] NSArray? AccessibilitySelectedColumns { get; set; }
-    [Selector("accessibilitySortDirection", "setAccessibilitySortDirection:")] NSAccessibilitySortDirection AccessibilitySortDirection { get; set; }
-    [Selector("accessibilityRowHeaderUIElements", "setAccessibilityRowHeaderUIElements:")] NSArray? AccessibilityRowHeaderUIElements { get; set; }
-    [Selector("accessibilitySelectedCells", "setAccessibilitySelectedCells:")] NSArray? AccessibilitySelectedCells { get; set; }
-    [Selector("accessibilityVisibleCells", "setAccessibilityVisibleCells:")] NSArray? AccessibilityVisibleCells { get; set; }
-    [Selector("accessibilityColumnHeaderUIElements", "setAccessibilityColumnHeaderUIElements:")] NSArray? AccessibilityColumnHeaderUIElements { get; set; }
-    [Selector("accessibilityRowIndexRange", "setAccessibilityRowIndexRange:")] NSRange AccessibilityRowIndexRange { get; set; }
-    [Selector("accessibilityColumnIndexRange", "setAccessibilityColumnIndexRange:")] NSRange AccessibilityColumnIndexRange { get; set; }
-    [Selector("accessibilityInsertionPointLineNumber", "setAccessibilityInsertionPointLineNumber:")] NSInteger AccessibilityInsertionPointLineNumber { get; set; }
-    [Selector("accessibilitySharedCharacterRange", "setAccessibilitySharedCharacterRange:")] NSRange AccessibilitySharedCharacterRange { get; set; }
-    [Selector("accessibilitySharedTextUIElements", "setAccessibilitySharedTextUIElements:")] NSArray? AccessibilitySharedTextUIElements { get; set; }
-    [Selector("accessibilityVisibleCharacterRange", "setAccessibilityVisibleCharacterRange:")] NSRange AccessibilityVisibleCharacterRange { get; set; }
-    [Selector("accessibilityNumberOfCharacters", "setAccessibilityNumberOfCharacters:")] NSInteger AccessibilityNumberOfCharacters { get; set; }
-    [Selector("accessibilitySelectedText", "setAccessibilitySelectedText:")] NSString? AccessibilitySelectedText { get; set; }
-    [Selector("accessibilitySelectedTextRange", "setAccessibilitySelectedTextRange:")] NSRange AccessibilitySelectedTextRange { get; set; }
-    [Selector("accessibilitySelectedTextRanges", "setAccessibilitySelectedTextRanges:")] NSArray? AccessibilitySelectedTextRanges { get; set; }
-    [Selector("accessibilityToolbarButton", "setAccessibilityToolbarButton:")] AnyObject? AccessibilityToolbarButton { get; set; }
-    [Selector("isAccessibilityModal", "setAccessibilityModal:")] bool AccessibilityModal { get; set; }
-    [Selector("accessibilityProxy", "setAccessibilityProxy:")] AnyObject? AccessibilityProxy { get; set; }
-    [Selector("isAccessibilityMain", "setAccessibilityMain:")] bool AccessibilityMain { get; set; }
-    [Selector("accessibilityFullScreenButton", "setAccessibilityFullScreenButton:")] AnyObject? AccessibilityFullScreenButton { get; set; }
-    [Selector("accessibilityGrowArea", "setAccessibilityGrowArea:")] AnyObject? AccessibilityGrowArea { get; set; }
-    [Selector("accessibilityDocument", "setAccessibilityDocument:")] NSString? AccessibilityDocument { get; set; }
-    [Selector("accessibilityDefaultButton", "setAccessibilityDefaultButton:")] AnyObject? AccessibilityDefaultButton { get; set; }
-    [Selector("accessibilityCloseButton", "setAccessibilityCloseButton:")] AnyObject? AccessibilityCloseButton { get; set; }
-    [Selector("accessibilityZoomButton", "setAccessibilityZoomButton:")] AnyObject? AccessibilityZoomButton { get; set; }
-    [Selector("accessibilityMinimizeButton", "setAccessibilityMinimizeButton:")] AnyObject? AccessibilityMinimizeButton { get; set; }
-    [Selector("isAccessibilityMinimized", "setAccessibilityMinimized:")] bool AccessibilityMinimized { get; set; }
-    [Selector("accessibilityCustomActions", "setAccessibilityCustomActions:")] NSArray? AccessibilityCustomActions { get; set; }
-    [Selector("accessibilityLayoutPointForScreenPoint:")] NSPoint AccessibilityLayoutPointForScreenPoint(NSPoint point);
-    [Selector("accessibilityLayoutSizeForScreenSize:")] NSSize AccessibilityLayoutSizeForScreenSize(NSSize size);
-    [Selector("accessibilityScreenPointForLayoutPoint:")] NSPoint AccessibilityScreenPointForLayoutPoint(NSPoint point);
-    [Selector("accessibilityScreenSizeForLayoutSize:")] NSSize AccessibilityScreenSizeForLayoutSize(NSSize size);
-    [Selector("accessibilityCellForColumn:row:")] AnyObject? AccessibilityCellForColumnRow(NSInteger column, NSInteger row);
-    [Selector("accessibilityAttributedStringForRange:")] NSAttributedString? AccessibilityAttributedStringForRange(NSRange range);
-    [Selector("accessibilityRangeForLine:")] NSRange AccessibilityRangeForLine(NSInteger line);
-    [Selector("accessibilityStringForRange:")] NSString? AccessibilityStringForRange(NSRange range);
-    [Selector("accessibilityRangeForPosition:")] NSRange AccessibilityRangeForPosition(NSPoint point);
-    [Selector("accessibilityRangeForIndex:")] NSRange AccessibilityRangeForIndex(NSInteger index);
-    [Selector("accessibilityFrameForRange:")] NSRect AccessibilityFrameForRange(NSRange range);
-    [Selector("accessibilityRTFForRange:")] NSData? AccessibilityRTFForRange(NSRange range);
-    [Selector("accessibilityStyleRangeForIndex:")] NSRange AccessibilityStyleRangeForIndex(NSInteger index);
-    [Selector("accessibilityLineForIndex:")] NSInteger AccessibilityLineForIndex(NSInteger index);
-    [Selector("accessibilityPerformCancel")] bool AccessibilityPerformCancel();
-    [Selector("accessibilityPerformConfirm")] bool AccessibilityPerformConfirm();
-    [Selector("accessibilityPerformDecrement")] bool AccessibilityPerformDecrement();
-    [Selector("accessibilityPerformDelete")] bool AccessibilityPerformDelete();
-    [Selector("accessibilityPerformIncrement")] bool AccessibilityPerformIncrement();
-    [Selector("accessibilityPerformPick")] bool AccessibilityPerformPick();
-    [Selector("accessibilityPerformPress")] bool AccessibilityPerformPress();
-    [Selector("accessibilityPerformRaise")] bool AccessibilityPerformRaise();
-    [Selector("accessibilityPerformShowAlternateUI")] bool AccessibilityPerformShowAlternateUI();
-    [Selector("accessibilityPerformShowDefaultUI")] bool AccessibilityPerformShowDefaultUI();
-    [Selector("accessibilityPerformShowMenu")] bool AccessibilityPerformShowMenu();
-    [Selector("isAccessibilitySelectorAllowed:")] bool IsAccessibilitySelectorAllowed(Selector selector);
+    [Selector("isAccessibilityElement", "setAccessibilityElement:")]
+    bool AccessibilityElement { get; set; }
+    [Selector("accessibilityFrame", "setAccessibilityFrame:")]
+    NSRect AccessibilityFrame { get; set; }
+    [Selector("isAccessibilityFocused", "setAccessibilityFocused:")]
+    bool AccessibilityFocused { get; set; }
+    [Selector("accessibilityActivationPoint", "setAccessibilityActivationPoint:")]
+    NSPoint AccessibilityActivationPoint { get; set; }
+    [Selector("accessibilityTopLevelUIElement", "setAccessibilityTopLevelUIElement:")]
+    AnyObject? AccessibilityTopLevelUIElement { get; set; }
+    [Selector("accessibilityURL", "setAccessibilityURL:")]
+    NSURL? AccessibilityURL { get; set; }
+    [Selector("accessibilityValue", "setAccessibilityValue:")]
+    AnyObject? AccessibilityValue { get; set; }
+    [Selector("accessibilityValueDescription", "setAccessibilityValueDescription:")]
+    NSString? AccessibilityValueDescription { get; set; }
+    [Selector("accessibilityVisibleChildren", "setAccessibilityVisibleChildren:")]
+    NSArray? AccessibilityVisibleChildren { get; set; }
+    [Selector("accessibilitySubrole", "setAccessibilitySubrole:")]
+    NSAccessibilitySubrole? AccessibilitySubrole { get; set; }
+    [Selector("accessibilityTitle", "setAccessibilityTitle:")]
+    NSString? AccessibilityTitle { get; set; }
+    [Selector("accessibilityTitleUIElement", "setAccessibilityTitleUIElement:")]
+    AnyObject? AccessibilityTitleUIElement { get; set; }
+    [Selector("accessibilityNextContents", "setAccessibilityNextContents:")]
+    NSArray? AccessibilityNextContents { get; set; }
+    [Selector("accessibilityOrientation", "setAccessibilityOrientation:")]
+    NSAccessibilityOrientation AccessibilityOrientation { get; set; }
+    [Selector("accessibilityOverflowButton", "setAccessibilityOverflowButton:")]
+    AnyObject? AccessibilityOverflowButton { get; set; }
+    [Selector("accessibilityParent", "setAccessibilityParent:")]
+    AnyObject? AccessibilityParent { get; set; }
+    [Selector("accessibilityPlaceholderValue", "setAccessibilityPlaceholderValue:")]
+    NSString? AccessibilityPlaceholderValue { get; set; }
+    [Selector("accessibilityPreviousContents", "setAccessibilityPreviousContents:")]
+    NSArray? AccessibilityPreviousContents { get; set; }
+    [Selector("accessibilityRole", "setAccessibilityRole:")]
+    NSAccessibilityRole? AccessibilityRole { get; set; }
+    [Selector("accessibilityRoleDescription", "setAccessibilityRoleDescription:")]
+    NSString? AccessibilityRoleDescription { get; set; }
+    [Selector("accessibilitySearchButton", "setAccessibilitySearchButton:")]
+    AnyObject? AccessibilitySearchButton { get; set; }
+    [Selector("accessibilitySearchMenu", "setAccessibilitySearchMenu:")]
+    AnyObject? AccessibilitySearchMenu { get; set; }
+    [Selector("isAccessibilitySelected", "setAccessibilitySelected:")]
+    bool AccessibilitySelected { get; set; }
+    [Selector("accessibilitySelectedChildren", "setAccessibilitySelectedChildren:")]
+    NSArray? AccessibilitySelectedChildren { get; set; }
+    [Selector("accessibilityServesAsTitleForUIElements", "setAccessibilityServesAsTitleForUIElements:")]
+    NSArray? AccessibilityServesAsTitleForUIElements { get; set; }
+    [Selector("accessibilityShownMenu", "setAccessibilityShownMenu:")]
+    AnyObject? AccessibilityShownMenu { get; set; }
+    [Selector("accessibilityMinValue", "setAccessibilityMinValue:")]
+    AnyObject? AccessibilityMinValue { get; set; }
+    [Selector("accessibilityMaxValue", "setAccessibilityMaxValue:")]
+    AnyObject? AccessibilityMaxValue { get; set; }
+    [Selector("accessibilityLinkedUIElements", "setAccessibilityLinkedUIElements:")]
+    NSArray? AccessibilityLinkedUIElements { get; set; }
+    [Selector("accessibilityWindow", "setAccessibilityWindow:")]
+    AnyObject? AccessibilityWindow { get; set; }
+    [Selector("accessibilityIdentifier", "setAccessibilityIdentifier:")]
+    NSString? AccessibilityIdentifier { get; set; }
+    [Selector("accessibilityHelp", "setAccessibilityHelp:")]
+    NSString? AccessibilityHelp { get; set; }
+    [Selector("accessibilityFilename", "setAccessibilityFilename:")]
+    NSString? AccessibilityFilename { get; set; }
+    [Selector("isAccessibilityExpanded", "setAccessibilityExpanded:")]
+    bool AccessibilityExpanded { get; set; }
+    [Selector("isAccessibilityEdited", "setAccessibilityEdited:")]
+    bool AccessibilityEdited { get; set; }
+    [Selector("isAccessibilityEnabled", "setAccessibilityEnabled:")]
+    bool AccessibilityEnabled { get; set; }
+    [Selector("accessibilityChildren", "setAccessibilityChildren:")]
+    NSArray? AccessibilityChildren { get; set; }
+    [Selector("accessibilityChildrenInNavigationOrder", "setAccessibilityChildrenInNavigationOrder:")]
+    NSArray? AccessibilityChildrenInNavigationOrder { get; set; }
+    [Selector("accessibilityClearButton", "setAccessibilityClearButton:")]
+    AnyObject? AccessibilityClearButton { get; set; }
+    [Selector("accessibilityCancelButton", "setAccessibilityCancelButton:")]
+    AnyObject? AccessibilityCancelButton { get; set; }
+    [Selector("isAccessibilityProtectedContent", "setAccessibilityProtectedContent:")]
+    bool AccessibilityProtectedContent { get; set; }
+    [Selector("accessibilityContents", "setAccessibilityContents:")]
+    NSArray? AccessibilityContents { get; set; }
+    [Selector("accessibilityLabel", "setAccessibilityLabel:")]
+    NSString? AccessibilityLabel { get; set; }
+    [Selector("isAccessibilityAlternateUIVisible", "setAccessibilityAlternateUIVisible:")]
+    bool AccessibilityAlternateUIVisible { get; set; }
+    [Selector("accessibilitySharedFocusElements", "setAccessibilitySharedFocusElements:")]
+    NSArray? AccessibilitySharedFocusElements { get; set; }
+    [Selector("isAccessibilityRequired", "setAccessibilityRequired:")]
+    bool AccessibilityRequired { get; set; }
+    [Selector("accessibilityCustomRotors", "setAccessibilityCustomRotors:")]
+    NSArray? AccessibilityCustomRotors { get; set; }
+    [Selector("accessibilityUserInputLabels", "setAccessibilityUserInputLabels:")]
+    NSArray? AccessibilityUserInputLabels { get; set; }
+    [Selector("accessibilityAttributedUserInputLabels", "setAccessibilityAttributedUserInputLabels:")]
+    NSArray? AccessibilityAttributedUserInputLabels { get; set; }
+    [Selector("accessibilityApplicationFocusedUIElement", "setAccessibilityApplicationFocusedUIElement:")]
+    AnyObject? AccessibilityApplicationFocusedUIElement { get; set; }
+    [Selector("accessibilityMainWindow", "setAccessibilityMainWindow:")]
+    AnyObject? AccessibilityMainWindow { get; set; }
+    [Selector("isAccessibilityHidden", "setAccessibilityHidden:")]
+    bool AccessibilityHidden { get; set; }
+    [Selector("isAccessibilityFrontmost", "setAccessibilityFrontmost:")]
+    bool AccessibilityFrontmost { get; set; }
+    [Selector("accessibilityFocusedWindow", "setAccessibilityFocusedWindow:")]
+    AnyObject? AccessibilityFocusedWindow { get; set; }
+    [Selector("accessibilityWindows", "setAccessibilityWindows:")]
+    NSArray? AccessibilityWindows { get; set; }
+    [Selector("accessibilityExtrasMenuBar", "setAccessibilityExtrasMenuBar:")]
+    AnyObject? AccessibilityExtrasMenuBar { get; set; }
+    [Selector("accessibilityMenuBar", "setAccessibilityMenuBar:")]
+    AnyObject? AccessibilityMenuBar { get; set; }
+    [Selector("accessibilityColumnTitles", "setAccessibilityColumnTitles:")]
+    NSArray? AccessibilityColumnTitles { get; set; }
+    [Selector("isAccessibilityOrderedByRow", "setAccessibilityOrderedByRow:")]
+    bool AccessibilityOrderedByRow { get; set; }
+    [Selector("accessibilityHorizontalUnits", "setAccessibilityHorizontalUnits:")]
+    NSAccessibilityUnits AccessibilityHorizontalUnits { get; set; }
+    [Selector("accessibilityVerticalUnits", "setAccessibilityVerticalUnits:")]
+    NSAccessibilityUnits AccessibilityVerticalUnits { get; set; }
+    [Selector("accessibilityHorizontalUnitDescription", "setAccessibilityHorizontalUnitDescription:")]
+    NSString? AccessibilityHorizontalUnitDescription { get; set; }
+    [Selector("accessibilityVerticalUnitDescription", "setAccessibilityVerticalUnitDescription:")]
+    NSString? AccessibilityVerticalUnitDescription { get; set; }
+    [Selector("accessibilityHandles", "setAccessibilityHandles:")]
+    NSArray? AccessibilityHandles { get; set; }
+    [Selector("accessibilityWarningValue", "setAccessibilityWarningValue:")]
+    AnyObject? AccessibilityWarningValue { get; set; }
+    [Selector("accessibilityCriticalValue", "setAccessibilityCriticalValue:")]
+    AnyObject? AccessibilityCriticalValue { get; set; }
+    [Selector("isAccessibilityDisclosed", "setAccessibilityDisclosed:")]
+    bool AccessibilityDisclosed { get; set; }
+    [Selector("accessibilityDisclosedByRow", "setAccessibilityDisclosedByRow:")]
+    AnyObject? AccessibilityDisclosedByRow { get; set; }
+    [Selector("accessibilityDisclosedRows", "setAccessibilityDisclosedRows:")]
+    AnyObject? AccessibilityDisclosedRows { get; set; }
+    [Selector("accessibilityDisclosureLevel", "setAccessibilityDisclosureLevel:")]
+    NSInteger AccessibilityDisclosureLevel { get; set; }
+    [Selector("accessibilityMarkerUIElements", "setAccessibilityMarkerUIElements:")]
+    NSArray? AccessibilityMarkerUIElements { get; set; }
+    [Selector("accessibilityMarkerValues", "setAccessibilityMarkerValues:")]
+    AnyObject? AccessibilityMarkerValues { get; set; }
+    [Selector("accessibilityMarkerGroupUIElement", "setAccessibilityMarkerGroupUIElement:")]
+    AnyObject? AccessibilityMarkerGroupUIElement { get; set; }
+    [Selector("accessibilityUnits", "setAccessibilityUnits:")]
+    NSAccessibilityUnits AccessibilityUnits { get; set; }
+    [Selector("accessibilityUnitDescription", "setAccessibilityUnitDescription:")]
+    NSString? AccessibilityUnitDescription { get; set; }
+    [Selector("accessibilityRulerMarkerType", "setAccessibilityRulerMarkerType:")]
+    NSAccessibilityRulerMarkerType AccessibilityRulerMarkerType { get; set; }
+    [Selector("accessibilityMarkerTypeDescription", "setAccessibilityMarkerTypeDescription:")]
+    NSString? AccessibilityMarkerTypeDescription { get; set; }
+    [Selector("accessibilityHorizontalScrollBar", "setAccessibilityHorizontalScrollBar:")]
+    AnyObject? AccessibilityHorizontalScrollBar { get; set; }
+    [Selector("accessibilityVerticalScrollBar", "setAccessibilityVerticalScrollBar:")]
+    AnyObject? AccessibilityVerticalScrollBar { get; set; }
+    [Selector("accessibilityAllowedValues", "setAccessibilityAllowedValues:")]
+    NSArray? AccessibilityAllowedValues { get; set; }
+    [Selector("accessibilityLabelUIElements", "setAccessibilityLabelUIElements:")]
+    NSArray? AccessibilityLabelUIElements { get; set; }
+    [Selector("accessibilityLabelValue", "setAccessibilityLabelValue:")]
+    float AccessibilityLabelValue { get; set; }
+    [Selector("accessibilitySplitters", "setAccessibilitySplitters:")]
+    NSArray? AccessibilitySplitters { get; set; }
+    [Selector("accessibilityDecrementButton", "setAccessibilityDecrementButton:")]
+    AnyObject? AccessibilityDecrementButton { get; set; }
+    [Selector("accessibilityIncrementButton", "setAccessibilityIncrementButton:")]
+    AnyObject? AccessibilityIncrementButton { get; set; }
+    [Selector("accessibilityTabs", "setAccessibilityTabs:")]
+    NSArray? AccessibilityTabs { get; set; }
+    [Selector("accessibilityHeader", "setAccessibilityHeader:")]
+    AnyObject? AccessibilityHeader { get; set; }
+    [Selector("accessibilityColumnCount", "setAccessibilityColumnCount:")]
+    NSInteger AccessibilityColumnCount { get; set; }
+    [Selector("accessibilityRowCount", "setAccessibilityRowCount:")]
+    NSInteger AccessibilityRowCount { get; set; }
+    [Selector("accessibilityIndex", "setAccessibilityIndex:")]
+    NSInteger AccessibilityIndex { get; set; }
+    [Selector("accessibilityColumns", "setAccessibilityColumns:")]
+    NSArray? AccessibilityColumns { get; set; }
+    [Selector("accessibilityRows", "setAccessibilityRows:")]
+    NSArray? AccessibilityRows { get; set; }
+    [Selector("accessibilityVisibleRows", "setAccessibilityVisibleRows:")]
+    NSArray? AccessibilityVisibleRows { get; set; }
+    [Selector("accessibilitySelectedRows", "setAccessibilitySelectedRows:")]
+    NSArray? AccessibilitySelectedRows { get; set; }
+    [Selector("accessibilityVisibleColumns", "setAccessibilityVisibleColumns:")]
+    NSArray? AccessibilityVisibleColumns { get; set; }
+    [Selector("accessibilitySelectedColumns", "setAccessibilitySelectedColumns:")]
+    NSArray? AccessibilitySelectedColumns { get; set; }
+    [Selector("accessibilitySortDirection", "setAccessibilitySortDirection:")]
+    NSAccessibilitySortDirection AccessibilitySortDirection { get; set; }
+    [Selector("accessibilityRowHeaderUIElements", "setAccessibilityRowHeaderUIElements:")]
+    NSArray? AccessibilityRowHeaderUIElements { get; set; }
+    [Selector("accessibilitySelectedCells", "setAccessibilitySelectedCells:")]
+    NSArray? AccessibilitySelectedCells { get; set; }
+    [Selector("accessibilityVisibleCells", "setAccessibilityVisibleCells:")]
+    NSArray? AccessibilityVisibleCells { get; set; }
+    [Selector("accessibilityColumnHeaderUIElements", "setAccessibilityColumnHeaderUIElements:")]
+    NSArray? AccessibilityColumnHeaderUIElements { get; set; }
+    [Selector("accessibilityRowIndexRange", "setAccessibilityRowIndexRange:")]
+    NSRange AccessibilityRowIndexRange { get; set; }
+    [Selector("accessibilityColumnIndexRange", "setAccessibilityColumnIndexRange:")]
+    NSRange AccessibilityColumnIndexRange { get; set; }
+    [Selector("accessibilityInsertionPointLineNumber", "setAccessibilityInsertionPointLineNumber:")]
+    NSInteger AccessibilityInsertionPointLineNumber { get; set; }
+    [Selector("accessibilitySharedCharacterRange", "setAccessibilitySharedCharacterRange:")]
+    NSRange AccessibilitySharedCharacterRange { get; set; }
+    [Selector("accessibilitySharedTextUIElements", "setAccessibilitySharedTextUIElements:")]
+    NSArray? AccessibilitySharedTextUIElements { get; set; }
+    [Selector("accessibilityVisibleCharacterRange", "setAccessibilityVisibleCharacterRange:")]
+    NSRange AccessibilityVisibleCharacterRange { get; set; }
+    [Selector("accessibilityNumberOfCharacters", "setAccessibilityNumberOfCharacters:")]
+    NSInteger AccessibilityNumberOfCharacters { get; set; }
+    [Selector("accessibilitySelectedText", "setAccessibilitySelectedText:")]
+    NSString? AccessibilitySelectedText { get; set; }
+    [Selector("accessibilitySelectedTextRange", "setAccessibilitySelectedTextRange:")]
+    NSRange AccessibilitySelectedTextRange { get; set; }
+    [Selector("accessibilitySelectedTextRanges", "setAccessibilitySelectedTextRanges:")]
+    NSArray? AccessibilitySelectedTextRanges { get; set; }
+    [Selector("accessibilityToolbarButton", "setAccessibilityToolbarButton:")]
+    AnyObject? AccessibilityToolbarButton { get; set; }
+    [Selector("isAccessibilityModal", "setAccessibilityModal:")]
+    bool AccessibilityModal { get; set; }
+    [Selector("accessibilityProxy", "setAccessibilityProxy:")]
+    AnyObject? AccessibilityProxy { get; set; }
+    [Selector("isAccessibilityMain", "setAccessibilityMain:")]
+    bool AccessibilityMain { get; set; }
+    [Selector("accessibilityFullScreenButton", "setAccessibilityFullScreenButton:")]
+    AnyObject? AccessibilityFullScreenButton { get; set; }
+    [Selector("accessibilityGrowArea", "setAccessibilityGrowArea:")]
+    AnyObject? AccessibilityGrowArea { get; set; }
+    [Selector("accessibilityDocument", "setAccessibilityDocument:")]
+    NSString? AccessibilityDocument { get; set; }
+    [Selector("accessibilityDefaultButton", "setAccessibilityDefaultButton:")]
+    AnyObject? AccessibilityDefaultButton { get; set; }
+    [Selector("accessibilityCloseButton", "setAccessibilityCloseButton:")]
+    AnyObject? AccessibilityCloseButton { get; set; }
+    [Selector("accessibilityZoomButton", "setAccessibilityZoomButton:")]
+    AnyObject? AccessibilityZoomButton { get; set; }
+    [Selector("accessibilityMinimizeButton", "setAccessibilityMinimizeButton:")]
+    AnyObject? AccessibilityMinimizeButton { get; set; }
+    [Selector("isAccessibilityMinimized", "setAccessibilityMinimized:")]
+    bool AccessibilityMinimized { get; set; }
+    [Selector("accessibilityCustomActions", "setAccessibilityCustomActions:")]
+    NSArray? AccessibilityCustomActions { get; set; }
+    [Selector("accessibilityLayoutPointForScreenPoint:")]
+    NSPoint AccessibilityLayoutPointForScreenPoint(NSPoint point);
+    [Selector("accessibilityLayoutSizeForScreenSize:")]
+    NSSize AccessibilityLayoutSizeForScreenSize(NSSize size);
+    [Selector("accessibilityScreenPointForLayoutPoint:")]
+    NSPoint AccessibilityScreenPointForLayoutPoint(NSPoint point);
+    [Selector("accessibilityScreenSizeForLayoutSize:")]
+    NSSize AccessibilityScreenSizeForLayoutSize(NSSize size);
+    [Selector("accessibilityCellForColumn:row:")]
+    AnyObject? AccessibilityCellForColumnRow(NSInteger column, NSInteger row);
+    [Selector("accessibilityAttributedStringForRange:")]
+    NSAttributedString? AccessibilityAttributedStringForRange(NSRange range);
+    [Selector("accessibilityRangeForLine:")]
+    NSRange AccessibilityRangeForLine(NSInteger line);
+    [Selector("accessibilityStringForRange:")]
+    NSString? AccessibilityStringForRange(NSRange range);
+    [Selector("accessibilityRangeForPosition:")]
+    NSRange AccessibilityRangeForPosition(NSPoint point);
+    [Selector("accessibilityRangeForIndex:")]
+    NSRange AccessibilityRangeForIndex(NSInteger index);
+    [Selector("accessibilityFrameForRange:")]
+    NSRect AccessibilityFrameForRange(NSRange range);
+    [Selector("accessibilityRTFForRange:")]
+    NSData? AccessibilityRTFForRange(NSRange range);
+    [Selector("accessibilityStyleRangeForIndex:")]
+    NSRange AccessibilityStyleRangeForIndex(NSInteger index);
+    [Selector("accessibilityLineForIndex:")]
+    NSInteger AccessibilityLineForIndex(NSInteger index);
+    [Selector("accessibilityPerformCancel")]
+    bool AccessibilityPerformCancel();
+    [Selector("accessibilityPerformConfirm")]
+    bool AccessibilityPerformConfirm();
+    [Selector("accessibilityPerformDecrement")]
+    bool AccessibilityPerformDecrement();
+    [Selector("accessibilityPerformDelete")]
+    bool AccessibilityPerformDelete();
+    [Selector("accessibilityPerformIncrement")]
+    bool AccessibilityPerformIncrement();
+    [Selector("accessibilityPerformPick")]
+    bool AccessibilityPerformPick();
+    [Selector("accessibilityPerformPress")]
+    bool AccessibilityPerformPress();
+    [Selector("accessibilityPerformRaise")]
+    bool AccessibilityPerformRaise();
+    [Selector("accessibilityPerformShowAlternateUI")]
+    bool AccessibilityPerformShowAlternateUI();
+    [Selector("accessibilityPerformShowDefaultUI")]
+    bool AccessibilityPerformShowDefaultUI();
+    [Selector("accessibilityPerformShowMenu")]
+    bool AccessibilityPerformShowMenu();
+    [Selector("isAccessibilitySelectorAllowed:")]
+    bool IsAccessibilitySelectorAllowed(Selector selector);
 }
 
 #endif

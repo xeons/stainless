@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public objc interface MEContentBlocker : NSObjectProtocol
 {
-    [Selector("contentRulesJSON")] NSData ContentRulesJSON();
+    [Selector("contentRulesJSON")]
+    NSData ContentRulesJSON();
 }
 
 #endif

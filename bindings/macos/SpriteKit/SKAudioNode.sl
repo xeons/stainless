@@ -33,26 +33,41 @@ import Standard.ObjC;
 
 public extern objc class SKAudioNode : SKNode, NSSecureCoding
 {
-    [Selector("avAudioNode", "setAvAudioNode:")] public AVAudioNode? AvAudioNode { get; set; }
-    [Selector("autoplayLooped", "setAutoplayLooped:")] public bool AutoplayLooped { get; set; }
-    [Selector("isPositional", "setPositional:")] public bool Positional { get; set; }
-    [Selector("initWithAVAudioNode:")] public Self InitWithAVAudioNode(AVAudioNode? node);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
-    [Selector("initWithFileNamed:")] public Self InitWithFileNamed(NSString name);
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL url);
+    [Selector("avAudioNode", "setAvAudioNode:")]
+    public AVAudioNode? AvAudioNode { get; set; }
+    [Selector("autoplayLooped", "setAutoplayLooped:")]
+    public bool AutoplayLooped { get; set; }
+    [Selector("isPositional", "setPositional:")]
+    public bool Positional { get; set; }
+    [Selector("initWithAVAudioNode:")]
+    public Self InitWithAVAudioNode(AVAudioNode? node);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder aDecoder);
+    [Selector("initWithFileNamed:")]
+    public Self InitWithFileNamed(NSString name);
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL url);
 }
 
 /// SKAudioNode, a category of SKAction.
 public extern objc class SKAction
 {
-    [Selector("stereoPanTo:duration:")] public static SKAction StereoPanToDuration(float v, NSTimeInterval duration);
-    [Selector("stereoPanBy:duration:")] public static SKAction StereoPanByDuration(float v, NSTimeInterval duration);
-    [Selector("changeReverbTo:duration:")] public static SKAction ChangeReverbToDuration(float v, NSTimeInterval duration);
-    [Selector("changeReverbBy:duration:")] public static SKAction ChangeReverbByDuration(float v, NSTimeInterval duration);
-    [Selector("changeObstructionTo:duration:")] public static SKAction ChangeObstructionToDuration(float v, NSTimeInterval duration);
-    [Selector("changeObstructionBy:duration:")] public static SKAction ChangeObstructionByDuration(float v, NSTimeInterval duration);
-    [Selector("changeOcclusionTo:duration:")] public static SKAction ChangeOcclusionToDuration(float v, NSTimeInterval duration);
-    [Selector("changeOcclusionBy:duration:")] public static SKAction ChangeOcclusionByDuration(float v, NSTimeInterval duration);
+    [Selector("stereoPanTo:duration:")]
+    public static SKAction StereoPanToDuration(float v, NSTimeInterval duration);
+    [Selector("stereoPanBy:duration:")]
+    public static SKAction StereoPanByDuration(float v, NSTimeInterval duration);
+    [Selector("changeReverbTo:duration:")]
+    public static SKAction ChangeReverbToDuration(float v, NSTimeInterval duration);
+    [Selector("changeReverbBy:duration:")]
+    public static SKAction ChangeReverbByDuration(float v, NSTimeInterval duration);
+    [Selector("changeObstructionTo:duration:")]
+    public static SKAction ChangeObstructionToDuration(float v, NSTimeInterval duration);
+    [Selector("changeObstructionBy:duration:")]
+    public static SKAction ChangeObstructionByDuration(float v, NSTimeInterval duration);
+    [Selector("changeOcclusionTo:duration:")]
+    public static SKAction ChangeOcclusionToDuration(float v, NSTimeInterval duration);
+    [Selector("changeOcclusionBy:duration:")]
+    public static SKAction ChangeOcclusionByDuration(float v, NSTimeInterval duration);
 }
 
 #endif

@@ -36,9 +36,11 @@ public objc closure void FSClientFetchInstalledExtensionsWithCompletionHandlerCo
 /// macOS 15.4 and later.
 public extern objc class FSClient : NSObject
 {
-    [Selector("sharedInstance")] public static FSClient? SharedInstance { get; }
+    [Selector("sharedInstance")]
+    public static FSClient? SharedInstance { get; }
     /// macOS 15.4 and later.
-    [Selector("fetchInstalledExtensionsWithCompletionHandler:")] public void FetchInstalledExtensionsWithCompletionHandler(FSClientFetchInstalledExtensionsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchInstalledExtensionsWithCompletionHandler:")]
+    public void FetchInstalledExtensionsWithCompletionHandler(FSClientFetchInstalledExtensionsWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

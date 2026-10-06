@@ -47,19 +47,32 @@ public enum MEMessageEncryptionState : long
 
 public extern objc class MEMessage : NSObject, NSSecureCoding
 {
-    [Selector("state")] public MEMessageState State { get; }
-    [Selector("encryptionState")] public MEMessageEncryptionState EncryptionState { get; }
-    [Selector("subject")] public NSString Subject { get; }
-    [Selector("fromAddress")] public MEEmailAddress FromAddress { get; }
-    [Selector("toAddresses")] public NSArray ToAddresses { get; }
-    [Selector("ccAddresses")] public NSArray CcAddresses { get; }
-    [Selector("bccAddresses")] public NSArray BccAddresses { get; }
-    [Selector("replyToAddresses")] public NSArray ReplyToAddresses { get; }
-    [Selector("allRecipientAddresses")] public NSArray AllRecipientAddresses { get; }
-    [Selector("dateSent")] public NSDate? DateSent { get; }
-    [Selector("dateReceived")] public NSDate? DateReceived { get; }
-    [Selector("headers")] public NSDictionary? Headers { get; }
-    [Selector("rawData")] public NSData? RawData { get; }
+    [Selector("state")]
+    public MEMessageState State { get; }
+    [Selector("encryptionState")]
+    public MEMessageEncryptionState EncryptionState { get; }
+    [Selector("subject")]
+    public NSString Subject { get; }
+    [Selector("fromAddress")]
+    public MEEmailAddress FromAddress { get; }
+    [Selector("toAddresses")]
+    public NSArray ToAddresses { get; }
+    [Selector("ccAddresses")]
+    public NSArray CcAddresses { get; }
+    [Selector("bccAddresses")]
+    public NSArray BccAddresses { get; }
+    [Selector("replyToAddresses")]
+    public NSArray ReplyToAddresses { get; }
+    [Selector("allRecipientAddresses")]
+    public NSArray AllRecipientAddresses { get; }
+    [Selector("dateSent")]
+    public NSDate? DateSent { get; }
+    [Selector("dateReceived")]
+    public NSDate? DateReceived { get; }
+    [Selector("headers")]
+    public NSDictionary? Headers { get; }
+    [Selector("rawData")]
+    public NSData? RawData { get; }
 }
 
 #endif

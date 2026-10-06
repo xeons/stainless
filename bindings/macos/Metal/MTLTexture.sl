@@ -67,8 +67,10 @@ public struct MTLTextureSwizzleChannels
 
 public extern objc class MTLSharedTextureHandle : NSObject, NSSecureCoding
 {
-    [Selector("device")] public MTLDevice Device { get; }
-    [Selector("label")] public NSString? Label { get; }
+    [Selector("device")]
+    public MTLDevice Device { get; }
+    [Selector("label")]
+    public NSString? Label { get; }
 }
 
 [Flags]
@@ -90,83 +92,150 @@ public enum MTLTextureCompressionType : long
 
 public extern objc class MTLTextureDescriptor : NSObject, NSCopying
 {
-    [Selector("textureType", "setTextureType:")] public MTLTextureType TextureType { get; set; }
-    [Selector("pixelFormat", "setPixelFormat:")] public MTLPixelFormat PixelFormat { get; set; }
-    [Selector("width", "setWidth:")] public NSUInteger Width { get; set; }
-    [Selector("height", "setHeight:")] public NSUInteger Height { get; set; }
-    [Selector("depth", "setDepth:")] public NSUInteger Depth { get; set; }
-    [Selector("mipmapLevelCount", "setMipmapLevelCount:")] public NSUInteger MipmapLevelCount { get; set; }
-    [Selector("sampleCount", "setSampleCount:")] public NSUInteger SampleCount { get; set; }
-    [Selector("arrayLength", "setArrayLength:")] public NSUInteger ArrayLength { get; set; }
-    [Selector("resourceOptions", "setResourceOptions:")] public MTLResourceOptions ResourceOptions { get; set; }
-    [Selector("cpuCacheMode", "setCpuCacheMode:")] public MTLCPUCacheMode CpuCacheMode { get; set; }
-    [Selector("storageMode", "setStorageMode:")] public MTLStorageMode StorageMode { get; set; }
-    [Selector("hazardTrackingMode", "setHazardTrackingMode:")] public MTLHazardTrackingMode HazardTrackingMode { get; set; }
-    [Selector("usage", "setUsage:")] public MTLTextureUsage Usage { get; set; }
-    [Selector("allowGPUOptimizedContents", "setAllowGPUOptimizedContents:")] public bool AllowGPUOptimizedContents { get; set; }
-    [Selector("compressionType", "setCompressionType:")] public MTLTextureCompressionType CompressionType { get; set; }
-    [Selector("swizzle", "setSwizzle:")] public MTLTextureSwizzleChannels Swizzle { get; set; }
+    [Selector("textureType", "setTextureType:")]
+    public MTLTextureType TextureType { get; set; }
+    [Selector("pixelFormat", "setPixelFormat:")]
+    public MTLPixelFormat PixelFormat { get; set; }
+    [Selector("width", "setWidth:")]
+    public NSUInteger Width { get; set; }
+    [Selector("height", "setHeight:")]
+    public NSUInteger Height { get; set; }
+    [Selector("depth", "setDepth:")]
+    public NSUInteger Depth { get; set; }
+    [Selector("mipmapLevelCount", "setMipmapLevelCount:")]
+    public NSUInteger MipmapLevelCount { get; set; }
+    [Selector("sampleCount", "setSampleCount:")]
+    public NSUInteger SampleCount { get; set; }
+    [Selector("arrayLength", "setArrayLength:")]
+    public NSUInteger ArrayLength { get; set; }
+    [Selector("resourceOptions", "setResourceOptions:")]
+    public MTLResourceOptions ResourceOptions { get; set; }
+    [Selector("cpuCacheMode", "setCpuCacheMode:")]
+    public MTLCPUCacheMode CpuCacheMode { get; set; }
+    [Selector("storageMode", "setStorageMode:")]
+    public MTLStorageMode StorageMode { get; set; }
+    [Selector("hazardTrackingMode", "setHazardTrackingMode:")]
+    public MTLHazardTrackingMode HazardTrackingMode { get; set; }
+    [Selector("usage", "setUsage:")]
+    public MTLTextureUsage Usage { get; set; }
+    [Selector("allowGPUOptimizedContents", "setAllowGPUOptimizedContents:")]
+    public bool AllowGPUOptimizedContents { get; set; }
+    [Selector("compressionType", "setCompressionType:")]
+    public MTLTextureCompressionType CompressionType { get; set; }
+    [Selector("swizzle", "setSwizzle:")]
+    public MTLTextureSwizzleChannels Swizzle { get; set; }
     /// macOS 26.0 and later.
-    [Selector("placementSparsePageSize", "setPlacementSparsePageSize:")] public MTLSparsePageSize PlacementSparsePageSize { get; set; }
-    [Selector("texture2DDescriptorWithPixelFormat:width:height:mipmapped:")] public static MTLTextureDescriptor Texture2DDescriptorWithPixelFormatWidthHeightMipmapped(MTLPixelFormat pixelFormat, NSUInteger width, NSUInteger height, bool mipmapped);
-    [Selector("textureCubeDescriptorWithPixelFormat:size:mipmapped:")] public static MTLTextureDescriptor TextureCubeDescriptorWithPixelFormatSizeMipmapped(MTLPixelFormat pixelFormat, NSUInteger size, bool mipmapped);
-    [Selector("textureBufferDescriptorWithPixelFormat:width:resourceOptions:usage:")] public static MTLTextureDescriptor TextureBufferDescriptorWithPixelFormatWidthResourceOptionsUsage(MTLPixelFormat pixelFormat, NSUInteger width, MTLResourceOptions resourceOptions, MTLTextureUsage usage);
+    [Selector("placementSparsePageSize", "setPlacementSparsePageSize:")]
+    public MTLSparsePageSize PlacementSparsePageSize { get; set; }
+    [Selector("texture2DDescriptorWithPixelFormat:width:height:mipmapped:")]
+    public static MTLTextureDescriptor Texture2DDescriptorWithPixelFormatWidthHeightMipmapped(MTLPixelFormat pixelFormat, NSUInteger width, NSUInteger height, bool mipmapped);
+    [Selector("textureCubeDescriptorWithPixelFormat:size:mipmapped:")]
+    public static MTLTextureDescriptor TextureCubeDescriptorWithPixelFormatSizeMipmapped(MTLPixelFormat pixelFormat, NSUInteger size, bool mipmapped);
+    [Selector("textureBufferDescriptorWithPixelFormat:width:resourceOptions:usage:")]
+    public static MTLTextureDescriptor TextureBufferDescriptorWithPixelFormatWidthResourceOptionsUsage(MTLPixelFormat pixelFormat, NSUInteger width, MTLResourceOptions resourceOptions, MTLTextureUsage usage);
 }
 
 /// macOS 26.0 and later.
 public extern objc class MTLTextureViewDescriptor : NSObject, NSCopying
 {
-    [Selector("pixelFormat", "setPixelFormat:")] public MTLPixelFormat PixelFormat { get; set; }
-    [Selector("textureType", "setTextureType:")] public MTLTextureType TextureType { get; set; }
-    [Selector("levelRange", "setLevelRange:")] public NSRange LevelRange { get; set; }
-    [Selector("sliceRange", "setSliceRange:")] public NSRange SliceRange { get; set; }
-    [Selector("swizzle", "setSwizzle:")] public MTLTextureSwizzleChannels Swizzle { get; set; }
+    [Selector("pixelFormat", "setPixelFormat:")]
+    public MTLPixelFormat PixelFormat { get; set; }
+    [Selector("textureType", "setTextureType:")]
+    public MTLTextureType TextureType { get; set; }
+    [Selector("levelRange", "setLevelRange:")]
+    public NSRange LevelRange { get; set; }
+    [Selector("sliceRange", "setSliceRange:")]
+    public NSRange SliceRange { get; set; }
+    [Selector("swizzle", "setSwizzle:")]
+    public MTLTextureSwizzleChannels Swizzle { get; set; }
 }
 
 public objc interface MTLTexture : MTLResource
 {
     /// Deprecated in macOS 10.12.
-    [Selector("rootResource")] MTLResource? RootResource { get; }
-    [Selector("parentTexture")] MTLTexture? ParentTexture { get; }
-    [Selector("parentRelativeLevel")] NSUInteger ParentRelativeLevel { get; }
-    [Selector("parentRelativeSlice")] NSUInteger ParentRelativeSlice { get; }
-    [Selector("buffer")] MTLBuffer? Buffer { get; }
-    [Selector("bufferOffset")] NSUInteger BufferOffset { get; }
-    [Selector("bufferBytesPerRow")] NSUInteger BufferBytesPerRow { get; }
-    [Selector("iosurface")] IOSurfaceRef? Iosurface { get; }
-    [Selector("iosurfacePlane")] NSUInteger IosurfacePlane { get; }
-    [Selector("textureType")] MTLTextureType TextureType { get; }
-    [Selector("pixelFormat")] MTLPixelFormat PixelFormat { get; }
-    [Selector("width")] NSUInteger Width { get; }
-    [Selector("height")] NSUInteger Height { get; }
-    [Selector("depth")] NSUInteger Depth { get; }
-    [Selector("mipmapLevelCount")] NSUInteger MipmapLevelCount { get; }
-    [Selector("sampleCount")] NSUInteger SampleCount { get; }
-    [Selector("arrayLength")] NSUInteger ArrayLength { get; }
-    [Selector("usage")] MTLTextureUsage Usage { get; }
-    [Selector("isShareable")] bool Shareable { get; }
-    [Selector("isFramebufferOnly")] bool FramebufferOnly { get; }
-    [Optional] [Selector("firstMipmapInTail")] NSUInteger FirstMipmapInTail { get; }
-    [Optional] [Selector("tailSizeInBytes")] NSUInteger TailSizeInBytes { get; }
-    [Optional] [Selector("isSparse")] bool IsSparse { get; }
-    [Selector("allowGPUOptimizedContents")] bool AllowGPUOptimizedContents { get; }
-    [Selector("compressionType")] MTLTextureCompressionType CompressionType { get; }
-    [Selector("gpuResourceID")] MTLResourceID GpuResourceID { get; }
-    [Selector("remoteStorageTexture")] MTLTexture? RemoteStorageTexture { get; }
-    [Selector("swizzle")] MTLTextureSwizzleChannels Swizzle { get; }
+    [Selector("rootResource")]
+    MTLResource? RootResource { get; }
+    [Selector("parentTexture")]
+    MTLTexture? ParentTexture { get; }
+    [Selector("parentRelativeLevel")]
+    NSUInteger ParentRelativeLevel { get; }
+    [Selector("parentRelativeSlice")]
+    NSUInteger ParentRelativeSlice { get; }
+    [Selector("buffer")]
+    MTLBuffer? Buffer { get; }
+    [Selector("bufferOffset")]
+    NSUInteger BufferOffset { get; }
+    [Selector("bufferBytesPerRow")]
+    NSUInteger BufferBytesPerRow { get; }
+    [Selector("iosurface")]
+    IOSurfaceRef? Iosurface { get; }
+    [Selector("iosurfacePlane")]
+    NSUInteger IosurfacePlane { get; }
+    [Selector("textureType")]
+    MTLTextureType TextureType { get; }
+    [Selector("pixelFormat")]
+    MTLPixelFormat PixelFormat { get; }
+    [Selector("width")]
+    NSUInteger Width { get; }
+    [Selector("height")]
+    NSUInteger Height { get; }
+    [Selector("depth")]
+    NSUInteger Depth { get; }
+    [Selector("mipmapLevelCount")]
+    NSUInteger MipmapLevelCount { get; }
+    [Selector("sampleCount")]
+    NSUInteger SampleCount { get; }
+    [Selector("arrayLength")]
+    NSUInteger ArrayLength { get; }
+    [Selector("usage")]
+    MTLTextureUsage Usage { get; }
+    [Selector("isShareable")]
+    bool Shareable { get; }
+    [Selector("isFramebufferOnly")]
+    bool FramebufferOnly { get; }
+    [Optional]
+    [Selector("firstMipmapInTail")]
+    NSUInteger FirstMipmapInTail { get; }
+    [Optional]
+    [Selector("tailSizeInBytes")]
+    NSUInteger TailSizeInBytes { get; }
+    [Optional]
+    [Selector("isSparse")]
+    bool IsSparse { get; }
+    [Selector("allowGPUOptimizedContents")]
+    bool AllowGPUOptimizedContents { get; }
+    [Selector("compressionType")]
+    MTLTextureCompressionType CompressionType { get; }
+    [Selector("gpuResourceID")]
+    MTLResourceID GpuResourceID { get; }
+    [Selector("remoteStorageTexture")]
+    MTLTexture? RemoteStorageTexture { get; }
+    [Selector("swizzle")]
+    MTLTextureSwizzleChannels Swizzle { get; }
     /// macOS 26.0 and later.
-    [Selector("sparseTextureTier")] MTLTextureSparseTier SparseTextureTier { get; }
-    [Selector("getBytes:bytesPerRow:bytesPerImage:fromRegion:mipmapLevel:slice:")] void GetBytesBytesPerRowBytesPerImageFromRegionMipmapLevelSlice(void* pixelBytes, NSUInteger bytesPerRow, NSUInteger bytesPerImage, MTLRegion region, NSUInteger level, NSUInteger slice);
-    [Selector("replaceRegion:mipmapLevel:slice:withBytes:bytesPerRow:bytesPerImage:")] void ReplaceRegionMipmapLevelSliceWithBytesBytesPerRowBytesPerImage(MTLRegion region, NSUInteger level, NSUInteger slice, void* pixelBytes, NSUInteger bytesPerRow, NSUInteger bytesPerImage);
-    [Selector("getBytes:bytesPerRow:fromRegion:mipmapLevel:")] void GetBytesBytesPerRowFromRegionMipmapLevel(void* pixelBytes, NSUInteger bytesPerRow, MTLRegion region, NSUInteger level);
-    [Selector("replaceRegion:mipmapLevel:withBytes:bytesPerRow:")] void ReplaceRegionMipmapLevelWithBytesBytesPerRow(MTLRegion region, NSUInteger level, void* pixelBytes, NSUInteger bytesPerRow);
-    [Selector("newTextureViewWithPixelFormat:")] MTLTexture? NewTextureViewWithPixelFormat(MTLPixelFormat pixelFormat);
-    [Selector("newTextureViewWithPixelFormat:textureType:levels:slices:")] MTLTexture? NewTextureViewWithPixelFormatTextureTypeLevelsSlices(MTLPixelFormat pixelFormat, MTLTextureType textureType, NSRange levelRange, NSRange sliceRange);
-    [Selector("newSharedTextureHandle")] MTLSharedTextureHandle? NewSharedTextureHandle();
+    [Selector("sparseTextureTier")]
+    MTLTextureSparseTier SparseTextureTier { get; }
+    [Selector("getBytes:bytesPerRow:bytesPerImage:fromRegion:mipmapLevel:slice:")]
+    void GetBytesBytesPerRowBytesPerImageFromRegionMipmapLevelSlice(void* pixelBytes, NSUInteger bytesPerRow, NSUInteger bytesPerImage, MTLRegion region, NSUInteger level, NSUInteger slice);
+    [Selector("replaceRegion:mipmapLevel:slice:withBytes:bytesPerRow:bytesPerImage:")]
+    void ReplaceRegionMipmapLevelSliceWithBytesBytesPerRowBytesPerImage(MTLRegion region, NSUInteger level, NSUInteger slice, void* pixelBytes, NSUInteger bytesPerRow, NSUInteger bytesPerImage);
+    [Selector("getBytes:bytesPerRow:fromRegion:mipmapLevel:")]
+    void GetBytesBytesPerRowFromRegionMipmapLevel(void* pixelBytes, NSUInteger bytesPerRow, MTLRegion region, NSUInteger level);
+    [Selector("replaceRegion:mipmapLevel:withBytes:bytesPerRow:")]
+    void ReplaceRegionMipmapLevelWithBytesBytesPerRow(MTLRegion region, NSUInteger level, void* pixelBytes, NSUInteger bytesPerRow);
+    [Selector("newTextureViewWithPixelFormat:")]
+    MTLTexture? NewTextureViewWithPixelFormat(MTLPixelFormat pixelFormat);
+    [Selector("newTextureViewWithPixelFormat:textureType:levels:slices:")]
+    MTLTexture? NewTextureViewWithPixelFormatTextureTypeLevelsSlices(MTLPixelFormat pixelFormat, MTLTextureType textureType, NSRange levelRange, NSRange sliceRange);
+    [Selector("newSharedTextureHandle")]
+    MTLSharedTextureHandle? NewSharedTextureHandle();
     /// macOS 26.0 and later.
-    [Selector("newTextureViewWithDescriptor:")] MTLTexture? NewTextureViewWithDescriptor(MTLTextureViewDescriptor descriptor);
-    [Selector("newRemoteTextureViewForDevice:")] MTLTexture? NewRemoteTextureViewForDevice(MTLDevice device);
-    [Selector("newTextureViewWithPixelFormat:textureType:levels:slices:swizzle:")] MTLTexture? NewTextureViewWithPixelFormatTextureTypeLevelsSlicesSwizzle(MTLPixelFormat pixelFormat, MTLTextureType textureType, NSRange levelRange, NSRange sliceRange, MTLTextureSwizzleChannels swizzle);
+    [Selector("newTextureViewWithDescriptor:")]
+    MTLTexture? NewTextureViewWithDescriptor(MTLTextureViewDescriptor descriptor);
+    [Selector("newRemoteTextureViewForDevice:")]
+    MTLTexture? NewRemoteTextureViewForDevice(MTLDevice device);
+    [Selector("newTextureViewWithPixelFormat:textureType:levels:slices:swizzle:")]
+    MTLTexture? NewTextureViewWithPixelFormatTextureTypeLevelsSlicesSwizzle(MTLPixelFormat pixelFormat, MTLTextureType textureType, NSRange levelRange, NSRange sliceRange, MTLTextureSwizzleChannels swizzle);
 }
 
 #endif

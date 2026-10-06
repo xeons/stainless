@@ -34,21 +34,26 @@ import Standard.ObjC;
 /// DOMNodeExtensions, a category of DOMNode.
 public extern objc class DOMNode
 {
-    [Selector("boundingBox")] public NSRect BoundingBox();
-    [Selector("lineBoxRects")] public NSArray? LineBoxRects();
+    [Selector("boundingBox")]
+    public NSRect BoundingBox();
+    [Selector("lineBoxRects")]
+    public NSArray? LineBoxRects();
 }
 
 /// DOMElementAppKitExtensions, a category of DOMElement.
 public extern objc class DOMElement
 {
-    [Selector("image")] public NSImage? Image();
+    [Selector("image")]
+    public NSImage? Image();
 }
 
 /// DOMHTMLDocumentExtensions, a category of DOMHTMLDocument.
 public extern objc class DOMHTMLDocument
 {
-    [Selector("createDocumentFragmentWithMarkupString:baseURL:")] public DOMDocumentFragment? CreateDocumentFragmentWithMarkupStringBaseURL(NSString? markupString, NSURL? baseURL);
-    [Selector("createDocumentFragmentWithText:")] public DOMDocumentFragment? CreateDocumentFragmentWithText(NSString? text);
+    [Selector("createDocumentFragmentWithMarkupString:baseURL:")]
+    public DOMDocumentFragment? CreateDocumentFragmentWithMarkupStringBaseURL(NSString? markupString, NSURL? baseURL);
+    [Selector("createDocumentFragmentWithText:")]
+    public DOMDocumentFragment? CreateDocumentFragmentWithText(NSString? text);
 }
 
 #endif

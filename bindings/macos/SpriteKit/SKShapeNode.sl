@@ -35,35 +35,64 @@ import Standard.ObjC;
 
 public extern objc class SKShapeNode : SKNode
 {
-    [Selector("path", "setPath:")] public CGPathRef? Path { get; set; }
-    [Selector("strokeColor", "setStrokeColor:")] public NSColor StrokeColor { get; set; }
-    [Selector("fillColor", "setFillColor:")] public NSColor FillColor { get; set; }
-    [Selector("blendMode", "setBlendMode:")] public SKBlendMode BlendMode { get; set; }
-    [Selector("isAntialiased", "setAntialiased:")] public bool Antialiased { get; set; }
-    [Selector("lineWidth", "setLineWidth:")] public CGFloat LineWidth { get; set; }
-    [Selector("glowWidth", "setGlowWidth:")] public CGFloat GlowWidth { get; set; }
-    [Selector("lineCap", "setLineCap:")] public CGLineCap LineCap { get; set; }
-    [Selector("lineJoin", "setLineJoin:")] public CGLineJoin LineJoin { get; set; }
-    [Selector("miterLimit", "setMiterLimit:")] public CGFloat MiterLimit { get; set; }
-    [Selector("lineLength")] public CGFloat LineLength { get; }
-    [Selector("fillTexture", "setFillTexture:")] public SKTexture? FillTexture { get; set; }
-    [Selector("fillShader", "setFillShader:")] public SKShader? FillShader { get; set; }
-    [Selector("strokeTexture", "setStrokeTexture:")] public SKTexture? StrokeTexture { get; set; }
-    [Selector("strokeShader", "setStrokeShader:")] public SKShader? StrokeShader { get; set; }
-    [Selector("attributeValues", "setAttributeValues:")] public NSDictionary AttributeValues { get; set; }
-    [Selector("shapeNodeWithPath:")] public static Self ShapeNodeWithPath(CGPathRef path);
-    [Selector("shapeNodeWithPath:centered:")] public static Self ShapeNodeWithPathCentered(CGPathRef path, bool centered);
-    [Selector("shapeNodeWithRect:")] public static Self ShapeNodeWithRect(CGRect rect);
-    [Selector("shapeNodeWithRectOfSize:")] public static Self ShapeNodeWithRectOfSize(CGSize size);
-    [Selector("shapeNodeWithRect:cornerRadius:")] public static Self ShapeNodeWithRectCornerRadius(CGRect rect, CGFloat cornerRadius);
-    [Selector("shapeNodeWithRectOfSize:cornerRadius:")] public static Self ShapeNodeWithRectOfSizeCornerRadius(CGSize size, CGFloat cornerRadius);
-    [Selector("shapeNodeWithCircleOfRadius:")] public static Self ShapeNodeWithCircleOfRadius(CGFloat radius);
-    [Selector("shapeNodeWithEllipseInRect:")] public static Self ShapeNodeWithEllipseInRect(CGRect rect);
-    [Selector("shapeNodeWithEllipseOfSize:")] public static Self ShapeNodeWithEllipseOfSize(CGSize size);
-    [Selector("shapeNodeWithPoints:count:")] public static Self ShapeNodeWithPointsCount(CGPoint* points, nuint numPoints);
-    [Selector("shapeNodeWithSplinePoints:count:")] public static Self ShapeNodeWithSplinePointsCount(CGPoint* points, nuint numPoints);
-    [Selector("valueForAttributeNamed:")] public SKAttributeValue? ValueForAttributeNamed(NSString key);
-    [Selector("setValue:forAttributeNamed:")] public void SetValueForAttributeNamed(SKAttributeValue value, NSString key);
+    [Selector("path", "setPath:")]
+    public CGPathRef? Path { get; set; }
+    [Selector("strokeColor", "setStrokeColor:")]
+    public NSColor StrokeColor { get; set; }
+    [Selector("fillColor", "setFillColor:")]
+    public NSColor FillColor { get; set; }
+    [Selector("blendMode", "setBlendMode:")]
+    public SKBlendMode BlendMode { get; set; }
+    [Selector("isAntialiased", "setAntialiased:")]
+    public bool Antialiased { get; set; }
+    [Selector("lineWidth", "setLineWidth:")]
+    public CGFloat LineWidth { get; set; }
+    [Selector("glowWidth", "setGlowWidth:")]
+    public CGFloat GlowWidth { get; set; }
+    [Selector("lineCap", "setLineCap:")]
+    public CGLineCap LineCap { get; set; }
+    [Selector("lineJoin", "setLineJoin:")]
+    public CGLineJoin LineJoin { get; set; }
+    [Selector("miterLimit", "setMiterLimit:")]
+    public CGFloat MiterLimit { get; set; }
+    [Selector("lineLength")]
+    public CGFloat LineLength { get; }
+    [Selector("fillTexture", "setFillTexture:")]
+    public SKTexture? FillTexture { get; set; }
+    [Selector("fillShader", "setFillShader:")]
+    public SKShader? FillShader { get; set; }
+    [Selector("strokeTexture", "setStrokeTexture:")]
+    public SKTexture? StrokeTexture { get; set; }
+    [Selector("strokeShader", "setStrokeShader:")]
+    public SKShader? StrokeShader { get; set; }
+    [Selector("attributeValues", "setAttributeValues:")]
+    public NSDictionary AttributeValues { get; set; }
+    [Selector("shapeNodeWithPath:")]
+    public static Self ShapeNodeWithPath(CGPathRef path);
+    [Selector("shapeNodeWithPath:centered:")]
+    public static Self ShapeNodeWithPathCentered(CGPathRef path, bool centered);
+    [Selector("shapeNodeWithRect:")]
+    public static Self ShapeNodeWithRect(CGRect rect);
+    [Selector("shapeNodeWithRectOfSize:")]
+    public static Self ShapeNodeWithRectOfSize(CGSize size);
+    [Selector("shapeNodeWithRect:cornerRadius:")]
+    public static Self ShapeNodeWithRectCornerRadius(CGRect rect, CGFloat cornerRadius);
+    [Selector("shapeNodeWithRectOfSize:cornerRadius:")]
+    public static Self ShapeNodeWithRectOfSizeCornerRadius(CGSize size, CGFloat cornerRadius);
+    [Selector("shapeNodeWithCircleOfRadius:")]
+    public static Self ShapeNodeWithCircleOfRadius(CGFloat radius);
+    [Selector("shapeNodeWithEllipseInRect:")]
+    public static Self ShapeNodeWithEllipseInRect(CGRect rect);
+    [Selector("shapeNodeWithEllipseOfSize:")]
+    public static Self ShapeNodeWithEllipseOfSize(CGSize size);
+    [Selector("shapeNodeWithPoints:count:")]
+    public static Self ShapeNodeWithPointsCount(CGPoint* points, nuint numPoints);
+    [Selector("shapeNodeWithSplinePoints:count:")]
+    public static Self ShapeNodeWithSplinePointsCount(CGPoint* points, nuint numPoints);
+    [Selector("valueForAttributeNamed:")]
+    public SKAttributeValue? ValueForAttributeNamed(NSString key);
+    [Selector("setValue:forAttributeNamed:")]
+    public void SetValueForAttributeNamed(SKAttributeValue value, NSString key);
 }
 
 #endif

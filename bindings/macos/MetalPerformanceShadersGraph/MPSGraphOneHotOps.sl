@@ -35,12 +35,18 @@ import Standard.ObjC;
 /// MPSGraphOneHotOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("oneHotWithIndicesTensor:depth:axis:dataType:onValue:offValue:name:")] public MPSGraphTensor OneHotWithIndicesTensorDepthAxisDataTypeOnValueOffValueName(MPSGraphTensor indicesTensor, NSUInteger depth, NSUInteger axis, MPSDataType dataType, double onValue, double offValue, NSString? name);
-    [Selector("oneHotWithIndicesTensor:depth:dataType:onValue:offValue:name:")] public MPSGraphTensor OneHotWithIndicesTensorDepthDataTypeOnValueOffValueName(MPSGraphTensor indicesTensor, NSUInteger depth, MPSDataType dataType, double onValue, double offValue, NSString? name);
-    [Selector("oneHotWithIndicesTensor:depth:axis:dataType:name:")] public MPSGraphTensor OneHotWithIndicesTensorDepthAxisDataTypeName(MPSGraphTensor indicesTensor, NSUInteger depth, NSUInteger axis, MPSDataType dataType, NSString? name);
-    [Selector("oneHotWithIndicesTensor:depth:axis:name:")] public MPSGraphTensor OneHotWithIndicesTensorDepthAxisName(MPSGraphTensor indicesTensor, NSUInteger depth, NSUInteger axis, NSString? name);
-    [Selector("oneHotWithIndicesTensor:depth:dataType:name:")] public MPSGraphTensor OneHotWithIndicesTensorDepthDataTypeName(MPSGraphTensor indicesTensor, NSUInteger depth, MPSDataType dataType, NSString? name);
-    [Selector("oneHotWithIndicesTensor:depth:name:")] public MPSGraphTensor OneHotWithIndicesTensorDepthName(MPSGraphTensor indicesTensor, NSUInteger depth, NSString? name);
+    [Selector("oneHotWithIndicesTensor:depth:axis:dataType:onValue:offValue:name:")]
+    public MPSGraphTensor OneHotWithIndicesTensorDepthAxisDataTypeOnValueOffValueName(MPSGraphTensor indicesTensor, NSUInteger depth, NSUInteger axis, MPSDataType dataType, double onValue, double offValue, NSString? name);
+    [Selector("oneHotWithIndicesTensor:depth:dataType:onValue:offValue:name:")]
+    public MPSGraphTensor OneHotWithIndicesTensorDepthDataTypeOnValueOffValueName(MPSGraphTensor indicesTensor, NSUInteger depth, MPSDataType dataType, double onValue, double offValue, NSString? name);
+    [Selector("oneHotWithIndicesTensor:depth:axis:dataType:name:")]
+    public MPSGraphTensor OneHotWithIndicesTensorDepthAxisDataTypeName(MPSGraphTensor indicesTensor, NSUInteger depth, NSUInteger axis, MPSDataType dataType, NSString? name);
+    [Selector("oneHotWithIndicesTensor:depth:axis:name:")]
+    public MPSGraphTensor OneHotWithIndicesTensorDepthAxisName(MPSGraphTensor indicesTensor, NSUInteger depth, NSUInteger axis, NSString? name);
+    [Selector("oneHotWithIndicesTensor:depth:dataType:name:")]
+    public MPSGraphTensor OneHotWithIndicesTensorDepthDataTypeName(MPSGraphTensor indicesTensor, NSUInteger depth, MPSDataType dataType, NSString? name);
+    [Selector("oneHotWithIndicesTensor:depth:name:")]
+    public MPSGraphTensor OneHotWithIndicesTensorDepthName(MPSGraphTensor indicesTensor, NSUInteger depth, NSString? name);
 }
 
 #endif

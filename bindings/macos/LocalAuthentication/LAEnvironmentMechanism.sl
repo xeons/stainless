@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class LAEnvironmentMechanism : NSObject
 {
-    [Selector("isUsable")] public bool IsUsable { get; }
-    [Selector("localizedName")] public NSString LocalizedName { get; }
-    [Selector("iconSystemName")] public NSString IconSystemName { get; }
+    [Selector("isUsable")]
+    public bool IsUsable { get; }
+    [Selector("localizedName")]
+    public NSString LocalizedName { get; }
+    [Selector("iconSystemName")]
+    public NSString IconSystemName { get; }
 }
 
 #endif

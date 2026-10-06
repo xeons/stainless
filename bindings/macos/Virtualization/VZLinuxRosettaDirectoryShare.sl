@@ -44,10 +44,14 @@ public objc closure void VZLinuxRosettaDirectoryShareInstallRosettaWithCompletio
 
 public extern objc class VZLinuxRosettaDirectoryShare : VZDirectoryShare
 {
-    [Selector("options", "setOptions:")] public VZLinuxRosettaCachingOptions? Options { get; set; }
-    [Selector("availability")] public static VZLinuxRosettaAvailability Availability { get; }
-    [Selector("initWithError:")] public Self? InitWithError(out NSError? error);
-    [Selector("installRosettaWithCompletionHandler:")] public static void InstallRosettaWithCompletionHandler(VZLinuxRosettaDirectoryShareInstallRosettaWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("options", "setOptions:")]
+    public VZLinuxRosettaCachingOptions? Options { get; set; }
+    [Selector("availability")]
+    public static VZLinuxRosettaAvailability Availability { get; }
+    [Selector("initWithError:")]
+    public Self? InitWithError(out NSError? error);
+    [Selector("installRosettaWithCompletionHandler:")]
+    public static void InstallRosettaWithCompletionHandler(VZLinuxRosettaDirectoryShareInstallRosettaWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 #endif
 

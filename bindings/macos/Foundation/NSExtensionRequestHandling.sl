@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public objc interface NSExtensionRequestHandling : NSObjectProtocol
 {
-    [Selector("beginRequestWithExtensionContext:")] void BeginRequestWithExtensionContext(NSExtensionContext context);
+    [Selector("beginRequestWithExtensionContext:")]
+    void BeginRequestWithExtensionContext(NSExtensionContext context);
 }
 
 #endif

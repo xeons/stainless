@@ -34,17 +34,23 @@ import Standard.ObjC;
 
 public extern objc class NSCIImageRep : NSImageRep
 {
-    [Selector("CIImage")] public CIImage CIImage { get; }
-    [Selector("imageRepWithCIImage:")] public static Self ImageRepWithCIImage(CIImage image);
-    [Selector("initWithCIImage:")] public Self InitWithCIImage(CIImage image);
+    [Selector("CIImage")]
+    public CIImage CIImage { get; }
+    [Selector("imageRepWithCIImage:")]
+    public static Self ImageRepWithCIImage(CIImage image);
+    [Selector("initWithCIImage:")]
+    public Self InitWithCIImage(CIImage image);
 }
 
 /// NSAppKitAdditions, a category of CIImage.
 public extern objc class CIImage
 {
-    [Selector("initWithBitmapImageRep:")] public Self? InitWithBitmapImageRep(NSBitmapImageRep bitmapImageRep);
-    [Selector("drawInRect:fromRect:operation:fraction:")] public void DrawInRectFromRectOperationFraction(NSRect rect, NSRect fromRect, NSCompositingOperation op, CGFloat delta);
-    [Selector("drawAtPoint:fromRect:operation:fraction:")] public void DrawAtPointFromRectOperationFraction(NSPoint point, NSRect fromRect, NSCompositingOperation op, CGFloat delta);
+    [Selector("initWithBitmapImageRep:")]
+    public Self? InitWithBitmapImageRep(NSBitmapImageRep bitmapImageRep);
+    [Selector("drawInRect:fromRect:operation:fraction:")]
+    public void DrawInRectFromRectOperationFraction(NSRect rect, NSRect fromRect, NSCompositingOperation op, CGFloat delta);
+    [Selector("drawAtPoint:fromRect:operation:fraction:")]
+    public void DrawAtPointFromRectOperationFraction(NSPoint point, NSRect fromRect, NSCompositingOperation op, CGFloat delta);
 }
 
 #endif

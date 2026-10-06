@@ -37,9 +37,12 @@ import Standard.ObjC;
 
 public extern objc class QLPreviewReplyAttachment : NSObject
 {
-    [Selector("data")] public NSData Data { get; }
-    [Selector("contentType")] public UTType ContentType { get; }
-    [Selector("initWithData:contentType:")] public Self InitWithDataContentType(NSData data, UTType contentType);
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("contentType")]
+    public UTType ContentType { get; }
+    [Selector("initWithData:contentType:")]
+    public Self InitWithDataContentType(NSData data, UTType contentType);
 }
 
 public objc closure bool QLPreviewReplyInitWithContextSizeIsBitmapDrawingBlockDrawingBlock(CGContextRef arg0, QLPreviewReply arg1, void** arg2);
@@ -48,12 +51,18 @@ public objc closure NSData? QLPreviewReplyInitWithDataOfContentTypeContentSizeDa
 
 public extern objc class QLPreviewReply : NSObject
 {
-    [Selector("stringEncoding", "setStringEncoding:")] public NSStringEncoding StringEncoding { get; set; }
-    [Selector("attachments", "setAttachments:")] public NSDictionary Attachments { get; set; }
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("initWithContextSize:isBitmap:drawingBlock:")] public Self InitWithContextSizeIsBitmapDrawingBlock(CGSize contextSize, bool isBitmap, QLPreviewReplyInitWithContextSizeIsBitmapDrawingBlockDrawingBlock drawingBlock);
-    [Selector("initWithFileURL:")] public Self InitWithFileURL(NSURL fileURL);
-    [Selector("initWithDataOfContentType:contentSize:dataCreationBlock:")] public Self InitWithDataOfContentTypeContentSizeDataCreationBlock(UTType contentType, CGSize contentSize, QLPreviewReplyInitWithDataOfContentTypeContentSizeDataCreationBlockDataCreationBlock dataCreationBlock);
+    [Selector("stringEncoding", "setStringEncoding:")]
+    public NSStringEncoding StringEncoding { get; set; }
+    [Selector("attachments", "setAttachments:")]
+    public NSDictionary Attachments { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("initWithContextSize:isBitmap:drawingBlock:")]
+    public Self InitWithContextSizeIsBitmapDrawingBlock(CGSize contextSize, bool isBitmap, QLPreviewReplyInitWithContextSizeIsBitmapDrawingBlockDrawingBlock drawingBlock);
+    [Selector("initWithFileURL:")]
+    public Self InitWithFileURL(NSURL fileURL);
+    [Selector("initWithDataOfContentType:contentSize:dataCreationBlock:")]
+    public Self InitWithDataOfContentTypeContentSizeDataCreationBlock(UTType contentType, CGSize contentSize, QLPreviewReplyInitWithDataOfContentTypeContentSizeDataCreationBlockDataCreationBlock dataCreationBlock);
 }
 
 public objc closure PDFDocument? QLPreviewReplyInitForPDFWithPageSizeDocumentCreationBlockDocumentCreationBlock(QLPreviewReply arg0, void** arg1);
@@ -61,7 +70,8 @@ public objc closure PDFDocument? QLPreviewReplyInitForPDFWithPageSizeDocumentCre
 /// UI, a category of QLPreviewReply.
 public extern objc class QLPreviewReply
 {
-    [Selector("initForPDFWithPageSize:documentCreationBlock:")] public Self InitForPDFWithPageSizeDocumentCreationBlock(CGSize defaultPageSize, QLPreviewReplyInitForPDFWithPageSizeDocumentCreationBlockDocumentCreationBlock documentCreationBlock);
+    [Selector("initForPDFWithPageSize:documentCreationBlock:")]
+    public Self InitForPDFWithPageSizeDocumentCreationBlock(CGSize defaultPageSize, QLPreviewReplyInitForPDFWithPageSizeDocumentCreationBlockDocumentCreationBlock documentCreationBlock);
 }
 
 #endif

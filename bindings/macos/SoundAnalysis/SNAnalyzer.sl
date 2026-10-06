@@ -34,25 +34,38 @@ import Standard.ObjC;
 
 public extern objc class SNAudioStreamAnalyzer : NSObject
 {
-    [Selector("initWithFormat:")] public Self InitWithFormat(AVAudioFormat format);
-    [Selector("addRequest:withObserver:error:")] public bool AddRequestWithObserverError(SNRequest request, SNResultsObserving observer, out NSError? error);
-    [Selector("removeRequest:")] public void RemoveRequest(SNRequest request);
-    [Selector("removeAllRequests")] public void RemoveAllRequests();
-    [Selector("analyzeAudioBuffer:atAudioFramePosition:")] public void AnalyzeAudioBufferAtAudioFramePosition(AVAudioBuffer audioBuffer, AVAudioFramePosition audioFramePosition);
-    [Selector("completeAnalysis")] public void CompleteAnalysis();
+    [Selector("initWithFormat:")]
+    public Self InitWithFormat(AVAudioFormat format);
+    [Selector("addRequest:withObserver:error:")]
+    public bool AddRequestWithObserverError(SNRequest request, SNResultsObserving observer, out NSError? error);
+    [Selector("removeRequest:")]
+    public void RemoveRequest(SNRequest request);
+    [Selector("removeAllRequests")]
+    public void RemoveAllRequests();
+    [Selector("analyzeAudioBuffer:atAudioFramePosition:")]
+    public void AnalyzeAudioBufferAtAudioFramePosition(AVAudioBuffer audioBuffer, AVAudioFramePosition audioFramePosition);
+    [Selector("completeAnalysis")]
+    public void CompleteAnalysis();
 }
 
 public objc closure void SNAudioFileAnalyzerAnalyzeWithCompletionHandlerCompletionHandlerBlock(bool arg0);
 
 public extern objc class SNAudioFileAnalyzer : NSObject
 {
-    [Selector("initWithURL:error:")] public Self? InitWithURLError(NSURL url, out NSError? error);
-    [Selector("addRequest:withObserver:error:")] public bool AddRequestWithObserverError(SNRequest request, SNResultsObserving observer, out NSError? error);
-    [Selector("removeRequest:")] public void RemoveRequest(SNRequest request);
-    [Selector("removeAllRequests")] public void RemoveAllRequests();
-    [Selector("analyze")] public void Analyze();
-    [Selector("analyzeWithCompletionHandler:")] public void AnalyzeWithCompletionHandler(SNAudioFileAnalyzerAnalyzeWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("cancelAnalysis")] public void CancelAnalysis();
+    [Selector("initWithURL:error:")]
+    public Self? InitWithURLError(NSURL url, out NSError? error);
+    [Selector("addRequest:withObserver:error:")]
+    public bool AddRequestWithObserverError(SNRequest request, SNResultsObserving observer, out NSError? error);
+    [Selector("removeRequest:")]
+    public void RemoveRequest(SNRequest request);
+    [Selector("removeAllRequests")]
+    public void RemoveAllRequests();
+    [Selector("analyze")]
+    public void Analyze();
+    [Selector("analyzeWithCompletionHandler:")]
+    public void AnalyzeWithCompletionHandler(SNAudioFileAnalyzerAnalyzeWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("cancelAnalysis")]
+    public void CancelAnalysis();
 }
 
 #endif

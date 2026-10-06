@@ -56,66 +56,110 @@ public enum AVCaptureVideoOrientation : long
 
 public extern objc class AVCaptureSession : NSObject
 {
-    [Selector("sessionPreset", "setSessionPreset:")] public AVCaptureSessionPreset? SessionPreset { get; set; }
-    [Selector("inputs")] public NSArray Inputs { get; }
-    [Selector("outputs")] public NSArray Outputs { get; }
-    [Selector("connections")] public NSArray? Connections { get; }
-    [Selector("supportsControls")] public bool SupportsControls { get; }
-    [Selector("maxControlsCount")] public NSInteger MaxControlsCount { get; }
-    [Selector("controlsDelegate")] public AVCaptureSessionControlsDelegate? ControlsDelegate { get; }
-    [Selector("controlsDelegateCallbackQueue")] public dispatch_queue_t? ControlsDelegateCallbackQueue { get; }
-    [Selector("controls")] public NSArray? Controls { get; }
-    [Selector("isRunning")] public bool Running { get; }
-    [Selector("synchronizationClock")] public CMClockRef? SynchronizationClock { get; }
+    [Selector("sessionPreset", "setSessionPreset:")]
+    public AVCaptureSessionPreset? SessionPreset { get; set; }
+    [Selector("inputs")]
+    public NSArray Inputs { get; }
+    [Selector("outputs")]
+    public NSArray Outputs { get; }
+    [Selector("connections")]
+    public NSArray? Connections { get; }
+    [Selector("supportsControls")]
+    public bool SupportsControls { get; }
+    [Selector("maxControlsCount")]
+    public NSInteger MaxControlsCount { get; }
+    [Selector("controlsDelegate")]
+    public AVCaptureSessionControlsDelegate? ControlsDelegate { get; }
+    [Selector("controlsDelegateCallbackQueue")]
+    public dispatch_queue_t? ControlsDelegateCallbackQueue { get; }
+    [Selector("controls")]
+    public NSArray? Controls { get; }
+    [Selector("isRunning")]
+    public bool Running { get; }
+    [Selector("synchronizationClock")]
+    public CMClockRef? SynchronizationClock { get; }
     /// Deprecated in macOS 12.3.
-    [Selector("masterClock")] public CMClockRef? MasterClock { get; }
+    [Selector("masterClock")]
+    public CMClockRef? MasterClock { get; }
     /// macOS 26.0 and later.
-    [Selector("isManualDeferredStartSupported")] public bool ManualDeferredStartSupported { get; }
+    [Selector("isManualDeferredStartSupported")]
+    public bool ManualDeferredStartSupported { get; }
     /// macOS 26.0 and later.
-    [Selector("automaticallyRunsDeferredStart", "setAutomaticallyRunsDeferredStart:")] public bool AutomaticallyRunsDeferredStart { get; set; }
+    [Selector("automaticallyRunsDeferredStart", "setAutomaticallyRunsDeferredStart:")]
+    public bool AutomaticallyRunsDeferredStart { get; set; }
     /// macOS 26.0 and later.
-    [Selector("deferredStartDelegate")] public AVCaptureSessionDeferredStartDelegate? DeferredStartDelegate { get; }
+    [Selector("deferredStartDelegate")]
+    public AVCaptureSessionDeferredStartDelegate? DeferredStartDelegate { get; }
     /// macOS 26.0 and later.
-    [Selector("deferredStartDelegateCallbackQueue")] public dispatch_queue_t? DeferredStartDelegateCallbackQueue { get; }
-    [Selector("canSetSessionPreset:")] public bool CanSetSessionPreset(AVCaptureSessionPreset preset);
-    [Selector("canAddInput:")] public bool CanAddInput(AVCaptureInput input);
-    [Selector("addInput:")] public void AddInput(AVCaptureInput input);
-    [Selector("removeInput:")] public void RemoveInput(AVCaptureInput input);
-    [Selector("canAddOutput:")] public bool CanAddOutput(AVCaptureOutput output);
-    [Selector("addOutput:")] public void AddOutput(AVCaptureOutput output);
-    [Selector("removeOutput:")] public void RemoveOutput(AVCaptureOutput output);
-    [Selector("addInputWithNoConnections:")] public void AddInputWithNoConnections(AVCaptureInput input);
-    [Selector("addOutputWithNoConnections:")] public void AddOutputWithNoConnections(AVCaptureOutput output);
-    [Selector("canAddConnection:")] public bool CanAddConnection(AVCaptureConnection connection);
-    [Selector("addConnection:")] public void AddConnection(AVCaptureConnection connection);
-    [Selector("removeConnection:")] public void RemoveConnection(AVCaptureConnection connection);
-    [Selector("setControlsDelegate:queue:")] public void SetControlsDelegateQueue(AVCaptureSessionControlsDelegate? controlsDelegate, dispatch_queue_t? controlsDelegateCallbackQueue);
-    [Selector("canAddControl:")] public bool CanAddControl(AVCaptureControl control);
-    [Selector("addControl:")] public void AddControl(AVCaptureControl control);
-    [Selector("removeControl:")] public void RemoveControl(AVCaptureControl control);
-    [Selector("beginConfiguration")] public void BeginConfiguration();
-    [Selector("commitConfiguration")] public void CommitConfiguration();
-    [Selector("startRunning")] public void StartRunning();
-    [Selector("stopRunning")] public void StopRunning();
+    [Selector("deferredStartDelegateCallbackQueue")]
+    public dispatch_queue_t? DeferredStartDelegateCallbackQueue { get; }
+    [Selector("canSetSessionPreset:")]
+    public bool CanSetSessionPreset(AVCaptureSessionPreset preset);
+    [Selector("canAddInput:")]
+    public bool CanAddInput(AVCaptureInput input);
+    [Selector("addInput:")]
+    public void AddInput(AVCaptureInput input);
+    [Selector("removeInput:")]
+    public void RemoveInput(AVCaptureInput input);
+    [Selector("canAddOutput:")]
+    public bool CanAddOutput(AVCaptureOutput output);
+    [Selector("addOutput:")]
+    public void AddOutput(AVCaptureOutput output);
+    [Selector("removeOutput:")]
+    public void RemoveOutput(AVCaptureOutput output);
+    [Selector("addInputWithNoConnections:")]
+    public void AddInputWithNoConnections(AVCaptureInput input);
+    [Selector("addOutputWithNoConnections:")]
+    public void AddOutputWithNoConnections(AVCaptureOutput output);
+    [Selector("canAddConnection:")]
+    public bool CanAddConnection(AVCaptureConnection connection);
+    [Selector("addConnection:")]
+    public void AddConnection(AVCaptureConnection connection);
+    [Selector("removeConnection:")]
+    public void RemoveConnection(AVCaptureConnection connection);
+    [Selector("setControlsDelegate:queue:")]
+    public void SetControlsDelegateQueue(AVCaptureSessionControlsDelegate? controlsDelegate, dispatch_queue_t? controlsDelegateCallbackQueue);
+    [Selector("canAddControl:")]
+    public bool CanAddControl(AVCaptureControl control);
+    [Selector("addControl:")]
+    public void AddControl(AVCaptureControl control);
+    [Selector("removeControl:")]
+    public void RemoveControl(AVCaptureControl control);
+    [Selector("beginConfiguration")]
+    public void BeginConfiguration();
+    [Selector("commitConfiguration")]
+    public void CommitConfiguration();
+    [Selector("startRunning")]
+    public void StartRunning();
+    [Selector("stopRunning")]
+    public void StopRunning();
     /// macOS 26.0 and later.
-    [Selector("runDeferredStartWhenNeeded")] public void RunDeferredStartWhenNeeded();
+    [Selector("runDeferredStartWhenNeeded")]
+    public void RunDeferredStartWhenNeeded();
     /// macOS 26.0 and later.
-    [Selector("setDeferredStartDelegate:deferredStartDelegateCallbackQueue:")] public void SetDeferredStartDelegateDeferredStartDelegateCallbackQueue(AVCaptureSessionDeferredStartDelegate? deferredStartDelegate, dispatch_queue_t? deferredStartDelegateCallbackQueue);
+    [Selector("setDeferredStartDelegate:deferredStartDelegateCallbackQueue:")]
+    public void SetDeferredStartDelegateDeferredStartDelegateCallbackQueue(AVCaptureSessionDeferredStartDelegate? deferredStartDelegate, dispatch_queue_t? deferredStartDelegateCallbackQueue);
 }
 
 public objc interface AVCaptureSessionControlsDelegate : NSObjectProtocol
 {
-    [Selector("sessionControlsDidBecomeActive:")] void SessionControlsDidBecomeActive(AVCaptureSession session);
-    [Selector("sessionControlsWillEnterFullscreenAppearance:")] void SessionControlsWillEnterFullscreenAppearance(AVCaptureSession session);
-    [Selector("sessionControlsWillExitFullscreenAppearance:")] void SessionControlsWillExitFullscreenAppearance(AVCaptureSession session);
-    [Selector("sessionControlsDidBecomeInactive:")] void SessionControlsDidBecomeInactive(AVCaptureSession session);
+    [Selector("sessionControlsDidBecomeActive:")]
+    void SessionControlsDidBecomeActive(AVCaptureSession session);
+    [Selector("sessionControlsWillEnterFullscreenAppearance:")]
+    void SessionControlsWillEnterFullscreenAppearance(AVCaptureSession session);
+    [Selector("sessionControlsWillExitFullscreenAppearance:")]
+    void SessionControlsWillExitFullscreenAppearance(AVCaptureSession session);
+    [Selector("sessionControlsDidBecomeInactive:")]
+    void SessionControlsDidBecomeInactive(AVCaptureSession session);
 }
 
 /// macOS 26.0 and later.
 public objc interface AVCaptureSessionDeferredStartDelegate : NSObjectProtocol
 {
-    [Selector("sessionWillRunDeferredStart:")] void SessionWillRunDeferredStart(AVCaptureSession session);
-    [Selector("sessionDidRunDeferredStart:")] void SessionDidRunDeferredStart(AVCaptureSession session);
+    [Selector("sessionWillRunDeferredStart:")]
+    void SessionWillRunDeferredStart(AVCaptureSession session);
+    [Selector("sessionDidRunDeferredStart:")]
+    void SessionDidRunDeferredStart(AVCaptureSession session);
 }
 
 public enum AVVideoFieldMode : long
@@ -128,39 +172,66 @@ public enum AVVideoFieldMode : long
 
 public extern objc class AVCaptureConnection : NSObject
 {
-    [Selector("inputPorts")] public NSArray? InputPorts { get; }
-    [Selector("output")] public AVCaptureOutput? Output { get; }
-    [Selector("videoPreviewLayer")] public AVCaptureVideoPreviewLayer? VideoPreviewLayer { get; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("isActive")] public bool Active { get; }
-    [Selector("audioChannels")] public NSArray? AudioChannels { get; }
-    [Selector("isVideoMirroringSupported")] public bool SupportsVideoMirroring { get; }
-    [Selector("isVideoMirrored", "setVideoMirrored:")] public bool VideoMirrored { get; set; }
-    [Selector("automaticallyAdjustsVideoMirroring", "setAutomaticallyAdjustsVideoMirroring:")] public bool AutomaticallyAdjustsVideoMirroring { get; set; }
-    [Selector("videoRotationAngle", "setVideoRotationAngle:")] public CGFloat VideoRotationAngle { get; set; }
+    [Selector("inputPorts")]
+    public NSArray? InputPorts { get; }
+    [Selector("output")]
+    public AVCaptureOutput? Output { get; }
+    [Selector("videoPreviewLayer")]
+    public AVCaptureVideoPreviewLayer? VideoPreviewLayer { get; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("isActive")]
+    public bool Active { get; }
+    [Selector("audioChannels")]
+    public NSArray? AudioChannels { get; }
+    [Selector("isVideoMirroringSupported")]
+    public bool SupportsVideoMirroring { get; }
+    [Selector("isVideoMirrored", "setVideoMirrored:")]
+    public bool VideoMirrored { get; set; }
+    [Selector("automaticallyAdjustsVideoMirroring", "setAutomaticallyAdjustsVideoMirroring:")]
+    public bool AutomaticallyAdjustsVideoMirroring { get; set; }
+    [Selector("videoRotationAngle", "setVideoRotationAngle:")]
+    public CGFloat VideoRotationAngle { get; set; }
     /// Deprecated in macOS 14.0.
-    [Selector("isVideoOrientationSupported")] public bool SupportsVideoOrientation { get; }
+    [Selector("isVideoOrientationSupported")]
+    public bool SupportsVideoOrientation { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("videoOrientation", "setVideoOrientation:")] public AVCaptureVideoOrientation VideoOrientation { get; set; }
-    [Selector("isVideoFieldModeSupported")] public bool SupportsVideoFieldMode { get; }
-    [Selector("videoFieldMode", "setVideoFieldMode:")] public AVVideoFieldMode VideoFieldMode { get; set; }
-    [Selector("isVideoMinFrameDurationSupported")] public bool SupportsVideoMinFrameDuration { get; }
-    [Selector("videoMinFrameDuration", "setVideoMinFrameDuration:")] public CMTime VideoMinFrameDuration { get; set; }
-    [Selector("isVideoMaxFrameDurationSupported")] public bool SupportsVideoMaxFrameDuration { get; }
-    [Selector("videoMaxFrameDuration", "setVideoMaxFrameDuration:")] public CMTime VideoMaxFrameDuration { get; set; }
-    [Selector("connectionWithInputPorts:output:")] public static Self ConnectionWithInputPortsOutput(NSArray ports, AVCaptureOutput output);
-    [Selector("connectionWithInputPort:videoPreviewLayer:")] public static Self ConnectionWithInputPortVideoPreviewLayer(AVCaptureInputPort port, AVCaptureVideoPreviewLayer layer);
-    [Selector("initWithInputPorts:output:")] public Self InitWithInputPortsOutput(NSArray ports, AVCaptureOutput output);
-    [Selector("initWithInputPort:videoPreviewLayer:")] public Self InitWithInputPortVideoPreviewLayer(AVCaptureInputPort port, AVCaptureVideoPreviewLayer layer);
-    [Selector("isVideoRotationAngleSupported:")] public bool IsVideoRotationAngleSupported(CGFloat videoRotationAngle);
+    [Selector("videoOrientation", "setVideoOrientation:")]
+    public AVCaptureVideoOrientation VideoOrientation { get; set; }
+    [Selector("isVideoFieldModeSupported")]
+    public bool SupportsVideoFieldMode { get; }
+    [Selector("videoFieldMode", "setVideoFieldMode:")]
+    public AVVideoFieldMode VideoFieldMode { get; set; }
+    [Selector("isVideoMinFrameDurationSupported")]
+    public bool SupportsVideoMinFrameDuration { get; }
+    [Selector("videoMinFrameDuration", "setVideoMinFrameDuration:")]
+    public CMTime VideoMinFrameDuration { get; set; }
+    [Selector("isVideoMaxFrameDurationSupported")]
+    public bool SupportsVideoMaxFrameDuration { get; }
+    [Selector("videoMaxFrameDuration", "setVideoMaxFrameDuration:")]
+    public CMTime VideoMaxFrameDuration { get; set; }
+    [Selector("connectionWithInputPorts:output:")]
+    public static Self ConnectionWithInputPortsOutput(NSArray ports, AVCaptureOutput output);
+    [Selector("connectionWithInputPort:videoPreviewLayer:")]
+    public static Self ConnectionWithInputPortVideoPreviewLayer(AVCaptureInputPort port, AVCaptureVideoPreviewLayer layer);
+    [Selector("initWithInputPorts:output:")]
+    public Self InitWithInputPortsOutput(NSArray ports, AVCaptureOutput output);
+    [Selector("initWithInputPort:videoPreviewLayer:")]
+    public Self InitWithInputPortVideoPreviewLayer(AVCaptureInputPort port, AVCaptureVideoPreviewLayer layer);
+    [Selector("isVideoRotationAngleSupported:")]
+    public bool IsVideoRotationAngleSupported(CGFloat videoRotationAngle);
 }
 
 public extern objc class AVCaptureAudioChannel : NSObject
 {
-    [Selector("averagePowerLevel")] public float AveragePowerLevel { get; }
-    [Selector("peakHoldLevel")] public float PeakHoldLevel { get; }
-    [Selector("volume", "setVolume:")] public float Volume { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
+    [Selector("averagePowerLevel")]
+    public float AveragePowerLevel { get; }
+    [Selector("peakHoldLevel")]
+    public float PeakHoldLevel { get; }
+    [Selector("volume", "setVolume:")]
+    public float Volume { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
 }
 
 #endif

@@ -34,13 +34,18 @@ import Standard.ObjC;
 public extern objc class CIPlugIn : NSObject
 {
     /// Deprecated in macOS 10.15.
-    [Selector("loadAllPlugIns")] public static void LoadAllPlugIns();
-    [Selector("loadNonExecutablePlugIns")] public static void LoadNonExecutablePlugIns();
+    [Selector("loadAllPlugIns")]
+    public static void LoadAllPlugIns();
+    [Selector("loadNonExecutablePlugIns")]
+    public static void LoadNonExecutablePlugIns();
     /// Deprecated in macOS 10.7.
-    [Selector("loadPlugIn:allowNonExecutable:")] public static void LoadPlugInAllowNonExecutable(NSURL? url, bool allowNonExecutable);
+    [Selector("loadPlugIn:allowNonExecutable:")]
+    public static void LoadPlugInAllowNonExecutable(NSURL? url, bool allowNonExecutable);
     /// Deprecated in macOS 10.15.
-    [Selector("loadPlugIn:allowExecutableCode:")] public static void LoadPlugInAllowExecutableCode(NSURL? url, bool allowExecutableCode);
-    [Selector("loadNonExecutablePlugIn:")] public static void LoadNonExecutablePlugIn(NSURL? url);
+    [Selector("loadPlugIn:allowExecutableCode:")]
+    public static void LoadPlugInAllowExecutableCode(NSURL? url, bool allowExecutableCode);
+    [Selector("loadNonExecutablePlugIn:")]
+    public static void LoadNonExecutablePlugIn(NSURL? url);
 }
 
 #endif

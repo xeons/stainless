@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class ASPasswordCredential : NSObject, ASAuthorizationCredential
 {
-    [Selector("user")] public NSString User { get; }
-    [Selector("password")] public NSString Password { get; }
-    [Selector("initWithUser:password:")] public Self InitWithUserPassword(NSString user, NSString password);
-    [Selector("credentialWithUser:password:")] public static Self CredentialWithUserPassword(NSString user, NSString password);
+    [Selector("user")]
+    public NSString User { get; }
+    [Selector("password")]
+    public NSString Password { get; }
+    [Selector("initWithUser:password:")]
+    public Self InitWithUserPassword(NSString user, NSString password);
+    [Selector("credentialWithUser:password:")]
+    public static Self CredentialWithUserPassword(NSString user, NSString password);
 }
 
 #endif

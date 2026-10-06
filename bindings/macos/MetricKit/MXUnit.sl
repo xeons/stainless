@@ -32,12 +32,14 @@ import Standard.ObjC;
 
 public extern objc class MXUnitSignalBars : NSDimension
 {
-    [Selector("bars")] public static MXUnitSignalBars Bars { get; }
+    [Selector("bars")]
+    public static MXUnitSignalBars Bars { get; }
 }
 
 public extern objc class MXUnitAveragePixelLuminance : NSDimension
 {
-    [Selector("apl")] public static MXUnitAveragePixelLuminance Apl { get; }
+    [Selector("apl")]
+    public static MXUnitAveragePixelLuminance Apl { get; }
 }
 
 #endif

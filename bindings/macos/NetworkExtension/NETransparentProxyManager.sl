@@ -34,7 +34,8 @@ public objc closure void NETransparentProxyManagerLoadAllFromPreferencesWithComp
 
 public extern objc class NETransparentProxyManager : NEVPNManager
 {
-    [Selector("loadAllFromPreferencesWithCompletionHandler:")] public static void LoadAllFromPreferencesWithCompletionHandler(NETransparentProxyManagerLoadAllFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadAllFromPreferencesWithCompletionHandler:")]
+    public static void LoadAllFromPreferencesWithCompletionHandler(NETransparentProxyManagerLoadAllFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

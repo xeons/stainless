@@ -46,12 +46,18 @@ public objc closure void AVPlayerItemRequestContentAuthorizationAsynchronouslyWi
 /// AVPlayerItemProtectedContent, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    [Selector("isAuthorizationRequiredForPlayback")] public bool AuthorizationRequiredForPlayback { get; }
-    [Selector("isApplicationAuthorizedForPlayback")] public bool ApplicationAuthorizedForPlayback { get; }
-    [Selector("isContentAuthorizedForPlayback")] public bool ContentAuthorizedForPlayback { get; }
-    [Selector("contentAuthorizationRequestStatus")] public AVContentAuthorizationStatus ContentAuthorizationRequestStatus { get; }
-    [Selector("requestContentAuthorizationAsynchronouslyWithTimeoutInterval:completionHandler:")] public void RequestContentAuthorizationAsynchronouslyWithTimeoutIntervalCompletionHandler(NSTimeInterval timeoutInterval, AVPlayerItemRequestContentAuthorizationAsynchronouslyWithTimeoutIntervalCompletionHandlerHandlerBlock handler);
-    [Selector("cancelContentAuthorizationRequest")] public void CancelContentAuthorizationRequest();
+    [Selector("isAuthorizationRequiredForPlayback")]
+    public bool AuthorizationRequiredForPlayback { get; }
+    [Selector("isApplicationAuthorizedForPlayback")]
+    public bool ApplicationAuthorizedForPlayback { get; }
+    [Selector("isContentAuthorizedForPlayback")]
+    public bool ContentAuthorizedForPlayback { get; }
+    [Selector("contentAuthorizationRequestStatus")]
+    public AVContentAuthorizationStatus ContentAuthorizationRequestStatus { get; }
+    [Selector("requestContentAuthorizationAsynchronouslyWithTimeoutInterval:completionHandler:")]
+    public void RequestContentAuthorizationAsynchronouslyWithTimeoutIntervalCompletionHandler(NSTimeInterval timeoutInterval, AVPlayerItemRequestContentAuthorizationAsynchronouslyWithTimeoutIntervalCompletionHandlerHandlerBlock handler);
+    [Selector("cancelContentAuthorizationRequest")]
+    public void CancelContentAuthorizationRequest();
 }
 
 #endif

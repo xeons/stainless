@@ -43,11 +43,16 @@ public objc closure void NSPDFPanelBeginSheetWithPDFInfoModalForWindowCompletion
 
 public extern objc class NSPDFPanel : NSObject
 {
-    [Selector("accessoryController", "setAccessoryController:")] public NSViewController? AccessoryController { get; set; }
-    [Selector("options", "setOptions:")] public NSPDFPanelOptions Options { get; set; }
-    [Selector("defaultFileName", "setDefaultFileName:")] public NSString DefaultFileName { get; set; }
-    [Selector("panel")] public static NSPDFPanel Panel();
-    [Selector("beginSheetWithPDFInfo:modalForWindow:completionHandler:")] public void BeginSheetWithPDFInfoModalForWindowCompletionHandler(NSPDFInfo pdfInfo, NSWindow? docWindow, NSPDFPanelBeginSheetWithPDFInfoModalForWindowCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("accessoryController", "setAccessoryController:")]
+    public NSViewController? AccessoryController { get; set; }
+    [Selector("options", "setOptions:")]
+    public NSPDFPanelOptions Options { get; set; }
+    [Selector("defaultFileName", "setDefaultFileName:")]
+    public NSString DefaultFileName { get; set; }
+    [Selector("panel")]
+    public static NSPDFPanel Panel();
+    [Selector("beginSheetWithPDFInfo:modalForWindow:completionHandler:")]
+    public void BeginSheetWithPDFInfoModalForWindowCompletionHandler(NSPDFInfo pdfInfo, NSWindow? docWindow, NSPDFPanelBeginSheetWithPDFInfoModalForWindowCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

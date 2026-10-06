@@ -35,8 +35,10 @@ public using CAValueFunctionName = NSString;
 
 public extern objc class CAValueFunction : NSObject, NSSecureCoding
 {
-    [Selector("name")] public CAValueFunctionName Name { get; }
-    [Selector("functionWithName:")] public static Self? FunctionWithName(CAValueFunctionName name);
+    [Selector("name")]
+    public CAValueFunctionName Name { get; }
+    [Selector("functionWithName:")]
+    public static Self? FunctionWithName(CAValueFunctionName name);
 }
 
 public extern "C" CAValueFunctionName? kCAValueFunctionRotateX;

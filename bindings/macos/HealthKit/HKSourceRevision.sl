@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class HKSourceRevision : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("source")] public HKSource Source { get; }
-    [Selector("version")] public NSString? Version { get; }
-    [Selector("productType")] public NSString? ProductType { get; }
-    [Selector("operatingSystemVersion")] public NSOperatingSystemVersion OperatingSystemVersion { get; }
-    [Selector("initWithSource:version:productType:operatingSystemVersion:")] public Self InitWithSourceVersionProductTypeOperatingSystemVersion(HKSource source, NSString? version, NSString? productType, NSOperatingSystemVersion operatingSystemVersion);
-    [Selector("initWithSource:version:")] public Self InitWithSourceVersion(HKSource source, NSString? version);
+    [Selector("source")]
+    public HKSource Source { get; }
+    [Selector("version")]
+    public NSString? Version { get; }
+    [Selector("productType")]
+    public NSString? ProductType { get; }
+    [Selector("operatingSystemVersion")]
+    public NSOperatingSystemVersion OperatingSystemVersion { get; }
+    [Selector("initWithSource:version:productType:operatingSystemVersion:")]
+    public Self InitWithSourceVersionProductTypeOperatingSystemVersion(HKSource source, NSString? version, NSString? productType, NSOperatingSystemVersion operatingSystemVersion);
+    [Selector("initWithSource:version:")]
+    public Self InitWithSourceVersion(HKSource source, NSString? version);
 }
 
 public extern "C" NSString HKSourceRevisionAnyVersion;

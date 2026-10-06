@@ -35,10 +35,14 @@ public objc closure void MKLookAroundSnapshotterGetSnapshotWithCompletionHandler
 
 public extern objc class MKLookAroundSnapshotter : NSObject
 {
-    [Selector("isLoading")] public bool Loading { get; }
-    [Selector("initWithScene:options:")] public Self InitWithSceneOptions(MKLookAroundScene scene, MKLookAroundSnapshotOptions options);
-    [Selector("getSnapshotWithCompletionHandler:")] public void GetSnapshotWithCompletionHandler(MKLookAroundSnapshotterGetSnapshotWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("cancel")] public void Cancel();
+    [Selector("isLoading")]
+    public bool Loading { get; }
+    [Selector("initWithScene:options:")]
+    public Self InitWithSceneOptions(MKLookAroundScene scene, MKLookAroundSnapshotOptions options);
+    [Selector("getSnapshotWithCompletionHandler:")]
+    public void GetSnapshotWithCompletionHandler(MKLookAroundSnapshotterGetSnapshotWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

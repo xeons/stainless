@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class VZUSBMassStorageDevice : VZStorageDevice, VZUSBDevice
 {
-    [Selector("initWithConfiguration:")] public Self InitWithConfiguration(VZUSBMassStorageDeviceConfiguration configuration);
+    [Selector("initWithConfiguration:")]
+    public Self InitWithConfiguration(VZUSBMassStorageDeviceConfiguration configuration);
 }
 
 #endif

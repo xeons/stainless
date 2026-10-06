@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public objc interface ASAuthorizationWebBrowserPlatformPublicKeyCredentialAssertionRequest
 {
-    [Selector("clientData")] ASPublicKeyCredentialClientData? ClientData { get; }
-    [Selector("shouldShowHybridTransport", "setShouldShowHybridTransport:")] bool ShouldShowHybridTransport { get; set; }
+    [Selector("clientData")]
+    ASPublicKeyCredentialClientData? ClientData { get; }
+    [Selector("shouldShowHybridTransport", "setShouldShowHybridTransport:")]
+    bool ShouldShowHybridTransport { get; set; }
 }
 
 #endif

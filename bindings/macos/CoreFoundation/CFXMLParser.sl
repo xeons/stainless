@@ -110,10 +110,12 @@ public struct CFXMLParserContext
 public extern "C" CFTypeID CFXMLParserGetTypeID();
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFXMLParserRef? CFXMLParserCreate(CFAllocatorRef? allocator, CFDataRef? xmlData, CFURLRef? dataSource, CFOptionFlags parseOptions, CFIndex versionOfNodes, CFXMLParserCallBacks* callBacks, CFXMLParserContext* context);
+[ReturnsRetained]
+public extern "C" CFXMLParserRef? CFXMLParserCreate(CFAllocatorRef? allocator, CFDataRef? xmlData, CFURLRef? dataSource, CFOptionFlags parseOptions, CFIndex versionOfNodes, CFXMLParserCallBacks* callBacks, CFXMLParserContext* context);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFXMLParserRef? CFXMLParserCreateWithDataFromURL(CFAllocatorRef? allocator, CFURLRef? dataSource, CFOptionFlags parseOptions, CFIndex versionOfNodes, CFXMLParserCallBacks* callBacks, CFXMLParserContext* context);
+[ReturnsRetained]
+public extern "C" CFXMLParserRef? CFXMLParserCreateWithDataFromURL(CFAllocatorRef? allocator, CFURLRef? dataSource, CFOptionFlags parseOptions, CFIndex versionOfNodes, CFXMLParserCallBacks* callBacks, CFXMLParserContext* context);
 
 /// Deprecated in macOS 10.8.
 public extern "C" void CFXMLParserGetContext(CFXMLParserRef? parser, CFXMLParserContext* context);
@@ -137,7 +139,8 @@ public extern "C" void* CFXMLParserGetDocument(CFXMLParserRef? parser);
 public extern "C" CFXMLParserStatusCode CFXMLParserGetStatusCode(CFXMLParserRef? parser);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFStringRef? CFXMLParserCopyErrorDescription(CFXMLParserRef? parser);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFXMLParserCopyErrorDescription(CFXMLParserRef? parser);
 
 /// Deprecated in macOS 10.8.
 public extern "C" void CFXMLParserAbort(CFXMLParserRef? parser, CFXMLParserStatusCode errorCode, CFStringRef? errorDescription);
@@ -146,20 +149,26 @@ public extern "C" void CFXMLParserAbort(CFXMLParserRef? parser, CFXMLParserStatu
 public extern "C" Boolean CFXMLParserParse(CFXMLParserRef? parser);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFXMLTreeRef? CFXMLTreeCreateFromData(CFAllocatorRef? allocator, CFDataRef? xmlData, CFURLRef? dataSource, CFOptionFlags parseOptions, CFIndex versionOfNodes);
+[ReturnsRetained]
+public extern "C" CFXMLTreeRef? CFXMLTreeCreateFromData(CFAllocatorRef? allocator, CFDataRef? xmlData, CFURLRef? dataSource, CFOptionFlags parseOptions, CFIndex versionOfNodes);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFXMLTreeRef? CFXMLTreeCreateFromDataWithError(CFAllocatorRef? allocator, CFDataRef? xmlData, CFURLRef? dataSource, CFOptionFlags parseOptions, CFIndex versionOfNodes, __CFDictionary** errorDict);
+[ReturnsRetained]
+public extern "C" CFXMLTreeRef? CFXMLTreeCreateFromDataWithError(CFAllocatorRef? allocator, CFDataRef? xmlData, CFURLRef? dataSource, CFOptionFlags parseOptions, CFIndex versionOfNodes, __CFDictionary** errorDict);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFXMLTreeRef? CFXMLTreeCreateWithDataFromURL(CFAllocatorRef? allocator, CFURLRef? dataSource, CFOptionFlags parseOptions, CFIndex versionOfNodes);
+[ReturnsRetained]
+public extern "C" CFXMLTreeRef? CFXMLTreeCreateWithDataFromURL(CFAllocatorRef? allocator, CFURLRef? dataSource, CFOptionFlags parseOptions, CFIndex versionOfNodes);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFDataRef? CFXMLTreeCreateXMLData(CFAllocatorRef? allocator, CFXMLTreeRef? xmlTree);
+[ReturnsRetained]
+public extern "C" CFDataRef? CFXMLTreeCreateXMLData(CFAllocatorRef? allocator, CFXMLTreeRef? xmlTree);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFXMLCreateStringByEscapingEntities(CFAllocatorRef? allocator, CFStringRef? string, CFDictionaryRef? entitiesDictionary);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFXMLCreateStringByEscapingEntities(CFAllocatorRef? allocator, CFStringRef? string, CFDictionaryRef? entitiesDictionary);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFXMLCreateStringByUnescapingEntities(CFAllocatorRef? allocator, CFStringRef? string, CFDictionaryRef? entitiesDictionary);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFXMLCreateStringByUnescapingEntities(CFAllocatorRef? allocator, CFStringRef? string, CFDictionaryRef? entitiesDictionary);
 
 public extern "C" CFStringRef? kCFXMLTreeErrorDescription;
 

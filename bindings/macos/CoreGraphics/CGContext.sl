@@ -170,7 +170,8 @@ public extern "C" CGPoint CGContextGetPathCurrentPoint(CGContextRef? c);
 
 public extern "C" CGRect CGContextGetPathBoundingBox(CGContextRef? c);
 
-[ReturnsRetained] public extern "C" CGPathRef? CGContextCopyPath(CGContextRef? c);
+[ReturnsRetained]
+public extern "C" CGPathRef? CGContextCopyPath(CGContextRef? c);
 
 public extern "C" bool CGContextPathContainsPoint(CGContextRef? c, CGPoint point, CGPathDrawingMode mode);
 

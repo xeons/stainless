@@ -32,10 +32,14 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCEmbeddingLayer : MLCLayer
 {
-    [Selector("descriptor")] public MLCEmbeddingDescriptor Descriptor { get; }
-    [Selector("weights")] public MLCTensor Weights { get; }
-    [Selector("weightsParameter")] public MLCTensorParameter WeightsParameter { get; }
-    [Selector("layerWithDescriptor:weights:")] public static Self LayerWithDescriptorWeights(MLCEmbeddingDescriptor descriptor, MLCTensor weights);
+    [Selector("descriptor")]
+    public MLCEmbeddingDescriptor Descriptor { get; }
+    [Selector("weights")]
+    public MLCTensor Weights { get; }
+    [Selector("weightsParameter")]
+    public MLCTensorParameter WeightsParameter { get; }
+    [Selector("layerWithDescriptor:weights:")]
+    public static Self LayerWithDescriptorWeights(MLCEmbeddingDescriptor descriptor, MLCTensor weights);
 }
 
 #endif

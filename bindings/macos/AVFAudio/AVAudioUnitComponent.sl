@@ -57,28 +57,49 @@ public extern "C" NSString? AVAudioUnitManufacturerNameApple;
 
 public extern objc class AVAudioUnitComponent : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("typeName")] public NSString TypeName { get; }
-    [Selector("localizedTypeName")] public NSString LocalizedTypeName { get; }
-    [Selector("manufacturerName")] public NSString ManufacturerName { get; }
-    [Selector("version")] public NSUInteger Version { get; }
-    [Selector("versionString")] public NSString VersionString { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("typeName")]
+    public NSString TypeName { get; }
+    [Selector("localizedTypeName")]
+    public NSString LocalizedTypeName { get; }
+    [Selector("manufacturerName")]
+    public NSString ManufacturerName { get; }
+    [Selector("version")]
+    public NSUInteger Version { get; }
+    [Selector("versionString")]
+    public NSString VersionString { get; }
     /// Deprecated in macOS 10.11.
-    [Selector("componentURL")] public NSURL? ComponentURL { get; }
-    [Selector("availableArchitectures")] public NSArray? AvailableArchitectures { get; }
-    [Selector("isSandboxSafe")] public bool SandboxSafe { get; }
-    [Selector("hasMIDIInput")] public bool HasMIDIInput { get; }
-    [Selector("hasMIDIOutput")] public bool HasMIDIOutput { get; }
-    [Selector("audioComponent")] public AudioComponent AudioComponent { get; }
-    [Selector("userTagNames", "setUserTagNames:")] public NSArray? UserTagNames { get; set; }
-    [Selector("allTagNames")] public NSArray AllTagNames { get; }
-    [Selector("audioComponentDescription")] public AudioComponentDescription AudioComponentDescription { get; }
-    [Selector("iconURL")] public NSURL? IconURL { get; }
-    [Selector("icon")] public NSImage? Icon { get; }
-    [Selector("passesAUVal")] public bool PassesAUVal { get; }
-    [Selector("hasCustomView")] public bool HasCustomView { get; }
-    [Selector("configurationDictionary")] public NSDictionary ConfigurationDictionary { get; }
-    [Selector("supportsNumberInputChannels:outputChannels:")] public bool SupportsNumberInputChannelsOutputChannels(NSInteger numInputChannels, NSInteger numOutputChannels);
+    [Selector("componentURL")]
+    public NSURL? ComponentURL { get; }
+    [Selector("availableArchitectures")]
+    public NSArray? AvailableArchitectures { get; }
+    [Selector("isSandboxSafe")]
+    public bool SandboxSafe { get; }
+    [Selector("hasMIDIInput")]
+    public bool HasMIDIInput { get; }
+    [Selector("hasMIDIOutput")]
+    public bool HasMIDIOutput { get; }
+    [Selector("audioComponent")]
+    public AudioComponent AudioComponent { get; }
+    [Selector("userTagNames", "setUserTagNames:")]
+    public NSArray? UserTagNames { get; set; }
+    [Selector("allTagNames")]
+    public NSArray AllTagNames { get; }
+    [Selector("audioComponentDescription")]
+    public AudioComponentDescription AudioComponentDescription { get; }
+    [Selector("iconURL")]
+    public NSURL? IconURL { get; }
+    [Selector("icon")]
+    public NSImage? Icon { get; }
+    [Selector("passesAUVal")]
+    public bool PassesAUVal { get; }
+    [Selector("hasCustomView")]
+    public bool HasCustomView { get; }
+    [Selector("configurationDictionary")]
+    public NSDictionary ConfigurationDictionary { get; }
+    [Selector("supportsNumberInputChannels:outputChannels:")]
+    public bool SupportsNumberInputChannelsOutputChannels(NSInteger numInputChannels, NSInteger numOutputChannels);
 }
 
 public extern "C" NSString? AVAudioUnitComponentTagsDidChangeNotification;
@@ -87,12 +108,18 @@ public objc closure bool AVAudioUnitComponentManagerComponentsPassingTestTestHan
 
 public extern objc class AVAudioUnitComponentManager : NSObject
 {
-    [Selector("tagNames")] public NSArray TagNames { get; }
-    [Selector("standardLocalizedTagNames")] public NSArray StandardLocalizedTagNames { get; }
-    [Selector("sharedAudioUnitComponentManager")] public static Self SharedAudioUnitComponentManager();
-    [Selector("componentsMatchingPredicate:")] public NSArray ComponentsMatchingPredicate(NSPredicate predicate);
-    [Selector("componentsPassingTest:")] public NSArray ComponentsPassingTest(AVAudioUnitComponentManagerComponentsPassingTestTestHandlerBlock testHandler);
-    [Selector("componentsMatchingDescription:")] public NSArray ComponentsMatchingDescription(AudioComponentDescription desc);
+    [Selector("tagNames")]
+    public NSArray TagNames { get; }
+    [Selector("standardLocalizedTagNames")]
+    public NSArray StandardLocalizedTagNames { get; }
+    [Selector("sharedAudioUnitComponentManager")]
+    public static Self SharedAudioUnitComponentManager();
+    [Selector("componentsMatchingPredicate:")]
+    public NSArray ComponentsMatchingPredicate(NSPredicate predicate);
+    [Selector("componentsPassingTest:")]
+    public NSArray ComponentsPassingTest(AVAudioUnitComponentManagerComponentsPassingTestTestHandlerBlock testHandler);
+    [Selector("componentsMatchingDescription:")]
+    public NSArray ComponentsMatchingDescription(AudioComponentDescription desc);
 }
 
 public extern "C" NSNotificationName? AVAudioUnitComponentManagerRegistrationsChangedNotification;

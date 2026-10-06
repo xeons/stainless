@@ -32,321 +32,536 @@ import Standard.ObjC;
 
 public extern objc class NSUnitConverter : NSObject
 {
-    [Selector("baseUnitValueFromValue:")] public double BaseUnitValueFromValue(double value);
-    [Selector("valueFromBaseUnitValue:")] public double ValueFromBaseUnitValue(double baseUnitValue);
+    [Selector("baseUnitValueFromValue:")]
+    public double BaseUnitValueFromValue(double value);
+    [Selector("valueFromBaseUnitValue:")]
+    public double ValueFromBaseUnitValue(double baseUnitValue);
 }
 
 public extern objc class NSUnitConverterLinear : NSUnitConverter, NSSecureCoding
 {
-    [Selector("coefficient")] public double Coefficient { get; }
-    [Selector("constant")] public double Constant { get; }
-    [Selector("initWithCoefficient:")] public Self InitWithCoefficient(double coefficient);
-    [Selector("initWithCoefficient:constant:")] public Self InitWithCoefficientConstant(double coefficient, double constant);
+    [Selector("coefficient")]
+    public double Coefficient { get; }
+    [Selector("constant")]
+    public double Constant { get; }
+    [Selector("initWithCoefficient:")]
+    public Self InitWithCoefficient(double coefficient);
+    [Selector("initWithCoefficient:constant:")]
+    public Self InitWithCoefficientConstant(double coefficient, double constant);
 }
 
 public extern objc class NSUnit : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("symbol")] public NSString Symbol { get; }
-    [Selector("initWithSymbol:")] public Self InitWithSymbol(NSString symbol);
+    [Selector("symbol")]
+    public NSString Symbol { get; }
+    [Selector("initWithSymbol:")]
+    public Self InitWithSymbol(NSString symbol);
 }
 
 public extern objc class NSDimension : NSUnit, NSSecureCoding
 {
-    [Selector("converter")] public NSUnitConverter Converter { get; }
-    [Selector("initWithSymbol:converter:")] public Self InitWithSymbolConverter(NSString symbol, NSUnitConverter converter);
-    [Selector("baseUnit")] public static Self BaseUnit();
+    [Selector("converter")]
+    public NSUnitConverter Converter { get; }
+    [Selector("initWithSymbol:converter:")]
+    public Self InitWithSymbolConverter(NSString symbol, NSUnitConverter converter);
+    [Selector("baseUnit")]
+    public static Self BaseUnit();
 }
 
 public extern objc class NSUnitAcceleration : NSDimension, NSSecureCoding
 {
-    [Selector("metersPerSecondSquared")] public static NSUnitAcceleration MetersPerSecondSquared { get; }
-    [Selector("gravity")] public static NSUnitAcceleration Gravity { get; }
+    [Selector("metersPerSecondSquared")]
+    public static NSUnitAcceleration MetersPerSecondSquared { get; }
+    [Selector("gravity")]
+    public static NSUnitAcceleration Gravity { get; }
 }
 
 public extern objc class NSUnitAngle : NSDimension, NSSecureCoding
 {
-    [Selector("degrees")] public static NSUnitAngle Degrees { get; }
-    [Selector("arcMinutes")] public static NSUnitAngle ArcMinutes { get; }
-    [Selector("arcSeconds")] public static NSUnitAngle ArcSeconds { get; }
-    [Selector("radians")] public static NSUnitAngle Radians { get; }
-    [Selector("gradians")] public static NSUnitAngle Gradians { get; }
-    [Selector("revolutions")] public static NSUnitAngle Revolutions { get; }
+    [Selector("degrees")]
+    public static NSUnitAngle Degrees { get; }
+    [Selector("arcMinutes")]
+    public static NSUnitAngle ArcMinutes { get; }
+    [Selector("arcSeconds")]
+    public static NSUnitAngle ArcSeconds { get; }
+    [Selector("radians")]
+    public static NSUnitAngle Radians { get; }
+    [Selector("gradians")]
+    public static NSUnitAngle Gradians { get; }
+    [Selector("revolutions")]
+    public static NSUnitAngle Revolutions { get; }
 }
 
 public extern objc class NSUnitArea : NSDimension, NSSecureCoding
 {
-    [Selector("squareMegameters")] public static NSUnitArea SquareMegameters { get; }
-    [Selector("squareKilometers")] public static NSUnitArea SquareKilometers { get; }
-    [Selector("squareMeters")] public static NSUnitArea SquareMeters { get; }
-    [Selector("squareCentimeters")] public static NSUnitArea SquareCentimeters { get; }
-    [Selector("squareMillimeters")] public static NSUnitArea SquareMillimeters { get; }
-    [Selector("squareMicrometers")] public static NSUnitArea SquareMicrometers { get; }
-    [Selector("squareNanometers")] public static NSUnitArea SquareNanometers { get; }
-    [Selector("squareInches")] public static NSUnitArea SquareInches { get; }
-    [Selector("squareFeet")] public static NSUnitArea SquareFeet { get; }
-    [Selector("squareYards")] public static NSUnitArea SquareYards { get; }
-    [Selector("squareMiles")] public static NSUnitArea SquareMiles { get; }
-    [Selector("acres")] public static NSUnitArea Acres { get; }
-    [Selector("ares")] public static NSUnitArea Ares { get; }
-    [Selector("hectares")] public static NSUnitArea Hectares { get; }
+    [Selector("squareMegameters")]
+    public static NSUnitArea SquareMegameters { get; }
+    [Selector("squareKilometers")]
+    public static NSUnitArea SquareKilometers { get; }
+    [Selector("squareMeters")]
+    public static NSUnitArea SquareMeters { get; }
+    [Selector("squareCentimeters")]
+    public static NSUnitArea SquareCentimeters { get; }
+    [Selector("squareMillimeters")]
+    public static NSUnitArea SquareMillimeters { get; }
+    [Selector("squareMicrometers")]
+    public static NSUnitArea SquareMicrometers { get; }
+    [Selector("squareNanometers")]
+    public static NSUnitArea SquareNanometers { get; }
+    [Selector("squareInches")]
+    public static NSUnitArea SquareInches { get; }
+    [Selector("squareFeet")]
+    public static NSUnitArea SquareFeet { get; }
+    [Selector("squareYards")]
+    public static NSUnitArea SquareYards { get; }
+    [Selector("squareMiles")]
+    public static NSUnitArea SquareMiles { get; }
+    [Selector("acres")]
+    public static NSUnitArea Acres { get; }
+    [Selector("ares")]
+    public static NSUnitArea Ares { get; }
+    [Selector("hectares")]
+    public static NSUnitArea Hectares { get; }
 }
 
 public extern objc class NSUnitConcentrationMass : NSDimension, NSSecureCoding
 {
-    [Selector("gramsPerLiter")] public static NSUnitConcentrationMass GramsPerLiter { get; }
-    [Selector("milligramsPerDeciliter")] public static NSUnitConcentrationMass MilligramsPerDeciliter { get; }
-    [Selector("millimolesPerLiterWithGramsPerMole:")] public static NSUnitConcentrationMass MillimolesPerLiterWithGramsPerMole(double gramsPerMole);
+    [Selector("gramsPerLiter")]
+    public static NSUnitConcentrationMass GramsPerLiter { get; }
+    [Selector("milligramsPerDeciliter")]
+    public static NSUnitConcentrationMass MilligramsPerDeciliter { get; }
+    [Selector("millimolesPerLiterWithGramsPerMole:")]
+    public static NSUnitConcentrationMass MillimolesPerLiterWithGramsPerMole(double gramsPerMole);
 }
 
 public extern objc class NSUnitDispersion : NSDimension, NSSecureCoding
 {
-    [Selector("partsPerMillion")] public static NSUnitDispersion PartsPerMillion { get; }
+    [Selector("partsPerMillion")]
+    public static NSUnitDispersion PartsPerMillion { get; }
 }
 
 public extern objc class NSUnitDuration : NSDimension, NSSecureCoding
 {
-    [Selector("hours")] public static NSUnitDuration Hours { get; }
-    [Selector("minutes")] public static NSUnitDuration Minutes { get; }
-    [Selector("seconds")] public static NSUnitDuration Seconds { get; }
-    [Selector("milliseconds")] public static NSUnitDuration Milliseconds { get; }
-    [Selector("microseconds")] public static NSUnitDuration Microseconds { get; }
-    [Selector("nanoseconds")] public static NSUnitDuration Nanoseconds { get; }
-    [Selector("picoseconds")] public static NSUnitDuration Picoseconds { get; }
+    [Selector("hours")]
+    public static NSUnitDuration Hours { get; }
+    [Selector("minutes")]
+    public static NSUnitDuration Minutes { get; }
+    [Selector("seconds")]
+    public static NSUnitDuration Seconds { get; }
+    [Selector("milliseconds")]
+    public static NSUnitDuration Milliseconds { get; }
+    [Selector("microseconds")]
+    public static NSUnitDuration Microseconds { get; }
+    [Selector("nanoseconds")]
+    public static NSUnitDuration Nanoseconds { get; }
+    [Selector("picoseconds")]
+    public static NSUnitDuration Picoseconds { get; }
 }
 
 public extern objc class NSUnitElectricCharge : NSDimension, NSSecureCoding
 {
-    [Selector("coulombs")] public static NSUnitElectricCharge Coulombs { get; }
-    [Selector("megaampereHours")] public static NSUnitElectricCharge MegaampereHours { get; }
-    [Selector("kiloampereHours")] public static NSUnitElectricCharge KiloampereHours { get; }
-    [Selector("ampereHours")] public static NSUnitElectricCharge AmpereHours { get; }
-    [Selector("milliampereHours")] public static NSUnitElectricCharge MilliampereHours { get; }
-    [Selector("microampereHours")] public static NSUnitElectricCharge MicroampereHours { get; }
+    [Selector("coulombs")]
+    public static NSUnitElectricCharge Coulombs { get; }
+    [Selector("megaampereHours")]
+    public static NSUnitElectricCharge MegaampereHours { get; }
+    [Selector("kiloampereHours")]
+    public static NSUnitElectricCharge KiloampereHours { get; }
+    [Selector("ampereHours")]
+    public static NSUnitElectricCharge AmpereHours { get; }
+    [Selector("milliampereHours")]
+    public static NSUnitElectricCharge MilliampereHours { get; }
+    [Selector("microampereHours")]
+    public static NSUnitElectricCharge MicroampereHours { get; }
 }
 
 public extern objc class NSUnitElectricCurrent : NSDimension, NSSecureCoding
 {
-    [Selector("megaamperes")] public static NSUnitElectricCurrent Megaamperes { get; }
-    [Selector("kiloamperes")] public static NSUnitElectricCurrent Kiloamperes { get; }
-    [Selector("amperes")] public static NSUnitElectricCurrent Amperes { get; }
-    [Selector("milliamperes")] public static NSUnitElectricCurrent Milliamperes { get; }
-    [Selector("microamperes")] public static NSUnitElectricCurrent Microamperes { get; }
+    [Selector("megaamperes")]
+    public static NSUnitElectricCurrent Megaamperes { get; }
+    [Selector("kiloamperes")]
+    public static NSUnitElectricCurrent Kiloamperes { get; }
+    [Selector("amperes")]
+    public static NSUnitElectricCurrent Amperes { get; }
+    [Selector("milliamperes")]
+    public static NSUnitElectricCurrent Milliamperes { get; }
+    [Selector("microamperes")]
+    public static NSUnitElectricCurrent Microamperes { get; }
 }
 
 public extern objc class NSUnitElectricPotentialDifference : NSDimension, NSSecureCoding
 {
-    [Selector("megavolts")] public static NSUnitElectricPotentialDifference Megavolts { get; }
-    [Selector("kilovolts")] public static NSUnitElectricPotentialDifference Kilovolts { get; }
-    [Selector("volts")] public static NSUnitElectricPotentialDifference Volts { get; }
-    [Selector("millivolts")] public static NSUnitElectricPotentialDifference Millivolts { get; }
-    [Selector("microvolts")] public static NSUnitElectricPotentialDifference Microvolts { get; }
+    [Selector("megavolts")]
+    public static NSUnitElectricPotentialDifference Megavolts { get; }
+    [Selector("kilovolts")]
+    public static NSUnitElectricPotentialDifference Kilovolts { get; }
+    [Selector("volts")]
+    public static NSUnitElectricPotentialDifference Volts { get; }
+    [Selector("millivolts")]
+    public static NSUnitElectricPotentialDifference Millivolts { get; }
+    [Selector("microvolts")]
+    public static NSUnitElectricPotentialDifference Microvolts { get; }
 }
 
 public extern objc class NSUnitElectricResistance : NSDimension, NSSecureCoding
 {
-    [Selector("megaohms")] public static NSUnitElectricResistance Megaohms { get; }
-    [Selector("kiloohms")] public static NSUnitElectricResistance Kiloohms { get; }
-    [Selector("ohms")] public static NSUnitElectricResistance Ohms { get; }
-    [Selector("milliohms")] public static NSUnitElectricResistance Milliohms { get; }
-    [Selector("microohms")] public static NSUnitElectricResistance Microohms { get; }
+    [Selector("megaohms")]
+    public static NSUnitElectricResistance Megaohms { get; }
+    [Selector("kiloohms")]
+    public static NSUnitElectricResistance Kiloohms { get; }
+    [Selector("ohms")]
+    public static NSUnitElectricResistance Ohms { get; }
+    [Selector("milliohms")]
+    public static NSUnitElectricResistance Milliohms { get; }
+    [Selector("microohms")]
+    public static NSUnitElectricResistance Microohms { get; }
 }
 
 public extern objc class NSUnitEnergy : NSDimension, NSSecureCoding
 {
-    [Selector("kilojoules")] public static NSUnitEnergy Kilojoules { get; }
-    [Selector("joules")] public static NSUnitEnergy Joules { get; }
-    [Selector("kilocalories")] public static NSUnitEnergy Kilocalories { get; }
-    [Selector("calories")] public static NSUnitEnergy Calories { get; }
-    [Selector("kilowattHours")] public static NSUnitEnergy KilowattHours { get; }
+    [Selector("kilojoules")]
+    public static NSUnitEnergy Kilojoules { get; }
+    [Selector("joules")]
+    public static NSUnitEnergy Joules { get; }
+    [Selector("kilocalories")]
+    public static NSUnitEnergy Kilocalories { get; }
+    [Selector("calories")]
+    public static NSUnitEnergy Calories { get; }
+    [Selector("kilowattHours")]
+    public static NSUnitEnergy KilowattHours { get; }
 }
 
 public extern objc class NSUnitFrequency : NSDimension, NSSecureCoding
 {
-    [Selector("terahertz")] public static NSUnitFrequency Terahertz { get; }
-    [Selector("gigahertz")] public static NSUnitFrequency Gigahertz { get; }
-    [Selector("megahertz")] public static NSUnitFrequency Megahertz { get; }
-    [Selector("kilohertz")] public static NSUnitFrequency Kilohertz { get; }
-    [Selector("hertz")] public static NSUnitFrequency Hertz { get; }
-    [Selector("millihertz")] public static NSUnitFrequency Millihertz { get; }
-    [Selector("microhertz")] public static NSUnitFrequency Microhertz { get; }
-    [Selector("nanohertz")] public static NSUnitFrequency Nanohertz { get; }
-    [Selector("framesPerSecond")] public static NSUnitFrequency FramesPerSecond { get; }
+    [Selector("terahertz")]
+    public static NSUnitFrequency Terahertz { get; }
+    [Selector("gigahertz")]
+    public static NSUnitFrequency Gigahertz { get; }
+    [Selector("megahertz")]
+    public static NSUnitFrequency Megahertz { get; }
+    [Selector("kilohertz")]
+    public static NSUnitFrequency Kilohertz { get; }
+    [Selector("hertz")]
+    public static NSUnitFrequency Hertz { get; }
+    [Selector("millihertz")]
+    public static NSUnitFrequency Millihertz { get; }
+    [Selector("microhertz")]
+    public static NSUnitFrequency Microhertz { get; }
+    [Selector("nanohertz")]
+    public static NSUnitFrequency Nanohertz { get; }
+    [Selector("framesPerSecond")]
+    public static NSUnitFrequency FramesPerSecond { get; }
 }
 
 public extern objc class NSUnitFuelEfficiency : NSDimension, NSSecureCoding
 {
-    [Selector("litersPer100Kilometers")] public static NSUnitFuelEfficiency LitersPer100Kilometers { get; }
-    [Selector("milesPerImperialGallon")] public static NSUnitFuelEfficiency MilesPerImperialGallon { get; }
-    [Selector("milesPerGallon")] public static NSUnitFuelEfficiency MilesPerGallon { get; }
+    [Selector("litersPer100Kilometers")]
+    public static NSUnitFuelEfficiency LitersPer100Kilometers { get; }
+    [Selector("milesPerImperialGallon")]
+    public static NSUnitFuelEfficiency MilesPerImperialGallon { get; }
+    [Selector("milesPerGallon")]
+    public static NSUnitFuelEfficiency MilesPerGallon { get; }
 }
 
 public extern objc class NSUnitInformationStorage : NSDimension, NSSecureCoding
 {
-    [Selector("bytes")] public static NSUnitInformationStorage Bytes { get; }
-    [Selector("bits")] public static NSUnitInformationStorage Bits { get; }
-    [Selector("nibbles")] public static NSUnitInformationStorage Nibbles { get; }
-    [Selector("yottabytes")] public static NSUnitInformationStorage Yottabytes { get; }
-    [Selector("zettabytes")] public static NSUnitInformationStorage Zettabytes { get; }
-    [Selector("exabytes")] public static NSUnitInformationStorage Exabytes { get; }
-    [Selector("petabytes")] public static NSUnitInformationStorage Petabytes { get; }
-    [Selector("terabytes")] public static NSUnitInformationStorage Terabytes { get; }
-    [Selector("gigabytes")] public static NSUnitInformationStorage Gigabytes { get; }
-    [Selector("megabytes")] public static NSUnitInformationStorage Megabytes { get; }
-    [Selector("kilobytes")] public static NSUnitInformationStorage Kilobytes { get; }
-    [Selector("yottabits")] public static NSUnitInformationStorage Yottabits { get; }
-    [Selector("zettabits")] public static NSUnitInformationStorage Zettabits { get; }
-    [Selector("exabits")] public static NSUnitInformationStorage Exabits { get; }
-    [Selector("petabits")] public static NSUnitInformationStorage Petabits { get; }
-    [Selector("terabits")] public static NSUnitInformationStorage Terabits { get; }
-    [Selector("gigabits")] public static NSUnitInformationStorage Gigabits { get; }
-    [Selector("megabits")] public static NSUnitInformationStorage Megabits { get; }
-    [Selector("kilobits")] public static NSUnitInformationStorage Kilobits { get; }
-    [Selector("yobibytes")] public static NSUnitInformationStorage Yobibytes { get; }
-    [Selector("zebibytes")] public static NSUnitInformationStorage Zebibytes { get; }
-    [Selector("exbibytes")] public static NSUnitInformationStorage Exbibytes { get; }
-    [Selector("pebibytes")] public static NSUnitInformationStorage Pebibytes { get; }
-    [Selector("tebibytes")] public static NSUnitInformationStorage Tebibytes { get; }
-    [Selector("gibibytes")] public static NSUnitInformationStorage Gibibytes { get; }
-    [Selector("mebibytes")] public static NSUnitInformationStorage Mebibytes { get; }
-    [Selector("kibibytes")] public static NSUnitInformationStorage Kibibytes { get; }
-    [Selector("yobibits")] public static NSUnitInformationStorage Yobibits { get; }
-    [Selector("zebibits")] public static NSUnitInformationStorage Zebibits { get; }
-    [Selector("exbibits")] public static NSUnitInformationStorage Exbibits { get; }
-    [Selector("pebibits")] public static NSUnitInformationStorage Pebibits { get; }
-    [Selector("tebibits")] public static NSUnitInformationStorage Tebibits { get; }
-    [Selector("gibibits")] public static NSUnitInformationStorage Gibibits { get; }
-    [Selector("mebibits")] public static NSUnitInformationStorage Mebibits { get; }
-    [Selector("kibibits")] public static NSUnitInformationStorage Kibibits { get; }
+    [Selector("bytes")]
+    public static NSUnitInformationStorage Bytes { get; }
+    [Selector("bits")]
+    public static NSUnitInformationStorage Bits { get; }
+    [Selector("nibbles")]
+    public static NSUnitInformationStorage Nibbles { get; }
+    [Selector("yottabytes")]
+    public static NSUnitInformationStorage Yottabytes { get; }
+    [Selector("zettabytes")]
+    public static NSUnitInformationStorage Zettabytes { get; }
+    [Selector("exabytes")]
+    public static NSUnitInformationStorage Exabytes { get; }
+    [Selector("petabytes")]
+    public static NSUnitInformationStorage Petabytes { get; }
+    [Selector("terabytes")]
+    public static NSUnitInformationStorage Terabytes { get; }
+    [Selector("gigabytes")]
+    public static NSUnitInformationStorage Gigabytes { get; }
+    [Selector("megabytes")]
+    public static NSUnitInformationStorage Megabytes { get; }
+    [Selector("kilobytes")]
+    public static NSUnitInformationStorage Kilobytes { get; }
+    [Selector("yottabits")]
+    public static NSUnitInformationStorage Yottabits { get; }
+    [Selector("zettabits")]
+    public static NSUnitInformationStorage Zettabits { get; }
+    [Selector("exabits")]
+    public static NSUnitInformationStorage Exabits { get; }
+    [Selector("petabits")]
+    public static NSUnitInformationStorage Petabits { get; }
+    [Selector("terabits")]
+    public static NSUnitInformationStorage Terabits { get; }
+    [Selector("gigabits")]
+    public static NSUnitInformationStorage Gigabits { get; }
+    [Selector("megabits")]
+    public static NSUnitInformationStorage Megabits { get; }
+    [Selector("kilobits")]
+    public static NSUnitInformationStorage Kilobits { get; }
+    [Selector("yobibytes")]
+    public static NSUnitInformationStorage Yobibytes { get; }
+    [Selector("zebibytes")]
+    public static NSUnitInformationStorage Zebibytes { get; }
+    [Selector("exbibytes")]
+    public static NSUnitInformationStorage Exbibytes { get; }
+    [Selector("pebibytes")]
+    public static NSUnitInformationStorage Pebibytes { get; }
+    [Selector("tebibytes")]
+    public static NSUnitInformationStorage Tebibytes { get; }
+    [Selector("gibibytes")]
+    public static NSUnitInformationStorage Gibibytes { get; }
+    [Selector("mebibytes")]
+    public static NSUnitInformationStorage Mebibytes { get; }
+    [Selector("kibibytes")]
+    public static NSUnitInformationStorage Kibibytes { get; }
+    [Selector("yobibits")]
+    public static NSUnitInformationStorage Yobibits { get; }
+    [Selector("zebibits")]
+    public static NSUnitInformationStorage Zebibits { get; }
+    [Selector("exbibits")]
+    public static NSUnitInformationStorage Exbibits { get; }
+    [Selector("pebibits")]
+    public static NSUnitInformationStorage Pebibits { get; }
+    [Selector("tebibits")]
+    public static NSUnitInformationStorage Tebibits { get; }
+    [Selector("gibibits")]
+    public static NSUnitInformationStorage Gibibits { get; }
+    [Selector("mebibits")]
+    public static NSUnitInformationStorage Mebibits { get; }
+    [Selector("kibibits")]
+    public static NSUnitInformationStorage Kibibits { get; }
 }
 
 public extern objc class NSUnitLength : NSDimension, NSSecureCoding
 {
-    [Selector("megameters")] public static NSUnitLength Megameters { get; }
-    [Selector("kilometers")] public static NSUnitLength Kilometers { get; }
-    [Selector("hectometers")] public static NSUnitLength Hectometers { get; }
-    [Selector("decameters")] public static NSUnitLength Decameters { get; }
-    [Selector("meters")] public static NSUnitLength Meters { get; }
-    [Selector("decimeters")] public static NSUnitLength Decimeters { get; }
-    [Selector("centimeters")] public static NSUnitLength Centimeters { get; }
-    [Selector("millimeters")] public static NSUnitLength Millimeters { get; }
-    [Selector("micrometers")] public static NSUnitLength Micrometers { get; }
-    [Selector("nanometers")] public static NSUnitLength Nanometers { get; }
-    [Selector("picometers")] public static NSUnitLength Picometers { get; }
-    [Selector("inches")] public static NSUnitLength Inches { get; }
-    [Selector("feet")] public static NSUnitLength Feet { get; }
-    [Selector("yards")] public static NSUnitLength Yards { get; }
-    [Selector("miles")] public static NSUnitLength Miles { get; }
-    [Selector("scandinavianMiles")] public static NSUnitLength ScandinavianMiles { get; }
-    [Selector("lightyears")] public static NSUnitLength Lightyears { get; }
-    [Selector("nauticalMiles")] public static NSUnitLength NauticalMiles { get; }
-    [Selector("fathoms")] public static NSUnitLength Fathoms { get; }
-    [Selector("furlongs")] public static NSUnitLength Furlongs { get; }
-    [Selector("astronomicalUnits")] public static NSUnitLength AstronomicalUnits { get; }
-    [Selector("parsecs")] public static NSUnitLength Parsecs { get; }
+    [Selector("megameters")]
+    public static NSUnitLength Megameters { get; }
+    [Selector("kilometers")]
+    public static NSUnitLength Kilometers { get; }
+    [Selector("hectometers")]
+    public static NSUnitLength Hectometers { get; }
+    [Selector("decameters")]
+    public static NSUnitLength Decameters { get; }
+    [Selector("meters")]
+    public static NSUnitLength Meters { get; }
+    [Selector("decimeters")]
+    public static NSUnitLength Decimeters { get; }
+    [Selector("centimeters")]
+    public static NSUnitLength Centimeters { get; }
+    [Selector("millimeters")]
+    public static NSUnitLength Millimeters { get; }
+    [Selector("micrometers")]
+    public static NSUnitLength Micrometers { get; }
+    [Selector("nanometers")]
+    public static NSUnitLength Nanometers { get; }
+    [Selector("picometers")]
+    public static NSUnitLength Picometers { get; }
+    [Selector("inches")]
+    public static NSUnitLength Inches { get; }
+    [Selector("feet")]
+    public static NSUnitLength Feet { get; }
+    [Selector("yards")]
+    public static NSUnitLength Yards { get; }
+    [Selector("miles")]
+    public static NSUnitLength Miles { get; }
+    [Selector("scandinavianMiles")]
+    public static NSUnitLength ScandinavianMiles { get; }
+    [Selector("lightyears")]
+    public static NSUnitLength Lightyears { get; }
+    [Selector("nauticalMiles")]
+    public static NSUnitLength NauticalMiles { get; }
+    [Selector("fathoms")]
+    public static NSUnitLength Fathoms { get; }
+    [Selector("furlongs")]
+    public static NSUnitLength Furlongs { get; }
+    [Selector("astronomicalUnits")]
+    public static NSUnitLength AstronomicalUnits { get; }
+    [Selector("parsecs")]
+    public static NSUnitLength Parsecs { get; }
 }
 
 public extern objc class NSUnitIlluminance : NSDimension, NSSecureCoding
 {
-    [Selector("lux")] public static NSUnitIlluminance Lux { get; }
+    [Selector("lux")]
+    public static NSUnitIlluminance Lux { get; }
 }
 
 public extern objc class NSUnitMass : NSDimension, NSSecureCoding
 {
-    [Selector("kilograms")] public static NSUnitMass Kilograms { get; }
-    [Selector("grams")] public static NSUnitMass Grams { get; }
-    [Selector("decigrams")] public static NSUnitMass Decigrams { get; }
-    [Selector("centigrams")] public static NSUnitMass Centigrams { get; }
-    [Selector("milligrams")] public static NSUnitMass Milligrams { get; }
-    [Selector("micrograms")] public static NSUnitMass Micrograms { get; }
-    [Selector("nanograms")] public static NSUnitMass Nanograms { get; }
-    [Selector("picograms")] public static NSUnitMass Picograms { get; }
-    [Selector("ounces")] public static NSUnitMass Ounces { get; }
-    [Selector("poundsMass")] public static NSUnitMass PoundsMass { get; }
-    [Selector("stones")] public static NSUnitMass Stones { get; }
-    [Selector("metricTons")] public static NSUnitMass MetricTons { get; }
-    [Selector("shortTons")] public static NSUnitMass ShortTons { get; }
-    [Selector("carats")] public static NSUnitMass Carats { get; }
-    [Selector("ouncesTroy")] public static NSUnitMass OuncesTroy { get; }
-    [Selector("slugs")] public static NSUnitMass Slugs { get; }
+    [Selector("kilograms")]
+    public static NSUnitMass Kilograms { get; }
+    [Selector("grams")]
+    public static NSUnitMass Grams { get; }
+    [Selector("decigrams")]
+    public static NSUnitMass Decigrams { get; }
+    [Selector("centigrams")]
+    public static NSUnitMass Centigrams { get; }
+    [Selector("milligrams")]
+    public static NSUnitMass Milligrams { get; }
+    [Selector("micrograms")]
+    public static NSUnitMass Micrograms { get; }
+    [Selector("nanograms")]
+    public static NSUnitMass Nanograms { get; }
+    [Selector("picograms")]
+    public static NSUnitMass Picograms { get; }
+    [Selector("ounces")]
+    public static NSUnitMass Ounces { get; }
+    [Selector("poundsMass")]
+    public static NSUnitMass PoundsMass { get; }
+    [Selector("stones")]
+    public static NSUnitMass Stones { get; }
+    [Selector("metricTons")]
+    public static NSUnitMass MetricTons { get; }
+    [Selector("shortTons")]
+    public static NSUnitMass ShortTons { get; }
+    [Selector("carats")]
+    public static NSUnitMass Carats { get; }
+    [Selector("ouncesTroy")]
+    public static NSUnitMass OuncesTroy { get; }
+    [Selector("slugs")]
+    public static NSUnitMass Slugs { get; }
 }
 
 public extern objc class NSUnitPower : NSDimension, NSSecureCoding
 {
-    [Selector("terawatts")] public static NSUnitPower Terawatts { get; }
-    [Selector("gigawatts")] public static NSUnitPower Gigawatts { get; }
-    [Selector("megawatts")] public static NSUnitPower Megawatts { get; }
-    [Selector("kilowatts")] public static NSUnitPower Kilowatts { get; }
-    [Selector("watts")] public static NSUnitPower Watts { get; }
-    [Selector("milliwatts")] public static NSUnitPower Milliwatts { get; }
-    [Selector("microwatts")] public static NSUnitPower Microwatts { get; }
-    [Selector("nanowatts")] public static NSUnitPower Nanowatts { get; }
-    [Selector("picowatts")] public static NSUnitPower Picowatts { get; }
-    [Selector("femtowatts")] public static NSUnitPower Femtowatts { get; }
-    [Selector("horsepower")] public static NSUnitPower Horsepower { get; }
+    [Selector("terawatts")]
+    public static NSUnitPower Terawatts { get; }
+    [Selector("gigawatts")]
+    public static NSUnitPower Gigawatts { get; }
+    [Selector("megawatts")]
+    public static NSUnitPower Megawatts { get; }
+    [Selector("kilowatts")]
+    public static NSUnitPower Kilowatts { get; }
+    [Selector("watts")]
+    public static NSUnitPower Watts { get; }
+    [Selector("milliwatts")]
+    public static NSUnitPower Milliwatts { get; }
+    [Selector("microwatts")]
+    public static NSUnitPower Microwatts { get; }
+    [Selector("nanowatts")]
+    public static NSUnitPower Nanowatts { get; }
+    [Selector("picowatts")]
+    public static NSUnitPower Picowatts { get; }
+    [Selector("femtowatts")]
+    public static NSUnitPower Femtowatts { get; }
+    [Selector("horsepower")]
+    public static NSUnitPower Horsepower { get; }
 }
 
 public extern objc class NSUnitPressure : NSDimension, NSSecureCoding
 {
-    [Selector("newtonsPerMetersSquared")] public static NSUnitPressure NewtonsPerMetersSquared { get; }
-    [Selector("gigapascals")] public static NSUnitPressure Gigapascals { get; }
-    [Selector("megapascals")] public static NSUnitPressure Megapascals { get; }
-    [Selector("kilopascals")] public static NSUnitPressure Kilopascals { get; }
-    [Selector("hectopascals")] public static NSUnitPressure Hectopascals { get; }
-    [Selector("inchesOfMercury")] public static NSUnitPressure InchesOfMercury { get; }
-    [Selector("bars")] public static NSUnitPressure Bars { get; }
-    [Selector("millibars")] public static NSUnitPressure Millibars { get; }
-    [Selector("millimetersOfMercury")] public static NSUnitPressure MillimetersOfMercury { get; }
-    [Selector("poundsForcePerSquareInch")] public static NSUnitPressure PoundsForcePerSquareInch { get; }
+    [Selector("newtonsPerMetersSquared")]
+    public static NSUnitPressure NewtonsPerMetersSquared { get; }
+    [Selector("gigapascals")]
+    public static NSUnitPressure Gigapascals { get; }
+    [Selector("megapascals")]
+    public static NSUnitPressure Megapascals { get; }
+    [Selector("kilopascals")]
+    public static NSUnitPressure Kilopascals { get; }
+    [Selector("hectopascals")]
+    public static NSUnitPressure Hectopascals { get; }
+    [Selector("inchesOfMercury")]
+    public static NSUnitPressure InchesOfMercury { get; }
+    [Selector("bars")]
+    public static NSUnitPressure Bars { get; }
+    [Selector("millibars")]
+    public static NSUnitPressure Millibars { get; }
+    [Selector("millimetersOfMercury")]
+    public static NSUnitPressure MillimetersOfMercury { get; }
+    [Selector("poundsForcePerSquareInch")]
+    public static NSUnitPressure PoundsForcePerSquareInch { get; }
 }
 
 public extern objc class NSUnitSpeed : NSDimension, NSSecureCoding
 {
-    [Selector("metersPerSecond")] public static NSUnitSpeed MetersPerSecond { get; }
-    [Selector("kilometersPerHour")] public static NSUnitSpeed KilometersPerHour { get; }
-    [Selector("milesPerHour")] public static NSUnitSpeed MilesPerHour { get; }
-    [Selector("knots")] public static NSUnitSpeed Knots { get; }
+    [Selector("metersPerSecond")]
+    public static NSUnitSpeed MetersPerSecond { get; }
+    [Selector("kilometersPerHour")]
+    public static NSUnitSpeed KilometersPerHour { get; }
+    [Selector("milesPerHour")]
+    public static NSUnitSpeed MilesPerHour { get; }
+    [Selector("knots")]
+    public static NSUnitSpeed Knots { get; }
 }
 
 public extern objc class NSUnitTemperature : NSDimension, NSSecureCoding
 {
-    [Selector("kelvin")] public static NSUnitTemperature Kelvin { get; }
-    [Selector("celsius")] public static NSUnitTemperature Celsius { get; }
-    [Selector("fahrenheit")] public static NSUnitTemperature Fahrenheit { get; }
+    [Selector("kelvin")]
+    public static NSUnitTemperature Kelvin { get; }
+    [Selector("celsius")]
+    public static NSUnitTemperature Celsius { get; }
+    [Selector("fahrenheit")]
+    public static NSUnitTemperature Fahrenheit { get; }
 }
 
 public extern objc class NSUnitVolume : NSDimension, NSSecureCoding
 {
-    [Selector("megaliters")] public static NSUnitVolume Megaliters { get; }
-    [Selector("kiloliters")] public static NSUnitVolume Kiloliters { get; }
-    [Selector("liters")] public static NSUnitVolume Liters { get; }
-    [Selector("deciliters")] public static NSUnitVolume Deciliters { get; }
-    [Selector("centiliters")] public static NSUnitVolume Centiliters { get; }
-    [Selector("milliliters")] public static NSUnitVolume Milliliters { get; }
-    [Selector("cubicKilometers")] public static NSUnitVolume CubicKilometers { get; }
-    [Selector("cubicMeters")] public static NSUnitVolume CubicMeters { get; }
-    [Selector("cubicDecimeters")] public static NSUnitVolume CubicDecimeters { get; }
-    [Selector("cubicCentimeters")] public static NSUnitVolume CubicCentimeters { get; }
-    [Selector("cubicMillimeters")] public static NSUnitVolume CubicMillimeters { get; }
-    [Selector("cubicInches")] public static NSUnitVolume CubicInches { get; }
-    [Selector("cubicFeet")] public static NSUnitVolume CubicFeet { get; }
-    [Selector("cubicYards")] public static NSUnitVolume CubicYards { get; }
-    [Selector("cubicMiles")] public static NSUnitVolume CubicMiles { get; }
-    [Selector("acreFeet")] public static NSUnitVolume AcreFeet { get; }
-    [Selector("bushels")] public static NSUnitVolume Bushels { get; }
-    [Selector("teaspoons")] public static NSUnitVolume Teaspoons { get; }
-    [Selector("tablespoons")] public static NSUnitVolume Tablespoons { get; }
-    [Selector("fluidOunces")] public static NSUnitVolume FluidOunces { get; }
-    [Selector("cups")] public static NSUnitVolume Cups { get; }
-    [Selector("pints")] public static NSUnitVolume Pints { get; }
-    [Selector("quarts")] public static NSUnitVolume Quarts { get; }
-    [Selector("gallons")] public static NSUnitVolume Gallons { get; }
-    [Selector("imperialTeaspoons")] public static NSUnitVolume ImperialTeaspoons { get; }
-    [Selector("imperialTablespoons")] public static NSUnitVolume ImperialTablespoons { get; }
-    [Selector("imperialFluidOunces")] public static NSUnitVolume ImperialFluidOunces { get; }
-    [Selector("imperialPints")] public static NSUnitVolume ImperialPints { get; }
-    [Selector("imperialQuarts")] public static NSUnitVolume ImperialQuarts { get; }
-    [Selector("imperialGallons")] public static NSUnitVolume ImperialGallons { get; }
-    [Selector("metricCups")] public static NSUnitVolume MetricCups { get; }
+    [Selector("megaliters")]
+    public static NSUnitVolume Megaliters { get; }
+    [Selector("kiloliters")]
+    public static NSUnitVolume Kiloliters { get; }
+    [Selector("liters")]
+    public static NSUnitVolume Liters { get; }
+    [Selector("deciliters")]
+    public static NSUnitVolume Deciliters { get; }
+    [Selector("centiliters")]
+    public static NSUnitVolume Centiliters { get; }
+    [Selector("milliliters")]
+    public static NSUnitVolume Milliliters { get; }
+    [Selector("cubicKilometers")]
+    public static NSUnitVolume CubicKilometers { get; }
+    [Selector("cubicMeters")]
+    public static NSUnitVolume CubicMeters { get; }
+    [Selector("cubicDecimeters")]
+    public static NSUnitVolume CubicDecimeters { get; }
+    [Selector("cubicCentimeters")]
+    public static NSUnitVolume CubicCentimeters { get; }
+    [Selector("cubicMillimeters")]
+    public static NSUnitVolume CubicMillimeters { get; }
+    [Selector("cubicInches")]
+    public static NSUnitVolume CubicInches { get; }
+    [Selector("cubicFeet")]
+    public static NSUnitVolume CubicFeet { get; }
+    [Selector("cubicYards")]
+    public static NSUnitVolume CubicYards { get; }
+    [Selector("cubicMiles")]
+    public static NSUnitVolume CubicMiles { get; }
+    [Selector("acreFeet")]
+    public static NSUnitVolume AcreFeet { get; }
+    [Selector("bushels")]
+    public static NSUnitVolume Bushels { get; }
+    [Selector("teaspoons")]
+    public static NSUnitVolume Teaspoons { get; }
+    [Selector("tablespoons")]
+    public static NSUnitVolume Tablespoons { get; }
+    [Selector("fluidOunces")]
+    public static NSUnitVolume FluidOunces { get; }
+    [Selector("cups")]
+    public static NSUnitVolume Cups { get; }
+    [Selector("pints")]
+    public static NSUnitVolume Pints { get; }
+    [Selector("quarts")]
+    public static NSUnitVolume Quarts { get; }
+    [Selector("gallons")]
+    public static NSUnitVolume Gallons { get; }
+    [Selector("imperialTeaspoons")]
+    public static NSUnitVolume ImperialTeaspoons { get; }
+    [Selector("imperialTablespoons")]
+    public static NSUnitVolume ImperialTablespoons { get; }
+    [Selector("imperialFluidOunces")]
+    public static NSUnitVolume ImperialFluidOunces { get; }
+    [Selector("imperialPints")]
+    public static NSUnitVolume ImperialPints { get; }
+    [Selector("imperialQuarts")]
+    public static NSUnitVolume ImperialQuarts { get; }
+    [Selector("imperialGallons")]
+    public static NSUnitVolume ImperialGallons { get; }
+    [Selector("metricCups")]
+    public static NSUnitVolume MetricCups { get; }
 }
 
 #endif

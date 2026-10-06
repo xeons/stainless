@@ -32,7 +32,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMBlob : DOMObject
 {
-    [Selector("size")] public ulong Size { get; }
+    [Selector("size")]
+    public ulong Size { get; }
 }
 
 #endif

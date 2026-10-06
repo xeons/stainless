@@ -35,25 +35,42 @@ public using NSTextInputSourceIdentifier = NSString;
 
 public extern objc class NSTextInputContext : NSObject
 {
-    [Selector("currentInputContext")] public static NSTextInputContext? CurrentInputContext { get; }
-    [Selector("client")] public NSTextInputClient Client { get; }
-    [Selector("acceptsGlyphInfo", "setAcceptsGlyphInfo:")] public bool AcceptsGlyphInfo { get; set; }
-    [Selector("allowedInputSourceLocales", "setAllowedInputSourceLocales:")] public NSArray? AllowedInputSourceLocales { get; set; }
-    [Selector("keyboardInputSources")] public NSArray? KeyboardInputSources { get; }
-    [Selector("selectedKeyboardInputSource", "setSelectedKeyboardInputSource:")] public NSTextInputSourceIdentifier? SelectedKeyboardInputSource { get; set; }
-    [Selector("initWithClient:")] public Self InitWithClient(NSTextInputClient client);
-    [Selector("activate")] public void Activate();
-    [Selector("deactivate")] public void Deactivate();
-    [Selector("handleEvent:")] public bool HandleEvent(NSEvent event);
-    [Selector("discardMarkedText")] public void DiscardMarkedText();
-    [Selector("invalidateCharacterCoordinates")] public void InvalidateCharacterCoordinates();
-    [Selector("textInputClientWillStartScrollingOrZooming")] public void TextInputClientWillStartScrollingOrZooming();
-    [Selector("textInputClientDidEndScrollingOrZooming")] public void TextInputClientDidEndScrollingOrZooming();
+    [Selector("currentInputContext")]
+    public static NSTextInputContext? CurrentInputContext { get; }
+    [Selector("client")]
+    public NSTextInputClient Client { get; }
+    [Selector("acceptsGlyphInfo", "setAcceptsGlyphInfo:")]
+    public bool AcceptsGlyphInfo { get; set; }
+    [Selector("allowedInputSourceLocales", "setAllowedInputSourceLocales:")]
+    public NSArray? AllowedInputSourceLocales { get; set; }
+    [Selector("keyboardInputSources")]
+    public NSArray? KeyboardInputSources { get; }
+    [Selector("selectedKeyboardInputSource", "setSelectedKeyboardInputSource:")]
+    public NSTextInputSourceIdentifier? SelectedKeyboardInputSource { get; set; }
+    [Selector("initWithClient:")]
+    public Self InitWithClient(NSTextInputClient client);
+    [Selector("activate")]
+    public void Activate();
+    [Selector("deactivate")]
+    public void Deactivate();
+    [Selector("handleEvent:")]
+    public bool HandleEvent(NSEvent event);
+    [Selector("discardMarkedText")]
+    public void DiscardMarkedText();
+    [Selector("invalidateCharacterCoordinates")]
+    public void InvalidateCharacterCoordinates();
+    [Selector("textInputClientWillStartScrollingOrZooming")]
+    public void TextInputClientWillStartScrollingOrZooming();
+    [Selector("textInputClientDidEndScrollingOrZooming")]
+    public void TextInputClientDidEndScrollingOrZooming();
     /// macOS 15.4 and later.
-    [Selector("textInputClientDidUpdateSelection")] public void TextInputClientDidUpdateSelection();
+    [Selector("textInputClientDidUpdateSelection")]
+    public void TextInputClientDidUpdateSelection();
     /// macOS 15.4 and later.
-    [Selector("textInputClientDidScroll")] public void TextInputClientDidScroll();
-    [Selector("localizedNameForInputSource:")] public static NSString? LocalizedNameForInputSource(NSTextInputSourceIdentifier inputSourceIdentifier);
+    [Selector("textInputClientDidScroll")]
+    public void TextInputClientDidScroll();
+    [Selector("localizedNameForInputSource:")]
+    public static NSString? LocalizedNameForInputSource(NSTextInputSourceIdentifier inputSourceIdentifier);
 }
 
 public extern "C" NSNotificationName? NSTextInputContextKeyboardSelectionDidChangeNotification;

@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class MLNeuralEngineComputeDevice : NSObject, MLComputeDeviceProtocol
 {
-    [Selector("totalCoreCount")] public NSInteger TotalCoreCount { get; }
+    [Selector("totalCoreCount")]
+    public NSInteger TotalCoreCount { get; }
 }
 
 #endif

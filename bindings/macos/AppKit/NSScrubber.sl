@@ -33,18 +33,32 @@ import Standard.ObjC;
 
 public objc interface NSScrubberDataSource : NSObjectProtocol
 {
-    [Selector("numberOfItemsForScrubber:")] NSInteger NumberOfItemsForScrubber(NSScrubber scrubber);
-    [Selector("scrubber:viewForItemAtIndex:")] NSScrubberItemView ScrubberViewForItemAtIndex(NSScrubber scrubber, NSInteger index);
+    [Selector("numberOfItemsForScrubber:")]
+    NSInteger NumberOfItemsForScrubber(NSScrubber scrubber);
+    [Selector("scrubber:viewForItemAtIndex:")]
+    NSScrubberItemView ScrubberViewForItemAtIndex(NSScrubber scrubber, NSInteger index);
 }
 
 public objc interface NSScrubberDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("scrubber:didSelectItemAtIndex:")] void ScrubberDidSelectItemAtIndex(NSScrubber scrubber, NSInteger selectedIndex);
-    [Optional] [Selector("scrubber:didHighlightItemAtIndex:")] void ScrubberDidHighlightItemAtIndex(NSScrubber scrubber, NSInteger highlightedIndex);
-    [Optional] [Selector("scrubber:didChangeVisibleRange:")] void ScrubberDidChangeVisibleRange(NSScrubber scrubber, NSRange visibleRange);
-    [Optional] [Selector("didBeginInteractingWithScrubber:")] void DidBeginInteractingWithScrubber(NSScrubber scrubber);
-    [Optional] [Selector("didFinishInteractingWithScrubber:")] void DidFinishInteractingWithScrubber(NSScrubber scrubber);
-    [Optional] [Selector("didCancelInteractingWithScrubber:")] void DidCancelInteractingWithScrubber(NSScrubber scrubber);
+    [Optional]
+    [Selector("scrubber:didSelectItemAtIndex:")]
+    void ScrubberDidSelectItemAtIndex(NSScrubber scrubber, NSInteger selectedIndex);
+    [Optional]
+    [Selector("scrubber:didHighlightItemAtIndex:")]
+    void ScrubberDidHighlightItemAtIndex(NSScrubber scrubber, NSInteger highlightedIndex);
+    [Optional]
+    [Selector("scrubber:didChangeVisibleRange:")]
+    void ScrubberDidChangeVisibleRange(NSScrubber scrubber, NSRange visibleRange);
+    [Optional]
+    [Selector("didBeginInteractingWithScrubber:")]
+    void DidBeginInteractingWithScrubber(NSScrubber scrubber);
+    [Optional]
+    [Selector("didFinishInteractingWithScrubber:")]
+    void DidFinishInteractingWithScrubber(NSScrubber scrubber);
+    [Optional]
+    [Selector("didCancelInteractingWithScrubber:")]
+    void DidCancelInteractingWithScrubber(NSScrubber scrubber);
 }
 
 public enum NSScrubberMode : long
@@ -63,46 +77,80 @@ public enum NSScrubberAlignment : long
 
 public extern objc class NSScrubberSelectionStyle : NSObject, NSCoding
 {
-    [Selector("outlineOverlayStyle")] public static NSScrubberSelectionStyle OutlineOverlayStyle { get; }
-    [Selector("roundedBackgroundStyle")] public static NSScrubberSelectionStyle RoundedBackgroundStyle { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("makeSelectionView")] public NSScrubberSelectionView? MakeSelectionView();
+    [Selector("outlineOverlayStyle")]
+    public static NSScrubberSelectionStyle OutlineOverlayStyle { get; }
+    [Selector("roundedBackgroundStyle")]
+    public static NSScrubberSelectionStyle RoundedBackgroundStyle { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("makeSelectionView")]
+    public NSScrubberSelectionView? MakeSelectionView();
 }
 
 public objc closure void NSScrubberPerformSequentialBatchUpdatesUpdateBlock();
 
 public extern objc class NSScrubber : NSView
 {
-    [Selector("dataSource", "setDataSource:")] public NSScrubberDataSource? DataSource { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSScrubberDelegate? Delegate { get; set; }
-    [Selector("scrubberLayout", "setScrubberLayout:")] public NSScrubberLayout ScrubberLayout { get; set; }
-    [Selector("numberOfItems")] public NSInteger NumberOfItems { get; }
-    [Selector("highlightedIndex")] public NSInteger HighlightedIndex { get; }
-    [Selector("selectedIndex", "setSelectedIndex:")] public NSInteger SelectedIndex { get; set; }
-    [Selector("mode", "setMode:")] public NSScrubberMode Mode { get; set; }
-    [Selector("itemAlignment", "setItemAlignment:")] public NSScrubberAlignment ItemAlignment { get; set; }
-    [Selector("isContinuous", "setContinuous:")] public bool Continuous { get; set; }
-    [Selector("floatsSelectionViews", "setFloatsSelectionViews:")] public bool FloatsSelectionViews { get; set; }
-    [Selector("selectionBackgroundStyle", "setSelectionBackgroundStyle:")] public NSScrubberSelectionStyle? SelectionBackgroundStyle { get; set; }
-    [Selector("selectionOverlayStyle", "setSelectionOverlayStyle:")] public NSScrubberSelectionStyle? SelectionOverlayStyle { get; set; }
-    [Selector("showsArrowButtons", "setShowsArrowButtons:")] public bool ShowsArrowButtons { get; set; }
-    [Selector("showsAdditionalContentIndicators", "setShowsAdditionalContentIndicators:")] public bool ShowsAdditionalContentIndicators { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("backgroundView", "setBackgroundView:")] public NSView? BackgroundView { get; set; }
-    [Selector("initWithFrame:")] public Self InitWithFrame(NSRect frameRect);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("reloadData")] public void ReloadData();
-    [Selector("performSequentialBatchUpdates:")] public void PerformSequentialBatchUpdates(NSScrubberPerformSequentialBatchUpdatesUpdateBlock updateBlock);
-    [Selector("insertItemsAtIndexes:")] public void InsertItemsAtIndexes(NSIndexSet indexes);
-    [Selector("removeItemsAtIndexes:")] public void RemoveItemsAtIndexes(NSIndexSet indexes);
-    [Selector("reloadItemsAtIndexes:")] public void ReloadItemsAtIndexes(NSIndexSet indexes);
-    [Selector("moveItemAtIndex:toIndex:")] public void MoveItemAtIndexToIndex(NSInteger oldIndex, NSInteger newIndex);
-    [Selector("scrollItemAtIndex:toAlignment:")] public void ScrollItemAtIndexToAlignment(NSInteger index, NSScrubberAlignment alignment);
-    [Selector("itemViewForItemAtIndex:")] public NSScrubberItemView? ItemViewForItemAtIndex(NSInteger index);
-    [Selector("registerClass:forItemIdentifier:")] public void RegisterClassForItemIdentifier(Class itemViewClass, NSUserInterfaceItemIdentifier itemIdentifier);
-    [Selector("registerNib:forItemIdentifier:")] public void RegisterNibForItemIdentifier(NSNib? nib, NSUserInterfaceItemIdentifier itemIdentifier);
-    [Selector("makeItemWithIdentifier:owner:")] public NSScrubberItemView? MakeItemWithIdentifierOwner(NSUserInterfaceItemIdentifier itemIdentifier, AnyObject? owner);
+    [Selector("dataSource", "setDataSource:")]
+    public NSScrubberDataSource? DataSource { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSScrubberDelegate? Delegate { get; set; }
+    [Selector("scrubberLayout", "setScrubberLayout:")]
+    public NSScrubberLayout ScrubberLayout { get; set; }
+    [Selector("numberOfItems")]
+    public NSInteger NumberOfItems { get; }
+    [Selector("highlightedIndex")]
+    public NSInteger HighlightedIndex { get; }
+    [Selector("selectedIndex", "setSelectedIndex:")]
+    public NSInteger SelectedIndex { get; set; }
+    [Selector("mode", "setMode:")]
+    public NSScrubberMode Mode { get; set; }
+    [Selector("itemAlignment", "setItemAlignment:")]
+    public NSScrubberAlignment ItemAlignment { get; set; }
+    [Selector("isContinuous", "setContinuous:")]
+    public bool Continuous { get; set; }
+    [Selector("floatsSelectionViews", "setFloatsSelectionViews:")]
+    public bool FloatsSelectionViews { get; set; }
+    [Selector("selectionBackgroundStyle", "setSelectionBackgroundStyle:")]
+    public NSScrubberSelectionStyle? SelectionBackgroundStyle { get; set; }
+    [Selector("selectionOverlayStyle", "setSelectionOverlayStyle:")]
+    public NSScrubberSelectionStyle? SelectionOverlayStyle { get; set; }
+    [Selector("showsArrowButtons", "setShowsArrowButtons:")]
+    public bool ShowsArrowButtons { get; set; }
+    [Selector("showsAdditionalContentIndicators", "setShowsAdditionalContentIndicators:")]
+    public bool ShowsAdditionalContentIndicators { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("backgroundView", "setBackgroundView:")]
+    public NSView? BackgroundView { get; set; }
+    [Selector("initWithFrame:")]
+    public Self InitWithFrame(NSRect frameRect);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("reloadData")]
+    public void ReloadData();
+    [Selector("performSequentialBatchUpdates:")]
+    public void PerformSequentialBatchUpdates(NSScrubberPerformSequentialBatchUpdatesUpdateBlock updateBlock);
+    [Selector("insertItemsAtIndexes:")]
+    public void InsertItemsAtIndexes(NSIndexSet indexes);
+    [Selector("removeItemsAtIndexes:")]
+    public void RemoveItemsAtIndexes(NSIndexSet indexes);
+    [Selector("reloadItemsAtIndexes:")]
+    public void ReloadItemsAtIndexes(NSIndexSet indexes);
+    [Selector("moveItemAtIndex:toIndex:")]
+    public void MoveItemAtIndexToIndex(NSInteger oldIndex, NSInteger newIndex);
+    [Selector("scrollItemAtIndex:toAlignment:")]
+    public void ScrollItemAtIndexToAlignment(NSInteger index, NSScrubberAlignment alignment);
+    [Selector("itemViewForItemAtIndex:")]
+    public NSScrubberItemView? ItemViewForItemAtIndex(NSInteger index);
+    [Selector("registerClass:forItemIdentifier:")]
+    public void RegisterClassForItemIdentifier(Class itemViewClass, NSUserInterfaceItemIdentifier itemIdentifier);
+    [Selector("registerNib:forItemIdentifier:")]
+    public void RegisterNibForItemIdentifier(NSNib? nib, NSUserInterfaceItemIdentifier itemIdentifier);
+    [Selector("makeItemWithIdentifier:owner:")]
+    public NSScrubberItemView? MakeItemWithIdentifierOwner(NSUserInterfaceItemIdentifier itemIdentifier, AnyObject? owner);
 }
 
 #endif

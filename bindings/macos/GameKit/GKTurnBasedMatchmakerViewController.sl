@@ -36,20 +36,30 @@ public extern objc class GKTurnBasedMatchmakerViewController : NSViewController,
 
 public extern objc class GKTurnBasedMatchmakerViewController
 {
-    [Selector("turnBasedMatchmakerDelegate", "setTurnBasedMatchmakerDelegate:")] public GKTurnBasedMatchmakerViewControllerDelegate? TurnBasedMatchmakerDelegate { get; set; }
-    [Selector("showExistingMatches", "setShowExistingMatches:")] public bool ShowExistingMatches { get; set; }
-    [Selector("matchmakingMode", "setMatchmakingMode:")] public GKMatchmakingMode MatchmakingMode { get; set; }
-    [Selector("initWithMatchRequest:")] public AnyObject InitWithMatchRequest(GKMatchRequest request);
+    [Selector("turnBasedMatchmakerDelegate", "setTurnBasedMatchmakerDelegate:")]
+    public GKTurnBasedMatchmakerViewControllerDelegate? TurnBasedMatchmakerDelegate { get; set; }
+    [Selector("showExistingMatches", "setShowExistingMatches:")]
+    public bool ShowExistingMatches { get; set; }
+    [Selector("matchmakingMode", "setMatchmakingMode:")]
+    public GKMatchmakingMode MatchmakingMode { get; set; }
+    [Selector("initWithMatchRequest:")]
+    public AnyObject InitWithMatchRequest(GKMatchRequest request);
 }
 
 public objc interface GKTurnBasedMatchmakerViewControllerDelegate : NSObjectProtocol
 {
-    [Selector("turnBasedMatchmakerViewControllerWasCancelled:")] void TurnBasedMatchmakerViewControllerWasCancelled(GKTurnBasedMatchmakerViewController viewController);
-    [Selector("turnBasedMatchmakerViewController:didFailWithError:")] void TurnBasedMatchmakerViewControllerDidFailWithError(GKTurnBasedMatchmakerViewController viewController, NSError error);
+    [Selector("turnBasedMatchmakerViewControllerWasCancelled:")]
+    void TurnBasedMatchmakerViewControllerWasCancelled(GKTurnBasedMatchmakerViewController viewController);
+    [Selector("turnBasedMatchmakerViewController:didFailWithError:")]
+    void TurnBasedMatchmakerViewControllerDidFailWithError(GKTurnBasedMatchmakerViewController viewController, NSError error);
     /// Deprecated in macOS 10.11.
-    [Optional] [Selector("turnBasedMatchmakerViewController:didFindMatch:")] void TurnBasedMatchmakerViewControllerDidFindMatch(GKTurnBasedMatchmakerViewController viewController, GKTurnBasedMatch match);
+    [Optional]
+    [Selector("turnBasedMatchmakerViewController:didFindMatch:")]
+    void TurnBasedMatchmakerViewControllerDidFindMatch(GKTurnBasedMatchmakerViewController viewController, GKTurnBasedMatch match);
     /// Deprecated in macOS 10.11.
-    [Optional] [Selector("turnBasedMatchmakerViewController:playerQuitForMatch:")] void TurnBasedMatchmakerViewControllerPlayerQuitForMatch(GKTurnBasedMatchmakerViewController viewController, GKTurnBasedMatch match);
+    [Optional]
+    [Selector("turnBasedMatchmakerViewController:playerQuitForMatch:")]
+    void TurnBasedMatchmakerViewControllerPlayerQuitForMatch(GKTurnBasedMatchmakerViewController viewController, GKTurnBasedMatch match);
 }
 
 #endif

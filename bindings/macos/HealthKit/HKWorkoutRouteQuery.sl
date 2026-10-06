@@ -36,8 +36,10 @@ public objc closure void HKWorkoutRouteQueryInitWithRouteDateIntervalDataHandler
 
 public extern objc class HKWorkoutRouteQuery : HKQuery
 {
-    [Selector("initWithRoute:dataHandler:")] public Self InitWithRouteDataHandler(HKWorkoutRoute workoutRoute, HKWorkoutRouteQueryInitWithRouteDataHandlerDataHandlerBlock dataHandler);
-    [Selector("initWithRoute:dateInterval:dataHandler:")] public Self InitWithRouteDateIntervalDataHandler(HKWorkoutRoute workoutRoute, NSDateInterval dateInterval, HKWorkoutRouteQueryInitWithRouteDateIntervalDataHandlerDataHandlerBlock dataHandler);
+    [Selector("initWithRoute:dataHandler:")]
+    public Self InitWithRouteDataHandler(HKWorkoutRoute workoutRoute, HKWorkoutRouteQueryInitWithRouteDataHandlerDataHandlerBlock dataHandler);
+    [Selector("initWithRoute:dateInterval:dataHandler:")]
+    public Self InitWithRouteDateIntervalDataHandler(HKWorkoutRoute workoutRoute, NSDateInterval dateInterval, HKWorkoutRouteQueryInitWithRouteDateIntervalDataHandlerDataHandlerBlock dataHandler);
 }
 
 #endif

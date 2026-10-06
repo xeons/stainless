@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class MEMessageSecurityInformation : NSObject, NSSecureCoding
 {
-    [Selector("signers")] public NSArray Signers { get; }
-    [Selector("isEncrypted")] public bool IsEncrypted { get; }
-    [Selector("signingError")] public NSError? SigningError { get; }
-    [Selector("encryptionError")] public NSError? EncryptionError { get; }
-    [Selector("shouldBlockRemoteContent")] public bool ShouldBlockRemoteContent { get; }
-    [Selector("localizedRemoteContentBlockingReason")] public NSString? LocalizedRemoteContentBlockingReason { get; }
-    [Selector("initWithSigners:isEncrypted:signingError:encryptionError:")] public Self InitWithSignersIsEncryptedSigningErrorEncryptionError(NSArray signers, bool isEncrypted, NSError? signingError, NSError? encryptionError);
-    [Selector("initWithSigners:isEncrypted:signingError:encryptionError:shouldBlockRemoteContent:localizedRemoteContentBlockingReason:")] public Self InitWithSignersIsEncryptedSigningErrorEncryptionErrorShouldBlockRemoteContentLocalizedRemoteContentBlockingReason(NSArray signers, bool isEncrypted, NSError? signingError, NSError? encryptionError, bool shouldBlockRemoteContent, NSString? localizedRemoteContentBlockingReason);
+    [Selector("signers")]
+    public NSArray Signers { get; }
+    [Selector("isEncrypted")]
+    public bool IsEncrypted { get; }
+    [Selector("signingError")]
+    public NSError? SigningError { get; }
+    [Selector("encryptionError")]
+    public NSError? EncryptionError { get; }
+    [Selector("shouldBlockRemoteContent")]
+    public bool ShouldBlockRemoteContent { get; }
+    [Selector("localizedRemoteContentBlockingReason")]
+    public NSString? LocalizedRemoteContentBlockingReason { get; }
+    [Selector("initWithSigners:isEncrypted:signingError:encryptionError:")]
+    public Self InitWithSignersIsEncryptedSigningErrorEncryptionError(NSArray signers, bool isEncrypted, NSError? signingError, NSError? encryptionError);
+    [Selector("initWithSigners:isEncrypted:signingError:encryptionError:shouldBlockRemoteContent:localizedRemoteContentBlockingReason:")]
+    public Self InitWithSignersIsEncryptedSigningErrorEncryptionErrorShouldBlockRemoteContentLocalizedRemoteContentBlockingReason(NSArray signers, bool isEncrypted, NSError? signingError, NSError? encryptionError, bool shouldBlockRemoteContent, NSString? localizedRemoteContentBlockingReason);
 }
 
 #endif

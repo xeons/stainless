@@ -64,58 +64,91 @@ public enum NSWhoseSubelementIdentifier : ulong
 
 public extern objc class NSScriptObjectSpecifier : NSObject, NSCoding
 {
-    [Selector("childSpecifier", "setChildSpecifier:")] public NSScriptObjectSpecifier? ChildSpecifier { get; set; }
-    [Selector("containerSpecifier", "setContainerSpecifier:")] public NSScriptObjectSpecifier? ContainerSpecifier { get; set; }
-    [Selector("containerIsObjectBeingTested", "setContainerIsObjectBeingTested:")] public bool ContainerIsObjectBeingTested { get; set; }
-    [Selector("containerIsRangeContainerObject", "setContainerIsRangeContainerObject:")] public bool ContainerIsRangeContainerObject { get; set; }
-    [Selector("key", "setKey:")] public NSString Key { get; set; }
-    [Selector("containerClassDescription", "setContainerClassDescription:")] public NSScriptClassDescription? ContainerClassDescription { get; set; }
-    [Selector("keyClassDescription")] public NSScriptClassDescription? KeyClassDescription { get; }
-    [Selector("objectsByEvaluatingSpecifier")] public AnyObject? ObjectsByEvaluatingSpecifier { get; }
-    [Selector("evaluationErrorNumber", "setEvaluationErrorNumber:")] public NSInteger EvaluationErrorNumber { get; set; }
-    [Selector("evaluationErrorSpecifier")] public NSScriptObjectSpecifier? EvaluationErrorSpecifier { get; }
-    [Selector("descriptor")] public NSAppleEventDescriptor? Descriptor { get; }
-    [Selector("objectSpecifierWithDescriptor:")] public static NSScriptObjectSpecifier? ObjectSpecifierWithDescriptor(NSAppleEventDescriptor descriptor);
-    [Selector("initWithContainerSpecifier:key:")] public Self InitWithContainerSpecifierKey(NSScriptObjectSpecifier container, NSString property);
-    [Selector("initWithContainerClassDescription:containerSpecifier:key:")] public Self InitWithContainerClassDescriptionContainerSpecifierKey(NSScriptClassDescription classDesc, NSScriptObjectSpecifier? container, NSString property);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder inCoder);
-    [Selector("indicesOfObjectsByEvaluatingWithContainer:count:")] public NSInteger* IndicesOfObjectsByEvaluatingWithContainerCount(AnyObject container, NSInteger* count);
-    [Selector("objectsByEvaluatingWithContainers:")] public AnyObject? ObjectsByEvaluatingWithContainers(AnyObject containers);
+    [Selector("childSpecifier", "setChildSpecifier:")]
+    public NSScriptObjectSpecifier? ChildSpecifier { get; set; }
+    [Selector("containerSpecifier", "setContainerSpecifier:")]
+    public NSScriptObjectSpecifier? ContainerSpecifier { get; set; }
+    [Selector("containerIsObjectBeingTested", "setContainerIsObjectBeingTested:")]
+    public bool ContainerIsObjectBeingTested { get; set; }
+    [Selector("containerIsRangeContainerObject", "setContainerIsRangeContainerObject:")]
+    public bool ContainerIsRangeContainerObject { get; set; }
+    [Selector("key", "setKey:")]
+    public NSString Key { get; set; }
+    [Selector("containerClassDescription", "setContainerClassDescription:")]
+    public NSScriptClassDescription? ContainerClassDescription { get; set; }
+    [Selector("keyClassDescription")]
+    public NSScriptClassDescription? KeyClassDescription { get; }
+    [Selector("objectsByEvaluatingSpecifier")]
+    public AnyObject? ObjectsByEvaluatingSpecifier { get; }
+    [Selector("evaluationErrorNumber", "setEvaluationErrorNumber:")]
+    public NSInteger EvaluationErrorNumber { get; set; }
+    [Selector("evaluationErrorSpecifier")]
+    public NSScriptObjectSpecifier? EvaluationErrorSpecifier { get; }
+    [Selector("descriptor")]
+    public NSAppleEventDescriptor? Descriptor { get; }
+    [Selector("objectSpecifierWithDescriptor:")]
+    public static NSScriptObjectSpecifier? ObjectSpecifierWithDescriptor(NSAppleEventDescriptor descriptor);
+    [Selector("initWithContainerSpecifier:key:")]
+    public Self InitWithContainerSpecifierKey(NSScriptObjectSpecifier container, NSString property);
+    [Selector("initWithContainerClassDescription:containerSpecifier:key:")]
+    public Self InitWithContainerClassDescriptionContainerSpecifierKey(NSScriptClassDescription classDesc, NSScriptObjectSpecifier? container, NSString property);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder inCoder);
+    [Selector("indicesOfObjectsByEvaluatingWithContainer:count:")]
+    public NSInteger* IndicesOfObjectsByEvaluatingWithContainerCount(AnyObject container, NSInteger* count);
+    [Selector("objectsByEvaluatingWithContainers:")]
+    public AnyObject? ObjectsByEvaluatingWithContainers(AnyObject containers);
 }
 
 /// NSScriptObjectSpecifiers, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("objectSpecifier")] public NSScriptObjectSpecifier? ObjectSpecifier { get; }
-    [Selector("indicesOfObjectsByEvaluatingObjectSpecifier:")] public NSArray? IndicesOfObjectsByEvaluatingObjectSpecifier(NSScriptObjectSpecifier specifier);
+    [Selector("objectSpecifier")]
+    public NSScriptObjectSpecifier? ObjectSpecifier { get; }
+    [Selector("indicesOfObjectsByEvaluatingObjectSpecifier:")]
+    public NSArray? IndicesOfObjectsByEvaluatingObjectSpecifier(NSScriptObjectSpecifier specifier);
 }
 
 public extern objc class NSIndexSpecifier : NSScriptObjectSpecifier
 {
-    [Selector("index", "setIndex:")] public NSInteger Index { get; set; }
-    [Selector("initWithContainerClassDescription:containerSpecifier:key:index:")] public Self InitWithContainerClassDescriptionContainerSpecifierKeyIndex(NSScriptClassDescription classDesc, NSScriptObjectSpecifier? container, NSString property, NSInteger index);
+    [Selector("index", "setIndex:")]
+    public NSInteger Index { get; set; }
+    [Selector("initWithContainerClassDescription:containerSpecifier:key:index:")]
+    public Self InitWithContainerClassDescriptionContainerSpecifierKeyIndex(NSScriptClassDescription classDesc, NSScriptObjectSpecifier? container, NSString property, NSInteger index);
 }
 
 public extern objc class NSMiddleSpecifier : NSScriptObjectSpecifier { }
 
 public extern objc class NSNameSpecifier : NSScriptObjectSpecifier
 {
-    [Selector("name", "setName:")] public NSString Name { get; set; }
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder inCoder);
-    [Selector("initWithContainerClassDescription:containerSpecifier:key:name:")] public Self InitWithContainerClassDescriptionContainerSpecifierKeyName(NSScriptClassDescription classDesc, NSScriptObjectSpecifier? container, NSString property, NSString name);
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder inCoder);
+    [Selector("initWithContainerClassDescription:containerSpecifier:key:name:")]
+    public Self InitWithContainerClassDescriptionContainerSpecifierKeyName(NSScriptClassDescription classDesc, NSScriptObjectSpecifier? container, NSString property, NSString name);
 }
 
 public extern objc class NSPositionalSpecifier : NSObject
 {
-    [Selector("position")] public NSInsertionPosition Position { get; }
-    [Selector("objectSpecifier")] public NSScriptObjectSpecifier? ObjectSpecifier { get; }
-    [Selector("insertionContainer")] public AnyObject? InsertionContainer { get; }
-    [Selector("insertionKey")] public NSString? InsertionKey { get; }
-    [Selector("insertionIndex")] public NSInteger InsertionIndex { get; }
-    [Selector("insertionReplaces")] public bool InsertionReplaces { get; }
-    [Selector("initWithPosition:objectSpecifier:")] public Self InitWithPositionObjectSpecifier(NSInsertionPosition position, NSScriptObjectSpecifier specifier);
-    [Selector("setInsertionClassDescription:")] public void SetInsertionClassDescription(NSScriptClassDescription classDescription);
-    [Selector("evaluate")] public void Evaluate();
+    [Selector("position")]
+    public NSInsertionPosition Position { get; }
+    [Selector("objectSpecifier")]
+    public NSScriptObjectSpecifier? ObjectSpecifier { get; }
+    [Selector("insertionContainer")]
+    public AnyObject? InsertionContainer { get; }
+    [Selector("insertionKey")]
+    public NSString? InsertionKey { get; }
+    [Selector("insertionIndex")]
+    public NSInteger InsertionIndex { get; }
+    [Selector("insertionReplaces")]
+    public bool InsertionReplaces { get; }
+    [Selector("initWithPosition:objectSpecifier:")]
+    public Self InitWithPositionObjectSpecifier(NSInsertionPosition position, NSScriptObjectSpecifier specifier);
+    [Selector("setInsertionClassDescription:")]
+    public void SetInsertionClassDescription(NSScriptClassDescription classDescription);
+    [Selector("evaluate")]
+    public void Evaluate();
 }
 
 public extern objc class NSPropertySpecifier : NSScriptObjectSpecifier { }
@@ -124,36 +157,54 @@ public extern objc class NSRandomSpecifier : NSScriptObjectSpecifier { }
 
 public extern objc class NSRangeSpecifier : NSScriptObjectSpecifier
 {
-    [Selector("startSpecifier", "setStartSpecifier:")] public NSScriptObjectSpecifier? StartSpecifier { get; set; }
-    [Selector("endSpecifier", "setEndSpecifier:")] public NSScriptObjectSpecifier? EndSpecifier { get; set; }
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder inCoder);
-    [Selector("initWithContainerClassDescription:containerSpecifier:key:startSpecifier:endSpecifier:")] public Self InitWithContainerClassDescriptionContainerSpecifierKeyStartSpecifierEndSpecifier(NSScriptClassDescription classDesc, NSScriptObjectSpecifier? container, NSString property, NSScriptObjectSpecifier? startSpec, NSScriptObjectSpecifier? endSpec);
+    [Selector("startSpecifier", "setStartSpecifier:")]
+    public NSScriptObjectSpecifier? StartSpecifier { get; set; }
+    [Selector("endSpecifier", "setEndSpecifier:")]
+    public NSScriptObjectSpecifier? EndSpecifier { get; set; }
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder inCoder);
+    [Selector("initWithContainerClassDescription:containerSpecifier:key:startSpecifier:endSpecifier:")]
+    public Self InitWithContainerClassDescriptionContainerSpecifierKeyStartSpecifierEndSpecifier(NSScriptClassDescription classDesc, NSScriptObjectSpecifier? container, NSString property, NSScriptObjectSpecifier? startSpec, NSScriptObjectSpecifier? endSpec);
 }
 
 public extern objc class NSRelativeSpecifier : NSScriptObjectSpecifier
 {
-    [Selector("relativePosition", "setRelativePosition:")] public NSRelativePosition RelativePosition { get; set; }
-    [Selector("baseSpecifier", "setBaseSpecifier:")] public NSScriptObjectSpecifier? BaseSpecifier { get; set; }
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder inCoder);
-    [Selector("initWithContainerClassDescription:containerSpecifier:key:relativePosition:baseSpecifier:")] public Self InitWithContainerClassDescriptionContainerSpecifierKeyRelativePositionBaseSpecifier(NSScriptClassDescription classDesc, NSScriptObjectSpecifier? container, NSString property, NSRelativePosition relPos, NSScriptObjectSpecifier? baseSpecifier);
+    [Selector("relativePosition", "setRelativePosition:")]
+    public NSRelativePosition RelativePosition { get; set; }
+    [Selector("baseSpecifier", "setBaseSpecifier:")]
+    public NSScriptObjectSpecifier? BaseSpecifier { get; set; }
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder inCoder);
+    [Selector("initWithContainerClassDescription:containerSpecifier:key:relativePosition:baseSpecifier:")]
+    public Self InitWithContainerClassDescriptionContainerSpecifierKeyRelativePositionBaseSpecifier(NSScriptClassDescription classDesc, NSScriptObjectSpecifier? container, NSString property, NSRelativePosition relPos, NSScriptObjectSpecifier? baseSpecifier);
 }
 
 public extern objc class NSUniqueIDSpecifier : NSScriptObjectSpecifier
 {
-    [Selector("uniqueID", "setUniqueID:")] public AnyObject UniqueID { get; set; }
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder inCoder);
-    [Selector("initWithContainerClassDescription:containerSpecifier:key:uniqueID:")] public Self InitWithContainerClassDescriptionContainerSpecifierKeyUniqueID(NSScriptClassDescription classDesc, NSScriptObjectSpecifier? container, NSString property, AnyObject uniqueID);
+    [Selector("uniqueID", "setUniqueID:")]
+    public AnyObject UniqueID { get; set; }
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder inCoder);
+    [Selector("initWithContainerClassDescription:containerSpecifier:key:uniqueID:")]
+    public Self InitWithContainerClassDescriptionContainerSpecifierKeyUniqueID(NSScriptClassDescription classDesc, NSScriptObjectSpecifier? container, NSString property, AnyObject uniqueID);
 }
 
 public extern objc class NSWhoseSpecifier : NSScriptObjectSpecifier
 {
-    [Selector("test", "setTest:")] public NSScriptWhoseTest Test { get; set; }
-    [Selector("startSubelementIdentifier", "setStartSubelementIdentifier:")] public NSWhoseSubelementIdentifier StartSubelementIdentifier { get; set; }
-    [Selector("startSubelementIndex", "setStartSubelementIndex:")] public NSInteger StartSubelementIndex { get; set; }
-    [Selector("endSubelementIdentifier", "setEndSubelementIdentifier:")] public NSWhoseSubelementIdentifier EndSubelementIdentifier { get; set; }
-    [Selector("endSubelementIndex", "setEndSubelementIndex:")] public NSInteger EndSubelementIndex { get; set; }
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder inCoder);
-    [Selector("initWithContainerClassDescription:containerSpecifier:key:test:")] public Self InitWithContainerClassDescriptionContainerSpecifierKeyTest(NSScriptClassDescription classDesc, NSScriptObjectSpecifier? container, NSString property, NSScriptWhoseTest test);
+    [Selector("test", "setTest:")]
+    public NSScriptWhoseTest Test { get; set; }
+    [Selector("startSubelementIdentifier", "setStartSubelementIdentifier:")]
+    public NSWhoseSubelementIdentifier StartSubelementIdentifier { get; set; }
+    [Selector("startSubelementIndex", "setStartSubelementIndex:")]
+    public NSInteger StartSubelementIndex { get; set; }
+    [Selector("endSubelementIdentifier", "setEndSubelementIdentifier:")]
+    public NSWhoseSubelementIdentifier EndSubelementIdentifier { get; set; }
+    [Selector("endSubelementIndex", "setEndSubelementIndex:")]
+    public NSInteger EndSubelementIndex { get; set; }
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder inCoder);
+    [Selector("initWithContainerClassDescription:containerSpecifier:key:test:")]
+    public Self InitWithContainerClassDescriptionContainerSpecifierKeyTest(NSScriptClassDescription classDesc, NSScriptObjectSpecifier? container, NSString property, NSScriptWhoseTest test);
 }
 
 #endif

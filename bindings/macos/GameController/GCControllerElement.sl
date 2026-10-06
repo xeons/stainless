@@ -40,15 +40,24 @@ public enum GCSystemGestureState : long
 
 public extern objc class GCControllerElement : NSObject
 {
-    [Selector("collection")] public GCControllerElement? Collection { get; }
-    [Selector("isAnalog")] public bool Analog { get; }
-    [Selector("isBoundToSystemGesture")] public bool BoundToSystemGesture { get; }
-    [Selector("preferredSystemGestureState", "setPreferredSystemGestureState:")] public GCSystemGestureState PreferredSystemGestureState { get; set; }
-    [Selector("sfSymbolsName", "setSfSymbolsName:")] public NSString? SfSymbolsName { get; set; }
-    [Selector("localizedName", "setLocalizedName:")] public NSString? LocalizedName { get; set; }
-    [Selector("unmappedSfSymbolsName", "setUnmappedSfSymbolsName:")] public NSString? UnmappedSfSymbolsName { get; set; }
-    [Selector("unmappedLocalizedName", "setUnmappedLocalizedName:")] public NSString? UnmappedLocalizedName { get; set; }
-    [Selector("aliases")] public NSSet Aliases { get; }
+    [Selector("collection")]
+    public GCControllerElement? Collection { get; }
+    [Selector("isAnalog")]
+    public bool Analog { get; }
+    [Selector("isBoundToSystemGesture")]
+    public bool BoundToSystemGesture { get; }
+    [Selector("preferredSystemGestureState", "setPreferredSystemGestureState:")]
+    public GCSystemGestureState PreferredSystemGestureState { get; set; }
+    [Selector("sfSymbolsName", "setSfSymbolsName:")]
+    public NSString? SfSymbolsName { get; set; }
+    [Selector("localizedName", "setLocalizedName:")]
+    public NSString? LocalizedName { get; set; }
+    [Selector("unmappedSfSymbolsName", "setUnmappedSfSymbolsName:")]
+    public NSString? UnmappedSfSymbolsName { get; set; }
+    [Selector("unmappedLocalizedName", "setUnmappedLocalizedName:")]
+    public NSString? UnmappedLocalizedName { get; set; }
+    [Selector("aliases")]
+    public NSSet Aliases { get; }
 }
 
 #endif

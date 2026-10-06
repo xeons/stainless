@@ -46,17 +46,28 @@ public objc closure void BAAssetPackManagerRemoveAssetPackWithIdentifierCompleti
 /// macOS 26 and later.
 public extern objc class BAAssetPackManager : NSObject
 {
-    [Selector("sharedManager")] public static BAAssetPackManager? SharedManager { get; }
-    [Selector("delegate", "setDelegate:")] public BAManagedAssetPackDownloadDelegate? Delegate { get; set; }
-    [Selector("getAllAssetPacksWithCompletionHandler:")] public void GetAllAssetPacksWithCompletionHandler(BAAssetPackManagerGetAllAssetPacksWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getAssetPackWithIdentifier:completionHandler:")] public void GetAssetPackWithIdentifierCompletionHandler(NSString assetPackIdentifier, BAAssetPackManagerGetAssetPackWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getStatusOfAssetPackWithIdentifier:completionHandler:")] public void GetStatusOfAssetPackWithIdentifierCompletionHandler(NSString assetPackIdentifier, BAAssetPackManagerGetStatusOfAssetPackWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("ensureLocalAvailabilityOfAssetPack:completionHandler:")] public void EnsureLocalAvailabilityOfAssetPackCompletionHandler(BAAssetPack assetPack, BAAssetPackManagerEnsureLocalAvailabilityOfAssetPackCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("checkForUpdatesWithCompletionHandler:")] public void CheckForUpdatesWithCompletionHandler(BAAssetPackManagerCheckForUpdatesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("contentsAtPath:searchingInAssetPackWithIdentifier:options:error:")] public NSData? ContentsAtPathSearchingInAssetPackWithIdentifierOptionsError(NSString path, NSString? assetPackIdentifier, NSDataReadingOptions options, out NSError? error);
-    [Selector("fileDescriptorForPath:searchingInAssetPackWithIdentifier:error:")] public int FileDescriptorForPathSearchingInAssetPackWithIdentifierError(NSString path, NSString? assetPackIdentifier, out NSError? error);
-    [Selector("URLForPath:error:")] public NSURL? URLForPathError(NSString path, out NSError? error);
-    [Selector("removeAssetPackWithIdentifier:completionHandler:")] public void RemoveAssetPackWithIdentifierCompletionHandler(NSString assetPackIdentifier, BAAssetPackManagerRemoveAssetPackWithIdentifierCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("sharedManager")]
+    public static BAAssetPackManager? SharedManager { get; }
+    [Selector("delegate", "setDelegate:")]
+    public BAManagedAssetPackDownloadDelegate? Delegate { get; set; }
+    [Selector("getAllAssetPacksWithCompletionHandler:")]
+    public void GetAllAssetPacksWithCompletionHandler(BAAssetPackManagerGetAllAssetPacksWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getAssetPackWithIdentifier:completionHandler:")]
+    public void GetAssetPackWithIdentifierCompletionHandler(NSString assetPackIdentifier, BAAssetPackManagerGetAssetPackWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getStatusOfAssetPackWithIdentifier:completionHandler:")]
+    public void GetStatusOfAssetPackWithIdentifierCompletionHandler(NSString assetPackIdentifier, BAAssetPackManagerGetStatusOfAssetPackWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("ensureLocalAvailabilityOfAssetPack:completionHandler:")]
+    public void EnsureLocalAvailabilityOfAssetPackCompletionHandler(BAAssetPack assetPack, BAAssetPackManagerEnsureLocalAvailabilityOfAssetPackCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("checkForUpdatesWithCompletionHandler:")]
+    public void CheckForUpdatesWithCompletionHandler(BAAssetPackManagerCheckForUpdatesWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("contentsAtPath:searchingInAssetPackWithIdentifier:options:error:")]
+    public NSData? ContentsAtPathSearchingInAssetPackWithIdentifierOptionsError(NSString path, NSString? assetPackIdentifier, NSDataReadingOptions options, out NSError? error);
+    [Selector("fileDescriptorForPath:searchingInAssetPackWithIdentifier:error:")]
+    public int FileDescriptorForPathSearchingInAssetPackWithIdentifierError(NSString path, NSString? assetPackIdentifier, out NSError? error);
+    [Selector("URLForPath:error:")]
+    public NSURL? URLForPathError(NSString path, out NSError? error);
+    [Selector("removeAssetPackWithIdentifier:completionHandler:")]
+    public void RemoveAssetPackWithIdentifierCompletionHandler(NSString assetPackIdentifier, BAAssetPackManagerRemoveAssetPackWithIdentifierCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 #endif

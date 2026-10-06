@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class MXCPUMetric : MXMetric
 {
-    [Selector("cumulativeCPUTime")] public NSMeasurement CumulativeCPUTime { get; }
-    [Selector("cumulativeCPUInstructions")] public NSMeasurement CumulativeCPUInstructions { get; }
+    [Selector("cumulativeCPUTime")]
+    public NSMeasurement CumulativeCPUTime { get; }
+    [Selector("cumulativeCPUInstructions")]
+    public NSMeasurement CumulativeCPUInstructions { get; }
 }
 
 #endif

@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLFrameSetElement : DOMHTMLElement
 {
-    [Selector("cols", "setCols:")] public NSString? Cols { get; set; }
-    [Selector("rows", "setRows:")] public NSString? Rows { get; set; }
+    [Selector("cols", "setCols:")]
+    public NSString? Cols { get; set; }
+    [Selector("rows", "setRows:")]
+    public NSString? Rows { get; set; }
 }
 
 #endif

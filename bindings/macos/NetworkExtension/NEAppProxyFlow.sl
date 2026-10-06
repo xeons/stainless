@@ -54,16 +54,25 @@ public objc closure void NEAppProxyFlowOpenWithLocalEndpointCompletionHandlerCom
 
 public extern objc class NEAppProxyFlow : NSObject
 {
-    [Selector("metaData")] public NEFlowMetaData MetaData { get; }
-    [Selector("networkInterface", "setNetworkInterface:")] public nw_interface_t? NetworkInterface { get; set; }
-    [Selector("remoteHostname")] public NSString? RemoteHostname { get; }
-    [Selector("isBound")] public bool IsBound { get; }
-    [Selector("openWithLocalFlowEndpoint:completionHandler:")] public void OpenWithLocalFlowEndpointCompletionHandler(nw_endpoint_t? localEndpoint, NEAppProxyFlowOpenWithLocalFlowEndpointCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("metaData")]
+    public NEFlowMetaData MetaData { get; }
+    [Selector("networkInterface", "setNetworkInterface:")]
+    public nw_interface_t? NetworkInterface { get; set; }
+    [Selector("remoteHostname")]
+    public NSString? RemoteHostname { get; }
+    [Selector("isBound")]
+    public bool IsBound { get; }
+    [Selector("openWithLocalFlowEndpoint:completionHandler:")]
+    public void OpenWithLocalFlowEndpointCompletionHandler(nw_endpoint_t? localEndpoint, NEAppProxyFlowOpenWithLocalFlowEndpointCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("openWithLocalEndpoint:completionHandler:")] public void OpenWithLocalEndpointCompletionHandler(NWHostEndpoint? localEndpoint, NEAppProxyFlowOpenWithLocalEndpointCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("closeReadWithError:")] public void CloseReadWithError(NSError? error);
-    [Selector("closeWriteWithError:")] public void CloseWriteWithError(NSError? error);
-    [Selector("setMetadata:")] public void SetMetadata(nw_parameters_t parameters);
+    [Selector("openWithLocalEndpoint:completionHandler:")]
+    public void OpenWithLocalEndpointCompletionHandler(NWHostEndpoint? localEndpoint, NEAppProxyFlowOpenWithLocalEndpointCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("closeReadWithError:")]
+    public void CloseReadWithError(NSError? error);
+    [Selector("closeWriteWithError:")]
+    public void CloseWriteWithError(NSError? error);
+    [Selector("setMetadata:")]
+    public void SetMetadata(nw_parameters_t parameters);
 }
 
 #endif

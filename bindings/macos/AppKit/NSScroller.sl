@@ -64,21 +64,36 @@ public enum NSScrollerKnobStyle : long
 
 public extern objc class NSScroller : NSControl
 {
-    [Selector("isCompatibleWithOverlayScrollers")] public static bool CompatibleWithOverlayScrollers { get; }
-    [Selector("preferredScrollerStyle")] public static NSScrollerStyle PreferredScrollerStyle { get; }
-    [Selector("scrollerStyle", "setScrollerStyle:")] public NSScrollerStyle ScrollerStyle { get; set; }
-    [Selector("knobStyle", "setKnobStyle:")] public NSScrollerKnobStyle KnobStyle { get; set; }
-    [Selector("usableParts")] public NSUsableScrollerParts UsableParts { get; }
-    [Selector("controlSize", "setControlSize:")] public NSControlSize ControlSize { get; set; }
-    [Selector("hitPart")] public NSScrollerPart HitPart { get; }
-    [Selector("knobProportion", "setKnobProportion:")] public CGFloat KnobProportion { get; set; }
-    [Selector("scrollerWidthForControlSize:scrollerStyle:")] public static CGFloat ScrollerWidthForControlSizeScrollerStyle(NSControlSize controlSize, NSScrollerStyle scrollerStyle);
-    [Selector("rectForPart:")] public NSRect RectForPart(NSScrollerPart partCode);
-    [Selector("checkSpaceForParts")] public void CheckSpaceForParts();
-    [Selector("drawKnob")] public void DrawKnob();
-    [Selector("drawKnobSlotInRect:highlight:")] public void DrawKnobSlotInRectHighlight(NSRect slotRect, bool flag);
-    [Selector("testPart:")] public NSScrollerPart TestPart(NSPoint point);
-    [Selector("trackKnob:")] public void TrackKnob(NSEvent event);
+    [Selector("isCompatibleWithOverlayScrollers")]
+    public static bool CompatibleWithOverlayScrollers { get; }
+    [Selector("preferredScrollerStyle")]
+    public static NSScrollerStyle PreferredScrollerStyle { get; }
+    [Selector("scrollerStyle", "setScrollerStyle:")]
+    public NSScrollerStyle ScrollerStyle { get; set; }
+    [Selector("knobStyle", "setKnobStyle:")]
+    public NSScrollerKnobStyle KnobStyle { get; set; }
+    [Selector("usableParts")]
+    public NSUsableScrollerParts UsableParts { get; }
+    [Selector("controlSize", "setControlSize:")]
+    public NSControlSize ControlSize { get; set; }
+    [Selector("hitPart")]
+    public NSScrollerPart HitPart { get; }
+    [Selector("knobProportion", "setKnobProportion:")]
+    public CGFloat KnobProportion { get; set; }
+    [Selector("scrollerWidthForControlSize:scrollerStyle:")]
+    public static CGFloat ScrollerWidthForControlSizeScrollerStyle(NSControlSize controlSize, NSScrollerStyle scrollerStyle);
+    [Selector("rectForPart:")]
+    public NSRect RectForPart(NSScrollerPart partCode);
+    [Selector("checkSpaceForParts")]
+    public void CheckSpaceForParts();
+    [Selector("drawKnob")]
+    public void DrawKnob();
+    [Selector("drawKnobSlotInRect:highlight:")]
+    public void DrawKnobSlotInRectHighlight(NSRect slotRect, bool flag);
+    [Selector("testPart:")]
+    public NSScrollerPart TestPart(NSPoint point);
+    [Selector("trackKnob:")]
+    public void TrackKnob(NSEvent event);
 }
 
 public extern "C" NSNotificationName? NSPreferredScrollerStyleDidChangeNotification;
@@ -103,23 +118,32 @@ public enum NSScrollerArrow : ulong
 public extern objc class NSScroller
 {
     /// Deprecated in macOS 10.14.
-    [Selector("arrowsPosition", "setArrowsPosition:")] public NSScrollArrowPosition ArrowsPosition { get; set; }
+    [Selector("arrowsPosition", "setArrowsPosition:")]
+    public NSScrollArrowPosition ArrowsPosition { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("controlTint", "setControlTint:")] public NSControlTint ControlTint { get; set; }
+    [Selector("controlTint", "setControlTint:")]
+    public NSControlTint ControlTint { get; set; }
     /// Deprecated in macOS 10.7.
-    [Selector("scrollerWidthForControlSize:")] public static CGFloat ScrollerWidthForControlSize(NSControlSize controlSize);
+    [Selector("scrollerWidthForControlSize:")]
+    public static CGFloat ScrollerWidthForControlSize(NSControlSize controlSize);
     /// Deprecated in macOS 10.7.
-    [Selector("scrollerWidth")] public static CGFloat ScrollerWidth();
+    [Selector("scrollerWidth")]
+    public static CGFloat ScrollerWidth();
     /// Deprecated in macOS 10.5.
-    [Selector("setFloatValue:knobProportion:")] public void SetFloatValueKnobProportion(float value, CGFloat proportion);
+    [Selector("setFloatValue:knobProportion:")]
+    public void SetFloatValueKnobProportion(float value, CGFloat proportion);
     /// Deprecated in macOS 10.14.
-    [Selector("highlight:")] public void Highlight(bool flag);
+    [Selector("highlight:")]
+    public void Highlight(bool flag);
     /// Deprecated in macOS 10.14.
-    [Selector("trackScrollButtons:")] public void TrackScrollButtons(NSEvent event);
+    [Selector("trackScrollButtons:")]
+    public void TrackScrollButtons(NSEvent event);
     /// Deprecated in macOS 10.7.
-    [Selector("drawParts")] public void DrawParts();
+    [Selector("drawParts")]
+    public void DrawParts();
     /// Deprecated in macOS 10.14.
-    [Selector("drawArrow:highlight:")] public void DrawArrowHighlight(NSScrollerArrow whichArrow, bool flag);
+    [Selector("drawArrow:highlight:")]
+    public void DrawArrowHighlight(NSScrollerArrow whichArrow, bool flag);
 }
 
 #endif

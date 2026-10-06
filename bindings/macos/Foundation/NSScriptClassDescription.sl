@@ -32,40 +32,63 @@ import Standard.ObjC;
 
 public extern objc class NSScriptClassDescription : NSClassDescription
 {
-    [Selector("suiteName")] public NSString? SuiteName { get; }
-    [Selector("className")] public NSString? ClassName { get; }
-    [Selector("implementationClassName")] public NSString? ImplementationClassName { get; }
-    [Selector("superclassDescription")] public NSScriptClassDescription? SuperclassDescription { get; }
-    [Selector("appleEventCode")] public FourCharCode AppleEventCode { get; }
-    [Selector("defaultSubcontainerAttributeKey")] public NSString? DefaultSubcontainerAttributeKey { get; }
-    [Selector("classDescriptionForClass:")] public static NSScriptClassDescription? ClassDescriptionForClass(Class aClass);
-    [Selector("initWithSuiteName:className:dictionary:")] public Self? InitWithSuiteNameClassNameDictionary(NSString suiteName, NSString className, NSDictionary? classDeclaration);
-    [Selector("matchesAppleEventCode:")] public bool MatchesAppleEventCode(FourCharCode appleEventCode);
-    [Selector("supportsCommand:")] public bool SupportsCommand(NSScriptCommandDescription commandDescription);
-    [Selector("selectorForCommand:")] public Selector SelectorForCommand(NSScriptCommandDescription commandDescription);
-    [Selector("typeForKey:")] public NSString? TypeForKey(NSString key);
-    [Selector("classDescriptionForKey:")] public NSScriptClassDescription? ClassDescriptionForKey(NSString key);
-    [Selector("appleEventCodeForKey:")] public FourCharCode AppleEventCodeForKey(NSString key);
-    [Selector("keyWithAppleEventCode:")] public NSString? KeyWithAppleEventCode(FourCharCode appleEventCode);
-    [Selector("isLocationRequiredToCreateForKey:")] public bool IsLocationRequiredToCreateForKey(NSString toManyRelationshipKey);
-    [Selector("hasPropertyForKey:")] public bool HasPropertyForKey(NSString key);
-    [Selector("hasOrderedToManyRelationshipForKey:")] public bool HasOrderedToManyRelationshipForKey(NSString key);
-    [Selector("hasReadablePropertyForKey:")] public bool HasReadablePropertyForKey(NSString key);
-    [Selector("hasWritablePropertyForKey:")] public bool HasWritablePropertyForKey(NSString key);
+    [Selector("suiteName")]
+    public NSString? SuiteName { get; }
+    [Selector("className")]
+    public NSString? ClassName { get; }
+    [Selector("implementationClassName")]
+    public NSString? ImplementationClassName { get; }
+    [Selector("superclassDescription")]
+    public NSScriptClassDescription? SuperclassDescription { get; }
+    [Selector("appleEventCode")]
+    public FourCharCode AppleEventCode { get; }
+    [Selector("defaultSubcontainerAttributeKey")]
+    public NSString? DefaultSubcontainerAttributeKey { get; }
+    [Selector("classDescriptionForClass:")]
+    public static NSScriptClassDescription? ClassDescriptionForClass(Class aClass);
+    [Selector("initWithSuiteName:className:dictionary:")]
+    public Self? InitWithSuiteNameClassNameDictionary(NSString suiteName, NSString className, NSDictionary? classDeclaration);
+    [Selector("matchesAppleEventCode:")]
+    public bool MatchesAppleEventCode(FourCharCode appleEventCode);
+    [Selector("supportsCommand:")]
+    public bool SupportsCommand(NSScriptCommandDescription commandDescription);
+    [Selector("selectorForCommand:")]
+    public Selector SelectorForCommand(NSScriptCommandDescription commandDescription);
+    [Selector("typeForKey:")]
+    public NSString? TypeForKey(NSString key);
+    [Selector("classDescriptionForKey:")]
+    public NSScriptClassDescription? ClassDescriptionForKey(NSString key);
+    [Selector("appleEventCodeForKey:")]
+    public FourCharCode AppleEventCodeForKey(NSString key);
+    [Selector("keyWithAppleEventCode:")]
+    public NSString? KeyWithAppleEventCode(FourCharCode appleEventCode);
+    [Selector("isLocationRequiredToCreateForKey:")]
+    public bool IsLocationRequiredToCreateForKey(NSString toManyRelationshipKey);
+    [Selector("hasPropertyForKey:")]
+    public bool HasPropertyForKey(NSString key);
+    [Selector("hasOrderedToManyRelationshipForKey:")]
+    public bool HasOrderedToManyRelationshipForKey(NSString key);
+    [Selector("hasReadablePropertyForKey:")]
+    public bool HasReadablePropertyForKey(NSString key);
+    [Selector("hasWritablePropertyForKey:")]
+    public bool HasWritablePropertyForKey(NSString key);
 }
 
 /// NSDeprecated, a category of NSScriptClassDescription.
 public extern objc class NSScriptClassDescription
 {
     /// Deprecated in macOS 10.5.
-    [Selector("isReadOnlyKey:")] public bool IsReadOnlyKey(NSString key);
+    [Selector("isReadOnlyKey:")]
+    public bool IsReadOnlyKey(NSString key);
 }
 
 /// NSScriptClassDescription, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("classCode")] public FourCharCode ClassCode { get; }
-    [Selector("className")] public NSString ClassName { get; }
+    [Selector("classCode")]
+    public FourCharCode ClassCode { get; }
+    [Selector("className")]
+    public NSString ClassName { get; }
 }
 
 #endif

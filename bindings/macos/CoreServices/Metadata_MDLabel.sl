@@ -38,7 +38,8 @@ public extern objc class MDLabelRef : CFTypeRef { }
 
 public extern "C" CFTypeID MDLabelGetTypeID();
 
-[ReturnsRetained] public extern "C" CFArrayRef? MDItemCopyLabels(MDItemRef? item);
+[ReturnsRetained]
+public extern "C" CFArrayRef? MDItemCopyLabels(MDItemRef? item);
 
 public extern "C" Boolean MDItemSetLabel(MDItemRef? item, MDLabelRef? label);
 
@@ -50,23 +51,30 @@ public enum MDLabelDomain : int
     LocalDomain = 1,
 }
 
-[ReturnsRetained] public extern "C" MDLabelRef? MDLabelCreate(CFAllocatorRef? allocator, CFStringRef? displayName, CFStringRef? kind, MDLabelDomain domain);
+[ReturnsRetained]
+public extern "C" MDLabelRef? MDLabelCreate(CFAllocatorRef? allocator, CFStringRef? displayName, CFStringRef? kind, MDLabelDomain domain);
 
-[ReturnsRetained] public extern "C" CFTypeRef? MDLabelCopyAttribute(MDLabelRef? label, CFStringRef? name);
+[ReturnsRetained]
+public extern "C" CFTypeRef? MDLabelCopyAttribute(MDLabelRef? label, CFStringRef? name);
 
-[ReturnsRetained] public extern "C" CFStringRef? MDLabelCopyAttributeName(MDLabelRef? label);
+[ReturnsRetained]
+public extern "C" CFStringRef? MDLabelCopyAttributeName(MDLabelRef? label);
 
 public extern "C" Boolean MDLabelDelete(MDLabelRef? label);
 
 public extern "C" Boolean MDLabelSetAttributes(MDLabelRef? label, CFDictionaryRef? attrs);
 
-[ReturnsRetained] public extern "C" CFArrayRef? MDCopyLabelKinds();
+[ReturnsRetained]
+public extern "C" CFArrayRef? MDCopyLabelKinds();
 
-[ReturnsRetained] public extern "C" CFArrayRef? MDCopyLabelsMatchingExpression(CFStringRef? simpleQueryString);
+[ReturnsRetained]
+public extern "C" CFArrayRef? MDCopyLabelsMatchingExpression(CFStringRef? simpleQueryString);
 
-[ReturnsRetained] public extern "C" CFArrayRef? MDCopyLabelsWithKind(CFStringRef? kind);
+[ReturnsRetained]
+public extern "C" CFArrayRef? MDCopyLabelsWithKind(CFStringRef? kind);
 
-[ReturnsRetained] public extern "C" MDLabelRef? MDCopyLabelWithUUID(CFUUIDRef? labelUUID);
+[ReturnsRetained]
+public extern "C" MDLabelRef? MDCopyLabelWithUUID(CFUUIDRef? labelUUID);
 
 public extern "C" CFStringRef? kMDLabelBundleURL;
 

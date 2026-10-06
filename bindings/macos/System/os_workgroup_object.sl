@@ -29,7 +29,8 @@ import Standard.ObjC;
 
 public extern objc class OS_os_workgroup : OS_object
 {
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
 }
 
 public using os_workgroup_t = OS_os_workgroup;

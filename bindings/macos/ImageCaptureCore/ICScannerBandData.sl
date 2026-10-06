@@ -33,19 +33,32 @@ import Standard.ObjC;
 
 public extern objc class ICScannerBandData : NSObject
 {
-    [Selector("fullImageWidth")] public NSUInteger FullImageWidth { get; }
-    [Selector("fullImageHeight")] public NSUInteger FullImageHeight { get; }
-    [Selector("bitsPerPixel")] public NSUInteger BitsPerPixel { get; }
-    [Selector("bitsPerComponent")] public NSUInteger BitsPerComponent { get; }
-    [Selector("numComponents")] public NSUInteger NumComponents { get; }
-    [Selector("isBigEndian")] public bool BigEndian { get; }
-    [Selector("pixelDataType")] public ICScannerPixelDataType PixelDataType { get; }
-    [Selector("colorSyncProfilePath")] public NSString? ColorSyncProfilePath { get; }
-    [Selector("bytesPerRow")] public NSUInteger BytesPerRow { get; }
-    [Selector("dataStartRow")] public NSUInteger DataStartRow { get; }
-    [Selector("dataNumRows")] public NSUInteger DataNumRows { get; }
-    [Selector("dataSize")] public NSUInteger DataSize { get; }
-    [Selector("dataBuffer")] public NSData? DataBuffer { get; }
+    [Selector("fullImageWidth")]
+    public NSUInteger FullImageWidth { get; }
+    [Selector("fullImageHeight")]
+    public NSUInteger FullImageHeight { get; }
+    [Selector("bitsPerPixel")]
+    public NSUInteger BitsPerPixel { get; }
+    [Selector("bitsPerComponent")]
+    public NSUInteger BitsPerComponent { get; }
+    [Selector("numComponents")]
+    public NSUInteger NumComponents { get; }
+    [Selector("isBigEndian")]
+    public bool BigEndian { get; }
+    [Selector("pixelDataType")]
+    public ICScannerPixelDataType PixelDataType { get; }
+    [Selector("colorSyncProfilePath")]
+    public NSString? ColorSyncProfilePath { get; }
+    [Selector("bytesPerRow")]
+    public NSUInteger BytesPerRow { get; }
+    [Selector("dataStartRow")]
+    public NSUInteger DataStartRow { get; }
+    [Selector("dataNumRows")]
+    public NSUInteger DataNumRows { get; }
+    [Selector("dataSize")]
+    public NSUInteger DataSize { get; }
+    [Selector("dataBuffer")]
+    public NSData? DataBuffer { get; }
 }
 
 #endif

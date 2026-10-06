@@ -33,33 +33,58 @@ import Standard.ObjC;
 
 public extern objc class AVAudioRecorder : NSObject
 {
-    [Selector("isRecording")] public bool Recording { get; }
-    [Selector("url")] public NSURL Url { get; }
-    [Selector("settings")] public NSDictionary Settings { get; }
-    [Selector("format")] public AVAudioFormat Format { get; }
-    [Selector("delegate", "setDelegate:")] public AVAudioRecorderDelegate? Delegate { get; set; }
-    [Selector("currentTime")] public NSTimeInterval CurrentTime { get; }
-    [Selector("deviceCurrentTime")] public NSTimeInterval DeviceCurrentTime { get; }
-    [Selector("isMeteringEnabled", "setMeteringEnabled:")] public bool MeteringEnabled { get; set; }
-    [Selector("initWithURL:settings:error:")] public Self? InitWithURLSettingsError(NSURL url, NSDictionary settings, out NSError? outError);
-    [Selector("initWithURL:format:error:")] public Self? InitWithURLFormatError(NSURL url, AVAudioFormat format, out NSError? outError);
-    [Selector("prepareToRecord")] public bool PrepareToRecord();
-    [Selector("record")] public bool Record();
-    [Selector("recordAtTime:")] public bool RecordAtTime(NSTimeInterval time);
-    [Selector("recordForDuration:")] public bool RecordForDuration(NSTimeInterval duration);
-    [Selector("recordAtTime:forDuration:")] public bool RecordAtTimeForDuration(NSTimeInterval time, NSTimeInterval duration);
-    [Selector("pause")] public void Pause();
-    [Selector("stop")] public void Stop();
-    [Selector("deleteRecording")] public bool DeleteRecording();
-    [Selector("updateMeters")] public void UpdateMeters();
-    [Selector("peakPowerForChannel:")] public float PeakPowerForChannel(NSUInteger channelNumber);
-    [Selector("averagePowerForChannel:")] public float AveragePowerForChannel(NSUInteger channelNumber);
+    [Selector("isRecording")]
+    public bool Recording { get; }
+    [Selector("url")]
+    public NSURL Url { get; }
+    [Selector("settings")]
+    public NSDictionary Settings { get; }
+    [Selector("format")]
+    public AVAudioFormat Format { get; }
+    [Selector("delegate", "setDelegate:")]
+    public AVAudioRecorderDelegate? Delegate { get; set; }
+    [Selector("currentTime")]
+    public NSTimeInterval CurrentTime { get; }
+    [Selector("deviceCurrentTime")]
+    public NSTimeInterval DeviceCurrentTime { get; }
+    [Selector("isMeteringEnabled", "setMeteringEnabled:")]
+    public bool MeteringEnabled { get; set; }
+    [Selector("initWithURL:settings:error:")]
+    public Self? InitWithURLSettingsError(NSURL url, NSDictionary settings, out NSError? outError);
+    [Selector("initWithURL:format:error:")]
+    public Self? InitWithURLFormatError(NSURL url, AVAudioFormat format, out NSError? outError);
+    [Selector("prepareToRecord")]
+    public bool PrepareToRecord();
+    [Selector("record")]
+    public bool Record();
+    [Selector("recordAtTime:")]
+    public bool RecordAtTime(NSTimeInterval time);
+    [Selector("recordForDuration:")]
+    public bool RecordForDuration(NSTimeInterval duration);
+    [Selector("recordAtTime:forDuration:")]
+    public bool RecordAtTimeForDuration(NSTimeInterval time, NSTimeInterval duration);
+    [Selector("pause")]
+    public void Pause();
+    [Selector("stop")]
+    public void Stop();
+    [Selector("deleteRecording")]
+    public bool DeleteRecording();
+    [Selector("updateMeters")]
+    public void UpdateMeters();
+    [Selector("peakPowerForChannel:")]
+    public float PeakPowerForChannel(NSUInteger channelNumber);
+    [Selector("averagePowerForChannel:")]
+    public float AveragePowerForChannel(NSUInteger channelNumber);
 }
 
 public objc interface AVAudioRecorderDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("audioRecorderDidFinishRecording:successfully:")] void AudioRecorderDidFinishRecordingSuccessfully(AVAudioRecorder recorder, bool flag);
-    [Optional] [Selector("audioRecorderEncodeErrorDidOccur:error:")] void AudioRecorderEncodeErrorDidOccurError(AVAudioRecorder recorder, NSError? error);
+    [Optional]
+    [Selector("audioRecorderDidFinishRecording:successfully:")]
+    void AudioRecorderDidFinishRecordingSuccessfully(AVAudioRecorder recorder, bool flag);
+    [Optional]
+    [Selector("audioRecorderEncodeErrorDidOccur:error:")]
+    void AudioRecorderEncodeErrorDidOccurError(AVAudioRecorder recorder, NSError? error);
 }
 
 #endif

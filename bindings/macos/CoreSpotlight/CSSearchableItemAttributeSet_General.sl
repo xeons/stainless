@@ -33,50 +33,79 @@ import Standard.ObjC;
 /// CSGeneral, a category of CSSearchableItemAttributeSet.
 public extern objc class CSSearchableItemAttributeSet
 {
-    [Selector("displayName", "setDisplayName:")] public NSString? DisplayName { get; set; }
-    [Selector("alternateNames", "setAlternateNames:")] public NSArray? AlternateNames { get; set; }
-    [Selector("path", "setPath:")] public NSString? Path { get; set; }
-    [Selector("contentURL", "setContentURL:")] public NSURL? ContentURL { get; set; }
-    [Selector("thumbnailURL", "setThumbnailURL:")] public NSURL? ThumbnailURL { get; set; }
-    [Selector("thumbnailData", "setThumbnailData:")] public NSData? ThumbnailData { get; set; }
-    [Selector("darkThumbnailURL", "setDarkThumbnailURL:")] public NSURL? DarkThumbnailURL { get; set; }
-    [Selector("relatedUniqueIdentifier", "setRelatedUniqueIdentifier:")] public NSString? RelatedUniqueIdentifier { get; set; }
-    [Selector("weakRelatedUniqueIdentifier", "setWeakRelatedUniqueIdentifier:")] public NSString? WeakRelatedUniqueIdentifier { get; set; }
-    [Selector("metadataModificationDate", "setMetadataModificationDate:")] public NSDate? MetadataModificationDate { get; set; }
-    [Selector("contentType", "setContentType:")] public NSString? ContentType { get; set; }
-    [Selector("contentTypeTree", "setContentTypeTree:")] public NSArray? ContentTypeTree { get; set; }
-    [Selector("keywords", "setKeywords:")] public NSArray? Keywords { get; set; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("version", "setVersion:")] public NSString? Version { get; set; }
-    [Selector("isUserCreated", "setUserCreated:")] public NSNumber? UserCreated { get; set; }
-    [Selector("isUserOwned", "setUserOwned:")] public NSNumber? UserOwned { get; set; }
-    [Selector("isUserCurated", "setUserCurated:")] public NSNumber? UserCurated { get; set; }
-    [Selector("rankingHint", "setRankingHint:")] public NSNumber? RankingHint { get; set; }
-    [Selector("domainIdentifier", "setDomainIdentifier:")] public NSString? DomainIdentifier { get; set; }
+    [Selector("displayName", "setDisplayName:")]
+    public NSString? DisplayName { get; set; }
+    [Selector("alternateNames", "setAlternateNames:")]
+    public NSArray? AlternateNames { get; set; }
+    [Selector("path", "setPath:")]
+    public NSString? Path { get; set; }
+    [Selector("contentURL", "setContentURL:")]
+    public NSURL? ContentURL { get; set; }
+    [Selector("thumbnailURL", "setThumbnailURL:")]
+    public NSURL? ThumbnailURL { get; set; }
+    [Selector("thumbnailData", "setThumbnailData:")]
+    public NSData? ThumbnailData { get; set; }
+    [Selector("darkThumbnailURL", "setDarkThumbnailURL:")]
+    public NSURL? DarkThumbnailURL { get; set; }
+    [Selector("relatedUniqueIdentifier", "setRelatedUniqueIdentifier:")]
+    public NSString? RelatedUniqueIdentifier { get; set; }
+    [Selector("weakRelatedUniqueIdentifier", "setWeakRelatedUniqueIdentifier:")]
+    public NSString? WeakRelatedUniqueIdentifier { get; set; }
+    [Selector("metadataModificationDate", "setMetadataModificationDate:")]
+    public NSDate? MetadataModificationDate { get; set; }
+    [Selector("contentType", "setContentType:")]
+    public NSString? ContentType { get; set; }
+    [Selector("contentTypeTree", "setContentTypeTree:")]
+    public NSArray? ContentTypeTree { get; set; }
+    [Selector("keywords", "setKeywords:")]
+    public NSArray? Keywords { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("version", "setVersion:")]
+    public NSString? Version { get; set; }
+    [Selector("isUserCreated", "setUserCreated:")]
+    public NSNumber? UserCreated { get; set; }
+    [Selector("isUserOwned", "setUserOwned:")]
+    public NSNumber? UserOwned { get; set; }
+    [Selector("isUserCurated", "setUserCurated:")]
+    public NSNumber? UserCurated { get; set; }
+    [Selector("rankingHint", "setRankingHint:")]
+    public NSNumber? RankingHint { get; set; }
+    [Selector("domainIdentifier", "setDomainIdentifier:")]
+    public NSString? DomainIdentifier { get; set; }
 }
 
 /// CSActionExtras, a category of CSSearchableItemAttributeSet.
 public extern objc class CSSearchableItemAttributeSet
 {
-    [Selector("supportsPhoneCall", "setSupportsPhoneCall:")] public NSNumber? SupportsPhoneCall { get; set; }
-    [Selector("supportsNavigation", "setSupportsNavigation:")] public NSNumber? SupportsNavigation { get; set; }
+    [Selector("supportsPhoneCall", "setSupportsPhoneCall:")]
+    public NSNumber? SupportsPhoneCall { get; set; }
+    [Selector("supportsNavigation", "setSupportsNavigation:")]
+    public NSNumber? SupportsNavigation { get; set; }
 }
 
 /// CSContainment, a category of CSSearchableItemAttributeSet.
 public extern objc class CSSearchableItemAttributeSet
 {
-    [Selector("containerTitle", "setContainerTitle:")] public NSString? ContainerTitle { get; set; }
-    [Selector("containerDisplayName", "setContainerDisplayName:")] public NSString? ContainerDisplayName { get; set; }
-    [Selector("containerIdentifier", "setContainerIdentifier:")] public NSString? ContainerIdentifier { get; set; }
-    [Selector("containerOrder", "setContainerOrder:")] public NSNumber? ContainerOrder { get; set; }
+    [Selector("containerTitle", "setContainerTitle:")]
+    public NSString? ContainerTitle { get; set; }
+    [Selector("containerDisplayName", "setContainerDisplayName:")]
+    public NSString? ContainerDisplayName { get; set; }
+    [Selector("containerIdentifier", "setContainerIdentifier:")]
+    public NSString? ContainerIdentifier { get; set; }
+    [Selector("containerOrder", "setContainerOrder:")]
+    public NSNumber? ContainerOrder { get; set; }
 }
 
 /// CSItemProvider, a category of CSSearchableItemAttributeSet.
 public extern objc class CSSearchableItemAttributeSet
 {
-    [Selector("providerDataTypeIdentifiers", "setProviderDataTypeIdentifiers:")] public NSArray? ProviderDataTypeIdentifiers { get; set; }
-    [Selector("providerFileTypeIdentifiers", "setProviderFileTypeIdentifiers:")] public NSArray? ProviderFileTypeIdentifiers { get; set; }
-    [Selector("providerInPlaceFileTypeIdentifiers", "setProviderInPlaceFileTypeIdentifiers:")] public NSArray? ProviderInPlaceFileTypeIdentifiers { get; set; }
+    [Selector("providerDataTypeIdentifiers", "setProviderDataTypeIdentifiers:")]
+    public NSArray? ProviderDataTypeIdentifiers { get; set; }
+    [Selector("providerFileTypeIdentifiers", "setProviderFileTypeIdentifiers:")]
+    public NSArray? ProviderFileTypeIdentifiers { get; set; }
+    [Selector("providerInPlaceFileTypeIdentifiers", "setProviderInPlaceFileTypeIdentifiers:")]
+    public NSArray? ProviderInPlaceFileTypeIdentifiers { get; set; }
 }
 
 #endif

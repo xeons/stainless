@@ -34,20 +34,28 @@ import Standard.ObjC;
 
 public extern objc class MPSImageAreaMax : MPSUnaryImageKernel
 {
-    [Selector("kernelHeight")] public NSUInteger KernelHeight { get; }
-    [Selector("kernelWidth")] public NSUInteger KernelWidth { get; }
-    [Selector("initWithDevice:kernelWidth:kernelHeight:")] public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("kernelHeight")]
+    public NSUInteger KernelHeight { get; }
+    [Selector("kernelWidth")]
+    public NSUInteger KernelWidth { get; }
+    [Selector("initWithDevice:kernelWidth:kernelHeight:")]
+    public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSImageAreaMin : MPSImageAreaMax { }
 
 public extern objc class MPSImageDilate : MPSUnaryImageKernel
 {
-    [Selector("kernelHeight")] public NSUInteger KernelHeight { get; }
-    [Selector("kernelWidth")] public NSUInteger KernelWidth { get; }
-    [Selector("initWithDevice:kernelWidth:kernelHeight:values:")] public Self InitWithDeviceKernelWidthKernelHeightValues(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, float* values);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("kernelHeight")]
+    public NSUInteger KernelHeight { get; }
+    [Selector("kernelWidth")]
+    public NSUInteger KernelWidth { get; }
+    [Selector("initWithDevice:kernelWidth:kernelHeight:values:")]
+    public Self InitWithDeviceKernelWidthKernelHeightValues(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight, float* values);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSImageErode : MPSImageDilate { }

@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class VZVmnetNetworkDeviceAttachment : VZNetworkDeviceAttachment
 {
-    [Selector("network")] public vmnet_network_ref Network { get; }
-    [Selector("initWithNetwork:")] public Self InitWithNetwork(vmnet_network_ref network);
+    [Selector("network")]
+    public vmnet_network_ref Network { get; }
+    [Selector("initWithNetwork:")]
+    public Self InitWithNetwork(vmnet_network_ref network);
 }
 
 #endif

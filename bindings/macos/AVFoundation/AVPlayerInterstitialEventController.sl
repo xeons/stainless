@@ -57,33 +57,56 @@ public enum AVPlayerInterstitialEventTimelineOccupancy : long
 
 public extern objc class AVPlayerInterstitialEvent : NSObject, NSCopying
 {
-    [Selector("primaryItem")] public AVPlayerItem? PrimaryItem { get; }
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("time")] public CMTime Time { get; }
-    [Selector("date")] public NSDate? Date { get; }
-    [Selector("templateItems")] public NSArray TemplateItems { get; }
-    [Selector("restrictions")] public AVPlayerInterstitialEventRestrictions Restrictions { get; }
-    [Selector("resumptionOffset")] public CMTime ResumptionOffset { get; }
-    [Selector("playoutLimit")] public CMTime PlayoutLimit { get; }
-    [Selector("alignsStartWithPrimarySegmentBoundary")] public bool AlignsStartWithPrimarySegmentBoundary { get; }
-    [Selector("alignsResumptionWithPrimarySegmentBoundary")] public bool AlignsResumptionWithPrimarySegmentBoundary { get; }
-    [Selector("cue")] public AVPlayerInterstitialEventCue Cue { get; }
-    [Selector("willPlayOnce")] public bool WillPlayOnce { get; }
-    [Selector("userDefinedAttributes")] public NSDictionary UserDefinedAttributes { get; }
-    [Selector("assetListResponse")] public NSDictionary? AssetListResponse { get; }
-    [Selector("timelineOccupancy")] public AVPlayerInterstitialEventTimelineOccupancy TimelineOccupancy { get; }
-    [Selector("supplementsPrimaryContent")] public bool SupplementsPrimaryContent { get; }
-    [Selector("contentMayVary")] public bool ContentMayVary { get; }
+    [Selector("primaryItem")]
+    public AVPlayerItem? PrimaryItem { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("time")]
+    public CMTime Time { get; }
+    [Selector("date")]
+    public NSDate? Date { get; }
+    [Selector("templateItems")]
+    public NSArray TemplateItems { get; }
+    [Selector("restrictions")]
+    public AVPlayerInterstitialEventRestrictions Restrictions { get; }
+    [Selector("resumptionOffset")]
+    public CMTime ResumptionOffset { get; }
+    [Selector("playoutLimit")]
+    public CMTime PlayoutLimit { get; }
+    [Selector("alignsStartWithPrimarySegmentBoundary")]
+    public bool AlignsStartWithPrimarySegmentBoundary { get; }
+    [Selector("alignsResumptionWithPrimarySegmentBoundary")]
+    public bool AlignsResumptionWithPrimarySegmentBoundary { get; }
+    [Selector("cue")]
+    public AVPlayerInterstitialEventCue Cue { get; }
+    [Selector("willPlayOnce")]
+    public bool WillPlayOnce { get; }
+    [Selector("userDefinedAttributes")]
+    public NSDictionary UserDefinedAttributes { get; }
+    [Selector("assetListResponse")]
+    public NSDictionary? AssetListResponse { get; }
+    [Selector("timelineOccupancy")]
+    public AVPlayerInterstitialEventTimelineOccupancy TimelineOccupancy { get; }
+    [Selector("supplementsPrimaryContent")]
+    public bool SupplementsPrimaryContent { get; }
+    [Selector("contentMayVary")]
+    public bool ContentMayVary { get; }
     /// macOS 26.0 and later.
-    [Selector("skipControlTimeRange")] public CMTimeRange SkipControlTimeRange { get; }
+    [Selector("skipControlTimeRange")]
+    public CMTimeRange SkipControlTimeRange { get; }
     /// macOS 26.0 and later.
-    [Selector("skipControlLocalizedLabelBundleKey")] public NSString? SkipControlLocalizedLabelBundleKey { get; }
+    [Selector("skipControlLocalizedLabelBundleKey")]
+    public NSString? SkipControlLocalizedLabelBundleKey { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("interstitialEventWithPrimaryItem:identifier:time:templateItems:restrictions:resumptionOffset:playoutLimit:userDefinedAttributes:")] public static Self InterstitialEventWithPrimaryItemIdentifierTimeTemplateItemsRestrictionsResumptionOffsetPlayoutLimitUserDefinedAttributes(AVPlayerItem primaryItem, NSString? identifier, CMTime time, NSArray templateItems, AVPlayerInterstitialEventRestrictions restrictions, CMTime resumptionOffset, CMTime playoutLimit, NSDictionary? userDefinedAttributes);
+    [Selector("interstitialEventWithPrimaryItem:identifier:time:templateItems:restrictions:resumptionOffset:playoutLimit:userDefinedAttributes:")]
+    public static Self InterstitialEventWithPrimaryItemIdentifierTimeTemplateItemsRestrictionsResumptionOffsetPlayoutLimitUserDefinedAttributes(AVPlayerItem primaryItem, NSString? identifier, CMTime time, NSArray templateItems, AVPlayerInterstitialEventRestrictions restrictions, CMTime resumptionOffset, CMTime playoutLimit, NSDictionary? userDefinedAttributes);
     /// Deprecated in macOS 15.0.
-    [Selector("interstitialEventWithPrimaryItem:identifier:date:templateItems:restrictions:resumptionOffset:playoutLimit:userDefinedAttributes:")] public static Self InterstitialEventWithPrimaryItemIdentifierDateTemplateItemsRestrictionsResumptionOffsetPlayoutLimitUserDefinedAttributes(AVPlayerItem primaryItem, NSString? identifier, NSDate date, NSArray templateItems, AVPlayerInterstitialEventRestrictions restrictions, CMTime resumptionOffset, CMTime playoutLimit, NSDictionary? userDefinedAttributes);
-    [Selector("interstitialEventWithPrimaryItem:time:")] public static Self InterstitialEventWithPrimaryItemTime(AVPlayerItem primaryItem, CMTime time);
-    [Selector("interstitialEventWithPrimaryItem:date:")] public static Self InterstitialEventWithPrimaryItemDate(AVPlayerItem primaryItem, NSDate date);
+    [Selector("interstitialEventWithPrimaryItem:identifier:date:templateItems:restrictions:resumptionOffset:playoutLimit:userDefinedAttributes:")]
+    public static Self InterstitialEventWithPrimaryItemIdentifierDateTemplateItemsRestrictionsResumptionOffsetPlayoutLimitUserDefinedAttributes(AVPlayerItem primaryItem, NSString? identifier, NSDate date, NSArray templateItems, AVPlayerInterstitialEventRestrictions restrictions, CMTime resumptionOffset, CMTime playoutLimit, NSDictionary? userDefinedAttributes);
+    [Selector("interstitialEventWithPrimaryItem:time:")]
+    public static Self InterstitialEventWithPrimaryItemTime(AVPlayerItem primaryItem, CMTime time);
+    [Selector("interstitialEventWithPrimaryItem:date:")]
+    public static Self InterstitialEventWithPrimaryItemDate(AVPlayerItem primaryItem, NSDate date);
 }
 
 public enum AVPlayerInterstitialEventAssetListResponseStatus : long
@@ -105,21 +128,30 @@ public enum AVPlayerInterstitialEventSkippableEventState : long
 /// MutableEvents, a category of AVPlayerInterstitialEvent.
 public extern objc class AVPlayerInterstitialEvent
 {
-    [Selector("plannedDuration", "setPlannedDuration:")] public CMTime PlannedDuration { get; set; }
+    [Selector("plannedDuration", "setPlannedDuration:")]
+    public CMTime PlannedDuration { get; set; }
 }
 
 public extern objc class AVPlayerInterstitialEventMonitor : NSObject
 {
-    [Selector("primaryPlayer")] public AVPlayer? PrimaryPlayer { get; }
-    [Selector("interstitialPlayer")] public AVQueuePlayer InterstitialPlayer { get; }
-    [Selector("events")] public NSArray Events { get; }
-    [Selector("currentEvent")] public AVPlayerInterstitialEvent? CurrentEvent { get; }
+    [Selector("primaryPlayer")]
+    public AVPlayer? PrimaryPlayer { get; }
+    [Selector("interstitialPlayer")]
+    public AVQueuePlayer InterstitialPlayer { get; }
+    [Selector("events")]
+    public NSArray Events { get; }
+    [Selector("currentEvent")]
+    public AVPlayerInterstitialEvent? CurrentEvent { get; }
     /// macOS 26.0 and later.
-    [Selector("currentEventSkippableState")] public AVPlayerInterstitialEventSkippableEventState CurrentEventSkippableState { get; }
+    [Selector("currentEventSkippableState")]
+    public AVPlayerInterstitialEventSkippableEventState CurrentEventSkippableState { get; }
     /// macOS 26.0 and later.
-    [Selector("currentEventSkipControlLabel")] public NSString? CurrentEventSkipControlLabel { get; }
-    [Selector("interstitialEventMonitorWithPrimaryPlayer:")] public static Self InterstitialEventMonitorWithPrimaryPlayer(AVPlayer primaryPlayer);
-    [Selector("initWithPrimaryPlayer:")] public Self InitWithPrimaryPlayer(AVPlayer primaryPlayer);
+    [Selector("currentEventSkipControlLabel")]
+    public NSString? CurrentEventSkipControlLabel { get; }
+    [Selector("interstitialEventMonitorWithPrimaryPlayer:")]
+    public static Self InterstitialEventMonitorWithPrimaryPlayer(AVPlayer primaryPlayer);
+    [Selector("initWithPrimaryPlayer:")]
+    public Self InitWithPrimaryPlayer(AVPlayer primaryPlayer);
 }
 
 public extern "C" NSNotificationName AVPlayerInterstitialEventMonitorEventsDidChangeNotification;
@@ -175,16 +207,23 @@ public extern "C" NSString AVPlayerInterstitialEventMonitorInterstitialEventDidF
 
 public extern objc class AVPlayerInterstitialEventController : AVPlayerInterstitialEventMonitor
 {
-    [Selector("events", "setEvents:")] public NSArray? Events { get; set; }
+    [Selector("events", "setEvents:")]
+    public NSArray? Events { get; set; }
     /// macOS 26.0 and later.
-    [Selector("localizedStringsBundle", "setLocalizedStringsBundle:")] public NSBundle? LocalizedStringsBundle { get; set; }
+    [Selector("localizedStringsBundle", "setLocalizedStringsBundle:")]
+    public NSBundle? LocalizedStringsBundle { get; set; }
     /// macOS 26.0 and later.
-    [Selector("localizedStringsTableName", "setLocalizedStringsTableName:")] public NSString? LocalizedStringsTableName { get; set; }
-    [Selector("interstitialEventControllerWithPrimaryPlayer:")] public static Self InterstitialEventControllerWithPrimaryPlayer(AVPlayer primaryPlayer);
-    [Selector("initWithPrimaryPlayer:")] public Self InitWithPrimaryPlayer(AVPlayer primaryPlayer);
-    [Selector("cancelCurrentEventWithResumptionOffset:")] public void CancelCurrentEventWithResumptionOffset(CMTime resumptionOffset);
+    [Selector("localizedStringsTableName", "setLocalizedStringsTableName:")]
+    public NSString? LocalizedStringsTableName { get; set; }
+    [Selector("interstitialEventControllerWithPrimaryPlayer:")]
+    public static Self InterstitialEventControllerWithPrimaryPlayer(AVPlayer primaryPlayer);
+    [Selector("initWithPrimaryPlayer:")]
+    public Self InitWithPrimaryPlayer(AVPlayer primaryPlayer);
+    [Selector("cancelCurrentEventWithResumptionOffset:")]
+    public void CancelCurrentEventWithResumptionOffset(CMTime resumptionOffset);
     /// macOS 26.0 and later.
-    [Selector("skipCurrentEvent")] public void SkipCurrentEvent();
+    [Selector("skipCurrentEvent")]
+    public void SkipCurrentEvent();
 }
 
 /// AVPlayerInterstitialSupport, a category of AVPlayer.
@@ -195,8 +234,10 @@ public extern "C" AVPlayerWaitingReason AVPlayerWaitingDuringInterstitialEventRe
 /// AVPlayerInterstitialSupport, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    [Selector("automaticallyHandlesInterstitialEvents", "setAutomaticallyHandlesInterstitialEvents:")] public bool AutomaticallyHandlesInterstitialEvents { get; set; }
-    [Selector("templatePlayerItem")] public AVPlayerItem? TemplatePlayerItem { get; }
+    [Selector("automaticallyHandlesInterstitialEvents", "setAutomaticallyHandlesInterstitialEvents:")]
+    public bool AutomaticallyHandlesInterstitialEvents { get; set; }
+    [Selector("templatePlayerItem")]
+    public AVPlayerItem? TemplatePlayerItem { get; }
 }
 
 #endif

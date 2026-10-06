@@ -39,26 +39,40 @@ public const int DOM_BUBBLING_PHASE = 3;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMEvent : DOMObject
 {
-    [Selector("type")] public NSString? Type { get; }
-    [Selector("target")] public DOMEventTarget? Target { get; }
-    [Selector("currentTarget")] public DOMEventTarget? CurrentTarget { get; }
-    [Selector("eventPhase")] public ushort EventPhase { get; }
-    [Selector("bubbles")] public bool Bubbles { get; }
-    [Selector("cancelable")] public bool Cancelable { get; }
-    [Selector("timeStamp")] public DOMTimeStamp TimeStamp { get; }
-    [Selector("srcElement")] public DOMEventTarget? SrcElement { get; }
-    [Selector("returnValue", "setReturnValue:")] public bool ReturnValue { get; set; }
-    [Selector("cancelBubble", "setCancelBubble:")] public bool CancelBubble { get; set; }
-    [Selector("stopPropagation")] public void StopPropagation();
-    [Selector("preventDefault")] public void PreventDefault();
-    [Selector("initEvent:canBubbleArg:cancelableArg:")] public void InitEventCanBubbleArgCancelableArg(NSString? eventTypeArg, bool canBubbleArg, bool cancelableArg);
+    [Selector("type")]
+    public NSString? Type { get; }
+    [Selector("target")]
+    public DOMEventTarget? Target { get; }
+    [Selector("currentTarget")]
+    public DOMEventTarget? CurrentTarget { get; }
+    [Selector("eventPhase")]
+    public ushort EventPhase { get; }
+    [Selector("bubbles")]
+    public bool Bubbles { get; }
+    [Selector("cancelable")]
+    public bool Cancelable { get; }
+    [Selector("timeStamp")]
+    public DOMTimeStamp TimeStamp { get; }
+    [Selector("srcElement")]
+    public DOMEventTarget? SrcElement { get; }
+    [Selector("returnValue", "setReturnValue:")]
+    public bool ReturnValue { get; set; }
+    [Selector("cancelBubble", "setCancelBubble:")]
+    public bool CancelBubble { get; set; }
+    [Selector("stopPropagation")]
+    public void StopPropagation();
+    [Selector("preventDefault")]
+    public void PreventDefault();
+    [Selector("initEvent:canBubbleArg:cancelableArg:")]
+    public void InitEventCanBubbleArgCancelableArg(NSString? eventTypeArg, bool canBubbleArg, bool cancelableArg);
 }
 
 /// DOMEventDeprecated, a category of DOMEvent.
 public extern objc class DOMEvent
 {
     /// Deprecated in macOS 10.5.
-    [Selector("initEvent:::")] public void InitEvent(NSString? eventTypeArg, bool canBubbleArg, bool cancelableArg);
+    [Selector("initEvent:::")]
+    public void InitEvent(NSString? eventTypeArg, bool canBubbleArg, bool cancelableArg);
 }
 
 #endif

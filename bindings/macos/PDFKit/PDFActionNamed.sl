@@ -48,8 +48,10 @@ public enum PDFActionNamedName : long
 
 public extern objc class PDFActionNamed : PDFAction, NSCopying
 {
-    [Selector("name", "setName:")] public PDFActionNamedName Name { get; set; }
-    [Selector("initWithName:")] public Self InitWithName(PDFActionNamedName name);
+    [Selector("name", "setName:")]
+    public PDFActionNamedName Name { get; set; }
+    [Selector("initWithName:")]
+    public Self InitWithName(PDFActionNamedName name);
 }
 
 #endif

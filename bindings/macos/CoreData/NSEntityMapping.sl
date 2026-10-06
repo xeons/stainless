@@ -43,17 +43,28 @@ public enum NSEntityMappingType : ulong
 
 public extern objc class NSEntityMapping : NSObject
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("mappingType", "setMappingType:")] public NSEntityMappingType MappingType { get; set; }
-    [Selector("sourceEntityName", "setSourceEntityName:")] public NSString? SourceEntityName { get; set; }
-    [Selector("sourceEntityVersionHash", "setSourceEntityVersionHash:")] public NSData? SourceEntityVersionHash { get; set; }
-    [Selector("destinationEntityName", "setDestinationEntityName:")] public NSString? DestinationEntityName { get; set; }
-    [Selector("destinationEntityVersionHash", "setDestinationEntityVersionHash:")] public NSData? DestinationEntityVersionHash { get; set; }
-    [Selector("attributeMappings", "setAttributeMappings:")] public NSArray? AttributeMappings { get; set; }
-    [Selector("relationshipMappings", "setRelationshipMappings:")] public NSArray? RelationshipMappings { get; set; }
-    [Selector("sourceExpression", "setSourceExpression:")] public NSExpression? SourceExpression { get; set; }
-    [Selector("userInfo", "setUserInfo:")] public NSDictionary? UserInfo { get; set; }
-    [Selector("entityMigrationPolicyClassName", "setEntityMigrationPolicyClassName:")] public NSString? EntityMigrationPolicyClassName { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("mappingType", "setMappingType:")]
+    public NSEntityMappingType MappingType { get; set; }
+    [Selector("sourceEntityName", "setSourceEntityName:")]
+    public NSString? SourceEntityName { get; set; }
+    [Selector("sourceEntityVersionHash", "setSourceEntityVersionHash:")]
+    public NSData? SourceEntityVersionHash { get; set; }
+    [Selector("destinationEntityName", "setDestinationEntityName:")]
+    public NSString? DestinationEntityName { get; set; }
+    [Selector("destinationEntityVersionHash", "setDestinationEntityVersionHash:")]
+    public NSData? DestinationEntityVersionHash { get; set; }
+    [Selector("attributeMappings", "setAttributeMappings:")]
+    public NSArray? AttributeMappings { get; set; }
+    [Selector("relationshipMappings", "setRelationshipMappings:")]
+    public NSArray? RelationshipMappings { get; set; }
+    [Selector("sourceExpression", "setSourceExpression:")]
+    public NSExpression? SourceExpression { get; set; }
+    [Selector("userInfo", "setUserInfo:")]
+    public NSDictionary? UserInfo { get; set; }
+    [Selector("entityMigrationPolicyClassName", "setEntityMigrationPolicyClassName:")]
+    public NSString? EntityMigrationPolicyClassName { get; set; }
 }
 
 #endif

@@ -32,10 +32,16 @@ import Standard.ObjC;
 
 public objc interface MKOverlay : MKAnnotation
 {
-    [Selector("coordinate")] CLLocationCoordinate2D Coordinate { get; }
-    [Selector("boundingMapRect")] MKMapRect BoundingMapRect { get; }
-    [Optional] [Selector("intersectsMapRect:")] bool IntersectsMapRect(MKMapRect mapRect);
-    [Optional] [Selector("canReplaceMapContent")] bool CanReplaceMapContent();
+    [Selector("coordinate")]
+    CLLocationCoordinate2D Coordinate { get; }
+    [Selector("boundingMapRect")]
+    MKMapRect BoundingMapRect { get; }
+    [Optional]
+    [Selector("intersectsMapRect:")]
+    bool IntersectsMapRect(MKMapRect mapRect);
+    [Optional]
+    [Selector("canReplaceMapContent")]
+    bool CanReplaceMapContent();
 }
 
 #endif

@@ -170,106 +170,170 @@ public enum ICScannerFeatureType : ulong
 
 public extern objc class ICScannerFeature : NSObject
 {
-    [Selector("type")] public ICScannerFeatureType Type { get; }
-    [Selector("internalName")] public NSString? InternalName { get; }
-    [Selector("humanReadableName")] public NSString? HumanReadableName { get; }
-    [Selector("tooltip")] public NSString? Tooltip { get; }
+    [Selector("type")]
+    public ICScannerFeatureType Type { get; }
+    [Selector("internalName")]
+    public NSString? InternalName { get; }
+    [Selector("humanReadableName")]
+    public NSString? HumanReadableName { get; }
+    [Selector("tooltip")]
+    public NSString? Tooltip { get; }
 }
 
 public extern objc class ICScannerFeatureEnumeration : ICScannerFeature
 {
-    [Selector("currentValue", "setCurrentValue:")] public AnyObject CurrentValue { get; set; }
-    [Selector("defaultValue")] public AnyObject DefaultValue { get; }
-    [Selector("values")] public NSArray Values { get; }
-    [Selector("menuItemLabels")] public NSArray MenuItemLabels { get; }
-    [Selector("menuItemLabelsTooltips")] public NSArray MenuItemLabelsTooltips { get; }
+    [Selector("currentValue", "setCurrentValue:")]
+    public AnyObject CurrentValue { get; set; }
+    [Selector("defaultValue")]
+    public AnyObject DefaultValue { get; }
+    [Selector("values")]
+    public NSArray Values { get; }
+    [Selector("menuItemLabels")]
+    public NSArray MenuItemLabels { get; }
+    [Selector("menuItemLabelsTooltips")]
+    public NSArray MenuItemLabelsTooltips { get; }
 }
 
 public extern objc class ICScannerFeatureRange : ICScannerFeature
 {
-    [Selector("currentValue", "setCurrentValue:")] public CGFloat CurrentValue { get; set; }
-    [Selector("defaultValue")] public CGFloat DefaultValue { get; }
-    [Selector("minValue")] public CGFloat MinValue { get; }
-    [Selector("maxValue")] public CGFloat MaxValue { get; }
-    [Selector("stepSize")] public CGFloat StepSize { get; }
+    [Selector("currentValue", "setCurrentValue:")]
+    public CGFloat CurrentValue { get; set; }
+    [Selector("defaultValue")]
+    public CGFloat DefaultValue { get; }
+    [Selector("minValue")]
+    public CGFloat MinValue { get; }
+    [Selector("maxValue")]
+    public CGFloat MaxValue { get; }
+    [Selector("stepSize")]
+    public CGFloat StepSize { get; }
 }
 
 public extern objc class ICScannerFeatureBoolean : ICScannerFeature
 {
-    [Selector("value", "setValue:")] public bool Value { get; set; }
+    [Selector("value", "setValue:")]
+    public bool Value { get; set; }
 }
 
 public extern objc class ICScannerFeatureTemplate : ICScannerFeature
 {
-    [Selector("targets")] public NSArray Targets { get; }
+    [Selector("targets")]
+    public NSArray Targets { get; }
 }
 
 public extern objc class ICScannerFunctionalUnit : NSObject
 {
-    [Selector("type")] public ICScannerFunctionalUnitType Type { get; }
-    [Selector("pixelDataType", "setPixelDataType:")] public ICScannerPixelDataType PixelDataType { get; set; }
-    [Selector("supportedBitDepths")] public NSIndexSet SupportedBitDepths { get; }
-    [Selector("bitDepth", "setBitDepth:")] public ICScannerBitDepth BitDepth { get; set; }
-    [Selector("supportedMeasurementUnits")] public NSIndexSet SupportedMeasurementUnits { get; }
-    [Selector("measurementUnit", "setMeasurementUnit:")] public ICScannerMeasurementUnit MeasurementUnit { get; set; }
-    [Selector("supportedResolutions")] public NSIndexSet SupportedResolutions { get; }
-    [Selector("preferredResolutions")] public NSIndexSet PreferredResolutions { get; }
-    [Selector("resolution", "setResolution:")] public NSUInteger Resolution { get; set; }
-    [Selector("nativeXResolution")] public NSUInteger NativeXResolution { get; }
-    [Selector("nativeYResolution")] public NSUInteger NativeYResolution { get; }
-    [Selector("supportedScaleFactors")] public NSIndexSet SupportedScaleFactors { get; }
-    [Selector("preferredScaleFactors")] public NSIndexSet PreferredScaleFactors { get; }
-    [Selector("scaleFactor", "setScaleFactor:")] public NSUInteger ScaleFactor { get; set; }
-    [Selector("templates")] public NSArray Templates { get; }
-    [Selector("vendorFeatures")] public NSArray? VendorFeatures { get; }
-    [Selector("physicalSize")] public NSSize PhysicalSize { get; }
-    [Selector("scanArea", "setScanArea:")] public NSRect ScanArea { get; set; }
-    [Selector("scanAreaOrientation", "setScanAreaOrientation:")] public ICEXIFOrientationType ScanAreaOrientation { get; set; }
-    [Selector("acceptsThresholdForBlackAndWhiteScanning")] public bool AcceptsThresholdForBlackAndWhiteScanning { get; }
-    [Selector("usesThresholdForBlackAndWhiteScanning", "setUsesThresholdForBlackAndWhiteScanning:")] public bool UsesThresholdForBlackAndWhiteScanning { get; set; }
-    [Selector("defaultThresholdForBlackAndWhiteScanning")] public byte DefaultThresholdForBlackAndWhiteScanning { get; }
-    [Selector("thresholdForBlackAndWhiteScanning", "setThresholdForBlackAndWhiteScanning:")] public byte ThresholdForBlackAndWhiteScanning { get; set; }
-    [Selector("state")] public ICScannerFunctionalUnitState State { get; }
-    [Selector("scanInProgress")] public bool ScanInProgress { get; }
-    [Selector("scanProgressPercentDone")] public CGFloat ScanProgressPercentDone { get; }
-    [Selector("canPerformOverviewScan")] public bool CanPerformOverviewScan { get; }
-    [Selector("overviewScanInProgress")] public bool OverviewScanInProgress { get; }
-    [Selector("overviewImage")] public CGImageRef? OverviewImage { get; }
-    [Selector("overviewResolution", "setOverviewResolution:")] public NSUInteger OverviewResolution { get; set; }
+    [Selector("type")]
+    public ICScannerFunctionalUnitType Type { get; }
+    [Selector("pixelDataType", "setPixelDataType:")]
+    public ICScannerPixelDataType PixelDataType { get; set; }
+    [Selector("supportedBitDepths")]
+    public NSIndexSet SupportedBitDepths { get; }
+    [Selector("bitDepth", "setBitDepth:")]
+    public ICScannerBitDepth BitDepth { get; set; }
+    [Selector("supportedMeasurementUnits")]
+    public NSIndexSet SupportedMeasurementUnits { get; }
+    [Selector("measurementUnit", "setMeasurementUnit:")]
+    public ICScannerMeasurementUnit MeasurementUnit { get; set; }
+    [Selector("supportedResolutions")]
+    public NSIndexSet SupportedResolutions { get; }
+    [Selector("preferredResolutions")]
+    public NSIndexSet PreferredResolutions { get; }
+    [Selector("resolution", "setResolution:")]
+    public NSUInteger Resolution { get; set; }
+    [Selector("nativeXResolution")]
+    public NSUInteger NativeXResolution { get; }
+    [Selector("nativeYResolution")]
+    public NSUInteger NativeYResolution { get; }
+    [Selector("supportedScaleFactors")]
+    public NSIndexSet SupportedScaleFactors { get; }
+    [Selector("preferredScaleFactors")]
+    public NSIndexSet PreferredScaleFactors { get; }
+    [Selector("scaleFactor", "setScaleFactor:")]
+    public NSUInteger ScaleFactor { get; set; }
+    [Selector("templates")]
+    public NSArray Templates { get; }
+    [Selector("vendorFeatures")]
+    public NSArray? VendorFeatures { get; }
+    [Selector("physicalSize")]
+    public NSSize PhysicalSize { get; }
+    [Selector("scanArea", "setScanArea:")]
+    public NSRect ScanArea { get; set; }
+    [Selector("scanAreaOrientation", "setScanAreaOrientation:")]
+    public ICEXIFOrientationType ScanAreaOrientation { get; set; }
+    [Selector("acceptsThresholdForBlackAndWhiteScanning")]
+    public bool AcceptsThresholdForBlackAndWhiteScanning { get; }
+    [Selector("usesThresholdForBlackAndWhiteScanning", "setUsesThresholdForBlackAndWhiteScanning:")]
+    public bool UsesThresholdForBlackAndWhiteScanning { get; set; }
+    [Selector("defaultThresholdForBlackAndWhiteScanning")]
+    public byte DefaultThresholdForBlackAndWhiteScanning { get; }
+    [Selector("thresholdForBlackAndWhiteScanning", "setThresholdForBlackAndWhiteScanning:")]
+    public byte ThresholdForBlackAndWhiteScanning { get; set; }
+    [Selector("state")]
+    public ICScannerFunctionalUnitState State { get; }
+    [Selector("scanInProgress")]
+    public bool ScanInProgress { get; }
+    [Selector("scanProgressPercentDone")]
+    public CGFloat ScanProgressPercentDone { get; }
+    [Selector("canPerformOverviewScan")]
+    public bool CanPerformOverviewScan { get; }
+    [Selector("overviewScanInProgress")]
+    public bool OverviewScanInProgress { get; }
+    [Selector("overviewImage")]
+    public CGImageRef? OverviewImage { get; }
+    [Selector("overviewResolution", "setOverviewResolution:")]
+    public NSUInteger OverviewResolution { get; set; }
 }
 
 public extern objc class ICScannerFunctionalUnitFlatbed : ICScannerFunctionalUnit
 {
-    [Selector("supportedDocumentTypes")] public NSIndexSet SupportedDocumentTypes { get; }
-    [Selector("documentType", "setDocumentType:")] public ICScannerDocumentType DocumentType { get; set; }
-    [Selector("documentSize")] public NSSize DocumentSize { get; }
+    [Selector("supportedDocumentTypes")]
+    public NSIndexSet SupportedDocumentTypes { get; }
+    [Selector("documentType", "setDocumentType:")]
+    public ICScannerDocumentType DocumentType { get; set; }
+    [Selector("documentSize")]
+    public NSSize DocumentSize { get; }
 }
 
 public extern objc class ICScannerFunctionalUnitPositiveTransparency : ICScannerFunctionalUnit
 {
-    [Selector("supportedDocumentTypes")] public NSIndexSet SupportedDocumentTypes { get; }
-    [Selector("documentType", "setDocumentType:")] public ICScannerDocumentType DocumentType { get; set; }
-    [Selector("documentSize")] public NSSize DocumentSize { get; }
+    [Selector("supportedDocumentTypes")]
+    public NSIndexSet SupportedDocumentTypes { get; }
+    [Selector("documentType", "setDocumentType:")]
+    public ICScannerDocumentType DocumentType { get; set; }
+    [Selector("documentSize")]
+    public NSSize DocumentSize { get; }
 }
 
 public extern objc class ICScannerFunctionalUnitNegativeTransparency : ICScannerFunctionalUnit
 {
-    [Selector("supportedDocumentTypes")] public NSIndexSet SupportedDocumentTypes { get; }
-    [Selector("documentType", "setDocumentType:")] public ICScannerDocumentType DocumentType { get; set; }
-    [Selector("documentSize")] public NSSize DocumentSize { get; }
+    [Selector("supportedDocumentTypes")]
+    public NSIndexSet SupportedDocumentTypes { get; }
+    [Selector("documentType", "setDocumentType:")]
+    public ICScannerDocumentType DocumentType { get; set; }
+    [Selector("documentSize")]
+    public NSSize DocumentSize { get; }
 }
 
 public extern objc class ICScannerFunctionalUnitDocumentFeeder : ICScannerFunctionalUnit
 {
-    [Selector("supportedDocumentTypes")] public NSIndexSet SupportedDocumentTypes { get; }
-    [Selector("documentType", "setDocumentType:")] public ICScannerDocumentType DocumentType { get; set; }
-    [Selector("documentSize")] public NSSize DocumentSize { get; }
-    [Selector("supportsDuplexScanning")] public bool SupportsDuplexScanning { get; }
-    [Selector("duplexScanningEnabled", "setDuplexScanningEnabled:")] public bool DuplexScanningEnabled { get; set; }
-    [Selector("documentLoaded")] public bool DocumentLoaded { get; }
-    [Selector("oddPageOrientation", "setOddPageOrientation:")] public ICEXIFOrientationType OddPageOrientation { get; set; }
-    [Selector("evenPageOrientation", "setEvenPageOrientation:")] public ICEXIFOrientationType EvenPageOrientation { get; set; }
-    [Selector("reverseFeederPageOrder")] public bool ReverseFeederPageOrder { get; }
+    [Selector("supportedDocumentTypes")]
+    public NSIndexSet SupportedDocumentTypes { get; }
+    [Selector("documentType", "setDocumentType:")]
+    public ICScannerDocumentType DocumentType { get; set; }
+    [Selector("documentSize")]
+    public NSSize DocumentSize { get; }
+    [Selector("supportsDuplexScanning")]
+    public bool SupportsDuplexScanning { get; }
+    [Selector("duplexScanningEnabled", "setDuplexScanningEnabled:")]
+    public bool DuplexScanningEnabled { get; set; }
+    [Selector("documentLoaded")]
+    public bool DocumentLoaded { get; }
+    [Selector("oddPageOrientation", "setOddPageOrientation:")]
+    public ICEXIFOrientationType OddPageOrientation { get; set; }
+    [Selector("evenPageOrientation", "setEvenPageOrientation:")]
+    public ICEXIFOrientationType EvenPageOrientation { get; set; }
+    [Selector("reverseFeederPageOrder")]
+    public bool ReverseFeederPageOrder { get; }
 }
 
 #endif

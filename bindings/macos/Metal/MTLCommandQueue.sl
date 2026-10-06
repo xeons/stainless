@@ -33,23 +33,35 @@ import Standard.ObjC;
 
 public objc interface MTLCommandQueue : NSObjectProtocol
 {
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("commandBuffer")] MTLCommandBuffer? CommandBuffer();
-    [Selector("commandBufferWithDescriptor:")] MTLCommandBuffer? CommandBufferWithDescriptor(MTLCommandBufferDescriptor descriptor);
-    [Selector("commandBufferWithUnretainedReferences")] MTLCommandBuffer? CommandBufferWithUnretainedReferences();
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("commandBuffer")]
+    MTLCommandBuffer? CommandBuffer();
+    [Selector("commandBufferWithDescriptor:")]
+    MTLCommandBuffer? CommandBufferWithDescriptor(MTLCommandBufferDescriptor descriptor);
+    [Selector("commandBufferWithUnretainedReferences")]
+    MTLCommandBuffer? CommandBufferWithUnretainedReferences();
     /// Deprecated in macOS 10.13.
-    [Selector("insertDebugCaptureBoundary")] void InsertDebugCaptureBoundary();
-    [Selector("addResidencySet:")] void AddResidencySet(MTLResidencySet residencySet);
-    [Selector("addResidencySets:count:")] void AddResidencySetsCount(void** residencySets, NSUInteger count);
-    [Selector("removeResidencySet:")] void RemoveResidencySet(MTLResidencySet residencySet);
-    [Selector("removeResidencySets:count:")] void RemoveResidencySetsCount(void** residencySets, NSUInteger count);
+    [Selector("insertDebugCaptureBoundary")]
+    void InsertDebugCaptureBoundary();
+    [Selector("addResidencySet:")]
+    void AddResidencySet(MTLResidencySet residencySet);
+    [Selector("addResidencySets:count:")]
+    void AddResidencySetsCount(void** residencySets, NSUInteger count);
+    [Selector("removeResidencySet:")]
+    void RemoveResidencySet(MTLResidencySet residencySet);
+    [Selector("removeResidencySets:count:")]
+    void RemoveResidencySetsCount(void** residencySets, NSUInteger count);
 }
 
 public extern objc class MTLCommandQueueDescriptor : NSObject, NSCopying
 {
-    [Selector("maxCommandBufferCount", "setMaxCommandBufferCount:")] public NSUInteger MaxCommandBufferCount { get; set; }
-    [Selector("logState", "setLogState:")] public MTLLogState? LogState { get; set; }
+    [Selector("maxCommandBufferCount", "setMaxCommandBufferCount:")]
+    public NSUInteger MaxCommandBufferCount { get; set; }
+    [Selector("logState", "setLogState:")]
+    public MTLLogState? LogState { get; set; }
 }
 
 #endif

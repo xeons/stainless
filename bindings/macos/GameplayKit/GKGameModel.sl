@@ -33,25 +33,40 @@ import Standard.ObjC;
 
 public objc interface GKGameModelUpdate : NSObjectProtocol
 {
-    [Selector("value", "setValue:")] NSInteger Value { get; set; }
+    [Selector("value", "setValue:")]
+    NSInteger Value { get; set; }
 }
 
 public objc interface GKGameModelPlayer : NSObjectProtocol
 {
-    [Selector("playerId")] NSInteger PlayerId { get; }
+    [Selector("playerId")]
+    NSInteger PlayerId { get; }
 }
 
 public objc interface GKGameModel : NSObjectProtocol, NSCopying
 {
-    [Selector("players")] NSArray? Players { get; }
-    [Selector("activePlayer")] GKGameModelPlayer? ActivePlayer { get; }
-    [Selector("setGameModel:")] void SetGameModel(GKGameModel gameModel);
-    [Selector("gameModelUpdatesForPlayer:")] NSArray? GameModelUpdatesForPlayer(GKGameModelPlayer player);
-    [Selector("applyGameModelUpdate:")] void ApplyGameModelUpdate(GKGameModelUpdate gameModelUpdate);
-    [Optional] [Selector("scoreForPlayer:")] NSInteger ScoreForPlayer(GKGameModelPlayer player);
-    [Optional] [Selector("isWinForPlayer:")] bool IsWinForPlayer(GKGameModelPlayer player);
-    [Optional] [Selector("isLossForPlayer:")] bool IsLossForPlayer(GKGameModelPlayer player);
-    [Optional] [Selector("unapplyGameModelUpdate:")] void UnapplyGameModelUpdate(GKGameModelUpdate gameModelUpdate);
+    [Selector("players")]
+    NSArray? Players { get; }
+    [Selector("activePlayer")]
+    GKGameModelPlayer? ActivePlayer { get; }
+    [Selector("setGameModel:")]
+    void SetGameModel(GKGameModel gameModel);
+    [Selector("gameModelUpdatesForPlayer:")]
+    NSArray? GameModelUpdatesForPlayer(GKGameModelPlayer player);
+    [Selector("applyGameModelUpdate:")]
+    void ApplyGameModelUpdate(GKGameModelUpdate gameModelUpdate);
+    [Optional]
+    [Selector("scoreForPlayer:")]
+    NSInteger ScoreForPlayer(GKGameModelPlayer player);
+    [Optional]
+    [Selector("isWinForPlayer:")]
+    bool IsWinForPlayer(GKGameModelPlayer player);
+    [Optional]
+    [Selector("isLossForPlayer:")]
+    bool IsLossForPlayer(GKGameModelPlayer player);
+    [Optional]
+    [Selector("unapplyGameModelUpdate:")]
+    void UnapplyGameModelUpdate(GKGameModelUpdate gameModelUpdate);
 }
 
 #endif

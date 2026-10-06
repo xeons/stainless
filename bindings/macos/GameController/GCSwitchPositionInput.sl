@@ -35,14 +35,22 @@ public objc closure void GCSwitchPositionInputPositionDidChangeHandlerBlock(GCPh
 
 public objc interface GCSwitchPositionInput : NSObjectProtocol
 {
-    [Selector("positionDidChangeHandler", "setPositionDidChangeHandler:")] GCSwitchPositionInputPositionDidChangeHandlerBlock? PositionDidChangeHandler { get; set; }
-    [Selector("position")] NSInteger Position { get; }
-    [Selector("positionRange")] NSRange PositionRange { get; }
-    [Selector("isSequential")] bool Sequential { get; }
-    [Selector("canWrap")] bool CanWrap { get; }
-    [Selector("lastPositionTimestamp")] NSTimeInterval LastPositionTimestamp { get; }
-    [Selector("lastPositionLatency")] NSTimeInterval LastPositionLatency { get; }
-    [Selector("sources")] NSSet Sources { get; }
+    [Selector("positionDidChangeHandler", "setPositionDidChangeHandler:")]
+    GCSwitchPositionInputPositionDidChangeHandlerBlock? PositionDidChangeHandler { get; set; }
+    [Selector("position")]
+    NSInteger Position { get; }
+    [Selector("positionRange")]
+    NSRange PositionRange { get; }
+    [Selector("isSequential")]
+    bool Sequential { get; }
+    [Selector("canWrap")]
+    bool CanWrap { get; }
+    [Selector("lastPositionTimestamp")]
+    NSTimeInterval LastPositionTimestamp { get; }
+    [Selector("lastPositionLatency")]
+    NSTimeInterval LastPositionLatency { get; }
+    [Selector("sources")]
+    NSSet Sources { get; }
 }
 
 #endif

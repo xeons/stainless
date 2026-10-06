@@ -32,15 +32,20 @@ import Standard.ObjC;
 
 public extern objc class NSSharingServicePickerTouchBarItem : NSTouchBarItem
 {
-    [Selector("delegate", "setDelegate:")] public NSSharingServicePickerTouchBarItemDelegate? Delegate { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("buttonTitle", "setButtonTitle:")] public NSString ButtonTitle { get; set; }
-    [Selector("buttonImage", "setButtonImage:")] public NSImage? ButtonImage { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSSharingServicePickerTouchBarItemDelegate? Delegate { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("buttonTitle", "setButtonTitle:")]
+    public NSString ButtonTitle { get; set; }
+    [Selector("buttonImage", "setButtonImage:")]
+    public NSImage? ButtonImage { get; set; }
 }
 
 public objc interface NSSharingServicePickerTouchBarItemDelegate : NSSharingServicePickerDelegate
 {
-    [Selector("itemsForSharingServicePickerTouchBarItem:")] NSArray ItemsForSharingServicePickerTouchBarItem(NSSharingServicePickerTouchBarItem pickerTouchBarItem);
+    [Selector("itemsForSharingServicePickerTouchBarItem:")]
+    NSArray ItemsForSharingServicePickerTouchBarItem(NSSharingServicePickerTouchBarItem pickerTouchBarItem);
 }
 
 #endif

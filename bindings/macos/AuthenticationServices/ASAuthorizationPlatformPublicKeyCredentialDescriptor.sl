@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationPlatformPublicKeyCredentialDescriptor : NSObject, ASAuthorizationPublicKeyCredentialDescriptor
 {
-    [Selector("initWithCredentialID:")] public Self InitWithCredentialID(NSData credentialID);
+    [Selector("initWithCredentialID:")]
+    public Self InitWithCredentialID(NSData credentialID);
 }
 
 #endif

@@ -33,48 +33,80 @@ import Standard.ObjC;
 
 public extern objc class DRDevice : NSObject
 {
-    [Selector("devices")] public static NSArray? Devices();
-    [Selector("deviceForBSDName:")] public static DRDevice? DeviceForBSDName(NSString? bsdName);
-    [Selector("deviceForIORegistryEntryPath:")] public static DRDevice? DeviceForIORegistryEntryPath(NSString? path);
-    [Selector("isValid")] public bool IsValid();
-    [Selector("info")] public NSDictionary? Info();
-    [Selector("status")] public NSDictionary? Status();
-    [Selector("openTray")] public bool OpenTray();
-    [Selector("closeTray")] public bool CloseTray();
-    [Selector("ejectMedia")] public bool EjectMedia();
-    [Selector("acquireExclusiveAccess")] public bool AcquireExclusiveAccess();
-    [Selector("releaseExclusiveAccess")] public void ReleaseExclusiveAccess();
-    [Selector("acquireMediaReservation")] public void AcquireMediaReservation();
-    [Selector("releaseMediaReservation")] public void ReleaseMediaReservation();
-    [Selector("isEqualToDevice:")] public bool IsEqualToDevice(DRDevice? otherDevice);
+    [Selector("devices")]
+    public static NSArray? Devices();
+    [Selector("deviceForBSDName:")]
+    public static DRDevice? DeviceForBSDName(NSString? bsdName);
+    [Selector("deviceForIORegistryEntryPath:")]
+    public static DRDevice? DeviceForIORegistryEntryPath(NSString? path);
+    [Selector("isValid")]
+    public bool IsValid();
+    [Selector("info")]
+    public NSDictionary? Info();
+    [Selector("status")]
+    public NSDictionary? Status();
+    [Selector("openTray")]
+    public bool OpenTray();
+    [Selector("closeTray")]
+    public bool CloseTray();
+    [Selector("ejectMedia")]
+    public bool EjectMedia();
+    [Selector("acquireExclusiveAccess")]
+    public bool AcquireExclusiveAccess();
+    [Selector("releaseExclusiveAccess")]
+    public void ReleaseExclusiveAccess();
+    [Selector("acquireMediaReservation")]
+    public void AcquireMediaReservation();
+    [Selector("releaseMediaReservation")]
+    public void ReleaseMediaReservation();
+    [Selector("isEqualToDevice:")]
+    public bool IsEqualToDevice(DRDevice? otherDevice);
 }
 
 /// InfoConvenience, a category of DRDevice.
 public extern objc class DRDevice
 {
-    [Selector("writesCD")] public bool WritesCD();
-    [Selector("writesDVD")] public bool WritesDVD();
-    [Selector("displayName")] public NSString? DisplayName();
-    [Selector("ioRegistryEntryPath")] public NSString? IoRegistryEntryPath();
+    [Selector("writesCD")]
+    public bool WritesCD();
+    [Selector("writesDVD")]
+    public bool WritesDVD();
+    [Selector("displayName")]
+    public NSString? DisplayName();
+    [Selector("ioRegistryEntryPath")]
+    public NSString? IoRegistryEntryPath();
 }
 
 /// StatusConvenience, a category of DRDevice.
 public extern objc class DRDevice
 {
-    [Selector("mediaIsPresent")] public bool MediaIsPresent();
-    [Selector("mediaIsTransitioning")] public bool MediaIsTransitioning();
-    [Selector("mediaIsBusy")] public bool MediaIsBusy();
-    [Selector("mediaType")] public NSString? MediaType();
-    [Selector("mediaIsBlank")] public bool MediaIsBlank();
-    [Selector("mediaIsAppendable")] public bool MediaIsAppendable();
-    [Selector("mediaIsOverwritable")] public bool MediaIsOverwritable();
-    [Selector("mediaIsErasable")] public bool MediaIsErasable();
-    [Selector("mediaIsReserved")] public bool MediaIsReserved();
-    [Selector("mediaSpaceOverwritable")] public DRMSF? MediaSpaceOverwritable();
-    [Selector("mediaSpaceUsed")] public DRMSF? MediaSpaceUsed();
-    [Selector("mediaSpaceFree")] public DRMSF? MediaSpaceFree();
-    [Selector("trayIsOpen")] public bool TrayIsOpen();
-    [Selector("bsdName")] public NSString? BsdName();
+    [Selector("mediaIsPresent")]
+    public bool MediaIsPresent();
+    [Selector("mediaIsTransitioning")]
+    public bool MediaIsTransitioning();
+    [Selector("mediaIsBusy")]
+    public bool MediaIsBusy();
+    [Selector("mediaType")]
+    public NSString? MediaType();
+    [Selector("mediaIsBlank")]
+    public bool MediaIsBlank();
+    [Selector("mediaIsAppendable")]
+    public bool MediaIsAppendable();
+    [Selector("mediaIsOverwritable")]
+    public bool MediaIsOverwritable();
+    [Selector("mediaIsErasable")]
+    public bool MediaIsErasable();
+    [Selector("mediaIsReserved")]
+    public bool MediaIsReserved();
+    [Selector("mediaSpaceOverwritable")]
+    public DRMSF? MediaSpaceOverwritable();
+    [Selector("mediaSpaceUsed")]
+    public DRMSF? MediaSpaceUsed();
+    [Selector("mediaSpaceFree")]
+    public DRMSF? MediaSpaceFree();
+    [Selector("trayIsOpen")]
+    public bool TrayIsOpen();
+    [Selector("bsdName")]
+    public NSString? BsdName();
 }
 
 public extern "C" float DRDeviceBurnSpeedCD1x;

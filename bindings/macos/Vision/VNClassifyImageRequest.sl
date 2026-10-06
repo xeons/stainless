@@ -33,10 +33,13 @@ import Standard.ObjC;
 
 public extern objc class VNClassifyImageRequest : VNImageBasedRequest
 {
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("results")]
+    public NSArray? Results { get; }
     /// Deprecated in macOS 12.0.
-    [Selector("knownClassificationsForRevision:error:")] public static NSArray? KnownClassificationsForRevisionError(NSUInteger requestRevision, out NSError? error);
-    [Selector("supportedIdentifiersAndReturnError:")] public NSArray? SupportedIdentifiersAndReturnError(out NSError? error);
+    [Selector("knownClassificationsForRevision:error:")]
+    public static NSArray? KnownClassificationsForRevisionError(NSUInteger requestRevision, out NSError? error);
+    [Selector("supportedIdentifiersAndReturnError:")]
+    public NSArray? SupportedIdentifiersAndReturnError(out NSError? error);
 }
 
 #endif

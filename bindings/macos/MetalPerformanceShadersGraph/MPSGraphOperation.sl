@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class MPSGraphOperation : MPSGraphObject, NSCopying
 {
-    [Selector("inputTensors")] public NSArray InputTensors { get; }
-    [Selector("outputTensors")] public NSArray OutputTensors { get; }
-    [Selector("controlDependencies")] public NSArray ControlDependencies { get; }
-    [Selector("graph")] public MPSGraph Graph { get; }
-    [Selector("name")] public NSString Name { get; }
+    [Selector("inputTensors")]
+    public NSArray InputTensors { get; }
+    [Selector("outputTensors")]
+    public NSArray OutputTensors { get; }
+    [Selector("controlDependencies")]
+    public NSArray ControlDependencies { get; }
+    [Selector("graph")]
+    public MPSGraph Graph { get; }
+    [Selector("name")]
+    public NSString Name { get; }
 }
 
 #endif

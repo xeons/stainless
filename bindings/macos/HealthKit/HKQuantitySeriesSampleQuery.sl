@@ -36,10 +36,14 @@ public objc closure void HKQuantitySeriesSampleQueryInitWithSampleQuantityHandle
 
 public extern objc class HKQuantitySeriesSampleQuery : HKQuery
 {
-    [Selector("includeSample", "setIncludeSample:")] public bool IncludeSample { get; set; }
-    [Selector("orderByQuantitySampleStartDate", "setOrderByQuantitySampleStartDate:")] public bool OrderByQuantitySampleStartDate { get; set; }
-    [Selector("initWithQuantityType:predicate:quantityHandler:")] public Self InitWithQuantityTypePredicateQuantityHandler(HKQuantityType quantityType, NSPredicate? predicate, HKQuantitySeriesSampleQueryInitWithQuantityTypePredicateQuantityHandlerQuantityHandlerBlock quantityHandler);
-    [Selector("initWithSample:quantityHandler:")] public Self InitWithSampleQuantityHandler(HKQuantitySample quantitySample, HKQuantitySeriesSampleQueryInitWithSampleQuantityHandlerQuantityHandlerBlock quantityHandler);
+    [Selector("includeSample", "setIncludeSample:")]
+    public bool IncludeSample { get; set; }
+    [Selector("orderByQuantitySampleStartDate", "setOrderByQuantitySampleStartDate:")]
+    public bool OrderByQuantitySampleStartDate { get; set; }
+    [Selector("initWithQuantityType:predicate:quantityHandler:")]
+    public Self InitWithQuantityTypePredicateQuantityHandler(HKQuantityType quantityType, NSPredicate? predicate, HKQuantitySeriesSampleQueryInitWithQuantityTypePredicateQuantityHandlerQuantityHandlerBlock quantityHandler);
+    [Selector("initWithSample:quantityHandler:")]
+    public Self InitWithSampleQuantityHandler(HKQuantitySample quantitySample, HKQuantitySeriesSampleQueryInitWithSampleQuantityHandlerQuantityHandlerBlock quantityHandler);
 }
 
 #endif

@@ -36,13 +36,20 @@ public objc closure void CKFetchShareMetadataOperationFetchShareMetadataCompleti
 
 public extern objc class CKFetchShareMetadataOperation : CKOperation
 {
-    [Selector("shareURLs", "setShareURLs:")] public NSArray? ShareURLs { get; set; }
-    [Selector("shouldFetchRootRecord", "setShouldFetchRootRecord:")] public bool ShouldFetchRootRecord { get; set; }
-    [Selector("rootRecordDesiredKeys", "setRootRecordDesiredKeys:")] public NSArray? RootRecordDesiredKeys { get; set; }
-    [Selector("perShareMetadataBlock", "setPerShareMetadataBlock:")] public CKFetchShareMetadataOperationPerShareMetadataBlock? PerShareMetadataBlock { get; set; }
-    [Selector("fetchShareMetadataCompletionBlock", "setFetchShareMetadataCompletionBlock:")] public CKFetchShareMetadataOperationFetchShareMetadataCompletionBlock? FetchShareMetadataCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithShareURLs:")] public Self InitWithShareURLs(NSArray shareURLs);
+    [Selector("shareURLs", "setShareURLs:")]
+    public NSArray? ShareURLs { get; set; }
+    [Selector("shouldFetchRootRecord", "setShouldFetchRootRecord:")]
+    public bool ShouldFetchRootRecord { get; set; }
+    [Selector("rootRecordDesiredKeys", "setRootRecordDesiredKeys:")]
+    public NSArray? RootRecordDesiredKeys { get; set; }
+    [Selector("perShareMetadataBlock", "setPerShareMetadataBlock:")]
+    public CKFetchShareMetadataOperationPerShareMetadataBlock? PerShareMetadataBlock { get; set; }
+    [Selector("fetchShareMetadataCompletionBlock", "setFetchShareMetadataCompletionBlock:")]
+    public CKFetchShareMetadataOperationFetchShareMetadataCompletionBlock? FetchShareMetadataCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithShareURLs:")]
+    public Self InitWithShareURLs(NSArray shareURLs);
 }
 
 #endif

@@ -34,9 +34,12 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MKAddress : NSObject
 {
-    [Selector("fullAddress")] public NSString FullAddress { get; }
-    [Selector("shortAddress")] public NSString? ShortAddress { get; }
-    [Selector("initWithFullAddress:shortAddress:")] public Self? InitWithFullAddressShortAddress(NSString fullAddress, NSString? shortAddress);
+    [Selector("fullAddress")]
+    public NSString FullAddress { get; }
+    [Selector("shortAddress")]
+    public NSString? ShortAddress { get; }
+    [Selector("initWithFullAddress:shortAddress:")]
+    public Self? InitWithFullAddressShortAddress(NSString fullAddress, NSString? shortAddress);
 }
 
 #endif

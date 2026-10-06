@@ -38,27 +38,34 @@ public enum NSSaveOptions : ulong
 
 public extern objc class NSCloneCommand : NSScriptCommand
 {
-    [Selector("keySpecifier")] public NSScriptObjectSpecifier KeySpecifier { get; }
-    [Selector("setReceiversSpecifier:")] public void SetReceiversSpecifier(NSScriptObjectSpecifier? receiversRef);
+    [Selector("keySpecifier")]
+    public NSScriptObjectSpecifier KeySpecifier { get; }
+    [Selector("setReceiversSpecifier:")]
+    public void SetReceiversSpecifier(NSScriptObjectSpecifier? receiversRef);
 }
 
 public extern objc class NSCloseCommand : NSScriptCommand
 {
-    [Selector("saveOptions")] public NSSaveOptions SaveOptions { get; }
+    [Selector("saveOptions")]
+    public NSSaveOptions SaveOptions { get; }
 }
 
 public extern objc class NSCountCommand : NSScriptCommand { }
 
 public extern objc class NSCreateCommand : NSScriptCommand
 {
-    [Selector("createClassDescription")] public NSScriptClassDescription CreateClassDescription { get; }
-    [Selector("resolvedKeyDictionary")] public NSDictionary ResolvedKeyDictionary { get; }
+    [Selector("createClassDescription")]
+    public NSScriptClassDescription CreateClassDescription { get; }
+    [Selector("resolvedKeyDictionary")]
+    public NSDictionary ResolvedKeyDictionary { get; }
 }
 
 public extern objc class NSDeleteCommand : NSScriptCommand
 {
-    [Selector("keySpecifier")] public NSScriptObjectSpecifier KeySpecifier { get; }
-    [Selector("setReceiversSpecifier:")] public void SetReceiversSpecifier(NSScriptObjectSpecifier? receiversRef);
+    [Selector("keySpecifier")]
+    public NSScriptObjectSpecifier KeySpecifier { get; }
+    [Selector("setReceiversSpecifier:")]
+    public void SetReceiversSpecifier(NSScriptObjectSpecifier? receiversRef);
 }
 
 public extern objc class NSExistsCommand : NSScriptCommand { }
@@ -67,19 +74,24 @@ public extern objc class NSGetCommand : NSScriptCommand { }
 
 public extern objc class NSMoveCommand : NSScriptCommand
 {
-    [Selector("keySpecifier")] public NSScriptObjectSpecifier KeySpecifier { get; }
-    [Selector("setReceiversSpecifier:")] public void SetReceiversSpecifier(NSScriptObjectSpecifier? receiversRef);
+    [Selector("keySpecifier")]
+    public NSScriptObjectSpecifier KeySpecifier { get; }
+    [Selector("setReceiversSpecifier:")]
+    public void SetReceiversSpecifier(NSScriptObjectSpecifier? receiversRef);
 }
 
 public extern objc class NSQuitCommand : NSScriptCommand
 {
-    [Selector("saveOptions")] public NSSaveOptions SaveOptions { get; }
+    [Selector("saveOptions")]
+    public NSSaveOptions SaveOptions { get; }
 }
 
 public extern objc class NSSetCommand : NSScriptCommand
 {
-    [Selector("keySpecifier")] public NSScriptObjectSpecifier KeySpecifier { get; }
-    [Selector("setReceiversSpecifier:")] public void SetReceiversSpecifier(NSScriptObjectSpecifier? receiversRef);
+    [Selector("keySpecifier")]
+    public NSScriptObjectSpecifier KeySpecifier { get; }
+    [Selector("setReceiversSpecifier:")]
+    public void SetReceiversSpecifier(NSScriptObjectSpecifier? receiversRef);
 }
 
 #endif

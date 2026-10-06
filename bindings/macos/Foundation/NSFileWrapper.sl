@@ -46,50 +46,81 @@ public enum NSFileWrapperWritingOptions : ulong
 
 public extern objc class NSFileWrapper : NSObject, NSSecureCoding
 {
-    [Selector("isDirectory")] public bool Directory { get; }
-    [Selector("isRegularFile")] public bool RegularFile { get; }
-    [Selector("isSymbolicLink")] public bool SymbolicLink { get; }
-    [Selector("preferredFilename", "setPreferredFilename:")] public NSString? PreferredFilename { get; set; }
-    [Selector("filename", "setFilename:")] public NSString? Filename { get; set; }
-    [Selector("fileAttributes", "setFileAttributes:")] public NSDictionary FileAttributes { get; set; }
-    [Selector("serializedRepresentation")] public NSData? SerializedRepresentation { get; }
-    [Selector("fileWrappers")] public NSDictionary? FileWrappers { get; }
-    [Selector("regularFileContents")] public NSData? RegularFileContents { get; }
-    [Selector("symbolicLinkDestinationURL")] public NSURL? SymbolicLinkDestinationURL { get; }
-    [Selector("initWithURL:options:error:")] public Self? InitWithURLOptionsError(NSURL url, NSFileWrapperReadingOptions options, out NSError? outError);
-    [Selector("initDirectoryWithFileWrappers:")] public Self InitDirectoryWithFileWrappers(NSDictionary childrenByPreferredName);
-    [Selector("initRegularFileWithContents:")] public Self InitRegularFileWithContents(NSData contents);
-    [Selector("initSymbolicLinkWithDestinationURL:")] public Self InitSymbolicLinkWithDestinationURL(NSURL url);
-    [Selector("initWithSerializedRepresentation:")] public Self? InitWithSerializedRepresentation(NSData serializeRepresentation);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder inCoder);
-    [Selector("matchesContentsOfURL:")] public bool MatchesContentsOfURL(NSURL url);
-    [Selector("readFromURL:options:error:")] public bool ReadFromURLOptionsError(NSURL url, NSFileWrapperReadingOptions options, out NSError? outError);
-    [Selector("writeToURL:options:originalContentsURL:error:")] public bool WriteToURLOptionsOriginalContentsURLError(NSURL url, NSFileWrapperWritingOptions options, NSURL? originalContentsURL, out NSError? outError);
-    [Selector("addFileWrapper:")] public NSString AddFileWrapper(NSFileWrapper child);
-    [Selector("addRegularFileWithContents:preferredFilename:")] public NSString AddRegularFileWithContentsPreferredFilename(NSData data, NSString fileName);
-    [Selector("removeFileWrapper:")] public void RemoveFileWrapper(NSFileWrapper child);
-    [Selector("keyForFileWrapper:")] public NSString? KeyForFileWrapper(NSFileWrapper child);
+    [Selector("isDirectory")]
+    public bool Directory { get; }
+    [Selector("isRegularFile")]
+    public bool RegularFile { get; }
+    [Selector("isSymbolicLink")]
+    public bool SymbolicLink { get; }
+    [Selector("preferredFilename", "setPreferredFilename:")]
+    public NSString? PreferredFilename { get; set; }
+    [Selector("filename", "setFilename:")]
+    public NSString? Filename { get; set; }
+    [Selector("fileAttributes", "setFileAttributes:")]
+    public NSDictionary FileAttributes { get; set; }
+    [Selector("serializedRepresentation")]
+    public NSData? SerializedRepresentation { get; }
+    [Selector("fileWrappers")]
+    public NSDictionary? FileWrappers { get; }
+    [Selector("regularFileContents")]
+    public NSData? RegularFileContents { get; }
+    [Selector("symbolicLinkDestinationURL")]
+    public NSURL? SymbolicLinkDestinationURL { get; }
+    [Selector("initWithURL:options:error:")]
+    public Self? InitWithURLOptionsError(NSURL url, NSFileWrapperReadingOptions options, out NSError? outError);
+    [Selector("initDirectoryWithFileWrappers:")]
+    public Self InitDirectoryWithFileWrappers(NSDictionary childrenByPreferredName);
+    [Selector("initRegularFileWithContents:")]
+    public Self InitRegularFileWithContents(NSData contents);
+    [Selector("initSymbolicLinkWithDestinationURL:")]
+    public Self InitSymbolicLinkWithDestinationURL(NSURL url);
+    [Selector("initWithSerializedRepresentation:")]
+    public Self? InitWithSerializedRepresentation(NSData serializeRepresentation);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder inCoder);
+    [Selector("matchesContentsOfURL:")]
+    public bool MatchesContentsOfURL(NSURL url);
+    [Selector("readFromURL:options:error:")]
+    public bool ReadFromURLOptionsError(NSURL url, NSFileWrapperReadingOptions options, out NSError? outError);
+    [Selector("writeToURL:options:originalContentsURL:error:")]
+    public bool WriteToURLOptionsOriginalContentsURLError(NSURL url, NSFileWrapperWritingOptions options, NSURL? originalContentsURL, out NSError? outError);
+    [Selector("addFileWrapper:")]
+    public NSString AddFileWrapper(NSFileWrapper child);
+    [Selector("addRegularFileWithContents:preferredFilename:")]
+    public NSString AddRegularFileWithContentsPreferredFilename(NSData data, NSString fileName);
+    [Selector("removeFileWrapper:")]
+    public void RemoveFileWrapper(NSFileWrapper child);
+    [Selector("keyForFileWrapper:")]
+    public NSString? KeyForFileWrapper(NSFileWrapper child);
 }
 
 /// NSDeprecated, a category of NSFileWrapper.
 public extern objc class NSFileWrapper
 {
     /// Deprecated in macOS 10.10.
-    [Selector("initWithPath:")] public AnyObject? InitWithPath(NSString path);
+    [Selector("initWithPath:")]
+    public AnyObject? InitWithPath(NSString path);
     /// Deprecated in macOS 10.10.
-    [Selector("initSymbolicLinkWithDestination:")] public AnyObject InitSymbolicLinkWithDestination(NSString path);
+    [Selector("initSymbolicLinkWithDestination:")]
+    public AnyObject InitSymbolicLinkWithDestination(NSString path);
     /// Deprecated in macOS 10.10.
-    [Selector("needsToBeUpdatedFromPath:")] public bool NeedsToBeUpdatedFromPath(NSString path);
+    [Selector("needsToBeUpdatedFromPath:")]
+    public bool NeedsToBeUpdatedFromPath(NSString path);
     /// Deprecated in macOS 10.10.
-    [Selector("updateFromPath:")] public bool UpdateFromPath(NSString path);
+    [Selector("updateFromPath:")]
+    public bool UpdateFromPath(NSString path);
     /// Deprecated in macOS 10.10.
-    [Selector("writeToFile:atomically:updateFilenames:")] public bool WriteToFileAtomicallyUpdateFilenames(NSString path, bool atomicFlag, bool updateFilenamesFlag);
+    [Selector("writeToFile:atomically:updateFilenames:")]
+    public bool WriteToFileAtomicallyUpdateFilenames(NSString path, bool atomicFlag, bool updateFilenamesFlag);
     /// Deprecated in macOS 10.10.
-    [Selector("addFileWithPath:")] public NSString AddFileWithPath(NSString path);
+    [Selector("addFileWithPath:")]
+    public NSString AddFileWithPath(NSString path);
     /// Deprecated in macOS 10.10.
-    [Selector("addSymbolicLinkWithDestination:preferredFilename:")] public NSString AddSymbolicLinkWithDestinationPreferredFilename(NSString path, NSString filename);
+    [Selector("addSymbolicLinkWithDestination:preferredFilename:")]
+    public NSString AddSymbolicLinkWithDestinationPreferredFilename(NSString path, NSString filename);
     /// Deprecated in macOS 10.10.
-    [Selector("symbolicLinkDestination")] public NSString SymbolicLinkDestination();
+    [Selector("symbolicLinkDestination")]
+    public NSString SymbolicLinkDestination();
 }
 
 #endif

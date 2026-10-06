@@ -33,35 +33,59 @@ import Standard.ObjC;
 
 public extern objc class NSObjectController : NSController
 {
-    [Selector("content", "setContent:")] public AnyObject? Content { get; set; }
-    [Selector("selection")] public AnyObject Selection { get; }
-    [Selector("selectedObjects")] public NSArray SelectedObjects { get; }
-    [Selector("automaticallyPreparesContent", "setAutomaticallyPreparesContent:")] public bool AutomaticallyPreparesContent { get; set; }
-    [Selector("objectClass", "setObjectClass:")] public Class ObjectClass { get; set; }
-    [Selector("isEditable", "setEditable:")] public bool Editable { get; set; }
-    [Selector("canAdd")] public bool CanAdd { get; }
-    [Selector("canRemove")] public bool CanRemove { get; }
-    [Selector("initWithContent:")] public Self InitWithContent(AnyObject? content);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("prepareContent")] public void PrepareContent();
-    [Selector("newObject")] public AnyObject NewObject();
-    [Selector("addObject:")] public void AddObject(AnyObject object);
-    [Selector("removeObject:")] public void RemoveObject(AnyObject object);
-    [Selector("add:")] public void Add(AnyObject? sender);
-    [Selector("remove:")] public void Remove(AnyObject? sender);
-    [Selector("validateUserInterfaceItem:")] public bool ValidateUserInterfaceItem(NSValidatedUserInterfaceItem item);
+    [Selector("content", "setContent:")]
+    public AnyObject? Content { get; set; }
+    [Selector("selection")]
+    public AnyObject Selection { get; }
+    [Selector("selectedObjects")]
+    public NSArray SelectedObjects { get; }
+    [Selector("automaticallyPreparesContent", "setAutomaticallyPreparesContent:")]
+    public bool AutomaticallyPreparesContent { get; set; }
+    [Selector("objectClass", "setObjectClass:")]
+    public Class ObjectClass { get; set; }
+    [Selector("isEditable", "setEditable:")]
+    public bool Editable { get; set; }
+    [Selector("canAdd")]
+    public bool CanAdd { get; }
+    [Selector("canRemove")]
+    public bool CanRemove { get; }
+    [Selector("initWithContent:")]
+    public Self InitWithContent(AnyObject? content);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("prepareContent")]
+    public void PrepareContent();
+    [Selector("newObject")]
+    public AnyObject NewObject();
+    [Selector("addObject:")]
+    public void AddObject(AnyObject object);
+    [Selector("removeObject:")]
+    public void RemoveObject(AnyObject object);
+    [Selector("add:")]
+    public void Add(AnyObject? sender);
+    [Selector("remove:")]
+    public void Remove(AnyObject? sender);
+    [Selector("validateUserInterfaceItem:")]
+    public bool ValidateUserInterfaceItem(NSValidatedUserInterfaceItem item);
 }
 
 /// NSManagedController, a category of NSObjectController.
 public extern objc class NSObjectController
 {
-    [Selector("managedObjectContext", "setManagedObjectContext:")] public NSManagedObjectContext? ManagedObjectContext { get; set; }
-    [Selector("entityName", "setEntityName:")] public NSString? EntityName { get; set; }
-    [Selector("fetchPredicate", "setFetchPredicate:")] public NSPredicate? FetchPredicate { get; set; }
-    [Selector("usesLazyFetching", "setUsesLazyFetching:")] public bool UsesLazyFetching { get; set; }
-    [Selector("fetchWithRequest:merge:error:")] public bool FetchWithRequestMergeError(NSFetchRequest? fetchRequest, bool merge, out NSError? error);
-    [Selector("fetch:")] public void Fetch(AnyObject? sender);
-    [Selector("defaultFetchRequest")] public NSFetchRequest DefaultFetchRequest();
+    [Selector("managedObjectContext", "setManagedObjectContext:")]
+    public NSManagedObjectContext? ManagedObjectContext { get; set; }
+    [Selector("entityName", "setEntityName:")]
+    public NSString? EntityName { get; set; }
+    [Selector("fetchPredicate", "setFetchPredicate:")]
+    public NSPredicate? FetchPredicate { get; set; }
+    [Selector("usesLazyFetching", "setUsesLazyFetching:")]
+    public bool UsesLazyFetching { get; set; }
+    [Selector("fetchWithRequest:merge:error:")]
+    public bool FetchWithRequestMergeError(NSFetchRequest? fetchRequest, bool merge, out NSError? error);
+    [Selector("fetch:")]
+    public void Fetch(AnyObject? sender);
+    [Selector("defaultFetchRequest")]
+    public NSFetchRequest DefaultFetchRequest();
 }
 
 #endif

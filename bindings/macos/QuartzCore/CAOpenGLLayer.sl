@@ -36,15 +36,24 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class CAOpenGLLayer : CALayer
 {
-    [Selector("isAsynchronous", "setAsynchronous:")] public bool Asynchronous { get; set; }
-    [Selector("colorspace", "setColorspace:")] public CGColorSpaceRef? Colorspace { get; set; }
-    [Selector("wantsExtendedDynamicRangeContent", "setWantsExtendedDynamicRangeContent:")] public bool WantsExtendedDynamicRangeContent { get; set; }
-    [Selector("canDrawInCGLContext:pixelFormat:forLayerTime:displayTime:")] public bool CanDrawInCGLContextPixelFormatForLayerTimeDisplayTime(CGLContextObj ctx, CGLPixelFormatObj pf, CFTimeInterval t, CVTimeStamp* ts);
-    [Selector("drawInCGLContext:pixelFormat:forLayerTime:displayTime:")] public void DrawInCGLContextPixelFormatForLayerTimeDisplayTime(CGLContextObj ctx, CGLPixelFormatObj pf, CFTimeInterval t, CVTimeStamp* ts);
-    [Selector("copyCGLPixelFormatForDisplayMask:")] public CGLPixelFormatObj CopyCGLPixelFormatForDisplayMask(uint mask);
-    [Selector("releaseCGLPixelFormat:")] public void ReleaseCGLPixelFormat(CGLPixelFormatObj pf);
-    [Selector("copyCGLContextForPixelFormat:")] public CGLContextObj CopyCGLContextForPixelFormat(CGLPixelFormatObj pf);
-    [Selector("releaseCGLContext:")] public void ReleaseCGLContext(CGLContextObj ctx);
+    [Selector("isAsynchronous", "setAsynchronous:")]
+    public bool Asynchronous { get; set; }
+    [Selector("colorspace", "setColorspace:")]
+    public CGColorSpaceRef? Colorspace { get; set; }
+    [Selector("wantsExtendedDynamicRangeContent", "setWantsExtendedDynamicRangeContent:")]
+    public bool WantsExtendedDynamicRangeContent { get; set; }
+    [Selector("canDrawInCGLContext:pixelFormat:forLayerTime:displayTime:")]
+    public bool CanDrawInCGLContextPixelFormatForLayerTimeDisplayTime(CGLContextObj ctx, CGLPixelFormatObj pf, CFTimeInterval t, CVTimeStamp* ts);
+    [Selector("drawInCGLContext:pixelFormat:forLayerTime:displayTime:")]
+    public void DrawInCGLContextPixelFormatForLayerTimeDisplayTime(CGLContextObj ctx, CGLPixelFormatObj pf, CFTimeInterval t, CVTimeStamp* ts);
+    [Selector("copyCGLPixelFormatForDisplayMask:")]
+    public CGLPixelFormatObj CopyCGLPixelFormatForDisplayMask(uint mask);
+    [Selector("releaseCGLPixelFormat:")]
+    public void ReleaseCGLPixelFormat(CGLPixelFormatObj pf);
+    [Selector("copyCGLContextForPixelFormat:")]
+    public CGLContextObj CopyCGLContextForPixelFormat(CGLPixelFormatObj pf);
+    [Selector("releaseCGLContext:")]
+    public void ReleaseCGLContext(CGLContextObj ctx);
 }
 
 #endif

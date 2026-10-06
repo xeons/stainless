@@ -33,20 +33,34 @@ import Standard.ObjC;
 
 public extern objc class DRMSF : NSNumber
 {
-    [Selector("msf")] public static DRMSF? Msf();
-    [Selector("msfWithFrames:")] public static DRMSF? MsfWithFrames(UInt32 frames);
-    [Selector("msfWithString:")] public static DRMSF? MsfWithString(NSString? string);
-    [Selector("initWithFrames:")] public AnyObject? InitWithFrames(UInt32 frames);
-    [Selector("initWithString:")] public AnyObject? InitWithString(NSString? string);
-    [Selector("minutes")] public UInt32 Minutes();
-    [Selector("seconds")] public UInt32 Seconds();
-    [Selector("frames")] public UInt32 Frames();
-    [Selector("sectors")] public UInt32 Sectors();
-    [Selector("msfByAdding:")] public DRMSF? MsfByAdding(DRMSF? msf);
-    [Selector("msfBySubtracting:")] public DRMSF? MsfBySubtracting(DRMSF? msf);
-    [Selector("description")] public NSString? Description();
-    [Selector("descriptionWithFormat:")] public NSString? DescriptionWithFormat(NSString? format);
-    [Selector("isEqualToMSF:")] public bool IsEqualToMSF(DRMSF? otherDRMSF);
+    [Selector("msf")]
+    public static DRMSF? Msf();
+    [Selector("msfWithFrames:")]
+    public static DRMSF? MsfWithFrames(UInt32 frames);
+    [Selector("msfWithString:")]
+    public static DRMSF? MsfWithString(NSString? string);
+    [Selector("initWithFrames:")]
+    public AnyObject? InitWithFrames(UInt32 frames);
+    [Selector("initWithString:")]
+    public AnyObject? InitWithString(NSString? string);
+    [Selector("minutes")]
+    public UInt32 Minutes();
+    [Selector("seconds")]
+    public UInt32 Seconds();
+    [Selector("frames")]
+    public UInt32 Frames();
+    [Selector("sectors")]
+    public UInt32 Sectors();
+    [Selector("msfByAdding:")]
+    public DRMSF? MsfByAdding(DRMSF? msf);
+    [Selector("msfBySubtracting:")]
+    public DRMSF? MsfBySubtracting(DRMSF? msf);
+    [Selector("description")]
+    public NSString? Description();
+    [Selector("descriptionWithFormat:")]
+    public NSString? DescriptionWithFormat(NSString? format);
+    [Selector("isEqualToMSF:")]
+    public bool IsEqualToMSF(DRMSF? otherDRMSF);
 }
 
 #endif

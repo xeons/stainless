@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class LAPersistedRight : LARight
 {
-    [Selector("key")] public LAPrivateKey Key { get; }
-    [Selector("secret")] public LASecret Secret { get; }
+    [Selector("key")]
+    public LAPrivateKey Key { get; }
+    [Selector("secret")]
+    public LASecret Secret { get; }
 }
 
 #endif

@@ -33,20 +33,29 @@ import Standard.ObjC;
 
 public extern objc class DRFolder : DRFSObject
 {
-    [Selector("folderWithPath:")] public static DRFolder? FolderWithPath(NSString? path);
-    [Selector("initWithPath:")] public AnyObject? InitWithPath(NSString? path);
+    [Selector("folderWithPath:")]
+    public static DRFolder? FolderWithPath(NSString? path);
+    [Selector("initWithPath:")]
+    public AnyObject? InitWithPath(NSString? path);
 }
 
 /// VirtualFolders, a category of DRFolder.
 public extern objc class DRFolder
 {
-    [Selector("virtualFolderWithName:")] public static DRFolder? VirtualFolderWithName(NSString? name);
-    [Selector("initWithName:")] public AnyObject? InitWithName(NSString? name);
-    [Selector("makeVirtual")] public void MakeVirtual();
-    [Selector("addChild:")] public void AddChild(DRFSObject? child);
-    [Selector("removeChild:")] public void RemoveChild(DRFSObject? child);
-    [Selector("count")] public NSUInteger Count();
-    [Selector("children")] public NSArray? Children();
+    [Selector("virtualFolderWithName:")]
+    public static DRFolder? VirtualFolderWithName(NSString? name);
+    [Selector("initWithName:")]
+    public AnyObject? InitWithName(NSString? name);
+    [Selector("makeVirtual")]
+    public void MakeVirtual();
+    [Selector("addChild:")]
+    public void AddChild(DRFSObject? child);
+    [Selector("removeChild:")]
+    public void RemoveChild(DRFSObject? child);
+    [Selector("count")]
+    public NSUInteger Count();
+    [Selector("children")]
+    public NSArray? Children();
 }
 
 #endif

@@ -34,13 +34,20 @@ import Standard.ObjC;
 /// macOS 15.4 and later.
 public extern objc class WKWebExtensionControllerConfiguration : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("isPersistent")] public bool Persistent { get; }
-    [Selector("identifier")] public NSUUID? Identifier { get; }
-    [Selector("webViewConfiguration", "setWebViewConfiguration:")] public WKWebViewConfiguration? WebViewConfiguration { get; set; }
-    [Selector("defaultWebsiteDataStore", "setDefaultWebsiteDataStore:")] public WKWebsiteDataStore? DefaultWebsiteDataStore { get; set; }
-    [Selector("defaultConfiguration")] public static Self DefaultConfiguration();
-    [Selector("nonPersistentConfiguration")] public static Self NonPersistentConfiguration();
-    [Selector("configurationWithIdentifier:")] public static Self ConfigurationWithIdentifier(NSUUID identifier);
+    [Selector("isPersistent")]
+    public bool Persistent { get; }
+    [Selector("identifier")]
+    public NSUUID? Identifier { get; }
+    [Selector("webViewConfiguration", "setWebViewConfiguration:")]
+    public WKWebViewConfiguration? WebViewConfiguration { get; set; }
+    [Selector("defaultWebsiteDataStore", "setDefaultWebsiteDataStore:")]
+    public WKWebsiteDataStore? DefaultWebsiteDataStore { get; set; }
+    [Selector("defaultConfiguration")]
+    public static Self DefaultConfiguration();
+    [Selector("nonPersistentConfiguration")]
+    public static Self NonPersistentConfiguration();
+    [Selector("configurationWithIdentifier:")]
+    public static Self ConfigurationWithIdentifier(NSUUID identifier);
 }
 
 #endif

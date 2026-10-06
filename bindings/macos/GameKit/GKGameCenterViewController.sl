@@ -48,32 +48,44 @@ public extern objc class GKGameCenterViewController : NSViewController, GKViewCo
 
 public extern objc class GKGameCenterViewController
 {
-    [Selector("gameCenterDelegate", "setGameCenterDelegate:")] public GKGameCenterControllerDelegate? GameCenterDelegate { get; set; }
-    [Selector("initWithState:")] public Self InitWithState(GKGameCenterViewControllerState state);
-    [Selector("initWithLeaderboardID:playerScope:timeScope:")] public Self InitWithLeaderboardIDPlayerScopeTimeScope(NSString leaderboardID, GKLeaderboardPlayerScope playerScope, GKLeaderboardTimeScope timeScope);
-    [Selector("initWithLeaderboard:playerScope:")] public Self InitWithLeaderboardPlayerScope(GKLeaderboard leaderboard, GKLeaderboardPlayerScope playerScope);
-    [Selector("initWithLeaderboardSetID:")] public Self InitWithLeaderboardSetID(NSString leaderboardSetID);
-    [Selector("initWithAchievementID:")] public Self InitWithAchievementID(NSString achievementID);
-    [Selector("initWithPlayer:")] public Self InitWithPlayer(GKPlayer player);
+    [Selector("gameCenterDelegate", "setGameCenterDelegate:")]
+    public GKGameCenterControllerDelegate? GameCenterDelegate { get; set; }
+    [Selector("initWithState:")]
+    public Self InitWithState(GKGameCenterViewControllerState state);
+    [Selector("initWithLeaderboardID:playerScope:timeScope:")]
+    public Self InitWithLeaderboardIDPlayerScopeTimeScope(NSString leaderboardID, GKLeaderboardPlayerScope playerScope, GKLeaderboardTimeScope timeScope);
+    [Selector("initWithLeaderboard:playerScope:")]
+    public Self InitWithLeaderboardPlayerScope(GKLeaderboard leaderboard, GKLeaderboardPlayerScope playerScope);
+    [Selector("initWithLeaderboardSetID:")]
+    public Self InitWithLeaderboardSetID(NSString leaderboardSetID);
+    [Selector("initWithAchievementID:")]
+    public Self InitWithAchievementID(NSString achievementID);
+    [Selector("initWithPlayer:")]
+    public Self InitWithPlayer(GKPlayer player);
 }
 
 /// Deprecated, a category of GKGameCenterViewController.
 public extern objc class GKGameCenterViewController
 {
     /// Deprecated in macOS 11.0.
-    [Selector("viewState", "setViewState:")] public GKGameCenterViewControllerState ViewState { get; set; }
+    [Selector("viewState", "setViewState:")]
+    public GKGameCenterViewControllerState ViewState { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("leaderboardTimeScope", "setLeaderboardTimeScope:")] public GKLeaderboardTimeScope LeaderboardTimeScope { get; set; }
+    [Selector("leaderboardTimeScope", "setLeaderboardTimeScope:")]
+    public GKLeaderboardTimeScope LeaderboardTimeScope { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("leaderboardIdentifier", "setLeaderboardIdentifier:")] public NSString? LeaderboardIdentifier { get; set; }
+    [Selector("leaderboardIdentifier", "setLeaderboardIdentifier:")]
+    public NSString? LeaderboardIdentifier { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("leaderboardCategory", "setLeaderboardCategory:")] public NSString? LeaderboardCategory { get; set; }
+    [Selector("leaderboardCategory", "setLeaderboardCategory:")]
+    public NSString? LeaderboardCategory { get; set; }
 }
 
 /// Deprecated in macOS 26.0.
 public objc interface GKGameCenterControllerDelegate : NSObjectProtocol
 {
-    [Selector("gameCenterViewControllerDidFinish:")] void GameCenterViewControllerDidFinish(GKGameCenterViewController gameCenterViewController);
+    [Selector("gameCenterViewControllerDidFinish:")]
+    void GameCenterViewControllerDidFinish(GKGameCenterViewController gameCenterViewController);
 }
 
 #endif

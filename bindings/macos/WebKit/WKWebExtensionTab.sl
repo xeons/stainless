@@ -82,39 +82,105 @@ public objc closure void WKWebExtensionTabCloseForWebExtensionContextCompletionH
 /// macOS 15.4 and later.
 public objc interface WKWebExtensionTab : NSObjectProtocol
 {
-    [Optional] [Selector("windowForWebExtensionContext:")] WKWebExtensionWindow? WindowForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("indexInWindowForWebExtensionContext:")] NSUInteger IndexInWindowForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("parentTabForWebExtensionContext:")] WKWebExtensionTab? ParentTabForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("setParentTab:forWebExtensionContext:completionHandler:")] void SetParentTabForWebExtensionContextCompletionHandler(WKWebExtensionTab? parentTab, WKWebExtensionContext context, WKWebExtensionTabSetParentTabForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("webViewForWebExtensionContext:")] WKWebView? WebViewForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("titleForWebExtensionContext:")] NSString? TitleForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("isPinnedForWebExtensionContext:")] bool IsPinnedForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("setPinned:forWebExtensionContext:completionHandler:")] void SetPinnedForWebExtensionContextCompletionHandler(bool pinned, WKWebExtensionContext context, WKWebExtensionTabSetPinnedForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("isReaderModeAvailableForWebExtensionContext:")] bool IsReaderModeAvailableForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("isReaderModeActiveForWebExtensionContext:")] bool IsReaderModeActiveForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("setReaderModeActive:forWebExtensionContext:completionHandler:")] void SetReaderModeActiveForWebExtensionContextCompletionHandler(bool active, WKWebExtensionContext context, WKWebExtensionTabSetReaderModeActiveForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("isPlayingAudioForWebExtensionContext:")] bool IsPlayingAudioForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("isMutedForWebExtensionContext:")] bool IsMutedForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("setMuted:forWebExtensionContext:completionHandler:")] void SetMutedForWebExtensionContextCompletionHandler(bool muted, WKWebExtensionContext context, WKWebExtensionTabSetMutedForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("sizeForWebExtensionContext:")] CGSize SizeForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("zoomFactorForWebExtensionContext:")] double ZoomFactorForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("setZoomFactor:forWebExtensionContext:completionHandler:")] void SetZoomFactorForWebExtensionContextCompletionHandler(double zoomFactor, WKWebExtensionContext context, WKWebExtensionTabSetZoomFactorForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("urlForWebExtensionContext:")] NSURL? UrlForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("pendingURLForWebExtensionContext:")] NSURL? PendingURLForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("isLoadingCompleteForWebExtensionContext:")] bool IsLoadingCompleteForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("detectWebpageLocaleForWebExtensionContext:completionHandler:")] void DetectWebpageLocaleForWebExtensionContextCompletionHandler(WKWebExtensionContext context, WKWebExtensionTabDetectWebpageLocaleForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("takeSnapshotUsingConfiguration:forWebExtensionContext:completionHandler:")] void TakeSnapshotUsingConfigurationForWebExtensionContextCompletionHandler(WKSnapshotConfiguration configuration, WKWebExtensionContext context, WKWebExtensionTabTakeSnapshotUsingConfigurationForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("loadURL:forWebExtensionContext:completionHandler:")] void LoadURLForWebExtensionContextCompletionHandler(NSURL url, WKWebExtensionContext context, WKWebExtensionTabLoadURLForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("reloadFromOrigin:forWebExtensionContext:completionHandler:")] void ReloadFromOriginForWebExtensionContextCompletionHandler(bool fromOrigin, WKWebExtensionContext context, WKWebExtensionTabReloadFromOriginForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("goBackForWebExtensionContext:completionHandler:")] void GoBackForWebExtensionContextCompletionHandler(WKWebExtensionContext context, WKWebExtensionTabGoBackForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("goForwardForWebExtensionContext:completionHandler:")] void GoForwardForWebExtensionContextCompletionHandler(WKWebExtensionContext context, WKWebExtensionTabGoForwardForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("activateForWebExtensionContext:completionHandler:")] void ActivateForWebExtensionContextCompletionHandler(WKWebExtensionContext context, WKWebExtensionTabActivateForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("isSelectedForWebExtensionContext:")] bool IsSelectedForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("setSelected:forWebExtensionContext:completionHandler:")] void SetSelectedForWebExtensionContextCompletionHandler(bool selected, WKWebExtensionContext context, WKWebExtensionTabSetSelectedForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("duplicateUsingConfiguration:forWebExtensionContext:completionHandler:")] void DuplicateUsingConfigurationForWebExtensionContextCompletionHandler(WKWebExtensionTabConfiguration configuration, WKWebExtensionContext context, WKWebExtensionTabDuplicateUsingConfigurationForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("closeForWebExtensionContext:completionHandler:")] void CloseForWebExtensionContextCompletionHandler(WKWebExtensionContext context, WKWebExtensionTabCloseForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("shouldGrantPermissionsOnUserGestureForWebExtensionContext:")] bool ShouldGrantPermissionsOnUserGestureForWebExtensionContext(WKWebExtensionContext context);
-    [Optional] [Selector("shouldBypassPermissionsForWebExtensionContext:")] bool ShouldBypassPermissionsForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("windowForWebExtensionContext:")]
+    WKWebExtensionWindow? WindowForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("indexInWindowForWebExtensionContext:")]
+    NSUInteger IndexInWindowForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("parentTabForWebExtensionContext:")]
+    WKWebExtensionTab? ParentTabForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("setParentTab:forWebExtensionContext:completionHandler:")]
+    void SetParentTabForWebExtensionContextCompletionHandler(WKWebExtensionTab? parentTab, WKWebExtensionContext context, WKWebExtensionTabSetParentTabForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("webViewForWebExtensionContext:")]
+    WKWebView? WebViewForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("titleForWebExtensionContext:")]
+    NSString? TitleForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("isPinnedForWebExtensionContext:")]
+    bool IsPinnedForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("setPinned:forWebExtensionContext:completionHandler:")]
+    void SetPinnedForWebExtensionContextCompletionHandler(bool pinned, WKWebExtensionContext context, WKWebExtensionTabSetPinnedForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("isReaderModeAvailableForWebExtensionContext:")]
+    bool IsReaderModeAvailableForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("isReaderModeActiveForWebExtensionContext:")]
+    bool IsReaderModeActiveForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("setReaderModeActive:forWebExtensionContext:completionHandler:")]
+    void SetReaderModeActiveForWebExtensionContextCompletionHandler(bool active, WKWebExtensionContext context, WKWebExtensionTabSetReaderModeActiveForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("isPlayingAudioForWebExtensionContext:")]
+    bool IsPlayingAudioForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("isMutedForWebExtensionContext:")]
+    bool IsMutedForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("setMuted:forWebExtensionContext:completionHandler:")]
+    void SetMutedForWebExtensionContextCompletionHandler(bool muted, WKWebExtensionContext context, WKWebExtensionTabSetMutedForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("sizeForWebExtensionContext:")]
+    CGSize SizeForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("zoomFactorForWebExtensionContext:")]
+    double ZoomFactorForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("setZoomFactor:forWebExtensionContext:completionHandler:")]
+    void SetZoomFactorForWebExtensionContextCompletionHandler(double zoomFactor, WKWebExtensionContext context, WKWebExtensionTabSetZoomFactorForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("urlForWebExtensionContext:")]
+    NSURL? UrlForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("pendingURLForWebExtensionContext:")]
+    NSURL? PendingURLForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("isLoadingCompleteForWebExtensionContext:")]
+    bool IsLoadingCompleteForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("detectWebpageLocaleForWebExtensionContext:completionHandler:")]
+    void DetectWebpageLocaleForWebExtensionContextCompletionHandler(WKWebExtensionContext context, WKWebExtensionTabDetectWebpageLocaleForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("takeSnapshotUsingConfiguration:forWebExtensionContext:completionHandler:")]
+    void TakeSnapshotUsingConfigurationForWebExtensionContextCompletionHandler(WKSnapshotConfiguration configuration, WKWebExtensionContext context, WKWebExtensionTabTakeSnapshotUsingConfigurationForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("loadURL:forWebExtensionContext:completionHandler:")]
+    void LoadURLForWebExtensionContextCompletionHandler(NSURL url, WKWebExtensionContext context, WKWebExtensionTabLoadURLForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("reloadFromOrigin:forWebExtensionContext:completionHandler:")]
+    void ReloadFromOriginForWebExtensionContextCompletionHandler(bool fromOrigin, WKWebExtensionContext context, WKWebExtensionTabReloadFromOriginForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("goBackForWebExtensionContext:completionHandler:")]
+    void GoBackForWebExtensionContextCompletionHandler(WKWebExtensionContext context, WKWebExtensionTabGoBackForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("goForwardForWebExtensionContext:completionHandler:")]
+    void GoForwardForWebExtensionContextCompletionHandler(WKWebExtensionContext context, WKWebExtensionTabGoForwardForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("activateForWebExtensionContext:completionHandler:")]
+    void ActivateForWebExtensionContextCompletionHandler(WKWebExtensionContext context, WKWebExtensionTabActivateForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("isSelectedForWebExtensionContext:")]
+    bool IsSelectedForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("setSelected:forWebExtensionContext:completionHandler:")]
+    void SetSelectedForWebExtensionContextCompletionHandler(bool selected, WKWebExtensionContext context, WKWebExtensionTabSetSelectedForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("duplicateUsingConfiguration:forWebExtensionContext:completionHandler:")]
+    void DuplicateUsingConfigurationForWebExtensionContextCompletionHandler(WKWebExtensionTabConfiguration configuration, WKWebExtensionContext context, WKWebExtensionTabDuplicateUsingConfigurationForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("closeForWebExtensionContext:completionHandler:")]
+    void CloseForWebExtensionContextCompletionHandler(WKWebExtensionContext context, WKWebExtensionTabCloseForWebExtensionContextCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("shouldGrantPermissionsOnUserGestureForWebExtensionContext:")]
+    bool ShouldGrantPermissionsOnUserGestureForWebExtensionContext(WKWebExtensionContext context);
+    [Optional]
+    [Selector("shouldBypassPermissionsForWebExtensionContext:")]
+    bool ShouldBypassPermissionsForWebExtensionContext(WKWebExtensionContext context);
 }
 
 #endif

@@ -48,8 +48,10 @@ public enum INEditMessageIntentResponseCode : long
 
 public extern objc class INEditMessageIntentResponse : INIntentResponse
 {
-    [Selector("code")] public INEditMessageIntentResponseCode Code { get; }
-    [Selector("initWithCode:userActivity:")] public Self InitWithCodeUserActivity(INEditMessageIntentResponseCode code, NSUserActivity? userActivity);
+    [Selector("code")]
+    public INEditMessageIntentResponseCode Code { get; }
+    [Selector("initWithCode:userActivity:")]
+    public Self InitWithCodeUserActivity(INEditMessageIntentResponseCode code, NSUserActivity? userActivity);
 }
 
 #endif

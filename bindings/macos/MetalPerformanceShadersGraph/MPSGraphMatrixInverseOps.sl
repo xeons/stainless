@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// MPSGraphMatrixInverseOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("inverseOfTensor:name:")] public MPSGraphTensor InverseOfTensorName(MPSGraphTensor inputTensor, NSString? name);
+    [Selector("inverseOfTensor:name:")]
+    public MPSGraphTensor InverseOfTensorName(MPSGraphTensor inputTensor, NSString? name);
 }
 
 #endif

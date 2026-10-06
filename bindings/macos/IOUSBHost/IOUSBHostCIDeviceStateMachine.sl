@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class IOUSBHostCIDeviceStateMachine : NSObject
 {
-    [Selector("deviceState")] public IOUSBHostCIDeviceState DeviceState { get; }
-    [Selector("completeRoute")] public NSUInteger CompleteRoute { get; }
-    [Selector("deviceAddress")] public NSUInteger DeviceAddress { get; }
-    [Selector("controllerInterface")] public IOUSBHostControllerInterface ControllerInterface { get; }
-    [Selector("initWithInterface:command:error:")] public Self? InitWithInterfaceCommandError(IOUSBHostControllerInterface @interface, IOUSBHostCIMessage* command, out NSError? error);
-    [Selector("inspectCommand:error:")] public bool InspectCommandError(IOUSBHostCIMessage* command, out NSError? error);
-    [Selector("respondToCommand:status:error:")] public bool RespondToCommandStatusError(IOUSBHostCIMessage* command, IOUSBHostCIMessageStatus status, out NSError? error);
-    [Selector("respondToCommand:status:deviceAddress:error:")] public bool RespondToCommandStatusDeviceAddressError(IOUSBHostCIMessage* command, IOUSBHostCIMessageStatus status, NSUInteger deviceAddress, out NSError? error);
+    [Selector("deviceState")]
+    public IOUSBHostCIDeviceState DeviceState { get; }
+    [Selector("completeRoute")]
+    public NSUInteger CompleteRoute { get; }
+    [Selector("deviceAddress")]
+    public NSUInteger DeviceAddress { get; }
+    [Selector("controllerInterface")]
+    public IOUSBHostControllerInterface ControllerInterface { get; }
+    [Selector("initWithInterface:command:error:")]
+    public Self? InitWithInterfaceCommandError(IOUSBHostControllerInterface @interface, IOUSBHostCIMessage* command, out NSError? error);
+    [Selector("inspectCommand:error:")]
+    public bool InspectCommandError(IOUSBHostCIMessage* command, out NSError? error);
+    [Selector("respondToCommand:status:error:")]
+    public bool RespondToCommandStatusError(IOUSBHostCIMessage* command, IOUSBHostCIMessageStatus status, out NSError? error);
+    [Selector("respondToCommand:status:deviceAddress:error:")]
+    public bool RespondToCommandStatusDeviceAddressError(IOUSBHostCIMessage* command, IOUSBHostCIMessageStatus status, NSUInteger deviceAddress, out NSError? error);
 }
 
 #endif

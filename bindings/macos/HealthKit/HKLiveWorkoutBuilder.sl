@@ -33,20 +33,32 @@ import Standard.ObjC;
 
 public objc interface HKLiveWorkoutBuilderDelegate : NSObjectProtocol
 {
-    [Selector("workoutBuilder:didCollectDataOfTypes:")] void WorkoutBuilderDidCollectDataOfTypes(HKLiveWorkoutBuilder workoutBuilder, NSSet collectedTypes);
-    [Selector("workoutBuilderDidCollectEvent:")] void WorkoutBuilderDidCollectEvent(HKLiveWorkoutBuilder workoutBuilder);
-    [Optional] [Selector("workoutBuilder:didBeginActivity:")] void WorkoutBuilderDidBeginActivity(HKLiveWorkoutBuilder workoutBuilder, HKWorkoutActivity workoutActivity);
-    [Optional] [Selector("workoutBuilder:didEndActivity:")] void WorkoutBuilderDidEndActivity(HKLiveWorkoutBuilder workoutBuilder, HKWorkoutActivity workoutActivity);
+    [Selector("workoutBuilder:didCollectDataOfTypes:")]
+    void WorkoutBuilderDidCollectDataOfTypes(HKLiveWorkoutBuilder workoutBuilder, NSSet collectedTypes);
+    [Selector("workoutBuilderDidCollectEvent:")]
+    void WorkoutBuilderDidCollectEvent(HKLiveWorkoutBuilder workoutBuilder);
+    [Optional]
+    [Selector("workoutBuilder:didBeginActivity:")]
+    void WorkoutBuilderDidBeginActivity(HKLiveWorkoutBuilder workoutBuilder, HKWorkoutActivity workoutActivity);
+    [Optional]
+    [Selector("workoutBuilder:didEndActivity:")]
+    void WorkoutBuilderDidEndActivity(HKLiveWorkoutBuilder workoutBuilder, HKWorkoutActivity workoutActivity);
 }
 
 public extern objc class HKLiveWorkoutBuilder : HKWorkoutBuilder
 {
-    [Selector("delegate", "setDelegate:")] public HKLiveWorkoutBuilderDelegate? Delegate { get; set; }
-    [Selector("workoutSession")] public HKWorkoutSession? WorkoutSession { get; }
-    [Selector("shouldCollectWorkoutEvents", "setShouldCollectWorkoutEvents:")] public bool ShouldCollectWorkoutEvents { get; set; }
-    [Selector("dataSource", "setDataSource:")] public HKLiveWorkoutDataSource? DataSource { get; set; }
-    [Selector("elapsedTime")] public NSTimeInterval ElapsedTime { get; }
-    [Selector("currentWorkoutActivity")] public HKWorkoutActivity? CurrentWorkoutActivity { get; }
+    [Selector("delegate", "setDelegate:")]
+    public HKLiveWorkoutBuilderDelegate? Delegate { get; set; }
+    [Selector("workoutSession")]
+    public HKWorkoutSession? WorkoutSession { get; }
+    [Selector("shouldCollectWorkoutEvents", "setShouldCollectWorkoutEvents:")]
+    public bool ShouldCollectWorkoutEvents { get; set; }
+    [Selector("dataSource", "setDataSource:")]
+    public HKLiveWorkoutDataSource? DataSource { get; set; }
+    [Selector("elapsedTime")]
+    public NSTimeInterval ElapsedTime { get; }
+    [Selector("currentWorkoutActivity")]
+    public HKWorkoutActivity? CurrentWorkoutActivity { get; }
 }
 
 #endif

@@ -39,11 +39,16 @@ public objc closure void HKSampleQueryInitWithQueryDescriptorsLimitSortDescripto
 
 public extern objc class HKSampleQuery : HKQuery
 {
-    [Selector("limit")] public NSUInteger Limit { get; }
-    [Selector("sortDescriptors")] public NSArray? SortDescriptors { get; }
-    [Selector("initWithSampleType:predicate:limit:sortDescriptors:resultsHandler:")] public Self InitWithSampleTypePredicateLimitSortDescriptorsResultsHandler(HKSampleType sampleType, NSPredicate? predicate, NSUInteger limit, NSArray? sortDescriptors, HKSampleQueryInitWithSampleTypePredicateLimitSortDescriptorsResultsHandlerResultsHandlerBlock resultsHandler);
-    [Selector("initWithQueryDescriptors:limit:resultsHandler:")] public Self InitWithQueryDescriptorsLimitResultsHandler(NSArray queryDescriptors, NSInteger limit, HKSampleQueryInitWithQueryDescriptorsLimitResultsHandlerResultsHandlerBlock resultsHandler);
-    [Selector("initWithQueryDescriptors:limit:sortDescriptors:resultsHandler:")] public Self InitWithQueryDescriptorsLimitSortDescriptorsResultsHandler(NSArray queryDescriptors, NSInteger limit, NSArray sortDescriptors, HKSampleQueryInitWithQueryDescriptorsLimitSortDescriptorsResultsHandlerResultsHandlerBlock resultsHandler);
+    [Selector("limit")]
+    public NSUInteger Limit { get; }
+    [Selector("sortDescriptors")]
+    public NSArray? SortDescriptors { get; }
+    [Selector("initWithSampleType:predicate:limit:sortDescriptors:resultsHandler:")]
+    public Self InitWithSampleTypePredicateLimitSortDescriptorsResultsHandler(HKSampleType sampleType, NSPredicate? predicate, NSUInteger limit, NSArray? sortDescriptors, HKSampleQueryInitWithSampleTypePredicateLimitSortDescriptorsResultsHandlerResultsHandlerBlock resultsHandler);
+    [Selector("initWithQueryDescriptors:limit:resultsHandler:")]
+    public Self InitWithQueryDescriptorsLimitResultsHandler(NSArray queryDescriptors, NSInteger limit, HKSampleQueryInitWithQueryDescriptorsLimitResultsHandlerResultsHandlerBlock resultsHandler);
+    [Selector("initWithQueryDescriptors:limit:sortDescriptors:resultsHandler:")]
+    public Self InitWithQueryDescriptorsLimitSortDescriptorsResultsHandler(NSArray queryDescriptors, NSInteger limit, NSArray sortDescriptors, HKSampleQueryInitWithQueryDescriptorsLimitSortDescriptorsResultsHandlerResultsHandlerBlock resultsHandler);
 }
 
 #endif

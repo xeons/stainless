@@ -35,14 +35,22 @@ import Standard.ObjC;
 
 public extern objc class IOUSBHostInterface : IOUSBHostObject
 {
-    [Selector("idleTimeout")] public NSTimeInterval IdleTimeout { get; }
-    [Selector("configurationDescriptor")] public IOUSBConfigurationDescriptor* ConfigurationDescriptor { get; }
-    [Selector("interfaceDescriptor")] public IOUSBInterfaceDescriptor* InterfaceDescriptor { get; }
-    [Selector("createMatchingDictionaryWithVendorID:productID:bcdDevice:interfaceNumber:configurationValue:interfaceClass:interfaceSubclass:interfaceProtocol:speed:productIDArray:")] public static CFMutableDictionaryRef CreateMatchingDictionaryWithVendorIDProductIDBcdDeviceInterfaceNumberConfigurationValueInterfaceClassInterfaceSubclassInterfaceProtocolSpeedProductIDArray(NSNumber? vendorID, NSNumber? productID, NSNumber? bcdDevice, NSNumber? interfaceNumber, NSNumber? configurationValue, NSNumber? interfaceClass, NSNumber? interfaceSubclass, NSNumber? interfaceProtocol, NSNumber? speed, NSArray? productIDArray);
-    [Selector("initWithIOService:options:queue:error:interestHandler:")] public Self? InitWithIOServiceOptionsQueueErrorInterestHandler(io_service_t ioService, IOUSBHostObjectInitOptions options, dispatch_queue_t? queue, out NSError? error, IOUSBHostInterestHandler? interestHandler);
-    [Selector("setIdleTimeout:error:")] public bool SetIdleTimeoutError(NSTimeInterval idleTimeout, out NSError? error);
-    [Selector("selectAlternateSetting:error:")] public bool SelectAlternateSettingError(NSUInteger alternateSetting, out NSError? error);
-    [Selector("copyPipeWithAddress:error:")] public IOUSBHostPipe? CopyPipeWithAddressError(NSUInteger address, out NSError? error);
+    [Selector("idleTimeout")]
+    public NSTimeInterval IdleTimeout { get; }
+    [Selector("configurationDescriptor")]
+    public IOUSBConfigurationDescriptor* ConfigurationDescriptor { get; }
+    [Selector("interfaceDescriptor")]
+    public IOUSBInterfaceDescriptor* InterfaceDescriptor { get; }
+    [Selector("createMatchingDictionaryWithVendorID:productID:bcdDevice:interfaceNumber:configurationValue:interfaceClass:interfaceSubclass:interfaceProtocol:speed:productIDArray:")]
+    public static CFMutableDictionaryRef CreateMatchingDictionaryWithVendorIDProductIDBcdDeviceInterfaceNumberConfigurationValueInterfaceClassInterfaceSubclassInterfaceProtocolSpeedProductIDArray(NSNumber? vendorID, NSNumber? productID, NSNumber? bcdDevice, NSNumber? interfaceNumber, NSNumber? configurationValue, NSNumber? interfaceClass, NSNumber? interfaceSubclass, NSNumber? interfaceProtocol, NSNumber? speed, NSArray? productIDArray);
+    [Selector("initWithIOService:options:queue:error:interestHandler:")]
+    public Self? InitWithIOServiceOptionsQueueErrorInterestHandler(io_service_t ioService, IOUSBHostObjectInitOptions options, dispatch_queue_t? queue, out NSError? error, IOUSBHostInterestHandler? interestHandler);
+    [Selector("setIdleTimeout:error:")]
+    public bool SetIdleTimeoutError(NSTimeInterval idleTimeout, out NSError? error);
+    [Selector("selectAlternateSetting:error:")]
+    public bool SelectAlternateSettingError(NSUInteger alternateSetting, out NSError? error);
+    [Selector("copyPipeWithAddress:error:")]
+    public IOUSBHostPipe? CopyPipeWithAddressError(NSUInteger address, out NSError? error);
 }
 
 #endif

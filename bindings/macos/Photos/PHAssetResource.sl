@@ -34,17 +34,26 @@ import Standard.ObjC;
 
 public extern objc class PHAssetResource : NSObject
 {
-    [Selector("type")] public PHAssetResourceType Type { get; }
-    [Selector("assetLocalIdentifier")] public NSString AssetLocalIdentifier { get; }
-    [Selector("originalFilename")] public NSString OriginalFilename { get; }
+    [Selector("type")]
+    public PHAssetResourceType Type { get; }
+    [Selector("assetLocalIdentifier")]
+    public NSString AssetLocalIdentifier { get; }
+    [Selector("originalFilename")]
+    public NSString OriginalFilename { get; }
     /// macOS 26.0 and later.
-    [Selector("contentType")] public UTType ContentType { get; }
+    [Selector("contentType")]
+    public UTType ContentType { get; }
     /// Deprecated in macOS 100000.
-    [Selector("uniformTypeIdentifier")] public NSString UniformTypeIdentifier { get; }
-    [Selector("pixelWidth")] public NSInteger PixelWidth { get; }
-    [Selector("pixelHeight")] public NSInteger PixelHeight { get; }
-    [Selector("assetResourcesForAsset:")] public static NSArray AssetResourcesForAsset(PHAsset asset);
-    [Selector("assetResourcesForLivePhoto:")] public static NSArray AssetResourcesForLivePhoto(PHLivePhoto livePhoto);
+    [Selector("uniformTypeIdentifier")]
+    public NSString UniformTypeIdentifier { get; }
+    [Selector("pixelWidth")]
+    public NSInteger PixelWidth { get; }
+    [Selector("pixelHeight")]
+    public NSInteger PixelHeight { get; }
+    [Selector("assetResourcesForAsset:")]
+    public static NSArray AssetResourcesForAsset(PHAsset asset);
+    [Selector("assetResourcesForLivePhoto:")]
+    public static NSArray AssetResourcesForLivePhoto(PHLivePhoto livePhoto);
 }
 
 #endif

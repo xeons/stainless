@@ -34,23 +34,40 @@ import Standard.ObjC;
 
 public extern objc class AVAudioTime : NSObject
 {
-    [Selector("isHostTimeValid")] public bool HostTimeValid { get; }
-    [Selector("hostTime")] public ulong HostTime { get; }
-    [Selector("isSampleTimeValid")] public bool SampleTimeValid { get; }
-    [Selector("sampleTime")] public AVAudioFramePosition SampleTime { get; }
-    [Selector("sampleRate")] public double SampleRate { get; }
-    [Selector("audioTimeStamp")] public AudioTimeStamp AudioTimeStamp { get; }
-    [Selector("initWithAudioTimeStamp:sampleRate:")] public Self InitWithAudioTimeStampSampleRate(AudioTimeStamp* ts, double sampleRate);
-    [Selector("initWithHostTime:")] public Self InitWithHostTime(ulong hostTime);
-    [Selector("initWithSampleTime:atRate:")] public Self InitWithSampleTimeAtRate(AVAudioFramePosition sampleTime, double sampleRate);
-    [Selector("initWithHostTime:sampleTime:atRate:")] public Self InitWithHostTimeSampleTimeAtRate(ulong hostTime, AVAudioFramePosition sampleTime, double sampleRate);
-    [Selector("timeWithAudioTimeStamp:sampleRate:")] public static Self TimeWithAudioTimeStampSampleRate(AudioTimeStamp* ts, double sampleRate);
-    [Selector("timeWithHostTime:")] public static Self TimeWithHostTime(ulong hostTime);
-    [Selector("timeWithSampleTime:atRate:")] public static Self TimeWithSampleTimeAtRate(AVAudioFramePosition sampleTime, double sampleRate);
-    [Selector("timeWithHostTime:sampleTime:atRate:")] public static Self TimeWithHostTimeSampleTimeAtRate(ulong hostTime, AVAudioFramePosition sampleTime, double sampleRate);
-    [Selector("hostTimeForSeconds:")] public static ulong HostTimeForSeconds(NSTimeInterval seconds);
-    [Selector("secondsForHostTime:")] public static NSTimeInterval SecondsForHostTime(ulong hostTime);
-    [Selector("extrapolateTimeFromAnchor:")] public AVAudioTime? ExtrapolateTimeFromAnchor(AVAudioTime anchorTime);
+    [Selector("isHostTimeValid")]
+    public bool HostTimeValid { get; }
+    [Selector("hostTime")]
+    public ulong HostTime { get; }
+    [Selector("isSampleTimeValid")]
+    public bool SampleTimeValid { get; }
+    [Selector("sampleTime")]
+    public AVAudioFramePosition SampleTime { get; }
+    [Selector("sampleRate")]
+    public double SampleRate { get; }
+    [Selector("audioTimeStamp")]
+    public AudioTimeStamp AudioTimeStamp { get; }
+    [Selector("initWithAudioTimeStamp:sampleRate:")]
+    public Self InitWithAudioTimeStampSampleRate(AudioTimeStamp* ts, double sampleRate);
+    [Selector("initWithHostTime:")]
+    public Self InitWithHostTime(ulong hostTime);
+    [Selector("initWithSampleTime:atRate:")]
+    public Self InitWithSampleTimeAtRate(AVAudioFramePosition sampleTime, double sampleRate);
+    [Selector("initWithHostTime:sampleTime:atRate:")]
+    public Self InitWithHostTimeSampleTimeAtRate(ulong hostTime, AVAudioFramePosition sampleTime, double sampleRate);
+    [Selector("timeWithAudioTimeStamp:sampleRate:")]
+    public static Self TimeWithAudioTimeStampSampleRate(AudioTimeStamp* ts, double sampleRate);
+    [Selector("timeWithHostTime:")]
+    public static Self TimeWithHostTime(ulong hostTime);
+    [Selector("timeWithSampleTime:atRate:")]
+    public static Self TimeWithSampleTimeAtRate(AVAudioFramePosition sampleTime, double sampleRate);
+    [Selector("timeWithHostTime:sampleTime:atRate:")]
+    public static Self TimeWithHostTimeSampleTimeAtRate(ulong hostTime, AVAudioFramePosition sampleTime, double sampleRate);
+    [Selector("hostTimeForSeconds:")]
+    public static ulong HostTimeForSeconds(NSTimeInterval seconds);
+    [Selector("secondsForHostTime:")]
+    public static NSTimeInterval SecondsForHostTime(ulong hostTime);
+    [Selector("extrapolateTimeFromAnchor:")]
+    public AVAudioTime? ExtrapolateTimeFromAnchor(AVAudioTime anchorTime);
 }
 
 #endif

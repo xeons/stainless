@@ -34,9 +34,12 @@ public extern objc class GCControllerInputState : NSObject, GCDevicePhysicalInpu
 
 public extern objc class GCControllerLiveInput : GCControllerInputState, GCDevicePhysicalInput
 {
-    [Selector("unmappedInput")] public GCControllerLiveInput? UnmappedInput { get; }
-    [Selector("capture")] public GCControllerInputState Capture();
-    [Selector("nextInputState")] public GCControllerInputState? NextInputState();
+    [Selector("unmappedInput")]
+    public GCControllerLiveInput? UnmappedInput { get; }
+    [Selector("capture")]
+    public GCControllerInputState Capture();
+    [Selector("nextInputState")]
+    public GCControllerInputState? NextInputState();
 }
 
 #endif

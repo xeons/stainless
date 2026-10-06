@@ -33,39 +33,60 @@ import Standard.ObjC;
 
 public objc interface MTLAccelerationStructureCommandEncoder : MTLCommandEncoder
 {
-    [Selector("buildAccelerationStructure:descriptor:scratchBuffer:scratchBufferOffset:")] void BuildAccelerationStructureDescriptorScratchBufferScratchBufferOffset(MTLAccelerationStructure accelerationStructure, MTLAccelerationStructureDescriptor descriptor, MTLBuffer scratchBuffer, NSUInteger scratchBufferOffset);
-    [Selector("refitAccelerationStructure:descriptor:destination:scratchBuffer:scratchBufferOffset:")] void RefitAccelerationStructureDescriptorDestinationScratchBufferScratchBufferOffset(MTLAccelerationStructure sourceAccelerationStructure, MTLAccelerationStructureDescriptor descriptor, MTLAccelerationStructure? destinationAccelerationStructure, MTLBuffer? scratchBuffer, NSUInteger scratchBufferOffset);
-    [Selector("refitAccelerationStructure:descriptor:destination:scratchBuffer:scratchBufferOffset:options:")] void RefitAccelerationStructureDescriptorDestinationScratchBufferScratchBufferOffsetOptions(MTLAccelerationStructure sourceAccelerationStructure, MTLAccelerationStructureDescriptor descriptor, MTLAccelerationStructure? destinationAccelerationStructure, MTLBuffer? scratchBuffer, NSUInteger scratchBufferOffset, MTLAccelerationStructureRefitOptions options);
-    [Selector("copyAccelerationStructure:toAccelerationStructure:")] void CopyAccelerationStructureToAccelerationStructure(MTLAccelerationStructure sourceAccelerationStructure, MTLAccelerationStructure destinationAccelerationStructure);
-    [Selector("writeCompactedAccelerationStructureSize:toBuffer:offset:")] void WriteCompactedAccelerationStructureSizeToBufferOffset(MTLAccelerationStructure accelerationStructure, MTLBuffer buffer, NSUInteger offset);
-    [Selector("writeCompactedAccelerationStructureSize:toBuffer:offset:sizeDataType:")] void WriteCompactedAccelerationStructureSizeToBufferOffsetSizeDataType(MTLAccelerationStructure accelerationStructure, MTLBuffer buffer, NSUInteger offset, MTLDataType sizeDataType);
-    [Selector("copyAndCompactAccelerationStructure:toAccelerationStructure:")] void CopyAndCompactAccelerationStructureToAccelerationStructure(MTLAccelerationStructure sourceAccelerationStructure, MTLAccelerationStructure destinationAccelerationStructure);
-    [Selector("updateFence:")] void UpdateFence(MTLFence fence);
-    [Selector("waitForFence:")] void WaitForFence(MTLFence fence);
-    [Selector("useResource:usage:")] void UseResourceUsage(MTLResource resource, MTLResourceUsage usage);
-    [Selector("useResources:count:usage:")] void UseResourcesCountUsage(void** resources, NSUInteger count, MTLResourceUsage usage);
-    [Selector("useHeap:")] void UseHeap(MTLHeap heap);
-    [Selector("useHeaps:count:")] void UseHeapsCount(void** heaps, NSUInteger count);
-    [Selector("sampleCountersInBuffer:atSampleIndex:withBarrier:")] void SampleCountersInBufferAtSampleIndexWithBarrier(MTLCounterSampleBuffer sampleBuffer, NSUInteger sampleIndex, bool barrier);
+    [Selector("buildAccelerationStructure:descriptor:scratchBuffer:scratchBufferOffset:")]
+    void BuildAccelerationStructureDescriptorScratchBufferScratchBufferOffset(MTLAccelerationStructure accelerationStructure, MTLAccelerationStructureDescriptor descriptor, MTLBuffer scratchBuffer, NSUInteger scratchBufferOffset);
+    [Selector("refitAccelerationStructure:descriptor:destination:scratchBuffer:scratchBufferOffset:")]
+    void RefitAccelerationStructureDescriptorDestinationScratchBufferScratchBufferOffset(MTLAccelerationStructure sourceAccelerationStructure, MTLAccelerationStructureDescriptor descriptor, MTLAccelerationStructure? destinationAccelerationStructure, MTLBuffer? scratchBuffer, NSUInteger scratchBufferOffset);
+    [Selector("refitAccelerationStructure:descriptor:destination:scratchBuffer:scratchBufferOffset:options:")]
+    void RefitAccelerationStructureDescriptorDestinationScratchBufferScratchBufferOffsetOptions(MTLAccelerationStructure sourceAccelerationStructure, MTLAccelerationStructureDescriptor descriptor, MTLAccelerationStructure? destinationAccelerationStructure, MTLBuffer? scratchBuffer, NSUInteger scratchBufferOffset, MTLAccelerationStructureRefitOptions options);
+    [Selector("copyAccelerationStructure:toAccelerationStructure:")]
+    void CopyAccelerationStructureToAccelerationStructure(MTLAccelerationStructure sourceAccelerationStructure, MTLAccelerationStructure destinationAccelerationStructure);
+    [Selector("writeCompactedAccelerationStructureSize:toBuffer:offset:")]
+    void WriteCompactedAccelerationStructureSizeToBufferOffset(MTLAccelerationStructure accelerationStructure, MTLBuffer buffer, NSUInteger offset);
+    [Selector("writeCompactedAccelerationStructureSize:toBuffer:offset:sizeDataType:")]
+    void WriteCompactedAccelerationStructureSizeToBufferOffsetSizeDataType(MTLAccelerationStructure accelerationStructure, MTLBuffer buffer, NSUInteger offset, MTLDataType sizeDataType);
+    [Selector("copyAndCompactAccelerationStructure:toAccelerationStructure:")]
+    void CopyAndCompactAccelerationStructureToAccelerationStructure(MTLAccelerationStructure sourceAccelerationStructure, MTLAccelerationStructure destinationAccelerationStructure);
+    [Selector("updateFence:")]
+    void UpdateFence(MTLFence fence);
+    [Selector("waitForFence:")]
+    void WaitForFence(MTLFence fence);
+    [Selector("useResource:usage:")]
+    void UseResourceUsage(MTLResource resource, MTLResourceUsage usage);
+    [Selector("useResources:count:usage:")]
+    void UseResourcesCountUsage(void** resources, NSUInteger count, MTLResourceUsage usage);
+    [Selector("useHeap:")]
+    void UseHeap(MTLHeap heap);
+    [Selector("useHeaps:count:")]
+    void UseHeapsCount(void** heaps, NSUInteger count);
+    [Selector("sampleCountersInBuffer:atSampleIndex:withBarrier:")]
+    void SampleCountersInBufferAtSampleIndexWithBarrier(MTLCounterSampleBuffer sampleBuffer, NSUInteger sampleIndex, bool barrier);
 }
 
 public extern objc class MTLAccelerationStructurePassSampleBufferAttachmentDescriptor : NSObject, NSCopying
 {
-    [Selector("sampleBuffer", "setSampleBuffer:")] public MTLCounterSampleBuffer? SampleBuffer { get; set; }
-    [Selector("startOfEncoderSampleIndex", "setStartOfEncoderSampleIndex:")] public NSUInteger StartOfEncoderSampleIndex { get; set; }
-    [Selector("endOfEncoderSampleIndex", "setEndOfEncoderSampleIndex:")] public NSUInteger EndOfEncoderSampleIndex { get; set; }
+    [Selector("sampleBuffer", "setSampleBuffer:")]
+    public MTLCounterSampleBuffer? SampleBuffer { get; set; }
+    [Selector("startOfEncoderSampleIndex", "setStartOfEncoderSampleIndex:")]
+    public NSUInteger StartOfEncoderSampleIndex { get; set; }
+    [Selector("endOfEncoderSampleIndex", "setEndOfEncoderSampleIndex:")]
+    public NSUInteger EndOfEncoderSampleIndex { get; set; }
 }
 
 public extern objc class MTLAccelerationStructurePassSampleBufferAttachmentDescriptorArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public MTLAccelerationStructurePassSampleBufferAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTLAccelerationStructurePassSampleBufferAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
+    [Selector("objectAtIndexedSubscript:")]
+    public MTLAccelerationStructurePassSampleBufferAttachmentDescriptor ObjectAtIndexedSubscript(NSUInteger attachmentIndex);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTLAccelerationStructurePassSampleBufferAttachmentDescriptor? attachment, NSUInteger attachmentIndex);
 }
 
 public extern objc class MTLAccelerationStructurePassDescriptor : NSObject, NSCopying
 {
-    [Selector("sampleBufferAttachments")] public MTLAccelerationStructurePassSampleBufferAttachmentDescriptorArray SampleBufferAttachments { get; }
-    [Selector("accelerationStructurePassDescriptor")] public static MTLAccelerationStructurePassDescriptor AccelerationStructurePassDescriptor();
+    [Selector("sampleBufferAttachments")]
+    public MTLAccelerationStructurePassSampleBufferAttachmentDescriptorArray SampleBufferAttachments { get; }
+    [Selector("accelerationStructurePassDescriptor")]
+    public static MTLAccelerationStructurePassDescriptor AccelerationStructurePassDescriptor();
 }
 
 #endif

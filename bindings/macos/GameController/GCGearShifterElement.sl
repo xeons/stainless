@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class GCGearShifterElement : NSObject, GCPhysicalInputElement
 {
-    [Selector("patternInput")] public GCSwitchPositionInput? PatternInput { get; }
-    [Selector("sequentialInput")] public GCRelativeInput? SequentialInput { get; }
+    [Selector("patternInput")]
+    public GCSwitchPositionInput? PatternInput { get; }
+    [Selector("sequentialInput")]
+    public GCRelativeInput? SequentialInput { get; }
 }
 
 #endif

@@ -50,7 +50,8 @@ public extern "C" NSString? WebPlugInShouldLoadMainResourceKey;
 /// Deprecated in macOS 10.14.
 public objc interface WebPlugInViewFactory : NSObjectProtocol
 {
-    [Selector("plugInViewWithArguments:")] static abstract NSView? PlugInViewWithArguments(NSDictionary? arguments);
+    [Selector("plugInViewWithArguments:")]
+    static abstract NSView? PlugInViewWithArguments(NSDictionary? arguments);
 }
 
 #endif

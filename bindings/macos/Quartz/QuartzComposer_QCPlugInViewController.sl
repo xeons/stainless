@@ -34,15 +34,19 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.15.
 public extern objc class QCPlugInViewController : NSViewController
 {
-    [Selector("initWithPlugIn:viewNibName:")] public AnyObject? InitWithPlugInViewNibName(QCPlugIn? plugIn, NSString? name);
-    [Selector("plugIn")] public QCPlugIn? PlugIn();
+    [Selector("initWithPlugIn:viewNibName:")]
+    public AnyObject? InitWithPlugInViewNibName(QCPlugIn? plugIn, NSString? name);
+    [Selector("plugIn")]
+    public QCPlugIn? PlugIn();
 }
 
 /// Deprecated in macOS 10.15.
 /// QCPlugInViewController, a category of QCPlugIn.
 public extern objc class QCPlugIn
 {
-    [ReturnsRetained] [Selector("createViewController")] public QCPlugInViewController? CreateViewController();
+    [ReturnsRetained]
+    [Selector("createViewController")]
+    public QCPlugInViewController? CreateViewController();
 }
 
 #endif

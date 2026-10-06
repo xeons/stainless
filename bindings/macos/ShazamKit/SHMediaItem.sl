@@ -67,25 +67,44 @@ public objc closure void SHMediaItemFetchMediaItemWithShazamIDCompletionHandlerC
 
 public extern objc class SHMediaItem : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("shazamID")] public NSString? ShazamID { get; }
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("subtitle")] public NSString? Subtitle { get; }
-    [Selector("artist")] public NSString? Artist { get; }
-    [Selector("genres")] public NSArray Genres { get; }
-    [Selector("appleMusicID")] public NSString? AppleMusicID { get; }
-    [Selector("appleMusicURL")] public NSURL? AppleMusicURL { get; }
-    [Selector("webURL")] public NSURL? WebURL { get; }
-    [Selector("artworkURL")] public NSURL? ArtworkURL { get; }
-    [Selector("videoURL")] public NSURL? VideoURL { get; }
-    [Selector("explicitContent")] public bool ExplicitContent { get; }
-    [Selector("isrc")] public NSString? Isrc { get; }
-    [Selector("timeRanges")] public NSArray? TimeRanges { get; }
-    [Selector("frequencySkewRanges")] public NSArray? FrequencySkewRanges { get; }
-    [Selector("creationDate")] public NSDate? CreationDate { get; }
-    [Selector("mediaItemWithProperties:")] public static Self MediaItemWithProperties(NSDictionary properties);
-    [Selector("fetchMediaItemWithShazamID:completionHandler:")] public static void FetchMediaItemWithShazamIDCompletionHandler(NSString shazamID, SHMediaItemFetchMediaItemWithShazamIDCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("valueForProperty:")] public AnyObject ValueForProperty(SHMediaItemProperty property);
-    [Selector("objectForKeyedSubscript:")] public AnyObject ObjectForKeyedSubscript(SHMediaItemProperty key);
+    [Selector("shazamID")]
+    public NSString? ShazamID { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("subtitle")]
+    public NSString? Subtitle { get; }
+    [Selector("artist")]
+    public NSString? Artist { get; }
+    [Selector("genres")]
+    public NSArray Genres { get; }
+    [Selector("appleMusicID")]
+    public NSString? AppleMusicID { get; }
+    [Selector("appleMusicURL")]
+    public NSURL? AppleMusicURL { get; }
+    [Selector("webURL")]
+    public NSURL? WebURL { get; }
+    [Selector("artworkURL")]
+    public NSURL? ArtworkURL { get; }
+    [Selector("videoURL")]
+    public NSURL? VideoURL { get; }
+    [Selector("explicitContent")]
+    public bool ExplicitContent { get; }
+    [Selector("isrc")]
+    public NSString? Isrc { get; }
+    [Selector("timeRanges")]
+    public NSArray? TimeRanges { get; }
+    [Selector("frequencySkewRanges")]
+    public NSArray? FrequencySkewRanges { get; }
+    [Selector("creationDate")]
+    public NSDate? CreationDate { get; }
+    [Selector("mediaItemWithProperties:")]
+    public static Self MediaItemWithProperties(NSDictionary properties);
+    [Selector("fetchMediaItemWithShazamID:completionHandler:")]
+    public static void FetchMediaItemWithShazamIDCompletionHandler(NSString shazamID, SHMediaItemFetchMediaItemWithShazamIDCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("valueForProperty:")]
+    public AnyObject ValueForProperty(SHMediaItemProperty property);
+    [Selector("objectForKeyedSubscript:")]
+    public AnyObject ObjectForKeyedSubscript(SHMediaItemProperty key);
 }
 
 #endif

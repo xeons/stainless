@@ -47,18 +47,30 @@ public enum AVDepthDataAccuracy : long
 
 public extern objc class AVDepthData : NSObject
 {
-    [Selector("availableDepthDataTypes")] public NSArray? AvailableDepthDataTypes { get; }
-    [Selector("depthDataType")] public OSType DepthDataType { get; }
-    [Selector("depthDataMap")] public CVPixelBufferRef? DepthDataMap { get; }
-    [Selector("depthDataQuality")] public AVDepthDataQuality DepthDataQuality { get; }
-    [Selector("isDepthDataFiltered")] public bool DepthDataFiltered { get; }
-    [Selector("depthDataAccuracy")] public AVDepthDataAccuracy DepthDataAccuracy { get; }
-    [Selector("cameraCalibrationData")] public AVCameraCalibrationData? CameraCalibrationData { get; }
-    [Selector("depthDataFromDictionaryRepresentation:error:")] public static Self? DepthDataFromDictionaryRepresentationError(NSDictionary imageSourceAuxDataInfoDictionary, out NSError? outError);
-    [Selector("depthDataByConvertingToDepthDataType:")] public Self DepthDataByConvertingToDepthDataType(OSType depthDataType);
-    [Selector("depthDataByApplyingExifOrientation:")] public Self DepthDataByApplyingExifOrientation(CGImagePropertyOrientation exifOrientation);
-    [Selector("depthDataByReplacingDepthDataMapWithPixelBuffer:error:")] public Self? DepthDataByReplacingDepthDataMapWithPixelBufferError(CVPixelBufferRef pixelBuffer, out NSError? outError);
-    [Selector("dictionaryRepresentationForAuxiliaryDataType:")] public NSDictionary? DictionaryRepresentationForAuxiliaryDataType(out NSString? outAuxDataType);
+    [Selector("availableDepthDataTypes")]
+    public NSArray? AvailableDepthDataTypes { get; }
+    [Selector("depthDataType")]
+    public OSType DepthDataType { get; }
+    [Selector("depthDataMap")]
+    public CVPixelBufferRef? DepthDataMap { get; }
+    [Selector("depthDataQuality")]
+    public AVDepthDataQuality DepthDataQuality { get; }
+    [Selector("isDepthDataFiltered")]
+    public bool DepthDataFiltered { get; }
+    [Selector("depthDataAccuracy")]
+    public AVDepthDataAccuracy DepthDataAccuracy { get; }
+    [Selector("cameraCalibrationData")]
+    public AVCameraCalibrationData? CameraCalibrationData { get; }
+    [Selector("depthDataFromDictionaryRepresentation:error:")]
+    public static Self? DepthDataFromDictionaryRepresentationError(NSDictionary imageSourceAuxDataInfoDictionary, out NSError? outError);
+    [Selector("depthDataByConvertingToDepthDataType:")]
+    public Self DepthDataByConvertingToDepthDataType(OSType depthDataType);
+    [Selector("depthDataByApplyingExifOrientation:")]
+    public Self DepthDataByApplyingExifOrientation(CGImagePropertyOrientation exifOrientation);
+    [Selector("depthDataByReplacingDepthDataMapWithPixelBuffer:error:")]
+    public Self? DepthDataByReplacingDepthDataMapWithPixelBufferError(CVPixelBufferRef pixelBuffer, out NSError? outError);
+    [Selector("dictionaryRepresentationForAuxiliaryDataType:")]
+    public NSDictionary? DictionaryRepresentationForAuxiliaryDataType(out NSString? outAuxDataType);
 }
 
 #endif

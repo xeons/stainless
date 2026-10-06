@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class NLLanguageRecognizer : NSObject
 {
-    [Selector("dominantLanguage")] public NLLanguage? DominantLanguage { get; }
-    [Selector("languageHints", "setLanguageHints:")] public NSDictionary? LanguageHints { get; set; }
-    [Selector("languageConstraints", "setLanguageConstraints:")] public NSArray LanguageConstraints { get; set; }
-    [Selector("dominantLanguageForString:")] public static NLLanguage? DominantLanguageForString(NSString string);
-    [Selector("init")] public Self Init();
-    [Selector("processString:")] public void ProcessString(NSString string);
-    [Selector("reset")] public void Reset();
-    [Selector("languageHypothesesWithMaximum:")] public NSDictionary LanguageHypothesesWithMaximum(NSUInteger maxHypotheses);
+    [Selector("dominantLanguage")]
+    public NLLanguage? DominantLanguage { get; }
+    [Selector("languageHints", "setLanguageHints:")]
+    public NSDictionary? LanguageHints { get; set; }
+    [Selector("languageConstraints", "setLanguageConstraints:")]
+    public NSArray LanguageConstraints { get; set; }
+    [Selector("dominantLanguageForString:")]
+    public static NLLanguage? DominantLanguageForString(NSString string);
+    [Selector("init")]
+    public Self Init();
+    [Selector("processString:")]
+    public void ProcessString(NSString string);
+    [Selector("reset")]
+    public void Reset();
+    [Selector("languageHypothesesWithMaximum:")]
+    public NSDictionary LanguageHypothesesWithMaximum(NSUInteger maxHypotheses);
 }
 
 #endif

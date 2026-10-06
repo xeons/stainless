@@ -36,57 +36,86 @@ public const int NSAttachmentCharacter = 65532;
 
 public objc interface NSTextAttachmentLayout : NSObjectProtocol
 {
-    [Selector("imageForBounds:attributes:location:textContainer:")] NSImage? ImageForBoundsAttributesLocationTextContainer(CGRect bounds, NSDictionary attributes, NSTextLocation location, NSTextContainer? textContainer);
-    [Selector("attachmentBoundsForAttributes:location:textContainer:proposedLineFragment:position:")] CGRect AttachmentBoundsForAttributesLocationTextContainerProposedLineFragmentPosition(NSDictionary attributes, NSTextLocation location, NSTextContainer? textContainer, CGRect proposedLineFragment, CGPoint position);
-    [Selector("viewProviderForParentView:location:textContainer:")] NSTextAttachmentViewProvider? ViewProviderForParentViewLocationTextContainer(NSView? parentView, NSTextLocation location, NSTextContainer? textContainer);
+    [Selector("imageForBounds:attributes:location:textContainer:")]
+    NSImage? ImageForBoundsAttributesLocationTextContainer(CGRect bounds, NSDictionary attributes, NSTextLocation location, NSTextContainer? textContainer);
+    [Selector("attachmentBoundsForAttributes:location:textContainer:proposedLineFragment:position:")]
+    CGRect AttachmentBoundsForAttributesLocationTextContainerProposedLineFragmentPosition(NSDictionary attributes, NSTextLocation location, NSTextContainer? textContainer, CGRect proposedLineFragment, CGPoint position);
+    [Selector("viewProviderForParentView:location:textContainer:")]
+    NSTextAttachmentViewProvider? ViewProviderForParentViewLocationTextContainer(NSView? parentView, NSTextLocation location, NSTextContainer? textContainer);
 }
 
 public extern objc class NSTextAttachment : NSObject, NSTextAttachmentLayout, NSSecureCoding
 {
-    [Selector("contents", "setContents:")] public NSData? Contents { get; set; }
-    [Selector("fileType", "setFileType:")] public NSString? FileType { get; set; }
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("bounds", "setBounds:")] public CGRect Bounds { get; set; }
-    [Selector("fileWrapper", "setFileWrapper:")] public NSFileWrapper? FileWrapper { get; set; }
-    [Selector("attachmentCell", "setAttachmentCell:")] public NSTextAttachmentCellProtocol? AttachmentCell { get; set; }
-    [Selector("lineLayoutPadding", "setLineLayoutPadding:")] public CGFloat LineLayoutPadding { get; set; }
-    [Selector("allowsTextAttachmentView", "setAllowsTextAttachmentView:")] public bool AllowsTextAttachmentView { get; set; }
-    [Selector("usesTextAttachmentView")] public bool UsesTextAttachmentView { get; }
-    [Selector("initWithData:ofType:")] public Self InitWithDataOfType(NSData? contentData, NSString? uti);
-    [Selector("initWithFileWrapper:")] public Self InitWithFileWrapper(NSFileWrapper? fileWrapper);
-    [Selector("textAttachmentViewProviderClassForFileType:")] public static Class TextAttachmentViewProviderClassForFileType(NSString fileType);
-    [Selector("registerTextAttachmentViewProviderClass:forFileType:")] public static void RegisterTextAttachmentViewProviderClassForFileType(Class textAttachmentViewProviderClass, NSString fileType);
+    [Selector("contents", "setContents:")]
+    public NSData? Contents { get; set; }
+    [Selector("fileType", "setFileType:")]
+    public NSString? FileType { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("bounds", "setBounds:")]
+    public CGRect Bounds { get; set; }
+    [Selector("fileWrapper", "setFileWrapper:")]
+    public NSFileWrapper? FileWrapper { get; set; }
+    [Selector("attachmentCell", "setAttachmentCell:")]
+    public NSTextAttachmentCellProtocol? AttachmentCell { get; set; }
+    [Selector("lineLayoutPadding", "setLineLayoutPadding:")]
+    public CGFloat LineLayoutPadding { get; set; }
+    [Selector("allowsTextAttachmentView", "setAllowsTextAttachmentView:")]
+    public bool AllowsTextAttachmentView { get; set; }
+    [Selector("usesTextAttachmentView")]
+    public bool UsesTextAttachmentView { get; }
+    [Selector("initWithData:ofType:")]
+    public Self InitWithDataOfType(NSData? contentData, NSString? uti);
+    [Selector("initWithFileWrapper:")]
+    public Self InitWithFileWrapper(NSFileWrapper? fileWrapper);
+    [Selector("textAttachmentViewProviderClassForFileType:")]
+    public static Class TextAttachmentViewProviderClassForFileType(NSString fileType);
+    [Selector("registerTextAttachmentViewProviderClass:forFileType:")]
+    public static void RegisterTextAttachmentViewProviderClassForFileType(Class textAttachmentViewProviderClass, NSString fileType);
 }
 
 /// NSAttributedStringAttachmentConveniences, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("attributedStringWithAttachment:")] public static NSAttributedString AttributedStringWithAttachment(NSTextAttachment attachment);
-    [Selector("attributedStringWithAttachment:attributes:")] public static Self AttributedStringWithAttachmentAttributes(NSTextAttachment attachment, NSDictionary attributes);
+    [Selector("attributedStringWithAttachment:")]
+    public static NSAttributedString AttributedStringWithAttachment(NSTextAttachment attachment);
+    [Selector("attributedStringWithAttachment:attributes:")]
+    public static Self AttributedStringWithAttachmentAttributes(NSTextAttachment attachment, NSDictionary attributes);
 }
 
 public extern objc class NSTextAttachmentViewProvider : NSObject
 {
-    [Selector("textAttachment")] public NSTextAttachment? TextAttachment { get; }
-    [Selector("textLayoutManager")] public NSTextLayoutManager? TextLayoutManager { get; }
-    [Selector("location")] public NSTextLocation Location { get; }
-    [Selector("view", "setView:")] public NSView? View { get; set; }
-    [Selector("tracksTextAttachmentViewBounds", "setTracksTextAttachmentViewBounds:")] public bool TracksTextAttachmentViewBounds { get; set; }
-    [Selector("initWithTextAttachment:parentView:textLayoutManager:location:")] public Self InitWithTextAttachmentParentViewTextLayoutManagerLocation(NSTextAttachment textAttachment, NSView? parentView, NSTextLayoutManager? textLayoutManager, NSTextLocation location);
-    [Selector("loadView")] public void LoadView();
-    [Selector("attachmentBoundsForAttributes:location:textContainer:proposedLineFragment:position:")] public CGRect AttachmentBoundsForAttributesLocationTextContainerProposedLineFragmentPosition(NSDictionary attributes, NSTextLocation location, NSTextContainer? textContainer, CGRect proposedLineFragment, CGPoint position);
+    [Selector("textAttachment")]
+    public NSTextAttachment? TextAttachment { get; }
+    [Selector("textLayoutManager")]
+    public NSTextLayoutManager? TextLayoutManager { get; }
+    [Selector("location")]
+    public NSTextLocation Location { get; }
+    [Selector("view", "setView:")]
+    public NSView? View { get; set; }
+    [Selector("tracksTextAttachmentViewBounds", "setTracksTextAttachmentViewBounds:")]
+    public bool TracksTextAttachmentViewBounds { get; set; }
+    [Selector("initWithTextAttachment:parentView:textLayoutManager:location:")]
+    public Self InitWithTextAttachmentParentViewTextLayoutManagerLocation(NSTextAttachment textAttachment, NSView? parentView, NSTextLayoutManager? textLayoutManager, NSTextLocation location);
+    [Selector("loadView")]
+    public void LoadView();
+    [Selector("attachmentBoundsForAttributes:location:textContainer:proposedLineFragment:position:")]
+    public CGRect AttachmentBoundsForAttributesLocationTextContainerProposedLineFragmentPosition(NSDictionary attributes, NSTextLocation location, NSTextContainer? textContainer, CGRect proposedLineFragment, CGPoint position);
 }
 
 /// NSMutableAttributedStringAttachmentConveniences, a category of NSMutableAttributedString.
 public extern objc class NSMutableAttributedString
 {
-    [Selector("updateAttachmentsFromPath:")] public void UpdateAttachmentsFromPath(NSString path);
+    [Selector("updateAttachmentsFromPath:")]
+    public void UpdateAttachmentsFromPath(NSString path);
 }
 
 public objc interface NSTextAttachmentContainer : NSObjectProtocol
 {
-    [Selector("imageForBounds:textContainer:characterIndex:")] NSImage? ImageForBoundsTextContainerCharacterIndex(CGRect imageBounds, NSTextContainer? textContainer, NSUInteger charIndex);
-    [Selector("attachmentBoundsForTextContainer:proposedLineFragment:glyphPosition:characterIndex:")] CGRect AttachmentBoundsForTextContainerProposedLineFragmentGlyphPositionCharacterIndex(NSTextContainer? textContainer, CGRect lineFrag, CGPoint position, NSUInteger charIndex);
+    [Selector("imageForBounds:textContainer:characterIndex:")]
+    NSImage? ImageForBoundsTextContainerCharacterIndex(CGRect imageBounds, NSTextContainer? textContainer, NSUInteger charIndex);
+    [Selector("attachmentBoundsForTextContainer:proposedLineFragment:glyphPosition:characterIndex:")]
+    CGRect AttachmentBoundsForTextContainerProposedLineFragmentGlyphPositionCharacterIndex(NSTextContainer? textContainer, CGRect lineFrag, CGPoint position, NSUInteger charIndex);
 }
 
 /// NSTextAttachment_Deprecation, a category of NSTextAttachment.

@@ -41,15 +41,24 @@ public enum NSMenuItemBadgeType : long
 
 public extern objc class NSMenuItemBadge : NSObject, NSCopying
 {
-    [Selector("itemCount")] public NSInteger ItemCount { get; }
-    [Selector("type")] public NSMenuItemBadgeType Type { get; }
-    [Selector("stringValue")] public NSString? StringValue { get; }
-    [Selector("updatesWithCount:")] public static Self UpdatesWithCount(NSInteger itemCount);
-    [Selector("newItemsWithCount:")] public static Self NewItemsWithCount(NSInteger itemCount);
-    [Selector("alertsWithCount:")] public static Self AlertsWithCount(NSInteger itemCount);
-    [Selector("initWithCount:type:")] public Self InitWithCountType(NSInteger itemCount, NSMenuItemBadgeType type);
-    [Selector("initWithCount:")] public Self InitWithCount(NSInteger itemCount);
-    [Selector("initWithString:")] public Self InitWithString(NSString string);
+    [Selector("itemCount")]
+    public NSInteger ItemCount { get; }
+    [Selector("type")]
+    public NSMenuItemBadgeType Type { get; }
+    [Selector("stringValue")]
+    public NSString? StringValue { get; }
+    [Selector("updatesWithCount:")]
+    public static Self UpdatesWithCount(NSInteger itemCount);
+    [Selector("newItemsWithCount:")]
+    public static Self NewItemsWithCount(NSInteger itemCount);
+    [Selector("alertsWithCount:")]
+    public static Self AlertsWithCount(NSInteger itemCount);
+    [Selector("initWithCount:type:")]
+    public Self InitWithCountType(NSInteger itemCount, NSMenuItemBadgeType type);
+    [Selector("initWithCount:")]
+    public Self InitWithCount(NSInteger itemCount);
+    [Selector("initWithString:")]
+    public Self InitWithString(NSString string);
 }
 
 #endif

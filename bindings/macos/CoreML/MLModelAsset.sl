@@ -39,12 +39,18 @@ public objc closure void MLModelAssetFunctionNamesWithCompletionHandlerHandlerBl
 
 public extern objc class MLModelAsset : NSObject
 {
-    [Selector("modelAssetWithSpecificationData:error:")] public static Self? ModelAssetWithSpecificationDataError(NSData specificationData, out NSError? error);
-    [Selector("modelAssetWithSpecificationData:blobMapping:error:")] public static Self? ModelAssetWithSpecificationDataBlobMappingError(NSData specificationData, NSDictionary blobMapping, out NSError? error);
-    [Selector("modelAssetWithURL:error:")] public static Self? ModelAssetWithURLError(NSURL compiledModelURL, out NSError? error);
-    [Selector("modelDescriptionWithCompletionHandler:")] public void ModelDescriptionWithCompletionHandler(MLModelAssetModelDescriptionWithCompletionHandlerHandlerBlock handler);
-    [Selector("modelDescriptionOfFunctionNamed:completionHandler:")] public void ModelDescriptionOfFunctionNamedCompletionHandler(NSString functionName, MLModelAssetModelDescriptionOfFunctionNamedCompletionHandlerHandlerBlock handler);
-    [Selector("functionNamesWithCompletionHandler:")] public void FunctionNamesWithCompletionHandler(MLModelAssetFunctionNamesWithCompletionHandlerHandlerBlock handler);
+    [Selector("modelAssetWithSpecificationData:error:")]
+    public static Self? ModelAssetWithSpecificationDataError(NSData specificationData, out NSError? error);
+    [Selector("modelAssetWithSpecificationData:blobMapping:error:")]
+    public static Self? ModelAssetWithSpecificationDataBlobMappingError(NSData specificationData, NSDictionary blobMapping, out NSError? error);
+    [Selector("modelAssetWithURL:error:")]
+    public static Self? ModelAssetWithURLError(NSURL compiledModelURL, out NSError? error);
+    [Selector("modelDescriptionWithCompletionHandler:")]
+    public void ModelDescriptionWithCompletionHandler(MLModelAssetModelDescriptionWithCompletionHandlerHandlerBlock handler);
+    [Selector("modelDescriptionOfFunctionNamed:completionHandler:")]
+    public void ModelDescriptionOfFunctionNamedCompletionHandler(NSString functionName, MLModelAssetModelDescriptionOfFunctionNamedCompletionHandlerHandlerBlock handler);
+    [Selector("functionNamesWithCompletionHandler:")]
+    public void FunctionNamesWithCompletionHandler(MLModelAssetFunctionNamesWithCompletionHandlerHandlerBlock handler);
 }
 
 #endif

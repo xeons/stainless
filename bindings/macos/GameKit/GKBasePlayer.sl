@@ -34,8 +34,10 @@ import Standard.ObjC;
 public extern objc class GKBasePlayer : NSObject, NSCopying
 {
     /// Deprecated in macOS 10.15.
-    [Selector("playerID")] public NSString? PlayerID { get; }
-    [Selector("displayName")] public NSString? DisplayName { get; }
+    [Selector("playerID")]
+    public NSString? PlayerID { get; }
+    [Selector("displayName")]
+    public NSString? DisplayName { get; }
 }
 
 #endif

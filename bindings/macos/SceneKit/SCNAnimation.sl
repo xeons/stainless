@@ -42,77 +42,124 @@ public objc closure void SCNAnimationDidStopBlock(SCNAnimation arg0, SCNAnimatab
 
 public extern objc class SCNTimingFunction : NSObject, NSSecureCoding
 {
-    [Selector("functionWithTimingMode:")] public static SCNTimingFunction FunctionWithTimingMode(SCNActionTimingMode timingMode);
-    [Selector("functionWithCAMediaTimingFunction:")] public static SCNTimingFunction FunctionWithCAMediaTimingFunction(CAMediaTimingFunction caTimingFunction);
+    [Selector("functionWithTimingMode:")]
+    public static SCNTimingFunction FunctionWithTimingMode(SCNActionTimingMode timingMode);
+    [Selector("functionWithCAMediaTimingFunction:")]
+    public static SCNTimingFunction FunctionWithCAMediaTimingFunction(CAMediaTimingFunction caTimingFunction);
 }
 
 public objc interface SCNAnimatable : NSObjectProtocol
 {
-    [Selector("animationKeys")] NSArray AnimationKeys { get; }
-    [Selector("addAnimation:forKey:")] void AddAnimationForKey(SCNAnimationProtocol animation, NSString? key);
-    [Selector("addAnimationPlayer:forKey:")] void AddAnimationPlayerForKey(SCNAnimationPlayer player, NSString? key);
-    [Selector("removeAllAnimations")] void RemoveAllAnimations();
-    [Selector("removeAllAnimationsWithBlendOutDuration:")] void RemoveAllAnimationsWithBlendOutDuration(CGFloat duration);
-    [Selector("removeAnimationForKey:")] void RemoveAnimationForKey(NSString key);
-    [Selector("removeAnimationForKey:blendOutDuration:")] void RemoveAnimationForKeyBlendOutDuration(NSString key, CGFloat duration);
-    [Selector("animationPlayerForKey:")] SCNAnimationPlayer? AnimationPlayerForKey(NSString key);
+    [Selector("animationKeys")]
+    NSArray AnimationKeys { get; }
+    [Selector("addAnimation:forKey:")]
+    void AddAnimationForKey(SCNAnimationProtocol animation, NSString? key);
+    [Selector("addAnimationPlayer:forKey:")]
+    void AddAnimationPlayerForKey(SCNAnimationPlayer player, NSString? key);
+    [Selector("removeAllAnimations")]
+    void RemoveAllAnimations();
+    [Selector("removeAllAnimationsWithBlendOutDuration:")]
+    void RemoveAllAnimationsWithBlendOutDuration(CGFloat duration);
+    [Selector("removeAnimationForKey:")]
+    void RemoveAnimationForKey(NSString key);
+    [Selector("removeAnimationForKey:blendOutDuration:")]
+    void RemoveAnimationForKeyBlendOutDuration(NSString key, CGFloat duration);
+    [Selector("animationPlayerForKey:")]
+    SCNAnimationPlayer? AnimationPlayerForKey(NSString key);
     /// Deprecated in macOS 10.13.
-    [Selector("removeAnimationForKey:fadeOutDuration:")] void RemoveAnimationForKeyFadeOutDuration(NSString key, CGFloat duration);
+    [Selector("removeAnimationForKey:fadeOutDuration:")]
+    void RemoveAnimationForKeyFadeOutDuration(NSString key, CGFloat duration);
     /// Deprecated in macOS 10.13.
-    [Selector("animationForKey:")] CAAnimation? AnimationForKey(NSString key);
+    [Selector("animationForKey:")]
+    CAAnimation? AnimationForKey(NSString key);
     /// Deprecated in macOS 10.13.
-    [Selector("pauseAnimationForKey:")] void PauseAnimationForKey(NSString key);
+    [Selector("pauseAnimationForKey:")]
+    void PauseAnimationForKey(NSString key);
     /// Deprecated in macOS 10.13.
-    [Selector("resumeAnimationForKey:")] void ResumeAnimationForKey(NSString key);
+    [Selector("resumeAnimationForKey:")]
+    void ResumeAnimationForKey(NSString key);
     /// Deprecated in macOS 10.13.
-    [Selector("setSpeed:forAnimationKey:")] void SetSpeedForAnimationKey(CGFloat speed, NSString key);
+    [Selector("setSpeed:forAnimationKey:")]
+    void SetSpeedForAnimationKey(CGFloat speed, NSString key);
     /// Deprecated in macOS 10.13.
-    [Selector("isAnimationForKeyPaused:")] bool IsAnimationForKeyPaused(NSString key);
+    [Selector("isAnimationForKeyPaused:")]
+    bool IsAnimationForKeyPaused(NSString key);
 }
 
 public extern objc class SCNAnimation : NSObject, SCNAnimationProtocol, NSCopying, NSSecureCoding
 {
-    [Selector("duration", "setDuration:")] public NSTimeInterval Duration { get; set; }
-    [Selector("keyPath", "setKeyPath:")] public NSString? KeyPath { get; set; }
-    [Selector("timingFunction", "setTimingFunction:")] public SCNTimingFunction TimingFunction { get; set; }
-    [Selector("blendInDuration", "setBlendInDuration:")] public NSTimeInterval BlendInDuration { get; set; }
-    [Selector("blendOutDuration", "setBlendOutDuration:")] public NSTimeInterval BlendOutDuration { get; set; }
-    [Selector("isRemovedOnCompletion", "setRemovedOnCompletion:")] public bool RemovedOnCompletion { get; set; }
-    [Selector("isAppliedOnCompletion", "setAppliedOnCompletion:")] public bool AppliedOnCompletion { get; set; }
-    [Selector("repeatCount", "setRepeatCount:")] public CGFloat RepeatCount { get; set; }
-    [Selector("autoreverses", "setAutoreverses:")] public bool Autoreverses { get; set; }
-    [Selector("startDelay", "setStartDelay:")] public NSTimeInterval StartDelay { get; set; }
-    [Selector("timeOffset", "setTimeOffset:")] public NSTimeInterval TimeOffset { get; set; }
-    [Selector("fillsForward", "setFillsForward:")] public bool FillsForward { get; set; }
-    [Selector("fillsBackward", "setFillsBackward:")] public bool FillsBackward { get; set; }
-    [Selector("usesSceneTimeBase", "setUsesSceneTimeBase:")] public bool UsesSceneTimeBase { get; set; }
-    [Selector("animationDidStart", "setAnimationDidStart:")] public SCNAnimationDidStartBlock? AnimationDidStart { get; set; }
-    [Selector("animationDidStop", "setAnimationDidStop:")] public SCNAnimationDidStopBlock? AnimationDidStop { get; set; }
-    [Selector("animationEvents", "setAnimationEvents:")] public NSArray? AnimationEvents { get; set; }
-    [Selector("isAdditive", "setAdditive:")] public bool Additive { get; set; }
-    [Selector("isCumulative", "setCumulative:")] public bool Cumulative { get; set; }
-    [Selector("animationWithContentsOfURL:")] public static SCNAnimation AnimationWithContentsOfURL(NSURL animationUrl);
-    [Selector("animationNamed:")] public static SCNAnimation AnimationNamed(NSString animationName);
-    [Selector("animationWithCAAnimation:")] public static SCNAnimation AnimationWithCAAnimation(CAAnimation caAnimation);
+    [Selector("duration", "setDuration:")]
+    public NSTimeInterval Duration { get; set; }
+    [Selector("keyPath", "setKeyPath:")]
+    public NSString? KeyPath { get; set; }
+    [Selector("timingFunction", "setTimingFunction:")]
+    public SCNTimingFunction TimingFunction { get; set; }
+    [Selector("blendInDuration", "setBlendInDuration:")]
+    public NSTimeInterval BlendInDuration { get; set; }
+    [Selector("blendOutDuration", "setBlendOutDuration:")]
+    public NSTimeInterval BlendOutDuration { get; set; }
+    [Selector("isRemovedOnCompletion", "setRemovedOnCompletion:")]
+    public bool RemovedOnCompletion { get; set; }
+    [Selector("isAppliedOnCompletion", "setAppliedOnCompletion:")]
+    public bool AppliedOnCompletion { get; set; }
+    [Selector("repeatCount", "setRepeatCount:")]
+    public CGFloat RepeatCount { get; set; }
+    [Selector("autoreverses", "setAutoreverses:")]
+    public bool Autoreverses { get; set; }
+    [Selector("startDelay", "setStartDelay:")]
+    public NSTimeInterval StartDelay { get; set; }
+    [Selector("timeOffset", "setTimeOffset:")]
+    public NSTimeInterval TimeOffset { get; set; }
+    [Selector("fillsForward", "setFillsForward:")]
+    public bool FillsForward { get; set; }
+    [Selector("fillsBackward", "setFillsBackward:")]
+    public bool FillsBackward { get; set; }
+    [Selector("usesSceneTimeBase", "setUsesSceneTimeBase:")]
+    public bool UsesSceneTimeBase { get; set; }
+    [Selector("animationDidStart", "setAnimationDidStart:")]
+    public SCNAnimationDidStartBlock? AnimationDidStart { get; set; }
+    [Selector("animationDidStop", "setAnimationDidStop:")]
+    public SCNAnimationDidStopBlock? AnimationDidStop { get; set; }
+    [Selector("animationEvents", "setAnimationEvents:")]
+    public NSArray? AnimationEvents { get; set; }
+    [Selector("isAdditive", "setAdditive:")]
+    public bool Additive { get; set; }
+    [Selector("isCumulative", "setCumulative:")]
+    public bool Cumulative { get; set; }
+    [Selector("animationWithContentsOfURL:")]
+    public static SCNAnimation AnimationWithContentsOfURL(NSURL animationUrl);
+    [Selector("animationNamed:")]
+    public static SCNAnimation AnimationNamed(NSString animationName);
+    [Selector("animationWithCAAnimation:")]
+    public static SCNAnimation AnimationWithCAAnimation(CAAnimation caAnimation);
 }
 
 public extern objc class SCNAnimationPlayer : NSObject, SCNAnimatable, NSCopying, NSSecureCoding
 {
-    [Selector("animation")] public SCNAnimation Animation { get; }
-    [Selector("speed", "setSpeed:")] public CGFloat Speed { get; set; }
-    [Selector("blendFactor", "setBlendFactor:")] public CGFloat BlendFactor { get; set; }
-    [Selector("paused", "setPaused:")] public bool Paused { get; set; }
-    [Selector("animationPlayerWithAnimation:")] public static SCNAnimationPlayer AnimationPlayerWithAnimation(SCNAnimation animation);
-    [Selector("play")] public void Play();
-    [Selector("stop")] public void Stop();
-    [Selector("stopWithBlendOutDuration:")] public void StopWithBlendOutDuration(NSTimeInterval duration);
+    [Selector("animation")]
+    public SCNAnimation Animation { get; }
+    [Selector("speed", "setSpeed:")]
+    public CGFloat Speed { get; set; }
+    [Selector("blendFactor", "setBlendFactor:")]
+    public CGFloat BlendFactor { get; set; }
+    [Selector("paused", "setPaused:")]
+    public bool Paused { get; set; }
+    [Selector("animationPlayerWithAnimation:")]
+    public static SCNAnimationPlayer AnimationPlayerWithAnimation(SCNAnimation animation);
+    [Selector("play")]
+    public void Play();
+    [Selector("stop")]
+    public void Stop();
+    [Selector("stopWithBlendOutDuration:")]
+    public void StopWithBlendOutDuration(NSTimeInterval duration);
 }
 
 public objc closure void SCNAnimationEventBlock(SCNAnimationProtocol arg0, AnyObject arg1, bool arg2);
 
 public extern objc class SCNAnimationEvent : NSObject
 {
-    [Selector("animationEventWithKeyTime:block:")] public static Self AnimationEventWithKeyTimeBlock(CGFloat time, SCNAnimationEventBlock eventBlock);
+    [Selector("animationEventWithKeyTime:block:")]
+    public static Self AnimationEventWithKeyTimeBlock(CGFloat time, SCNAnimationEventBlock eventBlock);
 }
 
 #endif

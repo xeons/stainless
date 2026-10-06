@@ -38,13 +38,19 @@ public objc closure void CKFetchShareParticipantsOperationFetchShareParticipants
 
 public extern objc class CKFetchShareParticipantsOperation : CKOperation
 {
-    [Selector("userIdentityLookupInfos", "setUserIdentityLookupInfos:")] public NSArray? UserIdentityLookupInfos { get; set; }
+    [Selector("userIdentityLookupInfos", "setUserIdentityLookupInfos:")]
+    public NSArray? UserIdentityLookupInfos { get; set; }
     /// Deprecated in macOS 12.0.
-    [Selector("shareParticipantFetchedBlock", "setShareParticipantFetchedBlock:")] public CKFetchShareParticipantsOperationShareParticipantFetchedBlock? ShareParticipantFetchedBlock { get; set; }
-    [Selector("perShareParticipantCompletionBlock", "setPerShareParticipantCompletionBlock:")] public CKFetchShareParticipantsOperationPerShareParticipantCompletionBlock? PerShareParticipantCompletionBlock { get; set; }
-    [Selector("fetchShareParticipantsCompletionBlock", "setFetchShareParticipantsCompletionBlock:")] public CKFetchShareParticipantsOperationFetchShareParticipantsCompletionBlock? FetchShareParticipantsCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithUserIdentityLookupInfos:")] public Self InitWithUserIdentityLookupInfos(NSArray userIdentityLookupInfos);
+    [Selector("shareParticipantFetchedBlock", "setShareParticipantFetchedBlock:")]
+    public CKFetchShareParticipantsOperationShareParticipantFetchedBlock? ShareParticipantFetchedBlock { get; set; }
+    [Selector("perShareParticipantCompletionBlock", "setPerShareParticipantCompletionBlock:")]
+    public CKFetchShareParticipantsOperationPerShareParticipantCompletionBlock? PerShareParticipantCompletionBlock { get; set; }
+    [Selector("fetchShareParticipantsCompletionBlock", "setFetchShareParticipantsCompletionBlock:")]
+    public CKFetchShareParticipantsOperationFetchShareParticipantsCompletionBlock? FetchShareParticipantsCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithUserIdentityLookupInfos:")]
+    public Self InitWithUserIdentityLookupInfos(NSArray userIdentityLookupInfos);
 }
 
 #endif

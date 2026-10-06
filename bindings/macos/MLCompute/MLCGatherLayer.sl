@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCGatherLayer : MLCLayer
 {
-    [Selector("dimension")] public NSUInteger Dimension { get; }
-    [Selector("layerWithDimension:")] public static Self LayerWithDimension(NSUInteger dimension);
+    [Selector("dimension")]
+    public NSUInteger Dimension { get; }
+    [Selector("layerWithDimension:")]
+    public static Self LayerWithDimension(NSUInteger dimension);
 }
 
 #endif

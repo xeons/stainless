@@ -42,30 +42,48 @@ public extern "C" CKRecordFieldKey CKShareTypeKey;
 
 public extern objc class CKShare : CKRecord, NSSecureCoding, NSCopying
 {
-    [Selector("publicPermission", "setPublicPermission:")] public CKShareParticipantPermission PublicPermission { get; set; }
-    [Selector("URL")] public NSURL? URL { get; }
-    [Selector("participants")] public NSArray Participants { get; }
-    [Selector("owner")] public CKShareParticipant Owner { get; }
-    [Selector("currentUserParticipant")] public CKShareParticipant? CurrentUserParticipant { get; }
+    [Selector("publicPermission", "setPublicPermission:")]
+    public CKShareParticipantPermission PublicPermission { get; set; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
+    [Selector("participants")]
+    public NSArray Participants { get; }
+    [Selector("owner")]
+    public CKShareParticipant Owner { get; }
+    [Selector("currentUserParticipant")]
+    public CKShareParticipant? CurrentUserParticipant { get; }
     /// macOS 26.0 and later.
-    [Selector("requesters")] public NSArray Requesters { get; }
+    [Selector("requesters")]
+    public NSArray Requesters { get; }
     /// macOS 26.0 and later.
-    [Selector("blockedIdentities")] public NSArray BlockedIdentities { get; }
+    [Selector("blockedIdentities")]
+    public NSArray BlockedIdentities { get; }
     /// macOS 26.0 and later.
-    [Selector("allowsAccessRequests", "setAllowsAccessRequests:")] public bool AllowsAccessRequests { get; set; }
-    [Selector("initWithRootRecord:")] public Self InitWithRootRecord(CKRecord rootRecord);
-    [Selector("initWithRootRecord:shareID:")] public Self InitWithRootRecordShareID(CKRecord rootRecord, CKRecordID shareID);
-    [Selector("initWithRecordZoneID:")] public Self InitWithRecordZoneID(CKRecordZoneID recordZoneID);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder aDecoder);
-    [Selector("addParticipant:")] public void AddParticipant(CKShareParticipant participant);
-    [Selector("removeParticipant:")] public void RemoveParticipant(CKShareParticipant participant);
-    [Selector("oneTimeURLForParticipantID:")] public NSURL? OneTimeURLForParticipantID(NSString participantID);
+    [Selector("allowsAccessRequests", "setAllowsAccessRequests:")]
+    public bool AllowsAccessRequests { get; set; }
+    [Selector("initWithRootRecord:")]
+    public Self InitWithRootRecord(CKRecord rootRecord);
+    [Selector("initWithRootRecord:shareID:")]
+    public Self InitWithRootRecordShareID(CKRecord rootRecord, CKRecordID shareID);
+    [Selector("initWithRecordZoneID:")]
+    public Self InitWithRecordZoneID(CKRecordZoneID recordZoneID);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder aDecoder);
+    [Selector("addParticipant:")]
+    public void AddParticipant(CKShareParticipant participant);
+    [Selector("removeParticipant:")]
+    public void RemoveParticipant(CKShareParticipant participant);
+    [Selector("oneTimeURLForParticipantID:")]
+    public NSURL? OneTimeURLForParticipantID(NSString participantID);
     /// macOS 26.0 and later.
-    [Selector("denyRequesters:")] public void DenyRequesters(NSArray requesters);
+    [Selector("denyRequesters:")]
+    public void DenyRequesters(NSArray requesters);
     /// macOS 26.0 and later.
-    [Selector("blockRequesters:")] public void BlockRequesters(NSArray requesters);
+    [Selector("blockRequesters:")]
+    public void BlockRequesters(NSArray requesters);
     /// macOS 26.0 and later.
-    [Selector("unblockIdentities:")] public void UnblockIdentities(NSArray blockedIdentities);
+    [Selector("unblockIdentities:")]
+    public void UnblockIdentities(NSArray blockedIdentities);
 }
 
 #endif

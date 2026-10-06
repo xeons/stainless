@@ -42,9 +42,12 @@ public using CKSubscriptionID = NSString;
 
 public extern objc class CKSubscription : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("subscriptionID")] public CKSubscriptionID? SubscriptionID { get; }
-    [Selector("subscriptionType")] public CKSubscriptionType SubscriptionType { get; }
-    [Selector("notificationInfo", "setNotificationInfo:")] public CKNotificationInfo? NotificationInfo { get; set; }
+    [Selector("subscriptionID")]
+    public CKSubscriptionID? SubscriptionID { get; }
+    [Selector("subscriptionType")]
+    public CKSubscriptionType SubscriptionType { get; }
+    [Selector("notificationInfo", "setNotificationInfo:")]
+    public CKNotificationInfo? NotificationInfo { get; set; }
 }
 
 [Flags]
@@ -58,56 +61,91 @@ public enum CKQuerySubscriptionOptions : ulong
 
 public extern objc class CKQuerySubscription : CKSubscription, NSSecureCoding, NSCopying
 {
-    [Selector("recordType")] public CKRecordType RecordType { get; }
-    [Selector("predicate")] public NSPredicate Predicate { get; }
-    [Selector("zoneID", "setZoneID:")] public CKRecordZoneID? ZoneID { get; set; }
-    [Selector("querySubscriptionOptions")] public CKQuerySubscriptionOptions QuerySubscriptionOptions { get; }
+    [Selector("recordType")]
+    public CKRecordType RecordType { get; }
+    [Selector("predicate")]
+    public NSPredicate Predicate { get; }
+    [Selector("zoneID", "setZoneID:")]
+    public CKRecordZoneID? ZoneID { get; set; }
+    [Selector("querySubscriptionOptions")]
+    public CKQuerySubscriptionOptions QuerySubscriptionOptions { get; }
     /// Deprecated in macOS 10.12.
-    [Selector("initWithRecordType:predicate:options:")] public Self InitWithRecordTypePredicateOptions(CKRecordType recordType, NSPredicate predicate, CKQuerySubscriptionOptions querySubscriptionOptions);
-    [Selector("initWithRecordType:predicate:subscriptionID:options:")] public Self InitWithRecordTypePredicateSubscriptionIDOptions(CKRecordType recordType, NSPredicate predicate, CKSubscriptionID subscriptionID, CKQuerySubscriptionOptions querySubscriptionOptions);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder aDecoder);
+    [Selector("initWithRecordType:predicate:options:")]
+    public Self InitWithRecordTypePredicateOptions(CKRecordType recordType, NSPredicate predicate, CKQuerySubscriptionOptions querySubscriptionOptions);
+    [Selector("initWithRecordType:predicate:subscriptionID:options:")]
+    public Self InitWithRecordTypePredicateSubscriptionIDOptions(CKRecordType recordType, NSPredicate predicate, CKSubscriptionID subscriptionID, CKQuerySubscriptionOptions querySubscriptionOptions);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder aDecoder);
 }
 
 public extern objc class CKRecordZoneSubscription : CKSubscription, NSSecureCoding, NSCopying
 {
-    [Selector("zoneID")] public CKRecordZoneID ZoneID { get; }
-    [Selector("recordType", "setRecordType:")] public CKRecordType? RecordType { get; set; }
+    [Selector("zoneID")]
+    public CKRecordZoneID ZoneID { get; }
+    [Selector("recordType", "setRecordType:")]
+    public CKRecordType? RecordType { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("initWithZoneID:")] public Self InitWithZoneID(CKRecordZoneID zoneID);
-    [Selector("initWithZoneID:subscriptionID:")] public Self InitWithZoneIDSubscriptionID(CKRecordZoneID zoneID, CKSubscriptionID subscriptionID);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder aDecoder);
+    [Selector("initWithZoneID:")]
+    public Self InitWithZoneID(CKRecordZoneID zoneID);
+    [Selector("initWithZoneID:subscriptionID:")]
+    public Self InitWithZoneIDSubscriptionID(CKRecordZoneID zoneID, CKSubscriptionID subscriptionID);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder aDecoder);
 }
 
 public extern objc class CKDatabaseSubscription : CKSubscription, NSSecureCoding, NSCopying
 {
-    [Selector("recordType", "setRecordType:")] public CKRecordType? RecordType { get; set; }
+    [Selector("recordType", "setRecordType:")]
+    public CKRecordType? RecordType { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("init")] public Self Init();
-    [Selector("new")] public static Self New();
-    [Selector("initWithSubscriptionID:")] public Self InitWithSubscriptionID(CKSubscriptionID subscriptionID);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder aDecoder);
+    [Selector("init")]
+    public Self Init();
+    [Selector("new")]
+    public static Self New();
+    [Selector("initWithSubscriptionID:")]
+    public Self InitWithSubscriptionID(CKSubscriptionID subscriptionID);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder aDecoder);
 }
 
 public extern objc class CKNotificationInfo : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("alertBody", "setAlertBody:")] public NSString? AlertBody { get; set; }
-    [Selector("alertLocalizationKey", "setAlertLocalizationKey:")] public NSString? AlertLocalizationKey { get; set; }
-    [Selector("alertLocalizationArgs", "setAlertLocalizationArgs:")] public NSArray? AlertLocalizationArgs { get; set; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("titleLocalizationKey", "setTitleLocalizationKey:")] public NSString? TitleLocalizationKey { get; set; }
-    [Selector("titleLocalizationArgs", "setTitleLocalizationArgs:")] public NSArray? TitleLocalizationArgs { get; set; }
-    [Selector("subtitle", "setSubtitle:")] public NSString? Subtitle { get; set; }
-    [Selector("subtitleLocalizationKey", "setSubtitleLocalizationKey:")] public NSString? SubtitleLocalizationKey { get; set; }
-    [Selector("subtitleLocalizationArgs", "setSubtitleLocalizationArgs:")] public NSArray? SubtitleLocalizationArgs { get; set; }
-    [Selector("alertActionLocalizationKey", "setAlertActionLocalizationKey:")] public NSString? AlertActionLocalizationKey { get; set; }
-    [Selector("alertLaunchImage", "setAlertLaunchImage:")] public NSString? AlertLaunchImage { get; set; }
-    [Selector("soundName", "setSoundName:")] public NSString? SoundName { get; set; }
-    [Selector("desiredKeys", "setDesiredKeys:")] public NSArray? DesiredKeys { get; set; }
-    [Selector("shouldBadge", "setShouldBadge:")] public bool ShouldBadge { get; set; }
-    [Selector("shouldSendContentAvailable", "setShouldSendContentAvailable:")] public bool ShouldSendContentAvailable { get; set; }
-    [Selector("shouldSendMutableContent", "setShouldSendMutableContent:")] public bool ShouldSendMutableContent { get; set; }
-    [Selector("category", "setCategory:")] public NSString? Category { get; set; }
-    [Selector("collapseIDKey", "setCollapseIDKey:")] public NSString? CollapseIDKey { get; set; }
+    [Selector("alertBody", "setAlertBody:")]
+    public NSString? AlertBody { get; set; }
+    [Selector("alertLocalizationKey", "setAlertLocalizationKey:")]
+    public NSString? AlertLocalizationKey { get; set; }
+    [Selector("alertLocalizationArgs", "setAlertLocalizationArgs:")]
+    public NSArray? AlertLocalizationArgs { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("titleLocalizationKey", "setTitleLocalizationKey:")]
+    public NSString? TitleLocalizationKey { get; set; }
+    [Selector("titleLocalizationArgs", "setTitleLocalizationArgs:")]
+    public NSArray? TitleLocalizationArgs { get; set; }
+    [Selector("subtitle", "setSubtitle:")]
+    public NSString? Subtitle { get; set; }
+    [Selector("subtitleLocalizationKey", "setSubtitleLocalizationKey:")]
+    public NSString? SubtitleLocalizationKey { get; set; }
+    [Selector("subtitleLocalizationArgs", "setSubtitleLocalizationArgs:")]
+    public NSArray? SubtitleLocalizationArgs { get; set; }
+    [Selector("alertActionLocalizationKey", "setAlertActionLocalizationKey:")]
+    public NSString? AlertActionLocalizationKey { get; set; }
+    [Selector("alertLaunchImage", "setAlertLaunchImage:")]
+    public NSString? AlertLaunchImage { get; set; }
+    [Selector("soundName", "setSoundName:")]
+    public NSString? SoundName { get; set; }
+    [Selector("desiredKeys", "setDesiredKeys:")]
+    public NSArray? DesiredKeys { get; set; }
+    [Selector("shouldBadge", "setShouldBadge:")]
+    public bool ShouldBadge { get; set; }
+    [Selector("shouldSendContentAvailable", "setShouldSendContentAvailable:")]
+    public bool ShouldSendContentAvailable { get; set; }
+    [Selector("shouldSendMutableContent", "setShouldSendMutableContent:")]
+    public bool ShouldSendMutableContent { get; set; }
+    [Selector("category", "setCategory:")]
+    public NSString? Category { get; set; }
+    [Selector("collapseIDKey", "setCollapseIDKey:")]
+    public NSString? CollapseIDKey { get; set; }
 }
 
 #endif

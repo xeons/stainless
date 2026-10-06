@@ -32,7 +32,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLDirectoryElement : DOMHTMLElement
 {
-    [Selector("compact", "setCompact:")] public bool Compact { get; set; }
+    [Selector("compact", "setCompact:")]
+    public bool Compact { get; set; }
 }
 
 #endif

@@ -33,13 +33,19 @@ import Standard.ObjC;
 
 public extern objc class PHProjectChangeRequest : PHChangeRequest
 {
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("projectExtensionData", "setProjectExtensionData:")] public NSData ProjectExtensionData { get; set; }
-    [Selector("initWithProject:")] public Self InitWithProject(PHProject project);
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("projectExtensionData", "setProjectExtensionData:")]
+    public NSData ProjectExtensionData { get; set; }
+    [Selector("initWithProject:")]
+    public Self InitWithProject(PHProject project);
     /// Deprecated in macOS 10.14.
-    [Selector("setKeyAsset:")] public void SetKeyAsset(PHAsset? keyAsset);
-    [Selector("setProjectPreviewImage:")] public void SetProjectPreviewImage(NSImage previewImage);
-    [Selector("removeAssets:")] public void RemoveAssets(NSFastEnumeration assets);
+    [Selector("setKeyAsset:")]
+    public void SetKeyAsset(PHAsset? keyAsset);
+    [Selector("setProjectPreviewImage:")]
+    public void SetProjectPreviewImage(NSImage previewImage);
+    [Selector("removeAssets:")]
+    public void RemoveAssets(NSFastEnumeration assets);
 }
 
 #endif

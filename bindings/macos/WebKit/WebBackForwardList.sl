@@ -34,27 +34,43 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class WebBackForwardList : NSObject
 {
-    [Selector("backItem")] public WebHistoryItem? BackItem { get; }
-    [Selector("currentItem")] public WebHistoryItem? CurrentItem { get; }
-    [Selector("forwardItem")] public WebHistoryItem? ForwardItem { get; }
-    [Selector("capacity", "setCapacity:")] public int Capacity { get; set; }
-    [Selector("backListCount")] public int BackListCount { get; }
-    [Selector("forwardListCount")] public int ForwardListCount { get; }
-    [Selector("addItem:")] public void AddItem(WebHistoryItem? item);
-    [Selector("goBack")] public void GoBack();
-    [Selector("goForward")] public void GoForward();
-    [Selector("goToItem:")] public void GoToItem(WebHistoryItem? item);
-    [Selector("backListWithLimit:")] public NSArray? BackListWithLimit(int limit);
-    [Selector("forwardListWithLimit:")] public NSArray? ForwardListWithLimit(int limit);
-    [Selector("containsItem:")] public bool ContainsItem(WebHistoryItem? item);
-    [Selector("itemAtIndex:")] public WebHistoryItem? ItemAtIndex(int index);
+    [Selector("backItem")]
+    public WebHistoryItem? BackItem { get; }
+    [Selector("currentItem")]
+    public WebHistoryItem? CurrentItem { get; }
+    [Selector("forwardItem")]
+    public WebHistoryItem? ForwardItem { get; }
+    [Selector("capacity", "setCapacity:")]
+    public int Capacity { get; set; }
+    [Selector("backListCount")]
+    public int BackListCount { get; }
+    [Selector("forwardListCount")]
+    public int ForwardListCount { get; }
+    [Selector("addItem:")]
+    public void AddItem(WebHistoryItem? item);
+    [Selector("goBack")]
+    public void GoBack();
+    [Selector("goForward")]
+    public void GoForward();
+    [Selector("goToItem:")]
+    public void GoToItem(WebHistoryItem? item);
+    [Selector("backListWithLimit:")]
+    public NSArray? BackListWithLimit(int limit);
+    [Selector("forwardListWithLimit:")]
+    public NSArray? ForwardListWithLimit(int limit);
+    [Selector("containsItem:")]
+    public bool ContainsItem(WebHistoryItem? item);
+    [Selector("itemAtIndex:")]
+    public WebHistoryItem? ItemAtIndex(int index);
 }
 
 /// WebBackForwardListDeprecated, a category of WebBackForwardList.
 public extern objc class WebBackForwardList
 {
-    [Selector("setPageCacheSize:")] public void SetPageCacheSize(NSUInteger size);
-    [Selector("pageCacheSize")] public NSUInteger PageCacheSize();
+    [Selector("setPageCacheSize:")]
+    public void SetPageCacheSize(NSUInteger size);
+    [Selector("pageCacheSize")]
+    public NSUInteger PageCacheSize();
 }
 
 #endif

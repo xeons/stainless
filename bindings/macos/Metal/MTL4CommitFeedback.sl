@@ -38,9 +38,12 @@ public objc closure void MTL4CommitFeedbackHandler(MTL4CommitFeedback arg0);
 /// macOS 26.0 and later.
 public objc interface MTL4CommitFeedback : NSObjectProtocol
 {
-    [Selector("error")] NSError? Error { get; }
-    [Selector("GPUStartTime")] CFTimeInterval GPUStartTime { get; }
-    [Selector("GPUEndTime")] CFTimeInterval GPUEndTime { get; }
+    [Selector("error")]
+    NSError? Error { get; }
+    [Selector("GPUStartTime")]
+    CFTimeInterval GPUStartTime { get; }
+    [Selector("GPUEndTime")]
+    CFTimeInterval GPUEndTime { get; }
 }
 
 #endif

@@ -41,11 +41,16 @@ public objc closure void NSTableViewRowActionRowActionWithStyleTitleHandlerHandl
 
 public extern objc class NSTableViewRowAction : NSObject, NSCopying
 {
-    [Selector("style")] public NSTableViewRowActionStyle Style { get; }
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("rowActionWithStyle:title:handler:")] public static Self RowActionWithStyleTitleHandler(NSTableViewRowActionStyle style, NSString title, NSTableViewRowActionRowActionWithStyleTitleHandlerHandlerBlock handler);
+    [Selector("style")]
+    public NSTableViewRowActionStyle Style { get; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("rowActionWithStyle:title:handler:")]
+    public static Self RowActionWithStyleTitleHandler(NSTableViewRowActionStyle style, NSString title, NSTableViewRowActionRowActionWithStyleTitleHandlerHandlerBlock handler);
 }
 
 #endif

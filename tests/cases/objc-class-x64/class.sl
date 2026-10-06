@@ -17,15 +17,20 @@ public struct Wide
 [ObjCRoot]
 public extern objc class NSObject
 {
-    [Selector("alloc")] public static Self Alloc();
-    [Selector("init")] public Self Init();
-    [Selector("hash")] public nuint Hash { get; }
+    [Selector("alloc")]
+    public static Self Alloc();
+    [Selector("init")]
+    public Self Init();
+    [Selector("hash")]
+    public nuint Hash { get; }
 }
 
 public objc interface Shape
 {
-    [Selector("area")] double Area();
-    [Optional, Selector("grow:")] void Grow(double by);
+    [Selector("area")]
+    double Area();
+    [Optional, Selector("grow:")]
+    void Grow(double by);
 }
 
 public objc class Canvas : NSObject, Shape
@@ -41,7 +46,8 @@ public objc class Canvas : NSObject, Shape
 
     public double Area() => (double)_count;
 
-    [Selector("isAbove:")] public bool IsAbove(bool flag) => flag && _count > 0;
+    [Selector("isAbove:")]
+    public bool IsAbove(bool flag) => flag && _count > 0;
 
     [Selector("spread")]
     public Wide Spread()
@@ -53,7 +59,8 @@ public objc class Canvas : NSObject, Shape
 
     public override nuint Hash => base.Hash + 1u;
 
-    [Selector("make")] public static Canvas Make() => new Canvas(1);
+    [Selector("make")]
+    public static Canvas Make() => new Canvas(1);
 
     ~Canvas()
     {

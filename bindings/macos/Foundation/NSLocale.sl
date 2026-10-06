@@ -34,73 +34,124 @@ public using NSLocaleKey = NSString;
 
 public extern objc class NSLocale : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("objectForKey:")] public AnyObject? ObjectForKey(NSLocaleKey key);
-    [Selector("displayNameForKey:value:")] public NSString? DisplayNameForKeyValue(NSLocaleKey key, AnyObject value);
-    [Selector("initWithLocaleIdentifier:")] public Self InitWithLocaleIdentifier(NSString string);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("objectForKey:")]
+    public AnyObject? ObjectForKey(NSLocaleKey key);
+    [Selector("displayNameForKey:value:")]
+    public NSString? DisplayNameForKeyValue(NSLocaleKey key, AnyObject value);
+    [Selector("initWithLocaleIdentifier:")]
+    public Self InitWithLocaleIdentifier(NSString string);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 /// NSExtendedLocale, a category of NSLocale.
 public extern objc class NSLocale
 {
-    [Selector("localeIdentifier")] public NSString LocaleIdentifier { get; }
-    [Selector("languageCode")] public NSString LanguageCode { get; }
-    [Selector("languageIdentifier")] public NSString LanguageIdentifier { get; }
+    [Selector("localeIdentifier")]
+    public NSString LocaleIdentifier { get; }
+    [Selector("languageCode")]
+    public NSString LanguageCode { get; }
+    [Selector("languageIdentifier")]
+    public NSString LanguageIdentifier { get; }
     /// Deprecated in macOS 100000.
-    [Selector("countryCode")] public NSString? CountryCode { get; }
-    [Selector("regionCode")] public NSString? RegionCode { get; }
-    [Selector("scriptCode")] public NSString? ScriptCode { get; }
-    [Selector("variantCode")] public NSString? VariantCode { get; }
-    [Selector("exemplarCharacterSet")] public NSCharacterSet ExemplarCharacterSet { get; }
-    [Selector("calendarIdentifier")] public NSString CalendarIdentifier { get; }
-    [Selector("collationIdentifier")] public NSString? CollationIdentifier { get; }
-    [Selector("usesMetricSystem")] public bool UsesMetricSystem { get; }
-    [Selector("decimalSeparator")] public NSString DecimalSeparator { get; }
-    [Selector("groupingSeparator")] public NSString GroupingSeparator { get; }
-    [Selector("currencySymbol")] public NSString CurrencySymbol { get; }
-    [Selector("currencyCode")] public NSString? CurrencyCode { get; }
-    [Selector("collatorIdentifier")] public NSString CollatorIdentifier { get; }
-    [Selector("quotationBeginDelimiter")] public NSString QuotationBeginDelimiter { get; }
-    [Selector("quotationEndDelimiter")] public NSString QuotationEndDelimiter { get; }
-    [Selector("alternateQuotationBeginDelimiter")] public NSString AlternateQuotationBeginDelimiter { get; }
-    [Selector("alternateQuotationEndDelimiter")] public NSString AlternateQuotationEndDelimiter { get; }
-    [Selector("localizedStringForLocaleIdentifier:")] public NSString LocalizedStringForLocaleIdentifier(NSString localeIdentifier);
-    [Selector("localizedStringForLanguageCode:")] public NSString? LocalizedStringForLanguageCode(NSString languageCode);
-    [Selector("localizedStringForCountryCode:")] public NSString? LocalizedStringForCountryCode(NSString countryCode);
-    [Selector("localizedStringForScriptCode:")] public NSString? LocalizedStringForScriptCode(NSString scriptCode);
-    [Selector("localizedStringForVariantCode:")] public NSString? LocalizedStringForVariantCode(NSString variantCode);
-    [Selector("localizedStringForCalendarIdentifier:")] public NSString? LocalizedStringForCalendarIdentifier(NSString calendarIdentifier);
-    [Selector("localizedStringForCollationIdentifier:")] public NSString? LocalizedStringForCollationIdentifier(NSString collationIdentifier);
-    [Selector("localizedStringForCurrencyCode:")] public NSString? LocalizedStringForCurrencyCode(NSString currencyCode);
-    [Selector("localizedStringForCollatorIdentifier:")] public NSString? LocalizedStringForCollatorIdentifier(NSString collatorIdentifier);
+    [Selector("countryCode")]
+    public NSString? CountryCode { get; }
+    [Selector("regionCode")]
+    public NSString? RegionCode { get; }
+    [Selector("scriptCode")]
+    public NSString? ScriptCode { get; }
+    [Selector("variantCode")]
+    public NSString? VariantCode { get; }
+    [Selector("exemplarCharacterSet")]
+    public NSCharacterSet ExemplarCharacterSet { get; }
+    [Selector("calendarIdentifier")]
+    public NSString CalendarIdentifier { get; }
+    [Selector("collationIdentifier")]
+    public NSString? CollationIdentifier { get; }
+    [Selector("usesMetricSystem")]
+    public bool UsesMetricSystem { get; }
+    [Selector("decimalSeparator")]
+    public NSString DecimalSeparator { get; }
+    [Selector("groupingSeparator")]
+    public NSString GroupingSeparator { get; }
+    [Selector("currencySymbol")]
+    public NSString CurrencySymbol { get; }
+    [Selector("currencyCode")]
+    public NSString? CurrencyCode { get; }
+    [Selector("collatorIdentifier")]
+    public NSString CollatorIdentifier { get; }
+    [Selector("quotationBeginDelimiter")]
+    public NSString QuotationBeginDelimiter { get; }
+    [Selector("quotationEndDelimiter")]
+    public NSString QuotationEndDelimiter { get; }
+    [Selector("alternateQuotationBeginDelimiter")]
+    public NSString AlternateQuotationBeginDelimiter { get; }
+    [Selector("alternateQuotationEndDelimiter")]
+    public NSString AlternateQuotationEndDelimiter { get; }
+    [Selector("localizedStringForLocaleIdentifier:")]
+    public NSString LocalizedStringForLocaleIdentifier(NSString localeIdentifier);
+    [Selector("localizedStringForLanguageCode:")]
+    public NSString? LocalizedStringForLanguageCode(NSString languageCode);
+    [Selector("localizedStringForCountryCode:")]
+    public NSString? LocalizedStringForCountryCode(NSString countryCode);
+    [Selector("localizedStringForScriptCode:")]
+    public NSString? LocalizedStringForScriptCode(NSString scriptCode);
+    [Selector("localizedStringForVariantCode:")]
+    public NSString? LocalizedStringForVariantCode(NSString variantCode);
+    [Selector("localizedStringForCalendarIdentifier:")]
+    public NSString? LocalizedStringForCalendarIdentifier(NSString calendarIdentifier);
+    [Selector("localizedStringForCollationIdentifier:")]
+    public NSString? LocalizedStringForCollationIdentifier(NSString collationIdentifier);
+    [Selector("localizedStringForCurrencyCode:")]
+    public NSString? LocalizedStringForCurrencyCode(NSString currencyCode);
+    [Selector("localizedStringForCollatorIdentifier:")]
+    public NSString? LocalizedStringForCollatorIdentifier(NSString collatorIdentifier);
 }
 
 /// NSLocaleCreation, a category of NSLocale.
 public extern objc class NSLocale
 {
-    [Selector("autoupdatingCurrentLocale")] public static NSLocale AutoupdatingCurrentLocale { get; }
-    [Selector("currentLocale")] public static NSLocale CurrentLocale { get; }
-    [Selector("systemLocale")] public static NSLocale SystemLocale { get; }
-    [Selector("localeWithLocaleIdentifier:")] public static Self LocaleWithLocaleIdentifier(NSString ident);
+    [Selector("autoupdatingCurrentLocale")]
+    public static NSLocale AutoupdatingCurrentLocale { get; }
+    [Selector("currentLocale")]
+    public static NSLocale CurrentLocale { get; }
+    [Selector("systemLocale")]
+    public static NSLocale SystemLocale { get; }
+    [Selector("localeWithLocaleIdentifier:")]
+    public static Self LocaleWithLocaleIdentifier(NSString ident);
 }
 
 /// NSLocaleGeneralInfo, a category of NSLocale.
 public extern objc class NSLocale
 {
-    [Selector("availableLocaleIdentifiers")] public static NSArray AvailableLocaleIdentifiers { get; }
-    [Selector("ISOLanguageCodes")] public static NSArray ISOLanguageCodes { get; }
-    [Selector("ISOCountryCodes")] public static NSArray ISOCountryCodes { get; }
-    [Selector("ISOCurrencyCodes")] public static NSArray ISOCurrencyCodes { get; }
-    [Selector("commonISOCurrencyCodes")] public static NSArray CommonISOCurrencyCodes { get; }
-    [Selector("preferredLanguages")] public static NSArray PreferredLanguages { get; }
-    [Selector("componentsFromLocaleIdentifier:")] public static NSDictionary ComponentsFromLocaleIdentifier(NSString string);
-    [Selector("localeIdentifierFromComponents:")] public static NSString LocaleIdentifierFromComponents(NSDictionary dict);
-    [Selector("canonicalLocaleIdentifierFromString:")] public static NSString CanonicalLocaleIdentifierFromString(NSString string);
-    [Selector("canonicalLanguageIdentifierFromString:")] public static NSString CanonicalLanguageIdentifierFromString(NSString string);
-    [Selector("localeIdentifierFromWindowsLocaleCode:")] public static NSString? LocaleIdentifierFromWindowsLocaleCode(uint lcid);
-    [Selector("windowsLocaleCodeFromLocaleIdentifier:")] public static uint WindowsLocaleCodeFromLocaleIdentifier(NSString localeIdentifier);
-    [Selector("characterDirectionForLanguage:")] public static NSLocaleLanguageDirection CharacterDirectionForLanguage(NSString isoLangCode);
-    [Selector("lineDirectionForLanguage:")] public static NSLocaleLanguageDirection LineDirectionForLanguage(NSString isoLangCode);
+    [Selector("availableLocaleIdentifiers")]
+    public static NSArray AvailableLocaleIdentifiers { get; }
+    [Selector("ISOLanguageCodes")]
+    public static NSArray ISOLanguageCodes { get; }
+    [Selector("ISOCountryCodes")]
+    public static NSArray ISOCountryCodes { get; }
+    [Selector("ISOCurrencyCodes")]
+    public static NSArray ISOCurrencyCodes { get; }
+    [Selector("commonISOCurrencyCodes")]
+    public static NSArray CommonISOCurrencyCodes { get; }
+    [Selector("preferredLanguages")]
+    public static NSArray PreferredLanguages { get; }
+    [Selector("componentsFromLocaleIdentifier:")]
+    public static NSDictionary ComponentsFromLocaleIdentifier(NSString string);
+    [Selector("localeIdentifierFromComponents:")]
+    public static NSString LocaleIdentifierFromComponents(NSDictionary dict);
+    [Selector("canonicalLocaleIdentifierFromString:")]
+    public static NSString CanonicalLocaleIdentifierFromString(NSString string);
+    [Selector("canonicalLanguageIdentifierFromString:")]
+    public static NSString CanonicalLanguageIdentifierFromString(NSString string);
+    [Selector("localeIdentifierFromWindowsLocaleCode:")]
+    public static NSString? LocaleIdentifierFromWindowsLocaleCode(uint lcid);
+    [Selector("windowsLocaleCodeFromLocaleIdentifier:")]
+    public static uint WindowsLocaleCodeFromLocaleIdentifier(NSString localeIdentifier);
+    [Selector("characterDirectionForLanguage:")]
+    public static NSLocaleLanguageDirection CharacterDirectionForLanguage(NSString isoLangCode);
+    [Selector("lineDirectionForLanguage:")]
+    public static NSLocaleLanguageDirection LineDirectionForLanguage(NSString isoLangCode);
 }
 
 public enum NSLocaleLanguageDirection : ulong

@@ -36,10 +36,14 @@ import Standard.ObjC;
 /// GameplayKit, a category of SKNode.
 public extern objc class SKNode
 {
-    [Selector("entity", "setEntity:")] public GKEntity? Entity { get; set; }
-    [Selector("obstaclesFromSpriteTextures:accuracy:")] public static NSArray ObstaclesFromSpriteTexturesAccuracy(NSArray sprites, float accuracy);
-    [Selector("obstaclesFromNodeBounds:")] public static NSArray ObstaclesFromNodeBounds(NSArray nodes);
-    [Selector("obstaclesFromNodePhysicsBodies:")] public static NSArray ObstaclesFromNodePhysicsBodies(NSArray nodes);
+    [Selector("entity", "setEntity:")]
+    public GKEntity? Entity { get; set; }
+    [Selector("obstaclesFromSpriteTextures:accuracy:")]
+    public static NSArray ObstaclesFromSpriteTexturesAccuracy(NSArray sprites, float accuracy);
+    [Selector("obstaclesFromNodeBounds:")]
+    public static NSArray ObstaclesFromNodeBounds(NSArray nodes);
+    [Selector("obstaclesFromNodePhysicsBodies:")]
+    public static NSArray ObstaclesFromNodePhysicsBodies(NSArray nodes);
 }
 
 /// GameplayKit, a category of SKScene.
@@ -48,13 +52,15 @@ public extern objc class SKScene : GKSceneRootNodeType { }
 /// GameplayKit, a category of SKTileMapNode.
 public extern objc class SKTileMapNode
 {
-    [Selector("tileMapNodesWithTileSet:columns:rows:tileSize:fromNoiseMap:tileTypeNoiseMapThresholds:")] public static NSArray TileMapNodesWithTileSetColumnsRowsTileSizeFromNoiseMapTileTypeNoiseMapThresholds(SKTileSet tileSet, NSUInteger columns, NSUInteger rows, CGSize tileSize, GKNoiseMap noiseMap, NSArray thresholds);
+    [Selector("tileMapNodesWithTileSet:columns:rows:tileSize:fromNoiseMap:tileTypeNoiseMapThresholds:")]
+    public static NSArray TileMapNodesWithTileSetColumnsRowsTileSizeFromNoiseMapTileTypeNoiseMapThresholds(SKTileSet tileSet, NSUInteger columns, NSUInteger rows, CGSize tileSize, GKNoiseMap noiseMap, NSArray thresholds);
 }
 
 /// GameplayKit, a category of SKTexture.
 public extern objc class SKTexture
 {
-    [Selector("textureWithNoiseMap:")] public static Self TextureWithNoiseMap(GKNoiseMap noiseMap);
+    [Selector("textureWithNoiseMap:")]
+    public static Self TextureWithNoiseMap(GKNoiseMap noiseMap);
 }
 
 #endif

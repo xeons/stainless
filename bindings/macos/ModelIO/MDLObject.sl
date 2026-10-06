@@ -35,17 +35,28 @@ public objc closure void MDLObjectEnumerateChildObjectsOfClassRootUsingBlockStop
 
 public extern objc class MDLObject : NSObject, MDLNamed
 {
-    [Selector("components")] public NSArray Components { get; }
-    [Selector("parent", "setParent:")] public MDLObject? Parent { get; set; }
-    [Selector("instance", "setInstance:")] public MDLObject? Instance { get; set; }
-    [Selector("path")] public NSString Path { get; }
-    [Selector("transform", "setTransform:")] public MDLTransformComponent? Transform { get; set; }
-    [Selector("children", "setChildren:")] public MDLObjectContainerComponent Children { get; set; }
-    [Selector("hidden", "setHidden:")] public bool Hidden { get; set; }
-    [Selector("objectAtPath:")] public MDLObject ObjectAtPath(NSString path);
-    [Selector("enumerateChildObjectsOfClass:root:usingBlock:stopPointer:")] public void EnumerateChildObjectsOfClassRootUsingBlockStopPointer(Class objectClass, MDLObject root, MDLObjectEnumerateChildObjectsOfClassRootUsingBlockStopPointerBlock block, bool* stopPointer);
-    [Selector("addChild:")] public void AddChild(MDLObject child);
-    [Selector("boundingBoxAtTime:")] public MDLAxisAlignedBoundingBox BoundingBoxAtTime(NSTimeInterval time);
+    [Selector("components")]
+    public NSArray Components { get; }
+    [Selector("parent", "setParent:")]
+    public MDLObject? Parent { get; set; }
+    [Selector("instance", "setInstance:")]
+    public MDLObject? Instance { get; set; }
+    [Selector("path")]
+    public NSString Path { get; }
+    [Selector("transform", "setTransform:")]
+    public MDLTransformComponent? Transform { get; set; }
+    [Selector("children", "setChildren:")]
+    public MDLObjectContainerComponent Children { get; set; }
+    [Selector("hidden", "setHidden:")]
+    public bool Hidden { get; set; }
+    [Selector("objectAtPath:")]
+    public MDLObject ObjectAtPath(NSString path);
+    [Selector("enumerateChildObjectsOfClass:root:usingBlock:stopPointer:")]
+    public void EnumerateChildObjectsOfClassRootUsingBlockStopPointer(Class objectClass, MDLObject root, MDLObjectEnumerateChildObjectsOfClassRootUsingBlockStopPointerBlock block, bool* stopPointer);
+    [Selector("addChild:")]
+    public void AddChild(MDLObject child);
+    [Selector("boundingBoxAtTime:")]
+    public MDLAxisAlignedBoundingBox BoundingBoxAtTime(NSTimeInterval time);
 }
 
 public extern objc class MDLObjectContainer : NSObject, MDLObjectContainerComponent { }

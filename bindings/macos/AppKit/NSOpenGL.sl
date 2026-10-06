@@ -101,37 +101,53 @@ public const int NSOpenGLProfileVersion4_1Core = 16640;
 /// Deprecated in macOS 10.14.
 public extern objc class NSOpenGLPixelFormat : NSObject, NSCoding
 {
-    [Selector("numberOfVirtualScreens")] public GLint NumberOfVirtualScreens { get; }
-    [Selector("CGLPixelFormatObj")] public CGLPixelFormatObj CGLPixelFormatObj { get; }
-    [Selector("initWithCGLPixelFormatObj:")] public NSOpenGLPixelFormat? InitWithCGLPixelFormatObj(CGLPixelFormatObj format);
-    [Selector("initWithAttributes:")] public Self? InitWithAttributes(NSOpenGLPixelFormatAttribute* attribs);
+    [Selector("numberOfVirtualScreens")]
+    public GLint NumberOfVirtualScreens { get; }
+    [Selector("CGLPixelFormatObj")]
+    public CGLPixelFormatObj CGLPixelFormatObj { get; }
+    [Selector("initWithCGLPixelFormatObj:")]
+    public NSOpenGLPixelFormat? InitWithCGLPixelFormatObj(CGLPixelFormatObj format);
+    [Selector("initWithAttributes:")]
+    public Self? InitWithAttributes(NSOpenGLPixelFormatAttribute* attribs);
     /// Deprecated in macOS 10.6.
-    [Selector("initWithData:")] public AnyObject? InitWithData(NSData? attribs);
+    [Selector("initWithData:")]
+    public AnyObject? InitWithData(NSData? attribs);
     /// Deprecated in macOS 10.6.
-    [Selector("attributes")] public NSData? Attributes();
+    [Selector("attributes")]
+    public NSData? Attributes();
     /// Deprecated in macOS 10.6.
-    [Selector("setAttributes:")] public void SetAttributes(NSData? attribs);
-    [Selector("getValues:forAttribute:forVirtualScreen:")] public void GetValuesForAttributeForVirtualScreen(GLint* vals, NSOpenGLPixelFormatAttribute attrib, GLint screen);
+    [Selector("setAttributes:")]
+    public void SetAttributes(NSData? attribs);
+    [Selector("getValues:forAttribute:forVirtualScreen:")]
+    public void GetValuesForAttributeForVirtualScreen(GLint* vals, NSOpenGLPixelFormatAttribute attrib, GLint screen);
 }
 
 /// Deprecated in macOS 10.7.
 public extern objc class NSOpenGLPixelBuffer : NSObject
 {
-    [Selector("CGLPBufferObj")] public CGLPBufferObj CGLPBufferObj { get; }
+    [Selector("CGLPBufferObj")]
+    public CGLPBufferObj CGLPBufferObj { get; }
     /// Deprecated in macOS 10.7.
-    [Selector("pixelsWide")] public GLsizei PixelsWide { get; }
+    [Selector("pixelsWide")]
+    public GLsizei PixelsWide { get; }
     /// Deprecated in macOS 10.7.
-    [Selector("pixelsHigh")] public GLsizei PixelsHigh { get; }
+    [Selector("pixelsHigh")]
+    public GLsizei PixelsHigh { get; }
     /// Deprecated in macOS 10.7.
-    [Selector("textureTarget")] public GLenum TextureTarget { get; }
+    [Selector("textureTarget")]
+    public GLenum TextureTarget { get; }
     /// Deprecated in macOS 10.7.
-    [Selector("textureInternalFormat")] public GLenum TextureInternalFormat { get; }
+    [Selector("textureInternalFormat")]
+    public GLenum TextureInternalFormat { get; }
     /// Deprecated in macOS 10.7.
-    [Selector("textureMaxMipMapLevel")] public GLint TextureMaxMipMapLevel { get; }
+    [Selector("textureMaxMipMapLevel")]
+    public GLint TextureMaxMipMapLevel { get; }
     /// Deprecated in macOS 10.7.
-    [Selector("initWithTextureTarget:textureInternalFormat:textureMaxMipMapLevel:pixelsWide:pixelsHigh:")] public Self? InitWithTextureTargetTextureInternalFormatTextureMaxMipMapLevelPixelsWidePixelsHigh(GLenum target, GLenum format, GLint maxLevel, GLsizei pixelsWide, GLsizei pixelsHigh);
+    [Selector("initWithTextureTarget:textureInternalFormat:textureMaxMipMapLevel:pixelsWide:pixelsHigh:")]
+    public Self? InitWithTextureTargetTextureInternalFormatTextureMaxMipMapLevelPixelsWidePixelsHigh(GLenum target, GLenum format, GLint maxLevel, GLsizei pixelsWide, GLsizei pixelsHigh);
     /// Deprecated in macOS 10.7.
-    [Selector("initWithCGLPBufferObj:")] public NSOpenGLPixelBuffer? InitWithCGLPBufferObj(CGLPBufferObj pbuffer);
+    [Selector("initWithCGLPBufferObj:")]
+    public NSOpenGLPixelBuffer? InitWithCGLPBufferObj(CGLPBufferObj pbuffer);
 }
 
 /// Deprecated in macOS 10.14.
@@ -157,44 +173,67 @@ public enum NSOpenGLContextParameter : long
 /// Deprecated in macOS 10.14.
 public extern objc class NSOpenGLContext : NSObject, NSLocking
 {
-    [Selector("pixelFormat")] public NSOpenGLPixelFormat? PixelFormat { get; }
+    [Selector("pixelFormat")]
+    public NSOpenGLPixelFormat? PixelFormat { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("view", "setView:")] public NSView? View { get; set; }
-    [Selector("currentContext")] public static NSOpenGLContext? CurrentContext { get; }
-    [Selector("currentVirtualScreen", "setCurrentVirtualScreen:")] public GLint CurrentVirtualScreen { get; set; }
-    [Selector("CGLContextObj")] public CGLContextObj CGLContextObj { get; }
-    [Selector("initWithFormat:shareContext:")] public Self? InitWithFormatShareContext(NSOpenGLPixelFormat format, NSOpenGLContext? share);
-    [Selector("initWithCGLContextObj:")] public NSOpenGLContext? InitWithCGLContextObj(CGLContextObj context);
+    [Selector("view", "setView:")]
+    public NSView? View { get; set; }
+    [Selector("currentContext")]
+    public static NSOpenGLContext? CurrentContext { get; }
+    [Selector("currentVirtualScreen", "setCurrentVirtualScreen:")]
+    public GLint CurrentVirtualScreen { get; set; }
+    [Selector("CGLContextObj")]
+    public CGLContextObj CGLContextObj { get; }
+    [Selector("initWithFormat:shareContext:")]
+    public Self? InitWithFormatShareContext(NSOpenGLPixelFormat format, NSOpenGLContext? share);
+    [Selector("initWithCGLContextObj:")]
+    public NSOpenGLContext? InitWithCGLContextObj(CGLContextObj context);
     /// Deprecated in macOS 10.7.
-    [Selector("setFullScreen")] public void SetFullScreen();
+    [Selector("setFullScreen")]
+    public void SetFullScreen();
     /// Deprecated in macOS 10.7.
-    [Selector("setOffScreen:width:height:rowbytes:")] public void SetOffScreenWidthHeightRowbytes(void* baseaddr, GLsizei width, GLsizei height, GLint rowbytes);
-    [Selector("clearDrawable")] public void ClearDrawable();
-    [Selector("update")] public void Update();
-    [Selector("flushBuffer")] public void FlushBuffer();
-    [Selector("makeCurrentContext")] public void MakeCurrentContext();
-    [Selector("clearCurrentContext")] public static void ClearCurrentContext();
+    [Selector("setOffScreen:width:height:rowbytes:")]
+    public void SetOffScreenWidthHeightRowbytes(void* baseaddr, GLsizei width, GLsizei height, GLint rowbytes);
+    [Selector("clearDrawable")]
+    public void ClearDrawable();
+    [Selector("update")]
+    public void Update();
+    [Selector("flushBuffer")]
+    public void FlushBuffer();
+    [Selector("makeCurrentContext")]
+    public void MakeCurrentContext();
+    [Selector("clearCurrentContext")]
+    public static void ClearCurrentContext();
     /// Deprecated in macOS 10.8.
-    [Selector("copyAttributesFromContext:withMask:")] public void CopyAttributesFromContextWithMask(NSOpenGLContext context, GLbitfield mask);
-    [Selector("setValues:forParameter:")] public void SetValuesForParameter(GLint* vals, NSOpenGLContextParameter param);
-    [Selector("getValues:forParameter:")] public void GetValuesForParameter(GLint* vals, NSOpenGLContextParameter param);
+    [Selector("copyAttributesFromContext:withMask:")]
+    public void CopyAttributesFromContextWithMask(NSOpenGLContext context, GLbitfield mask);
+    [Selector("setValues:forParameter:")]
+    public void SetValuesForParameter(GLint* vals, NSOpenGLContextParameter param);
+    [Selector("getValues:forParameter:")]
+    public void GetValuesForParameter(GLint* vals, NSOpenGLContextParameter param);
     /// Deprecated in macOS 10.8.
-    [Selector("createTexture:fromView:internalFormat:")] public void CreateTextureFromViewInternalFormat(GLenum target, NSView view, GLenum format);
+    [Selector("createTexture:fromView:internalFormat:")]
+    public void CreateTextureFromViewInternalFormat(GLenum target, NSView view, GLenum format);
 }
 
 /// NSOpenGLPixelBuffer, a category of NSOpenGLContext.
 public extern objc class NSOpenGLContext
 {
     /// Deprecated in macOS 10.7.
-    [Selector("setPixelBuffer:cubeMapFace:mipMapLevel:currentVirtualScreen:")] public void SetPixelBufferCubeMapFaceMipMapLevelCurrentVirtualScreen(NSOpenGLPixelBuffer pixelBuffer, GLenum face, GLint level, GLint screen);
+    [Selector("setPixelBuffer:cubeMapFace:mipMapLevel:currentVirtualScreen:")]
+    public void SetPixelBufferCubeMapFaceMipMapLevelCurrentVirtualScreen(NSOpenGLPixelBuffer pixelBuffer, GLenum face, GLint level, GLint screen);
     /// Deprecated in macOS 10.7.
-    [Selector("pixelBuffer")] public NSOpenGLPixelBuffer? PixelBuffer();
+    [Selector("pixelBuffer")]
+    public NSOpenGLPixelBuffer? PixelBuffer();
     /// Deprecated in macOS 10.7.
-    [Selector("pixelBufferCubeMapFace")] public GLenum PixelBufferCubeMapFace();
+    [Selector("pixelBufferCubeMapFace")]
+    public GLenum PixelBufferCubeMapFace();
     /// Deprecated in macOS 10.7.
-    [Selector("pixelBufferMipMapLevel")] public GLint PixelBufferMipMapLevel();
+    [Selector("pixelBufferMipMapLevel")]
+    public GLint PixelBufferMipMapLevel();
     /// Deprecated in macOS 10.7.
-    [Selector("setTextureImageToPixelBuffer:colorBuffer:")] public void SetTextureImageToPixelBufferColorBuffer(NSOpenGLPixelBuffer pixelBuffer, GLenum source);
+    [Selector("setTextureImageToPixelBuffer:colorBuffer:")]
+    public void SetTextureImageToPixelBufferColorBuffer(NSOpenGLPixelBuffer pixelBuffer, GLenum source);
 }
 
 #endif

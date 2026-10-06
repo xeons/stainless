@@ -35,7 +35,8 @@ public using AUViewColor = NSColor;
 
 public extern objc class AUGenericViewController : NSViewController
 {
-    [Selector("auAudioUnit", "setAuAudioUnit:")] public AUAudioUnit? AuAudioUnit { get; set; }
+    [Selector("auAudioUnit", "setAuAudioUnit:")]
+    public AUAudioUnit? AuAudioUnit { get; set; }
 }
 
 #endif

@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class CKLocationSortDescriptor : NSSortDescriptor, NSSecureCoding
 {
-    [Selector("relativeLocation")] public CLLocation RelativeLocation { get; }
-    [Selector("initWithKey:relativeLocation:")] public Self InitWithKeyRelativeLocation(NSString key, CLLocation relativeLocation);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder aDecoder);
+    [Selector("relativeLocation")]
+    public CLLocation RelativeLocation { get; }
+    [Selector("initWithKey:relativeLocation:")]
+    public Self InitWithKeyRelativeLocation(NSString key, CLLocation relativeLocation);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder aDecoder);
 }
 
 #endif

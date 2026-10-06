@@ -38,8 +38,10 @@ public enum SWHighlightMembershipEventTrigger : long
 
 public extern objc class SWHighlightMembershipEvent : NSObject, SWHighlightEvent
 {
-    [Selector("membershipEventTrigger")] public SWHighlightMembershipEventTrigger MembershipEventTrigger { get; }
-    [Selector("initWithHighlight:trigger:")] public Self InitWithHighlightTrigger(SWHighlight highlight, SWHighlightMembershipEventTrigger trigger);
+    [Selector("membershipEventTrigger")]
+    public SWHighlightMembershipEventTrigger MembershipEventTrigger { get; }
+    [Selector("initWithHighlight:trigger:")]
+    public Self InitWithHighlightTrigger(SWHighlight highlight, SWHighlightMembershipEventTrigger trigger);
 }
 
 #endif

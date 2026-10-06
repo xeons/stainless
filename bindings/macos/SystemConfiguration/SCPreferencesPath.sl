@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "SystemConfiguration")
 
-[ReturnsRetained] public extern "C" CFStringRef? SCPreferencesPathCreateUniqueChild(SCPreferencesRef prefs, CFStringRef prefix);
+[ReturnsRetained]
+public extern "C" CFStringRef? SCPreferencesPathCreateUniqueChild(SCPreferencesRef prefs, CFStringRef prefix);
 
 public extern "C" CFDictionaryRef? SCPreferencesPathGetValue(SCPreferencesRef prefs, CFStringRef path);
 

@@ -48,24 +48,42 @@ public objc closure void NLTaggerRequestAssetsForLanguageTagSchemeCompletionHand
 
 public extern objc class NLTagger : NSObject
 {
-    [Selector("tagSchemes")] public NSArray TagSchemes { get; }
-    [Selector("string", "setString:")] public NSString? String { get; set; }
-    [Selector("dominantLanguage")] public NLLanguage? DominantLanguage { get; }
-    [Selector("initWithTagSchemes:")] public Self InitWithTagSchemes(NSArray tagSchemes);
-    [Selector("availableTagSchemesForUnit:language:")] public static NSArray AvailableTagSchemesForUnitLanguage(NLTokenUnit unit, NLLanguage language);
-    [Selector("tokenRangeAtIndex:unit:")] public NSRange TokenRangeAtIndexUnit(NSUInteger characterIndex, NLTokenUnit unit);
-    [Selector("tokenRangeForRange:unit:")] public NSRange TokenRangeForRangeUnit(NSRange range, NLTokenUnit unit);
-    [Selector("enumerateTagsInRange:unit:scheme:options:usingBlock:")] public void EnumerateTagsInRangeUnitSchemeOptionsUsingBlock(NSRange range, NLTokenUnit unit, NLTagScheme scheme, NLTaggerOptions options, NLTaggerEnumerateTagsInRangeUnitSchemeOptionsUsingBlockBlock block);
-    [Selector("tagAtIndex:unit:scheme:tokenRange:")] public NLTag? TagAtIndexUnitSchemeTokenRange(NSUInteger characterIndex, NLTokenUnit unit, NLTagScheme scheme, NSRangePointer tokenRange);
-    [Selector("tagsInRange:unit:scheme:options:tokenRanges:")] public NSArray TagsInRangeUnitSchemeOptionsTokenRanges(NSRange range, NLTokenUnit unit, NLTagScheme scheme, NLTaggerOptions options, out NSArray? tokenRanges);
-    [Selector("tagHypothesesAtIndex:unit:scheme:maximumCount:tokenRange:")] public NSDictionary TagHypothesesAtIndexUnitSchemeMaximumCountTokenRange(NSUInteger characterIndex, NLTokenUnit unit, NLTagScheme scheme, NSUInteger maximumCount, NSRangePointer tokenRange);
-    [Selector("setLanguage:range:")] public void SetLanguageRange(NLLanguage language, NSRange range);
-    [Selector("setOrthography:range:")] public void SetOrthographyRange(NSOrthography orthography, NSRange range);
-    [Selector("setModels:forTagScheme:")] public void SetModelsForTagScheme(NSArray models, NLTagScheme tagScheme);
-    [Selector("modelsForTagScheme:")] public NSArray ModelsForTagScheme(NLTagScheme tagScheme);
-    [Selector("setGazetteers:forTagScheme:")] public void SetGazetteersForTagScheme(NSArray gazetteers, NLTagScheme tagScheme);
-    [Selector("gazetteersForTagScheme:")] public NSArray GazetteersForTagScheme(NLTagScheme tagScheme);
-    [Selector("requestAssetsForLanguage:tagScheme:completionHandler:")] public static void RequestAssetsForLanguageTagSchemeCompletionHandler(NLLanguage language, NLTagScheme tagScheme, NLTaggerRequestAssetsForLanguageTagSchemeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("tagSchemes")]
+    public NSArray TagSchemes { get; }
+    [Selector("string", "setString:")]
+    public NSString? String { get; set; }
+    [Selector("dominantLanguage")]
+    public NLLanguage? DominantLanguage { get; }
+    [Selector("initWithTagSchemes:")]
+    public Self InitWithTagSchemes(NSArray tagSchemes);
+    [Selector("availableTagSchemesForUnit:language:")]
+    public static NSArray AvailableTagSchemesForUnitLanguage(NLTokenUnit unit, NLLanguage language);
+    [Selector("tokenRangeAtIndex:unit:")]
+    public NSRange TokenRangeAtIndexUnit(NSUInteger characterIndex, NLTokenUnit unit);
+    [Selector("tokenRangeForRange:unit:")]
+    public NSRange TokenRangeForRangeUnit(NSRange range, NLTokenUnit unit);
+    [Selector("enumerateTagsInRange:unit:scheme:options:usingBlock:")]
+    public void EnumerateTagsInRangeUnitSchemeOptionsUsingBlock(NSRange range, NLTokenUnit unit, NLTagScheme scheme, NLTaggerOptions options, NLTaggerEnumerateTagsInRangeUnitSchemeOptionsUsingBlockBlock block);
+    [Selector("tagAtIndex:unit:scheme:tokenRange:")]
+    public NLTag? TagAtIndexUnitSchemeTokenRange(NSUInteger characterIndex, NLTokenUnit unit, NLTagScheme scheme, NSRangePointer tokenRange);
+    [Selector("tagsInRange:unit:scheme:options:tokenRanges:")]
+    public NSArray TagsInRangeUnitSchemeOptionsTokenRanges(NSRange range, NLTokenUnit unit, NLTagScheme scheme, NLTaggerOptions options, out NSArray? tokenRanges);
+    [Selector("tagHypothesesAtIndex:unit:scheme:maximumCount:tokenRange:")]
+    public NSDictionary TagHypothesesAtIndexUnitSchemeMaximumCountTokenRange(NSUInteger characterIndex, NLTokenUnit unit, NLTagScheme scheme, NSUInteger maximumCount, NSRangePointer tokenRange);
+    [Selector("setLanguage:range:")]
+    public void SetLanguageRange(NLLanguage language, NSRange range);
+    [Selector("setOrthography:range:")]
+    public void SetOrthographyRange(NSOrthography orthography, NSRange range);
+    [Selector("setModels:forTagScheme:")]
+    public void SetModelsForTagScheme(NSArray models, NLTagScheme tagScheme);
+    [Selector("modelsForTagScheme:")]
+    public NSArray ModelsForTagScheme(NLTagScheme tagScheme);
+    [Selector("setGazetteers:forTagScheme:")]
+    public void SetGazetteersForTagScheme(NSArray gazetteers, NLTagScheme tagScheme);
+    [Selector("gazetteersForTagScheme:")]
+    public NSArray GazetteersForTagScheme(NLTagScheme tagScheme);
+    [Selector("requestAssetsForLanguage:tagScheme:completionHandler:")]
+    public static void RequestAssetsForLanguageTagSchemeCompletionHandler(NLLanguage language, NLTagScheme tagScheme, NLTaggerRequestAssetsForLanguageTagSchemeCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public enum NLTaggerAssetsResult : long

@@ -82,58 +82,103 @@ public enum SCCaptureDynamicRange : long
 public extern objc class SCContentFilter : NSObject
 {
     /// Deprecated in macOS 14.2.
-    [Selector("streamType")] public SCStreamType StreamType { get; }
-    [Selector("style")] public SCShareableContentStyle Style { get; }
-    [Selector("pointPixelScale")] public float PointPixelScale { get; }
-    [Selector("contentRect")] public CGRect ContentRect { get; }
-    [Selector("includeMenuBar", "setIncludeMenuBar:")] public bool IncludeMenuBar { get; set; }
+    [Selector("streamType")]
+    public SCStreamType StreamType { get; }
+    [Selector("style")]
+    public SCShareableContentStyle Style { get; }
+    [Selector("pointPixelScale")]
+    public float PointPixelScale { get; }
+    [Selector("contentRect")]
+    public CGRect ContentRect { get; }
+    [Selector("includeMenuBar", "setIncludeMenuBar:")]
+    public bool IncludeMenuBar { get; set; }
     /// macOS 15.2 and later.
-    [Selector("includedDisplays")] public NSArray? IncludedDisplays { get; }
+    [Selector("includedDisplays")]
+    public NSArray? IncludedDisplays { get; }
     /// macOS 15.2 and later.
-    [Selector("includedApplications")] public NSArray? IncludedApplications { get; }
+    [Selector("includedApplications")]
+    public NSArray? IncludedApplications { get; }
     /// macOS 15.2 and later.
-    [Selector("includedWindows")] public NSArray? IncludedWindows { get; }
-    [Selector("initWithDesktopIndependentWindow:")] public Self InitWithDesktopIndependentWindow(SCWindow window);
-    [Selector("initWithDisplay:excludingWindows:")] public Self InitWithDisplayExcludingWindows(SCDisplay display, NSArray excluded);
-    [Selector("initWithDisplay:includingWindows:")] public Self InitWithDisplayIncludingWindows(SCDisplay display, NSArray includedWindows);
-    [Selector("initWithDisplay:includingApplications:exceptingWindows:")] public Self InitWithDisplayIncludingApplicationsExceptingWindows(SCDisplay display, NSArray applications, NSArray exceptingWindows);
-    [Selector("initWithDisplay:excludingApplications:exceptingWindows:")] public Self InitWithDisplayExcludingApplicationsExceptingWindows(SCDisplay display, NSArray applications, NSArray exceptingWindows);
+    [Selector("includedWindows")]
+    public NSArray? IncludedWindows { get; }
+    [Selector("initWithDesktopIndependentWindow:")]
+    public Self InitWithDesktopIndependentWindow(SCWindow window);
+    [Selector("initWithDisplay:excludingWindows:")]
+    public Self InitWithDisplayExcludingWindows(SCDisplay display, NSArray excluded);
+    [Selector("initWithDisplay:includingWindows:")]
+    public Self InitWithDisplayIncludingWindows(SCDisplay display, NSArray includedWindows);
+    [Selector("initWithDisplay:includingApplications:exceptingWindows:")]
+    public Self InitWithDisplayIncludingApplicationsExceptingWindows(SCDisplay display, NSArray applications, NSArray exceptingWindows);
+    [Selector("initWithDisplay:excludingApplications:exceptingWindows:")]
+    public Self InitWithDisplayExcludingApplicationsExceptingWindows(SCDisplay display, NSArray applications, NSArray exceptingWindows);
 }
 
 public extern objc class SCStreamConfiguration : NSObject
 {
-    [Selector("width", "setWidth:")] public nuint Width { get; set; }
-    [Selector("height", "setHeight:")] public nuint Height { get; set; }
-    [Selector("minimumFrameInterval", "setMinimumFrameInterval:")] public CMTime MinimumFrameInterval { get; set; }
-    [Selector("pixelFormat", "setPixelFormat:")] public OSType PixelFormat { get; set; }
-    [Selector("scalesToFit", "setScalesToFit:")] public bool ScalesToFit { get; set; }
-    [Selector("preservesAspectRatio", "setPreservesAspectRatio:")] public bool PreservesAspectRatio { get; set; }
-    [Selector("streamName", "setStreamName:")] public NSString? StreamName { get; set; }
-    [Selector("showsCursor", "setShowsCursor:")] public bool ShowsCursor { get; set; }
-    [Selector("showMouseClicks", "setShowMouseClicks:")] public bool ShowMouseClicks { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public CGColorRef BackgroundColor { get; set; }
-    [Selector("sourceRect", "setSourceRect:")] public CGRect SourceRect { get; set; }
-    [Selector("destinationRect", "setDestinationRect:")] public CGRect DestinationRect { get; set; }
-    [Selector("queueDepth", "setQueueDepth:")] public NSInteger QueueDepth { get; set; }
-    [Selector("colorMatrix", "setColorMatrix:")] public CFStringRef ColorMatrix { get; set; }
-    [Selector("colorSpaceName", "setColorSpaceName:")] public CFStringRef ColorSpaceName { get; set; }
-    [Selector("capturesAudio", "setCapturesAudio:")] public bool CapturesAudio { get; set; }
-    [Selector("sampleRate", "setSampleRate:")] public NSInteger SampleRate { get; set; }
-    [Selector("channelCount", "setChannelCount:")] public NSInteger ChannelCount { get; set; }
-    [Selector("excludesCurrentProcessAudio", "setExcludesCurrentProcessAudio:")] public bool ExcludesCurrentProcessAudio { get; set; }
-    [Selector("ignoreShadowsDisplay", "setIgnoreShadowsDisplay:")] public bool IgnoreShadowsDisplay { get; set; }
-    [Selector("ignoreShadowsSingleWindow", "setIgnoreShadowsSingleWindow:")] public bool IgnoreShadowsSingleWindow { get; set; }
-    [Selector("captureResolution", "setCaptureResolution:")] public SCCaptureResolutionType CaptureResolution { get; set; }
-    [Selector("capturesShadowsOnly", "setCapturesShadowsOnly:")] public bool CapturesShadowsOnly { get; set; }
-    [Selector("shouldBeOpaque", "setShouldBeOpaque:")] public bool ShouldBeOpaque { get; set; }
-    [Selector("ignoreGlobalClipDisplay", "setIgnoreGlobalClipDisplay:")] public bool IgnoreGlobalClipDisplay { get; set; }
-    [Selector("ignoreGlobalClipSingleWindow", "setIgnoreGlobalClipSingleWindow:")] public bool IgnoreGlobalClipSingleWindow { get; set; }
-    [Selector("presenterOverlayPrivacyAlertSetting", "setPresenterOverlayPrivacyAlertSetting:")] public SCPresenterOverlayAlertSetting PresenterOverlayPrivacyAlertSetting { get; set; }
-    [Selector("includeChildWindows", "setIncludeChildWindows:")] public bool IncludeChildWindows { get; set; }
-    [Selector("captureMicrophone", "setCaptureMicrophone:")] public bool CaptureMicrophone { get; set; }
-    [Selector("microphoneCaptureDeviceID", "setMicrophoneCaptureDeviceID:")] public NSString? MicrophoneCaptureDeviceID { get; set; }
-    [Selector("captureDynamicRange", "setCaptureDynamicRange:")] public SCCaptureDynamicRange CaptureDynamicRange { get; set; }
-    [Selector("streamConfigurationWithPreset:")] public static Self StreamConfigurationWithPreset(SCStreamConfigurationPreset preset);
+    [Selector("width", "setWidth:")]
+    public nuint Width { get; set; }
+    [Selector("height", "setHeight:")]
+    public nuint Height { get; set; }
+    [Selector("minimumFrameInterval", "setMinimumFrameInterval:")]
+    public CMTime MinimumFrameInterval { get; set; }
+    [Selector("pixelFormat", "setPixelFormat:")]
+    public OSType PixelFormat { get; set; }
+    [Selector("scalesToFit", "setScalesToFit:")]
+    public bool ScalesToFit { get; set; }
+    [Selector("preservesAspectRatio", "setPreservesAspectRatio:")]
+    public bool PreservesAspectRatio { get; set; }
+    [Selector("streamName", "setStreamName:")]
+    public NSString? StreamName { get; set; }
+    [Selector("showsCursor", "setShowsCursor:")]
+    public bool ShowsCursor { get; set; }
+    [Selector("showMouseClicks", "setShowMouseClicks:")]
+    public bool ShowMouseClicks { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public CGColorRef BackgroundColor { get; set; }
+    [Selector("sourceRect", "setSourceRect:")]
+    public CGRect SourceRect { get; set; }
+    [Selector("destinationRect", "setDestinationRect:")]
+    public CGRect DestinationRect { get; set; }
+    [Selector("queueDepth", "setQueueDepth:")]
+    public NSInteger QueueDepth { get; set; }
+    [Selector("colorMatrix", "setColorMatrix:")]
+    public CFStringRef ColorMatrix { get; set; }
+    [Selector("colorSpaceName", "setColorSpaceName:")]
+    public CFStringRef ColorSpaceName { get; set; }
+    [Selector("capturesAudio", "setCapturesAudio:")]
+    public bool CapturesAudio { get; set; }
+    [Selector("sampleRate", "setSampleRate:")]
+    public NSInteger SampleRate { get; set; }
+    [Selector("channelCount", "setChannelCount:")]
+    public NSInteger ChannelCount { get; set; }
+    [Selector("excludesCurrentProcessAudio", "setExcludesCurrentProcessAudio:")]
+    public bool ExcludesCurrentProcessAudio { get; set; }
+    [Selector("ignoreShadowsDisplay", "setIgnoreShadowsDisplay:")]
+    public bool IgnoreShadowsDisplay { get; set; }
+    [Selector("ignoreShadowsSingleWindow", "setIgnoreShadowsSingleWindow:")]
+    public bool IgnoreShadowsSingleWindow { get; set; }
+    [Selector("captureResolution", "setCaptureResolution:")]
+    public SCCaptureResolutionType CaptureResolution { get; set; }
+    [Selector("capturesShadowsOnly", "setCapturesShadowsOnly:")]
+    public bool CapturesShadowsOnly { get; set; }
+    [Selector("shouldBeOpaque", "setShouldBeOpaque:")]
+    public bool ShouldBeOpaque { get; set; }
+    [Selector("ignoreGlobalClipDisplay", "setIgnoreGlobalClipDisplay:")]
+    public bool IgnoreGlobalClipDisplay { get; set; }
+    [Selector("ignoreGlobalClipSingleWindow", "setIgnoreGlobalClipSingleWindow:")]
+    public bool IgnoreGlobalClipSingleWindow { get; set; }
+    [Selector("presenterOverlayPrivacyAlertSetting", "setPresenterOverlayPrivacyAlertSetting:")]
+    public SCPresenterOverlayAlertSetting PresenterOverlayPrivacyAlertSetting { get; set; }
+    [Selector("includeChildWindows", "setIncludeChildWindows:")]
+    public bool IncludeChildWindows { get; set; }
+    [Selector("captureMicrophone", "setCaptureMicrophone:")]
+    public bool CaptureMicrophone { get; set; }
+    [Selector("microphoneCaptureDeviceID", "setMicrophoneCaptureDeviceID:")]
+    public NSString? MicrophoneCaptureDeviceID { get; set; }
+    [Selector("captureDynamicRange", "setCaptureDynamicRange:")]
+    public SCCaptureDynamicRange CaptureDynamicRange { get; set; }
+    [Selector("streamConfigurationWithPreset:")]
+    public static Self StreamConfigurationWithPreset(SCStreamConfigurationPreset preset);
 }
 
 public enum SCStreamConfigurationPreset : long
@@ -175,32 +220,54 @@ public objc closure void SCStreamStopCaptureWithCompletionHandlerCompletionHandl
 
 public extern objc class SCStream : NSObject
 {
-    [Selector("synchronizationClock")] public CMClockRef? SynchronizationClock { get; }
-    [Selector("initWithFilter:configuration:delegate:")] public Self InitWithFilterConfigurationDelegate(SCContentFilter contentFilter, SCStreamConfiguration streamConfig, SCStreamDelegate? @delegate);
-    [Selector("addStreamOutput:type:sampleHandlerQueue:error:")] public bool AddStreamOutputTypeSampleHandlerQueueError(SCStreamOutput output, SCStreamOutputType type, dispatch_queue_t? sampleHandlerQueue, out NSError? error);
-    [Selector("removeStreamOutput:type:error:")] public bool RemoveStreamOutputTypeError(SCStreamOutput output, SCStreamOutputType type, out NSError? error);
-    [Selector("updateContentFilter:completionHandler:")] public void UpdateContentFilterCompletionHandler(SCContentFilter contentFilter, SCStreamUpdateContentFilterCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("updateConfiguration:completionHandler:")] public void UpdateConfigurationCompletionHandler(SCStreamConfiguration streamConfig, SCStreamUpdateConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("startCaptureWithCompletionHandler:")] public void StartCaptureWithCompletionHandler(SCStreamStartCaptureWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("stopCaptureWithCompletionHandler:")] public void StopCaptureWithCompletionHandler(SCStreamStopCaptureWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("addRecordingOutput:error:")] public bool AddRecordingOutputError(SCRecordingOutput recordingOutput, out NSError? error);
-    [Selector("removeRecordingOutput:error:")] public bool RemoveRecordingOutputError(SCRecordingOutput recordingOutput, out NSError? error);
+    [Selector("synchronizationClock")]
+    public CMClockRef? SynchronizationClock { get; }
+    [Selector("initWithFilter:configuration:delegate:")]
+    public Self InitWithFilterConfigurationDelegate(SCContentFilter contentFilter, SCStreamConfiguration streamConfig, SCStreamDelegate? @delegate);
+    [Selector("addStreamOutput:type:sampleHandlerQueue:error:")]
+    public bool AddStreamOutputTypeSampleHandlerQueueError(SCStreamOutput output, SCStreamOutputType type, dispatch_queue_t? sampleHandlerQueue, out NSError? error);
+    [Selector("removeStreamOutput:type:error:")]
+    public bool RemoveStreamOutputTypeError(SCStreamOutput output, SCStreamOutputType type, out NSError? error);
+    [Selector("updateContentFilter:completionHandler:")]
+    public void UpdateContentFilterCompletionHandler(SCContentFilter contentFilter, SCStreamUpdateContentFilterCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("updateConfiguration:completionHandler:")]
+    public void UpdateConfigurationCompletionHandler(SCStreamConfiguration streamConfig, SCStreamUpdateConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("startCaptureWithCompletionHandler:")]
+    public void StartCaptureWithCompletionHandler(SCStreamStartCaptureWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("stopCaptureWithCompletionHandler:")]
+    public void StopCaptureWithCompletionHandler(SCStreamStopCaptureWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("addRecordingOutput:error:")]
+    public bool AddRecordingOutputError(SCRecordingOutput recordingOutput, out NSError? error);
+    [Selector("removeRecordingOutput:error:")]
+    public bool RemoveRecordingOutputError(SCRecordingOutput recordingOutput, out NSError? error);
 }
 
 public objc interface SCStreamOutput : NSObjectProtocol
 {
-    [Optional] [Selector("stream:didOutputSampleBuffer:ofType:")] void StreamDidOutputSampleBufferOfType(SCStream stream, CMSampleBufferRef sampleBuffer, SCStreamOutputType type);
+    [Optional]
+    [Selector("stream:didOutputSampleBuffer:ofType:")]
+    void StreamDidOutputSampleBufferOfType(SCStream stream, CMSampleBufferRef sampleBuffer, SCStreamOutputType type);
 }
 
 public objc interface SCStreamDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("stream:didStopWithError:")] void StreamDidStopWithError(SCStream stream, NSError error);
-    [Optional] [Selector("outputVideoEffectDidStartForStream:")] void OutputVideoEffectDidStartForStream(SCStream stream);
-    [Optional] [Selector("outputVideoEffectDidStopForStream:")] void OutputVideoEffectDidStopForStream(SCStream stream);
+    [Optional]
+    [Selector("stream:didStopWithError:")]
+    void StreamDidStopWithError(SCStream stream, NSError error);
+    [Optional]
+    [Selector("outputVideoEffectDidStartForStream:")]
+    void OutputVideoEffectDidStartForStream(SCStream stream);
+    [Optional]
+    [Selector("outputVideoEffectDidStopForStream:")]
+    void OutputVideoEffectDidStopForStream(SCStream stream);
     /// macOS 15.2 and later.
-    [Optional] [Selector("streamDidBecomeActive:")] void StreamDidBecomeActive(SCStream stream);
+    [Optional]
+    [Selector("streamDidBecomeActive:")]
+    void StreamDidBecomeActive(SCStream stream);
     /// macOS 15.2 and later.
-    [Optional] [Selector("streamDidBecomeInactive:")] void StreamDidBecomeInactive(SCStream stream);
+    [Optional]
+    [Selector("streamDidBecomeInactive:")]
+    void StreamDidBecomeInactive(SCStream stream);
 }
 
 #endif

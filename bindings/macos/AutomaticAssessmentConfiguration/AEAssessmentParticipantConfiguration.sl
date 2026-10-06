@@ -33,12 +33,17 @@ import Standard.ObjC;
 
 public extern objc class AEAssessmentParticipantConfiguration : NSObject, NSCopying
 {
-    [Selector("allowsNetworkAccess", "setAllowsNetworkAccess:")] public bool AllowsNetworkAccess { get; set; }
+    [Selector("allowsNetworkAccess", "setAllowsNetworkAccess:")]
+    public bool AllowsNetworkAccess { get; set; }
     /// macOS 26.0 and later.
-    [Selector("isRequired", "setRequired:")] public bool Required { get; set; }
-    [Selector("configurationInfo", "setConfigurationInfo:")] public NSDictionary ConfigurationInfo { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("new")] public static Self New();
+    [Selector("isRequired", "setRequired:")]
+    public bool Required { get; set; }
+    [Selector("configurationInfo", "setConfigurationInfo:")]
+    public NSDictionary ConfigurationInfo { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("new")]
+    public static Self New();
 }
 
 #endif

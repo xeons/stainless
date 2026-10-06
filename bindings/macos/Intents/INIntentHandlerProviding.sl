@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public objc interface INIntentHandlerProviding : NSObjectProtocol
 {
-    [Selector("handlerForIntent:")] AnyObject? HandlerForIntent(INIntent intent);
+    [Selector("handlerForIntent:")]
+    AnyObject? HandlerForIntent(INIntent intent);
 }
 
 #endif

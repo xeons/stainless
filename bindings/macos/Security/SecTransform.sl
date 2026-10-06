@@ -87,13 +87,16 @@ public extern "C" CFStringRef? kSecTransformTransformName;
 public extern "C" CFStringRef? kSecTransformAbortAttributeName;
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" SecTransformRef? SecTransformCreateFromExternalRepresentation(CFDictionaryRef dictionary, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecTransformRef? SecTransformCreateFromExternalRepresentation(CFDictionaryRef dictionary, __CFError** error);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFDictionaryRef SecTransformCopyExternalRepresentation(SecTransformRef transformRef);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef SecTransformCopyExternalRepresentation(SecTransformRef transformRef);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" SecGroupTransformRef SecTransformCreateGroupTransform();
+[ReturnsRetained]
+public extern "C" SecGroupTransformRef SecTransformCreateGroupTransform();
 
 /// Deprecated in macOS 12.0.
 public extern "C" SecGroupTransformRef? SecTransformConnectTransforms(SecTransformRef sourceTransformRef, CFStringRef sourceAttributeName, SecTransformRef destinationTransformRef, CFStringRef destinationAttributeName, SecGroupTransformRef group, __CFError** error);
@@ -108,7 +111,8 @@ public extern "C" CFTypeRef? SecTransformGetAttribute(SecTransformRef transformR
 public extern "C" SecTransformRef? SecTransformFindByName(SecGroupTransformRef transform, CFStringRef name);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFTypeRef SecTransformExecute(SecTransformRef transformRef, __CFError** errorRef);
+[ReturnsRetained]
+public extern "C" CFTypeRef SecTransformExecute(SecTransformRef transformRef, __CFError** errorRef);
 
 public objc closure void SecMessageBlock(CFTypeRef? arg0, CFErrorRef? arg1, Boolean arg2);
 

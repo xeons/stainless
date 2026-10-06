@@ -34,12 +34,18 @@ import Standard.ObjC;
 
 public extern objc class MPSTemporalAA : MPSKernel, NSSecureCoding, NSCopying
 {
-    [Selector("blendFactor", "setBlendFactor:")] public float BlendFactor { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
-    [Selector("encodeWithCoder:")] public void EncodeWithCoder(NSCoder coder);
-    [Selector("encodeToCommandBuffer:sourceTexture:previousTexture:destinationTexture:motionVectorTexture:depthTexture:")] public void EncodeToCommandBufferSourceTexturePreviousTextureDestinationTextureMotionVectorTextureDepthTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture previousTexture, MTLTexture destinationTexture, MTLTexture? motionVectorTexture, MTLTexture? depthTexture);
+    [Selector("blendFactor", "setBlendFactor:")]
+    public float BlendFactor { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("encodeWithCoder:")]
+    public void EncodeWithCoder(NSCoder coder);
+    [Selector("encodeToCommandBuffer:sourceTexture:previousTexture:destinationTexture:motionVectorTexture:depthTexture:")]
+    public void EncodeToCommandBufferSourceTexturePreviousTextureDestinationTextureMotionVectorTextureDepthTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture previousTexture, MTLTexture destinationTexture, MTLTexture? motionVectorTexture, MTLTexture? depthTexture);
 }
 
 #endif

@@ -33,20 +33,28 @@ import Standard.ObjC;
 
 public objc interface CLSDataStoreDelegate : NSObjectProtocol
 {
-    [Selector("createContextForIdentifier:parentContext:parentIdentifierPath:")] CLSContext? CreateContextForIdentifierParentContextParentIdentifierPath(NSString identifier, CLSContext parentContext, NSArray parentIdentifierPath);
+    [Selector("createContextForIdentifier:parentContext:parentIdentifierPath:")]
+    CLSContext? CreateContextForIdentifierParentContextParentIdentifierPath(NSString identifier, CLSContext parentContext, NSArray parentIdentifierPath);
 }
 
 public objc closure void CLSDataStoreSaveWithCompletionCompletionBlock(NSError? arg0);
 
 public extern objc class CLSDataStore : NSObject
 {
-    [Selector("shared")] public static CLSDataStore Shared { get; }
-    [Selector("mainAppContext")] public CLSContext MainAppContext { get; }
-    [Selector("activeContext")] public CLSContext? ActiveContext { get; }
-    [Selector("runningActivity")] public CLSActivity? RunningActivity { get; }
-    [Selector("delegate", "setDelegate:")] public CLSDataStoreDelegate? Delegate { get; set; }
-    [Selector("saveWithCompletion:")] public void SaveWithCompletion(CLSDataStoreSaveWithCompletionCompletionBlock? completion);
-    [Selector("completeAllAssignedActivitiesMatching:")] public void CompleteAllAssignedActivitiesMatching(NSArray contextPath);
+    [Selector("shared")]
+    public static CLSDataStore Shared { get; }
+    [Selector("mainAppContext")]
+    public CLSContext MainAppContext { get; }
+    [Selector("activeContext")]
+    public CLSContext? ActiveContext { get; }
+    [Selector("runningActivity")]
+    public CLSActivity? RunningActivity { get; }
+    [Selector("delegate", "setDelegate:")]
+    public CLSDataStoreDelegate? Delegate { get; set; }
+    [Selector("saveWithCompletion:")]
+    public void SaveWithCompletion(CLSDataStoreSaveWithCompletionCompletionBlock? completion);
+    [Selector("completeAllAssignedActivitiesMatching:")]
+    public void CompleteAllAssignedActivitiesMatching(NSArray contextPath);
 }
 
 public objc closure void CLSDataStoreContextsMatchingPredicateCompletionCompletionBlock(NSArray arg0, NSError? arg1);
@@ -58,10 +66,14 @@ public objc closure void CLSDataStoreFetchActivityForURLCompletionCompletionBloc
 /// Contexts, a category of CLSDataStore.
 public extern objc class CLSDataStore
 {
-    [Selector("contextsMatchingPredicate:completion:")] public void ContextsMatchingPredicateCompletion(NSPredicate predicate, CLSDataStoreContextsMatchingPredicateCompletionCompletionBlock completion);
-    [Selector("contextsMatchingIdentifierPath:completion:")] public void ContextsMatchingIdentifierPathCompletion(NSArray identifierPath, CLSDataStoreContextsMatchingIdentifierPathCompletionCompletionBlock completion);
-    [Selector("removeContext:")] public void RemoveContext(CLSContext context);
-    [Selector("fetchActivityForURL:completion:")] public void FetchActivityForURLCompletion(NSURL url, CLSDataStoreFetchActivityForURLCompletionCompletionBlock completion);
+    [Selector("contextsMatchingPredicate:completion:")]
+    public void ContextsMatchingPredicateCompletion(NSPredicate predicate, CLSDataStoreContextsMatchingPredicateCompletionCompletionBlock completion);
+    [Selector("contextsMatchingIdentifierPath:completion:")]
+    public void ContextsMatchingIdentifierPathCompletion(NSArray identifierPath, CLSDataStoreContextsMatchingIdentifierPathCompletionCompletionBlock completion);
+    [Selector("removeContext:")]
+    public void RemoveContext(CLSContext context);
+    [Selector("fetchActivityForURL:completion:")]
+    public void FetchActivityForURLCompletion(NSURL url, CLSDataStoreFetchActivityForURLCompletionCompletionBlock completion);
 }
 
 #endif

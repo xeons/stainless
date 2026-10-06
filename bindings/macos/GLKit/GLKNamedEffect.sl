@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public objc interface GLKNamedEffect
 {
-    [Selector("prepareToDraw")] void PrepareToDraw();
+    [Selector("prepareToDraw")]
+    void PrepareToDraw();
 }
 
 #endif

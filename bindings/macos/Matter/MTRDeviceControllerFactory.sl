@@ -33,25 +33,40 @@ import Standard.ObjC;
 
 public extern objc class MTRDeviceControllerFactoryParams : NSObject
 {
-    [Selector("storage")] public MTRStorage Storage { get; }
-    [Selector("otaProviderDelegate", "setOtaProviderDelegate:")] public MTROTAProviderDelegate? OtaProviderDelegate { get; set; }
-    [Selector("productAttestationAuthorityCertificates", "setProductAttestationAuthorityCertificates:")] public NSArray? ProductAttestationAuthorityCertificates { get; set; }
-    [Selector("certificationDeclarationCertificates", "setCertificationDeclarationCertificates:")] public NSArray? CertificationDeclarationCertificates { get; set; }
-    [Selector("port", "setPort:")] public NSNumber? Port { get; set; }
-    [Selector("shouldStartServer", "setShouldStartServer:")] public bool ShouldStartServer { get; set; }
-    [Selector("initWithStorage:")] public Self InitWithStorage(MTRStorage storage);
+    [Selector("storage")]
+    public MTRStorage Storage { get; }
+    [Selector("otaProviderDelegate", "setOtaProviderDelegate:")]
+    public MTROTAProviderDelegate? OtaProviderDelegate { get; set; }
+    [Selector("productAttestationAuthorityCertificates", "setProductAttestationAuthorityCertificates:")]
+    public NSArray? ProductAttestationAuthorityCertificates { get; set; }
+    [Selector("certificationDeclarationCertificates", "setCertificationDeclarationCertificates:")]
+    public NSArray? CertificationDeclarationCertificates { get; set; }
+    [Selector("port", "setPort:")]
+    public NSNumber? Port { get; set; }
+    [Selector("shouldStartServer", "setShouldStartServer:")]
+    public bool ShouldStartServer { get; set; }
+    [Selector("initWithStorage:")]
+    public Self InitWithStorage(MTRStorage storage);
 }
 
 public extern objc class MTRDeviceControllerFactory : NSObject
 {
-    [Selector("isRunning")] public bool Running { get; }
-    [Selector("knownFabrics")] public NSArray? KnownFabrics { get; }
-    [Selector("sharedInstance")] public static MTRDeviceControllerFactory SharedInstance();
-    [Selector("startControllerFactory:error:")] public bool StartControllerFactoryError(MTRDeviceControllerFactoryParams startupParams, out NSError? error);
-    [Selector("stopControllerFactory")] public void StopControllerFactory();
-    [Selector("createControllerOnExistingFabric:error:")] public MTRDeviceController? CreateControllerOnExistingFabricError(MTRDeviceControllerStartupParams startupParams, out NSError? error);
-    [Selector("createControllerOnNewFabric:error:")] public MTRDeviceController? CreateControllerOnNewFabricError(MTRDeviceControllerStartupParams startupParams, out NSError? error);
-    [Selector("preWarmCommissioningSession")] public void PreWarmCommissioningSession();
+    [Selector("isRunning")]
+    public bool Running { get; }
+    [Selector("knownFabrics")]
+    public NSArray? KnownFabrics { get; }
+    [Selector("sharedInstance")]
+    public static MTRDeviceControllerFactory SharedInstance();
+    [Selector("startControllerFactory:error:")]
+    public bool StartControllerFactoryError(MTRDeviceControllerFactoryParams startupParams, out NSError? error);
+    [Selector("stopControllerFactory")]
+    public void StopControllerFactory();
+    [Selector("createControllerOnExistingFabric:error:")]
+    public MTRDeviceController? CreateControllerOnExistingFabricError(MTRDeviceControllerStartupParams startupParams, out NSError? error);
+    [Selector("createControllerOnNewFabric:error:")]
+    public MTRDeviceController? CreateControllerOnNewFabricError(MTRDeviceControllerStartupParams startupParams, out NSError? error);
+    [Selector("preWarmCommissioningSession")]
+    public void PreWarmCommissioningSession();
 }
 
 public extern "C" void MTRSetMessageReliabilityParameters(NSNumber? idleRetransmitMs, NSNumber? activeRetransmitMs, NSNumber? activeThresholdMs, NSNumber? additionalRetransmitDelayMs);
@@ -60,24 +75,34 @@ public extern "C" void MTRSetMessageReliabilityParameters(NSNumber? idleRetransm
 public extern objc class MTRControllerFactoryParams : MTRDeviceControllerFactoryParams
 {
     /// Deprecated in macOS 13.3.
-    [Selector("storageDelegate")] public MTRPersistentStorageDelegate StorageDelegate { get; }
+    [Selector("storageDelegate")]
+    public MTRPersistentStorageDelegate StorageDelegate { get; }
     /// Deprecated in macOS 13.3.
-    [Selector("startServer", "setStartServer:")] public bool StartServer { get; set; }
+    [Selector("startServer", "setStartServer:")]
+    public bool StartServer { get; set; }
     /// Deprecated in macOS 13.3.
-    [Selector("paaCerts", "setPaaCerts:")] public NSArray? PaaCerts { get; set; }
+    [Selector("paaCerts", "setPaaCerts:")]
+    public NSArray? PaaCerts { get; set; }
     /// Deprecated in macOS 13.3.
-    [Selector("cdCerts", "setCdCerts:")] public NSArray? CdCerts { get; set; }
+    [Selector("cdCerts", "setCdCerts:")]
+    public NSArray? CdCerts { get; set; }
 }
 
 /// Deprecated in macOS 13.3.
 public extern objc class MTRControllerFactory : NSObject
 {
-    [Selector("isRunning")] public bool IsRunning { get; }
-    [Selector("sharedInstance")] public static MTRControllerFactory SharedInstance();
-    [Selector("startup:")] public bool Startup(MTRControllerFactoryParams startupParams);
-    [Selector("shutdown")] public void Shutdown();
-    [Selector("startControllerOnExistingFabric:")] public MTRDeviceController? StartControllerOnExistingFabric(MTRDeviceControllerStartupParams startupParams);
-    [Selector("startControllerOnNewFabric:")] public MTRDeviceController? StartControllerOnNewFabric(MTRDeviceControllerStartupParams startupParams);
+    [Selector("isRunning")]
+    public bool IsRunning { get; }
+    [Selector("sharedInstance")]
+    public static MTRControllerFactory SharedInstance();
+    [Selector("startup:")]
+    public bool Startup(MTRControllerFactoryParams startupParams);
+    [Selector("shutdown")]
+    public void Shutdown();
+    [Selector("startControllerOnExistingFabric:")]
+    public MTRDeviceController? StartControllerOnExistingFabric(MTRDeviceControllerStartupParams startupParams);
+    [Selector("startControllerOnNewFabric:")]
+    public MTRDeviceController? StartControllerOnNewFabric(MTRDeviceControllerStartupParams startupParams);
 }
 
 #endif

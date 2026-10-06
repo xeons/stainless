@@ -36,49 +36,72 @@ import Standard.ObjC;
 
 public extern objc class AVCaptureInput : NSObject
 {
-    [Selector("ports")] public NSArray? Ports { get; }
+    [Selector("ports")]
+    public NSArray? Ports { get; }
 }
 
 public extern "C" NSNotificationName? AVCaptureInputPortFormatDescriptionDidChangeNotification;
 
 public extern objc class AVCaptureInputPort : NSObject
 {
-    [Selector("input")] public AVCaptureInput Input { get; }
-    [Selector("mediaType")] public AVMediaType MediaType { get; }
-    [Selector("formatDescription")] public CMFormatDescriptionRef? FormatDescription { get; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("clock")] public CMClockRef? Clock { get; }
+    [Selector("input")]
+    public AVCaptureInput Input { get; }
+    [Selector("mediaType")]
+    public AVMediaType MediaType { get; }
+    [Selector("formatDescription")]
+    public CMFormatDescriptionRef? FormatDescription { get; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("clock")]
+    public CMClockRef? Clock { get; }
 }
 
 public extern objc class AVCaptureDeviceInput : AVCaptureInput
 {
-    [Selector("device")] public AVCaptureDevice Device { get; }
+    [Selector("device")]
+    public AVCaptureDevice Device { get; }
     /// macOS 26.0 and later.
-    [Selector("isLockedVideoFrameDurationSupported")] public bool LockedVideoFrameDurationSupported { get; }
+    [Selector("isLockedVideoFrameDurationSupported")]
+    public bool LockedVideoFrameDurationSupported { get; }
     /// macOS 26.0 and later.
-    [Selector("activeLockedVideoFrameDuration", "setActiveLockedVideoFrameDuration:")] public CMTime ActiveLockedVideoFrameDuration { get; set; }
+    [Selector("activeLockedVideoFrameDuration", "setActiveLockedVideoFrameDuration:")]
+    public CMTime ActiveLockedVideoFrameDuration { get; set; }
     /// macOS 26.0 and later.
-    [Selector("isExternalSyncSupported")] public bool ExternalSyncSupported { get; }
+    [Selector("isExternalSyncSupported")]
+    public bool ExternalSyncSupported { get; }
     /// macOS 26.0 and later.
-    [Selector("activeExternalSyncVideoFrameDuration")] public CMTime ActiveExternalSyncVideoFrameDuration { get; }
+    [Selector("activeExternalSyncVideoFrameDuration")]
+    public CMTime ActiveExternalSyncVideoFrameDuration { get; }
     /// macOS 26.0 and later.
-    [Selector("externalSyncDevice")] public AVExternalSyncDevice? ExternalSyncDevice { get; }
-    [Selector("multichannelAudioMode", "setMultichannelAudioMode:")] public AVCaptureMultichannelAudioMode MultichannelAudioMode { get; set; }
-    [Selector("isWindNoiseRemovalSupported")] public bool WindNoiseRemovalSupported { get; }
-    [Selector("isWindNoiseRemovalEnabled", "setWindNoiseRemovalEnabled:")] public bool WindNoiseRemovalEnabled { get; set; }
+    [Selector("externalSyncDevice")]
+    public AVExternalSyncDevice? ExternalSyncDevice { get; }
+    [Selector("multichannelAudioMode", "setMultichannelAudioMode:")]
+    public AVCaptureMultichannelAudioMode MultichannelAudioMode { get; set; }
+    [Selector("isWindNoiseRemovalSupported")]
+    public bool WindNoiseRemovalSupported { get; }
+    [Selector("isWindNoiseRemovalEnabled", "setWindNoiseRemovalEnabled:")]
+    public bool WindNoiseRemovalEnabled { get; set; }
     /// macOS 26.0 and later.
-    [Selector("isCinematicVideoCaptureSupported")] public bool CinematicVideoCaptureSupported { get; }
+    [Selector("isCinematicVideoCaptureSupported")]
+    public bool CinematicVideoCaptureSupported { get; }
     /// macOS 26.0 and later.
-    [Selector("isCinematicVideoCaptureEnabled", "setCinematicVideoCaptureEnabled:")] public bool CinematicVideoCaptureEnabled { get; set; }
+    [Selector("isCinematicVideoCaptureEnabled", "setCinematicVideoCaptureEnabled:")]
+    public bool CinematicVideoCaptureEnabled { get; set; }
     /// macOS 26.0 and later.
-    [Selector("simulatedAperture", "setSimulatedAperture:")] public float SimulatedAperture { get; set; }
-    [Selector("deviceInputWithDevice:error:")] public static Self? DeviceInputWithDeviceError(AVCaptureDevice device, out NSError? outError);
-    [Selector("initWithDevice:error:")] public Self? InitWithDeviceError(AVCaptureDevice device, out NSError? outError);
+    [Selector("simulatedAperture", "setSimulatedAperture:")]
+    public float SimulatedAperture { get; set; }
+    [Selector("deviceInputWithDevice:error:")]
+    public static Self? DeviceInputWithDeviceError(AVCaptureDevice device, out NSError? outError);
+    [Selector("initWithDevice:error:")]
+    public Self? InitWithDeviceError(AVCaptureDevice device, out NSError? outError);
     /// macOS 26.0 and later.
-    [Selector("followExternalSyncDevice:videoFrameDuration:delegate:")] public void FollowExternalSyncDeviceVideoFrameDurationDelegate(AVExternalSyncDevice externalSyncDevice, CMTime frameDuration, AVExternalSyncDeviceDelegate? @delegate);
+    [Selector("followExternalSyncDevice:videoFrameDuration:delegate:")]
+    public void FollowExternalSyncDeviceVideoFrameDurationDelegate(AVExternalSyncDevice externalSyncDevice, CMTime frameDuration, AVExternalSyncDeviceDelegate? @delegate);
     /// macOS 26.0 and later.
-    [Selector("unfollowExternalSyncDevice")] public void UnfollowExternalSyncDevice();
-    [Selector("isMultichannelAudioModeSupported:")] public bool IsMultichannelAudioModeSupported(AVCaptureMultichannelAudioMode multichannelAudioMode);
+    [Selector("unfollowExternalSyncDevice")]
+    public void UnfollowExternalSyncDevice();
+    [Selector("isMultichannelAudioModeSupported:")]
+    public bool IsMultichannelAudioModeSupported(AVCaptureMultichannelAudioMode multichannelAudioMode);
 }
 
 public enum AVCaptureMultichannelAudioMode : long
@@ -90,16 +113,25 @@ public enum AVCaptureMultichannelAudioMode : long
 
 public extern objc class AVCaptureScreenInput : AVCaptureInput
 {
-    [Selector("minFrameDuration", "setMinFrameDuration:")] public CMTime MinFrameDuration { get; set; }
-    [Selector("cropRect", "setCropRect:")] public CGRect CropRect { get; set; }
-    [Selector("scaleFactor", "setScaleFactor:")] public CGFloat ScaleFactor { get; set; }
-    [Selector("capturesMouseClicks", "setCapturesMouseClicks:")] public bool CapturesMouseClicks { get; set; }
-    [Selector("capturesCursor", "setCapturesCursor:")] public bool CapturesCursor { get; set; }
+    [Selector("minFrameDuration", "setMinFrameDuration:")]
+    public CMTime MinFrameDuration { get; set; }
+    [Selector("cropRect", "setCropRect:")]
+    public CGRect CropRect { get; set; }
+    [Selector("scaleFactor", "setScaleFactor:")]
+    public CGFloat ScaleFactor { get; set; }
+    [Selector("capturesMouseClicks", "setCapturesMouseClicks:")]
+    public bool CapturesMouseClicks { get; set; }
+    [Selector("capturesCursor", "setCapturesCursor:")]
+    public bool CapturesCursor { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("removesDuplicateFrames", "setRemovesDuplicateFrames:")] public bool RemovesDuplicateFrames { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("new")] public static Self New();
-    [Selector("initWithDisplayID:")] public Self? InitWithDisplayID(CGDirectDisplayID displayID);
+    [Selector("removesDuplicateFrames", "setRemovesDuplicateFrames:")]
+    public bool RemovesDuplicateFrames { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("new")]
+    public static Self New();
+    [Selector("initWithDisplayID:")]
+    public Self? InitWithDisplayID(CGDirectDisplayID displayID);
 }
 
 #endif

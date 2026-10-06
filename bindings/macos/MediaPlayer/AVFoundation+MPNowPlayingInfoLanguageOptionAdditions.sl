@@ -33,13 +33,15 @@ import Standard.ObjC;
 /// MPNowPlayingInfoLanguageOptionAdditions, a category of AVMediaSelectionOption.
 public extern objc class AVMediaSelectionOption
 {
-    [Selector("makeNowPlayingInfoLanguageOption")] public MPNowPlayingInfoLanguageOption? MakeNowPlayingInfoLanguageOption();
+    [Selector("makeNowPlayingInfoLanguageOption")]
+    public MPNowPlayingInfoLanguageOption? MakeNowPlayingInfoLanguageOption();
 }
 
 /// MPNowPlayingInfoLanguageOptionAdditions, a category of AVMediaSelectionGroup.
 public extern objc class AVMediaSelectionGroup
 {
-    [Selector("makeNowPlayingInfoLanguageOptionGroup")] public MPNowPlayingInfoLanguageOptionGroup MakeNowPlayingInfoLanguageOptionGroup();
+    [Selector("makeNowPlayingInfoLanguageOptionGroup")]
+    public MPNowPlayingInfoLanguageOptionGroup MakeNowPlayingInfoLanguageOptionGroup();
 }
 
 #endif

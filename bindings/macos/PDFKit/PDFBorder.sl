@@ -51,11 +51,16 @@ public extern "C" PDFBorderKey? PDFBorderKeyDashPattern;
 
 public extern objc class PDFBorder : NSObject, NSCopying, NSCoding
 {
-    [Selector("style", "setStyle:")] public PDFBorderStyle Style { get; set; }
-    [Selector("lineWidth", "setLineWidth:")] public CGFloat LineWidth { get; set; }
-    [Selector("dashPattern", "setDashPattern:")] public NSArray? DashPattern { get; set; }
-    [Selector("borderKeyValues")] public NSDictionary BorderKeyValues { get; }
-    [Selector("drawInRect:")] public void DrawInRect(NSRect rect);
+    [Selector("style", "setStyle:")]
+    public PDFBorderStyle Style { get; set; }
+    [Selector("lineWidth", "setLineWidth:")]
+    public CGFloat LineWidth { get; set; }
+    [Selector("dashPattern", "setDashPattern:")]
+    public NSArray? DashPattern { get; set; }
+    [Selector("borderKeyValues")]
+    public NSDictionary BorderKeyValues { get; }
+    [Selector("drawInRect:")]
+    public void DrawInRect(NSRect rect);
 }
 
 #endif

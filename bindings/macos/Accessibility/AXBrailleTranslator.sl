@@ -34,33 +34,50 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class AXBrailleTable : NSObject, NSCopying, NSCoding
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("localizedName")] public NSString LocalizedName { get; }
-    [Selector("providerIdentifier")] public NSString ProviderIdentifier { get; }
-    [Selector("localizedProviderName")] public NSString LocalizedProviderName { get; }
-    [Selector("language")] public NSString? Language { get; }
-    [Selector("locales")] public NSSet Locales { get; }
-    [Selector("isEightDot")] public bool IsEightDot { get; }
-    [Selector("supportedLocales")] public static NSSet SupportedLocales();
-    [Selector("defaultTableForLocale:")] public static AXBrailleTable? DefaultTableForLocale(NSLocale locale);
-    [Selector("tablesForLocale:")] public static NSSet TablesForLocale(NSLocale locale);
-    [Selector("languageAgnosticTables")] public static NSSet LanguageAgnosticTables();
-    [Selector("initWithIdentifier:")] public Self? InitWithIdentifier(NSString identifier);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("localizedName")]
+    public NSString LocalizedName { get; }
+    [Selector("providerIdentifier")]
+    public NSString ProviderIdentifier { get; }
+    [Selector("localizedProviderName")]
+    public NSString LocalizedProviderName { get; }
+    [Selector("language")]
+    public NSString? Language { get; }
+    [Selector("locales")]
+    public NSSet Locales { get; }
+    [Selector("isEightDot")]
+    public bool IsEightDot { get; }
+    [Selector("supportedLocales")]
+    public static NSSet SupportedLocales();
+    [Selector("defaultTableForLocale:")]
+    public static AXBrailleTable? DefaultTableForLocale(NSLocale locale);
+    [Selector("tablesForLocale:")]
+    public static NSSet TablesForLocale(NSLocale locale);
+    [Selector("languageAgnosticTables")]
+    public static NSSet LanguageAgnosticTables();
+    [Selector("initWithIdentifier:")]
+    public Self? InitWithIdentifier(NSString identifier);
 }
 
 /// macOS 26.0 and later.
 public extern objc class AXBrailleTranslationResult : NSObject, NSCopying, NSCoding
 {
-    [Selector("resultString")] public NSString ResultString { get; }
-    [Selector("locationMap")] public NSArray? LocationMap { get; }
+    [Selector("resultString")]
+    public NSString ResultString { get; }
+    [Selector("locationMap")]
+    public NSArray? LocationMap { get; }
 }
 
 /// macOS 26.0 and later.
 public extern objc class AXBrailleTranslator : NSObject
 {
-    [Selector("initWithBrailleTable:")] public Self InitWithBrailleTable(AXBrailleTable brailleTable);
-    [Selector("translatePrintText:")] public AXBrailleTranslationResult TranslatePrintText(NSString printText);
-    [Selector("backTranslateBraille:")] public AXBrailleTranslationResult BackTranslateBraille(NSString braille);
+    [Selector("initWithBrailleTable:")]
+    public Self InitWithBrailleTable(AXBrailleTable brailleTable);
+    [Selector("translatePrintText:")]
+    public AXBrailleTranslationResult TranslatePrintText(NSString printText);
+    [Selector("backTranslateBraille:")]
+    public AXBrailleTranslationResult BackTranslateBraille(NSString braille);
 }
 
 #endif

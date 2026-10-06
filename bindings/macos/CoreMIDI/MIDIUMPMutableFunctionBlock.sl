@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class MIDIUMPMutableFunctionBlock : MIDIUMPFunctionBlock
 {
-    [Selector("UMPEndpoint")] public MIDIUMPMutableEndpoint? UMPEndpoint { get; }
-    [Selector("initWithName:direction:firstGroup:totalGroupsSpanned:maxSysEx8Streams:MIDI1Info:UIHint:isEnabled:")] public Self? InitWithNameDirectionFirstGroupTotalGroupsSpannedMaxSysEx8StreamsMIDI1InfoUIHintIsEnabled(NSString name, MIDIUMPFunctionBlockDirection direction, MIDIUMPGroupNumber firstGroup, MIDIUInteger7 totalGroupsSpanned, MIDIUInteger7 maxSysEx8Streams, MIDIUMPFunctionBlockMIDI1Info MIDI1Info, MIDIUMPFunctionBlockUIHint UIHint, bool isEnabled);
-    [Selector("setEnabled:error:")] public bool SetEnabledError(bool isEnabled, out NSError? error);
-    [Selector("setName:error:")] public bool SetNameError(NSString name, out NSError? error);
-    [Selector("reconfigureWithFirstGroup:direction:MIDI1Info:UIHint:error:")] public bool ReconfigureWithFirstGroupDirectionMIDI1InfoUIHintError(MIDIUMPGroupNumber firstGroup, MIDIUMPFunctionBlockDirection direction, MIDIUMPFunctionBlockMIDI1Info MIDI1Info, MIDIUMPFunctionBlockUIHint UIHint, out NSError? error);
+    [Selector("UMPEndpoint")]
+    public MIDIUMPMutableEndpoint? UMPEndpoint { get; }
+    [Selector("initWithName:direction:firstGroup:totalGroupsSpanned:maxSysEx8Streams:MIDI1Info:UIHint:isEnabled:")]
+    public Self? InitWithNameDirectionFirstGroupTotalGroupsSpannedMaxSysEx8StreamsMIDI1InfoUIHintIsEnabled(NSString name, MIDIUMPFunctionBlockDirection direction, MIDIUMPGroupNumber firstGroup, MIDIUInteger7 totalGroupsSpanned, MIDIUInteger7 maxSysEx8Streams, MIDIUMPFunctionBlockMIDI1Info MIDI1Info, MIDIUMPFunctionBlockUIHint UIHint, bool isEnabled);
+    [Selector("setEnabled:error:")]
+    public bool SetEnabledError(bool isEnabled, out NSError? error);
+    [Selector("setName:error:")]
+    public bool SetNameError(NSString name, out NSError? error);
+    [Selector("reconfigureWithFirstGroup:direction:MIDI1Info:UIHint:error:")]
+    public bool ReconfigureWithFirstGroupDirectionMIDI1InfoUIHintError(MIDIUMPGroupNumber firstGroup, MIDIUMPFunctionBlockDirection direction, MIDIUMPFunctionBlockMIDI1Info MIDI1Info, MIDIUMPFunctionBlockUIHint UIHint, out NSError? error);
 }
 
 #endif

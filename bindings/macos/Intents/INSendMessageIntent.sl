@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class INSendMessageIntent : INIntent
 {
-    [Selector("recipients")] public NSArray? Recipients { get; }
-    [Selector("outgoingMessageType")] public INOutgoingMessageType OutgoingMessageType { get; }
-    [Selector("content")] public NSString? Content { get; }
-    [Selector("speakableGroupName")] public INSpeakableString? SpeakableGroupName { get; }
-    [Selector("conversationIdentifier")] public NSString? ConversationIdentifier { get; }
-    [Selector("serviceName")] public NSString? ServiceName { get; }
-    [Selector("sender")] public INPerson? Sender { get; }
-    [Selector("attachments")] public NSArray? Attachments { get; }
-    [Selector("initWithRecipients:outgoingMessageType:content:speakableGroupName:conversationIdentifier:serviceName:sender:attachments:")] public Self InitWithRecipientsOutgoingMessageTypeContentSpeakableGroupNameConversationIdentifierServiceNameSenderAttachments(NSArray? recipients, INOutgoingMessageType outgoingMessageType, NSString? content, INSpeakableString? speakableGroupName, NSString? conversationIdentifier, NSString? serviceName, INPerson? sender, NSArray? attachments);
+    [Selector("recipients")]
+    public NSArray? Recipients { get; }
+    [Selector("outgoingMessageType")]
+    public INOutgoingMessageType OutgoingMessageType { get; }
+    [Selector("content")]
+    public NSString? Content { get; }
+    [Selector("speakableGroupName")]
+    public INSpeakableString? SpeakableGroupName { get; }
+    [Selector("conversationIdentifier")]
+    public NSString? ConversationIdentifier { get; }
+    [Selector("serviceName")]
+    public NSString? ServiceName { get; }
+    [Selector("sender")]
+    public INPerson? Sender { get; }
+    [Selector("attachments")]
+    public NSArray? Attachments { get; }
+    [Selector("initWithRecipients:outgoingMessageType:content:speakableGroupName:conversationIdentifier:serviceName:sender:attachments:")]
+    public Self InitWithRecipientsOutgoingMessageTypeContentSpeakableGroupNameConversationIdentifierServiceNameSenderAttachments(NSArray? recipients, INOutgoingMessageType outgoingMessageType, NSString? content, INSpeakableString? speakableGroupName, NSString? conversationIdentifier, NSString? serviceName, INPerson? sender, NSArray? attachments);
 }
 
 public objc closure void INSendMessageIntentHandlingHandleSendMessageCompletionCompletionBlock(INSendMessageIntentResponse arg0);
@@ -60,14 +69,27 @@ public objc closure void INSendMessageIntentHandlingResolveContentForSendMessage
 
 public objc interface INSendMessageIntentHandling : NSObjectProtocol
 {
-    [Selector("handleSendMessage:completion:")] void HandleSendMessageCompletion(INSendMessageIntent intent, INSendMessageIntentHandlingHandleSendMessageCompletionCompletionBlock completion);
-    [Optional] [Selector("confirmSendMessage:completion:")] void ConfirmSendMessageCompletion(INSendMessageIntent intent, INSendMessageIntentHandlingConfirmSendMessageCompletionCompletionBlock completion);
-    [Optional] [Selector("resolveRecipientsForSendMessage:withCompletion:")] void ResolveRecipientsForSendMessageWithCompletion(INSendMessageIntent intent, INSendMessageIntentHandlingResolveRecipientsForSendMessageWithCompletionCompletionBlock completion);
-    [Optional] [Selector("resolveRecipientsForSendMessage:completion:")] void ResolveRecipientsForSendMessageCompletion(INSendMessageIntent intent, INSendMessageIntentHandlingResolveRecipientsForSendMessageCompletionCompletionBlock completion);
+    [Selector("handleSendMessage:completion:")]
+    void HandleSendMessageCompletion(INSendMessageIntent intent, INSendMessageIntentHandlingHandleSendMessageCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("confirmSendMessage:completion:")]
+    void ConfirmSendMessageCompletion(INSendMessageIntent intent, INSendMessageIntentHandlingConfirmSendMessageCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("resolveRecipientsForSendMessage:withCompletion:")]
+    void ResolveRecipientsForSendMessageWithCompletion(INSendMessageIntent intent, INSendMessageIntentHandlingResolveRecipientsForSendMessageWithCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("resolveRecipientsForSendMessage:completion:")]
+    void ResolveRecipientsForSendMessageCompletion(INSendMessageIntent intent, INSendMessageIntentHandlingResolveRecipientsForSendMessageCompletionCompletionBlock completion);
     /// Deprecated in macOS 12.0.
-    [Optional] [Selector("resolveGroupNameForSendMessage:withCompletion:")] void ResolveGroupNameForSendMessageWithCompletion(INSendMessageIntent intent, INSendMessageIntentHandlingResolveGroupNameForSendMessageWithCompletionCompletionBlock completion);
-    [Optional] [Selector("resolveOutgoingMessageTypeForSendMessage:withCompletion:")] void ResolveOutgoingMessageTypeForSendMessageWithCompletion(INSendMessageIntent intent, INSendMessageIntentHandlingResolveOutgoingMessageTypeForSendMessageWithCompletionCompletionBlock completion);
-    [Optional] [Selector("resolveContentForSendMessage:withCompletion:")] void ResolveContentForSendMessageWithCompletion(INSendMessageIntent intent, INSendMessageIntentHandlingResolveContentForSendMessageWithCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("resolveGroupNameForSendMessage:withCompletion:")]
+    void ResolveGroupNameForSendMessageWithCompletion(INSendMessageIntent intent, INSendMessageIntentHandlingResolveGroupNameForSendMessageWithCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("resolveOutgoingMessageTypeForSendMessage:withCompletion:")]
+    void ResolveOutgoingMessageTypeForSendMessageWithCompletion(INSendMessageIntent intent, INSendMessageIntentHandlingResolveOutgoingMessageTypeForSendMessageWithCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("resolveContentForSendMessage:withCompletion:")]
+    void ResolveContentForSendMessageWithCompletion(INSendMessageIntent intent, INSendMessageIntentHandlingResolveContentForSendMessageWithCompletionCompletionBlock completion);
 }
 
 #endif

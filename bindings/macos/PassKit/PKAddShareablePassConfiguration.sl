@@ -34,31 +34,52 @@ import Standard.ObjC;
 
 public extern objc class PKShareablePassMetadataPreview : PKAddPassMetadataPreview
 {
-    [Selector("ownerDisplayName", "setOwnerDisplayName:")] public NSString? OwnerDisplayName { get; set; }
-    [Selector("provisioningTemplateIdentifier")] public NSString? ProvisioningTemplateIdentifier { get; }
-    [Selector("initWithTemplateIdentifier:")] public Self InitWithTemplateIdentifier(NSString templateIdentifier);
-    [Selector("previewWithTemplateIdentifier:")] public static Self PreviewWithTemplateIdentifier(NSString templateIdentifier);
+    [Selector("ownerDisplayName", "setOwnerDisplayName:")]
+    public NSString? OwnerDisplayName { get; set; }
+    [Selector("provisioningTemplateIdentifier")]
+    public NSString? ProvisioningTemplateIdentifier { get; }
+    [Selector("initWithTemplateIdentifier:")]
+    public Self InitWithTemplateIdentifier(NSString templateIdentifier);
+    [Selector("previewWithTemplateIdentifier:")]
+    public static Self PreviewWithTemplateIdentifier(NSString templateIdentifier);
 }
 
 public extern objc class PKShareablePassMetadata : NSObject
 {
-    [Selector("credentialIdentifier")] public NSString CredentialIdentifier { get; }
-    [Selector("sharingInstanceIdentifier")] public NSString SharingInstanceIdentifier { get; }
-    [Selector("templateIdentifier")] public NSString? TemplateIdentifier { get; }
-    [Selector("cardTemplateIdentifier")] public NSString? CardTemplateIdentifier { get; }
-    [Selector("cardConfigurationIdentifier")] public NSString CardConfigurationIdentifier { get; }
-    [Selector("requiresUnifiedAccessCapableDevice", "setRequiresUnifiedAccessCapableDevice:")] public bool RequiresUnifiedAccessCapableDevice { get; set; }
-    [Selector("serverEnvironmentIdentifier", "setServerEnvironmentIdentifier:")] public NSString? ServerEnvironmentIdentifier { get; set; }
-    [Selector("preview")] public PKShareablePassMetadataPreview? Preview { get; }
-    [Selector("passThumbnailImage")] public CGImageRef? PassThumbnailImage { get; }
-    [Selector("localizedDescription")] public NSString LocalizedDescription { get; }
-    [Selector("ownerDisplayName")] public NSString OwnerDisplayName { get; }
-    [Selector("accountHash", "setAccountHash:")] public NSString? AccountHash { get; set; }
-    [Selector("relyingPartyIdentifier", "setRelyingPartyIdentifier:")] public NSString? RelyingPartyIdentifier { get; set; }
-    [Selector("initWithProvisioningCredentialIdentifier:cardConfigurationIdentifier:sharingInstanceIdentifier:passThumbnailImage:ownerDisplayName:localizedDescription:")] public Self? InitWithProvisioningCredentialIdentifierCardConfigurationIdentifierSharingInstanceIdentifierPassThumbnailImageOwnerDisplayNameLocalizedDescription(NSString credentialIdentifier, NSString cardConfigurationIdentifier, NSString sharingInstanceIdentifier, CGImageRef passThumbnailImage, NSString ownerDisplayName, NSString localizedDescription);
-    [Selector("initWithProvisioningCredentialIdentifier:sharingInstanceIdentifier:passThumbnailImage:ownerDisplayName:localizedDescription:accountHash:templateIdentifier:relyingPartyIdentifier:requiresUnifiedAccessCapableDevice:")] public Self InitWithProvisioningCredentialIdentifierSharingInstanceIdentifierPassThumbnailImageOwnerDisplayNameLocalizedDescriptionAccountHashTemplateIdentifierRelyingPartyIdentifierRequiresUnifiedAccessCapableDevice(NSString credentialIdentifier, NSString sharingInstanceIdentifier, CGImageRef passThumbnailImage, NSString ownerDisplayName, NSString localizedDescription, NSString accountHash, NSString templateIdentifier, NSString relyingPartyIdentifier, bool requiresUnifiedAccessCapableDevice);
-    [Selector("initWithProvisioningCredentialIdentifier:sharingInstanceIdentifier:cardTemplateIdentifier:preview:")] public Self InitWithProvisioningCredentialIdentifierSharingInstanceIdentifierCardTemplateIdentifierPreview(NSString credentialIdentifier, NSString sharingInstanceIdentifier, NSString templateIdentifier, PKShareablePassMetadataPreview preview);
-    [Selector("initWithProvisioningCredentialIdentifier:sharingInstanceIdentifier:cardConfigurationIdentifier:preview:")] public Self InitWithProvisioningCredentialIdentifierSharingInstanceIdentifierCardConfigurationIdentifierPreview(NSString credentialIdentifier, NSString sharingInstanceIdentifier, NSString templateIdentifier, PKShareablePassMetadataPreview preview);
+    [Selector("credentialIdentifier")]
+    public NSString CredentialIdentifier { get; }
+    [Selector("sharingInstanceIdentifier")]
+    public NSString SharingInstanceIdentifier { get; }
+    [Selector("templateIdentifier")]
+    public NSString? TemplateIdentifier { get; }
+    [Selector("cardTemplateIdentifier")]
+    public NSString? CardTemplateIdentifier { get; }
+    [Selector("cardConfigurationIdentifier")]
+    public NSString CardConfigurationIdentifier { get; }
+    [Selector("requiresUnifiedAccessCapableDevice", "setRequiresUnifiedAccessCapableDevice:")]
+    public bool RequiresUnifiedAccessCapableDevice { get; set; }
+    [Selector("serverEnvironmentIdentifier", "setServerEnvironmentIdentifier:")]
+    public NSString? ServerEnvironmentIdentifier { get; set; }
+    [Selector("preview")]
+    public PKShareablePassMetadataPreview? Preview { get; }
+    [Selector("passThumbnailImage")]
+    public CGImageRef? PassThumbnailImage { get; }
+    [Selector("localizedDescription")]
+    public NSString LocalizedDescription { get; }
+    [Selector("ownerDisplayName")]
+    public NSString OwnerDisplayName { get; }
+    [Selector("accountHash", "setAccountHash:")]
+    public NSString? AccountHash { get; set; }
+    [Selector("relyingPartyIdentifier", "setRelyingPartyIdentifier:")]
+    public NSString? RelyingPartyIdentifier { get; set; }
+    [Selector("initWithProvisioningCredentialIdentifier:cardConfigurationIdentifier:sharingInstanceIdentifier:passThumbnailImage:ownerDisplayName:localizedDescription:")]
+    public Self? InitWithProvisioningCredentialIdentifierCardConfigurationIdentifierSharingInstanceIdentifierPassThumbnailImageOwnerDisplayNameLocalizedDescription(NSString credentialIdentifier, NSString cardConfigurationIdentifier, NSString sharingInstanceIdentifier, CGImageRef passThumbnailImage, NSString ownerDisplayName, NSString localizedDescription);
+    [Selector("initWithProvisioningCredentialIdentifier:sharingInstanceIdentifier:passThumbnailImage:ownerDisplayName:localizedDescription:accountHash:templateIdentifier:relyingPartyIdentifier:requiresUnifiedAccessCapableDevice:")]
+    public Self InitWithProvisioningCredentialIdentifierSharingInstanceIdentifierPassThumbnailImageOwnerDisplayNameLocalizedDescriptionAccountHashTemplateIdentifierRelyingPartyIdentifierRequiresUnifiedAccessCapableDevice(NSString credentialIdentifier, NSString sharingInstanceIdentifier, CGImageRef passThumbnailImage, NSString ownerDisplayName, NSString localizedDescription, NSString accountHash, NSString templateIdentifier, NSString relyingPartyIdentifier, bool requiresUnifiedAccessCapableDevice);
+    [Selector("initWithProvisioningCredentialIdentifier:sharingInstanceIdentifier:cardTemplateIdentifier:preview:")]
+    public Self InitWithProvisioningCredentialIdentifierSharingInstanceIdentifierCardTemplateIdentifierPreview(NSString credentialIdentifier, NSString sharingInstanceIdentifier, NSString templateIdentifier, PKShareablePassMetadataPreview preview);
+    [Selector("initWithProvisioningCredentialIdentifier:sharingInstanceIdentifier:cardConfigurationIdentifier:preview:")]
+    public Self InitWithProvisioningCredentialIdentifierSharingInstanceIdentifierCardConfigurationIdentifierPreview(NSString credentialIdentifier, NSString sharingInstanceIdentifier, NSString templateIdentifier, PKShareablePassMetadataPreview preview);
 }
 
 public enum PKAddShareablePassConfigurationPrimaryAction : ulong
@@ -73,11 +94,16 @@ public objc closure void PKAddShareablePassConfigurationConfigurationForPassMeta
 
 public extern objc class PKAddShareablePassConfiguration : PKAddSecureElementPassConfiguration
 {
-    [Selector("primaryAction")] public PKAddShareablePassConfigurationPrimaryAction PrimaryAction { get; }
-    [Selector("credentialsMetadata")] public NSArray CredentialsMetadata { get; }
-    [Selector("provisioningPolicyIdentifier")] public NSString ProvisioningPolicyIdentifier { get; }
-    [Selector("configurationForPassMetadata:provisioningPolicyIdentifier:primaryAction:completion:")] public static void ConfigurationForPassMetadataProvisioningPolicyIdentifierPrimaryActionCompletion(NSArray passMetadata, NSString provisioningPolicyIdentifier, PKAddShareablePassConfigurationPrimaryAction action, PKAddShareablePassConfigurationConfigurationForPassMetadataProvisioningPolicyIdentifierPrimaryActionCompletionCompletionBlock completion);
-    [Selector("configurationForPassMetadata:primaryAction:completion:")] public static void ConfigurationForPassMetadataPrimaryActionCompletion(NSArray passMetadata, PKAddShareablePassConfigurationPrimaryAction action, PKAddShareablePassConfigurationConfigurationForPassMetadataPrimaryActionCompletionCompletionBlock completion);
+    [Selector("primaryAction")]
+    public PKAddShareablePassConfigurationPrimaryAction PrimaryAction { get; }
+    [Selector("credentialsMetadata")]
+    public NSArray CredentialsMetadata { get; }
+    [Selector("provisioningPolicyIdentifier")]
+    public NSString ProvisioningPolicyIdentifier { get; }
+    [Selector("configurationForPassMetadata:provisioningPolicyIdentifier:primaryAction:completion:")]
+    public static void ConfigurationForPassMetadataProvisioningPolicyIdentifierPrimaryActionCompletion(NSArray passMetadata, NSString provisioningPolicyIdentifier, PKAddShareablePassConfigurationPrimaryAction action, PKAddShareablePassConfigurationConfigurationForPassMetadataProvisioningPolicyIdentifierPrimaryActionCompletionCompletionBlock completion);
+    [Selector("configurationForPassMetadata:primaryAction:completion:")]
+    public static void ConfigurationForPassMetadataPrimaryActionCompletion(NSArray passMetadata, PKAddShareablePassConfigurationPrimaryAction action, PKAddShareablePassConfigurationConfigurationForPassMetadataPrimaryActionCompletionCompletionBlock completion);
 }
 
 #endif

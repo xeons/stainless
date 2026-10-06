@@ -41,20 +41,29 @@ public enum FSContainerState : long
 
 public extern objc class FSContainerStatus : NSObject, NSCopying
 {
-    [Selector("state")] public FSContainerState State { get; }
-    [Selector("status")] public NSError? Status { get; }
-    [Selector("active")] public static FSContainerStatus Active { get; }
-    [Selector("ready")] public static FSContainerStatus Ready { get; }
-    [Selector("activeWithStatus:")] public static Self ActiveWithStatus(NSError errorStatus);
-    [Selector("blockedWithStatus:")] public static Self BlockedWithStatus(NSError errorStatus);
-    [Selector("notReadyWithStatus:")] public static Self NotReadyWithStatus(NSError errorStatus);
-    [Selector("readyWithStatus:")] public static Self ReadyWithStatus(NSError errorStatus);
+    [Selector("state")]
+    public FSContainerState State { get; }
+    [Selector("status")]
+    public NSError? Status { get; }
+    [Selector("active")]
+    public static FSContainerStatus Active { get; }
+    [Selector("ready")]
+    public static FSContainerStatus Ready { get; }
+    [Selector("activeWithStatus:")]
+    public static Self ActiveWithStatus(NSError errorStatus);
+    [Selector("blockedWithStatus:")]
+    public static Self BlockedWithStatus(NSError errorStatus);
+    [Selector("notReadyWithStatus:")]
+    public static Self NotReadyWithStatus(NSError errorStatus);
+    [Selector("readyWithStatus:")]
+    public static Self ReadyWithStatus(NSError errorStatus);
 }
 
 /// macOS 15.4 and later.
 public extern objc class FSContainerIdentifier : FSEntityIdentifier
 {
-    [Selector("volumeIdentifier")] public FSVolumeIdentifier VolumeIdentifier { get; }
+    [Selector("volumeIdentifier")]
+    public FSVolumeIdentifier VolumeIdentifier { get; }
 }
 
 #endif

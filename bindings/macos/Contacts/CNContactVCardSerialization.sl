@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class CNContactVCardSerialization : NSObject
 {
-    [Selector("descriptorForRequiredKeys")] public static CNKeyDescriptor DescriptorForRequiredKeys();
-    [Selector("dataWithContacts:error:")] public static NSData? DataWithContactsError(NSArray contacts, out NSError? error);
-    [Selector("contactsWithData:error:")] public static NSArray? ContactsWithDataError(NSData data, out NSError? error);
+    [Selector("descriptorForRequiredKeys")]
+    public static CNKeyDescriptor DescriptorForRequiredKeys();
+    [Selector("dataWithContacts:error:")]
+    public static NSData? DataWithContactsError(NSArray contacts, out NSError? error);
+    [Selector("contactsWithData:error:")]
+    public static NSArray? ContactsWithDataError(NSData data, out NSError? error);
 }
 
 #endif

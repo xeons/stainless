@@ -41,8 +41,10 @@ public enum MPSGraphNonMaximumSuppressionCoordinateMode : ulong
 /// MPSGraphNonMaximumSuppressionOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("nonMaximumSuppressionWithBoxesTensor:scoresTensor:IOUThreshold:scoreThreshold:perClassSuppression:coordinateMode:name:")] public MPSGraphTensor NonMaximumSuppressionWithBoxesTensorScoresTensorIOUThresholdScoreThresholdPerClassSuppressionCoordinateModeName(MPSGraphTensor boxesTensor, MPSGraphTensor scoresTensor, float IOUThreshold, float scoreThreshold, bool perClassSuppression, MPSGraphNonMaximumSuppressionCoordinateMode coordinateMode, NSString? name);
-    [Selector("nonMaximumSuppressionWithBoxesTensor:scoresTensor:classIndicesTensor:IOUThreshold:scoreThreshold:perClassSuppression:coordinateMode:name:")] public MPSGraphTensor NonMaximumSuppressionWithBoxesTensorScoresTensorClassIndicesTensorIOUThresholdScoreThresholdPerClassSuppressionCoordinateModeName(MPSGraphTensor boxesTensor, MPSGraphTensor scoresTensor, MPSGraphTensor classIndicesTensor, float IOUThreshold, float scoreThreshold, bool perClassSuppression, MPSGraphNonMaximumSuppressionCoordinateMode coordinateMode, NSString? name);
+    [Selector("nonMaximumSuppressionWithBoxesTensor:scoresTensor:IOUThreshold:scoreThreshold:perClassSuppression:coordinateMode:name:")]
+    public MPSGraphTensor NonMaximumSuppressionWithBoxesTensorScoresTensorIOUThresholdScoreThresholdPerClassSuppressionCoordinateModeName(MPSGraphTensor boxesTensor, MPSGraphTensor scoresTensor, float IOUThreshold, float scoreThreshold, bool perClassSuppression, MPSGraphNonMaximumSuppressionCoordinateMode coordinateMode, NSString? name);
+    [Selector("nonMaximumSuppressionWithBoxesTensor:scoresTensor:classIndicesTensor:IOUThreshold:scoreThreshold:perClassSuppression:coordinateMode:name:")]
+    public MPSGraphTensor NonMaximumSuppressionWithBoxesTensorScoresTensorClassIndicesTensorIOUThresholdScoreThresholdPerClassSuppressionCoordinateModeName(MPSGraphTensor boxesTensor, MPSGraphTensor scoresTensor, MPSGraphTensor classIndicesTensor, float IOUThreshold, float scoreThreshold, bool perClassSuppression, MPSGraphNonMaximumSuppressionCoordinateMode coordinateMode, NSString? name);
 }
 
 #endif

@@ -43,41 +43,72 @@ public enum UNNotificationInterruptionLevel : ulong
 
 public extern objc class UNNotificationContent : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("attachments")] public NSArray? Attachments { get; }
-    [Selector("badge")] public NSNumber? Badge { get; }
-    [Selector("body")] public NSString? Body { get; }
-    [Selector("categoryIdentifier")] public NSString? CategoryIdentifier { get; }
-    [Selector("sound")] public UNNotificationSound? Sound { get; }
-    [Selector("subtitle")] public NSString? Subtitle { get; }
-    [Selector("threadIdentifier")] public NSString? ThreadIdentifier { get; }
-    [Selector("title")] public NSString? Title { get; }
-    [Selector("userInfo")] public NSDictionary? UserInfo { get; }
-    [Selector("summaryArgument")] public NSString SummaryArgument { get; }
-    [Selector("summaryArgumentCount")] public NSUInteger SummaryArgumentCount { get; }
-    [Selector("targetContentIdentifier")] public NSString? TargetContentIdentifier { get; }
-    [Selector("interruptionLevel")] public UNNotificationInterruptionLevel InterruptionLevel { get; }
-    [Selector("relevanceScore")] public double RelevanceScore { get; }
-    [Selector("filterCriteria")] public NSString? FilterCriteria { get; }
-    [Selector("contentByUpdatingWithProvider:error:")] public UNNotificationContent? ContentByUpdatingWithProviderError(UNNotificationContentProviding provider, out NSError? outError);
+    [Selector("attachments")]
+    public NSArray? Attachments { get; }
+    [Selector("badge")]
+    public NSNumber? Badge { get; }
+    [Selector("body")]
+    public NSString? Body { get; }
+    [Selector("categoryIdentifier")]
+    public NSString? CategoryIdentifier { get; }
+    [Selector("sound")]
+    public UNNotificationSound? Sound { get; }
+    [Selector("subtitle")]
+    public NSString? Subtitle { get; }
+    [Selector("threadIdentifier")]
+    public NSString? ThreadIdentifier { get; }
+    [Selector("title")]
+    public NSString? Title { get; }
+    [Selector("userInfo")]
+    public NSDictionary? UserInfo { get; }
+    [Selector("summaryArgument")]
+    public NSString SummaryArgument { get; }
+    [Selector("summaryArgumentCount")]
+    public NSUInteger SummaryArgumentCount { get; }
+    [Selector("targetContentIdentifier")]
+    public NSString? TargetContentIdentifier { get; }
+    [Selector("interruptionLevel")]
+    public UNNotificationInterruptionLevel InterruptionLevel { get; }
+    [Selector("relevanceScore")]
+    public double RelevanceScore { get; }
+    [Selector("filterCriteria")]
+    public NSString? FilterCriteria { get; }
+    [Selector("contentByUpdatingWithProvider:error:")]
+    public UNNotificationContent? ContentByUpdatingWithProviderError(UNNotificationContentProviding provider, out NSError? outError);
 }
 
 public extern objc class UNMutableNotificationContent : UNNotificationContent
 {
-    [Selector("attachments", "setAttachments:")] public NSArray? Attachments { get; set; }
-    [Selector("badge", "setBadge:")] public NSNumber? Badge { get; set; }
-    [Selector("body", "setBody:")] public NSString? Body { get; set; }
-    [Selector("categoryIdentifier", "setCategoryIdentifier:")] public NSString? CategoryIdentifier { get; set; }
-    [Selector("sound", "setSound:")] public UNNotificationSound? Sound { get; set; }
-    [Selector("subtitle", "setSubtitle:")] public NSString? Subtitle { get; set; }
-    [Selector("threadIdentifier", "setThreadIdentifier:")] public NSString? ThreadIdentifier { get; set; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("userInfo", "setUserInfo:")] public NSDictionary? UserInfo { get; set; }
-    [Selector("summaryArgument", "setSummaryArgument:")] public NSString SummaryArgument { get; set; }
-    [Selector("summaryArgumentCount", "setSummaryArgumentCount:")] public NSUInteger SummaryArgumentCount { get; set; }
-    [Selector("targetContentIdentifier", "setTargetContentIdentifier:")] public NSString? TargetContentIdentifier { get; set; }
-    [Selector("interruptionLevel", "setInterruptionLevel:")] public UNNotificationInterruptionLevel InterruptionLevel { get; set; }
-    [Selector("relevanceScore", "setRelevanceScore:")] public double RelevanceScore { get; set; }
-    [Selector("filterCriteria", "setFilterCriteria:")] public NSString? FilterCriteria { get; set; }
+    [Selector("attachments", "setAttachments:")]
+    public NSArray? Attachments { get; set; }
+    [Selector("badge", "setBadge:")]
+    public NSNumber? Badge { get; set; }
+    [Selector("body", "setBody:")]
+    public NSString? Body { get; set; }
+    [Selector("categoryIdentifier", "setCategoryIdentifier:")]
+    public NSString? CategoryIdentifier { get; set; }
+    [Selector("sound", "setSound:")]
+    public UNNotificationSound? Sound { get; set; }
+    [Selector("subtitle", "setSubtitle:")]
+    public NSString? Subtitle { get; set; }
+    [Selector("threadIdentifier", "setThreadIdentifier:")]
+    public NSString? ThreadIdentifier { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("userInfo", "setUserInfo:")]
+    public NSDictionary? UserInfo { get; set; }
+    [Selector("summaryArgument", "setSummaryArgument:")]
+    public NSString SummaryArgument { get; set; }
+    [Selector("summaryArgumentCount", "setSummaryArgumentCount:")]
+    public NSUInteger SummaryArgumentCount { get; set; }
+    [Selector("targetContentIdentifier", "setTargetContentIdentifier:")]
+    public NSString? TargetContentIdentifier { get; set; }
+    [Selector("interruptionLevel", "setInterruptionLevel:")]
+    public UNNotificationInterruptionLevel InterruptionLevel { get; set; }
+    [Selector("relevanceScore", "setRelevanceScore:")]
+    public double RelevanceScore { get; set; }
+    [Selector("filterCriteria", "setFilterCriteria:")]
+    public NSString? FilterCriteria { get; set; }
 }
 
 #endif

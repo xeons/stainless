@@ -35,19 +35,28 @@ public extern "C" PKPushType PKPushTypeFileProvider;
 
 public extern objc class PKPushRegistry : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public PKPushRegistryDelegate? Delegate { get; set; }
-    [Selector("desiredPushTypes", "setDesiredPushTypes:")] public NSSet? DesiredPushTypes { get; set; }
-    [Selector("pushTokenForType:")] public NSData? PushTokenForType(PKPushType type);
-    [Selector("initWithQueue:")] public Self InitWithQueue(dispatch_queue_t? queue);
+    [Selector("delegate", "setDelegate:")]
+    public PKPushRegistryDelegate? Delegate { get; set; }
+    [Selector("desiredPushTypes", "setDesiredPushTypes:")]
+    public NSSet? DesiredPushTypes { get; set; }
+    [Selector("pushTokenForType:")]
+    public NSData? PushTokenForType(PKPushType type);
+    [Selector("initWithQueue:")]
+    public Self InitWithQueue(dispatch_queue_t? queue);
 }
 
 public objc closure void PKPushRegistryDelegatePushRegistryDidReceiveIncomingPushWithPayloadForTypeWithCompletionHandlerCompletionBlock();
 
 public objc interface PKPushRegistryDelegate : NSObjectProtocol
 {
-    [Selector("pushRegistry:didUpdatePushCredentials:forType:")] void PushRegistryDidUpdatePushCredentialsForType(PKPushRegistry registry, PKPushCredentials pushCredentials, PKPushType type);
-    [Optional] [Selector("pushRegistry:didReceiveIncomingPushWithPayload:forType:withCompletionHandler:")] void PushRegistryDidReceiveIncomingPushWithPayloadForTypeWithCompletionHandler(PKPushRegistry registry, PKPushPayload payload, PKPushType type, PKPushRegistryDelegatePushRegistryDidReceiveIncomingPushWithPayloadForTypeWithCompletionHandlerCompletionBlock completion);
-    [Optional] [Selector("pushRegistry:didInvalidatePushTokenForType:")] void PushRegistryDidInvalidatePushTokenForType(PKPushRegistry registry, PKPushType type);
+    [Selector("pushRegistry:didUpdatePushCredentials:forType:")]
+    void PushRegistryDidUpdatePushCredentialsForType(PKPushRegistry registry, PKPushCredentials pushCredentials, PKPushType type);
+    [Optional]
+    [Selector("pushRegistry:didReceiveIncomingPushWithPayload:forType:withCompletionHandler:")]
+    void PushRegistryDidReceiveIncomingPushWithPayloadForTypeWithCompletionHandler(PKPushRegistry registry, PKPushPayload payload, PKPushType type, PKPushRegistryDelegatePushRegistryDidReceiveIncomingPushWithPayloadForTypeWithCompletionHandlerCompletionBlock completion);
+    [Optional]
+    [Selector("pushRegistry:didInvalidatePushTokenForType:")]
+    void PushRegistryDidInvalidatePushTokenForType(PKPushRegistry registry, PKPushType type);
 }
 
 #endif

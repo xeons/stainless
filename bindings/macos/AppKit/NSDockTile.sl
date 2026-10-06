@@ -33,18 +33,27 @@ import Standard.ObjC;
 
 public extern objc class NSDockTile : NSObject
 {
-    [Selector("size")] public NSSize Size { get; }
-    [Selector("contentView", "setContentView:")] public NSView? ContentView { get; set; }
-    [Selector("showsApplicationBadge", "setShowsApplicationBadge:")] public bool ShowsApplicationBadge { get; set; }
-    [Selector("badgeLabel", "setBadgeLabel:")] public NSString? BadgeLabel { get; set; }
-    [Selector("owner")] public AnyObject? Owner { get; }
-    [Selector("display")] public void Display();
+    [Selector("size")]
+    public NSSize Size { get; }
+    [Selector("contentView", "setContentView:")]
+    public NSView? ContentView { get; set; }
+    [Selector("showsApplicationBadge", "setShowsApplicationBadge:")]
+    public bool ShowsApplicationBadge { get; set; }
+    [Selector("badgeLabel", "setBadgeLabel:")]
+    public NSString? BadgeLabel { get; set; }
+    [Selector("owner")]
+    public AnyObject? Owner { get; }
+    [Selector("display")]
+    public void Display();
 }
 
 public objc interface NSDockTilePlugIn : NSObjectProtocol
 {
-    [Selector("setDockTile:")] void SetDockTile(NSDockTile? dockTile);
-    [Optional] [Selector("dockMenu")] NSMenu? DockMenu();
+    [Selector("setDockTile:")]
+    void SetDockTile(NSDockTile? dockTile);
+    [Optional]
+    [Selector("dockMenu")]
+    NSMenu? DockMenu();
 }
 
 #endif

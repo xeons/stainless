@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class LAEnvironmentMechanismCompanion : LAEnvironmentMechanism
 {
-    [Selector("type")] public LACompanionType Type { get; }
-    [Selector("stateHash")] public NSData? StateHash { get; }
+    [Selector("type")]
+    public LACompanionType Type { get; }
+    [Selector("stateHash")]
+    public NSData? StateHash { get; }
 }
 
 #endif

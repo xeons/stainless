@@ -33,12 +33,18 @@ import Standard.ObjC;
 /// Scripting, a category of NSTextStorage.
 public extern objc class NSTextStorage
 {
-    [Selector("attributeRuns", "setAttributeRuns:")] public NSArray AttributeRuns { get; set; }
-    [Selector("paragraphs", "setParagraphs:")] public NSArray Paragraphs { get; set; }
-    [Selector("words", "setWords:")] public NSArray Words { get; set; }
-    [Selector("characters", "setCharacters:")] public NSArray Characters { get; set; }
-    [Selector("font", "setFont:")] public NSFont? Font { get; set; }
-    [Selector("foregroundColor", "setForegroundColor:")] public NSColor? ForegroundColor { get; set; }
+    [Selector("attributeRuns", "setAttributeRuns:")]
+    public NSArray AttributeRuns { get; set; }
+    [Selector("paragraphs", "setParagraphs:")]
+    public NSArray Paragraphs { get; set; }
+    [Selector("words", "setWords:")]
+    public NSArray Words { get; set; }
+    [Selector("characters", "setCharacters:")]
+    public NSArray Characters { get; set; }
+    [Selector("font", "setFont:")]
+    public NSFont? Font { get; set; }
+    [Selector("foregroundColor", "setForegroundColor:")]
+    public NSColor? ForegroundColor { get; set; }
 }
 
 #endif

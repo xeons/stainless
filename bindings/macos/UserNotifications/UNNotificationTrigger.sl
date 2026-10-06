@@ -33,23 +33,30 @@ import Standard.ObjC;
 
 public extern objc class UNNotificationTrigger : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("repeats")] public bool Repeats { get; }
+    [Selector("repeats")]
+    public bool Repeats { get; }
 }
 
 public extern objc class UNPushNotificationTrigger : UNNotificationTrigger { }
 
 public extern objc class UNTimeIntervalNotificationTrigger : UNNotificationTrigger
 {
-    [Selector("timeInterval")] public NSTimeInterval TimeInterval { get; }
-    [Selector("triggerWithTimeInterval:repeats:")] public static Self TriggerWithTimeIntervalRepeats(NSTimeInterval timeInterval, bool repeats);
-    [Selector("nextTriggerDate")] public NSDate? NextTriggerDate();
+    [Selector("timeInterval")]
+    public NSTimeInterval TimeInterval { get; }
+    [Selector("triggerWithTimeInterval:repeats:")]
+    public static Self TriggerWithTimeIntervalRepeats(NSTimeInterval timeInterval, bool repeats);
+    [Selector("nextTriggerDate")]
+    public NSDate? NextTriggerDate();
 }
 
 public extern objc class UNCalendarNotificationTrigger : UNNotificationTrigger
 {
-    [Selector("dateComponents")] public NSDateComponents DateComponents { get; }
-    [Selector("triggerWithDateMatchingComponents:repeats:")] public static Self TriggerWithDateMatchingComponentsRepeats(NSDateComponents dateComponents, bool repeats);
-    [Selector("nextTriggerDate")] public NSDate? NextTriggerDate();
+    [Selector("dateComponents")]
+    public NSDateComponents DateComponents { get; }
+    [Selector("triggerWithDateMatchingComponents:repeats:")]
+    public static Self TriggerWithDateMatchingComponentsRepeats(NSDateComponents dateComponents, bool repeats);
+    [Selector("nextTriggerDate")]
+    public NSDate? NextTriggerDate();
 }
 
 #endif

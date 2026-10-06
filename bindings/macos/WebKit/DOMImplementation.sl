@@ -33,24 +33,33 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMImplementation : DOMObject
 {
-    [Selector("hasFeature:version:")] public bool HasFeatureVersion(NSString? feature, NSString? version);
-    [Selector("createDocumentType:publicId:systemId:")] public DOMDocumentType? CreateDocumentTypePublicIdSystemId(NSString? qualifiedName, NSString? publicId, NSString? systemId);
-    [Selector("createDocument:qualifiedName:doctype:")] public DOMDocument? CreateDocumentQualifiedNameDoctype(NSString? namespaceURI, NSString? qualifiedName, DOMDocumentType? doctype);
-    [Selector("createCSSStyleSheet:media:")] public DOMCSSStyleSheet? CreateCSSStyleSheetMedia(NSString? title, NSString? media);
-    [Selector("createHTMLDocument:")] public DOMHTMLDocument? CreateHTMLDocument(NSString? title);
+    [Selector("hasFeature:version:")]
+    public bool HasFeatureVersion(NSString? feature, NSString? version);
+    [Selector("createDocumentType:publicId:systemId:")]
+    public DOMDocumentType? CreateDocumentTypePublicIdSystemId(NSString? qualifiedName, NSString? publicId, NSString? systemId);
+    [Selector("createDocument:qualifiedName:doctype:")]
+    public DOMDocument? CreateDocumentQualifiedNameDoctype(NSString? namespaceURI, NSString? qualifiedName, DOMDocumentType? doctype);
+    [Selector("createCSSStyleSheet:media:")]
+    public DOMCSSStyleSheet? CreateCSSStyleSheetMedia(NSString? title, NSString? media);
+    [Selector("createHTMLDocument:")]
+    public DOMHTMLDocument? CreateHTMLDocument(NSString? title);
 }
 
 /// DOMImplementationDeprecated, a category of DOMImplementation.
 public extern objc class DOMImplementation
 {
     /// Deprecated in macOS 10.5.
-    [Selector("hasFeature::")] public bool HasFeature(NSString? feature, NSString? version);
+    [Selector("hasFeature::")]
+    public bool HasFeature(NSString? feature, NSString? version);
     /// Deprecated in macOS 10.5.
-    [Selector("createDocumentType:::")] public DOMDocumentType? CreateDocumentType(NSString? qualifiedName, NSString? publicId, NSString? systemId);
+    [Selector("createDocumentType:::")]
+    public DOMDocumentType? CreateDocumentType(NSString? qualifiedName, NSString? publicId, NSString? systemId);
     /// Deprecated in macOS 10.5.
-    [Selector("createDocument:::")] public DOMDocument? CreateDocument(NSString? namespaceURI, NSString? qualifiedName, DOMDocumentType? doctype);
+    [Selector("createDocument:::")]
+    public DOMDocument? CreateDocument(NSString? namespaceURI, NSString? qualifiedName, DOMDocumentType? doctype);
     /// Deprecated in macOS 10.5.
-    [Selector("createCSSStyleSheet::")] public DOMCSSStyleSheet? CreateCSSStyleSheet(NSString? title, NSString? media);
+    [Selector("createCSSStyleSheet::")]
+    public DOMCSSStyleSheet? CreateCSSStyleSheet(NSString? title, NSString? media);
 }
 
 #endif

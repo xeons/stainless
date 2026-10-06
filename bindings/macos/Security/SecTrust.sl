@@ -114,29 +114,35 @@ public extern "C" OSStatus SecTrustEvaluateAsyncWithError(SecTrustRef trust, dis
 public extern "C" OSStatus SecTrustGetTrustResult(SecTrustRef trust, SecTrustResultType* result);
 
 /// Deprecated in macOS 11.0.
-[ReturnsRetained] public extern "C" SecKeyRef? SecTrustCopyPublicKey(SecTrustRef trust);
+[ReturnsRetained]
+public extern "C" SecKeyRef? SecTrustCopyPublicKey(SecTrustRef trust);
 
-[ReturnsRetained] public extern "C" SecKeyRef? SecTrustCopyKey(SecTrustRef trust);
+[ReturnsRetained]
+public extern "C" SecKeyRef? SecTrustCopyKey(SecTrustRef trust);
 
 public extern "C" CFIndex SecTrustGetCertificateCount(SecTrustRef trust);
 
 /// Deprecated in macOS 12.0.
 public extern "C" SecCertificateRef? SecTrustGetCertificateAtIndex(SecTrustRef trust, CFIndex ix);
 
-[ReturnsRetained] public extern "C" CFDataRef? SecTrustCopyExceptions(SecTrustRef trust);
+[ReturnsRetained]
+public extern "C" CFDataRef? SecTrustCopyExceptions(SecTrustRef trust);
 
 public extern "C" bool SecTrustSetExceptions(SecTrustRef trust, CFDataRef? exceptions);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CFArrayRef? SecTrustCopyProperties(SecTrustRef trust);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SecTrustCopyProperties(SecTrustRef trust);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? SecTrustCopyResult(SecTrustRef trust);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? SecTrustCopyResult(SecTrustRef trust);
 
 public extern "C" OSStatus SecTrustSetOCSPResponse(SecTrustRef trust, CFTypeRef? responseData);
 
 public extern "C" OSStatus SecTrustSetSignedCertificateTimestamps(SecTrustRef trust, CFArrayRef? sctArray);
 
-[ReturnsRetained] public extern "C" CFArrayRef? SecTrustCopyCertificateChain(SecTrustRef trust);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SecTrustCopyCertificateChain(SecTrustRef trust);
 
 /// Deprecated in macOS 10.9.
 public using SecTrustUserSetting = SecTrustResultType;

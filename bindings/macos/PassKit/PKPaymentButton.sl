@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class PKPaymentButton : NSButton
 {
-    [Selector("cornerRadius", "setCornerRadius:")] public CGFloat CornerRadius { get; set; }
-    [Selector("buttonWithType:style:")] public static Self ButtonWithTypeStyle(PKPaymentButtonType buttonType, PKPaymentButtonStyle buttonStyle);
-    [Selector("initWithPaymentButtonType:paymentButtonStyle:")] public Self InitWithPaymentButtonTypePaymentButtonStyle(PKPaymentButtonType type, PKPaymentButtonStyle style);
+    [Selector("cornerRadius", "setCornerRadius:")]
+    public CGFloat CornerRadius { get; set; }
+    [Selector("buttonWithType:style:")]
+    public static Self ButtonWithTypeStyle(PKPaymentButtonType buttonType, PKPaymentButtonStyle buttonStyle);
+    [Selector("initWithPaymentButtonType:paymentButtonStyle:")]
+    public Self InitWithPaymentButtonTypePaymentButtonStyle(PKPaymentButtonType type, PKPaymentButtonStyle style);
 }
 
 #endif

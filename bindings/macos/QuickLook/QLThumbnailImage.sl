@@ -32,7 +32,8 @@ import Standard.ObjC;
 #pragma comment(framework, "QuickLook")
 
 /// Deprecated in macOS 15.0.
-[ReturnsRetained] public extern "C" CGImageRef? QLThumbnailImageCreate(CFAllocatorRef? allocator, CFURLRef? url, CGSize maxThumbnailSize, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGImageRef? QLThumbnailImageCreate(CFAllocatorRef? allocator, CFURLRef? url, CGSize maxThumbnailSize, CFDictionaryRef? options);
 
 public extern "C" CFStringRef? kQLThumbnailOptionIconModeKey;
 

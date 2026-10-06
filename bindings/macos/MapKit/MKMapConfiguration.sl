@@ -39,7 +39,8 @@ public enum MKMapElevationStyle : long
 
 public extern objc class MKMapConfiguration : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("elevationStyle", "setElevationStyle:")] public MKMapElevationStyle ElevationStyle { get; set; }
+    [Selector("elevationStyle", "setElevationStyle:")]
+    public MKMapElevationStyle ElevationStyle { get; set; }
 }
 
 #endif

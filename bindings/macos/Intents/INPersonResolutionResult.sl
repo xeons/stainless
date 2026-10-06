@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class INPersonResolutionResult : INIntentResolutionResult
 {
-    [Selector("successWithResolvedPerson:")] public static Self SuccessWithResolvedPerson(INPerson resolvedPerson);
-    [Selector("disambiguationWithPeopleToDisambiguate:")] public static Self DisambiguationWithPeopleToDisambiguate(NSArray peopleToDisambiguate);
-    [Selector("confirmationRequiredWithPersonToConfirm:")] public static Self ConfirmationRequiredWithPersonToConfirm(INPerson? personToConfirm);
+    [Selector("successWithResolvedPerson:")]
+    public static Self SuccessWithResolvedPerson(INPerson resolvedPerson);
+    [Selector("disambiguationWithPeopleToDisambiguate:")]
+    public static Self DisambiguationWithPeopleToDisambiguate(NSArray peopleToDisambiguate);
+    [Selector("confirmationRequiredWithPersonToConfirm:")]
+    public static Self ConfirmationRequiredWithPersonToConfirm(INPerson? personToConfirm);
 }
 
 #endif

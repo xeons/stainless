@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class SWCollaborationCoordinator : NSObject
 {
-    [Selector("sharedCoordinator")] public static SWCollaborationCoordinator SharedCoordinator { get; }
-    [Selector("actionHandler", "setActionHandler:")] public SWCollaborationActionHandler? ActionHandler { get; set; }
+    [Selector("sharedCoordinator")]
+    public static SWCollaborationCoordinator SharedCoordinator { get; }
+    [Selector("actionHandler", "setActionHandler:")]
+    public SWCollaborationActionHandler? ActionHandler { get; set; }
 }
 
 #endif

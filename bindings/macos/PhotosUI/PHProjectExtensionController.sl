@@ -40,11 +40,18 @@ public objc closure void PHProjectExtensionControllerFinishProjectWithCompletion
 public objc interface PHProjectExtensionController : NSObjectProtocol
 {
     /// Deprecated in macOS 10.14.
-    [Optional] [Selector("supportedProjectTypes")] NSArray? SupportedProjectTypes { get; }
-    [Optional] [Selector("typeDescriptionDataSourceForCategory:invalidator:")] PHProjectTypeDescriptionDataSource TypeDescriptionDataSourceForCategoryInvalidator(PHProjectCategory category, PHProjectTypeDescriptionInvalidator invalidator);
-    [Selector("beginProjectWithExtensionContext:projectInfo:completion:")] void BeginProjectWithExtensionContextProjectInfoCompletion(PHProjectExtensionContext extensionContext, PHProjectInfo projectInfo, PHProjectExtensionControllerBeginProjectWithExtensionContextProjectInfoCompletionCompletionBlock completion);
-    [Selector("resumeProjectWithExtensionContext:completion:")] void ResumeProjectWithExtensionContextCompletion(PHProjectExtensionContext extensionContext, PHProjectExtensionControllerResumeProjectWithExtensionContextCompletionCompletionBlock completion);
-    [Selector("finishProjectWithCompletionHandler:")] void FinishProjectWithCompletionHandler(PHProjectExtensionControllerFinishProjectWithCompletionHandlerCompletionBlock completion);
+    [Optional]
+    [Selector("supportedProjectTypes")]
+    NSArray? SupportedProjectTypes { get; }
+    [Optional]
+    [Selector("typeDescriptionDataSourceForCategory:invalidator:")]
+    PHProjectTypeDescriptionDataSource TypeDescriptionDataSourceForCategoryInvalidator(PHProjectCategory category, PHProjectTypeDescriptionInvalidator invalidator);
+    [Selector("beginProjectWithExtensionContext:projectInfo:completion:")]
+    void BeginProjectWithExtensionContextProjectInfoCompletion(PHProjectExtensionContext extensionContext, PHProjectInfo projectInfo, PHProjectExtensionControllerBeginProjectWithExtensionContextProjectInfoCompletionCompletionBlock completion);
+    [Selector("resumeProjectWithExtensionContext:completion:")]
+    void ResumeProjectWithExtensionContextCompletion(PHProjectExtensionContext extensionContext, PHProjectExtensionControllerResumeProjectWithExtensionContextCompletionCompletionBlock completion);
+    [Selector("finishProjectWithCompletionHandler:")]
+    void FinishProjectWithCompletionHandler(PHProjectExtensionControllerFinishProjectWithCompletionHandlerCompletionBlock completion);
 }
 
 #endif

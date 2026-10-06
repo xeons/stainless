@@ -35,12 +35,18 @@ public objc closure void GCRelativeInputDeltaDidChangeHandlerBlock(GCPhysicalInp
 
 public objc interface GCRelativeInput : NSObjectProtocol
 {
-    [Selector("deltaDidChangeHandler", "setDeltaDidChangeHandler:")] GCRelativeInputDeltaDidChangeHandlerBlock? DeltaDidChangeHandler { get; set; }
-    [Selector("delta")] float Delta { get; }
-    [Selector("isAnalog")] bool Analog { get; }
-    [Selector("lastDeltaTimestamp")] NSTimeInterval LastDeltaTimestamp { get; }
-    [Selector("lastDeltaLatency")] NSTimeInterval LastDeltaLatency { get; }
-    [Selector("sources")] NSSet Sources { get; }
+    [Selector("deltaDidChangeHandler", "setDeltaDidChangeHandler:")]
+    GCRelativeInputDeltaDidChangeHandlerBlock? DeltaDidChangeHandler { get; set; }
+    [Selector("delta")]
+    float Delta { get; }
+    [Selector("isAnalog")]
+    bool Analog { get; }
+    [Selector("lastDeltaTimestamp")]
+    NSTimeInterval LastDeltaTimestamp { get; }
+    [Selector("lastDeltaLatency")]
+    NSTimeInterval LastDeltaLatency { get; }
+    [Selector("sources")]
+    NSSet Sources { get; }
 }
 
 #endif

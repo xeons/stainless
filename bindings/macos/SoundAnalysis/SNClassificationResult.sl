@@ -34,15 +34,20 @@ import Standard.ObjC;
 
 public extern objc class SNClassification : NSObject
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("confidence")] public double Confidence { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("confidence")]
+    public double Confidence { get; }
 }
 
 public extern objc class SNClassificationResult : NSObject, SNResult
 {
-    [Selector("classifications")] public NSArray Classifications { get; }
-    [Selector("timeRange")] public CMTimeRange TimeRange { get; }
-    [Selector("classificationForIdentifier:")] public SNClassification? ClassificationForIdentifier(NSString identifier);
+    [Selector("classifications")]
+    public NSArray Classifications { get; }
+    [Selector("timeRange")]
+    public CMTimeRange TimeRange { get; }
+    [Selector("classificationForIdentifier:")]
+    public SNClassification? ClassificationForIdentifier(NSString identifier);
 }
 
 #endif

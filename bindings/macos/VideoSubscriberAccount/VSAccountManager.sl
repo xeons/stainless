@@ -45,12 +45,15 @@ public extern "C" VSCheckAccessOption? VSCheckAccessOptionPrompt;
 
 public extern objc class VSAccountManager : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public VSAccountManagerDelegate? Delegate { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public VSAccountManagerDelegate? Delegate { get; set; }
 }
 
 public objc interface VSAccountManagerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("accountManager:shouldAuthenticateAccountProviderWithIdentifier:")] bool AccountManagerShouldAuthenticateAccountProviderWithIdentifier(VSAccountManager accountManager, NSString accountProviderIdentifier);
+    [Optional]
+    [Selector("accountManager:shouldAuthenticateAccountProviderWithIdentifier:")]
+    bool AccountManagerShouldAuthenticateAccountProviderWithIdentifier(VSAccountManager accountManager, NSString accountProviderIdentifier);
 }
 
 #endif

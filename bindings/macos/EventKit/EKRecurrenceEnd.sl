@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class EKRecurrenceEnd : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("endDate")] public NSDate? EndDate { get; }
-    [Selector("occurrenceCount")] public NSUInteger OccurrenceCount { get; }
-    [Selector("recurrenceEndWithEndDate:")] public static Self RecurrenceEndWithEndDate(NSDate endDate);
-    [Selector("recurrenceEndWithOccurrenceCount:")] public static Self RecurrenceEndWithOccurrenceCount(NSUInteger occurrenceCount);
+    [Selector("endDate")]
+    public NSDate? EndDate { get; }
+    [Selector("occurrenceCount")]
+    public NSUInteger OccurrenceCount { get; }
+    [Selector("recurrenceEndWithEndDate:")]
+    public static Self RecurrenceEndWithEndDate(NSDate endDate);
+    [Selector("recurrenceEndWithOccurrenceCount:")]
+    public static Self RecurrenceEndWithOccurrenceCount(NSUInteger occurrenceCount);
 }
 
 #endif

@@ -46,25 +46,34 @@ public enum MPSGraphScatterMode : long
 /// ScatterNDOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("scatterNDWithUpdatesTensor:indicesTensor:shape:batchDimensions:mode:name:")] public MPSGraphTensor ScatterNDWithUpdatesTensorIndicesTensorShapeBatchDimensionsModeName(MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, MPSShape shape, NSUInteger batchDimensions, MPSGraphScatterMode mode, NSString? name);
-    [Selector("scatterNDWithUpdatesTensor:indicesTensor:shape:batchDimensions:name:")] public MPSGraphTensor ScatterNDWithUpdatesTensorIndicesTensorShapeBatchDimensionsName(MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, MPSShape shape, NSUInteger batchDimensions, NSString? name);
-    [Selector("scatterNDWithDataTensor:updatesTensor:indicesTensor:batchDimensions:mode:name:")] public MPSGraphTensor ScatterNDWithDataTensorUpdatesTensorIndicesTensorBatchDimensionsModeName(MPSGraphTensor dataTensor, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, NSUInteger batchDimensions, MPSGraphScatterMode mode, NSString? name);
+    [Selector("scatterNDWithUpdatesTensor:indicesTensor:shape:batchDimensions:mode:name:")]
+    public MPSGraphTensor ScatterNDWithUpdatesTensorIndicesTensorShapeBatchDimensionsModeName(MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, MPSShape shape, NSUInteger batchDimensions, MPSGraphScatterMode mode, NSString? name);
+    [Selector("scatterNDWithUpdatesTensor:indicesTensor:shape:batchDimensions:name:")]
+    public MPSGraphTensor ScatterNDWithUpdatesTensorIndicesTensorShapeBatchDimensionsName(MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, MPSShape shape, NSUInteger batchDimensions, NSString? name);
+    [Selector("scatterNDWithDataTensor:updatesTensor:indicesTensor:batchDimensions:mode:name:")]
+    public MPSGraphTensor ScatterNDWithDataTensorUpdatesTensorIndicesTensorBatchDimensionsModeName(MPSGraphTensor dataTensor, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, NSUInteger batchDimensions, MPSGraphScatterMode mode, NSString? name);
 }
 
 /// MPSGraphScatterOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("scatterWithUpdatesTensor:indicesTensor:shape:axis:mode:name:")] public MPSGraphTensor ScatterWithUpdatesTensorIndicesTensorShapeAxisModeName(MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, MPSShape shape, NSInteger axis, MPSGraphScatterMode mode, NSString? name);
-    [Selector("scatterWithDataTensor:updatesTensor:indicesTensor:axis:mode:name:")] public MPSGraphTensor ScatterWithDataTensorUpdatesTensorIndicesTensorAxisModeName(MPSGraphTensor dataTensor, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, NSInteger axis, MPSGraphScatterMode mode, NSString? name);
+    [Selector("scatterWithUpdatesTensor:indicesTensor:shape:axis:mode:name:")]
+    public MPSGraphTensor ScatterWithUpdatesTensorIndicesTensorShapeAxisModeName(MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, MPSShape shape, NSInteger axis, MPSGraphScatterMode mode, NSString? name);
+    [Selector("scatterWithDataTensor:updatesTensor:indicesTensor:axis:mode:name:")]
+    public MPSGraphTensor ScatterWithDataTensorUpdatesTensorIndicesTensorAxisModeName(MPSGraphTensor dataTensor, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, NSInteger axis, MPSGraphScatterMode mode, NSString? name);
 }
 
 /// MPSGraphScatterAlongAxisOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("scatterAlongAxis:withUpdatesTensor:indicesTensor:shape:mode:name:")] public MPSGraphTensor ScatterAlongAxisWithUpdatesTensorIndicesTensorShapeModeName(NSInteger axis, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, MPSShape shape, MPSGraphScatterMode mode, NSString? name);
-    [Selector("scatterAlongAxisTensor:withUpdatesTensor:indicesTensor:shape:mode:name:")] public MPSGraphTensor ScatterAlongAxisTensorWithUpdatesTensorIndicesTensorShapeModeName(MPSGraphTensor axisTensor, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, MPSShape shape, MPSGraphScatterMode mode, NSString? name);
-    [Selector("scatterAlongAxis:withDataTensor:updatesTensor:indicesTensor:mode:name:")] public MPSGraphTensor ScatterAlongAxisWithDataTensorUpdatesTensorIndicesTensorModeName(NSInteger axis, MPSGraphTensor dataTensor, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, MPSGraphScatterMode mode, NSString? name);
-    [Selector("scatterAlongAxisTensor:withDataTensor:updatesTensor:indicesTensor:mode:name:")] public MPSGraphTensor ScatterAlongAxisTensorWithDataTensorUpdatesTensorIndicesTensorModeName(MPSGraphTensor axisTensor, MPSGraphTensor dataTensor, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, MPSGraphScatterMode mode, NSString? name);
+    [Selector("scatterAlongAxis:withUpdatesTensor:indicesTensor:shape:mode:name:")]
+    public MPSGraphTensor ScatterAlongAxisWithUpdatesTensorIndicesTensorShapeModeName(NSInteger axis, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, MPSShape shape, MPSGraphScatterMode mode, NSString? name);
+    [Selector("scatterAlongAxisTensor:withUpdatesTensor:indicesTensor:shape:mode:name:")]
+    public MPSGraphTensor ScatterAlongAxisTensorWithUpdatesTensorIndicesTensorShapeModeName(MPSGraphTensor axisTensor, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, MPSShape shape, MPSGraphScatterMode mode, NSString? name);
+    [Selector("scatterAlongAxis:withDataTensor:updatesTensor:indicesTensor:mode:name:")]
+    public MPSGraphTensor ScatterAlongAxisWithDataTensorUpdatesTensorIndicesTensorModeName(NSInteger axis, MPSGraphTensor dataTensor, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, MPSGraphScatterMode mode, NSString? name);
+    [Selector("scatterAlongAxisTensor:withDataTensor:updatesTensor:indicesTensor:mode:name:")]
+    public MPSGraphTensor ScatterAlongAxisTensorWithDataTensorUpdatesTensorIndicesTensorModeName(MPSGraphTensor axisTensor, MPSGraphTensor dataTensor, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, MPSGraphScatterMode mode, NSString? name);
 }
 
 #endif

@@ -38,72 +38,131 @@ public enum NSDecodingFailurePolicy : long
 
 public extern objc class NSCoder : NSObject
 {
-    [Selector("encodeValueOfObjCType:at:")] public void EncodeValueOfObjCTypeAt(byte* type, void* addr);
-    [Selector("encodeDataObject:")] public void EncodeDataObject(NSData data);
-    [Selector("decodeDataObject")] public NSData? DecodeDataObject();
-    [Selector("decodeValueOfObjCType:at:size:")] public void DecodeValueOfObjCTypeAtSize(byte* type, void* data, NSUInteger size);
-    [Selector("versionForClassName:")] public NSInteger VersionForClassName(NSString className);
+    [Selector("encodeValueOfObjCType:at:")]
+    public void EncodeValueOfObjCTypeAt(byte* type, void* addr);
+    [Selector("encodeDataObject:")]
+    public void EncodeDataObject(NSData data);
+    [Selector("decodeDataObject")]
+    public NSData? DecodeDataObject();
+    [Selector("decodeValueOfObjCType:at:size:")]
+    public void DecodeValueOfObjCTypeAtSize(byte* type, void* data, NSUInteger size);
+    [Selector("versionForClassName:")]
+    public NSInteger VersionForClassName(NSString className);
 }
 
 /// NSExtendedCoder, a category of NSCoder.
 public extern objc class NSCoder
 {
-    [Selector("systemVersion")] public uint SystemVersion { get; }
-    [Selector("allowsKeyedCoding")] public bool AllowsKeyedCoding { get; }
-    [Selector("requiresSecureCoding")] public bool RequiresSecureCoding { get; }
-    [Selector("allowedClasses")] public NSSet? AllowedClasses { get; }
-    [Selector("decodingFailurePolicy")] public NSDecodingFailurePolicy DecodingFailurePolicy { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("encodeObject:")] public void EncodeObject(AnyObject? object);
-    [Selector("encodeRootObject:")] public void EncodeRootObject(AnyObject rootObject);
-    [Selector("encodeBycopyObject:")] public void EncodeBycopyObject(AnyObject? anObject);
-    [Selector("encodeByrefObject:")] public void EncodeByrefObject(AnyObject? anObject);
-    [Selector("encodeConditionalObject:")] public void EncodeConditionalObject(AnyObject? object);
-    [Selector("encodeValuesOfObjCTypes:")] public void EncodeValuesOfObjCTypes(byte* types, ...);
-    [Selector("encodeArrayOfObjCType:count:at:")] public void EncodeArrayOfObjCTypeCountAt(byte* type, NSUInteger count, void* array);
-    [Selector("encodeBytes:length:")] public void EncodeBytesLength(void* byteaddr, NSUInteger length);
-    [Selector("decodeObject")] public AnyObject? DecodeObject();
-    [Selector("decodeTopLevelObjectAndReturnError:")] public AnyObject? DecodeTopLevelObjectAndReturnError(out NSError? error);
-    [Selector("decodeValuesOfObjCTypes:")] public void DecodeValuesOfObjCTypes(byte* types, ...);
-    [Selector("decodeArrayOfObjCType:count:at:")] public void DecodeArrayOfObjCTypeCountAt(byte* itemType, NSUInteger count, void* array);
-    [Selector("decodeBytesWithReturnedLength:")] public void* DecodeBytesWithReturnedLength(NSUInteger* lengthp);
-    [Selector("encodePropertyList:")] public void EncodePropertyList(AnyObject aPropertyList);
-    [Selector("decodePropertyList")] public AnyObject? DecodePropertyList();
-    [Selector("encodeObject:forKey:")] public void EncodeObjectForKey(AnyObject? object, NSString key);
-    [Selector("encodeConditionalObject:forKey:")] public void EncodeConditionalObjectForKey(AnyObject? object, NSString key);
-    [Selector("encodeBool:forKey:")] public void EncodeBoolForKey(bool value, NSString key);
-    [Selector("encodeInt:forKey:")] public void EncodeIntForKey(int value, NSString key);
-    [Selector("encodeInt32:forKey:")] public void EncodeInt32ForKey(int value, NSString key);
-    [Selector("encodeInt64:forKey:")] public void EncodeInt64ForKey(long value, NSString key);
-    [Selector("encodeFloat:forKey:")] public void EncodeFloatForKey(float value, NSString key);
-    [Selector("encodeDouble:forKey:")] public void EncodeDoubleForKey(double value, NSString key);
-    [Selector("encodeBytes:length:forKey:")] public void EncodeBytesLengthForKey(byte* bytes, NSUInteger length, NSString key);
-    [Selector("containsValueForKey:")] public bool ContainsValueForKey(NSString key);
-    [Selector("decodeObjectForKey:")] public AnyObject? DecodeObjectForKey(NSString key);
-    [Selector("decodeTopLevelObjectForKey:error:")] public AnyObject? DecodeTopLevelObjectForKeyError(NSString key, out NSError? error);
-    [Selector("decodeBoolForKey:")] public bool DecodeBoolForKey(NSString key);
-    [Selector("decodeIntForKey:")] public int DecodeIntForKey(NSString key);
-    [Selector("decodeInt32ForKey:")] public int DecodeInt32ForKey(NSString key);
-    [Selector("decodeInt64ForKey:")] public long DecodeInt64ForKey(NSString key);
-    [Selector("decodeFloatForKey:")] public float DecodeFloatForKey(NSString key);
-    [Selector("decodeDoubleForKey:")] public double DecodeDoubleForKey(NSString key);
-    [Selector("decodeBytesForKey:returnedLength:")] public byte* DecodeBytesForKeyReturnedLength(NSString key, NSUInteger* lengthp);
+    [Selector("systemVersion")]
+    public uint SystemVersion { get; }
+    [Selector("allowsKeyedCoding")]
+    public bool AllowsKeyedCoding { get; }
+    [Selector("requiresSecureCoding")]
+    public bool RequiresSecureCoding { get; }
+    [Selector("allowedClasses")]
+    public NSSet? AllowedClasses { get; }
+    [Selector("decodingFailurePolicy")]
+    public NSDecodingFailurePolicy DecodingFailurePolicy { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("encodeObject:")]
+    public void EncodeObject(AnyObject? object);
+    [Selector("encodeRootObject:")]
+    public void EncodeRootObject(AnyObject rootObject);
+    [Selector("encodeBycopyObject:")]
+    public void EncodeBycopyObject(AnyObject? anObject);
+    [Selector("encodeByrefObject:")]
+    public void EncodeByrefObject(AnyObject? anObject);
+    [Selector("encodeConditionalObject:")]
+    public void EncodeConditionalObject(AnyObject? object);
+    [Selector("encodeValuesOfObjCTypes:")]
+    public void EncodeValuesOfObjCTypes(byte* types, ...);
+    [Selector("encodeArrayOfObjCType:count:at:")]
+    public void EncodeArrayOfObjCTypeCountAt(byte* type, NSUInteger count, void* array);
+    [Selector("encodeBytes:length:")]
+    public void EncodeBytesLength(void* byteaddr, NSUInteger length);
+    [Selector("decodeObject")]
+    public AnyObject? DecodeObject();
+    [Selector("decodeTopLevelObjectAndReturnError:")]
+    public AnyObject? DecodeTopLevelObjectAndReturnError(out NSError? error);
+    [Selector("decodeValuesOfObjCTypes:")]
+    public void DecodeValuesOfObjCTypes(byte* types, ...);
+    [Selector("decodeArrayOfObjCType:count:at:")]
+    public void DecodeArrayOfObjCTypeCountAt(byte* itemType, NSUInteger count, void* array);
+    [Selector("decodeBytesWithReturnedLength:")]
+    public void* DecodeBytesWithReturnedLength(NSUInteger* lengthp);
+    [Selector("encodePropertyList:")]
+    public void EncodePropertyList(AnyObject aPropertyList);
+    [Selector("decodePropertyList")]
+    public AnyObject? DecodePropertyList();
+    [Selector("encodeObject:forKey:")]
+    public void EncodeObjectForKey(AnyObject? object, NSString key);
+    [Selector("encodeConditionalObject:forKey:")]
+    public void EncodeConditionalObjectForKey(AnyObject? object, NSString key);
+    [Selector("encodeBool:forKey:")]
+    public void EncodeBoolForKey(bool value, NSString key);
+    [Selector("encodeInt:forKey:")]
+    public void EncodeIntForKey(int value, NSString key);
+    [Selector("encodeInt32:forKey:")]
+    public void EncodeInt32ForKey(int value, NSString key);
+    [Selector("encodeInt64:forKey:")]
+    public void EncodeInt64ForKey(long value, NSString key);
+    [Selector("encodeFloat:forKey:")]
+    public void EncodeFloatForKey(float value, NSString key);
+    [Selector("encodeDouble:forKey:")]
+    public void EncodeDoubleForKey(double value, NSString key);
+    [Selector("encodeBytes:length:forKey:")]
+    public void EncodeBytesLengthForKey(byte* bytes, NSUInteger length, NSString key);
+    [Selector("containsValueForKey:")]
+    public bool ContainsValueForKey(NSString key);
+    [Selector("decodeObjectForKey:")]
+    public AnyObject? DecodeObjectForKey(NSString key);
+    [Selector("decodeTopLevelObjectForKey:error:")]
+    public AnyObject? DecodeTopLevelObjectForKeyError(NSString key, out NSError? error);
+    [Selector("decodeBoolForKey:")]
+    public bool DecodeBoolForKey(NSString key);
+    [Selector("decodeIntForKey:")]
+    public int DecodeIntForKey(NSString key);
+    [Selector("decodeInt32ForKey:")]
+    public int DecodeInt32ForKey(NSString key);
+    [Selector("decodeInt64ForKey:")]
+    public long DecodeInt64ForKey(NSString key);
+    [Selector("decodeFloatForKey:")]
+    public float DecodeFloatForKey(NSString key);
+    [Selector("decodeDoubleForKey:")]
+    public double DecodeDoubleForKey(NSString key);
+    [Selector("decodeBytesForKey:returnedLength:")]
+    public byte* DecodeBytesForKeyReturnedLength(NSString key, NSUInteger* lengthp);
     /// macOS 15.4 and later.
-    [Selector("decodeBytesWithMinimumLength:")] public void* DecodeBytesWithMinimumLength(NSUInteger length);
+    [Selector("decodeBytesWithMinimumLength:")]
+    public void* DecodeBytesWithMinimumLength(NSUInteger length);
     /// macOS 15.4 and later.
-    [Selector("decodeBytesForKey:minimumLength:")] public byte* DecodeBytesForKeyMinimumLength(NSString key, NSUInteger length);
-    [Selector("encodeInteger:forKey:")] public void EncodeIntegerForKey(NSInteger value, NSString key);
-    [Selector("decodeIntegerForKey:")] public NSInteger DecodeIntegerForKey(NSString key);
-    [Selector("decodeObjectOfClass:forKey:")] public AnyObject? DecodeObjectOfClassForKey(Class aClass, NSString key);
-    [Selector("decodeTopLevelObjectOfClass:forKey:error:")] public AnyObject? DecodeTopLevelObjectOfClassForKeyError(Class aClass, NSString key, out NSError? error);
-    [Selector("decodeArrayOfObjectsOfClass:forKey:")] public NSArray? DecodeArrayOfObjectsOfClassForKey(Class cls, NSString key);
-    [Selector("decodeDictionaryWithKeysOfClass:objectsOfClass:forKey:")] public NSDictionary? DecodeDictionaryWithKeysOfClassObjectsOfClassForKey(Class keyCls, Class objectCls, NSString key);
-    [Selector("decodeObjectOfClasses:forKey:")] public AnyObject? DecodeObjectOfClassesForKey(NSSet? classes, NSString key);
-    [Selector("decodeTopLevelObjectOfClasses:forKey:error:")] public AnyObject? DecodeTopLevelObjectOfClassesForKeyError(NSSet? classes, NSString key, out NSError? error);
-    [Selector("decodeArrayOfObjectsOfClasses:forKey:")] public NSArray? DecodeArrayOfObjectsOfClassesForKey(NSSet classes, NSString key);
-    [Selector("decodeDictionaryWithKeysOfClasses:objectsOfClasses:forKey:")] public NSDictionary? DecodeDictionaryWithKeysOfClassesObjectsOfClassesForKey(NSSet keyClasses, NSSet objectClasses, NSString key);
-    [Selector("decodePropertyListForKey:")] public AnyObject? DecodePropertyListForKey(NSString key);
-    [Selector("failWithError:")] public void FailWithError(NSError error);
+    [Selector("decodeBytesForKey:minimumLength:")]
+    public byte* DecodeBytesForKeyMinimumLength(NSString key, NSUInteger length);
+    [Selector("encodeInteger:forKey:")]
+    public void EncodeIntegerForKey(NSInteger value, NSString key);
+    [Selector("decodeIntegerForKey:")]
+    public NSInteger DecodeIntegerForKey(NSString key);
+    [Selector("decodeObjectOfClass:forKey:")]
+    public AnyObject? DecodeObjectOfClassForKey(Class aClass, NSString key);
+    [Selector("decodeTopLevelObjectOfClass:forKey:error:")]
+    public AnyObject? DecodeTopLevelObjectOfClassForKeyError(Class aClass, NSString key, out NSError? error);
+    [Selector("decodeArrayOfObjectsOfClass:forKey:")]
+    public NSArray? DecodeArrayOfObjectsOfClassForKey(Class cls, NSString key);
+    [Selector("decodeDictionaryWithKeysOfClass:objectsOfClass:forKey:")]
+    public NSDictionary? DecodeDictionaryWithKeysOfClassObjectsOfClassForKey(Class keyCls, Class objectCls, NSString key);
+    [Selector("decodeObjectOfClasses:forKey:")]
+    public AnyObject? DecodeObjectOfClassesForKey(NSSet? classes, NSString key);
+    [Selector("decodeTopLevelObjectOfClasses:forKey:error:")]
+    public AnyObject? DecodeTopLevelObjectOfClassesForKeyError(NSSet? classes, NSString key, out NSError? error);
+    [Selector("decodeArrayOfObjectsOfClasses:forKey:")]
+    public NSArray? DecodeArrayOfObjectsOfClassesForKey(NSSet classes, NSString key);
+    [Selector("decodeDictionaryWithKeysOfClasses:objectsOfClasses:forKey:")]
+    public NSDictionary? DecodeDictionaryWithKeysOfClassesObjectsOfClassesForKey(NSSet keyClasses, NSSet objectClasses, NSString key);
+    [Selector("decodePropertyListForKey:")]
+    public AnyObject? DecodePropertyListForKey(NSString key);
+    [Selector("failWithError:")]
+    public void FailWithError(NSError error);
 }
 
 /// Deprecated in macOS 10.5.
@@ -113,16 +172,19 @@ public extern "C" NSObject? NXReadNSObjectFromCoder(NSCoder decoder);
 public extern objc class NSCoder
 {
     /// Deprecated in macOS 10.5.
-    [Selector("encodeNXObject:")] public void EncodeNXObject(AnyObject object);
+    [Selector("encodeNXObject:")]
+    public void EncodeNXObject(AnyObject object);
     /// Deprecated in macOS 10.5.
-    [Selector("decodeNXObject")] public AnyObject? DecodeNXObject();
+    [Selector("decodeNXObject")]
+    public AnyObject? DecodeNXObject();
 }
 
 /// NSDeprecated, a category of NSCoder.
 public extern objc class NSCoder
 {
     /// Deprecated in macOS 100000.
-    [Selector("decodeValueOfObjCType:at:")] public void DecodeValueOfObjCTypeAt(byte* type, void* data);
+    [Selector("decodeValueOfObjCType:at:")]
+    public void DecodeValueOfObjCTypeAt(byte* type, void* data);
 }
 
 #endif

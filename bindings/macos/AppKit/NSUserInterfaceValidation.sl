@@ -32,13 +32,16 @@ import Standard.ObjC;
 
 public objc interface NSValidatedUserInterfaceItem
 {
-    [Selector("action")] Selector Action { get; }
-    [Selector("tag")] NSInteger Tag { get; }
+    [Selector("action")]
+    Selector Action { get; }
+    [Selector("tag")]
+    NSInteger Tag { get; }
 }
 
 public objc interface NSUserInterfaceValidations
 {
-    [Selector("validateUserInterfaceItem:")] bool ValidateUserInterfaceItem(NSValidatedUserInterfaceItem item);
+    [Selector("validateUserInterfaceItem:")]
+    bool ValidateUserInterfaceItem(NSValidatedUserInterfaceItem item);
 }
 
 #endif

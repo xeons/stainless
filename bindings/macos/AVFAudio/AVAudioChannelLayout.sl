@@ -34,14 +34,22 @@ import Standard.ObjC;
 
 public extern objc class AVAudioChannelLayout : NSObject, NSSecureCoding
 {
-    [Selector("layoutTag")] public AudioChannelLayoutTag LayoutTag { get; }
-    [Selector("layout")] public AudioChannelLayout* Layout { get; }
-    [Selector("channelCount")] public AVAudioChannelCount ChannelCount { get; }
-    [Selector("initWithLayoutTag:")] public Self? InitWithLayoutTag(AudioChannelLayoutTag layoutTag);
-    [Selector("initWithLayout:")] public Self InitWithLayout(AudioChannelLayout* layout);
-    [Selector("isEqual:")] public bool IsEqual(AnyObject object);
-    [Selector("layoutWithLayoutTag:")] public static Self LayoutWithLayoutTag(AudioChannelLayoutTag layoutTag);
-    [Selector("layoutWithLayout:")] public static Self LayoutWithLayout(AudioChannelLayout* layout);
+    [Selector("layoutTag")]
+    public AudioChannelLayoutTag LayoutTag { get; }
+    [Selector("layout")]
+    public AudioChannelLayout* Layout { get; }
+    [Selector("channelCount")]
+    public AVAudioChannelCount ChannelCount { get; }
+    [Selector("initWithLayoutTag:")]
+    public Self? InitWithLayoutTag(AudioChannelLayoutTag layoutTag);
+    [Selector("initWithLayout:")]
+    public Self InitWithLayout(AudioChannelLayout* layout);
+    [Selector("isEqual:")]
+    public bool IsEqual(AnyObject object);
+    [Selector("layoutWithLayoutTag:")]
+    public static Self LayoutWithLayoutTag(AudioChannelLayoutTag layoutTag);
+    [Selector("layoutWithLayout:")]
+    public static Self LayoutWithLayout(AudioChannelLayout* layout);
 }
 
 #endif

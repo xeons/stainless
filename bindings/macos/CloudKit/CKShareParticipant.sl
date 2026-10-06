@@ -58,16 +58,24 @@ public enum CKShareParticipantRole : long
 
 public extern objc class CKShareParticipant : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("userIdentity")] public CKUserIdentity UserIdentity { get; }
-    [Selector("role", "setRole:")] public CKShareParticipantRole Role { get; set; }
-    [Selector("acceptanceStatus")] public CKShareParticipantAcceptanceStatus AcceptanceStatus { get; }
-    [Selector("permission", "setPermission:")] public CKShareParticipantPermission Permission { get; set; }
-    [Selector("participantID")] public NSString? ParticipantID { get; }
+    [Selector("userIdentity")]
+    public CKUserIdentity UserIdentity { get; }
+    [Selector("role", "setRole:")]
+    public CKShareParticipantRole Role { get; set; }
+    [Selector("acceptanceStatus")]
+    public CKShareParticipantAcceptanceStatus AcceptanceStatus { get; }
+    [Selector("permission", "setPermission:")]
+    public CKShareParticipantPermission Permission { get; set; }
+    [Selector("participantID")]
+    public NSString? ParticipantID { get; }
     /// macOS 26.0 and later.
-    [Selector("isApprovedRequester")] public bool IsApprovedRequester { get; }
+    [Selector("isApprovedRequester")]
+    public bool IsApprovedRequester { get; }
     /// macOS 26.0 and later.
-    [Selector("dateAddedToShare")] public NSDate? DateAddedToShare { get; }
-    [Selector("oneTimeURLParticipant")] public static Self OneTimeURLParticipant();
+    [Selector("dateAddedToShare")]
+    public NSDate? DateAddedToShare { get; }
+    [Selector("oneTimeURLParticipant")]
+    public static Self OneTimeURLParticipant();
 }
 
 #endif

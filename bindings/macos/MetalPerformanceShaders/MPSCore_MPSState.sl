@@ -34,12 +34,18 @@ import Standard.ObjC;
 
 public extern objc class MPSStateResourceList : NSObject
 {
-    [Selector("resourceList")] public static Self ResourceList();
-    [Selector("resourceListWithTextureDescriptors:")] public static Self ResourceListWithTextureDescriptors(MTLTextureDescriptor d, ...);
-    [Selector("resourceListWithBufferSizes:")] public static Self ResourceListWithBufferSizes(NSUInteger firstSize, ...);
-    [Selector("init")] public Self Init();
-    [Selector("appendTexture:")] public void AppendTexture(MTLTextureDescriptor descriptor);
-    [Selector("appendBuffer:")] public void AppendBuffer(NSUInteger size);
+    [Selector("resourceList")]
+    public static Self ResourceList();
+    [Selector("resourceListWithTextureDescriptors:")]
+    public static Self ResourceListWithTextureDescriptors(MTLTextureDescriptor d, ...);
+    [Selector("resourceListWithBufferSizes:")]
+    public static Self ResourceListWithBufferSizes(NSUInteger firstSize, ...);
+    [Selector("init")]
+    public Self Init();
+    [Selector("appendTexture:")]
+    public void AppendTexture(MTLTextureDescriptor descriptor);
+    [Selector("appendBuffer:")]
+    public void AppendBuffer(NSUInteger size);
 }
 
 public struct MPSStateTextureInfo
@@ -63,28 +69,49 @@ public enum MPSStateResourceType : ulong
 
 public extern objc class MPSState : NSObject
 {
-    [Selector("resourceCount")] public NSUInteger ResourceCount { get; }
-    [Selector("readCount", "setReadCount:")] public NSUInteger ReadCount { get; set; }
-    [Selector("isTemporary")] public bool IsTemporary { get; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
+    [Selector("resourceCount")]
+    public NSUInteger ResourceCount { get; }
+    [Selector("readCount", "setReadCount:")]
+    public NSUInteger ReadCount { get; set; }
+    [Selector("isTemporary")]
+    public bool IsTemporary { get; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
     /// Deprecated in macOS 10.13.4.
-    [Selector("resource")] public MTLResource? Resource { get; }
-    [Selector("temporaryStateWithCommandBuffer:bufferSize:")] public static Self TemporaryStateWithCommandBufferBufferSize(MTLCommandBuffer cmdBuf, nuint bufferSize);
-    [Selector("temporaryStateWithCommandBuffer:textureDescriptor:")] public static Self TemporaryStateWithCommandBufferTextureDescriptor(MTLCommandBuffer cmdBuf, MTLTextureDescriptor descriptor);
-    [Selector("temporaryStateWithCommandBuffer:")] public static Self TemporaryStateWithCommandBuffer(MTLCommandBuffer cmdBuf);
-    [Selector("initWithDevice:bufferSize:")] public Self InitWithDeviceBufferSize(MTLDevice device, nuint bufferSize);
-    [Selector("initWithDevice:textureDescriptor:")] public Self InitWithDeviceTextureDescriptor(MTLDevice device, MTLTextureDescriptor descriptor);
-    [Selector("initWithResource:")] public Self InitWithResource(MTLResource? resource);
-    [Selector("initWithDevice:resourceList:")] public Self InitWithDeviceResourceList(MTLDevice device, MPSStateResourceList resourceList);
-    [Selector("temporaryStateWithCommandBuffer:resourceList:")] public static Self TemporaryStateWithCommandBufferResourceList(MTLCommandBuffer commandBuffer, MPSStateResourceList resourceList);
-    [Selector("initWithResources:")] public Self InitWithResources(NSArray? resources);
-    [Selector("resourceAtIndex:allocateMemory:")] public MTLResource? ResourceAtIndexAllocateMemory(NSUInteger index, bool allocateMemory);
-    [Selector("bufferSizeAtIndex:")] public NSUInteger BufferSizeAtIndex(NSUInteger index);
-    [Selector("textureInfoAtIndex:")] public MPSStateTextureInfo TextureInfoAtIndex(NSUInteger index);
-    [Selector("resourceTypeAtIndex:")] public MPSStateResourceType ResourceTypeAtIndex(NSUInteger index);
-    [Selector("synchronizeOnCommandBuffer:")] public void SynchronizeOnCommandBuffer(MTLCommandBuffer commandBuffer);
-    [Selector("resourceSize")] public NSUInteger ResourceSize();
-    [Selector("destinationImageDescriptorForSourceImages:sourceStates:forKernel:suggestedDescriptor:")] public MPSImageDescriptor DestinationImageDescriptorForSourceImagesSourceStatesForKernelSuggestedDescriptor(NSArray sourceImages, NSArray? sourceStates, MPSKernel kernel, MPSImageDescriptor inDescriptor);
+    [Selector("resource")]
+    public MTLResource? Resource { get; }
+    [Selector("temporaryStateWithCommandBuffer:bufferSize:")]
+    public static Self TemporaryStateWithCommandBufferBufferSize(MTLCommandBuffer cmdBuf, nuint bufferSize);
+    [Selector("temporaryStateWithCommandBuffer:textureDescriptor:")]
+    public static Self TemporaryStateWithCommandBufferTextureDescriptor(MTLCommandBuffer cmdBuf, MTLTextureDescriptor descriptor);
+    [Selector("temporaryStateWithCommandBuffer:")]
+    public static Self TemporaryStateWithCommandBuffer(MTLCommandBuffer cmdBuf);
+    [Selector("initWithDevice:bufferSize:")]
+    public Self InitWithDeviceBufferSize(MTLDevice device, nuint bufferSize);
+    [Selector("initWithDevice:textureDescriptor:")]
+    public Self InitWithDeviceTextureDescriptor(MTLDevice device, MTLTextureDescriptor descriptor);
+    [Selector("initWithResource:")]
+    public Self InitWithResource(MTLResource? resource);
+    [Selector("initWithDevice:resourceList:")]
+    public Self InitWithDeviceResourceList(MTLDevice device, MPSStateResourceList resourceList);
+    [Selector("temporaryStateWithCommandBuffer:resourceList:")]
+    public static Self TemporaryStateWithCommandBufferResourceList(MTLCommandBuffer commandBuffer, MPSStateResourceList resourceList);
+    [Selector("initWithResources:")]
+    public Self InitWithResources(NSArray? resources);
+    [Selector("resourceAtIndex:allocateMemory:")]
+    public MTLResource? ResourceAtIndexAllocateMemory(NSUInteger index, bool allocateMemory);
+    [Selector("bufferSizeAtIndex:")]
+    public NSUInteger BufferSizeAtIndex(NSUInteger index);
+    [Selector("textureInfoAtIndex:")]
+    public MPSStateTextureInfo TextureInfoAtIndex(NSUInteger index);
+    [Selector("resourceTypeAtIndex:")]
+    public MPSStateResourceType ResourceTypeAtIndex(NSUInteger index);
+    [Selector("synchronizeOnCommandBuffer:")]
+    public void SynchronizeOnCommandBuffer(MTLCommandBuffer commandBuffer);
+    [Selector("resourceSize")]
+    public NSUInteger ResourceSize();
+    [Selector("destinationImageDescriptorForSourceImages:sourceStates:forKernel:suggestedDescriptor:")]
+    public MPSImageDescriptor DestinationImageDescriptorForSourceImagesSourceStatesForKernelSuggestedDescriptor(NSArray sourceImages, NSArray? sourceStates, MPSKernel kernel, MPSImageDescriptor inDescriptor);
 }
 
 public using MPSStateBatch = NSArray;

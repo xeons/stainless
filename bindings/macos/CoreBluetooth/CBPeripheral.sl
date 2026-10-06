@@ -47,45 +47,93 @@ public enum CBCharacteristicWriteType : long
 
 public extern objc class CBPeripheral : CBPeer
 {
-    [Selector("delegate", "setDelegate:")] public CBPeripheralDelegate? Delegate { get; set; }
-    [Selector("name")] public NSString? Name { get; }
+    [Selector("delegate", "setDelegate:")]
+    public CBPeripheralDelegate? Delegate { get; set; }
+    [Selector("name")]
+    public NSString? Name { get; }
     /// Deprecated in macOS 10.13.
-    [Selector("RSSI")] public NSNumber? RSSI { get; }
-    [Selector("state")] public CBPeripheralState State { get; }
-    [Selector("services")] public NSArray? Services { get; }
-    [Selector("canSendWriteWithoutResponse")] public bool CanSendWriteWithoutResponse { get; }
-    [Selector("readRSSI")] public void ReadRSSI();
-    [Selector("discoverServices:")] public void DiscoverServices(NSArray? serviceUUIDs);
-    [Selector("discoverIncludedServices:forService:")] public void DiscoverIncludedServicesForService(NSArray? includedServiceUUIDs, CBService service);
-    [Selector("discoverCharacteristics:forService:")] public void DiscoverCharacteristicsForService(NSArray? characteristicUUIDs, CBService service);
-    [Selector("readValueForCharacteristic:")] public void ReadValueForCharacteristic(CBCharacteristic characteristic);
-    [Selector("maximumWriteValueLengthForType:")] public NSUInteger MaximumWriteValueLengthForType(CBCharacteristicWriteType type);
-    [Selector("writeValue:forCharacteristic:type:")] public void WriteValueForCharacteristicType(NSData data, CBCharacteristic characteristic, CBCharacteristicWriteType type);
-    [Selector("setNotifyValue:forCharacteristic:")] public void SetNotifyValueForCharacteristic(bool enabled, CBCharacteristic characteristic);
-    [Selector("discoverDescriptorsForCharacteristic:")] public void DiscoverDescriptorsForCharacteristic(CBCharacteristic characteristic);
-    [Selector("readValueForDescriptor:")] public void ReadValueForDescriptor(CBDescriptor descriptor);
-    [Selector("writeValue:forDescriptor:")] public void WriteValueForDescriptor(NSData data, CBDescriptor descriptor);
-    [Selector("openL2CAPChannel:")] public void OpenL2CAPChannel(CBL2CAPPSM PSM);
+    [Selector("RSSI")]
+    public NSNumber? RSSI { get; }
+    [Selector("state")]
+    public CBPeripheralState State { get; }
+    [Selector("services")]
+    public NSArray? Services { get; }
+    [Selector("canSendWriteWithoutResponse")]
+    public bool CanSendWriteWithoutResponse { get; }
+    [Selector("readRSSI")]
+    public void ReadRSSI();
+    [Selector("discoverServices:")]
+    public void DiscoverServices(NSArray? serviceUUIDs);
+    [Selector("discoverIncludedServices:forService:")]
+    public void DiscoverIncludedServicesForService(NSArray? includedServiceUUIDs, CBService service);
+    [Selector("discoverCharacteristics:forService:")]
+    public void DiscoverCharacteristicsForService(NSArray? characteristicUUIDs, CBService service);
+    [Selector("readValueForCharacteristic:")]
+    public void ReadValueForCharacteristic(CBCharacteristic characteristic);
+    [Selector("maximumWriteValueLengthForType:")]
+    public NSUInteger MaximumWriteValueLengthForType(CBCharacteristicWriteType type);
+    [Selector("writeValue:forCharacteristic:type:")]
+    public void WriteValueForCharacteristicType(NSData data, CBCharacteristic characteristic, CBCharacteristicWriteType type);
+    [Selector("setNotifyValue:forCharacteristic:")]
+    public void SetNotifyValueForCharacteristic(bool enabled, CBCharacteristic characteristic);
+    [Selector("discoverDescriptorsForCharacteristic:")]
+    public void DiscoverDescriptorsForCharacteristic(CBCharacteristic characteristic);
+    [Selector("readValueForDescriptor:")]
+    public void ReadValueForDescriptor(CBDescriptor descriptor);
+    [Selector("writeValue:forDescriptor:")]
+    public void WriteValueForDescriptor(NSData data, CBDescriptor descriptor);
+    [Selector("openL2CAPChannel:")]
+    public void OpenL2CAPChannel(CBL2CAPPSM PSM);
 }
 
 public objc interface CBPeripheralDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("peripheralDidUpdateName:")] void PeripheralDidUpdateName(CBPeripheral peripheral);
-    [Optional] [Selector("peripheral:didModifyServices:")] void PeripheralDidModifyServices(CBPeripheral peripheral, NSArray invalidatedServices);
+    [Optional]
+    [Selector("peripheralDidUpdateName:")]
+    void PeripheralDidUpdateName(CBPeripheral peripheral);
+    [Optional]
+    [Selector("peripheral:didModifyServices:")]
+    void PeripheralDidModifyServices(CBPeripheral peripheral, NSArray invalidatedServices);
     /// Deprecated in macOS 10.13.
-    [Optional] [Selector("peripheralDidUpdateRSSI:error:")] void PeripheralDidUpdateRSSIError(CBPeripheral peripheral, NSError? error);
-    [Optional] [Selector("peripheral:didReadRSSI:error:")] void PeripheralDidReadRSSIError(CBPeripheral peripheral, NSNumber RSSI, NSError? error);
-    [Optional] [Selector("peripheral:didDiscoverServices:")] void PeripheralDidDiscoverServices(CBPeripheral peripheral, NSError? error);
-    [Optional] [Selector("peripheral:didDiscoverIncludedServicesForService:error:")] void PeripheralDidDiscoverIncludedServicesForServiceError(CBPeripheral peripheral, CBService service, NSError? error);
-    [Optional] [Selector("peripheral:didDiscoverCharacteristicsForService:error:")] void PeripheralDidDiscoverCharacteristicsForServiceError(CBPeripheral peripheral, CBService service, NSError? error);
-    [Optional] [Selector("peripheral:didUpdateValueForCharacteristic:error:")] void PeripheralDidUpdateValueForCharacteristicError(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error);
-    [Optional] [Selector("peripheral:didWriteValueForCharacteristic:error:")] void PeripheralDidWriteValueForCharacteristicError(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error);
-    [Optional] [Selector("peripheral:didUpdateNotificationStateForCharacteristic:error:")] void PeripheralDidUpdateNotificationStateForCharacteristicError(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error);
-    [Optional] [Selector("peripheral:didDiscoverDescriptorsForCharacteristic:error:")] void PeripheralDidDiscoverDescriptorsForCharacteristicError(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error);
-    [Optional] [Selector("peripheral:didUpdateValueForDescriptor:error:")] void PeripheralDidUpdateValueForDescriptorError(CBPeripheral peripheral, CBDescriptor descriptor, NSError? error);
-    [Optional] [Selector("peripheral:didWriteValueForDescriptor:error:")] void PeripheralDidWriteValueForDescriptorError(CBPeripheral peripheral, CBDescriptor descriptor, NSError? error);
-    [Optional] [Selector("peripheralIsReadyToSendWriteWithoutResponse:")] void PeripheralIsReadyToSendWriteWithoutResponse(CBPeripheral peripheral);
-    [Optional] [Selector("peripheral:didOpenL2CAPChannel:error:")] void PeripheralDidOpenL2CAPChannelError(CBPeripheral peripheral, CBL2CAPChannel? channel, NSError? error);
+    [Optional]
+    [Selector("peripheralDidUpdateRSSI:error:")]
+    void PeripheralDidUpdateRSSIError(CBPeripheral peripheral, NSError? error);
+    [Optional]
+    [Selector("peripheral:didReadRSSI:error:")]
+    void PeripheralDidReadRSSIError(CBPeripheral peripheral, NSNumber RSSI, NSError? error);
+    [Optional]
+    [Selector("peripheral:didDiscoverServices:")]
+    void PeripheralDidDiscoverServices(CBPeripheral peripheral, NSError? error);
+    [Optional]
+    [Selector("peripheral:didDiscoverIncludedServicesForService:error:")]
+    void PeripheralDidDiscoverIncludedServicesForServiceError(CBPeripheral peripheral, CBService service, NSError? error);
+    [Optional]
+    [Selector("peripheral:didDiscoverCharacteristicsForService:error:")]
+    void PeripheralDidDiscoverCharacteristicsForServiceError(CBPeripheral peripheral, CBService service, NSError? error);
+    [Optional]
+    [Selector("peripheral:didUpdateValueForCharacteristic:error:")]
+    void PeripheralDidUpdateValueForCharacteristicError(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error);
+    [Optional]
+    [Selector("peripheral:didWriteValueForCharacteristic:error:")]
+    void PeripheralDidWriteValueForCharacteristicError(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error);
+    [Optional]
+    [Selector("peripheral:didUpdateNotificationStateForCharacteristic:error:")]
+    void PeripheralDidUpdateNotificationStateForCharacteristicError(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error);
+    [Optional]
+    [Selector("peripheral:didDiscoverDescriptorsForCharacteristic:error:")]
+    void PeripheralDidDiscoverDescriptorsForCharacteristicError(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error);
+    [Optional]
+    [Selector("peripheral:didUpdateValueForDescriptor:error:")]
+    void PeripheralDidUpdateValueForDescriptorError(CBPeripheral peripheral, CBDescriptor descriptor, NSError? error);
+    [Optional]
+    [Selector("peripheral:didWriteValueForDescriptor:error:")]
+    void PeripheralDidWriteValueForDescriptorError(CBPeripheral peripheral, CBDescriptor descriptor, NSError? error);
+    [Optional]
+    [Selector("peripheralIsReadyToSendWriteWithoutResponse:")]
+    void PeripheralIsReadyToSendWriteWithoutResponse(CBPeripheral peripheral);
+    [Optional]
+    [Selector("peripheral:didOpenL2CAPChannel:error:")]
+    void PeripheralDidOpenL2CAPChannelError(CBPeripheral peripheral, CBL2CAPChannel? channel, NSError? error);
 }
 
 #endif

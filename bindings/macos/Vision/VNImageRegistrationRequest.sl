@@ -34,12 +34,14 @@ public extern objc class VNImageRegistrationRequest : VNTargetedImageRequest { }
 
 public extern objc class VNTranslationalImageRegistrationRequest : VNImageRegistrationRequest
 {
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("results")]
+    public NSArray? Results { get; }
 }
 
 public extern objc class VNHomographicImageRegistrationRequest : VNImageRegistrationRequest
 {
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("results")]
+    public NSArray? Results { get; }
 }
 
 #endif

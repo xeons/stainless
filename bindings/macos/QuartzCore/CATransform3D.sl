@@ -82,8 +82,10 @@ public extern "C" CGAffineTransform CATransform3DGetAffineTransform(CATransform3
 /// CATransform3DAdditions, a category of NSValue.
 public extern objc class NSValue
 {
-    [Selector("CATransform3DValue")] public CATransform3D CATransform3DValue { get; }
-    [Selector("valueWithCATransform3D:")] public static NSValue ValueWithCATransform3D(CATransform3D t);
+    [Selector("CATransform3DValue")]
+    public CATransform3D CATransform3DValue { get; }
+    [Selector("valueWithCATransform3D:")]
+    public static NSValue ValueWithCATransform3D(CATransform3D t);
 }
 
 #endif

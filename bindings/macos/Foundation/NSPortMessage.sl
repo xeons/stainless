@@ -32,12 +32,18 @@ import Standard.ObjC;
 
 public extern objc class NSPortMessage : NSObject
 {
-    [Selector("components")] public NSArray? Components { get; }
-    [Selector("receivePort")] public NSPort? ReceivePort { get; }
-    [Selector("sendPort")] public NSPort? SendPort { get; }
-    [Selector("msgid", "setMsgid:")] public uint Msgid { get; set; }
-    [Selector("initWithSendPort:receivePort:components:")] public Self InitWithSendPortReceivePortComponents(NSPort? sendPort, NSPort? replyPort, NSArray? components);
-    [Selector("sendBeforeDate:")] public bool SendBeforeDate(NSDate date);
+    [Selector("components")]
+    public NSArray? Components { get; }
+    [Selector("receivePort")]
+    public NSPort? ReceivePort { get; }
+    [Selector("sendPort")]
+    public NSPort? SendPort { get; }
+    [Selector("msgid", "setMsgid:")]
+    public uint Msgid { get; set; }
+    [Selector("initWithSendPort:receivePort:components:")]
+    public Self InitWithSendPortReceivePortComponents(NSPort? sendPort, NSPort? replyPort, NSArray? components);
+    [Selector("sendBeforeDate:")]
+    public bool SendBeforeDate(NSDate date);
 }
 
 #endif

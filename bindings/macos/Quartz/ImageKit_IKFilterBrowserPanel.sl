@@ -33,18 +33,25 @@ import Standard.ObjC;
 
 public extern objc class IKFilterBrowserPanel : NSPanel
 {
-    [Selector("filterBrowserPanelWithStyleMask:")] public static AnyObject? FilterBrowserPanelWithStyleMask(uint styleMask);
-    [Selector("filterName")] public NSString? FilterName();
+    [Selector("filterBrowserPanelWithStyleMask:")]
+    public static AnyObject? FilterBrowserPanelWithStyleMask(uint styleMask);
+    [Selector("filterName")]
+    public NSString? FilterName();
 }
 
 /// IKFilterBrowserPanelRuntime, a category of IKFilterBrowserPanel.
 public extern objc class IKFilterBrowserPanel
 {
-    [Selector("beginWithOptions:modelessDelegate:didEndSelector:contextInfo:")] public void BeginWithOptionsModelessDelegateDidEndSelectorContextInfo(NSDictionary? inOptions, AnyObject? modelessDelegate, Selector didEndSelector, void* contextInfo);
-    [Selector("beginSheetWithOptions:modalForWindow:modalDelegate:didEndSelector:contextInfo:")] public void BeginSheetWithOptionsModalForWindowModalDelegateDidEndSelectorContextInfo(NSDictionary? inOptions, NSWindow? docWindow, AnyObject? modalDelegate, Selector didEndSelector, void* contextInfo);
-    [Selector("runModalWithOptions:")] public int RunModalWithOptions(NSDictionary? inOptions);
-    [Selector("filterBrowserViewWithOptions:")] public IKFilterBrowserView? FilterBrowserViewWithOptions(NSDictionary? inOptions);
-    [Selector("finish:")] public void Finish(AnyObject? sender);
+    [Selector("beginWithOptions:modelessDelegate:didEndSelector:contextInfo:")]
+    public void BeginWithOptionsModelessDelegateDidEndSelectorContextInfo(NSDictionary? inOptions, AnyObject? modelessDelegate, Selector didEndSelector, void* contextInfo);
+    [Selector("beginSheetWithOptions:modalForWindow:modalDelegate:didEndSelector:contextInfo:")]
+    public void BeginSheetWithOptionsModalForWindowModalDelegateDidEndSelectorContextInfo(NSDictionary? inOptions, NSWindow? docWindow, AnyObject? modalDelegate, Selector didEndSelector, void* contextInfo);
+    [Selector("runModalWithOptions:")]
+    public int RunModalWithOptions(NSDictionary? inOptions);
+    [Selector("filterBrowserViewWithOptions:")]
+    public IKFilterBrowserView? FilterBrowserViewWithOptions(NSDictionary? inOptions);
+    [Selector("finish:")]
+    public void Finish(AnyObject? sender);
 }
 
 public extern "C" NSString? IKFilterBrowserFilterSelectedNotification;

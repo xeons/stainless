@@ -33,29 +33,46 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLSelectElement : DOMHTMLElement
 {
-    [Selector("autofocus", "setAutofocus:")] public bool Autofocus { get; set; }
-    [Selector("disabled", "setDisabled:")] public bool Disabled { get; set; }
-    [Selector("form")] public DOMHTMLFormElement? Form { get; }
-    [Selector("multiple", "setMultiple:")] public bool Multiple { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("size", "setSize:")] public int Size { get; set; }
-    [Selector("type")] public NSString? Type { get; }
-    [Selector("options")] public DOMHTMLOptionsCollection? Options { get; }
-    [Selector("length")] public int Length { get; }
-    [Selector("selectedIndex", "setSelectedIndex:")] public int SelectedIndex { get; set; }
-    [Selector("value", "setValue:")] public NSString? Value { get; set; }
-    [Selector("willValidate")] public bool WillValidate { get; }
-    [Selector("item:")] public DOMNode? Item(uint index);
-    [Selector("namedItem:")] public DOMNode? NamedItem(NSString? name);
-    [Selector("add:before:")] public void AddBefore(DOMHTMLElement? element, DOMHTMLElement? before);
-    [Selector("remove:")] public void Remove(int index);
+    [Selector("autofocus", "setAutofocus:")]
+    public bool Autofocus { get; set; }
+    [Selector("disabled", "setDisabled:")]
+    public bool Disabled { get; set; }
+    [Selector("form")]
+    public DOMHTMLFormElement? Form { get; }
+    [Selector("multiple", "setMultiple:")]
+    public bool Multiple { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("size", "setSize:")]
+    public int Size { get; set; }
+    [Selector("type")]
+    public NSString? Type { get; }
+    [Selector("options")]
+    public DOMHTMLOptionsCollection? Options { get; }
+    [Selector("length")]
+    public int Length { get; }
+    [Selector("selectedIndex", "setSelectedIndex:")]
+    public int SelectedIndex { get; set; }
+    [Selector("value", "setValue:")]
+    public NSString? Value { get; set; }
+    [Selector("willValidate")]
+    public bool WillValidate { get; }
+    [Selector("item:")]
+    public DOMNode? Item(uint index);
+    [Selector("namedItem:")]
+    public DOMNode? NamedItem(NSString? name);
+    [Selector("add:before:")]
+    public void AddBefore(DOMHTMLElement? element, DOMHTMLElement? before);
+    [Selector("remove:")]
+    public void Remove(int index);
 }
 
 /// DOMHTMLSelectElementDeprecated, a category of DOMHTMLSelectElement.
 public extern objc class DOMHTMLSelectElement
 {
     /// Deprecated in macOS 10.5.
-    [Selector("add::")] public void Add(DOMHTMLElement? element, DOMHTMLElement? before);
+    [Selector("add::")]
+    public void Add(DOMHTMLElement? element, DOMHTMLElement? before);
 }
 
 #endif

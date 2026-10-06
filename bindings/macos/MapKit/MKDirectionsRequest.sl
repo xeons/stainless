@@ -39,26 +39,36 @@ public enum MKDirectionsRoutePreference : long
 
 public extern objc class MKDirectionsRequest : NSObject
 {
-    [Selector("source", "setSource:")] public MKMapItem? Source { get; set; }
-    [Selector("destination", "setDestination:")] public MKMapItem? Destination { get; set; }
+    [Selector("source", "setSource:")]
+    public MKMapItem? Source { get; set; }
+    [Selector("destination", "setDestination:")]
+    public MKMapItem? Destination { get; set; }
 }
 
 /// MKRequestOptions, a category of MKDirectionsRequest.
 public extern objc class MKDirectionsRequest
 {
-    [Selector("transportType", "setTransportType:")] public MKDirectionsTransportType TransportType { get; set; }
-    [Selector("requestsAlternateRoutes", "setRequestsAlternateRoutes:")] public bool RequestsAlternateRoutes { get; set; }
-    [Selector("departureDate", "setDepartureDate:")] public NSDate? DepartureDate { get; set; }
-    [Selector("arrivalDate", "setArrivalDate:")] public NSDate? ArrivalDate { get; set; }
-    [Selector("tollPreference", "setTollPreference:")] public MKDirectionsRoutePreference TollPreference { get; set; }
-    [Selector("highwayPreference", "setHighwayPreference:")] public MKDirectionsRoutePreference HighwayPreference { get; set; }
+    [Selector("transportType", "setTransportType:")]
+    public MKDirectionsTransportType TransportType { get; set; }
+    [Selector("requestsAlternateRoutes", "setRequestsAlternateRoutes:")]
+    public bool RequestsAlternateRoutes { get; set; }
+    [Selector("departureDate", "setDepartureDate:")]
+    public NSDate? DepartureDate { get; set; }
+    [Selector("arrivalDate", "setArrivalDate:")]
+    public NSDate? ArrivalDate { get; set; }
+    [Selector("tollPreference", "setTollPreference:")]
+    public MKDirectionsRoutePreference TollPreference { get; set; }
+    [Selector("highwayPreference", "setHighwayPreference:")]
+    public MKDirectionsRoutePreference HighwayPreference { get; set; }
 }
 
 /// MKDirectionsURL, a category of MKDirectionsRequest.
 public extern objc class MKDirectionsRequest
 {
-    [Selector("initWithContentsOfURL:")] public Self InitWithContentsOfURL(NSURL url);
-    [Selector("isDirectionsRequestURL:")] public static bool IsDirectionsRequestURL(NSURL url);
+    [Selector("initWithContentsOfURL:")]
+    public Self InitWithContentsOfURL(NSURL url);
+    [Selector("isDirectionsRequestURL:")]
+    public static bool IsDirectionsRequestURL(NSURL url);
 }
 
 #endif

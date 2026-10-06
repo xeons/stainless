@@ -34,8 +34,10 @@ import Standard.ObjC;
 
 public extern objc class CIFeature : NSObject
 {
-    [Selector("type")] public NSString Type { get; }
-    [Selector("bounds")] public CGRect Bounds { get; }
+    [Selector("type")]
+    public NSString Type { get; }
+    [Selector("bounds")]
+    public CGRect Bounds { get; }
 }
 
 public extern "C" NSString CIFeatureTypeFace;
@@ -48,52 +50,86 @@ public extern "C" NSString CIFeatureTypeText;
 
 public extern objc class CIFaceFeature : CIFeature
 {
-    [Selector("bounds")] public CGRect Bounds { get; }
-    [Selector("hasLeftEyePosition")] public bool HasLeftEyePosition { get; }
-    [Selector("leftEyePosition")] public CGPoint LeftEyePosition { get; }
-    [Selector("hasRightEyePosition")] public bool HasRightEyePosition { get; }
-    [Selector("rightEyePosition")] public CGPoint RightEyePosition { get; }
-    [Selector("hasMouthPosition")] public bool HasMouthPosition { get; }
-    [Selector("mouthPosition")] public CGPoint MouthPosition { get; }
-    [Selector("hasTrackingID")] public bool HasTrackingID { get; }
-    [Selector("trackingID")] public int TrackingID { get; }
-    [Selector("hasTrackingFrameCount")] public bool HasTrackingFrameCount { get; }
-    [Selector("trackingFrameCount")] public int TrackingFrameCount { get; }
-    [Selector("hasFaceAngle")] public bool HasFaceAngle { get; }
-    [Selector("faceAngle")] public float FaceAngle { get; }
-    [Selector("hasSmile")] public bool HasSmile { get; }
-    [Selector("leftEyeClosed")] public bool LeftEyeClosed { get; }
-    [Selector("rightEyeClosed")] public bool RightEyeClosed { get; }
+    [Selector("bounds")]
+    public CGRect Bounds { get; }
+    [Selector("hasLeftEyePosition")]
+    public bool HasLeftEyePosition { get; }
+    [Selector("leftEyePosition")]
+    public CGPoint LeftEyePosition { get; }
+    [Selector("hasRightEyePosition")]
+    public bool HasRightEyePosition { get; }
+    [Selector("rightEyePosition")]
+    public CGPoint RightEyePosition { get; }
+    [Selector("hasMouthPosition")]
+    public bool HasMouthPosition { get; }
+    [Selector("mouthPosition")]
+    public CGPoint MouthPosition { get; }
+    [Selector("hasTrackingID")]
+    public bool HasTrackingID { get; }
+    [Selector("trackingID")]
+    public int TrackingID { get; }
+    [Selector("hasTrackingFrameCount")]
+    public bool HasTrackingFrameCount { get; }
+    [Selector("trackingFrameCount")]
+    public int TrackingFrameCount { get; }
+    [Selector("hasFaceAngle")]
+    public bool HasFaceAngle { get; }
+    [Selector("faceAngle")]
+    public float FaceAngle { get; }
+    [Selector("hasSmile")]
+    public bool HasSmile { get; }
+    [Selector("leftEyeClosed")]
+    public bool LeftEyeClosed { get; }
+    [Selector("rightEyeClosed")]
+    public bool RightEyeClosed { get; }
 }
 
 public extern objc class CIRectangleFeature : CIFeature
 {
-    [Selector("bounds")] public CGRect Bounds { get; }
-    [Selector("topLeft")] public CGPoint TopLeft { get; }
-    [Selector("topRight")] public CGPoint TopRight { get; }
-    [Selector("bottomLeft")] public CGPoint BottomLeft { get; }
-    [Selector("bottomRight")] public CGPoint BottomRight { get; }
+    [Selector("bounds")]
+    public CGRect Bounds { get; }
+    [Selector("topLeft")]
+    public CGPoint TopLeft { get; }
+    [Selector("topRight")]
+    public CGPoint TopRight { get; }
+    [Selector("bottomLeft")]
+    public CGPoint BottomLeft { get; }
+    [Selector("bottomRight")]
+    public CGPoint BottomRight { get; }
 }
 
 public extern objc class CIQRCodeFeature : CIFeature, NSSecureCoding, NSCopying
 {
-    [Selector("bounds")] public CGRect Bounds { get; }
-    [Selector("topLeft")] public CGPoint TopLeft { get; }
-    [Selector("topRight")] public CGPoint TopRight { get; }
-    [Selector("bottomLeft")] public CGPoint BottomLeft { get; }
-    [Selector("bottomRight")] public CGPoint BottomRight { get; }
-    [Selector("messageString")] public NSString? MessageString { get; }
-    [Selector("symbolDescriptor")] public CIQRCodeDescriptor? SymbolDescriptor { get; }
+    [Selector("bounds")]
+    public CGRect Bounds { get; }
+    [Selector("topLeft")]
+    public CGPoint TopLeft { get; }
+    [Selector("topRight")]
+    public CGPoint TopRight { get; }
+    [Selector("bottomLeft")]
+    public CGPoint BottomLeft { get; }
+    [Selector("bottomRight")]
+    public CGPoint BottomRight { get; }
+    [Selector("messageString")]
+    public NSString? MessageString { get; }
+    [Selector("symbolDescriptor")]
+    public CIQRCodeDescriptor? SymbolDescriptor { get; }
 }
 
 public extern objc class CITextFeature : CIFeature
 {
-    [Selector("bounds")] public CGRect Bounds { get; }
-    [Selector("topLeft")] public CGPoint TopLeft { get; }
-    [Selector("topRight")] public CGPoint TopRight { get; }
-    [Selector("bottomLeft")] public CGPoint BottomLeft { get; }
-    [Selector("bottomRight")] public CGPoint BottomRight { get; }
-    [Selector("subFeatures")] public NSArray? SubFeatures { get; }
+    [Selector("bounds")]
+    public CGRect Bounds { get; }
+    [Selector("topLeft")]
+    public CGPoint TopLeft { get; }
+    [Selector("topRight")]
+    public CGPoint TopRight { get; }
+    [Selector("bottomLeft")]
+    public CGPoint BottomLeft { get; }
+    [Selector("bottomRight")]
+    public CGPoint BottomRight { get; }
+    [Selector("subFeatures")]
+    public NSArray? SubFeatures { get; }
 }
 
 #endif

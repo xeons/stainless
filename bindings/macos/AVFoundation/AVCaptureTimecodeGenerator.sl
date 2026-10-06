@@ -56,9 +56,12 @@ public enum AVCaptureTimecodeGeneratorSynchronizationStatus : long
 /// macOS 26.0 and later.
 public extern objc class AVCaptureTimecodeSource : NSObject, NSCopying
 {
-    [Selector("displayName")] public NSString DisplayName { get; }
-    [Selector("type")] public AVCaptureTimecodeSourceType Type { get; }
-    [Selector("uuid")] public NSUUID Uuid { get; }
+    [Selector("displayName")]
+    public NSString DisplayName { get; }
+    [Selector("type")]
+    public AVCaptureTimecodeSourceType Type { get; }
+    [Selector("uuid")]
+    public NSUUID Uuid { get; }
 }
 
 /// macOS 26.0 and later.
@@ -74,10 +77,12 @@ public struct AVCaptureTimecode
 }
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CMSampleBufferRef? AVCaptureTimecodeCreateMetadataSampleBufferAssociatedWithPresentationTimeStamp(AVCaptureTimecode timecode, CMTime presentationTimeStamp);
+[ReturnsRetained]
+public extern "C" CMSampleBufferRef? AVCaptureTimecodeCreateMetadataSampleBufferAssociatedWithPresentationTimeStamp(AVCaptureTimecode timecode, CMTime presentationTimeStamp);
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CMSampleBufferRef? AVCaptureTimecodeCreateMetadataSampleBufferForDuration(AVCaptureTimecode timecode, CMTime duration);
+[ReturnsRetained]
+public extern "C" CMSampleBufferRef? AVCaptureTimecodeCreateMetadataSampleBufferForDuration(AVCaptureTimecode timecode, CMTime duration);
 
 /// macOS 26.0 and later.
 public extern "C" AVCaptureTimecode AVCaptureTimecodeAdvancedByFrames(AVCaptureTimecode timecode, long framesToAdd);
@@ -85,26 +90,41 @@ public extern "C" AVCaptureTimecode AVCaptureTimecodeAdvancedByFrames(AVCaptureT
 /// macOS 26.0 and later.
 public objc interface AVCaptureTimecodeGeneratorDelegate : NSObjectProtocol
 {
-    [Selector("timecodeGenerator:didReceiveUpdate:fromSource:")] void TimecodeGeneratorDidReceiveUpdateFromSource(AVCaptureTimecodeGenerator generator, AVCaptureTimecode timecode, AVCaptureTimecodeSource source);
-    [Selector("timecodeGenerator:transitionedToSynchronizationStatus:forSource:")] void TimecodeGeneratorTransitionedToSynchronizationStatusForSource(AVCaptureTimecodeGenerator generator, AVCaptureTimecodeGeneratorSynchronizationStatus synchronizationStatus, AVCaptureTimecodeSource source);
-    [Selector("timecodeGenerator:didUpdateAvailableSources:")] void TimecodeGeneratorDidUpdateAvailableSources(AVCaptureTimecodeGenerator generator, NSArray availableSources);
+    [Selector("timecodeGenerator:didReceiveUpdate:fromSource:")]
+    void TimecodeGeneratorDidReceiveUpdateFromSource(AVCaptureTimecodeGenerator generator, AVCaptureTimecode timecode, AVCaptureTimecodeSource source);
+    [Selector("timecodeGenerator:transitionedToSynchronizationStatus:forSource:")]
+    void TimecodeGeneratorTransitionedToSynchronizationStatusForSource(AVCaptureTimecodeGenerator generator, AVCaptureTimecodeGeneratorSynchronizationStatus synchronizationStatus, AVCaptureTimecodeSource source);
+    [Selector("timecodeGenerator:didUpdateAvailableSources:")]
+    void TimecodeGeneratorDidUpdateAvailableSources(AVCaptureTimecodeGenerator generator, NSArray availableSources);
 }
 
 /// macOS 26.0 and later.
 public extern objc class AVCaptureTimecodeGenerator : NSObject
 {
-    [Selector("availableSources")] public NSArray AvailableSources { get; }
-    [Selector("currentSource")] public AVCaptureTimecodeSource CurrentSource { get; }
-    [Selector("delegate")] public AVCaptureTimecodeGeneratorDelegate? Delegate { get; }
-    [Selector("delegateCallbackQueue")] public dispatch_queue_t? DelegateCallbackQueue { get; }
-    [Selector("synchronizationTimeout", "setSynchronizationTimeout:")] public NSTimeInterval SynchronizationTimeout { get; set; }
-    [Selector("timecodeAlignmentOffset", "setTimecodeAlignmentOffset:")] public NSTimeInterval TimecodeAlignmentOffset { get; set; }
-    [Selector("timecodeFrameDuration", "setTimecodeFrameDuration:")] public CMTime TimecodeFrameDuration { get; set; }
-    [Selector("frameCountSource")] public static AVCaptureTimecodeSource FrameCountSource { get; }
-    [Selector("realTimeClockSource")] public static AVCaptureTimecodeSource RealTimeClockSource { get; }
-    [Selector("setDelegate:queue:")] public void SetDelegateQueue(AVCaptureTimecodeGeneratorDelegate? @delegate, dispatch_queue_t? callbackQueue);
-    [Selector("startSynchronizationWithTimecodeSource:")] public void StartSynchronizationWithTimecodeSource(AVCaptureTimecodeSource source);
-    [Selector("generateInitialTimecode")] public AVCaptureTimecode GenerateInitialTimecode();
+    [Selector("availableSources")]
+    public NSArray AvailableSources { get; }
+    [Selector("currentSource")]
+    public AVCaptureTimecodeSource CurrentSource { get; }
+    [Selector("delegate")]
+    public AVCaptureTimecodeGeneratorDelegate? Delegate { get; }
+    [Selector("delegateCallbackQueue")]
+    public dispatch_queue_t? DelegateCallbackQueue { get; }
+    [Selector("synchronizationTimeout", "setSynchronizationTimeout:")]
+    public NSTimeInterval SynchronizationTimeout { get; set; }
+    [Selector("timecodeAlignmentOffset", "setTimecodeAlignmentOffset:")]
+    public NSTimeInterval TimecodeAlignmentOffset { get; set; }
+    [Selector("timecodeFrameDuration", "setTimecodeFrameDuration:")]
+    public CMTime TimecodeFrameDuration { get; set; }
+    [Selector("frameCountSource")]
+    public static AVCaptureTimecodeSource FrameCountSource { get; }
+    [Selector("realTimeClockSource")]
+    public static AVCaptureTimecodeSource RealTimeClockSource { get; }
+    [Selector("setDelegate:queue:")]
+    public void SetDelegateQueue(AVCaptureTimecodeGeneratorDelegate? @delegate, dispatch_queue_t? callbackQueue);
+    [Selector("startSynchronizationWithTimecodeSource:")]
+    public void StartSynchronizationWithTimecodeSource(AVCaptureTimecodeSource source);
+    [Selector("generateInitialTimecode")]
+    public AVCaptureTimecode GenerateInitialTimecode();
 }
 
 #endif

@@ -47,38 +47,66 @@ public extern "C" VNImageOption VNImageOptionCIContext;
 
 public extern objc class VNImageRequestHandler : NSObject
 {
-    [Selector("initWithCVPixelBuffer:options:")] public Self InitWithCVPixelBufferOptions(CVPixelBufferRef pixelBuffer, NSDictionary options);
-    [Selector("initWithCVPixelBuffer:orientation:options:")] public Self InitWithCVPixelBufferOrientationOptions(CVPixelBufferRef pixelBuffer, CGImagePropertyOrientation orientation, NSDictionary options);
-    [Selector("initWithCVPixelBuffer:depthData:orientation:options:")] public Self InitWithCVPixelBufferDepthDataOrientationOptions(CVPixelBufferRef pixelBuffer, AVDepthData depthData, CGImagePropertyOrientation orientation, NSDictionary options);
-    [Selector("initWithCGImage:options:")] public Self InitWithCGImageOptions(CGImageRef image, NSDictionary options);
-    [Selector("initWithCGImage:orientation:options:")] public Self InitWithCGImageOrientationOptions(CGImageRef image, CGImagePropertyOrientation orientation, NSDictionary options);
-    [Selector("initWithCIImage:options:")] public Self InitWithCIImageOptions(CIImage image, NSDictionary options);
-    [Selector("initWithCIImage:orientation:options:")] public Self InitWithCIImageOrientationOptions(CIImage image, CGImagePropertyOrientation orientation, NSDictionary options);
-    [Selector("initWithURL:options:")] public Self InitWithURLOptions(NSURL imageURL, NSDictionary options);
-    [Selector("initWithURL:orientation:options:")] public Self InitWithURLOrientationOptions(NSURL imageURL, CGImagePropertyOrientation orientation, NSDictionary options);
-    [Selector("initWithData:options:")] public Self InitWithDataOptions(NSData imageData, NSDictionary options);
-    [Selector("initWithData:orientation:options:")] public Self InitWithDataOrientationOptions(NSData imageData, CGImagePropertyOrientation orientation, NSDictionary options);
-    [Selector("initWithCMSampleBuffer:options:")] public Self InitWithCMSampleBufferOptions(CMSampleBufferRef sampleBuffer, NSDictionary options);
-    [Selector("initWithCMSampleBuffer:orientation:options:")] public Self InitWithCMSampleBufferOrientationOptions(CMSampleBufferRef sampleBuffer, CGImagePropertyOrientation orientation, NSDictionary options);
-    [Selector("initWithCMSampleBuffer:depthData:orientation:options:")] public Self InitWithCMSampleBufferDepthDataOrientationOptions(CMSampleBufferRef sampleBuffer, AVDepthData depthData, CGImagePropertyOrientation orientation, NSDictionary options);
-    [Selector("performRequests:error:")] public bool PerformRequestsError(NSArray requests, out NSError? error);
+    [Selector("initWithCVPixelBuffer:options:")]
+    public Self InitWithCVPixelBufferOptions(CVPixelBufferRef pixelBuffer, NSDictionary options);
+    [Selector("initWithCVPixelBuffer:orientation:options:")]
+    public Self InitWithCVPixelBufferOrientationOptions(CVPixelBufferRef pixelBuffer, CGImagePropertyOrientation orientation, NSDictionary options);
+    [Selector("initWithCVPixelBuffer:depthData:orientation:options:")]
+    public Self InitWithCVPixelBufferDepthDataOrientationOptions(CVPixelBufferRef pixelBuffer, AVDepthData depthData, CGImagePropertyOrientation orientation, NSDictionary options);
+    [Selector("initWithCGImage:options:")]
+    public Self InitWithCGImageOptions(CGImageRef image, NSDictionary options);
+    [Selector("initWithCGImage:orientation:options:")]
+    public Self InitWithCGImageOrientationOptions(CGImageRef image, CGImagePropertyOrientation orientation, NSDictionary options);
+    [Selector("initWithCIImage:options:")]
+    public Self InitWithCIImageOptions(CIImage image, NSDictionary options);
+    [Selector("initWithCIImage:orientation:options:")]
+    public Self InitWithCIImageOrientationOptions(CIImage image, CGImagePropertyOrientation orientation, NSDictionary options);
+    [Selector("initWithURL:options:")]
+    public Self InitWithURLOptions(NSURL imageURL, NSDictionary options);
+    [Selector("initWithURL:orientation:options:")]
+    public Self InitWithURLOrientationOptions(NSURL imageURL, CGImagePropertyOrientation orientation, NSDictionary options);
+    [Selector("initWithData:options:")]
+    public Self InitWithDataOptions(NSData imageData, NSDictionary options);
+    [Selector("initWithData:orientation:options:")]
+    public Self InitWithDataOrientationOptions(NSData imageData, CGImagePropertyOrientation orientation, NSDictionary options);
+    [Selector("initWithCMSampleBuffer:options:")]
+    public Self InitWithCMSampleBufferOptions(CMSampleBufferRef sampleBuffer, NSDictionary options);
+    [Selector("initWithCMSampleBuffer:orientation:options:")]
+    public Self InitWithCMSampleBufferOrientationOptions(CMSampleBufferRef sampleBuffer, CGImagePropertyOrientation orientation, NSDictionary options);
+    [Selector("initWithCMSampleBuffer:depthData:orientation:options:")]
+    public Self InitWithCMSampleBufferDepthDataOrientationOptions(CMSampleBufferRef sampleBuffer, AVDepthData depthData, CGImagePropertyOrientation orientation, NSDictionary options);
+    [Selector("performRequests:error:")]
+    public bool PerformRequestsError(NSArray requests, out NSError? error);
 }
 
 public extern objc class VNSequenceRequestHandler : NSObject
 {
-    [Selector("init")] public Self Init();
-    [Selector("performRequests:onCVPixelBuffer:error:")] public bool PerformRequestsOnCVPixelBufferError(NSArray requests, CVPixelBufferRef pixelBuffer, out NSError? error);
-    [Selector("performRequests:onCVPixelBuffer:orientation:error:")] public bool PerformRequestsOnCVPixelBufferOrientationError(NSArray requests, CVPixelBufferRef pixelBuffer, CGImagePropertyOrientation orientation, out NSError? error);
-    [Selector("performRequests:onCGImage:error:")] public bool PerformRequestsOnCGImageError(NSArray requests, CGImageRef image, out NSError? error);
-    [Selector("performRequests:onCGImage:orientation:error:")] public bool PerformRequestsOnCGImageOrientationError(NSArray requests, CGImageRef image, CGImagePropertyOrientation orientation, out NSError? error);
-    [Selector("performRequests:onCIImage:error:")] public bool PerformRequestsOnCIImageError(NSArray requests, CIImage image, out NSError? error);
-    [Selector("performRequests:onCIImage:orientation:error:")] public bool PerformRequestsOnCIImageOrientationError(NSArray requests, CIImage image, CGImagePropertyOrientation orientation, out NSError? error);
-    [Selector("performRequests:onImageURL:error:")] public bool PerformRequestsOnImageURLError(NSArray requests, NSURL imageURL, out NSError? error);
-    [Selector("performRequests:onImageURL:orientation:error:")] public bool PerformRequestsOnImageURLOrientationError(NSArray requests, NSURL imageURL, CGImagePropertyOrientation orientation, out NSError? error);
-    [Selector("performRequests:onImageData:error:")] public bool PerformRequestsOnImageDataError(NSArray requests, NSData imageData, out NSError? error);
-    [Selector("performRequests:onImageData:orientation:error:")] public bool PerformRequestsOnImageDataOrientationError(NSArray requests, NSData imageData, CGImagePropertyOrientation orientation, out NSError? error);
-    [Selector("performRequests:onCMSampleBuffer:error:")] public bool PerformRequestsOnCMSampleBufferError(NSArray requests, CMSampleBufferRef sampleBuffer, out NSError? error);
-    [Selector("performRequests:onCMSampleBuffer:orientation:error:")] public bool PerformRequestsOnCMSampleBufferOrientationError(NSArray requests, CMSampleBufferRef sampleBuffer, CGImagePropertyOrientation orientation, out NSError? error);
+    [Selector("init")]
+    public Self Init();
+    [Selector("performRequests:onCVPixelBuffer:error:")]
+    public bool PerformRequestsOnCVPixelBufferError(NSArray requests, CVPixelBufferRef pixelBuffer, out NSError? error);
+    [Selector("performRequests:onCVPixelBuffer:orientation:error:")]
+    public bool PerformRequestsOnCVPixelBufferOrientationError(NSArray requests, CVPixelBufferRef pixelBuffer, CGImagePropertyOrientation orientation, out NSError? error);
+    [Selector("performRequests:onCGImage:error:")]
+    public bool PerformRequestsOnCGImageError(NSArray requests, CGImageRef image, out NSError? error);
+    [Selector("performRequests:onCGImage:orientation:error:")]
+    public bool PerformRequestsOnCGImageOrientationError(NSArray requests, CGImageRef image, CGImagePropertyOrientation orientation, out NSError? error);
+    [Selector("performRequests:onCIImage:error:")]
+    public bool PerformRequestsOnCIImageError(NSArray requests, CIImage image, out NSError? error);
+    [Selector("performRequests:onCIImage:orientation:error:")]
+    public bool PerformRequestsOnCIImageOrientationError(NSArray requests, CIImage image, CGImagePropertyOrientation orientation, out NSError? error);
+    [Selector("performRequests:onImageURL:error:")]
+    public bool PerformRequestsOnImageURLError(NSArray requests, NSURL imageURL, out NSError? error);
+    [Selector("performRequests:onImageURL:orientation:error:")]
+    public bool PerformRequestsOnImageURLOrientationError(NSArray requests, NSURL imageURL, CGImagePropertyOrientation orientation, out NSError? error);
+    [Selector("performRequests:onImageData:error:")]
+    public bool PerformRequestsOnImageDataError(NSArray requests, NSData imageData, out NSError? error);
+    [Selector("performRequests:onImageData:orientation:error:")]
+    public bool PerformRequestsOnImageDataOrientationError(NSArray requests, NSData imageData, CGImagePropertyOrientation orientation, out NSError? error);
+    [Selector("performRequests:onCMSampleBuffer:error:")]
+    public bool PerformRequestsOnCMSampleBufferError(NSArray requests, CMSampleBufferRef sampleBuffer, out NSError? error);
+    [Selector("performRequests:onCMSampleBuffer:orientation:error:")]
+    public bool PerformRequestsOnCMSampleBufferOrientationError(NSArray requests, CMSampleBufferRef sampleBuffer, CGImagePropertyOrientation orientation, out NSError? error);
 }
 
 #endif

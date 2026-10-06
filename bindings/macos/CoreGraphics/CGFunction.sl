@@ -48,6 +48,7 @@ public struct CGFunctionCallbacks
 
 public extern "C" CFTypeID CGFunctionGetTypeID();
 
-[ReturnsRetained] public extern "C" CGFunctionRef? CGFunctionCreate(void* info, nuint domainDimension, CGFloat* domain, nuint rangeDimension, CGFloat* range, CGFunctionCallbacks* callbacks);
+[ReturnsRetained]
+public extern "C" CGFunctionRef? CGFunctionCreate(void* info, nuint domainDimension, CGFloat* domain, nuint rangeDimension, CGFloat* range, CGFunctionCallbacks* callbacks);
 
 #endif

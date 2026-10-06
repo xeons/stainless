@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class MXGPUMetric : MXMetric
 {
-    [Selector("cumulativeGPUTime")] public NSMeasurement CumulativeGPUTime { get; }
+    [Selector("cumulativeGPUTime")]
+    public NSMeasurement CumulativeGPUTime { get; }
 }
 
 #endif

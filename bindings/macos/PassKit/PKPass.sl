@@ -32,26 +32,44 @@ import Standard.ObjC;
 
 public extern objc class PKPass : PKObject
 {
-    [Selector("passType")] public PKPassType PassType { get; }
+    [Selector("passType")]
+    public PKPassType PassType { get; }
     /// Deprecated in macOS 100000.
-    [Selector("paymentPass")] public PKPaymentPass? PaymentPass { get; }
-    [Selector("secureElementPass")] public PKSecureElementPass? SecureElementPass { get; }
-    [Selector("serialNumber")] public NSString SerialNumber { get; }
-    [Selector("passTypeIdentifier")] public NSString PassTypeIdentifier { get; }
-    [Selector("webServiceURL")] public NSURL? WebServiceURL { get; }
-    [Selector("authenticationToken")] public NSString? AuthenticationToken { get; }
-    [Selector("localizedName")] public NSString LocalizedName { get; }
-    [Selector("localizedDescription")] public NSString LocalizedDescription { get; }
-    [Selector("organizationName")] public NSString OrganizationName { get; }
+    [Selector("paymentPass")]
+    public PKPaymentPass? PaymentPass { get; }
+    [Selector("secureElementPass")]
+    public PKSecureElementPass? SecureElementPass { get; }
+    [Selector("serialNumber")]
+    public NSString SerialNumber { get; }
+    [Selector("passTypeIdentifier")]
+    public NSString PassTypeIdentifier { get; }
+    [Selector("webServiceURL")]
+    public NSURL? WebServiceURL { get; }
+    [Selector("authenticationToken")]
+    public NSString? AuthenticationToken { get; }
+    [Selector("localizedName")]
+    public NSString LocalizedName { get; }
+    [Selector("localizedDescription")]
+    public NSString LocalizedDescription { get; }
+    [Selector("organizationName")]
+    public NSString OrganizationName { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("relevantDate")] public NSDate? RelevantDate { get; }
-    [Selector("relevantDates")] public NSArray RelevantDates { get; }
-    [Selector("userInfo")] public NSDictionary? UserInfo { get; }
-    [Selector("passURL")] public NSURL? PassURL { get; }
-    [Selector("isRemotePass")] public bool RemotePass { get; }
-    [Selector("deviceName")] public NSString DeviceName { get; }
-    [Selector("initWithData:error:")] public Self? InitWithDataError(NSData data, out NSError? error);
-    [Selector("localizedValueForFieldKey:")] public AnyObject? LocalizedValueForFieldKey(NSString key);
+    [Selector("relevantDate")]
+    public NSDate? RelevantDate { get; }
+    [Selector("relevantDates")]
+    public NSArray RelevantDates { get; }
+    [Selector("userInfo")]
+    public NSDictionary? UserInfo { get; }
+    [Selector("passURL")]
+    public NSURL? PassURL { get; }
+    [Selector("isRemotePass")]
+    public bool RemotePass { get; }
+    [Selector("deviceName")]
+    public NSString DeviceName { get; }
+    [Selector("initWithData:error:")]
+    public Self? InitWithDataError(NSData data, out NSError? error);
+    [Selector("localizedValueForFieldKey:")]
+    public AnyObject? LocalizedValueForFieldKey(NSString key);
 }
 
 #endif

@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class CLSActivityItem : CLSObject
 {
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("identifier")] public NSString Identifier { get; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
 }
 
 #endif

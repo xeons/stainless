@@ -33,22 +33,37 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLAreaElement : DOMHTMLElement
 {
-    [Selector("alt", "setAlt:")] public NSString? Alt { get; set; }
-    [Selector("coords", "setCoords:")] public NSString? Coords { get; set; }
-    [Selector("noHref", "setNoHref:")] public bool NoHref { get; set; }
-    [Selector("shape", "setShape:")] public NSString? Shape { get; set; }
-    [Selector("target", "setTarget:")] public NSString? Target { get; set; }
+    [Selector("alt", "setAlt:")]
+    public NSString? Alt { get; set; }
+    [Selector("coords", "setCoords:")]
+    public NSString? Coords { get; set; }
+    [Selector("noHref", "setNoHref:")]
+    public bool NoHref { get; set; }
+    [Selector("shape", "setShape:")]
+    public NSString? Shape { get; set; }
+    [Selector("target", "setTarget:")]
+    public NSString? Target { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("accessKey", "setAccessKey:")] public NSString? AccessKey { get; set; }
-    [Selector("absoluteLinkURL")] public NSURL? AbsoluteLinkURL { get; }
-    [Selector("href", "setHref:")] public NSString? Href { get; set; }
-    [Selector("protocol")] public NSString? Protocol { get; }
-    [Selector("host")] public NSString? Host { get; }
-    [Selector("hostname")] public NSString? Hostname { get; }
-    [Selector("port")] public NSString? Port { get; }
-    [Selector("pathname")] public NSString? Pathname { get; }
-    [Selector("search")] public NSString? Search { get; }
-    [Selector("hashName")] public NSString? HashName { get; }
+    [Selector("accessKey", "setAccessKey:")]
+    public NSString? AccessKey { get; set; }
+    [Selector("absoluteLinkURL")]
+    public NSURL? AbsoluteLinkURL { get; }
+    [Selector("href", "setHref:")]
+    public NSString? Href { get; set; }
+    [Selector("protocol")]
+    public NSString? Protocol { get; }
+    [Selector("host")]
+    public NSString? Host { get; }
+    [Selector("hostname")]
+    public NSString? Hostname { get; }
+    [Selector("port")]
+    public NSString? Port { get; }
+    [Selector("pathname")]
+    public NSString? Pathname { get; }
+    [Selector("search")]
+    public NSString? Search { get; }
+    [Selector("hashName")]
+    public NSString? HashName { get; }
 }
 
 #endif

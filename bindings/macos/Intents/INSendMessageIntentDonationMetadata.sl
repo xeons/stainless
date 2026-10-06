@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class INSendMessageIntentDonationMetadata : INIntentDonationMetadata
 {
-    [Selector("mentionsCurrentUser", "setMentionsCurrentUser:")] public bool MentionsCurrentUser { get; set; }
-    [Selector("isReplyToCurrentUser", "setReplyToCurrentUser:")] public bool ReplyToCurrentUser { get; set; }
-    [Selector("notifyRecipientAnyway", "setNotifyRecipientAnyway:")] public bool NotifyRecipientAnyway { get; set; }
-    [Selector("recipientCount", "setRecipientCount:")] public NSUInteger RecipientCount { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("mentionsCurrentUser", "setMentionsCurrentUser:")]
+    public bool MentionsCurrentUser { get; set; }
+    [Selector("isReplyToCurrentUser", "setReplyToCurrentUser:")]
+    public bool ReplyToCurrentUser { get; set; }
+    [Selector("notifyRecipientAnyway", "setNotifyRecipientAnyway:")]
+    public bool NotifyRecipientAnyway { get; set; }
+    [Selector("recipientCount", "setRecipientCount:")]
+    public NSUInteger RecipientCount { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

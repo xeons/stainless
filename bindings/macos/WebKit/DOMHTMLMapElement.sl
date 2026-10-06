@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLMapElement : DOMHTMLElement
 {
-    [Selector("areas")] public DOMHTMLCollection? Areas { get; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
+    [Selector("areas")]
+    public DOMHTMLCollection? Areas { get; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
 }
 
 #endif

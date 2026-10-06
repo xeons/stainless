@@ -33,45 +33,84 @@ import Standard.ObjC;
 
 public extern objc class NSArrayController : NSObjectController
 {
-    [Selector("automaticallyRearrangesObjects", "setAutomaticallyRearrangesObjects:")] public bool AutomaticallyRearrangesObjects { get; set; }
-    [Selector("automaticRearrangementKeyPaths")] public NSArray? AutomaticRearrangementKeyPaths { get; }
-    [Selector("sortDescriptors", "setSortDescriptors:")] public NSArray SortDescriptors { get; set; }
-    [Selector("filterPredicate", "setFilterPredicate:")] public NSPredicate? FilterPredicate { get; set; }
-    [Selector("clearsFilterPredicateOnInsertion", "setClearsFilterPredicateOnInsertion:")] public bool ClearsFilterPredicateOnInsertion { get; set; }
-    [Selector("arrangedObjects")] public AnyObject ArrangedObjects { get; }
-    [Selector("avoidsEmptySelection", "setAvoidsEmptySelection:")] public bool AvoidsEmptySelection { get; set; }
-    [Selector("preservesSelection", "setPreservesSelection:")] public bool PreservesSelection { get; set; }
-    [Selector("selectsInsertedObjects", "setSelectsInsertedObjects:")] public bool SelectsInsertedObjects { get; set; }
-    [Selector("alwaysUsesMultipleValuesMarker", "setAlwaysUsesMultipleValuesMarker:")] public bool AlwaysUsesMultipleValuesMarker { get; set; }
-    [Selector("selectionIndexes")] public NSIndexSet SelectionIndexes { get; }
-    [Selector("selectionIndex")] public NSUInteger SelectionIndex { get; }
-    [Selector("selectedObjects")] public NSArray? SelectedObjects { get; }
-    [Selector("canInsert")] public bool CanInsert { get; }
-    [Selector("canSelectNext")] public bool CanSelectNext { get; }
-    [Selector("canSelectPrevious")] public bool CanSelectPrevious { get; }
-    [Selector("rearrangeObjects")] public void RearrangeObjects();
-    [Selector("didChangeArrangementCriteria")] public void DidChangeArrangementCriteria();
-    [Selector("arrangeObjects:")] public NSArray ArrangeObjects(NSArray objects);
-    [Selector("setSelectionIndexes:")] public bool SetSelectionIndexes(NSIndexSet indexes);
-    [Selector("setSelectionIndex:")] public bool SetSelectionIndex(NSUInteger index);
-    [Selector("addSelectionIndexes:")] public bool AddSelectionIndexes(NSIndexSet indexes);
-    [Selector("removeSelectionIndexes:")] public bool RemoveSelectionIndexes(NSIndexSet indexes);
-    [Selector("setSelectedObjects:")] public bool SetSelectedObjects(NSArray objects);
-    [Selector("addSelectedObjects:")] public bool AddSelectedObjects(NSArray objects);
-    [Selector("removeSelectedObjects:")] public bool RemoveSelectedObjects(NSArray objects);
-    [Selector("add:")] public void Add(AnyObject? sender);
-    [Selector("remove:")] public void Remove(AnyObject? sender);
-    [Selector("insert:")] public void Insert(AnyObject? sender);
-    [Selector("selectNext:")] public void SelectNext(AnyObject? sender);
-    [Selector("selectPrevious:")] public void SelectPrevious(AnyObject? sender);
-    [Selector("addObject:")] public void AddObject(AnyObject object);
-    [Selector("addObjects:")] public void AddObjects(NSArray objects);
-    [Selector("insertObject:atArrangedObjectIndex:")] public void InsertObjectAtArrangedObjectIndex(AnyObject object, NSUInteger index);
-    [Selector("insertObjects:atArrangedObjectIndexes:")] public void InsertObjectsAtArrangedObjectIndexes(NSArray objects, NSIndexSet indexes);
-    [Selector("removeObjectAtArrangedObjectIndex:")] public void RemoveObjectAtArrangedObjectIndex(NSUInteger index);
-    [Selector("removeObjectsAtArrangedObjectIndexes:")] public void RemoveObjectsAtArrangedObjectIndexes(NSIndexSet indexes);
-    [Selector("removeObject:")] public void RemoveObject(AnyObject object);
-    [Selector("removeObjects:")] public void RemoveObjects(NSArray objects);
+    [Selector("automaticallyRearrangesObjects", "setAutomaticallyRearrangesObjects:")]
+    public bool AutomaticallyRearrangesObjects { get; set; }
+    [Selector("automaticRearrangementKeyPaths")]
+    public NSArray? AutomaticRearrangementKeyPaths { get; }
+    [Selector("sortDescriptors", "setSortDescriptors:")]
+    public NSArray SortDescriptors { get; set; }
+    [Selector("filterPredicate", "setFilterPredicate:")]
+    public NSPredicate? FilterPredicate { get; set; }
+    [Selector("clearsFilterPredicateOnInsertion", "setClearsFilterPredicateOnInsertion:")]
+    public bool ClearsFilterPredicateOnInsertion { get; set; }
+    [Selector("arrangedObjects")]
+    public AnyObject ArrangedObjects { get; }
+    [Selector("avoidsEmptySelection", "setAvoidsEmptySelection:")]
+    public bool AvoidsEmptySelection { get; set; }
+    [Selector("preservesSelection", "setPreservesSelection:")]
+    public bool PreservesSelection { get; set; }
+    [Selector("selectsInsertedObjects", "setSelectsInsertedObjects:")]
+    public bool SelectsInsertedObjects { get; set; }
+    [Selector("alwaysUsesMultipleValuesMarker", "setAlwaysUsesMultipleValuesMarker:")]
+    public bool AlwaysUsesMultipleValuesMarker { get; set; }
+    [Selector("selectionIndexes")]
+    public NSIndexSet SelectionIndexes { get; }
+    [Selector("selectionIndex")]
+    public NSUInteger SelectionIndex { get; }
+    [Selector("selectedObjects")]
+    public NSArray? SelectedObjects { get; }
+    [Selector("canInsert")]
+    public bool CanInsert { get; }
+    [Selector("canSelectNext")]
+    public bool CanSelectNext { get; }
+    [Selector("canSelectPrevious")]
+    public bool CanSelectPrevious { get; }
+    [Selector("rearrangeObjects")]
+    public void RearrangeObjects();
+    [Selector("didChangeArrangementCriteria")]
+    public void DidChangeArrangementCriteria();
+    [Selector("arrangeObjects:")]
+    public NSArray ArrangeObjects(NSArray objects);
+    [Selector("setSelectionIndexes:")]
+    public bool SetSelectionIndexes(NSIndexSet indexes);
+    [Selector("setSelectionIndex:")]
+    public bool SetSelectionIndex(NSUInteger index);
+    [Selector("addSelectionIndexes:")]
+    public bool AddSelectionIndexes(NSIndexSet indexes);
+    [Selector("removeSelectionIndexes:")]
+    public bool RemoveSelectionIndexes(NSIndexSet indexes);
+    [Selector("setSelectedObjects:")]
+    public bool SetSelectedObjects(NSArray objects);
+    [Selector("addSelectedObjects:")]
+    public bool AddSelectedObjects(NSArray objects);
+    [Selector("removeSelectedObjects:")]
+    public bool RemoveSelectedObjects(NSArray objects);
+    [Selector("add:")]
+    public void Add(AnyObject? sender);
+    [Selector("remove:")]
+    public void Remove(AnyObject? sender);
+    [Selector("insert:")]
+    public void Insert(AnyObject? sender);
+    [Selector("selectNext:")]
+    public void SelectNext(AnyObject? sender);
+    [Selector("selectPrevious:")]
+    public void SelectPrevious(AnyObject? sender);
+    [Selector("addObject:")]
+    public void AddObject(AnyObject object);
+    [Selector("addObjects:")]
+    public void AddObjects(NSArray objects);
+    [Selector("insertObject:atArrangedObjectIndex:")]
+    public void InsertObjectAtArrangedObjectIndex(AnyObject object, NSUInteger index);
+    [Selector("insertObjects:atArrangedObjectIndexes:")]
+    public void InsertObjectsAtArrangedObjectIndexes(NSArray objects, NSIndexSet indexes);
+    [Selector("removeObjectAtArrangedObjectIndex:")]
+    public void RemoveObjectAtArrangedObjectIndex(NSUInteger index);
+    [Selector("removeObjectsAtArrangedObjectIndexes:")]
+    public void RemoveObjectsAtArrangedObjectIndexes(NSIndexSet indexes);
+    [Selector("removeObject:")]
+    public void RemoveObject(AnyObject object);
+    [Selector("removeObjects:")]
+    public void RemoveObjects(NSArray objects);
 }
 
 #endif

@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationSecurityKeyPublicKeyCredentialAssertionRequest : ASAuthorizationRequest, ASAuthorizationPublicKeyCredentialAssertionRequest
 {
-    [Selector("allowedCredentials", "setAllowedCredentials:")] public NSArray AllowedCredentials { get; set; }
-    [Selector("appID", "setAppID:")] public NSString? AppID { get; set; }
+    [Selector("allowedCredentials", "setAllowedCredentials:")]
+    public NSArray AllowedCredentials { get; set; }
+    [Selector("appID", "setAppID:")]
+    public NSString? AppID { get; set; }
 }
 
 public extern objc class ASAuthorizationSecurityKeyPublicKeyCredentialAssertionRequest : ASAuthorizationWebBrowserSecurityKeyPublicKeyCredentialAssertionRequest { }

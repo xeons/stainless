@@ -34,14 +34,22 @@ import Standard.ObjC;
 
 public extern objc class CNDecision : NSObject, NSCopying
 {
-    [Selector("time")] public CMTime Time { get; }
-    [Selector("detectionID")] public CNDetectionID DetectionID { get; }
-    [Selector("detectionGroupID")] public CNDetectionGroupID DetectionGroupID { get; }
-    [Selector("isUserDecision")] public bool UserDecision { get; }
-    [Selector("isGroupDecision")] public bool GroupDecision { get; }
-    [Selector("isStrongDecision")] public bool StrongDecision { get; }
-    [Selector("initWithTime:detectionID:strong:")] public Self InitWithTimeDetectionIDStrong(CMTime time, CNDetectionID detectionID, bool isStrong);
-    [Selector("initWithTime:detectionGroupID:strong:")] public Self InitWithTimeDetectionGroupIDStrong(CMTime time, CNDetectionGroupID detectionGroupID, bool isStrong);
+    [Selector("time")]
+    public CMTime Time { get; }
+    [Selector("detectionID")]
+    public CNDetectionID DetectionID { get; }
+    [Selector("detectionGroupID")]
+    public CNDetectionGroupID DetectionGroupID { get; }
+    [Selector("isUserDecision")]
+    public bool UserDecision { get; }
+    [Selector("isGroupDecision")]
+    public bool GroupDecision { get; }
+    [Selector("isStrongDecision")]
+    public bool StrongDecision { get; }
+    [Selector("initWithTime:detectionID:strong:")]
+    public Self InitWithTimeDetectionIDStrong(CMTime time, CNDetectionID detectionID, bool isStrong);
+    [Selector("initWithTime:detectionGroupID:strong:")]
+    public Self InitWithTimeDetectionGroupIDStrong(CMTime time, CNDetectionGroupID detectionGroupID, bool isStrong);
 }
 
 #endif

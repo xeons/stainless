@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class ASCredentialIdentityStoreState : NSObject
 {
-    [Selector("isEnabled")] public bool Enabled { get; }
-    [Selector("supportsIncrementalUpdates")] public bool SupportsIncrementalUpdates { get; }
+    [Selector("isEnabled")]
+    public bool Enabled { get; }
+    [Selector("supportsIncrementalUpdates")]
+    public bool SupportsIncrementalUpdates { get; }
 }
 
 #endif

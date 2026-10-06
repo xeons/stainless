@@ -156,70 +156,134 @@ public objc closure void NSCalendarEnumerateDatesStartingAfterDateMatchingCompon
 
 public extern objc class NSCalendar : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("currentCalendar")] public static NSCalendar CurrentCalendar { get; }
-    [Selector("autoupdatingCurrentCalendar")] public static NSCalendar AutoupdatingCurrentCalendar { get; }
-    [Selector("calendarIdentifier")] public NSCalendarIdentifier CalendarIdentifier { get; }
-    [Selector("locale", "setLocale:")] public NSLocale? Locale { get; set; }
-    [Selector("timeZone", "setTimeZone:")] public NSTimeZone TimeZone { get; set; }
-    [Selector("firstWeekday", "setFirstWeekday:")] public NSUInteger FirstWeekday { get; set; }
-    [Selector("minimumDaysInFirstWeek", "setMinimumDaysInFirstWeek:")] public NSUInteger MinimumDaysInFirstWeek { get; set; }
-    [Selector("eraSymbols")] public NSArray EraSymbols { get; }
-    [Selector("longEraSymbols")] public NSArray LongEraSymbols { get; }
-    [Selector("monthSymbols")] public NSArray MonthSymbols { get; }
-    [Selector("shortMonthSymbols")] public NSArray ShortMonthSymbols { get; }
-    [Selector("veryShortMonthSymbols")] public NSArray VeryShortMonthSymbols { get; }
-    [Selector("standaloneMonthSymbols")] public NSArray StandaloneMonthSymbols { get; }
-    [Selector("shortStandaloneMonthSymbols")] public NSArray ShortStandaloneMonthSymbols { get; }
-    [Selector("veryShortStandaloneMonthSymbols")] public NSArray VeryShortStandaloneMonthSymbols { get; }
-    [Selector("weekdaySymbols")] public NSArray WeekdaySymbols { get; }
-    [Selector("shortWeekdaySymbols")] public NSArray ShortWeekdaySymbols { get; }
-    [Selector("veryShortWeekdaySymbols")] public NSArray VeryShortWeekdaySymbols { get; }
-    [Selector("standaloneWeekdaySymbols")] public NSArray StandaloneWeekdaySymbols { get; }
-    [Selector("shortStandaloneWeekdaySymbols")] public NSArray ShortStandaloneWeekdaySymbols { get; }
-    [Selector("veryShortStandaloneWeekdaySymbols")] public NSArray VeryShortStandaloneWeekdaySymbols { get; }
-    [Selector("quarterSymbols")] public NSArray QuarterSymbols { get; }
-    [Selector("shortQuarterSymbols")] public NSArray ShortQuarterSymbols { get; }
-    [Selector("standaloneQuarterSymbols")] public NSArray StandaloneQuarterSymbols { get; }
-    [Selector("shortStandaloneQuarterSymbols")] public NSArray ShortStandaloneQuarterSymbols { get; }
-    [Selector("AMSymbol")] public NSString AMSymbol { get; }
-    [Selector("PMSymbol")] public NSString PMSymbol { get; }
-    [Selector("calendarWithIdentifier:")] public static NSCalendar? CalendarWithIdentifier(NSCalendarIdentifier calendarIdentifierConstant);
-    [Selector("initWithCalendarIdentifier:")] public AnyObject? InitWithCalendarIdentifier(NSCalendarIdentifier ident);
-    [Selector("minimumRangeOfUnit:")] public NSRange MinimumRangeOfUnit(NSCalendarUnit unit);
-    [Selector("maximumRangeOfUnit:")] public NSRange MaximumRangeOfUnit(NSCalendarUnit unit);
-    [Selector("rangeOfUnit:inUnit:forDate:")] public NSRange RangeOfUnitInUnitForDate(NSCalendarUnit smaller, NSCalendarUnit larger, NSDate date);
-    [Selector("ordinalityOfUnit:inUnit:forDate:")] public NSUInteger OrdinalityOfUnitInUnitForDate(NSCalendarUnit smaller, NSCalendarUnit larger, NSDate date);
-    [Selector("rangeOfUnit:startDate:interval:forDate:")] public bool RangeOfUnitStartDateIntervalForDate(NSCalendarUnit unit, out NSDate? datep, NSTimeInterval* tip, NSDate date);
-    [Selector("dateFromComponents:")] public NSDate? DateFromComponents(NSDateComponents comps);
-    [Selector("components:fromDate:")] public NSDateComponents ComponentsFromDate(NSCalendarUnit unitFlags, NSDate date);
-    [Selector("dateByAddingComponents:toDate:options:")] public NSDate? DateByAddingComponentsToDateOptions(NSDateComponents comps, NSDate date, NSCalendarOptions opts);
-    [Selector("components:fromDate:toDate:options:")] public NSDateComponents ComponentsFromDateToDateOptions(NSCalendarUnit unitFlags, NSDate startingDate, NSDate resultDate, NSCalendarOptions opts);
-    [Selector("getEra:year:month:day:fromDate:")] public void GetEraYearMonthDayFromDate(NSInteger* eraValuePointer, NSInteger* yearValuePointer, NSInteger* monthValuePointer, NSInteger* dayValuePointer, NSDate date);
-    [Selector("getEra:yearForWeekOfYear:weekOfYear:weekday:fromDate:")] public void GetEraYearForWeekOfYearWeekOfYearWeekdayFromDate(NSInteger* eraValuePointer, NSInteger* yearValuePointer, NSInteger* weekValuePointer, NSInteger* weekdayValuePointer, NSDate date);
-    [Selector("getHour:minute:second:nanosecond:fromDate:")] public void GetHourMinuteSecondNanosecondFromDate(NSInteger* hourValuePointer, NSInteger* minuteValuePointer, NSInteger* secondValuePointer, NSInteger* nanosecondValuePointer, NSDate date);
-    [Selector("component:fromDate:")] public NSInteger ComponentFromDate(NSCalendarUnit unit, NSDate date);
-    [Selector("dateWithEra:year:month:day:hour:minute:second:nanosecond:")] public NSDate? DateWithEraYearMonthDayHourMinuteSecondNanosecond(NSInteger eraValue, NSInteger yearValue, NSInteger monthValue, NSInteger dayValue, NSInteger hourValue, NSInteger minuteValue, NSInteger secondValue, NSInteger nanosecondValue);
-    [Selector("dateWithEra:yearForWeekOfYear:weekOfYear:weekday:hour:minute:second:nanosecond:")] public NSDate? DateWithEraYearForWeekOfYearWeekOfYearWeekdayHourMinuteSecondNanosecond(NSInteger eraValue, NSInteger yearValue, NSInteger weekValue, NSInteger weekdayValue, NSInteger hourValue, NSInteger minuteValue, NSInteger secondValue, NSInteger nanosecondValue);
-    [Selector("startOfDayForDate:")] public NSDate StartOfDayForDate(NSDate date);
-    [Selector("componentsInTimeZone:fromDate:")] public NSDateComponents ComponentsInTimeZoneFromDate(NSTimeZone timezone, NSDate date);
-    [Selector("compareDate:toDate:toUnitGranularity:")] public NSComparisonResult CompareDateToDateToUnitGranularity(NSDate date1, NSDate date2, NSCalendarUnit unit);
-    [Selector("isDate:equalToDate:toUnitGranularity:")] public bool IsDateEqualToDateToUnitGranularity(NSDate date1, NSDate date2, NSCalendarUnit unit);
-    [Selector("isDate:inSameDayAsDate:")] public bool IsDateInSameDayAsDate(NSDate date1, NSDate date2);
-    [Selector("isDateInToday:")] public bool IsDateInToday(NSDate date);
-    [Selector("isDateInYesterday:")] public bool IsDateInYesterday(NSDate date);
-    [Selector("isDateInTomorrow:")] public bool IsDateInTomorrow(NSDate date);
-    [Selector("isDateInWeekend:")] public bool IsDateInWeekend(NSDate date);
-    [Selector("rangeOfWeekendStartDate:interval:containingDate:")] public bool RangeOfWeekendStartDateIntervalContainingDate(out NSDate? datep, NSTimeInterval* tip, NSDate date);
-    [Selector("nextWeekendStartDate:interval:options:afterDate:")] public bool NextWeekendStartDateIntervalOptionsAfterDate(out NSDate? datep, NSTimeInterval* tip, NSCalendarOptions options, NSDate date);
-    [Selector("components:fromDateComponents:toDateComponents:options:")] public NSDateComponents ComponentsFromDateComponentsToDateComponentsOptions(NSCalendarUnit unitFlags, NSDateComponents startingDateComp, NSDateComponents resultDateComp, NSCalendarOptions options);
-    [Selector("dateByAddingUnit:value:toDate:options:")] public NSDate? DateByAddingUnitValueToDateOptions(NSCalendarUnit unit, NSInteger value, NSDate date, NSCalendarOptions options);
-    [Selector("enumerateDatesStartingAfterDate:matchingComponents:options:usingBlock:")] public void EnumerateDatesStartingAfterDateMatchingComponentsOptionsUsingBlock(NSDate start, NSDateComponents comps, NSCalendarOptions opts, NSCalendarEnumerateDatesStartingAfterDateMatchingComponentsOptionsUsingBlockBlock block);
-    [Selector("nextDateAfterDate:matchingComponents:options:")] public NSDate? NextDateAfterDateMatchingComponentsOptions(NSDate date, NSDateComponents comps, NSCalendarOptions options);
-    [Selector("nextDateAfterDate:matchingUnit:value:options:")] public NSDate? NextDateAfterDateMatchingUnitValueOptions(NSDate date, NSCalendarUnit unit, NSInteger value, NSCalendarOptions options);
-    [Selector("nextDateAfterDate:matchingHour:minute:second:options:")] public NSDate? NextDateAfterDateMatchingHourMinuteSecondOptions(NSDate date, NSInteger hourValue, NSInteger minuteValue, NSInteger secondValue, NSCalendarOptions options);
-    [Selector("dateBySettingUnit:value:ofDate:options:")] public NSDate? DateBySettingUnitValueOfDateOptions(NSCalendarUnit unit, NSInteger v, NSDate date, NSCalendarOptions opts);
-    [Selector("dateBySettingHour:minute:second:ofDate:options:")] public NSDate? DateBySettingHourMinuteSecondOfDateOptions(NSInteger h, NSInteger m, NSInteger s, NSDate date, NSCalendarOptions opts);
-    [Selector("date:matchesComponents:")] public bool DateMatchesComponents(NSDate date, NSDateComponents components);
+    [Selector("currentCalendar")]
+    public static NSCalendar CurrentCalendar { get; }
+    [Selector("autoupdatingCurrentCalendar")]
+    public static NSCalendar AutoupdatingCurrentCalendar { get; }
+    [Selector("calendarIdentifier")]
+    public NSCalendarIdentifier CalendarIdentifier { get; }
+    [Selector("locale", "setLocale:")]
+    public NSLocale? Locale { get; set; }
+    [Selector("timeZone", "setTimeZone:")]
+    public NSTimeZone TimeZone { get; set; }
+    [Selector("firstWeekday", "setFirstWeekday:")]
+    public NSUInteger FirstWeekday { get; set; }
+    [Selector("minimumDaysInFirstWeek", "setMinimumDaysInFirstWeek:")]
+    public NSUInteger MinimumDaysInFirstWeek { get; set; }
+    [Selector("eraSymbols")]
+    public NSArray EraSymbols { get; }
+    [Selector("longEraSymbols")]
+    public NSArray LongEraSymbols { get; }
+    [Selector("monthSymbols")]
+    public NSArray MonthSymbols { get; }
+    [Selector("shortMonthSymbols")]
+    public NSArray ShortMonthSymbols { get; }
+    [Selector("veryShortMonthSymbols")]
+    public NSArray VeryShortMonthSymbols { get; }
+    [Selector("standaloneMonthSymbols")]
+    public NSArray StandaloneMonthSymbols { get; }
+    [Selector("shortStandaloneMonthSymbols")]
+    public NSArray ShortStandaloneMonthSymbols { get; }
+    [Selector("veryShortStandaloneMonthSymbols")]
+    public NSArray VeryShortStandaloneMonthSymbols { get; }
+    [Selector("weekdaySymbols")]
+    public NSArray WeekdaySymbols { get; }
+    [Selector("shortWeekdaySymbols")]
+    public NSArray ShortWeekdaySymbols { get; }
+    [Selector("veryShortWeekdaySymbols")]
+    public NSArray VeryShortWeekdaySymbols { get; }
+    [Selector("standaloneWeekdaySymbols")]
+    public NSArray StandaloneWeekdaySymbols { get; }
+    [Selector("shortStandaloneWeekdaySymbols")]
+    public NSArray ShortStandaloneWeekdaySymbols { get; }
+    [Selector("veryShortStandaloneWeekdaySymbols")]
+    public NSArray VeryShortStandaloneWeekdaySymbols { get; }
+    [Selector("quarterSymbols")]
+    public NSArray QuarterSymbols { get; }
+    [Selector("shortQuarterSymbols")]
+    public NSArray ShortQuarterSymbols { get; }
+    [Selector("standaloneQuarterSymbols")]
+    public NSArray StandaloneQuarterSymbols { get; }
+    [Selector("shortStandaloneQuarterSymbols")]
+    public NSArray ShortStandaloneQuarterSymbols { get; }
+    [Selector("AMSymbol")]
+    public NSString AMSymbol { get; }
+    [Selector("PMSymbol")]
+    public NSString PMSymbol { get; }
+    [Selector("calendarWithIdentifier:")]
+    public static NSCalendar? CalendarWithIdentifier(NSCalendarIdentifier calendarIdentifierConstant);
+    [Selector("initWithCalendarIdentifier:")]
+    public AnyObject? InitWithCalendarIdentifier(NSCalendarIdentifier ident);
+    [Selector("minimumRangeOfUnit:")]
+    public NSRange MinimumRangeOfUnit(NSCalendarUnit unit);
+    [Selector("maximumRangeOfUnit:")]
+    public NSRange MaximumRangeOfUnit(NSCalendarUnit unit);
+    [Selector("rangeOfUnit:inUnit:forDate:")]
+    public NSRange RangeOfUnitInUnitForDate(NSCalendarUnit smaller, NSCalendarUnit larger, NSDate date);
+    [Selector("ordinalityOfUnit:inUnit:forDate:")]
+    public NSUInteger OrdinalityOfUnitInUnitForDate(NSCalendarUnit smaller, NSCalendarUnit larger, NSDate date);
+    [Selector("rangeOfUnit:startDate:interval:forDate:")]
+    public bool RangeOfUnitStartDateIntervalForDate(NSCalendarUnit unit, out NSDate? datep, NSTimeInterval* tip, NSDate date);
+    [Selector("dateFromComponents:")]
+    public NSDate? DateFromComponents(NSDateComponents comps);
+    [Selector("components:fromDate:")]
+    public NSDateComponents ComponentsFromDate(NSCalendarUnit unitFlags, NSDate date);
+    [Selector("dateByAddingComponents:toDate:options:")]
+    public NSDate? DateByAddingComponentsToDateOptions(NSDateComponents comps, NSDate date, NSCalendarOptions opts);
+    [Selector("components:fromDate:toDate:options:")]
+    public NSDateComponents ComponentsFromDateToDateOptions(NSCalendarUnit unitFlags, NSDate startingDate, NSDate resultDate, NSCalendarOptions opts);
+    [Selector("getEra:year:month:day:fromDate:")]
+    public void GetEraYearMonthDayFromDate(NSInteger* eraValuePointer, NSInteger* yearValuePointer, NSInteger* monthValuePointer, NSInteger* dayValuePointer, NSDate date);
+    [Selector("getEra:yearForWeekOfYear:weekOfYear:weekday:fromDate:")]
+    public void GetEraYearForWeekOfYearWeekOfYearWeekdayFromDate(NSInteger* eraValuePointer, NSInteger* yearValuePointer, NSInteger* weekValuePointer, NSInteger* weekdayValuePointer, NSDate date);
+    [Selector("getHour:minute:second:nanosecond:fromDate:")]
+    public void GetHourMinuteSecondNanosecondFromDate(NSInteger* hourValuePointer, NSInteger* minuteValuePointer, NSInteger* secondValuePointer, NSInteger* nanosecondValuePointer, NSDate date);
+    [Selector("component:fromDate:")]
+    public NSInteger ComponentFromDate(NSCalendarUnit unit, NSDate date);
+    [Selector("dateWithEra:year:month:day:hour:minute:second:nanosecond:")]
+    public NSDate? DateWithEraYearMonthDayHourMinuteSecondNanosecond(NSInteger eraValue, NSInteger yearValue, NSInteger monthValue, NSInteger dayValue, NSInteger hourValue, NSInteger minuteValue, NSInteger secondValue, NSInteger nanosecondValue);
+    [Selector("dateWithEra:yearForWeekOfYear:weekOfYear:weekday:hour:minute:second:nanosecond:")]
+    public NSDate? DateWithEraYearForWeekOfYearWeekOfYearWeekdayHourMinuteSecondNanosecond(NSInteger eraValue, NSInteger yearValue, NSInteger weekValue, NSInteger weekdayValue, NSInteger hourValue, NSInteger minuteValue, NSInteger secondValue, NSInteger nanosecondValue);
+    [Selector("startOfDayForDate:")]
+    public NSDate StartOfDayForDate(NSDate date);
+    [Selector("componentsInTimeZone:fromDate:")]
+    public NSDateComponents ComponentsInTimeZoneFromDate(NSTimeZone timezone, NSDate date);
+    [Selector("compareDate:toDate:toUnitGranularity:")]
+    public NSComparisonResult CompareDateToDateToUnitGranularity(NSDate date1, NSDate date2, NSCalendarUnit unit);
+    [Selector("isDate:equalToDate:toUnitGranularity:")]
+    public bool IsDateEqualToDateToUnitGranularity(NSDate date1, NSDate date2, NSCalendarUnit unit);
+    [Selector("isDate:inSameDayAsDate:")]
+    public bool IsDateInSameDayAsDate(NSDate date1, NSDate date2);
+    [Selector("isDateInToday:")]
+    public bool IsDateInToday(NSDate date);
+    [Selector("isDateInYesterday:")]
+    public bool IsDateInYesterday(NSDate date);
+    [Selector("isDateInTomorrow:")]
+    public bool IsDateInTomorrow(NSDate date);
+    [Selector("isDateInWeekend:")]
+    public bool IsDateInWeekend(NSDate date);
+    [Selector("rangeOfWeekendStartDate:interval:containingDate:")]
+    public bool RangeOfWeekendStartDateIntervalContainingDate(out NSDate? datep, NSTimeInterval* tip, NSDate date);
+    [Selector("nextWeekendStartDate:interval:options:afterDate:")]
+    public bool NextWeekendStartDateIntervalOptionsAfterDate(out NSDate? datep, NSTimeInterval* tip, NSCalendarOptions options, NSDate date);
+    [Selector("components:fromDateComponents:toDateComponents:options:")]
+    public NSDateComponents ComponentsFromDateComponentsToDateComponentsOptions(NSCalendarUnit unitFlags, NSDateComponents startingDateComp, NSDateComponents resultDateComp, NSCalendarOptions options);
+    [Selector("dateByAddingUnit:value:toDate:options:")]
+    public NSDate? DateByAddingUnitValueToDateOptions(NSCalendarUnit unit, NSInteger value, NSDate date, NSCalendarOptions options);
+    [Selector("enumerateDatesStartingAfterDate:matchingComponents:options:usingBlock:")]
+    public void EnumerateDatesStartingAfterDateMatchingComponentsOptionsUsingBlock(NSDate start, NSDateComponents comps, NSCalendarOptions opts, NSCalendarEnumerateDatesStartingAfterDateMatchingComponentsOptionsUsingBlockBlock block);
+    [Selector("nextDateAfterDate:matchingComponents:options:")]
+    public NSDate? NextDateAfterDateMatchingComponentsOptions(NSDate date, NSDateComponents comps, NSCalendarOptions options);
+    [Selector("nextDateAfterDate:matchingUnit:value:options:")]
+    public NSDate? NextDateAfterDateMatchingUnitValueOptions(NSDate date, NSCalendarUnit unit, NSInteger value, NSCalendarOptions options);
+    [Selector("nextDateAfterDate:matchingHour:minute:second:options:")]
+    public NSDate? NextDateAfterDateMatchingHourMinuteSecondOptions(NSDate date, NSInteger hourValue, NSInteger minuteValue, NSInteger secondValue, NSCalendarOptions options);
+    [Selector("dateBySettingUnit:value:ofDate:options:")]
+    public NSDate? DateBySettingUnitValueOfDateOptions(NSCalendarUnit unit, NSInteger v, NSDate date, NSCalendarOptions opts);
+    [Selector("dateBySettingHour:minute:second:ofDate:options:")]
+    public NSDate? DateBySettingHourMinuteSecondOfDateOptions(NSInteger h, NSInteger m, NSInteger s, NSDate date, NSCalendarOptions opts);
+    [Selector("date:matchesComponents:")]
+    public bool DateMatchesComponents(NSDate date, NSDateComponents components);
 }
 
 public extern "C" NSNotificationName NSCalendarDayChangedNotification;
@@ -229,35 +293,61 @@ public const long NSUndefinedDateComponent = 9223372036854775807;
 
 public extern objc class NSDateComponents : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("calendar", "setCalendar:")] public NSCalendar? Calendar { get; set; }
-    [Selector("timeZone", "setTimeZone:")] public NSTimeZone? TimeZone { get; set; }
-    [Selector("era", "setEra:")] public NSInteger Era { get; set; }
-    [Selector("year", "setYear:")] public NSInteger Year { get; set; }
-    [Selector("month", "setMonth:")] public NSInteger Month { get; set; }
-    [Selector("day", "setDay:")] public NSInteger Day { get; set; }
-    [Selector("hour", "setHour:")] public NSInteger Hour { get; set; }
-    [Selector("minute", "setMinute:")] public NSInteger Minute { get; set; }
-    [Selector("second", "setSecond:")] public NSInteger Second { get; set; }
-    [Selector("nanosecond", "setNanosecond:")] public NSInteger Nanosecond { get; set; }
-    [Selector("weekday", "setWeekday:")] public NSInteger Weekday { get; set; }
-    [Selector("weekdayOrdinal", "setWeekdayOrdinal:")] public NSInteger WeekdayOrdinal { get; set; }
-    [Selector("quarter", "setQuarter:")] public NSInteger Quarter { get; set; }
-    [Selector("weekOfMonth", "setWeekOfMonth:")] public NSInteger WeekOfMonth { get; set; }
-    [Selector("weekOfYear", "setWeekOfYear:")] public NSInteger WeekOfYear { get; set; }
-    [Selector("yearForWeekOfYear", "setYearForWeekOfYear:")] public NSInteger YearForWeekOfYear { get; set; }
-    [Selector("dayOfYear", "setDayOfYear:")] public NSInteger DayOfYear { get; set; }
-    [Selector("isLeapMonth", "setLeapMonth:")] public bool LeapMonth { get; set; }
+    [Selector("calendar", "setCalendar:")]
+    public NSCalendar? Calendar { get; set; }
+    [Selector("timeZone", "setTimeZone:")]
+    public NSTimeZone? TimeZone { get; set; }
+    [Selector("era", "setEra:")]
+    public NSInteger Era { get; set; }
+    [Selector("year", "setYear:")]
+    public NSInteger Year { get; set; }
+    [Selector("month", "setMonth:")]
+    public NSInteger Month { get; set; }
+    [Selector("day", "setDay:")]
+    public NSInteger Day { get; set; }
+    [Selector("hour", "setHour:")]
+    public NSInteger Hour { get; set; }
+    [Selector("minute", "setMinute:")]
+    public NSInteger Minute { get; set; }
+    [Selector("second", "setSecond:")]
+    public NSInteger Second { get; set; }
+    [Selector("nanosecond", "setNanosecond:")]
+    public NSInteger Nanosecond { get; set; }
+    [Selector("weekday", "setWeekday:")]
+    public NSInteger Weekday { get; set; }
+    [Selector("weekdayOrdinal", "setWeekdayOrdinal:")]
+    public NSInteger WeekdayOrdinal { get; set; }
+    [Selector("quarter", "setQuarter:")]
+    public NSInteger Quarter { get; set; }
+    [Selector("weekOfMonth", "setWeekOfMonth:")]
+    public NSInteger WeekOfMonth { get; set; }
+    [Selector("weekOfYear", "setWeekOfYear:")]
+    public NSInteger WeekOfYear { get; set; }
+    [Selector("yearForWeekOfYear", "setYearForWeekOfYear:")]
+    public NSInteger YearForWeekOfYear { get; set; }
+    [Selector("dayOfYear", "setDayOfYear:")]
+    public NSInteger DayOfYear { get; set; }
+    [Selector("isLeapMonth", "setLeapMonth:")]
+    public bool LeapMonth { get; set; }
     /// macOS 26.0 and later.
-    [Selector("isRepeatedDay", "setRepeatedDay:")] public bool RepeatedDay { get; set; }
-    [Selector("date")] public NSDate? Date { get; }
-    [Selector("isValidDate")] public bool ValidDate { get; }
+    [Selector("isRepeatedDay", "setRepeatedDay:")]
+    public bool RepeatedDay { get; set; }
+    [Selector("date")]
+    public NSDate? Date { get; }
+    [Selector("isValidDate")]
+    public bool ValidDate { get; }
     /// Deprecated in macOS 10.9.
-    [Selector("week")] public NSInteger Week();
+    [Selector("week")]
+    public NSInteger Week();
     /// Deprecated in macOS 10.9.
-    [Selector("setWeek:")] public void SetWeek(NSInteger v);
-    [Selector("setValue:forComponent:")] public void SetValueForComponent(NSInteger value, NSCalendarUnit unit);
-    [Selector("valueForComponent:")] public NSInteger ValueForComponent(NSCalendarUnit unit);
-    [Selector("isValidDateInCalendar:")] public bool IsValidDateInCalendar(NSCalendar calendar);
+    [Selector("setWeek:")]
+    public void SetWeek(NSInteger v);
+    [Selector("setValue:forComponent:")]
+    public void SetValueForComponent(NSInteger value, NSCalendarUnit unit);
+    [Selector("valueForComponent:")]
+    public NSInteger ValueForComponent(NSCalendarUnit unit);
+    [Selector("isValidDateInCalendar:")]
+    public bool IsValidDateInCalendar(NSCalendar calendar);
 }
 
 #endif

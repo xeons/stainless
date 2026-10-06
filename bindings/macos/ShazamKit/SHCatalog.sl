@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class SHCatalog : NSObject
 {
-    [Selector("minimumQuerySignatureDuration")] public NSTimeInterval MinimumQuerySignatureDuration { get; }
-    [Selector("maximumQuerySignatureDuration")] public NSTimeInterval MaximumQuerySignatureDuration { get; }
+    [Selector("minimumQuerySignatureDuration")]
+    public NSTimeInterval MinimumQuerySignatureDuration { get; }
+    [Selector("maximumQuerySignatureDuration")]
+    public NSTimeInterval MaximumQuerySignatureDuration { get; }
 }
 
 #endif

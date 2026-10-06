@@ -149,54 +149,90 @@ public extern "C" NSString? IOBluetoothPDUUserData;
 
 public extern objc class IOBluetoothHandsFree : NSObject
 {
-    [Selector("supportedFeatures", "setSupportedFeatures:")] public uint SupportedFeatures { get; set; }
-    [Selector("inputVolume", "setInputVolume:")] public float InputVolume { get; set; }
-    [Selector("isInputMuted", "setInputMuted:")] public bool InputMuted { get; set; }
-    [Selector("outputVolume", "setOutputVolume:")] public float OutputVolume { get; set; }
-    [Selector("isOutputMuted", "setOutputMuted:")] public bool OutputMuted { get; set; }
-    [Selector("device")] public IOBluetoothDevice? Device { get; }
-    [Selector("deviceSupportedFeatures")] public uint DeviceSupportedFeatures { get; }
-    [Selector("deviceSupportedSMSServices")] public uint DeviceSupportedSMSServices { get; }
-    [Selector("deviceCallHoldModes")] public uint DeviceCallHoldModes { get; }
-    [Selector("SMSMode")] public IOBluetoothSMSMode SMSMode { get; }
-    [Selector("isSMSEnabled")] public bool SMSEnabled { get; }
-    [Selector("delegate", "setDelegate:")] public IOBluetoothHandsFreeDelegate? Delegate { get; set; }
-    [Selector("isConnected")] public bool Connected { get; }
-    [Selector("indicator:")] public int Indicator(NSString? indicatorName);
-    [Selector("setIndicator:value:")] public void SetIndicatorValue(NSString? indicatorName, int indicatorValue);
-    [Selector("initWithDevice:delegate:")] public Self? InitWithDeviceDelegate(IOBluetoothDevice? device, IOBluetoothHandsFreeDelegate? inDelegate);
-    [Selector("connect")] public void Connect();
-    [Selector("disconnect")] public void Disconnect();
-    [Selector("connectSCO")] public void ConnectSCO();
-    [Selector("disconnectSCO")] public void DisconnectSCO();
-    [Selector("isSCOConnected")] public bool IsSCOConnected();
+    [Selector("supportedFeatures", "setSupportedFeatures:")]
+    public uint SupportedFeatures { get; set; }
+    [Selector("inputVolume", "setInputVolume:")]
+    public float InputVolume { get; set; }
+    [Selector("isInputMuted", "setInputMuted:")]
+    public bool InputMuted { get; set; }
+    [Selector("outputVolume", "setOutputVolume:")]
+    public float OutputVolume { get; set; }
+    [Selector("isOutputMuted", "setOutputMuted:")]
+    public bool OutputMuted { get; set; }
+    [Selector("device")]
+    public IOBluetoothDevice? Device { get; }
+    [Selector("deviceSupportedFeatures")]
+    public uint DeviceSupportedFeatures { get; }
+    [Selector("deviceSupportedSMSServices")]
+    public uint DeviceSupportedSMSServices { get; }
+    [Selector("deviceCallHoldModes")]
+    public uint DeviceCallHoldModes { get; }
+    [Selector("SMSMode")]
+    public IOBluetoothSMSMode SMSMode { get; }
+    [Selector("isSMSEnabled")]
+    public bool SMSEnabled { get; }
+    [Selector("delegate", "setDelegate:")]
+    public IOBluetoothHandsFreeDelegate? Delegate { get; set; }
+    [Selector("isConnected")]
+    public bool Connected { get; }
+    [Selector("indicator:")]
+    public int Indicator(NSString? indicatorName);
+    [Selector("setIndicator:value:")]
+    public void SetIndicatorValue(NSString? indicatorName, int indicatorValue);
+    [Selector("initWithDevice:delegate:")]
+    public Self? InitWithDeviceDelegate(IOBluetoothDevice? device, IOBluetoothHandsFreeDelegate? inDelegate);
+    [Selector("connect")]
+    public void Connect();
+    [Selector("disconnect")]
+    public void Disconnect();
+    [Selector("connectSCO")]
+    public void ConnectSCO();
+    [Selector("disconnectSCO")]
+    public void DisconnectSCO();
+    [Selector("isSCOConnected")]
+    public bool IsSCOConnected();
 }
 
 public objc interface IOBluetoothHandsFreeDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("handsFree:connected:")] void HandsFreeConnected(IOBluetoothHandsFree? device, NSNumber? status);
-    [Optional] [Selector("handsFree:disconnected:")] void HandsFreeDisconnected(IOBluetoothHandsFree? device, NSNumber? status);
-    [Optional] [Selector("handsFree:scoConnectionOpened:")] void HandsFreeScoConnectionOpened(IOBluetoothHandsFree? device, NSNumber? status);
-    [Optional] [Selector("handsFree:scoConnectionClosed:")] void HandsFreeScoConnectionClosed(IOBluetoothHandsFree? device, NSNumber? status);
+    [Optional]
+    [Selector("handsFree:connected:")]
+    void HandsFreeConnected(IOBluetoothHandsFree? device, NSNumber? status);
+    [Optional]
+    [Selector("handsFree:disconnected:")]
+    void HandsFreeDisconnected(IOBluetoothHandsFree? device, NSNumber? status);
+    [Optional]
+    [Selector("handsFree:scoConnectionOpened:")]
+    void HandsFreeScoConnectionOpened(IOBluetoothHandsFree? device, NSNumber? status);
+    [Optional]
+    [Selector("handsFree:scoConnectionClosed:")]
+    void HandsFreeScoConnectionClosed(IOBluetoothHandsFree? device, NSNumber? status);
 }
 
 /// HandsFreeDeviceAdditions, a category of IOBluetoothDevice.
 public extern objc class IOBluetoothDevice
 {
-    [Selector("isHandsFreeAudioGateway")] public bool HandsFreeAudioGateway { get; }
-    [Selector("isHandsFreeDevice")] public bool HandsFreeDevice { get; }
+    [Selector("isHandsFreeAudioGateway")]
+    public bool HandsFreeAudioGateway { get; }
+    [Selector("isHandsFreeDevice")]
+    public bool HandsFreeDevice { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("handsFreeAudioGatewayDriverID")] public NSString? HandsFreeAudioGatewayDriverID();
-    [Selector("handsFreeAudioGatewayServiceRecord")] public IOBluetoothSDPServiceRecord? HandsFreeAudioGatewayServiceRecord();
+    [Selector("handsFreeAudioGatewayDriverID")]
+    public NSString? HandsFreeAudioGatewayDriverID();
+    [Selector("handsFreeAudioGatewayServiceRecord")]
+    public IOBluetoothSDPServiceRecord? HandsFreeAudioGatewayServiceRecord();
     /// Deprecated in macOS 10.8.
-    [Selector("handsFreeDeviceDriverID")] public NSString? HandsFreeDeviceDriverID();
-    [Selector("handsFreeDeviceServiceRecord")] public IOBluetoothSDPServiceRecord? HandsFreeDeviceServiceRecord();
+    [Selector("handsFreeDeviceDriverID")]
+    public NSString? HandsFreeDeviceDriverID();
+    [Selector("handsFreeDeviceServiceRecord")]
+    public IOBluetoothSDPServiceRecord? HandsFreeDeviceServiceRecord();
 }
 
 /// HandsFreeSDPServiceRecordAdditions, a category of IOBluetoothSDPServiceRecord.
 public extern objc class IOBluetoothSDPServiceRecord
 {
-    [Selector("handsFreeSupportedFeatures")] public ushort HandsFreeSupportedFeatures();
+    [Selector("handsFreeSupportedFeatures")]
+    public ushort HandsFreeSupportedFeatures();
 }
 
 #endif

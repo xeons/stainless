@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public objc interface MTL4FXTemporalScaler : MTLFXTemporalScalerBase
 {
-    [Selector("encodeToCommandBuffer:")] void EncodeToCommandBuffer(MTL4CommandBuffer commandBuffer);
+    [Selector("encodeToCommandBuffer:")]
+    void EncodeToCommandBuffer(MTL4CommandBuffer commandBuffer);
 }
 
 #endif

@@ -33,14 +33,22 @@ import Standard.ObjC;
 
 public extern objc class ODModuleEntry : NSObject
 {
-    [Selector("mappings", "setMappings:")] public ODMappings? Mappings { get; set; }
-    [Selector("supportedOptions")] public NSArray? SupportedOptions { get; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("xpcServiceName", "setXpcServiceName:")] public NSString? XpcServiceName { get; set; }
-    [Selector("uuidString", "setUuidString:")] public NSString? UuidString { get; set; }
-    [Selector("moduleEntryWithName:xpcServiceName:")] public static Self? ModuleEntryWithNameXpcServiceName(NSString? name, NSString? xpcServiceName);
-    [Selector("setOption:value:")] public void SetOptionValue(NSString? optionName, AnyObject? value);
-    [Selector("option:")] public AnyObject? Option(NSString? optionName);
+    [Selector("mappings", "setMappings:")]
+    public ODMappings? Mappings { get; set; }
+    [Selector("supportedOptions")]
+    public NSArray? SupportedOptions { get; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("xpcServiceName", "setXpcServiceName:")]
+    public NSString? XpcServiceName { get; set; }
+    [Selector("uuidString", "setUuidString:")]
+    public NSString? UuidString { get; set; }
+    [Selector("moduleEntryWithName:xpcServiceName:")]
+    public static Self? ModuleEntryWithNameXpcServiceName(NSString? name, NSString? xpcServiceName);
+    [Selector("setOption:value:")]
+    public void SetOptionValue(NSString? optionName, AnyObject? value);
+    [Selector("option:")]
+    public AnyObject? Option(NSString? optionName);
 }
 
 #endif

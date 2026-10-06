@@ -33,30 +33,44 @@ import Standard.ObjC;
 
 public extern objc class ABGroup : ABRecord
 {
-    [Selector("members")] public NSArray? Members();
-    [Selector("addMember:")] public bool AddMember(ABPerson? person);
-    [Selector("removeMember:")] public bool RemoveMember(ABPerson? person);
-    [Selector("subgroups")] public NSArray? Subgroups();
-    [Selector("addSubgroup:")] public bool AddSubgroup(ABGroup? group);
-    [Selector("removeSubgroup:")] public bool RemoveSubgroup(ABGroup? group);
-    [Selector("parentGroups")] public NSArray? ParentGroups();
-    [Selector("setDistributionIdentifier:forProperty:person:")] public bool SetDistributionIdentifierForPropertyPerson(NSString? identifier, NSString? property, ABPerson? person);
-    [Selector("distributionIdentifierForProperty:person:")] public NSString? DistributionIdentifierForPropertyPerson(NSString? property, ABPerson? person);
+    [Selector("members")]
+    public NSArray? Members();
+    [Selector("addMember:")]
+    public bool AddMember(ABPerson? person);
+    [Selector("removeMember:")]
+    public bool RemoveMember(ABPerson? person);
+    [Selector("subgroups")]
+    public NSArray? Subgroups();
+    [Selector("addSubgroup:")]
+    public bool AddSubgroup(ABGroup? group);
+    [Selector("removeSubgroup:")]
+    public bool RemoveSubgroup(ABGroup? group);
+    [Selector("parentGroups")]
+    public NSArray? ParentGroups();
+    [Selector("setDistributionIdentifier:forProperty:person:")]
+    public bool SetDistributionIdentifierForPropertyPerson(NSString? identifier, NSString? property, ABPerson? person);
+    [Selector("distributionIdentifierForProperty:person:")]
+    public NSString? DistributionIdentifierForPropertyPerson(NSString? property, ABPerson? person);
 }
 
 /// ABGroup_Properties, a category of ABGroup.
 public extern objc class ABGroup
 {
-    [Selector("addPropertiesAndTypes:")] public static NSInteger AddPropertiesAndTypes(NSDictionary? properties);
-    [Selector("removeProperties:")] public static NSInteger RemoveProperties(NSArray? properties);
-    [Selector("properties")] public static NSArray? Properties();
-    [Selector("typeOfProperty:")] public static ABPropertyType TypeOfProperty(NSString? property);
+    [Selector("addPropertiesAndTypes:")]
+    public static NSInteger AddPropertiesAndTypes(NSDictionary? properties);
+    [Selector("removeProperties:")]
+    public static NSInteger RemoveProperties(NSArray? properties);
+    [Selector("properties")]
+    public static NSArray? Properties();
+    [Selector("typeOfProperty:")]
+    public static ABPropertyType TypeOfProperty(NSString? property);
 }
 
 /// ABGroup_Searching, a category of ABGroup.
 public extern objc class ABGroup
 {
-    [Selector("searchElementForProperty:label:key:value:comparison:")] public static ABSearchElement? SearchElementForPropertyLabelKeyValueComparison(NSString? property, NSString? label, NSString? key, AnyObject? value, ABSearchComparison comparison);
+    [Selector("searchElementForProperty:label:key:value:comparison:")]
+    public static ABSearchElement? SearchElementForPropertyLabelKeyValueComparison(NSString? property, NSString? label, NSString? key, AnyObject? value, ABSearchComparison comparison);
 }
 
 #endif

@@ -42,10 +42,14 @@ public enum QLThumbnailRepresentationType : long
 
 public extern objc class QLThumbnailRepresentation : NSObject
 {
-    [Selector("type")] public QLThumbnailRepresentationType Type { get; }
-    [Selector("CGImage")] public CGImageRef CGImage { get; }
-    [Selector("NSImage")] public NSImage NSImage { get; }
-    [Selector("contentRect")] public CGRect ContentRect { get; }
+    [Selector("type")]
+    public QLThumbnailRepresentationType Type { get; }
+    [Selector("CGImage")]
+    public CGImageRef CGImage { get; }
+    [Selector("NSImage")]
+    public NSImage NSImage { get; }
+    [Selector("contentRect")]
+    public CGRect ContentRect { get; }
 }
 
 #endif

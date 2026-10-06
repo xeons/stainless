@@ -39,14 +39,22 @@ public enum QLPreviewViewStyle : ulong
 
 public extern objc class QLPreviewView : NSView
 {
-    [Selector("previewItem", "setPreviewItem:")] public QLPreviewItem? PreviewItem { get; set; }
-    [Selector("displayState", "setDisplayState:")] public AnyObject? DisplayState { get; set; }
-    [Selector("shouldCloseWithWindow", "setShouldCloseWithWindow:")] public bool ShouldCloseWithWindow { get; set; }
-    [Selector("autostarts", "setAutostarts:")] public bool Autostarts { get; set; }
-    [Selector("initWithFrame:style:")] public AnyObject? InitWithFrameStyle(NSRect frame, QLPreviewViewStyle style);
-    [Selector("initWithFrame:")] public AnyObject? InitWithFrame(NSRect frame);
-    [Selector("refreshPreviewItem")] public void RefreshPreviewItem();
-    [Selector("close")] public void Close();
+    [Selector("previewItem", "setPreviewItem:")]
+    public QLPreviewItem? PreviewItem { get; set; }
+    [Selector("displayState", "setDisplayState:")]
+    public AnyObject? DisplayState { get; set; }
+    [Selector("shouldCloseWithWindow", "setShouldCloseWithWindow:")]
+    public bool ShouldCloseWithWindow { get; set; }
+    [Selector("autostarts", "setAutostarts:")]
+    public bool Autostarts { get; set; }
+    [Selector("initWithFrame:style:")]
+    public AnyObject? InitWithFrameStyle(NSRect frame, QLPreviewViewStyle style);
+    [Selector("initWithFrame:")]
+    public AnyObject? InitWithFrame(NSRect frame);
+    [Selector("refreshPreviewItem")]
+    public void RefreshPreviewItem();
+    [Selector("close")]
+    public void Close();
 }
 
 #endif

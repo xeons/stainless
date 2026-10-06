@@ -98,42 +98,68 @@ public enum NEVPNIKEv2TLSVersion : long
 
 public extern objc class NEVPNIKEv2SecurityAssociationParameters : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("encryptionAlgorithm", "setEncryptionAlgorithm:")] public NEVPNIKEv2EncryptionAlgorithm EncryptionAlgorithm { get; set; }
-    [Selector("integrityAlgorithm", "setIntegrityAlgorithm:")] public NEVPNIKEv2IntegrityAlgorithm IntegrityAlgorithm { get; set; }
-    [Selector("diffieHellmanGroup", "setDiffieHellmanGroup:")] public NEVPNIKEv2DiffieHellmanGroup DiffieHellmanGroup { get; set; }
+    [Selector("encryptionAlgorithm", "setEncryptionAlgorithm:")]
+    public NEVPNIKEv2EncryptionAlgorithm EncryptionAlgorithm { get; set; }
+    [Selector("integrityAlgorithm", "setIntegrityAlgorithm:")]
+    public NEVPNIKEv2IntegrityAlgorithm IntegrityAlgorithm { get; set; }
+    [Selector("diffieHellmanGroup", "setDiffieHellmanGroup:")]
+    public NEVPNIKEv2DiffieHellmanGroup DiffieHellmanGroup { get; set; }
     /// macOS 26.0 and later.
-    [Selector("postQuantumKeyExchangeMethods", "setPostQuantumKeyExchangeMethods:")] public NSArray? PostQuantumKeyExchangeMethods { get; set; }
-    [Selector("lifetimeMinutes", "setLifetimeMinutes:")] public int LifetimeMinutes { get; set; }
+    [Selector("postQuantumKeyExchangeMethods", "setPostQuantumKeyExchangeMethods:")]
+    public NSArray? PostQuantumKeyExchangeMethods { get; set; }
+    [Selector("lifetimeMinutes", "setLifetimeMinutes:")]
+    public int LifetimeMinutes { get; set; }
 }
 
 public extern objc class NEVPNIKEv2PPKConfiguration : NSObject, NSCopying
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("keychainReference")] public NSData KeychainReference { get; }
-    [Selector("isMandatory", "setIsMandatory:")] public bool IsMandatory { get; set; }
-    [Selector("initWithIdentifier:keychainReference:")] public Self InitWithIdentifierKeychainReference(NSString identifier, NSData keychainReference);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("keychainReference")]
+    public NSData KeychainReference { get; }
+    [Selector("isMandatory", "setIsMandatory:")]
+    public bool IsMandatory { get; set; }
+    [Selector("initWithIdentifier:keychainReference:")]
+    public Self InitWithIdentifierKeychainReference(NSString identifier, NSData keychainReference);
 }
 
 public extern objc class NEVPNProtocolIKEv2 : NEVPNProtocolIPSec
 {
-    [Selector("deadPeerDetectionRate", "setDeadPeerDetectionRate:")] public NEVPNIKEv2DeadPeerDetectionRate DeadPeerDetectionRate { get; set; }
-    [Selector("serverCertificateIssuerCommonName", "setServerCertificateIssuerCommonName:")] public NSString? ServerCertificateIssuerCommonName { get; set; }
-    [Selector("serverCertificateCommonName", "setServerCertificateCommonName:")] public NSString? ServerCertificateCommonName { get; set; }
-    [Selector("certificateType", "setCertificateType:")] public NEVPNIKEv2CertificateType CertificateType { get; set; }
-    [Selector("useConfigurationAttributeInternalIPSubnet", "setUseConfigurationAttributeInternalIPSubnet:")] public bool UseConfigurationAttributeInternalIPSubnet { get; set; }
-    [Selector("IKESecurityAssociationParameters")] public NEVPNIKEv2SecurityAssociationParameters? IKESecurityAssociationParameters { get; }
-    [Selector("childSecurityAssociationParameters")] public NEVPNIKEv2SecurityAssociationParameters? ChildSecurityAssociationParameters { get; }
-    [Selector("disableMOBIKE", "setDisableMOBIKE:")] public bool DisableMOBIKE { get; set; }
-    [Selector("disableRedirect", "setDisableRedirect:")] public bool DisableRedirect { get; set; }
-    [Selector("enablePFS", "setEnablePFS:")] public bool EnablePFS { get; set; }
+    [Selector("deadPeerDetectionRate", "setDeadPeerDetectionRate:")]
+    public NEVPNIKEv2DeadPeerDetectionRate DeadPeerDetectionRate { get; set; }
+    [Selector("serverCertificateIssuerCommonName", "setServerCertificateIssuerCommonName:")]
+    public NSString? ServerCertificateIssuerCommonName { get; set; }
+    [Selector("serverCertificateCommonName", "setServerCertificateCommonName:")]
+    public NSString? ServerCertificateCommonName { get; set; }
+    [Selector("certificateType", "setCertificateType:")]
+    public NEVPNIKEv2CertificateType CertificateType { get; set; }
+    [Selector("useConfigurationAttributeInternalIPSubnet", "setUseConfigurationAttributeInternalIPSubnet:")]
+    public bool UseConfigurationAttributeInternalIPSubnet { get; set; }
+    [Selector("IKESecurityAssociationParameters")]
+    public NEVPNIKEv2SecurityAssociationParameters? IKESecurityAssociationParameters { get; }
+    [Selector("childSecurityAssociationParameters")]
+    public NEVPNIKEv2SecurityAssociationParameters? ChildSecurityAssociationParameters { get; }
+    [Selector("disableMOBIKE", "setDisableMOBIKE:")]
+    public bool DisableMOBIKE { get; set; }
+    [Selector("disableRedirect", "setDisableRedirect:")]
+    public bool DisableRedirect { get; set; }
+    [Selector("enablePFS", "setEnablePFS:")]
+    public bool EnablePFS { get; set; }
     /// macOS 26.0 and later.
-    [Selector("allowPostQuantumKeyExchangeFallback", "setAllowPostQuantumKeyExchangeFallback:")] public bool AllowPostQuantumKeyExchangeFallback { get; set; }
-    [Selector("enableRevocationCheck", "setEnableRevocationCheck:")] public bool EnableRevocationCheck { get; set; }
-    [Selector("strictRevocationCheck", "setStrictRevocationCheck:")] public bool StrictRevocationCheck { get; set; }
-    [Selector("minimumTLSVersion", "setMinimumTLSVersion:")] public NEVPNIKEv2TLSVersion MinimumTLSVersion { get; set; }
-    [Selector("maximumTLSVersion", "setMaximumTLSVersion:")] public NEVPNIKEv2TLSVersion MaximumTLSVersion { get; set; }
-    [Selector("mtu", "setMtu:")] public NSUInteger Mtu { get; set; }
-    [Selector("ppkConfiguration", "setPpkConfiguration:")] public NEVPNIKEv2PPKConfiguration? PpkConfiguration { get; set; }
+    [Selector("allowPostQuantumKeyExchangeFallback", "setAllowPostQuantumKeyExchangeFallback:")]
+    public bool AllowPostQuantumKeyExchangeFallback { get; set; }
+    [Selector("enableRevocationCheck", "setEnableRevocationCheck:")]
+    public bool EnableRevocationCheck { get; set; }
+    [Selector("strictRevocationCheck", "setStrictRevocationCheck:")]
+    public bool StrictRevocationCheck { get; set; }
+    [Selector("minimumTLSVersion", "setMinimumTLSVersion:")]
+    public NEVPNIKEv2TLSVersion MinimumTLSVersion { get; set; }
+    [Selector("maximumTLSVersion", "setMaximumTLSVersion:")]
+    public NEVPNIKEv2TLSVersion MaximumTLSVersion { get; set; }
+    [Selector("mtu", "setMtu:")]
+    public NSUInteger Mtu { get; set; }
+    [Selector("ppkConfiguration", "setPpkConfiguration:")]
+    public NEVPNIKEv2PPKConfiguration? PpkConfiguration { get; set; }
 }
 
 #endif

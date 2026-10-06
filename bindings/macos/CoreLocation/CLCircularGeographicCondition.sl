@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class CLCircularGeographicCondition : CLCondition, NSSecureCoding
 {
-    [Selector("center")] public CLLocationCoordinate2D Center { get; }
-    [Selector("radius")] public CLLocationDistance Radius { get; }
-    [Selector("initWithCenter:radius:")] public Self InitWithCenterRadius(CLLocationCoordinate2D center, CLLocationDistance radius);
+    [Selector("center")]
+    public CLLocationCoordinate2D Center { get; }
+    [Selector("radius")]
+    public CLLocationDistance Radius { get; }
+    [Selector("initWithCenter:radius:")]
+    public Self InitWithCenterRadius(CLLocationCoordinate2D center, CLLocationDistance radius);
 }
 
 #endif

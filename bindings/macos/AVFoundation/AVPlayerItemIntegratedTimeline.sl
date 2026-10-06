@@ -40,28 +40,42 @@ public enum AVPlayerItemSegmentType : long
 
 public extern objc class AVPlayerItemSegment : NSObject
 {
-    [Selector("segmentType")] public AVPlayerItemSegmentType SegmentType { get; }
-    [Selector("timeMapping")] public CMTimeMapping TimeMapping { get; }
-    [Selector("loadedTimeRanges")] public NSArray? LoadedTimeRanges { get; }
-    [Selector("startDate")] public NSDate? StartDate { get; }
-    [Selector("interstitialEvent")] public AVPlayerInterstitialEvent? InterstitialEvent { get; }
+    [Selector("segmentType")]
+    public AVPlayerItemSegmentType SegmentType { get; }
+    [Selector("timeMapping")]
+    public CMTimeMapping TimeMapping { get; }
+    [Selector("loadedTimeRanges")]
+    public NSArray? LoadedTimeRanges { get; }
+    [Selector("startDate")]
+    public NSDate? StartDate { get; }
+    [Selector("interstitialEvent")]
+    public AVPlayerInterstitialEvent? InterstitialEvent { get; }
 }
 
 public extern objc class AVPlayerItemIntegratedTimelineSnapshot : NSObject
 {
-    [Selector("duration")] public CMTime Duration { get; }
-    [Selector("currentSegment")] public AVPlayerItemSegment? CurrentSegment { get; }
-    [Selector("segments")] public NSArray Segments { get; }
-    [Selector("currentTime")] public CMTime CurrentTime { get; }
-    [Selector("currentDate")] public NSDate? CurrentDate { get; }
-    [Selector("mapTime:toSegment:atSegmentOffset:")] public void MapTimeToSegmentAtSegmentOffset(CMTime time, out AVPlayerItemSegment? timeSegmentOut, CMTime* segmentOffsetOut);
+    [Selector("duration")]
+    public CMTime Duration { get; }
+    [Selector("currentSegment")]
+    public AVPlayerItemSegment? CurrentSegment { get; }
+    [Selector("segments")]
+    public NSArray Segments { get; }
+    [Selector("currentTime")]
+    public CMTime CurrentTime { get; }
+    [Selector("currentDate")]
+    public NSDate? CurrentDate { get; }
+    [Selector("mapTime:toSegment:atSegmentOffset:")]
+    public void MapTimeToSegmentAtSegmentOffset(CMTime time, out AVPlayerItemSegment? timeSegmentOut, CMTime* segmentOffsetOut);
 }
 
 public extern objc class AVPlayerItemIntegratedTimeline : NSObject
 {
-    [Selector("currentSnapshot")] public AVPlayerItemIntegratedTimelineSnapshot CurrentSnapshot { get; }
-    [Selector("currentTime")] public CMTime CurrentTime { get; }
-    [Selector("currentDate")] public NSDate? CurrentDate { get; }
+    [Selector("currentSnapshot")]
+    public AVPlayerItemIntegratedTimelineSnapshot CurrentSnapshot { get; }
+    [Selector("currentTime")]
+    public CMTime CurrentTime { get; }
+    [Selector("currentDate")]
+    public NSDate? CurrentDate { get; }
 }
 
 public objc closure void AVPlayerItemIntegratedTimelineSeekToTimeToleranceBeforeToleranceAfterCompletionHandlerCompletionHandlerBlock(bool arg0);
@@ -71,8 +85,10 @@ public objc closure void AVPlayerItemIntegratedTimelineSeekToDateCompletionHandl
 /// AVPlayerItemIntegratedTimelineControl, a category of AVPlayerItemIntegratedTimeline.
 public extern objc class AVPlayerItemIntegratedTimeline
 {
-    [Selector("seekToTime:toleranceBefore:toleranceAfter:completionHandler:")] public void SeekToTimeToleranceBeforeToleranceAfterCompletionHandler(CMTime time, CMTime toleranceBefore, CMTime toleranceAfter, AVPlayerItemIntegratedTimelineSeekToTimeToleranceBeforeToleranceAfterCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("seekToDate:completionHandler:")] public void SeekToDateCompletionHandler(NSDate date, AVPlayerItemIntegratedTimelineSeekToDateCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("seekToTime:toleranceBefore:toleranceAfter:completionHandler:")]
+    public void SeekToTimeToleranceBeforeToleranceAfterCompletionHandler(CMTime time, CMTime toleranceBefore, CMTime toleranceAfter, AVPlayerItemIntegratedTimelineSeekToTimeToleranceBeforeToleranceAfterCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("seekToDate:completionHandler:")]
+    public void SeekToDateCompletionHandler(NSDate date, AVPlayerItemIntegratedTimelineSeekToDateCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public objc interface AVPlayerItemIntegratedTimelineObserver : NSObjectProtocol { }
@@ -84,9 +100,12 @@ public objc closure void AVPlayerItemIntegratedTimelineAddBoundaryTimeObserverFo
 /// AVPlayerItemIntegratedTimelineObserver, a category of AVPlayerItemIntegratedTimeline.
 public extern objc class AVPlayerItemIntegratedTimeline
 {
-    [Selector("addPeriodicTimeObserverForInterval:queue:usingBlock:")] public AVPlayerItemIntegratedTimelineObserver AddPeriodicTimeObserverForIntervalQueueUsingBlock(CMTime interval, dispatch_queue_t? queue, AVPlayerItemIntegratedTimelineAddPeriodicTimeObserverForIntervalQueueUsingBlockBlock block);
-    [Selector("addBoundaryTimeObserverForSegment:offsetsIntoSegment:queue:usingBlock:")] public AVPlayerItemIntegratedTimelineObserver AddBoundaryTimeObserverForSegmentOffsetsIntoSegmentQueueUsingBlock(AVPlayerItemSegment segment, NSArray offsetsIntoSegment, dispatch_queue_t? queue, AVPlayerItemIntegratedTimelineAddBoundaryTimeObserverForSegmentOffsetsIntoSegmentQueueUsingBlockBlock block);
-    [Selector("removeTimeObserver:")] public void RemoveTimeObserver(AVPlayerItemIntegratedTimelineObserver observer);
+    [Selector("addPeriodicTimeObserverForInterval:queue:usingBlock:")]
+    public AVPlayerItemIntegratedTimelineObserver AddPeriodicTimeObserverForIntervalQueueUsingBlock(CMTime interval, dispatch_queue_t? queue, AVPlayerItemIntegratedTimelineAddPeriodicTimeObserverForIntervalQueueUsingBlockBlock block);
+    [Selector("addBoundaryTimeObserverForSegment:offsetsIntoSegment:queue:usingBlock:")]
+    public AVPlayerItemIntegratedTimelineObserver AddBoundaryTimeObserverForSegmentOffsetsIntoSegmentQueueUsingBlock(AVPlayerItemSegment segment, NSArray offsetsIntoSegment, dispatch_queue_t? queue, AVPlayerItemIntegratedTimelineAddBoundaryTimeObserverForSegmentOffsetsIntoSegmentQueueUsingBlockBlock block);
+    [Selector("removeTimeObserver:")]
+    public void RemoveTimeObserver(AVPlayerItemIntegratedTimelineObserver observer);
 }
 
 public extern "C" NSNotificationName AVPlayerIntegratedTimelineSnapshotsOutOfSyncNotification;
@@ -104,7 +123,8 @@ public extern "C" AVPlayerIntegratedTimelineSnapshotsOutOfSyncReason AVPlayerInt
 /// AVPlayerItemIntegratedTimelineSupport, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    [Selector("integratedTimeline")] public AVPlayerItemIntegratedTimeline IntegratedTimeline { get; }
+    [Selector("integratedTimeline")]
+    public AVPlayerItemIntegratedTimeline IntegratedTimeline { get; }
 }
 
 #endif

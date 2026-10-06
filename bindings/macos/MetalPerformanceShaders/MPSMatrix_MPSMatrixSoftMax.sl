@@ -34,24 +34,36 @@ import Standard.ObjC;
 
 public extern objc class MPSMatrixSoftMax : MPSMatrixUnaryKernel
 {
-    [Selector("sourceRows", "setSourceRows:")] public NSUInteger SourceRows { get; set; }
-    [Selector("sourceColumns", "setSourceColumns:")] public NSUInteger SourceColumns { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("encodeToCommandBuffer:inputMatrix:resultMatrix:")] public void EncodeToCommandBufferInputMatrixResultMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputMatrix, MPSMatrix resultMatrix);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("sourceRows", "setSourceRows:")]
+    public NSUInteger SourceRows { get; set; }
+    [Selector("sourceColumns", "setSourceColumns:")]
+    public NSUInteger SourceColumns { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("encodeToCommandBuffer:inputMatrix:resultMatrix:")]
+    public void EncodeToCommandBufferInputMatrixResultMatrix(MTLCommandBuffer commandBuffer, MPSMatrix inputMatrix, MPSMatrix resultMatrix);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
 }
 
 public extern objc class MPSMatrixLogSoftMax : MPSMatrixSoftMax { }
 
 public extern objc class MPSMatrixSoftMaxGradient : MPSMatrixBinaryKernel
 {
-    [Selector("sourceRows", "setSourceRows:")] public NSUInteger SourceRows { get; set; }
-    [Selector("sourceColumns", "setSourceColumns:")] public NSUInteger SourceColumns { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("encodeToCommandBuffer:gradientMatrix:forwardOutputMatrix:resultMatrix:")] public void EncodeToCommandBufferGradientMatrixForwardOutputMatrixResultMatrix(MTLCommandBuffer commandBuffer, MPSMatrix gradientMatrix, MPSMatrix forwardOutputMatrix, MPSMatrix resultMatrix);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("sourceRows", "setSourceRows:")]
+    public NSUInteger SourceRows { get; set; }
+    [Selector("sourceColumns", "setSourceColumns:")]
+    public NSUInteger SourceColumns { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("encodeToCommandBuffer:gradientMatrix:forwardOutputMatrix:resultMatrix:")]
+    public void EncodeToCommandBufferGradientMatrixForwardOutputMatrixResultMatrix(MTLCommandBuffer commandBuffer, MPSMatrix gradientMatrix, MPSMatrix forwardOutputMatrix, MPSMatrix resultMatrix);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
 }
 
 public extern objc class MPSMatrixLogSoftMaxGradient : MPSMatrixSoftMaxGradient { }

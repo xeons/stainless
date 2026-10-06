@@ -35,8 +35,10 @@ public using NSFileProviderDomainIdentifier = NSString;
 
 public extern objc class NSFileProviderDomainVersion : NSObject, NSSecureCoding
 {
-    [Selector("next")] public NSFileProviderDomainVersion Next();
-    [Selector("compare:")] public NSComparisonResult Compare(NSFileProviderDomainVersion otherVersion);
+    [Selector("next")]
+    public NSFileProviderDomainVersion Next();
+    [Selector("compare:")]
+    public NSComparisonResult Compare(NSFileProviderDomainVersion otherVersion);
 }
 
 [Flags]
@@ -55,23 +57,39 @@ public enum NSFileProviderKnownFolders : ulong
 
 public extern objc class NSFileProviderDomain : NSObject
 {
-    [Selector("identifier")] public NSFileProviderDomainIdentifier Identifier { get; }
-    [Selector("displayName")] public NSString DisplayName { get; }
-    [Selector("isDisconnected")] public bool Disconnected { get; }
-    [Selector("userEnabled")] public bool UserEnabled { get; }
-    [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
-    [Selector("isReplicated")] public bool Replicated { get; }
-    [Selector("testingModes", "setTestingModes:")] public NSFileProviderDomainTestingModes TestingModes { get; set; }
-    [Selector("backingStoreIdentity")] public NSData? BackingStoreIdentity { get; }
-    [Selector("supportsSyncingTrash", "setSupportsSyncingTrash:")] public bool SupportsSyncingTrash { get; set; }
-    [Selector("volumeUUID")] public NSUUID? VolumeUUID { get; }
-    [Selector("userInfo", "setUserInfo:")] public NSDictionary? UserInfo { get; set; }
-    [Selector("replicatedKnownFolders")] public NSFileProviderKnownFolders ReplicatedKnownFolders { get; }
-    [Selector("supportedKnownFolders", "setSupportedKnownFolders:")] public NSFileProviderKnownFolders SupportedKnownFolders { get; set; }
+    [Selector("identifier")]
+    public NSFileProviderDomainIdentifier Identifier { get; }
+    [Selector("displayName")]
+    public NSString DisplayName { get; }
+    [Selector("isDisconnected")]
+    public bool Disconnected { get; }
+    [Selector("userEnabled")]
+    public bool UserEnabled { get; }
+    [Selector("isHidden", "setHidden:")]
+    public bool Hidden { get; set; }
+    [Selector("isReplicated")]
+    public bool Replicated { get; }
+    [Selector("testingModes", "setTestingModes:")]
+    public NSFileProviderDomainTestingModes TestingModes { get; set; }
+    [Selector("backingStoreIdentity")]
+    public NSData? BackingStoreIdentity { get; }
+    [Selector("supportsSyncingTrash", "setSupportsSyncingTrash:")]
+    public bool SupportsSyncingTrash { get; set; }
+    [Selector("volumeUUID")]
+    public NSUUID? VolumeUUID { get; }
+    [Selector("userInfo", "setUserInfo:")]
+    public NSDictionary? UserInfo { get; set; }
+    [Selector("replicatedKnownFolders")]
+    public NSFileProviderKnownFolders ReplicatedKnownFolders { get; }
+    [Selector("supportedKnownFolders", "setSupportedKnownFolders:")]
+    public NSFileProviderKnownFolders SupportedKnownFolders { get; set; }
     /// macOS 26.0 and later.
-    [Selector("supportsStringSearchRequest", "setSupportsStringSearchRequest:")] public bool SupportsStringSearchRequest { get; set; }
-    [Selector("initWithIdentifier:displayName:")] public Self InitWithIdentifierDisplayName(NSFileProviderDomainIdentifier identifier, NSString displayName);
-    [Selector("initWithDisplayName:userInfo:volumeURL:")] public Self InitWithDisplayNameUserInfoVolumeURL(NSString displayName, NSDictionary userInfo, NSURL? volumeURL);
+    [Selector("supportsStringSearchRequest", "setSupportsStringSearchRequest:")]
+    public bool SupportsStringSearchRequest { get; set; }
+    [Selector("initWithIdentifier:displayName:")]
+    public Self InitWithIdentifierDisplayName(NSFileProviderDomainIdentifier identifier, NSString displayName);
+    [Selector("initWithDisplayName:userInfo:volumeURL:")]
+    public Self InitWithDisplayNameUserInfoVolumeURL(NSString displayName, NSDictionary userInfo, NSURL? volumeURL);
 }
 
 public extern "C" NSNotificationName NSFileProviderDomainDidChange;

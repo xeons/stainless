@@ -34,20 +34,24 @@ import Standard.ObjC;
 /// GatherNDOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("gatherNDWithUpdatesTensor:indicesTensor:batchDimensions:name:")] public MPSGraphTensor GatherNDWithUpdatesTensorIndicesTensorBatchDimensionsName(MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, NSUInteger batchDimensions, NSString? name);
+    [Selector("gatherNDWithUpdatesTensor:indicesTensor:batchDimensions:name:")]
+    public MPSGraphTensor GatherNDWithUpdatesTensorIndicesTensorBatchDimensionsName(MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, NSUInteger batchDimensions, NSString? name);
 }
 
 /// GatherOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("gatherWithUpdatesTensor:indicesTensor:axis:batchDimensions:name:")] public MPSGraphTensor GatherWithUpdatesTensorIndicesTensorAxisBatchDimensionsName(MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, NSUInteger axis, NSUInteger batchDimensions, NSString? name);
+    [Selector("gatherWithUpdatesTensor:indicesTensor:axis:batchDimensions:name:")]
+    public MPSGraphTensor GatherWithUpdatesTensorIndicesTensorAxisBatchDimensionsName(MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, NSUInteger axis, NSUInteger batchDimensions, NSString? name);
 }
 
 /// MPSGraphGatherAlongAxisOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("gatherAlongAxis:withUpdatesTensor:indicesTensor:name:")] public MPSGraphTensor GatherAlongAxisWithUpdatesTensorIndicesTensorName(NSInteger axis, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, NSString? name);
-    [Selector("gatherAlongAxisTensor:withUpdatesTensor:indicesTensor:name:")] public MPSGraphTensor GatherAlongAxisTensorWithUpdatesTensorIndicesTensorName(MPSGraphTensor axisTensor, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, NSString? name);
+    [Selector("gatherAlongAxis:withUpdatesTensor:indicesTensor:name:")]
+    public MPSGraphTensor GatherAlongAxisWithUpdatesTensorIndicesTensorName(NSInteger axis, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, NSString? name);
+    [Selector("gatherAlongAxisTensor:withUpdatesTensor:indicesTensor:name:")]
+    public MPSGraphTensor GatherAlongAxisTensorWithUpdatesTensorIndicesTensorName(MPSGraphTensor axisTensor, MPSGraphTensor updatesTensor, MPSGraphTensor indicesTensor, NSString? name);
 }
 
 #endif

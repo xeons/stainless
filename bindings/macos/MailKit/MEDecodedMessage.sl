@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class MEDecodedMessage : NSObject, NSSecureCoding
 {
-    [Selector("rawData")] public NSData? RawData { get; }
-    [Selector("securityInformation")] public MEMessageSecurityInformation SecurityInformation { get; }
-    [Selector("context")] public NSData? Context { get; }
-    [Selector("banner")] public MEDecodedMessageBanner? Banner { get; }
-    [Selector("initWithData:securityInformation:context:")] public Self InitWithDataSecurityInformationContext(NSData? rawData, MEMessageSecurityInformation securityInformation, NSData? context);
-    [Selector("initWithData:securityInformation:context:banner:")] public Self InitWithDataSecurityInformationContextBanner(NSData? rawData, MEMessageSecurityInformation securityInformation, NSData? context, MEDecodedMessageBanner? banner);
+    [Selector("rawData")]
+    public NSData? RawData { get; }
+    [Selector("securityInformation")]
+    public MEMessageSecurityInformation SecurityInformation { get; }
+    [Selector("context")]
+    public NSData? Context { get; }
+    [Selector("banner")]
+    public MEDecodedMessageBanner? Banner { get; }
+    [Selector("initWithData:securityInformation:context:")]
+    public Self InitWithDataSecurityInformationContext(NSData? rawData, MEMessageSecurityInformation securityInformation, NSData? context);
+    [Selector("initWithData:securityInformation:context:banner:")]
+    public Self InitWithDataSecurityInformationContextBanner(NSData? rawData, MEMessageSecurityInformation securityInformation, NSData? context, MEDecodedMessageBanner? banner);
 }
 
 #endif

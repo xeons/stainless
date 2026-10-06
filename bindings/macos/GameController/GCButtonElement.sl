@@ -31,10 +31,13 @@ import Standard.ObjC;
 
 public objc interface GCButtonElement : GCPhysicalInputElement
 {
-    [Selector("pressedInput")] GCPressedStateInput PressedInput { get; }
-    [Selector("touchedInput")] GCTouchedStateInput? TouchedInput { get; }
+    [Selector("pressedInput")]
+    GCPressedStateInput PressedInput { get; }
+    [Selector("touchedInput")]
+    GCTouchedStateInput? TouchedInput { get; }
     /// macOS 26.0 and later.
-    [Selector("forceInput")] GCLinearInput? ForceInput { get; }
+    [Selector("forceInput")]
+    GCLinearInput? ForceInput { get; }
 }
 
 #endif

@@ -41,65 +41,111 @@ public enum MPSGraphRNNActivation : ulong
 
 public extern objc class MPSGraphSingleGateRNNDescriptor : MPSGraphObject, NSCopying
 {
-    [Selector("reverse", "setReverse:")] public bool Reverse { get; set; }
-    [Selector("bidirectional", "setBidirectional:")] public bool Bidirectional { get; set; }
-    [Selector("training", "setTraining:")] public bool Training { get; set; }
-    [Selector("activation", "setActivation:")] public MPSGraphRNNActivation Activation { get; set; }
-    [Selector("descriptor")] public static Self? Descriptor();
+    [Selector("reverse", "setReverse:")]
+    public bool Reverse { get; set; }
+    [Selector("bidirectional", "setBidirectional:")]
+    public bool Bidirectional { get; set; }
+    [Selector("training", "setTraining:")]
+    public bool Training { get; set; }
+    [Selector("activation", "setActivation:")]
+    public MPSGraphRNNActivation Activation { get; set; }
+    [Selector("descriptor")]
+    public static Self? Descriptor();
 }
 
 public extern objc class MPSGraphLSTMDescriptor : MPSGraphObject, NSCopying
 {
-    [Selector("reverse", "setReverse:")] public bool Reverse { get; set; }
-    [Selector("bidirectional", "setBidirectional:")] public bool Bidirectional { get; set; }
-    [Selector("produceCell", "setProduceCell:")] public bool ProduceCell { get; set; }
-    [Selector("training", "setTraining:")] public bool Training { get; set; }
-    [Selector("forgetGateLast", "setForgetGateLast:")] public bool ForgetGateLast { get; set; }
-    [Selector("inputGateActivation", "setInputGateActivation:")] public MPSGraphRNNActivation InputGateActivation { get; set; }
-    [Selector("forgetGateActivation", "setForgetGateActivation:")] public MPSGraphRNNActivation ForgetGateActivation { get; set; }
-    [Selector("cellGateActivation", "setCellGateActivation:")] public MPSGraphRNNActivation CellGateActivation { get; set; }
-    [Selector("outputGateActivation", "setOutputGateActivation:")] public MPSGraphRNNActivation OutputGateActivation { get; set; }
-    [Selector("activation", "setActivation:")] public MPSGraphRNNActivation Activation { get; set; }
-    [Selector("descriptor")] public static Self? Descriptor();
+    [Selector("reverse", "setReverse:")]
+    public bool Reverse { get; set; }
+    [Selector("bidirectional", "setBidirectional:")]
+    public bool Bidirectional { get; set; }
+    [Selector("produceCell", "setProduceCell:")]
+    public bool ProduceCell { get; set; }
+    [Selector("training", "setTraining:")]
+    public bool Training { get; set; }
+    [Selector("forgetGateLast", "setForgetGateLast:")]
+    public bool ForgetGateLast { get; set; }
+    [Selector("inputGateActivation", "setInputGateActivation:")]
+    public MPSGraphRNNActivation InputGateActivation { get; set; }
+    [Selector("forgetGateActivation", "setForgetGateActivation:")]
+    public MPSGraphRNNActivation ForgetGateActivation { get; set; }
+    [Selector("cellGateActivation", "setCellGateActivation:")]
+    public MPSGraphRNNActivation CellGateActivation { get; set; }
+    [Selector("outputGateActivation", "setOutputGateActivation:")]
+    public MPSGraphRNNActivation OutputGateActivation { get; set; }
+    [Selector("activation", "setActivation:")]
+    public MPSGraphRNNActivation Activation { get; set; }
+    [Selector("descriptor")]
+    public static Self? Descriptor();
 }
 
 public extern objc class MPSGraphGRUDescriptor : MPSGraphObject, NSCopying
 {
-    [Selector("reverse", "setReverse:")] public bool Reverse { get; set; }
-    [Selector("bidirectional", "setBidirectional:")] public bool Bidirectional { get; set; }
-    [Selector("training", "setTraining:")] public bool Training { get; set; }
-    [Selector("resetGateFirst", "setResetGateFirst:")] public bool ResetGateFirst { get; set; }
-    [Selector("resetAfter", "setResetAfter:")] public bool ResetAfter { get; set; }
-    [Selector("flipZ", "setFlipZ:")] public bool FlipZ { get; set; }
-    [Selector("updateGateActivation", "setUpdateGateActivation:")] public MPSGraphRNNActivation UpdateGateActivation { get; set; }
-    [Selector("resetGateActivation", "setResetGateActivation:")] public MPSGraphRNNActivation ResetGateActivation { get; set; }
-    [Selector("outputGateActivation", "setOutputGateActivation:")] public MPSGraphRNNActivation OutputGateActivation { get; set; }
-    [Selector("descriptor")] public static Self? Descriptor();
+    [Selector("reverse", "setReverse:")]
+    public bool Reverse { get; set; }
+    [Selector("bidirectional", "setBidirectional:")]
+    public bool Bidirectional { get; set; }
+    [Selector("training", "setTraining:")]
+    public bool Training { get; set; }
+    [Selector("resetGateFirst", "setResetGateFirst:")]
+    public bool ResetGateFirst { get; set; }
+    [Selector("resetAfter", "setResetAfter:")]
+    public bool ResetAfter { get; set; }
+    [Selector("flipZ", "setFlipZ:")]
+    public bool FlipZ { get; set; }
+    [Selector("updateGateActivation", "setUpdateGateActivation:")]
+    public MPSGraphRNNActivation UpdateGateActivation { get; set; }
+    [Selector("resetGateActivation", "setResetGateActivation:")]
+    public MPSGraphRNNActivation ResetGateActivation { get; set; }
+    [Selector("outputGateActivation", "setOutputGateActivation:")]
+    public MPSGraphRNNActivation OutputGateActivation { get; set; }
+    [Selector("descriptor")]
+    public static Self? Descriptor();
 }
 
 /// MPSGraphRNNOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("singleGateRNNWithSourceTensor:recurrentWeight:inputWeight:bias:initState:mask:descriptor:name:")] public NSArray SingleGateRNNWithSourceTensorRecurrentWeightInputWeightBiasInitStateMaskDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? mask, MPSGraphSingleGateRNNDescriptor descriptor, NSString? name);
-    [Selector("singleGateRNNWithSourceTensor:recurrentWeight:inputWeight:bias:initState:descriptor:name:")] public NSArray SingleGateRNNWithSourceTensorRecurrentWeightInputWeightBiasInitStateDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphSingleGateRNNDescriptor descriptor, NSString? name);
-    [Selector("singleGateRNNWithSourceTensor:recurrentWeight:initState:descriptor:name:")] public NSArray SingleGateRNNWithSourceTensorRecurrentWeightInitStateDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? initState, MPSGraphSingleGateRNNDescriptor descriptor, NSString? name);
-    [Selector("singleGateRNNGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:stateGradient:inputWeight:bias:initState:mask:descriptor:name:")] public NSArray SingleGateRNNGradientsWithSourceTensorRecurrentWeightSourceGradientZStateStateGradientInputWeightBiasInitStateMaskDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor? stateGradient, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? mask, MPSGraphSingleGateRNNDescriptor descriptor, NSString? name);
-    [Selector("singleGateRNNGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:inputWeight:bias:initState:mask:descriptor:name:")] public NSArray SingleGateRNNGradientsWithSourceTensorRecurrentWeightSourceGradientZStateInputWeightBiasInitStateMaskDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? mask, MPSGraphSingleGateRNNDescriptor descriptor, NSString? name);
-    [Selector("singleGateRNNGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:inputWeight:bias:initState:descriptor:name:")] public NSArray SingleGateRNNGradientsWithSourceTensorRecurrentWeightSourceGradientZStateInputWeightBiasInitStateDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphSingleGateRNNDescriptor descriptor, NSString? name);
-    [Selector("singleGateRNNGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:initState:descriptor:name:")] public NSArray SingleGateRNNGradientsWithSourceTensorRecurrentWeightSourceGradientZStateInitStateDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor? initState, MPSGraphSingleGateRNNDescriptor descriptor, NSString? name);
-    [Selector("LSTMWithSourceTensor:recurrentWeight:inputWeight:bias:initState:initCell:mask:peephole:descriptor:name:")] public NSArray LSTMWithSourceTensorRecurrentWeightInputWeightBiasInitStateInitCellMaskPeepholeDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? initCell, MPSGraphTensor? mask, MPSGraphTensor? peephole, MPSGraphLSTMDescriptor descriptor, NSString? name);
-    [Selector("LSTMWithSourceTensor:recurrentWeight:inputWeight:bias:initState:initCell:descriptor:name:")] public NSArray LSTMWithSourceTensorRecurrentWeightInputWeightBiasInitStateInitCellDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? initCell, MPSGraphLSTMDescriptor descriptor, NSString? name);
-    [Selector("LSTMWithSourceTensor:recurrentWeight:initState:initCell:descriptor:name:")] public NSArray LSTMWithSourceTensorRecurrentWeightInitStateInitCellDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? initState, MPSGraphTensor? initCell, MPSGraphLSTMDescriptor descriptor, NSString? name);
-    [Selector("LSTMGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:cellOutputFwd:stateGradient:cellGradient:inputWeight:bias:initState:initCell:mask:peephole:descriptor:name:")] public NSArray LSTMGradientsWithSourceTensorRecurrentWeightSourceGradientZStateCellOutputFwdStateGradientCellGradientInputWeightBiasInitStateInitCellMaskPeepholeDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor cellOutputFwd, MPSGraphTensor? stateGradient, MPSGraphTensor? cellGradient, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? initCell, MPSGraphTensor? mask, MPSGraphTensor? peephole, MPSGraphLSTMDescriptor descriptor, NSString? name);
-    [Selector("LSTMGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:cellOutputFwd:inputWeight:bias:initState:initCell:mask:descriptor:name:")] public NSArray LSTMGradientsWithSourceTensorRecurrentWeightSourceGradientZStateCellOutputFwdInputWeightBiasInitStateInitCellMaskDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor cellOutputFwd, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? initCell, MPSGraphTensor? mask, MPSGraphLSTMDescriptor descriptor, NSString? name);
-    [Selector("LSTMGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:cellOutputFwd:inputWeight:bias:initState:initCell:descriptor:name:")] public NSArray LSTMGradientsWithSourceTensorRecurrentWeightSourceGradientZStateCellOutputFwdInputWeightBiasInitStateInitCellDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor cellOutputFwd, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? initCell, MPSGraphLSTMDescriptor descriptor, NSString? name);
-    [Selector("LSTMGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:cellOutputFwd:descriptor:name:")] public NSArray LSTMGradientsWithSourceTensorRecurrentWeightSourceGradientZStateCellOutputFwdDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor cellOutputFwd, MPSGraphLSTMDescriptor descriptor, NSString? name);
-    [Selector("GRUWithSourceTensor:recurrentWeight:inputWeight:bias:initState:mask:secondaryBias:descriptor:name:")] public NSArray GRUWithSourceTensorRecurrentWeightInputWeightBiasInitStateMaskSecondaryBiasDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? mask, MPSGraphTensor? secondaryBias, MPSGraphGRUDescriptor descriptor, NSString? name);
-    [Selector("GRUWithSourceTensor:recurrentWeight:inputWeight:bias:initState:descriptor:name:")] public NSArray GRUWithSourceTensorRecurrentWeightInputWeightBiasInitStateDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphGRUDescriptor descriptor, NSString? name);
-    [Selector("GRUWithSourceTensor:recurrentWeight:inputWeight:bias:descriptor:name:")] public NSArray GRUWithSourceTensorRecurrentWeightInputWeightBiasDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphGRUDescriptor descriptor, NSString? name);
-    [Selector("GRUGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:outputFwd:stateGradient:inputWeight:bias:initState:mask:secondaryBias:descriptor:name:")] public NSArray GRUGradientsWithSourceTensorRecurrentWeightSourceGradientZStateOutputFwdStateGradientInputWeightBiasInitStateMaskSecondaryBiasDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor outputFwd, MPSGraphTensor? stateGradient, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? mask, MPSGraphTensor? secondaryBias, MPSGraphGRUDescriptor descriptor, NSString? name);
-    [Selector("GRUGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:outputFwd:inputWeight:bias:initState:descriptor:name:")] public NSArray GRUGradientsWithSourceTensorRecurrentWeightSourceGradientZStateOutputFwdInputWeightBiasInitStateDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor outputFwd, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphGRUDescriptor descriptor, NSString? name);
-    [Selector("GRUGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:outputFwd:inputWeight:bias:descriptor:name:")] public NSArray GRUGradientsWithSourceTensorRecurrentWeightSourceGradientZStateOutputFwdInputWeightBiasDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor outputFwd, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphGRUDescriptor descriptor, NSString? name);
+    [Selector("singleGateRNNWithSourceTensor:recurrentWeight:inputWeight:bias:initState:mask:descriptor:name:")]
+    public NSArray SingleGateRNNWithSourceTensorRecurrentWeightInputWeightBiasInitStateMaskDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? mask, MPSGraphSingleGateRNNDescriptor descriptor, NSString? name);
+    [Selector("singleGateRNNWithSourceTensor:recurrentWeight:inputWeight:bias:initState:descriptor:name:")]
+    public NSArray SingleGateRNNWithSourceTensorRecurrentWeightInputWeightBiasInitStateDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphSingleGateRNNDescriptor descriptor, NSString? name);
+    [Selector("singleGateRNNWithSourceTensor:recurrentWeight:initState:descriptor:name:")]
+    public NSArray SingleGateRNNWithSourceTensorRecurrentWeightInitStateDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? initState, MPSGraphSingleGateRNNDescriptor descriptor, NSString? name);
+    [Selector("singleGateRNNGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:stateGradient:inputWeight:bias:initState:mask:descriptor:name:")]
+    public NSArray SingleGateRNNGradientsWithSourceTensorRecurrentWeightSourceGradientZStateStateGradientInputWeightBiasInitStateMaskDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor? stateGradient, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? mask, MPSGraphSingleGateRNNDescriptor descriptor, NSString? name);
+    [Selector("singleGateRNNGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:inputWeight:bias:initState:mask:descriptor:name:")]
+    public NSArray SingleGateRNNGradientsWithSourceTensorRecurrentWeightSourceGradientZStateInputWeightBiasInitStateMaskDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? mask, MPSGraphSingleGateRNNDescriptor descriptor, NSString? name);
+    [Selector("singleGateRNNGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:inputWeight:bias:initState:descriptor:name:")]
+    public NSArray SingleGateRNNGradientsWithSourceTensorRecurrentWeightSourceGradientZStateInputWeightBiasInitStateDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphSingleGateRNNDescriptor descriptor, NSString? name);
+    [Selector("singleGateRNNGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:initState:descriptor:name:")]
+    public NSArray SingleGateRNNGradientsWithSourceTensorRecurrentWeightSourceGradientZStateInitStateDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor? initState, MPSGraphSingleGateRNNDescriptor descriptor, NSString? name);
+    [Selector("LSTMWithSourceTensor:recurrentWeight:inputWeight:bias:initState:initCell:mask:peephole:descriptor:name:")]
+    public NSArray LSTMWithSourceTensorRecurrentWeightInputWeightBiasInitStateInitCellMaskPeepholeDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? initCell, MPSGraphTensor? mask, MPSGraphTensor? peephole, MPSGraphLSTMDescriptor descriptor, NSString? name);
+    [Selector("LSTMWithSourceTensor:recurrentWeight:inputWeight:bias:initState:initCell:descriptor:name:")]
+    public NSArray LSTMWithSourceTensorRecurrentWeightInputWeightBiasInitStateInitCellDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? initCell, MPSGraphLSTMDescriptor descriptor, NSString? name);
+    [Selector("LSTMWithSourceTensor:recurrentWeight:initState:initCell:descriptor:name:")]
+    public NSArray LSTMWithSourceTensorRecurrentWeightInitStateInitCellDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? initState, MPSGraphTensor? initCell, MPSGraphLSTMDescriptor descriptor, NSString? name);
+    [Selector("LSTMGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:cellOutputFwd:stateGradient:cellGradient:inputWeight:bias:initState:initCell:mask:peephole:descriptor:name:")]
+    public NSArray LSTMGradientsWithSourceTensorRecurrentWeightSourceGradientZStateCellOutputFwdStateGradientCellGradientInputWeightBiasInitStateInitCellMaskPeepholeDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor cellOutputFwd, MPSGraphTensor? stateGradient, MPSGraphTensor? cellGradient, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? initCell, MPSGraphTensor? mask, MPSGraphTensor? peephole, MPSGraphLSTMDescriptor descriptor, NSString? name);
+    [Selector("LSTMGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:cellOutputFwd:inputWeight:bias:initState:initCell:mask:descriptor:name:")]
+    public NSArray LSTMGradientsWithSourceTensorRecurrentWeightSourceGradientZStateCellOutputFwdInputWeightBiasInitStateInitCellMaskDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor cellOutputFwd, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? initCell, MPSGraphTensor? mask, MPSGraphLSTMDescriptor descriptor, NSString? name);
+    [Selector("LSTMGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:cellOutputFwd:inputWeight:bias:initState:initCell:descriptor:name:")]
+    public NSArray LSTMGradientsWithSourceTensorRecurrentWeightSourceGradientZStateCellOutputFwdInputWeightBiasInitStateInitCellDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor cellOutputFwd, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? initCell, MPSGraphLSTMDescriptor descriptor, NSString? name);
+    [Selector("LSTMGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:cellOutputFwd:descriptor:name:")]
+    public NSArray LSTMGradientsWithSourceTensorRecurrentWeightSourceGradientZStateCellOutputFwdDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor cellOutputFwd, MPSGraphLSTMDescriptor descriptor, NSString? name);
+    [Selector("GRUWithSourceTensor:recurrentWeight:inputWeight:bias:initState:mask:secondaryBias:descriptor:name:")]
+    public NSArray GRUWithSourceTensorRecurrentWeightInputWeightBiasInitStateMaskSecondaryBiasDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? mask, MPSGraphTensor? secondaryBias, MPSGraphGRUDescriptor descriptor, NSString? name);
+    [Selector("GRUWithSourceTensor:recurrentWeight:inputWeight:bias:initState:descriptor:name:")]
+    public NSArray GRUWithSourceTensorRecurrentWeightInputWeightBiasInitStateDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphGRUDescriptor descriptor, NSString? name);
+    [Selector("GRUWithSourceTensor:recurrentWeight:inputWeight:bias:descriptor:name:")]
+    public NSArray GRUWithSourceTensorRecurrentWeightInputWeightBiasDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphGRUDescriptor descriptor, NSString? name);
+    [Selector("GRUGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:outputFwd:stateGradient:inputWeight:bias:initState:mask:secondaryBias:descriptor:name:")]
+    public NSArray GRUGradientsWithSourceTensorRecurrentWeightSourceGradientZStateOutputFwdStateGradientInputWeightBiasInitStateMaskSecondaryBiasDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor outputFwd, MPSGraphTensor? stateGradient, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphTensor? mask, MPSGraphTensor? secondaryBias, MPSGraphGRUDescriptor descriptor, NSString? name);
+    [Selector("GRUGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:outputFwd:inputWeight:bias:initState:descriptor:name:")]
+    public NSArray GRUGradientsWithSourceTensorRecurrentWeightSourceGradientZStateOutputFwdInputWeightBiasInitStateDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor outputFwd, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphTensor? initState, MPSGraphGRUDescriptor descriptor, NSString? name);
+    [Selector("GRUGradientsWithSourceTensor:recurrentWeight:sourceGradient:zState:outputFwd:inputWeight:bias:descriptor:name:")]
+    public NSArray GRUGradientsWithSourceTensorRecurrentWeightSourceGradientZStateOutputFwdInputWeightBiasDescriptorName(MPSGraphTensor source, MPSGraphTensor recurrentWeight, MPSGraphTensor sourceGradient, MPSGraphTensor zState, MPSGraphTensor outputFwd, MPSGraphTensor? inputWeight, MPSGraphTensor? bias, MPSGraphGRUDescriptor descriptor, NSString? name);
 }
 
 #endif

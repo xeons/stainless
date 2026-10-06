@@ -35,25 +35,39 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class VTLowLatencySuperResolutionScalerConfiguration : NSObject, VTFrameProcessorConfiguration
 {
-    [Selector("frameWidth")] public NSInteger FrameWidth { get; }
-    [Selector("frameHeight")] public NSInteger FrameHeight { get; }
-    [Selector("frameSupportedPixelFormats")] public NSArray? FrameSupportedPixelFormats { get; }
-    [Selector("sourcePixelBufferAttributes")] public NSDictionary SourcePixelBufferAttributes { get; }
-    [Selector("destinationPixelBufferAttributes")] public NSDictionary DestinationPixelBufferAttributes { get; }
-    [Selector("scaleFactor")] public float ScaleFactor { get; }
-    [Selector("maximumDimensions")] public static CMVideoDimensions MaximumDimensions { get; }
-    [Selector("minimumDimensions")] public static CMVideoDimensions MinimumDimensions { get; }
-    [Selector("isSupported")] public static bool Supported { get; }
-    [Selector("initWithFrameWidth:frameHeight:scaleFactor:")] public Self InitWithFrameWidthFrameHeightScaleFactor(NSInteger frameWidth, NSInteger frameHeight, float scaleFactor);
-    [Selector("supportedScaleFactorsForFrameWidth:frameHeight:")] public static NSArray SupportedScaleFactorsForFrameWidthFrameHeight(NSInteger frameWidth, NSInteger frameHeight);
+    [Selector("frameWidth")]
+    public NSInteger FrameWidth { get; }
+    [Selector("frameHeight")]
+    public NSInteger FrameHeight { get; }
+    [Selector("frameSupportedPixelFormats")]
+    public NSArray? FrameSupportedPixelFormats { get; }
+    [Selector("sourcePixelBufferAttributes")]
+    public NSDictionary SourcePixelBufferAttributes { get; }
+    [Selector("destinationPixelBufferAttributes")]
+    public NSDictionary DestinationPixelBufferAttributes { get; }
+    [Selector("scaleFactor")]
+    public float ScaleFactor { get; }
+    [Selector("maximumDimensions")]
+    public static CMVideoDimensions MaximumDimensions { get; }
+    [Selector("minimumDimensions")]
+    public static CMVideoDimensions MinimumDimensions { get; }
+    [Selector("isSupported")]
+    public static bool Supported { get; }
+    [Selector("initWithFrameWidth:frameHeight:scaleFactor:")]
+    public Self InitWithFrameWidthFrameHeightScaleFactor(NSInteger frameWidth, NSInteger frameHeight, float scaleFactor);
+    [Selector("supportedScaleFactorsForFrameWidth:frameHeight:")]
+    public static NSArray SupportedScaleFactorsForFrameWidthFrameHeight(NSInteger frameWidth, NSInteger frameHeight);
 }
 
 /// macOS 26.0 and later.
 public extern objc class VTLowLatencySuperResolutionScalerParameters : NSObject, VTFrameProcessorParameters
 {
-    [Selector("sourceFrame")] public VTFrameProcessorFrame SourceFrame { get; }
-    [Selector("destinationFrame")] public VTFrameProcessorFrame DestinationFrame { get; }
-    [Selector("initWithSourceFrame:destinationFrame:")] public Self InitWithSourceFrameDestinationFrame(VTFrameProcessorFrame sourceFrame, VTFrameProcessorFrame destinationFrame);
+    [Selector("sourceFrame")]
+    public VTFrameProcessorFrame SourceFrame { get; }
+    [Selector("destinationFrame")]
+    public VTFrameProcessorFrame DestinationFrame { get; }
+    [Selector("initWithSourceFrame:destinationFrame:")]
+    public Self InitWithSourceFrameDestinationFrame(VTFrameProcessorFrame sourceFrame, VTFrameProcessorFrame destinationFrame);
 }
 
 #endif

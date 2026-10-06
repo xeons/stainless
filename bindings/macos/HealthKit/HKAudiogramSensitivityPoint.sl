@@ -33,14 +33,20 @@ import Standard.ObjC;
 
 public extern objc class HKAudiogramSensitivityPoint : NSObject, NSSecureCoding
 {
-    [Selector("frequency")] public HKQuantity Frequency { get; }
-    [Selector("leftEarSensitivity")] public HKQuantity? LeftEarSensitivity { get; }
-    [Selector("rightEarSensitivity")] public HKQuantity? RightEarSensitivity { get; }
+    [Selector("frequency")]
+    public HKQuantity Frequency { get; }
+    [Selector("leftEarSensitivity")]
+    public HKQuantity? LeftEarSensitivity { get; }
+    [Selector("rightEarSensitivity")]
+    public HKQuantity? RightEarSensitivity { get; }
     /// macOS 15.1 and later.
-    [Selector("tests")] public NSArray Tests { get; }
-    [Selector("sensitivityPointWithFrequency:leftEarSensitivity:rightEarSensitivity:error:")] public static Self? SensitivityPointWithFrequencyLeftEarSensitivityRightEarSensitivityError(HKQuantity frequency, HKQuantity? leftEarSensitivity, HKQuantity? rightEarSensitivity, out NSError? error);
+    [Selector("tests")]
+    public NSArray Tests { get; }
+    [Selector("sensitivityPointWithFrequency:leftEarSensitivity:rightEarSensitivity:error:")]
+    public static Self? SensitivityPointWithFrequencyLeftEarSensitivityRightEarSensitivityError(HKQuantity frequency, HKQuantity? leftEarSensitivity, HKQuantity? rightEarSensitivity, out NSError? error);
     /// macOS 15.1 and later.
-    [Selector("sensitivityPointWithFrequency:tests:error:")] public static Self? SensitivityPointWithFrequencyTestsError(HKQuantity frequency, NSArray tests, out NSError? errorOut);
+    [Selector("sensitivityPointWithFrequency:tests:error:")]
+    public static Self? SensitivityPointWithFrequencyTestsError(HKQuantity frequency, NSArray tests, out NSError? errorOut);
 }
 
 #endif

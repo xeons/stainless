@@ -38,103 +38,178 @@ public extern "C" NSString NSKeyedArchiveRootObjectKey;
 
 public extern objc class NSKeyedArchiver : NSCoder
 {
-    [Selector("delegate", "setDelegate:")] public NSKeyedArchiverDelegate? Delegate { get; set; }
-    [Selector("outputFormat", "setOutputFormat:")] public NSPropertyListFormat OutputFormat { get; set; }
-    [Selector("encodedData")] public NSData EncodedData { get; }
-    [Selector("requiresSecureCoding", "setRequiresSecureCoding:")] public bool RequiresSecureCoding { get; set; }
-    [Selector("initRequiringSecureCoding:")] public Self InitRequiringSecureCoding(bool requiresSecureCoding);
-    [Selector("archivedDataWithRootObject:requiringSecureCoding:error:")] public static NSData? ArchivedDataWithRootObjectRequiringSecureCodingError(AnyObject object, bool requiresSecureCoding, out NSError? error);
+    [Selector("delegate", "setDelegate:")]
+    public NSKeyedArchiverDelegate? Delegate { get; set; }
+    [Selector("outputFormat", "setOutputFormat:")]
+    public NSPropertyListFormat OutputFormat { get; set; }
+    [Selector("encodedData")]
+    public NSData EncodedData { get; }
+    [Selector("requiresSecureCoding", "setRequiresSecureCoding:")]
+    public bool RequiresSecureCoding { get; set; }
+    [Selector("initRequiringSecureCoding:")]
+    public Self InitRequiringSecureCoding(bool requiresSecureCoding);
+    [Selector("archivedDataWithRootObject:requiringSecureCoding:error:")]
+    public static NSData? ArchivedDataWithRootObjectRequiringSecureCodingError(AnyObject object, bool requiresSecureCoding, out NSError? error);
     /// Deprecated in macOS 10.14.
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 10.14.
-    [Selector("initForWritingWithMutableData:")] public Self InitForWritingWithMutableData(NSMutableData data);
+    [Selector("initForWritingWithMutableData:")]
+    public Self InitForWritingWithMutableData(NSMutableData data);
     /// Deprecated in macOS 10.14.
-    [Selector("archivedDataWithRootObject:")] public static NSData ArchivedDataWithRootObject(AnyObject rootObject);
+    [Selector("archivedDataWithRootObject:")]
+    public static NSData ArchivedDataWithRootObject(AnyObject rootObject);
     /// Deprecated in macOS 10.14.
-    [Selector("archiveRootObject:toFile:")] public static bool ArchiveRootObjectToFile(AnyObject rootObject, NSString path);
-    [Selector("finishEncoding")] public void FinishEncoding();
-    [Selector("setClassName:forClass:")] public static void SetClassNameForClass(NSString? codedName, Class cls);
-    [Selector("setClassName:forClass:")] public void SetClassNameForClassMethod(NSString? codedName, Class cls);
-    [Selector("classNameForClass:")] public static NSString? ClassNameForClass(Class cls);
-    [Selector("classNameForClass:")] public NSString? ClassNameForClassMethod(Class cls);
-    [Selector("encodeObject:forKey:")] public void EncodeObjectForKey(AnyObject? object, NSString key);
-    [Selector("encodeConditionalObject:forKey:")] public void EncodeConditionalObjectForKey(AnyObject? object, NSString key);
-    [Selector("encodeBool:forKey:")] public void EncodeBoolForKey(bool value, NSString key);
-    [Selector("encodeInt:forKey:")] public void EncodeIntForKey(int value, NSString key);
-    [Selector("encodeInt32:forKey:")] public void EncodeInt32ForKey(int value, NSString key);
-    [Selector("encodeInt64:forKey:")] public void EncodeInt64ForKey(long value, NSString key);
-    [Selector("encodeFloat:forKey:")] public void EncodeFloatForKey(float value, NSString key);
-    [Selector("encodeDouble:forKey:")] public void EncodeDoubleForKey(double value, NSString key);
-    [Selector("encodeBytes:length:forKey:")] public void EncodeBytesLengthForKey(byte* bytes, NSUInteger length, NSString key);
+    [Selector("archiveRootObject:toFile:")]
+    public static bool ArchiveRootObjectToFile(AnyObject rootObject, NSString path);
+    [Selector("finishEncoding")]
+    public void FinishEncoding();
+    [Selector("setClassName:forClass:")]
+    public static void SetClassNameForClass(NSString? codedName, Class cls);
+    [Selector("setClassName:forClass:")]
+    public void SetClassNameForClassMethod(NSString? codedName, Class cls);
+    [Selector("classNameForClass:")]
+    public static NSString? ClassNameForClass(Class cls);
+    [Selector("classNameForClass:")]
+    public NSString? ClassNameForClassMethod(Class cls);
+    [Selector("encodeObject:forKey:")]
+    public void EncodeObjectForKey(AnyObject? object, NSString key);
+    [Selector("encodeConditionalObject:forKey:")]
+    public void EncodeConditionalObjectForKey(AnyObject? object, NSString key);
+    [Selector("encodeBool:forKey:")]
+    public void EncodeBoolForKey(bool value, NSString key);
+    [Selector("encodeInt:forKey:")]
+    public void EncodeIntForKey(int value, NSString key);
+    [Selector("encodeInt32:forKey:")]
+    public void EncodeInt32ForKey(int value, NSString key);
+    [Selector("encodeInt64:forKey:")]
+    public void EncodeInt64ForKey(long value, NSString key);
+    [Selector("encodeFloat:forKey:")]
+    public void EncodeFloatForKey(float value, NSString key);
+    [Selector("encodeDouble:forKey:")]
+    public void EncodeDoubleForKey(double value, NSString key);
+    [Selector("encodeBytes:length:forKey:")]
+    public void EncodeBytesLengthForKey(byte* bytes, NSUInteger length, NSString key);
 }
 
 public extern objc class NSKeyedUnarchiver : NSCoder
 {
-    [Selector("delegate", "setDelegate:")] public NSKeyedUnarchiverDelegate? Delegate { get; set; }
-    [Selector("requiresSecureCoding", "setRequiresSecureCoding:")] public bool RequiresSecureCoding { get; set; }
-    [Selector("decodingFailurePolicy", "setDecodingFailurePolicy:")] public NSDecodingFailurePolicy DecodingFailurePolicy { get; set; }
-    [Selector("initForReadingFromData:error:")] public Self? InitForReadingFromDataError(NSData data, out NSError? error);
-    [Selector("unarchivedObjectOfClass:fromData:error:")] public static AnyObject? UnarchivedObjectOfClassFromDataError(Class cls, NSData data, out NSError? error);
-    [Selector("unarchivedArrayOfObjectsOfClass:fromData:error:")] public static NSArray? UnarchivedArrayOfObjectsOfClassFromDataError(Class cls, NSData data, out NSError? error);
-    [Selector("unarchivedDictionaryWithKeysOfClass:objectsOfClass:fromData:error:")] public static NSDictionary? UnarchivedDictionaryWithKeysOfClassObjectsOfClassFromDataError(Class keyCls, Class valueCls, NSData data, out NSError? error);
-    [Selector("unarchivedObjectOfClasses:fromData:error:")] public static AnyObject? UnarchivedObjectOfClassesFromDataError(NSSet classes, NSData data, out NSError? error);
-    [Selector("unarchivedArrayOfObjectsOfClasses:fromData:error:")] public static NSArray? UnarchivedArrayOfObjectsOfClassesFromDataError(NSSet classes, NSData data, out NSError? error);
-    [Selector("unarchivedDictionaryWithKeysOfClasses:objectsOfClasses:fromData:error:")] public static NSDictionary? UnarchivedDictionaryWithKeysOfClassesObjectsOfClassesFromDataError(NSSet keyClasses, NSSet valueClasses, NSData data, out NSError? error);
+    [Selector("delegate", "setDelegate:")]
+    public NSKeyedUnarchiverDelegate? Delegate { get; set; }
+    [Selector("requiresSecureCoding", "setRequiresSecureCoding:")]
+    public bool RequiresSecureCoding { get; set; }
+    [Selector("decodingFailurePolicy", "setDecodingFailurePolicy:")]
+    public NSDecodingFailurePolicy DecodingFailurePolicy { get; set; }
+    [Selector("initForReadingFromData:error:")]
+    public Self? InitForReadingFromDataError(NSData data, out NSError? error);
+    [Selector("unarchivedObjectOfClass:fromData:error:")]
+    public static AnyObject? UnarchivedObjectOfClassFromDataError(Class cls, NSData data, out NSError? error);
+    [Selector("unarchivedArrayOfObjectsOfClass:fromData:error:")]
+    public static NSArray? UnarchivedArrayOfObjectsOfClassFromDataError(Class cls, NSData data, out NSError? error);
+    [Selector("unarchivedDictionaryWithKeysOfClass:objectsOfClass:fromData:error:")]
+    public static NSDictionary? UnarchivedDictionaryWithKeysOfClassObjectsOfClassFromDataError(Class keyCls, Class valueCls, NSData data, out NSError? error);
+    [Selector("unarchivedObjectOfClasses:fromData:error:")]
+    public static AnyObject? UnarchivedObjectOfClassesFromDataError(NSSet classes, NSData data, out NSError? error);
+    [Selector("unarchivedArrayOfObjectsOfClasses:fromData:error:")]
+    public static NSArray? UnarchivedArrayOfObjectsOfClassesFromDataError(NSSet classes, NSData data, out NSError? error);
+    [Selector("unarchivedDictionaryWithKeysOfClasses:objectsOfClasses:fromData:error:")]
+    public static NSDictionary? UnarchivedDictionaryWithKeysOfClassesObjectsOfClassesFromDataError(NSSet keyClasses, NSSet valueClasses, NSData data, out NSError? error);
     /// Deprecated in macOS 10.14.
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 10.14.
-    [Selector("initForReadingWithData:")] public Self InitForReadingWithData(NSData data);
+    [Selector("initForReadingWithData:")]
+    public Self InitForReadingWithData(NSData data);
     /// Deprecated in macOS 10.14.
-    [Selector("unarchiveObjectWithData:")] public static AnyObject? UnarchiveObjectWithData(NSData data);
+    [Selector("unarchiveObjectWithData:")]
+    public static AnyObject? UnarchiveObjectWithData(NSData data);
     /// Deprecated in macOS 10.14.
-    [Selector("unarchiveTopLevelObjectWithData:error:")] public static AnyObject? UnarchiveTopLevelObjectWithDataError(NSData data, out NSError? error);
+    [Selector("unarchiveTopLevelObjectWithData:error:")]
+    public static AnyObject? UnarchiveTopLevelObjectWithDataError(NSData data, out NSError? error);
     /// Deprecated in macOS 10.14.
-    [Selector("unarchiveObjectWithFile:")] public static AnyObject? UnarchiveObjectWithFile(NSString path);
-    [Selector("finishDecoding")] public void FinishDecoding();
-    [Selector("setClass:forClassName:")] public static void SetClassForClassName(Class cls, NSString codedName);
-    [Selector("setClass:forClassName:")] public void SetClassForClassNameMethod(Class cls, NSString codedName);
-    [Selector("classForClassName:")] public static Class ClassForClassName(NSString codedName);
-    [Selector("classForClassName:")] public Class ClassForClassNameMethod(NSString codedName);
-    [Selector("containsValueForKey:")] public bool ContainsValueForKey(NSString key);
-    [Selector("decodeObjectForKey:")] public AnyObject? DecodeObjectForKey(NSString key);
-    [Selector("decodeBoolForKey:")] public bool DecodeBoolForKey(NSString key);
-    [Selector("decodeIntForKey:")] public int DecodeIntForKey(NSString key);
-    [Selector("decodeInt32ForKey:")] public int DecodeInt32ForKey(NSString key);
-    [Selector("decodeInt64ForKey:")] public long DecodeInt64ForKey(NSString key);
-    [Selector("decodeFloatForKey:")] public float DecodeFloatForKey(NSString key);
-    [Selector("decodeDoubleForKey:")] public double DecodeDoubleForKey(NSString key);
-    [Selector("decodeBytesForKey:returnedLength:")] public byte* DecodeBytesForKeyReturnedLength(NSString key, NSUInteger* lengthp);
+    [Selector("unarchiveObjectWithFile:")]
+    public static AnyObject? UnarchiveObjectWithFile(NSString path);
+    [Selector("finishDecoding")]
+    public void FinishDecoding();
+    [Selector("setClass:forClassName:")]
+    public static void SetClassForClassName(Class cls, NSString codedName);
+    [Selector("setClass:forClassName:")]
+    public void SetClassForClassNameMethod(Class cls, NSString codedName);
+    [Selector("classForClassName:")]
+    public static Class ClassForClassName(NSString codedName);
+    [Selector("classForClassName:")]
+    public Class ClassForClassNameMethod(NSString codedName);
+    [Selector("containsValueForKey:")]
+    public bool ContainsValueForKey(NSString key);
+    [Selector("decodeObjectForKey:")]
+    public AnyObject? DecodeObjectForKey(NSString key);
+    [Selector("decodeBoolForKey:")]
+    public bool DecodeBoolForKey(NSString key);
+    [Selector("decodeIntForKey:")]
+    public int DecodeIntForKey(NSString key);
+    [Selector("decodeInt32ForKey:")]
+    public int DecodeInt32ForKey(NSString key);
+    [Selector("decodeInt64ForKey:")]
+    public long DecodeInt64ForKey(NSString key);
+    [Selector("decodeFloatForKey:")]
+    public float DecodeFloatForKey(NSString key);
+    [Selector("decodeDoubleForKey:")]
+    public double DecodeDoubleForKey(NSString key);
+    [Selector("decodeBytesForKey:returnedLength:")]
+    public byte* DecodeBytesForKeyReturnedLength(NSString key, NSUInteger* lengthp);
 }
 
 public objc interface NSKeyedArchiverDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("archiver:willEncodeObject:")] AnyObject? ArchiverWillEncodeObject(NSKeyedArchiver archiver, AnyObject object);
-    [Optional] [Selector("archiver:didEncodeObject:")] void ArchiverDidEncodeObject(NSKeyedArchiver archiver, AnyObject? object);
-    [Optional] [Selector("archiver:willReplaceObject:withObject:")] void ArchiverWillReplaceObjectWithObject(NSKeyedArchiver archiver, AnyObject? object, AnyObject? newObject);
-    [Optional] [Selector("archiverWillFinish:")] void ArchiverWillFinish(NSKeyedArchiver archiver);
-    [Optional] [Selector("archiverDidFinish:")] void ArchiverDidFinish(NSKeyedArchiver archiver);
+    [Optional]
+    [Selector("archiver:willEncodeObject:")]
+    AnyObject? ArchiverWillEncodeObject(NSKeyedArchiver archiver, AnyObject object);
+    [Optional]
+    [Selector("archiver:didEncodeObject:")]
+    void ArchiverDidEncodeObject(NSKeyedArchiver archiver, AnyObject? object);
+    [Optional]
+    [Selector("archiver:willReplaceObject:withObject:")]
+    void ArchiverWillReplaceObjectWithObject(NSKeyedArchiver archiver, AnyObject? object, AnyObject? newObject);
+    [Optional]
+    [Selector("archiverWillFinish:")]
+    void ArchiverWillFinish(NSKeyedArchiver archiver);
+    [Optional]
+    [Selector("archiverDidFinish:")]
+    void ArchiverDidFinish(NSKeyedArchiver archiver);
 }
 
 public objc interface NSKeyedUnarchiverDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("unarchiver:cannotDecodeObjectOfClassName:originalClasses:")] Class UnarchiverCannotDecodeObjectOfClassNameOriginalClasses(NSKeyedUnarchiver unarchiver, NSString name, NSArray classNames);
-    [Optional] [Selector("unarchiver:willReplaceObject:withObject:")] void UnarchiverWillReplaceObjectWithObject(NSKeyedUnarchiver unarchiver, AnyObject object, AnyObject newObject);
-    [Optional] [Selector("unarchiverWillFinish:")] void UnarchiverWillFinish(NSKeyedUnarchiver unarchiver);
-    [Optional] [Selector("unarchiverDidFinish:")] void UnarchiverDidFinish(NSKeyedUnarchiver unarchiver);
+    [Optional]
+    [Selector("unarchiver:cannotDecodeObjectOfClassName:originalClasses:")]
+    Class UnarchiverCannotDecodeObjectOfClassNameOriginalClasses(NSKeyedUnarchiver unarchiver, NSString name, NSArray classNames);
+    [Optional]
+    [Selector("unarchiver:willReplaceObject:withObject:")]
+    void UnarchiverWillReplaceObjectWithObject(NSKeyedUnarchiver unarchiver, AnyObject object, AnyObject newObject);
+    [Optional]
+    [Selector("unarchiverWillFinish:")]
+    void UnarchiverWillFinish(NSKeyedUnarchiver unarchiver);
+    [Optional]
+    [Selector("unarchiverDidFinish:")]
+    void UnarchiverDidFinish(NSKeyedUnarchiver unarchiver);
 }
 
 /// NSKeyedArchiverObjectSubstitution, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("classForKeyedArchiver")] public Class ClassForKeyedArchiver { get; }
-    [Selector("replacementObjectForKeyedArchiver:")] public AnyObject? ReplacementObjectForKeyedArchiver(NSKeyedArchiver archiver);
-    [Selector("classFallbacksForKeyedArchiver")] public static NSArray ClassFallbacksForKeyedArchiver();
+    [Selector("classForKeyedArchiver")]
+    public Class ClassForKeyedArchiver { get; }
+    [Selector("replacementObjectForKeyedArchiver:")]
+    public AnyObject? ReplacementObjectForKeyedArchiver(NSKeyedArchiver archiver);
+    [Selector("classFallbacksForKeyedArchiver")]
+    public static NSArray ClassFallbacksForKeyedArchiver();
 }
 
 /// NSKeyedUnarchiverObjectSubstitution, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("classForKeyedUnarchiver")] public static Class ClassForKeyedUnarchiver();
+    [Selector("classForKeyedUnarchiver")]
+    public static Class ClassForKeyedUnarchiver();
 }
 
 #endif

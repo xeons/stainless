@@ -33,18 +33,30 @@ import Standard.ObjC;
 
 public extern objc class GKBehavior : NSObject, NSFastEnumeration, NSCopying
 {
-    [Selector("goalCount")] public NSInteger GoalCount { get; }
-    [Selector("behaviorWithGoal:weight:")] public static Self BehaviorWithGoalWeight(GKGoal goal, float weight);
-    [Selector("behaviorWithGoals:")] public static Self BehaviorWithGoals(NSArray goals);
-    [Selector("behaviorWithGoals:andWeights:")] public static Self BehaviorWithGoalsAndWeights(NSArray goals, NSArray weights);
-    [Selector("behaviorWithWeightedGoals:")] public static Self BehaviorWithWeightedGoals(NSDictionary weightedGoals);
-    [Selector("setWeight:forGoal:")] public void SetWeightForGoal(float weight, GKGoal goal);
-    [Selector("weightForGoal:")] public float WeightForGoal(GKGoal goal);
-    [Selector("removeGoal:")] public void RemoveGoal(GKGoal goal);
-    [Selector("removeAllGoals")] public void RemoveAllGoals();
-    [Selector("objectAtIndexedSubscript:")] public GKGoal ObjectAtIndexedSubscript(NSUInteger idx);
-    [Selector("setObject:forKeyedSubscript:")] public void SetObjectForKeyedSubscript(NSNumber weight, GKGoal goal);
-    [Selector("objectForKeyedSubscript:")] public NSNumber? ObjectForKeyedSubscript(GKGoal goal);
+    [Selector("goalCount")]
+    public NSInteger GoalCount { get; }
+    [Selector("behaviorWithGoal:weight:")]
+    public static Self BehaviorWithGoalWeight(GKGoal goal, float weight);
+    [Selector("behaviorWithGoals:")]
+    public static Self BehaviorWithGoals(NSArray goals);
+    [Selector("behaviorWithGoals:andWeights:")]
+    public static Self BehaviorWithGoalsAndWeights(NSArray goals, NSArray weights);
+    [Selector("behaviorWithWeightedGoals:")]
+    public static Self BehaviorWithWeightedGoals(NSDictionary weightedGoals);
+    [Selector("setWeight:forGoal:")]
+    public void SetWeightForGoal(float weight, GKGoal goal);
+    [Selector("weightForGoal:")]
+    public float WeightForGoal(GKGoal goal);
+    [Selector("removeGoal:")]
+    public void RemoveGoal(GKGoal goal);
+    [Selector("removeAllGoals")]
+    public void RemoveAllGoals();
+    [Selector("objectAtIndexedSubscript:")]
+    public GKGoal ObjectAtIndexedSubscript(NSUInteger idx);
+    [Selector("setObject:forKeyedSubscript:")]
+    public void SetObjectForKeyedSubscript(NSNumber weight, GKGoal goal);
+    [Selector("objectForKeyedSubscript:")]
+    public NSNumber? ObjectForKeyedSubscript(GKGoal goal);
 }
 
 #endif

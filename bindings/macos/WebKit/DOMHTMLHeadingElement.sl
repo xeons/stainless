@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLHeadingElement : DOMHTMLElement
 {
-    [Selector("align", "setAlign:")] public NSString? Align { get; set; }
+    [Selector("align", "setAlign:")]
+    public NSString? Align { get; set; }
 }
 
 #endif

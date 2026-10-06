@@ -35,36 +35,63 @@ import Standard.ObjC;
 
 public extern objc class PHAsset : PHObject
 {
-    [Selector("playbackStyle")] public PHAssetPlaybackStyle PlaybackStyle { get; }
-    [Selector("mediaType")] public PHAssetMediaType MediaType { get; }
-    [Selector("mediaSubtypes")] public PHAssetMediaSubtype MediaSubtypes { get; }
+    [Selector("playbackStyle")]
+    public PHAssetPlaybackStyle PlaybackStyle { get; }
+    [Selector("mediaType")]
+    public PHAssetMediaType MediaType { get; }
+    [Selector("mediaSubtypes")]
+    public PHAssetMediaSubtype MediaSubtypes { get; }
     /// macOS 26.0 and later.
-    [Selector("contentType")] public UTType ContentType { get; }
-    [Selector("pixelWidth")] public NSUInteger PixelWidth { get; }
-    [Selector("pixelHeight")] public NSUInteger PixelHeight { get; }
-    [Selector("creationDate")] public NSDate? CreationDate { get; }
-    [Selector("modificationDate")] public NSDate? ModificationDate { get; }
+    [Selector("contentType")]
+    public UTType ContentType { get; }
+    [Selector("pixelWidth")]
+    public NSUInteger PixelWidth { get; }
+    [Selector("pixelHeight")]
+    public NSUInteger PixelHeight { get; }
+    [Selector("creationDate")]
+    public NSDate? CreationDate { get; }
+    [Selector("modificationDate")]
+    public NSDate? ModificationDate { get; }
     /// macOS 26.0 and later.
-    [Selector("addedDate")] public NSDate AddedDate { get; }
-    [Selector("location")] public CLLocation? Location { get; }
-    [Selector("duration")] public NSTimeInterval Duration { get; }
-    [Selector("isHidden")] public bool Hidden { get; }
-    [Selector("isFavorite")] public bool Favorite { get; }
+    [Selector("addedDate")]
+    public NSDate AddedDate { get; }
+    [Selector("location")]
+    public CLLocation? Location { get; }
+    [Selector("duration")]
+    public NSTimeInterval Duration { get; }
+    [Selector("isHidden")]
+    public bool Hidden { get; }
+    [Selector("isFavorite")]
+    public bool Favorite { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("isSyncFailureHidden")] public bool SyncFailureHidden { get; }
-    [Selector("burstIdentifier")] public NSString? BurstIdentifier { get; }
-    [Selector("burstSelectionTypes")] public PHAssetBurstSelectionType BurstSelectionTypes { get; }
-    [Selector("representsBurst")] public bool RepresentsBurst { get; }
-    [Selector("sourceType")] public PHAssetSourceType SourceType { get; }
-    [Selector("hasAdjustments")] public bool HasAdjustments { get; }
-    [Selector("adjustmentFormatIdentifier")] public NSString? AdjustmentFormatIdentifier { get; }
-    [Selector("canPerformEditOperation:")] public bool CanPerformEditOperation(PHAssetEditOperation editOperation);
-    [Selector("fetchAssetsInAssetCollection:options:")] public static PHFetchResult FetchAssetsInAssetCollectionOptions(PHAssetCollection assetCollection, PHFetchOptions? options);
-    [Selector("fetchAssetsWithLocalIdentifiers:options:")] public static PHFetchResult FetchAssetsWithLocalIdentifiersOptions(NSArray identifiers, PHFetchOptions? options);
-    [Selector("fetchKeyAssetsInAssetCollection:options:")] public static PHFetchResult? FetchKeyAssetsInAssetCollectionOptions(PHAssetCollection assetCollection, PHFetchOptions? options);
-    [Selector("fetchAssetsWithBurstIdentifier:options:")] public static PHFetchResult FetchAssetsWithBurstIdentifierOptions(NSString burstIdentifier, PHFetchOptions? options);
-    [Selector("fetchAssetsWithOptions:")] public static PHFetchResult FetchAssetsWithOptions(PHFetchOptions? options);
-    [Selector("fetchAssetsWithMediaType:options:")] public static PHFetchResult FetchAssetsWithMediaTypeOptions(PHAssetMediaType mediaType, PHFetchOptions? options);
+    [Selector("isSyncFailureHidden")]
+    public bool SyncFailureHidden { get; }
+    [Selector("burstIdentifier")]
+    public NSString? BurstIdentifier { get; }
+    [Selector("burstSelectionTypes")]
+    public PHAssetBurstSelectionType BurstSelectionTypes { get; }
+    [Selector("representsBurst")]
+    public bool RepresentsBurst { get; }
+    [Selector("sourceType")]
+    public PHAssetSourceType SourceType { get; }
+    [Selector("hasAdjustments")]
+    public bool HasAdjustments { get; }
+    [Selector("adjustmentFormatIdentifier")]
+    public NSString? AdjustmentFormatIdentifier { get; }
+    [Selector("canPerformEditOperation:")]
+    public bool CanPerformEditOperation(PHAssetEditOperation editOperation);
+    [Selector("fetchAssetsInAssetCollection:options:")]
+    public static PHFetchResult FetchAssetsInAssetCollectionOptions(PHAssetCollection assetCollection, PHFetchOptions? options);
+    [Selector("fetchAssetsWithLocalIdentifiers:options:")]
+    public static PHFetchResult FetchAssetsWithLocalIdentifiersOptions(NSArray identifiers, PHFetchOptions? options);
+    [Selector("fetchKeyAssetsInAssetCollection:options:")]
+    public static PHFetchResult? FetchKeyAssetsInAssetCollectionOptions(PHAssetCollection assetCollection, PHFetchOptions? options);
+    [Selector("fetchAssetsWithBurstIdentifier:options:")]
+    public static PHFetchResult FetchAssetsWithBurstIdentifierOptions(NSString burstIdentifier, PHFetchOptions? options);
+    [Selector("fetchAssetsWithOptions:")]
+    public static PHFetchResult FetchAssetsWithOptions(PHFetchOptions? options);
+    [Selector("fetchAssetsWithMediaType:options:")]
+    public static PHFetchResult FetchAssetsWithMediaTypeOptions(PHAssetMediaType mediaType, PHFetchOptions? options);
 }
 
 #endif

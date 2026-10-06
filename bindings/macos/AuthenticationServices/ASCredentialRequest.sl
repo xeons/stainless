@@ -41,8 +41,10 @@ public enum ASCredentialRequestType : long
 
 public objc interface ASCredentialRequest : NSObjectProtocol, NSSecureCoding, NSCopying
 {
-    [Selector("type")] ASCredentialRequestType Type { get; }
-    [Selector("credentialIdentity")] ASCredentialIdentity CredentialIdentity { get; }
+    [Selector("type")]
+    ASCredentialRequestType Type { get; }
+    [Selector("credentialIdentity")]
+    ASCredentialIdentity CredentialIdentity { get; }
 }
 
 #endif

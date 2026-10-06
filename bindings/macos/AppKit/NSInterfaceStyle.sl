@@ -46,9 +46,11 @@ public extern "C" NSInterfaceStyle NSInterfaceStyleForKey(NSString? key, NSRespo
 public extern objc class NSResponder
 {
     /// Deprecated in macOS 10.8.
-    [Selector("interfaceStyle")] public NSInterfaceStyle InterfaceStyle();
+    [Selector("interfaceStyle")]
+    public NSInterfaceStyle InterfaceStyle();
     /// Deprecated in macOS 10.8.
-    [Selector("setInterfaceStyle:")] public void SetInterfaceStyle(NSInterfaceStyle interfaceStyle);
+    [Selector("setInterfaceStyle:")]
+    public void SetInterfaceStyle(NSInterfaceStyle interfaceStyle);
 }
 
 /// Deprecated in macOS 10.8.

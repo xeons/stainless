@@ -33,29 +33,52 @@ import Standard.ObjC;
 
 public extern objc class AVB17221ACMPMessage : NSObject, NSCopying
 {
-    [Selector("messageType", "setMessageType:")] public AVB17221ACMPMessageType MessageType { get; set; }
-    [Selector("status", "setStatus:")] public AVB17221ACMPStatusCode Status { get; set; }
-    [Selector("streamID", "setStreamID:")] public ulong StreamID { get; set; }
-    [Selector("controllerEntityID", "setControllerEntityID:")] public ulong ControllerEntityID { get; set; }
-    [Selector("talkerEntityID", "setTalkerEntityID:")] public ulong TalkerEntityID { get; set; }
-    [Selector("listenerEntityID", "setListenerEntityID:")] public ulong ListenerEntityID { get; set; }
-    [Selector("talkerUniqueID", "setTalkerUniqueID:")] public ushort TalkerUniqueID { get; set; }
-    [Selector("listenerUniqueID", "setListenerUniqueID:")] public ushort ListenerUniqueID { get; set; }
-    [Selector("destinationMAC", "setDestinationMAC:")] public AVBMACAddress? DestinationMAC { get; set; }
-    [Selector("connectionCount", "setConnectionCount:")] public ushort ConnectionCount { get; set; }
-    [Selector("sequenceID", "setSequenceID:")] public ushort SequenceID { get; set; }
-    [Selector("flags", "setFlags:")] public AVB17221ACMPFlags Flags { get; set; }
-    [Selector("vlanID", "setVlanID:")] public ushort VlanID { get; set; }
-    [Selector("connectedListenersEntries", "setConnectedListenersEntries:")] public ushort ConnectedListenersEntries { get; set; }
-    [Selector("connectedListenersEntriesValid", "setConnectedListenersEntriesValid:")] public bool ConnectedListenersEntriesValid { get; set; }
-    [Selector("ipFlags", "setIpFlags:")] public AVB17221ACMPIPFlag IpFlags { get; set; }
-    [Selector("sourcePort", "setSourcePort:")] public ushort SourcePort { get; set; }
-    [Selector("destinationPort", "setDestinationPort:")] public ushort DestinationPort { get; set; }
-    [Selector("sourceIPAddress", "setSourceIPAddress:")] public AVBIPAddress? SourceIPAddress { get; set; }
-    [Selector("destinationIPAddress", "setDestinationIPAddress:")] public AVBIPAddress? DestinationIPAddress { get; set; }
-    [Selector("sourceMAC", "setSourceMAC:")] public AVBMACAddress? SourceMAC { get; set; }
-    [Selector("errorForStatusCode:")] public static NSError? ErrorForStatusCode(AVB17221ACMPStatusCode statusCode);
-    [Selector("errorForStatusCode")] public NSError? ErrorForStatusCodeMethod();
+    [Selector("messageType", "setMessageType:")]
+    public AVB17221ACMPMessageType MessageType { get; set; }
+    [Selector("status", "setStatus:")]
+    public AVB17221ACMPStatusCode Status { get; set; }
+    [Selector("streamID", "setStreamID:")]
+    public ulong StreamID { get; set; }
+    [Selector("controllerEntityID", "setControllerEntityID:")]
+    public ulong ControllerEntityID { get; set; }
+    [Selector("talkerEntityID", "setTalkerEntityID:")]
+    public ulong TalkerEntityID { get; set; }
+    [Selector("listenerEntityID", "setListenerEntityID:")]
+    public ulong ListenerEntityID { get; set; }
+    [Selector("talkerUniqueID", "setTalkerUniqueID:")]
+    public ushort TalkerUniqueID { get; set; }
+    [Selector("listenerUniqueID", "setListenerUniqueID:")]
+    public ushort ListenerUniqueID { get; set; }
+    [Selector("destinationMAC", "setDestinationMAC:")]
+    public AVBMACAddress? DestinationMAC { get; set; }
+    [Selector("connectionCount", "setConnectionCount:")]
+    public ushort ConnectionCount { get; set; }
+    [Selector("sequenceID", "setSequenceID:")]
+    public ushort SequenceID { get; set; }
+    [Selector("flags", "setFlags:")]
+    public AVB17221ACMPFlags Flags { get; set; }
+    [Selector("vlanID", "setVlanID:")]
+    public ushort VlanID { get; set; }
+    [Selector("connectedListenersEntries", "setConnectedListenersEntries:")]
+    public ushort ConnectedListenersEntries { get; set; }
+    [Selector("connectedListenersEntriesValid", "setConnectedListenersEntriesValid:")]
+    public bool ConnectedListenersEntriesValid { get; set; }
+    [Selector("ipFlags", "setIpFlags:")]
+    public AVB17221ACMPIPFlag IpFlags { get; set; }
+    [Selector("sourcePort", "setSourcePort:")]
+    public ushort SourcePort { get; set; }
+    [Selector("destinationPort", "setDestinationPort:")]
+    public ushort DestinationPort { get; set; }
+    [Selector("sourceIPAddress", "setSourceIPAddress:")]
+    public AVBIPAddress? SourceIPAddress { get; set; }
+    [Selector("destinationIPAddress", "setDestinationIPAddress:")]
+    public AVBIPAddress? DestinationIPAddress { get; set; }
+    [Selector("sourceMAC", "setSourceMAC:")]
+    public AVBMACAddress? SourceMAC { get; set; }
+    [Selector("errorForStatusCode:")]
+    public static NSError? ErrorForStatusCode(AVB17221ACMPStatusCode statusCode);
+    [Selector("errorForStatusCode")]
+    public NSError? ErrorForStatusCodeMethod();
 }
 
 #endif

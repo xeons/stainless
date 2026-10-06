@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationPublicKeyCredentialParameters : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("algorithm")] public ASCOSEAlgorithmIdentifier Algorithm { get; }
-    [Selector("initWithAlgorithm:")] public Self InitWithAlgorithm(ASCOSEAlgorithmIdentifier algorithm);
+    [Selector("algorithm")]
+    public ASCOSEAlgorithmIdentifier Algorithm { get; }
+    [Selector("initWithAlgorithm:")]
+    public Self InitWithAlgorithm(ASCOSEAlgorithmIdentifier algorithm);
 }
 
 #endif

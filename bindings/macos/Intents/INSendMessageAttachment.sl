@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class INSendMessageAttachment : NSObject
 {
-    [Selector("audioMessageFile")] public INFile? AudioMessageFile { get; }
-    [Selector("attachmentWithAudioMessageFile:")] public static INSendMessageAttachment AttachmentWithAudioMessageFile(INFile audioMessageFile);
+    [Selector("audioMessageFile")]
+    public INFile? AudioMessageFile { get; }
+    [Selector("attachmentWithAudioMessageFile:")]
+    public static INSendMessageAttachment AttachmentWithAudioMessageFile(INFile audioMessageFile);
 }
 
 #endif

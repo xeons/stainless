@@ -33,39 +33,47 @@ import Standard.ObjC;
 /// WebDOMNodeOperations, a category of DOMNode.
 public extern objc class DOMNode
 {
-    [Selector("webArchive")] public WebArchive? WebArchive { get; }
+    [Selector("webArchive")]
+    public WebArchive? WebArchive { get; }
 }
 
 /// WebDOMDocumentOperations, a category of DOMDocument.
 public extern objc class DOMDocument
 {
-    [Selector("webFrame")] public WebFrame? WebFrame { get; }
-    [Selector("URLWithAttributeString:")] public NSURL? URLWithAttributeString(NSString? string);
+    [Selector("webFrame")]
+    public WebFrame? WebFrame { get; }
+    [Selector("URLWithAttributeString:")]
+    public NSURL? URLWithAttributeString(NSString? string);
 }
 
 /// WebDOMRangeOperations, a category of DOMRange.
 public extern objc class DOMRange
 {
-    [Selector("webArchive")] public WebArchive? WebArchive { get; }
-    [Selector("markupString")] public NSString? MarkupString { get; }
+    [Selector("webArchive")]
+    public WebArchive? WebArchive { get; }
+    [Selector("markupString")]
+    public NSString? MarkupString { get; }
 }
 
 /// WebDOMHTMLFrameElementOperations, a category of DOMHTMLFrameElement.
 public extern objc class DOMHTMLFrameElement
 {
-    [Selector("contentFrame")] public WebFrame? ContentFrame { get; }
+    [Selector("contentFrame")]
+    public WebFrame? ContentFrame { get; }
 }
 
 /// WebDOMHTMLIFrameElementOperations, a category of DOMHTMLIFrameElement.
 public extern objc class DOMHTMLIFrameElement
 {
-    [Selector("contentFrame")] public WebFrame? ContentFrame { get; }
+    [Selector("contentFrame")]
+    public WebFrame? ContentFrame { get; }
 }
 
 /// WebDOMHTMLObjectElementOperations, a category of DOMHTMLObjectElement.
 public extern objc class DOMHTMLObjectElement
 {
-    [Selector("contentFrame")] public WebFrame? ContentFrame { get; }
+    [Selector("contentFrame")]
+    public WebFrame? ContentFrame { get; }
 }
 
 #endif

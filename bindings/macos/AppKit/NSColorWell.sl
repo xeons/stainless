@@ -40,22 +40,36 @@ public enum NSColorWellStyle : long
 
 public extern objc class NSColorWell : NSControl
 {
-    [Selector("isActive")] public bool Active { get; }
+    [Selector("isActive")]
+    public bool Active { get; }
     /// Deprecated in macOS 100000.
-    [Selector("isBordered", "setBordered:")] public bool Bordered { get; set; }
-    [Selector("color", "setColor:")] public NSColor Color { get; set; }
-    [Selector("colorWellStyle", "setColorWellStyle:")] public NSColorWellStyle ColorWellStyle { get; set; }
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("pulldownTarget", "setPulldownTarget:")] public AnyObject? PulldownTarget { get; set; }
-    [Selector("pulldownAction", "setPulldownAction:")] public Selector PulldownAction { get; set; }
-    [Selector("supportsAlpha", "setSupportsAlpha:")] public bool SupportsAlpha { get; set; }
+    [Selector("isBordered", "setBordered:")]
+    public bool Bordered { get; set; }
+    [Selector("color", "setColor:")]
+    public NSColor Color { get; set; }
+    [Selector("colorWellStyle", "setColorWellStyle:")]
+    public NSColorWellStyle ColorWellStyle { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("pulldownTarget", "setPulldownTarget:")]
+    public AnyObject? PulldownTarget { get; set; }
+    [Selector("pulldownAction", "setPulldownAction:")]
+    public Selector PulldownAction { get; set; }
+    [Selector("supportsAlpha", "setSupportsAlpha:")]
+    public bool SupportsAlpha { get; set; }
     /// macOS 26.0 and later.
-    [Selector("maximumLinearExposure", "setMaximumLinearExposure:")] public CGFloat MaximumLinearExposure { get; set; }
-    [Selector("colorWellWithStyle:")] public static Self ColorWellWithStyle(NSColorWellStyle style);
-    [Selector("deactivate")] public void Deactivate();
-    [Selector("activate:")] public void Activate(bool exclusive);
-    [Selector("drawWellInside:")] public void DrawWellInside(NSRect insideRect);
-    [Selector("takeColorFrom:")] public void TakeColorFrom(AnyObject? sender);
+    [Selector("maximumLinearExposure", "setMaximumLinearExposure:")]
+    public CGFloat MaximumLinearExposure { get; set; }
+    [Selector("colorWellWithStyle:")]
+    public static Self ColorWellWithStyle(NSColorWellStyle style);
+    [Selector("deactivate")]
+    public void Deactivate();
+    [Selector("activate:")]
+    public void Activate(bool exclusive);
+    [Selector("drawWellInside:")]
+    public void DrawWellInside(NSRect insideRect);
+    [Selector("takeColorFrom:")]
+    public void TakeColorFrom(AnyObject? sender);
 }
 
 #endif

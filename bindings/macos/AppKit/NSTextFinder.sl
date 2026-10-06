@@ -64,47 +64,97 @@ public enum NSTextFinderMatchingType : long
 
 public extern objc class NSTextFinder : NSObject, NSCoding
 {
-    [Selector("client", "setClient:")] public NSTextFinderClient? Client { get; set; }
-    [Selector("findBarContainer", "setFindBarContainer:")] public NSTextFinderBarContainer? FindBarContainer { get; set; }
-    [Selector("findIndicatorNeedsUpdate", "setFindIndicatorNeedsUpdate:")] public bool FindIndicatorNeedsUpdate { get; set; }
-    [Selector("isIncrementalSearchingEnabled", "setIncrementalSearchingEnabled:")] public bool IncrementalSearchingEnabled { get; set; }
-    [Selector("incrementalSearchingShouldDimContentView", "setIncrementalSearchingShouldDimContentView:")] public bool IncrementalSearchingShouldDimContentView { get; set; }
-    [Selector("incrementalMatchRanges")] public NSArray IncrementalMatchRanges { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("performAction:")] public void PerformAction(NSTextFinderAction op);
-    [Selector("validateAction:")] public bool ValidateAction(NSTextFinderAction op);
-    [Selector("cancelFindIndicator")] public void CancelFindIndicator();
-    [Selector("drawIncrementalMatchHighlightInRect:")] public static void DrawIncrementalMatchHighlightInRect(NSRect rect);
-    [Selector("noteClientStringWillChange")] public void NoteClientStringWillChange();
+    [Selector("client", "setClient:")]
+    public NSTextFinderClient? Client { get; set; }
+    [Selector("findBarContainer", "setFindBarContainer:")]
+    public NSTextFinderBarContainer? FindBarContainer { get; set; }
+    [Selector("findIndicatorNeedsUpdate", "setFindIndicatorNeedsUpdate:")]
+    public bool FindIndicatorNeedsUpdate { get; set; }
+    [Selector("isIncrementalSearchingEnabled", "setIncrementalSearchingEnabled:")]
+    public bool IncrementalSearchingEnabled { get; set; }
+    [Selector("incrementalSearchingShouldDimContentView", "setIncrementalSearchingShouldDimContentView:")]
+    public bool IncrementalSearchingShouldDimContentView { get; set; }
+    [Selector("incrementalMatchRanges")]
+    public NSArray IncrementalMatchRanges { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("performAction:")]
+    public void PerformAction(NSTextFinderAction op);
+    [Selector("validateAction:")]
+    public bool ValidateAction(NSTextFinderAction op);
+    [Selector("cancelFindIndicator")]
+    public void CancelFindIndicator();
+    [Selector("drawIncrementalMatchHighlightInRect:")]
+    public static void DrawIncrementalMatchHighlightInRect(NSRect rect);
+    [Selector("noteClientStringWillChange")]
+    public void NoteClientStringWillChange();
 }
 
 public objc interface NSTextFinderClient : NSObjectProtocol
 {
-    [Optional] [Selector("isSelectable")] bool Selectable { get; }
-    [Optional] [Selector("allowsMultipleSelection")] bool AllowsMultipleSelection { get; }
-    [Optional] [Selector("isEditable")] bool Editable { get; }
-    [Optional] [Selector("string")] NSString String { get; }
-    [Optional] [Selector("firstSelectedRange")] NSRange FirstSelectedRange { get; }
-    [Optional] [Selector("selectedRanges", "setSelectedRanges:")] NSArray SelectedRanges { get; set; }
-    [Optional] [Selector("visibleCharacterRanges")] NSArray VisibleCharacterRanges { get; }
-    [Optional] [Selector("stringAtIndex:effectiveRange:endsWithSearchBoundary:")] NSString StringAtIndexEffectiveRangeEndsWithSearchBoundary(NSUInteger characterIndex, NSRangePointer outRange, bool* outFlag);
-    [Optional] [Selector("stringLength")] NSUInteger StringLength();
-    [Optional] [Selector("scrollRangeToVisible:")] void ScrollRangeToVisible(NSRange range);
-    [Optional] [Selector("shouldReplaceCharactersInRanges:withStrings:")] bool ShouldReplaceCharactersInRangesWithStrings(NSArray ranges, NSArray strings);
-    [Optional] [Selector("replaceCharactersInRange:withString:")] void ReplaceCharactersInRangeWithString(NSRange range, NSString string);
-    [Optional] [Selector("didReplaceCharacters")] void DidReplaceCharacters();
-    [Optional] [Selector("contentViewAtIndex:effectiveCharacterRange:")] NSView ContentViewAtIndexEffectiveCharacterRange(NSUInteger index, NSRangePointer outRange);
-    [Optional] [Selector("rectsForCharacterRange:")] NSArray? RectsForCharacterRange(NSRange range);
-    [Optional] [Selector("drawCharactersInRange:forContentView:")] void DrawCharactersInRangeForContentView(NSRange range, NSView view);
+    [Optional]
+    [Selector("isSelectable")]
+    bool Selectable { get; }
+    [Optional]
+    [Selector("allowsMultipleSelection")]
+    bool AllowsMultipleSelection { get; }
+    [Optional]
+    [Selector("isEditable")]
+    bool Editable { get; }
+    [Optional]
+    [Selector("string")]
+    NSString String { get; }
+    [Optional]
+    [Selector("firstSelectedRange")]
+    NSRange FirstSelectedRange { get; }
+    [Optional]
+    [Selector("selectedRanges", "setSelectedRanges:")]
+    NSArray SelectedRanges { get; set; }
+    [Optional]
+    [Selector("visibleCharacterRanges")]
+    NSArray VisibleCharacterRanges { get; }
+    [Optional]
+    [Selector("stringAtIndex:effectiveRange:endsWithSearchBoundary:")]
+    NSString StringAtIndexEffectiveRangeEndsWithSearchBoundary(NSUInteger characterIndex, NSRangePointer outRange, bool* outFlag);
+    [Optional]
+    [Selector("stringLength")]
+    NSUInteger StringLength();
+    [Optional]
+    [Selector("scrollRangeToVisible:")]
+    void ScrollRangeToVisible(NSRange range);
+    [Optional]
+    [Selector("shouldReplaceCharactersInRanges:withStrings:")]
+    bool ShouldReplaceCharactersInRangesWithStrings(NSArray ranges, NSArray strings);
+    [Optional]
+    [Selector("replaceCharactersInRange:withString:")]
+    void ReplaceCharactersInRangeWithString(NSRange range, NSString string);
+    [Optional]
+    [Selector("didReplaceCharacters")]
+    void DidReplaceCharacters();
+    [Optional]
+    [Selector("contentViewAtIndex:effectiveCharacterRange:")]
+    NSView ContentViewAtIndexEffectiveCharacterRange(NSUInteger index, NSRangePointer outRange);
+    [Optional]
+    [Selector("rectsForCharacterRange:")]
+    NSArray? RectsForCharacterRange(NSRange range);
+    [Optional]
+    [Selector("drawCharactersInRange:forContentView:")]
+    void DrawCharactersInRangeForContentView(NSRange range, NSView view);
 }
 
 public objc interface NSTextFinderBarContainer : NSObjectProtocol
 {
-    [Selector("findBarView", "setFindBarView:")] NSView? FindBarView { get; set; }
-    [Selector("isFindBarVisible", "setFindBarVisible:")] bool FindBarVisible { get; set; }
-    [Selector("findBarViewDidChangeHeight")] void FindBarViewDidChangeHeight();
-    [Optional] [Selector("contentView")] NSView? ContentView();
+    [Selector("findBarView", "setFindBarView:")]
+    NSView? FindBarView { get; set; }
+    [Selector("isFindBarVisible", "setFindBarVisible:")]
+    bool FindBarVisible { get; set; }
+    [Selector("findBarViewDidChangeHeight")]
+    void FindBarViewDidChangeHeight();
+    [Optional]
+    [Selector("contentView")]
+    NSView? ContentView();
 }
 
 #endif

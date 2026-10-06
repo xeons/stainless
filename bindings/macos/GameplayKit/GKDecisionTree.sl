@@ -33,20 +33,30 @@ import Standard.ObjC;
 
 public extern objc class GKDecisionNode : NSObject
 {
-    [Selector("createBranchWithValue:attribute:")] public Self CreateBranchWithValueAttribute(NSNumber value, NSObjectProtocol @attribute);
-    [Selector("createBranchWithPredicate:attribute:")] public Self CreateBranchWithPredicateAttribute(NSPredicate predicate, NSObjectProtocol @attribute);
-    [Selector("createBranchWithWeight:attribute:")] public Self CreateBranchWithWeightAttribute(NSInteger weight, NSObjectProtocol @attribute);
+    [Selector("createBranchWithValue:attribute:")]
+    public Self CreateBranchWithValueAttribute(NSNumber value, NSObjectProtocol @attribute);
+    [Selector("createBranchWithPredicate:attribute:")]
+    public Self CreateBranchWithPredicateAttribute(NSPredicate predicate, NSObjectProtocol @attribute);
+    [Selector("createBranchWithWeight:attribute:")]
+    public Self CreateBranchWithWeightAttribute(NSInteger weight, NSObjectProtocol @attribute);
 }
 
 public extern objc class GKDecisionTree : NSObject, NSSecureCoding
 {
-    [Selector("rootNode")] public GKDecisionNode? RootNode { get; }
-    [Selector("randomSource", "setRandomSource:")] public GKRandomSource RandomSource { get; set; }
-    [Selector("initWithAttribute:")] public Self InitWithAttribute(NSObjectProtocol @attribute);
-    [Selector("initWithExamples:actions:attributes:")] public Self InitWithExamplesActionsAttributes(NSArray examples, NSArray actions, NSArray attributes);
-    [Selector("initWithURL:error:")] public Self InitWithURLError(NSURL url, NSError? error);
-    [Selector("exportToURL:error:")] public bool ExportToURLError(NSURL url, NSError? error);
-    [Selector("findActionForAnswers:")] public NSObjectProtocol? FindActionForAnswers(NSDictionary answers);
+    [Selector("rootNode")]
+    public GKDecisionNode? RootNode { get; }
+    [Selector("randomSource", "setRandomSource:")]
+    public GKRandomSource RandomSource { get; set; }
+    [Selector("initWithAttribute:")]
+    public Self InitWithAttribute(NSObjectProtocol @attribute);
+    [Selector("initWithExamples:actions:attributes:")]
+    public Self InitWithExamplesActionsAttributes(NSArray examples, NSArray actions, NSArray attributes);
+    [Selector("initWithURL:error:")]
+    public Self InitWithURLError(NSURL url, NSError? error);
+    [Selector("exportToURL:error:")]
+    public bool ExportToURLError(NSURL url, NSError? error);
+    [Selector("findActionForAnswers:")]
+    public NSObjectProtocol? FindActionForAnswers(NSDictionary answers);
 }
 
 #endif

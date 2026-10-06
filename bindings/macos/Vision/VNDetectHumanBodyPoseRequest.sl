@@ -164,21 +164,30 @@ public extern "C" VNHumanBodyPoseObservationJointsGroupName VNHumanBodyPoseObser
 
 public extern objc class VNHumanBodyPoseObservation : VNRecognizedPointsObservation
 {
-    [Selector("availableJointNames")] public NSArray AvailableJointNames { get; }
-    [Selector("availableJointsGroupNames")] public NSArray AvailableJointsGroupNames { get; }
-    [Selector("recognizedPointForJointName:error:")] public VNRecognizedPoint? RecognizedPointForJointNameError(VNHumanBodyPoseObservationJointName jointName, out NSError? error);
-    [Selector("recognizedPointsForJointsGroupName:error:")] public NSDictionary? RecognizedPointsForJointsGroupNameError(VNHumanBodyPoseObservationJointsGroupName jointsGroupName, out NSError? error);
+    [Selector("availableJointNames")]
+    public NSArray AvailableJointNames { get; }
+    [Selector("availableJointsGroupNames")]
+    public NSArray AvailableJointsGroupNames { get; }
+    [Selector("recognizedPointForJointName:error:")]
+    public VNRecognizedPoint? RecognizedPointForJointNameError(VNHumanBodyPoseObservationJointName jointName, out NSError? error);
+    [Selector("recognizedPointsForJointsGroupName:error:")]
+    public NSDictionary? RecognizedPointsForJointsGroupNameError(VNHumanBodyPoseObservationJointsGroupName jointsGroupName, out NSError? error);
 }
 
 public extern objc class VNDetectHumanBodyPoseRequest : VNImageBasedRequest
 {
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("results")]
+    public NSArray? Results { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("supportedJointNamesForRevision:error:")] public static NSArray? SupportedJointNamesForRevisionError(NSUInteger revision, out NSError? error);
-    [Selector("supportedJointNamesAndReturnError:")] public NSArray? SupportedJointNamesAndReturnError(out NSError? error);
+    [Selector("supportedJointNamesForRevision:error:")]
+    public static NSArray? SupportedJointNamesForRevisionError(NSUInteger revision, out NSError? error);
+    [Selector("supportedJointNamesAndReturnError:")]
+    public NSArray? SupportedJointNamesAndReturnError(out NSError? error);
     /// Deprecated in macOS 14.0.
-    [Selector("supportedJointsGroupNamesForRevision:error:")] public static NSArray? SupportedJointsGroupNamesForRevisionError(NSUInteger revision, out NSError? error);
-    [Selector("supportedJointsGroupNamesAndReturnError:")] public NSArray? SupportedJointsGroupNamesAndReturnError(out NSError? error);
+    [Selector("supportedJointsGroupNamesForRevision:error:")]
+    public static NSArray? SupportedJointsGroupNamesForRevisionError(NSUInteger revision, out NSError? error);
+    [Selector("supportedJointsGroupNamesAndReturnError:")]
+    public NSArray? SupportedJointsGroupNamesAndReturnError(out NSError? error);
 }
 
 #endif

@@ -42,27 +42,51 @@ public enum NSPageControllerTransitionStyle : long
 
 public extern objc class NSPageController : NSViewController, NSAnimatablePropertyContainer, NSCoding
 {
-    [Selector("delegate", "setDelegate:")] public NSPageControllerDelegate? Delegate { get; set; }
-    [Selector("selectedViewController")] public NSViewController? SelectedViewController { get; }
-    [Selector("transitionStyle", "setTransitionStyle:")] public NSPageControllerTransitionStyle TransitionStyle { get; set; }
-    [Selector("arrangedObjects", "setArrangedObjects:")] public NSArray ArrangedObjects { get; set; }
-    [Selector("selectedIndex", "setSelectedIndex:")] public NSInteger SelectedIndex { get; set; }
-    [Selector("navigateForwardToObject:")] public void NavigateForwardToObject(AnyObject object);
-    [Selector("completeTransition")] public void CompleteTransition();
-    [Selector("navigateBack:")] public void NavigateBack(AnyObject? sender);
-    [Selector("navigateForward:")] public void NavigateForward(AnyObject? sender);
-    [Selector("takeSelectedIndexFrom:")] public void TakeSelectedIndexFrom(AnyObject? sender);
+    [Selector("delegate", "setDelegate:")]
+    public NSPageControllerDelegate? Delegate { get; set; }
+    [Selector("selectedViewController")]
+    public NSViewController? SelectedViewController { get; }
+    [Selector("transitionStyle", "setTransitionStyle:")]
+    public NSPageControllerTransitionStyle TransitionStyle { get; set; }
+    [Selector("arrangedObjects", "setArrangedObjects:")]
+    public NSArray ArrangedObjects { get; set; }
+    [Selector("selectedIndex", "setSelectedIndex:")]
+    public NSInteger SelectedIndex { get; set; }
+    [Selector("navigateForwardToObject:")]
+    public void NavigateForwardToObject(AnyObject object);
+    [Selector("completeTransition")]
+    public void CompleteTransition();
+    [Selector("navigateBack:")]
+    public void NavigateBack(AnyObject? sender);
+    [Selector("navigateForward:")]
+    public void NavigateForward(AnyObject? sender);
+    [Selector("takeSelectedIndexFrom:")]
+    public void TakeSelectedIndexFrom(AnyObject? sender);
 }
 
 public objc interface NSPageControllerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("pageController:identifierForObject:")] NSPageControllerObjectIdentifier PageControllerIdentifierForObject(NSPageController pageController, AnyObject object);
-    [Optional] [Selector("pageController:viewControllerForIdentifier:")] NSViewController PageControllerViewControllerForIdentifier(NSPageController pageController, NSPageControllerObjectIdentifier identifier);
-    [Optional] [Selector("pageController:frameForObject:")] NSRect PageControllerFrameForObject(NSPageController pageController, AnyObject? object);
-    [Optional] [Selector("pageController:prepareViewController:withObject:")] void PageControllerPrepareViewControllerWithObject(NSPageController pageController, NSViewController viewController, AnyObject? object);
-    [Optional] [Selector("pageController:didTransitionToObject:")] void PageControllerDidTransitionToObject(NSPageController pageController, AnyObject object);
-    [Optional] [Selector("pageControllerWillStartLiveTransition:")] void PageControllerWillStartLiveTransition(NSPageController pageController);
-    [Optional] [Selector("pageControllerDidEndLiveTransition:")] void PageControllerDidEndLiveTransition(NSPageController pageController);
+    [Optional]
+    [Selector("pageController:identifierForObject:")]
+    NSPageControllerObjectIdentifier PageControllerIdentifierForObject(NSPageController pageController, AnyObject object);
+    [Optional]
+    [Selector("pageController:viewControllerForIdentifier:")]
+    NSViewController PageControllerViewControllerForIdentifier(NSPageController pageController, NSPageControllerObjectIdentifier identifier);
+    [Optional]
+    [Selector("pageController:frameForObject:")]
+    NSRect PageControllerFrameForObject(NSPageController pageController, AnyObject? object);
+    [Optional]
+    [Selector("pageController:prepareViewController:withObject:")]
+    void PageControllerPrepareViewControllerWithObject(NSPageController pageController, NSViewController viewController, AnyObject? object);
+    [Optional]
+    [Selector("pageController:didTransitionToObject:")]
+    void PageControllerDidTransitionToObject(NSPageController pageController, AnyObject object);
+    [Optional]
+    [Selector("pageControllerWillStartLiveTransition:")]
+    void PageControllerWillStartLiveTransition(NSPageController pageController);
+    [Optional]
+    [Selector("pageControllerDidEndLiveTransition:")]
+    void PageControllerDidEndLiveTransition(NSPageController pageController);
 }
 
 #endif

@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class SFContentBlockerState : NSObject
 {
-    [Selector("isEnabled")] public bool Enabled { get; }
+    [Selector("isEnabled")]
+    public bool Enabled { get; }
 }
 
 #endif

@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationSingleSignOnRequest : ASAuthorizationOpenIDRequest
 {
-    [Selector("authorizationOptions", "setAuthorizationOptions:")] public NSArray AuthorizationOptions { get; set; }
-    [Selector("isUserInterfaceEnabled", "setUserInterfaceEnabled:")] public bool UserInterfaceEnabled { get; set; }
+    [Selector("authorizationOptions", "setAuthorizationOptions:")]
+    public NSArray AuthorizationOptions { get; set; }
+    [Selector("isUserInterfaceEnabled", "setUserInterfaceEnabled:")]
+    public bool UserInterfaceEnabled { get; set; }
 }
 
 #endif

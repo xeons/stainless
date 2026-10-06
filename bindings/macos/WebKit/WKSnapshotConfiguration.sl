@@ -34,9 +34,12 @@ import Standard.ObjC;
 
 public extern objc class WKSnapshotConfiguration : NSObject, NSCopying
 {
-    [Selector("rect", "setRect:")] public CGRect Rect { get; set; }
-    [Selector("snapshotWidth", "setSnapshotWidth:")] public NSNumber? SnapshotWidth { get; set; }
-    [Selector("afterScreenUpdates", "setAfterScreenUpdates:")] public bool AfterScreenUpdates { get; set; }
+    [Selector("rect", "setRect:")]
+    public CGRect Rect { get; set; }
+    [Selector("snapshotWidth", "setSnapshotWidth:")]
+    public NSNumber? SnapshotWidth { get; set; }
+    [Selector("afterScreenUpdates", "setAfterScreenUpdates:")]
+    public bool AfterScreenUpdates { get; set; }
 }
 
 #endif

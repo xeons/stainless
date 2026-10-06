@@ -41,38 +41,66 @@ public extern "C" NSString? QCViewDidStopRenderingNotification;
 /// Deprecated in macOS 10.15.
 public extern objc class QCView : NSView, QCCompositionRenderer
 {
-    [Selector("loadCompositionFromFile:")] public bool LoadCompositionFromFile(NSString? path);
-    [Selector("loadComposition:")] public bool LoadComposition(QCComposition? composition);
-    [Selector("loadedComposition")] public QCComposition? LoadedComposition();
-    [Selector("unloadComposition")] public void UnloadComposition();
-    [Selector("setAutostartsRendering:")] public void SetAutostartsRendering(bool flag);
-    [Selector("autostartsRendering")] public bool AutostartsRendering();
-    [Selector("setEraseColor:")] public void SetEraseColor(NSColor? color);
-    [Selector("eraseColor")] public NSColor? EraseColor();
-    [Selector("setEventForwardingMask:")] public void SetEventForwardingMask(NSUInteger mask);
-    [Selector("eventForwardingMask")] public NSUInteger EventForwardingMask();
-    [Selector("setMaxRenderingFrameRate:")] public void SetMaxRenderingFrameRate(float maxFPS);
-    [Selector("maxRenderingFrameRate")] public float MaxRenderingFrameRate();
-    [Selector("erase")] public void Erase();
-    [Selector("startRendering")] public bool StartRendering();
-    [Selector("renderAtTime:arguments:")] public bool RenderAtTimeArguments(NSTimeInterval time, NSDictionary? arguments);
-    [Selector("pauseRendering")] public void PauseRendering();
-    [Selector("isPausedRendering")] public bool IsPausedRendering();
-    [Selector("resumeRendering")] public void ResumeRendering();
-    [Selector("stopRendering")] public void StopRendering();
-    [Selector("isRendering")] public bool IsRendering();
-    [Selector("snapshotImage")] public NSImage? SnapshotImage();
-    [ReturnsRetained] [Selector("createSnapshotImageOfType:")] public AnyObject? CreateSnapshotImageOfType(NSString? type);
-    [Selector("openGLContext")] public NSOpenGLContext? OpenGLContext();
-    [Selector("openGLPixelFormat")] public NSOpenGLPixelFormat? OpenGLPixelFormat();
+    [Selector("loadCompositionFromFile:")]
+    public bool LoadCompositionFromFile(NSString? path);
+    [Selector("loadComposition:")]
+    public bool LoadComposition(QCComposition? composition);
+    [Selector("loadedComposition")]
+    public QCComposition? LoadedComposition();
+    [Selector("unloadComposition")]
+    public void UnloadComposition();
+    [Selector("setAutostartsRendering:")]
+    public void SetAutostartsRendering(bool flag);
+    [Selector("autostartsRendering")]
+    public bool AutostartsRendering();
+    [Selector("setEraseColor:")]
+    public void SetEraseColor(NSColor? color);
+    [Selector("eraseColor")]
+    public NSColor? EraseColor();
+    [Selector("setEventForwardingMask:")]
+    public void SetEventForwardingMask(NSUInteger mask);
+    [Selector("eventForwardingMask")]
+    public NSUInteger EventForwardingMask();
+    [Selector("setMaxRenderingFrameRate:")]
+    public void SetMaxRenderingFrameRate(float maxFPS);
+    [Selector("maxRenderingFrameRate")]
+    public float MaxRenderingFrameRate();
+    [Selector("erase")]
+    public void Erase();
+    [Selector("startRendering")]
+    public bool StartRendering();
+    [Selector("renderAtTime:arguments:")]
+    public bool RenderAtTimeArguments(NSTimeInterval time, NSDictionary? arguments);
+    [Selector("pauseRendering")]
+    public void PauseRendering();
+    [Selector("isPausedRendering")]
+    public bool IsPausedRendering();
+    [Selector("resumeRendering")]
+    public void ResumeRendering();
+    [Selector("stopRendering")]
+    public void StopRendering();
+    [Selector("isRendering")]
+    public bool IsRendering();
+    [Selector("snapshotImage")]
+    public NSImage? SnapshotImage();
+    [ReturnsRetained]
+    [Selector("createSnapshotImageOfType:")]
+    public AnyObject? CreateSnapshotImageOfType(NSString? type);
+    [Selector("openGLContext")]
+    public NSOpenGLContext? OpenGLContext();
+    [Selector("openGLPixelFormat")]
+    public NSOpenGLPixelFormat? OpenGLPixelFormat();
 }
 
 /// IBExtensions, a category of QCView.
 public extern objc class QCView
 {
-    [Selector("start:")] public void Start(AnyObject? sender);
-    [Selector("stop:")] public void Stop(AnyObject? sender);
-    [Selector("play:")] public void Play(AnyObject? sender);
+    [Selector("start:")]
+    public void Start(AnyObject? sender);
+    [Selector("stop:")]
+    public void Stop(AnyObject? sender);
+    [Selector("play:")]
+    public void Play(AnyObject? sender);
 }
 
 #endif

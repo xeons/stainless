@@ -34,13 +34,20 @@ import Standard.ObjC;
 
 public extern objc class MKTileOverlay : NSObject, MKOverlay
 {
-    [Selector("tileSize", "setTileSize:")] public CGSize TileSize { get; set; }
-    [Selector("isGeometryFlipped", "setGeometryFlipped:")] public bool GeometryFlipped { get; set; }
-    [Selector("minimumZ", "setMinimumZ:")] public NSInteger MinimumZ { get; set; }
-    [Selector("maximumZ", "setMaximumZ:")] public NSInteger MaximumZ { get; set; }
-    [Selector("URLTemplate")] public NSString? URLTemplate { get; }
-    [Selector("canReplaceMapContent", "setCanReplaceMapContent:")] public bool CanReplaceMapContent { get; set; }
-    [Selector("initWithURLTemplate:")] public Self InitWithURLTemplate(NSString? URLTemplate);
+    [Selector("tileSize", "setTileSize:")]
+    public CGSize TileSize { get; set; }
+    [Selector("isGeometryFlipped", "setGeometryFlipped:")]
+    public bool GeometryFlipped { get; set; }
+    [Selector("minimumZ", "setMinimumZ:")]
+    public NSInteger MinimumZ { get; set; }
+    [Selector("maximumZ", "setMaximumZ:")]
+    public NSInteger MaximumZ { get; set; }
+    [Selector("URLTemplate")]
+    public NSString? URLTemplate { get; }
+    [Selector("canReplaceMapContent", "setCanReplaceMapContent:")]
+    public bool CanReplaceMapContent { get; set; }
+    [Selector("initWithURLTemplate:")]
+    public Self InitWithURLTemplate(NSString? URLTemplate);
 }
 
 public struct MKTileOverlayPath
@@ -56,8 +63,10 @@ public objc closure void MKTileOverlayLoadTileAtPathResultResultBlock(NSData? ar
 /// CustomLoading, a category of MKTileOverlay.
 public extern objc class MKTileOverlay
 {
-    [Selector("URLForTilePath:")] public NSURL URLForTilePath(MKTileOverlayPath path);
-    [Selector("loadTileAtPath:result:")] public void LoadTileAtPathResult(MKTileOverlayPath path, MKTileOverlayLoadTileAtPathResultResultBlock result);
+    [Selector("URLForTilePath:")]
+    public NSURL URLForTilePath(MKTileOverlayPath path);
+    [Selector("loadTileAtPath:result:")]
+    public void LoadTileAtPathResult(MKTileOverlayPath path, MKTileOverlayLoadTileAtPathResultResultBlock result);
 }
 
 #endif

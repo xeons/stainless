@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioFileSystemDeviceConfiguration : VZDirectorySharingDeviceConfiguration
 {
-    [Selector("tag", "setTag:")] public NSString Tag { get; set; }
-    [Selector("share", "setShare:")] public VZDirectoryShare? Share { get; set; }
-    [Selector("macOSGuestAutomountTag")] public static NSString? MacOSGuestAutomountTag { get; }
-    [Selector("initWithTag:")] public Self InitWithTag(NSString tag);
-    [Selector("validateTag:error:")] public static bool ValidateTagError(NSString tag, out NSError? error);
+    [Selector("tag", "setTag:")]
+    public NSString Tag { get; set; }
+    [Selector("share", "setShare:")]
+    public VZDirectoryShare? Share { get; set; }
+    [Selector("macOSGuestAutomountTag")]
+    public static NSString? MacOSGuestAutomountTag { get; }
+    [Selector("initWithTag:")]
+    public Self InitWithTag(NSString tag);
+    [Selector("validateTag:error:")]
+    public static bool ValidateTagError(NSString tag, out NSError? error);
 }
 
 #endif

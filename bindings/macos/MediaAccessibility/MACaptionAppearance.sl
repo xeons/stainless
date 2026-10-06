@@ -83,21 +83,26 @@ public extern "C" void MACaptionAppearanceDidDisplayCaptions(CFArrayRef strings)
 
 public extern "C" bool MACaptionAppearanceAddSelectedLanguage(MACaptionAppearanceDomain domain, CFStringRef language);
 
-[ReturnsRetained] public extern "C" CFArrayRef MACaptionAppearanceCopySelectedLanguages(MACaptionAppearanceDomain domain);
+[ReturnsRetained]
+public extern "C" CFArrayRef MACaptionAppearanceCopySelectedLanguages(MACaptionAppearanceDomain domain);
 
 public extern "C" MACaptionAppearanceDisplayType MACaptionAppearanceGetDisplayType(MACaptionAppearanceDomain domain);
 
 public extern "C" void MACaptionAppearanceSetDisplayType(MACaptionAppearanceDomain domain, MACaptionAppearanceDisplayType displayType);
 
-[ReturnsRetained] public extern "C" CFArrayRef MACaptionAppearanceCopyPreferredCaptioningMediaCharacteristics(MACaptionAppearanceDomain domain);
+[ReturnsRetained]
+public extern "C" CFArrayRef MACaptionAppearanceCopyPreferredCaptioningMediaCharacteristics(MACaptionAppearanceDomain domain);
 
 public extern "C" bool MACaptionAppearanceIsCustomized(MACaptionAppearanceDomain domain);
 
-[ReturnsRetained] public extern "C" CGColorRef MACaptionAppearanceCopyForegroundColor(MACaptionAppearanceDomain domain, MACaptionAppearanceBehavior* behavior);
+[ReturnsRetained]
+public extern "C" CGColorRef MACaptionAppearanceCopyForegroundColor(MACaptionAppearanceDomain domain, MACaptionAppearanceBehavior* behavior);
 
-[ReturnsRetained] public extern "C" CGColorRef MACaptionAppearanceCopyBackgroundColor(MACaptionAppearanceDomain domain, MACaptionAppearanceBehavior* behavior);
+[ReturnsRetained]
+public extern "C" CGColorRef MACaptionAppearanceCopyBackgroundColor(MACaptionAppearanceDomain domain, MACaptionAppearanceBehavior* behavior);
 
-[ReturnsRetained] public extern "C" CGColorRef MACaptionAppearanceCopyWindowColor(MACaptionAppearanceDomain domain, MACaptionAppearanceBehavior* behavior);
+[ReturnsRetained]
+public extern "C" CGColorRef MACaptionAppearanceCopyWindowColor(MACaptionAppearanceDomain domain, MACaptionAppearanceBehavior* behavior);
 
 public extern "C" CGFloat MACaptionAppearanceGetForegroundOpacity(MACaptionAppearanceDomain domain, MACaptionAppearanceBehavior* behavior);
 
@@ -107,23 +112,27 @@ public extern "C" CGFloat MACaptionAppearanceGetWindowOpacity(MACaptionAppearanc
 
 public extern "C" CGFloat MACaptionAppearanceGetWindowRoundedCornerRadius(MACaptionAppearanceDomain domain, MACaptionAppearanceBehavior* behavior);
 
-[ReturnsRetained] public extern "C" CTFontDescriptorRef MACaptionAppearanceCopyFontDescriptorForStyle(MACaptionAppearanceDomain domain, MACaptionAppearanceBehavior* behavior, MACaptionAppearanceFontStyle fontStyle);
+[ReturnsRetained]
+public extern "C" CTFontDescriptorRef MACaptionAppearanceCopyFontDescriptorForStyle(MACaptionAppearanceDomain domain, MACaptionAppearanceBehavior* behavior, MACaptionAppearanceFontStyle fontStyle);
 
 public extern "C" CGFloat MACaptionAppearanceGetRelativeCharacterSize(MACaptionAppearanceDomain domain, MACaptionAppearanceBehavior* behavior);
 
 public extern "C" MACaptionAppearanceTextEdgeStyle MACaptionAppearanceGetTextEdgeStyle(MACaptionAppearanceDomain domain, MACaptionAppearanceBehavior* behavior);
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CFArrayRef MACaptionAppearanceCopyProfileIDs();
+[ReturnsRetained]
+public extern "C" CFArrayRef MACaptionAppearanceCopyProfileIDs();
 
 /// macOS 26.0 and later.
 public extern "C" void MACaptionAppearanceSetActiveProfileID(CFStringRef profileID);
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CFStringRef MACaptionAppearanceCopyActiveProfileID();
+[ReturnsRetained]
+public extern "C" CFStringRef MACaptionAppearanceCopyActiveProfileID();
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CFStringRef MACaptionAppearanceCopyProfileName(CFStringRef profileID);
+[ReturnsRetained]
+public extern "C" CFStringRef MACaptionAppearanceCopyProfileName(CFStringRef profileID);
 
 public objc closure void MACaptionAppearanceExecuteBlockForProfileIDABlock();
 

@@ -48,23 +48,39 @@ public objc closure bool NSBatchInsertRequestInitWithEntityNameManagedObjectHand
 
 public extern objc class NSBatchInsertRequest : NSPersistentStoreRequest
 {
-    [Selector("entityName")] public NSString EntityName { get; }
-    [Selector("entity")] public NSEntityDescription? Entity { get; }
-    [Selector("objectsToInsert", "setObjectsToInsert:")] public NSArray? ObjectsToInsert { get; set; }
-    [Selector("dictionaryHandler", "setDictionaryHandler:")] public NSBatchInsertRequestDictionaryHandlerBlock? DictionaryHandler { get; set; }
-    [Selector("managedObjectHandler", "setManagedObjectHandler:")] public NSBatchInsertRequestManagedObjectHandlerBlock? ManagedObjectHandler { get; set; }
-    [Selector("resultType", "setResultType:")] public NSBatchInsertRequestResultType ResultType { get; set; }
-    [Selector("batchInsertRequestWithEntityName:objects:")] public static Self BatchInsertRequestWithEntityNameObjects(NSString entityName, NSArray dictionaries);
-    [Selector("batchInsertRequestWithEntityName:dictionaryHandler:")] public static Self BatchInsertRequestWithEntityNameDictionaryHandler(NSString entityName, NSBatchInsertRequestBatchInsertRequestWithEntityNameDictionaryHandlerHandlerBlock handler);
-    [Selector("batchInsertRequestWithEntityName:managedObjectHandler:")] public static Self BatchInsertRequestWithEntityNameManagedObjectHandler(NSString entityName, NSBatchInsertRequestBatchInsertRequestWithEntityNameManagedObjectHandlerHandlerBlock handler);
+    [Selector("entityName")]
+    public NSString EntityName { get; }
+    [Selector("entity")]
+    public NSEntityDescription? Entity { get; }
+    [Selector("objectsToInsert", "setObjectsToInsert:")]
+    public NSArray? ObjectsToInsert { get; set; }
+    [Selector("dictionaryHandler", "setDictionaryHandler:")]
+    public NSBatchInsertRequestDictionaryHandlerBlock? DictionaryHandler { get; set; }
+    [Selector("managedObjectHandler", "setManagedObjectHandler:")]
+    public NSBatchInsertRequestManagedObjectHandlerBlock? ManagedObjectHandler { get; set; }
+    [Selector("resultType", "setResultType:")]
+    public NSBatchInsertRequestResultType ResultType { get; set; }
+    [Selector("batchInsertRequestWithEntityName:objects:")]
+    public static Self BatchInsertRequestWithEntityNameObjects(NSString entityName, NSArray dictionaries);
+    [Selector("batchInsertRequestWithEntityName:dictionaryHandler:")]
+    public static Self BatchInsertRequestWithEntityNameDictionaryHandler(NSString entityName, NSBatchInsertRequestBatchInsertRequestWithEntityNameDictionaryHandlerHandlerBlock handler);
+    [Selector("batchInsertRequestWithEntityName:managedObjectHandler:")]
+    public static Self BatchInsertRequestWithEntityNameManagedObjectHandler(NSString entityName, NSBatchInsertRequestBatchInsertRequestWithEntityNameManagedObjectHandlerHandlerBlock handler);
     /// Deprecated in macOS 11.0.
-    [Selector("init")] public Self Init();
-    [Selector("initWithEntityName:objects:")] public Self InitWithEntityNameObjects(NSString entityName, NSArray dictionaries);
-    [Selector("initWithEntity:objects:")] public Self InitWithEntityObjects(NSEntityDescription entity, NSArray dictionaries);
-    [Selector("initWithEntity:dictionaryHandler:")] public Self InitWithEntityDictionaryHandler(NSEntityDescription entity, NSBatchInsertRequestInitWithEntityDictionaryHandlerHandlerBlock handler);
-    [Selector("initWithEntity:managedObjectHandler:")] public Self InitWithEntityManagedObjectHandler(NSEntityDescription entity, NSBatchInsertRequestInitWithEntityManagedObjectHandlerHandlerBlock handler);
-    [Selector("initWithEntityName:dictionaryHandler:")] public Self InitWithEntityNameDictionaryHandler(NSString entityName, NSBatchInsertRequestInitWithEntityNameDictionaryHandlerHandlerBlock handler);
-    [Selector("initWithEntityName:managedObjectHandler:")] public Self InitWithEntityNameManagedObjectHandler(NSString entityName, NSBatchInsertRequestInitWithEntityNameManagedObjectHandlerHandlerBlock handler);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithEntityName:objects:")]
+    public Self InitWithEntityNameObjects(NSString entityName, NSArray dictionaries);
+    [Selector("initWithEntity:objects:")]
+    public Self InitWithEntityObjects(NSEntityDescription entity, NSArray dictionaries);
+    [Selector("initWithEntity:dictionaryHandler:")]
+    public Self InitWithEntityDictionaryHandler(NSEntityDescription entity, NSBatchInsertRequestInitWithEntityDictionaryHandlerHandlerBlock handler);
+    [Selector("initWithEntity:managedObjectHandler:")]
+    public Self InitWithEntityManagedObjectHandler(NSEntityDescription entity, NSBatchInsertRequestInitWithEntityManagedObjectHandlerHandlerBlock handler);
+    [Selector("initWithEntityName:dictionaryHandler:")]
+    public Self InitWithEntityNameDictionaryHandler(NSString entityName, NSBatchInsertRequestInitWithEntityNameDictionaryHandlerHandlerBlock handler);
+    [Selector("initWithEntityName:managedObjectHandler:")]
+    public Self InitWithEntityNameManagedObjectHandler(NSString entityName, NSBatchInsertRequestInitWithEntityNameManagedObjectHandlerHandlerBlock handler);
 }
 
 #endif

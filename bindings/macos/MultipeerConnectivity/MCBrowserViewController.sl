@@ -34,20 +34,31 @@ import Standard.ObjC;
 
 public extern objc class MCBrowserViewController : NSViewController, MCNearbyServiceBrowserDelegate
 {
-    [Selector("delegate", "setDelegate:")] public MCBrowserViewControllerDelegate? Delegate { get; set; }
-    [Selector("browser")] public MCNearbyServiceBrowser Browser { get; }
-    [Selector("session")] public MCSession Session { get; }
-    [Selector("minimumNumberOfPeers", "setMinimumNumberOfPeers:")] public NSUInteger MinimumNumberOfPeers { get; set; }
-    [Selector("maximumNumberOfPeers", "setMaximumNumberOfPeers:")] public NSUInteger MaximumNumberOfPeers { get; set; }
-    [Selector("initWithServiceType:session:")] public Self InitWithServiceTypeSession(NSString serviceType, MCSession session);
-    [Selector("initWithBrowser:session:")] public Self InitWithBrowserSession(MCNearbyServiceBrowser browser, MCSession session);
+    [Selector("delegate", "setDelegate:")]
+    public MCBrowserViewControllerDelegate? Delegate { get; set; }
+    [Selector("browser")]
+    public MCNearbyServiceBrowser Browser { get; }
+    [Selector("session")]
+    public MCSession Session { get; }
+    [Selector("minimumNumberOfPeers", "setMinimumNumberOfPeers:")]
+    public NSUInteger MinimumNumberOfPeers { get; set; }
+    [Selector("maximumNumberOfPeers", "setMaximumNumberOfPeers:")]
+    public NSUInteger MaximumNumberOfPeers { get; set; }
+    [Selector("initWithServiceType:session:")]
+    public Self InitWithServiceTypeSession(NSString serviceType, MCSession session);
+    [Selector("initWithBrowser:session:")]
+    public Self InitWithBrowserSession(MCNearbyServiceBrowser browser, MCSession session);
 }
 
 public objc interface MCBrowserViewControllerDelegate : NSObjectProtocol
 {
-    [Selector("browserViewControllerDidFinish:")] void BrowserViewControllerDidFinish(MCBrowserViewController browserViewController);
-    [Selector("browserViewControllerWasCancelled:")] void BrowserViewControllerWasCancelled(MCBrowserViewController browserViewController);
-    [Optional] [Selector("browserViewController:shouldPresentNearbyPeer:withDiscoveryInfo:")] bool BrowserViewControllerShouldPresentNearbyPeerWithDiscoveryInfo(MCBrowserViewController browserViewController, MCPeerID peerID, NSDictionary? info);
+    [Selector("browserViewControllerDidFinish:")]
+    void BrowserViewControllerDidFinish(MCBrowserViewController browserViewController);
+    [Selector("browserViewControllerWasCancelled:")]
+    void BrowserViewControllerWasCancelled(MCBrowserViewController browserViewController);
+    [Optional]
+    [Selector("browserViewController:shouldPresentNearbyPeer:withDiscoveryInfo:")]
+    bool BrowserViewControllerShouldPresentNearbyPeerWithDiscoveryInfo(MCBrowserViewController browserViewController, MCPeerID peerID, NSDictionary? info);
 }
 
 #endif

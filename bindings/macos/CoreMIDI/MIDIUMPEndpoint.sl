@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class MIDI2DeviceInfo : NSObject
 {
-    [Selector("manufacturerID")] public MIDI2DeviceManufacturer ManufacturerID { get; }
-    [Selector("family")] public MIDIUInteger14 Family { get; }
-    [Selector("modelNumber")] public MIDIUInteger14 ModelNumber { get; }
-    [Selector("revisionLevel")] public MIDI2DeviceRevisionLevel RevisionLevel { get; }
-    [Selector("initWithManufacturerID:family:modelNumber:revisionLevel:")] public Self InitWithManufacturerIDFamilyModelNumberRevisionLevel(MIDI2DeviceManufacturer manufacturerID, MIDIUInteger14 family, MIDIUInteger14 modelNumber, MIDI2DeviceRevisionLevel revisionLevel);
+    [Selector("manufacturerID")]
+    public MIDI2DeviceManufacturer ManufacturerID { get; }
+    [Selector("family")]
+    public MIDIUInteger14 Family { get; }
+    [Selector("modelNumber")]
+    public MIDIUInteger14 ModelNumber { get; }
+    [Selector("revisionLevel")]
+    public MIDI2DeviceRevisionLevel RevisionLevel { get; }
+    [Selector("initWithManufacturerID:family:modelNumber:revisionLevel:")]
+    public Self InitWithManufacturerIDFamilyModelNumberRevisionLevel(MIDI2DeviceManufacturer manufacturerID, MIDIUInteger14 family, MIDIUInteger14 modelNumber, MIDI2DeviceRevisionLevel revisionLevel);
 }
 
 [Flags]
@@ -49,18 +54,30 @@ public enum MIDIUMPProtocolOptions : byte
 
 public extern objc class MIDIUMPEndpoint : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("MIDIProtocol")] public MIDIProtocolID MIDIProtocol { get; }
-    [Selector("supportedMIDIProtocols")] public MIDIUMPProtocolOptions SupportedMIDIProtocols { get; }
-    [Selector("MIDIDestination")] public MIDIEndpointRef MIDIDestination { get; }
-    [Selector("MIDISource")] public MIDIEndpointRef MIDISource { get; }
-    [Selector("deviceInfo")] public MIDI2DeviceInfo DeviceInfo { get; }
-    [Selector("productInstanceID")] public NSString ProductInstanceID { get; }
-    [Selector("hasStaticFunctionBlocks")] public bool HasStaticFunctionBlocks { get; }
-    [Selector("hasJRTSReceiveCapability")] public bool HasJRTSReceiveCapability { get; }
-    [Selector("hasJRTSTransmitCapability")] public bool HasJRTSTransmitCapability { get; }
-    [Selector("endpointType")] public MIDIUMPCIObjectBackingType EndpointType { get; }
-    [Selector("functionBlocks", "setFunctionBlocks:")] public NSArray FunctionBlocks { get; set; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("MIDIProtocol")]
+    public MIDIProtocolID MIDIProtocol { get; }
+    [Selector("supportedMIDIProtocols")]
+    public MIDIUMPProtocolOptions SupportedMIDIProtocols { get; }
+    [Selector("MIDIDestination")]
+    public MIDIEndpointRef MIDIDestination { get; }
+    [Selector("MIDISource")]
+    public MIDIEndpointRef MIDISource { get; }
+    [Selector("deviceInfo")]
+    public MIDI2DeviceInfo DeviceInfo { get; }
+    [Selector("productInstanceID")]
+    public NSString ProductInstanceID { get; }
+    [Selector("hasStaticFunctionBlocks")]
+    public bool HasStaticFunctionBlocks { get; }
+    [Selector("hasJRTSReceiveCapability")]
+    public bool HasJRTSReceiveCapability { get; }
+    [Selector("hasJRTSTransmitCapability")]
+    public bool HasJRTSTransmitCapability { get; }
+    [Selector("endpointType")]
+    public MIDIUMPCIObjectBackingType EndpointType { get; }
+    [Selector("functionBlocks", "setFunctionBlocks:")]
+    public NSArray FunctionBlocks { get; set; }
 }
 
 #endif

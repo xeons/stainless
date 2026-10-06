@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.12.
 public extern objc class PDFAnnotationStamp : PDFAnnotation, NSCopying
 {
-    [Selector("name")] public NSString? Name();
-    [Selector("setName:")] public void SetName(NSString? name);
+    [Selector("name")]
+    public NSString? Name();
+    [Selector("setName:")]
+    public void SetName(NSString? name);
 }
 
 #endif

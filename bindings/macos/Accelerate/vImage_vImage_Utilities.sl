@@ -57,13 +57,17 @@ public extern "C" vImage_Error vImageBuffer_InitWithCGImage(vImage_Buffer* buf, 
 
 public delegate void vImageCreateCGImageFromBufferCallbackFunction(void* arg0, void* arg1);
 
-[ReturnsRetained] public extern "C" CGImageRef? vImageCreateCGImageFromBuffer(vImage_Buffer* buf, vImage_CGImageFormat* format, vImageCreateCGImageFromBufferCallbackFunction callback, void* userData, vImage_Flags flags, vImage_Error* error);
+[ReturnsRetained]
+public extern "C" CGImageRef? vImageCreateCGImageFromBuffer(vImage_Buffer* buf, vImage_CGImageFormat* format, vImageCreateCGImageFromBufferCallbackFunction callback, void* userData, vImage_Flags flags, vImage_Error* error);
 
-[ReturnsRetained] public extern "C" vImageConverterRef? vImageConverter_CreateWithCGImageFormat(vImage_CGImageFormat* srcFormat, vImage_CGImageFormat* destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
+[ReturnsRetained]
+public extern "C" vImageConverterRef? vImageConverter_CreateWithCGImageFormat(vImage_CGImageFormat* srcFormat, vImage_CGImageFormat* destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
 
-[ReturnsRetained] public extern "C" vImageConverterRef? vImageConverter_CreateWithColorSyncCodeFragment(CFTypeRef? codeFragment, vImage_CGImageFormat* srcFormat, vImage_CGImageFormat* destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
+[ReturnsRetained]
+public extern "C" vImageConverterRef? vImageConverter_CreateWithColorSyncCodeFragment(CFTypeRef? codeFragment, vImage_CGImageFormat* srcFormat, vImage_CGImageFormat* destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
 
-[ReturnsRetained] public extern "C" vImageConverterRef? vImageConverter_CreateWithCGColorConversionInfo(CGColorConversionInfoRef? colorConversionInfoRef, vImage_CGImageFormat* sFormat, vImage_CGImageFormat* dFormat, CGFloat* bg, vImage_Flags flags, vImage_Error* error);
+[ReturnsRetained]
+public extern "C" vImageConverterRef? vImageConverter_CreateWithCGColorConversionInfo(CGColorConversionInfoRef? colorConversionInfoRef, vImage_CGImageFormat* sFormat, vImage_CGImageFormat* dFormat, CGFloat* bg, vImage_Flags flags, vImage_Error* error);
 
 public extern "C" vImage_Error vImageConverter_MustOperateOutOfPlace(vImageConverterRef? converter, vImage_Buffer* srcs, vImage_Buffer* dests, vImage_Flags flags);
 

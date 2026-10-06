@@ -119,69 +119,137 @@ public enum PDFAccessPermissions : ulong
 
 public extern objc class PDFDocument : NSObject, NSCopying
 {
-    [Selector("documentURL")] public NSURL? DocumentURL { get; }
-    [Selector("documentRef")] public CGPDFDocumentRef? DocumentRef { get; }
-    [Selector("documentAttributes", "setDocumentAttributes:")] public NSDictionary? DocumentAttributes { get; set; }
-    [Selector("majorVersion")] public NSInteger MajorVersion { get; }
-    [Selector("minorVersion")] public NSInteger MinorVersion { get; }
-    [Selector("isEncrypted")] public bool IsEncrypted { get; }
-    [Selector("isLocked")] public bool IsLocked { get; }
-    [Selector("allowsPrinting")] public bool AllowsPrinting { get; }
-    [Selector("allowsCopying")] public bool AllowsCopying { get; }
-    [Selector("allowsDocumentChanges")] public bool AllowsDocumentChanges { get; }
-    [Selector("allowsDocumentAssembly")] public bool AllowsDocumentAssembly { get; }
-    [Selector("allowsContentAccessibility")] public bool AllowsContentAccessibility { get; }
-    [Selector("allowsCommenting")] public bool AllowsCommenting { get; }
-    [Selector("allowsFormFieldEntry")] public bool AllowsFormFieldEntry { get; }
-    [Selector("accessPermissions")] public PDFAccessPermissions AccessPermissions { get; }
-    [Selector("permissionsStatus")] public PDFDocumentPermissions PermissionsStatus { get; }
-    [Selector("string")] public NSString? String { get; }
-    [Selector("delegate", "setDelegate:")] public PDFDocumentDelegate? Delegate { get; set; }
-    [Selector("outlineRoot", "setOutlineRoot:")] public PDFOutline? OutlineRoot { get; set; }
-    [Selector("pageCount")] public NSUInteger PageCount { get; }
-    [Selector("pageClass")] public Class PageClass { get; }
-    [Selector("isFinding")] public bool IsFinding { get; }
-    [Selector("selectionForEntireDocument")] public PDFSelection? SelectionForEntireDocument { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithURL:")] public Self? InitWithURL(NSURL url);
-    [Selector("initWithData:")] public Self? InitWithData(NSData data);
-    [Selector("unlockWithPassword:")] public bool UnlockWithPassword(NSString password);
-    [Selector("dataRepresentation")] public NSData? DataRepresentation();
-    [Selector("dataRepresentationWithOptions:")] public NSData? DataRepresentationWithOptions(NSDictionary options);
-    [Selector("writeToFile:")] public bool WriteToFile(NSString path);
-    [Selector("writeToFile:withOptions:")] public bool WriteToFileWithOptions(NSString path, NSDictionary? options);
-    [Selector("writeToURL:")] public bool WriteToURL(NSURL url);
-    [Selector("writeToURL:withOptions:")] public bool WriteToURLWithOptions(NSURL url, NSDictionary? options);
-    [Selector("outlineItemForSelection:")] public PDFOutline? OutlineItemForSelection(PDFSelection selection);
-    [Selector("pageAtIndex:")] public PDFPage? PageAtIndex(NSUInteger index);
-    [Selector("indexForPage:")] public NSUInteger IndexForPage(PDFPage page);
-    [Selector("insertPage:atIndex:")] public void InsertPageAtIndex(PDFPage page, NSUInteger index);
-    [Selector("removePageAtIndex:")] public void RemovePageAtIndex(NSUInteger index);
-    [Selector("exchangePageAtIndex:withPageAtIndex:")] public void ExchangePageAtIndexWithPageAtIndex(NSUInteger indexA, NSUInteger indexB);
-    [Selector("findString:withOptions:")] public NSArray FindStringWithOptions(NSString string, NSStringCompareOptions options);
-    [Selector("beginFindString:withOptions:")] public void BeginFindStringWithOptions(NSString string, NSStringCompareOptions options);
-    [Selector("beginFindStrings:withOptions:")] public void BeginFindStringsWithOptions(NSArray strings, NSStringCompareOptions options);
-    [Selector("findString:fromSelection:withOptions:")] public PDFSelection? FindStringFromSelectionWithOptions(NSString string, PDFSelection? selection, NSStringCompareOptions options);
-    [Selector("cancelFindString")] public void CancelFindString();
-    [Selector("printOperationForPrintInfo:scalingMode:autoRotate:")] public NSPrintOperation? PrintOperationForPrintInfoScalingModeAutoRotate(NSPrintInfo? printInfo, PDFPrintScalingMode scaleMode, bool doRotate);
-    [Selector("selectionFromPage:atPoint:toPage:atPoint:")] public PDFSelection? SelectionFromPageAtPointToPageAtPoint(PDFPage startPage, NSPoint startPoint, PDFPage endPage, NSPoint endPoint);
-    [Selector("selectionFromPage:atPoint:toPage:atPoint:withGranularity:")] public PDFSelection? SelectionFromPageAtPointToPageAtPointWithGranularity(PDFPage startPage, NSPoint startPoint, PDFPage endPage, NSPoint endPoint, PDFSelectionGranularity granularity);
-    [Selector("selectionFromPage:atCharacterIndex:toPage:atCharacterIndex:")] public PDFSelection? SelectionFromPageAtCharacterIndexToPageAtCharacterIndex(PDFPage startPage, NSUInteger startCharacter, PDFPage endPage, NSUInteger endCharacter);
+    [Selector("documentURL")]
+    public NSURL? DocumentURL { get; }
+    [Selector("documentRef")]
+    public CGPDFDocumentRef? DocumentRef { get; }
+    [Selector("documentAttributes", "setDocumentAttributes:")]
+    public NSDictionary? DocumentAttributes { get; set; }
+    [Selector("majorVersion")]
+    public NSInteger MajorVersion { get; }
+    [Selector("minorVersion")]
+    public NSInteger MinorVersion { get; }
+    [Selector("isEncrypted")]
+    public bool IsEncrypted { get; }
+    [Selector("isLocked")]
+    public bool IsLocked { get; }
+    [Selector("allowsPrinting")]
+    public bool AllowsPrinting { get; }
+    [Selector("allowsCopying")]
+    public bool AllowsCopying { get; }
+    [Selector("allowsDocumentChanges")]
+    public bool AllowsDocumentChanges { get; }
+    [Selector("allowsDocumentAssembly")]
+    public bool AllowsDocumentAssembly { get; }
+    [Selector("allowsContentAccessibility")]
+    public bool AllowsContentAccessibility { get; }
+    [Selector("allowsCommenting")]
+    public bool AllowsCommenting { get; }
+    [Selector("allowsFormFieldEntry")]
+    public bool AllowsFormFieldEntry { get; }
+    [Selector("accessPermissions")]
+    public PDFAccessPermissions AccessPermissions { get; }
+    [Selector("permissionsStatus")]
+    public PDFDocumentPermissions PermissionsStatus { get; }
+    [Selector("string")]
+    public NSString? String { get; }
+    [Selector("delegate", "setDelegate:")]
+    public PDFDocumentDelegate? Delegate { get; set; }
+    [Selector("outlineRoot", "setOutlineRoot:")]
+    public PDFOutline? OutlineRoot { get; set; }
+    [Selector("pageCount")]
+    public NSUInteger PageCount { get; }
+    [Selector("pageClass")]
+    public Class PageClass { get; }
+    [Selector("isFinding")]
+    public bool IsFinding { get; }
+    [Selector("selectionForEntireDocument")]
+    public PDFSelection? SelectionForEntireDocument { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithURL:")]
+    public Self? InitWithURL(NSURL url);
+    [Selector("initWithData:")]
+    public Self? InitWithData(NSData data);
+    [Selector("unlockWithPassword:")]
+    public bool UnlockWithPassword(NSString password);
+    [Selector("dataRepresentation")]
+    public NSData? DataRepresentation();
+    [Selector("dataRepresentationWithOptions:")]
+    public NSData? DataRepresentationWithOptions(NSDictionary options);
+    [Selector("writeToFile:")]
+    public bool WriteToFile(NSString path);
+    [Selector("writeToFile:withOptions:")]
+    public bool WriteToFileWithOptions(NSString path, NSDictionary? options);
+    [Selector("writeToURL:")]
+    public bool WriteToURL(NSURL url);
+    [Selector("writeToURL:withOptions:")]
+    public bool WriteToURLWithOptions(NSURL url, NSDictionary? options);
+    [Selector("outlineItemForSelection:")]
+    public PDFOutline? OutlineItemForSelection(PDFSelection selection);
+    [Selector("pageAtIndex:")]
+    public PDFPage? PageAtIndex(NSUInteger index);
+    [Selector("indexForPage:")]
+    public NSUInteger IndexForPage(PDFPage page);
+    [Selector("insertPage:atIndex:")]
+    public void InsertPageAtIndex(PDFPage page, NSUInteger index);
+    [Selector("removePageAtIndex:")]
+    public void RemovePageAtIndex(NSUInteger index);
+    [Selector("exchangePageAtIndex:withPageAtIndex:")]
+    public void ExchangePageAtIndexWithPageAtIndex(NSUInteger indexA, NSUInteger indexB);
+    [Selector("findString:withOptions:")]
+    public NSArray FindStringWithOptions(NSString string, NSStringCompareOptions options);
+    [Selector("beginFindString:withOptions:")]
+    public void BeginFindStringWithOptions(NSString string, NSStringCompareOptions options);
+    [Selector("beginFindStrings:withOptions:")]
+    public void BeginFindStringsWithOptions(NSArray strings, NSStringCompareOptions options);
+    [Selector("findString:fromSelection:withOptions:")]
+    public PDFSelection? FindStringFromSelectionWithOptions(NSString string, PDFSelection? selection, NSStringCompareOptions options);
+    [Selector("cancelFindString")]
+    public void CancelFindString();
+    [Selector("printOperationForPrintInfo:scalingMode:autoRotate:")]
+    public NSPrintOperation? PrintOperationForPrintInfoScalingModeAutoRotate(NSPrintInfo? printInfo, PDFPrintScalingMode scaleMode, bool doRotate);
+    [Selector("selectionFromPage:atPoint:toPage:atPoint:")]
+    public PDFSelection? SelectionFromPageAtPointToPageAtPoint(PDFPage startPage, NSPoint startPoint, PDFPage endPage, NSPoint endPoint);
+    [Selector("selectionFromPage:atPoint:toPage:atPoint:withGranularity:")]
+    public PDFSelection? SelectionFromPageAtPointToPageAtPointWithGranularity(PDFPage startPage, NSPoint startPoint, PDFPage endPage, NSPoint endPoint, PDFSelectionGranularity granularity);
+    [Selector("selectionFromPage:atCharacterIndex:toPage:atCharacterIndex:")]
+    public PDFSelection? SelectionFromPageAtCharacterIndexToPageAtCharacterIndex(PDFPage startPage, NSUInteger startCharacter, PDFPage endPage, NSUInteger endCharacter);
 }
 
 public objc interface PDFDocumentDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("documentDidUnlock:")] void DocumentDidUnlock(NSNotification notification);
-    [Optional] [Selector("documentDidBeginDocumentFind:")] void DocumentDidBeginDocumentFind(NSNotification notification);
-    [Optional] [Selector("documentDidEndDocumentFind:")] void DocumentDidEndDocumentFind(NSNotification notification);
-    [Optional] [Selector("documentDidBeginPageFind:")] void DocumentDidBeginPageFind(NSNotification notification);
-    [Optional] [Selector("documentDidEndPageFind:")] void DocumentDidEndPageFind(NSNotification notification);
-    [Optional] [Selector("documentDidFindMatch:")] void DocumentDidFindMatch(NSNotification notification);
-    [Optional] [Selector("didMatchString:")] void DidMatchString(PDFSelection instance);
-    [Optional] [Selector("classForPage")] Class ClassForPage();
-    [Optional] [Selector("classForAnnotationType:")] Class ClassForAnnotationType(NSString annotationType);
+    [Optional]
+    [Selector("documentDidUnlock:")]
+    void DocumentDidUnlock(NSNotification notification);
+    [Optional]
+    [Selector("documentDidBeginDocumentFind:")]
+    void DocumentDidBeginDocumentFind(NSNotification notification);
+    [Optional]
+    [Selector("documentDidEndDocumentFind:")]
+    void DocumentDidEndDocumentFind(NSNotification notification);
+    [Optional]
+    [Selector("documentDidBeginPageFind:")]
+    void DocumentDidBeginPageFind(NSNotification notification);
+    [Optional]
+    [Selector("documentDidEndPageFind:")]
+    void DocumentDidEndPageFind(NSNotification notification);
+    [Optional]
+    [Selector("documentDidFindMatch:")]
+    void DocumentDidFindMatch(NSNotification notification);
+    [Optional]
+    [Selector("didMatchString:")]
+    void DidMatchString(PDFSelection instance);
+    [Optional]
+    [Selector("classForPage")]
+    Class ClassForPage();
+    [Optional]
+    [Selector("classForAnnotationType:")]
+    Class ClassForAnnotationType(NSString annotationType);
     /// Deprecated in macOS 10.12.
-    [Optional] [Selector("classForAnnotationClass:")] Class ClassForAnnotationClass(Class annotationClass);
+    [Optional]
+    [Selector("classForAnnotationClass:")]
+    Class ClassForAnnotationClass(Class annotationClass);
 }
 
 #endif

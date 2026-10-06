@@ -32,23 +32,38 @@ import Standard.ObjC;
 
 public objc interface NSURLAuthenticationChallengeSender : NSObjectProtocol
 {
-    [Selector("useCredential:forAuthenticationChallenge:")] void UseCredentialForAuthenticationChallenge(NSURLCredential credential, NSURLAuthenticationChallenge challenge);
-    [Selector("continueWithoutCredentialForAuthenticationChallenge:")] void ContinueWithoutCredentialForAuthenticationChallenge(NSURLAuthenticationChallenge challenge);
-    [Selector("cancelAuthenticationChallenge:")] void CancelAuthenticationChallenge(NSURLAuthenticationChallenge challenge);
-    [Optional] [Selector("performDefaultHandlingForAuthenticationChallenge:")] void PerformDefaultHandlingForAuthenticationChallenge(NSURLAuthenticationChallenge challenge);
-    [Optional] [Selector("rejectProtectionSpaceAndContinueWithChallenge:")] void RejectProtectionSpaceAndContinueWithChallenge(NSURLAuthenticationChallenge challenge);
+    [Selector("useCredential:forAuthenticationChallenge:")]
+    void UseCredentialForAuthenticationChallenge(NSURLCredential credential, NSURLAuthenticationChallenge challenge);
+    [Selector("continueWithoutCredentialForAuthenticationChallenge:")]
+    void ContinueWithoutCredentialForAuthenticationChallenge(NSURLAuthenticationChallenge challenge);
+    [Selector("cancelAuthenticationChallenge:")]
+    void CancelAuthenticationChallenge(NSURLAuthenticationChallenge challenge);
+    [Optional]
+    [Selector("performDefaultHandlingForAuthenticationChallenge:")]
+    void PerformDefaultHandlingForAuthenticationChallenge(NSURLAuthenticationChallenge challenge);
+    [Optional]
+    [Selector("rejectProtectionSpaceAndContinueWithChallenge:")]
+    void RejectProtectionSpaceAndContinueWithChallenge(NSURLAuthenticationChallenge challenge);
 }
 
 public extern objc class NSURLAuthenticationChallenge : NSObject, NSSecureCoding
 {
-    [Selector("protectionSpace")] public NSURLProtectionSpace ProtectionSpace { get; }
-    [Selector("proposedCredential")] public NSURLCredential? ProposedCredential { get; }
-    [Selector("previousFailureCount")] public NSInteger PreviousFailureCount { get; }
-    [Selector("failureResponse")] public NSURLResponse? FailureResponse { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("sender")] public NSURLAuthenticationChallengeSender? Sender { get; }
-    [Selector("initWithProtectionSpace:proposedCredential:previousFailureCount:failureResponse:error:sender:")] public Self InitWithProtectionSpaceProposedCredentialPreviousFailureCountFailureResponseErrorSender(NSURLProtectionSpace space, NSURLCredential? credential, NSInteger previousFailureCount, NSURLResponse? response, NSError? error, NSURLAuthenticationChallengeSender sender);
-    [Selector("initWithAuthenticationChallenge:sender:")] public Self InitWithAuthenticationChallengeSender(NSURLAuthenticationChallenge challenge, NSURLAuthenticationChallengeSender sender);
+    [Selector("protectionSpace")]
+    public NSURLProtectionSpace ProtectionSpace { get; }
+    [Selector("proposedCredential")]
+    public NSURLCredential? ProposedCredential { get; }
+    [Selector("previousFailureCount")]
+    public NSInteger PreviousFailureCount { get; }
+    [Selector("failureResponse")]
+    public NSURLResponse? FailureResponse { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("sender")]
+    public NSURLAuthenticationChallengeSender? Sender { get; }
+    [Selector("initWithProtectionSpace:proposedCredential:previousFailureCount:failureResponse:error:sender:")]
+    public Self InitWithProtectionSpaceProposedCredentialPreviousFailureCountFailureResponseErrorSender(NSURLProtectionSpace space, NSURLCredential? credential, NSInteger previousFailureCount, NSURLResponse? response, NSError? error, NSURLAuthenticationChallengeSender sender);
+    [Selector("initWithAuthenticationChallenge:sender:")]
+    public Self InitWithAuthenticationChallengeSender(NSURLAuthenticationChallenge challenge, NSURLAuthenticationChallengeSender sender);
 }
 
 #endif

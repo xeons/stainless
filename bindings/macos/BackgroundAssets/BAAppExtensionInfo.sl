@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class BAAppExtensionInfo : NSObject, NSSecureCoding
 {
-    [Selector("restrictedDownloadSizeRemaining")] public NSNumber? RestrictedDownloadSizeRemaining { get; }
-    [Selector("restrictedEssentialDownloadSizeRemaining")] public NSNumber? RestrictedEssentialDownloadSizeRemaining { get; }
+    [Selector("restrictedDownloadSizeRemaining")]
+    public NSNumber? RestrictedDownloadSizeRemaining { get; }
+    [Selector("restrictedEssentialDownloadSizeRemaining")]
+    public NSNumber? RestrictedEssentialDownloadSizeRemaining { get; }
 }
 
 #endif

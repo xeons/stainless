@@ -43,20 +43,34 @@ public struct NSAffineTransformStruct
 
 public extern objc class NSAffineTransform : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("transformStruct", "setTransformStruct:")] public NSAffineTransformStruct TransformStruct { get; set; }
-    [Selector("transform")] public static NSAffineTransform Transform();
-    [Selector("initWithTransform:")] public Self InitWithTransform(NSAffineTransform transform);
-    [Selector("init")] public Self Init();
-    [Selector("translateXBy:yBy:")] public void TranslateXByYBy(CGFloat deltaX, CGFloat deltaY);
-    [Selector("rotateByDegrees:")] public void RotateByDegrees(CGFloat angle);
-    [Selector("rotateByRadians:")] public void RotateByRadians(CGFloat angle);
-    [Selector("scaleBy:")] public void ScaleBy(CGFloat scale);
-    [Selector("scaleXBy:yBy:")] public void ScaleXByYBy(CGFloat scaleX, CGFloat scaleY);
-    [Selector("invert")] public void Invert();
-    [Selector("appendTransform:")] public void AppendTransform(NSAffineTransform transform);
-    [Selector("prependTransform:")] public void PrependTransform(NSAffineTransform transform);
-    [Selector("transformPoint:")] public NSPoint TransformPoint(NSPoint aPoint);
-    [Selector("transformSize:")] public NSSize TransformSize(NSSize aSize);
+    [Selector("transformStruct", "setTransformStruct:")]
+    public NSAffineTransformStruct TransformStruct { get; set; }
+    [Selector("transform")]
+    public static NSAffineTransform Transform();
+    [Selector("initWithTransform:")]
+    public Self InitWithTransform(NSAffineTransform transform);
+    [Selector("init")]
+    public Self Init();
+    [Selector("translateXBy:yBy:")]
+    public void TranslateXByYBy(CGFloat deltaX, CGFloat deltaY);
+    [Selector("rotateByDegrees:")]
+    public void RotateByDegrees(CGFloat angle);
+    [Selector("rotateByRadians:")]
+    public void RotateByRadians(CGFloat angle);
+    [Selector("scaleBy:")]
+    public void ScaleBy(CGFloat scale);
+    [Selector("scaleXBy:yBy:")]
+    public void ScaleXByYBy(CGFloat scaleX, CGFloat scaleY);
+    [Selector("invert")]
+    public void Invert();
+    [Selector("appendTransform:")]
+    public void AppendTransform(NSAffineTransform transform);
+    [Selector("prependTransform:")]
+    public void PrependTransform(NSAffineTransform transform);
+    [Selector("transformPoint:")]
+    public NSPoint TransformPoint(NSPoint aPoint);
+    [Selector("transformSize:")]
+    public NSSize TransformSize(NSSize aSize);
 }
 
 #endif

@@ -34,42 +34,66 @@ import Standard.ObjC;
 
 public extern objc class MKDirectionsResponse : NSObject
 {
-    [Selector("source")] public MKMapItem Source { get; }
-    [Selector("destination")] public MKMapItem Destination { get; }
-    [Selector("routes")] public NSArray Routes { get; }
+    [Selector("source")]
+    public MKMapItem Source { get; }
+    [Selector("destination")]
+    public MKMapItem Destination { get; }
+    [Selector("routes")]
+    public NSArray Routes { get; }
 }
 
 public extern objc class MKRoute : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("advisoryNotices")] public NSArray AdvisoryNotices { get; }
-    [Selector("distance")] public CLLocationDistance Distance { get; }
-    [Selector("expectedTravelTime")] public NSTimeInterval ExpectedTravelTime { get; }
-    [Selector("transportType")] public MKDirectionsTransportType TransportType { get; }
-    [Selector("polyline")] public MKPolyline Polyline { get; }
-    [Selector("steps")] public NSArray Steps { get; }
-    [Selector("hasTolls")] public bool HasTolls { get; }
-    [Selector("hasHighways")] public bool HasHighways { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("advisoryNotices")]
+    public NSArray AdvisoryNotices { get; }
+    [Selector("distance")]
+    public CLLocationDistance Distance { get; }
+    [Selector("expectedTravelTime")]
+    public NSTimeInterval ExpectedTravelTime { get; }
+    [Selector("transportType")]
+    public MKDirectionsTransportType TransportType { get; }
+    [Selector("polyline")]
+    public MKPolyline Polyline { get; }
+    [Selector("steps")]
+    public NSArray Steps { get; }
+    [Selector("hasTolls")]
+    public bool HasTolls { get; }
+    [Selector("hasHighways")]
+    public bool HasHighways { get; }
 }
 
 public extern objc class MKRouteStep : NSObject
 {
-    [Selector("instructions")] public NSString Instructions { get; }
-    [Selector("notice")] public NSString? Notice { get; }
-    [Selector("polyline")] public MKPolyline Polyline { get; }
-    [Selector("distance")] public CLLocationDistance Distance { get; }
-    [Selector("transportType")] public MKDirectionsTransportType TransportType { get; }
+    [Selector("instructions")]
+    public NSString Instructions { get; }
+    [Selector("notice")]
+    public NSString? Notice { get; }
+    [Selector("polyline")]
+    public MKPolyline Polyline { get; }
+    [Selector("distance")]
+    public CLLocationDistance Distance { get; }
+    [Selector("transportType")]
+    public MKDirectionsTransportType TransportType { get; }
 }
 
 public extern objc class MKETAResponse : NSObject
 {
-    [Selector("source")] public MKMapItem Source { get; }
-    [Selector("destination")] public MKMapItem Destination { get; }
-    [Selector("expectedTravelTime")] public NSTimeInterval ExpectedTravelTime { get; }
-    [Selector("distance")] public CLLocationDistance Distance { get; }
-    [Selector("expectedArrivalDate")] public NSDate? ExpectedArrivalDate { get; }
-    [Selector("expectedDepartureDate")] public NSDate? ExpectedDepartureDate { get; }
-    [Selector("transportType")] public MKDirectionsTransportType TransportType { get; }
+    [Selector("source")]
+    public MKMapItem Source { get; }
+    [Selector("destination")]
+    public MKMapItem Destination { get; }
+    [Selector("expectedTravelTime")]
+    public NSTimeInterval ExpectedTravelTime { get; }
+    [Selector("distance")]
+    public CLLocationDistance Distance { get; }
+    [Selector("expectedArrivalDate")]
+    public NSDate? ExpectedArrivalDate { get; }
+    [Selector("expectedDepartureDate")]
+    public NSDate? ExpectedDepartureDate { get; }
+    [Selector("transportType")]
+    public MKDirectionsTransportType TransportType { get; }
 }
 
 #endif

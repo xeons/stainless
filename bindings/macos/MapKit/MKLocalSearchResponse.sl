@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MKLocalSearchResponse : NSObject
 {
-    [Selector("mapItems")] public NSArray MapItems { get; }
-    [Selector("boundingRegion")] public MKCoordinateRegion BoundingRegion { get; }
+    [Selector("mapItems")]
+    public NSArray MapItems { get; }
+    [Selector("boundingRegion")]
+    public MKCoordinateRegion BoundingRegion { get; }
 }
 
 #endif

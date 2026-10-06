@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MLSequenceConstraint : NSObject, NSSecureCoding
 {
-    [Selector("valueDescription")] public MLFeatureDescription ValueDescription { get; }
-    [Selector("countRange")] public NSRange CountRange { get; }
+    [Selector("valueDescription")]
+    public MLFeatureDescription ValueDescription { get; }
+    [Selector("countRange")]
+    public NSRange CountRange { get; }
 }
 
 #endif

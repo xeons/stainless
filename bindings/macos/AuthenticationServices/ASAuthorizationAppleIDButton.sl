@@ -48,9 +48,12 @@ public enum ASAuthorizationAppleIDButtonStyle : long
 
 public extern objc class ASAuthorizationAppleIDButton : NSControl, NSAccessibilityButton
 {
-    [Selector("cornerRadius", "setCornerRadius:")] public CGFloat CornerRadius { get; set; }
-    [Selector("buttonWithType:style:")] public static Self ButtonWithTypeStyle(ASAuthorizationAppleIDButtonType type, ASAuthorizationAppleIDButtonStyle style);
-    [Selector("initWithAuthorizationButtonType:authorizationButtonStyle:")] public Self InitWithAuthorizationButtonTypeAuthorizationButtonStyle(ASAuthorizationAppleIDButtonType type, ASAuthorizationAppleIDButtonStyle style);
+    [Selector("cornerRadius", "setCornerRadius:")]
+    public CGFloat CornerRadius { get; set; }
+    [Selector("buttonWithType:style:")]
+    public static Self ButtonWithTypeStyle(ASAuthorizationAppleIDButtonType type, ASAuthorizationAppleIDButtonStyle style);
+    [Selector("initWithAuthorizationButtonType:authorizationButtonStyle:")]
+    public Self InitWithAuthorizationButtonTypeAuthorizationButtonStyle(ASAuthorizationAppleIDButtonType type, ASAuthorizationAppleIDButtonStyle style);
 }
 
 #endif

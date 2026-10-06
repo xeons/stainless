@@ -39,17 +39,28 @@ public objc closure void GKAchievementReportAchievementsWithCompletionHandlerCom
 
 public extern objc class GKAchievement : NSObject, NSCoding, NSSecureCoding
 {
-    [Selector("identifier", "setIdentifier:")] public NSString? Identifier { get; set; }
-    [Selector("percentComplete", "setPercentComplete:")] public double PercentComplete { get; set; }
-    [Selector("isCompleted")] public bool Completed { get; }
-    [Selector("lastReportedDate")] public NSDate LastReportedDate { get; }
-    [Selector("showsCompletionBanner", "setShowsCompletionBanner:")] public bool ShowsCompletionBanner { get; set; }
-    [Selector("player")] public GKPlayer? Player { get; }
-    [Selector("loadAchievementsWithCompletionHandler:")] public static void LoadAchievementsWithCompletionHandler(GKAchievementLoadAchievementsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("resetAchievementsWithCompletionHandler:")] public static void ResetAchievementsWithCompletionHandler(GKAchievementResetAchievementsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("initWithIdentifier:")] public Self InitWithIdentifier(NSString? identifier);
-    [Selector("initWithIdentifier:player:")] public Self InitWithIdentifierPlayer(NSString? identifier, GKPlayer player);
-    [Selector("reportAchievements:withCompletionHandler:")] public static void ReportAchievementsWithCompletionHandler(NSArray achievements, GKAchievementReportAchievementsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("identifier", "setIdentifier:")]
+    public NSString? Identifier { get; set; }
+    [Selector("percentComplete", "setPercentComplete:")]
+    public double PercentComplete { get; set; }
+    [Selector("isCompleted")]
+    public bool Completed { get; }
+    [Selector("lastReportedDate")]
+    public NSDate LastReportedDate { get; }
+    [Selector("showsCompletionBanner", "setShowsCompletionBanner:")]
+    public bool ShowsCompletionBanner { get; set; }
+    [Selector("player")]
+    public GKPlayer? Player { get; }
+    [Selector("loadAchievementsWithCompletionHandler:")]
+    public static void LoadAchievementsWithCompletionHandler(GKAchievementLoadAchievementsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("resetAchievementsWithCompletionHandler:")]
+    public static void ResetAchievementsWithCompletionHandler(GKAchievementResetAchievementsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("initWithIdentifier:")]
+    public Self InitWithIdentifier(NSString? identifier);
+    [Selector("initWithIdentifier:player:")]
+    public Self InitWithIdentifierPlayer(NSString? identifier, GKPlayer player);
+    [Selector("reportAchievements:withCompletionHandler:")]
+    public static void ReportAchievementsWithCompletionHandler(NSArray achievements, GKAchievementReportAchievementsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public objc closure void GKAchievementReportAchievementWithCompletionHandlerCompletionHandlerBlock(NSError? arg0);
@@ -58,18 +69,22 @@ public objc closure void GKAchievementReportAchievementWithCompletionHandlerComp
 public extern objc class GKAchievement
 {
     /// Deprecated in macOS 10.10.
-    [Selector("isHidden")] public bool Hidden { get; }
+    [Selector("isHidden")]
+    public bool Hidden { get; }
     /// Deprecated in macOS 10.10.
-    [Selector("reportAchievementWithCompletionHandler:")] public void ReportAchievementWithCompletionHandler(GKAchievementReportAchievementWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("reportAchievementWithCompletionHandler:")]
+    public void ReportAchievementWithCompletionHandler(GKAchievementReportAchievementWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 /// Obsoleted, a category of GKAchievement.
 public extern objc class GKAchievement
 {
     /// Deprecated in macOS 10.10.
-    [Selector("playerID")] public NSString? PlayerID { get; }
+    [Selector("playerID")]
+    public NSString? PlayerID { get; }
     /// Deprecated in macOS 10.10.
-    [Selector("initWithIdentifier:forPlayer:")] public Self? InitWithIdentifierForPlayer(NSString? identifier, NSString playerID);
+    [Selector("initWithIdentifier:forPlayer:")]
+    public Self? InitWithIdentifierForPlayer(NSString? identifier, NSString playerID);
 }
 
 #endif

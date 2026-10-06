@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class NSFetchRequestExpression : NSExpression
 {
-    [Selector("requestExpression")] public NSExpression RequestExpression { get; }
-    [Selector("contextExpression")] public NSExpression ContextExpression { get; }
-    [Selector("isCountOnlyRequest")] public bool CountOnlyRequest { get; }
-    [Selector("expressionForFetch:context:countOnly:")] public static NSExpression ExpressionForFetchContextCountOnly(NSExpression fetch, NSExpression context, bool countFlag);
+    [Selector("requestExpression")]
+    public NSExpression RequestExpression { get; }
+    [Selector("contextExpression")]
+    public NSExpression ContextExpression { get; }
+    [Selector("isCountOnlyRequest")]
+    public bool CountOnlyRequest { get; }
+    [Selector("expressionForFetch:context:countOnly:")]
+    public static NSExpression ExpressionForFetchContextCountOnly(NSExpression fetch, NSExpression context, bool countFlag);
 }
 
 #endif

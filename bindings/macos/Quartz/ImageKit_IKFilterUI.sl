@@ -46,12 +46,14 @@ public extern "C" NSString? IKUIFlavorAllowFallback;
 /// IKFilterUIAddition, a category of CIFilter.
 public extern objc class CIFilter
 {
-    [Selector("viewForUIConfiguration:excludedKeys:")] public IKFilterUIView? ViewForUIConfigurationExcludedKeys(NSDictionary? inUIConfiguration, NSArray? inKeys);
+    [Selector("viewForUIConfiguration:excludedKeys:")]
+    public IKFilterUIView? ViewForUIConfigurationExcludedKeys(NSDictionary? inUIConfiguration, NSArray? inKeys);
 }
 
 public objc interface IKFilterCustomUIProvider
 {
-    [Selector("provideViewForUIConfiguration:excludedKeys:")] IKFilterUIView? ProvideViewForUIConfigurationExcludedKeys(NSDictionary? inUIConfiguration, NSArray? inKeys);
+    [Selector("provideViewForUIConfiguration:excludedKeys:")]
+    IKFilterUIView? ProvideViewForUIConfigurationExcludedKeys(NSDictionary? inUIConfiguration, NSArray? inKeys);
 }
 
 #endif

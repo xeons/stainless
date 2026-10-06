@@ -33,25 +33,44 @@ import Standard.ObjC;
 
 public extern objc class AVB17221Entity : NSObject
 {
-    [Selector("isLocalEntity", "setLocalEntity:")] public bool LocalEntity { get; set; }
-    [Selector("timeToLive", "setTimeToLive:")] public byte TimeToLive { get; set; }
-    [Selector("entityID", "setEntityID:")] public ulong EntityID { get; set; }
-    [Selector("entityModelID", "setEntityModelID:")] public ulong EntityModelID { get; set; }
-    [Selector("entityCapabilities", "setEntityCapabilities:")] public AVB17221ADPEntityCapabilities EntityCapabilities { get; set; }
-    [Selector("talkerStreamSources", "setTalkerStreamSources:")] public ushort TalkerStreamSources { get; set; }
-    [Selector("talkerCapabilities", "setTalkerCapabilities:")] public AVB17221ADPTalkerCapabilities TalkerCapabilities { get; set; }
-    [Selector("listenerStreamSinks", "setListenerStreamSinks:")] public ushort ListenerStreamSinks { get; set; }
-    [Selector("listenerCapabilities", "setListenerCapabilities:")] public AVB17221ADPListenerCapabilities ListenerCapabilities { get; set; }
-    [Selector("controllerCapabilities", "setControllerCapabilities:")] public AVB17221ADPControllerCapabilities ControllerCapabilities { get; set; }
-    [Selector("availableIndex", "setAvailableIndex:")] public uint AvailableIndex { get; set; }
-    [Selector("gPTPGrandmasterID", "setGPTPGrandmasterID:")] public ulong GPTPGrandmasterID { get; set; }
-    [Selector("gPTPDomainNumber", "setGPTPDomainNumber:")] public byte GPTPDomainNumber { get; set; }
-    [Selector("identifyControlIndex", "setIdentifyControlIndex:")] public ushort IdentifyControlIndex { get; set; }
-    [Selector("interfaceIndex", "setInterfaceIndex:")] public ushort InterfaceIndex { get; set; }
-    [Selector("associationID", "setAssociationID:")] public ulong AssociationID { get; set; }
-    [Selector("currentConfigurationIndex", "setCurrentConfigurationIndex:")] public ushort CurrentConfigurationIndex { get; set; }
-    [Selector("macAddresses", "setMacAddresses:")] public NSArray MacAddresses { get; set; }
-    [Selector("entityDiscovery", "setEntityDiscovery:")] public AVB17221EntityDiscovery? EntityDiscovery { get; set; }
+    [Selector("isLocalEntity", "setLocalEntity:")]
+    public bool LocalEntity { get; set; }
+    [Selector("timeToLive", "setTimeToLive:")]
+    public byte TimeToLive { get; set; }
+    [Selector("entityID", "setEntityID:")]
+    public ulong EntityID { get; set; }
+    [Selector("entityModelID", "setEntityModelID:")]
+    public ulong EntityModelID { get; set; }
+    [Selector("entityCapabilities", "setEntityCapabilities:")]
+    public AVB17221ADPEntityCapabilities EntityCapabilities { get; set; }
+    [Selector("talkerStreamSources", "setTalkerStreamSources:")]
+    public ushort TalkerStreamSources { get; set; }
+    [Selector("talkerCapabilities", "setTalkerCapabilities:")]
+    public AVB17221ADPTalkerCapabilities TalkerCapabilities { get; set; }
+    [Selector("listenerStreamSinks", "setListenerStreamSinks:")]
+    public ushort ListenerStreamSinks { get; set; }
+    [Selector("listenerCapabilities", "setListenerCapabilities:")]
+    public AVB17221ADPListenerCapabilities ListenerCapabilities { get; set; }
+    [Selector("controllerCapabilities", "setControllerCapabilities:")]
+    public AVB17221ADPControllerCapabilities ControllerCapabilities { get; set; }
+    [Selector("availableIndex", "setAvailableIndex:")]
+    public uint AvailableIndex { get; set; }
+    [Selector("gPTPGrandmasterID", "setGPTPGrandmasterID:")]
+    public ulong GPTPGrandmasterID { get; set; }
+    [Selector("gPTPDomainNumber", "setGPTPDomainNumber:")]
+    public byte GPTPDomainNumber { get; set; }
+    [Selector("identifyControlIndex", "setIdentifyControlIndex:")]
+    public ushort IdentifyControlIndex { get; set; }
+    [Selector("interfaceIndex", "setInterfaceIndex:")]
+    public ushort InterfaceIndex { get; set; }
+    [Selector("associationID", "setAssociationID:")]
+    public ulong AssociationID { get; set; }
+    [Selector("currentConfigurationIndex", "setCurrentConfigurationIndex:")]
+    public ushort CurrentConfigurationIndex { get; set; }
+    [Selector("macAddresses", "setMacAddresses:")]
+    public NSArray MacAddresses { get; set; }
+    [Selector("entityDiscovery", "setEntityDiscovery:")]
+    public AVB17221EntityDiscovery? EntityDiscovery { get; set; }
 }
 
 #endif

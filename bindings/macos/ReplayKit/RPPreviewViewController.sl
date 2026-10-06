@@ -34,13 +34,18 @@ import Standard.ObjC;
 
 public extern objc class RPPreviewViewController : NSViewController
 {
-    [Selector("previewControllerDelegate", "setPreviewControllerDelegate:")] public RPPreviewViewControllerDelegate? PreviewControllerDelegate { get; set; }
+    [Selector("previewControllerDelegate", "setPreviewControllerDelegate:")]
+    public RPPreviewViewControllerDelegate? PreviewControllerDelegate { get; set; }
 }
 
 public objc interface RPPreviewViewControllerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("previewControllerDidFinish:")] void PreviewControllerDidFinish(RPPreviewViewController previewController);
-    [Optional] [Selector("previewController:didFinishWithActivityTypes:")] void PreviewControllerDidFinishWithActivityTypes(RPPreviewViewController previewController, NSSet activityTypes);
+    [Optional]
+    [Selector("previewControllerDidFinish:")]
+    void PreviewControllerDidFinish(RPPreviewViewController previewController);
+    [Optional]
+    [Selector("previewController:didFinishWithActivityTypes:")]
+    void PreviewControllerDidFinishWithActivityTypes(RPPreviewViewController previewController, NSSet activityTypes);
 }
 
 #endif

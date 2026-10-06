@@ -38,18 +38,30 @@ public objc closure void FIFinderSyncControllerSetTagDataForItemWithURLCompletio
 
 public extern objc class FIFinderSyncController : NSExtensionContext
 {
-    [Selector("directoryURLs", "setDirectoryURLs:")] public NSSet? DirectoryURLs { get; set; }
-    [Selector("isExtensionEnabled")] public static bool ExtensionEnabled { get; }
-    [Selector("defaultController")] public static Self DefaultController();
-    [Selector("setBadgeImage:label:forBadgeIdentifier:")] public void SetBadgeImageLabelForBadgeIdentifier(NSImage image, NSString? label, NSString badgeID);
-    [Selector("setBadgeIdentifier:forURL:")] public void SetBadgeIdentifierForURL(NSString badgeID, NSURL url);
-    [Selector("targetedURL")] public NSURL? TargetedURL();
-    [Selector("selectedItemURLs")] public NSArray? SelectedItemURLs();
-    [Selector("lastUsedDateForItemWithURL:")] public NSDate? LastUsedDateForItemWithURL(NSURL itemURL);
-    [Selector("setLastUsedDate:forItemWithURL:completion:")] public void SetLastUsedDateForItemWithURLCompletion(NSDate lastUsedDate, NSURL itemURL, FIFinderSyncControllerSetLastUsedDateForItemWithURLCompletionCompletionBlock completion);
-    [Selector("tagDataForItemWithURL:")] public NSData? TagDataForItemWithURL(NSURL itemURL);
-    [Selector("setTagData:forItemWithURL:completion:")] public void SetTagDataForItemWithURLCompletion(NSData? tagData, NSURL itemURL, FIFinderSyncControllerSetTagDataForItemWithURLCompletionCompletionBlock completion);
-    [Selector("showExtensionManagementInterface")] public static void ShowExtensionManagementInterface();
+    [Selector("directoryURLs", "setDirectoryURLs:")]
+    public NSSet? DirectoryURLs { get; set; }
+    [Selector("isExtensionEnabled")]
+    public static bool ExtensionEnabled { get; }
+    [Selector("defaultController")]
+    public static Self DefaultController();
+    [Selector("setBadgeImage:label:forBadgeIdentifier:")]
+    public void SetBadgeImageLabelForBadgeIdentifier(NSImage image, NSString? label, NSString badgeID);
+    [Selector("setBadgeIdentifier:forURL:")]
+    public void SetBadgeIdentifierForURL(NSString badgeID, NSURL url);
+    [Selector("targetedURL")]
+    public NSURL? TargetedURL();
+    [Selector("selectedItemURLs")]
+    public NSArray? SelectedItemURLs();
+    [Selector("lastUsedDateForItemWithURL:")]
+    public NSDate? LastUsedDateForItemWithURL(NSURL itemURL);
+    [Selector("setLastUsedDate:forItemWithURL:completion:")]
+    public void SetLastUsedDateForItemWithURLCompletion(NSDate lastUsedDate, NSURL itemURL, FIFinderSyncControllerSetLastUsedDateForItemWithURLCompletionCompletionBlock completion);
+    [Selector("tagDataForItemWithURL:")]
+    public NSData? TagDataForItemWithURL(NSURL itemURL);
+    [Selector("setTagData:forItemWithURL:completion:")]
+    public void SetTagDataForItemWithURLCompletion(NSData? tagData, NSURL itemURL, FIFinderSyncControllerSetTagDataForItemWithURLCompletionCompletionBlock completion);
+    [Selector("showExtensionManagementInterface")]
+    public static void ShowExtensionManagementInterface();
 }
 
 public enum FIMenuKind : ulong
@@ -65,16 +77,36 @@ public objc closure void FIFinderSyncProtocolValuesForAttributesForItemWithURLCo
 [ObjCName("FIFinderSync")]
 public objc interface FIFinderSyncProtocol
 {
-    [Optional] [Selector("toolbarItemName")] NSString ToolbarItemName { get; }
-    [Optional] [Selector("toolbarItemImage")] NSImage ToolbarItemImage { get; }
-    [Optional] [Selector("toolbarItemToolTip")] NSString ToolbarItemToolTip { get; }
-    [Optional] [Selector("menuForMenuKind:")] NSMenu? MenuForMenuKind(FIMenuKind menu);
-    [Optional] [Selector("beginObservingDirectoryAtURL:")] void BeginObservingDirectoryAtURL(NSURL url);
-    [Optional] [Selector("endObservingDirectoryAtURL:")] void EndObservingDirectoryAtURL(NSURL url);
-    [Optional] [Selector("requestBadgeIdentifierForURL:")] void RequestBadgeIdentifierForURL(NSURL url);
-    [Optional] [Selector("supportedServiceNamesForItemWithURL:")] NSArray SupportedServiceNamesForItemWithURL(NSURL itemURL);
-    [Optional] [Selector("makeListenerEndpointForServiceName:itemURL:andReturnError:")] NSXPCListenerEndpoint? MakeListenerEndpointForServiceNameItemURLAndReturnError(NSFileProviderServiceName serviceName, NSURL itemURL, out NSError? error);
-    [Optional] [Selector("valuesForAttributes:forItemWithURL:completion:")] void ValuesForAttributesForItemWithURLCompletion(NSArray attributes, NSURL itemURL, FIFinderSyncProtocolValuesForAttributesForItemWithURLCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("toolbarItemName")]
+    NSString ToolbarItemName { get; }
+    [Optional]
+    [Selector("toolbarItemImage")]
+    NSImage ToolbarItemImage { get; }
+    [Optional]
+    [Selector("toolbarItemToolTip")]
+    NSString ToolbarItemToolTip { get; }
+    [Optional]
+    [Selector("menuForMenuKind:")]
+    NSMenu? MenuForMenuKind(FIMenuKind menu);
+    [Optional]
+    [Selector("beginObservingDirectoryAtURL:")]
+    void BeginObservingDirectoryAtURL(NSURL url);
+    [Optional]
+    [Selector("endObservingDirectoryAtURL:")]
+    void EndObservingDirectoryAtURL(NSURL url);
+    [Optional]
+    [Selector("requestBadgeIdentifierForURL:")]
+    void RequestBadgeIdentifierForURL(NSURL url);
+    [Optional]
+    [Selector("supportedServiceNamesForItemWithURL:")]
+    NSArray SupportedServiceNamesForItemWithURL(NSURL itemURL);
+    [Optional]
+    [Selector("makeListenerEndpointForServiceName:itemURL:andReturnError:")]
+    NSXPCListenerEndpoint? MakeListenerEndpointForServiceNameItemURLAndReturnError(NSFileProviderServiceName serviceName, NSURL itemURL, out NSError? error);
+    [Optional]
+    [Selector("valuesForAttributes:forItemWithURL:completion:")]
+    void ValuesForAttributesForItemWithURLCompletion(NSArray attributes, NSURL itemURL, FIFinderSyncProtocolValuesForAttributesForItemWithURLCompletionCompletionBlock completion);
 }
 
 public extern objc class FIFinderSync : NSObject, FIFinderSyncProtocol, NSExtensionRequestHandling { }

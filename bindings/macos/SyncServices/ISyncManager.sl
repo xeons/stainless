@@ -34,31 +34,44 @@ import Standard.ObjC;
 public extern objc class ISyncManager : NSObject
 {
     /// Deprecated in macOS 10.7.
-    [Selector("sharedManager")] public static ISyncManager? SharedManager();
+    [Selector("sharedManager")]
+    public static ISyncManager? SharedManager();
     /// Deprecated in macOS 10.7.
-    [Selector("isEnabled")] public bool IsEnabled();
+    [Selector("isEnabled")]
+    public bool IsEnabled();
     /// Deprecated in macOS 10.7.
-    [Selector("syncDisabledReason")] public NSError? SyncDisabledReason();
+    [Selector("syncDisabledReason")]
+    public NSError? SyncDisabledReason();
     /// Deprecated in macOS 10.7.
-    [Selector("clientWithIdentifier:")] public ISyncClient? ClientWithIdentifier(NSString? clientId);
+    [Selector("clientWithIdentifier:")]
+    public ISyncClient? ClientWithIdentifier(NSString? clientId);
     /// Deprecated in macOS 10.7.
-    [Selector("registerClientWithIdentifier:descriptionFilePath:")] public ISyncClient? RegisterClientWithIdentifierDescriptionFilePath(NSString? clientId, NSString? descriptionFilePath);
+    [Selector("registerClientWithIdentifier:descriptionFilePath:")]
+    public ISyncClient? RegisterClientWithIdentifierDescriptionFilePath(NSString? clientId, NSString? descriptionFilePath);
     /// Deprecated in macOS 10.7.
-    [Selector("unregisterClient:")] public void UnregisterClient(ISyncClient? client);
+    [Selector("unregisterClient:")]
+    public void UnregisterClient(ISyncClient? client);
     /// Deprecated in macOS 10.7.
-    [Selector("registerSchemaWithBundlePath:")] public bool RegisterSchemaWithBundlePath(NSString? bundlePath);
+    [Selector("registerSchemaWithBundlePath:")]
+    public bool RegisterSchemaWithBundlePath(NSString? bundlePath);
     /// Deprecated in macOS 10.7.
-    [Selector("unregisterSchemaWithName:")] public void UnregisterSchemaWithName(NSString? schemaName);
+    [Selector("unregisterSchemaWithName:")]
+    public void UnregisterSchemaWithName(NSString? schemaName);
     /// Deprecated in macOS 10.7.
-    [Selector("clientWithIdentifier:needsSyncing:")] public void ClientWithIdentifierNeedsSyncing(NSString? clientId, bool flag);
+    [Selector("clientWithIdentifier:needsSyncing:")]
+    public void ClientWithIdentifierNeedsSyncing(NSString? clientId, bool flag);
     /// Deprecated in macOS 10.7.
-    [Selector("snapshotOfRecordsInTruthWithEntityNames:usingIdentifiersForClient:")] public ISyncRecordSnapshot? SnapshotOfRecordsInTruthWithEntityNamesUsingIdentifiersForClient(NSArray? entityNames, ISyncClient? client);
+    [Selector("snapshotOfRecordsInTruthWithEntityNames:usingIdentifiersForClient:")]
+    public ISyncRecordSnapshot? SnapshotOfRecordsInTruthWithEntityNamesUsingIdentifiersForClient(NSArray? entityNames, ISyncClient? client);
     /// Deprecated in macOS 10.7.
-    [Selector("addRequestMode:")] public void AddRequestMode(NSString? mode);
+    [Selector("addRequestMode:")]
+    public void AddRequestMode(NSString? mode);
     /// Deprecated in macOS 10.7.
-    [Selector("removeRequestMode:")] public void RemoveRequestMode(NSString? mode);
+    [Selector("removeRequestMode:")]
+    public void RemoveRequestMode(NSString? mode);
     /// Deprecated in macOS 10.7.
-    [Selector("requestModes")] public NSArray? RequestModes();
+    [Selector("requestModes")]
+    public NSArray? RequestModes();
 }
 
 /// Deprecated in macOS 10.7.

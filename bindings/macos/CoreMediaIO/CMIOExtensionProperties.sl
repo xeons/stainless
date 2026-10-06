@@ -70,59 +70,92 @@ public extern "C" CMIOExtensionProperty CMIOExtensionPropertyStreamLatency;
 
 public extern objc class CMIOExtensionPropertyAttributes : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("readOnlyPropertyAttribute")] public static CMIOExtensionPropertyAttributes ReadOnlyPropertyAttribute { get; }
-    [Selector("minValue")] public AnyObject? MinValue { get; }
-    [Selector("maxValue")] public AnyObject? MaxValue { get; }
-    [Selector("validValues")] public NSArray? ValidValues { get; }
-    [Selector("isReadOnly")] public bool ReadOnly { get; }
-    [Selector("propertyAttributesWithMinValue:maxValue:validValues:readOnly:")] public static Self PropertyAttributesWithMinValueMaxValueValidValuesReadOnly(AnyObject? minValue, AnyObject? maxValue, NSArray? validValues, bool readOnly);
-    [Selector("initWithMinValue:maxValue:validValues:readOnly:")] public Self InitWithMinValueMaxValueValidValuesReadOnly(AnyObject? minValue, AnyObject? maxValue, NSArray? validValues, bool readOnly);
+    [Selector("readOnlyPropertyAttribute")]
+    public static CMIOExtensionPropertyAttributes ReadOnlyPropertyAttribute { get; }
+    [Selector("minValue")]
+    public AnyObject? MinValue { get; }
+    [Selector("maxValue")]
+    public AnyObject? MaxValue { get; }
+    [Selector("validValues")]
+    public NSArray? ValidValues { get; }
+    [Selector("isReadOnly")]
+    public bool ReadOnly { get; }
+    [Selector("propertyAttributesWithMinValue:maxValue:validValues:readOnly:")]
+    public static Self PropertyAttributesWithMinValueMaxValueValidValuesReadOnly(AnyObject? minValue, AnyObject? maxValue, NSArray? validValues, bool readOnly);
+    [Selector("initWithMinValue:maxValue:validValues:readOnly:")]
+    public Self InitWithMinValueMaxValueValidValuesReadOnly(AnyObject? minValue, AnyObject? maxValue, NSArray? validValues, bool readOnly);
 }
 
 public extern objc class CMIOExtensionPropertyState : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("value")] public AnyObject? Value { get; }
-    [Selector("attributes")] public CMIOExtensionPropertyAttributes? Attributes { get; }
-    [Selector("propertyStateWithValue:")] public static Self PropertyStateWithValue(AnyObject? value);
-    [Selector("propertyStateWithValue:attributes:")] public static Self PropertyStateWithValueAttributes(AnyObject? value, CMIOExtensionPropertyAttributes? attributes);
-    [Selector("initWithValue:")] public Self InitWithValue(AnyObject? value);
-    [Selector("initWithValue:attributes:")] public Self InitWithValueAttributes(AnyObject? value, CMIOExtensionPropertyAttributes? attributes);
+    [Selector("value")]
+    public AnyObject? Value { get; }
+    [Selector("attributes")]
+    public CMIOExtensionPropertyAttributes? Attributes { get; }
+    [Selector("propertyStateWithValue:")]
+    public static Self PropertyStateWithValue(AnyObject? value);
+    [Selector("propertyStateWithValue:attributes:")]
+    public static Self PropertyStateWithValueAttributes(AnyObject? value, CMIOExtensionPropertyAttributes? attributes);
+    [Selector("initWithValue:")]
+    public Self InitWithValue(AnyObject? value);
+    [Selector("initWithValue:attributes:")]
+    public Self InitWithValueAttributes(AnyObject? value, CMIOExtensionPropertyAttributes? attributes);
 }
 
 public extern objc class CMIOExtensionStreamCustomClockConfiguration : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("clockName")] public NSString ClockName { get; }
-    [Selector("sourceIdentifier")] public NSUUID SourceIdentifier { get; }
-    [Selector("getTimeCallMinimumInterval")] public CMTime GetTimeCallMinimumInterval { get; }
-    [Selector("numberOfEventsForRateSmoothing")] public uint NumberOfEventsForRateSmoothing { get; }
-    [Selector("numberOfAveragesForRateSmoothing")] public uint NumberOfAveragesForRateSmoothing { get; }
-    [Selector("customClockConfigurationWithClockName:sourceIdentifier:getTimeCallMinimumInterval:numberOfEventsForRateSmoothing:numberOfAveragesForRateSmoothing:")] public static Self CustomClockConfigurationWithClockNameSourceIdentifierGetTimeCallMinimumIntervalNumberOfEventsForRateSmoothingNumberOfAveragesForRateSmoothing(NSString clockName, NSUUID sourceIdentifier, CMTime getTimeCallMinimumInterval, uint numberOfEventsForRateSmoothing, uint numberOfAveragesForRateSmoothing);
-    [Selector("initWithClockName:sourceIdentifier:getTimeCallMinimumInterval:numberOfEventsForRateSmoothing:numberOfAveragesForRateSmoothing:")] public Self InitWithClockNameSourceIdentifierGetTimeCallMinimumIntervalNumberOfEventsForRateSmoothingNumberOfAveragesForRateSmoothing(NSString clockName, NSUUID sourceIdentifier, CMTime getTimeCallMinimumInterval, uint numberOfEventsForRateSmoothing, uint numberOfAveragesForRateSmoothing);
+    [Selector("clockName")]
+    public NSString ClockName { get; }
+    [Selector("sourceIdentifier")]
+    public NSUUID SourceIdentifier { get; }
+    [Selector("getTimeCallMinimumInterval")]
+    public CMTime GetTimeCallMinimumInterval { get; }
+    [Selector("numberOfEventsForRateSmoothing")]
+    public uint NumberOfEventsForRateSmoothing { get; }
+    [Selector("numberOfAveragesForRateSmoothing")]
+    public uint NumberOfAveragesForRateSmoothing { get; }
+    [Selector("customClockConfigurationWithClockName:sourceIdentifier:getTimeCallMinimumInterval:numberOfEventsForRateSmoothing:numberOfAveragesForRateSmoothing:")]
+    public static Self CustomClockConfigurationWithClockNameSourceIdentifierGetTimeCallMinimumIntervalNumberOfEventsForRateSmoothingNumberOfAveragesForRateSmoothing(NSString clockName, NSUUID sourceIdentifier, CMTime getTimeCallMinimumInterval, uint numberOfEventsForRateSmoothing, uint numberOfAveragesForRateSmoothing);
+    [Selector("initWithClockName:sourceIdentifier:getTimeCallMinimumInterval:numberOfEventsForRateSmoothing:numberOfAveragesForRateSmoothing:")]
+    public Self InitWithClockNameSourceIdentifierGetTimeCallMinimumIntervalNumberOfEventsForRateSmoothingNumberOfAveragesForRateSmoothing(NSString clockName, NSUUID sourceIdentifier, CMTime getTimeCallMinimumInterval, uint numberOfEventsForRateSmoothing, uint numberOfAveragesForRateSmoothing);
 }
 
 public extern objc class CMIOExtensionStreamFormat : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("formatDescription")] public CMFormatDescriptionRef FormatDescription { get; }
-    [Selector("minFrameDuration")] public CMTime MinFrameDuration { get; }
-    [Selector("maxFrameDuration")] public CMTime MaxFrameDuration { get; }
-    [Selector("validFrameDurations")] public NSArray? ValidFrameDurations { get; }
-    [Selector("streamFormatWithFormatDescription:maxFrameDuration:minFrameDuration:validFrameDurations:")] public static Self StreamFormatWithFormatDescriptionMaxFrameDurationMinFrameDurationValidFrameDurations(CMFormatDescriptionRef formatDescription, CMTime maxFrameDuration, CMTime minFrameDuration, NSArray? validFrameDurations);
-    [Selector("initWithFormatDescription:maxFrameDuration:minFrameDuration:validFrameDurations:")] public Self InitWithFormatDescriptionMaxFrameDurationMinFrameDurationValidFrameDurations(CMFormatDescriptionRef formatDescription, CMTime maxFrameDuration, CMTime minFrameDuration, NSArray? validFrameDurations);
+    [Selector("formatDescription")]
+    public CMFormatDescriptionRef FormatDescription { get; }
+    [Selector("minFrameDuration")]
+    public CMTime MinFrameDuration { get; }
+    [Selector("maxFrameDuration")]
+    public CMTime MaxFrameDuration { get; }
+    [Selector("validFrameDurations")]
+    public NSArray? ValidFrameDurations { get; }
+    [Selector("streamFormatWithFormatDescription:maxFrameDuration:minFrameDuration:validFrameDurations:")]
+    public static Self StreamFormatWithFormatDescriptionMaxFrameDurationMinFrameDurationValidFrameDurations(CMFormatDescriptionRef formatDescription, CMTime maxFrameDuration, CMTime minFrameDuration, NSArray? validFrameDurations);
+    [Selector("initWithFormatDescription:maxFrameDuration:minFrameDuration:validFrameDurations:")]
+    public Self InitWithFormatDescriptionMaxFrameDurationMinFrameDurationValidFrameDurations(CMFormatDescriptionRef formatDescription, CMTime maxFrameDuration, CMTime minFrameDuration, NSArray? validFrameDurations);
 }
 
 public extern objc class CMIOExtensionScheduledOutput : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("sequenceNumber")] public ulong SequenceNumber { get; }
-    [Selector("hostTimeInNanoseconds")] public ulong HostTimeInNanoseconds { get; }
-    [Selector("scheduledOutputWithSequenceNumber:hostTimeInNanoseconds:")] public static Self ScheduledOutputWithSequenceNumberHostTimeInNanoseconds(ulong sequenceNumber, ulong hostTimeInNanoseconds);
-    [Selector("initWithSequenceNumber:hostTimeInNanoseconds:")] public Self InitWithSequenceNumberHostTimeInNanoseconds(ulong sequenceNumber, ulong hostTimeInNanoseconds);
+    [Selector("sequenceNumber")]
+    public ulong SequenceNumber { get; }
+    [Selector("hostTimeInNanoseconds")]
+    public ulong HostTimeInNanoseconds { get; }
+    [Selector("scheduledOutputWithSequenceNumber:hostTimeInNanoseconds:")]
+    public static Self ScheduledOutputWithSequenceNumberHostTimeInNanoseconds(ulong sequenceNumber, ulong hostTimeInNanoseconds);
+    [Selector("initWithSequenceNumber:hostTimeInNanoseconds:")]
+    public Self InitWithSequenceNumberHostTimeInNanoseconds(ulong sequenceNumber, ulong hostTimeInNanoseconds);
 }
 
 public extern objc class CMIOExtensionClient : NSObject, NSCopying
 {
-    [Selector("clientID")] public NSUUID ClientID { get; }
-    [Selector("signingID")] public NSString? SigningID { get; }
-    [Selector("pid")] public pid_t Pid { get; }
+    [Selector("clientID")]
+    public NSUUID ClientID { get; }
+    [Selector("signingID")]
+    public NSString? SigningID { get; }
+    [Selector("pid")]
+    public pid_t Pid { get; }
 }
 
 #endif

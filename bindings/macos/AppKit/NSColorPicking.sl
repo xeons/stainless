@@ -33,24 +33,38 @@ import Standard.ObjC;
 
 public objc interface NSColorPickingDefault
 {
-    [Selector("initWithPickerMask:colorPanel:")] Self? InitWithPickerMaskColorPanel(NSUInteger mask, NSColorPanel owningColorPanel);
-    [Selector("provideNewButtonImage")] NSImage ProvideNewButtonImage();
-    [Selector("insertNewButtonImage:in:")] void InsertNewButtonImageIn(NSImage newButtonImage, NSButtonCell buttonCell);
-    [Selector("viewSizeChanged:")] void ViewSizeChanged(AnyObject? sender);
-    [Selector("alphaControlAddedOrRemoved:")] void AlphaControlAddedOrRemoved(AnyObject? sender);
-    [Selector("attachColorList:")] void AttachColorList(NSColorList colorList);
-    [Selector("detachColorList:")] void DetachColorList(NSColorList colorList);
-    [Selector("setMode:")] void SetMode(NSColorPanelMode mode);
-    [Selector("buttonToolTip")] NSString ButtonToolTip();
-    [Selector("minContentSize")] NSSize MinContentSize();
+    [Selector("initWithPickerMask:colorPanel:")]
+    Self? InitWithPickerMaskColorPanel(NSUInteger mask, NSColorPanel owningColorPanel);
+    [Selector("provideNewButtonImage")]
+    NSImage ProvideNewButtonImage();
+    [Selector("insertNewButtonImage:in:")]
+    void InsertNewButtonImageIn(NSImage newButtonImage, NSButtonCell buttonCell);
+    [Selector("viewSizeChanged:")]
+    void ViewSizeChanged(AnyObject? sender);
+    [Selector("alphaControlAddedOrRemoved:")]
+    void AlphaControlAddedOrRemoved(AnyObject? sender);
+    [Selector("attachColorList:")]
+    void AttachColorList(NSColorList colorList);
+    [Selector("detachColorList:")]
+    void DetachColorList(NSColorList colorList);
+    [Selector("setMode:")]
+    void SetMode(NSColorPanelMode mode);
+    [Selector("buttonToolTip")]
+    NSString ButtonToolTip();
+    [Selector("minContentSize")]
+    NSSize MinContentSize();
 }
 
 public objc interface NSColorPickingCustom : NSColorPickingDefault
 {
-    [Selector("supportsMode:")] bool SupportsMode(NSColorPanelMode mode);
-    [Selector("currentMode")] NSColorPanelMode CurrentMode();
-    [Selector("provideNewView:")] NSView ProvideNewView(bool initialRequest);
-    [Selector("setColor:")] void SetColor(NSColor newColor);
+    [Selector("supportsMode:")]
+    bool SupportsMode(NSColorPanelMode mode);
+    [Selector("currentMode")]
+    NSColorPanelMode CurrentMode();
+    [Selector("provideNewView:")]
+    NSView ProvideNewView(bool initialRequest);
+    [Selector("setColor:")]
+    void SetColor(NSColor newColor);
 }
 
 #endif

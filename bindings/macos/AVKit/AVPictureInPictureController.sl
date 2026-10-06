@@ -35,38 +35,66 @@ import Standard.ObjC;
 
 public extern objc class AVPictureInPictureController : NSObject
 {
-    [Selector("pictureInPictureButtonStartImage")] public static NSImage PictureInPictureButtonStartImage { get; }
-    [Selector("pictureInPictureButtonStopImage")] public static NSImage PictureInPictureButtonStopImage { get; }
-    [Selector("contentSource", "setContentSource:")] public AVPictureInPictureControllerContentSource? ContentSource { get; set; }
-    [Selector("playerLayer")] public AVPlayerLayer PlayerLayer { get; }
-    [Selector("delegate", "setDelegate:")] public AVPictureInPictureControllerDelegate? Delegate { get; set; }
-    [Selector("isPictureInPicturePossible")] public bool PictureInPicturePossible { get; }
-    [Selector("isPictureInPictureActive")] public bool PictureInPictureActive { get; }
-    [Selector("isPictureInPictureSuspended")] public bool PictureInPictureSuspended { get; }
-    [Selector("requiresLinearPlayback", "setRequiresLinearPlayback:")] public bool RequiresLinearPlayback { get; set; }
-    [Selector("isPictureInPictureSupported")] public static bool IsPictureInPictureSupported();
-    [Selector("initWithContentSource:")] public Self InitWithContentSource(AVPictureInPictureControllerContentSource contentSource);
-    [Selector("initWithPlayerLayer:")] public Self? InitWithPlayerLayer(AVPlayerLayer playerLayer);
-    [Selector("startPictureInPicture")] public void StartPictureInPicture();
-    [Selector("stopPictureInPicture")] public void StopPictureInPicture();
+    [Selector("pictureInPictureButtonStartImage")]
+    public static NSImage PictureInPictureButtonStartImage { get; }
+    [Selector("pictureInPictureButtonStopImage")]
+    public static NSImage PictureInPictureButtonStopImage { get; }
+    [Selector("contentSource", "setContentSource:")]
+    public AVPictureInPictureControllerContentSource? ContentSource { get; set; }
+    [Selector("playerLayer")]
+    public AVPlayerLayer PlayerLayer { get; }
+    [Selector("delegate", "setDelegate:")]
+    public AVPictureInPictureControllerDelegate? Delegate { get; set; }
+    [Selector("isPictureInPicturePossible")]
+    public bool PictureInPicturePossible { get; }
+    [Selector("isPictureInPictureActive")]
+    public bool PictureInPictureActive { get; }
+    [Selector("isPictureInPictureSuspended")]
+    public bool PictureInPictureSuspended { get; }
+    [Selector("requiresLinearPlayback", "setRequiresLinearPlayback:")]
+    public bool RequiresLinearPlayback { get; set; }
+    [Selector("isPictureInPictureSupported")]
+    public static bool IsPictureInPictureSupported();
+    [Selector("initWithContentSource:")]
+    public Self InitWithContentSource(AVPictureInPictureControllerContentSource contentSource);
+    [Selector("initWithPlayerLayer:")]
+    public Self? InitWithPlayerLayer(AVPlayerLayer playerLayer);
+    [Selector("startPictureInPicture")]
+    public void StartPictureInPicture();
+    [Selector("stopPictureInPicture")]
+    public void StopPictureInPicture();
 }
 
 public extern objc class AVPictureInPictureControllerContentSource : NSObject
 {
-    [Selector("playerLayer")] public AVPlayerLayer? PlayerLayer { get; }
-    [Selector("initWithPlayerLayer:")] public Self InitWithPlayerLayer(AVPlayerLayer playerLayer);
+    [Selector("playerLayer")]
+    public AVPlayerLayer? PlayerLayer { get; }
+    [Selector("initWithPlayerLayer:")]
+    public Self InitWithPlayerLayer(AVPlayerLayer playerLayer);
 }
 
 public objc closure void AVPictureInPictureControllerDelegatePictureInPictureControllerRestoreUserInterfaceForPictureInPictureStopWithCompletionHandlerCompletionHandlerBlock(bool arg0);
 
 public objc interface AVPictureInPictureControllerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("pictureInPictureControllerWillStartPictureInPicture:")] void PictureInPictureControllerWillStartPictureInPicture(AVPictureInPictureController pictureInPictureController);
-    [Optional] [Selector("pictureInPictureControllerDidStartPictureInPicture:")] void PictureInPictureControllerDidStartPictureInPicture(AVPictureInPictureController pictureInPictureController);
-    [Optional] [Selector("pictureInPictureController:failedToStartPictureInPictureWithError:")] void PictureInPictureControllerFailedToStartPictureInPictureWithError(AVPictureInPictureController pictureInPictureController, NSError error);
-    [Optional] [Selector("pictureInPictureControllerWillStopPictureInPicture:")] void PictureInPictureControllerWillStopPictureInPicture(AVPictureInPictureController pictureInPictureController);
-    [Optional] [Selector("pictureInPictureControllerDidStopPictureInPicture:")] void PictureInPictureControllerDidStopPictureInPicture(AVPictureInPictureController pictureInPictureController);
-    [Optional] [Selector("pictureInPictureController:restoreUserInterfaceForPictureInPictureStopWithCompletionHandler:")] void PictureInPictureControllerRestoreUserInterfaceForPictureInPictureStopWithCompletionHandler(AVPictureInPictureController pictureInPictureController, AVPictureInPictureControllerDelegatePictureInPictureControllerRestoreUserInterfaceForPictureInPictureStopWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("pictureInPictureControllerWillStartPictureInPicture:")]
+    void PictureInPictureControllerWillStartPictureInPicture(AVPictureInPictureController pictureInPictureController);
+    [Optional]
+    [Selector("pictureInPictureControllerDidStartPictureInPicture:")]
+    void PictureInPictureControllerDidStartPictureInPicture(AVPictureInPictureController pictureInPictureController);
+    [Optional]
+    [Selector("pictureInPictureController:failedToStartPictureInPictureWithError:")]
+    void PictureInPictureControllerFailedToStartPictureInPictureWithError(AVPictureInPictureController pictureInPictureController, NSError error);
+    [Optional]
+    [Selector("pictureInPictureControllerWillStopPictureInPicture:")]
+    void PictureInPictureControllerWillStopPictureInPicture(AVPictureInPictureController pictureInPictureController);
+    [Optional]
+    [Selector("pictureInPictureControllerDidStopPictureInPicture:")]
+    void PictureInPictureControllerDidStopPictureInPicture(AVPictureInPictureController pictureInPictureController);
+    [Optional]
+    [Selector("pictureInPictureController:restoreUserInterfaceForPictureInPictureStopWithCompletionHandler:")]
+    void PictureInPictureControllerRestoreUserInterfaceForPictureInPictureStopWithCompletionHandler(AVPictureInPictureController pictureInPictureController, AVPictureInPictureControllerDelegatePictureInPictureControllerRestoreUserInterfaceForPictureInPictureStopWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

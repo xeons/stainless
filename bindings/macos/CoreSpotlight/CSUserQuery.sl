@@ -40,28 +40,44 @@ public enum CSUserInteraction : long
 
 public extern objc class CSUserQueryContext : CSSearchQueryContext
 {
-    [Selector("enableRankedResults", "setEnableRankedResults:")] public bool EnableRankedResults { get; set; }
-    [Selector("disableSemanticSearch", "setDisableSemanticSearch:")] public bool DisableSemanticSearch { get; set; }
-    [Selector("maxResultCount", "setMaxResultCount:")] public NSInteger MaxResultCount { get; set; }
-    [Selector("maxSuggestionCount", "setMaxSuggestionCount:")] public NSInteger MaxSuggestionCount { get; set; }
-    [Selector("maxRankedResultCount", "setMaxRankedResultCount:")] public NSInteger MaxRankedResultCount { get; set; }
-    [Selector("userQueryContext")] public static CSUserQueryContext UserQueryContext();
-    [Selector("userQueryContextWithCurrentSuggestion:")] public static CSUserQueryContext UserQueryContextWithCurrentSuggestion(CSSuggestion? currentSuggestion);
+    [Selector("enableRankedResults", "setEnableRankedResults:")]
+    public bool EnableRankedResults { get; set; }
+    [Selector("disableSemanticSearch", "setDisableSemanticSearch:")]
+    public bool DisableSemanticSearch { get; set; }
+    [Selector("maxResultCount", "setMaxResultCount:")]
+    public NSInteger MaxResultCount { get; set; }
+    [Selector("maxSuggestionCount", "setMaxSuggestionCount:")]
+    public NSInteger MaxSuggestionCount { get; set; }
+    [Selector("maxRankedResultCount", "setMaxRankedResultCount:")]
+    public NSInteger MaxRankedResultCount { get; set; }
+    [Selector("userQueryContext")]
+    public static CSUserQueryContext UserQueryContext();
+    [Selector("userQueryContextWithCurrentSuggestion:")]
+    public static CSUserQueryContext UserQueryContextWithCurrentSuggestion(CSSuggestion? currentSuggestion);
 }
 
 public objc closure void CSUserQueryFoundSuggestionsHandlerBlock(NSArray arg0);
 
 public extern objc class CSUserQuery : CSSearchQuery
 {
-    [Selector("foundSuggestionCount")] public NSInteger FoundSuggestionCount { get; }
-    [Selector("foundSuggestionsHandler", "setFoundSuggestionsHandler:")] public CSUserQueryFoundSuggestionsHandlerBlock? FoundSuggestionsHandler { get; set; }
-    [Selector("prepare")] public static void Prepare();
-    [Selector("prepareProtectionClasses:")] public static void PrepareProtectionClasses(NSArray protectionClasses);
-    [Selector("initWithUserQueryString:userQueryContext:")] public Self InitWithUserQueryStringUserQueryContext(NSString? userQueryString, CSUserQueryContext? userQueryContext);
-    [Selector("userEngagedWithItem:visibleItems:userInteractionType:")] public void UserEngagedWithItemVisibleItemsUserInteractionType(CSSearchableItem item, NSArray visibleItems, CSUserInteraction userInteractionType);
-    [Selector("userEngagedWithSuggestion:visibleSuggestions:userInteractionType:")] public void UserEngagedWithSuggestionVisibleSuggestionsUserInteractionType(CSSuggestion suggestion, NSArray visibleSuggestions, CSUserInteraction userInteractionType);
-    [Selector("start")] public void Start();
-    [Selector("cancel")] public void Cancel();
+    [Selector("foundSuggestionCount")]
+    public NSInteger FoundSuggestionCount { get; }
+    [Selector("foundSuggestionsHandler", "setFoundSuggestionsHandler:")]
+    public CSUserQueryFoundSuggestionsHandlerBlock? FoundSuggestionsHandler { get; set; }
+    [Selector("prepare")]
+    public static void Prepare();
+    [Selector("prepareProtectionClasses:")]
+    public static void PrepareProtectionClasses(NSArray protectionClasses);
+    [Selector("initWithUserQueryString:userQueryContext:")]
+    public Self InitWithUserQueryStringUserQueryContext(NSString? userQueryString, CSUserQueryContext? userQueryContext);
+    [Selector("userEngagedWithItem:visibleItems:userInteractionType:")]
+    public void UserEngagedWithItemVisibleItemsUserInteractionType(CSSearchableItem item, NSArray visibleItems, CSUserInteraction userInteractionType);
+    [Selector("userEngagedWithSuggestion:visibleSuggestions:userInteractionType:")]
+    public void UserEngagedWithSuggestionVisibleSuggestionsUserInteractionType(CSSuggestion suggestion, NSArray visibleSuggestions, CSUserInteraction userInteractionType);
+    [Selector("start")]
+    public void Start();
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

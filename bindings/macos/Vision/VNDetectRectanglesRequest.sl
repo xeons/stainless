@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class VNDetectRectanglesRequest : VNImageBasedRequest
 {
-    [Selector("minimumAspectRatio", "setMinimumAspectRatio:")] public VNAspectRatio MinimumAspectRatio { get; set; }
-    [Selector("maximumAspectRatio", "setMaximumAspectRatio:")] public VNAspectRatio MaximumAspectRatio { get; set; }
-    [Selector("quadratureTolerance", "setQuadratureTolerance:")] public VNDegrees QuadratureTolerance { get; set; }
-    [Selector("minimumSize", "setMinimumSize:")] public float MinimumSize { get; set; }
-    [Selector("minimumConfidence", "setMinimumConfidence:")] public VNConfidence MinimumConfidence { get; set; }
-    [Selector("maximumObservations", "setMaximumObservations:")] public NSUInteger MaximumObservations { get; set; }
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("minimumAspectRatio", "setMinimumAspectRatio:")]
+    public VNAspectRatio MinimumAspectRatio { get; set; }
+    [Selector("maximumAspectRatio", "setMaximumAspectRatio:")]
+    public VNAspectRatio MaximumAspectRatio { get; set; }
+    [Selector("quadratureTolerance", "setQuadratureTolerance:")]
+    public VNDegrees QuadratureTolerance { get; set; }
+    [Selector("minimumSize", "setMinimumSize:")]
+    public float MinimumSize { get; set; }
+    [Selector("minimumConfidence", "setMinimumConfidence:")]
+    public VNConfidence MinimumConfidence { get; set; }
+    [Selector("maximumObservations", "setMaximumObservations:")]
+    public NSUInteger MaximumObservations { get; set; }
+    [Selector("results")]
+    public NSArray? Results { get; }
 }
 
 #endif

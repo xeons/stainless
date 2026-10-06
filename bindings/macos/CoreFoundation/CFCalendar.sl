@@ -37,17 +37,21 @@ public extern objc class CFCalendarRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFCalendarGetTypeID();
 
-[ReturnsRetained] public extern "C" CFCalendarRef? CFCalendarCopyCurrent();
+[ReturnsRetained]
+public extern "C" CFCalendarRef? CFCalendarCopyCurrent();
 
-[ReturnsRetained] public extern "C" CFCalendarRef? CFCalendarCreateWithIdentifier(CFAllocatorRef? allocator, CFCalendarIdentifier? identifier);
+[ReturnsRetained]
+public extern "C" CFCalendarRef? CFCalendarCreateWithIdentifier(CFAllocatorRef? allocator, CFCalendarIdentifier? identifier);
 
 public extern "C" CFCalendarIdentifier? CFCalendarGetIdentifier(CFCalendarRef? calendar);
 
-[ReturnsRetained] public extern "C" CFLocaleRef? CFCalendarCopyLocale(CFCalendarRef? calendar);
+[ReturnsRetained]
+public extern "C" CFLocaleRef? CFCalendarCopyLocale(CFCalendarRef? calendar);
 
 public extern "C" void CFCalendarSetLocale(CFCalendarRef? calendar, CFLocaleRef? locale);
 
-[ReturnsRetained] public extern "C" CFTimeZoneRef? CFCalendarCopyTimeZone(CFCalendarRef? calendar);
+[ReturnsRetained]
+public extern "C" CFTimeZoneRef? CFCalendarCopyTimeZone(CFCalendarRef? calendar);
 
 public extern "C" void CFCalendarSetTimeZone(CFCalendarRef? calendar, CFTimeZoneRef? tz);
 

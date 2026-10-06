@@ -52,42 +52,69 @@ public extern "C" CGFloat NSSplitViewItemUnspecifiedDimension;
 
 public extern objc class NSSplitViewItem : NSObject, NSAnimatablePropertyContainer, NSCoding
 {
-    [Selector("behavior")] public NSSplitViewItemBehavior Behavior { get; }
-    [Selector("viewController", "setViewController:")] public NSViewController ViewController { get; set; }
-    [Selector("isCollapsed", "setCollapsed:")] public bool Collapsed { get; set; }
-    [Selector("canCollapse", "setCanCollapse:")] public bool CanCollapse { get; set; }
-    [Selector("collapseBehavior", "setCollapseBehavior:")] public NSSplitViewItemCollapseBehavior CollapseBehavior { get; set; }
-    [Selector("minimumThickness", "setMinimumThickness:")] public CGFloat MinimumThickness { get; set; }
-    [Selector("maximumThickness", "setMaximumThickness:")] public CGFloat MaximumThickness { get; set; }
-    [Selector("preferredThicknessFraction", "setPreferredThicknessFraction:")] public CGFloat PreferredThicknessFraction { get; set; }
-    [Selector("holdingPriority", "setHoldingPriority:")] public NSLayoutPriority HoldingPriority { get; set; }
-    [Selector("automaticMaximumThickness", "setAutomaticMaximumThickness:")] public CGFloat AutomaticMaximumThickness { get; set; }
-    [Selector("isSpringLoaded", "setSpringLoaded:")] public bool SpringLoaded { get; set; }
-    [Selector("canCollapseFromWindowResize", "setCanCollapseFromWindowResize:")] public bool CanCollapseFromWindowResize { get; set; }
-    [Selector("allowsFullHeightLayout", "setAllowsFullHeightLayout:")] public bool AllowsFullHeightLayout { get; set; }
-    [Selector("titlebarSeparatorStyle", "setTitlebarSeparatorStyle:")] public NSTitlebarSeparatorStyle TitlebarSeparatorStyle { get; set; }
+    [Selector("behavior")]
+    public NSSplitViewItemBehavior Behavior { get; }
+    [Selector("viewController", "setViewController:")]
+    public NSViewController ViewController { get; set; }
+    [Selector("isCollapsed", "setCollapsed:")]
+    public bool Collapsed { get; set; }
+    [Selector("canCollapse", "setCanCollapse:")]
+    public bool CanCollapse { get; set; }
+    [Selector("collapseBehavior", "setCollapseBehavior:")]
+    public NSSplitViewItemCollapseBehavior CollapseBehavior { get; set; }
+    [Selector("minimumThickness", "setMinimumThickness:")]
+    public CGFloat MinimumThickness { get; set; }
+    [Selector("maximumThickness", "setMaximumThickness:")]
+    public CGFloat MaximumThickness { get; set; }
+    [Selector("preferredThicknessFraction", "setPreferredThicknessFraction:")]
+    public CGFloat PreferredThicknessFraction { get; set; }
+    [Selector("holdingPriority", "setHoldingPriority:")]
+    public NSLayoutPriority HoldingPriority { get; set; }
+    [Selector("automaticMaximumThickness", "setAutomaticMaximumThickness:")]
+    public CGFloat AutomaticMaximumThickness { get; set; }
+    [Selector("isSpringLoaded", "setSpringLoaded:")]
+    public bool SpringLoaded { get; set; }
+    [Selector("canCollapseFromWindowResize", "setCanCollapseFromWindowResize:")]
+    public bool CanCollapseFromWindowResize { get; set; }
+    [Selector("allowsFullHeightLayout", "setAllowsFullHeightLayout:")]
+    public bool AllowsFullHeightLayout { get; set; }
+    [Selector("titlebarSeparatorStyle", "setTitlebarSeparatorStyle:")]
+    public NSTitlebarSeparatorStyle TitlebarSeparatorStyle { get; set; }
     /// macOS 26.0 and later.
-    [Selector("automaticallyAdjustsSafeAreaInsets", "setAutomaticallyAdjustsSafeAreaInsets:")] public bool AutomaticallyAdjustsSafeAreaInsets { get; set; }
+    [Selector("automaticallyAdjustsSafeAreaInsets", "setAutomaticallyAdjustsSafeAreaInsets:")]
+    public bool AutomaticallyAdjustsSafeAreaInsets { get; set; }
     /// macOS 26.0 and later.
-    [Selector("topAlignedAccessoryViewControllers", "setTopAlignedAccessoryViewControllers:")] public NSArray? TopAlignedAccessoryViewControllers { get; set; }
+    [Selector("topAlignedAccessoryViewControllers", "setTopAlignedAccessoryViewControllers:")]
+    public NSArray? TopAlignedAccessoryViewControllers { get; set; }
     /// macOS 26.0 and later.
-    [Selector("bottomAlignedAccessoryViewControllers", "setBottomAlignedAccessoryViewControllers:")] public NSArray? BottomAlignedAccessoryViewControllers { get; set; }
-    [Selector("splitViewItemWithViewController:")] public static Self SplitViewItemWithViewController(NSViewController viewController);
-    [Selector("sidebarWithViewController:")] public static Self SidebarWithViewController(NSViewController viewController);
-    [Selector("contentListWithViewController:")] public static Self ContentListWithViewController(NSViewController viewController);
-    [Selector("inspectorWithViewController:")] public static Self InspectorWithViewController(NSViewController viewController);
+    [Selector("bottomAlignedAccessoryViewControllers", "setBottomAlignedAccessoryViewControllers:")]
+    public NSArray? BottomAlignedAccessoryViewControllers { get; set; }
+    [Selector("splitViewItemWithViewController:")]
+    public static Self SplitViewItemWithViewController(NSViewController viewController);
+    [Selector("sidebarWithViewController:")]
+    public static Self SidebarWithViewController(NSViewController viewController);
+    [Selector("contentListWithViewController:")]
+    public static Self ContentListWithViewController(NSViewController viewController);
+    [Selector("inspectorWithViewController:")]
+    public static Self InspectorWithViewController(NSViewController viewController);
     /// macOS 26.0 and later.
-    [Selector("addTopAlignedAccessoryViewController:")] public void AddTopAlignedAccessoryViewController(NSSplitViewItemAccessoryViewController childViewController);
+    [Selector("addTopAlignedAccessoryViewController:")]
+    public void AddTopAlignedAccessoryViewController(NSSplitViewItemAccessoryViewController childViewController);
     /// macOS 26.0 and later.
-    [Selector("insertTopAlignedAccessoryViewController:atIndex:")] public void InsertTopAlignedAccessoryViewControllerAtIndex(NSSplitViewItemAccessoryViewController childViewController, NSInteger index);
+    [Selector("insertTopAlignedAccessoryViewController:atIndex:")]
+    public void InsertTopAlignedAccessoryViewControllerAtIndex(NSSplitViewItemAccessoryViewController childViewController, NSInteger index);
     /// macOS 26.0 and later.
-    [Selector("removeTopAlignedAccessoryViewControllerAtIndex:")] public void RemoveTopAlignedAccessoryViewControllerAtIndex(NSInteger index);
+    [Selector("removeTopAlignedAccessoryViewControllerAtIndex:")]
+    public void RemoveTopAlignedAccessoryViewControllerAtIndex(NSInteger index);
     /// macOS 26.0 and later.
-    [Selector("addBottomAlignedAccessoryViewController:")] public void AddBottomAlignedAccessoryViewController(NSSplitViewItemAccessoryViewController childViewController);
+    [Selector("addBottomAlignedAccessoryViewController:")]
+    public void AddBottomAlignedAccessoryViewController(NSSplitViewItemAccessoryViewController childViewController);
     /// macOS 26.0 and later.
-    [Selector("insertBottomAlignedAccessoryViewController:atIndex:")] public void InsertBottomAlignedAccessoryViewControllerAtIndex(NSSplitViewItemAccessoryViewController childViewController, NSInteger index);
+    [Selector("insertBottomAlignedAccessoryViewController:atIndex:")]
+    public void InsertBottomAlignedAccessoryViewControllerAtIndex(NSSplitViewItemAccessoryViewController childViewController, NSInteger index);
     /// macOS 26.0 and later.
-    [Selector("removeBottomAlignedAccessoryViewControllerAtIndex:")] public void RemoveBottomAlignedAccessoryViewControllerAtIndex(NSInteger index);
+    [Selector("removeBottomAlignedAccessoryViewControllerAtIndex:")]
+    public void RemoveBottomAlignedAccessoryViewControllerAtIndex(NSInteger index);
 }
 
 #endif

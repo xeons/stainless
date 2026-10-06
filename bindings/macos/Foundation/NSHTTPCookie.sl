@@ -71,24 +71,42 @@ public extern "C" NSHTTPCookieStringPolicy NSHTTPCookieSameSiteStrict;
 
 public extern objc class NSHTTPCookie : NSObject
 {
-    [Selector("properties")] public NSDictionary? Properties { get; }
-    [Selector("version")] public NSUInteger Version { get; }
-    [Selector("name")] public NSString Name { get; }
-    [Selector("value")] public NSString Value { get; }
-    [Selector("expiresDate")] public NSDate? ExpiresDate { get; }
-    [Selector("isSessionOnly")] public bool SessionOnly { get; }
-    [Selector("domain")] public NSString Domain { get; }
-    [Selector("path")] public NSString Path { get; }
-    [Selector("isSecure")] public bool Secure { get; }
-    [Selector("isHTTPOnly")] public bool HTTPOnly { get; }
-    [Selector("comment")] public NSString? Comment { get; }
-    [Selector("commentURL")] public NSURL? CommentURL { get; }
-    [Selector("portList")] public NSArray? PortList { get; }
-    [Selector("sameSitePolicy")] public NSHTTPCookieStringPolicy? SameSitePolicy { get; }
-    [Selector("initWithProperties:")] public Self? InitWithProperties(NSDictionary properties);
-    [Selector("cookieWithProperties:")] public static NSHTTPCookie? CookieWithProperties(NSDictionary properties);
-    [Selector("requestHeaderFieldsWithCookies:")] public static NSDictionary RequestHeaderFieldsWithCookies(NSArray cookies);
-    [Selector("cookiesWithResponseHeaderFields:forURL:")] public static NSArray CookiesWithResponseHeaderFieldsForURL(NSDictionary headerFields, NSURL URL);
+    [Selector("properties")]
+    public NSDictionary? Properties { get; }
+    [Selector("version")]
+    public NSUInteger Version { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("value")]
+    public NSString Value { get; }
+    [Selector("expiresDate")]
+    public NSDate? ExpiresDate { get; }
+    [Selector("isSessionOnly")]
+    public bool SessionOnly { get; }
+    [Selector("domain")]
+    public NSString Domain { get; }
+    [Selector("path")]
+    public NSString Path { get; }
+    [Selector("isSecure")]
+    public bool Secure { get; }
+    [Selector("isHTTPOnly")]
+    public bool HTTPOnly { get; }
+    [Selector("comment")]
+    public NSString? Comment { get; }
+    [Selector("commentURL")]
+    public NSURL? CommentURL { get; }
+    [Selector("portList")]
+    public NSArray? PortList { get; }
+    [Selector("sameSitePolicy")]
+    public NSHTTPCookieStringPolicy? SameSitePolicy { get; }
+    [Selector("initWithProperties:")]
+    public Self? InitWithProperties(NSDictionary properties);
+    [Selector("cookieWithProperties:")]
+    public static NSHTTPCookie? CookieWithProperties(NSDictionary properties);
+    [Selector("requestHeaderFieldsWithCookies:")]
+    public static NSDictionary RequestHeaderFieldsWithCookies(NSArray cookies);
+    [Selector("cookiesWithResponseHeaderFields:forURL:")]
+    public static NSArray CookiesWithResponseHeaderFieldsForURL(NSDictionary headerFields, NSURL URL);
 }
 
 #endif

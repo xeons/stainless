@@ -36,22 +36,52 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public objc interface WebFrameLoadDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("webView:didStartProvisionalLoadForFrame:")] void WebViewDidStartProvisionalLoadForFrame(WebView? sender, WebFrame? frame);
-    [Optional] [Selector("webView:didReceiveServerRedirectForProvisionalLoadForFrame:")] void WebViewDidReceiveServerRedirectForProvisionalLoadForFrame(WebView? sender, WebFrame? frame);
-    [Optional] [Selector("webView:didFailProvisionalLoadWithError:forFrame:")] void WebViewDidFailProvisionalLoadWithErrorForFrame(WebView? sender, NSError? error, WebFrame? frame);
-    [Optional] [Selector("webView:didCommitLoadForFrame:")] void WebViewDidCommitLoadForFrame(WebView? sender, WebFrame? frame);
-    [Optional] [Selector("webView:didReceiveTitle:forFrame:")] void WebViewDidReceiveTitleForFrame(WebView? sender, NSString? title, WebFrame? frame);
-    [Optional] [Selector("webView:didReceiveIcon:forFrame:")] void WebViewDidReceiveIconForFrame(WebView? sender, NSImage? image, WebFrame? frame);
-    [Optional] [Selector("webView:didFinishLoadForFrame:")] void WebViewDidFinishLoadForFrame(WebView? sender, WebFrame? frame);
-    [Optional] [Selector("webView:didFailLoadWithError:forFrame:")] void WebViewDidFailLoadWithErrorForFrame(WebView? sender, NSError? error, WebFrame? frame);
-    [Optional] [Selector("webView:didChangeLocationWithinPageForFrame:")] void WebViewDidChangeLocationWithinPageForFrame(WebView? sender, WebFrame? frame);
-    [Optional] [Selector("webView:willPerformClientRedirectToURL:delay:fireDate:forFrame:")] void WebViewWillPerformClientRedirectToURLDelayFireDateForFrame(WebView? sender, NSURL? URL, NSTimeInterval seconds, NSDate? date, WebFrame? frame);
-    [Optional] [Selector("webView:didCancelClientRedirectForFrame:")] void WebViewDidCancelClientRedirectForFrame(WebView? sender, WebFrame? frame);
-    [Optional] [Selector("webView:willCloseFrame:")] void WebViewWillCloseFrame(WebView? sender, WebFrame? frame);
-    [Optional] [Selector("webView:didClearWindowObject:forFrame:")] void WebViewDidClearWindowObjectForFrame(WebView? webView, WebScriptObject? windowObject, WebFrame? frame);
+    [Optional]
+    [Selector("webView:didStartProvisionalLoadForFrame:")]
+    void WebViewDidStartProvisionalLoadForFrame(WebView? sender, WebFrame? frame);
+    [Optional]
+    [Selector("webView:didReceiveServerRedirectForProvisionalLoadForFrame:")]
+    void WebViewDidReceiveServerRedirectForProvisionalLoadForFrame(WebView? sender, WebFrame? frame);
+    [Optional]
+    [Selector("webView:didFailProvisionalLoadWithError:forFrame:")]
+    void WebViewDidFailProvisionalLoadWithErrorForFrame(WebView? sender, NSError? error, WebFrame? frame);
+    [Optional]
+    [Selector("webView:didCommitLoadForFrame:")]
+    void WebViewDidCommitLoadForFrame(WebView? sender, WebFrame? frame);
+    [Optional]
+    [Selector("webView:didReceiveTitle:forFrame:")]
+    void WebViewDidReceiveTitleForFrame(WebView? sender, NSString? title, WebFrame? frame);
+    [Optional]
+    [Selector("webView:didReceiveIcon:forFrame:")]
+    void WebViewDidReceiveIconForFrame(WebView? sender, NSImage? image, WebFrame? frame);
+    [Optional]
+    [Selector("webView:didFinishLoadForFrame:")]
+    void WebViewDidFinishLoadForFrame(WebView? sender, WebFrame? frame);
+    [Optional]
+    [Selector("webView:didFailLoadWithError:forFrame:")]
+    void WebViewDidFailLoadWithErrorForFrame(WebView? sender, NSError? error, WebFrame? frame);
+    [Optional]
+    [Selector("webView:didChangeLocationWithinPageForFrame:")]
+    void WebViewDidChangeLocationWithinPageForFrame(WebView? sender, WebFrame? frame);
+    [Optional]
+    [Selector("webView:willPerformClientRedirectToURL:delay:fireDate:forFrame:")]
+    void WebViewWillPerformClientRedirectToURLDelayFireDateForFrame(WebView? sender, NSURL? URL, NSTimeInterval seconds, NSDate? date, WebFrame? frame);
+    [Optional]
+    [Selector("webView:didCancelClientRedirectForFrame:")]
+    void WebViewDidCancelClientRedirectForFrame(WebView? sender, WebFrame? frame);
+    [Optional]
+    [Selector("webView:willCloseFrame:")]
+    void WebViewWillCloseFrame(WebView? sender, WebFrame? frame);
+    [Optional]
+    [Selector("webView:didClearWindowObject:forFrame:")]
+    void WebViewDidClearWindowObjectForFrame(WebView? webView, WebScriptObject? windowObject, WebFrame? frame);
     /// Deprecated in macOS 10.5.
-    [Optional] [Selector("webView:windowScriptObjectAvailable:")] void WebViewWindowScriptObjectAvailable(WebView? webView, WebScriptObject? windowScriptObject);
-    [Optional] [Selector("webView:didCreateJavaScriptContext:forFrame:")] void WebViewDidCreateJavaScriptContextForFrame(WebView? webView, JSContext? context, WebFrame? frame);
+    [Optional]
+    [Selector("webView:windowScriptObjectAvailable:")]
+    void WebViewWindowScriptObjectAvailable(WebView? webView, WebScriptObject? windowScriptObject);
+    [Optional]
+    [Selector("webView:didCreateJavaScriptContext:forFrame:")]
+    void WebViewDidCreateJavaScriptContextForFrame(WebView? webView, JSContext? context, WebFrame? frame);
 }
 
 #endif

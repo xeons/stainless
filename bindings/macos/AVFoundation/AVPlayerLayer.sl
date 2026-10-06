@@ -35,13 +35,20 @@ import Standard.ObjC;
 
 public extern objc class AVPlayerLayer : CALayer
 {
-    [Selector("player", "setPlayer:")] public AVPlayer? Player { get; set; }
-    [Selector("videoGravity", "setVideoGravity:")] public AVLayerVideoGravity VideoGravity { get; set; }
-    [Selector("isReadyForDisplay")] public bool ReadyForDisplay { get; }
-    [Selector("videoRect")] public CGRect VideoRect { get; }
-    [Selector("pixelBufferAttributes", "setPixelBufferAttributes:")] public NSDictionary? PixelBufferAttributes { get; set; }
-    [Selector("playerLayerWithPlayer:")] public static AVPlayerLayer PlayerLayerWithPlayer(AVPlayer? player);
-    [Selector("copyDisplayedPixelBuffer")] public CVPixelBufferRef? CopyDisplayedPixelBuffer();
+    [Selector("player", "setPlayer:")]
+    public AVPlayer? Player { get; set; }
+    [Selector("videoGravity", "setVideoGravity:")]
+    public AVLayerVideoGravity VideoGravity { get; set; }
+    [Selector("isReadyForDisplay")]
+    public bool ReadyForDisplay { get; }
+    [Selector("videoRect")]
+    public CGRect VideoRect { get; }
+    [Selector("pixelBufferAttributes", "setPixelBufferAttributes:")]
+    public NSDictionary? PixelBufferAttributes { get; set; }
+    [Selector("playerLayerWithPlayer:")]
+    public static AVPlayerLayer PlayerLayerWithPlayer(AVPlayer? player);
+    [Selector("copyDisplayedPixelBuffer")]
+    public CVPixelBufferRef? CopyDisplayedPixelBuffer();
 }
 
 #endif

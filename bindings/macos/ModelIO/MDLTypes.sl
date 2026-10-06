@@ -79,18 +79,24 @@ public enum MDLDataPrecision : ulong
 
 public objc interface MDLNamed
 {
-    [Selector("name", "setName:")] NSString Name { get; set; }
+    [Selector("name", "setName:")]
+    NSString Name { get; set; }
 }
 
 public objc interface MDLComponent : NSObjectProtocol { }
 
 public objc interface MDLObjectContainerComponent : MDLComponent, NSFastEnumeration
 {
-    [Selector("count")] NSUInteger Count { get; }
-    [Selector("objects")] NSArray Objects { get; }
-    [Selector("addObject:")] void AddObject(MDLObject object);
-    [Selector("removeObject:")] void RemoveObject(MDLObject object);
-    [Selector("objectAtIndexedSubscript:")] MDLObject ObjectAtIndexedSubscript(NSUInteger index);
+    [Selector("count")]
+    NSUInteger Count { get; }
+    [Selector("objects")]
+    NSArray Objects { get; }
+    [Selector("addObject:")]
+    void AddObject(MDLObject object);
+    [Selector("removeObject:")]
+    void RemoveObject(MDLObject object);
+    [Selector("objectAtIndexedSubscript:")]
+    MDLObject ObjectAtIndexedSubscript(NSUInteger index);
 }
 
 public struct MDLAxisAlignedBoundingBox

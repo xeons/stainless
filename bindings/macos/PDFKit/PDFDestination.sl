@@ -36,11 +36,16 @@ public extern "C" CGFloat kPDFDestinationUnspecifiedValue;
 
 public extern objc class PDFDestination : NSObject, NSCopying
 {
-    [Selector("page")] public PDFPage? Page { get; }
-    [Selector("point")] public NSPoint Point { get; }
-    [Selector("zoom", "setZoom:")] public CGFloat Zoom { get; set; }
-    [Selector("initWithPage:atPoint:")] public Self InitWithPageAtPoint(PDFPage page, NSPoint point);
-    [Selector("compare:")] public NSComparisonResult Compare(PDFDestination destination);
+    [Selector("page")]
+    public PDFPage? Page { get; }
+    [Selector("point")]
+    public NSPoint Point { get; }
+    [Selector("zoom", "setZoom:")]
+    public CGFloat Zoom { get; set; }
+    [Selector("initWithPage:atPoint:")]
+    public Self InitWithPageAtPoint(PDFPage page, NSPoint point);
+    [Selector("compare:")]
+    public NSComparisonResult Compare(PDFDestination destination);
 }
 
 #endif

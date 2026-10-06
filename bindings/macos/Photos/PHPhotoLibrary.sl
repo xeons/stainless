@@ -48,12 +48,14 @@ public enum PHAccessLevel : long
 
 public objc interface PHPhotoLibraryChangeObserver : NSObjectProtocol
 {
-    [Selector("photoLibraryDidChange:")] void PhotoLibraryDidChange(PHChange changeInstance);
+    [Selector("photoLibraryDidChange:")]
+    void PhotoLibraryDidChange(PHChange changeInstance);
 }
 
 public objc interface PHPhotoLibraryAvailabilityObserver : NSObjectProtocol
 {
-    [Selector("photoLibraryDidBecomeUnavailable:")] void PhotoLibraryDidBecomeUnavailable(PHPhotoLibrary photoLibrary);
+    [Selector("photoLibraryDidBecomeUnavailable:")]
+    void PhotoLibraryDidBecomeUnavailable(PHPhotoLibrary photoLibrary);
 }
 
 public objc closure void PHPhotoLibraryRequestAuthorizationForAccessLevelHandlerHandlerBlock(PHAuthorizationStatus arg0);
@@ -64,22 +66,36 @@ public objc closure void PHPhotoLibraryPerformChangesCompletionHandlerCompletion
 
 public extern objc class PHPhotoLibrary : NSObject
 {
-    [Selector("unavailabilityReason")] public NSError? UnavailabilityReason { get; }
-    [Selector("currentChangeToken")] public PHPersistentChangeToken CurrentChangeToken { get; }
-    [Selector("sharedPhotoLibrary")] public static PHPhotoLibrary SharedPhotoLibrary();
-    [Selector("authorizationStatusForAccessLevel:")] public static PHAuthorizationStatus AuthorizationStatusForAccessLevel(PHAccessLevel accessLevel);
-    [Selector("requestAuthorizationForAccessLevel:handler:")] public static void RequestAuthorizationForAccessLevelHandler(PHAccessLevel accessLevel, PHPhotoLibraryRequestAuthorizationForAccessLevelHandlerHandlerBlock handler);
+    [Selector("unavailabilityReason")]
+    public NSError? UnavailabilityReason { get; }
+    [Selector("currentChangeToken")]
+    public PHPersistentChangeToken CurrentChangeToken { get; }
+    [Selector("sharedPhotoLibrary")]
+    public static PHPhotoLibrary SharedPhotoLibrary();
+    [Selector("authorizationStatusForAccessLevel:")]
+    public static PHAuthorizationStatus AuthorizationStatusForAccessLevel(PHAccessLevel accessLevel);
+    [Selector("requestAuthorizationForAccessLevel:handler:")]
+    public static void RequestAuthorizationForAccessLevelHandler(PHAccessLevel accessLevel, PHPhotoLibraryRequestAuthorizationForAccessLevelHandlerHandlerBlock handler);
     /// Deprecated in macOS 100000.
-    [Selector("authorizationStatus")] public static PHAuthorizationStatus AuthorizationStatus();
+    [Selector("authorizationStatus")]
+    public static PHAuthorizationStatus AuthorizationStatus();
     /// Deprecated in macOS 100000.
-    [Selector("requestAuthorization:")] public static void RequestAuthorization(PHPhotoLibraryRequestAuthorizationHandlerBlock handler);
-    [Selector("registerAvailabilityObserver:")] public void RegisterAvailabilityObserver(PHPhotoLibraryAvailabilityObserver observer);
-    [Selector("unregisterAvailabilityObserver:")] public void UnregisterAvailabilityObserver(PHPhotoLibraryAvailabilityObserver observer);
-    [Selector("performChanges:completionHandler:")] public void PerformChangesCompletionHandler(dispatch_block_t changeBlock, PHPhotoLibraryPerformChangesCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("performChangesAndWait:error:")] public bool PerformChangesAndWaitError(dispatch_block_t changeBlock, out NSError? error);
-    [Selector("registerChangeObserver:")] public void RegisterChangeObserver(PHPhotoLibraryChangeObserver observer);
-    [Selector("unregisterChangeObserver:")] public void UnregisterChangeObserver(PHPhotoLibraryChangeObserver observer);
-    [Selector("fetchPersistentChangesSinceToken:error:")] public PHPersistentChangeFetchResult? FetchPersistentChangesSinceTokenError(PHPersistentChangeToken token, out NSError? error);
+    [Selector("requestAuthorization:")]
+    public static void RequestAuthorization(PHPhotoLibraryRequestAuthorizationHandlerBlock handler);
+    [Selector("registerAvailabilityObserver:")]
+    public void RegisterAvailabilityObserver(PHPhotoLibraryAvailabilityObserver observer);
+    [Selector("unregisterAvailabilityObserver:")]
+    public void UnregisterAvailabilityObserver(PHPhotoLibraryAvailabilityObserver observer);
+    [Selector("performChanges:completionHandler:")]
+    public void PerformChangesCompletionHandler(dispatch_block_t changeBlock, PHPhotoLibraryPerformChangesCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("performChangesAndWait:error:")]
+    public bool PerformChangesAndWaitError(dispatch_block_t changeBlock, out NSError? error);
+    [Selector("registerChangeObserver:")]
+    public void RegisterChangeObserver(PHPhotoLibraryChangeObserver observer);
+    [Selector("unregisterChangeObserver:")]
+    public void UnregisterChangeObserver(PHPhotoLibraryChangeObserver observer);
+    [Selector("fetchPersistentChangesSinceToken:error:")]
+    public PHPersistentChangeFetchResult? FetchPersistentChangesSinceTokenError(PHPersistentChangeToken token, out NSError? error);
 }
 
 #endif

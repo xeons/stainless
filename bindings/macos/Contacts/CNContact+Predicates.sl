@@ -33,12 +33,18 @@ import Standard.ObjC;
 /// Predicates, a category of CNContact.
 public extern objc class CNContact
 {
-    [Selector("predicateForContactsMatchingName:")] public static NSPredicate PredicateForContactsMatchingName(NSString name);
-    [Selector("predicateForContactsMatchingEmailAddress:")] public static NSPredicate PredicateForContactsMatchingEmailAddress(NSString emailAddress);
-    [Selector("predicateForContactsMatchingPhoneNumber:")] public static NSPredicate PredicateForContactsMatchingPhoneNumber(CNPhoneNumber phoneNumber);
-    [Selector("predicateForContactsWithIdentifiers:")] public static NSPredicate PredicateForContactsWithIdentifiers(NSArray identifiers);
-    [Selector("predicateForContactsInGroupWithIdentifier:")] public static NSPredicate PredicateForContactsInGroupWithIdentifier(NSString groupIdentifier);
-    [Selector("predicateForContactsInContainerWithIdentifier:")] public static NSPredicate PredicateForContactsInContainerWithIdentifier(NSString containerIdentifier);
+    [Selector("predicateForContactsMatchingName:")]
+    public static NSPredicate PredicateForContactsMatchingName(NSString name);
+    [Selector("predicateForContactsMatchingEmailAddress:")]
+    public static NSPredicate PredicateForContactsMatchingEmailAddress(NSString emailAddress);
+    [Selector("predicateForContactsMatchingPhoneNumber:")]
+    public static NSPredicate PredicateForContactsMatchingPhoneNumber(CNPhoneNumber phoneNumber);
+    [Selector("predicateForContactsWithIdentifiers:")]
+    public static NSPredicate PredicateForContactsWithIdentifiers(NSArray identifiers);
+    [Selector("predicateForContactsInGroupWithIdentifier:")]
+    public static NSPredicate PredicateForContactsInGroupWithIdentifier(NSString groupIdentifier);
+    [Selector("predicateForContactsInContainerWithIdentifier:")]
+    public static NSPredicate PredicateForContactsInContainerWithIdentifier(NSString containerIdentifier);
 }
 
 #endif

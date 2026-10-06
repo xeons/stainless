@@ -34,10 +34,18 @@ import Standard.ObjC;
 
 public objc interface IKScannerDeviceViewDelegate
 {
-    [Optional] [Selector("scannerDeviceView:didScanToURL:fileData:error:")] void ScannerDeviceViewDidScanToURLFileDataError(IKScannerDeviceView? scannerDeviceView, NSURL? url, NSData? data, NSError? error);
-    [Optional] [Selector("scannerDeviceView:didScanToURL:error:")] void ScannerDeviceViewDidScanToURLError(IKScannerDeviceView? scannerDeviceView, NSURL? url, NSError? error);
-    [Optional] [Selector("scannerDeviceView:didScanToBandData:scanInfo:error:")] void ScannerDeviceViewDidScanToBandDataScanInfoError(IKScannerDeviceView? scannerDeviceView, ICScannerBandData? data, NSDictionary? scanInfo, NSError? error);
-    [Optional] [Selector("scannerDeviceView:didEncounterError:")] void ScannerDeviceViewDidEncounterError(IKScannerDeviceView? scannerDeviceView, NSError? error);
+    [Optional]
+    [Selector("scannerDeviceView:didScanToURL:fileData:error:")]
+    void ScannerDeviceViewDidScanToURLFileDataError(IKScannerDeviceView? scannerDeviceView, NSURL? url, NSData? data, NSError? error);
+    [Optional]
+    [Selector("scannerDeviceView:didScanToURL:error:")]
+    void ScannerDeviceViewDidScanToURLError(IKScannerDeviceView? scannerDeviceView, NSURL? url, NSError? error);
+    [Optional]
+    [Selector("scannerDeviceView:didScanToBandData:scanInfo:error:")]
+    void ScannerDeviceViewDidScanToBandDataScanInfoError(IKScannerDeviceView? scannerDeviceView, ICScannerBandData? data, NSDictionary? scanInfo, NSError? error);
+    [Optional]
+    [Selector("scannerDeviceView:didEncounterError:")]
+    void ScannerDeviceViewDidEncounterError(IKScannerDeviceView? scannerDeviceView, NSError? error);
 }
 
 public enum IKScannerDeviceViewTransferMode : long
@@ -55,19 +63,32 @@ public enum IKScannerDeviceViewDisplayMode : long
 
 public extern objc class IKScannerDeviceView : NSView
 {
-    [Selector("delegate", "setDelegate:")] public IKScannerDeviceViewDelegate? Delegate { get; set; }
-    [Selector("scannerDevice", "setScannerDevice:")] public ICScannerDevice? ScannerDevice { get; set; }
-    [Selector("mode", "setMode:")] public IKScannerDeviceViewDisplayMode Mode { get; set; }
-    [Selector("hasDisplayModeSimple", "setHasDisplayModeSimple:")] public bool HasDisplayModeSimple { get; set; }
-    [Selector("hasDisplayModeAdvanced", "setHasDisplayModeAdvanced:")] public bool HasDisplayModeAdvanced { get; set; }
-    [Selector("transferMode", "setTransferMode:")] public IKScannerDeviceViewTransferMode TransferMode { get; set; }
-    [Selector("scanControlLabel", "setScanControlLabel:")] public NSString? ScanControlLabel { get; set; }
-    [Selector("overviewControlLabel", "setOverviewControlLabel:")] public NSString? OverviewControlLabel { get; set; }
-    [Selector("displaysDownloadsDirectoryControl", "setDisplaysDownloadsDirectoryControl:")] public bool DisplaysDownloadsDirectoryControl { get; set; }
-    [Selector("downloadsDirectory", "setDownloadsDirectory:")] public NSURL? DownloadsDirectory { get; set; }
-    [Selector("documentName", "setDocumentName:")] public NSString? DocumentName { get; set; }
-    [Selector("displaysPostProcessApplicationControl", "setDisplaysPostProcessApplicationControl:")] public bool DisplaysPostProcessApplicationControl { get; set; }
-    [Selector("postProcessApplication", "setPostProcessApplication:")] public NSURL? PostProcessApplication { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public IKScannerDeviceViewDelegate? Delegate { get; set; }
+    [Selector("scannerDevice", "setScannerDevice:")]
+    public ICScannerDevice? ScannerDevice { get; set; }
+    [Selector("mode", "setMode:")]
+    public IKScannerDeviceViewDisplayMode Mode { get; set; }
+    [Selector("hasDisplayModeSimple", "setHasDisplayModeSimple:")]
+    public bool HasDisplayModeSimple { get; set; }
+    [Selector("hasDisplayModeAdvanced", "setHasDisplayModeAdvanced:")]
+    public bool HasDisplayModeAdvanced { get; set; }
+    [Selector("transferMode", "setTransferMode:")]
+    public IKScannerDeviceViewTransferMode TransferMode { get; set; }
+    [Selector("scanControlLabel", "setScanControlLabel:")]
+    public NSString? ScanControlLabel { get; set; }
+    [Selector("overviewControlLabel", "setOverviewControlLabel:")]
+    public NSString? OverviewControlLabel { get; set; }
+    [Selector("displaysDownloadsDirectoryControl", "setDisplaysDownloadsDirectoryControl:")]
+    public bool DisplaysDownloadsDirectoryControl { get; set; }
+    [Selector("downloadsDirectory", "setDownloadsDirectory:")]
+    public NSURL? DownloadsDirectory { get; set; }
+    [Selector("documentName", "setDocumentName:")]
+    public NSString? DocumentName { get; set; }
+    [Selector("displaysPostProcessApplicationControl", "setDisplaysPostProcessApplicationControl:")]
+    public bool DisplaysPostProcessApplicationControl { get; set; }
+    [Selector("postProcessApplication", "setPostProcessApplication:")]
+    public NSURL? PostProcessApplication { get; set; }
 }
 
 #endif

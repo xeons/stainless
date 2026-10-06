@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class ASKPluginObject : NSObject
 {
-    [Selector("pluginDidLoad:")] public static void PluginDidLoad(NSBundle? bundle);
+    [Selector("pluginDidLoad:")]
+    public static void PluginDidLoad(NSBundle? bundle);
 }
 
 #endif

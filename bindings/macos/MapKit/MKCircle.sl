@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class MKCircle : MKShape, MKOverlay
 {
-    [Selector("coordinate")] public CLLocationCoordinate2D Coordinate { get; }
-    [Selector("radius")] public CLLocationDistance Radius { get; }
-    [Selector("boundingMapRect")] public MKMapRect BoundingMapRect { get; }
-    [Selector("circleWithCenterCoordinate:radius:")] public static Self CircleWithCenterCoordinateRadius(CLLocationCoordinate2D coord, CLLocationDistance radius);
-    [Selector("circleWithMapRect:")] public static Self CircleWithMapRect(MKMapRect mapRect);
+    [Selector("coordinate")]
+    public CLLocationCoordinate2D Coordinate { get; }
+    [Selector("radius")]
+    public CLLocationDistance Radius { get; }
+    [Selector("boundingMapRect")]
+    public MKMapRect BoundingMapRect { get; }
+    [Selector("circleWithCenterCoordinate:radius:")]
+    public static Self CircleWithCenterCoordinateRadius(CLLocationCoordinate2D coord, CLLocationDistance radius);
+    [Selector("circleWithMapRect:")]
+    public static Self CircleWithMapRect(MKMapRect mapRect);
 }
 
 #endif

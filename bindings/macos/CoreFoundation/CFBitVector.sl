@@ -42,13 +42,17 @@ public extern objc class CFMutableBitVectorRef : CFBitVectorRef { }
 
 public extern "C" CFTypeID CFBitVectorGetTypeID();
 
-[ReturnsRetained] public extern "C" CFBitVectorRef? CFBitVectorCreate(CFAllocatorRef? allocator, UInt8* bytes, CFIndex numBits);
+[ReturnsRetained]
+public extern "C" CFBitVectorRef? CFBitVectorCreate(CFAllocatorRef? allocator, UInt8* bytes, CFIndex numBits);
 
-[ReturnsRetained] public extern "C" CFBitVectorRef? CFBitVectorCreateCopy(CFAllocatorRef? allocator, CFBitVectorRef? bv);
+[ReturnsRetained]
+public extern "C" CFBitVectorRef? CFBitVectorCreateCopy(CFAllocatorRef? allocator, CFBitVectorRef? bv);
 
-[ReturnsRetained] public extern "C" CFMutableBitVectorRef? CFBitVectorCreateMutable(CFAllocatorRef? allocator, CFIndex capacity);
+[ReturnsRetained]
+public extern "C" CFMutableBitVectorRef? CFBitVectorCreateMutable(CFAllocatorRef? allocator, CFIndex capacity);
 
-[ReturnsRetained] public extern "C" CFMutableBitVectorRef? CFBitVectorCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFBitVectorRef? bv);
+[ReturnsRetained]
+public extern "C" CFMutableBitVectorRef? CFBitVectorCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFBitVectorRef? bv);
 
 public extern "C" CFIndex CFBitVectorGetCount(CFBitVectorRef? bv);
 

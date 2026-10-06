@@ -67,16 +67,26 @@ public struct GCDualSenseAdaptiveTriggerPositionalResistiveStrengths
 
 public extern objc class GCDualSenseAdaptiveTrigger : GCControllerButtonInput
 {
-    [Selector("mode")] public GCDualSenseAdaptiveTriggerMode Mode { get; }
-    [Selector("status")] public GCDualSenseAdaptiveTriggerStatus Status { get; }
-    [Selector("armPosition")] public float ArmPosition { get; }
-    [Selector("setModeSlopeFeedbackWithStartPosition:endPosition:startStrength:endStrength:")] public void SetModeSlopeFeedbackWithStartPositionEndPositionStartStrengthEndStrength(float startPosition, float endPosition, float startStrength, float endStrength);
-    [Selector("setModeFeedbackWithStartPosition:resistiveStrength:")] public void SetModeFeedbackWithStartPositionResistiveStrength(float startPosition, float resistiveStrength);
-    [Selector("setModeFeedbackWithResistiveStrengths:")] public void SetModeFeedbackWithResistiveStrengths(GCDualSenseAdaptiveTriggerPositionalResistiveStrengths positionalResistiveStrengths);
-    [Selector("setModeWeaponWithStartPosition:endPosition:resistiveStrength:")] public void SetModeWeaponWithStartPositionEndPositionResistiveStrength(float startPosition, float endPosition, float resistiveStrength);
-    [Selector("setModeVibrationWithStartPosition:amplitude:frequency:")] public void SetModeVibrationWithStartPositionAmplitudeFrequency(float startPosition, float amplitude, float frequency);
-    [Selector("setModeVibrationWithAmplitudes:frequency:")] public void SetModeVibrationWithAmplitudesFrequency(GCDualSenseAdaptiveTriggerPositionalAmplitudes positionalAmplitudes, float frequency);
-    [Selector("setModeOff")] public void SetModeOff();
+    [Selector("mode")]
+    public GCDualSenseAdaptiveTriggerMode Mode { get; }
+    [Selector("status")]
+    public GCDualSenseAdaptiveTriggerStatus Status { get; }
+    [Selector("armPosition")]
+    public float ArmPosition { get; }
+    [Selector("setModeSlopeFeedbackWithStartPosition:endPosition:startStrength:endStrength:")]
+    public void SetModeSlopeFeedbackWithStartPositionEndPositionStartStrengthEndStrength(float startPosition, float endPosition, float startStrength, float endStrength);
+    [Selector("setModeFeedbackWithStartPosition:resistiveStrength:")]
+    public void SetModeFeedbackWithStartPositionResistiveStrength(float startPosition, float resistiveStrength);
+    [Selector("setModeFeedbackWithResistiveStrengths:")]
+    public void SetModeFeedbackWithResistiveStrengths(GCDualSenseAdaptiveTriggerPositionalResistiveStrengths positionalResistiveStrengths);
+    [Selector("setModeWeaponWithStartPosition:endPosition:resistiveStrength:")]
+    public void SetModeWeaponWithStartPositionEndPositionResistiveStrength(float startPosition, float endPosition, float resistiveStrength);
+    [Selector("setModeVibrationWithStartPosition:amplitude:frequency:")]
+    public void SetModeVibrationWithStartPositionAmplitudeFrequency(float startPosition, float amplitude, float frequency);
+    [Selector("setModeVibrationWithAmplitudes:frequency:")]
+    public void SetModeVibrationWithAmplitudesFrequency(GCDualSenseAdaptiveTriggerPositionalAmplitudes positionalAmplitudes, float frequency);
+    [Selector("setModeOff")]
+    public void SetModeOff();
 }
 
 #endif

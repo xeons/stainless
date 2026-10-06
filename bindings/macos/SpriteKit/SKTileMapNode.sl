@@ -35,35 +35,64 @@ import Standard.ObjC;
 
 public extern objc class SKTileMapNode : SKNode, NSCopying, NSSecureCoding
 {
-    [Selector("numberOfColumns", "setNumberOfColumns:")] public NSUInteger NumberOfColumns { get; set; }
-    [Selector("numberOfRows", "setNumberOfRows:")] public NSUInteger NumberOfRows { get; set; }
-    [Selector("tileSize", "setTileSize:")] public CGSize TileSize { get; set; }
-    [Selector("mapSize")] public CGSize MapSize { get; }
-    [Selector("tileSet", "setTileSet:")] public SKTileSet TileSet { get; set; }
-    [Selector("colorBlendFactor", "setColorBlendFactor:")] public CGFloat ColorBlendFactor { get; set; }
-    [Selector("color", "setColor:")] public NSColor Color { get; set; }
-    [Selector("blendMode", "setBlendMode:")] public SKBlendMode BlendMode { get; set; }
-    [Selector("anchorPoint", "setAnchorPoint:")] public CGPoint AnchorPoint { get; set; }
-    [Selector("shader", "setShader:")] public SKShader? Shader { get; set; }
-    [Selector("attributeValues", "setAttributeValues:")] public NSDictionary AttributeValues { get; set; }
-    [Selector("lightingBitMask", "setLightingBitMask:")] public uint LightingBitMask { get; set; }
-    [Selector("enableAutomapping", "setEnableAutomapping:")] public bool EnableAutomapping { get; set; }
-    [Selector("tileMapNodeWithTileSet:columns:rows:tileSize:")] public static Self TileMapNodeWithTileSetColumnsRowsTileSize(SKTileSet tileSet, NSUInteger columns, NSUInteger rows, CGSize tileSize);
-    [Selector("tileMapNodeWithTileSet:columns:rows:tileSize:fillWithTileGroup:")] public static Self TileMapNodeWithTileSetColumnsRowsTileSizeFillWithTileGroup(SKTileSet tileSet, NSUInteger columns, NSUInteger rows, CGSize tileSize, SKTileGroup tileGroup);
-    [Selector("tileMapNodeWithTileSet:columns:rows:tileSize:tileGroupLayout:")] public static Self TileMapNodeWithTileSetColumnsRowsTileSizeTileGroupLayout(SKTileSet tileSet, NSUInteger columns, NSUInteger rows, CGSize tileSize, NSArray tileGroupLayout);
-    [Selector("initWithTileSet:columns:rows:tileSize:")] public Self InitWithTileSetColumnsRowsTileSize(SKTileSet tileSet, NSUInteger columns, NSUInteger rows, CGSize tileSize);
-    [Selector("initWithTileSet:columns:rows:tileSize:fillWithTileGroup:")] public Self InitWithTileSetColumnsRowsTileSizeFillWithTileGroup(SKTileSet tileSet, NSUInteger columns, NSUInteger rows, CGSize tileSize, SKTileGroup tileGroup);
-    [Selector("initWithTileSet:columns:rows:tileSize:tileGroupLayout:")] public Self InitWithTileSetColumnsRowsTileSizeTileGroupLayout(SKTileSet tileSet, NSUInteger columns, NSUInteger rows, CGSize tileSize, NSArray tileGroupLayout);
-    [Selector("valueForAttributeNamed:")] public SKAttributeValue? ValueForAttributeNamed(NSString key);
-    [Selector("setValue:forAttributeNamed:")] public void SetValueForAttributeNamed(SKAttributeValue value, NSString key);
-    [Selector("fillWithTileGroup:")] public void FillWithTileGroup(SKTileGroup? tileGroup);
-    [Selector("tileDefinitionAtColumn:row:")] public SKTileDefinition? TileDefinitionAtColumnRow(NSUInteger column, NSUInteger row);
-    [Selector("tileGroupAtColumn:row:")] public SKTileGroup? TileGroupAtColumnRow(NSUInteger column, NSUInteger row);
-    [Selector("setTileGroup:forColumn:row:")] public void SetTileGroupForColumnRow(SKTileGroup? tileGroup, NSUInteger column, NSUInteger row);
-    [Selector("setTileGroup:andTileDefinition:forColumn:row:")] public void SetTileGroupAndTileDefinitionForColumnRow(SKTileGroup tileGroup, SKTileDefinition tileDefinition, NSUInteger column, NSUInteger row);
-    [Selector("tileColumnIndexFromPosition:")] public NSUInteger TileColumnIndexFromPosition(CGPoint position);
-    [Selector("tileRowIndexFromPosition:")] public NSUInteger TileRowIndexFromPosition(CGPoint position);
-    [Selector("centerOfTileAtColumn:row:")] public CGPoint CenterOfTileAtColumnRow(NSUInteger column, NSUInteger row);
+    [Selector("numberOfColumns", "setNumberOfColumns:")]
+    public NSUInteger NumberOfColumns { get; set; }
+    [Selector("numberOfRows", "setNumberOfRows:")]
+    public NSUInteger NumberOfRows { get; set; }
+    [Selector("tileSize", "setTileSize:")]
+    public CGSize TileSize { get; set; }
+    [Selector("mapSize")]
+    public CGSize MapSize { get; }
+    [Selector("tileSet", "setTileSet:")]
+    public SKTileSet TileSet { get; set; }
+    [Selector("colorBlendFactor", "setColorBlendFactor:")]
+    public CGFloat ColorBlendFactor { get; set; }
+    [Selector("color", "setColor:")]
+    public NSColor Color { get; set; }
+    [Selector("blendMode", "setBlendMode:")]
+    public SKBlendMode BlendMode { get; set; }
+    [Selector("anchorPoint", "setAnchorPoint:")]
+    public CGPoint AnchorPoint { get; set; }
+    [Selector("shader", "setShader:")]
+    public SKShader? Shader { get; set; }
+    [Selector("attributeValues", "setAttributeValues:")]
+    public NSDictionary AttributeValues { get; set; }
+    [Selector("lightingBitMask", "setLightingBitMask:")]
+    public uint LightingBitMask { get; set; }
+    [Selector("enableAutomapping", "setEnableAutomapping:")]
+    public bool EnableAutomapping { get; set; }
+    [Selector("tileMapNodeWithTileSet:columns:rows:tileSize:")]
+    public static Self TileMapNodeWithTileSetColumnsRowsTileSize(SKTileSet tileSet, NSUInteger columns, NSUInteger rows, CGSize tileSize);
+    [Selector("tileMapNodeWithTileSet:columns:rows:tileSize:fillWithTileGroup:")]
+    public static Self TileMapNodeWithTileSetColumnsRowsTileSizeFillWithTileGroup(SKTileSet tileSet, NSUInteger columns, NSUInteger rows, CGSize tileSize, SKTileGroup tileGroup);
+    [Selector("tileMapNodeWithTileSet:columns:rows:tileSize:tileGroupLayout:")]
+    public static Self TileMapNodeWithTileSetColumnsRowsTileSizeTileGroupLayout(SKTileSet tileSet, NSUInteger columns, NSUInteger rows, CGSize tileSize, NSArray tileGroupLayout);
+    [Selector("initWithTileSet:columns:rows:tileSize:")]
+    public Self InitWithTileSetColumnsRowsTileSize(SKTileSet tileSet, NSUInteger columns, NSUInteger rows, CGSize tileSize);
+    [Selector("initWithTileSet:columns:rows:tileSize:fillWithTileGroup:")]
+    public Self InitWithTileSetColumnsRowsTileSizeFillWithTileGroup(SKTileSet tileSet, NSUInteger columns, NSUInteger rows, CGSize tileSize, SKTileGroup tileGroup);
+    [Selector("initWithTileSet:columns:rows:tileSize:tileGroupLayout:")]
+    public Self InitWithTileSetColumnsRowsTileSizeTileGroupLayout(SKTileSet tileSet, NSUInteger columns, NSUInteger rows, CGSize tileSize, NSArray tileGroupLayout);
+    [Selector("valueForAttributeNamed:")]
+    public SKAttributeValue? ValueForAttributeNamed(NSString key);
+    [Selector("setValue:forAttributeNamed:")]
+    public void SetValueForAttributeNamed(SKAttributeValue value, NSString key);
+    [Selector("fillWithTileGroup:")]
+    public void FillWithTileGroup(SKTileGroup? tileGroup);
+    [Selector("tileDefinitionAtColumn:row:")]
+    public SKTileDefinition? TileDefinitionAtColumnRow(NSUInteger column, NSUInteger row);
+    [Selector("tileGroupAtColumn:row:")]
+    public SKTileGroup? TileGroupAtColumnRow(NSUInteger column, NSUInteger row);
+    [Selector("setTileGroup:forColumn:row:")]
+    public void SetTileGroupForColumnRow(SKTileGroup? tileGroup, NSUInteger column, NSUInteger row);
+    [Selector("setTileGroup:andTileDefinition:forColumn:row:")]
+    public void SetTileGroupAndTileDefinitionForColumnRow(SKTileGroup tileGroup, SKTileDefinition tileDefinition, NSUInteger column, NSUInteger row);
+    [Selector("tileColumnIndexFromPosition:")]
+    public NSUInteger TileColumnIndexFromPosition(CGPoint position);
+    [Selector("tileRowIndexFromPosition:")]
+    public NSUInteger TileRowIndexFromPosition(CGPoint position);
+    [Selector("centerOfTileAtColumn:row:")]
+    public CGPoint CenterOfTileAtColumnRow(NSUInteger column, NSUInteger row);
 }
 
 #endif

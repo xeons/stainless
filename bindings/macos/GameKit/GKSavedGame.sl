@@ -35,10 +35,14 @@ public objc closure void GKSavedGameLoadDataWithCompletionHandlerHandlerBlock(NS
 
 public extern objc class GKSavedGame : NSObject, NSCopying
 {
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("deviceName")] public NSString? DeviceName { get; }
-    [Selector("modificationDate")] public NSDate? ModificationDate { get; }
-    [Selector("loadDataWithCompletionHandler:")] public void LoadDataWithCompletionHandler(GKSavedGameLoadDataWithCompletionHandlerHandlerBlock? handler);
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("deviceName")]
+    public NSString? DeviceName { get; }
+    [Selector("modificationDate")]
+    public NSDate? ModificationDate { get; }
+    [Selector("loadDataWithCompletionHandler:")]
+    public void LoadDataWithCompletionHandler(GKSavedGameLoadDataWithCompletionHandlerHandlerBlock? handler);
 }
 
 public objc closure void GKLocalPlayerFetchSavedGamesWithCompletionHandlerHandlerBlock(NSArray? arg0, NSError? arg1);
@@ -52,10 +56,14 @@ public objc closure void GKLocalPlayerResolveConflictingSavedGamesWithDataComple
 /// GKSavedGame, a category of GKLocalPlayer.
 public extern objc class GKLocalPlayer : GKSavedGameListener
 {
-    [Selector("fetchSavedGamesWithCompletionHandler:")] public void FetchSavedGamesWithCompletionHandler(GKLocalPlayerFetchSavedGamesWithCompletionHandlerHandlerBlock? handler);
-    [Selector("saveGameData:withName:completionHandler:")] public void SaveGameDataWithNameCompletionHandler(NSData data, NSString name, GKLocalPlayerSaveGameDataWithNameCompletionHandlerHandlerBlock? handler);
-    [Selector("deleteSavedGamesWithName:completionHandler:")] public void DeleteSavedGamesWithNameCompletionHandler(NSString name, GKLocalPlayerDeleteSavedGamesWithNameCompletionHandlerHandlerBlock? handler);
-    [Selector("resolveConflictingSavedGames:withData:completionHandler:")] public void ResolveConflictingSavedGamesWithDataCompletionHandler(NSArray conflictingSavedGames, NSData data, GKLocalPlayerResolveConflictingSavedGamesWithDataCompletionHandlerHandlerBlock? handler);
+    [Selector("fetchSavedGamesWithCompletionHandler:")]
+    public void FetchSavedGamesWithCompletionHandler(GKLocalPlayerFetchSavedGamesWithCompletionHandlerHandlerBlock? handler);
+    [Selector("saveGameData:withName:completionHandler:")]
+    public void SaveGameDataWithNameCompletionHandler(NSData data, NSString name, GKLocalPlayerSaveGameDataWithNameCompletionHandlerHandlerBlock? handler);
+    [Selector("deleteSavedGamesWithName:completionHandler:")]
+    public void DeleteSavedGamesWithNameCompletionHandler(NSString name, GKLocalPlayerDeleteSavedGamesWithNameCompletionHandlerHandlerBlock? handler);
+    [Selector("resolveConflictingSavedGames:withData:completionHandler:")]
+    public void ResolveConflictingSavedGamesWithDataCompletionHandler(NSArray conflictingSavedGames, NSData data, GKLocalPlayerResolveConflictingSavedGamesWithDataCompletionHandlerHandlerBlock? handler);
 }
 
 #endif

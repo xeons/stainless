@@ -35,28 +35,50 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class WebFrame : NSObject
 {
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("webView")] public WebView? WebView { get; }
-    [Selector("frameView")] public WebFrameView? FrameView { get; }
-    [Selector("DOMDocument")] public DOMDocument? DOMDocument { get; }
-    [Selector("frameElement")] public DOMHTMLElement? FrameElement { get; }
-    [Selector("dataSource")] public WebDataSource? DataSource { get; }
-    [Selector("provisionalDataSource")] public WebDataSource? ProvisionalDataSource { get; }
-    [Selector("parentFrame")] public WebFrame? ParentFrame { get; }
-    [Selector("childFrames")] public NSArray? ChildFrames { get; }
-    [Selector("windowObject")] public WebScriptObject? WindowObject { get; }
-    [Selector("globalContext")] public JSGlobalContextRef GlobalContext { get; }
-    [Selector("javaScriptContext")] public JSContext? JavaScriptContext { get; }
-    [Selector("initWithName:webFrameView:webView:")] public Self? InitWithNameWebFrameViewWebView(NSString? name, WebFrameView? view, WebView? webView);
-    [Selector("loadRequest:")] public void LoadRequest(NSURLRequest? request);
-    [Selector("loadData:MIMEType:textEncodingName:baseURL:")] public void LoadDataMIMETypeTextEncodingNameBaseURL(NSData? data, NSString? MIMEType, NSString? encodingName, NSURL? URL);
-    [Selector("loadHTMLString:baseURL:")] public void LoadHTMLStringBaseURL(NSString? string, NSURL? URL);
-    [Selector("loadAlternateHTMLString:baseURL:forUnreachableURL:")] public void LoadAlternateHTMLStringBaseURLForUnreachableURL(NSString? string, NSURL? baseURL, NSURL? unreachableURL);
-    [Selector("loadArchive:")] public void LoadArchive(WebArchive? archive);
-    [Selector("stopLoading")] public void StopLoading();
-    [Selector("reload")] public void Reload();
-    [Selector("reloadFromOrigin")] public void ReloadFromOrigin();
-    [Selector("findFrameNamed:")] public WebFrame? FindFrameNamed(NSString? name);
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("webView")]
+    public WebView? WebView { get; }
+    [Selector("frameView")]
+    public WebFrameView? FrameView { get; }
+    [Selector("DOMDocument")]
+    public DOMDocument? DOMDocument { get; }
+    [Selector("frameElement")]
+    public DOMHTMLElement? FrameElement { get; }
+    [Selector("dataSource")]
+    public WebDataSource? DataSource { get; }
+    [Selector("provisionalDataSource")]
+    public WebDataSource? ProvisionalDataSource { get; }
+    [Selector("parentFrame")]
+    public WebFrame? ParentFrame { get; }
+    [Selector("childFrames")]
+    public NSArray? ChildFrames { get; }
+    [Selector("windowObject")]
+    public WebScriptObject? WindowObject { get; }
+    [Selector("globalContext")]
+    public JSGlobalContextRef GlobalContext { get; }
+    [Selector("javaScriptContext")]
+    public JSContext? JavaScriptContext { get; }
+    [Selector("initWithName:webFrameView:webView:")]
+    public Self? InitWithNameWebFrameViewWebView(NSString? name, WebFrameView? view, WebView? webView);
+    [Selector("loadRequest:")]
+    public void LoadRequest(NSURLRequest? request);
+    [Selector("loadData:MIMEType:textEncodingName:baseURL:")]
+    public void LoadDataMIMETypeTextEncodingNameBaseURL(NSData? data, NSString? MIMEType, NSString? encodingName, NSURL? URL);
+    [Selector("loadHTMLString:baseURL:")]
+    public void LoadHTMLStringBaseURL(NSString? string, NSURL? URL);
+    [Selector("loadAlternateHTMLString:baseURL:forUnreachableURL:")]
+    public void LoadAlternateHTMLStringBaseURLForUnreachableURL(NSString? string, NSURL? baseURL, NSURL? unreachableURL);
+    [Selector("loadArchive:")]
+    public void LoadArchive(WebArchive? archive);
+    [Selector("stopLoading")]
+    public void StopLoading();
+    [Selector("reload")]
+    public void Reload();
+    [Selector("reloadFromOrigin")]
+    public void ReloadFromOrigin();
+    [Selector("findFrameNamed:")]
+    public WebFrame? FindFrameNamed(NSString? name);
 }
 
 #endif

@@ -44,20 +44,30 @@ public enum MTLBinaryArchiveError : ulong
 
 public extern objc class MTLBinaryArchiveDescriptor : NSObject, NSCopying
 {
-    [Selector("url", "setUrl:")] public NSURL? Url { get; set; }
+    [Selector("url", "setUrl:")]
+    public NSURL? Url { get; set; }
 }
 
 public objc interface MTLBinaryArchive : NSObjectProtocol
 {
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("addComputePipelineFunctionsWithDescriptor:error:")] bool AddComputePipelineFunctionsWithDescriptorError(MTLComputePipelineDescriptor descriptor, out NSError? error);
-    [Selector("addRenderPipelineFunctionsWithDescriptor:error:")] bool AddRenderPipelineFunctionsWithDescriptorError(MTLRenderPipelineDescriptor descriptor, out NSError? error);
-    [Selector("addTileRenderPipelineFunctionsWithDescriptor:error:")] bool AddTileRenderPipelineFunctionsWithDescriptorError(MTLTileRenderPipelineDescriptor descriptor, out NSError? error);
-    [Selector("addMeshRenderPipelineFunctionsWithDescriptor:error:")] bool AddMeshRenderPipelineFunctionsWithDescriptorError(MTLMeshRenderPipelineDescriptor descriptor, out NSError? error);
-    [Selector("addLibraryWithDescriptor:error:")] bool AddLibraryWithDescriptorError(MTLStitchedLibraryDescriptor descriptor, out NSError? error);
-    [Selector("serializeToURL:error:")] bool SerializeToURLError(NSURL url, out NSError? error);
-    [Selector("addFunctionWithDescriptor:library:error:")] bool AddFunctionWithDescriptorLibraryError(MTLFunctionDescriptor descriptor, MTLLibrary library, out NSError? error);
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("addComputePipelineFunctionsWithDescriptor:error:")]
+    bool AddComputePipelineFunctionsWithDescriptorError(MTLComputePipelineDescriptor descriptor, out NSError? error);
+    [Selector("addRenderPipelineFunctionsWithDescriptor:error:")]
+    bool AddRenderPipelineFunctionsWithDescriptorError(MTLRenderPipelineDescriptor descriptor, out NSError? error);
+    [Selector("addTileRenderPipelineFunctionsWithDescriptor:error:")]
+    bool AddTileRenderPipelineFunctionsWithDescriptorError(MTLTileRenderPipelineDescriptor descriptor, out NSError? error);
+    [Selector("addMeshRenderPipelineFunctionsWithDescriptor:error:")]
+    bool AddMeshRenderPipelineFunctionsWithDescriptorError(MTLMeshRenderPipelineDescriptor descriptor, out NSError? error);
+    [Selector("addLibraryWithDescriptor:error:")]
+    bool AddLibraryWithDescriptorError(MTLStitchedLibraryDescriptor descriptor, out NSError? error);
+    [Selector("serializeToURL:error:")]
+    bool SerializeToURLError(NSURL url, out NSError? error);
+    [Selector("addFunctionWithDescriptor:library:error:")]
+    bool AddFunctionWithDescriptorLibraryError(MTLFunctionDescriptor descriptor, MTLLibrary library, out NSError? error);
 }
 
 #endif

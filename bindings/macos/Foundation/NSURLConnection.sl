@@ -32,58 +32,101 @@ import Standard.ObjC;
 
 public extern objc class NSURLConnection : NSObject
 {
-    [Selector("originalRequest")] public NSURLRequest OriginalRequest { get; }
-    [Selector("currentRequest")] public NSURLRequest CurrentRequest { get; }
+    [Selector("originalRequest")]
+    public NSURLRequest OriginalRequest { get; }
+    [Selector("currentRequest")]
+    public NSURLRequest CurrentRequest { get; }
     /// Deprecated in macOS 10.11.
-    [Selector("initWithRequest:delegate:startImmediately:")] public Self? InitWithRequestDelegateStartImmediately(NSURLRequest request, AnyObject? @delegate, bool startImmediately);
+    [Selector("initWithRequest:delegate:startImmediately:")]
+    public Self? InitWithRequestDelegateStartImmediately(NSURLRequest request, AnyObject? @delegate, bool startImmediately);
     /// Deprecated in macOS 10.11.
-    [Selector("initWithRequest:delegate:")] public Self? InitWithRequestDelegate(NSURLRequest request, AnyObject? @delegate);
+    [Selector("initWithRequest:delegate:")]
+    public Self? InitWithRequestDelegate(NSURLRequest request, AnyObject? @delegate);
     /// Deprecated in macOS 10.11.
-    [Selector("connectionWithRequest:delegate:")] public static NSURLConnection? ConnectionWithRequestDelegate(NSURLRequest request, AnyObject? @delegate);
-    [Selector("start")] public void Start();
-    [Selector("cancel")] public void Cancel();
-    [Selector("scheduleInRunLoop:forMode:")] public void ScheduleInRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
-    [Selector("unscheduleFromRunLoop:forMode:")] public void UnscheduleFromRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
-    [Selector("setDelegateQueue:")] public void SetDelegateQueue(NSOperationQueue? queue);
-    [Selector("canHandleRequest:")] public static bool CanHandleRequest(NSURLRequest request);
+    [Selector("connectionWithRequest:delegate:")]
+    public static NSURLConnection? ConnectionWithRequestDelegate(NSURLRequest request, AnyObject? @delegate);
+    [Selector("start")]
+    public void Start();
+    [Selector("cancel")]
+    public void Cancel();
+    [Selector("scheduleInRunLoop:forMode:")]
+    public void ScheduleInRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
+    [Selector("unscheduleFromRunLoop:forMode:")]
+    public void UnscheduleFromRunLoopForMode(NSRunLoop aRunLoop, NSRunLoopMode mode);
+    [Selector("setDelegateQueue:")]
+    public void SetDelegateQueue(NSOperationQueue? queue);
+    [Selector("canHandleRequest:")]
+    public static bool CanHandleRequest(NSURLRequest request);
 }
 
 public objc interface NSURLConnectionDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("connection:didFailWithError:")] void ConnectionDidFailWithError(NSURLConnection connection, NSError error);
-    [Optional] [Selector("connectionShouldUseCredentialStorage:")] bool ConnectionShouldUseCredentialStorage(NSURLConnection connection);
-    [Optional] [Selector("connection:willSendRequestForAuthenticationChallenge:")] void ConnectionWillSendRequestForAuthenticationChallenge(NSURLConnection connection, NSURLAuthenticationChallenge challenge);
+    [Optional]
+    [Selector("connection:didFailWithError:")]
+    void ConnectionDidFailWithError(NSURLConnection connection, NSError error);
+    [Optional]
+    [Selector("connectionShouldUseCredentialStorage:")]
+    bool ConnectionShouldUseCredentialStorage(NSURLConnection connection);
+    [Optional]
+    [Selector("connection:willSendRequestForAuthenticationChallenge:")]
+    void ConnectionWillSendRequestForAuthenticationChallenge(NSURLConnection connection, NSURLAuthenticationChallenge challenge);
     /// Deprecated in macOS 10.10.
-    [Optional] [Selector("connection:canAuthenticateAgainstProtectionSpace:")] bool ConnectionCanAuthenticateAgainstProtectionSpace(NSURLConnection connection, NSURLProtectionSpace protectionSpace);
+    [Optional]
+    [Selector("connection:canAuthenticateAgainstProtectionSpace:")]
+    bool ConnectionCanAuthenticateAgainstProtectionSpace(NSURLConnection connection, NSURLProtectionSpace protectionSpace);
     /// Deprecated in macOS 10.10.
-    [Optional] [Selector("connection:didReceiveAuthenticationChallenge:")] void ConnectionDidReceiveAuthenticationChallenge(NSURLConnection connection, NSURLAuthenticationChallenge challenge);
+    [Optional]
+    [Selector("connection:didReceiveAuthenticationChallenge:")]
+    void ConnectionDidReceiveAuthenticationChallenge(NSURLConnection connection, NSURLAuthenticationChallenge challenge);
     /// Deprecated in macOS 10.10.
-    [Optional] [Selector("connection:didCancelAuthenticationChallenge:")] void ConnectionDidCancelAuthenticationChallenge(NSURLConnection connection, NSURLAuthenticationChallenge challenge);
+    [Optional]
+    [Selector("connection:didCancelAuthenticationChallenge:")]
+    void ConnectionDidCancelAuthenticationChallenge(NSURLConnection connection, NSURLAuthenticationChallenge challenge);
 }
 
 public objc interface NSURLConnectionDataDelegate : NSURLConnectionDelegate
 {
-    [Optional] [Selector("connection:willSendRequest:redirectResponse:")] NSURLRequest? ConnectionWillSendRequestRedirectResponse(NSURLConnection connection, NSURLRequest request, NSURLResponse? response);
-    [Optional] [Selector("connection:didReceiveResponse:")] void ConnectionDidReceiveResponse(NSURLConnection connection, NSURLResponse response);
-    [Optional] [Selector("connection:didReceiveData:")] void ConnectionDidReceiveData(NSURLConnection connection, NSData data);
-    [Optional] [Selector("connection:needNewBodyStream:")] NSInputStream? ConnectionNeedNewBodyStream(NSURLConnection connection, NSURLRequest request);
-    [Optional] [Selector("connection:didSendBodyData:totalBytesWritten:totalBytesExpectedToWrite:")] void ConnectionDidSendBodyDataTotalBytesWrittenTotalBytesExpectedToWrite(NSURLConnection connection, NSInteger bytesWritten, NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite);
-    [Optional] [Selector("connection:willCacheResponse:")] NSCachedURLResponse? ConnectionWillCacheResponse(NSURLConnection connection, NSCachedURLResponse cachedResponse);
-    [Optional] [Selector("connectionDidFinishLoading:")] void ConnectionDidFinishLoading(NSURLConnection connection);
+    [Optional]
+    [Selector("connection:willSendRequest:redirectResponse:")]
+    NSURLRequest? ConnectionWillSendRequestRedirectResponse(NSURLConnection connection, NSURLRequest request, NSURLResponse? response);
+    [Optional]
+    [Selector("connection:didReceiveResponse:")]
+    void ConnectionDidReceiveResponse(NSURLConnection connection, NSURLResponse response);
+    [Optional]
+    [Selector("connection:didReceiveData:")]
+    void ConnectionDidReceiveData(NSURLConnection connection, NSData data);
+    [Optional]
+    [Selector("connection:needNewBodyStream:")]
+    NSInputStream? ConnectionNeedNewBodyStream(NSURLConnection connection, NSURLRequest request);
+    [Optional]
+    [Selector("connection:didSendBodyData:totalBytesWritten:totalBytesExpectedToWrite:")]
+    void ConnectionDidSendBodyDataTotalBytesWrittenTotalBytesExpectedToWrite(NSURLConnection connection, NSInteger bytesWritten, NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite);
+    [Optional]
+    [Selector("connection:willCacheResponse:")]
+    NSCachedURLResponse? ConnectionWillCacheResponse(NSURLConnection connection, NSCachedURLResponse cachedResponse);
+    [Optional]
+    [Selector("connectionDidFinishLoading:")]
+    void ConnectionDidFinishLoading(NSURLConnection connection);
 }
 
 public objc interface NSURLConnectionDownloadDelegate : NSURLConnectionDelegate
 {
-    [Optional] [Selector("connection:didWriteData:totalBytesWritten:expectedTotalBytes:")] void ConnectionDidWriteDataTotalBytesWrittenExpectedTotalBytes(NSURLConnection connection, long bytesWritten, long totalBytesWritten, long expectedTotalBytes);
-    [Optional] [Selector("connectionDidResumeDownloading:totalBytesWritten:expectedTotalBytes:")] void ConnectionDidResumeDownloadingTotalBytesWrittenExpectedTotalBytes(NSURLConnection connection, long totalBytesWritten, long expectedTotalBytes);
-    [Selector("connectionDidFinishDownloading:destinationURL:")] void ConnectionDidFinishDownloadingDestinationURL(NSURLConnection connection, NSURL destinationURL);
+    [Optional]
+    [Selector("connection:didWriteData:totalBytesWritten:expectedTotalBytes:")]
+    void ConnectionDidWriteDataTotalBytesWrittenExpectedTotalBytes(NSURLConnection connection, long bytesWritten, long totalBytesWritten, long expectedTotalBytes);
+    [Optional]
+    [Selector("connectionDidResumeDownloading:totalBytesWritten:expectedTotalBytes:")]
+    void ConnectionDidResumeDownloadingTotalBytesWrittenExpectedTotalBytes(NSURLConnection connection, long totalBytesWritten, long expectedTotalBytes);
+    [Selector("connectionDidFinishDownloading:destinationURL:")]
+    void ConnectionDidFinishDownloadingDestinationURL(NSURLConnection connection, NSURL destinationURL);
 }
 
 /// NSURLConnectionSynchronousLoading, a category of NSURLConnection.
 public extern objc class NSURLConnection
 {
     /// Deprecated in macOS 10.11.
-    [Selector("sendSynchronousRequest:returningResponse:error:")] public static NSData? SendSynchronousRequestReturningResponseError(NSURLRequest request, out NSURLResponse? response, out NSError? error);
+    [Selector("sendSynchronousRequest:returningResponse:error:")]
+    public static NSData? SendSynchronousRequestReturningResponseError(NSURLRequest request, out NSURLResponse? response, out NSError? error);
 }
 
 public objc closure void NSURLConnectionSendAsynchronousRequestQueueCompletionHandlerHandlerBlock(NSURLResponse? arg0, NSData? arg1, NSError? arg2);
@@ -92,7 +135,8 @@ public objc closure void NSURLConnectionSendAsynchronousRequestQueueCompletionHa
 public extern objc class NSURLConnection
 {
     /// Deprecated in macOS 10.11.
-    [Selector("sendAsynchronousRequest:queue:completionHandler:")] public static void SendAsynchronousRequestQueueCompletionHandler(NSURLRequest request, NSOperationQueue queue, NSURLConnectionSendAsynchronousRequestQueueCompletionHandlerHandlerBlock handler);
+    [Selector("sendAsynchronousRequest:queue:completionHandler:")]
+    public static void SendAsynchronousRequestQueueCompletionHandler(NSURLRequest request, NSOperationQueue queue, NSURLConnectionSendAsynchronousRequestQueueCompletionHandlerHandlerBlock handler);
 }
 
 #endif

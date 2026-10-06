@@ -47,21 +47,36 @@ public enum SKRepeatMode : long
 
 public extern objc class SKKeyframeSequence : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("interpolationMode", "setInterpolationMode:")] public SKInterpolationMode InterpolationMode { get; set; }
-    [Selector("repeatMode", "setRepeatMode:")] public SKRepeatMode RepeatMode { get; set; }
-    [Selector("initWithKeyframeValues:times:")] public Self InitWithKeyframeValuesTimes(NSArray values, NSArray times);
-    [Selector("initWithCapacity:")] public Self InitWithCapacity(NSUInteger numItems);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
-    [Selector("count")] public NSUInteger Count();
-    [Selector("addKeyframeValue:time:")] public void AddKeyframeValueTime(AnyObject value, CGFloat time);
-    [Selector("removeLastKeyframe")] public void RemoveLastKeyframe();
-    [Selector("removeKeyframeAtIndex:")] public void RemoveKeyframeAtIndex(NSUInteger index);
-    [Selector("setKeyframeValue:forIndex:")] public void SetKeyframeValueForIndex(AnyObject value, NSUInteger index);
-    [Selector("setKeyframeTime:forIndex:")] public void SetKeyframeTimeForIndex(CGFloat time, NSUInteger index);
-    [Selector("setKeyframeValue:time:forIndex:")] public void SetKeyframeValueTimeForIndex(AnyObject value, CGFloat time, NSUInteger index);
-    [Selector("getKeyframeValueForIndex:")] public AnyObject GetKeyframeValueForIndex(NSUInteger index);
-    [Selector("getKeyframeTimeForIndex:")] public CGFloat GetKeyframeTimeForIndex(NSUInteger index);
-    [Selector("sampleAtTime:")] public AnyObject? SampleAtTime(CGFloat time);
+    [Selector("interpolationMode", "setInterpolationMode:")]
+    public SKInterpolationMode InterpolationMode { get; set; }
+    [Selector("repeatMode", "setRepeatMode:")]
+    public SKRepeatMode RepeatMode { get; set; }
+    [Selector("initWithKeyframeValues:times:")]
+    public Self InitWithKeyframeValuesTimes(NSArray values, NSArray times);
+    [Selector("initWithCapacity:")]
+    public Self InitWithCapacity(NSUInteger numItems);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder aDecoder);
+    [Selector("count")]
+    public NSUInteger Count();
+    [Selector("addKeyframeValue:time:")]
+    public void AddKeyframeValueTime(AnyObject value, CGFloat time);
+    [Selector("removeLastKeyframe")]
+    public void RemoveLastKeyframe();
+    [Selector("removeKeyframeAtIndex:")]
+    public void RemoveKeyframeAtIndex(NSUInteger index);
+    [Selector("setKeyframeValue:forIndex:")]
+    public void SetKeyframeValueForIndex(AnyObject value, NSUInteger index);
+    [Selector("setKeyframeTime:forIndex:")]
+    public void SetKeyframeTimeForIndex(CGFloat time, NSUInteger index);
+    [Selector("setKeyframeValue:time:forIndex:")]
+    public void SetKeyframeValueTimeForIndex(AnyObject value, CGFloat time, NSUInteger index);
+    [Selector("getKeyframeValueForIndex:")]
+    public AnyObject GetKeyframeValueForIndex(NSUInteger index);
+    [Selector("getKeyframeTimeForIndex:")]
+    public CGFloat GetKeyframeTimeForIndex(NSUInteger index);
+    [Selector("sampleAtTime:")]
+    public AnyObject? SampleAtTime(CGFloat time);
 }
 
 #endif

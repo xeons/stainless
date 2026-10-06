@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class HKWorkoutActivity : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("UUID")] public NSUUID UUID { get; }
-    [Selector("workoutConfiguration")] public HKWorkoutConfiguration WorkoutConfiguration { get; }
-    [Selector("startDate")] public NSDate StartDate { get; }
-    [Selector("endDate")] public NSDate? EndDate { get; }
-    [Selector("metadata")] public NSDictionary? Metadata { get; }
-    [Selector("duration")] public NSTimeInterval Duration { get; }
-    [Selector("workoutEvents")] public NSArray WorkoutEvents { get; }
-    [Selector("allStatistics")] public NSDictionary AllStatistics { get; }
-    [Selector("statisticsForType:")] public HKStatistics? StatisticsForType(HKQuantityType quantityType);
-    [Selector("initWithWorkoutConfiguration:startDate:endDate:metadata:")] public Self InitWithWorkoutConfigurationStartDateEndDateMetadata(HKWorkoutConfiguration workoutConfiguration, NSDate startDate, NSDate? endDate, NSDictionary? metadata);
+    [Selector("UUID")]
+    public NSUUID UUID { get; }
+    [Selector("workoutConfiguration")]
+    public HKWorkoutConfiguration WorkoutConfiguration { get; }
+    [Selector("startDate")]
+    public NSDate StartDate { get; }
+    [Selector("endDate")]
+    public NSDate? EndDate { get; }
+    [Selector("metadata")]
+    public NSDictionary? Metadata { get; }
+    [Selector("duration")]
+    public NSTimeInterval Duration { get; }
+    [Selector("workoutEvents")]
+    public NSArray WorkoutEvents { get; }
+    [Selector("allStatistics")]
+    public NSDictionary AllStatistics { get; }
+    [Selector("statisticsForType:")]
+    public HKStatistics? StatisticsForType(HKQuantityType quantityType);
+    [Selector("initWithWorkoutConfiguration:startDate:endDate:metadata:")]
+    public Self InitWithWorkoutConfigurationStartDateEndDateMetadata(HKWorkoutConfiguration workoutConfiguration, NSDate startDate, NSDate? endDate, NSDictionary? metadata);
 }
 
 public extern "C" NSString HKPredicateKeyPathWorkoutActivityType;

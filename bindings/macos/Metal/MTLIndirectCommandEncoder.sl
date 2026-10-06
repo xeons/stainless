@@ -32,49 +32,82 @@ import Standard.ObjC;
 
 public objc interface MTLIndirectRenderCommand : NSObjectProtocol
 {
-    [Selector("setRenderPipelineState:")] void SetRenderPipelineState(MTLRenderPipelineState pipelineState);
-    [Selector("setVertexBuffer:offset:atIndex:")] void SetVertexBufferOffsetAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger index);
-    [Selector("setFragmentBuffer:offset:atIndex:")] void SetFragmentBufferOffsetAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger index);
-    [Selector("setVertexBuffer:offset:attributeStride:atIndex:")] void SetVertexBufferOffsetAttributeStrideAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger stride, NSUInteger index);
-    [Selector("drawPatches:patchStart:patchCount:patchIndexBuffer:patchIndexBufferOffset:instanceCount:baseInstance:tessellationFactorBuffer:tessellationFactorBufferOffset:tessellationFactorBufferInstanceStride:")] void DrawPatchesPatchStartPatchCountPatchIndexBufferPatchIndexBufferOffsetInstanceCountBaseInstanceTessellationFactorBufferTessellationFactorBufferOffsetTessellationFactorBufferInstanceStride(NSUInteger numberOfPatchControlPoints, NSUInteger patchStart, NSUInteger patchCount, MTLBuffer? patchIndexBuffer, NSUInteger patchIndexBufferOffset, NSUInteger instanceCount, NSUInteger baseInstance, MTLBuffer buffer, NSUInteger offset, NSUInteger instanceStride);
-    [Selector("drawIndexedPatches:patchStart:patchCount:patchIndexBuffer:patchIndexBufferOffset:controlPointIndexBuffer:controlPointIndexBufferOffset:instanceCount:baseInstance:tessellationFactorBuffer:tessellationFactorBufferOffset:tessellationFactorBufferInstanceStride:")] void DrawIndexedPatchesPatchStartPatchCountPatchIndexBufferPatchIndexBufferOffsetControlPointIndexBufferControlPointIndexBufferOffsetInstanceCountBaseInstanceTessellationFactorBufferTessellationFactorBufferOffsetTessellationFactorBufferInstanceStride(NSUInteger numberOfPatchControlPoints, NSUInteger patchStart, NSUInteger patchCount, MTLBuffer? patchIndexBuffer, NSUInteger patchIndexBufferOffset, MTLBuffer controlPointIndexBuffer, NSUInteger controlPointIndexBufferOffset, NSUInteger instanceCount, NSUInteger baseInstance, MTLBuffer buffer, NSUInteger offset, NSUInteger instanceStride);
-    [Selector("drawPrimitives:vertexStart:vertexCount:instanceCount:baseInstance:")] void DrawPrimitivesVertexStartVertexCountInstanceCountBaseInstance(MTLPrimitiveType primitiveType, NSUInteger vertexStart, NSUInteger vertexCount, NSUInteger instanceCount, NSUInteger baseInstance);
-    [Selector("drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferOffset:instanceCount:baseVertex:baseInstance:")] void DrawIndexedPrimitivesIndexCountIndexTypeIndexBufferIndexBufferOffsetInstanceCountBaseVertexBaseInstance(MTLPrimitiveType primitiveType, NSUInteger indexCount, MTLIndexType indexType, MTLBuffer indexBuffer, NSUInteger indexBufferOffset, NSUInteger instanceCount, NSInteger baseVertex, NSUInteger baseInstance);
-    [Selector("setObjectThreadgroupMemoryLength:atIndex:")] void SetObjectThreadgroupMemoryLengthAtIndex(NSUInteger length, NSUInteger index);
-    [Selector("setObjectBuffer:offset:atIndex:")] void SetObjectBufferOffsetAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger index);
-    [Selector("setMeshBuffer:offset:atIndex:")] void SetMeshBufferOffsetAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger index);
-    [Selector("drawMeshThreadgroups:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")] void DrawMeshThreadgroupsThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLSize threadgroupsPerGrid, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
-    [Selector("drawMeshThreads:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")] void DrawMeshThreadsThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLSize threadsPerGrid, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
-    [Selector("setBarrier")] void SetBarrier();
-    [Selector("clearBarrier")] void ClearBarrier();
+    [Selector("setRenderPipelineState:")]
+    void SetRenderPipelineState(MTLRenderPipelineState pipelineState);
+    [Selector("setVertexBuffer:offset:atIndex:")]
+    void SetVertexBufferOffsetAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger index);
+    [Selector("setFragmentBuffer:offset:atIndex:")]
+    void SetFragmentBufferOffsetAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger index);
+    [Selector("setVertexBuffer:offset:attributeStride:atIndex:")]
+    void SetVertexBufferOffsetAttributeStrideAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger stride, NSUInteger index);
+    [Selector("drawPatches:patchStart:patchCount:patchIndexBuffer:patchIndexBufferOffset:instanceCount:baseInstance:tessellationFactorBuffer:tessellationFactorBufferOffset:tessellationFactorBufferInstanceStride:")]
+    void DrawPatchesPatchStartPatchCountPatchIndexBufferPatchIndexBufferOffsetInstanceCountBaseInstanceTessellationFactorBufferTessellationFactorBufferOffsetTessellationFactorBufferInstanceStride(NSUInteger numberOfPatchControlPoints, NSUInteger patchStart, NSUInteger patchCount, MTLBuffer? patchIndexBuffer, NSUInteger patchIndexBufferOffset, NSUInteger instanceCount, NSUInteger baseInstance, MTLBuffer buffer, NSUInteger offset, NSUInteger instanceStride);
+    [Selector("drawIndexedPatches:patchStart:patchCount:patchIndexBuffer:patchIndexBufferOffset:controlPointIndexBuffer:controlPointIndexBufferOffset:instanceCount:baseInstance:tessellationFactorBuffer:tessellationFactorBufferOffset:tessellationFactorBufferInstanceStride:")]
+    void DrawIndexedPatchesPatchStartPatchCountPatchIndexBufferPatchIndexBufferOffsetControlPointIndexBufferControlPointIndexBufferOffsetInstanceCountBaseInstanceTessellationFactorBufferTessellationFactorBufferOffsetTessellationFactorBufferInstanceStride(NSUInteger numberOfPatchControlPoints, NSUInteger patchStart, NSUInteger patchCount, MTLBuffer? patchIndexBuffer, NSUInteger patchIndexBufferOffset, MTLBuffer controlPointIndexBuffer, NSUInteger controlPointIndexBufferOffset, NSUInteger instanceCount, NSUInteger baseInstance, MTLBuffer buffer, NSUInteger offset, NSUInteger instanceStride);
+    [Selector("drawPrimitives:vertexStart:vertexCount:instanceCount:baseInstance:")]
+    void DrawPrimitivesVertexStartVertexCountInstanceCountBaseInstance(MTLPrimitiveType primitiveType, NSUInteger vertexStart, NSUInteger vertexCount, NSUInteger instanceCount, NSUInteger baseInstance);
+    [Selector("drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferOffset:instanceCount:baseVertex:baseInstance:")]
+    void DrawIndexedPrimitivesIndexCountIndexTypeIndexBufferIndexBufferOffsetInstanceCountBaseVertexBaseInstance(MTLPrimitiveType primitiveType, NSUInteger indexCount, MTLIndexType indexType, MTLBuffer indexBuffer, NSUInteger indexBufferOffset, NSUInteger instanceCount, NSInteger baseVertex, NSUInteger baseInstance);
+    [Selector("setObjectThreadgroupMemoryLength:atIndex:")]
+    void SetObjectThreadgroupMemoryLengthAtIndex(NSUInteger length, NSUInteger index);
+    [Selector("setObjectBuffer:offset:atIndex:")]
+    void SetObjectBufferOffsetAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger index);
+    [Selector("setMeshBuffer:offset:atIndex:")]
+    void SetMeshBufferOffsetAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger index);
+    [Selector("drawMeshThreadgroups:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")]
+    void DrawMeshThreadgroupsThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLSize threadgroupsPerGrid, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
+    [Selector("drawMeshThreads:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:")]
+    void DrawMeshThreadsThreadsPerObjectThreadgroupThreadsPerMeshThreadgroup(MTLSize threadsPerGrid, MTLSize threadsPerObjectThreadgroup, MTLSize threadsPerMeshThreadgroup);
+    [Selector("setBarrier")]
+    void SetBarrier();
+    [Selector("clearBarrier")]
+    void ClearBarrier();
     /// macOS 26.0 and later.
-    [Selector("setDepthStencilState:")] void SetDepthStencilState(MTLDepthStencilState? depthStencilState);
+    [Selector("setDepthStencilState:")]
+    void SetDepthStencilState(MTLDepthStencilState? depthStencilState);
     /// macOS 26.0 and later.
-    [Selector("setDepthBias:slopeScale:clamp:")] void SetDepthBiasSlopeScaleClamp(float depthBias, float slopeScale, float clamp);
+    [Selector("setDepthBias:slopeScale:clamp:")]
+    void SetDepthBiasSlopeScaleClamp(float depthBias, float slopeScale, float clamp);
     /// macOS 26.0 and later.
-    [Selector("setDepthClipMode:")] void SetDepthClipMode(MTLDepthClipMode depthClipMode);
+    [Selector("setDepthClipMode:")]
+    void SetDepthClipMode(MTLDepthClipMode depthClipMode);
     /// macOS 26.0 and later.
-    [Selector("setCullMode:")] void SetCullMode(MTLCullMode cullMode);
+    [Selector("setCullMode:")]
+    void SetCullMode(MTLCullMode cullMode);
     /// macOS 26.0 and later.
-    [Selector("setFrontFacingWinding:")] void SetFrontFacingWinding(MTLWinding frontFacingWindning);
+    [Selector("setFrontFacingWinding:")]
+    void SetFrontFacingWinding(MTLWinding frontFacingWindning);
     /// macOS 26.0 and later.
-    [Selector("setTriangleFillMode:")] void SetTriangleFillMode(MTLTriangleFillMode fillMode);
-    [Selector("reset")] void Reset();
+    [Selector("setTriangleFillMode:")]
+    void SetTriangleFillMode(MTLTriangleFillMode fillMode);
+    [Selector("reset")]
+    void Reset();
 }
 
 public objc interface MTLIndirectComputeCommand : NSObjectProtocol
 {
-    [Selector("setComputePipelineState:")] void SetComputePipelineState(MTLComputePipelineState pipelineState);
-    [Selector("setKernelBuffer:offset:atIndex:")] void SetKernelBufferOffsetAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger index);
-    [Selector("setKernelBuffer:offset:attributeStride:atIndex:")] void SetKernelBufferOffsetAttributeStrideAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger stride, NSUInteger index);
-    [Selector("concurrentDispatchThreadgroups:threadsPerThreadgroup:")] void ConcurrentDispatchThreadgroupsThreadsPerThreadgroup(MTLSize threadgroupsPerGrid, MTLSize threadsPerThreadgroup);
-    [Selector("concurrentDispatchThreads:threadsPerThreadgroup:")] void ConcurrentDispatchThreadsThreadsPerThreadgroup(MTLSize threadsPerGrid, MTLSize threadsPerThreadgroup);
-    [Selector("setBarrier")] void SetBarrier();
-    [Selector("clearBarrier")] void ClearBarrier();
-    [Selector("setImageblockWidth:height:")] void SetImageblockWidthHeight(NSUInteger width, NSUInteger height);
-    [Selector("reset")] void Reset();
-    [Selector("setThreadgroupMemoryLength:atIndex:")] void SetThreadgroupMemoryLengthAtIndex(NSUInteger length, NSUInteger index);
-    [Selector("setStageInRegion:")] void SetStageInRegion(MTLRegion region);
+    [Selector("setComputePipelineState:")]
+    void SetComputePipelineState(MTLComputePipelineState pipelineState);
+    [Selector("setKernelBuffer:offset:atIndex:")]
+    void SetKernelBufferOffsetAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger index);
+    [Selector("setKernelBuffer:offset:attributeStride:atIndex:")]
+    void SetKernelBufferOffsetAttributeStrideAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger stride, NSUInteger index);
+    [Selector("concurrentDispatchThreadgroups:threadsPerThreadgroup:")]
+    void ConcurrentDispatchThreadgroupsThreadsPerThreadgroup(MTLSize threadgroupsPerGrid, MTLSize threadsPerThreadgroup);
+    [Selector("concurrentDispatchThreads:threadsPerThreadgroup:")]
+    void ConcurrentDispatchThreadsThreadsPerThreadgroup(MTLSize threadsPerGrid, MTLSize threadsPerThreadgroup);
+    [Selector("setBarrier")]
+    void SetBarrier();
+    [Selector("clearBarrier")]
+    void ClearBarrier();
+    [Selector("setImageblockWidth:height:")]
+    void SetImageblockWidthHeight(NSUInteger width, NSUInteger height);
+    [Selector("reset")]
+    void Reset();
+    [Selector("setThreadgroupMemoryLength:atIndex:")]
+    void SetThreadgroupMemoryLengthAtIndex(NSUInteger length, NSUInteger index);
+    [Selector("setStageInRegion:")]
+    void SetStageInRegion(MTLRegion region);
 }
 
 #endif

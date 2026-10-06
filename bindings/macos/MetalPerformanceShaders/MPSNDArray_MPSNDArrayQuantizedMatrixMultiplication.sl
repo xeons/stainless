@@ -33,23 +33,28 @@ import Standard.ObjC;
 
 public extern objc class MPSNDArrayQuantizedMatrixMultiplication : MPSNDArrayMatrixMultiplication
 {
-    [Selector("initWithDevice:leftQuantizationDescriptor:rightQuantizationDescriptor:")] public Self InitWithDeviceLeftQuantizationDescriptorRightQuantizationDescriptor(MTLDevice device, MPSNDArrayQuantizationDescriptor? leftQuantizationDescriptor, MPSNDArrayQuantizationDescriptor? rightQuantizationDescriptor);
+    [Selector("initWithDevice:leftQuantizationDescriptor:rightQuantizationDescriptor:")]
+    public Self InitWithDeviceLeftQuantizationDescriptorRightQuantizationDescriptor(MTLDevice device, MPSNDArrayQuantizationDescriptor? leftQuantizationDescriptor, MPSNDArrayQuantizationDescriptor? rightQuantizationDescriptor);
 }
 
 public extern objc class MPSNDArrayLUTDequantize : MPSNDArrayMultiaryKernel
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
 }
 
 public extern objc class MPSNDArrayVectorLUTDequantize : MPSNDArrayMultiaryKernel
 {
-    [Selector("vectorAxis", "setVectorAxis:")] public NSUInteger VectorAxis { get; set; }
-    [Selector("initWithDevice:axis:")] public Self InitWithDeviceAxis(MTLDevice device, NSUInteger axis);
+    [Selector("vectorAxis", "setVectorAxis:")]
+    public NSUInteger VectorAxis { get; set; }
+    [Selector("initWithDevice:axis:")]
+    public Self InitWithDeviceAxis(MTLDevice device, NSUInteger axis);
 }
 
 public extern objc class MPSNDArrayAffineInt4Dequantize : MPSNDArrayMultiaryKernel
 {
-    [Selector("initWithDevice:quantizationDescriptor:")] public Self InitWithDeviceQuantizationDescriptor(MTLDevice device, MPSNDArrayAffineQuantizationDescriptor quantizationDescriptor);
+    [Selector("initWithDevice:quantizationDescriptor:")]
+    public Self InitWithDeviceQuantizationDescriptor(MTLDevice device, MPSNDArrayAffineQuantizationDescriptor quantizationDescriptor);
 }
 
 #endif

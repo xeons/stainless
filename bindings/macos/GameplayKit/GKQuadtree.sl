@@ -33,19 +33,28 @@ import Standard.ObjC;
 
 public extern objc class GKQuadtreeNode : NSObject
 {
-    [Selector("quad")] public GKQuad Quad { get; }
+    [Selector("quad")]
+    public GKQuad Quad { get; }
 }
 
 public extern objc class GKQuadtree : NSObject
 {
-    [Selector("quadtreeWithBoundingQuad:minimumCellSize:")] public static Self QuadtreeWithBoundingQuadMinimumCellSize(GKQuad quad, float minCellSize);
-    [Selector("initWithBoundingQuad:minimumCellSize:")] public Self InitWithBoundingQuadMinimumCellSize(GKQuad quad, float minCellSize);
-    [Selector("addElement:withPoint:")] public GKQuadtreeNode AddElementWithPoint(AnyObject element, vector_float2 point);
-    [Selector("addElement:withQuad:")] public GKQuadtreeNode AddElementWithQuad(AnyObject element, GKQuad quad);
-    [Selector("elementsAtPoint:")] public NSArray ElementsAtPoint(vector_float2 point);
-    [Selector("elementsInQuad:")] public NSArray ElementsInQuad(GKQuad quad);
-    [Selector("removeElement:")] public bool RemoveElement(AnyObject element);
-    [Selector("removeElement:withNode:")] public bool RemoveElementWithNode(AnyObject data, GKQuadtreeNode node);
+    [Selector("quadtreeWithBoundingQuad:minimumCellSize:")]
+    public static Self QuadtreeWithBoundingQuadMinimumCellSize(GKQuad quad, float minCellSize);
+    [Selector("initWithBoundingQuad:minimumCellSize:")]
+    public Self InitWithBoundingQuadMinimumCellSize(GKQuad quad, float minCellSize);
+    [Selector("addElement:withPoint:")]
+    public GKQuadtreeNode AddElementWithPoint(AnyObject element, vector_float2 point);
+    [Selector("addElement:withQuad:")]
+    public GKQuadtreeNode AddElementWithQuad(AnyObject element, GKQuad quad);
+    [Selector("elementsAtPoint:")]
+    public NSArray ElementsAtPoint(vector_float2 point);
+    [Selector("elementsInQuad:")]
+    public NSArray ElementsInQuad(GKQuad quad);
+    [Selector("removeElement:")]
+    public bool RemoveElement(AnyObject element);
+    [Selector("removeElement:withNode:")]
+    public bool RemoveElementWithNode(AnyObject data, GKQuadtreeNode node);
 }
 
 #endif

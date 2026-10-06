@@ -35,10 +35,14 @@ import Standard.ObjC;
 /// WebPlugInContainer, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("webPlugInContainerSelectionColor")] public NSColor? WebPlugInContainerSelectionColor { get; }
-    [Selector("webFrame")] public WebFrame? WebFrame { get; }
-    [Selector("webPlugInContainerLoadRequest:inFrame:")] public void WebPlugInContainerLoadRequestInFrame(NSURLRequest? request, NSString? target);
-    [Selector("webPlugInContainerShowStatus:")] public void WebPlugInContainerShowStatus(NSString? message);
+    [Selector("webPlugInContainerSelectionColor")]
+    public NSColor? WebPlugInContainerSelectionColor { get; }
+    [Selector("webFrame")]
+    public WebFrame? WebFrame { get; }
+    [Selector("webPlugInContainerLoadRequest:inFrame:")]
+    public void WebPlugInContainerLoadRequestInFrame(NSURLRequest? request, NSString? target);
+    [Selector("webPlugInContainerShowStatus:")]
+    public void WebPlugInContainerShowStatus(NSString? message);
 }
 
 #endif

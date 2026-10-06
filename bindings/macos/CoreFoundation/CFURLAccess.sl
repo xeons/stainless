@@ -40,7 +40,8 @@ public extern "C" Boolean CFURLWriteDataAndPropertiesToResource(CFURLRef? url, C
 public extern "C" Boolean CFURLDestroyResource(CFURLRef? url, SInt32* errorCode);
 
 /// Deprecated in macOS 10.9.
-[ReturnsRetained] public extern "C" CFTypeRef? CFURLCreatePropertyFromResource(CFAllocatorRef? alloc, CFURLRef? url, CFStringRef? property, SInt32* errorCode);
+[ReturnsRetained]
+public extern "C" CFTypeRef? CFURLCreatePropertyFromResource(CFAllocatorRef? alloc, CFURLRef? url, CFStringRef? property, SInt32* errorCode);
 
 /// Deprecated in macOS 10.9.
 public enum CFURLError : long

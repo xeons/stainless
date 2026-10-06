@@ -33,16 +33,25 @@ import Standard.ObjC;
 
 public objc interface NSPreviewRepresentableActivityItem : NSObjectProtocol
 {
-    [Selector("item")] AnyObject Item { get; }
-    [Optional] [Selector("title")] NSString? Title { get; }
-    [Optional] [Selector("imageProvider")] NSItemProvider? ImageProvider { get; }
-    [Optional] [Selector("iconProvider")] NSItemProvider? IconProvider { get; }
+    [Selector("item")]
+    AnyObject Item { get; }
+    [Optional]
+    [Selector("title")]
+    NSString? Title { get; }
+    [Optional]
+    [Selector("imageProvider")]
+    NSItemProvider? ImageProvider { get; }
+    [Optional]
+    [Selector("iconProvider")]
+    NSItemProvider? IconProvider { get; }
 }
 
 public extern objc class NSPreviewRepresentingActivityItem : NSObject, NSPreviewRepresentableActivityItem
 {
-    [Selector("initWithItem:title:image:icon:")] public Self InitWithItemTitleImageIcon(AnyObject item, NSString? title, NSImage? image, NSImage? icon);
-    [Selector("initWithItem:title:imageProvider:iconProvider:")] public Self InitWithItemTitleImageProviderIconProvider(AnyObject item, NSString? title, NSItemProvider? imageProvider, NSItemProvider? iconProvider);
+    [Selector("initWithItem:title:image:icon:")]
+    public Self InitWithItemTitleImageIcon(AnyObject item, NSString? title, NSImage? image, NSImage? icon);
+    [Selector("initWithItem:title:imageProvider:iconProvider:")]
+    public Self InitWithItemTitleImageProviderIconProvider(AnyObject item, NSString? title, NSItemProvider? imageProvider, NSItemProvider? iconProvider);
 }
 
 #endif

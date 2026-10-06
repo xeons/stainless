@@ -133,10 +133,14 @@ public objc closure NSImage MPMediaItemArtworkInitWithBoundsSizeRequestHandlerRe
 
 public extern objc class MPMediaItemArtwork : NSObject
 {
-    [Selector("bounds")] public CGRect Bounds { get; }
-    [Selector("imageCropRect")] public CGRect ImageCropRect { get; }
-    [Selector("initWithBoundsSize:requestHandler:")] public Self InitWithBoundsSizeRequestHandler(CGSize boundsSize, MPMediaItemArtworkInitWithBoundsSizeRequestHandlerRequestHandlerBlock requestHandler);
-    [Selector("imageWithSize:")] public NSImage? ImageWithSize(CGSize size);
+    [Selector("bounds")]
+    public CGRect Bounds { get; }
+    [Selector("imageCropRect")]
+    public CGRect ImageCropRect { get; }
+    [Selector("initWithBoundsSize:requestHandler:")]
+    public Self InitWithBoundsSizeRequestHandler(CGSize boundsSize, MPMediaItemArtworkInitWithBoundsSizeRequestHandlerRequestHandlerBlock requestHandler);
+    [Selector("imageWithSize:")]
+    public NSImage? ImageWithSize(CGSize size);
 }
 
 public objc closure void MPMediaItemAnimatedArtworkInitWithArtworkIDPreviewImageRequestHandlerVideoAssetFileURLRequestHandlerPreviewImageRequestHandlerBlockArg1Block(NSImage? arg0);
@@ -151,7 +155,8 @@ public objc closure void MPMediaItemAnimatedArtworkInitWithArtworkIDPreviewImage
 public extern objc class MPMediaItemAnimatedArtwork : NSObject
 {
     /// macOS 26.0 and later.
-    [Selector("initWithArtworkID:previewImageRequestHandler:videoAssetFileURLRequestHandler:")] public Self InitWithArtworkIDPreviewImageRequestHandlerVideoAssetFileURLRequestHandler(NSString artworkID, MPMediaItemAnimatedArtworkInitWithArtworkIDPreviewImageRequestHandlerVideoAssetFileURLRequestHandlerPreviewImageRequestHandlerBlock previewImageRequestHandler, MPMediaItemAnimatedArtworkInitWithArtworkIDPreviewImageRequestHandlerVideoAssetFileURLRequestHandlerVideoAssetFileURLRequestHandlerBlock videoAssetFileURLRequestHandler);
+    [Selector("initWithArtworkID:previewImageRequestHandler:videoAssetFileURLRequestHandler:")]
+    public Self InitWithArtworkIDPreviewImageRequestHandlerVideoAssetFileURLRequestHandler(NSString artworkID, MPMediaItemAnimatedArtworkInitWithArtworkIDPreviewImageRequestHandlerVideoAssetFileURLRequestHandlerPreviewImageRequestHandlerBlock previewImageRequestHandler, MPMediaItemAnimatedArtworkInitWithArtworkIDPreviewImageRequestHandlerVideoAssetFileURLRequestHandlerVideoAssetFileURLRequestHandlerBlock videoAssetFileURLRequestHandler);
 }
 
 #endif

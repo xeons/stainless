@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class MTRCommissionableBrowserResult : NSObject
 {
-    [Selector("instanceName")] public NSString InstanceName { get; }
-    [Selector("vendorID")] public NSNumber VendorID { get; }
-    [Selector("productID")] public NSNumber ProductID { get; }
-    [Selector("discriminator")] public NSNumber Discriminator { get; }
-    [Selector("commissioningMode")] public bool CommissioningMode { get; }
+    [Selector("instanceName")]
+    public NSString InstanceName { get; }
+    [Selector("vendorID")]
+    public NSNumber VendorID { get; }
+    [Selector("productID")]
+    public NSNumber ProductID { get; }
+    [Selector("discriminator")]
+    public NSNumber Discriminator { get; }
+    [Selector("commissioningMode")]
+    public bool CommissioningMode { get; }
 }
 
 #endif

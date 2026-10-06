@@ -39,21 +39,36 @@ public using CAEmitterLayerRenderMode = NSString;
 
 public extern objc class CAEmitterLayer : CALayer
 {
-    [Selector("emitterCells", "setEmitterCells:")] public NSArray? EmitterCells { get; set; }
-    [Selector("birthRate", "setBirthRate:")] public float BirthRate { get; set; }
-    [Selector("lifetime", "setLifetime:")] public float Lifetime { get; set; }
-    [Selector("emitterPosition", "setEmitterPosition:")] public CGPoint EmitterPosition { get; set; }
-    [Selector("emitterZPosition", "setEmitterZPosition:")] public CGFloat EmitterZPosition { get; set; }
-    [Selector("emitterSize", "setEmitterSize:")] public CGSize EmitterSize { get; set; }
-    [Selector("emitterDepth", "setEmitterDepth:")] public CGFloat EmitterDepth { get; set; }
-    [Selector("emitterShape", "setEmitterShape:")] public CAEmitterLayerEmitterShape EmitterShape { get; set; }
-    [Selector("emitterMode", "setEmitterMode:")] public CAEmitterLayerEmitterMode EmitterMode { get; set; }
-    [Selector("renderMode", "setRenderMode:")] public CAEmitterLayerRenderMode RenderMode { get; set; }
-    [Selector("preservesDepth", "setPreservesDepth:")] public bool PreservesDepth { get; set; }
-    [Selector("velocity", "setVelocity:")] public float Velocity { get; set; }
-    [Selector("scale", "setScale:")] public float Scale { get; set; }
-    [Selector("spin", "setSpin:")] public float Spin { get; set; }
-    [Selector("seed", "setSeed:")] public uint Seed { get; set; }
+    [Selector("emitterCells", "setEmitterCells:")]
+    public NSArray? EmitterCells { get; set; }
+    [Selector("birthRate", "setBirthRate:")]
+    public float BirthRate { get; set; }
+    [Selector("lifetime", "setLifetime:")]
+    public float Lifetime { get; set; }
+    [Selector("emitterPosition", "setEmitterPosition:")]
+    public CGPoint EmitterPosition { get; set; }
+    [Selector("emitterZPosition", "setEmitterZPosition:")]
+    public CGFloat EmitterZPosition { get; set; }
+    [Selector("emitterSize", "setEmitterSize:")]
+    public CGSize EmitterSize { get; set; }
+    [Selector("emitterDepth", "setEmitterDepth:")]
+    public CGFloat EmitterDepth { get; set; }
+    [Selector("emitterShape", "setEmitterShape:")]
+    public CAEmitterLayerEmitterShape EmitterShape { get; set; }
+    [Selector("emitterMode", "setEmitterMode:")]
+    public CAEmitterLayerEmitterMode EmitterMode { get; set; }
+    [Selector("renderMode", "setRenderMode:")]
+    public CAEmitterLayerRenderMode RenderMode { get; set; }
+    [Selector("preservesDepth", "setPreservesDepth:")]
+    public bool PreservesDepth { get; set; }
+    [Selector("velocity", "setVelocity:")]
+    public float Velocity { get; set; }
+    [Selector("scale", "setScale:")]
+    public float Scale { get; set; }
+    [Selector("spin", "setSpin:")]
+    public float Spin { get; set; }
+    [Selector("seed", "setSeed:")]
+    public uint Seed { get; set; }
 }
 
 public extern "C" CAEmitterLayerEmitterShape? kCAEmitterLayerPoint;

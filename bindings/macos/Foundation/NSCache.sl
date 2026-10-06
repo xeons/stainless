@@ -32,21 +32,33 @@ import Standard.ObjC;
 
 public extern objc class NSCache : NSObject
 {
-    [Selector("name", "setName:")] public NSString Name { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSCacheDelegate? Delegate { get; set; }
-    [Selector("totalCostLimit", "setTotalCostLimit:")] public NSUInteger TotalCostLimit { get; set; }
-    [Selector("countLimit", "setCountLimit:")] public NSUInteger CountLimit { get; set; }
-    [Selector("evictsObjectsWithDiscardedContent", "setEvictsObjectsWithDiscardedContent:")] public bool EvictsObjectsWithDiscardedContent { get; set; }
-    [Selector("objectForKey:")] public AnyObject? ObjectForKey(AnyObject key);
-    [Selector("setObject:forKey:")] public void SetObjectForKey(AnyObject obj, AnyObject key);
-    [Selector("setObject:forKey:cost:")] public void SetObjectForKeyCost(AnyObject obj, AnyObject key, NSUInteger g);
-    [Selector("removeObjectForKey:")] public void RemoveObjectForKey(AnyObject key);
-    [Selector("removeAllObjects")] public void RemoveAllObjects();
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSCacheDelegate? Delegate { get; set; }
+    [Selector("totalCostLimit", "setTotalCostLimit:")]
+    public NSUInteger TotalCostLimit { get; set; }
+    [Selector("countLimit", "setCountLimit:")]
+    public NSUInteger CountLimit { get; set; }
+    [Selector("evictsObjectsWithDiscardedContent", "setEvictsObjectsWithDiscardedContent:")]
+    public bool EvictsObjectsWithDiscardedContent { get; set; }
+    [Selector("objectForKey:")]
+    public AnyObject? ObjectForKey(AnyObject key);
+    [Selector("setObject:forKey:")]
+    public void SetObjectForKey(AnyObject obj, AnyObject key);
+    [Selector("setObject:forKey:cost:")]
+    public void SetObjectForKeyCost(AnyObject obj, AnyObject key, NSUInteger g);
+    [Selector("removeObjectForKey:")]
+    public void RemoveObjectForKey(AnyObject key);
+    [Selector("removeAllObjects")]
+    public void RemoveAllObjects();
 }
 
 public objc interface NSCacheDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("cache:willEvictObject:")] void CacheWillEvictObject(NSCache cache, AnyObject obj);
+    [Optional]
+    [Selector("cache:willEvictObject:")]
+    void CacheWillEvictObject(NSCache cache, AnyObject obj);
 }
 
 #endif

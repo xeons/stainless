@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioGraphicsScanoutConfiguration : VZGraphicsDisplayConfiguration
 {
-    [Selector("widthInPixels", "setWidthInPixels:")] public NSInteger WidthInPixels { get; set; }
-    [Selector("heightInPixels", "setHeightInPixels:")] public NSInteger HeightInPixels { get; set; }
-    [Selector("initWithWidthInPixels:heightInPixels:")] public Self InitWithWidthInPixelsHeightInPixels(NSInteger widthInPixels, NSInteger heightInPixels);
+    [Selector("widthInPixels", "setWidthInPixels:")]
+    public NSInteger WidthInPixels { get; set; }
+    [Selector("heightInPixels", "setHeightInPixels:")]
+    public NSInteger HeightInPixels { get; set; }
+    [Selector("initWithWidthInPixels:heightInPixels:")]
+    public Self InitWithWidthInPixelsHeightInPixels(NSInteger widthInPixels, NSInteger heightInPixels);
 }
 
 #endif

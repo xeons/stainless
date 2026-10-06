@@ -40,64 +40,104 @@ public extern "C" NSExceptionName NSDecimalNumberDivideByZeroException;
 
 public objc interface NSDecimalNumberBehaviors
 {
-    [Selector("roundingMode")] NSRoundingMode RoundingMode();
-    [Selector("scale")] short Scale();
-    [Selector("exceptionDuringOperation:error:leftOperand:rightOperand:")] NSDecimalNumber? ExceptionDuringOperationErrorLeftOperandRightOperand(Selector operation, NSCalculationError error, NSDecimalNumber leftOperand, NSDecimalNumber? rightOperand);
+    [Selector("roundingMode")]
+    NSRoundingMode RoundingMode();
+    [Selector("scale")]
+    short Scale();
+    [Selector("exceptionDuringOperation:error:leftOperand:rightOperand:")]
+    NSDecimalNumber? ExceptionDuringOperationErrorLeftOperandRightOperand(Selector operation, NSCalculationError error, NSDecimalNumber leftOperand, NSDecimalNumber? rightOperand);
 }
 
 public extern objc class NSDecimalNumber : NSNumber
 {
-    [Selector("decimalValue")] public NSDecimal DecimalValue { get; }
-    [Selector("zero")] public static NSDecimalNumber Zero { get; }
-    [Selector("one")] public static NSDecimalNumber One { get; }
-    [Selector("minimumDecimalNumber")] public static NSDecimalNumber MinimumDecimalNumber { get; }
-    [Selector("maximumDecimalNumber")] public static NSDecimalNumber MaximumDecimalNumber { get; }
-    [Selector("notANumber")] public static NSDecimalNumber NotANumber { get; }
-    [Selector("defaultBehavior", "setDefaultBehavior:")] public static NSDecimalNumberBehaviors DefaultBehavior { get; set; }
-    [Selector("objCType")] public byte* ObjCType { get; }
-    [Selector("doubleValue")] public double DoubleValue { get; }
-    [Selector("initWithMantissa:exponent:isNegative:")] public Self InitWithMantissaExponentIsNegative(ulong mantissa, short exponent, bool flag);
-    [Selector("initWithDecimal:")] public Self InitWithDecimal(NSDecimal dcm);
-    [Selector("initWithString:")] public Self InitWithString(NSString? numberValue);
-    [Selector("initWithString:locale:")] public Self InitWithStringLocale(NSString? numberValue, AnyObject? locale);
-    [Selector("descriptionWithLocale:")] public NSString DescriptionWithLocale(AnyObject? locale);
-    [Selector("decimalNumberWithMantissa:exponent:isNegative:")] public static NSDecimalNumber DecimalNumberWithMantissaExponentIsNegative(ulong mantissa, short exponent, bool flag);
-    [Selector("decimalNumberWithDecimal:")] public static NSDecimalNumber DecimalNumberWithDecimal(NSDecimal dcm);
-    [Selector("decimalNumberWithString:")] public static NSDecimalNumber DecimalNumberWithString(NSString? numberValue);
-    [Selector("decimalNumberWithString:locale:")] public static NSDecimalNumber DecimalNumberWithStringLocale(NSString? numberValue, AnyObject? locale);
-    [Selector("decimalNumberByAdding:")] public NSDecimalNumber DecimalNumberByAdding(NSDecimalNumber decimalNumber);
-    [Selector("decimalNumberByAdding:withBehavior:")] public NSDecimalNumber DecimalNumberByAddingWithBehavior(NSDecimalNumber decimalNumber, NSDecimalNumberBehaviors? behavior);
-    [Selector("decimalNumberBySubtracting:")] public NSDecimalNumber DecimalNumberBySubtracting(NSDecimalNumber decimalNumber);
-    [Selector("decimalNumberBySubtracting:withBehavior:")] public NSDecimalNumber DecimalNumberBySubtractingWithBehavior(NSDecimalNumber decimalNumber, NSDecimalNumberBehaviors? behavior);
-    [Selector("decimalNumberByMultiplyingBy:")] public NSDecimalNumber DecimalNumberByMultiplyingBy(NSDecimalNumber decimalNumber);
-    [Selector("decimalNumberByMultiplyingBy:withBehavior:")] public NSDecimalNumber DecimalNumberByMultiplyingByWithBehavior(NSDecimalNumber decimalNumber, NSDecimalNumberBehaviors? behavior);
-    [Selector("decimalNumberByDividingBy:")] public NSDecimalNumber DecimalNumberByDividingBy(NSDecimalNumber decimalNumber);
-    [Selector("decimalNumberByDividingBy:withBehavior:")] public NSDecimalNumber DecimalNumberByDividingByWithBehavior(NSDecimalNumber decimalNumber, NSDecimalNumberBehaviors? behavior);
-    [Selector("decimalNumberByRaisingToPower:")] public NSDecimalNumber DecimalNumberByRaisingToPower(NSUInteger power);
-    [Selector("decimalNumberByRaisingToPower:withBehavior:")] public NSDecimalNumber DecimalNumberByRaisingToPowerWithBehavior(NSUInteger power, NSDecimalNumberBehaviors? behavior);
-    [Selector("decimalNumberByMultiplyingByPowerOf10:")] public NSDecimalNumber DecimalNumberByMultiplyingByPowerOf10(short power);
-    [Selector("decimalNumberByMultiplyingByPowerOf10:withBehavior:")] public NSDecimalNumber DecimalNumberByMultiplyingByPowerOf10WithBehavior(short power, NSDecimalNumberBehaviors? behavior);
-    [Selector("decimalNumberByRoundingAccordingToBehavior:")] public NSDecimalNumber DecimalNumberByRoundingAccordingToBehavior(NSDecimalNumberBehaviors? behavior);
-    [Selector("compare:")] public NSComparisonResult Compare(NSNumber decimalNumber);
+    [Selector("decimalValue")]
+    public NSDecimal DecimalValue { get; }
+    [Selector("zero")]
+    public static NSDecimalNumber Zero { get; }
+    [Selector("one")]
+    public static NSDecimalNumber One { get; }
+    [Selector("minimumDecimalNumber")]
+    public static NSDecimalNumber MinimumDecimalNumber { get; }
+    [Selector("maximumDecimalNumber")]
+    public static NSDecimalNumber MaximumDecimalNumber { get; }
+    [Selector("notANumber")]
+    public static NSDecimalNumber NotANumber { get; }
+    [Selector("defaultBehavior", "setDefaultBehavior:")]
+    public static NSDecimalNumberBehaviors DefaultBehavior { get; set; }
+    [Selector("objCType")]
+    public byte* ObjCType { get; }
+    [Selector("doubleValue")]
+    public double DoubleValue { get; }
+    [Selector("initWithMantissa:exponent:isNegative:")]
+    public Self InitWithMantissaExponentIsNegative(ulong mantissa, short exponent, bool flag);
+    [Selector("initWithDecimal:")]
+    public Self InitWithDecimal(NSDecimal dcm);
+    [Selector("initWithString:")]
+    public Self InitWithString(NSString? numberValue);
+    [Selector("initWithString:locale:")]
+    public Self InitWithStringLocale(NSString? numberValue, AnyObject? locale);
+    [Selector("descriptionWithLocale:")]
+    public NSString DescriptionWithLocale(AnyObject? locale);
+    [Selector("decimalNumberWithMantissa:exponent:isNegative:")]
+    public static NSDecimalNumber DecimalNumberWithMantissaExponentIsNegative(ulong mantissa, short exponent, bool flag);
+    [Selector("decimalNumberWithDecimal:")]
+    public static NSDecimalNumber DecimalNumberWithDecimal(NSDecimal dcm);
+    [Selector("decimalNumberWithString:")]
+    public static NSDecimalNumber DecimalNumberWithString(NSString? numberValue);
+    [Selector("decimalNumberWithString:locale:")]
+    public static NSDecimalNumber DecimalNumberWithStringLocale(NSString? numberValue, AnyObject? locale);
+    [Selector("decimalNumberByAdding:")]
+    public NSDecimalNumber DecimalNumberByAdding(NSDecimalNumber decimalNumber);
+    [Selector("decimalNumberByAdding:withBehavior:")]
+    public NSDecimalNumber DecimalNumberByAddingWithBehavior(NSDecimalNumber decimalNumber, NSDecimalNumberBehaviors? behavior);
+    [Selector("decimalNumberBySubtracting:")]
+    public NSDecimalNumber DecimalNumberBySubtracting(NSDecimalNumber decimalNumber);
+    [Selector("decimalNumberBySubtracting:withBehavior:")]
+    public NSDecimalNumber DecimalNumberBySubtractingWithBehavior(NSDecimalNumber decimalNumber, NSDecimalNumberBehaviors? behavior);
+    [Selector("decimalNumberByMultiplyingBy:")]
+    public NSDecimalNumber DecimalNumberByMultiplyingBy(NSDecimalNumber decimalNumber);
+    [Selector("decimalNumberByMultiplyingBy:withBehavior:")]
+    public NSDecimalNumber DecimalNumberByMultiplyingByWithBehavior(NSDecimalNumber decimalNumber, NSDecimalNumberBehaviors? behavior);
+    [Selector("decimalNumberByDividingBy:")]
+    public NSDecimalNumber DecimalNumberByDividingBy(NSDecimalNumber decimalNumber);
+    [Selector("decimalNumberByDividingBy:withBehavior:")]
+    public NSDecimalNumber DecimalNumberByDividingByWithBehavior(NSDecimalNumber decimalNumber, NSDecimalNumberBehaviors? behavior);
+    [Selector("decimalNumberByRaisingToPower:")]
+    public NSDecimalNumber DecimalNumberByRaisingToPower(NSUInteger power);
+    [Selector("decimalNumberByRaisingToPower:withBehavior:")]
+    public NSDecimalNumber DecimalNumberByRaisingToPowerWithBehavior(NSUInteger power, NSDecimalNumberBehaviors? behavior);
+    [Selector("decimalNumberByMultiplyingByPowerOf10:")]
+    public NSDecimalNumber DecimalNumberByMultiplyingByPowerOf10(short power);
+    [Selector("decimalNumberByMultiplyingByPowerOf10:withBehavior:")]
+    public NSDecimalNumber DecimalNumberByMultiplyingByPowerOf10WithBehavior(short power, NSDecimalNumberBehaviors? behavior);
+    [Selector("decimalNumberByRoundingAccordingToBehavior:")]
+    public NSDecimalNumber DecimalNumberByRoundingAccordingToBehavior(NSDecimalNumberBehaviors? behavior);
+    [Selector("compare:")]
+    public NSComparisonResult Compare(NSNumber decimalNumber);
 }
 
 public extern objc class NSDecimalNumberHandler : NSObject, NSDecimalNumberBehaviors, NSCoding
 {
-    [Selector("defaultDecimalNumberHandler")] public static NSDecimalNumberHandler DefaultDecimalNumberHandler { get; }
-    [Selector("initWithRoundingMode:scale:raiseOnExactness:raiseOnOverflow:raiseOnUnderflow:raiseOnDivideByZero:")] public Self InitWithRoundingModeScaleRaiseOnExactnessRaiseOnOverflowRaiseOnUnderflowRaiseOnDivideByZero(NSRoundingMode roundingMode, short scale, bool exact, bool overflow, bool underflow, bool divideByZero);
-    [Selector("decimalNumberHandlerWithRoundingMode:scale:raiseOnExactness:raiseOnOverflow:raiseOnUnderflow:raiseOnDivideByZero:")] public static Self DecimalNumberHandlerWithRoundingModeScaleRaiseOnExactnessRaiseOnOverflowRaiseOnUnderflowRaiseOnDivideByZero(NSRoundingMode roundingMode, short scale, bool exact, bool overflow, bool underflow, bool divideByZero);
+    [Selector("defaultDecimalNumberHandler")]
+    public static NSDecimalNumberHandler DefaultDecimalNumberHandler { get; }
+    [Selector("initWithRoundingMode:scale:raiseOnExactness:raiseOnOverflow:raiseOnUnderflow:raiseOnDivideByZero:")]
+    public Self InitWithRoundingModeScaleRaiseOnExactnessRaiseOnOverflowRaiseOnUnderflowRaiseOnDivideByZero(NSRoundingMode roundingMode, short scale, bool exact, bool overflow, bool underflow, bool divideByZero);
+    [Selector("decimalNumberHandlerWithRoundingMode:scale:raiseOnExactness:raiseOnOverflow:raiseOnUnderflow:raiseOnDivideByZero:")]
+    public static Self DecimalNumberHandlerWithRoundingModeScaleRaiseOnExactnessRaiseOnOverflowRaiseOnUnderflowRaiseOnDivideByZero(NSRoundingMode roundingMode, short scale, bool exact, bool overflow, bool underflow, bool divideByZero);
 }
 
 /// NSDecimalNumberExtensions, a category of NSNumber.
 public extern objc class NSNumber
 {
-    [Selector("decimalValue")] public NSDecimal DecimalValue { get; }
+    [Selector("decimalValue")]
+    public NSDecimal DecimalValue { get; }
 }
 
 /// NSDecimalNumberScanning, a category of NSScanner.
 public extern objc class NSScanner
 {
-    [Selector("scanDecimal:")] public bool ScanDecimal(NSDecimal* dcm);
+    [Selector("scanDecimal:")]
+    public bool ScanDecimal(NSDecimal* dcm);
 }
 
 #endif

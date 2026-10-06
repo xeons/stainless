@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "IOKit")
 
-[ReturnsRetained] public extern "C" CFTypeRef? IOURLCreatePropertyFromResource(CFAllocatorRef? alloc, CFURLRef? url, CFStringRef? property, SInt32* errorCode);
+[ReturnsRetained]
+public extern "C" CFTypeRef? IOURLCreatePropertyFromResource(CFAllocatorRef? alloc, CFURLRef? url, CFStringRef? property, SInt32* errorCode);
 
 public extern "C" Boolean IOURLCreateDataAndPropertiesFromResource(CFAllocatorRef? alloc, CFURLRef? url, __CFData** resourceData, __CFDictionary** properties, CFArrayRef? desiredProperties, SInt32* errorCode);
 

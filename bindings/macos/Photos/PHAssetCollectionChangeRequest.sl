@@ -33,18 +33,30 @@ import Standard.ObjC;
 
 public extern objc class PHAssetCollectionChangeRequest : PHChangeRequest
 {
-    [Selector("placeholderForCreatedAssetCollection")] public PHObjectPlaceholder PlaceholderForCreatedAssetCollection { get; }
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("creationRequestForAssetCollectionWithTitle:")] public static Self CreationRequestForAssetCollectionWithTitle(NSString title);
-    [Selector("deleteAssetCollections:")] public static void DeleteAssetCollections(NSFastEnumeration assetCollections);
-    [Selector("changeRequestForAssetCollection:")] public static Self? ChangeRequestForAssetCollection(PHAssetCollection assetCollection);
-    [Selector("changeRequestForAssetCollection:assets:")] public static Self? ChangeRequestForAssetCollectionAssets(PHAssetCollection assetCollection, PHFetchResult? assets);
-    [Selector("addAssets:")] public void AddAssets(NSFastEnumeration assets);
-    [Selector("insertAssets:atIndexes:")] public void InsertAssetsAtIndexes(NSFastEnumeration assets, NSIndexSet indexes);
-    [Selector("removeAssets:")] public void RemoveAssets(NSFastEnumeration assets);
-    [Selector("removeAssetsAtIndexes:")] public void RemoveAssetsAtIndexes(NSIndexSet indexes);
-    [Selector("replaceAssetsAtIndexes:withAssets:")] public void ReplaceAssetsAtIndexesWithAssets(NSIndexSet indexes, NSFastEnumeration assets);
-    [Selector("moveAssetsAtIndexes:toIndex:")] public void MoveAssetsAtIndexesToIndex(NSIndexSet fromIndexes, NSUInteger toIndex);
+    [Selector("placeholderForCreatedAssetCollection")]
+    public PHObjectPlaceholder PlaceholderForCreatedAssetCollection { get; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("creationRequestForAssetCollectionWithTitle:")]
+    public static Self CreationRequestForAssetCollectionWithTitle(NSString title);
+    [Selector("deleteAssetCollections:")]
+    public static void DeleteAssetCollections(NSFastEnumeration assetCollections);
+    [Selector("changeRequestForAssetCollection:")]
+    public static Self? ChangeRequestForAssetCollection(PHAssetCollection assetCollection);
+    [Selector("changeRequestForAssetCollection:assets:")]
+    public static Self? ChangeRequestForAssetCollectionAssets(PHAssetCollection assetCollection, PHFetchResult? assets);
+    [Selector("addAssets:")]
+    public void AddAssets(NSFastEnumeration assets);
+    [Selector("insertAssets:atIndexes:")]
+    public void InsertAssetsAtIndexes(NSFastEnumeration assets, NSIndexSet indexes);
+    [Selector("removeAssets:")]
+    public void RemoveAssets(NSFastEnumeration assets);
+    [Selector("removeAssetsAtIndexes:")]
+    public void RemoveAssetsAtIndexes(NSIndexSet indexes);
+    [Selector("replaceAssetsAtIndexes:withAssets:")]
+    public void ReplaceAssetsAtIndexesWithAssets(NSIndexSet indexes, NSFastEnumeration assets);
+    [Selector("moveAssetsAtIndexes:toIndex:")]
+    public void MoveAssetsAtIndexesToIndex(NSIndexSet fromIndexes, NSUInteger toIndex);
 }
 
 #endif

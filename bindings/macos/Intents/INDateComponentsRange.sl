@@ -34,11 +34,16 @@ import Standard.ObjC;
 
 public extern objc class INDateComponentsRange : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("startDateComponents")] public NSDateComponents? StartDateComponents { get; }
-    [Selector("endDateComponents")] public NSDateComponents? EndDateComponents { get; }
-    [Selector("initWithStartDateComponents:endDateComponents:")] public Self InitWithStartDateComponentsEndDateComponents(NSDateComponents? startDateComponents, NSDateComponents? endDateComponents);
-    [Selector("initWithEKRecurrenceRule:")] public Self InitWithEKRecurrenceRule(EKRecurrenceRule recurrenceRule);
-    [Selector("EKRecurrenceRule")] public EKRecurrenceRule? EKRecurrenceRule();
+    [Selector("startDateComponents")]
+    public NSDateComponents? StartDateComponents { get; }
+    [Selector("endDateComponents")]
+    public NSDateComponents? EndDateComponents { get; }
+    [Selector("initWithStartDateComponents:endDateComponents:")]
+    public Self InitWithStartDateComponentsEndDateComponents(NSDateComponents? startDateComponents, NSDateComponents? endDateComponents);
+    [Selector("initWithEKRecurrenceRule:")]
+    public Self InitWithEKRecurrenceRule(EKRecurrenceRule recurrenceRule);
+    [Selector("EKRecurrenceRule")]
+    public EKRecurrenceRule? EKRecurrenceRule();
 }
 
 #endif

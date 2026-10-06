@@ -42,8 +42,10 @@ public enum INSendMessageRecipientUnsupportedReason : long
 
 public extern objc class INSendMessageRecipientResolutionResult : INPersonResolutionResult
 {
-    [Selector("unsupportedForReason:")] public static Self UnsupportedForReason(INSendMessageRecipientUnsupportedReason reason);
-    [Selector("initWithPersonResolutionResult:")] public Self InitWithPersonResolutionResult(INPersonResolutionResult personResolutionResult);
+    [Selector("unsupportedForReason:")]
+    public static Self UnsupportedForReason(INSendMessageRecipientUnsupportedReason reason);
+    [Selector("initWithPersonResolutionResult:")]
+    public Self InitWithPersonResolutionResult(INPersonResolutionResult personResolutionResult);
 }
 
 #endif

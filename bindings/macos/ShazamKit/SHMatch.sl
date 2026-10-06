@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class SHMatch : NSObject, NSSecureCoding
 {
-    [Selector("mediaItems")] public NSArray MediaItems { get; }
-    [Selector("querySignature")] public SHSignature QuerySignature { get; }
+    [Selector("mediaItems")]
+    public NSArray MediaItems { get; }
+    [Selector("querySignature")]
+    public SHSignature QuerySignature { get; }
 }
 
 #endif

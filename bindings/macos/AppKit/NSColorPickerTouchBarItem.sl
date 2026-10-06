@@ -32,18 +32,30 @@ import Standard.ObjC;
 
 public extern objc class NSColorPickerTouchBarItem : NSTouchBarItem
 {
-    [Selector("color", "setColor:")] public NSColor Color { get; set; }
-    [Selector("showsAlpha", "setShowsAlpha:")] public bool ShowsAlpha { get; set; }
-    [Selector("allowedColorSpaces", "setAllowedColorSpaces:")] public NSArray? AllowedColorSpaces { get; set; }
-    [Selector("colorList", "setColorList:")] public NSColorList? ColorList { get; set; }
-    [Selector("customizationLabel", "setCustomizationLabel:")] public NSString? CustomizationLabel { get; set; }
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
-    [Selector("action", "setAction:")] public Selector Action { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("colorPickerWithIdentifier:")] public static Self ColorPickerWithIdentifier(NSTouchBarItemIdentifier identifier);
-    [Selector("textColorPickerWithIdentifier:")] public static Self TextColorPickerWithIdentifier(NSTouchBarItemIdentifier identifier);
-    [Selector("strokeColorPickerWithIdentifier:")] public static Self StrokeColorPickerWithIdentifier(NSTouchBarItemIdentifier identifier);
-    [Selector("colorPickerWithIdentifier:buttonImage:")] public static Self ColorPickerWithIdentifierButtonImage(NSTouchBarItemIdentifier identifier, NSImage image);
+    [Selector("color", "setColor:")]
+    public NSColor Color { get; set; }
+    [Selector("showsAlpha", "setShowsAlpha:")]
+    public bool ShowsAlpha { get; set; }
+    [Selector("allowedColorSpaces", "setAllowedColorSpaces:")]
+    public NSArray? AllowedColorSpaces { get; set; }
+    [Selector("colorList", "setColorList:")]
+    public NSColorList? ColorList { get; set; }
+    [Selector("customizationLabel", "setCustomizationLabel:")]
+    public NSString? CustomizationLabel { get; set; }
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
+    [Selector("action", "setAction:")]
+    public Selector Action { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("colorPickerWithIdentifier:")]
+    public static Self ColorPickerWithIdentifier(NSTouchBarItemIdentifier identifier);
+    [Selector("textColorPickerWithIdentifier:")]
+    public static Self TextColorPickerWithIdentifier(NSTouchBarItemIdentifier identifier);
+    [Selector("strokeColorPickerWithIdentifier:")]
+    public static Self StrokeColorPickerWithIdentifier(NSTouchBarItemIdentifier identifier);
+    [Selector("colorPickerWithIdentifier:buttonImage:")]
+    public static Self ColorPickerWithIdentifierButtonImage(NSTouchBarItemIdentifier identifier, NSImage image);
 }
 
 #endif

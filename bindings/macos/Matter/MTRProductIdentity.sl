@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class MTRProductIdentity : NSObject
 {
-    [Selector("vendorID")] public NSNumber VendorID { get; }
-    [Selector("productID")] public NSNumber ProductID { get; }
-    [Selector("initWithVendorID:productID:")] public Self InitWithVendorIDProductID(NSNumber vendorID, NSNumber productID);
+    [Selector("vendorID")]
+    public NSNumber VendorID { get; }
+    [Selector("productID")]
+    public NSNumber ProductID { get; }
+    [Selector("initWithVendorID:productID:")]
+    public Self InitWithVendorIDProductID(NSNumber vendorID, NSNumber productID);
 }
 
 /// macOS 15.4 and later.

@@ -33,140 +33,218 @@ import Standard.ObjC;
 
 public extern objc class NSSymbolEffectOptionsRepeatBehavior : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("behaviorPeriodic")] public static Self BehaviorPeriodic();
-    [Selector("behaviorPeriodicWithCount:")] public static Self BehaviorPeriodicWithCount(NSInteger count);
-    [Selector("behaviorPeriodicWithDelay:")] public static Self BehaviorPeriodicWithDelay(double delay);
-    [Selector("behaviorPeriodicWithCount:delay:")] public static Self BehaviorPeriodicWithCountDelay(NSInteger count, double delay);
-    [Selector("behaviorContinuous")] public static Self BehaviorContinuous();
+    [Selector("behaviorPeriodic")]
+    public static Self BehaviorPeriodic();
+    [Selector("behaviorPeriodicWithCount:")]
+    public static Self BehaviorPeriodicWithCount(NSInteger count);
+    [Selector("behaviorPeriodicWithDelay:")]
+    public static Self BehaviorPeriodicWithDelay(double delay);
+    [Selector("behaviorPeriodicWithCount:delay:")]
+    public static Self BehaviorPeriodicWithCountDelay(NSInteger count, double delay);
+    [Selector("behaviorContinuous")]
+    public static Self BehaviorContinuous();
 }
 
 public extern objc class NSSymbolEffectOptions : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("options")] public static Self Options();
+    [Selector("options")]
+    public static Self Options();
     /// Deprecated in macOS 100000.
-    [Selector("optionsWithRepeating")] public static Self OptionsWithRepeating();
+    [Selector("optionsWithRepeating")]
+    public static Self OptionsWithRepeating();
     /// Deprecated in macOS 100000.
-    [Selector("optionsWithRepeating")] public Self OptionsWithRepeatingMethod();
-    [Selector("optionsWithNonRepeating")] public static Self OptionsWithNonRepeating();
-    [Selector("optionsWithNonRepeating")] public Self OptionsWithNonRepeatingMethod();
+    [Selector("optionsWithRepeating")]
+    public Self OptionsWithRepeatingMethod();
+    [Selector("optionsWithNonRepeating")]
+    public static Self OptionsWithNonRepeating();
+    [Selector("optionsWithNonRepeating")]
+    public Self OptionsWithNonRepeatingMethod();
     /// Deprecated in macOS 100000.
-    [Selector("optionsWithRepeatCount:")] public static Self OptionsWithRepeatCount(NSInteger count);
+    [Selector("optionsWithRepeatCount:")]
+    public static Self OptionsWithRepeatCount(NSInteger count);
     /// Deprecated in macOS 100000.
-    [Selector("optionsWithRepeatCount:")] public Self OptionsWithRepeatCountMethod(NSInteger count);
-    [Selector("optionsWithSpeed:")] public static Self OptionsWithSpeed(double speed);
-    [Selector("optionsWithSpeed:")] public Self OptionsWithSpeedMethod(double speed);
-    [Selector("optionsWithRepeatBehavior:")] public static Self OptionsWithRepeatBehavior(NSSymbolEffectOptionsRepeatBehavior behavior);
-    [Selector("optionsWithRepeatBehavior:")] public Self OptionsWithRepeatBehaviorMethod(NSSymbolEffectOptionsRepeatBehavior behavior);
+    [Selector("optionsWithRepeatCount:")]
+    public Self OptionsWithRepeatCountMethod(NSInteger count);
+    [Selector("optionsWithSpeed:")]
+    public static Self OptionsWithSpeed(double speed);
+    [Selector("optionsWithSpeed:")]
+    public Self OptionsWithSpeedMethod(double speed);
+    [Selector("optionsWithRepeatBehavior:")]
+    public static Self OptionsWithRepeatBehavior(NSSymbolEffectOptionsRepeatBehavior behavior);
+    [Selector("optionsWithRepeatBehavior:")]
+    public Self OptionsWithRepeatBehaviorMethod(NSSymbolEffectOptionsRepeatBehavior behavior);
 }
 
 public extern objc class NSSymbolEffect : NSObject, NSCopying, NSSecureCoding { }
 
 public extern objc class NSSymbolPulseEffect : NSSymbolEffect
 {
-    [Selector("effect")] public static Self Effect();
-    [Selector("effectWithByLayer")] public Self EffectWithByLayer();
-    [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
+    [Selector("effect")]
+    public static Self Effect();
+    [Selector("effectWithByLayer")]
+    public Self EffectWithByLayer();
+    [Selector("effectWithWholeSymbol")]
+    public Self EffectWithWholeSymbol();
 }
 
 public extern objc class NSSymbolBounceEffect : NSSymbolEffect
 {
-    [Selector("effect")] public static Self Effect();
-    [Selector("bounceUpEffect")] public static Self BounceUpEffect();
-    [Selector("bounceDownEffect")] public static Self BounceDownEffect();
-    [Selector("effectWithByLayer")] public Self EffectWithByLayer();
-    [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
+    [Selector("effect")]
+    public static Self Effect();
+    [Selector("bounceUpEffect")]
+    public static Self BounceUpEffect();
+    [Selector("bounceDownEffect")]
+    public static Self BounceDownEffect();
+    [Selector("effectWithByLayer")]
+    public Self EffectWithByLayer();
+    [Selector("effectWithWholeSymbol")]
+    public Self EffectWithWholeSymbol();
 }
 
 public extern objc class NSSymbolVariableColorEffect : NSSymbolEffect
 {
-    [Selector("effect")] public static Self Effect();
-    [Selector("effectWithIterative")] public Self EffectWithIterative();
-    [Selector("effectWithCumulative")] public Self EffectWithCumulative();
-    [Selector("effectWithReversing")] public Self EffectWithReversing();
-    [Selector("effectWithNonReversing")] public Self EffectWithNonReversing();
-    [Selector("effectWithHideInactiveLayers")] public Self EffectWithHideInactiveLayers();
-    [Selector("effectWithDimInactiveLayers")] public Self EffectWithDimInactiveLayers();
+    [Selector("effect")]
+    public static Self Effect();
+    [Selector("effectWithIterative")]
+    public Self EffectWithIterative();
+    [Selector("effectWithCumulative")]
+    public Self EffectWithCumulative();
+    [Selector("effectWithReversing")]
+    public Self EffectWithReversing();
+    [Selector("effectWithNonReversing")]
+    public Self EffectWithNonReversing();
+    [Selector("effectWithHideInactiveLayers")]
+    public Self EffectWithHideInactiveLayers();
+    [Selector("effectWithDimInactiveLayers")]
+    public Self EffectWithDimInactiveLayers();
 }
 
 public extern objc class NSSymbolScaleEffect : NSSymbolEffect
 {
-    [Selector("effect")] public static Self Effect();
-    [Selector("scaleUpEffect")] public static Self ScaleUpEffect();
-    [Selector("scaleDownEffect")] public static Self ScaleDownEffect();
-    [Selector("effectWithByLayer")] public Self EffectWithByLayer();
-    [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
+    [Selector("effect")]
+    public static Self Effect();
+    [Selector("scaleUpEffect")]
+    public static Self ScaleUpEffect();
+    [Selector("scaleDownEffect")]
+    public static Self ScaleDownEffect();
+    [Selector("effectWithByLayer")]
+    public Self EffectWithByLayer();
+    [Selector("effectWithWholeSymbol")]
+    public Self EffectWithWholeSymbol();
 }
 
 public extern objc class NSSymbolAppearEffect : NSSymbolEffect
 {
-    [Selector("effect")] public static Self Effect();
-    [Selector("appearUpEffect")] public static Self AppearUpEffect();
-    [Selector("appearDownEffect")] public static Self AppearDownEffect();
-    [Selector("effectWithByLayer")] public Self EffectWithByLayer();
-    [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
+    [Selector("effect")]
+    public static Self Effect();
+    [Selector("appearUpEffect")]
+    public static Self AppearUpEffect();
+    [Selector("appearDownEffect")]
+    public static Self AppearDownEffect();
+    [Selector("effectWithByLayer")]
+    public Self EffectWithByLayer();
+    [Selector("effectWithWholeSymbol")]
+    public Self EffectWithWholeSymbol();
 }
 
 public extern objc class NSSymbolDisappearEffect : NSSymbolEffect
 {
-    [Selector("effect")] public static Self Effect();
-    [Selector("disappearUpEffect")] public static Self DisappearUpEffect();
-    [Selector("disappearDownEffect")] public static Self DisappearDownEffect();
-    [Selector("effectWithByLayer")] public Self EffectWithByLayer();
-    [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
+    [Selector("effect")]
+    public static Self Effect();
+    [Selector("disappearUpEffect")]
+    public static Self DisappearUpEffect();
+    [Selector("disappearDownEffect")]
+    public static Self DisappearDownEffect();
+    [Selector("effectWithByLayer")]
+    public Self EffectWithByLayer();
+    [Selector("effectWithWholeSymbol")]
+    public Self EffectWithWholeSymbol();
 }
 
 public extern objc class NSSymbolWiggleEffect : NSSymbolEffect
 {
-    [Selector("effect")] public static Self Effect();
-    [Selector("wiggleClockwiseEffect")] public static Self WiggleClockwiseEffect();
-    [Selector("wiggleCounterClockwiseEffect")] public static Self WiggleCounterClockwiseEffect();
-    [Selector("wiggleLeftEffect")] public static Self WiggleLeftEffect();
-    [Selector("wiggleRightEffect")] public static Self WiggleRightEffect();
-    [Selector("wiggleUpEffect")] public static Self WiggleUpEffect();
-    [Selector("wiggleDownEffect")] public static Self WiggleDownEffect();
-    [Selector("wiggleForwardEffect")] public static Self WiggleForwardEffect();
-    [Selector("wiggleBackwardEffect")] public static Self WiggleBackwardEffect();
-    [Selector("wiggleCustomAngleEffect:")] public static Self WiggleCustomAngleEffect(double angle);
-    [Selector("effectWithByLayer")] public Self EffectWithByLayer();
-    [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
+    [Selector("effect")]
+    public static Self Effect();
+    [Selector("wiggleClockwiseEffect")]
+    public static Self WiggleClockwiseEffect();
+    [Selector("wiggleCounterClockwiseEffect")]
+    public static Self WiggleCounterClockwiseEffect();
+    [Selector("wiggleLeftEffect")]
+    public static Self WiggleLeftEffect();
+    [Selector("wiggleRightEffect")]
+    public static Self WiggleRightEffect();
+    [Selector("wiggleUpEffect")]
+    public static Self WiggleUpEffect();
+    [Selector("wiggleDownEffect")]
+    public static Self WiggleDownEffect();
+    [Selector("wiggleForwardEffect")]
+    public static Self WiggleForwardEffect();
+    [Selector("wiggleBackwardEffect")]
+    public static Self WiggleBackwardEffect();
+    [Selector("wiggleCustomAngleEffect:")]
+    public static Self WiggleCustomAngleEffect(double angle);
+    [Selector("effectWithByLayer")]
+    public Self EffectWithByLayer();
+    [Selector("effectWithWholeSymbol")]
+    public Self EffectWithWholeSymbol();
 }
 
 public extern objc class NSSymbolRotateEffect : NSSymbolEffect
 {
-    [Selector("effect")] public static Self Effect();
-    [Selector("rotateClockwiseEffect")] public static Self RotateClockwiseEffect();
-    [Selector("rotateCounterClockwiseEffect")] public static Self RotateCounterClockwiseEffect();
-    [Selector("effectWithByLayer")] public Self EffectWithByLayer();
-    [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
+    [Selector("effect")]
+    public static Self Effect();
+    [Selector("rotateClockwiseEffect")]
+    public static Self RotateClockwiseEffect();
+    [Selector("rotateCounterClockwiseEffect")]
+    public static Self RotateCounterClockwiseEffect();
+    [Selector("effectWithByLayer")]
+    public Self EffectWithByLayer();
+    [Selector("effectWithWholeSymbol")]
+    public Self EffectWithWholeSymbol();
 }
 
 public extern objc class NSSymbolBreatheEffect : NSSymbolEffect
 {
-    [Selector("effect")] public static Self Effect();
-    [Selector("breathePulseEffect")] public static Self BreathePulseEffect();
-    [Selector("breathePlainEffect")] public static Self BreathePlainEffect();
-    [Selector("effectWithByLayer")] public Self EffectWithByLayer();
-    [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
+    [Selector("effect")]
+    public static Self Effect();
+    [Selector("breathePulseEffect")]
+    public static Self BreathePulseEffect();
+    [Selector("breathePlainEffect")]
+    public static Self BreathePlainEffect();
+    [Selector("effectWithByLayer")]
+    public Self EffectWithByLayer();
+    [Selector("effectWithWholeSymbol")]
+    public Self EffectWithWholeSymbol();
 }
 
 /// macOS 26.0 and later.
 public extern objc class NSSymbolDrawOnEffect : NSSymbolEffect
 {
-    [Selector("effect")] public static Self Effect();
-    [Selector("effectWithByLayer")] public Self EffectWithByLayer();
-    [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
-    [Selector("effectWithIndividually")] public Self EffectWithIndividually();
+    [Selector("effect")]
+    public static Self Effect();
+    [Selector("effectWithByLayer")]
+    public Self EffectWithByLayer();
+    [Selector("effectWithWholeSymbol")]
+    public Self EffectWithWholeSymbol();
+    [Selector("effectWithIndividually")]
+    public Self EffectWithIndividually();
 }
 
 /// macOS 26.0 and later.
 public extern objc class NSSymbolDrawOffEffect : NSSymbolEffect
 {
-    [Selector("effect")] public static Self Effect();
-    [Selector("effectWithByLayer")] public Self EffectWithByLayer();
-    [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
-    [Selector("effectWithIndividually")] public Self EffectWithIndividually();
-    [Selector("effectWithReversed")] public Self EffectWithReversed();
-    [Selector("effectWithNonReversed")] public Self EffectWithNonReversed();
+    [Selector("effect")]
+    public static Self Effect();
+    [Selector("effectWithByLayer")]
+    public Self EffectWithByLayer();
+    [Selector("effectWithWholeSymbol")]
+    public Self EffectWithWholeSymbol();
+    [Selector("effectWithIndividually")]
+    public Self EffectWithIndividually();
+    [Selector("effectWithReversed")]
+    public Self EffectWithReversed();
+    [Selector("effectWithNonReversed")]
+    public Self EffectWithNonReversed();
 }
 
 public extern objc class NSSymbolContentTransition : NSObject, NSCopying, NSSecureCoding { }
@@ -175,18 +253,26 @@ public extern objc class NSSymbolMagicReplaceContentTransition : NSSymbolContent
 
 public extern objc class NSSymbolReplaceContentTransition : NSSymbolContentTransition
 {
-    [Selector("transition")] public static Self Transition();
-    [Selector("replaceDownUpTransition")] public static Self ReplaceDownUpTransition();
-    [Selector("replaceUpUpTransition")] public static Self ReplaceUpUpTransition();
-    [Selector("replaceOffUpTransition")] public static Self ReplaceOffUpTransition();
-    [Selector("transitionWithByLayer")] public Self TransitionWithByLayer();
-    [Selector("transitionWithWholeSymbol")] public Self TransitionWithWholeSymbol();
-    [Selector("magicTransitionWithFallback:")] public static NSSymbolMagicReplaceContentTransition MagicTransitionWithFallback(NSSymbolReplaceContentTransition fallback);
+    [Selector("transition")]
+    public static Self Transition();
+    [Selector("replaceDownUpTransition")]
+    public static Self ReplaceDownUpTransition();
+    [Selector("replaceUpUpTransition")]
+    public static Self ReplaceUpUpTransition();
+    [Selector("replaceOffUpTransition")]
+    public static Self ReplaceOffUpTransition();
+    [Selector("transitionWithByLayer")]
+    public Self TransitionWithByLayer();
+    [Selector("transitionWithWholeSymbol")]
+    public Self TransitionWithWholeSymbol();
+    [Selector("magicTransitionWithFallback:")]
+    public static NSSymbolMagicReplaceContentTransition MagicTransitionWithFallback(NSSymbolReplaceContentTransition fallback);
 }
 
 public extern objc class NSSymbolAutomaticContentTransition : NSSymbolContentTransition
 {
-    [Selector("transition")] public static Self Transition();
+    [Selector("transition")]
+    public static Self Transition();
 }
 
 #endif

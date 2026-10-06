@@ -36,34 +36,62 @@ public objc closure void NSThreadInitWithBlockBlock();
 
 public extern objc class NSThread : NSObject
 {
-    [Selector("currentThread")] public static NSThread? CurrentThread { get; }
-    [Selector("threadDictionary")] public NSMutableDictionary ThreadDictionary { get; }
-    [Selector("threadPriority", "setThreadPriority:")] public double ThreadPriority { get; set; }
-    [Selector("qualityOfService", "setQualityOfService:")] public NSQualityOfService QualityOfService { get; set; }
-    [Selector("callStackReturnAddresses")] public static NSArray CallStackReturnAddresses { get; }
-    [Selector("callStackSymbols")] public static NSArray CallStackSymbols { get; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("stackSize", "setStackSize:")] public NSUInteger StackSize { get; set; }
-    [Selector("isMainThread")] public bool IsMainThread { get; }
-    [Selector("isMainThread")] public static bool ClassIsMainThread { get; }
-    [Selector("mainThread")] public static NSThread MainThread { get; }
-    [Selector("isExecuting")] public bool Executing { get; }
-    [Selector("isFinished")] public bool Finished { get; }
-    [Selector("isCancelled")] public bool Cancelled { get; }
-    [Selector("detachNewThreadWithBlock:")] public static void DetachNewThreadWithBlock(NSThreadDetachNewThreadWithBlockBlock block);
-    [Selector("detachNewThreadSelector:toTarget:withObject:")] public static void DetachNewThreadSelectorToTargetWithObject(Selector selector, AnyObject target, AnyObject? argument);
-    [Selector("isMultiThreaded")] public static bool IsMultiThreaded();
-    [Selector("sleepUntilDate:")] public static void SleepUntilDate(NSDate date);
-    [Selector("sleepForTimeInterval:")] public static void SleepForTimeInterval(NSTimeInterval ti);
-    [Selector("exit")] public static void Exit();
-    [Selector("threadPriority")] public static double ClassThreadPriority();
-    [Selector("setThreadPriority:")] public static bool SetThreadPriority(double p);
-    [Selector("init")] public Self Init();
-    [Selector("initWithTarget:selector:object:")] public Self InitWithTargetSelectorObject(AnyObject target, Selector selector, AnyObject? argument);
-    [Selector("initWithBlock:")] public Self InitWithBlock(NSThreadInitWithBlockBlock block);
-    [Selector("cancel")] public void Cancel();
-    [Selector("start")] public void Start();
-    [Selector("main")] public void Main();
+    [Selector("currentThread")]
+    public static NSThread? CurrentThread { get; }
+    [Selector("threadDictionary")]
+    public NSMutableDictionary ThreadDictionary { get; }
+    [Selector("threadPriority", "setThreadPriority:")]
+    public double ThreadPriority { get; set; }
+    [Selector("qualityOfService", "setQualityOfService:")]
+    public NSQualityOfService QualityOfService { get; set; }
+    [Selector("callStackReturnAddresses")]
+    public static NSArray CallStackReturnAddresses { get; }
+    [Selector("callStackSymbols")]
+    public static NSArray CallStackSymbols { get; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("stackSize", "setStackSize:")]
+    public NSUInteger StackSize { get; set; }
+    [Selector("isMainThread")]
+    public bool IsMainThread { get; }
+    [Selector("isMainThread")]
+    public static bool ClassIsMainThread { get; }
+    [Selector("mainThread")]
+    public static NSThread MainThread { get; }
+    [Selector("isExecuting")]
+    public bool Executing { get; }
+    [Selector("isFinished")]
+    public bool Finished { get; }
+    [Selector("isCancelled")]
+    public bool Cancelled { get; }
+    [Selector("detachNewThreadWithBlock:")]
+    public static void DetachNewThreadWithBlock(NSThreadDetachNewThreadWithBlockBlock block);
+    [Selector("detachNewThreadSelector:toTarget:withObject:")]
+    public static void DetachNewThreadSelectorToTargetWithObject(Selector selector, AnyObject target, AnyObject? argument);
+    [Selector("isMultiThreaded")]
+    public static bool IsMultiThreaded();
+    [Selector("sleepUntilDate:")]
+    public static void SleepUntilDate(NSDate date);
+    [Selector("sleepForTimeInterval:")]
+    public static void SleepForTimeInterval(NSTimeInterval ti);
+    [Selector("exit")]
+    public static void Exit();
+    [Selector("threadPriority")]
+    public static double ClassThreadPriority();
+    [Selector("setThreadPriority:")]
+    public static bool SetThreadPriority(double p);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithTarget:selector:object:")]
+    public Self InitWithTargetSelectorObject(AnyObject target, Selector selector, AnyObject? argument);
+    [Selector("initWithBlock:")]
+    public Self InitWithBlock(NSThreadInitWithBlockBlock block);
+    [Selector("cancel")]
+    public void Cancel();
+    [Selector("start")]
+    public void Start();
+    [Selector("main")]
+    public void Main();
 }
 
 /// Deprecated in macOS 26.0.
@@ -78,11 +106,16 @@ public extern "C" NSNotificationName NSThreadWillExitNotification;
 /// NSThreadPerformAdditions, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("performSelectorOnMainThread:withObject:waitUntilDone:modes:")] public void PerformSelectorOnMainThreadWithObjectWaitUntilDoneModes(Selector aSelector, AnyObject? arg, bool wait, NSArray? array);
-    [Selector("performSelectorOnMainThread:withObject:waitUntilDone:")] public void PerformSelectorOnMainThreadWithObjectWaitUntilDone(Selector aSelector, AnyObject? arg, bool wait);
-    [Selector("performSelector:onThread:withObject:waitUntilDone:modes:")] public void PerformSelectorOnThreadWithObjectWaitUntilDoneModes(Selector aSelector, NSThread thr, AnyObject? arg, bool wait, NSArray? array);
-    [Selector("performSelector:onThread:withObject:waitUntilDone:")] public void PerformSelectorOnThreadWithObjectWaitUntilDone(Selector aSelector, NSThread thr, AnyObject? arg, bool wait);
-    [Selector("performSelectorInBackground:withObject:")] public void PerformSelectorInBackgroundWithObject(Selector aSelector, AnyObject? arg);
+    [Selector("performSelectorOnMainThread:withObject:waitUntilDone:modes:")]
+    public void PerformSelectorOnMainThreadWithObjectWaitUntilDoneModes(Selector aSelector, AnyObject? arg, bool wait, NSArray? array);
+    [Selector("performSelectorOnMainThread:withObject:waitUntilDone:")]
+    public void PerformSelectorOnMainThreadWithObjectWaitUntilDone(Selector aSelector, AnyObject? arg, bool wait);
+    [Selector("performSelector:onThread:withObject:waitUntilDone:modes:")]
+    public void PerformSelectorOnThreadWithObjectWaitUntilDoneModes(Selector aSelector, NSThread thr, AnyObject? arg, bool wait, NSArray? array);
+    [Selector("performSelector:onThread:withObject:waitUntilDone:")]
+    public void PerformSelectorOnThreadWithObjectWaitUntilDone(Selector aSelector, NSThread thr, AnyObject? arg, bool wait);
+    [Selector("performSelectorInBackground:withObject:")]
+    public void PerformSelectorInBackgroundWithObject(Selector aSelector, AnyObject? arg);
 }
 
 #endif

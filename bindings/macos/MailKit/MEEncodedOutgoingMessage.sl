@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class MEEncodedOutgoingMessage : NSObject, NSSecureCoding
 {
-    [Selector("rawData")] public NSData RawData { get; }
-    [Selector("isSigned")] public bool IsSigned { get; }
-    [Selector("isEncrypted")] public bool IsEncrypted { get; }
-    [Selector("initWithRawData:isSigned:isEncrypted:")] public Self InitWithRawDataIsSignedIsEncrypted(NSData rawData, bool isSigned, bool isEncrypted);
+    [Selector("rawData")]
+    public NSData RawData { get; }
+    [Selector("isSigned")]
+    public bool IsSigned { get; }
+    [Selector("isEncrypted")]
+    public bool IsEncrypted { get; }
+    [Selector("initWithRawData:isSigned:isEncrypted:")]
+    public Self InitWithRawDataIsSignedIsEncrypted(NSData rawData, bool isSigned, bool isEncrypted);
 }
 
 #endif

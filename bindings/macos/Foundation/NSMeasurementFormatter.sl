@@ -39,12 +39,18 @@ public enum NSMeasurementFormatterUnitOptions : ulong
 
 public extern objc class NSMeasurementFormatter : NSFormatter, NSSecureCoding
 {
-    [Selector("unitOptions", "setUnitOptions:")] public NSMeasurementFormatterUnitOptions UnitOptions { get; set; }
-    [Selector("unitStyle", "setUnitStyle:")] public NSFormattingUnitStyle UnitStyle { get; set; }
-    [Selector("locale", "setLocale:")] public NSLocale? Locale { get; set; }
-    [Selector("numberFormatter", "setNumberFormatter:")] public NSNumberFormatter? NumberFormatter { get; set; }
-    [Selector("stringFromMeasurement:")] public NSString StringFromMeasurement(NSMeasurement measurement);
-    [Selector("stringFromUnit:")] public NSString StringFromUnit(NSUnit unit);
+    [Selector("unitOptions", "setUnitOptions:")]
+    public NSMeasurementFormatterUnitOptions UnitOptions { get; set; }
+    [Selector("unitStyle", "setUnitStyle:")]
+    public NSFormattingUnitStyle UnitStyle { get; set; }
+    [Selector("locale", "setLocale:")]
+    public NSLocale? Locale { get; set; }
+    [Selector("numberFormatter", "setNumberFormatter:")]
+    public NSNumberFormatter? NumberFormatter { get; set; }
+    [Selector("stringFromMeasurement:")]
+    public NSString StringFromMeasurement(NSMeasurement measurement);
+    [Selector("stringFromUnit:")]
+    public NSString StringFromUnit(NSUnit unit);
 }
 
 #endif

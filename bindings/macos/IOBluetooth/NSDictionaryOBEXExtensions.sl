@@ -33,31 +33,55 @@ import Standard.ObjC;
 /// NSDictionaryOBEXExtensions, a category of NSMutableDictionary.
 public extern objc class NSMutableDictionary
 {
-    [Selector("dictionaryWithOBEXHeadersData:headersDataSize:")] public static Self? DictionaryWithOBEXHeadersDataHeadersDataSize(void* inHeadersData, nuint inDataSize);
-    [Selector("dictionaryWithOBEXHeadersData:")] public static Self? DictionaryWithOBEXHeadersData(NSData? inHeadersData);
-    [Selector("getHeaderBytes")] public NSMutableData? GetHeaderBytes();
-    [Selector("addTargetHeader:length:")] public OBEXError AddTargetHeaderLength(void* inHeaderData, uint inHeaderDataLength);
-    [Selector("addHTTPHeader:length:")] public OBEXError AddHTTPHeaderLength(void* inHeaderData, uint inHeaderDataLength);
-    [Selector("addBodyHeader:length:endOfBody:")] public OBEXError AddBodyHeaderLengthEndOfBody(void* inHeaderData, uint inHeaderDataLength, bool isEndOfBody);
-    [Selector("addWhoHeader:length:")] public OBEXError AddWhoHeaderLength(void* inHeaderData, uint inHeaderDataLength);
-    [Selector("addConnectionIDHeader:length:")] public OBEXError AddConnectionIDHeaderLength(void* inHeaderData, uint inHeaderDataLength);
-    [Selector("addApplicationParameterHeader:length:")] public OBEXError AddApplicationParameterHeaderLength(void* inHeaderData, uint inHeaderDataLength);
-    [Selector("addByteSequenceHeader:length:")] public OBEXError AddByteSequenceHeaderLength(void* inHeaderData, uint inHeaderDataLength);
-    [Selector("addObjectClassHeader:length:")] public OBEXError AddObjectClassHeaderLength(void* inHeaderData, uint inHeaderDataLength);
-    [Selector("addAuthorizationChallengeHeader:length:")] public OBEXError AddAuthorizationChallengeHeaderLength(void* inHeaderData, uint inHeaderDataLength);
-    [Selector("addAuthorizationResponseHeader:length:")] public OBEXError AddAuthorizationResponseHeaderLength(void* inHeaderData, uint inHeaderDataLength);
-    [Selector("addTimeISOHeader:length:")] public OBEXError AddTimeISOHeaderLength(void* inHeaderData, uint inHeaderDataLength);
-    [Selector("addTypeHeader:")] public OBEXError AddTypeHeader(NSString? type);
-    [Selector("addLengthHeader:")] public OBEXError AddLengthHeader(uint length);
-    [Selector("addTime4ByteHeader:")] public OBEXError AddTime4ByteHeader(uint time4Byte);
-    [Selector("addCountHeader:")] public OBEXError AddCountHeader(uint inCount);
-    [Selector("addDescriptionHeader:")] public OBEXError AddDescriptionHeader(NSString? inDescriptionString);
-    [Selector("addNameHeader:")] public OBEXError AddNameHeader(NSString? inNameString);
-    [Selector("addUserDefinedHeader:length:")] public OBEXError AddUserDefinedHeaderLength(void* inHeaderData, uint inHeaderDataLength);
-    [Selector("addImageHandleHeader:")] public OBEXError AddImageHandleHeader(NSString? type);
-    [Selector("addImageDescriptorHeader:length:")] public OBEXError AddImageDescriptorHeaderLength(void* inHeaderData, uint inHeaderDataLength);
+    [Selector("dictionaryWithOBEXHeadersData:headersDataSize:")]
+    public static Self? DictionaryWithOBEXHeadersDataHeadersDataSize(void* inHeadersData, nuint inDataSize);
+    [Selector("dictionaryWithOBEXHeadersData:")]
+    public static Self? DictionaryWithOBEXHeadersData(NSData? inHeadersData);
+    [Selector("getHeaderBytes")]
+    public NSMutableData? GetHeaderBytes();
+    [Selector("addTargetHeader:length:")]
+    public OBEXError AddTargetHeaderLength(void* inHeaderData, uint inHeaderDataLength);
+    [Selector("addHTTPHeader:length:")]
+    public OBEXError AddHTTPHeaderLength(void* inHeaderData, uint inHeaderDataLength);
+    [Selector("addBodyHeader:length:endOfBody:")]
+    public OBEXError AddBodyHeaderLengthEndOfBody(void* inHeaderData, uint inHeaderDataLength, bool isEndOfBody);
+    [Selector("addWhoHeader:length:")]
+    public OBEXError AddWhoHeaderLength(void* inHeaderData, uint inHeaderDataLength);
+    [Selector("addConnectionIDHeader:length:")]
+    public OBEXError AddConnectionIDHeaderLength(void* inHeaderData, uint inHeaderDataLength);
+    [Selector("addApplicationParameterHeader:length:")]
+    public OBEXError AddApplicationParameterHeaderLength(void* inHeaderData, uint inHeaderDataLength);
+    [Selector("addByteSequenceHeader:length:")]
+    public OBEXError AddByteSequenceHeaderLength(void* inHeaderData, uint inHeaderDataLength);
+    [Selector("addObjectClassHeader:length:")]
+    public OBEXError AddObjectClassHeaderLength(void* inHeaderData, uint inHeaderDataLength);
+    [Selector("addAuthorizationChallengeHeader:length:")]
+    public OBEXError AddAuthorizationChallengeHeaderLength(void* inHeaderData, uint inHeaderDataLength);
+    [Selector("addAuthorizationResponseHeader:length:")]
+    public OBEXError AddAuthorizationResponseHeaderLength(void* inHeaderData, uint inHeaderDataLength);
+    [Selector("addTimeISOHeader:length:")]
+    public OBEXError AddTimeISOHeaderLength(void* inHeaderData, uint inHeaderDataLength);
+    [Selector("addTypeHeader:")]
+    public OBEXError AddTypeHeader(NSString? type);
+    [Selector("addLengthHeader:")]
+    public OBEXError AddLengthHeader(uint length);
+    [Selector("addTime4ByteHeader:")]
+    public OBEXError AddTime4ByteHeader(uint time4Byte);
+    [Selector("addCountHeader:")]
+    public OBEXError AddCountHeader(uint inCount);
+    [Selector("addDescriptionHeader:")]
+    public OBEXError AddDescriptionHeader(NSString? inDescriptionString);
+    [Selector("addNameHeader:")]
+    public OBEXError AddNameHeader(NSString? inNameString);
+    [Selector("addUserDefinedHeader:length:")]
+    public OBEXError AddUserDefinedHeaderLength(void* inHeaderData, uint inHeaderDataLength);
+    [Selector("addImageHandleHeader:")]
+    public OBEXError AddImageHandleHeader(NSString? type);
+    [Selector("addImageDescriptorHeader:length:")]
+    public OBEXError AddImageDescriptorHeaderLength(void* inHeaderData, uint inHeaderDataLength);
     /// Deprecated in macOS 10.7.
-    [Selector("withOBEXHeadersData:headersDataSize:")] public static Self? WithOBEXHeadersDataHeadersDataSize(void* inHeadersData, nuint inDataSize);
+    [Selector("withOBEXHeadersData:headersDataSize:")]
+    public static Self? WithOBEXHeadersDataHeadersDataSize(void* inHeadersData, nuint inDataSize);
 }
 
 #endif

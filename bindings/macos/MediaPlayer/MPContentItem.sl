@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class MPContentItem : NSObject
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("subtitle", "setSubtitle:")] public NSString? Subtitle { get; set; }
-    [Selector("artwork", "setArtwork:")] public MPMediaItemArtwork? Artwork { get; set; }
-    [Selector("playbackProgress", "setPlaybackProgress:")] public float PlaybackProgress { get; set; }
-    [Selector("isStreamingContent", "setStreamingContent:")] public bool StreamingContent { get; set; }
-    [Selector("isExplicitContent", "setExplicitContent:")] public bool ExplicitContent { get; set; }
-    [Selector("isContainer", "setContainer:")] public bool Container { get; set; }
-    [Selector("isPlayable", "setPlayable:")] public bool Playable { get; set; }
-    [Selector("initWithIdentifier:")] public Self InitWithIdentifier(NSString identifier);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("subtitle", "setSubtitle:")]
+    public NSString? Subtitle { get; set; }
+    [Selector("artwork", "setArtwork:")]
+    public MPMediaItemArtwork? Artwork { get; set; }
+    [Selector("playbackProgress", "setPlaybackProgress:")]
+    public float PlaybackProgress { get; set; }
+    [Selector("isStreamingContent", "setStreamingContent:")]
+    public bool StreamingContent { get; set; }
+    [Selector("isExplicitContent", "setExplicitContent:")]
+    public bool ExplicitContent { get; set; }
+    [Selector("isContainer", "setContainer:")]
+    public bool Container { get; set; }
+    [Selector("isPlayable", "setPlayable:")]
+    public bool Playable { get; set; }
+    [Selector("initWithIdentifier:")]
+    public Self InitWithIdentifier(NSString identifier);
 }
 
 #endif

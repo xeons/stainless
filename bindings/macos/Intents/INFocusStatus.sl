@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class INFocusStatus : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("isFocused")] public NSNumber? IsFocused { get; }
-    [Selector("initWithIsFocused:")] public Self InitWithIsFocused(NSNumber? isFocused);
+    [Selector("isFocused")]
+    public NSNumber? IsFocused { get; }
+    [Selector("initWithIsFocused:")]
+    public Self InitWithIsFocused(NSNumber? isFocused);
 }
 
 #endif

@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLBRElement : DOMHTMLElement
 {
-    [Selector("clear", "setClear:")] public NSString? Clear { get; set; }
+    [Selector("clear", "setClear:")]
+    public NSString? Clear { get; set; }
 }
 
 #endif

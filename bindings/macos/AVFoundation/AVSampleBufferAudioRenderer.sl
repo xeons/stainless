@@ -34,18 +34,25 @@ import Standard.ObjC;
 
 public extern objc class AVSampleBufferAudioRenderer : NSObject, AVQueuedSampleBufferRendering
 {
-    [Selector("status")] public AVQueuedSampleBufferRenderingStatus Status { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("audioOutputDeviceUniqueID", "setAudioOutputDeviceUniqueID:")] public NSString? AudioOutputDeviceUniqueID { get; set; }
-    [Selector("audioTimePitchAlgorithm", "setAudioTimePitchAlgorithm:")] public AVAudioTimePitchAlgorithm AudioTimePitchAlgorithm { get; set; }
-    [Selector("allowedAudioSpatializationFormats", "setAllowedAudioSpatializationFormats:")] public AVAudioSpatializationFormats AllowedAudioSpatializationFormats { get; set; }
+    [Selector("status")]
+    public AVQueuedSampleBufferRenderingStatus Status { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("audioOutputDeviceUniqueID", "setAudioOutputDeviceUniqueID:")]
+    public NSString? AudioOutputDeviceUniqueID { get; set; }
+    [Selector("audioTimePitchAlgorithm", "setAudioTimePitchAlgorithm:")]
+    public AVAudioTimePitchAlgorithm AudioTimePitchAlgorithm { get; set; }
+    [Selector("allowedAudioSpatializationFormats", "setAllowedAudioSpatializationFormats:")]
+    public AVAudioSpatializationFormats AllowedAudioSpatializationFormats { get; set; }
 }
 
 /// AVSampleBufferAudioRendererVolumeControl, a category of AVSampleBufferAudioRenderer.
 public extern objc class AVSampleBufferAudioRenderer
 {
-    [Selector("volume", "setVolume:")] public float Volume { get; set; }
-    [Selector("isMuted", "setMuted:")] public bool Muted { get; set; }
+    [Selector("volume", "setVolume:")]
+    public float Volume { get; set; }
+    [Selector("isMuted", "setMuted:")]
+    public bool Muted { get; set; }
 }
 
 public objc closure void AVSampleBufferAudioRendererFlushFromSourceTimeCompletionHandlerCompletionHandlerBlock(bool arg0);
@@ -53,7 +60,8 @@ public objc closure void AVSampleBufferAudioRendererFlushFromSourceTimeCompletio
 /// AVSampleBufferAudioRendererQueueManagement, a category of AVSampleBufferAudioRenderer.
 public extern objc class AVSampleBufferAudioRenderer
 {
-    [Selector("flushFromSourceTime:completionHandler:")] public void FlushFromSourceTimeCompletionHandler(CMTime time, AVSampleBufferAudioRendererFlushFromSourceTimeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("flushFromSourceTime:completionHandler:")]
+    public void FlushFromSourceTimeCompletionHandler(CMTime time, AVSampleBufferAudioRendererFlushFromSourceTimeCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public extern "C" NSNotificationName AVSampleBufferAudioRendererWasFlushedAutomaticallyNotification;

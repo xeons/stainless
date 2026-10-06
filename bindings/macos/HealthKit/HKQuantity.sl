@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class HKQuantity : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("quantityWithUnit:doubleValue:")] public static Self QuantityWithUnitDoubleValue(HKUnit unit, double value);
-    [Selector("isCompatibleWithUnit:")] public bool IsCompatibleWithUnit(HKUnit unit);
-    [Selector("doubleValueForUnit:")] public double DoubleValueForUnit(HKUnit unit);
-    [Selector("compare:")] public NSComparisonResult Compare(HKQuantity quantity);
+    [Selector("quantityWithUnit:doubleValue:")]
+    public static Self QuantityWithUnitDoubleValue(HKUnit unit, double value);
+    [Selector("isCompatibleWithUnit:")]
+    public bool IsCompatibleWithUnit(HKUnit unit);
+    [Selector("doubleValueForUnit:")]
+    public double DoubleValueForUnit(HKUnit unit);
+    [Selector("compare:")]
+    public NSComparisonResult Compare(HKQuantity quantity);
 }
 
 #endif

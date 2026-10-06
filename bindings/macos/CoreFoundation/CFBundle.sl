@@ -60,11 +60,14 @@ public extern "C" CFArrayRef? CFBundleGetAllBundles();
 
 public extern "C" CFTypeID CFBundleGetTypeID();
 
-[ReturnsRetained] public extern "C" CFBundleRef? CFBundleCreate(CFAllocatorRef? allocator, CFURLRef? bundleURL);
+[ReturnsRetained]
+public extern "C" CFBundleRef? CFBundleCreate(CFAllocatorRef? allocator, CFURLRef? bundleURL);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFBundleCreateBundlesFromDirectory(CFAllocatorRef? allocator, CFURLRef? directoryURL, CFStringRef? bundleType);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFBundleCreateBundlesFromDirectory(CFAllocatorRef? allocator, CFURLRef? directoryURL, CFStringRef? bundleType);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFBundleCopyBundleURL(CFBundleRef? bundle);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFBundleCopyBundleURL(CFBundleRef? bundle);
 
 public extern "C" CFTypeRef? CFBundleGetValueForInfoDictionaryKey(CFBundleRef? bundle, CFStringRef? key);
 
@@ -80,52 +83,74 @@ public extern "C" UInt32 CFBundleGetVersionNumber(CFBundleRef? bundle);
 
 public extern "C" CFStringRef? CFBundleGetDevelopmentRegion(CFBundleRef? bundle);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFBundleCopySupportFilesDirectoryURL(CFBundleRef? bundle);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFBundleCopySupportFilesDirectoryURL(CFBundleRef? bundle);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFBundleCopyResourcesDirectoryURL(CFBundleRef? bundle);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFBundleCopyResourcesDirectoryURL(CFBundleRef? bundle);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFBundleCopyPrivateFrameworksURL(CFBundleRef? bundle);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFBundleCopyPrivateFrameworksURL(CFBundleRef? bundle);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFBundleCopySharedFrameworksURL(CFBundleRef? bundle);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFBundleCopySharedFrameworksURL(CFBundleRef? bundle);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFBundleCopySharedSupportURL(CFBundleRef? bundle);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFBundleCopySharedSupportURL(CFBundleRef? bundle);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFBundleCopyBuiltInPlugInsURL(CFBundleRef? bundle);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFBundleCopyBuiltInPlugInsURL(CFBundleRef? bundle);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CFBundleCopyInfoDictionaryInDirectory(CFURLRef? bundleURL);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CFBundleCopyInfoDictionaryInDirectory(CFURLRef? bundleURL);
 
 public extern "C" Boolean CFBundleGetPackageInfoInDirectory(CFURLRef? url, UInt32* packageType, UInt32* packageCreator);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFBundleCopyResourceURL(CFBundleRef? bundle, CFStringRef? resourceName, CFStringRef? resourceType, CFStringRef? subDirName);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFBundleCopyResourceURL(CFBundleRef? bundle, CFStringRef? resourceName, CFStringRef? resourceType, CFStringRef? subDirName);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFBundleCopyResourceURLsOfType(CFBundleRef? bundle, CFStringRef? resourceType, CFStringRef? subDirName);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFBundleCopyResourceURLsOfType(CFBundleRef? bundle, CFStringRef? resourceType, CFStringRef? subDirName);
 
-[ReturnsRetained] public extern "C" CFStringRef? CFBundleCopyLocalizedString(CFBundleRef? bundle, CFStringRef? key, CFStringRef? value, CFStringRef? tableName);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFBundleCopyLocalizedString(CFBundleRef? bundle, CFStringRef? key, CFStringRef? value, CFStringRef? tableName);
 
 /// macOS 15.4 and later.
-[ReturnsRetained] public extern "C" CFStringRef? CFBundleCopyLocalizedStringForLocalizations(CFBundleRef? bundle, CFStringRef? key, CFStringRef? value, CFStringRef? tableName, CFArrayRef? localizations);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFBundleCopyLocalizedStringForLocalizations(CFBundleRef? bundle, CFStringRef? key, CFStringRef? value, CFStringRef? tableName, CFArrayRef? localizations);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFBundleCopyResourceURLInDirectory(CFURLRef? bundleURL, CFStringRef? resourceName, CFStringRef? resourceType, CFStringRef? subDirName);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFBundleCopyResourceURLInDirectory(CFURLRef? bundleURL, CFStringRef? resourceName, CFStringRef? resourceType, CFStringRef? subDirName);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFBundleCopyResourceURLsOfTypeInDirectory(CFURLRef? bundleURL, CFStringRef? resourceType, CFStringRef? subDirName);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFBundleCopyResourceURLsOfTypeInDirectory(CFURLRef? bundleURL, CFStringRef? resourceType, CFStringRef? subDirName);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFBundleCopyBundleLocalizations(CFBundleRef? bundle);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFBundleCopyBundleLocalizations(CFBundleRef? bundle);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFBundleCopyPreferredLocalizationsFromArray(CFArrayRef? locArray);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFBundleCopyPreferredLocalizationsFromArray(CFArrayRef? locArray);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFBundleCopyLocalizationsForPreferences(CFArrayRef? locArray, CFArrayRef? prefArray);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFBundleCopyLocalizationsForPreferences(CFArrayRef? locArray, CFArrayRef? prefArray);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFBundleCopyResourceURLForLocalization(CFBundleRef? bundle, CFStringRef? resourceName, CFStringRef? resourceType, CFStringRef? subDirName, CFStringRef? localizationName);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFBundleCopyResourceURLForLocalization(CFBundleRef? bundle, CFStringRef? resourceName, CFStringRef? resourceType, CFStringRef? subDirName, CFStringRef? localizationName);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFBundleCopyResourceURLsOfTypeForLocalization(CFBundleRef? bundle, CFStringRef? resourceType, CFStringRef? subDirName, CFStringRef? localizationName);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFBundleCopyResourceURLsOfTypeForLocalization(CFBundleRef? bundle, CFStringRef? resourceType, CFStringRef? subDirName, CFStringRef? localizationName);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CFBundleCopyInfoDictionaryForURL(CFURLRef? url);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CFBundleCopyInfoDictionaryForURL(CFURLRef? url);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFBundleCopyLocalizationsForURL(CFURLRef? url);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFBundleCopyLocalizationsForURL(CFURLRef? url);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFBundleCopyExecutableArchitecturesForURL(CFURLRef? url);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFBundleCopyExecutableArchitecturesForURL(CFURLRef? url);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFBundleCopyExecutableURL(CFBundleRef? bundle);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFBundleCopyExecutableURL(CFBundleRef? bundle);
 
 public const int kCFBundleExecutableArchitectureI386 = 7;
 public const int kCFBundleExecutableArchitecturePPC = 18;
@@ -133,7 +158,8 @@ public const int kCFBundleExecutableArchitectureX86_64 = 16777223;
 public const int kCFBundleExecutableArchitecturePPC64 = 16777234;
 public const int kCFBundleExecutableArchitectureARM64 = 16777228;
 
-[ReturnsRetained] public extern "C" CFArrayRef? CFBundleCopyExecutableArchitectures(CFBundleRef? bundle);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CFBundleCopyExecutableArchitectures(CFBundleRef? bundle);
 
 public extern "C" Boolean CFBundlePreflightExecutable(CFBundleRef? bundle, __CFError** error);
 
@@ -153,7 +179,8 @@ public extern "C" void* CFBundleGetDataPointerForName(CFBundleRef? bundle, CFStr
 
 public extern "C" void CFBundleGetDataPointersForNames(CFBundleRef? bundle, CFArrayRef? symbolNames, void** stbl);
 
-[ReturnsRetained] public extern "C" CFURLRef? CFBundleCopyAuxiliaryExecutableURL(CFBundleRef? bundle, CFStringRef? executableName);
+[ReturnsRetained]
+public extern "C" CFURLRef? CFBundleCopyAuxiliaryExecutableURL(CFBundleRef? bundle, CFStringRef? executableName);
 
 public extern "C" Boolean CFBundleIsExecutableLoadable(CFBundleRef? bundle);
 

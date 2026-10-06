@@ -33,19 +33,32 @@ import Standard.ObjC;
 
 public extern objc class HKActivitySummary : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("activityMoveMode", "setActivityMoveMode:")] public HKActivityMoveMode ActivityMoveMode { get; set; }
-    [Selector("isPaused", "setPaused:")] public bool Paused { get; set; }
-    [Selector("activeEnergyBurned", "setActiveEnergyBurned:")] public HKQuantity ActiveEnergyBurned { get; set; }
-    [Selector("appleMoveTime", "setAppleMoveTime:")] public HKQuantity AppleMoveTime { get; set; }
-    [Selector("appleExerciseTime", "setAppleExerciseTime:")] public HKQuantity AppleExerciseTime { get; set; }
-    [Selector("appleStandHours", "setAppleStandHours:")] public HKQuantity AppleStandHours { get; set; }
-    [Selector("activeEnergyBurnedGoal", "setActiveEnergyBurnedGoal:")] public HKQuantity ActiveEnergyBurnedGoal { get; set; }
-    [Selector("appleMoveTimeGoal", "setAppleMoveTimeGoal:")] public HKQuantity AppleMoveTimeGoal { get; set; }
-    [Selector("appleExerciseTimeGoal", "setAppleExerciseTimeGoal:")] public HKQuantity AppleExerciseTimeGoal { get; set; }
-    [Selector("exerciseTimeGoal", "setExerciseTimeGoal:")] public HKQuantity? ExerciseTimeGoal { get; set; }
-    [Selector("appleStandHoursGoal", "setAppleStandHoursGoal:")] public HKQuantity AppleStandHoursGoal { get; set; }
-    [Selector("standHoursGoal", "setStandHoursGoal:")] public HKQuantity? StandHoursGoal { get; set; }
-    [Selector("dateComponentsForCalendar:")] public NSDateComponents DateComponentsForCalendar(NSCalendar calendar);
+    [Selector("activityMoveMode", "setActivityMoveMode:")]
+    public HKActivityMoveMode ActivityMoveMode { get; set; }
+    [Selector("isPaused", "setPaused:")]
+    public bool Paused { get; set; }
+    [Selector("activeEnergyBurned", "setActiveEnergyBurned:")]
+    public HKQuantity ActiveEnergyBurned { get; set; }
+    [Selector("appleMoveTime", "setAppleMoveTime:")]
+    public HKQuantity AppleMoveTime { get; set; }
+    [Selector("appleExerciseTime", "setAppleExerciseTime:")]
+    public HKQuantity AppleExerciseTime { get; set; }
+    [Selector("appleStandHours", "setAppleStandHours:")]
+    public HKQuantity AppleStandHours { get; set; }
+    [Selector("activeEnergyBurnedGoal", "setActiveEnergyBurnedGoal:")]
+    public HKQuantity ActiveEnergyBurnedGoal { get; set; }
+    [Selector("appleMoveTimeGoal", "setAppleMoveTimeGoal:")]
+    public HKQuantity AppleMoveTimeGoal { get; set; }
+    [Selector("appleExerciseTimeGoal", "setAppleExerciseTimeGoal:")]
+    public HKQuantity AppleExerciseTimeGoal { get; set; }
+    [Selector("exerciseTimeGoal", "setExerciseTimeGoal:")]
+    public HKQuantity? ExerciseTimeGoal { get; set; }
+    [Selector("appleStandHoursGoal", "setAppleStandHoursGoal:")]
+    public HKQuantity AppleStandHoursGoal { get; set; }
+    [Selector("standHoursGoal", "setStandHoursGoal:")]
+    public HKQuantity? StandHoursGoal { get; set; }
+    [Selector("dateComponentsForCalendar:")]
+    public NSDateComponents DateComponentsForCalendar(NSCalendar calendar);
 }
 
 public extern "C" NSString HKPredicateKeyPathDateComponents;

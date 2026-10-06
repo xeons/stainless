@@ -32,13 +32,20 @@ import Standard.ObjC;
 
 public extern objc class NSMeasurement : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("unit")] public AnyObject Unit { get; }
-    [Selector("doubleValue")] public double DoubleValue { get; }
-    [Selector("initWithDoubleValue:unit:")] public Self InitWithDoubleValueUnit(double doubleValue, AnyObject unit);
-    [Selector("canBeConvertedToUnit:")] public bool CanBeConvertedToUnit(NSUnit unit);
-    [Selector("measurementByConvertingToUnit:")] public NSMeasurement MeasurementByConvertingToUnit(NSUnit unit);
-    [Selector("measurementByAddingMeasurement:")] public NSMeasurement MeasurementByAddingMeasurement(NSMeasurement measurement);
-    [Selector("measurementBySubtractingMeasurement:")] public NSMeasurement MeasurementBySubtractingMeasurement(NSMeasurement measurement);
+    [Selector("unit")]
+    public AnyObject Unit { get; }
+    [Selector("doubleValue")]
+    public double DoubleValue { get; }
+    [Selector("initWithDoubleValue:unit:")]
+    public Self InitWithDoubleValueUnit(double doubleValue, AnyObject unit);
+    [Selector("canBeConvertedToUnit:")]
+    public bool CanBeConvertedToUnit(NSUnit unit);
+    [Selector("measurementByConvertingToUnit:")]
+    public NSMeasurement MeasurementByConvertingToUnit(NSUnit unit);
+    [Selector("measurementByAddingMeasurement:")]
+    public NSMeasurement MeasurementByAddingMeasurement(NSMeasurement measurement);
+    [Selector("measurementBySubtractingMeasurement:")]
+    public NSMeasurement MeasurementBySubtractingMeasurement(NSMeasurement measurement);
 }
 
 #endif

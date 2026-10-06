@@ -35,64 +35,112 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTLFXFrameInterpolatorDescriptor : NSObject, NSCopying
 {
-    [Selector("colorTextureFormat", "setColorTextureFormat:")] public MTLPixelFormat ColorTextureFormat { get; set; }
-    [Selector("outputTextureFormat", "setOutputTextureFormat:")] public MTLPixelFormat OutputTextureFormat { get; set; }
-    [Selector("depthTextureFormat", "setDepthTextureFormat:")] public MTLPixelFormat DepthTextureFormat { get; set; }
-    [Selector("motionTextureFormat", "setMotionTextureFormat:")] public MTLPixelFormat MotionTextureFormat { get; set; }
-    [Selector("uiTextureFormat", "setUITextureFormat:")] public MTLPixelFormat UiTextureFormat { get; set; }
-    [Selector("scaler", "setScaler:")] public MTLFXFrameInterpolatableScaler? Scaler { get; set; }
-    [Selector("inputWidth", "setInputWidth:")] public NSUInteger InputWidth { get; set; }
-    [Selector("inputHeight", "setInputHeight:")] public NSUInteger InputHeight { get; set; }
-    [Selector("outputWidth", "setOutputWidth:")] public NSUInteger OutputWidth { get; set; }
-    [Selector("outputHeight", "setOutputHeight:")] public NSUInteger OutputHeight { get; set; }
-    [Selector("newFrameInterpolatorWithDevice:")] public MTLFXFrameInterpolator? NewFrameInterpolatorWithDevice(MTLDevice device);
-    [Selector("newFrameInterpolatorWithDevice:compiler:")] public MTL4FXFrameInterpolator? NewFrameInterpolatorWithDeviceCompiler(MTLDevice device, MTL4Compiler compiler);
-    [Selector("supportsMetal4FX:")] public static bool SupportsMetal4FX(MTLDevice device);
-    [Selector("supportsDevice:")] public static bool SupportsDevice(MTLDevice device);
+    [Selector("colorTextureFormat", "setColorTextureFormat:")]
+    public MTLPixelFormat ColorTextureFormat { get; set; }
+    [Selector("outputTextureFormat", "setOutputTextureFormat:")]
+    public MTLPixelFormat OutputTextureFormat { get; set; }
+    [Selector("depthTextureFormat", "setDepthTextureFormat:")]
+    public MTLPixelFormat DepthTextureFormat { get; set; }
+    [Selector("motionTextureFormat", "setMotionTextureFormat:")]
+    public MTLPixelFormat MotionTextureFormat { get; set; }
+    [Selector("uiTextureFormat", "setUITextureFormat:")]
+    public MTLPixelFormat UiTextureFormat { get; set; }
+    [Selector("scaler", "setScaler:")]
+    public MTLFXFrameInterpolatableScaler? Scaler { get; set; }
+    [Selector("inputWidth", "setInputWidth:")]
+    public NSUInteger InputWidth { get; set; }
+    [Selector("inputHeight", "setInputHeight:")]
+    public NSUInteger InputHeight { get; set; }
+    [Selector("outputWidth", "setOutputWidth:")]
+    public NSUInteger OutputWidth { get; set; }
+    [Selector("outputHeight", "setOutputHeight:")]
+    public NSUInteger OutputHeight { get; set; }
+    [Selector("newFrameInterpolatorWithDevice:")]
+    public MTLFXFrameInterpolator? NewFrameInterpolatorWithDevice(MTLDevice device);
+    [Selector("newFrameInterpolatorWithDevice:compiler:")]
+    public MTL4FXFrameInterpolator? NewFrameInterpolatorWithDeviceCompiler(MTLDevice device, MTL4Compiler compiler);
+    [Selector("supportsMetal4FX:")]
+    public static bool SupportsMetal4FX(MTLDevice device);
+    [Selector("supportsDevice:")]
+    public static bool SupportsDevice(MTLDevice device);
 }
 
 /// macOS 26.0 and later.
 public objc interface MTLFXFrameInterpolatorBase : NSObjectProtocol
 {
-    [Selector("colorTextureUsage")] MTLTextureUsage ColorTextureUsage { get; }
-    [Selector("outputTextureUsage")] MTLTextureUsage OutputTextureUsage { get; }
-    [Selector("depthTextureUsage")] MTLTextureUsage DepthTextureUsage { get; }
-    [Selector("motionTextureUsage")] MTLTextureUsage MotionTextureUsage { get; }
-    [Selector("uiTextureUsage")] MTLTextureUsage UiTextureUsage { get; }
-    [Selector("colorTextureFormat")] MTLPixelFormat ColorTextureFormat { get; }
-    [Selector("depthTextureFormat")] MTLPixelFormat DepthTextureFormat { get; }
-    [Selector("motionTextureFormat")] MTLPixelFormat MotionTextureFormat { get; }
-    [Selector("outputTextureFormat")] MTLPixelFormat OutputTextureFormat { get; }
-    [Selector("inputWidth")] NSUInteger InputWidth { get; }
-    [Selector("inputHeight")] NSUInteger InputHeight { get; }
-    [Selector("outputWidth")] NSUInteger OutputWidth { get; }
-    [Selector("outputHeight")] NSUInteger OutputHeight { get; }
-    [Selector("uiTextureFormat")] MTLPixelFormat UiTextureFormat { get; }
-    [Selector("colorTexture", "setColorTexture:")] MTLTexture? ColorTexture { get; set; }
-    [Selector("prevColorTexture", "setPrevColorTexture:")] MTLTexture? PrevColorTexture { get; set; }
-    [Selector("depthTexture", "setDepthTexture:")] MTLTexture? DepthTexture { get; set; }
-    [Selector("motionTexture", "setMotionTexture:")] MTLTexture? MotionTexture { get; set; }
-    [Selector("motionVectorScaleX", "setMotionVectorScaleX:")] float MotionVectorScaleX { get; set; }
-    [Selector("motionVectorScaleY", "setMotionVectorScaleY:")] float MotionVectorScaleY { get; set; }
-    [Selector("deltaTime", "setDeltaTime:")] float DeltaTime { get; set; }
-    [Selector("nearPlane", "setNearPlane:")] float NearPlane { get; set; }
-    [Selector("farPlane", "setFarPlane:")] float FarPlane { get; set; }
-    [Selector("fieldOfView", "setFieldOfView:")] float FieldOfView { get; set; }
-    [Selector("aspectRatio", "setAspectRatio:")] float AspectRatio { get; set; }
-    [Selector("uiTexture", "setUITexture:")] MTLTexture? UiTexture { get; set; }
-    [Selector("jitterOffsetX", "setJitterOffsetX:")] float JitterOffsetX { get; set; }
-    [Selector("jitterOffsetY", "setJitterOffsetY:")] float JitterOffsetY { get; set; }
-    [Selector("isUITextureComposited", "setIsUITextureComposited:")] bool UiTextureComposited { get; set; }
-    [Selector("shouldResetHistory", "setShouldResetHistory:")] bool ShouldResetHistory { get; set; }
-    [Selector("outputTexture", "setOutputTexture:")] MTLTexture? OutputTexture { get; set; }
-    [Selector("fence", "setFence:")] MTLFence? Fence { get; set; }
-    [Selector("isDepthReversed", "setDepthReversed:")] bool DepthReversed { get; set; }
+    [Selector("colorTextureUsage")]
+    MTLTextureUsage ColorTextureUsage { get; }
+    [Selector("outputTextureUsage")]
+    MTLTextureUsage OutputTextureUsage { get; }
+    [Selector("depthTextureUsage")]
+    MTLTextureUsage DepthTextureUsage { get; }
+    [Selector("motionTextureUsage")]
+    MTLTextureUsage MotionTextureUsage { get; }
+    [Selector("uiTextureUsage")]
+    MTLTextureUsage UiTextureUsage { get; }
+    [Selector("colorTextureFormat")]
+    MTLPixelFormat ColorTextureFormat { get; }
+    [Selector("depthTextureFormat")]
+    MTLPixelFormat DepthTextureFormat { get; }
+    [Selector("motionTextureFormat")]
+    MTLPixelFormat MotionTextureFormat { get; }
+    [Selector("outputTextureFormat")]
+    MTLPixelFormat OutputTextureFormat { get; }
+    [Selector("inputWidth")]
+    NSUInteger InputWidth { get; }
+    [Selector("inputHeight")]
+    NSUInteger InputHeight { get; }
+    [Selector("outputWidth")]
+    NSUInteger OutputWidth { get; }
+    [Selector("outputHeight")]
+    NSUInteger OutputHeight { get; }
+    [Selector("uiTextureFormat")]
+    MTLPixelFormat UiTextureFormat { get; }
+    [Selector("colorTexture", "setColorTexture:")]
+    MTLTexture? ColorTexture { get; set; }
+    [Selector("prevColorTexture", "setPrevColorTexture:")]
+    MTLTexture? PrevColorTexture { get; set; }
+    [Selector("depthTexture", "setDepthTexture:")]
+    MTLTexture? DepthTexture { get; set; }
+    [Selector("motionTexture", "setMotionTexture:")]
+    MTLTexture? MotionTexture { get; set; }
+    [Selector("motionVectorScaleX", "setMotionVectorScaleX:")]
+    float MotionVectorScaleX { get; set; }
+    [Selector("motionVectorScaleY", "setMotionVectorScaleY:")]
+    float MotionVectorScaleY { get; set; }
+    [Selector("deltaTime", "setDeltaTime:")]
+    float DeltaTime { get; set; }
+    [Selector("nearPlane", "setNearPlane:")]
+    float NearPlane { get; set; }
+    [Selector("farPlane", "setFarPlane:")]
+    float FarPlane { get; set; }
+    [Selector("fieldOfView", "setFieldOfView:")]
+    float FieldOfView { get; set; }
+    [Selector("aspectRatio", "setAspectRatio:")]
+    float AspectRatio { get; set; }
+    [Selector("uiTexture", "setUITexture:")]
+    MTLTexture? UiTexture { get; set; }
+    [Selector("jitterOffsetX", "setJitterOffsetX:")]
+    float JitterOffsetX { get; set; }
+    [Selector("jitterOffsetY", "setJitterOffsetY:")]
+    float JitterOffsetY { get; set; }
+    [Selector("isUITextureComposited", "setIsUITextureComposited:")]
+    bool UiTextureComposited { get; set; }
+    [Selector("shouldResetHistory", "setShouldResetHistory:")]
+    bool ShouldResetHistory { get; set; }
+    [Selector("outputTexture", "setOutputTexture:")]
+    MTLTexture? OutputTexture { get; set; }
+    [Selector("fence", "setFence:")]
+    MTLFence? Fence { get; set; }
+    [Selector("isDepthReversed", "setDepthReversed:")]
+    bool DepthReversed { get; set; }
 }
 
 /// macOS 26.0 and later.
 public objc interface MTLFXFrameInterpolator : MTLFXFrameInterpolatorBase
 {
-    [Selector("encodeToCommandBuffer:")] void EncodeToCommandBuffer(MTLCommandBuffer commandBuffer);
+    [Selector("encodeToCommandBuffer:")]
+    void EncodeToCommandBuffer(MTLCommandBuffer commandBuffer);
 }
 
 #endif

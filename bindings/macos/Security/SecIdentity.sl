@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern "C" CFTypeID SecIdentityGetTypeID();
 
-[ReturnsRetained] public extern "C" SecIdentityRef? SecIdentityCreate(CFAllocatorRef? allocator, SecCertificateRef certificate, SecKeyRef privateKey);
+[ReturnsRetained]
+public extern "C" SecIdentityRef? SecIdentityCreate(CFAllocatorRef? allocator, SecCertificateRef certificate, SecKeyRef privateKey);
 
 public extern "C" OSStatus SecIdentityCreateWithCertificate(CFTypeRef? keychainOrArray, SecCertificateRef certificateRef, __SecIdentity** identityRef);
 
@@ -44,7 +45,8 @@ public extern "C" OSStatus SecIdentityCopyPrivateKey(SecIdentityRef identityRef,
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecIdentityCopyPreference(CFStringRef name, CSSM_KEYUSE keyUsage, CFArrayRef? validIssuers, __SecIdentity** identity);
 
-[ReturnsRetained] public extern "C" SecIdentityRef? SecIdentityCopyPreferred(CFStringRef name, CFArrayRef? keyUsage, CFArrayRef? validIssuers);
+[ReturnsRetained]
+public extern "C" SecIdentityRef? SecIdentityCopyPreferred(CFStringRef name, CFArrayRef? keyUsage, CFArrayRef? validIssuers);
 
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecIdentitySetPreference(SecIdentityRef identity, CFStringRef name, CSSM_KEYUSE keyUsage);

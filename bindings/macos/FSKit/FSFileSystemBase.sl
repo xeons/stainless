@@ -37,9 +37,11 @@ public objc closure void FSFileSystemBaseWipeResourceCompletionHandlerCompletion
 public objc interface FSFileSystemBase : NSObjectProtocol
 {
     /// macOS 15.4 and later.
-    [Selector("containerStatus", "setContainerStatus:")] FSContainerStatus ContainerStatus { get; set; }
+    [Selector("containerStatus", "setContainerStatus:")]
+    FSContainerStatus ContainerStatus { get; set; }
     /// macOS 15.4 and later.
-    [Selector("wipeResource:completionHandler:")] void WipeResourceCompletionHandler(FSBlockDeviceResource resource, FSFileSystemBaseWipeResourceCompletionHandlerCompletionBlock completion);
+    [Selector("wipeResource:completionHandler:")]
+    void WipeResourceCompletionHandler(FSBlockDeviceResource resource, FSFileSystemBaseWipeResourceCompletionHandlerCompletionBlock completion);
 }
 
 #endif

@@ -35,32 +35,46 @@ import Standard.ObjC;
 
 public extern objc class AVAudioMix : NSObject, NSCopying, NSMutableCopying
 {
-    [Selector("inputParameters")] public NSArray InputParameters { get; }
+    [Selector("inputParameters")]
+    public NSArray InputParameters { get; }
 }
 
 public extern objc class AVMutableAudioMix : AVAudioMix
 {
-    [Selector("inputParameters", "setInputParameters:")] public NSArray InputParameters { get; set; }
-    [Selector("audioMix")] public static Self AudioMix();
+    [Selector("inputParameters", "setInputParameters:")]
+    public NSArray InputParameters { get; set; }
+    [Selector("audioMix")]
+    public static Self AudioMix();
 }
 
 public extern objc class AVAudioMixInputParameters : NSObject, NSCopying, NSMutableCopying
 {
-    [Selector("trackID")] public CMPersistentTrackID TrackID { get; }
-    [Selector("audioTimePitchAlgorithm")] public AVAudioTimePitchAlgorithm? AudioTimePitchAlgorithm { get; }
-    [Selector("audioTapProcessor")] public MTAudioProcessingTapRef? AudioTapProcessor { get; }
-    [Selector("getVolumeRampForTime:startVolume:endVolume:timeRange:")] public bool GetVolumeRampForTimeStartVolumeEndVolumeTimeRange(CMTime time, float* startVolume, float* endVolume, CMTimeRange* timeRange);
+    [Selector("trackID")]
+    public CMPersistentTrackID TrackID { get; }
+    [Selector("audioTimePitchAlgorithm")]
+    public AVAudioTimePitchAlgorithm? AudioTimePitchAlgorithm { get; }
+    [Selector("audioTapProcessor")]
+    public MTAudioProcessingTapRef? AudioTapProcessor { get; }
+    [Selector("getVolumeRampForTime:startVolume:endVolume:timeRange:")]
+    public bool GetVolumeRampForTimeStartVolumeEndVolumeTimeRange(CMTime time, float* startVolume, float* endVolume, CMTimeRange* timeRange);
 }
 
 public extern objc class AVMutableAudioMixInputParameters : AVAudioMixInputParameters
 {
-    [Selector("trackID", "setTrackID:")] public CMPersistentTrackID TrackID { get; set; }
-    [Selector("audioTimePitchAlgorithm", "setAudioTimePitchAlgorithm:")] public AVAudioTimePitchAlgorithm? AudioTimePitchAlgorithm { get; set; }
-    [Selector("audioTapProcessor", "setAudioTapProcessor:")] public MTAudioProcessingTapRef? AudioTapProcessor { get; set; }
-    [Selector("audioMixInputParametersWithTrack:")] public static Self AudioMixInputParametersWithTrack(AVAssetTrack? track);
-    [Selector("audioMixInputParameters")] public static Self AudioMixInputParameters();
-    [Selector("setVolumeRampFromStartVolume:toEndVolume:timeRange:")] public void SetVolumeRampFromStartVolumeToEndVolumeTimeRange(float startVolume, float endVolume, CMTimeRange timeRange);
-    [Selector("setVolume:atTime:")] public void SetVolumeAtTime(float volume, CMTime time);
+    [Selector("trackID", "setTrackID:")]
+    public CMPersistentTrackID TrackID { get; set; }
+    [Selector("audioTimePitchAlgorithm", "setAudioTimePitchAlgorithm:")]
+    public AVAudioTimePitchAlgorithm? AudioTimePitchAlgorithm { get; set; }
+    [Selector("audioTapProcessor", "setAudioTapProcessor:")]
+    public MTAudioProcessingTapRef? AudioTapProcessor { get; set; }
+    [Selector("audioMixInputParametersWithTrack:")]
+    public static Self AudioMixInputParametersWithTrack(AVAssetTrack? track);
+    [Selector("audioMixInputParameters")]
+    public static Self AudioMixInputParameters();
+    [Selector("setVolumeRampFromStartVolume:toEndVolume:timeRange:")]
+    public void SetVolumeRampFromStartVolumeToEndVolumeTimeRange(float startVolume, float endVolume, CMTimeRange timeRange);
+    [Selector("setVolume:atTime:")]
+    public void SetVolumeAtTime(float volume, CMTime time);
 }
 
 #endif

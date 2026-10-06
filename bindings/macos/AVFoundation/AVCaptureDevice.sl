@@ -40,40 +40,68 @@ public extern "C" NSNotificationName? AVCaptureDeviceWasDisconnectedNotification
 
 public extern objc class AVCaptureDevice : NSObject
 {
-    [Selector("uniqueID")] public NSString UniqueID { get; }
-    [Selector("modelID")] public NSString? ModelID { get; }
-    [Selector("localizedName")] public NSString LocalizedName { get; }
-    [Selector("manufacturer")] public NSString? Manufacturer { get; }
-    [Selector("transportType")] public int TransportType { get; }
-    [Selector("isConnected")] public bool Connected { get; }
-    [Selector("isInUseByAnotherApplication")] public bool InUseByAnotherApplication { get; }
-    [Selector("isSuspended")] public bool Suspended { get; }
-    [Selector("linkedDevices")] public NSArray LinkedDevices { get; }
-    [Selector("formats")] public NSArray Formats { get; }
-    [Selector("activeFormat", "setActiveFormat:")] public AVCaptureDeviceFormat ActiveFormat { get; set; }
-    [Selector("activeVideoMinFrameDuration", "setActiveVideoMinFrameDuration:")] public CMTime ActiveVideoMinFrameDuration { get; set; }
-    [Selector("activeVideoMaxFrameDuration", "setActiveVideoMaxFrameDuration:")] public CMTime ActiveVideoMaxFrameDuration { get; set; }
+    [Selector("uniqueID")]
+    public NSString UniqueID { get; }
+    [Selector("modelID")]
+    public NSString? ModelID { get; }
+    [Selector("localizedName")]
+    public NSString LocalizedName { get; }
+    [Selector("manufacturer")]
+    public NSString? Manufacturer { get; }
+    [Selector("transportType")]
+    public int TransportType { get; }
+    [Selector("isConnected")]
+    public bool Connected { get; }
+    [Selector("isInUseByAnotherApplication")]
+    public bool InUseByAnotherApplication { get; }
+    [Selector("isSuspended")]
+    public bool Suspended { get; }
+    [Selector("linkedDevices")]
+    public NSArray LinkedDevices { get; }
+    [Selector("formats")]
+    public NSArray Formats { get; }
+    [Selector("activeFormat", "setActiveFormat:")]
+    public AVCaptureDeviceFormat ActiveFormat { get; set; }
+    [Selector("activeVideoMinFrameDuration", "setActiveVideoMinFrameDuration:")]
+    public CMTime ActiveVideoMinFrameDuration { get; set; }
+    [Selector("activeVideoMaxFrameDuration", "setActiveVideoMaxFrameDuration:")]
+    public CMTime ActiveVideoMaxFrameDuration { get; set; }
     /// macOS 26.0 and later.
-    [Selector("isVideoFrameDurationLocked")] public bool VideoFrameDurationLocked { get; }
+    [Selector("isVideoFrameDurationLocked")]
+    public bool VideoFrameDurationLocked { get; }
     /// macOS 26.0 and later.
-    [Selector("minSupportedLockedVideoFrameDuration")] public CMTime MinSupportedLockedVideoFrameDuration { get; }
+    [Selector("minSupportedLockedVideoFrameDuration")]
+    public CMTime MinSupportedLockedVideoFrameDuration { get; }
     /// macOS 26.0 and later.
-    [Selector("isFollowingExternalSyncDevice")] public bool FollowingExternalSyncDevice { get; }
+    [Selector("isFollowingExternalSyncDevice")]
+    public bool FollowingExternalSyncDevice { get; }
     /// macOS 26.0 and later.
-    [Selector("minSupportedExternalSyncFrameDuration")] public CMTime MinSupportedExternalSyncFrameDuration { get; }
-    [Selector("isAutoVideoFrameRateEnabled", "setAutoVideoFrameRateEnabled:")] public bool AutoVideoFrameRateEnabled { get; set; }
-    [Selector("inputSources")] public NSArray InputSources { get; }
-    [Selector("activeInputSource", "setActiveInputSource:")] public AVCaptureDeviceInputSource? ActiveInputSource { get; set; }
+    [Selector("minSupportedExternalSyncFrameDuration")]
+    public CMTime MinSupportedExternalSyncFrameDuration { get; }
+    [Selector("isAutoVideoFrameRateEnabled", "setAutoVideoFrameRateEnabled:")]
+    public bool AutoVideoFrameRateEnabled { get; set; }
+    [Selector("inputSources")]
+    public NSArray InputSources { get; }
+    [Selector("activeInputSource", "setActiveInputSource:")]
+    public AVCaptureDeviceInputSource? ActiveInputSource { get; set; }
     /// Deprecated in macOS 10.15.
-    [Selector("devices")] public static NSArray Devices();
+    [Selector("devices")]
+    public static NSArray Devices();
     /// Deprecated in macOS 10.15.
-    [Selector("devicesWithMediaType:")] public static NSArray DevicesWithMediaType(AVMediaType mediaType);
-    [Selector("defaultDeviceWithMediaType:")] public static AVCaptureDevice? DefaultDeviceWithMediaType(AVMediaType mediaType);
-    [Selector("deviceWithUniqueID:")] public static AVCaptureDevice? DeviceWithUniqueID(NSString deviceUniqueID);
-    [Selector("hasMediaType:")] public bool HasMediaType(AVMediaType mediaType);
-    [Selector("lockForConfiguration:")] public bool LockForConfiguration(out NSError? outError);
-    [Selector("unlockForConfiguration")] public void UnlockForConfiguration();
-    [Selector("supportsAVCaptureSessionPreset:")] public bool SupportsAVCaptureSessionPreset(AVCaptureSessionPreset preset);
+    [Selector("devicesWithMediaType:")]
+    public static NSArray DevicesWithMediaType(AVMediaType mediaType);
+    [Selector("defaultDeviceWithMediaType:")]
+    public static AVCaptureDevice? DefaultDeviceWithMediaType(AVMediaType mediaType);
+    [Selector("deviceWithUniqueID:")]
+    public static AVCaptureDevice? DeviceWithUniqueID(NSString deviceUniqueID);
+    [Selector("hasMediaType:")]
+    public bool HasMediaType(AVMediaType mediaType);
+    [Selector("lockForConfiguration:")]
+    public bool LockForConfiguration(out NSError? outError);
+    [Selector("unlockForConfiguration")]
+    public void UnlockForConfiguration();
+    [Selector("supportsAVCaptureSessionPreset:")]
+    public bool SupportsAVCaptureSessionPreset(AVCaptureSessionPreset preset);
 }
 
 public enum AVCaptureDevicePosition : long
@@ -86,7 +114,8 @@ public enum AVCaptureDevicePosition : long
 /// AVCaptureDevicePosition, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("position")] public AVCaptureDevicePosition Position { get; }
+    [Selector("position")]
+    public AVCaptureDevicePosition Position { get; }
 }
 
 public using AVCaptureDeviceType = NSString;
@@ -110,20 +139,24 @@ public extern "C" AVCaptureDeviceType? AVCaptureDeviceTypeBuiltInMicrophone;
 /// AVCaptureDeviceType, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("deviceType")] public AVCaptureDeviceType DeviceType { get; }
+    [Selector("deviceType")]
+    public AVCaptureDeviceType DeviceType { get; }
 }
 
 /// AVCaptureDefaultDevice, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("defaultDeviceWithDeviceType:mediaType:position:")] public static AVCaptureDevice? DefaultDeviceWithDeviceTypeMediaTypePosition(AVCaptureDeviceType deviceType, AVMediaType? mediaType, AVCaptureDevicePosition position);
+    [Selector("defaultDeviceWithDeviceType:mediaType:position:")]
+    public static AVCaptureDevice? DefaultDeviceWithDeviceTypeMediaTypePosition(AVCaptureDeviceType deviceType, AVMediaType? mediaType, AVCaptureDevicePosition position);
 }
 
 /// AVCaptureDevicePreferredCamera, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("userPreferredCamera", "setUserPreferredCamera:")] public static AVCaptureDevice? UserPreferredCamera { get; set; }
-    [Selector("systemPreferredCamera")] public static AVCaptureDevice? SystemPreferredCamera { get; }
+    [Selector("userPreferredCamera", "setUserPreferredCamera:")]
+    public static AVCaptureDevice? UserPreferredCamera { get; set; }
+    [Selector("systemPreferredCamera")]
+    public static AVCaptureDevice? SystemPreferredCamera { get; }
 }
 
 /// AVCaptureDeviceSystemPressure, a category of AVCaptureDevice.
@@ -149,14 +182,22 @@ public enum AVCapturePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditio
 /// AVCaptureDeviceVirtual, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("primaryConstituentDeviceSwitchingBehavior")] public AVCapturePrimaryConstituentDeviceSwitchingBehavior PrimaryConstituentDeviceSwitchingBehavior { get; }
-    [Selector("primaryConstituentDeviceRestrictedSwitchingBehaviorConditions")] public AVCapturePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions PrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions { get; }
-    [Selector("activePrimaryConstituentDeviceSwitchingBehavior")] public AVCapturePrimaryConstituentDeviceSwitchingBehavior ActivePrimaryConstituentDeviceSwitchingBehavior { get; }
-    [Selector("activePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions")] public AVCapturePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions ActivePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions { get; }
-    [Selector("activePrimaryConstituentDevice")] public AVCaptureDevice? ActivePrimaryConstituentDevice { get; }
-    [Selector("supportedFallbackPrimaryConstituentDevices")] public NSArray? SupportedFallbackPrimaryConstituentDevices { get; }
-    [Selector("fallbackPrimaryConstituentDevices", "setFallbackPrimaryConstituentDevices:")] public NSArray? FallbackPrimaryConstituentDevices { get; set; }
-    [Selector("setPrimaryConstituentDeviceSwitchingBehavior:restrictedSwitchingBehaviorConditions:")] public void SetPrimaryConstituentDeviceSwitchingBehaviorRestrictedSwitchingBehaviorConditions(AVCapturePrimaryConstituentDeviceSwitchingBehavior switchingBehavior, AVCapturePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions restrictedSwitchingBehaviorConditions);
+    [Selector("primaryConstituentDeviceSwitchingBehavior")]
+    public AVCapturePrimaryConstituentDeviceSwitchingBehavior PrimaryConstituentDeviceSwitchingBehavior { get; }
+    [Selector("primaryConstituentDeviceRestrictedSwitchingBehaviorConditions")]
+    public AVCapturePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions PrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions { get; }
+    [Selector("activePrimaryConstituentDeviceSwitchingBehavior")]
+    public AVCapturePrimaryConstituentDeviceSwitchingBehavior ActivePrimaryConstituentDeviceSwitchingBehavior { get; }
+    [Selector("activePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions")]
+    public AVCapturePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions ActivePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions { get; }
+    [Selector("activePrimaryConstituentDevice")]
+    public AVCaptureDevice? ActivePrimaryConstituentDevice { get; }
+    [Selector("supportedFallbackPrimaryConstituentDevices")]
+    public NSArray? SupportedFallbackPrimaryConstituentDevices { get; }
+    [Selector("fallbackPrimaryConstituentDevices", "setFallbackPrimaryConstituentDevices:")]
+    public NSArray? FallbackPrimaryConstituentDevices { get; set; }
+    [Selector("setPrimaryConstituentDeviceSwitchingBehavior:restrictedSwitchingBehaviorConditions:")]
+    public void SetPrimaryConstituentDeviceSwitchingBehaviorRestrictedSwitchingBehaviorConditions(AVCapturePrimaryConstituentDeviceSwitchingBehavior switchingBehavior, AVCapturePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions restrictedSwitchingBehaviorConditions);
 }
 
 public enum AVCaptureFlashMode : long
@@ -169,10 +210,14 @@ public enum AVCaptureFlashMode : long
 /// AVCaptureDeviceFlash, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("hasFlash")] public bool HasFlash { get; }
-    [Selector("isFlashAvailable")] public bool FlashAvailable { get; }
-    [Selector("flashMode", "setFlashMode:")] public AVCaptureFlashMode FlashMode { get; set; }
-    [Selector("isFlashModeSupported:")] public bool IsFlashModeSupported(AVCaptureFlashMode flashMode);
+    [Selector("hasFlash")]
+    public bool HasFlash { get; }
+    [Selector("isFlashAvailable")]
+    public bool FlashAvailable { get; }
+    [Selector("flashMode", "setFlashMode:")]
+    public AVCaptureFlashMode FlashMode { get; set; }
+    [Selector("isFlashModeSupported:")]
+    public bool IsFlashModeSupported(AVCaptureFlashMode flashMode);
 }
 
 public enum AVCaptureTorchMode : long
@@ -187,13 +232,20 @@ public extern "C" float AVCaptureMaxAvailableTorchLevel;
 /// AVCaptureDeviceTorch, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("hasTorch")] public bool HasTorch { get; }
-    [Selector("isTorchAvailable")] public bool TorchAvailable { get; }
-    [Selector("isTorchActive")] public bool TorchActive { get; }
-    [Selector("torchLevel")] public float TorchLevel { get; }
-    [Selector("torchMode", "setTorchMode:")] public AVCaptureTorchMode TorchMode { get; set; }
-    [Selector("isTorchModeSupported:")] public bool IsTorchModeSupported(AVCaptureTorchMode torchMode);
-    [Selector("setTorchModeOnWithLevel:error:")] public bool SetTorchModeOnWithLevelError(float torchLevel, out NSError? outError);
+    [Selector("hasTorch")]
+    public bool HasTorch { get; }
+    [Selector("isTorchAvailable")]
+    public bool TorchAvailable { get; }
+    [Selector("isTorchActive")]
+    public bool TorchActive { get; }
+    [Selector("torchLevel")]
+    public float TorchLevel { get; }
+    [Selector("torchMode", "setTorchMode:")]
+    public AVCaptureTorchMode TorchMode { get; set; }
+    [Selector("isTorchModeSupported:")]
+    public bool IsTorchModeSupported(AVCaptureTorchMode torchMode);
+    [Selector("setTorchModeOnWithLevel:error:")]
+    public bool SetTorchModeOnWithLevelError(float torchLevel, out NSError? outError);
 }
 
 public enum AVCaptureFocusMode : long
@@ -206,26 +258,39 @@ public enum AVCaptureFocusMode : long
 /// AVCaptureDeviceFocus, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("focusMode", "setFocusMode:")] public AVCaptureFocusMode FocusMode { get; set; }
-    [Selector("isFocusPointOfInterestSupported")] public bool FocusPointOfInterestSupported { get; }
-    [Selector("focusPointOfInterest", "setFocusPointOfInterest:")] public CGPoint FocusPointOfInterest { get; set; }
+    [Selector("focusMode", "setFocusMode:")]
+    public AVCaptureFocusMode FocusMode { get; set; }
+    [Selector("isFocusPointOfInterestSupported")]
+    public bool FocusPointOfInterestSupported { get; }
+    [Selector("focusPointOfInterest", "setFocusPointOfInterest:")]
+    public CGPoint FocusPointOfInterest { get; set; }
     /// macOS 26.0 and later.
-    [Selector("isFocusRectOfInterestSupported")] public bool FocusRectOfInterestSupported { get; }
+    [Selector("isFocusRectOfInterestSupported")]
+    public bool FocusRectOfInterestSupported { get; }
     /// macOS 26.0 and later.
-    [Selector("minFocusRectOfInterestSize")] public CGSize MinFocusRectOfInterestSize { get; }
+    [Selector("minFocusRectOfInterestSize")]
+    public CGSize MinFocusRectOfInterestSize { get; }
     /// macOS 26.0 and later.
-    [Selector("focusRectOfInterest", "setFocusRectOfInterest:")] public CGRect FocusRectOfInterest { get; set; }
-    [Selector("isAdjustingFocus")] public bool AdjustingFocus { get; }
-    [Selector("minimumFocusDistance")] public NSInteger MinimumFocusDistance { get; }
-    [Selector("isFocusModeSupported:")] public bool IsFocusModeSupported(AVCaptureFocusMode focusMode);
+    [Selector("focusRectOfInterest", "setFocusRectOfInterest:")]
+    public CGRect FocusRectOfInterest { get; set; }
+    [Selector("isAdjustingFocus")]
+    public bool AdjustingFocus { get; }
+    [Selector("minimumFocusDistance")]
+    public NSInteger MinimumFocusDistance { get; }
+    [Selector("isFocusModeSupported:")]
+    public bool IsFocusModeSupported(AVCaptureFocusMode focusMode);
     /// macOS 26.0 and later.
-    [Selector("defaultRectForFocusPointOfInterest:")] public CGRect DefaultRectForFocusPointOfInterest(CGPoint pointOfInterest);
+    [Selector("defaultRectForFocusPointOfInterest:")]
+    public CGRect DefaultRectForFocusPointOfInterest(CGPoint pointOfInterest);
     /// macOS 26.0 and later.
-    [Selector("setCinematicVideoTrackingFocusWithDetectedObjectID:focusMode:")] public void SetCinematicVideoTrackingFocusWithDetectedObjectIDFocusMode(NSInteger detectedObjectID, AVCaptureCinematicVideoFocusMode focusMode);
+    [Selector("setCinematicVideoTrackingFocusWithDetectedObjectID:focusMode:")]
+    public void SetCinematicVideoTrackingFocusWithDetectedObjectIDFocusMode(NSInteger detectedObjectID, AVCaptureCinematicVideoFocusMode focusMode);
     /// macOS 26.0 and later.
-    [Selector("setCinematicVideoTrackingFocusAtPoint:focusMode:")] public void SetCinematicVideoTrackingFocusAtPointFocusMode(CGPoint point, AVCaptureCinematicVideoFocusMode focusMode);
+    [Selector("setCinematicVideoTrackingFocusAtPoint:focusMode:")]
+    public void SetCinematicVideoTrackingFocusAtPointFocusMode(CGPoint point, AVCaptureCinematicVideoFocusMode focusMode);
     /// macOS 26.0 and later.
-    [Selector("setCinematicVideoFixedFocusAtPoint:focusMode:")] public void SetCinematicVideoFixedFocusAtPointFocusMode(CGPoint point, AVCaptureCinematicVideoFocusMode focusMode);
+    [Selector("setCinematicVideoFixedFocusAtPoint:focusMode:")]
+    public void SetCinematicVideoFixedFocusAtPointFocusMode(CGPoint point, AVCaptureCinematicVideoFocusMode focusMode);
 }
 
 /// macOS 26.0 and later.
@@ -247,19 +312,28 @@ public enum AVCaptureExposureMode : long
 /// AVCaptureDeviceExposure, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("exposureMode", "setExposureMode:")] public AVCaptureExposureMode ExposureMode { get; set; }
-    [Selector("isExposurePointOfInterestSupported")] public bool ExposurePointOfInterestSupported { get; }
-    [Selector("exposurePointOfInterest", "setExposurePointOfInterest:")] public CGPoint ExposurePointOfInterest { get; set; }
+    [Selector("exposureMode", "setExposureMode:")]
+    public AVCaptureExposureMode ExposureMode { get; set; }
+    [Selector("isExposurePointOfInterestSupported")]
+    public bool ExposurePointOfInterestSupported { get; }
+    [Selector("exposurePointOfInterest", "setExposurePointOfInterest:")]
+    public CGPoint ExposurePointOfInterest { get; set; }
     /// macOS 26.0 and later.
-    [Selector("isExposureRectOfInterestSupported")] public bool ExposureRectOfInterestSupported { get; }
+    [Selector("isExposureRectOfInterestSupported")]
+    public bool ExposureRectOfInterestSupported { get; }
     /// macOS 26.0 and later.
-    [Selector("minExposureRectOfInterestSize")] public CGSize MinExposureRectOfInterestSize { get; }
+    [Selector("minExposureRectOfInterestSize")]
+    public CGSize MinExposureRectOfInterestSize { get; }
     /// macOS 26.0 and later.
-    [Selector("exposureRectOfInterest", "setExposureRectOfInterest:")] public CGRect ExposureRectOfInterest { get; set; }
-    [Selector("isAdjustingExposure")] public bool AdjustingExposure { get; }
-    [Selector("isExposureModeSupported:")] public bool IsExposureModeSupported(AVCaptureExposureMode exposureMode);
+    [Selector("exposureRectOfInterest", "setExposureRectOfInterest:")]
+    public CGRect ExposureRectOfInterest { get; set; }
+    [Selector("isAdjustingExposure")]
+    public bool AdjustingExposure { get; }
+    [Selector("isExposureModeSupported:")]
+    public bool IsExposureModeSupported(AVCaptureExposureMode exposureMode);
     /// macOS 26.0 and later.
-    [Selector("defaultRectForExposurePointOfInterest:")] public CGRect DefaultRectForExposurePointOfInterest(CGPoint pointOfInterest);
+    [Selector("defaultRectForExposurePointOfInterest:")]
+    public CGRect DefaultRectForExposurePointOfInterest(CGPoint pointOfInterest);
 }
 
 /// AVCaptureDeviceToneMapping, a category of AVCaptureDevice.
@@ -275,9 +349,12 @@ public enum AVCaptureWhiteBalanceMode : long
 /// AVCaptureDeviceWhiteBalance, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("whiteBalanceMode", "setWhiteBalanceMode:")] public AVCaptureWhiteBalanceMode WhiteBalanceMode { get; set; }
-    [Selector("isAdjustingWhiteBalance")] public bool AdjustingWhiteBalance { get; }
-    [Selector("isWhiteBalanceModeSupported:")] public bool IsWhiteBalanceModeSupported(AVCaptureWhiteBalanceMode whiteBalanceMode);
+    [Selector("whiteBalanceMode", "setWhiteBalanceMode:")]
+    public AVCaptureWhiteBalanceMode WhiteBalanceMode { get; set; }
+    [Selector("isAdjustingWhiteBalance")]
+    public bool AdjustingWhiteBalance { get; }
+    [Selector("isWhiteBalanceModeSupported:")]
+    public bool IsWhiteBalanceModeSupported(AVCaptureWhiteBalanceMode whiteBalanceMode);
 }
 
 /// AVCaptureDeviceSubjectAreaChangeMonitoring, a category of AVCaptureDevice.
@@ -289,7 +366,8 @@ public extern objc class AVCaptureDevice { }
 /// AVCaptureDeviceVideoZoom, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("displayVideoZoomFactorMultiplier")] public CGFloat DisplayVideoZoomFactorMultiplier { get; }
+    [Selector("displayVideoZoomFactorMultiplier")]
+    public CGFloat DisplayVideoZoomFactorMultiplier { get; }
 }
 
 public enum AVAuthorizationStatus : long
@@ -305,8 +383,10 @@ public objc closure void AVCaptureDeviceRequestAccessForMediaTypeCompletionHandl
 /// AVCaptureDeviceAuthorization, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("authorizationStatusForMediaType:")] public static AVAuthorizationStatus AuthorizationStatusForMediaType(AVMediaType mediaType);
-    [Selector("requestAccessForMediaType:completionHandler:")] public static void RequestAccessForMediaTypeCompletionHandler(AVMediaType mediaType, AVCaptureDeviceRequestAccessForMediaTypeCompletionHandlerHandlerBlock handler);
+    [Selector("authorizationStatusForMediaType:")]
+    public static AVAuthorizationStatus AuthorizationStatusForMediaType(AVMediaType mediaType);
+    [Selector("requestAccessForMediaType:completionHandler:")]
+    public static void RequestAccessForMediaTypeCompletionHandler(AVMediaType mediaType, AVCaptureDeviceRequestAccessForMediaTypeCompletionHandlerHandlerBlock handler);
 }
 
 public using AVCaptureDeviceTransportControlsSpeed = float;
@@ -320,10 +400,14 @@ public enum AVCaptureDeviceTransportControlsPlaybackMode : long
 /// AVCaptureDeviceTransportControls, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("transportControlsSupported")] public bool TransportControlsSupported { get; }
-    [Selector("transportControlsPlaybackMode")] public AVCaptureDeviceTransportControlsPlaybackMode TransportControlsPlaybackMode { get; }
-    [Selector("transportControlsSpeed")] public AVCaptureDeviceTransportControlsSpeed TransportControlsSpeed { get; }
-    [Selector("setTransportControlsPlaybackMode:speed:")] public void SetTransportControlsPlaybackModeSpeed(AVCaptureDeviceTransportControlsPlaybackMode mode, AVCaptureDeviceTransportControlsSpeed speed);
+    [Selector("transportControlsSupported")]
+    public bool TransportControlsSupported { get; }
+    [Selector("transportControlsPlaybackMode")]
+    public AVCaptureDeviceTransportControlsPlaybackMode TransportControlsPlaybackMode { get; }
+    [Selector("transportControlsSpeed")]
+    public AVCaptureDeviceTransportControlsSpeed TransportControlsSpeed { get; }
+    [Selector("setTransportControlsPlaybackMode:speed:")]
+    public void SetTransportControlsPlaybackModeSpeed(AVCaptureDeviceTransportControlsPlaybackMode mode, AVCaptureDeviceTransportControlsSpeed speed);
 }
 
 /// AVCaptureDeviceHighDynamicRangeSupport, a category of AVCaptureDevice.
@@ -338,7 +422,8 @@ public enum AVCaptureColorSpace : long
 /// AVCaptureDeviceColorSpaceSupport, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("activeColorSpace", "setActiveColorSpace:")] public AVCaptureColorSpace ActiveColorSpace { get; set; }
+    [Selector("activeColorSpace", "setActiveColorSpace:")]
+    public AVCaptureColorSpace ActiveColorSpace { get; set; }
 }
 
 /// AVCaptureDeviceDepthSupport, a category of AVCaptureDevice.
@@ -353,10 +438,14 @@ public extern objc class AVCaptureDevice { }
 /// AVCaptureDeviceCenterStage, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("centerStageControlMode", "setCenterStageControlMode:")] public static AVCaptureCenterStageControlMode CenterStageControlMode { get; set; }
-    [Selector("isCenterStageEnabled", "setCenterStageEnabled:")] public static bool CenterStageEnabled { get; set; }
-    [Selector("isCenterStageActive")] public bool CenterStageActive { get; }
-    [Selector("centerStageRectOfInterest", "setCenterStageRectOfInterest:")] public CGRect CenterStageRectOfInterest { get; set; }
+    [Selector("centerStageControlMode", "setCenterStageControlMode:")]
+    public static AVCaptureCenterStageControlMode CenterStageControlMode { get; set; }
+    [Selector("isCenterStageEnabled", "setCenterStageEnabled:")]
+    public static bool CenterStageEnabled { get; set; }
+    [Selector("isCenterStageActive")]
+    public bool CenterStageActive { get; }
+    [Selector("centerStageRectOfInterest", "setCenterStageRectOfInterest:")]
+    public CGRect CenterStageRectOfInterest { get; set; }
 }
 
 public enum AVCaptureCenterStageControlMode : long
@@ -369,45 +458,59 @@ public enum AVCaptureCenterStageControlMode : long
 /// AVCaptureDevicePortraitEffect, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("isPortraitEffectEnabled")] public static bool PortraitEffectEnabled { get; }
-    [Selector("isPortraitEffectActive")] public bool PortraitEffectActive { get; }
+    [Selector("isPortraitEffectEnabled")]
+    public static bool PortraitEffectEnabled { get; }
+    [Selector("isPortraitEffectActive")]
+    public bool PortraitEffectActive { get; }
 }
 
 /// AVCaptureDeviceReactionEffects, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("reactionEffectsEnabled")] public static bool ReactionEffectsEnabled { get; }
-    [Selector("reactionEffectGesturesEnabled")] public static bool ReactionEffectGesturesEnabled { get; }
-    [Selector("canPerformReactionEffects")] public bool CanPerformReactionEffects { get; }
-    [Selector("availableReactionTypes")] public NSSet? AvailableReactionTypes { get; }
-    [Selector("reactionEffectsInProgress")] public NSArray? ReactionEffectsInProgress { get; }
-    [Selector("performEffectForReaction:")] public void PerformEffectForReaction(AVCaptureReactionType reactionType);
+    [Selector("reactionEffectsEnabled")]
+    public static bool ReactionEffectsEnabled { get; }
+    [Selector("reactionEffectGesturesEnabled")]
+    public static bool ReactionEffectGesturesEnabled { get; }
+    [Selector("canPerformReactionEffects")]
+    public bool CanPerformReactionEffects { get; }
+    [Selector("availableReactionTypes")]
+    public NSSet? AvailableReactionTypes { get; }
+    [Selector("reactionEffectsInProgress")]
+    public NSArray? ReactionEffectsInProgress { get; }
+    [Selector("performEffectForReaction:")]
+    public void PerformEffectForReaction(AVCaptureReactionType reactionType);
 }
 
 /// AVCaptureDeviceBackgroundReplacement, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("isBackgroundReplacementEnabled")] public static bool BackgroundReplacementEnabled { get; }
-    [Selector("isBackgroundReplacementActive")] public bool BackgroundReplacementActive { get; }
+    [Selector("isBackgroundReplacementEnabled")]
+    public static bool BackgroundReplacementEnabled { get; }
+    [Selector("isBackgroundReplacementActive")]
+    public bool BackgroundReplacementActive { get; }
 }
 
 /// AVCaptureDeviceContinuityCamera, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("isContinuityCamera")] public bool ContinuityCamera { get; }
+    [Selector("isContinuityCamera")]
+    public bool ContinuityCamera { get; }
 }
 
 /// AVCaptureDeviceDeskViewCamera, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("companionDeskViewCamera")] public AVCaptureDevice? CompanionDeskViewCamera { get; }
+    [Selector("companionDeskViewCamera")]
+    public AVCaptureDevice? CompanionDeskViewCamera { get; }
 }
 
 /// AVCaptureMicrophoneMode, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("preferredMicrophoneMode")] public static AVCaptureMicrophoneMode PreferredMicrophoneMode { get; }
-    [Selector("activeMicrophoneMode")] public static AVCaptureMicrophoneMode ActiveMicrophoneMode { get; }
+    [Selector("preferredMicrophoneMode")]
+    public static AVCaptureMicrophoneMode PreferredMicrophoneMode { get; }
+    [Selector("activeMicrophoneMode")]
+    public static AVCaptureMicrophoneMode ActiveMicrophoneMode { get; }
 }
 
 public enum AVCaptureMicrophoneMode : long
@@ -420,7 +523,8 @@ public enum AVCaptureMicrophoneMode : long
 /// AVCaptureSystemUserInterface, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("showSystemUserInterface:")] public static void ShowSystemUserInterface(AVCaptureSystemUserInterface systemUserInterface);
+    [Selector("showSystemUserInterface:")]
+    public static void ShowSystemUserInterface(AVCaptureSystemUserInterface systemUserInterface);
 }
 
 public enum AVCaptureSystemUserInterface : long
@@ -438,7 +542,8 @@ public extern "C" AVSpatialCaptureDiscomfortReason? AVSpatialCaptureDiscomfortRe
 /// AVCaptureDeviceSpatialCapture, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("spatialCaptureDiscomfortReasons")] public NSSet? SpatialCaptureDiscomfortReasons { get; }
+    [Selector("spatialCaptureDiscomfortReasons")]
+    public NSSet? SpatialCaptureDiscomfortReasons { get; }
 }
 
 /// macOS 26.0 and later.
@@ -451,7 +556,8 @@ public extern "C" AVCaptureSceneMonitoringStatus? AVCaptureSceneMonitoringStatus
 /// AVCaptureDeviceCinematicVideoCapture, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("cinematicVideoCaptureSceneMonitoringStatuses")] public NSSet CinematicVideoCaptureSceneMonitoringStatuses { get; }
+    [Selector("cinematicVideoCaptureSceneMonitoringStatuses")]
+    public NSSet CinematicVideoCaptureSceneMonitoringStatuses { get; }
 }
 
 /// AVCaptureDeviceNominalFocalLengthIn35mmFilm, a category of AVCaptureDevice.
@@ -459,39 +565,56 @@ public extern objc class AVCaptureDevice { }
 
 public extern objc class AVCaptureDeviceDiscoverySession : NSObject
 {
-    [Selector("devices")] public NSArray Devices { get; }
-    [Selector("discoverySessionWithDeviceTypes:mediaType:position:")] public static Self DiscoverySessionWithDeviceTypesMediaTypePosition(NSArray deviceTypes, AVMediaType? mediaType, AVCaptureDevicePosition position);
+    [Selector("devices")]
+    public NSArray Devices { get; }
+    [Selector("discoverySessionWithDeviceTypes:mediaType:position:")]
+    public static Self DiscoverySessionWithDeviceTypesMediaTypePosition(NSArray deviceTypes, AVMediaType? mediaType, AVCaptureDevicePosition position);
 }
 
 public extern objc class AVCaptureDeviceRotationCoordinator : NSObject
 {
-    [Selector("device")] public AVCaptureDevice? Device { get; }
-    [Selector("previewLayer")] public CALayer? PreviewLayer { get; }
-    [Selector("videoRotationAngleForHorizonLevelPreview")] public CGFloat VideoRotationAngleForHorizonLevelPreview { get; }
-    [Selector("videoRotationAngleForHorizonLevelCapture")] public CGFloat VideoRotationAngleForHorizonLevelCapture { get; }
-    [Selector("initWithDevice:previewLayer:")] public Self InitWithDevicePreviewLayer(AVCaptureDevice device, CALayer? previewLayer);
+    [Selector("device")]
+    public AVCaptureDevice? Device { get; }
+    [Selector("previewLayer")]
+    public CALayer? PreviewLayer { get; }
+    [Selector("videoRotationAngleForHorizonLevelPreview")]
+    public CGFloat VideoRotationAngleForHorizonLevelPreview { get; }
+    [Selector("videoRotationAngleForHorizonLevelCapture")]
+    public CGFloat VideoRotationAngleForHorizonLevelCapture { get; }
+    [Selector("initWithDevice:previewLayer:")]
+    public Self InitWithDevicePreviewLayer(AVCaptureDevice device, CALayer? previewLayer);
 }
 
 public extern objc class AVExposureBiasRange : NSObject
 {
-    [Selector("minExposureBias")] public float MinExposureBias { get; }
-    [Selector("maxExposureBias")] public float MaxExposureBias { get; }
-    [Selector("containsExposureBias:")] public bool ContainsExposureBias(float exposureBias);
+    [Selector("minExposureBias")]
+    public float MinExposureBias { get; }
+    [Selector("maxExposureBias")]
+    public float MaxExposureBias { get; }
+    [Selector("containsExposureBias:")]
+    public bool ContainsExposureBias(float exposureBias);
 }
 
 public extern objc class AVFrameRateRange : NSObject
 {
-    [Selector("minFrameRate")] public Float64 MinFrameRate { get; }
-    [Selector("maxFrameRate")] public Float64 MaxFrameRate { get; }
-    [Selector("maxFrameDuration")] public CMTime MaxFrameDuration { get; }
-    [Selector("minFrameDuration")] public CMTime MinFrameDuration { get; }
+    [Selector("minFrameRate")]
+    public Float64 MinFrameRate { get; }
+    [Selector("maxFrameRate")]
+    public Float64 MaxFrameRate { get; }
+    [Selector("maxFrameDuration")]
+    public CMTime MaxFrameDuration { get; }
+    [Selector("minFrameDuration")]
+    public CMTime MinFrameDuration { get; }
 }
 
 public extern objc class AVZoomRange : NSObject
 {
-    [Selector("minZoomFactor")] public CGFloat MinZoomFactor { get; }
-    [Selector("maxZoomFactor")] public CGFloat MaxZoomFactor { get; }
-    [Selector("containsZoomFactor:")] public bool ContainsZoomFactor(CGFloat zoomFactor);
+    [Selector("minZoomFactor")]
+    public CGFloat MinZoomFactor { get; }
+    [Selector("maxZoomFactor")]
+    public CGFloat MaxZoomFactor { get; }
+    [Selector("containsZoomFactor:")]
+    public bool ContainsZoomFactor(CGFloat zoomFactor);
 }
 
 public enum AVCaptureAutoFocusSystem : long
@@ -503,19 +626,32 @@ public enum AVCaptureAutoFocusSystem : long
 
 public extern objc class AVCaptureDeviceFormat : NSObject
 {
-    [Selector("mediaType")] public AVMediaType MediaType { get; }
-    [Selector("formatDescription")] public CMFormatDescriptionRef FormatDescription { get; }
-    [Selector("videoSupportedFrameRateRanges")] public NSArray VideoSupportedFrameRateRanges { get; }
-    [Selector("systemRecommendedVideoZoomRange")] public AVZoomRange? SystemRecommendedVideoZoomRange { get; }
-    [Selector("systemRecommendedExposureBiasRange")] public AVExposureBiasRange? SystemRecommendedExposureBiasRange { get; }
-    [Selector("isHighPhotoQualitySupported")] public bool HighPhotoQualitySupported { get; }
-    [Selector("autoFocusSystem")] public AVCaptureAutoFocusSystem AutoFocusSystem { get; }
-    [Selector("supportedColorSpaces")] public NSArray? SupportedColorSpaces { get; }
-    [Selector("supportedVideoZoomRangesForDepthDataDelivery")] public NSArray? SupportedVideoZoomRangesForDepthDataDelivery { get; }
-    [Selector("zoomFactorsOutsideOfVideoZoomRangesForDepthDeliverySupported")] public bool ZoomFactorsOutsideOfVideoZoomRangesForDepthDeliverySupported { get; }
-    [Selector("supportedMaxPhotoDimensions")] public NSArray? SupportedMaxPhotoDimensions { get; }
-    [Selector("secondaryNativeResolutionZoomFactors")] public NSArray? SecondaryNativeResolutionZoomFactors { get; }
-    [Selector("isAutoVideoFrameRateSupported")] public bool AutoVideoFrameRateSupported { get; }
+    [Selector("mediaType")]
+    public AVMediaType MediaType { get; }
+    [Selector("formatDescription")]
+    public CMFormatDescriptionRef FormatDescription { get; }
+    [Selector("videoSupportedFrameRateRanges")]
+    public NSArray VideoSupportedFrameRateRanges { get; }
+    [Selector("systemRecommendedVideoZoomRange")]
+    public AVZoomRange? SystemRecommendedVideoZoomRange { get; }
+    [Selector("systemRecommendedExposureBiasRange")]
+    public AVExposureBiasRange? SystemRecommendedExposureBiasRange { get; }
+    [Selector("isHighPhotoQualitySupported")]
+    public bool HighPhotoQualitySupported { get; }
+    [Selector("autoFocusSystem")]
+    public AVCaptureAutoFocusSystem AutoFocusSystem { get; }
+    [Selector("supportedColorSpaces")]
+    public NSArray? SupportedColorSpaces { get; }
+    [Selector("supportedVideoZoomRangesForDepthDataDelivery")]
+    public NSArray? SupportedVideoZoomRangesForDepthDataDelivery { get; }
+    [Selector("zoomFactorsOutsideOfVideoZoomRangesForDepthDeliverySupported")]
+    public bool ZoomFactorsOutsideOfVideoZoomRangesForDepthDeliverySupported { get; }
+    [Selector("supportedMaxPhotoDimensions")]
+    public NSArray? SupportedMaxPhotoDimensions { get; }
+    [Selector("secondaryNativeResolutionZoomFactors")]
+    public NSArray? SecondaryNativeResolutionZoomFactors { get; }
+    [Selector("isAutoVideoFrameRateSupported")]
+    public bool AutoVideoFrameRateSupported { get; }
 }
 
 /// AVCaptureDeviceFormatDepthDataAdditions, a category of AVCaptureDeviceFormat.
@@ -527,7 +663,8 @@ public extern objc class AVCaptureDeviceFormat { }
 /// AVCaptureDeviceFormatSpatialVideoCapture, a category of AVCaptureDeviceFormat.
 public extern objc class AVCaptureDeviceFormat
 {
-    [Selector("isSpatialVideoCaptureSupported")] public bool SpatialVideoCaptureSupported { get; }
+    [Selector("isSpatialVideoCaptureSupported")]
+    public bool SpatialVideoCaptureSupported { get; }
 }
 
 /// AVCaptureDeviceFormatGeometricDistortionCorrection, a category of AVCaptureDeviceFormat.
@@ -536,45 +673,59 @@ public extern objc class AVCaptureDeviceFormat { }
 /// AVCaptureDeviceFormatCenterStage, a category of AVCaptureDeviceFormat.
 public extern objc class AVCaptureDeviceFormat
 {
-    [Selector("isCenterStageSupported")] public bool CenterStageSupported { get; }
-    [Selector("videoMinZoomFactorForCenterStage")] public CGFloat VideoMinZoomFactorForCenterStage { get; }
-    [Selector("videoMaxZoomFactorForCenterStage")] public CGFloat VideoMaxZoomFactorForCenterStage { get; }
-    [Selector("videoFrameRateRangeForCenterStage")] public AVFrameRateRange? VideoFrameRateRangeForCenterStage { get; }
+    [Selector("isCenterStageSupported")]
+    public bool CenterStageSupported { get; }
+    [Selector("videoMinZoomFactorForCenterStage")]
+    public CGFloat VideoMinZoomFactorForCenterStage { get; }
+    [Selector("videoMaxZoomFactorForCenterStage")]
+    public CGFloat VideoMaxZoomFactorForCenterStage { get; }
+    [Selector("videoFrameRateRangeForCenterStage")]
+    public AVFrameRateRange? VideoFrameRateRangeForCenterStage { get; }
 }
 
 /// AVCaptureDeviceFormatPortraitEffect, a category of AVCaptureDeviceFormat.
 public extern objc class AVCaptureDeviceFormat
 {
-    [Selector("isPortraitEffectSupported")] public bool PortraitEffectSupported { get; }
-    [Selector("videoFrameRateRangeForPortraitEffect")] public AVFrameRateRange? VideoFrameRateRangeForPortraitEffect { get; }
+    [Selector("isPortraitEffectSupported")]
+    public bool PortraitEffectSupported { get; }
+    [Selector("videoFrameRateRangeForPortraitEffect")]
+    public AVFrameRateRange? VideoFrameRateRangeForPortraitEffect { get; }
 }
 
 /// AVCaptureDeviceStudioLight, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    [Selector("isStudioLightEnabled")] public static bool StudioLightEnabled { get; }
-    [Selector("isStudioLightActive")] public bool StudioLightActive { get; }
+    [Selector("isStudioLightEnabled")]
+    public static bool StudioLightEnabled { get; }
+    [Selector("isStudioLightActive")]
+    public bool StudioLightActive { get; }
 }
 
 /// AVCaptureDeviceFormatStudioLight, a category of AVCaptureDeviceFormat.
 public extern objc class AVCaptureDeviceFormat
 {
-    [Selector("isStudioLightSupported")] public bool StudioLightSupported { get; }
-    [Selector("videoFrameRateRangeForStudioLight")] public AVFrameRateRange? VideoFrameRateRangeForStudioLight { get; }
+    [Selector("isStudioLightSupported")]
+    public bool StudioLightSupported { get; }
+    [Selector("videoFrameRateRangeForStudioLight")]
+    public AVFrameRateRange? VideoFrameRateRangeForStudioLight { get; }
 }
 
 /// AVCaptureDeviceFormatReactionEffects, a category of AVCaptureDeviceFormat.
 public extern objc class AVCaptureDeviceFormat
 {
-    [Selector("reactionEffectsSupported")] public bool ReactionEffectsSupported { get; }
-    [Selector("videoFrameRateRangeForReactionEffectsInProgress")] public AVFrameRateRange? VideoFrameRateRangeForReactionEffectsInProgress { get; }
+    [Selector("reactionEffectsSupported")]
+    public bool ReactionEffectsSupported { get; }
+    [Selector("videoFrameRateRangeForReactionEffectsInProgress")]
+    public AVFrameRateRange? VideoFrameRateRangeForReactionEffectsInProgress { get; }
 }
 
 /// AVCaptureDeviceFormatBackgroundReplacement, a category of AVCaptureDeviceFormat.
 public extern objc class AVCaptureDeviceFormat
 {
-    [Selector("isBackgroundReplacementSupported")] public bool BackgroundReplacementSupported { get; }
-    [Selector("videoFrameRateRangeForBackgroundReplacement")] public AVFrameRateRange? VideoFrameRateRangeForBackgroundReplacement { get; }
+    [Selector("isBackgroundReplacementSupported")]
+    public bool BackgroundReplacementSupported { get; }
+    [Selector("videoFrameRateRangeForBackgroundReplacement")]
+    public AVFrameRateRange? VideoFrameRateRangeForBackgroundReplacement { get; }
 }
 
 /// macOS 26.2 and later.
@@ -582,9 +733,11 @@ public extern objc class AVCaptureDeviceFormat
 public extern objc class AVCaptureDevice
 {
     /// macOS 26.2 and later.
-    [Selector("isEdgeLightEnabled")] public static bool EdgeLightEnabled { get; }
+    [Selector("isEdgeLightEnabled")]
+    public static bool EdgeLightEnabled { get; }
     /// macOS 26.2 and later.
-    [Selector("isEdgeLightActive")] public static bool EdgeLightActive { get; }
+    [Selector("isEdgeLightActive")]
+    public static bool EdgeLightActive { get; }
 }
 
 /// macOS 26.2 and later.
@@ -592,7 +745,8 @@ public extern objc class AVCaptureDevice
 public extern objc class AVCaptureDeviceFormat
 {
     /// macOS 26.2 and later.
-    [Selector("isEdgeLightSupported")] public bool EdgeLightSupported { get; }
+    [Selector("isEdgeLightSupported")]
+    public bool EdgeLightSupported { get; }
 }
 
 /// macOS 26.0 and later.
@@ -600,19 +754,26 @@ public extern objc class AVCaptureDeviceFormat
 public extern objc class AVCaptureDeviceFormat
 {
     /// macOS 26.0 and later.
-    [Selector("isCinematicVideoCaptureSupported")] public bool CinematicVideoCaptureSupported { get; }
+    [Selector("isCinematicVideoCaptureSupported")]
+    public bool CinematicVideoCaptureSupported { get; }
     /// macOS 26.0 and later.
-    [Selector("defaultSimulatedAperture")] public float DefaultSimulatedAperture { get; }
+    [Selector("defaultSimulatedAperture")]
+    public float DefaultSimulatedAperture { get; }
     /// macOS 26.0 and later.
-    [Selector("minSimulatedAperture")] public float MinSimulatedAperture { get; }
+    [Selector("minSimulatedAperture")]
+    public float MinSimulatedAperture { get; }
     /// macOS 26.0 and later.
-    [Selector("maxSimulatedAperture")] public float MaxSimulatedAperture { get; }
+    [Selector("maxSimulatedAperture")]
+    public float MaxSimulatedAperture { get; }
     /// macOS 26.0 and later.
-    [Selector("videoMinZoomFactorForCinematicVideo")] public CGFloat VideoMinZoomFactorForCinematicVideo { get; }
+    [Selector("videoMinZoomFactorForCinematicVideo")]
+    public CGFloat VideoMinZoomFactorForCinematicVideo { get; }
     /// macOS 26.0 and later.
-    [Selector("videoMaxZoomFactorForCinematicVideo")] public CGFloat VideoMaxZoomFactorForCinematicVideo { get; }
+    [Selector("videoMaxZoomFactorForCinematicVideo")]
+    public CGFloat VideoMaxZoomFactorForCinematicVideo { get; }
     /// macOS 26.0 and later.
-    [Selector("videoFrameRateRangeForCinematicVideo")] public AVFrameRateRange? VideoFrameRateRangeForCinematicVideo { get; }
+    [Selector("videoFrameRateRangeForCinematicVideo")]
+    public AVFrameRateRange? VideoFrameRateRangeForCinematicVideo { get; }
 }
 
 /// macOS 26.0 and later.
@@ -620,7 +781,8 @@ public extern objc class AVCaptureDeviceFormat
 public extern objc class AVCaptureDeviceFormat
 {
     /// macOS 26.0 and later.
-    [Selector("isCameraLensSmudgeDetectionSupported")] public bool CameraLensSmudgeDetectionSupported { get; }
+    [Selector("isCameraLensSmudgeDetectionSupported")]
+    public bool CameraLensSmudgeDetectionSupported { get; }
 }
 
 /// macOS 26.0 and later.
@@ -628,13 +790,17 @@ public extern objc class AVCaptureDeviceFormat
 public extern objc class AVCaptureDevice
 {
     /// macOS 26.0 and later.
-    [Selector("isCameraLensSmudgeDetectionEnabled")] public bool CameraLensSmudgeDetectionEnabled { get; }
+    [Selector("isCameraLensSmudgeDetectionEnabled")]
+    public bool CameraLensSmudgeDetectionEnabled { get; }
     /// macOS 26.0 and later.
-    [Selector("cameraLensSmudgeDetectionInterval")] public CMTime CameraLensSmudgeDetectionInterval { get; }
+    [Selector("cameraLensSmudgeDetectionInterval")]
+    public CMTime CameraLensSmudgeDetectionInterval { get; }
     /// macOS 26.0 and later.
-    [Selector("cameraLensSmudgeDetectionStatus")] public AVCaptureCameraLensSmudgeDetectionStatus CameraLensSmudgeDetectionStatus { get; }
+    [Selector("cameraLensSmudgeDetectionStatus")]
+    public AVCaptureCameraLensSmudgeDetectionStatus CameraLensSmudgeDetectionStatus { get; }
     /// macOS 26.0 and later.
-    [Selector("setCameraLensSmudgeDetectionEnabled:detectionInterval:")] public void SetCameraLensSmudgeDetectionEnabledDetectionInterval(bool cameraLensSmudgeDetectionEnabled, CMTime detectionInterval);
+    [Selector("setCameraLensSmudgeDetectionEnabled:detectionInterval:")]
+    public void SetCameraLensSmudgeDetectionEnabledDetectionInterval(bool cameraLensSmudgeDetectionEnabled, CMTime detectionInterval);
 }
 
 /// macOS 26.0 and later.
@@ -648,8 +814,10 @@ public enum AVCaptureCameraLensSmudgeDetectionStatus : long
 
 public extern objc class AVCaptureDeviceInputSource : NSObject
 {
-    [Selector("inputSourceID")] public NSString InputSourceID { get; }
-    [Selector("localizedName")] public NSString LocalizedName { get; }
+    [Selector("inputSourceID")]
+    public NSString InputSourceID { get; }
+    [Selector("localizedName")]
+    public NSString LocalizedName { get; }
 }
 
 #endif

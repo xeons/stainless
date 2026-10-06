@@ -35,34 +35,52 @@ import Standard.ObjC;
 /// WebScripting, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("webScriptNameForSelector:")] public static NSString? WebScriptNameForSelector(Selector selector);
-    [Selector("isSelectorExcludedFromWebScript:")] public static bool IsSelectorExcludedFromWebScript(Selector selector);
-    [Selector("webScriptNameForKey:")] public static NSString? WebScriptNameForKey(byte* name);
-    [Selector("isKeyExcludedFromWebScript:")] public static bool IsKeyExcludedFromWebScript(byte* name);
-    [Selector("invokeUndefinedMethodFromWebScript:withArguments:")] public AnyObject? InvokeUndefinedMethodFromWebScriptWithArguments(NSString? name, NSArray? arguments);
-    [Selector("invokeDefaultMethodWithArguments:")] public AnyObject? InvokeDefaultMethodWithArguments(NSArray? arguments);
-    [Selector("finalizeForWebScript")] public void FinalizeForWebScript();
+    [Selector("webScriptNameForSelector:")]
+    public static NSString? WebScriptNameForSelector(Selector selector);
+    [Selector("isSelectorExcludedFromWebScript:")]
+    public static bool IsSelectorExcludedFromWebScript(Selector selector);
+    [Selector("webScriptNameForKey:")]
+    public static NSString? WebScriptNameForKey(byte* name);
+    [Selector("isKeyExcludedFromWebScript:")]
+    public static bool IsKeyExcludedFromWebScript(byte* name);
+    [Selector("invokeUndefinedMethodFromWebScript:withArguments:")]
+    public AnyObject? InvokeUndefinedMethodFromWebScriptWithArguments(NSString? name, NSArray? arguments);
+    [Selector("invokeDefaultMethodWithArguments:")]
+    public AnyObject? InvokeDefaultMethodWithArguments(NSArray? arguments);
+    [Selector("finalizeForWebScript")]
+    public void FinalizeForWebScript();
 }
 
 /// Deprecated in macOS 10.14.
 public extern objc class WebScriptObject : NSObject
 {
-    [Selector("throwException:")] public static bool ThrowException(NSString? exceptionMessage);
-    [Selector("JSObject")] public JSObjectRef JSObject();
-    [Selector("callWebScriptMethod:withArguments:")] public AnyObject? CallWebScriptMethodWithArguments(NSString? name, NSArray? arguments);
-    [Selector("evaluateWebScript:")] public AnyObject? EvaluateWebScript(NSString? script);
-    [Selector("removeWebScriptKey:")] public void RemoveWebScriptKey(NSString? name);
-    [Selector("stringRepresentation")] public NSString? StringRepresentation();
-    [Selector("webScriptValueAtIndex:")] public AnyObject? WebScriptValueAtIndex(uint index);
-    [Selector("setWebScriptValueAtIndex:value:")] public void SetWebScriptValueAtIndexValue(uint index, AnyObject? value);
-    [Selector("setException:")] public void SetException(NSString? description);
-    [Selector("JSValue")] public JSValue? JSValue();
+    [Selector("throwException:")]
+    public static bool ThrowException(NSString? exceptionMessage);
+    [Selector("JSObject")]
+    public JSObjectRef JSObject();
+    [Selector("callWebScriptMethod:withArguments:")]
+    public AnyObject? CallWebScriptMethodWithArguments(NSString? name, NSArray? arguments);
+    [Selector("evaluateWebScript:")]
+    public AnyObject? EvaluateWebScript(NSString? script);
+    [Selector("removeWebScriptKey:")]
+    public void RemoveWebScriptKey(NSString? name);
+    [Selector("stringRepresentation")]
+    public NSString? StringRepresentation();
+    [Selector("webScriptValueAtIndex:")]
+    public AnyObject? WebScriptValueAtIndex(uint index);
+    [Selector("setWebScriptValueAtIndex:value:")]
+    public void SetWebScriptValueAtIndexValue(uint index, AnyObject? value);
+    [Selector("setException:")]
+    public void SetException(NSString? description);
+    [Selector("JSValue")]
+    public JSValue? JSValue();
 }
 
 /// Deprecated in macOS 10.14.
 public extern objc class WebUndefined : NSObject, NSCoding, NSCopying
 {
-    [Selector("undefined")] public static WebUndefined? Undefined();
+    [Selector("undefined")]
+    public static WebUndefined? Undefined();
 }
 
 #endif

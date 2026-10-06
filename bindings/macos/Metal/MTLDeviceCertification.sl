@@ -46,8 +46,10 @@ public extern "C" NSNotificationName? NSProcessInfoPerformanceProfileDidChangeNo
 /// NSDeviceCertification, a category of NSProcessInfo.
 public extern objc class NSProcessInfo
 {
-    [Selector("isDeviceCertifiedFor:")] public bool IsDeviceCertifiedFor(NSDeviceCertification performanceTier);
-    [Selector("hasPerformanceProfile:")] public bool HasPerformanceProfile(NSProcessPerformanceProfile performanceProfile);
+    [Selector("isDeviceCertifiedFor:")]
+    public bool IsDeviceCertifiedFor(NSDeviceCertification performanceTier);
+    [Selector("hasPerformanceProfile:")]
+    public bool HasPerformanceProfile(NSProcessPerformanceProfile performanceProfile);
 }
 
 #endif

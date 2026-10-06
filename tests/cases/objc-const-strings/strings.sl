@@ -13,10 +13,14 @@ public extern objc class NSObject { }
 
 public extern objc class NSString : NSObject
 {
-    [Selector("stringWithUTF8String:")] public static NSString FromUtf8(byte* text);
-    [Selector("length")] public nuint Length { get; }
-    [Selector("isEqualToString:")] public bool IsEqualToString(NSString other);
-    [Selector("characterAtIndex:")] public char16 CharacterAt(nuint index);
+    [Selector("stringWithUTF8String:")]
+    public static NSString FromUtf8(byte* text);
+    [Selector("length")]
+    public nuint Length { get; }
+    [Selector("isEqualToString:")]
+    public bool IsEqualToString(NSString other);
+    [Selector("characterAtIndex:")]
+    public char16 CharacterAt(nuint index);
 }
 
 [CFType]

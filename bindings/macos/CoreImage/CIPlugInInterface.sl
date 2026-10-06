@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public objc interface CIPlugInRegistration
 {
-    [Selector("load:")] bool Load(void* host);
+    [Selector("load:")]
+    bool Load(void* host);
 }
 
 #endif

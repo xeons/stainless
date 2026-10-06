@@ -34,9 +34,12 @@ public objc closure void NETunnelProviderSessionSendProviderMessageReturnErrorRe
 
 public extern objc class NETunnelProviderSession : NEVPNConnection
 {
-    [Selector("startTunnelWithOptions:andReturnError:")] public bool StartTunnelWithOptionsAndReturnError(NSDictionary? options, out NSError? error);
-    [Selector("stopTunnel")] public void StopTunnel();
-    [Selector("sendProviderMessage:returnError:responseHandler:")] public bool SendProviderMessageReturnErrorResponseHandler(NSData messageData, out NSError? error, NETunnelProviderSessionSendProviderMessageReturnErrorResponseHandlerResponseHandlerBlock? responseHandler);
+    [Selector("startTunnelWithOptions:andReturnError:")]
+    public bool StartTunnelWithOptionsAndReturnError(NSDictionary? options, out NSError? error);
+    [Selector("stopTunnel")]
+    public void StopTunnel();
+    [Selector("sendProviderMessage:returnError:responseHandler:")]
+    public bool SendProviderMessageReturnErrorResponseHandler(NSData messageData, out NSError? error, NETunnelProviderSessionSendProviderMessageReturnErrorResponseHandlerResponseHandlerBlock? responseHandler);
 }
 
 #endif

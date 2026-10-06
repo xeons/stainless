@@ -62,19 +62,32 @@ public enum UNAlertStyle : long
 
 public extern objc class UNNotificationSettings : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("authorizationStatus")] public UNAuthorizationStatus AuthorizationStatus { get; }
-    [Selector("soundSetting")] public UNNotificationSetting SoundSetting { get; }
-    [Selector("badgeSetting")] public UNNotificationSetting BadgeSetting { get; }
-    [Selector("alertSetting")] public UNNotificationSetting AlertSetting { get; }
-    [Selector("notificationCenterSetting")] public UNNotificationSetting NotificationCenterSetting { get; }
-    [Selector("lockScreenSetting")] public UNNotificationSetting LockScreenSetting { get; }
-    [Selector("alertStyle")] public UNAlertStyle AlertStyle { get; }
-    [Selector("showPreviewsSetting")] public UNShowPreviewsSetting ShowPreviewsSetting { get; }
-    [Selector("criticalAlertSetting")] public UNNotificationSetting CriticalAlertSetting { get; }
-    [Selector("providesAppNotificationSettings")] public bool ProvidesAppNotificationSettings { get; }
-    [Selector("timeSensitiveSetting")] public UNNotificationSetting TimeSensitiveSetting { get; }
-    [Selector("scheduledDeliverySetting")] public UNNotificationSetting ScheduledDeliverySetting { get; }
-    [Selector("directMessagesSetting")] public UNNotificationSetting DirectMessagesSetting { get; }
+    [Selector("authorizationStatus")]
+    public UNAuthorizationStatus AuthorizationStatus { get; }
+    [Selector("soundSetting")]
+    public UNNotificationSetting SoundSetting { get; }
+    [Selector("badgeSetting")]
+    public UNNotificationSetting BadgeSetting { get; }
+    [Selector("alertSetting")]
+    public UNNotificationSetting AlertSetting { get; }
+    [Selector("notificationCenterSetting")]
+    public UNNotificationSetting NotificationCenterSetting { get; }
+    [Selector("lockScreenSetting")]
+    public UNNotificationSetting LockScreenSetting { get; }
+    [Selector("alertStyle")]
+    public UNAlertStyle AlertStyle { get; }
+    [Selector("showPreviewsSetting")]
+    public UNShowPreviewsSetting ShowPreviewsSetting { get; }
+    [Selector("criticalAlertSetting")]
+    public UNNotificationSetting CriticalAlertSetting { get; }
+    [Selector("providesAppNotificationSettings")]
+    public bool ProvidesAppNotificationSettings { get; }
+    [Selector("timeSensitiveSetting")]
+    public UNNotificationSetting TimeSensitiveSetting { get; }
+    [Selector("scheduledDeliverySetting")]
+    public UNNotificationSetting ScheduledDeliverySetting { get; }
+    [Selector("directMessagesSetting")]
+    public UNNotificationSetting DirectMessagesSetting { get; }
 }
 
 #endif

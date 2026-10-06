@@ -80,16 +80,22 @@ public enum MTLCommandEncoderErrorState : long
 
 public extern objc class MTLCommandBufferDescriptor : NSObject, NSCopying
 {
-    [Selector("retainedReferences", "setRetainedReferences:")] public bool RetainedReferences { get; set; }
-    [Selector("errorOptions", "setErrorOptions:")] public MTLCommandBufferErrorOption ErrorOptions { get; set; }
-    [Selector("logState", "setLogState:")] public MTLLogState? LogState { get; set; }
+    [Selector("retainedReferences", "setRetainedReferences:")]
+    public bool RetainedReferences { get; set; }
+    [Selector("errorOptions", "setErrorOptions:")]
+    public MTLCommandBufferErrorOption ErrorOptions { get; set; }
+    [Selector("logState", "setLogState:")]
+    public MTLLogState? LogState { get; set; }
 }
 
 public objc interface MTLCommandBufferEncoderInfo : NSObjectProtocol
 {
-    [Selector("label")] NSString Label { get; }
-    [Selector("debugSignposts")] NSArray DebugSignposts { get; }
-    [Selector("errorState")] MTLCommandEncoderErrorState ErrorState { get; }
+    [Selector("label")]
+    NSString Label { get; }
+    [Selector("debugSignposts")]
+    NSArray DebugSignposts { get; }
+    [Selector("errorState")]
+    MTLCommandEncoderErrorState ErrorState { get; }
 }
 
 public objc closure void MTLCommandBufferHandler(MTLCommandBuffer arg0);
@@ -102,44 +108,82 @@ public enum MTLDispatchType : ulong
 
 public objc interface MTLCommandBuffer : NSObjectProtocol
 {
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("commandQueue")] MTLCommandQueue CommandQueue { get; }
-    [Selector("retainedReferences")] bool RetainedReferences { get; }
-    [Selector("errorOptions")] MTLCommandBufferErrorOption ErrorOptions { get; }
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
-    [Selector("kernelStartTime")] CFTimeInterval KernelStartTime { get; }
-    [Selector("kernelEndTime")] CFTimeInterval KernelEndTime { get; }
-    [Selector("logs")] MTLLogContainer Logs { get; }
-    [Selector("GPUStartTime")] CFTimeInterval GPUStartTime { get; }
-    [Selector("GPUEndTime")] CFTimeInterval GPUEndTime { get; }
-    [Selector("status")] MTLCommandBufferStatus Status { get; }
-    [Selector("error")] NSError? Error { get; }
-    [Selector("enqueue")] void Enqueue();
-    [Selector("commit")] void Commit();
-    [Selector("addScheduledHandler:")] void AddScheduledHandler(MTLCommandBufferHandler block);
-    [Selector("presentDrawable:")] void PresentDrawable(MTLDrawable drawable);
-    [Selector("presentDrawable:atTime:")] void PresentDrawableAtTime(MTLDrawable drawable, CFTimeInterval presentationTime);
-    [Selector("presentDrawable:afterMinimumDuration:")] void PresentDrawableAfterMinimumDuration(MTLDrawable drawable, CFTimeInterval duration);
-    [Selector("waitUntilScheduled")] void WaitUntilScheduled();
-    [Selector("addCompletedHandler:")] void AddCompletedHandler(MTLCommandBufferHandler block);
-    [Selector("waitUntilCompleted")] void WaitUntilCompleted();
-    [Selector("blitCommandEncoder")] MTLBlitCommandEncoder? BlitCommandEncoder();
-    [Selector("renderCommandEncoderWithDescriptor:")] MTLRenderCommandEncoder? RenderCommandEncoderWithDescriptor(MTLRenderPassDescriptor renderPassDescriptor);
-    [Selector("computeCommandEncoderWithDescriptor:")] MTLComputeCommandEncoder? ComputeCommandEncoderWithDescriptor(MTLComputePassDescriptor computePassDescriptor);
-    [Selector("blitCommandEncoderWithDescriptor:")] MTLBlitCommandEncoder? BlitCommandEncoderWithDescriptor(MTLBlitPassDescriptor blitPassDescriptor);
-    [Selector("computeCommandEncoder")] MTLComputeCommandEncoder? ComputeCommandEncoder();
-    [Selector("computeCommandEncoderWithDispatchType:")] MTLComputeCommandEncoder? ComputeCommandEncoderWithDispatchType(MTLDispatchType dispatchType);
-    [Selector("encodeWaitForEvent:value:")] void EncodeWaitForEventValue(MTLEvent event, ulong value);
-    [Selector("encodeSignalEvent:value:")] void EncodeSignalEventValue(MTLEvent event, ulong value);
-    [Selector("parallelRenderCommandEncoderWithDescriptor:")] MTLParallelRenderCommandEncoder? ParallelRenderCommandEncoderWithDescriptor(MTLRenderPassDescriptor renderPassDescriptor);
-    [Selector("resourceStateCommandEncoder")] MTLResourceStateCommandEncoder? ResourceStateCommandEncoder();
-    [Selector("resourceStateCommandEncoderWithDescriptor:")] MTLResourceStateCommandEncoder? ResourceStateCommandEncoderWithDescriptor(MTLResourceStatePassDescriptor resourceStatePassDescriptor);
-    [Selector("accelerationStructureCommandEncoder")] MTLAccelerationStructureCommandEncoder? AccelerationStructureCommandEncoder();
-    [Selector("accelerationStructureCommandEncoderWithDescriptor:")] MTLAccelerationStructureCommandEncoder AccelerationStructureCommandEncoderWithDescriptor(MTLAccelerationStructurePassDescriptor descriptor);
-    [Selector("pushDebugGroup:")] void PushDebugGroup(NSString string);
-    [Selector("popDebugGroup")] void PopDebugGroup();
-    [Selector("useResidencySet:")] void UseResidencySet(MTLResidencySet residencySet);
-    [Selector("useResidencySets:count:")] void UseResidencySetsCount(void** residencySets, NSUInteger count);
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("commandQueue")]
+    MTLCommandQueue CommandQueue { get; }
+    [Selector("retainedReferences")]
+    bool RetainedReferences { get; }
+    [Selector("errorOptions")]
+    MTLCommandBufferErrorOption ErrorOptions { get; }
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
+    [Selector("kernelStartTime")]
+    CFTimeInterval KernelStartTime { get; }
+    [Selector("kernelEndTime")]
+    CFTimeInterval KernelEndTime { get; }
+    [Selector("logs")]
+    MTLLogContainer Logs { get; }
+    [Selector("GPUStartTime")]
+    CFTimeInterval GPUStartTime { get; }
+    [Selector("GPUEndTime")]
+    CFTimeInterval GPUEndTime { get; }
+    [Selector("status")]
+    MTLCommandBufferStatus Status { get; }
+    [Selector("error")]
+    NSError? Error { get; }
+    [Selector("enqueue")]
+    void Enqueue();
+    [Selector("commit")]
+    void Commit();
+    [Selector("addScheduledHandler:")]
+    void AddScheduledHandler(MTLCommandBufferHandler block);
+    [Selector("presentDrawable:")]
+    void PresentDrawable(MTLDrawable drawable);
+    [Selector("presentDrawable:atTime:")]
+    void PresentDrawableAtTime(MTLDrawable drawable, CFTimeInterval presentationTime);
+    [Selector("presentDrawable:afterMinimumDuration:")]
+    void PresentDrawableAfterMinimumDuration(MTLDrawable drawable, CFTimeInterval duration);
+    [Selector("waitUntilScheduled")]
+    void WaitUntilScheduled();
+    [Selector("addCompletedHandler:")]
+    void AddCompletedHandler(MTLCommandBufferHandler block);
+    [Selector("waitUntilCompleted")]
+    void WaitUntilCompleted();
+    [Selector("blitCommandEncoder")]
+    MTLBlitCommandEncoder? BlitCommandEncoder();
+    [Selector("renderCommandEncoderWithDescriptor:")]
+    MTLRenderCommandEncoder? RenderCommandEncoderWithDescriptor(MTLRenderPassDescriptor renderPassDescriptor);
+    [Selector("computeCommandEncoderWithDescriptor:")]
+    MTLComputeCommandEncoder? ComputeCommandEncoderWithDescriptor(MTLComputePassDescriptor computePassDescriptor);
+    [Selector("blitCommandEncoderWithDescriptor:")]
+    MTLBlitCommandEncoder? BlitCommandEncoderWithDescriptor(MTLBlitPassDescriptor blitPassDescriptor);
+    [Selector("computeCommandEncoder")]
+    MTLComputeCommandEncoder? ComputeCommandEncoder();
+    [Selector("computeCommandEncoderWithDispatchType:")]
+    MTLComputeCommandEncoder? ComputeCommandEncoderWithDispatchType(MTLDispatchType dispatchType);
+    [Selector("encodeWaitForEvent:value:")]
+    void EncodeWaitForEventValue(MTLEvent event, ulong value);
+    [Selector("encodeSignalEvent:value:")]
+    void EncodeSignalEventValue(MTLEvent event, ulong value);
+    [Selector("parallelRenderCommandEncoderWithDescriptor:")]
+    MTLParallelRenderCommandEncoder? ParallelRenderCommandEncoderWithDescriptor(MTLRenderPassDescriptor renderPassDescriptor);
+    [Selector("resourceStateCommandEncoder")]
+    MTLResourceStateCommandEncoder? ResourceStateCommandEncoder();
+    [Selector("resourceStateCommandEncoderWithDescriptor:")]
+    MTLResourceStateCommandEncoder? ResourceStateCommandEncoderWithDescriptor(MTLResourceStatePassDescriptor resourceStatePassDescriptor);
+    [Selector("accelerationStructureCommandEncoder")]
+    MTLAccelerationStructureCommandEncoder? AccelerationStructureCommandEncoder();
+    [Selector("accelerationStructureCommandEncoderWithDescriptor:")]
+    MTLAccelerationStructureCommandEncoder AccelerationStructureCommandEncoderWithDescriptor(MTLAccelerationStructurePassDescriptor descriptor);
+    [Selector("pushDebugGroup:")]
+    void PushDebugGroup(NSString string);
+    [Selector("popDebugGroup")]
+    void PopDebugGroup();
+    [Selector("useResidencySet:")]
+    void UseResidencySet(MTLResidencySet residencySet);
+    [Selector("useResidencySets:count:")]
+    void UseResidencySetsCount(void** residencySets, NSUInteger count);
 }
 
 #endif

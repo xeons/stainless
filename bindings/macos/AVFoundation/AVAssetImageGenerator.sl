@@ -59,22 +59,37 @@ public objc closure void AVAssetImageGeneratorGenerateCGImageAsynchronouslyForTi
 
 public extern objc class AVAssetImageGenerator : NSObject
 {
-    [Selector("asset")] public AVAsset? Asset { get; }
-    [Selector("appliesPreferredTrackTransform", "setAppliesPreferredTrackTransform:")] public bool AppliesPreferredTrackTransform { get; set; }
-    [Selector("maximumSize", "setMaximumSize:")] public CGSize MaximumSize { get; set; }
-    [Selector("apertureMode", "setApertureMode:")] public AVAssetImageGeneratorApertureMode? ApertureMode { get; set; }
-    [Selector("dynamicRangePolicy", "setDynamicRangePolicy:")] public AVAssetImageGeneratorDynamicRangePolicy? DynamicRangePolicy { get; set; }
-    [Selector("videoComposition", "setVideoComposition:")] public AVVideoComposition? VideoComposition { get; set; }
-    [Selector("customVideoCompositor")] public AVVideoCompositing? CustomVideoCompositor { get; }
-    [Selector("requestedTimeToleranceBefore", "setRequestedTimeToleranceBefore:")] public CMTime RequestedTimeToleranceBefore { get; set; }
-    [Selector("requestedTimeToleranceAfter", "setRequestedTimeToleranceAfter:")] public CMTime RequestedTimeToleranceAfter { get; set; }
-    [Selector("assetImageGeneratorWithAsset:")] public static Self AssetImageGeneratorWithAsset(AVAsset asset);
-    [Selector("initWithAsset:")] public Self InitWithAsset(AVAsset asset);
+    [Selector("asset")]
+    public AVAsset? Asset { get; }
+    [Selector("appliesPreferredTrackTransform", "setAppliesPreferredTrackTransform:")]
+    public bool AppliesPreferredTrackTransform { get; set; }
+    [Selector("maximumSize", "setMaximumSize:")]
+    public CGSize MaximumSize { get; set; }
+    [Selector("apertureMode", "setApertureMode:")]
+    public AVAssetImageGeneratorApertureMode? ApertureMode { get; set; }
+    [Selector("dynamicRangePolicy", "setDynamicRangePolicy:")]
+    public AVAssetImageGeneratorDynamicRangePolicy? DynamicRangePolicy { get; set; }
+    [Selector("videoComposition", "setVideoComposition:")]
+    public AVVideoComposition? VideoComposition { get; set; }
+    [Selector("customVideoCompositor")]
+    public AVVideoCompositing? CustomVideoCompositor { get; }
+    [Selector("requestedTimeToleranceBefore", "setRequestedTimeToleranceBefore:")]
+    public CMTime RequestedTimeToleranceBefore { get; set; }
+    [Selector("requestedTimeToleranceAfter", "setRequestedTimeToleranceAfter:")]
+    public CMTime RequestedTimeToleranceAfter { get; set; }
+    [Selector("assetImageGeneratorWithAsset:")]
+    public static Self AssetImageGeneratorWithAsset(AVAsset asset);
+    [Selector("initWithAsset:")]
+    public Self InitWithAsset(AVAsset asset);
     /// Deprecated in macOS 15.0.
-    [Selector("copyCGImageAtTime:actualTime:error:")] public CGImageRef? CopyCGImageAtTimeActualTimeError(CMTime requestedTime, CMTime* actualTime, out NSError? outError);
-    [Selector("generateCGImagesAsynchronouslyForTimes:completionHandler:")] public void GenerateCGImagesAsynchronouslyForTimesCompletionHandler(NSArray requestedTimes, AVAssetImageGeneratorCompletionHandler handler);
-    [Selector("generateCGImageAsynchronouslyForTime:completionHandler:")] public void GenerateCGImageAsynchronouslyForTimeCompletionHandler(CMTime requestedTime, AVAssetImageGeneratorGenerateCGImageAsynchronouslyForTimeCompletionHandlerHandlerBlock handler);
-    [Selector("cancelAllCGImageGeneration")] public void CancelAllCGImageGeneration();
+    [Selector("copyCGImageAtTime:actualTime:error:")]
+    public CGImageRef? CopyCGImageAtTimeActualTimeError(CMTime requestedTime, CMTime* actualTime, out NSError? outError);
+    [Selector("generateCGImagesAsynchronouslyForTimes:completionHandler:")]
+    public void GenerateCGImagesAsynchronouslyForTimesCompletionHandler(NSArray requestedTimes, AVAssetImageGeneratorCompletionHandler handler);
+    [Selector("generateCGImageAsynchronouslyForTime:completionHandler:")]
+    public void GenerateCGImageAsynchronouslyForTimeCompletionHandler(CMTime requestedTime, AVAssetImageGeneratorGenerateCGImageAsynchronouslyForTimeCompletionHandlerHandlerBlock handler);
+    [Selector("cancelAllCGImageGeneration")]
+    public void CancelAllCGImageGeneration();
 }
 
 public objc closure void AVAssetImageGeneratorCompletionHandler(CMTime arg0, CGImageRef? arg1, CMTime arg2, AVAssetImageGeneratorResult arg3, NSError? arg4);

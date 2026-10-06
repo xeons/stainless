@@ -32,15 +32,24 @@ import Standard.ObjC;
 
 public extern objc class AEAssessmentSession : NSObject
 {
-    [Selector("supportsMultipleParticipants")] public static bool SupportsMultipleParticipants { get; }
-    [Selector("supportsConfigurationUpdates")] public static bool SupportsConfigurationUpdates { get; }
-    [Selector("delegate", "setDelegate:")] public AEAssessmentSessionDelegate? Delegate { get; set; }
-    [Selector("configuration")] public AEAssessmentConfiguration Configuration { get; }
-    [Selector("isActive")] public bool Active { get; }
-    [Selector("initWithConfiguration:")] public Self InitWithConfiguration(AEAssessmentConfiguration configuration);
-    [Selector("begin")] public void Begin();
-    [Selector("end")] public void End();
-    [Selector("updateToConfiguration:")] public void UpdateToConfiguration(AEAssessmentConfiguration configuration);
+    [Selector("supportsMultipleParticipants")]
+    public static bool SupportsMultipleParticipants { get; }
+    [Selector("supportsConfigurationUpdates")]
+    public static bool SupportsConfigurationUpdates { get; }
+    [Selector("delegate", "setDelegate:")]
+    public AEAssessmentSessionDelegate? Delegate { get; set; }
+    [Selector("configuration")]
+    public AEAssessmentConfiguration Configuration { get; }
+    [Selector("isActive")]
+    public bool Active { get; }
+    [Selector("initWithConfiguration:")]
+    public Self InitWithConfiguration(AEAssessmentConfiguration configuration);
+    [Selector("begin")]
+    public void Begin();
+    [Selector("end")]
+    public void End();
+    [Selector("updateToConfiguration:")]
+    public void UpdateToConfiguration(AEAssessmentConfiguration configuration);
 }
 
 #endif

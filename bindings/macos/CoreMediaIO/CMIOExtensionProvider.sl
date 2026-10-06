@@ -37,42 +37,65 @@ public extern "C" NSString CMIOExtensionMachServiceNameKey;
 
 public extern objc class CMIOExtensionProviderProperties : NSObject
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("manufacturer", "setManufacturer:")] public NSString? Manufacturer { get; set; }
-    [Selector("propertiesDictionary", "setPropertiesDictionary:")] public NSDictionary PropertiesDictionary { get; set; }
-    [Selector("providerPropertiesWithDictionary:")] public static Self ProviderPropertiesWithDictionary(NSDictionary propertiesDictionary);
-    [Selector("initWithDictionary:")] public Self InitWithDictionary(NSDictionary propertiesDictionary);
-    [Selector("setPropertyState:forProperty:")] public void SetPropertyStateForProperty(CMIOExtensionPropertyState? propertyState, CMIOExtensionProperty property);
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("manufacturer", "setManufacturer:")]
+    public NSString? Manufacturer { get; set; }
+    [Selector("propertiesDictionary", "setPropertiesDictionary:")]
+    public NSDictionary PropertiesDictionary { get; set; }
+    [Selector("providerPropertiesWithDictionary:")]
+    public static Self ProviderPropertiesWithDictionary(NSDictionary propertiesDictionary);
+    [Selector("initWithDictionary:")]
+    public Self InitWithDictionary(NSDictionary propertiesDictionary);
+    [Selector("setPropertyState:forProperty:")]
+    public void SetPropertyStateForProperty(CMIOExtensionPropertyState? propertyState, CMIOExtensionProperty property);
 }
 
 public objc interface CMIOExtensionProviderSource : NSObjectProtocol
 {
-    [Selector("availableProperties")] NSSet AvailableProperties { get; }
-    [Selector("connectClient:error:")] bool ConnectClientError(CMIOExtensionClient client, out NSError? outError);
-    [Selector("disconnectClient:")] void DisconnectClient(CMIOExtensionClient client);
-    [Selector("providerPropertiesForProperties:error:")] CMIOExtensionProviderProperties? ProviderPropertiesForPropertiesError(NSSet properties, out NSError? outError);
-    [Selector("setProviderProperties:error:")] bool SetProviderPropertiesError(CMIOExtensionProviderProperties providerProperties, out NSError? outError);
+    [Selector("availableProperties")]
+    NSSet AvailableProperties { get; }
+    [Selector("connectClient:error:")]
+    bool ConnectClientError(CMIOExtensionClient client, out NSError? outError);
+    [Selector("disconnectClient:")]
+    void DisconnectClient(CMIOExtensionClient client);
+    [Selector("providerPropertiesForProperties:error:")]
+    CMIOExtensionProviderProperties? ProviderPropertiesForPropertiesError(NSSet properties, out NSError? outError);
+    [Selector("setProviderProperties:error:")]
+    bool SetProviderPropertiesError(CMIOExtensionProviderProperties providerProperties, out NSError? outError);
 }
 
 public extern objc class CMIOExtensionProvider : NSObject
 {
-    [Selector("source")] public CMIOExtensionProviderSource? Source { get; }
-    [Selector("clientQueue")] public dispatch_queue_t ClientQueue { get; }
-    [Selector("connectedClients")] public NSArray ConnectedClients { get; }
-    [Selector("devices")] public NSArray Devices { get; }
-    [Selector("startServiceWithProvider:")] public static void StartServiceWithProvider(CMIOExtensionProvider provider);
-    [Selector("stopServiceWithProvider:")] public static void StopServiceWithProvider(CMIOExtensionProvider provider);
-    [Selector("providerWithSource:clientQueue:")] public static Self ProviderWithSourceClientQueue(CMIOExtensionProviderSource source, dispatch_queue_t? clientQueue);
-    [Selector("initWithSource:clientQueue:")] public Self InitWithSourceClientQueue(CMIOExtensionProviderSource source, dispatch_queue_t? clientQueue);
-    [Selector("addDevice:error:")] public bool AddDeviceError(CMIOExtensionDevice device, out NSError? outError);
-    [Selector("removeDevice:error:")] public bool RemoveDeviceError(CMIOExtensionDevice device, out NSError? outError);
-    [Selector("notifyPropertiesChanged:")] public void NotifyPropertiesChanged(NSDictionary propertyStates);
+    [Selector("source")]
+    public CMIOExtensionProviderSource? Source { get; }
+    [Selector("clientQueue")]
+    public dispatch_queue_t ClientQueue { get; }
+    [Selector("connectedClients")]
+    public NSArray ConnectedClients { get; }
+    [Selector("devices")]
+    public NSArray Devices { get; }
+    [Selector("startServiceWithProvider:")]
+    public static void StartServiceWithProvider(CMIOExtensionProvider provider);
+    [Selector("stopServiceWithProvider:")]
+    public static void StopServiceWithProvider(CMIOExtensionProvider provider);
+    [Selector("providerWithSource:clientQueue:")]
+    public static Self ProviderWithSourceClientQueue(CMIOExtensionProviderSource source, dispatch_queue_t? clientQueue);
+    [Selector("initWithSource:clientQueue:")]
+    public Self InitWithSourceClientQueue(CMIOExtensionProviderSource source, dispatch_queue_t? clientQueue);
+    [Selector("addDevice:error:")]
+    public bool AddDeviceError(CMIOExtensionDevice device, out NSError? outError);
+    [Selector("removeDevice:error:")]
+    public bool RemoveDeviceError(CMIOExtensionDevice device, out NSError? outError);
+    [Selector("notifyPropertiesChanged:")]
+    public void NotifyPropertiesChanged(NSDictionary propertyStates);
 }
 
 /// SignalHandling, a category of CMIOExtensionProvider.
 public extern objc class CMIOExtensionProvider
 {
-    [Selector("ignoreSIGTERM")] public static void IgnoreSIGTERM();
+    [Selector("ignoreSIGTERM")]
+    public static void IgnoreSIGTERM();
 }
 
 #endif

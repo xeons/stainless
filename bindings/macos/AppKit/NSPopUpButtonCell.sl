@@ -40,45 +40,84 @@ public enum NSPopUpArrowPosition : ulong
 
 public extern objc class NSPopUpButtonCell : NSMenuItemCell, NSMenuItemValidation
 {
-    [Selector("menu", "setMenu:")] public NSMenu? Menu { get; set; }
-    [Selector("pullsDown", "setPullsDown:")] public bool PullsDown { get; set; }
-    [Selector("autoenablesItems", "setAutoenablesItems:")] public bool AutoenablesItems { get; set; }
-    [Selector("preferredEdge", "setPreferredEdge:")] public NSRectEdge PreferredEdge { get; set; }
-    [Selector("usesItemFromMenu", "setUsesItemFromMenu:")] public bool UsesItemFromMenu { get; set; }
-    [Selector("altersStateOfSelectedItem", "setAltersStateOfSelectedItem:")] public bool AltersStateOfSelectedItem { get; set; }
-    [Selector("itemArray")] public NSArray ItemArray { get; }
-    [Selector("numberOfItems")] public NSInteger NumberOfItems { get; }
-    [Selector("lastItem")] public NSMenuItem? LastItem { get; }
-    [Selector("selectedItem")] public NSMenuItem? SelectedItem { get; }
-    [Selector("indexOfSelectedItem")] public NSInteger IndexOfSelectedItem { get; }
-    [Selector("itemTitles")] public NSArray ItemTitles { get; }
-    [Selector("titleOfSelectedItem")] public NSString? TitleOfSelectedItem { get; }
-    [Selector("arrowPosition", "setArrowPosition:")] public NSPopUpArrowPosition ArrowPosition { get; set; }
-    [Selector("initTextCell:pullsDown:")] public Self InitTextCellPullsDown(NSString stringValue, bool pullDown);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("addItemWithTitle:")] public void AddItemWithTitle(NSString title);
-    [Selector("addItemsWithTitles:")] public void AddItemsWithTitles(NSArray itemTitles);
-    [Selector("insertItemWithTitle:atIndex:")] public void InsertItemWithTitleAtIndex(NSString title, NSInteger index);
-    [Selector("removeItemWithTitle:")] public void RemoveItemWithTitle(NSString title);
-    [Selector("removeItemAtIndex:")] public void RemoveItemAtIndex(NSInteger index);
-    [Selector("removeAllItems")] public void RemoveAllItems();
-    [Selector("indexOfItem:")] public NSInteger IndexOfItem(NSMenuItem item);
-    [Selector("indexOfItemWithTitle:")] public NSInteger IndexOfItemWithTitle(NSString title);
-    [Selector("indexOfItemWithTag:")] public NSInteger IndexOfItemWithTag(NSInteger tag);
-    [Selector("indexOfItemWithRepresentedObject:")] public NSInteger IndexOfItemWithRepresentedObject(AnyObject? obj);
-    [Selector("indexOfItemWithTarget:andAction:")] public NSInteger IndexOfItemWithTargetAndAction(AnyObject? target, Selector actionSelector);
-    [Selector("itemAtIndex:")] public NSMenuItem? ItemAtIndex(NSInteger index);
-    [Selector("itemWithTitle:")] public NSMenuItem? ItemWithTitle(NSString title);
-    [Selector("selectItem:")] public void SelectItem(NSMenuItem? item);
-    [Selector("selectItemAtIndex:")] public void SelectItemAtIndex(NSInteger index);
-    [Selector("selectItemWithTitle:")] public void SelectItemWithTitle(NSString title);
-    [Selector("selectItemWithTag:")] public bool SelectItemWithTag(NSInteger tag);
-    [Selector("setTitle:")] public void SetTitle(NSString? string);
-    [Selector("synchronizeTitleAndSelectedItem")] public void SynchronizeTitleAndSelectedItem();
-    [Selector("itemTitleAtIndex:")] public NSString ItemTitleAtIndex(NSInteger index);
-    [Selector("attachPopUpWithFrame:inView:")] public void AttachPopUpWithFrameInView(NSRect cellFrame, NSView controlView);
-    [Selector("dismissPopUp")] public void DismissPopUp();
-    [Selector("performClickWithFrame:inView:")] public void PerformClickWithFrameInView(NSRect frame, NSView controlView);
+    [Selector("menu", "setMenu:")]
+    public NSMenu? Menu { get; set; }
+    [Selector("pullsDown", "setPullsDown:")]
+    public bool PullsDown { get; set; }
+    [Selector("autoenablesItems", "setAutoenablesItems:")]
+    public bool AutoenablesItems { get; set; }
+    [Selector("preferredEdge", "setPreferredEdge:")]
+    public NSRectEdge PreferredEdge { get; set; }
+    [Selector("usesItemFromMenu", "setUsesItemFromMenu:")]
+    public bool UsesItemFromMenu { get; set; }
+    [Selector("altersStateOfSelectedItem", "setAltersStateOfSelectedItem:")]
+    public bool AltersStateOfSelectedItem { get; set; }
+    [Selector("itemArray")]
+    public NSArray ItemArray { get; }
+    [Selector("numberOfItems")]
+    public NSInteger NumberOfItems { get; }
+    [Selector("lastItem")]
+    public NSMenuItem? LastItem { get; }
+    [Selector("selectedItem")]
+    public NSMenuItem? SelectedItem { get; }
+    [Selector("indexOfSelectedItem")]
+    public NSInteger IndexOfSelectedItem { get; }
+    [Selector("itemTitles")]
+    public NSArray ItemTitles { get; }
+    [Selector("titleOfSelectedItem")]
+    public NSString? TitleOfSelectedItem { get; }
+    [Selector("arrowPosition", "setArrowPosition:")]
+    public NSPopUpArrowPosition ArrowPosition { get; set; }
+    [Selector("initTextCell:pullsDown:")]
+    public Self InitTextCellPullsDown(NSString stringValue, bool pullDown);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("addItemWithTitle:")]
+    public void AddItemWithTitle(NSString title);
+    [Selector("addItemsWithTitles:")]
+    public void AddItemsWithTitles(NSArray itemTitles);
+    [Selector("insertItemWithTitle:atIndex:")]
+    public void InsertItemWithTitleAtIndex(NSString title, NSInteger index);
+    [Selector("removeItemWithTitle:")]
+    public void RemoveItemWithTitle(NSString title);
+    [Selector("removeItemAtIndex:")]
+    public void RemoveItemAtIndex(NSInteger index);
+    [Selector("removeAllItems")]
+    public void RemoveAllItems();
+    [Selector("indexOfItem:")]
+    public NSInteger IndexOfItem(NSMenuItem item);
+    [Selector("indexOfItemWithTitle:")]
+    public NSInteger IndexOfItemWithTitle(NSString title);
+    [Selector("indexOfItemWithTag:")]
+    public NSInteger IndexOfItemWithTag(NSInteger tag);
+    [Selector("indexOfItemWithRepresentedObject:")]
+    public NSInteger IndexOfItemWithRepresentedObject(AnyObject? obj);
+    [Selector("indexOfItemWithTarget:andAction:")]
+    public NSInteger IndexOfItemWithTargetAndAction(AnyObject? target, Selector actionSelector);
+    [Selector("itemAtIndex:")]
+    public NSMenuItem? ItemAtIndex(NSInteger index);
+    [Selector("itemWithTitle:")]
+    public NSMenuItem? ItemWithTitle(NSString title);
+    [Selector("selectItem:")]
+    public void SelectItem(NSMenuItem? item);
+    [Selector("selectItemAtIndex:")]
+    public void SelectItemAtIndex(NSInteger index);
+    [Selector("selectItemWithTitle:")]
+    public void SelectItemWithTitle(NSString title);
+    [Selector("selectItemWithTag:")]
+    public bool SelectItemWithTag(NSInteger tag);
+    [Selector("setTitle:")]
+    public void SetTitle(NSString? string);
+    [Selector("synchronizeTitleAndSelectedItem")]
+    public void SynchronizeTitleAndSelectedItem();
+    [Selector("itemTitleAtIndex:")]
+    public NSString ItemTitleAtIndex(NSInteger index);
+    [Selector("attachPopUpWithFrame:inView:")]
+    public void AttachPopUpWithFrameInView(NSRect cellFrame, NSView controlView);
+    [Selector("dismissPopUp")]
+    public void DismissPopUp();
+    [Selector("performClickWithFrame:inView:")]
+    public void PerformClickWithFrameInView(NSRect frame, NSView controlView);
 }
 
 public extern "C" NSNotificationName NSPopUpButtonCellWillPopUpNotification;

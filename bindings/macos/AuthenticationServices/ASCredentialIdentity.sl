@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public objc interface ASCredentialIdentity : NSObjectProtocol
 {
-    [Selector("serviceIdentifier")] ASCredentialServiceIdentifier ServiceIdentifier { get; }
-    [Selector("user")] NSString User { get; }
-    [Selector("recordIdentifier")] NSString? RecordIdentifier { get; }
-    [Selector("rank", "setRank:")] NSInteger Rank { get; set; }
+    [Selector("serviceIdentifier")]
+    ASCredentialServiceIdentifier ServiceIdentifier { get; }
+    [Selector("user")]
+    NSString User { get; }
+    [Selector("recordIdentifier")]
+    NSString? RecordIdentifier { get; }
+    [Selector("rank", "setRank:")]
+    NSInteger Rank { get; set; }
 }
 
 #endif

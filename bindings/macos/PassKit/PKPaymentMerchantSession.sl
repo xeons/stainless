@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class PKPaymentMerchantSession : NSObject
 {
-    [Selector("initWithDictionary:")] public Self InitWithDictionary(NSDictionary dictionary);
+    [Selector("initWithDictionary:")]
+    public Self InitWithDictionary(NSDictionary dictionary);
 }
 
 #endif

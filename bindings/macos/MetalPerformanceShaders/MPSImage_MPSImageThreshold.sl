@@ -33,44 +33,66 @@ import Standard.ObjC;
 
 public extern objc class MPSImageThresholdBinary : MPSUnaryImageKernel
 {
-    [Selector("thresholdValue")] public float ThresholdValue { get; }
-    [Selector("maximumValue")] public float MaximumValue { get; }
-    [Selector("transform")] public float* Transform { get; }
-    [Selector("initWithDevice:thresholdValue:maximumValue:linearGrayColorTransform:")] public Self InitWithDeviceThresholdValueMaximumValueLinearGrayColorTransform(MTLDevice device, float thresholdValue, float maximumValue, float* transform);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("thresholdValue")]
+    public float ThresholdValue { get; }
+    [Selector("maximumValue")]
+    public float MaximumValue { get; }
+    [Selector("transform")]
+    public float* Transform { get; }
+    [Selector("initWithDevice:thresholdValue:maximumValue:linearGrayColorTransform:")]
+    public Self InitWithDeviceThresholdValueMaximumValueLinearGrayColorTransform(MTLDevice device, float thresholdValue, float maximumValue, float* transform);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSImageThresholdBinaryInverse : MPSUnaryImageKernel
 {
-    [Selector("thresholdValue")] public float ThresholdValue { get; }
-    [Selector("maximumValue")] public float MaximumValue { get; }
-    [Selector("transform")] public float* Transform { get; }
-    [Selector("initWithDevice:thresholdValue:maximumValue:linearGrayColorTransform:")] public Self InitWithDeviceThresholdValueMaximumValueLinearGrayColorTransform(MTLDevice device, float thresholdValue, float maximumValue, float* transform);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("thresholdValue")]
+    public float ThresholdValue { get; }
+    [Selector("maximumValue")]
+    public float MaximumValue { get; }
+    [Selector("transform")]
+    public float* Transform { get; }
+    [Selector("initWithDevice:thresholdValue:maximumValue:linearGrayColorTransform:")]
+    public Self InitWithDeviceThresholdValueMaximumValueLinearGrayColorTransform(MTLDevice device, float thresholdValue, float maximumValue, float* transform);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSImageThresholdTruncate : MPSUnaryImageKernel
 {
-    [Selector("thresholdValue")] public float ThresholdValue { get; }
-    [Selector("transform")] public float* Transform { get; }
-    [Selector("initWithDevice:thresholdValue:linearGrayColorTransform:")] public Self InitWithDeviceThresholdValueLinearGrayColorTransform(MTLDevice device, float thresholdValue, float* transform);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("thresholdValue")]
+    public float ThresholdValue { get; }
+    [Selector("transform")]
+    public float* Transform { get; }
+    [Selector("initWithDevice:thresholdValue:linearGrayColorTransform:")]
+    public Self InitWithDeviceThresholdValueLinearGrayColorTransform(MTLDevice device, float thresholdValue, float* transform);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSImageThresholdToZero : MPSUnaryImageKernel
 {
-    [Selector("thresholdValue")] public float ThresholdValue { get; }
-    [Selector("transform")] public float* Transform { get; }
-    [Selector("initWithDevice:thresholdValue:linearGrayColorTransform:")] public Self InitWithDeviceThresholdValueLinearGrayColorTransform(MTLDevice device, float thresholdValue, float* transform);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("thresholdValue")]
+    public float ThresholdValue { get; }
+    [Selector("transform")]
+    public float* Transform { get; }
+    [Selector("initWithDevice:thresholdValue:linearGrayColorTransform:")]
+    public Self InitWithDeviceThresholdValueLinearGrayColorTransform(MTLDevice device, float thresholdValue, float* transform);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSImageThresholdToZeroInverse : MPSUnaryImageKernel
 {
-    [Selector("thresholdValue")] public float ThresholdValue { get; }
-    [Selector("transform")] public float* Transform { get; }
-    [Selector("initWithDevice:thresholdValue:linearGrayColorTransform:")] public Self InitWithDeviceThresholdValueLinearGrayColorTransform(MTLDevice device, float thresholdValue, float* transform);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("thresholdValue")]
+    public float ThresholdValue { get; }
+    [Selector("transform")]
+    public float* Transform { get; }
+    [Selector("initWithDevice:thresholdValue:linearGrayColorTransform:")]
+    public Self InitWithDeviceThresholdValueLinearGrayColorTransform(MTLDevice device, float thresholdValue, float* transform);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 #endif

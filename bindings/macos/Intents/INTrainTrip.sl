@@ -34,15 +34,24 @@ import Standard.ObjC;
 
 public extern objc class INTrainTrip : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("provider")] public NSString? Provider { get; }
-    [Selector("trainName")] public NSString? TrainName { get; }
-    [Selector("trainNumber")] public NSString? TrainNumber { get; }
-    [Selector("tripDuration")] public INDateComponentsRange TripDuration { get; }
-    [Selector("departureStationLocation")] public CLPlacemark DepartureStationLocation { get; }
-    [Selector("departurePlatform")] public NSString? DeparturePlatform { get; }
-    [Selector("arrivalStationLocation")] public CLPlacemark ArrivalStationLocation { get; }
-    [Selector("arrivalPlatform")] public NSString? ArrivalPlatform { get; }
-    [Selector("initWithProvider:trainName:trainNumber:tripDuration:departureStationLocation:departurePlatform:arrivalStationLocation:arrivalPlatform:")] public Self InitWithProviderTrainNameTrainNumberTripDurationDepartureStationLocationDeparturePlatformArrivalStationLocationArrivalPlatform(NSString? provider, NSString? trainName, NSString? trainNumber, INDateComponentsRange tripDuration, CLPlacemark departureStationLocation, NSString? departurePlatform, CLPlacemark arrivalStationLocation, NSString? arrivalPlatform);
+    [Selector("provider")]
+    public NSString? Provider { get; }
+    [Selector("trainName")]
+    public NSString? TrainName { get; }
+    [Selector("trainNumber")]
+    public NSString? TrainNumber { get; }
+    [Selector("tripDuration")]
+    public INDateComponentsRange TripDuration { get; }
+    [Selector("departureStationLocation")]
+    public CLPlacemark DepartureStationLocation { get; }
+    [Selector("departurePlatform")]
+    public NSString? DeparturePlatform { get; }
+    [Selector("arrivalStationLocation")]
+    public CLPlacemark ArrivalStationLocation { get; }
+    [Selector("arrivalPlatform")]
+    public NSString? ArrivalPlatform { get; }
+    [Selector("initWithProvider:trainName:trainNumber:tripDuration:departureStationLocation:departurePlatform:arrivalStationLocation:arrivalPlatform:")]
+    public Self InitWithProviderTrainNameTrainNumberTripDurationDepartureStationLocationDeparturePlatformArrivalStationLocationArrivalPlatform(NSString? provider, NSString? trainName, NSString? trainNumber, INDateComponentsRange tripDuration, CLPlacemark departureStationLocation, NSString? departurePlatform, CLPlacemark arrivalStationLocation, NSString? arrivalPlatform);
 }
 
 #endif

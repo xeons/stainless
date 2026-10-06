@@ -48,10 +48,14 @@ public extern "C" AVCoordinatedPlaybackSuspensionReason? AVCoordinatedPlaybackSu
 
 public extern objc class AVCoordinatedPlaybackSuspension : NSObject
 {
-    [Selector("reason")] public AVCoordinatedPlaybackSuspensionReason Reason { get; }
-    [Selector("beginDate")] public NSDate BeginDate { get; }
-    [Selector("end")] public void End();
-    [Selector("endProposingNewTime:")] public void EndProposingNewTime(CMTime time);
+    [Selector("reason")]
+    public AVCoordinatedPlaybackSuspensionReason Reason { get; }
+    [Selector("beginDate")]
+    public NSDate BeginDate { get; }
+    [Selector("end")]
+    public void End();
+    [Selector("endProposingNewTime:")]
+    public void EndProposingNewTime(CMTime time);
 }
 
 public extern "C" NSNotificationName? AVPlaybackCoordinatorOtherParticipantsDidChangeNotification;
@@ -60,47 +64,66 @@ public extern "C" NSNotificationName? AVPlaybackCoordinatorSuspensionReasonsDidC
 
 public extern objc class AVPlaybackCoordinator : NSObject
 {
-    [Selector("otherParticipants")] public NSArray OtherParticipants { get; }
-    [Selector("suspensionReasons")] public NSArray SuspensionReasons { get; }
-    [Selector("beginSuspensionForReason:")] public AVCoordinatedPlaybackSuspension BeginSuspensionForReason(AVCoordinatedPlaybackSuspensionReason suspensionReason);
-    [Selector("expectedItemTimeAtHostTime:")] public CMTime ExpectedItemTimeAtHostTime(CMTime hostClockTime);
+    [Selector("otherParticipants")]
+    public NSArray OtherParticipants { get; }
+    [Selector("suspensionReasons")]
+    public NSArray SuspensionReasons { get; }
+    [Selector("beginSuspensionForReason:")]
+    public AVCoordinatedPlaybackSuspension BeginSuspensionForReason(AVCoordinatedPlaybackSuspensionReason suspensionReason);
+    [Selector("expectedItemTimeAtHostTime:")]
+    public CMTime ExpectedItemTimeAtHostTime(CMTime hostClockTime);
 }
 
 public extern objc class AVCoordinatedPlaybackParticipant : NSObject
 {
-    [Selector("suspensionReasons")] public NSArray SuspensionReasons { get; }
-    [Selector("isReadyToPlay")] public bool ReadyToPlay { get; }
-    [Selector("identifier")] public NSUUID Identifier { get; }
+    [Selector("suspensionReasons")]
+    public NSArray SuspensionReasons { get; }
+    [Selector("isReadyToPlay")]
+    public bool ReadyToPlay { get; }
+    [Selector("identifier")]
+    public NSUUID Identifier { get; }
 }
 
 /// AVCoordinatedPlaybackPolicies, a category of AVPlaybackCoordinator.
 public extern objc class AVPlaybackCoordinator
 {
-    [Selector("suspensionReasonsThatTriggerWaiting", "setSuspensionReasonsThatTriggerWaiting:")] public NSArray SuspensionReasonsThatTriggerWaiting { get; set; }
-    [Selector("pauseSnapsToMediaTimeOfOriginator", "setPauseSnapsToMediaTimeOfOriginator:")] public bool PauseSnapsToMediaTimeOfOriginator { get; set; }
-    [Selector("setParticipantLimit:forWaitingOutSuspensionsWithReason:")] public void SetParticipantLimitForWaitingOutSuspensionsWithReason(NSInteger participantLimit, AVCoordinatedPlaybackSuspensionReason reason);
-    [Selector("participantLimitForWaitingOutSuspensionsWithReason:")] public NSInteger ParticipantLimitForWaitingOutSuspensionsWithReason(AVCoordinatedPlaybackSuspensionReason reason);
+    [Selector("suspensionReasonsThatTriggerWaiting", "setSuspensionReasonsThatTriggerWaiting:")]
+    public NSArray SuspensionReasonsThatTriggerWaiting { get; set; }
+    [Selector("pauseSnapsToMediaTimeOfOriginator", "setPauseSnapsToMediaTimeOfOriginator:")]
+    public bool PauseSnapsToMediaTimeOfOriginator { get; set; }
+    [Selector("setParticipantLimit:forWaitingOutSuspensionsWithReason:")]
+    public void SetParticipantLimitForWaitingOutSuspensionsWithReason(NSInteger participantLimit, AVCoordinatedPlaybackSuspensionReason reason);
+    [Selector("participantLimitForWaitingOutSuspensionsWithReason:")]
+    public NSInteger ParticipantLimitForWaitingOutSuspensionsWithReason(AVCoordinatedPlaybackSuspensionReason reason);
 }
 
 public extern objc class AVPlayerPlaybackCoordinator : AVPlaybackCoordinator
 {
-    [Selector("player")] public AVPlayer? Player { get; }
-    [Selector("delegate", "setDelegate:")] public AVPlayerPlaybackCoordinatorDelegate? Delegate { get; set; }
+    [Selector("player")]
+    public AVPlayer? Player { get; }
+    [Selector("delegate", "setDelegate:")]
+    public AVPlayerPlaybackCoordinatorDelegate? Delegate { get; set; }
 }
 
 /// AVPlaybackCoordinationMediumSupport, a category of AVPlayerPlaybackCoordinator.
 public extern objc class AVPlayerPlaybackCoordinator
 {
     /// macOS 26.0 and later.
-    [Selector("playbackCoordinationMedium")] public AVPlaybackCoordinationMedium? PlaybackCoordinationMedium { get; }
+    [Selector("playbackCoordinationMedium")]
+    public AVPlaybackCoordinationMedium? PlaybackCoordinationMedium { get; }
     /// macOS 26.0 and later.
-    [Selector("coordinateUsingCoordinationMedium:error:")] public bool CoordinateUsingCoordinationMediumError(AVPlaybackCoordinationMedium? coordinationMedium, out NSError? outError);
+    [Selector("coordinateUsingCoordinationMedium:error:")]
+    public bool CoordinateUsingCoordinationMediumError(AVPlaybackCoordinationMedium? coordinationMedium, out NSError? outError);
 }
 
 public objc interface AVPlayerPlaybackCoordinatorDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("playbackCoordinator:identifierForPlayerItem:")] NSString PlaybackCoordinatorIdentifierForPlayerItem(AVPlayerPlaybackCoordinator coordinator, AVPlayerItem playerItem);
-    [Optional] [Selector("playbackCoordinator:interstitialTimeRangesForPlayerItem:")] NSArray PlaybackCoordinatorInterstitialTimeRangesForPlayerItem(AVPlayerPlaybackCoordinator coordinator, AVPlayerItem playerItem);
+    [Optional]
+    [Selector("playbackCoordinator:identifierForPlayerItem:")]
+    NSString PlaybackCoordinatorIdentifierForPlayerItem(AVPlayerPlaybackCoordinator coordinator, AVPlayerItem playerItem);
+    [Optional]
+    [Selector("playbackCoordinator:interstitialTimeRangesForPlayerItem:")]
+    NSArray PlaybackCoordinatorInterstitialTimeRangesForPlayerItem(AVPlayerPlaybackCoordinator coordinator, AVPlayerItem playerItem);
 }
 
 [Flags]
@@ -117,13 +140,20 @@ public enum AVDelegatingPlaybackCoordinatorSeekOptions : ulong
 
 public extern objc class AVDelegatingPlaybackCoordinator : AVPlaybackCoordinator
 {
-    [Selector("playbackControlDelegate")] public AVPlaybackCoordinatorPlaybackControlDelegate? PlaybackControlDelegate { get; }
-    [Selector("currentItemIdentifier")] public NSString? CurrentItemIdentifier { get; }
-    [Selector("initWithPlaybackControlDelegate:")] public Self InitWithPlaybackControlDelegate(AVPlaybackCoordinatorPlaybackControlDelegate playbackControlDelegate);
-    [Selector("coordinateRateChangeToRate:options:")] public void CoordinateRateChangeToRateOptions(float rate, AVDelegatingPlaybackCoordinatorRateChangeOptions options);
-    [Selector("coordinateSeekToTime:options:")] public void CoordinateSeekToTimeOptions(CMTime time, AVDelegatingPlaybackCoordinatorSeekOptions options);
-    [Selector("transitionToItemWithIdentifier:proposingInitialTimingBasedOnTimebase:")] public void TransitionToItemWithIdentifierProposingInitialTimingBasedOnTimebase(NSString? itemIdentifier, CMTimebaseRef? snapshotTimebase);
-    [Selector("reapplyCurrentItemStateToPlaybackControlDelegate")] public void ReapplyCurrentItemStateToPlaybackControlDelegate();
+    [Selector("playbackControlDelegate")]
+    public AVPlaybackCoordinatorPlaybackControlDelegate? PlaybackControlDelegate { get; }
+    [Selector("currentItemIdentifier")]
+    public NSString? CurrentItemIdentifier { get; }
+    [Selector("initWithPlaybackControlDelegate:")]
+    public Self InitWithPlaybackControlDelegate(AVPlaybackCoordinatorPlaybackControlDelegate playbackControlDelegate);
+    [Selector("coordinateRateChangeToRate:options:")]
+    public void CoordinateRateChangeToRateOptions(float rate, AVDelegatingPlaybackCoordinatorRateChangeOptions options);
+    [Selector("coordinateSeekToTime:options:")]
+    public void CoordinateSeekToTimeOptions(CMTime time, AVDelegatingPlaybackCoordinatorSeekOptions options);
+    [Selector("transitionToItemWithIdentifier:proposingInitialTimingBasedOnTimebase:")]
+    public void TransitionToItemWithIdentifierProposingInitialTimingBasedOnTimebase(NSString? itemIdentifier, CMTimebaseRef? snapshotTimebase);
+    [Selector("reapplyCurrentItemStateToPlaybackControlDelegate")]
+    public void ReapplyCurrentItemStateToPlaybackControlDelegate();
 }
 
 public objc closure void AVPlaybackCoordinatorPlaybackControlDelegatePlaybackCoordinatorDidIssuePlayCommandCompletionHandlerCompletionHandlerBlock();
@@ -136,43 +166,60 @@ public objc closure void AVPlaybackCoordinatorPlaybackControlDelegatePlaybackCoo
 
 public objc interface AVPlaybackCoordinatorPlaybackControlDelegate : NSObjectProtocol
 {
-    [Selector("playbackCoordinator:didIssuePlayCommand:completionHandler:")] void PlaybackCoordinatorDidIssuePlayCommandCompletionHandler(AVDelegatingPlaybackCoordinator coordinator, AVDelegatingPlaybackCoordinatorPlayCommand playCommand, AVPlaybackCoordinatorPlaybackControlDelegatePlaybackCoordinatorDidIssuePlayCommandCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("playbackCoordinator:didIssuePauseCommand:completionHandler:")] void PlaybackCoordinatorDidIssuePauseCommandCompletionHandler(AVDelegatingPlaybackCoordinator coordinator, AVDelegatingPlaybackCoordinatorPauseCommand pauseCommand, AVPlaybackCoordinatorPlaybackControlDelegatePlaybackCoordinatorDidIssuePauseCommandCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("playbackCoordinator:didIssueSeekCommand:completionHandler:")] void PlaybackCoordinatorDidIssueSeekCommandCompletionHandler(AVDelegatingPlaybackCoordinator coordinator, AVDelegatingPlaybackCoordinatorSeekCommand seekCommand, AVPlaybackCoordinatorPlaybackControlDelegatePlaybackCoordinatorDidIssueSeekCommandCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("playbackCoordinator:didIssueBufferingCommand:completionHandler:")] void PlaybackCoordinatorDidIssueBufferingCommandCompletionHandler(AVDelegatingPlaybackCoordinator coordinator, AVDelegatingPlaybackCoordinatorBufferingCommand bufferingCommand, AVPlaybackCoordinatorPlaybackControlDelegatePlaybackCoordinatorDidIssueBufferingCommandCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("playbackCoordinator:didIssuePlayCommand:completionHandler:")]
+    void PlaybackCoordinatorDidIssuePlayCommandCompletionHandler(AVDelegatingPlaybackCoordinator coordinator, AVDelegatingPlaybackCoordinatorPlayCommand playCommand, AVPlaybackCoordinatorPlaybackControlDelegatePlaybackCoordinatorDidIssuePlayCommandCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("playbackCoordinator:didIssuePauseCommand:completionHandler:")]
+    void PlaybackCoordinatorDidIssuePauseCommandCompletionHandler(AVDelegatingPlaybackCoordinator coordinator, AVDelegatingPlaybackCoordinatorPauseCommand pauseCommand, AVPlaybackCoordinatorPlaybackControlDelegatePlaybackCoordinatorDidIssuePauseCommandCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("playbackCoordinator:didIssueSeekCommand:completionHandler:")]
+    void PlaybackCoordinatorDidIssueSeekCommandCompletionHandler(AVDelegatingPlaybackCoordinator coordinator, AVDelegatingPlaybackCoordinatorSeekCommand seekCommand, AVPlaybackCoordinatorPlaybackControlDelegatePlaybackCoordinatorDidIssueSeekCommandCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("playbackCoordinator:didIssueBufferingCommand:completionHandler:")]
+    void PlaybackCoordinatorDidIssueBufferingCommandCompletionHandler(AVDelegatingPlaybackCoordinator coordinator, AVDelegatingPlaybackCoordinatorBufferingCommand bufferingCommand, AVPlaybackCoordinatorPlaybackControlDelegatePlaybackCoordinatorDidIssueBufferingCommandCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public extern objc class AVDelegatingPlaybackCoordinatorPlaybackControlCommand : NSObject
 {
-    [Selector("originator")] public AVCoordinatedPlaybackParticipant? Originator { get; }
-    [Selector("expectedCurrentItemIdentifier")] public NSString ExpectedCurrentItemIdentifier { get; }
+    [Selector("originator")]
+    public AVCoordinatedPlaybackParticipant? Originator { get; }
+    [Selector("expectedCurrentItemIdentifier")]
+    public NSString ExpectedCurrentItemIdentifier { get; }
 }
 
 public extern objc class AVDelegatingPlaybackCoordinatorPlayCommand : AVDelegatingPlaybackCoordinatorPlaybackControlCommand
 {
-    [Selector("rate")] public float Rate { get; }
-    [Selector("itemTime")] public CMTime ItemTime { get; }
-    [Selector("hostClockTime")] public CMTime HostClockTime { get; }
+    [Selector("rate")]
+    public float Rate { get; }
+    [Selector("itemTime")]
+    public CMTime ItemTime { get; }
+    [Selector("hostClockTime")]
+    public CMTime HostClockTime { get; }
 }
 
 public extern objc class AVDelegatingPlaybackCoordinatorBufferingCommand : AVDelegatingPlaybackCoordinatorPlaybackControlCommand
 {
-    [Selector("anticipatedPlaybackRate")] public float AnticipatedPlaybackRate { get; }
-    [Selector("completionDueDate")] public NSDate? CompletionDueDate { get; }
+    [Selector("anticipatedPlaybackRate")]
+    public float AnticipatedPlaybackRate { get; }
+    [Selector("completionDueDate")]
+    public NSDate? CompletionDueDate { get; }
 }
 
 public extern objc class AVDelegatingPlaybackCoordinatorPauseCommand : AVDelegatingPlaybackCoordinatorPlaybackControlCommand
 {
-    [Selector("shouldBufferInAnticipationOfPlayback")] public bool ShouldBufferInAnticipationOfPlayback { get; }
-    [Selector("anticipatedPlaybackRate")] public float AnticipatedPlaybackRate { get; }
+    [Selector("shouldBufferInAnticipationOfPlayback")]
+    public bool ShouldBufferInAnticipationOfPlayback { get; }
+    [Selector("anticipatedPlaybackRate")]
+    public float AnticipatedPlaybackRate { get; }
 }
 
 public extern objc class AVDelegatingPlaybackCoordinatorSeekCommand : AVDelegatingPlaybackCoordinatorPlaybackControlCommand
 {
-    [Selector("itemTime")] public CMTime ItemTime { get; }
-    [Selector("shouldBufferInAnticipationOfPlayback")] public bool ShouldBufferInAnticipationOfPlayback { get; }
-    [Selector("anticipatedPlaybackRate")] public float AnticipatedPlaybackRate { get; }
-    [Selector("completionDueDate")] public NSDate? CompletionDueDate { get; }
+    [Selector("itemTime")]
+    public CMTime ItemTime { get; }
+    [Selector("shouldBufferInAnticipationOfPlayback")]
+    public bool ShouldBufferInAnticipationOfPlayback { get; }
+    [Selector("anticipatedPlaybackRate")]
+    public float AnticipatedPlaybackRate { get; }
+    [Selector("completionDueDate")]
+    public NSDate? CompletionDueDate { get; }
 }
 
 #endif

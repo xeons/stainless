@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class OSLogEntryActivity : OSLogEntry, OSLogEntryFromProcess
 {
-    [Selector("parentActivityIdentifier")] public os_activity_id_t ParentActivityIdentifier { get; }
+    [Selector("parentActivityIdentifier")]
+    public os_activity_id_t ParentActivityIdentifier { get; }
 }
 
 #endif

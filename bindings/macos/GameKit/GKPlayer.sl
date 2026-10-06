@@ -35,14 +35,22 @@ public extern "C" NSString? GKPlayerIDNoLongerAvailable;
 
 public extern objc class GKPlayer : GKBasePlayer
 {
-    [Selector("gamePlayerID")] public NSString? GamePlayerID { get; }
-    [Selector("teamPlayerID")] public NSString? TeamPlayerID { get; }
-    [Selector("displayName")] public NSString DisplayName { get; }
-    [Selector("alias")] public NSString Alias { get; }
-    [Selector("guestIdentifier")] public NSString? GuestIdentifier { get; }
-    [Selector("isInvitable")] public bool IsInvitable { get; }
-    [Selector("scopedIDsArePersistent")] public bool ScopedIDsArePersistent();
-    [Selector("anonymousGuestPlayerWithIdentifier:")] public static Self AnonymousGuestPlayerWithIdentifier(NSString guestIdentifier);
+    [Selector("gamePlayerID")]
+    public NSString? GamePlayerID { get; }
+    [Selector("teamPlayerID")]
+    public NSString? TeamPlayerID { get; }
+    [Selector("displayName")]
+    public NSString DisplayName { get; }
+    [Selector("alias")]
+    public NSString Alias { get; }
+    [Selector("guestIdentifier")]
+    public NSString? GuestIdentifier { get; }
+    [Selector("isInvitable")]
+    public bool IsInvitable { get; }
+    [Selector("scopedIDsArePersistent")]
+    public bool ScopedIDsArePersistent();
+    [Selector("anonymousGuestPlayerWithIdentifier:")]
+    public static Self AnonymousGuestPlayerWithIdentifier(NSString guestIdentifier);
 }
 
 public objc closure void GKPlayerLoadPhotoForSizeWithCompletionHandlerCompletionHandlerBlock(NSImage? arg0, NSError? arg1);
@@ -50,7 +58,8 @@ public objc closure void GKPlayerLoadPhotoForSizeWithCompletionHandlerCompletion
 /// UI, a category of GKPlayer.
 public extern objc class GKPlayer
 {
-    [Selector("loadPhotoForSize:withCompletionHandler:")] public void LoadPhotoForSizeWithCompletionHandler(GKPhotoSize size, GKPlayerLoadPhotoForSizeWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadPhotoForSize:withCompletionHandler:")]
+    public void LoadPhotoForSizeWithCompletionHandler(GKPhotoSize size, GKPlayerLoadPhotoForSizeWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public enum GKPhotoSize : long
@@ -67,11 +76,14 @@ public objc closure void GKPlayerLoadPlayersForIdentifiersWithCompletionHandlerC
 public extern objc class GKPlayer
 {
     /// Deprecated in macOS 10.10.
-    [Selector("isFriend")] public bool IsFriend { get; }
+    [Selector("isFriend")]
+    public bool IsFriend { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("playerID")] public NSString PlayerID { get; }
+    [Selector("playerID")]
+    public NSString PlayerID { get; }
     /// Deprecated in macOS 11.3.
-    [Selector("loadPlayersForIdentifiers:withCompletionHandler:")] public static void LoadPlayersForIdentifiersWithCompletionHandler(NSArray identifiers, GKPlayerLoadPlayersForIdentifiersWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("loadPlayersForIdentifiers:withCompletionHandler:")]
+    public static void LoadPlayersForIdentifiersWithCompletionHandler(NSArray identifiers, GKPlayerLoadPlayersForIdentifiersWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 #endif

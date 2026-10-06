@@ -52,114 +52,230 @@ public extern "C" NSString? MKMapViewDefaultClusterAnnotationViewReuseIdentifier
 
 public extern objc class MKMapView : NSView, NSCoding
 {
-    [Selector("delegate", "setDelegate:")] public MKMapViewDelegate? Delegate { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public MKMapViewDelegate? Delegate { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("mapType", "setMapType:")] public MKMapType MapType { get; set; }
-    [Selector("preferredConfiguration", "setPreferredConfiguration:")] public MKMapConfiguration? PreferredConfiguration { get; set; }
-    [Selector("region", "setRegion:")] public MKCoordinateRegion Region { get; set; }
-    [Selector("centerCoordinate", "setCenterCoordinate:")] public CLLocationCoordinate2D CenterCoordinate { get; set; }
-    [Selector("visibleMapRect", "setVisibleMapRect:")] public MKMapRect VisibleMapRect { get; set; }
-    [Selector("camera", "setCamera:")] public MKMapCamera? Camera { get; set; }
-    [Selector("cameraZoomRange", "setCameraZoomRange:")] public MKMapCameraZoomRange? CameraZoomRange { get; set; }
-    [Selector("cameraBoundary", "setCameraBoundary:")] public MKMapCameraBoundary? CameraBoundary { get; set; }
-    [Selector("isZoomEnabled", "setZoomEnabled:")] public bool ZoomEnabled { get; set; }
-    [Selector("isScrollEnabled", "setScrollEnabled:")] public bool ScrollEnabled { get; set; }
-    [Selector("isRotateEnabled", "setRotateEnabled:")] public bool RotateEnabled { get; set; }
-    [Selector("isPitchEnabled", "setPitchEnabled:")] public bool PitchEnabled { get; set; }
-    [Selector("showsUserTrackingButton", "setShowsUserTrackingButton:")] public bool ShowsUserTrackingButton { get; set; }
-    [Selector("pitchButtonVisibility", "setPitchButtonVisibility:")] public MKFeatureVisibility PitchButtonVisibility { get; set; }
-    [Selector("showsPitchControl", "setShowsPitchControl:")] public bool ShowsPitchControl { get; set; }
-    [Selector("showsZoomControls", "setShowsZoomControls:")] public bool ShowsZoomControls { get; set; }
-    [Selector("showsCompass", "setShowsCompass:")] public bool ShowsCompass { get; set; }
-    [Selector("showsScale", "setShowsScale:")] public bool ShowsScale { get; set; }
+    [Selector("mapType", "setMapType:")]
+    public MKMapType MapType { get; set; }
+    [Selector("preferredConfiguration", "setPreferredConfiguration:")]
+    public MKMapConfiguration? PreferredConfiguration { get; set; }
+    [Selector("region", "setRegion:")]
+    public MKCoordinateRegion Region { get; set; }
+    [Selector("centerCoordinate", "setCenterCoordinate:")]
+    public CLLocationCoordinate2D CenterCoordinate { get; set; }
+    [Selector("visibleMapRect", "setVisibleMapRect:")]
+    public MKMapRect VisibleMapRect { get; set; }
+    [Selector("camera", "setCamera:")]
+    public MKMapCamera? Camera { get; set; }
+    [Selector("cameraZoomRange", "setCameraZoomRange:")]
+    public MKMapCameraZoomRange? CameraZoomRange { get; set; }
+    [Selector("cameraBoundary", "setCameraBoundary:")]
+    public MKMapCameraBoundary? CameraBoundary { get; set; }
+    [Selector("isZoomEnabled", "setZoomEnabled:")]
+    public bool ZoomEnabled { get; set; }
+    [Selector("isScrollEnabled", "setScrollEnabled:")]
+    public bool ScrollEnabled { get; set; }
+    [Selector("isRotateEnabled", "setRotateEnabled:")]
+    public bool RotateEnabled { get; set; }
+    [Selector("isPitchEnabled", "setPitchEnabled:")]
+    public bool PitchEnabled { get; set; }
+    [Selector("showsUserTrackingButton", "setShowsUserTrackingButton:")]
+    public bool ShowsUserTrackingButton { get; set; }
+    [Selector("pitchButtonVisibility", "setPitchButtonVisibility:")]
+    public MKFeatureVisibility PitchButtonVisibility { get; set; }
+    [Selector("showsPitchControl", "setShowsPitchControl:")]
+    public bool ShowsPitchControl { get; set; }
+    [Selector("showsZoomControls", "setShowsZoomControls:")]
+    public bool ShowsZoomControls { get; set; }
+    [Selector("showsCompass", "setShowsCompass:")]
+    public bool ShowsCompass { get; set; }
+    [Selector("showsScale", "setShowsScale:")]
+    public bool ShowsScale { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")] public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
+    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")]
+    public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
     /// Deprecated in macOS 10.15.
-    [Selector("showsPointsOfInterest", "setShowsPointsOfInterest:")] public bool ShowsPointsOfInterest { get; set; }
+    [Selector("showsPointsOfInterest", "setShowsPointsOfInterest:")]
+    public bool ShowsPointsOfInterest { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("showsBuildings", "setShowsBuildings:")] public bool ShowsBuildings { get; set; }
+    [Selector("showsBuildings", "setShowsBuildings:")]
+    public bool ShowsBuildings { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("showsTraffic", "setShowsTraffic:")] public bool ShowsTraffic { get; set; }
-    [Selector("showsUserLocation", "setShowsUserLocation:")] public bool ShowsUserLocation { get; set; }
-    [Selector("userLocation")] public MKUserLocation UserLocation { get; }
-    [Selector("userTrackingMode", "setUserTrackingMode:")] public MKUserTrackingMode UserTrackingMode { get; set; }
-    [Selector("isUserLocationVisible")] public bool UserLocationVisible { get; }
-    [Selector("annotations")] public NSArray Annotations { get; }
-    [Selector("selectedAnnotations", "setSelectedAnnotations:")] public NSArray SelectedAnnotations { get; set; }
-    [Selector("annotationVisibleRect")] public CGRect AnnotationVisibleRect { get; }
-    [Selector("setRegion:animated:")] public void SetRegionAnimated(MKCoordinateRegion region, bool animated);
-    [Selector("setCenterCoordinate:animated:")] public void SetCenterCoordinateAnimated(CLLocationCoordinate2D coordinate, bool animated);
-    [Selector("regionThatFits:")] public MKCoordinateRegion RegionThatFits(MKCoordinateRegion region);
-    [Selector("setVisibleMapRect:animated:")] public void SetVisibleMapRectAnimated(MKMapRect mapRect, bool animate);
-    [Selector("mapRectThatFits:")] public MKMapRect MapRectThatFits(MKMapRect mapRect);
-    [Selector("setVisibleMapRect:edgePadding:animated:")] public void SetVisibleMapRectEdgePaddingAnimated(MKMapRect mapRect, NSEdgeInsets insets, bool animate);
-    [Selector("mapRectThatFits:edgePadding:")] public MKMapRect MapRectThatFitsEdgePadding(MKMapRect mapRect, NSEdgeInsets insets);
-    [Selector("setCamera:animated:")] public void SetCameraAnimated(MKMapCamera camera, bool animated);
-    [Selector("setCameraZoomRange:animated:")] public void SetCameraZoomRangeAnimated(MKMapCameraZoomRange? cameraZoomRange, bool animated);
-    [Selector("setCameraBoundary:animated:")] public void SetCameraBoundaryAnimated(MKMapCameraBoundary? cameraBoundary, bool animated);
-    [Selector("convertCoordinate:toPointToView:")] public CGPoint ConvertCoordinateToPointToView(CLLocationCoordinate2D coordinate, NSView? view);
-    [Selector("convertPoint:toCoordinateFromView:")] public CLLocationCoordinate2D ConvertPointToCoordinateFromView(CGPoint point, NSView? view);
-    [Selector("convertRegion:toRectToView:")] public CGRect ConvertRegionToRectToView(MKCoordinateRegion region, NSView? view);
-    [Selector("convertRect:toRegionFromView:")] public MKCoordinateRegion ConvertRectToRegionFromView(CGRect rect, NSView? view);
-    [Selector("setUserTrackingMode:animated:")] public void SetUserTrackingModeAnimated(MKUserTrackingMode mode, bool animated);
-    [Selector("addAnnotation:")] public void AddAnnotation(MKAnnotation annotation);
-    [Selector("addAnnotations:")] public void AddAnnotations(NSArray annotations);
-    [Selector("removeAnnotation:")] public void RemoveAnnotation(MKAnnotation annotation);
-    [Selector("removeAnnotations:")] public void RemoveAnnotations(NSArray annotations);
-    [Selector("annotationsInMapRect:")] public NSSet AnnotationsInMapRect(MKMapRect mapRect);
-    [Selector("viewForAnnotation:")] public MKAnnotationView? ViewForAnnotation(MKAnnotation annotation);
-    [Selector("dequeueReusableAnnotationViewWithIdentifier:")] public MKAnnotationView? DequeueReusableAnnotationViewWithIdentifier(NSString identifier);
-    [Selector("dequeueReusableAnnotationViewWithIdentifier:forAnnotation:")] public MKAnnotationView DequeueReusableAnnotationViewWithIdentifierForAnnotation(NSString identifier, MKAnnotation annotation);
-    [Selector("registerClass:forAnnotationViewWithReuseIdentifier:")] public void RegisterClassForAnnotationViewWithReuseIdentifier(Class viewClass, NSString identifier);
-    [Selector("selectAnnotation:animated:")] public void SelectAnnotationAnimated(MKAnnotation annotation, bool animated);
-    [Selector("deselectAnnotation:animated:")] public void DeselectAnnotationAnimated(MKAnnotation? annotation, bool animated);
-    [Selector("showAnnotations:animated:")] public void ShowAnnotationsAnimated(NSArray annotations, bool animated);
+    [Selector("showsTraffic", "setShowsTraffic:")]
+    public bool ShowsTraffic { get; set; }
+    [Selector("showsUserLocation", "setShowsUserLocation:")]
+    public bool ShowsUserLocation { get; set; }
+    [Selector("userLocation")]
+    public MKUserLocation UserLocation { get; }
+    [Selector("userTrackingMode", "setUserTrackingMode:")]
+    public MKUserTrackingMode UserTrackingMode { get; set; }
+    [Selector("isUserLocationVisible")]
+    public bool UserLocationVisible { get; }
+    [Selector("annotations")]
+    public NSArray Annotations { get; }
+    [Selector("selectedAnnotations", "setSelectedAnnotations:")]
+    public NSArray SelectedAnnotations { get; set; }
+    [Selector("annotationVisibleRect")]
+    public CGRect AnnotationVisibleRect { get; }
+    [Selector("setRegion:animated:")]
+    public void SetRegionAnimated(MKCoordinateRegion region, bool animated);
+    [Selector("setCenterCoordinate:animated:")]
+    public void SetCenterCoordinateAnimated(CLLocationCoordinate2D coordinate, bool animated);
+    [Selector("regionThatFits:")]
+    public MKCoordinateRegion RegionThatFits(MKCoordinateRegion region);
+    [Selector("setVisibleMapRect:animated:")]
+    public void SetVisibleMapRectAnimated(MKMapRect mapRect, bool animate);
+    [Selector("mapRectThatFits:")]
+    public MKMapRect MapRectThatFits(MKMapRect mapRect);
+    [Selector("setVisibleMapRect:edgePadding:animated:")]
+    public void SetVisibleMapRectEdgePaddingAnimated(MKMapRect mapRect, NSEdgeInsets insets, bool animate);
+    [Selector("mapRectThatFits:edgePadding:")]
+    public MKMapRect MapRectThatFitsEdgePadding(MKMapRect mapRect, NSEdgeInsets insets);
+    [Selector("setCamera:animated:")]
+    public void SetCameraAnimated(MKMapCamera camera, bool animated);
+    [Selector("setCameraZoomRange:animated:")]
+    public void SetCameraZoomRangeAnimated(MKMapCameraZoomRange? cameraZoomRange, bool animated);
+    [Selector("setCameraBoundary:animated:")]
+    public void SetCameraBoundaryAnimated(MKMapCameraBoundary? cameraBoundary, bool animated);
+    [Selector("convertCoordinate:toPointToView:")]
+    public CGPoint ConvertCoordinateToPointToView(CLLocationCoordinate2D coordinate, NSView? view);
+    [Selector("convertPoint:toCoordinateFromView:")]
+    public CLLocationCoordinate2D ConvertPointToCoordinateFromView(CGPoint point, NSView? view);
+    [Selector("convertRegion:toRectToView:")]
+    public CGRect ConvertRegionToRectToView(MKCoordinateRegion region, NSView? view);
+    [Selector("convertRect:toRegionFromView:")]
+    public MKCoordinateRegion ConvertRectToRegionFromView(CGRect rect, NSView? view);
+    [Selector("setUserTrackingMode:animated:")]
+    public void SetUserTrackingModeAnimated(MKUserTrackingMode mode, bool animated);
+    [Selector("addAnnotation:")]
+    public void AddAnnotation(MKAnnotation annotation);
+    [Selector("addAnnotations:")]
+    public void AddAnnotations(NSArray annotations);
+    [Selector("removeAnnotation:")]
+    public void RemoveAnnotation(MKAnnotation annotation);
+    [Selector("removeAnnotations:")]
+    public void RemoveAnnotations(NSArray annotations);
+    [Selector("annotationsInMapRect:")]
+    public NSSet AnnotationsInMapRect(MKMapRect mapRect);
+    [Selector("viewForAnnotation:")]
+    public MKAnnotationView? ViewForAnnotation(MKAnnotation annotation);
+    [Selector("dequeueReusableAnnotationViewWithIdentifier:")]
+    public MKAnnotationView? DequeueReusableAnnotationViewWithIdentifier(NSString identifier);
+    [Selector("dequeueReusableAnnotationViewWithIdentifier:forAnnotation:")]
+    public MKAnnotationView DequeueReusableAnnotationViewWithIdentifierForAnnotation(NSString identifier, MKAnnotation annotation);
+    [Selector("registerClass:forAnnotationViewWithReuseIdentifier:")]
+    public void RegisterClassForAnnotationViewWithReuseIdentifier(Class viewClass, NSString identifier);
+    [Selector("selectAnnotation:animated:")]
+    public void SelectAnnotationAnimated(MKAnnotation annotation, bool animated);
+    [Selector("deselectAnnotation:animated:")]
+    public void DeselectAnnotationAnimated(MKAnnotation? annotation, bool animated);
+    [Selector("showAnnotations:animated:")]
+    public void ShowAnnotationsAnimated(NSArray annotations, bool animated);
 }
 
 /// OverlaysAPI, a category of MKMapView.
 public extern objc class MKMapView
 {
-    [Selector("overlays")] public NSArray? Overlays { get; }
-    [Selector("addOverlay:level:")] public void AddOverlayLevel(MKOverlay overlay, MKOverlayLevel level);
-    [Selector("addOverlays:level:")] public void AddOverlaysLevel(NSArray overlays, MKOverlayLevel level);
-    [Selector("removeOverlay:")] public void RemoveOverlay(MKOverlay overlay);
-    [Selector("removeOverlays:")] public void RemoveOverlays(NSArray overlays);
-    [Selector("insertOverlay:atIndex:level:")] public void InsertOverlayAtIndexLevel(MKOverlay overlay, NSUInteger index, MKOverlayLevel level);
-    [Selector("insertOverlay:aboveOverlay:")] public void InsertOverlayAboveOverlay(MKOverlay overlay, MKOverlay sibling);
-    [Selector("insertOverlay:belowOverlay:")] public void InsertOverlayBelowOverlay(MKOverlay overlay, MKOverlay sibling);
-    [Selector("exchangeOverlay:withOverlay:")] public void ExchangeOverlayWithOverlay(MKOverlay overlay1, MKOverlay overlay2);
-    [Selector("overlaysInLevel:")] public NSArray OverlaysInLevel(MKOverlayLevel level);
-    [Selector("rendererForOverlay:")] public MKOverlayRenderer? RendererForOverlay(MKOverlay overlay);
-    [Selector("addOverlay:")] public void AddOverlay(MKOverlay overlay);
-    [Selector("addOverlays:")] public void AddOverlays(NSArray overlays);
-    [Selector("insertOverlay:atIndex:")] public void InsertOverlayAtIndex(MKOverlay overlay, NSUInteger index);
-    [Selector("exchangeOverlayAtIndex:withOverlayAtIndex:")] public void ExchangeOverlayAtIndexWithOverlayAtIndex(NSUInteger index1, NSUInteger index2);
+    [Selector("overlays")]
+    public NSArray? Overlays { get; }
+    [Selector("addOverlay:level:")]
+    public void AddOverlayLevel(MKOverlay overlay, MKOverlayLevel level);
+    [Selector("addOverlays:level:")]
+    public void AddOverlaysLevel(NSArray overlays, MKOverlayLevel level);
+    [Selector("removeOverlay:")]
+    public void RemoveOverlay(MKOverlay overlay);
+    [Selector("removeOverlays:")]
+    public void RemoveOverlays(NSArray overlays);
+    [Selector("insertOverlay:atIndex:level:")]
+    public void InsertOverlayAtIndexLevel(MKOverlay overlay, NSUInteger index, MKOverlayLevel level);
+    [Selector("insertOverlay:aboveOverlay:")]
+    public void InsertOverlayAboveOverlay(MKOverlay overlay, MKOverlay sibling);
+    [Selector("insertOverlay:belowOverlay:")]
+    public void InsertOverlayBelowOverlay(MKOverlay overlay, MKOverlay sibling);
+    [Selector("exchangeOverlay:withOverlay:")]
+    public void ExchangeOverlayWithOverlay(MKOverlay overlay1, MKOverlay overlay2);
+    [Selector("overlaysInLevel:")]
+    public NSArray OverlaysInLevel(MKOverlayLevel level);
+    [Selector("rendererForOverlay:")]
+    public MKOverlayRenderer? RendererForOverlay(MKOverlay overlay);
+    [Selector("addOverlay:")]
+    public void AddOverlay(MKOverlay overlay);
+    [Selector("addOverlays:")]
+    public void AddOverlays(NSArray overlays);
+    [Selector("insertOverlay:atIndex:")]
+    public void InsertOverlayAtIndex(MKOverlay overlay, NSUInteger index);
+    [Selector("exchangeOverlayAtIndex:withOverlayAtIndex:")]
+    public void ExchangeOverlayAtIndexWithOverlayAtIndex(NSUInteger index1, NSUInteger index2);
 }
 
 public objc interface MKMapViewDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("mapView:regionWillChangeAnimated:")] void MapViewRegionWillChangeAnimated(MKMapView mapView, bool animated);
-    [Optional] [Selector("mapView:regionDidChangeAnimated:")] void MapViewRegionDidChangeAnimated(MKMapView mapView, bool animated);
-    [Optional] [Selector("mapViewDidChangeVisibleRegion:")] void MapViewDidChangeVisibleRegion(MKMapView mapView);
-    [Optional] [Selector("mapViewWillStartLoadingMap:")] void MapViewWillStartLoadingMap(MKMapView mapView);
-    [Optional] [Selector("mapViewDidFinishLoadingMap:")] void MapViewDidFinishLoadingMap(MKMapView mapView);
-    [Optional] [Selector("mapViewDidFailLoadingMap:withError:")] void MapViewDidFailLoadingMapWithError(MKMapView mapView, NSError error);
-    [Optional] [Selector("mapViewWillStartRenderingMap:")] void MapViewWillStartRenderingMap(MKMapView mapView);
-    [Optional] [Selector("mapViewDidFinishRenderingMap:fullyRendered:")] void MapViewDidFinishRenderingMapFullyRendered(MKMapView mapView, bool fullyRendered);
-    [Optional] [Selector("mapView:viewForAnnotation:")] MKAnnotationView? MapViewViewForAnnotation(MKMapView mapView, MKAnnotation annotation);
-    [Optional] [Selector("mapView:didAddAnnotationViews:")] void MapViewDidAddAnnotationViews(MKMapView mapView, NSArray views);
-    [Optional] [Selector("mapView:didSelectAnnotationView:")] void MapViewDidSelectAnnotationView(MKMapView mapView, MKAnnotationView view);
-    [Optional] [Selector("mapView:didDeselectAnnotationView:")] void MapViewDidDeselectAnnotationView(MKMapView mapView, MKAnnotationView view);
-    [Optional] [Selector("mapView:selectionAccessoryForAnnotation:")] MKSelectionAccessory? MapViewSelectionAccessoryForAnnotation(MKMapView mapView, MKAnnotation annotation);
-    [Optional] [Selector("mapViewWillStartLocatingUser:")] void MapViewWillStartLocatingUser(MKMapView mapView);
-    [Optional] [Selector("mapViewDidStopLocatingUser:")] void MapViewDidStopLocatingUser(MKMapView mapView);
-    [Optional] [Selector("mapView:didUpdateUserLocation:")] void MapViewDidUpdateUserLocation(MKMapView mapView, MKUserLocation userLocation);
-    [Optional] [Selector("mapView:didFailToLocateUserWithError:")] void MapViewDidFailToLocateUserWithError(MKMapView mapView, NSError error);
-    [Optional] [Selector("mapView:annotationView:didChangeDragState:fromOldState:")] void MapViewAnnotationViewDidChangeDragStateFromOldState(MKMapView mapView, MKAnnotationView view, MKAnnotationViewDragState newState, MKAnnotationViewDragState oldState);
-    [Optional] [Selector("mapView:didChangeUserTrackingMode:animated:")] void MapViewDidChangeUserTrackingModeAnimated(MKMapView mapView, MKUserTrackingMode mode, bool animated);
-    [Optional] [Selector("mapView:rendererForOverlay:")] MKOverlayRenderer MapViewRendererForOverlay(MKMapView mapView, MKOverlay overlay);
-    [Optional] [Selector("mapView:didAddOverlayRenderers:")] void MapViewDidAddOverlayRenderers(MKMapView mapView, NSArray renderers);
-    [Optional] [Selector("mapView:clusterAnnotationForMemberAnnotations:")] MKClusterAnnotation MapViewClusterAnnotationForMemberAnnotations(MKMapView mapView, NSArray memberAnnotations);
+    [Optional]
+    [Selector("mapView:regionWillChangeAnimated:")]
+    void MapViewRegionWillChangeAnimated(MKMapView mapView, bool animated);
+    [Optional]
+    [Selector("mapView:regionDidChangeAnimated:")]
+    void MapViewRegionDidChangeAnimated(MKMapView mapView, bool animated);
+    [Optional]
+    [Selector("mapViewDidChangeVisibleRegion:")]
+    void MapViewDidChangeVisibleRegion(MKMapView mapView);
+    [Optional]
+    [Selector("mapViewWillStartLoadingMap:")]
+    void MapViewWillStartLoadingMap(MKMapView mapView);
+    [Optional]
+    [Selector("mapViewDidFinishLoadingMap:")]
+    void MapViewDidFinishLoadingMap(MKMapView mapView);
+    [Optional]
+    [Selector("mapViewDidFailLoadingMap:withError:")]
+    void MapViewDidFailLoadingMapWithError(MKMapView mapView, NSError error);
+    [Optional]
+    [Selector("mapViewWillStartRenderingMap:")]
+    void MapViewWillStartRenderingMap(MKMapView mapView);
+    [Optional]
+    [Selector("mapViewDidFinishRenderingMap:fullyRendered:")]
+    void MapViewDidFinishRenderingMapFullyRendered(MKMapView mapView, bool fullyRendered);
+    [Optional]
+    [Selector("mapView:viewForAnnotation:")]
+    MKAnnotationView? MapViewViewForAnnotation(MKMapView mapView, MKAnnotation annotation);
+    [Optional]
+    [Selector("mapView:didAddAnnotationViews:")]
+    void MapViewDidAddAnnotationViews(MKMapView mapView, NSArray views);
+    [Optional]
+    [Selector("mapView:didSelectAnnotationView:")]
+    void MapViewDidSelectAnnotationView(MKMapView mapView, MKAnnotationView view);
+    [Optional]
+    [Selector("mapView:didDeselectAnnotationView:")]
+    void MapViewDidDeselectAnnotationView(MKMapView mapView, MKAnnotationView view);
+    [Optional]
+    [Selector("mapView:selectionAccessoryForAnnotation:")]
+    MKSelectionAccessory? MapViewSelectionAccessoryForAnnotation(MKMapView mapView, MKAnnotation annotation);
+    [Optional]
+    [Selector("mapViewWillStartLocatingUser:")]
+    void MapViewWillStartLocatingUser(MKMapView mapView);
+    [Optional]
+    [Selector("mapViewDidStopLocatingUser:")]
+    void MapViewDidStopLocatingUser(MKMapView mapView);
+    [Optional]
+    [Selector("mapView:didUpdateUserLocation:")]
+    void MapViewDidUpdateUserLocation(MKMapView mapView, MKUserLocation userLocation);
+    [Optional]
+    [Selector("mapView:didFailToLocateUserWithError:")]
+    void MapViewDidFailToLocateUserWithError(MKMapView mapView, NSError error);
+    [Optional]
+    [Selector("mapView:annotationView:didChangeDragState:fromOldState:")]
+    void MapViewAnnotationViewDidChangeDragStateFromOldState(MKMapView mapView, MKAnnotationView view, MKAnnotationViewDragState newState, MKAnnotationViewDragState oldState);
+    [Optional]
+    [Selector("mapView:didChangeUserTrackingMode:animated:")]
+    void MapViewDidChangeUserTrackingModeAnimated(MKMapView mapView, MKUserTrackingMode mode, bool animated);
+    [Optional]
+    [Selector("mapView:rendererForOverlay:")]
+    MKOverlayRenderer MapViewRendererForOverlay(MKMapView mapView, MKOverlay overlay);
+    [Optional]
+    [Selector("mapView:didAddOverlayRenderers:")]
+    void MapViewDidAddOverlayRenderers(MKMapView mapView, NSArray renderers);
+    [Optional]
+    [Selector("mapView:clusterAnnotationForMemberAnnotations:")]
+    MKClusterAnnotation MapViewClusterAnnotationForMemberAnnotations(MKMapView mapView, NSArray memberAnnotations);
 }
 
 #endif

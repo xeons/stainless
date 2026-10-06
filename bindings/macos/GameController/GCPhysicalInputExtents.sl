@@ -33,9 +33,12 @@ import Standard.ObjC;
 /// macOS 26.2 and later.
 public objc interface GCPhysicalInputExtents : NSObjectProtocol
 {
-    [Selector("scaledValue")] double ScaledValue { get; }
-    [Selector("minimumValue")] double MinimumValue { get; }
-    [Selector("maximumValue")] double MaximumValue { get; }
+    [Selector("scaledValue")]
+    double ScaledValue { get; }
+    [Selector("minimumValue")]
+    double MinimumValue { get; }
+    [Selector("maximumValue")]
+    double MaximumValue { get; }
 }
 
 #endif

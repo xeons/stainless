@@ -63,39 +63,64 @@ public objc closure AVAudioBuffer? AVAudioConverterInputBlock(AVAudioPacketCount
 
 public extern objc class AVAudioConverter : NSObject
 {
-    [Selector("inputFormat")] public AVAudioFormat InputFormat { get; }
-    [Selector("outputFormat")] public AVAudioFormat OutputFormat { get; }
-    [Selector("channelMap", "setChannelMap:")] public NSArray ChannelMap { get; set; }
-    [Selector("magicCookie", "setMagicCookie:")] public NSData? MagicCookie { get; set; }
-    [Selector("downmix", "setDownmix:")] public bool Downmix { get; set; }
-    [Selector("dither", "setDither:")] public bool Dither { get; set; }
-    [Selector("sampleRateConverterQuality", "setSampleRateConverterQuality:")] public NSInteger SampleRateConverterQuality { get; set; }
-    [Selector("sampleRateConverterAlgorithm", "setSampleRateConverterAlgorithm:")] public NSString? SampleRateConverterAlgorithm { get; set; }
-    [Selector("primeMethod", "setPrimeMethod:")] public AVAudioConverterPrimeMethod PrimeMethod { get; set; }
-    [Selector("primeInfo", "setPrimeInfo:")] public AVAudioConverterPrimeInfo PrimeInfo { get; set; }
+    [Selector("inputFormat")]
+    public AVAudioFormat InputFormat { get; }
+    [Selector("outputFormat")]
+    public AVAudioFormat OutputFormat { get; }
+    [Selector("channelMap", "setChannelMap:")]
+    public NSArray ChannelMap { get; set; }
+    [Selector("magicCookie", "setMagicCookie:")]
+    public NSData? MagicCookie { get; set; }
+    [Selector("downmix", "setDownmix:")]
+    public bool Downmix { get; set; }
+    [Selector("dither", "setDither:")]
+    public bool Dither { get; set; }
+    [Selector("sampleRateConverterQuality", "setSampleRateConverterQuality:")]
+    public NSInteger SampleRateConverterQuality { get; set; }
+    [Selector("sampleRateConverterAlgorithm", "setSampleRateConverterAlgorithm:")]
+    public NSString? SampleRateConverterAlgorithm { get; set; }
+    [Selector("primeMethod", "setPrimeMethod:")]
+    public AVAudioConverterPrimeMethod PrimeMethod { get; set; }
+    [Selector("primeInfo", "setPrimeInfo:")]
+    public AVAudioConverterPrimeInfo PrimeInfo { get; set; }
     /// macOS 26.0 and later.
-    [Selector("audioSyncPacketFrequency", "setAudioSyncPacketFrequency:")] public NSInteger AudioSyncPacketFrequency { get; set; }
+    [Selector("audioSyncPacketFrequency", "setAudioSyncPacketFrequency:")]
+    public NSInteger AudioSyncPacketFrequency { get; set; }
     /// macOS 26.0 and later.
-    [Selector("contentSource", "setContentSource:")] public AVAudioContentSource ContentSource { get; set; }
+    [Selector("contentSource", "setContentSource:")]
+    public AVAudioContentSource ContentSource { get; set; }
     /// macOS 26.0 and later.
-    [Selector("dynamicRangeControlConfiguration", "setDynamicRangeControlConfiguration:")] public AVAudioDynamicRangeControlConfiguration DynamicRangeControlConfiguration { get; set; }
-    [Selector("initFromFormat:toFormat:")] public Self? InitFromFormatToFormat(AVAudioFormat fromFormat, AVAudioFormat toFormat);
-    [Selector("reset")] public void Reset();
-    [Selector("convertToBuffer:fromBuffer:error:")] public bool ConvertToBufferFromBufferError(AVAudioPCMBuffer outputBuffer, AVAudioPCMBuffer inputBuffer, out NSError? outError);
-    [Selector("convertToBuffer:error:withInputFromBlock:")] public AVAudioConverterOutputStatus ConvertToBufferErrorWithInputFromBlock(AVAudioBuffer outputBuffer, out NSError? outError, AVAudioConverterInputBlock inputBlock);
+    [Selector("dynamicRangeControlConfiguration", "setDynamicRangeControlConfiguration:")]
+    public AVAudioDynamicRangeControlConfiguration DynamicRangeControlConfiguration { get; set; }
+    [Selector("initFromFormat:toFormat:")]
+    public Self? InitFromFormatToFormat(AVAudioFormat fromFormat, AVAudioFormat toFormat);
+    [Selector("reset")]
+    public void Reset();
+    [Selector("convertToBuffer:fromBuffer:error:")]
+    public bool ConvertToBufferFromBufferError(AVAudioPCMBuffer outputBuffer, AVAudioPCMBuffer inputBuffer, out NSError? outError);
+    [Selector("convertToBuffer:error:withInputFromBlock:")]
+    public AVAudioConverterOutputStatus ConvertToBufferErrorWithInputFromBlock(AVAudioBuffer outputBuffer, out NSError? outError, AVAudioConverterInputBlock inputBlock);
 }
 
 /// Encoding, a category of AVAudioConverter.
 public extern objc class AVAudioConverter
 {
-    [Selector("bitRate", "setBitRate:")] public NSInteger BitRate { get; set; }
-    [Selector("bitRateStrategy", "setBitRateStrategy:")] public NSString? BitRateStrategy { get; set; }
-    [Selector("maximumOutputPacketSize")] public NSInteger MaximumOutputPacketSize { get; }
-    [Selector("availableEncodeBitRates")] public NSArray? AvailableEncodeBitRates { get; }
-    [Selector("applicableEncodeBitRates")] public NSArray? ApplicableEncodeBitRates { get; }
-    [Selector("availableEncodeSampleRates")] public NSArray? AvailableEncodeSampleRates { get; }
-    [Selector("applicableEncodeSampleRates")] public NSArray? ApplicableEncodeSampleRates { get; }
-    [Selector("availableEncodeChannelLayoutTags")] public NSArray? AvailableEncodeChannelLayoutTags { get; }
+    [Selector("bitRate", "setBitRate:")]
+    public NSInteger BitRate { get; set; }
+    [Selector("bitRateStrategy", "setBitRateStrategy:")]
+    public NSString? BitRateStrategy { get; set; }
+    [Selector("maximumOutputPacketSize")]
+    public NSInteger MaximumOutputPacketSize { get; }
+    [Selector("availableEncodeBitRates")]
+    public NSArray? AvailableEncodeBitRates { get; }
+    [Selector("applicableEncodeBitRates")]
+    public NSArray? ApplicableEncodeBitRates { get; }
+    [Selector("availableEncodeSampleRates")]
+    public NSArray? AvailableEncodeSampleRates { get; }
+    [Selector("applicableEncodeSampleRates")]
+    public NSArray? ApplicableEncodeSampleRates { get; }
+    [Selector("availableEncodeChannelLayoutTags")]
+    public NSArray? AvailableEncodeChannelLayoutTags { get; }
 }
 
 #endif

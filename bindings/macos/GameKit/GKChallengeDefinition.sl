@@ -37,15 +37,24 @@ public objc closure void GKChallengeDefinitionLoadImageWithCompletionHandlerComp
 /// macOS 26.0 and later.
 public extern objc class GKChallengeDefinition : NSObject
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("groupIdentifier")] public NSString? GroupIdentifier { get; }
-    [Selector("title")] public NSString Title { get; }
-    [Selector("details")] public NSString? Details { get; }
-    [Selector("durationOptions")] public NSArray DurationOptions { get; }
-    [Selector("isRepeatable")] public bool IsRepeatable { get; }
-    [Selector("leaderboard")] public GKLeaderboard? Leaderboard { get; }
-    [Selector("releaseState")] public GKReleaseState ReleaseState { get; }
-    [Selector("loadImageWithCompletionHandler:")] public void LoadImageWithCompletionHandler(GKChallengeDefinitionLoadImageWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("groupIdentifier")]
+    public NSString? GroupIdentifier { get; }
+    [Selector("title")]
+    public NSString Title { get; }
+    [Selector("details")]
+    public NSString? Details { get; }
+    [Selector("durationOptions")]
+    public NSArray DurationOptions { get; }
+    [Selector("isRepeatable")]
+    public bool IsRepeatable { get; }
+    [Selector("leaderboard")]
+    public GKLeaderboard? Leaderboard { get; }
+    [Selector("releaseState")]
+    public GKReleaseState ReleaseState { get; }
+    [Selector("loadImageWithCompletionHandler:")]
+    public void LoadImageWithCompletionHandler(GKChallengeDefinitionLoadImageWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void GKChallengeDefinitionLoadChallengeDefinitionsWithCompletionHandlerCompletionHandlerBlock(NSArray? arg0, NSError? arg1);
@@ -56,8 +65,10 @@ public objc closure void GKChallengeDefinitionHasActiveChallengesWithCompletionH
 /// State, a category of GKChallengeDefinition.
 public extern objc class GKChallengeDefinition
 {
-    [Selector("loadChallengeDefinitionsWithCompletionHandler:")] public static void LoadChallengeDefinitionsWithCompletionHandler(GKChallengeDefinitionLoadChallengeDefinitionsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("hasActiveChallengesWithCompletionHandler:")] public void HasActiveChallengesWithCompletionHandler(GKChallengeDefinitionHasActiveChallengesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadChallengeDefinitionsWithCompletionHandler:")]
+    public static void LoadChallengeDefinitionsWithCompletionHandler(GKChallengeDefinitionLoadChallengeDefinitionsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("hasActiveChallengesWithCompletionHandler:")]
+    public void HasActiveChallengesWithCompletionHandler(GKChallengeDefinitionHasActiveChallengesWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

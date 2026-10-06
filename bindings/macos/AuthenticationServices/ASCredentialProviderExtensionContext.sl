@@ -40,12 +40,18 @@ public objc closure void ASCredentialProviderExtensionContextCompleteOneTimeCode
 
 public extern objc class ASCredentialProviderExtensionContext : NSExtensionContext
 {
-    [Selector("completeRequestWithSelectedCredential:completionHandler:")] public void CompleteRequestWithSelectedCredentialCompletionHandler(ASPasswordCredential credential, ASCredentialProviderExtensionContextCompleteRequestWithSelectedCredentialCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("completeAssertionRequestWithSelectedPasskeyCredential:completionHandler:")] public void CompleteAssertionRequestWithSelectedPasskeyCredentialCompletionHandler(ASPasskeyAssertionCredential credential, ASCredentialProviderExtensionContextCompleteAssertionRequestWithSelectedPasskeyCredentialCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("completeRegistrationRequestWithSelectedPasskeyCredential:completionHandler:")] public void CompleteRegistrationRequestWithSelectedPasskeyCredentialCompletionHandler(ASPasskeyRegistrationCredential credential, ASCredentialProviderExtensionContextCompleteRegistrationRequestWithSelectedPasskeyCredentialCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("completeOneTimeCodeRequestWithSelectedCredential:completionHandler:")] public void CompleteOneTimeCodeRequestWithSelectedCredentialCompletionHandler(ASOneTimeCodeCredential credential, ASCredentialProviderExtensionContextCompleteOneTimeCodeRequestWithSelectedCredentialCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("completeExtensionConfigurationRequest")] public void CompleteExtensionConfigurationRequest();
-    [Selector("cancelRequestWithError:")] public void CancelRequestWithError(NSError error);
+    [Selector("completeRequestWithSelectedCredential:completionHandler:")]
+    public void CompleteRequestWithSelectedCredentialCompletionHandler(ASPasswordCredential credential, ASCredentialProviderExtensionContextCompleteRequestWithSelectedCredentialCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("completeAssertionRequestWithSelectedPasskeyCredential:completionHandler:")]
+    public void CompleteAssertionRequestWithSelectedPasskeyCredentialCompletionHandler(ASPasskeyAssertionCredential credential, ASCredentialProviderExtensionContextCompleteAssertionRequestWithSelectedPasskeyCredentialCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("completeRegistrationRequestWithSelectedPasskeyCredential:completionHandler:")]
+    public void CompleteRegistrationRequestWithSelectedPasskeyCredentialCompletionHandler(ASPasskeyRegistrationCredential credential, ASCredentialProviderExtensionContextCompleteRegistrationRequestWithSelectedPasskeyCredentialCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("completeOneTimeCodeRequestWithSelectedCredential:completionHandler:")]
+    public void CompleteOneTimeCodeRequestWithSelectedCredentialCompletionHandler(ASOneTimeCodeCredential credential, ASCredentialProviderExtensionContextCompleteOneTimeCodeRequestWithSelectedCredentialCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("completeExtensionConfigurationRequest")]
+    public void CompleteExtensionConfigurationRequest();
+    [Selector("cancelRequestWithError:")]
+    public void CancelRequestWithError(NSError error);
 }
 
 #endif

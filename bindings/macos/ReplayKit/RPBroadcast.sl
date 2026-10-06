@@ -37,13 +37,16 @@ public objc closure void RPBroadcastActivityControllerShowBroadcastPickerAtPoint
 
 public extern objc class RPBroadcastActivityController : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public RPBroadcastActivityControllerDelegate? Delegate { get; set; }
-    [Selector("showBroadcastPickerAtPoint:fromWindow:preferredExtensionIdentifier:completionHandler:")] public static void ShowBroadcastPickerAtPointFromWindowPreferredExtensionIdentifierCompletionHandler(CGPoint point, NSWindow? window, NSString? preferredExtension, RPBroadcastActivityControllerShowBroadcastPickerAtPointFromWindowPreferredExtensionIdentifierCompletionHandlerHandlerBlock handler);
+    [Selector("delegate", "setDelegate:")]
+    public RPBroadcastActivityControllerDelegate? Delegate { get; set; }
+    [Selector("showBroadcastPickerAtPoint:fromWindow:preferredExtensionIdentifier:completionHandler:")]
+    public static void ShowBroadcastPickerAtPointFromWindowPreferredExtensionIdentifierCompletionHandler(CGPoint point, NSWindow? window, NSString? preferredExtension, RPBroadcastActivityControllerShowBroadcastPickerAtPointFromWindowPreferredExtensionIdentifierCompletionHandlerHandlerBlock handler);
 }
 
 public objc interface RPBroadcastActivityControllerDelegate : NSObjectProtocol
 {
-    [Selector("broadcastActivityController:didFinishWithBroadcastController:error:")] void BroadcastActivityControllerDidFinishWithBroadcastControllerError(RPBroadcastActivityController broadcastActivityController, RPBroadcastController? broadcastController, NSError? error);
+    [Selector("broadcastActivityController:didFinishWithBroadcastController:error:")]
+    void BroadcastActivityControllerDidFinishWithBroadcastControllerError(RPBroadcastActivityController broadcastActivityController, RPBroadcastController? broadcastController, NSError? error);
 }
 
 public objc closure void RPBroadcastControllerStartBroadcastWithHandlerHandlerBlock(NSError? arg0);
@@ -52,22 +55,37 @@ public objc closure void RPBroadcastControllerFinishBroadcastWithHandlerHandlerB
 
 public extern objc class RPBroadcastController : NSObject
 {
-    [Selector("isBroadcasting")] public bool Broadcasting { get; }
-    [Selector("isPaused")] public bool Paused { get; }
-    [Selector("broadcastURL")] public NSURL BroadcastURL { get; }
-    [Selector("serviceInfo")] public NSDictionary? ServiceInfo { get; }
-    [Selector("delegate", "setDelegate:")] public RPBroadcastControllerDelegate? Delegate { get; set; }
-    [Selector("startBroadcastWithHandler:")] public void StartBroadcastWithHandler(RPBroadcastControllerStartBroadcastWithHandlerHandlerBlock handler);
-    [Selector("pauseBroadcast")] public void PauseBroadcast();
-    [Selector("resumeBroadcast")] public void ResumeBroadcast();
-    [Selector("finishBroadcastWithHandler:")] public void FinishBroadcastWithHandler(RPBroadcastControllerFinishBroadcastWithHandlerHandlerBlock handler);
+    [Selector("isBroadcasting")]
+    public bool Broadcasting { get; }
+    [Selector("isPaused")]
+    public bool Paused { get; }
+    [Selector("broadcastURL")]
+    public NSURL BroadcastURL { get; }
+    [Selector("serviceInfo")]
+    public NSDictionary? ServiceInfo { get; }
+    [Selector("delegate", "setDelegate:")]
+    public RPBroadcastControllerDelegate? Delegate { get; set; }
+    [Selector("startBroadcastWithHandler:")]
+    public void StartBroadcastWithHandler(RPBroadcastControllerStartBroadcastWithHandlerHandlerBlock handler);
+    [Selector("pauseBroadcast")]
+    public void PauseBroadcast();
+    [Selector("resumeBroadcast")]
+    public void ResumeBroadcast();
+    [Selector("finishBroadcastWithHandler:")]
+    public void FinishBroadcastWithHandler(RPBroadcastControllerFinishBroadcastWithHandlerHandlerBlock handler);
 }
 
 public objc interface RPBroadcastControllerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("broadcastController:didFinishWithError:")] void BroadcastControllerDidFinishWithError(RPBroadcastController broadcastController, NSError? error);
-    [Optional] [Selector("broadcastController:didUpdateServiceInfo:")] void BroadcastControllerDidUpdateServiceInfo(RPBroadcastController broadcastController, NSDictionary serviceInfo);
-    [Optional] [Selector("broadcastController:didUpdateBroadcastURL:")] void BroadcastControllerDidUpdateBroadcastURL(RPBroadcastController broadcastController, NSURL broadcastURL);
+    [Optional]
+    [Selector("broadcastController:didFinishWithError:")]
+    void BroadcastControllerDidFinishWithError(RPBroadcastController broadcastController, NSError? error);
+    [Optional]
+    [Selector("broadcastController:didUpdateServiceInfo:")]
+    void BroadcastControllerDidUpdateServiceInfo(RPBroadcastController broadcastController, NSDictionary serviceInfo);
+    [Optional]
+    [Selector("broadcastController:didUpdateBroadcastURL:")]
+    void BroadcastControllerDidUpdateBroadcastURL(RPBroadcastController broadcastController, NSURL broadcastURL);
 }
 
 #endif

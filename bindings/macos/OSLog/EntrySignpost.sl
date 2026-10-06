@@ -41,9 +41,12 @@ public enum OSLogEntrySignpostType : long
 
 public extern objc class OSLogEntrySignpost : OSLogEntry, OSLogEntryFromProcess, OSLogEntryWithPayload
 {
-    [Selector("signpostIdentifier")] public os_signpost_id_t SignpostIdentifier { get; }
-    [Selector("signpostName")] public NSString SignpostName { get; }
-    [Selector("signpostType")] public OSLogEntrySignpostType SignpostType { get; }
+    [Selector("signpostIdentifier")]
+    public os_signpost_id_t SignpostIdentifier { get; }
+    [Selector("signpostName")]
+    public NSString SignpostName { get; }
+    [Selector("signpostType")]
+    public OSLogEntrySignpostType SignpostType { get; }
 }
 
 #endif

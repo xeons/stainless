@@ -42,6 +42,7 @@ public objc closure void SecRequestSharedWebCredentialCompletionHandlerBlock(CFA
 /// Deprecated in macOS 11.0.
 public extern "C" void SecRequestSharedWebCredential(CFStringRef? fqdn, CFStringRef? account, SecRequestSharedWebCredentialCompletionHandlerBlock completionHandler);
 
-[ReturnsRetained] public extern "C" CFStringRef? SecCreateSharedWebCredentialPassword();
+[ReturnsRetained]
+public extern "C" CFStringRef? SecCreateSharedWebCredentialPassword();
 
 #endif

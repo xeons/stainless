@@ -33,16 +33,25 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLButtonElement : DOMHTMLElement
 {
-    [Selector("autofocus", "setAutofocus:")] public bool Autofocus { get; set; }
-    [Selector("disabled", "setDisabled:")] public bool Disabled { get; set; }
-    [Selector("form")] public DOMHTMLFormElement? Form { get; }
-    [Selector("type", "setType:")] public NSString? Type { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("value", "setValue:")] public NSString? Value { get; set; }
-    [Selector("willValidate")] public bool WillValidate { get; }
+    [Selector("autofocus", "setAutofocus:")]
+    public bool Autofocus { get; set; }
+    [Selector("disabled", "setDisabled:")]
+    public bool Disabled { get; set; }
+    [Selector("form")]
+    public DOMHTMLFormElement? Form { get; }
+    [Selector("type", "setType:")]
+    public NSString? Type { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("value", "setValue:")]
+    public NSString? Value { get; set; }
+    [Selector("willValidate")]
+    public bool WillValidate { get; }
     /// Deprecated in macOS 10.8.
-    [Selector("accessKey", "setAccessKey:")] public NSString? AccessKey { get; set; }
-    [Selector("click")] public void Click();
+    [Selector("accessKey", "setAccessKey:")]
+    public NSString? AccessKey { get; set; }
+    [Selector("click")]
+    public void Click();
 }
 
 #endif

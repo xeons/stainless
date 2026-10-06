@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class SFSafariExtensionViewController : NSViewController
 {
-    [Selector("dismissPopover")] public void DismissPopover();
+    [Selector("dismissPopover")]
+    public void DismissPopover();
 }
 
 #endif

@@ -34,35 +34,52 @@ import Standard.ObjC;
 
 public extern objc class MPSNNReshape : MPSCNNKernel
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("encodeToCommandBuffer:sourceImage:reshapedWidth:reshapedHeight:reshapedFeatureChannels:")] public MPSImage EncodeToCommandBufferSourceImageReshapedWidthReshapedHeightReshapedFeatureChannels(MTLCommandBuffer commandBuffer, MPSImage sourceImage, NSUInteger reshapedWidth, NSUInteger reshapedHeight, NSUInteger reshapedFeatureChannels);
-    [Selector("encodeToCommandBuffer:sourceImage:destinationState:destinationStateIsTemporary:reshapedWidth:reshapedHeight:reshapedFeatureChannels:")] public MPSImage EncodeToCommandBufferSourceImageDestinationStateDestinationStateIsTemporaryReshapedWidthReshapedHeightReshapedFeatureChannels(MTLCommandBuffer commandBuffer, MPSImage sourceImage, out MPSState? outState, bool isTemporary, NSUInteger reshapedWidth, NSUInteger reshapedHeight, NSUInteger reshapedFeatureChannels);
-    [Selector("encodeBatchToCommandBuffer:sourceImages:reshapedWidth:reshapedHeight:reshapedFeatureChannels:")] public MPSImageBatch EncodeBatchToCommandBufferSourceImagesReshapedWidthReshapedHeightReshapedFeatureChannels(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImages, NSUInteger reshapedWidth, NSUInteger reshapedHeight, NSUInteger reshapedFeatureChannels);
-    [Selector("encodeBatchToCommandBuffer:sourceImages:destinationStates:destinationStateIsTemporary:reshapedWidth:reshapedHeight:reshapedFeatureChannels:")] public MPSImageBatch EncodeBatchToCommandBufferSourceImagesDestinationStatesDestinationStateIsTemporaryReshapedWidthReshapedHeightReshapedFeatureChannels(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImages, out MPSStateBatch? outStates, bool isTemporary, NSUInteger reshapedWidth, NSUInteger reshapedHeight, NSUInteger reshapedFeatureChannels);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("encodeToCommandBuffer:sourceImage:reshapedWidth:reshapedHeight:reshapedFeatureChannels:")]
+    public MPSImage EncodeToCommandBufferSourceImageReshapedWidthReshapedHeightReshapedFeatureChannels(MTLCommandBuffer commandBuffer, MPSImage sourceImage, NSUInteger reshapedWidth, NSUInteger reshapedHeight, NSUInteger reshapedFeatureChannels);
+    [Selector("encodeToCommandBuffer:sourceImage:destinationState:destinationStateIsTemporary:reshapedWidth:reshapedHeight:reshapedFeatureChannels:")]
+    public MPSImage EncodeToCommandBufferSourceImageDestinationStateDestinationStateIsTemporaryReshapedWidthReshapedHeightReshapedFeatureChannels(MTLCommandBuffer commandBuffer, MPSImage sourceImage, out MPSState? outState, bool isTemporary, NSUInteger reshapedWidth, NSUInteger reshapedHeight, NSUInteger reshapedFeatureChannels);
+    [Selector("encodeBatchToCommandBuffer:sourceImages:reshapedWidth:reshapedHeight:reshapedFeatureChannels:")]
+    public MPSImageBatch EncodeBatchToCommandBufferSourceImagesReshapedWidthReshapedHeightReshapedFeatureChannels(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImages, NSUInteger reshapedWidth, NSUInteger reshapedHeight, NSUInteger reshapedFeatureChannels);
+    [Selector("encodeBatchToCommandBuffer:sourceImages:destinationStates:destinationStateIsTemporary:reshapedWidth:reshapedHeight:reshapedFeatureChannels:")]
+    public MPSImageBatch EncodeBatchToCommandBufferSourceImagesDestinationStatesDestinationStateIsTemporaryReshapedWidthReshapedHeightReshapedFeatureChannels(MTLCommandBuffer commandBuffer, MPSImageBatch sourceImages, out MPSStateBatch? outStates, bool isTemporary, NSUInteger reshapedWidth, NSUInteger reshapedHeight, NSUInteger reshapedFeatureChannels);
 }
 
 public extern objc class MPSNNReshapeGradient : MPSCNNGradientKernel
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNPad : MPSCNNKernel
 {
-    [Selector("paddingSizeBefore", "setPaddingSizeBefore:")] public MPSImageCoordinate PaddingSizeBefore { get; set; }
-    [Selector("paddingSizeAfter", "setPaddingSizeAfter:")] public MPSImageCoordinate PaddingSizeAfter { get; set; }
-    [Selector("fillValue", "setFillValue:")] public float FillValue { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithDevice:paddingSizeBefore:paddingSizeAfter:")] public Self InitWithDevicePaddingSizeBeforePaddingSizeAfter(MTLDevice device, MPSImageCoordinate paddingSizeBefore, MPSImageCoordinate paddingSizeAfter);
-    [Selector("initWithDevice:paddingSizeBefore:paddingSizeAfter:fillValueArray:")] public Self InitWithDevicePaddingSizeBeforePaddingSizeAfterFillValueArray(MTLDevice device, MPSImageCoordinate paddingSizeBefore, MPSImageCoordinate paddingSizeAfter, NSData? fillValueArray);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("paddingSizeBefore", "setPaddingSizeBefore:")]
+    public MPSImageCoordinate PaddingSizeBefore { get; set; }
+    [Selector("paddingSizeAfter", "setPaddingSizeAfter:")]
+    public MPSImageCoordinate PaddingSizeAfter { get; set; }
+    [Selector("fillValue", "setFillValue:")]
+    public float FillValue { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithDevice:paddingSizeBefore:paddingSizeAfter:")]
+    public Self InitWithDevicePaddingSizeBeforePaddingSizeAfter(MTLDevice device, MPSImageCoordinate paddingSizeBefore, MPSImageCoordinate paddingSizeAfter);
+    [Selector("initWithDevice:paddingSizeBefore:paddingSizeAfter:fillValueArray:")]
+    public Self InitWithDevicePaddingSizeBeforePaddingSizeAfterFillValueArray(MTLDevice device, MPSImageCoordinate paddingSizeBefore, MPSImageCoordinate paddingSizeAfter, NSData? fillValueArray);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSNNPadGradient : MPSCNNGradientKernel
 {
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 #endif

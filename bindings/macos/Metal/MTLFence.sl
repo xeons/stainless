@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public objc interface MTLFence : NSObjectProtocol
 {
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
 }
 
 #endif

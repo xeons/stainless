@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class VNDetectFaceCaptureQualityRequest : VNImageBasedRequest, VNFaceObservationAccepting
 {
-    [Selector("results")] public NSArray? Results { get; }
+    [Selector("results")]
+    public NSArray? Results { get; }
 }
 
 #endif

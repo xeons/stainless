@@ -34,15 +34,24 @@ import Standard.ObjC;
 
 public extern objc class CIFilterShape : NSObject, NSCopying
 {
-    [Selector("extent")] public CGRect Extent { get; }
-    [Selector("shapeWithRect:")] public static Self ShapeWithRect(CGRect r);
-    [Selector("initWithRect:")] public Self InitWithRect(CGRect r);
-    [Selector("transformBy:interior:")] public CIFilterShape TransformByInterior(CGAffineTransform m, bool flag);
-    [Selector("insetByX:Y:")] public CIFilterShape InsetByXY(int dx, int dy);
-    [Selector("unionWith:")] public CIFilterShape UnionWith(CIFilterShape s2);
-    [Selector("unionWithRect:")] public CIFilterShape UnionWithRect(CGRect r);
-    [Selector("intersectWith:")] public CIFilterShape IntersectWith(CIFilterShape s2);
-    [Selector("intersectWithRect:")] public CIFilterShape IntersectWithRect(CGRect r);
+    [Selector("extent")]
+    public CGRect Extent { get; }
+    [Selector("shapeWithRect:")]
+    public static Self ShapeWithRect(CGRect r);
+    [Selector("initWithRect:")]
+    public Self InitWithRect(CGRect r);
+    [Selector("transformBy:interior:")]
+    public CIFilterShape TransformByInterior(CGAffineTransform m, bool flag);
+    [Selector("insetByX:Y:")]
+    public CIFilterShape InsetByXY(int dx, int dy);
+    [Selector("unionWith:")]
+    public CIFilterShape UnionWith(CIFilterShape s2);
+    [Selector("unionWithRect:")]
+    public CIFilterShape UnionWithRect(CGRect r);
+    [Selector("intersectWith:")]
+    public CIFilterShape IntersectWith(CIFilterShape s2);
+    [Selector("intersectWithRect:")]
+    public CIFilterShape IntersectWithRect(CGRect r);
 }
 
 #endif

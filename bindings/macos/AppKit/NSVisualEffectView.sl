@@ -67,14 +67,22 @@ public enum NSVisualEffectState : long
 
 public extern objc class NSVisualEffectView : NSView
 {
-    [Selector("material", "setMaterial:")] public NSVisualEffectMaterial Material { get; set; }
-    [Selector("interiorBackgroundStyle")] public NSBackgroundStyle InteriorBackgroundStyle { get; }
-    [Selector("blendingMode", "setBlendingMode:")] public NSVisualEffectBlendingMode BlendingMode { get; set; }
-    [Selector("state", "setState:")] public NSVisualEffectState State { get; set; }
-    [Selector("maskImage", "setMaskImage:")] public NSImage? MaskImage { get; set; }
-    [Selector("isEmphasized", "setEmphasized:")] public bool Emphasized { get; set; }
-    [Selector("viewDidMoveToWindow")] public void ViewDidMoveToWindow();
-    [Selector("viewWillMoveToWindow:")] public void ViewWillMoveToWindow(NSWindow? newWindow);
+    [Selector("material", "setMaterial:")]
+    public NSVisualEffectMaterial Material { get; set; }
+    [Selector("interiorBackgroundStyle")]
+    public NSBackgroundStyle InteriorBackgroundStyle { get; }
+    [Selector("blendingMode", "setBlendingMode:")]
+    public NSVisualEffectBlendingMode BlendingMode { get; set; }
+    [Selector("state", "setState:")]
+    public NSVisualEffectState State { get; set; }
+    [Selector("maskImage", "setMaskImage:")]
+    public NSImage? MaskImage { get; set; }
+    [Selector("isEmphasized", "setEmphasized:")]
+    public bool Emphasized { get; set; }
+    [Selector("viewDidMoveToWindow")]
+    public void ViewDidMoveToWindow();
+    [Selector("viewWillMoveToWindow:")]
+    public void ViewWillMoveToWindow(NSWindow? newWindow);
 }
 
 #endif

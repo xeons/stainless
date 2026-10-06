@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class PHPersistentObjectChangeDetails : NSObject
 {
-    [Selector("objectType")] public PHObjectType ObjectType { get; }
-    [Selector("insertedLocalIdentifiers")] public NSSet InsertedLocalIdentifiers { get; }
-    [Selector("updatedLocalIdentifiers")] public NSSet UpdatedLocalIdentifiers { get; }
-    [Selector("deletedLocalIdentifiers")] public NSSet DeletedLocalIdentifiers { get; }
+    [Selector("objectType")]
+    public PHObjectType ObjectType { get; }
+    [Selector("insertedLocalIdentifiers")]
+    public NSSet InsertedLocalIdentifiers { get; }
+    [Selector("updatedLocalIdentifiers")]
+    public NSSet UpdatedLocalIdentifiers { get; }
+    [Selector("deletedLocalIdentifiers")]
+    public NSSet DeletedLocalIdentifiers { get; }
 }
 
 #endif

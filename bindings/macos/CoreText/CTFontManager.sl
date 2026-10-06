@@ -32,19 +32,25 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreText")
 
-[ReturnsRetained] public extern "C" CFArrayRef CTFontManagerCopyAvailablePostScriptNames();
+[ReturnsRetained]
+public extern "C" CFArrayRef CTFontManagerCopyAvailablePostScriptNames();
 
-[ReturnsRetained] public extern "C" CFArrayRef CTFontManagerCopyAvailableFontFamilyNames();
+[ReturnsRetained]
+public extern "C" CFArrayRef CTFontManagerCopyAvailableFontFamilyNames();
 
-[ReturnsRetained] public extern "C" CFArrayRef CTFontManagerCopyAvailableFontURLs();
+[ReturnsRetained]
+public extern "C" CFArrayRef CTFontManagerCopyAvailableFontURLs();
 
 public extern "C" CFComparisonResult CTFontManagerCompareFontFamilyNames(void* family1, void* family2, void* context);
 
-[ReturnsRetained] public extern "C" CFArrayRef? CTFontManagerCreateFontDescriptorsFromURL(CFURLRef fileURL);
+[ReturnsRetained]
+public extern "C" CFArrayRef? CTFontManagerCreateFontDescriptorsFromURL(CFURLRef fileURL);
 
-[ReturnsRetained] public extern "C" CTFontDescriptorRef? CTFontManagerCreateFontDescriptorFromData(CFDataRef data);
+[ReturnsRetained]
+public extern "C" CTFontDescriptorRef? CTFontManagerCreateFontDescriptorFromData(CFDataRef data);
 
-[ReturnsRetained] public extern "C" CFArrayRef CTFontManagerCreateFontDescriptorsFromData(CFDataRef data);
+[ReturnsRetained]
+public extern "C" CFArrayRef CTFontManagerCreateFontDescriptorsFromData(CFDataRef data);
 
 public enum CTFontManagerScope : uint
 {
@@ -96,7 +102,8 @@ public extern "C" bool CTFontManagerIsSupportedFont(CFURLRef fontURL);
 public objc closure CFArrayRef CTFontManagerCreateFontRequestRunLoopSourceCreateMatchesCallbackBlock(CFDictionaryRef arg0, pid_t arg1);
 
 /// Deprecated in macOS 11.0.
-[ReturnsRetained] public extern "C" CFRunLoopSourceRef? CTFontManagerCreateFontRequestRunLoopSource(CFIndex sourceOrder, CTFontManagerCreateFontRequestRunLoopSourceCreateMatchesCallbackBlock createMatchesCallback);
+[ReturnsRetained]
+public extern "C" CFRunLoopSourceRef? CTFontManagerCreateFontRequestRunLoopSource(CFIndex sourceOrder, CTFontManagerCreateFontRequestRunLoopSourceCreateMatchesCallbackBlock createMatchesCallback);
 
 public extern "C" CFStringRef? kCTFontManagerBundleIdentifier;
 

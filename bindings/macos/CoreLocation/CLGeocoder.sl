@@ -38,29 +38,39 @@ public objc closure void CLGeocodeCompletionHandler(NSArray? arg0, NSError? arg1
 /// Deprecated in macOS 26.0.
 public extern objc class CLGeocoder : NSObject
 {
-    [Selector("isGeocoding")] public bool Geocoding { get; }
+    [Selector("isGeocoding")]
+    public bool Geocoding { get; }
     /// Deprecated in macOS 26.0.
-    [Selector("reverseGeocodeLocation:completionHandler:")] public void ReverseGeocodeLocationCompletionHandler(CLLocation location, CLGeocodeCompletionHandler completionHandler);
+    [Selector("reverseGeocodeLocation:completionHandler:")]
+    public void ReverseGeocodeLocationCompletionHandler(CLLocation location, CLGeocodeCompletionHandler completionHandler);
     /// Deprecated in macOS 26.0.
-    [Selector("reverseGeocodeLocation:preferredLocale:completionHandler:")] public void ReverseGeocodeLocationPreferredLocaleCompletionHandler(CLLocation location, NSLocale? locale, CLGeocodeCompletionHandler completionHandler);
+    [Selector("reverseGeocodeLocation:preferredLocale:completionHandler:")]
+    public void ReverseGeocodeLocationPreferredLocaleCompletionHandler(CLLocation location, NSLocale? locale, CLGeocodeCompletionHandler completionHandler);
     /// Deprecated in macOS 10.13.
-    [Selector("geocodeAddressDictionary:completionHandler:")] public void GeocodeAddressDictionaryCompletionHandler(NSDictionary addressDictionary, CLGeocodeCompletionHandler completionHandler);
-    [Selector("geocodeAddressString:inRegion:completionHandler:")] public void GeocodeAddressStringInRegionCompletionHandler(NSString addressString, CLRegion? region, CLGeocodeCompletionHandler completionHandler);
+    [Selector("geocodeAddressDictionary:completionHandler:")]
+    public void GeocodeAddressDictionaryCompletionHandler(NSDictionary addressDictionary, CLGeocodeCompletionHandler completionHandler);
+    [Selector("geocodeAddressString:inRegion:completionHandler:")]
+    public void GeocodeAddressStringInRegionCompletionHandler(NSString addressString, CLRegion? region, CLGeocodeCompletionHandler completionHandler);
     /// Deprecated in macOS 26.0.
-    [Selector("geocodeAddressString:inRegion:preferredLocale:completionHandler:")] public void GeocodeAddressStringInRegionPreferredLocaleCompletionHandler(NSString addressString, CLRegion? region, NSLocale? locale, CLGeocodeCompletionHandler completionHandler);
+    [Selector("geocodeAddressString:inRegion:preferredLocale:completionHandler:")]
+    public void GeocodeAddressStringInRegionPreferredLocaleCompletionHandler(NSString addressString, CLRegion? region, NSLocale? locale, CLGeocodeCompletionHandler completionHandler);
     /// Deprecated in macOS 26.0.
-    [Selector("geocodeAddressString:completionHandler:")] public void GeocodeAddressStringCompletionHandler(NSString addressString, CLGeocodeCompletionHandler completionHandler);
+    [Selector("geocodeAddressString:completionHandler:")]
+    public void GeocodeAddressStringCompletionHandler(NSString addressString, CLGeocodeCompletionHandler completionHandler);
     /// Deprecated in macOS 26.0.
-    [Selector("cancelGeocode")] public void CancelGeocode();
+    [Selector("cancelGeocode")]
+    public void CancelGeocode();
 }
 
 /// ContactsAdditions, a category of CLGeocoder.
 public extern objc class CLGeocoder
 {
     /// Deprecated in macOS 26.0.
-    [Selector("geocodePostalAddress:completionHandler:")] public void GeocodePostalAddressCompletionHandler(CNPostalAddress postalAddress, CLGeocodeCompletionHandler completionHandler);
+    [Selector("geocodePostalAddress:completionHandler:")]
+    public void GeocodePostalAddressCompletionHandler(CNPostalAddress postalAddress, CLGeocodeCompletionHandler completionHandler);
     /// Deprecated in macOS 26.0.
-    [Selector("geocodePostalAddress:preferredLocale:completionHandler:")] public void GeocodePostalAddressPreferredLocaleCompletionHandler(CNPostalAddress postalAddress, NSLocale? locale, CLGeocodeCompletionHandler completionHandler);
+    [Selector("geocodePostalAddress:preferredLocale:completionHandler:")]
+    public void GeocodePostalAddressPreferredLocaleCompletionHandler(CNPostalAddress postalAddress, NSLocale? locale, CLGeocodeCompletionHandler completionHandler);
 }
 
 #endif

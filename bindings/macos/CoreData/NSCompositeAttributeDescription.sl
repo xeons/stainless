@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class NSCompositeAttributeDescription : NSAttributeDescription
 {
-    [Selector("elements", "setElements:")] public NSArray Elements { get; set; }
+    [Selector("elements", "setElements:")]
+    public NSArray Elements { get; set; }
 }
 
 #endif

@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class MKPointOfInterestFilter : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("filterIncludingAllCategories")] public static MKPointOfInterestFilter FilterIncludingAllCategories { get; }
-    [Selector("filterExcludingAllCategories")] public static MKPointOfInterestFilter FilterExcludingAllCategories { get; }
-    [Selector("initIncludingCategories:")] public Self InitIncludingCategories(NSArray categories);
-    [Selector("initExcludingCategories:")] public Self InitExcludingCategories(NSArray categories);
-    [Selector("includesCategory:")] public bool IncludesCategory(MKPointOfInterestCategory category);
-    [Selector("excludesCategory:")] public bool ExcludesCategory(MKPointOfInterestCategory category);
+    [Selector("filterIncludingAllCategories")]
+    public static MKPointOfInterestFilter FilterIncludingAllCategories { get; }
+    [Selector("filterExcludingAllCategories")]
+    public static MKPointOfInterestFilter FilterExcludingAllCategories { get; }
+    [Selector("initIncludingCategories:")]
+    public Self InitIncludingCategories(NSArray categories);
+    [Selector("initExcludingCategories:")]
+    public Self InitExcludingCategories(NSArray categories);
+    [Selector("includesCategory:")]
+    public bool IncludesCategory(MKPointOfInterestCategory category);
+    [Selector("excludesCategory:")]
+    public bool ExcludesCategory(MKPointOfInterestCategory category);
 }
 
 #endif

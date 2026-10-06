@@ -38,14 +38,22 @@ public objc closure void CKFetchRecordsOperationFetchRecordsCompletionBlock(NSDi
 
 public extern objc class CKFetchRecordsOperation : CKDatabaseOperation
 {
-    [Selector("recordIDs", "setRecordIDs:")] public NSArray? RecordIDs { get; set; }
-    [Selector("desiredKeys", "setDesiredKeys:")] public NSArray? DesiredKeys { get; set; }
-    [Selector("perRecordProgressBlock", "setPerRecordProgressBlock:")] public CKFetchRecordsOperationPerRecordProgressBlock? PerRecordProgressBlock { get; set; }
-    [Selector("perRecordCompletionBlock", "setPerRecordCompletionBlock:")] public CKFetchRecordsOperationPerRecordCompletionBlock? PerRecordCompletionBlock { get; set; }
-    [Selector("fetchRecordsCompletionBlock", "setFetchRecordsCompletionBlock:")] public CKFetchRecordsOperationFetchRecordsCompletionBlock? FetchRecordsCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithRecordIDs:")] public Self InitWithRecordIDs(NSArray recordIDs);
-    [Selector("fetchCurrentUserRecordOperation")] public static Self FetchCurrentUserRecordOperation();
+    [Selector("recordIDs", "setRecordIDs:")]
+    public NSArray? RecordIDs { get; set; }
+    [Selector("desiredKeys", "setDesiredKeys:")]
+    public NSArray? DesiredKeys { get; set; }
+    [Selector("perRecordProgressBlock", "setPerRecordProgressBlock:")]
+    public CKFetchRecordsOperationPerRecordProgressBlock? PerRecordProgressBlock { get; set; }
+    [Selector("perRecordCompletionBlock", "setPerRecordCompletionBlock:")]
+    public CKFetchRecordsOperationPerRecordCompletionBlock? PerRecordCompletionBlock { get; set; }
+    [Selector("fetchRecordsCompletionBlock", "setFetchRecordsCompletionBlock:")]
+    public CKFetchRecordsOperationFetchRecordsCompletionBlock? FetchRecordsCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithRecordIDs:")]
+    public Self InitWithRecordIDs(NSArray recordIDs);
+    [Selector("fetchCurrentUserRecordOperation")]
+    public static Self FetchCurrentUserRecordOperation();
 }
 
 #endif

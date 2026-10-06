@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class CBPeer : NSObject, NSCopying
 {
-    [Selector("identifier")] public NSUUID? Identifier { get; }
+    [Selector("identifier")]
+    public NSUUID? Identifier { get; }
 }
 
 #endif

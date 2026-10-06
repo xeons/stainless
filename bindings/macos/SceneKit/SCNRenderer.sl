@@ -37,16 +37,26 @@ import Standard.ObjC;
 
 public extern objc class SCNRenderer : NSObject, SCNSceneRenderer, SCNTechniqueSupport
 {
-    [Selector("scene", "setScene:")] public SCNScene? Scene { get; set; }
-    [Selector("nextFrameTime")] public CFTimeInterval NextFrameTime { get; }
-    [Selector("rendererWithContext:options:")] public static Self RendererWithContextOptions(CGLContextObj context, NSDictionary? options);
-    [Selector("rendererWithDevice:options:")] public static Self RendererWithDeviceOptions(MTLDevice? device, NSDictionary? options);
-    [Selector("renderAtTime:viewport:commandBuffer:passDescriptor:")] public void RenderAtTimeViewportCommandBufferPassDescriptor(CFTimeInterval time, CGRect viewport, MTLCommandBuffer commandBuffer, MTLRenderPassDescriptor renderPassDescriptor);
-    [Selector("renderAtTime:")] public void RenderAtTime(CFTimeInterval time);
-    [Selector("updateAtTime:")] public void UpdateAtTime(CFTimeInterval time);
-    [Selector("renderWithViewport:commandBuffer:passDescriptor:")] public void RenderWithViewportCommandBufferPassDescriptor(CGRect viewport, MTLCommandBuffer commandBuffer, MTLRenderPassDescriptor renderPassDescriptor);
-    [Selector("snapshotAtTime:withSize:antialiasingMode:")] public NSImage SnapshotAtTimeWithSizeAntialiasingMode(CFTimeInterval time, CGSize size, SCNAntialiasingMode antialiasingMode);
-    [Selector("updateProbes:atTime:")] public void UpdateProbesAtTime(NSArray lightProbes, CFTimeInterval time);
+    [Selector("scene", "setScene:")]
+    public SCNScene? Scene { get; set; }
+    [Selector("nextFrameTime")]
+    public CFTimeInterval NextFrameTime { get; }
+    [Selector("rendererWithContext:options:")]
+    public static Self RendererWithContextOptions(CGLContextObj context, NSDictionary? options);
+    [Selector("rendererWithDevice:options:")]
+    public static Self RendererWithDeviceOptions(MTLDevice? device, NSDictionary? options);
+    [Selector("renderAtTime:viewport:commandBuffer:passDescriptor:")]
+    public void RenderAtTimeViewportCommandBufferPassDescriptor(CFTimeInterval time, CGRect viewport, MTLCommandBuffer commandBuffer, MTLRenderPassDescriptor renderPassDescriptor);
+    [Selector("renderAtTime:")]
+    public void RenderAtTime(CFTimeInterval time);
+    [Selector("updateAtTime:")]
+    public void UpdateAtTime(CFTimeInterval time);
+    [Selector("renderWithViewport:commandBuffer:passDescriptor:")]
+    public void RenderWithViewportCommandBufferPassDescriptor(CGRect viewport, MTLCommandBuffer commandBuffer, MTLRenderPassDescriptor renderPassDescriptor);
+    [Selector("snapshotAtTime:withSize:antialiasingMode:")]
+    public NSImage SnapshotAtTimeWithSizeAntialiasingMode(CFTimeInterval time, CGSize size, SCNAntialiasingMode antialiasingMode);
+    [Selector("updateProbes:atTime:")]
+    public void UpdateProbesAtTime(NSArray lightProbes, CFTimeInterval time);
 }
 
 #endif

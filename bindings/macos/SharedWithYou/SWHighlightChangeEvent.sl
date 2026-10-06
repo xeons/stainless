@@ -39,9 +39,12 @@ public enum SWHighlightChangeEventTrigger : long
 
 public extern objc class SWHighlightChangeEvent : NSObject, SWHighlightEvent
 {
-    [Selector("changeEventTrigger")] public SWHighlightChangeEventTrigger ChangeEventTrigger { get; }
-    [Selector("highlightURL")] public NSURL HighlightURL { get; }
-    [Selector("initWithHighlight:trigger:")] public Self InitWithHighlightTrigger(SWHighlight highlight, SWHighlightChangeEventTrigger trigger);
+    [Selector("changeEventTrigger")]
+    public SWHighlightChangeEventTrigger ChangeEventTrigger { get; }
+    [Selector("highlightURL")]
+    public NSURL HighlightURL { get; }
+    [Selector("initWithHighlight:trigger:")]
+    public Self InitWithHighlightTrigger(SWHighlight highlight, SWHighlightChangeEventTrigger trigger);
 }
 
 #endif

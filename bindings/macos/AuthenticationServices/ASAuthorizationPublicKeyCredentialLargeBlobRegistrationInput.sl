@@ -38,8 +38,10 @@ public enum ASAuthorizationPublicKeyCredentialLargeBlobSupportRequirement : long
 
 public extern objc class ASAuthorizationPublicKeyCredentialLargeBlobRegistrationInput : NSObject
 {
-    [Selector("supportRequirement", "setSupportRequirement:")] public ASAuthorizationPublicKeyCredentialLargeBlobSupportRequirement SupportRequirement { get; set; }
-    [Selector("initWithSupportRequirement:")] public Self InitWithSupportRequirement(ASAuthorizationPublicKeyCredentialLargeBlobSupportRequirement requirement);
+    [Selector("supportRequirement", "setSupportRequirement:")]
+    public ASAuthorizationPublicKeyCredentialLargeBlobSupportRequirement SupportRequirement { get; set; }
+    [Selector("initWithSupportRequirement:")]
+    public Self InitWithSupportRequirement(ASAuthorizationPublicKeyCredentialLargeBlobSupportRequirement requirement);
 }
 
 #endif

@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public objc interface SWHighlightEvent : NSObjectProtocol, NSSecureCoding, NSCopying
 {
-    [Selector("highlightURL")] NSURL HighlightURL { get; }
+    [Selector("highlightURL")]
+    NSURL HighlightURL { get; }
 }
 
 #endif

@@ -35,23 +35,36 @@ public const int EAConnectionIDNone = 0;
 
 public extern objc class EAAccessory : NSObject
 {
-    [Selector("isConnected")] public bool Connected { get; }
-    [Selector("connectionID")] public NSUInteger ConnectionID { get; }
-    [Selector("manufacturer")] public NSString? Manufacturer { get; }
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("modelNumber")] public NSString? ModelNumber { get; }
-    [Selector("serialNumber")] public NSString? SerialNumber { get; }
-    [Selector("firmwareRevision")] public NSString? FirmwareRevision { get; }
-    [Selector("hardwareRevision")] public NSString? HardwareRevision { get; }
+    [Selector("isConnected")]
+    public bool Connected { get; }
+    [Selector("connectionID")]
+    public NSUInteger ConnectionID { get; }
+    [Selector("manufacturer")]
+    public NSString? Manufacturer { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("modelNumber")]
+    public NSString? ModelNumber { get; }
+    [Selector("serialNumber")]
+    public NSString? SerialNumber { get; }
+    [Selector("firmwareRevision")]
+    public NSString? FirmwareRevision { get; }
+    [Selector("hardwareRevision")]
+    public NSString? HardwareRevision { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("dockType")] public NSString DockType { get; }
-    [Selector("protocolStrings")] public NSArray? ProtocolStrings { get; }
-    [Selector("delegate", "setDelegate:")] public EAAccessoryDelegate? Delegate { get; set; }
+    [Selector("dockType")]
+    public NSString DockType { get; }
+    [Selector("protocolStrings")]
+    public NSArray? ProtocolStrings { get; }
+    [Selector("delegate", "setDelegate:")]
+    public EAAccessoryDelegate? Delegate { get; set; }
 }
 
 public objc interface EAAccessoryDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("accessoryDidDisconnect:")] void AccessoryDidDisconnect(EAAccessory accessory);
+    [Optional]
+    [Selector("accessoryDidDisconnect:")]
+    void AccessoryDidDisconnect(EAAccessory accessory);
 }
 
 #endif

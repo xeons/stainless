@@ -34,15 +34,24 @@ import Standard.ObjC;
 
 public extern objc class WKPreferences : NSObject, NSSecureCoding
 {
-    [Selector("minimumFontSize", "setMinimumFontSize:")] public CGFloat MinimumFontSize { get; set; }
-    [Selector("javaScriptCanOpenWindowsAutomatically", "setJavaScriptCanOpenWindowsAutomatically:")] public bool JavaScriptCanOpenWindowsAutomatically { get; set; }
-    [Selector("isFraudulentWebsiteWarningEnabled", "setFraudulentWebsiteWarningEnabled:")] public bool FraudulentWebsiteWarningEnabled { get; set; }
-    [Selector("shouldPrintBackgrounds", "setShouldPrintBackgrounds:")] public bool ShouldPrintBackgrounds { get; set; }
-    [Selector("tabFocusesLinks", "setTabFocusesLinks:")] public bool TabFocusesLinks { get; set; }
-    [Selector("isTextInteractionEnabled", "setTextInteractionEnabled:")] public bool TextInteractionEnabled { get; set; }
-    [Selector("isSiteSpecificQuirksModeEnabled", "setSiteSpecificQuirksModeEnabled:")] public bool SiteSpecificQuirksModeEnabled { get; set; }
-    [Selector("isElementFullscreenEnabled", "setElementFullscreenEnabled:")] public bool ElementFullscreenEnabled { get; set; }
-    [Selector("inactiveSchedulingPolicy", "setInactiveSchedulingPolicy:")] public WKInactiveSchedulingPolicy InactiveSchedulingPolicy { get; set; }
+    [Selector("minimumFontSize", "setMinimumFontSize:")]
+    public CGFloat MinimumFontSize { get; set; }
+    [Selector("javaScriptCanOpenWindowsAutomatically", "setJavaScriptCanOpenWindowsAutomatically:")]
+    public bool JavaScriptCanOpenWindowsAutomatically { get; set; }
+    [Selector("isFraudulentWebsiteWarningEnabled", "setFraudulentWebsiteWarningEnabled:")]
+    public bool FraudulentWebsiteWarningEnabled { get; set; }
+    [Selector("shouldPrintBackgrounds", "setShouldPrintBackgrounds:")]
+    public bool ShouldPrintBackgrounds { get; set; }
+    [Selector("tabFocusesLinks", "setTabFocusesLinks:")]
+    public bool TabFocusesLinks { get; set; }
+    [Selector("isTextInteractionEnabled", "setTextInteractionEnabled:")]
+    public bool TextInteractionEnabled { get; set; }
+    [Selector("isSiteSpecificQuirksModeEnabled", "setSiteSpecificQuirksModeEnabled:")]
+    public bool SiteSpecificQuirksModeEnabled { get; set; }
+    [Selector("isElementFullscreenEnabled", "setElementFullscreenEnabled:")]
+    public bool ElementFullscreenEnabled { get; set; }
+    [Selector("inactiveSchedulingPolicy", "setInactiveSchedulingPolicy:")]
+    public WKInactiveSchedulingPolicy InactiveSchedulingPolicy { get; set; }
 }
 
 public enum WKInactiveSchedulingPolicy : long
@@ -56,11 +65,14 @@ public enum WKInactiveSchedulingPolicy : long
 public extern objc class WKPreferences
 {
     /// Deprecated in macOS 10.15.
-    [Selector("javaEnabled", "setJavaEnabled:")] public bool JavaEnabled { get; set; }
+    [Selector("javaEnabled", "setJavaEnabled:")]
+    public bool JavaEnabled { get; set; }
     /// Deprecated in macOS 10.15.
-    [Selector("plugInsEnabled", "setPlugInsEnabled:")] public bool PlugInsEnabled { get; set; }
+    [Selector("plugInsEnabled", "setPlugInsEnabled:")]
+    public bool PlugInsEnabled { get; set; }
     /// Deprecated in macOS 11.0.
-    [Selector("javaScriptEnabled", "setJavaScriptEnabled:")] public bool JavaScriptEnabled { get; set; }
+    [Selector("javaScriptEnabled", "setJavaScriptEnabled:")]
+    public bool JavaScriptEnabled { get; set; }
 }
 
 #endif

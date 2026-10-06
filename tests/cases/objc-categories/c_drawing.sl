@@ -7,12 +7,14 @@ import Strings;
 
 public objc interface Uppering
 {
-    [Selector("uppercaseString")] NSString Uppercase { get; }
+    [Selector("uppercaseString")]
+    NSString Uppercase { get; }
 }
 
 public extern objc class NSString : Uppering
 {
-    [Selector("stringByAppendingString:")] public NSString Append(NSString other);
+    [Selector("stringByAppendingString:")]
+    public NSString Append(NSString other);
 
     // A helper, with a body, in a category.
     public NSString Shouted() => Append(NSString.FromUtf8("!")).Uppercase;

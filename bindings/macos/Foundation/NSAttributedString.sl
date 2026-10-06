@@ -38,8 +38,10 @@ public extern "C" NSAttributedStringFormattingContextKey NSInflectionConceptsKey
 
 public extern objc class NSAttributedString : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("string")] public NSString String { get; }
-    [Selector("attributesAtIndex:effectiveRange:")] public NSDictionary AttributesAtIndexEffectiveRange(NSUInteger location, NSRangePointer range);
+    [Selector("string")]
+    public NSString String { get; }
+    [Selector("attributesAtIndex:effectiveRange:")]
+    public NSDictionary AttributesAtIndexEffectiveRange(NSUInteger location, NSRangePointer range);
 }
 
 public objc closure void NSAttributedStringEnumerateAttributesInRangeOptionsUsingBlockBlock(NSDictionary arg0, NSRange arg1, bool* arg2);
@@ -49,17 +51,28 @@ public objc closure void NSAttributedStringEnumerateAttributeInRangeOptionsUsing
 /// NSExtendedAttributedString, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("length")] public NSUInteger Length { get; }
-    [Selector("attribute:atIndex:effectiveRange:")] public AnyObject? AttributeAtIndexEffectiveRange(NSAttributedStringKey attrName, NSUInteger location, NSRangePointer range);
-    [Selector("attributedSubstringFromRange:")] public NSAttributedString AttributedSubstringFromRange(NSRange range);
-    [Selector("attributesAtIndex:longestEffectiveRange:inRange:")] public NSDictionary AttributesAtIndexLongestEffectiveRangeInRange(NSUInteger location, NSRangePointer range, NSRange rangeLimit);
-    [Selector("attribute:atIndex:longestEffectiveRange:inRange:")] public AnyObject? AttributeAtIndexLongestEffectiveRangeInRange(NSAttributedStringKey attrName, NSUInteger location, NSRangePointer range, NSRange rangeLimit);
-    [Selector("isEqualToAttributedString:")] public bool IsEqualToAttributedString(NSAttributedString other);
-    [Selector("initWithString:")] public Self InitWithString(NSString str);
-    [Selector("initWithString:attributes:")] public Self InitWithStringAttributes(NSString str, NSDictionary? attrs);
-    [Selector("initWithAttributedString:")] public Self InitWithAttributedString(NSAttributedString attrStr);
-    [Selector("enumerateAttributesInRange:options:usingBlock:")] public void EnumerateAttributesInRangeOptionsUsingBlock(NSRange enumerationRange, NSAttributedStringEnumerationOptions opts, NSAttributedStringEnumerateAttributesInRangeOptionsUsingBlockBlock block);
-    [Selector("enumerateAttribute:inRange:options:usingBlock:")] public void EnumerateAttributeInRangeOptionsUsingBlock(NSAttributedStringKey attrName, NSRange enumerationRange, NSAttributedStringEnumerationOptions opts, NSAttributedStringEnumerateAttributeInRangeOptionsUsingBlockBlock block);
+    [Selector("length")]
+    public NSUInteger Length { get; }
+    [Selector("attribute:atIndex:effectiveRange:")]
+    public AnyObject? AttributeAtIndexEffectiveRange(NSAttributedStringKey attrName, NSUInteger location, NSRangePointer range);
+    [Selector("attributedSubstringFromRange:")]
+    public NSAttributedString AttributedSubstringFromRange(NSRange range);
+    [Selector("attributesAtIndex:longestEffectiveRange:inRange:")]
+    public NSDictionary AttributesAtIndexLongestEffectiveRangeInRange(NSUInteger location, NSRangePointer range, NSRange rangeLimit);
+    [Selector("attribute:atIndex:longestEffectiveRange:inRange:")]
+    public AnyObject? AttributeAtIndexLongestEffectiveRangeInRange(NSAttributedStringKey attrName, NSUInteger location, NSRangePointer range, NSRange rangeLimit);
+    [Selector("isEqualToAttributedString:")]
+    public bool IsEqualToAttributedString(NSAttributedString other);
+    [Selector("initWithString:")]
+    public Self InitWithString(NSString str);
+    [Selector("initWithString:attributes:")]
+    public Self InitWithStringAttributes(NSString str, NSDictionary? attrs);
+    [Selector("initWithAttributedString:")]
+    public Self InitWithAttributedString(NSAttributedString attrStr);
+    [Selector("enumerateAttributesInRange:options:usingBlock:")]
+    public void EnumerateAttributesInRangeOptionsUsingBlock(NSRange enumerationRange, NSAttributedStringEnumerationOptions opts, NSAttributedStringEnumerateAttributesInRangeOptionsUsingBlockBlock block);
+    [Selector("enumerateAttribute:inRange:options:usingBlock:")]
+    public void EnumerateAttributeInRangeOptionsUsingBlock(NSAttributedStringKey attrName, NSRange enumerationRange, NSAttributedStringEnumerationOptions opts, NSAttributedStringEnumerateAttributeInRangeOptionsUsingBlockBlock block);
 }
 
 [Flags]
@@ -71,24 +84,37 @@ public enum NSAttributedStringEnumerationOptions : ulong
 
 public extern objc class NSMutableAttributedString : NSAttributedString
 {
-    [Selector("replaceCharactersInRange:withString:")] public void ReplaceCharactersInRangeWithString(NSRange range, NSString str);
-    [Selector("setAttributes:range:")] public void SetAttributesRange(NSDictionary? attrs, NSRange range);
+    [Selector("replaceCharactersInRange:withString:")]
+    public void ReplaceCharactersInRangeWithString(NSRange range, NSString str);
+    [Selector("setAttributes:range:")]
+    public void SetAttributesRange(NSDictionary? attrs, NSRange range);
 }
 
 /// NSExtendedMutableAttributedString, a category of NSMutableAttributedString.
 public extern objc class NSMutableAttributedString
 {
-    [Selector("mutableString")] public NSMutableString MutableString { get; }
-    [Selector("addAttribute:value:range:")] public void AddAttributeValueRange(NSAttributedStringKey name, AnyObject value, NSRange range);
-    [Selector("addAttributes:range:")] public void AddAttributesRange(NSDictionary attrs, NSRange range);
-    [Selector("removeAttribute:range:")] public void RemoveAttributeRange(NSAttributedStringKey name, NSRange range);
-    [Selector("replaceCharactersInRange:withAttributedString:")] public void ReplaceCharactersInRangeWithAttributedString(NSRange range, NSAttributedString attrString);
-    [Selector("insertAttributedString:atIndex:")] public void InsertAttributedStringAtIndex(NSAttributedString attrString, NSUInteger loc);
-    [Selector("appendAttributedString:")] public void AppendAttributedString(NSAttributedString attrString);
-    [Selector("deleteCharactersInRange:")] public void DeleteCharactersInRange(NSRange range);
-    [Selector("setAttributedString:")] public void SetAttributedString(NSAttributedString attrString);
-    [Selector("beginEditing")] public void BeginEditing();
-    [Selector("endEditing")] public void EndEditing();
+    [Selector("mutableString")]
+    public NSMutableString MutableString { get; }
+    [Selector("addAttribute:value:range:")]
+    public void AddAttributeValueRange(NSAttributedStringKey name, AnyObject value, NSRange range);
+    [Selector("addAttributes:range:")]
+    public void AddAttributesRange(NSDictionary attrs, NSRange range);
+    [Selector("removeAttribute:range:")]
+    public void RemoveAttributeRange(NSAttributedStringKey name, NSRange range);
+    [Selector("replaceCharactersInRange:withAttributedString:")]
+    public void ReplaceCharactersInRangeWithAttributedString(NSRange range, NSAttributedString attrString);
+    [Selector("insertAttributedString:atIndex:")]
+    public void InsertAttributedStringAtIndex(NSAttributedString attrString, NSUInteger loc);
+    [Selector("appendAttributedString:")]
+    public void AppendAttributedString(NSAttributedString attrString);
+    [Selector("deleteCharactersInRange:")]
+    public void DeleteCharactersInRange(NSRange range);
+    [Selector("setAttributedString:")]
+    public void SetAttributedString(NSAttributedString attrString);
+    [Selector("beginEditing")]
+    public void BeginEditing();
+    [Selector("endEditing")]
+    public void EndEditing();
 }
 
 [Flags]
@@ -129,30 +155,45 @@ public enum NSAttributedStringMarkdownInterpretedSyntax : long
 
 public extern objc class NSAttributedStringMarkdownSourcePosition : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("startLine")] public NSInteger StartLine { get; }
-    [Selector("startColumn")] public NSInteger StartColumn { get; }
-    [Selector("endLine")] public NSInteger EndLine { get; }
-    [Selector("endColumn")] public NSInteger EndColumn { get; }
-    [Selector("initWithStartLine:startColumn:endLine:endColumn:")] public Self InitWithStartLineStartColumnEndLineEndColumn(NSInteger startLine, NSInteger startColumn, NSInteger endLine, NSInteger endColumn);
-    [Selector("rangeInString:")] public NSRange RangeInString(NSString string);
+    [Selector("startLine")]
+    public NSInteger StartLine { get; }
+    [Selector("startColumn")]
+    public NSInteger StartColumn { get; }
+    [Selector("endLine")]
+    public NSInteger EndLine { get; }
+    [Selector("endColumn")]
+    public NSInteger EndColumn { get; }
+    [Selector("initWithStartLine:startColumn:endLine:endColumn:")]
+    public Self InitWithStartLineStartColumnEndLineEndColumn(NSInteger startLine, NSInteger startColumn, NSInteger endLine, NSInteger endColumn);
+    [Selector("rangeInString:")]
+    public NSRange RangeInString(NSString string);
 }
 
 public extern objc class NSAttributedStringMarkdownParsingOptions : NSObject, NSCopying
 {
-    [Selector("allowsExtendedAttributes", "setAllowsExtendedAttributes:")] public bool AllowsExtendedAttributes { get; set; }
-    [Selector("interpretedSyntax", "setInterpretedSyntax:")] public NSAttributedStringMarkdownInterpretedSyntax InterpretedSyntax { get; set; }
-    [Selector("failurePolicy", "setFailurePolicy:")] public NSAttributedStringMarkdownParsingFailurePolicy FailurePolicy { get; set; }
-    [Selector("languageCode", "setLanguageCode:")] public NSString? LanguageCode { get; set; }
-    [Selector("appliesSourcePositionAttributes", "setAppliesSourcePositionAttributes:")] public bool AppliesSourcePositionAttributes { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("allowsExtendedAttributes", "setAllowsExtendedAttributes:")]
+    public bool AllowsExtendedAttributes { get; set; }
+    [Selector("interpretedSyntax", "setInterpretedSyntax:")]
+    public NSAttributedStringMarkdownInterpretedSyntax InterpretedSyntax { get; set; }
+    [Selector("failurePolicy", "setFailurePolicy:")]
+    public NSAttributedStringMarkdownParsingFailurePolicy FailurePolicy { get; set; }
+    [Selector("languageCode", "setLanguageCode:")]
+    public NSString? LanguageCode { get; set; }
+    [Selector("appliesSourcePositionAttributes", "setAppliesSourcePositionAttributes:")]
+    public bool AppliesSourcePositionAttributes { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 /// NSAttributedStringCreateFromMarkdown, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("initWithContentsOfMarkdownFileAtURL:options:baseURL:error:")] public Self? InitWithContentsOfMarkdownFileAtURLOptionsBaseURLError(NSURL markdownFile, NSAttributedStringMarkdownParsingOptions? options, NSURL? baseURL, out NSError? error);
-    [Selector("initWithMarkdown:options:baseURL:error:")] public Self? InitWithMarkdownOptionsBaseURLError(NSData markdown, NSAttributedStringMarkdownParsingOptions? options, NSURL? baseURL, out NSError? error);
-    [Selector("initWithMarkdownString:options:baseURL:error:")] public Self? InitWithMarkdownStringOptionsBaseURLError(NSString markdownString, NSAttributedStringMarkdownParsingOptions? options, NSURL? baseURL, out NSError? error);
+    [Selector("initWithContentsOfMarkdownFileAtURL:options:baseURL:error:")]
+    public Self? InitWithContentsOfMarkdownFileAtURLOptionsBaseURLError(NSURL markdownFile, NSAttributedStringMarkdownParsingOptions? options, NSURL? baseURL, out NSError? error);
+    [Selector("initWithMarkdown:options:baseURL:error:")]
+    public Self? InitWithMarkdownOptionsBaseURLError(NSData markdown, NSAttributedStringMarkdownParsingOptions? options, NSURL? baseURL, out NSError? error);
+    [Selector("initWithMarkdownString:options:baseURL:error:")]
+    public Self? InitWithMarkdownStringOptionsBaseURLError(NSString markdownString, NSAttributedStringMarkdownParsingOptions? options, NSURL? baseURL, out NSError? error);
 }
 
 [Flags]
@@ -165,20 +206,29 @@ public enum NSAttributedStringFormattingOptions : ulong
 /// NSAttributedStringFormatting, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("initWithFormat:options:locale:")] public Self InitWithFormatOptionsLocale(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, ...);
-    [Selector("initWithFormat:options:locale:arguments:")] public Self InitWithFormatOptionsLocaleArguments(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, VaList arguments);
-    [Selector("localizedAttributedStringWithFormat:")] public static Self LocalizedAttributedStringWithFormat(NSAttributedString format, ...);
-    [Selector("localizedAttributedStringWithFormat:options:")] public static Self LocalizedAttributedStringWithFormatOptions(NSAttributedString format, NSAttributedStringFormattingOptions options, ...);
-    [Selector("initWithFormat:options:locale:context:")] public Self InitWithFormatOptionsLocaleContext(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, NSDictionary context, ...);
-    [Selector("initWithFormat:options:locale:context:arguments:")] public Self InitWithFormatOptionsLocaleContextArguments(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, NSDictionary context, VaList arguments);
-    [Selector("localizedAttributedStringWithFormat:context:")] public static Self LocalizedAttributedStringWithFormatContext(NSAttributedString format, NSDictionary context, ...);
-    [Selector("localizedAttributedStringWithFormat:options:context:")] public static Self LocalizedAttributedStringWithFormatOptionsContext(NSAttributedString format, NSAttributedStringFormattingOptions options, NSDictionary context, ...);
+    [Selector("initWithFormat:options:locale:")]
+    public Self InitWithFormatOptionsLocale(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, ...);
+    [Selector("initWithFormat:options:locale:arguments:")]
+    public Self InitWithFormatOptionsLocaleArguments(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, VaList arguments);
+    [Selector("localizedAttributedStringWithFormat:")]
+    public static Self LocalizedAttributedStringWithFormat(NSAttributedString format, ...);
+    [Selector("localizedAttributedStringWithFormat:options:")]
+    public static Self LocalizedAttributedStringWithFormatOptions(NSAttributedString format, NSAttributedStringFormattingOptions options, ...);
+    [Selector("initWithFormat:options:locale:context:")]
+    public Self InitWithFormatOptionsLocaleContext(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, NSDictionary context, ...);
+    [Selector("initWithFormat:options:locale:context:arguments:")]
+    public Self InitWithFormatOptionsLocaleContextArguments(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, NSDictionary context, VaList arguments);
+    [Selector("localizedAttributedStringWithFormat:context:")]
+    public static Self LocalizedAttributedStringWithFormatContext(NSAttributedString format, NSDictionary context, ...);
+    [Selector("localizedAttributedStringWithFormat:options:context:")]
+    public static Self LocalizedAttributedStringWithFormatOptionsContext(NSAttributedString format, NSAttributedStringFormattingOptions options, NSDictionary context, ...);
 }
 
 /// NSMutableAttributedStringFormatting, a category of NSMutableAttributedString.
 public extern objc class NSMutableAttributedString
 {
-    [Selector("appendLocalizedFormat:")] public void AppendLocalizedFormat(NSAttributedString format, ...);
+    [Selector("appendLocalizedFormat:")]
+    public void AppendLocalizedFormat(NSAttributedString format, ...);
 }
 
 public extern "C" NSAttributedStringKey? NSReplacementIndexAttributeName;
@@ -186,7 +236,8 @@ public extern "C" NSAttributedStringKey? NSReplacementIndexAttributeName;
 /// NSMorphology, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("attributedStringByInflectingString")] public NSAttributedString AttributedStringByInflectingString();
+    [Selector("attributedStringByInflectingString")]
+    public NSAttributedString AttributedStringByInflectingString();
 }
 
 public extern "C" NSAttributedStringKey? NSMorphologyAttributeName;
@@ -233,30 +284,54 @@ public enum NSPresentationIntentTableColumnAlignment : long
 
 public extern objc class NSPresentationIntent : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("intentKind")] public NSPresentationIntentKind IntentKind { get; }
-    [Selector("parentIntent")] public NSPresentationIntent? ParentIntent { get; }
-    [Selector("identity")] public NSInteger Identity { get; }
-    [Selector("ordinal")] public NSInteger Ordinal { get; }
-    [Selector("columnAlignments")] public NSArray? ColumnAlignments { get; }
-    [Selector("columnCount")] public NSInteger ColumnCount { get; }
-    [Selector("headerLevel")] public NSInteger HeaderLevel { get; }
-    [Selector("languageHint")] public NSString? LanguageHint { get; }
-    [Selector("column")] public NSInteger Column { get; }
-    [Selector("row")] public NSInteger Row { get; }
-    [Selector("indentationLevel")] public NSInteger IndentationLevel { get; }
-    [Selector("paragraphIntentWithIdentity:nestedInsideIntent:")] public static NSPresentationIntent ParagraphIntentWithIdentityNestedInsideIntent(NSInteger identity, NSPresentationIntent? parent);
-    [Selector("headerIntentWithIdentity:level:nestedInsideIntent:")] public static NSPresentationIntent HeaderIntentWithIdentityLevelNestedInsideIntent(NSInteger identity, NSInteger level, NSPresentationIntent? parent);
-    [Selector("codeBlockIntentWithIdentity:languageHint:nestedInsideIntent:")] public static NSPresentationIntent CodeBlockIntentWithIdentityLanguageHintNestedInsideIntent(NSInteger identity, NSString? languageHint, NSPresentationIntent? parent);
-    [Selector("thematicBreakIntentWithIdentity:nestedInsideIntent:")] public static NSPresentationIntent ThematicBreakIntentWithIdentityNestedInsideIntent(NSInteger identity, NSPresentationIntent? parent);
-    [Selector("orderedListIntentWithIdentity:nestedInsideIntent:")] public static NSPresentationIntent OrderedListIntentWithIdentityNestedInsideIntent(NSInteger identity, NSPresentationIntent? parent);
-    [Selector("unorderedListIntentWithIdentity:nestedInsideIntent:")] public static NSPresentationIntent UnorderedListIntentWithIdentityNestedInsideIntent(NSInteger identity, NSPresentationIntent? parent);
-    [Selector("listItemIntentWithIdentity:ordinal:nestedInsideIntent:")] public static NSPresentationIntent ListItemIntentWithIdentityOrdinalNestedInsideIntent(NSInteger identity, NSInteger ordinal, NSPresentationIntent? parent);
-    [Selector("blockQuoteIntentWithIdentity:nestedInsideIntent:")] public static NSPresentationIntent BlockQuoteIntentWithIdentityNestedInsideIntent(NSInteger identity, NSPresentationIntent? parent);
-    [Selector("tableIntentWithIdentity:columnCount:alignments:nestedInsideIntent:")] public static NSPresentationIntent TableIntentWithIdentityColumnCountAlignmentsNestedInsideIntent(NSInteger identity, NSInteger columnCount, NSArray alignments, NSPresentationIntent? parent);
-    [Selector("tableHeaderRowIntentWithIdentity:nestedInsideIntent:")] public static NSPresentationIntent TableHeaderRowIntentWithIdentityNestedInsideIntent(NSInteger identity, NSPresentationIntent? parent);
-    [Selector("tableRowIntentWithIdentity:row:nestedInsideIntent:")] public static NSPresentationIntent TableRowIntentWithIdentityRowNestedInsideIntent(NSInteger identity, NSInteger row, NSPresentationIntent? parent);
-    [Selector("tableCellIntentWithIdentity:column:nestedInsideIntent:")] public static NSPresentationIntent TableCellIntentWithIdentityColumnNestedInsideIntent(NSInteger identity, NSInteger column, NSPresentationIntent? parent);
-    [Selector("isEquivalentToPresentationIntent:")] public bool IsEquivalentToPresentationIntent(NSPresentationIntent other);
+    [Selector("intentKind")]
+    public NSPresentationIntentKind IntentKind { get; }
+    [Selector("parentIntent")]
+    public NSPresentationIntent? ParentIntent { get; }
+    [Selector("identity")]
+    public NSInteger Identity { get; }
+    [Selector("ordinal")]
+    public NSInteger Ordinal { get; }
+    [Selector("columnAlignments")]
+    public NSArray? ColumnAlignments { get; }
+    [Selector("columnCount")]
+    public NSInteger ColumnCount { get; }
+    [Selector("headerLevel")]
+    public NSInteger HeaderLevel { get; }
+    [Selector("languageHint")]
+    public NSString? LanguageHint { get; }
+    [Selector("column")]
+    public NSInteger Column { get; }
+    [Selector("row")]
+    public NSInteger Row { get; }
+    [Selector("indentationLevel")]
+    public NSInteger IndentationLevel { get; }
+    [Selector("paragraphIntentWithIdentity:nestedInsideIntent:")]
+    public static NSPresentationIntent ParagraphIntentWithIdentityNestedInsideIntent(NSInteger identity, NSPresentationIntent? parent);
+    [Selector("headerIntentWithIdentity:level:nestedInsideIntent:")]
+    public static NSPresentationIntent HeaderIntentWithIdentityLevelNestedInsideIntent(NSInteger identity, NSInteger level, NSPresentationIntent? parent);
+    [Selector("codeBlockIntentWithIdentity:languageHint:nestedInsideIntent:")]
+    public static NSPresentationIntent CodeBlockIntentWithIdentityLanguageHintNestedInsideIntent(NSInteger identity, NSString? languageHint, NSPresentationIntent? parent);
+    [Selector("thematicBreakIntentWithIdentity:nestedInsideIntent:")]
+    public static NSPresentationIntent ThematicBreakIntentWithIdentityNestedInsideIntent(NSInteger identity, NSPresentationIntent? parent);
+    [Selector("orderedListIntentWithIdentity:nestedInsideIntent:")]
+    public static NSPresentationIntent OrderedListIntentWithIdentityNestedInsideIntent(NSInteger identity, NSPresentationIntent? parent);
+    [Selector("unorderedListIntentWithIdentity:nestedInsideIntent:")]
+    public static NSPresentationIntent UnorderedListIntentWithIdentityNestedInsideIntent(NSInteger identity, NSPresentationIntent? parent);
+    [Selector("listItemIntentWithIdentity:ordinal:nestedInsideIntent:")]
+    public static NSPresentationIntent ListItemIntentWithIdentityOrdinalNestedInsideIntent(NSInteger identity, NSInteger ordinal, NSPresentationIntent? parent);
+    [Selector("blockQuoteIntentWithIdentity:nestedInsideIntent:")]
+    public static NSPresentationIntent BlockQuoteIntentWithIdentityNestedInsideIntent(NSInteger identity, NSPresentationIntent? parent);
+    [Selector("tableIntentWithIdentity:columnCount:alignments:nestedInsideIntent:")]
+    public static NSPresentationIntent TableIntentWithIdentityColumnCountAlignmentsNestedInsideIntent(NSInteger identity, NSInteger columnCount, NSArray alignments, NSPresentationIntent? parent);
+    [Selector("tableHeaderRowIntentWithIdentity:nestedInsideIntent:")]
+    public static NSPresentationIntent TableHeaderRowIntentWithIdentityNestedInsideIntent(NSInteger identity, NSPresentationIntent? parent);
+    [Selector("tableRowIntentWithIdentity:row:nestedInsideIntent:")]
+    public static NSPresentationIntent TableRowIntentWithIdentityRowNestedInsideIntent(NSInteger identity, NSInteger row, NSPresentationIntent? parent);
+    [Selector("tableCellIntentWithIdentity:column:nestedInsideIntent:")]
+    public static NSPresentationIntent TableCellIntentWithIdentityColumnNestedInsideIntent(NSInteger identity, NSInteger column, NSPresentationIntent? parent);
+    [Selector("isEquivalentToPresentationIntent:")]
+    public bool IsEquivalentToPresentationIntent(NSPresentationIntent other);
 }
 
 #endif

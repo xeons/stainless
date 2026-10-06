@@ -31,9 +31,12 @@ import Standard.ObjC;
 
 public extern objc class MLMetricKey : MLKey
 {
-    [Selector("lossValue")] public static MLMetricKey LossValue { get; }
-    [Selector("epochIndex")] public static MLMetricKey EpochIndex { get; }
-    [Selector("miniBatchIndex")] public static MLMetricKey MiniBatchIndex { get; }
+    [Selector("lossValue")]
+    public static MLMetricKey LossValue { get; }
+    [Selector("epochIndex")]
+    public static MLMetricKey EpochIndex { get; }
+    [Selector("miniBatchIndex")]
+    public static MLMetricKey MiniBatchIndex { get; }
 }
 
 #endif

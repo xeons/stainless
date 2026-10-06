@@ -33,13 +33,18 @@ import Standard.ObjC;
 
 public extern objc class CNPhoneNumber : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("stringValue")] public NSString StringValue { get; }
-    [Selector("phoneNumberWithStringValue:")] public static Self? PhoneNumberWithStringValue(NSString stringValue);
-    [Selector("initWithStringValue:")] public Self? InitWithStringValue(NSString string);
+    [Selector("stringValue")]
+    public NSString StringValue { get; }
+    [Selector("phoneNumberWithStringValue:")]
+    public static Self? PhoneNumberWithStringValue(NSString stringValue);
+    [Selector("initWithStringValue:")]
+    public Self? InitWithStringValue(NSString string);
     /// Deprecated in macOS 10.13.
-    [Selector("init")] public Self? Init();
+    [Selector("init")]
+    public Self? Init();
     /// Deprecated in macOS 10.13.
-    [Selector("new")] public static Self? New();
+    [Selector("new")]
+    public static Self? New();
 }
 
 public extern "C" NSString? CNLabelPhoneNumberiPhone;

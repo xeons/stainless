@@ -34,33 +34,49 @@ public using NSNotificationName = NSString;
 
 public extern objc class NSNotification : NSObject, NSCopying, NSCoding
 {
-    [Selector("name")] public NSNotificationName Name { get; }
-    [Selector("object")] public AnyObject? Object { get; }
-    [Selector("userInfo")] public NSDictionary? UserInfo { get; }
-    [Selector("initWithName:object:userInfo:")] public Self InitWithNameObjectUserInfo(NSNotificationName name, AnyObject? object, NSDictionary? userInfo);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("name")]
+    public NSNotificationName Name { get; }
+    [Selector("object")]
+    public AnyObject? Object { get; }
+    [Selector("userInfo")]
+    public NSDictionary? UserInfo { get; }
+    [Selector("initWithName:object:userInfo:")]
+    public Self InitWithNameObjectUserInfo(NSNotificationName name, AnyObject? object, NSDictionary? userInfo);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 /// NSNotificationCreation, a category of NSNotification.
 public extern objc class NSNotification
 {
-    [Selector("notificationWithName:object:")] public static Self NotificationWithNameObject(NSNotificationName aName, AnyObject? anObject);
-    [Selector("notificationWithName:object:userInfo:")] public static Self NotificationWithNameObjectUserInfo(NSNotificationName aName, AnyObject? anObject, NSDictionary? aUserInfo);
-    [Selector("init")] public Self Init();
+    [Selector("notificationWithName:object:")]
+    public static Self NotificationWithNameObject(NSNotificationName aName, AnyObject? anObject);
+    [Selector("notificationWithName:object:userInfo:")]
+    public static Self NotificationWithNameObjectUserInfo(NSNotificationName aName, AnyObject? anObject, NSDictionary? aUserInfo);
+    [Selector("init")]
+    public Self Init();
 }
 
 public objc closure void NSNotificationCenterAddObserverForNameObjectQueueUsingBlockBlock(NSNotification arg0);
 
 public extern objc class NSNotificationCenter : NSObject
 {
-    [Selector("defaultCenter")] public static NSNotificationCenter DefaultCenter { get; }
-    [Selector("addObserver:selector:name:object:")] public void AddObserverSelectorNameObject(AnyObject observer, Selector aSelector, NSNotificationName? aName, AnyObject? anObject);
-    [Selector("postNotification:")] public void PostNotification(NSNotification notification);
-    [Selector("postNotificationName:object:")] public void PostNotificationNameObject(NSNotificationName aName, AnyObject? anObject);
-    [Selector("postNotificationName:object:userInfo:")] public void PostNotificationNameObjectUserInfo(NSNotificationName aName, AnyObject? anObject, NSDictionary? aUserInfo);
-    [Selector("removeObserver:")] public void RemoveObserver(AnyObject observer);
-    [Selector("removeObserver:name:object:")] public void RemoveObserverNameObject(AnyObject observer, NSNotificationName? aName, AnyObject? anObject);
-    [Selector("addObserverForName:object:queue:usingBlock:")] public NSObjectProtocol AddObserverForNameObjectQueueUsingBlock(NSNotificationName? name, AnyObject? obj, NSOperationQueue? queue, NSNotificationCenterAddObserverForNameObjectQueueUsingBlockBlock block);
+    [Selector("defaultCenter")]
+    public static NSNotificationCenter DefaultCenter { get; }
+    [Selector("addObserver:selector:name:object:")]
+    public void AddObserverSelectorNameObject(AnyObject observer, Selector aSelector, NSNotificationName? aName, AnyObject? anObject);
+    [Selector("postNotification:")]
+    public void PostNotification(NSNotification notification);
+    [Selector("postNotificationName:object:")]
+    public void PostNotificationNameObject(NSNotificationName aName, AnyObject? anObject);
+    [Selector("postNotificationName:object:userInfo:")]
+    public void PostNotificationNameObjectUserInfo(NSNotificationName aName, AnyObject? anObject, NSDictionary? aUserInfo);
+    [Selector("removeObserver:")]
+    public void RemoveObserver(AnyObject observer);
+    [Selector("removeObserver:name:object:")]
+    public void RemoveObserverNameObject(AnyObject observer, NSNotificationName? aName, AnyObject? anObject);
+    [Selector("addObserverForName:object:queue:usingBlock:")]
+    public NSObjectProtocol AddObserverForNameObjectQueueUsingBlock(NSNotificationName? name, AnyObject? obj, NSOperationQueue? queue, NSNotificationCenterAddObserverForNameObjectQueueUsingBlockBlock block);
 }
 
 #endif

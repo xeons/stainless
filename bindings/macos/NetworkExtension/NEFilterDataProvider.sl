@@ -40,23 +40,36 @@ public objc closure void NEFilterDataProviderApplySettingsCompletionHandlerCompl
 
 public extern objc class NEFilterDataProvider : NEFilterProvider
 {
-    [Selector("handleNewFlow:")] public NEFilterNewFlowVerdict HandleNewFlow(NEFilterFlow flow);
-    [Selector("handleInboundDataFromFlow:readBytesStartOffset:readBytes:")] public NEFilterDataVerdict HandleInboundDataFromFlowReadBytesStartOffsetReadBytes(NEFilterFlow flow, NSUInteger offset, NSData readBytes);
-    [Selector("handleOutboundDataFromFlow:readBytesStartOffset:readBytes:")] public NEFilterDataVerdict HandleOutboundDataFromFlowReadBytesStartOffsetReadBytes(NEFilterFlow flow, NSUInteger offset, NSData readBytes);
-    [Selector("handleInboundDataCompleteForFlow:")] public NEFilterDataVerdict HandleInboundDataCompleteForFlow(NEFilterFlow flow);
-    [Selector("handleOutboundDataCompleteForFlow:")] public NEFilterDataVerdict HandleOutboundDataCompleteForFlow(NEFilterFlow flow);
-    [Selector("applySettings:completionHandler:")] public void ApplySettingsCompletionHandler(NEFilterSettings? settings, NEFilterDataProviderApplySettingsCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("resumeFlow:withVerdict:")] public void ResumeFlowWithVerdict(NEFilterFlow flow, NEFilterVerdict verdict);
-    [Selector("updateFlow:usingVerdict:forDirection:")] public void UpdateFlowUsingVerdictForDirection(NEFilterSocketFlow flow, NEFilterDataVerdict verdict, NETrafficDirection direction);
+    [Selector("handleNewFlow:")]
+    public NEFilterNewFlowVerdict HandleNewFlow(NEFilterFlow flow);
+    [Selector("handleInboundDataFromFlow:readBytesStartOffset:readBytes:")]
+    public NEFilterDataVerdict HandleInboundDataFromFlowReadBytesStartOffsetReadBytes(NEFilterFlow flow, NSUInteger offset, NSData readBytes);
+    [Selector("handleOutboundDataFromFlow:readBytesStartOffset:readBytes:")]
+    public NEFilterDataVerdict HandleOutboundDataFromFlowReadBytesStartOffsetReadBytes(NEFilterFlow flow, NSUInteger offset, NSData readBytes);
+    [Selector("handleInboundDataCompleteForFlow:")]
+    public NEFilterDataVerdict HandleInboundDataCompleteForFlow(NEFilterFlow flow);
+    [Selector("handleOutboundDataCompleteForFlow:")]
+    public NEFilterDataVerdict HandleOutboundDataCompleteForFlow(NEFilterFlow flow);
+    [Selector("applySettings:completionHandler:")]
+    public void ApplySettingsCompletionHandler(NEFilterSettings? settings, NEFilterDataProviderApplySettingsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("resumeFlow:withVerdict:")]
+    public void ResumeFlowWithVerdict(NEFilterFlow flow, NEFilterVerdict verdict);
+    [Selector("updateFlow:usingVerdict:forDirection:")]
+    public void UpdateFlowUsingVerdictForDirection(NEFilterSocketFlow flow, NEFilterDataVerdict verdict, NETrafficDirection direction);
 }
 
 public extern objc class NEFilterDataVerdict : NEFilterVerdict, NSSecureCoding, NSCopying
 {
-    [Selector("statisticsReportFrequency", "setStatisticsReportFrequency:")] public NEFilterReportFrequency StatisticsReportFrequency { get; set; }
-    [Selector("allowVerdict")] public static NEFilterDataVerdict AllowVerdict();
-    [Selector("dropVerdict")] public static NEFilterDataVerdict DropVerdict();
-    [Selector("dataVerdictWithPassBytes:peekBytes:")] public static NEFilterDataVerdict DataVerdictWithPassBytesPeekBytes(NSUInteger passBytes, NSUInteger peekBytes);
-    [Selector("pauseVerdict")] public static NEFilterDataVerdict PauseVerdict();
+    [Selector("statisticsReportFrequency", "setStatisticsReportFrequency:")]
+    public NEFilterReportFrequency StatisticsReportFrequency { get; set; }
+    [Selector("allowVerdict")]
+    public static NEFilterDataVerdict AllowVerdict();
+    [Selector("dropVerdict")]
+    public static NEFilterDataVerdict DropVerdict();
+    [Selector("dataVerdictWithPassBytes:peekBytes:")]
+    public static NEFilterDataVerdict DataVerdictWithPassBytesPeekBytes(NSUInteger passBytes, NSUInteger peekBytes);
+    [Selector("pauseVerdict")]
+    public static NEFilterDataVerdict PauseVerdict();
 }
 
 #endif

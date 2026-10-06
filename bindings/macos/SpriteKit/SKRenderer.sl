@@ -35,18 +35,30 @@ import Standard.ObjC;
 
 public extern objc class SKRenderer : NSObject
 {
-    [Selector("scene", "setScene:")] public SKScene? Scene { get; set; }
-    [Selector("ignoresSiblingOrder", "setIgnoresSiblingOrder:")] public bool IgnoresSiblingOrder { get; set; }
-    [Selector("shouldCullNonVisibleNodes", "setShouldCullNonVisibleNodes:")] public bool ShouldCullNonVisibleNodes { get; set; }
-    [Selector("showsDrawCount", "setShowsDrawCount:")] public bool ShowsDrawCount { get; set; }
-    [Selector("showsNodeCount", "setShowsNodeCount:")] public bool ShowsNodeCount { get; set; }
-    [Selector("showsQuadCount", "setShowsQuadCount:")] public bool ShowsQuadCount { get; set; }
-    [Selector("showsPhysics", "setShowsPhysics:")] public bool ShowsPhysics { get; set; }
-    [Selector("showsFields", "setShowsFields:")] public bool ShowsFields { get; set; }
-    [Selector("rendererWithDevice:")] public static SKRenderer RendererWithDevice(MTLDevice device);
-    [Selector("renderWithViewport:commandBuffer:renderPassDescriptor:")] public void RenderWithViewportCommandBufferRenderPassDescriptor(CGRect viewport, MTLCommandBuffer commandBuffer, MTLRenderPassDescriptor renderPassDescriptor);
-    [Selector("renderWithViewport:renderCommandEncoder:renderPassDescriptor:commandQueue:")] public void RenderWithViewportRenderCommandEncoderRenderPassDescriptorCommandQueue(CGRect viewport, MTLRenderCommandEncoder renderCommandEncoder, MTLRenderPassDescriptor renderPassDescriptor, MTLCommandQueue commandQueue);
-    [Selector("updateAtTime:")] public void UpdateAtTime(NSTimeInterval currentTime);
+    [Selector("scene", "setScene:")]
+    public SKScene? Scene { get; set; }
+    [Selector("ignoresSiblingOrder", "setIgnoresSiblingOrder:")]
+    public bool IgnoresSiblingOrder { get; set; }
+    [Selector("shouldCullNonVisibleNodes", "setShouldCullNonVisibleNodes:")]
+    public bool ShouldCullNonVisibleNodes { get; set; }
+    [Selector("showsDrawCount", "setShowsDrawCount:")]
+    public bool ShowsDrawCount { get; set; }
+    [Selector("showsNodeCount", "setShowsNodeCount:")]
+    public bool ShowsNodeCount { get; set; }
+    [Selector("showsQuadCount", "setShowsQuadCount:")]
+    public bool ShowsQuadCount { get; set; }
+    [Selector("showsPhysics", "setShowsPhysics:")]
+    public bool ShowsPhysics { get; set; }
+    [Selector("showsFields", "setShowsFields:")]
+    public bool ShowsFields { get; set; }
+    [Selector("rendererWithDevice:")]
+    public static SKRenderer RendererWithDevice(MTLDevice device);
+    [Selector("renderWithViewport:commandBuffer:renderPassDescriptor:")]
+    public void RenderWithViewportCommandBufferRenderPassDescriptor(CGRect viewport, MTLCommandBuffer commandBuffer, MTLRenderPassDescriptor renderPassDescriptor);
+    [Selector("renderWithViewport:renderCommandEncoder:renderPassDescriptor:commandQueue:")]
+    public void RenderWithViewportRenderCommandEncoderRenderPassDescriptorCommandQueue(CGRect viewport, MTLRenderCommandEncoder renderCommandEncoder, MTLRenderPassDescriptor renderPassDescriptor, MTLCommandQueue commandQueue);
+    [Selector("updateAtTime:")]
+    public void UpdateAtTime(NSTimeInterval currentTime);
 }
 
 #endif

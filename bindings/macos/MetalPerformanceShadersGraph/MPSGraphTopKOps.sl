@@ -34,23 +34,35 @@ import Standard.ObjC;
 /// MPSGraphTopKOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("topKWithSourceTensor:k:name:")] public NSArray TopKWithSourceTensorKName(MPSGraphTensor source, NSUInteger k, NSString? name);
-    [Selector("topKWithSourceTensor:kTensor:name:")] public NSArray TopKWithSourceTensorKTensorName(MPSGraphTensor source, MPSGraphTensor kTensor, NSString? name);
-    [Selector("topKWithSourceTensor:axis:k:name:")] public NSArray TopKWithSourceTensorAxisKName(MPSGraphTensor source, NSInteger axis, NSUInteger k, NSString? name);
-    [Selector("bottomKWithSourceTensor:axis:k:name:")] public NSArray BottomKWithSourceTensorAxisKName(MPSGraphTensor source, NSInteger axis, NSUInteger k, NSString? name);
-    [Selector("topKWithSourceTensor:axisTensor:kTensor:name:")] public NSArray TopKWithSourceTensorAxisTensorKTensorName(MPSGraphTensor source, MPSGraphTensor axisTensor, MPSGraphTensor kTensor, NSString? name);
-    [Selector("bottomKWithSourceTensor:axisTensor:kTensor:name:")] public NSArray BottomKWithSourceTensorAxisTensorKTensorName(MPSGraphTensor source, MPSGraphTensor axisTensor, MPSGraphTensor kTensor, NSString? name);
+    [Selector("topKWithSourceTensor:k:name:")]
+    public NSArray TopKWithSourceTensorKName(MPSGraphTensor source, NSUInteger k, NSString? name);
+    [Selector("topKWithSourceTensor:kTensor:name:")]
+    public NSArray TopKWithSourceTensorKTensorName(MPSGraphTensor source, MPSGraphTensor kTensor, NSString? name);
+    [Selector("topKWithSourceTensor:axis:k:name:")]
+    public NSArray TopKWithSourceTensorAxisKName(MPSGraphTensor source, NSInteger axis, NSUInteger k, NSString? name);
+    [Selector("bottomKWithSourceTensor:axis:k:name:")]
+    public NSArray BottomKWithSourceTensorAxisKName(MPSGraphTensor source, NSInteger axis, NSUInteger k, NSString? name);
+    [Selector("topKWithSourceTensor:axisTensor:kTensor:name:")]
+    public NSArray TopKWithSourceTensorAxisTensorKTensorName(MPSGraphTensor source, MPSGraphTensor axisTensor, MPSGraphTensor kTensor, NSString? name);
+    [Selector("bottomKWithSourceTensor:axisTensor:kTensor:name:")]
+    public NSArray BottomKWithSourceTensorAxisTensorKTensorName(MPSGraphTensor source, MPSGraphTensor axisTensor, MPSGraphTensor kTensor, NSString? name);
 }
 
 /// MPSGraphTopKGradientOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("topKWithGradientTensor:source:k:name:")] public MPSGraphTensor TopKWithGradientTensorSourceKName(MPSGraphTensor gradient, MPSGraphTensor source, NSUInteger k, NSString? name);
-    [Selector("topKWithGradientTensor:source:axis:k:name:")] public MPSGraphTensor TopKWithGradientTensorSourceAxisKName(MPSGraphTensor gradient, MPSGraphTensor source, NSInteger axis, NSUInteger k, NSString? name);
-    [Selector("bottomKWithGradientTensor:source:axis:k:name:")] public MPSGraphTensor BottomKWithGradientTensorSourceAxisKName(MPSGraphTensor gradient, MPSGraphTensor source, NSInteger axis, NSUInteger k, NSString? name);
-    [Selector("topKWithGradientTensor:source:kTensor:name:")] public MPSGraphTensor TopKWithGradientTensorSourceKTensorName(MPSGraphTensor gradient, MPSGraphTensor source, MPSGraphTensor kTensor, NSString? name);
-    [Selector("topKWithGradientTensor:source:axisTensor:kTensor:name:")] public MPSGraphTensor TopKWithGradientTensorSourceAxisTensorKTensorName(MPSGraphTensor gradient, MPSGraphTensor source, MPSGraphTensor axisTensor, MPSGraphTensor kTensor, NSString? name);
-    [Selector("bottomKWithGradientTensor:source:axisTensor:kTensor:name:")] public MPSGraphTensor BottomKWithGradientTensorSourceAxisTensorKTensorName(MPSGraphTensor gradient, MPSGraphTensor source, MPSGraphTensor axisTensor, MPSGraphTensor kTensor, NSString? name);
+    [Selector("topKWithGradientTensor:source:k:name:")]
+    public MPSGraphTensor TopKWithGradientTensorSourceKName(MPSGraphTensor gradient, MPSGraphTensor source, NSUInteger k, NSString? name);
+    [Selector("topKWithGradientTensor:source:axis:k:name:")]
+    public MPSGraphTensor TopKWithGradientTensorSourceAxisKName(MPSGraphTensor gradient, MPSGraphTensor source, NSInteger axis, NSUInteger k, NSString? name);
+    [Selector("bottomKWithGradientTensor:source:axis:k:name:")]
+    public MPSGraphTensor BottomKWithGradientTensorSourceAxisKName(MPSGraphTensor gradient, MPSGraphTensor source, NSInteger axis, NSUInteger k, NSString? name);
+    [Selector("topKWithGradientTensor:source:kTensor:name:")]
+    public MPSGraphTensor TopKWithGradientTensorSourceKTensorName(MPSGraphTensor gradient, MPSGraphTensor source, MPSGraphTensor kTensor, NSString? name);
+    [Selector("topKWithGradientTensor:source:axisTensor:kTensor:name:")]
+    public MPSGraphTensor TopKWithGradientTensorSourceAxisTensorKTensorName(MPSGraphTensor gradient, MPSGraphTensor source, MPSGraphTensor axisTensor, MPSGraphTensor kTensor, NSString? name);
+    [Selector("bottomKWithGradientTensor:source:axisTensor:kTensor:name:")]
+    public MPSGraphTensor BottomKWithGradientTensorSourceAxisTensorKTensorName(MPSGraphTensor gradient, MPSGraphTensor source, MPSGraphTensor axisTensor, MPSGraphTensor kTensor, NSString? name);
 }
 
 #endif

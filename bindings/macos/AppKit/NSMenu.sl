@@ -47,52 +47,97 @@ public enum NSMenuSelectionMode : long
 
 public extern objc class NSMenu : NSObject, NSCopying, NSCoding, NSUserInterfaceItemIdentification, NSAppearanceCustomization, NSAccessibilityElementProtocol, NSAccessibility
 {
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("supermenu", "setSupermenu:")] public NSMenu? Supermenu { get; set; }
-    [Selector("itemArray", "setItemArray:")] public NSArray ItemArray { get; set; }
-    [Selector("numberOfItems")] public NSInteger NumberOfItems { get; }
-    [Selector("autoenablesItems", "setAutoenablesItems:")] public bool AutoenablesItems { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSMenuDelegate? Delegate { get; set; }
-    [Selector("menuBarHeight")] public CGFloat MenuBarHeight { get; }
-    [Selector("highlightedItem")] public NSMenuItem? HighlightedItem { get; }
-    [Selector("minimumWidth", "setMinimumWidth:")] public CGFloat MinimumWidth { get; set; }
-    [Selector("size")] public NSSize Size { get; }
-    [Selector("font", "setFont:")] public NSFont? Font { get; set; }
-    [Selector("allowsContextMenuPlugIns", "setAllowsContextMenuPlugIns:")] public bool AllowsContextMenuPlugIns { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("supermenu", "setSupermenu:")]
+    public NSMenu? Supermenu { get; set; }
+    [Selector("itemArray", "setItemArray:")]
+    public NSArray ItemArray { get; set; }
+    [Selector("numberOfItems")]
+    public NSInteger NumberOfItems { get; }
+    [Selector("autoenablesItems", "setAutoenablesItems:")]
+    public bool AutoenablesItems { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSMenuDelegate? Delegate { get; set; }
+    [Selector("menuBarHeight")]
+    public CGFloat MenuBarHeight { get; }
+    [Selector("highlightedItem")]
+    public NSMenuItem? HighlightedItem { get; }
+    [Selector("minimumWidth", "setMinimumWidth:")]
+    public CGFloat MinimumWidth { get; set; }
+    [Selector("size")]
+    public NSSize Size { get; }
+    [Selector("font", "setFont:")]
+    public NSFont? Font { get; set; }
+    [Selector("allowsContextMenuPlugIns", "setAllowsContextMenuPlugIns:")]
+    public bool AllowsContextMenuPlugIns { get; set; }
     /// macOS 15.2 and later.
-    [Selector("automaticallyInsertsWritingToolsItems", "setAutomaticallyInsertsWritingToolsItems:")] public bool AutomaticallyInsertsWritingToolsItems { get; set; }
-    [Selector("showsStateColumn", "setShowsStateColumn:")] public bool ShowsStateColumn { get; set; }
-    [Selector("userInterfaceLayoutDirection", "setUserInterfaceLayoutDirection:")] public NSUserInterfaceLayoutDirection UserInterfaceLayoutDirection { get; set; }
-    [Selector("initWithTitle:")] public Self InitWithTitle(NSString title);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("popUpContextMenu:withEvent:forView:")] public static void PopUpContextMenuWithEventForView(NSMenu menu, NSEvent event, NSView view);
-    [Selector("popUpContextMenu:withEvent:forView:withFont:")] public static void PopUpContextMenuWithEventForViewWithFont(NSMenu menu, NSEvent event, NSView view, NSFont? font);
-    [Selector("popUpMenuPositioningItem:atLocation:inView:")] public bool PopUpMenuPositioningItemAtLocationInView(NSMenuItem? item, NSPoint location, NSView? view);
-    [Selector("setMenuBarVisible:")] public static void SetMenuBarVisible(bool visible);
-    [Selector("menuBarVisible")] public static bool MenuBarVisible();
-    [Selector("insertItem:atIndex:")] public void InsertItemAtIndex(NSMenuItem newItem, NSInteger index);
-    [Selector("addItem:")] public void AddItem(NSMenuItem newItem);
-    [Selector("insertItemWithTitle:action:keyEquivalent:atIndex:")] public NSMenuItem InsertItemWithTitleActionKeyEquivalentAtIndex(NSString string, Selector selector, NSString charCode, NSInteger index);
-    [Selector("addItemWithTitle:action:keyEquivalent:")] public NSMenuItem AddItemWithTitleActionKeyEquivalent(NSString string, Selector selector, NSString charCode);
-    [Selector("removeItemAtIndex:")] public void RemoveItemAtIndex(NSInteger index);
-    [Selector("removeItem:")] public void RemoveItem(NSMenuItem item);
-    [Selector("setSubmenu:forItem:")] public void SetSubmenuForItem(NSMenu? menu, NSMenuItem item);
-    [Selector("removeAllItems")] public void RemoveAllItems();
-    [Selector("itemAtIndex:")] public NSMenuItem? ItemAtIndex(NSInteger index);
-    [Selector("indexOfItem:")] public NSInteger IndexOfItem(NSMenuItem item);
-    [Selector("indexOfItemWithTitle:")] public NSInteger IndexOfItemWithTitle(NSString title);
-    [Selector("indexOfItemWithTag:")] public NSInteger IndexOfItemWithTag(NSInteger tag);
-    [Selector("indexOfItemWithRepresentedObject:")] public NSInteger IndexOfItemWithRepresentedObject(AnyObject? object);
-    [Selector("indexOfItemWithSubmenu:")] public NSInteger IndexOfItemWithSubmenu(NSMenu? submenu);
-    [Selector("indexOfItemWithTarget:andAction:")] public NSInteger IndexOfItemWithTargetAndAction(AnyObject? target, Selector actionSelector);
-    [Selector("itemWithTitle:")] public NSMenuItem? ItemWithTitle(NSString title);
-    [Selector("itemWithTag:")] public NSMenuItem? ItemWithTag(NSInteger tag);
-    [Selector("update")] public void Update();
-    [Selector("performKeyEquivalent:")] public bool PerformKeyEquivalent(NSEvent event);
-    [Selector("itemChanged:")] public void ItemChanged(NSMenuItem item);
-    [Selector("performActionForItemAtIndex:")] public void PerformActionForItemAtIndex(NSInteger index);
-    [Selector("cancelTracking")] public void CancelTracking();
-    [Selector("cancelTrackingWithoutAnimation")] public void CancelTrackingWithoutAnimation();
+    [Selector("automaticallyInsertsWritingToolsItems", "setAutomaticallyInsertsWritingToolsItems:")]
+    public bool AutomaticallyInsertsWritingToolsItems { get; set; }
+    [Selector("showsStateColumn", "setShowsStateColumn:")]
+    public bool ShowsStateColumn { get; set; }
+    [Selector("userInterfaceLayoutDirection", "setUserInterfaceLayoutDirection:")]
+    public NSUserInterfaceLayoutDirection UserInterfaceLayoutDirection { get; set; }
+    [Selector("initWithTitle:")]
+    public Self InitWithTitle(NSString title);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("popUpContextMenu:withEvent:forView:")]
+    public static void PopUpContextMenuWithEventForView(NSMenu menu, NSEvent event, NSView view);
+    [Selector("popUpContextMenu:withEvent:forView:withFont:")]
+    public static void PopUpContextMenuWithEventForViewWithFont(NSMenu menu, NSEvent event, NSView view, NSFont? font);
+    [Selector("popUpMenuPositioningItem:atLocation:inView:")]
+    public bool PopUpMenuPositioningItemAtLocationInView(NSMenuItem? item, NSPoint location, NSView? view);
+    [Selector("setMenuBarVisible:")]
+    public static void SetMenuBarVisible(bool visible);
+    [Selector("menuBarVisible")]
+    public static bool MenuBarVisible();
+    [Selector("insertItem:atIndex:")]
+    public void InsertItemAtIndex(NSMenuItem newItem, NSInteger index);
+    [Selector("addItem:")]
+    public void AddItem(NSMenuItem newItem);
+    [Selector("insertItemWithTitle:action:keyEquivalent:atIndex:")]
+    public NSMenuItem InsertItemWithTitleActionKeyEquivalentAtIndex(NSString string, Selector selector, NSString charCode, NSInteger index);
+    [Selector("addItemWithTitle:action:keyEquivalent:")]
+    public NSMenuItem AddItemWithTitleActionKeyEquivalent(NSString string, Selector selector, NSString charCode);
+    [Selector("removeItemAtIndex:")]
+    public void RemoveItemAtIndex(NSInteger index);
+    [Selector("removeItem:")]
+    public void RemoveItem(NSMenuItem item);
+    [Selector("setSubmenu:forItem:")]
+    public void SetSubmenuForItem(NSMenu? menu, NSMenuItem item);
+    [Selector("removeAllItems")]
+    public void RemoveAllItems();
+    [Selector("itemAtIndex:")]
+    public NSMenuItem? ItemAtIndex(NSInteger index);
+    [Selector("indexOfItem:")]
+    public NSInteger IndexOfItem(NSMenuItem item);
+    [Selector("indexOfItemWithTitle:")]
+    public NSInteger IndexOfItemWithTitle(NSString title);
+    [Selector("indexOfItemWithTag:")]
+    public NSInteger IndexOfItemWithTag(NSInteger tag);
+    [Selector("indexOfItemWithRepresentedObject:")]
+    public NSInteger IndexOfItemWithRepresentedObject(AnyObject? object);
+    [Selector("indexOfItemWithSubmenu:")]
+    public NSInteger IndexOfItemWithSubmenu(NSMenu? submenu);
+    [Selector("indexOfItemWithTarget:andAction:")]
+    public NSInteger IndexOfItemWithTargetAndAction(AnyObject? target, Selector actionSelector);
+    [Selector("itemWithTitle:")]
+    public NSMenuItem? ItemWithTitle(NSString title);
+    [Selector("itemWithTag:")]
+    public NSMenuItem? ItemWithTag(NSInteger tag);
+    [Selector("update")]
+    public void Update();
+    [Selector("performKeyEquivalent:")]
+    public bool PerformKeyEquivalent(NSEvent event);
+    [Selector("itemChanged:")]
+    public void ItemChanged(NSMenuItem item);
+    [Selector("performActionForItemAtIndex:")]
+    public void PerformActionForItemAtIndex(NSInteger index);
+    [Selector("cancelTracking")]
+    public void CancelTracking();
+    [Selector("cancelTrackingWithoutAnimation")]
+    public void CancelTrackingWithoutAnimation();
 }
 
 public objc closure void NSMenuPaletteMenuWithColorsTitlesSelectionHandlerOnSelectionChangeBlock(NSMenu arg0);
@@ -102,41 +147,65 @@ public objc closure void NSMenuPaletteMenuWithColorsTitlesTemplateImageSelection
 /// NSPaletteMenus, a category of NSMenu.
 public extern objc class NSMenu
 {
-    [Selector("presentationStyle", "setPresentationStyle:")] public NSMenuPresentationStyle PresentationStyle { get; set; }
-    [Selector("selectionMode", "setSelectionMode:")] public NSMenuSelectionMode SelectionMode { get; set; }
-    [Selector("selectedItems", "setSelectedItems:")] public NSArray? SelectedItems { get; set; }
-    [Selector("paletteMenuWithColors:titles:selectionHandler:")] public static Self PaletteMenuWithColorsTitlesSelectionHandler(NSArray colors, NSArray itemTitles, NSMenuPaletteMenuWithColorsTitlesSelectionHandlerOnSelectionChangeBlock? onSelectionChange);
-    [Selector("paletteMenuWithColors:titles:templateImage:selectionHandler:")] public static Self PaletteMenuWithColorsTitlesTemplateImageSelectionHandler(NSArray colors, NSArray itemTitles, NSImage image, NSMenuPaletteMenuWithColorsTitlesTemplateImageSelectionHandlerOnSelectionChangeBlock? onSelectionChange);
+    [Selector("presentationStyle", "setPresentationStyle:")]
+    public NSMenuPresentationStyle PresentationStyle { get; set; }
+    [Selector("selectionMode", "setSelectionMode:")]
+    public NSMenuSelectionMode SelectionMode { get; set; }
+    [Selector("selectedItems", "setSelectedItems:")]
+    public NSArray? SelectedItems { get; set; }
+    [Selector("paletteMenuWithColors:titles:selectionHandler:")]
+    public static Self PaletteMenuWithColorsTitlesSelectionHandler(NSArray colors, NSArray itemTitles, NSMenuPaletteMenuWithColorsTitlesSelectionHandlerOnSelectionChangeBlock? onSelectionChange);
+    [Selector("paletteMenuWithColors:titles:templateImage:selectionHandler:")]
+    public static Self PaletteMenuWithColorsTitlesTemplateImageSelectionHandler(NSArray colors, NSArray itemTitles, NSImage image, NSMenuPaletteMenuWithColorsTitlesTemplateImageSelectionHandlerOnSelectionChangeBlock? onSelectionChange);
 }
 
 /// NSSubmenuAction, a category of NSMenu.
 public extern objc class NSMenu
 {
-    [Selector("submenuAction:")] public void SubmenuAction(AnyObject? sender);
+    [Selector("submenuAction:")]
+    public void SubmenuAction(AnyObject? sender);
 }
 
 public objc interface NSMenuItemValidation : NSObjectProtocol
 {
-    [Selector("validateMenuItem:")] bool ValidateMenuItem(NSMenuItem menuItem);
+    [Selector("validateMenuItem:")]
+    bool ValidateMenuItem(NSMenuItem menuItem);
 }
 
 /// NSMenuValidation, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 11.0.
-    [Selector("validateMenuItem:")] public bool ValidateMenuItem(NSMenuItem menuItem);
+    [Selector("validateMenuItem:")]
+    public bool ValidateMenuItem(NSMenuItem menuItem);
 }
 
 public objc interface NSMenuDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("menuNeedsUpdate:")] void MenuNeedsUpdate(NSMenu menu);
-    [Optional] [Selector("numberOfItemsInMenu:")] NSInteger NumberOfItemsInMenu(NSMenu menu);
-    [Optional] [Selector("menu:updateItem:atIndex:shouldCancel:")] bool MenuUpdateItemAtIndexShouldCancel(NSMenu menu, NSMenuItem item, NSInteger index, bool shouldCancel);
-    [Optional] [Selector("menuHasKeyEquivalent:forEvent:target:action:")] bool MenuHasKeyEquivalentForEventTargetAction(NSMenu menu, NSEvent event, out AnyObject? target, Selector* action);
-    [Optional] [Selector("menuWillOpen:")] void MenuWillOpen(NSMenu menu);
-    [Optional] [Selector("menuDidClose:")] void MenuDidClose(NSMenu menu);
-    [Optional] [Selector("menu:willHighlightItem:")] void MenuWillHighlightItem(NSMenu menu, NSMenuItem? item);
-    [Optional] [Selector("confinementRectForMenu:onScreen:")] NSRect ConfinementRectForMenuOnScreen(NSMenu menu, NSScreen? screen);
+    [Optional]
+    [Selector("menuNeedsUpdate:")]
+    void MenuNeedsUpdate(NSMenu menu);
+    [Optional]
+    [Selector("numberOfItemsInMenu:")]
+    NSInteger NumberOfItemsInMenu(NSMenu menu);
+    [Optional]
+    [Selector("menu:updateItem:atIndex:shouldCancel:")]
+    bool MenuUpdateItemAtIndexShouldCancel(NSMenu menu, NSMenuItem item, NSInteger index, bool shouldCancel);
+    [Optional]
+    [Selector("menuHasKeyEquivalent:forEvent:target:action:")]
+    bool MenuHasKeyEquivalentForEventTargetAction(NSMenu menu, NSEvent event, out AnyObject? target, Selector* action);
+    [Optional]
+    [Selector("menuWillOpen:")]
+    void MenuWillOpen(NSMenu menu);
+    [Optional]
+    [Selector("menuDidClose:")]
+    void MenuDidClose(NSMenu menu);
+    [Optional]
+    [Selector("menu:willHighlightItem:")]
+    void MenuWillHighlightItem(NSMenu menu, NSMenuItem? item);
+    [Optional]
+    [Selector("confinementRectForMenu:onScreen:")]
+    NSRect ConfinementRectForMenuOnScreen(NSMenu menu, NSScreen? screen);
 }
 
 [Flags]
@@ -153,7 +222,8 @@ public enum NSMenuProperties : ulong
 /// NSMenuPropertiesToUpdate, a category of NSMenu.
 public extern objc class NSMenu
 {
-    [Selector("propertiesToUpdate")] public NSMenuProperties PropertiesToUpdate { get; }
+    [Selector("propertiesToUpdate")]
+    public NSMenuProperties PropertiesToUpdate { get; }
 }
 
 public extern "C" NSNotificationName NSMenuWillSendActionNotification;
@@ -174,35 +244,50 @@ public extern "C" NSNotificationName NSMenuDidEndTrackingNotification;
 public extern objc class NSMenu
 {
     /// Deprecated in macOS 10.11.
-    [Selector("menuChangedMessagesEnabled", "setMenuChangedMessagesEnabled:")] public bool MenuChangedMessagesEnabled { get; set; }
+    [Selector("menuChangedMessagesEnabled", "setMenuChangedMessagesEnabled:")]
+    public bool MenuChangedMessagesEnabled { get; set; }
     /// Deprecated in macOS 10.11.
-    [Selector("isTornOff")] public bool TornOff { get; }
+    [Selector("isTornOff")]
+    public bool TornOff { get; }
     /// Deprecated in macOS 10.2.
-    [Selector("setMenuRepresentation:")] public void SetMenuRepresentation(AnyObject? menuRep);
+    [Selector("setMenuRepresentation:")]
+    public void SetMenuRepresentation(AnyObject? menuRep);
     /// Deprecated in macOS 10.2.
-    [Selector("menuRepresentation")] public AnyObject? MenuRepresentation();
+    [Selector("menuRepresentation")]
+    public AnyObject? MenuRepresentation();
     /// Deprecated in macOS 10.2.
-    [Selector("setContextMenuRepresentation:")] public void SetContextMenuRepresentation(AnyObject? menuRep);
+    [Selector("setContextMenuRepresentation:")]
+    public void SetContextMenuRepresentation(AnyObject? menuRep);
     /// Deprecated in macOS 10.2.
-    [Selector("contextMenuRepresentation")] public AnyObject? ContextMenuRepresentation();
+    [Selector("contextMenuRepresentation")]
+    public AnyObject? ContextMenuRepresentation();
     /// Deprecated in macOS 10.2.
-    [Selector("setTearOffMenuRepresentation:")] public void SetTearOffMenuRepresentation(AnyObject? menuRep);
+    [Selector("setTearOffMenuRepresentation:")]
+    public void SetTearOffMenuRepresentation(AnyObject? menuRep);
     /// Deprecated in macOS 10.2.
-    [Selector("tearOffMenuRepresentation")] public AnyObject? TearOffMenuRepresentation();
+    [Selector("tearOffMenuRepresentation")]
+    public AnyObject? TearOffMenuRepresentation();
     /// Deprecated in macOS 10.11.
-    [Selector("menuZone")] public static _NSZone* MenuZone();
+    [Selector("menuZone")]
+    public static _NSZone* MenuZone();
     /// Deprecated in macOS 10.2.
-    [Selector("setMenuZone:")] public static void SetMenuZone(_NSZone* zone);
+    [Selector("setMenuZone:")]
+    public static void SetMenuZone(_NSZone* zone);
     /// Deprecated in macOS 10.2.
-    [Selector("attachedMenu")] public NSMenu? AttachedMenu();
+    [Selector("attachedMenu")]
+    public NSMenu? AttachedMenu();
     /// Deprecated in macOS 10.2.
-    [Selector("isAttached")] public bool IsAttached();
+    [Selector("isAttached")]
+    public bool IsAttached();
     /// Deprecated in macOS 10.2.
-    [Selector("sizeToFit")] public void SizeToFit();
+    [Selector("sizeToFit")]
+    public void SizeToFit();
     /// Deprecated in macOS 10.2.
-    [Selector("locationForSubmenu:")] public NSPoint LocationForSubmenu(NSMenu? submenu);
+    [Selector("locationForSubmenu:")]
+    public NSPoint LocationForSubmenu(NSMenu? submenu);
     /// Deprecated in macOS 10.11.
-    [Selector("helpRequested:")] public void HelpRequested(NSEvent eventPtr);
+    [Selector("helpRequested:")]
+    public void HelpRequested(NSEvent eventPtr);
 }
 
 #endif

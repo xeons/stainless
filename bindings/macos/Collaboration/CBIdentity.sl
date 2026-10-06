@@ -36,43 +36,69 @@ import Standard.ObjC;
 
 public extern objc class CBIdentity : NSObject, NSCoding, NSCopying
 {
-    [Selector("authority")] public CBIdentityAuthority Authority { get; }
-    [Selector("uniqueIdentifier")] public NSUUID? UniqueIdentifier { get; }
+    [Selector("authority")]
+    public CBIdentityAuthority Authority { get; }
+    [Selector("uniqueIdentifier")]
+    public NSUUID? UniqueIdentifier { get; }
     /// Deprecated in macOS 10.11.
-    [Selector("UUIDString")] public NSString? UUIDString { get; }
-    [Selector("fullName")] public NSString FullName { get; }
-    [Selector("posixName")] public NSString PosixName { get; }
-    [Selector("aliases")] public NSArray Aliases { get; }
-    [Selector("emailAddress")] public NSString? EmailAddress { get; }
-    [Selector("image")] public NSImage? Image { get; }
-    [Selector("persistentReference")] public NSData? PersistentReference { get; }
-    [Selector("isHidden")] public bool Hidden { get; }
-    [Selector("CSIdentity")] public CSIdentityRef? CSIdentity { get; }
-    [Selector("identityWithName:authority:")] public static CBIdentity? IdentityWithNameAuthority(NSString name, CBIdentityAuthority authority);
-    [Selector("identityWithUniqueIdentifier:authority:")] public static CBIdentity? IdentityWithUniqueIdentifierAuthority(NSUUID uuid, CBIdentityAuthority authority);
+    [Selector("UUIDString")]
+    public NSString? UUIDString { get; }
+    [Selector("fullName")]
+    public NSString FullName { get; }
+    [Selector("posixName")]
+    public NSString PosixName { get; }
+    [Selector("aliases")]
+    public NSArray Aliases { get; }
+    [Selector("emailAddress")]
+    public NSString? EmailAddress { get; }
+    [Selector("image")]
+    public NSImage? Image { get; }
+    [Selector("persistentReference")]
+    public NSData? PersistentReference { get; }
+    [Selector("isHidden")]
+    public bool Hidden { get; }
+    [Selector("CSIdentity")]
+    public CSIdentityRef? CSIdentity { get; }
+    [Selector("identityWithName:authority:")]
+    public static CBIdentity? IdentityWithNameAuthority(NSString name, CBIdentityAuthority authority);
+    [Selector("identityWithUniqueIdentifier:authority:")]
+    public static CBIdentity? IdentityWithUniqueIdentifierAuthority(NSUUID uuid, CBIdentityAuthority authority);
     /// Deprecated in macOS 10.11.
-    [Selector("identityWithUUIDString:authority:")] public static CBIdentity? IdentityWithUUIDStringAuthority(NSString uuid, CBIdentityAuthority authority);
-    [Selector("identityWithPersistentReference:")] public static CBIdentity? IdentityWithPersistentReference(NSData data);
-    [Selector("identityWithCSIdentity:")] public static CBIdentity IdentityWithCSIdentity(CSIdentityRef csIdentity);
-    [Selector("isMemberOfGroup:")] public bool IsMemberOfGroup(CBGroupIdentity group);
+    [Selector("identityWithUUIDString:authority:")]
+    public static CBIdentity? IdentityWithUUIDStringAuthority(NSString uuid, CBIdentityAuthority authority);
+    [Selector("identityWithPersistentReference:")]
+    public static CBIdentity? IdentityWithPersistentReference(NSData data);
+    [Selector("identityWithCSIdentity:")]
+    public static CBIdentity IdentityWithCSIdentity(CSIdentityRef csIdentity);
+    [Selector("isMemberOfGroup:")]
+    public bool IsMemberOfGroup(CBGroupIdentity group);
 }
 
 public extern objc class CBUserIdentity : CBIdentity, NSCoding, NSCopying
 {
-    [Selector("posixUID")] public uid_t PosixUID { get; }
-    [Selector("certificate")] public SecCertificateRef? Certificate { get; }
-    [Selector("isEnabled")] public bool Enabled { get; }
-    [Selector("userIdentityWithPosixUID:authority:")] public static CBUserIdentity? UserIdentityWithPosixUIDAuthority(uid_t uid, CBIdentityAuthority authority);
-    [Selector("authenticateWithPassword:")] public bool AuthenticateWithPassword(NSString password);
+    [Selector("posixUID")]
+    public uid_t PosixUID { get; }
+    [Selector("certificate")]
+    public SecCertificateRef? Certificate { get; }
+    [Selector("isEnabled")]
+    public bool Enabled { get; }
+    [Selector("userIdentityWithPosixUID:authority:")]
+    public static CBUserIdentity? UserIdentityWithPosixUIDAuthority(uid_t uid, CBIdentityAuthority authority);
+    [Selector("authenticateWithPassword:")]
+    public bool AuthenticateWithPassword(NSString password);
 }
 
 public extern objc class CBGroupIdentity : CBIdentity
 {
-    [Selector("posixGID")] public gid_t PosixGID { get; }
+    [Selector("posixGID")]
+    public gid_t PosixGID { get; }
     /// Deprecated in macOS 10.11.
-    [Selector("members")] public NSArray? Members { get; }
-    [Selector("memberIdentities")] public NSArray? MemberIdentities { get; }
-    [Selector("groupIdentityWithPosixGID:authority:")] public static CBGroupIdentity? GroupIdentityWithPosixGIDAuthority(gid_t gid, CBIdentityAuthority authority);
+    [Selector("members")]
+    public NSArray? Members { get; }
+    [Selector("memberIdentities")]
+    public NSArray? MemberIdentities { get; }
+    [Selector("groupIdentityWithPosixGID:authority:")]
+    public static CBGroupIdentity? GroupIdentityWithPosixGIDAuthority(gid_t gid, CBIdentityAuthority authority);
 }
 
 #endif

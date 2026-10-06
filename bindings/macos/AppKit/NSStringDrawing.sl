@@ -34,25 +34,34 @@ import Standard.ObjC;
 
 public extern objc class NSStringDrawingContext : NSObject
 {
-    [Selector("minimumScaleFactor", "setMinimumScaleFactor:")] public CGFloat MinimumScaleFactor { get; set; }
-    [Selector("actualScaleFactor")] public CGFloat ActualScaleFactor { get; }
-    [Selector("totalBounds")] public CGRect TotalBounds { get; }
+    [Selector("minimumScaleFactor", "setMinimumScaleFactor:")]
+    public CGFloat MinimumScaleFactor { get; set; }
+    [Selector("actualScaleFactor")]
+    public CGFloat ActualScaleFactor { get; }
+    [Selector("totalBounds")]
+    public CGRect TotalBounds { get; }
 }
 
 /// NSStringDrawing, a category of NSString.
 public extern objc class NSString
 {
-    [Selector("sizeWithAttributes:")] public CGSize SizeWithAttributes(NSDictionary? attrs);
-    [Selector("drawAtPoint:withAttributes:")] public void DrawAtPointWithAttributes(CGPoint point, NSDictionary? attrs);
-    [Selector("drawInRect:withAttributes:")] public void DrawInRectWithAttributes(CGRect rect, NSDictionary? attrs);
+    [Selector("sizeWithAttributes:")]
+    public CGSize SizeWithAttributes(NSDictionary? attrs);
+    [Selector("drawAtPoint:withAttributes:")]
+    public void DrawAtPointWithAttributes(CGPoint point, NSDictionary? attrs);
+    [Selector("drawInRect:withAttributes:")]
+    public void DrawInRectWithAttributes(CGRect rect, NSDictionary? attrs);
 }
 
 /// NSStringDrawing, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("size")] public CGSize Size();
-    [Selector("drawAtPoint:")] public void DrawAtPoint(CGPoint point);
-    [Selector("drawInRect:")] public void DrawInRect(CGRect rect);
+    [Selector("size")]
+    public CGSize Size();
+    [Selector("drawAtPoint:")]
+    public void DrawAtPoint(CGPoint point);
+    [Selector("drawInRect:")]
+    public void DrawInRect(CGRect rect);
 }
 
 [Flags]
@@ -70,29 +79,37 @@ public enum NSStringDrawingOptions : long
 /// NSExtendedStringDrawing, a category of NSString.
 public extern objc class NSString
 {
-    [Selector("drawWithRect:options:attributes:context:")] public void DrawWithRectOptionsAttributesContext(CGRect rect, NSStringDrawingOptions options, NSDictionary? attributes, NSStringDrawingContext? context);
-    [Selector("boundingRectWithSize:options:attributes:context:")] public CGRect BoundingRectWithSizeOptionsAttributesContext(CGSize size, NSStringDrawingOptions options, NSDictionary? attributes, NSStringDrawingContext? context);
+    [Selector("drawWithRect:options:attributes:context:")]
+    public void DrawWithRectOptionsAttributesContext(CGRect rect, NSStringDrawingOptions options, NSDictionary? attributes, NSStringDrawingContext? context);
+    [Selector("boundingRectWithSize:options:attributes:context:")]
+    public CGRect BoundingRectWithSizeOptionsAttributesContext(CGSize size, NSStringDrawingOptions options, NSDictionary? attributes, NSStringDrawingContext? context);
 }
 
 /// NSExtendedStringDrawing, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("drawWithRect:options:context:")] public void DrawWithRectOptionsContext(CGRect rect, NSStringDrawingOptions options, NSStringDrawingContext? context);
-    [Selector("boundingRectWithSize:options:context:")] public CGRect BoundingRectWithSizeOptionsContext(CGSize size, NSStringDrawingOptions options, NSStringDrawingContext? context);
+    [Selector("drawWithRect:options:context:")]
+    public void DrawWithRectOptionsContext(CGRect rect, NSStringDrawingOptions options, NSStringDrawingContext? context);
+    [Selector("boundingRectWithSize:options:context:")]
+    public CGRect BoundingRectWithSizeOptionsContext(CGSize size, NSStringDrawingOptions options, NSStringDrawingContext? context);
 }
 
 /// NSStringDrawingDeprecated, a category of NSString.
 public extern objc class NSString
 {
-    [Selector("drawWithRect:options:attributes:")] public void DrawWithRectOptionsAttributes(NSRect rect, NSStringDrawingOptions options, NSDictionary? attributes);
-    [Selector("boundingRectWithSize:options:attributes:")] public NSRect BoundingRectWithSizeOptionsAttributes(NSSize size, NSStringDrawingOptions options, NSDictionary? attributes);
+    [Selector("drawWithRect:options:attributes:")]
+    public void DrawWithRectOptionsAttributes(NSRect rect, NSStringDrawingOptions options, NSDictionary? attributes);
+    [Selector("boundingRectWithSize:options:attributes:")]
+    public NSRect BoundingRectWithSizeOptionsAttributes(NSSize size, NSStringDrawingOptions options, NSDictionary? attributes);
 }
 
 /// NSStringDrawingDeprecated, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("drawWithRect:options:")] public void DrawWithRectOptions(NSRect rect, NSStringDrawingOptions options);
-    [Selector("boundingRectWithSize:options:")] public NSRect BoundingRectWithSizeOptions(NSSize size, NSStringDrawingOptions options);
+    [Selector("drawWithRect:options:")]
+    public void DrawWithRectOptions(NSRect rect, NSStringDrawingOptions options);
+    [Selector("boundingRectWithSize:options:")]
+    public NSRect BoundingRectWithSizeOptions(NSSize size, NSStringDrawingOptions options);
 }
 
 #endif

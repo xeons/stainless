@@ -32,36 +32,66 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCActivationLayer : MLCLayer
 {
-    [Selector("descriptor")] public MLCActivationDescriptor Descriptor { get; }
-    [Selector("reluLayer")] public static MLCActivationLayer ReluLayer { get; }
-    [Selector("relu6Layer")] public static MLCActivationLayer Relu6Layer { get; }
-    [Selector("leakyReLULayer")] public static MLCActivationLayer LeakyReLULayer { get; }
-    [Selector("sigmoidLayer")] public static MLCActivationLayer SigmoidLayer { get; }
-    [Selector("hardSigmoidLayer")] public static MLCActivationLayer HardSigmoidLayer { get; }
-    [Selector("tanhLayer")] public static MLCActivationLayer TanhLayer { get; }
-    [Selector("absoluteLayer")] public static MLCActivationLayer AbsoluteLayer { get; }
-    [Selector("softPlusLayer")] public static MLCActivationLayer SoftPlusLayer { get; }
-    [Selector("softSignLayer")] public static MLCActivationLayer SoftSignLayer { get; }
-    [Selector("eluLayer")] public static MLCActivationLayer EluLayer { get; }
-    [Selector("logSigmoidLayer")] public static MLCActivationLayer LogSigmoidLayer { get; }
-    [Selector("seluLayer")] public static MLCActivationLayer SeluLayer { get; }
-    [Selector("celuLayer")] public static MLCActivationLayer CeluLayer { get; }
-    [Selector("hardShrinkLayer")] public static MLCActivationLayer HardShrinkLayer { get; }
-    [Selector("softShrinkLayer")] public static MLCActivationLayer SoftShrinkLayer { get; }
-    [Selector("tanhShrinkLayer")] public static MLCActivationLayer TanhShrinkLayer { get; }
-    [Selector("geluLayer")] public static MLCActivationLayer GeluLayer { get; }
-    [Selector("hardSwishLayer")] public static MLCActivationLayer HardSwishLayer { get; }
-    [Selector("layerWithDescriptor:")] public static Self LayerWithDescriptor(MLCActivationDescriptor descriptor);
-    [Selector("leakyReLULayerWithNegativeSlope:")] public static Self LeakyReLULayerWithNegativeSlope(float negativeSlope);
-    [Selector("linearLayerWithScale:bias:")] public static Self LinearLayerWithScaleBias(float scale, float bias);
-    [Selector("softPlusLayerWithBeta:")] public static Self SoftPlusLayerWithBeta(float beta);
-    [Selector("eluLayerWithA:")] public static Self EluLayerWithA(float a);
-    [Selector("relunLayerWithA:b:")] public static Self RelunLayerWithAB(float a, float b);
-    [Selector("celuLayerWithA:")] public static Self CeluLayerWithA(float a);
-    [Selector("hardShrinkLayerWithA:")] public static Self HardShrinkLayerWithA(float a);
-    [Selector("softShrinkLayerWithA:")] public static Self SoftShrinkLayerWithA(float a);
-    [Selector("thresholdLayerWithThreshold:replacement:")] public static Self ThresholdLayerWithThresholdReplacement(float threshold, float replacement);
-    [Selector("clampLayerWithMinValue:maxValue:")] public static Self ClampLayerWithMinValueMaxValue(float minValue, float maxValue);
+    [Selector("descriptor")]
+    public MLCActivationDescriptor Descriptor { get; }
+    [Selector("reluLayer")]
+    public static MLCActivationLayer ReluLayer { get; }
+    [Selector("relu6Layer")]
+    public static MLCActivationLayer Relu6Layer { get; }
+    [Selector("leakyReLULayer")]
+    public static MLCActivationLayer LeakyReLULayer { get; }
+    [Selector("sigmoidLayer")]
+    public static MLCActivationLayer SigmoidLayer { get; }
+    [Selector("hardSigmoidLayer")]
+    public static MLCActivationLayer HardSigmoidLayer { get; }
+    [Selector("tanhLayer")]
+    public static MLCActivationLayer TanhLayer { get; }
+    [Selector("absoluteLayer")]
+    public static MLCActivationLayer AbsoluteLayer { get; }
+    [Selector("softPlusLayer")]
+    public static MLCActivationLayer SoftPlusLayer { get; }
+    [Selector("softSignLayer")]
+    public static MLCActivationLayer SoftSignLayer { get; }
+    [Selector("eluLayer")]
+    public static MLCActivationLayer EluLayer { get; }
+    [Selector("logSigmoidLayer")]
+    public static MLCActivationLayer LogSigmoidLayer { get; }
+    [Selector("seluLayer")]
+    public static MLCActivationLayer SeluLayer { get; }
+    [Selector("celuLayer")]
+    public static MLCActivationLayer CeluLayer { get; }
+    [Selector("hardShrinkLayer")]
+    public static MLCActivationLayer HardShrinkLayer { get; }
+    [Selector("softShrinkLayer")]
+    public static MLCActivationLayer SoftShrinkLayer { get; }
+    [Selector("tanhShrinkLayer")]
+    public static MLCActivationLayer TanhShrinkLayer { get; }
+    [Selector("geluLayer")]
+    public static MLCActivationLayer GeluLayer { get; }
+    [Selector("hardSwishLayer")]
+    public static MLCActivationLayer HardSwishLayer { get; }
+    [Selector("layerWithDescriptor:")]
+    public static Self LayerWithDescriptor(MLCActivationDescriptor descriptor);
+    [Selector("leakyReLULayerWithNegativeSlope:")]
+    public static Self LeakyReLULayerWithNegativeSlope(float negativeSlope);
+    [Selector("linearLayerWithScale:bias:")]
+    public static Self LinearLayerWithScaleBias(float scale, float bias);
+    [Selector("softPlusLayerWithBeta:")]
+    public static Self SoftPlusLayerWithBeta(float beta);
+    [Selector("eluLayerWithA:")]
+    public static Self EluLayerWithA(float a);
+    [Selector("relunLayerWithA:b:")]
+    public static Self RelunLayerWithAB(float a, float b);
+    [Selector("celuLayerWithA:")]
+    public static Self CeluLayerWithA(float a);
+    [Selector("hardShrinkLayerWithA:")]
+    public static Self HardShrinkLayerWithA(float a);
+    [Selector("softShrinkLayerWithA:")]
+    public static Self SoftShrinkLayerWithA(float a);
+    [Selector("thresholdLayerWithThreshold:replacement:")]
+    public static Self ThresholdLayerWithThresholdReplacement(float threshold, float replacement);
+    [Selector("clampLayerWithMinValue:maxValue:")]
+    public static Self ClampLayerWithMinValueMaxValue(float minValue, float maxValue);
 }
 
 #endif

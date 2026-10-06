@@ -33,22 +33,34 @@ import Standard.ObjC;
 
 public extern objc class AEAssessmentConfiguration : NSObject, NSCopying
 {
-    [Selector("autocorrectMode", "setAutocorrectMode:")] public AEAutocorrectMode AutocorrectMode { get; set; }
-    [Selector("allowsSpellCheck", "setAllowsSpellCheck:")] public bool AllowsSpellCheck { get; set; }
-    [Selector("allowsPredictiveKeyboard", "setAllowsPredictiveKeyboard:")] public bool AllowsPredictiveKeyboard { get; set; }
-    [Selector("allowsKeyboardShortcuts", "setAllowsKeyboardShortcuts:")] public bool AllowsKeyboardShortcuts { get; set; }
+    [Selector("autocorrectMode", "setAutocorrectMode:")]
+    public AEAutocorrectMode AutocorrectMode { get; set; }
+    [Selector("allowsSpellCheck", "setAllowsSpellCheck:")]
+    public bool AllowsSpellCheck { get; set; }
+    [Selector("allowsPredictiveKeyboard", "setAllowsPredictiveKeyboard:")]
+    public bool AllowsPredictiveKeyboard { get; set; }
+    [Selector("allowsKeyboardShortcuts", "setAllowsKeyboardShortcuts:")]
+    public bool AllowsKeyboardShortcuts { get; set; }
     /// macOS 26.1 and later.
-    [Selector("allowsAccessibilityKeyboard", "setAllowsAccessibilityKeyboard:")] public bool AllowsAccessibilityKeyboard { get; set; }
+    [Selector("allowsAccessibilityKeyboard", "setAllowsAccessibilityKeyboard:")]
+    public bool AllowsAccessibilityKeyboard { get; set; }
     /// macOS 26.1 and later.
-    [Selector("allowsAccessibilityLiveCaptions", "setAllowsAccessibilityLiveCaptions:")] public bool AllowsAccessibilityLiveCaptions { get; set; }
+    [Selector("allowsAccessibilityLiveCaptions", "setAllowsAccessibilityLiveCaptions:")]
+    public bool AllowsAccessibilityLiveCaptions { get; set; }
     /// macOS 26.1 and later.
-    [Selector("allowsAccessibilityReader", "setAllowsAccessibilityReader:")] public bool AllowsAccessibilityReader { get; set; }
+    [Selector("allowsAccessibilityReader", "setAllowsAccessibilityReader:")]
+    public bool AllowsAccessibilityReader { get; set; }
     /// macOS 26.1 and later.
-    [Selector("allowsScreenshots", "setAllowsScreenshots:")] public bool AllowsScreenshots { get; set; }
-    [Selector("mainParticipantConfiguration")] public AEAssessmentParticipantConfiguration MainParticipantConfiguration { get; }
-    [Selector("configurationsByApplication")] public NSDictionary ConfigurationsByApplication { get; }
-    [Selector("setConfiguration:forApplication:")] public void SetConfigurationForApplication(AEAssessmentParticipantConfiguration configuration, AEAssessmentApplication application);
-    [Selector("removeApplication:")] public void RemoveApplication(AEAssessmentApplication application);
+    [Selector("allowsScreenshots", "setAllowsScreenshots:")]
+    public bool AllowsScreenshots { get; set; }
+    [Selector("mainParticipantConfiguration")]
+    public AEAssessmentParticipantConfiguration MainParticipantConfiguration { get; }
+    [Selector("configurationsByApplication")]
+    public NSDictionary ConfigurationsByApplication { get; }
+    [Selector("setConfiguration:forApplication:")]
+    public void SetConfigurationForApplication(AEAssessmentParticipantConfiguration configuration, AEAssessmentApplication application);
+    [Selector("removeApplication:")]
+    public void RemoveApplication(AEAssessmentApplication application);
 }
 
 [Flags]

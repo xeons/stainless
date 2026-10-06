@@ -49,22 +49,37 @@ public enum EKEventStatus : long
 
 public extern objc class EKEvent : EKCalendarItem
 {
-    [Selector("eventIdentifier")] public NSString? EventIdentifier { get; }
-    [Selector("isAllDay", "setAllDay:")] public bool AllDay { get; set; }
-    [Selector("startDate", "setStartDate:")] public NSDate? StartDate { get; set; }
-    [Selector("endDate", "setEndDate:")] public NSDate? EndDate { get; set; }
-    [Selector("structuredLocation", "setStructuredLocation:")] public EKStructuredLocation? StructuredLocation { get; set; }
-    [Selector("organizer")] public EKParticipant? Organizer { get; }
-    [Selector("availability", "setAvailability:")] public EKEventAvailability Availability { get; set; }
-    [Selector("status")] public EKEventStatus Status { get; }
-    [Selector("isDetached")] public bool IsDetached { get; }
-    [Selector("occurrenceDate")] public NSDate? OccurrenceDate { get; }
-    [Selector("birthdayContactIdentifier")] public NSString? BirthdayContactIdentifier { get; }
+    [Selector("eventIdentifier")]
+    public NSString? EventIdentifier { get; }
+    [Selector("isAllDay", "setAllDay:")]
+    public bool AllDay { get; set; }
+    [Selector("startDate", "setStartDate:")]
+    public NSDate? StartDate { get; set; }
+    [Selector("endDate", "setEndDate:")]
+    public NSDate? EndDate { get; set; }
+    [Selector("structuredLocation", "setStructuredLocation:")]
+    public EKStructuredLocation? StructuredLocation { get; set; }
+    [Selector("organizer")]
+    public EKParticipant? Organizer { get; }
+    [Selector("availability", "setAvailability:")]
+    public EKEventAvailability Availability { get; set; }
+    [Selector("status")]
+    public EKEventStatus Status { get; }
+    [Selector("isDetached")]
+    public bool IsDetached { get; }
+    [Selector("occurrenceDate")]
+    public NSDate? OccurrenceDate { get; }
+    [Selector("birthdayContactIdentifier")]
+    public NSString? BirthdayContactIdentifier { get; }
     /// Deprecated in macOS 10.11.
-    [Selector("birthdayPersonUniqueID")] public NSString? BirthdayPersonUniqueID { get; }
-    [Selector("eventWithEventStore:")] public static EKEvent EventWithEventStore(EKEventStore eventStore);
-    [Selector("compareStartDateWithEvent:")] public NSComparisonResult CompareStartDateWithEvent(EKEvent other);
-    [Selector("refresh")] public bool Refresh();
+    [Selector("birthdayPersonUniqueID")]
+    public NSString? BirthdayPersonUniqueID { get; }
+    [Selector("eventWithEventStore:")]
+    public static EKEvent EventWithEventStore(EKEventStore eventStore);
+    [Selector("compareStartDateWithEvent:")]
+    public NSComparisonResult CompareStartDateWithEvent(EKEvent other);
+    [Selector("refresh")]
+    public bool Refresh();
 }
 
 #endif

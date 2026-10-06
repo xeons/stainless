@@ -33,15 +33,23 @@ import Standard.ObjC;
 
 public extern objc class EKParticipant : EKObject, NSCopying
 {
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("name")] public NSString? Name { get; }
-    [Selector("participantStatus")] public EKParticipantStatus ParticipantStatus { get; }
-    [Selector("participantRole")] public EKParticipantRole ParticipantRole { get; }
-    [Selector("participantType")] public EKParticipantType ParticipantType { get; }
-    [Selector("isCurrentUser")] public bool CurrentUser { get; }
-    [Selector("contactPredicate")] public NSPredicate? ContactPredicate { get; }
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
+    [Selector("participantStatus")]
+    public EKParticipantStatus ParticipantStatus { get; }
+    [Selector("participantRole")]
+    public EKParticipantRole ParticipantRole { get; }
+    [Selector("participantType")]
+    public EKParticipantType ParticipantType { get; }
+    [Selector("isCurrentUser")]
+    public bool CurrentUser { get; }
+    [Selector("contactPredicate")]
+    public NSPredicate? ContactPredicate { get; }
     /// Deprecated in macOS 10.11.
-    [Selector("ABPersonInAddressBook:")] public ABPerson? ABPersonInAddressBook(ABAddressBook addressBook);
+    [Selector("ABPersonInAddressBook:")]
+    public ABPerson? ABPersonInAddressBook(ABAddressBook addressBook);
 }
 
 #endif

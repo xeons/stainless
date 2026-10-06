@@ -33,12 +33,18 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLOptionsCollection : DOMObject
 {
-    [Selector("selectedIndex", "setSelectedIndex:")] public int SelectedIndex { get; set; }
-    [Selector("length", "setLength:")] public uint Length { get; set; }
-    [Selector("namedItem:")] public DOMNode? NamedItem(NSString? name);
-    [Selector("add:index:")] public void AddIndex(DOMHTMLOptionElement? option, uint index);
-    [Selector("remove:")] public void Remove(uint index);
-    [Selector("item:")] public DOMNode? Item(uint index);
+    [Selector("selectedIndex", "setSelectedIndex:")]
+    public int SelectedIndex { get; set; }
+    [Selector("length", "setLength:")]
+    public uint Length { get; set; }
+    [Selector("namedItem:")]
+    public DOMNode? NamedItem(NSString? name);
+    [Selector("add:index:")]
+    public void AddIndex(DOMHTMLOptionElement? option, uint index);
+    [Selector("remove:")]
+    public void Remove(uint index);
+    [Selector("item:")]
+    public DOMNode? Item(uint index);
 }
 
 #endif

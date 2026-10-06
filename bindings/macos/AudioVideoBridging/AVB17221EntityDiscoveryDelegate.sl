@@ -57,14 +57,22 @@ public enum AVB17221EntityPropertyChanged : ulong
 
 public objc interface AVB17221EntityDiscoveryDelegate
 {
-    [Selector("didAddRemoteEntity:on17221EntityDiscovery:")] void DidAddRemoteEntityOn17221EntityDiscovery(AVB17221Entity newEntity, AVB17221EntityDiscovery entityDiscovery);
-    [Selector("didRemoveRemoteEntity:on17221EntityDiscovery:")] void DidRemoveRemoteEntityOn17221EntityDiscovery(AVB17221Entity oldEntity, AVB17221EntityDiscovery entityDiscovery);
-    [Selector("didRediscoverRemoteEntity:on17221EntityDiscovery:")] void DidRediscoverRemoteEntityOn17221EntityDiscovery(AVB17221Entity entity, AVB17221EntityDiscovery entityDiscovery);
-    [Selector("didUpdateRemoteEntity:changedProperties:on17221EntityDiscovery:")] void DidUpdateRemoteEntityChangedPropertiesOn17221EntityDiscovery(AVB17221Entity entity, AVB17221EntityPropertyChanged changedProperties, AVB17221EntityDiscovery entityDiscovery);
-    [Selector("didAddLocalEntity:on17221EntityDiscovery:")] void DidAddLocalEntityOn17221EntityDiscovery(AVB17221Entity newEntity, AVB17221EntityDiscovery entityDiscovery);
-    [Selector("didRemoveLocalEntity:on17221EntityDiscovery:")] void DidRemoveLocalEntityOn17221EntityDiscovery(AVB17221Entity oldEntity, AVB17221EntityDiscovery entityDiscovery);
-    [Selector("didRediscoverLocalEntity:on17221EntityDiscovery:")] void DidRediscoverLocalEntityOn17221EntityDiscovery(AVB17221Entity entity, AVB17221EntityDiscovery entityDiscovery);
-    [Selector("didUpdateLocalEntity:changedProperties:on17221EntityDiscovery:")] void DidUpdateLocalEntityChangedPropertiesOn17221EntityDiscovery(AVB17221Entity entity, AVB17221EntityPropertyChanged changedProperties, AVB17221EntityDiscovery entityDiscovery);
+    [Selector("didAddRemoteEntity:on17221EntityDiscovery:")]
+    void DidAddRemoteEntityOn17221EntityDiscovery(AVB17221Entity newEntity, AVB17221EntityDiscovery entityDiscovery);
+    [Selector("didRemoveRemoteEntity:on17221EntityDiscovery:")]
+    void DidRemoveRemoteEntityOn17221EntityDiscovery(AVB17221Entity oldEntity, AVB17221EntityDiscovery entityDiscovery);
+    [Selector("didRediscoverRemoteEntity:on17221EntityDiscovery:")]
+    void DidRediscoverRemoteEntityOn17221EntityDiscovery(AVB17221Entity entity, AVB17221EntityDiscovery entityDiscovery);
+    [Selector("didUpdateRemoteEntity:changedProperties:on17221EntityDiscovery:")]
+    void DidUpdateRemoteEntityChangedPropertiesOn17221EntityDiscovery(AVB17221Entity entity, AVB17221EntityPropertyChanged changedProperties, AVB17221EntityDiscovery entityDiscovery);
+    [Selector("didAddLocalEntity:on17221EntityDiscovery:")]
+    void DidAddLocalEntityOn17221EntityDiscovery(AVB17221Entity newEntity, AVB17221EntityDiscovery entityDiscovery);
+    [Selector("didRemoveLocalEntity:on17221EntityDiscovery:")]
+    void DidRemoveLocalEntityOn17221EntityDiscovery(AVB17221Entity oldEntity, AVB17221EntityDiscovery entityDiscovery);
+    [Selector("didRediscoverLocalEntity:on17221EntityDiscovery:")]
+    void DidRediscoverLocalEntityOn17221EntityDiscovery(AVB17221Entity entity, AVB17221EntityDiscovery entityDiscovery);
+    [Selector("didUpdateLocalEntity:changedProperties:on17221EntityDiscovery:")]
+    void DidUpdateLocalEntityChangedPropertiesOn17221EntityDiscovery(AVB17221Entity entity, AVB17221EntityPropertyChanged changedProperties, AVB17221EntityDiscovery entityDiscovery);
 }
 
 #endif

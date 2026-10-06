@@ -32,14 +32,16 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMXPathExpression : DOMObject
 {
-    [Selector("evaluate:type:inResult:")] public DOMXPathResult? EvaluateTypeInResult(DOMNode? contextNode, ushort type, DOMXPathResult? inResult);
+    [Selector("evaluate:type:inResult:")]
+    public DOMXPathResult? EvaluateTypeInResult(DOMNode? contextNode, ushort type, DOMXPathResult? inResult);
 }
 
 /// DOMXPathExpressionDeprecated, a category of DOMXPathExpression.
 public extern objc class DOMXPathExpression
 {
     /// Deprecated in macOS 10.5.
-    [Selector("evaluate:::")] public DOMXPathResult? Evaluate(DOMNode? contextNode, ushort type, DOMXPathResult? inResult);
+    [Selector("evaluate:::")]
+    public DOMXPathResult? Evaluate(DOMNode? contextNode, ushort type, DOMXPathResult? inResult);
 }
 
 #endif

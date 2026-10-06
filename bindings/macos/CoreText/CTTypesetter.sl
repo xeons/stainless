@@ -44,13 +44,17 @@ public extern "C" CFStringRef kCTTypesetterOptionDisableBidiProcessing;
 
 public extern "C" CFStringRef kCTTypesetterOptionForcedEmbeddingLevel;
 
-[ReturnsRetained] public extern "C" CTTypesetterRef CTTypesetterCreateWithAttributedString(CFAttributedStringRef string);
+[ReturnsRetained]
+public extern "C" CTTypesetterRef CTTypesetterCreateWithAttributedString(CFAttributedStringRef string);
 
-[ReturnsRetained] public extern "C" CTTypesetterRef? CTTypesetterCreateWithAttributedStringAndOptions(CFAttributedStringRef string, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CTTypesetterRef? CTTypesetterCreateWithAttributedStringAndOptions(CFAttributedStringRef string, CFDictionaryRef? options);
 
-[ReturnsRetained] public extern "C" CTLineRef CTTypesetterCreateLineWithOffset(CTTypesetterRef typesetter, CFRange stringRange, double offset);
+[ReturnsRetained]
+public extern "C" CTLineRef CTTypesetterCreateLineWithOffset(CTTypesetterRef typesetter, CFRange stringRange, double offset);
 
-[ReturnsRetained] public extern "C" CTLineRef CTTypesetterCreateLine(CTTypesetterRef typesetter, CFRange stringRange);
+[ReturnsRetained]
+public extern "C" CTLineRef CTTypesetterCreateLine(CTTypesetterRef typesetter, CFRange stringRange);
 
 public extern "C" CFIndex CTTypesetterSuggestLineBreakWithOffset(CTTypesetterRef typesetter, CFIndex startIndex, double width, double offset);
 

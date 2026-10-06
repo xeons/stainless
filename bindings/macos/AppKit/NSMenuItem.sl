@@ -33,52 +33,92 @@ import Standard.ObjC;
 
 public extern objc class NSMenuItem : NSObject, NSCopying, NSCoding, NSValidatedUserInterfaceItem, NSUserInterfaceItemIdentification, NSAccessibilityElementProtocol, NSAccessibility
 {
-    [Selector("usesUserKeyEquivalents", "setUsesUserKeyEquivalents:")] public static bool UsesUserKeyEquivalents { get; set; }
+    [Selector("usesUserKeyEquivalents", "setUsesUserKeyEquivalents:")]
+    public static bool UsesUserKeyEquivalents { get; set; }
     /// macOS 15.2 and later.
-    [Selector("writingToolsItems")] public static NSArray? WritingToolsItems { get; }
-    [Selector("menu", "setMenu:")] public NSMenu? Menu { get; set; }
-    [Selector("hasSubmenu")] public bool HasSubmenu { get; }
-    [Selector("submenu", "setSubmenu:")] public NSMenu? Submenu { get; set; }
-    [Selector("parentItem")] public NSMenuItem? ParentItem { get; }
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("attributedTitle", "setAttributedTitle:")] public NSAttributedString? AttributedTitle { get; set; }
-    [Selector("subtitle", "setSubtitle:")] public NSString? Subtitle { get; set; }
-    [Selector("isSeparatorItem")] public bool SeparatorItem { get; }
-    [Selector("isSectionHeader")] public bool SectionHeader { get; }
-    [Selector("keyEquivalent", "setKeyEquivalent:")] public NSString KeyEquivalent { get; set; }
-    [Selector("keyEquivalentModifierMask", "setKeyEquivalentModifierMask:")] public NSEventModifierFlags KeyEquivalentModifierMask { get; set; }
-    [Selector("userKeyEquivalent")] public NSString UserKeyEquivalent { get; }
-    [Selector("allowsKeyEquivalentWhenHidden", "setAllowsKeyEquivalentWhenHidden:")] public bool AllowsKeyEquivalentWhenHidden { get; set; }
-    [Selector("allowsAutomaticKeyEquivalentLocalization", "setAllowsAutomaticKeyEquivalentLocalization:")] public bool AllowsAutomaticKeyEquivalentLocalization { get; set; }
-    [Selector("allowsAutomaticKeyEquivalentMirroring", "setAllowsAutomaticKeyEquivalentMirroring:")] public bool AllowsAutomaticKeyEquivalentMirroring { get; set; }
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("state", "setState:")] public NSControlStateValue State { get; set; }
-    [Selector("onStateImage", "setOnStateImage:")] public NSImage? OnStateImage { get; set; }
-    [Selector("offStateImage", "setOffStateImage:")] public NSImage? OffStateImage { get; set; }
-    [Selector("mixedStateImage", "setMixedStateImage:")] public NSImage? MixedStateImage { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("isAlternate", "setAlternate:")] public bool Alternate { get; set; }
-    [Selector("indentationLevel", "setIndentationLevel:")] public NSInteger IndentationLevel { get; set; }
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
-    [Selector("action", "setAction:")] public Selector Action { get; set; }
-    [Selector("tag", "setTag:")] public NSInteger Tag { get; set; }
-    [Selector("representedObject", "setRepresentedObject:")] public AnyObject? RepresentedObject { get; set; }
-    [Selector("view", "setView:")] public NSView? View { get; set; }
-    [Selector("isHighlighted")] public bool Highlighted { get; }
-    [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
-    [Selector("isHiddenOrHasHiddenAncestor")] public bool HiddenOrHasHiddenAncestor { get; }
-    [Selector("toolTip", "setToolTip:")] public NSString? ToolTip { get; set; }
-    [Selector("badge", "setBadge:")] public NSMenuItemBadge? Badge { get; set; }
-    [Selector("separatorItem")] public static NSMenuItem ClassSeparatorItem();
-    [Selector("sectionHeaderWithTitle:")] public static Self SectionHeaderWithTitle(NSString title);
-    [Selector("initWithTitle:action:keyEquivalent:")] public Self InitWithTitleActionKeyEquivalent(NSString string, Selector selector, NSString charCode);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
+    [Selector("writingToolsItems")]
+    public static NSArray? WritingToolsItems { get; }
+    [Selector("menu", "setMenu:")]
+    public NSMenu? Menu { get; set; }
+    [Selector("hasSubmenu")]
+    public bool HasSubmenu { get; }
+    [Selector("submenu", "setSubmenu:")]
+    public NSMenu? Submenu { get; set; }
+    [Selector("parentItem")]
+    public NSMenuItem? ParentItem { get; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("attributedTitle", "setAttributedTitle:")]
+    public NSAttributedString? AttributedTitle { get; set; }
+    [Selector("subtitle", "setSubtitle:")]
+    public NSString? Subtitle { get; set; }
+    [Selector("isSeparatorItem")]
+    public bool SeparatorItem { get; }
+    [Selector("isSectionHeader")]
+    public bool SectionHeader { get; }
+    [Selector("keyEquivalent", "setKeyEquivalent:")]
+    public NSString KeyEquivalent { get; set; }
+    [Selector("keyEquivalentModifierMask", "setKeyEquivalentModifierMask:")]
+    public NSEventModifierFlags KeyEquivalentModifierMask { get; set; }
+    [Selector("userKeyEquivalent")]
+    public NSString UserKeyEquivalent { get; }
+    [Selector("allowsKeyEquivalentWhenHidden", "setAllowsKeyEquivalentWhenHidden:")]
+    public bool AllowsKeyEquivalentWhenHidden { get; set; }
+    [Selector("allowsAutomaticKeyEquivalentLocalization", "setAllowsAutomaticKeyEquivalentLocalization:")]
+    public bool AllowsAutomaticKeyEquivalentLocalization { get; set; }
+    [Selector("allowsAutomaticKeyEquivalentMirroring", "setAllowsAutomaticKeyEquivalentMirroring:")]
+    public bool AllowsAutomaticKeyEquivalentMirroring { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("state", "setState:")]
+    public NSControlStateValue State { get; set; }
+    [Selector("onStateImage", "setOnStateImage:")]
+    public NSImage? OnStateImage { get; set; }
+    [Selector("offStateImage", "setOffStateImage:")]
+    public NSImage? OffStateImage { get; set; }
+    [Selector("mixedStateImage", "setMixedStateImage:")]
+    public NSImage? MixedStateImage { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("isAlternate", "setAlternate:")]
+    public bool Alternate { get; set; }
+    [Selector("indentationLevel", "setIndentationLevel:")]
+    public NSInteger IndentationLevel { get; set; }
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
+    [Selector("action", "setAction:")]
+    public Selector Action { get; set; }
+    [Selector("tag", "setTag:")]
+    public NSInteger Tag { get; set; }
+    [Selector("representedObject", "setRepresentedObject:")]
+    public AnyObject? RepresentedObject { get; set; }
+    [Selector("view", "setView:")]
+    public NSView? View { get; set; }
+    [Selector("isHighlighted")]
+    public bool Highlighted { get; }
+    [Selector("isHidden", "setHidden:")]
+    public bool Hidden { get; set; }
+    [Selector("isHiddenOrHasHiddenAncestor")]
+    public bool HiddenOrHasHiddenAncestor { get; }
+    [Selector("toolTip", "setToolTip:")]
+    public NSString? ToolTip { get; set; }
+    [Selector("badge", "setBadge:")]
+    public NSMenuItemBadge? Badge { get; set; }
+    [Selector("separatorItem")]
+    public static NSMenuItem ClassSeparatorItem();
+    [Selector("sectionHeaderWithTitle:")]
+    public static Self SectionHeaderWithTitle(NSString title);
+    [Selector("initWithTitle:action:keyEquivalent:")]
+    public Self InitWithTitleActionKeyEquivalent(NSString string, Selector selector, NSString charCode);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
 }
 
 /// NSViewEnclosingMenuItem, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("enclosingMenuItem")] public NSMenuItem? EnclosingMenuItem { get; }
+    [Selector("enclosingMenuItem")]
+    public NSMenuItem? EnclosingMenuItem { get; }
 }
 
 public extern "C" NSUserInterfaceItemIdentifier? NSMenuItemImportFromDeviceIdentifier;
@@ -87,13 +127,17 @@ public extern "C" NSUserInterfaceItemIdentifier? NSMenuItemImportFromDeviceIdent
 public extern objc class NSMenuItem
 {
     /// Deprecated in macOS 10.6.
-    [Selector("setMnemonicLocation:")] public void SetMnemonicLocation(NSUInteger location);
+    [Selector("setMnemonicLocation:")]
+    public void SetMnemonicLocation(NSUInteger location);
     /// Deprecated in macOS 10.6.
-    [Selector("mnemonicLocation")] public NSUInteger MnemonicLocation();
+    [Selector("mnemonicLocation")]
+    public NSUInteger MnemonicLocation();
     /// Deprecated in macOS 10.6.
-    [Selector("mnemonic")] public NSString? Mnemonic();
+    [Selector("mnemonic")]
+    public NSString? Mnemonic();
     /// Deprecated in macOS 10.13.
-    [Selector("setTitleWithMnemonic:")] public void SetTitleWithMnemonic(NSString stringWithAmpersand);
+    [Selector("setTitleWithMnemonic:")]
+    public void SetTitleWithMnemonic(NSString stringWithAmpersand);
 }
 
 #endif

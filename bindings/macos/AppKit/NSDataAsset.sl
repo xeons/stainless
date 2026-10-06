@@ -35,11 +35,16 @@ public using NSDataAssetName = NSString;
 
 public extern objc class NSDataAsset : NSObject, NSCopying
 {
-    [Selector("name")] public NSDataAssetName Name { get; }
-    [Selector("data")] public NSData Data { get; }
-    [Selector("typeIdentifier")] public NSString TypeIdentifier { get; }
-    [Selector("initWithName:")] public Self? InitWithName(NSDataAssetName name);
-    [Selector("initWithName:bundle:")] public Self? InitWithNameBundle(NSDataAssetName name, NSBundle bundle);
+    [Selector("name")]
+    public NSDataAssetName Name { get; }
+    [Selector("data")]
+    public NSData Data { get; }
+    [Selector("typeIdentifier")]
+    public NSString TypeIdentifier { get; }
+    [Selector("initWithName:")]
+    public Self? InitWithName(NSDataAssetName name);
+    [Selector("initWithName:bundle:")]
+    public Self? InitWithNameBundle(NSDataAssetName name, NSBundle bundle);
 }
 
 #endif

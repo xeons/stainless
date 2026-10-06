@@ -34,17 +34,28 @@ import Standard.ObjC;
 /// NSAccessibility, a category of SKNode.
 public extern objc class SKNode
 {
-    [Selector("isAccessibilityElement", "setAccessibilityElement:")] public bool AccessibilityElement { get; set; }
-    [Selector("accessibilityRole", "setAccessibilityRole:")] public NSString? AccessibilityRole { get; set; }
-    [Selector("accessibilityRoleDescription", "setAccessibilityRoleDescription:")] public NSString? AccessibilityRoleDescription { get; set; }
-    [Selector("accessibilitySubrole", "setAccessibilitySubrole:")] public NSString? AccessibilitySubrole { get; set; }
-    [Selector("accessibilityFrame", "setAccessibilityFrame:")] public CGRect AccessibilityFrame { get; set; }
-    [Selector("accessibilityParent", "setAccessibilityParent:")] public AnyObject? AccessibilityParent { get; set; }
-    [Selector("accessibilityChildren", "setAccessibilityChildren:")] public NSArray? AccessibilityChildren { get; set; }
-    [Selector("accessibilityHelp", "setAccessibilityHelp:")] public NSString? AccessibilityHelp { get; set; }
-    [Selector("accessibilityLabel", "setAccessibilityLabel:")] public NSString? AccessibilityLabel { get; set; }
-    [Selector("isAccessibilityEnabled", "setAccessibilityEnabled:")] public bool AccessibilityEnabled { get; set; }
-    [Selector("accessibilityHitTest:")] public AnyObject? AccessibilityHitTest(CGPoint point);
+    [Selector("isAccessibilityElement", "setAccessibilityElement:")]
+    public bool AccessibilityElement { get; set; }
+    [Selector("accessibilityRole", "setAccessibilityRole:")]
+    public NSString? AccessibilityRole { get; set; }
+    [Selector("accessibilityRoleDescription", "setAccessibilityRoleDescription:")]
+    public NSString? AccessibilityRoleDescription { get; set; }
+    [Selector("accessibilitySubrole", "setAccessibilitySubrole:")]
+    public NSString? AccessibilitySubrole { get; set; }
+    [Selector("accessibilityFrame", "setAccessibilityFrame:")]
+    public CGRect AccessibilityFrame { get; set; }
+    [Selector("accessibilityParent", "setAccessibilityParent:")]
+    public AnyObject? AccessibilityParent { get; set; }
+    [Selector("accessibilityChildren", "setAccessibilityChildren:")]
+    public NSArray? AccessibilityChildren { get; set; }
+    [Selector("accessibilityHelp", "setAccessibilityHelp:")]
+    public NSString? AccessibilityHelp { get; set; }
+    [Selector("accessibilityLabel", "setAccessibilityLabel:")]
+    public NSString? AccessibilityLabel { get; set; }
+    [Selector("isAccessibilityEnabled", "setAccessibilityEnabled:")]
+    public bool AccessibilityEnabled { get; set; }
+    [Selector("accessibilityHitTest:")]
+    public AnyObject? AccessibilityHitTest(CGPoint point);
 }
 
 #endif

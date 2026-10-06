@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationPublicKeyCredentialPRFAssertionOutput : NSObject
 {
-    [Selector("first")] public NSData First { get; }
-    [Selector("second")] public NSData? Second { get; }
+    [Selector("first")]
+    public NSData First { get; }
+    [Selector("second")]
+    public NSData? Second { get; }
 }
 
 #endif

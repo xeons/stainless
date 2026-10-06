@@ -45,24 +45,39 @@ public objc closure void SFSpeechRecognizerRecognitionTaskWithRequestResultHandl
 
 public extern objc class SFSpeechRecognizer : NSObject
 {
-    [Selector("isAvailable")] public bool Available { get; }
-    [Selector("locale")] public NSLocale Locale { get; }
-    [Selector("supportsOnDeviceRecognition", "setSupportsOnDeviceRecognition:")] public bool SupportsOnDeviceRecognition { get; set; }
-    [Selector("delegate", "setDelegate:")] public SFSpeechRecognizerDelegate? Delegate { get; set; }
-    [Selector("defaultTaskHint", "setDefaultTaskHint:")] public SFSpeechRecognitionTaskHint DefaultTaskHint { get; set; }
-    [Selector("queue", "setQueue:")] public NSOperationQueue Queue { get; set; }
-    [Selector("supportedLocales")] public static NSSet SupportedLocales();
-    [Selector("authorizationStatus")] public static SFSpeechRecognizerAuthorizationStatus AuthorizationStatus();
-    [Selector("requestAuthorization:")] public static void RequestAuthorization(SFSpeechRecognizerRequestAuthorizationHandlerBlock handler);
-    [Selector("init")] public Self? Init();
-    [Selector("initWithLocale:")] public Self? InitWithLocale(NSLocale locale);
-    [Selector("recognitionTaskWithRequest:resultHandler:")] public SFSpeechRecognitionTask RecognitionTaskWithRequestResultHandler(SFSpeechRecognitionRequest request, SFSpeechRecognizerRecognitionTaskWithRequestResultHandlerResultHandlerBlock resultHandler);
-    [Selector("recognitionTaskWithRequest:delegate:")] public SFSpeechRecognitionTask RecognitionTaskWithRequestDelegate(SFSpeechRecognitionRequest request, SFSpeechRecognitionTaskDelegate @delegate);
+    [Selector("isAvailable")]
+    public bool Available { get; }
+    [Selector("locale")]
+    public NSLocale Locale { get; }
+    [Selector("supportsOnDeviceRecognition", "setSupportsOnDeviceRecognition:")]
+    public bool SupportsOnDeviceRecognition { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public SFSpeechRecognizerDelegate? Delegate { get; set; }
+    [Selector("defaultTaskHint", "setDefaultTaskHint:")]
+    public SFSpeechRecognitionTaskHint DefaultTaskHint { get; set; }
+    [Selector("queue", "setQueue:")]
+    public NSOperationQueue Queue { get; set; }
+    [Selector("supportedLocales")]
+    public static NSSet SupportedLocales();
+    [Selector("authorizationStatus")]
+    public static SFSpeechRecognizerAuthorizationStatus AuthorizationStatus();
+    [Selector("requestAuthorization:")]
+    public static void RequestAuthorization(SFSpeechRecognizerRequestAuthorizationHandlerBlock handler);
+    [Selector("init")]
+    public Self? Init();
+    [Selector("initWithLocale:")]
+    public Self? InitWithLocale(NSLocale locale);
+    [Selector("recognitionTaskWithRequest:resultHandler:")]
+    public SFSpeechRecognitionTask RecognitionTaskWithRequestResultHandler(SFSpeechRecognitionRequest request, SFSpeechRecognizerRecognitionTaskWithRequestResultHandlerResultHandlerBlock resultHandler);
+    [Selector("recognitionTaskWithRequest:delegate:")]
+    public SFSpeechRecognitionTask RecognitionTaskWithRequestDelegate(SFSpeechRecognitionRequest request, SFSpeechRecognitionTaskDelegate @delegate);
 }
 
 public objc interface SFSpeechRecognizerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("speechRecognizer:availabilityDidChange:")] void SpeechRecognizerAvailabilityDidChange(SFSpeechRecognizer speechRecognizer, bool available);
+    [Optional]
+    [Selector("speechRecognizer:availabilityDidChange:")]
+    void SpeechRecognizerAvailabilityDidChange(SFSpeechRecognizer speechRecognizer, bool available);
 }
 
 #endif

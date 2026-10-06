@@ -61,26 +61,36 @@ public objc closure void CNAssetSpatialAudioInfoLoadFromAssetCompletionHandlerCo
 /// macOS 26.0 and later.
 public extern objc class CNAssetSpatialAudioInfo : NSObject
 {
-    [Selector("isSupported")] public static bool IsSupported { get; }
-    [Selector("checkIfContainsSpatialAudio:completionHandler:")] public static void CheckIfContainsSpatialAudioCompletionHandler(AVAsset asset, CNAssetSpatialAudioInfoCheckIfContainsSpatialAudioCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("loadFromAsset:completionHandler:")] public static void LoadFromAssetCompletionHandler(AVAsset asset, CNAssetSpatialAudioInfoLoadFromAssetCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("isSupported")]
+    public static bool IsSupported { get; }
+    [Selector("checkIfContainsSpatialAudio:completionHandler:")]
+    public static void CheckIfContainsSpatialAudioCompletionHandler(AVAsset asset, CNAssetSpatialAudioInfoCheckIfContainsSpatialAudioCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadFromAsset:completionHandler:")]
+    public static void LoadFromAssetCompletionHandler(AVAsset asset, CNAssetSpatialAudioInfoLoadFromAssetCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 /// Properties, a category of CNAssetSpatialAudioInfo.
 public extern objc class CNAssetSpatialAudioInfo
 {
-    [Selector("defaultSpatialAudioTrack")] public AVAssetTrack DefaultSpatialAudioTrack { get; }
-    [Selector("defaultEffectIntensity")] public float DefaultEffectIntensity { get; }
-    [Selector("defaultRenderingStyle")] public CNSpatialAudioRenderingStyle DefaultRenderingStyle { get; }
-    [Selector("spatialAudioMixMetadata")] public NSData SpatialAudioMixMetadata { get; }
+    [Selector("defaultSpatialAudioTrack")]
+    public AVAssetTrack DefaultSpatialAudioTrack { get; }
+    [Selector("defaultEffectIntensity")]
+    public float DefaultEffectIntensity { get; }
+    [Selector("defaultRenderingStyle")]
+    public CNSpatialAudioRenderingStyle DefaultRenderingStyle { get; }
+    [Selector("spatialAudioMixMetadata")]
+    public NSData SpatialAudioMixMetadata { get; }
 }
 
 /// SynthesizeAVFoundationObjects, a category of CNAssetSpatialAudioInfo.
 public extern objc class CNAssetSpatialAudioInfo
 {
-    [Selector("audioMixWithEffectIntensity:renderingStyle:")] public AVAudioMix AudioMixWithEffectIntensityRenderingStyle(float effectIntensity, CNSpatialAudioRenderingStyle renderingStyle);
-    [Selector("assetReaderOutputSettingsForContentType:")] public NSDictionary AssetReaderOutputSettingsForContentType(CNSpatialAudioContentType contentType);
-    [Selector("assetWriterInputSettingsForContentType:")] public NSDictionary AssetWriterInputSettingsForContentType(CNSpatialAudioContentType contentType);
+    [Selector("audioMixWithEffectIntensity:renderingStyle:")]
+    public AVAudioMix AudioMixWithEffectIntensityRenderingStyle(float effectIntensity, CNSpatialAudioRenderingStyle renderingStyle);
+    [Selector("assetReaderOutputSettingsForContentType:")]
+    public NSDictionary AssetReaderOutputSettingsForContentType(CNSpatialAudioContentType contentType);
+    [Selector("assetWriterInputSettingsForContentType:")]
+    public NSDictionary AssetWriterInputSettingsForContentType(CNSpatialAudioContentType contentType);
 }
 
 #endif

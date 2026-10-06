@@ -37,11 +37,16 @@ public const int DOM_DOM_DELTA_PAGE = 2;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMWheelEvent : DOMMouseEvent
 {
-    [Selector("wheelDeltaX")] public int WheelDeltaX { get; }
-    [Selector("wheelDeltaY")] public int WheelDeltaY { get; }
-    [Selector("wheelDelta")] public int WheelDelta { get; }
-    [Selector("isHorizontal")] public bool IsHorizontal { get; }
-    [Selector("initWheelEvent:wheelDeltaY:view:screenX:screenY:clientX:clientY:ctrlKey:altKey:shiftKey:metaKey:")] public void InitWheelEventWheelDeltaYViewScreenXScreenYClientXClientYCtrlKeyAltKeyShiftKeyMetaKey(int wheelDeltaX, int wheelDeltaY, DOMAbstractView? view, int screenX, int screenY, int clientX, int clientY, bool ctrlKey, bool altKey, bool shiftKey, bool metaKey);
+    [Selector("wheelDeltaX")]
+    public int WheelDeltaX { get; }
+    [Selector("wheelDeltaY")]
+    public int WheelDeltaY { get; }
+    [Selector("wheelDelta")]
+    public int WheelDelta { get; }
+    [Selector("isHorizontal")]
+    public bool IsHorizontal { get; }
+    [Selector("initWheelEvent:wheelDeltaY:view:screenX:screenY:clientX:clientY:ctrlKey:altKey:shiftKey:metaKey:")]
+    public void InitWheelEventWheelDeltaYViewScreenXScreenYClientXClientYCtrlKeyAltKeyShiftKeyMetaKey(int wheelDeltaX, int wheelDeltaY, DOMAbstractView? view, int screenX, int screenY, int clientX, int clientY, bool ctrlKey, bool altKey, bool shiftKey, bool metaKey);
 }
 
 #endif

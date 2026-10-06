@@ -38,13 +38,20 @@ public objc closure void SFCertificatePresentationPresentSheetInWindowDismissHan
 /// macOS 15.4 and later.
 public extern objc class SFCertificatePresentation : NSObject
 {
-    [Selector("trust")] public SecTrustRef Trust { get; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("message", "setMessage:")] public NSString? Message { get; set; }
-    [Selector("helpURL", "setHelpURL:")] public NSURL? HelpURL { get; set; }
-    [Selector("initWithTrust:")] public Self InitWithTrust(SecTrustRef trust);
-    [Selector("presentSheetInWindow:dismissHandler:")] public void PresentSheetInWindowDismissHandler(NSWindow window, SFCertificatePresentationPresentSheetInWindowDismissHandlerDismissHandlerBlock? dismissHandler);
-    [Selector("dismissSheet")] public void DismissSheet();
+    [Selector("trust")]
+    public SecTrustRef Trust { get; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("message", "setMessage:")]
+    public NSString? Message { get; set; }
+    [Selector("helpURL", "setHelpURL:")]
+    public NSURL? HelpURL { get; set; }
+    [Selector("initWithTrust:")]
+    public Self InitWithTrust(SecTrustRef trust);
+    [Selector("presentSheetInWindow:dismissHandler:")]
+    public void PresentSheetInWindowDismissHandler(NSWindow window, SFCertificatePresentationPresentSheetInWindowDismissHandlerDismissHandlerBlock? dismissHandler);
+    [Selector("dismissSheet")]
+    public void DismissSheet();
 }
 
 #endif

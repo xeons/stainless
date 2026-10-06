@@ -32,13 +32,20 @@ import Standard.ObjC;
 
 public extern objc class NSUUID : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("UUIDString")] public NSString UUIDString { get; }
-    [Selector("UUID")] public static Self UUID();
-    [Selector("init")] public Self Init();
-    [Selector("initWithUUIDString:")] public Self? InitWithUUIDString(NSString string);
-    [Selector("initWithUUIDBytes:")] public Self InitWithUUIDBytes(byte* bytes);
-    [Selector("getUUIDBytes:")] public void GetUUIDBytes(byte* uuid);
-    [Selector("compare:")] public NSComparisonResult Compare(NSUUID otherUUID);
+    [Selector("UUIDString")]
+    public NSString UUIDString { get; }
+    [Selector("UUID")]
+    public static Self UUID();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithUUIDString:")]
+    public Self? InitWithUUIDString(NSString string);
+    [Selector("initWithUUIDBytes:")]
+    public Self InitWithUUIDBytes(byte* bytes);
+    [Selector("getUUIDBytes:")]
+    public void GetUUIDBytes(byte* uuid);
+    [Selector("compare:")]
+    public NSComparisonResult Compare(NSUUID otherUUID);
 }
 
 #endif

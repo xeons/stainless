@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class DDDiscoverySession : NSObject
 {
-    [Selector("reportEvent:")] public void ReportEvent(DDDeviceEvent inEvent);
+    [Selector("reportEvent:")]
+    public void ReportEvent(DDDeviceEvent inEvent);
 }
 
 #endif

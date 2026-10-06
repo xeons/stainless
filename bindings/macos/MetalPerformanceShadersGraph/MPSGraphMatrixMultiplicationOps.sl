@@ -34,10 +34,14 @@ import Standard.ObjC;
 /// MPSGraphMatrixMultiplicationOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("matrixMultiplicationWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor MatrixMultiplicationWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    [Selector("HammingDistanceWithPrimaryTensor:secondaryTensor:resultDataType:name:")] public MPSGraphTensor HammingDistanceWithPrimaryTensorSecondaryTensorResultDataTypeName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, MPSDataType resultDataType, NSString? name);
-    [Selector("scaledDotProductAttentionWithQueryTensor:keyTensor:valueTensor:maskTensor:scale:name:")] public MPSGraphTensor ScaledDotProductAttentionWithQueryTensorKeyTensorValueTensorMaskTensorScaleName(MPSGraphTensor queryTensor, MPSGraphTensor keyTensor, MPSGraphTensor valueTensor, MPSGraphTensor? maskTensor, float scale, NSString? name);
-    [Selector("scaledDotProductAttentionWithQueryTensor:keyTensor:valueTensor:scale:name:")] public MPSGraphTensor ScaledDotProductAttentionWithQueryTensorKeyTensorValueTensorScaleName(MPSGraphTensor queryTensor, MPSGraphTensor keyTensor, MPSGraphTensor valueTensor, float scale, NSString? name);
+    [Selector("matrixMultiplicationWithPrimaryTensor:secondaryTensor:name:")]
+    public MPSGraphTensor MatrixMultiplicationWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
+    [Selector("HammingDistanceWithPrimaryTensor:secondaryTensor:resultDataType:name:")]
+    public MPSGraphTensor HammingDistanceWithPrimaryTensorSecondaryTensorResultDataTypeName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, MPSDataType resultDataType, NSString? name);
+    [Selector("scaledDotProductAttentionWithQueryTensor:keyTensor:valueTensor:maskTensor:scale:name:")]
+    public MPSGraphTensor ScaledDotProductAttentionWithQueryTensorKeyTensorValueTensorMaskTensorScaleName(MPSGraphTensor queryTensor, MPSGraphTensor keyTensor, MPSGraphTensor valueTensor, MPSGraphTensor? maskTensor, float scale, NSString? name);
+    [Selector("scaledDotProductAttentionWithQueryTensor:keyTensor:valueTensor:scale:name:")]
+    public MPSGraphTensor ScaledDotProductAttentionWithQueryTensorKeyTensorValueTensorScaleName(MPSGraphTensor queryTensor, MPSGraphTensor keyTensor, MPSGraphTensor valueTensor, float scale, NSString? name);
 }
 
 #endif

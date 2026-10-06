@@ -79,40 +79,74 @@ public extern "C" IOSurfacePropertyKey IOSurfacePropertyKeyName;
 
 public extern objc class IOSurface : NSObject, NSSecureCoding
 {
-    [Selector("allocationSize")] public NSInteger AllocationSize { get; }
-    [Selector("width")] public NSInteger Width { get; }
-    [Selector("height")] public NSInteger Height { get; }
-    [Selector("baseAddress")] public void* BaseAddress { get; }
-    [Selector("pixelFormat")] public OSType PixelFormat { get; }
-    [Selector("bytesPerRow")] public NSInteger BytesPerRow { get; }
-    [Selector("bytesPerElement")] public NSInteger BytesPerElement { get; }
-    [Selector("elementWidth")] public NSInteger ElementWidth { get; }
-    [Selector("elementHeight")] public NSInteger ElementHeight { get; }
-    [Selector("surfaceID")] public uint SurfaceID { get; }
-    [Selector("seed")] public uint Seed { get; }
-    [Selector("planeCount")] public NSUInteger PlaneCount { get; }
-    [Selector("isInUse")] public bool InUse { get; }
-    [Selector("localUseCount")] public int LocalUseCount { get; }
-    [Selector("allowsPixelSizeCasting")] public bool AllowsPixelSizeCasting { get; }
-    [Selector("initWithProperties:")] public Self? InitWithProperties(NSDictionary properties);
-    [Selector("lockWithOptions:seed:")] public kern_return_t LockWithOptionsSeed(IOSurfaceLockOptions options, uint* seed);
-    [Selector("unlockWithOptions:seed:")] public kern_return_t UnlockWithOptionsSeed(IOSurfaceLockOptions options, uint* seed);
-    [Selector("widthOfPlaneAtIndex:")] public NSInteger WidthOfPlaneAtIndex(NSUInteger planeIndex);
-    [Selector("heightOfPlaneAtIndex:")] public NSInteger HeightOfPlaneAtIndex(NSUInteger planeIndex);
-    [Selector("bytesPerRowOfPlaneAtIndex:")] public NSInteger BytesPerRowOfPlaneAtIndex(NSUInteger planeIndex);
-    [Selector("bytesPerElementOfPlaneAtIndex:")] public NSInteger BytesPerElementOfPlaneAtIndex(NSUInteger planeIndex);
-    [Selector("elementWidthOfPlaneAtIndex:")] public NSInteger ElementWidthOfPlaneAtIndex(NSUInteger planeIndex);
-    [Selector("elementHeightOfPlaneAtIndex:")] public NSInteger ElementHeightOfPlaneAtIndex(NSUInteger planeIndex);
-    [Selector("baseAddressOfPlaneAtIndex:")] public void* BaseAddressOfPlaneAtIndex(NSUInteger planeIndex);
-    [Selector("setAttachment:forKey:")] public void SetAttachmentForKey(AnyObject anObject, NSString key);
-    [Selector("attachmentForKey:")] public AnyObject? AttachmentForKey(NSString key);
-    [Selector("removeAttachmentForKey:")] public void RemoveAttachmentForKey(NSString key);
-    [Selector("setAllAttachments:")] public void SetAllAttachments(NSDictionary dict);
-    [Selector("allAttachments")] public NSDictionary? AllAttachments();
-    [Selector("removeAllAttachments")] public void RemoveAllAttachments();
-    [Selector("incrementUseCount")] public void IncrementUseCount();
-    [Selector("decrementUseCount")] public void DecrementUseCount();
-    [Selector("setPurgeable:oldState:")] public kern_return_t SetPurgeableOldState(IOSurfacePurgeabilityState newState, IOSurfacePurgeabilityState* oldState);
+    [Selector("allocationSize")]
+    public NSInteger AllocationSize { get; }
+    [Selector("width")]
+    public NSInteger Width { get; }
+    [Selector("height")]
+    public NSInteger Height { get; }
+    [Selector("baseAddress")]
+    public void* BaseAddress { get; }
+    [Selector("pixelFormat")]
+    public OSType PixelFormat { get; }
+    [Selector("bytesPerRow")]
+    public NSInteger BytesPerRow { get; }
+    [Selector("bytesPerElement")]
+    public NSInteger BytesPerElement { get; }
+    [Selector("elementWidth")]
+    public NSInteger ElementWidth { get; }
+    [Selector("elementHeight")]
+    public NSInteger ElementHeight { get; }
+    [Selector("surfaceID")]
+    public uint SurfaceID { get; }
+    [Selector("seed")]
+    public uint Seed { get; }
+    [Selector("planeCount")]
+    public NSUInteger PlaneCount { get; }
+    [Selector("isInUse")]
+    public bool InUse { get; }
+    [Selector("localUseCount")]
+    public int LocalUseCount { get; }
+    [Selector("allowsPixelSizeCasting")]
+    public bool AllowsPixelSizeCasting { get; }
+    [Selector("initWithProperties:")]
+    public Self? InitWithProperties(NSDictionary properties);
+    [Selector("lockWithOptions:seed:")]
+    public kern_return_t LockWithOptionsSeed(IOSurfaceLockOptions options, uint* seed);
+    [Selector("unlockWithOptions:seed:")]
+    public kern_return_t UnlockWithOptionsSeed(IOSurfaceLockOptions options, uint* seed);
+    [Selector("widthOfPlaneAtIndex:")]
+    public NSInteger WidthOfPlaneAtIndex(NSUInteger planeIndex);
+    [Selector("heightOfPlaneAtIndex:")]
+    public NSInteger HeightOfPlaneAtIndex(NSUInteger planeIndex);
+    [Selector("bytesPerRowOfPlaneAtIndex:")]
+    public NSInteger BytesPerRowOfPlaneAtIndex(NSUInteger planeIndex);
+    [Selector("bytesPerElementOfPlaneAtIndex:")]
+    public NSInteger BytesPerElementOfPlaneAtIndex(NSUInteger planeIndex);
+    [Selector("elementWidthOfPlaneAtIndex:")]
+    public NSInteger ElementWidthOfPlaneAtIndex(NSUInteger planeIndex);
+    [Selector("elementHeightOfPlaneAtIndex:")]
+    public NSInteger ElementHeightOfPlaneAtIndex(NSUInteger planeIndex);
+    [Selector("baseAddressOfPlaneAtIndex:")]
+    public void* BaseAddressOfPlaneAtIndex(NSUInteger planeIndex);
+    [Selector("setAttachment:forKey:")]
+    public void SetAttachmentForKey(AnyObject anObject, NSString key);
+    [Selector("attachmentForKey:")]
+    public AnyObject? AttachmentForKey(NSString key);
+    [Selector("removeAttachmentForKey:")]
+    public void RemoveAttachmentForKey(NSString key);
+    [Selector("setAllAttachments:")]
+    public void SetAllAttachments(NSDictionary dict);
+    [Selector("allAttachments")]
+    public NSDictionary? AllAttachments();
+    [Selector("removeAllAttachments")]
+    public void RemoveAllAttachments();
+    [Selector("incrementUseCount")]
+    public void IncrementUseCount();
+    [Selector("decrementUseCount")]
+    public void DecrementUseCount();
+    [Selector("setPurgeable:oldState:")]
+    public kern_return_t SetPurgeableOldState(IOSurfacePurgeabilityState newState, IOSurfacePurgeabilityState* oldState);
 }
 
 /// Deprecated in macOS 10.14.

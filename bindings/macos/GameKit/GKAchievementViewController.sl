@@ -33,13 +33,15 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.10.
 public extern objc class GKAchievementViewController : GKGameCenterViewController
 {
-    [Selector("achievementDelegate", "setAchievementDelegate:")] public GKAchievementViewControllerDelegate? AchievementDelegate { get; set; }
+    [Selector("achievementDelegate", "setAchievementDelegate:")]
+    public GKAchievementViewControllerDelegate? AchievementDelegate { get; set; }
 }
 
 /// Deprecated in macOS 10.10.
 public objc interface GKAchievementViewControllerDelegate : NSObjectProtocol
 {
-    [Selector("achievementViewControllerDidFinish:")] void AchievementViewControllerDidFinish(GKAchievementViewController? viewController);
+    [Selector("achievementViewControllerDidFinish:")]
+    void AchievementViewControllerDidFinish(GKAchievementViewController? viewController);
 }
 
 #endif

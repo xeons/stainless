@@ -41,29 +41,46 @@ public extern "C" NSFileProviderPage NSFileProviderInitialPageSortedByName;
 
 public objc interface NSFileProviderEnumerationObserver : NSObjectProtocol
 {
-    [Optional] [Selector("suggestedPageSize")] NSInteger SuggestedPageSize { get; }
-    [Selector("didEnumerateItems:")] void DidEnumerateItems(NSArray updatedItems);
-    [Selector("finishEnumeratingUpToPage:")] void FinishEnumeratingUpToPage(NSFileProviderPage? nextPage);
-    [Selector("finishEnumeratingWithError:")] void FinishEnumeratingWithError(NSError error);
+    [Optional]
+    [Selector("suggestedPageSize")]
+    NSInteger SuggestedPageSize { get; }
+    [Selector("didEnumerateItems:")]
+    void DidEnumerateItems(NSArray updatedItems);
+    [Selector("finishEnumeratingUpToPage:")]
+    void FinishEnumeratingUpToPage(NSFileProviderPage? nextPage);
+    [Selector("finishEnumeratingWithError:")]
+    void FinishEnumeratingWithError(NSError error);
 }
 
 public objc interface NSFileProviderChangeObserver : NSObjectProtocol
 {
-    [Optional] [Selector("suggestedBatchSize")] NSInteger SuggestedBatchSize { get; }
-    [Selector("didUpdateItems:")] void DidUpdateItems(NSArray updatedItems);
-    [Selector("didDeleteItemsWithIdentifiers:")] void DidDeleteItemsWithIdentifiers(NSArray deletedItemIdentifiers);
-    [Selector("finishEnumeratingChangesUpToSyncAnchor:moreComing:")] void FinishEnumeratingChangesUpToSyncAnchorMoreComing(NSFileProviderSyncAnchor anchor, bool moreComing);
-    [Selector("finishEnumeratingWithError:")] void FinishEnumeratingWithError(NSError error);
+    [Optional]
+    [Selector("suggestedBatchSize")]
+    NSInteger SuggestedBatchSize { get; }
+    [Selector("didUpdateItems:")]
+    void DidUpdateItems(NSArray updatedItems);
+    [Selector("didDeleteItemsWithIdentifiers:")]
+    void DidDeleteItemsWithIdentifiers(NSArray deletedItemIdentifiers);
+    [Selector("finishEnumeratingChangesUpToSyncAnchor:moreComing:")]
+    void FinishEnumeratingChangesUpToSyncAnchorMoreComing(NSFileProviderSyncAnchor anchor, bool moreComing);
+    [Selector("finishEnumeratingWithError:")]
+    void FinishEnumeratingWithError(NSError error);
 }
 
 public objc closure void NSFileProviderEnumeratorCurrentSyncAnchorWithCompletionHandlerCompletionHandlerBlock(NSFileProviderSyncAnchor? arg0);
 
 public objc interface NSFileProviderEnumerator : NSObjectProtocol
 {
-    [Selector("invalidate")] void Invalidate();
-    [Selector("enumerateItemsForObserver:startingAtPage:")] void EnumerateItemsForObserverStartingAtPage(NSFileProviderEnumerationObserver observer, NSFileProviderPage page);
-    [Optional] [Selector("enumerateChangesForObserver:fromSyncAnchor:")] void EnumerateChangesForObserverFromSyncAnchor(NSFileProviderChangeObserver observer, NSFileProviderSyncAnchor syncAnchor);
-    [Optional] [Selector("currentSyncAnchorWithCompletionHandler:")] void CurrentSyncAnchorWithCompletionHandler(NSFileProviderEnumeratorCurrentSyncAnchorWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("invalidate")]
+    void Invalidate();
+    [Selector("enumerateItemsForObserver:startingAtPage:")]
+    void EnumerateItemsForObserverStartingAtPage(NSFileProviderEnumerationObserver observer, NSFileProviderPage page);
+    [Optional]
+    [Selector("enumerateChangesForObserver:fromSyncAnchor:")]
+    void EnumerateChangesForObserverFromSyncAnchor(NSFileProviderChangeObserver observer, NSFileProviderSyncAnchor syncAnchor);
+    [Optional]
+    [Selector("currentSyncAnchorWithCompletionHandler:")]
+    void CurrentSyncAnchorWithCompletionHandler(NSFileProviderEnumeratorCurrentSyncAnchorWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

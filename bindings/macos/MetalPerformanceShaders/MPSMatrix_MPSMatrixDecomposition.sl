@@ -41,14 +41,18 @@ public enum MPSMatrixDecompositionStatus : int
 
 public extern objc class MPSMatrixDecompositionLU : MPSMatrixUnaryKernel
 {
-    [Selector("initWithDevice:rows:columns:")] public Self InitWithDeviceRowsColumns(MTLDevice device, NSUInteger rows, NSUInteger columns);
-    [Selector("encodeToCommandBuffer:sourceMatrix:resultMatrix:pivotIndices:status:")] public void EncodeToCommandBufferSourceMatrixResultMatrixPivotIndicesStatus(MTLCommandBuffer commandBuffer, MPSMatrix sourceMatrix, MPSMatrix resultMatrix, MPSMatrix pivotIndices, MTLBuffer? status);
+    [Selector("initWithDevice:rows:columns:")]
+    public Self InitWithDeviceRowsColumns(MTLDevice device, NSUInteger rows, NSUInteger columns);
+    [Selector("encodeToCommandBuffer:sourceMatrix:resultMatrix:pivotIndices:status:")]
+    public void EncodeToCommandBufferSourceMatrixResultMatrixPivotIndicesStatus(MTLCommandBuffer commandBuffer, MPSMatrix sourceMatrix, MPSMatrix resultMatrix, MPSMatrix pivotIndices, MTLBuffer? status);
 }
 
 public extern objc class MPSMatrixDecompositionCholesky : MPSMatrixUnaryKernel
 {
-    [Selector("initWithDevice:lower:order:")] public Self InitWithDeviceLowerOrder(MTLDevice device, bool lower, NSUInteger order);
-    [Selector("encodeToCommandBuffer:sourceMatrix:resultMatrix:status:")] public void EncodeToCommandBufferSourceMatrixResultMatrixStatus(MTLCommandBuffer commandBuffer, MPSMatrix sourceMatrix, MPSMatrix resultMatrix, MTLBuffer? status);
+    [Selector("initWithDevice:lower:order:")]
+    public Self InitWithDeviceLowerOrder(MTLDevice device, bool lower, NSUInteger order);
+    [Selector("encodeToCommandBuffer:sourceMatrix:resultMatrix:status:")]
+    public void EncodeToCommandBufferSourceMatrixResultMatrixStatus(MTLCommandBuffer commandBuffer, MPSMatrix sourceMatrix, MPSMatrix resultMatrix, MTLBuffer? status);
 }
 
 #endif

@@ -34,16 +34,23 @@ import Standard.ObjC;
 /// Deprecated in macOS 15.0.
 public extern objc class SKRequest : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public SKRequestDelegate? Delegate { get; set; }
-    [Selector("cancel")] public void Cancel();
-    [Selector("start")] public void Start();
+    [Selector("delegate", "setDelegate:")]
+    public SKRequestDelegate? Delegate { get; set; }
+    [Selector("cancel")]
+    public void Cancel();
+    [Selector("start")]
+    public void Start();
 }
 
 /// Deprecated in macOS 15.0.
 public objc interface SKRequestDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("requestDidFinish:")] void RequestDidFinish(SKRequest request);
-    [Optional] [Selector("request:didFailWithError:")] void RequestDidFailWithError(SKRequest request, NSError error);
+    [Optional]
+    [Selector("requestDidFinish:")]
+    void RequestDidFinish(SKRequest request);
+    [Optional]
+    [Selector("request:didFailWithError:")]
+    void RequestDidFailWithError(SKRequest request, NSError error);
 }
 
 #endif

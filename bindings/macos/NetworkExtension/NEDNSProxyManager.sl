@@ -51,13 +51,20 @@ public objc closure void NEDNSProxyManagerSaveToPreferencesWithCompletionHandler
 
 public extern objc class NEDNSProxyManager : NSObject
 {
-    [Selector("localizedDescription", "setLocalizedDescription:")] public NSString? LocalizedDescription { get; set; }
-    [Selector("providerProtocol", "setProviderProtocol:")] public NEDNSProxyProviderProtocol? ProviderProtocol { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("sharedManager")] public static NEDNSProxyManager SharedManager();
-    [Selector("loadFromPreferencesWithCompletionHandler:")] public void LoadFromPreferencesWithCompletionHandler(NEDNSProxyManagerLoadFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("removeFromPreferencesWithCompletionHandler:")] public void RemoveFromPreferencesWithCompletionHandler(NEDNSProxyManagerRemoveFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("saveToPreferencesWithCompletionHandler:")] public void SaveToPreferencesWithCompletionHandler(NEDNSProxyManagerSaveToPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("localizedDescription", "setLocalizedDescription:")]
+    public NSString? LocalizedDescription { get; set; }
+    [Selector("providerProtocol", "setProviderProtocol:")]
+    public NEDNSProxyProviderProtocol? ProviderProtocol { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("sharedManager")]
+    public static NEDNSProxyManager SharedManager();
+    [Selector("loadFromPreferencesWithCompletionHandler:")]
+    public void LoadFromPreferencesWithCompletionHandler(NEDNSProxyManagerLoadFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("removeFromPreferencesWithCompletionHandler:")]
+    public void RemoveFromPreferencesWithCompletionHandler(NEDNSProxyManagerRemoveFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("saveToPreferencesWithCompletionHandler:")]
+    public void SaveToPreferencesWithCompletionHandler(NEDNSProxyManagerSaveToPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

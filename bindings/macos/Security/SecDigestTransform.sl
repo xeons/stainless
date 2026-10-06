@@ -64,7 +64,8 @@ public extern "C" CFStringRef? kSecDigestLengthAttribute;
 public extern "C" CFStringRef? kSecDigestHMACKeyAttribute;
 
 /// Deprecated in macOS 13.0.
-[ReturnsRetained] public extern "C" SecTransformRef SecDigestTransformCreate(CFTypeRef? digestType, CFIndex digestLength, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecTransformRef SecDigestTransformCreate(CFTypeRef? digestType, CFIndex digestLength, __CFError** error);
 
 /// Deprecated in macOS 13.0.
 public extern "C" CFTypeID SecDigestTransformGetTypeID();

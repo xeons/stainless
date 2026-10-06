@@ -115,116 +115,211 @@ public enum NSControlSize : ulong
 
 public extern objc class NSCell : NSObject, NSCopying, NSCoding, NSUserInterfaceItemIdentification, NSAccessibilityElementProtocol, NSAccessibility
 {
-    [Selector("prefersTrackingUntilMouseUp")] public static bool PrefersTrackingUntilMouseUp { get; }
-    [Selector("controlView", "setControlView:")] public NSView? ControlView { get; set; }
-    [Selector("type", "setType:")] public NSCellType Type { get; set; }
-    [Selector("state", "setState:")] public NSControlStateValue State { get; set; }
-    [Selector("target", "setTarget:")] public AnyObject? Target { get; set; }
-    [Selector("action", "setAction:")] public Selector Action { get; set; }
-    [Selector("tag", "setTag:")] public NSInteger Tag { get; set; }
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("isOpaque")] public bool Opaque { get; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("isContinuous", "setContinuous:")] public bool Continuous { get; set; }
-    [Selector("isEditable", "setEditable:")] public bool Editable { get; set; }
-    [Selector("isSelectable", "setSelectable:")] public bool Selectable { get; set; }
-    [Selector("isBordered", "setBordered:")] public bool Bordered { get; set; }
-    [Selector("isBezeled", "setBezeled:")] public bool Bezeled { get; set; }
-    [Selector("isScrollable", "setScrollable:")] public bool Scrollable { get; set; }
-    [Selector("isHighlighted", "setHighlighted:")] public bool Highlighted { get; set; }
-    [Selector("alignment", "setAlignment:")] public NSTextAlignment Alignment { get; set; }
-    [Selector("wraps", "setWraps:")] public bool Wraps { get; set; }
-    [Selector("font", "setFont:")] public NSFont? Font { get; set; }
-    [Selector("keyEquivalent")] public NSString KeyEquivalent { get; }
-    [Selector("formatter", "setFormatter:")] public NSFormatter? Formatter { get; set; }
-    [Selector("objectValue", "setObjectValue:")] public AnyObject? ObjectValue { get; set; }
-    [Selector("hasValidObjectValue")] public bool HasValidObjectValue { get; }
-    [Selector("stringValue", "setStringValue:")] public NSString StringValue { get; set; }
-    [Selector("intValue", "setIntValue:")] public int IntValue { get; set; }
-    [Selector("floatValue", "setFloatValue:")] public float FloatValue { get; set; }
-    [Selector("doubleValue", "setDoubleValue:")] public double DoubleValue { get; set; }
-    [Selector("integerValue", "setIntegerValue:")] public NSInteger IntegerValue { get; set; }
-    [Selector("image", "setImage:")] public NSImage? Image { get; set; }
-    [Selector("controlSize", "setControlSize:")] public NSControlSize ControlSize { get; set; }
-    [Selector("representedObject", "setRepresentedObject:")] public AnyObject? RepresentedObject { get; set; }
-    [Selector("cellSize")] public NSSize CellSize { get; }
-    [Selector("mouseDownFlags")] public NSInteger MouseDownFlags { get; }
-    [Selector("menu", "setMenu:")] public NSMenu? Menu { get; set; }
-    [Selector("defaultMenu")] public static NSMenu? DefaultMenu { get; }
-    [Selector("sendsActionOnEndEditing", "setSendsActionOnEndEditing:")] public bool SendsActionOnEndEditing { get; set; }
-    [Selector("baseWritingDirection", "setBaseWritingDirection:")] public NSWritingDirection BaseWritingDirection { get; set; }
-    [Selector("lineBreakMode", "setLineBreakMode:")] public NSLineBreakMode LineBreakMode { get; set; }
-    [Selector("allowsUndo", "setAllowsUndo:")] public bool AllowsUndo { get; set; }
-    [Selector("truncatesLastVisibleLine", "setTruncatesLastVisibleLine:")] public bool TruncatesLastVisibleLine { get; set; }
-    [Selector("userInterfaceLayoutDirection", "setUserInterfaceLayoutDirection:")] public NSUserInterfaceLayoutDirection UserInterfaceLayoutDirection { get; set; }
-    [Selector("usesSingleLineMode", "setUsesSingleLineMode:")] public bool UsesSingleLineMode { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initTextCell:")] public Self InitTextCell(NSString string);
-    [Selector("initImageCell:")] public Self InitImageCell(NSImage? image);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("sendActionOn:")] public NSInteger SendActionOn(NSEventMask mask);
-    [Selector("compare:")] public NSComparisonResult Compare(AnyObject otherCell);
-    [Selector("takeIntValueFrom:")] public void TakeIntValueFrom(AnyObject? sender);
-    [Selector("takeFloatValueFrom:")] public void TakeFloatValueFrom(AnyObject? sender);
-    [Selector("takeDoubleValueFrom:")] public void TakeDoubleValueFrom(AnyObject? sender);
-    [Selector("takeStringValueFrom:")] public void TakeStringValueFrom(AnyObject? sender);
-    [Selector("takeObjectValueFrom:")] public void TakeObjectValueFrom(AnyObject? sender);
-    [Selector("takeIntegerValueFrom:")] public void TakeIntegerValueFrom(AnyObject? sender);
-    [Selector("cellAttribute:")] public NSInteger CellAttribute(NSCellAttribute parameter);
-    [Selector("setCellAttribute:to:")] public void SetCellAttributeTo(NSCellAttribute parameter, NSInteger value);
-    [Selector("imageRectForBounds:")] public NSRect ImageRectForBounds(NSRect rect);
-    [Selector("titleRectForBounds:")] public NSRect TitleRectForBounds(NSRect rect);
-    [Selector("drawingRectForBounds:")] public NSRect DrawingRectForBounds(NSRect rect);
-    [Selector("_bulletStringForString:bulletCharacter:")] public static NSString _BulletStringForStringBulletCharacter(NSString string, unichar bulletChar);
-    [Selector("cellSizeForBounds:")] public NSSize CellSizeForBounds(NSRect rect);
-    [Selector("highlightColorWithFrame:inView:")] public NSColor? HighlightColorWithFrameInView(NSRect cellFrame, NSView controlView);
-    [Selector("calcDrawInfo:")] public void CalcDrawInfo(NSRect rect);
-    [Selector("setUpFieldEditorAttributes:")] public NSText SetUpFieldEditorAttributes(NSText textObj);
-    [Selector("drawInteriorWithFrame:inView:")] public void DrawInteriorWithFrameInView(NSRect cellFrame, NSView controlView);
-    [Selector("drawWithFrame:inView:")] public void DrawWithFrameInView(NSRect cellFrame, NSView controlView);
-    [Selector("highlight:withFrame:inView:")] public void HighlightWithFrameInView(bool flag, NSRect cellFrame, NSView controlView);
-    [Selector("getPeriodicDelay:interval:")] public void GetPeriodicDelayInterval(float* delay, float* interval);
-    [Selector("startTrackingAt:inView:")] public bool StartTrackingAtInView(NSPoint startPoint, NSView controlView);
-    [Selector("continueTracking:at:inView:")] public bool ContinueTrackingAtInView(NSPoint lastPoint, NSPoint currentPoint, NSView controlView);
-    [Selector("stopTracking:at:inView:mouseIsUp:")] public void StopTrackingAtInViewMouseIsUp(NSPoint lastPoint, NSPoint stopPoint, NSView controlView, bool flag);
-    [Selector("trackMouse:inRect:ofView:untilMouseUp:")] public bool TrackMouseInRectOfViewUntilMouseUp(NSEvent event, NSRect cellFrame, NSView controlView, bool flag);
-    [Selector("editWithFrame:inView:editor:delegate:event:")] public void EditWithFrameInViewEditorDelegateEvent(NSRect rect, NSView controlView, NSText textObj, AnyObject? @delegate, NSEvent? event);
-    [Selector("selectWithFrame:inView:editor:delegate:start:length:")] public void SelectWithFrameInViewEditorDelegateStartLength(NSRect rect, NSView controlView, NSText textObj, AnyObject? @delegate, NSInteger selStart, NSInteger selLength);
-    [Selector("endEditing:")] public void EndEditing(NSText textObj);
-    [Selector("resetCursorRect:inView:")] public void ResetCursorRectInView(NSRect cellFrame, NSView controlView);
-    [Selector("menuForEvent:inRect:ofView:")] public NSMenu? MenuForEventInRectOfView(NSEvent event, NSRect cellFrame, NSView view);
-    [Selector("fieldEditorForView:")] public NSTextView? FieldEditorForView(NSView controlView);
-    [Selector("draggingImageComponentsWithFrame:inView:")] public NSArray DraggingImageComponentsWithFrameInView(NSRect frame, NSView view);
+    [Selector("prefersTrackingUntilMouseUp")]
+    public static bool PrefersTrackingUntilMouseUp { get; }
+    [Selector("controlView", "setControlView:")]
+    public NSView? ControlView { get; set; }
+    [Selector("type", "setType:")]
+    public NSCellType Type { get; set; }
+    [Selector("state", "setState:")]
+    public NSControlStateValue State { get; set; }
+    [Selector("target", "setTarget:")]
+    public AnyObject? Target { get; set; }
+    [Selector("action", "setAction:")]
+    public Selector Action { get; set; }
+    [Selector("tag", "setTag:")]
+    public NSInteger Tag { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("isOpaque")]
+    public bool Opaque { get; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("isContinuous", "setContinuous:")]
+    public bool Continuous { get; set; }
+    [Selector("isEditable", "setEditable:")]
+    public bool Editable { get; set; }
+    [Selector("isSelectable", "setSelectable:")]
+    public bool Selectable { get; set; }
+    [Selector("isBordered", "setBordered:")]
+    public bool Bordered { get; set; }
+    [Selector("isBezeled", "setBezeled:")]
+    public bool Bezeled { get; set; }
+    [Selector("isScrollable", "setScrollable:")]
+    public bool Scrollable { get; set; }
+    [Selector("isHighlighted", "setHighlighted:")]
+    public bool Highlighted { get; set; }
+    [Selector("alignment", "setAlignment:")]
+    public NSTextAlignment Alignment { get; set; }
+    [Selector("wraps", "setWraps:")]
+    public bool Wraps { get; set; }
+    [Selector("font", "setFont:")]
+    public NSFont? Font { get; set; }
+    [Selector("keyEquivalent")]
+    public NSString KeyEquivalent { get; }
+    [Selector("formatter", "setFormatter:")]
+    public NSFormatter? Formatter { get; set; }
+    [Selector("objectValue", "setObjectValue:")]
+    public AnyObject? ObjectValue { get; set; }
+    [Selector("hasValidObjectValue")]
+    public bool HasValidObjectValue { get; }
+    [Selector("stringValue", "setStringValue:")]
+    public NSString StringValue { get; set; }
+    [Selector("intValue", "setIntValue:")]
+    public int IntValue { get; set; }
+    [Selector("floatValue", "setFloatValue:")]
+    public float FloatValue { get; set; }
+    [Selector("doubleValue", "setDoubleValue:")]
+    public double DoubleValue { get; set; }
+    [Selector("integerValue", "setIntegerValue:")]
+    public NSInteger IntegerValue { get; set; }
+    [Selector("image", "setImage:")]
+    public NSImage? Image { get; set; }
+    [Selector("controlSize", "setControlSize:")]
+    public NSControlSize ControlSize { get; set; }
+    [Selector("representedObject", "setRepresentedObject:")]
+    public AnyObject? RepresentedObject { get; set; }
+    [Selector("cellSize")]
+    public NSSize CellSize { get; }
+    [Selector("mouseDownFlags")]
+    public NSInteger MouseDownFlags { get; }
+    [Selector("menu", "setMenu:")]
+    public NSMenu? Menu { get; set; }
+    [Selector("defaultMenu")]
+    public static NSMenu? DefaultMenu { get; }
+    [Selector("sendsActionOnEndEditing", "setSendsActionOnEndEditing:")]
+    public bool SendsActionOnEndEditing { get; set; }
+    [Selector("baseWritingDirection", "setBaseWritingDirection:")]
+    public NSWritingDirection BaseWritingDirection { get; set; }
+    [Selector("lineBreakMode", "setLineBreakMode:")]
+    public NSLineBreakMode LineBreakMode { get; set; }
+    [Selector("allowsUndo", "setAllowsUndo:")]
+    public bool AllowsUndo { get; set; }
+    [Selector("truncatesLastVisibleLine", "setTruncatesLastVisibleLine:")]
+    public bool TruncatesLastVisibleLine { get; set; }
+    [Selector("userInterfaceLayoutDirection", "setUserInterfaceLayoutDirection:")]
+    public NSUserInterfaceLayoutDirection UserInterfaceLayoutDirection { get; set; }
+    [Selector("usesSingleLineMode", "setUsesSingleLineMode:")]
+    public bool UsesSingleLineMode { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initTextCell:")]
+    public Self InitTextCell(NSString string);
+    [Selector("initImageCell:")]
+    public Self InitImageCell(NSImage? image);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("sendActionOn:")]
+    public NSInteger SendActionOn(NSEventMask mask);
+    [Selector("compare:")]
+    public NSComparisonResult Compare(AnyObject otherCell);
+    [Selector("takeIntValueFrom:")]
+    public void TakeIntValueFrom(AnyObject? sender);
+    [Selector("takeFloatValueFrom:")]
+    public void TakeFloatValueFrom(AnyObject? sender);
+    [Selector("takeDoubleValueFrom:")]
+    public void TakeDoubleValueFrom(AnyObject? sender);
+    [Selector("takeStringValueFrom:")]
+    public void TakeStringValueFrom(AnyObject? sender);
+    [Selector("takeObjectValueFrom:")]
+    public void TakeObjectValueFrom(AnyObject? sender);
+    [Selector("takeIntegerValueFrom:")]
+    public void TakeIntegerValueFrom(AnyObject? sender);
+    [Selector("cellAttribute:")]
+    public NSInteger CellAttribute(NSCellAttribute parameter);
+    [Selector("setCellAttribute:to:")]
+    public void SetCellAttributeTo(NSCellAttribute parameter, NSInteger value);
+    [Selector("imageRectForBounds:")]
+    public NSRect ImageRectForBounds(NSRect rect);
+    [Selector("titleRectForBounds:")]
+    public NSRect TitleRectForBounds(NSRect rect);
+    [Selector("drawingRectForBounds:")]
+    public NSRect DrawingRectForBounds(NSRect rect);
+    [Selector("_bulletStringForString:bulletCharacter:")]
+    public static NSString _BulletStringForStringBulletCharacter(NSString string, unichar bulletChar);
+    [Selector("cellSizeForBounds:")]
+    public NSSize CellSizeForBounds(NSRect rect);
+    [Selector("highlightColorWithFrame:inView:")]
+    public NSColor? HighlightColorWithFrameInView(NSRect cellFrame, NSView controlView);
+    [Selector("calcDrawInfo:")]
+    public void CalcDrawInfo(NSRect rect);
+    [Selector("setUpFieldEditorAttributes:")]
+    public NSText SetUpFieldEditorAttributes(NSText textObj);
+    [Selector("drawInteriorWithFrame:inView:")]
+    public void DrawInteriorWithFrameInView(NSRect cellFrame, NSView controlView);
+    [Selector("drawWithFrame:inView:")]
+    public void DrawWithFrameInView(NSRect cellFrame, NSView controlView);
+    [Selector("highlight:withFrame:inView:")]
+    public void HighlightWithFrameInView(bool flag, NSRect cellFrame, NSView controlView);
+    [Selector("getPeriodicDelay:interval:")]
+    public void GetPeriodicDelayInterval(float* delay, float* interval);
+    [Selector("startTrackingAt:inView:")]
+    public bool StartTrackingAtInView(NSPoint startPoint, NSView controlView);
+    [Selector("continueTracking:at:inView:")]
+    public bool ContinueTrackingAtInView(NSPoint lastPoint, NSPoint currentPoint, NSView controlView);
+    [Selector("stopTracking:at:inView:mouseIsUp:")]
+    public void StopTrackingAtInViewMouseIsUp(NSPoint lastPoint, NSPoint stopPoint, NSView controlView, bool flag);
+    [Selector("trackMouse:inRect:ofView:untilMouseUp:")]
+    public bool TrackMouseInRectOfViewUntilMouseUp(NSEvent event, NSRect cellFrame, NSView controlView, bool flag);
+    [Selector("editWithFrame:inView:editor:delegate:event:")]
+    public void EditWithFrameInViewEditorDelegateEvent(NSRect rect, NSView controlView, NSText textObj, AnyObject? @delegate, NSEvent? event);
+    [Selector("selectWithFrame:inView:editor:delegate:start:length:")]
+    public void SelectWithFrameInViewEditorDelegateStartLength(NSRect rect, NSView controlView, NSText textObj, AnyObject? @delegate, NSInteger selStart, NSInteger selLength);
+    [Selector("endEditing:")]
+    public void EndEditing(NSText textObj);
+    [Selector("resetCursorRect:inView:")]
+    public void ResetCursorRectInView(NSRect cellFrame, NSView controlView);
+    [Selector("menuForEvent:inRect:ofView:")]
+    public NSMenu? MenuForEventInRectOfView(NSEvent event, NSRect cellFrame, NSView view);
+    [Selector("fieldEditorForView:")]
+    public NSTextView? FieldEditorForView(NSView controlView);
+    [Selector("draggingImageComponentsWithFrame:inView:")]
+    public NSArray DraggingImageComponentsWithFrameInView(NSRect frame, NSView view);
 }
 
 /// NSKeyboardUI, a category of NSCell.
 public extern objc class NSCell
 {
-    [Selector("refusesFirstResponder", "setRefusesFirstResponder:")] public bool RefusesFirstResponder { get; set; }
-    [Selector("acceptsFirstResponder")] public bool AcceptsFirstResponder { get; }
-    [Selector("showsFirstResponder", "setShowsFirstResponder:")] public bool ShowsFirstResponder { get; set; }
-    [Selector("focusRingType", "setFocusRingType:")] public NSFocusRingType FocusRingType { get; set; }
-    [Selector("defaultFocusRingType")] public static NSFocusRingType DefaultFocusRingType { get; }
-    [Selector("wantsNotificationForMarkedText")] public bool WantsNotificationForMarkedText { get; }
-    [Selector("performClick:")] public void PerformClick(AnyObject? sender);
-    [Selector("drawFocusRingMaskWithFrame:inView:")] public void DrawFocusRingMaskWithFrameInView(NSRect cellFrame, NSView controlView);
-    [Selector("focusRingMaskBoundsForFrame:inView:")] public NSRect FocusRingMaskBoundsForFrameInView(NSRect cellFrame, NSView controlView);
+    [Selector("refusesFirstResponder", "setRefusesFirstResponder:")]
+    public bool RefusesFirstResponder { get; set; }
+    [Selector("acceptsFirstResponder")]
+    public bool AcceptsFirstResponder { get; }
+    [Selector("showsFirstResponder", "setShowsFirstResponder:")]
+    public bool ShowsFirstResponder { get; set; }
+    [Selector("focusRingType", "setFocusRingType:")]
+    public NSFocusRingType FocusRingType { get; set; }
+    [Selector("defaultFocusRingType")]
+    public static NSFocusRingType DefaultFocusRingType { get; }
+    [Selector("wantsNotificationForMarkedText")]
+    public bool WantsNotificationForMarkedText { get; }
+    [Selector("performClick:")]
+    public void PerformClick(AnyObject? sender);
+    [Selector("drawFocusRingMaskWithFrame:inView:")]
+    public void DrawFocusRingMaskWithFrameInView(NSRect cellFrame, NSView controlView);
+    [Selector("focusRingMaskBoundsForFrame:inView:")]
+    public NSRect FocusRingMaskBoundsForFrameInView(NSRect cellFrame, NSView controlView);
 }
 
 /// NSCellAttributedStringMethods, a category of NSCell.
 public extern objc class NSCell
 {
-    [Selector("attributedStringValue", "setAttributedStringValue:")] public NSAttributedString AttributedStringValue { get; set; }
-    [Selector("allowsEditingTextAttributes", "setAllowsEditingTextAttributes:")] public bool AllowsEditingTextAttributes { get; set; }
-    [Selector("importsGraphics", "setImportsGraphics:")] public bool ImportsGraphics { get; set; }
+    [Selector("attributedStringValue", "setAttributedStringValue:")]
+    public NSAttributedString AttributedStringValue { get; set; }
+    [Selector("allowsEditingTextAttributes", "setAllowsEditingTextAttributes:")]
+    public bool AllowsEditingTextAttributes { get; set; }
+    [Selector("importsGraphics", "setImportsGraphics:")]
+    public bool ImportsGraphics { get; set; }
 }
 
 /// NSCellMixedState, a category of NSCell.
 public extern objc class NSCell
 {
-    [Selector("allowsMixedState", "setAllowsMixedState:")] public bool AllowsMixedState { get; set; }
-    [Selector("nextState")] public NSInteger NextState { get; }
-    [Selector("setNextState")] public void SetNextState();
+    [Selector("allowsMixedState", "setAllowsMixedState:")]
+    public bool AllowsMixedState { get; set; }
+    [Selector("nextState")]
+    public NSInteger NextState { get; }
+    [Selector("setNextState")]
+    public void SetNextState();
 }
 
 [Flags]
@@ -239,14 +334,17 @@ public enum NSCellHitResult : ulong
 /// NSCellHitTest, a category of NSCell.
 public extern objc class NSCell
 {
-    [Selector("hitTestForEvent:inRect:ofView:")] public NSCellHitResult HitTestForEventInRectOfView(NSEvent event, NSRect cellFrame, NSView controlView);
+    [Selector("hitTestForEvent:inRect:ofView:")]
+    public NSCellHitResult HitTestForEventInRectOfView(NSEvent event, NSRect cellFrame, NSView controlView);
 }
 
 /// NSCellExpansion, a category of NSCell.
 public extern objc class NSCell
 {
-    [Selector("expansionFrameWithFrame:inView:")] public NSRect ExpansionFrameWithFrameInView(NSRect cellFrame, NSView view);
-    [Selector("drawWithExpansionFrame:inView:")] public void DrawWithExpansionFrameInView(NSRect cellFrame, NSView view);
+    [Selector("expansionFrameWithFrame:inView:")]
+    public NSRect ExpansionFrameWithFrameInView(NSRect cellFrame, NSView view);
+    [Selector("drawWithExpansionFrame:inView:")]
+    public void DrawWithExpansionFrameInView(NSRect cellFrame, NSView view);
 }
 
 public enum NSBackgroundStyle : long
@@ -260,8 +358,10 @@ public enum NSBackgroundStyle : long
 /// NSCellBackgroundStyle, a category of NSCell.
 public extern objc class NSCell
 {
-    [Selector("backgroundStyle", "setBackgroundStyle:")] public NSBackgroundStyle BackgroundStyle { get; set; }
-    [Selector("interiorBackgroundStyle")] public NSBackgroundStyle InteriorBackgroundStyle { get; }
+    [Selector("backgroundStyle", "setBackgroundStyle:")]
+    public NSBackgroundStyle BackgroundStyle { get; set; }
+    [Selector("interiorBackgroundStyle")]
+    public NSBackgroundStyle InteriorBackgroundStyle { get; }
 }
 
 public extern "C" void NSDrawThreePartImage(NSRect frame, NSImage? startCap, NSImage? centerFill, NSImage? endCap, BOOL vertical, NSCompositingOperation op, CGFloat alphaFraction, BOOL flipped);
@@ -272,23 +372,32 @@ public extern "C" void NSDrawNinePartImage(NSRect frame, NSImage? topLeftCorner,
 public extern objc class NSCell
 {
     /// Deprecated in macOS 11.0.
-    [Selector("controlTint", "setControlTint:")] public NSControlTint ControlTint { get; set; }
+    [Selector("controlTint", "setControlTint:")]
+    public NSControlTint ControlTint { get; set; }
     /// Deprecated in macOS 10.0.
-    [Selector("entryType")] public NSInteger EntryType();
+    [Selector("entryType")]
+    public NSInteger EntryType();
     /// Deprecated in macOS 10.0.
-    [Selector("setEntryType:")] public void SetEntryType(NSInteger type);
+    [Selector("setEntryType:")]
+    public void SetEntryType(NSInteger type);
     /// Deprecated in macOS 10.0.
-    [Selector("isEntryAcceptable:")] public bool IsEntryAcceptable(NSString string);
+    [Selector("isEntryAcceptable:")]
+    public bool IsEntryAcceptable(NSString string);
     /// Deprecated in macOS 10.0.
-    [Selector("setFloatingPointFormat:left:right:")] public void SetFloatingPointFormatLeftRight(bool autoRange, NSUInteger leftDigits, NSUInteger rightDigits);
+    [Selector("setFloatingPointFormat:left:right:")]
+    public void SetFloatingPointFormatLeftRight(bool autoRange, NSUInteger leftDigits, NSUInteger rightDigits);
     /// Deprecated in macOS 10.8.
-    [Selector("setMnemonicLocation:")] public void SetMnemonicLocation(NSUInteger location);
+    [Selector("setMnemonicLocation:")]
+    public void SetMnemonicLocation(NSUInteger location);
     /// Deprecated in macOS 10.8.
-    [Selector("mnemonicLocation")] public NSUInteger MnemonicLocation();
+    [Selector("mnemonicLocation")]
+    public NSUInteger MnemonicLocation();
     /// Deprecated in macOS 10.8.
-    [Selector("mnemonic")] public NSString Mnemonic();
+    [Selector("mnemonic")]
+    public NSString Mnemonic();
     /// Deprecated in macOS 10.8.
-    [Selector("setTitleWithMnemonic:")] public void SetTitleWithMnemonic(NSString stringWithAmpersand);
+    [Selector("setTitleWithMnemonic:")]
+    public void SetTitleWithMnemonic(NSString stringWithAmpersand);
 }
 
 /// Deprecated in macOS 10.14.

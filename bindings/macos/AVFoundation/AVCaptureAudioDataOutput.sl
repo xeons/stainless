@@ -35,20 +35,30 @@ import Standard.ObjC;
 
 public extern objc class AVCaptureAudioDataOutput : AVCaptureOutput
 {
-    [Selector("sampleBufferDelegate")] public AVCaptureAudioDataOutputSampleBufferDelegate? SampleBufferDelegate { get; }
-    [Selector("sampleBufferCallbackQueue")] public dispatch_queue_t? SampleBufferCallbackQueue { get; }
-    [Selector("audioSettings", "setAudioSettings:")] public NSDictionary? AudioSettings { get; set; }
+    [Selector("sampleBufferDelegate")]
+    public AVCaptureAudioDataOutputSampleBufferDelegate? SampleBufferDelegate { get; }
+    [Selector("sampleBufferCallbackQueue")]
+    public dispatch_queue_t? SampleBufferCallbackQueue { get; }
+    [Selector("audioSettings", "setAudioSettings:")]
+    public NSDictionary? AudioSettings { get; set; }
     /// macOS 26.0 and later.
-    [Selector("spatialAudioChannelLayoutTag", "setSpatialAudioChannelLayoutTag:")] public AudioChannelLayoutTag SpatialAudioChannelLayoutTag { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("new")] public static Self New();
-    [Selector("setSampleBufferDelegate:queue:")] public void SetSampleBufferDelegateQueue(AVCaptureAudioDataOutputSampleBufferDelegate? sampleBufferDelegate, dispatch_queue_t? sampleBufferCallbackQueue);
-    [Selector("recommendedAudioSettingsForAssetWriterWithOutputFileType:")] public NSDictionary? RecommendedAudioSettingsForAssetWriterWithOutputFileType(AVFileType outputFileType);
+    [Selector("spatialAudioChannelLayoutTag", "setSpatialAudioChannelLayoutTag:")]
+    public AudioChannelLayoutTag SpatialAudioChannelLayoutTag { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("new")]
+    public static Self New();
+    [Selector("setSampleBufferDelegate:queue:")]
+    public void SetSampleBufferDelegateQueue(AVCaptureAudioDataOutputSampleBufferDelegate? sampleBufferDelegate, dispatch_queue_t? sampleBufferCallbackQueue);
+    [Selector("recommendedAudioSettingsForAssetWriterWithOutputFileType:")]
+    public NSDictionary? RecommendedAudioSettingsForAssetWriterWithOutputFileType(AVFileType outputFileType);
 }
 
 public objc interface AVCaptureAudioDataOutputSampleBufferDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("captureOutput:didOutputSampleBuffer:fromConnection:")] void CaptureOutputDidOutputSampleBufferFromConnection(AVCaptureOutput output, CMSampleBufferRef sampleBuffer, AVCaptureConnection connection);
+    [Optional]
+    [Selector("captureOutput:didOutputSampleBuffer:fromConnection:")]
+    void CaptureOutputDidOutputSampleBufferFromConnection(AVCaptureOutput output, CMSampleBufferRef sampleBuffer, AVCaptureConnection connection);
 }
 
 #endif

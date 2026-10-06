@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMFile : DOMBlob
 {
-    [Selector("name")] public NSString? Name { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
 }
 
 #endif

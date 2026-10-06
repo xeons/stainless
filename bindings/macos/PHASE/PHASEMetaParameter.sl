@@ -33,44 +33,62 @@ import Standard.ObjC;
 
 public extern objc class PHASEMetaParameterDefinition : PHASEDefinition
 {
-    [Selector("value")] public AnyObject Value { get; }
+    [Selector("value")]
+    public AnyObject Value { get; }
 }
 
 public extern objc class PHASENumberMetaParameterDefinition : PHASEMetaParameterDefinition
 {
-    [Selector("minimum")] public double Minimum { get; }
-    [Selector("maximum")] public double Maximum { get; }
-    [Selector("initWithValue:identifier:")] public Self InitWithValueIdentifier(double value, NSString identifier);
-    [Selector("initWithValue:")] public Self InitWithValue(double value);
-    [Selector("initWithValue:minimum:maximum:identifier:")] public Self InitWithValueMinimumMaximumIdentifier(double value, double minimum, double maximum, NSString identifier);
-    [Selector("initWithValue:minimum:maximum:")] public Self InitWithValueMinimumMaximum(double value, double minimum, double maximum);
+    [Selector("minimum")]
+    public double Minimum { get; }
+    [Selector("maximum")]
+    public double Maximum { get; }
+    [Selector("initWithValue:identifier:")]
+    public Self InitWithValueIdentifier(double value, NSString identifier);
+    [Selector("initWithValue:")]
+    public Self InitWithValue(double value);
+    [Selector("initWithValue:minimum:maximum:identifier:")]
+    public Self InitWithValueMinimumMaximumIdentifier(double value, double minimum, double maximum, NSString identifier);
+    [Selector("initWithValue:minimum:maximum:")]
+    public Self InitWithValueMinimumMaximum(double value, double minimum, double maximum);
 }
 
 public extern objc class PHASEStringMetaParameterDefinition : PHASEMetaParameterDefinition
 {
-    [Selector("initWithValue:identifier:")] public Self InitWithValueIdentifier(NSString value, NSString identifier);
-    [Selector("initWithValue:")] public Self InitWithValue(NSString value);
+    [Selector("initWithValue:identifier:")]
+    public Self InitWithValueIdentifier(NSString value, NSString identifier);
+    [Selector("initWithValue:")]
+    public Self InitWithValue(NSString value);
 }
 
 public extern objc class PHASEMappedMetaParameterDefinition : PHASENumberMetaParameterDefinition
 {
-    [Selector("envelope")] public PHASEEnvelope Envelope { get; }
-    [Selector("inputMetaParameterDefinition")] public PHASENumberMetaParameterDefinition InputMetaParameterDefinition { get; }
-    [Selector("initWithInputMetaParameterDefinition:envelope:identifier:")] public Self InitWithInputMetaParameterDefinitionEnvelopeIdentifier(PHASENumberMetaParameterDefinition inputMetaParameterDefinition, PHASEEnvelope envelope, NSString identifier);
-    [Selector("initWithInputMetaParameterDefinition:envelope:")] public Self InitWithInputMetaParameterDefinitionEnvelope(PHASENumberMetaParameterDefinition inputMetaParameterDefinition, PHASEEnvelope envelope);
+    [Selector("envelope")]
+    public PHASEEnvelope Envelope { get; }
+    [Selector("inputMetaParameterDefinition")]
+    public PHASENumberMetaParameterDefinition InputMetaParameterDefinition { get; }
+    [Selector("initWithInputMetaParameterDefinition:envelope:identifier:")]
+    public Self InitWithInputMetaParameterDefinitionEnvelopeIdentifier(PHASENumberMetaParameterDefinition inputMetaParameterDefinition, PHASEEnvelope envelope, NSString identifier);
+    [Selector("initWithInputMetaParameterDefinition:envelope:")]
+    public Self InitWithInputMetaParameterDefinitionEnvelope(PHASENumberMetaParameterDefinition inputMetaParameterDefinition, PHASEEnvelope envelope);
 }
 
 public extern objc class PHASEMetaParameter : NSObject
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("value", "setValue:")] public AnyObject Value { get; set; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("value", "setValue:")]
+    public AnyObject Value { get; set; }
 }
 
 public extern objc class PHASENumberMetaParameter : PHASEMetaParameter
 {
-    [Selector("minimum")] public double Minimum { get; }
-    [Selector("maximum")] public double Maximum { get; }
-    [Selector("fadeToValue:duration:")] public void FadeToValueDuration(double value, NSTimeInterval duration);
+    [Selector("minimum")]
+    public double Minimum { get; }
+    [Selector("maximum")]
+    public double Maximum { get; }
+    [Selector("fadeToValue:duration:")]
+    public void FadeToValueDuration(double value, NSTimeInterval duration);
 }
 
 public extern objc class PHASEStringMetaParameter : PHASEMetaParameter { }

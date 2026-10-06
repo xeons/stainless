@@ -35,8 +35,10 @@ import Standard.ObjC;
 
 public extern objc class AVPlayerVideoOutput : NSObject
 {
-    [Selector("initWithSpecification:")] public Self InitWithSpecification(AVVideoOutputSpecification specification);
-    [Selector("copyTaggedBufferGroupForHostTime:presentationTimeStamp:activeConfiguration:")] public CMTaggedBufferGroupRef? CopyTaggedBufferGroupForHostTimePresentationTimeStampActiveConfiguration(CMTime hostTime, CMTime* presentationTimeStampOut, out AVPlayerVideoOutputConfiguration? activeConfigurationOut);
+    [Selector("initWithSpecification:")]
+    public Self InitWithSpecification(AVVideoOutputSpecification specification);
+    [Selector("copyTaggedBufferGroupForHostTime:presentationTimeStamp:activeConfiguration:")]
+    public CMTaggedBufferGroupRef? CopyTaggedBufferGroupForHostTimePresentationTimeStampActiveConfiguration(CMTime hostTime, CMTime* presentationTimeStampOut, out AVPlayerVideoOutputConfiguration? activeConfigurationOut);
 }
 
 public enum CMTagCollectionVideoOutputPreset : uint
@@ -49,22 +51,32 @@ public extern "C" OSStatus CMTagCollectionCreateWithVideoOutputPreset(CFAllocato
 
 public extern objc class AVVideoOutputSpecification : NSObject, NSCopying
 {
-    [Selector("preferredTagCollections")] public NSArray? PreferredTagCollections { get; }
+    [Selector("preferredTagCollections")]
+    public NSArray? PreferredTagCollections { get; }
     /// Deprecated in macOS 100000.
-    [Selector("defaultPixelBufferAttributes", "setDefaultPixelBufferAttributes:")] public NSDictionary? DefaultPixelBufferAttributes { get; set; }
-    [Selector("defaultOutputSettings", "setDefaultOutputSettings:")] public NSDictionary? DefaultOutputSettings { get; set; }
-    [Selector("initWithTagCollections:")] public Self InitWithTagCollections(NSArray tagCollections);
+    [Selector("defaultPixelBufferAttributes", "setDefaultPixelBufferAttributes:")]
+    public NSDictionary? DefaultPixelBufferAttributes { get; set; }
+    [Selector("defaultOutputSettings", "setDefaultOutputSettings:")]
+    public NSDictionary? DefaultOutputSettings { get; set; }
+    [Selector("initWithTagCollections:")]
+    public Self InitWithTagCollections(NSArray tagCollections);
     /// Deprecated in macOS 100000.
-    [Selector("setOutputPixelBufferAttributes:forTagCollection:")] public void SetOutputPixelBufferAttributesForTagCollection(NSDictionary? pixelBufferAttributes, CMTagCollectionRef tagCollection);
-    [Selector("setOutputSettings:forTagCollection:")] public void SetOutputSettingsForTagCollection(NSDictionary? outputSettings, CMTagCollectionRef tagCollection);
+    [Selector("setOutputPixelBufferAttributes:forTagCollection:")]
+    public void SetOutputPixelBufferAttributesForTagCollection(NSDictionary? pixelBufferAttributes, CMTagCollectionRef tagCollection);
+    [Selector("setOutputSettings:forTagCollection:")]
+    public void SetOutputSettingsForTagCollection(NSDictionary? outputSettings, CMTagCollectionRef tagCollection);
 }
 
 public extern objc class AVPlayerVideoOutputConfiguration : NSObject
 {
-    [Selector("sourcePlayerItem")] public AVPlayerItem? SourcePlayerItem { get; }
-    [Selector("dataChannelDescriptions")] public NSArray? DataChannelDescriptions { get; }
-    [Selector("preferredTransform")] public CGAffineTransform PreferredTransform { get; }
-    [Selector("activationTime")] public CMTime ActivationTime { get; }
+    [Selector("sourcePlayerItem")]
+    public AVPlayerItem? SourcePlayerItem { get; }
+    [Selector("dataChannelDescriptions")]
+    public NSArray? DataChannelDescriptions { get; }
+    [Selector("preferredTransform")]
+    public CGAffineTransform PreferredTransform { get; }
+    [Selector("activationTime")]
+    public CMTime ActivationTime { get; }
 }
 
 #endif

@@ -47,14 +47,22 @@ public enum NSToolbarItemGroupControlRepresentation : long
 
 public extern objc class NSToolbarItemGroup : NSToolbarItem
 {
-    [Selector("subitems", "setSubitems:")] public NSArray Subitems { get; set; }
-    [Selector("controlRepresentation", "setControlRepresentation:")] public NSToolbarItemGroupControlRepresentation ControlRepresentation { get; set; }
-    [Selector("selectionMode", "setSelectionMode:")] public NSToolbarItemGroupSelectionMode SelectionMode { get; set; }
-    [Selector("selectedIndex", "setSelectedIndex:")] public NSInteger SelectedIndex { get; set; }
-    [Selector("groupWithItemIdentifier:titles:selectionMode:labels:target:action:")] public static Self GroupWithItemIdentifierTitlesSelectionModeLabelsTargetAction(NSToolbarItemIdentifier itemIdentifier, NSArray titles, NSToolbarItemGroupSelectionMode selectionMode, NSArray? labels, AnyObject? target, Selector action);
-    [Selector("groupWithItemIdentifier:images:selectionMode:labels:target:action:")] public static Self GroupWithItemIdentifierImagesSelectionModeLabelsTargetAction(NSToolbarItemIdentifier itemIdentifier, NSArray images, NSToolbarItemGroupSelectionMode selectionMode, NSArray? labels, AnyObject? target, Selector action);
-    [Selector("setSelected:atIndex:")] public void SetSelectedAtIndex(bool selected, NSInteger index);
-    [Selector("isSelectedAtIndex:")] public bool IsSelectedAtIndex(NSInteger index);
+    [Selector("subitems", "setSubitems:")]
+    public NSArray Subitems { get; set; }
+    [Selector("controlRepresentation", "setControlRepresentation:")]
+    public NSToolbarItemGroupControlRepresentation ControlRepresentation { get; set; }
+    [Selector("selectionMode", "setSelectionMode:")]
+    public NSToolbarItemGroupSelectionMode SelectionMode { get; set; }
+    [Selector("selectedIndex", "setSelectedIndex:")]
+    public NSInteger SelectedIndex { get; set; }
+    [Selector("groupWithItemIdentifier:titles:selectionMode:labels:target:action:")]
+    public static Self GroupWithItemIdentifierTitlesSelectionModeLabelsTargetAction(NSToolbarItemIdentifier itemIdentifier, NSArray titles, NSToolbarItemGroupSelectionMode selectionMode, NSArray? labels, AnyObject? target, Selector action);
+    [Selector("groupWithItemIdentifier:images:selectionMode:labels:target:action:")]
+    public static Self GroupWithItemIdentifierImagesSelectionModeLabelsTargetAction(NSToolbarItemIdentifier itemIdentifier, NSArray images, NSToolbarItemGroupSelectionMode selectionMode, NSArray? labels, AnyObject? target, Selector action);
+    [Selector("setSelected:atIndex:")]
+    public void SetSelectedAtIndex(bool selected, NSInteger index);
+    [Selector("isSelectedAtIndex:")]
+    public bool IsSelectedAtIndex(NSInteger index);
 }
 
 #endif

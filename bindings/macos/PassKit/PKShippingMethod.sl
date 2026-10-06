@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class PKShippingMethod : PKPaymentSummaryItem
 {
-    [Selector("identifier", "setIdentifier:")] public NSString? Identifier { get; set; }
-    [Selector("detail", "setDetail:")] public NSString? Detail { get; set; }
-    [Selector("dateComponentsRange", "setDateComponentsRange:")] public PKDateComponentsRange? DateComponentsRange { get; set; }
+    [Selector("identifier", "setIdentifier:")]
+    public NSString? Identifier { get; set; }
+    [Selector("detail", "setDetail:")]
+    public NSString? Detail { get; set; }
+    [Selector("dateComponentsRange", "setDateComponentsRange:")]
+    public PKDateComponentsRange? DateComponentsRange { get; set; }
 }
 
 #endif

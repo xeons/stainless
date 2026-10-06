@@ -32,8 +32,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCMatMulLayer : MLCLayer
 {
-    [Selector("descriptor")] public MLCMatMulDescriptor Descriptor { get; }
-    [Selector("layerWithDescriptor:")] public static Self? LayerWithDescriptor(MLCMatMulDescriptor descriptor);
+    [Selector("descriptor")]
+    public MLCMatMulDescriptor Descriptor { get; }
+    [Selector("layerWithDescriptor:")]
+    public static Self? LayerWithDescriptor(MLCMatMulDescriptor descriptor);
 }
 
 #endif

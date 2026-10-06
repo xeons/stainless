@@ -40,14 +40,22 @@ public enum NSDateIntervalFormatterStyle : ulong
 
 public extern objc class NSDateIntervalFormatter : NSFormatter
 {
-    [Selector("locale", "setLocale:")] public NSLocale? Locale { get; set; }
-    [Selector("calendar", "setCalendar:")] public NSCalendar? Calendar { get; set; }
-    [Selector("timeZone", "setTimeZone:")] public NSTimeZone? TimeZone { get; set; }
-    [Selector("dateTemplate", "setDateTemplate:")] public NSString? DateTemplate { get; set; }
-    [Selector("dateStyle", "setDateStyle:")] public NSDateIntervalFormatterStyle DateStyle { get; set; }
-    [Selector("timeStyle", "setTimeStyle:")] public NSDateIntervalFormatterStyle TimeStyle { get; set; }
-    [Selector("stringFromDate:toDate:")] public NSString StringFromDateToDate(NSDate fromDate, NSDate toDate);
-    [Selector("stringFromDateInterval:")] public NSString? StringFromDateInterval(NSDateInterval dateInterval);
+    [Selector("locale", "setLocale:")]
+    public NSLocale? Locale { get; set; }
+    [Selector("calendar", "setCalendar:")]
+    public NSCalendar? Calendar { get; set; }
+    [Selector("timeZone", "setTimeZone:")]
+    public NSTimeZone? TimeZone { get; set; }
+    [Selector("dateTemplate", "setDateTemplate:")]
+    public NSString? DateTemplate { get; set; }
+    [Selector("dateStyle", "setDateStyle:")]
+    public NSDateIntervalFormatterStyle DateStyle { get; set; }
+    [Selector("timeStyle", "setTimeStyle:")]
+    public NSDateIntervalFormatterStyle TimeStyle { get; set; }
+    [Selector("stringFromDate:toDate:")]
+    public NSString StringFromDateToDate(NSDate fromDate, NSDate toDate);
+    [Selector("stringFromDateInterval:")]
+    public NSString? StringFromDateInterval(NSDateInterval dateInterval);
 }
 
 #endif

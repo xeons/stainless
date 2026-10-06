@@ -44,15 +44,23 @@ public enum WKNavigationType : long
 
 public extern objc class WKNavigationAction : NSObject
 {
-    [Selector("sourceFrame")] public WKFrameInfo SourceFrame { get; }
-    [Selector("targetFrame")] public WKFrameInfo? TargetFrame { get; }
-    [Selector("navigationType")] public WKNavigationType NavigationType { get; }
-    [Selector("request")] public NSURLRequest Request { get; }
-    [Selector("shouldPerformDownload")] public bool ShouldPerformDownload { get; }
+    [Selector("sourceFrame")]
+    public WKFrameInfo SourceFrame { get; }
+    [Selector("targetFrame")]
+    public WKFrameInfo? TargetFrame { get; }
+    [Selector("navigationType")]
+    public WKNavigationType NavigationType { get; }
+    [Selector("request")]
+    public NSURLRequest Request { get; }
+    [Selector("shouldPerformDownload")]
+    public bool ShouldPerformDownload { get; }
     /// macOS 26.0 and later.
-    [Selector("isContentRuleListRedirect")] public bool IsContentRuleListRedirect { get; }
-    [Selector("modifierFlags")] public NSEventModifierFlags ModifierFlags { get; }
-    [Selector("buttonNumber")] public NSInteger ButtonNumber { get; }
+    [Selector("isContentRuleListRedirect")]
+    public bool IsContentRuleListRedirect { get; }
+    [Selector("modifierFlags")]
+    public NSEventModifierFlags ModifierFlags { get; }
+    [Selector("buttonNumber")]
+    public NSInteger ButtonNumber { get; }
 }
 
 #endif

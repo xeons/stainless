@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class MXCellularConditionMetric : MXMetric
 {
-    [Selector("histogrammedCellularConditionTime")] public MXHistogram HistogrammedCellularConditionTime { get; }
+    [Selector("histogrammedCellularConditionTime")]
+    public MXHistogram HistogrammedCellularConditionTime { get; }
 }
 
 #endif

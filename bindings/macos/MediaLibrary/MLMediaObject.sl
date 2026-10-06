@@ -36,31 +36,44 @@ import Standard.ObjC;
 public extern objc class MLMediaObject : NSObject
 {
     /// Deprecated in macOS 10.15.
-    [Selector("mediaLibrary")] public MLMediaLibrary? MediaLibrary { get; }
+    [Selector("mediaLibrary")]
+    public MLMediaLibrary? MediaLibrary { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("identifier")] public NSString Identifier { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("mediaSourceIdentifier")] public NSString MediaSourceIdentifier { get; }
+    [Selector("mediaSourceIdentifier")]
+    public NSString MediaSourceIdentifier { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("attributes")] public NSDictionary Attributes { get; }
+    [Selector("attributes")]
+    public NSDictionary Attributes { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("mediaType")] public MLMediaType MediaType { get; }
+    [Selector("mediaType")]
+    public MLMediaType MediaType { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("contentType")] public NSString? ContentType { get; }
+    [Selector("contentType")]
+    public NSString? ContentType { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("name")] public NSString? Name { get; }
+    [Selector("name")]
+    public NSString? Name { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("URL")] public NSURL? URL { get; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("originalURL")] public NSURL? OriginalURL { get; }
+    [Selector("originalURL")]
+    public NSURL? OriginalURL { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("fileSize")] public NSUInteger FileSize { get; }
+    [Selector("fileSize")]
+    public NSUInteger FileSize { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("modificationDate")] public NSDate? ModificationDate { get; }
+    [Selector("modificationDate")]
+    public NSDate? ModificationDate { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("thumbnailURL")] public NSURL? ThumbnailURL { get; }
+    [Selector("thumbnailURL")]
+    public NSURL? ThumbnailURL { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("artworkImage")] public NSImage? ArtworkImage { get; }
+    [Selector("artworkImage")]
+    public NSImage? ArtworkImage { get; }
 }
 
 #endif

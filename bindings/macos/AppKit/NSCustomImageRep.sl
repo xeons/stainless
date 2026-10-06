@@ -36,11 +36,16 @@ public objc closure bool NSCustomImageRepInitWithSizeFlippedDrawingHandlerDrawin
 
 public extern objc class NSCustomImageRep : NSImageRep
 {
-    [Selector("drawingHandler")] public NSCustomImageRepDrawingHandlerBlock? DrawingHandler { get; }
-    [Selector("drawSelector")] public Selector DrawSelector { get; }
-    [Selector("delegate")] public AnyObject? Delegate { get; }
-    [Selector("initWithSize:flipped:drawingHandler:")] public Self InitWithSizeFlippedDrawingHandler(NSSize size, bool drawingHandlerShouldBeCalledWithFlippedContext, NSCustomImageRepInitWithSizeFlippedDrawingHandlerDrawingHandlerBlock drawingHandler);
-    [Selector("initWithDrawSelector:delegate:")] public Self InitWithDrawSelectorDelegate(Selector selector, AnyObject @delegate);
+    [Selector("drawingHandler")]
+    public NSCustomImageRepDrawingHandlerBlock? DrawingHandler { get; }
+    [Selector("drawSelector")]
+    public Selector DrawSelector { get; }
+    [Selector("delegate")]
+    public AnyObject? Delegate { get; }
+    [Selector("initWithSize:flipped:drawingHandler:")]
+    public Self InitWithSizeFlippedDrawingHandler(NSSize size, bool drawingHandlerShouldBeCalledWithFlippedContext, NSCustomImageRepInitWithSizeFlippedDrawingHandlerDrawingHandlerBlock drawingHandler);
+    [Selector("initWithDrawSelector:delegate:")]
+    public Self InitWithDrawSelectorDelegate(Selector selector, AnyObject @delegate);
 }
 
 #endif

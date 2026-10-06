@@ -32,15 +32,24 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMNodeIterator : DOMObject
 {
-    [Selector("root")] public DOMNode? Root { get; }
-    [Selector("whatToShow")] public uint WhatToShow { get; }
-    [Selector("filter")] public DOMNodeFilter? Filter { get; }
-    [Selector("expandEntityReferences")] public bool ExpandEntityReferences { get; }
-    [Selector("referenceNode")] public DOMNode? ReferenceNode { get; }
-    [Selector("pointerBeforeReferenceNode")] public bool PointerBeforeReferenceNode { get; }
-    [Selector("nextNode")] public DOMNode? NextNode();
-    [Selector("previousNode")] public DOMNode? PreviousNode();
-    [Selector("detach")] public void Detach();
+    [Selector("root")]
+    public DOMNode? Root { get; }
+    [Selector("whatToShow")]
+    public uint WhatToShow { get; }
+    [Selector("filter")]
+    public DOMNodeFilter? Filter { get; }
+    [Selector("expandEntityReferences")]
+    public bool ExpandEntityReferences { get; }
+    [Selector("referenceNode")]
+    public DOMNode? ReferenceNode { get; }
+    [Selector("pointerBeforeReferenceNode")]
+    public bool PointerBeforeReferenceNode { get; }
+    [Selector("nextNode")]
+    public DOMNode? NextNode();
+    [Selector("previousNode")]
+    public DOMNode? PreviousNode();
+    [Selector("detach")]
+    public void Detach();
 }
 
 #endif

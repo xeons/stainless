@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class SKCameraNode : SKNode
 {
-    [Selector("containsNode:")] public bool ContainsNode(SKNode node);
-    [Selector("containedNodeSet")] public NSSet ContainedNodeSet();
+    [Selector("containsNode:")]
+    public bool ContainsNode(SKNode node);
+    [Selector("containedNodeSet")]
+    public NSSet ContainedNodeSet();
 }
 
 #endif

@@ -50,26 +50,42 @@ public enum SCScreenshotDynamicRange : long
 
 public extern objc class SCScreenshotConfiguration : NSObject
 {
-    [Selector("width", "setWidth:")] public NSInteger Width { get; set; }
-    [Selector("height", "setHeight:")] public NSInteger Height { get; set; }
-    [Selector("showsCursor", "setShowsCursor:")] public bool ShowsCursor { get; set; }
-    [Selector("sourceRect", "setSourceRect:")] public CGRect SourceRect { get; set; }
-    [Selector("destinationRect", "setDestinationRect:")] public CGRect DestinationRect { get; set; }
-    [Selector("ignoreShadows", "setIgnoreShadows:")] public bool IgnoreShadows { get; set; }
-    [Selector("ignoreClipping", "setIgnoreClipping:")] public bool IgnoreClipping { get; set; }
-    [Selector("includeChildWindows", "setIncludeChildWindows:")] public bool IncludeChildWindows { get; set; }
-    [Selector("displayIntent", "setDisplayIntent:")] public SCScreenshotDisplayIntent DisplayIntent { get; set; }
-    [Selector("dynamicRange", "setDynamicRange:")] public SCScreenshotDynamicRange DynamicRange { get; set; }
-    [Selector("contentType", "setContentType:")] public UTType ContentType { get; set; }
-    [Selector("fileURL", "setFileURL:")] public NSURL? FileURL { get; set; }
-    [Selector("supportedContentTypes")] public static NSArray SupportedContentTypes { get; }
+    [Selector("width", "setWidth:")]
+    public NSInteger Width { get; set; }
+    [Selector("height", "setHeight:")]
+    public NSInteger Height { get; set; }
+    [Selector("showsCursor", "setShowsCursor:")]
+    public bool ShowsCursor { get; set; }
+    [Selector("sourceRect", "setSourceRect:")]
+    public CGRect SourceRect { get; set; }
+    [Selector("destinationRect", "setDestinationRect:")]
+    public CGRect DestinationRect { get; set; }
+    [Selector("ignoreShadows", "setIgnoreShadows:")]
+    public bool IgnoreShadows { get; set; }
+    [Selector("ignoreClipping", "setIgnoreClipping:")]
+    public bool IgnoreClipping { get; set; }
+    [Selector("includeChildWindows", "setIncludeChildWindows:")]
+    public bool IncludeChildWindows { get; set; }
+    [Selector("displayIntent", "setDisplayIntent:")]
+    public SCScreenshotDisplayIntent DisplayIntent { get; set; }
+    [Selector("dynamicRange", "setDynamicRange:")]
+    public SCScreenshotDynamicRange DynamicRange { get; set; }
+    [Selector("contentType", "setContentType:")]
+    public UTType ContentType { get; set; }
+    [Selector("fileURL", "setFileURL:")]
+    public NSURL? FileURL { get; set; }
+    [Selector("supportedContentTypes")]
+    public static NSArray SupportedContentTypes { get; }
 }
 
 public extern objc class SCScreenshotOutput : NSObject
 {
-    [Selector("sdrImage", "setSdrImage:")] public CGImageRef? SdrImage { get; set; }
-    [Selector("hdrImage", "setHdrImage:")] public CGImageRef? HdrImage { get; set; }
-    [Selector("fileURL", "setFileURL:")] public NSURL? FileURL { get; set; }
+    [Selector("sdrImage", "setSdrImage:")]
+    public CGImageRef? SdrImage { get; set; }
+    [Selector("hdrImage", "setHdrImage:")]
+    public CGImageRef? HdrImage { get; set; }
+    [Selector("fileURL", "setFileURL:")]
+    public NSURL? FileURL { get; set; }
 }
 
 public objc closure void SCScreenshotManagerCaptureSampleBufferWithFilterConfigurationCompletionHandlerCompletionHandlerBlock(CMSampleBufferRef? arg0, NSError? arg1);
@@ -84,14 +100,19 @@ public objc closure void SCScreenshotManagerCaptureScreenshotWithRectConfigurati
 
 public extern objc class SCScreenshotManager : NSObject
 {
-    [Selector("captureSampleBufferWithFilter:configuration:completionHandler:")] public static void CaptureSampleBufferWithFilterConfigurationCompletionHandler(SCContentFilter contentFilter, SCStreamConfiguration config, SCScreenshotManagerCaptureSampleBufferWithFilterConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("captureImageWithFilter:configuration:completionHandler:")] public static void CaptureImageWithFilterConfigurationCompletionHandler(SCContentFilter contentFilter, SCStreamConfiguration config, SCScreenshotManagerCaptureImageWithFilterConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("captureSampleBufferWithFilter:configuration:completionHandler:")]
+    public static void CaptureSampleBufferWithFilterConfigurationCompletionHandler(SCContentFilter contentFilter, SCStreamConfiguration config, SCScreenshotManagerCaptureSampleBufferWithFilterConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("captureImageWithFilter:configuration:completionHandler:")]
+    public static void CaptureImageWithFilterConfigurationCompletionHandler(SCContentFilter contentFilter, SCStreamConfiguration config, SCScreenshotManagerCaptureImageWithFilterConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// macOS 15.2 and later.
-    [Selector("captureImageInRect:completionHandler:")] public static void CaptureImageInRectCompletionHandler(CGRect rect, SCScreenshotManagerCaptureImageInRectCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("captureImageInRect:completionHandler:")]
+    public static void CaptureImageInRectCompletionHandler(CGRect rect, SCScreenshotManagerCaptureImageInRectCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// macOS 26.0 and later.
-    [Selector("captureScreenshotWithFilter:configuration:completionHandler:")] public static void CaptureScreenshotWithFilterConfigurationCompletionHandler(SCContentFilter contentFilter, SCScreenshotConfiguration config, SCScreenshotManagerCaptureScreenshotWithFilterConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("captureScreenshotWithFilter:configuration:completionHandler:")]
+    public static void CaptureScreenshotWithFilterConfigurationCompletionHandler(SCContentFilter contentFilter, SCScreenshotConfiguration config, SCScreenshotManagerCaptureScreenshotWithFilterConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// macOS 26.0 and later.
-    [Selector("captureScreenshotWithRect:configuration:completionHandler:")] public static void CaptureScreenshotWithRectConfigurationCompletionHandler(CGRect rect, SCScreenshotConfiguration config, SCScreenshotManagerCaptureScreenshotWithRectConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("captureScreenshotWithRect:configuration:completionHandler:")]
+    public static void CaptureScreenshotWithRectConfigurationCompletionHandler(CGRect rect, SCScreenshotConfiguration config, SCScreenshotManagerCaptureScreenshotWithRectConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 #endif

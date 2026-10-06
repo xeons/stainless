@@ -64,32 +64,55 @@ public objc closure void PGRemoveTraceRange(PGTraceRange_s* arg0);
 
 public extern objc class PGDeviceDescriptor : NSObject
 {
-    [Selector("device", "setDevice:")] public MTLDevice? Device { get; set; }
-    [Selector("mmioLength", "setMmioLength:")] public nuint MmioLength { get; set; }
-    [Selector("createTask", "setCreateTask:")] public PGCreateTask? CreateTask { get; set; }
-    [Selector("destroyTask", "setDestroyTask:")] public PGDestroyTask? DestroyTask { get; set; }
-    [Selector("mapMemory", "setMapMemory:")] public PGMapMemory? MapMemory { get; set; }
-    [Selector("unmapMemory", "setUnmapMemory:")] public PGUnmapMemory? UnmapMemory { get; set; }
-    [Selector("readMemory", "setReadMemory:")] public PGReadMemory? ReadMemory { get; set; }
-    [Selector("raiseInterrupt", "setRaiseInterrupt:")] public PGRaiseInterrupt? RaiseInterrupt { get; set; }
-    [Selector("addTraceRange", "setAddTraceRange:")] public PGAddTraceRange? AddTraceRange { get; set; }
-    [Selector("removeTraceRange", "setRemoveTraceRange:")] public PGRemoveTraceRange? RemoveTraceRange { get; set; }
-    [Selector("displayPortCount", "setDisplayPortCount:")] public uint DisplayPortCount { get; set; }
+    [Selector("device", "setDevice:")]
+    public MTLDevice? Device { get; set; }
+    [Selector("mmioLength", "setMmioLength:")]
+    public nuint MmioLength { get; set; }
+    [Selector("createTask", "setCreateTask:")]
+    public PGCreateTask? CreateTask { get; set; }
+    [Selector("destroyTask", "setDestroyTask:")]
+    public PGDestroyTask? DestroyTask { get; set; }
+    [Selector("mapMemory", "setMapMemory:")]
+    public PGMapMemory? MapMemory { get; set; }
+    [Selector("unmapMemory", "setUnmapMemory:")]
+    public PGUnmapMemory? UnmapMemory { get; set; }
+    [Selector("readMemory", "setReadMemory:")]
+    public PGReadMemory? ReadMemory { get; set; }
+    [Selector("raiseInterrupt", "setRaiseInterrupt:")]
+    public PGRaiseInterrupt? RaiseInterrupt { get; set; }
+    [Selector("addTraceRange", "setAddTraceRange:")]
+    public PGAddTraceRange? AddTraceRange { get; set; }
+    [Selector("removeTraceRange", "setRemoveTraceRange:")]
+    public PGRemoveTraceRange? RemoveTraceRange { get; set; }
+    [Selector("displayPortCount", "setDisplayPortCount:")]
+    public uint DisplayPortCount { get; set; }
 }
 
 public objc interface PGDevice : NSObjectProtocol
 {
-    [Selector("mmioReadAtOffset:")] uint MmioReadAtOffset(nuint offset);
-    [Selector("mmioWriteAtOffset:value:")] void MmioWriteAtOffsetValue(nuint offset, uint value);
-    [Selector("newDisplayWithDescriptor:port:serialNum:")] PGDisplay? NewDisplayWithDescriptorPortSerialNum(PGDisplayDescriptor descriptor, NSUInteger port, uint serialNum);
-    [Selector("willSuspend")] void WillSuspend();
-    [ReturnsRetained] [Selector("finishSuspend")] NSData? FinishSuspend();
-    [Selector("willResumeWithSuspendState:error:")] bool WillResumeWithSuspendStateError(NSData suspendState, out NSError? error);
-    [Selector("didResume")] void DidResume();
-    [Selector("pause")] void Pause();
-    [Selector("unpause")] void Unpause();
-    [Selector("stop")] void Stop();
-    [Selector("reset")] void Reset();
+    [Selector("mmioReadAtOffset:")]
+    uint MmioReadAtOffset(nuint offset);
+    [Selector("mmioWriteAtOffset:value:")]
+    void MmioWriteAtOffsetValue(nuint offset, uint value);
+    [Selector("newDisplayWithDescriptor:port:serialNum:")]
+    PGDisplay? NewDisplayWithDescriptorPortSerialNum(PGDisplayDescriptor descriptor, NSUInteger port, uint serialNum);
+    [Selector("willSuspend")]
+    void WillSuspend();
+    [ReturnsRetained]
+    [Selector("finishSuspend")]
+    NSData? FinishSuspend();
+    [Selector("willResumeWithSuspendState:error:")]
+    bool WillResumeWithSuspendStateError(NSData suspendState, out NSError? error);
+    [Selector("didResume")]
+    void DidResume();
+    [Selector("pause")]
+    void Pause();
+    [Selector("unpause")]
+    void Unpause();
+    [Selector("stop")]
+    void Stop();
+    [Selector("reset")]
+    void Reset();
 }
 
 public extern "C" PGDevice? PGNewDeviceWithDescriptor(PGDeviceDescriptor descriptor);

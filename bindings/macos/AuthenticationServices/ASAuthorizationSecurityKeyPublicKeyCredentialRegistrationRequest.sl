@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationSecurityKeyPublicKeyCredentialRegistrationRequest : ASAuthorizationRequest, ASAuthorizationPublicKeyCredentialRegistrationRequest
 {
-    [Selector("credentialParameters", "setCredentialParameters:")] public NSArray CredentialParameters { get; set; }
-    [Selector("excludedCredentials", "setExcludedCredentials:")] public NSArray ExcludedCredentials { get; set; }
-    [Selector("residentKeyPreference", "setResidentKeyPreference:")] public ASAuthorizationPublicKeyCredentialResidentKeyPreference ResidentKeyPreference { get; set; }
+    [Selector("credentialParameters", "setCredentialParameters:")]
+    public NSArray CredentialParameters { get; set; }
+    [Selector("excludedCredentials", "setExcludedCredentials:")]
+    public NSArray ExcludedCredentials { get; set; }
+    [Selector("residentKeyPreference", "setResidentKeyPreference:")]
+    public ASAuthorizationPublicKeyCredentialResidentKeyPreference ResidentKeyPreference { get; set; }
 }
 
 public extern objc class ASAuthorizationSecurityKeyPublicKeyCredentialRegistrationRequest : ASAuthorizationWebBrowserSecurityKeyPublicKeyCredentialRegistrationRequest { }

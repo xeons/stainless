@@ -38,11 +38,13 @@ public extern objc class DREraseRef : CFTypeRef { }
 
 public extern "C" CFTypeID DREraseGetTypeID();
 
-[ReturnsRetained] public extern "C" DREraseRef? DREraseCreate(DRDeviceRef? device);
+[ReturnsRetained]
+public extern "C" DREraseRef? DREraseCreate(DRDeviceRef? device);
 
 public extern "C" OSStatus DREraseStart(DREraseRef? erase);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? DREraseCopyStatus(DREraseRef? erase);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? DREraseCopyStatus(DREraseRef? erase);
 
 public extern "C" CFStringRef? kDREraseStatusChangedNotification;
 

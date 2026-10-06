@@ -33,19 +33,29 @@ import Standard.ObjC;
 
 public extern objc class NSSpeechRecognizer : NSObject
 {
-    [Selector("delegate", "setDelegate:")] public NSSpeechRecognizerDelegate? Delegate { get; set; }
-    [Selector("commands", "setCommands:")] public NSArray? Commands { get; set; }
-    [Selector("displayedCommandsTitle", "setDisplayedCommandsTitle:")] public NSString? DisplayedCommandsTitle { get; set; }
-    [Selector("listensInForegroundOnly", "setListensInForegroundOnly:")] public bool ListensInForegroundOnly { get; set; }
-    [Selector("blocksOtherRecognizers", "setBlocksOtherRecognizers:")] public bool BlocksOtherRecognizers { get; set; }
-    [Selector("init")] public Self? Init();
-    [Selector("startListening")] public void StartListening();
-    [Selector("stopListening")] public void StopListening();
+    [Selector("delegate", "setDelegate:")]
+    public NSSpeechRecognizerDelegate? Delegate { get; set; }
+    [Selector("commands", "setCommands:")]
+    public NSArray? Commands { get; set; }
+    [Selector("displayedCommandsTitle", "setDisplayedCommandsTitle:")]
+    public NSString? DisplayedCommandsTitle { get; set; }
+    [Selector("listensInForegroundOnly", "setListensInForegroundOnly:")]
+    public bool ListensInForegroundOnly { get; set; }
+    [Selector("blocksOtherRecognizers", "setBlocksOtherRecognizers:")]
+    public bool BlocksOtherRecognizers { get; set; }
+    [Selector("init")]
+    public Self? Init();
+    [Selector("startListening")]
+    public void StartListening();
+    [Selector("stopListening")]
+    public void StopListening();
 }
 
 public objc interface NSSpeechRecognizerDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("speechRecognizer:didRecognizeCommand:")] void SpeechRecognizerDidRecognizeCommand(NSSpeechRecognizer sender, NSString command);
+    [Optional]
+    [Selector("speechRecognizer:didRecognizeCommand:")]
+    void SpeechRecognizerDidRecognizeCommand(NSSpeechRecognizer sender, NSString command);
 }
 
 #endif

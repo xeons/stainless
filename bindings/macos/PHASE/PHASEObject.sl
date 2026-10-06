@@ -33,17 +33,28 @@ import Standard.ObjC;
 
 public extern objc class PHASEObject : NSObject, NSCopying
 {
-    [Selector("parent")] public PHASEObject? Parent { get; }
-    [Selector("children")] public NSArray Children { get; }
-    [Selector("right")] public static simd_float3 Right { get; }
-    [Selector("up")] public static simd_float3 Up { get; }
-    [Selector("forward")] public static simd_float3 Forward { get; }
-    [Selector("transform", "setTransform:")] public simd_float4x4 Transform { get; set; }
-    [Selector("worldTransform", "setWorldTransform:")] public simd_float4x4 WorldTransform { get; set; }
-    [Selector("initWithEngine:")] public Self InitWithEngine(PHASEEngine engine);
-    [Selector("addChild:error:")] public bool AddChildError(PHASEObject child, out NSError? error);
-    [Selector("removeChild:")] public void RemoveChild(PHASEObject child);
-    [Selector("removeChildren")] public void RemoveChildren();
+    [Selector("parent")]
+    public PHASEObject? Parent { get; }
+    [Selector("children")]
+    public NSArray Children { get; }
+    [Selector("right")]
+    public static simd_float3 Right { get; }
+    [Selector("up")]
+    public static simd_float3 Up { get; }
+    [Selector("forward")]
+    public static simd_float3 Forward { get; }
+    [Selector("transform", "setTransform:")]
+    public simd_float4x4 Transform { get; set; }
+    [Selector("worldTransform", "setWorldTransform:")]
+    public simd_float4x4 WorldTransform { get; set; }
+    [Selector("initWithEngine:")]
+    public Self InitWithEngine(PHASEEngine engine);
+    [Selector("addChild:error:")]
+    public bool AddChildError(PHASEObject child, out NSError? error);
+    [Selector("removeChild:")]
+    public void RemoveChild(PHASEObject child);
+    [Selector("removeChildren")]
+    public void RemoveChildren();
 }
 
 #endif

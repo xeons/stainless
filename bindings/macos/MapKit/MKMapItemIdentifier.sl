@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MKMapItemIdentifier : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("identifierString")] public NSString? IdentifierString { get; }
-    [Selector("initWithIdentifierString:")] public Self? InitWithIdentifierString(NSString string);
+    [Selector("identifierString")]
+    public NSString? IdentifierString { get; }
+    [Selector("initWithIdentifierString:")]
+    public Self? InitWithIdentifierString(NSString string);
 }
 
 #endif

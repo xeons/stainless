@@ -39,22 +39,33 @@ public extern "C" NSString? DRBurnProgressPanelDidFinishNotification;
 
 public extern objc class DRBurnProgressPanel : NSPanel
 {
-    [Selector("progressPanel")] public static DRBurnProgressPanel? ProgressPanel();
-    [Selector("beginProgressSheetForBurn:layout:modalForWindow:")] public void BeginProgressSheetForBurnLayoutModalForWindow(DRBurn? burn, AnyObject? layout, NSWindow? docWindow);
-    [Selector("beginProgressPanelForBurn:layout:")] public void BeginProgressPanelForBurnLayout(DRBurn? burn, AnyObject? layout);
-    [Selector("setDescription:")] public void SetDescription(NSString? description);
-    [Selector("description")] public NSString? Description();
-    [Selector("setVerboseProgressStatus:")] public void SetVerboseProgressStatus(bool verbose);
-    [Selector("verboseProgressStatus")] public bool VerboseProgressStatus();
-    [Selector("stopBurn:")] public void StopBurn(AnyObject? sender);
+    [Selector("progressPanel")]
+    public static DRBurnProgressPanel? ProgressPanel();
+    [Selector("beginProgressSheetForBurn:layout:modalForWindow:")]
+    public void BeginProgressSheetForBurnLayoutModalForWindow(DRBurn? burn, AnyObject? layout, NSWindow? docWindow);
+    [Selector("beginProgressPanelForBurn:layout:")]
+    public void BeginProgressPanelForBurnLayout(DRBurn? burn, AnyObject? layout);
+    [Selector("setDescription:")]
+    public void SetDescription(NSString? description);
+    [Selector("description")]
+    public NSString? Description();
+    [Selector("setVerboseProgressStatus:")]
+    public void SetVerboseProgressStatus(bool verbose);
+    [Selector("verboseProgressStatus")]
+    public bool VerboseProgressStatus();
+    [Selector("stopBurn:")]
+    public void StopBurn(AnyObject? sender);
 }
 
 /// DRBurnProgressPanelDelegateMethods, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("burnProgressPanelWillBegin:")] public void BurnProgressPanelWillBegin(NSNotification? aNotification);
-    [Selector("burnProgressPanelDidFinish:")] public void BurnProgressPanelDidFinish(NSNotification? aNotification);
-    [Selector("burnProgressPanel:burnDidFinish:")] public bool BurnProgressPanelBurnDidFinish(DRBurnProgressPanel? theBurnPanel, DRBurn? burn);
+    [Selector("burnProgressPanelWillBegin:")]
+    public void BurnProgressPanelWillBegin(NSNotification? aNotification);
+    [Selector("burnProgressPanelDidFinish:")]
+    public void BurnProgressPanelDidFinish(NSNotification? aNotification);
+    [Selector("burnProgressPanel:burnDidFinish:")]
+    public bool BurnProgressPanelBurnDidFinish(DRBurnProgressPanel? theBurnPanel, DRBurn? burn);
 }
 
 #endif

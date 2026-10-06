@@ -45,11 +45,16 @@ public objc closure void ASAuthorizationWebBrowserPublicKeyCredentialManagerPlat
 public extern objc class ASAuthorizationWebBrowserPublicKeyCredentialManager : NSObject
 {
     /// macOS 26.2 and later.
-    [Selector("isDeviceConfiguredForPasskeys")] public static bool IsDeviceConfiguredForPasskeys { get; }
-    [Selector("authorizationStateForPlatformCredentials")] public ASAuthorizationWebBrowserPublicKeyCredentialManagerAuthorizationState AuthorizationStateForPlatformCredentials { get; }
-    [Selector("init")] public Self Init();
-    [Selector("requestAuthorizationForPublicKeyCredentials:")] public void RequestAuthorizationForPublicKeyCredentials(ASAuthorizationWebBrowserPublicKeyCredentialManagerRequestAuthorizationForPublicKeyCredentialsCompletionHandlerBlock completionHandler);
-    [Selector("platformCredentialsForRelyingParty:completionHandler:")] public void PlatformCredentialsForRelyingPartyCompletionHandler(NSString relyingParty, ASAuthorizationWebBrowserPublicKeyCredentialManagerPlatformCredentialsForRelyingPartyCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("isDeviceConfiguredForPasskeys")]
+    public static bool IsDeviceConfiguredForPasskeys { get; }
+    [Selector("authorizationStateForPlatformCredentials")]
+    public ASAuthorizationWebBrowserPublicKeyCredentialManagerAuthorizationState AuthorizationStateForPlatformCredentials { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("requestAuthorizationForPublicKeyCredentials:")]
+    public void RequestAuthorizationForPublicKeyCredentials(ASAuthorizationWebBrowserPublicKeyCredentialManagerRequestAuthorizationForPublicKeyCredentialsCompletionHandlerBlock completionHandler);
+    [Selector("platformCredentialsForRelyingParty:completionHandler:")]
+    public void PlatformCredentialsForRelyingPartyCompletionHandler(NSString relyingParty, ASAuthorizationWebBrowserPublicKeyCredentialManagerPlatformCredentialsForRelyingPartyCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

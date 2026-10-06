@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class NEAppRule : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("matchSigningIdentifier")] public NSString MatchSigningIdentifier { get; }
-    [Selector("matchDesignatedRequirement")] public NSString? MatchDesignatedRequirement { get; }
-    [Selector("matchPath", "setMatchPath:")] public NSString? MatchPath { get; set; }
-    [Selector("matchDomains", "setMatchDomains:")] public NSArray? MatchDomains { get; set; }
-    [Selector("matchTools", "setMatchTools:")] public NSArray? MatchTools { get; set; }
-    [Selector("initWithSigningIdentifier:designatedRequirement:")] public Self InitWithSigningIdentifierDesignatedRequirement(NSString signingIdentifier, NSString designatedRequirement);
+    [Selector("matchSigningIdentifier")]
+    public NSString MatchSigningIdentifier { get; }
+    [Selector("matchDesignatedRequirement")]
+    public NSString? MatchDesignatedRequirement { get; }
+    [Selector("matchPath", "setMatchPath:")]
+    public NSString? MatchPath { get; set; }
+    [Selector("matchDomains", "setMatchDomains:")]
+    public NSArray? MatchDomains { get; set; }
+    [Selector("matchTools", "setMatchTools:")]
+    public NSArray? MatchTools { get; set; }
+    [Selector("initWithSigningIdentifier:designatedRequirement:")]
+    public Self InitWithSigningIdentifierDesignatedRequirement(NSString signingIdentifier, NSString designatedRequirement);
 }
 
 #endif

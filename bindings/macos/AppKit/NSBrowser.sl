@@ -49,157 +49,320 @@ public enum NSBrowserDropOperation : ulong
 
 public extern objc class NSBrowser : NSControl
 {
-    [Selector("cellClass")] public static Class CellClass { get; }
-    [Selector("isLoaded")] public bool Loaded { get; }
-    [Selector("doubleAction", "setDoubleAction:")] public Selector DoubleAction { get; set; }
-    [Selector("cellPrototype", "setCellPrototype:")] public AnyObject? CellPrototype { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSBrowserDelegate? Delegate { get; set; }
-    [Selector("reusesColumns", "setReusesColumns:")] public bool ReusesColumns { get; set; }
-    [Selector("hasHorizontalScroller", "setHasHorizontalScroller:")] public bool HasHorizontalScroller { get; set; }
-    [Selector("autohidesScroller", "setAutohidesScroller:")] public bool AutohidesScroller { get; set; }
-    [Selector("separatesColumns", "setSeparatesColumns:")] public bool SeparatesColumns { get; set; }
-    [Selector("isTitled", "setTitled:")] public bool Titled { get; set; }
-    [Selector("minColumnWidth", "setMinColumnWidth:")] public CGFloat MinColumnWidth { get; set; }
-    [Selector("maxVisibleColumns", "setMaxVisibleColumns:")] public NSInteger MaxVisibleColumns { get; set; }
-    [Selector("allowsMultipleSelection", "setAllowsMultipleSelection:")] public bool AllowsMultipleSelection { get; set; }
-    [Selector("allowsBranchSelection", "setAllowsBranchSelection:")] public bool AllowsBranchSelection { get; set; }
-    [Selector("allowsEmptySelection", "setAllowsEmptySelection:")] public bool AllowsEmptySelection { get; set; }
-    [Selector("takesTitleFromPreviousColumn", "setTakesTitleFromPreviousColumn:")] public bool TakesTitleFromPreviousColumn { get; set; }
-    [Selector("sendsActionOnArrowKeys", "setSendsActionOnArrowKeys:")] public bool SendsActionOnArrowKeys { get; set; }
-    [Selector("pathSeparator", "setPathSeparator:")] public NSString PathSeparator { get; set; }
-    [Selector("clickedColumn")] public NSInteger ClickedColumn { get; }
-    [Selector("clickedRow")] public NSInteger ClickedRow { get; }
-    [Selector("selectedColumn")] public NSInteger SelectedColumn { get; }
-    [Selector("selectedCell")] public AnyObject? SelectedCell { get; }
-    [Selector("selectedCells")] public NSArray? SelectedCells { get; }
-    [Selector("selectionIndexPath", "setSelectionIndexPath:")] public NSIndexPath? SelectionIndexPath { get; set; }
-    [Selector("selectionIndexPaths", "setSelectionIndexPaths:")] public NSArray? SelectionIndexPaths { get; set; }
-    [Selector("lastColumn", "setLastColumn:")] public NSInteger LastColumn { get; set; }
-    [Selector("numberOfVisibleColumns")] public NSInteger NumberOfVisibleColumns { get; }
-    [Selector("firstVisibleColumn")] public NSInteger FirstVisibleColumn { get; }
-    [Selector("lastVisibleColumn")] public NSInteger LastVisibleColumn { get; }
-    [Selector("titleHeight")] public CGFloat TitleHeight { get; }
-    [Selector("columnResizingType", "setColumnResizingType:")] public NSBrowserColumnResizingType ColumnResizingType { get; set; }
-    [Selector("prefersAllColumnUserResizing", "setPrefersAllColumnUserResizing:")] public bool PrefersAllColumnUserResizing { get; set; }
-    [Selector("rowHeight", "setRowHeight:")] public CGFloat RowHeight { get; set; }
-    [Selector("columnsAutosaveName", "setColumnsAutosaveName:")] public NSBrowserColumnsAutosaveName ColumnsAutosaveName { get; set; }
-    [Selector("allowsTypeSelect", "setAllowsTypeSelect:")] public bool AllowsTypeSelect { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("loadColumnZero")] public void LoadColumnZero();
-    [Selector("setCellClass:")] public void SetCellClass(Class factoryId);
-    [Selector("itemAtIndexPath:")] public AnyObject? ItemAtIndexPath(NSIndexPath indexPath);
-    [Selector("itemAtRow:inColumn:")] public AnyObject? ItemAtRowInColumn(NSInteger row, NSInteger column);
-    [Selector("indexPathForColumn:")] public NSIndexPath IndexPathForColumn(NSInteger column);
-    [Selector("isLeafItem:")] public bool IsLeafItem(AnyObject? item);
-    [Selector("reloadDataForRowIndexes:inColumn:")] public void ReloadDataForRowIndexesInColumn(NSIndexSet rowIndexes, NSInteger column);
-    [Selector("parentForItemsInColumn:")] public AnyObject? ParentForItemsInColumn(NSInteger column);
-    [Selector("scrollRowToVisible:inColumn:")] public void ScrollRowToVisibleInColumn(NSInteger row, NSInteger column);
-    [Selector("setTitle:ofColumn:")] public void SetTitleOfColumn(NSString string, NSInteger column);
-    [Selector("titleOfColumn:")] public NSString? TitleOfColumn(NSInteger column);
-    [Selector("setPath:")] public bool SetPath(NSString path);
-    [Selector("path")] public NSString Path();
-    [Selector("pathToColumn:")] public NSString PathToColumn(NSInteger column);
-    [Selector("selectedCellInColumn:")] public AnyObject? SelectedCellInColumn(NSInteger column);
-    [Selector("selectRow:inColumn:")] public void SelectRowInColumn(NSInteger row, NSInteger column);
-    [Selector("selectedRowInColumn:")] public NSInteger SelectedRowInColumn(NSInteger column);
-    [Selector("selectRowIndexes:inColumn:")] public void SelectRowIndexesInColumn(NSIndexSet indexes, NSInteger column);
-    [Selector("selectedRowIndexesInColumn:")] public NSIndexSet? SelectedRowIndexesInColumn(NSInteger column);
-    [Selector("reloadColumn:")] public void ReloadColumn(NSInteger column);
-    [Selector("validateVisibleColumns")] public void ValidateVisibleColumns();
-    [Selector("scrollColumnsRightBy:")] public void ScrollColumnsRightBy(NSInteger shiftAmount);
-    [Selector("scrollColumnsLeftBy:")] public void ScrollColumnsLeftBy(NSInteger shiftAmount);
-    [Selector("scrollColumnToVisible:")] public void ScrollColumnToVisible(NSInteger column);
-    [Selector("addColumn")] public void AddColumn();
-    [Selector("loadedCellAtRow:column:")] public AnyObject? LoadedCellAtRowColumn(NSInteger row, NSInteger col);
-    [Selector("selectAll:")] public void SelectAll(AnyObject? sender);
-    [Selector("tile")] public void Tile();
-    [Selector("doClick:")] public void DoClick(AnyObject? sender);
-    [Selector("doDoubleClick:")] public void DoDoubleClick(AnyObject? sender);
-    [Selector("sendAction")] public bool SendAction();
-    [Selector("titleFrameOfColumn:")] public NSRect TitleFrameOfColumn(NSInteger column);
-    [Selector("drawTitleOfColumn:inRect:")] public void DrawTitleOfColumnInRect(NSInteger column, NSRect rect);
-    [Selector("frameOfColumn:")] public NSRect FrameOfColumn(NSInteger column);
-    [Selector("frameOfInsideOfColumn:")] public NSRect FrameOfInsideOfColumn(NSInteger column);
-    [Selector("frameOfRow:inColumn:")] public NSRect FrameOfRowInColumn(NSInteger row, NSInteger column);
-    [Selector("getRow:column:forPoint:")] public bool GetRowColumnForPoint(NSInteger* row, NSInteger* column, NSPoint point);
-    [Selector("columnWidthForColumnContentWidth:")] public CGFloat ColumnWidthForColumnContentWidth(CGFloat columnContentWidth);
-    [Selector("columnContentWidthForColumnWidth:")] public CGFloat ColumnContentWidthForColumnWidth(CGFloat columnWidth);
-    [Selector("setWidth:ofColumn:")] public void SetWidthOfColumn(CGFloat columnWidth, NSInteger columnIndex);
-    [Selector("widthOfColumn:")] public CGFloat WidthOfColumn(NSInteger column);
-    [Selector("noteHeightOfRowsWithIndexesChanged:inColumn:")] public void NoteHeightOfRowsWithIndexesChangedInColumn(NSIndexSet indexSet, NSInteger columnIndex);
-    [Selector("setDefaultColumnWidth:")] public void SetDefaultColumnWidth(CGFloat columnWidth);
-    [Selector("defaultColumnWidth")] public CGFloat DefaultColumnWidth();
-    [Selector("removeSavedColumnsWithAutosaveName:")] public static void RemoveSavedColumnsWithAutosaveName(NSBrowserColumnsAutosaveName name);
-    [Selector("canDragRowsWithIndexes:inColumn:withEvent:")] public bool CanDragRowsWithIndexesInColumnWithEvent(NSIndexSet rowIndexes, NSInteger column, NSEvent event);
-    [Selector("draggingImageForRowsWithIndexes:inColumn:withEvent:offset:")] public NSImage? DraggingImageForRowsWithIndexesInColumnWithEventOffset(NSIndexSet rowIndexes, NSInteger column, NSEvent event, NSPointPointer dragImageOffset);
-    [Selector("setDraggingSourceOperationMask:forLocal:")] public void SetDraggingSourceOperationMaskForLocal(NSDragOperation mask, bool isLocal);
-    [Selector("editItemAtIndexPath:withEvent:select:")] public void EditItemAtIndexPathWithEventSelect(NSIndexPath indexPath, NSEvent? event, bool select);
+    [Selector("cellClass")]
+    public static Class CellClass { get; }
+    [Selector("isLoaded")]
+    public bool Loaded { get; }
+    [Selector("doubleAction", "setDoubleAction:")]
+    public Selector DoubleAction { get; set; }
+    [Selector("cellPrototype", "setCellPrototype:")]
+    public AnyObject? CellPrototype { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSBrowserDelegate? Delegate { get; set; }
+    [Selector("reusesColumns", "setReusesColumns:")]
+    public bool ReusesColumns { get; set; }
+    [Selector("hasHorizontalScroller", "setHasHorizontalScroller:")]
+    public bool HasHorizontalScroller { get; set; }
+    [Selector("autohidesScroller", "setAutohidesScroller:")]
+    public bool AutohidesScroller { get; set; }
+    [Selector("separatesColumns", "setSeparatesColumns:")]
+    public bool SeparatesColumns { get; set; }
+    [Selector("isTitled", "setTitled:")]
+    public bool Titled { get; set; }
+    [Selector("minColumnWidth", "setMinColumnWidth:")]
+    public CGFloat MinColumnWidth { get; set; }
+    [Selector("maxVisibleColumns", "setMaxVisibleColumns:")]
+    public NSInteger MaxVisibleColumns { get; set; }
+    [Selector("allowsMultipleSelection", "setAllowsMultipleSelection:")]
+    public bool AllowsMultipleSelection { get; set; }
+    [Selector("allowsBranchSelection", "setAllowsBranchSelection:")]
+    public bool AllowsBranchSelection { get; set; }
+    [Selector("allowsEmptySelection", "setAllowsEmptySelection:")]
+    public bool AllowsEmptySelection { get; set; }
+    [Selector("takesTitleFromPreviousColumn", "setTakesTitleFromPreviousColumn:")]
+    public bool TakesTitleFromPreviousColumn { get; set; }
+    [Selector("sendsActionOnArrowKeys", "setSendsActionOnArrowKeys:")]
+    public bool SendsActionOnArrowKeys { get; set; }
+    [Selector("pathSeparator", "setPathSeparator:")]
+    public NSString PathSeparator { get; set; }
+    [Selector("clickedColumn")]
+    public NSInteger ClickedColumn { get; }
+    [Selector("clickedRow")]
+    public NSInteger ClickedRow { get; }
+    [Selector("selectedColumn")]
+    public NSInteger SelectedColumn { get; }
+    [Selector("selectedCell")]
+    public AnyObject? SelectedCell { get; }
+    [Selector("selectedCells")]
+    public NSArray? SelectedCells { get; }
+    [Selector("selectionIndexPath", "setSelectionIndexPath:")]
+    public NSIndexPath? SelectionIndexPath { get; set; }
+    [Selector("selectionIndexPaths", "setSelectionIndexPaths:")]
+    public NSArray? SelectionIndexPaths { get; set; }
+    [Selector("lastColumn", "setLastColumn:")]
+    public NSInteger LastColumn { get; set; }
+    [Selector("numberOfVisibleColumns")]
+    public NSInteger NumberOfVisibleColumns { get; }
+    [Selector("firstVisibleColumn")]
+    public NSInteger FirstVisibleColumn { get; }
+    [Selector("lastVisibleColumn")]
+    public NSInteger LastVisibleColumn { get; }
+    [Selector("titleHeight")]
+    public CGFloat TitleHeight { get; }
+    [Selector("columnResizingType", "setColumnResizingType:")]
+    public NSBrowserColumnResizingType ColumnResizingType { get; set; }
+    [Selector("prefersAllColumnUserResizing", "setPrefersAllColumnUserResizing:")]
+    public bool PrefersAllColumnUserResizing { get; set; }
+    [Selector("rowHeight", "setRowHeight:")]
+    public CGFloat RowHeight { get; set; }
+    [Selector("columnsAutosaveName", "setColumnsAutosaveName:")]
+    public NSBrowserColumnsAutosaveName ColumnsAutosaveName { get; set; }
+    [Selector("allowsTypeSelect", "setAllowsTypeSelect:")]
+    public bool AllowsTypeSelect { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("loadColumnZero")]
+    public void LoadColumnZero();
+    [Selector("setCellClass:")]
+    public void SetCellClass(Class factoryId);
+    [Selector("itemAtIndexPath:")]
+    public AnyObject? ItemAtIndexPath(NSIndexPath indexPath);
+    [Selector("itemAtRow:inColumn:")]
+    public AnyObject? ItemAtRowInColumn(NSInteger row, NSInteger column);
+    [Selector("indexPathForColumn:")]
+    public NSIndexPath IndexPathForColumn(NSInteger column);
+    [Selector("isLeafItem:")]
+    public bool IsLeafItem(AnyObject? item);
+    [Selector("reloadDataForRowIndexes:inColumn:")]
+    public void ReloadDataForRowIndexesInColumn(NSIndexSet rowIndexes, NSInteger column);
+    [Selector("parentForItemsInColumn:")]
+    public AnyObject? ParentForItemsInColumn(NSInteger column);
+    [Selector("scrollRowToVisible:inColumn:")]
+    public void ScrollRowToVisibleInColumn(NSInteger row, NSInteger column);
+    [Selector("setTitle:ofColumn:")]
+    public void SetTitleOfColumn(NSString string, NSInteger column);
+    [Selector("titleOfColumn:")]
+    public NSString? TitleOfColumn(NSInteger column);
+    [Selector("setPath:")]
+    public bool SetPath(NSString path);
+    [Selector("path")]
+    public NSString Path();
+    [Selector("pathToColumn:")]
+    public NSString PathToColumn(NSInteger column);
+    [Selector("selectedCellInColumn:")]
+    public AnyObject? SelectedCellInColumn(NSInteger column);
+    [Selector("selectRow:inColumn:")]
+    public void SelectRowInColumn(NSInteger row, NSInteger column);
+    [Selector("selectedRowInColumn:")]
+    public NSInteger SelectedRowInColumn(NSInteger column);
+    [Selector("selectRowIndexes:inColumn:")]
+    public void SelectRowIndexesInColumn(NSIndexSet indexes, NSInteger column);
+    [Selector("selectedRowIndexesInColumn:")]
+    public NSIndexSet? SelectedRowIndexesInColumn(NSInteger column);
+    [Selector("reloadColumn:")]
+    public void ReloadColumn(NSInteger column);
+    [Selector("validateVisibleColumns")]
+    public void ValidateVisibleColumns();
+    [Selector("scrollColumnsRightBy:")]
+    public void ScrollColumnsRightBy(NSInteger shiftAmount);
+    [Selector("scrollColumnsLeftBy:")]
+    public void ScrollColumnsLeftBy(NSInteger shiftAmount);
+    [Selector("scrollColumnToVisible:")]
+    public void ScrollColumnToVisible(NSInteger column);
+    [Selector("addColumn")]
+    public void AddColumn();
+    [Selector("loadedCellAtRow:column:")]
+    public AnyObject? LoadedCellAtRowColumn(NSInteger row, NSInteger col);
+    [Selector("selectAll:")]
+    public void SelectAll(AnyObject? sender);
+    [Selector("tile")]
+    public void Tile();
+    [Selector("doClick:")]
+    public void DoClick(AnyObject? sender);
+    [Selector("doDoubleClick:")]
+    public void DoDoubleClick(AnyObject? sender);
+    [Selector("sendAction")]
+    public bool SendAction();
+    [Selector("titleFrameOfColumn:")]
+    public NSRect TitleFrameOfColumn(NSInteger column);
+    [Selector("drawTitleOfColumn:inRect:")]
+    public void DrawTitleOfColumnInRect(NSInteger column, NSRect rect);
+    [Selector("frameOfColumn:")]
+    public NSRect FrameOfColumn(NSInteger column);
+    [Selector("frameOfInsideOfColumn:")]
+    public NSRect FrameOfInsideOfColumn(NSInteger column);
+    [Selector("frameOfRow:inColumn:")]
+    public NSRect FrameOfRowInColumn(NSInteger row, NSInteger column);
+    [Selector("getRow:column:forPoint:")]
+    public bool GetRowColumnForPoint(NSInteger* row, NSInteger* column, NSPoint point);
+    [Selector("columnWidthForColumnContentWidth:")]
+    public CGFloat ColumnWidthForColumnContentWidth(CGFloat columnContentWidth);
+    [Selector("columnContentWidthForColumnWidth:")]
+    public CGFloat ColumnContentWidthForColumnWidth(CGFloat columnWidth);
+    [Selector("setWidth:ofColumn:")]
+    public void SetWidthOfColumn(CGFloat columnWidth, NSInteger columnIndex);
+    [Selector("widthOfColumn:")]
+    public CGFloat WidthOfColumn(NSInteger column);
+    [Selector("noteHeightOfRowsWithIndexesChanged:inColumn:")]
+    public void NoteHeightOfRowsWithIndexesChangedInColumn(NSIndexSet indexSet, NSInteger columnIndex);
+    [Selector("setDefaultColumnWidth:")]
+    public void SetDefaultColumnWidth(CGFloat columnWidth);
+    [Selector("defaultColumnWidth")]
+    public CGFloat DefaultColumnWidth();
+    [Selector("removeSavedColumnsWithAutosaveName:")]
+    public static void RemoveSavedColumnsWithAutosaveName(NSBrowserColumnsAutosaveName name);
+    [Selector("canDragRowsWithIndexes:inColumn:withEvent:")]
+    public bool CanDragRowsWithIndexesInColumnWithEvent(NSIndexSet rowIndexes, NSInteger column, NSEvent event);
+    [Selector("draggingImageForRowsWithIndexes:inColumn:withEvent:offset:")]
+    public NSImage? DraggingImageForRowsWithIndexesInColumnWithEventOffset(NSIndexSet rowIndexes, NSInteger column, NSEvent event, NSPointPointer dragImageOffset);
+    [Selector("setDraggingSourceOperationMask:forLocal:")]
+    public void SetDraggingSourceOperationMaskForLocal(NSDragOperation mask, bool isLocal);
+    [Selector("editItemAtIndexPath:withEvent:select:")]
+    public void EditItemAtIndexPathWithEventSelect(NSIndexPath indexPath, NSEvent? event, bool select);
 }
 
 public extern "C" NSNotificationName NSBrowserColumnConfigurationDidChangeNotification;
 
 public objc interface NSBrowserDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("browser:numberOfRowsInColumn:")] NSInteger BrowserNumberOfRowsInColumn(NSBrowser sender, NSInteger column);
-    [Optional] [Selector("browser:createRowsForColumn:inMatrix:")] void BrowserCreateRowsForColumnInMatrix(NSBrowser sender, NSInteger column, NSMatrix matrix);
-    [Optional] [Selector("browser:numberOfChildrenOfItem:")] NSInteger BrowserNumberOfChildrenOfItem(NSBrowser browser, AnyObject? item);
-    [Optional] [Selector("browser:child:ofItem:")] AnyObject BrowserChildOfItem(NSBrowser browser, NSInteger index, AnyObject? item);
-    [Optional] [Selector("browser:isLeafItem:")] bool BrowserIsLeafItem(NSBrowser browser, AnyObject? item);
-    [Optional] [Selector("browser:objectValueForItem:")] AnyObject? BrowserObjectValueForItem(NSBrowser browser, AnyObject? item);
-    [Optional] [Selector("browser:heightOfRow:inColumn:")] CGFloat BrowserHeightOfRowInColumn(NSBrowser browser, NSInteger row, NSInteger columnIndex);
-    [Optional] [Selector("rootItemForBrowser:")] AnyObject? RootItemForBrowser(NSBrowser browser);
-    [Optional] [Selector("browser:setObjectValue:forItem:")] void BrowserSetObjectValueForItem(NSBrowser browser, AnyObject? object, AnyObject? item);
-    [Optional] [Selector("browser:shouldEditItem:")] bool BrowserShouldEditItem(NSBrowser browser, AnyObject? item);
-    [Optional] [Selector("browser:willDisplayCell:atRow:column:")] void BrowserWillDisplayCellAtRowColumn(NSBrowser sender, AnyObject cell, NSInteger row, NSInteger column);
-    [Optional] [Selector("browser:titleOfColumn:")] NSString? BrowserTitleOfColumn(NSBrowser sender, NSInteger column);
-    [Optional] [Selector("browser:selectCellWithString:inColumn:")] bool BrowserSelectCellWithStringInColumn(NSBrowser sender, NSString title, NSInteger column);
-    [Optional] [Selector("browser:selectRow:inColumn:")] bool BrowserSelectRowInColumn(NSBrowser sender, NSInteger row, NSInteger column);
-    [Optional] [Selector("browser:isColumnValid:")] bool BrowserIsColumnValid(NSBrowser sender, NSInteger column);
-    [Optional] [Selector("browserWillScroll:")] void BrowserWillScroll(NSBrowser sender);
-    [Optional] [Selector("browserDidScroll:")] void BrowserDidScroll(NSBrowser sender);
-    [Optional] [Selector("browser:shouldSizeColumn:forUserResize:toWidth:")] CGFloat BrowserShouldSizeColumnForUserResizeToWidth(NSBrowser browser, NSInteger columnIndex, bool forUserResize, CGFloat suggestedWidth);
-    [Optional] [Selector("browser:sizeToFitWidthOfColumn:")] CGFloat BrowserSizeToFitWidthOfColumn(NSBrowser browser, NSInteger columnIndex);
-    [Optional] [Selector("browserColumnConfigurationDidChange:")] void BrowserColumnConfigurationDidChange(NSNotification notification);
-    [Optional] [Selector("browser:shouldShowCellExpansionForRow:column:")] bool BrowserShouldShowCellExpansionForRowColumn(NSBrowser browser, NSInteger row, NSInteger column);
-    [Optional] [Selector("browser:writeRowsWithIndexes:inColumn:toPasteboard:")] bool BrowserWriteRowsWithIndexesInColumnToPasteboard(NSBrowser browser, NSIndexSet rowIndexes, NSInteger column, NSPasteboard pasteboard);
+    [Optional]
+    [Selector("browser:numberOfRowsInColumn:")]
+    NSInteger BrowserNumberOfRowsInColumn(NSBrowser sender, NSInteger column);
+    [Optional]
+    [Selector("browser:createRowsForColumn:inMatrix:")]
+    void BrowserCreateRowsForColumnInMatrix(NSBrowser sender, NSInteger column, NSMatrix matrix);
+    [Optional]
+    [Selector("browser:numberOfChildrenOfItem:")]
+    NSInteger BrowserNumberOfChildrenOfItem(NSBrowser browser, AnyObject? item);
+    [Optional]
+    [Selector("browser:child:ofItem:")]
+    AnyObject BrowserChildOfItem(NSBrowser browser, NSInteger index, AnyObject? item);
+    [Optional]
+    [Selector("browser:isLeafItem:")]
+    bool BrowserIsLeafItem(NSBrowser browser, AnyObject? item);
+    [Optional]
+    [Selector("browser:objectValueForItem:")]
+    AnyObject? BrowserObjectValueForItem(NSBrowser browser, AnyObject? item);
+    [Optional]
+    [Selector("browser:heightOfRow:inColumn:")]
+    CGFloat BrowserHeightOfRowInColumn(NSBrowser browser, NSInteger row, NSInteger columnIndex);
+    [Optional]
+    [Selector("rootItemForBrowser:")]
+    AnyObject? RootItemForBrowser(NSBrowser browser);
+    [Optional]
+    [Selector("browser:setObjectValue:forItem:")]
+    void BrowserSetObjectValueForItem(NSBrowser browser, AnyObject? object, AnyObject? item);
+    [Optional]
+    [Selector("browser:shouldEditItem:")]
+    bool BrowserShouldEditItem(NSBrowser browser, AnyObject? item);
+    [Optional]
+    [Selector("browser:willDisplayCell:atRow:column:")]
+    void BrowserWillDisplayCellAtRowColumn(NSBrowser sender, AnyObject cell, NSInteger row, NSInteger column);
+    [Optional]
+    [Selector("browser:titleOfColumn:")]
+    NSString? BrowserTitleOfColumn(NSBrowser sender, NSInteger column);
+    [Optional]
+    [Selector("browser:selectCellWithString:inColumn:")]
+    bool BrowserSelectCellWithStringInColumn(NSBrowser sender, NSString title, NSInteger column);
+    [Optional]
+    [Selector("browser:selectRow:inColumn:")]
+    bool BrowserSelectRowInColumn(NSBrowser sender, NSInteger row, NSInteger column);
+    [Optional]
+    [Selector("browser:isColumnValid:")]
+    bool BrowserIsColumnValid(NSBrowser sender, NSInteger column);
+    [Optional]
+    [Selector("browserWillScroll:")]
+    void BrowserWillScroll(NSBrowser sender);
+    [Optional]
+    [Selector("browserDidScroll:")]
+    void BrowserDidScroll(NSBrowser sender);
+    [Optional]
+    [Selector("browser:shouldSizeColumn:forUserResize:toWidth:")]
+    CGFloat BrowserShouldSizeColumnForUserResizeToWidth(NSBrowser browser, NSInteger columnIndex, bool forUserResize, CGFloat suggestedWidth);
+    [Optional]
+    [Selector("browser:sizeToFitWidthOfColumn:")]
+    CGFloat BrowserSizeToFitWidthOfColumn(NSBrowser browser, NSInteger columnIndex);
+    [Optional]
+    [Selector("browserColumnConfigurationDidChange:")]
+    void BrowserColumnConfigurationDidChange(NSNotification notification);
+    [Optional]
+    [Selector("browser:shouldShowCellExpansionForRow:column:")]
+    bool BrowserShouldShowCellExpansionForRowColumn(NSBrowser browser, NSInteger row, NSInteger column);
+    [Optional]
+    [Selector("browser:writeRowsWithIndexes:inColumn:toPasteboard:")]
+    bool BrowserWriteRowsWithIndexesInColumnToPasteboard(NSBrowser browser, NSIndexSet rowIndexes, NSInteger column, NSPasteboard pasteboard);
     /// Deprecated in macOS 10.13.
-    [Optional] [Selector("browser:namesOfPromisedFilesDroppedAtDestination:forDraggedRowsWithIndexes:inColumn:")] NSArray BrowserNamesOfPromisedFilesDroppedAtDestinationForDraggedRowsWithIndexesInColumn(NSBrowser browser, NSURL dropDestination, NSIndexSet rowIndexes, NSInteger column);
-    [Optional] [Selector("browser:canDragRowsWithIndexes:inColumn:withEvent:")] bool BrowserCanDragRowsWithIndexesInColumnWithEvent(NSBrowser browser, NSIndexSet rowIndexes, NSInteger column, NSEvent event);
-    [Optional] [Selector("browser:draggingImageForRowsWithIndexes:inColumn:withEvent:offset:")] NSImage? BrowserDraggingImageForRowsWithIndexesInColumnWithEventOffset(NSBrowser browser, NSIndexSet rowIndexes, NSInteger column, NSEvent event, NSPointPointer dragImageOffset);
-    [Optional] [Selector("browser:validateDrop:proposedRow:column:dropOperation:")] NSDragOperation BrowserValidateDropProposedRowColumnDropOperation(NSBrowser browser, NSDraggingInfo info, NSInteger* row, NSInteger* column, NSBrowserDropOperation* dropOperation);
-    [Optional] [Selector("browser:acceptDrop:atRow:column:dropOperation:")] bool BrowserAcceptDropAtRowColumnDropOperation(NSBrowser browser, NSDraggingInfo info, NSInteger row, NSInteger column, NSBrowserDropOperation dropOperation);
-    [Optional] [Selector("browser:typeSelectStringForRow:inColumn:")] NSString? BrowserTypeSelectStringForRowInColumn(NSBrowser browser, NSInteger row, NSInteger column);
-    [Optional] [Selector("browser:shouldTypeSelectForEvent:withCurrentSearchString:")] bool BrowserShouldTypeSelectForEventWithCurrentSearchString(NSBrowser browser, NSEvent event, NSString? searchString);
-    [Optional] [Selector("browser:nextTypeSelectMatchFromRow:toRow:inColumn:forString:")] NSInteger BrowserNextTypeSelectMatchFromRowToRowInColumnForString(NSBrowser browser, NSInteger startRow, NSInteger endRow, NSInteger column, NSString? searchString);
-    [Optional] [Selector("browser:previewViewControllerForLeafItem:")] NSViewController? BrowserPreviewViewControllerForLeafItem(NSBrowser browser, AnyObject item);
-    [Optional] [Selector("browser:headerViewControllerForItem:")] NSViewController? BrowserHeaderViewControllerForItem(NSBrowser browser, AnyObject? item);
-    [Optional] [Selector("browser:didChangeLastColumn:toColumn:")] void BrowserDidChangeLastColumnToColumn(NSBrowser browser, NSInteger oldLastColumn, NSInteger column);
-    [Optional] [Selector("browser:selectionIndexesForProposedSelection:inColumn:")] NSIndexSet BrowserSelectionIndexesForProposedSelectionInColumn(NSBrowser browser, NSIndexSet proposedSelectionIndexes, NSInteger column);
+    [Optional]
+    [Selector("browser:namesOfPromisedFilesDroppedAtDestination:forDraggedRowsWithIndexes:inColumn:")]
+    NSArray BrowserNamesOfPromisedFilesDroppedAtDestinationForDraggedRowsWithIndexesInColumn(NSBrowser browser, NSURL dropDestination, NSIndexSet rowIndexes, NSInteger column);
+    [Optional]
+    [Selector("browser:canDragRowsWithIndexes:inColumn:withEvent:")]
+    bool BrowserCanDragRowsWithIndexesInColumnWithEvent(NSBrowser browser, NSIndexSet rowIndexes, NSInteger column, NSEvent event);
+    [Optional]
+    [Selector("browser:draggingImageForRowsWithIndexes:inColumn:withEvent:offset:")]
+    NSImage? BrowserDraggingImageForRowsWithIndexesInColumnWithEventOffset(NSBrowser browser, NSIndexSet rowIndexes, NSInteger column, NSEvent event, NSPointPointer dragImageOffset);
+    [Optional]
+    [Selector("browser:validateDrop:proposedRow:column:dropOperation:")]
+    NSDragOperation BrowserValidateDropProposedRowColumnDropOperation(NSBrowser browser, NSDraggingInfo info, NSInteger* row, NSInteger* column, NSBrowserDropOperation* dropOperation);
+    [Optional]
+    [Selector("browser:acceptDrop:atRow:column:dropOperation:")]
+    bool BrowserAcceptDropAtRowColumnDropOperation(NSBrowser browser, NSDraggingInfo info, NSInteger row, NSInteger column, NSBrowserDropOperation dropOperation);
+    [Optional]
+    [Selector("browser:typeSelectStringForRow:inColumn:")]
+    NSString? BrowserTypeSelectStringForRowInColumn(NSBrowser browser, NSInteger row, NSInteger column);
+    [Optional]
+    [Selector("browser:shouldTypeSelectForEvent:withCurrentSearchString:")]
+    bool BrowserShouldTypeSelectForEventWithCurrentSearchString(NSBrowser browser, NSEvent event, NSString? searchString);
+    [Optional]
+    [Selector("browser:nextTypeSelectMatchFromRow:toRow:inColumn:forString:")]
+    NSInteger BrowserNextTypeSelectMatchFromRowToRowInColumnForString(NSBrowser browser, NSInteger startRow, NSInteger endRow, NSInteger column, NSString? searchString);
+    [Optional]
+    [Selector("browser:previewViewControllerForLeafItem:")]
+    NSViewController? BrowserPreviewViewControllerForLeafItem(NSBrowser browser, AnyObject item);
+    [Optional]
+    [Selector("browser:headerViewControllerForItem:")]
+    NSViewController? BrowserHeaderViewControllerForItem(NSBrowser browser, AnyObject? item);
+    [Optional]
+    [Selector("browser:didChangeLastColumn:toColumn:")]
+    void BrowserDidChangeLastColumnToColumn(NSBrowser browser, NSInteger oldLastColumn, NSInteger column);
+    [Optional]
+    [Selector("browser:selectionIndexesForProposedSelection:inColumn:")]
+    NSIndexSet BrowserSelectionIndexesForProposedSelectionInColumn(NSBrowser browser, NSIndexSet proposedSelectionIndexes, NSInteger column);
 }
 
 /// NSDeprecated, a category of NSBrowser.
 public extern objc class NSBrowser
 {
     /// Deprecated in macOS 10.6.
-    [Selector("setAcceptsArrowKeys:")] public void SetAcceptsArrowKeys(bool flag);
+    [Selector("setAcceptsArrowKeys:")]
+    public void SetAcceptsArrowKeys(bool flag);
     /// Deprecated in macOS 10.6.
-    [Selector("acceptsArrowKeys")] public bool AcceptsArrowKeys();
+    [Selector("acceptsArrowKeys")]
+    public bool AcceptsArrowKeys();
     /// Deprecated in macOS 10.3.
-    [Selector("displayColumn:")] public void DisplayColumn(NSInteger column);
+    [Selector("displayColumn:")]
+    public void DisplayColumn(NSInteger column);
     /// Deprecated in macOS 10.3.
-    [Selector("displayAllColumns")] public void DisplayAllColumns();
+    [Selector("displayAllColumns")]
+    public void DisplayAllColumns();
     /// Deprecated in macOS 10.3.
-    [Selector("scrollViaScroller:")] public void ScrollViaScroller(NSScroller? sender);
+    [Selector("scrollViaScroller:")]
+    public void ScrollViaScroller(NSScroller? sender);
     /// Deprecated in macOS 10.3.
-    [Selector("updateScroller")] public void UpdateScroller();
+    [Selector("updateScroller")]
+    public void UpdateScroller();
     /// Deprecated in macOS 10.10.
-    [Selector("setMatrixClass:")] public void SetMatrixClass(Class factoryId);
+    [Selector("setMatrixClass:")]
+    public void SetMatrixClass(Class factoryId);
     /// Deprecated in macOS 10.10.
-    [Selector("matrixClass")] public Class MatrixClass();
+    [Selector("matrixClass")]
+    public Class MatrixClass();
     /// Deprecated in macOS 10.10.
-    [Selector("columnOfMatrix:")] public NSInteger ColumnOfMatrix(NSMatrix matrix);
+    [Selector("columnOfMatrix:")]
+    public NSInteger ColumnOfMatrix(NSMatrix matrix);
     /// Deprecated in macOS 10.10.
-    [Selector("matrixInColumn:")] public NSMatrix? MatrixInColumn(NSInteger column);
+    [Selector("matrixInColumn:")]
+    public NSMatrix? MatrixInColumn(NSInteger column);
 }
 
 #endif

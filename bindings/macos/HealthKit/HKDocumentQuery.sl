@@ -35,10 +35,14 @@ public objc closure void HKDocumentQueryInitWithDocumentTypePredicateLimitSortDe
 
 public extern objc class HKDocumentQuery : HKQuery
 {
-    [Selector("limit")] public NSUInteger Limit { get; }
-    [Selector("sortDescriptors")] public NSArray? SortDescriptors { get; }
-    [Selector("includeDocumentData")] public bool IncludeDocumentData { get; }
-    [Selector("initWithDocumentType:predicate:limit:sortDescriptors:includeDocumentData:resultsHandler:")] public Self InitWithDocumentTypePredicateLimitSortDescriptorsIncludeDocumentDataResultsHandler(HKDocumentType documentType, NSPredicate? predicate, NSUInteger limit, NSArray? sortDescriptors, bool includeDocumentData, HKDocumentQueryInitWithDocumentTypePredicateLimitSortDescriptorsIncludeDocumentDataResultsHandlerResultsHandlerBlock resultsHandler);
+    [Selector("limit")]
+    public NSUInteger Limit { get; }
+    [Selector("sortDescriptors")]
+    public NSArray? SortDescriptors { get; }
+    [Selector("includeDocumentData")]
+    public bool IncludeDocumentData { get; }
+    [Selector("initWithDocumentType:predicate:limit:sortDescriptors:includeDocumentData:resultsHandler:")]
+    public Self InitWithDocumentTypePredicateLimitSortDescriptorsIncludeDocumentDataResultsHandler(HKDocumentType documentType, NSPredicate? predicate, NSUInteger limit, NSArray? sortDescriptors, bool includeDocumentData, HKDocumentQueryInitWithDocumentTypePredicateLimitSortDescriptorsIncludeDocumentDataResultsHandlerResultsHandlerBlock resultsHandler);
 }
 
 #endif

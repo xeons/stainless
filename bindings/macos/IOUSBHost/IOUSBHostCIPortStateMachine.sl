@@ -33,19 +33,32 @@ import Standard.ObjC;
 
 public extern objc class IOUSBHostCIPortStateMachine : NSObject
 {
-    [Selector("portNumber")] public NSUInteger PortNumber { get; }
-    [Selector("portState")] public IOUSBHostCIPortState PortState { get; }
-    [Selector("portStatus")] public IOUSBHostCIPortStatus PortStatus { get; }
-    [Selector("controllerInterface")] public IOUSBHostControllerInterface ControllerInterface { get; }
-    [Selector("powered", "setPowered:")] public bool Powered { get; set; }
-    [Selector("connected", "setConnected:")] public bool Connected { get; set; }
-    [Selector("overcurrent", "setOvercurrent:")] public bool Overcurrent { get; set; }
-    [Selector("linkState")] public IOUSBHostCILinkState LinkState { get; }
-    [Selector("speed")] public IOUSBHostCIDeviceSpeed Speed { get; }
-    [Selector("initWithInterface:portNumber:error:")] public Self? InitWithInterfacePortNumberError(IOUSBHostControllerInterface @interface, NSUInteger portNumber, out NSError? error);
-    [Selector("inspectCommand:error:")] public bool InspectCommandError(IOUSBHostCIMessage* command, out NSError? error);
-    [Selector("respondToCommand:status:error:")] public bool RespondToCommandStatusError(IOUSBHostCIMessage* command, IOUSBHostCIMessageStatus status, out NSError? error);
-    [Selector("updateLinkState:speed:inhibitLinkStateChange:error:")] public bool UpdateLinkStateSpeedInhibitLinkStateChangeError(IOUSBHostCILinkState linkState, IOUSBHostCIDeviceSpeed speed, bool inhibitLinkStateChange, out NSError? error);
+    [Selector("portNumber")]
+    public NSUInteger PortNumber { get; }
+    [Selector("portState")]
+    public IOUSBHostCIPortState PortState { get; }
+    [Selector("portStatus")]
+    public IOUSBHostCIPortStatus PortStatus { get; }
+    [Selector("controllerInterface")]
+    public IOUSBHostControllerInterface ControllerInterface { get; }
+    [Selector("powered", "setPowered:")]
+    public bool Powered { get; set; }
+    [Selector("connected", "setConnected:")]
+    public bool Connected { get; set; }
+    [Selector("overcurrent", "setOvercurrent:")]
+    public bool Overcurrent { get; set; }
+    [Selector("linkState")]
+    public IOUSBHostCILinkState LinkState { get; }
+    [Selector("speed")]
+    public IOUSBHostCIDeviceSpeed Speed { get; }
+    [Selector("initWithInterface:portNumber:error:")]
+    public Self? InitWithInterfacePortNumberError(IOUSBHostControllerInterface @interface, NSUInteger portNumber, out NSError? error);
+    [Selector("inspectCommand:error:")]
+    public bool InspectCommandError(IOUSBHostCIMessage* command, out NSError? error);
+    [Selector("respondToCommand:status:error:")]
+    public bool RespondToCommandStatusError(IOUSBHostCIMessage* command, IOUSBHostCIMessageStatus status, out NSError? error);
+    [Selector("updateLinkState:speed:inhibitLinkStateChange:error:")]
+    public bool UpdateLinkStateSpeedInhibitLinkStateChangeError(IOUSBHostCILinkState linkState, IOUSBHostCIDeviceSpeed speed, bool inhibitLinkStateChange, out NSError? error);
 }
 
 #endif

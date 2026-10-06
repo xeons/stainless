@@ -38,13 +38,20 @@ public objc closure void CKModifySubscriptionsOperationModifySubscriptionsComple
 
 public extern objc class CKModifySubscriptionsOperation : CKDatabaseOperation
 {
-    [Selector("subscriptionsToSave", "setSubscriptionsToSave:")] public NSArray? SubscriptionsToSave { get; set; }
-    [Selector("subscriptionIDsToDelete", "setSubscriptionIDsToDelete:")] public NSArray? SubscriptionIDsToDelete { get; set; }
-    [Selector("perSubscriptionSaveBlock", "setPerSubscriptionSaveBlock:")] public CKModifySubscriptionsOperationPerSubscriptionSaveBlock? PerSubscriptionSaveBlock { get; set; }
-    [Selector("perSubscriptionDeleteBlock", "setPerSubscriptionDeleteBlock:")] public CKModifySubscriptionsOperationPerSubscriptionDeleteBlock? PerSubscriptionDeleteBlock { get; set; }
-    [Selector("modifySubscriptionsCompletionBlock", "setModifySubscriptionsCompletionBlock:")] public CKModifySubscriptionsOperationModifySubscriptionsCompletionBlock? ModifySubscriptionsCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithSubscriptionsToSave:subscriptionIDsToDelete:")] public Self InitWithSubscriptionsToSaveSubscriptionIDsToDelete(NSArray? subscriptionsToSave, NSArray? subscriptionIDsToDelete);
+    [Selector("subscriptionsToSave", "setSubscriptionsToSave:")]
+    public NSArray? SubscriptionsToSave { get; set; }
+    [Selector("subscriptionIDsToDelete", "setSubscriptionIDsToDelete:")]
+    public NSArray? SubscriptionIDsToDelete { get; set; }
+    [Selector("perSubscriptionSaveBlock", "setPerSubscriptionSaveBlock:")]
+    public CKModifySubscriptionsOperationPerSubscriptionSaveBlock? PerSubscriptionSaveBlock { get; set; }
+    [Selector("perSubscriptionDeleteBlock", "setPerSubscriptionDeleteBlock:")]
+    public CKModifySubscriptionsOperationPerSubscriptionDeleteBlock? PerSubscriptionDeleteBlock { get; set; }
+    [Selector("modifySubscriptionsCompletionBlock", "setModifySubscriptionsCompletionBlock:")]
+    public CKModifySubscriptionsOperationModifySubscriptionsCompletionBlock? ModifySubscriptionsCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithSubscriptionsToSave:subscriptionIDsToDelete:")]
+    public Self InitWithSubscriptionsToSaveSubscriptionIDsToDelete(NSArray? subscriptionsToSave, NSArray? subscriptionIDsToDelete);
 }
 
 #endif

@@ -37,21 +37,35 @@ public using NSColorName = NSString;
 
 public extern objc class NSColorList : NSObject, NSSecureCoding
 {
-    [Selector("availableColorLists")] public static NSArray AvailableColorLists { get; }
-    [Selector("name")] public NSColorListName? Name { get; }
-    [Selector("allKeys")] public NSArray AllKeys { get; }
-    [Selector("isEditable")] public bool Editable { get; }
-    [Selector("colorListNamed:")] public static NSColorList? ColorListNamed(NSColorListName name);
-    [Selector("initWithName:")] public Self InitWithName(NSColorListName name);
-    [Selector("initWithName:fromFile:")] public Self? InitWithNameFromFile(NSColorListName name, NSString? path);
-    [Selector("setColor:forKey:")] public void SetColorForKey(NSColor color, NSColorName key);
-    [Selector("insertColor:key:atIndex:")] public void InsertColorKeyAtIndex(NSColor color, NSColorName key, NSUInteger loc);
-    [Selector("removeColorWithKey:")] public void RemoveColorWithKey(NSColorName key);
-    [Selector("colorWithKey:")] public NSColor? ColorWithKey(NSColorName key);
-    [Selector("writeToURL:error:")] public bool WriteToURLError(NSURL? url, out NSError? errPtr);
+    [Selector("availableColorLists")]
+    public static NSArray AvailableColorLists { get; }
+    [Selector("name")]
+    public NSColorListName? Name { get; }
+    [Selector("allKeys")]
+    public NSArray AllKeys { get; }
+    [Selector("isEditable")]
+    public bool Editable { get; }
+    [Selector("colorListNamed:")]
+    public static NSColorList? ColorListNamed(NSColorListName name);
+    [Selector("initWithName:")]
+    public Self InitWithName(NSColorListName name);
+    [Selector("initWithName:fromFile:")]
+    public Self? InitWithNameFromFile(NSColorListName name, NSString? path);
+    [Selector("setColor:forKey:")]
+    public void SetColorForKey(NSColor color, NSColorName key);
+    [Selector("insertColor:key:atIndex:")]
+    public void InsertColorKeyAtIndex(NSColor color, NSColorName key, NSUInteger loc);
+    [Selector("removeColorWithKey:")]
+    public void RemoveColorWithKey(NSColorName key);
+    [Selector("colorWithKey:")]
+    public NSColor? ColorWithKey(NSColorName key);
+    [Selector("writeToURL:error:")]
+    public bool WriteToURLError(NSURL? url, out NSError? errPtr);
     /// Deprecated in macOS 10.14.
-    [Selector("writeToFile:")] public bool WriteToFile(NSString? path);
-    [Selector("removeFile")] public void RemoveFile();
+    [Selector("writeToFile:")]
+    public bool WriteToFile(NSString? path);
+    [Selector("removeFile")]
+    public void RemoveFile();
 }
 
 public extern "C" NSNotificationName NSColorListDidChangeNotification;

@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public objc interface MLBatchProvider
 {
-    [Selector("count")] NSInteger Count { get; }
-    [Selector("featuresAtIndex:")] MLFeatureProvider FeaturesAtIndex(NSInteger index);
+    [Selector("count")]
+    NSInteger Count { get; }
+    [Selector("featuresAtIndex:")]
+    MLFeatureProvider FeaturesAtIndex(NSInteger index);
 }
 
 #endif

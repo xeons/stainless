@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class CNContactRelation : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("contactRelationWithName:")] public static Self ContactRelationWithName(NSString name);
-    [Selector("initWithName:")] public Self InitWithName(NSString name);
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("contactRelationWithName:")]
+    public static Self ContactRelationWithName(NSString name);
+    [Selector("initWithName:")]
+    public Self InitWithName(NSString name);
 }
 
 public extern "C" NSString? CNLabelContactRelationAssistant;

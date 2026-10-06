@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class AVSynchronizedLayer : CALayer
 {
-    [Selector("playerItem", "setPlayerItem:")] public AVPlayerItem? PlayerItem { get; set; }
-    [Selector("synchronizedLayerWithPlayerItem:")] public static AVSynchronizedLayer SynchronizedLayerWithPlayerItem(AVPlayerItem playerItem);
+    [Selector("playerItem", "setPlayerItem:")]
+    public AVPlayerItem? PlayerItem { get; set; }
+    [Selector("synchronizedLayerWithPlayerItem:")]
+    public static AVSynchronizedLayer SynchronizedLayerWithPlayerItem(AVPlayerItem playerItem);
 }
 
 #endif

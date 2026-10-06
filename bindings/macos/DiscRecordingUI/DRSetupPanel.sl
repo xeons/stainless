@@ -35,17 +35,28 @@ import Standard.ObjC;
 
 public extern objc class DRSetupPanel : NSPanel
 {
-    [Selector("initWithNibName:")] public AnyObject? InitWithNibName(NSString? nibName);
-    [Selector("runSetupPanel")] public NSInteger RunSetupPanel();
-    [Selector("beginSetupSheetForWindow:modalDelegate:didEndSelector:contextInfo:")] public void BeginSetupSheetForWindowModalDelegateDidEndSelectorContextInfo(NSWindow? owner, AnyObject? modalDelegate, Selector didEndSelector, void* contextInfo);
-    [Selector("ok:")] public void Ok(AnyObject? sender);
-    [Selector("cancel:")] public void Cancel(AnyObject? sender);
-    [Selector("eject:")] public void Eject(AnyObject? sender);
-    [Selector("open:")] public void Open(AnyObject? sender);
-    [Selector("close:")] public void Close(AnyObject? sender);
-    [Selector("deviceSelectionChanged:")] public void DeviceSelectionChanged(DRDevice? device);
-    [Selector("mediaStateChanged:")] public bool MediaStateChanged(NSDictionary? status);
-    [Selector("setupForDisplay")] public void SetupForDisplay();
+    [Selector("initWithNibName:")]
+    public AnyObject? InitWithNibName(NSString? nibName);
+    [Selector("runSetupPanel")]
+    public NSInteger RunSetupPanel();
+    [Selector("beginSetupSheetForWindow:modalDelegate:didEndSelector:contextInfo:")]
+    public void BeginSetupSheetForWindowModalDelegateDidEndSelectorContextInfo(NSWindow? owner, AnyObject? modalDelegate, Selector didEndSelector, void* contextInfo);
+    [Selector("ok:")]
+    public void Ok(AnyObject? sender);
+    [Selector("cancel:")]
+    public void Cancel(AnyObject? sender);
+    [Selector("eject:")]
+    public void Eject(AnyObject? sender);
+    [Selector("open:")]
+    public void Open(AnyObject? sender);
+    [Selector("close:")]
+    public void Close(AnyObject? sender);
+    [Selector("deviceSelectionChanged:")]
+    public void DeviceSelectionChanged(DRDevice? device);
+    [Selector("mediaStateChanged:")]
+    public bool MediaStateChanged(NSDictionary? status);
+    [Selector("setupForDisplay")]
+    public void SetupForDisplay();
 }
 
 public extern "C" NSString? DRSetupPanelDeviceSelectionChangedNotification;
@@ -55,11 +66,16 @@ public extern "C" NSString? DRSetupPanelSelectedDeviceKey;
 /// DRSetupPanelDelegate, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("setupPanel:deviceCouldBeTarget:")] public bool SetupPanelDeviceCouldBeTarget(DRSetupPanel? aPanel, DRDevice? device);
-    [Selector("setupPanel:determineBestDeviceOfA:orB:")] public DRDevice? SetupPanelDetermineBestDeviceOfAOrB(DRSetupPanel? aPanel, DRDevice? deviceA, DRDevice? device);
-    [Selector("setupPanelDeviceSelectionChanged:")] public void SetupPanelDeviceSelectionChanged(NSNotification? aNotification);
-    [Selector("setupPanelShouldHandleMediaReservations:")] public bool SetupPanelShouldHandleMediaReservations(DRSetupPanel? aPanel);
-    [Selector("setupPanel:deviceContainsSuitableMedia:promptString:")] public bool SetupPanelDeviceContainsSuitableMediaPromptString(DRSetupPanel? aPanel, DRDevice? device, out NSString? prompt);
+    [Selector("setupPanel:deviceCouldBeTarget:")]
+    public bool SetupPanelDeviceCouldBeTarget(DRSetupPanel? aPanel, DRDevice? device);
+    [Selector("setupPanel:determineBestDeviceOfA:orB:")]
+    public DRDevice? SetupPanelDetermineBestDeviceOfAOrB(DRSetupPanel? aPanel, DRDevice? deviceA, DRDevice? device);
+    [Selector("setupPanelDeviceSelectionChanged:")]
+    public void SetupPanelDeviceSelectionChanged(NSNotification? aNotification);
+    [Selector("setupPanelShouldHandleMediaReservations:")]
+    public bool SetupPanelShouldHandleMediaReservations(DRSetupPanel? aPanel);
+    [Selector("setupPanel:deviceContainsSuitableMedia:promptString:")]
+    public bool SetupPanelDeviceContainsSuitableMediaPromptString(DRSetupPanel? aPanel, DRDevice? device, out NSString? prompt);
 }
 
 #endif

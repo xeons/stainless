@@ -115,13 +115,20 @@ public enum HKStateOfMindKind : long
 
 public extern objc class HKStateOfMind : HKSample, NSSecureCoding, NSCopying
 {
-    [Selector("kind")] public HKStateOfMindKind Kind { get; }
-    [Selector("valence")] public double Valence { get; }
-    [Selector("valenceClassification")] public HKStateOfMindValenceClassification ValenceClassification { get; }
-    [Selector("labels")] public NSArray? Labels { get; }
-    [Selector("associations")] public NSArray? Associations { get; }
-    [Selector("stateOfMindWithDate:kind:valence:labels:associations:")] public static Self StateOfMindWithDateKindValenceLabelsAssociations(NSDate date, HKStateOfMindKind kind, double valence, NSArray labels, NSArray associations);
-    [Selector("stateOfMindWithDate:kind:valence:labels:associations:metadata:")] public static Self StateOfMindWithDateKindValenceLabelsAssociationsMetadata(NSDate date, HKStateOfMindKind kind, double valence, NSArray labels, NSArray associations, NSDictionary? metadata);
+    [Selector("kind")]
+    public HKStateOfMindKind Kind { get; }
+    [Selector("valence")]
+    public double Valence { get; }
+    [Selector("valenceClassification")]
+    public HKStateOfMindValenceClassification ValenceClassification { get; }
+    [Selector("labels")]
+    public NSArray? Labels { get; }
+    [Selector("associations")]
+    public NSArray? Associations { get; }
+    [Selector("stateOfMindWithDate:kind:valence:labels:associations:")]
+    public static Self StateOfMindWithDateKindValenceLabelsAssociations(NSDate date, HKStateOfMindKind kind, double valence, NSArray labels, NSArray associations);
+    [Selector("stateOfMindWithDate:kind:valence:labels:associations:metadata:")]
+    public static Self StateOfMindWithDateKindValenceLabelsAssociationsMetadata(NSDate date, HKStateOfMindKind kind, double valence, NSArray labels, NSArray associations, NSDictionary? metadata);
 }
 
 #endif

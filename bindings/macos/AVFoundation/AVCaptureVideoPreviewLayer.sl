@@ -33,23 +33,38 @@ import Standard.ObjC;
 
 public extern objc class AVCaptureVideoPreviewLayer : CALayer
 {
-    [Selector("session", "setSession:")] public AVCaptureSession? Session { get; set; }
-    [Selector("connection")] public AVCaptureConnection? Connection { get; }
-    [Selector("videoGravity", "setVideoGravity:")] public AVLayerVideoGravity VideoGravity { get; set; }
+    [Selector("session", "setSession:")]
+    public AVCaptureSession? Session { get; set; }
+    [Selector("connection")]
+    public AVCaptureConnection? Connection { get; }
+    [Selector("videoGravity", "setVideoGravity:")]
+    public AVLayerVideoGravity VideoGravity { get; set; }
     /// macOS 26.0 and later.
-    [Selector("isDeferredStartSupported")] public bool DeferredStartSupported { get; }
+    [Selector("isDeferredStartSupported")]
+    public bool DeferredStartSupported { get; }
     /// macOS 26.0 and later.
-    [Selector("isDeferredStartEnabled", "setDeferredStartEnabled:")] public bool DeferredStartEnabled { get; set; }
-    [Selector("layerWithSession:")] public static Self LayerWithSession(AVCaptureSession session);
-    [Selector("initWithSession:")] public Self InitWithSession(AVCaptureSession session);
-    [Selector("layerWithSessionWithNoConnection:")] public static Self LayerWithSessionWithNoConnection(AVCaptureSession session);
-    [Selector("initWithSessionWithNoConnection:")] public Self InitWithSessionWithNoConnection(AVCaptureSession session);
-    [Selector("setSessionWithNoConnection:")] public void SetSessionWithNoConnection(AVCaptureSession session);
-    [Selector("captureDevicePointOfInterestForPoint:")] public CGPoint CaptureDevicePointOfInterestForPoint(CGPoint pointInLayer);
-    [Selector("pointForCaptureDevicePointOfInterest:")] public CGPoint PointForCaptureDevicePointOfInterest(CGPoint captureDevicePointOfInterest);
-    [Selector("metadataOutputRectOfInterestForRect:")] public CGRect MetadataOutputRectOfInterestForRect(CGRect rectInLayerCoordinates);
-    [Selector("rectForMetadataOutputRectOfInterest:")] public CGRect RectForMetadataOutputRectOfInterest(CGRect rectInMetadataOutputCoordinates);
-    [Selector("transformedMetadataObjectForMetadataObject:")] public AVMetadataObject? TransformedMetadataObjectForMetadataObject(AVMetadataObject metadataObject);
+    [Selector("isDeferredStartEnabled", "setDeferredStartEnabled:")]
+    public bool DeferredStartEnabled { get; set; }
+    [Selector("layerWithSession:")]
+    public static Self LayerWithSession(AVCaptureSession session);
+    [Selector("initWithSession:")]
+    public Self InitWithSession(AVCaptureSession session);
+    [Selector("layerWithSessionWithNoConnection:")]
+    public static Self LayerWithSessionWithNoConnection(AVCaptureSession session);
+    [Selector("initWithSessionWithNoConnection:")]
+    public Self InitWithSessionWithNoConnection(AVCaptureSession session);
+    [Selector("setSessionWithNoConnection:")]
+    public void SetSessionWithNoConnection(AVCaptureSession session);
+    [Selector("captureDevicePointOfInterestForPoint:")]
+    public CGPoint CaptureDevicePointOfInterestForPoint(CGPoint pointInLayer);
+    [Selector("pointForCaptureDevicePointOfInterest:")]
+    public CGPoint PointForCaptureDevicePointOfInterest(CGPoint captureDevicePointOfInterest);
+    [Selector("metadataOutputRectOfInterestForRect:")]
+    public CGRect MetadataOutputRectOfInterestForRect(CGRect rectInLayerCoordinates);
+    [Selector("rectForMetadataOutputRectOfInterest:")]
+    public CGRect RectForMetadataOutputRectOfInterest(CGRect rectInMetadataOutputCoordinates);
+    [Selector("transformedMetadataObjectForMetadataObject:")]
+    public AVMetadataObject? TransformedMetadataObjectForMetadataObject(AVMetadataObject metadataObject);
 }
 
 #endif

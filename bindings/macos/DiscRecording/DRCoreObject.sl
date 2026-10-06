@@ -49,6 +49,7 @@ public extern "C" void DRSetRefCon(DRTypeRef? @ref, void* refCon, DRRefConCallba
 
 public extern "C" void* DRGetRefCon(DRTypeRef? @ref);
 
-[ReturnsRetained] public extern "C" CFStringRef? DRCopyLocalizedStringForValue(CFStringRef? value);
+[ReturnsRetained]
+public extern "C" CFStringRef? DRCopyLocalizedStringForValue(CFStringRef? value);
 
 #endif

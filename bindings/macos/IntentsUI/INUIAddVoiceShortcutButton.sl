@@ -45,17 +45,24 @@ public enum INUIAddVoiceShortcutButtonStyle : ulong
 
 public objc interface INUIAddVoiceShortcutButtonDelegate : NSObjectProtocol
 {
-    [Selector("presentAddVoiceShortcutViewController:forAddVoiceShortcutButton:")] void PresentAddVoiceShortcutViewControllerForAddVoiceShortcutButton(INUIAddVoiceShortcutViewController addVoiceShortcutViewController, INUIAddVoiceShortcutButton addVoiceShortcutButton);
-    [Selector("presentEditVoiceShortcutViewController:forAddVoiceShortcutButton:")] void PresentEditVoiceShortcutViewControllerForAddVoiceShortcutButton(INUIEditVoiceShortcutViewController editVoiceShortcutViewController, INUIAddVoiceShortcutButton addVoiceShortcutButton);
+    [Selector("presentAddVoiceShortcutViewController:forAddVoiceShortcutButton:")]
+    void PresentAddVoiceShortcutViewControllerForAddVoiceShortcutButton(INUIAddVoiceShortcutViewController addVoiceShortcutViewController, INUIAddVoiceShortcutButton addVoiceShortcutButton);
+    [Selector("presentEditVoiceShortcutViewController:forAddVoiceShortcutButton:")]
+    void PresentEditVoiceShortcutViewControllerForAddVoiceShortcutButton(INUIEditVoiceShortcutViewController editVoiceShortcutViewController, INUIAddVoiceShortcutButton addVoiceShortcutButton);
 }
 
 public extern objc class INUIAddVoiceShortcutButton : NSButton
 {
-    [Selector("style", "setStyle:")] public INUIAddVoiceShortcutButtonStyle Style { get; set; }
-    [Selector("delegate", "setDelegate:")] public INUIAddVoiceShortcutButtonDelegate? Delegate { get; set; }
-    [Selector("shortcut", "setShortcut:")] public INShortcut? Shortcut { get; set; }
-    [Selector("cornerRadius", "setCornerRadius:")] public CGFloat CornerRadius { get; set; }
-    [Selector("initWithStyle:")] public Self InitWithStyle(INUIAddVoiceShortcutButtonStyle style);
+    [Selector("style", "setStyle:")]
+    public INUIAddVoiceShortcutButtonStyle Style { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public INUIAddVoiceShortcutButtonDelegate? Delegate { get; set; }
+    [Selector("shortcut", "setShortcut:")]
+    public INShortcut? Shortcut { get; set; }
+    [Selector("cornerRadius", "setCornerRadius:")]
+    public CGFloat CornerRadius { get; set; }
+    [Selector("initWithStyle:")]
+    public Self InitWithStyle(INUIAddVoiceShortcutButtonStyle style);
 }
 
 #endif

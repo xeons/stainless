@@ -33,16 +33,25 @@ import Standard.ObjC;
 
 public extern objc class CKShareMetadata : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("containerIdentifier")] public NSString ContainerIdentifier { get; }
-    [Selector("share")] public CKShare Share { get; }
-    [Selector("hierarchicalRootRecordID")] public CKRecordID? HierarchicalRootRecordID { get; }
-    [Selector("participantRole")] public CKShareParticipantRole ParticipantRole { get; }
-    [Selector("participantStatus")] public CKShareParticipantAcceptanceStatus ParticipantStatus { get; }
-    [Selector("participantPermission")] public CKShareParticipantPermission ParticipantPermission { get; }
-    [Selector("ownerIdentity")] public CKUserIdentity OwnerIdentity { get; }
-    [Selector("rootRecord")] public CKRecord? RootRecord { get; }
+    [Selector("containerIdentifier")]
+    public NSString ContainerIdentifier { get; }
+    [Selector("share")]
+    public CKShare Share { get; }
+    [Selector("hierarchicalRootRecordID")]
+    public CKRecordID? HierarchicalRootRecordID { get; }
+    [Selector("participantRole")]
+    public CKShareParticipantRole ParticipantRole { get; }
+    [Selector("participantStatus")]
+    public CKShareParticipantAcceptanceStatus ParticipantStatus { get; }
+    [Selector("participantPermission")]
+    public CKShareParticipantPermission ParticipantPermission { get; }
+    [Selector("ownerIdentity")]
+    public CKUserIdentity OwnerIdentity { get; }
+    [Selector("rootRecord")]
+    public CKRecord? RootRecord { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("rootRecordID")] public CKRecordID RootRecordID { get; }
+    [Selector("rootRecordID")]
+    public CKRecordID RootRecordID { get; }
 }
 
 #endif

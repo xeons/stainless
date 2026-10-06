@@ -45,37 +45,68 @@ public objc closure void ICCameraFileRequestFingerprintWithCompletionCompletionB
 
 public extern objc class ICCameraFile : ICCameraItem
 {
-    [Selector("width")] public NSInteger Width { get; }
-    [Selector("height")] public NSInteger Height { get; }
-    [Selector("originalFilename")] public NSString? OriginalFilename { get; }
-    [Selector("createdFilename")] public NSString? CreatedFilename { get; }
-    [Selector("fileSize")] public off_t FileSize { get; }
-    [Selector("orientation", "setOrientation:")] public ICEXIFOrientationType Orientation { get; set; }
-    [Selector("duration")] public double Duration { get; }
-    [Selector("highFramerate")] public bool HighFramerate { get; }
-    [Selector("timeLapse")] public bool TimeLapse { get; }
-    [Selector("firstPicked")] public bool FirstPicked { get; }
-    [Selector("originatingAssetID")] public NSString? OriginatingAssetID { get; }
-    [Selector("groupUUID")] public NSString? GroupUUID { get; }
-    [Selector("gpsString")] public NSString? GpsString { get; }
-    [Selector("relatedUUID")] public NSString? RelatedUUID { get; }
-    [Selector("burstUUID")] public NSString? BurstUUID { get; }
-    [Selector("burstFavorite")] public bool BurstFavorite { get; }
-    [Selector("burstPicked")] public bool BurstPicked { get; }
-    [Selector("sidecarFiles")] public NSArray? SidecarFiles { get; }
-    [Selector("pairedRawImage")] public ICCameraFile? PairedRawImage { get; }
-    [Selector("fileCreationDate")] public NSDate? FileCreationDate { get; }
-    [Selector("fileModificationDate")] public NSDate? FileModificationDate { get; }
-    [Selector("exifCreationDate")] public NSDate? ExifCreationDate { get; }
-    [Selector("exifModificationDate")] public NSDate? ExifModificationDate { get; }
-    [Selector("fingerprint")] public NSString? Fingerprint { get; }
-    [Selector("fingerprintForFileAtURL:")] public static NSString? FingerprintForFileAtURL(NSURL url);
-    [Selector("requestThumbnailDataWithOptions:completion:")] public void RequestThumbnailDataWithOptionsCompletion(NSDictionary? options, ICCameraFileRequestThumbnailDataWithOptionsCompletionCompletionBlock completion);
-    [Selector("requestMetadataDictionaryWithOptions:completion:")] public void RequestMetadataDictionaryWithOptionsCompletion(NSDictionary? options, ICCameraFileRequestMetadataDictionaryWithOptionsCompletionCompletionBlock completion);
-    [Selector("requestDownloadWithOptions:completion:")] public NSProgress? RequestDownloadWithOptionsCompletion(NSDictionary? options, ICCameraFileRequestDownloadWithOptionsCompletionCompletionBlock completion);
-    [Selector("requestReadDataAtOffset:length:completion:")] public void RequestReadDataAtOffsetLengthCompletion(off_t offset, off_t length, ICCameraFileRequestReadDataAtOffsetLengthCompletionCompletionBlock completion);
-    [Selector("requestSecurityScopedURLWithCompletion:")] public void RequestSecurityScopedURLWithCompletion(ICCameraFileRequestSecurityScopedURLWithCompletionCompletionBlock completion);
-    [Selector("requestFingerprintWithCompletion:")] public void RequestFingerprintWithCompletion(ICCameraFileRequestFingerprintWithCompletionCompletionBlock completion);
+    [Selector("width")]
+    public NSInteger Width { get; }
+    [Selector("height")]
+    public NSInteger Height { get; }
+    [Selector("originalFilename")]
+    public NSString? OriginalFilename { get; }
+    [Selector("createdFilename")]
+    public NSString? CreatedFilename { get; }
+    [Selector("fileSize")]
+    public off_t FileSize { get; }
+    [Selector("orientation", "setOrientation:")]
+    public ICEXIFOrientationType Orientation { get; set; }
+    [Selector("duration")]
+    public double Duration { get; }
+    [Selector("highFramerate")]
+    public bool HighFramerate { get; }
+    [Selector("timeLapse")]
+    public bool TimeLapse { get; }
+    [Selector("firstPicked")]
+    public bool FirstPicked { get; }
+    [Selector("originatingAssetID")]
+    public NSString? OriginatingAssetID { get; }
+    [Selector("groupUUID")]
+    public NSString? GroupUUID { get; }
+    [Selector("gpsString")]
+    public NSString? GpsString { get; }
+    [Selector("relatedUUID")]
+    public NSString? RelatedUUID { get; }
+    [Selector("burstUUID")]
+    public NSString? BurstUUID { get; }
+    [Selector("burstFavorite")]
+    public bool BurstFavorite { get; }
+    [Selector("burstPicked")]
+    public bool BurstPicked { get; }
+    [Selector("sidecarFiles")]
+    public NSArray? SidecarFiles { get; }
+    [Selector("pairedRawImage")]
+    public ICCameraFile? PairedRawImage { get; }
+    [Selector("fileCreationDate")]
+    public NSDate? FileCreationDate { get; }
+    [Selector("fileModificationDate")]
+    public NSDate? FileModificationDate { get; }
+    [Selector("exifCreationDate")]
+    public NSDate? ExifCreationDate { get; }
+    [Selector("exifModificationDate")]
+    public NSDate? ExifModificationDate { get; }
+    [Selector("fingerprint")]
+    public NSString? Fingerprint { get; }
+    [Selector("fingerprintForFileAtURL:")]
+    public static NSString? FingerprintForFileAtURL(NSURL url);
+    [Selector("requestThumbnailDataWithOptions:completion:")]
+    public void RequestThumbnailDataWithOptionsCompletion(NSDictionary? options, ICCameraFileRequestThumbnailDataWithOptionsCompletionCompletionBlock completion);
+    [Selector("requestMetadataDictionaryWithOptions:completion:")]
+    public void RequestMetadataDictionaryWithOptionsCompletion(NSDictionary? options, ICCameraFileRequestMetadataDictionaryWithOptionsCompletionCompletionBlock completion);
+    [Selector("requestDownloadWithOptions:completion:")]
+    public NSProgress? RequestDownloadWithOptionsCompletion(NSDictionary? options, ICCameraFileRequestDownloadWithOptionsCompletionCompletionBlock completion);
+    [Selector("requestReadDataAtOffset:length:completion:")]
+    public void RequestReadDataAtOffsetLengthCompletion(off_t offset, off_t length, ICCameraFileRequestReadDataAtOffsetLengthCompletionCompletionBlock completion);
+    [Selector("requestSecurityScopedURLWithCompletion:")]
+    public void RequestSecurityScopedURLWithCompletion(ICCameraFileRequestSecurityScopedURLWithCompletionCompletionBlock completion);
+    [Selector("requestFingerprintWithCompletion:")]
+    public void RequestFingerprintWithCompletion(ICCameraFileRequestFingerprintWithCompletionCompletionBlock completion);
 }
 
 #endif

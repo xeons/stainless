@@ -33,29 +33,47 @@ import Standard.ObjC;
 
 public extern objc class NSLayoutGuide : NSObject, NSCoding, NSUserInterfaceItemIdentification
 {
-    [Selector("frame")] public NSRect Frame { get; }
-    [Selector("owningView", "setOwningView:")] public NSView? OwningView { get; set; }
-    [Selector("identifier", "setIdentifier:")] public NSUserInterfaceItemIdentifier Identifier { get; set; }
-    [Selector("leadingAnchor")] public NSLayoutXAxisAnchor LeadingAnchor { get; }
-    [Selector("trailingAnchor")] public NSLayoutXAxisAnchor TrailingAnchor { get; }
-    [Selector("leftAnchor")] public NSLayoutXAxisAnchor LeftAnchor { get; }
-    [Selector("rightAnchor")] public NSLayoutXAxisAnchor RightAnchor { get; }
-    [Selector("topAnchor")] public NSLayoutYAxisAnchor TopAnchor { get; }
-    [Selector("bottomAnchor")] public NSLayoutYAxisAnchor BottomAnchor { get; }
-    [Selector("widthAnchor")] public NSLayoutDimension WidthAnchor { get; }
-    [Selector("heightAnchor")] public NSLayoutDimension HeightAnchor { get; }
-    [Selector("centerXAnchor")] public NSLayoutXAxisAnchor CenterXAnchor { get; }
-    [Selector("centerYAnchor")] public NSLayoutYAxisAnchor CenterYAnchor { get; }
-    [Selector("hasAmbiguousLayout")] public bool HasAmbiguousLayout { get; }
-    [Selector("constraintsAffectingLayoutForOrientation:")] public NSArray ConstraintsAffectingLayoutForOrientation(NSLayoutConstraintOrientation orientation);
+    [Selector("frame")]
+    public NSRect Frame { get; }
+    [Selector("owningView", "setOwningView:")]
+    public NSView? OwningView { get; set; }
+    [Selector("identifier", "setIdentifier:")]
+    public NSUserInterfaceItemIdentifier Identifier { get; set; }
+    [Selector("leadingAnchor")]
+    public NSLayoutXAxisAnchor LeadingAnchor { get; }
+    [Selector("trailingAnchor")]
+    public NSLayoutXAxisAnchor TrailingAnchor { get; }
+    [Selector("leftAnchor")]
+    public NSLayoutXAxisAnchor LeftAnchor { get; }
+    [Selector("rightAnchor")]
+    public NSLayoutXAxisAnchor RightAnchor { get; }
+    [Selector("topAnchor")]
+    public NSLayoutYAxisAnchor TopAnchor { get; }
+    [Selector("bottomAnchor")]
+    public NSLayoutYAxisAnchor BottomAnchor { get; }
+    [Selector("widthAnchor")]
+    public NSLayoutDimension WidthAnchor { get; }
+    [Selector("heightAnchor")]
+    public NSLayoutDimension HeightAnchor { get; }
+    [Selector("centerXAnchor")]
+    public NSLayoutXAxisAnchor CenterXAnchor { get; }
+    [Selector("centerYAnchor")]
+    public NSLayoutYAxisAnchor CenterYAnchor { get; }
+    [Selector("hasAmbiguousLayout")]
+    public bool HasAmbiguousLayout { get; }
+    [Selector("constraintsAffectingLayoutForOrientation:")]
+    public NSArray ConstraintsAffectingLayoutForOrientation(NSLayoutConstraintOrientation orientation);
 }
 
 /// NSLayoutGuideSupport, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("layoutGuides")] public NSArray? LayoutGuides { get; }
-    [Selector("addLayoutGuide:")] public void AddLayoutGuide(NSLayoutGuide guide);
-    [Selector("removeLayoutGuide:")] public void RemoveLayoutGuide(NSLayoutGuide guide);
+    [Selector("layoutGuides")]
+    public NSArray? LayoutGuides { get; }
+    [Selector("addLayoutGuide:")]
+    public void AddLayoutGuide(NSLayoutGuide guide);
+    [Selector("removeLayoutGuide:")]
+    public void RemoveLayoutGuide(NSLayoutGuide guide);
 }
 
 #endif

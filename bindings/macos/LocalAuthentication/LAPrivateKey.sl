@@ -40,13 +40,20 @@ public objc closure void LAPrivateKeyExchangeKeysWithPublicKeySecKeyAlgorithmSec
 
 public extern objc class LAPrivateKey : NSObject
 {
-    [Selector("publicKey")] public LAPublicKey PublicKey { get; }
-    [Selector("signData:secKeyAlgorithm:completion:")] public void SignDataSecKeyAlgorithmCompletion(NSData data, SecKeyAlgorithm algorithm, LAPrivateKeySignDataSecKeyAlgorithmCompletionHandlerBlock handler);
-    [Selector("canSignUsingSecKeyAlgorithm:")] public bool CanSignUsingSecKeyAlgorithm(SecKeyAlgorithm algorithm);
-    [Selector("decryptData:secKeyAlgorithm:completion:")] public void DecryptDataSecKeyAlgorithmCompletion(NSData data, SecKeyAlgorithm algorithm, LAPrivateKeyDecryptDataSecKeyAlgorithmCompletionHandlerBlock handler);
-    [Selector("canDecryptUsingSecKeyAlgorithm:")] public bool CanDecryptUsingSecKeyAlgorithm(SecKeyAlgorithm algorithm);
-    [Selector("exchangeKeysWithPublicKey:secKeyAlgorithm:secKeyParameters:completion:")] public void ExchangeKeysWithPublicKeySecKeyAlgorithmSecKeyParametersCompletion(NSData publicKey, SecKeyAlgorithm algorithm, NSDictionary parameters, LAPrivateKeyExchangeKeysWithPublicKeySecKeyAlgorithmSecKeyParametersCompletionHandlerBlock handler);
-    [Selector("canExchangeKeysUsingSecKeyAlgorithm:")] public bool CanExchangeKeysUsingSecKeyAlgorithm(SecKeyAlgorithm algorithm);
+    [Selector("publicKey")]
+    public LAPublicKey PublicKey { get; }
+    [Selector("signData:secKeyAlgorithm:completion:")]
+    public void SignDataSecKeyAlgorithmCompletion(NSData data, SecKeyAlgorithm algorithm, LAPrivateKeySignDataSecKeyAlgorithmCompletionHandlerBlock handler);
+    [Selector("canSignUsingSecKeyAlgorithm:")]
+    public bool CanSignUsingSecKeyAlgorithm(SecKeyAlgorithm algorithm);
+    [Selector("decryptData:secKeyAlgorithm:completion:")]
+    public void DecryptDataSecKeyAlgorithmCompletion(NSData data, SecKeyAlgorithm algorithm, LAPrivateKeyDecryptDataSecKeyAlgorithmCompletionHandlerBlock handler);
+    [Selector("canDecryptUsingSecKeyAlgorithm:")]
+    public bool CanDecryptUsingSecKeyAlgorithm(SecKeyAlgorithm algorithm);
+    [Selector("exchangeKeysWithPublicKey:secKeyAlgorithm:secKeyParameters:completion:")]
+    public void ExchangeKeysWithPublicKeySecKeyAlgorithmSecKeyParametersCompletion(NSData publicKey, SecKeyAlgorithm algorithm, NSDictionary parameters, LAPrivateKeyExchangeKeysWithPublicKeySecKeyAlgorithmSecKeyParametersCompletionHandlerBlock handler);
+    [Selector("canExchangeKeysUsingSecKeyAlgorithm:")]
+    public bool CanExchangeKeysUsingSecKeyAlgorithm(SecKeyAlgorithm algorithm);
 }
 
 #endif

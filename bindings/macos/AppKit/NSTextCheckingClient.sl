@@ -58,32 +58,68 @@ public enum NSWritingToolsResultOptions : ulong
 
 public objc interface NSTextInputTraits
 {
-    [Optional] [Selector("autocorrectionType", "setAutocorrectionType:")] NSTextInputTraitType AutocorrectionType { get; set; }
-    [Optional] [Selector("spellCheckingType", "setSpellCheckingType:")] NSTextInputTraitType SpellCheckingType { get; set; }
-    [Optional] [Selector("grammarCheckingType", "setGrammarCheckingType:")] NSTextInputTraitType GrammarCheckingType { get; set; }
-    [Optional] [Selector("smartQuotesType", "setSmartQuotesType:")] NSTextInputTraitType SmartQuotesType { get; set; }
-    [Optional] [Selector("smartDashesType", "setSmartDashesType:")] NSTextInputTraitType SmartDashesType { get; set; }
-    [Optional] [Selector("smartInsertDeleteType", "setSmartInsertDeleteType:")] NSTextInputTraitType SmartInsertDeleteType { get; set; }
-    [Optional] [Selector("textReplacementType", "setTextReplacementType:")] NSTextInputTraitType TextReplacementType { get; set; }
-    [Optional] [Selector("dataDetectionType", "setDataDetectionType:")] NSTextInputTraitType DataDetectionType { get; set; }
-    [Optional] [Selector("linkDetectionType", "setLinkDetectionType:")] NSTextInputTraitType LinkDetectionType { get; set; }
-    [Optional] [Selector("textCompletionType", "setTextCompletionType:")] NSTextInputTraitType TextCompletionType { get; set; }
-    [Optional] [Selector("inlinePredictionType", "setInlinePredictionType:")] NSTextInputTraitType InlinePredictionType { get; set; }
-    [Optional] [Selector("mathExpressionCompletionType", "setMathExpressionCompletionType:")] NSTextInputTraitType MathExpressionCompletionType { get; set; }
-    [Optional] [Selector("writingToolsBehavior", "setWritingToolsBehavior:")] NSWritingToolsBehavior WritingToolsBehavior { get; set; }
-    [Optional] [Selector("allowedWritingToolsResultOptions", "setAllowedWritingToolsResultOptions:")] NSWritingToolsResultOptions AllowedWritingToolsResultOptions { get; set; }
+    [Optional]
+    [Selector("autocorrectionType", "setAutocorrectionType:")]
+    NSTextInputTraitType AutocorrectionType { get; set; }
+    [Optional]
+    [Selector("spellCheckingType", "setSpellCheckingType:")]
+    NSTextInputTraitType SpellCheckingType { get; set; }
+    [Optional]
+    [Selector("grammarCheckingType", "setGrammarCheckingType:")]
+    NSTextInputTraitType GrammarCheckingType { get; set; }
+    [Optional]
+    [Selector("smartQuotesType", "setSmartQuotesType:")]
+    NSTextInputTraitType SmartQuotesType { get; set; }
+    [Optional]
+    [Selector("smartDashesType", "setSmartDashesType:")]
+    NSTextInputTraitType SmartDashesType { get; set; }
+    [Optional]
+    [Selector("smartInsertDeleteType", "setSmartInsertDeleteType:")]
+    NSTextInputTraitType SmartInsertDeleteType { get; set; }
+    [Optional]
+    [Selector("textReplacementType", "setTextReplacementType:")]
+    NSTextInputTraitType TextReplacementType { get; set; }
+    [Optional]
+    [Selector("dataDetectionType", "setDataDetectionType:")]
+    NSTextInputTraitType DataDetectionType { get; set; }
+    [Optional]
+    [Selector("linkDetectionType", "setLinkDetectionType:")]
+    NSTextInputTraitType LinkDetectionType { get; set; }
+    [Optional]
+    [Selector("textCompletionType", "setTextCompletionType:")]
+    NSTextInputTraitType TextCompletionType { get; set; }
+    [Optional]
+    [Selector("inlinePredictionType", "setInlinePredictionType:")]
+    NSTextInputTraitType InlinePredictionType { get; set; }
+    [Optional]
+    [Selector("mathExpressionCompletionType", "setMathExpressionCompletionType:")]
+    NSTextInputTraitType MathExpressionCompletionType { get; set; }
+    [Optional]
+    [Selector("writingToolsBehavior", "setWritingToolsBehavior:")]
+    NSWritingToolsBehavior WritingToolsBehavior { get; set; }
+    [Optional]
+    [Selector("allowedWritingToolsResultOptions", "setAllowedWritingToolsResultOptions:")]
+    NSWritingToolsResultOptions AllowedWritingToolsResultOptions { get; set; }
 }
 
 public objc interface NSTextCheckingClient : NSTextInputClient, NSTextInputTraits
 {
-    [Selector("annotatedSubstringForProposedRange:actualRange:")] NSAttributedString? AnnotatedSubstringForProposedRangeActualRange(NSRange range, NSRangePointer actualRange);
-    [Selector("setAnnotations:range:")] void SetAnnotationsRange(NSDictionary annotations, NSRange range);
-    [Selector("addAnnotations:range:")] void AddAnnotationsRange(NSDictionary annotations, NSRange range);
-    [Selector("removeAnnotation:range:")] void RemoveAnnotationRange(NSAttributedStringKey annotationName, NSRange range);
-    [Selector("replaceCharactersInRange:withAnnotatedString:")] void ReplaceCharactersInRangeWithAnnotatedString(NSRange range, NSAttributedString annotatedString);
-    [Selector("selectAndShowRange:")] void SelectAndShowRange(NSRange range);
-    [Selector("viewForRange:firstRect:actualRange:")] NSView? ViewForRangeFirstRectActualRange(NSRange range, NSRectPointer firstRect, NSRangePointer actualRange);
-    [Selector("candidateListTouchBarItem")] NSCandidateListTouchBarItem? CandidateListTouchBarItem();
+    [Selector("annotatedSubstringForProposedRange:actualRange:")]
+    NSAttributedString? AnnotatedSubstringForProposedRangeActualRange(NSRange range, NSRangePointer actualRange);
+    [Selector("setAnnotations:range:")]
+    void SetAnnotationsRange(NSDictionary annotations, NSRange range);
+    [Selector("addAnnotations:range:")]
+    void AddAnnotationsRange(NSDictionary annotations, NSRange range);
+    [Selector("removeAnnotation:range:")]
+    void RemoveAnnotationRange(NSAttributedStringKey annotationName, NSRange range);
+    [Selector("replaceCharactersInRange:withAnnotatedString:")]
+    void ReplaceCharactersInRangeWithAnnotatedString(NSRange range, NSAttributedString annotatedString);
+    [Selector("selectAndShowRange:")]
+    void SelectAndShowRange(NSRange range);
+    [Selector("viewForRange:firstRect:actualRange:")]
+    NSView? ViewForRangeFirstRectActualRange(NSRange range, NSRectPointer firstRect, NSRangePointer actualRange);
+    [Selector("candidateListTouchBarItem")]
+    NSCandidateListTouchBarItem? CandidateListTouchBarItem();
 }
 
 #endif

@@ -35,8 +35,10 @@ public objc closure OSStatus AVAudioSourceNodeRenderBlock(bool* arg0, AudioTimeS
 
 public extern objc class AVAudioSourceNode : AVAudioNode, AVAudioMixing
 {
-    [Selector("initWithRenderBlock:")] public Self InitWithRenderBlock(AVAudioSourceNodeRenderBlock block);
-    [Selector("initWithFormat:renderBlock:")] public Self InitWithFormatRenderBlock(AVAudioFormat format, AVAudioSourceNodeRenderBlock block);
+    [Selector("initWithRenderBlock:")]
+    public Self InitWithRenderBlock(AVAudioSourceNodeRenderBlock block);
+    [Selector("initWithFormat:renderBlock:")]
+    public Self InitWithFormatRenderBlock(AVAudioFormat format, AVAudioSourceNodeRenderBlock block);
 }
 
 #endif

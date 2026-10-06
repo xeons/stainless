@@ -67,7 +67,8 @@ public extern "C" OSStatus CMTagCollectionCreateCopy(CMTagCollectionRef tagColle
 
 public extern "C" OSStatus CMTagCollectionCreateMutableCopy(CMTagCollectionRef tagCollection, CFAllocatorRef? allocator, OpaqueCMTagCollection** newMutableCollectionCopyOut);
 
-[ReturnsRetained] public extern "C" CFStringRef? CMTagCollectionCopyDescription(CFAllocatorRef? allocator, CMTagCollectionRef? tagCollection);
+[ReturnsRetained]
+public extern "C" CFStringRef? CMTagCollectionCopyDescription(CFAllocatorRef? allocator, CMTagCollectionRef? tagCollection);
 
 public extern "C" CMItemCount CMTagCollectionGetCount(CMTagCollectionRef tagCollection);
 
@@ -117,11 +118,13 @@ public extern "C" OSStatus CMTagCollectionAddTagsFromCollection(CMMutableTagColl
 
 public extern "C" OSStatus CMTagCollectionAddTagsFromArray(CMMutableTagCollectionRef tagCollection, CMTag* tags, CMItemCount tagCount);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CMTagCollectionCopyAsDictionary(CMTagCollectionRef tagCollection, CFAllocatorRef? allocator);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CMTagCollectionCopyAsDictionary(CMTagCollectionRef tagCollection, CFAllocatorRef? allocator);
 
 public extern "C" OSStatus CMTagCollectionCreateFromDictionary(CFDictionaryRef dict, CFAllocatorRef? allocator, OpaqueCMTagCollection** newCollectionOut);
 
-[ReturnsRetained] public extern "C" CFDataRef? CMTagCollectionCopyAsData(CMTagCollectionRef tagCollection, CFAllocatorRef? allocator);
+[ReturnsRetained]
+public extern "C" CFDataRef? CMTagCollectionCopyAsData(CMTagCollectionRef tagCollection, CFAllocatorRef? allocator);
 
 public extern "C" OSStatus CMTagCollectionCreateFromData(CFDataRef data, CFAllocatorRef? allocator, OpaqueCMTagCollection** newCollectionOut);
 

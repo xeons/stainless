@@ -42,40 +42,65 @@ public enum GKMatchmakingMode : long
 
 public extern objc class GKMatchmakerViewController : NSViewController, GKViewController
 {
-    [Selector("matchmakerDelegate", "setMatchmakerDelegate:")] public GKMatchmakerViewControllerDelegate? MatchmakerDelegate { get; set; }
-    [Selector("matchRequest")] public GKMatchRequest MatchRequest { get; }
-    [Selector("isHosted", "setHosted:")] public bool Hosted { get; set; }
-    [Selector("matchmakingMode", "setMatchmakingMode:")] public GKMatchmakingMode MatchmakingMode { get; set; }
-    [Selector("canStartWithMinimumPlayers", "setCanStartWithMinimumPlayers:")] public bool CanStartWithMinimumPlayers { get; set; }
+    [Selector("matchmakerDelegate", "setMatchmakerDelegate:")]
+    public GKMatchmakerViewControllerDelegate? MatchmakerDelegate { get; set; }
+    [Selector("matchRequest")]
+    public GKMatchRequest MatchRequest { get; }
+    [Selector("isHosted", "setHosted:")]
+    public bool Hosted { get; set; }
+    [Selector("matchmakingMode", "setMatchmakingMode:")]
+    public GKMatchmakingMode MatchmakingMode { get; set; }
+    [Selector("canStartWithMinimumPlayers", "setCanStartWithMinimumPlayers:")]
+    public bool CanStartWithMinimumPlayers { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("defaultInvitationMessage", "setDefaultInvitationMessage:")] public NSString? DefaultInvitationMessage { get; set; }
-    [Selector("initWithMatchRequest:")] public AnyObject? InitWithMatchRequest(GKMatchRequest request);
-    [Selector("initWithInvite:")] public AnyObject? InitWithInvite(GKInvite invite);
-    [Selector("addPlayersToMatch:")] public void AddPlayersToMatch(GKMatch match);
-    [Selector("setHostedPlayer:didConnect:")] public void SetHostedPlayerDidConnect(GKPlayer player, bool connected);
+    [Selector("defaultInvitationMessage", "setDefaultInvitationMessage:")]
+    public NSString? DefaultInvitationMessage { get; set; }
+    [Selector("initWithMatchRequest:")]
+    public AnyObject? InitWithMatchRequest(GKMatchRequest request);
+    [Selector("initWithInvite:")]
+    public AnyObject? InitWithInvite(GKInvite invite);
+    [Selector("addPlayersToMatch:")]
+    public void AddPlayersToMatch(GKMatch match);
+    [Selector("setHostedPlayer:didConnect:")]
+    public void SetHostedPlayerDidConnect(GKPlayer player, bool connected);
 }
 
 /// Obsoleted, a category of GKMatchmakerViewController.
 public extern objc class GKMatchmakerViewController
 {
     /// Deprecated in macOS 10.10.
-    [Selector("setHostedPlayer:connected:")] public void SetHostedPlayerConnected(NSString playerID, bool connected);
+    [Selector("setHostedPlayer:connected:")]
+    public void SetHostedPlayerConnected(NSString playerID, bool connected);
 }
 
 public objc closure void GKMatchmakerViewControllerDelegateMatchmakerViewControllerGetMatchPropertiesForRecipientWithCompletionHandlerCompletionHandlerBlock(GKMatchProperties arg0);
 
 public objc interface GKMatchmakerViewControllerDelegate : NSObjectProtocol
 {
-    [Selector("matchmakerViewControllerWasCancelled:")] void MatchmakerViewControllerWasCancelled(GKMatchmakerViewController viewController);
-    [Selector("matchmakerViewController:didFailWithError:")] void MatchmakerViewControllerDidFailWithError(GKMatchmakerViewController viewController, NSError error);
-    [Optional] [Selector("matchmakerViewController:didFindMatch:")] void MatchmakerViewControllerDidFindMatch(GKMatchmakerViewController viewController, GKMatch match);
-    [Optional] [Selector("matchmakerViewController:didFindHostedPlayers:")] void MatchmakerViewControllerDidFindHostedPlayers(GKMatchmakerViewController viewController, NSArray players);
-    [Optional] [Selector("matchmakerViewController:hostedPlayerDidAccept:")] void MatchmakerViewControllerHostedPlayerDidAccept(GKMatchmakerViewController viewController, GKPlayer player);
-    [Optional] [Selector("matchmakerViewController:getMatchPropertiesForRecipient:withCompletionHandler:")] void MatchmakerViewControllerGetMatchPropertiesForRecipientWithCompletionHandler(GKMatchmakerViewController viewController, GKPlayer recipient, GKMatchmakerViewControllerDelegateMatchmakerViewControllerGetMatchPropertiesForRecipientWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("matchmakerViewControllerWasCancelled:")]
+    void MatchmakerViewControllerWasCancelled(GKMatchmakerViewController viewController);
+    [Selector("matchmakerViewController:didFailWithError:")]
+    void MatchmakerViewControllerDidFailWithError(GKMatchmakerViewController viewController, NSError error);
+    [Optional]
+    [Selector("matchmakerViewController:didFindMatch:")]
+    void MatchmakerViewControllerDidFindMatch(GKMatchmakerViewController viewController, GKMatch match);
+    [Optional]
+    [Selector("matchmakerViewController:didFindHostedPlayers:")]
+    void MatchmakerViewControllerDidFindHostedPlayers(GKMatchmakerViewController viewController, NSArray players);
+    [Optional]
+    [Selector("matchmakerViewController:hostedPlayerDidAccept:")]
+    void MatchmakerViewControllerHostedPlayerDidAccept(GKMatchmakerViewController viewController, GKPlayer player);
+    [Optional]
+    [Selector("matchmakerViewController:getMatchPropertiesForRecipient:withCompletionHandler:")]
+    void MatchmakerViewControllerGetMatchPropertiesForRecipientWithCompletionHandler(GKMatchmakerViewController viewController, GKPlayer recipient, GKMatchmakerViewControllerDelegateMatchmakerViewControllerGetMatchPropertiesForRecipientWithCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 10.10.
-    [Optional] [Selector("matchmakerViewController:didFindPlayers:")] void MatchmakerViewControllerDidFindPlayers(GKMatchmakerViewController viewController, NSArray playerIDs);
+    [Optional]
+    [Selector("matchmakerViewController:didFindPlayers:")]
+    void MatchmakerViewControllerDidFindPlayers(GKMatchmakerViewController viewController, NSArray playerIDs);
     /// Deprecated in macOS 10.10.
-    [Optional] [Selector("matchmakerViewController:didReceiveAcceptFromHostedPlayer:")] void MatchmakerViewControllerDidReceiveAcceptFromHostedPlayer(GKMatchmakerViewController viewController, NSString playerID);
+    [Optional]
+    [Selector("matchmakerViewController:didReceiveAcceptFromHostedPlayer:")]
+    void MatchmakerViewControllerDidReceiveAcceptFromHostedPlayer(GKMatchmakerViewController viewController, NSString playerID);
 }
 
 #endif

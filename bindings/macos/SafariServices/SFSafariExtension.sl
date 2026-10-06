@@ -35,7 +35,8 @@ public objc closure void SFSafariExtensionGetBaseURIWithCompletionHandlerComplet
 
 public extern objc class SFSafariExtension : NSObject
 {
-    [Selector("getBaseURIWithCompletionHandler:")] public static void GetBaseURIWithCompletionHandler(SFSafariExtensionGetBaseURIWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getBaseURIWithCompletionHandler:")]
+    public static void GetBaseURIWithCompletionHandler(SFSafariExtensionGetBaseURIWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

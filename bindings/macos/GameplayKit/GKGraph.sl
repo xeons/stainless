@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class GKGraph : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("nodes")] public NSArray? Nodes { get; }
-    [Selector("graphWithNodes:")] public static Self GraphWithNodes(NSArray nodes);
-    [Selector("initWithNodes:")] public Self InitWithNodes(NSArray nodes);
-    [Selector("connectNodeToLowestCostNode:bidirectional:")] public void ConnectNodeToLowestCostNodeBidirectional(GKGraphNode node, bool bidirectional);
-    [Selector("removeNodes:")] public void RemoveNodes(NSArray nodes);
-    [Selector("addNodes:")] public void AddNodes(NSArray nodes);
-    [Selector("findPathFromNode:toNode:")] public NSArray FindPathFromNodeToNode(GKGraphNode startNode, GKGraphNode endNode);
+    [Selector("nodes")]
+    public NSArray? Nodes { get; }
+    [Selector("graphWithNodes:")]
+    public static Self GraphWithNodes(NSArray nodes);
+    [Selector("initWithNodes:")]
+    public Self InitWithNodes(NSArray nodes);
+    [Selector("connectNodeToLowestCostNode:bidirectional:")]
+    public void ConnectNodeToLowestCostNodeBidirectional(GKGraphNode node, bool bidirectional);
+    [Selector("removeNodes:")]
+    public void RemoveNodes(NSArray nodes);
+    [Selector("addNodes:")]
+    public void AddNodes(NSArray nodes);
+    [Selector("findPathFromNode:toNode:")]
+    public NSArray FindPathFromNodeToNode(GKGraphNode startNode, GKGraphNode endNode);
 }
 
 #endif

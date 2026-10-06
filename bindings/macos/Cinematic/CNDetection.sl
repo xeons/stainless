@@ -56,17 +56,28 @@ public enum CNDetectionType : long
 
 public extern objc class CNDetection : NSObject, NSCopying
 {
-    [Selector("time")] public CMTime Time { get; }
-    [Selector("detectionType")] public CNDetectionType DetectionType { get; }
-    [Selector("normalizedRect")] public CGRect NormalizedRect { get; }
-    [Selector("focusDisparity")] public float FocusDisparity { get; }
-    [Selector("detectionID")] public CNDetectionID DetectionID { get; }
-    [Selector("detectionGroupID")] public CNDetectionGroupID DetectionGroupID { get; }
-    [Selector("initWithTime:detectionType:normalizedRect:focusDisparity:")] public Self InitWithTimeDetectionTypeNormalizedRectFocusDisparity(CMTime time, CNDetectionType detectionType, CGRect normalizedRect, float focusDisparity);
-    [Selector("isValidDetectionID:")] public static bool IsValidDetectionID(CNDetectionID detectionID);
-    [Selector("isValidDetectionGroupID:")] public static bool IsValidDetectionGroupID(CNDetectionGroupID detectionGroupID);
-    [Selector("accessibilityLabelForDetectionType:")] public static NSString AccessibilityLabelForDetectionType(CNDetectionType detectionType);
-    [Selector("disparityInNormalizedRect:sourceDisparity:detectionType:priorDisparity:")] public static float DisparityInNormalizedRectSourceDisparityDetectionTypePriorDisparity(CGRect normalizedRect, CVPixelBufferRef sourceDisparity, CNDetectionType detectionType, float priorDisparity);
+    [Selector("time")]
+    public CMTime Time { get; }
+    [Selector("detectionType")]
+    public CNDetectionType DetectionType { get; }
+    [Selector("normalizedRect")]
+    public CGRect NormalizedRect { get; }
+    [Selector("focusDisparity")]
+    public float FocusDisparity { get; }
+    [Selector("detectionID")]
+    public CNDetectionID DetectionID { get; }
+    [Selector("detectionGroupID")]
+    public CNDetectionGroupID DetectionGroupID { get; }
+    [Selector("initWithTime:detectionType:normalizedRect:focusDisparity:")]
+    public Self InitWithTimeDetectionTypeNormalizedRectFocusDisparity(CMTime time, CNDetectionType detectionType, CGRect normalizedRect, float focusDisparity);
+    [Selector("isValidDetectionID:")]
+    public static bool IsValidDetectionID(CNDetectionID detectionID);
+    [Selector("isValidDetectionGroupID:")]
+    public static bool IsValidDetectionGroupID(CNDetectionGroupID detectionGroupID);
+    [Selector("accessibilityLabelForDetectionType:")]
+    public static NSString AccessibilityLabelForDetectionType(CNDetectionType detectionType);
+    [Selector("disparityInNormalizedRect:sourceDisparity:detectionType:priorDisparity:")]
+    public static float DisparityInNormalizedRectSourceDisparityDetectionTypePriorDisparity(CGRect normalizedRect, CVPixelBufferRef sourceDisparity, CNDetectionType detectionType, float priorDisparity);
 }
 
 #endif

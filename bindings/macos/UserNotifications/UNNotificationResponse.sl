@@ -37,13 +37,16 @@ public extern "C" NSString? UNNotificationDismissActionIdentifier;
 
 public extern objc class UNNotificationResponse : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("notification")] public UNNotification Notification { get; }
-    [Selector("actionIdentifier")] public NSString ActionIdentifier { get; }
+    [Selector("notification")]
+    public UNNotification Notification { get; }
+    [Selector("actionIdentifier")]
+    public NSString ActionIdentifier { get; }
 }
 
 public extern objc class UNTextInputNotificationResponse : UNNotificationResponse
 {
-    [Selector("userText")] public NSString UserText { get; }
+    [Selector("userText")]
+    public NSString UserText { get; }
 }
 
 #endif

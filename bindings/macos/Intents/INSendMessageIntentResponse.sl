@@ -44,9 +44,12 @@ public enum INSendMessageIntentResponseCode : long
 
 public extern objc class INSendMessageIntentResponse : INIntentResponse
 {
-    [Selector("code")] public INSendMessageIntentResponseCode Code { get; }
-    [Selector("sentMessages", "setSentMessages:")] public NSArray? SentMessages { get; set; }
-    [Selector("initWithCode:userActivity:")] public Self InitWithCodeUserActivity(INSendMessageIntentResponseCode code, NSUserActivity? userActivity);
+    [Selector("code")]
+    public INSendMessageIntentResponseCode Code { get; }
+    [Selector("sentMessages", "setSentMessages:")]
+    public NSArray? SentMessages { get; set; }
+    [Selector("initWithCode:userActivity:")]
+    public Self InitWithCodeUserActivity(INSendMessageIntentResponseCode code, NSUserActivity? userActivity);
 }
 
 #endif

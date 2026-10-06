@@ -33,20 +33,29 @@ import Standard.ObjC;
 
 public extern objc class MLFeatureDescription : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("type")] public MLFeatureType Type { get; }
-    [Selector("isOptional")] public bool Optional { get; }
-    [Selector("isAllowedValue:")] public bool IsAllowedValue(MLFeatureValue value);
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("type")]
+    public MLFeatureType Type { get; }
+    [Selector("isOptional")]
+    public bool Optional { get; }
+    [Selector("isAllowedValue:")]
+    public bool IsAllowedValue(MLFeatureValue value);
 }
 
 /// MLFeatureValueConstraints, a category of MLFeatureDescription.
 public extern objc class MLFeatureDescription
 {
-    [Selector("multiArrayConstraint")] public MLMultiArrayConstraint? MultiArrayConstraint { get; }
-    [Selector("imageConstraint")] public MLImageConstraint? ImageConstraint { get; }
-    [Selector("dictionaryConstraint")] public MLDictionaryConstraint? DictionaryConstraint { get; }
-    [Selector("sequenceConstraint")] public MLSequenceConstraint? SequenceConstraint { get; }
-    [Selector("stateConstraint")] public MLStateConstraint? StateConstraint { get; }
+    [Selector("multiArrayConstraint")]
+    public MLMultiArrayConstraint? MultiArrayConstraint { get; }
+    [Selector("imageConstraint")]
+    public MLImageConstraint? ImageConstraint { get; }
+    [Selector("dictionaryConstraint")]
+    public MLDictionaryConstraint? DictionaryConstraint { get; }
+    [Selector("sequenceConstraint")]
+    public MLSequenceConstraint? SequenceConstraint { get; }
+    [Selector("stateConstraint")]
+    public MLStateConstraint? StateConstraint { get; }
 }
 
 #endif

@@ -55,6 +55,7 @@ public struct CGPatternCallbacks
 
 public extern "C" CFTypeID CGPatternGetTypeID();
 
-[ReturnsRetained] public extern "C" CGPatternRef? CGPatternCreate(void* info, CGRect bounds, CGAffineTransform matrix, CGFloat xStep, CGFloat yStep, CGPatternTiling tiling, bool isColored, CGPatternCallbacks* callbacks);
+[ReturnsRetained]
+public extern "C" CGPatternRef? CGPatternCreate(void* info, CGRect bounds, CGAffineTransform matrix, CGFloat xStep, CGFloat yStep, CGPatternTiling tiling, bool isColored, CGPatternCallbacks* callbacks);
 
 #endif

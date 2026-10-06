@@ -66,13 +66,17 @@ public extern objc class CFMutableSetRef : CFSetRef { }
 
 public extern "C" CFTypeID CFSetGetTypeID();
 
-[ReturnsRetained] public extern "C" CFSetRef? CFSetCreate(CFAllocatorRef? allocator, void** values, CFIndex numValues, CFSetCallBacks* callBacks);
+[ReturnsRetained]
+public extern "C" CFSetRef? CFSetCreate(CFAllocatorRef? allocator, void** values, CFIndex numValues, CFSetCallBacks* callBacks);
 
-[ReturnsRetained] public extern "C" CFSetRef? CFSetCreateCopy(CFAllocatorRef? allocator, CFSetRef? theSet);
+[ReturnsRetained]
+public extern "C" CFSetRef? CFSetCreateCopy(CFAllocatorRef? allocator, CFSetRef? theSet);
 
-[ReturnsRetained] public extern "C" CFMutableSetRef? CFSetCreateMutable(CFAllocatorRef? allocator, CFIndex capacity, CFSetCallBacks* callBacks);
+[ReturnsRetained]
+public extern "C" CFMutableSetRef? CFSetCreateMutable(CFAllocatorRef? allocator, CFIndex capacity, CFSetCallBacks* callBacks);
 
-[ReturnsRetained] public extern "C" CFMutableSetRef? CFSetCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFSetRef? theSet);
+[ReturnsRetained]
+public extern "C" CFMutableSetRef? CFSetCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFSetRef? theSet);
 
 public extern "C" CFIndex CFSetGetCount(CFSetRef? theSet);
 

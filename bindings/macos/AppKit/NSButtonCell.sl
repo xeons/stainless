@@ -74,36 +74,66 @@ public enum NSBezelStyle : ulong
 
 public extern objc class NSButtonCell : NSActionCell
 {
-    [Selector("bezelStyle", "setBezelStyle:")] public NSBezelStyle BezelStyle { get; set; }
-    [Selector("highlightsBy", "setHighlightsBy:")] public NSCellStyleMask HighlightsBy { get; set; }
-    [Selector("showsStateBy", "setShowsStateBy:")] public NSCellStyleMask ShowsStateBy { get; set; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("attributedTitle", "setAttributedTitle:")] public NSAttributedString AttributedTitle { get; set; }
-    [Selector("alternateTitle", "setAlternateTitle:")] public NSString AlternateTitle { get; set; }
-    [Selector("attributedAlternateTitle", "setAttributedAlternateTitle:")] public NSAttributedString AttributedAlternateTitle { get; set; }
-    [Selector("alternateImage", "setAlternateImage:")] public NSImage? AlternateImage { get; set; }
-    [Selector("imagePosition", "setImagePosition:")] public NSCellImagePosition ImagePosition { get; set; }
-    [Selector("imageScaling", "setImageScaling:")] public NSImageScaling ImageScaling { get; set; }
-    [Selector("keyEquivalent", "setKeyEquivalent:")] public NSString KeyEquivalent { get; set; }
-    [Selector("keyEquivalentModifierMask", "setKeyEquivalentModifierMask:")] public NSEventModifierFlags KeyEquivalentModifierMask { get; set; }
-    [Selector("isTransparent", "setTransparent:")] public bool Transparent { get; set; }
-    [Selector("isOpaque")] public bool Opaque { get; }
-    [Selector("imageDimsWhenDisabled", "setImageDimsWhenDisabled:")] public bool ImageDimsWhenDisabled { get; set; }
-    [Selector("showsBorderOnlyWhileMouseInside", "setShowsBorderOnlyWhileMouseInside:")] public bool ShowsBorderOnlyWhileMouseInside { get; set; }
-    [Selector("sound", "setSound:")] public NSSound? Sound { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("initTextCell:")] public Self InitTextCell(NSString string);
-    [Selector("initImageCell:")] public Self InitImageCell(NSImage? image);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("setButtonType:")] public void SetButtonType(NSButtonType type);
-    [Selector("setPeriodicDelay:interval:")] public void SetPeriodicDelayInterval(float delay, float interval);
-    [Selector("getPeriodicDelay:interval:")] public void GetPeriodicDelayInterval(float* delay, float* interval);
-    [Selector("performClick:")] public void PerformClick(AnyObject? sender);
-    [Selector("mouseEntered:")] public void MouseEntered(NSEvent event);
-    [Selector("mouseExited:")] public void MouseExited(NSEvent event);
-    [Selector("drawBezelWithFrame:inView:")] public void DrawBezelWithFrameInView(NSRect frame, NSView controlView);
-    [Selector("drawImage:withFrame:inView:")] public void DrawImageWithFrameInView(NSImage image, NSRect frame, NSView controlView);
-    [Selector("drawTitle:withFrame:inView:")] public NSRect DrawTitleWithFrameInView(NSAttributedString title, NSRect frame, NSView controlView);
+    [Selector("bezelStyle", "setBezelStyle:")]
+    public NSBezelStyle BezelStyle { get; set; }
+    [Selector("highlightsBy", "setHighlightsBy:")]
+    public NSCellStyleMask HighlightsBy { get; set; }
+    [Selector("showsStateBy", "setShowsStateBy:")]
+    public NSCellStyleMask ShowsStateBy { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("attributedTitle", "setAttributedTitle:")]
+    public NSAttributedString AttributedTitle { get; set; }
+    [Selector("alternateTitle", "setAlternateTitle:")]
+    public NSString AlternateTitle { get; set; }
+    [Selector("attributedAlternateTitle", "setAttributedAlternateTitle:")]
+    public NSAttributedString AttributedAlternateTitle { get; set; }
+    [Selector("alternateImage", "setAlternateImage:")]
+    public NSImage? AlternateImage { get; set; }
+    [Selector("imagePosition", "setImagePosition:")]
+    public NSCellImagePosition ImagePosition { get; set; }
+    [Selector("imageScaling", "setImageScaling:")]
+    public NSImageScaling ImageScaling { get; set; }
+    [Selector("keyEquivalent", "setKeyEquivalent:")]
+    public NSString KeyEquivalent { get; set; }
+    [Selector("keyEquivalentModifierMask", "setKeyEquivalentModifierMask:")]
+    public NSEventModifierFlags KeyEquivalentModifierMask { get; set; }
+    [Selector("isTransparent", "setTransparent:")]
+    public bool Transparent { get; set; }
+    [Selector("isOpaque")]
+    public bool Opaque { get; }
+    [Selector("imageDimsWhenDisabled", "setImageDimsWhenDisabled:")]
+    public bool ImageDimsWhenDisabled { get; set; }
+    [Selector("showsBorderOnlyWhileMouseInside", "setShowsBorderOnlyWhileMouseInside:")]
+    public bool ShowsBorderOnlyWhileMouseInside { get; set; }
+    [Selector("sound", "setSound:")]
+    public NSSound? Sound { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("initTextCell:")]
+    public Self InitTextCell(NSString string);
+    [Selector("initImageCell:")]
+    public Self InitImageCell(NSImage? image);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("setButtonType:")]
+    public void SetButtonType(NSButtonType type);
+    [Selector("setPeriodicDelay:interval:")]
+    public void SetPeriodicDelayInterval(float delay, float interval);
+    [Selector("getPeriodicDelay:interval:")]
+    public void GetPeriodicDelayInterval(float* delay, float* interval);
+    [Selector("performClick:")]
+    public void PerformClick(AnyObject? sender);
+    [Selector("mouseEntered:")]
+    public void MouseEntered(NSEvent event);
+    [Selector("mouseExited:")]
+    public void MouseExited(NSEvent event);
+    [Selector("drawBezelWithFrame:inView:")]
+    public void DrawBezelWithFrameInView(NSRect frame, NSView controlView);
+    [Selector("drawImage:withFrame:inView:")]
+    public void DrawImageWithFrameInView(NSImage image, NSRect frame, NSView controlView);
+    [Selector("drawTitle:withFrame:inView:")]
+    public NSRect DrawTitleWithFrameInView(NSAttributedString title, NSRect frame, NSView controlView);
 }
 
 /// Deprecated in macOS 10.12.
@@ -120,21 +150,29 @@ public enum NSGradientType : ulong
 public extern objc class NSButtonCell
 {
     /// Deprecated in macOS 10.12.
-    [Selector("gradientType", "setGradientType:")] public NSGradientType GradientType { get; set; }
+    [Selector("gradientType", "setGradientType:")]
+    public NSGradientType GradientType { get; set; }
     /// Deprecated in macOS 10.15.
-    [Selector("keyEquivalentFont", "setKeyEquivalentFont:")] public NSFont? KeyEquivalentFont { get; set; }
+    [Selector("keyEquivalentFont", "setKeyEquivalentFont:")]
+    public NSFont? KeyEquivalentFont { get; set; }
     /// Deprecated in macOS 10.8.
-    [Selector("setTitleWithMnemonic:")] public void SetTitleWithMnemonic(NSString? stringWithAmpersand);
+    [Selector("setTitleWithMnemonic:")]
+    public void SetTitleWithMnemonic(NSString? stringWithAmpersand);
     /// Deprecated in macOS 10.8.
-    [Selector("setAlternateTitleWithMnemonic:")] public void SetAlternateTitleWithMnemonic(NSString? stringWithAmpersand);
+    [Selector("setAlternateTitleWithMnemonic:")]
+    public void SetAlternateTitleWithMnemonic(NSString? stringWithAmpersand);
     /// Deprecated in macOS 10.8.
-    [Selector("setAlternateMnemonicLocation:")] public void SetAlternateMnemonicLocation(NSUInteger location);
+    [Selector("setAlternateMnemonicLocation:")]
+    public void SetAlternateMnemonicLocation(NSUInteger location);
     /// Deprecated in macOS 10.8.
-    [Selector("alternateMnemonicLocation")] public NSUInteger AlternateMnemonicLocation();
+    [Selector("alternateMnemonicLocation")]
+    public NSUInteger AlternateMnemonicLocation();
     /// Deprecated in macOS 10.8.
-    [Selector("alternateMnemonic")] public NSString? AlternateMnemonic();
+    [Selector("alternateMnemonic")]
+    public NSString? AlternateMnemonic();
     /// Deprecated in macOS 10.15.
-    [Selector("setKeyEquivalentFont:size:")] public void SetKeyEquivalentFontSize(NSString fontName, CGFloat fontSize);
+    [Selector("setKeyEquivalentFont:size:")]
+    public void SetKeyEquivalentFontSize(NSString fontName, CGFloat fontSize);
 }
 
 #endif

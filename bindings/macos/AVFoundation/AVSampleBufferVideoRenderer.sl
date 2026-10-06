@@ -43,26 +43,35 @@ public objc closure void AVSampleBufferVideoRendererFlushWithRemovalOfDisplayedI
 
 public extern objc class AVSampleBufferVideoRenderer : NSObject, AVQueuedSampleBufferRendering
 {
-    [Selector("status")] public AVQueuedSampleBufferRenderingStatus Status { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("requiresFlushToResumeDecoding")] public bool RequiresFlushToResumeDecoding { get; }
-    [Selector("flushWithRemovalOfDisplayedImage:completionHandler:")] public void FlushWithRemovalOfDisplayedImageCompletionHandler(bool removeDisplayedImage, AVSampleBufferVideoRendererFlushWithRemovalOfDisplayedImageCompletionHandlerHandlerBlock? handler);
+    [Selector("status")]
+    public AVQueuedSampleBufferRenderingStatus Status { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("requiresFlushToResumeDecoding")]
+    public bool RequiresFlushToResumeDecoding { get; }
+    [Selector("flushWithRemovalOfDisplayedImage:completionHandler:")]
+    public void FlushWithRemovalOfDisplayedImageCompletionHandler(bool removeDisplayedImage, AVSampleBufferVideoRendererFlushWithRemovalOfDisplayedImageCompletionHandlerHandlerBlock? handler);
 }
 
 /// AVSampleBufferVideoRendererPixelBufferOutput, a category of AVSampleBufferVideoRenderer.
 public extern objc class AVSampleBufferVideoRenderer
 {
-    [Selector("copyDisplayedPixelBuffer")] public CVPixelBufferRef? CopyDisplayedPixelBuffer();
+    [Selector("copyDisplayedPixelBuffer")]
+    public CVPixelBufferRef? CopyDisplayedPixelBuffer();
 }
 
 /// AVSampleBufferVideoRendererPowerOptimization, a category of AVSampleBufferVideoRenderer.
 public extern objc class AVSampleBufferVideoRenderer
 {
     /// macOS 26.0 and later.
-    [Selector("recommendedPixelBufferAttributes")] public NSDictionary? RecommendedPixelBufferAttributes { get; }
-    [Selector("expectMinimumUpcomingSampleBufferPresentationTime:")] public void ExpectMinimumUpcomingSampleBufferPresentationTime(CMTime minimumUpcomingPresentationTime);
-    [Selector("expectMonotonicallyIncreasingUpcomingSampleBufferPresentationTimes")] public void ExpectMonotonicallyIncreasingUpcomingSampleBufferPresentationTimes();
-    [Selector("resetUpcomingSampleBufferPresentationTimeExpectations")] public void ResetUpcomingSampleBufferPresentationTimeExpectations();
+    [Selector("recommendedPixelBufferAttributes")]
+    public NSDictionary? RecommendedPixelBufferAttributes { get; }
+    [Selector("expectMinimumUpcomingSampleBufferPresentationTime:")]
+    public void ExpectMinimumUpcomingSampleBufferPresentationTime(CMTime minimumUpcomingPresentationTime);
+    [Selector("expectMonotonicallyIncreasingUpcomingSampleBufferPresentationTimes")]
+    public void ExpectMonotonicallyIncreasingUpcomingSampleBufferPresentationTimes();
+    [Selector("resetUpcomingSampleBufferPresentationTimeExpectations")]
+    public void ResetUpcomingSampleBufferPresentationTimeExpectations();
 }
 
 public objc closure void AVSampleBufferVideoRendererLoadVideoPerformanceMetricsWithCompletionHandlerCompletionHandlerBlock(AVVideoPerformanceMetrics? arg0);
@@ -70,7 +79,8 @@ public objc closure void AVSampleBufferVideoRendererLoadVideoPerformanceMetricsW
 /// AVSampleBufferVideoRendererVideoPerformanceMetrics, a category of AVSampleBufferVideoRenderer.
 public extern objc class AVSampleBufferVideoRenderer
 {
-    [Selector("loadVideoPerformanceMetricsWithCompletionHandler:")] public void LoadVideoPerformanceMetricsWithCompletionHandler(AVSampleBufferVideoRendererLoadVideoPerformanceMetricsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("loadVideoPerformanceMetricsWithCompletionHandler:")]
+    public void LoadVideoPerformanceMetricsWithCompletionHandler(AVSampleBufferVideoRendererLoadVideoPerformanceMetricsWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

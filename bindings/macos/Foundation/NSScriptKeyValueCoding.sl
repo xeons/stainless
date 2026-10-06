@@ -35,14 +35,22 @@ public extern "C" NSString NSOperationNotSupportedForKeyException;
 /// NSScriptKeyValueCoding, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("valueAtIndex:inPropertyWithKey:")] public AnyObject? ValueAtIndexInPropertyWithKey(NSUInteger index, NSString key);
-    [Selector("valueWithName:inPropertyWithKey:")] public AnyObject? ValueWithNameInPropertyWithKey(NSString name, NSString key);
-    [Selector("valueWithUniqueID:inPropertyWithKey:")] public AnyObject? ValueWithUniqueIDInPropertyWithKey(AnyObject uniqueID, NSString key);
-    [Selector("insertValue:atIndex:inPropertyWithKey:")] public void InsertValueAtIndexInPropertyWithKey(AnyObject value, NSUInteger index, NSString key);
-    [Selector("removeValueAtIndex:fromPropertyWithKey:")] public void RemoveValueAtIndexFromPropertyWithKey(NSUInteger index, NSString key);
-    [Selector("replaceValueAtIndex:inPropertyWithKey:withValue:")] public void ReplaceValueAtIndexInPropertyWithKeyWithValue(NSUInteger index, NSString key, AnyObject value);
-    [Selector("insertValue:inPropertyWithKey:")] public void InsertValueInPropertyWithKey(AnyObject value, NSString key);
-    [Selector("coerceValue:forKey:")] public AnyObject? CoerceValueForKey(AnyObject? value, NSString key);
+    [Selector("valueAtIndex:inPropertyWithKey:")]
+    public AnyObject? ValueAtIndexInPropertyWithKey(NSUInteger index, NSString key);
+    [Selector("valueWithName:inPropertyWithKey:")]
+    public AnyObject? ValueWithNameInPropertyWithKey(NSString name, NSString key);
+    [Selector("valueWithUniqueID:inPropertyWithKey:")]
+    public AnyObject? ValueWithUniqueIDInPropertyWithKey(AnyObject uniqueID, NSString key);
+    [Selector("insertValue:atIndex:inPropertyWithKey:")]
+    public void InsertValueAtIndexInPropertyWithKey(AnyObject value, NSUInteger index, NSString key);
+    [Selector("removeValueAtIndex:fromPropertyWithKey:")]
+    public void RemoveValueAtIndexFromPropertyWithKey(NSUInteger index, NSString key);
+    [Selector("replaceValueAtIndex:inPropertyWithKey:withValue:")]
+    public void ReplaceValueAtIndexInPropertyWithKeyWithValue(NSUInteger index, NSString key, AnyObject value);
+    [Selector("insertValue:inPropertyWithKey:")]
+    public void InsertValueInPropertyWithKey(AnyObject value, NSString key);
+    [Selector("coerceValue:forKey:")]
+    public AnyObject? CoerceValueForKey(AnyObject? value, NSString key);
 }
 
 #endif

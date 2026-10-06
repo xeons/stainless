@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class NEFlowMetaData : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("sourceAppUniqueIdentifier")] public NSData SourceAppUniqueIdentifier { get; }
-    [Selector("sourceAppSigningIdentifier")] public NSString SourceAppSigningIdentifier { get; }
-    [Selector("sourceAppAuditToken")] public NSData? SourceAppAuditToken { get; }
-    [Selector("filterFlowIdentifier")] public NSUUID? FilterFlowIdentifier { get; }
+    [Selector("sourceAppUniqueIdentifier")]
+    public NSData SourceAppUniqueIdentifier { get; }
+    [Selector("sourceAppSigningIdentifier")]
+    public NSString SourceAppSigningIdentifier { get; }
+    [Selector("sourceAppAuditToken")]
+    public NSData? SourceAppAuditToken { get; }
+    [Selector("filterFlowIdentifier")]
+    public NSUUID? FilterFlowIdentifier { get; }
 }
 
 #endif

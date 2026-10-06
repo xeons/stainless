@@ -33,17 +33,28 @@ import Standard.ObjC;
 
 public extern objc class DRBurnSetupPanel : DRSetupPanel
 {
-    [Selector("setupPanel")] public static DRBurnSetupPanel? SetupPanel();
-    [Selector("setDefaultButtonTitle:")] public void SetDefaultButtonTitle(NSString? title);
-    [Selector("setCanSelectTestBurn:")] public void SetCanSelectTestBurn(bool flag);
-    [Selector("setCanSelectAppendableMedia:")] public void SetCanSelectAppendableMedia(bool flag);
-    [Selector("burnObject")] public DRBurn? BurnObject();
-    [Selector("expand:")] public void Expand(AnyObject? sender);
-    [Selector("burnSpeed:")] public void BurnSpeed(AnyObject? sender);
-    [Selector("appendable:")] public void Appendable(AnyObject? sender);
-    [Selector("completionAction:")] public void CompletionAction(AnyObject? sender);
-    [Selector("testBurn:")] public void TestBurn(AnyObject? sender);
-    [Selector("verifyBurn:")] public void VerifyBurn(AnyObject? sender);
+    [Selector("setupPanel")]
+    public static DRBurnSetupPanel? SetupPanel();
+    [Selector("setDefaultButtonTitle:")]
+    public void SetDefaultButtonTitle(NSString? title);
+    [Selector("setCanSelectTestBurn:")]
+    public void SetCanSelectTestBurn(bool flag);
+    [Selector("setCanSelectAppendableMedia:")]
+    public void SetCanSelectAppendableMedia(bool flag);
+    [Selector("burnObject")]
+    public DRBurn? BurnObject();
+    [Selector("expand:")]
+    public void Expand(AnyObject? sender);
+    [Selector("burnSpeed:")]
+    public void BurnSpeed(AnyObject? sender);
+    [Selector("appendable:")]
+    public void Appendable(AnyObject? sender);
+    [Selector("completionAction:")]
+    public void CompletionAction(AnyObject? sender);
+    [Selector("testBurn:")]
+    public void TestBurn(AnyObject? sender);
+    [Selector("verifyBurn:")]
+    public void VerifyBurn(AnyObject? sender);
 }
 
 public extern "C" NSString? DRBurnSetupPanelDefaultButtonDefaultTitle;

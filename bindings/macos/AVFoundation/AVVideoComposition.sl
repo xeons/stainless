@@ -39,21 +39,33 @@ public objc closure void AVVideoCompositionVideoCompositionWithPropertiesOfAsset
 
 public extern objc class AVVideoComposition : NSObject, NSCopying, NSMutableCopying
 {
-    [Selector("customVideoCompositorClass")] public Class CustomVideoCompositorClass { get; }
-    [Selector("frameDuration")] public CMTime FrameDuration { get; }
-    [Selector("sourceTrackIDForFrameTiming")] public CMPersistentTrackID SourceTrackIDForFrameTiming { get; }
-    [Selector("renderSize")] public CGSize RenderSize { get; }
-    [Selector("renderScale")] public float RenderScale { get; }
-    [Selector("instructions")] public NSArray Instructions { get; }
-    [Selector("animationTool")] public AVVideoCompositionCoreAnimationTool? AnimationTool { get; }
-    [Selector("sourceSampleDataTrackIDs")] public NSArray? SourceSampleDataTrackIDs { get; }
+    [Selector("customVideoCompositorClass")]
+    public Class CustomVideoCompositorClass { get; }
+    [Selector("frameDuration")]
+    public CMTime FrameDuration { get; }
+    [Selector("sourceTrackIDForFrameTiming")]
+    public CMPersistentTrackID SourceTrackIDForFrameTiming { get; }
+    [Selector("renderSize")]
+    public CGSize RenderSize { get; }
+    [Selector("renderScale")]
+    public float RenderScale { get; }
+    [Selector("instructions")]
+    public NSArray Instructions { get; }
+    [Selector("animationTool")]
+    public AVVideoCompositionCoreAnimationTool? AnimationTool { get; }
+    [Selector("sourceSampleDataTrackIDs")]
+    public NSArray? SourceSampleDataTrackIDs { get; }
     /// macOS 26.0 and later.
-    [Selector("outputBufferDescription")] public NSArray? OutputBufferDescription { get; }
+    [Selector("outputBufferDescription")]
+    public NSArray? OutputBufferDescription { get; }
     /// macOS 26.0 and later.
-    [Selector("spatialVideoConfigurations")] public NSArray? SpatialVideoConfigurations { get; }
+    [Selector("spatialVideoConfigurations")]
+    public NSArray? SpatialVideoConfigurations { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("videoCompositionWithPropertiesOfAsset:")] public static AVVideoComposition VideoCompositionWithPropertiesOfAsset(AVAsset asset);
-    [Selector("videoCompositionWithPropertiesOfAsset:completionHandler:")] public static void VideoCompositionWithPropertiesOfAssetCompletionHandler(AVAsset asset, AVVideoCompositionVideoCompositionWithPropertiesOfAssetCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("videoCompositionWithPropertiesOfAsset:")]
+    public static AVVideoComposition VideoCompositionWithPropertiesOfAsset(AVAsset asset);
+    [Selector("videoCompositionWithPropertiesOfAsset:completionHandler:")]
+    public static void VideoCompositionWithPropertiesOfAssetCompletionHandler(AVAsset asset, AVVideoCompositionVideoCompositionWithPropertiesOfAssetCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public using AVVideoCompositionPerFrameHDRDisplayMetadataPolicy = NSString;
@@ -65,10 +77,14 @@ public extern "C" AVVideoCompositionPerFrameHDRDisplayMetadataPolicy AVVideoComp
 /// AVVideoCompositionColorimetery, a category of AVVideoComposition.
 public extern objc class AVVideoComposition
 {
-    [Selector("colorPrimaries")] public NSString? ColorPrimaries { get; }
-    [Selector("colorYCbCrMatrix")] public NSString? ColorYCbCrMatrix { get; }
-    [Selector("colorTransferFunction")] public NSString? ColorTransferFunction { get; }
-    [Selector("perFrameHDRDisplayMetadataPolicy")] public AVVideoCompositionPerFrameHDRDisplayMetadataPolicy PerFrameHDRDisplayMetadataPolicy { get; }
+    [Selector("colorPrimaries")]
+    public NSString? ColorPrimaries { get; }
+    [Selector("colorYCbCrMatrix")]
+    public NSString? ColorYCbCrMatrix { get; }
+    [Selector("colorTransferFunction")]
+    public NSString? ColorTransferFunction { get; }
+    [Selector("perFrameHDRDisplayMetadataPolicy")]
+    public AVVideoCompositionPerFrameHDRDisplayMetadataPolicy PerFrameHDRDisplayMetadataPolicy { get; }
 }
 
 public objc closure void AVVideoCompositionVideoCompositionWithAssetApplyingCIFiltersWithHandlerApplierBlock(AVAsynchronousCIImageFilteringRequest arg0);
@@ -81,8 +97,10 @@ public objc closure void AVVideoCompositionVideoCompositionWithAssetApplyingCIFi
 public extern objc class AVVideoComposition
 {
     /// Deprecated in macOS 15.0.
-    [Selector("videoCompositionWithAsset:applyingCIFiltersWithHandler:")] public static AVVideoComposition VideoCompositionWithAssetApplyingCIFiltersWithHandler(AVAsset asset, AVVideoCompositionVideoCompositionWithAssetApplyingCIFiltersWithHandlerApplierBlock applier);
-    [Selector("videoCompositionWithAsset:applyingCIFiltersWithHandler:completionHandler:")] public static void VideoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandler(AVAsset asset, AVVideoCompositionVideoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandlerApplierBlock applier, AVVideoCompositionVideoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("videoCompositionWithAsset:applyingCIFiltersWithHandler:")]
+    public static AVVideoComposition VideoCompositionWithAssetApplyingCIFiltersWithHandler(AVAsset asset, AVVideoCompositionVideoCompositionWithAssetApplyingCIFiltersWithHandlerApplierBlock applier);
+    [Selector("videoCompositionWithAsset:applyingCIFiltersWithHandler:completionHandler:")]
+    public static void VideoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandler(AVAsset asset, AVVideoCompositionVideoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandlerApplierBlock applier, AVVideoCompositionVideoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void AVMutableVideoCompositionVideoCompositionWithPropertiesOfAssetCompletionHandlerCompletionHandlerBlock(AVMutableVideoComposition? arg0, NSError? arg1);
@@ -91,32 +109,50 @@ public objc closure void AVMutableVideoCompositionVideoCompositionWithProperties
 
 public extern objc class AVMutableVideoComposition : AVVideoComposition
 {
-    [Selector("customVideoCompositorClass", "setCustomVideoCompositorClass:")] public Class CustomVideoCompositorClass { get; set; }
-    [Selector("frameDuration", "setFrameDuration:")] public CMTime FrameDuration { get; set; }
-    [Selector("sourceTrackIDForFrameTiming", "setSourceTrackIDForFrameTiming:")] public CMPersistentTrackID SourceTrackIDForFrameTiming { get; set; }
-    [Selector("renderSize", "setRenderSize:")] public CGSize RenderSize { get; set; }
-    [Selector("renderScale", "setRenderScale:")] public float RenderScale { get; set; }
-    [Selector("instructions", "setInstructions:")] public NSArray Instructions { get; set; }
-    [Selector("animationTool", "setAnimationTool:")] public AVVideoCompositionCoreAnimationTool? AnimationTool { get; set; }
-    [Selector("sourceSampleDataTrackIDs", "setSourceSampleDataTrackIDs:")] public NSArray? SourceSampleDataTrackIDs { get; set; }
+    [Selector("customVideoCompositorClass", "setCustomVideoCompositorClass:")]
+    public Class CustomVideoCompositorClass { get; set; }
+    [Selector("frameDuration", "setFrameDuration:")]
+    public CMTime FrameDuration { get; set; }
+    [Selector("sourceTrackIDForFrameTiming", "setSourceTrackIDForFrameTiming:")]
+    public CMPersistentTrackID SourceTrackIDForFrameTiming { get; set; }
+    [Selector("renderSize", "setRenderSize:")]
+    public CGSize RenderSize { get; set; }
+    [Selector("renderScale", "setRenderScale:")]
+    public float RenderScale { get; set; }
+    [Selector("instructions", "setInstructions:")]
+    public NSArray Instructions { get; set; }
+    [Selector("animationTool", "setAnimationTool:")]
+    public AVVideoCompositionCoreAnimationTool? AnimationTool { get; set; }
+    [Selector("sourceSampleDataTrackIDs", "setSourceSampleDataTrackIDs:")]
+    public NSArray? SourceSampleDataTrackIDs { get; set; }
     /// macOS 26.0 and later.
-    [Selector("outputBufferDescription", "setOutputBufferDescription:")] public NSArray? OutputBufferDescription { get; set; }
-    [Selector("videoComposition")] public static AVMutableVideoComposition VideoComposition();
+    [Selector("outputBufferDescription", "setOutputBufferDescription:")]
+    public NSArray? OutputBufferDescription { get; set; }
+    [Selector("videoComposition")]
+    public static AVMutableVideoComposition VideoComposition();
     /// Deprecated in macOS 15.0.
-    [Selector("videoCompositionWithPropertiesOfAsset:")] public static AVMutableVideoComposition VideoCompositionWithPropertiesOfAsset(AVAsset asset);
-    [Selector("videoCompositionWithPropertiesOfAsset:completionHandler:")] public static void VideoCompositionWithPropertiesOfAssetCompletionHandler(AVAsset asset, AVMutableVideoCompositionVideoCompositionWithPropertiesOfAssetCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("videoCompositionWithPropertiesOfAsset:")]
+    public static AVMutableVideoComposition VideoCompositionWithPropertiesOfAsset(AVAsset asset);
+    [Selector("videoCompositionWithPropertiesOfAsset:completionHandler:")]
+    public static void VideoCompositionWithPropertiesOfAssetCompletionHandler(AVAsset asset, AVMutableVideoCompositionVideoCompositionWithPropertiesOfAssetCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
-    [Selector("videoCompositionWithPropertiesOfAsset:prototypeInstruction:")] public static AVMutableVideoComposition VideoCompositionWithPropertiesOfAssetPrototypeInstruction(AVAsset asset, AVVideoCompositionInstruction prototypeInstruction);
-    [Selector("videoCompositionWithPropertiesOfAsset:prototypeInstruction:completionHandler:")] public static void VideoCompositionWithPropertiesOfAssetPrototypeInstructionCompletionHandler(AVAsset asset, AVVideoCompositionInstruction prototypeInstruction, AVMutableVideoCompositionVideoCompositionWithPropertiesOfAssetPrototypeInstructionCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("videoCompositionWithPropertiesOfAsset:prototypeInstruction:")]
+    public static AVMutableVideoComposition VideoCompositionWithPropertiesOfAssetPrototypeInstruction(AVAsset asset, AVVideoCompositionInstruction prototypeInstruction);
+    [Selector("videoCompositionWithPropertiesOfAsset:prototypeInstruction:completionHandler:")]
+    public static void VideoCompositionWithPropertiesOfAssetPrototypeInstructionCompletionHandler(AVAsset asset, AVVideoCompositionInstruction prototypeInstruction, AVMutableVideoCompositionVideoCompositionWithPropertiesOfAssetPrototypeInstructionCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 /// AVMutableVideoCompositionColorimetery, a category of AVMutableVideoComposition.
 public extern objc class AVMutableVideoComposition
 {
-    [Selector("colorPrimaries", "setColorPrimaries:")] public NSString? ColorPrimaries { get; set; }
-    [Selector("colorYCbCrMatrix", "setColorYCbCrMatrix:")] public NSString? ColorYCbCrMatrix { get; set; }
-    [Selector("colorTransferFunction", "setColorTransferFunction:")] public NSString? ColorTransferFunction { get; set; }
-    [Selector("perFrameHDRDisplayMetadataPolicy", "setPerFrameHDRDisplayMetadataPolicy:")] public AVVideoCompositionPerFrameHDRDisplayMetadataPolicy PerFrameHDRDisplayMetadataPolicy { get; set; }
+    [Selector("colorPrimaries", "setColorPrimaries:")]
+    public NSString? ColorPrimaries { get; set; }
+    [Selector("colorYCbCrMatrix", "setColorYCbCrMatrix:")]
+    public NSString? ColorYCbCrMatrix { get; set; }
+    [Selector("colorTransferFunction", "setColorTransferFunction:")]
+    public NSString? ColorTransferFunction { get; set; }
+    [Selector("perFrameHDRDisplayMetadataPolicy", "setPerFrameHDRDisplayMetadataPolicy:")]
+    public AVVideoCompositionPerFrameHDRDisplayMetadataPolicy PerFrameHDRDisplayMetadataPolicy { get; set; }
 }
 
 public objc closure void AVMutableVideoCompositionVideoCompositionWithAssetApplyingCIFiltersWithHandlerApplierBlock(AVAsynchronousCIImageFilteringRequest arg0);
@@ -129,57 +165,88 @@ public objc closure void AVMutableVideoCompositionVideoCompositionWithAssetApply
 public extern objc class AVMutableVideoComposition
 {
     /// Deprecated in macOS 15.0.
-    [Selector("videoCompositionWithAsset:applyingCIFiltersWithHandler:")] public static AVMutableVideoComposition VideoCompositionWithAssetApplyingCIFiltersWithHandler(AVAsset asset, AVMutableVideoCompositionVideoCompositionWithAssetApplyingCIFiltersWithHandlerApplierBlock applier);
-    [Selector("videoCompositionWithAsset:applyingCIFiltersWithHandler:completionHandler:")] public static void VideoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandler(AVAsset asset, AVMutableVideoCompositionVideoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandlerApplierBlock applier, AVMutableVideoCompositionVideoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("videoCompositionWithAsset:applyingCIFiltersWithHandler:")]
+    public static AVMutableVideoComposition VideoCompositionWithAssetApplyingCIFiltersWithHandler(AVAsset asset, AVMutableVideoCompositionVideoCompositionWithAssetApplyingCIFiltersWithHandlerApplierBlock applier);
+    [Selector("videoCompositionWithAsset:applyingCIFiltersWithHandler:completionHandler:")]
+    public static void VideoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandler(AVAsset asset, AVMutableVideoCompositionVideoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandlerApplierBlock applier, AVMutableVideoCompositionVideoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public extern objc class AVVideoCompositionInstruction : NSObject, NSSecureCoding, NSCopying, NSMutableCopying, AVVideoCompositionInstructionProtocol
 {
-    [Selector("timeRange")] public CMTimeRange TimeRange { get; }
-    [Selector("backgroundColor")] public CGColorRef? BackgroundColor { get; }
-    [Selector("layerInstructions")] public NSArray LayerInstructions { get; }
-    [Selector("enablePostProcessing")] public bool EnablePostProcessing { get; }
-    [Selector("requiredSourceTrackIDs")] public NSArray? RequiredSourceTrackIDs { get; }
-    [Selector("passthroughTrackID")] public CMPersistentTrackID PassthroughTrackID { get; }
-    [Selector("requiredSourceSampleDataTrackIDs")] public NSArray? RequiredSourceSampleDataTrackIDs { get; }
+    [Selector("timeRange")]
+    public CMTimeRange TimeRange { get; }
+    [Selector("backgroundColor")]
+    public CGColorRef? BackgroundColor { get; }
+    [Selector("layerInstructions")]
+    public NSArray LayerInstructions { get; }
+    [Selector("enablePostProcessing")]
+    public bool EnablePostProcessing { get; }
+    [Selector("requiredSourceTrackIDs")]
+    public NSArray? RequiredSourceTrackIDs { get; }
+    [Selector("passthroughTrackID")]
+    public CMPersistentTrackID PassthroughTrackID { get; }
+    [Selector("requiredSourceSampleDataTrackIDs")]
+    public NSArray? RequiredSourceSampleDataTrackIDs { get; }
 }
 
 public extern objc class AVMutableVideoCompositionInstruction : AVVideoCompositionInstruction
 {
-    [Selector("timeRange", "setTimeRange:")] public CMTimeRange TimeRange { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public CGColorRef? BackgroundColor { get; set; }
-    [Selector("layerInstructions", "setLayerInstructions:")] public NSArray LayerInstructions { get; set; }
-    [Selector("enablePostProcessing", "setEnablePostProcessing:")] public bool EnablePostProcessing { get; set; }
-    [Selector("requiredSourceSampleDataTrackIDs", "setRequiredSourceSampleDataTrackIDs:")] public NSArray? RequiredSourceSampleDataTrackIDs { get; set; }
-    [Selector("videoCompositionInstruction")] public static Self VideoCompositionInstruction();
+    [Selector("timeRange", "setTimeRange:")]
+    public CMTimeRange TimeRange { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public CGColorRef? BackgroundColor { get; set; }
+    [Selector("layerInstructions", "setLayerInstructions:")]
+    public NSArray LayerInstructions { get; set; }
+    [Selector("enablePostProcessing", "setEnablePostProcessing:")]
+    public bool EnablePostProcessing { get; set; }
+    [Selector("requiredSourceSampleDataTrackIDs", "setRequiredSourceSampleDataTrackIDs:")]
+    public NSArray? RequiredSourceSampleDataTrackIDs { get; set; }
+    [Selector("videoCompositionInstruction")]
+    public static Self VideoCompositionInstruction();
 }
 
 public extern objc class AVVideoCompositionLayerInstruction : NSObject, NSSecureCoding, NSCopying, NSMutableCopying
 {
-    [Selector("trackID")] public CMPersistentTrackID TrackID { get; }
-    [Selector("getTransformRampForTime:startTransform:endTransform:timeRange:")] public bool GetTransformRampForTimeStartTransformEndTransformTimeRange(CMTime time, CGAffineTransform* startTransform, CGAffineTransform* endTransform, CMTimeRange* timeRange);
-    [Selector("getOpacityRampForTime:startOpacity:endOpacity:timeRange:")] public bool GetOpacityRampForTimeStartOpacityEndOpacityTimeRange(CMTime time, float* startOpacity, float* endOpacity, CMTimeRange* timeRange);
-    [Selector("getCropRectangleRampForTime:startCropRectangle:endCropRectangle:timeRange:")] public bool GetCropRectangleRampForTimeStartCropRectangleEndCropRectangleTimeRange(CMTime time, CGRect* startCropRectangle, CGRect* endCropRectangle, CMTimeRange* timeRange);
+    [Selector("trackID")]
+    public CMPersistentTrackID TrackID { get; }
+    [Selector("getTransformRampForTime:startTransform:endTransform:timeRange:")]
+    public bool GetTransformRampForTimeStartTransformEndTransformTimeRange(CMTime time, CGAffineTransform* startTransform, CGAffineTransform* endTransform, CMTimeRange* timeRange);
+    [Selector("getOpacityRampForTime:startOpacity:endOpacity:timeRange:")]
+    public bool GetOpacityRampForTimeStartOpacityEndOpacityTimeRange(CMTime time, float* startOpacity, float* endOpacity, CMTimeRange* timeRange);
+    [Selector("getCropRectangleRampForTime:startCropRectangle:endCropRectangle:timeRange:")]
+    public bool GetCropRectangleRampForTimeStartCropRectangleEndCropRectangleTimeRange(CMTime time, CGRect* startCropRectangle, CGRect* endCropRectangle, CMTimeRange* timeRange);
 }
 
 public extern objc class AVMutableVideoCompositionLayerInstruction : AVVideoCompositionLayerInstruction
 {
-    [Selector("trackID", "setTrackID:")] public CMPersistentTrackID TrackID { get; set; }
-    [Selector("videoCompositionLayerInstructionWithAssetTrack:")] public static Self VideoCompositionLayerInstructionWithAssetTrack(AVAssetTrack track);
-    [Selector("videoCompositionLayerInstruction")] public static Self VideoCompositionLayerInstruction();
-    [Selector("setTransformRampFromStartTransform:toEndTransform:timeRange:")] public void SetTransformRampFromStartTransformToEndTransformTimeRange(CGAffineTransform startTransform, CGAffineTransform endTransform, CMTimeRange timeRange);
-    [Selector("setTransform:atTime:")] public void SetTransformAtTime(CGAffineTransform transform, CMTime time);
-    [Selector("setOpacityRampFromStartOpacity:toEndOpacity:timeRange:")] public void SetOpacityRampFromStartOpacityToEndOpacityTimeRange(float startOpacity, float endOpacity, CMTimeRange timeRange);
-    [Selector("setOpacity:atTime:")] public void SetOpacityAtTime(float opacity, CMTime time);
-    [Selector("setCropRectangleRampFromStartCropRectangle:toEndCropRectangle:timeRange:")] public void SetCropRectangleRampFromStartCropRectangleToEndCropRectangleTimeRange(CGRect startCropRectangle, CGRect endCropRectangle, CMTimeRange timeRange);
-    [Selector("setCropRectangle:atTime:")] public void SetCropRectangleAtTime(CGRect cropRectangle, CMTime time);
+    [Selector("trackID", "setTrackID:")]
+    public CMPersistentTrackID TrackID { get; set; }
+    [Selector("videoCompositionLayerInstructionWithAssetTrack:")]
+    public static Self VideoCompositionLayerInstructionWithAssetTrack(AVAssetTrack track);
+    [Selector("videoCompositionLayerInstruction")]
+    public static Self VideoCompositionLayerInstruction();
+    [Selector("setTransformRampFromStartTransform:toEndTransform:timeRange:")]
+    public void SetTransformRampFromStartTransformToEndTransformTimeRange(CGAffineTransform startTransform, CGAffineTransform endTransform, CMTimeRange timeRange);
+    [Selector("setTransform:atTime:")]
+    public void SetTransformAtTime(CGAffineTransform transform, CMTime time);
+    [Selector("setOpacityRampFromStartOpacity:toEndOpacity:timeRange:")]
+    public void SetOpacityRampFromStartOpacityToEndOpacityTimeRange(float startOpacity, float endOpacity, CMTimeRange timeRange);
+    [Selector("setOpacity:atTime:")]
+    public void SetOpacityAtTime(float opacity, CMTime time);
+    [Selector("setCropRectangleRampFromStartCropRectangle:toEndCropRectangle:timeRange:")]
+    public void SetCropRectangleRampFromStartCropRectangleToEndCropRectangleTimeRange(CGRect startCropRectangle, CGRect endCropRectangle, CMTimeRange timeRange);
+    [Selector("setCropRectangle:atTime:")]
+    public void SetCropRectangleAtTime(CGRect cropRectangle, CMTime time);
 }
 
 public extern objc class AVVideoCompositionCoreAnimationTool : NSObject
 {
-    [Selector("videoCompositionCoreAnimationToolWithAdditionalLayer:asTrackID:")] public static Self VideoCompositionCoreAnimationToolWithAdditionalLayerAsTrackID(CALayer layer, CMPersistentTrackID trackID);
-    [Selector("videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:inLayer:")] public static Self VideoCompositionCoreAnimationToolWithPostProcessingAsVideoLayerInLayer(CALayer videoLayer, CALayer animationLayer);
-    [Selector("videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayers:inLayer:")] public static Self VideoCompositionCoreAnimationToolWithPostProcessingAsVideoLayersInLayer(NSArray videoLayers, CALayer animationLayer);
+    [Selector("videoCompositionCoreAnimationToolWithAdditionalLayer:asTrackID:")]
+    public static Self VideoCompositionCoreAnimationToolWithAdditionalLayerAsTrackID(CALayer layer, CMPersistentTrackID trackID);
+    [Selector("videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:inLayer:")]
+    public static Self VideoCompositionCoreAnimationToolWithPostProcessingAsVideoLayerInLayer(CALayer videoLayer, CALayer animationLayer);
+    [Selector("videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayers:inLayer:")]
+    public static Self VideoCompositionCoreAnimationToolWithPostProcessingAsVideoLayersInLayer(NSArray videoLayers, CALayer animationLayer);
 }
 
 public objc closure void AVAssetFindUnusedTrackIDWithCompletionHandlerCompletionHandlerBlock(CMPersistentTrackID arg0, NSError? arg1);
@@ -188,8 +255,10 @@ public objc closure void AVAssetFindUnusedTrackIDWithCompletionHandlerCompletion
 public extern objc class AVAsset
 {
     /// Deprecated in macOS 15.0.
-    [Selector("unusedTrackID")] public CMPersistentTrackID UnusedTrackID();
-    [Selector("findUnusedTrackIDWithCompletionHandler:")] public void FindUnusedTrackIDWithCompletionHandler(AVAssetFindUnusedTrackIDWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("unusedTrackID")]
+    public CMPersistentTrackID UnusedTrackID();
+    [Selector("findUnusedTrackIDWithCompletionHandler:")]
+    public void FindUnusedTrackIDWithCompletionHandler(AVAssetFindUnusedTrackIDWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void AVVideoCompositionDetermineValidityForAssetTimeRangeValidationDelegateCompletionHandlerCompletionHandlerBlock(bool arg0, NSError? arg1);
@@ -198,18 +267,29 @@ public objc closure void AVVideoCompositionDetermineValidityForAssetTimeRangeVal
 public extern objc class AVVideoComposition
 {
     /// Deprecated in macOS 15.0.
-    [Selector("isValidForAsset:timeRange:validationDelegate:")] public bool IsValidForAssetTimeRangeValidationDelegate(AVAsset? asset, CMTimeRange timeRange, AVVideoCompositionValidationHandling? validationDelegate);
+    [Selector("isValidForAsset:timeRange:validationDelegate:")]
+    public bool IsValidForAssetTimeRangeValidationDelegate(AVAsset? asset, CMTimeRange timeRange, AVVideoCompositionValidationHandling? validationDelegate);
     /// Deprecated in macOS 15.0.
-    [Selector("determineValidityForAsset:timeRange:validationDelegate:completionHandler:")] public void DetermineValidityForAssetTimeRangeValidationDelegateCompletionHandler(AVAsset? asset, CMTimeRange timeRange, AVVideoCompositionValidationHandling? validationDelegate, AVVideoCompositionDetermineValidityForAssetTimeRangeValidationDelegateCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("isValidForTracks:assetDuration:timeRange:validationDelegate:")] public bool IsValidForTracksAssetDurationTimeRangeValidationDelegate(NSArray tracks, CMTime duration, CMTimeRange timeRange, AVVideoCompositionValidationHandling? validationDelegate);
+    [Selector("determineValidityForAsset:timeRange:validationDelegate:completionHandler:")]
+    public void DetermineValidityForAssetTimeRangeValidationDelegateCompletionHandler(AVAsset? asset, CMTimeRange timeRange, AVVideoCompositionValidationHandling? validationDelegate, AVVideoCompositionDetermineValidityForAssetTimeRangeValidationDelegateCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("isValidForTracks:assetDuration:timeRange:validationDelegate:")]
+    public bool IsValidForTracksAssetDurationTimeRangeValidationDelegate(NSArray tracks, CMTime duration, CMTimeRange timeRange, AVVideoCompositionValidationHandling? validationDelegate);
 }
 
 public objc interface AVVideoCompositionValidationHandling : NSObjectProtocol
 {
-    [Optional] [Selector("videoComposition:shouldContinueValidatingAfterFindingInvalidValueForKey:")] bool VideoCompositionShouldContinueValidatingAfterFindingInvalidValueForKey(AVVideoComposition videoComposition, NSString key);
-    [Optional] [Selector("videoComposition:shouldContinueValidatingAfterFindingEmptyTimeRange:")] bool VideoCompositionShouldContinueValidatingAfterFindingEmptyTimeRange(AVVideoComposition videoComposition, CMTimeRange timeRange);
-    [Optional] [Selector("videoComposition:shouldContinueValidatingAfterFindingInvalidTimeRangeInInstruction:")] bool VideoCompositionShouldContinueValidatingAfterFindingInvalidTimeRangeInInstruction(AVVideoComposition videoComposition, AVVideoCompositionInstructionProtocol videoCompositionInstruction);
-    [Optional] [Selector("videoComposition:shouldContinueValidatingAfterFindingInvalidTrackIDInInstruction:layerInstruction:asset:")] bool VideoCompositionShouldContinueValidatingAfterFindingInvalidTrackIDInInstructionLayerInstructionAsset(AVVideoComposition videoComposition, AVVideoCompositionInstructionProtocol videoCompositionInstruction, AVVideoCompositionLayerInstruction layerInstruction, AVAsset asset);
+    [Optional]
+    [Selector("videoComposition:shouldContinueValidatingAfterFindingInvalidValueForKey:")]
+    bool VideoCompositionShouldContinueValidatingAfterFindingInvalidValueForKey(AVVideoComposition videoComposition, NSString key);
+    [Optional]
+    [Selector("videoComposition:shouldContinueValidatingAfterFindingEmptyTimeRange:")]
+    bool VideoCompositionShouldContinueValidatingAfterFindingEmptyTimeRange(AVVideoComposition videoComposition, CMTimeRange timeRange);
+    [Optional]
+    [Selector("videoComposition:shouldContinueValidatingAfterFindingInvalidTimeRangeInInstruction:")]
+    bool VideoCompositionShouldContinueValidatingAfterFindingInvalidTimeRangeInInstruction(AVVideoComposition videoComposition, AVVideoCompositionInstructionProtocol videoCompositionInstruction);
+    [Optional]
+    [Selector("videoComposition:shouldContinueValidatingAfterFindingInvalidTrackIDInInstruction:layerInstruction:asset:")]
+    bool VideoCompositionShouldContinueValidatingAfterFindingInvalidTrackIDInInstructionLayerInstructionAsset(AVVideoComposition videoComposition, AVVideoCompositionInstructionProtocol videoCompositionInstruction, AVVideoCompositionLayerInstruction layerInstruction, AVAsset asset);
 }
 
 #endif

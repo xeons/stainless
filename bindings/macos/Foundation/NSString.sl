@@ -81,10 +81,14 @@ public enum NSStringEncodingConversionOptions : ulong
 
 public extern objc class NSString : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("length")] public NSUInteger Length { get; }
-    [Selector("characterAtIndex:")] public unichar CharacterAtIndex(NSUInteger index);
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("length")]
+    public NSUInteger Length { get; }
+    [Selector("characterAtIndex:")]
+    public unichar CharacterAtIndex(NSUInteger index);
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 public objc closure void NSStringEnumerateSubstringsInRangeOptionsUsingBlockBlock(NSString? arg0, NSRange arg1, NSRange arg2, bool* arg3);
@@ -98,124 +102,242 @@ public objc closure void NSStringInitWithBytesNoCopyLengthEncodingDeallocatorDea
 /// NSStringExtensionMethods, a category of NSString.
 public extern objc class NSString
 {
-    [Selector("doubleValue")] public double DoubleValue { get; }
-    [Selector("floatValue")] public float FloatValue { get; }
-    [Selector("intValue")] public int IntValue { get; }
-    [Selector("integerValue")] public NSInteger IntegerValue { get; }
-    [Selector("longLongValue")] public long LongLongValue { get; }
-    [Selector("boolValue")] public bool BoolValue { get; }
-    [Selector("uppercaseString")] public NSString UppercaseString { get; }
-    [Selector("lowercaseString")] public NSString LowercaseString { get; }
-    [Selector("capitalizedString")] public NSString CapitalizedString { get; }
-    [Selector("localizedUppercaseString")] public NSString LocalizedUppercaseString { get; }
-    [Selector("localizedLowercaseString")] public NSString LocalizedLowercaseString { get; }
-    [Selector("localizedCapitalizedString")] public NSString LocalizedCapitalizedString { get; }
-    [Selector("UTF8String")] public byte* UTF8String { get; }
-    [Selector("fastestEncoding")] public NSStringEncoding FastestEncoding { get; }
-    [Selector("smallestEncoding")] public NSStringEncoding SmallestEncoding { get; }
-    [Selector("availableStringEncodings")] public static NSStringEncoding* AvailableStringEncodings { get; }
-    [Selector("defaultCStringEncoding")] public static NSStringEncoding DefaultCStringEncoding { get; }
-    [Selector("decomposedStringWithCanonicalMapping")] public NSString DecomposedStringWithCanonicalMapping { get; }
-    [Selector("precomposedStringWithCanonicalMapping")] public NSString PrecomposedStringWithCanonicalMapping { get; }
-    [Selector("decomposedStringWithCompatibilityMapping")] public NSString DecomposedStringWithCompatibilityMapping { get; }
-    [Selector("precomposedStringWithCompatibilityMapping")] public NSString PrecomposedStringWithCompatibilityMapping { get; }
-    [Selector("description")] public NSString Description { get; }
-    [Selector("hash")] public NSUInteger Hash { get; }
-    [Selector("substringFromIndex:")] public NSString SubstringFromIndex(NSUInteger from);
-    [Selector("substringToIndex:")] public NSString SubstringToIndex(NSUInteger to);
-    [Selector("substringWithRange:")] public NSString SubstringWithRange(NSRange range);
-    [Selector("getCharacters:range:")] public void GetCharactersRange(unichar* buffer, NSRange range);
-    [Selector("compare:")] public NSComparisonResult Compare(NSString string);
-    [Selector("compare:options:")] public NSComparisonResult CompareOptions(NSString string, NSStringCompareOptions mask);
-    [Selector("compare:options:range:")] public NSComparisonResult CompareOptionsRange(NSString string, NSStringCompareOptions mask, NSRange rangeOfReceiverToCompare);
-    [Selector("compare:options:range:locale:")] public NSComparisonResult CompareOptionsRangeLocale(NSString string, NSStringCompareOptions mask, NSRange rangeOfReceiverToCompare, AnyObject? locale);
-    [Selector("caseInsensitiveCompare:")] public NSComparisonResult CaseInsensitiveCompare(NSString string);
-    [Selector("localizedCompare:")] public NSComparisonResult LocalizedCompare(NSString string);
-    [Selector("localizedCaseInsensitiveCompare:")] public NSComparisonResult LocalizedCaseInsensitiveCompare(NSString string);
-    [Selector("localizedStandardCompare:")] public NSComparisonResult LocalizedStandardCompare(NSString string);
-    [Selector("isEqualToString:")] public bool IsEqualToString(NSString aString);
-    [Selector("hasPrefix:")] public bool HasPrefix(NSString str);
-    [Selector("hasSuffix:")] public bool HasSuffix(NSString str);
-    [Selector("commonPrefixWithString:options:")] public NSString CommonPrefixWithStringOptions(NSString str, NSStringCompareOptions mask);
-    [Selector("containsString:")] public bool ContainsString(NSString str);
-    [Selector("localizedCaseInsensitiveContainsString:")] public bool LocalizedCaseInsensitiveContainsString(NSString str);
-    [Selector("localizedStandardContainsString:")] public bool LocalizedStandardContainsString(NSString str);
-    [Selector("localizedStandardRangeOfString:")] public NSRange LocalizedStandardRangeOfString(NSString str);
-    [Selector("rangeOfString:")] public NSRange RangeOfString(NSString searchString);
-    [Selector("rangeOfString:options:")] public NSRange RangeOfStringOptions(NSString searchString, NSStringCompareOptions mask);
-    [Selector("rangeOfString:options:range:")] public NSRange RangeOfStringOptionsRange(NSString searchString, NSStringCompareOptions mask, NSRange rangeOfReceiverToSearch);
-    [Selector("rangeOfString:options:range:locale:")] public NSRange RangeOfStringOptionsRangeLocale(NSString searchString, NSStringCompareOptions mask, NSRange rangeOfReceiverToSearch, NSLocale? locale);
-    [Selector("rangeOfCharacterFromSet:")] public NSRange RangeOfCharacterFromSet(NSCharacterSet searchSet);
-    [Selector("rangeOfCharacterFromSet:options:")] public NSRange RangeOfCharacterFromSetOptions(NSCharacterSet searchSet, NSStringCompareOptions mask);
-    [Selector("rangeOfCharacterFromSet:options:range:")] public NSRange RangeOfCharacterFromSetOptionsRange(NSCharacterSet searchSet, NSStringCompareOptions mask, NSRange rangeOfReceiverToSearch);
-    [Selector("rangeOfComposedCharacterSequenceAtIndex:")] public NSRange RangeOfComposedCharacterSequenceAtIndex(NSUInteger index);
-    [Selector("rangeOfComposedCharacterSequencesForRange:")] public NSRange RangeOfComposedCharacterSequencesForRange(NSRange range);
-    [Selector("stringByAppendingString:")] public NSString StringByAppendingString(NSString aString);
-    [Selector("stringByAppendingFormat:")] public NSString StringByAppendingFormat(NSString format, ...);
-    [Selector("uppercaseStringWithLocale:")] public NSString UppercaseStringWithLocale(NSLocale? locale);
-    [Selector("lowercaseStringWithLocale:")] public NSString LowercaseStringWithLocale(NSLocale? locale);
-    [Selector("capitalizedStringWithLocale:")] public NSString CapitalizedStringWithLocale(NSLocale? locale);
-    [Selector("getLineStart:end:contentsEnd:forRange:")] public void GetLineStartEndContentsEndForRange(NSUInteger* startPtr, NSUInteger* lineEndPtr, NSUInteger* contentsEndPtr, NSRange range);
-    [Selector("lineRangeForRange:")] public NSRange LineRangeForRange(NSRange range);
-    [Selector("getParagraphStart:end:contentsEnd:forRange:")] public void GetParagraphStartEndContentsEndForRange(NSUInteger* startPtr, NSUInteger* parEndPtr, NSUInteger* contentsEndPtr, NSRange range);
-    [Selector("paragraphRangeForRange:")] public NSRange ParagraphRangeForRange(NSRange range);
-    [Selector("enumerateSubstringsInRange:options:usingBlock:")] public void EnumerateSubstringsInRangeOptionsUsingBlock(NSRange range, NSStringEnumerationOptions opts, NSStringEnumerateSubstringsInRangeOptionsUsingBlockBlock block);
-    [Selector("enumerateLinesUsingBlock:")] public void EnumerateLinesUsingBlock(NSStringEnumerateLinesUsingBlockBlock block);
-    [Selector("dataUsingEncoding:allowLossyConversion:")] public NSData? DataUsingEncodingAllowLossyConversion(NSStringEncoding encoding, bool lossy);
-    [Selector("dataUsingEncoding:")] public NSData? DataUsingEncoding(NSStringEncoding encoding);
-    [Selector("canBeConvertedToEncoding:")] public bool CanBeConvertedToEncoding(NSStringEncoding encoding);
-    [Selector("cStringUsingEncoding:")] public byte* CStringUsingEncoding(NSStringEncoding encoding);
-    [Selector("getCString:maxLength:encoding:")] public bool GetCStringMaxLengthEncoding(byte* buffer, NSUInteger maxBufferCount, NSStringEncoding encoding);
-    [Selector("getBytes:maxLength:usedLength:encoding:options:range:remainingRange:")] public bool GetBytesMaxLengthUsedLengthEncodingOptionsRangeRemainingRange(void* buffer, NSUInteger maxBufferCount, NSUInteger* usedBufferCount, NSStringEncoding encoding, NSStringEncodingConversionOptions options, NSRange range, NSRangePointer leftover);
-    [Selector("maximumLengthOfBytesUsingEncoding:")] public NSUInteger MaximumLengthOfBytesUsingEncoding(NSStringEncoding enc);
-    [Selector("lengthOfBytesUsingEncoding:")] public NSUInteger LengthOfBytesUsingEncoding(NSStringEncoding enc);
-    [Selector("localizedNameOfStringEncoding:")] public static NSString LocalizedNameOfStringEncoding(NSStringEncoding encoding);
-    [Selector("componentsSeparatedByString:")] public NSArray ComponentsSeparatedByString(NSString separator);
-    [Selector("componentsSeparatedByCharactersInSet:")] public NSArray ComponentsSeparatedByCharactersInSet(NSCharacterSet separator);
-    [Selector("stringByTrimmingCharactersInSet:")] public NSString StringByTrimmingCharactersInSet(NSCharacterSet set);
-    [Selector("stringByPaddingToLength:withString:startingAtIndex:")] public NSString StringByPaddingToLengthWithStringStartingAtIndex(NSUInteger newLength, NSString padString, NSUInteger padIndex);
-    [Selector("stringByFoldingWithOptions:locale:")] public NSString StringByFoldingWithOptionsLocale(NSStringCompareOptions options, NSLocale? locale);
-    [Selector("stringByReplacingOccurrencesOfString:withString:options:range:")] public NSString StringByReplacingOccurrencesOfStringWithStringOptionsRange(NSString target, NSString replacement, NSStringCompareOptions options, NSRange searchRange);
-    [Selector("stringByReplacingOccurrencesOfString:withString:")] public NSString StringByReplacingOccurrencesOfStringWithString(NSString target, NSString replacement);
-    [Selector("stringByReplacingCharactersInRange:withString:")] public NSString StringByReplacingCharactersInRangeWithString(NSRange range, NSString replacement);
-    [Selector("stringByApplyingTransform:reverse:")] public NSString? StringByApplyingTransformReverse(NSStringTransform transform, bool reverse);
-    [Selector("writeToURL:atomically:encoding:error:")] public bool WriteToURLAtomicallyEncodingError(NSURL url, bool useAuxiliaryFile, NSStringEncoding enc, out NSError? error);
-    [Selector("writeToFile:atomically:encoding:error:")] public bool WriteToFileAtomicallyEncodingError(NSString path, bool useAuxiliaryFile, NSStringEncoding enc, out NSError? error);
-    [Selector("initWithCharactersNoCopy:length:freeWhenDone:")] public Self InitWithCharactersNoCopyLengthFreeWhenDone(unichar* characters, NSUInteger length, bool freeBuffer);
-    [Selector("initWithCharactersNoCopy:length:deallocator:")] public Self InitWithCharactersNoCopyLengthDeallocator(unichar* chars, NSUInteger len, NSStringInitWithCharactersNoCopyLengthDeallocatorDeallocatorBlock? deallocator);
-    [Selector("initWithCharacters:length:")] public Self InitWithCharactersLength(unichar* characters, NSUInteger length);
-    [Selector("initWithUTF8String:")] public Self? InitWithUTF8String(byte* nullTerminatedCString);
-    [Selector("initWithString:")] public Self InitWithString(NSString aString);
-    [Selector("initWithFormat:")] public Self InitWithFormat(NSString format, ...);
-    [Selector("initWithFormat:arguments:")] public Self InitWithFormatArguments(NSString format, VaList argList);
-    [Selector("initWithFormat:locale:")] public Self InitWithFormatLocale(NSString format, AnyObject? locale, ...);
-    [Selector("initWithFormat:locale:arguments:")] public Self InitWithFormatLocaleArguments(NSString format, AnyObject? locale, VaList argList);
-    [Selector("initWithValidatedFormat:validFormatSpecifiers:error:")] public Self? InitWithValidatedFormatValidFormatSpecifiersError(NSString format, NSString validFormatSpecifiers, out NSError? error, ...);
-    [Selector("initWithValidatedFormat:validFormatSpecifiers:locale:error:")] public Self? InitWithValidatedFormatValidFormatSpecifiersLocaleError(NSString format, NSString validFormatSpecifiers, AnyObject? locale, out NSError? error, ...);
-    [Selector("initWithValidatedFormat:validFormatSpecifiers:arguments:error:")] public Self? InitWithValidatedFormatValidFormatSpecifiersArgumentsError(NSString format, NSString validFormatSpecifiers, VaList argList, out NSError? error);
-    [Selector("initWithValidatedFormat:validFormatSpecifiers:locale:arguments:error:")] public Self? InitWithValidatedFormatValidFormatSpecifiersLocaleArgumentsError(NSString format, NSString validFormatSpecifiers, AnyObject? locale, VaList argList, out NSError? error);
-    [Selector("initWithData:encoding:")] public Self? InitWithDataEncoding(NSData data, NSStringEncoding encoding);
-    [Selector("initWithBytes:length:encoding:")] public Self? InitWithBytesLengthEncoding(void* bytes, NSUInteger len, NSStringEncoding encoding);
-    [Selector("initWithBytesNoCopy:length:encoding:freeWhenDone:")] public Self? InitWithBytesNoCopyLengthEncodingFreeWhenDone(void* bytes, NSUInteger len, NSStringEncoding encoding, bool freeBuffer);
-    [Selector("initWithBytesNoCopy:length:encoding:deallocator:")] public Self? InitWithBytesNoCopyLengthEncodingDeallocator(void* bytes, NSUInteger len, NSStringEncoding encoding, NSStringInitWithBytesNoCopyLengthEncodingDeallocatorDeallocatorBlock? deallocator);
-    [Selector("string")] public static Self String();
-    [Selector("stringWithString:")] public static Self StringWithString(NSString string);
-    [Selector("stringWithCharacters:length:")] public static Self StringWithCharactersLength(unichar* characters, NSUInteger length);
-    [Selector("stringWithUTF8String:")] public static Self? StringWithUTF8String(byte* nullTerminatedCString);
-    [Selector("stringWithFormat:")] public static Self StringWithFormat(NSString format, ...);
-    [Selector("localizedStringWithFormat:")] public static Self LocalizedStringWithFormat(NSString format, ...);
-    [Selector("stringWithValidatedFormat:validFormatSpecifiers:error:")] public static Self? StringWithValidatedFormatValidFormatSpecifiersError(NSString format, NSString validFormatSpecifiers, out NSError? error, ...);
-    [Selector("localizedStringWithValidatedFormat:validFormatSpecifiers:error:")] public static Self? LocalizedStringWithValidatedFormatValidFormatSpecifiersError(NSString format, NSString validFormatSpecifiers, out NSError? error, ...);
-    [Selector("initWithCString:encoding:")] public Self? InitWithCStringEncoding(byte* nullTerminatedCString, NSStringEncoding encoding);
-    [Selector("stringWithCString:encoding:")] public static Self? StringWithCStringEncoding(byte* cString, NSStringEncoding enc);
-    [Selector("initWithContentsOfURL:encoding:error:")] public Self? InitWithContentsOfURLEncodingError(NSURL url, NSStringEncoding enc, out NSError? error);
-    [Selector("initWithContentsOfFile:encoding:error:")] public Self? InitWithContentsOfFileEncodingError(NSString path, NSStringEncoding enc, out NSError? error);
-    [Selector("stringWithContentsOfURL:encoding:error:")] public static Self? StringWithContentsOfURLEncodingError(NSURL url, NSStringEncoding enc, out NSError? error);
-    [Selector("stringWithContentsOfFile:encoding:error:")] public static Self? StringWithContentsOfFileEncodingError(NSString path, NSStringEncoding enc, out NSError? error);
-    [Selector("initWithContentsOfURL:usedEncoding:error:")] public Self? InitWithContentsOfURLUsedEncodingError(NSURL url, NSStringEncoding* enc, out NSError? error);
-    [Selector("initWithContentsOfFile:usedEncoding:error:")] public Self? InitWithContentsOfFileUsedEncodingError(NSString path, NSStringEncoding* enc, out NSError? error);
-    [Selector("stringWithContentsOfURL:usedEncoding:error:")] public static Self? StringWithContentsOfURLUsedEncodingError(NSURL url, NSStringEncoding* enc, out NSError? error);
-    [Selector("stringWithContentsOfFile:usedEncoding:error:")] public static Self? StringWithContentsOfFileUsedEncodingError(NSString path, NSStringEncoding* enc, out NSError? error);
+    [Selector("doubleValue")]
+    public double DoubleValue { get; }
+    [Selector("floatValue")]
+    public float FloatValue { get; }
+    [Selector("intValue")]
+    public int IntValue { get; }
+    [Selector("integerValue")]
+    public NSInteger IntegerValue { get; }
+    [Selector("longLongValue")]
+    public long LongLongValue { get; }
+    [Selector("boolValue")]
+    public bool BoolValue { get; }
+    [Selector("uppercaseString")]
+    public NSString UppercaseString { get; }
+    [Selector("lowercaseString")]
+    public NSString LowercaseString { get; }
+    [Selector("capitalizedString")]
+    public NSString CapitalizedString { get; }
+    [Selector("localizedUppercaseString")]
+    public NSString LocalizedUppercaseString { get; }
+    [Selector("localizedLowercaseString")]
+    public NSString LocalizedLowercaseString { get; }
+    [Selector("localizedCapitalizedString")]
+    public NSString LocalizedCapitalizedString { get; }
+    [Selector("UTF8String")]
+    public byte* UTF8String { get; }
+    [Selector("fastestEncoding")]
+    public NSStringEncoding FastestEncoding { get; }
+    [Selector("smallestEncoding")]
+    public NSStringEncoding SmallestEncoding { get; }
+    [Selector("availableStringEncodings")]
+    public static NSStringEncoding* AvailableStringEncodings { get; }
+    [Selector("defaultCStringEncoding")]
+    public static NSStringEncoding DefaultCStringEncoding { get; }
+    [Selector("decomposedStringWithCanonicalMapping")]
+    public NSString DecomposedStringWithCanonicalMapping { get; }
+    [Selector("precomposedStringWithCanonicalMapping")]
+    public NSString PrecomposedStringWithCanonicalMapping { get; }
+    [Selector("decomposedStringWithCompatibilityMapping")]
+    public NSString DecomposedStringWithCompatibilityMapping { get; }
+    [Selector("precomposedStringWithCompatibilityMapping")]
+    public NSString PrecomposedStringWithCompatibilityMapping { get; }
+    [Selector("description")]
+    public NSString Description { get; }
+    [Selector("hash")]
+    public NSUInteger Hash { get; }
+    [Selector("substringFromIndex:")]
+    public NSString SubstringFromIndex(NSUInteger from);
+    [Selector("substringToIndex:")]
+    public NSString SubstringToIndex(NSUInteger to);
+    [Selector("substringWithRange:")]
+    public NSString SubstringWithRange(NSRange range);
+    [Selector("getCharacters:range:")]
+    public void GetCharactersRange(unichar* buffer, NSRange range);
+    [Selector("compare:")]
+    public NSComparisonResult Compare(NSString string);
+    [Selector("compare:options:")]
+    public NSComparisonResult CompareOptions(NSString string, NSStringCompareOptions mask);
+    [Selector("compare:options:range:")]
+    public NSComparisonResult CompareOptionsRange(NSString string, NSStringCompareOptions mask, NSRange rangeOfReceiverToCompare);
+    [Selector("compare:options:range:locale:")]
+    public NSComparisonResult CompareOptionsRangeLocale(NSString string, NSStringCompareOptions mask, NSRange rangeOfReceiverToCompare, AnyObject? locale);
+    [Selector("caseInsensitiveCompare:")]
+    public NSComparisonResult CaseInsensitiveCompare(NSString string);
+    [Selector("localizedCompare:")]
+    public NSComparisonResult LocalizedCompare(NSString string);
+    [Selector("localizedCaseInsensitiveCompare:")]
+    public NSComparisonResult LocalizedCaseInsensitiveCompare(NSString string);
+    [Selector("localizedStandardCompare:")]
+    public NSComparisonResult LocalizedStandardCompare(NSString string);
+    [Selector("isEqualToString:")]
+    public bool IsEqualToString(NSString aString);
+    [Selector("hasPrefix:")]
+    public bool HasPrefix(NSString str);
+    [Selector("hasSuffix:")]
+    public bool HasSuffix(NSString str);
+    [Selector("commonPrefixWithString:options:")]
+    public NSString CommonPrefixWithStringOptions(NSString str, NSStringCompareOptions mask);
+    [Selector("containsString:")]
+    public bool ContainsString(NSString str);
+    [Selector("localizedCaseInsensitiveContainsString:")]
+    public bool LocalizedCaseInsensitiveContainsString(NSString str);
+    [Selector("localizedStandardContainsString:")]
+    public bool LocalizedStandardContainsString(NSString str);
+    [Selector("localizedStandardRangeOfString:")]
+    public NSRange LocalizedStandardRangeOfString(NSString str);
+    [Selector("rangeOfString:")]
+    public NSRange RangeOfString(NSString searchString);
+    [Selector("rangeOfString:options:")]
+    public NSRange RangeOfStringOptions(NSString searchString, NSStringCompareOptions mask);
+    [Selector("rangeOfString:options:range:")]
+    public NSRange RangeOfStringOptionsRange(NSString searchString, NSStringCompareOptions mask, NSRange rangeOfReceiverToSearch);
+    [Selector("rangeOfString:options:range:locale:")]
+    public NSRange RangeOfStringOptionsRangeLocale(NSString searchString, NSStringCompareOptions mask, NSRange rangeOfReceiverToSearch, NSLocale? locale);
+    [Selector("rangeOfCharacterFromSet:")]
+    public NSRange RangeOfCharacterFromSet(NSCharacterSet searchSet);
+    [Selector("rangeOfCharacterFromSet:options:")]
+    public NSRange RangeOfCharacterFromSetOptions(NSCharacterSet searchSet, NSStringCompareOptions mask);
+    [Selector("rangeOfCharacterFromSet:options:range:")]
+    public NSRange RangeOfCharacterFromSetOptionsRange(NSCharacterSet searchSet, NSStringCompareOptions mask, NSRange rangeOfReceiverToSearch);
+    [Selector("rangeOfComposedCharacterSequenceAtIndex:")]
+    public NSRange RangeOfComposedCharacterSequenceAtIndex(NSUInteger index);
+    [Selector("rangeOfComposedCharacterSequencesForRange:")]
+    public NSRange RangeOfComposedCharacterSequencesForRange(NSRange range);
+    [Selector("stringByAppendingString:")]
+    public NSString StringByAppendingString(NSString aString);
+    [Selector("stringByAppendingFormat:")]
+    public NSString StringByAppendingFormat(NSString format, ...);
+    [Selector("uppercaseStringWithLocale:")]
+    public NSString UppercaseStringWithLocale(NSLocale? locale);
+    [Selector("lowercaseStringWithLocale:")]
+    public NSString LowercaseStringWithLocale(NSLocale? locale);
+    [Selector("capitalizedStringWithLocale:")]
+    public NSString CapitalizedStringWithLocale(NSLocale? locale);
+    [Selector("getLineStart:end:contentsEnd:forRange:")]
+    public void GetLineStartEndContentsEndForRange(NSUInteger* startPtr, NSUInteger* lineEndPtr, NSUInteger* contentsEndPtr, NSRange range);
+    [Selector("lineRangeForRange:")]
+    public NSRange LineRangeForRange(NSRange range);
+    [Selector("getParagraphStart:end:contentsEnd:forRange:")]
+    public void GetParagraphStartEndContentsEndForRange(NSUInteger* startPtr, NSUInteger* parEndPtr, NSUInteger* contentsEndPtr, NSRange range);
+    [Selector("paragraphRangeForRange:")]
+    public NSRange ParagraphRangeForRange(NSRange range);
+    [Selector("enumerateSubstringsInRange:options:usingBlock:")]
+    public void EnumerateSubstringsInRangeOptionsUsingBlock(NSRange range, NSStringEnumerationOptions opts, NSStringEnumerateSubstringsInRangeOptionsUsingBlockBlock block);
+    [Selector("enumerateLinesUsingBlock:")]
+    public void EnumerateLinesUsingBlock(NSStringEnumerateLinesUsingBlockBlock block);
+    [Selector("dataUsingEncoding:allowLossyConversion:")]
+    public NSData? DataUsingEncodingAllowLossyConversion(NSStringEncoding encoding, bool lossy);
+    [Selector("dataUsingEncoding:")]
+    public NSData? DataUsingEncoding(NSStringEncoding encoding);
+    [Selector("canBeConvertedToEncoding:")]
+    public bool CanBeConvertedToEncoding(NSStringEncoding encoding);
+    [Selector("cStringUsingEncoding:")]
+    public byte* CStringUsingEncoding(NSStringEncoding encoding);
+    [Selector("getCString:maxLength:encoding:")]
+    public bool GetCStringMaxLengthEncoding(byte* buffer, NSUInteger maxBufferCount, NSStringEncoding encoding);
+    [Selector("getBytes:maxLength:usedLength:encoding:options:range:remainingRange:")]
+    public bool GetBytesMaxLengthUsedLengthEncodingOptionsRangeRemainingRange(void* buffer, NSUInteger maxBufferCount, NSUInteger* usedBufferCount, NSStringEncoding encoding, NSStringEncodingConversionOptions options, NSRange range, NSRangePointer leftover);
+    [Selector("maximumLengthOfBytesUsingEncoding:")]
+    public NSUInteger MaximumLengthOfBytesUsingEncoding(NSStringEncoding enc);
+    [Selector("lengthOfBytesUsingEncoding:")]
+    public NSUInteger LengthOfBytesUsingEncoding(NSStringEncoding enc);
+    [Selector("localizedNameOfStringEncoding:")]
+    public static NSString LocalizedNameOfStringEncoding(NSStringEncoding encoding);
+    [Selector("componentsSeparatedByString:")]
+    public NSArray ComponentsSeparatedByString(NSString separator);
+    [Selector("componentsSeparatedByCharactersInSet:")]
+    public NSArray ComponentsSeparatedByCharactersInSet(NSCharacterSet separator);
+    [Selector("stringByTrimmingCharactersInSet:")]
+    public NSString StringByTrimmingCharactersInSet(NSCharacterSet set);
+    [Selector("stringByPaddingToLength:withString:startingAtIndex:")]
+    public NSString StringByPaddingToLengthWithStringStartingAtIndex(NSUInteger newLength, NSString padString, NSUInteger padIndex);
+    [Selector("stringByFoldingWithOptions:locale:")]
+    public NSString StringByFoldingWithOptionsLocale(NSStringCompareOptions options, NSLocale? locale);
+    [Selector("stringByReplacingOccurrencesOfString:withString:options:range:")]
+    public NSString StringByReplacingOccurrencesOfStringWithStringOptionsRange(NSString target, NSString replacement, NSStringCompareOptions options, NSRange searchRange);
+    [Selector("stringByReplacingOccurrencesOfString:withString:")]
+    public NSString StringByReplacingOccurrencesOfStringWithString(NSString target, NSString replacement);
+    [Selector("stringByReplacingCharactersInRange:withString:")]
+    public NSString StringByReplacingCharactersInRangeWithString(NSRange range, NSString replacement);
+    [Selector("stringByApplyingTransform:reverse:")]
+    public NSString? StringByApplyingTransformReverse(NSStringTransform transform, bool reverse);
+    [Selector("writeToURL:atomically:encoding:error:")]
+    public bool WriteToURLAtomicallyEncodingError(NSURL url, bool useAuxiliaryFile, NSStringEncoding enc, out NSError? error);
+    [Selector("writeToFile:atomically:encoding:error:")]
+    public bool WriteToFileAtomicallyEncodingError(NSString path, bool useAuxiliaryFile, NSStringEncoding enc, out NSError? error);
+    [Selector("initWithCharactersNoCopy:length:freeWhenDone:")]
+    public Self InitWithCharactersNoCopyLengthFreeWhenDone(unichar* characters, NSUInteger length, bool freeBuffer);
+    [Selector("initWithCharactersNoCopy:length:deallocator:")]
+    public Self InitWithCharactersNoCopyLengthDeallocator(unichar* chars, NSUInteger len, NSStringInitWithCharactersNoCopyLengthDeallocatorDeallocatorBlock? deallocator);
+    [Selector("initWithCharacters:length:")]
+    public Self InitWithCharactersLength(unichar* characters, NSUInteger length);
+    [Selector("initWithUTF8String:")]
+    public Self? InitWithUTF8String(byte* nullTerminatedCString);
+    [Selector("initWithString:")]
+    public Self InitWithString(NSString aString);
+    [Selector("initWithFormat:")]
+    public Self InitWithFormat(NSString format, ...);
+    [Selector("initWithFormat:arguments:")]
+    public Self InitWithFormatArguments(NSString format, VaList argList);
+    [Selector("initWithFormat:locale:")]
+    public Self InitWithFormatLocale(NSString format, AnyObject? locale, ...);
+    [Selector("initWithFormat:locale:arguments:")]
+    public Self InitWithFormatLocaleArguments(NSString format, AnyObject? locale, VaList argList);
+    [Selector("initWithValidatedFormat:validFormatSpecifiers:error:")]
+    public Self? InitWithValidatedFormatValidFormatSpecifiersError(NSString format, NSString validFormatSpecifiers, out NSError? error, ...);
+    [Selector("initWithValidatedFormat:validFormatSpecifiers:locale:error:")]
+    public Self? InitWithValidatedFormatValidFormatSpecifiersLocaleError(NSString format, NSString validFormatSpecifiers, AnyObject? locale, out NSError? error, ...);
+    [Selector("initWithValidatedFormat:validFormatSpecifiers:arguments:error:")]
+    public Self? InitWithValidatedFormatValidFormatSpecifiersArgumentsError(NSString format, NSString validFormatSpecifiers, VaList argList, out NSError? error);
+    [Selector("initWithValidatedFormat:validFormatSpecifiers:locale:arguments:error:")]
+    public Self? InitWithValidatedFormatValidFormatSpecifiersLocaleArgumentsError(NSString format, NSString validFormatSpecifiers, AnyObject? locale, VaList argList, out NSError? error);
+    [Selector("initWithData:encoding:")]
+    public Self? InitWithDataEncoding(NSData data, NSStringEncoding encoding);
+    [Selector("initWithBytes:length:encoding:")]
+    public Self? InitWithBytesLengthEncoding(void* bytes, NSUInteger len, NSStringEncoding encoding);
+    [Selector("initWithBytesNoCopy:length:encoding:freeWhenDone:")]
+    public Self? InitWithBytesNoCopyLengthEncodingFreeWhenDone(void* bytes, NSUInteger len, NSStringEncoding encoding, bool freeBuffer);
+    [Selector("initWithBytesNoCopy:length:encoding:deallocator:")]
+    public Self? InitWithBytesNoCopyLengthEncodingDeallocator(void* bytes, NSUInteger len, NSStringEncoding encoding, NSStringInitWithBytesNoCopyLengthEncodingDeallocatorDeallocatorBlock? deallocator);
+    [Selector("string")]
+    public static Self String();
+    [Selector("stringWithString:")]
+    public static Self StringWithString(NSString string);
+    [Selector("stringWithCharacters:length:")]
+    public static Self StringWithCharactersLength(unichar* characters, NSUInteger length);
+    [Selector("stringWithUTF8String:")]
+    public static Self? StringWithUTF8String(byte* nullTerminatedCString);
+    [Selector("stringWithFormat:")]
+    public static Self StringWithFormat(NSString format, ...);
+    [Selector("localizedStringWithFormat:")]
+    public static Self LocalizedStringWithFormat(NSString format, ...);
+    [Selector("stringWithValidatedFormat:validFormatSpecifiers:error:")]
+    public static Self? StringWithValidatedFormatValidFormatSpecifiersError(NSString format, NSString validFormatSpecifiers, out NSError? error, ...);
+    [Selector("localizedStringWithValidatedFormat:validFormatSpecifiers:error:")]
+    public static Self? LocalizedStringWithValidatedFormatValidFormatSpecifiersError(NSString format, NSString validFormatSpecifiers, out NSError? error, ...);
+    [Selector("initWithCString:encoding:")]
+    public Self? InitWithCStringEncoding(byte* nullTerminatedCString, NSStringEncoding encoding);
+    [Selector("stringWithCString:encoding:")]
+    public static Self? StringWithCStringEncoding(byte* cString, NSStringEncoding enc);
+    [Selector("initWithContentsOfURL:encoding:error:")]
+    public Self? InitWithContentsOfURLEncodingError(NSURL url, NSStringEncoding enc, out NSError? error);
+    [Selector("initWithContentsOfFile:encoding:error:")]
+    public Self? InitWithContentsOfFileEncodingError(NSString path, NSStringEncoding enc, out NSError? error);
+    [Selector("stringWithContentsOfURL:encoding:error:")]
+    public static Self? StringWithContentsOfURLEncodingError(NSURL url, NSStringEncoding enc, out NSError? error);
+    [Selector("stringWithContentsOfFile:encoding:error:")]
+    public static Self? StringWithContentsOfFileEncodingError(NSString path, NSStringEncoding enc, out NSError? error);
+    [Selector("initWithContentsOfURL:usedEncoding:error:")]
+    public Self? InitWithContentsOfURLUsedEncodingError(NSURL url, NSStringEncoding* enc, out NSError? error);
+    [Selector("initWithContentsOfFile:usedEncoding:error:")]
+    public Self? InitWithContentsOfFileUsedEncodingError(NSString path, NSStringEncoding* enc, out NSError? error);
+    [Selector("stringWithContentsOfURL:usedEncoding:error:")]
+    public static Self? StringWithContentsOfURLUsedEncodingError(NSURL url, NSStringEncoding* enc, out NSError? error);
+    [Selector("stringWithContentsOfFile:usedEncoding:error:")]
+    public static Self? StringWithContentsOfFileUsedEncodingError(NSString path, NSStringEncoding* enc, out NSError? error);
 }
 
 [Flags]
@@ -272,7 +394,8 @@ public using NSStringEncodingDetectionOptionsKey = NSString;
 /// NSStringEncodingDetection, a category of NSString.
 public extern objc class NSString
 {
-    [Selector("stringEncodingForData:encodingOptions:convertedString:usedLossyConversion:")] public static NSStringEncoding StringEncodingForDataEncodingOptionsConvertedStringUsedLossyConversion(NSData data, NSDictionary? opts, out NSString? string, bool* usedLossyConversion);
+    [Selector("stringEncodingForData:encodingOptions:convertedString:usedLossyConversion:")]
+    public static NSStringEncoding StringEncodingForDataEncodingOptionsConvertedStringUsedLossyConversion(NSData data, NSDictionary? opts, out NSString? string, bool* usedLossyConversion);
 }
 
 public extern "C" NSStringEncodingDetectionOptionsKey NSStringEncodingDetectionSuggestedEncodingsKey;
@@ -294,21 +417,31 @@ public extern objc class NSString : NSItemProviderReading, NSItemProviderWriting
 
 public extern objc class NSMutableString : NSString
 {
-    [Selector("replaceCharactersInRange:withString:")] public void ReplaceCharactersInRangeWithString(NSRange range, NSString aString);
+    [Selector("replaceCharactersInRange:withString:")]
+    public void ReplaceCharactersInRangeWithString(NSRange range, NSString aString);
 }
 
 /// NSMutableStringExtensionMethods, a category of NSMutableString.
 public extern objc class NSMutableString
 {
-    [Selector("insertString:atIndex:")] public void InsertStringAtIndex(NSString aString, NSUInteger loc);
-    [Selector("deleteCharactersInRange:")] public void DeleteCharactersInRange(NSRange range);
-    [Selector("appendString:")] public void AppendString(NSString aString);
-    [Selector("appendFormat:")] public void AppendFormat(NSString format, ...);
-    [Selector("setString:")] public void SetString(NSString aString);
-    [Selector("replaceOccurrencesOfString:withString:options:range:")] public NSUInteger ReplaceOccurrencesOfStringWithStringOptionsRange(NSString target, NSString replacement, NSStringCompareOptions options, NSRange searchRange);
-    [Selector("applyTransform:reverse:range:updatedRange:")] public bool ApplyTransformReverseRangeUpdatedRange(NSStringTransform transform, bool reverse, NSRange range, NSRangePointer resultingRange);
-    [Selector("initWithCapacity:")] public NSMutableString InitWithCapacity(NSUInteger capacity);
-    [Selector("stringWithCapacity:")] public static NSMutableString StringWithCapacity(NSUInteger capacity);
+    [Selector("insertString:atIndex:")]
+    public void InsertStringAtIndex(NSString aString, NSUInteger loc);
+    [Selector("deleteCharactersInRange:")]
+    public void DeleteCharactersInRange(NSRange range);
+    [Selector("appendString:")]
+    public void AppendString(NSString aString);
+    [Selector("appendFormat:")]
+    public void AppendFormat(NSString format, ...);
+    [Selector("setString:")]
+    public void SetString(NSString aString);
+    [Selector("replaceOccurrencesOfString:withString:options:range:")]
+    public NSUInteger ReplaceOccurrencesOfStringWithStringOptionsRange(NSString target, NSString replacement, NSStringCompareOptions options, NSRange searchRange);
+    [Selector("applyTransform:reverse:range:updatedRange:")]
+    public bool ApplyTransformReverseRangeUpdatedRange(NSStringTransform transform, bool reverse, NSRange range, NSRangePointer resultingRange);
+    [Selector("initWithCapacity:")]
+    public NSMutableString InitWithCapacity(NSUInteger capacity);
+    [Selector("stringWithCapacity:")]
+    public static NSMutableString StringWithCapacity(NSUInteger capacity);
 }
 
 public extern "C" NSExceptionName NSCharacterConversionException;
@@ -318,48 +451,68 @@ public extern "C" NSExceptionName NSParseErrorException;
 /// NSExtendedStringPropertyListParsing, a category of NSString.
 public extern objc class NSString
 {
-    [Selector("propertyList")] public AnyObject PropertyList();
-    [Selector("propertyListFromStringsFileFormat")] public NSDictionary? PropertyListFromStringsFileFormat();
+    [Selector("propertyList")]
+    public AnyObject PropertyList();
+    [Selector("propertyListFromStringsFileFormat")]
+    public NSDictionary? PropertyListFromStringsFileFormat();
 }
 
 /// NSStringDeprecated, a category of NSString.
 public extern objc class NSString
 {
     /// Deprecated in macOS 10.4.
-    [Selector("cString")] public byte* CString();
+    [Selector("cString")]
+    public byte* CString();
     /// Deprecated in macOS 10.4.
-    [Selector("lossyCString")] public byte* LossyCString();
+    [Selector("lossyCString")]
+    public byte* LossyCString();
     /// Deprecated in macOS 10.4.
-    [Selector("cStringLength")] public NSUInteger CStringLength();
+    [Selector("cStringLength")]
+    public NSUInteger CStringLength();
     /// Deprecated in macOS 10.4.
-    [Selector("getCString:")] public void GetCString(byte* bytes);
+    [Selector("getCString:")]
+    public void GetCString(byte* bytes);
     /// Deprecated in macOS 10.4.
-    [Selector("getCString:maxLength:")] public void GetCStringMaxLength(byte* bytes, NSUInteger maxLength);
+    [Selector("getCString:maxLength:")]
+    public void GetCStringMaxLength(byte* bytes, NSUInteger maxLength);
     /// Deprecated in macOS 10.4.
-    [Selector("getCString:maxLength:range:remainingRange:")] public void GetCStringMaxLengthRangeRemainingRange(byte* bytes, NSUInteger maxLength, NSRange aRange, NSRangePointer leftoverRange);
+    [Selector("getCString:maxLength:range:remainingRange:")]
+    public void GetCStringMaxLengthRangeRemainingRange(byte* bytes, NSUInteger maxLength, NSRange aRange, NSRangePointer leftoverRange);
     /// Deprecated in macOS 10.4.
-    [Selector("writeToFile:atomically:")] public bool WriteToFileAtomically(NSString path, bool useAuxiliaryFile);
+    [Selector("writeToFile:atomically:")]
+    public bool WriteToFileAtomically(NSString path, bool useAuxiliaryFile);
     /// Deprecated in macOS 10.4.
-    [Selector("writeToURL:atomically:")] public bool WriteToURLAtomically(NSURL url, bool atomically);
+    [Selector("writeToURL:atomically:")]
+    public bool WriteToURLAtomically(NSURL url, bool atomically);
     /// Deprecated in macOS 10.4.
-    [Selector("initWithContentsOfFile:")] public AnyObject? InitWithContentsOfFile(NSString path);
+    [Selector("initWithContentsOfFile:")]
+    public AnyObject? InitWithContentsOfFile(NSString path);
     /// Deprecated in macOS 10.4.
-    [Selector("initWithContentsOfURL:")] public AnyObject? InitWithContentsOfURL(NSURL url);
+    [Selector("initWithContentsOfURL:")]
+    public AnyObject? InitWithContentsOfURL(NSURL url);
     /// Deprecated in macOS 10.4.
-    [Selector("stringWithContentsOfFile:")] public static AnyObject? StringWithContentsOfFile(NSString path);
+    [Selector("stringWithContentsOfFile:")]
+    public static AnyObject? StringWithContentsOfFile(NSString path);
     /// Deprecated in macOS 10.4.
-    [Selector("stringWithContentsOfURL:")] public static AnyObject? StringWithContentsOfURL(NSURL url);
+    [Selector("stringWithContentsOfURL:")]
+    public static AnyObject? StringWithContentsOfURL(NSURL url);
     /// Deprecated in macOS 10.4.
-    [Selector("initWithCStringNoCopy:length:freeWhenDone:")] public AnyObject? InitWithCStringNoCopyLengthFreeWhenDone(byte* bytes, NSUInteger length, bool freeBuffer);
+    [Selector("initWithCStringNoCopy:length:freeWhenDone:")]
+    public AnyObject? InitWithCStringNoCopyLengthFreeWhenDone(byte* bytes, NSUInteger length, bool freeBuffer);
     /// Deprecated in macOS 10.4.
-    [Selector("initWithCString:length:")] public AnyObject? InitWithCStringLength(byte* bytes, NSUInteger length);
+    [Selector("initWithCString:length:")]
+    public AnyObject? InitWithCStringLength(byte* bytes, NSUInteger length);
     /// Deprecated in macOS 10.4.
-    [Selector("initWithCString:")] public AnyObject? InitWithCString(byte* bytes);
+    [Selector("initWithCString:")]
+    public AnyObject? InitWithCString(byte* bytes);
     /// Deprecated in macOS 10.4.
-    [Selector("stringWithCString:length:")] public static AnyObject? StringWithCStringLength(byte* bytes, NSUInteger length);
+    [Selector("stringWithCString:length:")]
+    public static AnyObject? StringWithCStringLength(byte* bytes, NSUInteger length);
     /// Deprecated in macOS 10.4.
-    [Selector("stringWithCString:")] public static AnyObject? StringWithCString(byte* bytes);
-    [Selector("getCharacters:")] public void GetCharacters(unichar* buffer);
+    [Selector("stringWithCString:")]
+    public static AnyObject? StringWithCString(byte* bytes);
+    [Selector("getCharacters:")]
+    public void GetCharacters(unichar* buffer);
 }
 
 public const ulong NSProprietaryStringEncoding = 65536;

@@ -43,45 +43,63 @@ public enum SKProductPeriodUnit : ulong
 /// Deprecated in macOS 15.0.
 public extern objc class SKProductSubscriptionPeriod : NSObject
 {
-    [Selector("numberOfUnits")] public NSUInteger NumberOfUnits { get; }
-    [Selector("unit")] public SKProductPeriodUnit Unit { get; }
+    [Selector("numberOfUnits")]
+    public NSUInteger NumberOfUnits { get; }
+    [Selector("unit")]
+    public SKProductPeriodUnit Unit { get; }
 }
 
 /// Deprecated in macOS 15.0.
 public extern objc class SKProduct : NSObject
 {
     /// Deprecated in macOS 15.0.
-    [Selector("localizedDescription")] public NSString LocalizedDescription { get; }
+    [Selector("localizedDescription")]
+    public NSString LocalizedDescription { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("localizedTitle")] public NSString LocalizedTitle { get; }
+    [Selector("localizedTitle")]
+    public NSString LocalizedTitle { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("price")] public NSDecimalNumber Price { get; }
+    [Selector("price")]
+    public NSDecimalNumber Price { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("priceLocale")] public NSLocale PriceLocale { get; }
+    [Selector("priceLocale")]
+    public NSLocale PriceLocale { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("productIdentifier")] public NSString ProductIdentifier { get; }
+    [Selector("productIdentifier")]
+    public NSString ProductIdentifier { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("isDownloadable")] public bool IsDownloadable { get; }
+    [Selector("isDownloadable")]
+    public bool IsDownloadable { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("downloadable")] public bool Downloadable { get; }
+    [Selector("downloadable")]
+    public bool Downloadable { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("isFamilyShareable")] public bool IsFamilyShareable { get; }
+    [Selector("isFamilyShareable")]
+    public bool IsFamilyShareable { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("contentLengths")] public NSArray? ContentLengths { get; }
+    [Selector("contentLengths")]
+    public NSArray? ContentLengths { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("downloadContentLengths")] public NSArray DownloadContentLengths { get; }
+    [Selector("downloadContentLengths")]
+    public NSArray DownloadContentLengths { get; }
     /// Deprecated in macOS 10.14.
-    [Selector("contentVersion")] public NSString? ContentVersion { get; }
+    [Selector("contentVersion")]
+    public NSString? ContentVersion { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("downloadContentVersion")] public NSString DownloadContentVersion { get; }
+    [Selector("downloadContentVersion")]
+    public NSString DownloadContentVersion { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("subscriptionPeriod")] public SKProductSubscriptionPeriod? SubscriptionPeriod { get; }
+    [Selector("subscriptionPeriod")]
+    public SKProductSubscriptionPeriod? SubscriptionPeriod { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("introductoryPrice")] public SKProductDiscount? IntroductoryPrice { get; }
+    [Selector("introductoryPrice")]
+    public SKProductDiscount? IntroductoryPrice { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("subscriptionGroupIdentifier")] public NSString? SubscriptionGroupIdentifier { get; }
+    [Selector("subscriptionGroupIdentifier")]
+    public NSString? SubscriptionGroupIdentifier { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("discounts")] public NSArray Discounts { get; }
+    [Selector("discounts")]
+    public NSArray Discounts { get; }
 }
 
 #endif

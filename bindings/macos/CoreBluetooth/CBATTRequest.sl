@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class CBATTRequest : NSObject
 {
-    [Selector("central")] public CBCentral Central { get; }
-    [Selector("characteristic")] public CBCharacteristic Characteristic { get; }
-    [Selector("offset")] public NSUInteger Offset { get; }
-    [Selector("value", "setValue:")] public NSData? Value { get; set; }
+    [Selector("central")]
+    public CBCentral Central { get; }
+    [Selector("characteristic")]
+    public CBCharacteristic Characteristic { get; }
+    [Selector("offset")]
+    public NSUInteger Offset { get; }
+    [Selector("value", "setValue:")]
+    public NSData? Value { get; set; }
 }
 
 #endif

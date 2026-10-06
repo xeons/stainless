@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class NSCustomTouchBarItem : NSTouchBarItem
 {
-    [Selector("view", "setView:")] public NSView View { get; set; }
-    [Selector("viewController", "setViewController:")] public NSViewController? ViewController { get; set; }
-    [Selector("customizationLabel", "setCustomizationLabel:")] public NSString? CustomizationLabel { get; set; }
+    [Selector("view", "setView:")]
+    public NSView View { get; set; }
+    [Selector("viewController", "setViewController:")]
+    public NSViewController? ViewController { get; set; }
+    [Selector("customizationLabel", "setCustomizationLabel:")]
+    public NSString? CustomizationLabel { get; set; }
 }
 
 #endif

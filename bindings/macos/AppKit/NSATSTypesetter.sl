@@ -34,56 +34,84 @@ import Standard.ObjC;
 
 public extern objc class NSATSTypesetter : NSTypesetter
 {
-    [Selector("sharedTypesetter")] public static NSATSTypesetter SharedTypesetter { get; }
+    [Selector("sharedTypesetter")]
+    public static NSATSTypesetter SharedTypesetter { get; }
 }
 
 /// NSPantherCompatibility, a category of NSATSTypesetter.
 public extern objc class NSATSTypesetter
 {
     /// Deprecated in macOS 10.4.
-    [Selector("lineFragmentRectForProposedRect:remainingRect:")] public NSRect LineFragmentRectForProposedRectRemainingRect(NSRect proposedRect, NSRectPointer remainingRect);
+    [Selector("lineFragmentRectForProposedRect:remainingRect:")]
+    public NSRect LineFragmentRectForProposedRectRemainingRect(NSRect proposedRect, NSRectPointer remainingRect);
 }
 
 /// NSPrimitiveInterface, a category of NSATSTypesetter.
 public extern objc class NSATSTypesetter
 {
-    [Selector("usesFontLeading", "setUsesFontLeading:")] public bool UsesFontLeading { get; set; }
-    [Selector("typesetterBehavior", "setTypesetterBehavior:")] public NSTypesetterBehavior TypesetterBehavior { get; set; }
-    [Selector("hyphenationFactor", "setHyphenationFactor:")] public float HyphenationFactor { get; set; }
-    [Selector("lineFragmentPadding", "setLineFragmentPadding:")] public CGFloat LineFragmentPadding { get; set; }
-    [Selector("bidiProcessingEnabled", "setBidiProcessingEnabled:")] public bool BidiProcessingEnabled { get; set; }
-    [Selector("attributedString", "setAttributedString:")] public NSAttributedString? AttributedString { get; set; }
-    [Selector("paragraphGlyphRange")] public NSRange ParagraphGlyphRange { get; }
-    [Selector("paragraphSeparatorGlyphRange")] public NSRange ParagraphSeparatorGlyphRange { get; }
-    [Selector("layoutManager")] public NSLayoutManager? LayoutManager { get; }
-    [Selector("currentTextContainer")] public NSTextContainer? CurrentTextContainer { get; }
-    [Selector("substituteFontForFont:")] public NSFont SubstituteFontForFont(NSFont originalFont);
-    [Selector("textTabForGlyphLocation:writingDirection:maxLocation:")] public NSTextTab? TextTabForGlyphLocationWritingDirectionMaxLocation(CGFloat glyphLocation, NSWritingDirection direction, CGFloat maxLocation);
-    [Selector("setParagraphGlyphRange:separatorGlyphRange:")] public void SetParagraphGlyphRangeSeparatorGlyphRange(NSRange paragraphRange, NSRange paragraphSeparatorRange);
-    [Selector("layoutParagraphAtPoint:")] public NSUInteger LayoutParagraphAtPoint(NSPoint* lineFragmentOrigin);
-    [Selector("lineSpacingAfterGlyphAtIndex:withProposedLineFragmentRect:")] public CGFloat LineSpacingAfterGlyphAtIndexWithProposedLineFragmentRect(NSUInteger glyphIndex, NSRect rect);
-    [Selector("paragraphSpacingBeforeGlyphAtIndex:withProposedLineFragmentRect:")] public CGFloat ParagraphSpacingBeforeGlyphAtIndexWithProposedLineFragmentRect(NSUInteger glyphIndex, NSRect rect);
-    [Selector("paragraphSpacingAfterGlyphAtIndex:withProposedLineFragmentRect:")] public CGFloat ParagraphSpacingAfterGlyphAtIndexWithProposedLineFragmentRect(NSUInteger glyphIndex, NSRect rect);
-    [Selector("setHardInvalidation:forGlyphRange:")] public void SetHardInvalidationForGlyphRange(bool flag, NSRange glyphRange);
-    [Selector("getLineFragmentRect:usedRect:forParagraphSeparatorGlyphRange:atProposedOrigin:")] public void GetLineFragmentRectUsedRectForParagraphSeparatorGlyphRangeAtProposedOrigin(NSRect* lineFragmentRect, NSRect* lineFragmentUsedRect, NSRange paragraphSeparatorGlyphRange, NSPoint lineOrigin);
+    [Selector("usesFontLeading", "setUsesFontLeading:")]
+    public bool UsesFontLeading { get; set; }
+    [Selector("typesetterBehavior", "setTypesetterBehavior:")]
+    public NSTypesetterBehavior TypesetterBehavior { get; set; }
+    [Selector("hyphenationFactor", "setHyphenationFactor:")]
+    public float HyphenationFactor { get; set; }
+    [Selector("lineFragmentPadding", "setLineFragmentPadding:")]
+    public CGFloat LineFragmentPadding { get; set; }
+    [Selector("bidiProcessingEnabled", "setBidiProcessingEnabled:")]
+    public bool BidiProcessingEnabled { get; set; }
+    [Selector("attributedString", "setAttributedString:")]
+    public NSAttributedString? AttributedString { get; set; }
+    [Selector("paragraphGlyphRange")]
+    public NSRange ParagraphGlyphRange { get; }
+    [Selector("paragraphSeparatorGlyphRange")]
+    public NSRange ParagraphSeparatorGlyphRange { get; }
+    [Selector("layoutManager")]
+    public NSLayoutManager? LayoutManager { get; }
+    [Selector("currentTextContainer")]
+    public NSTextContainer? CurrentTextContainer { get; }
+    [Selector("substituteFontForFont:")]
+    public NSFont SubstituteFontForFont(NSFont originalFont);
+    [Selector("textTabForGlyphLocation:writingDirection:maxLocation:")]
+    public NSTextTab? TextTabForGlyphLocationWritingDirectionMaxLocation(CGFloat glyphLocation, NSWritingDirection direction, CGFloat maxLocation);
+    [Selector("setParagraphGlyphRange:separatorGlyphRange:")]
+    public void SetParagraphGlyphRangeSeparatorGlyphRange(NSRange paragraphRange, NSRange paragraphSeparatorRange);
+    [Selector("layoutParagraphAtPoint:")]
+    public NSUInteger LayoutParagraphAtPoint(NSPoint* lineFragmentOrigin);
+    [Selector("lineSpacingAfterGlyphAtIndex:withProposedLineFragmentRect:")]
+    public CGFloat LineSpacingAfterGlyphAtIndexWithProposedLineFragmentRect(NSUInteger glyphIndex, NSRect rect);
+    [Selector("paragraphSpacingBeforeGlyphAtIndex:withProposedLineFragmentRect:")]
+    public CGFloat ParagraphSpacingBeforeGlyphAtIndexWithProposedLineFragmentRect(NSUInteger glyphIndex, NSRect rect);
+    [Selector("paragraphSpacingAfterGlyphAtIndex:withProposedLineFragmentRect:")]
+    public CGFloat ParagraphSpacingAfterGlyphAtIndexWithProposedLineFragmentRect(NSUInteger glyphIndex, NSRect rect);
+    [Selector("setHardInvalidation:forGlyphRange:")]
+    public void SetHardInvalidationForGlyphRange(bool flag, NSRange glyphRange);
+    [Selector("getLineFragmentRect:usedRect:forParagraphSeparatorGlyphRange:atProposedOrigin:")]
+    public void GetLineFragmentRectUsedRectForParagraphSeparatorGlyphRangeAtProposedOrigin(NSRect* lineFragmentRect, NSRect* lineFragmentUsedRect, NSRange paragraphSeparatorGlyphRange, NSPoint lineOrigin);
 }
 
 /// NSLayoutPhaseInterface, a category of NSATSTypesetter.
 public extern objc class NSATSTypesetter
 {
-    [Selector("willSetLineFragmentRect:forGlyphRange:usedRect:baselineOffset:")] public void WillSetLineFragmentRectForGlyphRangeUsedRectBaselineOffset(NSRect* lineRect, NSRange glyphRange, NSRect* usedRect, CGFloat* baselineOffset);
-    [Selector("shouldBreakLineByWordBeforeCharacterAtIndex:")] public bool ShouldBreakLineByWordBeforeCharacterAtIndex(NSUInteger charIndex);
-    [Selector("shouldBreakLineByHyphenatingBeforeCharacterAtIndex:")] public bool ShouldBreakLineByHyphenatingBeforeCharacterAtIndex(NSUInteger charIndex);
-    [Selector("hyphenationFactorForGlyphAtIndex:")] public float HyphenationFactorForGlyphAtIndex(NSUInteger glyphIndex);
-    [Selector("hyphenCharacterForGlyphAtIndex:")] public UTF32Char HyphenCharacterForGlyphAtIndex(NSUInteger glyphIndex);
-    [Selector("boundingBoxForControlGlyphAtIndex:forTextContainer:proposedLineFragment:glyphPosition:characterIndex:")] public NSRect BoundingBoxForControlGlyphAtIndexForTextContainerProposedLineFragmentGlyphPositionCharacterIndex(NSUInteger glyphIndex, NSTextContainer textContainer, NSRect proposedRect, NSPoint glyphPosition, NSUInteger charIndex);
+    [Selector("willSetLineFragmentRect:forGlyphRange:usedRect:baselineOffset:")]
+    public void WillSetLineFragmentRectForGlyphRangeUsedRectBaselineOffset(NSRect* lineRect, NSRange glyphRange, NSRect* usedRect, CGFloat* baselineOffset);
+    [Selector("shouldBreakLineByWordBeforeCharacterAtIndex:")]
+    public bool ShouldBreakLineByWordBeforeCharacterAtIndex(NSUInteger charIndex);
+    [Selector("shouldBreakLineByHyphenatingBeforeCharacterAtIndex:")]
+    public bool ShouldBreakLineByHyphenatingBeforeCharacterAtIndex(NSUInteger charIndex);
+    [Selector("hyphenationFactorForGlyphAtIndex:")]
+    public float HyphenationFactorForGlyphAtIndex(NSUInteger glyphIndex);
+    [Selector("hyphenCharacterForGlyphAtIndex:")]
+    public UTF32Char HyphenCharacterForGlyphAtIndex(NSUInteger glyphIndex);
+    [Selector("boundingBoxForControlGlyphAtIndex:forTextContainer:proposedLineFragment:glyphPosition:characterIndex:")]
+    public NSRect BoundingBoxForControlGlyphAtIndexForTextContainerProposedLineFragmentGlyphPositionCharacterIndex(NSUInteger glyphIndex, NSTextContainer textContainer, NSRect proposedRect, NSPoint glyphPosition, NSUInteger charIndex);
 }
 
 /// NSGlyphStorageInterface, a category of NSATSTypesetter.
 public extern objc class NSATSTypesetter
 {
     /// Deprecated in macOS 10.13.
-    [Selector("getGlyphsInRange:glyphs:characterIndexes:glyphInscriptions:elasticBits:")] public NSUInteger GetGlyphsInRangeGlyphsCharacterIndexesGlyphInscriptionsElasticBits(NSRange glyphsRange, NSGlyph* glyphBuffer, NSUInteger* charIndexBuffer, NSGlyphInscription* inscribeBuffer, bool* elasticBuffer);
+    [Selector("getGlyphsInRange:glyphs:characterIndexes:glyphInscriptions:elasticBits:")]
+    public NSUInteger GetGlyphsInRangeGlyphsCharacterIndexesGlyphInscriptionsElasticBits(NSRange glyphsRange, NSGlyph* glyphBuffer, NSUInteger* charIndexBuffer, NSGlyphInscription* inscribeBuffer, bool* elasticBuffer);
 }
 
 #endif

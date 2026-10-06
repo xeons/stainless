@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public objc interface MTRCommissionableBrowserDelegate : NSObjectProtocol
 {
-    [Selector("controller:didFindCommissionableDevice:")] void ControllerDidFindCommissionableDevice(MTRDeviceController controller, MTRCommissionableBrowserResult device);
-    [Selector("controller:didRemoveCommissionableDevice:")] void ControllerDidRemoveCommissionableDevice(MTRDeviceController controller, MTRCommissionableBrowserResult device);
+    [Selector("controller:didFindCommissionableDevice:")]
+    void ControllerDidFindCommissionableDevice(MTRDeviceController controller, MTRCommissionableBrowserResult device);
+    [Selector("controller:didRemoveCommissionableDevice:")]
+    void ControllerDidRemoveCommissionableDevice(MTRDeviceController controller, MTRCommissionableBrowserResult device);
 }
 
 #endif

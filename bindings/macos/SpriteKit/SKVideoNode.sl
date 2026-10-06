@@ -34,25 +34,40 @@ import Standard.ObjC;
 
 public extern objc class SKVideoNode : SKNode
 {
-    [Selector("size", "setSize:")] public CGSize Size { get; set; }
-    [Selector("anchorPoint", "setAnchorPoint:")] public CGPoint AnchorPoint { get; set; }
-    [Selector("videoNodeWithAVPlayer:")] public static SKVideoNode VideoNodeWithAVPlayer(AVPlayer player);
+    [Selector("size", "setSize:")]
+    public CGSize Size { get; set; }
+    [Selector("anchorPoint", "setAnchorPoint:")]
+    public CGPoint AnchorPoint { get; set; }
+    [Selector("videoNodeWithAVPlayer:")]
+    public static SKVideoNode VideoNodeWithAVPlayer(AVPlayer player);
     /// Deprecated in macOS 10.11.
-    [Selector("videoNodeWithVideoFileNamed:")] public static SKVideoNode VideoNodeWithVideoFileNamed(NSString videoFile);
-    [Selector("videoNodeWithFileNamed:")] public static SKVideoNode VideoNodeWithFileNamed(NSString videoFile);
+    [Selector("videoNodeWithVideoFileNamed:")]
+    public static SKVideoNode VideoNodeWithVideoFileNamed(NSString videoFile);
+    [Selector("videoNodeWithFileNamed:")]
+    public static SKVideoNode VideoNodeWithFileNamed(NSString videoFile);
     /// Deprecated in macOS 10.11.
-    [Selector("videoNodeWithVideoURL:")] public static SKVideoNode VideoNodeWithVideoURL(NSURL videoURL);
-    [Selector("videoNodeWithURL:")] public static SKVideoNode VideoNodeWithURL(NSURL videoURL);
-    [Selector("initWithAVPlayer:")] public Self InitWithAVPlayer(AVPlayer player);
+    [Selector("videoNodeWithVideoURL:")]
+    public static SKVideoNode VideoNodeWithVideoURL(NSURL videoURL);
+    [Selector("videoNodeWithURL:")]
+    public static SKVideoNode VideoNodeWithURL(NSURL videoURL);
+    [Selector("initWithAVPlayer:")]
+    public Self InitWithAVPlayer(AVPlayer player);
     /// Deprecated in macOS 10.10.
-    [Selector("initWithVideoFileNamed:")] public Self InitWithVideoFileNamed(NSString videoFile);
-    [Selector("initWithFileNamed:")] public Self InitWithFileNamed(NSString videoFile);
+    [Selector("initWithVideoFileNamed:")]
+    public Self InitWithVideoFileNamed(NSString videoFile);
+    [Selector("initWithFileNamed:")]
+    public Self InitWithFileNamed(NSString videoFile);
     /// Deprecated in macOS 10.10.
-    [Selector("initWithVideoURL:")] public Self InitWithVideoURL(NSURL url);
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL url);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
-    [Selector("play")] public void Play();
-    [Selector("pause")] public void Pause();
+    [Selector("initWithVideoURL:")]
+    public Self InitWithVideoURL(NSURL url);
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL url);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder aDecoder);
+    [Selector("play")]
+    public void Play();
+    [Selector("pause")]
+    public void Pause();
 }
 
 #endif

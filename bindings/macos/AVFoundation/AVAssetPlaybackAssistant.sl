@@ -49,8 +49,10 @@ public objc closure void AVAssetPlaybackAssistantLoadPlaybackConfigurationOption
 
 public extern objc class AVAssetPlaybackAssistant : NSObject
 {
-    [Selector("assetPlaybackAssistantWithAsset:")] public static Self AssetPlaybackAssistantWithAsset(AVAsset asset);
-    [Selector("loadPlaybackConfigurationOptionsWithCompletionHandler:")] public void LoadPlaybackConfigurationOptionsWithCompletionHandler(AVAssetPlaybackAssistantLoadPlaybackConfigurationOptionsWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("assetPlaybackAssistantWithAsset:")]
+    public static Self AssetPlaybackAssistantWithAsset(AVAsset asset);
+    [Selector("loadPlaybackConfigurationOptionsWithCompletionHandler:")]
+    public void LoadPlaybackConfigurationOptionsWithCompletionHandler(AVAssetPlaybackAssistantLoadPlaybackConfigurationOptionsWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

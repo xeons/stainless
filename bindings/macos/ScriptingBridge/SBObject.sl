@@ -34,22 +34,33 @@ import Standard.ObjC;
 
 public extern objc class SBObject : NSObject, NSCoding
 {
-    [Selector("init")] public Self Init();
-    [Selector("initWithProperties:")] public Self InitWithProperties(NSDictionary properties);
-    [Selector("initWithData:")] public Self InitWithData(AnyObject data);
-    [Selector("get")] public AnyObject? Get();
-    [Selector("lastError")] public NSError? LastError();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithProperties:")]
+    public Self InitWithProperties(NSDictionary properties);
+    [Selector("initWithData:")]
+    public Self InitWithData(AnyObject data);
+    [Selector("get")]
+    public AnyObject? Get();
+    [Selector("lastError")]
+    public NSError? LastError();
 }
 
 /// SBGlueInterface, a category of SBObject.
 public extern objc class SBObject
 {
-    [Selector("initWithElementCode:properties:data:")] public Self InitWithElementCodePropertiesData(DescType code, NSDictionary? properties, AnyObject? data);
-    [Selector("propertyWithCode:")] public SBObject PropertyWithCode(AEKeyword code);
-    [Selector("propertyWithClass:code:")] public SBObject PropertyWithClassCode(Class cls, AEKeyword code);
-    [Selector("elementArrayWithCode:")] public SBElementArray ElementArrayWithCode(DescType code);
-    [Selector("sendEvent:id:parameters:")] public AnyObject SendEventIdParameters(AEEventClass eventClass, AEEventID eventID, DescType firstParamCode, ...);
-    [Selector("setTo:")] public void SetTo(AnyObject? value);
+    [Selector("initWithElementCode:properties:data:")]
+    public Self InitWithElementCodePropertiesData(DescType code, NSDictionary? properties, AnyObject? data);
+    [Selector("propertyWithCode:")]
+    public SBObject PropertyWithCode(AEKeyword code);
+    [Selector("propertyWithClass:code:")]
+    public SBObject PropertyWithClassCode(Class cls, AEKeyword code);
+    [Selector("elementArrayWithCode:")]
+    public SBElementArray ElementArrayWithCode(DescType code);
+    [Selector("sendEvent:id:parameters:")]
+    public AnyObject SendEventIdParameters(AEEventClass eventClass, AEEventID eventID, DescType firstParamCode, ...);
+    [Selector("setTo:")]
+    public void SetTo(AnyObject? value);
 }
 
 #endif

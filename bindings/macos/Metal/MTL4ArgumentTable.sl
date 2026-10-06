@@ -34,24 +34,37 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTL4ArgumentTableDescriptor : NSObject, NSCopying
 {
-    [Selector("maxBufferBindCount", "setMaxBufferBindCount:")] public NSUInteger MaxBufferBindCount { get; set; }
-    [Selector("maxTextureBindCount", "setMaxTextureBindCount:")] public NSUInteger MaxTextureBindCount { get; set; }
-    [Selector("maxSamplerStateBindCount", "setMaxSamplerStateBindCount:")] public NSUInteger MaxSamplerStateBindCount { get; set; }
-    [Selector("initializeBindings", "setInitializeBindings:")] public bool InitializeBindings { get; set; }
-    [Selector("supportAttributeStrides", "setSupportAttributeStrides:")] public bool SupportAttributeStrides { get; set; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
+    [Selector("maxBufferBindCount", "setMaxBufferBindCount:")]
+    public NSUInteger MaxBufferBindCount { get; set; }
+    [Selector("maxTextureBindCount", "setMaxTextureBindCount:")]
+    public NSUInteger MaxTextureBindCount { get; set; }
+    [Selector("maxSamplerStateBindCount", "setMaxSamplerStateBindCount:")]
+    public NSUInteger MaxSamplerStateBindCount { get; set; }
+    [Selector("initializeBindings", "setInitializeBindings:")]
+    public bool InitializeBindings { get; set; }
+    [Selector("supportAttributeStrides", "setSupportAttributeStrides:")]
+    public bool SupportAttributeStrides { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
 }
 
 /// macOS 26.0 and later.
 public objc interface MTL4ArgumentTable : NSObjectProtocol
 {
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("label")] NSString? Label { get; }
-    [Selector("setAddress:atIndex:")] void SetAddressAtIndex(MTLGPUAddress gpuAddress, NSUInteger bindingIndex);
-    [Selector("setAddress:attributeStride:atIndex:")] void SetAddressAttributeStrideAtIndex(MTLGPUAddress gpuAddress, NSUInteger stride, NSUInteger bindingIndex);
-    [Selector("setResource:atBufferIndex:")] void SetResourceAtBufferIndex(MTLResourceID resourceID, NSUInteger bindingIndex);
-    [Selector("setTexture:atIndex:")] void SetTextureAtIndex(MTLResourceID resourceID, NSUInteger bindingIndex);
-    [Selector("setSamplerState:atIndex:")] void SetSamplerStateAtIndex(MTLResourceID resourceID, NSUInteger bindingIndex);
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("label")]
+    NSString? Label { get; }
+    [Selector("setAddress:atIndex:")]
+    void SetAddressAtIndex(MTLGPUAddress gpuAddress, NSUInteger bindingIndex);
+    [Selector("setAddress:attributeStride:atIndex:")]
+    void SetAddressAttributeStrideAtIndex(MTLGPUAddress gpuAddress, NSUInteger stride, NSUInteger bindingIndex);
+    [Selector("setResource:atBufferIndex:")]
+    void SetResourceAtBufferIndex(MTLResourceID resourceID, NSUInteger bindingIndex);
+    [Selector("setTexture:atIndex:")]
+    void SetTextureAtIndex(MTLResourceID resourceID, NSUInteger bindingIndex);
+    [Selector("setSamplerState:atIndex:")]
+    void SetSamplerStateAtIndex(MTLResourceID resourceID, NSUInteger bindingIndex);
 }
 
 #endif

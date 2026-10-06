@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MKLookAroundSnapshotOptions : NSObject
 {
-    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")] public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
-    [Selector("size", "setSize:")] public CGSize Size { get; set; }
+    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")]
+    public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
+    [Selector("size", "setSize:")]
+    public CGSize Size { get; set; }
 }
 
 #endif

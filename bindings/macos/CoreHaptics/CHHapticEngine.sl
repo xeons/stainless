@@ -58,26 +58,46 @@ public objc closure void CHHapticEngineResetHandler();
 
 public extern objc class CHHapticEngine : NSObject
 {
-    [Selector("currentTime")] public NSTimeInterval CurrentTime { get; }
-    [Selector("stoppedHandler", "setStoppedHandler:")] public CHHapticEngineStoppedHandler StoppedHandler { get; set; }
-    [Selector("resetHandler", "setResetHandler:")] public CHHapticEngineResetHandler ResetHandler { get; set; }
-    [Selector("playsHapticsOnly", "setPlaysHapticsOnly:")] public bool PlaysHapticsOnly { get; set; }
-    [Selector("playsAudioOnly", "setPlaysAudioOnly:")] public bool PlaysAudioOnly { get; set; }
-    [Selector("isMutedForAudio", "setIsMutedForAudio:")] public bool IsMutedForAudio { get; set; }
-    [Selector("isMutedForHaptics", "setIsMutedForHaptics:")] public bool IsMutedForHaptics { get; set; }
-    [Selector("isAutoShutdownEnabled", "setAutoShutdownEnabled:")] public bool AutoShutdownEnabled { get; set; }
-    [Selector("capabilitiesForHardware")] public static CHHapticDeviceCapability CapabilitiesForHardware();
-    [Selector("initAndReturnError:")] public Self? InitAndReturnError(out NSError? error);
-    [Selector("startWithCompletionHandler:")] public void StartWithCompletionHandler(CHHapticCompletionHandler? completionHandler);
-    [Selector("startAndReturnError:")] public bool StartAndReturnError(out NSError? outError);
-    [Selector("stopWithCompletionHandler:")] public void StopWithCompletionHandler(CHHapticCompletionHandler? completionHandler);
-    [Selector("notifyWhenPlayersFinished:")] public void NotifyWhenPlayersFinished(CHHapticEngineFinishedHandler finishedHandler);
-    [Selector("createPlayerWithPattern:error:")] public CHHapticPatternPlayer? CreatePlayerWithPatternError(CHHapticPattern pattern, out NSError? outError);
-    [Selector("createAdvancedPlayerWithPattern:error:")] public CHHapticAdvancedPatternPlayer? CreateAdvancedPlayerWithPatternError(CHHapticPattern pattern, out NSError? outError);
-    [Selector("registerAudioResource:options:error:")] public CHHapticAudioResourceID RegisterAudioResourceOptionsError(NSURL resourceURL, NSDictionary options, out NSError? outError);
-    [Selector("unregisterAudioResource:error:")] public bool UnregisterAudioResourceError(CHHapticAudioResourceID resourceID, out NSError? outError);
-    [Selector("playPatternFromURL:error:")] public bool PlayPatternFromURLError(NSURL fileURL, out NSError? outError);
-    [Selector("playPatternFromData:error:")] public bool PlayPatternFromDataError(NSData data, out NSError? outError);
+    [Selector("currentTime")]
+    public NSTimeInterval CurrentTime { get; }
+    [Selector("stoppedHandler", "setStoppedHandler:")]
+    public CHHapticEngineStoppedHandler StoppedHandler { get; set; }
+    [Selector("resetHandler", "setResetHandler:")]
+    public CHHapticEngineResetHandler ResetHandler { get; set; }
+    [Selector("playsHapticsOnly", "setPlaysHapticsOnly:")]
+    public bool PlaysHapticsOnly { get; set; }
+    [Selector("playsAudioOnly", "setPlaysAudioOnly:")]
+    public bool PlaysAudioOnly { get; set; }
+    [Selector("isMutedForAudio", "setIsMutedForAudio:")]
+    public bool IsMutedForAudio { get; set; }
+    [Selector("isMutedForHaptics", "setIsMutedForHaptics:")]
+    public bool IsMutedForHaptics { get; set; }
+    [Selector("isAutoShutdownEnabled", "setAutoShutdownEnabled:")]
+    public bool AutoShutdownEnabled { get; set; }
+    [Selector("capabilitiesForHardware")]
+    public static CHHapticDeviceCapability CapabilitiesForHardware();
+    [Selector("initAndReturnError:")]
+    public Self? InitAndReturnError(out NSError? error);
+    [Selector("startWithCompletionHandler:")]
+    public void StartWithCompletionHandler(CHHapticCompletionHandler? completionHandler);
+    [Selector("startAndReturnError:")]
+    public bool StartAndReturnError(out NSError? outError);
+    [Selector("stopWithCompletionHandler:")]
+    public void StopWithCompletionHandler(CHHapticCompletionHandler? completionHandler);
+    [Selector("notifyWhenPlayersFinished:")]
+    public void NotifyWhenPlayersFinished(CHHapticEngineFinishedHandler finishedHandler);
+    [Selector("createPlayerWithPattern:error:")]
+    public CHHapticPatternPlayer? CreatePlayerWithPatternError(CHHapticPattern pattern, out NSError? outError);
+    [Selector("createAdvancedPlayerWithPattern:error:")]
+    public CHHapticAdvancedPatternPlayer? CreateAdvancedPlayerWithPatternError(CHHapticPattern pattern, out NSError? outError);
+    [Selector("registerAudioResource:options:error:")]
+    public CHHapticAudioResourceID RegisterAudioResourceOptionsError(NSURL resourceURL, NSDictionary options, out NSError? outError);
+    [Selector("unregisterAudioResource:error:")]
+    public bool UnregisterAudioResourceError(CHHapticAudioResourceID resourceID, out NSError? outError);
+    [Selector("playPatternFromURL:error:")]
+    public bool PlayPatternFromURLError(NSURL fileURL, out NSError? outError);
+    [Selector("playPatternFromData:error:")]
+    public bool PlayPatternFromDataError(NSData data, out NSError? outError);
 }
 
 public using CHHapticAudioResourceKey = NSString;

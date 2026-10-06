@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class SWCollaborationShareOptions : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("optionsGroups", "setOptionsGroups:")] public NSArray OptionsGroups { get; set; }
-    [Selector("summary", "setSummary:")] public NSString Summary { get; set; }
-    [Selector("initWithOptionsGroups:summary:")] public Self InitWithOptionsGroupsSummary(NSArray optionsGroups, NSString summary);
-    [Selector("initWithOptionsGroups:")] public Self InitWithOptionsGroups(NSArray optionsGroups);
-    [Selector("shareOptionsWithOptionsGroups:summary:")] public static SWCollaborationShareOptions ShareOptionsWithOptionsGroupsSummary(NSArray optionsGroups, NSString summary);
-    [Selector("shareOptionsWithOptionsGroups:")] public static SWCollaborationShareOptions ShareOptionsWithOptionsGroups(NSArray optionsGroups);
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
+    [Selector("optionsGroups", "setOptionsGroups:")]
+    public NSArray OptionsGroups { get; set; }
+    [Selector("summary", "setSummary:")]
+    public NSString Summary { get; set; }
+    [Selector("initWithOptionsGroups:summary:")]
+    public Self InitWithOptionsGroupsSummary(NSArray optionsGroups, NSString summary);
+    [Selector("initWithOptionsGroups:")]
+    public Self InitWithOptionsGroups(NSArray optionsGroups);
+    [Selector("shareOptionsWithOptionsGroups:summary:")]
+    public static SWCollaborationShareOptions ShareOptionsWithOptionsGroupsSummary(NSArray optionsGroups, NSString summary);
+    [Selector("shareOptionsWithOptionsGroups:")]
+    public static SWCollaborationShareOptions ShareOptionsWithOptionsGroups(NSArray optionsGroups);
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
 }
 
 #endif

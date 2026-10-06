@@ -14,24 +14,33 @@ import Standard.ObjC;
 [ObjCName("NSObject")]
 public objc interface NSObjectProtocol
 {
-    [Selector("description")] NSString Description { get; }
+    [Selector("description")]
+    NSString Description { get; }
 }
 
 [ObjCRoot]
 public extern objc class NSObject : NSObjectProtocol
 {
-    [Selector("alloc")] public static Self Alloc();
-    [Selector("init")] public Self Init();
-    [Selector("description")] public NSString Description { get; }
+    [Selector("alloc")]
+    public static Self Alloc();
+    [Selector("init")]
+    public Self Init();
+    [Selector("description")]
+    public NSString Description { get; }
 }
 
 public extern objc class NSString : NSObject
 {
-    [Selector("stringWithUTF8String:")] public static Self FromUtf8(byte* text);
-    [Selector("stringByAppendingString:")] public NSString Append(NSString other);
-    [Selector("hasPrefix:")] public bool HasPrefix(NSString prefix);
-    [Selector("UTF8String")] public byte* Utf8 { get; }
-    [Selector("length")] public nuint Length { get; }
+    [Selector("stringWithUTF8String:")]
+    public static Self FromUtf8(byte* text);
+    [Selector("stringByAppendingString:")]
+    public NSString Append(NSString other);
+    [Selector("hasPrefix:")]
+    public bool HasPrefix(NSString prefix);
+    [Selector("UTF8String")]
+    public byte* Utf8 { get; }
+    [Selector("length")]
+    public nuint Length { get; }
 }
 
 public struct Wide
@@ -44,9 +53,12 @@ public struct Wide
 
 public objc interface Shape
 {
-    [Selector("area")] double Area();
-    [Selector("sides")] long Sides { get; }
-    [Optional, Selector("grow:")] void Grow(double by);
+    [Selector("area")]
+    double Area();
+    [Selector("sides")]
+    long Sides { get; }
+    [Optional, Selector("grow:")]
+    void Grow(double by);
 }
 
 public objc class Square : NSObject, Shape
@@ -55,7 +67,8 @@ public objc class Square : NSObject, Shape
     public double Area() => 4.0;
     public long Sides => 4;
 
-    [Selector("scaled:")] public long Scaled(long by) => by * 3;
+    [Selector("scaled:")]
+    public long Scaled(long by) => by * 3;
 
     [Selector("spreadFlipped:")]
     public Wide Spread(bool flipped)
@@ -68,13 +81,16 @@ public objc class Square : NSObject, Shape
         return wide;
     }
 
-    [Selector("isLargerThan:")] public bool IsLargerThan(double other) => Area() > other;
+    [Selector("isLargerThan:")]
+    public bool IsLargerThan(double other) => Area() > other;
 
-    [Selector("named:")] public NSString Named(NSString name) => name.Append(NSString.FromUtf8(" square"));
+    [Selector("named:")]
+    public NSString Named(NSString name) => name.Append(NSString.FromUtf8(" square"));
 
     public override NSString Description => NSString.FromUtf8("a square, ").Append(base.Description);
 
-    [Selector("square")] public static Square Make() => Square.Alloc().Init();
+    [Selector("square")]
+    public static Square Make() => Square.Alloc().Init();
 
     // No selector: a Stainless helper, called directly.
     long Doubled(long value) => value * 2;

@@ -29,7 +29,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreFoundation")
 
-[ReturnsRetained] public extern "C" CFStringRef? CFStringTokenizerCopyBestStringLanguage(CFStringRef? string, CFRange range);
+[ReturnsRetained]
+public extern "C" CFStringRef? CFStringTokenizerCopyBestStringLanguage(CFStringRef? string, CFRange range);
 
 public struct __CFStringTokenizer;
 
@@ -58,7 +59,8 @@ public enum CFStringTokenizerTokenType : ulong
 
 public extern "C" CFTypeID CFStringTokenizerGetTypeID();
 
-[ReturnsRetained] public extern "C" CFStringTokenizerRef? CFStringTokenizerCreate(CFAllocatorRef? alloc, CFStringRef? string, CFRange range, CFOptionFlags options, CFLocaleRef? locale);
+[ReturnsRetained]
+public extern "C" CFStringTokenizerRef? CFStringTokenizerCreate(CFAllocatorRef? alloc, CFStringRef? string, CFRange range, CFOptionFlags options, CFLocaleRef? locale);
 
 public extern "C" void CFStringTokenizerSetString(CFStringTokenizerRef? tokenizer, CFStringRef? string, CFRange range);
 
@@ -68,7 +70,8 @@ public extern "C" CFStringTokenizerTokenType CFStringTokenizerAdvanceToNextToken
 
 public extern "C" CFRange CFStringTokenizerGetCurrentTokenRange(CFStringTokenizerRef? tokenizer);
 
-[ReturnsRetained] public extern "C" CFTypeRef? CFStringTokenizerCopyCurrentTokenAttribute(CFStringTokenizerRef? tokenizer, CFOptionFlags @attribute);
+[ReturnsRetained]
+public extern "C" CFTypeRef? CFStringTokenizerCopyCurrentTokenAttribute(CFStringTokenizerRef? tokenizer, CFOptionFlags @attribute);
 
 public extern "C" CFIndex CFStringTokenizerGetCurrentSubTokens(CFStringTokenizerRef? tokenizer, CFRange* ranges, CFIndex maxRangeLength, CFMutableArrayRef? derivedSubTokens);
 

@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class JRSInputMethodController : NSObject
 {
-    [Selector("controller")] public static JRSInputMethodController? Controller();
-    [Selector("availableInputMethodLocales")] public NSArray? AvailableInputMethodLocales();
-    [Selector("currentInputMethodName")] public NSString? CurrentInputMethodName();
-    [Selector("currentInputMethodLocale")] public NSString? CurrentInputMethodLocale();
-    [Selector("setCurrentInputMethodForLocale:")] public void SetCurrentInputMethodForLocale(NSString? theLocale);
+    [Selector("controller")]
+    public static JRSInputMethodController? Controller();
+    [Selector("availableInputMethodLocales")]
+    public NSArray? AvailableInputMethodLocales();
+    [Selector("currentInputMethodName")]
+    public NSString? CurrentInputMethodName();
+    [Selector("currentInputMethodLocale")]
+    public NSString? CurrentInputMethodLocale();
+    [Selector("setCurrentInputMethodForLocale:")]
+    public void SetCurrentInputMethodForLocale(NSString? theLocale);
 }
 
 #endif

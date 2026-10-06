@@ -32,9 +32,11 @@ import Standard.ObjC;
 
 public delegate void CGBitmapContextReleaseDataCallback(void* arg0, void* arg1);
 
-[ReturnsRetained] public extern "C" CGContextRef? CGBitmapContextCreateWithData(void* data, nuint width, nuint height, nuint bitsPerComponent, nuint bytesPerRow, CGColorSpaceRef? space, CGBitmapInfo bitmapInfo, CGBitmapContextReleaseDataCallback releaseCallback, void* releaseInfo);
+[ReturnsRetained]
+public extern "C" CGContextRef? CGBitmapContextCreateWithData(void* data, nuint width, nuint height, nuint bitsPerComponent, nuint bytesPerRow, CGColorSpaceRef? space, CGBitmapInfo bitmapInfo, CGBitmapContextReleaseDataCallback releaseCallback, void* releaseInfo);
 
-[ReturnsRetained] public extern "C" CGContextRef? CGBitmapContextCreate(void* data, nuint width, nuint height, nuint bitsPerComponent, nuint bytesPerRow, CGColorSpaceRef? space, CGBitmapInfo bitmapInfo);
+[ReturnsRetained]
+public extern "C" CGContextRef? CGBitmapContextCreate(void* data, nuint width, nuint height, nuint bitsPerComponent, nuint bytesPerRow, CGColorSpaceRef? space, CGBitmapInfo bitmapInfo);
 
 [Flags]
 public enum CGColorModel : uint
@@ -107,7 +109,8 @@ public objc closure void CGBitmapContextCreateAdaptiveOnFreeBlock(CGRenderingBuf
 public objc closure void CGBitmapContextCreateAdaptiveOnErrorBlock(CFErrorRef arg0, CGContentInfo* arg1, CGBitmapParameters* arg2);
 
 /// macOS 26.0 and later.
-[ReturnsRetained] public extern "C" CGContextRef? CGBitmapContextCreateAdaptive(nuint width, nuint height, CFDictionaryRef? auxiliaryInfo, CGBitmapContextCreateAdaptiveOnResolveBlock? onResolve, CGBitmapContextCreateAdaptiveOnAllocateBlock? onAllocate, CGBitmapContextCreateAdaptiveOnFreeBlock? onFree, CGBitmapContextCreateAdaptiveOnErrorBlock? onError);
+[ReturnsRetained]
+public extern "C" CGContextRef? CGBitmapContextCreateAdaptive(nuint width, nuint height, CFDictionaryRef? auxiliaryInfo, CGBitmapContextCreateAdaptiveOnResolveBlock? onResolve, CGBitmapContextCreateAdaptiveOnAllocateBlock? onAllocate, CGBitmapContextCreateAdaptiveOnFreeBlock? onFree, CGBitmapContextCreateAdaptiveOnErrorBlock? onError);
 
 public extern "C" CFStringRef? kCGAdaptiveMaximumBitDepth;
 
@@ -129,6 +132,7 @@ public extern "C" CGImageAlphaInfo CGBitmapContextGetAlphaInfo(CGContextRef? con
 
 public extern "C" CGBitmapInfo CGBitmapContextGetBitmapInfo(CGContextRef? context);
 
-[ReturnsRetained] public extern "C" CGImageRef? CGBitmapContextCreateImage(CGContextRef? context);
+[ReturnsRetained]
+public extern "C" CGImageRef? CGBitmapContextCreateImage(CGContextRef? context);
 
 #endif

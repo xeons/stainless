@@ -41,35 +41,49 @@ public objc closure void NSPageLayoutBeginSheetUsingPrintInfoOnWindowCompletionH
 
 public extern objc class NSPageLayout : NSObject
 {
-    [Selector("accessoryControllers")] public NSArray? AccessoryControllers { get; }
-    [Selector("printInfo")] public NSPrintInfo? PrintInfo { get; }
-    [Selector("pageLayout")] public static NSPageLayout PageLayout();
-    [Selector("addAccessoryController:")] public void AddAccessoryController(NSViewController accessoryController);
-    [Selector("removeAccessoryController:")] public void RemoveAccessoryController(NSViewController accessoryController);
-    [Selector("beginSheetUsingPrintInfo:onWindow:completionHandler:")] public void BeginSheetUsingPrintInfoOnWindowCompletionHandler(NSPrintInfo printInfo, NSWindow parentWindow, NSPageLayoutBeginSheetUsingPrintInfoOnWindowCompletionHandlerHandlerBlock? handler);
+    [Selector("accessoryControllers")]
+    public NSArray? AccessoryControllers { get; }
+    [Selector("printInfo")]
+    public NSPrintInfo? PrintInfo { get; }
+    [Selector("pageLayout")]
+    public static NSPageLayout PageLayout();
+    [Selector("addAccessoryController:")]
+    public void AddAccessoryController(NSViewController accessoryController);
+    [Selector("removeAccessoryController:")]
+    public void RemoveAccessoryController(NSViewController accessoryController);
+    [Selector("beginSheetUsingPrintInfo:onWindow:completionHandler:")]
+    public void BeginSheetUsingPrintInfoOnWindowCompletionHandler(NSPrintInfo printInfo, NSWindow parentWindow, NSPageLayoutBeginSheetUsingPrintInfoOnWindowCompletionHandlerHandlerBlock? handler);
     /// Deprecated in macOS 100000.
-    [Selector("beginSheetWithPrintInfo:modalForWindow:delegate:didEndSelector:contextInfo:")] public void BeginSheetWithPrintInfoModalForWindowDelegateDidEndSelectorContextInfo(NSPrintInfo printInfo, NSWindow docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
-    [Selector("runModalWithPrintInfo:")] public NSInteger RunModalWithPrintInfo(NSPrintInfo printInfo);
-    [Selector("runModal")] public NSInteger RunModal();
+    [Selector("beginSheetWithPrintInfo:modalForWindow:delegate:didEndSelector:contextInfo:")]
+    public void BeginSheetWithPrintInfoModalForWindowDelegateDidEndSelectorContextInfo(NSPrintInfo printInfo, NSWindow docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
+    [Selector("runModalWithPrintInfo:")]
+    public NSInteger RunModalWithPrintInfo(NSPrintInfo printInfo);
+    [Selector("runModal")]
+    public NSInteger RunModal();
 }
 
 /// NSDeprecated, a category of NSPageLayout.
 public extern objc class NSPageLayout
 {
     /// Deprecated in macOS 10.5.
-    [Selector("setAccessoryView:")] public void SetAccessoryView(NSView? accessoryView);
+    [Selector("setAccessoryView:")]
+    public void SetAccessoryView(NSView? accessoryView);
     /// Deprecated in macOS 10.5.
-    [Selector("accessoryView")] public NSView? AccessoryView();
+    [Selector("accessoryView")]
+    public NSView? AccessoryView();
     /// Deprecated in macOS 10.5.
-    [Selector("readPrintInfo")] public void ReadPrintInfo();
+    [Selector("readPrintInfo")]
+    public void ReadPrintInfo();
     /// Deprecated in macOS 10.5.
-    [Selector("writePrintInfo")] public void WritePrintInfo();
+    [Selector("writePrintInfo")]
+    public void WritePrintInfo();
 }
 
 /// NSPageLayoutPanel, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("runPageLayout:")] public void RunPageLayout(AnyObject? sender);
+    [Selector("runPageLayout:")]
+    public void RunPageLayout(AnyObject? sender);
 }
 
 #endif

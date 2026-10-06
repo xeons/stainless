@@ -33,34 +33,52 @@ import Standard.ObjC;
 
 public extern objc class PHChange : NSObject
 {
-    [Selector("changeDetailsForObject:")] public PHObjectChangeDetails? ChangeDetailsForObject(PHObject object);
-    [Selector("changeDetailsForFetchResult:")] public PHFetchResultChangeDetails? ChangeDetailsForFetchResult(PHFetchResult object);
+    [Selector("changeDetailsForObject:")]
+    public PHObjectChangeDetails? ChangeDetailsForObject(PHObject object);
+    [Selector("changeDetailsForFetchResult:")]
+    public PHFetchResultChangeDetails? ChangeDetailsForFetchResult(PHFetchResult object);
 }
 
 public extern objc class PHObjectChangeDetails : NSObject
 {
-    [Selector("objectBeforeChanges")] public AnyObject ObjectBeforeChanges { get; }
-    [Selector("objectAfterChanges")] public AnyObject? ObjectAfterChanges { get; }
-    [Selector("assetContentChanged")] public bool AssetContentChanged { get; }
-    [Selector("objectWasDeleted")] public bool ObjectWasDeleted { get; }
+    [Selector("objectBeforeChanges")]
+    public AnyObject ObjectBeforeChanges { get; }
+    [Selector("objectAfterChanges")]
+    public AnyObject? ObjectAfterChanges { get; }
+    [Selector("assetContentChanged")]
+    public bool AssetContentChanged { get; }
+    [Selector("objectWasDeleted")]
+    public bool ObjectWasDeleted { get; }
 }
 
 public objc closure void PHFetchResultChangeDetailsEnumerateMovesWithBlockHandlerBlock(NSUInteger arg0, NSUInteger arg1);
 
 public extern objc class PHFetchResultChangeDetails : NSObject
 {
-    [Selector("fetchResultBeforeChanges")] public PHFetchResult FetchResultBeforeChanges { get; }
-    [Selector("fetchResultAfterChanges")] public PHFetchResult FetchResultAfterChanges { get; }
-    [Selector("hasIncrementalChanges")] public bool HasIncrementalChanges { get; }
-    [Selector("removedIndexes")] public NSIndexSet? RemovedIndexes { get; }
-    [Selector("removedObjects")] public NSArray RemovedObjects { get; }
-    [Selector("insertedIndexes")] public NSIndexSet? InsertedIndexes { get; }
-    [Selector("insertedObjects")] public NSArray InsertedObjects { get; }
-    [Selector("changedIndexes")] public NSIndexSet? ChangedIndexes { get; }
-    [Selector("changedObjects")] public NSArray ChangedObjects { get; }
-    [Selector("hasMoves")] public bool HasMoves { get; }
-    [Selector("enumerateMovesWithBlock:")] public void EnumerateMovesWithBlock(PHFetchResultChangeDetailsEnumerateMovesWithBlockHandlerBlock handler);
-    [Selector("changeDetailsFromFetchResult:toFetchResult:changedObjects:")] public static Self ChangeDetailsFromFetchResultToFetchResultChangedObjects(PHFetchResult fromResult, PHFetchResult toResult, NSArray changedObjects);
+    [Selector("fetchResultBeforeChanges")]
+    public PHFetchResult FetchResultBeforeChanges { get; }
+    [Selector("fetchResultAfterChanges")]
+    public PHFetchResult FetchResultAfterChanges { get; }
+    [Selector("hasIncrementalChanges")]
+    public bool HasIncrementalChanges { get; }
+    [Selector("removedIndexes")]
+    public NSIndexSet? RemovedIndexes { get; }
+    [Selector("removedObjects")]
+    public NSArray RemovedObjects { get; }
+    [Selector("insertedIndexes")]
+    public NSIndexSet? InsertedIndexes { get; }
+    [Selector("insertedObjects")]
+    public NSArray InsertedObjects { get; }
+    [Selector("changedIndexes")]
+    public NSIndexSet? ChangedIndexes { get; }
+    [Selector("changedObjects")]
+    public NSArray ChangedObjects { get; }
+    [Selector("hasMoves")]
+    public bool HasMoves { get; }
+    [Selector("enumerateMovesWithBlock:")]
+    public void EnumerateMovesWithBlock(PHFetchResultChangeDetailsEnumerateMovesWithBlockHandlerBlock handler);
+    [Selector("changeDetailsFromFetchResult:toFetchResult:changedObjects:")]
+    public static Self ChangeDetailsFromFetchResultToFetchResultChangedObjects(PHFetchResult fromResult, PHFetchResult toResult, NSArray changedObjects);
 }
 
 #endif

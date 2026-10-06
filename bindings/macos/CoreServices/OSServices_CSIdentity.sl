@@ -56,9 +56,11 @@ public using CSIdentityFlags = CFOptionFlags;
 
 public extern "C" CFTypeID CSIdentityGetTypeID();
 
-[ReturnsRetained] public extern "C" CSIdentityRef? CSIdentityCreate(CFAllocatorRef? allocator, CSIdentityClass identityClass, CFStringRef? fullName, CFStringRef? posixName, CSIdentityFlags flags, CSIdentityAuthorityRef? authority);
+[ReturnsRetained]
+public extern "C" CSIdentityRef? CSIdentityCreate(CFAllocatorRef? allocator, CSIdentityClass identityClass, CFStringRef? fullName, CFStringRef? posixName, CSIdentityFlags flags, CSIdentityAuthorityRef? authority);
 
-[ReturnsRetained] public extern "C" CSIdentityRef? CSIdentityCreateCopy(CFAllocatorRef? allocator, CSIdentityRef? identity);
+[ReturnsRetained]
+public extern "C" CSIdentityRef? CSIdentityCreateCopy(CFAllocatorRef? allocator, CSIdentityRef? identity);
 
 public extern "C" CSIdentityClass CSIdentityGetClass(CSIdentityRef? identity);
 
@@ -86,7 +88,8 @@ public extern "C" Boolean CSIdentityIsMemberOfGroup(CSIdentityRef? identity, CSI
 
 public extern "C" Boolean CSIdentityIsHidden(CSIdentityRef? identity);
 
-[ReturnsRetained] public extern "C" CFDataRef? CSIdentityCreatePersistentReference(CFAllocatorRef? allocator, CSIdentityRef? identity);
+[ReturnsRetained]
+public extern "C" CFDataRef? CSIdentityCreatePersistentReference(CFAllocatorRef? allocator, CSIdentityRef? identity);
 
 public extern "C" Boolean CSIdentityIsEnabled(CSIdentityRef? user);
 
@@ -94,7 +97,8 @@ public extern "C" Boolean CSIdentityAuthenticateUsingPassword(CSIdentityRef? use
 
 public extern "C" SecCertificateRef? CSIdentityGetCertificate(CSIdentityRef? user);
 
-[ReturnsRetained] public extern "C" CSIdentityQueryRef? CSIdentityCreateGroupMembershipQuery(CFAllocatorRef? allocator, CSIdentityRef? group);
+[ReturnsRetained]
+public extern "C" CSIdentityQueryRef? CSIdentityCreateGroupMembershipQuery(CFAllocatorRef? allocator, CSIdentityRef? group);
 
 public extern "C" void CSIdentitySetFullName(CSIdentityRef? identity, CFStringRef? fullName);
 

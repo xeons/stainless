@@ -44,49 +44,74 @@ public enum NSTestComparisonOperation : ulong
 
 public extern objc class NSScriptWhoseTest : NSObject, NSCoding
 {
-    [Selector("isTrue")] public bool IsTrue();
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder inCoder);
+    [Selector("isTrue")]
+    public bool IsTrue();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder inCoder);
 }
 
 public extern objc class NSLogicalTest : NSScriptWhoseTest
 {
-    [Selector("initAndTestWithTests:")] public Self InitAndTestWithTests(NSArray subTests);
-    [Selector("initOrTestWithTests:")] public Self InitOrTestWithTests(NSArray subTests);
-    [Selector("initNotTestWithTest:")] public Self InitNotTestWithTest(NSScriptWhoseTest subTest);
+    [Selector("initAndTestWithTests:")]
+    public Self InitAndTestWithTests(NSArray subTests);
+    [Selector("initOrTestWithTests:")]
+    public Self InitOrTestWithTests(NSArray subTests);
+    [Selector("initNotTestWithTest:")]
+    public Self InitNotTestWithTest(NSScriptWhoseTest subTest);
 }
 
 public extern objc class NSSpecifierTest : NSScriptWhoseTest
 {
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder inCoder);
-    [Selector("initWithObjectSpecifier:comparisonOperator:testObject:")] public Self InitWithObjectSpecifierComparisonOperatorTestObject(NSScriptObjectSpecifier? obj1, NSTestComparisonOperation compOp, AnyObject? obj2);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder inCoder);
+    [Selector("initWithObjectSpecifier:comparisonOperator:testObject:")]
+    public Self InitWithObjectSpecifierComparisonOperatorTestObject(NSScriptObjectSpecifier? obj1, NSTestComparisonOperation compOp, AnyObject? obj2);
 }
 
 /// NSComparisonMethods, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("isEqualTo:")] public bool IsEqualTo(AnyObject? object);
-    [Selector("isLessThanOrEqualTo:")] public bool IsLessThanOrEqualTo(AnyObject? object);
-    [Selector("isLessThan:")] public bool IsLessThan(AnyObject? object);
-    [Selector("isGreaterThanOrEqualTo:")] public bool IsGreaterThanOrEqualTo(AnyObject? object);
-    [Selector("isGreaterThan:")] public bool IsGreaterThan(AnyObject? object);
-    [Selector("isNotEqualTo:")] public bool IsNotEqualTo(AnyObject? object);
-    [Selector("doesContain:")] public bool DoesContain(AnyObject object);
-    [Selector("isLike:")] public bool IsLike(NSString object);
-    [Selector("isCaseInsensitiveLike:")] public bool IsCaseInsensitiveLike(NSString object);
+    [Selector("isEqualTo:")]
+    public bool IsEqualTo(AnyObject? object);
+    [Selector("isLessThanOrEqualTo:")]
+    public bool IsLessThanOrEqualTo(AnyObject? object);
+    [Selector("isLessThan:")]
+    public bool IsLessThan(AnyObject? object);
+    [Selector("isGreaterThanOrEqualTo:")]
+    public bool IsGreaterThanOrEqualTo(AnyObject? object);
+    [Selector("isGreaterThan:")]
+    public bool IsGreaterThan(AnyObject? object);
+    [Selector("isNotEqualTo:")]
+    public bool IsNotEqualTo(AnyObject? object);
+    [Selector("doesContain:")]
+    public bool DoesContain(AnyObject object);
+    [Selector("isLike:")]
+    public bool IsLike(NSString object);
+    [Selector("isCaseInsensitiveLike:")]
+    public bool IsCaseInsensitiveLike(NSString object);
 }
 
 /// NSScriptingComparisonMethods, a category of NSObject.
 public extern objc class NSObject
 {
-    [Selector("scriptingIsEqualTo:")] public bool ScriptingIsEqualTo(AnyObject object);
-    [Selector("scriptingIsLessThanOrEqualTo:")] public bool ScriptingIsLessThanOrEqualTo(AnyObject object);
-    [Selector("scriptingIsLessThan:")] public bool ScriptingIsLessThan(AnyObject object);
-    [Selector("scriptingIsGreaterThanOrEqualTo:")] public bool ScriptingIsGreaterThanOrEqualTo(AnyObject object);
-    [Selector("scriptingIsGreaterThan:")] public bool ScriptingIsGreaterThan(AnyObject object);
-    [Selector("scriptingBeginsWith:")] public bool ScriptingBeginsWith(AnyObject object);
-    [Selector("scriptingEndsWith:")] public bool ScriptingEndsWith(AnyObject object);
-    [Selector("scriptingContains:")] public bool ScriptingContains(AnyObject object);
+    [Selector("scriptingIsEqualTo:")]
+    public bool ScriptingIsEqualTo(AnyObject object);
+    [Selector("scriptingIsLessThanOrEqualTo:")]
+    public bool ScriptingIsLessThanOrEqualTo(AnyObject object);
+    [Selector("scriptingIsLessThan:")]
+    public bool ScriptingIsLessThan(AnyObject object);
+    [Selector("scriptingIsGreaterThanOrEqualTo:")]
+    public bool ScriptingIsGreaterThanOrEqualTo(AnyObject object);
+    [Selector("scriptingIsGreaterThan:")]
+    public bool ScriptingIsGreaterThan(AnyObject object);
+    [Selector("scriptingBeginsWith:")]
+    public bool ScriptingBeginsWith(AnyObject object);
+    [Selector("scriptingEndsWith:")]
+    public bool ScriptingEndsWith(AnyObject object);
+    [Selector("scriptingContains:")]
+    public bool ScriptingContains(AnyObject object);
 }
 
 #endif

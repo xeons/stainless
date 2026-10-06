@@ -51,41 +51,68 @@ public objc closure void PGDisplayCursorMoveHandler();
 
 public extern objc class PGDisplayDescriptor : NSObject
 {
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("sizeInMillimeters", "setSizeInMillimeters:")] public NSSize SizeInMillimeters { get; set; }
-    [Selector("queue", "setQueue:")] public dispatch_queue_t? Queue { get; set; }
-    [Selector("modeChangeHandler", "setModeChangeHandler:")] public PGDisplayModeChangeHandler? ModeChangeHandler { get; set; }
-    [Selector("newFrameEventHandler", "setNewFrameEventHandler:")] public PGDisplayNewFrameEventHandler? NewFrameEventHandler { get; set; }
-    [Selector("cursorGlyphHandler", "setCursorGlyphHandler:")] public PGDisplayCursorGlyphHandler? CursorGlyphHandler { get; set; }
-    [Selector("cursorShowHandler", "setCursorShowHandler:")] public PGDisplayCursorShowHandler? CursorShowHandler { get; set; }
-    [Selector("cursorMoveHandler", "setCursorMoveHandler:")] public PGDisplayCursorMoveHandler? CursorMoveHandler { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("sizeInMillimeters", "setSizeInMillimeters:")]
+    public NSSize SizeInMillimeters { get; set; }
+    [Selector("queue", "setQueue:")]
+    public dispatch_queue_t? Queue { get; set; }
+    [Selector("modeChangeHandler", "setModeChangeHandler:")]
+    public PGDisplayModeChangeHandler? ModeChangeHandler { get; set; }
+    [Selector("newFrameEventHandler", "setNewFrameEventHandler:")]
+    public PGDisplayNewFrameEventHandler? NewFrameEventHandler { get; set; }
+    [Selector("cursorGlyphHandler", "setCursorGlyphHandler:")]
+    public PGDisplayCursorGlyphHandler? CursorGlyphHandler { get; set; }
+    [Selector("cursorShowHandler", "setCursorShowHandler:")]
+    public PGDisplayCursorShowHandler? CursorShowHandler { get; set; }
+    [Selector("cursorMoveHandler", "setCursorMoveHandler:")]
+    public PGDisplayCursorMoveHandler? CursorMoveHandler { get; set; }
 }
 
 public extern objc class PGDisplayMode : NSObject
 {
-    [Selector("sizeInPixels")] public PGDisplayCoord_t SizeInPixels { get; }
-    [Selector("refreshRate")] public double RefreshRate { get; }
-    [Selector("initWithSizeInPixels:refreshRateInHz:")] public PGDisplayMode? InitWithSizeInPixelsRefreshRateInHz(PGDisplayCoord_t sizeInPixels, double refreshRateInHz);
+    [Selector("sizeInPixels")]
+    public PGDisplayCoord_t SizeInPixels { get; }
+    [Selector("refreshRate")]
+    public double RefreshRate { get; }
+    [Selector("initWithSizeInPixels:refreshRateInHz:")]
+    public PGDisplayMode? InitWithSizeInPixelsRefreshRateInHz(PGDisplayCoord_t sizeInPixels, double refreshRateInHz);
 }
 
 public objc interface PGDisplay : NSObjectProtocol
 {
-    [Selector("name")] NSString? Name { get; }
-    [Selector("sizeInMillimeters")] NSSize SizeInMillimeters { get; }
-    [Selector("queue")] dispatch_queue_t? Queue { get; }
-    [Selector("modeChangeHandler")] PGDisplayModeChangeHandler? ModeChangeHandler { get; }
-    [Selector("newFrameEventHandler")] PGDisplayNewFrameEventHandler? NewFrameEventHandler { get; }
-    [Selector("cursorGlyphHandler")] PGDisplayCursorGlyphHandler? CursorGlyphHandler { get; }
-    [Selector("cursorShowHandler")] PGDisplayCursorShowHandler? CursorShowHandler { get; }
-    [Selector("cursorMoveHandler")] PGDisplayCursorMoveHandler? CursorMoveHandler { get; }
-    [Selector("cursorPosition")] PGDisplayCoord_t CursorPosition { get; }
-    [Selector("serialNum")] uint SerialNum { get; }
-    [Selector("port")] NSUInteger Port { get; }
-    [Selector("minimumTextureUsage")] MTLTextureUsage MinimumTextureUsage { get; }
-    [Selector("guestPresentCount")] NSUInteger GuestPresentCount { get; }
-    [Selector("hostPresentCount")] NSUInteger HostPresentCount { get; }
-    [Selector("modeList", "setModeList:")] NSArray? ModeList { get; set; }
-    [Selector("encodeCurrentFrameToCommandBuffer:texture:region:")] bool EncodeCurrentFrameToCommandBufferTextureRegion(MTLCommandBuffer commandBuffer, MTLTexture texture, MTLRegion region);
+    [Selector("name")]
+    NSString? Name { get; }
+    [Selector("sizeInMillimeters")]
+    NSSize SizeInMillimeters { get; }
+    [Selector("queue")]
+    dispatch_queue_t? Queue { get; }
+    [Selector("modeChangeHandler")]
+    PGDisplayModeChangeHandler? ModeChangeHandler { get; }
+    [Selector("newFrameEventHandler")]
+    PGDisplayNewFrameEventHandler? NewFrameEventHandler { get; }
+    [Selector("cursorGlyphHandler")]
+    PGDisplayCursorGlyphHandler? CursorGlyphHandler { get; }
+    [Selector("cursorShowHandler")]
+    PGDisplayCursorShowHandler? CursorShowHandler { get; }
+    [Selector("cursorMoveHandler")]
+    PGDisplayCursorMoveHandler? CursorMoveHandler { get; }
+    [Selector("cursorPosition")]
+    PGDisplayCoord_t CursorPosition { get; }
+    [Selector("serialNum")]
+    uint SerialNum { get; }
+    [Selector("port")]
+    NSUInteger Port { get; }
+    [Selector("minimumTextureUsage")]
+    MTLTextureUsage MinimumTextureUsage { get; }
+    [Selector("guestPresentCount")]
+    NSUInteger GuestPresentCount { get; }
+    [Selector("hostPresentCount")]
+    NSUInteger HostPresentCount { get; }
+    [Selector("modeList", "setModeList:")]
+    NSArray? ModeList { get; set; }
+    [Selector("encodeCurrentFrameToCommandBuffer:texture:region:")]
+    bool EncodeCurrentFrameToCommandBufferTextureRegion(MTLCommandBuffer commandBuffer, MTLTexture texture, MTLRegion region);
 }
 
 public const int HAS_NS_BITMAP_HEADER = 1;

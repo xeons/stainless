@@ -35,13 +35,17 @@ import Standard.ObjC;
 public extern objc class NWTLSParameters : NSObject
 {
     /// Deprecated in macOS 15.0.
-    [Selector("TLSSessionID", "setTLSSessionID:")] public NSData? TLSSessionID { get; set; }
+    [Selector("TLSSessionID", "setTLSSessionID:")]
+    public NSData? TLSSessionID { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("SSLCipherSuites", "setSSLCipherSuites:")] public NSSet? SSLCipherSuites { get; set; }
+    [Selector("SSLCipherSuites", "setSSLCipherSuites:")]
+    public NSSet? SSLCipherSuites { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("minimumSSLProtocolVersion", "setMinimumSSLProtocolVersion:")] public NSUInteger MinimumSSLProtocolVersion { get; set; }
+    [Selector("minimumSSLProtocolVersion", "setMinimumSSLProtocolVersion:")]
+    public NSUInteger MinimumSSLProtocolVersion { get; set; }
     /// Deprecated in macOS 15.0.
-    [Selector("maximumSSLProtocolVersion", "setMaximumSSLProtocolVersion:")] public NSUInteger MaximumSSLProtocolVersion { get; set; }
+    [Selector("maximumSSLProtocolVersion", "setMaximumSSLProtocolVersion:")]
+    public NSUInteger MaximumSSLProtocolVersion { get; set; }
 }
 
 #endif

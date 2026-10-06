@@ -178,7 +178,8 @@ public extern "C" MTLRegion MPSRectNoClip;
 
 public objc interface MPSDeviceProvider
 {
-    [Selector("mpsMTLDevice")] MTLDevice? MpsMTLDevice();
+    [Selector("mpsMTLDevice")]
+    MTLDevice? MpsMTLDevice();
 }
 
 public using MPSShape = NSArray;

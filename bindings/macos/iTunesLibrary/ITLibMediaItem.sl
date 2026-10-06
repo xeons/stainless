@@ -77,55 +77,104 @@ public enum ITLibMediaItemPlayStatus : ulong
 
 public extern objc class ITLibMediaItem : ITLibMediaEntity
 {
-    [Selector("title")] public NSString Title { get; }
-    [Selector("sortTitle")] public NSString? SortTitle { get; }
-    [Selector("artist")] public ITLibArtist? Artist { get; }
-    [Selector("composer")] public NSString Composer { get; }
-    [Selector("sortComposer")] public NSString? SortComposer { get; }
-    [Selector("rating")] public NSInteger Rating { get; }
-    [Selector("isRatingComputed")] public bool RatingComputed { get; }
-    [Selector("startTime")] public NSUInteger StartTime { get; }
-    [Selector("stopTime")] public NSUInteger StopTime { get; }
-    [Selector("album")] public ITLibAlbum Album { get; }
-    [Selector("genre")] public NSString Genre { get; }
-    [Selector("kind")] public NSString? Kind { get; }
-    [Selector("mediaKind")] public ITLibMediaItemMediaKind MediaKind { get; }
-    [Selector("fileSize")] public ulong FileSize { get; }
-    [Selector("size")] public NSUInteger Size { get; }
-    [Selector("totalTime")] public NSUInteger TotalTime { get; }
-    [Selector("trackNumber")] public NSUInteger TrackNumber { get; }
-    [Selector("category")] public NSString? Category { get; }
-    [Selector("description")] public NSString? Description { get; }
-    [Selector("lyricsContentRating")] public ITLibMediaItemLyricsContentRating LyricsContentRating { get; }
-    [Selector("contentRating")] public NSString? ContentRating { get; }
-    [Selector("modifiedDate")] public NSDate? ModifiedDate { get; }
-    [Selector("addedDate")] public NSDate? AddedDate { get; }
-    [Selector("bitrate")] public NSUInteger Bitrate { get; }
-    [Selector("sampleRate")] public NSUInteger SampleRate { get; }
-    [Selector("beatsPerMinute")] public NSUInteger BeatsPerMinute { get; }
-    [Selector("playCount")] public NSUInteger PlayCount { get; }
-    [Selector("lastPlayedDate")] public NSDate? LastPlayedDate { get; }
-    [Selector("playStatus")] public ITLibMediaItemPlayStatus PlayStatus { get; }
-    [Selector("location")] public NSURL? Location { get; }
-    [Selector("hasArtworkAvailable")] public bool ArtworkAvailable { get; }
-    [Selector("artwork")] public ITLibArtwork? Artwork { get; }
-    [Selector("comments")] public NSString? Comments { get; }
-    [Selector("isPurchased")] public bool Purchased { get; }
-    [Selector("isCloud")] public bool Cloud { get; }
-    [Selector("isDRMProtected")] public bool DrmProtected { get; }
-    [Selector("isVideo")] public bool Video { get; }
-    [Selector("videoInfo")] public ITLibMediaItemVideoInfo? VideoInfo { get; }
-    [Selector("releaseDate")] public NSDate? ReleaseDate { get; }
-    [Selector("year")] public NSUInteger Year { get; }
-    [Selector("fileType")] public NSUInteger FileType { get; }
-    [Selector("skipCount")] public NSUInteger SkipCount { get; }
-    [Selector("skipDate")] public NSDate? SkipDate { get; }
-    [Selector("voiceOverLanguage")] public NSString? VoiceOverLanguage { get; }
-    [Selector("volumeAdjustment")] public NSInteger VolumeAdjustment { get; }
-    [Selector("volumeNormalizationEnergy")] public NSUInteger VolumeNormalizationEnergy { get; }
-    [Selector("isUserDisabled")] public bool UserDisabled { get; }
-    [Selector("grouping")] public NSString? Grouping { get; }
-    [Selector("locationType")] public ITLibMediaItemLocationType LocationType { get; }
+    [Selector("title")]
+    public NSString Title { get; }
+    [Selector("sortTitle")]
+    public NSString? SortTitle { get; }
+    [Selector("artist")]
+    public ITLibArtist? Artist { get; }
+    [Selector("composer")]
+    public NSString Composer { get; }
+    [Selector("sortComposer")]
+    public NSString? SortComposer { get; }
+    [Selector("rating")]
+    public NSInteger Rating { get; }
+    [Selector("isRatingComputed")]
+    public bool RatingComputed { get; }
+    [Selector("startTime")]
+    public NSUInteger StartTime { get; }
+    [Selector("stopTime")]
+    public NSUInteger StopTime { get; }
+    [Selector("album")]
+    public ITLibAlbum Album { get; }
+    [Selector("genre")]
+    public NSString Genre { get; }
+    [Selector("kind")]
+    public NSString? Kind { get; }
+    [Selector("mediaKind")]
+    public ITLibMediaItemMediaKind MediaKind { get; }
+    [Selector("fileSize")]
+    public ulong FileSize { get; }
+    [Selector("size")]
+    public NSUInteger Size { get; }
+    [Selector("totalTime")]
+    public NSUInteger TotalTime { get; }
+    [Selector("trackNumber")]
+    public NSUInteger TrackNumber { get; }
+    [Selector("category")]
+    public NSString? Category { get; }
+    [Selector("description")]
+    public NSString? Description { get; }
+    [Selector("lyricsContentRating")]
+    public ITLibMediaItemLyricsContentRating LyricsContentRating { get; }
+    [Selector("contentRating")]
+    public NSString? ContentRating { get; }
+    [Selector("modifiedDate")]
+    public NSDate? ModifiedDate { get; }
+    [Selector("addedDate")]
+    public NSDate? AddedDate { get; }
+    [Selector("bitrate")]
+    public NSUInteger Bitrate { get; }
+    [Selector("sampleRate")]
+    public NSUInteger SampleRate { get; }
+    [Selector("beatsPerMinute")]
+    public NSUInteger BeatsPerMinute { get; }
+    [Selector("playCount")]
+    public NSUInteger PlayCount { get; }
+    [Selector("lastPlayedDate")]
+    public NSDate? LastPlayedDate { get; }
+    [Selector("playStatus")]
+    public ITLibMediaItemPlayStatus PlayStatus { get; }
+    [Selector("location")]
+    public NSURL? Location { get; }
+    [Selector("hasArtworkAvailable")]
+    public bool ArtworkAvailable { get; }
+    [Selector("artwork")]
+    public ITLibArtwork? Artwork { get; }
+    [Selector("comments")]
+    public NSString? Comments { get; }
+    [Selector("isPurchased")]
+    public bool Purchased { get; }
+    [Selector("isCloud")]
+    public bool Cloud { get; }
+    [Selector("isDRMProtected")]
+    public bool DrmProtected { get; }
+    [Selector("isVideo")]
+    public bool Video { get; }
+    [Selector("videoInfo")]
+    public ITLibMediaItemVideoInfo? VideoInfo { get; }
+    [Selector("releaseDate")]
+    public NSDate? ReleaseDate { get; }
+    [Selector("year")]
+    public NSUInteger Year { get; }
+    [Selector("fileType")]
+    public NSUInteger FileType { get; }
+    [Selector("skipCount")]
+    public NSUInteger SkipCount { get; }
+    [Selector("skipDate")]
+    public NSDate? SkipDate { get; }
+    [Selector("voiceOverLanguage")]
+    public NSString? VoiceOverLanguage { get; }
+    [Selector("volumeAdjustment")]
+    public NSInteger VolumeAdjustment { get; }
+    [Selector("volumeNormalizationEnergy")]
+    public NSUInteger VolumeNormalizationEnergy { get; }
+    [Selector("isUserDisabled")]
+    public bool UserDisabled { get; }
+    [Selector("grouping")]
+    public NSString? Grouping { get; }
+    [Selector("locationType")]
+    public ITLibMediaItemLocationType LocationType { get; }
 }
 
 public extern "C" NSString ITLibMediaItemPropertyAlbumTitle;

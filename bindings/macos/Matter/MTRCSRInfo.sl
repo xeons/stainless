@@ -33,25 +33,38 @@ import Standard.ObjC;
 
 public extern objc class MTROperationalCSRInfo : NSObject
 {
-    [Selector("csr")] public MTRCSRDERBytes Csr { get; }
-    [Selector("csrNonce")] public NSData CsrNonce { get; }
-    [Selector("csrElementsTLV")] public MTRTLVBytes CsrElementsTLV { get; }
-    [Selector("attestationSignature")] public NSData AttestationSignature { get; }
+    [Selector("csr")]
+    public MTRCSRDERBytes Csr { get; }
+    [Selector("csrNonce")]
+    public NSData CsrNonce { get; }
+    [Selector("csrElementsTLV")]
+    public MTRTLVBytes CsrElementsTLV { get; }
+    [Selector("attestationSignature")]
+    public NSData AttestationSignature { get; }
     /// Deprecated in macOS 14.0.
-    [Selector("initWithCSR:csrNonce:csrElementsTLV:attestationSignature:")] public Self InitWithCSRCsrNonceCsrElementsTLVAttestationSignature(MTRCSRDERBytes csr, NSData csrNonce, MTRTLVBytes csrElementsTLV, NSData attestationSignature);
-    [Selector("initWithCSRNonce:csrElementsTLV:attestationSignature:")] public Self? InitWithCSRNonceCsrElementsTLVAttestationSignature(NSData csrNonce, MTRTLVBytes csrElementsTLV, NSData attestationSignature);
-    [Selector("initWithCSRElementsTLV:attestationSignature:")] public Self? InitWithCSRElementsTLVAttestationSignature(MTRTLVBytes csrElementsTLV, NSData attestationSignature);
-    [Selector("initWithCSRResponseParams:")] public Self? InitWithCSRResponseParams(MTROperationalCredentialsClusterCSRResponseParams responseParams);
+    [Selector("initWithCSR:csrNonce:csrElementsTLV:attestationSignature:")]
+    public Self InitWithCSRCsrNonceCsrElementsTLVAttestationSignature(MTRCSRDERBytes csr, NSData csrNonce, MTRTLVBytes csrElementsTLV, NSData attestationSignature);
+    [Selector("initWithCSRNonce:csrElementsTLV:attestationSignature:")]
+    public Self? InitWithCSRNonceCsrElementsTLVAttestationSignature(NSData csrNonce, MTRTLVBytes csrElementsTLV, NSData attestationSignature);
+    [Selector("initWithCSRElementsTLV:attestationSignature:")]
+    public Self? InitWithCSRElementsTLVAttestationSignature(MTRTLVBytes csrElementsTLV, NSData attestationSignature);
+    [Selector("initWithCSRResponseParams:")]
+    public Self? InitWithCSRResponseParams(MTROperationalCredentialsClusterCSRResponseParams responseParams);
 }
 
 /// Deprecated in macOS 13.3.
 public extern objc class CSRInfo : NSObject
 {
-    [Selector("nonce", "setNonce:")] public NSData Nonce { get; set; }
-    [Selector("elements", "setElements:")] public NSData Elements { get; set; }
-    [Selector("elementsSignature", "setElementsSignature:")] public NSData ElementsSignature { get; set; }
-    [Selector("csr", "setCsr:")] public NSData Csr { get; set; }
-    [Selector("initWithNonce:elements:elementsSignature:csr:")] public Self InitWithNonceElementsElementsSignatureCsr(NSData nonce, NSData elements, NSData elementsSignature, NSData csr);
+    [Selector("nonce", "setNonce:")]
+    public NSData Nonce { get; set; }
+    [Selector("elements", "setElements:")]
+    public NSData Elements { get; set; }
+    [Selector("elementsSignature", "setElementsSignature:")]
+    public NSData ElementsSignature { get; set; }
+    [Selector("csr", "setCsr:")]
+    public NSData Csr { get; set; }
+    [Selector("initWithNonce:elements:elementsSignature:csr:")]
+    public Self InitWithNonceElementsElementsSignatureCsr(NSData nonce, NSData elements, NSData elementsSignature, NSData csr);
 }
 
 #endif

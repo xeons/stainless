@@ -33,10 +33,14 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLCollection : DOMObject
 {
-    [Selector("length")] public uint Length { get; }
-    [Selector("item:")] public DOMNode? Item(uint index);
-    [Selector("namedItem:")] public DOMNode? NamedItem(NSString? name);
-    [Selector("tags:")] public DOMNodeList? Tags(NSString? name);
+    [Selector("length")]
+    public uint Length { get; }
+    [Selector("item:")]
+    public DOMNode? Item(uint index);
+    [Selector("namedItem:")]
+    public DOMNode? NamedItem(NSString? name);
+    [Selector("tags:")]
+    public DOMNodeList? Tags(NSString? name);
 }
 
 #endif

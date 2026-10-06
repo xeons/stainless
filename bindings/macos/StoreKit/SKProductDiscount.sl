@@ -50,19 +50,26 @@ public enum SKProductDiscountType : ulong
 public extern objc class SKProductDiscount : NSObject
 {
     /// Deprecated in macOS 15.0.
-    [Selector("price")] public NSDecimalNumber Price { get; }
+    [Selector("price")]
+    public NSDecimalNumber Price { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("priceLocale")] public NSLocale PriceLocale { get; }
+    [Selector("priceLocale")]
+    public NSLocale PriceLocale { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("identifier")] public NSString? Identifier { get; }
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("subscriptionPeriod")] public SKProductSubscriptionPeriod SubscriptionPeriod { get; }
+    [Selector("subscriptionPeriod")]
+    public SKProductSubscriptionPeriod SubscriptionPeriod { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("numberOfPeriods")] public NSUInteger NumberOfPeriods { get; }
+    [Selector("numberOfPeriods")]
+    public NSUInteger NumberOfPeriods { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("paymentMode")] public SKProductDiscountPaymentMode PaymentMode { get; }
+    [Selector("paymentMode")]
+    public SKProductDiscountPaymentMode PaymentMode { get; }
     /// Deprecated in macOS 15.0.
-    [Selector("type")] public SKProductDiscountType Type { get; }
+    [Selector("type")]
+    public SKProductDiscountType Type { get; }
 }
 
 #endif

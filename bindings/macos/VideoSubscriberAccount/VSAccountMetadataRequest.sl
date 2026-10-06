@@ -33,19 +33,32 @@ import Standard.ObjC;
 
 public extern objc class VSAccountMetadataRequest : NSObject
 {
-    [Selector("channelIdentifier", "setChannelIdentifier:")] public NSString? ChannelIdentifier { get; set; }
-    [Selector("supportedAccountProviderIdentifiers", "setSupportedAccountProviderIdentifiers:")] public NSArray SupportedAccountProviderIdentifiers { get; set; }
-    [Selector("featuredAccountProviderIdentifiers", "setFeaturedAccountProviderIdentifiers:")] public NSArray FeaturedAccountProviderIdentifiers { get; set; }
-    [Selector("verificationToken", "setVerificationToken:")] public NSString? VerificationToken { get; set; }
-    [Selector("includeAccountProviderIdentifier", "setIncludeAccountProviderIdentifier:")] public bool IncludeAccountProviderIdentifier { get; set; }
-    [Selector("includeAuthenticationExpirationDate", "setIncludeAuthenticationExpirationDate:")] public bool IncludeAuthenticationExpirationDate { get; set; }
-    [Selector("localizedVideoTitle", "setLocalizedVideoTitle:")] public NSString? LocalizedVideoTitle { get; set; }
-    [Selector("isInterruptionAllowed", "setInterruptionAllowed:")] public bool InterruptionAllowed { get; set; }
-    [Selector("forceAuthentication", "setForceAuthentication:")] public bool ForceAuthentication { get; set; }
-    [Selector("attributeNames", "setAttributeNames:")] public NSArray AttributeNames { get; set; }
-    [Selector("supportedAuthenticationSchemes", "setSupportedAuthenticationSchemes:")] public NSArray SupportedAuthenticationSchemes { get; set; }
-    [Selector("accountProviderAuthenticationToken", "setAccountProviderAuthenticationToken:")] public NSString? AccountProviderAuthenticationToken { get; set; }
-    [Selector("applicationAccountProviders", "setApplicationAccountProviders:")] public NSArray? ApplicationAccountProviders { get; set; }
+    [Selector("channelIdentifier", "setChannelIdentifier:")]
+    public NSString? ChannelIdentifier { get; set; }
+    [Selector("supportedAccountProviderIdentifiers", "setSupportedAccountProviderIdentifiers:")]
+    public NSArray SupportedAccountProviderIdentifiers { get; set; }
+    [Selector("featuredAccountProviderIdentifiers", "setFeaturedAccountProviderIdentifiers:")]
+    public NSArray FeaturedAccountProviderIdentifiers { get; set; }
+    [Selector("verificationToken", "setVerificationToken:")]
+    public NSString? VerificationToken { get; set; }
+    [Selector("includeAccountProviderIdentifier", "setIncludeAccountProviderIdentifier:")]
+    public bool IncludeAccountProviderIdentifier { get; set; }
+    [Selector("includeAuthenticationExpirationDate", "setIncludeAuthenticationExpirationDate:")]
+    public bool IncludeAuthenticationExpirationDate { get; set; }
+    [Selector("localizedVideoTitle", "setLocalizedVideoTitle:")]
+    public NSString? LocalizedVideoTitle { get; set; }
+    [Selector("isInterruptionAllowed", "setInterruptionAllowed:")]
+    public bool InterruptionAllowed { get; set; }
+    [Selector("forceAuthentication", "setForceAuthentication:")]
+    public bool ForceAuthentication { get; set; }
+    [Selector("attributeNames", "setAttributeNames:")]
+    public NSArray AttributeNames { get; set; }
+    [Selector("supportedAuthenticationSchemes", "setSupportedAuthenticationSchemes:")]
+    public NSArray SupportedAuthenticationSchemes { get; set; }
+    [Selector("accountProviderAuthenticationToken", "setAccountProviderAuthenticationToken:")]
+    public NSString? AccountProviderAuthenticationToken { get; set; }
+    [Selector("applicationAccountProviders", "setApplicationAccountProviders:")]
+    public NSArray? ApplicationAccountProviders { get; set; }
 }
 
 #endif

@@ -47,8 +47,10 @@ public extern "C" MIDIUMPEndpointManagerDictionaryKey? MIDIUMPFunctionBlockObjec
 
 public extern objc class MIDIUMPEndpointManager : NSObject
 {
-    [Selector("sharedInstance")] public static MIDIUMPEndpointManager? SharedInstance { get; }
-    [Selector("UMPEndpoints")] public NSArray UMPEndpoints { get; }
+    [Selector("sharedInstance")]
+    public static MIDIUMPEndpointManager? SharedInstance { get; }
+    [Selector("UMPEndpoints")]
+    public NSArray UMPEndpoints { get; }
 }
 
 #endif

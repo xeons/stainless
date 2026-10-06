@@ -36,7 +36,8 @@ public objc closure void MLUpdateProgressHandlersInitForEventsProgressHandlerCom
 
 public extern objc class MLUpdateProgressHandlers : NSObject
 {
-    [Selector("initForEvents:progressHandler:completionHandler:")] public Self InitForEventsProgressHandlerCompletionHandler(MLUpdateProgressEvent interestedEvents, MLUpdateProgressHandlersInitForEventsProgressHandlerCompletionHandlerProgressHandlerBlock? progressHandler, MLUpdateProgressHandlersInitForEventsProgressHandlerCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("initForEvents:progressHandler:completionHandler:")]
+    public Self InitForEventsProgressHandlerCompletionHandler(MLUpdateProgressEvent interestedEvents, MLUpdateProgressHandlersInitForEventsProgressHandlerCompletionHandlerProgressHandlerBlock? progressHandler, MLUpdateProgressHandlersInitForEventsProgressHandlerCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

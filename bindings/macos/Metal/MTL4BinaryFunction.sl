@@ -35,8 +35,10 @@ import Standard.ObjC;
 [ObjCName("MTL4BinaryFunction")]
 public objc interface MTL4BinaryFunctionProtocol : NSObjectProtocol
 {
-    [Selector("name")] NSString? Name { get; }
-    [Selector("functionType")] MTLFunctionType FunctionType { get; }
+    [Selector("name")]
+    NSString? Name { get; }
+    [Selector("functionType")]
+    MTLFunctionType FunctionType { get; }
 }
 
 #endif

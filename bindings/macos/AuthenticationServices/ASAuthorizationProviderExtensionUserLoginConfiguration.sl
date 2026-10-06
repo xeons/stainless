@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationProviderExtensionUserLoginConfiguration : NSObject
 {
-    [Selector("loginUserName", "setLoginUserName:")] public NSString LoginUserName { get; set; }
-    [Selector("initWithLoginUserName:")] public Self InitWithLoginUserName(NSString loginUserName);
-    [Selector("setCustomAssertionRequestHeaderClaims:returningError:")] public bool SetCustomAssertionRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
-    [Selector("setCustomAssertionRequestBodyClaims:returningError:")] public bool SetCustomAssertionRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
-    [Selector("setCustomLoginRequestHeaderClaims:returningError:")] public bool SetCustomLoginRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
-    [Selector("setCustomLoginRequestBodyClaims:returningError:")] public bool SetCustomLoginRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
+    [Selector("loginUserName", "setLoginUserName:")]
+    public NSString LoginUserName { get; set; }
+    [Selector("initWithLoginUserName:")]
+    public Self InitWithLoginUserName(NSString loginUserName);
+    [Selector("setCustomAssertionRequestHeaderClaims:returningError:")]
+    public bool SetCustomAssertionRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
+    [Selector("setCustomAssertionRequestBodyClaims:returningError:")]
+    public bool SetCustomAssertionRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
+    [Selector("setCustomLoginRequestHeaderClaims:returningError:")]
+    public bool SetCustomLoginRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
+    [Selector("setCustomLoginRequestBodyClaims:returningError:")]
+    public bool SetCustomLoginRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
 }
 
 #endif

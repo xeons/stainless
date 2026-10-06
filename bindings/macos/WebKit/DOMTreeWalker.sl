@@ -32,18 +32,30 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMTreeWalker : DOMObject
 {
-    [Selector("root")] public DOMNode? Root { get; }
-    [Selector("whatToShow")] public uint WhatToShow { get; }
-    [Selector("filter")] public DOMNodeFilter? Filter { get; }
-    [Selector("expandEntityReferences")] public bool ExpandEntityReferences { get; }
-    [Selector("currentNode", "setCurrentNode:")] public DOMNode? CurrentNode { get; set; }
-    [Selector("parentNode")] public DOMNode? ParentNode();
-    [Selector("firstChild")] public DOMNode? FirstChild();
-    [Selector("lastChild")] public DOMNode? LastChild();
-    [Selector("previousSibling")] public DOMNode? PreviousSibling();
-    [Selector("nextSibling")] public DOMNode? NextSibling();
-    [Selector("previousNode")] public DOMNode? PreviousNode();
-    [Selector("nextNode")] public DOMNode? NextNode();
+    [Selector("root")]
+    public DOMNode? Root { get; }
+    [Selector("whatToShow")]
+    public uint WhatToShow { get; }
+    [Selector("filter")]
+    public DOMNodeFilter? Filter { get; }
+    [Selector("expandEntityReferences")]
+    public bool ExpandEntityReferences { get; }
+    [Selector("currentNode", "setCurrentNode:")]
+    public DOMNode? CurrentNode { get; set; }
+    [Selector("parentNode")]
+    public DOMNode? ParentNode();
+    [Selector("firstChild")]
+    public DOMNode? FirstChild();
+    [Selector("lastChild")]
+    public DOMNode? LastChild();
+    [Selector("previousSibling")]
+    public DOMNode? PreviousSibling();
+    [Selector("nextSibling")]
+    public DOMNode? NextSibling();
+    [Selector("previousNode")]
+    public DOMNode? PreviousNode();
+    [Selector("nextNode")]
+    public DOMNode? NextNode();
 }
 
 #endif

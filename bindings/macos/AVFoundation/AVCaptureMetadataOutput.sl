@@ -34,21 +34,32 @@ import Standard.ObjC;
 
 public extern objc class AVCaptureMetadataOutput : AVCaptureOutput
 {
-    [Selector("metadataObjectsDelegate")] public AVCaptureMetadataOutputObjectsDelegate? MetadataObjectsDelegate { get; }
-    [Selector("metadataObjectsCallbackQueue")] public dispatch_queue_t? MetadataObjectsCallbackQueue { get; }
-    [Selector("availableMetadataObjectTypes")] public NSArray AvailableMetadataObjectTypes { get; }
-    [Selector("metadataObjectTypes", "setMetadataObjectTypes:")] public NSArray? MetadataObjectTypes { get; set; }
-    [Selector("rectOfInterest", "setRectOfInterest:")] public CGRect RectOfInterest { get; set; }
+    [Selector("metadataObjectsDelegate")]
+    public AVCaptureMetadataOutputObjectsDelegate? MetadataObjectsDelegate { get; }
+    [Selector("metadataObjectsCallbackQueue")]
+    public dispatch_queue_t? MetadataObjectsCallbackQueue { get; }
+    [Selector("availableMetadataObjectTypes")]
+    public NSArray AvailableMetadataObjectTypes { get; }
+    [Selector("metadataObjectTypes", "setMetadataObjectTypes:")]
+    public NSArray? MetadataObjectTypes { get; set; }
+    [Selector("rectOfInterest", "setRectOfInterest:")]
+    public CGRect RectOfInterest { get; set; }
     /// macOS 26.0 and later.
-    [Selector("requiredMetadataObjectTypesForCinematicVideoCapture")] public NSArray? RequiredMetadataObjectTypesForCinematicVideoCapture { get; }
-    [Selector("init")] public Self Init();
-    [Selector("new")] public static Self New();
-    [Selector("setMetadataObjectsDelegate:queue:")] public void SetMetadataObjectsDelegateQueue(AVCaptureMetadataOutputObjectsDelegate? objectsDelegate, dispatch_queue_t? objectsCallbackQueue);
+    [Selector("requiredMetadataObjectTypesForCinematicVideoCapture")]
+    public NSArray? RequiredMetadataObjectTypesForCinematicVideoCapture { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("new")]
+    public static Self New();
+    [Selector("setMetadataObjectsDelegate:queue:")]
+    public void SetMetadataObjectsDelegateQueue(AVCaptureMetadataOutputObjectsDelegate? objectsDelegate, dispatch_queue_t? objectsCallbackQueue);
 }
 
 public objc interface AVCaptureMetadataOutputObjectsDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("captureOutput:didOutputMetadataObjects:fromConnection:")] void CaptureOutputDidOutputMetadataObjectsFromConnection(AVCaptureOutput output, NSArray metadataObjects, AVCaptureConnection connection);
+    [Optional]
+    [Selector("captureOutput:didOutputMetadataObjects:fromConnection:")]
+    void CaptureOutputDidOutputMetadataObjectsFromConnection(AVCaptureOutput output, NSArray metadataObjects, AVCaptureConnection connection);
 }
 
 #endif

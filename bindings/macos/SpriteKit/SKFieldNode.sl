@@ -33,29 +33,52 @@ import Standard.ObjC;
 
 public extern objc class SKFieldNode : SKNode
 {
-    [Selector("region", "setRegion:")] public SKRegion? Region { get; set; }
-    [Selector("strength", "setStrength:")] public float Strength { get; set; }
-    [Selector("falloff", "setFalloff:")] public float Falloff { get; set; }
-    [Selector("minimumRadius", "setMinimumRadius:")] public float MinimumRadius { get; set; }
-    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
-    [Selector("isExclusive", "setExclusive:")] public bool Exclusive { get; set; }
-    [Selector("categoryBitMask", "setCategoryBitMask:")] public uint CategoryBitMask { get; set; }
-    [Selector("direction", "setDirection:")] public vector_float3 Direction { get; set; }
-    [Selector("smoothness", "setSmoothness:")] public float Smoothness { get; set; }
-    [Selector("animationSpeed", "setAnimationSpeed:")] public float AnimationSpeed { get; set; }
-    [Selector("texture", "setTexture:")] public SKTexture? Texture { get; set; }
-    [Selector("dragField")] public static SKFieldNode DragField();
-    [Selector("vortexField")] public static SKFieldNode VortexField();
-    [Selector("radialGravityField")] public static SKFieldNode RadialGravityField();
-    [Selector("linearGravityFieldWithVector:")] public static SKFieldNode LinearGravityFieldWithVector(vector_float3 direction);
-    [Selector("velocityFieldWithVector:")] public static SKFieldNode VelocityFieldWithVector(vector_float3 direction);
-    [Selector("velocityFieldWithTexture:")] public static SKFieldNode VelocityFieldWithTexture(SKTexture velocityTexture);
-    [Selector("noiseFieldWithSmoothness:animationSpeed:")] public static SKFieldNode NoiseFieldWithSmoothnessAnimationSpeed(CGFloat smoothness, CGFloat speed);
-    [Selector("turbulenceFieldWithSmoothness:animationSpeed:")] public static SKFieldNode TurbulenceFieldWithSmoothnessAnimationSpeed(CGFloat smoothness, CGFloat speed);
-    [Selector("springField")] public static SKFieldNode SpringField();
-    [Selector("electricField")] public static SKFieldNode ElectricField();
-    [Selector("magneticField")] public static SKFieldNode MagneticField();
-    [Selector("customFieldWithEvaluationBlock:")] public static SKFieldNode CustomFieldWithEvaluationBlock(SKFieldForceEvaluator block);
+    [Selector("region", "setRegion:")]
+    public SKRegion? Region { get; set; }
+    [Selector("strength", "setStrength:")]
+    public float Strength { get; set; }
+    [Selector("falloff", "setFalloff:")]
+    public float Falloff { get; set; }
+    [Selector("minimumRadius", "setMinimumRadius:")]
+    public float MinimumRadius { get; set; }
+    [Selector("isEnabled", "setEnabled:")]
+    public bool Enabled { get; set; }
+    [Selector("isExclusive", "setExclusive:")]
+    public bool Exclusive { get; set; }
+    [Selector("categoryBitMask", "setCategoryBitMask:")]
+    public uint CategoryBitMask { get; set; }
+    [Selector("direction", "setDirection:")]
+    public vector_float3 Direction { get; set; }
+    [Selector("smoothness", "setSmoothness:")]
+    public float Smoothness { get; set; }
+    [Selector("animationSpeed", "setAnimationSpeed:")]
+    public float AnimationSpeed { get; set; }
+    [Selector("texture", "setTexture:")]
+    public SKTexture? Texture { get; set; }
+    [Selector("dragField")]
+    public static SKFieldNode DragField();
+    [Selector("vortexField")]
+    public static SKFieldNode VortexField();
+    [Selector("radialGravityField")]
+    public static SKFieldNode RadialGravityField();
+    [Selector("linearGravityFieldWithVector:")]
+    public static SKFieldNode LinearGravityFieldWithVector(vector_float3 direction);
+    [Selector("velocityFieldWithVector:")]
+    public static SKFieldNode VelocityFieldWithVector(vector_float3 direction);
+    [Selector("velocityFieldWithTexture:")]
+    public static SKFieldNode VelocityFieldWithTexture(SKTexture velocityTexture);
+    [Selector("noiseFieldWithSmoothness:animationSpeed:")]
+    public static SKFieldNode NoiseFieldWithSmoothnessAnimationSpeed(CGFloat smoothness, CGFloat speed);
+    [Selector("turbulenceFieldWithSmoothness:animationSpeed:")]
+    public static SKFieldNode TurbulenceFieldWithSmoothnessAnimationSpeed(CGFloat smoothness, CGFloat speed);
+    [Selector("springField")]
+    public static SKFieldNode SpringField();
+    [Selector("electricField")]
+    public static SKFieldNode ElectricField();
+    [Selector("magneticField")]
+    public static SKFieldNode MagneticField();
+    [Selector("customFieldWithEvaluationBlock:")]
+    public static SKFieldNode CustomFieldWithEvaluationBlock(SKFieldForceEvaluator block);
 }
 
 public objc closure vector_float3 SKFieldForceEvaluator(vector_float3 arg0, vector_float3 arg1, float arg2, float arg3, NSTimeInterval arg4);

@@ -35,36 +35,61 @@ import Standard.ObjC;
 
 public extern objc class SKView : NSView, NSSecureCoding
 {
-    [Selector("isPaused", "setPaused:")] public bool Paused { get; set; }
-    [Selector("showsFPS", "setShowsFPS:")] public bool ShowsFPS { get; set; }
-    [Selector("showsDrawCount", "setShowsDrawCount:")] public bool ShowsDrawCount { get; set; }
-    [Selector("showsNodeCount", "setShowsNodeCount:")] public bool ShowsNodeCount { get; set; }
-    [Selector("showsQuadCount", "setShowsQuadCount:")] public bool ShowsQuadCount { get; set; }
-    [Selector("showsPhysics", "setShowsPhysics:")] public bool ShowsPhysics { get; set; }
-    [Selector("showsFields", "setShowsFields:")] public bool ShowsFields { get; set; }
-    [Selector("isAsynchronous", "setAsynchronous:")] public bool Asynchronous { get; set; }
-    [Selector("allowsTransparency", "setAllowsTransparency:")] public bool AllowsTransparency { get; set; }
-    [Selector("ignoresSiblingOrder", "setIgnoresSiblingOrder:")] public bool IgnoresSiblingOrder { get; set; }
-    [Selector("shouldCullNonVisibleNodes", "setShouldCullNonVisibleNodes:")] public bool ShouldCullNonVisibleNodes { get; set; }
-    [Selector("preferredFramesPerSecond", "setPreferredFramesPerSecond:")] public NSInteger PreferredFramesPerSecond { get; set; }
-    [Selector("disableDepthStencilBuffer", "setDisableDepthStencilBuffer:")] public bool DisableDepthStencilBuffer { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSObject? Delegate { get; set; }
+    [Selector("isPaused", "setPaused:")]
+    public bool Paused { get; set; }
+    [Selector("showsFPS", "setShowsFPS:")]
+    public bool ShowsFPS { get; set; }
+    [Selector("showsDrawCount", "setShowsDrawCount:")]
+    public bool ShowsDrawCount { get; set; }
+    [Selector("showsNodeCount", "setShowsNodeCount:")]
+    public bool ShowsNodeCount { get; set; }
+    [Selector("showsQuadCount", "setShowsQuadCount:")]
+    public bool ShowsQuadCount { get; set; }
+    [Selector("showsPhysics", "setShowsPhysics:")]
+    public bool ShowsPhysics { get; set; }
+    [Selector("showsFields", "setShowsFields:")]
+    public bool ShowsFields { get; set; }
+    [Selector("isAsynchronous", "setAsynchronous:")]
+    public bool Asynchronous { get; set; }
+    [Selector("allowsTransparency", "setAllowsTransparency:")]
+    public bool AllowsTransparency { get; set; }
+    [Selector("ignoresSiblingOrder", "setIgnoresSiblingOrder:")]
+    public bool IgnoresSiblingOrder { get; set; }
+    [Selector("shouldCullNonVisibleNodes", "setShouldCullNonVisibleNodes:")]
+    public bool ShouldCullNonVisibleNodes { get; set; }
+    [Selector("preferredFramesPerSecond", "setPreferredFramesPerSecond:")]
+    public NSInteger PreferredFramesPerSecond { get; set; }
+    [Selector("disableDepthStencilBuffer", "setDisableDepthStencilBuffer:")]
+    public bool DisableDepthStencilBuffer { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSObject? Delegate { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("frameInterval", "setFrameInterval:")] public NSInteger FrameInterval { get; set; }
+    [Selector("frameInterval", "setFrameInterval:")]
+    public NSInteger FrameInterval { get; set; }
     /// Deprecated in macOS 10.12.
-    [Selector("preferredFrameRate", "setPreferredFrameRate:")] public float PreferredFrameRate { get; set; }
-    [Selector("scene")] public SKScene? Scene { get; }
-    [Selector("presentScene:")] public void PresentScene(SKScene? scene);
-    [Selector("presentScene:transition:")] public void PresentSceneTransition(SKScene scene, SKTransition transition);
-    [Selector("textureFromNode:")] public SKTexture? TextureFromNode(SKNode node);
-    [Selector("textureFromNode:crop:")] public SKTexture? TextureFromNodeCrop(SKNode node, CGRect crop);
-    [Selector("convertPoint:toScene:")] public CGPoint ConvertPointToScene(CGPoint point, SKScene scene);
-    [Selector("convertPoint:fromScene:")] public CGPoint ConvertPointFromScene(CGPoint point, SKScene scene);
+    [Selector("preferredFrameRate", "setPreferredFrameRate:")]
+    public float PreferredFrameRate { get; set; }
+    [Selector("scene")]
+    public SKScene? Scene { get; }
+    [Selector("presentScene:")]
+    public void PresentScene(SKScene? scene);
+    [Selector("presentScene:transition:")]
+    public void PresentSceneTransition(SKScene scene, SKTransition transition);
+    [Selector("textureFromNode:")]
+    public SKTexture? TextureFromNode(SKNode node);
+    [Selector("textureFromNode:crop:")]
+    public SKTexture? TextureFromNodeCrop(SKNode node, CGRect crop);
+    [Selector("convertPoint:toScene:")]
+    public CGPoint ConvertPointToScene(CGPoint point, SKScene scene);
+    [Selector("convertPoint:fromScene:")]
+    public CGPoint ConvertPointFromScene(CGPoint point, SKScene scene);
 }
 
 public objc interface SKViewDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("view:shouldRenderAtTime:")] bool ViewShouldRenderAtTime(SKView view, NSTimeInterval time);
+    [Optional]
+    [Selector("view:shouldRenderAtTime:")]
+    bool ViewShouldRenderAtTime(SKView view, NSTimeInterval time);
 }
 
 #endif

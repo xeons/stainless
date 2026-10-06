@@ -34,15 +34,24 @@ import Standard.ObjC;
 
 public extern objc class INBusTrip : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("provider")] public NSString? Provider { get; }
-    [Selector("busName")] public NSString? BusName { get; }
-    [Selector("busNumber")] public NSString? BusNumber { get; }
-    [Selector("tripDuration")] public INDateComponentsRange TripDuration { get; }
-    [Selector("departureBusStopLocation")] public CLPlacemark DepartureBusStopLocation { get; }
-    [Selector("departurePlatform")] public NSString? DeparturePlatform { get; }
-    [Selector("arrivalBusStopLocation")] public CLPlacemark ArrivalBusStopLocation { get; }
-    [Selector("arrivalPlatform")] public NSString? ArrivalPlatform { get; }
-    [Selector("initWithProvider:busName:busNumber:tripDuration:departureBusStopLocation:departurePlatform:arrivalBusStopLocation:arrivalPlatform:")] public Self InitWithProviderBusNameBusNumberTripDurationDepartureBusStopLocationDeparturePlatformArrivalBusStopLocationArrivalPlatform(NSString? provider, NSString? busName, NSString? busNumber, INDateComponentsRange tripDuration, CLPlacemark departureBusStopLocation, NSString? departurePlatform, CLPlacemark arrivalBusStopLocation, NSString? arrivalPlatform);
+    [Selector("provider")]
+    public NSString? Provider { get; }
+    [Selector("busName")]
+    public NSString? BusName { get; }
+    [Selector("busNumber")]
+    public NSString? BusNumber { get; }
+    [Selector("tripDuration")]
+    public INDateComponentsRange TripDuration { get; }
+    [Selector("departureBusStopLocation")]
+    public CLPlacemark DepartureBusStopLocation { get; }
+    [Selector("departurePlatform")]
+    public NSString? DeparturePlatform { get; }
+    [Selector("arrivalBusStopLocation")]
+    public CLPlacemark ArrivalBusStopLocation { get; }
+    [Selector("arrivalPlatform")]
+    public NSString? ArrivalPlatform { get; }
+    [Selector("initWithProvider:busName:busNumber:tripDuration:departureBusStopLocation:departurePlatform:arrivalBusStopLocation:arrivalPlatform:")]
+    public Self InitWithProviderBusNameBusNumberTripDurationDepartureBusStopLocationDeparturePlatformArrivalBusStopLocationArrivalPlatform(NSString? provider, NSString? busName, NSString? busNumber, INDateComponentsRange tripDuration, CLPlacemark departureBusStopLocation, NSString? departurePlatform, CLPlacemark arrivalBusStopLocation, NSString? arrivalPlatform);
 }
 
 #endif

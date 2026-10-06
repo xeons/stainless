@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationSecurityKeyPublicKeyCredentialRegistration : NSObject, ASAuthorizationPublicKeyCredentialRegistration
 {
-    [Selector("transports")] public NSArray Transports { get; }
+    [Selector("transports")]
+    public NSArray Transports { get; }
 }
 
 #endif

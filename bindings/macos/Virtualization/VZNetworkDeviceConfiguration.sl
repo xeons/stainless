@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class VZNetworkDeviceConfiguration : NSObject, NSCopying
 {
-    [Selector("MACAddress", "setMACAddress:")] public VZMACAddress MACAddress { get; set; }
-    [Selector("attachment", "setAttachment:")] public VZNetworkDeviceAttachment? Attachment { get; set; }
+    [Selector("MACAddress", "setMACAddress:")]
+    public VZMACAddress MACAddress { get; set; }
+    [Selector("attachment", "setAttachment:")]
+    public VZNetworkDeviceAttachment? Attachment { get; set; }
 }
 
 #endif

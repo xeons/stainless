@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class AVPlaybackCoordinationMedium : NSObject
 {
-    [Selector("connectedPlaybackCoordinators")] public NSArray ConnectedPlaybackCoordinators { get; }
-    [Selector("init")] public Self Init();
+    [Selector("connectedPlaybackCoordinators")]
+    public NSArray ConnectedPlaybackCoordinators { get; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

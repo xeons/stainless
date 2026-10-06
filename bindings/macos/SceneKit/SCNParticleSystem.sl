@@ -144,106 +144,192 @@ public enum SCNParticleEvent : long
 
 public extern objc class SCNParticlePropertyController : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("animation", "setAnimation:")] public CAAnimation? Animation { get; set; }
-    [Selector("inputMode", "setInputMode:")] public SCNParticleInputMode InputMode { get; set; }
-    [Selector("inputScale", "setInputScale:")] public CGFloat InputScale { get; set; }
-    [Selector("inputBias", "setInputBias:")] public CGFloat InputBias { get; set; }
-    [Selector("inputOrigin", "setInputOrigin:")] public SCNNode? InputOrigin { get; set; }
-    [Selector("inputProperty", "setInputProperty:")] public SCNParticleProperty? InputProperty { get; set; }
-    [Selector("controllerWithAnimation:")] public static Self ControllerWithAnimation(CAAnimation animation);
+    [Selector("animation", "setAnimation:")]
+    public CAAnimation? Animation { get; set; }
+    [Selector("inputMode", "setInputMode:")]
+    public SCNParticleInputMode InputMode { get; set; }
+    [Selector("inputScale", "setInputScale:")]
+    public CGFloat InputScale { get; set; }
+    [Selector("inputBias", "setInputBias:")]
+    public CGFloat InputBias { get; set; }
+    [Selector("inputOrigin", "setInputOrigin:")]
+    public SCNNode? InputOrigin { get; set; }
+    [Selector("inputProperty", "setInputProperty:")]
+    public SCNParticleProperty? InputProperty { get; set; }
+    [Selector("controllerWithAnimation:")]
+    public static Self ControllerWithAnimation(CAAnimation animation);
 }
 
 public extern objc class SCNParticleSystem : NSObject, NSCopying, NSSecureCoding, SCNAnimatable
 {
-    [Selector("emissionDuration", "setEmissionDuration:")] public CGFloat EmissionDuration { get; set; }
-    [Selector("emissionDurationVariation", "setEmissionDurationVariation:")] public CGFloat EmissionDurationVariation { get; set; }
-    [Selector("idleDuration", "setIdleDuration:")] public CGFloat IdleDuration { get; set; }
-    [Selector("idleDurationVariation", "setIdleDurationVariation:")] public CGFloat IdleDurationVariation { get; set; }
-    [Selector("loops", "setLoops:")] public bool Loops { get; set; }
-    [Selector("birthRate", "setBirthRate:")] public CGFloat BirthRate { get; set; }
-    [Selector("birthRateVariation", "setBirthRateVariation:")] public CGFloat BirthRateVariation { get; set; }
-    [Selector("warmupDuration", "setWarmupDuration:")] public CGFloat WarmupDuration { get; set; }
-    [Selector("emitterShape", "setEmitterShape:")] public SCNGeometry? EmitterShape { get; set; }
-    [Selector("birthLocation", "setBirthLocation:")] public SCNParticleBirthLocation BirthLocation { get; set; }
-    [Selector("birthDirection", "setBirthDirection:")] public SCNParticleBirthDirection BirthDirection { get; set; }
-    [Selector("spreadingAngle", "setSpreadingAngle:")] public CGFloat SpreadingAngle { get; set; }
-    [Selector("emittingDirection", "setEmittingDirection:")] public SCNVector3 EmittingDirection { get; set; }
-    [Selector("orientationDirection", "setOrientationDirection:")] public SCNVector3 OrientationDirection { get; set; }
-    [Selector("acceleration", "setAcceleration:")] public SCNVector3 Acceleration { get; set; }
-    [Selector("isLocal", "setLocal:")] public bool Local { get; set; }
-    [Selector("particleAngle", "setParticleAngle:")] public CGFloat ParticleAngle { get; set; }
-    [Selector("particleAngleVariation", "setParticleAngleVariation:")] public CGFloat ParticleAngleVariation { get; set; }
-    [Selector("particleVelocity", "setParticleVelocity:")] public CGFloat ParticleVelocity { get; set; }
-    [Selector("particleVelocityVariation", "setParticleVelocityVariation:")] public CGFloat ParticleVelocityVariation { get; set; }
-    [Selector("particleAngularVelocity", "setParticleAngularVelocity:")] public CGFloat ParticleAngularVelocity { get; set; }
-    [Selector("particleAngularVelocityVariation", "setParticleAngularVelocityVariation:")] public CGFloat ParticleAngularVelocityVariation { get; set; }
-    [Selector("particleLifeSpan", "setParticleLifeSpan:")] public CGFloat ParticleLifeSpan { get; set; }
-    [Selector("particleLifeSpanVariation", "setParticleLifeSpanVariation:")] public CGFloat ParticleLifeSpanVariation { get; set; }
-    [Selector("systemSpawnedOnDying", "setSystemSpawnedOnDying:")] public SCNParticleSystem? SystemSpawnedOnDying { get; set; }
-    [Selector("systemSpawnedOnCollision", "setSystemSpawnedOnCollision:")] public SCNParticleSystem? SystemSpawnedOnCollision { get; set; }
-    [Selector("systemSpawnedOnLiving", "setSystemSpawnedOnLiving:")] public SCNParticleSystem? SystemSpawnedOnLiving { get; set; }
-    [Selector("particleImage", "setParticleImage:")] public AnyObject? ParticleImage { get; set; }
-    [Selector("imageSequenceColumnCount", "setImageSequenceColumnCount:")] public NSUInteger ImageSequenceColumnCount { get; set; }
-    [Selector("imageSequenceRowCount", "setImageSequenceRowCount:")] public NSUInteger ImageSequenceRowCount { get; set; }
-    [Selector("imageSequenceInitialFrame", "setImageSequenceInitialFrame:")] public CGFloat ImageSequenceInitialFrame { get; set; }
-    [Selector("imageSequenceInitialFrameVariation", "setImageSequenceInitialFrameVariation:")] public CGFloat ImageSequenceInitialFrameVariation { get; set; }
-    [Selector("imageSequenceFrameRate", "setImageSequenceFrameRate:")] public CGFloat ImageSequenceFrameRate { get; set; }
-    [Selector("imageSequenceFrameRateVariation", "setImageSequenceFrameRateVariation:")] public CGFloat ImageSequenceFrameRateVariation { get; set; }
-    [Selector("imageSequenceAnimationMode", "setImageSequenceAnimationMode:")] public SCNParticleImageSequenceAnimationMode ImageSequenceAnimationMode { get; set; }
-    [Selector("particleColor", "setParticleColor:")] public NSColor ParticleColor { get; set; }
-    [Selector("particleColorVariation", "setParticleColorVariation:")] public SCNVector4 ParticleColorVariation { get; set; }
-    [Selector("particleSize", "setParticleSize:")] public CGFloat ParticleSize { get; set; }
-    [Selector("particleSizeVariation", "setParticleSizeVariation:")] public CGFloat ParticleSizeVariation { get; set; }
-    [Selector("particleIntensity", "setParticleIntensity:")] public CGFloat ParticleIntensity { get; set; }
-    [Selector("particleIntensityVariation", "setParticleIntensityVariation:")] public CGFloat ParticleIntensityVariation { get; set; }
-    [Selector("blendMode", "setBlendMode:")] public SCNParticleBlendMode BlendMode { get; set; }
-    [Selector("isBlackPassEnabled", "setBlackPassEnabled:")] public bool BlackPassEnabled { get; set; }
-    [Selector("orientationMode", "setOrientationMode:")] public SCNParticleOrientationMode OrientationMode { get; set; }
-    [Selector("sortingMode", "setSortingMode:")] public SCNParticleSortingMode SortingMode { get; set; }
-    [Selector("isLightingEnabled", "setLightingEnabled:")] public bool LightingEnabled { get; set; }
-    [Selector("affectedByGravity", "setAffectedByGravity:")] public bool AffectedByGravity { get; set; }
-    [Selector("affectedByPhysicsFields", "setAffectedByPhysicsFields:")] public bool AffectedByPhysicsFields { get; set; }
-    [Selector("particleDiesOnCollision", "setParticleDiesOnCollision:")] public bool ParticleDiesOnCollision { get; set; }
-    [Selector("colliderNodes", "setColliderNodes:")] public NSArray? ColliderNodes { get; set; }
-    [Selector("particleMass", "setParticleMass:")] public CGFloat ParticleMass { get; set; }
-    [Selector("particleMassVariation", "setParticleMassVariation:")] public CGFloat ParticleMassVariation { get; set; }
-    [Selector("particleBounce", "setParticleBounce:")] public CGFloat ParticleBounce { get; set; }
-    [Selector("particleBounceVariation", "setParticleBounceVariation:")] public CGFloat ParticleBounceVariation { get; set; }
-    [Selector("particleFriction", "setParticleFriction:")] public CGFloat ParticleFriction { get; set; }
-    [Selector("particleFrictionVariation", "setParticleFrictionVariation:")] public CGFloat ParticleFrictionVariation { get; set; }
-    [Selector("particleCharge", "setParticleCharge:")] public CGFloat ParticleCharge { get; set; }
-    [Selector("particleChargeVariation", "setParticleChargeVariation:")] public CGFloat ParticleChargeVariation { get; set; }
-    [Selector("dampingFactor", "setDampingFactor:")] public CGFloat DampingFactor { get; set; }
-    [Selector("speedFactor", "setSpeedFactor:")] public CGFloat SpeedFactor { get; set; }
-    [Selector("stretchFactor", "setStretchFactor:")] public CGFloat StretchFactor { get; set; }
-    [Selector("fresnelExponent", "setFresnelExponent:")] public CGFloat FresnelExponent { get; set; }
-    [Selector("writesToDepthBuffer", "setWritesToDepthBuffer:")] public bool WritesToDepthBuffer { get; set; }
-    [Selector("propertyControllers", "setPropertyControllers:")] public NSDictionary? PropertyControllers { get; set; }
-    [Selector("particleSystem")] public static Self ParticleSystem();
-    [Selector("particleSystemNamed:inDirectory:")] public static Self? ParticleSystemNamedInDirectory(NSString name, NSString? directory);
-    [Selector("reset")] public void Reset();
-    [Selector("handleEvent:forProperties:withBlock:")] public void HandleEventForPropertiesWithBlock(SCNParticleEvent event, NSArray properties, SCNParticleEventBlock block);
-    [Selector("addModifierForProperties:atStage:withBlock:")] public void AddModifierForPropertiesAtStageWithBlock(NSArray properties, SCNParticleModifierStage stage, SCNParticleModifierBlock block);
-    [Selector("removeModifiersOfStage:")] public void RemoveModifiersOfStage(SCNParticleModifierStage stage);
-    [Selector("removeAllModifiers")] public void RemoveAllModifiers();
+    [Selector("emissionDuration", "setEmissionDuration:")]
+    public CGFloat EmissionDuration { get; set; }
+    [Selector("emissionDurationVariation", "setEmissionDurationVariation:")]
+    public CGFloat EmissionDurationVariation { get; set; }
+    [Selector("idleDuration", "setIdleDuration:")]
+    public CGFloat IdleDuration { get; set; }
+    [Selector("idleDurationVariation", "setIdleDurationVariation:")]
+    public CGFloat IdleDurationVariation { get; set; }
+    [Selector("loops", "setLoops:")]
+    public bool Loops { get; set; }
+    [Selector("birthRate", "setBirthRate:")]
+    public CGFloat BirthRate { get; set; }
+    [Selector("birthRateVariation", "setBirthRateVariation:")]
+    public CGFloat BirthRateVariation { get; set; }
+    [Selector("warmupDuration", "setWarmupDuration:")]
+    public CGFloat WarmupDuration { get; set; }
+    [Selector("emitterShape", "setEmitterShape:")]
+    public SCNGeometry? EmitterShape { get; set; }
+    [Selector("birthLocation", "setBirthLocation:")]
+    public SCNParticleBirthLocation BirthLocation { get; set; }
+    [Selector("birthDirection", "setBirthDirection:")]
+    public SCNParticleBirthDirection BirthDirection { get; set; }
+    [Selector("spreadingAngle", "setSpreadingAngle:")]
+    public CGFloat SpreadingAngle { get; set; }
+    [Selector("emittingDirection", "setEmittingDirection:")]
+    public SCNVector3 EmittingDirection { get; set; }
+    [Selector("orientationDirection", "setOrientationDirection:")]
+    public SCNVector3 OrientationDirection { get; set; }
+    [Selector("acceleration", "setAcceleration:")]
+    public SCNVector3 Acceleration { get; set; }
+    [Selector("isLocal", "setLocal:")]
+    public bool Local { get; set; }
+    [Selector("particleAngle", "setParticleAngle:")]
+    public CGFloat ParticleAngle { get; set; }
+    [Selector("particleAngleVariation", "setParticleAngleVariation:")]
+    public CGFloat ParticleAngleVariation { get; set; }
+    [Selector("particleVelocity", "setParticleVelocity:")]
+    public CGFloat ParticleVelocity { get; set; }
+    [Selector("particleVelocityVariation", "setParticleVelocityVariation:")]
+    public CGFloat ParticleVelocityVariation { get; set; }
+    [Selector("particleAngularVelocity", "setParticleAngularVelocity:")]
+    public CGFloat ParticleAngularVelocity { get; set; }
+    [Selector("particleAngularVelocityVariation", "setParticleAngularVelocityVariation:")]
+    public CGFloat ParticleAngularVelocityVariation { get; set; }
+    [Selector("particleLifeSpan", "setParticleLifeSpan:")]
+    public CGFloat ParticleLifeSpan { get; set; }
+    [Selector("particleLifeSpanVariation", "setParticleLifeSpanVariation:")]
+    public CGFloat ParticleLifeSpanVariation { get; set; }
+    [Selector("systemSpawnedOnDying", "setSystemSpawnedOnDying:")]
+    public SCNParticleSystem? SystemSpawnedOnDying { get; set; }
+    [Selector("systemSpawnedOnCollision", "setSystemSpawnedOnCollision:")]
+    public SCNParticleSystem? SystemSpawnedOnCollision { get; set; }
+    [Selector("systemSpawnedOnLiving", "setSystemSpawnedOnLiving:")]
+    public SCNParticleSystem? SystemSpawnedOnLiving { get; set; }
+    [Selector("particleImage", "setParticleImage:")]
+    public AnyObject? ParticleImage { get; set; }
+    [Selector("imageSequenceColumnCount", "setImageSequenceColumnCount:")]
+    public NSUInteger ImageSequenceColumnCount { get; set; }
+    [Selector("imageSequenceRowCount", "setImageSequenceRowCount:")]
+    public NSUInteger ImageSequenceRowCount { get; set; }
+    [Selector("imageSequenceInitialFrame", "setImageSequenceInitialFrame:")]
+    public CGFloat ImageSequenceInitialFrame { get; set; }
+    [Selector("imageSequenceInitialFrameVariation", "setImageSequenceInitialFrameVariation:")]
+    public CGFloat ImageSequenceInitialFrameVariation { get; set; }
+    [Selector("imageSequenceFrameRate", "setImageSequenceFrameRate:")]
+    public CGFloat ImageSequenceFrameRate { get; set; }
+    [Selector("imageSequenceFrameRateVariation", "setImageSequenceFrameRateVariation:")]
+    public CGFloat ImageSequenceFrameRateVariation { get; set; }
+    [Selector("imageSequenceAnimationMode", "setImageSequenceAnimationMode:")]
+    public SCNParticleImageSequenceAnimationMode ImageSequenceAnimationMode { get; set; }
+    [Selector("particleColor", "setParticleColor:")]
+    public NSColor ParticleColor { get; set; }
+    [Selector("particleColorVariation", "setParticleColorVariation:")]
+    public SCNVector4 ParticleColorVariation { get; set; }
+    [Selector("particleSize", "setParticleSize:")]
+    public CGFloat ParticleSize { get; set; }
+    [Selector("particleSizeVariation", "setParticleSizeVariation:")]
+    public CGFloat ParticleSizeVariation { get; set; }
+    [Selector("particleIntensity", "setParticleIntensity:")]
+    public CGFloat ParticleIntensity { get; set; }
+    [Selector("particleIntensityVariation", "setParticleIntensityVariation:")]
+    public CGFloat ParticleIntensityVariation { get; set; }
+    [Selector("blendMode", "setBlendMode:")]
+    public SCNParticleBlendMode BlendMode { get; set; }
+    [Selector("isBlackPassEnabled", "setBlackPassEnabled:")]
+    public bool BlackPassEnabled { get; set; }
+    [Selector("orientationMode", "setOrientationMode:")]
+    public SCNParticleOrientationMode OrientationMode { get; set; }
+    [Selector("sortingMode", "setSortingMode:")]
+    public SCNParticleSortingMode SortingMode { get; set; }
+    [Selector("isLightingEnabled", "setLightingEnabled:")]
+    public bool LightingEnabled { get; set; }
+    [Selector("affectedByGravity", "setAffectedByGravity:")]
+    public bool AffectedByGravity { get; set; }
+    [Selector("affectedByPhysicsFields", "setAffectedByPhysicsFields:")]
+    public bool AffectedByPhysicsFields { get; set; }
+    [Selector("particleDiesOnCollision", "setParticleDiesOnCollision:")]
+    public bool ParticleDiesOnCollision { get; set; }
+    [Selector("colliderNodes", "setColliderNodes:")]
+    public NSArray? ColliderNodes { get; set; }
+    [Selector("particleMass", "setParticleMass:")]
+    public CGFloat ParticleMass { get; set; }
+    [Selector("particleMassVariation", "setParticleMassVariation:")]
+    public CGFloat ParticleMassVariation { get; set; }
+    [Selector("particleBounce", "setParticleBounce:")]
+    public CGFloat ParticleBounce { get; set; }
+    [Selector("particleBounceVariation", "setParticleBounceVariation:")]
+    public CGFloat ParticleBounceVariation { get; set; }
+    [Selector("particleFriction", "setParticleFriction:")]
+    public CGFloat ParticleFriction { get; set; }
+    [Selector("particleFrictionVariation", "setParticleFrictionVariation:")]
+    public CGFloat ParticleFrictionVariation { get; set; }
+    [Selector("particleCharge", "setParticleCharge:")]
+    public CGFloat ParticleCharge { get; set; }
+    [Selector("particleChargeVariation", "setParticleChargeVariation:")]
+    public CGFloat ParticleChargeVariation { get; set; }
+    [Selector("dampingFactor", "setDampingFactor:")]
+    public CGFloat DampingFactor { get; set; }
+    [Selector("speedFactor", "setSpeedFactor:")]
+    public CGFloat SpeedFactor { get; set; }
+    [Selector("stretchFactor", "setStretchFactor:")]
+    public CGFloat StretchFactor { get; set; }
+    [Selector("fresnelExponent", "setFresnelExponent:")]
+    public CGFloat FresnelExponent { get; set; }
+    [Selector("writesToDepthBuffer", "setWritesToDepthBuffer:")]
+    public bool WritesToDepthBuffer { get; set; }
+    [Selector("propertyControllers", "setPropertyControllers:")]
+    public NSDictionary? PropertyControllers { get; set; }
+    [Selector("particleSystem")]
+    public static Self ParticleSystem();
+    [Selector("particleSystemNamed:inDirectory:")]
+    public static Self? ParticleSystemNamedInDirectory(NSString name, NSString? directory);
+    [Selector("reset")]
+    public void Reset();
+    [Selector("handleEvent:forProperties:withBlock:")]
+    public void HandleEventForPropertiesWithBlock(SCNParticleEvent event, NSArray properties, SCNParticleEventBlock block);
+    [Selector("addModifierForProperties:atStage:withBlock:")]
+    public void AddModifierForPropertiesAtStageWithBlock(NSArray properties, SCNParticleModifierStage stage, SCNParticleModifierBlock block);
+    [Selector("removeModifiersOfStage:")]
+    public void RemoveModifiersOfStage(SCNParticleModifierStage stage);
+    [Selector("removeAllModifiers")]
+    public void RemoveAllModifiers();
 }
 
 /// SCNParticleSystemSupport, a category of SCNNode.
 public extern objc class SCNNode
 {
-    [Selector("particleSystems")] public NSArray? ParticleSystems { get; }
-    [Selector("addParticleSystem:")] public void AddParticleSystem(SCNParticleSystem system);
-    [Selector("removeAllParticleSystems")] public void RemoveAllParticleSystems();
-    [Selector("removeParticleSystem:")] public void RemoveParticleSystem(SCNParticleSystem system);
+    [Selector("particleSystems")]
+    public NSArray? ParticleSystems { get; }
+    [Selector("addParticleSystem:")]
+    public void AddParticleSystem(SCNParticleSystem system);
+    [Selector("removeAllParticleSystems")]
+    public void RemoveAllParticleSystems();
+    [Selector("removeParticleSystem:")]
+    public void RemoveParticleSystem(SCNParticleSystem system);
 }
 
 /// SCNParticleSystemSupport, a category of SCNScene.
 public extern objc class SCNScene
 {
-    [Selector("particleSystems")] public NSArray? ParticleSystems { get; }
-    [Selector("addParticleSystem:withTransform:")] public void AddParticleSystemWithTransform(SCNParticleSystem system, SCNMatrix4 transform);
-    [Selector("removeAllParticleSystems")] public void RemoveAllParticleSystems();
-    [Selector("removeParticleSystem:")] public void RemoveParticleSystem(SCNParticleSystem system);
+    [Selector("particleSystems")]
+    public NSArray? ParticleSystems { get; }
+    [Selector("addParticleSystem:withTransform:")]
+    public void AddParticleSystemWithTransform(SCNParticleSystem system, SCNMatrix4 transform);
+    [Selector("removeAllParticleSystems")]
+    public void RemoveAllParticleSystems();
+    [Selector("removeParticleSystem:")]
+    public void RemoveParticleSystem(SCNParticleSystem system);
 }
 
 #endif

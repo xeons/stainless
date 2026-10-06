@@ -32,15 +32,19 @@ import Standard.ObjC;
 
 public extern objc class NSPressureConfiguration : NSObject
 {
-    [Selector("pressureBehavior")] public NSPressureBehavior PressureBehavior { get; }
-    [Selector("initWithPressureBehavior:")] public Self InitWithPressureBehavior(NSPressureBehavior pressureBehavior);
-    [Selector("set")] public void Set();
+    [Selector("pressureBehavior")]
+    public NSPressureBehavior PressureBehavior { get; }
+    [Selector("initWithPressureBehavior:")]
+    public Self InitWithPressureBehavior(NSPressureBehavior pressureBehavior);
+    [Selector("set")]
+    public void Set();
 }
 
 /// NSPressureConfiguration, a category of NSView.
 public extern objc class NSView
 {
-    [Selector("pressureConfiguration", "setPressureConfiguration:")] public NSPressureConfiguration? PressureConfiguration { get; set; }
+    [Selector("pressureConfiguration", "setPressureConfiguration:")]
+    public NSPressureConfiguration? PressureConfiguration { get; set; }
 }
 
 #endif

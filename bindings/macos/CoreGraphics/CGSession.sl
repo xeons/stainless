@@ -30,7 +30,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreGraphics")
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? CGSessionCopyCurrentDictionary();
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? CGSessionCopyCurrentDictionary();
 
 public const CFStringRef kCGSessionUserIDKey = "kCGSSessionUserIDKey";
 

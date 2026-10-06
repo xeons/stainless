@@ -59,18 +59,30 @@ public objc closure void INInteractionDeleteInteractionsWithGroupIdentifierCompl
 
 public extern objc class INInteraction : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("intent")] public INIntent Intent { get; }
-    [Selector("intentResponse")] public INIntentResponse? IntentResponse { get; }
-    [Selector("intentHandlingStatus")] public INIntentHandlingStatus IntentHandlingStatus { get; }
-    [Selector("direction", "setDirection:")] public INInteractionDirection Direction { get; set; }
-    [Selector("dateInterval", "setDateInterval:")] public NSDateInterval? DateInterval { get; set; }
-    [Selector("identifier", "setIdentifier:")] public NSString Identifier { get; set; }
-    [Selector("groupIdentifier", "setGroupIdentifier:")] public NSString? GroupIdentifier { get; set; }
-    [Selector("initWithIntent:response:")] public Self InitWithIntentResponse(INIntent intent, INIntentResponse? response);
-    [Selector("donateInteractionWithCompletion:")] public void DonateInteractionWithCompletion(INInteractionDonateInteractionWithCompletionCompletionBlock? completion);
-    [Selector("deleteAllInteractionsWithCompletion:")] public static void DeleteAllInteractionsWithCompletion(INInteractionDeleteAllInteractionsWithCompletionCompletionBlock? completion);
-    [Selector("deleteInteractionsWithIdentifiers:completion:")] public static void DeleteInteractionsWithIdentifiersCompletion(NSArray identifiers, INInteractionDeleteInteractionsWithIdentifiersCompletionCompletionBlock? completion);
-    [Selector("deleteInteractionsWithGroupIdentifier:completion:")] public static void DeleteInteractionsWithGroupIdentifierCompletion(NSString groupIdentifier, INInteractionDeleteInteractionsWithGroupIdentifierCompletionCompletionBlock? completion);
+    [Selector("intent")]
+    public INIntent Intent { get; }
+    [Selector("intentResponse")]
+    public INIntentResponse? IntentResponse { get; }
+    [Selector("intentHandlingStatus")]
+    public INIntentHandlingStatus IntentHandlingStatus { get; }
+    [Selector("direction", "setDirection:")]
+    public INInteractionDirection Direction { get; set; }
+    [Selector("dateInterval", "setDateInterval:")]
+    public NSDateInterval? DateInterval { get; set; }
+    [Selector("identifier", "setIdentifier:")]
+    public NSString Identifier { get; set; }
+    [Selector("groupIdentifier", "setGroupIdentifier:")]
+    public NSString? GroupIdentifier { get; set; }
+    [Selector("initWithIntent:response:")]
+    public Self InitWithIntentResponse(INIntent intent, INIntentResponse? response);
+    [Selector("donateInteractionWithCompletion:")]
+    public void DonateInteractionWithCompletion(INInteractionDonateInteractionWithCompletionCompletionBlock? completion);
+    [Selector("deleteAllInteractionsWithCompletion:")]
+    public static void DeleteAllInteractionsWithCompletion(INInteractionDeleteAllInteractionsWithCompletionCompletionBlock? completion);
+    [Selector("deleteInteractionsWithIdentifiers:completion:")]
+    public static void DeleteInteractionsWithIdentifiersCompletion(NSArray identifiers, INInteractionDeleteInteractionsWithIdentifiersCompletionCompletionBlock? completion);
+    [Selector("deleteInteractionsWithGroupIdentifier:completion:")]
+    public static void DeleteInteractionsWithGroupIdentifierCompletion(NSString groupIdentifier, INInteractionDeleteInteractionsWithGroupIdentifierCompletionCompletionBlock? completion);
 }
 
 #endif

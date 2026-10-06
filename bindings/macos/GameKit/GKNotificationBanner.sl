@@ -39,9 +39,11 @@ public objc closure void GKNotificationBannerShowBannerWithTitleMessageDurationC
 public extern objc class GKNotificationBanner : NSObject
 {
     /// Deprecated in macOS 13.0.
-    [Selector("showBannerWithTitle:message:completionHandler:")] public static void ShowBannerWithTitleMessageCompletionHandler(NSString? title, NSString? message, GKNotificationBannerShowBannerWithTitleMessageCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("showBannerWithTitle:message:completionHandler:")]
+    public static void ShowBannerWithTitleMessageCompletionHandler(NSString? title, NSString? message, GKNotificationBannerShowBannerWithTitleMessageCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// Deprecated in macOS 13.0.
-    [Selector("showBannerWithTitle:message:duration:completionHandler:")] public static void ShowBannerWithTitleMessageDurationCompletionHandler(NSString? title, NSString? message, NSTimeInterval duration, GKNotificationBannerShowBannerWithTitleMessageDurationCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("showBannerWithTitle:message:duration:completionHandler:")]
+    public static void ShowBannerWithTitleMessageDurationCompletionHandler(NSString? title, NSString? message, NSTimeInterval duration, GKNotificationBannerShowBannerWithTitleMessageDurationCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 #endif

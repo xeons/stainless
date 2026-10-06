@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class MLModelStructureNeuralNetworkLayer : NSObject
 {
-    [Selector("name")] public NSString Name { get; }
-    [Selector("type")] public NSString Type { get; }
-    [Selector("inputNames")] public NSArray InputNames { get; }
-    [Selector("outputNames")] public NSArray OutputNames { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("type")]
+    public NSString Type { get; }
+    [Selector("inputNames")]
+    public NSArray InputNames { get; }
+    [Selector("outputNames")]
+    public NSArray OutputNames { get; }
 }
 
 #endif

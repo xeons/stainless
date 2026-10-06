@@ -34,26 +34,50 @@ import Standard.ObjC;
 
 public objc interface IOBluetoothDevicePairDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("devicePairingStarted:")] void DevicePairingStarted(AnyObject? sender);
-    [Optional] [Selector("devicePairingConnecting:")] void DevicePairingConnecting(AnyObject? sender);
-    [Optional] [Selector("devicePairingConnected:")] void DevicePairingConnected(AnyObject? sender);
-    [Optional] [Selector("devicePairingPINCodeRequest:")] void DevicePairingPINCodeRequest(AnyObject? sender);
-    [Optional] [Selector("devicePairingUserConfirmationRequest:numericValue:")] void DevicePairingUserConfirmationRequestNumericValue(AnyObject? sender, BluetoothNumericValue numericValue);
-    [Optional] [Selector("devicePairingUserPasskeyNotification:passkey:")] void DevicePairingUserPasskeyNotificationPasskey(AnyObject? sender, BluetoothPasskey passkey);
-    [Optional] [Selector("devicePairingFinished:error:")] void DevicePairingFinishedError(AnyObject? sender, IOReturn error);
-    [Optional] [Selector("deviceSimplePairingComplete:status:")] void DeviceSimplePairingCompleteStatus(AnyObject? sender, BluetoothHCIEventStatus status);
+    [Optional]
+    [Selector("devicePairingStarted:")]
+    void DevicePairingStarted(AnyObject? sender);
+    [Optional]
+    [Selector("devicePairingConnecting:")]
+    void DevicePairingConnecting(AnyObject? sender);
+    [Optional]
+    [Selector("devicePairingConnected:")]
+    void DevicePairingConnected(AnyObject? sender);
+    [Optional]
+    [Selector("devicePairingPINCodeRequest:")]
+    void DevicePairingPINCodeRequest(AnyObject? sender);
+    [Optional]
+    [Selector("devicePairingUserConfirmationRequest:numericValue:")]
+    void DevicePairingUserConfirmationRequestNumericValue(AnyObject? sender, BluetoothNumericValue numericValue);
+    [Optional]
+    [Selector("devicePairingUserPasskeyNotification:passkey:")]
+    void DevicePairingUserPasskeyNotificationPasskey(AnyObject? sender, BluetoothPasskey passkey);
+    [Optional]
+    [Selector("devicePairingFinished:error:")]
+    void DevicePairingFinishedError(AnyObject? sender, IOReturn error);
+    [Optional]
+    [Selector("deviceSimplePairingComplete:status:")]
+    void DeviceSimplePairingCompleteStatus(AnyObject? sender, BluetoothHCIEventStatus status);
 }
 
 public extern objc class IOBluetoothDevicePair : NSObject, CBCentralManagerDelegate
 {
-    [Selector("delegate", "setDelegate:")] public AnyObject? Delegate { get; set; }
-    [Selector("pairWithDevice:")] public static Self? PairWithDevice(IOBluetoothDevice? device);
-    [Selector("start")] public IOReturn Start();
-    [Selector("stop")] public void Stop();
-    [Selector("device")] public IOBluetoothDevice? Device();
-    [Selector("setDevice:")] public void SetDevice(IOBluetoothDevice? inDevice);
-    [Selector("replyPINCode:PINCode:")] public void ReplyPINCodePINCode(ByteCount PINCodeSize, BluetoothPINCode* PINCode);
-    [Selector("replyUserConfirmation:")] public void ReplyUserConfirmation(bool reply);
+    [Selector("delegate", "setDelegate:")]
+    public AnyObject? Delegate { get; set; }
+    [Selector("pairWithDevice:")]
+    public static Self? PairWithDevice(IOBluetoothDevice? device);
+    [Selector("start")]
+    public IOReturn Start();
+    [Selector("stop")]
+    public void Stop();
+    [Selector("device")]
+    public IOBluetoothDevice? Device();
+    [Selector("setDevice:")]
+    public void SetDevice(IOBluetoothDevice? inDevice);
+    [Selector("replyPINCode:PINCode:")]
+    public void ReplyPINCodePINCode(ByteCount PINCodeSize, BluetoothPINCode* PINCode);
+    [Selector("replyUserConfirmation:")]
+    public void ReplyUserConfirmation(bool reply);
 }
 
 #endif

@@ -53,26 +53,46 @@ public enum NSTextLayoutFragmentState : ulong
 
 public extern objc class NSTextLayoutFragment : NSObject, NSSecureCoding
 {
-    [Selector("textLayoutManager")] public NSTextLayoutManager? TextLayoutManager { get; }
-    [Selector("textElement")] public NSTextElement? TextElement { get; }
-    [Selector("rangeInElement")] public NSTextRange RangeInElement { get; }
-    [Selector("textLineFragments")] public NSArray TextLineFragments { get; }
-    [Selector("layoutQueue", "setLayoutQueue:")] public NSOperationQueue? LayoutQueue { get; set; }
-    [Selector("state")] public NSTextLayoutFragmentState State { get; }
-    [Selector("layoutFragmentFrame")] public CGRect LayoutFragmentFrame { get; }
-    [Selector("renderingSurfaceBounds")] public CGRect RenderingSurfaceBounds { get; }
-    [Selector("leadingPadding")] public CGFloat LeadingPadding { get; }
-    [Selector("trailingPadding")] public CGFloat TrailingPadding { get; }
-    [Selector("topMargin")] public CGFloat TopMargin { get; }
-    [Selector("bottomMargin")] public CGFloat BottomMargin { get; }
-    [Selector("textAttachmentViewProviders")] public NSArray TextAttachmentViewProviders { get; }
-    [Selector("initWithTextElement:range:")] public Self InitWithTextElementRange(NSTextElement textElement, NSTextRange? rangeInElement);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("textLineFragmentForVerticalOffset:requiresExactMatch:")] public NSTextLineFragment? TextLineFragmentForVerticalOffsetRequiresExactMatch(CGFloat verticalOffset, bool requiresExactMatch);
-    [Selector("textLineFragmentForTextLocation:isUpstreamAffinity:")] public NSTextLineFragment? TextLineFragmentForTextLocationIsUpstreamAffinity(NSTextLocation textLocation, bool isUpstreamAffinity);
-    [Selector("invalidateLayout")] public void InvalidateLayout();
-    [Selector("drawAtPoint:inContext:")] public void DrawAtPointInContext(CGPoint point, CGContextRef context);
-    [Selector("frameForTextAttachmentAtLocation:")] public CGRect FrameForTextAttachmentAtLocation(NSTextLocation location);
+    [Selector("textLayoutManager")]
+    public NSTextLayoutManager? TextLayoutManager { get; }
+    [Selector("textElement")]
+    public NSTextElement? TextElement { get; }
+    [Selector("rangeInElement")]
+    public NSTextRange RangeInElement { get; }
+    [Selector("textLineFragments")]
+    public NSArray TextLineFragments { get; }
+    [Selector("layoutQueue", "setLayoutQueue:")]
+    public NSOperationQueue? LayoutQueue { get; set; }
+    [Selector("state")]
+    public NSTextLayoutFragmentState State { get; }
+    [Selector("layoutFragmentFrame")]
+    public CGRect LayoutFragmentFrame { get; }
+    [Selector("renderingSurfaceBounds")]
+    public CGRect RenderingSurfaceBounds { get; }
+    [Selector("leadingPadding")]
+    public CGFloat LeadingPadding { get; }
+    [Selector("trailingPadding")]
+    public CGFloat TrailingPadding { get; }
+    [Selector("topMargin")]
+    public CGFloat TopMargin { get; }
+    [Selector("bottomMargin")]
+    public CGFloat BottomMargin { get; }
+    [Selector("textAttachmentViewProviders")]
+    public NSArray TextAttachmentViewProviders { get; }
+    [Selector("initWithTextElement:range:")]
+    public Self InitWithTextElementRange(NSTextElement textElement, NSTextRange? rangeInElement);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("textLineFragmentForVerticalOffset:requiresExactMatch:")]
+    public NSTextLineFragment? TextLineFragmentForVerticalOffsetRequiresExactMatch(CGFloat verticalOffset, bool requiresExactMatch);
+    [Selector("textLineFragmentForTextLocation:isUpstreamAffinity:")]
+    public NSTextLineFragment? TextLineFragmentForTextLocationIsUpstreamAffinity(NSTextLocation textLocation, bool isUpstreamAffinity);
+    [Selector("invalidateLayout")]
+    public void InvalidateLayout();
+    [Selector("drawAtPoint:inContext:")]
+    public void DrawAtPointInContext(CGPoint point, CGContextRef context);
+    [Selector("frameForTextAttachmentAtLocation:")]
+    public CGRect FrameForTextAttachmentAtLocation(NSTextLocation location);
 }
 
 #endif

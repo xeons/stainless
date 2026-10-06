@@ -40,26 +40,46 @@ public objc closure void NSTaskTerminationHandlerBlock(NSTask arg0);
 
 public extern objc class NSTask : NSObject
 {
-    [Selector("executableURL", "setExecutableURL:")] public NSURL? ExecutableURL { get; set; }
-    [Selector("arguments", "setArguments:")] public NSArray? Arguments { get; set; }
-    [Selector("environment", "setEnvironment:")] public NSDictionary? Environment { get; set; }
-    [Selector("currentDirectoryURL", "setCurrentDirectoryURL:")] public NSURL? CurrentDirectoryURL { get; set; }
-    [Selector("launchRequirementData", "setLaunchRequirementData:")] public NSData? LaunchRequirementData { get; set; }
-    [Selector("standardInput", "setStandardInput:")] public AnyObject? StandardInput { get; set; }
-    [Selector("standardOutput", "setStandardOutput:")] public AnyObject? StandardOutput { get; set; }
-    [Selector("standardError", "setStandardError:")] public AnyObject? StandardError { get; set; }
-    [Selector("processIdentifier")] public int ProcessIdentifier { get; }
-    [Selector("isRunning")] public bool Running { get; }
-    [Selector("terminationStatus")] public int TerminationStatus { get; }
-    [Selector("terminationReason")] public NSTaskTerminationReason TerminationReason { get; }
-    [Selector("terminationHandler", "setTerminationHandler:")] public NSTaskTerminationHandlerBlock? TerminationHandler { get; set; }
-    [Selector("qualityOfService", "setQualityOfService:")] public NSQualityOfService QualityOfService { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("launchAndReturnError:")] public bool LaunchAndReturnError(out NSError? error);
-    [Selector("interrupt")] public void Interrupt();
-    [Selector("terminate")] public void Terminate();
-    [Selector("suspend")] public bool Suspend();
-    [Selector("resume")] public bool Resume();
+    [Selector("executableURL", "setExecutableURL:")]
+    public NSURL? ExecutableURL { get; set; }
+    [Selector("arguments", "setArguments:")]
+    public NSArray? Arguments { get; set; }
+    [Selector("environment", "setEnvironment:")]
+    public NSDictionary? Environment { get; set; }
+    [Selector("currentDirectoryURL", "setCurrentDirectoryURL:")]
+    public NSURL? CurrentDirectoryURL { get; set; }
+    [Selector("launchRequirementData", "setLaunchRequirementData:")]
+    public NSData? LaunchRequirementData { get; set; }
+    [Selector("standardInput", "setStandardInput:")]
+    public AnyObject? StandardInput { get; set; }
+    [Selector("standardOutput", "setStandardOutput:")]
+    public AnyObject? StandardOutput { get; set; }
+    [Selector("standardError", "setStandardError:")]
+    public AnyObject? StandardError { get; set; }
+    [Selector("processIdentifier")]
+    public int ProcessIdentifier { get; }
+    [Selector("isRunning")]
+    public bool Running { get; }
+    [Selector("terminationStatus")]
+    public int TerminationStatus { get; }
+    [Selector("terminationReason")]
+    public NSTaskTerminationReason TerminationReason { get; }
+    [Selector("terminationHandler", "setTerminationHandler:")]
+    public NSTaskTerminationHandlerBlock? TerminationHandler { get; set; }
+    [Selector("qualityOfService", "setQualityOfService:")]
+    public NSQualityOfService QualityOfService { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("launchAndReturnError:")]
+    public bool LaunchAndReturnError(out NSError? error);
+    [Selector("interrupt")]
+    public void Interrupt();
+    [Selector("terminate")]
+    public void Terminate();
+    [Selector("suspend")]
+    public bool Suspend();
+    [Selector("resume")]
+    public bool Resume();
 }
 
 public objc closure void NSTaskLaunchedTaskWithExecutableURLArgumentsErrorTerminationHandlerTerminationHandlerBlock(NSTask arg0);
@@ -67,21 +87,27 @@ public objc closure void NSTaskLaunchedTaskWithExecutableURLArgumentsErrorTermin
 /// NSTaskConveniences, a category of NSTask.
 public extern objc class NSTask
 {
-    [Selector("launchedTaskWithExecutableURL:arguments:error:terminationHandler:")] public static NSTask? LaunchedTaskWithExecutableURLArgumentsErrorTerminationHandler(NSURL url, NSArray arguments, out NSError? error, NSTaskLaunchedTaskWithExecutableURLArgumentsErrorTerminationHandlerTerminationHandlerBlock? terminationHandler);
-    [Selector("waitUntilExit")] public void WaitUntilExit();
+    [Selector("launchedTaskWithExecutableURL:arguments:error:terminationHandler:")]
+    public static NSTask? LaunchedTaskWithExecutableURLArgumentsErrorTerminationHandler(NSURL url, NSArray arguments, out NSError? error, NSTaskLaunchedTaskWithExecutableURLArgumentsErrorTerminationHandlerTerminationHandlerBlock? terminationHandler);
+    [Selector("waitUntilExit")]
+    public void WaitUntilExit();
 }
 
 /// NSDeprecated, a category of NSTask.
 public extern objc class NSTask
 {
     /// Deprecated in macOS 100000.
-    [Selector("launchPath", "setLaunchPath:")] public NSString? LaunchPath { get; set; }
+    [Selector("launchPath", "setLaunchPath:")]
+    public NSString? LaunchPath { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("currentDirectoryPath", "setCurrentDirectoryPath:")] public NSString? CurrentDirectoryPath { get; set; }
+    [Selector("currentDirectoryPath", "setCurrentDirectoryPath:")]
+    public NSString? CurrentDirectoryPath { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("launch")] public void Launch();
+    [Selector("launch")]
+    public void Launch();
     /// Deprecated in macOS 100000.
-    [Selector("launchedTaskWithLaunchPath:arguments:")] public static NSTask LaunchedTaskWithLaunchPathArguments(NSString path, NSArray arguments);
+    [Selector("launchedTaskWithLaunchPath:arguments:")]
+    public static NSTask LaunchedTaskWithLaunchPathArguments(NSString path, NSArray arguments);
 }
 
 public extern "C" NSNotificationName NSTaskDidTerminateNotification;

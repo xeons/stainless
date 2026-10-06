@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class LAEnvironmentState : NSObject, NSCopying
 {
-    [Selector("biometry")] public LAEnvironmentMechanismBiometry? Biometry { get; }
-    [Selector("userPassword")] public LAEnvironmentMechanismUserPassword? UserPassword { get; }
-    [Selector("companions")] public NSArray Companions { get; }
-    [Selector("allMechanisms")] public NSArray AllMechanisms { get; }
+    [Selector("biometry")]
+    public LAEnvironmentMechanismBiometry? Biometry { get; }
+    [Selector("userPassword")]
+    public LAEnvironmentMechanismUserPassword? UserPassword { get; }
+    [Selector("companions")]
+    public NSArray Companions { get; }
+    [Selector("allMechanisms")]
+    public NSArray AllMechanisms { get; }
 }
 
 #endif

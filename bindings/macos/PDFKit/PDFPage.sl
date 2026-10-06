@@ -63,44 +63,75 @@ public using PDFPageImageInitializationOption = NSString;
 
 public extern objc class PDFPage : NSObject, NSCopying
 {
-    [Selector("document")] public PDFDocument? Document { get; }
-    [Selector("pageRef")] public CGPDFPageRef? PageRef { get; }
-    [Selector("label")] public NSString? Label { get; }
-    [Selector("rotation", "setRotation:")] public NSInteger Rotation { get; set; }
-    [Selector("annotations")] public NSArray Annotations { get; }
-    [Selector("displaysAnnotations", "setDisplaysAnnotations:")] public bool DisplaysAnnotations { get; set; }
-    [Selector("numberOfCharacters")] public NSUInteger NumberOfCharacters { get; }
-    [Selector("string")] public NSString? String { get; }
-    [Selector("attributedString")] public NSAttributedString? AttributedString { get; }
-    [Selector("dataRepresentation")] public NSData? DataRepresentation { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithImage:options:")] public Self? InitWithImageOptions(NSImage image, NSDictionary options);
-    [Selector("initWithImage:")] public Self? InitWithImage(NSImage image);
-    [Selector("boundsForBox:")] public NSRect BoundsForBox(PDFDisplayBox box);
-    [Selector("setBounds:forBox:")] public void SetBoundsForBox(NSRect bounds, PDFDisplayBox box);
-    [Selector("addAnnotation:")] public void AddAnnotation(PDFAnnotation annotation);
-    [Selector("removeAnnotation:")] public void RemoveAnnotation(PDFAnnotation annotation);
-    [Selector("annotationAtPoint:")] public PDFAnnotation? AnnotationAtPoint(NSPoint point);
-    [Selector("transformForBox:")] public CGAffineTransform TransformForBox(PDFDisplayBox box);
-    [Selector("drawWithBox:toContext:")] public void DrawWithBoxToContext(PDFDisplayBox box, CGContextRef context);
-    [Selector("transformContext:forBox:")] public void TransformContextForBox(CGContextRef context, PDFDisplayBox box);
-    [Selector("thumbnailOfSize:forBox:")] public NSImage ThumbnailOfSizeForBox(NSSize size, PDFDisplayBox box);
-    [Selector("characterBoundsAtIndex:")] public NSRect CharacterBoundsAtIndex(NSInteger index);
-    [Selector("characterIndexAtPoint:")] public NSInteger CharacterIndexAtPoint(NSPoint point);
-    [Selector("selectionForRect:")] public PDFSelection? SelectionForRect(NSRect rect);
-    [Selector("selectionForWordAtPoint:")] public PDFSelection? SelectionForWordAtPoint(NSPoint point);
-    [Selector("selectionForLineAtPoint:")] public PDFSelection? SelectionForLineAtPoint(NSPoint point);
-    [Selector("selectionFromPoint:toPoint:")] public PDFSelection? SelectionFromPointToPoint(NSPoint startPoint, NSPoint endPoint);
-    [Selector("selectionForRange:")] public PDFSelection? SelectionForRange(NSRange range);
+    [Selector("document")]
+    public PDFDocument? Document { get; }
+    [Selector("pageRef")]
+    public CGPDFPageRef? PageRef { get; }
+    [Selector("label")]
+    public NSString? Label { get; }
+    [Selector("rotation", "setRotation:")]
+    public NSInteger Rotation { get; set; }
+    [Selector("annotations")]
+    public NSArray Annotations { get; }
+    [Selector("displaysAnnotations", "setDisplaysAnnotations:")]
+    public bool DisplaysAnnotations { get; set; }
+    [Selector("numberOfCharacters")]
+    public NSUInteger NumberOfCharacters { get; }
+    [Selector("string")]
+    public NSString? String { get; }
+    [Selector("attributedString")]
+    public NSAttributedString? AttributedString { get; }
+    [Selector("dataRepresentation")]
+    public NSData? DataRepresentation { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithImage:options:")]
+    public Self? InitWithImageOptions(NSImage image, NSDictionary options);
+    [Selector("initWithImage:")]
+    public Self? InitWithImage(NSImage image);
+    [Selector("boundsForBox:")]
+    public NSRect BoundsForBox(PDFDisplayBox box);
+    [Selector("setBounds:forBox:")]
+    public void SetBoundsForBox(NSRect bounds, PDFDisplayBox box);
+    [Selector("addAnnotation:")]
+    public void AddAnnotation(PDFAnnotation annotation);
+    [Selector("removeAnnotation:")]
+    public void RemoveAnnotation(PDFAnnotation annotation);
+    [Selector("annotationAtPoint:")]
+    public PDFAnnotation? AnnotationAtPoint(NSPoint point);
+    [Selector("transformForBox:")]
+    public CGAffineTransform TransformForBox(PDFDisplayBox box);
+    [Selector("drawWithBox:toContext:")]
+    public void DrawWithBoxToContext(PDFDisplayBox box, CGContextRef context);
+    [Selector("transformContext:forBox:")]
+    public void TransformContextForBox(CGContextRef context, PDFDisplayBox box);
+    [Selector("thumbnailOfSize:forBox:")]
+    public NSImage ThumbnailOfSizeForBox(NSSize size, PDFDisplayBox box);
+    [Selector("characterBoundsAtIndex:")]
+    public NSRect CharacterBoundsAtIndex(NSInteger index);
+    [Selector("characterIndexAtPoint:")]
+    public NSInteger CharacterIndexAtPoint(NSPoint point);
+    [Selector("selectionForRect:")]
+    public PDFSelection? SelectionForRect(NSRect rect);
+    [Selector("selectionForWordAtPoint:")]
+    public PDFSelection? SelectionForWordAtPoint(NSPoint point);
+    [Selector("selectionForLineAtPoint:")]
+    public PDFSelection? SelectionForLineAtPoint(NSPoint point);
+    [Selector("selectionFromPoint:toPoint:")]
+    public PDFSelection? SelectionFromPointToPoint(NSPoint startPoint, NSPoint endPoint);
+    [Selector("selectionForRange:")]
+    public PDFSelection? SelectionForRange(NSRange range);
 }
 
 /// PDFPageDeprecated, a category of PDFPage.
 public extern objc class PDFPage
 {
     /// Deprecated in macOS 10.12.
-    [Selector("drawWithBox:")] public void DrawWithBox(PDFDisplayBox box);
+    [Selector("drawWithBox:")]
+    public void DrawWithBox(PDFDisplayBox box);
     /// Deprecated in macOS 10.12.
-    [Selector("transformContextForBox:")] public void TransformContextForBox(PDFDisplayBox box);
+    [Selector("transformContextForBox:")]
+    public void TransformContextForBox(PDFDisplayBox box);
 }
 
 public extern "C" PDFPageImageInitializationOption? PDFPageImageInitializationOptionMediaBox;

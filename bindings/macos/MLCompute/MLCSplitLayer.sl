@@ -34,11 +34,16 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCSplitLayer : MLCLayer
 {
-    [Selector("dimension")] public NSUInteger Dimension { get; }
-    [Selector("splitCount")] public NSUInteger SplitCount { get; }
-    [Selector("splitSectionLengths")] public NSArray? SplitSectionLengths { get; }
-    [Selector("layerWithSplitCount:dimension:")] public static Self LayerWithSplitCountDimension(NSUInteger splitCount, NSUInteger dimension);
-    [Selector("layerWithSplitSectionLengths:dimension:")] public static Self LayerWithSplitSectionLengthsDimension(NSArray splitSectionLengths, NSUInteger dimension);
+    [Selector("dimension")]
+    public NSUInteger Dimension { get; }
+    [Selector("splitCount")]
+    public NSUInteger SplitCount { get; }
+    [Selector("splitSectionLengths")]
+    public NSArray? SplitSectionLengths { get; }
+    [Selector("layerWithSplitCount:dimension:")]
+    public static Self LayerWithSplitCountDimension(NSUInteger splitCount, NSUInteger dimension);
+    [Selector("layerWithSplitSectionLengths:dimension:")]
+    public static Self LayerWithSplitSectionLengthsDimension(NSArray splitSectionLengths, NSUInteger dimension);
 }
 
 #endif

@@ -35,17 +35,23 @@ import Standard.ObjC;
 /// macOS 15.4 and later.
 public extern objc class VTFrameProcessorFrame : NSObject
 {
-    [Selector("buffer")] public CVPixelBufferRef Buffer { get; }
-    [Selector("presentationTimeStamp")] public CMTime PresentationTimeStamp { get; }
-    [Selector("initWithBuffer:presentationTimeStamp:")] public Self? InitWithBufferPresentationTimeStamp(CVPixelBufferRef buffer, CMTime presentationTimeStamp);
+    [Selector("buffer")]
+    public CVPixelBufferRef Buffer { get; }
+    [Selector("presentationTimeStamp")]
+    public CMTime PresentationTimeStamp { get; }
+    [Selector("initWithBuffer:presentationTimeStamp:")]
+    public Self? InitWithBufferPresentationTimeStamp(CVPixelBufferRef buffer, CMTime presentationTimeStamp);
 }
 
 /// macOS 15.4 and later.
 public extern objc class VTFrameProcessorOpticalFlow : NSObject
 {
-    [Selector("forwardFlow")] public CVPixelBufferRef ForwardFlow { get; }
-    [Selector("backwardFlow")] public CVPixelBufferRef BackwardFlow { get; }
-    [Selector("initWithForwardFlow:backwardFlow:")] public Self? InitWithForwardFlowBackwardFlow(CVPixelBufferRef forwardFlow, CVPixelBufferRef backwardFlow);
+    [Selector("forwardFlow")]
+    public CVPixelBufferRef ForwardFlow { get; }
+    [Selector("backwardFlow")]
+    public CVPixelBufferRef BackwardFlow { get; }
+    [Selector("initWithForwardFlow:backwardFlow:")]
+    public Self? InitWithForwardFlowBackwardFlow(CVPixelBufferRef forwardFlow, CVPixelBufferRef backwardFlow);
 }
 
 #endif

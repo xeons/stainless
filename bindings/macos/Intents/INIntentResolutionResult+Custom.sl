@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Custom, a category of INIntentResolutionResult.
 public extern objc class INIntentResolutionResult
 {
-    [Selector("unsupportedWithReason:")] public static Self UnsupportedWithReason(NSInteger reason);
-    [Selector("confirmationRequiredWithItemToConfirm:forReason:")] public static Self ConfirmationRequiredWithItemToConfirmForReason(AnyObject itemToConfirm, NSInteger reason);
+    [Selector("unsupportedWithReason:")]
+    public static Self UnsupportedWithReason(NSInteger reason);
+    [Selector("confirmationRequiredWithItemToConfirm:forReason:")]
+    public static Self ConfirmationRequiredWithItemToConfirmForReason(AnyObject itemToConfirm, NSInteger reason);
 }
 
 #endif

@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class ICCameraFolder : ICCameraItem
 {
-    [Selector("contents")] public NSArray? Contents { get; }
+    [Selector("contents")]
+    public NSArray? Contents { get; }
 }
 
 #endif

@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class AVBInterface : NSObject
 {
-    [Selector("interfaceName")] public NSString InterfaceName { get; }
-    [Selector("entityDiscovery")] public AVB17221EntityDiscovery? EntityDiscovery { get; }
-    [Selector("aecp")] public AVB17221AECPInterface? Aecp { get; }
-    [Selector("acmp")] public AVB17221ACMPInterface? Acmp { get; }
-    [Selector("macAddressForInterfaceNamed:")] public static AVBMACAddress? MacAddressForInterfaceNamed(NSString anInterfaceName);
-    [Selector("supportedInterfaces")] public static NSArray? SupportedInterfaces();
-    [Selector("isAVBEnabledOnInterfaceNamed:")] public static bool IsAVBEnabledOnInterfaceNamed(NSString anInterfaceName);
-    [Selector("isAVBCapableInterfaceNamed:")] public static bool IsAVBCapableInterfaceNamed(NSString anInterfaceName);
-    [Selector("initWithInterfaceName:")] public Self? InitWithInterfaceName(NSString anInterfaceName);
-    [Selector("myEntityID")] public static ulong MyEntityID();
+    [Selector("interfaceName")]
+    public NSString InterfaceName { get; }
+    [Selector("entityDiscovery")]
+    public AVB17221EntityDiscovery? EntityDiscovery { get; }
+    [Selector("aecp")]
+    public AVB17221AECPInterface? Aecp { get; }
+    [Selector("acmp")]
+    public AVB17221ACMPInterface? Acmp { get; }
+    [Selector("macAddressForInterfaceNamed:")]
+    public static AVBMACAddress? MacAddressForInterfaceNamed(NSString anInterfaceName);
+    [Selector("supportedInterfaces")]
+    public static NSArray? SupportedInterfaces();
+    [Selector("isAVBEnabledOnInterfaceNamed:")]
+    public static bool IsAVBEnabledOnInterfaceNamed(NSString anInterfaceName);
+    [Selector("isAVBCapableInterfaceNamed:")]
+    public static bool IsAVBCapableInterfaceNamed(NSString anInterfaceName);
+    [Selector("initWithInterfaceName:")]
+    public Self? InitWithInterfaceName(NSString anInterfaceName);
+    [Selector("myEntityID")]
+    public static ulong MyEntityID();
 }
 
 #endif

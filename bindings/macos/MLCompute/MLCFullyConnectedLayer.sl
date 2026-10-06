@@ -32,12 +32,18 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCFullyConnectedLayer : MLCLayer
 {
-    [Selector("descriptor")] public MLCConvolutionDescriptor Descriptor { get; }
-    [Selector("weights")] public MLCTensor Weights { get; }
-    [Selector("biases")] public MLCTensor? Biases { get; }
-    [Selector("weightsParameter")] public MLCTensorParameter WeightsParameter { get; }
-    [Selector("biasesParameter")] public MLCTensorParameter? BiasesParameter { get; }
-    [Selector("layerWithWeights:biases:descriptor:")] public static Self? LayerWithWeightsBiasesDescriptor(MLCTensor weights, MLCTensor? biases, MLCConvolutionDescriptor descriptor);
+    [Selector("descriptor")]
+    public MLCConvolutionDescriptor Descriptor { get; }
+    [Selector("weights")]
+    public MLCTensor Weights { get; }
+    [Selector("biases")]
+    public MLCTensor? Biases { get; }
+    [Selector("weightsParameter")]
+    public MLCTensorParameter WeightsParameter { get; }
+    [Selector("biasesParameter")]
+    public MLCTensorParameter? BiasesParameter { get; }
+    [Selector("layerWithWeights:biases:descriptor:")]
+    public static Self? LayerWithWeightsBiasesDescriptor(MLCTensor weights, MLCTensor? biases, MLCConvolutionDescriptor descriptor);
 }
 
 #endif

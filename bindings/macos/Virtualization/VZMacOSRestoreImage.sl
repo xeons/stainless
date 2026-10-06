@@ -38,13 +38,20 @@ public objc closure void VZMacOSRestoreImageFetchLatestSupportedWithCompletionHa
 
 public extern objc class VZMacOSRestoreImage : NSObject
 {
-    [Selector("isSupported")] public bool Supported { get; }
-    [Selector("URL")] public NSURL URL { get; }
-    [Selector("buildVersion")] public NSString BuildVersion { get; }
-    [Selector("operatingSystemVersion")] public NSOperatingSystemVersion OperatingSystemVersion { get; }
-    [Selector("mostFeaturefulSupportedConfiguration")] public VZMacOSConfigurationRequirements? MostFeaturefulSupportedConfiguration { get; }
-    [Selector("loadFileURL:completionHandler:")] public static void LoadFileURLCompletionHandler(NSURL fileURL, VZMacOSRestoreImageLoadFileURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("fetchLatestSupportedWithCompletionHandler:")] public static void FetchLatestSupportedWithCompletionHandler(VZMacOSRestoreImageFetchLatestSupportedWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("isSupported")]
+    public bool Supported { get; }
+    [Selector("URL")]
+    public NSURL URL { get; }
+    [Selector("buildVersion")]
+    public NSString BuildVersion { get; }
+    [Selector("operatingSystemVersion")]
+    public NSOperatingSystemVersion OperatingSystemVersion { get; }
+    [Selector("mostFeaturefulSupportedConfiguration")]
+    public VZMacOSConfigurationRequirements? MostFeaturefulSupportedConfiguration { get; }
+    [Selector("loadFileURL:completionHandler:")]
+    public static void LoadFileURLCompletionHandler(NSURL fileURL, VZMacOSRestoreImageLoadFileURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchLatestSupportedWithCompletionHandler:")]
+    public static void FetchLatestSupportedWithCompletionHandler(VZMacOSRestoreImageFetchLatestSupportedWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 #endif
 

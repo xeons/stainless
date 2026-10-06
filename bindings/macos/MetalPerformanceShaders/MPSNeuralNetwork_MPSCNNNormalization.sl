@@ -34,64 +34,102 @@ import Standard.ObjC;
 
 public extern objc class MPSCNNSpatialNormalization : MPSCNNKernel
 {
-    [Selector("alpha", "setAlpha:")] public float Alpha { get; set; }
-    [Selector("beta", "setBeta:")] public float Beta { get; set; }
-    [Selector("delta", "setDelta:")] public float Delta { get; set; }
-    [Selector("initWithDevice:kernelWidth:kernelHeight:")] public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("alpha", "setAlpha:")]
+    public float Alpha { get; set; }
+    [Selector("beta", "setBeta:")]
+    public float Beta { get; set; }
+    [Selector("delta", "setDelta:")]
+    public float Delta { get; set; }
+    [Selector("initWithDevice:kernelWidth:kernelHeight:")]
+    public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNSpatialNormalizationGradient : MPSCNNGradientKernel
 {
-    [Selector("alpha", "setAlpha:")] public float Alpha { get; set; }
-    [Selector("beta", "setBeta:")] public float Beta { get; set; }
-    [Selector("delta", "setDelta:")] public float Delta { get; set; }
-    [Selector("initWithDevice:kernelWidth:kernelHeight:")] public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("alpha", "setAlpha:")]
+    public float Alpha { get; set; }
+    [Selector("beta", "setBeta:")]
+    public float Beta { get; set; }
+    [Selector("delta", "setDelta:")]
+    public float Delta { get; set; }
+    [Selector("initWithDevice:kernelWidth:kernelHeight:")]
+    public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNLocalContrastNormalization : MPSCNNKernel
 {
-    [Selector("alpha", "setAlpha:")] public float Alpha { get; set; }
-    [Selector("beta", "setBeta:")] public float Beta { get; set; }
-    [Selector("delta", "setDelta:")] public float Delta { get; set; }
-    [Selector("p0", "setP0:")] public float P0 { get; set; }
-    [Selector("pm", "setPm:")] public float Pm { get; set; }
-    [Selector("ps", "setPs:")] public float Ps { get; set; }
-    [Selector("initWithDevice:kernelWidth:kernelHeight:")] public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("alpha", "setAlpha:")]
+    public float Alpha { get; set; }
+    [Selector("beta", "setBeta:")]
+    public float Beta { get; set; }
+    [Selector("delta", "setDelta:")]
+    public float Delta { get; set; }
+    [Selector("p0", "setP0:")]
+    public float P0 { get; set; }
+    [Selector("pm", "setPm:")]
+    public float Pm { get; set; }
+    [Selector("ps", "setPs:")]
+    public float Ps { get; set; }
+    [Selector("initWithDevice:kernelWidth:kernelHeight:")]
+    public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNLocalContrastNormalizationGradient : MPSCNNGradientKernel
 {
-    [Selector("alpha", "setAlpha:")] public float Alpha { get; set; }
-    [Selector("beta", "setBeta:")] public float Beta { get; set; }
-    [Selector("delta", "setDelta:")] public float Delta { get; set; }
-    [Selector("p0", "setP0:")] public float P0 { get; set; }
-    [Selector("pm", "setPm:")] public float Pm { get; set; }
-    [Selector("ps", "setPs:")] public float Ps { get; set; }
-    [Selector("initWithDevice:kernelWidth:kernelHeight:")] public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("alpha", "setAlpha:")]
+    public float Alpha { get; set; }
+    [Selector("beta", "setBeta:")]
+    public float Beta { get; set; }
+    [Selector("delta", "setDelta:")]
+    public float Delta { get; set; }
+    [Selector("p0", "setP0:")]
+    public float P0 { get; set; }
+    [Selector("pm", "setPm:")]
+    public float Pm { get; set; }
+    [Selector("ps", "setPs:")]
+    public float Ps { get; set; }
+    [Selector("initWithDevice:kernelWidth:kernelHeight:")]
+    public Self InitWithDeviceKernelWidthKernelHeight(MTLDevice device, NSUInteger kernelWidth, NSUInteger kernelHeight);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNCrossChannelNormalization : MPSCNNKernel
 {
-    [Selector("alpha", "setAlpha:")] public float Alpha { get; set; }
-    [Selector("beta", "setBeta:")] public float Beta { get; set; }
-    [Selector("delta", "setDelta:")] public float Delta { get; set; }
-    [Selector("kernelSize")] public NSUInteger KernelSize { get; }
-    [Selector("initWithDevice:kernelSize:")] public Self InitWithDeviceKernelSize(MTLDevice device, NSUInteger kernelSize);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("alpha", "setAlpha:")]
+    public float Alpha { get; set; }
+    [Selector("beta", "setBeta:")]
+    public float Beta { get; set; }
+    [Selector("delta", "setDelta:")]
+    public float Delta { get; set; }
+    [Selector("kernelSize")]
+    public NSUInteger KernelSize { get; }
+    [Selector("initWithDevice:kernelSize:")]
+    public Self InitWithDeviceKernelSize(MTLDevice device, NSUInteger kernelSize);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 public extern objc class MPSCNNCrossChannelNormalizationGradient : MPSCNNGradientKernel
 {
-    [Selector("alpha", "setAlpha:")] public float Alpha { get; set; }
-    [Selector("beta", "setBeta:")] public float Beta { get; set; }
-    [Selector("delta", "setDelta:")] public float Delta { get; set; }
-    [Selector("kernelSize")] public NSUInteger KernelSize { get; }
-    [Selector("initWithDevice:kernelSize:")] public Self InitWithDeviceKernelSize(MTLDevice device, NSUInteger kernelSize);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("alpha", "setAlpha:")]
+    public float Alpha { get; set; }
+    [Selector("beta", "setBeta:")]
+    public float Beta { get; set; }
+    [Selector("delta", "setDelta:")]
+    public float Delta { get; set; }
+    [Selector("kernelSize")]
+    public NSUInteger KernelSize { get; }
+    [Selector("initWithDevice:kernelSize:")]
+    public Self InitWithDeviceKernelSize(MTLDevice device, NSUInteger kernelSize);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
 }
 
 #endif

@@ -33,14 +33,21 @@ import Standard.ObjC;
 
 public extern objc class SFTranscriptionSegment : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("substring")] public NSString Substring { get; }
-    [Selector("substringRange")] public NSRange SubstringRange { get; }
-    [Selector("timestamp")] public NSTimeInterval Timestamp { get; }
-    [Selector("duration")] public NSTimeInterval Duration { get; }
-    [Selector("confidence")] public float Confidence { get; }
-    [Selector("alternativeSubstrings")] public NSArray AlternativeSubstrings { get; }
+    [Selector("substring")]
+    public NSString Substring { get; }
+    [Selector("substringRange")]
+    public NSRange SubstringRange { get; }
+    [Selector("timestamp")]
+    public NSTimeInterval Timestamp { get; }
+    [Selector("duration")]
+    public NSTimeInterval Duration { get; }
+    [Selector("confidence")]
+    public float Confidence { get; }
+    [Selector("alternativeSubstrings")]
+    public NSArray AlternativeSubstrings { get; }
     /// Deprecated in macOS 11.3.
-    [Selector("voiceAnalytics")] public SFVoiceAnalytics? VoiceAnalytics { get; }
+    [Selector("voiceAnalytics")]
+    public SFVoiceAnalytics? VoiceAnalytics { get; }
 }
 
 #endif

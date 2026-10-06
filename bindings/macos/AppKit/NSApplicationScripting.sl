@@ -34,15 +34,18 @@ import Standard.ObjC;
 /// NSScripting, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("orderedDocuments")] public NSArray OrderedDocuments { get; }
-    [Selector("orderedWindows")] public NSArray OrderedWindows { get; }
+    [Selector("orderedDocuments")]
+    public NSArray OrderedDocuments { get; }
+    [Selector("orderedWindows")]
+    public NSArray OrderedWindows { get; }
 }
 
 /// NSApplicationScriptingDelegation, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 11.0.
-    [Selector("application:delegateHandlesKey:")] public bool ApplicationDelegateHandlesKey(NSApplication sender, NSString key);
+    [Selector("application:delegateHandlesKey:")]
+    public bool ApplicationDelegateHandlesKey(NSApplication sender, NSString key);
 }
 
 #endif

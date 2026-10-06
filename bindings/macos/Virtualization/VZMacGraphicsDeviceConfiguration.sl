@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class VZMacGraphicsDeviceConfiguration : VZGraphicsDeviceConfiguration
 {
-    [Selector("displays", "setDisplays:")] public NSArray Displays { get; set; }
-    [Selector("init")] public Self Init();
+    [Selector("displays", "setDisplays:")]
+    public NSArray Displays { get; set; }
+    [Selector("init")]
+    public Self Init();
 }
 
 #endif

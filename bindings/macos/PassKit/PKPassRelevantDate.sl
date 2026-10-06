@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class PKPassRelevantDate : NSObject
 {
-    [Selector("interval")] public NSDateInterval? Interval { get; }
-    [Selector("date")] public NSDate? Date { get; }
+    [Selector("interval")]
+    public NSDateInterval? Interval { get; }
+    [Selector("date")]
+    public NSDate? Date { get; }
 }
 
 public extern objc class PKPassRelevantDate { }

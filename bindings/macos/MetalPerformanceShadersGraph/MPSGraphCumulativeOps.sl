@@ -34,22 +34,38 @@ import Standard.ObjC;
 /// MPSGraphCumulativeOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("cumulativeSumWithTensor:axis:exclusive:reverse:name:")] public MPSGraphTensor CumulativeSumWithTensorAxisExclusiveReverseName(MPSGraphTensor tensor, NSInteger axis, bool exclusive, bool reverse, NSString? name);
-    [Selector("cumulativeSumWithTensor:axisTensor:exclusive:reverse:name:")] public MPSGraphTensor CumulativeSumWithTensorAxisTensorExclusiveReverseName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, bool exclusive, bool reverse, NSString? name);
-    [Selector("cumulativeSumWithTensor:axis:name:")] public MPSGraphTensor CumulativeSumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("cumulativeSumWithTensor:axisTensor:name:")] public MPSGraphTensor CumulativeSumWithTensorAxisTensorName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, NSString? name);
-    [Selector("cumulativeProductWithTensor:axis:exclusive:reverse:name:")] public MPSGraphTensor CumulativeProductWithTensorAxisExclusiveReverseName(MPSGraphTensor tensor, NSInteger axis, bool exclusive, bool reverse, NSString? name);
-    [Selector("cumulativeProductWithTensor:axisTensor:exclusive:reverse:name:")] public MPSGraphTensor CumulativeProductWithTensorAxisTensorExclusiveReverseName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, bool exclusive, bool reverse, NSString? name);
-    [Selector("cumulativeProductWithTensor:axis:name:")] public MPSGraphTensor CumulativeProductWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("cumulativeProductWithTensor:axisTensor:name:")] public MPSGraphTensor CumulativeProductWithTensorAxisTensorName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, NSString? name);
-    [Selector("cumulativeMinimumWithTensor:axis:exclusive:reverse:name:")] public MPSGraphTensor CumulativeMinimumWithTensorAxisExclusiveReverseName(MPSGraphTensor tensor, NSInteger axis, bool exclusive, bool reverse, NSString? name);
-    [Selector("cumulativeMinimumWithTensor:axisTensor:exclusive:reverse:name:")] public MPSGraphTensor CumulativeMinimumWithTensorAxisTensorExclusiveReverseName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, bool exclusive, bool reverse, NSString? name);
-    [Selector("cumulativeMinimumWithTensor:axis:name:")] public MPSGraphTensor CumulativeMinimumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("cumulativeMinimumWithTensor:axisTensor:name:")] public MPSGraphTensor CumulativeMinimumWithTensorAxisTensorName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, NSString? name);
-    [Selector("cumulativeMaximumWithTensor:axis:exclusive:reverse:name:")] public MPSGraphTensor CumulativeMaximumWithTensorAxisExclusiveReverseName(MPSGraphTensor tensor, NSInteger axis, bool exclusive, bool reverse, NSString? name);
-    [Selector("cumulativeMaximumWithTensor:axisTensor:exclusive:reverse:name:")] public MPSGraphTensor CumulativeMaximumWithTensorAxisTensorExclusiveReverseName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, bool exclusive, bool reverse, NSString? name);
-    [Selector("cumulativeMaximumWithTensor:axis:name:")] public MPSGraphTensor CumulativeMaximumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("cumulativeMaximumWithTensor:axisTensor:name:")] public MPSGraphTensor CumulativeMaximumWithTensorAxisTensorName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, NSString? name);
+    [Selector("cumulativeSumWithTensor:axis:exclusive:reverse:name:")]
+    public MPSGraphTensor CumulativeSumWithTensorAxisExclusiveReverseName(MPSGraphTensor tensor, NSInteger axis, bool exclusive, bool reverse, NSString? name);
+    [Selector("cumulativeSumWithTensor:axisTensor:exclusive:reverse:name:")]
+    public MPSGraphTensor CumulativeSumWithTensorAxisTensorExclusiveReverseName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, bool exclusive, bool reverse, NSString? name);
+    [Selector("cumulativeSumWithTensor:axis:name:")]
+    public MPSGraphTensor CumulativeSumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("cumulativeSumWithTensor:axisTensor:name:")]
+    public MPSGraphTensor CumulativeSumWithTensorAxisTensorName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, NSString? name);
+    [Selector("cumulativeProductWithTensor:axis:exclusive:reverse:name:")]
+    public MPSGraphTensor CumulativeProductWithTensorAxisExclusiveReverseName(MPSGraphTensor tensor, NSInteger axis, bool exclusive, bool reverse, NSString? name);
+    [Selector("cumulativeProductWithTensor:axisTensor:exclusive:reverse:name:")]
+    public MPSGraphTensor CumulativeProductWithTensorAxisTensorExclusiveReverseName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, bool exclusive, bool reverse, NSString? name);
+    [Selector("cumulativeProductWithTensor:axis:name:")]
+    public MPSGraphTensor CumulativeProductWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("cumulativeProductWithTensor:axisTensor:name:")]
+    public MPSGraphTensor CumulativeProductWithTensorAxisTensorName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, NSString? name);
+    [Selector("cumulativeMinimumWithTensor:axis:exclusive:reverse:name:")]
+    public MPSGraphTensor CumulativeMinimumWithTensorAxisExclusiveReverseName(MPSGraphTensor tensor, NSInteger axis, bool exclusive, bool reverse, NSString? name);
+    [Selector("cumulativeMinimumWithTensor:axisTensor:exclusive:reverse:name:")]
+    public MPSGraphTensor CumulativeMinimumWithTensorAxisTensorExclusiveReverseName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, bool exclusive, bool reverse, NSString? name);
+    [Selector("cumulativeMinimumWithTensor:axis:name:")]
+    public MPSGraphTensor CumulativeMinimumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("cumulativeMinimumWithTensor:axisTensor:name:")]
+    public MPSGraphTensor CumulativeMinimumWithTensorAxisTensorName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, NSString? name);
+    [Selector("cumulativeMaximumWithTensor:axis:exclusive:reverse:name:")]
+    public MPSGraphTensor CumulativeMaximumWithTensorAxisExclusiveReverseName(MPSGraphTensor tensor, NSInteger axis, bool exclusive, bool reverse, NSString? name);
+    [Selector("cumulativeMaximumWithTensor:axisTensor:exclusive:reverse:name:")]
+    public MPSGraphTensor CumulativeMaximumWithTensorAxisTensorExclusiveReverseName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, bool exclusive, bool reverse, NSString? name);
+    [Selector("cumulativeMaximumWithTensor:axis:name:")]
+    public MPSGraphTensor CumulativeMaximumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("cumulativeMaximumWithTensor:axisTensor:name:")]
+    public MPSGraphTensor CumulativeMaximumWithTensorAxisTensorName(MPSGraphTensor tensor, MPSGraphTensor axisTensor, NSString? name);
 }
 
 #endif

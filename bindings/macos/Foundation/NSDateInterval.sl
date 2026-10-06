@@ -32,18 +32,30 @@ import Standard.ObjC;
 
 public extern objc class NSDateInterval : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("startDate")] public NSDate StartDate { get; }
-    [Selector("endDate")] public NSDate EndDate { get; }
-    [Selector("duration")] public NSTimeInterval Duration { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
-    [Selector("initWithStartDate:duration:")] public Self InitWithStartDateDuration(NSDate startDate, NSTimeInterval duration);
-    [Selector("initWithStartDate:endDate:")] public Self InitWithStartDateEndDate(NSDate startDate, NSDate endDate);
-    [Selector("compare:")] public NSComparisonResult Compare(NSDateInterval dateInterval);
-    [Selector("isEqualToDateInterval:")] public bool IsEqualToDateInterval(NSDateInterval dateInterval);
-    [Selector("intersectsDateInterval:")] public bool IntersectsDateInterval(NSDateInterval dateInterval);
-    [Selector("intersectionWithDateInterval:")] public NSDateInterval? IntersectionWithDateInterval(NSDateInterval dateInterval);
-    [Selector("containsDate:")] public bool ContainsDate(NSDate date);
+    [Selector("startDate")]
+    public NSDate StartDate { get; }
+    [Selector("endDate")]
+    public NSDate EndDate { get; }
+    [Selector("duration")]
+    public NSTimeInterval Duration { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithCoder:")]
+    public Self InitWithCoder(NSCoder coder);
+    [Selector("initWithStartDate:duration:")]
+    public Self InitWithStartDateDuration(NSDate startDate, NSTimeInterval duration);
+    [Selector("initWithStartDate:endDate:")]
+    public Self InitWithStartDateEndDate(NSDate startDate, NSDate endDate);
+    [Selector("compare:")]
+    public NSComparisonResult Compare(NSDateInterval dateInterval);
+    [Selector("isEqualToDateInterval:")]
+    public bool IsEqualToDateInterval(NSDateInterval dateInterval);
+    [Selector("intersectsDateInterval:")]
+    public bool IntersectsDateInterval(NSDateInterval dateInterval);
+    [Selector("intersectionWithDateInterval:")]
+    public NSDateInterval? IntersectionWithDateInterval(NSDateInterval dateInterval);
+    [Selector("containsDate:")]
+    public bool ContainsDate(NSDate date);
 }
 
 #endif

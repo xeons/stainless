@@ -33,60 +33,82 @@ import Standard.ObjC;
 
 public extern objc class DDMatch : NSObject
 {
-    [Selector("matchedString")] public NSString MatchedString { get; }
+    [Selector("matchedString")]
+    public NSString MatchedString { get; }
 }
 
 public extern objc class DDMatchLink : DDMatch
 {
-    [Selector("URL")] public NSURL URL { get; }
+    [Selector("URL")]
+    public NSURL URL { get; }
 }
 
 public extern objc class DDMatchPhoneNumber : DDMatch
 {
-    [Selector("phoneNumber")] public NSString PhoneNumber { get; }
-    [Selector("label")] public NSString? Label { get; }
+    [Selector("phoneNumber")]
+    public NSString PhoneNumber { get; }
+    [Selector("label")]
+    public NSString? Label { get; }
 }
 
 public extern objc class DDMatchEmailAddress : DDMatch
 {
-    [Selector("emailAddress")] public NSString EmailAddress { get; }
-    [Selector("label")] public NSString? Label { get; }
+    [Selector("emailAddress")]
+    public NSString EmailAddress { get; }
+    [Selector("label")]
+    public NSString? Label { get; }
 }
 
 public extern objc class DDMatchPostalAddress : DDMatch
 {
-    [Selector("street")] public NSString? Street { get; }
-    [Selector("city")] public NSString? City { get; }
-    [Selector("state")] public NSString? State { get; }
-    [Selector("postalCode")] public NSString? PostalCode { get; }
-    [Selector("country")] public NSString? Country { get; }
+    [Selector("street")]
+    public NSString? Street { get; }
+    [Selector("city")]
+    public NSString? City { get; }
+    [Selector("state")]
+    public NSString? State { get; }
+    [Selector("postalCode")]
+    public NSString? PostalCode { get; }
+    [Selector("country")]
+    public NSString? Country { get; }
 }
 
 public extern objc class DDMatchCalendarEvent : DDMatch
 {
-    [Selector("isAllDay")] public bool AllDay { get; }
-    [Selector("startDate")] public NSDate? StartDate { get; }
-    [Selector("startTimeZone")] public NSTimeZone? StartTimeZone { get; }
-    [Selector("endDate")] public NSDate? EndDate { get; }
-    [Selector("endTimeZone")] public NSTimeZone? EndTimeZone { get; }
+    [Selector("isAllDay")]
+    public bool AllDay { get; }
+    [Selector("startDate")]
+    public NSDate? StartDate { get; }
+    [Selector("startTimeZone")]
+    public NSTimeZone? StartTimeZone { get; }
+    [Selector("endDate")]
+    public NSDate? EndDate { get; }
+    [Selector("endTimeZone")]
+    public NSTimeZone? EndTimeZone { get; }
 }
 
 public extern objc class DDMatchShipmentTrackingNumber : DDMatch
 {
-    [Selector("carrier")] public NSString Carrier { get; }
-    [Selector("trackingNumber")] public NSString TrackingNumber { get; }
+    [Selector("carrier")]
+    public NSString Carrier { get; }
+    [Selector("trackingNumber")]
+    public NSString TrackingNumber { get; }
 }
 
 public extern objc class DDMatchFlightNumber : DDMatch
 {
-    [Selector("airline")] public NSString Airline { get; }
-    [Selector("flightNumber")] public NSString FlightNumber { get; }
+    [Selector("airline")]
+    public NSString Airline { get; }
+    [Selector("flightNumber")]
+    public NSString FlightNumber { get; }
 }
 
 public extern objc class DDMatchMoneyAmount : DDMatch
 {
-    [Selector("currency")] public NSString Currency { get; }
-    [Selector("amount")] public double Amount { get; }
+    [Selector("currency")]
+    public NSString Currency { get; }
+    [Selector("amount")]
+    public double Amount { get; }
 }
 
 #endif

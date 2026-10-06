@@ -45,8 +45,10 @@ public objc closure void ASAuthorizationAppleIDProviderGetCredentialStateForUser
 
 public extern objc class ASAuthorizationAppleIDProvider : NSObject, ASAuthorizationProvider
 {
-    [Selector("createRequest")] public ASAuthorizationAppleIDRequest CreateRequest();
-    [Selector("getCredentialStateForUserID:completion:")] public void GetCredentialStateForUserIDCompletion(NSString userID, ASAuthorizationAppleIDProviderGetCredentialStateForUserIDCompletionCompletionBlock completion);
+    [Selector("createRequest")]
+    public ASAuthorizationAppleIDRequest CreateRequest();
+    [Selector("getCredentialStateForUserID:completion:")]
+    public void GetCredentialStateForUserIDCompletion(NSString userID, ASAuthorizationAppleIDProviderGetCredentialStateForUserIDCompletionCompletionBlock completion);
 }
 
 #endif

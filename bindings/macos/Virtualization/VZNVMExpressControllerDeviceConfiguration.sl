@@ -31,7 +31,8 @@ import Standard.ObjC;
 
 public extern objc class VZNVMExpressControllerDeviceConfiguration : VZStorageDeviceConfiguration
 {
-    [Selector("initWithAttachment:")] public Self InitWithAttachment(VZStorageDeviceAttachment attachment);
+    [Selector("initWithAttachment:")]
+    public Self InitWithAttachment(VZStorageDeviceAttachment attachment);
 }
 
 #endif

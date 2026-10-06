@@ -33,9 +33,12 @@ import Standard.ObjC;
 #if ARM64
 public extern objc class VZMacOSConfigurationRequirements : NSObject
 {
-    [Selector("hardwareModel")] public VZMacHardwareModel HardwareModel { get; }
-    [Selector("minimumSupportedCPUCount")] public NSUInteger MinimumSupportedCPUCount { get; }
-    [Selector("minimumSupportedMemorySize")] public ulong MinimumSupportedMemorySize { get; }
+    [Selector("hardwareModel")]
+    public VZMacHardwareModel HardwareModel { get; }
+    [Selector("minimumSupportedCPUCount")]
+    public NSUInteger MinimumSupportedCPUCount { get; }
+    [Selector("minimumSupportedMemorySize")]
+    public ulong MinimumSupportedMemorySize { get; }
 }
 #endif
 

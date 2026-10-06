@@ -34,62 +34,107 @@ import Standard.ObjC;
 
 public extern objc class AVCaptureFileOutput : AVCaptureOutput
 {
-    [Selector("delegate", "setDelegate:")] public AVCaptureFileOutputDelegate? Delegate { get; set; }
-    [Selector("outputFileURL")] public NSURL? OutputFileURL { get; }
-    [Selector("isRecording")] public bool Recording { get; }
-    [Selector("isRecordingPaused")] public bool RecordingPaused { get; }
-    [Selector("recordedDuration")] public CMTime RecordedDuration { get; }
-    [Selector("recordedFileSize")] public long RecordedFileSize { get; }
-    [Selector("maxRecordedDuration", "setMaxRecordedDuration:")] public CMTime MaxRecordedDuration { get; set; }
-    [Selector("maxRecordedFileSize", "setMaxRecordedFileSize:")] public long MaxRecordedFileSize { get; set; }
-    [Selector("minFreeDiskSpaceLimit", "setMinFreeDiskSpaceLimit:")] public long MinFreeDiskSpaceLimit { get; set; }
-    [Selector("startRecordingToOutputFileURL:recordingDelegate:")] public void StartRecordingToOutputFileURLRecordingDelegate(NSURL outputFileURL, AVCaptureFileOutputRecordingDelegate @delegate);
-    [Selector("stopRecording")] public void StopRecording();
-    [Selector("pauseRecording")] public void PauseRecording();
-    [Selector("resumeRecording")] public void ResumeRecording();
+    [Selector("delegate", "setDelegate:")]
+    public AVCaptureFileOutputDelegate? Delegate { get; set; }
+    [Selector("outputFileURL")]
+    public NSURL? OutputFileURL { get; }
+    [Selector("isRecording")]
+    public bool Recording { get; }
+    [Selector("isRecordingPaused")]
+    public bool RecordingPaused { get; }
+    [Selector("recordedDuration")]
+    public CMTime RecordedDuration { get; }
+    [Selector("recordedFileSize")]
+    public long RecordedFileSize { get; }
+    [Selector("maxRecordedDuration", "setMaxRecordedDuration:")]
+    public CMTime MaxRecordedDuration { get; set; }
+    [Selector("maxRecordedFileSize", "setMaxRecordedFileSize:")]
+    public long MaxRecordedFileSize { get; set; }
+    [Selector("minFreeDiskSpaceLimit", "setMinFreeDiskSpaceLimit:")]
+    public long MinFreeDiskSpaceLimit { get; set; }
+    [Selector("startRecordingToOutputFileURL:recordingDelegate:")]
+    public void StartRecordingToOutputFileURLRecordingDelegate(NSURL outputFileURL, AVCaptureFileOutputRecordingDelegate @delegate);
+    [Selector("stopRecording")]
+    public void StopRecording();
+    [Selector("pauseRecording")]
+    public void PauseRecording();
+    [Selector("resumeRecording")]
+    public void ResumeRecording();
 }
 
 public objc interface AVCaptureFileOutputRecordingDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("captureOutput:didStartRecordingToOutputFileAtURL:fromConnections:")] void CaptureOutputDidStartRecordingToOutputFileAtURLFromConnections(AVCaptureFileOutput output, NSURL fileURL, NSArray connections);
+    [Optional]
+    [Selector("captureOutput:didStartRecordingToOutputFileAtURL:fromConnections:")]
+    void CaptureOutputDidStartRecordingToOutputFileAtURLFromConnections(AVCaptureFileOutput output, NSURL fileURL, NSArray connections);
     /// macOS 15.2 and later.
-    [Optional] [Selector("captureOutput:didStartRecordingToOutputFileAtURL:startPTS:fromConnections:")] void CaptureOutputDidStartRecordingToOutputFileAtURLStartPTSFromConnections(AVCaptureFileOutput output, NSURL fileURL, CMTime startPTS, NSArray connections);
-    [Optional] [Selector("captureOutput:didPauseRecordingToOutputFileAtURL:fromConnections:")] void CaptureOutputDidPauseRecordingToOutputFileAtURLFromConnections(AVCaptureFileOutput output, NSURL fileURL, NSArray connections);
-    [Optional] [Selector("captureOutput:didResumeRecordingToOutputFileAtURL:fromConnections:")] void CaptureOutputDidResumeRecordingToOutputFileAtURLFromConnections(AVCaptureFileOutput output, NSURL fileURL, NSArray connections);
-    [Optional] [Selector("captureOutput:willFinishRecordingToOutputFileAtURL:fromConnections:error:")] void CaptureOutputWillFinishRecordingToOutputFileAtURLFromConnectionsError(AVCaptureFileOutput output, NSURL fileURL, NSArray connections, NSError? error);
-    [Selector("captureOutput:didFinishRecordingToOutputFileAtURL:fromConnections:error:")] void CaptureOutputDidFinishRecordingToOutputFileAtURLFromConnectionsError(AVCaptureFileOutput output, NSURL outputFileURL, NSArray connections, NSError? error);
+    [Optional]
+    [Selector("captureOutput:didStartRecordingToOutputFileAtURL:startPTS:fromConnections:")]
+    void CaptureOutputDidStartRecordingToOutputFileAtURLStartPTSFromConnections(AVCaptureFileOutput output, NSURL fileURL, CMTime startPTS, NSArray connections);
+    [Optional]
+    [Selector("captureOutput:didPauseRecordingToOutputFileAtURL:fromConnections:")]
+    void CaptureOutputDidPauseRecordingToOutputFileAtURLFromConnections(AVCaptureFileOutput output, NSURL fileURL, NSArray connections);
+    [Optional]
+    [Selector("captureOutput:didResumeRecordingToOutputFileAtURL:fromConnections:")]
+    void CaptureOutputDidResumeRecordingToOutputFileAtURLFromConnections(AVCaptureFileOutput output, NSURL fileURL, NSArray connections);
+    [Optional]
+    [Selector("captureOutput:willFinishRecordingToOutputFileAtURL:fromConnections:error:")]
+    void CaptureOutputWillFinishRecordingToOutputFileAtURLFromConnectionsError(AVCaptureFileOutput output, NSURL fileURL, NSArray connections, NSError? error);
+    [Selector("captureOutput:didFinishRecordingToOutputFileAtURL:fromConnections:error:")]
+    void CaptureOutputDidFinishRecordingToOutputFileAtURLFromConnectionsError(AVCaptureFileOutput output, NSURL outputFileURL, NSArray connections, NSError? error);
 }
 
 public objc interface AVCaptureFileOutputDelegate : NSObjectProtocol
 {
-    [Selector("captureOutputShouldProvideSampleAccurateRecordingStart:")] bool CaptureOutputShouldProvideSampleAccurateRecordingStart(AVCaptureOutput output);
-    [Optional] [Selector("captureOutput:didOutputSampleBuffer:fromConnection:")] void CaptureOutputDidOutputSampleBufferFromConnection(AVCaptureFileOutput output, CMSampleBufferRef sampleBuffer, AVCaptureConnection connection);
+    [Selector("captureOutputShouldProvideSampleAccurateRecordingStart:")]
+    bool CaptureOutputShouldProvideSampleAccurateRecordingStart(AVCaptureOutput output);
+    [Optional]
+    [Selector("captureOutput:didOutputSampleBuffer:fromConnection:")]
+    void CaptureOutputDidOutputSampleBufferFromConnection(AVCaptureFileOutput output, CMSampleBufferRef sampleBuffer, AVCaptureConnection connection);
 }
 
 public extern objc class AVCaptureMovieFileOutput : AVCaptureFileOutput
 {
-    [Selector("movieFragmentInterval", "setMovieFragmentInterval:")] public CMTime MovieFragmentInterval { get; set; }
-    [Selector("metadata", "setMetadata:")] public NSArray? Metadata { get; set; }
-    [Selector("isPrimaryConstituentDeviceSwitchingBehaviorForRecordingEnabled", "setPrimaryConstituentDeviceSwitchingBehaviorForRecordingEnabled:")] public bool PrimaryConstituentDeviceSwitchingBehaviorForRecordingEnabled { get; set; }
-    [Selector("primaryConstituentDeviceSwitchingBehaviorForRecording")] public AVCapturePrimaryConstituentDeviceSwitchingBehavior PrimaryConstituentDeviceSwitchingBehaviorForRecording { get; }
-    [Selector("primaryConstituentDeviceRestrictedSwitchingBehaviorConditionsForRecording")] public AVCapturePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions PrimaryConstituentDeviceRestrictedSwitchingBehaviorConditionsForRecording { get; }
-    [Selector("isSpatialVideoCaptureSupported")] public bool SpatialVideoCaptureSupported { get; }
-    [Selector("isSpatialVideoCaptureEnabled", "setSpatialVideoCaptureEnabled:")] public bool SpatialVideoCaptureEnabled { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("new")] public static Self New();
-    [Selector("outputSettingsForConnection:")] public NSDictionary OutputSettingsForConnection(AVCaptureConnection connection);
-    [Selector("setOutputSettings:forConnection:")] public void SetOutputSettingsForConnection(NSDictionary? outputSettings, AVCaptureConnection connection);
-    [Selector("setPrimaryConstituentDeviceSwitchingBehaviorForRecording:restrictedSwitchingBehaviorConditions:")] public void SetPrimaryConstituentDeviceSwitchingBehaviorForRecordingRestrictedSwitchingBehaviorConditions(AVCapturePrimaryConstituentDeviceSwitchingBehavior switchingBehavior, AVCapturePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions restrictedSwitchingBehaviorConditions);
+    [Selector("movieFragmentInterval", "setMovieFragmentInterval:")]
+    public CMTime MovieFragmentInterval { get; set; }
+    [Selector("metadata", "setMetadata:")]
+    public NSArray? Metadata { get; set; }
+    [Selector("isPrimaryConstituentDeviceSwitchingBehaviorForRecordingEnabled", "setPrimaryConstituentDeviceSwitchingBehaviorForRecordingEnabled:")]
+    public bool PrimaryConstituentDeviceSwitchingBehaviorForRecordingEnabled { get; set; }
+    [Selector("primaryConstituentDeviceSwitchingBehaviorForRecording")]
+    public AVCapturePrimaryConstituentDeviceSwitchingBehavior PrimaryConstituentDeviceSwitchingBehaviorForRecording { get; }
+    [Selector("primaryConstituentDeviceRestrictedSwitchingBehaviorConditionsForRecording")]
+    public AVCapturePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions PrimaryConstituentDeviceRestrictedSwitchingBehaviorConditionsForRecording { get; }
+    [Selector("isSpatialVideoCaptureSupported")]
+    public bool SpatialVideoCaptureSupported { get; }
+    [Selector("isSpatialVideoCaptureEnabled", "setSpatialVideoCaptureEnabled:")]
+    public bool SpatialVideoCaptureEnabled { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("new")]
+    public static Self New();
+    [Selector("outputSettingsForConnection:")]
+    public NSDictionary OutputSettingsForConnection(AVCaptureConnection connection);
+    [Selector("setOutputSettings:forConnection:")]
+    public void SetOutputSettingsForConnection(NSDictionary? outputSettings, AVCaptureConnection connection);
+    [Selector("setPrimaryConstituentDeviceSwitchingBehaviorForRecording:restrictedSwitchingBehaviorConditions:")]
+    public void SetPrimaryConstituentDeviceSwitchingBehaviorForRecordingRestrictedSwitchingBehaviorConditions(AVCapturePrimaryConstituentDeviceSwitchingBehavior switchingBehavior, AVCapturePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions restrictedSwitchingBehaviorConditions);
 }
 
 public extern objc class AVCaptureAudioFileOutput : AVCaptureFileOutput
 {
-    [Selector("metadata", "setMetadata:")] public NSArray Metadata { get; set; }
-    [Selector("audioSettings", "setAudioSettings:")] public NSDictionary? AudioSettings { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("new")] public static Self New();
-    [Selector("availableOutputFileTypes")] public static NSArray AvailableOutputFileTypes();
-    [Selector("startRecordingToOutputFileURL:outputFileType:recordingDelegate:")] public void StartRecordingToOutputFileURLOutputFileTypeRecordingDelegate(NSURL outputFileURL, AVFileType fileType, AVCaptureFileOutputRecordingDelegate @delegate);
+    [Selector("metadata", "setMetadata:")]
+    public NSArray Metadata { get; set; }
+    [Selector("audioSettings", "setAudioSettings:")]
+    public NSDictionary? AudioSettings { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("new")]
+    public static Self New();
+    [Selector("availableOutputFileTypes")]
+    public static NSArray AvailableOutputFileTypes();
+    [Selector("startRecordingToOutputFileURL:outputFileType:recordingDelegate:")]
+    public void StartRecordingToOutputFileURLOutputFileTypeRecordingDelegate(NSURL outputFileURL, AVFileType fileType, AVCaptureFileOutputRecordingDelegate @delegate);
 }
 
 #endif

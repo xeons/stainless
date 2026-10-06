@@ -35,10 +35,14 @@ public using CBL2CAPPSM = ushort;
 
 public extern objc class CBL2CAPChannel : NSObject
 {
-    [Selector("peer")] public CBPeer? Peer { get; }
-    [Selector("inputStream")] public NSInputStream? InputStream { get; }
-    [Selector("outputStream")] public NSOutputStream? OutputStream { get; }
-    [Selector("PSM")] public CBL2CAPPSM PSM { get; }
+    [Selector("peer")]
+    public CBPeer? Peer { get; }
+    [Selector("inputStream")]
+    public NSInputStream? InputStream { get; }
+    [Selector("outputStream")]
+    public NSOutputStream? OutputStream { get; }
+    [Selector("PSM")]
+    public CBL2CAPPSM PSM { get; }
 }
 
 #endif

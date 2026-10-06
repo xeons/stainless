@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public objc interface ASAuthorizationWebBrowserSecurityKeyPublicKeyCredentialProvider
 {
-    [Selector("createCredentialRegistrationRequestWithClientData:displayName:name:userID:")] ASAuthorizationSecurityKeyPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithClientDataDisplayNameNameUserID(ASPublicKeyCredentialClientData clientData, NSString displayName, NSString name, NSData userID);
-    [Selector("createCredentialAssertionRequestWithClientData:")] ASAuthorizationSecurityKeyPublicKeyCredentialAssertionRequest CreateCredentialAssertionRequestWithClientData(ASPublicKeyCredentialClientData clientData);
+    [Selector("createCredentialRegistrationRequestWithClientData:displayName:name:userID:")]
+    ASAuthorizationSecurityKeyPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithClientDataDisplayNameNameUserID(ASPublicKeyCredentialClientData clientData, NSString displayName, NSString name, NSData userID);
+    [Selector("createCredentialAssertionRequestWithClientData:")]
+    ASAuthorizationSecurityKeyPublicKeyCredentialAssertionRequest CreateCredentialAssertionRequestWithClientData(ASPublicKeyCredentialClientData clientData);
 }
 
 #endif

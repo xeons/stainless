@@ -31,8 +31,10 @@ import Standard.ObjC;
 
 public extern objc class MKMultiPolygonRenderer : MKOverlayPathRenderer
 {
-    [Selector("multiPolygon")] public MKMultiPolygon MultiPolygon { get; }
-    [Selector("initWithMultiPolygon:")] public Self InitWithMultiPolygon(MKMultiPolygon multiPolygon);
+    [Selector("multiPolygon")]
+    public MKMultiPolygon MultiPolygon { get; }
+    [Selector("initWithMultiPolygon:")]
+    public Self InitWithMultiPolygon(MKMultiPolygon multiPolygon);
 }
 
 #endif

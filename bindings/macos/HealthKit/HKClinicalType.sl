@@ -53,7 +53,8 @@ public extern "C" HKClinicalTypeIdentifier HKClinicalTypeIdentifierCoverageRecor
 /// ClinicalType, a category of HKObjectType.
 public extern objc class HKObjectType
 {
-    [Selector("clinicalTypeForIdentifier:")] public static HKClinicalType? ClinicalTypeForIdentifier(HKClinicalTypeIdentifier identifier);
+    [Selector("clinicalTypeForIdentifier:")]
+    public static HKClinicalType? ClinicalTypeForIdentifier(HKClinicalTypeIdentifier identifier);
 }
 
 public extern objc class HKClinicalType : HKSampleType { }

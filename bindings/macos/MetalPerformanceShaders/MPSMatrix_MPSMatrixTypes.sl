@@ -33,19 +33,28 @@ import Standard.ObjC;
 
 public extern objc class MPSMatrixUnaryKernel : MPSKernel
 {
-    [Selector("sourceMatrixOrigin", "setSourceMatrixOrigin:")] public MTLOrigin SourceMatrixOrigin { get; set; }
-    [Selector("resultMatrixOrigin", "setResultMatrixOrigin:")] public MTLOrigin ResultMatrixOrigin { get; set; }
-    [Selector("batchStart", "setBatchStart:")] public NSUInteger BatchStart { get; set; }
-    [Selector("batchSize", "setBatchSize:")] public NSUInteger BatchSize { get; set; }
+    [Selector("sourceMatrixOrigin", "setSourceMatrixOrigin:")]
+    public MTLOrigin SourceMatrixOrigin { get; set; }
+    [Selector("resultMatrixOrigin", "setResultMatrixOrigin:")]
+    public MTLOrigin ResultMatrixOrigin { get; set; }
+    [Selector("batchStart", "setBatchStart:")]
+    public NSUInteger BatchStart { get; set; }
+    [Selector("batchSize", "setBatchSize:")]
+    public NSUInteger BatchSize { get; set; }
 }
 
 public extern objc class MPSMatrixBinaryKernel : MPSKernel
 {
-    [Selector("primarySourceMatrixOrigin", "setPrimarySourceMatrixOrigin:")] public MTLOrigin PrimarySourceMatrixOrigin { get; set; }
-    [Selector("secondarySourceMatrixOrigin", "setSecondarySourceMatrixOrigin:")] public MTLOrigin SecondarySourceMatrixOrigin { get; set; }
-    [Selector("resultMatrixOrigin", "setResultMatrixOrigin:")] public MTLOrigin ResultMatrixOrigin { get; set; }
-    [Selector("batchStart", "setBatchStart:")] public NSUInteger BatchStart { get; set; }
-    [Selector("batchSize", "setBatchSize:")] public NSUInteger BatchSize { get; set; }
+    [Selector("primarySourceMatrixOrigin", "setPrimarySourceMatrixOrigin:")]
+    public MTLOrigin PrimarySourceMatrixOrigin { get; set; }
+    [Selector("secondarySourceMatrixOrigin", "setSecondarySourceMatrixOrigin:")]
+    public MTLOrigin SecondarySourceMatrixOrigin { get; set; }
+    [Selector("resultMatrixOrigin", "setResultMatrixOrigin:")]
+    public MTLOrigin ResultMatrixOrigin { get; set; }
+    [Selector("batchStart", "setBatchStart:")]
+    public NSUInteger BatchStart { get; set; }
+    [Selector("batchSize", "setBatchSize:")]
+    public NSUInteger BatchSize { get; set; }
 }
 
 #endif

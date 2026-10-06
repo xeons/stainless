@@ -47,9 +47,12 @@ public enum ITLibArtworkFormat : ulong
 
 public extern objc class ITLibArtwork : NSObject
 {
-    [Selector("image")] public NSImage? Image { get; }
-    [Selector("imageData")] public NSData? ImageData { get; }
-    [Selector("imageDataFormat")] public ITLibArtworkFormat ImageDataFormat { get; }
+    [Selector("image")]
+    public NSImage? Image { get; }
+    [Selector("imageData")]
+    public NSData? ImageData { get; }
+    [Selector("imageDataFormat")]
+    public ITLibArtworkFormat ImageDataFormat { get; }
 }
 
 #endif

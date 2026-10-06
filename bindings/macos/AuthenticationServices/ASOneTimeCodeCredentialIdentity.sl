@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class ASOneTimeCodeCredentialIdentity : NSObject, NSCopying, NSSecureCoding, ASCredentialIdentity
 {
-    [Selector("label")] public NSString Label { get; }
-    [Selector("initWithServiceIdentifier:label:recordIdentifier:")] public Self InitWithServiceIdentifierLabelRecordIdentifier(ASCredentialServiceIdentifier serviceIdentifier, NSString label, NSString? recordIdentifier);
+    [Selector("label")]
+    public NSString Label { get; }
+    [Selector("initWithServiceIdentifier:label:recordIdentifier:")]
+    public Self InitWithServiceIdentifierLabelRecordIdentifier(ASCredentialServiceIdentifier serviceIdentifier, NSString label, NSString? recordIdentifier);
 }
 
 #endif

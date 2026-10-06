@@ -32,11 +32,16 @@ import Standard.ObjC;
 
 public extern objc class HKDiscreteQuantitySample : HKQuantitySample
 {
-    [Selector("minimumQuantity")] public HKQuantity MinimumQuantity { get; }
-    [Selector("averageQuantity")] public HKQuantity AverageQuantity { get; }
-    [Selector("maximumQuantity")] public HKQuantity MaximumQuantity { get; }
-    [Selector("mostRecentQuantity")] public HKQuantity MostRecentQuantity { get; }
-    [Selector("mostRecentQuantityDateInterval")] public NSDateInterval MostRecentQuantityDateInterval { get; }
+    [Selector("minimumQuantity")]
+    public HKQuantity MinimumQuantity { get; }
+    [Selector("averageQuantity")]
+    public HKQuantity AverageQuantity { get; }
+    [Selector("maximumQuantity")]
+    public HKQuantity MaximumQuantity { get; }
+    [Selector("mostRecentQuantity")]
+    public HKQuantity MostRecentQuantity { get; }
+    [Selector("mostRecentQuantityDateInterval")]
+    public NSDateInterval MostRecentQuantityDateInterval { get; }
 }
 
 public extern "C" NSString HKPredicateKeyPathMin;

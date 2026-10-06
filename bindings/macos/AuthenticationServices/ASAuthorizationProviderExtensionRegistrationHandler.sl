@@ -88,20 +88,42 @@ public objc closure void ASAuthorizationProviderExtensionRegistrationHandlerProf
 
 public objc interface ASAuthorizationProviderExtensionRegistrationHandler : NSObjectProtocol
 {
-    [Optional] [Selector("supportedDeviceSigningAlgorithms")] NSArray? SupportedDeviceSigningAlgorithms { get; }
-    [Optional] [Selector("supportedDeviceEncryptionAlgorithms")] NSArray? SupportedDeviceEncryptionAlgorithms { get; }
-    [Optional] [Selector("supportedUserSecureEnclaveKeySigningAlgorithms")] NSArray? SupportedUserSecureEnclaveKeySigningAlgorithms { get; }
-    [Selector("beginDeviceRegistrationUsingLoginManager:options:completion:")] void BeginDeviceRegistrationUsingLoginManagerOptionsCompletion(ASAuthorizationProviderExtensionLoginManager loginManager, ASAuthorizationProviderExtensionRequestOptions options, ASAuthorizationProviderExtensionRegistrationHandlerBeginDeviceRegistrationUsingLoginManagerOptionsCompletionCompletionBlock completion);
-    [Selector("beginUserRegistrationUsingLoginManager:userName:authenticationMethod:options:completion:")] void BeginUserRegistrationUsingLoginManagerUserNameAuthenticationMethodOptionsCompletion(ASAuthorizationProviderExtensionLoginManager loginManager, NSString? userName, ASAuthorizationProviderExtensionAuthenticationMethod authenticationMethod, ASAuthorizationProviderExtensionRequestOptions options, ASAuthorizationProviderExtensionRegistrationHandlerBeginUserRegistrationUsingLoginManagerUserNameAuthenticationMethodOptionsCompletionCompletionBlock completion);
-    [Optional] [Selector("registrationDidComplete")] void RegistrationDidComplete();
-    [Optional] [Selector("registrationDidCancel")] void RegistrationDidCancel();
-    [Optional] [Selector("supportedGrantTypes")] ASAuthorizationProviderExtensionSupportedGrantTypes SupportedGrantTypes();
-    [Optional] [Selector("protocolVersion")] ASAuthorizationProviderExtensionPlatformSSOProtocolVersion ProtocolVersion();
-    [Optional] [Selector("keyWillRotateForKeyType:newKey:loginManager:completion:")] void KeyWillRotateForKeyTypeNewKeyLoginManagerCompletion(ASAuthorizationProviderExtensionKeyType keyType, SecKeyRef newKey, ASAuthorizationProviderExtensionLoginManager loginManager, ASAuthorizationProviderExtensionRegistrationHandlerKeyWillRotateForKeyTypeNewKeyLoginManagerCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("supportedDeviceSigningAlgorithms")]
+    NSArray? SupportedDeviceSigningAlgorithms { get; }
+    [Optional]
+    [Selector("supportedDeviceEncryptionAlgorithms")]
+    NSArray? SupportedDeviceEncryptionAlgorithms { get; }
+    [Optional]
+    [Selector("supportedUserSecureEnclaveKeySigningAlgorithms")]
+    NSArray? SupportedUserSecureEnclaveKeySigningAlgorithms { get; }
+    [Selector("beginDeviceRegistrationUsingLoginManager:options:completion:")]
+    void BeginDeviceRegistrationUsingLoginManagerOptionsCompletion(ASAuthorizationProviderExtensionLoginManager loginManager, ASAuthorizationProviderExtensionRequestOptions options, ASAuthorizationProviderExtensionRegistrationHandlerBeginDeviceRegistrationUsingLoginManagerOptionsCompletionCompletionBlock completion);
+    [Selector("beginUserRegistrationUsingLoginManager:userName:authenticationMethod:options:completion:")]
+    void BeginUserRegistrationUsingLoginManagerUserNameAuthenticationMethodOptionsCompletion(ASAuthorizationProviderExtensionLoginManager loginManager, NSString? userName, ASAuthorizationProviderExtensionAuthenticationMethod authenticationMethod, ASAuthorizationProviderExtensionRequestOptions options, ASAuthorizationProviderExtensionRegistrationHandlerBeginUserRegistrationUsingLoginManagerUserNameAuthenticationMethodOptionsCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("registrationDidComplete")]
+    void RegistrationDidComplete();
+    [Optional]
+    [Selector("registrationDidCancel")]
+    void RegistrationDidCancel();
+    [Optional]
+    [Selector("supportedGrantTypes")]
+    ASAuthorizationProviderExtensionSupportedGrantTypes SupportedGrantTypes();
+    [Optional]
+    [Selector("protocolVersion")]
+    ASAuthorizationProviderExtensionPlatformSSOProtocolVersion ProtocolVersion();
+    [Optional]
+    [Selector("keyWillRotateForKeyType:newKey:loginManager:completion:")]
+    void KeyWillRotateForKeyTypeNewKeyLoginManagerCompletion(ASAuthorizationProviderExtensionKeyType keyType, SecKeyRef newKey, ASAuthorizationProviderExtensionLoginManager loginManager, ASAuthorizationProviderExtensionRegistrationHandlerKeyWillRotateForKeyTypeNewKeyLoginManagerCompletionCompletionBlock completion);
     /// macOS 26.0 and later.
-    [Optional] [Selector("displayNamesForGroups:loginManager:completion:")] void DisplayNamesForGroupsLoginManagerCompletion(NSArray groups, ASAuthorizationProviderExtensionLoginManager loginManager, ASAuthorizationProviderExtensionRegistrationHandlerDisplayNamesForGroupsLoginManagerCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("displayNamesForGroups:loginManager:completion:")]
+    void DisplayNamesForGroupsLoginManagerCompletion(NSArray groups, ASAuthorizationProviderExtensionLoginManager loginManager, ASAuthorizationProviderExtensionRegistrationHandlerDisplayNamesForGroupsLoginManagerCompletionCompletionBlock completion);
     /// macOS 26.0 and later.
-    [Optional] [Selector("profilePictureForUserUsingLoginManager:completion:")] void ProfilePictureForUserUsingLoginManagerCompletion(ASAuthorizationProviderExtensionLoginManager loginManager, ASAuthorizationProviderExtensionRegistrationHandlerProfilePictureForUserUsingLoginManagerCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("profilePictureForUserUsingLoginManager:completion:")]
+    void ProfilePictureForUserUsingLoginManagerCompletion(ASAuthorizationProviderExtensionLoginManager loginManager, ASAuthorizationProviderExtensionRegistrationHandlerProfilePictureForUserUsingLoginManagerCompletionCompletionBlock completion);
 }
 
 #endif

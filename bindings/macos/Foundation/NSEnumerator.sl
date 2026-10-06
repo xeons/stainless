@@ -40,18 +40,21 @@ public struct NSFastEnumerationState
 
 public objc interface NSFastEnumeration
 {
-    [Selector("countByEnumeratingWithState:objects:count:")] NSUInteger CountByEnumeratingWithStateObjectsCount(NSFastEnumerationState* state, void** buffer, NSUInteger len);
+    [Selector("countByEnumeratingWithState:objects:count:")]
+    NSUInteger CountByEnumeratingWithStateObjectsCount(NSFastEnumerationState* state, void** buffer, NSUInteger len);
 }
 
 public extern objc class NSEnumerator : NSObject, NSFastEnumeration
 {
-    [Selector("nextObject")] public AnyObject? NextObject();
+    [Selector("nextObject")]
+    public AnyObject? NextObject();
 }
 
 /// NSExtendedEnumerator, a category of NSEnumerator.
 public extern objc class NSEnumerator
 {
-    [Selector("allObjects")] public NSArray AllObjects { get; }
+    [Selector("allObjects")]
+    public NSArray AllObjects { get; }
 }
 
 #endif

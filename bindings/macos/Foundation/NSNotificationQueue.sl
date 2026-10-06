@@ -47,11 +47,16 @@ public enum NSNotificationCoalescing : ulong
 
 public extern objc class NSNotificationQueue : NSObject
 {
-    [Selector("defaultQueue")] public static NSNotificationQueue DefaultQueue { get; }
-    [Selector("initWithNotificationCenter:")] public Self InitWithNotificationCenter(NSNotificationCenter notificationCenter);
-    [Selector("enqueueNotification:postingStyle:")] public void EnqueueNotificationPostingStyle(NSNotification notification, NSPostingStyle postingStyle);
-    [Selector("enqueueNotification:postingStyle:coalesceMask:forModes:")] public void EnqueueNotificationPostingStyleCoalesceMaskForModes(NSNotification notification, NSPostingStyle postingStyle, NSNotificationCoalescing coalesceMask, NSArray? modes);
-    [Selector("dequeueNotificationsMatching:coalesceMask:")] public void DequeueNotificationsMatchingCoalesceMask(NSNotification notification, NSUInteger coalesceMask);
+    [Selector("defaultQueue")]
+    public static NSNotificationQueue DefaultQueue { get; }
+    [Selector("initWithNotificationCenter:")]
+    public Self InitWithNotificationCenter(NSNotificationCenter notificationCenter);
+    [Selector("enqueueNotification:postingStyle:")]
+    public void EnqueueNotificationPostingStyle(NSNotification notification, NSPostingStyle postingStyle);
+    [Selector("enqueueNotification:postingStyle:coalesceMask:forModes:")]
+    public void EnqueueNotificationPostingStyleCoalesceMaskForModes(NSNotification notification, NSPostingStyle postingStyle, NSNotificationCoalescing coalesceMask, NSArray? modes);
+    [Selector("dequeueNotificationsMatching:coalesceMask:")]
+    public void DequeueNotificationsMatchingCoalesceMask(NSNotification notification, NSUInteger coalesceMask);
 }
 
 #endif

@@ -34,11 +34,16 @@ import Standard.ObjC;
 
 public extern objc class PKContact : NSObject
 {
-    [Selector("name", "setName:")] public NSPersonNameComponents? Name { get; set; }
-    [Selector("postalAddress", "setPostalAddress:")] public CNPostalAddress? PostalAddress { get; set; }
-    [Selector("phoneNumber", "setPhoneNumber:")] public CNPhoneNumber? PhoneNumber { get; set; }
-    [Selector("emailAddress", "setEmailAddress:")] public NSString? EmailAddress { get; set; }
-    [Selector("supplementarySubLocality", "setSupplementarySubLocality:")] public NSString? SupplementarySubLocality { get; set; }
+    [Selector("name", "setName:")]
+    public NSPersonNameComponents? Name { get; set; }
+    [Selector("postalAddress", "setPostalAddress:")]
+    public CNPostalAddress? PostalAddress { get; set; }
+    [Selector("phoneNumber", "setPhoneNumber:")]
+    public CNPhoneNumber? PhoneNumber { get; set; }
+    [Selector("emailAddress", "setEmailAddress:")]
+    public NSString? EmailAddress { get; set; }
+    [Selector("supplementarySubLocality", "setSupplementarySubLocality:")]
+    public NSString? SupplementarySubLocality { get; set; }
 }
 
 #endif

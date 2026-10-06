@@ -40,24 +40,42 @@ public enum NSLevelIndicatorPlaceholderVisibility : long
 
 public extern objc class NSLevelIndicator : NSControl
 {
-    [Selector("levelIndicatorStyle", "setLevelIndicatorStyle:")] public NSLevelIndicatorStyle LevelIndicatorStyle { get; set; }
-    [Selector("isEditable", "setEditable:")] public bool Editable { get; set; }
-    [Selector("minValue", "setMinValue:")] public double MinValue { get; set; }
-    [Selector("maxValue", "setMaxValue:")] public double MaxValue { get; set; }
-    [Selector("warningValue", "setWarningValue:")] public double WarningValue { get; set; }
-    [Selector("criticalValue", "setCriticalValue:")] public double CriticalValue { get; set; }
-    [Selector("tickMarkPosition", "setTickMarkPosition:")] public NSTickMarkPosition TickMarkPosition { get; set; }
-    [Selector("numberOfTickMarks", "setNumberOfTickMarks:")] public NSInteger NumberOfTickMarks { get; set; }
-    [Selector("numberOfMajorTickMarks", "setNumberOfMajorTickMarks:")] public NSInteger NumberOfMajorTickMarks { get; set; }
-    [Selector("fillColor", "setFillColor:")] public NSColor? FillColor { get; set; }
-    [Selector("warningFillColor", "setWarningFillColor:")] public NSColor? WarningFillColor { get; set; }
-    [Selector("criticalFillColor", "setCriticalFillColor:")] public NSColor? CriticalFillColor { get; set; }
-    [Selector("drawsTieredCapacityLevels", "setDrawsTieredCapacityLevels:")] public bool DrawsTieredCapacityLevels { get; set; }
-    [Selector("placeholderVisibility", "setPlaceholderVisibility:")] public NSLevelIndicatorPlaceholderVisibility PlaceholderVisibility { get; set; }
-    [Selector("ratingImage", "setRatingImage:")] public NSImage? RatingImage { get; set; }
-    [Selector("ratingPlaceholderImage", "setRatingPlaceholderImage:")] public NSImage? RatingPlaceholderImage { get; set; }
-    [Selector("tickMarkValueAtIndex:")] public double TickMarkValueAtIndex(NSInteger index);
-    [Selector("rectOfTickMarkAtIndex:")] public NSRect RectOfTickMarkAtIndex(NSInteger index);
+    [Selector("levelIndicatorStyle", "setLevelIndicatorStyle:")]
+    public NSLevelIndicatorStyle LevelIndicatorStyle { get; set; }
+    [Selector("isEditable", "setEditable:")]
+    public bool Editable { get; set; }
+    [Selector("minValue", "setMinValue:")]
+    public double MinValue { get; set; }
+    [Selector("maxValue", "setMaxValue:")]
+    public double MaxValue { get; set; }
+    [Selector("warningValue", "setWarningValue:")]
+    public double WarningValue { get; set; }
+    [Selector("criticalValue", "setCriticalValue:")]
+    public double CriticalValue { get; set; }
+    [Selector("tickMarkPosition", "setTickMarkPosition:")]
+    public NSTickMarkPosition TickMarkPosition { get; set; }
+    [Selector("numberOfTickMarks", "setNumberOfTickMarks:")]
+    public NSInteger NumberOfTickMarks { get; set; }
+    [Selector("numberOfMajorTickMarks", "setNumberOfMajorTickMarks:")]
+    public NSInteger NumberOfMajorTickMarks { get; set; }
+    [Selector("fillColor", "setFillColor:")]
+    public NSColor? FillColor { get; set; }
+    [Selector("warningFillColor", "setWarningFillColor:")]
+    public NSColor? WarningFillColor { get; set; }
+    [Selector("criticalFillColor", "setCriticalFillColor:")]
+    public NSColor? CriticalFillColor { get; set; }
+    [Selector("drawsTieredCapacityLevels", "setDrawsTieredCapacityLevels:")]
+    public bool DrawsTieredCapacityLevels { get; set; }
+    [Selector("placeholderVisibility", "setPlaceholderVisibility:")]
+    public NSLevelIndicatorPlaceholderVisibility PlaceholderVisibility { get; set; }
+    [Selector("ratingImage", "setRatingImage:")]
+    public NSImage? RatingImage { get; set; }
+    [Selector("ratingPlaceholderImage", "setRatingPlaceholderImage:")]
+    public NSImage? RatingPlaceholderImage { get; set; }
+    [Selector("tickMarkValueAtIndex:")]
+    public double TickMarkValueAtIndex(NSInteger index);
+    [Selector("rectOfTickMarkAtIndex:")]
+    public NSRect RectOfTickMarkAtIndex(NSInteger index);
 }
 
 #endif

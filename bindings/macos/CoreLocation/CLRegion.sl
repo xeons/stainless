@@ -50,16 +50,23 @@ public enum CLProximity : long
 public extern objc class CLRegion : NSObject, NSCopying, NSSecureCoding
 {
     /// Deprecated in macOS 10.10.
-    [Selector("center")] public CLLocationCoordinate2D Center { get; }
+    [Selector("center")]
+    public CLLocationCoordinate2D Center { get; }
     /// Deprecated in macOS 10.10.
-    [Selector("radius")] public CLLocationDistance Radius { get; }
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("notifyOnEntry", "setNotifyOnEntry:")] public bool NotifyOnEntry { get; set; }
-    [Selector("notifyOnExit", "setNotifyOnExit:")] public bool NotifyOnExit { get; set; }
+    [Selector("radius")]
+    public CLLocationDistance Radius { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("notifyOnEntry", "setNotifyOnEntry:")]
+    public bool NotifyOnEntry { get; set; }
+    [Selector("notifyOnExit", "setNotifyOnExit:")]
+    public bool NotifyOnExit { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("initCircularRegionWithCenter:radius:identifier:")] public Self InitCircularRegionWithCenterRadiusIdentifier(CLLocationCoordinate2D center, CLLocationDistance radius, NSString identifier);
+    [Selector("initCircularRegionWithCenter:radius:identifier:")]
+    public Self InitCircularRegionWithCenterRadiusIdentifier(CLLocationCoordinate2D center, CLLocationDistance radius, NSString identifier);
     /// Deprecated in macOS 10.10.
-    [Selector("containsCoordinate:")] public bool ContainsCoordinate(CLLocationCoordinate2D coordinate);
+    [Selector("containsCoordinate:")]
+    public bool ContainsCoordinate(CLLocationCoordinate2D coordinate);
 }
 
 #endif

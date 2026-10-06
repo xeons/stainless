@@ -44,9 +44,12 @@ public objc closure NEFilterPacketProviderVerdict NEFilterPacketHandler(NEFilter
 
 public extern objc class NEFilterPacketProvider : NEFilterProvider
 {
-    [Selector("packetHandler", "setPacketHandler:")] public NEFilterPacketHandler? PacketHandler { get; set; }
-    [Selector("delayCurrentPacket:")] public NEPacket DelayCurrentPacket(NEFilterPacketContext context);
-    [Selector("allowPacket:")] public void AllowPacket(NEPacket packet);
+    [Selector("packetHandler", "setPacketHandler:")]
+    public NEFilterPacketHandler? PacketHandler { get; set; }
+    [Selector("delayCurrentPacket:")]
+    public NEPacket DelayCurrentPacket(NEFilterPacketContext context);
+    [Selector("allowPacket:")]
+    public void AllowPacket(NEPacket packet);
 }
 
 #endif

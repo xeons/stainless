@@ -43,22 +43,38 @@ public enum SKTransitionDirection : long
 
 public extern objc class SKTransition : NSObject, NSCopying
 {
-    [Selector("pausesIncomingScene", "setPausesIncomingScene:")] public bool PausesIncomingScene { get; set; }
-    [Selector("pausesOutgoingScene", "setPausesOutgoingScene:")] public bool PausesOutgoingScene { get; set; }
-    [Selector("crossFadeWithDuration:")] public static SKTransition CrossFadeWithDuration(NSTimeInterval sec);
-    [Selector("fadeWithDuration:")] public static SKTransition FadeWithDuration(NSTimeInterval sec);
-    [Selector("fadeWithColor:duration:")] public static SKTransition FadeWithColorDuration(NSColor color, NSTimeInterval sec);
-    [Selector("flipHorizontalWithDuration:")] public static SKTransition FlipHorizontalWithDuration(NSTimeInterval sec);
-    [Selector("flipVerticalWithDuration:")] public static SKTransition FlipVerticalWithDuration(NSTimeInterval sec);
-    [Selector("revealWithDirection:duration:")] public static SKTransition RevealWithDirectionDuration(SKTransitionDirection direction, NSTimeInterval sec);
-    [Selector("moveInWithDirection:duration:")] public static SKTransition MoveInWithDirectionDuration(SKTransitionDirection direction, NSTimeInterval sec);
-    [Selector("pushWithDirection:duration:")] public static SKTransition PushWithDirectionDuration(SKTransitionDirection direction, NSTimeInterval sec);
-    [Selector("doorsOpenHorizontalWithDuration:")] public static SKTransition DoorsOpenHorizontalWithDuration(NSTimeInterval sec);
-    [Selector("doorsOpenVerticalWithDuration:")] public static SKTransition DoorsOpenVerticalWithDuration(NSTimeInterval sec);
-    [Selector("doorsCloseHorizontalWithDuration:")] public static SKTransition DoorsCloseHorizontalWithDuration(NSTimeInterval sec);
-    [Selector("doorsCloseVerticalWithDuration:")] public static SKTransition DoorsCloseVerticalWithDuration(NSTimeInterval sec);
-    [Selector("doorwayWithDuration:")] public static SKTransition DoorwayWithDuration(NSTimeInterval sec);
-    [Selector("transitionWithCIFilter:duration:")] public static SKTransition TransitionWithCIFilterDuration(CIFilter filter, NSTimeInterval sec);
+    [Selector("pausesIncomingScene", "setPausesIncomingScene:")]
+    public bool PausesIncomingScene { get; set; }
+    [Selector("pausesOutgoingScene", "setPausesOutgoingScene:")]
+    public bool PausesOutgoingScene { get; set; }
+    [Selector("crossFadeWithDuration:")]
+    public static SKTransition CrossFadeWithDuration(NSTimeInterval sec);
+    [Selector("fadeWithDuration:")]
+    public static SKTransition FadeWithDuration(NSTimeInterval sec);
+    [Selector("fadeWithColor:duration:")]
+    public static SKTransition FadeWithColorDuration(NSColor color, NSTimeInterval sec);
+    [Selector("flipHorizontalWithDuration:")]
+    public static SKTransition FlipHorizontalWithDuration(NSTimeInterval sec);
+    [Selector("flipVerticalWithDuration:")]
+    public static SKTransition FlipVerticalWithDuration(NSTimeInterval sec);
+    [Selector("revealWithDirection:duration:")]
+    public static SKTransition RevealWithDirectionDuration(SKTransitionDirection direction, NSTimeInterval sec);
+    [Selector("moveInWithDirection:duration:")]
+    public static SKTransition MoveInWithDirectionDuration(SKTransitionDirection direction, NSTimeInterval sec);
+    [Selector("pushWithDirection:duration:")]
+    public static SKTransition PushWithDirectionDuration(SKTransitionDirection direction, NSTimeInterval sec);
+    [Selector("doorsOpenHorizontalWithDuration:")]
+    public static SKTransition DoorsOpenHorizontalWithDuration(NSTimeInterval sec);
+    [Selector("doorsOpenVerticalWithDuration:")]
+    public static SKTransition DoorsOpenVerticalWithDuration(NSTimeInterval sec);
+    [Selector("doorsCloseHorizontalWithDuration:")]
+    public static SKTransition DoorsCloseHorizontalWithDuration(NSTimeInterval sec);
+    [Selector("doorsCloseVerticalWithDuration:")]
+    public static SKTransition DoorsCloseVerticalWithDuration(NSTimeInterval sec);
+    [Selector("doorwayWithDuration:")]
+    public static SKTransition DoorwayWithDuration(NSTimeInterval sec);
+    [Selector("transitionWithCIFilter:duration:")]
+    public static SKTransition TransitionWithCIFilterDuration(CIFilter filter, NSTimeInterval sec);
 }
 
 #endif

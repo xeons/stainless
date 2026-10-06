@@ -33,7 +33,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMCSSCharsetRule : DOMCSSRule
 {
-    [Selector("encoding")] public NSString? Encoding { get; }
+    [Selector("encoding")]
+    public NSString? Encoding { get; }
 }
 
 #endif

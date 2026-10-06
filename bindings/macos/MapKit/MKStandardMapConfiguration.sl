@@ -37,13 +37,20 @@ public enum MKStandardMapEmphasisStyle : long
 
 public extern objc class MKStandardMapConfiguration : MKMapConfiguration
 {
-    [Selector("emphasisStyle", "setEmphasisStyle:")] public MKStandardMapEmphasisStyle EmphasisStyle { get; set; }
-    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")] public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
-    [Selector("showsTraffic", "setShowsTraffic:")] public bool ShowsTraffic { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithElevationStyle:")] public Self InitWithElevationStyle(MKMapElevationStyle elevationStyle);
-    [Selector("initWithElevationStyle:emphasisStyle:")] public Self InitWithElevationStyleEmphasisStyle(MKMapElevationStyle elevationStyle, MKStandardMapEmphasisStyle emphasisStyle);
-    [Selector("initWithEmphasisStyle:")] public Self InitWithEmphasisStyle(MKStandardMapEmphasisStyle emphasisStyle);
+    [Selector("emphasisStyle", "setEmphasisStyle:")]
+    public MKStandardMapEmphasisStyle EmphasisStyle { get; set; }
+    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")]
+    public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
+    [Selector("showsTraffic", "setShowsTraffic:")]
+    public bool ShowsTraffic { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithElevationStyle:")]
+    public Self InitWithElevationStyle(MKMapElevationStyle elevationStyle);
+    [Selector("initWithElevationStyle:emphasisStyle:")]
+    public Self InitWithElevationStyleEmphasisStyle(MKMapElevationStyle elevationStyle, MKStandardMapEmphasisStyle emphasisStyle);
+    [Selector("initWithEmphasisStyle:")]
+    public Self InitWithEmphasisStyle(MKStandardMapEmphasisStyle emphasisStyle);
 }
 
 #endif

@@ -31,9 +31,12 @@ import Standard.ObjC;
 
 public extern objc class GCControllerAxisInput : GCControllerElement
 {
-    [Selector("valueChangedHandler", "setValueChangedHandler:")] public GCControllerAxisValueChangedHandler? ValueChangedHandler { get; set; }
-    [Selector("value")] public float Value { get; }
-    [Selector("setValue:")] public void SetValue(float value);
+    [Selector("valueChangedHandler", "setValueChangedHandler:")]
+    public GCControllerAxisValueChangedHandler? ValueChangedHandler { get; set; }
+    [Selector("value")]
+    public float Value { get; }
+    [Selector("setValue:")]
+    public void SetValue(float value);
 }
 
 public objc closure void GCControllerAxisValueChangedHandler(GCControllerAxisInput arg0, float arg1);

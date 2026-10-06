@@ -45,9 +45,11 @@ public extern "C" CFStringRef kSecInputIsDigest;
 public extern "C" CFStringRef? kSecInputIsRaw;
 
 /// Deprecated in macOS 13.0.
-[ReturnsRetained] public extern "C" SecTransformRef? SecSignTransformCreate(SecKeyRef key, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecTransformRef? SecSignTransformCreate(SecKeyRef key, __CFError** error);
 
 /// Deprecated in macOS 13.0.
-[ReturnsRetained] public extern "C" SecTransformRef? SecVerifyTransformCreate(SecKeyRef key, CFDataRef? signature, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecTransformRef? SecVerifyTransformCreate(SecKeyRef key, CFDataRef? signature, __CFError** error);
 
 #endif

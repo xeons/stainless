@@ -42,23 +42,43 @@ public enum SFSpeechRecognitionTaskState : long
 
 public extern objc class SFSpeechRecognitionTask : NSObject
 {
-    [Selector("state")] public SFSpeechRecognitionTaskState State { get; }
-    [Selector("isFinishing")] public bool Finishing { get; }
-    [Selector("isCancelled")] public bool Cancelled { get; }
-    [Selector("error")] public NSError? Error { get; }
-    [Selector("finish")] public void Finish();
-    [Selector("cancel")] public void Cancel();
+    [Selector("state")]
+    public SFSpeechRecognitionTaskState State { get; }
+    [Selector("isFinishing")]
+    public bool Finishing { get; }
+    [Selector("isCancelled")]
+    public bool Cancelled { get; }
+    [Selector("error")]
+    public NSError? Error { get; }
+    [Selector("finish")]
+    public void Finish();
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 public objc interface SFSpeechRecognitionTaskDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("speechRecognitionDidDetectSpeech:")] void SpeechRecognitionDidDetectSpeech(SFSpeechRecognitionTask task);
-    [Optional] [Selector("speechRecognitionTask:didHypothesizeTranscription:")] void SpeechRecognitionTaskDidHypothesizeTranscription(SFSpeechRecognitionTask task, SFTranscription transcription);
-    [Optional] [Selector("speechRecognitionTask:didFinishRecognition:")] void SpeechRecognitionTaskDidFinishRecognition(SFSpeechRecognitionTask task, SFSpeechRecognitionResult recognitionResult);
-    [Optional] [Selector("speechRecognitionTaskFinishedReadingAudio:")] void SpeechRecognitionTaskFinishedReadingAudio(SFSpeechRecognitionTask task);
-    [Optional] [Selector("speechRecognitionTaskWasCancelled:")] void SpeechRecognitionTaskWasCancelled(SFSpeechRecognitionTask task);
-    [Optional] [Selector("speechRecognitionTask:didFinishSuccessfully:")] void SpeechRecognitionTaskDidFinishSuccessfully(SFSpeechRecognitionTask task, bool successfully);
-    [Optional] [Selector("speechRecognitionTask:didProcessAudioDuration:")] void SpeechRecognitionTaskDidProcessAudioDuration(SFSpeechRecognitionTask task, NSTimeInterval duration);
+    [Optional]
+    [Selector("speechRecognitionDidDetectSpeech:")]
+    void SpeechRecognitionDidDetectSpeech(SFSpeechRecognitionTask task);
+    [Optional]
+    [Selector("speechRecognitionTask:didHypothesizeTranscription:")]
+    void SpeechRecognitionTaskDidHypothesizeTranscription(SFSpeechRecognitionTask task, SFTranscription transcription);
+    [Optional]
+    [Selector("speechRecognitionTask:didFinishRecognition:")]
+    void SpeechRecognitionTaskDidFinishRecognition(SFSpeechRecognitionTask task, SFSpeechRecognitionResult recognitionResult);
+    [Optional]
+    [Selector("speechRecognitionTaskFinishedReadingAudio:")]
+    void SpeechRecognitionTaskFinishedReadingAudio(SFSpeechRecognitionTask task);
+    [Optional]
+    [Selector("speechRecognitionTaskWasCancelled:")]
+    void SpeechRecognitionTaskWasCancelled(SFSpeechRecognitionTask task);
+    [Optional]
+    [Selector("speechRecognitionTask:didFinishSuccessfully:")]
+    void SpeechRecognitionTaskDidFinishSuccessfully(SFSpeechRecognitionTask task, bool successfully);
+    [Optional]
+    [Selector("speechRecognitionTask:didProcessAudioDuration:")]
+    void SpeechRecognitionTaskDidProcessAudioDuration(SFSpeechRecognitionTask task, NSTimeInterval duration);
 }
 
 #endif

@@ -39,25 +39,32 @@ public extern objc class WSProtocolHandlerRef : CFTypeRef { }
 public extern "C" CFTypeID WSProtocolHandlerGetTypeID();
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" WSProtocolHandlerRef? WSProtocolHandlerCreate(CFAllocatorRef? allocator, CFStringRef? protocol);
+[ReturnsRetained]
+public extern "C" WSProtocolHandlerRef? WSProtocolHandlerCreate(CFAllocatorRef? allocator, CFStringRef? protocol);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFDictionaryRef? WSProtocolHandlerCopyRequestDictionary(WSProtocolHandlerRef? @ref, CFDataRef? data);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? WSProtocolHandlerCopyRequestDictionary(WSProtocolHandlerRef? @ref, CFDataRef? data);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFDictionaryRef? WSProtocolHandlerCopyReplyDictionary(WSProtocolHandlerRef? @ref, CFStringRef? methodName, CFDataRef? data);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? WSProtocolHandlerCopyReplyDictionary(WSProtocolHandlerRef? @ref, CFStringRef? methodName, CFDataRef? data);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFDataRef? WSProtocolHandlerCopyReplyDocument(WSProtocolHandlerRef? @ref, CFDictionaryRef? methodContext, CFTypeRef? resultValue);
+[ReturnsRetained]
+public extern "C" CFDataRef? WSProtocolHandlerCopyReplyDocument(WSProtocolHandlerRef? @ref, CFDictionaryRef? methodContext, CFTypeRef? resultValue);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFDataRef? WSProtocolHandlerCopyFaultDocument(WSProtocolHandlerRef? @ref, CFDictionaryRef? methodContext, CFDictionaryRef? faultDict);
+[ReturnsRetained]
+public extern "C" CFDataRef? WSProtocolHandlerCopyFaultDocument(WSProtocolHandlerRef? @ref, CFDictionaryRef? methodContext, CFDictionaryRef? faultDict);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFDataRef? WSProtocolHandlerCopyRequestDocument(WSProtocolHandlerRef? @ref, CFStringRef? methodName, CFDictionaryRef? methodParams, CFArrayRef? methodParamOrder, CFDictionaryRef? methodExtras);
+[ReturnsRetained]
+public extern "C" CFDataRef? WSProtocolHandlerCopyRequestDocument(WSProtocolHandlerRef? @ref, CFStringRef? methodName, CFDictionaryRef? methodParams, CFArrayRef? methodParamOrder, CFDictionaryRef? methodExtras);
 
 /// Deprecated in macOS 10.8.
-[ReturnsRetained] public extern "C" CFTypeRef? WSProtocolHandlerCopyProperty(WSProtocolHandlerRef? @ref, CFStringRef? propertyName);
+[ReturnsRetained]
+public extern "C" CFTypeRef? WSProtocolHandlerCopyProperty(WSProtocolHandlerRef? @ref, CFStringRef? propertyName);
 
 /// Deprecated in macOS 10.8.
 public extern "C" void WSProtocolHandlerSetProperty(WSProtocolHandlerRef? @ref, CFStringRef? propertyName, CFTypeRef? propertyValue);

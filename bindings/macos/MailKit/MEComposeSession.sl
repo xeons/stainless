@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class MEComposeSession : NSObject, NSSecureCoding
 {
-    [Selector("sessionID")] public NSUUID SessionID { get; }
-    [Selector("mailMessage")] public MEMessage MailMessage { get; }
-    [Selector("composeContext")] public MEComposeContext ComposeContext { get; }
-    [Selector("reloadSession")] public void ReloadSession();
+    [Selector("sessionID")]
+    public NSUUID SessionID { get; }
+    [Selector("mailMessage")]
+    public MEMessage MailMessage { get; }
+    [Selector("composeContext")]
+    public MEComposeContext ComposeContext { get; }
+    [Selector("reloadSession")]
+    public void ReloadSession();
 }
 
 public extern "C" NSErrorDomain? MEComposeSessionErrorDomain;
@@ -54,12 +58,21 @@ public objc closure void MEComposeSessionHandlerSessionCanSendMessageWithComplet
 
 public objc interface MEComposeSessionHandler : NSObjectProtocol
 {
-    [Selector("mailComposeSessionDidBegin:")] void MailComposeSessionDidBegin(MEComposeSession session);
-    [Selector("mailComposeSessionDidEnd:")] void MailComposeSessionDidEnd(MEComposeSession session);
-    [Selector("viewControllerForSession:")] MEExtensionViewController ViewControllerForSession(MEComposeSession session);
-    [Optional] [Selector("session:annotateAddressesWithCompletionHandler:")] void SessionAnnotateAddressesWithCompletionHandler(MEComposeSession session, MEComposeSessionHandlerSessionAnnotateAddressesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("session:canSendMessageWithCompletionHandler:")] void SessionCanSendMessageWithCompletionHandler(MEComposeSession session, MEComposeSessionHandlerSessionCanSendMessageWithCompletionHandlerCompletionBlock completion);
-    [Optional] [Selector("additionalHeadersForSession:")] NSDictionary AdditionalHeadersForSession(MEComposeSession session);
+    [Selector("mailComposeSessionDidBegin:")]
+    void MailComposeSessionDidBegin(MEComposeSession session);
+    [Selector("mailComposeSessionDidEnd:")]
+    void MailComposeSessionDidEnd(MEComposeSession session);
+    [Selector("viewControllerForSession:")]
+    MEExtensionViewController ViewControllerForSession(MEComposeSession session);
+    [Optional]
+    [Selector("session:annotateAddressesWithCompletionHandler:")]
+    void SessionAnnotateAddressesWithCompletionHandler(MEComposeSession session, MEComposeSessionHandlerSessionAnnotateAddressesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("session:canSendMessageWithCompletionHandler:")]
+    void SessionCanSendMessageWithCompletionHandler(MEComposeSession session, MEComposeSessionHandlerSessionCanSendMessageWithCompletionHandlerCompletionBlock completion);
+    [Optional]
+    [Selector("additionalHeadersForSession:")]
+    NSDictionary AdditionalHeadersForSession(MEComposeSession session);
 }
 
 #endif

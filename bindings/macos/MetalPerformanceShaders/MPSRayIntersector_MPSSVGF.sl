@@ -40,60 +40,102 @@ public enum MPSTemporalWeighting : ulong
 
 public extern objc class MPSSVGF : MPSKernel, NSSecureCoding, NSCopying
 {
-    [Selector("depthWeight", "setDepthWeight:")] public float DepthWeight { get; set; }
-    [Selector("normalWeight", "setNormalWeight:")] public float NormalWeight { get; set; }
-    [Selector("luminanceWeight", "setLuminanceWeight:")] public float LuminanceWeight { get; set; }
-    [Selector("temporalWeighting", "setTemporalWeighting:")] public MPSTemporalWeighting TemporalWeighting { get; set; }
-    [Selector("temporalReprojectionBlendFactor", "setTemporalReprojectionBlendFactor:")] public float TemporalReprojectionBlendFactor { get; set; }
-    [Selector("reprojectionThreshold", "setReprojectionThreshold:")] public float ReprojectionThreshold { get; set; }
-    [Selector("minimumFramesForVarianceEstimation", "setMinimumFramesForVarianceEstimation:")] public NSUInteger MinimumFramesForVarianceEstimation { get; set; }
-    [Selector("varianceEstimationRadius", "setVarianceEstimationRadius:")] public NSUInteger VarianceEstimationRadius { get; set; }
-    [Selector("varianceEstimationSigma", "setVarianceEstimationSigma:")] public float VarianceEstimationSigma { get; set; }
-    [Selector("variancePrefilterSigma", "setVariancePrefilterSigma:")] public float VariancePrefilterSigma { get; set; }
-    [Selector("variancePrefilterRadius", "setVariancePrefilterRadius:")] public NSUInteger VariancePrefilterRadius { get; set; }
-    [Selector("bilateralFilterSigma", "setBilateralFilterSigma:")] public float BilateralFilterSigma { get; set; }
-    [Selector("bilateralFilterRadius", "setBilateralFilterRadius:")] public NSUInteger BilateralFilterRadius { get; set; }
-    [Selector("channelCount", "setChannelCount:")] public NSUInteger ChannelCount { get; set; }
-    [Selector("channelCount2", "setChannelCount2:")] public NSUInteger ChannelCount2 { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
-    [Selector("copyWithZone:device:")] public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
-    [Selector("encodeWithCoder:")] public void EncodeWithCoder(NSCoder coder);
-    [Selector("encodeReprojectionToCommandBuffer:sourceTexture:previousTexture:destinationTexture:previousLuminanceMomentsTexture:destinationLuminanceMomentsTexture:previousFrameCountTexture:destinationFrameCountTexture:motionVectorTexture:depthNormalTexture:previousDepthNormalTexture:")] public void EncodeReprojectionToCommandBufferSourceTexturePreviousTextureDestinationTexturePreviousLuminanceMomentsTextureDestinationLuminanceMomentsTexturePreviousFrameCountTextureDestinationFrameCountTextureMotionVectorTextureDepthNormalTexturePreviousDepthNormalTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture previousTexture, MTLTexture destinationTexture, MTLTexture previousLuminanceMomentsTexture, MTLTexture destinationLuminanceMomentsTexture, MTLTexture previousFrameCountTexture, MTLTexture destinationFrameCountTexture, MTLTexture? motionVectorTexture, MTLTexture? depthNormalTexture, MTLTexture? previousDepthNormalTexture);
-    [Selector("encodeReprojectionToCommandBuffer:sourceTexture:previousTexture:destinationTexture:previousLuminanceMomentsTexture:destinationLuminanceMomentsTexture:sourceTexture2:previousTexture2:destinationTexture2:previousLuminanceMomentsTexture2:destinationLuminanceMomentsTexture2:previousFrameCountTexture:destinationFrameCountTexture:motionVectorTexture:depthNormalTexture:previousDepthNormalTexture:")] public void EncodeReprojectionToCommandBufferSourceTexturePreviousTextureDestinationTexturePreviousLuminanceMomentsTextureDestinationLuminanceMomentsTextureSourceTexture2PreviousTexture2DestinationTexture2PreviousLuminanceMomentsTexture2DestinationLuminanceMomentsTexture2PreviousFrameCountTextureDestinationFrameCountTextureMotionVectorTextureDepthNormalTexturePreviousDepthNormalTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture previousTexture, MTLTexture destinationTexture, MTLTexture previousLuminanceMomentsTexture, MTLTexture destinationLuminanceMomentsTexture, MTLTexture? sourceTexture2, MTLTexture? previousTexture2, MTLTexture? destinationTexture2, MTLTexture? previousLuminanceMomentsTexture2, MTLTexture? destinationLuminanceMomentsTexture2, MTLTexture previousFrameCountTexture, MTLTexture destinationFrameCountTexture, MTLTexture? motionVectorTexture, MTLTexture? depthNormalTexture, MTLTexture? previousDepthNormalTexture);
-    [Selector("encodeVarianceEstimationToCommandBuffer:sourceTexture:luminanceMomentsTexture:destinationTexture:frameCountTexture:depthNormalTexture:")] public void EncodeVarianceEstimationToCommandBufferSourceTextureLuminanceMomentsTextureDestinationTextureFrameCountTextureDepthNormalTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture luminanceMomentsTexture, MTLTexture destinationTexture, MTLTexture frameCountTexture, MTLTexture? depthNormalTexture);
-    [Selector("encodeVarianceEstimationToCommandBuffer:sourceTexture:luminanceMomentsTexture:destinationTexture:sourceTexture2:luminanceMomentsTexture2:destinationTexture2:frameCountTexture:depthNormalTexture:")] public void EncodeVarianceEstimationToCommandBufferSourceTextureLuminanceMomentsTextureDestinationTextureSourceTexture2LuminanceMomentsTexture2DestinationTexture2FrameCountTextureDepthNormalTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture luminanceMomentsTexture, MTLTexture destinationTexture, MTLTexture? sourceTexture2, MTLTexture? luminanceMomentsTexture2, MTLTexture? destinationTexture2, MTLTexture frameCountTexture, MTLTexture? depthNormalTexture);
-    [Selector("encodeBilateralFilterToCommandBuffer:stepDistance:sourceTexture:destinationTexture:depthNormalTexture:")] public void EncodeBilateralFilterToCommandBufferStepDistanceSourceTextureDestinationTextureDepthNormalTexture(MTLCommandBuffer commandBuffer, NSUInteger stepDistance, MTLTexture sourceTexture, MTLTexture destinationTexture, MTLTexture depthNormalTexture);
-    [Selector("encodeBilateralFilterToCommandBuffer:stepDistance:sourceTexture:destinationTexture:sourceTexture2:destinationTexture2:depthNormalTexture:")] public void EncodeBilateralFilterToCommandBufferStepDistanceSourceTextureDestinationTextureSourceTexture2DestinationTexture2DepthNormalTexture(MTLCommandBuffer commandBuffer, NSUInteger stepDistance, MTLTexture sourceTexture, MTLTexture destinationTexture, MTLTexture? sourceTexture2, MTLTexture? destinationTexture2, MTLTexture depthNormalTexture);
+    [Selector("depthWeight", "setDepthWeight:")]
+    public float DepthWeight { get; set; }
+    [Selector("normalWeight", "setNormalWeight:")]
+    public float NormalWeight { get; set; }
+    [Selector("luminanceWeight", "setLuminanceWeight:")]
+    public float LuminanceWeight { get; set; }
+    [Selector("temporalWeighting", "setTemporalWeighting:")]
+    public MPSTemporalWeighting TemporalWeighting { get; set; }
+    [Selector("temporalReprojectionBlendFactor", "setTemporalReprojectionBlendFactor:")]
+    public float TemporalReprojectionBlendFactor { get; set; }
+    [Selector("reprojectionThreshold", "setReprojectionThreshold:")]
+    public float ReprojectionThreshold { get; set; }
+    [Selector("minimumFramesForVarianceEstimation", "setMinimumFramesForVarianceEstimation:")]
+    public NSUInteger MinimumFramesForVarianceEstimation { get; set; }
+    [Selector("varianceEstimationRadius", "setVarianceEstimationRadius:")]
+    public NSUInteger VarianceEstimationRadius { get; set; }
+    [Selector("varianceEstimationSigma", "setVarianceEstimationSigma:")]
+    public float VarianceEstimationSigma { get; set; }
+    [Selector("variancePrefilterSigma", "setVariancePrefilterSigma:")]
+    public float VariancePrefilterSigma { get; set; }
+    [Selector("variancePrefilterRadius", "setVariancePrefilterRadius:")]
+    public NSUInteger VariancePrefilterRadius { get; set; }
+    [Selector("bilateralFilterSigma", "setBilateralFilterSigma:")]
+    public float BilateralFilterSigma { get; set; }
+    [Selector("bilateralFilterRadius", "setBilateralFilterRadius:")]
+    public NSUInteger BilateralFilterRadius { get; set; }
+    [Selector("channelCount", "setChannelCount:")]
+    public NSUInteger ChannelCount { get; set; }
+    [Selector("channelCount2", "setChannelCount2:")]
+    public NSUInteger ChannelCount2 { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("copyWithZone:device:")]
+    public Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Selector("encodeWithCoder:")]
+    public void EncodeWithCoder(NSCoder coder);
+    [Selector("encodeReprojectionToCommandBuffer:sourceTexture:previousTexture:destinationTexture:previousLuminanceMomentsTexture:destinationLuminanceMomentsTexture:previousFrameCountTexture:destinationFrameCountTexture:motionVectorTexture:depthNormalTexture:previousDepthNormalTexture:")]
+    public void EncodeReprojectionToCommandBufferSourceTexturePreviousTextureDestinationTexturePreviousLuminanceMomentsTextureDestinationLuminanceMomentsTexturePreviousFrameCountTextureDestinationFrameCountTextureMotionVectorTextureDepthNormalTexturePreviousDepthNormalTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture previousTexture, MTLTexture destinationTexture, MTLTexture previousLuminanceMomentsTexture, MTLTexture destinationLuminanceMomentsTexture, MTLTexture previousFrameCountTexture, MTLTexture destinationFrameCountTexture, MTLTexture? motionVectorTexture, MTLTexture? depthNormalTexture, MTLTexture? previousDepthNormalTexture);
+    [Selector("encodeReprojectionToCommandBuffer:sourceTexture:previousTexture:destinationTexture:previousLuminanceMomentsTexture:destinationLuminanceMomentsTexture:sourceTexture2:previousTexture2:destinationTexture2:previousLuminanceMomentsTexture2:destinationLuminanceMomentsTexture2:previousFrameCountTexture:destinationFrameCountTexture:motionVectorTexture:depthNormalTexture:previousDepthNormalTexture:")]
+    public void EncodeReprojectionToCommandBufferSourceTexturePreviousTextureDestinationTexturePreviousLuminanceMomentsTextureDestinationLuminanceMomentsTextureSourceTexture2PreviousTexture2DestinationTexture2PreviousLuminanceMomentsTexture2DestinationLuminanceMomentsTexture2PreviousFrameCountTextureDestinationFrameCountTextureMotionVectorTextureDepthNormalTexturePreviousDepthNormalTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture previousTexture, MTLTexture destinationTexture, MTLTexture previousLuminanceMomentsTexture, MTLTexture destinationLuminanceMomentsTexture, MTLTexture? sourceTexture2, MTLTexture? previousTexture2, MTLTexture? destinationTexture2, MTLTexture? previousLuminanceMomentsTexture2, MTLTexture? destinationLuminanceMomentsTexture2, MTLTexture previousFrameCountTexture, MTLTexture destinationFrameCountTexture, MTLTexture? motionVectorTexture, MTLTexture? depthNormalTexture, MTLTexture? previousDepthNormalTexture);
+    [Selector("encodeVarianceEstimationToCommandBuffer:sourceTexture:luminanceMomentsTexture:destinationTexture:frameCountTexture:depthNormalTexture:")]
+    public void EncodeVarianceEstimationToCommandBufferSourceTextureLuminanceMomentsTextureDestinationTextureFrameCountTextureDepthNormalTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture luminanceMomentsTexture, MTLTexture destinationTexture, MTLTexture frameCountTexture, MTLTexture? depthNormalTexture);
+    [Selector("encodeVarianceEstimationToCommandBuffer:sourceTexture:luminanceMomentsTexture:destinationTexture:sourceTexture2:luminanceMomentsTexture2:destinationTexture2:frameCountTexture:depthNormalTexture:")]
+    public void EncodeVarianceEstimationToCommandBufferSourceTextureLuminanceMomentsTextureDestinationTextureSourceTexture2LuminanceMomentsTexture2DestinationTexture2FrameCountTextureDepthNormalTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture luminanceMomentsTexture, MTLTexture destinationTexture, MTLTexture? sourceTexture2, MTLTexture? luminanceMomentsTexture2, MTLTexture? destinationTexture2, MTLTexture frameCountTexture, MTLTexture? depthNormalTexture);
+    [Selector("encodeBilateralFilterToCommandBuffer:stepDistance:sourceTexture:destinationTexture:depthNormalTexture:")]
+    public void EncodeBilateralFilterToCommandBufferStepDistanceSourceTextureDestinationTextureDepthNormalTexture(MTLCommandBuffer commandBuffer, NSUInteger stepDistance, MTLTexture sourceTexture, MTLTexture destinationTexture, MTLTexture depthNormalTexture);
+    [Selector("encodeBilateralFilterToCommandBuffer:stepDistance:sourceTexture:destinationTexture:sourceTexture2:destinationTexture2:depthNormalTexture:")]
+    public void EncodeBilateralFilterToCommandBufferStepDistanceSourceTextureDestinationTextureSourceTexture2DestinationTexture2DepthNormalTexture(MTLCommandBuffer commandBuffer, NSUInteger stepDistance, MTLTexture sourceTexture, MTLTexture destinationTexture, MTLTexture? sourceTexture2, MTLTexture? destinationTexture2, MTLTexture depthNormalTexture);
 }
 
 public objc interface MPSSVGFTextureAllocator : NSObjectProtocol
 {
-    [Selector("textureWithPixelFormat:width:height:")] MTLTexture? TextureWithPixelFormatWidthHeight(MTLPixelFormat pixelFormat, NSUInteger width, NSUInteger height);
-    [Selector("returnTexture:")] void ReturnTexture(MTLTexture texture);
+    [Selector("textureWithPixelFormat:width:height:")]
+    MTLTexture? TextureWithPixelFormatWidthHeight(MTLPixelFormat pixelFormat, NSUInteger width, NSUInteger height);
+    [Selector("returnTexture:")]
+    void ReturnTexture(MTLTexture texture);
 }
 
 public extern objc class MPSSVGFDefaultTextureAllocator : NSObject, MPSSVGFTextureAllocator
 {
-    [Selector("device")] public MTLDevice Device { get; }
-    [Selector("allocatedTextureCount")] public NSUInteger AllocatedTextureCount { get; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("textureWithPixelFormat:width:height:")] public MTLTexture? TextureWithPixelFormatWidthHeight(MTLPixelFormat pixelFormat, NSUInteger width, NSUInteger height);
-    [Selector("returnTexture:")] public void ReturnTexture(MTLTexture texture);
-    [Selector("reset")] public void Reset();
+    [Selector("device")]
+    public MTLDevice Device { get; }
+    [Selector("allocatedTextureCount")]
+    public NSUInteger AllocatedTextureCount { get; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("textureWithPixelFormat:width:height:")]
+    public MTLTexture? TextureWithPixelFormatWidthHeight(MTLPixelFormat pixelFormat, NSUInteger width, NSUInteger height);
+    [Selector("returnTexture:")]
+    public void ReturnTexture(MTLTexture texture);
+    [Selector("reset")]
+    public void Reset();
 }
 
 public extern objc class MPSSVGFDenoiser : NSObject
 {
-    [Selector("svgf")] public MPSSVGF Svgf { get; }
-    [Selector("textureAllocator")] public MPSSVGFTextureAllocator TextureAllocator { get; }
-    [Selector("bilateralFilterIterations", "setBilateralFilterIterations:")] public NSUInteger BilateralFilterIterations { get; set; }
-    [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
-    [Selector("initWithSVGF:textureAllocator:")] public Self InitWithSVGFTextureAllocator(MPSSVGF svgf, MPSSVGFTextureAllocator textureAllocator);
-    [Selector("clearTemporalHistory")] public void ClearTemporalHistory();
-    [Selector("releaseTemporaryTextures")] public void ReleaseTemporaryTextures();
-    [Selector("encodeToCommandBuffer:sourceTexture:motionVectorTexture:depthNormalTexture:previousDepthNormalTexture:")] public MTLTexture EncodeToCommandBufferSourceTextureMotionVectorTextureDepthNormalTexturePreviousDepthNormalTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture? motionVectorTexture, MTLTexture depthNormalTexture, MTLTexture? previousDepthNormalTexture);
-    [Selector("encodeToCommandBuffer:sourceTexture:destinationTexture:sourceTexture2:destinationTexture2:motionVectorTexture:depthNormalTexture:previousDepthNormalTexture:")] public void EncodeToCommandBufferSourceTextureDestinationTextureSourceTexture2DestinationTexture2MotionVectorTextureDepthNormalTexturePreviousDepthNormalTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, out MTLTexture? destinationTexture, MTLTexture? sourceTexture2, out MTLTexture? destinationTexture2, MTLTexture? motionVectorTexture, MTLTexture depthNormalTexture, MTLTexture? previousDepthNormalTexture);
+    [Selector("svgf")]
+    public MPSSVGF Svgf { get; }
+    [Selector("textureAllocator")]
+    public MPSSVGFTextureAllocator TextureAllocator { get; }
+    [Selector("bilateralFilterIterations", "setBilateralFilterIterations:")]
+    public NSUInteger BilateralFilterIterations { get; set; }
+    [Selector("initWithDevice:")]
+    public Self InitWithDevice(MTLDevice device);
+    [Selector("initWithSVGF:textureAllocator:")]
+    public Self InitWithSVGFTextureAllocator(MPSSVGF svgf, MPSSVGFTextureAllocator textureAllocator);
+    [Selector("clearTemporalHistory")]
+    public void ClearTemporalHistory();
+    [Selector("releaseTemporaryTextures")]
+    public void ReleaseTemporaryTextures();
+    [Selector("encodeToCommandBuffer:sourceTexture:motionVectorTexture:depthNormalTexture:previousDepthNormalTexture:")]
+    public MTLTexture EncodeToCommandBufferSourceTextureMotionVectorTextureDepthNormalTexturePreviousDepthNormalTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, MTLTexture? motionVectorTexture, MTLTexture depthNormalTexture, MTLTexture? previousDepthNormalTexture);
+    [Selector("encodeToCommandBuffer:sourceTexture:destinationTexture:sourceTexture2:destinationTexture2:motionVectorTexture:depthNormalTexture:previousDepthNormalTexture:")]
+    public void EncodeToCommandBufferSourceTextureDestinationTextureSourceTexture2DestinationTexture2MotionVectorTextureDepthNormalTexturePreviousDepthNormalTexture(MTLCommandBuffer commandBuffer, MTLTexture sourceTexture, out MTLTexture? destinationTexture, MTLTexture? sourceTexture2, out MTLTexture? destinationTexture2, MTLTexture? motionVectorTexture, MTLTexture depthNormalTexture, MTLTexture? previousDepthNormalTexture);
 }
 
 #endif

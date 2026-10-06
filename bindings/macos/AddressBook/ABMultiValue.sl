@@ -33,25 +33,40 @@ import Standard.ObjC;
 
 public extern objc class ABMultiValue : NSObject, NSCopying, NSMutableCopying, NSFastEnumeration
 {
-    [Selector("count")] public NSUInteger Count();
-    [Selector("valueAtIndex:")] public AnyObject? ValueAtIndex(NSUInteger index);
-    [Selector("labelAtIndex:")] public NSString? LabelAtIndex(NSUInteger index);
-    [Selector("identifierAtIndex:")] public NSString? IdentifierAtIndex(NSUInteger index);
-    [Selector("indexForIdentifier:")] public NSUInteger IndexForIdentifier(NSString? identifier);
-    [Selector("primaryIdentifier")] public NSString? PrimaryIdentifier();
-    [Selector("propertyType")] public ABPropertyType PropertyType();
-    [Selector("valueForIdentifier:")] public AnyObject? ValueForIdentifier(NSString? identifier);
-    [Selector("labelForIdentifier:")] public AnyObject? LabelForIdentifier(NSString? identifier);
+    [Selector("count")]
+    public NSUInteger Count();
+    [Selector("valueAtIndex:")]
+    public AnyObject? ValueAtIndex(NSUInteger index);
+    [Selector("labelAtIndex:")]
+    public NSString? LabelAtIndex(NSUInteger index);
+    [Selector("identifierAtIndex:")]
+    public NSString? IdentifierAtIndex(NSUInteger index);
+    [Selector("indexForIdentifier:")]
+    public NSUInteger IndexForIdentifier(NSString? identifier);
+    [Selector("primaryIdentifier")]
+    public NSString? PrimaryIdentifier();
+    [Selector("propertyType")]
+    public ABPropertyType PropertyType();
+    [Selector("valueForIdentifier:")]
+    public AnyObject? ValueForIdentifier(NSString? identifier);
+    [Selector("labelForIdentifier:")]
+    public AnyObject? LabelForIdentifier(NSString? identifier);
 }
 
 public extern objc class ABMutableMultiValue : ABMultiValue
 {
-    [Selector("addValue:withLabel:")] public NSString? AddValueWithLabel(AnyObject? value, NSString? label);
-    [Selector("insertValue:withLabel:atIndex:")] public NSString? InsertValueWithLabelAtIndex(AnyObject? value, NSString? label, NSUInteger index);
-    [Selector("removeValueAndLabelAtIndex:")] public bool RemoveValueAndLabelAtIndex(NSUInteger index);
-    [Selector("replaceValueAtIndex:withValue:")] public bool ReplaceValueAtIndexWithValue(NSUInteger index, AnyObject? value);
-    [Selector("replaceLabelAtIndex:withLabel:")] public bool ReplaceLabelAtIndexWithLabel(NSUInteger index, NSString? label);
-    [Selector("setPrimaryIdentifier:")] public bool SetPrimaryIdentifier(NSString? identifier);
+    [Selector("addValue:withLabel:")]
+    public NSString? AddValueWithLabel(AnyObject? value, NSString? label);
+    [Selector("insertValue:withLabel:atIndex:")]
+    public NSString? InsertValueWithLabelAtIndex(AnyObject? value, NSString? label, NSUInteger index);
+    [Selector("removeValueAndLabelAtIndex:")]
+    public bool RemoveValueAndLabelAtIndex(NSUInteger index);
+    [Selector("replaceValueAtIndex:withValue:")]
+    public bool ReplaceValueAtIndexWithValue(NSUInteger index, AnyObject? value);
+    [Selector("replaceLabelAtIndex:withLabel:")]
+    public bool ReplaceLabelAtIndexWithLabel(NSUInteger index, NSString? label);
+    [Selector("setPrimaryIdentifier:")]
+    public bool SetPrimaryIdentifier(NSString? identifier);
 }
 
 #endif

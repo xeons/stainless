@@ -98,9 +98,11 @@ public struct CTParagraphStyleSetting
     public void* value;
 }
 
-[ReturnsRetained] public extern "C" CTParagraphStyleRef CTParagraphStyleCreate(CTParagraphStyleSetting* settings, nuint settingCount);
+[ReturnsRetained]
+public extern "C" CTParagraphStyleRef CTParagraphStyleCreate(CTParagraphStyleSetting* settings, nuint settingCount);
 
-[ReturnsRetained] public extern "C" CTParagraphStyleRef CTParagraphStyleCreateCopy(CTParagraphStyleRef paragraphStyle);
+[ReturnsRetained]
+public extern "C" CTParagraphStyleRef CTParagraphStyleCreateCopy(CTParagraphStyleRef paragraphStyle);
 
 public extern "C" bool CTParagraphStyleGetValueForSpecifier(CTParagraphStyleRef paragraphStyle, CTParagraphStyleSpecifier spec, nuint valueBufferSize, void* valueBuffer);
 

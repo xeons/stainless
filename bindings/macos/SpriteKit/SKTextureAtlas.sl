@@ -39,13 +39,20 @@ public objc closure void SKTextureAtlasPreloadWithCompletionHandlerCompletionHan
 
 public extern objc class SKTextureAtlas : NSObject, NSSecureCoding
 {
-    [Selector("textureNames")] public NSArray TextureNames { get; }
-    [Selector("atlasNamed:")] public static Self AtlasNamed(NSString name);
-    [Selector("atlasWithDictionary:")] public static Self AtlasWithDictionary(NSDictionary properties);
-    [Selector("textureNamed:")] public SKTexture TextureNamed(NSString name);
-    [Selector("preloadTextureAtlases:withCompletionHandler:")] public static void PreloadTextureAtlasesWithCompletionHandler(NSArray textureAtlases, SKTextureAtlasPreloadTextureAtlasesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("preloadTextureAtlasesNamed:withCompletionHandler:")] public static void PreloadTextureAtlasesNamedWithCompletionHandler(NSArray atlasNames, SKTextureAtlasPreloadTextureAtlasesNamedWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("preloadWithCompletionHandler:")] public void PreloadWithCompletionHandler(SKTextureAtlasPreloadWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("textureNames")]
+    public NSArray TextureNames { get; }
+    [Selector("atlasNamed:")]
+    public static Self AtlasNamed(NSString name);
+    [Selector("atlasWithDictionary:")]
+    public static Self AtlasWithDictionary(NSDictionary properties);
+    [Selector("textureNamed:")]
+    public SKTexture TextureNamed(NSString name);
+    [Selector("preloadTextureAtlases:withCompletionHandler:")]
+    public static void PreloadTextureAtlasesWithCompletionHandler(NSArray textureAtlases, SKTextureAtlasPreloadTextureAtlasesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("preloadTextureAtlasesNamed:withCompletionHandler:")]
+    public static void PreloadTextureAtlasesNamedWithCompletionHandler(NSArray atlasNames, SKTextureAtlasPreloadTextureAtlasesNamedWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("preloadWithCompletionHandler:")]
+    public void PreloadWithCompletionHandler(SKTextureAtlasPreloadWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

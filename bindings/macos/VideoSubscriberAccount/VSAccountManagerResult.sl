@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class VSAccountManagerResult : NSObject
 {
-    [Selector("cancel")] public void Cancel();
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

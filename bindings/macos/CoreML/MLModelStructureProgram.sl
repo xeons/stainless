@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class MLModelStructureProgram : NSObject
 {
-    [Selector("functions")] public NSDictionary Functions { get; }
+    [Selector("functions")]
+    public NSDictionary Functions { get; }
 }
 
 #endif

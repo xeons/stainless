@@ -33,40 +33,70 @@ import Standard.ObjC;
 
 public extern objc class NSDiffableDataSourceSnapshot : NSObject, NSCopying
 {
-    [Selector("numberOfItems")] public NSInteger NumberOfItems { get; }
-    [Selector("numberOfSections")] public NSInteger NumberOfSections { get; }
-    [Selector("sectionIdentifiers")] public NSArray SectionIdentifiers { get; }
-    [Selector("itemIdentifiers")] public NSArray ItemIdentifiers { get; }
-    [Selector("numberOfItemsInSection:")] public NSInteger NumberOfItemsInSection(AnyObject sectionIdentifier);
-    [Selector("itemIdentifiersInSectionWithIdentifier:")] public NSArray ItemIdentifiersInSectionWithIdentifier(AnyObject sectionIdentifier);
-    [Selector("sectionIdentifierForSectionContainingItemIdentifier:")] public AnyObject? SectionIdentifierForSectionContainingItemIdentifier(AnyObject itemIdentifier);
-    [Selector("indexOfItemIdentifier:")] public NSInteger IndexOfItemIdentifier(AnyObject itemIdentifier);
-    [Selector("indexOfSectionIdentifier:")] public NSInteger IndexOfSectionIdentifier(AnyObject sectionIdentifier);
-    [Selector("appendItemsWithIdentifiers:")] public void AppendItemsWithIdentifiers(NSArray identifiers);
-    [Selector("appendItemsWithIdentifiers:intoSectionWithIdentifier:")] public void AppendItemsWithIdentifiersIntoSectionWithIdentifier(NSArray identifiers, AnyObject sectionIdentifier);
-    [Selector("insertItemsWithIdentifiers:beforeItemWithIdentifier:")] public void InsertItemsWithIdentifiersBeforeItemWithIdentifier(NSArray identifiers, AnyObject itemIdentifier);
-    [Selector("insertItemsWithIdentifiers:afterItemWithIdentifier:")] public void InsertItemsWithIdentifiersAfterItemWithIdentifier(NSArray identifiers, AnyObject itemIdentifier);
-    [Selector("deleteItemsWithIdentifiers:")] public void DeleteItemsWithIdentifiers(NSArray identifiers);
-    [Selector("deleteAllItems")] public void DeleteAllItems();
-    [Selector("moveItemWithIdentifier:beforeItemWithIdentifier:")] public void MoveItemWithIdentifierBeforeItemWithIdentifier(AnyObject fromIdentifier, AnyObject toIdentifier);
-    [Selector("moveItemWithIdentifier:afterItemWithIdentifier:")] public void MoveItemWithIdentifierAfterItemWithIdentifier(AnyObject fromIdentifier, AnyObject toIdentifier);
-    [Selector("reloadItemsWithIdentifiers:")] public void ReloadItemsWithIdentifiers(NSArray identifiers);
-    [Selector("appendSectionsWithIdentifiers:")] public void AppendSectionsWithIdentifiers(NSArray sectionIdentifiers);
-    [Selector("insertSectionsWithIdentifiers:beforeSectionWithIdentifier:")] public void InsertSectionsWithIdentifiersBeforeSectionWithIdentifier(NSArray sectionIdentifiers, AnyObject toSectionIdentifier);
-    [Selector("insertSectionsWithIdentifiers:afterSectionWithIdentifier:")] public void InsertSectionsWithIdentifiersAfterSectionWithIdentifier(NSArray sectionIdentifiers, AnyObject toSectionIdentifier);
-    [Selector("deleteSectionsWithIdentifiers:")] public void DeleteSectionsWithIdentifiers(NSArray sectionIdentifiers);
-    [Selector("moveSectionWithIdentifier:beforeSectionWithIdentifier:")] public void MoveSectionWithIdentifierBeforeSectionWithIdentifier(AnyObject fromSectionIdentifier, AnyObject toSectionIdentifier);
-    [Selector("moveSectionWithIdentifier:afterSectionWithIdentifier:")] public void MoveSectionWithIdentifierAfterSectionWithIdentifier(AnyObject fromSectionIdentifier, AnyObject toSectionIdentifier);
-    [Selector("reloadSectionsWithIdentifiers:")] public void ReloadSectionsWithIdentifiers(NSArray sectionIdentifiers);
+    [Selector("numberOfItems")]
+    public NSInteger NumberOfItems { get; }
+    [Selector("numberOfSections")]
+    public NSInteger NumberOfSections { get; }
+    [Selector("sectionIdentifiers")]
+    public NSArray SectionIdentifiers { get; }
+    [Selector("itemIdentifiers")]
+    public NSArray ItemIdentifiers { get; }
+    [Selector("numberOfItemsInSection:")]
+    public NSInteger NumberOfItemsInSection(AnyObject sectionIdentifier);
+    [Selector("itemIdentifiersInSectionWithIdentifier:")]
+    public NSArray ItemIdentifiersInSectionWithIdentifier(AnyObject sectionIdentifier);
+    [Selector("sectionIdentifierForSectionContainingItemIdentifier:")]
+    public AnyObject? SectionIdentifierForSectionContainingItemIdentifier(AnyObject itemIdentifier);
+    [Selector("indexOfItemIdentifier:")]
+    public NSInteger IndexOfItemIdentifier(AnyObject itemIdentifier);
+    [Selector("indexOfSectionIdentifier:")]
+    public NSInteger IndexOfSectionIdentifier(AnyObject sectionIdentifier);
+    [Selector("appendItemsWithIdentifiers:")]
+    public void AppendItemsWithIdentifiers(NSArray identifiers);
+    [Selector("appendItemsWithIdentifiers:intoSectionWithIdentifier:")]
+    public void AppendItemsWithIdentifiersIntoSectionWithIdentifier(NSArray identifiers, AnyObject sectionIdentifier);
+    [Selector("insertItemsWithIdentifiers:beforeItemWithIdentifier:")]
+    public void InsertItemsWithIdentifiersBeforeItemWithIdentifier(NSArray identifiers, AnyObject itemIdentifier);
+    [Selector("insertItemsWithIdentifiers:afterItemWithIdentifier:")]
+    public void InsertItemsWithIdentifiersAfterItemWithIdentifier(NSArray identifiers, AnyObject itemIdentifier);
+    [Selector("deleteItemsWithIdentifiers:")]
+    public void DeleteItemsWithIdentifiers(NSArray identifiers);
+    [Selector("deleteAllItems")]
+    public void DeleteAllItems();
+    [Selector("moveItemWithIdentifier:beforeItemWithIdentifier:")]
+    public void MoveItemWithIdentifierBeforeItemWithIdentifier(AnyObject fromIdentifier, AnyObject toIdentifier);
+    [Selector("moveItemWithIdentifier:afterItemWithIdentifier:")]
+    public void MoveItemWithIdentifierAfterItemWithIdentifier(AnyObject fromIdentifier, AnyObject toIdentifier);
+    [Selector("reloadItemsWithIdentifiers:")]
+    public void ReloadItemsWithIdentifiers(NSArray identifiers);
+    [Selector("appendSectionsWithIdentifiers:")]
+    public void AppendSectionsWithIdentifiers(NSArray sectionIdentifiers);
+    [Selector("insertSectionsWithIdentifiers:beforeSectionWithIdentifier:")]
+    public void InsertSectionsWithIdentifiersBeforeSectionWithIdentifier(NSArray sectionIdentifiers, AnyObject toSectionIdentifier);
+    [Selector("insertSectionsWithIdentifiers:afterSectionWithIdentifier:")]
+    public void InsertSectionsWithIdentifiersAfterSectionWithIdentifier(NSArray sectionIdentifiers, AnyObject toSectionIdentifier);
+    [Selector("deleteSectionsWithIdentifiers:")]
+    public void DeleteSectionsWithIdentifiers(NSArray sectionIdentifiers);
+    [Selector("moveSectionWithIdentifier:beforeSectionWithIdentifier:")]
+    public void MoveSectionWithIdentifierBeforeSectionWithIdentifier(AnyObject fromSectionIdentifier, AnyObject toSectionIdentifier);
+    [Selector("moveSectionWithIdentifier:afterSectionWithIdentifier:")]
+    public void MoveSectionWithIdentifierAfterSectionWithIdentifier(AnyObject fromSectionIdentifier, AnyObject toSectionIdentifier);
+    [Selector("reloadSectionsWithIdentifiers:")]
+    public void ReloadSectionsWithIdentifiers(NSArray sectionIdentifiers);
 }
 
 public extern objc class NSCollectionViewDiffableDataSource : NSObject, NSCollectionViewDataSource
 {
-    [Selector("supplementaryViewProvider", "setSupplementaryViewProvider:")] public NSCollectionViewDiffableDataSourceSupplementaryViewProvider? SupplementaryViewProvider { get; set; }
-    [Selector("snapshot")] public NSDiffableDataSourceSnapshot Snapshot();
-    [Selector("applySnapshot:animatingDifferences:")] public void ApplySnapshotAnimatingDifferences(NSDiffableDataSourceSnapshot snapshot, bool animatingDifferences);
-    [Selector("itemIdentifierForIndexPath:")] public AnyObject? ItemIdentifierForIndexPath(NSIndexPath indexPath);
-    [Selector("indexPathForItemIdentifier:")] public NSIndexPath? IndexPathForItemIdentifier(AnyObject identifier);
+    [Selector("supplementaryViewProvider", "setSupplementaryViewProvider:")]
+    public NSCollectionViewDiffableDataSourceSupplementaryViewProvider? SupplementaryViewProvider { get; set; }
+    [Selector("snapshot")]
+    public NSDiffableDataSourceSnapshot Snapshot();
+    [Selector("applySnapshot:animatingDifferences:")]
+    public void ApplySnapshotAnimatingDifferences(NSDiffableDataSourceSnapshot snapshot, bool animatingDifferences);
+    [Selector("itemIdentifierForIndexPath:")]
+    public AnyObject? ItemIdentifierForIndexPath(NSIndexPath indexPath);
+    [Selector("indexPathForItemIdentifier:")]
+    public NSIndexPath? IndexPathForItemIdentifier(AnyObject identifier);
 }
 
 public objc closure NSView? NSCollectionViewDiffableDataSourceSupplementaryViewProvider(NSCollectionView arg0, NSString arg1, NSIndexPath arg2);

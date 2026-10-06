@@ -40,14 +40,22 @@ public enum NSMassFormatterUnit : long
 
 public extern objc class NSMassFormatter : NSFormatter
 {
-    [Selector("numberFormatter", "setNumberFormatter:")] public NSNumberFormatter? NumberFormatter { get; set; }
-    [Selector("unitStyle", "setUnitStyle:")] public NSFormattingUnitStyle UnitStyle { get; set; }
-    [Selector("isForPersonMassUse", "setForPersonMassUse:")] public bool ForPersonMassUse { get; set; }
-    [Selector("stringFromValue:unit:")] public NSString StringFromValueUnit(double value, NSMassFormatterUnit unit);
-    [Selector("stringFromKilograms:")] public NSString StringFromKilograms(double numberInKilograms);
-    [Selector("unitStringFromValue:unit:")] public NSString UnitStringFromValueUnit(double value, NSMassFormatterUnit unit);
-    [Selector("unitStringFromKilograms:usedUnit:")] public NSString UnitStringFromKilogramsUsedUnit(double numberInKilograms, NSMassFormatterUnit* unitp);
-    [Selector("getObjectValue:forString:errorDescription:")] public bool GetObjectValueForStringErrorDescription(out AnyObject? obj, NSString string, out NSString? error);
+    [Selector("numberFormatter", "setNumberFormatter:")]
+    public NSNumberFormatter? NumberFormatter { get; set; }
+    [Selector("unitStyle", "setUnitStyle:")]
+    public NSFormattingUnitStyle UnitStyle { get; set; }
+    [Selector("isForPersonMassUse", "setForPersonMassUse:")]
+    public bool ForPersonMassUse { get; set; }
+    [Selector("stringFromValue:unit:")]
+    public NSString StringFromValueUnit(double value, NSMassFormatterUnit unit);
+    [Selector("stringFromKilograms:")]
+    public NSString StringFromKilograms(double numberInKilograms);
+    [Selector("unitStringFromValue:unit:")]
+    public NSString UnitStringFromValueUnit(double value, NSMassFormatterUnit unit);
+    [Selector("unitStringFromKilograms:usedUnit:")]
+    public NSString UnitStringFromKilogramsUsedUnit(double numberInKilograms, NSMassFormatterUnit* unitp);
+    [Selector("getObjectValue:forString:errorDescription:")]
+    public bool GetObjectValueForStringErrorDescription(out AnyObject? obj, NSString string, out NSString? error);
 }
 
 #endif

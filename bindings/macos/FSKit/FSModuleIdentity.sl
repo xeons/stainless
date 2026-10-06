@@ -35,11 +35,14 @@ import Standard.ObjC;
 public extern objc class FSModuleIdentity : NSObject
 {
     /// macOS 15.4 and later.
-    [Selector("bundleIdentifier")] public NSString BundleIdentifier { get; }
+    [Selector("bundleIdentifier")]
+    public NSString BundleIdentifier { get; }
     /// macOS 15.4 and later.
-    [Selector("url")] public NSURL Url { get; }
+    [Selector("url")]
+    public NSURL Url { get; }
     /// macOS 15.4 and later.
-    [Selector("isEnabled")] public bool Enabled { get; }
+    [Selector("isEnabled")]
+    public bool Enabled { get; }
 }
 
 #endif

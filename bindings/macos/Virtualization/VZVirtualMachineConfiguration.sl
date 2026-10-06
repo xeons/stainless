@@ -33,45 +33,73 @@ import Standard.ObjC;
 
 public extern objc class VZVirtualMachineConfiguration : NSObject, NSCopying
 {
-    [Selector("bootLoader", "setBootLoader:")] public VZBootLoader? BootLoader { get; set; }
-    [Selector("memorySize", "setMemorySize:")] public ulong MemorySize { get; set; }
-    [Selector("CPUCount", "setCPUCount:")] public NSUInteger CPUCount { get; set; }
-    [Selector("platform", "setPlatform:")] public VZPlatformConfiguration? Platform { get; set; }
-    [Selector("audioDevices", "setAudioDevices:")] public NSArray? AudioDevices { get; set; }
-    [Selector("consoleDevices", "setConsoleDevices:")] public NSArray? ConsoleDevices { get; set; }
-    [Selector("directorySharingDevices", "setDirectorySharingDevices:")] public NSArray? DirectorySharingDevices { get; set; }
-    [Selector("entropyDevices", "setEntropyDevices:")] public NSArray EntropyDevices { get; set; }
-    [Selector("memoryBalloonDevices", "setMemoryBalloonDevices:")] public NSArray MemoryBalloonDevices { get; set; }
-    [Selector("networkDevices", "setNetworkDevices:")] public NSArray NetworkDevices { get; set; }
-    [Selector("serialPorts", "setSerialPorts:")] public NSArray SerialPorts { get; set; }
-    [Selector("socketDevices", "setSocketDevices:")] public NSArray SocketDevices { get; set; }
-    [Selector("storageDevices", "setStorageDevices:")] public NSArray StorageDevices { get; set; }
-    [Selector("keyboards", "setKeyboards:")] public NSArray? Keyboards { get; set; }
-    [Selector("pointingDevices", "setPointingDevices:")] public NSArray? PointingDevices { get; set; }
-    [Selector("graphicsDevices", "setGraphicsDevices:")] public NSArray? GraphicsDevices { get; set; }
-    [Selector("usbControllers", "setUsbControllers:")] public NSArray? UsbControllers { get; set; }
+    [Selector("bootLoader", "setBootLoader:")]
+    public VZBootLoader? BootLoader { get; set; }
+    [Selector("memorySize", "setMemorySize:")]
+    public ulong MemorySize { get; set; }
+    [Selector("CPUCount", "setCPUCount:")]
+    public NSUInteger CPUCount { get; set; }
+    [Selector("platform", "setPlatform:")]
+    public VZPlatformConfiguration? Platform { get; set; }
+    [Selector("audioDevices", "setAudioDevices:")]
+    public NSArray? AudioDevices { get; set; }
+    [Selector("consoleDevices", "setConsoleDevices:")]
+    public NSArray? ConsoleDevices { get; set; }
+    [Selector("directorySharingDevices", "setDirectorySharingDevices:")]
+    public NSArray? DirectorySharingDevices { get; set; }
+    [Selector("entropyDevices", "setEntropyDevices:")]
+    public NSArray EntropyDevices { get; set; }
+    [Selector("memoryBalloonDevices", "setMemoryBalloonDevices:")]
+    public NSArray MemoryBalloonDevices { get; set; }
+    [Selector("networkDevices", "setNetworkDevices:")]
+    public NSArray NetworkDevices { get; set; }
+    [Selector("serialPorts", "setSerialPorts:")]
+    public NSArray SerialPorts { get; set; }
+    [Selector("socketDevices", "setSocketDevices:")]
+    public NSArray SocketDevices { get; set; }
+    [Selector("storageDevices", "setStorageDevices:")]
+    public NSArray StorageDevices { get; set; }
+    [Selector("keyboards", "setKeyboards:")]
+    public NSArray? Keyboards { get; set; }
+    [Selector("pointingDevices", "setPointingDevices:")]
+    public NSArray? PointingDevices { get; set; }
+    [Selector("graphicsDevices", "setGraphicsDevices:")]
+    public NSArray? GraphicsDevices { get; set; }
+    [Selector("usbControllers", "setUsbControllers:")]
+    public NSArray? UsbControllers { get; set; }
 }
 
 #if ARM64
 /// VZVirtualMachineConfigurationValidation, a category of VZVirtualMachineConfiguration.
 public extern objc class VZVirtualMachineConfiguration
 {
-    [Selector("minimumAllowedMemorySize")] public static ulong MinimumAllowedMemorySize { get; }
-    [Selector("maximumAllowedMemorySize")] public static ulong MaximumAllowedMemorySize { get; }
-    [Selector("minimumAllowedCPUCount")] public static NSUInteger MinimumAllowedCPUCount { get; }
-    [Selector("maximumAllowedCPUCount")] public static NSUInteger MaximumAllowedCPUCount { get; }
-    [Selector("validateWithError:")] public bool ValidateWithError(out NSError? error);
-    [Selector("validateSaveRestoreSupportWithError:")] public bool ValidateSaveRestoreSupportWithError(out NSError? error);
+    [Selector("minimumAllowedMemorySize")]
+    public static ulong MinimumAllowedMemorySize { get; }
+    [Selector("maximumAllowedMemorySize")]
+    public static ulong MaximumAllowedMemorySize { get; }
+    [Selector("minimumAllowedCPUCount")]
+    public static NSUInteger MinimumAllowedCPUCount { get; }
+    [Selector("maximumAllowedCPUCount")]
+    public static NSUInteger MaximumAllowedCPUCount { get; }
+    [Selector("validateWithError:")]
+    public bool ValidateWithError(out NSError? error);
+    [Selector("validateSaveRestoreSupportWithError:")]
+    public bool ValidateSaveRestoreSupportWithError(out NSError? error);
 }
 #else
 /// VZVirtualMachineConfigurationValidation, a category of VZVirtualMachineConfiguration.
 public extern objc class VZVirtualMachineConfiguration
 {
-    [Selector("minimumAllowedMemorySize")] public static ulong MinimumAllowedMemorySize { get; }
-    [Selector("maximumAllowedMemorySize")] public static ulong MaximumAllowedMemorySize { get; }
-    [Selector("minimumAllowedCPUCount")] public static NSUInteger MinimumAllowedCPUCount { get; }
-    [Selector("maximumAllowedCPUCount")] public static NSUInteger MaximumAllowedCPUCount { get; }
-    [Selector("validateWithError:")] public bool ValidateWithError(out NSError? error);
+    [Selector("minimumAllowedMemorySize")]
+    public static ulong MinimumAllowedMemorySize { get; }
+    [Selector("maximumAllowedMemorySize")]
+    public static ulong MaximumAllowedMemorySize { get; }
+    [Selector("minimumAllowedCPUCount")]
+    public static NSUInteger MinimumAllowedCPUCount { get; }
+    [Selector("maximumAllowedCPUCount")]
+    public static NSUInteger MaximumAllowedCPUCount { get; }
+    [Selector("validateWithError:")]
+    public bool ValidateWithError(out NSError? error);
 }
 #endif
 

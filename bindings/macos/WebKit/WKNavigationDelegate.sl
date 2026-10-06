@@ -59,22 +59,52 @@ public objc closure void WKNavigationDelegateWebViewShouldGoToBackForwardListIte
 
 public objc interface WKNavigationDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("webView:decidePolicyForNavigationAction:decisionHandler:")] void WebViewDecidePolicyForNavigationActionDecisionHandler(WKWebView webView, WKNavigationAction navigationAction, WKNavigationDelegateWebViewDecidePolicyForNavigationActionDecisionHandlerDecisionHandlerBlock decisionHandler);
-    [Optional] [Selector("webView:decidePolicyForNavigationAction:preferences:decisionHandler:")] void WebViewDecidePolicyForNavigationActionPreferencesDecisionHandler(WKWebView webView, WKNavigationAction navigationAction, WKWebpagePreferences preferences, WKNavigationDelegateWebViewDecidePolicyForNavigationActionPreferencesDecisionHandlerDecisionHandlerBlock decisionHandler);
-    [Optional] [Selector("webView:decidePolicyForNavigationResponse:decisionHandler:")] void WebViewDecidePolicyForNavigationResponseDecisionHandler(WKWebView webView, WKNavigationResponse navigationResponse, WKNavigationDelegateWebViewDecidePolicyForNavigationResponseDecisionHandlerDecisionHandlerBlock decisionHandler);
-    [Optional] [Selector("webView:didStartProvisionalNavigation:")] void WebViewDidStartProvisionalNavigation(WKWebView webView, WKNavigation? navigation);
-    [Optional] [Selector("webView:didReceiveServerRedirectForProvisionalNavigation:")] void WebViewDidReceiveServerRedirectForProvisionalNavigation(WKWebView webView, WKNavigation? navigation);
-    [Optional] [Selector("webView:didFailProvisionalNavigation:withError:")] void WebViewDidFailProvisionalNavigationWithError(WKWebView webView, WKNavigation? navigation, NSError error);
-    [Optional] [Selector("webView:didCommitNavigation:")] void WebViewDidCommitNavigation(WKWebView webView, WKNavigation? navigation);
-    [Optional] [Selector("webView:didFinishNavigation:")] void WebViewDidFinishNavigation(WKWebView webView, WKNavigation? navigation);
-    [Optional] [Selector("webView:didFailNavigation:withError:")] void WebViewDidFailNavigationWithError(WKWebView webView, WKNavigation? navigation, NSError error);
-    [Optional] [Selector("webView:didReceiveAuthenticationChallenge:completionHandler:")] void WebViewDidReceiveAuthenticationChallengeCompletionHandler(WKWebView webView, NSURLAuthenticationChallenge challenge, WKNavigationDelegateWebViewDidReceiveAuthenticationChallengeCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("webViewWebContentProcessDidTerminate:")] void WebViewWebContentProcessDidTerminate(WKWebView webView);
-    [Optional] [Selector("webView:authenticationChallenge:shouldAllowDeprecatedTLS:")] void WebViewAuthenticationChallengeShouldAllowDeprecatedTLS(WKWebView webView, NSURLAuthenticationChallenge challenge, WKNavigationDelegateWebViewAuthenticationChallengeShouldAllowDeprecatedTLSDecisionHandlerBlock decisionHandler);
-    [Optional] [Selector("webView:navigationAction:didBecomeDownload:")] void WebViewNavigationActionDidBecomeDownload(WKWebView webView, WKNavigationAction navigationAction, WKDownload download);
-    [Optional] [Selector("webView:navigationResponse:didBecomeDownload:")] void WebViewNavigationResponseDidBecomeDownload(WKWebView webView, WKNavigationResponse navigationResponse, WKDownload download);
+    [Optional]
+    [Selector("webView:decidePolicyForNavigationAction:decisionHandler:")]
+    void WebViewDecidePolicyForNavigationActionDecisionHandler(WKWebView webView, WKNavigationAction navigationAction, WKNavigationDelegateWebViewDecidePolicyForNavigationActionDecisionHandlerDecisionHandlerBlock decisionHandler);
+    [Optional]
+    [Selector("webView:decidePolicyForNavigationAction:preferences:decisionHandler:")]
+    void WebViewDecidePolicyForNavigationActionPreferencesDecisionHandler(WKWebView webView, WKNavigationAction navigationAction, WKWebpagePreferences preferences, WKNavigationDelegateWebViewDecidePolicyForNavigationActionPreferencesDecisionHandlerDecisionHandlerBlock decisionHandler);
+    [Optional]
+    [Selector("webView:decidePolicyForNavigationResponse:decisionHandler:")]
+    void WebViewDecidePolicyForNavigationResponseDecisionHandler(WKWebView webView, WKNavigationResponse navigationResponse, WKNavigationDelegateWebViewDecidePolicyForNavigationResponseDecisionHandlerDecisionHandlerBlock decisionHandler);
+    [Optional]
+    [Selector("webView:didStartProvisionalNavigation:")]
+    void WebViewDidStartProvisionalNavigation(WKWebView webView, WKNavigation? navigation);
+    [Optional]
+    [Selector("webView:didReceiveServerRedirectForProvisionalNavigation:")]
+    void WebViewDidReceiveServerRedirectForProvisionalNavigation(WKWebView webView, WKNavigation? navigation);
+    [Optional]
+    [Selector("webView:didFailProvisionalNavigation:withError:")]
+    void WebViewDidFailProvisionalNavigationWithError(WKWebView webView, WKNavigation? navigation, NSError error);
+    [Optional]
+    [Selector("webView:didCommitNavigation:")]
+    void WebViewDidCommitNavigation(WKWebView webView, WKNavigation? navigation);
+    [Optional]
+    [Selector("webView:didFinishNavigation:")]
+    void WebViewDidFinishNavigation(WKWebView webView, WKNavigation? navigation);
+    [Optional]
+    [Selector("webView:didFailNavigation:withError:")]
+    void WebViewDidFailNavigationWithError(WKWebView webView, WKNavigation? navigation, NSError error);
+    [Optional]
+    [Selector("webView:didReceiveAuthenticationChallenge:completionHandler:")]
+    void WebViewDidReceiveAuthenticationChallengeCompletionHandler(WKWebView webView, NSURLAuthenticationChallenge challenge, WKNavigationDelegateWebViewDidReceiveAuthenticationChallengeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("webViewWebContentProcessDidTerminate:")]
+    void WebViewWebContentProcessDidTerminate(WKWebView webView);
+    [Optional]
+    [Selector("webView:authenticationChallenge:shouldAllowDeprecatedTLS:")]
+    void WebViewAuthenticationChallengeShouldAllowDeprecatedTLS(WKWebView webView, NSURLAuthenticationChallenge challenge, WKNavigationDelegateWebViewAuthenticationChallengeShouldAllowDeprecatedTLSDecisionHandlerBlock decisionHandler);
+    [Optional]
+    [Selector("webView:navigationAction:didBecomeDownload:")]
+    void WebViewNavigationActionDidBecomeDownload(WKWebView webView, WKNavigationAction navigationAction, WKDownload download);
+    [Optional]
+    [Selector("webView:navigationResponse:didBecomeDownload:")]
+    void WebViewNavigationResponseDidBecomeDownload(WKWebView webView, WKNavigationResponse navigationResponse, WKDownload download);
     /// macOS 26.0 and later.
-    [Optional] [Selector("webView:shouldGoToBackForwardListItem:willUseInstantBack:completionHandler:")] void WebViewShouldGoToBackForwardListItemWillUseInstantBackCompletionHandler(WKWebView webView, WKBackForwardListItem backForwardListItem, bool willUseInstantBack, WKNavigationDelegateWebViewShouldGoToBackForwardListItemWillUseInstantBackCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("webView:shouldGoToBackForwardListItem:willUseInstantBack:completionHandler:")]
+    void WebViewShouldGoToBackForwardListItemWillUseInstantBackCompletionHandler(WKWebView webView, WKBackForwardListItem backForwardListItem, bool willUseInstantBack, WKNavigationDelegateWebViewShouldGoToBackForwardListItemWillUseInstantBackCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

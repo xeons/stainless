@@ -56,71 +56,124 @@ public extern "C" CGFloat NSGridViewSizeForContent;
 
 public extern objc class NSGridView : NSView
 {
-    [Selector("numberOfRows")] public NSInteger NumberOfRows { get; }
-    [Selector("numberOfColumns")] public NSInteger NumberOfColumns { get; }
-    [Selector("xPlacement", "setXPlacement:")] public NSGridCellPlacement XPlacement { get; set; }
-    [Selector("yPlacement", "setYPlacement:")] public NSGridCellPlacement YPlacement { get; set; }
-    [Selector("rowAlignment", "setRowAlignment:")] public NSGridRowAlignment RowAlignment { get; set; }
-    [Selector("rowSpacing", "setRowSpacing:")] public CGFloat RowSpacing { get; set; }
-    [Selector("columnSpacing", "setColumnSpacing:")] public CGFloat ColumnSpacing { get; set; }
-    [Selector("initWithFrame:")] public Self InitWithFrame(NSRect frameRect);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    [Selector("gridViewWithNumberOfColumns:rows:")] public static Self GridViewWithNumberOfColumnsRows(NSInteger columnCount, NSInteger rowCount);
-    [Selector("gridViewWithViews:")] public static Self GridViewWithViews(NSArray rows);
-    [Selector("rowAtIndex:")] public NSGridRow RowAtIndex(NSInteger index);
-    [Selector("indexOfRow:")] public NSInteger IndexOfRow(NSGridRow row);
-    [Selector("columnAtIndex:")] public NSGridColumn ColumnAtIndex(NSInteger index);
-    [Selector("indexOfColumn:")] public NSInteger IndexOfColumn(NSGridColumn column);
-    [Selector("cellAtColumnIndex:rowIndex:")] public NSGridCell CellAtColumnIndexRowIndex(NSInteger columnIndex, NSInteger rowIndex);
-    [Selector("cellForView:")] public NSGridCell? CellForView(NSView view);
-    [Selector("addRowWithViews:")] public NSGridRow AddRowWithViews(NSArray views);
-    [Selector("insertRowAtIndex:withViews:")] public NSGridRow InsertRowAtIndexWithViews(NSInteger index, NSArray views);
-    [Selector("moveRowAtIndex:toIndex:")] public void MoveRowAtIndexToIndex(NSInteger fromIndex, NSInteger toIndex);
-    [Selector("removeRowAtIndex:")] public void RemoveRowAtIndex(NSInteger index);
-    [Selector("addColumnWithViews:")] public NSGridColumn AddColumnWithViews(NSArray views);
-    [Selector("insertColumnAtIndex:withViews:")] public NSGridColumn InsertColumnAtIndexWithViews(NSInteger index, NSArray views);
-    [Selector("moveColumnAtIndex:toIndex:")] public void MoveColumnAtIndexToIndex(NSInteger fromIndex, NSInteger toIndex);
-    [Selector("removeColumnAtIndex:")] public void RemoveColumnAtIndex(NSInteger index);
-    [Selector("mergeCellsInHorizontalRange:verticalRange:")] public void MergeCellsInHorizontalRangeVerticalRange(NSRange hRange, NSRange vRange);
+    [Selector("numberOfRows")]
+    public NSInteger NumberOfRows { get; }
+    [Selector("numberOfColumns")]
+    public NSInteger NumberOfColumns { get; }
+    [Selector("xPlacement", "setXPlacement:")]
+    public NSGridCellPlacement XPlacement { get; set; }
+    [Selector("yPlacement", "setYPlacement:")]
+    public NSGridCellPlacement YPlacement { get; set; }
+    [Selector("rowAlignment", "setRowAlignment:")]
+    public NSGridRowAlignment RowAlignment { get; set; }
+    [Selector("rowSpacing", "setRowSpacing:")]
+    public CGFloat RowSpacing { get; set; }
+    [Selector("columnSpacing", "setColumnSpacing:")]
+    public CGFloat ColumnSpacing { get; set; }
+    [Selector("initWithFrame:")]
+    public Self InitWithFrame(NSRect frameRect);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
+    [Selector("gridViewWithNumberOfColumns:rows:")]
+    public static Self GridViewWithNumberOfColumnsRows(NSInteger columnCount, NSInteger rowCount);
+    [Selector("gridViewWithViews:")]
+    public static Self GridViewWithViews(NSArray rows);
+    [Selector("rowAtIndex:")]
+    public NSGridRow RowAtIndex(NSInteger index);
+    [Selector("indexOfRow:")]
+    public NSInteger IndexOfRow(NSGridRow row);
+    [Selector("columnAtIndex:")]
+    public NSGridColumn ColumnAtIndex(NSInteger index);
+    [Selector("indexOfColumn:")]
+    public NSInteger IndexOfColumn(NSGridColumn column);
+    [Selector("cellAtColumnIndex:rowIndex:")]
+    public NSGridCell CellAtColumnIndexRowIndex(NSInteger columnIndex, NSInteger rowIndex);
+    [Selector("cellForView:")]
+    public NSGridCell? CellForView(NSView view);
+    [Selector("addRowWithViews:")]
+    public NSGridRow AddRowWithViews(NSArray views);
+    [Selector("insertRowAtIndex:withViews:")]
+    public NSGridRow InsertRowAtIndexWithViews(NSInteger index, NSArray views);
+    [Selector("moveRowAtIndex:toIndex:")]
+    public void MoveRowAtIndexToIndex(NSInteger fromIndex, NSInteger toIndex);
+    [Selector("removeRowAtIndex:")]
+    public void RemoveRowAtIndex(NSInteger index);
+    [Selector("addColumnWithViews:")]
+    public NSGridColumn AddColumnWithViews(NSArray views);
+    [Selector("insertColumnAtIndex:withViews:")]
+    public NSGridColumn InsertColumnAtIndexWithViews(NSInteger index, NSArray views);
+    [Selector("moveColumnAtIndex:toIndex:")]
+    public void MoveColumnAtIndexToIndex(NSInteger fromIndex, NSInteger toIndex);
+    [Selector("removeColumnAtIndex:")]
+    public void RemoveColumnAtIndex(NSInteger index);
+    [Selector("mergeCellsInHorizontalRange:verticalRange:")]
+    public void MergeCellsInHorizontalRangeVerticalRange(NSRange hRange, NSRange vRange);
 }
 
 public extern objc class NSGridRow : NSObject, NSCoding
 {
-    [Selector("gridView")] public NSGridView? GridView { get; }
-    [Selector("numberOfCells")] public NSInteger NumberOfCells { get; }
-    [Selector("yPlacement", "setYPlacement:")] public NSGridCellPlacement YPlacement { get; set; }
-    [Selector("rowAlignment", "setRowAlignment:")] public NSGridRowAlignment RowAlignment { get; set; }
-    [Selector("height", "setHeight:")] public CGFloat Height { get; set; }
-    [Selector("topPadding", "setTopPadding:")] public CGFloat TopPadding { get; set; }
-    [Selector("bottomPadding", "setBottomPadding:")] public CGFloat BottomPadding { get; set; }
-    [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
-    [Selector("cellAtIndex:")] public NSGridCell CellAtIndex(NSInteger index);
-    [Selector("mergeCellsInRange:")] public void MergeCellsInRange(NSRange range);
+    [Selector("gridView")]
+    public NSGridView? GridView { get; }
+    [Selector("numberOfCells")]
+    public NSInteger NumberOfCells { get; }
+    [Selector("yPlacement", "setYPlacement:")]
+    public NSGridCellPlacement YPlacement { get; set; }
+    [Selector("rowAlignment", "setRowAlignment:")]
+    public NSGridRowAlignment RowAlignment { get; set; }
+    [Selector("height", "setHeight:")]
+    public CGFloat Height { get; set; }
+    [Selector("topPadding", "setTopPadding:")]
+    public CGFloat TopPadding { get; set; }
+    [Selector("bottomPadding", "setBottomPadding:")]
+    public CGFloat BottomPadding { get; set; }
+    [Selector("isHidden", "setHidden:")]
+    public bool Hidden { get; set; }
+    [Selector("cellAtIndex:")]
+    public NSGridCell CellAtIndex(NSInteger index);
+    [Selector("mergeCellsInRange:")]
+    public void MergeCellsInRange(NSRange range);
 }
 
 public extern objc class NSGridColumn : NSObject, NSCoding
 {
-    [Selector("gridView")] public NSGridView? GridView { get; }
-    [Selector("numberOfCells")] public NSInteger NumberOfCells { get; }
-    [Selector("xPlacement", "setXPlacement:")] public NSGridCellPlacement XPlacement { get; set; }
-    [Selector("width", "setWidth:")] public CGFloat Width { get; set; }
-    [Selector("leadingPadding", "setLeadingPadding:")] public CGFloat LeadingPadding { get; set; }
-    [Selector("trailingPadding", "setTrailingPadding:")] public CGFloat TrailingPadding { get; set; }
-    [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
-    [Selector("cellAtIndex:")] public NSGridCell CellAtIndex(NSInteger index);
-    [Selector("mergeCellsInRange:")] public void MergeCellsInRange(NSRange range);
+    [Selector("gridView")]
+    public NSGridView? GridView { get; }
+    [Selector("numberOfCells")]
+    public NSInteger NumberOfCells { get; }
+    [Selector("xPlacement", "setXPlacement:")]
+    public NSGridCellPlacement XPlacement { get; set; }
+    [Selector("width", "setWidth:")]
+    public CGFloat Width { get; set; }
+    [Selector("leadingPadding", "setLeadingPadding:")]
+    public CGFloat LeadingPadding { get; set; }
+    [Selector("trailingPadding", "setTrailingPadding:")]
+    public CGFloat TrailingPadding { get; set; }
+    [Selector("isHidden", "setHidden:")]
+    public bool Hidden { get; set; }
+    [Selector("cellAtIndex:")]
+    public NSGridCell CellAtIndex(NSInteger index);
+    [Selector("mergeCellsInRange:")]
+    public void MergeCellsInRange(NSRange range);
 }
 
 public extern objc class NSGridCell : NSObject, NSCoding
 {
-    [Selector("contentView", "setContentView:")] public NSView? ContentView { get; set; }
-    [Selector("emptyContentView")] public static NSView EmptyContentView { get; }
-    [Selector("row")] public NSGridRow? Row { get; }
-    [Selector("column")] public NSGridColumn? Column { get; }
-    [Selector("xPlacement", "setXPlacement:")] public NSGridCellPlacement XPlacement { get; set; }
-    [Selector("yPlacement", "setYPlacement:")] public NSGridCellPlacement YPlacement { get; set; }
-    [Selector("rowAlignment", "setRowAlignment:")] public NSGridRowAlignment RowAlignment { get; set; }
-    [Selector("customPlacementConstraints", "setCustomPlacementConstraints:")] public NSArray CustomPlacementConstraints { get; set; }
+    [Selector("contentView", "setContentView:")]
+    public NSView? ContentView { get; set; }
+    [Selector("emptyContentView")]
+    public static NSView EmptyContentView { get; }
+    [Selector("row")]
+    public NSGridRow? Row { get; }
+    [Selector("column")]
+    public NSGridColumn? Column { get; }
+    [Selector("xPlacement", "setXPlacement:")]
+    public NSGridCellPlacement XPlacement { get; set; }
+    [Selector("yPlacement", "setYPlacement:")]
+    public NSGridCellPlacement YPlacement { get; set; }
+    [Selector("rowAlignment", "setRowAlignment:")]
+    public NSGridRowAlignment RowAlignment { get; set; }
+    [Selector("customPlacementConstraints", "setCustomPlacementConstraints:")]
+    public NSArray CustomPlacementConstraints { get; set; }
 }
 
 #endif

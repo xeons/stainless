@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class NSTrackingSeparatorToolbarItem : NSToolbarItem
 {
-    [Selector("splitView", "setSplitView:")] public NSSplitView? SplitView { get; set; }
-    [Selector("dividerIndex", "setDividerIndex:")] public NSInteger DividerIndex { get; set; }
-    [Selector("trackingSeparatorToolbarItemWithIdentifier:splitView:dividerIndex:")] public static Self TrackingSeparatorToolbarItemWithIdentifierSplitViewDividerIndex(NSToolbarItemIdentifier identifier, NSSplitView splitView, NSInteger dividerIndex);
+    [Selector("splitView", "setSplitView:")]
+    public NSSplitView? SplitView { get; set; }
+    [Selector("dividerIndex", "setDividerIndex:")]
+    public NSInteger DividerIndex { get; set; }
+    [Selector("trackingSeparatorToolbarItemWithIdentifier:splitView:dividerIndex:")]
+    public static Self TrackingSeparatorToolbarItemWithIdentifierSplitViewDividerIndex(NSToolbarItemIdentifier identifier, NSSplitView splitView, NSInteger dividerIndex);
 }
 
 #endif

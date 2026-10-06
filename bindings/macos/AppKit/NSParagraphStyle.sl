@@ -57,80 +57,134 @@ public extern "C" NSTextTabOptionKey NSTabColumnTerminatorsAttributeName;
 
 public extern objc class NSTextTab : NSObject, NSCopying, NSCoding, NSSecureCoding
 {
-    [Selector("location")] public CGFloat Location { get; }
-    [Selector("options")] public NSDictionary Options { get; }
-    [Selector("columnTerminatorsForLocale:")] public static NSCharacterSet ColumnTerminatorsForLocale(NSLocale? aLocale);
+    [Selector("location")]
+    public CGFloat Location { get; }
+    [Selector("options")]
+    public NSDictionary Options { get; }
+    [Selector("columnTerminatorsForLocale:")]
+    public static NSCharacterSet ColumnTerminatorsForLocale(NSLocale? aLocale);
 }
 
 public extern objc class NSParagraphStyle : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("defaultParagraphStyle")] public static NSParagraphStyle DefaultParagraphStyle { get; }
-    [Selector("lineSpacing")] public CGFloat LineSpacing { get; }
-    [Selector("paragraphSpacing")] public CGFloat ParagraphSpacing { get; }
-    [Selector("headIndent")] public CGFloat HeadIndent { get; }
-    [Selector("tailIndent")] public CGFloat TailIndent { get; }
-    [Selector("firstLineHeadIndent")] public CGFloat FirstLineHeadIndent { get; }
-    [Selector("minimumLineHeight")] public CGFloat MinimumLineHeight { get; }
-    [Selector("maximumLineHeight")] public CGFloat MaximumLineHeight { get; }
-    [Selector("lineBreakMode")] public NSLineBreakMode LineBreakMode { get; }
-    [Selector("baseWritingDirection")] public NSWritingDirection BaseWritingDirection { get; }
-    [Selector("lineHeightMultiple")] public CGFloat LineHeightMultiple { get; }
-    [Selector("paragraphSpacingBefore")] public CGFloat ParagraphSpacingBefore { get; }
-    [Selector("hyphenationFactor")] public float HyphenationFactor { get; }
-    [Selector("usesDefaultHyphenation")] public bool UsesDefaultHyphenation { get; }
-    [Selector("tabStops")] public NSArray TabStops { get; }
-    [Selector("defaultTabInterval")] public CGFloat DefaultTabInterval { get; }
-    [Selector("textLists")] public NSArray TextLists { get; }
-    [Selector("allowsDefaultTighteningForTruncation")] public bool AllowsDefaultTighteningForTruncation { get; }
-    [Selector("lineBreakStrategy")] public NSLineBreakStrategy LineBreakStrategy { get; }
-    [Selector("defaultWritingDirectionForLanguage:")] public static NSWritingDirection DefaultWritingDirectionForLanguage(NSString? languageName);
+    [Selector("defaultParagraphStyle")]
+    public static NSParagraphStyle DefaultParagraphStyle { get; }
+    [Selector("lineSpacing")]
+    public CGFloat LineSpacing { get; }
+    [Selector("paragraphSpacing")]
+    public CGFloat ParagraphSpacing { get; }
+    [Selector("headIndent")]
+    public CGFloat HeadIndent { get; }
+    [Selector("tailIndent")]
+    public CGFloat TailIndent { get; }
+    [Selector("firstLineHeadIndent")]
+    public CGFloat FirstLineHeadIndent { get; }
+    [Selector("minimumLineHeight")]
+    public CGFloat MinimumLineHeight { get; }
+    [Selector("maximumLineHeight")]
+    public CGFloat MaximumLineHeight { get; }
+    [Selector("lineBreakMode")]
+    public NSLineBreakMode LineBreakMode { get; }
+    [Selector("baseWritingDirection")]
+    public NSWritingDirection BaseWritingDirection { get; }
+    [Selector("lineHeightMultiple")]
+    public CGFloat LineHeightMultiple { get; }
+    [Selector("paragraphSpacingBefore")]
+    public CGFloat ParagraphSpacingBefore { get; }
+    [Selector("hyphenationFactor")]
+    public float HyphenationFactor { get; }
+    [Selector("usesDefaultHyphenation")]
+    public bool UsesDefaultHyphenation { get; }
+    [Selector("tabStops")]
+    public NSArray TabStops { get; }
+    [Selector("defaultTabInterval")]
+    public CGFloat DefaultTabInterval { get; }
+    [Selector("textLists")]
+    public NSArray TextLists { get; }
+    [Selector("allowsDefaultTighteningForTruncation")]
+    public bool AllowsDefaultTighteningForTruncation { get; }
+    [Selector("lineBreakStrategy")]
+    public NSLineBreakStrategy LineBreakStrategy { get; }
+    [Selector("defaultWritingDirectionForLanguage:")]
+    public static NSWritingDirection DefaultWritingDirectionForLanguage(NSString? languageName);
 }
 
 public extern objc class NSMutableParagraphStyle : NSParagraphStyle
 {
-    [Selector("lineSpacing", "setLineSpacing:")] public CGFloat LineSpacing { get; set; }
-    [Selector("paragraphSpacing", "setParagraphSpacing:")] public CGFloat ParagraphSpacing { get; set; }
-    [Selector("firstLineHeadIndent", "setFirstLineHeadIndent:")] public CGFloat FirstLineHeadIndent { get; set; }
-    [Selector("headIndent", "setHeadIndent:")] public CGFloat HeadIndent { get; set; }
-    [Selector("tailIndent", "setTailIndent:")] public CGFloat TailIndent { get; set; }
-    [Selector("lineBreakMode", "setLineBreakMode:")] public NSLineBreakMode LineBreakMode { get; set; }
-    [Selector("minimumLineHeight", "setMinimumLineHeight:")] public CGFloat MinimumLineHeight { get; set; }
-    [Selector("maximumLineHeight", "setMaximumLineHeight:")] public CGFloat MaximumLineHeight { get; set; }
-    [Selector("baseWritingDirection", "setBaseWritingDirection:")] public NSWritingDirection BaseWritingDirection { get; set; }
-    [Selector("lineHeightMultiple", "setLineHeightMultiple:")] public CGFloat LineHeightMultiple { get; set; }
-    [Selector("paragraphSpacingBefore", "setParagraphSpacingBefore:")] public CGFloat ParagraphSpacingBefore { get; set; }
-    [Selector("hyphenationFactor", "setHyphenationFactor:")] public float HyphenationFactor { get; set; }
-    [Selector("usesDefaultHyphenation", "setUsesDefaultHyphenation:")] public bool UsesDefaultHyphenation { get; set; }
-    [Selector("tabStops", "setTabStops:")] public NSArray? TabStops { get; set; }
-    [Selector("defaultTabInterval", "setDefaultTabInterval:")] public CGFloat DefaultTabInterval { get; set; }
-    [Selector("allowsDefaultTighteningForTruncation", "setAllowsDefaultTighteningForTruncation:")] public bool AllowsDefaultTighteningForTruncation { get; set; }
-    [Selector("lineBreakStrategy", "setLineBreakStrategy:")] public NSLineBreakStrategy LineBreakStrategy { get; set; }
-    [Selector("textLists", "setTextLists:")] public NSArray TextLists { get; set; }
-    [Selector("addTabStop:")] public void AddTabStop(NSTextTab anObject);
-    [Selector("removeTabStop:")] public void RemoveTabStop(NSTextTab anObject);
-    [Selector("setParagraphStyle:")] public void SetParagraphStyle(NSParagraphStyle obj);
+    [Selector("lineSpacing", "setLineSpacing:")]
+    public CGFloat LineSpacing { get; set; }
+    [Selector("paragraphSpacing", "setParagraphSpacing:")]
+    public CGFloat ParagraphSpacing { get; set; }
+    [Selector("firstLineHeadIndent", "setFirstLineHeadIndent:")]
+    public CGFloat FirstLineHeadIndent { get; set; }
+    [Selector("headIndent", "setHeadIndent:")]
+    public CGFloat HeadIndent { get; set; }
+    [Selector("tailIndent", "setTailIndent:")]
+    public CGFloat TailIndent { get; set; }
+    [Selector("lineBreakMode", "setLineBreakMode:")]
+    public NSLineBreakMode LineBreakMode { get; set; }
+    [Selector("minimumLineHeight", "setMinimumLineHeight:")]
+    public CGFloat MinimumLineHeight { get; set; }
+    [Selector("maximumLineHeight", "setMaximumLineHeight:")]
+    public CGFloat MaximumLineHeight { get; set; }
+    [Selector("baseWritingDirection", "setBaseWritingDirection:")]
+    public NSWritingDirection BaseWritingDirection { get; set; }
+    [Selector("lineHeightMultiple", "setLineHeightMultiple:")]
+    public CGFloat LineHeightMultiple { get; set; }
+    [Selector("paragraphSpacingBefore", "setParagraphSpacingBefore:")]
+    public CGFloat ParagraphSpacingBefore { get; set; }
+    [Selector("hyphenationFactor", "setHyphenationFactor:")]
+    public float HyphenationFactor { get; set; }
+    [Selector("usesDefaultHyphenation", "setUsesDefaultHyphenation:")]
+    public bool UsesDefaultHyphenation { get; set; }
+    [Selector("tabStops", "setTabStops:")]
+    public NSArray? TabStops { get; set; }
+    [Selector("defaultTabInterval", "setDefaultTabInterval:")]
+    public CGFloat DefaultTabInterval { get; set; }
+    [Selector("allowsDefaultTighteningForTruncation", "setAllowsDefaultTighteningForTruncation:")]
+    public bool AllowsDefaultTighteningForTruncation { get; set; }
+    [Selector("lineBreakStrategy", "setLineBreakStrategy:")]
+    public NSLineBreakStrategy LineBreakStrategy { get; set; }
+    [Selector("textLists", "setTextLists:")]
+    public NSArray TextLists { get; set; }
+    [Selector("addTabStop:")]
+    public void AddTabStop(NSTextTab anObject);
+    [Selector("removeTabStop:")]
+    public void RemoveTabStop(NSTextTab anObject);
+    [Selector("setParagraphStyle:")]
+    public void SetParagraphStyle(NSParagraphStyle obj);
 }
 
 public extern objc class NSTextTab
 {
-    [Selector("alignment")] public NSTextAlignment Alignment { get; }
-    [Selector("initWithTextAlignment:location:options:")] public Self InitWithTextAlignmentLocationOptions(NSTextAlignment alignment, CGFloat loc, NSDictionary options);
+    [Selector("alignment")]
+    public NSTextAlignment Alignment { get; }
+    [Selector("initWithTextAlignment:location:options:")]
+    public Self InitWithTextAlignmentLocationOptions(NSTextAlignment alignment, CGFloat loc, NSDictionary options);
 }
 
 public extern objc class NSParagraphStyle
 {
-    [Selector("alignment")] public NSTextAlignment Alignment { get; }
-    [Selector("tighteningFactorForTruncation")] public float TighteningFactorForTruncation { get; }
-    [Selector("textBlocks")] public NSArray TextBlocks { get; }
-    [Selector("headerLevel")] public NSInteger HeaderLevel { get; }
+    [Selector("alignment")]
+    public NSTextAlignment Alignment { get; }
+    [Selector("tighteningFactorForTruncation")]
+    public float TighteningFactorForTruncation { get; }
+    [Selector("textBlocks")]
+    public NSArray TextBlocks { get; }
+    [Selector("headerLevel")]
+    public NSInteger HeaderLevel { get; }
 }
 
 public extern objc class NSMutableParagraphStyle
 {
-    [Selector("alignment", "setAlignment:")] public NSTextAlignment Alignment { get; set; }
-    [Selector("tighteningFactorForTruncation", "setTighteningFactorForTruncation:")] public float TighteningFactorForTruncation { get; set; }
-    [Selector("textBlocks", "setTextBlocks:")] public NSArray TextBlocks { get; set; }
-    [Selector("headerLevel", "setHeaderLevel:")] public NSInteger HeaderLevel { get; set; }
+    [Selector("alignment", "setAlignment:")]
+    public NSTextAlignment Alignment { get; set; }
+    [Selector("tighteningFactorForTruncation", "setTighteningFactorForTruncation:")]
+    public float TighteningFactorForTruncation { get; set; }
+    [Selector("textBlocks", "setTextBlocks:")]
+    public NSArray TextBlocks { get; set; }
+    [Selector("headerLevel", "setHeaderLevel:")]
+    public NSInteger HeaderLevel { get; set; }
 }
 
 public enum NSTextTabType : ulong
@@ -144,8 +198,10 @@ public enum NSTextTabType : ulong
 /// NSTextTabDeprecated, a category of NSTextTab.
 public extern objc class NSTextTab
 {
-    [Selector("tabStopType")] public NSTextTabType TabStopType { get; }
-    [Selector("initWithType:location:")] public Self InitWithTypeLocation(NSTextTabType type, CGFloat loc);
+    [Selector("tabStopType")]
+    public NSTextTabType TabStopType { get; }
+    [Selector("initWithType:location:")]
+    public Self InitWithTypeLocation(NSTextTabType type, CGFloat loc);
 }
 
 #endif

@@ -124,7 +124,8 @@ public extern "C" NSTextHighlightColorScheme NSTextHighlightColorSchemeBlue;
 /// NSAttributedStringAttributeFixing, a category of NSMutableAttributedString.
 public extern objc class NSMutableAttributedString
 {
-    [Selector("fixAttributesInRange:")] public void FixAttributesInRange(NSRange range);
+    [Selector("fixAttributesInRange:")]
+    public void FixAttributesInRange(NSRange range);
 }
 
 public using NSAttributedStringDocumentType = NSString;
@@ -200,24 +201,32 @@ public extern "C" NSAttributedStringDocumentReadingOptionKey NSTextKit1ListMarke
 /// NSAttributedStringDocumentFormats, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("initWithURL:options:documentAttributes:error:")] public Self? InitWithURLOptionsDocumentAttributesError(NSURL url, NSDictionary options, out NSDictionary? dict, out NSError? error);
-    [Selector("initWithData:options:documentAttributes:error:")] public Self? InitWithDataOptionsDocumentAttributesError(NSData data, NSDictionary options, out NSDictionary? dict, out NSError? error);
-    [Selector("dataFromRange:documentAttributes:error:")] public NSData? DataFromRangeDocumentAttributesError(NSRange range, NSDictionary dict, out NSError? error);
-    [Selector("fileWrapperFromRange:documentAttributes:error:")] public NSFileWrapper? FileWrapperFromRangeDocumentAttributesError(NSRange range, NSDictionary dict, out NSError? error);
+    [Selector("initWithURL:options:documentAttributes:error:")]
+    public Self? InitWithURLOptionsDocumentAttributesError(NSURL url, NSDictionary options, out NSDictionary? dict, out NSError? error);
+    [Selector("initWithData:options:documentAttributes:error:")]
+    public Self? InitWithDataOptionsDocumentAttributesError(NSData data, NSDictionary options, out NSDictionary? dict, out NSError? error);
+    [Selector("dataFromRange:documentAttributes:error:")]
+    public NSData? DataFromRangeDocumentAttributesError(NSRange range, NSDictionary dict, out NSError? error);
+    [Selector("fileWrapperFromRange:documentAttributes:error:")]
+    public NSFileWrapper? FileWrapperFromRangeDocumentAttributesError(NSRange range, NSDictionary dict, out NSError? error);
 }
 
 /// NSMutableAttributedStringDocumentFormats, a category of NSMutableAttributedString.
 public extern objc class NSMutableAttributedString
 {
-    [Selector("readFromURL:options:documentAttributes:error:")] public bool ReadFromURLOptionsDocumentAttributesError(NSURL url, NSDictionary opts, out NSDictionary? dict, out NSError? error);
-    [Selector("readFromData:options:documentAttributes:error:")] public bool ReadFromDataOptionsDocumentAttributesError(NSData data, NSDictionary opts, out NSDictionary? dict, out NSError? error);
+    [Selector("readFromURL:options:documentAttributes:error:")]
+    public bool ReadFromURLOptionsDocumentAttributesError(NSURL url, NSDictionary opts, out NSDictionary? dict, out NSError? error);
+    [Selector("readFromData:options:documentAttributes:error:")]
+    public bool ReadFromDataOptionsDocumentAttributesError(NSData data, NSDictionary opts, out NSDictionary? dict, out NSError? error);
 }
 
 /// NSAttributedStringKitAdditions, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("containsAttachmentsInRange:")] public bool ContainsAttachmentsInRange(NSRange range);
-    [Selector("prefersRTFDInRange:")] public bool PrefersRTFDInRange(NSRange range);
+    [Selector("containsAttachmentsInRange:")]
+    public bool ContainsAttachmentsInRange(NSRange range);
+    [Selector("prefersRTFDInRange:")]
+    public bool PrefersRTFDInRange(NSRange range);
 }
 
 public extern "C" NSAttributedStringKey NSCursorAttributeName;
@@ -243,9 +252,12 @@ public enum NSSpellingState : long
 /// NSAttributedStringAppKitAttributeFixing, a category of NSMutableAttributedString.
 public extern objc class NSMutableAttributedString
 {
-    [Selector("fixFontAttributeInRange:")] public void FixFontAttributeInRange(NSRange range);
-    [Selector("fixParagraphStyleAttributeInRange:")] public void FixParagraphStyleAttributeInRange(NSRange range);
-    [Selector("fixAttachmentAttributeInRange:")] public void FixAttachmentAttributeInRange(NSRange range);
+    [Selector("fixFontAttributeInRange:")]
+    public void FixFontAttributeInRange(NSRange range);
+    [Selector("fixParagraphStyleAttributeInRange:")]
+    public void FixParagraphStyleAttributeInRange(NSRange range);
+    [Selector("fixAttachmentAttributeInRange:")]
+    public void FixAttachmentAttributeInRange(NSRange range);
 }
 
 public extern "C" NSAttributedStringDocumentType NSMacSimpleTextDocumentType;
@@ -321,50 +333,79 @@ public extern "C" NSAttributedStringDocumentReadingOptionKey? NSFileTypeDocument
 /// NSAttributedStringAppKitDocumentFormats, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("initWithRTF:documentAttributes:")] public Self? InitWithRTFDocumentAttributes(NSData data, out NSDictionary? dict);
-    [Selector("initWithRTFD:documentAttributes:")] public Self? InitWithRTFDDocumentAttributes(NSData data, out NSDictionary? dict);
-    [Selector("initWithHTML:documentAttributes:")] public Self? InitWithHTMLDocumentAttributes(NSData data, out NSDictionary? dict);
-    [Selector("initWithHTML:baseURL:documentAttributes:")] public Self? InitWithHTMLBaseURLDocumentAttributes(NSData data, NSURL @base, out NSDictionary? dict);
-    [Selector("initWithDocFormat:documentAttributes:")] public Self? InitWithDocFormatDocumentAttributes(NSData data, out NSDictionary? dict);
-    [Selector("initWithHTML:options:documentAttributes:")] public Self? InitWithHTMLOptionsDocumentAttributes(NSData data, NSDictionary options, out NSDictionary? dict);
-    [Selector("initWithRTFDFileWrapper:documentAttributes:")] public Self? InitWithRTFDFileWrapperDocumentAttributes(NSFileWrapper wrapper, out NSDictionary? dict);
-    [Selector("RTFFromRange:documentAttributes:")] public NSData? RTFFromRangeDocumentAttributes(NSRange range, NSDictionary dict);
-    [Selector("RTFDFromRange:documentAttributes:")] public NSData? RTFDFromRangeDocumentAttributes(NSRange range, NSDictionary dict);
-    [Selector("RTFDFileWrapperFromRange:documentAttributes:")] public NSFileWrapper? RTFDFileWrapperFromRangeDocumentAttributes(NSRange range, NSDictionary dict);
-    [Selector("docFormatFromRange:documentAttributes:")] public NSData? DocFormatFromRangeDocumentAttributes(NSRange range, NSDictionary dict);
+    [Selector("initWithRTF:documentAttributes:")]
+    public Self? InitWithRTFDocumentAttributes(NSData data, out NSDictionary? dict);
+    [Selector("initWithRTFD:documentAttributes:")]
+    public Self? InitWithRTFDDocumentAttributes(NSData data, out NSDictionary? dict);
+    [Selector("initWithHTML:documentAttributes:")]
+    public Self? InitWithHTMLDocumentAttributes(NSData data, out NSDictionary? dict);
+    [Selector("initWithHTML:baseURL:documentAttributes:")]
+    public Self? InitWithHTMLBaseURLDocumentAttributes(NSData data, NSURL @base, out NSDictionary? dict);
+    [Selector("initWithDocFormat:documentAttributes:")]
+    public Self? InitWithDocFormatDocumentAttributes(NSData data, out NSDictionary? dict);
+    [Selector("initWithHTML:options:documentAttributes:")]
+    public Self? InitWithHTMLOptionsDocumentAttributes(NSData data, NSDictionary options, out NSDictionary? dict);
+    [Selector("initWithRTFDFileWrapper:documentAttributes:")]
+    public Self? InitWithRTFDFileWrapperDocumentAttributes(NSFileWrapper wrapper, out NSDictionary? dict);
+    [Selector("RTFFromRange:documentAttributes:")]
+    public NSData? RTFFromRangeDocumentAttributes(NSRange range, NSDictionary dict);
+    [Selector("RTFDFromRange:documentAttributes:")]
+    public NSData? RTFDFromRangeDocumentAttributes(NSRange range, NSDictionary dict);
+    [Selector("RTFDFileWrapperFromRange:documentAttributes:")]
+    public NSFileWrapper? RTFDFileWrapperFromRangeDocumentAttributes(NSRange range, NSDictionary dict);
+    [Selector("docFormatFromRange:documentAttributes:")]
+    public NSData? DocFormatFromRangeDocumentAttributes(NSRange range, NSDictionary dict);
 }
 
 /// NSAttributedStringAppKitAdditions, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("fontAttributesInRange:")] public NSDictionary FontAttributesInRange(NSRange range);
-    [Selector("rulerAttributesInRange:")] public NSDictionary RulerAttributesInRange(NSRange range);
-    [Selector("lineBreakBeforeIndex:withinRange:")] public NSUInteger LineBreakBeforeIndexWithinRange(NSUInteger location, NSRange aRange);
-    [Selector("lineBreakByHyphenatingBeforeIndex:withinRange:")] public NSUInteger LineBreakByHyphenatingBeforeIndexWithinRange(NSUInteger location, NSRange aRange);
-    [Selector("doubleClickAtIndex:")] public NSRange DoubleClickAtIndex(NSUInteger location);
-    [Selector("nextWordFromIndex:forward:")] public NSUInteger NextWordFromIndexForward(NSUInteger location, bool isForward);
-    [Selector("rangeOfTextBlock:atIndex:")] public NSRange RangeOfTextBlockAtIndex(NSTextBlock block, NSUInteger location);
-    [Selector("rangeOfTextTable:atIndex:")] public NSRange RangeOfTextTableAtIndex(NSTextTable table, NSUInteger location);
-    [Selector("rangeOfTextList:atIndex:")] public NSRange RangeOfTextListAtIndex(NSTextList list, NSUInteger location);
-    [Selector("itemNumberInTextList:atIndex:")] public NSInteger ItemNumberInTextListAtIndex(NSTextList list, NSUInteger location);
+    [Selector("fontAttributesInRange:")]
+    public NSDictionary FontAttributesInRange(NSRange range);
+    [Selector("rulerAttributesInRange:")]
+    public NSDictionary RulerAttributesInRange(NSRange range);
+    [Selector("lineBreakBeforeIndex:withinRange:")]
+    public NSUInteger LineBreakBeforeIndexWithinRange(NSUInteger location, NSRange aRange);
+    [Selector("lineBreakByHyphenatingBeforeIndex:withinRange:")]
+    public NSUInteger LineBreakByHyphenatingBeforeIndexWithinRange(NSUInteger location, NSRange aRange);
+    [Selector("doubleClickAtIndex:")]
+    public NSRange DoubleClickAtIndex(NSUInteger location);
+    [Selector("nextWordFromIndex:forward:")]
+    public NSUInteger NextWordFromIndexForward(NSUInteger location, bool isForward);
+    [Selector("rangeOfTextBlock:atIndex:")]
+    public NSRange RangeOfTextBlockAtIndex(NSTextBlock block, NSUInteger location);
+    [Selector("rangeOfTextTable:atIndex:")]
+    public NSRange RangeOfTextTableAtIndex(NSTextTable table, NSUInteger location);
+    [Selector("rangeOfTextList:atIndex:")]
+    public NSRange RangeOfTextListAtIndex(NSTextList list, NSUInteger location);
+    [Selector("itemNumberInTextList:atIndex:")]
+    public NSInteger ItemNumberInTextListAtIndex(NSTextList list, NSUInteger location);
 }
 
 /// NSAttributedStringPasteboardAdditions, a category of NSAttributedString.
 public extern objc class NSAttributedString : NSPasteboardReading, NSPasteboardWriting
 {
-    [Selector("textTypes")] public static NSArray? TextTypes { get; }
-    [Selector("textUnfilteredTypes")] public static NSArray? TextUnfilteredTypes { get; }
+    [Selector("textTypes")]
+    public static NSArray? TextTypes { get; }
+    [Selector("textUnfilteredTypes")]
+    public static NSArray? TextUnfilteredTypes { get; }
 }
 
 /// NSMutableAttributedStringAppKitAdditions, a category of NSMutableAttributedString.
 public extern objc class NSMutableAttributedString
 {
-    [Selector("superscriptRange:")] public void SuperscriptRange(NSRange range);
-    [Selector("subscriptRange:")] public void SubscriptRange(NSRange range);
-    [Selector("unscriptRange:")] public void UnscriptRange(NSRange range);
-    [Selector("applyFontTraits:range:")] public void ApplyFontTraitsRange(NSFontTraitMask traitMask, NSRange range);
-    [Selector("setAlignment:range:")] public void SetAlignmentRange(NSTextAlignment alignment, NSRange range);
-    [Selector("setBaseWritingDirection:range:")] public void SetBaseWritingDirectionRange(NSWritingDirection writingDirection, NSRange range);
+    [Selector("superscriptRange:")]
+    public void SuperscriptRange(NSRange range);
+    [Selector("subscriptRange:")]
+    public void SubscriptRange(NSRange range);
+    [Selector("unscriptRange:")]
+    public void UnscriptRange(NSRange range);
+    [Selector("applyFontTraits:range:")]
+    public void ApplyFontTraitsRange(NSFontTraitMask traitMask, NSRange range);
+    [Selector("setAlignment:range:")]
+    public void SetAlignmentRange(NSTextAlignment alignment, NSRange range);
+    [Selector("setBaseWritingDirection:range:")]
+    public void SetBaseWritingDirectionRange(NSWritingDirection writingDirection, NSRange range);
 }
 
 /// Deprecated in macOS 10.11.
@@ -394,30 +435,40 @@ public extern "C" NSUInteger NSUnderlineByWordMask;
 /// NSDeprecatedKitAdditions, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    [Selector("containsAttachments")] public bool ContainsAttachments { get; }
+    [Selector("containsAttachments")]
+    public bool ContainsAttachments { get; }
     /// Deprecated in macOS 10.5.
-    [Selector("textFileTypes")] public static NSArray TextFileTypes();
+    [Selector("textFileTypes")]
+    public static NSArray TextFileTypes();
     /// Deprecated in macOS 10.5.
-    [Selector("textPasteboardTypes")] public static NSArray TextPasteboardTypes();
+    [Selector("textPasteboardTypes")]
+    public static NSArray TextPasteboardTypes();
     /// Deprecated in macOS 10.5.
-    [Selector("textUnfilteredFileTypes")] public static NSArray TextUnfilteredFileTypes();
+    [Selector("textUnfilteredFileTypes")]
+    public static NSArray TextUnfilteredFileTypes();
     /// Deprecated in macOS 10.5.
-    [Selector("textUnfilteredPasteboardTypes")] public static NSArray TextUnfilteredPasteboardTypes();
+    [Selector("textUnfilteredPasteboardTypes")]
+    public static NSArray TextUnfilteredPasteboardTypes();
     /// Deprecated in macOS 10.11.
-    [Selector("initWithURL:documentAttributes:")] public Self? InitWithURLDocumentAttributes(NSURL url, out NSDictionary? dict);
+    [Selector("initWithURL:documentAttributes:")]
+    public Self? InitWithURLDocumentAttributes(NSURL url, out NSDictionary? dict);
     /// Deprecated in macOS 10.11.
-    [Selector("initWithPath:documentAttributes:")] public Self? InitWithPathDocumentAttributes(NSString path, out NSDictionary? dict);
+    [Selector("initWithPath:documentAttributes:")]
+    public Self? InitWithPathDocumentAttributes(NSString path, out NSDictionary? dict);
     /// Deprecated in macOS 10.11.
-    [Selector("URLAtIndex:effectiveRange:")] public NSURL? URLAtIndexEffectiveRange(NSUInteger location, NSRangePointer effectiveRange);
+    [Selector("URLAtIndex:effectiveRange:")]
+    public NSURL? URLAtIndexEffectiveRange(NSUInteger location, NSRangePointer effectiveRange);
 }
 
 /// NSDeprecatedKitAdditions, a category of NSMutableAttributedString.
 public extern objc class NSMutableAttributedString
 {
     /// Deprecated in macOS 10.11.
-    [Selector("readFromURL:options:documentAttributes:")] public bool ReadFromURLOptionsDocumentAttributes(NSURL url, NSDictionary options, out NSDictionary? dict);
+    [Selector("readFromURL:options:documentAttributes:")]
+    public bool ReadFromURLOptionsDocumentAttributes(NSURL url, NSDictionary options, out NSDictionary? dict);
     /// Deprecated in macOS 10.11.
-    [Selector("readFromData:options:documentAttributes:")] public bool ReadFromDataOptionsDocumentAttributes(NSData data, NSDictionary options, out NSDictionary? dict);
+    [Selector("readFromData:options:documentAttributes:")]
+    public bool ReadFromDataOptionsDocumentAttributes(NSData data, NSDictionary options, out NSDictionary? dict);
 }
 
 #endif

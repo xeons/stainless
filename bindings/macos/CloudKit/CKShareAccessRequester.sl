@@ -35,9 +35,12 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class CKShareAccessRequester : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("userIdentity")] public CKUserIdentity UserIdentity { get; }
-    [Selector("participantLookupInfo")] public CKUserIdentityLookupInfo ParticipantLookupInfo { get; }
-    [Selector("contact")] public CNContact Contact { get; }
+    [Selector("userIdentity")]
+    public CKUserIdentity UserIdentity { get; }
+    [Selector("participantLookupInfo")]
+    public CKUserIdentityLookupInfo ParticipantLookupInfo { get; }
+    [Selector("contact")]
+    public CNContact Contact { get; }
 }
 
 #endif

@@ -50,84 +50,138 @@ public enum MDLTextureChannelEncoding : long
 
 public extern objc class MDLTexture : NSObject, MDLNamed
 {
-    [Selector("dimensions")] public vector_int2 Dimensions { get; }
-    [Selector("rowStride")] public NSInteger RowStride { get; }
-    [Selector("channelCount")] public NSUInteger ChannelCount { get; }
-    [Selector("mipLevelCount")] public NSUInteger MipLevelCount { get; }
-    [Selector("channelEncoding")] public MDLTextureChannelEncoding ChannelEncoding { get; }
-    [Selector("isCube", "setIsCube:")] public bool IsCube { get; set; }
-    [Selector("hasAlphaValues", "setHasAlphaValues:")] public bool HasAlphaValues { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("textureNamed:")] public static Self? TextureNamed(NSString name);
-    [Selector("textureNamed:bundle:")] public static Self? TextureNamedBundle(NSString name, NSBundle? bundleOrNil);
-    [Selector("textureNamed:assetResolver:")] public static Self? TextureNamedAssetResolver(NSString name, MDLAssetResolver resolver);
-    [Selector("textureCubeWithImagesNamed:")] public static Self? TextureCubeWithImagesNamed(NSArray names);
-    [Selector("textureCubeWithImagesNamed:bundle:")] public static Self? TextureCubeWithImagesNamedBundle(NSArray names, NSBundle? bundleOrNil);
-    [Selector("irradianceTextureCubeWithTexture:name:dimensions:")] public static Self IrradianceTextureCubeWithTextureNameDimensions(MDLTexture texture, NSString? name, vector_int2 dimensions);
-    [Selector("irradianceTextureCubeWithTexture:name:dimensions:roughness:")] public static Self IrradianceTextureCubeWithTextureNameDimensionsRoughness(MDLTexture texture, NSString? name, vector_int2 dimensions, float roughness);
-    [Selector("initWithData:topLeftOrigin:name:dimensions:rowStride:channelCount:channelEncoding:isCube:")] public Self InitWithDataTopLeftOriginNameDimensionsRowStrideChannelCountChannelEncodingIsCube(NSData? pixelData, bool topLeftOrigin, NSString? name, vector_int2 dimensions, NSInteger rowStride, NSUInteger channelCount, MDLTextureChannelEncoding channelEncoding, bool isCube);
-    [Selector("writeToURL:")] public bool WriteToURL(NSURL URL);
-    [Selector("writeToURL:level:")] public bool WriteToURLLevel(NSURL URL, NSUInteger level);
-    [Selector("writeToURL:type:")] public bool WriteToURLType(NSURL nsurl, CFStringRef type);
-    [Selector("writeToURL:type:level:")] public bool WriteToURLTypeLevel(NSURL nsurl, CFStringRef type, NSUInteger level);
-    [Selector("imageFromTexture")] public CGImageRef? ImageFromTexture();
-    [Selector("imageFromTextureAtLevel:")] public CGImageRef? ImageFromTextureAtLevel(NSUInteger level);
-    [Selector("texelDataWithTopLeftOrigin")] public NSData? TexelDataWithTopLeftOrigin();
-    [Selector("texelDataWithBottomLeftOrigin")] public NSData? TexelDataWithBottomLeftOrigin();
-    [Selector("texelDataWithTopLeftOriginAtMipLevel:create:")] public NSData? TexelDataWithTopLeftOriginAtMipLevelCreate(NSInteger level, bool create);
-    [Selector("texelDataWithBottomLeftOriginAtMipLevel:create:")] public NSData? TexelDataWithBottomLeftOriginAtMipLevelCreate(NSInteger level, bool create);
+    [Selector("dimensions")]
+    public vector_int2 Dimensions { get; }
+    [Selector("rowStride")]
+    public NSInteger RowStride { get; }
+    [Selector("channelCount")]
+    public NSUInteger ChannelCount { get; }
+    [Selector("mipLevelCount")]
+    public NSUInteger MipLevelCount { get; }
+    [Selector("channelEncoding")]
+    public MDLTextureChannelEncoding ChannelEncoding { get; }
+    [Selector("isCube", "setIsCube:")]
+    public bool IsCube { get; set; }
+    [Selector("hasAlphaValues", "setHasAlphaValues:")]
+    public bool HasAlphaValues { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("textureNamed:")]
+    public static Self? TextureNamed(NSString name);
+    [Selector("textureNamed:bundle:")]
+    public static Self? TextureNamedBundle(NSString name, NSBundle? bundleOrNil);
+    [Selector("textureNamed:assetResolver:")]
+    public static Self? TextureNamedAssetResolver(NSString name, MDLAssetResolver resolver);
+    [Selector("textureCubeWithImagesNamed:")]
+    public static Self? TextureCubeWithImagesNamed(NSArray names);
+    [Selector("textureCubeWithImagesNamed:bundle:")]
+    public static Self? TextureCubeWithImagesNamedBundle(NSArray names, NSBundle? bundleOrNil);
+    [Selector("irradianceTextureCubeWithTexture:name:dimensions:")]
+    public static Self IrradianceTextureCubeWithTextureNameDimensions(MDLTexture texture, NSString? name, vector_int2 dimensions);
+    [Selector("irradianceTextureCubeWithTexture:name:dimensions:roughness:")]
+    public static Self IrradianceTextureCubeWithTextureNameDimensionsRoughness(MDLTexture texture, NSString? name, vector_int2 dimensions, float roughness);
+    [Selector("initWithData:topLeftOrigin:name:dimensions:rowStride:channelCount:channelEncoding:isCube:")]
+    public Self InitWithDataTopLeftOriginNameDimensionsRowStrideChannelCountChannelEncodingIsCube(NSData? pixelData, bool topLeftOrigin, NSString? name, vector_int2 dimensions, NSInteger rowStride, NSUInteger channelCount, MDLTextureChannelEncoding channelEncoding, bool isCube);
+    [Selector("writeToURL:")]
+    public bool WriteToURL(NSURL URL);
+    [Selector("writeToURL:level:")]
+    public bool WriteToURLLevel(NSURL URL, NSUInteger level);
+    [Selector("writeToURL:type:")]
+    public bool WriteToURLType(NSURL nsurl, CFStringRef type);
+    [Selector("writeToURL:type:level:")]
+    public bool WriteToURLTypeLevel(NSURL nsurl, CFStringRef type, NSUInteger level);
+    [Selector("imageFromTexture")]
+    public CGImageRef? ImageFromTexture();
+    [Selector("imageFromTextureAtLevel:")]
+    public CGImageRef? ImageFromTextureAtLevel(NSUInteger level);
+    [Selector("texelDataWithTopLeftOrigin")]
+    public NSData? TexelDataWithTopLeftOrigin();
+    [Selector("texelDataWithBottomLeftOrigin")]
+    public NSData? TexelDataWithBottomLeftOrigin();
+    [Selector("texelDataWithTopLeftOriginAtMipLevel:create:")]
+    public NSData? TexelDataWithTopLeftOriginAtMipLevelCreate(NSInteger level, bool create);
+    [Selector("texelDataWithBottomLeftOriginAtMipLevel:create:")]
+    public NSData? TexelDataWithBottomLeftOriginAtMipLevelCreate(NSInteger level, bool create);
 }
 
 public extern objc class MDLURLTexture : MDLTexture
 {
-    [Selector("URL", "setURL:")] public NSURL URL { get; set; }
-    [Selector("initWithURL:name:")] public Self InitWithURLName(NSURL URL, NSString? name);
+    [Selector("URL", "setURL:")]
+    public NSURL URL { get; set; }
+    [Selector("initWithURL:name:")]
+    public Self InitWithURLName(NSURL URL, NSString? name);
 }
 
 public extern objc class MDLCheckerboardTexture : MDLTexture
 {
-    [Selector("divisions", "setDivisions:")] public float Divisions { get; set; }
-    [Selector("color1", "setColor1:")] public CGColorRef? Color1 { get; set; }
-    [Selector("color2", "setColor2:")] public CGColorRef? Color2 { get; set; }
-    [Selector("initWithDivisions:name:dimensions:channelCount:channelEncoding:color1:color2:")] public Self InitWithDivisionsNameDimensionsChannelCountChannelEncodingColor1Color2(float divisions, NSString? name, vector_int2 dimensions, int channelCount, MDLTextureChannelEncoding channelEncoding, CGColorRef color1, CGColorRef color2);
+    [Selector("divisions", "setDivisions:")]
+    public float Divisions { get; set; }
+    [Selector("color1", "setColor1:")]
+    public CGColorRef? Color1 { get; set; }
+    [Selector("color2", "setColor2:")]
+    public CGColorRef? Color2 { get; set; }
+    [Selector("initWithDivisions:name:dimensions:channelCount:channelEncoding:color1:color2:")]
+    public Self InitWithDivisionsNameDimensionsChannelCountChannelEncodingColor1Color2(float divisions, NSString? name, vector_int2 dimensions, int channelCount, MDLTextureChannelEncoding channelEncoding, CGColorRef color1, CGColorRef color2);
 }
 
 public extern objc class MDLSkyCubeTexture : MDLTexture
 {
-    [Selector("turbidity", "setTurbidity:")] public float Turbidity { get; set; }
-    [Selector("sunElevation", "setSunElevation:")] public float SunElevation { get; set; }
-    [Selector("sunAzimuth", "setSunAzimuth:")] public float SunAzimuth { get; set; }
-    [Selector("upperAtmosphereScattering", "setUpperAtmosphereScattering:")] public float UpperAtmosphereScattering { get; set; }
-    [Selector("groundAlbedo", "setGroundAlbedo:")] public float GroundAlbedo { get; set; }
-    [Selector("horizonElevation", "setHorizonElevation:")] public float HorizonElevation { get; set; }
-    [Selector("groundColor", "setGroundColor:")] public CGColorRef? GroundColor { get; set; }
-    [Selector("gamma", "setGamma:")] public float Gamma { get; set; }
-    [Selector("exposure", "setExposure:")] public float Exposure { get; set; }
-    [Selector("brightness", "setBrightness:")] public float Brightness { get; set; }
-    [Selector("contrast", "setContrast:")] public float Contrast { get; set; }
-    [Selector("saturation", "setSaturation:")] public float Saturation { get; set; }
-    [Selector("highDynamicRangeCompression", "setHighDynamicRangeCompression:")] public vector_float2 HighDynamicRangeCompression { get; set; }
-    [Selector("initWithName:channelEncoding:textureDimensions:turbidity:sunElevation:upperAtmosphereScattering:groundAlbedo:")] public Self InitWithNameChannelEncodingTextureDimensionsTurbiditySunElevationUpperAtmosphereScatteringGroundAlbedo(NSString? name, MDLTextureChannelEncoding channelEncoding, vector_int2 textureDimensions, float turbidity, float sunElevation, float upperAtmosphereScattering, float groundAlbedo);
-    [Selector("initWithName:channelEncoding:textureDimensions:turbidity:sunElevation:sunAzimuth:upperAtmosphereScattering:groundAlbedo:")] public Self InitWithNameChannelEncodingTextureDimensionsTurbiditySunElevationSunAzimuthUpperAtmosphereScatteringGroundAlbedo(NSString? name, MDLTextureChannelEncoding channelEncoding, vector_int2 textureDimensions, float turbidity, float sunElevation, float sunAzimuth, float upperAtmosphereScattering, float groundAlbedo);
-    [Selector("updateTexture")] public void UpdateTexture();
+    [Selector("turbidity", "setTurbidity:")]
+    public float Turbidity { get; set; }
+    [Selector("sunElevation", "setSunElevation:")]
+    public float SunElevation { get; set; }
+    [Selector("sunAzimuth", "setSunAzimuth:")]
+    public float SunAzimuth { get; set; }
+    [Selector("upperAtmosphereScattering", "setUpperAtmosphereScattering:")]
+    public float UpperAtmosphereScattering { get; set; }
+    [Selector("groundAlbedo", "setGroundAlbedo:")]
+    public float GroundAlbedo { get; set; }
+    [Selector("horizonElevation", "setHorizonElevation:")]
+    public float HorizonElevation { get; set; }
+    [Selector("groundColor", "setGroundColor:")]
+    public CGColorRef? GroundColor { get; set; }
+    [Selector("gamma", "setGamma:")]
+    public float Gamma { get; set; }
+    [Selector("exposure", "setExposure:")]
+    public float Exposure { get; set; }
+    [Selector("brightness", "setBrightness:")]
+    public float Brightness { get; set; }
+    [Selector("contrast", "setContrast:")]
+    public float Contrast { get; set; }
+    [Selector("saturation", "setSaturation:")]
+    public float Saturation { get; set; }
+    [Selector("highDynamicRangeCompression", "setHighDynamicRangeCompression:")]
+    public vector_float2 HighDynamicRangeCompression { get; set; }
+    [Selector("initWithName:channelEncoding:textureDimensions:turbidity:sunElevation:upperAtmosphereScattering:groundAlbedo:")]
+    public Self InitWithNameChannelEncodingTextureDimensionsTurbiditySunElevationUpperAtmosphereScatteringGroundAlbedo(NSString? name, MDLTextureChannelEncoding channelEncoding, vector_int2 textureDimensions, float turbidity, float sunElevation, float upperAtmosphereScattering, float groundAlbedo);
+    [Selector("initWithName:channelEncoding:textureDimensions:turbidity:sunElevation:sunAzimuth:upperAtmosphereScattering:groundAlbedo:")]
+    public Self InitWithNameChannelEncodingTextureDimensionsTurbiditySunElevationSunAzimuthUpperAtmosphereScatteringGroundAlbedo(NSString? name, MDLTextureChannelEncoding channelEncoding, vector_int2 textureDimensions, float turbidity, float sunElevation, float sunAzimuth, float upperAtmosphereScattering, float groundAlbedo);
+    [Selector("updateTexture")]
+    public void UpdateTexture();
 }
 
 public extern objc class MDLColorSwatchTexture : MDLTexture
 {
-    [Selector("initWithColorTemperatureGradientFrom:toColorTemperature:name:textureDimensions:")] public Self InitWithColorTemperatureGradientFromToColorTemperatureNameTextureDimensions(float colorTemperature1, float colorTemperature2, NSString? name, vector_int2 textureDimensions);
-    [Selector("initWithColorGradientFrom:toColor:name:textureDimensions:")] public Self InitWithColorGradientFromToColorNameTextureDimensions(CGColorRef color1, CGColorRef color2, NSString? name, vector_int2 textureDimensions);
+    [Selector("initWithColorTemperatureGradientFrom:toColorTemperature:name:textureDimensions:")]
+    public Self InitWithColorTemperatureGradientFromToColorTemperatureNameTextureDimensions(float colorTemperature1, float colorTemperature2, NSString? name, vector_int2 textureDimensions);
+    [Selector("initWithColorGradientFrom:toColor:name:textureDimensions:")]
+    public Self InitWithColorGradientFromToColorNameTextureDimensions(CGColorRef color1, CGColorRef color2, NSString? name, vector_int2 textureDimensions);
 }
 
 public extern objc class MDLNoiseTexture : MDLTexture
 {
-    [Selector("initVectorNoiseWithSmoothness:name:textureDimensions:channelEncoding:")] public Self InitVectorNoiseWithSmoothnessNameTextureDimensionsChannelEncoding(float smoothness, NSString? name, vector_int2 textureDimensions, MDLTextureChannelEncoding channelEncoding);
-    [Selector("initScalarNoiseWithSmoothness:name:textureDimensions:channelCount:channelEncoding:grayscale:")] public Self InitScalarNoiseWithSmoothnessNameTextureDimensionsChannelCountChannelEncodingGrayscale(float smoothness, NSString? name, vector_int2 textureDimensions, int channelCount, MDLTextureChannelEncoding channelEncoding, bool grayscale);
-    [Selector("initCellularNoiseWithFrequency:name:textureDimensions:channelEncoding:")] public Self InitCellularNoiseWithFrequencyNameTextureDimensionsChannelEncoding(float frequency, NSString? name, vector_int2 textureDimensions, MDLTextureChannelEncoding channelEncoding);
+    [Selector("initVectorNoiseWithSmoothness:name:textureDimensions:channelEncoding:")]
+    public Self InitVectorNoiseWithSmoothnessNameTextureDimensionsChannelEncoding(float smoothness, NSString? name, vector_int2 textureDimensions, MDLTextureChannelEncoding channelEncoding);
+    [Selector("initScalarNoiseWithSmoothness:name:textureDimensions:channelCount:channelEncoding:grayscale:")]
+    public Self InitScalarNoiseWithSmoothnessNameTextureDimensionsChannelCountChannelEncodingGrayscale(float smoothness, NSString? name, vector_int2 textureDimensions, int channelCount, MDLTextureChannelEncoding channelEncoding, bool grayscale);
+    [Selector("initCellularNoiseWithFrequency:name:textureDimensions:channelEncoding:")]
+    public Self InitCellularNoiseWithFrequencyNameTextureDimensionsChannelEncoding(float frequency, NSString? name, vector_int2 textureDimensions, MDLTextureChannelEncoding channelEncoding);
 }
 
 public extern objc class MDLNormalMapTexture : MDLTexture
 {
-    [Selector("initByGeneratingNormalMapWithTexture:name:smoothness:contrast:")] public Self InitByGeneratingNormalMapWithTextureNameSmoothnessContrast(MDLTexture sourceTexture, NSString? name, float smoothness, float contrast);
+    [Selector("initByGeneratingNormalMapWithTexture:name:smoothness:contrast:")]
+    public Self InitByGeneratingNormalMapWithTextureNameSmoothnessContrast(MDLTexture sourceTexture, NSString? name, float smoothness, float contrast);
 }
 
 #endif

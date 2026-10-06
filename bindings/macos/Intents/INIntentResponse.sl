@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class INIntentResponse : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("userActivity", "setUserActivity:")] public NSUserActivity? UserActivity { get; set; }
+    [Selector("userActivity", "setUserActivity:")]
+    public NSUserActivity? UserActivity { get; set; }
 }
 
 #endif

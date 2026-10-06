@@ -34,18 +34,28 @@ import Standard.ObjC;
 
 public extern objc class NSSlider : NSControl, NSAccessibilitySlider
 {
-    [Selector("sliderType", "setSliderType:")] public NSSliderType SliderType { get; set; }
-    [Selector("minValue", "setMinValue:")] public double MinValue { get; set; }
-    [Selector("maxValue", "setMaxValue:")] public double MaxValue { get; set; }
+    [Selector("sliderType", "setSliderType:")]
+    public NSSliderType SliderType { get; set; }
+    [Selector("minValue", "setMinValue:")]
+    public double MinValue { get; set; }
+    [Selector("maxValue", "setMaxValue:")]
+    public double MaxValue { get; set; }
     /// macOS 26.0 and later.
-    [Selector("neutralValue", "setNeutralValue:")] public double NeutralValue { get; set; }
-    [Selector("altIncrementValue", "setAltIncrementValue:")] public double AltIncrementValue { get; set; }
-    [Selector("knobThickness")] public CGFloat KnobThickness { get; }
-    [Selector("isVertical", "setVertical:")] public bool Vertical { get; set; }
-    [Selector("trackFillColor", "setTrackFillColor:")] public NSColor? TrackFillColor { get; set; }
+    [Selector("neutralValue", "setNeutralValue:")]
+    public double NeutralValue { get; set; }
+    [Selector("altIncrementValue", "setAltIncrementValue:")]
+    public double AltIncrementValue { get; set; }
+    [Selector("knobThickness")]
+    public CGFloat KnobThickness { get; }
+    [Selector("isVertical", "setVertical:")]
+    public bool Vertical { get; set; }
+    [Selector("trackFillColor", "setTrackFillColor:")]
+    public NSColor? TrackFillColor { get; set; }
     /// macOS 26.0 and later.
-    [Selector("tintProminence", "setTintProminence:")] public NSTintProminence TintProminence { get; set; }
-    [Selector("acceptsFirstMouse:")] public bool AcceptsFirstMouse(NSEvent? event);
+    [Selector("tintProminence", "setTintProminence:")]
+    public NSTintProminence TintProminence { get; set; }
+    [Selector("acceptsFirstMouse:")]
+    public bool AcceptsFirstMouse(NSEvent? event);
 }
 
 /// NSSliderVerticalGetter, a category of NSSlider.
@@ -54,47 +64,67 @@ public extern objc class NSSlider { }
 /// NSTickMarkSupport, a category of NSSlider.
 public extern objc class NSSlider
 {
-    [Selector("numberOfTickMarks", "setNumberOfTickMarks:")] public NSInteger NumberOfTickMarks { get; set; }
-    [Selector("tickMarkPosition", "setTickMarkPosition:")] public NSTickMarkPosition TickMarkPosition { get; set; }
-    [Selector("allowsTickMarkValuesOnly", "setAllowsTickMarkValuesOnly:")] public bool AllowsTickMarkValuesOnly { get; set; }
-    [Selector("tickMarkValueAtIndex:")] public double TickMarkValueAtIndex(NSInteger index);
-    [Selector("rectOfTickMarkAtIndex:")] public NSRect RectOfTickMarkAtIndex(NSInteger index);
-    [Selector("indexOfTickMarkAtPoint:")] public NSInteger IndexOfTickMarkAtPoint(NSPoint point);
-    [Selector("closestTickMarkValueToValue:")] public double ClosestTickMarkValueToValue(double value);
+    [Selector("numberOfTickMarks", "setNumberOfTickMarks:")]
+    public NSInteger NumberOfTickMarks { get; set; }
+    [Selector("tickMarkPosition", "setTickMarkPosition:")]
+    public NSTickMarkPosition TickMarkPosition { get; set; }
+    [Selector("allowsTickMarkValuesOnly", "setAllowsTickMarkValuesOnly:")]
+    public bool AllowsTickMarkValuesOnly { get; set; }
+    [Selector("tickMarkValueAtIndex:")]
+    public double TickMarkValueAtIndex(NSInteger index);
+    [Selector("rectOfTickMarkAtIndex:")]
+    public NSRect RectOfTickMarkAtIndex(NSInteger index);
+    [Selector("indexOfTickMarkAtPoint:")]
+    public NSInteger IndexOfTickMarkAtPoint(NSPoint point);
+    [Selector("closestTickMarkValueToValue:")]
+    public double ClosestTickMarkValueToValue(double value);
 }
 
 /// NSSliderConvenience, a category of NSSlider.
 public extern objc class NSSlider
 {
-    [Selector("sliderWithTarget:action:")] public static Self SliderWithTargetAction(AnyObject? target, Selector action);
-    [Selector("sliderWithValue:minValue:maxValue:target:action:")] public static Self SliderWithValueMinValueMaxValueTargetAction(double value, double minValue, double maxValue, AnyObject? target, Selector action);
+    [Selector("sliderWithTarget:action:")]
+    public static Self SliderWithTargetAction(AnyObject? target, Selector action);
+    [Selector("sliderWithValue:minValue:maxValue:target:action:")]
+    public static Self SliderWithValueMinValueMaxValueTargetAction(double value, double minValue, double maxValue, AnyObject? target, Selector action);
 }
 
 /// NSSliderDeprecated, a category of NSSlider.
 public extern objc class NSSlider
 {
     /// Deprecated in macOS 10.9.
-    [Selector("setTitleCell:")] public void SetTitleCell(NSCell? cell);
+    [Selector("setTitleCell:")]
+    public void SetTitleCell(NSCell? cell);
     /// Deprecated in macOS 10.9.
-    [Selector("titleCell")] public AnyObject? TitleCell();
+    [Selector("titleCell")]
+    public AnyObject? TitleCell();
     /// Deprecated in macOS 10.9.
-    [Selector("setTitleColor:")] public void SetTitleColor(NSColor? newColor);
+    [Selector("setTitleColor:")]
+    public void SetTitleColor(NSColor? newColor);
     /// Deprecated in macOS 10.9.
-    [Selector("titleColor")] public NSColor? TitleColor();
+    [Selector("titleColor")]
+    public NSColor? TitleColor();
     /// Deprecated in macOS 10.9.
-    [Selector("setTitleFont:")] public void SetTitleFont(NSFont? fontObj);
+    [Selector("setTitleFont:")]
+    public void SetTitleFont(NSFont? fontObj);
     /// Deprecated in macOS 10.9.
-    [Selector("titleFont")] public NSFont? TitleFont();
+    [Selector("titleFont")]
+    public NSFont? TitleFont();
     /// Deprecated in macOS 10.9.
-    [Selector("title")] public NSString? Title();
+    [Selector("title")]
+    public NSString? Title();
     /// Deprecated in macOS 10.9.
-    [Selector("setTitle:")] public void SetTitle(NSString? string);
+    [Selector("setTitle:")]
+    public void SetTitle(NSString? string);
     /// Deprecated in macOS 10.9.
-    [Selector("setKnobThickness:")] public void SetKnobThickness(CGFloat thickness);
+    [Selector("setKnobThickness:")]
+    public void SetKnobThickness(CGFloat thickness);
     /// Deprecated in macOS 10.9.
-    [Selector("setImage:")] public void SetImage(NSImage? backgroundImage);
+    [Selector("setImage:")]
+    public void SetImage(NSImage? backgroundImage);
     /// Deprecated in macOS 10.9.
-    [Selector("image")] public NSImage? Image();
+    [Selector("image")]
+    public NSImage? Image();
 }
 
 #endif

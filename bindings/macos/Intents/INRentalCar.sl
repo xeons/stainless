@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class INRentalCar : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("rentalCompanyName")] public NSString RentalCompanyName { get; }
-    [Selector("type")] public NSString? Type { get; }
-    [Selector("make")] public NSString? Make { get; }
-    [Selector("model")] public NSString? Model { get; }
-    [Selector("rentalCarDescription")] public NSString? RentalCarDescription { get; }
-    [Selector("initWithRentalCompanyName:type:make:model:rentalCarDescription:")] public Self InitWithRentalCompanyNameTypeMakeModelRentalCarDescription(NSString rentalCompanyName, NSString? type, NSString? make, NSString? model, NSString? rentalCarDescription);
+    [Selector("rentalCompanyName")]
+    public NSString RentalCompanyName { get; }
+    [Selector("type")]
+    public NSString? Type { get; }
+    [Selector("make")]
+    public NSString? Make { get; }
+    [Selector("model")]
+    public NSString? Model { get; }
+    [Selector("rentalCarDescription")]
+    public NSString? RentalCarDescription { get; }
+    [Selector("initWithRentalCompanyName:type:make:model:rentalCarDescription:")]
+    public Self InitWithRentalCompanyNameTypeMakeModelRentalCarDescription(NSString rentalCompanyName, NSString? type, NSString? make, NSString? model, NSString? rentalCarDescription);
 }
 
 #endif

@@ -35,15 +35,21 @@ public objc closure void SACrashDetectionManagerRequestAuthorizationWithCompleti
 
 public extern objc class SACrashDetectionManager : NSObject
 {
-    [Selector("isAvailable")] public static bool Available { get; }
-    [Selector("authorizationStatus")] public SAAuthorizationStatus AuthorizationStatus { get; }
-    [Selector("delegate", "setDelegate:")] public SACrashDetectionDelegate? Delegate { get; set; }
-    [Selector("requestAuthorizationWithCompletionHandler:")] public void RequestAuthorizationWithCompletionHandler(SACrashDetectionManagerRequestAuthorizationWithCompletionHandlerHandlerBlock handler);
+    [Selector("isAvailable")]
+    public static bool Available { get; }
+    [Selector("authorizationStatus")]
+    public SAAuthorizationStatus AuthorizationStatus { get; }
+    [Selector("delegate", "setDelegate:")]
+    public SACrashDetectionDelegate? Delegate { get; set; }
+    [Selector("requestAuthorizationWithCompletionHandler:")]
+    public void RequestAuthorizationWithCompletionHandler(SACrashDetectionManagerRequestAuthorizationWithCompletionHandlerHandlerBlock handler);
 }
 
 public objc interface SACrashDetectionDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("crashDetectionManager:didDetectEvent:")] void CrashDetectionManagerDidDetectEvent(SACrashDetectionManager crashDetectionManager, SACrashDetectionEvent event);
+    [Optional]
+    [Selector("crashDetectionManager:didDetectEvent:")]
+    void CrashDetectionManagerDidDetectEvent(SACrashDetectionManager crashDetectionManager, SACrashDetectionEvent event);
 }
 
 #endif

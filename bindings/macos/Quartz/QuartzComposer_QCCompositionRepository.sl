@@ -38,16 +38,21 @@ public extern "C" NSString? QCCompositionRepositoryDidUpdateNotification;
 /// QCCompositionRepository, a category of QCComposition.
 public extern objc class QCComposition
 {
-    [Selector("identifier")] public NSString? Identifier();
+    [Selector("identifier")]
+    public NSString? Identifier();
 }
 
 /// Deprecated in macOS 10.15.
 public extern objc class QCCompositionRepository : NSObject
 {
-    [Selector("sharedCompositionRepository")] public static QCCompositionRepository? SharedCompositionRepository();
-    [Selector("compositionWithIdentifier:")] public QCComposition? CompositionWithIdentifier(NSString? identifier);
-    [Selector("compositionsWithProtocols:andAttributes:")] public NSArray? CompositionsWithProtocolsAndAttributes(NSArray? protocols, NSDictionary? attributes);
-    [Selector("allCompositions")] public NSArray? AllCompositions();
+    [Selector("sharedCompositionRepository")]
+    public static QCCompositionRepository? SharedCompositionRepository();
+    [Selector("compositionWithIdentifier:")]
+    public QCComposition? CompositionWithIdentifier(NSString? identifier);
+    [Selector("compositionsWithProtocols:andAttributes:")]
+    public NSArray? CompositionsWithProtocolsAndAttributes(NSArray? protocols, NSDictionary? attributes);
+    [Selector("allCompositions")]
+    public NSArray? AllCompositions();
 }
 
 #endif

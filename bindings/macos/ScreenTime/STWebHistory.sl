@@ -41,17 +41,25 @@ public objc closure void STWebHistoryFetchAllHistoryWithCompletionHandlerComplet
 public extern objc class STWebHistory : NSObject
 {
     /// macOS 15.4 and later.
-    [Selector("initWithBundleIdentifier:profileIdentifier:error:")] public Self? InitWithBundleIdentifierProfileIdentifierError(NSString bundleIdentifier, STWebHistoryProfileIdentifier? profileIdentifier, out NSError? error);
+    [Selector("initWithBundleIdentifier:profileIdentifier:error:")]
+    public Self? InitWithBundleIdentifierProfileIdentifierError(NSString bundleIdentifier, STWebHistoryProfileIdentifier? profileIdentifier, out NSError? error);
     /// macOS 15.4 and later.
-    [Selector("initWithProfileIdentifier:")] public Self InitWithProfileIdentifier(STWebHistoryProfileIdentifier? profileIdentifier);
-    [Selector("initWithBundleIdentifier:error:")] public Self? InitWithBundleIdentifierError(NSString bundleIdentifier, out NSError? error);
+    [Selector("initWithProfileIdentifier:")]
+    public Self InitWithProfileIdentifier(STWebHistoryProfileIdentifier? profileIdentifier);
+    [Selector("initWithBundleIdentifier:error:")]
+    public Self? InitWithBundleIdentifierError(NSString bundleIdentifier, out NSError? error);
     /// macOS 15.4 and later.
-    [Selector("fetchHistoryDuringInterval:completionHandler:")] public void FetchHistoryDuringIntervalCompletionHandler(NSDateInterval interval, STWebHistoryFetchHistoryDuringIntervalCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchHistoryDuringInterval:completionHandler:")]
+    public void FetchHistoryDuringIntervalCompletionHandler(NSDateInterval interval, STWebHistoryFetchHistoryDuringIntervalCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 15.4 and later.
-    [Selector("fetchAllHistoryWithCompletionHandler:")] public void FetchAllHistoryWithCompletionHandler(STWebHistoryFetchAllHistoryWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("deleteHistoryForURL:")] public void DeleteHistoryForURL(NSURL url);
-    [Selector("deleteHistoryDuringInterval:")] public void DeleteHistoryDuringInterval(NSDateInterval interval);
-    [Selector("deleteAllHistory")] public void DeleteAllHistory();
+    [Selector("fetchAllHistoryWithCompletionHandler:")]
+    public void FetchAllHistoryWithCompletionHandler(STWebHistoryFetchAllHistoryWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("deleteHistoryForURL:")]
+    public void DeleteHistoryForURL(NSURL url);
+    [Selector("deleteHistoryDuringInterval:")]
+    public void DeleteHistoryDuringInterval(NSDateInterval interval);
+    [Selector("deleteAllHistory")]
+    public void DeleteAllHistory();
 }
 
 #endif

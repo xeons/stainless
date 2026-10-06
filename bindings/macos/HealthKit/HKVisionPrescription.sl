@@ -38,10 +38,14 @@ public enum HKVisionPrescriptionType : ulong
 
 public extern objc class HKVisionPrescription : HKSample, NSSecureCoding, NSCopying
 {
-    [Selector("prescriptionType")] public HKVisionPrescriptionType PrescriptionType { get; }
-    [Selector("dateIssued")] public NSDate DateIssued { get; }
-    [Selector("expirationDate")] public NSDate? ExpirationDate { get; }
-    [Selector("prescriptionWithType:dateIssued:expirationDate:device:metadata:")] public static Self PrescriptionWithTypeDateIssuedExpirationDateDeviceMetadata(HKVisionPrescriptionType type, NSDate dateIssued, NSDate? expirationDate, HKDevice? device, NSDictionary? metadata);
+    [Selector("prescriptionType")]
+    public HKVisionPrescriptionType PrescriptionType { get; }
+    [Selector("dateIssued")]
+    public NSDate DateIssued { get; }
+    [Selector("expirationDate")]
+    public NSDate? ExpirationDate { get; }
+    [Selector("prescriptionWithType:dateIssued:expirationDate:device:metadata:")]
+    public static Self PrescriptionWithTypeDateIssuedExpirationDateDeviceMetadata(HKVisionPrescriptionType type, NSDate dateIssued, NSDate? expirationDate, HKDevice? device, NSDictionary? metadata);
 }
 
 #endif

@@ -42,13 +42,20 @@ public extern "C" NSString? NSAppleScriptErrorRange;
 
 public extern objc class NSAppleScript : NSObject, NSCopying
 {
-    [Selector("source")] public NSString? Source { get; }
-    [Selector("isCompiled")] public bool Compiled { get; }
-    [Selector("initWithContentsOfURL:error:")] public Self? InitWithContentsOfURLError(NSURL url, out NSDictionary? errorInfo);
-    [Selector("initWithSource:")] public Self? InitWithSource(NSString source);
-    [Selector("compileAndReturnError:")] public bool CompileAndReturnError(out NSDictionary? errorInfo);
-    [Selector("executeAndReturnError:")] public NSAppleEventDescriptor ExecuteAndReturnError(out NSDictionary? errorInfo);
-    [Selector("executeAppleEvent:error:")] public NSAppleEventDescriptor ExecuteAppleEventError(NSAppleEventDescriptor event, out NSDictionary? errorInfo);
+    [Selector("source")]
+    public NSString? Source { get; }
+    [Selector("isCompiled")]
+    public bool Compiled { get; }
+    [Selector("initWithContentsOfURL:error:")]
+    public Self? InitWithContentsOfURLError(NSURL url, out NSDictionary? errorInfo);
+    [Selector("initWithSource:")]
+    public Self? InitWithSource(NSString source);
+    [Selector("compileAndReturnError:")]
+    public bool CompileAndReturnError(out NSDictionary? errorInfo);
+    [Selector("executeAndReturnError:")]
+    public NSAppleEventDescriptor ExecuteAndReturnError(out NSDictionary? errorInfo);
+    [Selector("executeAppleEvent:error:")]
+    public NSAppleEventDescriptor ExecuteAppleEventError(NSAppleEventDescriptor event, out NSDictionary? errorInfo);
 }
 
 #endif

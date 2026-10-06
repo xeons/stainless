@@ -45,15 +45,24 @@ public const int DOM_FIRST_ORDERED_NODE_TYPE = 9;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMXPathResult : DOMObject
 {
-    [Selector("resultType")] public ushort ResultType { get; }
-    [Selector("numberValue")] public double NumberValue { get; }
-    [Selector("stringValue")] public NSString? StringValue { get; }
-    [Selector("booleanValue")] public bool BooleanValue { get; }
-    [Selector("singleNodeValue")] public DOMNode? SingleNodeValue { get; }
-    [Selector("invalidIteratorState")] public bool InvalidIteratorState { get; }
-    [Selector("snapshotLength")] public uint SnapshotLength { get; }
-    [Selector("iterateNext")] public DOMNode? IterateNext();
-    [Selector("snapshotItem:")] public DOMNode? SnapshotItem(uint index);
+    [Selector("resultType")]
+    public ushort ResultType { get; }
+    [Selector("numberValue")]
+    public double NumberValue { get; }
+    [Selector("stringValue")]
+    public NSString? StringValue { get; }
+    [Selector("booleanValue")]
+    public bool BooleanValue { get; }
+    [Selector("singleNodeValue")]
+    public DOMNode? SingleNodeValue { get; }
+    [Selector("invalidIteratorState")]
+    public bool InvalidIteratorState { get; }
+    [Selector("snapshotLength")]
+    public uint SnapshotLength { get; }
+    [Selector("iterateNext")]
+    public DOMNode? IterateNext();
+    [Selector("snapshotItem:")]
+    public DOMNode? SnapshotItem(uint index);
 }
 
 #endif

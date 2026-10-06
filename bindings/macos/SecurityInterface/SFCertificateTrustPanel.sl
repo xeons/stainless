@@ -35,11 +35,16 @@ import Standard.ObjC;
 
 public extern objc class SFCertificateTrustPanel : SFCertificatePanel
 {
-    [Selector("sharedCertificateTrustPanel")] public static SFCertificateTrustPanel? SharedCertificateTrustPanel();
-    [Selector("runModalForTrust:message:")] public NSInteger RunModalForTrustMessage(SecTrustRef? trust, NSString? message);
-    [Selector("beginSheetForWindow:modalDelegate:didEndSelector:contextInfo:trust:message:")] public void BeginSheetForWindowModalDelegateDidEndSelectorContextInfoTrustMessage(NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo, SecTrustRef? trust, NSString? message);
-    [Selector("setInformativeText:")] public void SetInformativeText(NSString? informativeText);
-    [Selector("informativeText")] public NSString? InformativeText();
+    [Selector("sharedCertificateTrustPanel")]
+    public static SFCertificateTrustPanel? SharedCertificateTrustPanel();
+    [Selector("runModalForTrust:message:")]
+    public NSInteger RunModalForTrustMessage(SecTrustRef? trust, NSString? message);
+    [Selector("beginSheetForWindow:modalDelegate:didEndSelector:contextInfo:trust:message:")]
+    public void BeginSheetForWindowModalDelegateDidEndSelectorContextInfoTrustMessage(NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo, SecTrustRef? trust, NSString? message);
+    [Selector("setInformativeText:")]
+    public void SetInformativeText(NSString? informativeText);
+    [Selector("informativeText")]
+    public NSString? InformativeText();
 }
 
 #endif

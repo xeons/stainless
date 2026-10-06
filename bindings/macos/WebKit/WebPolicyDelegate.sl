@@ -60,18 +60,29 @@ public extern "C" NSString? WebActionOriginalURLKey;
 /// Deprecated in macOS 10.14.
 public objc interface WebPolicyDecisionListener : NSObjectProtocol
 {
-    [Selector("use")] void Use();
-    [Selector("download")] void Download();
-    [Selector("ignore")] void Ignore();
+    [Selector("use")]
+    void Use();
+    [Selector("download")]
+    void Download();
+    [Selector("ignore")]
+    void Ignore();
 }
 
 /// Deprecated in macOS 10.14.
 public objc interface WebPolicyDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("webView:decidePolicyForNavigationAction:request:frame:decisionListener:")] void WebViewDecidePolicyForNavigationActionRequestFrameDecisionListener(WebView? webView, NSDictionary? actionInformation, NSURLRequest? request, WebFrame? frame, WebPolicyDecisionListener? listener);
-    [Optional] [Selector("webView:decidePolicyForNewWindowAction:request:newFrameName:decisionListener:")] void WebViewDecidePolicyForNewWindowActionRequestNewFrameNameDecisionListener(WebView? webView, NSDictionary? actionInformation, NSURLRequest? request, NSString? frameName, WebPolicyDecisionListener? listener);
-    [Optional] [Selector("webView:decidePolicyForMIMEType:request:frame:decisionListener:")] void WebViewDecidePolicyForMIMETypeRequestFrameDecisionListener(WebView? webView, NSString? type, NSURLRequest? request, WebFrame? frame, WebPolicyDecisionListener? listener);
-    [Optional] [Selector("webView:unableToImplementPolicyWithError:frame:")] void WebViewUnableToImplementPolicyWithErrorFrame(WebView? webView, NSError? error, WebFrame? frame);
+    [Optional]
+    [Selector("webView:decidePolicyForNavigationAction:request:frame:decisionListener:")]
+    void WebViewDecidePolicyForNavigationActionRequestFrameDecisionListener(WebView? webView, NSDictionary? actionInformation, NSURLRequest? request, WebFrame? frame, WebPolicyDecisionListener? listener);
+    [Optional]
+    [Selector("webView:decidePolicyForNewWindowAction:request:newFrameName:decisionListener:")]
+    void WebViewDecidePolicyForNewWindowActionRequestNewFrameNameDecisionListener(WebView? webView, NSDictionary? actionInformation, NSURLRequest? request, NSString? frameName, WebPolicyDecisionListener? listener);
+    [Optional]
+    [Selector("webView:decidePolicyForMIMEType:request:frame:decisionListener:")]
+    void WebViewDecidePolicyForMIMETypeRequestFrameDecisionListener(WebView? webView, NSString? type, NSURLRequest? request, WebFrame? frame, WebPolicyDecisionListener? listener);
+    [Optional]
+    [Selector("webView:unableToImplementPolicyWithError:frame:")]
+    void WebViewUnableToImplementPolicyWithErrorFrame(WebView? webView, NSError? error, WebFrame? frame);
 }
 
 #endif

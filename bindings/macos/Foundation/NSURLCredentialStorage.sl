@@ -32,14 +32,22 @@ import Standard.ObjC;
 
 public extern objc class NSURLCredentialStorage : NSObject
 {
-    [Selector("sharedCredentialStorage")] public static NSURLCredentialStorage SharedCredentialStorage { get; }
-    [Selector("allCredentials")] public NSDictionary AllCredentials { get; }
-    [Selector("credentialsForProtectionSpace:")] public NSDictionary? CredentialsForProtectionSpace(NSURLProtectionSpace space);
-    [Selector("setCredential:forProtectionSpace:")] public void SetCredentialForProtectionSpace(NSURLCredential credential, NSURLProtectionSpace space);
-    [Selector("removeCredential:forProtectionSpace:")] public void RemoveCredentialForProtectionSpace(NSURLCredential credential, NSURLProtectionSpace space);
-    [Selector("removeCredential:forProtectionSpace:options:")] public void RemoveCredentialForProtectionSpaceOptions(NSURLCredential credential, NSURLProtectionSpace space, NSDictionary? options);
-    [Selector("defaultCredentialForProtectionSpace:")] public NSURLCredential? DefaultCredentialForProtectionSpace(NSURLProtectionSpace space);
-    [Selector("setDefaultCredential:forProtectionSpace:")] public void SetDefaultCredentialForProtectionSpace(NSURLCredential credential, NSURLProtectionSpace space);
+    [Selector("sharedCredentialStorage")]
+    public static NSURLCredentialStorage SharedCredentialStorage { get; }
+    [Selector("allCredentials")]
+    public NSDictionary AllCredentials { get; }
+    [Selector("credentialsForProtectionSpace:")]
+    public NSDictionary? CredentialsForProtectionSpace(NSURLProtectionSpace space);
+    [Selector("setCredential:forProtectionSpace:")]
+    public void SetCredentialForProtectionSpace(NSURLCredential credential, NSURLProtectionSpace space);
+    [Selector("removeCredential:forProtectionSpace:")]
+    public void RemoveCredentialForProtectionSpace(NSURLCredential credential, NSURLProtectionSpace space);
+    [Selector("removeCredential:forProtectionSpace:options:")]
+    public void RemoveCredentialForProtectionSpaceOptions(NSURLCredential credential, NSURLProtectionSpace space, NSDictionary? options);
+    [Selector("defaultCredentialForProtectionSpace:")]
+    public NSURLCredential? DefaultCredentialForProtectionSpace(NSURLProtectionSpace space);
+    [Selector("setDefaultCredential:forProtectionSpace:")]
+    public void SetDefaultCredentialForProtectionSpace(NSURLCredential credential, NSURLProtectionSpace space);
 }
 
 public objc closure void NSURLCredentialStorageGetCredentialsForProtectionSpaceTaskCompletionHandlerCompletionHandlerBlock(NSDictionary? arg0);
@@ -49,11 +57,16 @@ public objc closure void NSURLCredentialStorageGetDefaultCredentialForProtection
 /// NSURLSessionTaskAdditions, a category of NSURLCredentialStorage.
 public extern objc class NSURLCredentialStorage
 {
-    [Selector("getCredentialsForProtectionSpace:task:completionHandler:")] public void GetCredentialsForProtectionSpaceTaskCompletionHandler(NSURLProtectionSpace protectionSpace, NSURLSessionTask task, NSURLCredentialStorageGetCredentialsForProtectionSpaceTaskCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("setCredential:forProtectionSpace:task:")] public void SetCredentialForProtectionSpaceTask(NSURLCredential credential, NSURLProtectionSpace protectionSpace, NSURLSessionTask task);
-    [Selector("removeCredential:forProtectionSpace:options:task:")] public void RemoveCredentialForProtectionSpaceOptionsTask(NSURLCredential credential, NSURLProtectionSpace protectionSpace, NSDictionary? options, NSURLSessionTask task);
-    [Selector("getDefaultCredentialForProtectionSpace:task:completionHandler:")] public void GetDefaultCredentialForProtectionSpaceTaskCompletionHandler(NSURLProtectionSpace space, NSURLSessionTask task, NSURLCredentialStorageGetDefaultCredentialForProtectionSpaceTaskCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("setDefaultCredential:forProtectionSpace:task:")] public void SetDefaultCredentialForProtectionSpaceTask(NSURLCredential credential, NSURLProtectionSpace protectionSpace, NSURLSessionTask task);
+    [Selector("getCredentialsForProtectionSpace:task:completionHandler:")]
+    public void GetCredentialsForProtectionSpaceTaskCompletionHandler(NSURLProtectionSpace protectionSpace, NSURLSessionTask task, NSURLCredentialStorageGetCredentialsForProtectionSpaceTaskCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("setCredential:forProtectionSpace:task:")]
+    public void SetCredentialForProtectionSpaceTask(NSURLCredential credential, NSURLProtectionSpace protectionSpace, NSURLSessionTask task);
+    [Selector("removeCredential:forProtectionSpace:options:task:")]
+    public void RemoveCredentialForProtectionSpaceOptionsTask(NSURLCredential credential, NSURLProtectionSpace protectionSpace, NSDictionary? options, NSURLSessionTask task);
+    [Selector("getDefaultCredentialForProtectionSpace:task:completionHandler:")]
+    public void GetDefaultCredentialForProtectionSpaceTaskCompletionHandler(NSURLProtectionSpace space, NSURLSessionTask task, NSURLCredentialStorageGetDefaultCredentialForProtectionSpaceTaskCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("setDefaultCredential:forProtectionSpace:task:")]
+    public void SetDefaultCredentialForProtectionSpaceTask(NSURLCredential credential, NSURLProtectionSpace protectionSpace, NSURLSessionTask task);
 }
 
 /// Deprecated in macOS 10.14.

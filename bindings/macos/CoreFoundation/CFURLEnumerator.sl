@@ -50,9 +50,11 @@ public enum CFURLEnumeratorOptions : ulong
     GenerateRelativePathURLs = 64,
 }
 
-[ReturnsRetained] public extern "C" CFURLEnumeratorRef? CFURLEnumeratorCreateForDirectoryURL(CFAllocatorRef? alloc, CFURLRef? directoryURL, CFURLEnumeratorOptions option, CFArrayRef? propertyKeys);
+[ReturnsRetained]
+public extern "C" CFURLEnumeratorRef? CFURLEnumeratorCreateForDirectoryURL(CFAllocatorRef? alloc, CFURLRef? directoryURL, CFURLEnumeratorOptions option, CFArrayRef? propertyKeys);
 
-[ReturnsRetained] public extern "C" CFURLEnumeratorRef? CFURLEnumeratorCreateForMountedVolumes(CFAllocatorRef? alloc, CFURLEnumeratorOptions option, CFArrayRef? propertyKeys);
+[ReturnsRetained]
+public extern "C" CFURLEnumeratorRef? CFURLEnumeratorCreateForMountedVolumes(CFAllocatorRef? alloc, CFURLEnumeratorOptions option, CFArrayRef? propertyKeys);
 
 public enum CFURLEnumeratorResult : long
 {

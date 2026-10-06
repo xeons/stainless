@@ -47,25 +47,45 @@ public objc closure void SKTexturePreloadWithCompletionHandlerCompletionHandlerB
 
 public extern objc class SKTexture : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("filteringMode", "setFilteringMode:")] public SKTextureFilteringMode FilteringMode { get; set; }
-    [Selector("usesMipmaps", "setUsesMipmaps:")] public bool UsesMipmaps { get; set; }
-    [Selector("textureWithImageNamed:")] public static Self TextureWithImageNamed(NSString name);
-    [Selector("textureWithRect:inTexture:")] public static Self TextureWithRectInTexture(CGRect rect, SKTexture texture);
-    [Selector("textureVectorNoiseWithSmoothness:size:")] public static Self TextureVectorNoiseWithSmoothnessSize(CGFloat smoothness, CGSize size);
-    [Selector("textureNoiseWithSmoothness:size:grayscale:")] public static Self TextureNoiseWithSmoothnessSizeGrayscale(CGFloat smoothness, CGSize size, bool grayscale);
-    [Selector("textureWithCGImage:")] public static Self TextureWithCGImage(CGImageRef image);
-    [Selector("textureWithImage:")] public static Self TextureWithImage(NSImage image);
-    [Selector("textureWithData:size:")] public static Self TextureWithDataSize(NSData pixelData, CGSize size);
-    [Selector("textureWithData:size:flipped:")] public static Self TextureWithDataSizeFlipped(NSData pixelData, CGSize size, bool flipped);
-    [Selector("textureWithData:size:rowLength:alignment:")] public static Self TextureWithDataSizeRowLengthAlignment(NSData pixelData, CGSize size, uint rowLength, uint alignment);
-    [Selector("textureByApplyingCIFilter:")] public Self TextureByApplyingCIFilter(CIFilter filter);
-    [Selector("textureByGeneratingNormalMap")] public Self TextureByGeneratingNormalMap();
-    [Selector("textureByGeneratingNormalMapWithSmoothness:contrast:")] public Self TextureByGeneratingNormalMapWithSmoothnessContrast(CGFloat smoothness, CGFloat contrast);
-    [Selector("textureRect")] public CGRect TextureRect();
-    [Selector("size")] public CGSize Size();
-    [ReturnsRetained] [Selector("CGImage")] public CGImageRef CGImage();
-    [Selector("preloadTextures:withCompletionHandler:")] public static void PreloadTexturesWithCompletionHandler(NSArray textures, SKTexturePreloadTexturesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("preloadWithCompletionHandler:")] public void PreloadWithCompletionHandler(SKTexturePreloadWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("filteringMode", "setFilteringMode:")]
+    public SKTextureFilteringMode FilteringMode { get; set; }
+    [Selector("usesMipmaps", "setUsesMipmaps:")]
+    public bool UsesMipmaps { get; set; }
+    [Selector("textureWithImageNamed:")]
+    public static Self TextureWithImageNamed(NSString name);
+    [Selector("textureWithRect:inTexture:")]
+    public static Self TextureWithRectInTexture(CGRect rect, SKTexture texture);
+    [Selector("textureVectorNoiseWithSmoothness:size:")]
+    public static Self TextureVectorNoiseWithSmoothnessSize(CGFloat smoothness, CGSize size);
+    [Selector("textureNoiseWithSmoothness:size:grayscale:")]
+    public static Self TextureNoiseWithSmoothnessSizeGrayscale(CGFloat smoothness, CGSize size, bool grayscale);
+    [Selector("textureWithCGImage:")]
+    public static Self TextureWithCGImage(CGImageRef image);
+    [Selector("textureWithImage:")]
+    public static Self TextureWithImage(NSImage image);
+    [Selector("textureWithData:size:")]
+    public static Self TextureWithDataSize(NSData pixelData, CGSize size);
+    [Selector("textureWithData:size:flipped:")]
+    public static Self TextureWithDataSizeFlipped(NSData pixelData, CGSize size, bool flipped);
+    [Selector("textureWithData:size:rowLength:alignment:")]
+    public static Self TextureWithDataSizeRowLengthAlignment(NSData pixelData, CGSize size, uint rowLength, uint alignment);
+    [Selector("textureByApplyingCIFilter:")]
+    public Self TextureByApplyingCIFilter(CIFilter filter);
+    [Selector("textureByGeneratingNormalMap")]
+    public Self TextureByGeneratingNormalMap();
+    [Selector("textureByGeneratingNormalMapWithSmoothness:contrast:")]
+    public Self TextureByGeneratingNormalMapWithSmoothnessContrast(CGFloat smoothness, CGFloat contrast);
+    [Selector("textureRect")]
+    public CGRect TextureRect();
+    [Selector("size")]
+    public CGSize Size();
+    [ReturnsRetained]
+    [Selector("CGImage")]
+    public CGImageRef CGImage();
+    [Selector("preloadTextures:withCompletionHandler:")]
+    public static void PreloadTexturesWithCompletionHandler(NSArray textures, SKTexturePreloadTexturesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("preloadWithCompletionHandler:")]
+    public void PreloadWithCompletionHandler(SKTexturePreloadWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

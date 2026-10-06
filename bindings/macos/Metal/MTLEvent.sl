@@ -33,32 +33,43 @@ import Standard.ObjC;
 
 public objc interface MTLEvent : NSObjectProtocol
 {
-    [Selector("device")] MTLDevice? Device { get; }
-    [Selector("label", "setLabel:")] NSString? Label { get; set; }
+    [Selector("device")]
+    MTLDevice? Device { get; }
+    [Selector("label", "setLabel:")]
+    NSString? Label { get; set; }
 }
 
 public extern objc class MTLSharedEventListener : NSObject
 {
-    [Selector("dispatchQueue")] public dispatch_queue_t DispatchQueue { get; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithDispatchQueue:")] public Self InitWithDispatchQueue(dispatch_queue_t dispatchQueue);
+    [Selector("dispatchQueue")]
+    public dispatch_queue_t DispatchQueue { get; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithDispatchQueue:")]
+    public Self InitWithDispatchQueue(dispatch_queue_t dispatchQueue);
     /// macOS 26.0 and later.
-    [Selector("sharedListener")] public static MTLSharedEventListener SharedListener();
+    [Selector("sharedListener")]
+    public static MTLSharedEventListener SharedListener();
 }
 
 public objc closure void MTLSharedEventNotificationBlock(MTLSharedEvent arg0, ulong arg1);
 
 public objc interface MTLSharedEvent : MTLEvent
 {
-    [Selector("signaledValue", "setSignaledValue:")] ulong SignaledValue { get; set; }
-    [Selector("notifyListener:atValue:block:")] void NotifyListenerAtValueBlock(MTLSharedEventListener listener, ulong value, MTLSharedEventNotificationBlock block);
-    [Selector("newSharedEventHandle")] MTLSharedEventHandle NewSharedEventHandle();
-    [Selector("waitUntilSignaledValue:timeoutMS:")] bool WaitUntilSignaledValueTimeoutMS(ulong value, ulong milliseconds);
+    [Selector("signaledValue", "setSignaledValue:")]
+    ulong SignaledValue { get; set; }
+    [Selector("notifyListener:atValue:block:")]
+    void NotifyListenerAtValueBlock(MTLSharedEventListener listener, ulong value, MTLSharedEventNotificationBlock block);
+    [Selector("newSharedEventHandle")]
+    MTLSharedEventHandle NewSharedEventHandle();
+    [Selector("waitUntilSignaledValue:timeoutMS:")]
+    bool WaitUntilSignaledValueTimeoutMS(ulong value, ulong milliseconds);
 }
 
 public extern objc class MTLSharedEventHandle : NSObject, NSSecureCoding
 {
-    [Selector("label")] public NSString? Label { get; }
+    [Selector("label")]
+    public NSString? Label { get; }
 }
 
 #endif

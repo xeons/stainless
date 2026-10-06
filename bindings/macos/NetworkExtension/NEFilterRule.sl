@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class NEFilterRule : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("networkRule")] public NENetworkRule? NetworkRule { get; }
-    [Selector("action")] public NEFilterAction Action { get; }
-    [Selector("initWithNetworkRule:action:")] public Self InitWithNetworkRuleAction(NENetworkRule networkRule, NEFilterAction action);
+    [Selector("networkRule")]
+    public NENetworkRule? NetworkRule { get; }
+    [Selector("action")]
+    public NEFilterAction Action { get; }
+    [Selector("initWithNetworkRule:action:")]
+    public Self InitWithNetworkRuleAction(NENetworkRule networkRule, NEFilterAction action);
 }
 
 #endif

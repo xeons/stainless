@@ -31,10 +31,14 @@ import Standard.ObjC;
 
 public extern objc class MKHybridMapConfiguration : MKMapConfiguration
 {
-    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")] public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
-    [Selector("showsTraffic", "setShowsTraffic:")] public bool ShowsTraffic { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithElevationStyle:")] public Self InitWithElevationStyle(MKMapElevationStyle elevationStyle);
+    [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")]
+    public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
+    [Selector("showsTraffic", "setShowsTraffic:")]
+    public bool ShowsTraffic { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithElevationStyle:")]
+    public Self InitWithElevationStyle(MKMapElevationStyle elevationStyle);
 }
 
 #endif

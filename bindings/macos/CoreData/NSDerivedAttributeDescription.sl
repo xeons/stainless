@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern objc class NSDerivedAttributeDescription : NSAttributeDescription
 {
-    [Selector("derivationExpression", "setDerivationExpression:")] public NSExpression? DerivationExpression { get; set; }
+    [Selector("derivationExpression", "setDerivationExpression:")]
+    public NSExpression? DerivationExpression { get; set; }
 }
 
 #endif

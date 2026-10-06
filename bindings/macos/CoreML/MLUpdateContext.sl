@@ -33,11 +33,16 @@ import Standard.ObjC;
 
 public extern objc class MLUpdateContext : NSObject
 {
-    [Selector("task")] public MLUpdateTask Task { get; }
-    [Selector("model")] public MLModel Model { get; }
-    [Selector("event")] public MLUpdateProgressEvent Event { get; }
-    [Selector("metrics")] public NSDictionary Metrics { get; }
-    [Selector("parameters")] public NSDictionary Parameters { get; }
+    [Selector("task")]
+    public MLUpdateTask Task { get; }
+    [Selector("model")]
+    public MLModel Model { get; }
+    [Selector("event")]
+    public MLUpdateProgressEvent Event { get; }
+    [Selector("metrics")]
+    public NSDictionary Metrics { get; }
+    [Selector("parameters")]
+    public NSDictionary Parameters { get; }
 }
 
 #endif

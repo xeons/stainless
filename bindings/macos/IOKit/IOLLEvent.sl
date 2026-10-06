@@ -82,7 +82,8 @@ public struct _NXTabletProximityData
     public UInt16 systemTabletID;
     public UInt16 vendorPointerType;
     public UInt32 pointerSerialNumber;
-    [Packed] public UInt64 uniqueID;
+    [Packed]
+    public UInt64 uniqueID;
     public UInt32 capabilityMask;
     public UInt8 pointerType;
     public UInt8 enterProximity;
@@ -238,7 +239,8 @@ public struct NXEventDataProximity
     public UInt16 systemTabletID;
     public UInt16 vendorPointerType;
     public UInt32 pointerSerialNumber;
-    [Packed] public UInt64 uniqueID;
+    [Packed]
+    public UInt64 uniqueID;
     public UInt32 capabilityMask;
     public UInt8 pointerType;
     public UInt8 enterProximity;
@@ -269,10 +271,12 @@ public struct _NXEvent
 {
     public SInt32 type;
     public _NXEventLocation location;
-    [Packed] public UInt64 time;
+    [Packed]
+    public UInt64 time;
     public SInt32 flags;
     public UInt32 window;
-    [Packed] public UInt64 service_id;
+    [Packed]
+    public UInt64 service_id;
     public SInt32 ext_pid;
     public NXEventData data;
 }

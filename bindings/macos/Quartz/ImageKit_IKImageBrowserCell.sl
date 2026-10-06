@@ -51,20 +51,34 @@ public extern "C" NSString? IKImageBrowserCellPlaceHolderLayer;
 
 public extern objc class IKImageBrowserCell : NSObject
 {
-    [Selector("imageBrowserView")] public IKImageBrowserView? ImageBrowserView();
-    [Selector("representedItem")] public AnyObject? RepresentedItem();
-    [Selector("indexOfRepresentedItem")] public NSUInteger IndexOfRepresentedItem();
-    [Selector("frame")] public NSRect Frame();
-    [Selector("imageContainerFrame")] public NSRect ImageContainerFrame();
-    [Selector("imageFrame")] public NSRect ImageFrame();
-    [Selector("selectionFrame")] public NSRect SelectionFrame();
-    [Selector("titleFrame")] public NSRect TitleFrame();
-    [Selector("subtitleFrame")] public NSRect SubtitleFrame();
-    [Selector("imageAlignment")] public NSImageAlignment ImageAlignment();
-    [Selector("isSelected")] public bool IsSelected();
-    [Selector("cellState")] public IKImageBrowserCellState CellState();
-    [Selector("opacity")] public CGFloat Opacity();
-    [Selector("layerForType:")] public CALayer? LayerForType(NSString? type);
+    [Selector("imageBrowserView")]
+    public IKImageBrowserView? ImageBrowserView();
+    [Selector("representedItem")]
+    public AnyObject? RepresentedItem();
+    [Selector("indexOfRepresentedItem")]
+    public NSUInteger IndexOfRepresentedItem();
+    [Selector("frame")]
+    public NSRect Frame();
+    [Selector("imageContainerFrame")]
+    public NSRect ImageContainerFrame();
+    [Selector("imageFrame")]
+    public NSRect ImageFrame();
+    [Selector("selectionFrame")]
+    public NSRect SelectionFrame();
+    [Selector("titleFrame")]
+    public NSRect TitleFrame();
+    [Selector("subtitleFrame")]
+    public NSRect SubtitleFrame();
+    [Selector("imageAlignment")]
+    public NSImageAlignment ImageAlignment();
+    [Selector("isSelected")]
+    public bool IsSelected();
+    [Selector("cellState")]
+    public IKImageBrowserCellState CellState();
+    [Selector("opacity")]
+    public CGFloat Opacity();
+    [Selector("layerForType:")]
+    public CALayer? LayerForType(NSString? type);
 }
 
 #endif

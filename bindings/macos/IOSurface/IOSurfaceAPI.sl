@@ -32,7 +32,8 @@ import Standard.ObjC;
 
 public extern "C" xpc_object_t IOSurfaceCreateXPCObject(IOSurfaceRef aSurface);
 
-[ReturnsRetained] public extern "C" IOSurfaceRef? IOSurfaceLookupFromXPCObject(xpc_object_t xobj);
+[ReturnsRetained]
+public extern "C" IOSurfaceRef? IOSurfaceLookupFromXPCObject(xpc_object_t xobj);
 
 public const int IOSURFACE_API_H = 1;
 

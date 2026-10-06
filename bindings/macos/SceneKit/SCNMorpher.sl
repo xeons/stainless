@@ -40,14 +40,22 @@ public enum SCNMorpherCalculationMode : long
 
 public extern objc class SCNMorpher : NSObject, SCNAnimatable, NSSecureCoding
 {
-    [Selector("targets", "setTargets:")] public NSArray Targets { get; set; }
-    [Selector("weights", "setWeights:")] public NSArray Weights { get; set; }
-    [Selector("calculationMode", "setCalculationMode:")] public SCNMorpherCalculationMode CalculationMode { get; set; }
-    [Selector("unifiesNormals", "setUnifiesNormals:")] public bool UnifiesNormals { get; set; }
-    [Selector("setWeight:forTargetAtIndex:")] public void SetWeightForTargetAtIndex(CGFloat weight, NSUInteger targetIndex);
-    [Selector("weightForTargetAtIndex:")] public CGFloat WeightForTargetAtIndex(NSUInteger targetIndex);
-    [Selector("setWeight:forTargetNamed:")] public void SetWeightForTargetNamed(CGFloat weight, NSString targetName);
-    [Selector("weightForTargetNamed:")] public CGFloat WeightForTargetNamed(NSString targetName);
+    [Selector("targets", "setTargets:")]
+    public NSArray Targets { get; set; }
+    [Selector("weights", "setWeights:")]
+    public NSArray Weights { get; set; }
+    [Selector("calculationMode", "setCalculationMode:")]
+    public SCNMorpherCalculationMode CalculationMode { get; set; }
+    [Selector("unifiesNormals", "setUnifiesNormals:")]
+    public bool UnifiesNormals { get; set; }
+    [Selector("setWeight:forTargetAtIndex:")]
+    public void SetWeightForTargetAtIndex(CGFloat weight, NSUInteger targetIndex);
+    [Selector("weightForTargetAtIndex:")]
+    public CGFloat WeightForTargetAtIndex(NSUInteger targetIndex);
+    [Selector("setWeight:forTargetNamed:")]
+    public void SetWeightForTargetNamed(CGFloat weight, NSString targetName);
+    [Selector("weightForTargetNamed:")]
+    public CGFloat WeightForTargetNamed(NSString targetName);
 }
 
 #endif

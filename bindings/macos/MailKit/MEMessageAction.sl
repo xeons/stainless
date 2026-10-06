@@ -58,13 +58,20 @@ public enum MEMessageActionFlag : long
 
 public extern objc class MEMessageAction : NSObject, NSSecureCoding
 {
-    [Selector("moveToTrashAction")] public static MEMessageAction MoveToTrashAction { get; }
-    [Selector("moveToArchiveAction")] public static MEMessageAction MoveToArchiveAction { get; }
-    [Selector("moveToJunkAction")] public static MEMessageAction MoveToJunkAction { get; }
-    [Selector("markAsReadAction")] public static MEMessageAction MarkAsReadAction { get; }
-    [Selector("markAsUnreadAction")] public static MEMessageAction MarkAsUnreadAction { get; }
-    [Selector("flagActionWithFlag:")] public static Self FlagActionWithFlag(MEMessageActionFlag flag);
-    [Selector("setBackgroundColorActionWithColor:")] public static Self SetBackgroundColorActionWithColor(MEMessageActionMessageColor color);
+    [Selector("moveToTrashAction")]
+    public static MEMessageAction MoveToTrashAction { get; }
+    [Selector("moveToArchiveAction")]
+    public static MEMessageAction MoveToArchiveAction { get; }
+    [Selector("moveToJunkAction")]
+    public static MEMessageAction MoveToJunkAction { get; }
+    [Selector("markAsReadAction")]
+    public static MEMessageAction MarkAsReadAction { get; }
+    [Selector("markAsUnreadAction")]
+    public static MEMessageAction MarkAsUnreadAction { get; }
+    [Selector("flagActionWithFlag:")]
+    public static Self FlagActionWithFlag(MEMessageActionFlag flag);
+    [Selector("setBackgroundColorActionWithColor:")]
+    public static Self SetBackgroundColorActionWithColor(MEMessageActionMessageColor color);
 }
 
 #endif

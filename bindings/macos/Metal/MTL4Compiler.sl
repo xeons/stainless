@@ -34,14 +34,17 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class MTL4CompilerDescriptor : NSObject, NSCopying
 {
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("pipelineDataSetSerializer", "setPipelineDataSetSerializer:")] public MTL4PipelineDataSetSerializer? PipelineDataSetSerializer { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("pipelineDataSetSerializer", "setPipelineDataSetSerializer:")]
+    public MTL4PipelineDataSetSerializer? PipelineDataSetSerializer { get; set; }
 }
 
 /// macOS 26.0 and later.
 public extern objc class MTL4CompilerTaskOptions : NSObject, NSCopying
 {
-    [Selector("lookupArchives", "setLookupArchives:")] public NSArray? LookupArchives { get; set; }
+    [Selector("lookupArchives", "setLookupArchives:")]
+    public NSArray? LookupArchives { get; set; }
 }
 
 /// macOS 26.0 and later.
@@ -53,31 +56,54 @@ public objc closure void MTL4NewMachineLearningPipelineStateCompletionHandler(MT
 /// macOS 26.0 and later.
 public objc interface MTL4Compiler : NSObjectProtocol
 {
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("label")] NSString? Label { get; }
-    [Selector("pipelineDataSetSerializer")] MTL4PipelineDataSetSerializer? PipelineDataSetSerializer { get; }
-    [Selector("newLibraryWithDescriptor:error:")] MTLLibrary? NewLibraryWithDescriptorError(MTL4LibraryDescriptor descriptor, out NSError? error);
-    [Selector("newDynamicLibrary:error:")] MTLDynamicLibraryProtocol? NewDynamicLibraryError(MTLLibrary library, out NSError? error);
-    [Selector("newDynamicLibraryWithURL:error:")] MTLDynamicLibraryProtocol? NewDynamicLibraryWithURLError(NSURL url, out NSError? error);
-    [Selector("newComputePipelineStateWithDescriptor:compilerTaskOptions:error:")] MTLComputePipelineState? NewComputePipelineStateWithDescriptorCompilerTaskOptionsError(MTL4ComputePipelineDescriptor descriptor, MTL4CompilerTaskOptions? compilerTaskOptions, out NSError? error);
-    [Selector("newComputePipelineStateWithDescriptor:dynamicLinkingDescriptor:compilerTaskOptions:error:")] MTLComputePipelineState? NewComputePipelineStateWithDescriptorDynamicLinkingDescriptorCompilerTaskOptionsError(MTL4ComputePipelineDescriptor descriptor, MTL4PipelineStageDynamicLinkingDescriptor? dynamicLinkingDescriptor, MTL4CompilerTaskOptions? compilerTaskOptions, out NSError? error);
-    [Selector("newRenderPipelineStateWithDescriptor:compilerTaskOptions:error:")] MTLRenderPipelineState? NewRenderPipelineStateWithDescriptorCompilerTaskOptionsError(MTL4PipelineDescriptor descriptor, MTL4CompilerTaskOptions? compilerTaskOptions, out NSError? error);
-    [Selector("newRenderPipelineStateWithDescriptor:dynamicLinkingDescriptor:compilerTaskOptions:error:")] MTLRenderPipelineState? NewRenderPipelineStateWithDescriptorDynamicLinkingDescriptorCompilerTaskOptionsError(MTL4PipelineDescriptor descriptor, MTL4RenderPipelineDynamicLinkingDescriptor? dynamicLinkingDescriptor, MTL4CompilerTaskOptions? compilerTaskOptions, out NSError? error);
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("label")]
+    NSString? Label { get; }
+    [Selector("pipelineDataSetSerializer")]
+    MTL4PipelineDataSetSerializer? PipelineDataSetSerializer { get; }
+    [Selector("newLibraryWithDescriptor:error:")]
+    MTLLibrary? NewLibraryWithDescriptorError(MTL4LibraryDescriptor descriptor, out NSError? error);
+    [Selector("newDynamicLibrary:error:")]
+    MTLDynamicLibraryProtocol? NewDynamicLibraryError(MTLLibrary library, out NSError? error);
+    [Selector("newDynamicLibraryWithURL:error:")]
+    MTLDynamicLibraryProtocol? NewDynamicLibraryWithURLError(NSURL url, out NSError? error);
+    [Selector("newComputePipelineStateWithDescriptor:compilerTaskOptions:error:")]
+    MTLComputePipelineState? NewComputePipelineStateWithDescriptorCompilerTaskOptionsError(MTL4ComputePipelineDescriptor descriptor, MTL4CompilerTaskOptions? compilerTaskOptions, out NSError? error);
+    [Selector("newComputePipelineStateWithDescriptor:dynamicLinkingDescriptor:compilerTaskOptions:error:")]
+    MTLComputePipelineState? NewComputePipelineStateWithDescriptorDynamicLinkingDescriptorCompilerTaskOptionsError(MTL4ComputePipelineDescriptor descriptor, MTL4PipelineStageDynamicLinkingDescriptor? dynamicLinkingDescriptor, MTL4CompilerTaskOptions? compilerTaskOptions, out NSError? error);
+    [Selector("newRenderPipelineStateWithDescriptor:compilerTaskOptions:error:")]
+    MTLRenderPipelineState? NewRenderPipelineStateWithDescriptorCompilerTaskOptionsError(MTL4PipelineDescriptor descriptor, MTL4CompilerTaskOptions? compilerTaskOptions, out NSError? error);
+    [Selector("newRenderPipelineStateWithDescriptor:dynamicLinkingDescriptor:compilerTaskOptions:error:")]
+    MTLRenderPipelineState? NewRenderPipelineStateWithDescriptorDynamicLinkingDescriptorCompilerTaskOptionsError(MTL4PipelineDescriptor descriptor, MTL4RenderPipelineDynamicLinkingDescriptor? dynamicLinkingDescriptor, MTL4CompilerTaskOptions? compilerTaskOptions, out NSError? error);
     /// macOS 26.0 and later.
-    [Selector("newRenderPipelineStateBySpecializationWithDescriptor:pipeline:error:")] MTLRenderPipelineState? NewRenderPipelineStateBySpecializationWithDescriptorPipelineError(MTL4PipelineDescriptor descriptor, MTLRenderPipelineState pipeline, out NSError? error);
-    [Selector("newBinaryFunctionWithDescriptor:compilerTaskOptions:error:")] MTL4BinaryFunctionProtocol? NewBinaryFunctionWithDescriptorCompilerTaskOptionsError(MTL4BinaryFunctionDescriptor descriptor, MTL4CompilerTaskOptions? compilerTaskOptions, out NSError? error);
-    [Selector("newLibraryWithDescriptor:completionHandler:")] MTL4CompilerTask NewLibraryWithDescriptorCompletionHandler(MTL4LibraryDescriptor descriptor, MTLNewLibraryCompletionHandler completionHandler);
-    [Selector("newDynamicLibrary:completionHandler:")] MTL4CompilerTask NewDynamicLibraryCompletionHandler(MTLLibrary library, MTLNewDynamicLibraryCompletionHandler completionHandler);
-    [Selector("newDynamicLibraryWithURL:completionHandler:")] MTL4CompilerTask NewDynamicLibraryWithURLCompletionHandler(NSURL url, MTLNewDynamicLibraryCompletionHandler completionHandler);
-    [Selector("newComputePipelineStateWithDescriptor:compilerTaskOptions:completionHandler:")] MTL4CompilerTask NewComputePipelineStateWithDescriptorCompilerTaskOptionsCompletionHandler(MTL4ComputePipelineDescriptor descriptor, MTL4CompilerTaskOptions? compilerTaskOptions, MTLNewComputePipelineStateCompletionHandler completionHandler);
-    [Selector("newComputePipelineStateWithDescriptor:dynamicLinkingDescriptor:compilerTaskOptions:completionHandler:")] MTL4CompilerTask NewComputePipelineStateWithDescriptorDynamicLinkingDescriptorCompilerTaskOptionsCompletionHandler(MTL4ComputePipelineDescriptor descriptor, MTL4PipelineStageDynamicLinkingDescriptor? dynamicLinkingDescriptor, MTL4CompilerTaskOptions? compilerTaskOptions, MTLNewComputePipelineStateCompletionHandler completionHandler);
-    [Selector("newRenderPipelineStateWithDescriptor:compilerTaskOptions:completionHandler:")] MTL4CompilerTask NewRenderPipelineStateWithDescriptorCompilerTaskOptionsCompletionHandler(MTL4PipelineDescriptor descriptor, MTL4CompilerTaskOptions? compilerTaskOptions, MTLNewRenderPipelineStateCompletionHandler completionHandler);
-    [Selector("newRenderPipelineStateWithDescriptor:dynamicLinkingDescriptor:compilerTaskOptions:completionHandler:")] MTL4CompilerTask NewRenderPipelineStateWithDescriptorDynamicLinkingDescriptorCompilerTaskOptionsCompletionHandler(MTL4PipelineDescriptor descriptor, MTL4RenderPipelineDynamicLinkingDescriptor? dynamicLinkingDescriptor, MTL4CompilerTaskOptions? compilerTaskOptions, MTLNewRenderPipelineStateCompletionHandler completionHandler);
+    [Selector("newRenderPipelineStateBySpecializationWithDescriptor:pipeline:error:")]
+    MTLRenderPipelineState? NewRenderPipelineStateBySpecializationWithDescriptorPipelineError(MTL4PipelineDescriptor descriptor, MTLRenderPipelineState pipeline, out NSError? error);
+    [Selector("newBinaryFunctionWithDescriptor:compilerTaskOptions:error:")]
+    MTL4BinaryFunctionProtocol? NewBinaryFunctionWithDescriptorCompilerTaskOptionsError(MTL4BinaryFunctionDescriptor descriptor, MTL4CompilerTaskOptions? compilerTaskOptions, out NSError? error);
+    [Selector("newLibraryWithDescriptor:completionHandler:")]
+    MTL4CompilerTask NewLibraryWithDescriptorCompletionHandler(MTL4LibraryDescriptor descriptor, MTLNewLibraryCompletionHandler completionHandler);
+    [Selector("newDynamicLibrary:completionHandler:")]
+    MTL4CompilerTask NewDynamicLibraryCompletionHandler(MTLLibrary library, MTLNewDynamicLibraryCompletionHandler completionHandler);
+    [Selector("newDynamicLibraryWithURL:completionHandler:")]
+    MTL4CompilerTask NewDynamicLibraryWithURLCompletionHandler(NSURL url, MTLNewDynamicLibraryCompletionHandler completionHandler);
+    [Selector("newComputePipelineStateWithDescriptor:compilerTaskOptions:completionHandler:")]
+    MTL4CompilerTask NewComputePipelineStateWithDescriptorCompilerTaskOptionsCompletionHandler(MTL4ComputePipelineDescriptor descriptor, MTL4CompilerTaskOptions? compilerTaskOptions, MTLNewComputePipelineStateCompletionHandler completionHandler);
+    [Selector("newComputePipelineStateWithDescriptor:dynamicLinkingDescriptor:compilerTaskOptions:completionHandler:")]
+    MTL4CompilerTask NewComputePipelineStateWithDescriptorDynamicLinkingDescriptorCompilerTaskOptionsCompletionHandler(MTL4ComputePipelineDescriptor descriptor, MTL4PipelineStageDynamicLinkingDescriptor? dynamicLinkingDescriptor, MTL4CompilerTaskOptions? compilerTaskOptions, MTLNewComputePipelineStateCompletionHandler completionHandler);
+    [Selector("newRenderPipelineStateWithDescriptor:compilerTaskOptions:completionHandler:")]
+    MTL4CompilerTask NewRenderPipelineStateWithDescriptorCompilerTaskOptionsCompletionHandler(MTL4PipelineDescriptor descriptor, MTL4CompilerTaskOptions? compilerTaskOptions, MTLNewRenderPipelineStateCompletionHandler completionHandler);
+    [Selector("newRenderPipelineStateWithDescriptor:dynamicLinkingDescriptor:compilerTaskOptions:completionHandler:")]
+    MTL4CompilerTask NewRenderPipelineStateWithDescriptorDynamicLinkingDescriptorCompilerTaskOptionsCompletionHandler(MTL4PipelineDescriptor descriptor, MTL4RenderPipelineDynamicLinkingDescriptor? dynamicLinkingDescriptor, MTL4CompilerTaskOptions? compilerTaskOptions, MTLNewRenderPipelineStateCompletionHandler completionHandler);
     /// macOS 26.0 and later.
-    [Selector("newRenderPipelineStateBySpecializationWithDescriptor:pipeline:completionHandler:")] MTL4CompilerTask NewRenderPipelineStateBySpecializationWithDescriptorPipelineCompletionHandler(MTL4PipelineDescriptor descriptor, MTLRenderPipelineState pipeline, MTLNewRenderPipelineStateCompletionHandler completionHandler);
-    [Selector("newBinaryFunctionWithDescriptor:compilerTaskOptions:completionHandler:")] MTL4CompilerTask NewBinaryFunctionWithDescriptorCompilerTaskOptionsCompletionHandler(MTL4BinaryFunctionDescriptor descriptor, MTL4CompilerTaskOptions? compilerTaskOptions, MTL4NewBinaryFunctionCompletionHandler completionHandler);
-    [Selector("newMachineLearningPipelineStateWithDescriptor:error:")] MTL4MachineLearningPipelineState? NewMachineLearningPipelineStateWithDescriptorError(MTL4MachineLearningPipelineDescriptor descriptor, out NSError? error);
-    [Selector("newMachineLearningPipelineStateWithDescriptor:completionHandler:")] MTL4CompilerTask NewMachineLearningPipelineStateWithDescriptorCompletionHandler(MTL4MachineLearningPipelineDescriptor descriptor, MTL4NewMachineLearningPipelineStateCompletionHandler completionHandler);
+    [Selector("newRenderPipelineStateBySpecializationWithDescriptor:pipeline:completionHandler:")]
+    MTL4CompilerTask NewRenderPipelineStateBySpecializationWithDescriptorPipelineCompletionHandler(MTL4PipelineDescriptor descriptor, MTLRenderPipelineState pipeline, MTLNewRenderPipelineStateCompletionHandler completionHandler);
+    [Selector("newBinaryFunctionWithDescriptor:compilerTaskOptions:completionHandler:")]
+    MTL4CompilerTask NewBinaryFunctionWithDescriptorCompilerTaskOptionsCompletionHandler(MTL4BinaryFunctionDescriptor descriptor, MTL4CompilerTaskOptions? compilerTaskOptions, MTL4NewBinaryFunctionCompletionHandler completionHandler);
+    [Selector("newMachineLearningPipelineStateWithDescriptor:error:")]
+    MTL4MachineLearningPipelineState? NewMachineLearningPipelineStateWithDescriptorError(MTL4MachineLearningPipelineDescriptor descriptor, out NSError? error);
+    [Selector("newMachineLearningPipelineStateWithDescriptor:completionHandler:")]
+    MTL4CompilerTask NewMachineLearningPipelineStateWithDescriptorCompletionHandler(MTL4MachineLearningPipelineDescriptor descriptor, MTL4NewMachineLearningPipelineStateCompletionHandler completionHandler);
 }
 
 #endif

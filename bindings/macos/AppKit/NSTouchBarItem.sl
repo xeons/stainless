@@ -37,14 +37,22 @@ public using NSTouchBarItemPriority = float;
 
 public extern objc class NSTouchBarItem : NSObject, NSCoding
 {
-    [Selector("identifier")] public NSTouchBarItemIdentifier? Identifier { get; }
-    [Selector("visibilityPriority", "setVisibilityPriority:")] public NSTouchBarItemPriority VisibilityPriority { get; set; }
-    [Selector("view")] public NSView? View { get; }
-    [Selector("viewController")] public NSViewController? ViewController { get; }
-    [Selector("customizationLabel")] public NSString? CustomizationLabel { get; }
-    [Selector("isVisible")] public bool Visible { get; }
-    [Selector("initWithIdentifier:")] public Self InitWithIdentifier(NSTouchBarItemIdentifier identifier);
-    [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
+    [Selector("identifier")]
+    public NSTouchBarItemIdentifier? Identifier { get; }
+    [Selector("visibilityPriority", "setVisibilityPriority:")]
+    public NSTouchBarItemPriority VisibilityPriority { get; set; }
+    [Selector("view")]
+    public NSView? View { get; }
+    [Selector("viewController")]
+    public NSViewController? ViewController { get; }
+    [Selector("customizationLabel")]
+    public NSString? CustomizationLabel { get; }
+    [Selector("isVisible")]
+    public bool Visible { get; }
+    [Selector("initWithIdentifier:")]
+    public Self InitWithIdentifier(NSTouchBarItemIdentifier identifier);
+    [Selector("initWithCoder:")]
+    public Self? InitWithCoder(NSCoder coder);
 }
 
 public extern "C" NSTouchBarItemIdentifier NSTouchBarItemIdentifierFixedSpaceSmall;

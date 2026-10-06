@@ -40,22 +40,34 @@ public enum NLModelType : long
 
 public extern objc class NLModel : NSObject
 {
-    [Selector("configuration")] public NLModelConfiguration Configuration { get; }
-    [Selector("modelWithContentsOfURL:error:")] public static Self? ModelWithContentsOfURLError(NSURL url, out NSError? error);
-    [Selector("modelWithMLModel:error:")] public static Self? ModelWithMLModelError(MLModel mlModel, out NSError? error);
-    [Selector("predictedLabelForString:")] public NSString? PredictedLabelForString(NSString string);
-    [Selector("predictedLabelsForTokens:")] public NSArray PredictedLabelsForTokens(NSArray tokens);
-    [Selector("predictedLabelHypothesesForString:maximumCount:")] public NSDictionary PredictedLabelHypothesesForStringMaximumCount(NSString string, NSUInteger maximumCount);
-    [Selector("predictedLabelHypothesesForTokens:maximumCount:")] public NSArray PredictedLabelHypothesesForTokensMaximumCount(NSArray tokens, NSUInteger maximumCount);
+    [Selector("configuration")]
+    public NLModelConfiguration Configuration { get; }
+    [Selector("modelWithContentsOfURL:error:")]
+    public static Self? ModelWithContentsOfURLError(NSURL url, out NSError? error);
+    [Selector("modelWithMLModel:error:")]
+    public static Self? ModelWithMLModelError(MLModel mlModel, out NSError? error);
+    [Selector("predictedLabelForString:")]
+    public NSString? PredictedLabelForString(NSString string);
+    [Selector("predictedLabelsForTokens:")]
+    public NSArray PredictedLabelsForTokens(NSArray tokens);
+    [Selector("predictedLabelHypothesesForString:maximumCount:")]
+    public NSDictionary PredictedLabelHypothesesForStringMaximumCount(NSString string, NSUInteger maximumCount);
+    [Selector("predictedLabelHypothesesForTokens:maximumCount:")]
+    public NSArray PredictedLabelHypothesesForTokensMaximumCount(NSArray tokens, NSUInteger maximumCount);
 }
 
 public extern objc class NLModelConfiguration : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("type")] public NLModelType Type { get; }
-    [Selector("language")] public NLLanguage? Language { get; }
-    [Selector("revision")] public NSUInteger Revision { get; }
-    [Selector("supportedRevisionsForType:")] public static NSIndexSet SupportedRevisionsForType(NLModelType type);
-    [Selector("currentRevisionForType:")] public static NSUInteger CurrentRevisionForType(NLModelType type);
+    [Selector("type")]
+    public NLModelType Type { get; }
+    [Selector("language")]
+    public NLLanguage? Language { get; }
+    [Selector("revision")]
+    public NSUInteger Revision { get; }
+    [Selector("supportedRevisionsForType:")]
+    public static NSIndexSet SupportedRevisionsForType(NLModelType type);
+    [Selector("currentRevisionForType:")]
+    public static NSUInteger CurrentRevisionForType(NLModelType type);
 }
 
 #endif

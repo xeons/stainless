@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class CWChannel : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("channelNumber")] public NSInteger ChannelNumber { get; }
-    [Selector("channelWidth")] public CWChannelWidth ChannelWidth { get; }
-    [Selector("channelBand")] public CWChannelBand ChannelBand { get; }
-    [Selector("isEqualToChannel:")] public bool IsEqualToChannel(CWChannel channel);
+    [Selector("channelNumber")]
+    public NSInteger ChannelNumber { get; }
+    [Selector("channelWidth")]
+    public CWChannelWidth ChannelWidth { get; }
+    [Selector("channelBand")]
+    public CWChannelBand ChannelBand { get; }
+    [Selector("isEqualToChannel:")]
+    public bool IsEqualToChannel(CWChannel channel);
 }
 
 #endif

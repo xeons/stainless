@@ -57,23 +57,31 @@ public extern "C" Boolean DRFSObjectIsVirtual(DRFSObjectRef? object);
 /// Deprecated in macOS 10.14.
 public extern "C" void DRFSObjectGetRealFSRef(DRFSObjectRef? object, FSRef* fsRef);
 
-[ReturnsRetained] public extern "C" CFURLRef? DRFSObjectCopyRealURL(DRFSObjectRef? object);
+[ReturnsRetained]
+public extern "C" CFURLRef? DRFSObjectCopyRealURL(DRFSObjectRef? object);
 
 public extern "C" DRFolderRef? DRFSObjectGetParent(DRFSObjectRef? object);
 
-[ReturnsRetained] public extern "C" CFStringRef? DRFSObjectCopyBaseName(DRFSObjectRef? object);
+[ReturnsRetained]
+public extern "C" CFStringRef? DRFSObjectCopyBaseName(DRFSObjectRef? object);
 
-[ReturnsRetained] public extern "C" CFStringRef? DRFSObjectCopySpecificName(DRFSObjectRef? object, CFStringRef? fsKey);
+[ReturnsRetained]
+public extern "C" CFStringRef? DRFSObjectCopySpecificName(DRFSObjectRef? object, CFStringRef? fsKey);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? DRFSObjectCopySpecificNames(DRFSObjectRef? object);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? DRFSObjectCopySpecificNames(DRFSObjectRef? object);
 
-[ReturnsRetained] public extern "C" CFStringRef? DRFSObjectCopyMangledName(DRFSObjectRef? object, CFStringRef? fsKey);
+[ReturnsRetained]
+public extern "C" CFStringRef? DRFSObjectCopyMangledName(DRFSObjectRef? object, CFStringRef? fsKey);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? DRFSObjectCopyMangledNames(DRFSObjectRef? object);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? DRFSObjectCopyMangledNames(DRFSObjectRef? object);
 
-[ReturnsRetained] public extern "C" CFTypeRef? DRFSObjectCopyFilesystemProperty(DRFSObjectRef? object, CFStringRef? fsKey, CFStringRef? propertyKey, Boolean coalesce);
+[ReturnsRetained]
+public extern "C" CFTypeRef? DRFSObjectCopyFilesystemProperty(DRFSObjectRef? object, CFStringRef? fsKey, CFStringRef? propertyKey, Boolean coalesce);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef? DRFSObjectCopyFilesystemProperties(DRFSObjectRef? object, CFStringRef? fsKey, Boolean coalesce);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef? DRFSObjectCopyFilesystemProperties(DRFSObjectRef? object, CFStringRef? fsKey, Boolean coalesce);
 
 public extern "C" DRFilesystemMask DRFSObjectGetFilesystemMask(DRFSObjectRef? object, DRFilesystemMask* explicitMask, DRFilesystemMask* effectiveMask);
 

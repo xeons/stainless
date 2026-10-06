@@ -102,12 +102,18 @@ public extern "C" SCNMatrix4 SCNMatrix4FromGLKMatrix4(GLKMatrix4 mat);
 /// SceneKitAdditions, a category of NSValue.
 public extern objc class NSValue
 {
-    [Selector("SCNVector3Value")] public SCNVector3 SCNVector3Value { get; }
-    [Selector("SCNVector4Value")] public SCNVector4 SCNVector4Value { get; }
-    [Selector("SCNMatrix4Value")] public SCNMatrix4 SCNMatrix4Value { get; }
-    [Selector("valueWithSCNVector3:")] public static NSValue ValueWithSCNVector3(SCNVector3 v);
-    [Selector("valueWithSCNVector4:")] public static NSValue ValueWithSCNVector4(SCNVector4 v);
-    [Selector("valueWithSCNMatrix4:")] public static NSValue ValueWithSCNMatrix4(SCNMatrix4 v);
+    [Selector("SCNVector3Value")]
+    public SCNVector3 SCNVector3Value { get; }
+    [Selector("SCNVector4Value")]
+    public SCNVector4 SCNVector4Value { get; }
+    [Selector("SCNMatrix4Value")]
+    public SCNMatrix4 SCNMatrix4Value { get; }
+    [Selector("valueWithSCNVector3:")]
+    public static NSValue ValueWithSCNVector3(SCNVector3 v);
+    [Selector("valueWithSCNVector4:")]
+    public static NSValue ValueWithSCNVector4(SCNVector4 v);
+    [Selector("valueWithSCNMatrix4:")]
+    public static NSValue ValueWithSCNMatrix4(SCNMatrix4 v);
 }
 
 public extern "C" NSString SCNErrorDomain;

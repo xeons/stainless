@@ -44,7 +44,8 @@ public objc closure void NEURLFilterVerdictForURLCompletionHandlerCompletionHand
 public extern objc class NEURLFilter : NSObject
 {
     /// macOS 26.0 and later.
-    [Selector("verdictForURL:completionHandler:")] public static void VerdictForURLCompletionHandler(NSURL url, NEURLFilterVerdictForURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("verdictForURL:completionHandler:")]
+    public static void VerdictForURLCompletionHandler(NSURL url, NEURLFilterVerdictForURLCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

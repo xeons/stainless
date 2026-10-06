@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class VZVirtioFileSystemDevice : VZDirectorySharingDevice
 {
-    [Selector("tag")] public NSString Tag { get; }
-    [Selector("share", "setShare:")] public VZDirectoryShare? Share { get; set; }
+    [Selector("tag")]
+    public NSString Tag { get; }
+    [Selector("share", "setShare:")]
+    public VZDirectoryShare? Share { get; set; }
 }
 
 #endif

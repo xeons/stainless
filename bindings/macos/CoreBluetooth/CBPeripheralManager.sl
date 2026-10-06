@@ -60,39 +60,78 @@ public enum CBPeripheralManagerConnectionLatency : long
 
 public extern objc class CBPeripheralManager : CBManager
 {
-    [Selector("delegate", "setDelegate:")] public CBPeripheralManagerDelegate? Delegate { get; set; }
-    [Selector("isAdvertising")] public bool IsAdvertising { get; }
+    [Selector("delegate", "setDelegate:")]
+    public CBPeripheralManagerDelegate? Delegate { get; set; }
+    [Selector("isAdvertising")]
+    public bool IsAdvertising { get; }
     /// Deprecated in macOS 10.15.
-    [Selector("authorizationStatus")] public static CBPeripheralManagerAuthorizationStatus AuthorizationStatus();
-    [Selector("init")] public Self Init();
-    [Selector("initWithDelegate:queue:")] public Self InitWithDelegateQueue(CBPeripheralManagerDelegate? @delegate, dispatch_queue_t? queue);
-    [Selector("initWithDelegate:queue:options:")] public Self InitWithDelegateQueueOptions(CBPeripheralManagerDelegate? @delegate, dispatch_queue_t? queue, NSDictionary? options);
-    [Selector("startAdvertising:")] public void StartAdvertising(NSDictionary? advertisementData);
-    [Selector("stopAdvertising")] public void StopAdvertising();
-    [Selector("setDesiredConnectionLatency:forCentral:")] public void SetDesiredConnectionLatencyForCentral(CBPeripheralManagerConnectionLatency latency, CBCentral central);
-    [Selector("addService:")] public void AddService(CBMutableService service);
-    [Selector("removeService:")] public void RemoveService(CBMutableService service);
-    [Selector("removeAllServices")] public void RemoveAllServices();
-    [Selector("respondToRequest:withResult:")] public void RespondToRequestWithResult(CBATTRequest request, CBATTError result);
-    [Selector("updateValue:forCharacteristic:onSubscribedCentrals:")] public bool UpdateValueForCharacteristicOnSubscribedCentrals(NSData value, CBMutableCharacteristic characteristic, NSArray? centrals);
-    [Selector("publishL2CAPChannelWithEncryption:")] public void PublishL2CAPChannelWithEncryption(bool encryptionRequired);
-    [Selector("unpublishL2CAPChannel:")] public void UnpublishL2CAPChannel(CBL2CAPPSM PSM);
+    [Selector("authorizationStatus")]
+    public static CBPeripheralManagerAuthorizationStatus AuthorizationStatus();
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithDelegate:queue:")]
+    public Self InitWithDelegateQueue(CBPeripheralManagerDelegate? @delegate, dispatch_queue_t? queue);
+    [Selector("initWithDelegate:queue:options:")]
+    public Self InitWithDelegateQueueOptions(CBPeripheralManagerDelegate? @delegate, dispatch_queue_t? queue, NSDictionary? options);
+    [Selector("startAdvertising:")]
+    public void StartAdvertising(NSDictionary? advertisementData);
+    [Selector("stopAdvertising")]
+    public void StopAdvertising();
+    [Selector("setDesiredConnectionLatency:forCentral:")]
+    public void SetDesiredConnectionLatencyForCentral(CBPeripheralManagerConnectionLatency latency, CBCentral central);
+    [Selector("addService:")]
+    public void AddService(CBMutableService service);
+    [Selector("removeService:")]
+    public void RemoveService(CBMutableService service);
+    [Selector("removeAllServices")]
+    public void RemoveAllServices();
+    [Selector("respondToRequest:withResult:")]
+    public void RespondToRequestWithResult(CBATTRequest request, CBATTError result);
+    [Selector("updateValue:forCharacteristic:onSubscribedCentrals:")]
+    public bool UpdateValueForCharacteristicOnSubscribedCentrals(NSData value, CBMutableCharacteristic characteristic, NSArray? centrals);
+    [Selector("publishL2CAPChannelWithEncryption:")]
+    public void PublishL2CAPChannelWithEncryption(bool encryptionRequired);
+    [Selector("unpublishL2CAPChannel:")]
+    public void UnpublishL2CAPChannel(CBL2CAPPSM PSM);
 }
 
 public objc interface CBPeripheralManagerDelegate : NSObjectProtocol
 {
-    [Selector("peripheralManagerDidUpdateState:")] void PeripheralManagerDidUpdateState(CBPeripheralManager peripheral);
-    [Optional] [Selector("peripheralManager:willRestoreState:")] void PeripheralManagerWillRestoreState(CBPeripheralManager peripheral, NSDictionary dict);
-    [Optional] [Selector("peripheralManagerDidStartAdvertising:error:")] void PeripheralManagerDidStartAdvertisingError(CBPeripheralManager peripheral, NSError? error);
-    [Optional] [Selector("peripheralManager:didAddService:error:")] void PeripheralManagerDidAddServiceError(CBPeripheralManager peripheral, CBService service, NSError? error);
-    [Optional] [Selector("peripheralManager:central:didSubscribeToCharacteristic:")] void PeripheralManagerCentralDidSubscribeToCharacteristic(CBPeripheralManager peripheral, CBCentral central, CBCharacteristic characteristic);
-    [Optional] [Selector("peripheralManager:central:didUnsubscribeFromCharacteristic:")] void PeripheralManagerCentralDidUnsubscribeFromCharacteristic(CBPeripheralManager peripheral, CBCentral central, CBCharacteristic characteristic);
-    [Optional] [Selector("peripheralManager:didReceiveReadRequest:")] void PeripheralManagerDidReceiveReadRequest(CBPeripheralManager peripheral, CBATTRequest request);
-    [Optional] [Selector("peripheralManager:didReceiveWriteRequests:")] void PeripheralManagerDidReceiveWriteRequests(CBPeripheralManager peripheral, NSArray requests);
-    [Optional] [Selector("peripheralManagerIsReadyToUpdateSubscribers:")] void PeripheralManagerIsReadyToUpdateSubscribers(CBPeripheralManager peripheral);
-    [Optional] [Selector("peripheralManager:didPublishL2CAPChannel:error:")] void PeripheralManagerDidPublishL2CAPChannelError(CBPeripheralManager peripheral, CBL2CAPPSM PSM, NSError? error);
-    [Optional] [Selector("peripheralManager:didUnpublishL2CAPChannel:error:")] void PeripheralManagerDidUnpublishL2CAPChannelError(CBPeripheralManager peripheral, CBL2CAPPSM PSM, NSError? error);
-    [Optional] [Selector("peripheralManager:didOpenL2CAPChannel:error:")] void PeripheralManagerDidOpenL2CAPChannelError(CBPeripheralManager peripheral, CBL2CAPChannel? channel, NSError? error);
+    [Selector("peripheralManagerDidUpdateState:")]
+    void PeripheralManagerDidUpdateState(CBPeripheralManager peripheral);
+    [Optional]
+    [Selector("peripheralManager:willRestoreState:")]
+    void PeripheralManagerWillRestoreState(CBPeripheralManager peripheral, NSDictionary dict);
+    [Optional]
+    [Selector("peripheralManagerDidStartAdvertising:error:")]
+    void PeripheralManagerDidStartAdvertisingError(CBPeripheralManager peripheral, NSError? error);
+    [Optional]
+    [Selector("peripheralManager:didAddService:error:")]
+    void PeripheralManagerDidAddServiceError(CBPeripheralManager peripheral, CBService service, NSError? error);
+    [Optional]
+    [Selector("peripheralManager:central:didSubscribeToCharacteristic:")]
+    void PeripheralManagerCentralDidSubscribeToCharacteristic(CBPeripheralManager peripheral, CBCentral central, CBCharacteristic characteristic);
+    [Optional]
+    [Selector("peripheralManager:central:didUnsubscribeFromCharacteristic:")]
+    void PeripheralManagerCentralDidUnsubscribeFromCharacteristic(CBPeripheralManager peripheral, CBCentral central, CBCharacteristic characteristic);
+    [Optional]
+    [Selector("peripheralManager:didReceiveReadRequest:")]
+    void PeripheralManagerDidReceiveReadRequest(CBPeripheralManager peripheral, CBATTRequest request);
+    [Optional]
+    [Selector("peripheralManager:didReceiveWriteRequests:")]
+    void PeripheralManagerDidReceiveWriteRequests(CBPeripheralManager peripheral, NSArray requests);
+    [Optional]
+    [Selector("peripheralManagerIsReadyToUpdateSubscribers:")]
+    void PeripheralManagerIsReadyToUpdateSubscribers(CBPeripheralManager peripheral);
+    [Optional]
+    [Selector("peripheralManager:didPublishL2CAPChannel:error:")]
+    void PeripheralManagerDidPublishL2CAPChannelError(CBPeripheralManager peripheral, CBL2CAPPSM PSM, NSError? error);
+    [Optional]
+    [Selector("peripheralManager:didUnpublishL2CAPChannel:error:")]
+    void PeripheralManagerDidUnpublishL2CAPChannelError(CBPeripheralManager peripheral, CBL2CAPPSM PSM, NSError? error);
+    [Optional]
+    [Selector("peripheralManager:didOpenL2CAPChannel:error:")]
+    void PeripheralManagerDidOpenL2CAPChannelError(CBPeripheralManager peripheral, CBL2CAPChannel? channel, NSError? error);
 }
 
 #endif

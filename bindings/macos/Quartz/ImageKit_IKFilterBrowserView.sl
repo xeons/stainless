@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class IKFilterBrowserView : NSView
 {
-    [Selector("setPreviewState:")] public void SetPreviewState(bool inState);
-    [Selector("filterName")] public NSString? FilterName();
+    [Selector("setPreviewState:")]
+    public void SetPreviewState(bool inState);
+    [Selector("filterName")]
+    public NSString? FilterName();
 }
 
 #endif

@@ -41,12 +41,18 @@ public objc closure void SFSafariTabActivateWithCompletionHandlerCompletionHandl
 
 public extern objc class SFSafariTab : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("getActivePageWithCompletionHandler:")] public void GetActivePageWithCompletionHandler(SFSafariTabGetActivePageWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getPagesWithCompletionHandler:")] public void GetPagesWithCompletionHandler(SFSafariTabGetPagesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("getContainingWindowWithCompletionHandler:")] public void GetContainingWindowWithCompletionHandler(SFSafariTabGetContainingWindowWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("activateWithCompletionHandler:")] public void ActivateWithCompletionHandler(SFSafariTabActivateWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("navigateToURL:")] public void NavigateToURL(NSURL url);
-    [Selector("close")] public void Close();
+    [Selector("getActivePageWithCompletionHandler:")]
+    public void GetActivePageWithCompletionHandler(SFSafariTabGetActivePageWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getPagesWithCompletionHandler:")]
+    public void GetPagesWithCompletionHandler(SFSafariTabGetPagesWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("getContainingWindowWithCompletionHandler:")]
+    public void GetContainingWindowWithCompletionHandler(SFSafariTabGetContainingWindowWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("activateWithCompletionHandler:")]
+    public void ActivateWithCompletionHandler(SFSafariTabActivateWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("navigateToURL:")]
+    public void NavigateToURL(NSURL url);
+    [Selector("close")]
+    public void Close();
 }
 
 #endif

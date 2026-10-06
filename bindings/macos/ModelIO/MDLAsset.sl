@@ -33,49 +33,84 @@ import Standard.ObjC;
 
 public extern objc class MDLAsset : NSObject, NSCopying, NSFastEnumeration
 {
-    [Selector("boundingBox")] public MDLAxisAlignedBoundingBox BoundingBox { get; }
-    [Selector("frameInterval", "setFrameInterval:")] public NSTimeInterval FrameInterval { get; set; }
-    [Selector("startTime", "setStartTime:")] public NSTimeInterval StartTime { get; set; }
-    [Selector("endTime", "setEndTime:")] public NSTimeInterval EndTime { get; set; }
-    [Selector("upAxis", "setUpAxis:")] public vector_float3 UpAxis { get; set; }
-    [Selector("URL")] public NSURL? URL { get; }
-    [Selector("resolver", "setResolver:")] public MDLAssetResolver? Resolver { get; set; }
-    [Selector("bufferAllocator")] public MDLMeshBufferAllocator BufferAllocator { get; }
-    [Selector("vertexDescriptor")] public MDLVertexDescriptor? VertexDescriptor { get; }
-    [Selector("count")] public NSUInteger Count { get; }
+    [Selector("boundingBox")]
+    public MDLAxisAlignedBoundingBox BoundingBox { get; }
+    [Selector("frameInterval", "setFrameInterval:")]
+    public NSTimeInterval FrameInterval { get; set; }
+    [Selector("startTime", "setStartTime:")]
+    public NSTimeInterval StartTime { get; set; }
+    [Selector("endTime", "setEndTime:")]
+    public NSTimeInterval EndTime { get; set; }
+    [Selector("upAxis", "setUpAxis:")]
+    public vector_float3 UpAxis { get; set; }
+    [Selector("URL")]
+    public NSURL? URL { get; }
+    [Selector("resolver", "setResolver:")]
+    public MDLAssetResolver? Resolver { get; set; }
+    [Selector("bufferAllocator")]
+    public MDLMeshBufferAllocator BufferAllocator { get; }
+    [Selector("vertexDescriptor")]
+    public MDLVertexDescriptor? VertexDescriptor { get; }
+    [Selector("count")]
+    public NSUInteger Count { get; }
     /// Deprecated in macOS 12.0.
-    [Selector("masters", "setMasters:")] public MDLObjectContainerComponent Masters { get; set; }
-    [Selector("originals", "setOriginals:")] public MDLObjectContainerComponent Originals { get; set; }
-    [Selector("animations", "setAnimations:")] public MDLObjectContainerComponent Animations { get; set; }
-    [Selector("initWithURL:")] public Self InitWithURL(NSURL URL);
-    [Selector("initWithURL:vertexDescriptor:bufferAllocator:")] public Self InitWithURLVertexDescriptorBufferAllocator(NSURL? URL, MDLVertexDescriptor? vertexDescriptor, MDLMeshBufferAllocator? bufferAllocator);
-    [Selector("initWithBufferAllocator:")] public Self InitWithBufferAllocator(MDLMeshBufferAllocator? bufferAllocator);
-    [Selector("initWithURL:vertexDescriptor:bufferAllocator:preserveTopology:error:")] public Self InitWithURLVertexDescriptorBufferAllocatorPreserveTopologyError(NSURL URL, MDLVertexDescriptor? vertexDescriptor, MDLMeshBufferAllocator? bufferAllocator, bool preserveTopology, out NSError? error);
-    [Selector("exportAssetToURL:")] public bool ExportAssetToURL(NSURL URL);
-    [Selector("exportAssetToURL:error:")] public bool ExportAssetToURLError(NSURL URL, out NSError? error);
-    [Selector("objectAtPath:")] public MDLObject ObjectAtPath(NSString path);
-    [Selector("canImportFileExtension:")] public static bool CanImportFileExtension(NSString extension);
-    [Selector("canExportFileExtension:")] public static bool CanExportFileExtension(NSString extension);
-    [Selector("childObjectsOfClass:")] public NSArray ChildObjectsOfClass(Class objectClass);
-    [Selector("loadTextures")] public void LoadTextures();
-    [Selector("boundingBoxAtTime:")] public MDLAxisAlignedBoundingBox BoundingBoxAtTime(NSTimeInterval time);
-    [Selector("addObject:")] public void AddObject(MDLObject object);
-    [Selector("removeObject:")] public void RemoveObject(MDLObject object);
-    [Selector("objectAtIndexedSubscript:")] public MDLObject? ObjectAtIndexedSubscript(NSUInteger index);
-    [Selector("objectAtIndex:")] public MDLObject ObjectAtIndex(NSUInteger index);
+    [Selector("masters", "setMasters:")]
+    public MDLObjectContainerComponent Masters { get; set; }
+    [Selector("originals", "setOriginals:")]
+    public MDLObjectContainerComponent Originals { get; set; }
+    [Selector("animations", "setAnimations:")]
+    public MDLObjectContainerComponent Animations { get; set; }
+    [Selector("initWithURL:")]
+    public Self InitWithURL(NSURL URL);
+    [Selector("initWithURL:vertexDescriptor:bufferAllocator:")]
+    public Self InitWithURLVertexDescriptorBufferAllocator(NSURL? URL, MDLVertexDescriptor? vertexDescriptor, MDLMeshBufferAllocator? bufferAllocator);
+    [Selector("initWithBufferAllocator:")]
+    public Self InitWithBufferAllocator(MDLMeshBufferAllocator? bufferAllocator);
+    [Selector("initWithURL:vertexDescriptor:bufferAllocator:preserveTopology:error:")]
+    public Self InitWithURLVertexDescriptorBufferAllocatorPreserveTopologyError(NSURL URL, MDLVertexDescriptor? vertexDescriptor, MDLMeshBufferAllocator? bufferAllocator, bool preserveTopology, out NSError? error);
+    [Selector("exportAssetToURL:")]
+    public bool ExportAssetToURL(NSURL URL);
+    [Selector("exportAssetToURL:error:")]
+    public bool ExportAssetToURLError(NSURL URL, out NSError? error);
+    [Selector("objectAtPath:")]
+    public MDLObject ObjectAtPath(NSString path);
+    [Selector("canImportFileExtension:")]
+    public static bool CanImportFileExtension(NSString extension);
+    [Selector("canExportFileExtension:")]
+    public static bool CanExportFileExtension(NSString extension);
+    [Selector("childObjectsOfClass:")]
+    public NSArray ChildObjectsOfClass(Class objectClass);
+    [Selector("loadTextures")]
+    public void LoadTextures();
+    [Selector("boundingBoxAtTime:")]
+    public MDLAxisAlignedBoundingBox BoundingBoxAtTime(NSTimeInterval time);
+    [Selector("addObject:")]
+    public void AddObject(MDLObject object);
+    [Selector("removeObject:")]
+    public void RemoveObject(MDLObject object);
+    [Selector("objectAtIndexedSubscript:")]
+    public MDLObject? ObjectAtIndexedSubscript(NSUInteger index);
+    [Selector("objectAtIndex:")]
+    public MDLObject ObjectAtIndex(NSUInteger index);
 }
 
 public objc interface MDLLightProbeIrradianceDataSource : NSObjectProtocol
 {
-    [Selector("boundingBox", "setBoundingBox:")] MDLAxisAlignedBoundingBox BoundingBox { get; set; }
-    [Optional] [Selector("sphericalHarmonicsLevel", "setSphericalHarmonicsLevel:")] NSUInteger SphericalHarmonicsLevel { get; set; }
-    [Optional] [Selector("sphericalHarmonicsCoefficientsAtPosition:")] NSData SphericalHarmonicsCoefficientsAtPosition(vector_float3 position);
+    [Selector("boundingBox", "setBoundingBox:")]
+    MDLAxisAlignedBoundingBox BoundingBox { get; set; }
+    [Optional]
+    [Selector("sphericalHarmonicsLevel", "setSphericalHarmonicsLevel:")]
+    NSUInteger SphericalHarmonicsLevel { get; set; }
+    [Optional]
+    [Selector("sphericalHarmonicsCoefficientsAtPosition:")]
+    NSData SphericalHarmonicsCoefficientsAtPosition(vector_float3 position);
 }
 
 /// MDLLightBaking, a category of MDLAsset.
 public extern objc class MDLAsset
 {
-    [Selector("placeLightProbesWithDensity:heuristic:usingIrradianceDataSource:")] public static NSArray PlaceLightProbesWithDensityHeuristicUsingIrradianceDataSource(float value, MDLProbePlacement type, MDLLightProbeIrradianceDataSource dataSource);
+    [Selector("placeLightProbesWithDensity:heuristic:usingIrradianceDataSource:")]
+    public static NSArray PlaceLightProbesWithDensityHeuristicUsingIrradianceDataSource(float value, MDLProbePlacement type, MDLLightProbeIrradianceDataSource dataSource);
 }
 
 #endif

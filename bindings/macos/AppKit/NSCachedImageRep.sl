@@ -34,13 +34,17 @@ import Standard.ObjC;
 public extern objc class NSCachedImageRep : NSImageRep
 {
     /// Deprecated in macOS 10.6.
-    [Selector("initWithWindow:rect:")] public AnyObject? InitWithWindowRect(NSWindow? win, NSRect rect);
+    [Selector("initWithWindow:rect:")]
+    public AnyObject? InitWithWindowRect(NSWindow? win, NSRect rect);
     /// Deprecated in macOS 10.6.
-    [Selector("initWithSize:depth:separate:alpha:")] public AnyObject? InitWithSizeDepthSeparateAlpha(NSSize size, NSWindowDepth depth, bool flag, bool alpha);
+    [Selector("initWithSize:depth:separate:alpha:")]
+    public AnyObject? InitWithSizeDepthSeparateAlpha(NSSize size, NSWindowDepth depth, bool flag, bool alpha);
     /// Deprecated in macOS 10.6.
-    [Selector("window")] public NSWindow? Window();
+    [Selector("window")]
+    public NSWindow? Window();
     /// Deprecated in macOS 10.6.
-    [Selector("rect")] public NSRect Rect();
+    [Selector("rect")]
+    public NSRect Rect();
 }
 
 #endif

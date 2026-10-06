@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class MLStateConstraint : NSObject, NSSecureCoding
 {
-    [Selector("bufferShape")] public NSArray? BufferShape { get; }
-    [Selector("dataType")] public MLMultiArrayDataType DataType { get; }
+    [Selector("bufferShape")]
+    public NSArray? BufferShape { get; }
+    [Selector("dataType")]
+    public MLMultiArrayDataType DataType { get; }
 }
 
 #endif

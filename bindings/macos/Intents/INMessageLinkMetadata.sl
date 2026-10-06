@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class INMessageLinkMetadata : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("siteName", "setSiteName:")] public NSString? SiteName { get; set; }
-    [Selector("summary", "setSummary:")] public NSString? Summary { get; set; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("openGraphType", "setOpenGraphType:")] public NSString? OpenGraphType { get; set; }
-    [Selector("linkURL", "setLinkURL:")] public NSURL? LinkURL { get; set; }
-    [Selector("initWithSiteName:summary:title:openGraphType:linkURL:")] public Self InitWithSiteNameSummaryTitleOpenGraphTypeLinkURL(NSString? siteName, NSString? summary, NSString? title, NSString? openGraphType, NSURL? linkURL);
+    [Selector("siteName", "setSiteName:")]
+    public NSString? SiteName { get; set; }
+    [Selector("summary", "setSummary:")]
+    public NSString? Summary { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("openGraphType", "setOpenGraphType:")]
+    public NSString? OpenGraphType { get; set; }
+    [Selector("linkURL", "setLinkURL:")]
+    public NSURL? LinkURL { get; set; }
+    [Selector("initWithSiteName:summary:title:openGraphType:linkURL:")]
+    public Self InitWithSiteNameSummaryTitleOpenGraphTypeLinkURL(NSString? siteName, NSString? summary, NSString? title, NSString? openGraphType, NSURL? linkURL);
 }
 
 #endif

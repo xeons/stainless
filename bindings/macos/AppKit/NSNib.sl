@@ -35,20 +35,26 @@ public using NSNibName = NSString;
 
 public extern objc class NSNib : NSObject, NSCoding
 {
-    [Selector("initWithNibNamed:bundle:")] public Self? InitWithNibNamedBundle(NSNibName nibName, NSBundle? bundle);
-    [Selector("initWithNibData:bundle:")] public Self InitWithNibDataBundle(NSData nibData, NSBundle? bundle);
-    [Selector("instantiateWithOwner:topLevelObjects:")] public bool InstantiateWithOwnerTopLevelObjects(AnyObject? owner, out NSArray? topLevelObjects);
+    [Selector("initWithNibNamed:bundle:")]
+    public Self? InitWithNibNamedBundle(NSNibName nibName, NSBundle? bundle);
+    [Selector("initWithNibData:bundle:")]
+    public Self InitWithNibDataBundle(NSData nibData, NSBundle? bundle);
+    [Selector("instantiateWithOwner:topLevelObjects:")]
+    public bool InstantiateWithOwnerTopLevelObjects(AnyObject? owner, out NSArray? topLevelObjects);
 }
 
 /// NSDeprecated, a category of NSNib.
 public extern objc class NSNib
 {
     /// Deprecated in macOS 10.8.
-    [Selector("initWithContentsOfURL:")] public AnyObject? InitWithContentsOfURL(NSURL? nibFileURL);
+    [Selector("initWithContentsOfURL:")]
+    public AnyObject? InitWithContentsOfURL(NSURL? nibFileURL);
     /// Deprecated in macOS 10.8.
-    [Selector("instantiateNibWithExternalNameTable:")] public bool InstantiateNibWithExternalNameTable(NSDictionary? externalNameTable);
+    [Selector("instantiateNibWithExternalNameTable:")]
+    public bool InstantiateNibWithExternalNameTable(NSDictionary? externalNameTable);
     /// Deprecated in macOS 10.8.
-    [Selector("instantiateNibWithOwner:topLevelObjects:")] public bool InstantiateNibWithOwnerTopLevelObjects(AnyObject? owner, out NSArray? topLevelObjects);
+    [Selector("instantiateNibWithOwner:topLevelObjects:")]
+    public bool InstantiateNibWithOwnerTopLevelObjects(AnyObject? owner, out NSArray? topLevelObjects);
 }
 
 /// Deprecated in macOS 10.8.

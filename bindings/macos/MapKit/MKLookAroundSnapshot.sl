@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class MKLookAroundSnapshot : NSObject
 {
-    [Selector("image")] public NSImage Image { get; }
+    [Selector("image")]
+    public NSImage Image { get; }
 }
 
 #endif

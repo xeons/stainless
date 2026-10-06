@@ -36,84 +36,152 @@ public objc closure void JSValueValueWithNewPromiseInContextFromExecutorCallback
 
 public extern objc class JSValue : NSObject
 {
-    [Selector("context")] public JSContext? Context { get; }
-    [Selector("isUndefined")] public bool IsUndefined { get; }
-    [Selector("isNull")] public bool IsNull { get; }
-    [Selector("isBoolean")] public bool IsBoolean { get; }
-    [Selector("isNumber")] public bool IsNumber { get; }
-    [Selector("isString")] public bool IsString { get; }
-    [Selector("isObject")] public bool IsObject { get; }
-    [Selector("isArray")] public bool IsArray { get; }
-    [Selector("isDate")] public bool IsDate { get; }
-    [Selector("isSymbol")] public bool IsSymbol { get; }
-    [Selector("isBigInt")] public bool IsBigInt { get; }
-    [Selector("valueWithObject:inContext:")] public static JSValue? ValueWithObjectInContext(AnyObject? value, JSContext? context);
-    [Selector("valueWithBool:inContext:")] public static JSValue? ValueWithBoolInContext(bool value, JSContext? context);
-    [Selector("valueWithDouble:inContext:")] public static JSValue? ValueWithDoubleInContext(double value, JSContext? context);
-    [Selector("valueWithInt32:inContext:")] public static JSValue? ValueWithInt32InContext(int value, JSContext? context);
-    [Selector("valueWithUInt32:inContext:")] public static JSValue? ValueWithUInt32InContext(uint value, JSContext? context);
-    [Selector("valueWithNewObjectInContext:")] public static JSValue? ValueWithNewObjectInContext(JSContext? context);
-    [Selector("valueWithNewArrayInContext:")] public static JSValue? ValueWithNewArrayInContext(JSContext? context);
-    [Selector("valueWithNewRegularExpressionFromPattern:flags:inContext:")] public static JSValue? ValueWithNewRegularExpressionFromPatternFlagsInContext(NSString? pattern, NSString? flags, JSContext? context);
-    [Selector("valueWithNewErrorFromMessage:inContext:")] public static JSValue? ValueWithNewErrorFromMessageInContext(NSString? message, JSContext? context);
-    [Selector("valueWithNewPromiseInContext:fromExecutor:")] public static JSValue? ValueWithNewPromiseInContextFromExecutor(JSContext? context, JSValueValueWithNewPromiseInContextFromExecutorCallbackBlock? callback);
-    [Selector("valueWithNewPromiseResolvedWithResult:inContext:")] public static JSValue? ValueWithNewPromiseResolvedWithResultInContext(AnyObject? result, JSContext? context);
-    [Selector("valueWithNewPromiseRejectedWithReason:inContext:")] public static JSValue? ValueWithNewPromiseRejectedWithReasonInContext(AnyObject? reason, JSContext? context);
-    [Selector("valueWithNewSymbolFromDescription:inContext:")] public static JSValue? ValueWithNewSymbolFromDescriptionInContext(NSString? description, JSContext? context);
-    [Selector("valueWithNewBigIntFromString:inContext:")] public static JSValue? ValueWithNewBigIntFromStringInContext(NSString string, JSContext context);
-    [Selector("valueWithNewBigIntFromInt64:inContext:")] public static JSValue? ValueWithNewBigIntFromInt64InContext(long int64, JSContext context);
-    [Selector("valueWithNewBigIntFromUInt64:inContext:")] public static JSValue? ValueWithNewBigIntFromUInt64InContext(ulong uint64, JSContext context);
-    [Selector("valueWithNewBigIntFromDouble:inContext:")] public static JSValue? ValueWithNewBigIntFromDoubleInContext(double value, JSContext context);
-    [Selector("valueWithNullInContext:")] public static JSValue? ValueWithNullInContext(JSContext? context);
-    [Selector("valueWithUndefinedInContext:")] public static JSValue? ValueWithUndefinedInContext(JSContext? context);
-    [Selector("toObject")] public AnyObject? ToObject();
-    [Selector("toObjectOfClass:")] public AnyObject? ToObjectOfClass(Class expectedClass);
-    [Selector("toBool")] public bool ToBool();
-    [Selector("toDouble")] public double ToDouble();
-    [Selector("toInt32")] public int ToInt32();
-    [Selector("toUInt32")] public uint ToUInt32();
-    [Selector("toInt64")] public long ToInt64();
-    [Selector("toUInt64")] public ulong ToUInt64();
-    [Selector("toNumber")] public NSNumber? ToNumber();
-    [Selector("toString")] public NSString? ToString();
-    [Selector("toDate")] public NSDate? ToDate();
-    [Selector("toArray")] public NSArray? ToArray();
-    [Selector("toDictionary")] public NSDictionary? ToDictionary();
-    [Selector("isInstanceOf:")] public bool IsInstanceOf(AnyObject? value);
-    [Selector("isEqualToObject:")] public bool IsEqualToObject(AnyObject? value);
-    [Selector("isEqualWithTypeCoercionToObject:")] public bool IsEqualWithTypeCoercionToObject(AnyObject? value);
-    [Selector("compareJSValue:")] public JSRelationCondition CompareJSValue(JSValue other);
-    [Selector("compareInt64:")] public JSRelationCondition CompareInt64(long other);
-    [Selector("compareUInt64:")] public JSRelationCondition CompareUInt64(ulong other);
-    [Selector("compareDouble:")] public JSRelationCondition CompareDouble(double other);
-    [Selector("callWithArguments:")] public JSValue? CallWithArguments(NSArray? arguments);
-    [Selector("constructWithArguments:")] public JSValue? ConstructWithArguments(NSArray? arguments);
-    [Selector("invokeMethod:withArguments:")] public JSValue? InvokeMethodWithArguments(NSString? method, NSArray? arguments);
+    [Selector("context")]
+    public JSContext? Context { get; }
+    [Selector("isUndefined")]
+    public bool IsUndefined { get; }
+    [Selector("isNull")]
+    public bool IsNull { get; }
+    [Selector("isBoolean")]
+    public bool IsBoolean { get; }
+    [Selector("isNumber")]
+    public bool IsNumber { get; }
+    [Selector("isString")]
+    public bool IsString { get; }
+    [Selector("isObject")]
+    public bool IsObject { get; }
+    [Selector("isArray")]
+    public bool IsArray { get; }
+    [Selector("isDate")]
+    public bool IsDate { get; }
+    [Selector("isSymbol")]
+    public bool IsSymbol { get; }
+    [Selector("isBigInt")]
+    public bool IsBigInt { get; }
+    [Selector("valueWithObject:inContext:")]
+    public static JSValue? ValueWithObjectInContext(AnyObject? value, JSContext? context);
+    [Selector("valueWithBool:inContext:")]
+    public static JSValue? ValueWithBoolInContext(bool value, JSContext? context);
+    [Selector("valueWithDouble:inContext:")]
+    public static JSValue? ValueWithDoubleInContext(double value, JSContext? context);
+    [Selector("valueWithInt32:inContext:")]
+    public static JSValue? ValueWithInt32InContext(int value, JSContext? context);
+    [Selector("valueWithUInt32:inContext:")]
+    public static JSValue? ValueWithUInt32InContext(uint value, JSContext? context);
+    [Selector("valueWithNewObjectInContext:")]
+    public static JSValue? ValueWithNewObjectInContext(JSContext? context);
+    [Selector("valueWithNewArrayInContext:")]
+    public static JSValue? ValueWithNewArrayInContext(JSContext? context);
+    [Selector("valueWithNewRegularExpressionFromPattern:flags:inContext:")]
+    public static JSValue? ValueWithNewRegularExpressionFromPatternFlagsInContext(NSString? pattern, NSString? flags, JSContext? context);
+    [Selector("valueWithNewErrorFromMessage:inContext:")]
+    public static JSValue? ValueWithNewErrorFromMessageInContext(NSString? message, JSContext? context);
+    [Selector("valueWithNewPromiseInContext:fromExecutor:")]
+    public static JSValue? ValueWithNewPromiseInContextFromExecutor(JSContext? context, JSValueValueWithNewPromiseInContextFromExecutorCallbackBlock? callback);
+    [Selector("valueWithNewPromiseResolvedWithResult:inContext:")]
+    public static JSValue? ValueWithNewPromiseResolvedWithResultInContext(AnyObject? result, JSContext? context);
+    [Selector("valueWithNewPromiseRejectedWithReason:inContext:")]
+    public static JSValue? ValueWithNewPromiseRejectedWithReasonInContext(AnyObject? reason, JSContext? context);
+    [Selector("valueWithNewSymbolFromDescription:inContext:")]
+    public static JSValue? ValueWithNewSymbolFromDescriptionInContext(NSString? description, JSContext? context);
+    [Selector("valueWithNewBigIntFromString:inContext:")]
+    public static JSValue? ValueWithNewBigIntFromStringInContext(NSString string, JSContext context);
+    [Selector("valueWithNewBigIntFromInt64:inContext:")]
+    public static JSValue? ValueWithNewBigIntFromInt64InContext(long int64, JSContext context);
+    [Selector("valueWithNewBigIntFromUInt64:inContext:")]
+    public static JSValue? ValueWithNewBigIntFromUInt64InContext(ulong uint64, JSContext context);
+    [Selector("valueWithNewBigIntFromDouble:inContext:")]
+    public static JSValue? ValueWithNewBigIntFromDoubleInContext(double value, JSContext context);
+    [Selector("valueWithNullInContext:")]
+    public static JSValue? ValueWithNullInContext(JSContext? context);
+    [Selector("valueWithUndefinedInContext:")]
+    public static JSValue? ValueWithUndefinedInContext(JSContext? context);
+    [Selector("toObject")]
+    public AnyObject? ToObject();
+    [Selector("toObjectOfClass:")]
+    public AnyObject? ToObjectOfClass(Class expectedClass);
+    [Selector("toBool")]
+    public bool ToBool();
+    [Selector("toDouble")]
+    public double ToDouble();
+    [Selector("toInt32")]
+    public int ToInt32();
+    [Selector("toUInt32")]
+    public uint ToUInt32();
+    [Selector("toInt64")]
+    public long ToInt64();
+    [Selector("toUInt64")]
+    public ulong ToUInt64();
+    [Selector("toNumber")]
+    public NSNumber? ToNumber();
+    [Selector("toString")]
+    public NSString? ToString();
+    [Selector("toDate")]
+    public NSDate? ToDate();
+    [Selector("toArray")]
+    public NSArray? ToArray();
+    [Selector("toDictionary")]
+    public NSDictionary? ToDictionary();
+    [Selector("isInstanceOf:")]
+    public bool IsInstanceOf(AnyObject? value);
+    [Selector("isEqualToObject:")]
+    public bool IsEqualToObject(AnyObject? value);
+    [Selector("isEqualWithTypeCoercionToObject:")]
+    public bool IsEqualWithTypeCoercionToObject(AnyObject? value);
+    [Selector("compareJSValue:")]
+    public JSRelationCondition CompareJSValue(JSValue other);
+    [Selector("compareInt64:")]
+    public JSRelationCondition CompareInt64(long other);
+    [Selector("compareUInt64:")]
+    public JSRelationCondition CompareUInt64(ulong other);
+    [Selector("compareDouble:")]
+    public JSRelationCondition CompareDouble(double other);
+    [Selector("callWithArguments:")]
+    public JSValue? CallWithArguments(NSArray? arguments);
+    [Selector("constructWithArguments:")]
+    public JSValue? ConstructWithArguments(NSArray? arguments);
+    [Selector("invokeMethod:withArguments:")]
+    public JSValue? InvokeMethodWithArguments(NSString? method, NSArray? arguments);
 }
 
 /// StructSupport, a category of JSValue.
 public extern objc class JSValue
 {
-    [Selector("valueWithPoint:inContext:")] public static JSValue? ValueWithPointInContext(CGPoint point, JSContext? context);
-    [Selector("valueWithRange:inContext:")] public static JSValue? ValueWithRangeInContext(NSRange range, JSContext? context);
-    [Selector("valueWithRect:inContext:")] public static JSValue? ValueWithRectInContext(CGRect rect, JSContext? context);
-    [Selector("valueWithSize:inContext:")] public static JSValue? ValueWithSizeInContext(CGSize size, JSContext? context);
-    [Selector("toPoint")] public CGPoint ToPoint();
-    [Selector("toRange")] public NSRange ToRange();
-    [Selector("toRect")] public CGRect ToRect();
-    [Selector("toSize")] public CGSize ToSize();
+    [Selector("valueWithPoint:inContext:")]
+    public static JSValue? ValueWithPointInContext(CGPoint point, JSContext? context);
+    [Selector("valueWithRange:inContext:")]
+    public static JSValue? ValueWithRangeInContext(NSRange range, JSContext? context);
+    [Selector("valueWithRect:inContext:")]
+    public static JSValue? ValueWithRectInContext(CGRect rect, JSContext? context);
+    [Selector("valueWithSize:inContext:")]
+    public static JSValue? ValueWithSizeInContext(CGSize size, JSContext? context);
+    [Selector("toPoint")]
+    public CGPoint ToPoint();
+    [Selector("toRange")]
+    public NSRange ToRange();
+    [Selector("toRect")]
+    public CGRect ToRect();
+    [Selector("toSize")]
+    public CGSize ToSize();
 }
 
 /// PropertyAccess, a category of JSValue.
 public extern objc class JSValue
 {
-    [Selector("valueForProperty:")] public JSValue? ValueForProperty(JSValueProperty? property);
-    [Selector("setValue:forProperty:")] public void SetValueForProperty(AnyObject? value, JSValueProperty? property);
-    [Selector("deleteProperty:")] public bool DeleteProperty(JSValueProperty? property);
-    [Selector("hasProperty:")] public bool HasProperty(JSValueProperty? property);
-    [Selector("defineProperty:descriptor:")] public void DefinePropertyDescriptor(JSValueProperty? property, AnyObject? descriptor);
-    [Selector("valueAtIndex:")] public JSValue? ValueAtIndex(NSUInteger index);
-    [Selector("setValue:atIndex:")] public void SetValueAtIndex(AnyObject? value, NSUInteger index);
+    [Selector("valueForProperty:")]
+    public JSValue? ValueForProperty(JSValueProperty? property);
+    [Selector("setValue:forProperty:")]
+    public void SetValueForProperty(AnyObject? value, JSValueProperty? property);
+    [Selector("deleteProperty:")]
+    public bool DeleteProperty(JSValueProperty? property);
+    [Selector("hasProperty:")]
+    public bool HasProperty(JSValueProperty? property);
+    [Selector("defineProperty:descriptor:")]
+    public void DefinePropertyDescriptor(JSValueProperty? property, AnyObject? descriptor);
+    [Selector("valueAtIndex:")]
+    public JSValue? ValueAtIndex(NSUInteger index);
+    [Selector("setValue:atIndex:")]
+    public void SetValueAtIndex(AnyObject? value, NSUInteger index);
 }
 
 public using JSValueProperty = AnyObject;
@@ -121,17 +189,23 @@ public using JSValueProperty = AnyObject;
 /// SubscriptSupport, a category of JSValue.
 public extern objc class JSValue
 {
-    [Selector("objectForKeyedSubscript:")] public JSValue? ObjectForKeyedSubscript(AnyObject? key);
-    [Selector("objectAtIndexedSubscript:")] public JSValue? ObjectAtIndexedSubscript(NSUInteger index);
-    [Selector("setObject:forKeyedSubscript:")] public void SetObjectForKeyedSubscript(AnyObject? object, AnyObject? key);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(AnyObject? object, NSUInteger index);
+    [Selector("objectForKeyedSubscript:")]
+    public JSValue? ObjectForKeyedSubscript(AnyObject? key);
+    [Selector("objectAtIndexedSubscript:")]
+    public JSValue? ObjectAtIndexedSubscript(NSUInteger index);
+    [Selector("setObject:forKeyedSubscript:")]
+    public void SetObjectForKeyedSubscript(AnyObject? object, AnyObject? key);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(AnyObject? object, NSUInteger index);
 }
 
 /// JSValueRefSupport, a category of JSValue.
 public extern objc class JSValue
 {
-    [Selector("JSValueRef")] public JSValueRef JSValueRef { get; }
-    [Selector("valueWithJSValueRef:inContext:")] public static JSValue? ValueWithJSValueRefInContext(JSValueRef value, JSContext? context);
+    [Selector("JSValueRef")]
+    public JSValueRef JSValueRef { get; }
+    [Selector("valueWithJSValueRef:inContext:")]
+    public static JSValue? ValueWithJSValueRefInContext(JSValueRef value, JSContext? context);
 }
 
 public extern "C" NSString? JSPropertyDescriptorWritableKey;

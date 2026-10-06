@@ -41,14 +41,22 @@ public enum NSPersistentCloudKitContainerSchemaInitializationOptions : ulong
 
 public extern objc class NSPersistentCloudKitContainer : NSPersistentContainer
 {
-    [Selector("initializeCloudKitSchemaWithOptions:error:")] public bool InitializeCloudKitSchemaWithOptionsError(NSPersistentCloudKitContainerSchemaInitializationOptions options, out NSError? error);
-    [Selector("recordForManagedObjectID:")] public CKRecord? RecordForManagedObjectID(NSManagedObjectID managedObjectID);
-    [Selector("recordsForManagedObjectIDs:")] public NSDictionary RecordsForManagedObjectIDs(NSArray managedObjectIDs);
-    [Selector("recordIDForManagedObjectID:")] public CKRecordID? RecordIDForManagedObjectID(NSManagedObjectID managedObjectID);
-    [Selector("recordIDsForManagedObjectIDs:")] public NSDictionary RecordIDsForManagedObjectIDs(NSArray managedObjectIDs);
-    [Selector("canUpdateRecordForManagedObjectWithID:")] public bool CanUpdateRecordForManagedObjectWithID(NSManagedObjectID objectID);
-    [Selector("canDeleteRecordForManagedObjectWithID:")] public bool CanDeleteRecordForManagedObjectWithID(NSManagedObjectID objectID);
-    [Selector("canModifyManagedObjectsInStore:")] public bool CanModifyManagedObjectsInStore(NSPersistentStore store);
+    [Selector("initializeCloudKitSchemaWithOptions:error:")]
+    public bool InitializeCloudKitSchemaWithOptionsError(NSPersistentCloudKitContainerSchemaInitializationOptions options, out NSError? error);
+    [Selector("recordForManagedObjectID:")]
+    public CKRecord? RecordForManagedObjectID(NSManagedObjectID managedObjectID);
+    [Selector("recordsForManagedObjectIDs:")]
+    public NSDictionary RecordsForManagedObjectIDs(NSArray managedObjectIDs);
+    [Selector("recordIDForManagedObjectID:")]
+    public CKRecordID? RecordIDForManagedObjectID(NSManagedObjectID managedObjectID);
+    [Selector("recordIDsForManagedObjectIDs:")]
+    public NSDictionary RecordIDsForManagedObjectIDs(NSArray managedObjectIDs);
+    [Selector("canUpdateRecordForManagedObjectWithID:")]
+    public bool CanUpdateRecordForManagedObjectWithID(NSManagedObjectID objectID);
+    [Selector("canDeleteRecordForManagedObjectWithID:")]
+    public bool CanDeleteRecordForManagedObjectWithID(NSManagedObjectID objectID);
+    [Selector("canModifyManagedObjectsInStore:")]
+    public bool CanModifyManagedObjectsInStore(NSPersistentStore store);
 }
 
 #endif

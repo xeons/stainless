@@ -37,8 +37,10 @@ public objc closure void SFContentBlockerManagerGetStateOfContentBlockerWithIden
 
 public extern objc class SFContentBlockerManager : NSObject
 {
-    [Selector("reloadContentBlockerWithIdentifier:completionHandler:")] public static void ReloadContentBlockerWithIdentifierCompletionHandler(NSString identifier, SFContentBlockerManagerReloadContentBlockerWithIdentifierCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("getStateOfContentBlockerWithIdentifier:completionHandler:")] public static void GetStateOfContentBlockerWithIdentifierCompletionHandler(NSString identifier, SFContentBlockerManagerGetStateOfContentBlockerWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("reloadContentBlockerWithIdentifier:completionHandler:")]
+    public static void ReloadContentBlockerWithIdentifierCompletionHandler(NSString identifier, SFContentBlockerManagerReloadContentBlockerWithIdentifierCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("getStateOfContentBlockerWithIdentifier:completionHandler:")]
+    public static void GetStateOfContentBlockerWithIdentifierCompletionHandler(NSString identifier, SFContentBlockerManagerGetStateOfContentBlockerWithIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

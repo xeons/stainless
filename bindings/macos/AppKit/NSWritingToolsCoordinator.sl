@@ -76,22 +76,37 @@ public enum NSWritingToolsCoordinatorTextAnimation : long
 /// macOS 15.2 and later.
 public extern objc class NSWritingToolsCoordinator : NSObject
 {
-    [Selector("isWritingToolsAvailable")] public static bool IsWritingToolsAvailable { get; }
-    [Selector("delegate")] public NSWritingToolsCoordinatorDelegate? Delegate { get; }
-    [Selector("view")] public NSView? View { get; }
-    [Selector("effectContainerView", "setEffectContainerView:")] public NSView? EffectContainerView { get; set; }
-    [Selector("decorationContainerView", "setDecorationContainerView:")] public NSView? DecorationContainerView { get; set; }
-    [Selector("state")] public NSWritingToolsCoordinatorState State { get; }
-    [Selector("preferredBehavior", "setPreferredBehavior:")] public NSWritingToolsBehavior PreferredBehavior { get; set; }
-    [Selector("behavior")] public NSWritingToolsBehavior Behavior { get; }
-    [Selector("preferredResultOptions", "setPreferredResultOptions:")] public NSWritingToolsResultOptions PreferredResultOptions { get; set; }
-    [Selector("resultOptions")] public NSWritingToolsResultOptions ResultOptions { get; }
+    [Selector("isWritingToolsAvailable")]
+    public static bool IsWritingToolsAvailable { get; }
+    [Selector("delegate")]
+    public NSWritingToolsCoordinatorDelegate? Delegate { get; }
+    [Selector("view")]
+    public NSView? View { get; }
+    [Selector("effectContainerView", "setEffectContainerView:")]
+    public NSView? EffectContainerView { get; set; }
+    [Selector("decorationContainerView", "setDecorationContainerView:")]
+    public NSView? DecorationContainerView { get; set; }
+    [Selector("state")]
+    public NSWritingToolsCoordinatorState State { get; }
+    [Selector("preferredBehavior", "setPreferredBehavior:")]
+    public NSWritingToolsBehavior PreferredBehavior { get; set; }
+    [Selector("behavior")]
+    public NSWritingToolsBehavior Behavior { get; }
+    [Selector("preferredResultOptions", "setPreferredResultOptions:")]
+    public NSWritingToolsResultOptions PreferredResultOptions { get; set; }
+    [Selector("resultOptions")]
+    public NSWritingToolsResultOptions ResultOptions { get; }
     /// macOS 26.0 and later.
-    [Selector("includesTextListMarkers", "setIncludesTextListMarkers:")] public bool IncludesTextListMarkers { get; set; }
-    [Selector("initWithDelegate:")] public Self InitWithDelegate(NSWritingToolsCoordinatorDelegate? @delegate);
-    [Selector("stopWritingTools")] public void StopWritingTools();
-    [Selector("updateRange:withText:reason:forContextWithIdentifier:")] public void UpdateRangeWithTextReasonForContextWithIdentifier(NSRange range, NSAttributedString replacementText, NSWritingToolsCoordinatorTextUpdateReason reason, NSUUID contextID);
-    [Selector("updateForReflowedTextInContextWithIdentifier:")] public void UpdateForReflowedTextInContextWithIdentifier(NSUUID contextID);
+    [Selector("includesTextListMarkers", "setIncludesTextListMarkers:")]
+    public bool IncludesTextListMarkers { get; set; }
+    [Selector("initWithDelegate:")]
+    public Self InitWithDelegate(NSWritingToolsCoordinatorDelegate? @delegate);
+    [Selector("stopWritingTools")]
+    public void StopWritingTools();
+    [Selector("updateRange:withText:reason:forContextWithIdentifier:")]
+    public void UpdateRangeWithTextReasonForContextWithIdentifier(NSRange range, NSAttributedString replacementText, NSWritingToolsCoordinatorTextUpdateReason reason, NSUUID contextID);
+    [Selector("updateForReflowedTextInContextWithIdentifier:")]
+    public void UpdateForReflowedTextInContextWithIdentifier(NSUUID contextID);
 }
 
 public objc closure void NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsContextsForScopeCompletionCompletionBlock(NSArray arg0);
@@ -123,31 +138,53 @@ public objc closure void NSWritingToolsCoordinatorDelegateWritingToolsCoordinato
 /// macOS 15.2 and later.
 public objc interface NSWritingToolsCoordinatorDelegate : NSObjectProtocol
 {
-    [Selector("writingToolsCoordinator:requestsContextsForScope:completion:")] void WritingToolsCoordinatorRequestsContextsForScopeCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSWritingToolsCoordinatorContextScope scope, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsContextsForScopeCompletionCompletionBlock completion);
-    [Selector("writingToolsCoordinator:replaceRange:inContext:proposedText:reason:animationParameters:completion:")] void WritingToolsCoordinatorReplaceRangeInContextProposedTextReasonAnimationParametersCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSRange range, NSWritingToolsCoordinatorContext context, NSAttributedString replacementText, NSWritingToolsCoordinatorTextReplacementReason reason, NSWritingToolsCoordinatorAnimationParameters? animationParameters, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorReplaceRangeInContextProposedTextReasonAnimationParametersCompletionCompletionBlock completion);
-    [Selector("writingToolsCoordinator:selectRanges:inContext:completion:")] void WritingToolsCoordinatorSelectRangesInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSArray ranges, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorSelectRangesInContextCompletionCompletionBlock completion);
-    [Selector("writingToolsCoordinator:requestsBoundingBezierPathsForRange:inContext:completion:")] void WritingToolsCoordinatorRequestsBoundingBezierPathsForRangeInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSRange range, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsBoundingBezierPathsForRangeInContextCompletionCompletionBlock completion);
-    [Selector("writingToolsCoordinator:requestsUnderlinePathsForRange:inContext:completion:")] void WritingToolsCoordinatorRequestsUnderlinePathsForRangeInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSRange range, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsUnderlinePathsForRangeInContextCompletionCompletionBlock completion);
-    [Selector("writingToolsCoordinator:prepareForTextAnimation:forRange:inContext:completion:")] void WritingToolsCoordinatorPrepareForTextAnimationForRangeInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSWritingToolsCoordinatorTextAnimation textAnimation, NSRange range, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorPrepareForTextAnimationForRangeInContextCompletionCompletionBlock completion);
-    [Selector("writingToolsCoordinator:requestsPreviewForTextAnimation:ofRange:inContext:completion:")] void WritingToolsCoordinatorRequestsPreviewForTextAnimationOfRangeInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSWritingToolsCoordinatorTextAnimation textAnimation, NSRange range, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsPreviewForTextAnimationOfRangeInContextCompletionCompletionBlock completion);
-    [Selector("writingToolsCoordinator:requestsPreviewForRect:inContext:completion:")] void WritingToolsCoordinatorRequestsPreviewForRectInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSRect rect, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsPreviewForRectInContextCompletionCompletionBlock completion);
-    [Selector("writingToolsCoordinator:finishTextAnimation:forRange:inContext:completion:")] void WritingToolsCoordinatorFinishTextAnimationForRangeInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSWritingToolsCoordinatorTextAnimation textAnimation, NSRange range, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorFinishTextAnimationForRangeInContextCompletionCompletionBlock completion);
-    [Optional] [Selector("writingToolsCoordinator:requestsSingleContainerSubrangesOfRange:inContext:completion:")] void WritingToolsCoordinatorRequestsSingleContainerSubrangesOfRangeInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSRange range, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsSingleContainerSubrangesOfRangeInContextCompletionCompletionBlock completion);
-    [Optional] [Selector("writingToolsCoordinator:requestsDecorationContainerViewForRange:inContext:completion:")] void WritingToolsCoordinatorRequestsDecorationContainerViewForRangeInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSRange range, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsDecorationContainerViewForRangeInContextCompletionCompletionBlock completion);
-    [Optional] [Selector("writingToolsCoordinator:willChangeToState:completion:")] void WritingToolsCoordinatorWillChangeToStateCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSWritingToolsCoordinatorState newState, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorWillChangeToStateCompletionCompletionBlock completion);
+    [Selector("writingToolsCoordinator:requestsContextsForScope:completion:")]
+    void WritingToolsCoordinatorRequestsContextsForScopeCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSWritingToolsCoordinatorContextScope scope, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsContextsForScopeCompletionCompletionBlock completion);
+    [Selector("writingToolsCoordinator:replaceRange:inContext:proposedText:reason:animationParameters:completion:")]
+    void WritingToolsCoordinatorReplaceRangeInContextProposedTextReasonAnimationParametersCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSRange range, NSWritingToolsCoordinatorContext context, NSAttributedString replacementText, NSWritingToolsCoordinatorTextReplacementReason reason, NSWritingToolsCoordinatorAnimationParameters? animationParameters, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorReplaceRangeInContextProposedTextReasonAnimationParametersCompletionCompletionBlock completion);
+    [Selector("writingToolsCoordinator:selectRanges:inContext:completion:")]
+    void WritingToolsCoordinatorSelectRangesInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSArray ranges, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorSelectRangesInContextCompletionCompletionBlock completion);
+    [Selector("writingToolsCoordinator:requestsBoundingBezierPathsForRange:inContext:completion:")]
+    void WritingToolsCoordinatorRequestsBoundingBezierPathsForRangeInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSRange range, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsBoundingBezierPathsForRangeInContextCompletionCompletionBlock completion);
+    [Selector("writingToolsCoordinator:requestsUnderlinePathsForRange:inContext:completion:")]
+    void WritingToolsCoordinatorRequestsUnderlinePathsForRangeInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSRange range, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsUnderlinePathsForRangeInContextCompletionCompletionBlock completion);
+    [Selector("writingToolsCoordinator:prepareForTextAnimation:forRange:inContext:completion:")]
+    void WritingToolsCoordinatorPrepareForTextAnimationForRangeInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSWritingToolsCoordinatorTextAnimation textAnimation, NSRange range, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorPrepareForTextAnimationForRangeInContextCompletionCompletionBlock completion);
+    [Selector("writingToolsCoordinator:requestsPreviewForTextAnimation:ofRange:inContext:completion:")]
+    void WritingToolsCoordinatorRequestsPreviewForTextAnimationOfRangeInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSWritingToolsCoordinatorTextAnimation textAnimation, NSRange range, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsPreviewForTextAnimationOfRangeInContextCompletionCompletionBlock completion);
+    [Selector("writingToolsCoordinator:requestsPreviewForRect:inContext:completion:")]
+    void WritingToolsCoordinatorRequestsPreviewForRectInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSRect rect, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsPreviewForRectInContextCompletionCompletionBlock completion);
+    [Selector("writingToolsCoordinator:finishTextAnimation:forRange:inContext:completion:")]
+    void WritingToolsCoordinatorFinishTextAnimationForRangeInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSWritingToolsCoordinatorTextAnimation textAnimation, NSRange range, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorFinishTextAnimationForRangeInContextCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("writingToolsCoordinator:requestsSingleContainerSubrangesOfRange:inContext:completion:")]
+    void WritingToolsCoordinatorRequestsSingleContainerSubrangesOfRangeInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSRange range, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsSingleContainerSubrangesOfRangeInContextCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("writingToolsCoordinator:requestsDecorationContainerViewForRange:inContext:completion:")]
+    void WritingToolsCoordinatorRequestsDecorationContainerViewForRangeInContextCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSRange range, NSWritingToolsCoordinatorContext context, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsDecorationContainerViewForRangeInContextCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("writingToolsCoordinator:willChangeToState:completion:")]
+    void WritingToolsCoordinatorWillChangeToStateCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSWritingToolsCoordinatorState newState, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorWillChangeToStateCompletionCompletionBlock completion);
     /// macOS 15.2 and later.
     /// Deprecated in macOS 15.4.
-    [Optional] [Selector("writingToolsCoordinator:requestsRangeInContextWithIdentifierForPoint:completion:")] void WritingToolsCoordinatorRequestsRangeInContextWithIdentifierForPointCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSPoint point, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsRangeInContextWithIdentifierForPointCompletionCompletionBlock completion);
+    [Optional]
+    [Selector("writingToolsCoordinator:requestsRangeInContextWithIdentifierForPoint:completion:")]
+    void WritingToolsCoordinatorRequestsRangeInContextWithIdentifierForPointCompletion(NSWritingToolsCoordinator writingToolsCoordinator, NSPoint point, NSWritingToolsCoordinatorDelegateWritingToolsCoordinatorRequestsRangeInContextWithIdentifierForPointCompletionCompletionBlock completion);
 }
 
 /// macOS 15.2 and later.
 public extern objc class NSTextPreview : NSObject
 {
-    [Selector("previewImage")] public CGImageRef PreviewImage { get; }
-    [Selector("presentationFrame")] public NSRect PresentationFrame { get; }
-    [Selector("candidateRects")] public NSArray CandidateRects { get; }
-    [Selector("initWithSnapshotImage:presentationFrame:candidateRects:")] public Self InitWithSnapshotImagePresentationFrameCandidateRects(CGImageRef snapshotImage, NSRect presentationFrame, NSArray candidateRects);
-    [Selector("initWithSnapshotImage:presentationFrame:")] public Self InitWithSnapshotImagePresentationFrame(CGImageRef snapshotImage, NSRect presentationFrame);
+    [Selector("previewImage")]
+    public CGImageRef PreviewImage { get; }
+    [Selector("presentationFrame")]
+    public NSRect PresentationFrame { get; }
+    [Selector("candidateRects")]
+    public NSArray CandidateRects { get; }
+    [Selector("initWithSnapshotImage:presentationFrame:candidateRects:")]
+    public Self InitWithSnapshotImagePresentationFrameCandidateRects(CGImageRef snapshotImage, NSRect presentationFrame, NSArray candidateRects);
+    [Selector("initWithSnapshotImage:presentationFrame:")]
+    public Self InitWithSnapshotImagePresentationFrame(CGImageRef snapshotImage, NSRect presentationFrame);
 }
 
 #endif

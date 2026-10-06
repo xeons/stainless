@@ -38,10 +38,14 @@ public objc closure void HKWorkoutRouteBuilderFinishRouteWithWorkoutMetadataComp
 
 public extern objc class HKWorkoutRouteBuilder : HKSeriesBuilder
 {
-    [Selector("initWithHealthStore:device:")] public Self InitWithHealthStoreDevice(HKHealthStore healthStore, HKDevice? device);
-    [Selector("insertRouteData:completion:")] public void InsertRouteDataCompletion(NSArray routeData, HKWorkoutRouteBuilderInsertRouteDataCompletionCompletionBlock completion);
-    [Selector("addMetadata:completion:")] public void AddMetadataCompletion(NSDictionary metadata, HKWorkoutRouteBuilderAddMetadataCompletionCompletionBlock completion);
-    [Selector("finishRouteWithWorkout:metadata:completion:")] public void FinishRouteWithWorkoutMetadataCompletion(HKWorkout workout, NSDictionary? metadata, HKWorkoutRouteBuilderFinishRouteWithWorkoutMetadataCompletionCompletionBlock completion);
+    [Selector("initWithHealthStore:device:")]
+    public Self InitWithHealthStoreDevice(HKHealthStore healthStore, HKDevice? device);
+    [Selector("insertRouteData:completion:")]
+    public void InsertRouteDataCompletion(NSArray routeData, HKWorkoutRouteBuilderInsertRouteDataCompletionCompletionBlock completion);
+    [Selector("addMetadata:completion:")]
+    public void AddMetadataCompletion(NSDictionary metadata, HKWorkoutRouteBuilderAddMetadataCompletionCompletionBlock completion);
+    [Selector("finishRouteWithWorkout:metadata:completion:")]
+    public void FinishRouteWithWorkoutMetadataCompletion(HKWorkout workout, NSDictionary? metadata, HKWorkoutRouteBuilderFinishRouteWithWorkoutMetadataCompletionCompletionBlock completion);
 }
 
 #endif

@@ -49,9 +49,12 @@ public enum MTLTensorDataType : long
 /// macOS 26.0 and later.
 public extern objc class MTLTensorExtents : NSObject
 {
-    [Selector("rank")] public NSUInteger Rank { get; }
-    [Selector("initWithRank:values:")] public Self? InitWithRankValues(NSUInteger rank, NSInteger* values);
-    [Selector("extentAtDimensionIndex:")] public NSInteger ExtentAtDimensionIndex(NSUInteger dimensionIndex);
+    [Selector("rank")]
+    public NSUInteger Rank { get; }
+    [Selector("initWithRank:values:")]
+    public Self? InitWithRankValues(NSUInteger rank, NSInteger* values);
+    [Selector("extentAtDimensionIndex:")]
+    public NSInteger ExtentAtDimensionIndex(NSUInteger dimensionIndex);
 }
 
 /// macOS 26.0 and later.
@@ -77,28 +80,45 @@ public enum MTLTensorUsage : ulong
 /// macOS 26.0 and later.
 public extern objc class MTLTensorDescriptor : NSObject, NSCopying
 {
-    [Selector("dimensions", "setDimensions:")] public MTLTensorExtents Dimensions { get; set; }
-    [Selector("strides", "setStrides:")] public MTLTensorExtents? Strides { get; set; }
-    [Selector("dataType", "setDataType:")] public MTLTensorDataType DataType { get; set; }
-    [Selector("usage", "setUsage:")] public MTLTensorUsage Usage { get; set; }
-    [Selector("resourceOptions", "setResourceOptions:")] public MTLResourceOptions ResourceOptions { get; set; }
-    [Selector("cpuCacheMode", "setCpuCacheMode:")] public MTLCPUCacheMode CpuCacheMode { get; set; }
-    [Selector("storageMode", "setStorageMode:")] public MTLStorageMode StorageMode { get; set; }
-    [Selector("hazardTrackingMode", "setHazardTrackingMode:")] public MTLHazardTrackingMode HazardTrackingMode { get; set; }
+    [Selector("dimensions", "setDimensions:")]
+    public MTLTensorExtents Dimensions { get; set; }
+    [Selector("strides", "setStrides:")]
+    public MTLTensorExtents? Strides { get; set; }
+    [Selector("dataType", "setDataType:")]
+    public MTLTensorDataType DataType { get; set; }
+    [Selector("usage", "setUsage:")]
+    public MTLTensorUsage Usage { get; set; }
+    [Selector("resourceOptions", "setResourceOptions:")]
+    public MTLResourceOptions ResourceOptions { get; set; }
+    [Selector("cpuCacheMode", "setCpuCacheMode:")]
+    public MTLCPUCacheMode CpuCacheMode { get; set; }
+    [Selector("storageMode", "setStorageMode:")]
+    public MTLStorageMode StorageMode { get; set; }
+    [Selector("hazardTrackingMode", "setHazardTrackingMode:")]
+    public MTLHazardTrackingMode HazardTrackingMode { get; set; }
 }
 
 /// macOS 26.0 and later.
 public objc interface MTLTensor : MTLResource
 {
-    [Selector("gpuResourceID")] MTLResourceID GpuResourceID { get; }
-    [Selector("buffer")] MTLBuffer? Buffer { get; }
-    [Selector("bufferOffset")] NSUInteger BufferOffset { get; }
-    [Selector("strides")] MTLTensorExtents? Strides { get; }
-    [Selector("dimensions")] MTLTensorExtents Dimensions { get; }
-    [Selector("dataType")] MTLTensorDataType DataType { get; }
-    [Selector("usage")] MTLTensorUsage Usage { get; }
-    [Selector("replaceSliceOrigin:sliceDimensions:withBytes:strides:")] void ReplaceSliceOriginSliceDimensionsWithBytesStrides(MTLTensorExtents sliceOrigin, MTLTensorExtents sliceDimensions, void* bytes, MTLTensorExtents strides);
-    [Selector("getBytes:strides:fromSliceOrigin:sliceDimensions:")] void GetBytesStridesFromSliceOriginSliceDimensions(void* bytes, MTLTensorExtents strides, MTLTensorExtents sliceOrigin, MTLTensorExtents sliceDimensions);
+    [Selector("gpuResourceID")]
+    MTLResourceID GpuResourceID { get; }
+    [Selector("buffer")]
+    MTLBuffer? Buffer { get; }
+    [Selector("bufferOffset")]
+    NSUInteger BufferOffset { get; }
+    [Selector("strides")]
+    MTLTensorExtents? Strides { get; }
+    [Selector("dimensions")]
+    MTLTensorExtents Dimensions { get; }
+    [Selector("dataType")]
+    MTLTensorDataType DataType { get; }
+    [Selector("usage")]
+    MTLTensorUsage Usage { get; }
+    [Selector("replaceSliceOrigin:sliceDimensions:withBytes:strides:")]
+    void ReplaceSliceOriginSliceDimensionsWithBytesStrides(MTLTensorExtents sliceOrigin, MTLTensorExtents sliceDimensions, void* bytes, MTLTensorExtents strides);
+    [Selector("getBytes:strides:fromSliceOrigin:sliceDimensions:")]
+    void GetBytesStridesFromSliceOriginSliceDimensions(void* bytes, MTLTensorExtents strides, MTLTensorExtents sliceOrigin, MTLTensorExtents sliceDimensions);
 }
 
 public const int MTL_TENSOR_MAX_RANK = 16;

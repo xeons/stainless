@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class JRSSymbolicator : NSObject
 {
-    [Selector("symbolicatorForPid:")] public static JRSSymbolicator? SymbolicatorForPid(pid_t pid);
-    [Selector("addressForSymbol:")] public ulong AddressForSymbol(NSString? symbolName);
+    [Selector("symbolicatorForPid:")]
+    public static JRSSymbolicator? SymbolicatorForPid(pid_t pid);
+    [Selector("addressForSymbol:")]
+    public ulong AddressForSymbol(NSString? symbolName);
 }
 
 #endif

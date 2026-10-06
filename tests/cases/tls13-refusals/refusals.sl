@@ -18,8 +18,10 @@ import Standard.Security.Cryptography;
 import Standard.Text;
 import Standard.Threading;
 
-[Embed("ed25519.crt.pem")] static readonly byte[] Ed25519Certificate;
-[Embed("ed25519.key.pem")] static readonly byte[] Ed25519Key;
+[Embed("ed25519.crt.pem")]
+static readonly byte[] Ed25519Certificate;
+[Embed("ed25519.key.pem")]
+static readonly byte[] Ed25519Key;
 
 String ConvertToText(byte[] bytes) => Text.FromBytes(&bytes[0u], bytes.Length);
 

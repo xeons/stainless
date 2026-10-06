@@ -34,23 +34,33 @@ import Standard.ObjC;
 
 public extern objc class SFAuthorization : NSObject, NSSecureCoding
 {
-    [Selector("authorization")] public static AnyObject? Authorization();
-    [Selector("authorizationRef")] public AuthorizationRef AuthorizationRef();
-    [Selector("authorizationWithFlags:rights:environment:")] public static AnyObject? AuthorizationWithFlagsRightsEnvironment(AuthorizationFlags flags, AuthorizationRights* rights, AuthorizationEnvironment* environment);
-    [Selector("initWithFlags:rights:environment:")] public AnyObject? InitWithFlagsRightsEnvironment(AuthorizationFlags flags, AuthorizationRights* rights, AuthorizationEnvironment* environment);
-    [Selector("init")] public AnyObject? Init();
-    [Selector("invalidateCredentials")] public void InvalidateCredentials();
-    [Selector("obtainWithRight:flags:error:")] public bool ObtainWithRightFlagsError(AuthorizationString rightName, AuthorizationFlags flags, out NSError? error);
-    [Selector("obtainWithRights:flags:environment:authorizedRights:error:")] public bool ObtainWithRightsFlagsEnvironmentAuthorizedRightsError(AuthorizationRights* rights, AuthorizationFlags flags, AuthorizationEnvironment* environment, AuthorizationRights** authorizedRights, out NSError? error);
+    [Selector("authorization")]
+    public static AnyObject? Authorization();
+    [Selector("authorizationRef")]
+    public AuthorizationRef AuthorizationRef();
+    [Selector("authorizationWithFlags:rights:environment:")]
+    public static AnyObject? AuthorizationWithFlagsRightsEnvironment(AuthorizationFlags flags, AuthorizationRights* rights, AuthorizationEnvironment* environment);
+    [Selector("initWithFlags:rights:environment:")]
+    public AnyObject? InitWithFlagsRightsEnvironment(AuthorizationFlags flags, AuthorizationRights* rights, AuthorizationEnvironment* environment);
+    [Selector("init")]
+    public AnyObject? Init();
+    [Selector("invalidateCredentials")]
+    public void InvalidateCredentials();
+    [Selector("obtainWithRight:flags:error:")]
+    public bool ObtainWithRightFlagsError(AuthorizationString rightName, AuthorizationFlags flags, out NSError? error);
+    [Selector("obtainWithRights:flags:environment:authorizedRights:error:")]
+    public bool ObtainWithRightsFlagsEnvironmentAuthorizedRightsError(AuthorizationRights* rights, AuthorizationFlags flags, AuthorizationEnvironment* environment, AuthorizationRights** authorizedRights, out NSError? error);
 }
 
 /// SFAuthorizationDeprecated, a category of SFAuthorization.
 public extern objc class SFAuthorization
 {
     /// Deprecated in macOS 10.5.
-    [Selector("permitWithRights:flags:environment:authorizedRights:")] public OSStatus PermitWithRightsFlagsEnvironmentAuthorizedRights(AuthorizationRights* rights, AuthorizationFlags flags, AuthorizationEnvironment* environment, AuthorizationRights* authorizedRights);
+    [Selector("permitWithRights:flags:environment:authorizedRights:")]
+    public OSStatus PermitWithRightsFlagsEnvironmentAuthorizedRights(AuthorizationRights* rights, AuthorizationFlags flags, AuthorizationEnvironment* environment, AuthorizationRights* authorizedRights);
     /// Deprecated in macOS 10.5.
-    [Selector("permitWithRight:flags:")] public OSStatus PermitWithRightFlags(AuthorizationString rightName, AuthorizationFlags flags);
+    [Selector("permitWithRight:flags:")]
+    public OSStatus PermitWithRightFlags(AuthorizationString rightName, AuthorizationFlags flags);
 }
 
 #endif

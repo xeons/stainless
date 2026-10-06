@@ -65,12 +65,18 @@ public extern "C" CHHapticPatternKey? CHHapticPatternKeyParameterCurveControlPoi
 
 public extern objc class CHHapticPattern : NSObject
 {
-    [Selector("duration")] public NSTimeInterval Duration { get; }
-    [Selector("initWithEvents:parameters:error:")] public Self? InitWithEventsParametersError(NSArray events, NSArray parameters, out NSError? outError);
-    [Selector("initWithEvents:parameterCurves:error:")] public Self? InitWithEventsParameterCurvesError(NSArray events, NSArray parameterCurves, out NSError? outError);
-    [Selector("initWithDictionary:error:")] public Self? InitWithDictionaryError(NSDictionary patternDict, out NSError? outError);
-    [Selector("initWithContentsOfURL:error:")] public Self? InitWithContentsOfURLError(NSURL ahapURL, out NSError? outError);
-    [Selector("exportDictionaryAndReturnError:")] public NSDictionary? ExportDictionaryAndReturnError(out NSError? outError);
+    [Selector("duration")]
+    public NSTimeInterval Duration { get; }
+    [Selector("initWithEvents:parameters:error:")]
+    public Self? InitWithEventsParametersError(NSArray events, NSArray parameters, out NSError? outError);
+    [Selector("initWithEvents:parameterCurves:error:")]
+    public Self? InitWithEventsParameterCurvesError(NSArray events, NSArray parameterCurves, out NSError? outError);
+    [Selector("initWithDictionary:error:")]
+    public Self? InitWithDictionaryError(NSDictionary patternDict, out NSError? outError);
+    [Selector("initWithContentsOfURL:error:")]
+    public Self? InitWithContentsOfURLError(NSURL ahapURL, out NSError? outError);
+    [Selector("exportDictionaryAndReturnError:")]
+    public NSDictionary? ExportDictionaryAndReturnError(out NSError? outError);
 }
 
 #endif

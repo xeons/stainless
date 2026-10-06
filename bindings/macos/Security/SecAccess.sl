@@ -94,7 +94,8 @@ public extern "C" OSStatus SecAccessCreate(CFStringRef descriptor, CFArrayRef? t
 public extern "C" OSStatus SecAccessCreateFromOwnerAndACL(CSSM_ACL_OWNER_PROTOTYPE* owner, uint32 aclCount, CSSM_ACL_ENTRY_INFO* acls, __SecAccess** accessRef);
 
 /// Deprecated in macOS 10.10.
-[ReturnsRetained] public extern "C" SecAccessRef? SecAccessCreateWithOwnerAndACL(uid_t userId, gid_t groupId, SecAccessOwnerType ownerType, CFArrayRef? acls, __CFError** error);
+[ReturnsRetained]
+public extern "C" SecAccessRef? SecAccessCreateWithOwnerAndACL(uid_t userId, gid_t groupId, SecAccessOwnerType ownerType, CFArrayRef? acls, __CFError** error);
 
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecAccessGetOwnerAndACL(SecAccessRef accessRef, CSSM_ACL_OWNER_PROTOTYPE_PTR* owner, uint32* aclCount, CSSM_ACL_ENTRY_INFO_PTR* acls);
@@ -109,6 +110,7 @@ public extern "C" OSStatus SecAccessCopyACLList(SecAccessRef accessRef, __CFArra
 public extern "C" OSStatus SecAccessCopySelectedACLList(SecAccessRef accessRef, CSSM_ACL_AUTHORIZATION_TAG action, __CFArray** aclList);
 
 /// Deprecated in macOS 10.10.
-[ReturnsRetained] public extern "C" CFArrayRef? SecAccessCopyMatchingACLList(SecAccessRef accessRef, CFTypeRef authorizationTag);
+[ReturnsRetained]
+public extern "C" CFArrayRef? SecAccessCopyMatchingACLList(SecAccessRef accessRef, CFTypeRef authorizationTag);
 
 #endif

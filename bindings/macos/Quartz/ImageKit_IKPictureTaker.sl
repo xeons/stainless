@@ -34,16 +34,26 @@ import Standard.ObjC;
 
 public extern objc class IKPictureTaker : NSPanel
 {
-    [Selector("pictureTaker")] public static IKPictureTaker? PictureTaker();
-    [Selector("runModal")] public NSInteger RunModal();
-    [Selector("beginPictureTakerWithDelegate:didEndSelector:contextInfo:")] public void BeginPictureTakerWithDelegateDidEndSelectorContextInfo(AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
-    [Selector("beginPictureTakerSheetForWindow:withDelegate:didEndSelector:contextInfo:")] public void BeginPictureTakerSheetForWindowWithDelegateDidEndSelectorContextInfo(NSWindow? aWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
-    [Selector("popUpRecentsMenuForView:withDelegate:didEndSelector:contextInfo:")] public void PopUpRecentsMenuForViewWithDelegateDidEndSelectorContextInfo(NSView? aView, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
-    [Selector("setInputImage:")] public void SetInputImage(NSImage? image);
-    [Selector("inputImage")] public NSImage? InputImage();
-    [Selector("outputImage")] public NSImage? OutputImage();
-    [Selector("setMirroring:")] public void SetMirroring(bool b);
-    [Selector("mirroring")] public bool Mirroring();
+    [Selector("pictureTaker")]
+    public static IKPictureTaker? PictureTaker();
+    [Selector("runModal")]
+    public NSInteger RunModal();
+    [Selector("beginPictureTakerWithDelegate:didEndSelector:contextInfo:")]
+    public void BeginPictureTakerWithDelegateDidEndSelectorContextInfo(AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
+    [Selector("beginPictureTakerSheetForWindow:withDelegate:didEndSelector:contextInfo:")]
+    public void BeginPictureTakerSheetForWindowWithDelegateDidEndSelectorContextInfo(NSWindow? aWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
+    [Selector("popUpRecentsMenuForView:withDelegate:didEndSelector:contextInfo:")]
+    public void PopUpRecentsMenuForViewWithDelegateDidEndSelectorContextInfo(NSView? aView, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
+    [Selector("setInputImage:")]
+    public void SetInputImage(NSImage? image);
+    [Selector("inputImage")]
+    public NSImage? InputImage();
+    [Selector("outputImage")]
+    public NSImage? OutputImage();
+    [Selector("setMirroring:")]
+    public void SetMirroring(bool b);
+    [Selector("mirroring")]
+    public bool Mirroring();
 }
 
 public extern "C" NSString? IKPictureTakerAllowsVideoCaptureKey;

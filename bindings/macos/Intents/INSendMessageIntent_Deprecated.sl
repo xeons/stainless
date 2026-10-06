@@ -33,12 +33,16 @@ import Standard.ObjC;
 /// Deprecated, a category of INSendMessageIntent.
 public extern objc class INSendMessageIntent
 {
-    [Selector("groupName")] public NSString? GroupName { get; }
-    [Selector("initWithRecipients:content:groupName:serviceName:sender:")] public Self InitWithRecipientsContentGroupNameServiceNameSender(NSArray? recipients, NSString? content, NSString? groupName, NSString? serviceName, INPerson? sender);
+    [Selector("groupName")]
+    public NSString? GroupName { get; }
+    [Selector("initWithRecipients:content:groupName:serviceName:sender:")]
+    public Self InitWithRecipientsContentGroupNameServiceNameSender(NSArray? recipients, NSString? content, NSString? groupName, NSString? serviceName, INPerson? sender);
     /// Deprecated in macOS 11.0.
-    [Selector("initWithRecipients:content:speakableGroupName:conversationIdentifier:serviceName:sender:")] public Self InitWithRecipientsContentSpeakableGroupNameConversationIdentifierServiceNameSender(NSArray? recipients, NSString? content, INSpeakableString? speakableGroupName, NSString? conversationIdentifier, NSString? serviceName, INPerson? sender);
+    [Selector("initWithRecipients:content:speakableGroupName:conversationIdentifier:serviceName:sender:")]
+    public Self InitWithRecipientsContentSpeakableGroupNameConversationIdentifierServiceNameSender(NSArray? recipients, NSString? content, INSpeakableString? speakableGroupName, NSString? conversationIdentifier, NSString? serviceName, INPerson? sender);
     /// Deprecated in macOS 11.0.
-    [Selector("initWithRecipients:outgoingMessageType:content:speakableGroupName:conversationIdentifier:serviceName:sender:")] public Self InitWithRecipientsOutgoingMessageTypeContentSpeakableGroupNameConversationIdentifierServiceNameSender(NSArray? recipients, INOutgoingMessageType outgoingMessageType, NSString? content, INSpeakableString? speakableGroupName, NSString? conversationIdentifier, NSString? serviceName, INPerson? sender);
+    [Selector("initWithRecipients:outgoingMessageType:content:speakableGroupName:conversationIdentifier:serviceName:sender:")]
+    public Self InitWithRecipientsOutgoingMessageTypeContentSpeakableGroupNameConversationIdentifierServiceNameSender(NSArray? recipients, INOutgoingMessageType outgoingMessageType, NSString? content, INSpeakableString? speakableGroupName, NSString? conversationIdentifier, NSString? serviceName, INPerson? sender);
 }
 
 #endif

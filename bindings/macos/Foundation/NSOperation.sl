@@ -34,25 +34,43 @@ public objc closure void NSOperationCompletionBlock();
 
 public extern objc class NSOperation : NSObject
 {
-    [Selector("isCancelled")] public bool Cancelled { get; }
-    [Selector("isExecuting")] public bool Executing { get; }
-    [Selector("isFinished")] public bool Finished { get; }
-    [Selector("isConcurrent")] public bool Concurrent { get; }
-    [Selector("isAsynchronous")] public bool Asynchronous { get; }
-    [Selector("isReady")] public bool Ready { get; }
-    [Selector("dependencies")] public NSArray Dependencies { get; }
-    [Selector("queuePriority", "setQueuePriority:")] public NSOperationQueuePriority QueuePriority { get; set; }
-    [Selector("completionBlock", "setCompletionBlock:")] public NSOperationCompletionBlock? CompletionBlock { get; set; }
+    [Selector("isCancelled")]
+    public bool Cancelled { get; }
+    [Selector("isExecuting")]
+    public bool Executing { get; }
+    [Selector("isFinished")]
+    public bool Finished { get; }
+    [Selector("isConcurrent")]
+    public bool Concurrent { get; }
+    [Selector("isAsynchronous")]
+    public bool Asynchronous { get; }
+    [Selector("isReady")]
+    public bool Ready { get; }
+    [Selector("dependencies")]
+    public NSArray Dependencies { get; }
+    [Selector("queuePriority", "setQueuePriority:")]
+    public NSOperationQueuePriority QueuePriority { get; set; }
+    [Selector("completionBlock", "setCompletionBlock:")]
+    public NSOperationCompletionBlock? CompletionBlock { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("threadPriority", "setThreadPriority:")] public double ThreadPriority { get; set; }
-    [Selector("qualityOfService", "setQualityOfService:")] public NSQualityOfService QualityOfService { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("start")] public void Start();
-    [Selector("main")] public void Main();
-    [Selector("cancel")] public void Cancel();
-    [Selector("addDependency:")] public void AddDependency(NSOperation op);
-    [Selector("removeDependency:")] public void RemoveDependency(NSOperation op);
-    [Selector("waitUntilFinished")] public void WaitUntilFinished();
+    [Selector("threadPriority", "setThreadPriority:")]
+    public double ThreadPriority { get; set; }
+    [Selector("qualityOfService", "setQualityOfService:")]
+    public NSQualityOfService QualityOfService { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("start")]
+    public void Start();
+    [Selector("main")]
+    public void Main();
+    [Selector("cancel")]
+    public void Cancel();
+    [Selector("addDependency:")]
+    public void AddDependency(NSOperation op);
+    [Selector("removeDependency:")]
+    public void RemoveDependency(NSOperation op);
+    [Selector("waitUntilFinished")]
+    public void WaitUntilFinished();
 }
 
 public enum NSOperationQueuePriority : long
@@ -70,17 +88,24 @@ public objc closure void NSBlockOperationAddExecutionBlockBlock();
 
 public extern objc class NSBlockOperation : NSOperation
 {
-    [Selector("executionBlocks")] public NSArray ExecutionBlocks { get; }
-    [Selector("blockOperationWithBlock:")] public static Self BlockOperationWithBlock(NSBlockOperationBlockOperationWithBlockBlock block);
-    [Selector("addExecutionBlock:")] public void AddExecutionBlock(NSBlockOperationAddExecutionBlockBlock block);
+    [Selector("executionBlocks")]
+    public NSArray ExecutionBlocks { get; }
+    [Selector("blockOperationWithBlock:")]
+    public static Self BlockOperationWithBlock(NSBlockOperationBlockOperationWithBlockBlock block);
+    [Selector("addExecutionBlock:")]
+    public void AddExecutionBlock(NSBlockOperationAddExecutionBlockBlock block);
 }
 
 public extern objc class NSInvocationOperation : NSOperation
 {
-    [Selector("invocation")] public NSInvocation Invocation { get; }
-    [Selector("result")] public AnyObject? Result { get; }
-    [Selector("initWithTarget:selector:object:")] public Self? InitWithTargetSelectorObject(AnyObject target, Selector sel, AnyObject? arg);
-    [Selector("initWithInvocation:")] public Self InitWithInvocation(NSInvocation inv);
+    [Selector("invocation")]
+    public NSInvocation Invocation { get; }
+    [Selector("result")]
+    public AnyObject? Result { get; }
+    [Selector("initWithTarget:selector:object:")]
+    public Self? InitWithTargetSelectorObject(AnyObject target, Selector sel, AnyObject? arg);
+    [Selector("initWithInvocation:")]
+    public Self InitWithInvocation(NSInvocation inv);
 }
 
 public extern "C" NSExceptionName NSInvocationOperationVoidResultException;
@@ -93,29 +118,45 @@ public objc closure void NSOperationQueueAddBarrierBlockBarrierBlock();
 
 public extern objc class NSOperationQueue : NSObject, NSProgressReporting
 {
-    [Selector("progress")] public NSProgress Progress { get; }
-    [Selector("maxConcurrentOperationCount", "setMaxConcurrentOperationCount:")] public NSInteger MaxConcurrentOperationCount { get; set; }
-    [Selector("isSuspended", "setSuspended:")] public bool Suspended { get; set; }
-    [Selector("name", "setName:")] public NSString? Name { get; set; }
-    [Selector("qualityOfService", "setQualityOfService:")] public NSQualityOfService QualityOfService { get; set; }
-    [Selector("underlyingQueue", "setUnderlyingQueue:")] public dispatch_queue_t? UnderlyingQueue { get; set; }
-    [Selector("currentQueue")] public static NSOperationQueue? CurrentQueue { get; }
-    [Selector("mainQueue")] public static NSOperationQueue MainQueue { get; }
-    [Selector("addOperation:")] public void AddOperation(NSOperation op);
-    [Selector("addOperations:waitUntilFinished:")] public void AddOperationsWaitUntilFinished(NSArray ops, bool wait);
-    [Selector("addOperationWithBlock:")] public void AddOperationWithBlock(NSOperationQueueAddOperationWithBlockBlock block);
-    [Selector("addBarrierBlock:")] public void AddBarrierBlock(NSOperationQueueAddBarrierBlockBarrierBlock barrier);
-    [Selector("cancelAllOperations")] public void CancelAllOperations();
-    [Selector("waitUntilAllOperationsAreFinished")] public void WaitUntilAllOperationsAreFinished();
+    [Selector("progress")]
+    public NSProgress Progress { get; }
+    [Selector("maxConcurrentOperationCount", "setMaxConcurrentOperationCount:")]
+    public NSInteger MaxConcurrentOperationCount { get; set; }
+    [Selector("isSuspended", "setSuspended:")]
+    public bool Suspended { get; set; }
+    [Selector("name", "setName:")]
+    public NSString? Name { get; set; }
+    [Selector("qualityOfService", "setQualityOfService:")]
+    public NSQualityOfService QualityOfService { get; set; }
+    [Selector("underlyingQueue", "setUnderlyingQueue:")]
+    public dispatch_queue_t? UnderlyingQueue { get; set; }
+    [Selector("currentQueue")]
+    public static NSOperationQueue? CurrentQueue { get; }
+    [Selector("mainQueue")]
+    public static NSOperationQueue MainQueue { get; }
+    [Selector("addOperation:")]
+    public void AddOperation(NSOperation op);
+    [Selector("addOperations:waitUntilFinished:")]
+    public void AddOperationsWaitUntilFinished(NSArray ops, bool wait);
+    [Selector("addOperationWithBlock:")]
+    public void AddOperationWithBlock(NSOperationQueueAddOperationWithBlockBlock block);
+    [Selector("addBarrierBlock:")]
+    public void AddBarrierBlock(NSOperationQueueAddBarrierBlockBarrierBlock barrier);
+    [Selector("cancelAllOperations")]
+    public void CancelAllOperations();
+    [Selector("waitUntilAllOperationsAreFinished")]
+    public void WaitUntilAllOperationsAreFinished();
 }
 
 /// NSDeprecated, a category of NSOperationQueue.
 public extern objc class NSOperationQueue
 {
     /// Deprecated in macOS 100000.
-    [Selector("operations")] public NSArray Operations { get; }
+    [Selector("operations")]
+    public NSArray Operations { get; }
     /// Deprecated in macOS 100000.
-    [Selector("operationCount")] public NSUInteger OperationCount { get; }
+    [Selector("operationCount")]
+    public NSUInteger OperationCount { get; }
 }
 
 public const long NSOperationQualityOfServiceUserInteractive = 33;

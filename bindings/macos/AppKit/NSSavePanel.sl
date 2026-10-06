@@ -38,83 +38,141 @@ public objc closure void NSSavePanelBeginWithCompletionHandlerHandlerBlock(NSMod
 
 public extern objc class NSSavePanel : NSPanel
 {
-    [Selector("URL")] public NSURL? URL { get; }
-    [Selector("identifier", "setIdentifier:")] public NSUserInterfaceItemIdentifier? Identifier { get; set; }
-    [Selector("directoryURL", "setDirectoryURL:")] public NSURL? DirectoryURL { get; set; }
-    [Selector("allowedContentTypes", "setAllowedContentTypes:")] public NSArray? AllowedContentTypes { get; set; }
-    [Selector("allowsOtherFileTypes", "setAllowsOtherFileTypes:")] public bool AllowsOtherFileTypes { get; set; }
-    [Selector("currentContentType", "setCurrentContentType:")] public UTType? CurrentContentType { get; set; }
-    [Selector("accessoryView", "setAccessoryView:")] public NSView? AccessoryView { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSOpenSavePanelDelegate? Delegate { get; set; }
-    [Selector("isExpanded")] public bool Expanded { get; }
-    [Selector("canCreateDirectories", "setCanCreateDirectories:")] public bool CanCreateDirectories { get; set; }
-    [Selector("canSelectHiddenExtension", "setCanSelectHiddenExtension:")] public bool CanSelectHiddenExtension { get; set; }
-    [Selector("isExtensionHidden", "setExtensionHidden:")] public bool ExtensionHidden { get; set; }
-    [Selector("treatsFilePackagesAsDirectories", "setTreatsFilePackagesAsDirectories:")] public bool TreatsFilePackagesAsDirectories { get; set; }
-    [Selector("prompt", "setPrompt:")] public NSString? Prompt { get; set; }
-    [Selector("title", "setTitle:")] public NSString? Title { get; set; }
-    [Selector("nameFieldLabel", "setNameFieldLabel:")] public NSString? NameFieldLabel { get; set; }
-    [Selector("nameFieldStringValue", "setNameFieldStringValue:")] public NSString? NameFieldStringValue { get; set; }
-    [Selector("message", "setMessage:")] public NSString? Message { get; set; }
-    [Selector("showsHiddenFiles", "setShowsHiddenFiles:")] public bool ShowsHiddenFiles { get; set; }
-    [Selector("showsTagField", "setShowsTagField:")] public bool ShowsTagField { get; set; }
-    [Selector("tagNames", "setTagNames:")] public NSArray? TagNames { get; set; }
-    [Selector("showsContentTypes", "setShowsContentTypes:")] public bool ShowsContentTypes { get; set; }
-    [Selector("savePanel")] public static NSSavePanel SavePanel();
-    [Selector("validateVisibleColumns")] public void ValidateVisibleColumns();
-    [Selector("ok:")] public void Ok(AnyObject? sender);
-    [Selector("cancel:")] public void Cancel(AnyObject? sender);
-    [Selector("beginSheetModalForWindow:completionHandler:")] public void BeginSheetModalForWindowCompletionHandler(NSWindow window, NSSavePanelBeginSheetModalForWindowCompletionHandlerHandlerBlock handler);
-    [Selector("beginWithCompletionHandler:")] public void BeginWithCompletionHandler(NSSavePanelBeginWithCompletionHandlerHandlerBlock handler);
-    [Selector("runModal")] public NSModalResponse RunModal();
+    [Selector("URL")]
+    public NSURL? URL { get; }
+    [Selector("identifier", "setIdentifier:")]
+    public NSUserInterfaceItemIdentifier? Identifier { get; set; }
+    [Selector("directoryURL", "setDirectoryURL:")]
+    public NSURL? DirectoryURL { get; set; }
+    [Selector("allowedContentTypes", "setAllowedContentTypes:")]
+    public NSArray? AllowedContentTypes { get; set; }
+    [Selector("allowsOtherFileTypes", "setAllowsOtherFileTypes:")]
+    public bool AllowsOtherFileTypes { get; set; }
+    [Selector("currentContentType", "setCurrentContentType:")]
+    public UTType? CurrentContentType { get; set; }
+    [Selector("accessoryView", "setAccessoryView:")]
+    public NSView? AccessoryView { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSOpenSavePanelDelegate? Delegate { get; set; }
+    [Selector("isExpanded")]
+    public bool Expanded { get; }
+    [Selector("canCreateDirectories", "setCanCreateDirectories:")]
+    public bool CanCreateDirectories { get; set; }
+    [Selector("canSelectHiddenExtension", "setCanSelectHiddenExtension:")]
+    public bool CanSelectHiddenExtension { get; set; }
+    [Selector("isExtensionHidden", "setExtensionHidden:")]
+    public bool ExtensionHidden { get; set; }
+    [Selector("treatsFilePackagesAsDirectories", "setTreatsFilePackagesAsDirectories:")]
+    public bool TreatsFilePackagesAsDirectories { get; set; }
+    [Selector("prompt", "setPrompt:")]
+    public NSString? Prompt { get; set; }
+    [Selector("title", "setTitle:")]
+    public NSString? Title { get; set; }
+    [Selector("nameFieldLabel", "setNameFieldLabel:")]
+    public NSString? NameFieldLabel { get; set; }
+    [Selector("nameFieldStringValue", "setNameFieldStringValue:")]
+    public NSString? NameFieldStringValue { get; set; }
+    [Selector("message", "setMessage:")]
+    public NSString? Message { get; set; }
+    [Selector("showsHiddenFiles", "setShowsHiddenFiles:")]
+    public bool ShowsHiddenFiles { get; set; }
+    [Selector("showsTagField", "setShowsTagField:")]
+    public bool ShowsTagField { get; set; }
+    [Selector("tagNames", "setTagNames:")]
+    public NSArray? TagNames { get; set; }
+    [Selector("showsContentTypes", "setShowsContentTypes:")]
+    public bool ShowsContentTypes { get; set; }
+    [Selector("savePanel")]
+    public static NSSavePanel SavePanel();
+    [Selector("validateVisibleColumns")]
+    public void ValidateVisibleColumns();
+    [Selector("ok:")]
+    public void Ok(AnyObject? sender);
+    [Selector("cancel:")]
+    public void Cancel(AnyObject? sender);
+    [Selector("beginSheetModalForWindow:completionHandler:")]
+    public void BeginSheetModalForWindowCompletionHandler(NSWindow window, NSSavePanelBeginSheetModalForWindowCompletionHandlerHandlerBlock handler);
+    [Selector("beginWithCompletionHandler:")]
+    public void BeginWithCompletionHandler(NSSavePanelBeginWithCompletionHandlerHandlerBlock handler);
+    [Selector("runModal")]
+    public NSModalResponse RunModal();
 }
 
 public objc interface NSOpenSavePanelDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("panel:shouldEnableURL:")] bool PanelShouldEnableURL(AnyObject sender, NSURL url);
-    [Optional] [Selector("panel:validateURL:error:")] bool PanelValidateURLError(AnyObject sender, NSURL url, out NSError? outError);
-    [Optional] [Selector("panel:didChangeToDirectoryURL:")] void PanelDidChangeToDirectoryURL(AnyObject sender, NSURL? url);
-    [Optional] [Selector("panel:userEnteredFilename:confirmed:")] NSString? PanelUserEnteredFilenameConfirmed(AnyObject sender, NSString filename, bool okFlag);
-    [Optional] [Selector("panel:willExpand:")] void PanelWillExpand(AnyObject sender, bool expanding);
-    [Optional] [Selector("panelSelectionDidChange:")] void PanelSelectionDidChange(AnyObject? sender);
-    [Optional] [Selector("panel:displayNameForType:")] NSString? PanelDisplayNameForType(AnyObject sender, UTType type);
-    [Optional] [Selector("panel:didSelectType:")] void PanelDidSelectType(AnyObject sender, UTType? type);
+    [Optional]
+    [Selector("panel:shouldEnableURL:")]
+    bool PanelShouldEnableURL(AnyObject sender, NSURL url);
+    [Optional]
+    [Selector("panel:validateURL:error:")]
+    bool PanelValidateURLError(AnyObject sender, NSURL url, out NSError? outError);
+    [Optional]
+    [Selector("panel:didChangeToDirectoryURL:")]
+    void PanelDidChangeToDirectoryURL(AnyObject sender, NSURL? url);
+    [Optional]
+    [Selector("panel:userEnteredFilename:confirmed:")]
+    NSString? PanelUserEnteredFilenameConfirmed(AnyObject sender, NSString filename, bool okFlag);
+    [Optional]
+    [Selector("panel:willExpand:")]
+    void PanelWillExpand(AnyObject sender, bool expanding);
+    [Optional]
+    [Selector("panelSelectionDidChange:")]
+    void PanelSelectionDidChange(AnyObject? sender);
+    [Optional]
+    [Selector("panel:displayNameForType:")]
+    NSString? PanelDisplayNameForType(AnyObject sender, UTType type);
+    [Optional]
+    [Selector("panel:didSelectType:")]
+    void PanelDidSelectType(AnyObject sender, UTType? type);
 }
 
 /// NSSavePanelDelegateDeprecated, a category of NSObject.
 public extern objc class NSObject
 {
     /// Deprecated in macOS 10.6.
-    [Selector("panel:isValidFilename:")] public bool PanelIsValidFilename(AnyObject sender, NSString filename);
+    [Selector("panel:isValidFilename:")]
+    public bool PanelIsValidFilename(AnyObject sender, NSString filename);
     /// Deprecated in macOS 10.6.
-    [Selector("panel:directoryDidChange:")] public void PanelDirectoryDidChange(AnyObject sender, NSString path);
+    [Selector("panel:directoryDidChange:")]
+    public void PanelDirectoryDidChange(AnyObject sender, NSString path);
     /// Deprecated in macOS 10.6.
-    [Selector("panel:compareFilename:with:caseSensitive:")] public NSComparisonResult PanelCompareFilenameWithCaseSensitive(AnyObject sender, NSString name1, NSString name2, bool caseSensitive);
+    [Selector("panel:compareFilename:with:caseSensitive:")]
+    public NSComparisonResult PanelCompareFilenameWithCaseSensitive(AnyObject sender, NSString name1, NSString name2, bool caseSensitive);
     /// Deprecated in macOS 10.6.
-    [Selector("panel:shouldShowFilename:")] public bool PanelShouldShowFilename(AnyObject sender, NSString filename);
+    [Selector("panel:shouldShowFilename:")]
+    public bool PanelShouldShowFilename(AnyObject sender, NSString filename);
 }
 
 /// NSDeprecated, a category of NSSavePanel.
 public extern objc class NSSavePanel
 {
     /// Deprecated in macOS 12.0.
-    [Selector("allowedFileTypes", "setAllowedFileTypes:")] public NSArray? AllowedFileTypes { get; set; }
+    [Selector("allowedFileTypes", "setAllowedFileTypes:")]
+    public NSArray? AllowedFileTypes { get; set; }
     /// Deprecated in macOS 10.6.
-    [Selector("filename")] public NSString Filename();
+    [Selector("filename")]
+    public NSString Filename();
     /// Deprecated in macOS 10.6.
-    [Selector("directory")] public NSString Directory();
+    [Selector("directory")]
+    public NSString Directory();
     /// Deprecated in macOS 10.6.
-    [Selector("setDirectory:")] public void SetDirectory(NSString? path);
+    [Selector("setDirectory:")]
+    public void SetDirectory(NSString? path);
     /// Deprecated in macOS 10.6.
-    [Selector("requiredFileType")] public NSString? RequiredFileType();
+    [Selector("requiredFileType")]
+    public NSString? RequiredFileType();
     /// Deprecated in macOS 10.6.
-    [Selector("setRequiredFileType:")] public void SetRequiredFileType(NSString? type);
+    [Selector("setRequiredFileType:")]
+    public void SetRequiredFileType(NSString? type);
     /// Deprecated in macOS 10.6.
-    [Selector("beginSheetForDirectory:file:modalForWindow:modalDelegate:didEndSelector:contextInfo:")] public void BeginSheetForDirectoryFileModalForWindowModalDelegateDidEndSelectorContextInfo(NSString? path, NSString? name, NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
+    [Selector("beginSheetForDirectory:file:modalForWindow:modalDelegate:didEndSelector:contextInfo:")]
+    public void BeginSheetForDirectoryFileModalForWindowModalDelegateDidEndSelectorContextInfo(NSString? path, NSString? name, NSWindow? docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
     /// Deprecated in macOS 10.6.
-    [Selector("runModalForDirectory:file:")] public NSInteger RunModalForDirectoryFile(NSString? path, NSString? name);
+    [Selector("runModalForDirectory:file:")]
+    public NSInteger RunModalForDirectoryFile(NSString? path, NSString? name);
     /// Deprecated in macOS 10.3.
-    [Selector("selectText:")] public void SelectText(AnyObject? sender);
+    [Selector("selectText:")]
+    public void SelectText(AnyObject? sender);
 }
 
 public const int NSFileHandlingPanelCancelButton = 0;

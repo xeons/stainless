@@ -35,23 +35,35 @@ import Standard.ObjC;
 /// macOS 26.0 and later.
 public extern objc class AVCaptureExternalDisplayConfiguration : NSObject
 {
-    [Selector("shouldMatchFrameRate", "setShouldMatchFrameRate:")] public bool ShouldMatchFrameRate { get; set; }
-    [Selector("bypassColorSpaceConversion", "setBypassColorSpaceConversion:")] public bool BypassColorSpaceConversion { get; set; }
-    [Selector("preferredResolution", "setPreferredResolution:")] public CMVideoDimensions PreferredResolution { get; set; }
+    [Selector("shouldMatchFrameRate", "setShouldMatchFrameRate:")]
+    public bool ShouldMatchFrameRate { get; set; }
+    [Selector("bypassColorSpaceConversion", "setBypassColorSpaceConversion:")]
+    public bool BypassColorSpaceConversion { get; set; }
+    [Selector("preferredResolution", "setPreferredResolution:")]
+    public CMVideoDimensions PreferredResolution { get; set; }
 }
 
 /// macOS 26.0 and later.
 public extern objc class AVCaptureExternalDisplayConfigurator : NSObject
 {
-    [Selector("device")] public AVCaptureDevice? Device { get; }
-    [Selector("previewLayer")] public CALayer? PreviewLayer { get; }
-    [Selector("isActive")] public bool Active { get; }
-    [Selector("activeExternalDisplayFrameRate")] public double ActiveExternalDisplayFrameRate { get; }
-    [Selector("isMatchingFrameRateSupported")] public static bool ShouldMatchFrameRateSupported { get; }
-    [Selector("isBypassingColorSpaceConversionSupported")] public static bool SupportsBypassingColorSpaceConversion { get; }
-    [Selector("isPreferredResolutionSupported")] public static bool SupportsPreferredResolution { get; }
-    [Selector("initWithDevice:previewLayer:configuration:")] public Self InitWithDevicePreviewLayerConfiguration(AVCaptureDevice device, CALayer previewLayer, AVCaptureExternalDisplayConfiguration configuration);
-    [Selector("stop")] public void Stop();
+    [Selector("device")]
+    public AVCaptureDevice? Device { get; }
+    [Selector("previewLayer")]
+    public CALayer? PreviewLayer { get; }
+    [Selector("isActive")]
+    public bool Active { get; }
+    [Selector("activeExternalDisplayFrameRate")]
+    public double ActiveExternalDisplayFrameRate { get; }
+    [Selector("isMatchingFrameRateSupported")]
+    public static bool ShouldMatchFrameRateSupported { get; }
+    [Selector("isBypassingColorSpaceConversionSupported")]
+    public static bool SupportsBypassingColorSpaceConversion { get; }
+    [Selector("isPreferredResolutionSupported")]
+    public static bool SupportsPreferredResolution { get; }
+    [Selector("initWithDevice:previewLayer:configuration:")]
+    public Self InitWithDevicePreviewLayerConfiguration(AVCaptureDevice device, CALayer previewLayer, AVCaptureExternalDisplayConfiguration configuration);
+    [Selector("stop")]
+    public void Stop();
 }
 
 #endif

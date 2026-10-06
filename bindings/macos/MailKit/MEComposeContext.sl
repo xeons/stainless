@@ -41,13 +41,20 @@ public enum MEComposeUserAction : long
 
 public extern objc class MEComposeContext : NSObject
 {
-    [Selector("contextID")] public NSUUID ContextID { get; }
-    [Selector("originalMessage")] public MEMessage? OriginalMessage { get; }
-    [Selector("action")] public MEComposeUserAction Action { get; }
-    [Selector("isEncrypted")] public bool IsEncrypted { get; }
-    [Selector("shouldEncrypt")] public bool ShouldEncrypt { get; }
-    [Selector("isSigned")] public bool IsSigned { get; }
-    [Selector("shouldSign")] public bool ShouldSign { get; }
+    [Selector("contextID")]
+    public NSUUID ContextID { get; }
+    [Selector("originalMessage")]
+    public MEMessage? OriginalMessage { get; }
+    [Selector("action")]
+    public MEComposeUserAction Action { get; }
+    [Selector("isEncrypted")]
+    public bool IsEncrypted { get; }
+    [Selector("shouldEncrypt")]
+    public bool ShouldEncrypt { get; }
+    [Selector("isSigned")]
+    public bool IsSigned { get; }
+    [Selector("shouldSign")]
+    public bool ShouldSign { get; }
 }
 
 #endif

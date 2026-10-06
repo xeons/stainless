@@ -88,15 +88,18 @@ public extern "C" bool CGRectContainsRect(CGRect rect1, CGRect rect2);
 
 public extern "C" bool CGRectIntersectsRect(CGRect rect1, CGRect rect2);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef CGPointCreateDictionaryRepresentation(CGPoint point);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef CGPointCreateDictionaryRepresentation(CGPoint point);
 
 public extern "C" bool CGPointMakeWithDictionaryRepresentation(CFDictionaryRef? dict, CGPoint* point);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef CGSizeCreateDictionaryRepresentation(CGSize size);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef CGSizeCreateDictionaryRepresentation(CGSize size);
 
 public extern "C" bool CGSizeMakeWithDictionaryRepresentation(CFDictionaryRef? dict, CGSize* size);
 
-[ReturnsRetained] public extern "C" CFDictionaryRef CGRectCreateDictionaryRepresentation(CGRect arg0);
+[ReturnsRetained]
+public extern "C" CFDictionaryRef CGRectCreateDictionaryRepresentation(CGRect arg0);
 
 public extern "C" bool CGRectMakeWithDictionaryRepresentation(CFDictionaryRef? dict, CGRect* rect);
 

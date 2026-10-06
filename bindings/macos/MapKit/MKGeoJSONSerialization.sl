@@ -35,14 +35,18 @@ public objc interface MKGeoJSONObject : NSObjectProtocol { }
 
 public extern objc class MKGeoJSONDecoder : NSObject
 {
-    [Selector("geoJSONObjectsWithData:error:")] public NSArray? GeoJSONObjectsWithDataError(NSData data, out NSError? errorPtr);
+    [Selector("geoJSONObjectsWithData:error:")]
+    public NSArray? GeoJSONObjectsWithDataError(NSData data, out NSError? errorPtr);
 }
 
 public extern objc class MKGeoJSONFeature : NSObject, MKGeoJSONObject
 {
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("properties")] public NSData? Properties { get; }
-    [Selector("geometry")] public NSArray Geometry { get; }
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("properties")]
+    public NSData? Properties { get; }
+    [Selector("geometry")]
+    public NSArray Geometry { get; }
 }
 
 /// MKGeoJSONSerialization, a category of MKPointAnnotation.

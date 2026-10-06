@@ -34,27 +34,38 @@ import Standard.ObjC;
 
 public extern objc class AVPictureInPictureController
 {
-    [Selector("invalidatePlaybackState")] public void InvalidatePlaybackState();
+    [Selector("invalidatePlaybackState")]
+    public void InvalidatePlaybackState();
 }
 
 public objc closure void AVPictureInPictureSampleBufferPlaybackDelegatePictureInPictureControllerSkipByIntervalCompletionHandlerCompletionHandlerBlock();
 
 public objc interface AVPictureInPictureSampleBufferPlaybackDelegate : NSObjectProtocol
 {
-    [Selector("pictureInPictureController:setPlaying:")] void PictureInPictureControllerSetPlaying(AVPictureInPictureController pictureInPictureController, bool playing);
-    [Selector("pictureInPictureControllerTimeRangeForPlayback:")] CMTimeRange PictureInPictureControllerTimeRangeForPlayback(AVPictureInPictureController pictureInPictureController);
-    [Selector("pictureInPictureControllerIsPlaybackPaused:")] bool PictureInPictureControllerIsPlaybackPaused(AVPictureInPictureController pictureInPictureController);
-    [Selector("pictureInPictureController:didTransitionToRenderSize:")] void PictureInPictureControllerDidTransitionToRenderSize(AVPictureInPictureController pictureInPictureController, CMVideoDimensions newRenderSize);
-    [Selector("pictureInPictureController:skipByInterval:completionHandler:")] void PictureInPictureControllerSkipByIntervalCompletionHandler(AVPictureInPictureController pictureInPictureController, CMTime skipInterval, AVPictureInPictureSampleBufferPlaybackDelegatePictureInPictureControllerSkipByIntervalCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Optional] [Selector("pictureInPictureControllerShouldProhibitBackgroundAudioPlayback:")] bool PictureInPictureControllerShouldProhibitBackgroundAudioPlayback(AVPictureInPictureController pictureInPictureController);
+    [Selector("pictureInPictureController:setPlaying:")]
+    void PictureInPictureControllerSetPlaying(AVPictureInPictureController pictureInPictureController, bool playing);
+    [Selector("pictureInPictureControllerTimeRangeForPlayback:")]
+    CMTimeRange PictureInPictureControllerTimeRangeForPlayback(AVPictureInPictureController pictureInPictureController);
+    [Selector("pictureInPictureControllerIsPlaybackPaused:")]
+    bool PictureInPictureControllerIsPlaybackPaused(AVPictureInPictureController pictureInPictureController);
+    [Selector("pictureInPictureController:didTransitionToRenderSize:")]
+    void PictureInPictureControllerDidTransitionToRenderSize(AVPictureInPictureController pictureInPictureController, CMVideoDimensions newRenderSize);
+    [Selector("pictureInPictureController:skipByInterval:completionHandler:")]
+    void PictureInPictureControllerSkipByIntervalCompletionHandler(AVPictureInPictureController pictureInPictureController, CMTime skipInterval, AVPictureInPictureSampleBufferPlaybackDelegatePictureInPictureControllerSkipByIntervalCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Optional]
+    [Selector("pictureInPictureControllerShouldProhibitBackgroundAudioPlayback:")]
+    bool PictureInPictureControllerShouldProhibitBackgroundAudioPlayback(AVPictureInPictureController pictureInPictureController);
 }
 
 /// AVSampleBufferDisplayLayerSupport, a category of AVPictureInPictureControllerContentSource.
 public extern objc class AVPictureInPictureControllerContentSource
 {
-    [Selector("sampleBufferDisplayLayer")] public AVSampleBufferDisplayLayer? SampleBufferDisplayLayer { get; }
-    [Selector("sampleBufferPlaybackDelegate")] public AVPictureInPictureSampleBufferPlaybackDelegate? SampleBufferPlaybackDelegate { get; }
-    [Selector("initWithSampleBufferDisplayLayer:playbackDelegate:")] public Self InitWithSampleBufferDisplayLayerPlaybackDelegate(AVSampleBufferDisplayLayer sampleBufferDisplayLayer, AVPictureInPictureSampleBufferPlaybackDelegate playbackDelegate);
+    [Selector("sampleBufferDisplayLayer")]
+    public AVSampleBufferDisplayLayer? SampleBufferDisplayLayer { get; }
+    [Selector("sampleBufferPlaybackDelegate")]
+    public AVPictureInPictureSampleBufferPlaybackDelegate? SampleBufferPlaybackDelegate { get; }
+    [Selector("initWithSampleBufferDisplayLayer:playbackDelegate:")]
+    public Self InitWithSampleBufferDisplayLayerPlaybackDelegate(AVSampleBufferDisplayLayer sampleBufferDisplayLayer, AVPictureInPictureSampleBufferPlaybackDelegate playbackDelegate);
 }
 
 #endif

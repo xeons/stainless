@@ -39,13 +39,20 @@ public enum CMMotionActivityConfidence : long
 
 public extern objc class CMMotionActivity : CMLogItem
 {
-    [Selector("confidence")] public CMMotionActivityConfidence Confidence { get; }
-    [Selector("startDate")] public NSDate StartDate { get; }
-    [Selector("unknown")] public bool Unknown { get; }
-    [Selector("stationary")] public bool Stationary { get; }
-    [Selector("walking")] public bool Walking { get; }
-    [Selector("running")] public bool Running { get; }
-    [Selector("automotive")] public bool Automotive { get; }
+    [Selector("confidence")]
+    public CMMotionActivityConfidence Confidence { get; }
+    [Selector("startDate")]
+    public NSDate StartDate { get; }
+    [Selector("unknown")]
+    public bool Unknown { get; }
+    [Selector("stationary")]
+    public bool Stationary { get; }
+    [Selector("walking")]
+    public bool Walking { get; }
+    [Selector("running")]
+    public bool Running { get; }
+    [Selector("automotive")]
+    public bool Automotive { get; }
 }
 
 #endif

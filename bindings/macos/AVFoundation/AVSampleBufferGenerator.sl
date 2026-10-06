@@ -36,13 +36,22 @@ public objc closure void AVSampleBufferGeneratorNotifyOfDataReadyForSampleBuffer
 
 public extern objc class AVSampleBufferGenerator : NSObject
 {
-    [Selector("initWithAsset:timebase:")] public Self InitWithAssetTimebase(AVAsset asset, CMTimebaseRef? timebase);
-    [ReturnsRetained] [Selector("createSampleBufferForRequest:error:")] public CMSampleBufferRef? CreateSampleBufferForRequestError(AVSampleBufferRequest request, out NSError? outError);
+    [Selector("initWithAsset:timebase:")]
+    public Self InitWithAssetTimebase(AVAsset asset, CMTimebaseRef? timebase);
+    [ReturnsRetained]
+    [Selector("createSampleBufferForRequest:error:")]
+    public CMSampleBufferRef? CreateSampleBufferForRequestError(AVSampleBufferRequest request, out NSError? outError);
     /// Deprecated in macOS 13.0.
-    [ReturnsRetained] [Selector("createSampleBufferForRequest:")] public CMSampleBufferRef? CreateSampleBufferForRequest(AVSampleBufferRequest request);
-    [Selector("makeBatch")] public AVSampleBufferGeneratorBatch MakeBatch();
-    [ReturnsRetained] [Selector("createSampleBufferForRequest:addingToBatch:error:")] public CMSampleBufferRef? CreateSampleBufferForRequestAddingToBatchError(AVSampleBufferRequest request, AVSampleBufferGeneratorBatch batch, out NSError? outError);
-    [Selector("notifyOfDataReadyForSampleBuffer:completionHandler:")] public static void NotifyOfDataReadyForSampleBufferCompletionHandler(CMSampleBufferRef sbuf, AVSampleBufferGeneratorNotifyOfDataReadyForSampleBufferCompletionHandlerCompletionHandlerBlock completionHandler);
+    [ReturnsRetained]
+    [Selector("createSampleBufferForRequest:")]
+    public CMSampleBufferRef? CreateSampleBufferForRequest(AVSampleBufferRequest request);
+    [Selector("makeBatch")]
+    public AVSampleBufferGeneratorBatch MakeBatch();
+    [ReturnsRetained]
+    [Selector("createSampleBufferForRequest:addingToBatch:error:")]
+    public CMSampleBufferRef? CreateSampleBufferForRequestAddingToBatchError(AVSampleBufferRequest request, AVSampleBufferGeneratorBatch batch, out NSError? outError);
+    [Selector("notifyOfDataReadyForSampleBuffer:completionHandler:")]
+    public static void NotifyOfDataReadyForSampleBufferCompletionHandler(CMSampleBufferRef sbuf, AVSampleBufferGeneratorNotifyOfDataReadyForSampleBufferCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public enum AVSampleBufferRequestDirection : long
@@ -61,22 +70,32 @@ public enum AVSampleBufferRequestMode : long
 
 public extern objc class AVSampleBufferRequest : NSObject
 {
-    [Selector("startCursor")] public AVSampleCursor StartCursor { get; }
-    [Selector("direction", "setDirection:")] public AVSampleBufferRequestDirection Direction { get; set; }
-    [Selector("limitCursor", "setLimitCursor:")] public AVSampleCursor? LimitCursor { get; set; }
-    [Selector("preferredMinSampleCount", "setPreferredMinSampleCount:")] public NSInteger PreferredMinSampleCount { get; set; }
-    [Selector("maxSampleCount", "setMaxSampleCount:")] public NSInteger MaxSampleCount { get; set; }
-    [Selector("mode", "setMode:")] public AVSampleBufferRequestMode Mode { get; set; }
-    [Selector("overrideTime", "setOverrideTime:")] public CMTime OverrideTime { get; set; }
-    [Selector("initWithStartCursor:")] public Self InitWithStartCursor(AVSampleCursor startCursor);
+    [Selector("startCursor")]
+    public AVSampleCursor StartCursor { get; }
+    [Selector("direction", "setDirection:")]
+    public AVSampleBufferRequestDirection Direction { get; set; }
+    [Selector("limitCursor", "setLimitCursor:")]
+    public AVSampleCursor? LimitCursor { get; set; }
+    [Selector("preferredMinSampleCount", "setPreferredMinSampleCount:")]
+    public NSInteger PreferredMinSampleCount { get; set; }
+    [Selector("maxSampleCount", "setMaxSampleCount:")]
+    public NSInteger MaxSampleCount { get; set; }
+    [Selector("mode", "setMode:")]
+    public AVSampleBufferRequestMode Mode { get; set; }
+    [Selector("overrideTime", "setOverrideTime:")]
+    public CMTime OverrideTime { get; set; }
+    [Selector("initWithStartCursor:")]
+    public Self InitWithStartCursor(AVSampleCursor startCursor);
 }
 
 public objc closure void AVSampleBufferGeneratorBatchMakeDataReadyWithCompletionHandlerCompletionHandlerBlock(NSError? arg0);
 
 public extern objc class AVSampleBufferGeneratorBatch : NSObject
 {
-    [Selector("makeDataReadyWithCompletionHandler:")] public void MakeDataReadyWithCompletionHandler(AVSampleBufferGeneratorBatchMakeDataReadyWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("cancel")] public void Cancel();
+    [Selector("makeDataReadyWithCompletionHandler:")]
+    public void MakeDataReadyWithCompletionHandler(AVSampleBufferGeneratorBatchMakeDataReadyWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

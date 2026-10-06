@@ -35,16 +35,25 @@ import Standard.ObjC;
 
 public extern objc class MKMapCamera : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("centerCoordinate", "setCenterCoordinate:")] public CLLocationCoordinate2D CenterCoordinate { get; set; }
-    [Selector("centerCoordinateDistance", "setCenterCoordinateDistance:")] public CLLocationDistance CenterCoordinateDistance { get; set; }
-    [Selector("heading", "setHeading:")] public CLLocationDirection Heading { get; set; }
-    [Selector("pitch", "setPitch:")] public CGFloat Pitch { get; set; }
+    [Selector("centerCoordinate", "setCenterCoordinate:")]
+    public CLLocationCoordinate2D CenterCoordinate { get; set; }
+    [Selector("centerCoordinateDistance", "setCenterCoordinateDistance:")]
+    public CLLocationDistance CenterCoordinateDistance { get; set; }
+    [Selector("heading", "setHeading:")]
+    public CLLocationDirection Heading { get; set; }
+    [Selector("pitch", "setPitch:")]
+    public CGFloat Pitch { get; set; }
     /// Deprecated in macOS 100000.
-    [Selector("altitude", "setAltitude:")] public CLLocationDistance Altitude { get; set; }
-    [Selector("camera")] public static Self Camera();
-    [Selector("cameraLookingAtCenterCoordinate:fromEyeCoordinate:eyeAltitude:")] public static Self CameraLookingAtCenterCoordinateFromEyeCoordinateEyeAltitude(CLLocationCoordinate2D centerCoordinate, CLLocationCoordinate2D eyeCoordinate, CLLocationDistance eyeAltitude);
-    [Selector("cameraLookingAtCenterCoordinate:fromDistance:pitch:heading:")] public static Self CameraLookingAtCenterCoordinateFromDistancePitchHeading(CLLocationCoordinate2D centerCoordinate, CLLocationDistance distance, CGFloat pitch, CLLocationDirection heading);
-    [Selector("cameraLookingAtMapItem:forViewSize:allowPitch:")] public static Self CameraLookingAtMapItemForViewSizeAllowPitch(MKMapItem mapItem, CGSize viewSize, bool allowPitch);
+    [Selector("altitude", "setAltitude:")]
+    public CLLocationDistance Altitude { get; set; }
+    [Selector("camera")]
+    public static Self Camera();
+    [Selector("cameraLookingAtCenterCoordinate:fromEyeCoordinate:eyeAltitude:")]
+    public static Self CameraLookingAtCenterCoordinateFromEyeCoordinateEyeAltitude(CLLocationCoordinate2D centerCoordinate, CLLocationCoordinate2D eyeCoordinate, CLLocationDistance eyeAltitude);
+    [Selector("cameraLookingAtCenterCoordinate:fromDistance:pitch:heading:")]
+    public static Self CameraLookingAtCenterCoordinateFromDistancePitchHeading(CLLocationCoordinate2D centerCoordinate, CLLocationDistance distance, CGFloat pitch, CLLocationDirection heading);
+    [Selector("cameraLookingAtMapItem:forViewSize:allowPitch:")]
+    public static Self CameraLookingAtMapItemForViewSizeAllowPitch(MKMapItem mapItem, CGSize viewSize, bool allowPitch);
 }
 
 #endif

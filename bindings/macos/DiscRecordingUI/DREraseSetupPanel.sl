@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class DREraseSetupPanel : DRSetupPanel
 {
-    [Selector("setupPanel")] public static DREraseSetupPanel? SetupPanel();
-    [Selector("eraseObject")] public DRErase? EraseObject();
-    [Selector("eraseType:")] public void EraseType(AnyObject? sender);
+    [Selector("setupPanel")]
+    public static DREraseSetupPanel? SetupPanel();
+    [Selector("eraseObject")]
+    public DRErase? EraseObject();
+    [Selector("eraseType:")]
+    public void EraseType(AnyObject? sender);
 }
 
 #endif

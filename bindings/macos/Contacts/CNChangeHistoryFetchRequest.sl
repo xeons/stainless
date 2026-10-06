@@ -32,12 +32,18 @@ import Standard.ObjC;
 
 public extern objc class CNChangeHistoryFetchRequest : CNFetchRequest, NSSecureCoding
 {
-    [Selector("startingToken", "setStartingToken:")] public NSData? StartingToken { get; set; }
-    [Selector("additionalContactKeyDescriptors", "setAdditionalContactKeyDescriptors:")] public NSArray? AdditionalContactKeyDescriptors { get; set; }
-    [Selector("shouldUnifyResults", "setShouldUnifyResults:")] public bool ShouldUnifyResults { get; set; }
-    [Selector("mutableObjects", "setMutableObjects:")] public bool MutableObjects { get; set; }
-    [Selector("includeGroupChanges", "setIncludeGroupChanges:")] public bool IncludeGroupChanges { get; set; }
-    [Selector("excludedTransactionAuthors", "setExcludedTransactionAuthors:")] public NSArray? ExcludedTransactionAuthors { get; set; }
+    [Selector("startingToken", "setStartingToken:")]
+    public NSData? StartingToken { get; set; }
+    [Selector("additionalContactKeyDescriptors", "setAdditionalContactKeyDescriptors:")]
+    public NSArray? AdditionalContactKeyDescriptors { get; set; }
+    [Selector("shouldUnifyResults", "setShouldUnifyResults:")]
+    public bool ShouldUnifyResults { get; set; }
+    [Selector("mutableObjects", "setMutableObjects:")]
+    public bool MutableObjects { get; set; }
+    [Selector("includeGroupChanges", "setIncludeGroupChanges:")]
+    public bool IncludeGroupChanges { get; set; }
+    [Selector("excludedTransactionAuthors", "setExcludedTransactionAuthors:")]
+    public NSArray? ExcludedTransactionAuthors { get; set; }
 }
 
 #endif

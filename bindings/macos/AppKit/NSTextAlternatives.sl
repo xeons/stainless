@@ -33,10 +33,14 @@ import Standard.ObjC;
 
 public extern objc class NSTextAlternatives : NSObject, NSSecureCoding
 {
-    [Selector("primaryString")] public NSString PrimaryString { get; }
-    [Selector("alternativeStrings")] public NSArray AlternativeStrings { get; }
-    [Selector("initWithPrimaryString:alternativeStrings:")] public Self InitWithPrimaryStringAlternativeStrings(NSString primaryString, NSArray alternativeStrings);
-    [Selector("noteSelectedAlternativeString:")] public void NoteSelectedAlternativeString(NSString alternativeString);
+    [Selector("primaryString")]
+    public NSString PrimaryString { get; }
+    [Selector("alternativeStrings")]
+    public NSArray AlternativeStrings { get; }
+    [Selector("initWithPrimaryString:alternativeStrings:")]
+    public Self InitWithPrimaryStringAlternativeStrings(NSString primaryString, NSArray alternativeStrings);
+    [Selector("noteSelectedAlternativeString:")]
+    public void NoteSelectedAlternativeString(NSString alternativeString);
 }
 
 public extern "C" NSNotificationName? NSTextAlternativesSelectedAlternativeStringNotification;

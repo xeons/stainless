@@ -34,7 +34,8 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public objc interface DOMXPathNSResolver : NSObjectProtocol
 {
-    [Selector("lookupNamespaceURI:")] NSString? LookupNamespaceURI(NSString? prefix);
+    [Selector("lookupNamespaceURI:")]
+    NSString? LookupNamespaceURI(NSString? prefix);
 }
 
 #endif

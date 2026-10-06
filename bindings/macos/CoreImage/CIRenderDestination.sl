@@ -40,23 +40,39 @@ public objc closure MTLTexture CIRenderDestinationInitWithWidthHeightPixelFormat
 
 public extern objc class CIRenderDestination : NSObject
 {
-    [Selector("width")] public NSUInteger Width { get; }
-    [Selector("height")] public NSUInteger Height { get; }
-    [Selector("alphaMode", "setAlphaMode:")] public CIRenderDestinationAlphaMode AlphaMode { get; set; }
-    [Selector("isFlipped", "setFlipped:")] public bool Flipped { get; set; }
-    [Selector("isDithered", "setDithered:")] public bool Dithered { get; set; }
-    [Selector("isClamped", "setClamped:")] public bool Clamped { get; set; }
-    [Selector("colorSpace", "setColorSpace:")] public CGColorSpaceRef? ColorSpace { get; set; }
-    [Selector("blendKernel", "setBlendKernel:")] public CIBlendKernel? BlendKernel { get; set; }
-    [Selector("blendsInDestinationColorSpace", "setBlendsInDestinationColorSpace:")] public bool BlendsInDestinationColorSpace { get; set; }
+    [Selector("width")]
+    public NSUInteger Width { get; }
+    [Selector("height")]
+    public NSUInteger Height { get; }
+    [Selector("alphaMode", "setAlphaMode:")]
+    public CIRenderDestinationAlphaMode AlphaMode { get; set; }
+    [Selector("isFlipped", "setFlipped:")]
+    public bool Flipped { get; set; }
+    [Selector("isDithered", "setDithered:")]
+    public bool Dithered { get; set; }
+    [Selector("isClamped", "setClamped:")]
+    public bool Clamped { get; set; }
+    [Selector("colorSpace", "setColorSpace:")]
+    public CGColorSpaceRef? ColorSpace { get; set; }
+    [Selector("blendKernel", "setBlendKernel:")]
+    public CIBlendKernel? BlendKernel { get; set; }
+    [Selector("blendsInDestinationColorSpace", "setBlendsInDestinationColorSpace:")]
+    public bool BlendsInDestinationColorSpace { get; set; }
     /// macOS 26.0 and later.
-    [Selector("captureTraceURL", "setCaptureTraceURL:")] public NSURL? CaptureTraceURL { get; set; }
-    [Selector("initWithPixelBuffer:")] public Self InitWithPixelBuffer(CVPixelBufferRef pixelBuffer);
-    [Selector("initWithIOSurface:")] public Self InitWithIOSurface(IOSurface surface);
-    [Selector("initWithMTLTexture:commandBuffer:")] public Self InitWithMTLTextureCommandBuffer(MTLTexture texture, MTLCommandBuffer? commandBuffer);
-    [Selector("initWithWidth:height:pixelFormat:commandBuffer:mtlTextureProvider:")] public Self InitWithWidthHeightPixelFormatCommandBufferMtlTextureProvider(NSUInteger width, NSUInteger height, MTLPixelFormat pixelFormat, MTLCommandBuffer? commandBuffer, CIRenderDestinationInitWithWidthHeightPixelFormatCommandBufferMtlTextureProviderBlock? block);
-    [Selector("initWithGLTexture:target:width:height:")] public Self InitWithGLTextureTargetWidthHeight(uint texture, uint target, NSUInteger width, NSUInteger height);
-    [Selector("initWithBitmapData:width:height:bytesPerRow:format:")] public Self InitWithBitmapDataWidthHeightBytesPerRowFormat(void* data, NSUInteger width, NSUInteger height, NSUInteger bytesPerRow, CIFormat format);
+    [Selector("captureTraceURL", "setCaptureTraceURL:")]
+    public NSURL? CaptureTraceURL { get; set; }
+    [Selector("initWithPixelBuffer:")]
+    public Self InitWithPixelBuffer(CVPixelBufferRef pixelBuffer);
+    [Selector("initWithIOSurface:")]
+    public Self InitWithIOSurface(IOSurface surface);
+    [Selector("initWithMTLTexture:commandBuffer:")]
+    public Self InitWithMTLTextureCommandBuffer(MTLTexture texture, MTLCommandBuffer? commandBuffer);
+    [Selector("initWithWidth:height:pixelFormat:commandBuffer:mtlTextureProvider:")]
+    public Self InitWithWidthHeightPixelFormatCommandBufferMtlTextureProvider(NSUInteger width, NSUInteger height, MTLPixelFormat pixelFormat, MTLCommandBuffer? commandBuffer, CIRenderDestinationInitWithWidthHeightPixelFormatCommandBufferMtlTextureProviderBlock? block);
+    [Selector("initWithGLTexture:target:width:height:")]
+    public Self InitWithGLTextureTargetWidthHeight(uint texture, uint target, NSUInteger width, NSUInteger height);
+    [Selector("initWithBitmapData:width:height:bytesPerRow:format:")]
+    public Self InitWithBitmapDataWidthHeightBytesPerRowFormat(void* data, NSUInteger width, NSUInteger height, NSUInteger bytesPerRow, CIFormat format);
 }
 
 public enum CIRenderDestinationAlphaMode : ulong
@@ -68,24 +84,33 @@ public enum CIRenderDestinationAlphaMode : ulong
 
 public extern objc class CIRenderInfo : NSObject
 {
-    [Selector("kernelExecutionTime")] public NSTimeInterval KernelExecutionTime { get; }
-    [Selector("kernelCompileTime")] public NSTimeInterval KernelCompileTime { get; }
-    [Selector("passCount")] public NSInteger PassCount { get; }
-    [Selector("pixelsProcessed")] public NSInteger PixelsProcessed { get; }
+    [Selector("kernelExecutionTime")]
+    public NSTimeInterval KernelExecutionTime { get; }
+    [Selector("kernelCompileTime")]
+    public NSTimeInterval KernelCompileTime { get; }
+    [Selector("passCount")]
+    public NSInteger PassCount { get; }
+    [Selector("pixelsProcessed")]
+    public NSInteger PixelsProcessed { get; }
 }
 
 public extern objc class CIRenderTask : NSObject
 {
-    [Selector("waitUntilCompletedAndReturnError:")] public CIRenderInfo? WaitUntilCompletedAndReturnError(out NSError? error);
+    [Selector("waitUntilCompletedAndReturnError:")]
+    public CIRenderInfo? WaitUntilCompletedAndReturnError(out NSError? error);
 }
 
 /// CIRenderDestination, a category of CIContext.
 public extern objc class CIContext
 {
-    [Selector("startTaskToRender:fromRect:toDestination:atPoint:error:")] public CIRenderTask? StartTaskToRenderFromRectToDestinationAtPointError(CIImage image, CGRect fromRect, CIRenderDestination destination, CGPoint atPoint, out NSError? error);
-    [Selector("startTaskToRender:toDestination:error:")] public CIRenderTask? StartTaskToRenderToDestinationError(CIImage image, CIRenderDestination destination, out NSError? error);
-    [Selector("prepareRender:fromRect:toDestination:atPoint:error:")] public bool PrepareRenderFromRectToDestinationAtPointError(CIImage image, CGRect fromRect, CIRenderDestination destination, CGPoint atPoint, out NSError? error);
-    [Selector("startTaskToClear:error:")] public CIRenderTask? StartTaskToClearError(CIRenderDestination destination, out NSError? error);
+    [Selector("startTaskToRender:fromRect:toDestination:atPoint:error:")]
+    public CIRenderTask? StartTaskToRenderFromRectToDestinationAtPointError(CIImage image, CGRect fromRect, CIRenderDestination destination, CGPoint atPoint, out NSError? error);
+    [Selector("startTaskToRender:toDestination:error:")]
+    public CIRenderTask? StartTaskToRenderToDestinationError(CIImage image, CIRenderDestination destination, out NSError? error);
+    [Selector("prepareRender:fromRect:toDestination:atPoint:error:")]
+    public bool PrepareRenderFromRectToDestinationAtPointError(CIImage image, CGRect fromRect, CIRenderDestination destination, CGPoint atPoint, out NSError? error);
+    [Selector("startTaskToClear:error:")]
+    public CIRenderTask? StartTaskToClearError(CIRenderDestination destination, out NSError? error);
 }
 
 #endif

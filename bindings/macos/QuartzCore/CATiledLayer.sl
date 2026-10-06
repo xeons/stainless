@@ -32,10 +32,14 @@ import Standard.ObjC;
 
 public extern objc class CATiledLayer : CALayer
 {
-    [Selector("levelsOfDetail", "setLevelsOfDetail:")] public nuint LevelsOfDetail { get; set; }
-    [Selector("levelsOfDetailBias", "setLevelsOfDetailBias:")] public nuint LevelsOfDetailBias { get; set; }
-    [Selector("tileSize", "setTileSize:")] public CGSize TileSize { get; set; }
-    [Selector("fadeDuration")] public static CFTimeInterval FadeDuration();
+    [Selector("levelsOfDetail", "setLevelsOfDetail:")]
+    public nuint LevelsOfDetail { get; set; }
+    [Selector("levelsOfDetailBias", "setLevelsOfDetailBias:")]
+    public nuint LevelsOfDetailBias { get; set; }
+    [Selector("tileSize", "setTileSize:")]
+    public CGSize TileSize { get; set; }
+    [Selector("fadeDuration")]
+    public static CFTimeInterval FadeDuration();
 }
 
 #endif

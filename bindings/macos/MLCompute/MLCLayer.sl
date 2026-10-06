@@ -34,11 +34,16 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCLayer : NSObject
 {
-    [Selector("layerID")] public NSUInteger LayerID { get; }
-    [Selector("label", "setLabel:")] public NSString Label { get; set; }
-    [Selector("isDebuggingEnabled", "setIsDebuggingEnabled:")] public bool IsDebuggingEnabled { get; set; }
-    [Selector("deviceType")] public MLCDeviceType DeviceType { get; }
-    [Selector("supportsDataType:onDevice:")] public static bool SupportsDataTypeOnDevice(MLCDataType dataType, MLCDevice device);
+    [Selector("layerID")]
+    public NSUInteger LayerID { get; }
+    [Selector("label", "setLabel:")]
+    public NSString Label { get; set; }
+    [Selector("isDebuggingEnabled", "setIsDebuggingEnabled:")]
+    public bool IsDebuggingEnabled { get; set; }
+    [Selector("deviceType")]
+    public MLCDeviceType DeviceType { get; }
+    [Selector("supportsDataType:onDevice:")]
+    public static bool SupportsDataTypeOnDevice(MLCDataType dataType, MLCDevice device);
 }
 
 #endif

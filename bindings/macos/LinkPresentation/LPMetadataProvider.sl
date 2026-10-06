@@ -37,11 +37,16 @@ public objc closure void LPMetadataProviderStartFetchingMetadataForRequestComple
 
 public extern objc class LPMetadataProvider : NSObject
 {
-    [Selector("shouldFetchSubresources", "setShouldFetchSubresources:")] public bool ShouldFetchSubresources { get; set; }
-    [Selector("timeout", "setTimeout:")] public NSTimeInterval Timeout { get; set; }
-    [Selector("startFetchingMetadataForURL:completionHandler:")] public void StartFetchingMetadataForURLCompletionHandler(NSURL URL, LPMetadataProviderStartFetchingMetadataForURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("startFetchingMetadataForRequest:completionHandler:")] public void StartFetchingMetadataForRequestCompletionHandler(NSURLRequest request, LPMetadataProviderStartFetchingMetadataForRequestCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("cancel")] public void Cancel();
+    [Selector("shouldFetchSubresources", "setShouldFetchSubresources:")]
+    public bool ShouldFetchSubresources { get; set; }
+    [Selector("timeout", "setTimeout:")]
+    public NSTimeInterval Timeout { get; set; }
+    [Selector("startFetchingMetadataForURL:completionHandler:")]
+    public void StartFetchingMetadataForURLCompletionHandler(NSURL URL, LPMetadataProviderStartFetchingMetadataForURLCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("startFetchingMetadataForRequest:completionHandler:")]
+    public void StartFetchingMetadataForRequestCompletionHandler(NSURLRequest request, LPMetadataProviderStartFetchingMetadataForRequestCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("cancel")]
+    public void Cancel();
 }
 
 #endif

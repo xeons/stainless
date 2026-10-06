@@ -45,42 +45,61 @@ public objc closure void CKFetchRecordZoneChangesOperationFetchRecordZoneChanges
 
 public extern objc class CKFetchRecordZoneChangesOperation : CKDatabaseOperation
 {
-    [Selector("recordZoneIDs", "setRecordZoneIDs:")] public NSArray? RecordZoneIDs { get; set; }
-    [Selector("configurationsByRecordZoneID", "setConfigurationsByRecordZoneID:")] public NSDictionary? ConfigurationsByRecordZoneID { get; set; }
-    [Selector("fetchAllChanges", "setFetchAllChanges:")] public bool FetchAllChanges { get; set; }
+    [Selector("recordZoneIDs", "setRecordZoneIDs:")]
+    public NSArray? RecordZoneIDs { get; set; }
+    [Selector("configurationsByRecordZoneID", "setConfigurationsByRecordZoneID:")]
+    public NSDictionary? ConfigurationsByRecordZoneID { get; set; }
+    [Selector("fetchAllChanges", "setFetchAllChanges:")]
+    public bool FetchAllChanges { get; set; }
     /// Deprecated in macOS 12.0.
-    [Selector("recordChangedBlock", "setRecordChangedBlock:")] public CKFetchRecordZoneChangesOperationRecordChangedBlock? RecordChangedBlock { get; set; }
-    [Selector("recordWasChangedBlock", "setRecordWasChangedBlock:")] public CKFetchRecordZoneChangesOperationRecordWasChangedBlock? RecordWasChangedBlock { get; set; }
-    [Selector("recordWithIDWasDeletedBlock", "setRecordWithIDWasDeletedBlock:")] public CKFetchRecordZoneChangesOperationRecordWithIDWasDeletedBlock? RecordWithIDWasDeletedBlock { get; set; }
-    [Selector("recordZoneChangeTokensUpdatedBlock", "setRecordZoneChangeTokensUpdatedBlock:")] public CKFetchRecordZoneChangesOperationRecordZoneChangeTokensUpdatedBlock? RecordZoneChangeTokensUpdatedBlock { get; set; }
-    [Selector("recordZoneFetchCompletionBlock", "setRecordZoneFetchCompletionBlock:")] public CKFetchRecordZoneChangesOperationRecordZoneFetchCompletionBlock? RecordZoneFetchCompletionBlock { get; set; }
-    [Selector("fetchRecordZoneChangesCompletionBlock", "setFetchRecordZoneChangesCompletionBlock:")] public CKFetchRecordZoneChangesOperationFetchRecordZoneChangesCompletionBlock? FetchRecordZoneChangesCompletionBlock { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithRecordZoneIDs:configurationsByRecordZoneID:")] public Self InitWithRecordZoneIDsConfigurationsByRecordZoneID(NSArray recordZoneIDs, NSDictionary? configurationsByRecordZoneID);
+    [Selector("recordChangedBlock", "setRecordChangedBlock:")]
+    public CKFetchRecordZoneChangesOperationRecordChangedBlock? RecordChangedBlock { get; set; }
+    [Selector("recordWasChangedBlock", "setRecordWasChangedBlock:")]
+    public CKFetchRecordZoneChangesOperationRecordWasChangedBlock? RecordWasChangedBlock { get; set; }
+    [Selector("recordWithIDWasDeletedBlock", "setRecordWithIDWasDeletedBlock:")]
+    public CKFetchRecordZoneChangesOperationRecordWithIDWasDeletedBlock? RecordWithIDWasDeletedBlock { get; set; }
+    [Selector("recordZoneChangeTokensUpdatedBlock", "setRecordZoneChangeTokensUpdatedBlock:")]
+    public CKFetchRecordZoneChangesOperationRecordZoneChangeTokensUpdatedBlock? RecordZoneChangeTokensUpdatedBlock { get; set; }
+    [Selector("recordZoneFetchCompletionBlock", "setRecordZoneFetchCompletionBlock:")]
+    public CKFetchRecordZoneChangesOperationRecordZoneFetchCompletionBlock? RecordZoneFetchCompletionBlock { get; set; }
+    [Selector("fetchRecordZoneChangesCompletionBlock", "setFetchRecordZoneChangesCompletionBlock:")]
+    public CKFetchRecordZoneChangesOperationFetchRecordZoneChangesCompletionBlock? FetchRecordZoneChangesCompletionBlock { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithRecordZoneIDs:configurationsByRecordZoneID:")]
+    public Self InitWithRecordZoneIDsConfigurationsByRecordZoneID(NSArray recordZoneIDs, NSDictionary? configurationsByRecordZoneID);
 }
 
 /// Deprecated, a category of CKFetchRecordZoneChangesOperation.
 public extern objc class CKFetchRecordZoneChangesOperation
 {
     /// Deprecated in macOS 10.14.
-    [Selector("optionsByRecordZoneID", "setOptionsByRecordZoneID:")] public NSDictionary? OptionsByRecordZoneID { get; set; }
+    [Selector("optionsByRecordZoneID", "setOptionsByRecordZoneID:")]
+    public NSDictionary? OptionsByRecordZoneID { get; set; }
     /// Deprecated in macOS 10.14.
-    [Selector("initWithRecordZoneIDs:optionsByRecordZoneID:")] public Self InitWithRecordZoneIDsOptionsByRecordZoneID(NSArray recordZoneIDs, NSDictionary? optionsByRecordZoneID);
+    [Selector("initWithRecordZoneIDs:optionsByRecordZoneID:")]
+    public Self InitWithRecordZoneIDsOptionsByRecordZoneID(NSArray recordZoneIDs, NSDictionary? optionsByRecordZoneID);
 }
 
 public extern objc class CKFetchRecordZoneChangesConfiguration : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("previousServerChangeToken", "setPreviousServerChangeToken:")] public CKServerChangeToken? PreviousServerChangeToken { get; set; }
-    [Selector("resultsLimit", "setResultsLimit:")] public NSUInteger ResultsLimit { get; set; }
-    [Selector("desiredKeys", "setDesiredKeys:")] public NSArray? DesiredKeys { get; set; }
+    [Selector("previousServerChangeToken", "setPreviousServerChangeToken:")]
+    public CKServerChangeToken? PreviousServerChangeToken { get; set; }
+    [Selector("resultsLimit", "setResultsLimit:")]
+    public NSUInteger ResultsLimit { get; set; }
+    [Selector("desiredKeys", "setDesiredKeys:")]
+    public NSArray? DesiredKeys { get; set; }
 }
 
 /// Deprecated in macOS 10.14.
 public extern objc class CKFetchRecordZoneChangesOptions : NSObject, NSSecureCoding, NSCopying
 {
-    [Selector("previousServerChangeToken", "setPreviousServerChangeToken:")] public CKServerChangeToken? PreviousServerChangeToken { get; set; }
-    [Selector("resultsLimit", "setResultsLimit:")] public NSUInteger ResultsLimit { get; set; }
-    [Selector("desiredKeys", "setDesiredKeys:")] public NSArray? DesiredKeys { get; set; }
+    [Selector("previousServerChangeToken", "setPreviousServerChangeToken:")]
+    public CKServerChangeToken? PreviousServerChangeToken { get; set; }
+    [Selector("resultsLimit", "setResultsLimit:")]
+    public NSUInteger ResultsLimit { get; set; }
+    [Selector("desiredKeys", "setDesiredKeys:")]
+    public NSArray? DesiredKeys { get; set; }
 }
 
 #endif

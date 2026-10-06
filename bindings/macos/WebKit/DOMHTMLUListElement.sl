@@ -33,8 +33,10 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLUListElement : DOMHTMLElement
 {
-    [Selector("compact", "setCompact:")] public bool Compact { get; set; }
-    [Selector("type", "setType:")] public NSString? Type { get; set; }
+    [Selector("compact", "setCompact:")]
+    public bool Compact { get; set; }
+    [Selector("type", "setType:")]
+    public NSString? Type { get; set; }
 }
 
 #endif

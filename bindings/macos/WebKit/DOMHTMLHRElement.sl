@@ -33,10 +33,14 @@ import Standard.ObjC;
 /// Deprecated in macOS 10.14.
 public extern objc class DOMHTMLHRElement : DOMHTMLElement
 {
-    [Selector("align", "setAlign:")] public NSString? Align { get; set; }
-    [Selector("noShade", "setNoShade:")] public bool NoShade { get; set; }
-    [Selector("size", "setSize:")] public NSString? Size { get; set; }
-    [Selector("width", "setWidth:")] public NSString? Width { get; set; }
+    [Selector("align", "setAlign:")]
+    public NSString? Align { get; set; }
+    [Selector("noShade", "setNoShade:")]
+    public bool NoShade { get; set; }
+    [Selector("size", "setSize:")]
+    public NSString? Size { get; set; }
+    [Selector("width", "setWidth:")]
+    public NSString? Width { get; set; }
 }
 
 #endif

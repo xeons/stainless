@@ -43,8 +43,10 @@ public extern "C" NSArray ASAuthorizationAllSupportedPublicKeyCredentialDescript
 
 public extern objc class ASAuthorizationSecurityKeyPublicKeyCredentialDescriptor : NSObject, ASAuthorizationPublicKeyCredentialDescriptor
 {
-    [Selector("transports", "setTransports:")] public NSArray Transports { get; set; }
-    [Selector("initWithCredentialID:transports:")] public Self InitWithCredentialIDTransports(NSData credentialID, NSArray allowedTransports);
+    [Selector("transports", "setTransports:")]
+    public NSArray Transports { get; set; }
+    [Selector("initWithCredentialID:transports:")]
+    public Self InitWithCredentialIDTransports(NSData credentialID, NSArray allowedTransports);
 }
 
 #endif

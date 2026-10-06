@@ -34,7 +34,8 @@ public using NSUserInterfaceItemIdentifier = NSString;
 
 public objc interface NSUserInterfaceItemIdentification
 {
-    [Selector("identifier", "setIdentifier:")] NSUserInterfaceItemIdentifier? Identifier { get; set; }
+    [Selector("identifier", "setIdentifier:")]
+    NSUserInterfaceItemIdentifier? Identifier { get; set; }
 }
 
 #endif

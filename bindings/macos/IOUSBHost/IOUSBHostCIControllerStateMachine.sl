@@ -33,13 +33,20 @@ import Standard.ObjC;
 
 public extern objc class IOUSBHostCIControllerStateMachine : NSObject
 {
-    [Selector("controllerState")] public IOUSBHostCIControllerState ControllerState { get; }
-    [Selector("controllerInterface")] public IOUSBHostControllerInterface ControllerInterface { get; }
-    [Selector("initWithInterface:error:")] public Self? InitWithInterfaceError(IOUSBHostControllerInterface @interface, out NSError? error);
-    [Selector("inspectCommand:error:")] public bool InspectCommandError(IOUSBHostCIMessage* command, out NSError? error);
-    [Selector("respondToCommand:status:error:")] public bool RespondToCommandStatusError(IOUSBHostCIMessage* command, IOUSBHostCIMessageStatus status, out NSError? error);
-    [Selector("respondToCommand:status:frame:timestamp:error:")] public bool RespondToCommandStatusFrameTimestampError(IOUSBHostCIMessage* command, IOUSBHostCIMessageStatus status, ulong frame, ulong timestamp, out NSError? error);
-    [Selector("enqueueUpdatedFrame:timestamp:error:")] public bool EnqueueUpdatedFrameTimestampError(ulong frame, ulong timestamp, out NSError? error);
+    [Selector("controllerState")]
+    public IOUSBHostCIControllerState ControllerState { get; }
+    [Selector("controllerInterface")]
+    public IOUSBHostControllerInterface ControllerInterface { get; }
+    [Selector("initWithInterface:error:")]
+    public Self? InitWithInterfaceError(IOUSBHostControllerInterface @interface, out NSError? error);
+    [Selector("inspectCommand:error:")]
+    public bool InspectCommandError(IOUSBHostCIMessage* command, out NSError? error);
+    [Selector("respondToCommand:status:error:")]
+    public bool RespondToCommandStatusError(IOUSBHostCIMessage* command, IOUSBHostCIMessageStatus status, out NSError? error);
+    [Selector("respondToCommand:status:frame:timestamp:error:")]
+    public bool RespondToCommandStatusFrameTimestampError(IOUSBHostCIMessage* command, IOUSBHostCIMessageStatus status, ulong frame, ulong timestamp, out NSError? error);
+    [Selector("enqueueUpdatedFrame:timestamp:error:")]
+    public bool EnqueueUpdatedFrameTimestampError(ulong frame, ulong timestamp, out NSError? error);
 }
 
 #endif

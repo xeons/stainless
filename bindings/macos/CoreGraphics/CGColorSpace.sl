@@ -140,35 +140,48 @@ public extern "C" CFStringRef kCGColorSpaceExtendedLinearGray;
 
 public extern "C" CFStringRef kCGColorSpaceCoreMedia709;
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateDeviceGray();
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateDeviceGray();
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateDeviceRGB();
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateDeviceRGB();
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateDeviceCMYK();
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateDeviceCMYK();
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateCalibratedGray(CGFloat* whitePoint, CGFloat* blackPoint, CGFloat gamma);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateCalibratedGray(CGFloat* whitePoint, CGFloat* blackPoint, CGFloat gamma);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateCalibratedRGB(CGFloat* whitePoint, CGFloat* blackPoint, CGFloat* gamma, CGFloat* matrix);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateCalibratedRGB(CGFloat* whitePoint, CGFloat* blackPoint, CGFloat* gamma, CGFloat* matrix);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateLab(CGFloat* whitePoint, CGFloat* blackPoint, CGFloat* range);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateLab(CGFloat* whitePoint, CGFloat* blackPoint, CGFloat* range);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateWithICCData(CFTypeRef? data);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateWithICCData(CFTypeRef? data);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateICCBased(nuint nComponents, CGFloat* range, CGDataProviderRef? profile, CGColorSpaceRef? alternate);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateICCBased(nuint nComponents, CGFloat* range, CGDataProviderRef? profile, CGColorSpaceRef? alternate);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateIndexed(CGColorSpaceRef? baseSpace, nuint lastIndex, byte* colorTable);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateIndexed(CGColorSpaceRef? baseSpace, nuint lastIndex, byte* colorTable);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreatePattern(CGColorSpaceRef? baseSpace);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreatePattern(CGColorSpaceRef? baseSpace);
 
 public extern "C" CFStringRef kCGColorSpaceExtendedRange;
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateWithColorSyncProfile(ColorSyncProfileRef? arg0, CFDictionaryRef? options);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateWithColorSyncProfile(ColorSyncProfileRef? arg0, CFDictionaryRef? options);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateWithName(CFStringRef? name);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateWithName(CFStringRef? name);
 
 public extern "C" CFStringRef? CGColorSpaceGetName(CGColorSpaceRef? space);
 
-[ReturnsRetained] public extern "C" CFStringRef? CGColorSpaceCopyName(CGColorSpaceRef? space);
+[ReturnsRetained]
+public extern "C" CFStringRef? CGColorSpaceCopyName(CGColorSpaceRef? space);
 
 public extern "C" CFTypeID CGColorSpaceGetTypeID();
 
@@ -178,13 +191,15 @@ public extern "C" CGColorSpaceModel CGColorSpaceGetModel(CGColorSpaceRef? space)
 
 public extern "C" CGColorSpaceRef? CGColorSpaceGetBaseColorSpace(CGColorSpaceRef? space);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef CGColorSpaceCopyBaseColorSpace(CGColorSpaceRef space);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef CGColorSpaceCopyBaseColorSpace(CGColorSpaceRef space);
 
 public extern "C" nuint CGColorSpaceGetColorTableCount(CGColorSpaceRef? space);
 
 public extern "C" void CGColorSpaceGetColorTable(CGColorSpaceRef? space, byte* table);
 
-[ReturnsRetained] public extern "C" CFDataRef? CGColorSpaceCopyICCData(CGColorSpaceRef? space);
+[ReturnsRetained]
+public extern "C" CFDataRef? CGColorSpaceCopyICCData(CGColorSpaceRef? space);
 
 public extern "C" bool CGColorSpaceIsWideGamutRGB(CGColorSpaceRef arg0);
 
@@ -198,28 +213,37 @@ public extern "C" bool CGColorSpaceIsHLGBased(CGColorSpaceRef s);
 
 public extern "C" bool CGColorSpaceSupportsOutput(CGColorSpaceRef? space);
 
-[ReturnsRetained] public extern "C" CFPropertyListRef? CGColorSpaceCopyPropertyList(CGColorSpaceRef space);
+[ReturnsRetained]
+public extern "C" CFPropertyListRef? CGColorSpaceCopyPropertyList(CGColorSpaceRef space);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateWithPropertyList(CFPropertyListRef plist);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateWithPropertyList(CFPropertyListRef plist);
 
 public extern "C" bool CGColorSpaceUsesExtendedRange(CGColorSpaceRef? space);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateLinearized(CGColorSpaceRef? space);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateLinearized(CGColorSpaceRef? space);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateExtended(CGColorSpaceRef? space);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateExtended(CGColorSpaceRef? space);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateExtendedLinearized(CGColorSpaceRef? space);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateExtendedLinearized(CGColorSpaceRef? space);
 
-[ReturnsRetained] public extern "C" CGColorSpaceRef CGColorSpaceCreateCopyWithStandardRange(CGColorSpaceRef? space);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef CGColorSpaceCreateCopyWithStandardRange(CGColorSpaceRef? space);
 
 /// Deprecated in macOS 10.13.
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateWithICCProfile(CFDataRef? data);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateWithICCProfile(CFDataRef? data);
 
 /// Deprecated in macOS 10.13.
-[ReturnsRetained] public extern "C" CFDataRef? CGColorSpaceCopyICCProfile(CGColorSpaceRef? space);
+[ReturnsRetained]
+public extern "C" CFDataRef? CGColorSpaceCopyICCProfile(CGColorSpaceRef? space);
 
 /// Deprecated in macOS 12.0.
-[ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateWithPlatformColorSpace(void* @ref);
+[ReturnsRetained]
+public extern "C" CGColorSpaceRef? CGColorSpaceCreateWithPlatformColorSpace(void* @ref);
 
 public const int CG_HDR_BT_2100 = 1;
 

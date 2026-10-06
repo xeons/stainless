@@ -35,10 +35,14 @@ public objc closure void MLModelPredictionFromFeaturesUsingStateOptionsCompletio
 /// MLState, a category of MLModel.
 public extern objc class MLModel
 {
-    [Selector("newState")] public MLState NewState();
-    [Selector("predictionFromFeatures:usingState:error:")] public MLFeatureProvider? PredictionFromFeaturesUsingStateError(MLFeatureProvider inputFeatures, MLState state, out NSError? error);
-    [Selector("predictionFromFeatures:usingState:options:error:")] public MLFeatureProvider? PredictionFromFeaturesUsingStateOptionsError(MLFeatureProvider inputFeatures, MLState state, MLPredictionOptions options, out NSError? error);
-    [Selector("predictionFromFeatures:usingState:options:completionHandler:")] public void PredictionFromFeaturesUsingStateOptionsCompletionHandler(MLFeatureProvider inputFeatures, MLState state, MLPredictionOptions options, MLModelPredictionFromFeaturesUsingStateOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("newState")]
+    public MLState NewState();
+    [Selector("predictionFromFeatures:usingState:error:")]
+    public MLFeatureProvider? PredictionFromFeaturesUsingStateError(MLFeatureProvider inputFeatures, MLState state, out NSError? error);
+    [Selector("predictionFromFeatures:usingState:options:error:")]
+    public MLFeatureProvider? PredictionFromFeaturesUsingStateOptionsError(MLFeatureProvider inputFeatures, MLState state, MLPredictionOptions options, out NSError? error);
+    [Selector("predictionFromFeatures:usingState:options:completionHandler:")]
+    public void PredictionFromFeaturesUsingStateOptionsCompletionHandler(MLFeatureProvider inputFeatures, MLState state, MLPredictionOptions options, MLModelPredictionFromFeaturesUsingStateOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

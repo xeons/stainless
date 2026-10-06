@@ -56,15 +56,24 @@ public objc closure void CSSearchableIndexDeleteAllSearchableItemsWithCompletion
 
 public extern objc class CSSearchableIndex : NSObject
 {
-    [Selector("indexDelegate", "setIndexDelegate:")] public CSSearchableIndexDelegate? IndexDelegate { get; set; }
-    [Selector("isIndexingAvailable")] public static bool IsIndexingAvailable();
-    [Selector("defaultSearchableIndex")] public static Self DefaultSearchableIndex();
-    [Selector("initWithName:")] public Self InitWithName(NSString name);
-    [Selector("initWithName:protectionClass:")] public Self InitWithNameProtectionClass(NSString name, NSFileProtectionType? protectionClass);
-    [Selector("indexSearchableItems:completionHandler:")] public void IndexSearchableItemsCompletionHandler(NSArray items, CSSearchableIndexIndexSearchableItemsCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("deleteSearchableItemsWithIdentifiers:completionHandler:")] public void DeleteSearchableItemsWithIdentifiersCompletionHandler(NSArray identifiers, CSSearchableIndexDeleteSearchableItemsWithIdentifiersCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("deleteSearchableItemsWithDomainIdentifiers:completionHandler:")] public void DeleteSearchableItemsWithDomainIdentifiersCompletionHandler(NSArray domainIdentifiers, CSSearchableIndexDeleteSearchableItemsWithDomainIdentifiersCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("deleteAllSearchableItemsWithCompletionHandler:")] public void DeleteAllSearchableItemsWithCompletionHandler(CSSearchableIndexDeleteAllSearchableItemsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("indexDelegate", "setIndexDelegate:")]
+    public CSSearchableIndexDelegate? IndexDelegate { get; set; }
+    [Selector("isIndexingAvailable")]
+    public static bool IsIndexingAvailable();
+    [Selector("defaultSearchableIndex")]
+    public static Self DefaultSearchableIndex();
+    [Selector("initWithName:")]
+    public Self InitWithName(NSString name);
+    [Selector("initWithName:protectionClass:")]
+    public Self InitWithNameProtectionClass(NSString name, NSFileProtectionType? protectionClass);
+    [Selector("indexSearchableItems:completionHandler:")]
+    public void IndexSearchableItemsCompletionHandler(NSArray items, CSSearchableIndexIndexSearchableItemsCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("deleteSearchableItemsWithIdentifiers:completionHandler:")]
+    public void DeleteSearchableItemsWithIdentifiersCompletionHandler(NSArray identifiers, CSSearchableIndexDeleteSearchableItemsWithIdentifiersCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("deleteSearchableItemsWithDomainIdentifiers:completionHandler:")]
+    public void DeleteSearchableItemsWithDomainIdentifiersCompletionHandler(NSArray domainIdentifiers, CSSearchableIndexDeleteSearchableItemsWithDomainIdentifiersCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("deleteAllSearchableItemsWithCompletionHandler:")]
+    public void DeleteAllSearchableItemsWithCompletionHandler(CSSearchableIndexDeleteAllSearchableItemsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
 public objc closure void CSSearchableIndexEndIndexBatchWithExpectedClientStateNewClientStateCompletionHandlerCompletionHandlerBlock(NSError? arg0);
@@ -76,10 +85,14 @@ public objc closure void CSSearchableIndexFetchLastClientStateWithCompletionHand
 /// CSOptionalBatching, a category of CSSearchableIndex.
 public extern objc class CSSearchableIndex
 {
-    [Selector("beginIndexBatch")] public void BeginIndexBatch();
-    [Selector("endIndexBatchWithExpectedClientState:newClientState:completionHandler:")] public void EndIndexBatchWithExpectedClientStateNewClientStateCompletionHandler(NSData? expectedClientState, NSData newClientState, CSSearchableIndexEndIndexBatchWithExpectedClientStateNewClientStateCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("endIndexBatchWithClientState:completionHandler:")] public void EndIndexBatchWithClientStateCompletionHandler(NSData clientState, CSSearchableIndexEndIndexBatchWithClientStateCompletionHandlerCompletionHandlerBlock? completionHandler);
-    [Selector("fetchLastClientStateWithCompletionHandler:")] public void FetchLastClientStateWithCompletionHandler(CSSearchableIndexFetchLastClientStateWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("beginIndexBatch")]
+    public void BeginIndexBatch();
+    [Selector("endIndexBatchWithExpectedClientState:newClientState:completionHandler:")]
+    public void EndIndexBatchWithExpectedClientStateNewClientStateCompletionHandler(NSData? expectedClientState, NSData newClientState, CSSearchableIndexEndIndexBatchWithExpectedClientStateNewClientStateCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("endIndexBatchWithClientState:completionHandler:")]
+    public void EndIndexBatchWithClientStateCompletionHandler(NSData clientState, CSSearchableIndexEndIndexBatchWithClientStateCompletionHandlerCompletionHandlerBlock? completionHandler);
+    [Selector("fetchLastClientStateWithCompletionHandler:")]
+    public void FetchLastClientStateWithCompletionHandler(CSSearchableIndexFetchLastClientStateWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void CSSearchableIndexFetchDataForBundleIdentifierItemIdentifierContentTypeCompletionHandlerCompletionHandlerBlock(NSData? arg0, NSError? arg1);
@@ -87,7 +100,8 @@ public objc closure void CSSearchableIndexFetchDataForBundleIdentifierItemIdenti
 /// CSExternalProvider, a category of CSSearchableIndex.
 public extern objc class CSSearchableIndex
 {
-    [Selector("fetchDataForBundleIdentifier:itemIdentifier:contentType:completionHandler:")] public void FetchDataForBundleIdentifierItemIdentifierContentTypeCompletionHandler(NSString bundleIdentifier, NSString itemIdentifier, UTType contentType, CSSearchableIndexFetchDataForBundleIdentifierItemIdentifierContentTypeCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("fetchDataForBundleIdentifier:itemIdentifier:contentType:completionHandler:")]
+    public void FetchDataForBundleIdentifierItemIdentifierContentTypeCompletionHandler(NSString bundleIdentifier, NSString itemIdentifier, UTType contentType, CSSearchableIndexFetchDataForBundleIdentifierItemIdentifierContentTypeCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 /// CSOptionalBatchingWithExpectedState, a category of CSSearchableIndex.
@@ -101,16 +115,30 @@ public objc closure void CSSearchableIndexDelegateSearchableItemsForIdentifiersS
 
 public objc interface CSSearchableIndexDelegate : NSObjectProtocol
 {
-    [Selector("searchableIndex:reindexAllSearchableItemsWithAcknowledgementHandler:")] void SearchableIndexReindexAllSearchableItemsWithAcknowledgementHandler(CSSearchableIndex searchableIndex, CSSearchableIndexDelegateSearchableIndexReindexAllSearchableItemsWithAcknowledgementHandlerAcknowledgementHandlerBlock acknowledgementHandler);
-    [Selector("searchableIndex:reindexSearchableItemsWithIdentifiers:acknowledgementHandler:")] void SearchableIndexReindexSearchableItemsWithIdentifiersAcknowledgementHandler(CSSearchableIndex searchableIndex, NSArray identifiers, CSSearchableIndexDelegateSearchableIndexReindexSearchableItemsWithIdentifiersAcknowledgementHandlerAcknowledgementHandlerBlock acknowledgementHandler);
-    [Optional] [Selector("searchableIndexDidThrottle:")] void SearchableIndexDidThrottle(CSSearchableIndex searchableIndex);
-    [Optional] [Selector("searchableIndexDidFinishThrottle:")] void SearchableIndexDidFinishThrottle(CSSearchableIndex searchableIndex);
-    [Optional] [Selector("dataForSearchableIndex:itemIdentifier:typeIdentifier:error:")] NSData? DataForSearchableIndexItemIdentifierTypeIdentifierError(CSSearchableIndex searchableIndex, NSString itemIdentifier, NSString typeIdentifier, out NSError? outError);
-    [Optional] [Selector("fileURLForSearchableIndex:itemIdentifier:typeIdentifier:inPlace:error:")] NSURL? FileURLForSearchableIndexItemIdentifierTypeIdentifierInPlaceError(CSSearchableIndex searchableIndex, NSString itemIdentifier, NSString typeIdentifier, bool inPlace, out NSError? outError);
+    [Selector("searchableIndex:reindexAllSearchableItemsWithAcknowledgementHandler:")]
+    void SearchableIndexReindexAllSearchableItemsWithAcknowledgementHandler(CSSearchableIndex searchableIndex, CSSearchableIndexDelegateSearchableIndexReindexAllSearchableItemsWithAcknowledgementHandlerAcknowledgementHandlerBlock acknowledgementHandler);
+    [Selector("searchableIndex:reindexSearchableItemsWithIdentifiers:acknowledgementHandler:")]
+    void SearchableIndexReindexSearchableItemsWithIdentifiersAcknowledgementHandler(CSSearchableIndex searchableIndex, NSArray identifiers, CSSearchableIndexDelegateSearchableIndexReindexSearchableItemsWithIdentifiersAcknowledgementHandlerAcknowledgementHandlerBlock acknowledgementHandler);
+    [Optional]
+    [Selector("searchableIndexDidThrottle:")]
+    void SearchableIndexDidThrottle(CSSearchableIndex searchableIndex);
+    [Optional]
+    [Selector("searchableIndexDidFinishThrottle:")]
+    void SearchableIndexDidFinishThrottle(CSSearchableIndex searchableIndex);
+    [Optional]
+    [Selector("dataForSearchableIndex:itemIdentifier:typeIdentifier:error:")]
+    NSData? DataForSearchableIndexItemIdentifierTypeIdentifierError(CSSearchableIndex searchableIndex, NSString itemIdentifier, NSString typeIdentifier, out NSError? outError);
+    [Optional]
+    [Selector("fileURLForSearchableIndex:itemIdentifier:typeIdentifier:inPlace:error:")]
+    NSURL? FileURLForSearchableIndexItemIdentifierTypeIdentifierInPlaceError(CSSearchableIndex searchableIndex, NSString itemIdentifier, NSString typeIdentifier, bool inPlace, out NSError? outError);
     /// macOS 15.4 and later.
-    [Optional] [Selector("searchableItemsForIdentifiers:searchableItemsHandler:")] void SearchableItemsForIdentifiersSearchableItemsHandler(NSArray identifiers, CSSearchableIndexDelegateSearchableItemsForIdentifiersSearchableItemsHandlerSearchableItemsHandlerBlock searchableItemsHandler);
+    [Optional]
+    [Selector("searchableItemsForIdentifiers:searchableItemsHandler:")]
+    void SearchableItemsForIdentifiersSearchableItemsHandler(NSArray identifiers, CSSearchableIndexDelegateSearchableItemsForIdentifiersSearchableItemsHandlerSearchableItemsHandlerBlock searchableItemsHandler);
     /// macOS 15.4 and later.
-    [Optional] [Selector("searchableItemsDidUpdate:")] void SearchableItemsDidUpdate(NSArray items);
+    [Optional]
+    [Selector("searchableItemsDidUpdate:")]
+    void SearchableItemsDidUpdate(NSArray items);
 }
 
 #endif

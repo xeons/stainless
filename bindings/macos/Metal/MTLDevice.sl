@@ -158,184 +158,331 @@ public struct MTLSizeAndAlign
 
 public extern objc class MTLArgumentDescriptor : NSObject, NSCopying
 {
-    [Selector("dataType", "setDataType:")] public MTLDataType DataType { get; set; }
-    [Selector("index", "setIndex:")] public NSUInteger Index { get; set; }
-    [Selector("arrayLength", "setArrayLength:")] public NSUInteger ArrayLength { get; set; }
-    [Selector("access", "setAccess:")] public MTLBindingAccess Access { get; set; }
-    [Selector("textureType", "setTextureType:")] public MTLTextureType TextureType { get; set; }
-    [Selector("constantBlockAlignment", "setConstantBlockAlignment:")] public NSUInteger ConstantBlockAlignment { get; set; }
-    [Selector("argumentDescriptor")] public static MTLArgumentDescriptor ArgumentDescriptor();
+    [Selector("dataType", "setDataType:")]
+    public MTLDataType DataType { get; set; }
+    [Selector("index", "setIndex:")]
+    public NSUInteger Index { get; set; }
+    [Selector("arrayLength", "setArrayLength:")]
+    public NSUInteger ArrayLength { get; set; }
+    [Selector("access", "setAccess:")]
+    public MTLBindingAccess Access { get; set; }
+    [Selector("textureType", "setTextureType:")]
+    public MTLTextureType TextureType { get; set; }
+    [Selector("constantBlockAlignment", "setConstantBlockAlignment:")]
+    public NSUInteger ConstantBlockAlignment { get; set; }
+    [Selector("argumentDescriptor")]
+    public static MTLArgumentDescriptor ArgumentDescriptor();
 }
 
 public extern objc class MTLArchitecture : NSObject, NSCopying
 {
-    [Selector("name")] public NSString Name { get; }
+    [Selector("name")]
+    public NSString Name { get; }
 }
 
 public objc closure void MTLDeviceNewBufferWithBytesNoCopyLengthOptionsDeallocatorDeallocatorBlock(void* arg0, NSUInteger arg1);
 
 public objc interface MTLDevice : NSObjectProtocol
 {
-    [Selector("name")] NSString Name { get; }
-    [Selector("registryID")] ulong RegistryID { get; }
-    [Selector("architecture")] MTLArchitecture Architecture { get; }
-    [Selector("maxThreadsPerThreadgroup")] MTLSize MaxThreadsPerThreadgroup { get; }
-    [Selector("isLowPower")] bool LowPower { get; }
-    [Selector("isHeadless")] bool Headless { get; }
-    [Selector("isRemovable")] bool Removable { get; }
-    [Selector("hasUnifiedMemory")] bool HasUnifiedMemory { get; }
-    [Selector("recommendedMaxWorkingSetSize")] ulong RecommendedMaxWorkingSetSize { get; }
-    [Selector("location")] MTLDeviceLocation Location { get; }
-    [Selector("locationNumber")] NSUInteger LocationNumber { get; }
-    [Selector("maxTransferRate")] ulong MaxTransferRate { get; }
-    [Selector("isDepth24Stencil8PixelFormatSupported")] bool Depth24Stencil8PixelFormatSupported { get; }
-    [Selector("readWriteTextureSupport")] MTLReadWriteTextureTier ReadWriteTextureSupport { get; }
-    [Selector("argumentBuffersSupport")] MTLArgumentBuffersTier ArgumentBuffersSupport { get; }
-    [Selector("areRasterOrderGroupsSupported")] bool RasterOrderGroupsSupported { get; }
-    [Selector("supports32BitFloatFiltering")] bool Supports32BitFloatFiltering { get; }
-    [Selector("supports32BitMSAA")] bool Supports32BitMSAA { get; }
-    [Selector("supportsQueryTextureLOD")] bool SupportsQueryTextureLOD { get; }
-    [Selector("supportsBCTextureCompression")] bool SupportsBCTextureCompression { get; }
-    [Selector("supportsPullModelInterpolation")] bool SupportsPullModelInterpolation { get; }
+    [Selector("name")]
+    NSString Name { get; }
+    [Selector("registryID")]
+    ulong RegistryID { get; }
+    [Selector("architecture")]
+    MTLArchitecture Architecture { get; }
+    [Selector("maxThreadsPerThreadgroup")]
+    MTLSize MaxThreadsPerThreadgroup { get; }
+    [Selector("isLowPower")]
+    bool LowPower { get; }
+    [Selector("isHeadless")]
+    bool Headless { get; }
+    [Selector("isRemovable")]
+    bool Removable { get; }
+    [Selector("hasUnifiedMemory")]
+    bool HasUnifiedMemory { get; }
+    [Selector("recommendedMaxWorkingSetSize")]
+    ulong RecommendedMaxWorkingSetSize { get; }
+    [Selector("location")]
+    MTLDeviceLocation Location { get; }
+    [Selector("locationNumber")]
+    NSUInteger LocationNumber { get; }
+    [Selector("maxTransferRate")]
+    ulong MaxTransferRate { get; }
+    [Selector("isDepth24Stencil8PixelFormatSupported")]
+    bool Depth24Stencil8PixelFormatSupported { get; }
+    [Selector("readWriteTextureSupport")]
+    MTLReadWriteTextureTier ReadWriteTextureSupport { get; }
+    [Selector("argumentBuffersSupport")]
+    MTLArgumentBuffersTier ArgumentBuffersSupport { get; }
+    [Selector("areRasterOrderGroupsSupported")]
+    bool RasterOrderGroupsSupported { get; }
+    [Selector("supports32BitFloatFiltering")]
+    bool Supports32BitFloatFiltering { get; }
+    [Selector("supports32BitMSAA")]
+    bool Supports32BitMSAA { get; }
+    [Selector("supportsQueryTextureLOD")]
+    bool SupportsQueryTextureLOD { get; }
+    [Selector("supportsBCTextureCompression")]
+    bool SupportsBCTextureCompression { get; }
+    [Selector("supportsPullModelInterpolation")]
+    bool SupportsPullModelInterpolation { get; }
     /// Deprecated in macOS 13.0.
-    [Selector("areBarycentricCoordsSupported")] bool BarycentricCoordsSupported { get; }
-    [Selector("supportsShaderBarycentricCoordinates")] bool SupportsShaderBarycentricCoordinates { get; }
-    [Selector("currentAllocatedSize")] NSUInteger CurrentAllocatedSize { get; }
-    [Selector("maxThreadgroupMemoryLength")] NSUInteger MaxThreadgroupMemoryLength { get; }
-    [Selector("maxArgumentBufferSamplerCount")] NSUInteger MaxArgumentBufferSamplerCount { get; }
-    [Selector("areProgrammableSamplePositionsSupported")] bool ProgrammableSamplePositionsSupported { get; }
-    [Selector("peerGroupID")] ulong PeerGroupID { get; }
-    [Selector("peerIndex")] uint PeerIndex { get; }
-    [Selector("peerCount")] uint PeerCount { get; }
-    [Selector("sparseTileSizeInBytes")] NSUInteger SparseTileSizeInBytes { get; }
-    [Selector("maxBufferLength")] NSUInteger MaxBufferLength { get; }
-    [Selector("counterSets")] NSArray? CounterSets { get; }
-    [Selector("supportsDynamicLibraries")] bool SupportsDynamicLibraries { get; }
-    [Selector("supportsRenderDynamicLibraries")] bool SupportsRenderDynamicLibraries { get; }
-    [Selector("supportsRaytracing")] bool SupportsRaytracing { get; }
-    [Selector("supportsFunctionPointers")] bool SupportsFunctionPointers { get; }
-    [Selector("supportsFunctionPointersFromRender")] bool SupportsFunctionPointersFromRender { get; }
-    [Selector("supportsRaytracingFromRender")] bool SupportsRaytracingFromRender { get; }
-    [Selector("supportsPrimitiveMotionBlur")] bool SupportsPrimitiveMotionBlur { get; }
-    [Selector("shouldMaximizeConcurrentCompilation", "setShouldMaximizeConcurrentCompilation:")] bool ShouldMaximizeConcurrentCompilation { get; set; }
-    [Selector("maximumConcurrentCompilationTaskCount")] NSUInteger MaximumConcurrentCompilationTaskCount { get; }
-    [Selector("newLogStateWithDescriptor:error:")] MTLLogState? NewLogStateWithDescriptorError(MTLLogStateDescriptor descriptor, out NSError? error);
-    [Selector("newCommandQueue")] MTLCommandQueue? NewCommandQueue();
-    [Selector("newCommandQueueWithMaxCommandBufferCount:")] MTLCommandQueue? NewCommandQueueWithMaxCommandBufferCount(NSUInteger maxCommandBufferCount);
-    [Selector("newCommandQueueWithDescriptor:")] MTLCommandQueue? NewCommandQueueWithDescriptor(MTLCommandQueueDescriptor descriptor);
-    [Selector("heapTextureSizeAndAlignWithDescriptor:")] MTLSizeAndAlign HeapTextureSizeAndAlignWithDescriptor(MTLTextureDescriptor desc);
-    [Selector("heapBufferSizeAndAlignWithLength:options:")] MTLSizeAndAlign HeapBufferSizeAndAlignWithLengthOptions(NSUInteger length, MTLResourceOptions options);
-    [Selector("newHeapWithDescriptor:")] MTLHeap? NewHeapWithDescriptor(MTLHeapDescriptor descriptor);
-    [Selector("newBufferWithLength:options:")] MTLBuffer? NewBufferWithLengthOptions(NSUInteger length, MTLResourceOptions options);
-    [Selector("newBufferWithBytes:length:options:")] MTLBuffer? NewBufferWithBytesLengthOptions(void* pointer, NSUInteger length, MTLResourceOptions options);
-    [Selector("newBufferWithBytesNoCopy:length:options:deallocator:")] MTLBuffer? NewBufferWithBytesNoCopyLengthOptionsDeallocator(void* pointer, NSUInteger length, MTLResourceOptions options, MTLDeviceNewBufferWithBytesNoCopyLengthOptionsDeallocatorDeallocatorBlock? deallocator);
-    [Selector("newDepthStencilStateWithDescriptor:")] MTLDepthStencilState? NewDepthStencilStateWithDescriptor(MTLDepthStencilDescriptor descriptor);
-    [Selector("newTextureWithDescriptor:")] MTLTexture? NewTextureWithDescriptor(MTLTextureDescriptor descriptor);
-    [Selector("newTextureWithDescriptor:iosurface:plane:")] MTLTexture? NewTextureWithDescriptorIosurfacePlane(MTLTextureDescriptor descriptor, IOSurfaceRef iosurface, NSUInteger plane);
-    [Selector("newSharedTextureWithDescriptor:")] MTLTexture? NewSharedTextureWithDescriptor(MTLTextureDescriptor descriptor);
-    [Selector("newSharedTextureWithHandle:")] MTLTexture? NewSharedTextureWithHandle(MTLSharedTextureHandle sharedHandle);
-    [Selector("newSamplerStateWithDescriptor:")] MTLSamplerState? NewSamplerStateWithDescriptor(MTLSamplerDescriptor descriptor);
-    [Selector("newDefaultLibrary")] MTLLibrary? NewDefaultLibrary();
-    [Selector("newDefaultLibraryWithBundle:error:")] MTLLibrary? NewDefaultLibraryWithBundleError(NSBundle bundle, out NSError? error);
+    [Selector("areBarycentricCoordsSupported")]
+    bool BarycentricCoordsSupported { get; }
+    [Selector("supportsShaderBarycentricCoordinates")]
+    bool SupportsShaderBarycentricCoordinates { get; }
+    [Selector("currentAllocatedSize")]
+    NSUInteger CurrentAllocatedSize { get; }
+    [Selector("maxThreadgroupMemoryLength")]
+    NSUInteger MaxThreadgroupMemoryLength { get; }
+    [Selector("maxArgumentBufferSamplerCount")]
+    NSUInteger MaxArgumentBufferSamplerCount { get; }
+    [Selector("areProgrammableSamplePositionsSupported")]
+    bool ProgrammableSamplePositionsSupported { get; }
+    [Selector("peerGroupID")]
+    ulong PeerGroupID { get; }
+    [Selector("peerIndex")]
+    uint PeerIndex { get; }
+    [Selector("peerCount")]
+    uint PeerCount { get; }
+    [Selector("sparseTileSizeInBytes")]
+    NSUInteger SparseTileSizeInBytes { get; }
+    [Selector("maxBufferLength")]
+    NSUInteger MaxBufferLength { get; }
+    [Selector("counterSets")]
+    NSArray? CounterSets { get; }
+    [Selector("supportsDynamicLibraries")]
+    bool SupportsDynamicLibraries { get; }
+    [Selector("supportsRenderDynamicLibraries")]
+    bool SupportsRenderDynamicLibraries { get; }
+    [Selector("supportsRaytracing")]
+    bool SupportsRaytracing { get; }
+    [Selector("supportsFunctionPointers")]
+    bool SupportsFunctionPointers { get; }
+    [Selector("supportsFunctionPointersFromRender")]
+    bool SupportsFunctionPointersFromRender { get; }
+    [Selector("supportsRaytracingFromRender")]
+    bool SupportsRaytracingFromRender { get; }
+    [Selector("supportsPrimitiveMotionBlur")]
+    bool SupportsPrimitiveMotionBlur { get; }
+    [Selector("shouldMaximizeConcurrentCompilation", "setShouldMaximizeConcurrentCompilation:")]
+    bool ShouldMaximizeConcurrentCompilation { get; set; }
+    [Selector("maximumConcurrentCompilationTaskCount")]
+    NSUInteger MaximumConcurrentCompilationTaskCount { get; }
+    [Selector("newLogStateWithDescriptor:error:")]
+    MTLLogState? NewLogStateWithDescriptorError(MTLLogStateDescriptor descriptor, out NSError? error);
+    [Selector("newCommandQueue")]
+    MTLCommandQueue? NewCommandQueue();
+    [Selector("newCommandQueueWithMaxCommandBufferCount:")]
+    MTLCommandQueue? NewCommandQueueWithMaxCommandBufferCount(NSUInteger maxCommandBufferCount);
+    [Selector("newCommandQueueWithDescriptor:")]
+    MTLCommandQueue? NewCommandQueueWithDescriptor(MTLCommandQueueDescriptor descriptor);
+    [Selector("heapTextureSizeAndAlignWithDescriptor:")]
+    MTLSizeAndAlign HeapTextureSizeAndAlignWithDescriptor(MTLTextureDescriptor desc);
+    [Selector("heapBufferSizeAndAlignWithLength:options:")]
+    MTLSizeAndAlign HeapBufferSizeAndAlignWithLengthOptions(NSUInteger length, MTLResourceOptions options);
+    [Selector("newHeapWithDescriptor:")]
+    MTLHeap? NewHeapWithDescriptor(MTLHeapDescriptor descriptor);
+    [Selector("newBufferWithLength:options:")]
+    MTLBuffer? NewBufferWithLengthOptions(NSUInteger length, MTLResourceOptions options);
+    [Selector("newBufferWithBytes:length:options:")]
+    MTLBuffer? NewBufferWithBytesLengthOptions(void* pointer, NSUInteger length, MTLResourceOptions options);
+    [Selector("newBufferWithBytesNoCopy:length:options:deallocator:")]
+    MTLBuffer? NewBufferWithBytesNoCopyLengthOptionsDeallocator(void* pointer, NSUInteger length, MTLResourceOptions options, MTLDeviceNewBufferWithBytesNoCopyLengthOptionsDeallocatorDeallocatorBlock? deallocator);
+    [Selector("newDepthStencilStateWithDescriptor:")]
+    MTLDepthStencilState? NewDepthStencilStateWithDescriptor(MTLDepthStencilDescriptor descriptor);
+    [Selector("newTextureWithDescriptor:")]
+    MTLTexture? NewTextureWithDescriptor(MTLTextureDescriptor descriptor);
+    [Selector("newTextureWithDescriptor:iosurface:plane:")]
+    MTLTexture? NewTextureWithDescriptorIosurfacePlane(MTLTextureDescriptor descriptor, IOSurfaceRef iosurface, NSUInteger plane);
+    [Selector("newSharedTextureWithDescriptor:")]
+    MTLTexture? NewSharedTextureWithDescriptor(MTLTextureDescriptor descriptor);
+    [Selector("newSharedTextureWithHandle:")]
+    MTLTexture? NewSharedTextureWithHandle(MTLSharedTextureHandle sharedHandle);
+    [Selector("newSamplerStateWithDescriptor:")]
+    MTLSamplerState? NewSamplerStateWithDescriptor(MTLSamplerDescriptor descriptor);
+    [Selector("newDefaultLibrary")]
+    MTLLibrary? NewDefaultLibrary();
+    [Selector("newDefaultLibraryWithBundle:error:")]
+    MTLLibrary? NewDefaultLibraryWithBundleError(NSBundle bundle, out NSError? error);
     /// Deprecated in macOS 13.0.
-    [Selector("newLibraryWithFile:error:")] MTLLibrary? NewLibraryWithFileError(NSString filepath, out NSError? error);
-    [Selector("newLibraryWithURL:error:")] MTLLibrary? NewLibraryWithURLError(NSURL url, out NSError? error);
-    [Selector("newLibraryWithData:error:")] MTLLibrary? NewLibraryWithDataError(dispatch_data_t data, out NSError? error);
-    [Selector("newLibraryWithSource:options:error:")] MTLLibrary? NewLibraryWithSourceOptionsError(NSString source, MTLCompileOptions? options, out NSError? error);
-    [Selector("newLibraryWithSource:options:completionHandler:")] void NewLibraryWithSourceOptionsCompletionHandler(NSString source, MTLCompileOptions? options, MTLNewLibraryCompletionHandler completionHandler);
-    [Selector("newLibraryWithStitchedDescriptor:error:")] MTLLibrary? NewLibraryWithStitchedDescriptorError(MTLStitchedLibraryDescriptor descriptor, out NSError? error);
-    [Selector("newLibraryWithStitchedDescriptor:completionHandler:")] void NewLibraryWithStitchedDescriptorCompletionHandler(MTLStitchedLibraryDescriptor descriptor, MTLNewLibraryCompletionHandler completionHandler);
-    [Selector("newRenderPipelineStateWithDescriptor:error:")] MTLRenderPipelineState? NewRenderPipelineStateWithDescriptorError(MTLRenderPipelineDescriptor descriptor, out NSError? error);
-    [Selector("newRenderPipelineStateWithDescriptor:options:reflection:error:")] MTLRenderPipelineState? NewRenderPipelineStateWithDescriptorOptionsReflectionError(MTLRenderPipelineDescriptor descriptor, MTLPipelineOption options, void** reflection, out NSError? error);
-    [Selector("newRenderPipelineStateWithDescriptor:completionHandler:")] void NewRenderPipelineStateWithDescriptorCompletionHandler(MTLRenderPipelineDescriptor descriptor, MTLNewRenderPipelineStateCompletionHandler completionHandler);
-    [Selector("newRenderPipelineStateWithDescriptor:options:completionHandler:")] void NewRenderPipelineStateWithDescriptorOptionsCompletionHandler(MTLRenderPipelineDescriptor descriptor, MTLPipelineOption options, MTLNewRenderPipelineStateWithReflectionCompletionHandler completionHandler);
-    [Selector("newComputePipelineStateWithFunction:error:")] MTLComputePipelineState? NewComputePipelineStateWithFunctionError(MTLFunction computeFunction, out NSError? error);
-    [Selector("newComputePipelineStateWithFunction:options:reflection:error:")] MTLComputePipelineState? NewComputePipelineStateWithFunctionOptionsReflectionError(MTLFunction computeFunction, MTLPipelineOption options, void** reflection, out NSError? error);
-    [Selector("newComputePipelineStateWithFunction:completionHandler:")] void NewComputePipelineStateWithFunctionCompletionHandler(MTLFunction computeFunction, MTLNewComputePipelineStateCompletionHandler completionHandler);
-    [Selector("newComputePipelineStateWithFunction:options:completionHandler:")] void NewComputePipelineStateWithFunctionOptionsCompletionHandler(MTLFunction computeFunction, MTLPipelineOption options, MTLNewComputePipelineStateWithReflectionCompletionHandler completionHandler);
-    [Selector("newComputePipelineStateWithDescriptor:options:reflection:error:")] MTLComputePipelineState? NewComputePipelineStateWithDescriptorOptionsReflectionError(MTLComputePipelineDescriptor descriptor, MTLPipelineOption options, void** reflection, out NSError? error);
-    [Selector("newComputePipelineStateWithDescriptor:options:completionHandler:")] void NewComputePipelineStateWithDescriptorOptionsCompletionHandler(MTLComputePipelineDescriptor descriptor, MTLPipelineOption options, MTLNewComputePipelineStateWithReflectionCompletionHandler completionHandler);
-    [Selector("newFence")] MTLFence? NewFence();
+    [Selector("newLibraryWithFile:error:")]
+    MTLLibrary? NewLibraryWithFileError(NSString filepath, out NSError? error);
+    [Selector("newLibraryWithURL:error:")]
+    MTLLibrary? NewLibraryWithURLError(NSURL url, out NSError? error);
+    [Selector("newLibraryWithData:error:")]
+    MTLLibrary? NewLibraryWithDataError(dispatch_data_t data, out NSError? error);
+    [Selector("newLibraryWithSource:options:error:")]
+    MTLLibrary? NewLibraryWithSourceOptionsError(NSString source, MTLCompileOptions? options, out NSError? error);
+    [Selector("newLibraryWithSource:options:completionHandler:")]
+    void NewLibraryWithSourceOptionsCompletionHandler(NSString source, MTLCompileOptions? options, MTLNewLibraryCompletionHandler completionHandler);
+    [Selector("newLibraryWithStitchedDescriptor:error:")]
+    MTLLibrary? NewLibraryWithStitchedDescriptorError(MTLStitchedLibraryDescriptor descriptor, out NSError? error);
+    [Selector("newLibraryWithStitchedDescriptor:completionHandler:")]
+    void NewLibraryWithStitchedDescriptorCompletionHandler(MTLStitchedLibraryDescriptor descriptor, MTLNewLibraryCompletionHandler completionHandler);
+    [Selector("newRenderPipelineStateWithDescriptor:error:")]
+    MTLRenderPipelineState? NewRenderPipelineStateWithDescriptorError(MTLRenderPipelineDescriptor descriptor, out NSError? error);
+    [Selector("newRenderPipelineStateWithDescriptor:options:reflection:error:")]
+    MTLRenderPipelineState? NewRenderPipelineStateWithDescriptorOptionsReflectionError(MTLRenderPipelineDescriptor descriptor, MTLPipelineOption options, void** reflection, out NSError? error);
+    [Selector("newRenderPipelineStateWithDescriptor:completionHandler:")]
+    void NewRenderPipelineStateWithDescriptorCompletionHandler(MTLRenderPipelineDescriptor descriptor, MTLNewRenderPipelineStateCompletionHandler completionHandler);
+    [Selector("newRenderPipelineStateWithDescriptor:options:completionHandler:")]
+    void NewRenderPipelineStateWithDescriptorOptionsCompletionHandler(MTLRenderPipelineDescriptor descriptor, MTLPipelineOption options, MTLNewRenderPipelineStateWithReflectionCompletionHandler completionHandler);
+    [Selector("newComputePipelineStateWithFunction:error:")]
+    MTLComputePipelineState? NewComputePipelineStateWithFunctionError(MTLFunction computeFunction, out NSError? error);
+    [Selector("newComputePipelineStateWithFunction:options:reflection:error:")]
+    MTLComputePipelineState? NewComputePipelineStateWithFunctionOptionsReflectionError(MTLFunction computeFunction, MTLPipelineOption options, void** reflection, out NSError? error);
+    [Selector("newComputePipelineStateWithFunction:completionHandler:")]
+    void NewComputePipelineStateWithFunctionCompletionHandler(MTLFunction computeFunction, MTLNewComputePipelineStateCompletionHandler completionHandler);
+    [Selector("newComputePipelineStateWithFunction:options:completionHandler:")]
+    void NewComputePipelineStateWithFunctionOptionsCompletionHandler(MTLFunction computeFunction, MTLPipelineOption options, MTLNewComputePipelineStateWithReflectionCompletionHandler completionHandler);
+    [Selector("newComputePipelineStateWithDescriptor:options:reflection:error:")]
+    MTLComputePipelineState? NewComputePipelineStateWithDescriptorOptionsReflectionError(MTLComputePipelineDescriptor descriptor, MTLPipelineOption options, void** reflection, out NSError? error);
+    [Selector("newComputePipelineStateWithDescriptor:options:completionHandler:")]
+    void NewComputePipelineStateWithDescriptorOptionsCompletionHandler(MTLComputePipelineDescriptor descriptor, MTLPipelineOption options, MTLNewComputePipelineStateWithReflectionCompletionHandler completionHandler);
+    [Selector("newFence")]
+    MTLFence? NewFence();
     /// Deprecated in macOS 13.0.
-    [Selector("supportsFeatureSet:")] bool SupportsFeatureSet(MTLFeatureSet featureSet);
-    [Selector("supportsFamily:")] bool SupportsFamily(MTLGPUFamily gpuFamily);
-    [Selector("supportsTextureSampleCount:")] bool SupportsTextureSampleCount(NSUInteger sampleCount);
-    [Selector("minimumLinearTextureAlignmentForPixelFormat:")] NSUInteger MinimumLinearTextureAlignmentForPixelFormat(MTLPixelFormat format);
-    [Selector("minimumTextureBufferAlignmentForPixelFormat:")] NSUInteger MinimumTextureBufferAlignmentForPixelFormat(MTLPixelFormat format);
-    [Selector("newRenderPipelineStateWithTileDescriptor:options:reflection:error:")] MTLRenderPipelineState? NewRenderPipelineStateWithTileDescriptorOptionsReflectionError(MTLTileRenderPipelineDescriptor descriptor, MTLPipelineOption options, void** reflection, out NSError? error);
-    [Selector("newRenderPipelineStateWithTileDescriptor:options:completionHandler:")] void NewRenderPipelineStateWithTileDescriptorOptionsCompletionHandler(MTLTileRenderPipelineDescriptor descriptor, MTLPipelineOption options, MTLNewRenderPipelineStateWithReflectionCompletionHandler completionHandler);
-    [Selector("newRenderPipelineStateWithMeshDescriptor:options:reflection:error:")] MTLRenderPipelineState? NewRenderPipelineStateWithMeshDescriptorOptionsReflectionError(MTLMeshRenderPipelineDescriptor descriptor, MTLPipelineOption options, void** reflection, out NSError? error);
-    [Selector("newRenderPipelineStateWithMeshDescriptor:options:completionHandler:")] void NewRenderPipelineStateWithMeshDescriptorOptionsCompletionHandler(MTLMeshRenderPipelineDescriptor descriptor, MTLPipelineOption options, MTLNewRenderPipelineStateWithReflectionCompletionHandler completionHandler);
-    [Selector("getDefaultSamplePositions:count:")] void GetDefaultSamplePositionsCount(MTLSamplePosition* positions, NSUInteger count);
-    [Selector("newArgumentEncoderWithArguments:")] MTLArgumentEncoder? NewArgumentEncoderWithArguments(NSArray arguments);
-    [Selector("supportsRasterizationRateMapWithLayerCount:")] bool SupportsRasterizationRateMapWithLayerCount(NSUInteger layerCount);
-    [Selector("newRasterizationRateMapWithDescriptor:")] MTLRasterizationRateMap? NewRasterizationRateMapWithDescriptor(MTLRasterizationRateMapDescriptor descriptor);
-    [Selector("newIndirectCommandBufferWithDescriptor:maxCommandCount:options:")] MTLIndirectCommandBuffer? NewIndirectCommandBufferWithDescriptorMaxCommandCountOptions(MTLIndirectCommandBufferDescriptor descriptor, NSUInteger maxCount, MTLResourceOptions options);
-    [Selector("newEvent")] MTLEvent? NewEvent();
-    [Selector("newSharedEvent")] MTLSharedEvent? NewSharedEvent();
-    [Selector("newSharedEventWithHandle:")] MTLSharedEvent? NewSharedEventWithHandle(MTLSharedEventHandle sharedEventHandle);
+    [Selector("supportsFeatureSet:")]
+    bool SupportsFeatureSet(MTLFeatureSet featureSet);
+    [Selector("supportsFamily:")]
+    bool SupportsFamily(MTLGPUFamily gpuFamily);
+    [Selector("supportsTextureSampleCount:")]
+    bool SupportsTextureSampleCount(NSUInteger sampleCount);
+    [Selector("minimumLinearTextureAlignmentForPixelFormat:")]
+    NSUInteger MinimumLinearTextureAlignmentForPixelFormat(MTLPixelFormat format);
+    [Selector("minimumTextureBufferAlignmentForPixelFormat:")]
+    NSUInteger MinimumTextureBufferAlignmentForPixelFormat(MTLPixelFormat format);
+    [Selector("newRenderPipelineStateWithTileDescriptor:options:reflection:error:")]
+    MTLRenderPipelineState? NewRenderPipelineStateWithTileDescriptorOptionsReflectionError(MTLTileRenderPipelineDescriptor descriptor, MTLPipelineOption options, void** reflection, out NSError? error);
+    [Selector("newRenderPipelineStateWithTileDescriptor:options:completionHandler:")]
+    void NewRenderPipelineStateWithTileDescriptorOptionsCompletionHandler(MTLTileRenderPipelineDescriptor descriptor, MTLPipelineOption options, MTLNewRenderPipelineStateWithReflectionCompletionHandler completionHandler);
+    [Selector("newRenderPipelineStateWithMeshDescriptor:options:reflection:error:")]
+    MTLRenderPipelineState? NewRenderPipelineStateWithMeshDescriptorOptionsReflectionError(MTLMeshRenderPipelineDescriptor descriptor, MTLPipelineOption options, void** reflection, out NSError? error);
+    [Selector("newRenderPipelineStateWithMeshDescriptor:options:completionHandler:")]
+    void NewRenderPipelineStateWithMeshDescriptorOptionsCompletionHandler(MTLMeshRenderPipelineDescriptor descriptor, MTLPipelineOption options, MTLNewRenderPipelineStateWithReflectionCompletionHandler completionHandler);
+    [Selector("getDefaultSamplePositions:count:")]
+    void GetDefaultSamplePositionsCount(MTLSamplePosition* positions, NSUInteger count);
+    [Selector("newArgumentEncoderWithArguments:")]
+    MTLArgumentEncoder? NewArgumentEncoderWithArguments(NSArray arguments);
+    [Selector("supportsRasterizationRateMapWithLayerCount:")]
+    bool SupportsRasterizationRateMapWithLayerCount(NSUInteger layerCount);
+    [Selector("newRasterizationRateMapWithDescriptor:")]
+    MTLRasterizationRateMap? NewRasterizationRateMapWithDescriptor(MTLRasterizationRateMapDescriptor descriptor);
+    [Selector("newIndirectCommandBufferWithDescriptor:maxCommandCount:options:")]
+    MTLIndirectCommandBuffer? NewIndirectCommandBufferWithDescriptorMaxCommandCountOptions(MTLIndirectCommandBufferDescriptor descriptor, NSUInteger maxCount, MTLResourceOptions options);
+    [Selector("newEvent")]
+    MTLEvent? NewEvent();
+    [Selector("newSharedEvent")]
+    MTLSharedEvent? NewSharedEvent();
+    [Selector("newSharedEventWithHandle:")]
+    MTLSharedEvent? NewSharedEventWithHandle(MTLSharedEventHandle sharedEventHandle);
     /// Deprecated in macOS 14.0.
-    [Selector("newIOHandleWithURL:error:")] MTLIOFileHandle? NewIOHandleWithURLError(NSURL url, out NSError? error);
-    [Selector("newIOCommandQueueWithDescriptor:error:")] MTLIOCommandQueue? NewIOCommandQueueWithDescriptorError(MTLIOCommandQueueDescriptor descriptor, out NSError? error);
+    [Selector("newIOHandleWithURL:error:")]
+    MTLIOFileHandle? NewIOHandleWithURLError(NSURL url, out NSError? error);
+    [Selector("newIOCommandQueueWithDescriptor:error:")]
+    MTLIOCommandQueue? NewIOCommandQueueWithDescriptorError(MTLIOCommandQueueDescriptor descriptor, out NSError? error);
     /// Deprecated in macOS 14.0.
-    [Selector("newIOHandleWithURL:compressionMethod:error:")] MTLIOFileHandle? NewIOHandleWithURLCompressionMethodError(NSURL url, MTLIOCompressionMethod compressionMethod, out NSError? error);
-    [Selector("newIOFileHandleWithURL:error:")] MTLIOFileHandle? NewIOFileHandleWithURLError(NSURL url, out NSError? error);
-    [Selector("newIOFileHandleWithURL:compressionMethod:error:")] MTLIOFileHandle? NewIOFileHandleWithURLCompressionMethodError(NSURL url, MTLIOCompressionMethod compressionMethod, out NSError? error);
-    [Selector("sparseTileSizeWithTextureType:pixelFormat:sampleCount:")] MTLSize SparseTileSizeWithTextureTypePixelFormatSampleCount(MTLTextureType textureType, MTLPixelFormat pixelFormat, NSUInteger sampleCount);
-    [Optional] [Selector("convertSparsePixelRegions:toTileRegions:withTileSize:alignmentMode:numRegions:")] void ConvertSparsePixelRegionsToTileRegionsWithTileSizeAlignmentModeNumRegions(MTLRegion* pixelRegions, MTLRegion* tileRegions, MTLSize tileSize, MTLSparseTextureRegionAlignmentMode mode, NSUInteger numRegions);
-    [Optional] [Selector("convertSparseTileRegions:toPixelRegions:withTileSize:numRegions:")] void ConvertSparseTileRegionsToPixelRegionsWithTileSizeNumRegions(MTLRegion* tileRegions, MTLRegion* pixelRegions, MTLSize tileSize, NSUInteger numRegions);
-    [Selector("sparseTileSizeInBytesForSparsePageSize:")] NSUInteger SparseTileSizeInBytesForSparsePageSize(MTLSparsePageSize sparsePageSize);
-    [Selector("sparseTileSizeWithTextureType:pixelFormat:sampleCount:sparsePageSize:")] MTLSize SparseTileSizeWithTextureTypePixelFormatSampleCountSparsePageSize(MTLTextureType textureType, MTLPixelFormat pixelFormat, NSUInteger sampleCount, MTLSparsePageSize sparsePageSize);
-    [Selector("newCounterSampleBufferWithDescriptor:error:")] MTLCounterSampleBuffer? NewCounterSampleBufferWithDescriptorError(MTLCounterSampleBufferDescriptor descriptor, out NSError? error);
-    [Selector("sampleTimestamps:gpuTimestamp:")] void SampleTimestampsGpuTimestamp(MTLTimestamp* cpuTimestamp, MTLTimestamp* gpuTimestamp);
-    [Selector("newArgumentEncoderWithBufferBinding:")] MTLArgumentEncoder NewArgumentEncoderWithBufferBinding(MTLBufferBinding bufferBinding);
-    [Selector("supportsCounterSampling:")] bool SupportsCounterSampling(MTLCounterSamplingPoint samplingPoint);
-    [Selector("supportsVertexAmplificationCount:")] bool SupportsVertexAmplificationCount(NSUInteger count);
-    [Selector("newDynamicLibrary:error:")] MTLDynamicLibraryProtocol? NewDynamicLibraryError(MTLLibrary library, out NSError? error);
-    [Selector("newDynamicLibraryWithURL:error:")] MTLDynamicLibraryProtocol? NewDynamicLibraryWithURLError(NSURL url, out NSError? error);
-    [Selector("newBinaryArchiveWithDescriptor:error:")] MTLBinaryArchive? NewBinaryArchiveWithDescriptorError(MTLBinaryArchiveDescriptor descriptor, out NSError? error);
-    [Selector("accelerationStructureSizesWithDescriptor:")] MTLAccelerationStructureSizes AccelerationStructureSizesWithDescriptor(MTLAccelerationStructureDescriptor descriptor);
-    [Selector("newAccelerationStructureWithSize:")] MTLAccelerationStructure? NewAccelerationStructureWithSize(NSUInteger size);
-    [Selector("newAccelerationStructureWithDescriptor:")] MTLAccelerationStructure? NewAccelerationStructureWithDescriptor(MTLAccelerationStructureDescriptor descriptor);
-    [Selector("heapAccelerationStructureSizeAndAlignWithSize:")] MTLSizeAndAlign HeapAccelerationStructureSizeAndAlignWithSize(NSUInteger size);
-    [Selector("heapAccelerationStructureSizeAndAlignWithDescriptor:")] MTLSizeAndAlign HeapAccelerationStructureSizeAndAlignWithDescriptor(MTLAccelerationStructureDescriptor descriptor);
-    [Selector("newResidencySetWithDescriptor:error:")] MTLResidencySet? NewResidencySetWithDescriptorError(MTLResidencySetDescriptor desc, out NSError? error);
+    [Selector("newIOHandleWithURL:compressionMethod:error:")]
+    MTLIOFileHandle? NewIOHandleWithURLCompressionMethodError(NSURL url, MTLIOCompressionMethod compressionMethod, out NSError? error);
+    [Selector("newIOFileHandleWithURL:error:")]
+    MTLIOFileHandle? NewIOFileHandleWithURLError(NSURL url, out NSError? error);
+    [Selector("newIOFileHandleWithURL:compressionMethod:error:")]
+    MTLIOFileHandle? NewIOFileHandleWithURLCompressionMethodError(NSURL url, MTLIOCompressionMethod compressionMethod, out NSError? error);
+    [Selector("sparseTileSizeWithTextureType:pixelFormat:sampleCount:")]
+    MTLSize SparseTileSizeWithTextureTypePixelFormatSampleCount(MTLTextureType textureType, MTLPixelFormat pixelFormat, NSUInteger sampleCount);
+    [Optional]
+    [Selector("convertSparsePixelRegions:toTileRegions:withTileSize:alignmentMode:numRegions:")]
+    void ConvertSparsePixelRegionsToTileRegionsWithTileSizeAlignmentModeNumRegions(MTLRegion* pixelRegions, MTLRegion* tileRegions, MTLSize tileSize, MTLSparseTextureRegionAlignmentMode mode, NSUInteger numRegions);
+    [Optional]
+    [Selector("convertSparseTileRegions:toPixelRegions:withTileSize:numRegions:")]
+    void ConvertSparseTileRegionsToPixelRegionsWithTileSizeNumRegions(MTLRegion* tileRegions, MTLRegion* pixelRegions, MTLSize tileSize, NSUInteger numRegions);
+    [Selector("sparseTileSizeInBytesForSparsePageSize:")]
+    NSUInteger SparseTileSizeInBytesForSparsePageSize(MTLSparsePageSize sparsePageSize);
+    [Selector("sparseTileSizeWithTextureType:pixelFormat:sampleCount:sparsePageSize:")]
+    MTLSize SparseTileSizeWithTextureTypePixelFormatSampleCountSparsePageSize(MTLTextureType textureType, MTLPixelFormat pixelFormat, NSUInteger sampleCount, MTLSparsePageSize sparsePageSize);
+    [Selector("newCounterSampleBufferWithDescriptor:error:")]
+    MTLCounterSampleBuffer? NewCounterSampleBufferWithDescriptorError(MTLCounterSampleBufferDescriptor descriptor, out NSError? error);
+    [Selector("sampleTimestamps:gpuTimestamp:")]
+    void SampleTimestampsGpuTimestamp(MTLTimestamp* cpuTimestamp, MTLTimestamp* gpuTimestamp);
+    [Selector("newArgumentEncoderWithBufferBinding:")]
+    MTLArgumentEncoder NewArgumentEncoderWithBufferBinding(MTLBufferBinding bufferBinding);
+    [Selector("supportsCounterSampling:")]
+    bool SupportsCounterSampling(MTLCounterSamplingPoint samplingPoint);
+    [Selector("supportsVertexAmplificationCount:")]
+    bool SupportsVertexAmplificationCount(NSUInteger count);
+    [Selector("newDynamicLibrary:error:")]
+    MTLDynamicLibraryProtocol? NewDynamicLibraryError(MTLLibrary library, out NSError? error);
+    [Selector("newDynamicLibraryWithURL:error:")]
+    MTLDynamicLibraryProtocol? NewDynamicLibraryWithURLError(NSURL url, out NSError? error);
+    [Selector("newBinaryArchiveWithDescriptor:error:")]
+    MTLBinaryArchive? NewBinaryArchiveWithDescriptorError(MTLBinaryArchiveDescriptor descriptor, out NSError? error);
+    [Selector("accelerationStructureSizesWithDescriptor:")]
+    MTLAccelerationStructureSizes AccelerationStructureSizesWithDescriptor(MTLAccelerationStructureDescriptor descriptor);
+    [Selector("newAccelerationStructureWithSize:")]
+    MTLAccelerationStructure? NewAccelerationStructureWithSize(NSUInteger size);
+    [Selector("newAccelerationStructureWithDescriptor:")]
+    MTLAccelerationStructure? NewAccelerationStructureWithDescriptor(MTLAccelerationStructureDescriptor descriptor);
+    [Selector("heapAccelerationStructureSizeAndAlignWithSize:")]
+    MTLSizeAndAlign HeapAccelerationStructureSizeAndAlignWithSize(NSUInteger size);
+    [Selector("heapAccelerationStructureSizeAndAlignWithDescriptor:")]
+    MTLSizeAndAlign HeapAccelerationStructureSizeAndAlignWithDescriptor(MTLAccelerationStructureDescriptor descriptor);
+    [Selector("newResidencySetWithDescriptor:error:")]
+    MTLResidencySet? NewResidencySetWithDescriptorError(MTLResidencySetDescriptor desc, out NSError? error);
     /// macOS 26.0 and later.
-    [Selector("tensorSizeAndAlignWithDescriptor:")] MTLSizeAndAlign TensorSizeAndAlignWithDescriptor(MTLTensorDescriptor descriptor);
+    [Selector("tensorSizeAndAlignWithDescriptor:")]
+    MTLSizeAndAlign TensorSizeAndAlignWithDescriptor(MTLTensorDescriptor descriptor);
     /// macOS 26.0 and later.
-    [Selector("newTensorWithDescriptor:error:")] MTLTensor? NewTensorWithDescriptorError(MTLTensorDescriptor descriptor, out NSError? error);
+    [Selector("newTensorWithDescriptor:error:")]
+    MTLTensor? NewTensorWithDescriptorError(MTLTensorDescriptor descriptor, out NSError? error);
     /// macOS 26.0 and later.
-    [Selector("functionHandleWithFunction:")] MTLFunctionHandle? FunctionHandleWithFunction(MTLFunction function);
+    [Selector("functionHandleWithFunction:")]
+    MTLFunctionHandle? FunctionHandleWithFunction(MTLFunction function);
     /// macOS 26.0 and later.
-    [Selector("newCommandAllocator")] MTL4CommandAllocator? NewCommandAllocator();
+    [Selector("newCommandAllocator")]
+    MTL4CommandAllocator? NewCommandAllocator();
     /// macOS 26.0 and later.
-    [Selector("newCommandAllocatorWithDescriptor:error:")] MTL4CommandAllocator? NewCommandAllocatorWithDescriptorError(MTL4CommandAllocatorDescriptor descriptor, out NSError? error);
+    [Selector("newCommandAllocatorWithDescriptor:error:")]
+    MTL4CommandAllocator? NewCommandAllocatorWithDescriptorError(MTL4CommandAllocatorDescriptor descriptor, out NSError? error);
     /// macOS 26.0 and later.
-    [Selector("newMTL4CommandQueue")] MTL4CommandQueue? NewMTL4CommandQueue();
+    [Selector("newMTL4CommandQueue")]
+    MTL4CommandQueue? NewMTL4CommandQueue();
     /// macOS 26.0 and later.
-    [Selector("newMTL4CommandQueueWithDescriptor:error:")] MTL4CommandQueue? NewMTL4CommandQueueWithDescriptorError(MTL4CommandQueueDescriptor descriptor, out NSError? error);
+    [Selector("newMTL4CommandQueueWithDescriptor:error:")]
+    MTL4CommandQueue? NewMTL4CommandQueueWithDescriptorError(MTL4CommandQueueDescriptor descriptor, out NSError? error);
     /// macOS 26.0 and later.
-    [Selector("newCommandBuffer")] MTL4CommandBuffer? NewCommandBuffer();
+    [Selector("newCommandBuffer")]
+    MTL4CommandBuffer? NewCommandBuffer();
     /// macOS 26.0 and later.
-    [Selector("newArgumentTableWithDescriptor:error:")] MTL4ArgumentTable? NewArgumentTableWithDescriptorError(MTL4ArgumentTableDescriptor descriptor, out NSError? error);
+    [Selector("newArgumentTableWithDescriptor:error:")]
+    MTL4ArgumentTable? NewArgumentTableWithDescriptorError(MTL4ArgumentTableDescriptor descriptor, out NSError? error);
     /// macOS 26.0 and later.
-    [Selector("newTextureViewPoolWithDescriptor:error:")] MTLTextureViewPool? NewTextureViewPoolWithDescriptorError(MTLResourceViewPoolDescriptor descriptor, out NSError? error);
+    [Selector("newTextureViewPoolWithDescriptor:error:")]
+    MTLTextureViewPool? NewTextureViewPoolWithDescriptorError(MTLResourceViewPoolDescriptor descriptor, out NSError? error);
     /// macOS 26.0 and later.
-    [Selector("newCompilerWithDescriptor:error:")] MTL4Compiler? NewCompilerWithDescriptorError(MTL4CompilerDescriptor descriptor, out NSError? error);
+    [Selector("newCompilerWithDescriptor:error:")]
+    MTL4Compiler? NewCompilerWithDescriptorError(MTL4CompilerDescriptor descriptor, out NSError? error);
     /// macOS 26.0 and later.
-    [Selector("newArchiveWithURL:error:")] MTL4Archive? NewArchiveWithURLError(NSURL url, out NSError? error);
+    [Selector("newArchiveWithURL:error:")]
+    MTL4Archive? NewArchiveWithURLError(NSURL url, out NSError? error);
     /// macOS 26.0 and later.
-    [Selector("newPipelineDataSetSerializerWithDescriptor:")] MTL4PipelineDataSetSerializer NewPipelineDataSetSerializerWithDescriptor(MTL4PipelineDataSetSerializerDescriptor descriptor);
+    [Selector("newPipelineDataSetSerializerWithDescriptor:")]
+    MTL4PipelineDataSetSerializer NewPipelineDataSetSerializerWithDescriptor(MTL4PipelineDataSetSerializerDescriptor descriptor);
     /// macOS 26.0 and later.
-    [Selector("newBufferWithLength:options:placementSparsePageSize:")] MTLBuffer? NewBufferWithLengthOptionsPlacementSparsePageSize(NSUInteger length, MTLResourceOptions options, MTLSparsePageSize placementSparsePageSize);
+    [Selector("newBufferWithLength:options:placementSparsePageSize:")]
+    MTLBuffer? NewBufferWithLengthOptionsPlacementSparsePageSize(NSUInteger length, MTLResourceOptions options, MTLSparsePageSize placementSparsePageSize);
     /// macOS 26.0 and later.
-    [Selector("newCounterHeapWithDescriptor:error:")] MTL4CounterHeap? NewCounterHeapWithDescriptorError(MTL4CounterHeapDescriptor descriptor, out NSError? error);
+    [Selector("newCounterHeapWithDescriptor:error:")]
+    MTL4CounterHeap? NewCounterHeapWithDescriptorError(MTL4CounterHeapDescriptor descriptor, out NSError? error);
     /// macOS 26.0 and later.
-    [Selector("sizeOfCounterHeapEntry:")] NSUInteger SizeOfCounterHeapEntry(MTL4CounterHeapType type);
+    [Selector("sizeOfCounterHeapEntry:")]
+    NSUInteger SizeOfCounterHeapEntry(MTL4CounterHeapType type);
     /// macOS 26.0 and later.
-    [Selector("queryTimestampFrequency")] ulong QueryTimestampFrequency();
+    [Selector("queryTimestampFrequency")]
+    ulong QueryTimestampFrequency();
     /// macOS 26.0 and later.
-    [Selector("functionHandleWithBinaryFunction:")] MTLFunctionHandle? FunctionHandleWithBinaryFunction(MTL4BinaryFunctionProtocol function);
+    [Selector("functionHandleWithBinaryFunction:")]
+    MTLFunctionHandle? FunctionHandleWithBinaryFunction(MTL4BinaryFunctionProtocol function);
 }
 
 public using MTLTimestamp = ulong;

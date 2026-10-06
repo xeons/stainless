@@ -32,8 +32,10 @@ import Standard.ObjC;
 
 public extern objc class NSRotationGestureRecognizer : NSGestureRecognizer
 {
-    [Selector("rotation", "setRotation:")] public CGFloat Rotation { get; set; }
-    [Selector("rotationInDegrees", "setRotationInDegrees:")] public CGFloat RotationInDegrees { get; set; }
+    [Selector("rotation", "setRotation:")]
+    public CGFloat Rotation { get; set; }
+    [Selector("rotationInDegrees", "setRotationInDegrees:")]
+    public CGFloat RotationInDegrees { get; set; }
 }
 
 #endif

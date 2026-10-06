@@ -33,15 +33,24 @@ import Standard.ObjC;
 
 public extern objc class NSTextListElement : NSTextParagraph
 {
-    [Selector("textList")] public NSTextList TextList { get; }
-    [Selector("contents")] public NSAttributedString? Contents { get; }
-    [Selector("markerAttributes")] public NSDictionary? MarkerAttributes { get; }
-    [Selector("attributedString")] public NSAttributedString AttributedString { get; }
-    [Selector("childElements")] public NSArray ChildElements { get; }
-    [Selector("parentElement")] public NSTextListElement? ParentElement { get; }
-    [Selector("initWithParentElement:textList:contents:markerAttributes:childElements:")] public Self InitWithParentElementTextListContentsMarkerAttributesChildElements(NSTextListElement? parent, NSTextList textList, NSAttributedString? contents, NSDictionary? markerAttributes, NSArray? children);
-    [Selector("textListElementWithContents:markerAttributes:textList:childElements:")] public static Self TextListElementWithContentsMarkerAttributesTextListChildElements(NSAttributedString contents, NSDictionary? markerAttributes, NSTextList textList, NSArray? children);
-    [Selector("textListElementWithChildElements:textList:nestingLevel:")] public static Self? TextListElementWithChildElementsTextListNestingLevel(NSArray children, NSTextList textList, NSInteger nestingLevel);
+    [Selector("textList")]
+    public NSTextList TextList { get; }
+    [Selector("contents")]
+    public NSAttributedString? Contents { get; }
+    [Selector("markerAttributes")]
+    public NSDictionary? MarkerAttributes { get; }
+    [Selector("attributedString")]
+    public NSAttributedString AttributedString { get; }
+    [Selector("childElements")]
+    public NSArray ChildElements { get; }
+    [Selector("parentElement")]
+    public NSTextListElement? ParentElement { get; }
+    [Selector("initWithParentElement:textList:contents:markerAttributes:childElements:")]
+    public Self InitWithParentElementTextListContentsMarkerAttributesChildElements(NSTextListElement? parent, NSTextList textList, NSAttributedString? contents, NSDictionary? markerAttributes, NSArray? children);
+    [Selector("textListElementWithContents:markerAttributes:textList:childElements:")]
+    public static Self TextListElementWithContentsMarkerAttributesTextListChildElements(NSAttributedString contents, NSDictionary? markerAttributes, NSTextList textList, NSArray? children);
+    [Selector("textListElementWithChildElements:textList:nestingLevel:")]
+    public static Self? TextListElementWithChildElementsTextListNestingLevel(NSArray children, NSTextList textList, NSInteger nestingLevel);
 }
 
 #endif

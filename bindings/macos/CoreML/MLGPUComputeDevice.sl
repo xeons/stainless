@@ -33,7 +33,8 @@ import Standard.ObjC;
 
 public extern objc class MLGPUComputeDevice : NSObject, MLComputeDeviceProtocol
 {
-    [Selector("metalDevice")] public MTLDevice? MetalDevice { get; }
+    [Selector("metalDevice")]
+    public MTLDevice? MetalDevice { get; }
 }
 
 #endif

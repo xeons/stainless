@@ -34,20 +34,34 @@ import Standard.ObjC;
 /// NSScripting, a category of NSWindow.
 public extern objc class NSWindow
 {
-    [Selector("hasCloseBox")] public bool HasCloseBox { get; }
-    [Selector("hasTitleBar")] public bool HasTitleBar { get; }
-    [Selector("isFloatingPanel")] public bool FloatingPanel { get; }
-    [Selector("isMiniaturizable")] public bool Miniaturizable { get; }
-    [Selector("isModalPanel")] public bool ModalPanel { get; }
-    [Selector("isResizable")] public bool Resizable { get; }
-    [Selector("isZoomable")] public bool Zoomable { get; }
-    [Selector("orderedIndex", "setOrderedIndex:")] public NSInteger OrderedIndex { get; set; }
-    [Selector("setIsMiniaturized:")] public void SetIsMiniaturized(bool flag);
-    [Selector("setIsVisible:")] public void SetIsVisible(bool flag);
-    [Selector("setIsZoomed:")] public void SetIsZoomed(bool flag);
-    [Selector("handleCloseScriptCommand:")] public AnyObject? HandleCloseScriptCommand(NSCloseCommand command);
-    [Selector("handlePrintScriptCommand:")] public AnyObject? HandlePrintScriptCommand(NSScriptCommand command);
-    [Selector("handleSaveScriptCommand:")] public AnyObject? HandleSaveScriptCommand(NSScriptCommand command);
+    [Selector("hasCloseBox")]
+    public bool HasCloseBox { get; }
+    [Selector("hasTitleBar")]
+    public bool HasTitleBar { get; }
+    [Selector("isFloatingPanel")]
+    public bool FloatingPanel { get; }
+    [Selector("isMiniaturizable")]
+    public bool Miniaturizable { get; }
+    [Selector("isModalPanel")]
+    public bool ModalPanel { get; }
+    [Selector("isResizable")]
+    public bool Resizable { get; }
+    [Selector("isZoomable")]
+    public bool Zoomable { get; }
+    [Selector("orderedIndex", "setOrderedIndex:")]
+    public NSInteger OrderedIndex { get; set; }
+    [Selector("setIsMiniaturized:")]
+    public void SetIsMiniaturized(bool flag);
+    [Selector("setIsVisible:")]
+    public void SetIsVisible(bool flag);
+    [Selector("setIsZoomed:")]
+    public void SetIsZoomed(bool flag);
+    [Selector("handleCloseScriptCommand:")]
+    public AnyObject? HandleCloseScriptCommand(NSCloseCommand command);
+    [Selector("handlePrintScriptCommand:")]
+    public AnyObject? HandlePrintScriptCommand(NSScriptCommand command);
+    [Selector("handleSaveScriptCommand:")]
+    public AnyObject? HandleSaveScriptCommand(NSScriptCommand command);
 }
 
 #endif

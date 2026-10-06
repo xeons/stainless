@@ -34,22 +34,38 @@ import Standard.ObjC;
 /// Deprecated in macOS 14.3.
 public extern objc class MLCTensorDescriptor : NSObject, NSCopying
 {
-    [Selector("dataType")] public MLCDataType DataType { get; }
-    [Selector("dimensionCount")] public NSUInteger DimensionCount { get; }
-    [Selector("shape")] public NSArray? Shape { get; }
-    [Selector("stride")] public NSArray? Stride { get; }
-    [Selector("tensorAllocationSizeInBytes")] public NSUInteger TensorAllocationSizeInBytes { get; }
-    [Selector("sequenceLengths")] public NSArray? SequenceLengths { get; }
-    [Selector("sortedSequences")] public bool SortedSequences { get; }
-    [Selector("batchSizePerSequenceStep")] public NSArray? BatchSizePerSequenceStep { get; }
-    [Selector("maxTensorDimensions")] public static NSUInteger MaxTensorDimensions { get; }
-    [Selector("descriptorWithShape:dataType:")] public static Self? DescriptorWithShapeDataType(NSArray shape, MLCDataType dataType);
-    [Selector("descriptorWithShape:sequenceLengths:sortedSequences:dataType:")] public static Self? DescriptorWithShapeSequenceLengthsSortedSequencesDataType(NSArray shape, NSArray sequenceLengths, bool sortedSequences, MLCDataType dataType);
-    [Selector("descriptorWithWidth:height:featureChannelCount:batchSize:")] public static Self? DescriptorWithWidthHeightFeatureChannelCountBatchSize(NSUInteger width, NSUInteger height, NSUInteger featureChannels, NSUInteger batchSize);
-    [Selector("descriptorWithWidth:height:featureChannelCount:batchSize:dataType:")] public static Self? DescriptorWithWidthHeightFeatureChannelCountBatchSizeDataType(NSUInteger width, NSUInteger height, NSUInteger featureChannelCount, NSUInteger batchSize, MLCDataType dataType);
-    [Selector("convolutionWeightsDescriptorWithWidth:height:inputFeatureChannelCount:outputFeatureChannelCount:dataType:")] public static Self? ConvolutionWeightsDescriptorWithWidthHeightInputFeatureChannelCountOutputFeatureChannelCountDataType(NSUInteger width, NSUInteger height, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount, MLCDataType dataType);
-    [Selector("convolutionWeightsDescriptorWithInputFeatureChannelCount:outputFeatureChannelCount:dataType:")] public static Self? ConvolutionWeightsDescriptorWithInputFeatureChannelCountOutputFeatureChannelCountDataType(NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount, MLCDataType dataType);
-    [Selector("convolutionBiasesDescriptorWithFeatureChannelCount:dataType:")] public static Self? ConvolutionBiasesDescriptorWithFeatureChannelCountDataType(NSUInteger featureChannelCount, MLCDataType dataType);
+    [Selector("dataType")]
+    public MLCDataType DataType { get; }
+    [Selector("dimensionCount")]
+    public NSUInteger DimensionCount { get; }
+    [Selector("shape")]
+    public NSArray? Shape { get; }
+    [Selector("stride")]
+    public NSArray? Stride { get; }
+    [Selector("tensorAllocationSizeInBytes")]
+    public NSUInteger TensorAllocationSizeInBytes { get; }
+    [Selector("sequenceLengths")]
+    public NSArray? SequenceLengths { get; }
+    [Selector("sortedSequences")]
+    public bool SortedSequences { get; }
+    [Selector("batchSizePerSequenceStep")]
+    public NSArray? BatchSizePerSequenceStep { get; }
+    [Selector("maxTensorDimensions")]
+    public static NSUInteger MaxTensorDimensions { get; }
+    [Selector("descriptorWithShape:dataType:")]
+    public static Self? DescriptorWithShapeDataType(NSArray shape, MLCDataType dataType);
+    [Selector("descriptorWithShape:sequenceLengths:sortedSequences:dataType:")]
+    public static Self? DescriptorWithShapeSequenceLengthsSortedSequencesDataType(NSArray shape, NSArray sequenceLengths, bool sortedSequences, MLCDataType dataType);
+    [Selector("descriptorWithWidth:height:featureChannelCount:batchSize:")]
+    public static Self? DescriptorWithWidthHeightFeatureChannelCountBatchSize(NSUInteger width, NSUInteger height, NSUInteger featureChannels, NSUInteger batchSize);
+    [Selector("descriptorWithWidth:height:featureChannelCount:batchSize:dataType:")]
+    public static Self? DescriptorWithWidthHeightFeatureChannelCountBatchSizeDataType(NSUInteger width, NSUInteger height, NSUInteger featureChannelCount, NSUInteger batchSize, MLCDataType dataType);
+    [Selector("convolutionWeightsDescriptorWithWidth:height:inputFeatureChannelCount:outputFeatureChannelCount:dataType:")]
+    public static Self? ConvolutionWeightsDescriptorWithWidthHeightInputFeatureChannelCountOutputFeatureChannelCountDataType(NSUInteger width, NSUInteger height, NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount, MLCDataType dataType);
+    [Selector("convolutionWeightsDescriptorWithInputFeatureChannelCount:outputFeatureChannelCount:dataType:")]
+    public static Self? ConvolutionWeightsDescriptorWithInputFeatureChannelCountOutputFeatureChannelCountDataType(NSUInteger inputFeatureChannelCount, NSUInteger outputFeatureChannelCount, MLCDataType dataType);
+    [Selector("convolutionBiasesDescriptorWithFeatureChannelCount:dataType:")]
+    public static Self? ConvolutionBiasesDescriptorWithFeatureChannelCountDataType(NSUInteger featureChannelCount, MLCDataType dataType);
 }
 
 #endif

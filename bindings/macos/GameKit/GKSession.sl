@@ -35,30 +35,49 @@ import Standard.ObjC;
 public extern objc class GKSession : NSObject
 {
     /// Deprecated in macOS 10.10.
-    [Selector("delegate", "setDelegate:")] public GKSessionDelegate? Delegate { get; set; }
-    [Selector("sessionID")] public NSString? SessionID { get; }
-    [Selector("displayName")] public NSString? DisplayName { get; }
+    [Selector("delegate", "setDelegate:")]
+    public GKSessionDelegate? Delegate { get; set; }
+    [Selector("sessionID")]
+    public NSString? SessionID { get; }
+    [Selector("displayName")]
+    public NSString? DisplayName { get; }
     /// Deprecated in macOS 10.10.
-    [Selector("sessionMode")] public GKSessionMode SessionMode { get; }
-    [Selector("peerID")] public NSString? PeerID { get; }
-    [Selector("isAvailable", "setAvailable:")] public bool Available { get; set; }
-    [Selector("disconnectTimeout", "setDisconnectTimeout:")] public NSTimeInterval DisconnectTimeout { get; set; }
+    [Selector("sessionMode")]
+    public GKSessionMode SessionMode { get; }
+    [Selector("peerID")]
+    public NSString? PeerID { get; }
+    [Selector("isAvailable", "setAvailable:")]
+    public bool Available { get; set; }
+    [Selector("disconnectTimeout", "setDisconnectTimeout:")]
+    public NSTimeInterval DisconnectTimeout { get; set; }
     /// Deprecated in macOS 10.10.
-    [Selector("initWithSessionID:displayName:sessionMode:")] public AnyObject? InitWithSessionIDDisplayNameSessionMode(NSString? sessionID, NSString? name, GKSessionMode mode);
-    [Selector("displayNameForPeer:")] public NSString? DisplayNameForPeer(NSString? peerID);
+    [Selector("initWithSessionID:displayName:sessionMode:")]
+    public AnyObject? InitWithSessionIDDisplayNameSessionMode(NSString? sessionID, NSString? name, GKSessionMode mode);
+    [Selector("displayNameForPeer:")]
+    public NSString? DisplayNameForPeer(NSString? peerID);
     /// Deprecated in macOS 10.10.
-    [Selector("sendData:toPeers:withDataMode:error:")] public bool SendDataToPeersWithDataModeError(NSData? data, NSArray? peers, GKSendDataMode mode, out NSError? error);
+    [Selector("sendData:toPeers:withDataMode:error:")]
+    public bool SendDataToPeersWithDataModeError(NSData? data, NSArray? peers, GKSendDataMode mode, out NSError? error);
     /// Deprecated in macOS 10.10.
-    [Selector("sendDataToAllPeers:withDataMode:error:")] public bool SendDataToAllPeersWithDataModeError(NSData? data, GKSendDataMode mode, out NSError? error);
-    [Selector("setDataReceiveHandler:withContext:")] public void SetDataReceiveHandlerWithContext(AnyObject? handler, void* context);
-    [Selector("connectToPeer:withTimeout:")] public void ConnectToPeerWithTimeout(NSString? peerID, NSTimeInterval timeout);
-    [Selector("cancelConnectToPeer:")] public void CancelConnectToPeer(NSString? peerID);
-    [Selector("acceptConnectionFromPeer:error:")] public bool AcceptConnectionFromPeerError(NSString? peerID, out NSError? error);
-    [Selector("denyConnectionFromPeer:")] public void DenyConnectionFromPeer(NSString? peerID);
-    [Selector("disconnectPeerFromAllPeers:")] public void DisconnectPeerFromAllPeers(NSString? peerID);
-    [Selector("disconnectFromAllPeers")] public void DisconnectFromAllPeers();
+    [Selector("sendDataToAllPeers:withDataMode:error:")]
+    public bool SendDataToAllPeersWithDataModeError(NSData? data, GKSendDataMode mode, out NSError? error);
+    [Selector("setDataReceiveHandler:withContext:")]
+    public void SetDataReceiveHandlerWithContext(AnyObject? handler, void* context);
+    [Selector("connectToPeer:withTimeout:")]
+    public void ConnectToPeerWithTimeout(NSString? peerID, NSTimeInterval timeout);
+    [Selector("cancelConnectToPeer:")]
+    public void CancelConnectToPeer(NSString? peerID);
+    [Selector("acceptConnectionFromPeer:error:")]
+    public bool AcceptConnectionFromPeerError(NSString? peerID, out NSError? error);
+    [Selector("denyConnectionFromPeer:")]
+    public void DenyConnectionFromPeer(NSString? peerID);
+    [Selector("disconnectPeerFromAllPeers:")]
+    public void DisconnectPeerFromAllPeers(NSString? peerID);
+    [Selector("disconnectFromAllPeers")]
+    public void DisconnectFromAllPeers();
     /// Deprecated in macOS 10.10.
-    [Selector("peersWithConnectionState:")] public NSArray? PeersWithConnectionState(GKPeerConnectionState state);
+    [Selector("peersWithConnectionState:")]
+    public NSArray? PeersWithConnectionState(GKPeerConnectionState state);
 }
 
 #endif

@@ -33,21 +33,32 @@ import Standard.ObjC;
 
 public extern objc class NSDictionaryControllerKeyValuePair : NSObject
 {
-    [Selector("key", "setKey:")] public NSString? Key { get; set; }
-    [Selector("value", "setValue:")] public AnyObject? Value { get; set; }
-    [Selector("localizedKey", "setLocalizedKey:")] public NSString? LocalizedKey { get; set; }
-    [Selector("isExplicitlyIncluded")] public bool ExplicitlyIncluded { get; }
+    [Selector("key", "setKey:")]
+    public NSString? Key { get; set; }
+    [Selector("value", "setValue:")]
+    public AnyObject? Value { get; set; }
+    [Selector("localizedKey", "setLocalizedKey:")]
+    public NSString? LocalizedKey { get; set; }
+    [Selector("isExplicitlyIncluded")]
+    public bool ExplicitlyIncluded { get; }
 }
 
 public extern objc class NSDictionaryController : NSArrayController
 {
-    [Selector("initialKey", "setInitialKey:")] public NSString InitialKey { get; set; }
-    [Selector("initialValue", "setInitialValue:")] public AnyObject InitialValue { get; set; }
-    [Selector("includedKeys", "setIncludedKeys:")] public NSArray IncludedKeys { get; set; }
-    [Selector("excludedKeys", "setExcludedKeys:")] public NSArray ExcludedKeys { get; set; }
-    [Selector("localizedKeyDictionary", "setLocalizedKeyDictionary:")] public NSDictionary LocalizedKeyDictionary { get; set; }
-    [Selector("localizedKeyTable", "setLocalizedKeyTable:")] public NSString? LocalizedKeyTable { get; set; }
-    [Selector("newObject")] public NSDictionaryControllerKeyValuePair NewObject();
+    [Selector("initialKey", "setInitialKey:")]
+    public NSString InitialKey { get; set; }
+    [Selector("initialValue", "setInitialValue:")]
+    public AnyObject InitialValue { get; set; }
+    [Selector("includedKeys", "setIncludedKeys:")]
+    public NSArray IncludedKeys { get; set; }
+    [Selector("excludedKeys", "setExcludedKeys:")]
+    public NSArray ExcludedKeys { get; set; }
+    [Selector("localizedKeyDictionary", "setLocalizedKeyDictionary:")]
+    public NSDictionary LocalizedKeyDictionary { get; set; }
+    [Selector("localizedKeyTable", "setLocalizedKeyTable:")]
+    public NSString? LocalizedKeyTable { get; set; }
+    [Selector("newObject")]
+    public NSDictionaryControllerKeyValuePair NewObject();
 }
 
 #endif

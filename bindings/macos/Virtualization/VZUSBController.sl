@@ -37,9 +37,12 @@ public objc closure void VZUSBControllerDetachDeviceCompletionHandlerCompletionH
 
 public extern objc class VZUSBController : NSObject
 {
-    [Selector("usbDevices")] public NSArray UsbDevices { get; }
-    [Selector("attachDevice:completionHandler:")] public void AttachDeviceCompletionHandler(VZUSBDevice device, VZUSBControllerAttachDeviceCompletionHandlerCompletionHandlerBlock completionHandler);
-    [Selector("detachDevice:completionHandler:")] public void DetachDeviceCompletionHandler(VZUSBDevice device, VZUSBControllerDetachDeviceCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("usbDevices")]
+    public NSArray UsbDevices { get; }
+    [Selector("attachDevice:completionHandler:")]
+    public void AttachDeviceCompletionHandler(VZUSBDevice device, VZUSBControllerAttachDeviceCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("detachDevice:completionHandler:")]
+    public void DetachDeviceCompletionHandler(VZUSBDevice device, VZUSBControllerDetachDeviceCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 #endif

@@ -39,15 +39,24 @@ public using NSHelpManagerContextHelpKey = NSString;
 
 public extern objc class NSHelpManager : NSObject
 {
-    [Selector("sharedHelpManager")] public static NSHelpManager SharedHelpManager { get; }
-    [Selector("isContextHelpModeActive", "setContextHelpModeActive:")] public static bool ContextHelpModeActive { get; set; }
-    [Selector("setContextHelp:forObject:")] public void SetContextHelpForObject(NSAttributedString attrString, AnyObject object);
-    [Selector("removeContextHelpForObject:")] public void RemoveContextHelpForObject(AnyObject object);
-    [Selector("contextHelpForObject:")] public NSAttributedString? ContextHelpForObject(AnyObject object);
-    [Selector("showContextHelpForObject:locationHint:")] public bool ShowContextHelpForObjectLocationHint(AnyObject object, NSPoint pt);
-    [Selector("openHelpAnchor:inBook:")] public void OpenHelpAnchorInBook(NSHelpAnchorName anchor, NSHelpBookName? book);
-    [Selector("findString:inBook:")] public void FindStringInBook(NSString query, NSHelpBookName? book);
-    [Selector("registerBooksInBundle:")] public bool RegisterBooksInBundle(NSBundle bundle);
+    [Selector("sharedHelpManager")]
+    public static NSHelpManager SharedHelpManager { get; }
+    [Selector("isContextHelpModeActive", "setContextHelpModeActive:")]
+    public static bool ContextHelpModeActive { get; set; }
+    [Selector("setContextHelp:forObject:")]
+    public void SetContextHelpForObject(NSAttributedString attrString, AnyObject object);
+    [Selector("removeContextHelpForObject:")]
+    public void RemoveContextHelpForObject(AnyObject object);
+    [Selector("contextHelpForObject:")]
+    public NSAttributedString? ContextHelpForObject(AnyObject object);
+    [Selector("showContextHelpForObject:locationHint:")]
+    public bool ShowContextHelpForObjectLocationHint(AnyObject object, NSPoint pt);
+    [Selector("openHelpAnchor:inBook:")]
+    public void OpenHelpAnchorInBook(NSHelpAnchorName anchor, NSHelpBookName? book);
+    [Selector("findString:inBook:")]
+    public void FindStringInBook(NSString query, NSHelpBookName? book);
+    [Selector("registerBooksInBundle:")]
+    public bool RegisterBooksInBundle(NSBundle bundle);
 }
 
 public extern "C" NSNotificationName NSContextHelpModeDidActivateNotification;
@@ -57,14 +66,17 @@ public extern "C" NSNotificationName NSContextHelpModeDidDeactivateNotification;
 /// NSBundleHelpExtension, a category of NSBundle.
 public extern objc class NSBundle
 {
-    [Selector("contextHelpForKey:")] public NSAttributedString? ContextHelpForKey(NSHelpManagerContextHelpKey key);
+    [Selector("contextHelpForKey:")]
+    public NSAttributedString? ContextHelpForKey(NSHelpManagerContextHelpKey key);
 }
 
 /// NSApplicationHelpExtension, a category of NSApplication.
 public extern objc class NSApplication
 {
-    [Selector("activateContextHelpMode:")] public void ActivateContextHelpMode(AnyObject? sender);
-    [Selector("showHelp:")] public void ShowHelp(AnyObject? sender);
+    [Selector("activateContextHelpMode:")]
+    public void ActivateContextHelpMode(AnyObject? sender);
+    [Selector("showHelp:")]
+    public void ShowHelp(AnyObject? sender);
 }
 
 #endif

@@ -42,9 +42,12 @@ public enum MTL4BinaryFunctionOptions : ulong
 /// macOS 26.0 and later.
 public extern objc class MTL4BinaryFunctionDescriptor : NSObject, NSCopying
 {
-    [Selector("name", "setName:")] public NSString Name { get; set; }
-    [Selector("functionDescriptor", "setFunctionDescriptor:")] public MTL4FunctionDescriptor FunctionDescriptor { get; set; }
-    [Selector("options", "setOptions:")] public MTL4BinaryFunctionOptions Options { get; set; }
+    [Selector("name", "setName:")]
+    public NSString Name { get; set; }
+    [Selector("functionDescriptor", "setFunctionDescriptor:")]
+    public MTL4FunctionDescriptor FunctionDescriptor { get; set; }
+    [Selector("options", "setOptions:")]
+    public MTL4BinaryFunctionOptions Options { get; set; }
 }
 
 #endif

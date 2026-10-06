@@ -34,44 +34,80 @@ import Standard.ObjC;
 
 public extern objc class MPSCNNInstanceNormalizationGradientState : MPSNNGradientState
 {
-    [Selector("instanceNormalization")] public MPSCNNInstanceNormalization InstanceNormalization { get; }
-    [Selector("gamma")] public MTLBuffer? Gamma { get; }
-    [Selector("beta")] public MTLBuffer? Beta { get; }
-    [Selector("gradientForGamma")] public MTLBuffer GradientForGamma { get; }
-    [Selector("gradientForBeta")] public MTLBuffer GradientForBeta { get; }
+    [Selector("instanceNormalization")]
+    public MPSCNNInstanceNormalization InstanceNormalization { get; }
+    [Selector("gamma")]
+    public MTLBuffer? Gamma { get; }
+    [Selector("beta")]
+    public MTLBuffer? Beta { get; }
+    [Selector("gradientForGamma")]
+    public MTLBuffer GradientForGamma { get; }
+    [Selector("gradientForBeta")]
+    public MTLBuffer GradientForBeta { get; }
 }
 
 public using MPSCNNInstanceNormalizationGradientStateBatch = NSArray;
 
 public objc interface MPSCNNInstanceNormalizationDataSource : NSObjectProtocol, NSCopying
 {
-    [Selector("numberOfFeatureChannels")] NSUInteger NumberOfFeatureChannels { get; }
-    [Optional] [Selector("supportsSecureCoding")] static abstract bool SupportsSecureCoding { get; }
-    [Selector("gamma")] float* Gamma();
-    [Selector("beta")] float* Beta();
-    [Selector("label")] NSString? Label();
-    [Optional] [Selector("updateGammaAndBetaWithCommandBuffer:instanceNormalizationStateBatch:")] MPSCNNNormalizationGammaAndBetaState? UpdateGammaAndBetaWithCommandBufferInstanceNormalizationStateBatch(MTLCommandBuffer commandBuffer, MPSCNNInstanceNormalizationGradientStateBatch instanceNormalizationStateBatch);
-    [Optional] [Selector("updateGammaAndBetaWithInstanceNormalizationStateBatch:")] bool UpdateGammaAndBetaWithInstanceNormalizationStateBatch(MPSCNNInstanceNormalizationGradientStateBatch instanceNormalizationStateBatch);
-    [Optional] [Selector("epsilon")] float Epsilon();
-    [Optional] [Selector("encodeWithCoder:")] void EncodeWithCoder(NSCoder aCoder);
-    [Optional] [Selector("initWithCoder:")] Self? InitWithCoder(NSCoder aDecoder);
-    [Optional] [Selector("copyWithZone:device:")] Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
-    [Optional] [Selector("load")] bool Load();
-    [Optional] [Selector("purge")] void Purge();
+    [Selector("numberOfFeatureChannels")]
+    NSUInteger NumberOfFeatureChannels { get; }
+    [Optional]
+    [Selector("supportsSecureCoding")]
+    static abstract bool SupportsSecureCoding { get; }
+    [Selector("gamma")]
+    float* Gamma();
+    [Selector("beta")]
+    float* Beta();
+    [Selector("label")]
+    NSString? Label();
+    [Optional]
+    [Selector("updateGammaAndBetaWithCommandBuffer:instanceNormalizationStateBatch:")]
+    MPSCNNNormalizationGammaAndBetaState? UpdateGammaAndBetaWithCommandBufferInstanceNormalizationStateBatch(MTLCommandBuffer commandBuffer, MPSCNNInstanceNormalizationGradientStateBatch instanceNormalizationStateBatch);
+    [Optional]
+    [Selector("updateGammaAndBetaWithInstanceNormalizationStateBatch:")]
+    bool UpdateGammaAndBetaWithInstanceNormalizationStateBatch(MPSCNNInstanceNormalizationGradientStateBatch instanceNormalizationStateBatch);
+    [Optional]
+    [Selector("epsilon")]
+    float Epsilon();
+    [Optional]
+    [Selector("encodeWithCoder:")]
+    void EncodeWithCoder(NSCoder aCoder);
+    [Optional]
+    [Selector("initWithCoder:")]
+    Self? InitWithCoder(NSCoder aDecoder);
+    [Optional]
+    [Selector("copyWithZone:device:")]
+    Self CopyWithZoneDevice(_NSZone* zone, MTLDevice? device);
+    [Optional]
+    [Selector("load")]
+    bool Load();
+    [Optional]
+    [Selector("purge")]
+    void Purge();
 }
 
 public extern objc class MPSCNNInstanceNormalization : MPSCNNKernel
 {
-    [Selector("epsilon", "setEpsilon:")] public float Epsilon { get; set; }
-    [Selector("dataSource")] public MPSCNNInstanceNormalizationDataSource DataSource { get; }
-    [Selector("initWithDevice:dataSource:")] public Self InitWithDeviceDataSource(MTLDevice device, MPSCNNInstanceNormalizationDataSource dataSource);
-    [Selector("initWithCoder:device:")] public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
+    [Selector("epsilon", "setEpsilon:")]
+    public float Epsilon { get; set; }
+    [Selector("dataSource")]
+    public MPSCNNInstanceNormalizationDataSource DataSource { get; }
+    [Selector("initWithDevice:dataSource:")]
+    public Self InitWithDeviceDataSource(MTLDevice device, MPSCNNInstanceNormalizationDataSource dataSource);
+    [Selector("initWithCoder:device:")]
+    public Self? InitWithCoderDevice(NSCoder aDecoder, MTLDevice device);
     /// Deprecated in macOS 10.14.
-    [Selector("reloadDataSource:")] public void ReloadDataSource(MPSCNNInstanceNormalizationDataSource dataSource);
-    [Selector("reloadGammaAndBetaFromDataSource")] public void ReloadGammaAndBetaFromDataSource();
-    [Selector("reloadGammaAndBetaWithCommandBuffer:gammaAndBetaState:")] public void ReloadGammaAndBetaWithCommandBufferGammaAndBetaState(MTLCommandBuffer commandBuffer, MPSCNNNormalizationGammaAndBetaState gammaAndBetaState);
-    [Selector("resultStateForSourceImage:sourceStates:destinationImage:")] public MPSCNNInstanceNormalizationGradientState? ResultStateForSourceImageSourceStatesDestinationImage(MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
-    [Selector("temporaryResultStateForCommandBuffer:sourceImage:sourceStates:destinationImage:")] public MPSCNNInstanceNormalizationGradientState? TemporaryResultStateForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
+    [Selector("reloadDataSource:")]
+    public void ReloadDataSource(MPSCNNInstanceNormalizationDataSource dataSource);
+    [Selector("reloadGammaAndBetaFromDataSource")]
+    public void ReloadGammaAndBetaFromDataSource();
+    [Selector("reloadGammaAndBetaWithCommandBuffer:gammaAndBetaState:")]
+    public void ReloadGammaAndBetaWithCommandBufferGammaAndBetaState(MTLCommandBuffer commandBuffer, MPSCNNNormalizationGammaAndBetaState gammaAndBetaState);
+    [Selector("resultStateForSourceImage:sourceStates:destinationImage:")]
+    public MPSCNNInstanceNormalizationGradientState? ResultStateForSourceImageSourceStatesDestinationImage(MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
+    [Selector("temporaryResultStateForCommandBuffer:sourceImage:sourceStates:destinationImage:")]
+    public MPSCNNInstanceNormalizationGradientState? TemporaryResultStateForCommandBufferSourceImageSourceStatesDestinationImage(MTLCommandBuffer commandBuffer, MPSImage sourceImage, NSArray? sourceStates, MPSImage destinationImage);
 }
 
 public extern objc class MPSCNNInstanceNormalizationGradient : MPSCNNGradientKernel { }

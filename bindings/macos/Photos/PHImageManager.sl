@@ -60,22 +60,34 @@ public objc closure void PHAssetImageProgressHandler(double arg0, NSError? arg1,
 
 public extern objc class PHImageRequestOptions : NSObject, NSCopying
 {
-    [Selector("version", "setVersion:")] public PHImageRequestOptionsVersion Version { get; set; }
-    [Selector("deliveryMode", "setDeliveryMode:")] public PHImageRequestOptionsDeliveryMode DeliveryMode { get; set; }
-    [Selector("resizeMode", "setResizeMode:")] public PHImageRequestOptionsResizeMode ResizeMode { get; set; }
-    [Selector("normalizedCropRect", "setNormalizedCropRect:")] public CGRect NormalizedCropRect { get; set; }
-    [Selector("isNetworkAccessAllowed", "setNetworkAccessAllowed:")] public bool NetworkAccessAllowed { get; set; }
-    [Selector("isSynchronous", "setSynchronous:")] public bool Synchronous { get; set; }
-    [Selector("progressHandler", "setProgressHandler:")] public PHAssetImageProgressHandler? ProgressHandler { get; set; }
-    [Selector("allowSecondaryDegradedImage", "setAllowSecondaryDegradedImage:")] public bool AllowSecondaryDegradedImage { get; set; }
+    [Selector("version", "setVersion:")]
+    public PHImageRequestOptionsVersion Version { get; set; }
+    [Selector("deliveryMode", "setDeliveryMode:")]
+    public PHImageRequestOptionsDeliveryMode DeliveryMode { get; set; }
+    [Selector("resizeMode", "setResizeMode:")]
+    public PHImageRequestOptionsResizeMode ResizeMode { get; set; }
+    [Selector("normalizedCropRect", "setNormalizedCropRect:")]
+    public CGRect NormalizedCropRect { get; set; }
+    [Selector("isNetworkAccessAllowed", "setNetworkAccessAllowed:")]
+    public bool NetworkAccessAllowed { get; set; }
+    [Selector("isSynchronous", "setSynchronous:")]
+    public bool Synchronous { get; set; }
+    [Selector("progressHandler", "setProgressHandler:")]
+    public PHAssetImageProgressHandler? ProgressHandler { get; set; }
+    [Selector("allowSecondaryDegradedImage", "setAllowSecondaryDegradedImage:")]
+    public bool AllowSecondaryDegradedImage { get; set; }
 }
 
 public extern objc class PHLivePhotoRequestOptions : NSObject, NSCopying
 {
-    [Selector("version", "setVersion:")] public PHImageRequestOptionsVersion Version { get; set; }
-    [Selector("deliveryMode", "setDeliveryMode:")] public PHImageRequestOptionsDeliveryMode DeliveryMode { get; set; }
-    [Selector("isNetworkAccessAllowed", "setNetworkAccessAllowed:")] public bool NetworkAccessAllowed { get; set; }
-    [Selector("progressHandler", "setProgressHandler:")] public PHAssetImageProgressHandler? ProgressHandler { get; set; }
+    [Selector("version", "setVersion:")]
+    public PHImageRequestOptionsVersion Version { get; set; }
+    [Selector("deliveryMode", "setDeliveryMode:")]
+    public PHImageRequestOptionsDeliveryMode DeliveryMode { get; set; }
+    [Selector("isNetworkAccessAllowed", "setNetworkAccessAllowed:")]
+    public bool NetworkAccessAllowed { get; set; }
+    [Selector("progressHandler", "setProgressHandler:")]
+    public PHAssetImageProgressHandler? ProgressHandler { get; set; }
 }
 
 public enum PHVideoRequestOptionsVersion : long
@@ -96,10 +108,14 @@ public objc closure void PHAssetVideoProgressHandler(double arg0, NSError? arg1,
 
 public extern objc class PHVideoRequestOptions : NSObject, NSCopying
 {
-    [Selector("isNetworkAccessAllowed", "setNetworkAccessAllowed:")] public bool NetworkAccessAllowed { get; set; }
-    [Selector("version", "setVersion:")] public PHVideoRequestOptionsVersion Version { get; set; }
-    [Selector("deliveryMode", "setDeliveryMode:")] public PHVideoRequestOptionsDeliveryMode DeliveryMode { get; set; }
-    [Selector("progressHandler", "setProgressHandler:")] public PHAssetVideoProgressHandler? ProgressHandler { get; set; }
+    [Selector("isNetworkAccessAllowed", "setNetworkAccessAllowed:")]
+    public bool NetworkAccessAllowed { get; set; }
+    [Selector("version", "setVersion:")]
+    public PHVideoRequestOptionsVersion Version { get; set; }
+    [Selector("deliveryMode", "setDeliveryMode:")]
+    public PHVideoRequestOptionsDeliveryMode DeliveryMode { get; set; }
+    [Selector("progressHandler", "setProgressHandler:")]
+    public PHAssetVideoProgressHandler? ProgressHandler { get; set; }
 }
 
 public using PHImageRequestID = int;
@@ -130,23 +146,35 @@ public objc closure void PHImageManagerRequestAVAssetForVideoOptionsResultHandle
 
 public extern objc class PHImageManager : NSObject
 {
-    [Selector("defaultManager")] public static PHImageManager DefaultManager();
-    [Selector("requestImageForAsset:targetSize:contentMode:options:resultHandler:")] public PHImageRequestID RequestImageForAssetTargetSizeContentModeOptionsResultHandler(PHAsset asset, CGSize targetSize, PHImageContentMode contentMode, PHImageRequestOptions? options, PHImageManagerRequestImageForAssetTargetSizeContentModeOptionsResultHandlerResultHandlerBlock resultHandler);
-    [Selector("requestImageDataAndOrientationForAsset:options:resultHandler:")] public PHImageRequestID RequestImageDataAndOrientationForAssetOptionsResultHandler(PHAsset asset, PHImageRequestOptions? options, PHImageManagerRequestImageDataAndOrientationForAssetOptionsResultHandlerResultHandlerBlock resultHandler);
-    [Selector("cancelImageRequest:")] public void CancelImageRequest(PHImageRequestID requestID);
-    [Selector("requestLivePhotoForAsset:targetSize:contentMode:options:resultHandler:")] public PHImageRequestID RequestLivePhotoForAssetTargetSizeContentModeOptionsResultHandler(PHAsset asset, CGSize targetSize, PHImageContentMode contentMode, PHLivePhotoRequestOptions? options, PHImageManagerRequestLivePhotoForAssetTargetSizeContentModeOptionsResultHandlerResultHandlerBlock resultHandler);
-    [Selector("requestPlayerItemForVideo:options:resultHandler:")] public PHImageRequestID RequestPlayerItemForVideoOptionsResultHandler(PHAsset asset, PHVideoRequestOptions? options, PHImageManagerRequestPlayerItemForVideoOptionsResultHandlerResultHandlerBlock resultHandler);
-    [Selector("requestExportSessionForVideo:options:exportPreset:resultHandler:")] public PHImageRequestID RequestExportSessionForVideoOptionsExportPresetResultHandler(PHAsset asset, PHVideoRequestOptions? options, NSString exportPreset, PHImageManagerRequestExportSessionForVideoOptionsExportPresetResultHandlerResultHandlerBlock resultHandler);
-    [Selector("requestAVAssetForVideo:options:resultHandler:")] public PHImageRequestID RequestAVAssetForVideoOptionsResultHandler(PHAsset asset, PHVideoRequestOptions? options, PHImageManagerRequestAVAssetForVideoOptionsResultHandlerResultHandlerBlock resultHandler);
+    [Selector("defaultManager")]
+    public static PHImageManager DefaultManager();
+    [Selector("requestImageForAsset:targetSize:contentMode:options:resultHandler:")]
+    public PHImageRequestID RequestImageForAssetTargetSizeContentModeOptionsResultHandler(PHAsset asset, CGSize targetSize, PHImageContentMode contentMode, PHImageRequestOptions? options, PHImageManagerRequestImageForAssetTargetSizeContentModeOptionsResultHandlerResultHandlerBlock resultHandler);
+    [Selector("requestImageDataAndOrientationForAsset:options:resultHandler:")]
+    public PHImageRequestID RequestImageDataAndOrientationForAssetOptionsResultHandler(PHAsset asset, PHImageRequestOptions? options, PHImageManagerRequestImageDataAndOrientationForAssetOptionsResultHandlerResultHandlerBlock resultHandler);
+    [Selector("cancelImageRequest:")]
+    public void CancelImageRequest(PHImageRequestID requestID);
+    [Selector("requestLivePhotoForAsset:targetSize:contentMode:options:resultHandler:")]
+    public PHImageRequestID RequestLivePhotoForAssetTargetSizeContentModeOptionsResultHandler(PHAsset asset, CGSize targetSize, PHImageContentMode contentMode, PHLivePhotoRequestOptions? options, PHImageManagerRequestLivePhotoForAssetTargetSizeContentModeOptionsResultHandlerResultHandlerBlock resultHandler);
+    [Selector("requestPlayerItemForVideo:options:resultHandler:")]
+    public PHImageRequestID RequestPlayerItemForVideoOptionsResultHandler(PHAsset asset, PHVideoRequestOptions? options, PHImageManagerRequestPlayerItemForVideoOptionsResultHandlerResultHandlerBlock resultHandler);
+    [Selector("requestExportSessionForVideo:options:exportPreset:resultHandler:")]
+    public PHImageRequestID RequestExportSessionForVideoOptionsExportPresetResultHandler(PHAsset asset, PHVideoRequestOptions? options, NSString exportPreset, PHImageManagerRequestExportSessionForVideoOptionsExportPresetResultHandlerResultHandlerBlock resultHandler);
+    [Selector("requestAVAssetForVideo:options:resultHandler:")]
+    public PHImageRequestID RequestAVAssetForVideoOptionsResultHandler(PHAsset asset, PHVideoRequestOptions? options, PHImageManagerRequestAVAssetForVideoOptionsResultHandlerResultHandlerBlock resultHandler);
 }
 
 public extern objc class PHCachingImageManager : PHImageManager
 {
     /// Deprecated in macOS 26.0.
-    [Selector("allowsCachingHighQualityImages", "setAllowsCachingHighQualityImages:")] public bool AllowsCachingHighQualityImages { get; set; }
-    [Selector("startCachingImagesForAssets:targetSize:contentMode:options:")] public void StartCachingImagesForAssetsTargetSizeContentModeOptions(NSArray assets, CGSize targetSize, PHImageContentMode contentMode, PHImageRequestOptions? options);
-    [Selector("stopCachingImagesForAssets:targetSize:contentMode:options:")] public void StopCachingImagesForAssetsTargetSizeContentModeOptions(NSArray assets, CGSize targetSize, PHImageContentMode contentMode, PHImageRequestOptions? options);
-    [Selector("stopCachingImagesForAllAssets")] public void StopCachingImagesForAllAssets();
+    [Selector("allowsCachingHighQualityImages", "setAllowsCachingHighQualityImages:")]
+    public bool AllowsCachingHighQualityImages { get; set; }
+    [Selector("startCachingImagesForAssets:targetSize:contentMode:options:")]
+    public void StartCachingImagesForAssetsTargetSizeContentModeOptions(NSArray assets, CGSize targetSize, PHImageContentMode contentMode, PHImageRequestOptions? options);
+    [Selector("stopCachingImagesForAssets:targetSize:contentMode:options:")]
+    public void StopCachingImagesForAssetsTargetSizeContentModeOptions(NSArray assets, CGSize targetSize, PHImageContentMode contentMode, PHImageRequestOptions? options);
+    [Selector("stopCachingImagesForAllAssets")]
+    public void StopCachingImagesForAllAssets();
 }
 
 #endif

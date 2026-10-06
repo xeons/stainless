@@ -33,8 +33,10 @@ import Standard.ObjC;
 
 public extern objc class CNGroup : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("name")] public NSString Name { get; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("name")]
+    public NSString Name { get; }
 }
 
 public extern "C" NSString? CNGroupIdentifierKey;

@@ -33,16 +33,26 @@ import Standard.ObjC;
 
 public extern objc class AVB17221EntityDiscovery : NSObject
 {
-    [Selector("interfaceName", "setInterfaceName:")] public NSString InterfaceName { get; set; }
-    [Selector("interface")] public AVBInterface? Interface { get; }
-    [Selector("discoveryDelegate", "setDiscoveryDelegate:")] public AVB17221EntityDiscoveryDelegate? DiscoveryDelegate { get; set; }
-    [Selector("initWithInterfaceName:")] public Self InitWithInterfaceName(NSString anInterfaceName);
-    [Selector("primeIterators")] public void PrimeIterators();
-    [Selector("discoverEntities")] public bool DiscoverEntities();
-    [Selector("discoverEntity:")] public bool DiscoverEntity(ulong entityID);
-    [Selector("addLocalEntity:error:")] public bool AddLocalEntityError(AVB17221Entity anEntity, out NSError? error);
-    [Selector("removeLocalEntity:error:")] public bool RemoveLocalEntityError(ulong guid, out NSError? error);
-    [Selector("changeEntityWithEntityID:toNewGPTPGrandmasterID:error:")] public bool ChangeEntityWithEntityIDToNewGPTPGrandmasterIDError(ulong entityID, ulong gPTPGrandmasterID, out NSError? error);
+    [Selector("interfaceName", "setInterfaceName:")]
+    public NSString InterfaceName { get; set; }
+    [Selector("interface")]
+    public AVBInterface? Interface { get; }
+    [Selector("discoveryDelegate", "setDiscoveryDelegate:")]
+    public AVB17221EntityDiscoveryDelegate? DiscoveryDelegate { get; set; }
+    [Selector("initWithInterfaceName:")]
+    public Self InitWithInterfaceName(NSString anInterfaceName);
+    [Selector("primeIterators")]
+    public void PrimeIterators();
+    [Selector("discoverEntities")]
+    public bool DiscoverEntities();
+    [Selector("discoverEntity:")]
+    public bool DiscoverEntity(ulong entityID);
+    [Selector("addLocalEntity:error:")]
+    public bool AddLocalEntityError(AVB17221Entity anEntity, out NSError? error);
+    [Selector("removeLocalEntity:error:")]
+    public bool RemoveLocalEntityError(ulong guid, out NSError? error);
+    [Selector("changeEntityWithEntityID:toNewGPTPGrandmasterID:error:")]
+    public bool ChangeEntityWithEntityIDToNewGPTPGrandmasterIDError(ulong entityID, ulong gPTPGrandmasterID, out NSError? error);
 }
 
 #endif

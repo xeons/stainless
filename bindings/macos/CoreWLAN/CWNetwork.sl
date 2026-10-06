@@ -33,19 +33,32 @@ import Standard.ObjC;
 
 public extern objc class CWNetwork : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("ssid")] public NSString? Ssid { get; }
-    [Selector("ssidData")] public NSData? SsidData { get; }
-    [Selector("bssid")] public NSString? Bssid { get; }
-    [Selector("wlanChannel")] public CWChannel? WlanChannel { get; }
-    [Selector("rssiValue")] public NSInteger RssiValue { get; }
-    [Selector("noiseMeasurement")] public NSInteger NoiseMeasurement { get; }
-    [Selector("informationElementData")] public NSData? InformationElementData { get; }
-    [Selector("countryCode")] public NSString? CountryCode { get; }
-    [Selector("beaconInterval")] public NSInteger BeaconInterval { get; }
-    [Selector("ibss")] public bool Ibss { get; }
-    [Selector("isEqualToNetwork:")] public bool IsEqualToNetwork(CWNetwork network);
-    [Selector("supportsSecurity:")] public bool SupportsSecurity(CWSecurity security);
-    [Selector("supportsPHYMode:")] public bool SupportsPHYMode(CWPHYMode phyMode);
+    [Selector("ssid")]
+    public NSString? Ssid { get; }
+    [Selector("ssidData")]
+    public NSData? SsidData { get; }
+    [Selector("bssid")]
+    public NSString? Bssid { get; }
+    [Selector("wlanChannel")]
+    public CWChannel? WlanChannel { get; }
+    [Selector("rssiValue")]
+    public NSInteger RssiValue { get; }
+    [Selector("noiseMeasurement")]
+    public NSInteger NoiseMeasurement { get; }
+    [Selector("informationElementData")]
+    public NSData? InformationElementData { get; }
+    [Selector("countryCode")]
+    public NSString? CountryCode { get; }
+    [Selector("beaconInterval")]
+    public NSInteger BeaconInterval { get; }
+    [Selector("ibss")]
+    public bool Ibss { get; }
+    [Selector("isEqualToNetwork:")]
+    public bool IsEqualToNetwork(CWNetwork network);
+    [Selector("supportsSecurity:")]
+    public bool SupportsSecurity(CWSecurity security);
+    [Selector("supportsPHYMode:")]
+    public bool SupportsPHYMode(CWPHYMode phyMode);
 }
 
 #endif

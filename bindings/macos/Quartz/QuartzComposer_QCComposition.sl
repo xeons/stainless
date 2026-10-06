@@ -138,12 +138,18 @@ public extern "C" NSString? QCCompositionProtocolMusicVisualizer;
 /// Deprecated in macOS 10.15.
 public extern objc class QCComposition : NSObject, NSCopying
 {
-    [Selector("compositionWithFile:")] public static QCComposition? CompositionWithFile(NSString? path);
-    [Selector("compositionWithData:")] public static QCComposition? CompositionWithData(NSData? data);
-    [Selector("protocols")] public NSArray? Protocols();
-    [Selector("attributes")] public NSDictionary? Attributes();
-    [Selector("inputKeys")] public NSArray? InputKeys();
-    [Selector("outputKeys")] public NSArray? OutputKeys();
+    [Selector("compositionWithFile:")]
+    public static QCComposition? CompositionWithFile(NSString? path);
+    [Selector("compositionWithData:")]
+    public static QCComposition? CompositionWithData(NSData? data);
+    [Selector("protocols")]
+    public NSArray? Protocols();
+    [Selector("attributes")]
+    public NSDictionary? Attributes();
+    [Selector("inputKeys")]
+    public NSArray? InputKeys();
+    [Selector("outputKeys")]
+    public NSArray? OutputKeys();
 }
 
 #endif

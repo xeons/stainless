@@ -33,34 +33,54 @@ import Standard.ObjC;
 
 public extern objc class MTRDeviceAttestationDeviceInfo : NSObject
 {
-    [Selector("vendorID")] public NSNumber? VendorID { get; }
-    [Selector("productID")] public NSNumber? ProductID { get; }
-    [Selector("basicInformationVendorID")] public NSNumber BasicInformationVendorID { get; }
-    [Selector("basicInformationProductID")] public NSNumber BasicInformationProductID { get; }
-    [Selector("dacCertificate")] public MTRCertificateDERBytes DacCertificate { get; }
-    [Selector("dacPAICertificate")] public MTRCertificateDERBytes DacPAICertificate { get; }
+    [Selector("vendorID")]
+    public NSNumber? VendorID { get; }
+    [Selector("productID")]
+    public NSNumber? ProductID { get; }
+    [Selector("basicInformationVendorID")]
+    public NSNumber BasicInformationVendorID { get; }
+    [Selector("basicInformationProductID")]
+    public NSNumber BasicInformationProductID { get; }
+    [Selector("dacCertificate")]
+    public MTRCertificateDERBytes DacCertificate { get; }
+    [Selector("dacPAICertificate")]
+    public MTRCertificateDERBytes DacPAICertificate { get; }
     /// Deprecated in macOS 26.1.
-    [Selector("certificateDeclaration")] public NSData? CertificateDeclaration { get; }
+    [Selector("certificateDeclaration")]
+    public NSData? CertificateDeclaration { get; }
     /// macOS 26.1 and later.
-    [Selector("attestationChallenge")] public NSData AttestationChallenge { get; }
+    [Selector("attestationChallenge")]
+    public NSData AttestationChallenge { get; }
     /// macOS 26.1 and later.
-    [Selector("attestationNonce")] public NSData AttestationNonce { get; }
+    [Selector("attestationNonce")]
+    public NSData AttestationNonce { get; }
     /// macOS 26.1 and later.
-    [Selector("elementsTLV")] public MTRTLVBytes ElementsTLV { get; }
+    [Selector("elementsTLV")]
+    public MTRTLVBytes ElementsTLV { get; }
     /// macOS 26.1 and later.
-    [Selector("certificationDeclaration")] public NSData? CertificationDeclaration { get; }
+    [Selector("certificationDeclaration")]
+    public NSData? CertificationDeclaration { get; }
     /// macOS 26.1 and later.
-    [Selector("elementsSignature")] public NSData ElementsSignature { get; }
+    [Selector("elementsSignature")]
+    public NSData ElementsSignature { get; }
 }
 
 public objc interface MTRDeviceAttestationDelegate : NSObjectProtocol
 {
-    [Optional] [Selector("deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:")] void DeviceAttestationCompletedForControllerOpaqueDeviceHandleAttestationDeviceInfoError(MTRDeviceController controller, void* opaqueDeviceHandle, MTRDeviceAttestationDeviceInfo attestationDeviceInfo, NSError? error);
-    [Optional] [Selector("deviceAttestationFailedForController:opaqueDeviceHandle:error:")] void DeviceAttestationFailedForControllerOpaqueDeviceHandleError(MTRDeviceController controller, void* opaqueDeviceHandle, NSError error);
+    [Optional]
+    [Selector("deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:")]
+    void DeviceAttestationCompletedForControllerOpaqueDeviceHandleAttestationDeviceInfoError(MTRDeviceController controller, void* opaqueDeviceHandle, MTRDeviceAttestationDeviceInfo attestationDeviceInfo, NSError? error);
+    [Optional]
+    [Selector("deviceAttestationFailedForController:opaqueDeviceHandle:error:")]
+    void DeviceAttestationFailedForControllerOpaqueDeviceHandleError(MTRDeviceController controller, void* opaqueDeviceHandle, NSError error);
     /// Deprecated in macOS 13.3.
-    [Optional] [Selector("deviceAttestation:completedForDevice:attestationDeviceInfo:error:")] void DeviceAttestationCompletedForDeviceAttestationDeviceInfoError(MTRDeviceController controller, void* device, MTRDeviceAttestationDeviceInfo attestationDeviceInfo, NSError? error);
+    [Optional]
+    [Selector("deviceAttestation:completedForDevice:attestationDeviceInfo:error:")]
+    void DeviceAttestationCompletedForDeviceAttestationDeviceInfoError(MTRDeviceController controller, void* device, MTRDeviceAttestationDeviceInfo attestationDeviceInfo, NSError? error);
     /// Deprecated in macOS 13.3.
-    [Optional] [Selector("deviceAttestation:failedForDevice:error:")] void DeviceAttestationFailedForDeviceError(MTRDeviceController controller, void* device, NSError error);
+    [Optional]
+    [Selector("deviceAttestation:failedForDevice:error:")]
+    void DeviceAttestationFailedForDeviceError(MTRDeviceController controller, void* device, NSError error);
 }
 
 #endif

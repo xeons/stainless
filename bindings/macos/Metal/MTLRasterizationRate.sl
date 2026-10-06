@@ -33,55 +33,86 @@ import Standard.ObjC;
 
 public extern objc class MTLRasterizationRateSampleArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public NSNumber ObjectAtIndexedSubscript(NSUInteger index);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(NSNumber value, NSUInteger index);
+    [Selector("objectAtIndexedSubscript:")]
+    public NSNumber ObjectAtIndexedSubscript(NSUInteger index);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(NSNumber value, NSUInteger index);
 }
 
 public extern objc class MTLRasterizationRateLayerDescriptor : NSObject, NSCopying
 {
-    [Selector("sampleCount")] public MTLSize SampleCount { get; }
-    [Selector("maxSampleCount")] public MTLSize MaxSampleCount { get; }
-    [Selector("horizontalSampleStorage")] public float* HorizontalSampleStorage { get; }
-    [Selector("verticalSampleStorage")] public float* VerticalSampleStorage { get; }
-    [Selector("horizontal")] public MTLRasterizationRateSampleArray Horizontal { get; }
-    [Selector("vertical")] public MTLRasterizationRateSampleArray Vertical { get; }
-    [Selector("initWithSampleCount:")] public Self InitWithSampleCount(MTLSize sampleCount);
-    [Selector("initWithSampleCount:horizontal:vertical:")] public Self InitWithSampleCountHorizontalVertical(MTLSize sampleCount, float* horizontal, float* vertical);
+    [Selector("sampleCount")]
+    public MTLSize SampleCount { get; }
+    [Selector("maxSampleCount")]
+    public MTLSize MaxSampleCount { get; }
+    [Selector("horizontalSampleStorage")]
+    public float* HorizontalSampleStorage { get; }
+    [Selector("verticalSampleStorage")]
+    public float* VerticalSampleStorage { get; }
+    [Selector("horizontal")]
+    public MTLRasterizationRateSampleArray Horizontal { get; }
+    [Selector("vertical")]
+    public MTLRasterizationRateSampleArray Vertical { get; }
+    [Selector("initWithSampleCount:")]
+    public Self InitWithSampleCount(MTLSize sampleCount);
+    [Selector("initWithSampleCount:horizontal:vertical:")]
+    public Self InitWithSampleCountHorizontalVertical(MTLSize sampleCount, float* horizontal, float* vertical);
 }
 
 public extern objc class MTLRasterizationRateLayerDescriptor { }
 
 public extern objc class MTLRasterizationRateLayerArray : NSObject
 {
-    [Selector("objectAtIndexedSubscript:")] public MTLRasterizationRateLayerDescriptor? ObjectAtIndexedSubscript(NSUInteger layerIndex);
-    [Selector("setObject:atIndexedSubscript:")] public void SetObjectAtIndexedSubscript(MTLRasterizationRateLayerDescriptor? layer, NSUInteger layerIndex);
+    [Selector("objectAtIndexedSubscript:")]
+    public MTLRasterizationRateLayerDescriptor? ObjectAtIndexedSubscript(NSUInteger layerIndex);
+    [Selector("setObject:atIndexedSubscript:")]
+    public void SetObjectAtIndexedSubscript(MTLRasterizationRateLayerDescriptor? layer, NSUInteger layerIndex);
 }
 
 public extern objc class MTLRasterizationRateMapDescriptor : NSObject, NSCopying
 {
-    [Selector("layers")] public MTLRasterizationRateLayerArray Layers { get; }
-    [Selector("screenSize", "setScreenSize:")] public MTLSize ScreenSize { get; set; }
-    [Selector("label", "setLabel:")] public NSString? Label { get; set; }
-    [Selector("layerCount")] public NSUInteger LayerCount { get; }
-    [Selector("rasterizationRateMapDescriptorWithScreenSize:")] public static MTLRasterizationRateMapDescriptor RasterizationRateMapDescriptorWithScreenSize(MTLSize screenSize);
-    [Selector("rasterizationRateMapDescriptorWithScreenSize:layer:")] public static MTLRasterizationRateMapDescriptor RasterizationRateMapDescriptorWithScreenSizeLayer(MTLSize screenSize, MTLRasterizationRateLayerDescriptor layer);
-    [Selector("rasterizationRateMapDescriptorWithScreenSize:layerCount:layers:")] public static MTLRasterizationRateMapDescriptor RasterizationRateMapDescriptorWithScreenSizeLayerCountLayers(MTLSize screenSize, NSUInteger layerCount, out MTLRasterizationRateLayerDescriptor? layers);
-    [Selector("layerAtIndex:")] public MTLRasterizationRateLayerDescriptor? LayerAtIndex(NSUInteger layerIndex);
-    [Selector("setLayer:atIndex:")] public void SetLayerAtIndex(MTLRasterizationRateLayerDescriptor? layer, NSUInteger layerIndex);
+    [Selector("layers")]
+    public MTLRasterizationRateLayerArray Layers { get; }
+    [Selector("screenSize", "setScreenSize:")]
+    public MTLSize ScreenSize { get; set; }
+    [Selector("label", "setLabel:")]
+    public NSString? Label { get; set; }
+    [Selector("layerCount")]
+    public NSUInteger LayerCount { get; }
+    [Selector("rasterizationRateMapDescriptorWithScreenSize:")]
+    public static MTLRasterizationRateMapDescriptor RasterizationRateMapDescriptorWithScreenSize(MTLSize screenSize);
+    [Selector("rasterizationRateMapDescriptorWithScreenSize:layer:")]
+    public static MTLRasterizationRateMapDescriptor RasterizationRateMapDescriptorWithScreenSizeLayer(MTLSize screenSize, MTLRasterizationRateLayerDescriptor layer);
+    [Selector("rasterizationRateMapDescriptorWithScreenSize:layerCount:layers:")]
+    public static MTLRasterizationRateMapDescriptor RasterizationRateMapDescriptorWithScreenSizeLayerCountLayers(MTLSize screenSize, NSUInteger layerCount, out MTLRasterizationRateLayerDescriptor? layers);
+    [Selector("layerAtIndex:")]
+    public MTLRasterizationRateLayerDescriptor? LayerAtIndex(NSUInteger layerIndex);
+    [Selector("setLayer:atIndex:")]
+    public void SetLayerAtIndex(MTLRasterizationRateLayerDescriptor? layer, NSUInteger layerIndex);
 }
 
 public objc interface MTLRasterizationRateMap : NSObjectProtocol
 {
-    [Selector("device")] MTLDevice Device { get; }
-    [Selector("label")] NSString? Label { get; }
-    [Selector("screenSize")] MTLSize ScreenSize { get; }
-    [Selector("physicalGranularity")] MTLSize PhysicalGranularity { get; }
-    [Selector("layerCount")] NSUInteger LayerCount { get; }
-    [Selector("parameterBufferSizeAndAlign")] MTLSizeAndAlign ParameterBufferSizeAndAlign { get; }
-    [Selector("copyParameterDataToBuffer:offset:")] void CopyParameterDataToBufferOffset(MTLBuffer buffer, NSUInteger offset);
-    [Selector("physicalSizeForLayer:")] MTLSize PhysicalSizeForLayer(NSUInteger layerIndex);
-    [Selector("mapScreenToPhysicalCoordinates:forLayer:")] MTLCoordinate2D MapScreenToPhysicalCoordinatesForLayer(MTLCoordinate2D screenCoordinates, NSUInteger layerIndex);
-    [Selector("mapPhysicalToScreenCoordinates:forLayer:")] MTLCoordinate2D MapPhysicalToScreenCoordinatesForLayer(MTLCoordinate2D physicalCoordinates, NSUInteger layerIndex);
+    [Selector("device")]
+    MTLDevice Device { get; }
+    [Selector("label")]
+    NSString? Label { get; }
+    [Selector("screenSize")]
+    MTLSize ScreenSize { get; }
+    [Selector("physicalGranularity")]
+    MTLSize PhysicalGranularity { get; }
+    [Selector("layerCount")]
+    NSUInteger LayerCount { get; }
+    [Selector("parameterBufferSizeAndAlign")]
+    MTLSizeAndAlign ParameterBufferSizeAndAlign { get; }
+    [Selector("copyParameterDataToBuffer:offset:")]
+    void CopyParameterDataToBufferOffset(MTLBuffer buffer, NSUInteger offset);
+    [Selector("physicalSizeForLayer:")]
+    MTLSize PhysicalSizeForLayer(NSUInteger layerIndex);
+    [Selector("mapScreenToPhysicalCoordinates:forLayer:")]
+    MTLCoordinate2D MapScreenToPhysicalCoordinatesForLayer(MTLCoordinate2D screenCoordinates, NSUInteger layerIndex);
+    [Selector("mapPhysicalToScreenCoordinates:forLayer:")]
+    MTLCoordinate2D MapPhysicalToScreenCoordinatesForLayer(MTLCoordinate2D physicalCoordinates, NSUInteger layerIndex);
 }
 
 #endif

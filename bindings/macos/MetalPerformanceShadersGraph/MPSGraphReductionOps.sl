@@ -34,24 +34,42 @@ import Standard.ObjC;
 /// MPSGraphReductionOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    [Selector("reductionSumWithTensor:axis:name:")] public MPSGraphTensor ReductionSumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("reductionSumWithTensor:axes:name:")] public MPSGraphTensor ReductionSumWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
-    [Selector("reductionMaximumWithTensor:axis:name:")] public MPSGraphTensor ReductionMaximumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("reductionMaximumWithTensor:axes:name:")] public MPSGraphTensor ReductionMaximumWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
-    [Selector("reductionMinimumWithTensor:axis:name:")] public MPSGraphTensor ReductionMinimumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("reductionMinimumWithTensor:axes:name:")] public MPSGraphTensor ReductionMinimumWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
-    [Selector("reductionMaximumPropagateNaNWithTensor:axis:name:")] public MPSGraphTensor ReductionMaximumPropagateNaNWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("reductionMaximumPropagateNaNWithTensor:axes:name:")] public MPSGraphTensor ReductionMaximumPropagateNaNWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
-    [Selector("reductionMinimumPropagateNaNWithTensor:axis:name:")] public MPSGraphTensor ReductionMinimumPropagateNaNWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("reductionMinimumPropagateNaNWithTensor:axes:name:")] public MPSGraphTensor ReductionMinimumPropagateNaNWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
-    [Selector("reductionProductWithTensor:axis:name:")] public MPSGraphTensor ReductionProductWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("reductionProductWithTensor:axes:name:")] public MPSGraphTensor ReductionProductWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
-    [Selector("reductionArgMaximumWithTensor:axis:name:")] public MPSGraphTensor ReductionArgMaximumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("reductionArgMinimumWithTensor:axis:name:")] public MPSGraphTensor ReductionArgMinimumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("reductionAndWithTensor:axis:name:")] public MPSGraphTensor ReductionAndWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("reductionAndWithTensor:axes:name:")] public MPSGraphTensor ReductionAndWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
-    [Selector("reductionOrWithTensor:axis:name:")] public MPSGraphTensor ReductionOrWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
-    [Selector("reductionOrWithTensor:axes:name:")] public MPSGraphTensor ReductionOrWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
+    [Selector("reductionSumWithTensor:axis:name:")]
+    public MPSGraphTensor ReductionSumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("reductionSumWithTensor:axes:name:")]
+    public MPSGraphTensor ReductionSumWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
+    [Selector("reductionMaximumWithTensor:axis:name:")]
+    public MPSGraphTensor ReductionMaximumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("reductionMaximumWithTensor:axes:name:")]
+    public MPSGraphTensor ReductionMaximumWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
+    [Selector("reductionMinimumWithTensor:axis:name:")]
+    public MPSGraphTensor ReductionMinimumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("reductionMinimumWithTensor:axes:name:")]
+    public MPSGraphTensor ReductionMinimumWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
+    [Selector("reductionMaximumPropagateNaNWithTensor:axis:name:")]
+    public MPSGraphTensor ReductionMaximumPropagateNaNWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("reductionMaximumPropagateNaNWithTensor:axes:name:")]
+    public MPSGraphTensor ReductionMaximumPropagateNaNWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
+    [Selector("reductionMinimumPropagateNaNWithTensor:axis:name:")]
+    public MPSGraphTensor ReductionMinimumPropagateNaNWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("reductionMinimumPropagateNaNWithTensor:axes:name:")]
+    public MPSGraphTensor ReductionMinimumPropagateNaNWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
+    [Selector("reductionProductWithTensor:axis:name:")]
+    public MPSGraphTensor ReductionProductWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("reductionProductWithTensor:axes:name:")]
+    public MPSGraphTensor ReductionProductWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
+    [Selector("reductionArgMaximumWithTensor:axis:name:")]
+    public MPSGraphTensor ReductionArgMaximumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("reductionArgMinimumWithTensor:axis:name:")]
+    public MPSGraphTensor ReductionArgMinimumWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("reductionAndWithTensor:axis:name:")]
+    public MPSGraphTensor ReductionAndWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("reductionAndWithTensor:axes:name:")]
+    public MPSGraphTensor ReductionAndWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
+    [Selector("reductionOrWithTensor:axis:name:")]
+    public MPSGraphTensor ReductionOrWithTensorAxisName(MPSGraphTensor tensor, NSInteger axis, NSString? name);
+    [Selector("reductionOrWithTensor:axes:name:")]
+    public MPSGraphTensor ReductionOrWithTensorAxesName(MPSGraphTensor tensor, NSArray? axes, NSString? name);
 }
 
 #endif

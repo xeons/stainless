@@ -32,9 +32,12 @@ import Standard.ObjC;
 
 public extern objc class ASWebAuthenticationSessionWebBrowserSessionManager : NSObject
 {
-    [Selector("sharedManager")] public static ASWebAuthenticationSessionWebBrowserSessionManager SharedManager { get; }
-    [Selector("sessionHandler", "setSessionHandler:")] public ASWebAuthenticationSessionWebBrowserSessionHandling SessionHandler { get; set; }
-    [Selector("wasLaunchedByAuthenticationServices")] public bool WasLaunchedByAuthenticationServices { get; }
+    [Selector("sharedManager")]
+    public static ASWebAuthenticationSessionWebBrowserSessionManager SharedManager { get; }
+    [Selector("sessionHandler", "setSessionHandler:")]
+    public ASWebAuthenticationSessionWebBrowserSessionHandling SessionHandler { get; set; }
+    [Selector("wasLaunchedByAuthenticationServices")]
+    public bool WasLaunchedByAuthenticationServices { get; }
 }
 
 #endif

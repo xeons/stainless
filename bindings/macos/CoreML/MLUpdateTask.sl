@@ -36,11 +36,16 @@ public objc closure void MLUpdateTaskUpdateTaskForModelAtURLTrainingDataCompleti
 
 public extern objc class MLUpdateTask : MLTask
 {
-    [Selector("updateTaskForModelAtURL:trainingData:configuration:completionHandler:error:")] public static Self? UpdateTaskForModelAtURLTrainingDataConfigurationCompletionHandlerError(NSURL modelURL, MLBatchProvider trainingData, MLModelConfiguration? configuration, MLUpdateTaskUpdateTaskForModelAtURLTrainingDataConfigurationCompletionHandlerErrorCompletionHandlerBlock completionHandler, out NSError? error);
-    [Selector("updateTaskForModelAtURL:trainingData:completionHandler:error:")] public static Self? UpdateTaskForModelAtURLTrainingDataCompletionHandlerError(NSURL modelURL, MLBatchProvider trainingData, MLUpdateTaskUpdateTaskForModelAtURLTrainingDataCompletionHandlerErrorCompletionHandlerBlock completionHandler, out NSError? error);
-    [Selector("updateTaskForModelAtURL:trainingData:configuration:progressHandlers:error:")] public static Self? UpdateTaskForModelAtURLTrainingDataConfigurationProgressHandlersError(NSURL modelURL, MLBatchProvider trainingData, MLModelConfiguration? configuration, MLUpdateProgressHandlers progressHandlers, out NSError? error);
-    [Selector("updateTaskForModelAtURL:trainingData:progressHandlers:error:")] public static Self? UpdateTaskForModelAtURLTrainingDataProgressHandlersError(NSURL modelURL, MLBatchProvider trainingData, MLUpdateProgressHandlers progressHandlers, out NSError? error);
-    [Selector("resumeWithParameters:")] public void ResumeWithParameters(NSDictionary updateParameters);
+    [Selector("updateTaskForModelAtURL:trainingData:configuration:completionHandler:error:")]
+    public static Self? UpdateTaskForModelAtURLTrainingDataConfigurationCompletionHandlerError(NSURL modelURL, MLBatchProvider trainingData, MLModelConfiguration? configuration, MLUpdateTaskUpdateTaskForModelAtURLTrainingDataConfigurationCompletionHandlerErrorCompletionHandlerBlock completionHandler, out NSError? error);
+    [Selector("updateTaskForModelAtURL:trainingData:completionHandler:error:")]
+    public static Self? UpdateTaskForModelAtURLTrainingDataCompletionHandlerError(NSURL modelURL, MLBatchProvider trainingData, MLUpdateTaskUpdateTaskForModelAtURLTrainingDataCompletionHandlerErrorCompletionHandlerBlock completionHandler, out NSError? error);
+    [Selector("updateTaskForModelAtURL:trainingData:configuration:progressHandlers:error:")]
+    public static Self? UpdateTaskForModelAtURLTrainingDataConfigurationProgressHandlersError(NSURL modelURL, MLBatchProvider trainingData, MLModelConfiguration? configuration, MLUpdateProgressHandlers progressHandlers, out NSError? error);
+    [Selector("updateTaskForModelAtURL:trainingData:progressHandlers:error:")]
+    public static Self? UpdateTaskForModelAtURLTrainingDataProgressHandlersError(NSURL modelURL, MLBatchProvider trainingData, MLUpdateProgressHandlers progressHandlers, out NSError? error);
+    [Selector("resumeWithParameters:")]
+    public void ResumeWithParameters(NSDictionary updateParameters);
 }
 
 #endif

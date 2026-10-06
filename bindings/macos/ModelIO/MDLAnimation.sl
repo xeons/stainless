@@ -33,29 +33,42 @@ import Standard.ObjC;
 
 public extern objc class MDLSkeleton : MDLObject, NSCopying
 {
-    [Selector("jointPaths")] public NSArray JointPaths { get; }
-    [Selector("jointBindTransforms")] public MDLMatrix4x4Array JointBindTransforms { get; }
-    [Selector("jointRestTransforms")] public MDLMatrix4x4Array JointRestTransforms { get; }
-    [Selector("initWithName:jointPaths:")] public Self InitWithNameJointPaths(NSString name, NSArray jointPaths);
+    [Selector("jointPaths")]
+    public NSArray JointPaths { get; }
+    [Selector("jointBindTransforms")]
+    public MDLMatrix4x4Array JointBindTransforms { get; }
+    [Selector("jointRestTransforms")]
+    public MDLMatrix4x4Array JointRestTransforms { get; }
+    [Selector("initWithName:jointPaths:")]
+    public Self InitWithNameJointPaths(NSString name, NSArray jointPaths);
 }
 
 public objc interface MDLJointAnimation { }
 
 public extern objc class MDLPackedJointAnimation : MDLObject, NSCopying, MDLJointAnimation
 {
-    [Selector("jointPaths")] public NSArray JointPaths { get; }
-    [Selector("translations")] public MDLAnimatedVector3Array Translations { get; }
-    [Selector("rotations")] public MDLAnimatedQuaternionArray Rotations { get; }
-    [Selector("scales")] public MDLAnimatedVector3Array Scales { get; }
-    [Selector("initWithName:jointPaths:")] public Self InitWithNameJointPaths(NSString name, NSArray jointPaths);
+    [Selector("jointPaths")]
+    public NSArray JointPaths { get; }
+    [Selector("translations")]
+    public MDLAnimatedVector3Array Translations { get; }
+    [Selector("rotations")]
+    public MDLAnimatedQuaternionArray Rotations { get; }
+    [Selector("scales")]
+    public MDLAnimatedVector3Array Scales { get; }
+    [Selector("initWithName:jointPaths:")]
+    public Self InitWithNameJointPaths(NSString name, NSArray jointPaths);
 }
 
 public extern objc class MDLAnimationBindComponent : NSObject, NSCopying, MDLComponent
 {
-    [Selector("skeleton", "setSkeleton:")] public MDLSkeleton? Skeleton { get; set; }
-    [Selector("jointAnimation", "setJointAnimation:")] public MDLJointAnimation? JointAnimation { get; set; }
-    [Selector("jointPaths", "setJointPaths:")] public NSArray? JointPaths { get; set; }
-    [Selector("geometryBindTransform", "setGeometryBindTransform:")] public matrix_double4x4 GeometryBindTransform { get; set; }
+    [Selector("skeleton", "setSkeleton:")]
+    public MDLSkeleton? Skeleton { get; set; }
+    [Selector("jointAnimation", "setJointAnimation:")]
+    public MDLJointAnimation? JointAnimation { get; set; }
+    [Selector("jointPaths", "setJointPaths:")]
+    public NSArray? JointPaths { get; set; }
+    [Selector("geometryBindTransform", "setGeometryBindTransform:")]
+    public matrix_double4x4 GeometryBindTransform { get; set; }
 }
 
 #endif

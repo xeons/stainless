@@ -33,12 +33,18 @@ import Standard.ObjC;
 
 public extern objc class WKBackForwardList : NSObject
 {
-    [Selector("currentItem")] public WKBackForwardListItem? CurrentItem { get; }
-    [Selector("backItem")] public WKBackForwardListItem? BackItem { get; }
-    [Selector("forwardItem")] public WKBackForwardListItem? ForwardItem { get; }
-    [Selector("backList")] public NSArray BackList { get; }
-    [Selector("forwardList")] public NSArray ForwardList { get; }
-    [Selector("itemAtIndex:")] public WKBackForwardListItem? ItemAtIndex(NSInteger index);
+    [Selector("currentItem")]
+    public WKBackForwardListItem? CurrentItem { get; }
+    [Selector("backItem")]
+    public WKBackForwardListItem? BackItem { get; }
+    [Selector("forwardItem")]
+    public WKBackForwardListItem? ForwardItem { get; }
+    [Selector("backList")]
+    public NSArray BackList { get; }
+    [Selector("forwardList")]
+    public NSArray ForwardList { get; }
+    [Selector("itemAtIndex:")]
+    public WKBackForwardListItem? ItemAtIndex(NSInteger index);
 }
 
 #endif

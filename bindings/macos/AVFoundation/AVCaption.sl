@@ -86,31 +86,52 @@ public enum AVCaptionRegionScroll : long
 
 public extern objc class AVCaptionRegion : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("appleITTTopRegion")] public static AVCaptionRegion AppleITTTopRegion { get; }
-    [Selector("appleITTBottomRegion")] public static AVCaptionRegion AppleITTBottomRegion { get; }
-    [Selector("appleITTLeftRegion")] public static AVCaptionRegion AppleITTLeftRegion { get; }
-    [Selector("appleITTRightRegion")] public static AVCaptionRegion AppleITTRightRegion { get; }
-    [Selector("subRipTextBottomRegion")] public static AVCaptionRegion SubRipTextBottomRegion { get; }
-    [Selector("identifier")] public NSString? Identifier { get; }
-    [Selector("origin")] public AVCaptionPoint Origin { get; }
-    [Selector("size")] public AVCaptionSize Size { get; }
-    [Selector("scroll")] public AVCaptionRegionScroll Scroll { get; }
-    [Selector("displayAlignment")] public AVCaptionRegionDisplayAlignment DisplayAlignment { get; }
-    [Selector("writingMode")] public AVCaptionRegionWritingMode WritingMode { get; }
-    [Selector("encodeWithCoder:")] public void EncodeWithCoder(NSCoder encoder);
-    [Selector("isEqual:")] public bool IsEqual(AnyObject object);
-    [Selector("mutableCopyWithZone:")] public AnyObject MutableCopyWithZone(_NSZone* zone);
+    [Selector("appleITTTopRegion")]
+    public static AVCaptionRegion AppleITTTopRegion { get; }
+    [Selector("appleITTBottomRegion")]
+    public static AVCaptionRegion AppleITTBottomRegion { get; }
+    [Selector("appleITTLeftRegion")]
+    public static AVCaptionRegion AppleITTLeftRegion { get; }
+    [Selector("appleITTRightRegion")]
+    public static AVCaptionRegion AppleITTRightRegion { get; }
+    [Selector("subRipTextBottomRegion")]
+    public static AVCaptionRegion SubRipTextBottomRegion { get; }
+    [Selector("identifier")]
+    public NSString? Identifier { get; }
+    [Selector("origin")]
+    public AVCaptionPoint Origin { get; }
+    [Selector("size")]
+    public AVCaptionSize Size { get; }
+    [Selector("scroll")]
+    public AVCaptionRegionScroll Scroll { get; }
+    [Selector("displayAlignment")]
+    public AVCaptionRegionDisplayAlignment DisplayAlignment { get; }
+    [Selector("writingMode")]
+    public AVCaptionRegionWritingMode WritingMode { get; }
+    [Selector("encodeWithCoder:")]
+    public void EncodeWithCoder(NSCoder encoder);
+    [Selector("isEqual:")]
+    public bool IsEqual(AnyObject object);
+    [Selector("mutableCopyWithZone:")]
+    public AnyObject MutableCopyWithZone(_NSZone* zone);
 }
 
 public extern objc class AVMutableCaptionRegion : AVCaptionRegion
 {
-    [Selector("origin", "setOrigin:")] public AVCaptionPoint Origin { get; set; }
-    [Selector("size", "setSize:")] public AVCaptionSize Size { get; set; }
-    [Selector("scroll", "setScroll:")] public AVCaptionRegionScroll Scroll { get; set; }
-    [Selector("displayAlignment", "setDisplayAlignment:")] public AVCaptionRegionDisplayAlignment DisplayAlignment { get; set; }
-    [Selector("writingMode", "setWritingMode:")] public AVCaptionRegionWritingMode WritingMode { get; set; }
-    [Selector("init")] public Self Init();
-    [Selector("initWithIdentifier:")] public Self InitWithIdentifier(NSString identifier);
+    [Selector("origin", "setOrigin:")]
+    public AVCaptionPoint Origin { get; set; }
+    [Selector("size", "setSize:")]
+    public AVCaptionSize Size { get; set; }
+    [Selector("scroll", "setScroll:")]
+    public AVCaptionRegionScroll Scroll { get; set; }
+    [Selector("displayAlignment", "setDisplayAlignment:")]
+    public AVCaptionRegionDisplayAlignment DisplayAlignment { get; set; }
+    [Selector("writingMode", "setWritingMode:")]
+    public AVCaptionRegionWritingMode WritingMode { get; set; }
+    [Selector("init")]
+    public Self Init();
+    [Selector("initWithIdentifier:")]
+    public Self InitWithIdentifier(NSString identifier);
 }
 
 public enum AVCaptionAnimation : long
@@ -121,15 +142,20 @@ public enum AVCaptionAnimation : long
 
 public extern objc class AVCaption : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
 {
-    [Selector("text")] public NSString Text { get; }
-    [Selector("timeRange")] public CMTimeRange TimeRange { get; }
-    [Selector("initWithText:timeRange:")] public Self InitWithTextTimeRange(NSString text, CMTimeRange timeRange);
+    [Selector("text")]
+    public NSString Text { get; }
+    [Selector("timeRange")]
+    public CMTimeRange TimeRange { get; }
+    [Selector("initWithText:timeRange:")]
+    public Self InitWithTextTimeRange(NSString text, CMTimeRange timeRange);
 }
 
 public extern objc class AVMutableCaption : AVCaption
 {
-    [Selector("text", "setText:")] public NSString Text { get; set; }
-    [Selector("timeRange", "setTimeRange:")] public CMTimeRange TimeRange { get; set; }
+    [Selector("text", "setText:")]
+    public NSString Text { get; set; }
+    [Selector("timeRange", "setTimeRange:")]
+    public CMTimeRange TimeRange { get; set; }
 }
 
 public enum AVCaptionFontWeight : long
@@ -177,58 +203,87 @@ public enum AVCaptionTextAlignment : long
 /// Styling, a category of AVCaption.
 public extern objc class AVCaption
 {
-    [ReturnsRetained] [Selector("textColorAtIndex:range:")] public CGColorRef? TextColorAtIndexRange(NSInteger index, NSRange* outRange);
-    [ReturnsRetained] [Selector("backgroundColorAtIndex:range:")] public CGColorRef? BackgroundColorAtIndexRange(NSInteger index, NSRange* outRange);
-    [Selector("fontWeightAtIndex:range:")] public AVCaptionFontWeight FontWeightAtIndexRange(NSInteger index, NSRange* outRange);
-    [Selector("fontStyleAtIndex:range:")] public AVCaptionFontStyle FontStyleAtIndexRange(NSInteger index, NSRange* outRange);
-    [Selector("decorationAtIndex:range:")] public AVCaptionDecoration DecorationAtIndexRange(NSInteger index, NSRange* outRange);
-    [Selector("textCombineAtIndex:range:")] public AVCaptionTextCombine TextCombineAtIndexRange(NSInteger index, NSRange* outRange);
-    [Selector("rubyAtIndex:range:")] public AVCaptionRuby? RubyAtIndexRange(NSInteger index, NSRange* outRange);
+    [ReturnsRetained]
+    [Selector("textColorAtIndex:range:")]
+    public CGColorRef? TextColorAtIndexRange(NSInteger index, NSRange* outRange);
+    [ReturnsRetained]
+    [Selector("backgroundColorAtIndex:range:")]
+    public CGColorRef? BackgroundColorAtIndexRange(NSInteger index, NSRange* outRange);
+    [Selector("fontWeightAtIndex:range:")]
+    public AVCaptionFontWeight FontWeightAtIndexRange(NSInteger index, NSRange* outRange);
+    [Selector("fontStyleAtIndex:range:")]
+    public AVCaptionFontStyle FontStyleAtIndexRange(NSInteger index, NSRange* outRange);
+    [Selector("decorationAtIndex:range:")]
+    public AVCaptionDecoration DecorationAtIndexRange(NSInteger index, NSRange* outRange);
+    [Selector("textCombineAtIndex:range:")]
+    public AVCaptionTextCombine TextCombineAtIndexRange(NSInteger index, NSRange* outRange);
+    [Selector("rubyAtIndex:range:")]
+    public AVCaptionRuby? RubyAtIndexRange(NSInteger index, NSRange* outRange);
 }
 
 /// Region, a category of AVCaption.
 public extern objc class AVCaption
 {
-    [Selector("region")] public AVCaptionRegion? Region { get; }
-    [Selector("textAlignment")] public AVCaptionTextAlignment TextAlignment { get; }
+    [Selector("region")]
+    public AVCaptionRegion? Region { get; }
+    [Selector("textAlignment")]
+    public AVCaptionTextAlignment TextAlignment { get; }
 }
 
 /// Animation, a category of AVCaption.
 public extern objc class AVCaption
 {
-    [Selector("animation")] public AVCaptionAnimation Animation { get; }
+    [Selector("animation")]
+    public AVCaptionAnimation Animation { get; }
 }
 
 /// Styling, a category of AVMutableCaption.
 public extern objc class AVMutableCaption
 {
-    [Selector("setTextColor:inRange:")] public void SetTextColorInRange(CGColorRef color, NSRange range);
-    [Selector("setBackgroundColor:inRange:")] public void SetBackgroundColorInRange(CGColorRef color, NSRange range);
-    [Selector("setFontWeight:inRange:")] public void SetFontWeightInRange(AVCaptionFontWeight fontWeight, NSRange range);
-    [Selector("setFontStyle:inRange:")] public void SetFontStyleInRange(AVCaptionFontStyle fontStyle, NSRange range);
-    [Selector("setDecoration:inRange:")] public void SetDecorationInRange(AVCaptionDecoration decoration, NSRange range);
-    [Selector("setTextCombine:inRange:")] public void SetTextCombineInRange(AVCaptionTextCombine textCombine, NSRange range);
-    [Selector("setRuby:inRange:")] public void SetRubyInRange(AVCaptionRuby ruby, NSRange range);
-    [Selector("removeTextColorInRange:")] public void RemoveTextColorInRange(NSRange range);
-    [Selector("removeBackgroundColorInRange:")] public void RemoveBackgroundColorInRange(NSRange range);
-    [Selector("removeFontWeightInRange:")] public void RemoveFontWeightInRange(NSRange range);
-    [Selector("removeFontStyleInRange:")] public void RemoveFontStyleInRange(NSRange range);
-    [Selector("removeDecorationInRange:")] public void RemoveDecorationInRange(NSRange range);
-    [Selector("removeTextCombineInRange:")] public void RemoveTextCombineInRange(NSRange range);
-    [Selector("removeRubyInRange:")] public void RemoveRubyInRange(NSRange range);
+    [Selector("setTextColor:inRange:")]
+    public void SetTextColorInRange(CGColorRef color, NSRange range);
+    [Selector("setBackgroundColor:inRange:")]
+    public void SetBackgroundColorInRange(CGColorRef color, NSRange range);
+    [Selector("setFontWeight:inRange:")]
+    public void SetFontWeightInRange(AVCaptionFontWeight fontWeight, NSRange range);
+    [Selector("setFontStyle:inRange:")]
+    public void SetFontStyleInRange(AVCaptionFontStyle fontStyle, NSRange range);
+    [Selector("setDecoration:inRange:")]
+    public void SetDecorationInRange(AVCaptionDecoration decoration, NSRange range);
+    [Selector("setTextCombine:inRange:")]
+    public void SetTextCombineInRange(AVCaptionTextCombine textCombine, NSRange range);
+    [Selector("setRuby:inRange:")]
+    public void SetRubyInRange(AVCaptionRuby ruby, NSRange range);
+    [Selector("removeTextColorInRange:")]
+    public void RemoveTextColorInRange(NSRange range);
+    [Selector("removeBackgroundColorInRange:")]
+    public void RemoveBackgroundColorInRange(NSRange range);
+    [Selector("removeFontWeightInRange:")]
+    public void RemoveFontWeightInRange(NSRange range);
+    [Selector("removeFontStyleInRange:")]
+    public void RemoveFontStyleInRange(NSRange range);
+    [Selector("removeDecorationInRange:")]
+    public void RemoveDecorationInRange(NSRange range);
+    [Selector("removeTextCombineInRange:")]
+    public void RemoveTextCombineInRange(NSRange range);
+    [Selector("removeRubyInRange:")]
+    public void RemoveRubyInRange(NSRange range);
 }
 
 /// Region, a category of AVMutableCaption.
 public extern objc class AVMutableCaption
 {
-    [Selector("region", "setRegion:")] public AVCaptionRegion Region { get; set; }
-    [Selector("textAlignment", "setTextAlignment:")] public AVCaptionTextAlignment TextAlignment { get; set; }
+    [Selector("region", "setRegion:")]
+    public AVCaptionRegion Region { get; set; }
+    [Selector("textAlignment", "setTextAlignment:")]
+    public AVCaptionTextAlignment TextAlignment { get; set; }
 }
 
 /// Animation, a category of AVMutableCaption.
 public extern objc class AVMutableCaption
 {
-    [Selector("animation", "setAnimation:")] public AVCaptionAnimation Animation { get; set; }
+    [Selector("animation", "setAnimation:")]
+    public AVCaptionAnimation Animation { get; set; }
 }
 
 public enum AVCaptionRubyPosition : long
@@ -247,11 +302,16 @@ public enum AVCaptionRubyAlignment : long
 
 public extern objc class AVCaptionRuby : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("text")] public NSString Text { get; }
-    [Selector("position")] public AVCaptionRubyPosition Position { get; }
-    [Selector("alignment")] public AVCaptionRubyAlignment Alignment { get; }
-    [Selector("initWithText:")] public Self InitWithText(NSString text);
-    [Selector("initWithText:position:alignment:")] public Self InitWithTextPositionAlignment(NSString text, AVCaptionRubyPosition position, AVCaptionRubyAlignment alignment);
+    [Selector("text")]
+    public NSString Text { get; }
+    [Selector("position")]
+    public AVCaptionRubyPosition Position { get; }
+    [Selector("alignment")]
+    public AVCaptionRubyAlignment Alignment { get; }
+    [Selector("initWithText:")]
+    public Self InitWithText(NSString text);
+    [Selector("initWithText:position:alignment:")]
+    public Self InitWithTextPositionAlignment(NSString text, AVCaptionRubyPosition position, AVCaptionRubyAlignment alignment);
 }
 
 #endif

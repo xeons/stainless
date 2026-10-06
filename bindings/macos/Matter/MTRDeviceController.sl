@@ -36,76 +36,118 @@ public objc closure void MTRDeviceConnectionCallback(MTRBaseDevice? arg0, NSErro
 
 public extern objc class MTRDeviceController : NSObject
 {
-    [Selector("isRunning")] public bool Running { get; }
+    [Selector("isRunning")]
+    public bool Running { get; }
     /// macOS 15.2 and later.
-    [Selector("isSuspended")] public bool Suspended { get; }
-    [Selector("uniqueIdentifier")] public NSUUID UniqueIdentifier { get; }
-    [Selector("controllerNodeID")] public NSNumber? ControllerNodeID { get; }
+    [Selector("isSuspended")]
+    public bool Suspended { get; }
+    [Selector("uniqueIdentifier")]
+    public NSUUID UniqueIdentifier { get; }
+    [Selector("controllerNodeID")]
+    public NSNumber? ControllerNodeID { get; }
     /// macOS 15.4 and later.
-    [Selector("devices")] public NSArray Devices { get; }
+    [Selector("devices")]
+    public NSArray Devices { get; }
     /// macOS 15.4 and later.
-    [Selector("nodesWithStoredData")] public NSArray NodesWithStoredData { get; }
-    [Selector("initWithParameters:error:")] public MTRDeviceController? InitWithParametersError(MTRDeviceControllerAbstractParameters parameters, out NSError? error);
-    [Selector("setupCommissioningSessionWithPayload:newNodeID:error:")] public bool SetupCommissioningSessionWithPayloadNewNodeIDError(MTRSetupPayload payload, NSNumber newNodeID, out NSError? error);
-    [Selector("setupCommissioningSessionWithDiscoveredDevice:payload:newNodeID:error:")] public bool SetupCommissioningSessionWithDiscoveredDevicePayloadNewNodeIDError(MTRCommissionableBrowserResult discoveredDevice, MTRSetupPayload payload, NSNumber newNodeID, out NSError? error);
-    [Selector("commissionNodeWithID:commissioningParams:error:")] public bool CommissionNodeWithIDCommissioningParamsError(NSNumber nodeID, MTRCommissioningParameters commissioningParams, out NSError? error);
-    [Selector("continueCommissioningDevice:ignoreAttestationFailure:error:")] public bool ContinueCommissioningDeviceIgnoreAttestationFailureError(void* opaqueDeviceHandle, bool ignoreAttestationFailure, out NSError? error);
-    [Selector("cancelCommissioningForNodeID:error:")] public bool CancelCommissioningForNodeIDError(NSNumber nodeID, out NSError? error);
-    [Selector("deviceBeingCommissionedWithNodeID:error:")] public MTRBaseDevice? DeviceBeingCommissionedWithNodeIDError(NSNumber nodeID, out NSError? error);
+    [Selector("nodesWithStoredData")]
+    public NSArray NodesWithStoredData { get; }
+    [Selector("initWithParameters:error:")]
+    public MTRDeviceController? InitWithParametersError(MTRDeviceControllerAbstractParameters parameters, out NSError? error);
+    [Selector("setupCommissioningSessionWithPayload:newNodeID:error:")]
+    public bool SetupCommissioningSessionWithPayloadNewNodeIDError(MTRSetupPayload payload, NSNumber newNodeID, out NSError? error);
+    [Selector("setupCommissioningSessionWithDiscoveredDevice:payload:newNodeID:error:")]
+    public bool SetupCommissioningSessionWithDiscoveredDevicePayloadNewNodeIDError(MTRCommissionableBrowserResult discoveredDevice, MTRSetupPayload payload, NSNumber newNodeID, out NSError? error);
+    [Selector("commissionNodeWithID:commissioningParams:error:")]
+    public bool CommissionNodeWithIDCommissioningParamsError(NSNumber nodeID, MTRCommissioningParameters commissioningParams, out NSError? error);
+    [Selector("continueCommissioningDevice:ignoreAttestationFailure:error:")]
+    public bool ContinueCommissioningDeviceIgnoreAttestationFailureError(void* opaqueDeviceHandle, bool ignoreAttestationFailure, out NSError? error);
+    [Selector("cancelCommissioningForNodeID:error:")]
+    public bool CancelCommissioningForNodeIDError(NSNumber nodeID, out NSError? error);
+    [Selector("deviceBeingCommissionedWithNodeID:error:")]
+    public MTRBaseDevice? DeviceBeingCommissionedWithNodeIDError(NSNumber nodeID, out NSError? error);
     /// Deprecated in macOS 14.6.
-    [Selector("preWarmCommissioningSession")] public void PreWarmCommissioningSession();
-    [Selector("setDeviceControllerDelegate:queue:")] public void SetDeviceControllerDelegateQueue(MTRDeviceControllerDelegate @delegate, dispatch_queue_t queue);
+    [Selector("preWarmCommissioningSession")]
+    public void PreWarmCommissioningSession();
+    [Selector("setDeviceControllerDelegate:queue:")]
+    public void SetDeviceControllerDelegateQueue(MTRDeviceControllerDelegate @delegate, dispatch_queue_t queue);
     /// macOS 15.2 and later.
-    [Selector("addDeviceControllerDelegate:queue:")] public void AddDeviceControllerDelegateQueue(MTRDeviceControllerDelegate @delegate, dispatch_queue_t queue);
+    [Selector("addDeviceControllerDelegate:queue:")]
+    public void AddDeviceControllerDelegateQueue(MTRDeviceControllerDelegate @delegate, dispatch_queue_t queue);
     /// macOS 15.2 and later.
-    [Selector("removeDeviceControllerDelegate:")] public void RemoveDeviceControllerDelegate(MTRDeviceControllerDelegate @delegate);
-    [Selector("startBrowseForCommissionables:queue:")] public bool StartBrowseForCommissionablesQueue(MTRCommissionableBrowserDelegate @delegate, dispatch_queue_t queue);
-    [Selector("stopBrowseForCommissionables")] public bool StopBrowseForCommissionables();
-    [Selector("attestationChallengeForDeviceID:")] public NSData? AttestationChallengeForDeviceID(NSNumber deviceID);
-    [Selector("addServerEndpoint:")] public bool AddServerEndpoint(MTRServerEndpoint endpoint);
-    [Selector("removeServerEndpoint:queue:completion:")] public void RemoveServerEndpointQueueCompletion(MTRServerEndpoint endpoint, dispatch_queue_t queue, dispatch_block_t completion);
-    [Selector("removeServerEndpoint:")] public void RemoveServerEndpoint(MTRServerEndpoint endpoint);
+    [Selector("removeDeviceControllerDelegate:")]
+    public void RemoveDeviceControllerDelegate(MTRDeviceControllerDelegate @delegate);
+    [Selector("startBrowseForCommissionables:queue:")]
+    public bool StartBrowseForCommissionablesQueue(MTRCommissionableBrowserDelegate @delegate, dispatch_queue_t queue);
+    [Selector("stopBrowseForCommissionables")]
+    public bool StopBrowseForCommissionables();
+    [Selector("attestationChallengeForDeviceID:")]
+    public NSData? AttestationChallengeForDeviceID(NSNumber deviceID);
+    [Selector("addServerEndpoint:")]
+    public bool AddServerEndpoint(MTRServerEndpoint endpoint);
+    [Selector("removeServerEndpoint:queue:completion:")]
+    public void RemoveServerEndpointQueueCompletion(MTRServerEndpoint endpoint, dispatch_queue_t queue, dispatch_block_t completion);
+    [Selector("removeServerEndpoint:")]
+    public void RemoveServerEndpoint(MTRServerEndpoint endpoint);
     /// macOS 15.4 and later.
-    [Selector("forgetDeviceWithNodeID:")] public void ForgetDeviceWithNodeID(NSNumber nodeID);
-    [Selector("computePASEVerifierForSetupPasscode:iterations:salt:error:")] public static NSData? ComputePASEVerifierForSetupPasscodeIterationsSaltError(NSNumber setupPasscode, NSNumber iterations, NSData salt, out NSError? error);
+    [Selector("forgetDeviceWithNodeID:")]
+    public void ForgetDeviceWithNodeID(NSNumber nodeID);
+    [Selector("computePASEVerifierForSetupPasscode:iterations:salt:error:")]
+    public static NSData? ComputePASEVerifierForSetupPasscodeIterationsSaltError(NSNumber setupPasscode, NSNumber iterations, NSData salt, out NSError? error);
     /// macOS 15.2 and later.
-    [Selector("suspend")] public void Suspend();
+    [Selector("suspend")]
+    public void Suspend();
     /// macOS 15.2 and later.
-    [Selector("resume")] public void Resume();
-    [Selector("shutdown")] public void Shutdown();
+    [Selector("resume")]
+    public void Resume();
+    [Selector("shutdown")]
+    public void Shutdown();
 }
 
 /// Deprecated, a category of MTRDeviceController.
 public extern objc class MTRDeviceController
 {
     /// Deprecated in macOS 13.3.
-    [Selector("controllerNodeId")] public NSNumber? ControllerNodeId { get; }
+    [Selector("controllerNodeId")]
+    public NSNumber? ControllerNodeId { get; }
     /// Deprecated in macOS 13.3.
-    [Selector("fetchAttestationChallengeForDeviceId:")] public NSData? FetchAttestationChallengeForDeviceId(ulong deviceId);
+    [Selector("fetchAttestationChallengeForDeviceId:")]
+    public NSData? FetchAttestationChallengeForDeviceId(ulong deviceId);
     /// Deprecated in macOS 13.3.
-    [Selector("getBaseDevice:queue:completionHandler:")] public bool GetBaseDeviceQueueCompletionHandler(ulong deviceID, dispatch_queue_t queue, MTRDeviceConnectionCallback completionHandler);
+    [Selector("getBaseDevice:queue:completionHandler:")]
+    public bool GetBaseDeviceQueueCompletionHandler(ulong deviceID, dispatch_queue_t queue, MTRDeviceConnectionCallback completionHandler);
     /// Deprecated in macOS 13.3.
-    [Selector("pairDevice:discriminator:setupPINCode:error:")] public bool PairDeviceDiscriminatorSetupPINCodeError(ulong deviceID, ushort discriminator, uint setupPINCode, out NSError? error);
+    [Selector("pairDevice:discriminator:setupPINCode:error:")]
+    public bool PairDeviceDiscriminatorSetupPINCodeError(ulong deviceID, ushort discriminator, uint setupPINCode, out NSError? error);
     /// Deprecated in macOS 13.3.
-    [Selector("pairDevice:address:port:setupPINCode:error:")] public bool PairDeviceAddressPortSetupPINCodeError(ulong deviceID, NSString address, ushort port, uint setupPINCode, out NSError? error);
+    [Selector("pairDevice:address:port:setupPINCode:error:")]
+    public bool PairDeviceAddressPortSetupPINCodeError(ulong deviceID, NSString address, ushort port, uint setupPINCode, out NSError? error);
     /// Deprecated in macOS 13.3.
-    [Selector("pairDevice:onboardingPayload:error:")] public bool PairDeviceOnboardingPayloadError(ulong deviceID, NSString onboardingPayload, out NSError? error);
+    [Selector("pairDevice:onboardingPayload:error:")]
+    public bool PairDeviceOnboardingPayloadError(ulong deviceID, NSString onboardingPayload, out NSError? error);
     /// Deprecated in macOS 13.3.
-    [Selector("commissionDevice:commissioningParams:error:")] public bool CommissionDeviceCommissioningParamsError(ulong deviceId, MTRCommissioningParameters commissioningParams, out NSError? error);
+    [Selector("commissionDevice:commissioningParams:error:")]
+    public bool CommissionDeviceCommissioningParamsError(ulong deviceId, MTRCommissioningParameters commissioningParams, out NSError? error);
     /// Deprecated in macOS 13.3.
-    [Selector("stopDevicePairing:error:")] public bool StopDevicePairingError(ulong deviceID, out NSError? error);
+    [Selector("stopDevicePairing:error:")]
+    public bool StopDevicePairingError(ulong deviceID, out NSError? error);
     /// Deprecated in macOS 13.3.
-    [Selector("getDeviceBeingCommissioned:error:")] public MTRBaseDevice? GetDeviceBeingCommissionedError(ulong deviceId, out NSError? error);
+    [Selector("getDeviceBeingCommissioned:error:")]
+    public MTRBaseDevice? GetDeviceBeingCommissionedError(ulong deviceId, out NSError? error);
     /// Deprecated in macOS 13.3.
-    [Selector("openPairingWindow:duration:error:")] public bool OpenPairingWindowDurationError(ulong deviceID, NSUInteger duration, out NSError? error);
+    [Selector("openPairingWindow:duration:error:")]
+    public bool OpenPairingWindowDurationError(ulong deviceID, NSUInteger duration, out NSError? error);
     /// Deprecated in macOS 13.3.
-    [Selector("openPairingWindowWithPIN:duration:discriminator:setupPIN:error:")] public NSString? OpenPairingWindowWithPINDurationDiscriminatorSetupPINError(ulong deviceID, NSUInteger duration, NSUInteger discriminator, NSUInteger setupPIN, out NSError? error);
+    [Selector("openPairingWindowWithPIN:duration:discriminator:setupPIN:error:")]
+    public NSString? OpenPairingWindowWithPINDurationDiscriminatorSetupPINError(ulong deviceID, NSUInteger duration, NSUInteger discriminator, NSUInteger setupPIN, out NSError? error);
     /// Deprecated in macOS 13.3.
-    [Selector("computePaseVerifier:iterations:salt:")] public NSData? ComputePaseVerifierIterationsSalt(uint setupPincode, uint iterations, NSData salt);
+    [Selector("computePaseVerifier:iterations:salt:")]
+    public NSData? ComputePaseVerifierIterationsSalt(uint setupPincode, uint iterations, NSData salt);
     /// Deprecated in macOS 13.3.
-    [Selector("setPairingDelegate:queue:")] public void SetPairingDelegateQueue(MTRDevicePairingDelegate @delegate, dispatch_queue_t queue);
+    [Selector("setPairingDelegate:queue:")]
+    public void SetPairingDelegateQueue(MTRDevicePairingDelegate @delegate, dispatch_queue_t queue);
     /// Deprecated in macOS 13.3.
-    [Selector("setNocChainIssuer:queue:")] public void SetNocChainIssuerQueue(MTRNOCChainIssuer nocChainIssuer, dispatch_queue_t queue);
+    [Selector("setNocChainIssuer:queue:")]
+    public void SetNocChainIssuerQueue(MTRNOCChainIssuer nocChainIssuer, dispatch_queue_t queue);
 }
 
 #endif

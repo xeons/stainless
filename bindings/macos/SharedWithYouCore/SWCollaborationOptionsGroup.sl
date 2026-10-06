@@ -35,12 +35,18 @@ public extern "C" NSString UTCollaborationOptionsTypeIdentifier;
 
 public extern objc class SWCollaborationOptionsGroup : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("title", "setTitle:")] public NSString Title { get; set; }
-    [Selector("identifier")] public NSString Identifier { get; }
-    [Selector("footer", "setFooter:")] public NSString Footer { get; set; }
-    [Selector("options", "setOptions:")] public NSArray Options { get; set; }
-    [Selector("initWithIdentifier:options:")] public Self InitWithIdentifierOptions(NSString identifier, NSArray options);
-    [Selector("optionsGroupWithIdentifier:options:")] public static SWCollaborationOptionsGroup OptionsGroupWithIdentifierOptions(NSString identifier, NSArray options);
+    [Selector("title", "setTitle:")]
+    public NSString Title { get; set; }
+    [Selector("identifier")]
+    public NSString Identifier { get; }
+    [Selector("footer", "setFooter:")]
+    public NSString Footer { get; set; }
+    [Selector("options", "setOptions:")]
+    public NSArray Options { get; set; }
+    [Selector("initWithIdentifier:options:")]
+    public Self InitWithIdentifierOptions(NSString identifier, NSArray options);
+    [Selector("optionsGroupWithIdentifier:options:")]
+    public static SWCollaborationOptionsGroup OptionsGroupWithIdentifierOptions(NSString identifier, NSArray options);
 }
 
 #endif

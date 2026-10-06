@@ -34,75 +34,117 @@ import Standard.ObjC;
 
 public extern objc class NSTextField : NSControl, NSUserInterfaceValidations, NSAccessibilityNavigableStaticText, NSTextContent
 {
-    [Selector("placeholderString", "setPlaceholderString:")] public NSString? PlaceholderString { get; set; }
-    [Selector("placeholderAttributedString", "setPlaceholderAttributedString:")] public NSAttributedString? PlaceholderAttributedString { get; set; }
-    [Selector("backgroundColor", "setBackgroundColor:")] public NSColor? BackgroundColor { get; set; }
-    [Selector("drawsBackground", "setDrawsBackground:")] public bool DrawsBackground { get; set; }
-    [Selector("textColor", "setTextColor:")] public NSColor? TextColor { get; set; }
-    [Selector("isBordered", "setBordered:")] public bool Bordered { get; set; }
-    [Selector("isBezeled", "setBezeled:")] public bool Bezeled { get; set; }
-    [Selector("isEditable", "setEditable:")] public bool Editable { get; set; }
-    [Selector("isSelectable", "setSelectable:")] public bool Selectable { get; set; }
-    [Selector("delegate", "setDelegate:")] public NSTextFieldDelegate? Delegate { get; set; }
-    [Selector("acceptsFirstResponder")] public bool AcceptsFirstResponder { get; }
-    [Selector("bezelStyle", "setBezelStyle:")] public NSTextFieldBezelStyle BezelStyle { get; set; }
-    [Selector("preferredMaxLayoutWidth", "setPreferredMaxLayoutWidth:")] public CGFloat PreferredMaxLayoutWidth { get; set; }
-    [Selector("maximumNumberOfLines", "setMaximumNumberOfLines:")] public NSInteger MaximumNumberOfLines { get; set; }
-    [Selector("allowsDefaultTighteningForTruncation", "setAllowsDefaultTighteningForTruncation:")] public bool AllowsDefaultTighteningForTruncation { get; set; }
-    [Selector("lineBreakStrategy", "setLineBreakStrategy:")] public NSLineBreakStrategy LineBreakStrategy { get; set; }
+    [Selector("placeholderString", "setPlaceholderString:")]
+    public NSString? PlaceholderString { get; set; }
+    [Selector("placeholderAttributedString", "setPlaceholderAttributedString:")]
+    public NSAttributedString? PlaceholderAttributedString { get; set; }
+    [Selector("backgroundColor", "setBackgroundColor:")]
+    public NSColor? BackgroundColor { get; set; }
+    [Selector("drawsBackground", "setDrawsBackground:")]
+    public bool DrawsBackground { get; set; }
+    [Selector("textColor", "setTextColor:")]
+    public NSColor? TextColor { get; set; }
+    [Selector("isBordered", "setBordered:")]
+    public bool Bordered { get; set; }
+    [Selector("isBezeled", "setBezeled:")]
+    public bool Bezeled { get; set; }
+    [Selector("isEditable", "setEditable:")]
+    public bool Editable { get; set; }
+    [Selector("isSelectable", "setSelectable:")]
+    public bool Selectable { get; set; }
+    [Selector("delegate", "setDelegate:")]
+    public NSTextFieldDelegate? Delegate { get; set; }
+    [Selector("acceptsFirstResponder")]
+    public bool AcceptsFirstResponder { get; }
+    [Selector("bezelStyle", "setBezelStyle:")]
+    public NSTextFieldBezelStyle BezelStyle { get; set; }
+    [Selector("preferredMaxLayoutWidth", "setPreferredMaxLayoutWidth:")]
+    public CGFloat PreferredMaxLayoutWidth { get; set; }
+    [Selector("maximumNumberOfLines", "setMaximumNumberOfLines:")]
+    public NSInteger MaximumNumberOfLines { get; set; }
+    [Selector("allowsDefaultTighteningForTruncation", "setAllowsDefaultTighteningForTruncation:")]
+    public bool AllowsDefaultTighteningForTruncation { get; set; }
+    [Selector("lineBreakStrategy", "setLineBreakStrategy:")]
+    public NSLineBreakStrategy LineBreakStrategy { get; set; }
     /// macOS 15.2 and later.
-    [Selector("allowsWritingTools", "setAllowsWritingTools:")] public bool AllowsWritingTools { get; set; }
+    [Selector("allowsWritingTools", "setAllowsWritingTools:")]
+    public bool AllowsWritingTools { get; set; }
     /// macOS 15.4 and later.
-    [Selector("allowsWritingToolsAffordance", "setAllowsWritingToolsAffordance:")] public bool AllowsWritingToolsAffordance { get; set; }
+    [Selector("allowsWritingToolsAffordance", "setAllowsWritingToolsAffordance:")]
+    public bool AllowsWritingToolsAffordance { get; set; }
     /// macOS 26.0 and later.
-    [Selector("placeholderStrings", "setPlaceholderStrings:")] public NSArray? PlaceholderStrings { get; set; }
+    [Selector("placeholderStrings", "setPlaceholderStrings:")]
+    public NSArray? PlaceholderStrings { get; set; }
     /// macOS 26.0 and later.
-    [Selector("placeholderAttributedStrings", "setPlaceholderAttributedStrings:")] public NSArray? PlaceholderAttributedStrings { get; set; }
+    [Selector("placeholderAttributedStrings", "setPlaceholderAttributedStrings:")]
+    public NSArray? PlaceholderAttributedStrings { get; set; }
     /// macOS 26.0 and later.
-    [Selector("resolvesNaturalAlignmentWithBaseWritingDirection", "setResolvesNaturalAlignmentWithBaseWritingDirection:")] public bool ResolvesNaturalAlignmentWithBaseWritingDirection { get; set; }
-    [Selector("selectText:")] public void SelectText(AnyObject? sender);
-    [Selector("textShouldBeginEditing:")] public bool TextShouldBeginEditing(NSText textObject);
-    [Selector("textShouldEndEditing:")] public bool TextShouldEndEditing(NSText textObject);
-    [Selector("textDidBeginEditing:")] public void TextDidBeginEditing(NSNotification notification);
-    [Selector("textDidEndEditing:")] public void TextDidEndEditing(NSNotification notification);
-    [Selector("textDidChange:")] public void TextDidChange(NSNotification notification);
+    [Selector("resolvesNaturalAlignmentWithBaseWritingDirection", "setResolvesNaturalAlignmentWithBaseWritingDirection:")]
+    public bool ResolvesNaturalAlignmentWithBaseWritingDirection { get; set; }
+    [Selector("selectText:")]
+    public void SelectText(AnyObject? sender);
+    [Selector("textShouldBeginEditing:")]
+    public bool TextShouldBeginEditing(NSText textObject);
+    [Selector("textShouldEndEditing:")]
+    public bool TextShouldEndEditing(NSText textObject);
+    [Selector("textDidBeginEditing:")]
+    public void TextDidBeginEditing(NSNotification notification);
+    [Selector("textDidEndEditing:")]
+    public void TextDidEndEditing(NSNotification notification);
+    [Selector("textDidChange:")]
+    public void TextDidChange(NSNotification notification);
 }
 
 /// NSTouchBar, a category of NSTextField.
 public extern objc class NSTextField
 {
-    [Selector("isAutomaticTextCompletionEnabled", "setAutomaticTextCompletionEnabled:")] public bool AutomaticTextCompletionEnabled { get; set; }
-    [Selector("allowsCharacterPickerTouchBarItem", "setAllowsCharacterPickerTouchBarItem:")] public bool AllowsCharacterPickerTouchBarItem { get; set; }
+    [Selector("isAutomaticTextCompletionEnabled", "setAutomaticTextCompletionEnabled:")]
+    public bool AutomaticTextCompletionEnabled { get; set; }
+    [Selector("allowsCharacterPickerTouchBarItem", "setAllowsCharacterPickerTouchBarItem:")]
+    public bool AllowsCharacterPickerTouchBarItem { get; set; }
 }
 
 /// NSTextFieldConvenience, a category of NSTextField.
 public extern objc class NSTextField
 {
-    [Selector("labelWithString:")] public static Self LabelWithString(NSString stringValue);
-    [Selector("wrappingLabelWithString:")] public static Self WrappingLabelWithString(NSString stringValue);
-    [Selector("labelWithAttributedString:")] public static Self LabelWithAttributedString(NSAttributedString attributedStringValue);
-    [Selector("textFieldWithString:")] public static Self TextFieldWithString(NSString stringValue);
+    [Selector("labelWithString:")]
+    public static Self LabelWithString(NSString stringValue);
+    [Selector("wrappingLabelWithString:")]
+    public static Self WrappingLabelWithString(NSString stringValue);
+    [Selector("labelWithAttributedString:")]
+    public static Self LabelWithAttributedString(NSAttributedString attributedStringValue);
+    [Selector("textFieldWithString:")]
+    public static Self TextFieldWithString(NSString stringValue);
 }
 
 /// NSTextFieldAttributedStringMethods, a category of NSTextField.
 public extern objc class NSTextField
 {
-    [Selector("allowsEditingTextAttributes", "setAllowsEditingTextAttributes:")] public bool AllowsEditingTextAttributes { get; set; }
-    [Selector("importsGraphics", "setImportsGraphics:")] public bool ImportsGraphics { get; set; }
+    [Selector("allowsEditingTextAttributes", "setAllowsEditingTextAttributes:")]
+    public bool AllowsEditingTextAttributes { get; set; }
+    [Selector("importsGraphics", "setImportsGraphics:")]
+    public bool ImportsGraphics { get; set; }
 }
 
 public objc interface NSTextFieldDelegate : NSControlTextEditingDelegate
 {
-    [Optional] [Selector("textField:textView:candidatesForSelectedRange:")] NSArray? TextFieldTextViewCandidatesForSelectedRange(NSTextField textField, NSTextView textView, NSRange selectedRange);
-    [Optional] [Selector("textField:textView:candidates:forSelectedRange:")] NSArray TextFieldTextViewCandidatesForSelectedRange(NSTextField textField, NSTextView textView, NSArray candidates, NSRange selectedRange);
-    [Optional] [Selector("textField:textView:shouldSelectCandidateAtIndex:")] bool TextFieldTextViewShouldSelectCandidateAtIndex(NSTextField textField, NSTextView textView, NSUInteger index);
+    [Optional]
+    [Selector("textField:textView:candidatesForSelectedRange:")]
+    NSArray? TextFieldTextViewCandidatesForSelectedRange(NSTextField textField, NSTextView textView, NSRange selectedRange);
+    [Optional]
+    [Selector("textField:textView:candidates:forSelectedRange:")]
+    NSArray TextFieldTextViewCandidatesForSelectedRange(NSTextField textField, NSTextView textView, NSArray candidates, NSRange selectedRange);
+    [Optional]
+    [Selector("textField:textView:shouldSelectCandidateAtIndex:")]
+    bool TextFieldTextViewShouldSelectCandidateAtIndex(NSTextField textField, NSTextView textView, NSUInteger index);
 }
 
 /// NSDeprecated, a category of NSTextField.
 public extern objc class NSTextField
 {
     /// Deprecated in macOS 10.8.
-    [Selector("setTitleWithMnemonic:")] public void SetTitleWithMnemonic(NSString? stringWithAmpersand);
+    [Selector("setTitleWithMnemonic:")]
+    public void SetTitleWithMnemonic(NSString? stringWithAmpersand);
 }
 
 #endif

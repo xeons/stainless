@@ -33,9 +33,12 @@ import Standard.ObjC;
 
 public extern objc class MLNumericConstraint : NSObject, NSSecureCoding
 {
-    [Selector("minNumber")] public NSNumber MinNumber { get; }
-    [Selector("maxNumber")] public NSNumber MaxNumber { get; }
-    [Selector("enumeratedNumbers")] public NSSet? EnumeratedNumbers { get; }
+    [Selector("minNumber")]
+    public NSNumber MinNumber { get; }
+    [Selector("maxNumber")]
+    public NSNumber MaxNumber { get; }
+    [Selector("enumeratedNumbers")]
+    public NSSet? EnumeratedNumbers { get; }
 }
 
 #endif

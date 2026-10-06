@@ -46,57 +46,75 @@ public objc closure void MTRSubscriptionEstablishedHandler();
 
 public extern objc class MTRCluster : NSObject
 {
-    [Selector("endpointID")] public NSNumber? EndpointID { get; }
+    [Selector("endpointID")]
+    public NSNumber? EndpointID { get; }
 }
 
 public extern objc class MTRGenericBaseCluster : MTRCluster { }
 
 public extern objc class MTRGenericCluster : MTRCluster
 {
-    [Selector("device")] public MTRDevice Device { get; }
+    [Selector("device")]
+    public MTRDevice Device { get; }
 }
 
 public extern objc class MTRWriteParams : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("timedWriteTimeout", "setTimedWriteTimeout:")] public NSNumber? TimedWriteTimeout { get; set; }
-    [Selector("dataVersion", "setDataVersion:")] public NSNumber? DataVersion { get; set; }
+    [Selector("timedWriteTimeout", "setTimedWriteTimeout:")]
+    public NSNumber? TimedWriteTimeout { get; set; }
+    [Selector("dataVersion", "setDataVersion:")]
+    public NSNumber? DataVersion { get; set; }
 }
 
 public extern objc class MTRReadParams : NSObject, NSCopying, NSSecureCoding
 {
-    [Selector("shouldFilterByFabric", "setFilterByFabric:")] public bool FilterByFabric { get; set; }
-    [Selector("minEventNumber", "setMinEventNumber:")] public NSNumber? MinEventNumber { get; set; }
-    [Selector("shouldAssumeUnknownAttributesReportable", "setAssumeUnknownAttributesReportable:")] public bool AssumeUnknownAttributesReportable { get; set; }
+    [Selector("shouldFilterByFabric", "setFilterByFabric:")]
+    public bool FilterByFabric { get; set; }
+    [Selector("minEventNumber", "setMinEventNumber:")]
+    public NSNumber? MinEventNumber { get; set; }
+    [Selector("shouldAssumeUnknownAttributesReportable", "setAssumeUnknownAttributesReportable:")]
+    public bool AssumeUnknownAttributesReportable { get; set; }
 }
 
 public extern objc class MTRSubscribeParams : MTRReadParams, NSCopying, NSSecureCoding
 {
-    [Selector("shouldReplaceExistingSubscriptions", "setReplaceExistingSubscriptions:")] public bool ReplaceExistingSubscriptions { get; set; }
-    [Selector("shouldResubscribeAutomatically", "setResubscribeAutomatically:")] public bool ResubscribeAutomatically { get; set; }
-    [Selector("minInterval", "setMinInterval:")] public NSNumber MinInterval { get; set; }
-    [Selector("maxInterval", "setMaxInterval:")] public NSNumber MaxInterval { get; set; }
-    [Selector("shouldReportEventsUrgently", "setReportEventsUrgently:")] public bool ReportEventsUrgently { get; set; }
-    [Selector("initWithMinInterval:maxInterval:")] public Self InitWithMinIntervalMaxInterval(NSNumber minInterval, NSNumber maxInterval);
+    [Selector("shouldReplaceExistingSubscriptions", "setReplaceExistingSubscriptions:")]
+    public bool ReplaceExistingSubscriptions { get; set; }
+    [Selector("shouldResubscribeAutomatically", "setResubscribeAutomatically:")]
+    public bool ResubscribeAutomatically { get; set; }
+    [Selector("minInterval", "setMinInterval:")]
+    public NSNumber MinInterval { get; set; }
+    [Selector("maxInterval", "setMaxInterval:")]
+    public NSNumber MaxInterval { get; set; }
+    [Selector("shouldReportEventsUrgently", "setReportEventsUrgently:")]
+    public bool ReportEventsUrgently { get; set; }
+    [Selector("initWithMinInterval:maxInterval:")]
+    public Self InitWithMinIntervalMaxInterval(NSNumber minInterval, NSNumber maxInterval);
 }
 
 /// Deprecated, a category of MTRReadParams.
 public extern objc class MTRReadParams
 {
     /// Deprecated in macOS 13.3.
-    [Selector("fabricFiltered", "setFabricFiltered:")] public NSNumber? FabricFiltered { get; set; }
+    [Selector("fabricFiltered", "setFabricFiltered:")]
+    public NSNumber? FabricFiltered { get; set; }
 }
 
 /// Deprecated, a category of MTRSubscribeParams.
 public extern objc class MTRSubscribeParams
 {
     /// Deprecated in macOS 13.3.
-    [Selector("keepPreviousSubscriptions", "setKeepPreviousSubscriptions:")] public NSNumber? KeepPreviousSubscriptions { get; set; }
+    [Selector("keepPreviousSubscriptions", "setKeepPreviousSubscriptions:")]
+    public NSNumber? KeepPreviousSubscriptions { get; set; }
     /// Deprecated in macOS 13.3.
-    [Selector("autoResubscribe", "setAutoResubscribe:")] public NSNumber? AutoResubscribe { get; set; }
+    [Selector("autoResubscribe", "setAutoResubscribe:")]
+    public NSNumber? AutoResubscribe { get; set; }
     /// Deprecated in macOS 13.3.
-    [Selector("init")] public Self Init();
+    [Selector("init")]
+    public Self Init();
     /// Deprecated in macOS 13.3.
-    [Selector("new")] public static Self New();
+    [Selector("new")]
+    public static Self New();
 }
 
 #endif

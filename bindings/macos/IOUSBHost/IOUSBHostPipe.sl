@@ -34,31 +34,54 @@ import Standard.ObjC;
 
 public extern objc class IOUSBHostPipe : IOUSBHostIOSource
 {
-    [Selector("originalDescriptors")] public IOUSBHostIOSourceDescriptors* OriginalDescriptors { get; }
-    [Selector("descriptors")] public IOUSBHostIOSourceDescriptors* Descriptors { get; }
-    [Selector("idleTimeout")] public NSTimeInterval IdleTimeout { get; }
-    [Selector("adjustPipeWithDescriptors:error:")] public bool AdjustPipeWithDescriptorsError(IOUSBHostIOSourceDescriptors* descriptors, out NSError? error);
-    [Selector("setIdleTimeout:error:")] public bool SetIdleTimeoutError(NSTimeInterval idleTimeout, out NSError? error);
-    [Selector("clearStallWithError:")] public bool ClearStallWithError(out NSError? error);
-    [Selector("sendControlRequest:data:bytesTransferred:completionTimeout:error:")] public bool SendControlRequestDataBytesTransferredCompletionTimeoutError(IOUSBDeviceRequest request, NSMutableData? data, NSUInteger* bytesTransferred, NSTimeInterval completionTimeout, out NSError? error);
-    [Selector("sendControlRequest:data:bytesTransferred:error:")] public bool SendControlRequestDataBytesTransferredError(IOUSBDeviceRequest request, NSMutableData? data, NSUInteger* bytesTransferred, out NSError? error);
-    [Selector("sendControlRequest:error:")] public bool SendControlRequestError(IOUSBDeviceRequest request, out NSError? error);
-    [Selector("enqueueControlRequest:data:completionTimeout:error:completionHandler:")] public bool EnqueueControlRequestDataCompletionTimeoutErrorCompletionHandler(IOUSBDeviceRequest request, NSMutableData? data, NSTimeInterval completionTimeout, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
-    [Selector("enqueueControlRequest:data:error:completionHandler:")] public bool EnqueueControlRequestDataErrorCompletionHandler(IOUSBDeviceRequest request, NSMutableData? data, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
-    [Selector("enqueueControlRequest:error:completionHandler:")] public bool EnqueueControlRequestErrorCompletionHandler(IOUSBDeviceRequest request, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
-    [Selector("abortWithOption:error:")] public bool AbortWithOptionError(IOUSBHostAbortOption option, out NSError? error);
-    [Selector("abortWithError:")] public bool AbortWithError(out NSError? error);
-    [Selector("sendIORequestWithData:bytesTransferred:completionTimeout:error:")] public bool SendIORequestWithDataBytesTransferredCompletionTimeoutError(NSMutableData? data, NSUInteger* bytesTransferred, NSTimeInterval completionTimeout, out NSError? error);
-    [Selector("enqueueIORequestWithData:completionTimeout:error:completionHandler:")] public bool EnqueueIORequestWithDataCompletionTimeoutErrorCompletionHandler(NSMutableData? data, NSTimeInterval completionTimeout, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
+    [Selector("originalDescriptors")]
+    public IOUSBHostIOSourceDescriptors* OriginalDescriptors { get; }
+    [Selector("descriptors")]
+    public IOUSBHostIOSourceDescriptors* Descriptors { get; }
+    [Selector("idleTimeout")]
+    public NSTimeInterval IdleTimeout { get; }
+    [Selector("adjustPipeWithDescriptors:error:")]
+    public bool AdjustPipeWithDescriptorsError(IOUSBHostIOSourceDescriptors* descriptors, out NSError? error);
+    [Selector("setIdleTimeout:error:")]
+    public bool SetIdleTimeoutError(NSTimeInterval idleTimeout, out NSError? error);
+    [Selector("clearStallWithError:")]
+    public bool ClearStallWithError(out NSError? error);
+    [Selector("sendControlRequest:data:bytesTransferred:completionTimeout:error:")]
+    public bool SendControlRequestDataBytesTransferredCompletionTimeoutError(IOUSBDeviceRequest request, NSMutableData? data, NSUInteger* bytesTransferred, NSTimeInterval completionTimeout, out NSError? error);
+    [Selector("sendControlRequest:data:bytesTransferred:error:")]
+    public bool SendControlRequestDataBytesTransferredError(IOUSBDeviceRequest request, NSMutableData? data, NSUInteger* bytesTransferred, out NSError? error);
+    [Selector("sendControlRequest:error:")]
+    public bool SendControlRequestError(IOUSBDeviceRequest request, out NSError? error);
+    [Selector("enqueueControlRequest:data:completionTimeout:error:completionHandler:")]
+    public bool EnqueueControlRequestDataCompletionTimeoutErrorCompletionHandler(IOUSBDeviceRequest request, NSMutableData? data, NSTimeInterval completionTimeout, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
+    [Selector("enqueueControlRequest:data:error:completionHandler:")]
+    public bool EnqueueControlRequestDataErrorCompletionHandler(IOUSBDeviceRequest request, NSMutableData? data, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
+    [Selector("enqueueControlRequest:error:completionHandler:")]
+    public bool EnqueueControlRequestErrorCompletionHandler(IOUSBDeviceRequest request, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
+    [Selector("abortWithOption:error:")]
+    public bool AbortWithOptionError(IOUSBHostAbortOption option, out NSError? error);
+    [Selector("abortWithError:")]
+    public bool AbortWithError(out NSError? error);
+    [Selector("sendIORequestWithData:bytesTransferred:completionTimeout:error:")]
+    public bool SendIORequestWithDataBytesTransferredCompletionTimeoutError(NSMutableData? data, NSUInteger* bytesTransferred, NSTimeInterval completionTimeout, out NSError? error);
+    [Selector("enqueueIORequestWithData:completionTimeout:error:completionHandler:")]
+    public bool EnqueueIORequestWithDataCompletionTimeoutErrorCompletionHandler(NSMutableData? data, NSTimeInterval completionTimeout, out NSError? error, IOUSBHostCompletionHandler? completionHandler);
     /// Deprecated in macOS 100000.
-    [Selector("sendIORequestWithData:frameList:frameListCount:firstFrameNumber:error:")] public bool SendIORequestWithDataFrameListFrameListCountFirstFrameNumberError(NSMutableData data, IOUSBHostIsochronousFrame* frameList, NSUInteger frameListCount, ulong firstFrameNumber, out NSError? error);
+    [Selector("sendIORequestWithData:frameList:frameListCount:firstFrameNumber:error:")]
+    public bool SendIORequestWithDataFrameListFrameListCountFirstFrameNumberError(NSMutableData data, IOUSBHostIsochronousFrame* frameList, NSUInteger frameListCount, ulong firstFrameNumber, out NSError? error);
     /// Deprecated in macOS 100000.
-    [Selector("enqueueIORequestWithData:frameList:frameListCount:firstFrameNumber:error:completionHandler:")] public bool EnqueueIORequestWithDataFrameListFrameListCountFirstFrameNumberErrorCompletionHandler(NSMutableData data, IOUSBHostIsochronousFrame* frameList, NSUInteger frameListCount, ulong firstFrameNumber, out NSError? error, IOUSBHostIsochronousCompletionHandler? completionHandler);
-    [Selector("sendIORequestWithData:transactionList:transactionListCount:firstFrameNumber:options:error:")] public bool SendIORequestWithDataTransactionListTransactionListCountFirstFrameNumberOptionsError(NSMutableData data, IOUSBHostIsochronousTransaction* transactionList, NSUInteger transactionListCount, ulong firstFrameNumber, IOUSBHostIsochronousTransferOptions options, out NSError? error);
-    [Selector("enqueueIORequestWithData:transactionList:transactionListCount:firstFrameNumber:options:error:completionHandler:")] public bool EnqueueIORequestWithDataTransactionListTransactionListCountFirstFrameNumberOptionsErrorCompletionHandler(NSMutableData data, IOUSBHostIsochronousTransaction* transactionList, NSUInteger transactionListCount, ulong firstFrameNumber, IOUSBHostIsochronousTransferOptions options, out NSError? error, IOUSBHostIsochronousTransactionCompletionHandler? completionHandler);
-    [Selector("enableStreamsWithError:")] public bool EnableStreamsWithError(out NSError? error);
-    [Selector("disableStreamsWithError:")] public bool DisableStreamsWithError(out NSError? error);
-    [Selector("copyStreamWithStreamID:error:")] public IOUSBHostStream? CopyStreamWithStreamIDError(NSUInteger streamID, out NSError? error);
+    [Selector("enqueueIORequestWithData:frameList:frameListCount:firstFrameNumber:error:completionHandler:")]
+    public bool EnqueueIORequestWithDataFrameListFrameListCountFirstFrameNumberErrorCompletionHandler(NSMutableData data, IOUSBHostIsochronousFrame* frameList, NSUInteger frameListCount, ulong firstFrameNumber, out NSError? error, IOUSBHostIsochronousCompletionHandler? completionHandler);
+    [Selector("sendIORequestWithData:transactionList:transactionListCount:firstFrameNumber:options:error:")]
+    public bool SendIORequestWithDataTransactionListTransactionListCountFirstFrameNumberOptionsError(NSMutableData data, IOUSBHostIsochronousTransaction* transactionList, NSUInteger transactionListCount, ulong firstFrameNumber, IOUSBHostIsochronousTransferOptions options, out NSError? error);
+    [Selector("enqueueIORequestWithData:transactionList:transactionListCount:firstFrameNumber:options:error:completionHandler:")]
+    public bool EnqueueIORequestWithDataTransactionListTransactionListCountFirstFrameNumberOptionsErrorCompletionHandler(NSMutableData data, IOUSBHostIsochronousTransaction* transactionList, NSUInteger transactionListCount, ulong firstFrameNumber, IOUSBHostIsochronousTransferOptions options, out NSError? error, IOUSBHostIsochronousTransactionCompletionHandler? completionHandler);
+    [Selector("enableStreamsWithError:")]
+    public bool EnableStreamsWithError(out NSError? error);
+    [Selector("disableStreamsWithError:")]
+    public bool DisableStreamsWithError(out NSError? error);
+    [Selector("copyStreamWithStreamID:error:")]
+    public IOUSBHostStream? CopyStreamWithStreamIDError(NSUInteger streamID, out NSError? error);
 }
 
 #endif

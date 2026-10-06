@@ -45,35 +45,54 @@ public extern objc class GLKMeshBufferAllocator : NSObject, MDLMeshBufferAllocat
 /// Deprecated in macOS 10.14.
 public extern objc class GLKMeshBuffer : NSObject, MDLMeshBuffer
 {
-    [Selector("length")] public NSUInteger Length { get; }
-    [Selector("allocator")] public GLKMeshBufferAllocator Allocator { get; }
-    [Selector("glBufferName")] public GLuint GlBufferName { get; }
-    [Selector("offset")] public NSUInteger Offset { get; }
-    [Selector("zone")] public MDLMeshBufferZone? Zone { get; }
-    [Selector("type")] public MDLMeshBufferType Type { get; }
+    [Selector("length")]
+    public NSUInteger Length { get; }
+    [Selector("allocator")]
+    public GLKMeshBufferAllocator Allocator { get; }
+    [Selector("glBufferName")]
+    public GLuint GlBufferName { get; }
+    [Selector("offset")]
+    public NSUInteger Offset { get; }
+    [Selector("zone")]
+    public MDLMeshBufferZone? Zone { get; }
+    [Selector("type")]
+    public MDLMeshBufferType Type { get; }
 }
 
 /// Deprecated in macOS 10.14.
 public extern objc class GLKSubmesh : NSObject
 {
-    [Selector("type")] public GLenum Type { get; }
-    [Selector("mode")] public GLenum Mode { get; }
-    [Selector("elementCount")] public GLsizei ElementCount { get; }
-    [Selector("elementBuffer")] public GLKMeshBuffer ElementBuffer { get; }
-    [Selector("mesh")] public GLKMesh? Mesh { get; }
-    [Selector("name")] public NSString Name { get; }
+    [Selector("type")]
+    public GLenum Type { get; }
+    [Selector("mode")]
+    public GLenum Mode { get; }
+    [Selector("elementCount")]
+    public GLsizei ElementCount { get; }
+    [Selector("elementBuffer")]
+    public GLKMeshBuffer ElementBuffer { get; }
+    [Selector("mesh")]
+    public GLKMesh? Mesh { get; }
+    [Selector("name")]
+    public NSString Name { get; }
 }
 
 /// Deprecated in macOS 10.14.
 public extern objc class GLKMesh : NSObject
 {
-    [Selector("vertexCount")] public NSUInteger VertexCount { get; }
-    [Selector("vertexBuffers")] public NSArray VertexBuffers { get; }
-    [Selector("vertexDescriptor")] public MDLVertexDescriptor VertexDescriptor { get; }
-    [Selector("submeshes")] public NSArray Submeshes { get; }
-    [Selector("name")] public NSString Name { get; }
-    [Selector("initWithMesh:error:")] public Self? InitWithMeshError(MDLMesh mesh, out NSError? error);
-    [Selector("newMeshesFromAsset:sourceMeshes:error:")] public static NSArray? NewMeshesFromAssetSourceMeshesError(MDLAsset asset, out NSArray? sourceMeshes, out NSError? error);
+    [Selector("vertexCount")]
+    public NSUInteger VertexCount { get; }
+    [Selector("vertexBuffers")]
+    public NSArray VertexBuffers { get; }
+    [Selector("vertexDescriptor")]
+    public MDLVertexDescriptor VertexDescriptor { get; }
+    [Selector("submeshes")]
+    public NSArray Submeshes { get; }
+    [Selector("name")]
+    public NSString Name { get; }
+    [Selector("initWithMesh:error:")]
+    public Self? InitWithMeshError(MDLMesh mesh, out NSError? error);
+    [Selector("newMeshesFromAsset:sourceMeshes:error:")]
+    public static NSArray? NewMeshesFromAssetSourceMeshesError(MDLAsset asset, out NSArray? sourceMeshes, out NSError? error);
 }
 
 public struct _GLKVertexAttributeParameters

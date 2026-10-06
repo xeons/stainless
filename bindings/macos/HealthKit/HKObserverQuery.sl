@@ -38,8 +38,10 @@ public objc closure void HKObserverQueryInitWithQueryDescriptorsUpdateHandlerUpd
 
 public extern objc class HKObserverQuery : HKQuery
 {
-    [Selector("initWithSampleType:predicate:updateHandler:")] public Self InitWithSampleTypePredicateUpdateHandler(HKSampleType sampleType, NSPredicate? predicate, HKObserverQueryInitWithSampleTypePredicateUpdateHandlerUpdateHandlerBlock updateHandler);
-    [Selector("initWithQueryDescriptors:updateHandler:")] public Self InitWithQueryDescriptorsUpdateHandler(NSArray queryDescriptors, HKObserverQueryInitWithQueryDescriptorsUpdateHandlerUpdateHandlerBlock updateHandler);
+    [Selector("initWithSampleType:predicate:updateHandler:")]
+    public Self InitWithSampleTypePredicateUpdateHandler(HKSampleType sampleType, NSPredicate? predicate, HKObserverQueryInitWithSampleTypePredicateUpdateHandlerUpdateHandlerBlock updateHandler);
+    [Selector("initWithQueryDescriptors:updateHandler:")]
+    public Self InitWithQueryDescriptorsUpdateHandler(NSArray queryDescriptors, HKObserverQueryInitWithQueryDescriptorsUpdateHandlerUpdateHandlerBlock updateHandler);
 }
 
 #endif
